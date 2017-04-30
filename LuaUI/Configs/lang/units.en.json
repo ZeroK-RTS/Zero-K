@@ -34,12 +34,12 @@
 		"description" : "Produces Tactical Missiles, Builds at 10 m/s",
 		"helptext" : "The Missile Silo constructs and holds up to four different cruise missiles, each with a unique warhead. It offers excellent standoff strike capability for offensive and defensive purposes."
 	},
-	"armflea" : {
+	"spiderscout" : {
 		"name" : "Flea",
 		"description" : "Ultralight Scout Spider (Burrows)",
 		"helptext" : "The Flea can hide in inaccessible locations where its sophisticated sensor suite allows it to see further than it can be seen. It can be used in small groups to effectively raid mexes early on, and in maps with tall cliffs can attack from unexpected angles. It does very little damage and dies to any form of opposition."
 	},
-	"armfus" : {
+	"energyfusion" : {
 		"name" : "Fusion Reactor",
 		"description" : "Medium Powerplant (+35)",
 		"helptext" : "Fusion reactors provide a good amount of steady energy output at a fair price. They are attractive targets and not very well-armored, so keep them well-protected. When killed, fusion reactors will cause heavy damage to nearby units."
@@ -144,7 +144,7 @@
 		"description" : "Morphs Into Chicken Structures",
 		"helptext" : "A hapless non-combat organism whose sole purpose in life is to morph into one of the Chicken Hive's structures."
 	},
-	"armjamt" : {
+	"staticjammer" : {
 		"name" : "Sneaky Pete",
 		"description" : "Area Cloaker/Jammer",
 		"helptext" : "Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. Sneaky Pete is also equipped with a cloak shield to hide nearby units from enemy sight."
@@ -174,7 +174,7 @@
 		"description" : "Anti-Air Hovercraft",
 		"helptext" : "The Flail launches a single large, short-medium range SAM that does heavy damage."
 	},
-	"armham" : {
+	"cloakarty" : {
 		"name" : "Hammer",
 		"description" : "Light Artillery Bot",
 		"helptext" : "The Hammer has a long range plasma cannon that allows indirect fire over obstacles, and outranges static defenses up to heavy laser towers. Although effective versus mobile units, it should be guarded in order to prevent raiders and other fast units from closing range."
@@ -199,7 +199,7 @@
 		"description" : "Planetary Energy Chisel",
 		"helptext" : "This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases."
 	},
-	"armcrabe" : {
+	"spidercrabe" : {
 		"name" : "Crabe",
 		"description" : "Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary",
 		"helptext" : "The Crabe's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crabe curls up into armored form reducing incoming damage to a third. The Crabe's main weakness is its lack of mobility."
@@ -209,7 +209,7 @@
 		"description" : "Scout/Suicide Minisub",
 		"helptext" : "The Lancelet is basically a large smart torpedo with scouting functionality. It can remain hidden in the depths to observe enemy movements, then detonate its explosive charge to sink unwary ships."
 	},
-	"armmstor" : {
+	"staticstorage" : {
 		"name" : "Storage",
 		"description" : "Stores Metal and Energy (500)",
 		"helptext" : "Storages act as a buffer when one expects a big influx of metal, such as reclaiming a vast wreckage field. However, longer periods of increased metal income are better dealt with by acquiring more buildpower."
@@ -324,7 +324,7 @@
 		"description" : "Large Powerplant (+100) - HAZARDOUS",
 		"helptext" : "The Advanced Geothermal Powerplant produces a massive amount of energy. It requires protection, though, as destroying it results in a devastating explosion."
 	},
-	"armnanotc" : {
+	"staticcon" : {
 		"name" : "Caretaker",
 		"description" : "Static Constructor, Builds at 10 m/s",
 		"helptext" : "The most cost-effective source of buildpower, the Caretaker is ideal for increasing the output of factories or automatically repairing nearby defenses. It cannot start any construction projects itself, however."
@@ -339,7 +339,7 @@
 		"description" : "Flying Spike Spitter",
 		"helptext" : "It's a flying chicken! The Talon is a lethal predator that takes down enemy aircraft with its spikes, but will also happily employ them on ground targets. It can be defeated like any other air unit, however."
 	},
-	"armestor" : {
+	"energypylon" : {
 		"name" : "Energy Pylon",
 		"description" : "Extends overdrive grid",
 		"helptext" : "Energy Transmission Pylons help extend energy grids and connect more Extractors or energy sources. This in turn helps Extractors overdrive, producing more metal. Pylons can also provide a fast way to power defenses that rely on the energy grid. Note that over short distances or in low-energy situations using energy producers like solar collectors to connect grids can be a more cost efficient alternative."
@@ -359,7 +359,7 @@
 		"description" : "Chicken Bomb",
 		"helptext" : "The Dodo's body contains a volatile mixture of organic explosives. At the slightest provocation, it explodes spectacularly, with the resulting shockwave throwing nearby units into the air. Beware as its flying limbs and spikes will do residual damage."
 	},
-	"armcybr" : {
+	"bomberheavy" : {
 		"name" : "Wyvern",
 		"description" : "Singularity Bomber",
 		"helptext" : "The Wyvern drops a single powerful bomb that can send units flying. It is sturdy enough to penetrate moderate AA and escape to repair, but should not be used recklessly - it's too expensive for that."
@@ -439,7 +439,7 @@
 		"description" : "All-Terrain Spores (Anti-Air/Skirm)",
 		"helptext" : "The Sporeshooter shoots spores to drop aircraft and hit land targets from a distance. Can climb walls for surprise attacks."
 	},
-	"armcir" : {
+	"turretaafar" : {
 		"name" : "Chainsaw",
 		"description" : "Long-Range Anti-Air Missile Battery",
 		"helptext" : "The Chainsaw is a long range anti-air turret, dealing out massive damage, able to knock bombers out of the sky very quickly. It can't take very much damage in return, though, and does poorly when attacked directly."
@@ -489,7 +489,7 @@
 		"description" : "Artillery Minelayer Vehicle",
 		"helptext" : "The Wolverine lays mines which are fairly effective but have a limited lifespan from a distance (rather haphazardly). The Wolverine outranges most defenses comfortably, but is lightly armored and cannot flee easily so keep it screened with friendly units, possibly assisted by your own mines."
 	},
-	"armcomdgun" : {
+	"striderantiheavy" : {
 		"name" : "Ultimatum",
 		"description" : "Cloaked Anti-Heavy/Anti-Strider Walker",
 		"helptext" : "The Ultimatum packs only one weapon: a disintegrator gun that can vaporize a heavy tank in one blast. It is best used for sneaking up to enemy heavy striders and inflicting serious damage or destruction with a few shots. Defense against it is achieved by screening your heavyweights with lighter units."
@@ -514,7 +514,7 @@
 		"description" : "Amphibious Assault Commander, Builds at 10 m/s",
 		"helptext" : "The Sonic Commander is a well-balanced command platform that can mount most modules and fight on land and underwater alike"
 	},
-	"armmanni" : {
+	"hoverarty" : {
 		"name" : "Penetrator",
 		"description" : "Anti-Heavy Artillery Hovercraft",
 		"helptext" : "The Penetrator's weapon, nicknamed 'the Blue Laser of Death', has the power and accuracy to skewer most units with a single shot. Use it against high armor units, but keep it behind the front lines - it has light armor and can't run from danger."
@@ -644,7 +644,7 @@
 		"description" : "Air Transport",
 		"helptext" : "The Valkyrie is the basic air transport. It is ideal to ferry units to the front or make a drop deep behind enemy lines, but should not be used to land in areas with any kind of AA cover."
 	},
-	"armorco" : {
+	"detriment" : {
 		"name" : "Detriment",
 		"description" : "Ultimate Assault Strider",
 		"helptext" : "The Detriment is the single heaviest strider in the field. It can defend itself against air attacks or use its rockets to hit distant targets, but the real meat lies in the massive gauss guns designed for one purpose - to kill other heavy units quickly and efficiently. Remember - the wise commander sends his Detriment out with adequate escorts against light unit swarms and air assaults."
@@ -669,7 +669,7 @@
 		"description" : "Advanced Battle Drone",
 		"helptext" : "The Viper is an advanced battle drone similar to the Firefly but equipped with a Disruptor Pulse Beam, slowing its targets more with each hit."
 	},
-	"armcsa" : {
+	"athena" : {
 		"name" : "Athena",
 		"description" : "Airborne SpecOps Engineer, Builds at 7.5 m/s",
 		"helptext" : "The Athena is the pinnacle of stealth strike capability. Equipped with a cloaking device and a radar jammer, it can slip through enemy lines to assemble squads of raiders, inflicting havoc on the opposition's logistics. The Athena can also resurrect wrecks on the battlefield, adding them to your army."
@@ -744,7 +744,7 @@
 		"description" : "Early Warning System",
 		"helptext" : "The Radar tower provides early warning of enemy units and their movements over a moderate distance at virtually no cost. It has a very small but steady energy cost and will automatically shut down if you run out of energy. Radar coverage is blocked by terrain such as mountains."
 	},
-	"armdeva" : {
+	"turretriot" : {
 		"name" : "Stardust",
 		"description" : "Anti-Swarm Turret",
 		"helptext" : "The Stardust sports a powerful autocannon. While it has a short range and is thus even more vulnerable to skirmishers than the LLT, its high rate of fire and AoE allow it to quickly chew up swarms of lighter units."
@@ -824,12 +824,12 @@
 		"description" : "Tends the Nest",
 		"helptext" : "The egg-laying brood queen is not quite as fearsome in combat as the other queen, but can in the long run present an even bigger threat. It produces all the different chicken breeds of the Thunderbirds."
 	},
-	"armjeth" : {
+	"cloakaa" : {
 		"name" : "Gremlin",
 		"description" : "Cloaked Anti-Air Bot",
 		"helptext" : "Fast and fairly sturdy for its price, the Gremlin is good budget mobile anti-air. It can cloak, allowing it to provide unexpected anti-air protection or escape ground forces it's defenseless against."
 	},
-	"armmerl" : {
+	"vehheavyarty" : {
 		"name" : "Impaler",
 		"description" : "Precision Artillery Vehicle",
 		"helptext" : "The Impaler fires vertically a high damage, high accuracy kinetic missile at long range. Its high arc makes it able to fire over any obstacle, however that makes the flight time so high that it's useless against moving targets. Use the Impaler to kill specific buildings."
@@ -1204,12 +1204,12 @@
 		"description" : "Amphibious Riot Bot (Anti-Sub)",
 		"helptext" : "A typical riot unit, the Scallop is armed with impact explosives for underwater use and a quadruple shotgun when on land."
 	},
-	"armca" : {
+	"planecon" : {
 		"name" : "Crane",
 		"description" : "Construction Aircraft, Builds at 4 m/s",
 		"helptext" : "The Crane flies quickly over any terrain, but is fragile to any AA. Though it has relatively poor nano power compared to other constructors, it is able to build in many hard to reach places and expand an air players territory in a nonlinear fashion. Due to its mobility, it is ideal for reclaiming wrecks and other repetetitive tasks."
 	},
-	"armkam" : {
+	"gunshipraid" : {
 		"name" : "Banshee",
 		"description" : "Raider Gunship",
 		"helptext" : "The Banshee is a light gunship. Its high speed and decent damage makes it excellent for quickly taking out enemy economy or inaccurate units like assaults. However, it flies close to the ground and has a short range, meaning even other raiders can engage it on an equal footing. Like any raider, the Banshee should avoid riots and static defense."

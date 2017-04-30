@@ -55,7 +55,7 @@ local lastShot = {} -- List of the last targets, to stop target switching
 -- Value is the default state of the command
 local HandledUnitDefIDs = {
 	[UnitDefNames["corrl"].id] = 1,
-	[UnitDefNames["armcir"].id] = 1,
+	[UnitDefNames["turretaafar"].id] = 1,
 	[UnitDefNames["nsaclash"].id] = 1,
 	[UnitDefNames["missiletower"].id] = 1,
 	[UnitDefNames["screamer"].id] = 1,
@@ -82,13 +82,13 @@ local HandledUnitDefIDs = {
 	
 	-- Static only OKP below
 	[UnitDefNames["amphfloater"].id] = 1,
-	[UnitDefNames["armmerl"].id] = 1,
+	[UnitDefNames["vehheavyarty"].id] = 1,
 	[UnitDefNames["corstorm"].id] = 1,
 	[UnitDefNames["corthud"].id] = 1,
 	[UnitDefNames["spiderassault"].id] = 1,
 	[UnitDefNames["armrock"].id] = 1,
 --	[UnitDefNames["shipcarrier"].id] = 1,
-	[UnitDefNames["armorco"].id] = 1,
+	[UnitDefNames["detriment"].id] = 1,
 	[UnitDefNames["shipassault"].id] = 1,
 	[UnitDefNames["shiparty"].id] = 1,
 	
@@ -96,7 +96,7 @@ local HandledUnitDefIDs = {
 	--[UnitDefNames["correap"].id] = 1,
 	--[UnitDefNames["corraid"].id] = 1,
 	--[UnitDefNames["corgol"].id] = 1,
-	--[UnitDefNames["armham"].id] = 1,
+	--[UnitDefNames["cloakarty"].id] = 1,
 }
 
 include("LuaRules/Configs/customcmds.h.lua")

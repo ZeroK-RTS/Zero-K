@@ -34,12 +34,12 @@
         "description": "Buduje rakiety taktyczne, moc 10 m/s",
         "helptext": "Silos rakietowy buduje rakiety taktyczne. Do wyboru jest kilka różnych głowic, co zapewnia świetne możliwości zarówno defensywne, jak i ofensywne. Silos może składować do czterech rakiet."
     },
-    "armflea": {
+    "spiderscout": {
         "name": "Flea",
         "description": "Ultralekki pająk zwiadowczy (zakopuje się)",
         "helptext": "Flea ma duży zasięg widzenia i włącza niewidzialość, gdy stoi nieruchomo, może więc schować się w trudno dostępnych miejscach i obserwować wroga z ukrycia. W małych grupkach dobrze nadaje się do najazdów na kopalnie lub dywersji poprzez atak od strony klifów. Zadaje jednak bardzo mało obrażeń i można go zniszczyć bez większego wysiłku."
     },
-    "armfus": {
+    "energyfusion": {
         "name": "Reaktor fuzyjny",
         "description": "Średnia elektrownia (+35)",
         "helptext": "Reaktory fuzyjne zapewniają stały przypływ dużej ilości energii za niewygórowaną cenę. Są jednak dobrym celem dla wroga i nie są zbyt wytrzymałe, toteż warto zapewnić im ochronę. Wybuch reaktora zadaje wysokie obrażenia okolicznym jednostkom."
@@ -154,7 +154,7 @@
         "description": "Przeobraża się w budynki kurczaków",
         "helptext": "Bezbronny kurczak, którego celem życiowym jest przeobrażenie się w jeden z budynków kurczaków."
     },
-    "armjamt": {
+    "staticjammer": {
         "name": "Sneaky Pete",
         "description": "Wieża zakłócająco-maskująca",
         "helptext": "Zakłócacze nie pozwalają radarom wykrywać jednostek na ich obszarze. Sneaky Peet posiada również niewidzialność obszarową, które pozwala ukryć jednostki także przed normalnym widzeniem."
@@ -189,7 +189,7 @@
         "description": "Poduszkowiec przeciwlotniczy",
         "helptext": "Flail jest uzbrojony w ciężkie rakiety ziemia-powietrze średniego zasięgu."
     },
-    "armham": {
+    "cloakarty": {
         "name": "Hammer",
         "description": "Lekki bot artyleryjski",
         "helptext": "Hammer ma działa plazmowe dalekiego zasięgu, których wysoka trajektoria pozwala im omijać przeszkody. Ma większy zasięg niż podstawowe wieżyczki obronne. Daje radę przeciwko jednostkom bojowym."
@@ -214,7 +214,7 @@
         "description": "Laser orbitalny",
         "helptext": "W czasie pokoju narzędzie do przerabiania terenu pod terraforming. W czasie wojny narzędzie do przerabiania wrogich robotów w złom."
     },
-    "armcrabe": {
+    "spidercrabe": {
         "name": "Crab",
         "description": "Ciężki opancerzony pająk bojowy",
         "helptext": "Ciężkie pociski Craba niszczą grupy lekkich jednostek i mają zasięg większy niż lekkie wieżyczki. Gdy nie porusza się, Crab zwija się w kulkę i otrzymuje tylko 1/4 obrażeń."
@@ -224,7 +224,7 @@
         "description": "Zwiadowcza łódź podwodna kamikaze",
         "helptext": "Lancelet to właściwie duża torpeda z możliwościami zwiadowczymi. Po wykonaniu rekonesansu może zdetonować się, zadając ciężkie obrażenia."
     },
-    "armmstor": {
+    "staticstorage": {
         "name": "Magazyn",
         "description": "Magazynuje metal i energię (po 500)",
         "helptext": "Magazyn pozwala na przechowywanie surowców na wypadek, gdy nie ma wystarczająco dużo budowniczych, by je wykorzystać. Lepiej jest jednak zbudować więcej budowniczych, a magazynu używać bardziej jako bufora na wypadek dużych, niespodziewanych zysków, na przykład zbierania dużego złomowiska."
@@ -339,7 +339,7 @@
         "description": "Duża elektrownia (+100) - NIEBEZPIECZNE",
         "helptext": "Ulepszona elektrownia geotermiczna produkuje ogromne ilości energii, jednak jej zniszczenie wiąże się z równie wielkim wybuchem."
     },
-    "armnanotc": {
+    "staticcon": {
         "name": "Caretaker",
         "description": "Wieżyczka budowlana, moc 10 m/s",
         "helptext": "Jako najtańsze źródło mocy budowlanej, Caretaker świetnie sprawuje się do pomocy fabrykom, naprawy jednostek i zbierania złomu. Nie jest jednak w stanie samemu rozpoczynać żadnej budowy."
@@ -354,7 +354,7 @@
         "description": "Latający kurczak",
         "helptext": "Talon to latający kurczak, który atakuje cele naziemne i latające. Broń przeciwlotnicza dobrze się go pozbywa."
     },
-    "armestor": {
+    "energypylon": {
         "name": "Pylon",
         "description": "Węzeł energetyczny",
         "helptext": "Węzeł energetyczny pozwala rozszerzyć siatkę energetyczną, by pomóc dostarczyć energię z generatorów do kopalni lub wieżyczek. Pamiętaj, że na małe dystanse bardziej opłaca się użyć rzędu lekkich elektrowni (tj. paneli słonecznych lub turbin)."
@@ -374,7 +374,7 @@
         "description": "Kurczak-bomba",
         "helptext": "Dodo zawiera w sobie niestabilną mieszankę i jest w stanie wybuchnąć; rozrzucone wokół kolce z jego skorupy także zadają poważne obrażenia."
     },
-    "armcybr": {
+    "bomberheavy": {
         "name": "Wyvern",
         "description": "Bombowiec implozyjny",
         "helptext": "Wyvern spuszcza pojedynczą niszczycielską bombę o dużej sile i obszarze rażenia, która może rozrzucić mniejsze jednostki wokół. Jest też wystarczająco wytrzymały, by latać wśród umiarkowanej ilości obrony przeciwlotniczej. Jest jednak bardzo drogi, co nie pozwala na lekkomyślne używanie."
@@ -454,7 +454,7 @@
         "description": "Kurczak harcownik (i przeciwlotniczy)",
         "helptext": "Sporeshooter wypuszcza zarodniki, by niszczyć przeciwników i jest w stanie wspinać się po klifach."
     },
-    "armcir": {
+    "turretaafar": {
         "name": "Chainsaw",
         "description": "Bateria przeciwlotnicza dalekiego zasięgu",
         "helptext": "Chainsaw to wieżyczka przeciwlotnicza o dużym zasięgu. Pomimo, że sama nie jest zbyt wytrzymała, i w razie bezpośredniego ataku nie utrzyma się długo, to potrafi mocno zaszkodzić wrogim bombowcom, prawie całkowicie zamykając dla nich przestrzeń powietrzną wokół siebie."
@@ -509,7 +509,7 @@
         "description": "Pojazd artyleryjski / stawiacz min",
         "helptext": "Wolverine wystrzeliwuje na wyznaczony obszar miny (które pozostają uzbrojone przez ograniczony czas). Wolverine ma większy zasięg niż większość wieżyczek, jednak z powodu bardzo niskiej wytrzymałości wymaga ochrony innych jednostek lub swoich własnych min."
     },
-    "armcomdgun": {
+    "striderantiheavy": {
         "name": "Ultimatum",
         "description": "Niewidzialny bot na ciężkie jednostki",
         "helptext": "Ultimatum posiada dezintegrator, który jest w stanie zniszczyć nawet ciężkie jednostki jednym strzałem. Niewidzialność pozwala mu podejść pod wrogie mechy i szybko się ich pozbyć; lekkie jednostki bardzo skutecznie mu w tym przeszkadzają."
@@ -534,7 +534,7 @@
         "description": "Amfibijny Dowódca, moc 10 m/s",
         "helptext": "Sonic to Dowódca z działkiem dźwiękowym, które pozwala mu walczyć zarówno na ziemi, jak i pod wodą."
     },
-    "armmanni": {
+    "hoverarty": {
         "name": "Penetrator",
         "description": "Poduszkowiec precyzyjnej artylerii",
         "helptext": "Broń Penetratora ma wystarczającą siłę i celność, by jednym strzałem zniszczyć lub poważnie uszkodzić większość jednostek. Jest jednak wolny i ma niską wytrzymałość, a zatem warto trzymać go z dala od niebezpieczeństw - ma wystarczająco duży zasięg, by bezpiecznie prowadzić ostrzał."
@@ -659,7 +659,7 @@
         "description": "Transportowiec powietrzny",
         "helptext": "Valkyrie to podstawowa latająca jednostka transportowa. Świetnie radzi sobie w szybkim przenoszeniu jednostek z bazy na front, bądź w desancie głęboko za linie wroga, lecz musi unikać obszaru bronionego przez nawet najmniejszą ilość artylerii przeciwlotniczej."
     },
-    "armorco": {
+    "detriment": {
         "name": "Detriment",
         "description": "Najcięższy mech szturmowy",
         "helptext": "Detriment to najcięższy mech na polu bitwy. Posiada lasery przeciwlotnicze i rakiety dalekiego zasięgu, ale jego siła pochodzi z niesamowitego pancerza i potężnych dział, które szybko likwidują wrogie jednostki. Mimo swojej ogromnej mocy, Detriment nie powinien pracować bez odpowiedniego wsparcia ze strony lzejszych jednostek."
@@ -684,7 +684,7 @@
         "description": "Zaawansowany dron bojowy",
         "helptext": "Viper to zaawansowany dron bojowy uzbrojony w promień spowalniający."
     },
-    "armcsa": {
+    "athena": {
         "name": "Athena",
         "description": "Konstruktor specjalistyczny, moc 7.5 m/s",
         "helptext": "Athena to technologiczne cacko wyposażone w niewidzialność, zakłócacz radaru i możliwość odbudowy jednostek bezpośrednio ze złomu. Ponadto jest w stanie budować jednostki na polu bitwy bez użycia fabryki i działać jak normalny konstruktor."
@@ -759,7 +759,7 @@
         "description": "System wczesnego ostrzegania",
         "helptext": "Radar wykrywa obecność wrogich jednostek z dużej odległości. Ma malutki koszt utrzymania, lecz wyłączy się w razie braku energii. Radar jest blokowany przez teren, na przykład góry."
     },
-    "armdeva": {
+    "turretriot": {
         "name": "Stardust",
         "description": "Wieżyczka wsparcia",
         "helptext": "Stardust posiada potężne działko maszynowe, które zadaje ogromne obrażenia obszarowe; jego niski zasięg powoduje jednak, że jest bezbronny przeciwko harcownikom i artylerii."
@@ -844,12 +844,12 @@
         "description": "Dba o gniazdo",
         "helptext": "Matka roju zajmuje się rodzeniem różnych typów kurczaków bojowych."
     },
-    "armjeth": {
+    "cloakaa": {
         "name": "Gremlin",
         "description": "Niewidzialny bot przeciwlotniczy",
         "helptext": "Niewidzialny, szybki i dość wytrzymały jak na swoją cenę, Gremlin skutecznie zapewnia obronę przeciwlotniczą. Jest bezbronny przeciw wojskom lądowym."
     },
-    "armmerl": {
+    "vehheavyarty": {
         "name": "Impaler",
         "description": "Pojazd artylerii precyzyjnej",
         "helptext": "Impaler wystrzeliwuje potężne pociski kinetyczne dalekiego zasięgu, które dzięki wysokiej trajektorii są w stanie omijać większość przeszkód, choć są jednak przez to bezużyteczne przeciw poruszającym się celom. Impaler jest przeznaczony do niszczenia budynków."
@@ -1169,12 +1169,12 @@
         "description": "Amfibijny bot wsparcia",
         "helptext": "Wszechstronna amfibia uzbrojona w torpedy do użytku pod wodą i shotgun do niszczenia celów na lądzie."
     },
-    "armca": {
+    "planecon": {
         "name": "Crane",
         "description": "Statek powietrzny konstruktor, moc 4 m/s",
         "helptext": "Crane to latający konstruktor, który mimo niskiej mocy budowy jest w stanie szybko przelecieć w dowolne miejsce, co czyni go idealnym do zajmowania kopalń, zbierania złomu i innych podobnych zadań."
     },
-    "armkam": {
+    "gunshipraid": {
         "name": "Banshee",
         "description": "Lekki statek powietrzny",
         "helptext": "Banshee ma bardzo dużą prędkość i dość dobre obrażenia, co pozwala na szybkie najazdy w celu zniszczenia ekonomii przeciwnika lub niecelnych jednostek, na przykład szturmowych lub harcowników. Pułap lotu Banshee jest jednak na tyle niski, że może zostać zestrzelona nawet przez jednostki o krótszym zasięgu."

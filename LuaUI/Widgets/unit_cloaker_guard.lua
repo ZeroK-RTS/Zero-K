@@ -57,7 +57,7 @@ local cloakieeStopDis = 90 -- how far from the cloaker the cloakiees should stop
 
 local cloakerArray = { 
 
-  "armjamt",
+  "staticjammer",
   "spherecloaker",
   "armadvcom",
 

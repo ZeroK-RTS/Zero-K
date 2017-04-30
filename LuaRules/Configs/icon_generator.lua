@@ -145,7 +145,7 @@ unitConfigs = {
     rot   = 200,
     clamp = 10,
   },
-  [UnitDefNames.armjamt.id] = {
+  [UnitDefNames.staticjammer.id] = {
     rot = -45,
   },
   [UnitDefNames.corsilo.id] = {
@@ -172,7 +172,7 @@ unitConfigs = {
   [UnitDefNames.corgator.id] = {
     border = 0.125,
   },
-  [UnitDefNames.armflea.id] = {
+  [UnitDefNames.spiderscout.id] = {
     border = 0.125,
   },
 
@@ -270,7 +270,7 @@ unitConfigs = {
     angle  = 10,
     unfold = false,
   },
-  [UnitDefNames.armorco.id] = {
+  [UnitDefNames.detriment.id] = {
     rot    = 20,
     angle  = 10,
   },

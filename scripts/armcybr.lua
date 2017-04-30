@@ -24,7 +24,7 @@ local smokePiece = {base}
 --Signal
 local SIG_move = 1
 local SIG_TAKEOFF = 2
-local takeoffHeight = UnitDefNames["armcybr"].wantedHeight
+local takeoffHeight = UnitDefNames["bomberheavy"].wantedHeight
 
 local gun_1 = false
 

@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armnanotc]],
+  unitname                      = [[staticcon]],
   name                          = [[Caretaker]],
   description                   = [[Static Constructor, Builds at 10 m/s]],
   acceleration                  = 0,
@@ -10,8 +10,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
   buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[armnanotc_aoplane.dds]],
-  buildPic                      = [[armnanotc.png]],
+  buildingGroundDecalType       = [[staticcon_aoplane.dds]],
+  buildPic                      = [[staticcon.png]],
   canGuard                      = true,
   canMove                       = false,
   canPatrol                     = true,
@@ -46,7 +46,7 @@ unitDef = {
   minCloakDistance              = 150,
   movementClass                 = [[KBOT1]],
   objectName                    = [[armsenan.s3o]],
-  script                        = [[armnanotc.lua]],
+  script                        = [[staticcon.lua]],
   selfDestructAs                = [[NANOBOOM2]],
   showNanoSpray                 = false,
   sightDistance                 = 380,
@@ -76,4 +76,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armnanotc = unitDef })
+return lowerkeys({ staticcon = unitDef })

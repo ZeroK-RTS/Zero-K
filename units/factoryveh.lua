@@ -20,7 +20,7 @@ unitDef = {
     [[corraid]],
     [[capturecar]],
     [[corgarp]],
-    [[armmerl]],
+    [[vehheavyarty]],
     [[vehaa]],
   },
 

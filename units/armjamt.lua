@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armjamt]],
+  unitname                      = [[staticjammer]],
   name                          = [[Sneaky Pete]],
   description                   = [[Area Cloaker/Jammer]],
   activateWhenBuilt             = true,
@@ -8,8 +8,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
   buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[armjamt_aoplane.dds]],
-  buildPic                      = [[ARMJAMT.png]],
+  buildingGroundDecalType       = [[staticjammer_aoplane.dds]],
+  buildPic                      = [[staticjammer.png]],
   category                      = [[SINK UNARMED]],
   cloakCost                     = 1,
   collisionVolumeOffsets        = [[0 0 0]],
@@ -51,7 +51,7 @@ unitDef = {
   objectName                    = [[radarjammer.dae]],
   onoffable                     = true,
   radarDistanceJam              = 550,
-  script                        = [[armjamt.lua]],
+  script                        = [[staticjammer.lua]],
   selfDestructAs                = [[BIG_UNITEX]],
   sightDistance                 = 250,
   useBuildingGroundDecal        = true,
@@ -78,4 +78,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armjamt = unitDef })
+return lowerkeys({ staticjammer = unitDef })

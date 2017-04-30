@@ -58,7 +58,7 @@ local longRangeSwarmieeArray = NameToDefID({
 	"armsptk",
 	"corstorm",
 	"shiparty",
-	"armham",
+	"cloakarty",
 	"shiparty",
 })
 
@@ -80,8 +80,8 @@ local lowRangeSwarmieeArray = NameToDefID({
 	"correap",
 	"corgol",
 	
-	"armcrabe",
-	"armmanni",
+	"spidercrabe",
+	"hoverarty",
 	
 	"chickenr",
 	"chickenblobber",
@@ -110,7 +110,7 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 	"hoverdepthcharge",
 	
 	"corgator",
-	"armflea",
+	"spiderscout",
 	"armpw",
 	"corfav",
 })
@@ -131,10 +131,10 @@ local riotRangeSkirmieeArray = NameToDefID({
 	"corsh",
 	"hoverscout",
 	"amphriot",
-	"armcomdgun",
+	"striderantiheavy",
 	"dante",
 	
-	"armjeth",
+	"cloakaa",
 	"corcrash",
 	"jumpaa",
 	"hoveraa",
@@ -207,7 +207,7 @@ local longRangeSkirmieeArray = NameToDefID({
 	"chickenc",
 	"bantha",
 	"corllt",
-	"armdeva",
+	"turretriot",
 	"turretemp",
 })
 
@@ -221,7 +221,7 @@ local artyRangeSkirmieeArray = NameToDefID({
 	"corhlt",
 	"armpb",
 	"cordoom",
-	"armorco",
+	"detriment",
 	"ampharty",
 	
 	"shipskirm",
@@ -245,7 +245,7 @@ local slasherSkirmieeArray = NameToDefID({
 	"armrock",
 	"armpb",
 	"corllt",
-	"armdeva",
+	"turretriot",
 	"turretemp",
 })
 
@@ -269,16 +269,16 @@ local veryShortRangeExplodables = NameToDefID({
 local shortRangeExplodables = NameToDefID({
 	"armwin",
 	"cormex",
-	"armdeva",
-	"armestor",
+	"turretriot",
+	"energypylon",
 })
 
 local diverExplodables = NameToDefID({
-	"armestor",
+	"energypylon",
 })
 
 local medRangeExplodables = NameToDefID({
-	"armfus", -- don't suicide vs fusions if possible.
+	"energyfusion", -- don't suicide vs fusions if possible.
 	"geo",
 	"cafus", -- same with singu, at least to make an effort for survival.
 	"energyheavygeo",
@@ -309,7 +309,7 @@ artyRangeSkirmieeArray   = Union(artyRangeSkirmieeArray, medRangeExplodables)
 local skirmableAir = NameToDefID({
 	"blastwing",
 	"bladew",
-	"armkam",
+	"gunshipraid",
 	"gunshipsupport",
 	"gunshipheavyskirm",
 	"blackdawn",
@@ -325,7 +325,7 @@ local brawler = NameToDefID({
 -- Things that are fled by some things
 local fleeables = NameToDefID({
 	"corllt",
-	"armdeva",
+	"turretriot",
 	"turretemp",
 	"corgrav",
 	
@@ -470,7 +470,7 @@ local behaviourConfig = {
 		stoppingDistance = 10,
 	},
 	
-	["armflea"] = {
+	["spiderscout"] = {
 		skirms = veryShortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = fleeables,
@@ -1048,7 +1048,7 @@ local behaviourConfig = {
 		skirmOrderDisMin = 100, -- Make it turn around.
 	},
 	
-	["armmerl"] = {
+	["vehheavyarty"] = {
 		skirms = allGround,
 		skirmRadar = true, 
 		swarms = {}, 
@@ -1078,7 +1078,7 @@ local behaviourConfig = {
 		skirmLeeway = 100, 
 	},
 	
-	["armham"] = {
+	["cloakarty"] = {
 		skirms = allGround, 
 		swarms = {}, 
 		flees = {},
@@ -1104,7 +1104,7 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 150, 
 	},	
-	["armmanni"] = {
+	["hoverarty"] = {
 		skirms = allGround, 
 		swarms = {}, 
 		flees = {},
@@ -1165,7 +1165,7 @@ local behaviourConfig = {
 	},
 	
 	-- mobile AA
-	["armjeth"] = {
+	["cloakaa"] = {
 		skirms = skirmableAir, 
 		swarms = brawler, 
 		flees = armedLand,

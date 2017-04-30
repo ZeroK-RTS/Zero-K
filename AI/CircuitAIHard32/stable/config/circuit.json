@@ -2,7 +2,7 @@
 {
 // --- EASY config ---
 "easy": {  // Null AI
-"economy": {"energy": {"land": {"cafus": [1], "armfus": [2], "armsolar": [3]}, "water": {"cafus": [1], "armfus": [2], "armwin": [3]}}, "default": "corrl"}
+"economy": {"energy": {"land": {"cafus": [1], "energyfusion": [2], "armsolar": [3]}, "water": {"cafus": [1], "energyfusion": [2], "armwin": [3]}}, "default": "corrl"}
 },
 // --- EASY config ---
 
@@ -25,7 +25,7 @@
 		"income_tier": [20, 30, 60],
 
 		//             conjurer,   glaive,  scythe,       rocko,     warrior,  zeus,      hammer,   sniper,     tick,      eraser,          gremlin
-		"unit":      ["armrectr", "armpw", "spherepole", "armrock", "armwar", "armzeus", "armham", "armsnipe", "armtick", "spherecloaker", "armjeth"],
+		"unit":      ["armrectr", "armpw", "spherepole", "armrock", "armwar", "armzeus", "cloakarty", "armsnipe", "armtick", "spherecloaker", "cloakaa"],
 
 		"land": {
 			// 0-8m Opening - Glaives & Warriors most important for scouting, map control and defence.
@@ -62,7 +62,7 @@
 
 		"income_tier": [7, 16, 24, 32, 40, 56, 72],
 		//             wasp,         blastwing,   gnat,     banshee,  rapier,           brawler,    blackdawn,   krow,     valkyrie,  vindicator,  trident
-		"unit":      ["gunshipcon", "blastwing", "bladew", "armkam", "gunshipsupport", "gunshipheavyskirm", "blackdawn", "corcrw", "corvalk", "corbtrans", "gunshipaa"],
+		"unit":      ["gunshipcon", "blastwing", "bladew", "gunshipraid", "gunshipsupport", "gunshipheavyskirm", "blackdawn", "corcrw", "corvalk", "corbtrans", "gunshipaa"],
 		"land": {
 			// 0-8m Opening - Blastwing and banshee Harass
 			"tier0": [ 0.00,         0.17,        0.00,     0.10,     0.71,             0.00,       0.02,        0.00,     0.00,      0.00,        0.00],
@@ -120,7 +120,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             weaver,       flea,      hermit,          venom,       redback,      recluse,   crabe,      infiltrator, tarantula
-		"unit":      ["spidercon", "armflea", "spiderassault", "spideremp", "spiderriot", "armsptk", "armcrabe", "armspy",    "spideraa"],
+		"unit":      ["spidercon", "spiderscout", "spiderassault", "spideremp", "spiderriot", "armsptk", "spidercrabe", "armspy",    "spideraa"],
 		"land": {
 			// 0-12m Opening - Opening turbo Flea spam & Riots
 			"tier0": [ 0.00,         0.93,      0.00,            0.02,        0.05,         0.00,      0.00,       0.00,        0.00],
@@ -149,7 +149,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             mason,    dart,     scorcher,   slasher,   leveler,    ravager,   dominatrix,   wolverine, impaler,   crasher
-		"unit":      ["corned", "corfav", "corgator", "cormist", "corlevlr", "corraid", "capturecar", "corgarp", "armmerl", "vehaa"],
+		"unit":      ["corned", "corfav", "corgator", "cormist", "corlevlr", "corraid", "capturecar", "corgarp", "vehheavyarty", "vehaa"],
 		"land": {
 			// 0-8m Opening - Dart, Riot & Slasher
 			"tier0": [ 0.00,     0.33,     0.55,       0.12,      0.00,       0.00,      0.00,         0.00,      0.00,      0.00],
@@ -178,7 +178,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             quill,   dagger,  scalpel,    halberd,        claymore,           mace,        penetrator, flail
-		"unit":      ["corch", "corsh", "nsaclash", "hoverassault", "hoverdepthcharge", "hoverriot", "armmanni", "hoveraa"],
+		"unit":      ["corch", "corsh", "nsaclash", "hoverassault", "hoverdepthcharge", "hoverriot", "hoverarty", "hoveraa"],
 		"land": {
 			// 0-8m Opening - Raiders and Riots
 			"tier0": [ 0.00,    0.65,    0.00,       0.00,           0.00,               0.35,        0.00,       0.00],
@@ -213,7 +213,7 @@
 
 		"income_tier": [30, 60],
 		//             crane,   swift,     hawk,      raven,     phoenix,    thunderbird,         wyvern,    vulture
-		"unit":      ["armca", "fighter", "corvamp", "corshad", "corhurc2", "armstiletto_laser", "armcybr", "corawac"],
+		"unit":      ["planecon", "fighter", "corvamp", "corshad", "corhurc2", "armstiletto_laser", "bomberheavy", "corawac"],
 		"air": {
 			// 0-10m Early Game
 			"tier0": [ 0.00,    0.00,      0.90,      0.00,      0.00,       0.00,                0.05,      0.05],
@@ -313,7 +313,7 @@
 
 		"income_tier": [60, 80, 100],
 		//             ultimatum,    scorpion,   dante,   catapult,   funnelweb,   bantha,     detriment, scylla,          reef,          battleship
-		"unit":      ["armcomdgun", "scorpion", "dante", "armraven", "funnelweb", "bantha", "armorco", "subtacmissile", "shipcarrier", "shipheavyarty"],
+		"unit":      ["striderantiheavy", "scorpion", "dante", "armraven", "funnelweb", "bantha", "detriment", "subtacmissile", "shipcarrier", "shipheavyarty"],
 		"land": {
 			"tier0": [ 0.01,         0.10,       0.81,    0.00,       0.05,        0.03,       0.00,      0.00,            0.00,          0.00],
 			"tier1": [ 0.03,         0.14,       0.22,    0.24,       0.20,        0.16,       0.01,      0.00,            0.00,          0.00],
@@ -428,7 +428,7 @@
 		"pwr_mod": 0.9,
 		"thr_mod": 0.9
 	},
-	"armham": {
+	"cloakarty": {
 		"role": ["artillery"],
 		"retreat": 0.99,
 		"thr_mod": 0.1
@@ -449,7 +449,7 @@
 		"role": ["support"],
 		"limit": 2
 	},
-	"armjeth": {
+	"cloakaa": {
 		"role": ["anti_air"],
 		"attribute": ["melee"],
 		"retreat": 0.7,
@@ -478,7 +478,7 @@
 		"pwr_mod": 1.7,
 		"thr_mod": 1.7
 	},
-	"armkam": {
+	"gunshipraid": {
 		"role": ["scout", "air"],
 		"limit": 1,
 		"retreat": 0.8,
@@ -569,7 +569,7 @@
 	"spidercon": {
 		"role": ["builder"]
 	},
-	"armflea": {
+	"spiderscout": {
 		"role": ["scout"],
 		"limit": 25,
 		"retreat": 0.01
@@ -597,7 +597,7 @@
 		"attribute": ["support"],
 		"retreat": 0.8
 	},
-	"armcrabe": {
+	"spidercrabe": {
 		"role": ["heavy"],
 		"attribute": ["siege", "ret_fight"],
 		"retreat": 0.65,
@@ -725,7 +725,7 @@
 		"limit": 1,
 		"retreat": 0.8
 	},
-	"armmerl": {
+	"vehheavyarty": {
 		"role": ["artillery", "artillery", "heavy"],
 		"retreat": 0.99,
 		"thr_mod": 0.1
@@ -830,7 +830,7 @@
 		"pwr_mod": 1.25,
 		"thr_mod": 1.25
 	},
-	"armmanni": {
+	"hoverarty": {
 		"role": ["anti_heavy", "heavy"],
 		"attribute": ["siege"],
 		"retreat": 0.99,
@@ -846,7 +846,7 @@
 	},
 
 	// factoryplane
-	"armca": {
+	"planecon": {
 		"role": ["builder", "air"],
 		"limit": 2,
 		"retreat": 0.99
@@ -886,7 +886,7 @@
 		"retreat": 0.99,
 		"thr_mod": 0.1
 	},
-	"armcybr": {
+	"bomberheavy": {
 		"role": ["bomber", "air"],
 		"limit": 3,
 		"retreat": 0.99,
@@ -983,7 +983,7 @@
 	},
 
 	// striderhub
-	"armcomdgun": {
+	"striderantiheavy": {
 		"role": ["anti_heavy", "heavy"],
 		"retreat": 0.7
 	},
@@ -1021,7 +1021,7 @@
 		"pwr_mod": 0.5,
 		"thr_mod": 0.5
 	},
-	"armorco": {
+	"detriment": {
 		"role": ["heavy", "support", "heavy"],
 		"attribute": ["melee"],
 		"retreat": 0.01,  // no retreat, demolish enemy base
@@ -1090,7 +1090,7 @@
 	"cafus": {
 		"role": ["static", "heavy"]
 	},
-	"armfus": {
+	"energyfusion": {
 		"role": ["static", "heavy"]
 	},
 	"corrazor": {
@@ -1111,11 +1111,11 @@
 		"role": ["static"],
 		"thr_mod": 2.0
 	},
-	"armdeva": {
+	"turretriot": {
 		"role": ["static"],
 		"thr_mod": 3.5
 	},
-	"armcir": {
+	"turretaafar": {
 		"role": ["anti_air"],
 		"thr_mod": 2.0
 	},
@@ -1165,16 +1165,16 @@
 	"corrad": {
 		"role": ["mine"]
 	},
-	"armnanotc": {
+	"staticcon": {
 		"role": ["mine"]
 	},
-	"armestor": {
+	"energypylon": {
 		"role": ["mine"]
 	},
 	"staticheavyradar": {
 		"role": ["mine"]
 	},
-	"armmstor": {
+	"staticstorage": {
 		"role": ["mine"],
 		"limit": 5
 	},
@@ -1284,7 +1284,7 @@
 // AA condition for 3v3: (enemy_air_metal*0.90 > (aa_metal+aa_cost)*1.06) and (aa_metal+aa_cost < army_metal*0.40)
 //
 // Probability of UnitDef for AA role depends on income tier: (tierN[UnitDef]+_weight_)*enemy_air_metal/aa_metal*importance
-// armjeth probability for tier 1: (0.00+0.01)*enemy_air_metal*110.0
+// cloakaa probability for tier 1: (0.00+0.01)*enemy_air_metal*110.0
 "response": {
 	"_weight_": 0.01,  // base weight of response probability
 
@@ -1379,7 +1379,7 @@
 	// Parabola defined by 3 control points.
 	// For example land config:
 	//   P0 = cafus: (4000/225; random(1..2)) = (17.78, 1)
-	//   P1 = armfus: (1000/35; random(3)) = (28.57, 3)
+	//   P1 = energyfusion: (1000/35; random(3)) = (28.57, 3)
 	//   P2 = armsolar: (70/2; random(10..15)) = (35, 13)
 	// P(x) => y = 0.079550*x*x - 3.501790*x + 38.113789
 	// Then parabola P(x) defines limit for
@@ -1402,17 +1402,17 @@
 			// "<energy_def>": [<lower limit>, <upper limit>]
 			// limit = random(<lower limit>..<upper limit>)
 			"cafus": [1, 1],
-			"armfus": [3],
+			"energyfusion": [3],
 			"armsolar": [6, 18]
 		},
 		"water": {
 			"cafus": [1],
-			"armfus": [4],
+			"energyfusion": [4],
 			"armwin": [20]
 		},
 		"factor": 0.51,  // income factor for energy
 
-		"pylon": ["armestor", "armsolar", "armwin"]
+		"pylon": ["energypylon", "armsolar", "armwin"]
 	},
 
 	// Scales metal income
@@ -1438,7 +1438,7 @@
 
 "porcupine": {
 	//        0         1        2          3         4             5           6            7          8          9           10         11          12        13
-	"unit": ["corllt", "corrl", "armdeva", "corhlt", "turrettorp", "corrazor", "armnanotc", "cordoom", "corjamt", "turretemp", "turretantiheavy", "corbhmth", "armcir", "screamer"],
+	"unit": ["corllt", "corrl", "turretriot", "corhlt", "turrettorp", "corrazor", "staticcon", "cordoom", "corjamt", "turretemp", "turretantiheavy", "corbhmth", "turretaafar", "screamer"],
 	// Actual number of defences per cluster bounded by income
 	"land":  [0, 1, 1, 2, 3, 5, 2, 6, 2, 3, 12, 11, 13],
 	"water": [4, 1, 6, 4, 4, 3, 5],
@@ -1872,7 +1872,7 @@
 					{"unit": "corllt", "category": "defence", "offset": [-80, -80]},
 					{"unit": "corrl", "category": "defence", "offset": [-70, 70]},
 					{"unit": "corrl", "category": "defence", "offset": [-80, 80]},
-					{"unit": "armcir", "category": "defence", "offset": {"front": 120}, "condition": "air"},
+					{"unit": "turretaafar", "category": "defence", "offset": {"front": 120}, "condition": "air"},
 					{"unit": "corflak", "category": "defence", "offset": {"front": 120}, "condition": "no_air"}
 				],
 				[  // chain2
@@ -1880,25 +1880,25 @@
 					{"unit": "turretemp", "category": "defence", "offset": {"right": 80}},
 					{"unit": "corrl", "category": "defence", "offset": [70, -70]},
 					{"unit": "corrl", "category": "defence", "offset": [80, -80]},
-					{"unit": "armcir", "category": "defence", "offset": {"front": 120}, "condition": "air"},
+					{"unit": "turretaafar", "category": "defence", "offset": {"front": 120}, "condition": "air"},
 					{"unit": "corflak", "category": "defence", "offset": {"front": 120}, "condition": "no_air"}
 				]
 			]
 		},
-		"armfus": {
+		"energyfusion": {
 			"pylon": true,
 			"hub": [[
 					{"unit": "corllt", "category": "defence", "offset": [80, -80]},
-					{"unit": "armdeva", "category": "defence", "offset": [-80, 80]}
+					{"unit": "turretriot", "category": "defence", "offset": [-80, 80]}
 				]]
 		}
 	},
 //	"factory": {
 //		"factoryplane": {
-//			"hub": [[{"unit": "armnanotc", "category": "nano", "offset": {"back": 0}}]]
+//			"hub": [[{"unit": "staticcon", "category": "nano", "offset": {"back": 0}}]]
 //		},
 //		"factorygunship": {
-//			"hub": [[{"unit": "armnanotc", "category": "nano", "offset": {"back": 0}}]]
+//			"hub": [[{"unit": "staticcon", "category": "nano", "offset": {"back": 0}}]]
 //		}
 //	},
 	"mex": {
@@ -1912,40 +1912,40 @@
 		"staticheavyarty": {
 			"hub": [[
 					{"unit": "corrad", "category": "radar", "offset": {"back": 40}},
-					{"unit": "armcir", "category": "defence", "offset": {"left": 120}, "condition": "air"},
+					{"unit": "turretaafar", "category": "defence", "offset": {"left": 120}, "condition": "air"},
 					{"unit": "corllt", "category": "defence", "offset": [-80, 80]},
 					{"unit": "corrl", "category": "defence", "offset": [80, 80]},
-					{"unit": "armdeva", "category": "defence", "offset": [80, -80]},
+					{"unit": "turretriot", "category": "defence", "offset": [80, -80]},
 					{"unit": "corrl", "category": "defence", "offset": [-80, -80]}
 				]]
 		},
 		"raveparty": {
 			"hub": [[
 					{"unit": "corrad", "category": "radar", "offset": {"back": 40}},
-					{"unit": "armcir", "category": "defence", "offset": {"left": 120}, "condition": "air"},
+					{"unit": "turretaafar", "category": "defence", "offset": {"left": 120}, "condition": "air"},
 					{"unit": "corllt", "category": "defence", "offset": [-80, 80]},
 					{"unit": "corrl", "category": "defence", "offset": [80, 80]},
-					{"unit": "armdeva", "category": "defence", "offset": [80, -80]},
+					{"unit": "turretriot", "category": "defence", "offset": [80, -80]},
 					{"unit": "corrl", "category": "defence", "offset": [-80, -80]}
 				]]
 		},
 		"mahlazer": {
 			"hub": [[
 					{"unit": "corrad", "category": "radar", "offset": {"back": 40}},
-					{"unit": "armcir", "category": "defence", "offset": {"left": 120}, "condition": "air"},
+					{"unit": "turretaafar", "category": "defence", "offset": {"left": 120}, "condition": "air"},
 					{"unit": "corllt", "category": "defence", "offset": [-80, 80]},
 					{"unit": "corrl", "category": "defence", "offset": [80, 80]},
-					{"unit": "armdeva", "category": "defence", "offset": [80, -80]},
+					{"unit": "turretriot", "category": "defence", "offset": [80, -80]},
 					{"unit": "corrl", "category": "defence", "offset": [-80, -80]}
 				]]
 		},
 		"corsilo": {
 			"hub": [[
 					{"unit": "corrad", "category": "radar", "offset": {"back": 40}},
-					{"unit": "armcir", "category": "defence", "offset": {"left": 120}, "condition": "air"},
+					{"unit": "turretaafar", "category": "defence", "offset": {"left": 120}, "condition": "air"},
 					{"unit": "corllt", "category": "defence", "offset": [-80, 80]},
 					{"unit": "corrl", "category": "defence", "offset": [80, 80]},
-					{"unit": "armdeva", "category": "defence", "offset": [80, -80]},
+					{"unit": "turretriot", "category": "defence", "offset": [80, -80]},
 					{"unit": "corrl", "category": "defence", "offset": [-80, -80]}
 				]]
 		},
@@ -1956,7 +1956,7 @@
 					{"unit": "corrad", "category": "radar", "offset": {"back": 40}},
 					{"unit": "corllt", "category": "defence", "offset": [-80, 80]},
 					{"unit": "corrl", "category": "defence", "offset": [80, 80]},
-					{"unit": "armdeva", "category": "defence", "offset": [80, -80]},
+					{"unit": "turretriot", "category": "defence", "offset": [80, -80]},
 					{"unit": "corrl", "category": "defence", "offset": [-80, -80]}
 				]]
 		}
@@ -2079,17 +2079,17 @@
 		"fac_strider": ["striderhub"],
 		"solar": ["armsolar"],
 		"wind": ["armwin"],
-		"fusion": ["armfus"],
+		"fusion": ["energyfusion"],
 		"singu": ["cafus"],
-		"pylon": ["armestor"],
-		"store": ["armmstor"],
+		"pylon": ["energypylon"],
+		"store": ["staticstorage"],
 		"mex": ["cormex"],
 		"def_low": ["corrl", "corllt"],
-		"caretaker": ["armnanotc"],
+		"caretaker": ["staticcon"],
 		"superweapon": ["raveparty", "corsilo", "staticheavyarty", "zenith", "screamer"],
 		"protector": ["staticantinuke"],
 //		"terraform": ["terraunit"],
-		"strider": ["armcomdgun", "scorpion", "dante", "armraven", "funnelweb", "bantha", "armorco", "subtacmissile", "shipcarrier", "shipheavyarty"]
+		"strider": ["striderantiheavy", "scorpion", "dante", "armraven", "funnelweb", "bantha", "detriment", "subtacmissile", "shipcarrier", "shipheavyarty"]
 	}
 }
 },

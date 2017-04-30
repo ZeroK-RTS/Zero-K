@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[armca]],
+  unitname            = [[planecon]],
   name                = [[Crane]],
   description         = [[Construction Aircraft, Builds at 4 m/s]],
   acceleration        = 0.1,
@@ -12,7 +12,7 @@ unitDef = {
   buildoptions        = {
   },
 
-  buildPic            = [[ARMCA.png]],
+  buildPic            = [[planecon.png]],
   buildRange3D        = false,
   canFly              = true,
   canGuard            = true,
@@ -53,7 +53,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[crane.s3o]],
-  script              = [[armca.lua]],
+  script              = [[planecon.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,
   sightDistance       = 380,
@@ -82,4 +82,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armca = unitDef })
+return lowerkeys({ planecon = unitDef })

@@ -14,7 +14,7 @@ unitDef = {
     [[hoverassault]],
 	[[hoverdepthcharge]],
 	[[hoverriot]],
-    [[armmanni]],
+    [[hoverarty]],
     [[hoveraa]],
   },
 

@@ -15,7 +15,7 @@ local sounds = {
 			[1] = "building_select1",
 		},
 	},
-	armcsa = {
+	athena = {
 		build = "builder_start",
 		ok = {
 			[1] = "gunship_move",
@@ -76,7 +76,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	armcomdgun = {
+	striderantiheavy = {
 		build = "builder_start",
 		ok = {
 			[1] = "heavy_bot_move",
@@ -104,7 +104,7 @@ local sounds = {
 			[1] = "spider_select",
 		},
 	},
-	armflea = {
+	spiderscout = {
 		ok = {
 			[1] = "light_bot_move",
 		},
@@ -145,7 +145,7 @@ local sounds = {
 		},
 	},
 
-	armcrabe = {
+	spidercrabe = {
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -404,7 +404,7 @@ local sounds = {
 			[1] = "medium_bot_select",
 		},
 	},
-	armham = {
+	cloakarty = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -412,7 +412,7 @@ local sounds = {
 			[1] = "medium_bot_select",
 		},
 	},
-	armjeth = {
+	cloakaa = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -545,7 +545,7 @@ local sounds = {
 			[1] = "spy_select",
 		},
 	},
-	armorco = {
+	detriment = {
 		ok = {
 			[1] = "turret_select",
 		},
@@ -687,7 +687,7 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
-	armmerl = {
+	vehheavyarty = {
 		ok = {
 			[1] = "tank_move",
 		},
@@ -778,7 +778,7 @@ local sounds = {
 			[1] = "hovercraft_select",
 		},
 	},
-	armmanni = {
+	hoverarty = {
 		ok = {
 			[1] = "hovercraft_move",
 		},
@@ -844,7 +844,7 @@ local sounds = {
 			[1] = "bomber_select",
 		},
 	},
-	armcybr = {
+	bomberheavy = {
 		ok = {
 			[1] = "bomber_move",
 		},
@@ -862,7 +862,7 @@ local sounds = {
 	},
 	
 	-- Gunship
-	armca = {
+	planecon = {
 		build = "builder_start",
 		ok = {
 			[1] = "gunship_move",
@@ -896,7 +896,7 @@ local sounds = {
 			[1] = "light_gunship_select",
 		},
 	},
-	armkam = {
+	gunshipraid = {
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -1103,12 +1103,12 @@ local sounds = {
 			[1] = "building_select1",
 		},
 	},
-	armfus = {
+	energyfusion = {
 		select = {
 			[1] = "fusion_select",
 		},
 	},
-	armestor = {
+	energypylon = {
 		select = {
 			[1] = "fusion_select",
 		},
@@ -1128,7 +1128,7 @@ local sounds = {
 			[1] = "geo_select",
 		},
 	},
-	armmstor = {
+	staticstorage = {
 		select = {
 			[1] = "building_select2",
 		},
@@ -1138,7 +1138,7 @@ local sounds = {
 			[1] = "fusion_select",
 		},
 	},
-	armnanotc = {
+	staticcon = {
 		build = "builder_start",
 		select = {
 			[1] = "building_select1",
@@ -1261,7 +1261,7 @@ local sounds = {
 			[1] = "shield_select",
 		},
 	},
-	armjamt = {
+	staticjammer = {
 		select = {
 			[1] = "cloaker_select",
 		},
@@ -1300,7 +1300,7 @@ local sounds = {
 			[1] = "faraday_select",
 		},
 	},
-	armdeva = {
+	turretriot = {
 		ok = {
 			[1] = "turret_move",
 		},
@@ -1414,7 +1414,7 @@ local sounds = {
 			[1] = "light_turret_select",
 		},
 	},
-	armcir = {
+	turretaafar = {
 		ok = {
 			[1] = "light_turret_select",
 		},

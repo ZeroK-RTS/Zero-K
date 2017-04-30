@@ -49,7 +49,7 @@ local myTeam
 
 local exceptionList = {	--add exempt units here
 	"armsnipe",
-	"armjeth",
+	"cloakaa",
 	"wolverine_mine",
 	"blastwing",
 }

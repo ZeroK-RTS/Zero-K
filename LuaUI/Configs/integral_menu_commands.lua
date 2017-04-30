@@ -38,8 +38,8 @@ local units = {
 		spherepole = WEIRD_RAIDER,
 		armwar = RIOT,
 		armrock = SKIRMISHER,
-		armham = ARTILLERY,
-		armjeth = ANTI_AIR,
+		cloakarty = ARTILLERY,
+		cloakaa = ANTI_AIR,
 		armzeus = ASSAULT,
 		armsnipe = HEAVY_SOMETHING,
 		armtick = SPECIAL,
@@ -67,7 +67,7 @@ local units = {
 		corgarp = ARTILLERY,
 		vehaa = ANTI_AIR,
 		corraid = ASSAULT,
-		armmerl = HEAVY_SOMETHING,
+		vehheavyarty = HEAVY_SOMETHING,
 		capturecar = SPECIAL,
 	},
 	factoryhover = {
@@ -76,14 +76,14 @@ local units = {
 		hoverdepthcharge = SPECIAL,
 		hoverriot = RIOT,
 		nsaclash = SKIRMISHER,
-		armmanni = ARTILLERY,
+		hoverarty = ARTILLERY,
 		hoveraa = ANTI_AIR,
 		hoverassault = ASSAULT,
 	},
 	factorygunship = {
 		gunshipcon = CONSTRUCTOR,
 		bladew = WEIRD_RAIDER,
-		armkam = RAIDER,
+		gunshipraid = RAIDER,
 		gunshipheavyskirm = ARTILLERY,
 		gunshipsupport = SKIRMISHER,
 		corvalk = SPECIAL,
@@ -94,26 +94,26 @@ local units = {
 		blastwing = RIOT,
 	},
 	factoryplane = {
-		armca = CONSTRUCTOR,
+		planecon = CONSTRUCTOR,
 		fighter = RAIDER,
 		corhurc2 = RIOT,
 		-- No Plane Artillery
 		corvamp = WEIRD_RAIDER,
 		corawac = UTILITY,
 		corshad = ASSAULT,
-		armcybr = HEAVY_SOMETHING,
+		bomberheavy = HEAVY_SOMETHING,
 		armstiletto_laser = SPECIAL,
 	},
 	factoryspider = {
 		spidercon = CONSTRUCTOR,
-		armflea = RAIDER,
+		spiderscout = RAIDER,
 		spiderriot = RIOT,
 		armsptk = SKIRMISHER,
 		-- No Spider Artillery
 		spideraa = ANTI_AIR,
 		spideremp = WEIRD_RAIDER,
 		spiderassault = ASSAULT,
-		armcrabe = HEAVY_SOMETHING,
+		spidercrabe = HEAVY_SOMETHING,
 		armspy = SPECIAL,
 	},
 	factoryjump = {
@@ -165,7 +165,7 @@ local units = {
 	pw_bomberfac = {
 		corhurc2 = RIOT,
 		corshad = ASSAULT,
-		armcybr = HEAVY_SOMETHING,
+		bomberheavy = HEAVY_SOMETHING,
 		armstiletto_laser = SPECIAL,
 	},
 	pw_dropfac = {
@@ -220,18 +220,18 @@ local econ = {
 	armwin =     {order = 2, row = 2, col = 1},
 	armsolar =   {order = 3, row = 2, col = 2},
 	geo =        {order = 4, row = 2, col = 3},
-	armfus =     {order = 5, row = 2, col = 4},
+	energyfusion =     {order = 5, row = 2, col = 4},
 	cafus =      {order = 6, row = 2, col = 5},
-	armmstor =   {order = 7, row = 3, col = 1},
-	armestor =   {order = 8, row = 3, col = 2},
-	armnanotc =  {order = 9, row = 3, col = 3},
+	staticstorage =   {order = 7, row = 3, col = 1},
+	energypylon =   {order = 8, row = 3, col = 2},
+	staticcon =  {order = 9, row = 3, col = 3},
 	staticrearm =    {order = 10, row = 3, col = 4},
 }
 
 local defense = {
 	corrl =    {order = 0, row = 1, col = 1},
 	corllt =   {order = 1, row = 1, col = 2},
-	armdeva =  {order = 2, row = 1, col = 3},
+	turretriot =  {order = 2, row = 1, col = 3},
 	turretemp = {order = 3, row = 1, col = 4},
 	armpb =    {order = 5, row = 1, col = 5},
 	corhlt =   {order = 6, row = 1, col = 6},
@@ -239,7 +239,7 @@ local defense = {
 	missiletower =  {order = 9, row = 2, col = 1},
 	corrazor =     {order = 10, row = 2, col = 2},
 	corflak =      {order = 11, row = 2, col = 3},
-	armcir =       {order = 12, row = 2, col = 4},
+	turretaafar =       {order = 12, row = 2, col = 4},
 	screamer =     {order = 13, row = 2, col = 5},
 
 --	turretemp = {order = 3, row = 3},
@@ -252,7 +252,7 @@ local defense = {
 
 local aux = {	--merged into special
 	corrad =   {order = 10, row = 1, col = 1},
-	armjamt =  {order = 12, row = 1, col = 2},
+	staticjammer =  {order = 12, row = 1, col = 2},
 	staticheavyradar =  {order = 14, row = 1, col = 3},
 }
 

@@ -1646,7 +1646,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	else -- for assisting other workers
 		if (metalCost and metalCost > 300) or job.id == CMD_RESURRECT then -- for expensive buildings and resurrect
 			cost = (distance/2) + (200 * (costMod - 2))
-		elseif unitDef and (unitDef.reloadTime > 0 or unitDef.name == 'armnanotc') then -- for small defenses and caretakers, allow up to two workers before increasing cost
+		elseif unitDef and (unitDef.reloadTime > 0 or unitDef.name == 'staticcon') then -- for small defenses and caretakers, allow up to two workers before increasing cost
 			cost = distance - 150 + (800 * (costMod - 2))
 		elseif job.id == CMD_REPAIR then -- for repair
 			if job.target then

@@ -2,7 +2,7 @@ local THRESHOLD_EXPENSIVE = 1200
 INCOME_TO_SPLURGE = 20	-- ignore expensive warning if you have this much income
 METAL_PER_NANO = 8		-- suggested nanos per metal ^ -1
 MIN_PULL_FOR_NANOS = -10	-- don't make more nanos if our pull is already this low	--unused
-NANO_DEF_ID = UnitDefNames.armnanotc.id
+NANO_DEF_ID = UnitDefNames.staticcon.id
 ENERGY_TO_METAL_RATIO = 6	-- suggested maximum for energy
 ENERGY_LOW_THRESHOLD = 200
 DEFENSE_QUOTA = 0.4	-- suggested maximum proportion of total assets that is defense
@@ -56,7 +56,7 @@ local hyperweaponDefs = {
 	"mahlazer",
 	"zenith",
 	"raveparty",
-	"armorco",
+	"detriment",
 }
 local canRetreatDefs = {
 	"gunshipheavyskirm",
@@ -73,7 +73,7 @@ local canRetreatDefs = {
 	--"armraven",
 	"scorpion",
 	"bantha",
-	"armorco",
+	"detriment",
 	
 	"shipheavyarty",
 	"reef",
@@ -82,7 +82,7 @@ local canRetreatDefs = {
 local energyDefs = {
 	"armsolar",
 	"armwin",
-	"armfus",
+	"energyfusion",
 	--"geo",
 	"cafus",
 }
@@ -90,7 +90,7 @@ local energyDefs = {
 local defenseDefs = {
 	"corllt",
 	"corrl",
-	"armdeva",
+	"turretriot",
 	"corgrav",
 	"corhlt",
 	"armpb",
@@ -98,7 +98,7 @@ local defenseDefs = {
 	"corrazor",
 	"missiletower",
 	"corflak",
-	"armcir",
+	"turretaafar",
 	"screamer",
 	
 	"cordoom",
@@ -106,7 +106,7 @@ local defenseDefs = {
 	
 	"turrettorp",
 	
-	"armjamt",
+	"staticjammer",
 	"corjamt"
 }
 

@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armfus]],
+  unitname                      = [[energyfusion]],
   name                          = [[Fusion Reactor]],
   description                   = [[Medium Powerplant (+35)]],
   activateWhenBuilt             = true,
@@ -9,7 +9,7 @@ unitDef = {
   buildingGroundDecalSizeX      = 6,
   BuildingGroundDecalSizeY      = 6,
   BuildingGroundDecalType       = [[arm_fusion_ground.dds]],
-  buildPic                      = [[ARMFUS.png]],
+  buildPic                      = [[energyfusion.png]],
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
 
@@ -33,7 +33,7 @@ unitDef = {
   maxSlope                      = 18,
   minCloakDistance              = 150,
   objectName                    = [[arm_fusion.s3o]],
-  script                        = "armfus.lua",
+  script                        = "energyfusion.lua",
   selfDestructAs                = [[ATOMIC_BLAST]],
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
@@ -60,4 +60,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armfus = unitDef })
+return lowerkeys({ energyfusion = unitDef })

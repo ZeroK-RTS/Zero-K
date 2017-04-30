@@ -81,9 +81,9 @@ local floor                 = math.floor
 
 -----------------------------------------------------------------------------------
 local alwaysDisplay = {
-	[UnitDefNames.armfus.id] = true,
+	[UnitDefNames.energyfusion.id] = true,
 	[UnitDefNames.cafus.id] = true,
-	[UnitDefNames.armnanotc.id] = true,
+	[UnitDefNames.staticcon.id] = true,
 	[UnitDefNames.corsilo.id] = true,
 }
 

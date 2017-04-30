@@ -11,7 +11,7 @@ local menu_armcom = {
       },
       {
         angle= 90,
-        unit = "armfus",
+        unit = "energyfusion",
       },
       {
         angle= 135,
@@ -23,7 +23,7 @@ local menu_armcom = {
       --},
       {
         angle = -45,
-        unit = "armnanotc",
+        unit = "staticcon",
       },
       {
         angle= -90,
@@ -46,7 +46,7 @@ local menu_armcom = {
       },
       {
         angle = -90,
-        unit = "armcsa"
+        unit = "athena"
       },
 	  {
         angle = -135,
@@ -112,7 +112,7 @@ local menu_armcom = {
       },
       {
         angle = -90,
-        unit = "armdeva"
+        unit = "turretriot"
       },
       {
         angle = -135,
@@ -147,7 +147,7 @@ local menu_armcom = {
       },
       {
         angle = 90,
-        unit = "armcir"
+        unit = "turretaafar"
       },
       {
         angle = 180,
@@ -170,15 +170,15 @@ local menu_armcom = {
       },
       {
         angle = 135,
-        unit = "armjamt"
+        unit = "staticjammer"
       },
 	  {
         angle = -45,
-        unit = "armestor"
+        unit = "energypylon"
       },
       {
         angle = -135,
-        unit = "armmstor"
+        unit = "staticstorage"
       },
 	}
   },

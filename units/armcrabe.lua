@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[armcrabe]],
+  unitname               = [[spidercrabe]],
   name                   = [[Crabe]],
   description            = [[Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary]],
   acceleration           = 0.22,
   brakeRate              = 0.18,
   buildCostMetal         = 1600,
-  buildPic               = [[armcrabe.png]],
+  buildPic               = [[spidercrabe.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -42,18 +42,18 @@ unitDef = {
   movementClass          = [[TKBOT4]],
   moveState              = 0,
   noChaseCategory        = [[FIXEDWING GUNSHIP]],
-  objectName             = [[ARMCRABE]],
+  objectName             = [[spidercrabe]],
   pushResistant          = 0,
-  script                 = [[armcrabe.lua]],
+  script                 = [[spidercrabe.lua]],
   selfDestructAs         = [[BIG_UNIT]],
 
   sfxtypes               = {
 
     explosiongenerators = {
-    --  [[custom:ARMCRABE_FLARE]],
+    --  [[custom:spidercrabe_FLARE]],
 	  [[custom:LARGE_MUZZLE_FLASH_FX]],
-      [[custom:ARMCRABE_FLASH]],
-      [[custom:ARMCRABE_WhiteLight]],
+      [[custom:spidercrabe_FLASH]],
+      [[custom:spidercrabe_WhiteLight]],
     },
 
   },
@@ -94,7 +94,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.3,
-      explosionGenerator      = [[custom:ARMCRABE_EXPLOSION]],
+      explosionGenerator      = [[custom:spidercrabe_EXPLOSION]],
       impulseBoost            = 0,
       impulseFactor           = 0.32,
       interceptedByShieldType = 1,
@@ -132,4 +132,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armcrabe = unitDef })
+return lowerkeys({ spidercrabe = unitDef })

@@ -13,12 +13,12 @@ unitDef = {
 
   buildoptions                  = {
     [[spidercon]],
-    [[armflea]],
+    [[spiderscout]],
 	[[spiderassault]],
     [[spideremp]],
 	[[spiderriot]],
     [[armsptk]],
-    [[armcrabe]],
+    [[spidercrabe]],
     [[spideraa]],
     [[armspy]],
   },

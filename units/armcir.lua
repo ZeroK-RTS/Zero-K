@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armcir]],
+  unitname                      = [[turretaafar]],
   name                          = [[Chainsaw]],
   description                   = [[Long-Range Anti-Air Missile Battery]],
   acceleration                  = 0,
@@ -9,8 +9,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 3.6,
   buildingGroundDecalSizeY      = 3.6,
-  buildingGroundDecalType       = [[armcir_aoplane.dds]],
-  buildPic                      = [[ARMCIR.png]],
+  buildingGroundDecalType       = [[turretaafar_aoplane.dds]],
+  buildPic                      = [[turretaafar.png]],
   category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 12 0]],
   collisionVolumeScales         = [[58 76 58]],
@@ -43,7 +43,7 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[armcir.s3o]],
-  script                        = [[armcir.lua]],
+  script                        = [[turretaafar.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   sightDistance                 = 702,
   turnRate                      = 0,
@@ -146,4 +146,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armcir = unitDef })
+return lowerkeys({ turretaafar = unitDef })

@@ -46,7 +46,7 @@ local AAunittypes        = {["missiletower"] = 100, ["screamer"] = 300} -- what 
 -- number is the threshold of "points" above which a turret is considered escorted if it has at least that amount within half range
 local AAescort           = {  -- points of how much each AA unit is worth
 ["corrl"] = 100, 
-["armcir"] = 350, 
+["turretaafar"] = 350, 
 ["corrazor"] = 250, 
 ["corflak"] = 350, 
 
@@ -54,7 +54,7 @@ local AAescort           = {  -- points of how much each AA unit is worth
 ["fighter"] = 80, 
 ["gunshipsupport"] = 100, 
 
-["armjeth"] = 60, 
+["cloakaa"] = 60, 
 ["corcrash"] = 80, 
 ["vehaa"] = 60, 
 ["jumpaa"] = 250, 

@@ -1,4 +1,4 @@
-local menu_armcsa = {
+local menu_athena = { -- TODO_RENAME_FILE
 	items = {
 	  {
 		angle = -90,
@@ -7,7 +7,7 @@ local menu_armcsa = {
 		items = {
 		  {
 			angle= -45,
-			unit = "armflea",
+			unit = "spiderscout",
 		  },
 		  { 
 			angle = -135,
@@ -19,7 +19,7 @@ local menu_armcsa = {
 		  },
 		  { 
 			angle = 0,
-			unit = "armjeth",
+			unit = "cloakaa",
 		  },
 		  { 
 			angle = 45,
@@ -69,11 +69,11 @@ local menu_armcsa = {
 		  },
 		  {
 			angle = 135,
-			unit = "armjamt"
+			unit = "staticjammer"
 		  },		  
 		  {
 			angle = 180,
-			unit = "armnanotc"
+			unit = "staticcon"
 		  },		  
 		}
 	  },
@@ -84,11 +84,11 @@ local menu_armcsa = {
 		items = {
 		  {
 			angle = 90,
-			unit = "armmerl"
+			unit = "vehheavyarty"
 		  },
 		  {
 			angle = 135,
-			unit = "armcomdgun"
+			unit = "striderantiheavy"
 		  },		  
 		  {
 			angle = -90,
@@ -99,5 +99,5 @@ local menu_armcsa = {
   }
 }
 
-return menu_armcsa
+return menu_athena
 

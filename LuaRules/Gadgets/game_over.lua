@@ -84,7 +84,7 @@ local function GetUnitDefIdByName(defName)
 end
 
 local doesNotCountList = {
-	[GetUnitDefIdByName("armflea")] = true,
+	[GetUnitDefIdByName("spiderscout")] = true,
 	[GetUnitDefIdByName("corroach")] = true,
 	[GetUnitDefIdByName("armtick")] = true,
 	[GetUnitDefIdByName("blastwing")] = true,

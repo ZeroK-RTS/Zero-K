@@ -47,7 +47,7 @@ modes = {
 	[7] = 'Chicken: Speed'
 }
 defaultDifficulty = modes[2]
-testBuilding 	= UnitDefNames["armestor"].id	--testing to place burrow
+testBuilding 	= UnitDefNames["energypylon"].id	--testing to place burrow
 testBuildingQ 	= UnitDefNames["chicken_dragon"].id	--testing to place queen
 
 --------------------------------------------------------------------------------

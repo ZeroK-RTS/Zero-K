@@ -92,7 +92,7 @@ local sexTable         = {}
 local statsBuffer      = {0, 0, 0, 0, 0}
 local energy = {     --FIXME not used, see line 443 in widget:UnitDestroyed
   "armsolar",
-  "armfus", 
+  "energyfusion", 
   "cafus", 
   "armtide", 
   "armwin",
@@ -113,7 +113,7 @@ local aa = {
 	"corrazor", --razor kiss
 	"missiletower",--hacksaw
 	"corflak",
-	"armcir", --chainsaw
+	"turretaafar", --chainsaw
 	"screamer",
 }
 
@@ -227,7 +227,7 @@ local function CheckSelected()
       isTurret =true
     end
     
-    if ((name == "armfus") or -- fusion
+    if ((name == "energyfusion") or -- fusion
 	--(name == "corfus") or (name == "aafus") are not in game anymore.
         (name == "cafus"))then  --adv fusion
       isFus = true

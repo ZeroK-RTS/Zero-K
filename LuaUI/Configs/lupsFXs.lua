@@ -65,10 +65,10 @@ groundFlashCorestor = {
   colormap   = { {0.9, 0.9, 0.0, 0.15},{0.9, 0.9, 0.0, 0.20},{0.9, 0.9, 0.0, 0.20},{0.9, 0.9, 0.0, 0.15}, },
   repeatEffect = true,
 }
-groundFlashArmestor = {
+groundFlashenergypylon = {
   life       = 50,
   size       = 80,
-  texture    = "bitmaps/GPL/Lups/gf_armestor.png",
+  texture    = "bitmaps/GPL/Lups/gf_energypylon.png",
   colormap   = { {0.9, 0.9, 0.0, 0.2},{0.9, 0.9, 0.0, 0.3},{0.9, 0.9, 0.0, 0.3},{0.9, 0.9, 0.0, 0.2}, },
   repeatEffect = true,
 }

@@ -54,7 +54,7 @@ end
 
 local unitHealthRatioOverride = {
 	[UnitDefNames["corfav"].id] = 4,
-	[UnitDefNames["armflea"].id] = 4,
+	[UnitDefNames["spiderscout"].id] = 4,
 }
 
 -- Pregenerate HP ratio
@@ -87,25 +87,25 @@ local unitIsBadAgainstGround = {
 local unitIsBomber = {
 	[UnitDefNames["corshad"].id] = true,
 	[UnitDefNames["corhurc2"].id] = true,
-	[UnitDefNames["armcybr"].id] = true,
+	[UnitDefNames["bomberheavy"].id] = true,
 	[UnitDefNames["armstiletto_laser"].id] = true,
 }
 
 -- Hardcode things which do high burst damage with a long cooldown
 local unitIsHeavyHitter = {
 	[UnitDefNames["turretantiheavy"].id] = true,
-	[UnitDefNames["armmanni"].id] = true,
+	[UnitDefNames["hoverarty"].id] = true,
 	[UnitDefNames["armsnipe"].id] = true,
 	[UnitDefNames["shieldarty"].id] = true,
 	[UnitDefNames["nsaclash"].id] = true,
 	[UnitDefNames["bantha"].id] = true,
-	[UnitDefNames["armcybr"].id] = true,
+	[UnitDefNames["bomberheavy"].id] = true,
 }
 
 local unitIsCheap = {
 	[UnitDefNames["corrl"].id] = true,
 	[UnitDefNames["corllt"].id] = true,
-	[UnitDefNames["armflea"].id] = true,
+	[UnitDefNames["spiderscout"].id] = true,
 	[UnitDefNames["armpw"].id] = true,
 	[UnitDefNames["corfav"].id] = true,
 	[UnitDefNames["corgator"].id] = true,
@@ -117,12 +117,12 @@ local unitIsCheap = {
 local unitIsHeavy = {
 	[UnitDefNames["shieldfelon"].id] = true,
 	[UnitDefNames["correap"].id] = true,
-	[UnitDefNames["armmanni"].id] = true,
+	[UnitDefNames["hoverarty"].id] = true,
 	[UnitDefNames["armsnipe"].id] = true,
 	[UnitDefNames["corgol"].id] = true,
 	[UnitDefNames["tawf114"].id] = true,
 	[UnitDefNames["amphassault"].id] = true,
-	[UnitDefNames["armcrabe"].id] = true,
+	[UnitDefNames["spidercrabe"].id] = true,
 	[UnitDefNames["corcrw"].id] = true,
 	[UnitDefNames["corsumo"].id] = true,
 	[UnitDefNames["dante"].id] = true,
@@ -130,7 +130,7 @@ local unitIsHeavy = {
 	[UnitDefNames["funnelweb"].id] = true,
 	[UnitDefNames["armraven"].id] = true,
 	[UnitDefNames["bantha"].id] = true,
-	[UnitDefNames["armorco"].id] = true,
+	[UnitDefNames["detriment"].id] = true,
 }
 
 -- Hardcode weapons that are bad against fast moving stuff.
@@ -143,11 +143,11 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["corstorm_storm_rocket"].id]     = {2.0},
 	[WeaponDefNames["corcrash_armkbot_missile"].id]  = {16.0},
 	[WeaponDefNames["armrock_bot_rocket"].id]        = {2.5},
-	[WeaponDefNames["armham_hammer_weapon"].id]      = {1.5},
+	[WeaponDefNames["cloakarty_hammer_weapon"].id]      = {1.5},
 	[WeaponDefNames["armsnipe_shockrifle"].id]       = {2.5},
 	[WeaponDefNames["cormist_cortruck_missile"].id]  = {11.0},
 	[WeaponDefNames["corraid_plasma"].id]            = {2.5},
-	[WeaponDefNames["armmerl_cortruck_rocket"].id]   = {0.5},
+	[WeaponDefNames["vehheavyarty_cortruck_rocket"].id]   = {0.5},
 	[WeaponDefNames["vehaa_missile"].id]             = {14.0},
 	[WeaponDefNames["gunshipheavyskirm_emg"].id]              = {3.0},
 	[WeaponDefNames["gunshipaa_aa_missile"].id]      = {14.0},
@@ -158,14 +158,14 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["amphaa_missile"].id]            = {14.0},
 	[WeaponDefNames["spiderassault_thud_weapon"].id] = {2.5},
 	[WeaponDefNames["armsptk_adv_rocket"].id]        = {2.5},
-	[WeaponDefNames["armcrabe_arm_crabe_gauss"].id]  = {2.5},
+	[WeaponDefNames["spidercrabe_arm_crabe_gauss"].id]  = {2.5},
 	[WeaponDefNames["spideraa_aa"].id]               = {11.0},
 	[WeaponDefNames["puppy_missile"].id]             = {8.0},
 	[WeaponDefNames["correap_cor_reap"].id]          = {2.5},
 	[WeaponDefNames["corgol_cor_gol"].id]            = {2.0},
 	[WeaponDefNames["cormart_core_artillery"].id]    = {1.5},
 	[WeaponDefNames["trem_plasma"].id]               = {0.5},
-	[WeaponDefNames["armcomdgun_disintegrator"].id]  = {2.8},
+	[WeaponDefNames["striderantiheavy_disintegrator"].id]  = {2.8},
 	[WeaponDefNames["dante_napalm_rockets"].id]      = {2.8},
 	[WeaponDefNames["armraven_rocket"].id]           = {0.5},
 --	[WeaponDefNames["shipcarrier_armmship_rocket"].id]      = {0.5},
@@ -173,10 +173,10 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["shipskirm_rocket"].id]          = {2.8},
 	[WeaponDefNames["shiparty_plasma"].id]           = {2.0},
 	[WeaponDefNames["corrl_armrl_missile"].id]       = {14.0},
-	[WeaponDefNames["armdeva_armdeva_weapon"].id]    = {5.0},
+	[WeaponDefNames["turretriot_turretriot_weapon"].id]    = {5.0},
 	[WeaponDefNames["corrazor_aagun"].id]            = {7.0, 0, 3},
 	[WeaponDefNames["missiletower_missile"].id]      = {16.0},
-	[WeaponDefNames["armcir_missile"].id]            = {14.0},
+	[WeaponDefNames["turretaafar_missile"].id]            = {14.0},
 	[WeaponDefNames["corbhmth_plasma"].id]           = {2.5},
 	[WeaponDefNames["staticheavyarty_plasma"].id]           = {2.0},
 }
@@ -208,12 +208,12 @@ for wdid = 1, #WeaponDefs do
 end
 
 local radarWobblePenalty = {
-	[WeaponDefNames["armmerl_cortruck_rocket"].id] = 5,
+	[WeaponDefNames["vehheavyarty_cortruck_rocket"].id] = 5,
 --	[WeaponDefNames["shipcarrier_armmship_rocket"].id] = 5,
 	[WeaponDefNames["armsnipe_shockrifle"].id] = 5,
 	[WeaponDefNames["turretantiheavy_ata"].id] = 5,
-	[WeaponDefNames["armmanni_ata"].id] = 5,
-	[WeaponDefNames["armham_hammer_weapon"].id] = 5,
+	[WeaponDefNames["hoverarty_ata"].id] = 5,
+	[WeaponDefNames["cloakarty_hammer_weapon"].id] = 5,
 }
 
 for i = 1, #UnitDefs do

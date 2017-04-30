@@ -2,7 +2,7 @@ local menu = {
 	items = {
 		{
 			angle = 0,
-			unit = "armcomdgun",
+			unit = "striderantiheavy",
 			label = "Stealth",
 		},
 		{
@@ -49,7 +49,7 @@ local menu = {
 		},
 		{
 			angle = 180,
-			unit = "armorco",
+			unit = "detriment",
 			label = "Massive",
 		},
 	}

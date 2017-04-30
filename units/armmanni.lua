@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[armmanni]],
+  unitname            = [[hoverarty]],
   name                = [[Penetrator]],
   description         = [[Anti-Heavy Artillery Hovercraft]],
   acceleration        = 0.016,
@@ -7,7 +7,7 @@ unitDef = {
   brakeRate           = 0.148,
   buildCostMetal      = 1000,
   builder             = false,
-  buildPic            = [[armmanni.png]],
+  buildPic            = [[hoverarty.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -45,7 +45,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[penetrator_lordmuffe.s3o]],
-  script	          = [[armmanni.lua]],
+  script	          = [[hoverarty.lua]],
   selfDestructAs      = [[MEDIUM_BUILDINGEX]],
   
   sfxtypes            = {
@@ -146,4 +146,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armmanni = unitDef })
+return lowerkeys({ hoverarty = unitDef })

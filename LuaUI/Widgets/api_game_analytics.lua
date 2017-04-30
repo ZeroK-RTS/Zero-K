@@ -47,7 +47,7 @@ unitCategories.basicEnergyBuildings = {
 
 unitCategories.advancedEnergyBuildings = {
 	energyheavygeo  = true, 
-	armfus = true, 
+	energyfusion = true, 
 	cafus  = true, 
 	geo    = true, 
 }
@@ -57,7 +57,7 @@ unitCategories.energyBuildings = Spring.Utilities.MergeTable(	unitCategories.bas
 
 unitCategories.lightGroundTurrets = {
 	turretemp   = true,
-	armdeva    = true,
+	turretriot    = true,
 	corllt     = true,
 	corrl      = true,
 	turrettorp = true,
@@ -93,8 +93,8 @@ unitCategories.factories = Spring.Utilities.MergeTable(	unitCategories.basicFact
 
 unitCategories.builders = {
 	amphcon    = true,
-	armca      = true,
-	-- armcsa  = true,
+	planecon      = true,
+	-- athena  = true,
 	armrectr   = true,
 	spidercon = true,
 	coracv     = true,
@@ -111,7 +111,7 @@ unitCategories.gameEnder = {
 	mahlazer  = true,
 	raveparty = true,
 	bantha  = true, -- Not really a game ender, but beginners shouldn't build it early.
-	armorco   = true,
+	detriment   = true,
 }
 
 --------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armmstor]],
+  unitname                      = [[staticstorage]],
   name                          = [[Storage]],
   description                   = [[Stores Metal and Energy (500)]],
   activateWhenBuilt             = true,
@@ -8,8 +8,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
   buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[armmstor_aoplane.dds]],
-  buildPic                      = [[ARMMSTOR.png]],
+  buildingGroundDecalType       = [[staticstorage_aoplane.dds]],
+  buildPic                      = [[staticstorage.png]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[60 60 60]],
@@ -27,7 +27,7 @@ unitDef = {
   metalStorage                  = 500,
   minCloakDistance              = 150,
   objectName                    = [[pylon.s3o]],
-  script                        = "armmstor.lua",
+  script                        = "staticstorage.lua",
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
@@ -62,4 +62,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armmstor = unitDef })
+return lowerkeys({ staticstorage = unitDef })

@@ -110,8 +110,8 @@ effectUnitDefs = {
   corestor = {
     {class='GroundFlash', options=groundFlashCorestor},
   },
-  armestor = {
-    {class='GroundFlash', options=groundFlashArmestor},
+  energypylon = {
+    {class='GroundFlash', options=groundFlashenergypylon},
   },
 
   --// FACTORIES //----------------------------
@@ -152,7 +152,7 @@ effectUnitDefs = {
     {class='StaticParticles', options=MergeTable(radarBlink,{piece="head", delay=15})},
   },
 
-  armcrabe = {
+  spidercrabe = {
 	{class='StaticParticles', options=MergeTable(blinkyLightWhite, {piece="blight"}) },
   },   
   corcan = {
@@ -195,13 +195,13 @@ effectUnitDefs = {
 	{class='StaticParticles', options=MergeTable(blinkyLightBlue, {piece="light", delay = 20, size = 25}) },
   },
   
-  armorco = {
+  detriment = {
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="light", delay = 20, size = 30}) },
   },
 
   -- length tag does nothing
   --// PLANES //----------------------------
-  armcybr = {
+  bomberheavy = {
     {class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle1", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle2", onActive=true, noIconDraw = true}},
    },
@@ -229,7 +229,7 @@ effectUnitDefs = {
 	--{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="LWingTip"}) },
 	--{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="RWingTip"}) },	
   },
-  armcsa = {
+  athena = {
     {class='AirJet', options={color={0.45,0.45,0.9}, width=2.8, length=15, piece="enginel", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.45,0.45,0.9}, width=2.8, length=15, piece="enginer", onActive=true, noIconDraw = true}},
     {class='Ribbon', options={width=1, size=12, piece="wingtipl", noIconDraw = true}},
@@ -243,13 +243,13 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="rjet", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
   },
 
-  armkam = {
+  gunshipraid = {
     {class='Ribbon', options={width=1, size=10, piece="lfx", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=10, piece="rfx", noIconDraw = true}},  
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="lfx", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="rfx", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
   },
-  armca = {
+  planecon = {
     {class='Ribbon', options={width=1, size=10, piece="engine1", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=10, piece="engine2", noIconDraw = true}},  
     {class='AirJet', options={color={0.1,0.4,0.6}, width=8, length=20, piece="body", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},

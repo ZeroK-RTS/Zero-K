@@ -74,7 +74,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 2,
 					[1] = {ID = UnitDefNames['corgarp'].id, chance = 0.9},
-					[2] = {ID = UnitDefNames['armmerl'].id, chance = 0.1},
+					[2] = {ID = UnitDefNames['vehheavyarty'].id, chance = 0.1},
 				},
 				
 				[5] = { --assault
@@ -178,14 +178,14 @@ factionBuildConfig = {
 				[2] = { -- scout
 					importanceMult = 1.2,
 					count = 1,
-					[1] = {ID = UnitDefNames['armflea'].id, chance = 1},
+					[1] = {ID = UnitDefNames['spiderscout'].id, chance = 1},
 					--[2] = {ID = UnitDefNames['armspy'].id, chance = 0.05},
 				},
 				
 				[3] = { -- raider
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['armflea'].id, chance = 1},
+					[1] = {ID = UnitDefNames['spiderscout'].id, chance = 1},
 				},
 				
 				[4] = { -- arty
@@ -197,7 +197,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 2,
 					[1] = {ID = UnitDefNames['spiderassault'].id, chance = 0.95},
-					[2] = {ID = UnitDefNames['armcrabe'].id, chance = 0.05},
+					[2] = {ID = UnitDefNames['spidercrabe'].id, chance = 0.05},
 				},
 				
 				[6] = { -- skirm
@@ -249,7 +249,7 @@ factionBuildConfig = {
 				[4] = { -- arty
 					importanceMult = 1,
 					count = 2,
-					[1] = {ID = UnitDefNames['armham'].id, chance = 0.9},
+					[1] = {ID = UnitDefNames['cloakarty'].id, chance = 0.9},
 					[2] = {ID = UnitDefNames['armsnipe'].id, chance = 0.1},
 				},
 				
@@ -274,7 +274,7 @@ factionBuildConfig = {
 				[8] = { -- aa
 					importanceMult = 1.3,
 					count = 1,
-					[1] = {ID = UnitDefNames['armjeth'].id, chance = 1},
+					[1] = {ID = UnitDefNames['cloakaa'].id, chance = 1},
 				},	
 			},
 			[UnitDefNames['factoryshield'].id] = {
@@ -364,7 +364,7 @@ factionBuildConfig = {
 				[4] = { -- arty
 					importanceMult = 0.5,
 					count = 1,
-					[1] = {ID = UnitDefNames['armmanni'].id, chance = 1},
+					[1] = {ID = UnitDefNames['hoverarty'].id, chance = 1},
 				},
 				
 				[5] = { --assault
@@ -523,7 +523,7 @@ factionBuildConfig = {
 				[1] = { -- con
 					importanceMult = 0.8,
 					count = 1,
-					[1] = {ID = UnitDefNames['armca'].id, chance = 1},
+					[1] = {ID = UnitDefNames['planecon'].id, chance = 1},
 				},
 				
 				[2] = { -- scout
@@ -587,7 +587,7 @@ factionBuildConfig = {
 					importanceMult = 1.4,
 					count = 4,
 					[1] = {ID = UnitDefNames['gunshipsupport'].id, chance = 0.30},
-					[2] = {ID = UnitDefNames['armkam'].id, chance = 0.35},
+					[2] = {ID = UnitDefNames['gunshipraid'].id, chance = 0.35},
 					[3] = {ID = UnitDefNames['gunshipheavyskirm'].id, chance = 0.175},
 					[4] = {ID = UnitDefNames['blackdawn'].id, chance = 0.175},
 				},	
@@ -607,12 +607,12 @@ factionBuildConfig = {
 		energyIds = {
 			count = 4,
 			[1] = {ID = UnitDefNames['cafus'].id},
-			[2] = {ID = UnitDefNames['armfus'].id},
+			[2] = {ID = UnitDefNames['energyfusion'].id},
 			[3] = {ID = UnitDefNames['armsolar'].id},
 			[4] = {ID = UnitDefNames['armwin'].id},
 		},
 		econByDefId = {
-			[UnitDefNames['armfus'].id] = {
+			[UnitDefNames['energyfusion'].id] = {
 				energyGreaterThan = 30, 
 				energySpacing = 100,
 				whileStall = false,
@@ -716,7 +716,7 @@ factionBuildConfig = {
 			
 			[2] = {
 				count = 3,
-				[1] = {ID = UnitDefNames['armdeva'].id, chance = 0.4},
+				[1] = {ID = UnitDefNames['turretriot'].id, chance = 0.4},
 				[2] = {ID = UnitDefNames['turretemp'].id, chance = 0.3},
 				[3] = {ID = UnitDefNames['corgrav'].id, chance = 0.3},
 			},
@@ -737,7 +737,7 @@ factionBuildConfig = {
 				level = 1,
 				index = 2,
 			},
-			[UnitDefNames['armdeva'].id] = {
+			[UnitDefNames['turretriot'].id] = {
 				level = 2,
 				index = 1,
 			},
@@ -769,7 +769,7 @@ factionBuildConfig = {
 			
 			[3] = {
 				count = 2,
-				[1] = {ID = UnitDefNames['armcir'].id, chance = 0.7},
+				[1] = {ID = UnitDefNames['turretaafar'].id, chance = 0.7},
 				[2] = {ID = UnitDefNames['corflak'].id, chance = 0.3},
 			},
 		},
@@ -787,7 +787,7 @@ factionBuildConfig = {
 				level = 2,
 				index = 2,
 			},
-			[UnitDefNames['armcir'].id] = {
+			[UnitDefNames['turretaafar'].id] = {
 				level = 3,
 				index = 1,
 			},
@@ -798,7 +798,7 @@ factionBuildConfig = {
 		},
 
 		airpadDefID = UnitDefNames['staticrearm'].id,
-		nanoDefID = UnitDefNames['armnanotc'].id,
-		metalStoreDefID = UnitDefNames['armmstor'].id,
+		nanoDefID = UnitDefNames['staticcon'].id,
+		metalStoreDefID = UnitDefNames['staticstorage'].id,
 	}
 }

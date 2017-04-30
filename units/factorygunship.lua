@@ -15,7 +15,7 @@ unitDef = {
     [[gunshipcon]],
     [[blastwing]],
     [[bladew]],
-    [[armkam]],
+    [[gunshipraid]],
     [[gunshipsupport]],
     [[gunshipheavyskirm]],
     [[blackdawn]],

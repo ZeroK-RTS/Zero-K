@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[armorco]],
+  unitname               = [[detriment]],
   name                   = [[Detriment]],
   description            = [[Ultimate Assault Strider]],
   acceleration           = 0.1092,
@@ -8,7 +8,7 @@ unitDef = {
   brakeRate              = 0.2392,
   buildCostMetal         = 24000,
   builder                = false,
-  buildPic               = [[ARMORCO.png]],
+  buildPic               = [[detriment.png]],
   canGuard               = true,
   --canManualFire          = true,
   canMove                = true,
@@ -44,7 +44,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[detriment.s3o]],
-  script                 = [[armorco.lua]],
+  script                 = [[detriment.lua]],
   selfDestructAs         = [[NUCLEAR_MISSILE]],
   selfDestructCountdown  = 10,
   sightDistance          = 910,
@@ -341,4 +341,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armorco = unitDef })
+return lowerkeys({ detriment = unitDef })

@@ -45,14 +45,14 @@ local buildoptions = {
 		{ "cormex" },
 		{ "armwin" },-- wind
 		{ "armsolar",  notSea=true },
-		{ "armnanotc" },-- caretaker
+		{ "staticcon" },-- caretaker
 		{ "geo",  notSea=true },
 		{ "staticrearm" },-- repair pad
 
 		-- adv
-		{ "armestor",  tech=2 },-- pylon
-		{ "armmstor",  tech=2 },-- storage
-		{ "armfus",  tech=2 },
+		{ "energypylon",  tech=2 },-- pylon
+		{ "staticstorage",  tech=2 },-- storage
+		{ "energyfusion",  tech=2 },
 		{ "cafus",  tech=2 },-- singularity
 	},
 
@@ -61,7 +61,7 @@ local buildoptions = {
 		{ "corllt",  notSea=true },
 		{ "turretemp",  notSea=true },-- Faraday
 		{ "turrettorp",  notLand=true },-- you can build it on land, but torpedoes are only useful around water.
-		{ "armdeva" },-- Stardust
+		{ "turretriot" },-- Stardust
 		{ "corgrav",  notSea=true },-- newton
 		{ "armpb",  notSea=true },-- Popup gauss
 		{ "corhlt",  tech=2 },-- peoples should prefer Stardust, Faraday, Newton, Urchin more.
@@ -77,7 +77,7 @@ local buildoptions = {
 		{ "missiletower" },-- hacksaw
 		{ "corflak" },
 
-		{ "armcir",  tech=2 },-- chainsaw
+		{ "turretaafar",  tech=2 },-- chainsaw
 		{ "screamer",  tech=3 },
 	},
 
@@ -85,7 +85,7 @@ local buildoptions = {
 		{ "corrad" },
 		{ "staticheavyradar",  tech=2 },
 		{ "corjamt",  tech=2 },-- Aegis
-		{ "armjamt",  tech=2 },-- Sneaky Pete
+		{ "staticjammer",  tech=2 },-- Sneaky Pete
 		{ "missilesilo",  tech=2 },
 		{ CMD_RAMP,  tech=3 },
 		{ CMD_LEVEL,  tech=3 },

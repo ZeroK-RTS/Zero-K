@@ -23,7 +23,7 @@ local assault = {
 	"corraid",
 	
 	"armzeus",
-	--"armcrabe",
+	--"spidercrabe",
 	"spiderassault",
 	"corcan",
 	--"corsumo",
@@ -36,7 +36,7 @@ local assault = {
 	"hoverassault",
 	
 	--"bantha",
-	--"armorco",
+	--"detriment",
 	--"corkrog",
 	
 	--"chickena",
@@ -56,7 +56,7 @@ local skirm = {
 	"cormort",
 	"slowmort",
 	"cormortgold",
-	"armmanni",
+	"hoverarty",
 	
 	"nsaclash",
 	
@@ -91,14 +91,14 @@ local riot = {
 }
 
 local arty = {
-	"armham",
+	"cloakarty",
 	"punisher",
 	"firewalker",
 	"tawf013",
 	"corgarp",
 	
-	"armmerl",
-	--"armmanni",
+	"vehheavyarty",
+	--"hoverarty",
 	"cormart",
 	"trem",
 	
@@ -117,7 +117,7 @@ local counteredByAssaults = {
 }
 
 local prioritySos = {
-	"armfus",
+	"energyfusion",
 	"cafus",
 	"factoryshield",
     "factorycloak",

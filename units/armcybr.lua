@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[armcybr]],
+  unitname            = [[bomberheavy]],
   name                = [[Wyvern]],
   description         = [[Singularity Bomber]],
   --autoheal			  = 25,
   brakerate           = 0.4,
   buildCostMetal      = 2000,
   builder             = false,
-  buildPic            = [[ARMCYBR.png]],
+  buildPic            = [[bomberheavy.png]],
   canFly              = true,
   canGuard            = true,
   canMove             = true,
@@ -49,9 +49,9 @@ unitDef = {
   mygravity           = 1,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
-  objectName          = [[ARMCYBR]],
+  objectName          = [[armcybr]],
   refuelTime		  = 20,
-  script			  = [[armcybr.lua]],
+  script			  = [[bomberheavy.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
   turnRadius          = 20,
@@ -139,4 +139,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armcybr = unitDef })
+return lowerkeys({ bomberheavy = unitDef })

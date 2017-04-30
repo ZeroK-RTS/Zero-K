@@ -76,10 +76,10 @@ local dropableUnits = {
 	--this list additional units that should be dropped.
 	[UnitDefNames["amphcon"].id] = true, --clam
 	[UnitDefNames["amphraid"].id] = true, --duck
-	[UnitDefNames["armcomdgun"].id] = true, --ultimatum
+	[UnitDefNames["striderantiheavy"].id] = true, --ultimatum
 	[UnitDefNames["core_spectre"].id] = true, --aspis
 	[UnitDefNames["spherecloaker"].id] = true, --eraser
-	[UnitDefNames["armorco"].id] = true, --detriment
+	[UnitDefNames["detriment"].id] = true, --detriment
 }
 
 if UnitDefNames["factoryamph"] then

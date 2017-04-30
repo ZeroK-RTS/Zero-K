@@ -45,7 +45,7 @@ modConfig["ZK"]["unitList"] =
 	--1FACTION
 	staticantinuke = { weapons = { 3 }, differentInbuildDraw = true },		--antinuke
 	turretemp = { weapons = { 1 } },		--faraday
-	armdeva = { weapons = { 1 } },		--stardust
+	turretriot = { weapons = { 1 } },		--stardust
 	armpb = { weapons = { 1 } },		--pitbull
 	mahlazer = { weapons = { 1 } },		--starlight
 	turretemp = { weapons = { 1 } },		--faraday
@@ -53,7 +53,7 @@ modConfig["ZK"]["unitList"] =
 	staticheavyarty = { weapons = { 1 } },		--bertha
 	tacnuke = { weapons = { 1 } },		--tacnuke
 	armarch = { weapons = { 2 } },		--packo (unused)
-	armcir = { weapons = { 2 } },		--chainsaw
+	turretaafar = { weapons = { 2 } },		--chainsaw
 	armdl = { weapons = { 1 } },		--anemone (unused)
 	corrl = { weapons = { 4 } },		--defender
 	corllt = { weapons = { 1 } },		--LLT
