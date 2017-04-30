@@ -264,7 +264,7 @@
 
 		"income_tier": [40],
 		//             freaker,   puppy,   pyro,      placeholder,     moderator,  jack,     sumo,      firewalker,   skuttle,   archangel
-		"unit":      ["jumpcon", "jumpscout", "jumpraid", "jumpblackhole", "slowmort", "jumpassault", "jumpsumo", "jumparty", "jumpbomb", "jumpaa"],
+		"unit":      ["jumpcon", "jumpscout", "jumpraid", "jumpblackhole", "jumpskirm", "jumpassault", "jumpsumo", "jumparty", "jumpbomb", "jumpaa"],
 		"land": {
 			"tier0": [ 0.10,      0.20,    0.35,      0.05,            0.20,       0.10,     0.00,      0.00,         0.00,      0.00],
 			"tier1": [ 0.10,      0.00,    0.30,      0.05,            0.25,       0.15,     0.03,      0.12,         0.00,      0.00]
@@ -758,7 +758,7 @@
 	"jumpblackhole": {
 		"role": ["support"]
 	},
-	"slowmort": {
+	"jumpskirm": {
 		"role": ["skirmish"],
 		"attribute": ["support"]
 	},

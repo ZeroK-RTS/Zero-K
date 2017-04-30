@@ -200,7 +200,7 @@ end
 
 local longRangeSkirmieeArray = NameToDefID({
 	"cloakskirm",
-	"slowmort",
+	"jumpskirm",
 	"amphfloater",
 	"hoverskirm", -- hover janus
 	"vehcapture",
@@ -894,7 +894,7 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
 	},
-	["slowmort"] = {
+	["jumpskirm"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},

@@ -20,7 +20,7 @@ unitDef = {
     [[corak]],
     [[hoverassault]],
     [[cloakheavyraid]],
-    [[slowmort]],
+    [[jumpskirm]],
     [[spiderskirm]],
     [[tankheavyraid]],
     [[cloakassault]],

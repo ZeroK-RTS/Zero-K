@@ -95,7 +95,7 @@ skirmDefs = {
 	"spiderskirm",
 	"cloaksnipe",
 	"cormort",
-	"slowmort",
+	"jumpskirm",
 	"cormortgold",
 	"hoverarty",
 	

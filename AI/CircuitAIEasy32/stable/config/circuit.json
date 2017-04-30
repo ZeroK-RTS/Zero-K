@@ -715,7 +715,7 @@
 	"jumpblackhole": {
 		"role": ["support"]
 	},
-	"slowmort": {
+	"jumpskirm": {
 		"role": ["skirmish"],
 		"attribute": ["support"]
 	},

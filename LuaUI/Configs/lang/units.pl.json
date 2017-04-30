@@ -439,7 +439,7 @@
         "description": "Skacząca niewidzialna bomba",
         "helptext": "Mimo że jest powolna, droga i ma niski obszar rażenia, ta niesamowicie niszczycielska bomba wyposażona w niewidzialność i możliwość skakania jest postrachem wszystkich ciężkich jednostek. Dobrą obronę przed nią stanowią lekkie jednostki przeczesujące okolicę."
     },
-    "slowmort": {
+    "jumpskirm": {
         "name": "Moderator",
         "description": "Bot harcownik spowalniacz",
         "helptext": "Moderator oprócz zadawania obrażeń spowalnia cel maksymalnie o 50%%, dzięki czemu jest efektywny przeciw większości celów. Jego niska szybkostrzelność sprawia, że lekkie jednostki nie powinny mieć z nim większych problemów."

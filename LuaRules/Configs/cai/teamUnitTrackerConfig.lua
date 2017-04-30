@@ -103,7 +103,7 @@ local ground = {
 		"amphfloater",
 		"spiderskirm",
 		"cloaksnipe",
-		"slowmort",
+		"jumpskirm",
 		"chickens",
 		"chicken_sporeshooter",
 		"striderscorpion",

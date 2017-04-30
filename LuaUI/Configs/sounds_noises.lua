@@ -264,7 +264,7 @@ local sounds = {
 			[1] = "crawlie_select",
 		},
 	},
-	slowmort = {
+	jumpskirm = {
 		ok = {
 			[1] = "bot_move",
 		},

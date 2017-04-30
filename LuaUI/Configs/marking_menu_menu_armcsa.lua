@@ -54,7 +54,7 @@ local menu_athena = { -- TODO_RENAME_FILE
 		  },		  
 		  {
 			angle = 45,
-			unit = "slowmort"
+			unit = "jumpskirm"
 		  },
 		}
 	  },

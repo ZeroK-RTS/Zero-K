@@ -145,7 +145,7 @@ factionBuildConfig = {
 				[6] = { -- skirm
 					importanceMult = 0.6,
 					count = 1,
-					[1] = {ID = UnitDefNames['slowmort'].id, chance = 1},
+					[1] = {ID = UnitDefNames['jumpskirm'].id, chance = 1},
 				},
 				
 				[7] = { -- riot

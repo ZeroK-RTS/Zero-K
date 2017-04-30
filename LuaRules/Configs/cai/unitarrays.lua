@@ -54,7 +54,7 @@ local skirm = {
 	"spiderskirm",
 	"cloaksnipe",
 	"cormort",
-	"slowmort",
+	"jumpskirm",
 	"cormortgold",
 	"hoverarty",
 	

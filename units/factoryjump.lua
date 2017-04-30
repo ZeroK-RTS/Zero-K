@@ -16,7 +16,7 @@ unitDef = {
     [[jumpscout]],
     [[jumpraid]],
 	[[jumpblackhole]],
-	[[slowmort]],
+	[[jumpskirm]],
     [[jumpassault]],
     [[jumpsumo]],
 	[[jumparty]],
