@@ -470,7 +470,7 @@ function ReceivePersistentMessages(newMessages)
   
   ClearPersistentMessageHistory()
   for index, msg in pairs(newMessages) do
-    local image = (msg.imageFromArchive and "" or "LuaUI/Images/") .. msg.image
+    local image = msg.image and ((msg.imageFromArchive and "" or "LuaUI/Images/") .. msg.image) or nil
     ShowPersistentMessageBox(msg.message, msg.width, msg.height, msg.fontSize, image)
   end
 end
