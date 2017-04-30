@@ -205,7 +205,7 @@ local longRangeSkirmieeArray = NameToDefID({
 	"nsaclash", -- hover janus
 	"capturecar",
 	"chickenc",
-	"armbanth",
+	"bantha",
 	"corllt",
 	"armdeva",
 	"turretemp",
@@ -282,7 +282,7 @@ local medRangeExplodables = NameToDefID({
 	"geo",
 	"cafus", -- same with singu, at least to make an effort for survival.
 	"energyheavygeo",
-	"armbanth", -- banthas also have a fairly heavy but dodgeable explosion.
+	"bantha", -- banthas also have a fairly heavy but dodgeable explosion.
 })
 
 for name, data in pairs(UnitDefNames) do -- avoid factory death explosions.
@@ -311,7 +311,7 @@ local skirmableAir = NameToDefID({
 	"bladew",
 	"armkam",
 	"gunshipsupport",
-	"armbrawl",
+	"gunshipheavyskirm",
 	"blackdawn",
 	"corbtrans",
 	"corcrw",
@@ -319,7 +319,7 @@ local skirmableAir = NameToDefID({
 
 -- Brawler, for AA to swarm.
 local brawler = NameToDefID({
-	"armbrawl",
+	"gunshipheavyskirm",
 })
 
 -- Things that are fled by some things
@@ -1115,7 +1115,7 @@ local behaviourConfig = {
 		stoppingDistance = -100,
 		velocityPrediction = 0,
 	},	
-	["armbanth"] = {
+	["bantha"] = {
 		skirms = allGround, 
 		swarms = {}, 
 		flees = {},

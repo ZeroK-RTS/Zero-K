@@ -28,7 +28,7 @@ local menu = {
 		},
 		{
 			angle = 45,
-			unit = "armbanth",
+			unit = "bantha",
 			label = "Heavy",
 		},
 		{

@@ -521,7 +521,7 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
-	armbanth = {
+	bantha = {
 		ok = {
 			[1] = "turret_select",
 		},
@@ -920,7 +920,7 @@ local sounds = {
 			[1] = "gunship_select",
 		},
 	},
-	armbrawl = {
+	gunshipheavyskirm = {
 		ok = {
 			[1] = "heavy_gunship_move",
 		},
@@ -1340,7 +1340,7 @@ local sounds = {
 			[1] = "turret_select",
 		},
 	},
-	armbrtha = {
+	staticheavyarty = {
 		ok = {
 			[1] = "turret_select",
 		},

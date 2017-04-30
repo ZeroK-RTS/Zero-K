@@ -62,7 +62,7 @@
 
 		"income_tier": [7, 16, 24, 32, 40, 56, 72],
 		//             wasp,         blastwing,   gnat,     banshee,  rapier,           brawler,    blackdawn,   krow,     valkyrie,  vindicator,  trident
-		"unit":      ["gunshipcon", "blastwing", "bladew", "armkam", "gunshipsupport", "armbrawl", "blackdawn", "corcrw", "corvalk", "corbtrans", "gunshipaa"],
+		"unit":      ["gunshipcon", "blastwing", "bladew", "armkam", "gunshipsupport", "gunshipheavyskirm", "blackdawn", "corcrw", "corvalk", "corbtrans", "gunshipaa"],
 		"land": {
 			// 0-8m Opening - Blastwing and banshee Harass
 			"tier0": [ 0.00,         0.17,        0.00,     0.10,     0.71,             0.00,       0.02,        0.00,     0.00,      0.00,        0.00],
@@ -313,7 +313,7 @@
 
 		"income_tier": [60, 80, 100],
 		//             ultimatum,    scorpion,   dante,   catapult,   funnelweb,   bantha,     detriment, scylla,          reef,          battleship
-		"unit":      ["armcomdgun", "scorpion", "dante", "armraven", "funnelweb", "armbanth", "armorco", "subtacmissile", "shipcarrier", "shipheavyarty"],
+		"unit":      ["armcomdgun", "scorpion", "dante", "armraven", "funnelweb", "bantha", "armorco", "subtacmissile", "shipcarrier", "shipheavyarty"],
 		"land": {
 			"tier0": [ 0.01,         0.10,       0.81,    0.00,       0.05,        0.03,       0.00,      0.00,            0.00,          0.00],
 			"tier1": [ 0.03,         0.14,       0.22,    0.24,       0.20,        0.16,       0.01,      0.00,            0.00,          0.00],
@@ -485,7 +485,7 @@
 		"pwr_mod": 3,
 		"thr_mod": 3
 	},
-	"armbrawl": {
+	"gunshipheavyskirm": {
 		"role": ["air"],
 		"attribute": ["no_strafe", "siege"],
 		"retreat": 0.55,
@@ -1015,7 +1015,7 @@
 		"pwr_mod": 15.0,
 		"thr_mod": 15.0
 	},
-	"armbanth": {
+	"bantha": {
 		"role": ["heavy", "support", "heavy"],
 		"retreat": 0.6,
 		"pwr_mod": 0.5,
@@ -1063,7 +1063,7 @@
 		"limit": 1,
 		"thr_mod": 0.01
 	},
-	"armbrtha": {
+	"staticheavyarty": {
 		"role": ["anti_heavy", "static", "heavy"],
 		"limit": 5,
 		"thr_mod": 0.01
@@ -1454,7 +1454,7 @@
 	"base": [[0, 20], [0, 120], [2, 450], [5, 660], [1, 980], [5, 1160], [1, 1380], [2, 1680], [5, 2000], [2, 2420], [13, 2800], [7, 3300]],
 
 	"superweapon": {
-		"unit":   ["raveparty", "corsilo", "armbrtha", "zenith"],
+		"unit":   ["raveparty", "corsilo", "staticheavyarty", "zenith"],
 		"weight": [ 0.4,         0.2,       0.3,        0.1    ],
 
 		"condition": [40, 400]  // [<Minimum income>, <maximum seconds to build>]
@@ -1909,7 +1909,7 @@
 		}
 	},
 	"big_gun": {
-		"armbrtha": {
+		"staticheavyarty": {
 			"hub": [[
 					{"unit": "corrad", "category": "radar", "offset": {"back": 40}},
 					{"unit": "armcir", "category": "defence", "offset": {"left": 120}, "condition": "air"},
@@ -2086,10 +2086,10 @@
 		"mex": ["cormex"],
 		"def_low": ["corrl", "corllt"],
 		"caretaker": ["armnanotc"],
-		"superweapon": ["raveparty", "corsilo", "armbrtha", "zenith", "screamer"],
+		"superweapon": ["raveparty", "corsilo", "staticheavyarty", "zenith", "screamer"],
 		"protector": ["staticantinuke"],
 //		"terraform": ["terraunit"],
-		"strider": ["armcomdgun", "scorpion", "dante", "armraven", "funnelweb", "armbanth", "armorco", "subtacmissile", "shipcarrier", "shipheavyarty"]
+		"strider": ["armcomdgun", "scorpion", "dante", "armraven", "funnelweb", "bantha", "armorco", "subtacmissile", "shipcarrier", "shipheavyarty"]
 	}
 }
 },

@@ -35,7 +35,7 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  objectName             = [[amphimpulse.s3o]],
+  objectName             = [[amphraider2.s3o]],
   script                 = [[amphimpulse.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 

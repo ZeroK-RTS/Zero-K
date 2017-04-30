@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[armbanth]],
+  unitname               = [[bantha]],
   name                   = [[Bantha]],
   description            = [[Ranged Support Strider]],
   acceleration           = 0.1047,
   brakeRate              = 0.2212,
   buildCostMetal         = 10500,
   builder                = false,
-  buildPic               = [[ARMBANTH.png]],
+  buildPic               = [[bantha.png]],
   canGuard               = true,
   canManualFire          = true,
   canMove                = true,
@@ -47,7 +47,7 @@ unitDef = {
   noChaseCategory        = [[FIXEDWING SATELLITE SUB]],
   objectName             = [[Bantha.s3o]],
   selfDestructAs         = [[ATOMIC_BLAST]],
-  script                 = [[armbanth.lua]],
+  script                 = [[bantha.lua]],
   
   sfxtypes               = {
 
@@ -261,4 +261,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armbanth = unitDef })
+return lowerkeys({ bantha = unitDef })

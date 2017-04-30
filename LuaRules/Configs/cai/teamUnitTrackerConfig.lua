@@ -89,7 +89,7 @@ local ground = {
 		"corgol",
 		"amphassault",
 		"hoverassault",
-		"armbanth",
+		"bantha",
 		"armorco",
 		"corkrog",
 		"chickena",
@@ -174,7 +174,7 @@ local air = {
 		"armkam",
 		"gunshipsupport",
 		"blackdawn",
-		"armbrawl",
+		"gunshipheavyskirm",
 		"corcrw",
 	},
 	

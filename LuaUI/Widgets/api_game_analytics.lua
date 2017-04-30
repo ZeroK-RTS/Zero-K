@@ -110,7 +110,7 @@ unitCategories.gameEnder = {
 	zenith    = true,
 	mahlazer  = true,
 	raveparty = true,
-	armbanth  = true, -- Not really a game ender, but beginners shouldn't build it early.
+	bantha  = true, -- Not really a game ender, but beginners shouldn't build it early.
 	armorco   = true,
 }
 

@@ -49,7 +49,7 @@ for name,data in pairs(tips) do
 end
 
 local superweaponDefs = {
-	"armbrtha",
+	"staticheavyarty",
 	"corsilo",
 }
 local hyperweaponDefs = {
@@ -59,7 +59,7 @@ local hyperweaponDefs = {
 	"armorco",
 }
 local canRetreatDefs = {
-	"armbrawl",
+	"gunshipheavyskirm",
 	"blackdawn",
 	"corcrw",
 	
@@ -72,7 +72,7 @@ local canRetreatDefs = {
 	"dante",
 	--"armraven",
 	"scorpion",
-	"armbanth",
+	"bantha",
 	"armorco",
 	
 	"shipheavyarty",

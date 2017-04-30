@@ -50,7 +50,7 @@ modConfig["ZK"]["unitList"] =
 	mahlazer = { weapons = { 1 } },		--starlight
 	turretemp = { weapons = { 1 } },		--faraday
 	turretantiheavy = { weapons = { 1 } },		--annihilator
-	armbrtha = { weapons = { 1 } },		--bertha
+	staticheavyarty = { weapons = { 1 } },		--bertha
 	tacnuke = { weapons = { 1 } },		--tacnuke
 	armarch = { weapons = { 2 } },		--packo (unused)
 	armcir = { weapons = { 2 } },		--chainsaw

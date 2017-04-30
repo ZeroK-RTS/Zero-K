@@ -394,7 +394,7 @@
 		"description" : "Small Powerplant (+2)",
 		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a quarter and offers excellent protection against raiders."
 	},
-	"armbrawl" : {
+	"gunshipheavyskirm" : {
 		"name" : "Brawler",
 		"description" : "Fire Support Gunship",
 		"helptext" : "The Brawler is a fire support gunship that flies out of the reach of most ground mobiles. It is tough enough to survive limited anti-air fire, and its twin EMGs chew through units stupid enough to stay put."
@@ -714,7 +714,7 @@
 		"description" : "Strategic Nuke Interception System",
 		"helptext" : "The Protector automatically intercepts enemy nuclear ICBMs aimed within its coverage radius."
 	},
-	"armbrtha" : {
+	"staticheavyarty" : {
 		"name" : "Big Bertha",
 		"description" : "Strategic Plasma Cannon",
 		"helptext" : "The Bertha is a massive cannon that fires high-energy plasmoids across the map. Used appropriately, it can effectively suppress enemy operations from the safety of your base. Do not expect it to win battles alone for you, however."
@@ -1094,7 +1094,7 @@
 		"description" : "Produces Heavy and Specialized Vehicles, Builds at 10 m/s",
 		"helptext" : "The Heavy Tank Factory is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Pillager, Reaper, Banisher, Goliath"
 	},
-	"armbanth" : {
+	"bantha" : {
 		"name" : "Bantha",
 		"description" : "Ranged Support Strider",
 		"helptext" : "The Bantha is an even heavier solution to a particularly uncrackable defense line, with a tachyon projector and EMP missiles for stand-off engagements, lightning hand cannons for general purpose combat, and a good deal of armor. Beware though, for it is defenseless against air and cannot be used effectively on its own."

@@ -42,7 +42,7 @@ local buildOpts = {
 	[[screamer]],
 	[[staticantinuke]],
 	[[corbhmth]],
-	[[armbrtha]],
+	[[staticheavyarty]],
 	[[missilesilo]],
 	[[corsilo]],
 	[[mahlazer]],

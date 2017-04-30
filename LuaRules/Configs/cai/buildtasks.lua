@@ -588,7 +588,7 @@ factionBuildConfig = {
 					count = 4,
 					[1] = {ID = UnitDefNames['gunshipsupport'].id, chance = 0.30},
 					[2] = {ID = UnitDefNames['armkam'].id, chance = 0.35},
-					[3] = {ID = UnitDefNames['armbrawl'].id, chance = 0.175},
+					[3] = {ID = UnitDefNames['gunshipheavyskirm'].id, chance = 0.175},
 					[4] = {ID = UnitDefNames['blackdawn'].id, chance = 0.175},
 				},	
 			},

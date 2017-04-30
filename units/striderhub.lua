@@ -18,7 +18,7 @@ unitDef = {
     [[dante]],
     [[armraven]],
     [[funnelweb]],
-    [[armbanth]],
+    [[bantha]],
     [[armorco]],
     [[shipheavyarty]],
 	[[shipcarrier]],

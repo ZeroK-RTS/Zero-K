@@ -37,7 +37,7 @@ unitDef = {
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[turretemp]],
+  objectName                    = [[armartic]],
   script                        = [[turretemp.lua]],
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
 

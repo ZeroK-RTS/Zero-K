@@ -274,7 +274,7 @@ unitConfigs = {
     rot    = 20,
     angle  = 10,
   },
-  [UnitDefNames.armbanth.id] = {
+  [UnitDefNames.bantha.id] = {
     rot    = 28,
     angle  = 10,
     unfold = true,

@@ -1,9 +1,9 @@
--- armbrtha_flare
--- armbrtha_smoke
--- armbrtha_shockwave
+-- staticheavyarty_flare
+-- staticheavyarty_smoke
+-- staticheavyarty_shockwave
 
 return {
-  ["armbrtha_flare"] = {
+  ["staticheavyarty_flare"] = {
     clouds0 = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -146,7 +146,7 @@ return {
     },
   },
 
-  ["armbrtha_smoke"] = {
+  ["staticheavyarty_smoke"] = {
     clouds0 = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -177,7 +177,7 @@ return {
     },
   },
 
-  ["armbrtha_shockwave"] = {
+  ["staticheavyarty_shockwave"] = {
     clouds0 = {
       air                = true,
       class              = [[CSimpleParticleSystem]],

@@ -32,7 +32,7 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
-  objectName             = [[amphraid.s3o]],
+  objectName             = [[amphraider3.s3o]],
   script                 = [[amphraid.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 

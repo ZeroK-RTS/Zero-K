@@ -17,7 +17,7 @@ unitDef = {
     [[bladew]],
     [[armkam]],
     [[gunshipsupport]],
-    [[armbrawl]],
+    [[gunshipheavyskirm]],
     [[blackdawn]],
     [[corcrw]],
 	[[gunshipaa]],

@@ -409,7 +409,7 @@
         "description": "Mała elektrownia (+2)",
         "helptext": "Panele słoneczne to najbardziej podstawowe elektrownie. Zaatakowane, zwijają się na 8 sekund, co daje im świetną ochronę przed lekkimi najazdami przez zmniejszenie otrzymywanych obrażeń czterokrotnie. "
     },
-    "armbrawl": {
+    "gunshipheavyskirm": {
         "name": "Brawler",
         "description": "Statek powietrzny wsparcia",
         "helptext": "Brawler to statek powietrzny, którego wysokość lotu sprawia nie lada problem przy próbach zestrzelenia go. Jest wytrzymały i posiada podwójne karabiny o dużym zasięgu."
@@ -729,7 +729,7 @@
         "description": "Tarcza antyrakietowa",
         "helptext": "Protector automatycznie przechwytuje rakiety z głowicami atomowymi wycelowane w obszar przezeń broniony."
     },
-    "armbrtha": {
+    "staticheavyarty": {
         "name": "Big Bertha",
         "description": "Działo strategiczne",
         "helptext": "Bertha to masywne działo o ogromnym zasięgu. Przy roztropnym doborze celów jest w stanie niweczyć przedsięwzięcia przeciwnika i niszczyć ważne cele z bezpiecznej odległości, jednak nie jest w stanie sama zapewnić zwycięstwa ze względu na bardzo ograniczoną szybkostrzelność."
@@ -1059,7 +1059,7 @@
         "description": "Buduje czołgi, moc 10 m/s",
         "helptext": "Czołgi specjalizują się w brutalnej sile i wytrzymałości pancerza. Nic tak nie załatwia sporów, jak pancerna pięść na gąsienicach."
     },
-    "armbanth": {
+    "bantha": {
         "name": "Bantha",
         "description": "Mech bojowy",
         "helptext": "Bantha to ciężki mech bojowy, uzbrojony po zęby i bardzo wytrzymały. Posiada rakiety EMP dalekiego zasięgu, ciężki laser oraz działka EMP. Nie ma jednak żadnej obrony przeciwlotniczej i słabo radzi sobie bez wsparcia mniejszych jednostek"

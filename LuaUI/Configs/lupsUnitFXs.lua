@@ -191,7 +191,7 @@ effectUnitDefs = {
 	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=20, strength = .005, precision=50, repeatEffect=true, onActive=true, noIconDraw = true}},	
   },
   
-  armbanth = {
+  bantha = {
 	{class='StaticParticles', options=MergeTable(blinkyLightBlue, {piece="light", delay = 20, size = 25}) },
   },
   
@@ -211,7 +211,7 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, size=12, piece="wingtip1", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=12, piece="wingtip2", noIconDraw = true}},
   },
-  armbrawl = {
+  gunshipheavyskirm = {
     {class='AirJet', options={color={0.0,0.5,1.0}, width=5, length=15, piece="lfjet", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.0,0.5,1.0}, width=5, length=15, piece="rfjet", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.0,0.5,1.0}, width=2.5, length=10, piece="lrjet", onActive=true, noIconDraw = true}},

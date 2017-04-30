@@ -77,7 +77,7 @@ assaultDefs = {
 	"armanac",
 	"hoverassault",
 	
-	--"armbanth",
+	--"bantha",
 	--"armorco",
 	--"corkrog",
 	
@@ -187,7 +187,7 @@ airFactoryDefs = {
 }
 
 superweaponDefs = {
-	"armbrtha",
+	"staticheavyarty",
 	"corsilo",
 	"mahlazer",
 	"zenith",

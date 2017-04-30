@@ -120,7 +120,7 @@ local super = {	--merged into special
 	missilesilo = {order = 15, row = 1, col = 4},
 	staticantinuke =      {order = 16, row = 1, col = 5},
 	corbhmth =     {order = 2, row = 2, col = 1},
-	armbrtha =     {order = 3, row = 2, col = 2},
+	staticheavyarty =     {order = 3, row = 2, col = 2},
 	corsilo =      {order = 4, row = 2, col = 3},
 	zenith =       {order = 5, row = 2, col = 4},
 	raveparty =    {order = 6, row = 2, col = 5},

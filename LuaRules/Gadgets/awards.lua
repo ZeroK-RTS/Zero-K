@@ -99,7 +99,7 @@ local shareList_update = TEAM_SLOWUPDATE_RATE*60*5 -- five minute frames
 local boats, t3Units, comms = {}, {}, {}
 
 local staticO_small = {
-	armbrtha = 1,
+	staticheavyarty = 1,
 	seismic = 1,
 	tacnuke = 1,
 	empmissile = 1,

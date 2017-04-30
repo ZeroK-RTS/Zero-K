@@ -93,7 +93,7 @@ local buildoptions = {
 		{ CMD_SMOOTH,  tech=3 },
 		{ CMD_RESTORE,  tech=3 },
 		{ CMD_BUMPY,  tech=3 },
-		{ "armbrtha",  tech=3, notSea=true },
+		{ "staticheavyarty",  tech=3, notSea=true },
 		{ "corsilo",  tech=3, notSea=true },-- Nuke
 	},
 

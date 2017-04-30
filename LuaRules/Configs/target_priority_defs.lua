@@ -98,7 +98,7 @@ local unitIsHeavyHitter = {
 	[UnitDefNames["armsnipe"].id] = true,
 	[UnitDefNames["shieldarty"].id] = true,
 	[UnitDefNames["nsaclash"].id] = true,
-	[UnitDefNames["armbanth"].id] = true,
+	[UnitDefNames["bantha"].id] = true,
 	[UnitDefNames["armcybr"].id] = true,
 }
 
@@ -129,7 +129,7 @@ local unitIsHeavy = {
 	[UnitDefNames["scorpion"].id] = true,
 	[UnitDefNames["funnelweb"].id] = true,
 	[UnitDefNames["armraven"].id] = true,
-	[UnitDefNames["armbanth"].id] = true,
+	[UnitDefNames["bantha"].id] = true,
 	[UnitDefNames["armorco"].id] = true,
 }
 
@@ -149,7 +149,7 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["corraid_plasma"].id]            = {2.5},
 	[WeaponDefNames["armmerl_cortruck_rocket"].id]   = {0.5},
 	[WeaponDefNames["vehaa_missile"].id]             = {14.0},
-	[WeaponDefNames["armbrawl_emg"].id]              = {3.0},
+	[WeaponDefNames["gunshipheavyskirm_emg"].id]              = {3.0},
 	[WeaponDefNames["gunshipaa_aa_missile"].id]      = {14.0},
 	[WeaponDefNames["nsaclash_missile"].id]          = {4.5},
 	[WeaponDefNames["hoverassault_dew"].id]          = {2.5},
@@ -178,7 +178,7 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["missiletower_missile"].id]      = {16.0},
 	[WeaponDefNames["armcir_missile"].id]            = {14.0},
 	[WeaponDefNames["corbhmth_plasma"].id]           = {2.5},
-	[WeaponDefNames["armbrtha_plasma"].id]           = {2.0},
+	[WeaponDefNames["staticheavyarty_plasma"].id]           = {2.0},
 }
 
 local stunWeaponDefs = {

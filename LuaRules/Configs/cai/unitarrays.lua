@@ -35,7 +35,7 @@ local assault = {
 	"armanac",
 	"hoverassault",
 	
-	--"armbanth",
+	--"bantha",
 	--"armorco",
 	--"corkrog",
 	
