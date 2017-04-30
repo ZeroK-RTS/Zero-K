@@ -6,9 +6,9 @@ include 'constants.lua'
 
 local pelvis, torso, head, shouldercannon, shoulderflare = piece('pelvis', 'torso', 'head', 'shouldercannon', 'shoulderflare')
 local aaturret, aagun, aaflare1, aaflare2, headlaser1, headlaser2, headlaser3 = piece('AAturret', 'AAguns', 'AAflare1', 'AAflare2', 'headlaser1', 'headlaser2', 'headlaser3')
-local larm, lplaneconnnon, larmbarrel1, larmflare1, larmbarrel2, larmflare2, larmbarrel3, larmflare3 = piece('larm', 'lplaneconnnon', 'larmbarrel1', 'larmflare1',
+local larm, larmcannon, larmbarrel1, larmflare1, larmbarrel2, larmflare2, larmbarrel3, larmflare3 = piece('larm', 'larmcannon', 'larmbarrel1', 'larmflare1',
 	'larmbarrel2', 'larmflare2', 'larmbarrel3', 'larmflare3')
-local rarm, rplaneconnnon, rarmbarrel1, rarmflare1, rarmbarrel2, rarmflare2, rarmbarrel3, rarmflare3 = piece('rarm', 'rplaneconnnon', 'rarmbarrel1', 'rarmflare1',
+local rarm, rarmcannon, rarmbarrel1, rarmflare1, rarmbarrel2, rarmflare2, rarmbarrel3, rarmflare3 = piece('rarm', 'rarmcannon', 'rarmbarrel1', 'rarmflare1',
 	'rarmbarrel2', 'rarmflare2', 'rarmbarrel3', 'rarmflare3')
 local lupleg, lmidleg, lleg, lfoot, lftoe, lbtoe = piece('lupleg', 'lmidleg', 'lleg', 'lfoot', 'lftoe', 'lbtoe')
 local rupleg, rmidleg, rleg, rfoot, rftoe, rbtoe = piece('rupleg', 'rmidleg', 'rleg', 'rfoot', 'rftoe', 'rbtoe')
@@ -100,12 +100,12 @@ local function Step(frontLeg, backLeg)
 		if (frontLeg == leftLeg) then
 			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
 			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(lplaneconnnon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+			Turn(larmcannon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
 		else
 			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
 			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
-			Turn(rplaneconnnon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+			Turn(rarmcannon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 		end
 	end
@@ -262,8 +262,8 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(torso, sfxNone)
 		Explode(head, sfxNone)
 		Explode(pelvis, sfxNone)
-		Explode(rplaneconnnon, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(lplaneconnnon, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rarmcannon, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(larmcannon, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(larm, sfxShatter)
 		
 		return 1 -- corpsetype
