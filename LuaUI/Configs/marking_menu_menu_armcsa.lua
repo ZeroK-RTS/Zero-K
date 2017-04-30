@@ -79,7 +79,7 @@ local menu_armcsa = {
 	  },
 	  {
 		angle = 180,
-		unit = "panther",
+		unit = "tankheavyraid",
 		label = "Misc.",
 		items = {
 		  {

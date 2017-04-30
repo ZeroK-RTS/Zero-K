@@ -1139,7 +1139,7 @@
 		"description" : "Heavy Anti-Air Jumper",
 		"helptext" : "The Archangel packs twin anti-air lasers and an autocannon for slaying enemy aircraft rapidly. It can also jump to quickly access high ground or to escape."
 	},
-	"panther" : {
+	"tankheavyraid" : {
 		"name" : "Panther",
 		"description" : "Lightning Assault/Raider Tank",
 		"helptext" : "The Panther is a high-tech raider. Its weapon, a lightning gun, deals mostly paralyze damage. This way, the Panther can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base. When killed, it sets off an EMP explosion that can stun surrounding raiders."

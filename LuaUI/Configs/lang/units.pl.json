@@ -1114,7 +1114,7 @@
         "description": "Jednorazowa rakieta",
         "helptext": "Szybka jednostka samobójcza dobra do wyborowego niszczenia odsłoniętych celów. Stojąc obok złomu, pobiera z niego metal i replikuje się."
     },
-    "panther": {
+    "tankheavyraid": {
         "name": "Panther",
         "description": "Lekki czołg szturmowy",
         "helptext": "Panther to lekki czołg uzbrojony w działko EMP, które zadaje niskie obrażenia, ale paraliżuje cel, dzięki czemu może unieszkodliwiać mało ważne cele, by je ominąć i przejść do niszczenia ważniejszych. Zniszczony Panther uwalnia falę EMP."

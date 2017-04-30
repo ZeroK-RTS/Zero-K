@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[panther]],
+  unitname               = [[tankheavyraid]],
   name                   = [[Panther]],
   description            = [[Lightning Assault/Raider Tank]],
   acceleration           = 0.125,
   brakeRate              = 0.1375,
   buildCostMetal         = 300,
   builder                = false,
-  buildPic               = [[panther.png]],
+  buildPic               = [[tankheavyraid.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -42,7 +42,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[corseal.s3o]],
-  script                 = [[panther.lua]],
+  script                 = [[tankheavyraid.lua]],
   selfDestructAs         = [[PANTHER_DEATH]],
 
   sfxtypes               = {
@@ -143,4 +143,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ panther = unitDef })
+return lowerkeys({ tankheavyraid = unitDef })

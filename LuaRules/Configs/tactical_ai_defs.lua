@@ -126,7 +126,7 @@ local shortRangeSkirmieeArray = NameToDefID({
 })
 
 local riotRangeSkirmieeArray = NameToDefID({
-	"panther",
+	"tankheavyraid",
 	"armwar",
 	"corsh",
 	"hoverscout",
@@ -617,7 +617,7 @@ local behaviourConfig = {
 		skirmOrderDis = 150,
 	},
   
-	["panther"] = {
+	["tankheavyraid"] = {
 		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},

@@ -22,7 +22,7 @@ unitDef = {
     [[cloakheavyraid]],
     [[slowmort]],
     [[armsptk]],
-    [[panther]],
+    [[tankheavyraid]],
     [[armzeus]],
     [[armsnipe]],
     [[armmerl]],

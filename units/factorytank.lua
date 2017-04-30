@@ -14,7 +14,7 @@ unitDef = {
   buildoptions                  = {
     [[coracv]],
     [[tankraid]],
-	[[panther]],
+	[[tankheavyraid]],
     [[tankriot]],
 	[[correap]],
     [[corgol]],

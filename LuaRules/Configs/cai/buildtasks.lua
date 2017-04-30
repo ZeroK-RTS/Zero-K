@@ -416,7 +416,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 2,
 					[1] = {ID = UnitDefNames['tankraid'].id, chance = 0.3},
-					[2] = {ID = UnitDefNames['panther'].id, chance = 0.7},
+					[2] = {ID = UnitDefNames['tankheavyraid'].id, chance = 0.7},
 				},
 				
 				[4] = { -- arty

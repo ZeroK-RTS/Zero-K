@@ -51,7 +51,7 @@ raiderDefs = {
 	"corgator",
 	
 	"corpyro",
-	"panther",
+	"tankheavyraid",
 	"tankraid",
 	
 	"armsh",
