@@ -14,7 +14,7 @@ if (gadgetHandler:IsSyncedCode()) then
 	local untransportable_defs = {
 		[UnitDefNames.shiptransport.id] = true, -- Surfboard
 		[UnitDefNames.gunshipheavytrans.id] = true, -- Vindicator
-		[UnitDefNames.corvalk.id] = true, -- Valkyrie
+		[UnitDefNames.gunshiptrans.id] = true, -- Valkyrie
 	}
 
 	-- holds potentially untransportable units to notify transports to drop orders

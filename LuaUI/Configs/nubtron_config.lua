@@ -58,11 +58,11 @@ finish<unitClass>		- Triggers if structure partly completed structure is no long
 
 --- unit classes ---
 local unitClasses = {
-	Mex	= { 'cormex' },
+	Mex	= { 'staticmex' },
 	Solar	= { 'energysolar' },
-	LLT	= { 'corllt' },
+	LLT	= { 'turretlaser' },
 	BotLab	= { 'factorycloak' },
-	Radar	= { 'corrad' },
+	Radar	= { 'staticradar' },
 
 	Con	= { 'cloakcon' },
 	Raider	= { 'cloakraid' },

@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[corthud]],
+  unitname            = [[shieldassault]],
   name                = [[Thug]],
   description         = [[Shielded Assault Bot]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
   brakeRate           = 0.22,
   buildCostMetal      = 180,
-  buildPic            = [[CORTHUD.png]],
+  buildPic            = [[shieldassault.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -37,7 +37,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[thud.s3o]],
   onoffable           = false,
-  script			  = [[corthud.lua]],
+  script			  = [[shieldassault.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -155,4 +155,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corthud = unitDef })
+return lowerkeys({ shieldassault = unitDef })

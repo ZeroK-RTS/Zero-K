@@ -130,8 +130,8 @@ local function CopyMoveThenUnload(transportID, unitID)
 	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, queueToRemove, {})
 end
 
-local valkMaxMass = UnitDefNames.corvalk.transportMass
-local valkMaxSize = UnitDefNames.corvalk.transportSize * 2
+local valkMaxMass = UnitDefNames.gunshiptrans.transportMass
+local valkMaxSize = UnitDefNames.gunshiptrans.transportSize * 2
 
 local function DoSelectionLoad()
 	-- Find the units which can transport and the units which are transports

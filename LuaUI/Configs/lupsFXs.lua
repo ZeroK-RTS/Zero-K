@@ -111,7 +111,7 @@ energysinguBursts = {
   quality    = 4, -- Ultra settings
 }
 
-corjamtBursts = {
+staticshieldBursts = {
   layer      = -35,
   life       = math.huge,
   piece      = "glow",
@@ -129,7 +129,7 @@ corjamtBursts = {
   noIconDraw = true,
   count      = 8,
 }
-corjamtBall = {
+staticshieldBall = {
 	piece = "glow", 
 	life = math.huge, 
 	size = 11, 
@@ -435,7 +435,7 @@ end
 -- OverDrive FXs -----------------------------------------------------------
 ----------------------------------------------------------------------------
 
-cormexGlow = {
+staticmexGlow = {
   layer       = -5,
   delay       = 0,
   pos         = {0,0,0},

@@ -42,7 +42,7 @@ local menu_athena = { -- TODO_RENAME_FILE
 		  },
 		  { 
 			angle = -135,
-			unit = "core_spectre",
+			unit = "shieldshield",
 		  },	
 		  {
 			angle = -45,
@@ -60,7 +60,7 @@ local menu_athena = { -- TODO_RENAME_FILE
 	  },
 	  {
 		angle = 90,
-		unit = "corrad",
+		unit = "staticradar",
 		label = "Support",
 		items = {
 		  {

@@ -1,6 +1,6 @@
 local alwaysHoldPos = {
 	[UnitDefNames["spidercrabe"].id] = true,
-    [UnitDefNames["cormist"].id] = true,
+    [UnitDefNames["vehsupport"].id] = true,
     [UnitDefNames["trem"].id] = true,
 }
 

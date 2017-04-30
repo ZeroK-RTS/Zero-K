@@ -163,7 +163,7 @@ local sounds = {
 	},
 	
 	-- Shield
-	cornecro = {
+	shieldcon = {
 		build = "builder_start",
 		ok = {
 			[1] = "bot_move",
@@ -172,7 +172,7 @@ local sounds = {
 			[1] = "light_bot_select2",
 		},
 	},
-	corclog = {
+	shieldscout = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -188,7 +188,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	corstorm = {
+	shieldskirm = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -196,7 +196,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	corthud = {
+	shieldassault = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -204,7 +204,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	corroach = {
+	shieldbomb = {
 		ok = {
 			[1] = "light_bot_move",
 		},
@@ -212,7 +212,7 @@ local sounds = {
 			[1] = "crawlie_select",
 		},
 	},
-	cormak = {
+	shieldriot = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -220,7 +220,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	corcrash = {
+	shieldaa = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -246,7 +246,7 @@ local sounds = {
 	},
 	
 	-- Jumper
-	corfast = {
+	jumpcon = {
 		build = "builder_start",
 		ok = {
 			[1] = "bot_move",
@@ -272,7 +272,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	corsumo = {
+	jumpsumo = {
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -288,7 +288,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	corpyro = {
+	jumpraid = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -312,7 +312,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	corcan = {
+	jumpassault = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -328,7 +328,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	corsktl = {
+	jumpbomb = {
 		ok = {
 			[1] = "light_bot_move",
 		},
@@ -563,7 +563,7 @@ local sounds = {
 	},
 	
 	-- Vehicle
-	corned = {
+	vehcon = {
 		build = "builder_start",
 		ok = {
 			[1] = "vehicle_move",
@@ -572,7 +572,7 @@ local sounds = {
 			[1] = "vehicle_select2",
 		},
 	},
-	corfav = {
+	vehscout = {
 		ok = {
 			[1] = "vehicle_move",
 		},
@@ -580,7 +580,7 @@ local sounds = {
 			[1] = "vehicle_select2",
 		},
 	},
-	cormist = {
+	vehsupport = {
 		ok = {
 			[1] = "vehicle_move",
 		},
@@ -588,7 +588,7 @@ local sounds = {
 			[1] = "vehicle_select2",
 		},
 	},
-	corgator = {
+	vehraid = {
 		ok = {
 			[1] = "vehicle_move",
 		},
@@ -596,7 +596,7 @@ local sounds = {
 			[1] = "vehicle_select2",
 		},
 	},
-	corgarp = {
+	veharty = {
 		ok = {
 			[1] = "vehicle_move",
 		},
@@ -604,7 +604,7 @@ local sounds = {
 			[1] = "vehicle_select2",
 		},
 	},
-	corlevlr = {
+	vehriot = {
 		ok = {
 			[1] = "vehicle_move",
 		},
@@ -612,7 +612,7 @@ local sounds = {
 			[1] = "vehicle_select2",
 		},
 	},
-	corraid = {
+	vehassault = {
 		ok = {
 			[1] = "vehicle_move",
 		},
@@ -671,7 +671,7 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
-	cormart = {
+	tankarty = {
 		ok = {
 			[1] = "tank_move",
 		},
@@ -679,7 +679,7 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
-	correap = {
+	tankassault = {
 		ok = {
 			[1] = "tank_move",
 		},
@@ -711,7 +711,7 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
-	corgol = {
+	tankheavyassault = {
 		ok = {
 			[1] = "tank_move",
 		},
@@ -719,7 +719,7 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
-	corsent = {
+	tankaa = {
 		ok = {
 			[1] = "tank_move",
 		},
@@ -729,7 +729,7 @@ local sounds = {
 	},
 	
 	-- Hovercraft
-	corch = {
+	hovercon = {
 		build = "builder_start",
 		ok = {
 			[1] = "hovercraft_move",
@@ -738,7 +738,7 @@ local sounds = {
 			[1] = "hovercraft_select",
 		},
 	},
-	corsh = {
+	hoverraid = {
 		ok = {
 			[1] = "hovercraft_move",
 		},
@@ -796,7 +796,7 @@ local sounds = {
 	},
 	
 	-- Fixed wing
-	fighter = {
+	planefighter = {
 		ok = {
 			[1] = "fighter_move",
 		},
@@ -804,7 +804,7 @@ local sounds = {
 			[1] = "fighter_select",
 		},
 	},
-	corvamp = {
+	planefighterheavy = {
 		ok = {
 			[1] = "fighter_move",
 		},
@@ -812,7 +812,7 @@ local sounds = {
 			[1] = "fighter_select",
 		},
 	},
-	corshad = {
+	bomberprec = {
 		ok = {
 			[1] = "bomber_move",
 		},
@@ -828,7 +828,7 @@ local sounds = {
 			[1] = "bomber_select",
 		},
 	},
-	corhurc2 = {
+	bomberriot = {
 		ok = {
 			[1] = "bomber_move",
 		},
@@ -936,7 +936,7 @@ local sounds = {
 			[1] = "heavy_gunship_select",
 		},
 	},
-	corcrw = {
+	gunshipkrow = {
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -944,7 +944,7 @@ local sounds = {
 			[1] = "heavy_gunship_select",
 		},
 	},
-	corvalk = {
+	gunshiptrans = {
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -1088,7 +1088,7 @@ local sounds = {
 	-- Transport boat doesn't have one by design.
 	
 	-- Economy
-	cormex = {
+	staticmex = {
 		select = {
 			[1] = "building_select2",
 		},
@@ -1221,7 +1221,7 @@ local sounds = {
 	
 	-- Intel
 	--[[
-	corrad = { NEEDED
+	staticradar = { NEEDED
 		select = {
 			[1] = "factory_select",
 		},
@@ -1237,7 +1237,7 @@ local sounds = {
 			[1] = "sonar_select",
 		},
 	},
-	corrad = {
+	staticradar = {
 		select = {
 			[1] = "radar_select",
 		},
@@ -1248,12 +1248,12 @@ local sounds = {
 		},
 	},
 	
-	corjamt = {
+	staticshield = {
 		select = {
 			[1] = "shield_select",
 		},
 	},
-	core_spectre = {
+	shieldshield = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -1276,7 +1276,7 @@ local sounds = {
 	},
 	
 	-- Land Turrets
-	corllt = {
+	turretlaser = {
 		ok = {
 			[1] = "turret_move",
 		},
@@ -1284,7 +1284,7 @@ local sounds = {
 			[1] = "light_turret_select",
 		},
 	},
-	corgrav = {
+	turretimpulse = {
 		ok = {
 			[1] = "turret_move",
 		},
@@ -1308,7 +1308,7 @@ local sounds = {
 			[1] = "light_turret_select",
 		},
 	},
-	corhlt = {
+	turretheavylaser = {
 		ok = {
 			[1] = "light_turret_select",
 		},
@@ -1332,7 +1332,7 @@ local sounds = {
 			[1] = "turret_select",
 		},
 	},
-	cordoom = {
+	turretheavy = {
 		ok = {
 			[1] = "turret_select",
 		},
@@ -1382,7 +1382,7 @@ local sounds = {
 	},
 	
 	-- Air Turrets
-	corrl = {
+	turretmissile = {
 		ok = {
 			[1] = "turret_move",
 		},
@@ -1406,7 +1406,7 @@ local sounds = {
 			[1] = "light_turret_select",
 		},
 	},
-    corrazor = {
+    turretaalaser = {
 		ok = {
 			[1] = "turret_move",
 		},
@@ -1422,7 +1422,7 @@ local sounds = {
 			[1] = "turret_select",
 		},
 	},
-	corflak = {
+	turretaaflak = {
 		ok = {
 			[1] = "light_turret_select",
 		},
@@ -1478,7 +1478,7 @@ local sounds = {
 			[1] = "silo_select",
 		},
 	},
-	corsilo = {
+	staticnuke = {
 		select = {
 			[1] = "silo_select",
 		},

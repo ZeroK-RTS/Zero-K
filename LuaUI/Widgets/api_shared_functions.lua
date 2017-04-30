@@ -255,7 +255,7 @@ end
 local builderDefs = {}
 for udid, ud in ipairs(UnitDefs) do 
 	for i, option in ipairs(ud.buildOptions) do 
-		if UnitDefNames.cormex.id == option then
+		if UnitDefNames.staticmex.id == option then
 			builderDefs[udid] = true
 		end
 	end

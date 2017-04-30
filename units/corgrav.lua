@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[corgrav]],
+  unitname                      = [[turretimpulse]],
   name                          = [[Newton]],
   description                   = [[Gravity Turret - On to Repulse, Off to Attract]],
   activateWhenBuilt             = true,
@@ -8,8 +8,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
   buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[corgrav_aoplane.dds]],
-  buildPic                      = [[corgrav.png]],
+  buildingGroundDecalType       = [[turretimpulse_aoplane.dds]],
+  buildPic                      = [[turretimpulse.png]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[50 50 50]],
@@ -36,7 +36,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName                    = [[corgrav]],
+  objectName                    = [[turretimpulse]],
   onoffable                     = true,
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
   sightDistance                 = 506,
@@ -165,7 +165,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
-      object           = [[corgrav_dead]],
+      object           = [[turretimpulse_dead]],
     },
 
     HEAP  = {
@@ -179,4 +179,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corgrav = unitDef })
+return lowerkeys({ turretimpulse = unitDef })

@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[corch]],
+  unitname            = [[hovercon]],
   name                = [[Quill]],
   description         = [[Construction Hovercraft, Builds at 5 m/s]],
   acceleration        = 0.066,
@@ -12,7 +12,7 @@ unitDef = {
   buildoptions        = {
   },
 
-  buildPic            = [[CORCH.png]],
+  buildPic            = [[hovercon.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -57,7 +57,7 @@ unitDef = {
   },
 
   showNanoSpray       = false,
-  script              = [[corch.lua]],
+  script              = [[hovercon.lua]],
   sightDistance       = 325,
   sonarDistance       = 325,
   turninplace         = 0,
@@ -71,7 +71,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[corch_dead.s3o]],
+      object           = [[hovercon_dead.s3o]],
     },
 
     HEAP  = {
@@ -85,4 +85,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corch = unitDef })
+return lowerkeys({ hovercon = unitDef })

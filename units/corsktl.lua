@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[corsktl]],
+  unitname               = [[jumpbomb]],
   name                   = [[Skuttle]],
   description            = [[Cloaked Jumping Anti-Heavy Bomb]],
   acceleration           = 0.18,
   brakeRate              = 0.54,
   buildCostMetal         = 550,
   builder                = false,
-  buildPic               = [[CORSKTL.png]],
+  buildPic               = [[jumpbomb.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -36,7 +36,7 @@ unitDef = {
 	modelradius    = [[10]],
   },
 
-  explodeAs              = [[CORSKTL_DEATH]],
+  explodeAs              = [[jumpbomb_DEATH]],
   fireState              = 0,
   footprintX             = 1,
   footprintZ             = 1,
@@ -58,9 +58,9 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[skuttle.s3o]],
-  selfDestructAs         = [[CORSKTL_DEATH]],
+  selfDestructAs         = [[jumpbomb_DEATH]],
   selfDestructCountdown  = 0,
-  script                 = [[corsktl.lua]],
+  script                 = [[jumpbomb.lua]],
   sightDistance          = 280,
   trackOffset            = 0,
   trackStrength          = 8,
@@ -93,7 +93,7 @@ unitDef = {
 --------------------------------------------------------------------------------
 
 local weaponDefs = {
-  CORSKTL_DEATH = {
+  jumpbomb_DEATH = {
     areaOfEffect       = 180,
     craterBoost        = 4,
     craterMult         = 5,
@@ -116,4 +116,4 @@ local weaponDefs = {
 unitDef.weaponDefs = weaponDefs
 
 --------------------------------------------------------------------------------
-return lowerkeys({ corsktl = unitDef })
+return lowerkeys({ jumpbomb = unitDef })

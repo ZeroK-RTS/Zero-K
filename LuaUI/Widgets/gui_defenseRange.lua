@@ -55,24 +55,24 @@ modConfig["ZK"]["unitList"] =
 	armarch = { weapons = { 2 } },		--packo (unused)
 	turretaafar = { weapons = { 2 } },		--chainsaw
 	armdl = { weapons = { 1 } },		--anemone (unused)
-	corrl = { weapons = { 4 } },		--defender
-	corllt = { weapons = { 1 } },		--LLT
-	corhlt = { weapons = { 1 } },		--HLT
+	turretmissile = { weapons = { 4 } },		--defender
+	turretlaser = { weapons = { 1 } },		--LLT
+	turretheavylaser = { weapons = { 1 } },		--HLT
 	corvipe = { weapons = { 1 } },		--viper (unused)
-	cordoom = { weapons = { 1 } },		--doomsday
+	turretheavy = { weapons = { 1 } },		--doomsday
 	cordl = { weapons = { 1 } },		--jellyfish (unused)
-	corrazor = { weapons = { 2 } },		--razorkiss
-	corflak = { weapons = { 2 } },		--flak
+	turretaalaser = { weapons = { 2 } },		--razorkiss
+	turretaaflak = { weapons = { 2 } },		--flak
 	screamer = { weapons = { 2 } },		--screamer
 	missiletower = { weapons = { 2 } },	--hacksaw
 	staticarty = { weapons = { 1 } },		--behemoth
 	turrettorp = { weapons = { 1 } },	--torpedo launcher
 	coratl = { weapons = { 1 } },		--adv torpedo launcher (unused)
-	corgrav = { weapons = { 1 } },		--newton
-	corjamt = { },
+	turretimpulse = { weapons = { 1 } },		--newton
+	staticshield = { },
 }
 
-local shieldDefID = UnitDefNames["corjamt"].id
+local shieldDefID = UnitDefNames["staticshield"].id
 
 local unitDefIDRemap = {
 	[UnitDefNames["missilesilo"].id] = UnitDefNames["tacnuke"].id,

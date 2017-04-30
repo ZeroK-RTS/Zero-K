@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[corfast]],
+  unitname            = [[jumpcon]],
   name                = [[Constable]],
   description         = [[Jumpjet Constructor, Builds at 5 m/s]],
   acceleration        = 0.26,
@@ -11,7 +11,7 @@ unitDef = {
   buildoptions        = {
   },
 
-  buildPic            = [[CORFAST.png]],
+  buildPic            = [[jumpcon.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -49,7 +49,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[behe_coroner.s3o]],
-  script              = [[corfast.lua]],
+  script              = [[jumpcon.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -158,4 +158,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corfast = unitDef })
+return lowerkeys({ jumpcon = unitDef })

@@ -53,7 +53,7 @@ for i=1, #UnitDefs do
 end
 
 local unitHealthRatioOverride = {
-	[UnitDefNames["corfav"].id] = 4,
+	[UnitDefNames["vehscout"].id] = 4,
 	[UnitDefNames["spiderscout"].id] = 4,
 }
 
@@ -66,8 +66,8 @@ end
 
 -- Don't shoot at fighters or drones, they are unimportant.
 local unitIsFighterOrDrone = {
-	[UnitDefNames["fighter"].id] = true,
-	[UnitDefNames["corvamp"].id] = true,
+	[UnitDefNames["planefighter"].id] = true,
+	[UnitDefNames["planefighterheavy"].id] = true,
 	[UnitDefNames["dronelight"].id] = true,
 	[UnitDefNames["droneheavyslow"].id] = true,
 	[UnitDefNames["dronecarry"].id] = true,
@@ -80,13 +80,13 @@ local unitIsClaw = {
 
 -- swifts should prefer to target air over ground
 local unitIsBadAgainstGround = {
-	[UnitDefNames["fighter"].id] = true,
+	[UnitDefNames["planefighter"].id] = true,
 }
 
 -- Prioritize bombers
 local unitIsBomber = {
-	[UnitDefNames["corshad"].id] = true,
-	[UnitDefNames["corhurc2"].id] = true,
+	[UnitDefNames["bomberprec"].id] = true,
+	[UnitDefNames["bomberriot"].id] = true,
 	[UnitDefNames["bomberheavy"].id] = true,
 	[UnitDefNames["bomberdisarm"].id] = true,
 }
@@ -103,28 +103,28 @@ local unitIsHeavyHitter = {
 }
 
 local unitIsCheap = {
-	[UnitDefNames["corrl"].id] = true,
-	[UnitDefNames["corllt"].id] = true,
+	[UnitDefNames["turretmissile"].id] = true,
+	[UnitDefNames["turretlaser"].id] = true,
 	[UnitDefNames["spiderscout"].id] = true,
 	[UnitDefNames["cloakraid"].id] = true,
-	[UnitDefNames["corfav"].id] = true,
-	[UnitDefNames["corgator"].id] = true,
-	[UnitDefNames["corsh"].id] = true,
+	[UnitDefNames["vehscout"].id] = true,
+	[UnitDefNames["vehraid"].id] = true,
+	[UnitDefNames["hoverraid"].id] = true,
 	[UnitDefNames["corak"].id] = true,
 	[UnitDefNames["puppy"].id] = true,
 }
 
 local unitIsHeavy = {
 	[UnitDefNames["shieldfelon"].id] = true,
-	[UnitDefNames["correap"].id] = true,
+	[UnitDefNames["tankassault"].id] = true,
 	[UnitDefNames["hoverarty"].id] = true,
 	[UnitDefNames["cloaksnipe"].id] = true,
-	[UnitDefNames["corgol"].id] = true,
+	[UnitDefNames["tankheavyassault"].id] = true,
 	[UnitDefNames["tawf114"].id] = true,
 	[UnitDefNames["amphassault"].id] = true,
 	[UnitDefNames["spidercrabe"].id] = true,
-	[UnitDefNames["corcrw"].id] = true,
-	[UnitDefNames["corsumo"].id] = true,
+	[UnitDefNames["gunshipkrow"].id] = true,
+	[UnitDefNames["jumpsumo"].id] = true,
 	[UnitDefNames["dante"].id] = true,
 	[UnitDefNames["scorpion"].id] = true,
 	[UnitDefNames["funnelweb"].id] = true,
@@ -139,14 +139,14 @@ local VEL_DEFAULT_BASE = 1
 local VEL_DEFAULT_SCALE = 8
 
 local velocityPenaltyDefs = {
-	[WeaponDefNames["corthud_thud_weapon"].id]       = {2.5},
-	[WeaponDefNames["corstorm_storm_rocket"].id]     = {2.0},
-	[WeaponDefNames["corcrash_armkbot_missile"].id]  = {16.0},
+	[WeaponDefNames["shieldassault_thud_weapon"].id]       = {2.5},
+	[WeaponDefNames["shieldskirm_storm_rocket"].id]     = {2.0},
+	[WeaponDefNames["shieldaa_armkbot_missile"].id]  = {16.0},
 	[WeaponDefNames["cloakskirm_bot_rocket"].id]        = {2.5},
 	[WeaponDefNames["cloakarty_hammer_weapon"].id]      = {1.5},
 	[WeaponDefNames["cloaksnipe_shockrifle"].id]       = {2.5},
-	[WeaponDefNames["cormist_cortruck_missile"].id]  = {11.0},
-	[WeaponDefNames["corraid_plasma"].id]            = {2.5},
+	[WeaponDefNames["vehsupport_cortruck_missile"].id]  = {11.0},
+	[WeaponDefNames["vehassault_plasma"].id]            = {2.5},
 	[WeaponDefNames["vehheavyarty_cortruck_rocket"].id]   = {0.5},
 	[WeaponDefNames["vehaa_missile"].id]             = {14.0},
 	[WeaponDefNames["gunshipheavyskirm_emg"].id]              = {3.0},
@@ -161,9 +161,9 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["spidercrabe_arm_crabe_gauss"].id]  = {2.5},
 	[WeaponDefNames["spideraa_aa"].id]               = {11.0},
 	[WeaponDefNames["puppy_missile"].id]             = {8.0},
-	[WeaponDefNames["correap_cor_reap"].id]          = {2.5},
-	[WeaponDefNames["corgol_cor_gol"].id]            = {2.0},
-	[WeaponDefNames["cormart_core_artillery"].id]    = {1.5},
+	[WeaponDefNames["tankassault_cor_reap"].id]          = {2.5},
+	[WeaponDefNames["tankheavyassault_cor_gol"].id]            = {2.0},
+	[WeaponDefNames["tankarty_core_artillery"].id]    = {1.5},
 	[WeaponDefNames["trem_plasma"].id]               = {0.5},
 	[WeaponDefNames["striderantiheavy_disintegrator"].id]  = {2.8},
 	[WeaponDefNames["dante_napalm_rockets"].id]      = {2.8},
@@ -172,9 +172,9 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["shipheavyarty_plasma"].id]      = {2.5},
 	[WeaponDefNames["shipskirm_rocket"].id]          = {2.8},
 	[WeaponDefNames["shiparty_plasma"].id]           = {2.0},
-	[WeaponDefNames["corrl_armrl_missile"].id]       = {14.0},
+	[WeaponDefNames["turretmissile_armrl_missile"].id]       = {14.0},
 	[WeaponDefNames["turretriot_turretriot_weapon"].id]    = {5.0},
-	[WeaponDefNames["corrazor_aagun"].id]            = {7.0, 0, 3},
+	[WeaponDefNames["turretaalaser_aagun"].id]            = {7.0, 0, 3},
 	[WeaponDefNames["missiletower_missile"].id]      = {16.0},
 	[WeaponDefNames["turretaafar_missile"].id]            = {14.0},
 	[WeaponDefNames["staticarty_plasma"].id]           = {2.5},
@@ -193,10 +193,10 @@ local captureWeaponDefs = {
 }
 
 local gravityWeaponDefs = {
-	[WeaponDefNames["corgrav_gravity_neg"].id] = true,
-	[WeaponDefNames["corgrav_gravity_pos"].id] = true,
-	[WeaponDefNames["corsumo_gravity_neg"].id] = true,
-	[WeaponDefNames["corsumo_gravity_pos"].id] = true,
+	[WeaponDefNames["turretimpulse_gravity_neg"].id] = true,
+	[WeaponDefNames["turretimpulse_gravity_pos"].id] = true,
+	[WeaponDefNames["jumpsumo_gravity_neg"].id] = true,
+	[WeaponDefNames["jumpsumo_gravity_pos"].id] = true,
 }
 
 -- for heatrays

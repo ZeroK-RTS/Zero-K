@@ -1,10 +1,10 @@
 unitDef = {
-  unitname               = [[fighter]],
+  unitname               = [[planefighter]],
   name                   = [[Swift]],
   description            = [[Multi-role Fighter]],
   brakerate              = 0.4,
   buildCostMetal         = 150,
-  buildPic               = [[fighter.png]],
+  buildPic               = [[planefighter.png]],
   canFly                 = true,
   canGuard               = true,
   canMove                = true,
@@ -57,7 +57,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
   objectName             = [[fighter.s3o]],
-  script                 = [[fighter.lua]],
+  script                 = [[planefighter.lua]],
   selfDestructAs         = [[GUNSHIPEX]],
 
   sfxtypes               = {
@@ -211,4 +211,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ fighter = unitDef })
+return lowerkeys({ planefighter = unitDef })

@@ -42,7 +42,7 @@ local buildoptions = {
 
 	{-- economy
 		-- common
-		{ "cormex" },
+		{ "staticmex" },
 		{ "energywind" },-- wind
 		{ "energysolar",  notSea=true },
 		{ "staticcon" },-- caretaker
@@ -58,14 +58,14 @@ local buildoptions = {
 
 
 	{-- point_defense
-		{ "corllt",  notSea=true },
+		{ "turretlaser",  notSea=true },
 		{ "turretemp",  notSea=true },-- Faraday
 		{ "turrettorp",  notLand=true },-- you can build it on land, but torpedoes are only useful around water.
 		{ "turretriot" },-- Stardust
-		{ "corgrav",  notSea=true },-- newton
+		{ "turretimpulse",  notSea=true },-- newton
 		{ "turretgauss",  notSea=true },-- Popup gauss
-		{ "corhlt",  tech=2 },-- peoples should prefer Stardust, Faraday, Newton, Urchin more.
-		{ "cordoom",  tech=2, notSea=true },
+		{ "turretheavylaser",  tech=2 },-- peoples should prefer Stardust, Faraday, Newton, Urchin more.
+		{ "turretheavy",  tech=2, notSea=true },
 		{ "turretantiheavy",  tech=3, notSea=true },
 		{ "staticarty",  tech=3, notSea=true },
 		{ "staticantinuke",  tech=3, notSea=true },-- Protector
@@ -73,18 +73,18 @@ local buildoptions = {
 
 	{-- air_defense
 		{ "corr" },-- mt
-		{ "corrazor" },
+		{ "turretaalaser" },
 		{ "missiletower" },-- hacksaw
-		{ "corflak" },
+		{ "turretaaflak" },
 
 		{ "turretaafar",  tech=2 },-- chainsaw
 		{ "screamer",  tech=3 },
 	},
 
 	{-- special
-		{ "corrad" },
+		{ "staticradar" },
 		{ "staticheavyradar",  tech=2 },
-		{ "corjamt",  tech=2 },-- Aegis
+		{ "staticshield",  tech=2 },-- Aegis
 		{ "staticjammer",  tech=2 },-- Sneaky Pete
 		{ "missilesilo",  tech=2 },
 		{ CMD_RAMP,  tech=3 },
@@ -94,7 +94,7 @@ local buildoptions = {
 		{ CMD_RESTORE,  tech=3 },
 		{ CMD_BUMPY,  tech=3 },
 		{ "staticheavyarty",  tech=3, notSea=true },
-		{ "corsilo",  tech=3, notSea=true },-- Nuke
+		{ "staticnuke",  tech=3, notSea=true },-- Nuke
 	},
 
 	{-- super

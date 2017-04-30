@@ -209,7 +209,7 @@ local fallbackCommands  = {}
 
 local terraunitDefID = UnitDefNames["terraunit"].id
 
-local corclogDefID = UnitDefNames["corclog"].id
+local shieldscoutDefID = UnitDefNames["shieldscout"].id
 --local novheavymineDefID = UnitDefNames["novheavymine"].id
 
 local exceptionArray = {
@@ -3468,7 +3468,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 
-	if (unitDefID == corclogDefID) then
+	if (unitDefID == shieldscoutDefID) then
 		local  _,_,_,_,build = spGetUnitHealth(unitID)
 		if build == 1 then
 			local ux, uy, uz  = spGetUnitPosition(unitID)

@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[correap]],
+  unitname            = [[tankassault]],
   name                = [[Reaper]],
   description         = [[Assault Tank]],
   acceleration        = 0.0237,
   brakeRate           = 0.04786,
   buildCostMetal      = 850,
   builder             = false,
-  buildPic            = [[correap.png]],
+  buildPic            = [[tankassault.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -42,8 +42,8 @@ unitDef = {
   movementClass       = [[TANK4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[correap.s3o]],
-  script	      = [[correap.cob]],
+  objectName          = [[tankassault.s3o]],
+  script	      = [[tankassault.cob]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -114,7 +114,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[correap_dead.s3o]],
+      object           = [[tankassault_dead.s3o]],
     },
 
     HEAP  = {
@@ -128,4 +128,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ correap = unitDef })
+return lowerkeys({ tankassault = unitDef })

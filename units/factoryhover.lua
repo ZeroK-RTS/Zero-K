@@ -8,8 +8,8 @@ unitDef = {
   builder          = true,
 
   buildoptions     = {
-    [[corch]],
-    [[corsh]],
+    [[hovercon]],
+    [[hoverraid]],
     [[nsaclash]],
     [[hoverassault]],
 	[[hoverdepthcharge]],

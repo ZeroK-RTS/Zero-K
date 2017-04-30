@@ -14,10 +14,10 @@ unitDef = {
 
   buildoptions                  = {
     [[planecon]],
-    [[fighter]],
-    [[corvamp]],
-	[[corshad]],
-	[[corhurc2]],
+    [[planefighter]],
+    [[planefighterheavy]],
+	[[bomberprec]],
+	[[bomberriot]],
     [[bomberdisarm]],
     [[bomberheavy]],
     [[planescout]],

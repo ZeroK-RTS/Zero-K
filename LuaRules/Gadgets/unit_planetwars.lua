@@ -285,7 +285,7 @@ local function initialiseNoGoZones()
 	end
 
 	do
-		local mexUnitDef = UnitDefNames["cormex"]
+		local mexUnitDef = UnitDefNames["staticmex"]
 		local metalSpots = GG.metalSpots
 		
 		if metalSpots then

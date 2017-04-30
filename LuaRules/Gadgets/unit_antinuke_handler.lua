@@ -25,7 +25,7 @@ end
 --------------------------------------------------------------------------------
 
 local nukeDefs = {
-	[UnitDefNames["corsilo"].id] = true,
+	[UnitDefNames["staticnuke"].id] = true,
 }
 
 local interceptorRanges = {

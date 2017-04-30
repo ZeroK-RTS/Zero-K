@@ -167,7 +167,7 @@ local windTooltips = {
 	["energywind"] = true,
 }
 
-local mexDefID = UnitDefNames["cormex"] and UnitDefNames["cormex"].id or ''
+local mexDefID = UnitDefNames["staticmex"] and UnitDefNames["staticmex"].id or ''
 local windgenDefID = UnitDefNames["energywind"] and UnitDefNames["energywind"].id or ''
 
 local energyStructureDefs = {
@@ -180,7 +180,7 @@ local energyStructureDefs = {
 }
 
 local metalStructureDefs = {
-	[UnitDefNames["cormex"].id] = {cost = 75},
+	[UnitDefNames["staticmex"].id] = {cost = 75},
 }
 
 local terraCmds = {

@@ -54,14 +54,14 @@ local lastShot = {} -- List of the last targets, to stop target switching
 
 -- Value is the default state of the command
 local HandledUnitDefIDs = {
-	[UnitDefNames["corrl"].id] = 1,
+	[UnitDefNames["turretmissile"].id] = 1,
 	[UnitDefNames["turretaafar"].id] = 1,
 	[UnitDefNames["nsaclash"].id] = 1,
 	[UnitDefNames["missiletower"].id] = 1,
 	[UnitDefNames["screamer"].id] = 1,
 	[UnitDefNames["amphaa"].id] = 1,
 	[UnitDefNames["puppy"].id] = 1,
-	[UnitDefNames["fighter"].id] = 1,
+	[UnitDefNames["planefighter"].id] = 1,
 	[UnitDefNames["hoveraa"].id] = 1,
 	[UnitDefNames["spideraa"].id] = 1,
 	[UnitDefNames["vehaa"].id] = 1,
@@ -70,11 +70,11 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["cloaksnipe"].id] = 1,
 	[UnitDefNames["amphraid"].id] = 1,
 	[UnitDefNames["amphriot"].id] = 1,
-	[UnitDefNames["corcrash"].id] = 1,
-	[UnitDefNames["cormist"].id] = 1,
+	[UnitDefNames["shieldaa"].id] = 1,
+	[UnitDefNames["vehsupport"].id] = 1,
 	[UnitDefNames["tawf114"].id] = 1, --HT's banisher
 	[UnitDefNames["shieldarty"].id] = 1, --Shields's racketeer
-	[UnitDefNames["corshad"].id] = 1,
+	[UnitDefNames["bomberprec"].id] = 1,
 	[UnitDefNames["shipscout"].id] = 0, --Defaults to off because of strange disarm + normal damage behaviour.
 	[UnitDefNames["shiptorpraider"].id] = 1,
 	[UnitDefNames["shipskirm"].id] = 1,
@@ -83,8 +83,8 @@ local HandledUnitDefIDs = {
 	-- Static only OKP below
 	[UnitDefNames["amphfloater"].id] = 1,
 	[UnitDefNames["vehheavyarty"].id] = 1,
-	[UnitDefNames["corstorm"].id] = 1,
-	[UnitDefNames["corthud"].id] = 1,
+	[UnitDefNames["shieldskirm"].id] = 1,
+	[UnitDefNames["shieldassault"].id] = 1,
 	[UnitDefNames["spiderassault"].id] = 1,
 	[UnitDefNames["cloakskirm"].id] = 1,
 --	[UnitDefNames["shipcarrier"].id] = 1,
@@ -93,9 +93,9 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["shiparty"].id] = 1,
 	
 	-- Needs LUS
-	--[UnitDefNames["correap"].id] = 1,
-	--[UnitDefNames["corraid"].id] = 1,
-	--[UnitDefNames["corgol"].id] = 1,
+	--[UnitDefNames["tankassault"].id] = 1,
+	--[UnitDefNames["vehassault"].id] = 1,
+	--[UnitDefNames["tankheavyassault"].id] = 1,
 	--[UnitDefNames["cloakarty"].id] = 1,
 }
 

@@ -3,33 +3,33 @@ local raider = {
 	"spherepole",
 	"corak",
 	"armflash",
-	"corfav",
-	"corgator",
+	"vehscout",
+	"vehraid",
 	"amphraid",
 	
-	"corpyro",
+	"jumpraid",
 	"panther",
 	"logkoda",
 	
 	"armsh",
-	"corsh",
+	"hoverraid",
 	
 	"chicken",
 	"chicken_leaper",
 }
 
 local assault = {
-	"corthud",
-	"corraid",
+	"shieldassault",
+	"vehassault",
 	
 	"cloakassault",
 	--"spidercrabe",
 	"spiderassault",
-	"corcan",
-	--"corsumo",
+	"jumpassault",
+	--"jumpsumo",
 	"armbull",
-	"correap",
-	"corgol",
+	"tankassault",
+	"tankheavyassault",
 	"amphassault",
 	
 	"armanac",
@@ -46,7 +46,7 @@ local assault = {
 
 local skirm = {
 	"cloakskirm",
-	"corstorm",
+	"shieldskirm",
 	"armjanus",
 	"armstump",
 	"amphfloater",
@@ -66,14 +66,14 @@ local skirm = {
 }
 
 local jumper = { -- uses jump for offense. IE do not put commander or AA here.
-	"corcan",
-	"corsumo",
+	"jumpassault",
+	"jumpsumo",
 }
 
 local riot = {
 	"armwar",
-	"cormak",
-	"corlevlr",
+	"shieldriot",
+	"vehriot",
 	"spiderriot",
 	"amphimpulse",
 	"amphriot",
@@ -95,11 +95,11 @@ local arty = {
 	"punisher",
 	"firewalker",
 	"tawf013",
-	"corgarp",
+	"veharty",
 	
 	"vehheavyarty",
 	--"hoverarty",
-	"cormart",
+	"tankarty",
 	"trem",
 	
 	"armshock",
@@ -113,7 +113,7 @@ local arty = {
 
 local counteredByAssaults = {
 	"puppy",
-	"cormist",
+	"vehsupport",
 }
 
 local prioritySos = {

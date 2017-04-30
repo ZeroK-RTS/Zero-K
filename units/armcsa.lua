@@ -12,7 +12,7 @@ unitDef = {
 
   buildoptions        = {
     [[staticcon]],
-    [[corrad]],
+    [[staticradar]],
     [[staticheavyradar]],
     [[staticjammer]],
     [[cloakcon]],
@@ -28,7 +28,7 @@ unitDef = {
     [[vehheavyarty]],
     [[spiderantiheavy]],
     [[cloakaa]],
-    [[core_spectre]],
+    [[shieldshield]],
     [[spherecloaker]],
     [[amphtele]],
     [[striderantiheavy]],

@@ -25,10 +25,10 @@ gameMode				= true
 tooltipMessage			= "Kill chickens and collect their eggs to get metal."
 
 mexesUnitDefID = {
-	[-UnitDefNames.cormex.id] = true, 
+	[-UnitDefNames.staticmex.id] = true, 
 }
 mexes = {
-	"cormex",
+	"staticmex",
 }
 noTarget = {
 	terraunit=true,

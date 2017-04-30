@@ -47,7 +47,7 @@ unitDef = {
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
-  objectName          = [[corshad.s3o]],
+  objectName          = [[bomberprec.s3o]],
   script			  = [[bomberdive.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
 
@@ -129,7 +129,7 @@ unitDef = {
       },
 	  
 	  customParams            = {
-		torp_underwater = [[corshad_a_torpedo]],
+		torp_underwater = [[bomberprec_a_torpedo]],
 	  },
 
       explosionGenerator      = [[custom:xamelimpact]],

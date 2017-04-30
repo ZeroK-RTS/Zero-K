@@ -2,7 +2,7 @@
 {
 // --- EASY config ---
 "easy": {  // Null AI
-"economy": {"energy": {"land": {"energysingu": [1], "energyfusion": [2], "energysolar": [3]}, "water": {"energysingu": [1], "energyfusion": [2], "energywind": [3]}}, "default": "corrl"}
+"economy": {"energy": {"land": {"energysingu": [1], "energyfusion": [2], "energysolar": [3]}, "water": {"energysingu": [1], "energyfusion": [2], "energywind": [3]}}, "default": "turretmissile"}
 },
 // --- EASY config ---
 
@@ -62,7 +62,7 @@
 
 		"income_tier": [7, 16, 24, 32, 40, 56, 72],
 		//             wasp,         gunshipbomb,   gnat,     banshee,  rapier,           brawler,    gunshipassault,   krow,     valkyrie,  vindicator,  trident
-		"unit":      ["gunshipcon", "gunshipbomb", "gunshipemp", "gunshipraid", "gunshipsupport", "gunshipheavyskirm", "gunshipassault", "corcrw", "corvalk", "gunshipheavytrans", "gunshipaa"],
+		"unit":      ["gunshipcon", "gunshipbomb", "gunshipemp", "gunshipraid", "gunshipsupport", "gunshipheavyskirm", "gunshipassault", "gunshipkrow", "gunshiptrans", "gunshipheavytrans", "gunshipaa"],
 		"land": {
 			// 0-8m Opening - gunshipbomb and banshee Harass
 			"tier0": [ 0.00,         0.17,        0.00,     0.10,     0.71,             0.00,       0.02,        0.00,     0.00,      0.00,        0.00],
@@ -148,8 +148,8 @@
 		"require_energy": false,
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
-		//             mason,    dart,     scorcher,   slasher,   leveler,    ravager,   dominatrix,   wolverine, impaler,   crasher
-		"unit":      ["corned", "corfav", "corgator", "cormist", "corlevlr", "corraid", "vehcapture", "corgarp", "vehheavyarty", "vehaa"],
+		//             mason,    dart,     shoverconer,   slasher,   leveler,    ravager,   dominatrix,   wolverine, impaler,   crasher
+		"unit":      ["vehcon", "vehscout", "vehraid", "vehsupport", "vehriot", "vehassault", "vehcapture", "veharty", "vehheavyarty", "vehaa"],
 		"land": {
 			// 0-8m Opening - Dart, Riot & Slasher
 			"tier0": [ 0.00,     0.33,     0.55,       0.12,      0.00,       0.00,      0.00,         0.00,      0.00,      0.00],
@@ -178,7 +178,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             quill,   dagger,  scalpel,    halberd,        claymore,           mace,        penetrator, flail
-		"unit":      ["corch", "corsh", "nsaclash", "hoverassault", "hoverdepthcharge", "hoverriot", "hoverarty", "hoveraa"],
+		"unit":      ["hovercon", "hoverraid", "nsaclash", "hoverassault", "hoverdepthcharge", "hoverriot", "hoverarty", "hoveraa"],
 		"land": {
 			// 0-8m Opening - Raiders and Riots
 			"tier0": [ 0.00,    0.65,    0.00,       0.00,           0.00,               0.35,        0.00,       0.00],
@@ -213,7 +213,7 @@
 
 		"income_tier": [30, 60],
 		//             crane,   swift,     hawk,      raven,     phoenix,    thunderbird,         wyvern,    vulture
-		"unit":      ["planecon", "fighter", "corvamp", "corshad", "corhurc2", "bomberdisarm", "bomberheavy", "planescout"],
+		"unit":      ["planecon", "planefighter", "planefighterheavy", "bomberprec", "bomberriot", "bomberdisarm", "bomberheavy", "planescout"],
 		"air": {
 			// 0-10m Early Game
 			"tier0": [ 0.00,    0.00,      0.90,      0.00,      0.00,       0.00,                0.05,      0.05],
@@ -235,7 +235,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             welder,   kodachi,   panther,   banisher,  reaper,    goliath,  pillager,  tremor, copperhead
-		"unit":      ["tankcon", "logkoda", "panther", "tawf114", "correap", "corgol", "cormart", "trem", "corsent"],
+		"unit":      ["tankcon", "logkoda", "panther", "tawf114", "tankassault", "tankheavyassault", "tankarty", "trem", "tankaa"],
 		"land": {
 			// 0-8m Opening - Koda and Banisher
 			"tier0": [ 0.00,     0.50,      0.00,      0.10,      0.40,      0.00,     0.00,      0.00,   0.00],
@@ -264,7 +264,7 @@
 
 		"income_tier": [40],
 		//             freaker,   puppy,   pyro,      placeholder,     moderator,  jack,     sumo,      firewalker,   skuttle,   archangel
-		"unit":      ["corfast", "puppy", "corpyro", "jumpblackhole", "slowmort", "corcan", "corsumo", "firewalker", "corsktl", "jumpaa"],
+		"unit":      ["jumpcon", "puppy", "jumpraid", "jumpblackhole", "slowmort", "jumpassault", "jumpsumo", "firewalker", "jumpbomb", "jumpaa"],
 		"land": {
 			"tier0": [ 0.00,      0.10,    0.00,      0.25,            0.00,       0.25,     0.00,      0.15,         0.25,      0.00],
 			"tier1": [ 0.00,      0.10,    0.00,      0.30,            0.00,       0.25,     0.00,      0.20,         0.15,      0.00]
@@ -279,7 +279,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             convict,    dirtbag,   bandit,  rogue,      thug,      outlaw,   felon,         racketeer,    roach,      aspis,          vandal
-		"unit":      ["cornecro", "corclog", "corak", "corstorm", "corthud", "cormak", "shieldfelon", "shieldarty", "corroach", "core_spectre", "corcrash"],
+		"unit":      ["shieldcon", "shieldscout", "corak", "shieldskirm", "shieldassault", "shieldriot", "shieldfelon", "shieldarty", "shieldbomb", "shieldshield", "shieldaa"],
 		"land": {
 			"tier0": [ 0.00,       0.20,      0.75,    0.00,       0.00,      0.05,     0.00,          0.00,         0.00,       0.00,           0.00],
 			"tier1": [ 0.00,       0.14,      0.35,    0.29,       0.13,      0.05,     0.02,          0.01,         0.00,       0.01,           0.00],
@@ -491,13 +491,13 @@
 		"retreat": 0.75,
 		"dmg_mod": 1.25
 	},
-	"corcrw": {
+	"gunshipkrow": {
 		"role": ["heavy", "air", "support"],
 		"retreat": 0.7,
 		"limit": 0,
 		"dmg_mod": 2.0
 	},
-	"corvalk": {
+	"gunshiptrans": {
 		"role": ["transport", "air"]
 	},
 	"gunshipheavytrans": {
@@ -597,11 +597,11 @@
 	},
 
 	// factoryshield
-	"cornecro": {
+	"shieldcon": {
 		"role": ["builder", "static", "builder"],
 		"retreat": 1.3
 	},
-	"corclog": {
+	"shieldscout": {
 		"role": ["scout"],
 		"retreat": 0.1
 	},
@@ -611,17 +611,17 @@
 		"dmg_mod": 2.0,
 		"retreat": 0.35
 	},
-	"corstorm": {
+	"shieldskirm": {
 		"role": ["skirmish"],
 		"retreat": 0.7
 	},
-	"corthud": {
+	"shieldassault": {
 		"role": ["assault"],
 		"attribute": ["support"],
 		"dmg_mod": 1.5,
 		"retreat": 1.2
 	},
-	"cormak": {
+	"shieldriot": {
 		"role": ["riot"],
 		"attribute": ["support"],
 		"retreat": 0.5
@@ -639,46 +639,46 @@
 		"dmg_mod": 1.5,
 		"retreat": 0.8
 	},
-	"corroach": {
+	"shieldbomb": {
 		"role": ["mine"]
 	},
-	"core_spectre": {
+	"shieldshield": {
 		"role": ["support", "static", "support"],
 		"retreat": 1.1
 	},
-	"corcrash": {
+	"shieldaa": {
 		"role": ["anti_air"],
 		"retreat": 0.7,
 		"dmg_mod": 1.2
 	},
 
 	// factoryveh
-	"corned": {
+	"vehcon": {
 		"role": ["builder"]
 	},
-	"corfav": {
+	"vehscout": {
 		"role": ["scout"],
 		"limit": 4,
 		"retreat": 0.01
 	},
-	"corgator": {
+	"vehraid": {
 		"role": ["raider"],
 		"attribute": ["melee"],
 		"dmg_mod": 1.5,
 		"retreat": 0.35
 	},
-	"cormist": {
+	"vehsupport": {
 		"role": ["support"],
 		"attribute": ["siege", "ret_fight", "support"],
 		"retreat": 0.6  // cannot retreat
 	},
-	"corlevlr": {
+	"vehriot": {
 		"role": ["riot"],
 		"attribute": ["support"],
 		"dmg_mod": 1.5,
 		"retreat": 0.6
 	},
-	"corraid": {
+	"vehassault": {
 		"role": ["assault"],
 		"attribute": ["melee"],
 		"dmg_mod": 1.1,
@@ -689,7 +689,7 @@
 		"retreat": 0.9,
 		"dmg_mod": 5.0
 	},
-	"corgarp": {
+	"veharty": {
 		"role": ["skirmish"],
 		"attribute": ["support"],
 		"retreat": 0.8
@@ -708,14 +708,14 @@
 	},
 
 	// factoryjump
-	"corfast": {
+	"jumpcon": {
 		"role": ["builder"]
 	},
 	"puppy": {
 		"role": ["raider"],
 		"attribute": ["scout"]
 	},
-	"corpyro": {
+	"jumpraid": {
 		"role": ["raider"]
 	},
 	"jumpblackhole": {
@@ -725,13 +725,13 @@
 		"role": ["skirmish"],
 		"attribute": ["support"]
 	},
-	"corcan": {
+	"jumpassault": {
 		"role": ["assault"],
 		"attribute": ["melee"],
 		"limit": 0,
 		"dmg_mod": 2.0
 	},
-	"corsumo": {
+	"jumpsumo": {
 		"role": ["heavy", "support", "heavy"],
 		"attribute": ["no_jump"]
 	},
@@ -740,7 +740,7 @@
 		"limit": 0,
 		"retreat": 0.99
 	},
-	"corsktl": {
+	"jumpbomb": {
 		"role": ["anti_heavy", "mine"],
 		"limit": 3,
 		"retreat": 0.01
@@ -753,10 +753,10 @@
 	},
 
 	// factoryhover
-	"corch": {
+	"hovercon": {
 		"role": ["builder"]
 	},
-	"corsh": {
+	"hoverraid": {
 		"role": ["raider"],
 		"attribute": ["scout"],
 		"limit": 6,
@@ -802,28 +802,28 @@
 		"limit": 2,
 		"retreat": 0.99
 	},
-	"fighter": {
+	"planefighter": {
 		"role": ["scout", "air"],
 		"attribute": ["boost"],
 		"limit": 1,
 		"dmg_mod": 2.0,
 		"retreat": 0.8
 	},
-	"corvamp": {
+	"planefighterheavy": {
 		"role": ["anti_air", "air"],
 		"attribute": ["melee", "siege"],
 		"dmg_mod": 2,
 		"limit": 7,
 		"retreat": 0.6
 	},
-	"corshad": {
+	"bomberprec": {
 		"role": ["bomber", "air"],
 		"fire_state": "hold",
 		"retreat": 0.9,
 		"limit": 3,
 		"dmg_mod": 1.25
 	},
-	"corhurc2": {
+	"bomberriot": {
 		"role": ["bomber", "air"],
 		"retreat": 0.6
 	},
@@ -865,20 +865,20 @@
 		"limit": 1,
 		"retreat": 0.7
 	},
-	"correap": {
+	"tankassault": {
 		"role": ["assault", "heavy", "anti_heavy", "assault"],
 		"attribute": ["melee"],
 		"retreat": 0.65,
 		"limit": 1,
 		"dmg_mod": 1.14
 	},
-	"corgol": {
+	"tankheavyassault": {
 		"role": ["heavy", "anti_heavy", "heavy"],
 		"retreat": 0.55,
 		"limit": 0,
 		"dmg_mod": 2.0
 	},
-	"cormart": {
+	"tankarty": {
 		"role": ["artillery", "heavy"],
 		"limit": 2,
 		"retreat": 0.99,
@@ -890,7 +890,7 @@
 		"retreat": 0.99,
 		"dmg_mod": 0.2
 	},
-	"corsent": {
+	"tankaa": {
 		"role": ["anti_air"],
 		"attribute": ["melee"],
 		"retreat": 0.8,
@@ -950,7 +950,7 @@
 	},
 
 	// statics
-	"corsilo": {
+	"staticnuke": {
 		"role": ["static", "heavy"],
 		"fire_state": "hold",  // burst attacks
 		"reload": 30.0,
@@ -978,7 +978,7 @@
 		"limit": 1,
 		"dmg_mod": 0.01
 	},
-	"cordoom": {
+	"turretheavy": {
 		"role": ["static", "support", "static"],
 		"dmg_mod": 5.0
 	},
@@ -993,7 +993,7 @@
 	"staticantinuke": {
 		"role": ["static", "heavy"]
 	},
-	"corhlt": {
+	"turretheavylaser": {
 		"role": ["static", "heavy"],
 		"dmg_mod": 4.0
 	},
@@ -1003,7 +1003,7 @@
 	"energyfusion": {
 		"role": ["static", "heavy"]
 	},
-	"corrazor": {
+	"turretaalaser": {
 		"role": ["static", "anti_air"],
 		"dmg_mod": 2.5
 	},
@@ -1011,11 +1011,11 @@
 		"role": ["static", "anti_air", "heavy"],
 		"dmg_mod": 3.0
 	},
-	"corllt": {
+	"turretlaser": {
 		"role": ["static"],
 		"dmg_mod": 3.0
 	},
-	"corrl": {
+	"turretmissile": {
 		"role": ["static"],
 		"dmg_mod": 3.0
 	},
@@ -1027,7 +1027,7 @@
 		"role": ["static", "anti_air"],
 		"dmg_mod": 4.0
 	},
-	"corflak": {
+	"turretaaflak": {
 		"role": ["static", "anti_air"],
 		"dmg_mod": 4.0
 	},
@@ -1044,7 +1044,7 @@
 		"dmg_mod": 3.5
 	},
 
-	//	"unit": ["corllt", "corrl", "turretriot", "corhlt", "turrettorp", "corrazor", "staticcon", "cordoom", "corjamt", "turretemp", "turretantiheavy", "staticarty"],//
+	//	"unit": ["turretlaser", "turretmissile", "turretriot", "turretheavylaser", "turrettorp", "turretaalaser", "staticcon", "turretheavy", "staticshield", "turretemp", "turretantiheavy", "staticarty"],//
 
 	// support factories won't be built in front
 	"factoryplane": {
@@ -1172,12 +1172,12 @@
 	"airpad": "staticrearm",
 
 	// Unknown UnitDef replacer
-	"default": "corrl"
+	"default": "turretmissile"
 },
 
 "porcupine": {
 	//        0         1        2          3         4             5           6            7          8          9           10         11		  12		13
-	"unit": ["corllt", "corrl", "turretriot", "corhlt", "turrettorp", "corrazor", "staticcon", "cordoom", "corjamt", "turretemp", "turretantiheavy", "staticarty", "turretaafar", "screamer"],
+	"unit": ["turretlaser", "turretmissile", "turretriot", "turretheavylaser", "turrettorp", "turretaalaser", "staticcon", "turretheavy", "staticshield", "turretemp", "turretantiheavy", "staticarty", "turretaafar", "screamer"],
 	// Actual number of defences per cluster bounded by income
 	"land":  [0, 0, 1, 1, 0, 0, 1, 1, 9, 9, 6, 6, 5, 3, 12],
 	"water": [4, 1, 6, 4, 4, 3, 5],
@@ -1200,7 +1200,7 @@
 	},
 
 	// Fallback defence
-	"default": "corrl"
+	"default": "turretmissile"
 },
 
 "commander": {
@@ -1668,10 +1668,10 @@
 		"singu": ["energysingu"],
 		"pylon": ["energypylon"],
 		"store": ["staticstorage"],
-		"mex": ["cormex"],
-		"def_low": ["corrl", "corllt"],
+		"mex": ["staticmex"],
+		"def_low": ["turretmissile", "turretlaser"],
 		"caretaker": ["staticcon"],
-		"superweapon": ["raveparty", "corsilo", "staticheavyarty", "zenith", "screamer"],
+		"superweapon": ["raveparty", "staticnuke", "staticheavyarty", "zenith", "screamer"],
 		"protector": ["staticantinuke"],
 //		"terraform": ["terraunit"],
 		"strider": ["striderantiheavy", "scorpion", "dante", "striderarty", "funnelweb", "bantha", "detriment", "subtacmissile", "shipcarrier", "shipheavyarty"]

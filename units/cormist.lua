@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[cormist]],
+  unitname               = [[vehsupport]],
   name                   = [[Slasher]],
   description            = [[Deployable Missile Vehicle (must stop to fire)]],
   acceleration           = 0.0354,
   brakeRate              = 0.0358,
   buildCostMetal         = 140,
   builder                = false,
-  buildPic               = [[CORMIST.png]],
+  buildPic               = [[vehsupport.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -42,8 +42,8 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
-  objectName             = [[cormist_512.s3o]],
-  script                 = [[cormist.lua]],
+  objectName             = [[vehsupport_512.s3o]],
+  script                 = [[vehsupport.lua]],
   pushResistant          = 0,
   selfDestructAs         = [[BIG_UNITEX]],
 
@@ -128,7 +128,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[cormist_dead_new.s3o]],
+      object           = [[vehsupport_dead_new.s3o]],
     },
 
     HEAP  = {
@@ -142,4 +142,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ cormist = unitDef })
+return lowerkeys({ vehsupport = unitDef })

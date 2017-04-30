@@ -365,7 +365,7 @@ function widget:Initialize()
 				end
 			end
 			
-			if ud.name == 'cormex' then
+			if ud.name == 'staticmex' then
 				local x, _, z = spGetUnitPosition(uid)
 				territoryPos.x = territoryPos.x + x
 				territoryPos.z = territoryPos.z + z
@@ -805,7 +805,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 	
 	-- update territory info when new mexes are created.
-	if UnitDefs[unitDefID].name == 'cormex' then
+	if UnitDefs[unitDefID].name == 'staticmex' then
 		local x, _, z = spGetUnitPosition(unitID)
 		territoryPos.x = territoryPos.x + x
 		territoryPos.z = territoryPos.z + z
@@ -913,7 +913,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 		allBuilders[unitID] = nil
 	end
 	
-	if UnitDefs[unitDefID].name == 'cormex' then
+	if UnitDefs[unitDefID].name == 'staticmex' then
 		local x, _, z = spGetUnitPosition(unitID)
 		territoryPos.x = territoryPos.x - x
 		territoryPos.z = territoryPos.z - z

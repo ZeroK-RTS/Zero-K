@@ -3,7 +3,7 @@
 local oneClickWepDefs = {}
 
 local oneClickWepDefNames = {
-	corcrw = {
+	gunshipkrow = {
 		{ functionToCall = "ClusterBomb", reloadTime = 854, name = "Carpet Bomb", tooltip = "Drop a huge number of bombs in a circle under the Krow", weaponToReload = 3, texture = "LuaUI/Images/Commands/Bold/bomb.png",},
 	},
 	hoverdepthcharge = {
@@ -12,10 +12,10 @@ local oneClickWepDefNames = {
 	cloakbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
-	corroach = {
+	shieldbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
-	corsktl = {
+	jumpbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
 	gunshipbomb = {
@@ -29,7 +29,7 @@ local oneClickWepDefNames = {
 		{ functionToCall = "FlameTrail", reloadTime = 850, name = "Flame Trail", tooltip = "Leave a path of flame in your wake", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
 	},
 	--]]
-	fighter = {
+	planefighter = {
 		{ functionToCall = "Sprint", reloadTime = 850, name = "Speed Boost", tooltip = "Speed boost (5x for 1 second)", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
 	},
 	--planescout = {
@@ -38,7 +38,7 @@ local oneClickWepDefNames = {
 	gunshipheavytrans = {
 		{ functionToCall = "ForceDropUnit", reloadTime = 7, name = "Drop Cargo", tooltip = "Eject cargo!", useSpecialReloadFrame = true,},
 	},
-	corvalk = {
+	gunshiptrans = {
 		{ functionToCall = "ForceDropUnit", reloadTime = 7, name = "Drop Cargo", tooltip = "Eject cargo!", useSpecialReloadFrame = true,},
 	},		
 }

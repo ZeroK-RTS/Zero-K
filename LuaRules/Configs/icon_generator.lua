@@ -140,7 +140,7 @@ defaults = {border=0.05, angle=45, rot="right", clamp=-10000, scale=1.5, empty=f
 --// per unitdef settings
 unitConfigs = {
   
-  [UnitDefNames.corrad.id] = {
+  [UnitDefNames.staticradar.id] = {
     scale = 3,
     rot   = 200,
     clamp = 10,
@@ -148,19 +148,19 @@ unitConfigs = {
   [UnitDefNames.staticjammer.id] = {
     rot = -45,
   },
-  [UnitDefNames.corsilo.id] = {
+  [UnitDefNames.staticnuke.id] = {
     clamp = 0,
   },
-  [UnitDefNames.corsh.id] = {
+  [UnitDefNames.hoverraid.id] = {
     clamp = 0,
   },
-  [UnitDefNames.corrl.id] = {
+  [UnitDefNames.turretmissile.id] = {
     clamp = 2,
   },
-  [UnitDefNames.corhlt.id] = {
+  [UnitDefNames.turretheavylaser.id] = {
     clamp = 2,
   },
-  [UnitDefNames.corfav.id] = {
+  [UnitDefNames.vehscout.id] = {
     border = 0.156,
   },
   [UnitDefNames.gunshipbomb.id] = {
@@ -169,7 +169,7 @@ unitConfigs = {
   [UnitDefNames.gunshipemp.id] = {
     border = 0.125,
   },
-  [UnitDefNames.corgator.id] = {
+  [UnitDefNames.vehraid.id] = {
     border = 0.125,
   },
   [UnitDefNames.spiderscout.id] = {
@@ -177,23 +177,23 @@ unitConfigs = {
   },
 
 
-  [UnitDefNames.corsumo.id] = {
+  [UnitDefNames.jumpsumo.id] = {
     unfold = true,
   },
-  [UnitDefNames.corpyro.id] = {
+  [UnitDefNames.jumpraid.id] = {
     unfold = true,
   },
-  [UnitDefNames.corstorm.id] = {
+  [UnitDefNames.shieldskirm.id] = {
     unfold = true,
   },
-  [UnitDefNames.core_spectre.id] = {
+  [UnitDefNames.shieldshield.id] = {
     unfold = true,
   },
-  [UnitDefNames.corjamt.id] = {
+  [UnitDefNames.staticshield.id] = {
     unfold = true,
   },
   	
-  [UnitDefNames.cormart.id] = {
+  [UnitDefNames.tankarty.id] = {
     unfold = true,
     attack = true,
     shotangle = 45,
@@ -237,15 +237,15 @@ unitConfigs = {
     unfold = true,
     wait   = 100,
   },
-  [UnitDefNames.cormex.id] = {
+  [UnitDefNames.staticmex.id] = {
     clamp  = 0,
     unfold = true,
     wait   = 600,
   },
-  [UnitDefNames.cordoom.id] = {
+  [UnitDefNames.turretheavy.id] = {
     unfold = true,
   },
-  [UnitDefNames.corcrw.id] = {
+  [UnitDefNames.gunshipkrow.id] = {
     unfold = true,
   },
   [UnitDefNames.chickenf.id] = {
@@ -327,7 +327,7 @@ unitConfigs = {
     unfold  = true,
     wait = 60,
   },
-  [UnitDefNames.corch.id] = {
+  [UnitDefNames.hovercon.id] = {
     unfold  = true,
     wait = 60,
   },

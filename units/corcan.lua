@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[corcan]],
+  unitname            = [[jumpassault]],
   name                = [[Jack]],
   description         = [[Melee Assault Jumper]],
   acceleration        = 0.16,
   brakeRate           = 0.2,
   buildCostMetal      = 600,
   builder             = false,
-  buildPic            = [[CORCAN.png]],
+  buildPic            = [[jumpassault.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -43,7 +43,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[corcan.s3o]],
-  script	          = [[corcan.lua]],
+  script	          = [[jumpassault.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -131,7 +131,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[corcan_dead.s3o]],
+      object           = [[jumpassault_dead.s3o]],
     },
 
 
@@ -146,4 +146,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corcan = unitDef })
+return lowerkeys({ jumpassault = unitDef })

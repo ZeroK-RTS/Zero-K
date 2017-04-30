@@ -15,7 +15,7 @@ local Spring = Spring
 local table  = table
 
 local stockpilerDefNames = { 
-	"corsilo", 
+	"staticnuke", 
 	"subtacmissile",
 	"shipcarrier"
 }

@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[corclog]],
+  unitname               = [[shieldscout]],
   name                   = [[Dirtbag]],
   description            = [[Box of Dirt]],
   acceleration           = 0.2,
   brakeRate              = 0.6,
   buildCostMetal         = 30,
-  buildPic               = [[corclog.png]],
+  buildPic               = [[shieldscout.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -43,7 +43,7 @@ unitDef = {
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName             = [[clogger.s3o]],
-  script                 = [[corclog.lua]],
+  script                 = [[shieldscout.lua]],
   selfDestructAs         = [[CLOGGER_EXPLODE]],
   selfDestructCountdown  = 0,
   sightDistance          = 300,
@@ -147,4 +147,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corclog = unitDef })
+return lowerkeys({ shieldscout = unitDef })

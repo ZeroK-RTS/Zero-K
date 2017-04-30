@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[cormart]],
+  unitname            = [[tankarty]],
   name                = [[Pillager]],
   description         = [[General-Purpose Artillery]],
   acceleration        = 0.0282,
   brakeRate           = 0.136,
   buildCostMetal      = 700,
   builder             = false,
-  buildPic            = [[CORMART.png]],
+  buildPic            = [[tankarty.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -37,7 +37,7 @@ unitDef = {
   moveState           = 0,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
-  objectName          = [[cormart.s3o]],
+  objectName          = [[tankarty.s3o]],
   pushResistant       = 0,
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 660,
@@ -109,7 +109,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[cormart_dead.s3o]],
+      object           = [[tankarty_dead.s3o]],
     },
 
     
@@ -124,4 +124,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ cormart = unitDef })
+return lowerkeys({ tankarty = unitDef })

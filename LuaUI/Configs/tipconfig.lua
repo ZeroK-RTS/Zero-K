@@ -32,11 +32,11 @@ generalTips = {
 }
 
 unitTips = {
-	corclog = {"The \255\255\64\0Dirtbag\008 leaves a mound of earth when it dies, obstructing units (especially vehicles) and weapons.", 3, 5},
+	shieldscout = {"The \255\255\64\0Dirtbag\008 leaves a mound of earth when it dies, obstructing units (especially vehicles) and weapons.", 3, 5},
 	vehcapture = {"The \255\255\64\0Dominatrix\008 capture vehicle can capture enemy units (with a 10 second cooldown between captures), but control is lost if the capturing Dominatrix dies.", 3, 5},
 	spidercrabe = {"The \255\255\64\0Crabe\008 outranges basic defenses. It curls up into armored form when stationary, becoming a formidable defense turret.", 3, 5},
 	firewalker = {"The \255\255\64\0Firewalker\008 creates large clouds of fire which can seriously harm units - friend or foe - standing in them.", 3, 5},
-	corsktl = {"The \255\255\64\0Skuttle\008 has a very powerful explosion with a very small blast radius. Use it to jump on enemy heavy targets and kill them in one or two blows.", 3, 5},
+	jumpbomb = {"The \255\255\64\0Skuttle\008 has a very powerful explosion with a very small blast radius. Use it to jump on enemy heavy targets and kill them in one or two blows.", 3, 5},
 	
 	tawf114 = {"The \255\255\64\0Banisher\008 packs a punch against groups of small units, but can be easily rushed - make sure to screen it.", 3, 4},
 	hoverarty = {"The \255\255\64\0Penetrator\008 can split many units apart in one shot, but has no AoE and a 20s reload time, and is itself very flimsy. Use it for pinpoint fire from a distance.", 3, 4},
@@ -47,32 +47,32 @@ raiderDefs = {
 	"spherepole",
 	"corak",
 	"armflash",
-	"corfav",
-	"corgator",
+	"vehscout",
+	"vehraid",
 	
-	"corpyro",
+	"jumpraid",
 	"panther",
 	"logkoda",
 	
 	"armsh",
-	"corsh",
+	"hoverraid",
 	
 	"chicken",
 	"chicken_leaper",
 }
 
 assaultDefs = {
-	"corthud",
-	"corraid",
+	"shieldassault",
+	"vehassault",
 	
 	"cloakassault",
 	--"spidercrabe",
 	"spiderassault",
-	"corcan",
-	--"corsumo",
+	"jumpassault",
+	--"jumpsumo",
 	"armbull",
-	"correap",
-	"corgol",
+	"tankassault",
+	"tankheavyassault",
 	
 	"armanac",
 	"hoverassault",
@@ -88,7 +88,7 @@ assaultDefs = {
 
 skirmDefs = {
 	"cloakskirm",
-	"corstorm",
+	"shieldskirm",
 	"armjanus",
 	"armstump",
 	
@@ -106,8 +106,8 @@ skirmDefs = {
 
 riotDefs = {
 	"armwar",
-	"cormak",
-	"corlevlr",
+	"shieldriot",
+	"vehriot",
 	
 	"spideremp",
 	"tawf003",
@@ -124,11 +124,11 @@ artyDefs = {
 	"punisher",
 	"firewalker",
 	"tawf013",
-	"corgarp",
+	"veharty",
 	
 	"vehheavyarty",
 	--"hoverarty",
-	"cormart",
+	"tankarty",
 	"trem",
 	
 	"armshock",
@@ -142,25 +142,25 @@ artyDefs = {
 
 bomberDefs = {
 	"bomberdive",
-	"corshad",
-	"corhurc2",
+	"bomberprec",
+	"bomberriot",
 	"bomberdisarm",
 	"bomberheavy",
 }
 
 conDefs = {
 	"cloakcon",
-	"cornecro",
+	"shieldcon",
 	"arm_weaver",
-	"corfast",
-	"corned",
+	"jumpcon",
+	"vehcon",
 	"tankcon",
-	"corch",
+	"hovercon",
 	"planecon",
 	"shipcon",
 }
 
-mexDefs = {"cormex"}
+mexDefs = {"staticmex"}
 
 energyDefs = {
 	"energysolar",
@@ -188,7 +188,7 @@ airFactoryDefs = {
 
 superweaponDefs = {
 	"staticheavyarty",
-	"corsilo",
+	"staticnuke",
 	"mahlazer",
 	"zenith",
 	"raveparty",
@@ -197,7 +197,7 @@ superweaponDefs = {
 needPowerDefs = {
 	"turretantiheavy",
 	"staticarty",
-	"cordoom",
+	"turretheavy",
 }
 
 for name in pairs(UnitDefNames) do

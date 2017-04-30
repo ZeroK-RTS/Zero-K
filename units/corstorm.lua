@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[corstorm]],
+  unitname               = [[shieldskirm]],
   name                   = [[Rogue]],
   description            = [[Skirmisher Bot (Indirect Fire)]],
   acceleration           = 0.25,
   brakeRate              = 0.2,
   buildCostMetal         = 120,
-  buildPic               = [[CORSTORM.png]],
+  buildPic               = [[shieldskirm.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -42,7 +42,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[storm.s3o]],
-  script                 = [[corstorm.lua]],
+  script                 = [[shieldskirm.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -139,4 +139,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corstorm = unitDef })
+return lowerkeys({ shieldskirm = unitDef })

@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[corrad]],
+  unitname                      = [[staticradar]],
   name                          = [[Radar Tower]],
   description                   = [[Early Warning System]],
   acceleration                  = 0,
@@ -10,8 +10,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
   buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[corrad_aoplane.dds]],
-  buildPic                      = [[corrad.png]],
+  buildingGroundDecalType       = [[staticradar_aoplane.dds]],
+  buildPic                      = [[staticradar.png]],
   category                      = [[FLOAT UNARMED]],
   collisionVolumeOffsets        = [[0 -32 0]],
   collisionVolumeScales         = [[32 90 32]],
@@ -44,7 +44,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[ARADARLVL1.s3o]],
-  script                        = [[corrad.lua]],
+  script                        = [[staticradar.lua]],
   onoffable                     = true,
   radarDistance                 = 2100,
   radarEmitHeight			    = 32,
@@ -168,4 +168,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corrad = unitDef })
+return lowerkeys({ staticradar = unitDef })

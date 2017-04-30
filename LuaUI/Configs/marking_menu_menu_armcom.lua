@@ -2,7 +2,7 @@ local menu_armcom = {
   items = {
   {
     angle = 0,
-    unit = "cormex",
+    unit = "staticmex",
     label = "Economy",
     items = {
       {
@@ -95,20 +95,20 @@ local menu_armcom = {
   },
   {
     angle = 180,
-    unit = "corllt",
+    unit = "turretlaser",
     label = "Defense",
     items = {
       {
         angle = 45,
-        unit = "corrl"
+        unit = "turretmissile"
       },
       {
         angle = 90,
-        unit = "corhlt"
+        unit = "turretheavylaser"
       },
       {
         angle = 135,
-        unit = "corgrav"
+        unit = "turretimpulse"
       },
       {
         angle = -90,
@@ -126,7 +126,7 @@ local menu_armcom = {
   },
   {
     angle = 135,
-    unit = "corrl",
+    unit = "turretmissile",
     label = "AA/AS",
     items = {
       {
@@ -135,11 +135,11 @@ local menu_armcom = {
       },
       {
         angle = -90,
-        unit = "corrazor"
+        unit = "turretaalaser"
       },
       {
         angle = 45,
-        unit = "corflak"
+        unit = "turretaaflak"
       },
       {
         angle = -135,
@@ -157,7 +157,7 @@ local menu_armcom = {
   },
   {
     angle = 90,
-    unit = "corrad",
+    unit = "staticradar",
     label = "Support",
     items = {
       {
@@ -166,7 +166,7 @@ local menu_armcom = {
       },
       {
         angle = -180,
-        unit = "corjamt"
+        unit = "staticshield"
       },
       {
         angle = 135,
@@ -189,7 +189,7 @@ local menu_armcom = {
     items = {
       {
         angle = 0,
-        unit = "corsilo"
+        unit = "staticnuke"
       },
       {
         angle = 90,
@@ -201,7 +201,7 @@ local menu_armcom = {
       },
       {
         angle = 180,
-        unit = "cordoom"
+        unit = "turretheavy"
       },
       {
         angle = -45,

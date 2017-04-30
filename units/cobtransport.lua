@@ -6,7 +6,7 @@ unitDef = {
   brakeRate           = 6,
   buildCostMetal      = 80,
   builder             = false,
-  buildPic            = [[CORVALK.png]],
+  buildPic            = [[gunshiptrans.png]],
   canFly              = true,
   canGuard            = true,
   canload             = [[1]],
@@ -45,7 +45,7 @@ unitDef = {
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  objectName          = [[CORVALK.s3o]],
+  objectName          = [[gunshiptrans.s3o]],
   releaseHeld         = true,
   selfDestructAs      = [[GUNSHIPEX]],
 

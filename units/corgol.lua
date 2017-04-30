@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[corgol]],
+  unitname            = [[tankheavyassault]],
   name                = [[Goliath]],
   description         = [[Very Heavy Tank Buster]],
   acceleration        = 0.0282,
   brakeRate           = 0.052,
   buildCostMetal      = 2200,
   builder             = false,
-  buildPic            = [[corgol.png]],
+  buildPic            = [[tankheavyassault.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -36,8 +36,8 @@ unitDef = {
   movementClass       = [[TANK4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
-  objectName          = [[corgol_512.s3o]],
-  script	      = [[corgol.cob]],
+  objectName          = [[tankheavyassault_512.s3o]],
+  script	      = [[tankheavyassault.cob]],
   selfDestructAs      = [[BIG_UNIT]],
 
   sfxtypes            = {
@@ -160,7 +160,7 @@ unitDef = {
       weaponVelocity          = 500,
     },
 
-    CORGOL_FLAMETHROWER = {
+    tankheavyassault_FLAMETHROWER = {
       name                    = [[Flamethrower]],
       areaOfEffect            = 64,
       avoidFeature            = false,
@@ -232,4 +232,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corgol = unitDef })
+return lowerkeys({ tankheavyassault = unitDef })

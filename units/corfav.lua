@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[corfav]],
+  unitname               = [[vehscout]],
   name                   = [[Dart]],
   description            = [[Raider/Scout Vehicle]],
   acceleration           = 0.14,
   brakeRate              = 0.1555,
   buildCostMetal         = 35,
   builder                = false,
-  buildPic               = [[CORFAV.png]],
+  buildPic               = [[vehscout.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -41,7 +41,7 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[CORFAV.s3o]],
+  objectName             = [[vehscout.s3o]],
   selfDestructAs         = [[SMALL_UNITEX]],
   sightDistance          = 580,
   trackOffset            = 0,
@@ -115,7 +115,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[CORFAV_DEAD.s3o]],
+      object           = [[vehscout_DEAD.s3o]],
     },
 
     HEAP  = {
@@ -129,4 +129,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corfav = unitDef })
+return lowerkeys({ vehscout = unitDef })

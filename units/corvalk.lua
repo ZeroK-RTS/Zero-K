@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[corvalk]],
+  unitname            = [[gunshiptrans]],
   name                = [[Valkyrie]],
   description         = [[Air Transport]],
   acceleration        = 0.2,
   brakeRate           = 0.96,
   buildCostMetal      = 100,
   builder             = false,
-  buildPic            = [[CORVALK.png]],
+  buildPic            = [[gunshiptrans.png]],
   canFly              = true,
   canGuard            = true,
   canload             = [[1]],
@@ -46,7 +46,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[smallTransport.s3o]],
-  script              = [[corvalk.lua]],
+  script              = [[gunshiptrans.lua]],
   releaseHeld         = true,
   selfDestructAs      = [[GUNSHIPEX]],
 
@@ -87,4 +87,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corvalk = unitDef })
+return lowerkeys({ gunshiptrans = unitDef })

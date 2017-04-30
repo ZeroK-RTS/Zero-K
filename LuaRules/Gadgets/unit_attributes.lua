@@ -64,7 +64,7 @@ local hasSensorOrJamm = {
 	[ UnitDefNames['spherecloaker'].id ] = true,
 	[ UnitDefNames['staticjammer'].id ] = true,
 	[ UnitDefNames['staticsonar'].id ] = true,
-	[ UnitDefNames['corrad'].id ] = true,
+	[ UnitDefNames['staticradar'].id ] = true,
 	[ UnitDefNames['planescout'].id ] = true,
 	[ UnitDefNames['shipcarrier'].id ] = true,
 }

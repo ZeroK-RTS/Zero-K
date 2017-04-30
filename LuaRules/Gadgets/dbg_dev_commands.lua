@@ -400,7 +400,7 @@ local ORDERS_PASSIVE = {
 -------------------------------------------------------------------------------------
 
 -- UnitName TeamID Number Radius [Xpos Zpos]
--- For example '/luarules circle corllt 1 60 420 3200 3200'
+-- For example '/luarules circle turretlaser 1 60 420 3200 3200'
 local function circleGive(cmd, line, words, player)
 	if not (spIsCheatingEnabled() and #words >= 4) then 
 		return

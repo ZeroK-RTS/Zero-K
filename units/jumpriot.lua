@@ -19,7 +19,7 @@ unitDef = {
     helptext       = [[The Infernal is a fire-based riot jumper.]],
 	},
 
-  explodeAs             = [[CORPYRO_PYRO_DEATH]],
+  explodeAs             = [[jumpraid_PYRO_DEATH]],
   footprintX            = 2,
   footprintZ            = 2,
   iconType              = [[jumpjetriot]],
@@ -36,7 +36,7 @@ unitDef = {
   noChaseCategory       = [[FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName            = [[freaker.s3o]],
   script		        = [[jumpblackhole.lua]],
-  selfDestructAs        = [[CORPYRO_NAPALM]],
+  selfDestructAs        = [[jumpraid_NAPALM]],
   selfDestructCountdown = 1,
 
   sfxtypes              = {

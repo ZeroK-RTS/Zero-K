@@ -19,9 +19,9 @@ unitDef = {
     [[gunshipsupport]],
     [[gunshipheavyskirm]],
     [[gunshipassault]],
-    [[corcrw]],
+    [[gunshipkrow]],
 	[[gunshipaa]],
-    [[corvalk]],
+    [[gunshiptrans]],
     [[gunshipheavytrans]],
   },
 

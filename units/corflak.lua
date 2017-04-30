@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[corflak]],
+  unitname                      = [[turretaaflak]],
   name                          = [[Cobra]],
   description                   = [[Anti-Air Flak Gun]],
   acceleration                  = 0,
@@ -9,8 +9,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
   buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[corflak_aoplane.dds]],
-  buildPic                      = [[CORFLAK.png]],
+  buildingGroundDecalType       = [[turretaaflak_aoplane.dds]],
+  buildPic                      = [[turretaaflak.png]],
   category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 11 -4]],
   collisionVolumeScales         = [[50 86 50]],
@@ -41,7 +41,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName                    = [[CORFLAK.s3o]],
+  objectName                    = [[turretaaflak.s3o]],
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
   
   sfxtypes               = {
@@ -120,7 +120,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[corflak_dead.s3o]],
+      object           = [[turretaaflak_dead.s3o]],
     },
 
 
@@ -135,4 +135,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corflak = unitDef })
+return lowerkeys({ turretaaflak = unitDef })

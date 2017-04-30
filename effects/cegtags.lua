@@ -1,4 +1,4 @@
--- heatray_scorcher
+-- heatray_shoverconer
 -- redlaser_ak
 -- yellowlaser_hlt
 -- yellowlaser_can
@@ -9,7 +9,7 @@
 -- slashtag
 
 return {
-  ["heatray_scorcher"] = {
+  ["heatray_shoverconer"] = {
     greenlaser = {
       air                = true,
       class              = [[CSimpleGroundFlash]],

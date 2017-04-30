@@ -1,9 +1,9 @@
 local heatmapNames = {
 	mobileAntiAir = {
 		["cloakaa"] = {mult = 1},
-		["corcrash"] = {mult = 1},
+		["shieldaa"] = {mult = 1},
 		["vehaa"] = {mult = 1},
-		["corsent"] = {mult = 1},
+		["tankaa"] = {mult = 1},
 		["hoveraa"] = {mult = 1},
 		["spideraa"] = {mult = 1},
 		["jumpaa"] = {mult = 1},
@@ -18,14 +18,14 @@ local heatmapNames = {
 	},
 	
 	staticAntiAir = {
-		["corrl"] = {mult = 1},
-		["corrazor"] = {mult = 1},
+		["turretmissile"] = {mult = 1},
+		["turretaalaser"] = {mult = 1},
 		["missiletower"] = {mult = 2},
 		["turretaafar"] = {mult = 1.5},
-		["corflak"] = {mult = 2},
+		["turretaaflak"] = {mult = 2},
 		["screamer"] = {mult = 1},
 		
-		["corgrav"] = {mult = 1},
+		["turretimpulse"] = {mult = 1},
 		["turretemp"] = {mult = 1},
 	},
 	
@@ -33,25 +33,25 @@ local heatmapNames = {
 		["cloakraid"] = {mult = 1},
 		["spherepole"] = {mult = 1},
 		["corak"] = {mult = 1},
-		["corfav"] = {mult = 1},
-		["corgator"] = {mult = 1},
+		["vehscout"] = {mult = 1},
+		["vehraid"] = {mult = 1},
 		["panther"] = {mult = 1},
 		["logkoda"] = {mult = 1},
 		["spiderscout"] = {mult = 1},
-		["corpyro"] = {mult = 1},
+		["jumpraid"] = {mult = 1},
 		["amphraid"] = {mult = 1},
-		["corsh"] = {mult = 1},
+		["hoverraid"] = {mult = 1},
 		["chicken"] = {mult = 1},
 		["chicken_leaper"] = {mult = 1},
         
 		["cloakassault"] = {mult = 1},
-		["corthud"] = {mult = 1},
-		["corraid"] = {mult = 1},
+		["shieldassault"] = {mult = 1},
+		["vehassault"] = {mult = 1},
 		["spiderassault"] = {mult = 1},
-		["corcan"] = {mult = 1},
-		["corsumo"] = {mult = 1},
-		["correap"] = {mult = 1},
-		["corgol"] = {mult = 1},
+		["jumpassault"] = {mult = 1},
+		["jumpsumo"] = {mult = 1},
+		["tankassault"] = {mult = 1},
+		["tankheavyassault"] = {mult = 1},
 		["amphassault"] = {mult = 1},
 		["hoverassault"] = {mult = 1},
 		["bantha"] = {mult = 1},
@@ -62,7 +62,7 @@ local heatmapNames = {
 		["chicken_tiamat"] = {mult = 1},
         
 		["cloakskirm"] = {mult = 1},
-		["corstorm"] = {mult = 1},
+		["shieldskirm"] = {mult = 1},
 		["nsaclash"] = {mult = 1},
 		["amphfloater"] = {mult = 1},
 		["spiderskirm"] = {mult = 1},
@@ -73,12 +73,12 @@ local heatmapNames = {
 		["scorpion"] = {mult = 1},
         
 		["spidercrabe"] = {mult = 1},
-		["cormist"] = {mult = 1},
+		["vehsupport"] = {mult = 1},
 		["firewalker"] = {mult = 1},
 		
 		["armwar"] = {mult = 1},
-		["cormak"] = {mult = 1},
-		["corlevlr"] = {mult = 1},
+		["shieldriot"] = {mult = 1},
+		["vehriot"] = {mult = 1},
 		["spiderriot"] = {mult = 1},
 		["amphimpulse"] = {mult = 1},
 		["amphriot"] = {mult = 1, range = 300},
@@ -91,10 +91,10 @@ local heatmapNames = {
 		["chickenwurm"] = {mult = 1},
 		
 		["cloakarty"] = {mult = 1},
-		["corgarp"] = {mult = 1},
+		["veharty"] = {mult = 1},
 		["vehheavyarty"] = {mult = 1},
 		["hoverarty"] = {mult = 1},
-		["cormart"] = {mult = 1},
+		["tankarty"] = {mult = 1},
 		["trem"] = {mult = 1},
 		["striderarty"] = {mult = 1},
 		["chickenr"] = {mult = 1},
@@ -102,15 +102,15 @@ local heatmapNames = {
 	},
 	
 	staticLand = {
-		["corrl"] = {mult = 2},
-		["corllt"] = {mult = 2},
-		["corgrav"] = {mult = 2},
+		["turretmissile"] = {mult = 2},
+		["turretlaser"] = {mult = 2},
+		["turretimpulse"] = {mult = 2},
 		["turretemp"] = {mult = 2},
 		["turretriot"] = {mult = 2},
-		["corhlt"] = {mult = 2},
+		["turretheavylaser"] = {mult = 2},
 		["turretgauss"] = {mult = 2},
 		["turretantiheavy"] = {mult = 2},
-		["cordoom"] = {mult = 2},
+		["turretheavy"] = {mult = 2},
 		["staticarty"] = {mult = 2},
 	},
 }
@@ -118,27 +118,27 @@ local heatmapNames = {
 local completeUnitListNames = {
 
 	turretAA = {
-		"corrazor",
+		"turretaalaser",
 		"missiletower",
 		"turretaafar",
-		"corflak",
+		"turretaaflak",
 		"screamer",
 	},
 
 	turret = {
-		"corrl",
-		"corllt",
-		"corgrav",
+		"turretmissile",
+		"turretlaser",
+		"turretimpulse",
 		"turretemp",
 		"turretriot",
-		"corhlt",
+		"turretheavylaser",
 		"turretgauss",
 		"turretantiheavy",
-		"cordoom",
+		"turretheavy",
 	},
 	
 	economy = {
-		"cormex",
+		"staticmex",
 		"energywind",
 		"energysolar",
 		"energyfusion",
@@ -162,12 +162,12 @@ local completeUnitListNames = {
 	
 	constructor = {
 		"cloakcon",
-		"cornecro",
-		"corned",
+		"shieldcon",
+		"vehcon",
 		"tankcon",
 		"spidercon",
-		"corfast",
-		"corch",
+		"jumpcon",
+		"hovercon",
 		"amphcon",
 		"planecon",
 		"gunshipcon",
@@ -181,28 +181,28 @@ local ground = {
 		"cloakraid",
 		"spherepole",
 		"corak",
-		"corfav",
-		"corgator",
+		"vehscout",
+		"vehraid",
 		"panther",
 		"panther",
 		"logkoda",
 		"spiderscout",
-		"corpyro",
+		"jumpraid",
 		"amphraid",
-		"corsh",
+		"hoverraid",
 		"chicken",
 		"chicken_leaper",
 	},
 
 	assault = {
 		"cloakassault",
-		"corthud",
-		"corraid",
+		"shieldassault",
+		"vehassault",
 		"spiderassault",
-		"corcan",
-		"corsumo",
-		"correap",
-		"corgol",
+		"jumpassault",
+		"jumpsumo",
+		"tankassault",
+		"tankheavyassault",
 		"amphassault",
 		"hoverassault",
 		"bantha",
@@ -215,7 +215,7 @@ local ground = {
 
 	skirm = {
 		"cloakskirm",
-		"corstorm",
+		"shieldskirm",
 		"nsaclash",
 		"amphfloater",
 		"spiderskirm",
@@ -228,14 +228,14 @@ local ground = {
 	
 	antiSkirm = {
 		"spidercrabe",
-		"cormist",
+		"vehsupport",
 		"firewalker",
 	},
 
 	riot = {
 		"armwar",
-		"cormak",
-		"corlevlr",
+		"shieldriot",
+		"vehriot",
 		"spiderriot",
 		"amphimpulse",
 		"amphriot",
@@ -250,10 +250,10 @@ local ground = {
 
 	arty = {
 		"cloakarty",
-		"corgarp",
+		"veharty",
 		"vehheavyarty",
 		"hoverarty",
-		"cormart",
+		"tankarty",
 		"trem",
 		"striderarty",
 		"chickenr",
@@ -264,9 +264,9 @@ local ground = {
 local antiAir = {	
 	antiAir = {
 		"cloakaa",
-		"corcrash",
+		"shieldaa",
 		"vehaa",
-		"corsent",
+		"tankaa",
 		"hoveraa",
 		"spideraa",
 		"jumpaa",
@@ -278,9 +278,9 @@ local antiAir = {
 
 local air = {
 	bomber = {
-		"corshad",
+		"bomberprec",
 		"bomberdive",
-		"corhurc2",
+		"bomberriot",
 		"bomberdisarm",
 		"bomberheavy",
 	},
@@ -292,24 +292,24 @@ local air = {
 		"gunshipsupport",
 		"gunshipassault",
 		"gunshipheavyskirm",
-		"corcrw",
+		"gunshipkrow",
 	},
 	
 	transport = {
-		"corvalk",
+		"gunshiptrans",
 		"gunshipheavytrans",
 	},
 }
 
 local fighter = {
 	fighter = {
-		"fighter",
-		"corvamp",
+		"planefighter",
+		"planefighterheavy",
 	},
 }
 
 local economyTargetNames =  {
-	["cormex"] = {mult = 1.5},
+	["staticmex"] = {mult = 1.5},
 	["energywind"] = {mult = 1},
 	["energysolar"] = {mult = 0.6},
 	["energyfusion"] = {mult = 1},
@@ -331,12 +331,12 @@ local economyTargetNames =  {
 	["factoryship"] = {mult = 0.2},
 
 	["cloakcon"] = {mult = 1},
-	["cornecro"] = {mult = 1},
-	["corned"] = {mult = 1},
+	["shieldcon"] = {mult = 1},
+	["vehcon"] = {mult = 1},
 	["tankcon"] = {mult = 1},
 	["spidercon"] = {mult = 1},
-	["corfast"] = {mult = 1},
-	["corch"] = {mult = 1},
+	["jumpcon"] = {mult = 1},
+	["hovercon"] = {mult = 1},
 	["amphcon"] = {mult = 1},
 	["planecon"] = {mult = 1},
 	["gunshipcon"] = {mult = 1},

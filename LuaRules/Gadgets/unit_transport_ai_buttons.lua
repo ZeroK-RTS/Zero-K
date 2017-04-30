@@ -78,7 +78,7 @@ local transportToCmdDesc = {
 }
 
 local transDefs = {
-  [ UnitDefNames['corvalk'].id ] = true,
+  [ UnitDefNames['gunshiptrans'].id ] = true,
   [ UnitDefNames['gunshipheavytrans'].id ] = true,
 }
 

@@ -12,16 +12,16 @@ unitDef = {
   buildingGroundDecalType       = [[factoryjump_aoplane.dds]],
 
   buildoptions                  = {
-    [[corfast]],
+    [[jumpcon]],
     [[puppy]],
-    [[corpyro]],
+    [[jumpraid]],
 	[[jumpblackhole]],
 	[[slowmort]],
-    [[corcan]],
-    [[corsumo]],
+    [[jumpassault]],
+    [[jumpsumo]],
 	[[firewalker]],
     [[jumpaa]],
-	[[corsktl]],
+	[[jumpbomb]],
   },
 
   buildPic                      = [[factoryjump.png]],

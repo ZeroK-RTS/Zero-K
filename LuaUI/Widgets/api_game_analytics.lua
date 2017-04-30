@@ -58,17 +58,17 @@ unitCategories.energyBuildings = Spring.Utilities.MergeTable(	unitCategories.bas
 unitCategories.lightGroundTurrets = {
 	turretemp   = true,
 	turretriot    = true,
-	corllt     = true,
-	corrl      = true,
+	turretlaser     = true,
+	turretmissile      = true,
 	turrettorp = true,
-	corgrav    = true,
+	turretimpulse    = true,
 }              
 
 unitCategories.heavyGroundTurrets = {
 	turretantiheavy  = true,
 	staticarty = true,
-	corhlt   = true,
-	cordoom  = true,
+	turretheavylaser   = true,
+	turretheavy  = true,
 }
 
 unitCategories.basicFactories = {
@@ -98,10 +98,10 @@ unitCategories.builders = {
 	cloakcon   = true,
 	spidercon = true,
 	tankcon     = true,
-	corfast    = true,
-	corch      = true,
-	cornecro   = true,
-	corned     = true,
+	jumpcon    = true,
+	hovercon      = true,
+	shieldcon   = true,
+	vehcon     = true,
 	gunshipcon = true,
 	shipcon    = true,
 }

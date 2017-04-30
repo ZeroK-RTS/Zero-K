@@ -2,27 +2,27 @@
 local completeUnitListNames = {
 
 	turretAA = {
-		"corrazor",
+		"turretaalaser",
 		"missiletower",
 		"turretaafar",
-		"corflak",
+		"turretaaflak",
 		"screamer",
 	},
 
 	turret = {
-		"corrl",
-		"corllt",
-		"corgrav",
+		"turretmissile",
+		"turretlaser",
+		"turretimpulse",
 		"turretemp",
 		"turretriot",
-		"corhlt",
+		"turretheavylaser",
 		"turretgauss",
 		"turretantiheavy",
-		"cordoom",
+		"turretheavy",
 	},
 	
 	economy = {
-		"cormex",
+		"staticmex",
 		"energywind",
 		"energysolar",
 		"energyfusion",
@@ -46,12 +46,12 @@ local completeUnitListNames = {
 	
 	constructor = {
 		"cloakcon",
-		"cornecro",
-		"corned",
+		"shieldcon",
+		"vehcon",
 		"tankcon",
 		"spidercon",
-		"corfast",
-		"corch",
+		"jumpcon",
+		"hovercon",
 		"amphcon",
 		"planecon",
 		"gunshipcon",
@@ -65,28 +65,28 @@ local ground = {
 		"cloakraid",
 		"spherepole",
 		"corak",
-		"corfav",
-		"corgator",
+		"vehscout",
+		"vehraid",
 		"panther",
 		"panther",
 		"logkoda",
 		"spiderscout",
-		"corpyro",
+		"jumpraid",
 		"amphraid",
-		"corsh",
+		"hoverraid",
 		"chicken",
 		"chicken_leaper",
 	},
 
 	assault = {
 		"cloakassault",
-		"corthud",
-		"corraid",
+		"shieldassault",
+		"vehassault",
 		"spiderassault",
-		"corcan",
-		"corsumo",
-		"correap",
-		"corgol",
+		"jumpassault",
+		"jumpsumo",
+		"tankassault",
+		"tankheavyassault",
 		"amphassault",
 		"hoverassault",
 		"bantha",
@@ -99,7 +99,7 @@ local ground = {
 
 	skirm = {
 		"cloakskirm",
-		"corstorm",
+		"shieldskirm",
 		"nsaclash",
 		"amphfloater",
 		"spiderskirm",
@@ -112,14 +112,14 @@ local ground = {
 	
 	antiSkirm = {
 		"spidercrabe",
-		"cormist",
+		"vehsupport",
 		"firewalker",
 	},
 
 	riot = {
 		"armwar",
-		"cormak",
-		"corlevlr",
+		"shieldriot",
+		"vehriot",
 		"spiderriot",
 		"amphimpulse",
 		"amphriot",
@@ -134,10 +134,10 @@ local ground = {
 
 	arty = {
 		"cloakarty",
-		"corgarp",
+		"veharty",
 		"vehheavyarty",
 		"hoverarty",
-		"cormart",
+		"tankarty",
 		"trem",
 		"striderarty",
 		"chickenr",
@@ -148,9 +148,9 @@ local ground = {
 local antiAir = {	
 	antiAir = {
 		"cloakaa",
-		"corcrash",
+		"shieldaa",
 		"vehaa",
-		"corsent",
+		"tankaa",
 		"hoveraa",
 		"spideraa",
 		"jumpaa",
@@ -162,8 +162,8 @@ local antiAir = {
 
 local air = {
 	bomber = {
-		"corshad",
-		"corhurc2",
+		"bomberprec",
+		"bomberriot",
 		"bomberdisarm",
 		"bomberheavy",
 	},
@@ -175,24 +175,24 @@ local air = {
 		"gunshipsupport",
 		"gunshipassault",
 		"gunshipheavyskirm",
-		"corcrw",
+		"gunshipkrow",
 	},
 	
 	transport = {
-		"corvalk",
+		"gunshiptrans",
 		"gunshipheavytrans",
 	},
 }
 
 local fighter = {
 	fighter = {
-		"fighter",
-		"corvamp",
+		"planefighter",
+		"planefighterheavy",
 	},
 }
 
 local defenseRequirementNames =  {
-	["cormex"] = {mult = 1.5},
+	["staticmex"] = {mult = 1.5},
 	["energywind"] = {mult = 1},
 	["energysolar"] = {mult = 0.6},
 	["energyfusion"] = {mult = 1},

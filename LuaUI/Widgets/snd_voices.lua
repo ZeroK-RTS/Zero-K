@@ -101,18 +101,18 @@ local energy = {     --FIXME not used, see line 443 in widget:UnitDestroyed
 local commanders = {}
 
 local heavies = { --not used yet
-	"correap",
-	"corgol", --goliath
-	"corcan",
-	"corsumo",
+	"tankassault",
+	"tankheavyassault", --goliath
+	"jumpassault",
+	"jumpsumo",
 	"dante",
 }
 
 local aa = {
-	"corrl", --defender
-	"corrazor", --razor kiss
+	"turretmissile", --defender
+	"turretaalaser", --razor kiss
 	"missiletower",--hacksaw
-	"corflak",
+	"turretaaflak",
 	"turretaafar", --chainsaw
 	"screamer",
 }

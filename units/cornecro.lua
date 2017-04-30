@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[cornecro]],
+  unitname            = [[shieldcon]],
   name                = [[Convict]],
   description         = [[Shielded Construction Bot, Builds at 5 m/s]],
   acceleration        = 0.5,
@@ -12,7 +12,7 @@ unitDef = {
   buildoptions        = {
   },
 
-  buildPic            = [[CORNECRO.png]],
+  buildPic            = [[shieldcon.png]],
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND UNARMED]],
@@ -40,7 +40,7 @@ unitDef = {
   movementClass       = [[KBOT2]],
   objectName          = [[conbot.s3o]],
   onoffable           = false,
-  script			  = [[cornecro.lua]],
+  script			  = [[shieldcon.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
   showNanoSpray       = false,
   sightDistance       = 375,
@@ -112,4 +112,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ cornecro = unitDef })
+return lowerkeys({ shieldcon = unitDef })

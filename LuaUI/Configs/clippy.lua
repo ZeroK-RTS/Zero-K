@@ -50,7 +50,7 @@ end
 
 local superweaponDefs = {
 	"staticheavyarty",
-	"corsilo",
+	"staticnuke",
 }
 local hyperweaponDefs = {
 	"mahlazer",
@@ -61,13 +61,13 @@ local hyperweaponDefs = {
 local canRetreatDefs = {
 	"gunshipheavyskirm",
 	"gunshipassault",
-	"corcrw",
+	"gunshipkrow",
 	
-	"correap",
-	"corgol",
+	"tankassault",
+	"tankheavyassault",
 	--"trem",
-	"corcan",
-	"corsumo",
+	"jumpassault",
+	"jumpsumo",
 	
 	"dante",
 	--"striderarty",
@@ -88,26 +88,26 @@ local energyDefs = {
 }
 
 local defenseDefs = {
-	"corllt",
-	"corrl",
+	"turretlaser",
+	"turretmissile",
 	"turretriot",
-	"corgrav",
-	"corhlt",
+	"turretimpulse",
+	"turretheavylaser",
 	"turretgauss",
 	
-	"corrazor",
+	"turretaalaser",
 	"missiletower",
-	"corflak",
+	"turretaaflak",
 	"turretaafar",
 	"screamer",
 	
-	"cordoom",
+	"turretheavy",
 	"turretantiheavy",
 	
 	"turrettorp",
 	
 	"staticjammer",
-	"corjamt"
+	"staticshield"
 }
 
 factoryDefs = {

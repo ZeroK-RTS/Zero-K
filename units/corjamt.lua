@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[corjamt]],
+  unitname                      = [[staticshield]],
   name                          = [[Aegis]],
   description                   = [[Area Shield]],
   acceleration                  = 0,
@@ -10,8 +10,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
   buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[corjamt_aoplane.dds]],
-  buildPic                      = [[CORJAMT.png]],
+  buildingGroundDecalType       = [[staticshield_aoplane.dds]],
+  buildPic                      = [[staticshield.png]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[30 39 30]],
@@ -32,7 +32,7 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[m-8.s3o]],
   onoffable                     = true,
-  script                        = [[corjamt.lua]],
+  script                        = [[staticshield.lua]],
   selfDestructAs                = [[BIG_UNITEX]],
   sightDistance                 = 200,
   turnRate                      = 0,
@@ -46,7 +46,7 @@ unitDef = {
     helptext_de    = [[Aegis schützt deine Einheiten in mit seinem Schild vor Angriffen, die durch den Schild absorbiert werden können, aber nur solange die nötige Energieversorgung gewährleistet ist und der Beschuss nicht zu stark wird.]],
 	removewait     = 1,
 
-    morphto = [[core_spectre]],
+    morphto = [[shieldshield]],
     morphtime = [[30]],
 	
 	priority_misc = 1, -- Medium
@@ -118,4 +118,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corjamt = unitDef })
+return lowerkeys({ staticshield = unitDef })

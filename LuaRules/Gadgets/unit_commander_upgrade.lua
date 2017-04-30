@@ -61,7 +61,7 @@ for _, eud in pairs (UnitDefs) do
 	end
 end
 
-local commAreaShield = WeaponDefNames["core_spectre_cor_shield_small"]
+local commAreaShield = WeaponDefNames["shieldshield_cor_shield_small"]
 
 local commAreaShieldDefID = {
 	maxCharge = commAreaShield.shieldPower,

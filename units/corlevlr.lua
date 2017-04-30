@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[corlevlr]],
+  unitname            = [[vehriot]],
   name                = [[Leveler]],
   description         = [[Riot Vehicle]],
   acceleration        = 0.0318,
   brakeRate           = 0.124,
   buildCostMetal      = 240,
   builder             = false,
-  buildPic            = [[corlevlr.png]],
+  buildPic            = [[vehriot.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,	
@@ -61,7 +61,7 @@ unitDef = {
   weapons             = {
 
     {
-      def                = [[CORLEVLR_WEAPON]],
+      def                = [[vehriot_WEAPON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -71,7 +71,7 @@ unitDef = {
 
   weaponDefs          = {
 
-    CORLEVLR_WEAPON = {
+    vehriot_WEAPON = {
       name                    = [[Impulse Cannon]],
       areaOfEffect            = 144,
       avoidFeature            = true,
@@ -134,4 +134,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corlevlr = unitDef })
+return lowerkeys({ vehriot = unitDef })

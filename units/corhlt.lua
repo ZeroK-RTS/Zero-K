@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[corhlt]],
+  unitname                      = [[turretheavylaser]],
   name                          = [[Stinger]],
   description                   = [[High-Energy Laser Tower]],
   acceleration                  = 0,
@@ -9,8 +9,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
   buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[corhlt_aoplane.dds]],
-  buildPic                      = [[CORHLT.png]],
+  buildingGroundDecalType       = [[turretheavylaser_aoplane.dds]],
+  buildPic                      = [[turretheavylaser.png]],
   category                      = [[FLOAT TURRET]],
   collisionVolumeOffsets        = [[0 17 0]],
   collisionVolumeScales         = [[36 110 36]],
@@ -42,7 +42,7 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[hlt.s3o]],
-  script                        = [[corhlt.lua]],
+  script                        = [[turretheavylaser.lua]],
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
 
   sfxtypes                      = {
@@ -132,7 +132,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[corhlt_d.s3o]],
+      object           = [[turretheavylaser_d.s3o]],
     },
     
 
@@ -147,4 +147,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corhlt = unitDef })
+return lowerkeys({ turretheavylaser = unitDef })

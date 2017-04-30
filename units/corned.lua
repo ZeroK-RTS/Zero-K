@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[corned]],
+  unitname               = [[vehcon]],
   name                   = [[Mason]],
   description            = [[Construction Vehicle, Builds at 5 m/s]],
   acceleration           = 0.066,
@@ -11,7 +11,7 @@ unitDef = {
   buildoptions           = {
   },
 
-  buildPic               = [[corned.png]],
+  buildPic               = [[vehcon.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -80,4 +80,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corned = unitDef })
+return lowerkeys({ vehcon = unitDef })

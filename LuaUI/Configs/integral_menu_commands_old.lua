@@ -76,7 +76,7 @@ local factories = {
 --all buildings (except facs) need a row or they won't appear!
 --you can put too many things into the same row, but the buttons will be squished
 local econ = {
-	cormex =     {order = 1, row = 1, col = 1},
+	staticmex =     {order = 1, row = 1, col = 1},
 	energywind =     {order = 2, row = 2, col = 1},
 	energysolar =   {order = 3, row = 2, col = 2},
 	geo =        {order = 4, row = 2, col = 3},
@@ -89,29 +89,29 @@ local econ = {
 }
 
 local defense = {
-	corrl =    {order = 0, row = 1, col = 1},
-	corllt =   {order = 1, row = 1, col = 2},
+	turretmissile =    {order = 0, row = 1, col = 1},
+	turretlaser =   {order = 1, row = 1, col = 2},
 	turretriot =  {order = 2, row = 1, col = 3},
 	turretemp = {order = 3, row = 1, col = 4},
 	turretgauss =    {order = 5, row = 1, col = 5},
-	corhlt =   {order = 6, row = 1, col = 6},
+	turretheavylaser =   {order = 6, row = 1, col = 6},
 
 	missiletower =  {order = 9, row = 2, col = 1},
-	corrazor =     {order = 10, row = 2, col = 2},
-	corflak =      {order = 11, row = 2, col = 3},
+	turretaalaser =     {order = 10, row = 2, col = 2},
+	turretaaflak =      {order = 11, row = 2, col = 3},
 	turretaafar =       {order = 12, row = 2, col = 4},
 	screamer =     {order = 13, row = 2, col = 5},
 
 --	turretemp = {order = 3, row = 3},
-	corgrav =    {order = 4, row = 3, col = 1},
+	turretimpulse =    {order = 4, row = 3, col = 1},
 	turrettorp = {order = 14, row = 3, col = 2},
-	cordoom =    {order = 16, row = 3, col = 3},
+	turretheavy =    {order = 16, row = 3, col = 3},
 	turretantiheavy =    {order = 17, row = 3, col = 4},
-	corjamt =    {order = 18, row = 3, col = 5},
+	staticshield =    {order = 18, row = 3, col = 5},
 }
 
 local aux = {	--merged into special
-	corrad =   {order = 10, row = 1, col = 1},
+	staticradar =   {order = 10, row = 1, col = 1},
 	staticjammer =  {order = 12, row = 1, col = 2},
 	staticheavyradar =  {order = 14, row = 1, col = 3},
 }
@@ -121,7 +121,7 @@ local super = {	--merged into special
 	staticantinuke =      {order = 16, row = 1, col = 5},
 	staticarty =     {order = 2, row = 2, col = 1},
 	staticheavyarty =     {order = 3, row = 2, col = 2},
-	corsilo =      {order = 4, row = 2, col = 3},
+	staticnuke =      {order = 4, row = 2, col = 3},
 	zenith =       {order = 5, row = 2, col = 4},
 	raveparty =    {order = 6, row = 2, col = 5},
 	mahlazer =     {order = 7, row = 2, col = 6},
