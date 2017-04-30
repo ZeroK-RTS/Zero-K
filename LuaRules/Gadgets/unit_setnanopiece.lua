@@ -28,7 +28,7 @@ local units = {
   [UnitDefNames.cloakcon.id] = {"claw1"},
   [UnitDefNames.corfast.id] = {"flare"},
   [UnitDefNames.corned.id] = {"firepoint"},
-  [UnitDefNames.coracv.id] = {"nano1", "nano2"},
+  [UnitDefNames.tankcon.id] = {"nano1", "nano2"},
   [UnitDefNames.corch.id] = {"beam"},
   [UnitDefNames.shipcon.id] = {"beam"},
   

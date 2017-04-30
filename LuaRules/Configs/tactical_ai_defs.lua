@@ -146,7 +146,7 @@ local riotRangeSkirmieeArray = NameToDefID({
 	"cornecro",
 	"corned",
 	"corch",
-	"coracv",
+	"tankcon",
 	"spidercon",
 	"corfast",
 	"amphcon",
@@ -203,7 +203,7 @@ local longRangeSkirmieeArray = NameToDefID({
 	"slowmort",
 	"amphfloater",
 	"nsaclash", -- hover janus
-	"capturecar",
+	"vehcapture",
 	"chickenc",
 	"bantha",
 	"corllt",
@@ -280,7 +280,7 @@ local diverExplodables = NameToDefID({
 local medRangeExplodables = NameToDefID({
 	"energyfusion", -- don't suicide vs fusions if possible.
 	"geo",
-	"cafus", -- same with singu, at least to make an effort for survival.
+	"energysingu", -- same with singu, at least to make an effort for survival.
 	"energyheavygeo",
 	"bantha", -- banthas also have a fairly heavy but dodgeable explosion.
 })
@@ -313,7 +313,7 @@ local skirmableAir = NameToDefID({
 	"gunshipsupport",
 	"gunshipheavyskirm",
 	"gunshipassault",
-	"corbtrans",
+	"gunshipheavytrans",
 	"corcrw",
 })
 
@@ -343,7 +343,7 @@ local fleeables = NameToDefID({
 	"cormak",
 	
 	"corlevlr",
-	"capturecar",
+	"vehcapture",
 
 	"hoverriot", -- mumbo
     "shieldfelon",
@@ -992,7 +992,7 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 20, 
 	},
-	["capturecar"] = {
+	["vehcapture"] = {
 		skirms = longRangeSkirmieeArray, 
 		swarms = longRangeSwarmieeArray, 
 		flees = {},

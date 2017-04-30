@@ -12,7 +12,7 @@ unitDef = {
   buildingGroundDecalType       = [[factorytank_aoplane.dds]],
 
   buildoptions                  = {
-    [[coracv]],
+    [[tankcon]],
     [[logkoda]],
 	[[panther]],
     [[tawf114]],

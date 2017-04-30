@@ -1,5 +1,5 @@
 local tbl = {
-  corbtrans = {
+  gunshipheavytrans = {
     {class='AirJet', options={color={0.2,0.4,0.8}, width=8, length=35, baseLength = 9, piece="engineEmit", onActive=true, noIconDraw = true}},
   },
   gunshipsupport = {

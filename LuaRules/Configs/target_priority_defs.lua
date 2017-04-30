@@ -177,7 +177,7 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["corrazor_aagun"].id]            = {7.0, 0, 3},
 	[WeaponDefNames["missiletower_missile"].id]      = {16.0},
 	[WeaponDefNames["turretaafar_missile"].id]            = {14.0},
-	[WeaponDefNames["corbhmth_plasma"].id]           = {2.5},
+	[WeaponDefNames["staticarty_plasma"].id]           = {2.5},
 	[WeaponDefNames["staticheavyarty_plasma"].id]           = {2.0},
 }
 
@@ -189,7 +189,7 @@ local stunWeaponDefs = {
 }
 
 local captureWeaponDefs = {
-	[WeaponDefNames["capturecar_captureray"].id] = true
+	[WeaponDefNames["vehcapture_captureray"].id] = true
 }
 
 local gravityWeaponDefs = {

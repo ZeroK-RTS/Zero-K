@@ -13,7 +13,7 @@ if (gadgetHandler:IsSyncedCode()) then
 	-- transports and potentially untransportable units
 	local untransportable_defs = {
 		[UnitDefNames.shiptransport.id] = true, -- Surfboard
-		[UnitDefNames.corbtrans.id] = true, -- Vindicator
+		[UnitDefNames.gunshipheavytrans.id] = true, -- Vindicator
 		[UnitDefNames.corvalk.id] = true, -- Valkyrie
 	}
 

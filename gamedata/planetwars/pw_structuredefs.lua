@@ -89,7 +89,7 @@ local structureConfig = {
 		unitDef.canmove = true
 		unitDef.canattack = true
 		unitDef.workertime = 10
-		unitDef.buildoptions = { [[corvalk]], [[corbtrans]] }
+		unitDef.buildoptions = { [[corvalk]], [[gunshipheavytrans]] }
 		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
 		

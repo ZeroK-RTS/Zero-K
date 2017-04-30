@@ -93,7 +93,7 @@ local statsBuffer      = {0, 0, 0, 0, 0}
 local energy = {     --FIXME not used, see line 443 in widget:UnitDestroyed
   "energysolar",
   "energyfusion", 
-  "cafus", 
+  "energysingu", 
   "armtide", 
   "energywind",
   "geo",
@@ -229,7 +229,7 @@ local function CheckSelected()
     
     if ((name == "energyfusion") or -- fusion
 	--(name == "corfus") or (name == "aafus") are not in game anymore.
-        (name == "cafus"))then  --adv fusion
+        (name == "energysingu"))then  --adv fusion
       isFus = true
     end
 

@@ -7,7 +7,7 @@ local menu_armcom = {
     items = {
       {
         angle = 45,
-        unit = "cafus"
+        unit = "energysingu"
       },
       {
         angle= 90,
@@ -205,7 +205,7 @@ local menu_armcom = {
       },
       {
         angle = -45,
-        unit = "corbhmth"
+        unit = "staticarty"
       },
       {
         angle = -90,

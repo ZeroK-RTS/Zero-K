@@ -299,7 +299,7 @@
         "description": "Statek transportowy",
         "helptext": "Surfboard jest statkiem transportowym; jednostki, które przewozi, mogą strzelać w trakcie przewozu."
     },
-    "cafus": {
+    "energysingu": {
         "name": "Reaktor grawitacyjny",
         "description": "Duża elektrownia (+225) - NIEBEZPIECZNE",
         "helptext": "Reaktor grawitacyjny wytwarza niesamowite ilości energii przy użyciu technologii czarnych dziur - co jest tak niebezpieczne, na jakie brzmi. Zniszczenie reaktora powoduje wybuch porównywalny ze strategiczną bombą atomową. Okolicę reaktora należy traktować jako niebezpieczną."
@@ -582,7 +582,7 @@
     "gunshipbomb": {
         "name": "Blastwing",
         "description": "Latająca bomba (zakopuje się)",
-        "helptext": "Blastwing zadaje skromne obrażenia, które wystarczają do zniczenia kopalni lub turbiny. Większa część zniszczeń odbywa się na skutek odłamków lecących po jego torze lotu, toteż należy rozważnie dobierać kierunek ataku. Gdy wyląduje na ziemi, włącza niewidzialność, co czyni z niego minę. Nie powinno się używać zbyt wielu Blastwingów jednocześnie, ponieważ zniszczenie jednego powoduje reakcję łańcuchową i detonację całej grupy."
+        "helptext": "Blastwing zadaje skromne obrażenia, które wystarczają do zniczenia kopalni lub turbiny. Większa część zniszczeń odbywa się na skutek odłamków lecących po jego torze lotu, toteż należy rozważnie dobierać kierunek ataku. Gdy wyląduje na ziemi, włącza niewidzialność, co czyni z niego minę. Nie powinno się używać zbyt wielu gunshipbombów jednocześnie, ponieważ zniszczenie jednego powoduje reakcję łańcuchową i detonację całej grupy."
     },
     "pw_generic": {
         "name": "Neutralny Budynek",
@@ -624,7 +624,7 @@
         "description": "Bot harcownik",
         "helptext": "Rocko jest uzbrojony w powolne rakiety, które mimo niskich obrażeń i braku samonaprowadzania mają duży zasięg. Najlepiej sprawdzają się stojąc w linii prostopadłej do celu, atakując z maksymalnej odległości i nie dając się złapać przeciwnikom. Można go pokonać lekkimi jednostkami, które są w stanie unikać ich rakiet, dogonić go i zniszczyć."
     },
-    "coracv": {
+    "tankcon": {
         "name": "Welder",
         "description": "Uzbrojony czołg konstruktor, moc 7.5 m/s",
         "helptext": "Welder to konstruktor, który może sam się bronić przed lekkimi atakami dzięki wbudowanemu działku."
@@ -744,7 +744,7 @@
         "description": "Niewidzialny snajper harcownik",
         "helptext": "Karabin snajperski Spectra zadaje ciężkie obrażenia pojedynczym celom. Jako jedyna jednostka może strzelać pozostając niewidzialnym; jego naboje są jednak widoczne i mogą pomóc przeciwnikom w znalezieniu go. Utrzymanie niewidzialności kosztuje także spore ilości energii. Najlepszym sposobem na wykrycie Spectra jest przeczesanie okolicy tanimi jednostkami."
     },
-    "corbhmth": {
+    "staticarty": {
         "name": "Behemoth",
         "description": "Bateria plazmowa - wymaga sieci energetycznej 50 E",
         "helptext": "Behemoth to skuteczna (przeciw-)artyleria; świetnie chroni okolicę. Nie jest to jednak klasyczna wieża obronna i łatwo ją zniszczyć w bezpośrednim natarciu."
@@ -1049,7 +1049,7 @@
         "description": "Ciężki niewidzialny pająk-mech",
         "helptext": "Scorpion to ciężki pajęczy mech bojowy z działkiem EMP i dwoma promieniami cząsteczkowymi. Jest bardzo wytrzymały i może stać się niewidzialny."
     },
-    "capturecar": {
+    "vehcapture": {
         "name": "Dominatrix",
         "description": "Pojazd do przejmowania",
         "helptext": "Dominatrix przejmuje jednostki wroga pod swoją kontrolę. Wiele Dominatrix może współpracować przy przejmowaniu danej jednostki, ale tylko jednej z nich zostanie przypisana. Po przejęciu jednostki, Dominatrix nie może przejmować przez kolejne 12 sekund. Zniszczenie powoduje zwrot wszystkich przypisanych jednostek do pierwotnego właściciela."
@@ -1264,12 +1264,12 @@
         "description": "Ciężki rakietowy mech artyleryjski",
         "helptext": "Catapult to mech artyleryjski zalewający okolicę falami ciężkich rakiet. Świetny przeciwko ufortyfikowanym pozycjom."
     },
-    "corbtrans": {
+    "gunshipheavytrans": {
         "name": "Vindicator",
         "description": "Uzbrojony transportowy statek powietrzny",
         "helptext": "Vindicator jest w stanie przenosić każdą jednostkę. Jego wytrzymałość i lekkie uzbrojenie pomagają mu dostarczać jednostki nawet w wirze walki."
     },
-    "corawac": {
+    "planescout": {
         "name": "Vulture",
         "description": "Samolot zwiadowczy z zakłócaczem",
         "helptext": "Vulture oferuje niezrównane możliwości zwiadowcze, zapewniając radar i sonar. Jest także wyposażony w zakłócacz."

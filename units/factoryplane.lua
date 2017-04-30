@@ -20,7 +20,7 @@ unitDef = {
 	[[corhurc2]],
     [[bomberdisarm]],
     [[bomberheavy]],
-    [[corawac]],
+    [[planescout]],
   },
 
   buildPic                      = [[factoryplane.png]],

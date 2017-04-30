@@ -2,7 +2,7 @@
 {
 // --- EASY config ---
 "easy": {  // Null AI
-"economy": {"energy": {"land": {"cafus": [1], "energyfusion": [2], "energysolar": [3]}, "water": {"cafus": [1], "energyfusion": [2], "energywind": [3]}}, "default": "corrl"}
+"economy": {"energy": {"land": {"energysingu": [1], "energyfusion": [2], "energysolar": [3]}, "water": {"energysingu": [1], "energyfusion": [2], "energywind": [3]}}, "default": "corrl"}
 },
 // --- EASY config ---
 
@@ -62,9 +62,9 @@
 
 		"income_tier": [7, 16, 24, 32, 40, 56, 72],
 		//             wasp,         gunshipbomb,   gnat,     banshee,  rapier,           brawler,    gunshipassault,   krow,     valkyrie,  vindicator,  trident
-		"unit":      ["gunshipcon", "gunshipbomb", "gunshipemp", "gunshipraid", "gunshipsupport", "gunshipheavyskirm", "gunshipassault", "corcrw", "corvalk", "corbtrans", "gunshipaa"],
+		"unit":      ["gunshipcon", "gunshipbomb", "gunshipemp", "gunshipraid", "gunshipsupport", "gunshipheavyskirm", "gunshipassault", "corcrw", "corvalk", "gunshipheavytrans", "gunshipaa"],
 		"land": {
-			// 0-8m Opening - Blastwing and banshee Harass
+			// 0-8m Opening - gunshipbomb and banshee Harass
 			"tier0": [ 0.00,         0.17,        0.00,     0.10,     0.71,             0.00,       0.02,        0.00,     0.00,      0.00,        0.00],
 			// 9-16m Early Game - Banshee with a chance of gunshipassault
 			"tier1": [ 0.00,         0.20,        0.00,     0.02,     0.75,             0.01,       0.02,        0.00,     0.00,      0.00,        0.00],
@@ -149,7 +149,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             mason,    dart,     scorcher,   slasher,   leveler,    ravager,   dominatrix,   wolverine, impaler,   crasher
-		"unit":      ["corned", "corfav", "corgator", "cormist", "corlevlr", "corraid", "capturecar", "corgarp", "vehheavyarty", "vehaa"],
+		"unit":      ["corned", "corfav", "corgator", "cormist", "corlevlr", "corraid", "vehcapture", "corgarp", "vehheavyarty", "vehaa"],
 		"land": {
 			// 0-8m Opening - Dart, Riot & Slasher
 			"tier0": [ 0.00,     0.33,     0.55,       0.12,      0.00,       0.00,      0.00,         0.00,      0.00,      0.00],
@@ -213,7 +213,7 @@
 
 		"income_tier": [30, 60],
 		//             crane,   swift,     hawk,      raven,     phoenix,    thunderbird,         wyvern,    vulture
-		"unit":      ["planecon", "fighter", "corvamp", "corshad", "corhurc2", "bomberdisarm", "bomberheavy", "corawac"],
+		"unit":      ["planecon", "fighter", "corvamp", "corshad", "corhurc2", "bomberdisarm", "bomberheavy", "planescout"],
 		"air": {
 			// 0-10m Early Game
 			"tier0": [ 0.00,    0.00,      0.90,      0.00,      0.00,       0.00,                0.05,      0.05],
@@ -235,7 +235,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             welder,   kodachi,   panther,   banisher,  reaper,    goliath,  pillager,  tremor, copperhead
-		"unit":      ["coracv", "logkoda", "panther", "tawf114", "correap", "corgol", "cormart", "trem", "corsent"],
+		"unit":      ["tankcon", "logkoda", "panther", "tawf114", "correap", "corgol", "cormart", "trem", "corsent"],
 		"land": {
 			// 0-8m Opening - Koda and Banisher
 			"tier0": [ 0.00,     0.50,      0.00,      0.10,      0.40,      0.00,     0.00,      0.00,   0.00],
@@ -500,7 +500,7 @@
 	"corvalk": {
 		"role": ["transport", "air"]
 	},
-	"corbtrans": {
+	"gunshipheavytrans": {
 		"role": ["transport", "air"]
 	},
 	"gunshipaa": {
@@ -684,7 +684,7 @@
 		"dmg_mod": 1.1,
 		"retreat": 0.67  // slow to turn around
 	},
-	"capturecar": {
+	"vehcapture": {
 		"role": ["skirmish"],
 		"retreat": 0.9,
 		"dmg_mod": 5.0
@@ -839,13 +839,13 @@
 		"limit": 0,
 		"dmg_mod": 1.5
 	},
-	"corawac": {
+	"planescout": {
 		"role": ["scout", "air"],
 		"retreat": 0.8
 	},
 
 	// factorytank
-	"coracv": {
+	"tankcon": {
 		"role": ["builder"]
 	},
 	"logkoda": {
@@ -986,7 +986,7 @@
 		"role": ["static", "support", "static"],
 		"dmg_mod": 5.0
 	},
-	"corbhmth": {
+	"staticarty": {
 		"role": ["static", "support", "static"],
 		"dmg_mod": 5.0
 	},
@@ -997,7 +997,7 @@
 		"role": ["static", "heavy"],
 		"dmg_mod": 4.0
 	},
-	"cafus": {
+	"energysingu": {
 		"role": ["static", "heavy"]
 	},
 	"energyfusion": {
@@ -1044,7 +1044,7 @@
 		"dmg_mod": 3.5
 	},
 
-	//	"unit": ["corllt", "corrl", "turretriot", "corhlt", "turrettorp", "corrazor", "staticcon", "cordoom", "corjamt", "turretemp", "turretantiheavy", "corbhmth"],//
+	//	"unit": ["corllt", "corrl", "turretriot", "corhlt", "turrettorp", "corrazor", "staticcon", "cordoom", "corjamt", "turretemp", "turretantiheavy", "staticarty"],//
 
 	// support factories won't be built in front
 	"factoryplane": {
@@ -1122,7 +1122,7 @@
 	// Limits of energy structures partly defined by parabola in space (structure_cost/energyMake, unit_limit).
 	// Parabola defined by 3 control points.
 	// For example land config:
-	//   P0 = cafus: (4000/225; random(1..2)) = (17.78, 1)
+	//   P0 = energysingu: (4000/225; random(1..2)) = (17.78, 1)
 	//   P1 = energyfusion: (1000/35; random(3)) = (28.57, 3)
 	//   P2 = energysolar: (70/2; random(10..15)) = (35, 13)
 	// P(x) => y = 0.079550*x*x - 3.501790*x + 38.113789
@@ -1145,11 +1145,11 @@
 		"land": {
 			// "<energy_def>": [<lower limit>, <upper limit>]
 			// limit = random(<lower limit>..<upper limit>)
-			"cafus": [1, 20],
+			"energysingu": [1, 20],
 			"energysolar": [20, 40]
 		},
 		"water": {
-			"cafus": [1],
+			"energysingu": [1],
 			"energyfusion": [4],
 			"energywind": [20]
 		},
@@ -1177,7 +1177,7 @@
 
 "porcupine": {
 	//        0         1        2          3         4             5           6            7          8          9           10         11		  12		13
-	"unit": ["corllt", "corrl", "turretriot", "corhlt", "turrettorp", "corrazor", "staticcon", "cordoom", "corjamt", "turretemp", "turretantiheavy", "corbhmth", "turretaafar", "screamer"],
+	"unit": ["corllt", "corrl", "turretriot", "corhlt", "turrettorp", "corrazor", "staticcon", "cordoom", "corjamt", "turretemp", "turretantiheavy", "staticarty", "turretaafar", "screamer"],
 	// Actual number of defences per cluster bounded by income
 	"land":  [0, 0, 1, 1, 0, 0, 1, 1, 9, 9, 6, 6, 5, 3, 12],
 	"water": [4, 1, 6, 4, 4, 3, 5],
@@ -1665,7 +1665,7 @@
 		"solar": ["energysolar"],
 		"wind": ["energywind"],
 		"fusion": ["energyfusion"],
-		"singu": ["cafus"],
+		"singu": ["energysingu"],
 		"pylon": ["energypylon"],
 		"store": ["staticstorage"],
 		"mex": ["cormex"],

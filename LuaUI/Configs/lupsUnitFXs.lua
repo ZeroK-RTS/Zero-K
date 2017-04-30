@@ -53,10 +53,10 @@ local presets = {
 
 effectUnitDefs = {
   --// FUSIONS //--------------------------
-  cafus = {
-    {class='Bursts', options=cafusBursts},
-    {class='StaticParticles', options=cafusCorona},
-    --{class='ShieldSphere', options=cafusShieldSphere},
+  energysingu = {
+    {class='Bursts', options=energysinguBursts},
+    {class='StaticParticles', options=energysinguCorona},
+    --{class='ShieldSphere', options=energysinguShieldSphere},
     --{class='ShieldJitter', options={layer=-16, life=math.huge, pos={0,58.9,0}, size=100, precision=22, strength = 0.001, repeatEffect=true}},
     {class='GroundFlash', options=groundFlashOrange},
   },
@@ -310,7 +310,7 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, size=8, piece="wingtip1", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=8, piece="wingtip2", noIconDraw = true}},
   },
-  corbtrans = {
+  gunshipheavytrans = {
     {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav1", onActive=true})},
     {class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav1", onActive=true})},
     {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav2", onActive=true})},
@@ -331,7 +331,7 @@ effectUnitDefs = {
     {class='ShieldSphere', options=MergeTable(valkShieldSphere, {piece="agrav4", onActive=true})},
     {class='StaticParticles', options=MergeTable(valkCorona, {piece="agrav4", onActive=true})},
   },  
-  corawac = {
+  planescout = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="thrust", onActive=true}},
     {class='Ribbon', options={width=1, size=8, piece="wingtipl"}},
     {class='Ribbon', options={width=1, size=8, piece="wingtipr"}},

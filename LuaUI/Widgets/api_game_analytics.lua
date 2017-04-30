@@ -48,7 +48,7 @@ unitCategories.basicEnergyBuildings = {
 unitCategories.advancedEnergyBuildings = {
 	energyheavygeo  = true, 
 	energyfusion = true, 
-	cafus  = true, 
+	energysingu  = true, 
 	geo    = true, 
 }
 
@@ -66,7 +66,7 @@ unitCategories.lightGroundTurrets = {
 
 unitCategories.heavyGroundTurrets = {
 	turretantiheavy  = true,
-	corbhmth = true,
+	staticarty = true,
 	corhlt   = true,
 	cordoom  = true,
 }
@@ -97,7 +97,7 @@ unitCategories.builders = {
 	-- athena  = true,
 	cloakcon   = true,
 	spidercon = true,
-	coracv     = true,
+	tankcon     = true,
 	corfast    = true,
 	corch      = true,
 	cornecro   = true,

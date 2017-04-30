@@ -118,7 +118,7 @@ local counteredByAssaults = {
 
 local prioritySos = {
 	"energyfusion",
-	"cafus",
+	"energysingu",
 	"factoryshield",
     "factorycloak",
     "factoryveh",

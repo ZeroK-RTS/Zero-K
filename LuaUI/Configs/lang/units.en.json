@@ -284,7 +284,7 @@
 		"description" : "Transport Platform",
 		"helptext" : "The Surfboard serves as a naval transport and firing platform--that is, any unit on the Surfboard can fire off of it."
 	},
-	"cafus" : {
+	"energysingu" : {
 		"name" : "Singularity Reactor",
 		"description" : "Large Powerplant (+225) - HAZARDOUS",
 		"helptext" : "The Singularity Reactor generates massive amount of energy using a controlled black hole - which is about as safe as it sounds. When the reactor is destroyed, the black hole implodes violently, dragging units inside. An entire continent on which this is built should be considered unsafe ground."
@@ -562,7 +562,7 @@
 	"gunshipbomb" : {
 		"name" : "Blastwing",
 		"description" : "Flying Bomb (Burrows)",
-		"helptext" : "The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more fomidible punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your gunshipbomb dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed."
+		"helptext" : "The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more fomidible punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your Blastwing dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed."
 	},
 	"pw_generic" : {
 		"name" : "Generic Neutral Structure",
@@ -604,7 +604,7 @@
 		"description" : "Skirmisher Bot (Direct-Fire)",
 		"helptext" : "The Rocko's low damage, low speed unguided rockets are redeemed by their range. They are most effective in a line formation, firing at maximum range and kiting the enemy. Counter them by attacking them with fast units which can close range and dodge their missiles."
 	},
-	"coracv" : {
+	"tankcon" : {
 		"name" : "Welder",
 		"description" : "Armed Construction Tank, Builds at 7.5 m/s",
 		"helptext" : "Armed with a small defensive tower, the Welder can defend itself against light enemy attacks."
@@ -729,7 +729,7 @@
 		"description" : "Cloaked Skirmish/Anti-Heavy Artillery Bot",
 		"helptext" : "The Spectre's energy rifle inflicts heavy damage to a single target. It can fire while cloaked; however its visible round betrays its position. It requires quite a bit of energy to keep cloaked, especially when moving. The best way to locate a Spectre is by sweeping the area with many cheap units."
 	},
-	"corbhmth" : {
+	"staticarty" : {
 		"name" : "Behemoth",
 		"description" : "Plasma Artillery Battery - Requires 50 Power",
 		"helptext" : "The Behemoth offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly."
@@ -1084,7 +1084,7 @@
 		"description" : "Spawns Big Chickens",
 		"helptext" : "Roosts such as this one are where the more powerful Thunderbirds are hatched."
 	},
-	"capturecar" : {
+	"vehcapture" : {
 		"name" : "Dominatrix",
 		"description" : "Capture Vehicle",
 		"helptext" : "The Dominatrix captures enemies, turning them against their former allies. Multiple Dominatrix can capture a single target faster, although only one becomes the controller. After taking control of a unit the Dominatrix cannot fire for 12 seconds. If a Dominatrix is destroyed all units it controls are freed."
@@ -1299,12 +1299,12 @@
 		"description" : "Heavy Saturation Artillery Strider",
 		"helptext" : "The Catapult is an MLRS strider. It can launch a volley of rockets that guarantees the destruction of almost anything in the target area, then quickly retreat behind friendly forces."
 	},
-	"corbtrans" : {
+	"gunshipheavytrans" : {
 		"name" : "Vindicator",
 		"description" : "Armed Heavy Air Transport",
 		"helptext" : "The Vindicator can haul any land unit in the game. Its twin laser guns and automated cargo ejection system make it ideal for drops into hot LZs."
 	},
-	"corawac" : {
+	"planescout" : {
 		"name" : "Vulture",
 		"description" : "Area Jammer, Radar/Sonar Plane",
 		"helptext" : "The Vulture provides an unparalleled means for deep scouting, and can locate underwater targets with its sonar. It is also equipped with an area jammer, which prevents radar from working in the area underneath."

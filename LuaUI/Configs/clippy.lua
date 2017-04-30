@@ -84,7 +84,7 @@ local energyDefs = {
 	"energywind",
 	"energyfusion",
 	--"geo",
-	"cafus",
+	"energysingu",
 }
 
 local defenseDefs = {

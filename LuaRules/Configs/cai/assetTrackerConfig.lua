@@ -111,7 +111,7 @@ local heatmapNames = {
 		["turretgauss"] = {mult = 2},
 		["turretantiheavy"] = {mult = 2},
 		["cordoom"] = {mult = 2},
-		["corbhmth"] = {mult = 2},
+		["staticarty"] = {mult = 2},
 	},
 }
 
@@ -142,7 +142,7 @@ local completeUnitListNames = {
 		"energywind",
 		"energysolar",
 		"energyfusion",
-		"cafus",
+		"energysingu",
 		"geo",
 		"energyheavygeo",
 		"staticcon",
@@ -164,7 +164,7 @@ local completeUnitListNames = {
 		"cloakcon",
 		"cornecro",
 		"corned",
-		"coracv",
+		"tankcon",
 		"spidercon",
 		"corfast",
 		"corch",
@@ -297,7 +297,7 @@ local air = {
 	
 	transport = {
 		"corvalk",
-		"corbtrans",
+		"gunshipheavytrans",
 	},
 }
 
@@ -313,7 +313,7 @@ local economyTargetNames =  {
 	["energywind"] = {mult = 1},
 	["energysolar"] = {mult = 0.6},
 	["energyfusion"] = {mult = 1},
-	["cafus"] = {mult = 1},
+	["energysingu"] = {mult = 1},
 	["geo"] = {mult = 1.5},
 	["energyheavygeo"] = {mult = 1.5},
 	["staticcon"] = {mult = 1},
@@ -333,7 +333,7 @@ local economyTargetNames =  {
 	["cloakcon"] = {mult = 1},
 	["cornecro"] = {mult = 1},
 	["corned"] = {mult = 1},
-	["coracv"] = {mult = 1},
+	["tankcon"] = {mult = 1},
 	["spidercon"] = {mult = 1},
 	["corfast"] = {mult = 1},
 	["corch"] = {mult = 1},

@@ -176,7 +176,7 @@ local energyStructureDefs = {
 	[UnitDefNames["geo"].id] = {cost = 500, income = 25},
 	[UnitDefNames["energyheavygeo"].id] = {cost = 1000, income = 75},
 	[UnitDefNames["energyfusion"].id] = {cost = 1000, income = 35},
-	[UnitDefNames["cafus"].id] = {cost = 4000, income = 225},
+	[UnitDefNames["energysingu"].id] = {cost = 4000, income = 225},
 }
 
 local metalStructureDefs = {

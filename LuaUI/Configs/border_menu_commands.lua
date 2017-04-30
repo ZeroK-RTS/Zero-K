@@ -53,7 +53,7 @@ local buildoptions = {
 		{ "energypylon",  tech=2 },-- pylon
 		{ "staticstorage",  tech=2 },-- storage
 		{ "energyfusion",  tech=2 },
-		{ "cafus",  tech=2 },-- singularity
+		{ "energysingu",  tech=2 },-- singularity
 	},
 
 
@@ -67,7 +67,7 @@ local buildoptions = {
 		{ "corhlt",  tech=2 },-- peoples should prefer Stardust, Faraday, Newton, Urchin more.
 		{ "cordoom",  tech=2, notSea=true },
 		{ "turretantiheavy",  tech=3, notSea=true },
-		{ "corbhmth",  tech=3, notSea=true },
+		{ "staticarty",  tech=3, notSea=true },
 		{ "staticantinuke",  tech=3, notSea=true },-- Protector
 	},
 

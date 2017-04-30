@@ -620,7 +620,7 @@ local sounds = {
 			[1] = "vehicle_select2",
 		},
 	},
-	capturecar = {
+	vehcapture = {
 		ok = {
 			[1] = "vehicle_move",
 		},
@@ -638,7 +638,7 @@ local sounds = {
 	},
 	
 	-- Tank
-	coracv = {
+	tankcon = {
 		build = "builder_start",
 		ok = {
 			[1] = "light_tank_move2",
@@ -852,7 +852,7 @@ local sounds = {
 			[1] = "bomber_select",
 		},
 	},
-	corawac = {
+	planescout = {
 		ok = {
 			[1] = "bomber_move",
 		},
@@ -952,7 +952,7 @@ local sounds = {
 			[1] = "gunship_select",
 		},
 	},
-	corbtrans = {
+	gunshipheavytrans = {
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -1113,7 +1113,7 @@ local sounds = {
 			[1] = "fusion_select",
 		},
 	},
-	cafus = {
+	energysingu = {
 		select = {
 			[1] = "adv_fusion_select",
 		},
@@ -1348,7 +1348,7 @@ local sounds = {
 			[1] = "turret_select",
 		},
 	},
-	corbhmth = {
+	staticarty = {
 		ok = {
 			[1] = "turret_select",
 		},

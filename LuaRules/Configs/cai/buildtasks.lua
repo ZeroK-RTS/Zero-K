@@ -403,7 +403,7 @@ factionBuildConfig = {
 				[1] = { -- con
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['coracv'].id, chance = 1},
+					[1] = {ID = UnitDefNames['tankcon'].id, chance = 1},
 				},
 				
 				[2] = { -- scout
@@ -529,7 +529,7 @@ factionBuildConfig = {
 				[2] = { -- scout
 					importanceMult = 0.6,
 					count = 1,
-					[1] = {ID = UnitDefNames['corawac'].id, chance = 1},
+					[1] = {ID = UnitDefNames['planescout'].id, chance = 1},
 				},
 				
 				[3] = { -- fighter
@@ -606,7 +606,7 @@ factionBuildConfig = {
 
 		energyIds = {
 			count = 4,
-			[1] = {ID = UnitDefNames['cafus'].id},
+			[1] = {ID = UnitDefNames['energysingu'].id},
 			[2] = {ID = UnitDefNames['energyfusion'].id},
 			[3] = {ID = UnitDefNames['energysolar'].id},
 			[4] = {ID = UnitDefNames['energywind'].id},
@@ -640,7 +640,7 @@ factionBuildConfig = {
 				energy = true,
 			},
 			
-			[UnitDefNames['cafus'].id] = {
+			[UnitDefNames['energysingu'].id] = {
 				energyGreaterThan = 120, 
 				energySpacing = 600,
 				whileStall = false,

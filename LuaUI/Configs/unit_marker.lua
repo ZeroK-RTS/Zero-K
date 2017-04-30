@@ -4,7 +4,7 @@ local unitlistNames = {
 	staticheavyarty = {},
 	athena = { mark_each_appearance = true, show_owner = true, },
 	cloaksnipe = { mark_each_appearance = true, },
-	cafus = {},
+	energysingu = {},
 	chicken_dragon = {},
 	chickenflyerqueen = {},
 	chickenlandqueen = {},

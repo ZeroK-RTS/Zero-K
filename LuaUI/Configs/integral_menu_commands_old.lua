@@ -81,7 +81,7 @@ local econ = {
 	energysolar =   {order = 3, row = 2, col = 2},
 	geo =        {order = 4, row = 2, col = 3},
 	energyfusion =     {order = 5, row = 2, col = 4},
-	cafus =      {order = 6, row = 2, col = 5},
+	energysingu =      {order = 6, row = 2, col = 5},
 	staticstorage =   {order = 7, row = 3, col = 1},
 	energypylon =   {order = 8, row = 3, col = 2},
 	staticcon =  {order = 9, row = 3, col = 3},
@@ -119,7 +119,7 @@ local aux = {	--merged into special
 local super = {	--merged into special
 	missilesilo = {order = 15, row = 1, col = 4},
 	staticantinuke =      {order = 16, row = 1, col = 5},
-	corbhmth =     {order = 2, row = 2, col = 1},
+	staticarty =     {order = 2, row = 2, col = 1},
 	staticheavyarty =     {order = 3, row = 2, col = 2},
 	corsilo =      {order = 4, row = 2, col = 3},
 	zenith =       {order = 5, row = 2, col = 4},

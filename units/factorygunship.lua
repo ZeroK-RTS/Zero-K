@@ -22,7 +22,7 @@ unitDef = {
     [[corcrw]],
 	[[gunshipaa]],
     [[corvalk]],
-    [[corbtrans]],
+    [[gunshipheavytrans]],
   },
 
   buildPic                      = [[factorygunship.png]],

@@ -68,7 +68,7 @@ local units = {
 		vehaa = ANTI_AIR,
 		corraid = ASSAULT,
 		vehheavyarty = HEAVY_SOMETHING,
-		capturecar = SPECIAL,
+		vehcapture = SPECIAL,
 	},
 	factoryhover = {
 		corch = CONSTRUCTOR,
@@ -87,7 +87,7 @@ local units = {
 		gunshipheavyskirm = ARTILLERY,
 		gunshipsupport = SKIRMISHER,
 		corvalk = SPECIAL,
-		corbtrans = UTILITY,
+		gunshipheavytrans = UTILITY,
 		gunshipaa = ANTI_AIR,
 		gunshipassault = ASSAULT,
 		corcrw = HEAVY_SOMETHING,
@@ -99,7 +99,7 @@ local units = {
 		corhurc2 = RIOT,
 		-- No Plane Artillery
 		corvamp = WEIRD_RAIDER,
-		corawac = UTILITY,
+		planescout = UTILITY,
 		corshad = ASSAULT,
 		bomberheavy = HEAVY_SOMETHING,
 		bomberdisarm = SPECIAL,
@@ -129,7 +129,7 @@ local units = {
 		corsktl = SPECIAL,
 	},
 	factorytank = {
-		coracv =  CONSTRUCTOR,
+		tankcon =  CONSTRUCTOR,
 		logkoda = WEIRD_RAIDER,
 		panther = RAIDER,
 		tawf114 = RIOT,
@@ -170,7 +170,7 @@ local units = {
 	},
 	pw_dropfac = {
 		corvalk = SPECIAL,
-		corbtrans = UTILITY,
+		gunshipheavytrans = UTILITY,
 	},
 }
 
@@ -221,7 +221,7 @@ local econ = {
 	energysolar =   {order = 3, row = 2, col = 2},
 	geo =        {order = 4, row = 2, col = 3},
 	energyfusion =     {order = 5, row = 2, col = 4},
-	cafus =      {order = 6, row = 2, col = 5},
+	energysingu =      {order = 6, row = 2, col = 5},
 	staticstorage =   {order = 7, row = 3, col = 1},
 	energypylon =   {order = 8, row = 3, col = 2},
 	staticcon =  {order = 9, row = 3, col = 3},
@@ -259,7 +259,7 @@ local aux = {	--merged into special
 local super = {	--merged into special
 	missilesilo = {order = 15, row = 1, col = 4},
 	staticantinuke =      {order = 16, row = 1, col = 5},
-	corbhmth =     {order = 2, row = 2, col = 1},
+	staticarty =     {order = 2, row = 2, col = 1},
 	staticheavyarty =     {order = 3, row = 2, col = 2},
 	corsilo =      {order = 4, row = 2, col = 3},
 	zenith =       {order = 5, row = 2, col = 4},

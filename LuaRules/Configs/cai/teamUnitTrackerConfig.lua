@@ -26,7 +26,7 @@ local completeUnitListNames = {
 		"energywind",
 		"energysolar",
 		"energyfusion",
-		"cafus",
+		"energysingu",
 		"geo",
 		"energyheavygeo",
 		"staticcon",
@@ -48,7 +48,7 @@ local completeUnitListNames = {
 		"cloakcon",
 		"cornecro",
 		"corned",
-		"coracv",
+		"tankcon",
 		"spidercon",
 		"corfast",
 		"corch",
@@ -180,7 +180,7 @@ local air = {
 	
 	transport = {
 		"corvalk",
-		"corbtrans",
+		"gunshipheavytrans",
 	},
 }
 
@@ -196,7 +196,7 @@ local defenseRequirementNames =  {
 	["energywind"] = {mult = 1},
 	["energysolar"] = {mult = 0.6},
 	["energyfusion"] = {mult = 1},
-	["cafus"] = {mult = 1},
+	["energysingu"] = {mult = 1},
 	["geo"] = {mult = 1.5},
 	["energyheavygeo"] = {mult = 1.5},
 	["staticcon"] = {mult = 1},
