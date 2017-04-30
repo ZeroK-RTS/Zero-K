@@ -21,7 +21,7 @@ local carrierDefNames = {
 	},
 	--corcrw = { {drone = UnitDefNames.attackdrone.id, reloadTime = 15, maxDrones = 6, spawnSize = 2, range = 900, buildTime=3,
 			-- offsets = {0,0,0,colvolMidX=0, colvolMidY=0,colvolMidZ=0,aimX=0,aimY=0,aimZ=0}},
-	funnelweb = {
+	striderfunnelweb = {
 		spawnPieces = {"emitl", "emitr"},
 		{
 			drone = UnitDefNames.attackdrone.id, 

@@ -17,7 +17,7 @@ unitDef = {
 	[[scorpion]],
     [[dante]],
     [[armraven]],
-    [[funnelweb]],
+    [[striderfunnelweb]],
     [[armbanth]],
     [[armorco]],
     [[shipheavyarty]],

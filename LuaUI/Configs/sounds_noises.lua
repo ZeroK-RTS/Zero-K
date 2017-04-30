@@ -513,7 +513,7 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
-	funnelweb = {
+	striderfunnelweb = {
 		ok = {
 			[1] = "heavy_bot_move",
 		},

@@ -12,7 +12,7 @@ local menu = {
 			items = {
 				{
 					angle = 45,
-					unit = "funnelweb"
+					unit = "striderfunnelweb"
 				}
 			},  
 		},

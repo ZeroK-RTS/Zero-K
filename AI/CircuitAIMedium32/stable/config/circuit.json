@@ -315,7 +315,7 @@
 
 		"income_tier": [60, 80, 100],
 		//             ultimatum,    scorpion,   dante,   catapult,   funnelweb,   bantha,     detriment, scylla,          reef,          battleship
-		"unit":      ["armcomdgun", "scorpion", "dante", "armraven", "funnelweb", "armbanth", "armorco", "subtacmissile", "shipcarrier", "shipheavyarty"],
+		"unit":      ["armcomdgun", "scorpion", "dante", "armraven", "striderfunnelweb", "armbanth", "armorco", "subtacmissile", "shipcarrier", "shipheavyarty"],
 		"land": {
 			"tier0": [ 0.01,         0.10,       0.81,    0.00,       0.05,        0.03,       0.00,      0.00,            0.00,          0.00],
 			"tier1": [ 0.03,         0.14,       0.22,    0.24,       0.20,        0.16,       0.01,      0.00,            0.00,          0.00],
@@ -909,7 +909,7 @@
 		"retreat": 0.9,
 		"dmg_mod": 0.1
 	},
-	"funnelweb": {
+	"striderfunnelweb": {
 		"role": ["heavy", "support", "air"],
 		"attribute": ["support"],
 		"retreat": 0.75,
@@ -1720,7 +1720,7 @@
 		"superweapon": ["raveparty", "corsilo", "armbrtha", "zenith", "screamer"],
 		"protector": ["armamd"],
 //		"terraform": ["terraunit"],
-		"strider": ["armcomdgun", "scorpion", "dante", "armraven", "funnelweb", "armbanth", "armorco", "subtacmissile", "shipcarrier", "shipheavyarty"]
+		"strider": ["armcomdgun", "scorpion", "dante", "armraven", "striderfunnelweb", "armbanth", "armorco", "subtacmissile", "shipcarrier", "shipheavyarty"]
 	}
 }
 },

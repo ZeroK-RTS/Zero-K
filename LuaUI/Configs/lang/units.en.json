@@ -769,7 +769,7 @@
 		"description" : "Raider/Riot Jumper",
 		"helptext" : "The Pyro is a cheap, fast walker with a flamethrower. The flamethrower deals increased damage to large units and can hit multiple targets at the same time. When killed, the Pyro sets surrounding units on fire. Additionally, Pyros also come with jetpacks, allowing them to jump over obstacles or get the drop on enemies."
 	},
-	"funnelweb" : {
+	"striderfunnelweb" : {
 		"name" : "Funnelweb",
 		"description" : "Drone/Shield Support Strider",
 		"helptext" : "The slow all-terrain Funnelweb features an area shield and a powerful drone complement."

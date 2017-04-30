@@ -784,7 +784,7 @@
         "description": "Lekki skoczek wsparcia",
         "helptext": "Pyro to lekki bot z miotaczem ognia, który zadaje zwiększone obrażenia dużym jednostkom i może razić wiele celów jednocześnie, i możliwością skoku. Chociaż Pyro otrzymuje obrażenia od ognia, to nie da się go podpalić. Ze zniszczonych Pyro wylewa się resztka napalmu, podpalając okoliczne jednostki."
     },
-    "funnelweb": {
+    "striderfunnelweb": {
         "name": "Funnelweb",
         "description": "Ekranowany mech-matka ",
         "helptext": "Funnelweb to ciężki mech-pająk z tarczą obszarową i kontyngentem dronów bojowych."
