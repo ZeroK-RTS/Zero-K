@@ -247,10 +247,10 @@
         "description": "Истребитель",
         "name": "Ястреб"
     },
-    "hoverskirm": {
+    "hoverskirm2": {
         "helptext": "The Trisula is a fairly fast, sturdy combatant armed with a scatter beam weapon that can erase multiple small targets or slag a single large one.",
         "description": "Light Assault/Battle Hover",
-        "name": "hoverskirm"
+        "name": "hoverskirm2"
     },
     "vehriot": {
         "helptext": "Мощная пушка Уравнителя (Leveler) легко уничтожает толпы легких юнитов противника. Снаряд из этой пушки летит по прямой траектории, так что их лучше всего выстраивать в линию. Из-за малой скорости и дальности, Уравнитель - лёгкая добыча для стрелков. Разрывы снарядов Уравнителя сглаживают землю, облегчая прохождение по ней для других машин.",

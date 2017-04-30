@@ -254,7 +254,7 @@
         "description": "Myśliwiec",
         "helptext": "Hawk specjalizuje się w zestrzeliwaniu innych jednostek latających. Jest dość wytrzymały i może działać pod lekkim ostrzałem przeciwlotniczym, ale sam nie jest w stanie atakować celów naziemnych."
     },
-    "hoverskirm": {
+    "hoverskirm2": {
         "name": "Trisula",
         "description": "Lekki poduszkowiec bojowy",
         "helptext": "Trisula to w miarę szybki, wytrzymały poduszkowiec uzbrojony w rozszczepiany promień, który może zniszczyć kilka mniejszych jednostek lub mocno uszkodzić jedną większą."
