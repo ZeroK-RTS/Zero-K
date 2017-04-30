@@ -25,7 +25,7 @@ local UNIT = 117
 local projectiles = {}
 
 local projectileHomingDistance = {
-	[WeaponDefNames["screamer_advsam"].id] = 1200^2,
+	[WeaponDefNames["turretaaheavy_advsam"].id] = 1200^2,
 	[WeaponDefNames["amphraid_torpedo"].id] = 200^2,
 }
 

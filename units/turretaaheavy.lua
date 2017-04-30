@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[screamer]],
+  unitname                      = [[turretaaheavy]],
   name                          = [[Screamer]],
   description                   = [[Very Long-Range Anti-Air Missile Tower]],
   acceleration                  = 0,
@@ -10,8 +10,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
   buildingGroundDecalSizeY      = 6,
-  buildingGroundDecalType       = [[screamer_aoplane.dds]],
-  buildPic                      = [[SCREAMER.png]],
+  buildingGroundDecalType       = [[turretaaheavy_aoplane.dds]],
+  buildPic                      = [[turretaaheavy.png]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[74 74 74]],
@@ -44,7 +44,7 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[SCREAMER.s3o]],
   onoffable                     = false,
-  script						= [[screamer.lua]],
+  script						= [[turretaaheavy.lua]],
   selfDestructAs                = [[ESTOR_BUILDING]],
   sightDistance                 = 660,
   turnRate                      = 0,
@@ -68,7 +68,7 @@ unitDef = {
       name                    = [[Advanced Anti-Air Missile]],
       areaOfEffect            = 240,
       canAttackGround         = false,
-      cegTag                  = [[screamertrail]],
+      cegTag                  = [[turretaaheavytrail]],
       craterBoost             = 0.1,
       craterMult              = 0.2,
       cylinderTargeting       = 3.2,
@@ -140,4 +140,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ screamer = unitDef })
+return lowerkeys({ turretaaheavy = unitDef })

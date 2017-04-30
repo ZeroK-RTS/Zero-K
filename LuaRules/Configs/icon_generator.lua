@@ -292,7 +292,7 @@ unitConfigs = {
     rot    = 28,
     angle  = 10,
   },  
-  [UnitDefNames.screamer.id] = {
+  [UnitDefNames.turretaaheavy.id] = {
     rot    = 30,
     angle  = 30,
   },

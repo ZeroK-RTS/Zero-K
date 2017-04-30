@@ -131,7 +131,7 @@ local menu_armcom = {
     items = {
       {
         angle = 0,
-        unit = "screamer"
+        unit = "turretaaheavy"
       },
       {
         angle = -90,

@@ -134,7 +134,7 @@
 		"description" : "Heavy Attack Flyer",
 		"helptext" : "Large, angry and capable of fighting both air and land opposition, the Roc is a formidable flying chicken."
 	},
-	"screamer" : {
+	"turretaaheavy" : {
 		"name" : "Screamer",
 		"description" : "Very Long-Range Anti-Air Missile Tower",
 		"helptext" : "The Screamer is an extremely long-ranging first strike anti-air weapon that sends a clear message to enemy aircraft - can't go here, sonny. Each shot must be stockpiled for 20 seconds, but is well worth the time, for a quick salvo of missiles will wipe out almost any air attack without fuss."

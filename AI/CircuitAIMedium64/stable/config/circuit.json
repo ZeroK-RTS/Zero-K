@@ -995,7 +995,7 @@
 		"role": ["static", "anti_air"],
 		"dmg_mod": 2.5
 	},
-	"screamer": {
+	"turretaaheavy": {
 		"role": ["static", "anti_air", "heavy"],
 		"dmg_mod": 3.0
 	},
@@ -1223,7 +1223,7 @@
 
 "porcupine": {
 	//        0         1        2          3         4             5           6            7          8          9           10         11		  12		13
-	"unit": ["turretlaser", "turretmissile", "turretriot", "turretheavylaser", "turrettorp", "turretaalaser", "staticcon", "turretheavy", "staticshield", "turretemp", "turretantiheavy", "staticarty", "turretaafar", "screamer"],
+	"unit": ["turretlaser", "turretmissile", "turretriot", "turretheavylaser", "turrettorp", "turretaalaser", "staticcon", "turretheavy", "staticshield", "turretemp", "turretantiheavy", "staticarty", "turretaafar", "turretaaheavy"],
 	// Actual number of defences per cluster bounded by income
 	"land":  [0, 1, 2, 3, 4, 5, 9, 5, 3, 2, 3, 12, 11],
 	"water": [4, 1, 6, 4, 4, 3, 5],
@@ -1239,7 +1239,7 @@
 	"base": [[0, 20], [5, 580], [1, 980], [5, 1160], [1, 1380], [2, 1680], [5, 2000], [2, 2420], [13, 2800], [7, 3300]],
 
 	"superweapon": {
-		"unit":   ["raveparty", "staticnuke", "staticheavyarty", "zenith", "screamer"],
+		"unit":   ["raveparty", "staticnuke", "staticheavyarty", "zenith", "turretaaheavy"],
 		"weight": [ 0.6,         0.2,       0.1,        0.1,		0.1],
 
 		"condition": [50, 250]  // [<Minimum income>, <maximum seconds to build>]
@@ -1717,7 +1717,7 @@
 		"mex": ["staticmex"],
 		"def_low": ["turretmissile", "turretlaser"],
 		"caretaker": ["staticcon"],
-		"superweapon": ["raveparty", "staticnuke", "staticheavyarty", "zenith", "screamer"],
+		"superweapon": ["raveparty", "staticnuke", "staticheavyarty", "zenith", "turretaaheavy"],
 		"protector": ["staticantinuke"],
 //		"terraform": ["terraunit"],
 		"strider": ["striderantiheavy", "striderscorpion", "striderdante", "striderarty", "striderfunnelweb", "striderbantha", "striderdetriment", "subtacmissile", "shipcarrier", "shipheavyarty"]

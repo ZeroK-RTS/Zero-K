@@ -78,7 +78,7 @@ local buildoptions = {
 		{ "turretaaflak" },
 
 		{ "turretaafar",  tech=2 },-- chainsaw
-		{ "screamer",  tech=3 },
+		{ "turretaaheavy",  tech=3 },
 	},
 
 	{-- special

@@ -63,7 +63,7 @@ modConfig["ZK"]["unitList"] =
 	cordl = { weapons = { 1 } },		--jellyfish (unused)
 	turretaalaser = { weapons = { 2 } },		--razorkiss
 	turretaaflak = { weapons = { 2 } },		--flak
-	screamer = { weapons = { 2 } },		--screamer
+	turretaaheavy = { weapons = { 2 } },		--turretaaheavy
 	turretaaclose = { weapons = { 2 } },	--hacksaw
 	staticarty = { weapons = { 1 } },		--behemoth
 	turrettorp = { weapons = { 1 } },	--torpedo launcher

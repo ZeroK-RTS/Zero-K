@@ -23,7 +23,7 @@ local heatmapNames = {
 		["turretaaclose"] = {mult = 2},
 		["turretaafar"] = {mult = 1.5},
 		["turretaaflak"] = {mult = 2},
-		["screamer"] = {mult = 1},
+		["turretaaheavy"] = {mult = 1},
 		
 		["turretimpulse"] = {mult = 1},
 		["turretemp"] = {mult = 1},
@@ -122,7 +122,7 @@ local completeUnitListNames = {
 		"turretaaclose",
 		"turretaafar",
 		"turretaaflak",
-		"screamer",
+		"turretaaheavy",
 	},
 
 	turret = {

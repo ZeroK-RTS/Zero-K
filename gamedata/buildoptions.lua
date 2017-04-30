@@ -39,7 +39,7 @@ local buildOpts = {
 	[[turretaaclose]],
 	[[turretaafar]],
 	[[turretaaflak]],
-	[[screamer]],
+	[[turretaaheavy]],
 	[[staticantinuke]],
 	[[staticarty]],
 	[[staticheavyarty]],

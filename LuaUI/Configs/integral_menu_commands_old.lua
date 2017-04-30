@@ -100,7 +100,7 @@ local defense = {
 	turretaalaser =     {order = 10, row = 2, col = 2},
 	turretaaflak =      {order = 11, row = 2, col = 3},
 	turretaafar =       {order = 12, row = 2, col = 4},
-	screamer =     {order = 13, row = 2, col = 5},
+	turretaaheavy =     {order = 13, row = 2, col = 5},
 
 --	turretemp = {order = 3, row = 3},
 	turretimpulse =    {order = 4, row = 3, col = 1},

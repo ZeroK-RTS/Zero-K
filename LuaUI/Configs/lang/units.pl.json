@@ -144,7 +144,7 @@
         "description": "Korweta (lekka / wsparcia)",
         "helptext": "Corsair to korweta z dwoma shotgunami, którymi ciężko kara wszystko, co się zbliży. Jest jednak bezbronna wobec jednostek podwodnych i ma niski zasięg."
     },
-    "screamer": {
+    "turretaaheavy": {
         "name": "Screamer",
         "description": "Wieża przeciwlotnicza bardzo dalekiego zasięgu",
         "helptext": "Screamer to szczyt obrony przeciwlotniczej - ma ogromny zasięg i siłę ognia, co praktycznie uniemożliwia korzystanie z jednostek powietrznych w chronionym przezeń obszarze. Ma jednak ograniczoną amunicję - wytwarza jeden pocisk co 20 sekund."

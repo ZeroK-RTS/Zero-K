@@ -99,7 +99,7 @@ local defenseDefs = {
 	"turretaaclose",
 	"turretaaflak",
 	"turretaafar",
-	"screamer",
+	"turretaaheavy",
 	
 	"turretheavy",
 	"turretantiheavy",

@@ -1007,7 +1007,7 @@
 		"role": ["static", "anti_air"],
 		"dmg_mod": 2.5
 	},
-	"screamer": {
+	"turretaaheavy": {
 		"role": ["static", "anti_air", "heavy"],
 		"dmg_mod": 3.0
 	},
@@ -1177,7 +1177,7 @@
 
 "porcupine": {
 	//        0         1        2          3         4             5           6            7          8          9           10         11		  12		13
-	"unit": ["turretlaser", "turretmissile", "turretriot", "turretheavylaser", "turrettorp", "turretaalaser", "staticcon", "turretheavy", "staticshield", "turretemp", "turretantiheavy", "staticarty", "turretaafar", "screamer"],
+	"unit": ["turretlaser", "turretmissile", "turretriot", "turretheavylaser", "turrettorp", "turretaalaser", "staticcon", "turretheavy", "staticshield", "turretemp", "turretantiheavy", "staticarty", "turretaafar", "turretaaheavy"],
 	// Actual number of defences per cluster bounded by income
 	"land":  [0, 0, 1, 1, 0, 0, 1, 1, 9, 9, 6, 6, 5, 3, 12],
 	"water": [4, 1, 6, 4, 4, 3, 5],
@@ -1671,7 +1671,7 @@
 		"mex": ["staticmex"],
 		"def_low": ["turretmissile", "turretlaser"],
 		"caretaker": ["staticcon"],
-		"superweapon": ["raveparty", "staticnuke", "staticheavyarty", "zenith", "screamer"],
+		"superweapon": ["raveparty", "staticnuke", "staticheavyarty", "zenith", "turretaaheavy"],
 		"protector": ["staticantinuke"],
 //		"terraform": ["terraunit"],
 		"strider": ["striderantiheavy", "striderscorpion", "striderdante", "striderarty", "striderfunnelweb", "striderbantha", "striderdetriment", "subtacmissile", "shipcarrier", "shipheavyarty"]

@@ -114,7 +114,7 @@ local aa = {
 	"turretaaclose",--hacksaw
 	"turretaaflak",
 	"turretaafar", --chainsaw
-	"screamer",
+	"turretaaheavy",
 }
 
 local sea = { --not used yet

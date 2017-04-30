@@ -1430,7 +1430,7 @@ local sounds = {
 			[1] = "turret_select",
 		},
 	},
-	screamer = {
+	turretaaheavy = {
 		ok = {
 			[1] = "turret_select",
 		},
