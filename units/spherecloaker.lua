@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[spherecloaker]],
+  unitname               = [[cloakjammer]],
   name                   = [[Eraser]],
   description            = [[Area Cloaker/Jammer Walker]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 0.75,
   buildCostMetal         = 600,
-  buildPic               = [[spherecloaker.png]],
+  buildPic               = [[cloakjammer.png]],
   canMove                = true,
   category               = [[LAND UNARMED]],
   corpse                 = [[DEAD]],
@@ -42,10 +42,10 @@ unitDef = {
   maxVelocity            = 1.9,
   minCloakDistance       = 180,
   movementClass          = [[AKBOT2]],
-  objectName             = [[spherecloaker.s3o]],
+  objectName             = [[cloakjammer.s3o]],
   onoffable              = true,
   pushResistant          = 0,
-  script                 = [[spherecloaker.lua]],
+  script                 = [[cloakjammer.lua]],
   radarDistanceJam       = 440,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 400,
@@ -77,4 +77,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ spherecloaker = unitDef })
+return lowerkeys({ cloakjammer = unitDef })

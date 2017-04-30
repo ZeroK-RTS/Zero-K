@@ -1,6 +1,6 @@
 local raider = {
 	"armpw",
-	"spherepole",
+	"cloakheavyraid",
 	"corak",
 	"armflash",
 	"corfav",
@@ -58,7 +58,7 @@ local skirm = {
 	"cormortgold",
 	"armmanni",
 	
-	"nsaclash",
+	"hoverskirm",
 	
 	"chickens",
 	"chicken_sporeshooter",
@@ -80,7 +80,7 @@ local riot = {
 	
 	"arm_venom",
 	"tawf003",
-	"tawf114",
+	"tankriot",
 
 	"hoverriot",
 	

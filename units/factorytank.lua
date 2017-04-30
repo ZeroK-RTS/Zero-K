@@ -15,7 +15,7 @@ unitDef = {
     [[coracv]],
     [[logkoda]],
 	[[panther]],
-    [[tawf114]],
+    [[tankriot]],
 	[[correap]],
     [[corgol]],
 	[[cormart]],

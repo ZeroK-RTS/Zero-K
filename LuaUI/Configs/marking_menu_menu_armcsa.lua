@@ -15,7 +15,7 @@ local menu_armcsa = {
 		  },
 		  { 
 			angle = -180,
-			unit = "spherepole",
+			unit = "cloakheavyraid",
 		  },
 		  { 
 			angle = 0,
@@ -38,7 +38,7 @@ local menu_armcsa = {
 		  },
 		  { 
 			angle = 135,
-			unit = "spherecloaker",
+			unit = "cloakjammer",
 		  },
 		  { 
 			angle = -135,

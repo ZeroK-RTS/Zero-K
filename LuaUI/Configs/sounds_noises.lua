@@ -364,7 +364,7 @@ local sounds = {
 			[1] = "light_bot_select",
 		},
 	},
-	spherepole = {
+	cloakheavyraid = {
 		ok = {
 			[1] = "spy_move",
 		},
@@ -703,7 +703,7 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
-	tawf114 = {
+	tankriot = {
 		ok = {
 			[1] = "tank_move",
 		},
@@ -746,7 +746,7 @@ local sounds = {
 			[1] = "hovercraft_select",
 		},
 	},
-	nsaclash = {
+	hoverskirm = {
 		ok = {
 			[1] = "hovercraft_move",
 		},
@@ -912,7 +912,7 @@ local sounds = {
 			[1] = "gunship_select",
 		},
 	},
-	gunshipsupport = {
+	gunshipskirm = {
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -1266,7 +1266,7 @@ local sounds = {
 			[1] = "cloaker_select",
 		},
 	},
-	spherecloaker = {
+	cloakjammer = {
 		ok = {
 			[1] = "bot_move",
 		},

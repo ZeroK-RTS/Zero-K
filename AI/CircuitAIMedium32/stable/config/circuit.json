@@ -25,7 +25,7 @@
 		"income_tier": [40, 80],
 
 		//             conjurer,   glaive,  scythe,       rocko,     warrior,  zeus,      hammer,   sniper,     tick,      eraser,          gremlin
-		"unit":      ["armrectr", "armpw", "spherepole", "armrock", "armwar", "armzeus", "armham", "armsnipe", "armtick", "spherecloaker", "armjeth"],
+		"unit":      ["armrectr", "armpw", "cloakheavyraid", "armrock", "armwar", "armzeus", "armham", "armsnipe", "armtick", "cloakjammer", "armjeth"],
 
 		"land": {
 			// 0-8m Opening - Glaives & Warriors most important for scouting, map control and defence.
@@ -62,7 +62,7 @@
 
 		"income_tier": [7, 16, 24, 32, 40, 56, 72],
 		//             wasp,         blastwing,   gnat,     banshee,  rapier,           brawler,    blackdawn,   krow,     valkyrie,  vindicator,  trident
-		"unit":      ["gunshipcon", "blastwing", "bladew", "armkam", "gunshipsupport", "armbrawl", "blackdawn", "corcrw", "corvalk", "corbtrans", "gunshipaa"],
+		"unit":      ["gunshipcon", "blastwing", "bladew", "armkam", "gunshipskirm", "armbrawl", "blackdawn", "corcrw", "corvalk", "corbtrans", "gunshipaa"],
 		"land": {
 			// 0-8m Opening - Blastwing and banshee Harass
 			"tier0": [ 0.00,         0.17,        0.00,     0.10,     0.71,             0.00,       0.02,        0.00,     0.00,      0.00,        0.00],
@@ -178,7 +178,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             quill,   dagger,  scalpel,    halberd,        claymore,           mace,        penetrator, flail
-		"unit":      ["corch", "corsh", "nsaclash", "hoverassault", "hoverdepthcharge", "hoverriot", "armmanni", "hoveraa"],
+		"unit":      ["corch", "corsh", "hoverskirm", "hoverassault", "hoverdepthcharge", "hoverriot", "armmanni", "hoveraa"],
 		"land": {
 			// 0-8m Opening - Raiders and Riots
 			"tier0": [ 0.00,    0.65,    0.00,       0.00,           0.00,               0.35,        0.00,       0.00],
@@ -235,7 +235,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             welder,   kodachi,   panther,   banisher,  reaper,    goliath,  pillager,  tremor, copperhead
-		"unit":      ["coracv", "logkoda", "panther", "tawf114", "correap", "corgol", "cormart", "tankheavyarty", "corsent"],
+		"unit":      ["coracv", "logkoda", "panther", "tankriot", "correap", "corgol", "cormart", "tankheavyarty", "corsent"],
 		"land": {
 			// 0-8m Opening - Koda and Banisher
 			"tier0": [ 0.00,     0.50,      0.00,      0.10,      0.40,      0.00,     0.00,      0.00,   0.00],
@@ -406,7 +406,7 @@
 		"retreat": 0.4,
 		"dmg_mod": 2.0
 	},
-	"spherepole": {
+	"cloakheavyraid": {
 		"role": ["skirmish"],
 		"retreat": 0.4,
 		"dmg_mod": 2.0
@@ -442,7 +442,7 @@
 		"role": ["mine"],
 		"retreat": 0.01
 	},
-	"spherecloaker": {
+	"cloakjammer": {
 		"role": ["support"],
 		"limit": 1
 	},
@@ -467,7 +467,7 @@
 		"role": ["air", "air"],
 		"retreat": 0.9
 	},
-	"gunshipsupport": {
+	"gunshipskirm": {
 		"role": ["air"],
 		"dmg_mod": 1.7,
 		"retreat": 0.75
@@ -753,7 +753,7 @@
 		"limit": 6,
 		"retreat": 0.8
 	},
-	"nsaclash": {
+	"hoverskirm": {
 		"role": ["assault"],
 		"retreat": 0.6,
 		"dmg_mod": 4.0
@@ -850,7 +850,7 @@
 		"limit": 0,
 		"retreat": 0.75
 	},
-	"tawf114": {
+	"tankriot": {
 		"role": ["riot"],
 		"attribute": ["support"],
 		"limit": 1,

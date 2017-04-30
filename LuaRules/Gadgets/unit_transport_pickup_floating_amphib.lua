@@ -78,7 +78,7 @@ local dropableUnits = {
 	[UnitDefNames["amphraid"].id] = true, --duck
 	[UnitDefNames["armcomdgun"].id] = true, --ultimatum
 	[UnitDefNames["core_spectre"].id] = true, --aspis
-	[UnitDefNames["spherecloaker"].id] = true, --eraser
+	[UnitDefNames["cloakjammer"].id] = true, --eraser
 	[UnitDefNames["armorco"].id] = true, --detriment
 }
 

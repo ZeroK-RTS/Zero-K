@@ -38,13 +38,13 @@ unitTips = {
 	firewalker = {"The \255\255\64\0Firewalker\008 creates large clouds of fire which can seriously harm units - friend or foe - standing in them.", 3, 5},
 	corsktl = {"The \255\255\64\0Skuttle\008 has a very powerful explosion with a very small blast radius. Use it to jump on enemy heavy targets and kill them in one or two blows.", 3, 5},
 	
-	tawf114 = {"The \255\255\64\0Banisher\008 packs a punch against groups of small units, but can be easily rushed - make sure to screen it.", 3, 4},
+	tankriot = {"The \255\255\64\0Banisher\008 packs a punch against groups of small units, but can be easily rushed - make sure to screen it.", 3, 4},
 	armmanni = {"The \255\255\64\0Penetrator\008 can split many units apart in one shot, but has no AoE and a 20s reload time, and is itself very flimsy. Use it for pinpoint fire from a distance.", 3, 4},
 }
 
 raiderDefs = {
 	"armpw",
-	"spherepole",
+	"cloakheavyraid",
 	"corak",
 	"armflash",
 	"corfav",
@@ -99,7 +99,7 @@ skirmDefs = {
 	"cormortgold",
 	"armmanni",
 	
-	"nsaclash",
+	"hoverskirm",
 	
 	"chickens",
 }
@@ -111,7 +111,7 @@ riotDefs = {
 	
 	"arm_venom",
 	"tawf003",
-	"tawf114",
+	"tankriot",
 
 	"hoverriot",
 	

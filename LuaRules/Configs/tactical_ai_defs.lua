@@ -99,7 +99,7 @@ lowRangeSwarmieeArray = Union(lowRangeSwarmieeArray,medRangeSwarmieeArray)
 local veryShortRangeSkirmieeArray = NameToDefID({
 	"corclog",
 	"corcan",
-	"spherepole",
+	"cloakheavyraid",
 	"armtick",
 	"puppy",
 	"corroach",
@@ -152,7 +152,7 @@ local riotRangeSkirmieeArray = NameToDefID({
 	"amphcon",
 	"shipcon",
 	
-	"spherecloaker",
+	"cloakjammer",
 	"core_spectre",
 	
 	"shiptorpraider",
@@ -184,7 +184,7 @@ local medRangeSkirmieeArray = NameToDefID({
 
 	"correap",
 	"corgol",
-	"tawf114", -- banisher
+	"tankriot", -- banisher
 	"scorpion",
 	
 	
@@ -202,7 +202,7 @@ local longRangeSkirmieeArray = NameToDefID({
 	"armrock",
 	"slowmort",
 	"amphfloater",
-	"nsaclash", -- hover janus
+	"hoverskirm", -- hover janus
 	"capturecar",
 	"chickenc",
 	"armbanth",
@@ -310,7 +310,7 @@ local skirmableAir = NameToDefID({
 	"blastwing",
 	"bladew",
 	"armkam",
-	"gunshipsupport",
+	"gunshipskirm",
 	"armbrawl",
 	"blackdawn",
 	"corbtrans",
@@ -742,7 +742,7 @@ local behaviourConfig = {
 		skirmLeeway = -30,
 		stoppingDistance = 5
 	},
-	["tawf114"] = {
+	["tankriot"] = {
 		skirms = lowMedRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
@@ -918,7 +918,7 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
 	},
-	["nsaclash"] = {
+	["hoverskirm"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
@@ -929,7 +929,7 @@ local behaviourConfig = {
 		skirmOrderDis = 200,
 		velocityPrediction = 90,
 	},
-	["gunshipsupport"] = {
+	["gunshipskirm"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
@@ -1146,7 +1146,7 @@ local behaviourConfig = {
 	--]]
 
 	-- support
-	["spherecloaker"] = {
+	["cloakjammer"] = {
 		skirms = {}, 
 		swarms = {}, 
 		flees = armedLand,

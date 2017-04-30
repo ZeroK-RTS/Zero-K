@@ -9,7 +9,7 @@
 		"description" : "Ciężki powietrzny konstruktor, moc 7.5 M/s",
 		"helptext" : "Wasp łączy w sobie mobilność statku powietrznego i wysoką moc budowy."
 	},
-    "gunshipsupport": {
+    "gunshipskirm": {
         "name": "Rapier",
         "description": "Wielozadaniowy statek powietrzny",
         "helptext": "Rapier to lekki bojowy statek powietrzny. Chociaż jego pociski nie zadają wysokich obrażeń, to są celne i spowalniają trafione jednostki."
@@ -424,7 +424,7 @@
         "description": "Szturmowy kurczak",
         "helptext": "Cockatrice to wytrzymała bestia, która powoli podchodzi do celu i rozczłonkowuje go przeogromnymi szczękami. Nie grzeszy inteligencją ani szybkością ataku."
     },
-    "nsaclash": {
+    "hoverskirm": {
         "name": "Scalpel",
         "description": "Poduszkowiec harcownik",
         "helptext": "Scalpel to poduszkowiec harcownik z rakietami o dużym zasięgu, obrażeniach i długim czasie przeładowania. Wysoka trajektoria lotu pozwala mu strzelać nad przeszkodami."
@@ -544,7 +544,7 @@
         "description": "Bomba (zakopuje się)",
         "helptext": "Roach to szybka jednostka samobójcza; swietnie niszczy jednostki w grupach, przede wszystkim szturmowe i harcowników. Gdy nie porusza się, staje się niewidzialny, dzięki czemu działa jak mina. Można go skutecznie zniszczyć celnymi jednostkami lub poświęcić lekką jednostkę, aby przedwcześnie go zdetonować."
     },
-    "spherecloaker": {
+    "cloakjammer": {
         "name": "Eraser",
         "description": "Bot zakłócająco-maskujący",
         "helptext": "Zakłócacze nie pozwalają radarom wykrywać jednostek na ich obszarze. Eraser posiada również niewidzalność obszarową, które pozwala ukryć jednostki także przed normalnym widzeniem."
@@ -719,7 +719,7 @@
         "description": "Zaczepny statek powietrzny",
         "helptext": "Black Dawn wystrzeliwuje niszczycielskie salwy rakiet, które z braku samonaprowadzania mają jednak kłopoty z trafianiem szybkich jednostek. Blackdawn jest wytrzymały, ale też drogi i ma niską szybkostrzelnosc, zatem oczekując między atakami warto oddalić sie, aby nie otrzymywać niepotrzebnie obrażeń."
     },
-    "tawf114": {
+    "tankriot": {
         "name": "Banisher",
         "description": "Ciężki czołg wsparcia",
         "helptext": "Mobilny jak na jednostkę wsparcia, Banisher posiada ciężkie rakiety krótkiego zasięgu, które szybko niszczą grupy lekkich jednostek, są skuteczne przeciw lotnictwu i wyrównują teren. Banishera łatwo zniszczyć jednostkami szturmowymi lub harcownikami."
@@ -974,7 +974,7 @@
         "description": "Pająk przeciwlotniczy",
         "helptext": "Chroni pająki przed lotnictwem przy użyciu rakiet dalekiego zasięgu."
     },
-    "spherepole": {
+    "cloakheavyraid": {
         "name": "Scythe",
         "description": "Niewidzialny kosynier",
         "helptext": "Scythe to lekka jednostka do walki w zwarciu, której niewidzialność pozwala zblizyć się do wrogich jednostek lub je ominąć. Po wyjściu z walki Scythe samoczynnie regeneruje się."

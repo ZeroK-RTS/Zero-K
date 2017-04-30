@@ -24,8 +24,8 @@ local unitlistNames = {
 	pw_hq_attacker = {},
 	pw_hq_defender = {},
 	raveparty = {},
-	spherepole = { mark_each_appearance = true, },
-	spherecloaker = { mark_each_appearance = true, },
+	cloakheavyraid = { mark_each_appearance = true, },
+	cloakjammer = { mark_each_appearance = true, },
 	striderhub = {},
 	zenith = {},
 }

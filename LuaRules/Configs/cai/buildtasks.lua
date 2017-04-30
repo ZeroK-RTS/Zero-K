@@ -243,7 +243,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 2,
 					[1] = {ID = UnitDefNames['armpw'].id, chance = 0.7},
-					[2] = {ID = UnitDefNames['spherepole'].id, chance = 0.3},
+					[2] = {ID = UnitDefNames['cloakheavyraid'].id, chance = 0.3},
 				},
 				
 				[4] = { -- arty
@@ -371,13 +371,13 @@ factionBuildConfig = {
 					importanceMult = 1.2,
 					count = 2,
 					[1] = {ID = UnitDefNames['hoverassault'].id, chance = 0.65},
-					[2] = {ID = UnitDefNames['nsaclash'].id, chance = 0.35},
+					[2] = {ID = UnitDefNames['hoverskirm'].id, chance = 0.35},
 				},
 				
 				[6] = { -- skirm
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['nsaclash'].id, chance = 1},
+					[1] = {ID = UnitDefNames['hoverskirm'].id, chance = 1},
 				},
 				
 				[7] = { -- riot
@@ -430,7 +430,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 3,
 					[1] = {ID = UnitDefNames['correap'].id, chance = 0.75},
-					[2] = {ID = UnitDefNames['tawf114'].id, chance = 0.15},
+					[2] = {ID = UnitDefNames['tankriot'].id, chance = 0.15},
 					[3] = {ID = UnitDefNames['corgol'].id, chance = 0.1},
 				},
 				
@@ -443,7 +443,7 @@ factionBuildConfig = {
 				[7] = { -- riot
 					importanceMult = 0.8,
 					count = 1,
-					[1] = {ID = UnitDefNames['tawf114'].id, chance = 1},
+					[1] = {ID = UnitDefNames['tankriot'].id, chance = 1},
 				},
 				
 				[8] = { -- aa
@@ -575,7 +575,7 @@ factionBuildConfig = {
 				[3] = { -- fighter
 					importanceMult = 0.6,
 					count = 2,
-					[1] = {ID = UnitDefNames['gunshipsupport'].id, chance = 1},
+					[1] = {ID = UnitDefNames['gunshipskirm'].id, chance = 1},
 				},
 				
 				[4] = { -- bomber
@@ -586,7 +586,7 @@ factionBuildConfig = {
 				[5] = { -- gunship
 					importanceMult = 1.4,
 					count = 4,
-					[1] = {ID = UnitDefNames['gunshipsupport'].id, chance = 0.30},
+					[1] = {ID = UnitDefNames['gunshipskirm'].id, chance = 0.30},
 					[2] = {ID = UnitDefNames['armkam'].id, chance = 0.35},
 					[3] = {ID = UnitDefNames['armbrawl'].id, chance = 0.175},
 					[4] = {ID = UnitDefNames['blackdawn'].id, chance = 0.175},

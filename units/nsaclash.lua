@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[nsaclash]],
+  unitname            = [[hoverskirm]],
   name                = [[Scalpel]],
   description         = [[Skirmisher/Anti-Heavy Hovercraft]],
   acceleration        = 0.0435,
@@ -7,7 +7,7 @@ unitDef = {
   brakeRate           = 0.205,
   buildCostMetal      = 220,
   builder             = false,
-  buildPic            = [[nsaclash.png]],
+  buildPic            = [[hoverskirm.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -44,8 +44,8 @@ unitDef = {
   moveState           = 0,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
-  objectName          = [[nsaclash.s3o]],
-  script              = [[nsaclash.lua]],
+  objectName          = [[hoverskirm.s3o]],
+  script              = [[hoverskirm.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -131,7 +131,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[nsaclash_dead.s3o]],
+      object           = [[hoverskirm_dead.s3o]],
     },
 
     HEAP  = {
@@ -145,4 +145,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ nsaclash = unitDef })
+return lowerkeys({ hoverskirm = unitDef })

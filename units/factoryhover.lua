@@ -10,7 +10,7 @@ unitDef = {
   buildoptions     = {
     [[corch]],
     [[corsh]],
-    [[nsaclash]],
+    [[hoverskirm]],
     [[hoverassault]],
 	[[hoverdepthcharge]],
 	[[hoverriot]],

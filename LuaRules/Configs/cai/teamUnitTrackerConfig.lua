@@ -63,7 +63,7 @@ local ground = {
 
 	raider = {
 		"armpw",
-		"spherepole",
+		"cloakheavyraid",
 		"corak",
 		"corfav",
 		"corgator",
@@ -100,7 +100,7 @@ local ground = {
 	skirm = {
 		"armrock",
 		"corstorm",
-		"nsaclash",
+		"hoverskirm",
 		"amphfloater",
 		"armsptk",
 		"armsnipe",
@@ -126,7 +126,7 @@ local ground = {
 		"shieldfelon",
 		"spiderriot",
 		"arm_venom",
-		"tawf114",
+		"tankriot",
 		"hoverriot",
 		"dante",
 		"chickenwurm",
@@ -172,7 +172,7 @@ local air = {
 		"bladew",
 		"blastwing",
 		"armkam",
-		"gunshipsupport",
+		"gunshipskirm",
 		"blackdawn",
 		"armbrawl",
 		"corcrw",

@@ -12,7 +12,7 @@ unitDef = {
   buildoptions                  = {
     [[armrectr]],
     [[armpw]],
-    [[spherepole]],
+    [[cloakheavyraid]],
     [[armrock]],
     [[armwar]],
     [[armzeus]],
@@ -20,7 +20,7 @@ unitDef = {
     [[armsnipe]],
     [[armjeth]],
     [[armtick]],
-    [[spherecloaker]],
+    [[cloakjammer]],
   },
 
   buildPic                      = [[factorycloak.png]],

@@ -11,7 +11,7 @@ local heatmapNames = {
 		["shipaa"] = {mult = 1},
 		["gunship11"] = {mult = 1},
 		
-		["tawf114"] = {mult = 0.4},
+		["tankriot"] = {mult = 0.4},
 		["slowmort"] = {mult = 0.4},
 		["armsnipe"] = {mult = 0.4},
 		["shieldfelon"] = {mult = 0.4},
@@ -31,7 +31,7 @@ local heatmapNames = {
 	
 	mobileLand = {
 		["armpw"] = {mult = 1},
-		["spherepole"] = {mult = 1},
+		["cloakheavyraid"] = {mult = 1},
 		["corak"] = {mult = 1},
 		["corfav"] = {mult = 1},
 		["corgator"] = {mult = 1},
@@ -63,7 +63,7 @@ local heatmapNames = {
         
 		["armrock"] = {mult = 1},
 		["corstorm"] = {mult = 1},
-		["nsaclash"] = {mult = 1},
+		["hoverskirm"] = {mult = 1},
 		["amphfloater"] = {mult = 1},
 		["armsptk"] = {mult = 1},
 		["armsnipe"] = {mult = 1},
@@ -85,7 +85,7 @@ local heatmapNames = {
 		["shieldfelon"] = {mult = 1},
 		["spiderriot"] = {mult = 1},
 		["arm_venom"] = {mult = 1},
-		["tawf114"] = {mult = 1},
+		["tankriot"] = {mult = 1},
 		["hoverriot"] = {mult = 1},
 		["dante"] = {mult = 1},
 		["chickenwurm"] = {mult = 1},
@@ -179,7 +179,7 @@ local ground = {
 
 	raider = {
 		"armpw",
-		"spherepole",
+		"cloakheavyraid",
 		"corak",
 		"corfav",
 		"corgator",
@@ -216,7 +216,7 @@ local ground = {
 	skirm = {
 		"armrock",
 		"corstorm",
-		"nsaclash",
+		"hoverskirm",
 		"amphfloater",
 		"armsptk",
 		"armsnipe",
@@ -242,7 +242,7 @@ local ground = {
 		"shieldfelon",
 		"spiderriot",
 		"arm_venom",
-		"tawf114",
+		"tankriot",
 		"hoverriot",
 		"dante",
 		"chickenwurm",
@@ -289,7 +289,7 @@ local air = {
 		"bladew",
 		"blastwing",
 		"armkam",
-		"gunshipsupport",
+		"gunshipskirm",
 		"blackdawn",
 		"armbrawl",
 		"corcrw",

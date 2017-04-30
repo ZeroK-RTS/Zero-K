@@ -9,7 +9,7 @@
 		"description" : "Heavy Gunship Constructor, builds at 7.5 M/s",
 		"helptext" : "A heavy constructor which combines the convenience of flying with high buildpower."
 	},
-	"gunshipsupport" : {
+	"gunshipskirm" : {
 		"name" : "Rapier",
 		"description" : "Multi-Role Support Gunship",
 		"helptext" : "The Rapier is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets."
@@ -409,7 +409,7 @@
 		"description" : "Assault/Anti-Armor",
 		"helptext" : "The Cockatrice is truly a beast. Seemingly impervious to enemy fire, it casually walks up to its target and dismembers it with its incredibly powerful jaws. Fortunately, it is not fast or particularly intelligent, and can be destroyed with skirmishers or swarmers easily."
 	},
-	"nsaclash" : {
+	"hoverskirm" : {
 		"name" : "Scalpel",
 		"description" : "Skirmisher/Anti-Heavy Hovercraft",
 		"helptext" : "Use the Scalpel for hit-and-run attacks. Has a long reload time and not too many hit points, and should always be kept at range with the enemy. An arcing projectile allows it to shoot over obstacles and friendly units."
@@ -524,7 +524,7 @@
 		"description" : "Crawling Bomb (Burrows)",
 		"helptext" : "This fast-moving suicide unit is very good against massed units, particularly assault tanks. It features a cloaking device which is automatically activated once the unit stands still, effectifely turning it into a mine. Chain explodes terribly, so best not to mass it. Counter with defenders and missile trucks, or single cheap units to set off a premature detonation."
 	},
-	"spherecloaker" : {
+	"cloakjammer" : {
 		"name" : "Eraser",
 		"description" : "Area Cloaker/Jammer Walker",
 		"helptext" : "The Eraser has a jamming device to conceal your units' radar returns. It also has a small cloak shield to hide friendly nearby units from enemy sight."
@@ -704,7 +704,7 @@
 		"description" : "Heavy Raider/Assault Gunship",
 		"helptext" : "The Black Dawn fires a volley of unguided rockets. It has high HP and a huge damage output, but is expensive and inaccurate, especially vs moving targets. It is best for taking on clumps of base structures, slow moving or stationary units. The Black Dawn should disengage between volleys to minimize damage taken."
 	},
-	"tawf114" : {
+	"tankriot" : {
 		"name" : "Banisher",
 		"description" : "Heavy Riot Support Tank",
 		"helptext" : "Remarkably mobile for a riot platform, the Banisher packs twin high-velocity fragmentation missiles that are devastating to light units and aircraft alike, although they have limited range. Like other riot units, the Banisher does not have the range and speed to hold its own against most skirmishers. The missile is quite effective at flattening terrain so it is particularly useful at knocking down walls that Welders cannot reach."
@@ -949,7 +949,7 @@
 		"description" : "Flying Spore Scout",
 		"helptext" : "A small flying chicken scout with spore."
 	},
-	"spherepole" : {
+	"cloakheavyraid" : {
 		"name" : "Scythe",
 		"description" : "Cloaked Raider Bot",
 		"helptext" : "The Scythe isn't particularly tough in a stand-up fight, but its cloaking device lets it slip past enemy defenses to stab at the enemy's economy. Damaged Scythes can quickly regenerate when out of combat."

@@ -159,7 +159,7 @@ effectUnitDefs = {
 	--{class='StaticParticles', options=MergeTable(jackGlow, {piece="point"}) },
   },  
   
-  spherepole = {
+  cloakheavyraid = {
     {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="blade", onActive=false, noIconDraw = true}},
   },
   
