@@ -98,7 +98,7 @@ local unitIsHeavyHitter = {
 	[UnitDefNames["cloaksnipe"].id] = true,
 	[UnitDefNames["shieldarty"].id] = true,
 	[UnitDefNames["nsaclash"].id] = true,
-	[UnitDefNames["bantha"].id] = true,
+	[UnitDefNames["striderbantha"].id] = true,
 	[UnitDefNames["bomberheavy"].id] = true,
 }
 
@@ -125,12 +125,12 @@ local unitIsHeavy = {
 	[UnitDefNames["spidercrabe"].id] = true,
 	[UnitDefNames["gunshipkrow"].id] = true,
 	[UnitDefNames["jumpsumo"].id] = true,
-	[UnitDefNames["dante"].id] = true,
-	[UnitDefNames["scorpion"].id] = true,
+	[UnitDefNames["striderdante"].id] = true,
+	[UnitDefNames["striderscorpion"].id] = true,
 	[UnitDefNames["funnelweb"].id] = true,
 	[UnitDefNames["striderarty"].id] = true,
-	[UnitDefNames["bantha"].id] = true,
-	[UnitDefNames["detriment"].id] = true,
+	[UnitDefNames["striderbantha"].id] = true,
+	[UnitDefNames["striderdetriment"].id] = true,
 }
 
 -- Hardcode weapons that are bad against fast moving stuff.
@@ -166,7 +166,7 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["tankarty_core_artillery"].id]    = {1.5},
 	[WeaponDefNames["trem_plasma"].id]               = {0.5},
 	[WeaponDefNames["striderantiheavy_disintegrator"].id]  = {2.8},
-	[WeaponDefNames["dante_napalm_rockets"].id]      = {2.8},
+	[WeaponDefNames["striderdante_napalm_rockets"].id]      = {2.8},
 	[WeaponDefNames["striderarty_rocket"].id]           = {0.5},
 --	[WeaponDefNames["shipcarrier_armmship_rocket"].id]      = {0.5},
 	[WeaponDefNames["shipheavyarty_plasma"].id]      = {2.5},

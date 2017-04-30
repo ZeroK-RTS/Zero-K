@@ -7,7 +7,7 @@ local menu = {
 		},
 		{
 			angle = -45,
-			unit = "scorpion",
+			unit = "striderscorpion",
 			label = "Spider",
 			items = {
 				{
@@ -18,7 +18,7 @@ local menu = {
 		},
 		{
 			angle = -90,
-			unit = "dante",
+			unit = "striderdante",
 			label = "Light",
 		},
 		{
@@ -28,7 +28,7 @@ local menu = {
 		},
 		{
 			angle = 45,
-			unit = "bantha",
+			unit = "striderbantha",
 			label = "Heavy",
 		},
 		{
@@ -49,7 +49,7 @@ local menu = {
 		},
 		{
 			angle = 180,
-			unit = "detriment",
+			unit = "striderdetriment",
 			label = "Massive",
 		},
 	}

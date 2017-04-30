@@ -72,7 +72,7 @@ end
 
 local paths = {
 	--PathfinderGenerator.CreatePathfinder(UnitDefNames["tankassault"].id, "tank4", true),
-	--PathfinderGenerator.CreatePathfinder(UnitDefNames["dante"].id, "kbot4", true),
+	--PathfinderGenerator.CreatePathfinder(UnitDefNames["striderdante"].id, "kbot4", true),
 	--PathfinderGenerator.CreatePathfinder(UnitDefNames["spidercrabe"].id, "tkbot4", true),
 	--PathfinderGenerator.CreatePathfinder(UnitDefNames["hoverarty"].id, "hover3"),
 	--PathfinderGenerator.CreatePathfinder(UnitDefNames["subraider"].id, "uboat3", true),

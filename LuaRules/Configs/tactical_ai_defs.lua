@@ -132,7 +132,7 @@ local riotRangeSkirmieeArray = NameToDefID({
 	"hoverscout",
 	"amphriot",
 	"striderantiheavy",
-	"dante",
+	"striderdante",
 	
 	"cloakaa",
 	"shieldaa",
@@ -185,7 +185,7 @@ local medRangeSkirmieeArray = NameToDefID({
 	"tankassault",
 	"tankheavyassault",
 	"tawf114", -- banisher
-	"scorpion",
+	"striderscorpion",
 	
 	
 	"shipscout",
@@ -205,7 +205,7 @@ local longRangeSkirmieeArray = NameToDefID({
 	"nsaclash", -- hover janus
 	"vehcapture",
 	"chickenc",
-	"bantha",
+	"striderbantha",
 	"turretlaser",
 	"turretriot",
 	"turretemp",
@@ -221,7 +221,7 @@ local artyRangeSkirmieeArray = NameToDefID({
 	"turretheavylaser",
 	"turretgauss",
 	"turretheavy",
-	"detriment",
+	"striderdetriment",
 	"ampharty",
 	
 	"shipskirm",
@@ -229,7 +229,7 @@ local artyRangeSkirmieeArray = NameToDefID({
 
 local slasherSkirmieeArray = NameToDefID({
 	"jumpsumo",
-	"dante",
+	"striderdante",
 	"armwar",
 	"hoverassault",
 	"shieldriot",
@@ -282,7 +282,7 @@ local medRangeExplodables = NameToDefID({
 	"geo",
 	"energysingu", -- same with singu, at least to make an effort for survival.
 	"energyheavygeo",
-	"bantha", -- banthas also have a fairly heavy but dodgeable explosion.
+	"striderbantha", -- striderbanthas also have a fairly heavy but dodgeable explosion.
 })
 
 for name, data in pairs(UnitDefNames) do -- avoid factory death explosions.
@@ -903,7 +903,7 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 20, 
 	},
-	["dante"] = {
+	["striderdante"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
@@ -1115,7 +1115,7 @@ local behaviourConfig = {
 		stoppingDistance = -100,
 		velocityPrediction = 0,
 	},	
-	["bantha"] = {
+	["striderbantha"] = {
 		skirms = allGround, 
 		swarms = {}, 
 		flees = {},

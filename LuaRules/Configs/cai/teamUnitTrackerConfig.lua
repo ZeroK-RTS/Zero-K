@@ -89,8 +89,8 @@ local ground = {
 		"tankheavyassault",
 		"amphassault",
 		"hoverassault",
-		"bantha",
-		"detriment",
+		"striderbantha",
+		"striderdetriment",
 		"corkrog",
 		"chickena",
 		"chickenc",
@@ -107,7 +107,7 @@ local ground = {
 		"slowmort",
 		"chickens",
 		"chicken_sporeshooter",
-		"scorpion",
+		"striderscorpion",
 	},
 	
 	antiSkirm = {
@@ -128,7 +128,7 @@ local ground = {
 		"spideremp",
 		"tawf114",
 		"hoverriot",
-		"dante",
+		"striderdante",
 		"chickenwurm",
 	},
 

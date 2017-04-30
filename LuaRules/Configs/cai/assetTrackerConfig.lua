@@ -54,8 +54,8 @@ local heatmapNames = {
 		["tankheavyassault"] = {mult = 1},
 		["amphassault"] = {mult = 1},
 		["hoverassault"] = {mult = 1},
-		["bantha"] = {mult = 1},
-		["detriment"] = {mult = 1},
+		["striderbantha"] = {mult = 1},
+		["striderdetriment"] = {mult = 1},
 		["corkrog"] = {mult = 1},
 		["chickena"] = {mult = 1},
 		["chickenc"] = {mult = 1},
@@ -70,7 +70,7 @@ local heatmapNames = {
 		["slowmort"] = {mult = 1},
 		["chickens"] = {mult = 1},
 		["chicken_sporeshooter"] = {mult = 1},
-		["scorpion"] = {mult = 1},
+		["striderscorpion"] = {mult = 1},
         
 		["spidercrabe"] = {mult = 1},
 		["vehsupport"] = {mult = 1},
@@ -87,7 +87,7 @@ local heatmapNames = {
 		["spideremp"] = {mult = 1},
 		["tawf114"] = {mult = 1},
 		["hoverriot"] = {mult = 1},
-		["dante"] = {mult = 1},
+		["striderdante"] = {mult = 1},
 		["chickenwurm"] = {mult = 1},
 		
 		["cloakarty"] = {mult = 1},
@@ -205,8 +205,8 @@ local ground = {
 		"tankheavyassault",
 		"amphassault",
 		"hoverassault",
-		"bantha",
-		"detriment",
+		"striderbantha",
+		"striderdetriment",
 		"corkrog",
 		"chickena",
 		"chickenc",
@@ -223,7 +223,7 @@ local ground = {
 		"slowmort",
 		"chickens",
 		"chicken_sporeshooter",
-		"scorpion",
+		"striderscorpion",
 	},
 	
 	antiSkirm = {
@@ -244,7 +244,7 @@ local ground = {
 		"spideremp",
 		"tawf114",
 		"hoverriot",
-		"dante",
+		"striderdante",
 		"chickenwurm",
 	},
 

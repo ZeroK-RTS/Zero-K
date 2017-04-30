@@ -105,7 +105,7 @@ local heavies = { --not used yet
 	"tankheavyassault", --goliath
 	"jumpassault",
 	"jumpsumo",
-	"dante",
+	"striderdante",
 }
 
 local aa = {

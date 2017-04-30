@@ -644,7 +644,7 @@
 		"description" : "Air Transport",
 		"helptext" : "The Valkyrie is the basic air transport. It is ideal to ferry units to the front or make a drop deep behind enemy lines, but should not be used to land in areas with any kind of AA cover."
 	},
-	"detriment" : {
+	"striderdetriment" : {
 		"name" : "Detriment",
 		"description" : "Ultimate Assault Strider",
 		"helptext" : "The Detriment is the single heaviest strider in the field. It can defend itself against air attacks or use its rockets to hit distant targets, but the real meat lies in the massive gauss guns designed for one purpose - to kill other heavy units quickly and efficiently. Remember - the wise commander sends his Detriment out with adequate escorts against light unit swarms and air assaults."
@@ -809,7 +809,7 @@
 		"description" : "PlanetWars Field HQ (changes influence gain)",
 		"helptext" : "This building is integral to strategic control of the planet. If the winning team is an attacker and has lost their Command Center, their influence gains are halved. If the defender wins, their loss of the CC causes the attacker to keep 20%% of the influence gain."
 	},
-	"dante" : {
+	"striderdante" : {
 		"name" : "Dante",
 		"description" : "Assault/Riot Strider",
 		"helptext" : "The Dante is a heavy combat unit that specializes in getting close and melting its target. Its flamethrower and twin heatrays aren't extraordinary, but its incendiary rockets can be fired in a salvo of twenty that devastates a wide swath of terrain."
@@ -1074,7 +1074,7 @@
 		"description" : "Seismic Missile",
 		"helptext" : "The Quake creates a powerful seismic shockwave that smooths a wide area of terrain, while causing minimal harm to units."
 	},
-	"scorpion" : {
+	"striderscorpion" : {
 		"name" : "Scorpion",
 		"description" : "Cloaked Infiltration Strider",
 		"helptext" : "The Scorpion paralyzes enemies with its lightning sting and then chews them up with its particle beam claws. Its tough carapace shrugs off most enemy fire, and can also turn the Scorpion transparent."
@@ -1094,7 +1094,7 @@
 		"description" : "Produces Heavy and Specialized Vehicles, Builds at 10 m/s",
 		"helptext" : "The Heavy Tank Factory is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Pillager, Reaper, Banisher, Goliath"
 	},
-	"bantha" : {
+	"striderbantha" : {
 		"name" : "Bantha",
 		"description" : "Ranged Support Strider",
 		"helptext" : "The Bantha is an even heavier solution to a particularly uncrackable defense line, with a tachyon projector and EMP missiles for stand-off engagements, lightning hand cannons for general purpose combat, and a good deal of armor. Beware though, for it is defenseless against air and cannot be used effectively on its own."

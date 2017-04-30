@@ -314,8 +314,8 @@
 		"require_energy": false,
 
 		"income_tier": [60, 80, 100],
-		//             ultimatum,    scorpion,   dante,   catapult,   funnelweb,   bantha,     detriment, scylla,          reef,          battleship
-		"unit":      ["striderantiheavy", "scorpion", "dante", "striderarty", "funnelweb", "bantha", "detriment", "subtacmissile", "shipcarrier", "shipheavyarty"],
+		//             ultimatum,    striderscorpion,   striderdante,   catapult,   funnelweb,   striderbantha,     striderdetriment, scylla,          reef,          battleship
+		"unit":      ["striderantiheavy", "striderscorpion", "striderdante", "striderarty", "funnelweb", "striderbantha", "striderdetriment", "subtacmissile", "shipcarrier", "shipheavyarty"],
 		"land": {
 			"tier0": [ 0.01,         0.10,       0.81,    0.00,       0.05,        0.03,       0.00,      0.00,            0.00,          0.00],
 			"tier1": [ 0.03,         0.14,       0.22,    0.24,       0.20,        0.16,       0.01,      0.00,            0.00,          0.00],
@@ -890,13 +890,13 @@
 		"role": ["anti_heavy", "support", "heavy"],
 		"retreat": 0.7
 	},
-	"scorpion": {
+	"striderscorpion": {
 		"role": ["anti_heavy", "support", "heavy"],
 		"fire_state": "return",
 		"retreat": 0.6,
 		"dmg_mod": 1.25
 	},
-	"dante": {
+	"striderdante": {
 		"role": ["heavy"],
 		"attribute": ["melee"],
 		"limit": 2,
@@ -915,12 +915,12 @@
 		"retreat": 0.75,
 		"dmg_mod": 15.0
 	},
-	"bantha": {
+	"striderbantha": {
 		"role": ["heavy", "support", "heavy"],
 		"retreat": 0.6,
 		"dmg_mod": 2.0
 	},
-	"detriment": {
+	"striderdetriment": {
 		"role": ["heavy", "support", "heavy"],
 		"attribute": ["melee"],
 		"retreat": 0.01,  // no retreat, demolish enemy base
@@ -1720,7 +1720,7 @@
 		"superweapon": ["raveparty", "staticnuke", "staticheavyarty", "zenith", "screamer"],
 		"protector": ["staticantinuke"],
 //		"terraform": ["terraunit"],
-		"strider": ["striderantiheavy", "scorpion", "dante", "striderarty", "funnelweb", "bantha", "detriment", "subtacmissile", "shipcarrier", "shipheavyarty"]
+		"strider": ["striderantiheavy", "striderscorpion", "striderdante", "striderarty", "funnelweb", "striderbantha", "striderdetriment", "subtacmissile", "shipcarrier", "shipheavyarty"]
 	}
 }
 },

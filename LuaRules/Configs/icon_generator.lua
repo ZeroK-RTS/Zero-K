@@ -270,11 +270,11 @@ unitConfigs = {
     angle  = 10,
     unfold = false,
   },
-  [UnitDefNames.detriment.id] = {
+  [UnitDefNames.striderdetriment.id] = {
     rot    = 20,
     angle  = 10,
   },
-  [UnitDefNames.bantha.id] = {
+  [UnitDefNames.striderbantha.id] = {
     rot    = 28,
     angle  = 10,
     unfold = true,
@@ -284,7 +284,7 @@ unitConfigs = {
     angle  = 10,
     border = 0.09,
   },
-  [UnitDefNames.dante.id] = {
+  [UnitDefNames.striderdante.id] = {
     rot    = 28,
     angle  = 10,
   },

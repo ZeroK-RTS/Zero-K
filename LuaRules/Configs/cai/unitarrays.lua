@@ -35,8 +35,8 @@ local assault = {
 	"armanac",
 	"hoverassault",
 	
-	--"bantha",
-	--"detriment",
+	--"striderbantha",
+	--"striderdetriment",
 	--"corkrog",
 	
 	--"chickena",
@@ -62,7 +62,7 @@ local skirm = {
 	
 	"chickens",
 	"chicken_sporeshooter",
-	--"scorpion",
+	--"striderscorpion",
 }
 
 local jumper = { -- uses jump for offense. IE do not put commander or AA here.
@@ -85,7 +85,7 @@ local riot = {
 	"hoverriot",
 	
 	"armraz",
-	"dante",
+	"striderdante",
 	
 	"chickenwurm",
 }

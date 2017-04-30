@@ -77,8 +77,8 @@ assaultDefs = {
 	"armanac",
 	"hoverassault",
 	
-	--"bantha",
-	--"detriment",
+	--"striderbantha",
+	--"striderdetriment",
 	--"corkrog",
 	
 	--"chickena",
@@ -116,7 +116,7 @@ riotDefs = {
 	"hoverriot",
 	
 	"armraz",
-	"dante",
+	"striderdante",
 }
 
 artyDefs = {

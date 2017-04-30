@@ -191,11 +191,11 @@ effectUnitDefs = {
 	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=20, strength = .005, precision=50, repeatEffect=true, onActive=true, noIconDraw = true}},	
   },
   
-  bantha = {
+  striderbantha = {
 	{class='StaticParticles', options=MergeTable(blinkyLightBlue, {piece="light", delay = 20, size = 25}) },
   },
   
-  detriment = {
+  striderdetriment = {
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="light", delay = 20, size = 30}) },
   },
 

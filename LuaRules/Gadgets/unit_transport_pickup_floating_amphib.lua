@@ -79,7 +79,7 @@ local dropableUnits = {
 	[UnitDefNames["striderantiheavy"].id] = true, --ultimatum
 	[UnitDefNames["shieldshield"].id] = true, --aspis
 	[UnitDefNames["spherecloaker"].id] = true, --eraser
-	[UnitDefNames["detriment"].id] = true, --detriment
+	[UnitDefNames["striderdetriment"].id] = true, --striderdetriment
 }
 
 if UnitDefNames["factoryamph"] then

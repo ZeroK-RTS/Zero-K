@@ -14,12 +14,12 @@ unitDef = {
 
   buildoptions                  = {
     [[striderantiheavy]],
-	[[scorpion]],
-    [[dante]],
+	[[striderscorpion]],
+    [[striderdante]],
     [[striderarty]],
     [[funnelweb]],
-    [[bantha]],
-    [[detriment]],
+    [[striderbantha]],
+    [[striderdetriment]],
     [[shipheavyarty]],
 	[[shipcarrier]],
 	[[subtacmissile]],

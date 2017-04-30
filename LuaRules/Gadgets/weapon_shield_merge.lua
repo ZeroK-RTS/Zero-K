@@ -218,7 +218,7 @@ end
 
 local beamMultiHitException = {
 	[UnitDefNames["amphassault"].id] = true,
-	[UnitDefNames["detriment"].id] = true,
+	[UnitDefNames["striderdetriment"].id] = true,
 }
 local repeatedHits = {}
 local penetrationPower = {}

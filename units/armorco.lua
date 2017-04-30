@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[detriment]],
+  unitname               = [[striderdetriment]],
   name                   = [[Detriment]],
   description            = [[Ultimate Assault Strider]],
   acceleration           = 0.1092,
@@ -8,7 +8,7 @@ unitDef = {
   brakeRate              = 0.2392,
   buildCostMetal         = 24000,
   builder                = false,
-  buildPic               = [[detriment.png]],
+  buildPic               = [[striderdetriment.png]],
   canGuard               = true,
   --canManualFire          = true,
   canMove                = true,
@@ -43,8 +43,8 @@ unitDef = {
   movementClass          = [[AKBOT6]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
-  objectName             = [[detriment.s3o]],
-  script                 = [[detriment.lua]],
+  objectName             = [[striderdetriment.s3o]],
+  script                 = [[striderdetriment.lua]],
   selfDestructAs         = [[NUCLEAR_MISSILE]],
   selfDestructCountdown  = 10,
   sightDistance          = 910,
@@ -341,4 +341,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ detriment = unitDef })
+return lowerkeys({ striderdetriment = unitDef })

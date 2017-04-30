@@ -505,7 +505,7 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
-	dante = {
+	striderdante = {
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -521,7 +521,7 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
-	bantha = {
+	striderbantha = {
 		ok = {
 			[1] = "turret_select",
 		},
@@ -537,7 +537,7 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
-	scorpion = {
+	striderscorpion = {
 		ok = {
 			[1] = "spy_move",
 		},
@@ -545,7 +545,7 @@ local sounds = {
 			[1] = "spy_select",
 		},
 	},
-	detriment = {
+	striderdetriment = {
 		ok = {
 			[1] = "turret_select",
 		},

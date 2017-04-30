@@ -56,7 +56,7 @@ local hyperweaponDefs = {
 	"mahlazer",
 	"zenith",
 	"raveparty",
-	"detriment",
+	"striderdetriment",
 }
 local canRetreatDefs = {
 	"gunshipheavyskirm",
@@ -69,11 +69,11 @@ local canRetreatDefs = {
 	"jumpassault",
 	"jumpsumo",
 	
-	"dante",
+	"striderdante",
 	--"striderarty",
-	"scorpion",
-	"bantha",
-	"detriment",
+	"striderscorpion",
+	"striderbantha",
+	"striderdetriment",
 	
 	"shipheavyarty",
 	"reef",

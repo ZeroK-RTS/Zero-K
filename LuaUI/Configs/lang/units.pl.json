@@ -659,7 +659,7 @@
         "description": "Transportowiec powietrzny",
         "helptext": "Valkyrie to podstawowa latająca jednostka transportowa. Świetnie radzi sobie w szybkim przenoszeniu jednostek z bazy na front, bądź w desancie głęboko za linie wroga, lecz musi unikać obszaru bronionego przez nawet najmniejszą ilość artylerii przeciwlotniczej."
     },
-    "detriment": {
+    "striderdetriment": {
         "name": "Detriment",
         "description": "Najcięższy mech szturmowy",
         "helptext": "Detriment to najcięższy mech na polu bitwy. Posiada lasery przeciwlotnicze i rakiety dalekiego zasięgu, ale jego siła pochodzi z niesamowitego pancerza i potężnych dział, które szybko likwidują wrogie jednostki. Mimo swojej ogromnej mocy, Detriment nie powinien pracować bez odpowiedniego wsparcia ze strony lzejszych jednostek."
@@ -829,7 +829,7 @@
         "description": "Kwatera główna Wojen Planet (zmienia uzyskiwane wpływy)",
         "helptext": "Kwatera główna jest kluczowa w utrzymaniu kontroli nad planetą; jeżeli zwycięzca bitwy ją utraci, to czekają go konsekwencje. W wypadku agresora, otrzymuje on dwukrotnie mniejsze wpływy. Utracony przez obrońców powoduje, że agresor otrzymuje 20%% wpływów."
     },
-    "dante": {
+    "striderdante": {
         "name": "Dante",
         "description": "Szturmowy mech bojowy",
         "helptext": "Dante to ciężki mech bojowy stworzony do walki na krótki dystans. Posiada promień cieplny, miotacz ognia i rakiety zapalające, które może wystrzelić w salwie."
@@ -1044,7 +1044,7 @@
         "description": "Rakieta sejsmiczna",
         "helptext": "Jednorazowa rakieta sejsmiczna dalekiego zasięgu. Nie zadaje obrażeń, lecz wyrównuje trafiony teren."
     },
-    "scorpion": {
+    "striderscorpion": {
         "name": "Scorpion",
         "description": "Ciężki niewidzialny pająk-mech",
         "helptext": "Scorpion to ciężki pajęczy mech bojowy z działkiem EMP i dwoma promieniami cząsteczkowymi. Jest bardzo wytrzymały i może stać się niewidzialny."
@@ -1059,7 +1059,7 @@
         "description": "Buduje czołgi, moc 10 m/s",
         "helptext": "Czołgi specjalizują się w brutalnej sile i wytrzymałości pancerza. Nic tak nie załatwia sporów, jak pancerna pięść na gąsienicach."
     },
-    "bantha": {
+    "striderbantha": {
         "name": "Bantha",
         "description": "Mech bojowy",
         "helptext": "Bantha to ciężki mech bojowy, uzbrojony po zęby i bardzo wytrzymały. Posiada rakiety EMP dalekiego zasięgu, ciężki laser oraz działka EMP. Nie ma jednak żadnej obrony przeciwlotniczej i słabo radzi sobie bez wsparcia mniejszych jednostek"
