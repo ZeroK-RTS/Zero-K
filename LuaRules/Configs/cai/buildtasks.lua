@@ -536,7 +536,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 2,
 					[1] = {ID = UnitDefNames['planefighter'].id, chance = 0.7},
-					[2] = {ID = UnitDefNames['planefighterheavy'].id, chance = 0.3},
+					[2] = {ID = UnitDefNames['planeheavyfighter'].id, chance = 0.3},
 				},
 				
 				[4] = { -- bomber

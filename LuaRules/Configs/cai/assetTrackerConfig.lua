@@ -303,7 +303,7 @@ local air = {
 local fighter = {
 	fighter = {
 		"planefighter",
-		"planefighterheavy",
+		"planeheavyfighter",
 	},
 }
 

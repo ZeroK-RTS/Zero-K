@@ -249,7 +249,7 @@
         "description": "Meteoryt",
         "helptext": "Asteroidy ściągnięte z orbity miażdżą jednostki, na które spadną; można z nich także odzyskać surowce."
     },
-    "planefighterheavy": {
+    "planeheavyfighter": {
         "name": "Hawk",
         "description": "Myśliwiec",
         "helptext": "Hawk specjalizuje się w zestrzeliwaniu innych jednostek latających. Jest dość wytrzymały i może działać pod lekkim ostrzałem przeciwlotniczym, ale sam nie jest w stanie atakować celów naziemnych."

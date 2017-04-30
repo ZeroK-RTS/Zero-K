@@ -234,7 +234,7 @@
 		"description" : "Space Rock",
 		"helptext" : "Asteroids can be manipulated to fall onto the planet by the Meteor Controller; they serve primarily as a weapon to crush the units they fall on, but they can also be reclaimed for resources."
 	},
-	"planefighterheavy" : {
+	"planeheavyfighter" : {
 		"name" : "Hawk",
 		"description" : "Air Superiority Fighter",
 		"helptext" : "The Hawk specializes in bringing down anything else that flies. It is sturdy enough to take limited AA fire, although it has no ground attack capability."

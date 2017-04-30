@@ -98,7 +98,7 @@ local units = {
 		planefighter = RAIDER,
 		bomberriot = RIOT,
 		-- No Plane Artillery
-		planefighterheavy = WEIRD_RAIDER,
+		planeheavyfighter = WEIRD_RAIDER,
 		planescout = UTILITY,
 		bomberprec = ASSAULT,
 		bomberheavy = HEAVY_SOMETHING,

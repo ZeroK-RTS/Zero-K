@@ -15,7 +15,7 @@ unitDef = {
   buildoptions                  = {
     [[planecon]],
     [[planefighter]],
-    [[planefighterheavy]],
+    [[planeheavyfighter]],
 	[[bomberprec]],
 	[[bomberriot]],
     [[bomberdisarm]],

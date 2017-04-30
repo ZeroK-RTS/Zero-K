@@ -804,7 +804,7 @@ local sounds = {
 			[1] = "fighter_select",
 		},
 	},
-	planefighterheavy = {
+	planeheavyfighter = {
 		ok = {
 			[1] = "fighter_move",
 		},

@@ -1,10 +1,10 @@
 unitDef = {
-  unitname               = [[planefighterheavy]],
+  unitname               = [[planeheavyfighter]],
   name                   = [[Hawk]],
   description            = [[Air Superiority Fighter]],
   brakerate              = 0.4,
   buildCostMetal         = 300,
-  buildPic               = [[planefighterheavy.png]],
+  buildPic               = [[planeheavyfighter.png]],
   canFly                 = true,
   canGuard               = true,
   canMove                = true,
@@ -141,4 +141,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ planefighterheavy = unitDef })
+return lowerkeys({ planeheavyfighter = unitDef })

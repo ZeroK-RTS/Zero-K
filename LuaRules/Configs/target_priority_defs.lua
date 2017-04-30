@@ -67,7 +67,7 @@ end
 -- Don't shoot at fighters or drones, they are unimportant.
 local unitIsFighterOrDrone = {
 	[UnitDefNames["planefighter"].id] = true,
-	[UnitDefNames["planefighterheavy"].id] = true,
+	[UnitDefNames["planeheavyfighter"].id] = true,
 	[UnitDefNames["dronelight"].id] = true,
 	[UnitDefNames["droneheavyslow"].id] = true,
 	[UnitDefNames["dronecarry"].id] = true,
