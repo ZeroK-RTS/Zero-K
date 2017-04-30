@@ -19,7 +19,7 @@ unitDef = {
 	[[correap]],
     [[corgol]],
 	[[cormart]],
-	[[trem]],
+	[[tankheavyarty]],
     [[corsent]],
   },
 

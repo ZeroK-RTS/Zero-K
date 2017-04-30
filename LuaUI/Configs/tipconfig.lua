@@ -129,7 +129,7 @@ artyDefs = {
 	"armmerl",
 	--"armmanni",
 	"cormart",
-	"trem",
+	"tankheavyarty",
 	
 	"armshock",
 	"armraven",

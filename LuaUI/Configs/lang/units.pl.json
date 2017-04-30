@@ -1139,7 +1139,7 @@
         "description": "Myśliwiec wielozadaniowy",
         "helptext": "Swift to wielozadaniowy myśliwiec szybkiego reagowania, który może atakować zarówno cele powietrzne, jak i naziemne. Jest bardzo zwinny i świetnie sobie radzi z wrogim lotnictwem dzięki samonaprowadzanym rakietom powietrze-powietrze, jednak jest bardzo lekki i łatwo go zestrzelić. Posiada także dopalacz."
     },
-    "trem": {
+    "tankheavyarty": {
         "name": "Tremor",
         "description": "Ciężka artyleria",
         "helptext": "Zasada działania Tremora jest prosta: zawsze lepiej jest użyć więcej amunicji. Jest to ciężka bateria artyleryjska niszcząca wszystko na danym obszarze przy użyciu gradu pocisków burzących, które przy okazji wyrównują teren."

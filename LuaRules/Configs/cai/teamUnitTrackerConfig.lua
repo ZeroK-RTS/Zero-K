@@ -138,7 +138,7 @@ local ground = {
 		"armmerl",
 		"armmanni",
 		"cormart",
-		"trem",
+		"tankheavyarty",
 		"armraven",
 		"chickenr",
 		"chickenblobber",

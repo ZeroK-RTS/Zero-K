@@ -1174,7 +1174,7 @@
 		"description" : "Raider/Riot Jumper",
 		"helptext" : "The Pyro is a cheap, fast walker with a flamethrower. The flamethrower deals increased damage to large units and can hit multiple targets at the same time. When killed, the Pyro sets surrounding units on fire. Additionally, Pyros also come with jetpacks, allowing them to jump over obstacles or get the drop on enemies."
 	},
-	"trem" : {
+	"tankheavyarty" : {
 		"name" : "Tremor",
 		"description" : "Heavy Saturation Artillery Tank",
 		"helptext" : "The principle behind the Tremor is simple: flood an area with enough shots, and you'll hit something at least once. Slow, clumsy, vulnerable and extremely frightening, the Tremor works best against high-density target areas, where its saturation shots are most likely to do damage. It pulverizes shields in seconds and its shells smooth terrain."

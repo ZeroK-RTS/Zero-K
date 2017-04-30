@@ -65,7 +65,7 @@ local canRetreatDefs = {
 	
 	"correap",
 	"corgol",
-	--"trem",
+	--"tankheavyarty",
 	"corcan",
 	"corsumo",
 	

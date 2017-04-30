@@ -1,7 +1,7 @@
 local alwaysHoldPos = {
 	[UnitDefNames["armcrabe"].id] = true,
     [UnitDefNames["cormist"].id] = true,
-    [UnitDefNames["trem"].id] = true,
+    [UnitDefNames["tankheavyarty"].id] = true,
 }
 
 local holdPosException = {

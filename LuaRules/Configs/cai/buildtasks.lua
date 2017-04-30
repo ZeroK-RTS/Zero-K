@@ -423,7 +423,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 2,
 					[1] = {ID = UnitDefNames['cormart'].id, chance = 0.7},
-					[2] = {ID = UnitDefNames['trem'].id, chance = 0.3},
+					[2] = {ID = UnitDefNames['tankheavyarty'].id, chance = 0.3},
 				},
 				
 				[5] = { --assault

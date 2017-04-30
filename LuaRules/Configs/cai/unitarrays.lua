@@ -100,7 +100,7 @@ local arty = {
 	"armmerl",
 	--"armmanni",
 	"cormart",
-	"trem",
+	"tankheavyarty",
 	
 	"armshock",
 	"armraven",

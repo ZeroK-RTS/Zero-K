@@ -695,7 +695,7 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
-	trem = {
+	tankheavyarty = {
 		ok = {
 			[1] = "tank_move",
 		},
