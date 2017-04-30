@@ -65,7 +65,7 @@ local canRetreatDefs = {
 	
 	"tankassault",
 	"tankheavyassault",
-	--"trem",
+	--"tankheavyarty",
 	"jumpassault",
 	"jumpsumo",
 	
@@ -83,7 +83,7 @@ local energyDefs = {
 	"energysolar",
 	"energywind",
 	"energyfusion",
-	--"geo",
+	--"energygeo",
 	"energysingu",
 }
 
@@ -96,7 +96,7 @@ local defenseDefs = {
 	"turretgauss",
 	
 	"turretaalaser",
-	"missiletower",
+	"turretaaclose",
 	"turretaaflak",
 	"turretaafar",
 	"screamer",

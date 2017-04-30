@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[tawf114]],
+  unitname            = [[tankriot]],
   name                = [[Banisher]],
   description         = [[Heavy Riot Support Tank]],
   acceleration        = 0.02181,
   brakeRate           = 0.04282,
   buildCostMetal      = 520,
   builder             = false,
-  buildPic            = [[TAWF114.png]],
+  buildPic            = [[tankriot.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -37,7 +37,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[corbanish.s3o]],
-  script              = [[tawf114.lua]],
+  script              = [[tankriot.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 400,
   trackOffset         = 8,
@@ -133,4 +133,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ tawf114 = unitDef })
+return lowerkeys({ tankriot = unitDef })

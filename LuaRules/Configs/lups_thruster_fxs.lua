@@ -2,7 +2,7 @@ local tbl = {
   gunshipheavytrans = {
     {class='AirJet', options={color={0.2,0.4,0.8}, width=8, length=35, baseLength = 9, piece="engineEmit", onActive=true, noIconDraw = true}},
   },
-  gunshipsupport = {
+  gunshipskirm = {
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, baseLength = 6, piece="thrust1", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, baseLength = 6, piece="thrust2", onActive=true, noIconDraw = true}},
   },

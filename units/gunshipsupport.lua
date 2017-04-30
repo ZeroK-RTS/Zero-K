@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[gunshipsupport]],
+  unitname               = [[gunshipskirm]],
   name                   = [[Rapier]],
   description            = [[Multi-Role Support Gunship]],
   acceleration           = 0.152,
   brakeRate              = 0.1216,
   buildCostMetal         = 300,
   builder                = false,
-  buildPic               = [[CORAPE.png]],
+  buildPic               = [[gunshipskirm.png]],
   canFly                 = true,
   canMove                = true,
   canSubmerge            = false,
@@ -41,7 +41,7 @@ unitDef = {
   minCloakDistance       = 75,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[rapier.s3o]],
-  script                 = [[gunshipsupport.lua]],
+  script                 = [[gunshipskirm.lua]],
   selfDestructAs         = [[GUNSHIPEX]],
 
   sfxtypes               = {
@@ -137,4 +137,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ gunshipsupport = unitDef })
+return lowerkeys({ gunshipskirm = unitDef })

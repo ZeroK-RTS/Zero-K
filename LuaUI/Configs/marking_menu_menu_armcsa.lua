@@ -15,7 +15,7 @@ local menu_athena = { -- TODO_RENAME_FILE
 		  },
 		  { 
 			angle = -180,
-			unit = "spherepole",
+			unit = "cloakheavyraid",
 		  },
 		  { 
 			angle = 0,
@@ -38,7 +38,7 @@ local menu_athena = { -- TODO_RENAME_FILE
 		  },
 		  { 
 			angle = 135,
-			unit = "spherecloaker",
+			unit = "cloakjammer",
 		  },
 		  { 
 			angle = -135,
@@ -54,7 +54,7 @@ local menu_athena = { -- TODO_RENAME_FILE
 		  },		  
 		  {
 			angle = 45,
-			unit = "slowmort"
+			unit = "jumpskirm"
 		  },
 		}
 	  },
@@ -79,7 +79,7 @@ local menu_athena = { -- TODO_RENAME_FILE
 	  },
 	  {
 		angle = 180,
-		unit = "panther",
+		unit = "tankheavyraid",
 		label = "Misc.",
 		items = {
 		  {

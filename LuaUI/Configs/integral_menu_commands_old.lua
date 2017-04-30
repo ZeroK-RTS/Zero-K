@@ -53,7 +53,7 @@ AddBuildQueue("factorytank")
 AddBuildQueue("factoyamph")
 AddBuildQueue("factoryship")
 AddBuildQueue("striderhub")
-AddBuildQueue("missilesilo")
+AddBuildQueue("staticmissilesilo")
 AddBuildQueue("pw_bomberfac")
 AddBuildQueue("pw_dropfac")
 
@@ -79,7 +79,7 @@ local econ = {
 	staticmex =     {order = 1, row = 1, col = 1},
 	energywind =     {order = 2, row = 2, col = 1},
 	energysolar =   {order = 3, row = 2, col = 2},
-	geo =        {order = 4, row = 2, col = 3},
+	energygeo =        {order = 4, row = 2, col = 3},
 	energyfusion =     {order = 5, row = 2, col = 4},
 	energysingu =      {order = 6, row = 2, col = 5},
 	staticstorage =   {order = 7, row = 3, col = 1},
@@ -96,7 +96,7 @@ local defense = {
 	turretgauss =    {order = 5, row = 1, col = 5},
 	turretheavylaser =   {order = 6, row = 1, col = 6},
 
-	missiletower =  {order = 9, row = 2, col = 1},
+	turretaaclose =  {order = 9, row = 2, col = 1},
 	turretaalaser =     {order = 10, row = 2, col = 2},
 	turretaaflak =      {order = 11, row = 2, col = 3},
 	turretaafar =       {order = 12, row = 2, col = 4},
@@ -117,7 +117,7 @@ local aux = {	--merged into special
 }
 
 local super = {	--merged into special
-	missilesilo = {order = 15, row = 1, col = 4},
+	staticmissilesilo = {order = 15, row = 1, col = 4},
 	staticantinuke =      {order = 16, row = 1, col = 5},
 	staticarty =     {order = 2, row = 2, col = 1},
 	staticheavyarty =     {order = 3, row = 2, col = 2},

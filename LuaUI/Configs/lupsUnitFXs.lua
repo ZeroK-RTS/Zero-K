@@ -100,7 +100,7 @@ effectUnitDefs = {
 	--{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=100, strength = .001, precision=50, repeatEffect=true, quality = 5}},
   },
   
-  funnelweb = {
+  striderfunnelweb = {
 	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4, onActive = true}},
 	{class='Bursts', options=MergeTable(staticshieldBursts, {piece="aimpoint"})},
 	{class='ShieldSphere', options=staticshieldBall},
@@ -159,7 +159,7 @@ effectUnitDefs = {
 	--{class='StaticParticles', options=MergeTable(jackGlow, {piece="point"}) },
   },  
   
-  spherepole = {
+  cloakheavyraid = {
     {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="blade", onActive=false, noIconDraw = true}},
   },
   
@@ -358,7 +358,7 @@ effectUnitDefs = {
     {class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="light2"}) },
     {class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="light1"}) },    
   },
-  fighterdrone = {
+  dronefighter = {
     --{class='AirJet', options={color={0.6,0.1,0.0}, width=3, length=40, piece="DroneMain", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
     {class='Ribbon', options={width=1, size=24, piece="DroneMain"}},
   },

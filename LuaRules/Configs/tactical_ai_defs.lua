@@ -54,7 +54,7 @@ end
 
 local longRangeSwarmieeArray = NameToDefID({ 
 	"tankarty",
-	"firewalker",
+	"jumparty",
 	"spiderskirm",
 	"shieldskirm",
 	"shiparty",
@@ -74,7 +74,7 @@ local lowRangeSwarmieeArray = NameToDefID({
 	"spiderassault",
 	"vehassault",
 	"cloakassault",
-	"logkoda",
+	"tankraid",
 	"hoverassault",
 	
 	"tankassault",
@@ -99,9 +99,9 @@ lowRangeSwarmieeArray = Union(lowRangeSwarmieeArray,medRangeSwarmieeArray)
 local veryShortRangeSkirmieeArray = NameToDefID({
 	"shieldscout",
 	"jumpassault",
-	"spherepole",
+	"cloakheavyraid",
 	"cloakbomb",
-	"puppy",
+	"jumpscout",
 	"shieldbomb",
 	"chicken",
 	"chickena",
@@ -117,7 +117,7 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 
 local shortRangeSkirmieeArray = NameToDefID({
 	"jumpraid",
-	"logkoda",
+	"tankraid",
 	"amphraid",
 	"jumpsumo",
 	
@@ -126,7 +126,7 @@ local shortRangeSkirmieeArray = NameToDefID({
 })
 
 local riotRangeSkirmieeArray = NameToDefID({
-	"panther",
+	"tankheavyraid",
 	"armwar",
 	"hoverraid",
 	"hoverscout",
@@ -152,7 +152,7 @@ local riotRangeSkirmieeArray = NameToDefID({
 	"amphcon",
 	"shipcon",
 	
-	"spherecloaker",
+	"cloakjammer",
 	"shieldshield",
 	
 	"shiptorpraider",
@@ -184,7 +184,7 @@ local medRangeSkirmieeArray = NameToDefID({
 
 	"tankassault",
 	"tankheavyassault",
-	"tawf114", -- banisher
+	"tankriot", -- banisher
 	"striderscorpion",
 	
 	
@@ -200,9 +200,9 @@ end
 
 local longRangeSkirmieeArray = NameToDefID({
 	"cloakskirm",
-	"slowmort",
+	"jumpskirm",
 	"amphfloater",
-	"nsaclash", -- hover janus
+	"hoverskirm", -- hover janus
 	"vehcapture",
 	"chickenc",
 	"striderbantha",
@@ -279,7 +279,7 @@ local diverExplodables = NameToDefID({
 
 local medRangeExplodables = NameToDefID({
 	"energyfusion", -- don't suicide vs fusions if possible.
-	"geo",
+	"energygeo",
 	"energysingu", -- same with singu, at least to make an effort for survival.
 	"energyheavygeo",
 	"striderbantha", -- striderbanthas also have a fairly heavy but dodgeable explosion.
@@ -310,7 +310,7 @@ local skirmableAir = NameToDefID({
 	"gunshipbomb",
 	"gunshipemp",
 	"gunshipraid",
-	"gunshipsupport",
+	"gunshipskirm",
 	"gunshipheavyskirm",
 	"gunshipassault",
 	"gunshipheavytrans",
@@ -444,7 +444,7 @@ local behaviourConfig = {
 		alwaysJinkFight = true,	
 	},
 	
-	["puppy"] = {
+	["jumpscout"] = {
 		skirms = {}, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
@@ -605,7 +605,7 @@ local behaviourConfig = {
 		velocityPrediction = 20
 	},
 	
-	["logkoda"] = {
+	["tankraid"] = {
 		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
@@ -617,7 +617,7 @@ local behaviourConfig = {
 		skirmOrderDis = 150,
 	},
   
-	["panther"] = {
+	["tankheavyraid"] = {
 		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
@@ -742,7 +742,7 @@ local behaviourConfig = {
 		skirmLeeway = -30,
 		stoppingDistance = 5
 	},
-	["tawf114"] = {
+	["tankriot"] = {
 		skirms = lowMedRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
@@ -894,7 +894,7 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
 	},
-	["slowmort"] = {
+	["jumpskirm"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
@@ -918,7 +918,7 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
 	},
-	["nsaclash"] = {
+	["hoverskirm"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
@@ -929,7 +929,7 @@ local behaviourConfig = {
 		skirmOrderDis = 200,
 		velocityPrediction = 90,
 	},
-	["gunshipsupport"] = {
+	["gunshipskirm"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
@@ -1085,7 +1085,7 @@ local behaviourConfig = {
 		skirmRadar = true,
 		skirmLeeway = 40, 
 	},
-	["firewalker"] = {
+	["jumparty"] = {
 		skirms = allGround, 
 		swarms = {}, 
 		flees = {},
@@ -1146,7 +1146,7 @@ local behaviourConfig = {
 	--]]
 
 	-- support
-	["spherecloaker"] = {
+	["cloakjammer"] = {
 		skirms = {}, 
 		swarms = {}, 
 		flees = armedLand,

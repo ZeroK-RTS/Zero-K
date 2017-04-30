@@ -173,7 +173,7 @@ local windgenDefID = UnitDefNames["energywind"] and UnitDefNames["energywind"].i
 local energyStructureDefs = {
 	[UnitDefNames["energywind"].id] = {cost = 35, income = 1.25},
 	[UnitDefNames["energysolar"].id] = {cost = 70, income = 2},
-	[UnitDefNames["geo"].id] = {cost = 500, income = 25},
+	[UnitDefNames["energygeo"].id] = {cost = 500, income = 25},
 	[UnitDefNames["energyheavygeo"].id] = {cost = 1000, income = 75},
 	[UnitDefNames["energyfusion"].id] = {cost = 1000, income = 35},
 	[UnitDefNames["energysingu"].id] = {cost = 4000, income = 225},

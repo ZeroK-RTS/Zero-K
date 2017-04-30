@@ -46,7 +46,7 @@ local buildoptions = {
 		{ "energywind" },-- wind
 		{ "energysolar",  notSea=true },
 		{ "staticcon" },-- caretaker
-		{ "geo",  notSea=true },
+		{ "energygeo",  notSea=true },
 		{ "staticrearm" },-- repair pad
 
 		-- adv
@@ -74,7 +74,7 @@ local buildoptions = {
 	{-- air_defense
 		{ "corr" },-- mt
 		{ "turretaalaser" },
-		{ "missiletower" },-- hacksaw
+		{ "turretaaclose" },-- hacksaw
 		{ "turretaaflak" },
 
 		{ "turretaafar",  tech=2 },-- chainsaw
@@ -86,7 +86,7 @@ local buildoptions = {
 		{ "staticheavyradar",  tech=2 },
 		{ "staticshield",  tech=2 },-- Aegis
 		{ "staticjammer",  tech=2 },-- Sneaky Pete
-		{ "missilesilo",  tech=2 },
+		{ "staticmissilesilo",  tech=2 },
 		{ CMD_RAMP,  tech=3 },
 		{ CMD_LEVEL,  tech=3 },
 		{ CMD_RAISE,  tech=3 },

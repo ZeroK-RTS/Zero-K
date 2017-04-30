@@ -35,7 +35,7 @@ local units = {
 	factorycloak = {
 		cloakcon = CONSTRUCTOR,
 		cloakraid = RAIDER,
-		spherepole = WEIRD_RAIDER,
+		cloakheavyraid = WEIRD_RAIDER,
 		armwar = RIOT,
 		cloakskirm = SKIRMISHER,
 		cloakarty = ARTILLERY,
@@ -43,7 +43,7 @@ local units = {
 		cloakassault = ASSAULT,
 		cloaksnipe = HEAVY_SOMETHING,
 		cloakbomb = SPECIAL,
-		spherecloaker = UTILITY,
+		cloakjammer = UTILITY,
 	},
 	factoryshield = {
 		shieldcon = CONSTRUCTOR,
@@ -75,7 +75,7 @@ local units = {
 		hoverraid = RAIDER,
 		hoverdepthcharge = SPECIAL,
 		hoverriot = RIOT,
-		nsaclash = SKIRMISHER,
+		hoverskirm = SKIRMISHER,
 		hoverarty = ARTILLERY,
 		hoveraa = ANTI_AIR,
 		hoverassault = ASSAULT,
@@ -85,7 +85,7 @@ local units = {
 		gunshipemp = WEIRD_RAIDER,
 		gunshipraid = RAIDER,
 		gunshipheavyskirm = ARTILLERY,
-		gunshipsupport = SKIRMISHER,
+		gunshipskirm = SKIRMISHER,
 		gunshiptrans = SPECIAL,
 		gunshipheavytrans = UTILITY,
 		gunshipaa = ANTI_AIR,
@@ -118,11 +118,11 @@ local units = {
 	},
 	factoryjump = {
 		jumpcon = CONSTRUCTOR,
-		puppy = WEIRD_RAIDER,
+		jumpscout = WEIRD_RAIDER,
 		jumpraid = RAIDER,
 		jumpblackhole = RIOT,
-		slowmort = SKIRMISHER,
-		firewalker = ARTILLERY,
+		jumpskirm = SKIRMISHER,
+		jumparty = ARTILLERY,
 		jumpaa = ANTI_AIR,
 		jumpassault = ASSAULT,
 		jumpsumo = HEAVY_SOMETHING,
@@ -130,11 +130,11 @@ local units = {
 	},
 	factorytank = {
 		tankcon =  CONSTRUCTOR,
-		logkoda = WEIRD_RAIDER,
-		panther = RAIDER,
-		tawf114 = RIOT,
+		tankraid = WEIRD_RAIDER,
+		tankheavyraid = RAIDER,
+		tankriot = RIOT,
 		tankarty = ARTILLERY,
-		trem = UTILITY,
+		tankheavyarty = UTILITY,
 		tankaa = ANTI_AIR,
 		tankassault = ASSAULT,
 		tankheavyassault = HEAVY_SOMETHING,
@@ -195,7 +195,7 @@ local function AddBuildQueue(name)
 end
 
 AddBuildQueue("striderhub")
-AddBuildQueue("missilesilo")
+AddBuildQueue("staticmissilesilo")
 
 local factories = {
 	factorycloak =    {order = 1, row = 1, col = 1},
@@ -219,7 +219,7 @@ local econ = {
 	staticmex =     {order = 1, row = 1, col = 1},
 	energywind =     {order = 2, row = 2, col = 1},
 	energysolar =   {order = 3, row = 2, col = 2},
-	geo =        {order = 4, row = 2, col = 3},
+	energygeo =        {order = 4, row = 2, col = 3},
 	energyfusion =     {order = 5, row = 2, col = 4},
 	energysingu =      {order = 6, row = 2, col = 5},
 	staticstorage =   {order = 7, row = 3, col = 1},
@@ -236,7 +236,7 @@ local defense = {
 	turretgauss =    {order = 5, row = 1, col = 5},
 	turretheavylaser =   {order = 6, row = 1, col = 6},
 
-	missiletower =  {order = 9, row = 2, col = 1},
+	turretaaclose =  {order = 9, row = 2, col = 1},
 	turretaalaser =     {order = 10, row = 2, col = 2},
 	turretaaflak =      {order = 11, row = 2, col = 3},
 	turretaafar =       {order = 12, row = 2, col = 4},
@@ -257,7 +257,7 @@ local aux = {	--merged into special
 }
 
 local super = {	--merged into special
-	missilesilo = {order = 15, row = 1, col = 4},
+	staticmissilesilo = {order = 15, row = 1, col = 4},
 	staticantinuke =      {order = 16, row = 1, col = 5},
 	staticarty =     {order = 2, row = 2, col = 1},
 	staticheavyarty =     {order = 3, row = 2, col = 2},

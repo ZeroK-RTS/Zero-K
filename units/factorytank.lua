@@ -13,13 +13,13 @@ unitDef = {
 
   buildoptions                  = {
     [[tankcon]],
-    [[logkoda]],
-	[[panther]],
-    [[tawf114]],
+    [[tankraid]],
+	[[tankheavyraid]],
+    [[tankriot]],
 	[[tankassault]],
     [[tankheavyassault]],
 	[[tankarty]],
-	[[trem]],
+	[[tankheavyarty]],
     [[tankaa]],
   },
 

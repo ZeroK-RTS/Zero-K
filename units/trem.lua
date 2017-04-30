@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[trem]],
+  unitname               = [[tankheavyarty]],
   name                   = [[Tremor]],
   description            = [[Heavy Saturation Artillery Tank]],
   acceleration           = 0.05952,
   brakeRate              = 0.124,
   buildCostMetal         = 1500,
   builder                = false,
-  buildPic               = [[TREM.png]],
+  buildPic               = [[tankheavyarty.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -143,4 +143,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ trem = unitDef })
+return lowerkeys({ tankheavyarty = unitDef })

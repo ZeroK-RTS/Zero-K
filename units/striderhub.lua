@@ -17,7 +17,7 @@ unitDef = {
 	[[striderscorpion]],
     [[striderdante]],
     [[striderarty]],
-    [[funnelweb]],
+    [[striderfunnelweb]],
     [[striderbantha]],
     [[striderdetriment]],
     [[shipheavyarty]],

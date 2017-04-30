@@ -119,20 +119,20 @@ factionBuildConfig = {
 				[2] = { -- scout
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['puppy'].id, chance = 1},
+					[1] = {ID = UnitDefNames['jumpscout'].id, chance = 1},
 				},
 				
 				[3] = { -- raider
 					importanceMult = 1,
 					count = 2,
-					[1] = {ID = UnitDefNames['puppy'].id, chance = 0.6},
+					[1] = {ID = UnitDefNames['jumpscout'].id, chance = 0.6},
 					[2] = {ID = UnitDefNames['jumpraid'].id, chance = 0.4},
 				},
 				
 				[4] = { -- arty
 					importanceMult = 0.3,
 					count = 1,
-					[1] = {ID = UnitDefNames['firewalker'].id, chance = 1},	
+					[1] = {ID = UnitDefNames['jumparty'].id, chance = 1},	
 				},
 				
 				[5] = { --assault
@@ -145,7 +145,7 @@ factionBuildConfig = {
 				[6] = { -- skirm
 					importanceMult = 0.6,
 					count = 1,
-					[1] = {ID = UnitDefNames['slowmort'].id, chance = 1},
+					[1] = {ID = UnitDefNames['jumpskirm'].id, chance = 1},
 				},
 				
 				[7] = { -- riot
@@ -243,7 +243,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 2,
 					[1] = {ID = UnitDefNames['cloakraid'].id, chance = 0.7},
-					[2] = {ID = UnitDefNames['spherepole'].id, chance = 0.3},
+					[2] = {ID = UnitDefNames['cloakheavyraid'].id, chance = 0.3},
 				},
 				
 				[4] = { -- arty
@@ -307,7 +307,7 @@ factionBuildConfig = {
 				[4] = { -- arty
 					importanceMult = 0,
 					count = 0,	
-				--	[1] = {ID = UnitDefNames['firewalker'].id, chance = 1},					
+				--	[1] = {ID = UnitDefNames['jumparty'].id, chance = 1},					
 				},
 				
 				[5] = { --assault
@@ -371,13 +371,13 @@ factionBuildConfig = {
 					importanceMult = 1.2,
 					count = 2,
 					[1] = {ID = UnitDefNames['hoverassault'].id, chance = 0.65},
-					[2] = {ID = UnitDefNames['nsaclash'].id, chance = 0.35},
+					[2] = {ID = UnitDefNames['hoverskirm'].id, chance = 0.35},
 				},
 				
 				[6] = { -- skirm
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['nsaclash'].id, chance = 1},
+					[1] = {ID = UnitDefNames['hoverskirm'].id, chance = 1},
 				},
 				
 				[7] = { -- riot
@@ -409,28 +409,28 @@ factionBuildConfig = {
 				[2] = { -- scout
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['logkoda'].id, chance = 1},
+					[1] = {ID = UnitDefNames['tankraid'].id, chance = 1},
 				},
 				
 				[3] = { -- raider
 					importanceMult = 1,
 					count = 2,
-					[1] = {ID = UnitDefNames['logkoda'].id, chance = 0.3},
-					[2] = {ID = UnitDefNames['panther'].id, chance = 0.7},
+					[1] = {ID = UnitDefNames['tankraid'].id, chance = 0.3},
+					[2] = {ID = UnitDefNames['tankheavyraid'].id, chance = 0.7},
 				},
 				
 				[4] = { -- arty
 					importanceMult = 1,
 					count = 2,
 					[1] = {ID = UnitDefNames['tankarty'].id, chance = 0.7},
-					[2] = {ID = UnitDefNames['trem'].id, chance = 0.3},
+					[2] = {ID = UnitDefNames['tankheavyarty'].id, chance = 0.3},
 				},
 				
 				[5] = { --assault
 					importanceMult = 1,
 					count = 3,
 					[1] = {ID = UnitDefNames['tankassault'].id, chance = 0.75},
-					[2] = {ID = UnitDefNames['tawf114'].id, chance = 0.15},
+					[2] = {ID = UnitDefNames['tankriot'].id, chance = 0.15},
 					[3] = {ID = UnitDefNames['tankheavyassault'].id, chance = 0.1},
 				},
 				
@@ -443,7 +443,7 @@ factionBuildConfig = {
 				[7] = { -- riot
 					importanceMult = 0.8,
 					count = 1,
-					[1] = {ID = UnitDefNames['tawf114'].id, chance = 1},
+					[1] = {ID = UnitDefNames['tankriot'].id, chance = 1},
 				},
 				
 				[8] = { -- aa
@@ -575,7 +575,7 @@ factionBuildConfig = {
 				[3] = { -- fighterheavy
 					importanceMult = 0.6,
 					count = 2,
-					[1] = {ID = UnitDefNames['gunshipsupport'].id, chance = 1},
+					[1] = {ID = UnitDefNames['gunshipskirm'].id, chance = 1},
 				},
 				
 				[4] = { -- bomber
@@ -586,7 +586,7 @@ factionBuildConfig = {
 				[5] = { -- gunship
 					importanceMult = 1.4,
 					count = 4,
-					[1] = {ID = UnitDefNames['gunshipsupport'].id, chance = 0.30},
+					[1] = {ID = UnitDefNames['gunshipskirm'].id, chance = 0.30},
 					[2] = {ID = UnitDefNames['gunshipraid'].id, chance = 0.35},
 					[3] = {ID = UnitDefNames['gunshipheavyskirm'].id, chance = 0.175},
 					[4] = {ID = UnitDefNames['gunshipassault'].id, chance = 0.175},
@@ -626,7 +626,7 @@ factionBuildConfig = {
 				energy = true,
 			},
 			
-			[UnitDefNames['geo'].id] = {
+			[UnitDefNames['energygeo'].id] = {
 				energyGreaterThan = 20, 
 				energySpacing = 400,
 				whileStall = false,
@@ -764,7 +764,7 @@ factionBuildConfig = {
 			[2] = {
 				count = 2,
 				[1] = {ID = UnitDefNames['turretaalaser'].id, chance = 0.7},
-				[2] = {ID = UnitDefNames['missiletower'].id, chance = 0.3},
+				[2] = {ID = UnitDefNames['turretaaclose'].id, chance = 0.3},
 			},
 			
 			[3] = {
@@ -783,7 +783,7 @@ factionBuildConfig = {
 				level = 2,
 				index = 1,
 			},
-			[UnitDefNames['missiletower'].id] = {
+			[UnitDefNames['turretaaclose'].id] = {
 				level = 2,
 				index = 2,
 			},

@@ -72,7 +72,7 @@ local cmdStopFirezone = {
 }
 
 local bombUnitDefIDs = {
-	[UnitDefNames["puppy"].id] = true,
+	[UnitDefNames["jumpscout"].id] = true,
 }
 for udid = 1, #UnitDefs do
 	local ud = UnitDefs[udid]

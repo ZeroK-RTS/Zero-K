@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[slowmort]],
+  unitname            = [[jumpskirm]],
   name                = [[Moderator]],
   description         = [[Disruptor Skirmisher Walker]],
   acceleration        = 0.2,
@@ -7,7 +7,7 @@ unitDef = {
   brakeRate           = 0.6,
   buildCostMetal      = 240,
   builder             = false,
-  buildPic            = [[slowmort.png]],
+  buildPic            = [[jumpskirm.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -37,7 +37,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB UNARMED]],
   objectName          = [[CORMORT.s3o]],
-  script              = [[slowmort.lua]],
+  script              = [[jumpskirm.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -229,4 +229,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ slowmort = unitDef })
+return lowerkeys({ jumpskirm = unitDef })

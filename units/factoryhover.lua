@@ -10,7 +10,7 @@ unitDef = {
   buildoptions     = {
     [[hovercon]],
     [[hoverraid]],
-    [[nsaclash]],
+    [[hoverskirm]],
     [[hoverassault]],
 	[[hoverdepthcharge]],
 	[[hoverriot]],

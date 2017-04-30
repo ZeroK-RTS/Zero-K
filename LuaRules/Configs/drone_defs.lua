@@ -21,7 +21,7 @@ local carrierDefNames = {
 	},
 	--gunshipkrow = { {drone = UnitDefNames.dronelight.id, reloadTime = 15, maxDrones = 6, spawnSize = 2, range = 900, buildTime=3,
 			-- offsets = {0,0,0,colvolMidX=0, colvolMidY=0,colvolMidZ=0,aimX=0,aimY=0,aimZ=0}},
-	funnelweb = {
+	striderfunnelweb = {
 		spawnPieces = {"emitl", "emitr"},
 		{
 			drone = UnitDefNames.dronelight.id, 
@@ -47,7 +47,7 @@ local carrierDefNames = {
 	nebula = {
 		spawnPieces = {"pad1", "pad2", "pad3", "pad4"},
 		{
-			drone = UnitDefNames.fighterdrone.id, 
+			drone = UnitDefNames.dronefighter.id, 
 			reloadTime = 15, 
 			maxDrones = 8, 
 			spawnSize = 2, 
@@ -185,7 +185,7 @@ local thingsWhichAreDrones = {
 	[UnitDefNames.dronecarry.id] = true,
 	[UnitDefNames.dronelight.id] = true,
 	[UnitDefNames.droneheavyslow.id] = true,
-	[UnitDefNames.fighterdrone.id] = true
+	[UnitDefNames.dronefighter.id] = true
 }
 
 local function ProcessCarrierDef(carrierData)

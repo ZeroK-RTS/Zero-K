@@ -49,7 +49,7 @@ unitCategories.advancedEnergyBuildings = {
 	energyheavygeo  = true, 
 	energyfusion = true, 
 	energysingu  = true, 
-	geo    = true, 
+	energygeo    = true, 
 }
 
 unitCategories.energyBuildings = Spring.Utilities.MergeTable(	unitCategories.basicEnergyBuildings, 

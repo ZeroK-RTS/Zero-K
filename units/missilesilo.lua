@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[missilesilo]],
+  unitname                      = [[staticmissilesilo]],
   name                          = [[Missile Silo]],
   description                   = [[Produces Tactical Missiles, Builds at 10 m/s]],
   buildCostMetal                = 1200,
@@ -7,7 +7,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
   buildingGroundDecalSizeY      = 6,
-  buildingGroundDecalType       = [[missilesilo_aoplane.dds]],
+  buildingGroundDecalType       = [[staticmissilesilo_aoplane.dds]],
 
   buildoptions                  = {
     [[tacnuke]],
@@ -16,7 +16,7 @@ unitDef = {
     [[napalmmissile]],
   },
 
-  buildPic                      = [[missilesilo.png]],
+  buildPic                      = [[staticmissilesilo.png]],
   canFight                      = false,
   canMove                       = false,
   canPatrol                     = false,
@@ -43,7 +43,7 @@ unitDef = {
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
   objectName                    = [[missilesilo.s3o]],
-  script                        = [[missilesilo.lua]],
+  script                        = [[staticmissilesilo.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,
@@ -72,4 +72,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ missilesilo = unitDef })
+return lowerkeys({ staticmissilesilo = unitDef })

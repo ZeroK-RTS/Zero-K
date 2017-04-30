@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[geo]],
+  unitname                      = [[energygeo]],
   name                          = [[Geothermal Generator]],
   description                   = [[Medium Powerplant (+25)]],
   acceleration                  = 0,
@@ -10,8 +10,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 7,
   buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[geo_aoplane.dds]],
-  buildPic                      = [[GEO.png]],
+  buildingGroundDecalType       = [[energygeo_aoplane.dds]],
+  buildPic                      = [[energygeo.png]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[84 84 84]],
@@ -49,7 +49,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[geo.dae]],
-  script                        = [[geo.lua]],
+  script                        = [[energygeo.lua]],
   selfDestructAs                = [[ESTOR_BUILDING]],
   sightDistance                 = 273,
   turnRate                      = 0,
@@ -79,4 +79,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ geo = unitDef })
+return lowerkeys({ energygeo = unitDef })

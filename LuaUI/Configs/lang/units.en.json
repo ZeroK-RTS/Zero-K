@@ -9,7 +9,7 @@
 		"description" : "Heavy Gunship Constructor, builds at 7.5 M/s",
 		"helptext" : "A heavy constructor which combines the convenience of flying with high buildpower."
 	},
-	"gunshipsupport" : {
+	"gunshipskirm" : {
 		"name" : "Rapier",
 		"description" : "Multi-Role Support Gunship",
 		"helptext" : "The Rapier is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets."
@@ -29,7 +29,7 @@
 		"description" : "General-Purpose Artillery",
 		"helptext" : "The heavy, long-ranging gun of the Pillager makes it the unit of choice for standoff shelling of enemy mobiles or structures. As always, it should be wary of anything that gets close to it."
 	},
-	"missilesilo" : {
+	"staticmissilesilo" : {
 		"name" : "Missile Silo",
 		"description" : "Produces Tactical Missiles, Builds at 10 m/s",
 		"helptext" : "The Missile Silo constructs and holds up to four different cruise missiles, each with a unique warhead. It offers excellent standoff strike capability for offensive and defensive purposes."
@@ -254,7 +254,7 @@
 		"description" : "Area Shield",
 		"helptext" : "The Aegis protects a modest area with its bubble shield that stops incoming projectiles (but not AoE effects). The shield has a significant energy upkeep and does not block very powerful weapons."
 	},
-	"missiletower" : {
+	"turretaaclose" : {
 		"name" : "Hacksaw",
 		"description" : "Burst Anti-Air Turret",
 		"helptext" : "The Hacksaw's twin missiles brutally punish any aircraft that enters their range, but take a considerable amount of time to reload, making them less than ideal against light targets."
@@ -374,7 +374,7 @@
 		"description" : "Burrowing Flamer (Assault/Riot)",
 		"helptext" : "The Wurm \"burrows\" under the surface of the ground, revealing itself to hurl a ball of fire that immolates a large swathe of terrain. It can climb cliffs and surprise defense turrets, but is weak to assaults."
 	},
-	"fighterdrone" : {
+	"dronefighter" : {
 		"name" : "Spicula",
 		"description" : "Fighter Drone",
 		"helptext" : "The Spicula is a fast multirole fighter drone whose particle beam is effective against both land and air targets."
@@ -409,7 +409,7 @@
 		"description" : "Assault/Anti-Armor",
 		"helptext" : "The Cockatrice is truly a beast. Seemingly impervious to enemy fire, it casually walks up to its target and dismembers it with its incredibly powerful jaws. Fortunately, it is not fast or particularly intelligent, and can be destroyed with skirmishers or swarmers easily."
 	},
-	"nsaclash" : {
+	"hoverskirm" : {
 		"name" : "Scalpel",
 		"description" : "Skirmisher/Anti-Heavy Hovercraft",
 		"helptext" : "Use the Scalpel for hit-and-run attacks. Has a long reload time and not too many hit points, and should always be kept at range with the enemy. An arcing projectile allows it to shoot over obstacles and friendly units."
@@ -424,7 +424,7 @@
 		"description" : "Cloaked Jumping Anti-Heavy Bomb",
 		"helptext" : "This slow-moving, expensive cloaked unit can jump on to enemy units and blast even a heavy tank straight to hell. Counter with swarms of cheap screening units. Be careful of its very small explosion radius when using it."
 	},
-	"slowmort" : {
+	"jumpskirm" : {
 		"name" : "Moderator",
 		"description" : "Distruptor Skirmisher Walker",
 		"helptext" : "The Moderator's disruptor beam reduces enemy speed and rate of fire by up to 50%% in addition to dealing damage, making it effective against almost all targets."
@@ -524,7 +524,7 @@
 		"description" : "Crawling Bomb (Burrows)",
 		"helptext" : "This fast-moving suicide unit is very good against massed units, particularly assault tanks. It features a cloaking device which is automatically activated once the unit stands still, effectifely turning it into a mine. Chain explodes terribly, so best not to mass it. Counter with defenders and missile trucks, or single cheap units to set off a premature detonation."
 	},
-	"spherecloaker" : {
+	"cloakjammer" : {
 		"name" : "Eraser",
 		"description" : "Area Cloaker/Jammer Walker",
 		"helptext" : "The Eraser has a jamming device to conceal your units' radar returns. It also has a small cloak shield to hide friendly nearby units from enemy sight."
@@ -649,7 +649,7 @@
 		"description" : "Ultimate Assault Strider",
 		"helptext" : "The Detriment is the single heaviest strider in the field. It can defend itself against air attacks or use its rockets to hit distant targets, but the real meat lies in the massive gauss guns designed for one purpose - to kill other heavy units quickly and efficiently. Remember - the wise commander sends his Detriment out with adequate escorts against light unit swarms and air assaults."
 	},
-	"geo" : {
+	"energygeo" : {
 		"name" : "Geothermal Generator",
 		"description" : "Medium Powerplant (+25)",
 		"helptext" : "Geothermal plants are highly efficient energy sources that can only be built on geovents on the map. They explode quite violently when destroyed, so avoid placing anything directly adjacent."
@@ -704,7 +704,7 @@
 		"description" : "Heavy Raider/Assault Gunship",
 		"helptext" : "The Black Dawn fires a volley of unguided rockets. It has high HP and a huge damage output, but is expensive and inaccurate, especially vs moving targets. It is best for taking on clumps of base structures, slow moving or stationary units. The Black Dawn should disengage between volleys to minimize damage taken."
 	},
-	"tawf114" : {
+	"tankriot" : {
 		"name" : "Banisher",
 		"description" : "Heavy Riot Support Tank",
 		"helptext" : "Remarkably mobile for a riot platform, the Banisher packs twin high-velocity fragmentation missiles that are devastating to light units and aircraft alike, although they have limited range. Like other riot units, the Banisher does not have the range and speed to hold its own against most skirmishers. The missile is quite effective at flattening terrain so it is particularly useful at knocking down walls that Welders cannot reach."
@@ -769,7 +769,7 @@
 		"description" : "Raider/Riot Jumper",
 		"helptext" : "The Pyro is a cheap, fast walker with a flamethrower. The flamethrower deals increased damage to large units and can hit multiple targets at the same time. When killed, the Pyro sets surrounding units on fire. Additionally, Pyros also come with jetpacks, allowing them to jump over obstacles or get the drop on enemies."
 	},
-	"funnelweb" : {
+	"striderfunnelweb" : {
 		"name" : "Funnelweb",
 		"description" : "Drone/Shield Support Strider",
 		"helptext" : "The slow all-terrain Funnelweb features an area shield and a powerful drone complement."
@@ -934,7 +934,7 @@
 		"description" : "Tachyon Projector - Requires 50 Power",
 		"helptext" : "Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter."
 	},
-	"firewalker" : {
+	"jumparty" : {
 		"name" : "Firewalker",
 		"description" : "Saturation Artillery Walker",
 		"helptext" : "The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver."
@@ -949,7 +949,7 @@
 		"description" : "Flying Spore Scout",
 		"helptext" : "A small flying chicken scout with spore."
 	},
-	"spherepole" : {
+	"cloakheavyraid" : {
 		"name" : "Scythe",
 		"description" : "Cloaked Raider Bot",
 		"helptext" : "The Scythe isn't particularly tough in a stand-up fight, but its cloaking device lets it slip past enemy defenses to stab at the enemy's economy. Damaged Scythes can quickly regenerate when out of combat."
@@ -1119,7 +1119,7 @@
 		"description" : "Heavy Riot Jumper - On to Repulse, Off to Attract",
 		"helptext" : "The Sumo's impressive armor makes it a near-unstoppable sphere of death. It stomps on enemy units to break up their formation and can toss the survivors around with its Gravity Beams. Its stomp is the only way it can damage buildings."
 	},
-	"puppy" : {
+	"jumpscout" : {
 		"name" : "Puppy",
 		"description" : "Walking Missile",
 		"helptext" : "This fast-moving suicide unit is good for raiding and sniping lightly-armored targets. When standing next to wreckages, it automatically draws metal from them to replicate itself, grey goo style."
@@ -1139,7 +1139,7 @@
 		"description" : "Heavy Anti-Air Jumper",
 		"helptext" : "The Archangel packs twin anti-air lasers and an autocannon for slaying enemy aircraft rapidly. It can also jump to quickly access high ground or to escape."
 	},
-	"panther" : {
+	"tankheavyraid" : {
 		"name" : "Panther",
 		"description" : "Lightning Assault/Raider Tank",
 		"helptext" : "The Panther is a high-tech raider. Its weapon, a lightning gun, deals mostly paralyze damage. This way, the Panther can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base. When killed, it sets off an EMP explosion that can stun surrounding raiders."
@@ -1174,12 +1174,12 @@
 		"description" : "Raider/Riot Jumper",
 		"helptext" : "The Pyro is a cheap, fast walker with a flamethrower. The flamethrower deals increased damage to large units and can hit multiple targets at the same time. When killed, the Pyro sets surrounding units on fire. Additionally, Pyros also come with jetpacks, allowing them to jump over obstacles or get the drop on enemies."
 	},
-	"trem" : {
+	"tankheavyarty" : {
 		"name" : "Tremor",
 		"description" : "Heavy Saturation Artillery Tank",
 		"helptext" : "The principle behind the Tremor is simple: flood an area with enough shots, and you'll hit something at least once. Slow, clumsy, vulnerable and extremely frightening, the Tremor works best against high-density target areas, where its saturation shots are most likely to do damage. It pulverizes shields in seconds and its shells smooth terrain."
 	},
-	"logkoda" : {
+	"tankraid" : {
 		"name" : "Kodachi",
 		"description" : "Raider Tank",
 		"helptext" : "The diminutive Kodachi is a unique raider. Its small yet agile chassis has enough armor and speed to get it close enough to fire its weapon, a napalm bomb. The Kodachi should run in, get a shot off, and withdraw before it takes significant damage. Damaged Kodachis regenerate out of combat."
@@ -1189,7 +1189,7 @@
 		"description" : "Cloaked Construction Bot, Builds at 5 m/s",
 		"helptext" : "The Conjurer packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance."
 	},
-	"heavyturret" : {
+	"turretsunlance" : {
 		"name" : "Sunlance",
 		"description" : "Anti-Tank Turret - Requires 25 Power",
 		"helptext" : "The Sunlance's heavy disruptor beam cripples even the heaviest assault unit and will stop any armored assault dead in its tracks."

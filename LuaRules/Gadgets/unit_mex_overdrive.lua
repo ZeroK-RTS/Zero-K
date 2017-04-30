@@ -113,7 +113,7 @@ local paybackDefs = { -- cost is how much to pay back
 	[UnitDefNames["energysolar"].id] = {cost = UnitDefNames["energysolar"].metalCost*PAYBACK_FACTOR},
 	[UnitDefNames["energyfusion"].id] = {cost = UnitDefNames["energyfusion"].metalCost*PAYBACK_FACTOR},
 	[UnitDefNames["energysingu"].id] = {cost = UnitDefNames["energysingu"].metalCost*PAYBACK_FACTOR},
-	[UnitDefNames["geo"].id] = {cost = UnitDefNames["geo"].metalCost*PAYBACK_FACTOR},
+	[UnitDefNames["energygeo"].id] = {cost = UnitDefNames["energygeo"].metalCost*PAYBACK_FACTOR},
 	[UnitDefNames["energyheavygeo"].id] = {cost = UnitDefNames["energyheavygeo"].metalCost*PAYBACK_FACTOR},
 }
 

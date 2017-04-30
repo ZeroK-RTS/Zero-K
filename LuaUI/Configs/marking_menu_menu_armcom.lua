@@ -15,7 +15,7 @@ local menu_armcom = {
       },
       {
         angle= 135,
-        unit = "geo",
+        unit = "energygeo",
       },
       --{
       --  angle = -45,
@@ -143,7 +143,7 @@ local menu_armcom = {
       },
       {
         angle = -135,
-        unit = "missiletower"
+        unit = "turretaaclose"
       },
       {
         angle = 90,
@@ -193,7 +193,7 @@ local menu_armcom = {
       },
       {
         angle = 90,
-        unit = "missilesilo"
+        unit = "staticmissilesilo"
       },
 	  {
         angle = 135,

@@ -13,13 +13,13 @@ unitDef = {
 
   buildoptions                  = {
     [[jumpcon]],
-    [[puppy]],
+    [[jumpscout]],
     [[jumpraid]],
 	[[jumpblackhole]],
-	[[slowmort]],
+	[[jumpskirm]],
     [[jumpassault]],
     [[jumpsumo]],
-	[[firewalker]],
+	[[jumparty]],
     [[jumpaa]],
 	[[jumpbomb]],
   },

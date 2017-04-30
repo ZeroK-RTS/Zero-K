@@ -119,7 +119,7 @@ local kamikaze = {
 	shieldbomb=1,
 	jumpbomb=1,
 	gunshipbomb=1,
-	puppy=1,
+	jumpscout=1,
 }
 
 local flamerWeaponDefs = {}

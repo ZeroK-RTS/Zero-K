@@ -1,6 +1,6 @@
 local raider = {
 	"cloakraid",
-	"spherepole",
+	"cloakheavyraid",
 	"corak",
 	"armflash",
 	"vehscout",
@@ -8,8 +8,8 @@ local raider = {
 	"amphraid",
 	
 	"jumpraid",
-	"panther",
-	"logkoda",
+	"tankheavyraid",
+	"tankraid",
 	
 	"armsh",
 	"hoverraid",
@@ -54,11 +54,11 @@ local skirm = {
 	"spiderskirm",
 	"cloaksnipe",
 	"cormort",
-	"slowmort",
+	"jumpskirm",
 	"cormortgold",
 	"hoverarty",
 	
-	"nsaclash",
+	"hoverskirm",
 	
 	"chickens",
 	"chicken_sporeshooter",
@@ -80,7 +80,7 @@ local riot = {
 	
 	"spideremp",
 	"tawf003",
-	"tawf114",
+	"tankriot",
 
 	"hoverriot",
 	
@@ -93,14 +93,14 @@ local riot = {
 local arty = {
 	"cloakarty",
 	"punisher",
-	"firewalker",
+	"jumparty",
 	"tawf013",
 	"veharty",
 	
 	"vehheavyarty",
 	--"hoverarty",
 	"tankarty",
-	"trem",
+	"tankheavyarty",
 	
 	"armshock",
 	"striderarty",
@@ -112,7 +112,7 @@ local arty = {
 }
 
 local counteredByAssaults = {
-	"puppy",
+	"jumpscout",
 	"vehsupport",
 }
 

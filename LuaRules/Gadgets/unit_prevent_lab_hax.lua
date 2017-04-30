@@ -45,7 +45,7 @@ local terraunitDefID = UnitDefNames["terraunit"].id
 
 local EXCEPTION_LIST = {
 	factorygunship = true,
-	missilesilo = true,
+	staticmissilesilo = true,
 	staticrearm = true,
 }
 

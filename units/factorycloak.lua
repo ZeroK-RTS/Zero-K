@@ -12,7 +12,7 @@ unitDef = {
   buildoptions                  = {
     [[cloakcon]],
     [[cloakraid]],
-    [[spherepole]],
+    [[cloakheavyraid]],
     [[cloakskirm]],
     [[armwar]],
     [[cloakassault]],
@@ -20,7 +20,7 @@ unitDef = {
     [[cloaksnipe]],
     [[cloakaa]],
     [[cloakbomb]],
-    [[spherecloaker]],
+    [[cloakjammer]],
   },
 
   buildPic                      = [[factorycloak.png]],

@@ -256,7 +256,7 @@ local sounds = {
 		},
 	},
 	
-	puppy = {
+	jumpscout = {
 		ok = {
 			[1] = "light_bot_move",
 		},
@@ -264,7 +264,7 @@ local sounds = {
 			[1] = "crawlie_select",
 		},
 	},
-	slowmort = {
+	jumpskirm = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -280,7 +280,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	firewalker = {
+	jumparty = {
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -364,7 +364,7 @@ local sounds = {
 			[1] = "light_bot_select",
 		},
 	},
-	spherepole = {
+	cloakheavyraid = {
 		ok = {
 			[1] = "spy_move",
 		},
@@ -513,7 +513,7 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
-	funnelweb = {
+	striderfunnelweb = {
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -647,7 +647,7 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
-	panther = {
+	tankheavyraid = {
 		ok = {
 			[1] = "light_tank_move2",
 		},
@@ -655,7 +655,7 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
-	logkoda = {
+	tankraid = {
 		ok = {
 			[1] = "light_tank_move2",
 		},
@@ -695,7 +695,7 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
-	trem = {
+	tankheavyarty = {
 		ok = {
 			[1] = "tank_move",
 		},
@@ -703,7 +703,7 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
-	tawf114 = {
+	tankriot = {
 		ok = {
 			[1] = "tank_move",
 		},
@@ -746,7 +746,7 @@ local sounds = {
 			[1] = "hovercraft_select",
 		},
 	},
-	nsaclash = {
+	hoverskirm = {
 		ok = {
 			[1] = "hovercraft_move",
 		},
@@ -912,7 +912,7 @@ local sounds = {
 			[1] = "gunship_select",
 		},
 	},
-	gunshipsupport = {
+	gunshipskirm = {
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -1118,7 +1118,7 @@ local sounds = {
 			[1] = "adv_fusion_select",
 		},
 	},
-	geo = {
+	energygeo = {
 		select = {
 			[1] = "geo_select",
 		},
@@ -1266,7 +1266,7 @@ local sounds = {
 			[1] = "cloaker_select",
 		},
 	},
-	spherecloaker = {
+	cloakjammer = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -1398,7 +1398,7 @@ local sounds = {
 			[1] = "light_turret_select",
 		},
 	},
-	missiletower = {
+	turretaaclose = {
 		ok = {
 			[1] = "turret_move",
 		},
@@ -1440,7 +1440,7 @@ local sounds = {
 	},
 	
 	-- Silo etc
-	missilesilo = {
+	staticmissilesilo = {
 		build = "builder_start",
 		select = {
 			[1] = "silo_select",

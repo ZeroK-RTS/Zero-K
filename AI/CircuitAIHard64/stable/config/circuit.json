@@ -25,7 +25,7 @@
 		"income_tier": [20, 30, 60],
 
 		//             conjurer,   glaive,  scythe,       rocko,     warrior,  zeus,      hammer,   sniper,     tick,      eraser,          gremlin
-		"unit":      ["cloakcon", "cloakraid", "spherepole", "cloakskirm", "armwar", "cloakassault", "cloakarty", "cloaksnipe", "cloakbomb", "spherecloaker", "cloakaa"],
+		"unit":      ["cloakcon", "cloakraid", "cloakheavyraid", "cloakskirm", "armwar", "cloakassault", "cloakarty", "cloaksnipe", "cloakbomb", "cloakjammer", "cloakaa"],
 
 		"land": {
 			// 0-8m Opening - Glaives & Warriors most important for scouting, map control and defence.
@@ -62,7 +62,7 @@
 
 		"income_tier": [7, 16, 24, 32, 40, 56, 72],
 		//             wasp,         gunshipbomb,   gnat,     banshee,  rapier,           brawler,    gunshipassault,   krow,     valkyrie,  vindicator,  trident
-		"unit":      ["gunshipcon", "gunshipbomb", "gunshipemp", "gunshipraid", "gunshipsupport", "gunshipheavyskirm", "gunshipassault", "gunshipkrow", "gunshiptrans", "gunshipheavytrans", "gunshipaa"],
+		"unit":      ["gunshipcon", "gunshipbomb", "gunshipemp", "gunshipraid", "gunshipskirm", "gunshipheavyskirm", "gunshipassault", "gunshipkrow", "gunshiptrans", "gunshipheavytrans", "gunshipaa"],
 		"land": {
 			// 0-8m Opening - gunshipbomb and banshee Harass
 			"tier0": [ 0.00,         0.17,        0.00,     0.10,     0.71,             0.00,       0.02,        0.00,     0.00,      0.00,        0.00],
@@ -178,7 +178,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             quill,   dagger,  scalpel,    halberd,        claymore,           mace,        penetrator, flail
-		"unit":      ["hovercon", "hoverraid", "nsaclash", "hoverassault", "hoverdepthcharge", "hoverriot", "hoverarty", "hoveraa"],
+		"unit":      ["hovercon", "hoverraid", "hoverskirm", "hoverassault", "hoverdepthcharge", "hoverriot", "hoverarty", "hoveraa"],
 		"land": {
 			// 0-8m Opening - Raiders and Riots
 			"tier0": [ 0.00,    0.65,    0.00,       0.00,           0.00,               0.35,        0.00,       0.00],
@@ -235,7 +235,8 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             welder,   kodachi,   panther,   banisher,  reaper,    goliath,  pillager,  tremor, copperhead
-		"unit":      ["tankcon", "logkoda", "panther", "tawf114", "tankassault", "tankheavyassault", "tankarty", "trem", "tankaa"],
+		"unit":      ["coracv", "logkoda", "panther", "tawf114", "correap", "corgol", "cormart", "tankheavyarty", "corsent"],
+		"unit":      ["tankcon", "tankraid", "tankheavyraid", "tankriot", "tankassault", "tankheavyassault", "tankarty", "tankheavyarty", "tankaa"],
 		"land": {
 			// 0-8m Opening - Koda and Banisher
 			"tier0": [ 0.00,     0.50,      0.00,      0.10,      0.40,      0.00,     0.00,      0.00,   0.00],
@@ -264,7 +265,7 @@
 
 		"income_tier": [40],
 		//             freaker,   puppy,   pyro,      placeholder,     moderator,  jack,     sumo,      firewalker,   skuttle,   archangel
-		"unit":      ["jumpcon", "puppy", "jumpraid", "jumpblackhole", "slowmort", "jumpassault", "jumpsumo", "firewalker", "jumpbomb", "jumpaa"],
+		"unit":      ["jumpcon", "jumpscout", "jumpraid", "jumpblackhole", "jumpskirm", "jumpassault", "jumpsumo", "jumparty", "jumpbomb", "jumpaa"],
 		"land": {
 			"tier0": [ 0.10,      0.20,    0.35,      0.05,            0.20,       0.10,     0.00,      0.00,         0.00,      0.00],
 			"tier1": [ 0.10,      0.00,    0.30,      0.05,            0.25,       0.15,     0.03,      0.12,         0.00,      0.00]
@@ -313,7 +314,7 @@
 
 		"income_tier": [60, 80, 100],
 		//             ultimatum,    striderscorpion,   striderdante,   catapult,   funnelweb,   striderbantha,     striderdetriment, scylla,          reef,          battleship
-		"unit":      ["striderantiheavy", "striderscorpion", "striderdante", "striderarty", "funnelweb", "striderbantha", "striderdetriment", "subtacmissile", "shipcarrier", "shipheavyarty"],
+		"unit":      ["striderantiheavy", "striderscorpion", "striderdante", "striderarty", "striderfunnelweb", "striderbantha", "striderdetriment", "subtacmissile", "shipcarrier", "shipheavyarty"],
 		"land": {
 			"tier0": [ 0.01,         0.10,       0.81,    0.00,       0.05,        0.03,       0.00,      0.00,            0.00,          0.00],
 			"tier1": [ 0.03,         0.14,       0.22,    0.24,       0.20,        0.16,       0.01,      0.00,            0.00,          0.00],
@@ -406,7 +407,7 @@
 		"pwr_mod": 2.0,
 		"thr_mod": 2.0
 	},
-	"spherepole": {
+	"cloakheavyraid": {
 		"role": ["raider", "mine"],
 		"limit": 8,
 		"retreat": 0.2
@@ -445,7 +446,7 @@
 		"role": ["mine"],
 		"retreat": 0.01
 	},
-	"spherecloaker": {
+	"cloakjammer": {
 		"role": ["support"],
 		"limit": 2
 	},
@@ -472,7 +473,7 @@
 		"role": ["air", "air"],
 		"retreat": 0.9
 	},
-	"gunshipsupport": {
+	"gunshipskirm": {
 		"role": ["air"],
 		"retreat": 0.75,
 		"pwr_mod": 1.7,
@@ -742,7 +743,7 @@
 	"jumpcon": {
 		"role": ["builder"]
 	},
-	"puppy": {
+	"jumpscout": {
 		"role": ["riot"],
 		"limit": 15,
 		"attribute": ["scout", "support"],
@@ -758,7 +759,7 @@
 	"jumpblackhole": {
 		"role": ["support"]
 	},
-	"slowmort": {
+	"jumpskirm": {
 		"role": ["skirmish"],
 		"attribute": ["support"]
 	},
@@ -774,7 +775,7 @@
 		"limit": 1,
 		"attribute": ["melee", "no_jump"]  // jump on attack
 	},
-	"firewalker": {
+	"jumparty": {
 		"role": ["artillery"],
 		"attribute": ["siege"],
 		"retreat": 0.99
@@ -805,7 +806,7 @@
 		"limit": 6,
 		"retreat": 0.8
 	},
-	"nsaclash": {
+	"hoverskirm": {
 		"role": ["assault"],
 		"retreat": 0.6,
 		"pwr_mod": 4.0,
@@ -903,18 +904,18 @@
 	"tankcon": {
 		"role": ["builder"]
 	},
-	"logkoda": {
+	"tankraid": {
 		"role": ["skirmish"],
 		"attribute": ["scout"],
 		"limit": 2,
 		"retreat": 0.9
 	},
-	"panther": {
+	"tankheavyraid": {
 		"role": ["raider", "assault"],
 		"limit": 3,
 		"retreat": 0.75
 	},
-	"tawf114": {
+	"tankriot": {
 		"role": ["riot"],
 		"attribute": ["support"],
 		"limit": 1,
@@ -938,7 +939,7 @@
 		"retreat": 0.99,
 		"thr_mod": 0.1
 	},
-	"trem": {
+	"tankheavyarty": {
 		"role": ["artillery", "support", "super"],
 		"attribute": ["super"],
 		"limit": 1,
@@ -1008,7 +1009,7 @@
 		"fire_state": "return",
 		"retreat": 0.9
 	},
-	"funnelweb": {
+	"striderfunnelweb": {
 		"role": ["heavy", "support", "air"],
 		"attribute": ["support"],
 		"retreat": 0.75,
@@ -1047,7 +1048,7 @@
 		"limit": 1,
 		"thr_mod": 0.01
 	},
-	"missilesilo": {
+	"staticmissilesilo": {
 		"role": ["static", "support", "heavy"],
 		"thr_mod": 0.01
 	},
@@ -1123,7 +1124,7 @@
 		"role": ["anti_air"],
 		"thr_mod": 2.0
 	},
-	"missiletower": {
+	"turretaaclose": {
 		"role": ["anti_air"],
 		"thr_mod": 2.0
 	},
@@ -1383,7 +1384,7 @@
 	//   P2 = energysolar: (70/2; random(10..15)) = (35, 13)
 	// P(x) => y = 0.079550*x*x - 3.501790*x + 38.113789
 	// Then parabola P(x) defines limit for
-	//   "geo": x=500/25=20, y = P(20) = 31.82 - 70.0358 + 38.113789 ~= 0
+	//   "energygeo": x=500/25=20, y = P(20) = 31.82 - 70.0358 + 38.113789 ~= 0
 	//   "energywind": x=35/1.2=29.17, y = P(29.17) ~= 4
 	//
 	// Metal income condition for energy structure is: income > sqrt(structure_cost*0.4).
@@ -2089,7 +2090,7 @@
 		"superweapon": ["raveparty", "staticnuke", "staticheavyarty", "zenith", "screamer"],
 		"protector": ["staticantinuke"],
 //		"terraform": ["terraunit"],
-		"strider": ["striderantiheavy", "striderscorpion", "striderdante", "striderarty", "funnelweb", "striderbantha", "striderdetriment", "subtacmissile", "shipcarrier", "shipheavyarty"]
+		"strider": ["striderantiheavy", "striderscorpion", "striderdante", "striderarty", "striderfunnelweb", "striderbantha", "striderdetriment", "subtacmissile", "shipcarrier", "shipheavyarty"]
 	}
 }
 },

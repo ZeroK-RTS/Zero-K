@@ -16,7 +16,7 @@ unitDef = {
     [[gunshipbomb]],
     [[gunshipemp]],
     [[gunshipraid]],
-    [[gunshipsupport]],
+    [[gunshipskirm]],
     [[gunshipheavyskirm]],
     [[gunshipassault]],
     [[gunshipkrow]],

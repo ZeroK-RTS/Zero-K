@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[spherepole]],
+  unitname               = [[cloakheavyraid]],
   name                   = [[Scythe]],
   description            = [[Cloaked Raider Bot]],
   acceleration           = 0.5,
   brakeRate              = 0.3,
   buildCostMetal         = 250,
-  buildPic               = [[spherepole.png]],
+  buildPic               = [[cloakheavyraid.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -42,7 +42,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherepole.s3o]],
-  script				 = [[spherepole.lua]],
+  script				 = [[cloakheavyraid.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {
@@ -145,4 +145,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ spherepole = unitDef })
+return lowerkeys({ cloakheavyraid = unitDef })

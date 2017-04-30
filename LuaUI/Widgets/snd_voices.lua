@@ -96,7 +96,7 @@ local energy = {     --FIXME not used, see line 443 in widget:UnitDestroyed
   "energysingu", 
   "armtide", 
   "energywind",
-  "geo",
+  "energygeo",
 }
 local commanders = {}
 
@@ -111,7 +111,7 @@ local heavies = { --not used yet
 local aa = {
 	"turretmissile", --defender
 	"turretaalaser", --razor kiss
-	"missiletower",--hacksaw
+	"turretaaclose",--hacksaw
 	"turretaaflak",
 	"turretaafar", --chainsaw
 	"screamer",

@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[funnelweb]],
+  unitname               = [[striderfunnelweb]],
   name                   = [[Funnelweb]],
   description            = [[Drone/Shield Support Strider]],
   acceleration           = 0.0552,
   activateWhenBuilt      = true,
   brakeRate              = 0.1375,
   buildCostMetal         = 4500,
-  buildPic               = [[funnelweb.png]],
+  buildPic               = [[striderfunnelweb.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -45,7 +45,7 @@ unitDef = {
     },
 
   },
-  script                 = [[funnelweb.lua]],
+  script                 = [[striderfunnelweb.lua]],
   sightDistance          = 650,
   trackOffset            = 0,
   trackStrength          = 8,
@@ -144,4 +144,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ funnelweb = unitDef })
+return lowerkeys({ striderfunnelweb = unitDef })

@@ -23,7 +23,7 @@ unitDef = {
     helptext_de    = [[Störsender wie diese behindern das feindliche Radar, verschleiern, die von deinen Einheiten ausgelösten, Radarechos. Sneaky Pete bietet außerdem noch ein Deckmantel, um Einheiten in der Nähe vor dem Gegner zu verstecken.]],
 	removewait     = 1,
 
-    morphto = [[spherecloaker]],
+    morphto = [[cloakjammer]],
     morphtime = 30,
 
     area_cloak = 1,

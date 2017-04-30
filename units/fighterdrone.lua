@@ -1,10 +1,10 @@
 unitDef = {
-  unitname               = [[fighterdrone]],
+  unitname               = [[dronefighter]],
   name                   = [[Spicula]],
   description            = [[Fighter Drone]],
   brakerate              = 0.4,
   buildCostMetal         = 100,
-  buildPic               = [[fighterdrone.png]],
+  buildPic               = [[dronefighter.png]],
   canBeAssisted          = false,
   canFly                 = true,
   canGuard               = true,
@@ -52,7 +52,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[fighterdrone.dae]],
-  script                 = [[fighterdrone.lua]],
+  script                 = [[dronefighter.lua]],
   selfDestructAs         = [[GUNSHIPEX]],
 
   sfxtypes               = {
@@ -117,4 +117,4 @@ unitDef = {
   },
 }
 
-return lowerkeys({ fighterdrone = unitDef })
+return lowerkeys({ dronefighter = unitDef })

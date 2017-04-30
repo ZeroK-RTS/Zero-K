@@ -233,7 +233,7 @@ unitConfigs = {
   [UnitDefNames.hoverdepthcharge.id] = {
     unfold = true,
   },
-  [UnitDefNames.spherecloaker.id] = {
+  [UnitDefNames.cloakjammer.id] = {
     unfold = true,
     wait   = 100,
   },
