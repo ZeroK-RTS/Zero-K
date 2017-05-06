@@ -223,6 +223,7 @@ local function LoadUnits()
 		-- can occur with explicitly set IDs.
 		local newID = spCreateUnit(data.unitDefName, px, py, pz, FacingFromHeading(data.heading), data.unitTeam, isNanoFrame, false)
 		if newID then
+			Spring.SetUnitRulesParam(newID, "saveload_oldID", oldID)
 			data.newID = newID
 			-- position and velocity
 			spSetUnitVelocity(newID, unpack(data.vel))
