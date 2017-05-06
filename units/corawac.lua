@@ -6,7 +6,6 @@ unitDef = {
   buildCostMetal      = 340,
   builder             = false,
   buildPic            = [[CORAWAC.png]],
-  canAttack           = false,
   canFly              = true,
   canGuard            = true,
   canMove             = true,

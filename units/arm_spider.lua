@@ -13,11 +13,9 @@ unitDef = {
   },
 
   buildPic               = [[arm_spider.png]],
-  canAttack              = false,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   category               = [[LAND UNARMED]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[30 30 30]],

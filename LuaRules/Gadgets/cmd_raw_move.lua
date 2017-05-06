@@ -20,22 +20,51 @@ if gadgetHandler:IsSyncedCode() then
 local spGetUnitPosition = Spring.GetUnitPosition
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 
+local CMD_STOP   = CMD.STOP
+local CMD_INSERT = CMD.INSERT
+
+local stopCommand = {
+	[CMD.GUARD] = true,
+	[CMD.REPAIR] = true,
+	[CMD.RECLAIM] = true,
+	[CMD.RESURRECT] = true,
+	[CMD_JUMP] = true,
+	[CMD.PATROL] = true,
+	[CMD.FIGHT] = true,
+	[CMD.MOVE] = true,
+}
+
 local canMoveDefs = {}
 local canFlyDefs = {}
 local stopDist = {}
 local goalDist = {}
-local turnRadiusSq = {}
+local turnDiameterSq = {}
+local turnPeriods = {}
 local stopDistSq = {}
 local stoppingRadiusIncrease = {}
+local stuckTravelOverride = {}
+local startMovingTime = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if ud.canMove then
 		canMoveDefs[i] = true
 		stopDist[i] = 16
-		local turningRadius = ud.speed*2195/(ud.turnRate * 2 * math.pi)
-		if turningRadius > 40 then
-			turnRadiusSq[i] = turningRadius*turningRadius
+		local turningDiameter = 2*(ud.speed*2195/(ud.turnRate * 2 * math.pi))
+		if turningDiameter > 20 then
+			turnDiameterSq[i] = turningDiameter*turningDiameter
+		end
+		if ud.turnRate > 150 then
+			turnPeriods[i] = math.ceil(1100/ud.turnRate)
+		else
+			turnPeriods[i] = 8
+		end
+		if (ud.moveDef.maxSlope or 0) > 0.8 and ud.speed < 60 then
+			-- Slow spiders need a lot of leeway when climing cliffs.
+			stuckTravelOverride[i] = 5
+			startMovingTime[i] = 12 -- May take longer to start moving
+			-- Lower stopping distance for more precise placement on terrain
+			stopDist[i] = 4
 		end
 		if ud.canFly then
 			canFlyDefs[i] = true
@@ -72,8 +101,9 @@ local moveRawCmdDesc = {
 	tooltip = 'Move: Order the unit to move to a position.',
 }
 
-local TEST_MOVE_DISTANCE = 16
-local LAZY_SEARCH_DISTANCE = 600
+local TEST_MOVE_SPACING = 16
+local LAZY_TEST_MOVE_SPACING = 8
+local LAZY_SEARCH_DISTANCE = 450
 local STUCK_TRAVEL = 45
 local STUCK_MOVE_RANGE = 140
 local GIVE_UP_STUCK_DIST_SQ = 250^2
@@ -94,18 +124,18 @@ local oldCommandStoppingRadius = {}
 ----------------------------------------------------------------------------------------------
 -- Utilities
 
-local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distance, distanceLimit)
+local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distance, testSpacing, distanceLimit)
 	local vX = gX - sX
 	local vZ = gZ - sZ
 	-- distance had better be math.sqrt(vX*vX + vZ*vZ) or things will break
-	if distance < TEST_MOVE_DISTANCE then
+	if distance < testSpacing then
 		return true
 	end
 	vX, vZ = vX/distance, vZ/distance
 	if distanceLimit and (distance > distanceLimit) then
 		distance = distanceLimit
 	end
-	for test = 0, distance, TEST_MOVE_DISTANCE do
+	for test = 0, distance, testSpacing do
 		if not Spring.TestMoveOrder(unitDefID, sX + test*vX, 0, sZ + test*vZ) then
 			return false
 		end
@@ -123,11 +153,24 @@ local function ResetUnitData(unitData)
 	unitData.handlingWaitTime = nil
 	unitData.nextRawCheckDistSq = nil
 	unitData.doingRawMove = nil
+	unitData.possiblyTurning = nil
 end
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 -- Unit and command handling
+
+local function StopRawMoveUnit(unitID)
+	if not rawMoveUnit[unitID] then
+		return
+	end
+	if not rawMoveUnit[unitID].switchedFromRaw then
+		local x, y, z = spGetUnitPosition(unitID)
+		Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
+	end
+	rawMoveUnit[unitID] = nil
+	--Spring.Echo("StopRawMoveUnit", math.random())
+end
 
 function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions) -- Only calls for custom commands
 	if (cmdID ~= CMD_RAW_MOVE) then
@@ -188,17 +231,17 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return true, false
 	end
 	
-	
 	if not unitData.stuckCheckTimer then
 		unitData.ux, unitData.uz = x, z
-		unitData.stuckCheckTimer = math.floor(math.random()*10) + 6
+		unitData.stuckCheckTimer = math.floor(math.random()*10) + (startMovingTime[unitDefID] or 6)
 	end
 	unitData.stuckCheckTimer = unitData.stuckCheckTimer - 1
+	
 	if unitData.stuckCheckTimer <= 0 then
 		local oldX, oldZ = unitData.ux, unitData.uz
 		local travelled = math.abs(oldX - x) + math.abs(oldZ - z)
 		unitData.ux, unitData.uz = x, z
-		if travelled < STUCK_TRAVEL then
+		if travelled < (stuckTravelOverride[unitDefID] or STUCK_TRAVEL) then
 			unitData.stuckCheckTimer = math.floor(math.random()*2) + 1
 			if distSq < GIVE_UP_STUCK_DIST_SQ then
 				Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
@@ -233,21 +276,28 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if unitData.nextTestTime <= 0 then
 		local lazy = unitData.doingRawMove
 		local freePath
-		if (turnRadiusSq[unitDefID] or 0) > distSq then
+		if (turnDiameterSq[unitDefID] or 0) > distSq then
 			freePath = false
 		else
 			local distance = math.sqrt(distSq)
-			freePath = IsPathFree(unitDefID, x, z, cmdParams[1], cmdParams[3], distance, lazy and LAZY_SEARCH_DISTANCE)
+			freePath = IsPathFree(unitDefID, x, z, cmdParams[1], cmdParams[3], distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE)
 			if (not freePath) then
 				unitData.nextRawCheckDistSq = (distance - RAW_CHECK_SPACING)*(distance - RAW_CHECK_SPACING)
 			end
 		end
 		if (not unitData.commandHandled) or unitData.doingRawMove ~= freePath then
 			Spring.SetUnitMoveGoal(unitID, cmdParams[1], cmdParams[2], cmdParams[3], goalDist[unitDefID] or 16, nil, freePath)
+			unitData.nextTestTime = math.floor(math.random()*2) + turnPeriods[unitDefID]
+			unitData.possiblyTurning = true
+		elseif unitData.possiblyTurning then
+			unitData.nextTestTime = math.floor(math.random()*2) + turnPeriods[unitDefID]
+			unitData.possiblyTurning = false
+		else
+			unitData.nextTestTime = math.floor(math.random()*5) + 6
 		end
+		
 		unitData.doingRawMove = freePath
 		unitData.switchedFromRaw = not freePath
-		unitData.nextTestTime = math.floor(math.random()*12) + 16
 	end
 	
 	if not unitData.commandHandled then
@@ -256,21 +306,27 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	return true, false
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
-	return {[CMD.STOP] = true}
-end
-
-function gadget:AllowCommand_GetWantedUnitDefID()	
-	return true
+function gadget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)
+	if cmdID == CMD_STOP then
+		-- Handling for shift clicking on commands to remove.
+		StopRawMoveUnit(unitID)
+	end
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if cmdID == CMD.STOP and rawMoveUnit[unitID] then
-		if not rawMoveUnit[unitID].switchedFromRaw then
-			local x, y, z = spGetUnitPosition(unitID)
-			Spring.SetUnitMoveGoal(unitID, x, y, z, stopDist[unitDefID] or 16)
+	if canMoveDefs[unitDefID] then
+		if cmdID == CMD_STOP or ((not cmdOptions.shift) and (cmdID < 0 or stopCommand[cmdID])) then
+			StopRawMoveUnit(unitID)
+		elseif cmdID == CMD_INSERT and (cmdParams[1] == 0 or not cmdOptions.alt) then
+			StopRawMoveUnit(unitID)
 		end
-		rawMoveUnit[unitID] = nil
+	else
+		if cmdID == CMD_INSERT then
+			cmdID = cmdParams[2]
+		end
+		if cmdID == CMD_RAW_MOVE then
+			return false
+		end
 	end
 	return true
 end

@@ -9,7 +9,6 @@ unitDef = {
   buildCostMetal      = 100,
   builder             = false,
   buildPic            = [[shiptorpraider.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

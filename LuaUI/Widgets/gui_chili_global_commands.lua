@@ -5,7 +5,7 @@ function widget:GetInfo()
 		author    = "GoogleFrog",
 		date      = "16 November 2016",
 		license   = "GNU GPL, v2 or later",
-		layer     = 0,
+		layer     = -11,
 		enabled   = false,
 	}
 end
@@ -18,7 +18,6 @@ local BUTTON_PLACE_SPACE = 27
 
 local contentHolder
 local commandButtonOffset
-local preInitCommands = {}
 
 -- Chili classes
 local Chili
@@ -49,52 +48,48 @@ local globalCommands = {
 	
 }
 
+local teamcolor_selector, mapOverlay
+
+local buttons = {}
+local strings = {
+	toggle_eco_display = {"", ""},
+	place_retreat_zone = {"", ""},
+	place_ferry_route = {"", ""},
+	viewstandard = {"", ""},
+	viewheightmap = {"", ""},
+	viewblockmap = {"", ""},
+	viewfow = {"", ""},
+	clearmapmarks = {"", ""},
+	lastmsgpos = {"", ""},
+}
+
 options_path = 'Settings/HUD Panels/Global Commands'
 options = {
 	background_opacity = {
-		name = "Opacity",
 		type = "number",
 		value = 1, min = 0, max = 1, step = 0.01,
 	},
 	clearmapmarks = {
-		name = 'Erase Map Drawing',
-		desc = 'Erases all map drawing and markers (for you, not for others on your team).',
 		type = 'button',
 		action = 'clearmapmarks',
 	},	
 	lastmsgpos = {
-		name = 'Zoom To Last Message',
-		desc = 'Moves the camera to the most recently placed map marker or message.',
 		type = 'button',
 		action = 'lastmsgpos',
 	},
 	viewstandard = {
-		name = 'Clear Overlays',
-		desc = 'Disables Heightmap, Pathing and Line of Sight overlays.',
 		type = 'button',
 		action = 'showstandard',
 	},
 	viewheightmap = {
-		name = 'Toggle Height Map',
-		desc = 'Shows contours of terrain elevation.',
 		type = 'button',
 		action = 'showelevation',
 	},
 	viewblockmap = {
-		name = 'Toggle Pathing Map',
-		desc = 'Select a unit to see where it can go. Select a building blueprint to see where it can be placed.',
 		type = 'button',
 		action = 'showpathtraversability',
 	},
 	viewfow = {
-		name = 'Toggle Line of Sight',
-		desc = 'Shows sight distance and radar coverage.',
-		type = 'button',
-		action = 'togglelos',
-	},
-	viewfow = {
-		name = 'Toggle Line of Sight',
-		desc = 'Shows sight distance and radar coverage.',
 		type = 'button',
 		action = 'togglelos',
 	},
@@ -147,10 +142,60 @@ options = {
 			end
 			contentHolder:Invalidate()
 		end,
-		advanced = true,
+		hidden = true,
 		noHotkey = true,
 	},
 }
+
+local function languageChanged ()
+	for k, str in pairs(strings) do
+		str[1] = WG.Translate ("interface", k .. "_name")
+		str[2] = WG.Translate ("interface", k .. "_desc")
+	end
+
+	options.background_opacity.name = WG.Translate ("interface", "opacity")
+
+	local bulk_translate_options = {"viewstandard", "viewheightmap", "viewfow", "viewblockmap", "clearmapmarks", "lastmsgpos"}
+	for i = 1, #bulk_translate_options do
+		local opt = bulk_translate_options[i]
+		options[opt].name = strings[opt][1]
+		options[opt].desc = strings[opt][2]
+	end
+
+	teamcolor_selector.tooltip = WG.Translate("interface", "teamcolor_selector")
+	teamcolor_selector:Invalidate()
+	mapOverlay.UpdateTooltip(WG.Translate("interface", "overlay_selector"))
+
+	for k, button in pairs(buttons) do
+
+		local name, desc
+		local option = button.crude_option
+		local hotkey = ''
+		if option then
+			name = options[option].name
+			desc = options[option].desc
+			local action = WG.crude.GetActionName(options_path, options[option])
+			if action then
+				hotkey = WG.crude.GetHotkey(action)
+				if hotkey ~= '' then
+					hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
+				end
+			end
+		else
+			local str = strings[k]
+			name = str[1]
+			desc = str[2]
+		end
+
+		if desc then
+			desc = "\n\n" .. desc
+		else
+			desc = ''
+		end
+		button.tooltip = name .. hotkey .. desc
+		button:Invalidate()
+	end
+end
 
 local commandButtonMouseDown = { 
 	function(self)
@@ -180,22 +225,14 @@ local function MakeCommandButton(parent, position, file, params, vertical, onCli
 	local option = params.option
 	local name, desc, action, hotkey, command
 	if option then
-		name = options[option].name
-		desc = options[option].desc and (' (' .. options[option].desc .. ')') or ''
 		action = WG.crude.GetActionName(options_path, options[option])
 	end
-	name = name or params.name or ""
-	desc = desc or params.desc or ""
+	name = params.name or ""
+	desc = params.desc or ""
 	action = action or params.action
-	if action then
-		hotkey = WG.crude.GetHotkey(action)
-		if hotkey ~= '' then
-			hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
-		end
-	end
 	command = params.command
 	
-	Chili.Button:New{
+	local btn = Chili.Button:New{
 		x = (vertical and 0) or ((position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y),
 		y = (vertical and ((position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y)) or BUTTON_Y,
 		width = BUTTON_SIZE, 
@@ -204,8 +241,9 @@ local function MakeCommandButton(parent, position, file, params, vertical, onCli
 		caption = "",
 		margin = {0,0,0,0},
 		padding = {2,2,2,2},
-		tooltip = (name .. desc .. (hotkey or "")), 
+		tooltip = name .. desc,
 		parent = parent,
+		crude_option = option,
 		OnMouseDown = (command and commandButtonMouseDown) or globalMouseDown,
 		OnClick = {
 			function(self)
@@ -233,6 +271,7 @@ local function MakeCommandButton(parent, position, file, params, vertical, onCli
 			} or nil
 		},
 	}
+	return btn
 end
 
 local function MakeDropdownButtonsFromWidget(parent, position, tooltip, width, titleImage, widgetName, widgetPath, settingName)
@@ -288,6 +327,8 @@ local function MakeDropdownButtonsFromWidget(parent, position, tooltip, width, t
 		parent = overlaySelector,
 		file = titleImage,
 	}
+
+	return overlaySelector
 end
 
 local function MakeDropdownButtons(parent, position, overlays)
@@ -309,7 +350,7 @@ local function MakeDropdownButtons(parent, position, overlays)
 	
 	local overlayImageMap = {}
 	for i = 1, #overlays do
-		MakeCommandButton(overlayPanel, i, overlays[i][1], {option = overlays[i][2]}, true, HideSelector)
+		buttons["overlay_" .. overlays[i][2]] = MakeCommandButton(overlayPanel, i, overlays[i][1], {option = overlays[i][2]}, true, HideSelector)
 		
 		overlayImageMap[overlays[i][3]] = overlays[i][1]
 	end
@@ -323,7 +364,7 @@ local function MakeDropdownButtons(parent, position, overlays)
 		caption = "",
 		margin = {0,0,0,0},
 		padding = {2,2,2,2},
-		tooltip = "Set map overlay", 
+		tooltip = "", 
 		parent = parent,
 		OnMouseDown = globalMouseDown,
 		OnClick = {
@@ -354,13 +395,19 @@ local function MakeDropdownButtons(parent, position, overlays)
 		currentOverlayImage.file = overlayImageMap[newDrawMode]
 		currentOverlayImage:Invalidate()
 	end
+
+	function externalFunctions.UpdateTooltip(newTooltip)
+		overlaySelector.tooltip = newTooltip
+		overlaySelector:Invalidate()
+	end
 	
 	return externalFunctions
 end
 
 local function AddCommand(imageFile, tooltip, onClick)
-	MakeCommandButton(contentHolder, commandButtonOffset, imageFile, {desc = tooltip}, nil, onClick)
+	local button = MakeCommandButton(contentHolder, commandButtonOffset, imageFile, {desc = tooltip}, nil, onClick)
 	commandButtonOffset = commandButtonOffset + 1
+	return button
 end
 
 local function InitializeControls()
@@ -410,22 +457,22 @@ local function InitializeControls()
 	offset = offset + 1
 	
 	-- handled differently because command is registered in another widget
-	MakeCommandButton(contentHolder, offset,
+	buttons.toggle_eco_display = MakeCommandButton(contentHolder, offset,
 		'LuaUI/images/map/metalmap.png', 
-		{name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}
+		{action = 'showeco'}
 	)
 	offset = offset + 1
 	
-	MakeDropdownButtonsFromWidget(contentHolder, offset, "Select team colour mode. Options include simple mode and colorblind mode.", 180, 'LuaUI/images/map/minimap_colors_simple.png', "Local Team Colors", "Settings/Interface/Team Colors", "colorSetting")
+	teamcolor_selector = MakeDropdownButtonsFromWidget(contentHolder, offset, "", 180, 'LuaUI/images/map/minimap_colors_simple.png', "Local Team Colors", "Settings/Interface/Team Colors", "colorSetting")
 	offset = offset + 1
 	
-	MakeCommandButton(contentHolder, offset,
+	buttons.clearmapmarks = MakeCommandButton(contentHolder, offset,
 		'LuaUI/images/drawingcursors/eraser.png', 
 		{option = 'clearmapmarks'} 
 	)
 	offset = offset + 1
 	
-	MakeCommandButton(contentHolder, offset,
+	buttons.lastmsgpos = MakeCommandButton(contentHolder, offset,
 		'LuaUI/images/Crystal_Clear_action_flag.png', 
 		{option = 'lastmsgpos'} 
 	)
@@ -434,24 +481,19 @@ local function InitializeControls()
 	-- Global commands
 	offset = offset + 0.5
 	
-	MakeCommandButton(contentHolder, offset,
+	buttons.place_retreat_zone = MakeCommandButton(contentHolder, offset,
 		'LuaUI/images/commands/Bold/retreat.png', 
-		{name = "Place Retreat Zone", action = 'sethaven', command = CMD_RETREAT_ZONE, desc = " (Shift to place multiple zones, overlap to remove)"}
+		{action = 'sethaven', command = CMD_RETREAT_ZONE}
 	)
 	offset = offset + 1
 	
-	MakeCommandButton(contentHolder, offset,
+	buttons.place_ferry_route = MakeCommandButton(contentHolder, offset,
 		'LuaUI/images/commands/Bold/ferry.png', 
-		{name = "Place Ferry Route", action = 'setferry', command = CMD_SET_FERRY, desc = " (Shift to queue and edit waypoints, overlap the start to remove)"}
+		{action = 'setferry', command = CMD_SET_FERRY}
 	)
 	offset = offset + 1
 	
 	commandButtonOffset = offset + 0.5
-	
-	for i = 1, #preInitCommands do
-		AddCommand(preInitCommands[i][1], preInitCommands[i][2], preInitCommands[i][3])
-	end
-	preInitCommands = nil
 end
 
 function options.background_opacity.OnChange(self)
@@ -466,21 +508,8 @@ end
 local GlobalCommandBar = {}
 
 function GlobalCommandBar.AddCommand(imageFile, tooltip, onClick)
-	if preInitCommands then
-		preInitCommands[#preInitCommands + 1] = {
-			imageFile, 
-			tooltip, 
-			onClick
-		}
-		return
-	end
-	AddCommand(imageFile, tooltip, onClick)
+	return AddCommand(imageFile, tooltip, onClick)
 end
-
-
--- Scary stuff here, registering the command before widget is initialized.
--- It is allowed as long as GlobalCommandBar remembers what it was told before it initialized.
-WG.GlobalCommandBar = GlobalCommandBar
 
 function widget:Initialize()
 	Chili = WG.Chili
@@ -496,6 +525,8 @@ function widget:Initialize()
 	Progressbar = Chili.Progressbar
 	Control = Chili.Control
 	screen0 = Chili.Screen0
-	
+
 	InitializeControls()
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
+	WG.GlobalCommandBar = GlobalCommandBar
 end

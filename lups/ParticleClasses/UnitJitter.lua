@@ -262,7 +262,7 @@ end
 
 function UnitJitter:Visible()
   if self.allyTeam == LocalAllyTeamID then
-    return Spring.IsUnitVisible(self.unit)
+    return Spring.IsUnitVisible(self.unit, 0, true) -- Don't draw for icons
   end
 
   local inLos = true
@@ -274,7 +274,7 @@ function UnitJitter:Visible()
     local losState = Spring.GetUnitLosState(self.unit, LocalAllyTeamID) or {}
     inLos = (inLos)and(not losState.los)
   end
-  return (inLos)and(Spring.IsUnitVisible(self.unit))
+  return (inLos)and(Spring.IsUnitVisible(self.unit, 0, true)) -- Don't draw for icons
 end
 
 -----------------------------------------------------------------------------------------------------------------

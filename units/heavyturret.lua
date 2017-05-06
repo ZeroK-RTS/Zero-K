@@ -10,9 +10,7 @@ unitDef = {
   buildingGroundDecalSizeY      = 5,
   buildingGroundDecalType       = [[heavyturret_decal.dds]],
   buildPic                      = [[heavyturret.png]],
-  canAttack                     = true,
   canGuard                      = true,
-  canstop                       = [[1]],
   category                      = [[FLOAT]],
   corpse                        = [[DEAD]],
 

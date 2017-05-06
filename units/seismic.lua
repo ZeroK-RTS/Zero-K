@@ -9,7 +9,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 3,
   buildingGroundDecalType       = [[seismic_aoplane.dds]],
   buildPic                      = [[seismic.png]],
-  canAttack                     = true,
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 15 0]],
   collisionVolumeScales         = [[20 50 20]],

@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal         = 300,
   builder                = false,
   buildPic               = [[CORAPE.png]],
-  canAttack              = true,
   canFly                 = true,
   canMove                = true,
   canSubmerge            = false,

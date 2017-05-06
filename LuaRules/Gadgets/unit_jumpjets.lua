@@ -468,10 +468,14 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return gadget:AllowCommand(unitID, unitDefID, teamID, CMD_JUMP, {cmdParams[4], cmdParams[5], cmdParams[6]}, cmdParams[3])
 	end
 	
-	if ((not jumpDefs[unitDefID]) or jumpDefs[unitDefID].noJumpHandling) then 
+	if not jumpDefs[unitDefID] then 
 		if cmdID == CMD_JUMP then
 			return false
 		end
+		return true
+	end
+	
+	if (jumpDefs[unitDefID].noJumpHandling) then 
 		return true
 	end
 	

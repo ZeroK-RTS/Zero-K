@@ -10,7 +10,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 5,
   buildingGroundDecalType       = [[armdeva_aoplane.dds]],
   buildPic                      = [[armdeva.png]],
-  canAttack                     = true,
   category                      = [[FLOAT TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[45 45 45]],

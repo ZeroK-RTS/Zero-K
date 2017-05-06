@@ -14,7 +14,6 @@ unitDef = {
   canGuard              = false,
   canMove               = false,
   canPatrol             = false,
-  canstop               = [[1]],
   canSubmerge           = false,
   category              = [[FIXEDWING]],
   cruiseAlt             = 30,

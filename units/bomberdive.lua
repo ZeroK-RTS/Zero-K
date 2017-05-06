@@ -6,7 +6,6 @@ unitDef = {
   buildCostMetal      = 300,
   builder             = false,
   buildPic            = [[bomberdive.png]],
-  canAttack           = true,
   canFly              = true,
   canGuard            = true,
   canMove             = true,

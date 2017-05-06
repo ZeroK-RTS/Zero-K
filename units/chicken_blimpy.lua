@@ -9,7 +9,6 @@ unitDef = {
   builder             = false,
   buildPic            = [[chicken_blimpy.png]],
   buildTime           = 750,
-  canAttack           = true,
   canFly              = true,
   canGuard            = true,
   canLand             = true,

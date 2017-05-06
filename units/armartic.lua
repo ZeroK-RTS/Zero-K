@@ -9,7 +9,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[armartic_aoplane.dds]],
   buildPic                      = [[armartic.png]],
-  canAttack                     = true,
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[32 75 32]],

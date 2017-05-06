@@ -9,7 +9,6 @@ unitDef = {
   builder             = false,
   buildPic            = [[chicken_sporeshooter.png]],
   buildTime           = 400,
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

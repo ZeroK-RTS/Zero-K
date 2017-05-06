@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 3500,
   builder             = false,
   buildPic            = [[dante.png]],
-  canAttack           = true,
   canGuard            = true,
   canManualFire       = true,
   canMove             = true,

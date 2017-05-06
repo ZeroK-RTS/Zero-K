@@ -10,7 +10,6 @@ unitDef = {
   builder             = false,
   buildPic            = [[chickenf.png]],
   buildTime           = 450,
-  canAttack           = true,
   canFly              = true,
   canGuard            = true,
   canLand             = true,

@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal      = 220,
   builder             = false,
   buildPic            = [[nsaclash.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

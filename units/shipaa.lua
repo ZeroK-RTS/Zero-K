@@ -11,11 +11,9 @@ unitDef = {
   builder                = false,
 
   buildPic               = [[shipaa.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 4 4]],
   collisionVolumeScales  = [[32 32 128]],

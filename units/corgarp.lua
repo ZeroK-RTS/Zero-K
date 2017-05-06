@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 260,
   builder             = false,
   buildPic            = [[corgarp.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

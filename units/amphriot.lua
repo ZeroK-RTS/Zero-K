@@ -7,11 +7,9 @@ unitDef = {
   brakeRate              = 0.375,
   buildCostMetal         = 280,
   buildPic               = [[amphriot.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = true,
   category               = [[LAND SINK]],
   corpse                 = [[DEAD]],
 

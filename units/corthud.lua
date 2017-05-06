@@ -7,7 +7,6 @@ unitDef = {
   brakeRate           = 0.22,
   buildCostMetal      = 180,
   buildPic            = [[CORTHUD.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

@@ -7,7 +7,6 @@ unitDef = {
   brakeRate              = 0.75,
   buildCostMetal         = 600,
   buildPic               = [[core_spectre.png]],
-  canAttack              = false,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

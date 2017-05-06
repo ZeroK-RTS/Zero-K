@@ -726,7 +726,7 @@ local function IsUnitFXVisible(fx)
 	if fx.onActive then
 		unitActive = GetUnitIsActive(unitID)
 	end
-
+	--Spring.Utilities.UnitEcho(unitID, "w")
 	if (not fx.onActive) or (unitActive) then
 		if fx.alwaysVisible then
 			return true
@@ -735,7 +735,7 @@ local function IsUnitFXVisible(fx)
 		else
 			local unitRadius = (spGetUnitRadius(unitID) or 0) + 40
 			local r = fx.radius or 0
-			return Spring.IsUnitVisible(unitID, unitRadius + r)
+			return Spring.IsUnitVisible(unitID, unitRadius + r, fx.noIconDraw)
 		end
 	else
 		return fx.alwaysVisible

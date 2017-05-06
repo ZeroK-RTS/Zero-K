@@ -7,11 +7,9 @@ unitDef = {
   buildCostMetal      = 2200,
   builder             = false,
   buildPic            = [[corgol.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[LAND]],
   corpse              = [[DEAD]],
 

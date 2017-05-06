@@ -5,7 +5,7 @@ function widget:GetInfo()
     author    = "Evil4Zerggin (adapted by KingRaptor)",
     date      = "29 December 2008",
     license   = "GNU LGPL, v2.1 or later",
-    layer     = -100000.5,	-- lower than minimap but higher than epic
+    layer     = -100000.5,	-- lower than minimap but higher than epic (this doesn't actually do anything for the implied purpose)
     enabled   = true  --  loaded by default?
   }
 end
@@ -24,12 +24,20 @@ local lineWidth = 2
 local maxAlpha = 1
 local fontSize = 24
 local fontSizeLarge = 32
+local circleFreq = 1
+local circleUpdateFreq = 0.01
+local circleRadius = 150
+local circleRadiusMin = 50
+local circleAlpha = 0.9
+--local circleAlphaMin = 0.1
+local circleTTL = 3
 
 local minimapHighlightSize = 8
 local minimapHighlightLineMin = 6
 local minimapHighlightLineMax = 10
 
 local useFade = false
+local circleDrawList
 ----------------------------------------------------------------
 --speedups
 ----------------------------------------------------------------
@@ -85,6 +93,7 @@ local Lups
 --vars
 ----------------------------------------------------------------
 local mapPoints = {}
+local circles = {}
 local timeNow, timePart
 local on = false
 local mapX = Game.mapX * 512
@@ -150,6 +159,41 @@ local function GetColorChar(colorTable)
 	end
 	return string.char(col[4],col[1],col[2],col[3])
 end
+
+local function CreateCircle(point)
+	circles[#circles + 1] = {
+		point = point,
+		x = point.x,
+		y = point.y,
+		z = point.z,
+		color = point.color,
+		alpha = 0,
+		radius = circleRadius,
+		time = 0,
+	}
+end
+
+-- from gfx_commands_fx.lua
+local function CircleVertices(circleDivs)
+	for i = 1, circleDivs do
+		local theta = 2 * math.pi * i / circleDivs
+		gl.Vertex(math.cos(theta), math.sin(theta), 0)
+	end
+end
+
+local function DrawCircle(circle)
+	if not Spring.IsSphereInView(circle.x, circle.y, circle.z, circle.radius) then
+		return
+	end
+	gl.PushMatrix()
+	gl.Translate(circle.x, circle.y + 10, circle.z)
+	gl.Rotate(90, 1, 0, 0)
+	gl.Scale(circle.radius, circle.radius, 1)
+	gl.Color(circle.color[1], circle.color[2], circle.color[3], circle.alpha)
+	gl.CallList(circleDrawList)
+	gl.PopMatrix()
+end
+
 ----------------------------------------------------------------
 --callins
 ----------------------------------------------------------------
@@ -166,13 +210,17 @@ function widget:Initialize()
 		ClearPoints = ClearPoints,
 		SetUseFade = SetUseFade
 	}
+	
+	circleDrawList = gl.CreateList(gl.BeginEnd, GL.LINE_LOOP, CircleVertices, 48)
+	
 	-- debug
-	--WG.CustomMarker.AddPoint("newPoint", 300, 300, "lalala")
+	--WG.CustomMarker.AddPoint("newPoint", Game.mapSizeX/2, Game.mapSizeZ/2, "Custom marker", {0, 1, 0.5, 1})
 end
 
 function widget:Shutdown()
 	ClearPoints()
 	WG.CustomMarker = nil
+	gl.DeleteList(circleDrawList)
 end
 
 function widget:GameFrame(f)
@@ -192,6 +240,20 @@ function widget:GameFrame(f)
 	end
 end
 
+function widget:DrawWorldPreUnit()
+	glLineWidth(4)
+	gl.DepthTest(false)
+	--gl.LineStipple(true)
+	for i=1,#circles do
+		local circle = circles[i]
+		DrawCircle(circle)
+	end
+	glLineWidth(1)
+	gl.DepthTest(true)
+	gl.Color(1,1,1,1)
+	--gl.LineStipple(false)
+end
+
 function widget:DrawScreen()
 	if (not on) then return end
 	
@@ -207,6 +269,7 @@ function widget:DrawScreen()
 			if (sx >= 0 and sy >= 0
 					and sx <= vsx and sy <= vsy) then
 				--in screen
+				--[[
 				local vertices = {
 					{v = {sx, sy - highlightLineMin, 0}},
 					{v = {sx, sy - highlightLineMax, 0}},
@@ -221,6 +284,7 @@ function widget:DrawScreen()
 				glRect(sx - highlightSize, sy - highlightSize, sx + highlightSize, sy + highlightSize)
 				glShape(GL_LINES, vertices)
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+				]]
 				if point.text then
 					glText(GetColorChar(point.color)..point.text.."\008", sx, sy + 16, fontSizeLarge, 'cno')
 				end
@@ -294,12 +358,12 @@ end
 function widget:ViewResize(viewSizeX, viewSizeY)
 	vsx = viewSizeX
 	vsy = viewSizeY
-  sMidX = viewSizeX * 0.5
-  sMidY = viewSizeY * 0.5
+	sMidX = viewSizeX * 0.5
+	sMidY = viewSizeY * 0.5
 end
 
-
-
+local ringPeriod = 0
+local ringUpdatePeriod = 0
 function widget:Update(dt)
 	if (not timeNow) then
 		StartTime()
@@ -312,7 +376,37 @@ function widget:Update(dt)
 			timePart = timePart - blinkPeriod
 			on = not on
 		end
-  end
+	end
+	
+	ringPeriod = ringPeriod + dt
+	if ringPeriod > circleFreq then
+		for id, point in pairs(mapPoints) do
+			CreateCircle(point)	
+		end
+		ringPeriod = 0
+	end
+	
+	ringUpdatePeriod = ringUpdatePeriod + dt
+	if ringUpdatePeriod > circleUpdateFreq then
+		local notRemoved = {}
+		local delta = ringUpdatePeriod/circleTTL
+		for i=1,#circles do
+			local circle = circles[i]
+			local age = circle.time / circleTTL
+			if age > 1 then
+				
+			else
+				circle.time = circle.time + ringUpdatePeriod
+				circle.radius = circleRadius - (circleRadius - circleRadiusMin) * age
+				local alphaMult = 0.5 - math.abs(0.5 - age)
+				circle.alpha = circleAlpha * alphaMult * 2
+				notRemoved[#notRemoved + 1] = circle
+			end
+			
+		end
+		circles = notRemoved
+		ringUpdatePeriod = 0
+	end
 end
 
 function widget:DrawInMiniMap(sx, sy)

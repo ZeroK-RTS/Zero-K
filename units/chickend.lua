@@ -14,8 +14,6 @@ unitDef = {
   buildingGroundDecalType       = [[chickend_aoplane.dds]],
   buildPic                      = [[chickend.png]],
   buildTime                     = 120,
-  canAttack                     = true,
-  canstop                       = [[1]],
   category                      = [[SINK]],
 
   customParams                  = {

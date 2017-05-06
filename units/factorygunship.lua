@@ -28,7 +28,6 @@ unitDef = {
   buildPic                      = [[factorygunship.png]],
   canMove                       = true,
   canPatrol                     = true,
-  canstop                       = [[1]],
   category                      = [[FLOAT UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[86 86 86]],

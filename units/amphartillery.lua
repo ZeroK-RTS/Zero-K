@@ -7,11 +7,9 @@ unitDef = {
   brakeRate              = 0.4,
   buildCostMetal         = 240,
   buildPic               = [[amphartillery.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   category               = [[LAND SINK]],
   corpse                 = [[DEAD]],
 

@@ -7,11 +7,9 @@ unitDef = {
   brakeRate              = 0.4,
   buildCostMetal         = 200,
   buildPic               = [[amphraider2.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canStop                = true,
   category               = [[SINK]],
   corpse                 = [[DEAD]],
 

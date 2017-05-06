@@ -1,0 +1,112 @@
+{
+	"pw_artefact" : {
+		"name" : "Starożytny artefakt",
+		"description" : "Tajemniczy relikt",
+		"helptext" : "Ten tajemniczy obiekt skrywa niebywałą moc. Choć jest słabo zrozumiany przez naukowców, uważa się, że można go użyć jako broni na skalę galaktyczną. Jest niewrażliwy na wszystkie znane ataki."
+	},
+	"pw_bomberfac" : {
+		"name" : "Fabryka bombowców",
+		"description" : "Produkuje bombowce",
+		"helptext" : "Produkuje bombowce orbitalne do ataku na wrogie planety. Podczas inwazji planetarnych, produkuje zwykłe samoloty."
+	},
+	"pw_dropfac" : {
+		"name" : "Fabryka desantowców",
+		"description" : "Produkuje desantowce",
+		"helptext" : "Produkuje desantowce orbitalne do inwazji na wrogie planety. Podczas inwazji planetarnych, produkuje zwykłe transportowce."
+	},
+	"pw_estorage" : {
+		"name" : "Magazyn energii",
+		"description" : "Przechowuje energię",
+		"helptext" : "Duży akumulator."
+	},
+	"pw_estorage2" : {
+		"name" : "Podwójny magazyn energii",
+		"description" : "Przechowuje energię",
+		"helptext" : "Podwójny duży akumulator."
+	},
+	"pw_garrison" : {
+		"name" : "Garnizon polowy",
+		"description" : "Zmniejsza wpływy wroga",
+		"helptext" : "Garnizon sprawuje pieczę nad planetą, ograniczając wrogie wpływy uzyskane z bitew."
+	},
+	"pw_gaspowerstation" : {
+		"name" : "Elektrownia gazowa",
+		"description" : "Produkuje energię",
+		"helptext" : "Elektrownia zasilana gazem."
+	},
+	"pw_grid" : {
+		"name" : "Sieć ochrony planetarnej",
+		"description" : "Chroni przed wszystkimi statkami orbitalnymi",
+		"helptext" : "Chroni przed bombowcami i ogranicza wrogie wpływy z bitew."
+	},
+	"pw_guerilla" : {
+		"name" : "Tunel partyzancki",
+		"description" : "Zdalnie szerzy wpływy",
+		"helptext" : "Ten budynek pozwala szerzyć wpływy na niesąsiadującej planecie."
+	},
+	"pw_hq_attacker" : {
+		"name" : "Dowództwo atakujących",
+		"description" : "Kwatera polowa",
+		"helptext" : "Jeżeli atakujący wygrają, ale stracą ten budynek, to otrzymują tylko 50%% normalnych wpływów za wygraną bitwę."
+	},
+	"pw_hq_defender" : {
+		"name" : "Dowództwo obrońców",
+		"description" : "Kwatera polowa",
+		"helptext" : "Jeżeli atakujący przegrają, ale zniszczą ten budynek, to otrzymują 20%% ilości wpływów za wygraną bitwę."
+	},
+	"pw_inhibitor" : {
+		"name" : "Inhibitor tunelu czasoprzestrzennego",
+		"description" : "Blokuje wpływy",
+		"helptext" : "Nie pozwala wrogim planetom szerzyć wpływów przez tunel czasoprzestrzenny."
+	},
+	"pw_interception" : {
+		"name" : "Wartownia przechwytująca",
+		"description" : "Przechwytuje bombowce orbitalne",
+		"helptext" : "Chroni planetę przed bombowcami orbitalnymi."
+	},
+	"pw_mine" : {
+		"name" : "Generator planetarny",
+		"description" : "Wytwarza 50 energii/turę",
+		"helptext" : "Mały, efektywny generator planetarny."
+	},
+	"pw_mine2" : {
+		"name" : "Orbitalna stacja solarna",
+		"description" : "Wytwarza 100 energii/turę",
+		"helptext" : "Średnia stacja wytwarzająca energię."
+	},
+	"pw_mine3" : {
+		"name" : "Planetarny kompleks energetyczny",
+		"description" : "Wytwarza 250 energii/turę",
+		"helptext" : "Masywny kompleks pobierający energię prosto z jądra planety. Ogromne moce przerabiane w tym budynku powodują, że większe uszkodzenia mają katastrofalne skutki."
+	},
+	"pw_mstorage2" : {
+		"name" : "Magazyn metalu",
+		"description" : "Składuje metal",
+		"helptext" : "Składuje metal do użytku planetarnego."
+	},
+	"pw_warpgate" : {
+		"name" : "Fabryka rdzeni",
+		"description" : "Produkuje rdzenie czasoprzestrzenne",
+		"helptext" : "Tutaj produkowane są rdzenie czasoprzestrzenne, które pozwalają wysyłać statki w dowolne miejsce w galaktyce w mgnieniu oka."
+	},
+	"pw_warpjammer" : {
+		"name" : "Zagłuszacz czasoprzestrzenny",
+		"description" : "Chroni przed skokiem czasoprzestrzennym",
+		"helptext" : "Zagłuszacz czasoprzestrzenny nie pozwala na skok czasoprzestrzenny na tę planetę."
+	},
+	"pw_wormhole" : {
+		"name" : "Tunel czasoprzestrzenny",
+		"description" : "Łączy z sąsiadami",
+		"helptext" : "Pozwala statkom orbitalnym opuszczać planetę oraz szerzy wpływy na sąsiadujących planetach."
+	},
+	"pw_wormhole2" : {
+		"name" : "Ulepszony tunel czasoprzestrzenny",
+		"description" : "Zwiększa szerzone wpływy",
+		"helptext" : "Pozwala statkom orbitalnym opuszczać planetę oraz szerzy wpływy na sąsiadujących planetach efektywniej, niż podstawowy tunel."
+	},
+	"generic_tech" : {
+		"name" : "Placówka badawcza",
+		"description" : "Odblokowuje technologię",
+		"helptext" : "Ten budynek odblokowuje konkretną technologię dla swojej frakcji."
+	}
+}

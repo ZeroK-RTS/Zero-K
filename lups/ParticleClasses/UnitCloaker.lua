@@ -266,7 +266,7 @@ end
 
 function UnitCloaker:Visible()
   if self.allyTeam == LocalAllyTeamID then
-    return Spring.IsUnitVisible(self.unit)
+    return Spring.IsUnitVisible(self.unit, 0, true) -- Don't draw for icons
   end
 
   local _, specFullView = Spring.GetSpectatingState()

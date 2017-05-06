@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal      = 50,
   builder             = false,
   buildPic            = [[attackdrone.png]],
-  canAttack           = true,
   canBeAssisted       = false,
   canFly              = true,
   canGuard            = true,

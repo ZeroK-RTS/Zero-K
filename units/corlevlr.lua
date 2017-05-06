@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 240,
   builder             = false,
   buildPic            = [[corlevlr.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,	

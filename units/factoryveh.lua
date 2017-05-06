@@ -27,7 +27,6 @@ unitDef = {
   buildPic                      = [[factoryveh.png]],
   canMove                       = true,
   canPatrol                     = true,
-  canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
 

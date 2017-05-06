@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 2000,
   builder             = false,
   buildPic            = [[ARMCYBR.png]],
-  canAttack           = true,
   canFly              = true,
   canGuard            = true,
   canMove             = true,

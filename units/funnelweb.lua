@@ -7,7 +7,6 @@ unitDef = {
   brakeRate              = 0.1375,
   buildCostMetal         = 4500,
   buildPic               = [[funnelweb.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

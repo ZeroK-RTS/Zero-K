@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 90,
   builder             = false,
   buildPic            = [[BLADEW.png]],
-  canAttack           = true,
   canFly              = true,
   canGuard            = true,
   canMove             = true,

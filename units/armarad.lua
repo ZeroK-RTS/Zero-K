@@ -10,7 +10,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[armarad_aoplane.dds]],
   buildPic                      = [[armarad.png]],
-  canAttack                     = false,
   category                      = [[UNARMED FLOAT]],
   collisionVolumeOffsets        = [[0 -8 0]],
   collisionVolumeScales         = [[32 83 32]],

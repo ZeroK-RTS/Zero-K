@@ -7,7 +7,6 @@ unitDef = {
   brakeRate           = 0.3,
   buildCostMetal      = 2000,
   buildPic            = [[amphassault.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

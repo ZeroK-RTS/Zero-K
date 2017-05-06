@@ -35,7 +35,6 @@ unitDef = {
 
   buildPic            = [[chickenbroodqueen.png]],
   buildTime           = 1000,
-  canAttack           = true,
   CanBeAssisted       = 0,
   canGuard            = true,
   canMove             = true,

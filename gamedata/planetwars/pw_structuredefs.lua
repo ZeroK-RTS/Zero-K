@@ -43,9 +43,7 @@ local structureConfig = {
 		unitDef.buildpic = "pw_generic.png"
 		
 		unitDef.customparams.soundselect = "radar_select"
-		unitDef.customparams.helptext = "This structure unlocks a specific tech for its owning faction."
-		unitDef.customparams.description_pl = "Stacja badawcza"
-		unitDef.customparams.helptext_pl = "Ten budynek odblokowuje konkretna technologie dla swojej frakcji."
+		unitDef.customparams.statsname = "generic_tech"
 	end,
 
 	pw_artefact = function(unitDef)
@@ -62,11 +60,6 @@ local structureConfig = {
 		
 		unitDef.customparams.invincible = "1"
 		unitDef.customparams.soundselect = "cloaker_select"
-		unitDef.customparams.helptext = "This mysterious alien device houses unimaginable powers. Although it remains poorly understood by our scientists, "
-						.."it could potentially be harnessed as a galaxy-dominating superweapon. The artefact is invulnerable to all known weapons."
-		unitDef.customparams.helptext_pl = "Te tajemnicze artefakty obcych skrywaja niesamowita moc. Chociaz naukowcy nie rozumieja do konca zasady ich dzialania, to uwaza sie, "
-						.."ze moga posluzyc za bron zdolna do dominacji nad galaktyka. Artefakt jest niewrazliwy na wszystkie znane rodzaje broni."
-		unitDef.customparams.description_pl = "Artefakt obcych"
 		
 		unitDef.collisionvolumescales = [[60 70 60]]
 		unitDef.collisionvolumetype	= [[CylY]]
@@ -87,9 +80,6 @@ local structureConfig = {
 		unitDef.buildcostmetal = 400*STRUCTURE_COST_MULT
 		
 		unitDef.customparams.soundselect = "building_select1"
-		unitDef.customparams.helptext = "Produces space dropships for invading hostile planets."
-		--unitDef.customparams.helptext_pl = "Produkuje desantowce orbitalne do inwazji na wrogie planety."
-		--unitDef.customparams.description_pl = "Produkuje desantowce"
 		
 		unitDef.collisionvolumescales = [[275 120 215]]
 		
@@ -127,7 +117,6 @@ local structureConfig = {
 		unitDef.buildcostmetal = 400*STRUCTURE_COST_MULT
 		
 		unitDef.customparams.soundselect = "building_select1"
-		unitDef.customparams.helptext = "Increases the number of bombers that can be deployed to a single planet."
 		
 		unitDef.collisionvolumescales = [[240 160 120]]
 		unitDef.collisionvolumeoffsets = [[0 -10 0]]
@@ -173,9 +162,6 @@ local structureConfig = {
 		unitDef.collisionvolumescales = [[90 125 90]]
 		
 		unitDef.customparams.soundselect = "building_select2"
-		unitDef.customparams.helptext = "A small, efficient power generator."
-		unitDef.customparams.helptext_pl = "Maly, efektywny generator planetarny."
-		unitDef.customparams.description_pl = "Wytwarza 50 energii/ture"
 		
 		unitDef.featuredefs.dead.object = "pw_mine2_dead.dae"
 	end,
@@ -201,9 +187,6 @@ local structureConfig = {
 		unitDef.collisionvolumeoffsets = [[0 10 0]]
 		
 		unitDef.customparams.soundselect = "building_select2"
-		unitDef.customparams.helptext = "A larger power generator with increased output."
-		unitDef.customparams.helptext_pl = "Sredni generator planetarny."
-		unitDef.customparams.description_pl = "Wytwarza 100 energii/ture"
 		
 		unitDef.featuredefs.dead.object = "pw_mine_dead.dae"
 		unitDef.featuredefs.heap.object = "debris4x4b.s3o"
@@ -230,9 +213,6 @@ local structureConfig = {
 		unitDef.selfdestructas = "NUCLEAR_MISSILE"
 		
 		unitDef.customparams.soundselect = "building_select2"
-		unitDef.customparams.helptext = "This massive complex draws energy directly from the planet's mantle. It goes up in a nuclear explosion if destroyed."
-		unitDef.customparams.helptext_pl = "Planetarny kompleks energetyczny. Uzywa glownie mocy geotermicznych, ale takze nuklearnych, co powoduje niebezpieczenstwo wybuchu w razie zniszczenia."
-		unitDef.customparams.description_pl = "Wytwarza 250 energii/ture."
 		
 		unitDef.collisionvolumescales = [[130 130 130]]
 		
@@ -255,9 +235,6 @@ local structureConfig = {
 		unitDef.buildcostmetal = 250*STRUCTURE_COST_MULT
 		
 		unitDef.customparams.soundselect = "factory_select"
-		unitDef.customparams.helptext = "This structure maintains an army which reduces the Influence gained from battles."
-		unitDef.customparams.helptext_pl = "Garnizon sprawuje piecze nad planeta, ograniczajac wrogie wplywy zyskane z bitew."
-		unitDef.customparams.description_pl = "Garnizon - ogranicza wplywy"
 		
 		unitDef.weapondefs = {bogus_fake_targeter = CopyTable(fakeWeapondef, true)}
 		unitDef.weapons = CopyTable(fakeWeapons, true)
@@ -280,9 +257,6 @@ local structureConfig = {
 		unitDef.buildcostmetal = 250*STRUCTURE_COST_MULT
 		
 		unitDef.customparams.soundselect = "radar_select"
-		unitDef.customparams.helptext = "This structure intercepts incoming bombers."
-		unitDef.customparams.helptext_pl = "Ten budynek przechwytuje nadlatujace bombowce orbitalne."
-		unitDef.customparams.description_pl = "Przechwytuje bombowce orbitalne."
 		
 		unitDef.sightdistance = 800
 		unitDef.radardistance = 2100
@@ -314,9 +288,6 @@ local structureConfig = {
 		unitDef.sightdistance = 495
 		
 		unitDef.customparams.soundselect = "turret_select"
-		unitDef.customparams.helptext = "This structure reduces Influence gains as well as intercepting incoming bombers."
-		unitDef.customparams.helptext_pl = "Ten budynek zmniejsza wrogie wplywy z bitew i przechwytuje bombowce orbitalne."
-		unitDef.customparams.description_pl = "Kompleks ochrony planetarnej"
 		
 		unitDef.weapondefs = {bogus_fake_targeter = CopyTable(fakeWeapondef, true)}
 		unitDef.weapondefs.bogus_fake_targeter.range = 450
@@ -342,9 +313,6 @@ local structureConfig = {
 		unitDef.customparams.evacuation_speed = "1"
 		
 		unitDef.customparams.soundselect = "shield_select"
-		unitDef.customparams.helptext = "Allows ships to leave this planet for its connected neighbours, and projects influence spread to connected planets."
-		unitDef.customparams.helptext_pl = "Tunel czasoprzestrzenny laczy planete z sasiadami - pozwala statkom orbitalnym opuszczac planete i szerzy wplywy."
-		unitDef.customparams.description_pl = "Tunel czasoprzestrzenny"
 		
 		unitDef.collisionvolumescales = [[40 45 40]]
 		unitDef.collisionvolumetype	= [[CylY]]
@@ -368,9 +336,6 @@ local structureConfig = {
 		
 		unitDef.customparams.pw_replaces = "pw_wormhole"
 		unitDef.customparams.soundselect = "shield_select"
-		unitDef.customparams.helptext = "This structure maintains a stronger wormhole for increased influence spread to neighboring planets."
-		unitDef.customparams.helptext_pl = "Ulepszony tunel czasoprzestrzenny zwieksza wplywy na polaczonych planetach."
-		unitDef.customparams.description_pl = "Ulepszony tunel czasoprzestrzenny"
 		
 		unitDef.collisionvolumescales = [[70 60 70]]
 		unitDef.collisionvolumetype	= [[CylY]]
@@ -391,9 +356,6 @@ local structureConfig = {
 		unitDef.buildcostmetal = 500*STRUCTURE_COST_MULT
 		
 		unitDef.customparams.soundselect = "cloaker_select"
-		unitDef.customparams.helptext = "This facility produces the coveted Warp Cores that can send ships across the galaxy in the blink of an eye."	
-		unitDef.customparams.helptext_pl = "Tutaj produkowane sa Rdzenie Czasoprzestrzenne, ktore pozwalaja wysylac statki w dowolne miejsce w galaktyce w mgnieniu oka."	
-		unitDef.customparams.description_pl = "Produkuje Rdzenie Czasoprzestrzenne"
 		
 		unitDef.featuredefs.dead.object = "pw_techlab_dead.dae"
 	end,
@@ -414,9 +376,6 @@ local structureConfig = {
 		unitDef.selfdestructas = "GRAV_BLAST"
 		
 		unitDef.customparams.soundselect = "radar_select"
-		unitDef.customparams.helptext = "The Warp Jammer protects the planet with a field that prevents warpcore-equipped ships from jumping to it."
-		unitDef.customparams.helptext_pl = "Zagluszacz czasoprzestrzenny nie pozwala na skok czasoprzestrzenny przy uzyciu Rdzeni na ta planete."
-		unitDef.customparams.description_pl = "Zagluszacz czasoprzestrzenny"
 		
 		unitDef.customparams.area_cloak = 1
 		unitDef.customparams.area_cloak_upkeep = 12
@@ -445,9 +404,6 @@ local structureConfig = {
 		unitDef.buildcostmetal = 350*STRUCTURE_COST_MULT
 		
 		unitDef.customparams.soundselect = "shield_select"
-		unitDef.customparams.helptext = "Inhibits Influence spread from enemy planets."
-		unitDef.customparams.helptext_pl = "Nie pozwala wrogim planetom szerzyc wplywow przez tunel czasoprzestrzenny."
-		unitDef.customparams.description_pl = "Inhibitor tunelu czasoprzestrzennego"
 		
 		unitDef.collisionvolumescales = [[80 25 60]]
 		unitDef.collisionvolumetype	= [[Box]]
@@ -467,9 +423,6 @@ local structureConfig = {
 		unitDef.buildcostmetal = 750*STRUCTURE_COST_MULT
 		
 		unitDef.customparams.soundselect = "shield_select"
-		unitDef.customparams.helptext = "A jumpgate capable of sending Influence to any planet."
-		unitDef.customparams.helptext_pl = "Ten budynek pozwala szerzyc wplywy na dowolnej innej planecie."
-		unitDef.customparams.description_pl = "Zdalnie szerzy wplywy"
 		
 		unitDef.collisionvolumescales = [[70 60 70]]
 		unitDef.collisionvolumetype	= [[CylY]]
@@ -491,7 +444,6 @@ local structureConfig = {
 		unitDef.footprintz = 6
 		
 		unitDef.customparams.soundselect = "geo_select"
-		unitDef.customparams.helptext = "A gas-fired power generator."
 		
 		unitDef.collisionvolumescales = [[70 60 70]]
 		unitDef.collisionvolumetype	= [[CylY]]
@@ -567,9 +519,7 @@ local structureConfig = {
 		unitDef.selfdestructas = "GRAV_BLAST"
 		
 		unitDef.customparams.soundselect = "cloaker_select"
-		unitDef.customparams.helptext = "This facility produces the coveted Warp Cores that can send ships across the galaxy in the blink of an eye."	
-		unitDef.customparams.helptext_pl = "Tutaj produkowane sa Rdzenie Czasoprzestrzenne, ktore pozwalaja wysylac statki w dowolne miejsce w galaktyce w mgnieniu oka."	
-		unitDef.customparams.description_pl = "Produkuje Rdzenie Czasoprzestrzenne"
+		unitDef.customparams.statsname = "pw_warpgate"
 		
 		unitDef.collisionvolumescales = [[120 100 120]]
 		unitDef.collisionvolumetype	= [[CylY]]

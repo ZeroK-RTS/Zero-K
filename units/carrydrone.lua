@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal      = 75,
   builder             = false,
   buildPic            = [[carrydrone.png]],
-  canAttack           = true,
   canBeAssisted       = false,
   canFly              = true,
   canGuard            = true,

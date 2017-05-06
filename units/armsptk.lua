@@ -6,11 +6,9 @@ unitDef = {
   brakeRate              = 0.78,
   buildCostMetal         = 280,
   buildPic               = [[ARMSPTK.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   category               = [[LAND]],
   corpse                 = [[DEAD]],
 

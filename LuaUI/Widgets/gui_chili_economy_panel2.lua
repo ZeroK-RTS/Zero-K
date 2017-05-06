@@ -315,7 +315,7 @@ options = {
 			ApplySkin(window_metal, fancySkinLeft)
 			ApplySkin(window_energy, fancySkinRight)
 		end,
-		advanced = true,
+		hidden = true,
 		noHotkey = true,
 	}
 }

@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal      = 300,
   builder             = false,
   buildPic            = [[hoveraa.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

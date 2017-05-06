@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 85,
   builder             = false,
   buildPic            = [[CORSH.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

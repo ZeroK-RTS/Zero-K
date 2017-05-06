@@ -6,7 +6,6 @@ unitDef = {
   buildCostMetal      = 300,
   builder             = false,
   buildPic            = [[CORSHAD.png]],
-  canAttack           = true,
   canFly              = true,
   canGuard            = true,
   canMove             = true,

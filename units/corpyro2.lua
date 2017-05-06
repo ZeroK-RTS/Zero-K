@@ -7,11 +7,9 @@ unitDef = {
   buildCostMetal        = 220,
   builder               = false,
   buildPic              = [[CORPYRO.png]],
-  canAttack             = true,
   canGuard              = true,
   canMove               = true,
   canPatrol             = true,
-  canstop               = [[1]],
   category              = [[LAND FIREPROOF]],
   corpse                = [[DEAD]],
 

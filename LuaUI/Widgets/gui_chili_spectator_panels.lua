@@ -273,7 +273,7 @@ options = {
 			end
 			playerWindow.mainPanel:Invalidate()
 		end,
-		advanced = true,
+		hidden = true,
 		noHotkey = true,
 	},
 }

@@ -10,7 +10,6 @@ unitDef = {
   builder             = false,
   buildPic            = [[chicken_digger.png]],
   buildTime           = 40,
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

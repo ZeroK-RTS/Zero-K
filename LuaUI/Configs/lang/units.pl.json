@@ -69,10 +69,10 @@
         "description": "Ciężki bot wsparcia artyleryjskiego",
         "helptext": "Firewalker posiada wyrzutnie napalmu średniego zasięgu, które podpalają trafiony teren. Jest jednak dość niezdarny i ma problemy z ruchliwością."
     },
-    "destroyer": {
-        "name": "Daimyo",
-        "description": "Niszczyciel (wsparcie / przeciwpodwodny)",
-        "helptext": "Główną bronią Daimyo jest mocne działo; jest także wyposażony w rakiety, które mogą zanurzyć się i uderzać w cele podwodne. Walcząc przeciwko Daimyo, najlepiej atakować z bezpiecznej odległości."
+    "shipassault": {
+        "name": "Siren",
+        "description": "Niszczyciel (wsparcie / szturmowy)",
+        "helptext": "Niszczyciel Siren to statek ogólnego przeznaczenia, który łączy silne obszarowe działko soniczne (zdolne razić cele zarówno pod wodą, jak i nad nią), rakiety kinetyczne średniego zasięgu (świetne na budynki) oraz dobry pancerz."
     },
     "armtick": {
         "name": "Tick",
@@ -139,10 +139,10 @@
         "description": "Ciężki latający kurczak",
         "helptext": "Wściekły latający kurczak, który pluje w dół kwasem."
     },
-    "shipraider": {
-        "name": "Typhoon",
-        "description": "Korweta (lekka / szturmowa)",
-        "helptext": "Typhoon to stosunkowo tani statek. który łączy w sobie dużą prędkość, wytrzymałość i siłę ognia. Jest jednak bezbronny wobec jednostek podwodnych i ma niski zasięg."
+    "shipriot": {
+        "name": "Corsair",
+        "description": "Korweta (lekka / wsparcia)",
+        "helptext": "Corsair to korweta z dwoma shotgunami, którymi ciężko kara wszystko, co się zbliży. Jest jednak bezbronna wobec jednostek podwodnych i ma niski zasięg."
     },
     "screamer": {
         "name": "Screamer",
@@ -200,12 +200,14 @@
         "helptext": "Tuba to jedyna struktura obronna Kurczaków. Wystrzeliwuje zarodniki w cele naziemne i latające."
     },
     "rocksink": {
-        "name": "Huśtawka do testowania",
-        "description": "Zwykła zabawka\nMała huśtawka\nA rozkołysze rozbawi!"
+        "name": "Bańka wstańka",
+        "description" : "Do testowania",
+        "helptext": "Kołysze się pod wpływem ostrzału."
     },
     "fakeunit_aatarget": {
         "name": "Cel przeciwlotniczy",
-        "description": "Skoczek na E5!"
+        "description": "Skoczek na E5!",
+        "helptext" : "Techniczna jednostka do bicia w przelocie."
     },
     "mahlazer": {
         "name": "Starlight",
@@ -279,7 +281,8 @@
     },
     "empiricaldpser": {
         "name": "Empiryczna sprawdzarka DPSów",
-        "description": "W imieniu Rzeczypospolitej skazuję to na śmierć!"
+        "description": "Mierzy obrażenia",
+        "helptext": "Specjalny przyrząd do pomiaru wpierdolu."
     },
     "hoverassault": {
         "name": "Halberd",
@@ -291,7 +294,7 @@
         "description": "Bot konstruktor z tarczą, moc 5 m/s",
         "helptext": "Convict to bot budowniczy z tarczą, którą ochrania siebie i to, co buduje."
     },
-    "armtboat": {
+    "shiptransport": {
         "name": "Surfboard",
         "description": "Statek transportowy",
         "helptext": "Surfboard jest statkiem transportowym; jednostki, które przewozi, mogą strzelać w trakcie przewozu."
@@ -343,7 +346,8 @@
     },
     "terraunit": {
         "name": "Terraform",
-        "description": "Koszt: 0"
+        "description": "Koszt: 0",
+        "helptext" : "Ta jednostka reprezentuje obszar poddany terraformingowi."
     },
     "chickenf": {
         "name": "Talon",
@@ -415,11 +419,6 @@
         "description": "Buduje harde boty, moc 10 m/s",
         "helptext": "Boty tu produkowane z reguły wyposażone są w tarcze, co daje im wysoką wytrzymałość. Łączenie tarcz powoduje, że dobrze działają w grupach. Dobra fabryka dla nowicjuszy."
     },
-    "armraz": {
-        "name": "Razorback",
-        "description": "Szturmowy mech bojowy",
-        "helptext": "Razorback posiada dwa działka maszynowe, które pozwalają mu walczyć z hordami mniejszych jednostek, oraz mocny laser krótkiego zasięgu. Mimo że jego siła jest duża, w jej użytku może przeszkadzać jego krótki zasięg."
-    },
     "chickena": {
         "name": "Cockatrice",
         "description": "Szturmowy kurczak",
@@ -439,11 +438,6 @@
         "name": "Skuttle",
         "description": "Skacząca niewidzialna bomba",
         "helptext": "Mimo że jest powolna, droga i ma niski obszar rażenia, ta niesamowicie niszczycielska bomba wyposażona w niewidzialność i możliwość skakania jest postrachem wszystkich ciężkich jednostek. Dobrą obronę przed nią stanowią lekkie jednostki przeczesujące okolicę."
-    },
-    "armcarry": {
-        "name": "Reef",
-        "description": "Lotniskowiec",
-        "helptext": "Najbardziej wielozadaniowy spośród okrętów. Lotniskowiec posiada rakiety kinetyczne do bombardowania odległych celów, posiada lądowiska dla samolotów i przede wszystkim produkuje własne drony bojowe."
     },
     "slowmort": {
         "name": "Moderator",
@@ -465,10 +459,10 @@
         "description": "Bateria przeciwlotnicza dalekiego zasięgu",
         "helptext": "Chainsaw to wieżyczka przeciwlotnicza o dużym zasięgu. Pomimo, że sama nie jest zbyt wytrzymała, i w razie bezpośredniego ataku nie utrzyma się długo, to potrafi mocno zaszkodzić wrogim bombowcom, prawie całkowicie zamykając dla nich przestrzeń powietrzną wokół siebie."
     },
-    "shiptorp": {
+    "shiptorpraider": {
         "name": "Hunter",
-        "description": "Fregata torpedowa wsparcia",
-        "helptext": "Hunter to statek z torpedami przeznaczony do niszczenia łodzi podwodnych. Ma duży obszar rażenia."
+        "description": "Lekka łódź torpedowa",
+        "helptext": "Hunter to lekka łódź z torpedami przeznaczona do najazdów i niszczenia łodzi podwodnych. W dużej ilości nieźle się też sprawdza przeciwko bardzo ciężkim okrętom."
     },
     "corsilo": {
         "name": "Silencer",
@@ -810,8 +804,8 @@
         "description": "Wieżyczka paralizacyjna",
         "helptext": "Faraday to wieżyczka uzbrojona w mocne działko EMP. Doskonale współpracuje z innymi wieżyczkami, lecz sama jest bezużyteczna. Kiedy nie atakuje, otrzymuje tylko ćwierć obrażeń."
     },
-    "corbats": {
-        "name": "Warlord",
+    "shipheavyarty": {
+        "name": "Shogun",
         "description": "Ciężki pancernik artyleryjski",
         "helptext": "Jedna salwa z pancernika jest w stanie poradzić sobie z większością celów na powierzchni wody, a daleki zasięg pozwala również na ostrzał celów lądowych. Pancernik wymaga jednak ochrony przed jednostkami podwodnymi i powietrznymi."
     },
@@ -877,7 +871,8 @@
     },
     "fakeunit_los": {
         "name": "Widzimisię",
-        "description": "Widzi mu się."
+        "description": "Widzi mu się.",
+        "helptext" : "- Widzisz?\n- Nie widzę.\n-No widzisz!"
     },
     "logkoda": {
         "name": "Kodachi",
@@ -896,7 +891,8 @@
     },
     "damagesink": {
         "name": "Pochłaniacz obrażeń",
-        "description": "Ma w dupie, że ktoś go bije."
+        "description": "Ma w dupie, że ktoś go bije.",
+        "helptext" : "No i co mu zrobisz?"
     },
     "bomberdive": {
         "name": "Raven",
@@ -929,14 +925,14 @@
         "helptext": "Conch to wytrzymały konstruktor, który swoje obowiązki wykonuje zarówno na lądzie, jak i pod wodą."
     },
     "shipaa": {
-        "name": "Shredder",
+        "name": "Zephyr",
         "description": "Fregata przeciwlotnicza",
         "helptext": "Zapewnia flocie ochronę przed wrogim lotnictwem przy użyciu podwójych działek laserowych."
     },
     "subraider": {
-        "name": "Snake",
+        "name": "Seawolf",
         "description": "Lekka łódź podwodna",
-        "helptext": "Cicha i śmiercionośna łódź podwodna, która szybko pozbywa się jednostek bez ochrony. Spowalnia trafione cele. Łatwo zniszczyć ją jednak torpedami i ładunkami głębinowymi."
+        "helptext": "Cicha i śmiercionośna łódź podwodna, która szybko pozbywa się jednostek bez ochrony. Spowalnia trafione cele. Łatwo zniszczyć ją jednak torpedami; należy też wystrzegać się niszczycieli."
     },
     "armanni": {
         "name": "Annihilator",
@@ -1009,12 +1005,12 @@
         "helptext": "Djinn to amfibijny teleporter jednokierunkowy. Może w dowolnym punkcie mapy postawić węzeł wejściowy, z którego jednostki mogą przeteleportować się do Djinna pod warunkiem, że ten stoi nieruchomo."
     },
     "shipskirm": {
-        "name": "Enforcer",
-        "description": "Krążownik rakietowy (harcownik / artyleria)",
-        "helptext": "Krążownik z rakietami do ostrzeliwania celów na powierzchni wody i na lądzie. Bezbronny przeciwko łodziom podwodnym; słabo spisuje się także przeciw korwetom i lotnictwu."
+        "name": "Mistral",
+        "description": "Łódź rakietowa - harcownik",
+        "helptext": "Mistral wystrzeliwuje salwy rakiet średniego zasięgu, dobre do ostrzeliwania celów zarówno morskich, jak i nabrzeżnych. Jest bardzo lekko pancerzony, więc powinien wystrzegać się szybkich jednostek, które mogą go łatwo dosięgnąć, oraz łodzi podwodnych."
     },
     "shipscout": {
-        "name": "Skeeter",
+        "name": "Cutter",
         "description": "Łódka patrolowa - rozbraja",
         "helptext": "Tania i szybka, łódka patrolowa dobrze nadaje się do najazdów na odkryte tereny wroga i wypatrywania celów dla większych statków. Nie ma siły ognia ani wytrzymałości do poważnej walki."
     },
@@ -1034,9 +1030,9 @@
         "helptext": "Stinger to średnia wieża laserowa, która jest w stanie jednym strzałem zniszczyć większość lekkich jednostek, jednak niska szybkostrzelność pozwala dużej ilości tanich jednostek ją zniszczyć."
     },
     "shiparty": {
-        "name": "Crusader",
-        "description": "Niszczyciel - wsparcie artyleryjskie / przeciwpodwodny",
-        "helptext": "Crusader posiada potężną armatę średniego zasięgu, idealną do bombardowania nieruchomych wieżyczek broniących wybrzeży. Jego drugą bronią jest wyrzutnia ładunków głębinowych. Łatwo pada ofiarą jednostek latających i korwet, gdyż nie posiada broni skutecznym przeciwko szybkim celom."
+        "name": "Ronin",
+        "description": "Krążownik artyleryjski",
+        "helptext": "Ronin posiada potężną armatę średniego zasięgu, idealną do bombardowania nieruchomych wieżyczek broniących wybrzeży. Jednostki powietrzne i podwodne oraz lekkie łodzie są dla niego zagrożeniem."
     },
     "shieldfelon": {
         "name": "Felon",
@@ -1078,10 +1074,10 @@
         "description": "Działo przeciwlotnicze Flak",
         "helptext": "Cobra to działo przeciwlotnicze które zadaje ciężkie obrażenia na dużym obszarze. Świetnie niszczy wrogie statki powietrzne."
     },
-    "reef": {
+    "shipcarrier": {
         "name": "Reef",
-        "description": "Lotniskowiec",
-        "helptext": "Najbardziej wielozadaniowy spośród okrętów. Lotniskowiec posiada rakiety kinetyczne do bombardowania odległych celów, posiada lądowiska dla samolotów i przede wszystkim produkuje własne drony bojowe."
+        "description": "Lotniskowiec z rakietami taktycznymi",
+        "helptext": "Najbardziej wielozadaniowy spośród okrętów. Lotniskowiec posiada rakiety taktyczne do bombardowania odległych celów, posiada lądowiska dla samolotów i przede wszystkim produkuje własne drony bojowe."
     },
     "corsumo": {
         "name": "Sumo",
@@ -1195,7 +1191,8 @@
     },
     "fakeunit": {
         "name": "Sygnał-ściema",
-        "description": "Jak do mnie, to mnie nie ma!"
+        "description": "Jak do mnie, to mnie nie ma!",
+        "helptext" : "Nikogo nie ma w domu!"
     },
     "heavyturret": {
         "name": "Sunlance",
@@ -1277,6 +1274,31 @@
         "description": "Samolot zwiadowczy z zakłócaczem",
         "helptext": "Vulture oferuje niezrównane możliwości zwiadowcze, zapewniając radar i sonar. Jest także wyposażony w zakłócacz."
     },
+	"dynstrike1" : {
+		"name" : "Dowódca Strike",
+		"description" : "Dowódca szturmowy",
+		"helptext" : "Strike to zrównoważony Dowódca, który może używać większość modułów i ma dobre osiągi. Posiada zwiększoną regenerację w porównaniu do innych Dowódców."
+	},
+	"dynknight1" : {
+		"name" : "Dowódca Knight",
+		"description" : "Dowódca szturmowy",
+		"helptext" : "Knight to zrównoważony Dowódca, który może używać większość modułów i ma dobre osiągi. Posiada zwiększoną regenerację w porównaniu do innych Dowódców."
+	},
+	"dynsupport1" : {
+		"name" : "Dowódca Engineer",
+		"description" : "Dowódca ekonomiczny",
+		"helptext" : "Dowódca Engineer może korzystać z najbardziej ezoterycznych modułów i broni. Mimo że jego prędkość i wytrzymałość pozostawiają wiele do życzenia, to świetnie nadaje się do budowy z racji zwiększonej mocy i zasięgu konstrukcji."
+	},
+	"dynassault1" : {
+		"name" : "Dowódca Guardian",
+		"description" : "Ciężki Dowódca bojowy",
+		"helptext" : "Guardian to Dowódca reprezentujący brutalną siłę i wytrzymałość; jest jednak wolny i nie może używać większości modułów wsparcia."
+	},
+	"dynrecon1" : {
+		"name" : "Dowódca Recon",
+		"description" : "Mobilny Dowódca",
+		"helptext" : "Recon to zwinny Dowódca, który może używać większość specjalnych broni i jest w stanie skakać."
+	},
     "amphfloater": {
         "name": "Buoy",
         "description": "Ciężki amfibijny bot harcownik",

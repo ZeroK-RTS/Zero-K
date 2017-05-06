@@ -194,14 +194,14 @@ options = {
 		name = 'Flush Left',
 		type = 'bool',
 		value = false,
-		advanced = true,
+		hidden = true,
 		noHotkey = true,
 	},
 	fancySkinning = {
 		name = 'Fancy Skinning',
 		type = 'bool',
 		value = false,
-		advanced = true,
+		hidden = true,
 		noHotkey = true,
 	},
 }

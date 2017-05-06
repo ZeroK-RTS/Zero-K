@@ -29,7 +29,6 @@ unitDef = {
   canGuard                      = true,
   canMove                       = false,
   canPatrol                     = true,
-  canstop                       = [[1]],
   cantBeTransported             = true,
   category                      = [[FLOAT UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],

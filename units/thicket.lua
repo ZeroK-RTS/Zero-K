@@ -13,7 +13,6 @@ unitDef = {
   buildingGroundDecalType       = [[thicket_aoplane.dds]],
   buildPic                      = [[thicket.png]],
   buildTime                     = 20,
-  canAttack                     = false,
   category                      = [[SINK UNARMED]],
 
   customParams                  = {

@@ -518,7 +518,7 @@ options = {
 			fakewindow.TileImageBK = newClass.TileImageBK
 			fakewindow:Invalidate()
 		end,
-		advanced = true,
+		hidden = true,
 		noHotkey = true,
 	},
 	--[[

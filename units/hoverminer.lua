@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 200,
   builder             = false,
   buildPic            = [[hoverminer.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

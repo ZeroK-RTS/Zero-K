@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 520,
   builder             = false,
   buildPic            = [[TAWF114.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

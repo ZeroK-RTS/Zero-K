@@ -111,7 +111,6 @@ local CONSTRUCTOR_BUTTON_ID = "cons"
 
 local exceptionList = {
 	armasp = true,
-	armcarry = true,
 	reef = true,
 }
 
@@ -337,7 +336,7 @@ options = {
 				mainBackground.SetSkin(self.value)
 			end
 		end,
-		advanced = true,
+		hidden = true,
 		noHotkey = true,
 	}
 }

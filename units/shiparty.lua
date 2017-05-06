@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal         = 850,
   builder                = false,
   buildPic               = [[shiparty.png]],
-  canAttack              = true,
   canMove                = true,
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 1 3]],

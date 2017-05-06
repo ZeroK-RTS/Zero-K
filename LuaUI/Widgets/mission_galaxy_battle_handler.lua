@@ -35,6 +35,7 @@ local FAILURE_ICON = LUAUI_DIRNAME .. "images/cross.png"
 local OBJECTIVE_ICON = LUAUI_DIRNAME .. "images/bullet.png"
 
 local mainObjectiveBlock, bonusObjectiveBlock
+local globalCommandButton
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -74,16 +75,16 @@ end
 --------------------------------------------------------------------------------
 -- Objectives Handler
 
-local function GetObjectivesBlock(holderWindow, name, position, items, gameRulesParam)
+local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam)
 	
-	local missionsLabel = Chili.TextBox:New{
+	local missionsLabel = Chili.Label:New{
 		x = 8,
 		y = position,
 		width = "100%",
 		height = 18,
 		align = "left",
 		valign = "top",
-		text = name,
+		caption = "",
 		fontsize = 18,
 		parent = holderWindow,
 	}
@@ -151,6 +152,9 @@ local function GetObjectivesBlock(holderWindow, name, position, items, gameRules
 	function externalFunctions.Update()
 		UpdateObjectiveSuccess()
 	end
+	function externalFunctions.UpdateTooltip(text)
+		missionsLabel:SetCaption(text)
+	end
 	
 	function externalFunctions.MakeObjectivesString()
 		local objectivesString = ""
@@ -192,10 +196,10 @@ local function InitializeBonusObjectives()
 	}
 	
 	local position = 4
-	mainObjectiveBlock, position = GetObjectivesBlock(holderWindow, "Main Objectives", position, objectiveList,  "objectiveSuccess_")
+	mainObjectiveBlock, position = GetObjectivesBlock(holderWindow, position, objectiveList,  "objectiveSuccess_")
 	if #bonusObjectiveList > 0 then
 		position = position + 8
-		bonusObjectiveBlock, position = GetObjectivesBlock(holderWindow, "Bonus Objectives", position, bonusObjectiveList, "bonusObjectiveSuccess_")
+		bonusObjectiveBlock, position = GetObjectivesBlock(holderWindow, position, bonusObjectiveList, "bonusObjectiveSuccess_")
 	end
 	
 	if WG.GlobalCommandBar then
@@ -204,7 +208,7 @@ local function InitializeBonusObjectives()
 				holderWindow:SetVisibility(not holderWindow.visible)
 			end
 		end
-		WG.GlobalCommandBar.AddCommand(LUAUI_DIRNAME .. "images/advplayerslist/random.png", "Toggle mission objectives.", ToggleWindow)
+		globalCommandButton = WG.GlobalCommandBar.AddCommand(LUAUI_DIRNAME .. "images/advplayerslist/random.png", "", ToggleWindow)
 	end
 	
 	holderWindow:SetPos(nil, nil, nil, position + holderWindow.padding[2] + holderWindow.padding[4] + 3)
@@ -213,9 +217,23 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function languageChanged ()
+	if globalCommandButton then
+		globalCommandButton.tooltip = WG.Translate("interface", "toggle_mission_objectives_name") .. "\n\n" .. WG.Translate("interface", "toggle_mission_objectives_desc")
+		globalCommandButton:Invalidate()
+	end
+	if mainObjectiveBlock then
+		mainObjectiveBlock.UpdateTooltip(WG.Translate("interface", "main_objectives"))
+	end
+	if bonusObjectiveBlock then
+		bonusObjectiveBlock.UpdateTooltip(WG.Translate("interface", "bonus_objectives"))
+	end
+end
+
 function widget:Initialize()
 	Chili = WG.Chili
 	InitializeBonusObjectives()
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
 end
 
 function widget:GameFrame(n)

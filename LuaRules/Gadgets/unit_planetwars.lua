@@ -737,7 +737,7 @@ local function InitializeUnitsToSpawn()
 end
 
 function gadget:Initialize()
-	if Spring.GetGameRulesParam("planetwars_structures") == 0 then
+	if not Spring.GetModOptions().planet or Spring.GetGameRulesParam("planetwars_structures") == 0 then
 		gadgetHandler:RemoveGadget()
 		return
 	end

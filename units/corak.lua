@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.4,
   buildCostMetal         = 75,
   buildPic               = [[CORAK.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
