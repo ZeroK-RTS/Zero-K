@@ -61,6 +61,7 @@ options_order = {
 	'invertzoom', 
 	'invertalt', 
 	'tiltedzoom',
+	'tiltzoomfactor',
 	'zoomouttocenter', 
 
 	'lblRotate',
@@ -282,6 +283,15 @@ options = {
 		type = 'bool',
 		value = true,
 		noHotkey = true,
+		path = zoomPath,
+	},
+	tiltzoomfactor = {
+		name = 'Tilt amount',
+		desc = 'How tilted the camera is when fully zoomed in. 0.1 is fully tilted, 2.0 is not tilted.',
+		type = 'number',
+		min = 0.1, max = 2, step = 0.1,
+		value = 1.0,
+		OnChange = function(self) SetFOV(options.fov.value) end,
 		path = zoomPath,
 	},
 
@@ -754,8 +764,9 @@ SetFOV = function(fov)
 	cs.py = overview_mode and maxDistY or math.min(cs.py, maxDistY)
 
 	--Update Tilt Zoom Constants
+	local tiltzoomfactor = options.tiltzoomfactor.value or 1.0
 	topDownBufferZone = maxDistY * topDownBufferZonePercent
-	minZoomTiltAngle = (30 + 17 * math.tan(currentFOVhalf_rad)) * RADperDEGREE
+	minZoomTiltAngle = (30 + 17 * math.tan(currentFOVhalf_rad)) * RADperDEGREE * tiltzoomfactor
 
 	if cs.name == "free" then
 	  OverrideSetCameraStateInterpolate(cs,options.smoothness.value)
