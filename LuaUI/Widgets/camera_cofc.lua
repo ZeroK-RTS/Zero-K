@@ -65,7 +65,7 @@ options_order = {
 	'zoomouttocenter', 
 
 	'lblRotate',
-	'rotfactor',
+	'rotatefactor',
 	'targetmouse', 
 	-- 'rotateonedge', 
 	'inverttilt',
@@ -296,7 +296,7 @@ options = {
 		path = zoomPath,
 	},
 
-	rotfactor = {
+	rotatefactor = {
 		name = 'Rotation speed',
 		type = 'number',
 		min = 0.5, max = 10, step = 0.5,
@@ -1689,7 +1689,7 @@ local function RotateCamera(x, y, dx, dy, smooth, lock, tilt)
 	lastMouseX = nil
 	if cs.rx then
 		
-		local trfactor = (tilt and options.tiltfactor.value or options.rotfactor.value) / 2000
+		local trfactor = (tilt and options.tiltfactor.value or options.rotatefactor.value) / 2000
 		cs.rx = cs.rx + dy * trfactor
 		cs.ry = cs.ry - dx * trfactor
 		
@@ -2044,7 +2044,7 @@ function widget:Update(dt)
 		
 		cs = GetTargetCameraState()
 
-		local speed = options.rotfactor.value * (s and 500 or 250) * fpsCompensationFactor
+		local speed = (options.rotatefactor.value / 2000) * (s and 500 or 250) * fpsCompensationFactor
 
 		if (rot.right or rot.left) and options.leftRightEdge.value == 'orbit' then
 			SetLockSpot2(cs, vsx * 0.5, vsy * 0.5)
