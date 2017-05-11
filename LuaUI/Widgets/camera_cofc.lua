@@ -2585,22 +2585,16 @@ function widget:Initialize()
 	helpText = explode( '\n', options.helpwindow.value )
 	cx = vsx * 0.5
 	cy = vsy * 0.5
-	
-	spSendCommands( 'unbindaction toggleoverview' )
-	spSendCommands( 'unbindaction trackmode' )
-	spSendCommands( 'unbindaction track' )
-	spSendCommands( 'unbindaction mousestate' ) --//disable screen-panning-mode toggled by 'backspace' key
-	
-	--Note: the following is for compatibility with epicmenu.lua's zkkey framework
+
 	if WG.crude then
 		if WG.crude.GetHotkey then
-			epicmenuHkeyComp[1] = WG.crude.GetHotkey("toggleoverview") --get hotkey
+			epicmenuHkeyComp[1] = WG.crude.GetHotkey("toggleoverview")
 			epicmenuHkeyComp[2] = WG.crude.GetHotkey("trackmode")
 			epicmenuHkeyComp[3] = WG.crude.GetHotkey("track")
 			epicmenuHkeyComp[4] = WG.crude.GetHotkey("mousestate")
 		end
-		if 	WG.crude.SetHotkey then
-			WG.crude.SetHotkey("toggleoverview",nil) --unbind hotkey
+		if WG.crude.SetHotkey then
+			WG.crude.SetHotkey("toggleoverview",nil)
 			WG.crude.SetHotkey("trackmode",nil)
 			WG.crude.SetHotkey("track",nil)
 			WG.crude.SetHotkey("mousestate",nil)
@@ -2622,14 +2616,9 @@ end
 
 function widget:Shutdown()
 	spSendCommands{"viewta"}
-	spSendCommands( 'bind any+tab toggleoverview' )
-	spSendCommands( 'bind any+t track' )
-	spSendCommands( 'bind ctrl+t trackmode' )
-	spSendCommands( 'bind backspace mousestate' ) --//re-enable screen-panning-mode toggled by 'backspace' key
-	
-	--Note: the following is for compatibility with epicmenu.lua's zkkey framework
+
 	if WG.crude and WG.crude.SetHotkey then
-		WG.crude.SetHotkey("toggleoverview",epicmenuHkeyComp[1]) --rebind hotkey
+		WG.crude.SetHotkey("toggleoverview",epicmenuHkeyComp[1])
 		WG.crude.SetHotkey("trackmode",epicmenuHkeyComp[2])
 		WG.crude.SetHotkey("track",epicmenuHkeyComp[3])
 		WG.crude.SetHotkey("mousestate",epicmenuHkeyComp[4])
