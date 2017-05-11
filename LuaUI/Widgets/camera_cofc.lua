@@ -66,6 +66,7 @@ options_order = {
 
 	'lblRotate',
 	'rotatefactor',
+	'rotsmoothness',
 	'targetmouse', 
 	-- 'rotateonedge', 
 	'inverttilt',
@@ -175,10 +176,19 @@ options = {
 	},
 	smoothness = {
 		name = 'Smoothness',
-		desc = "Controls how smooth the camera moves.",
+		desc = "Controls how smoothly the camera moves.",
 		type = 'number',
 		min = 0.0, max = 0.8, step = 0.1,
-		value = 0.2,
+		value = 0.3,
+		-- Applies to the following:
+		-- 	Zoom()
+		--	Altitude()
+		--	SetFOV()
+		--	edge screen scroll
+		--	toggling zoomouttocenter
+		--	and calls to SetCameraTarget() without passing in an explicit smoothness parameter
+		--
+		-- Smoothness for rotation and tilt are handled by the rotsmoothness option instead
 	},
 	
 	
@@ -303,6 +313,14 @@ options = {
 		value = 2,
 		path = rotatePath,
 	},	
+	rotsmoothness = {
+		name = 'Rotation Smoothness',
+		desc = "Controls how smoothly the camera rotates.",
+		type = 'number',
+		min = 0.0, max = 0.8, step = 0.1,
+		value = 0.1,
+		path = rotatePath,
+	},
 	-- rotateonedge = {
 	-- 	name = "Rotate camera at edge",
 	-- 	desc = "Rotate camera when the cursor is at the edge of the screen (edge scroll must be off).",
@@ -1732,7 +1750,7 @@ local function RotateCamera(x, y, dx, dy, smooth, lock, tilt)
 			ls_have = false
 		end
 		-- spSetCameraState(cs, smooth and options.smoothness.value or 0)
-		OverrideSetCameraStateInterpolate(cs,smooth and options.smoothness.value or 0)
+		OverrideSetCameraStateInterpolate(cs,smooth and options.rotsmoothness.value or 0)
 	end
 end
 
