@@ -65,12 +65,13 @@ options_order = {
 	'zoomouttocenter', 
 
 	'lblRotate',
-	'rotfactor',
+	'rotatefactor',
 	'rotsmoothness',
 	'targetmouse', 
 	-- 'rotateonedge', 
-  'inverttilt',
-  'groundrot',
+	'inverttilt',
+	'tiltfactor',
+	'groundrot',
 	
 	'lblScroll',
 	'speedFactor', 
@@ -305,11 +306,11 @@ options = {
 		path = zoomPath,
 	},
 
-	rotfactor = {
+	rotatefactor = {
 		name = 'Rotation speed',
 		type = 'number',
-		min = 0.001, max = 0.020, step = 0.001,
-		value = 0.005,
+		min = 0.5, max = 10, step = 0.5,
+		value = 2,
 		path = rotatePath,
 	},	
 	rotsmoothness = {
@@ -343,7 +344,7 @@ options = {
 		noHotkey = true,
 		path = rotatePath,
 	},
-  inverttilt = {
+	inverttilt = {
 		name = 'Invert tilt',
 		desc = 'Invert the tilt direction when using ctrl+mousewheel.',
 		type = 'bool',
@@ -351,6 +352,13 @@ options = {
 		noHotkey = true,
 		path = rotatePath,
 	},
+	tiltfactor = {
+		name = 'Tilt speed',
+		type = 'number',
+		min = 2, max = 40, step = 2,
+		value = 10,
+		path = rotatePath,
+	},	
 	groundrot = {
 		name = "Rotate When Camera Hits Ground",
 		desc = "If world-rotation motion causes the camera to hit the ground, camera-rotation motion takes over. Doesn't apply in Free Mode.",
@@ -1693,14 +1701,15 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 	end
 end
 
-local function RotateCamera(x, y, dx, dy, smooth, lock)
+local function RotateCamera(x, y, dx, dy, smooth, lock, tilt)
 	local cs = GetTargetCameraState()
 	local cs1 = cs
 	lastMouseX = nil
 	if cs.rx then
 		
-		cs.rx = cs.rx + dy * options.rotfactor.value
-		cs.ry = cs.ry - dx * options.rotfactor.value
+		local trfactor = (tilt and options.tiltfactor.value or options.rotatefactor.value) / 2000
+		cs.rx = cs.rx + dy * trfactor
+		cs.ry = cs.ry - dx * trfactor
 		
 		--local max_rx = options.restrictangle.value and -0.1 or HALFPIMINUS
 		local max_rx = HALFPIMINUS
@@ -1844,7 +1853,7 @@ local function Tilt(s, dir)
     
 
 	local speed = dir * (s and 30 or 10)
-	RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, true) --smooth, lock
+	RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, true, true) --smooth, lock, tilt
 
 	return true
 end
@@ -2053,15 +2062,15 @@ function widget:Update(dt)
 		
 		cs = GetTargetCameraState()
 
-		local speed = options.rotfactor.value * (s and 500 or 250) * fpsCompensationFactor
+		local speed = (options.rotatefactor.value / 2000) * (s and 500 or 250) * fpsCompensationFactor
 
 		if (rot.right or rot.left) and options.leftRightEdge.value == 'orbit' then
 			SetLockSpot2(cs, vsx * 0.5, vsy * 0.5)
 		end
 		if rot.right then
-			RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, ls_have)
+			RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, ls_have, false)
 		elseif rot.left then
-			RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, ls_have)
+			RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, ls_have, false)
 		end
 		
 		if (rot.up or rot.down) and options.topBottomEdge.value == 'orbit' then
@@ -2070,9 +2079,9 @@ function widget:Update(dt)
 			ls_have = false
 		end
 		if rot.up then
-			RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, ls_have)
+			RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, ls_have, false)
 		elseif rot.down then
-			RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, ls_have)
+			RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, ls_have, false)
 		end
 		ls_have = false
 		
@@ -2246,7 +2255,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 			end
 		end
 		if abs(dx) > 0 or abs(dy) > 0 then
-			RotateCamera(x, y, dx, dy, true, ls_have)
+			RotateCamera(x, y, dx, dy, true, ls_have, false)
 		end
 		
 		spWarpMouse(msx, msy)
@@ -2446,10 +2455,10 @@ function widget:KeyPress(key, modifier, isRepeat)
 		
 			local speed = (modifier.shift and 30 or 10)
 
-			if key == key_code.right then 		RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, not modifier.alt)
-			elseif key == key_code.left then 	RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, not modifier.alt)
-			elseif key == key_code.down then 	onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, not modifier.alt)
-			elseif key == key_code.up then 		onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, not modifier.alt)
+			if key == key_code.right then 		RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, not modifier.alt, false)
+			elseif key == key_code.left then 	RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, not modifier.alt, false)
+			elseif key == key_code.down then 	onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, not modifier.alt, false)
+			elseif key == key_code.up then 		onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, not modifier.alt, false)
 			end
 			return
 		else
