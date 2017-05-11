@@ -45,7 +45,7 @@ local newHeight = 0
 local maxCameraHeight = 0.7*math.max(Game.mapX, Game.mapY)*625
 
 function widget:Update(dt)
-	if WG.Cutscene and WG.Cutscene.IsInCutscene() then
+	if (WG.Cutscene and WG.Cutscene.IsInCutscene()) or WG.COFC_Enabled then
 		return
 	end
 	local state = spGetCameraState()

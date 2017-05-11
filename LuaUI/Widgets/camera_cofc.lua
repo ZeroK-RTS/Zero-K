@@ -2607,14 +2607,13 @@ function widget:Initialize()
 		end
 	end
 
+	WG.COFC_Enabled = true
 	WG.COFC_SetCameraTarget = SetCameraTarget
 	WG.COFC_SetCameraTargetBox = SetCameraTargetBox
 
 	--for external use, so that minimap can scale when zoomed out
 	WG.COFC_SkyBufferProportion = 0 
 	
-	spSendCommands("luaui disablewidget SmoothScroll")
-	spSendCommands("luaui disablewidget SmoothCam")
 	if WG.SetWidgetOption then
 		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC") --tell epicmenu.lua that we select COFC as our default camera (since we enabled it!)
 	end
@@ -2638,6 +2637,7 @@ function widget:Shutdown()
 
 	WG.COFC_SetCameraTarget = nil
 	WG.COFC_SkyBufferProportion = nil
+	WG.COFC_Enabled = nil
 end
 
 function widget:TextCommand(command)
