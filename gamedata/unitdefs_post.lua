@@ -483,17 +483,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Set drones to take forever to build such that normal constructors do not complete them.
--- 
-for name, ud in pairs(UnitDefs) do
-	if ud.customparams.is_drone then
-		ud.customparams.real_buildtime = ud.buildtime
-		ud.buildtime = ud.buildtime*1000000000
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Set airLOS
 -- 
 for name, ud in pairs(UnitDefs) do
@@ -506,8 +495,7 @@ end
 -- Set mass
 -- 
 for name, ud in pairs(UnitDefs) do
-	local buildtime = ud.customparams.real_buildtime or ud.buildtime
-	ud.mass = (((buildtime/2) + (ud.maxdamage/8))^0.6)*6.5
+	ud.mass = (((ud.buildtime/2) + (ud.maxdamage/8))^0.6)*6.5
 	if ud.customparams.massmult then
 		ud.mass = ud.mass*ud.customparams.massmult
 	end
