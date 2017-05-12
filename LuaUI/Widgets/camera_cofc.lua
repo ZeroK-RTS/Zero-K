@@ -1920,28 +1920,6 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	
 end
 
-local function PeriodicWarning()
-	local c_widgets, c_widgets_list = '', {}
-	for name,data in pairs(widgetHandler.knownWidgets) do
-		if data.active and
-			(
-			name:find('SmoothScroll')
-			or name:find('Hybrid Overhead')
-			or name:find('Complete Control Camera')
-			)
-			then
-			c_widgets_list[#c_widgets_list+1] = name
-		end
-	end
-	for i=1, #c_widgets_list do
-		c_widgets = c_widgets .. c_widgets_list[i] .. ', '
-	end
-	if c_widgets ~= '' then
-		echo('<COFCam> *Periodic warning* Please disable other camera widgets: ' .. c_widgets)
-	end
-end
---==End camera control function^^ (functions that actually do camera control)
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local missedMouseRelease = false
@@ -2038,13 +2016,6 @@ function widget:Update(dt)
 		if WG.alliedCursorsPos then 
 			AutoZoomInOutToCursor()
 		end
-	end
-	
-	
-	-- Periodic warning
-	--cycle = cycle%(32*15) + framePassed --automatically reset "cycle" value to Zero (0) every 32*15th iteration.
-	if cycle == 0 then
-		PeriodicWarning()
 	end
 
 	cs = GetTargetCameraState()
