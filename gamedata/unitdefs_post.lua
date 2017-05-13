@@ -436,17 +436,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Massive terraform speed to make ground flattening rapid for construction
---
-
-for name, unitDef in pairs(UnitDefs) do
-	if (unitDef.workertime) then
-		unitDef.terraformspeed = unitDef.workertime * 20
-    end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Set higher default losEmitHeight. Engine default is 20.
 --
 
