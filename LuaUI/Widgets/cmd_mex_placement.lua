@@ -500,10 +500,11 @@ local mexSpotToDraw = false
 local drawMexSpots = false
 
 function widget:Update()
-	if WG.metalSpots and (not wasSpectating) and spGetSpectatingState() then
+	local isSpectating = spGetSpectatingState()
+	if WG.metalSpots and (wasSpectating ~= isSpectating) then
 		spotByID = {}
 		spotData = {}
-		wasSpectating = true
+		wasSpectating = isSpectating
 		local units = spGetAllUnits()
 		for i, unitID in ipairs(units) do 
 			local unitDefID = spGetUnitDefID(unitID)
