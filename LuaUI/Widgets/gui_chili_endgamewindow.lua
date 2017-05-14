@@ -19,6 +19,7 @@ end
 local spSendCommands			= Spring.SendCommands
 
 local echo = Spring.Echo
+local GetGameSeconds = Spring.GetGameSeconds
 local spec
 
 local Chili
@@ -47,6 +48,7 @@ local addedStatsSubPanel = false
 local awardButton = false
 local statsButton = false
 local exitButton = false
+local toggleButton = false
 local showingTab
 local teamNames = {}
 local teamColors = {}
@@ -191,7 +193,7 @@ end
 function SetAwardList(awardList)
 	WG.awardList = awardList
 	SetupAwardsPanel()
-	ShowAwards()
+--	ShowAwards()
 end
 
 local function ShowEndGameWindow()
@@ -216,6 +218,14 @@ local function ToggleStatsGraph()
 		screen0:RemoveChild(window_endgame)
 	else
 		-- toggle on
+		
+		-- set the togglekey reminder here
+		-- this is dumb but I don't know of a hook for when it's changed in epicmenu
+		-- so this is as good a place as any to make sure it's set correctly
+		local toggleKey = WG.crude.GetHotkey("togglestatsgraph")
+		toggleButton.caption="Toggle ("..toggleKey..")"
+		toggleButton:Invalidate()
+
 		if not gameEnded then
 			showingTab = nil
 			WG.MakeStatsPanel()
@@ -282,8 +292,21 @@ local function SetupControls()
 	}
 	
 	local B_HEIGHT = 40
-	awardButton = Button:New{
+
+	local toggleKey = WG.crude.GetHotkey("togglestatsgraph")
+	toggleButton = Button:New{
 		x=9, y=7,
+		width=125;
+		height=B_HEIGHT;
+		caption="Toggle ("..toggleKey..")",
+		parent = window_endgame;
+		OnClick = {
+			ToggleStatsGraph
+		};
+	}
+
+	awardButton = Button:New{
+		x=145, y=7,
 		height=B_HEIGHT;
 		caption="Awards",
 		OnClick = {
@@ -296,7 +319,7 @@ local function SetupControls()
 	SetButtonSelected(awardButton, true)
 	
 	statsButton = Button:New{
-		x=85, y=7,
+		x=226, y=7,
 		height=B_HEIGHT;
 		caption="Statistics",
 		OnClick = {
@@ -416,6 +439,14 @@ function widget:GameOver (winners)
 end
 
 function widget:Update(dt)
+	local gameSeconds = GetGameSeconds()
+	if (gameSeconds % 15) == 1 then
+		if showingTab == 'stats' then
+			local button = WG.statsPanelEngineButtonClicked or 1
+			statsSubPanel.engineButtons[button].OnClick[1](statsSubPanel.engineButtons[button])
+		end
+	end
+
 	if not showEndgameWindowTimer then
 		return
 	end
@@ -430,7 +461,8 @@ function widget:Update(dt)
 	addedStatsSubPanel = false
 	screen0:RemoveChild(window_endgame)
 
-	window_endgame:SetPos(10,10,50,50)
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	window_endgame:SetPos(screenWidth*0.2,screenHeight*0.2,screenWidth*0.6,screenHeight*0.6)
 
 	showingTab = nil
 	WG.statsPanelEngineButtonClicked = nil

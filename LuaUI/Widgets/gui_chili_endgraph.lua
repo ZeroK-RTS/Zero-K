@@ -54,6 +54,11 @@ local Chili, window0, graphPanel, graphSelect, graphLabel, graphTime
 local wasActive = {}
 local playerNames = {}
 
+local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
+local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
+local BUTTON_COLOR
+local BUTTON_FOCUS_COLOR
+
 ------------------------------------
 --formats final stat to fit in label
 
@@ -123,6 +128,18 @@ local function fixLabelAlignment()
 		fixLabelAlignment() 
 	end
 end
+
+local function SetButtonSelected(button, isSelected)
+	if isSelected then
+		button.backgroundColor = SELECT_BUTTON_COLOR
+		button.focusColor = SELECT_BUTTON_FOCUS_COLOR
+	else
+		button.backgroundColor = BUTTON_COLOR
+		button.focusColor = BUTTON_FOCUS_COLOR
+	end
+	button:Invalidate()
+end
+
 ------------------------------------------------------------------------
 --Total package of graph: Draws graph and labels for each nonSpec player
 local function drawGraph(graphArray, graph_m, teamID)
@@ -355,7 +372,11 @@ function loadpanel()
 			parent = graphSelect,
 			OnClick = { 
 				function(obj)
+					if WG.statsPanelEngineButtonClicked then
+						SetButtonSelected(window0.engineButtons[WG.statsPanelEngineButtonClicked], false)
+					end
 					WG.statsPanelEngineButtonClicked = i
+					SetButtonSelected(obj, true)
 					graphPanel:ClearChildren()
 					lineLabels:ClearChildren()
 					getEngineArrays(obj.name,obj.caption)
@@ -363,6 +384,8 @@ function loadpanel()
 			}
 		}
 	end
+	BUTTON_COLOR = window0.engineButtons[1].backgroundColor
+	BUTTON_FOCUS_COLOR = window0.engineButtons[1].focusColor
 
 	local allyToggle = Chili.Checkbox:New {
 		parent = window0,
