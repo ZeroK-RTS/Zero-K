@@ -4,7 +4,7 @@
 local custom_cmd_actions = {
 	-- cmdTypes are:
 	-- 1: Targeted commands (eg attack)
-	-- 2: State commands (eg on/off). Parameter 'count' creates actions to set a particular state
+	-- 2: State commands (eg on/off). Parameter 'state' creates actions to set a particular state
 	-- 3: Instant commands (eg self-d)
 	
 	--SPRING COMMANDS
@@ -27,14 +27,14 @@ local custom_cmd_actions = {
 	rawmove = {cmdType = 1, name = "Move"},
 	
 	-- states
-	onoff = {cmdType = 2, name = "On/Off", count = 2},
-	['repeat'] = {cmdType = 2, name = "Repeat", count = 2},
-	wantcloak = {cmdType = 2, name = "Cloak", count = 2},
-	movestate = {cmdType = 2, name = "Move State", count = 3},
-	firestate = {cmdType = 2, name = "Fire State", count = 3},
-	idlemode = {cmdType = 2, name = "Land/Fly", count = 2},
-	autorepairlevel = {cmdType = 2, name = "Air Retreat Threshold", count = 4},
-	preventoverkill = {cmdType = 2, name = "Prevent Overkill", count = 2},
+	onoff = {cmdType = 2, name = "On/Off", states = {'Off', 'On'}},
+	['repeat'] = {cmdType = 2, name = "Repeat", states = {'Off', 'On'}},
+	wantcloak = {cmdType = 2, name = "Cloak", states = {'Off', 'On'}},
+	movestate = {cmdType = 2, name = "Move State", states = {'Hold Position', 'Maneuver', 'Roam'}},
+	firestate = {cmdType = 2, name = "Fire State", states = {'Hold Fire', 'Return Fire', 'Fire At Will'}},
+	idlemode = {cmdType = 2, name = "Land/Fly", states = {'Land', 'Fly'}},
+	autorepairlevel = {cmdType = 2, name = "Air Retreat Threshold", states = {'Off', '30%', '50%', '80%'}},
+	preventoverkill = {cmdType = 2, name = "Prevent Overkill", states = {'Off', 'On'}},
 	
 	      
 	--CUSTOM COMMANDS
@@ -79,23 +79,23 @@ local custom_cmd_actions = {
 	
 	--states
 --	stealth = {cmdType = 2, name = "stealth"}, --no longer applicable
-	cloak_shield = {cmdType = 2, name = "Area Cloaker", count = 2},
-	retreat = {cmdType = 2, name = "Retreat Threshold", count = 4},
+	cloak_shield = {cmdType = 2, name = "Area Cloaker", states = {'Off', 'On'}},
+	retreat = {cmdType = 2, name = "Retreat Threshold", states = {'Off', '30%', '65%', '99%'}},
 	['luaui noretreat'] = {cmdType = 2, name = "luaui noretreat"},
-	priority = {cmdType = 2, name = "Construction Priority", count = 3},
-	miscpriority = {cmdType = 2, name = "Misc. Priority", count = 3},
-	ap_fly_state = {cmdType = 2, name = "Land/Fly", count = 2},
-	ap_autorepairlevel = {cmdType = 2, name = "Auto Repair", count = 4},
-	floatstate = {cmdType = 2, name = "Float State", count = 3},
-	dontfireatradar = {cmdType = 2, name = "Firing at Radar Dots", count = 2},
-	antinukezone = {cmdType = 2, name = "Ceasefire Antinuke Zone", count = 2},
-	unitai = {cmdType = 2, name = "Unit AI", count = 2},
-	selection_rank = {cmdType = 2, name = "Selection Rank", count = 4},
-	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Seppuku", count = 2},
-	autoassist = {cmdType = 2, name = "Factory Auto Assist", count = 2},
-	airstrafe = {cmdType = 2, name = "Gunship Strafe", count = 2},
-	divestate = {cmdType = 2, name = "Raven Dive", count = 4},
-	globalbuild = {cmdType = 2, name = "Constructor Global AI", count = 2},
+	priority = {cmdType = 2, name = "Construction Priority", states = {'Low', 'Normal', 'High'}},
+	miscpriority = {cmdType = 2, name = "Misc. Priority", states = {'Low', 'Normal', 'High'}},
+	ap_fly_state = {cmdType = 2, name = "Land/Fly", states = {'Land', 'Fly'}},
+	ap_autorepairlevel = {cmdType = 2, name = "Auto Repair", states = {'Off', '30%', '50%', '80%'}},
+	floatstate = {cmdType = 2, name = "Float State", states = {'Sink', 'When Shooting', 'Float'}},
+	dontfireatradar = {cmdType = 2, name = "Firing at Radar Dots", states = {'Off', 'On'}},
+	antinukezone = {cmdType = 2, name = "Ceasefire Antinuke Zone", states = {'Off', 'On'}},
+	unitai = {cmdType = 2, name = "Unit AI", states = {'Off', 'On'}},
+	selection_rank = {cmdType = 2, name = "Selection Rank", states = {'0', '1', '2', '3'}},
+	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Seppuku", states = {'Off', 'On'}},
+	autoassist = {cmdType = 2, name = "Factory Auto Assist", states = {'Off', 'On'}},
+	airstrafe = {cmdType = 2, name = "Gunship Strafe", states = {'Off', 'On'}},
+	divestate = {cmdType = 2, name = "Raven Dive", states = {'Never', 'Under Shields', 'For Mobiles', 'Always Low'}},
+	globalbuild = {cmdType = 2, name = "Constructor Global AI", states = {'Off', 'On'}},
 }
 
 -- These actions are created from echoing all actions that appear when all units are selected.
@@ -189,13 +189,14 @@ end
 -- Add toggle-to-particular-state commands
 local fullCustomCmdActions = {}
 for name, data in pairs(custom_cmd_actions) do
-	if data.count then
-		for i = 0, data.count-1 do
-			fullCustomCmdActions[name .. " " .. i] = {
+	if data.states then
+		for i = 1, #data.states do
+			fullCustomCmdActions[name .. " " .. (i-1)] = {
 				cmdType = data.cmdType,
-				name = data.name .. ": " .. i,
+				name = data.name .. ": set " .. data.states[i],
 			}
 		end
+		data.name = data.name .. ": toggle"
 	end
 	fullCustomCmdActions[name] = data
 end
