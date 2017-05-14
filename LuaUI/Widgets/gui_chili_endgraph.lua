@@ -236,25 +236,28 @@ local function getEngineArrays(statistic, labelCaption)
 
 	for i = 1, #teams do
 		local teamID = teams[i]
-		local effectiveTeam = usingAllyteams
-			and select(6, Spring.GetTeamInfo(teamID))
-			or teamID
+		if Spring.GetTeamStatsHistory(teamID, 0, graphLength) then
 
-		teamScores[effectiveTeam] = teamScores[effectiveTeam] or {}
-		local stats
-		if rulesParamStats[statistic] then
-			stats = {}
-			for i = 0, graphLength do
-				stats[i] = {}
-				stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+			local effectiveTeam = usingAllyteams
+				and select(6, Spring.GetTeamInfo(teamID))
+				or teamID
+
+			teamScores[effectiveTeam] = teamScores[effectiveTeam] or {}
+			local stats
+			if rulesParamStats[statistic] then
+				stats = {}
+				for i = 0, graphLength do
+					stats[i] = {}
+					stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+				end
+			else
+				stats = Spring.GetTeamStatsHistory(teamID, 0, graphLength)
 			end
-		else
-			stats = Spring.GetTeamStatsHistory(teamID, 0, graphLength)
-		end
-		for b = 1, graphLength do
-			teamScores[effectiveTeam][b] = (teamScores[effectiveTeam][b] or 0) + (stats and stats[b][statistic] or 0)
-			if graphMax < teamScores[effectiveTeam][b] then
-				graphMax = teamScores[effectiveTeam][b]
+			for b = 1, graphLength do
+				teamScores[effectiveTeam][b] = (teamScores[effectiveTeam][b] or 0) + (stats and stats[b][statistic] or 0)
+				if graphMax < teamScores[effectiveTeam][b] then
+					graphMax = teamScores[effectiveTeam][b]
+				end
 			end
 		end
 	end

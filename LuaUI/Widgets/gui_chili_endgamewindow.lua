@@ -424,6 +424,14 @@ function widget:Update(dt)
 		return
 	end
 	
+	statsPanel:ClearChildren()
+	window_endgame:RemoveChild(awardPanel)
+	window_endgame:RemoveChild(statsPanel)
+	addedStatsSubPanel = false
+	screen0:RemoveChild(window_endgame)
+
+	window_endgame:SetPos(10,10,50,50)
+
 	showingTab = nil
 	WG.statsPanelEngineButtonClicked = nil
 	window_endgame:AddChild(awardButton)
