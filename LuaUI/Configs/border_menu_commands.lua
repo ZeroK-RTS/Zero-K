@@ -3,7 +3,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 --FIXME: use this table until state tooltip detection is fixed
 local tooltips = {
 	priority = "Priority: Set construction priority (low, normal, high)",
-	retreat = "Retreat: Retreat to closest retreat point at 30/60/90% of health (right-click to disable)",
+	retreat = "Retreat: Retreat to closest retreat point at 30/65/99% of health (right-click to disable)",
 	landat = "Repair level: set the HP % at which this aircraft will go to a repair pad (0, 30, 50, 80)",
 	factoryGuard = "Auto Assist: Newly built constructors automatically assist their factory",
 	diveBomb = "Dive bomb (never; target under shield; any target; always (including moving))",
