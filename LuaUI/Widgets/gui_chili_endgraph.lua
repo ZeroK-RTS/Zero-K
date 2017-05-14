@@ -252,7 +252,7 @@ local function getEngineArrays(statistic, labelCaption)
 			stats = Spring.GetTeamStatsHistory(teamID, 0, graphLength)
 		end
 		for b = 1, graphLength do
-			teamScores[effectiveTeam][b] = (teamScores[effectiveTeam][b] or 0) + stats[b][statistic]
+			teamScores[effectiveTeam][b] = (teamScores[effectiveTeam][b] or 0) + (stats and stats[b][statistic] or 0)
 			if graphMax < teamScores[effectiveTeam][b] then
 				graphMax = teamScores[effectiveTeam][b]
 			end
@@ -343,14 +343,16 @@ function loadpanel()
 		height = 10,
 		caption = "",
 	}
-
+	
+	window0.engineButtons = {}
 	for i = 1, #buttons do
-		local engineButton = Chili.Button:New {
+		window0.engineButtons[i] = Chili.Button:New {
 			name = buttons[i][1],
 			caption = buttons[i][2],
 			parent = graphSelect,
 			OnClick = { 
 				function(obj)
+					WG.statsPanelEngineButtonClicked = i
 					graphPanel:ClearChildren()
 					lineLabels:ClearChildren()
 					getEngineArrays(obj.name,obj.caption)
@@ -386,6 +388,7 @@ function loadpanel()
 
 	WG.statsPanel = window0
 end
+WG.MakeStatsPanel = loadpanel
 
 function widget:Initialize()
 	if Spring.IsGameOver() then

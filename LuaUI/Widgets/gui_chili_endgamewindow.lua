@@ -15,6 +15,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
 local spSendCommands			= Spring.SendCommands
 
 local echo = Spring.Echo
@@ -45,9 +46,12 @@ local statsSubPanel
 local addedStatsSubPanel = false
 local awardButton = false
 local statsButton = false
-local showingTab = 'awards'
+local exitButton = false
+local showingTab
 local teamNames = {}
 local teamColors = {}
+local showingEndgameWindow = false
+local gameEnded = false
 
 local awardPanelHeight = 50
 
@@ -57,6 +61,20 @@ local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
 
 local awardDescs = VFS.Include("LuaRules/Configs/award_names.lua")
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+options_path = 'Settings/HUD Panels/Stats Graph'
+options_order = {'togglestatsgraph'}
+options = { 
+	togglestatsgraph = { type = 'button',
+		name = 'Toggle stats graph',
+		desc = 'Shows and hides the statistics graph, which is normally only displayed at the end of the game.',
+		action = 'togglestatsgraph',
+		dontRegisterAction = true,
+	},
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -100,13 +118,14 @@ local function ShowTab(tabName)
 	return false
 end
 
-
 local function AddStatsSubPanel()
 	if addedStatsSubPanel then
 		return
 	end
 	addedStatsSubPanel = true
 	statsPanel:AddChild(statsSubPanel)
+	local button = WG.statsPanelEngineButtonClicked or 1
+	statsSubPanel.engineButtons[button].OnClick[1](statsSubPanel.engineButtons[button])
 end
 
 local function SetButtonSelected(button, isSelected)
@@ -147,8 +166,6 @@ local function ShowStats()
 	SetButtonSelected(awardButton, false)
 end
 
-
-
 local function SetupAwardsPanel()
 	awardSubPanel:ClearChildren()
 	for teamID,awards in pairs(WG.awardList) do
@@ -171,7 +188,6 @@ local function SetupAwardsPanel()
 	end
 end
 
-
 function SetAwardList(awardList)
 	WG.awardList = awardList
 	SetupAwardsPanel()
@@ -188,10 +204,35 @@ local function ShowEndGameWindow()
 	screen0:AddChild(window_endgame)
 end
 
+local function ToggleStatsGraph()
+	if showingEndgameWindow then
+		-- toggle off
+		if not gameEnded then
+			statsPanel:ClearChildren()
+			window_endgame:RemoveChild(awardPanel)
+			window_endgame:RemoveChild(statsPanel)
+			addedStatsSubPanel = false
+		end
+		screen0:RemoveChild(window_endgame)
+	else
+		-- toggle on
+		if not gameEnded then
+			showingTab = nil
+			WG.MakeStatsPanel()
+			ShowStats()
+			window_endgame:RemoveChild(awardButton)
+			window_endgame:RemoveChild(statsButton)
+			window_endgame:RemoveChild(exitButton)
+		end
+		screen0:AddChild(window_endgame)
+	end
+	showingEndgameWindow = not showingEndgameWindow
+end
+
 local function SetupControls()
 	window_endgame = Window:New{  
 		name = "GameOver",
-		caption = "Game aborted",
+		caption = "Game in progress - Statistics",
 		textColor = {0.5,0.5,0.5,1}, 
 		fontSize = 50,
 		x = '20%',
@@ -264,7 +305,7 @@ local function SetupControls()
 		parent = window_endgame;
 	}
 	
-	Button:New{
+	exitButton = Button:New{
 		y=7;
 		width=80;
 		right=9;
@@ -316,8 +357,11 @@ function widget:Initialize()
 	SetTeamNamesAndColors()
 	
 	if Spring.IsGameOver() then
+		window_endgame.caption = "Game aborted"
 		showEndgameWindowTimer = 1
 	end
+	
+	widgetHandler:AddAction("togglestatsgraph", ToggleStatsGraph, nil, 'tp')
 end
 
 function widget:GameOver (winners)
@@ -380,12 +424,19 @@ function widget:Update(dt)
 		return
 	end
 	
+	showingTab = nil
+	WG.statsPanelEngineButtonClicked = nil
+	window_endgame:AddChild(awardButton)
+	window_endgame:AddChild(statsButton)
+	window_endgame:AddChild(exitButton)
 	ShowEndGameWindow()
 	showEndgameWindowTimer = nil
+	showingEndgameWindow = true
+	gameEnded = true
 end
 
 function widget:Shutdown()
 	widgetHandler:DeregisterGlobal("SetAwardList")
+	widgetHandler:RemoveAction("togglestatsgraph")
 end
-
 
