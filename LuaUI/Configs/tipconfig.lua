@@ -32,53 +32,53 @@ generalTips = {
 }
 
 unitTips = {
-	corclog = {"The \255\255\64\0Dirtbag\008 leaves a mound of earth when it dies, obstructing units (especially vehicles) and weapons.", 3, 5},
-	capturecar = {"The \255\255\64\0Dominatrix\008 capture vehicle can capture enemy units (with a 10 second cooldown between captures), but control is lost if the capturing Dominatrix dies.", 3, 5},
-	armcrabe = {"The \255\255\64\0Crabe\008 outranges basic defenses. It curls up into armored form when stationary, becoming a formidable defense turret.", 3, 5},
-	firewalker = {"The \255\255\64\0Firewalker\008 creates large clouds of fire which can seriously harm units - friend or foe - standing in them.", 3, 5},
-	corsktl = {"The \255\255\64\0Skuttle\008 has a very powerful explosion with a very small blast radius. Use it to jump on enemy heavy targets and kill them in one or two blows.", 3, 5},
+	shieldscout = {"The \255\255\64\0Dirtbag\008 leaves a mound of earth when it dies, obstructing units (especially vehicles) and weapons.", 3, 5},
+	vehcapture = {"The \255\255\64\0Dominatrix\008 capture vehicle can capture enemy units (with a 10 second cooldown between captures), but control is lost if the capturing Dominatrix dies.", 3, 5},
+	spidercrabe = {"The \255\255\64\0Crabe\008 outranges basic defenses. It curls up into armored form when stationary, becoming a formidable defense turret.", 3, 5},
+	jumparty = {"The \255\255\64\0Firewalker\008 creates large clouds of fire which can seriously harm units - friend or foe - standing in them.", 3, 5},
+	jumpbomb = {"The \255\255\64\0Skuttle\008 has a very powerful explosion with a very small blast radius. Use it to jump on enemy heavy targets and kill them in one or two blows.", 3, 5},
 	
-	tawf114 = {"The \255\255\64\0Banisher\008 packs a punch against groups of small units, but can be easily rushed - make sure to screen it.", 3, 4},
-	armmanni = {"The \255\255\64\0Penetrator\008 can split many units apart in one shot, but has no AoE and a 20s reload time, and is itself very flimsy. Use it for pinpoint fire from a distance.", 3, 4},
+	tankriot = {"The \255\255\64\0Banisher\008 packs a punch against groups of small units, but can be easily rushed - make sure to screen it.", 3, 4},
+	hoverarty = {"The \255\255\64\0Penetrator\008 can split many units apart in one shot, but has no AoE and a 20s reload time, and is itself very flimsy. Use it for pinpoint fire from a distance.", 3, 4},
 }
 
 raiderDefs = {
-	"armpw",
-	"spherepole",
-	"corak",
+	"cloakraid",
+	"cloakheavyraid",
+	"shieldraid",
 	"armflash",
-	"corfav",
-	"corgator",
+	"vehscout",
+	"vehraid",
 	
-	"corpyro",
-	"panther",
-	"logkoda",
+	"jumpraid",
+	"tankheavyraid",
+	"tankraid",
 	
 	"armsh",
-	"corsh",
+	"hoverraid",
 	
 	"chicken",
 	"chicken_leaper",
 }
 
 assaultDefs = {
-	"corthud",
-	"corraid",
+	"shieldassault",
+	"vehassault",
 	
-	"armzeus",
-	--"armcrabe",
+	"cloakassault",
+	--"spidercrabe",
 	"spiderassault",
-	"corcan",
-	--"corsumo",
+	"jumpassault",
+	--"jumpsumo",
 	"armbull",
-	"correap",
-	"corgol",
+	"tankassault",
+	"tankheavyassault",
 	
 	"armanac",
 	"hoverassault",
 	
-	--"armbanth",
-	--"armorco",
+	--"striderbantha",
+	--"striderdetriment",
 	--"corkrog",
 	
 	--"chickena",
@@ -87,52 +87,52 @@ assaultDefs = {
 }
 
 skirmDefs = {
-	"armrock",
-	"corstorm",
+	"cloakskirm",
+	"shieldskirm",
 	"armjanus",
 	"armstump",
 	
-	"armsptk",
-	"armsnipe",
+	"spiderskirm",
+	"cloaksnipe",
 	"cormort",
-	"slowmort",
+	"jumpskirm",
 	"cormortgold",
-	"armmanni",
+	"hoverarty",
 	
-	"nsaclash",
+	"hoverskirm",
 	
 	"chickens",
 }
 
 riotDefs = {
-	"armwar",
-	"cormak",
-	"corlevlr",
+	"cloakriot",
+	"shieldriot",
+	"vehriot",
 	
-	"arm_venom",
+	"spideremp",
 	"tawf003",
-	"tawf114",
+	"tankriot",
 
 	"hoverriot",
 	
 	"armraz",
-	"dante",
+	"striderdante",
 }
 
 artyDefs = {
-	"armham",
+	"cloakarty",
 	"punisher",
-	"firewalker",
+	"jumparty",
 	"tawf013",
-	"corgarp",
+	"veharty",
 	
-	"armmerl",
-	--"armmanni",
-	"cormart",
-	"trem",
+	"vehheavyarty",
+	--"hoverarty",
+	"tankarty",
+	"tankheavyarty",
 	
 	"armshock",
-	"armraven",
+	"striderarty",
 	
 	"hoverartillery",
 	
@@ -142,32 +142,32 @@ artyDefs = {
 
 bomberDefs = {
 	"bomberdive",
-	"corshad",
-	"corhurc2",
-	"armstiletto_laser",
-	"armcybr",
+	"bomberprec",
+	"bomberriot",
+	"bomberdisarm",
+	"bomberheavy",
 }
 
 conDefs = {
-	"armrectr",
-	"cornecro",
+	"cloakcon",
+	"shieldcon",
 	"arm_weaver",
-	"corfast",
-	"corned",
-	"coracv",
-	"corch",
-	"armca",
+	"jumpcon",
+	"vehcon",
+	"tankcon",
+	"hovercon",
+	"planecon",
 	"shipcon",
 }
 
-mexDefs = {"cormex"}
+mexDefs = {"staticmex"}
 
 energyDefs = {
-	"armsolar",
-	"armwin",
-	"armfus",
-	"geo",
-	"cafus",
+	"energysolar",
+	"energywind",
+	"energyfusion",
+	"energygeo",
+	"energysingu",
 }
 
 factoryDefs = {
@@ -187,17 +187,17 @@ airFactoryDefs = {
 }
 
 superweaponDefs = {
-	"armbrtha",
-	"corsilo",
+	"staticheavyarty",
+	"staticnuke",
 	"mahlazer",
 	"zenith",
 	"raveparty",
 }
 
 needPowerDefs = {
-	"armanni",
-	"corbhmth",
-	"cordoom",
+	"turretantiheavy",
+	"staticarty",
+	"turretheavy",
 }
 
 for name in pairs(UnitDefNames) do

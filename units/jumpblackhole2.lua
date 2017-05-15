@@ -5,7 +5,7 @@ unitDef = {
   acceleration           = 0.35,
   brakeRate              = 1.05,
   buildCostMetal         = 100,
-  buildPic               = [[cormak.png]],
+  buildPic               = [[shieldriot.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -35,7 +35,7 @@ unitDef = {
   objectName             = [[behethud.s3o]],
   onoffable              = true,
   selfDestructAs         = [[BIG_UNITEX]],
-  script                 = [[cormak.lua]],
+  script                 = [[shieldriot.lua]],
 
   sfxtypes               = {
 

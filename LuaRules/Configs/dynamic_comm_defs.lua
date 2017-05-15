@@ -670,7 +670,7 @@ local moduleDefs = {
 		requireLevel = 3,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.battleDrones = (sharedData.battleDrones or 0) + 1
+			sharedData.droneheavyslows = (sharedData.droneheavyslows or 0) + 1
 		end
 	},
 	{

@@ -53,10 +53,10 @@ local presets = {
 
 effectUnitDefs = {
   --// FUSIONS //--------------------------
-  cafus = {
-    {class='Bursts', options=cafusBursts},
-    {class='StaticParticles', options=cafusCorona},
-    --{class='ShieldSphere', options=cafusShieldSphere},
+  energysingu = {
+    {class='Bursts', options=energysinguBursts},
+    {class='StaticParticles', options=energysinguCorona},
+    --{class='ShieldSphere', options=energysinguShieldSphere},
     --{class='ShieldJitter', options={layer=-16, life=math.huge, pos={0,58.9,0}, size=100, precision=22, strength = 0.001, repeatEffect=true}},
     {class='GroundFlash', options=groundFlashOrange},
   },
@@ -80,38 +80,38 @@ effectUnitDefs = {
 
   --// SHIELDS //---------------------------
   -- Don't raise strength of ShieldJitter recklessly, it can really distort things (including unit icons) under it!
-  corjamt = {
-   {class='Bursts', options=corjamtBursts},
-    {class='ShieldSphere', options=corjamtBall},
+  staticshield = {
+   {class='Bursts', options=staticshieldBursts},
+    {class='ShieldSphere', options=staticshieldBall},
 	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=350, strength = .001, precision=50, repeatEffect=true, quality = 4, onActive = true}},
 --	{class='ShieldSphere', options={piece="base", life=math.huge, size=350, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
 --	{class='GroundFlash', options=groundFlashShield},
 --	{class='UnitPieceLight', options={piece="glow", colormap = {{0,0,1,0.2}},},},
   },
-  core_spectre = {
-    {class='Bursts', options=corjamtBursts},
-    {class='ShieldSphere', options= corjamtBall},
+  shieldshield = {
+    {class='Bursts', options=staticshieldBursts},
+    {class='ShieldSphere', options= staticshieldBall},
 	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=350, strength = .001, precision=50, repeatEffect=true, quality = 4, onActive = true}},
 --	{class='ShieldSphere', options={piece="base", life=math.huge, size=360, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
   },
   shieldfelon = {
-	--{class='Bursts', options=MergeTable({piece="lpilot"},corjamtBursts)},
-	--{class='Bursts', options=MergeTable({piece="rpilot"},corjamtBursts)},
+	--{class='Bursts', options=MergeTable({piece="lpilot"},staticshieldBursts)},
+	--{class='Bursts', options=MergeTable({piece="rpilot"},staticshieldBursts)},
 	--{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=100, strength = .001, precision=50, repeatEffect=true, quality = 5}},
   },
   
-  funnelweb = {
+  striderfunnelweb = {
 	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4, onActive = true}},
-	{class='Bursts', options=MergeTable(corjamtBursts, {piece="aimpoint"})},
-	{class='ShieldSphere', options=corjamtBall},
+	{class='Bursts', options=MergeTable(staticshieldBursts, {piece="aimpoint"})},
+	{class='ShieldSphere', options=staticshieldBall},
   },
 
   --// ENERGY STORAGE //--------------------
   corestor = {
     {class='GroundFlash', options=groundFlashCorestor},
   },
-  armestor = {
-    {class='GroundFlash', options=groundFlashArmestor},
+  energypylon = {
+    {class='GroundFlash', options=groundFlashenergypylon},
   },
 
   --// FACTORIES //----------------------------
@@ -133,12 +133,12 @@ effectUnitDefs = {
     {class='SimpleParticles', options=MergeTable({delay=120},roostDirt)},
   },
   
-  armasp= {
+  staticrearm= {
   	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="light1"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="light2"}) },
   },
   
-  armarad = {
+  staticheavyradar = {
     {class='StaticParticles', options=MergeTable(blinkyLightWhite,{piece="point"})},
     --{class='StaticParticles', options=MergeTable(blinkyLightBlue,{piece="point", delay=15})},
   },  
@@ -147,19 +147,19 @@ effectUnitDefs = {
     {class='StaticParticles', options=MergeTable(radarBlink,{pos={-1.6,25,0.0},delay=15})},
     {class='StaticParticles', options=MergeTable(radarBlink,{pos={0,21,-1.0},delay=30})},
   },
-  corrad = {
+  staticradar = {
     {class='StaticParticles', options=MergeTable(radarBlink,{piece="head"})},
     {class='StaticParticles', options=MergeTable(radarBlink,{piece="head", delay=15})},
   },
 
-  armcrabe = {
+  spidercrabe = {
 	{class='StaticParticles', options=MergeTable(blinkyLightWhite, {piece="blight"}) },
   },   
-  corcan = {
+  jumpassault = {
 	--{class='StaticParticles', options=MergeTable(jackGlow, {piece="point"}) },
   },  
   
-  spherepole = {
+  cloakheavyraid = {
     {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="blade", onActive=false, noIconDraw = true}},
   },
   
@@ -191,17 +191,17 @@ effectUnitDefs = {
 	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=20, strength = .005, precision=50, repeatEffect=true, onActive=true, noIconDraw = true}},	
   },
   
-  armbanth = {
+  striderbantha = {
 	{class='StaticParticles', options=MergeTable(blinkyLightBlue, {piece="light", delay = 20, size = 25}) },
   },
   
-  armorco = {
+  striderdetriment = {
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="light", delay = 20, size = 30}) },
   },
 
   -- length tag does nothing
   --// PLANES //----------------------------
-  armcybr = {
+  bomberheavy = {
     {class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle1", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle2", onActive=true, noIconDraw = true}},
    },
@@ -211,7 +211,7 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, size=12, piece="wingtip1", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=12, piece="wingtip2", noIconDraw = true}},
   },
-  armbrawl = {
+  gunshipheavyskirm = {
     {class='AirJet', options={color={0.0,0.5,1.0}, width=5, length=15, piece="lfjet", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.0,0.5,1.0}, width=5, length=15, piece="rfjet", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.0,0.5,1.0}, width=2.5, length=10, piece="lrjet", onActive=true, noIconDraw = true}},
@@ -221,7 +221,7 @@ effectUnitDefs = {
     {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="rjet", noIconDraw = true}},
     {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="ljet", noIconDraw = true}},
   },
-  armstiletto_laser = {
+  bomberdisarm = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=20, piece="Jet1", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=20, piece="Jet2", onActive=true, noIconDraw = true}},
     {class='Ribbon', options={width=1, size=6, piece="LWingTip", noIconDraw = true}},
@@ -229,27 +229,27 @@ effectUnitDefs = {
 	--{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="LWingTip"}) },
 	--{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="RWingTip"}) },	
   },
-  armcsa = {
+  athena = {
     {class='AirJet', options={color={0.45,0.45,0.9}, width=2.8, length=15, piece="enginel", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.45,0.45,0.9}, width=2.8, length=15, piece="enginer", onActive=true, noIconDraw = true}},
     {class='Ribbon', options={width=1, size=12, piece="wingtipl", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=12, piece="wingtipr", noIconDraw = true}},
   },
 
-  bladew = {
+  gunshipemp = {
     {class='Ribbon', options={width=1, size=5, piece="ljet", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=5, piece="rjet", noIconDraw = true}},  
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="ljet", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="rjet", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
   },
 
-  armkam = {
+  gunshipraid = {
     {class='Ribbon', options={width=1, size=10, piece="lfx", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=10, piece="rfx", noIconDraw = true}},  
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="lfx", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="rfx", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
   },
-  armca = {
+  planecon = {
     {class='Ribbon', options={width=1, size=10, piece="engine1", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=10, piece="engine2", noIconDraw = true}},  
     {class='AirJet', options={color={0.1,0.4,0.6}, width=8, length=20, piece="body", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
@@ -270,7 +270,7 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=5, length=40, piece="exhaustRight", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=6, length=60, piece="exhaustTop", onActive=true, noIconDraw = true}},
   },
-  corshad = {
+  bomberprec = {
     {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustr", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustl", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
     {class='Ribbon', options={width=1, piece="wingtipl", noIconDraw = true}},
@@ -298,19 +298,19 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=15, piece="ExhaustRearLeft", onActive=true, emitVector = {0, 0, -1}, noIconDraw = true}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=15, piece="ExhaustRearRight", onActive=true, emitVector = {0, 0, -1}, noIconDraw = true}},
    },
-  corhurc2 = {
+  bomberriot = {
     {class='AirJet', options={color={0.7,0.3,0.1}, width=5, length=40, piece="exhaust", onActive=true, noIconDraw = true}},
     {class='Ribbon', options={width=1, piece="wingtipl", noIconDraw = true}},
     {class='Ribbon', options={width=1, piece="wingtipr", noIconDraw = true}},
 	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },	
   },
-  corvamp = {
+  fighterheavy = {
     -- jets done in gadget
     {class='Ribbon', options={width=1, size=8, piece="wingtip1", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=8, piece="wingtip2", noIconDraw = true}},
   },
-  corbtrans = {
+  gunshipheavytrans = {
     {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav1", onActive=true})},
     {class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav1", onActive=true})},
     {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav2", onActive=true})},
@@ -320,7 +320,7 @@ effectUnitDefs = {
     {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav4", onActive=true})},
     {class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav4", onActive=true})},
   }, 
-  corvalk = {
+  gunshiptrans = {
     {class='AirJet', options={color={0.2,0.4,0.8}, width=3.5, length=22, piece="engineEmit", onActive=true}},
     {class='ShieldSphere', options=MergeTable(valkShieldSphere, {piece="agrav1", onActive=true})},
     {class='StaticParticles', options=MergeTable(valkCorona, {piece="agrav1", onActive=true})},
@@ -331,20 +331,20 @@ effectUnitDefs = {
     {class='ShieldSphere', options=MergeTable(valkShieldSphere, {piece="agrav4", onActive=true})},
     {class='StaticParticles', options=MergeTable(valkCorona, {piece="agrav4", onActive=true})},
   },  
-  corawac = {
+  planescout = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="thrust", onActive=true}},
     {class='Ribbon', options={width=1, size=8, piece="wingtipl"}},
     {class='Ribbon', options={width=1, size=8, piece="wingtipr"}},
 	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },		
   },
-  blackdawn = {
+  gunshipassault = {
     {class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Lengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Rengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Lwingengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Rwingengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
   },
-  corcrw = {
+  gunshipkrow = {
     {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetrear", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
     {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetleft", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
     {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetright", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
@@ -358,7 +358,7 @@ effectUnitDefs = {
     {class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="light2"}) },
     {class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="light1"}) },    
   },
-  fighterdrone = {
+  dronefighter = {
     --{class='AirJet', options={color={0.6,0.1,0.0}, width=3, length=40, piece="DroneMain", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
     {class='Ribbon', options={width=1, size=24, piece="DroneMain"}},
   },

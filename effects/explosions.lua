@@ -51,7 +51,7 @@
 -- blue_explosion (deprecated)
 -- flashsmallunit
 -- empflash360
--- flashbantha
+-- flashstriderbantha
 -- flashmediumunitex
 -- flashbigunit
 -- purple_explosion
@@ -1636,7 +1636,7 @@ return {
     },
   },
 
-  ["flashbantha"] = {
+  ["flashstriderbantha"] = {
     usedefaultexplosions = false,
     groundflash = {
       circlealpha        = 2.2,

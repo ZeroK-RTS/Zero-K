@@ -9,7 +9,7 @@ local weaponDef = {
 
 	customParams            = {
 		slot = [[3]],
-		muzzleEffectFire = [[custom:ARMBRTHA_FLARE]],
+		muzzleEffectFire = [[custom:staticheavyarty_FLARE]],
 		manualfire = 1,
 		
 		light_color = [[1.3 1.3 2.3]],

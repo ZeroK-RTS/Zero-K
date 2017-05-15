@@ -23,7 +23,7 @@ unitDef = {
 	helptext_de    = [[Der Wurm "gr‰bt" sich unter die Bodenoberfl‰che und zeigt sich nur, wenn er Feuerb‰lle, die groﬂe Schneisen in das Gel‰nde brennen, schleudert.]],
   },
 
-  explodeAs           = [[CORPYRO_PYRO_DEATH]],
+  explodeAs           = [[jumpraid_PYRO_DEATH]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[spidergeneric]],
@@ -41,7 +41,7 @@ unitDef = {
   objectName          = [[chickenwurm.s3o]],
   power               = 350,
   script              = [[chickenwurm.lua]],
-  selfDestructAs      = [[CORPYRO_PYRO_DEATH]],
+  selfDestructAs      = [[jumpraid_PYRO_DEATH]],
 
   sfxtypes            = {
 

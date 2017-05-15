@@ -12,15 +12,15 @@ unitDef = {
   buildingGroundDecalType       = [[factoryveh_aoplane.dds]],
 
   buildoptions                  = {
-    [[corned]],
-    [[corfav]],
-    [[corgator]],
-    [[cormist]],
-    [[corlevlr]],
-    [[corraid]],
-    [[capturecar]],
-    [[corgarp]],
-    [[armmerl]],
+    [[vehcon]],
+    [[vehscout]],
+    [[vehraid]],
+    [[vehsupport]],
+    [[vehriot]],
+    [[vehassault]],
+    [[vehcapture]],
+    [[veharty]],
+    [[vehheavyarty]],
     [[vehaa]],
   },
 
@@ -32,8 +32,8 @@ unitDef = {
 
   customParams                  = {
 	description_de = [[Produziert Radfahrzeug, Baut mit 10 M/s]],
-    helptext       = [[A traditional favourite, the Vehicle Plant is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Leveler, Slasher]],
-	helptext_de    = [[Der Traditionalist unter den Fabriken. Die Vehicle Plant ist ideal für den Blitzkrieg, denn schnelle und hoch aggressive Einheiten werden hier gebaut. Diese Einheiten machen ihren Mangel an Geschwindigkeit mit reichlich Feuerkraft wieder wett. Wichtigste Einheiten: Dart, Scorcher, Ravager, Leveler, Slasher]],
+    helptext       = [[A traditional favourite, the Vehicle Plant is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Shoverconer, Ravager, Leveler, Slasher]],
+	helptext_de    = [[Der Traditionalist unter den Fabriken. Die Vehicle Plant ist ideal für den Blitzkrieg, denn schnelle und hoch aggressive Einheiten werden hier gebaut. Diese Einheiten machen ihren Mangel an Geschwindigkeit mit reichlich Feuerkraft wieder wett. Wichtigste Einheiten: Dart, Shoverconer, Ravager, Leveler, Slasher]],
     sortName       = [[2]],
   },
 

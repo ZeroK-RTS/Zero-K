@@ -82,7 +82,7 @@ function constructionAndEconomyHandler(a, at, frame)
 	--** Corresponding number inputs for airfactory jobs
 	-- 1 = con
 	-- 2 = scout
-	-- 3 = fighter
+	-- 3 = fighterheavy
 	-- 4 = bomber
 	-- 5 = gunship
 	

@@ -1,15 +1,15 @@
 local waterCannonIterable = {
-	WeaponDefNames["amphraider2_watercannon"].id,
+	WeaponDefNames["amphimpulse_watercannon"].id,
 	WeaponDefNames["amphbomb_watercannon"].id,
 }
 
 local waterCannonIndexable = {
-	[WeaponDefNames["amphraider2_watercannon"].id] = true,
+	[WeaponDefNames["amphimpulse_watercannon"].id] = true,
 	[WeaponDefNames["amphbomb_watercannon"].id] = true,
 }
 
 local unitDefData = {
-	[UnitDefNames["amphraider2"].id] = {
+	[UnitDefNames["amphimpulse"].id] = {
 		tankMax = 180,
 		shotCost = 1.2,
 		tankRegenRate = 14,

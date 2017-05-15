@@ -5,11 +5,11 @@
 
 local spawn_defs = {
     corhurc_minebomb   = {name = "cormine_impulse", cost = 0, expire = 60},
-	armcent_droppod = {name = "armpw", cost=0, expire=0},
-	armpnix3_armadvbomb = {name = "armflea", cost=0, expire=0},
+	armcent_droppod = {name = "cloakraid", cost=0, expire=0},
+	armpnix3_armadvbomb = {name = "spiderscout", cost=0, expire=0},
 	cormine_cortruck_missile = {name = "corareamine", cost=0, expire=0},
 	chicken_blimpy_dodobomb = {name = "chicken_dodo", cost=0, expire=30},
-	corgarp_mine = {name = "wolverine_mine", cost=0, expire=60},
+	veharty_mine = {name = "wolverine_mine", cost=0, expire=60},
 	hoverminer_mine = {name = "wolverine_mine", cost=0, expire=60},
 	zenith_meteor = {name = "asteroid_dead", cost=0, expire=0, feature = true},
 	zenith_meteor_float = {name = "asteroid_dead", cost=0, expire=0, feature = true},
@@ -25,7 +25,7 @@ local spawn_defs = {
 }
 
 local shieldCollide = { -- unitDefs as the shield hit callin is setup really strangely
-	corgarp_mine = {damage = 220, gadgetDamage = 200}, -- gadgetDamage = damage - weapon default damage
+	veharty_mine = {damage = 220, gadgetDamage = 200}, -- gadgetDamage = damage - weapon default damage
 	-- Weapon name must be used
 }
 

@@ -18,7 +18,7 @@ local UPDATE_PERIOD = 15 -- I'd prefer if this was not changed
 
 
 local weapons = {
-	corcrw_timedistort = { slowDamage = 100, onlySlow = true, scaleSlow = true },
+	gunshipkrow_timedistort = { slowDamage = 100, onlySlow = true, scaleSlow = true },
 	slowmissile_weapon = { slowDamage = 1, onlySlow = true, scaleSlow = true },
 	vehdisable_disableray = { slowDamage = 30, scaleSlow = false },
 }

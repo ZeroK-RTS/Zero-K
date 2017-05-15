@@ -129,7 +129,7 @@ unitDef = {
       },
 	  
 	  customParams            = {
-		torp_underwater = [[corshad_a_torpedo]],
+		torp_underwater = [[bomberprec_a_torpedo]],
 	  },
 
       explosionGenerator      = [[custom:xamelimpact]],

@@ -89,7 +89,7 @@ local structureConfig = {
 		unitDef.canmove = true
 		unitDef.canattack = true
 		unitDef.workertime = 10
-		unitDef.buildoptions = { [[corvalk]], [[corbtrans]] }
+		unitDef.buildoptions = { [[gunshiptrans]], [[gunshipheavytrans]] }
 		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
 		
@@ -127,7 +127,7 @@ local structureConfig = {
 		unitDef.canmove = true
 		unitDef.canattack = true
 		unitDef.workertime = 10
-		unitDef.buildoptions = { [[corshad]], [[corhurc2]], [[armstiletto_laser]], [[armcybr]] }
+		unitDef.buildoptions = { [[bomberprec]], [[bomberriot]], [[bomberdisarm]], [[bomberheavy]] }
 		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
 		

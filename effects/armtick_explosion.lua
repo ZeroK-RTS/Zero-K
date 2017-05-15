@@ -1,9 +1,9 @@
--- armtick_explosion
+-- cloakbomb_explosion
 
 -- based on gundam_electric_explosion.lua
 
 return {
-  ["armtick_explosion"] = {
+  ["cloakbomb_explosion"] = {
     dirt = {
       count              = 4,
       ground             = true,

@@ -41,7 +41,7 @@ local floatDefs = {
 		stopPositionLeeway = 0.1,
 	},
 
-	[UnitDefNames["amphraider2"].id] = {
+	[UnitDefNames["amphimpulse"].id] = {
 		initialRiseSpeed = 5,
 		riseAccel = 0.15,
 		riseUpDrag = 0.99,

@@ -42,59 +42,59 @@ local buildoptions = {
 
 	{-- economy
 		-- common
-		{ "cormex" },
-		{ "armwin" },-- wind
-		{ "armsolar",  notSea=true },
-		{ "armnanotc" },-- caretaker
-		{ "geo",  notSea=true },
-		{ "armasp" },-- repair pad
+		{ "staticmex" },
+		{ "energywind" },-- wind
+		{ "energysolar",  notSea=true },
+		{ "staticcon" },-- caretaker
+		{ "energygeo",  notSea=true },
+		{ "staticrearm" },-- repair pad
 
 		-- adv
-		{ "armestor",  tech=2 },-- pylon
-		{ "armmstor",  tech=2 },-- storage
-		{ "armfus",  tech=2 },
-		{ "cafus",  tech=2 },-- singularity
+		{ "energypylon",  tech=2 },-- pylon
+		{ "staticstorage",  tech=2 },-- storage
+		{ "energyfusion",  tech=2 },
+		{ "energysingu",  tech=2 },-- singularity
 	},
 
 
 	{-- point_defense
-		{ "corllt",  notSea=true },
-		{ "armartic",  notSea=true },-- Faraday
+		{ "turretlaser",  notSea=true },
+		{ "turretemp",  notSea=true },-- Faraday
 		{ "turrettorp",  notLand=true },-- you can build it on land, but torpedoes are only useful around water.
-		{ "armdeva" },-- Stardust
-		{ "corgrav",  notSea=true },-- newton
-		{ "armpb",  notSea=true },-- Popup gauss
-		{ "corhlt",  tech=2 },-- peoples should prefer Stardust, Faraday, Newton, Urchin more.
-		{ "cordoom",  tech=2, notSea=true },
-		{ "armanni",  tech=3, notSea=true },
-		{ "corbhmth",  tech=3, notSea=true },
-		{ "armamd",  tech=3, notSea=true },-- Protector
+		{ "turretriot" },-- Stardust
+		{ "turretimpulse",  notSea=true },-- newton
+		{ "turretgauss",  notSea=true },-- Popup gauss
+		{ "turretheavylaser",  tech=2 },-- peoples should prefer Stardust, Faraday, Newton, Urchin more.
+		{ "turretheavy",  tech=2, notSea=true },
+		{ "turretantiheavy",  tech=3, notSea=true },
+		{ "staticarty",  tech=3, notSea=true },
+		{ "staticantinuke",  tech=3, notSea=true },-- Protector
 	},
 
 	{-- air_defense
 		{ "corr" },-- mt
-		{ "corrazor" },
-		{ "missiletower" },-- hacksaw
-		{ "corflak" },
+		{ "turretaalaser" },
+		{ "turretaaclose" },-- hacksaw
+		{ "turretaaflak" },
 
-		{ "armcir",  tech=2 },-- chainsaw
-		{ "screamer",  tech=3 },
+		{ "turretaafar",  tech=2 },-- chainsaw
+		{ "turretaaheavy",  tech=3 },
 	},
 
 	{-- special
-		{ "corrad" },
-		{ "armarad",  tech=2 },
-		{ "corjamt",  tech=2 },-- Aegis
-		{ "armjamt",  tech=2 },-- Sneaky Pete
-		{ "missilesilo",  tech=2 },
+		{ "staticradar" },
+		{ "staticheavyradar",  tech=2 },
+		{ "staticshield",  tech=2 },-- Aegis
+		{ "staticjammer",  tech=2 },-- Sneaky Pete
+		{ "staticmissilesilo",  tech=2 },
 		{ CMD_RAMP,  tech=3 },
 		{ CMD_LEVEL,  tech=3 },
 		{ CMD_RAISE,  tech=3 },
 		{ CMD_SMOOTH,  tech=3 },
 		{ CMD_RESTORE,  tech=3 },
 		{ CMD_BUMPY,  tech=3 },
-		{ "armbrtha",  tech=3, notSea=true },
-		{ "corsilo",  tech=3, notSea=true },-- Nuke
+		{ "staticheavyarty",  tech=3, notSea=true },
+		{ "staticnuke",  tech=3, notSea=true },-- Nuke
 	},
 
 	{-- super

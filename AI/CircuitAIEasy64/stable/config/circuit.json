@@ -1,0 +1,1736 @@
+// Mono-space font required
+{
+// --- EASY config ---
+"easy": {  // Null AI
+"economy": {"energy": {"land": {"energysingu": [1], "energyfusion": [2], "energysolar": [3]}, "water": {"energysingu": [1], "energyfusion": [2], "energywind": [3]}}, "default": "turretmissile"}
+},
+// --- EASY config ---
+
+// --- NORMAL config ---
+"normal": {
+// Define factories
+"factory": {
+	"factorycloak": {
+		// Adjusts the priority of factory choice (factories with map_percent < 20 are ignored)
+		// map_percent is [20..100]
+		// On start: priority ~= map_percent * importance0 + random(-20..+20)
+		// During game: priority ~= map_percent * importance1 + random(-20..+20)
+		// importanceN = 1.0 by default if not set
+		"importance": [0.9, 0.2],
+
+		// 'require_energy' adds energy requirement for tierN (N>0): fallback to lowest tier on low energy
+		"require_energy": true,
+
+		// If income*ecoFactor < income_tier[N] then 'tierN' probability will be used
+		"income_tier": [40, 80],
+
+		//             conjurer,   glaive,  scythe,       rocko,     warrior,  zeus,      hammer,   sniper,     tick,      eraser,          gremlin
+		"unit":      ["cloakcon", "cloakraid", "cloakheavyraid", "cloakskirm", "cloakriot", "cloakassault", "cloakarty", "cloaksnipe", "cloakbomb", "cloakjammer", "cloakaa"],
+
+		"land": {
+			// 0-8m Opening - Glaives & Warriors most important for scouting, map control and defence.
+			"tier0": [ 0.10,       0.90,    0.00,         0.00,      0.00,     0.00,      0.00,     0.00,       0.00,      0.00,            0.00],
+
+			// 9-16m Early Game - Map control still important but move towards Scythe raiding and Riot defense from raider balls.
+			"tier1": [ 0.15,       0.00,    0.85,         0.00,      0.00,     0.00,      0.00,     0.00,       0.00,      0.00,            0.00]
+
+			// 17-24m Expanding - Good size terriotiry now, so less scouting and begin producing a little assault/arty on the side.
+//			"tier2": [ 0.09,       0.20,    0.04,         0.44,      0.15,     0.06,      0.00,     0.02,       0.00,      0.00,            0.00],
+
+			// 25-32m Expansions meet - Economy can afford to begin producing in bulk so unit compositions alter.
+//			"tier3": [ 0.03,       0.29,    0.05,         0.35,      0.05,     0.16,      0.00,     0.06,       0.00,      0.01,            0.00],
+
+			// 33m -40m Solid Fronts - Now we stop raiding and start pushing.
+//			"tier4": [ 0.04,       0.30,    0.09,         0.09,      0.10,     0.27,      0.00,     0.09,       0.00,      0.02,            0.00],
+
+			// 41m - 56m Mid Game - we must have 2 facs by now, stop making balanced compositions and start being abusive.
+//			"tier5": [ 0.05,       0.20,    0.05,         0.33,      0.00,     0.18,      0.00,     0.14,       0.00,      0.05,            0.00],
+
+			// 57m - 72m Late Game - we must have 2 facs & Striders by now, go nuts!
+//			"tier6": [ 0.06,       0.40,    0.20,         0.00,      0.00,     0.10,      0.00,     0.17,       0.00,      0.07,            0.00],
+
+			// 72m - inf+ Late late Game - This fac sucks!
+//			"tier7": [ 0.07,       0.14,    0.15,         0.00,      0.00,     0.30,      0.00,     0.23,       0.00,      0.11,            0.00]
+		},
+
+		"caretaker": 1
+	},
+
+	"factorygunship": {
+		"importance": [0.8, 1.8],
+		"require_energy": false,
+
+		"income_tier": [7, 16, 24, 32, 40, 56, 72],
+		//             wasp,         gunshipbomb,   gnat,     banshee,  rapier,           brawler,    gunshipassault,   krow,     valkyrie,  vindicator,  trident
+		"unit":      ["gunshipcon", "gunshipbomb", "gunshipemp", "gunshipraid", "gunshipskirm", "gunshipheavyskirm", "gunshipassault", "gunshipkrow", "gunshiptrans", "gunshipheavytrans", "gunshipaa"],
+		"land": {
+			// 0-8m Opening - gunshipbomb and banshee Harass
+			"tier0": [ 0.00,         0.17,        0.00,     0.10,     0.71,             0.00,       0.02,        0.00,     0.00,      0.00,        0.00],
+			// 9-16m Early Game - Banshee with a chance of gunshipassault
+			"tier1": [ 0.00,         0.20,        0.00,     0.02,     0.75,             0.01,       0.02,        0.00,     0.00,      0.00,        0.00],
+			// 17-24m Expanding - Time to start a-makin Brawlers
+			"tier2": [ 0.00,         0.02,        0.00,     0.00,     0.87,             0.05,       0.04,        0.02,     0.00,      0.00,        0.00],
+			// 25-32m Expansions meet - Time to keep a-makin Brawlers
+			"tier3": [ 0.00,         0.05,        0.00,     0.00,     0.73,             0.09,       0.08,        0.05,     0.00,      0.00,        0.00],
+			// 33m -40m Solid Fronts - Brawlers with a chance of Krow
+			"tier4": [ 0.00,         0.04,        0.00,     0.00,     0.65,             0.13,       0.10,        0.08,     0.00,      0.00,        0.00],
+			// 41m - 56m Mid Game - Brawlers with a bigger chance of Krow
+			"tier5": [ 0.00,         0.05,        0.00,     0.00,     0.67,             0.12,       0.06,        0.10,     0.00,      0.00,        0.00],
+			// 57m - 72m Late Game - we must have 2 facs & Striders by now, go nuts!
+			"tier6": [ 0.00,         0.05,        0.00,     0.00,     0.00,             0.80,       0.02,        0.13,     0.00,      0.00,        0.00],
+			// 72m - inf+ Late late Game - Spam Krows!
+			"tier7": [ 0.00,         0.05,        0.00,     0.00,     0.00,             0.80,       0.00,        0.15,     0.00,      0.00,        0.00]
+		},
+
+		"caretaker": 2
+	},
+
+	"factoryamph": {
+		"importance": [0.8, 1.0],
+		"require_energy": false,
+
+		"income_tier": [8, 16, 24, 32, 40, 56, 72],
+		//             conch,     duck,          archer,        buoy,          scallop,    grizzly,       djinn,      angler
+		"unit":      ["amphcon", "amphraid", "amphimpulse", "amphfloater", "amphriot", "amphassault", "amphtele", "amphaa"],
+		"land": {
+			// 0-8m Opening - Ducks and Archers
+			"tier0": [ 0.00,      0.73,          0.25,          0.00,          0.02,       0.00,          0.00,       0.00],
+			// 9-16m Early Game - Still mostly Ducks, Ducks are amazing
+			"tier1": [ 0.05,      0.50,          0.16,          0.20,          0.09,       0.00,          0.00,       0.00],
+			// 17-24m Expanding - Less Ducks, more Scallop/Bouy
+			"tier2": [ 0.10,      0.31,          0.09,          0.40,          0.05,       0.05,          0.00,       0.00],
+			// 25-32m Expansions meet - Time to start producing Bouy
+			"tier3": [ 0.10,      0.21,          0.02,          0.42,          0.12,       0.13,          0.00,       0.00],
+			// 33m -40m Solid Fronts - Time to start producing even more Bouy
+			"tier4": [ 0.11,      0.26,          0.02,          0.42,          0.04,       0.15,          0.00,       0.00],
+			// 41m - 56m Mid Game - Switch to Grizzly
+			"tier5": [ 0.14,      0.20,          0.02,          0.45,          0.02,       0.17,          0.00,       0.00],
+			// 57m - 72m Late Game -  MORE Grizzly
+			"tier6": [ 0.15,      0.15,          0.02,          0.48,          0.02,       0.18,          0.00,       0.00],
+			// 72m - inf+ Late late Game - SPAM GRIZZLY
+			"tier7": [ 0.15,      0.13,          0.02,          0.46,          0.02,       0.22,          0.00,       0.00]
+		},
+
+		"caretaker": 2
+	},
+
+	"factoryspider": {
+		"importance": [1.00, 0.7],
+		"require_energy": false,
+
+		"income_tier": [8, 16, 24, 32, 40, 56, 72],
+		//             weaver,       flea,      hermit,          venom,       redback,      recluse,   crabe,      infiltrator, tarantula
+		"unit":      ["spidercon", "spiderscout", "spiderassault", "spideremp", "spiderriot", "spiderskirm", "spidercrabe", "spiderantiheavy",    "spideraa"],
+		"land": {
+			// 0-12m Opening - Opening turbo Flea spam & Riots
+			"tier0": [ 0.00,         0.93,      0.00,            0.02,        0.05,         0.00,      0.00,       0.00,        0.00],
+			// 13-18m Early Game - Reducing Flea spam, still mostly Riots
+			"tier1": [ 0.00,         0.79,      0.08,            0.04,        0.02,         0.07,      0.00,       0.00,        0.00],
+			// 17-24m Expanding - Slant production towards Hermit & Redback
+			"tier2": [ 0.06,         0.69,      0.10,            0.05,        0.01,         0.07,      0.02,       0.00,        0.00],
+			// 25-32m Expansions meet - Slant production towards Hermit & Recluse
+			"tier3": [ 0.08,         0.65,      0.10,            0.03,        0.00,         0.09,      0.05,       0.00,        0.00],
+			// 33m -40m Solid Fronts - 	Greater Emphasis on Hermit & Crabbe
+			"tier4": [ 0.08,         0.60,      0.11,            0.03,        0.01,         0.09,      0.08,       0.00,        0.00],
+			// 41m - 56m Mid Game - We need more Crabbes
+			"tier5": [ 0.08,         0.62,      0.11,            0.02,        0.01,         0.06,      0.10,       0.00,        0.00],
+			// 57m - 72m Late Game -  MORE CRABBES
+			"tier6": [ 0.09,         0.60,      0.13,            0.00,        0.01,         0.06,      0.11,       0.00,        0.00],
+			// 72m - inf+ Late late Game - TURBO CRABBES
+			"tier7": [ 0.10,         0.55,      0.16,            0.00,        0.01,         0.01,      0.17,       0.00,        0.00]
+		},
+
+		"caretaker": 2
+	},
+
+	"factoryveh": {
+		"importance": [0.9, 0.2],
+		"require_energy": false,
+
+		"income_tier": [8, 16, 24, 32, 40, 56, 72],
+		//             mason,    dart,     shoverconer,   slasher,   leveler,    ravager,   dominatrix,   wolverine, impaler,   crasher
+		"unit":      ["vehcon", "vehscout", "vehraid", "vehsupport", "vehriot", "vehassault", "vehcapture", "veharty", "vehheavyarty", "vehaa"],
+		"land": {
+			// 0-8m Opening - Dart, Riot & Slasher
+			"tier0": [ 0.00,     0.33,     0.55,       0.12,      0.00,       0.00,      0.00,         0.00,      0.00,      0.00],
+			// 9-16m Early Game - Slasher/Riot with an occasional Ravager
+			"tier1": [ 0.10,     0.22,     0.58,       0.10,      0.00,       0.00,      0.00,         0.00,      0.00,      0.00],
+			// 17-24m Expanding - Less scouting and Riot, more Ravager
+			"tier2": [ 0.10,     0.10,     0.39,       0.23,      0.05,       0.10,      0.00,         0.03,      0.00,      0.00],
+			// 25-32m Expansions meet - Begin serious Ravager production
+			"tier3": [ 0.10,     0.10,     0.33,       0.21,      0.04,       0.16,      0.02,         0.04,      0.00,      0.00],
+			// 33m -40m Solid Fronts - 	Overdrive Ravager production
+			"tier4": [ 0.12,     0.10,     0.37,       0.00,      0.05,       0.29,      0.02,         0.05,      0.00,      0.00],
+			// 41m - 56m Mid Game - Drop Slashers, more Artillery
+			"tier5": [ 0.14,     0.16,     0.23,       0.00,      0.02,       0.35,      0.01,         0.05,      0.04,      0.00],
+			// 57m - 72m Late Game -  More artillery and Ravager
+			"tier6": [ 0.16,     0.22,     0.03,       0.00,      0.02,       0.42,      0.02,         0.06,      0.07,      0.00],
+			// 72m - inf+ Late late Game - Maximum Artillery
+			"tier7": [ 0.17,     0.12,     0.05,       0.00,      0.02,       0.52,      0.05,         0.00,      0.07,      0.00]
+		},
+
+		"caretaker": 3
+	},
+
+	"factoryhover": {
+		"importance": [0.8, 0.6],
+		"require_energy": false,
+
+		"income_tier": [8, 16, 24, 32, 40, 56, 72],
+		//             quill,   dagger,  scalpel,    halberd,        claymore,           mace,        penetrator, flail
+		"unit":      ["hovercon", "hoverraid", "hoverskirm", "hoverassault", "hoverdepthcharge", "hoverriot", "hoverarty", "hoveraa"],
+		"land": {
+			// 0-8m Opening - Raiders and Riots
+			"tier0": [ 0.00,    0.65,    0.00,       0.00,           0.00,               0.35,        0.00,       0.00],
+			// 9-16m Early Game - Mostly Mace, some support
+			"tier1": [ 0.00,    0.40,    0.34,       0.11,           0.00,               0.15,        0.00,       0.00],
+			// 17-24m Expanding - MAXIMUM OP Scalpel time
+			"tier2": [ 0.05,    0.25,    0.30,       0.30,           0.00,               0.02,        0.08,       0.00],
+			// 25-32m Expansions meet - Mix in some Halberds
+			"tier3": [ 0.10,    0.14,    0.31,       0.30,           0.01,               0.02,        0.12,       0.00],
+			// 33m -40m Solid Fronts - 	More Halberd and Pene
+			"tier4": [ 0.10,    0.10,    0.20,       0.41,           0.01,               0.04,        0.14,       0.00],
+			// 41m - 56m Mid Game - Even more Halberd and Pene
+			"tier5": [ 0.10,    0.18,    0.19,       0.30,           0.01,               0.03,        0.19,       0.00],
+			// 57m - 72m Late Game - More Pene
+			"tier6": [ 0.10,    0.14,    0.10,       0.34,           0.01,               0.10,        0.21,       0.00],
+			// 72m - inf+ Late late Game - MAXIMUM PENE
+			"tier7": [ 0.10,    0.17,    0.07,       0.21,           0.00,               0.10,        0.35,       0.00]
+		},
+		"water": {
+			// 33m -40m
+			"tier4": [ 0.00,    0.49,    0.10,       0.20,           0.10,               0.10,        0.01,       0.00],
+			// 41m - inf+
+			"tier5": [ 0.00,    0.24,    0.05,       0.41,           0.20,               0.05,        0.05,       0.00]
+		},
+
+		"caretaker": 2
+	},
+
+	"factoryplane": {
+		"importance": [1.1, 2.2],
+		"require_energy": false,
+
+		"income_tier": [30, 60],
+		//             crane,   swift,     hawk,      raven,     phoenix,    thunderbird,         wyvern,    vulture
+		"unit":      ["planecon", "planefighter", "planeheavyfighter", "bomberprec", "bomberriot", "bomberdisarm", "bomberheavy", "planescout"],
+		"air": {
+			// 0-10m Early Game
+			"tier0": [ 0.00,    0.00,      0.90,      0.00,      0.00,       0.00,                0.05,      0.05],
+			// 11-20m Expansion
+			"tier1": [ 0.00,    0.00,      0.70,      0.00,      0.02,       0.01,                0.25,      0.02]
+		},
+		"land": {
+			// 0-10m Early Game
+			"tier0": [ 0.10,    0.00,      0.00,      0.70,      0.05,       0.00,                0.10,      0.05],
+			// 11-20m Expansion
+			"tier1": [ 0.10,    0.00,      0.00,      0.05,      0.00,       0.00,                0.80,      0.05]
+		},
+		"caretaker": 3
+	},
+
+	"factorytank": {
+		"importance": [0.7, 1.8],
+		"require_energy": false,
+
+		"income_tier": [8, 16, 24, 32, 40, 56, 72],
+		//             welder,   kodachi,   panther,   banisher,  reaper,    goliath,  pillager,  tremor, copperhead
+		"unit":      ["tankcon", "tankraid", "tankheavyraid", "tankriot", "tankassault", "tankheavyassault", "tankarty", "tankheavyarty", "tankaa"],
+		"land": {
+			// 0-8m Opening - Koda and Banisher
+			"tier0": [ 0.00,     0.50,      0.00,      0.10,      0.40,      0.00,     0.00,      0.00,   0.00],
+			// 9-16m Early Game - Mostly Banisher
+			"tier1": [ 0.20,     0.35,      0.00,      0.03,      0.42,      0.00,     0.00,      0.00,   0.00],
+			// 17-24m Expanding - Begin mixing in Reapers!
+			"tier2": [ 0.20,     0.28,      0.00,      0.02,      0.46,      0.04,     0.00,      0.00,   0.00],
+			// 25-32m Expansions meet - More Reapers!
+			"tier3": [ 0.30,     0.27,      0.00,      0.02,      0.36,      0.05,     0.00,      0.00,   0.00],
+			// 33m -40m Solid Fronts - 	MAXIMUM REAPERS
+			"tier4": [ 0.30,     0.27,      0.00,      0.02,      0.35,      0.06,     0.00,      0.00,   0.00],
+			// 41m - 56m Mid Game - More arty & Golly
+			"tier5": [ 0.32,     0.20,      0.00,      0.02,      0.35,      0.11,     0.00,      0.00,   0.00],
+			// 57m - 72m Late Game - Even more arty & Golly
+			"tier6": [ 0.32,     0.15,      0.00,      0.02,      0.38,      0.13,     0.00,      0.00,   0.00],
+			// 72m - inf+ Late late Game - MAXIMUM GOLLY
+			"tier7": [ 0.32,     0.10,      0.00,      0.02,      0.36,      0.20,     0.00,      0.00,   0.00]
+		},
+
+		"caretaker": 3
+	},
+
+	"factoryjump": {
+		"importance": [0.85, 1.1],
+		"require_energy": false,
+
+		"income_tier": [40],
+		//             freaker,   puppy,   pyro,      placeholder,     moderator,  jack,     sumo,      firewalker,   skuttle,   archangel
+		"unit":      ["jumpcon", "jumpscout", "jumpraid", "jumpblackhole", "jumpskirm", "jumpassault", "jumpsumo", "jumparty", "jumpbomb", "jumpaa"],
+		"land": {
+			"tier0": [ 0.00,      0.10,    0.00,      0.25,            0.00,       0.25,     0.00,      0.15,         0.25,      0.00],
+			"tier1": [ 0.00,      0.10,    0.00,      0.30,            0.00,       0.25,     0.00,      0.20,         0.15,      0.00]
+		},
+
+		"caretaker": 2
+	},
+
+	"factoryshield": {
+		"importance": [1.1, 0.6],
+		"require_energy": false,
+
+		"income_tier": [8, 16, 24, 32, 40, 56, 72],
+		//             convict,    dirtbag,   bandit,  rogue,      thug,      outlaw,   felon,         racketeer,    roach,      aspis,          vandal
+		"unit":      ["shieldcon", "shieldscout", "shieldraid", "shieldskirm", "shieldassault", "shieldriot", "shieldfelon", "shieldarty", "shieldbomb", "shieldshield", "shieldaa"],
+		"land": {
+			"tier0": [ 0.00,       0.20,      0.75,    0.00,       0.00,      0.05,     0.00,          0.00,         0.00,       0.00,           0.00],
+			"tier1": [ 0.00,       0.14,      0.35,    0.29,       0.13,      0.05,     0.02,          0.01,         0.00,       0.01,           0.00],
+			"tier2": [ 0.05,       0.08,      0.22,    0.15,       0.33,      0.05,     0.05,          0.03,         0.00,       0.04,           0.00],
+			"tier3": [ 0.05,       0.08,      0.24,    0.10,       0.30,      0.05,     0.06,          0.06,         0.01,       0.04,           0.01],
+			"tier4": [ 0.05,       0.07,      0.20,    0.10,       0.32,      0.05,     0.07,          0.07,         0.01,       0.05,           0.01],
+			"tier4": [ 0.05,       0.07,      0.20,    0.10,       0.29,      0.05,     0.08,          0.08,         0.01,       0.06,           0.01],
+			"tier6": [ 0.05,       0.06,      0.20,    0.10,       0.26,      0.05,     0.09,          0.09,         0.01,       0.08,           0.01],
+			"tier7": [ 0.05,       0.05,      0.20,    0.09,       0.24,      0.05,     0.10,          0.10,         0.01,       0.10,           0.01]
+		},
+
+		"caretaker": 1
+	},
+
+//	"factoryship": {
+//		"importance": [1.15],
+//		"require_energy": false,
+//
+//		"income_tier": [40],
+//		//             mariner    skeeter,     snake,       typhoon,      hunter,     enforcer,    crusader,   serpent,   surfboard,  shredder
+//		"unit":      ["shipcon", "shipscout", "subraider", "shipraider", "shiptorp", "shipskirm", "shiparty", "subarty", "armtboat", "shipaa"],
+//		"water": {
+//			"tier0": [ 0.00,      0.10,        0.32,        0.30,         0.17,       0.05,        0.05,       0.01,      0.00,       0.00],
+//			"tier1": [ 0.00,      0.01,        0.10,        0.10,         0.20,       0.15,        0.25,       0.19,      0.00,       0.00]
+//		},
+//
+//		"caretaker": 4
+//	},
+
+	"striderhub": {
+		"importance": [0, 0.5],
+		"require_energy": false,
+
+		"income_tier": [60, 80, 100],
+		//             ultimatum,    striderscorpion,   striderdante,   catapult,   funnelweb,   striderbantha,     striderdetriment, scylla,          reef,          battleship
+		"unit":      ["striderantiheavy", "striderscorpion", "striderdante", "striderarty", "striderfunnelweb", "striderbantha", "striderdetriment", "subtacmissile", "shipcarrier", "shipheavyarty"],
+		"land": {
+			"tier0": [ 0.01,         0.10,       0.81,    0.00,       0.05,        0.03,       0.00,      0.00,            0.00,          0.00],
+			"tier1": [ 0.03,         0.14,       0.22,    0.24,       0.20,        0.16,       0.01,      0.00,            0.00,          0.00],
+			"tier2": [ 0.05,         0.10,       0.16,    0.35,       0.10,        0.21,       0.03,      0.00,            0.00,          0.00],
+			"tier3": [ 0.05,         0.10,       0.01,    0.26,       0.10,        0.35,       0.13,      0.00,            0.00,          0.00]
+		},
+		"water": {
+			"tier1": [ 0.50,         0.00,       0.00,    0.00,       0.00,        0.00,       0.00,      0.00,            0.25,          0.25],
+			"tier2": [ 0.10,         0.00,       0.00,    0.00,       0.00,        0.00,       0.10,      0.00,            0.40,          0.40]
+		},
+
+		"caretaker": 2
+	}
+},
+
+
+// Factory selection parameters
+"select": {
+	"air_map": 80,
+	"offset": [-20, 20],
+	// Speed factor: 8x8 ~ 0%, 24x24 ~ 40%
+	"speed": [0, 40],
+	"map": [8, 24]
+},
+
+"quota": {
+	"scout": 3,  // max scout units out of raiders
+	"raid": [14.0, 20.0],  // [<min>, <avg>] power of raider squad
+	"attack": 40.0,  // min power of attack group
+	"def_rad": 1050,  // defence radius
+	"thr_mod": {
+		"attack": [0.25, 0.5],  // [<min>, <max>] enemy threat modifier for target selection of attack task
+		"defence": [1.2, 1.2]  // [<min>, <max>] enemy threat modifier for group size calculation of defence task
+	}
+},
+
+// If unit's health drops below specified percent it will retreat
+"retreat": {
+	"builder": 0.2,  // default value for all builders
+	"fighter": 0.25,  // default value for all not-builder units
+	"shield": [0.0, 0.2]  // [<empty>, <full>] shield power
+},
+
+"behaviour": {
+	// factorycloak
+	"cloakcon": {
+		// "role": [<main>, <enemy>, <enemy>, ...]
+		// <main> is the role to make desicions of when to build it and what task to assign
+		// <enemy> is to decide how to counter enemy unit, if missing then equals to <main>
+		// Roles: builder, scout, raider, riot, assault, skirmish, artillery, anti_air, anti_sub, anti_heavy, bomber, support, mine, transport, air, sub, static, heavy
+		// Auto-assigned roles: builder, air, static
+		"role": ["builder"]
+
+		// Attributes - optinal states
+		// "melee" - always move close to target, disregard attack range
+		// "siege" - mostly use fight command instead of move
+		// "no_jump" - disable jump on retreat
+		// "boost" - boost speed on retreat
+		// "comm" - commander, auto-assigned
+		// "no_strafe" - disable gunship's strafe
+		// "stockpile" - load weapon before any task (NOT IMPLEMENTED), auto-assigned
+		// "super" - superweapon, auto-assigned to porcupine items
+		// "ret_hold" - hold fire on retreat
+		// "ret_fight" - fight on retreat
+//		"attribute": ["boost", "no_strafe"],
+
+		// Fire state (open by default)
+		// "hold" - hold fire
+		// "return" - return fire
+		// "open" - fire at will
+//		"fire_state": "open",
+
+		// Overrides reloadTime in seconds
+//		"reload": 1.0,
+
+		// Limits number of units
+//		"limit": 10,
+
+		// Minimum hp percent before retreat
+//		"retreat": 0.8,
+
+		// Threat multiplier
+//		"dmg_mod": 1.0
+	},
+	"cloakraid": {
+		"role": ["raider"],
+		"attribute": ["scout"],
+		"retreat": 0.4,
+		"dmg_mod": 2.0
+	},
+	"cloakheavyraid": {
+		"role": ["skirmish"],
+		"retreat": 0.4,
+		"dmg_mod": 2.0
+	},
+	"cloakskirm": {
+		"role": ["assault"],
+		"retreat": 0.55,  // mostly disposable
+		"dmg_mod": 0.75
+	},
+	"cloakriot": {
+		"role": ["riot"],
+		"attribute": ["support"],
+		"retreat": 0.6,
+		"dmg_mod": 0.75
+	},
+	"cloakassault": {
+		"role": ["assault"],
+		"limit": 0,
+		"retreat": 0.55,  // assaults need to assault
+		"dmg_mod": 0.8
+	},
+	"cloakarty": {
+		"role": ["artillery"],
+		"retreat": 0.99,
+		"dmg_mod": 0.1
+	},
+	"cloaksnipe": {
+		"role": ["heavy", "anti_heavy"],
+		"fire_state": "open",
+		"attribute": ["support"],
+		"retreat": 0.99
+	},
+	"cloakbomb": {
+		"role": ["mine"],
+		"retreat": 0.01
+	},
+	"cloakjammer": {
+		"role": ["support"],
+		"limit": 1
+	},
+	"cloakaa": {
+		"role": ["anti_air"],
+		"retreat": 0.7,
+		"fire_state": "return",
+		"dmg_mod": 1.2
+	},
+
+	// factorygunship
+	"gunshipcon": {
+		"role": ["builder", "air"],
+		"limit": 2,
+		"retreat": 0.99
+	},
+	"gunshipbomb": {
+		"role": ["air"],
+		"retreat": 0.01
+	},
+	"gunshipemp": {
+		"role": ["air", "air"],
+		"retreat": 0.9
+	},
+	"gunshipskirm": {
+		"role": ["air"],
+		"dmg_mod": 1.7,
+		"retreat": 0.75
+	},
+	"gunshipraid": {
+		"role": ["scout", "air"],
+		"retreat": 0.8
+	},
+	"gunshipheavyskirm": {
+		"role": ["air"],
+		"attribute": ["no_strafe", "siege"],
+		"retreat": 0.55,
+		"dmg_mod": 1.25
+	},
+	"gunshipassault": {
+		"role": ["anti_heavy", "air"],
+		"fire_state": "hold",
+		"reload": 5.5,
+		"retreat": 0.75,
+		"dmg_mod": 1.25
+	},
+	"gunshipkrow": {
+		"role": ["heavy", "air", "support"],
+		"retreat": 0.1,
+		"dmg_mod": 2.0
+	},
+	"gunshiptrans": {
+		"role": ["transport", "air"]
+	},
+	"gunshipheavytrans": {
+		"role": ["transport", "air"]
+	},
+	"gunshipaa": {
+		"role": ["anti_air", "air"],
+		"retreat": 0.95,
+		"dmg_mod": 1.2
+	},
+
+	// factoryamph
+	"amphcon": {
+		"role": ["builder"]
+	},
+	"amphraid": {
+		"role": ["raider"],
+		"attribute": ["scout"],
+		"retreat": 0.35  // pretty disposable
+	},
+	"amphimpulse": {
+		"role": ["riot"],
+		"attribute": ["melee"],
+		"retreat": 0.5,
+		"dmg_mod": 2.0
+	},
+	"amphfloater": {
+		"role": ["assault"],
+		"dmg_mod": 2.0,
+		"retreat": 0.5  // too slow to be retreating all the time
+	},
+	"amphriot": {
+		"role": ["riot"],
+		"attribute": ["melee", "support"],
+		"retreat": 0.35  // too slow to be retreating all the time
+	},
+	"amphassault": {
+		"role": ["heavy"],
+		"retreat": 0.55,
+		"dmg_mod": 2.0
+	},
+	"amphtele": {
+		"role": ["transport"]
+	},
+	"amphaa": {
+		"role": ["anti_air"],
+		"retreat": 0.7,
+		"dmg_mod": 1.2
+	},
+
+	// factoryspider
+	"spidercon": {
+		"role": ["builder"]
+	},
+	"spiderscout": {
+		"role": ["scout"],
+		"retreat": 0.01
+	},
+	"spiderassault": {
+		"role": ["assault"],
+		"attribute": ["melee"],
+		"dmg_mod": 2.0,
+		"retreat": 0.65
+	},
+	"spideremp": {
+		"role": ["riot"],
+		"attribute": ["support"],
+		"limit": 1,
+		"retreat": 0.5
+	},
+	"spiderriot": {
+		"role": ["skirmish"],
+		"attribute": ["support"],
+		"retreat": 0.55
+	},
+	"spiderskirm": {
+		"role": ["assault"],
+		"attribute": ["support"],
+		"retreat": 0.8
+	},
+	"spidercrabe": {
+		"role": ["heavy"],
+		"attribute": ["siege", "ret_fight"],
+		"dmg_mod": 2.5,
+		"retreat": 0.15
+	},
+	"spiderantiheavy": {
+		"role": ["anti_heavy", "scout"],
+		"limit": 0
+	},
+	"spideraa": {
+		"role": ["anti_air"],
+		"retreat": 0.9,
+		"dmg_mod": 1.2
+	},
+
+	// factoryshield
+	"shieldcon": {
+		"role": ["builder", "static", "builder"],
+		"retreat": 1.3
+	},
+	"shieldscout": {
+		"role": ["scout"],
+		"retreat": 0.1
+	},
+	"shieldraid": {
+		"role": ["raider"],
+		"attribute": ["scout"],
+		"dmg_mod": 2.0,
+		"retreat": 0.35
+	},
+	"shieldskirm": {
+		"role": ["skirmish"],
+		"retreat": 0.7
+	},
+	"shieldassault": {
+		"role": ["assault"],
+		"attribute": ["support"],
+		"dmg_mod": 1.5,
+		"retreat": 1.2
+	},
+	"shieldriot": {
+		"role": ["riot"],
+		"attribute": ["support"],
+		"retreat": 0.5
+	},
+	"shieldfelon": {
+		"role": ["assault",	"support", "heavy"],
+		"dmg_mod": 2.0,
+		"limit": 2,
+		"retreat": 1.5
+	},
+	"shieldarty": {
+		"role": ["anti_heavy", "skirmish"],
+		"attribute": ["support"],
+		"dmg_mod": 1.5,
+		"retreat": 0.8
+	},
+	"shieldbomb": {
+		"role": ["mine"]
+	},
+	"shieldshield": {
+		"role": ["support", "static", "support"],
+		"retreat": 1.1
+	},
+	"shieldaa": {
+		"role": ["anti_air"],
+		"retreat": 0.7,
+		"dmg_mod": 1.2
+	},
+
+	// factoryveh
+	"vehcon": {
+		"role": ["builder"]
+	},
+	"vehscout": {
+		"role": ["scout"],
+		"limit": 4,
+		"retreat": 0.01
+	},
+	"vehraid": {
+		"role": ["raider"],
+		"attribute": ["melee"],
+		"dmg_mod": 1.5,
+		"retreat": 0.35
+	},
+	"vehsupport": {
+		"role": ["support"],
+		"attribute": ["siege", "ret_fight", "support"],
+		"retreat": 0.6  // cannot retreat
+	},
+	"vehriot": {
+		"role": ["riot"],
+		"attribute": ["support"],
+		"dmg_mod": 1.5,
+		"retreat": 0.6
+	},
+	"vehassault": {
+		"role": ["assault"],
+		"attribute": ["melee"],
+		"dmg_mod": 1.1,
+		"retreat": 0.67  // slow to turn around
+	},
+	"vehcapture": {
+		"role": ["skirmish"],
+		"retreat": 0.9,
+		"dmg_mod": 5.0
+	},
+	"veharty": {
+		"role": ["skirmish"],
+		"attribute": ["support"],
+		"retreat": 0.8
+	},
+	"vehheavyarty": {
+		"role": ["artillery", "artillery", "heavy"],
+		"retreat": 0.99,
+		"dmg_mod": 0.1
+	},
+	"vehaa": {
+		"role": ["anti_air"],
+		"attribute": ["melee"],
+		"retreat": 0.75,
+		"dmg_mod": 1.2
+	},
+
+	// factoryjump
+	"jumpcon": {
+		"role": ["builder"]
+	},
+	"jumpscout": {
+		"role": ["raider"],
+		"attribute": ["scout"]
+	},
+	"jumpraid": {
+		"role": ["raider"]
+	},
+	"jumpblackhole": {
+		"role": ["support"]
+	},
+	"jumpskirm": {
+		"role": ["skirmish"],
+		"attribute": ["support"]
+	},
+	"jumpassault": {
+		"role": ["assault"],
+		"attribute": ["melee"],
+		"dmg_mod": 2.0
+	},
+	"jumpsumo": {
+		"role": ["heavy", "support", "heavy"],
+		"attribute": ["no_jump"]
+	},
+	"jumparty": {
+		"role": ["artillery"],
+		"retreat": 0.99
+	},
+	"jumpbomb": {
+		"role": ["anti_heavy", "mine"],
+		"limit": 3,
+		"retreat": 0.01
+	},
+	"jumpaa": {
+		"role": ["anti_air"],
+		"attribute": ["melee"],
+		"retreat": 0.9,
+		"dmg_mod": 1.2
+	},
+
+	// factoryhover
+	"hovercon": {
+		"role": ["builder"]
+	},
+	"hoverraid": {
+		"role": ["raider"],
+		"attribute": ["scout"],
+		"limit": 6,
+		"retreat": 0.8
+	},
+	"hoverskirm": {
+		"role": ["assault"],
+		"retreat": 0.6,
+		"dmg_mod": 4.0
+	},
+	"hoverassault": {
+		"role": ["raider"],
+		"attribute": ["melee", "ret_hold"],
+		"dmg_mod": 1.5,
+		"retreat": 0.4
+	},
+	"hoverdepthcharge": {
+		"role": ["anti_sub", "riot"],
+		"attribute": ["melee"],
+		"retreat": 0.6
+	},
+	"hoverriot": {
+		"role": ["riot"],
+		"attribute": ["support"],
+		"dmg_mod": 1.25,
+		"retreat": 0.6
+	},
+	"hoverarty": {
+		"role": ["artillery" , "support", "heavy"],
+		"retreat": 0.99
+	},
+	"hoveraa": {
+		"role": ["anti_air"],
+		"attribute": ["melee"],
+		"retreat": 0.9,
+		"dmg_mod": 1.2
+	},
+
+	// factoryplane
+	"planecon": {
+		"role": ["builder", "air"],
+		"limit": 2,
+		"retreat": 0.99
+	},
+	"planefighter": {
+		"role": ["scout", "air"],
+		"attribute": ["boost"],
+		"limit": 1,
+		"dmg_mod": 2.0,
+		"retreat": 0.8
+	},
+	"planeheavyfighter": {
+		"role": ["anti_air", "air"],
+		"attribute": ["melee", "siege"],
+		"dmg_mod": 2,
+		"limit": 7,
+		"retreat": 0.6
+	},
+	"bomberprec": {
+		"role": ["bomber", "air"],
+		"fire_state": "hold",
+		"retreat": 0.9,
+		"limit": 3,
+		"dmg_mod": 1.25
+	},
+	"bomberriot": {
+		"role": ["bomber", "air"],
+		"limit": 0,
+		"retreat": 0.6
+	},
+	"bomberdisarm": {
+		"role": ["bomber", "air"],
+		"limit": 0,
+		"fire_state": "hold",
+		"retreat": 0.6
+	},
+	"bomberheavy": {
+		"role": ["bomber", "support", "air"],
+		"retreat": 0.6,
+		"dmg_mod": 1.5
+	},
+	"planescout": {
+		"role": ["scout", "air"],
+		"limit": 1,
+		"retreat": 0.8
+	},
+
+	// factorytank
+	"tankcon": {
+		"role": ["builder"]
+	},
+	"tankraid": {
+		"role": ["skirmish"],
+		"attribute": ["scout"],
+		"limit": 2,
+		"retreat": 0.9
+	},
+	"tankheavyraid": {
+		"role": ["raider", "assault", "raider"],
+		"limit": 0,
+		"retreat": 0.75
+	},
+	"tankriot": {
+		"role": ["riot"],
+		"attribute": ["support"],
+		"limit": 1,
+		"retreat": 0.7
+	},
+	"tankassault": {
+		"role": ["assault", "heavy", "anti_heavy", "assault"],
+		"retreat": 0.25,
+		"dmg_mod": 1.14
+	},
+	"tankheavyassault": {
+		"role": ["heavy", "anti_heavy", "heavy"],
+		"retreat": 0.25,
+		"dmg_mod": 2.0
+	},
+	"tankarty": {
+		"role": ["artillery", "heavy"],
+		"limit": 2,
+		"retreat": 0.99,
+		"dmg_mod": 0.1
+	},
+	"tankheavyarty": {
+		"role": ["artillery", "support", "heavy"],
+		"limit": 1,
+		"retreat": 0.99,
+		"dmg_mod": 0.2
+	},
+	"tankaa": {
+		"role": ["anti_air"],
+		"attribute": ["melee"],
+		"retreat": 0.8,
+		"dmg_mod": 1.2
+	},
+
+	// striderhub
+	"striderantiheavy": {
+		"role": ["anti_heavy", "support", "heavy"],
+		"retreat": 0.7
+	},
+	"striderscorpion": {
+		"role": ["anti_heavy", "support", "heavy"],
+		"fire_state": "return",
+		"retreat": 0.6,
+		"dmg_mod": 1.25
+	},
+	"striderdante": {
+		"role": ["heavy"],
+		"attribute": ["melee"],
+		"limit": 2,
+		"retreat": 0.5,
+		"dmg_mod": 1.25
+	},
+	"striderarty": {
+		"role": ["anti_heavy", "heavy"],
+		"fire_state": "return",
+		"retreat": 0.9,
+		"dmg_mod": 0.1
+	},
+	"striderfunnelweb": {
+		"role": ["heavy", "support", "air"],
+		"attribute": ["support"],
+		"retreat": 0.75,
+		"dmg_mod": 15.0
+	},
+	"striderbantha": {
+		"role": ["heavy", "support", "heavy"],
+		"retreat": 0.6,
+		"dmg_mod": 2.0
+	},
+	"striderdetriment": {
+		"role": ["heavy", "support", "heavy"],
+		"attribute": ["melee"],
+		"retreat": 0.01,  // no retreat, demolish enemy base
+		"dmg_mod": 2.0
+	},
+	"subtacmissile": {
+		"role": ["artillery", "heavy"],
+		"attribute": ["stockpile"]
+	},
+	"shipcarrier": {
+		"role": ["artillery", "heavy"]
+	},
+	"shipheavyarty": {
+		"role": ["artillery", "heavy"]
+	},
+
+	// statics
+	"staticnuke": {
+		"role": ["static", "heavy"],
+		"fire_state": "hold",  // burst attacks
+		"reload": 30.0,
+		"limit": 1,
+		"dmg_mod": 0.01
+	},
+	"staticmissilesilo": {
+		"role": ["static", "support", "heavy"],
+		"dmg_mod": 0.01
+	},
+	"raveparty": {
+		"role": ["static", "heavy"],
+		"limit": 2,
+		"dmg_mod": 0.01
+	},
+	"zenith": {
+		"role": ["static", "heavy"],
+		"fire_state": "hold",  // burst attacks
+		"reload": 105.0,  // 105sec / 0.7sec/met = 150 meteorsControlled
+		"limit": 2,
+		"dmg_mod": 0.01
+	},
+	"staticheavyarty": {
+		"role": ["anti_heavy", "static", "heavy"],
+		"limit": 5,
+		"dmg_mod": 0.01
+	},
+	"turretheavy": {
+		"role": ["static", "support", "static"],
+		"dmg_mod": 5.0
+	},
+	"turretantiheavy": {
+		"role": ["static", "support", "static"],
+		"dmg_mod": 5.0
+	},
+	"staticarty": {
+		"role": ["static", "support", "static"],
+		"dmg_mod": 5.0
+	},
+	"staticantinuke": {
+		"role": ["static", "heavy"]
+	},
+	"turretheavylaser": {
+		"role": ["static", "heavy"],
+		"dmg_mod": 4.0
+	},
+	"energysingu": {
+		"role": ["static", "heavy"]
+	},
+	"energyfusion": {
+		"role": ["static", "heavy"]
+	},
+	"turretaalaser": {
+		"role": ["static", "anti_air"],
+		"dmg_mod": 2.5
+	},
+	"turretaaheavy": {
+		"role": ["static", "anti_air", "heavy"],
+		"dmg_mod": 3.0
+	},
+	"turretlaser": {
+		"role": ["static"],
+		"dmg_mod": 3.0
+	},
+	"turretmissile": {
+		"role": ["static"],
+		"dmg_mod": 3.0
+	},
+	"turretriot": {
+		"role": ["static"],
+		"dmg_mod": 3.5
+	},
+	"turretaafar": {
+		"role": ["static", "anti_air"],
+		"dmg_mod": 4.0
+	},
+	"turretaaflak": {
+		"role": ["static", "anti_air"],
+		"dmg_mod": 4.0
+	},
+	"turretaaclose": {
+		"role": ["static", "anti_air"],
+		"dmg_mod": 4.0
+	},
+	"turretgauss": {
+		"role": ["static"],
+		"dmg_mod": 3.5
+	},
+	"turretemp": {
+		"role": ["static"],
+		"dmg_mod": 3.5
+	},
+
+	//	"unit": ["turretlaser", "turretmissile", "turretriot", "turretheavylaser", "turrettorp", "turretaalaser", "staticcon", "turretheavy", "staticshield", "turretemp", "turretantiheavy", "staticarty"],//
+
+	// support factories won't be built in front
+	"factoryplane": {
+		"role": ["static"],
+		"attribute": ["support"]
+	},
+	"factoryjump": {
+		"role": ["static"],
+		"attribute": ["support"]
+	},
+	"factorygunship": {
+		"role": ["static"],
+		"attribute": ["support"]
+	},
+	"striderhub": {
+		"role": ["static"],
+		"attribute": ["support"]
+	}
+},
+
+// Build special units when enemy_metal*ratio > response_metal*eps; eps=teamSize*eps_step+(1-eps_step)
+// AA condition for 3v3: (enemy_air_metal*0.67 > (aa_metal+aa_cost)*1.08) and (aa_metal+aa_cost < army_metal*0.25)
+//
+// Probability of UnitDef for AA role depends on income tier: (tierN[UnitDef]+_weight_)*enemy_air_metal/aa_metal*importance
+// cloakaa probability for tier 1: (0.00+0.10)*enemy_air_metal*67.0
+"response": {
+	"_weight_": 0.10,  // base weight of response probability
+
+	"raider": {
+		"vs":         ["builder", "anti_air", "scout", "raider", "assault", "anti_heavy"],
+		"ratio":      [ 1.35,      0.50,       2.00,    2.00,     0.50,       0.50],
+		"importance": [ 15.0,      10.0,       16.0,    10.0,     10.0,       10.0],
+		"max_percent": 0.10,
+		"eps_step": 0.00
+	},
+	"riot": {
+		"vs":         ["assault", "skirmish"],
+		"ratio":      [ 3.10,	3.0],
+		"importance": [ 40.0,	40.0],
+		"max_percent": 0.50,
+		"eps_step": 0.01
+	},
+	"scout": {
+		"vs":         ["builder", "artillery", "anti_air", "scout", "raider", "heavy", "anti_heavy"],
+		"ratio":      [ 0.50,      0.50,        0.25,       2.0,     1.0,      0.25,    0.1],
+		"importance": [ 15.0,      15.0,        10.0,       10.0,    10.0,     15.0,    15.0],
+		"max_percent": 0.07,
+		"eps_step": 0.00
+	},
+	"mine": {
+		"vs":         ["raider", "skirmish", "assault"],
+		"ratio":      [ 0.25,     0.25,       0.25],
+		"importance": [ 1.0,      1.0,        1.0],
+		"max_percent": 0.04,
+		"eps_step": 0.00
+	},
+	"artillery": {
+		"vs":         ["static", "artillery", "support"],
+		"ratio":      [ 0.45,	1.50,	1.50],
+		"importance": [ 25.0,	25.0,	25.0],
+		"max_percent": 0.10,
+		"eps_step": 0.02
+	},
+	"builder": {
+		"vs":         ["static", "artillery", "support", "assault"],
+		"ratio":      [ 0.5,	0.5,	0.50,	0.25],
+		"importance": [ 35.0,	35.0,	35.0,	35.0],
+		"max_percent": 0.65,
+		"eps_step": 0.00
+	},
+	"anti_air": {
+		"vs":         ["air"],
+		"ratio":      [ 2.00],
+		"importance": [ 88.0],
+		"max_percent": 0.50,
+		"eps_step": 0.03
+	},
+	"anti_sub": {
+		"vs":         ["sub"],
+		"ratio":      [ 1.0],
+		"importance": [ 2.0],
+		"max_percent": 0.15,
+		"eps_step": 0.0
+	},
+	"anti_heavy": {
+		"vs":         ["heavy", "static", "support"],
+		"ratio":      [ 0.25,     0.4,	1.0],
+		"importance": [ 16.0,    15.0,	15.0],
+		"max_percent": 0.20,
+		"eps_step": 0.00
+	},
+	"heavy": {
+		"vs":         ["heavy", "static", "support"],
+		"ratio":      [ 0.3,     0.6,	1.5],
+		"importance": [ 20.0,    25.0,	20.0],
+		"max_percent": 0.20,
+		"eps_step": 0.01
+	},
+	"bomber": {
+		"vs":         ["heavy", "anti_heavy", "artillery"],
+		"ratio":      [ 0.75,    1.00,         1.00],
+		"importance": [ 15.0,    15.0,         15.0],
+		"max_percent": 0.20,
+		"eps_step": 0.00
+	},
+	"skirmish": {
+		"vs":         ["raider"],
+		"ratio":      [ 2.0],
+		"importance": [ 40.0],
+		"max_percent": 0.20,
+		"eps_step": 0.01
+	},
+	"assault": {
+		"vs":         ["raider", "skirmish", "air"],
+		"ratio":      [ 2.50,   3.00,     2.50],
+		"importance": [ 30.0,   25.0,     30.0],
+		"max_percent": 0.80,
+		"eps_step": 0.02
+	},
+	"support": {
+		"vs":         ["heavy"],
+		"ratio":      [ 1.00],
+		"importance": [ 5.00],
+		"max_percent": 0.05,
+		"eps_step": 0.02
+	}
+},
+
+"economy": {
+	// Limits of energy structures partly defined by parabola in space (structure_cost/energyMake, unit_limit).
+	// Parabola defined by 3 control points.
+	// For example land config:
+	//   P0 = energysingu: (4000/225; random(1..2)) = (17.78, 1)
+	//   P1 = energyfusion: (1000/35; random(3)) = (28.57, 3)
+	//   P2 = energysolar: (70/2; random(10..15)) = (35, 13)
+	// P(x) => y = 0.079550*x*x - 3.501790*x + 38.113789
+	// Then parabola P(x) defines limit for
+	//   "energygeo": x=500/25=20, y = P(20) = 31.82 - 70.0358 + 38.113789 ~= 0
+	//   "energywind": x=35/1.2=29.17, y = P(29.17) ~= 4
+	//
+	// Metal income condition for energy structure is: income > sqrt(structure_cost*0.4).
+	// Energy buildings are sorted by structure_cost/energy_make (asc).
+	// Config in example with factor=0.8 leads to next build choice:
+	//   1) nothing if singu_limit >= 1;
+	//   2) else if singu_limit < 1 and income > 50 then singu;
+	//   (ignored) else if geo_limit < 0 and income > 17.68 then geo;
+	//   3) else if fusion_limit < 3 and income > 25 then fusion;
+	//   4) else if tidal_limit < 4 and income > 4.68 then wind/tidal;
+	//   5) else if solar_limit < 13 and income > 6.61 then solar;
+	//   6) if nothing selected then build lowest energy that didn't reach its limit, disregard income.
+	"energy": {
+		// If land area >= 40% of the map then "land" config used, "water" otherwise
+		"land": {
+			// "<energy_def>": [<lower limit>, <upper limit>]
+			// limit = random(<lower limit>..<upper limit>)
+			"energysingu": [1, 1],
+			"energyfusion": [3],
+			"energysolar": [6, 18]
+		},
+		"water": {
+			"energysingu": [1],
+			"energyfusion": [4],
+			"energywind": [20]
+		},
+		"factor": 0.90,  // income factor for energy
+
+		"pylon": ["energypylon", "energysolar", "energywind"]
+	},
+
+	// Scales metal income
+	// ecoFactor = teamSize*eps_step+(1-eps_step)
+	"eps_step": 0.07,
+
+	// Mobile buildpower to metal income ratio
+	"buildpower": 1.5,
+	// Metal excess to income ratio, -1 to disable
+	"excess": -1.0,
+
+	// New factory switch interval, in seconds
+	"switch": 1020,
+
+	"terra": "terraunit",
+	"airpad": "staticrearm",
+
+	// Unknown UnitDef replacer
+	"default": "turretmissile"
+},
+
+"porcupine": {
+	//        0         1        2          3         4             5           6            7          8          9           10         11		  12		13
+	"unit": ["turretlaser", "turretmissile", "turretriot", "turretheavylaser", "turrettorp", "turretaalaser", "staticcon", "turretheavy", "staticshield", "turretemp", "turretantiheavy", "staticarty", "turretaafar", "turretaaheavy"],
+	// Actual number of defences per cluster bounded by income
+	"land":  [0, 1, 9, 6, 1, 1, 9, 2, 5, 0, 0, 12, 11],
+	"water": [4, 1, 6, 4, 4, 3, 5],
+	"prevent": 1,  // number of preventive defences
+	"amount": {  // income bound factor
+		"offset": [-0.2, 0.2],
+		// Amount factor: 8x8 ~ 2.0, 24x24 ~ 1.0
+		"factor": [2.0, 2.00],
+		"map": [8, 24]
+	},
+
+	// Base defence and time to build it, in seconds
+	"base": [[0, 20], [0, 120], [5, 580], [1, 980], [5, 1160], [1, 1380], [2, 1680], [5, 2000], [2, 2420], [13, 2800], [7, 3300]],
+
+	"superweapon": {
+		"unit":   ["raveparty", "staticnuke", "staticheavyarty", "zenith", "turretaaheavy"],
+		"weight": [ 0.6,         0.2,       0.1,        0.1,		0.1],
+
+		"condition": [50, 150]  // [<Minimum income>, <maximum seconds to build>]
+	},
+
+	// Fallback defence
+	"default": "turretmissile"
+},
+
+"commander": {
+	"prefix": "dyntrainer_",
+	"suffix": "_base",
+	"unit": {
+		"support": {
+			// Choice importance, 0 by default
+			"importance": 0.90,
+
+			// Starting units (order matters)
+			"start": {
+				"factory": {
+					"factorycloak": [
+						// [<weight>, [<role>, <role>, ...]]
+						[0.5, ["builder", "riot", "raider", "raider", "builder"]],
+						[0.5, ["builder", "raider", "raider", "raider", "raider", "builder", "riot"]]
+					],
+					"factorygunship": [
+						[0.5, ["builder", "skirmish", "skirmish", "mine", "skirmish", "skirmish"]],
+						[0.5, ["scout", "mine", "builder","mine", "skirmish", "skirmish", "mine", "skirmish", "skirmish"]]
+					],
+					"factoryamph": [
+						[0.5, ["builder", "riot", "raider"]],
+						[0.5, ["builder", "raider", "raider", "raider", "raider"]]
+					],
+					"factoryveh": [
+						[0.5, ["builder", "scout", "scout", "scout", "raider", "raider", "builder"]],
+						[0.5, ["builder", "scout", "scout", "scout", "riot", "raider", "builder"]]
+					],
+					"factoryhover": [
+						[0.5, ["builder", "raider", "raider", "raider"]],
+						[0.5, ["builder", "raider","raider"]]
+					],
+					"factoryplane": [
+						[0.5, ["anti_air", "builder", "anti_air", "anti_air"]],
+						[0.5, ["anti_air", "builder", "anti_air", "builder"]]
+					],
+					"factorytank": [
+						[0.5, ["builder", "skirmish", "assault", "builder", "assault", "builder", "riot"]],
+						[0.5, ["builder", "skirmish", "builder", "riot", "builder", "assault", "assault"]]
+					],
+					"factoryspider": [
+						[0.5, ["builder", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "riot", "scout", "builder", "scout", "riot", "scout", "builder"]],
+						[0.5, ["builder", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "riot", "scout", "builder", "support"]]
+					],
+					"factoryshield": [
+						[0.5, ["builder", "scout", "raider", "scout", "scout", "raider", "raider", "builder", "builder"]],
+						[0.5, ["builder", "scout", "scout", "raider", "raider", "builder", "raider", "raider", "raider"]]
+					],
+					"factoryjump": [
+						[0.5, ["scout", "riot", "builder", "raider"]],
+						[0.5, ["builder", "raider", "raider"]]
+					]
+				},
+				"default": ["riot", "raider", "builder"]
+			},
+
+			// Morph params
+			"upgrade": {
+				"time": 120,  // Force-morph delay, in seconds
+				"module": [  // List of dynamic module IDs
+					[13],  // shotgun
+					[31, 42],  // Cloak, Nano
+					[15, 41, 37],  // sniper, range, armor
+					[35, 35, 35],  // battle drones
+					[35, 35, 35],  // battle drones
+					[34, 34, 34],  // companion drones
+					[34, 34, 34],  // companion drones
+					[40, 40, 40],  // speed
+					[40, 40, 40],  // speed
+					[40, 40, 37],  // speed, armour
+					[37, 37, 37],  // armour
+					[37, 37, 37],  // armour
+					[37, 36, 36],  // armour, autoheal
+					[36, 36, 36],  // autoheal
+					[36, 36, 36],  // autoheal
+					[42, 42, 42],  // builder
+					[42, 42, 42],  // builder
+					[42, 42, 29],  // builder, jammer
+					[32, 27, 33]  // area cloak, disruptor ammo, lazarus
+				]
+			},
+
+			// Commander hides if ("time" elapsed) and ("threat" exceeds value or enemy has "air")
+			"hide": {
+				"time": 100,  // seconds
+				"threat": 30,
+				"air": true
+			}
+		},
+		"recon": {
+			// Choice importance, 0 by default
+			"importance": 0.10,
+
+			// Starting units (order matters)
+			"start": {
+				"factory": {
+					"factorycloak": [
+						// [<weight>, [<role>, <role>, ...]]
+						[0.5, ["raider", "riot", "builder"]],
+						[0.5, ["builder", "raider", "raider"]]
+						],
+					"factorygunship": [
+						[0.5, ["mine", "mine", "mine", "mine", "skirmish", "skirmish", "mine", "skirmish", "skirmish"]],
+						[0.5, ["scout", "mine", "builder","mine", "skirmish", "skirmish", "mine", "skirmish", "skirmish"]]
+					],
+					"factoryamph": [
+						[0.5, ["scout", "riot", "raider"]],
+						[0.5, ["builder", "raider", "raider"]]
+					],
+					"factoryveh": [
+						[0.5, ["scout", "scout", "scout", "scout", "raider", "raider", "builder"]],
+						[0.5, ["scout",  "raider", "scout", "scout", "raider", "raider", "raider", "builder"]]
+					],
+					"factoryhover": [
+						[0.5, ["builder", "raider","raider"]],
+						[0.5, ["builder", "raider","raider"]]
+					],
+					"factoryplane": [
+						[0.5, ["anti_air", "builder", "anti_air", "anti_air"]],
+						[0.5, ["anti_air", "builder", "anti_air", "builder"]]
+					],
+					"factorytank": [
+						[0.5, ["skirmish", "builder", "assault", "builder", "assault", "builder", "builder", "heavy"]],
+						[0.5, ["builder", "skirmish", "builder", "skirmish", "assault", "builder", "assault"]]
+					],
+					"factoryspider": [
+						[0.5, ["scout", "scout", "scout", "scout", "scout", "scout", "riot", "scout", "builder", "scout", "riot", "scout", "builder"]],
+						[0.5, ["scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "builder", "riot", "scout", "builder", "support"]]
+					],
+					"factoryshield": [
+						[0.5, ["scout", "raider", "raider", "raider", "builder", "builder"]],
+						[0.5, ["scout", "builder", "raider", "raider", "builder", "raider", "raider", "raider"]]
+					],
+					"factoryjump": [
+						[0.5, ["scout", "riot", "raider"]],
+						[0.5, ["builder", "raider", "raider"]]
+					]
+				},
+				"default": ["raider", "raider", "builder"]
+			},
+
+			// Morph params
+			"upgrade": {
+				"time": 90,  // Force-morph delay, in seconds
+				"module": [  // List of dynamic module IDs
+					[7, 37],  // Machinegun, armor
+					[32, 36],  // Cloak, Regen
+					[19, 38, 39],  // disruptor bomb, high density, damage boost
+					[35, 35, 35],  // battle drones
+					[35, 35, 35],  // battle drones
+					[34, 34, 34],  // companion drones
+					[34, 34, 34],  // companion drones
+					[40, 40, 40],  // speed
+					[40, 40, 40],  // speed
+					[40, 40, 37],  // speed, armour
+					[37, 37, 37],  // armour
+					[37, 37, 37],  // armour
+					[37, 36, 36],  // armour, autoheal
+					[36, 36, 36],  // autoheal
+					[36, 36, 36],  // autoheal
+					[42, 42, 42],  // builder
+					[42, 42, 42],  // builder
+					[42, 42, 29],  // builder, jammer
+					[32, 27, 33]  // area cloak, disruptor ammo, lazarus
+				]
+			},
+
+			// Commander hides if ("time" elapsed) and ("threat" exceeds value or enemy has "air")
+			"hide": {
+				"time": 100,  // seconds
+				"threat": 20,
+				"air": true
+			}
+		},
+		"assault": {
+			// Choice importance, 0 by default
+			"importance": 0.25,
+
+			// Starting units (order matters)
+			"start": {
+				"factory": {
+					"factorycloak": [
+						// [<weight>, [<role>, <role>, ...]]
+						[0.5, ["raider", "riot", "builder"]],
+						[0.5, ["builder", "raider", "riot"]]
+					],
+					"factorygunship": [
+						[0.5, ["mine", "mine", "mine", "mine", "skirmish", "skirmish", "mine", "skirmish", "skirmish"]],
+						[0.5, ["anti_heavy"]]
+					],
+					"factoryamph": [
+						[0.5, ["builder", "scout", "riot", "raider"]],
+						[0.5, ["builder", "raider", "raider"]]
+					],
+					"factoryveh": [
+						[0.5, ["scout", "scout", "scout", "riot", "builder", "skirmish", "skirmish", "builder", "skirmish", "skirmish", "skirmish"]],
+						[0.5, ["scout", "scout", "scout", "scout", "riot", "raider", "raider", "raider", "builder", "builder"]]
+					],
+					"factoryhover": [
+						[0.5, ["builder", "raider","raider"]],
+						[0.5, ["builder", "raider","raider"]]
+					],
+					"factoryplane": [
+						[0.5, ["anti_air", "builder", "anti_air", "anti_air"]],
+						[0.5, ["anti_air", "builder", "anti_air", "builder"]]
+					],
+					"factorytank": [
+						[0.5, ["builder", "skirmish", "builder", "assault", "builder", "skirmish", "heavy"]],
+						[0.5, ["skirmish", "skirmish", "builder", "assault", "builder", "builder","heavy"]]
+					],
+					"factoryspider": [
+						[0.5, ["scout", "scout", "scout", "builder", "scout", "scout", "scout", "riot", "scout", "builder", "scout", "riot", "scout", "builder"]],
+						[0.5, ["scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "builder", "riot", "scout", "builder", "support"]]
+					],
+					"factoryshield": [
+						[0.5, ["scout", "scout", "scout", "builder", "scout", "raider", "raider", "raider", "builder", "builder"]],
+						[0.5, ["scout", "builder", "raider", "raider", "scout", "scout", "scout", "builder", "raider", "raider", "raider"]]
+					],
+					"factoryjump": [
+						[0.5, ["scout", "riot", "raider"]],
+						[0.5, ["builder", "raider", "raider"]]
+					]
+				},
+				"default": ["raider", "raider", "builder"]
+			},
+
+			// Morph params
+			"upgrade": {
+				"time": 60,  // Force-morph delay, in seconds
+				"module": [  // List of dynamic module IDs
+					[11],  // Riot
+					[24, 37],  // health
+					[11, 41, 41],  // Double Riot + range
+					[38, 41, 41],  // HP + range
+					[36, 41, 36],  // shield, regen, range
+					[41, 41, 41],  // range
+					[39, 39, 39],  // dmg
+					[41, 41, 41],  // range
+					[39, 39, 39],  // dmg
+					[41, 41, 41],  // range
+					[39, 39, 39],  // dmg
+					[41, 41, 41],  // range
+					[39, 39, 39],  // dmg
+					[41, 41, 41],  // range
+					[39, 39, 39],  // dmg
+					[41, 41, 41],  // range
+					[39, 39, 39]  // dmg
+				]
+			},
+
+			// Commander hides if ("time" elapsed) and ("threat" exceeds value or enemy has "air")
+			"hide": {
+				"time": 100,  // seconds
+				"threat": 60,
+				"air": true
+			}
+		},
+		"strike": {
+		   // Choice importance, 0 by default
+			"importance": 0.75,
+
+			// Starting units (order matters)
+			"start": {
+				"factory": {
+					"factorycloak": [
+						// [<weight>, [<role>, <role>, ...]]
+						[0.5, ["raider", "riot", "builder"]],
+						[0.5, ["builder", "raider", "raider"]]
+					],
+					"factorygunship": [
+						[0.5, ["mine", "mine", "mine", "mine", "skirmish", "skirmish", "mine", "skirmish", "skirmish"]],
+						[0.5, ["scout", "mine", "builder","mine", "skirmish", "skirmish", "mine", "skirmish", "skirmish"]]
+					],
+					"factoryamph": [
+						[0.5, ["scout", "riot", "raider"]],
+						[0.5, ["builder", "raider", "raider"]]
+					],
+					"factoryveh": [
+						[0.5, ["scout", "scout", "scout", "raider", "raider", "builder"]],
+						[0.5, ["scout",  "raider", "raider", "scout", "scout", "scout", "raider", "raider", "builder"]]
+					],
+					"factoryhover": [
+						[0.5, ["builder", "raider","raider"]],
+						[0.5, ["builder", "raider","raider"]]
+					],
+					"factoryplane": [
+						[0.5, ["anti_air", "builder", "anti_air", "anti_air"]],
+						[0.5, ["anti_air", "builder", "anti_air", "builder"]]
+					],
+					"factorytank": [
+						[0.5, ["skirmish", "builder", "assault", "builder", "builder", "riot"]],
+						[0.5, ["builder", "riot", "builder", "assault", "builder", "assault"]]
+					],
+					"factoryspider": [
+						[0.5, ["scout", "scout", "scout", "scout", "scout", "scout", "riot", "scout", "builder", "scout", "riot", "scout", "builder"]],
+						[0.5, ["scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "scout", "builder", "riot", "scout", "builder", "support"]]
+					],
+					"factoryshield": [
+						[0.5, ["scout", "raider", "raider", "raider", "builder", "builder"]],
+						[0.5, ["scout", "builder", "raider", "raider", "builder", "raider", "raider", "raider"]]
+					],
+					"factoryjump": [
+						[0.5, ["scout", "riot", "raider"]],
+						[0.5, ["builder", "raider", "raider"]]
+					]
+				},
+				"default": ["raider", "raider", "builder"]
+			},
+
+			// Morph params
+			"upgrade": {
+				"time": 60,  // Force-morph delay, in seconds
+				"module": [  // List of dynamic module IDs
+					[4],  // beam laser
+					[31, 36],  // cloak, regen
+					[37, 40, 36],  // Dgun, speed, speed
+					[37, 40, 36],  // armor, speed, regen
+					[37, 40, 36],  // armor, speed, regen
+					[37, 40, 36],  // armor, speed, regen
+					[37, 40, 36],  // armor, speed, regen
+					[40, 40, 40],  // speed
+					[40, 40, 40],  // speed
+					[40, 40, 37],  // speed, armour
+					[37, 37, 37],  // armour
+					[37, 37, 37],  // armour
+					[37, 36, 36],  // armour, autoheal
+					[36, 36, 36],  // autoheal
+					[36, 36, 36],  // autoheal
+					[42, 42, 42],  // builder
+					[42, 42, 42],  // builder
+					[42, 42, 29],  // builder, jammer
+					[32, 27, 33]  // area cloak, disruptor ammo, lazarus
+				]
+			},
+
+			// Commander hides if ("time" elapsed) and ("threat" exceeds value or enemy has "air")
+			"hide": {
+				"time": 100,  // seconds
+				"threat": 50,
+				"air": true
+			}
+		}
+	}
+},
+
+"building": {
+	"class_land": {
+		"fac_land": {
+			// "type": [<blocker_shape>, <structure_type>]
+			// Available blocker_shape: rectangle, circle.
+			// Available structure_type: factory, mex, engy_low, engy_mid, engy_high, pylon, def_low, def_mid, def_high, special, nano, unknown
+			"type": ["rectangle", "factory"],
+
+			// Unit of measurement: 1 size/yard/radius = SQUARE_SIZE * 2 = 16 elmos, integer.
+			// Offset in South facing
+			"offset": [0, 5],  // default: [0, 0]
+
+			// Size of a blocker without yard
+//			"size": [7, 7],  // default: size of a unit
+
+			// Spacer, blocker_size = size + yard
+			"yard": [10, 10]  // default: [0, 0]
+
+			// "ignore": [<structure_type>, <structure_type>, ...]
+			// Ignore specified structures.
+			// Additional values: none, all
+//			"ignore": ["none"]  // default: ["none"]
+		},
+		"fac_air": {
+			"type": ["rectangle", "factory"],
+			"yard": [8, 8]
+		},
+		"fac_water": {
+			"type": ["rectangle", "factory"],
+			"offset": [0, 4],
+			"yard": [10, 12]
+		},
+		"fac_strider": {
+			"type": ["rectangle", "special"],
+			"offset": [0, 12],
+			"yard": [16, 16]
+		},
+		"solar": {
+			"type": ["rectangle", "engy_low"],
+			"ignore": ["mex", "engy_mid", "engy_high", "def_low", "pylon", "nano"]
+		},
+		"wind": {
+			"type": ["circle", "engy_low"],
+			// Integer radius of a blocker or desciption string.
+			// Available string values: explosion, expl_ally
+//			"radius": "explosion",  // default: "explosion"
+			"ignore": ["mex", "engy_mid", "engy_high", "pylon", "nano"]
+		},
+		"fusion": {
+			"type": ["circle", "engy_mid"],
+			"ignore": ["mex", "pylon", "def_low"]
+		},
+		"singu": {
+			"type": ["circle", "engy_high"],
+			"radius": "expl_ally",  // [radius ~ 1 player .. radius/2 ~ 4+ players]
+			"ignore": ["mex", "engy_low", "def_low", "pylon", "nano"]
+		},
+		"pylon": {
+			"type": ["circle", "pylon"],
+			"not_ignore": ["factory", "pylon"]  // default: ["all"]
+		},
+		"store": {
+			"type": ["rectangle", "mex"],
+			"not_ignore": ["factory"]
+		},
+		"mex": {
+			"type": ["rectangle", "mex"],
+			"not_ignore": ["factory", "pylon"]
+		},
+		"def_low": {
+			"type": ["circle", "def_low"],
+			"radius": 6,  // 100 / (SQUARE_SIZE * 2)
+			"ignore": ["engy_mid", "engy_high", "pylon", "nano"]
+		},
+		"caretaker": {
+			"type": ["rectangle", "nano"],
+			"ignore": ["mex", "def_low", "engy_mid", "pylon", "engy_high"]
+		},
+		"superweapon": {
+			"type": ["circle", "special"],
+			"ignore": ["mex", "def_low", "pylon", "engy_high"]
+		},
+		"protector": {
+			"type": ["circle", "special"],
+			"ignore": ["mex", "def_low", "engy_mid", "pylon", "engy_high"]
+		},
+//		"terraform": {
+//			"type": ["rectangle", "special"],
+//			"size": [7, 7]  // int2(3 + 4, 3 + 4)
+//		},
+		"strider": {
+			"type": ["rectangle", "special"],
+			"yard": [4, 4],
+			"ignore": ["all"]
+		},
+		"_default_": {
+			"type": ["rectangle", "unknown"],
+			"yard": [4, 4],
+			"ignore": ["pylon", "engy_high"]
+		}
+	},
+	// Water overrides land. Map considered as water if amount of land < 40%
+	"class_water" : {
+		"wind": {
+			"type": ["circle", "engy_low"],
+			"radius": 1,  // default: "explosion"
+			"ignore": ["mex", "engy_mid", "engy_high", "pylon", "nano"]
+		}
+	},
+	"instance": {
+		"fac_land": ["factorycloak", "factoryamph", "factoryhover", "factoryjump", "factoryshield", "factoryspider", "factorytank", "factoryveh"],
+		"fac_air": ["factoryplane", "factorygunship", "staticrearm"],
+		"fac_water": ["factoryship"],
+		"fac_strider": ["striderhub"],
+		"solar": ["energysolar"],
+		"wind": ["energywind"],
+		"fusion": ["energyfusion"],
+		"singu": ["energysingu"],
+		"pylon": ["energypylon"],
+		"store": ["staticstorage"],
+		"mex": ["staticmex"],
+		"def_low": ["turretmissile", "turretlaser"],
+		"caretaker": ["staticcon"],
+		"superweapon": ["raveparty", "staticnuke", "staticheavyarty", "zenith", "turretaaheavy"],
+		"protector": ["staticantinuke"],
+//		"terraform": ["terraunit"],
+		"strider": ["striderantiheavy", "striderscorpion", "striderdante", "striderarty", "striderfunnelweb", "striderbantha", "striderdetriment", "subtacmissile", "shipcarrier", "shipheavyarty"]
+	}
+}
+},
+// --- NORMAL config ---
+
+// --- HARD config COMMENTED ---
+// "hard": {},
+// --- HARD config COMMENTED ---
+
+// Fallback config
+"default": "normal"
+}

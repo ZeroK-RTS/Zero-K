@@ -5,20 +5,20 @@ local unitArray = {}
 
 -- weapons to track
 local weapons = {
-	corshad_bogus_bomb = true,
-	corshad_shield_check = true,
+	bomberprec_bogus_bomb = true,
+	bomberprec_shield_check = true,
 	bomberdive_bogus_bomb = true,
 	bomberdive_shield_check = true,
 }
 
 -- bombers to track
 local units = {
-	corshad = {
+	bomberprec = {
 		diveDamage = 600,
 		diveHeight = 25,
 		diveRate = 1.55,
 		altPerFlightFrame = 6.25,
-		orgHeight = UnitDefNames["corshad"].wantedHeight*FUDGE_FACTOR,
+		orgHeight = UnitDefNames["bomberprec"].wantedHeight*FUDGE_FACTOR,
 	},
 	bomberdive = {
 		diveDamage = 600,

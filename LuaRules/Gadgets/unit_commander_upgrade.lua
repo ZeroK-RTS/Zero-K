@@ -61,7 +61,7 @@ for _, eud in pairs (UnitDefs) do
 	end
 end
 
-local commAreaShield = WeaponDefNames["core_spectre_cor_shield_small"]
+local commAreaShield = WeaponDefNames["shieldshield_cor_shield_small"]
 
 local commAreaShieldDefID = {
 	maxCharge = commAreaShield.shieldPower,
@@ -178,12 +178,12 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		Spring.SetUnitRulesParam(unitID, "comm_banner_overhead", images.overhead or "fakeunit", INLOS)
 	end
 	
-	if data.drones or data.battleDrones then
+	if data.drones or data.droneheavyslows then
 		if data.drones then
 			Spring.SetUnitRulesParam(unitID, "carrier_count_drone", data.drones, INLOS)
 		end
-		if data.battleDrones then
-			Spring.SetUnitRulesParam(unitID, "carrier_count_battleDrone", data.battleDrones, INLOS)
+		if data.droneheavyslows then
+			Spring.SetUnitRulesParam(unitID, "carrier_count_droneheavyslow", data.droneheavyslows, INLOS)
 		end
 		if GG.Drones_InitializeDynamicCarrier then
 			GG.Drones_InitializeDynamicCarrier(unitID)

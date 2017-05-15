@@ -256,8 +256,8 @@ function widget:Initialize()
 			weaponRange[uDefID] = uDef.maxWeaponRange
 		end
 	end
-	if UnitDefNames["cormex"] then
-		isMex[UnitDefNames["cormex"].id] = true;
+	if UnitDefNames["staticmex"] then
+		isMex[UnitDefNames["staticmex"].id] = true;
 	end
 	WG.InitialQueue = true
 	

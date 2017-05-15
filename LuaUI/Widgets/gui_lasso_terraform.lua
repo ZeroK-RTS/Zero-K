@@ -195,7 +195,7 @@ local mouseUnit = {id = false}
 
 local mouseX, mouseY
 
-local mexDefID = UnitDefNames.cormex.id
+local mexDefID = UnitDefNames.staticmex.id
 
 --------------------------------------------------------------------------------
 -- Command handling and issuing.

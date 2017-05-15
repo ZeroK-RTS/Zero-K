@@ -73,7 +73,7 @@ local drawPlayerAlways = {}
 -- Commands
 
 local allyTargetUnits = {
-	[UnitDefNames["corsumo"].id] = true,
+	[UnitDefNames["jumpsumo"].id] = true,
 }
 
 include("LuaRules/Configs/customcmds.h.lua")

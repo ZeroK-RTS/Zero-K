@@ -43,7 +43,7 @@ local airpadDefs = {
 		cap = 1, 
 		padPieceName={"land"}
 	},
-	[UnitDefNames["armasp"].id] = {
+	[UnitDefNames["staticrearm"].id] = {
 		mobile = false, 
 		cap = 4, 
 		padPieceName={"land1","land2","land3","land4"}

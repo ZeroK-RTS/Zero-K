@@ -25,11 +25,11 @@ local spGetUnitPiecePosDir  = Spring.GetUnitPiecePosDir
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local units = {
-  [UnitDefNames.armrectr.id] = {"claw1"},
-  [UnitDefNames.corfast.id] = {"flare"},
-  [UnitDefNames.corned.id] = {"firepoint"},
-  [UnitDefNames.coracv.id] = {"nano1", "nano2"},
-  [UnitDefNames.corch.id] = {"beam"},
+  [UnitDefNames.cloakcon.id] = {"claw1"},
+  [UnitDefNames.jumpcon.id] = {"flare"},
+  [UnitDefNames.vehcon.id] = {"firepoint"},
+  [UnitDefNames.tankcon.id] = {"nano1", "nano2"},
+  [UnitDefNames.hovercon.id] = {"beam"},
   [UnitDefNames.shipcon.id] = {"beam"},
   
   [UnitDefNames.factorycloak.id] = {"claw1"},

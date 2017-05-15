@@ -63,7 +63,7 @@ options = {
 include("keysym.h.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local mexDefID = UnitDefNames["cormex"].id
+local mexDefID = UnitDefNames["staticmex"].id
 
 local INCREMENT_SIZE = 20
 local heightIncrease = KEYSYMS.C

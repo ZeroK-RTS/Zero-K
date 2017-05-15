@@ -112,7 +112,7 @@ local function RestorePuppy(unitID, x, y, z)
 	spSetUnitNoDraw(unitID, false)
 	spSetUnitCollisionVolumeData(unitID, 20, 20, 20, 0, 0, 0, 0, 1, 0)
 	cannotBeDamage[unitID] = false
-	spAddUnitDamage(unitID, 15, 0, -1, WeaponDefNames["puppy_missile"].id) -- prevent puppy fountain
+	spAddUnitDamage(unitID, 15, 0, -1, WeaponDefNames["jumpscout_missile"].id) -- prevent puppy fountain
 	-- Spring.SetUnitNoSelect(unitID, false)
 	spSetUnitNoMinimap(unitID, false)
 	spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
@@ -126,7 +126,7 @@ function GG.PuppyHandler_Shot(unitID)
 end
 
 function gadget:Initialize()
-  local puppyDef =  UnitDefNames.puppy
+  local puppyDef =  UnitDefNames.jumpscout
   puppyDefID = puppyDef.id
   puppyWeaponID = puppyDef.weapons[1].weaponDef
   puppyLosRadius = puppyDef.losRadius

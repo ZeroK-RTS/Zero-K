@@ -109,12 +109,12 @@ local PAYBACK_FACTOR = 0.5
 local MEX_REFUND_SHARE = 0.5 -- refund starts at 50%
 
 local paybackDefs = { -- cost is how much to pay back
-	[UnitDefNames["armwin"].id] = {cost = UnitDefNames["armwin"].metalCost*PAYBACK_FACTOR},
-	[UnitDefNames["armsolar"].id] = {cost = UnitDefNames["armsolar"].metalCost*PAYBACK_FACTOR},
-	[UnitDefNames["armfus"].id] = {cost = UnitDefNames["armfus"].metalCost*PAYBACK_FACTOR},
-	[UnitDefNames["cafus"].id] = {cost = UnitDefNames["cafus"].metalCost*PAYBACK_FACTOR},
-	[UnitDefNames["geo"].id] = {cost = UnitDefNames["geo"].metalCost*PAYBACK_FACTOR},
-	[UnitDefNames["amgeo"].id] = {cost = UnitDefNames["amgeo"].metalCost*PAYBACK_FACTOR},
+	[UnitDefNames["energywind"].id] = {cost = UnitDefNames["energywind"].metalCost*PAYBACK_FACTOR},
+	[UnitDefNames["energysolar"].id] = {cost = UnitDefNames["energysolar"].metalCost*PAYBACK_FACTOR},
+	[UnitDefNames["energyfusion"].id] = {cost = UnitDefNames["energyfusion"].metalCost*PAYBACK_FACTOR},
+	[UnitDefNames["energysingu"].id] = {cost = UnitDefNames["energysingu"].metalCost*PAYBACK_FACTOR},
+	[UnitDefNames["energygeo"].id] = {cost = UnitDefNames["energygeo"].metalCost*PAYBACK_FACTOR},
+	[UnitDefNames["energyheavygeo"].id] = {cost = UnitDefNames["energyheavygeo"].metalCost*PAYBACK_FACTOR},
 }
 
 local spammedError = false
