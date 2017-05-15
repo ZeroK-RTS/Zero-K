@@ -71,8 +71,6 @@ local image_energy
 local bar_energy
 local bar_overlay_energy
 local bar_reserve_energy
-local lbl_net_metal
-local lbl_net_energy
 local lbl_storage_metal
 local lbl_storage_energy
 local lbl_expense_metal
@@ -212,7 +210,7 @@ local function option_colourBlindUpdate()
 end
 
 options_order = {
-	'ecoPanelHideSpec', 'numbersMode', 'eExcessFlash', 'energyFlash', 'energyWarning', 'metalWarning', 'opacity',
+	'ecoPanelHideSpec', 'eExcessFlash', 'energyFlash', 'energyWarning', 'metalWarning', 'opacity',
 	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve',
 	'colourBlind','fontSize','warningFontSize', 'fancySkinning'}
  
@@ -223,14 +221,6 @@ options = {
 		value = false,
 		noHotkey = true,
 		desc = "Should the panel hide when spectating?",
-		OnChange = option_recreateWindow
-	},
-	numbersMode = {
-		name  = 'Net as number', 
-		type  = 'bool', 
-		value = false,
-		noHotkey = true,
-		desc = "Show net as a number instead of with arrows.",
 		OnChange = option_recreateWindow
 	},
 	eExcessFlash = {
@@ -716,7 +706,7 @@ function widget:GameFrame(n)
 	local team_energyWaste = Format(-cp.team_energyWaste)
 	local team_energyOther = Format(-teamEnergyExp + teamMSpent + cp.team_energyOverdrive)
 
-	local metalTooltip = strings["local_metal_economy"] ..
+	image_metal.tooltip = strings["local_metal_economy"] ..
 	"\n  " .. strings["resbar_base_extraction"] .. ": " .. metalBase ..
 	"\n  " .. strings["resbar_overdrive"] .. ": " .. metalOverdrive ..
 	"\n  " .. strings["resbar_reclaim"] .. ": " .. metalReclaim ..
@@ -736,7 +726,7 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_waste"] .. ": " .. team_metalWaste ..
     "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity)
 	
-	local energyTooltip = strings["local_energy_economy"] ..
+	image_energy.tooltip = strings["local_energy_economy"] ..
 	"\n  " .. strings["resbar_generators"] .. ": " .. energyGenerators ..
 	"\n  " .. strings["resbar_reclaim"] .. ": " .. energyReclaim ..
 	"\n  " .. strings["resbar_sharing_and_overdrive"] .. ": " .. energyOverdrive .. 
@@ -759,79 +749,64 @@ function widget:GameFrame(n)
 	lbl_expense_energy:SetCaption( negativeColourStr..Format(realEnergyPull, negativeColourStr.." -") )
 	lbl_income_metal:SetCaption( Format(mInco+mReci, positiveColourStr.."+") )
 	lbl_income_energy:SetCaption( Format(eInco, positiveColourStr.."+") )
+	lbl_storage_energy:SetCaption(("%.0f"):format(eCurr))
+	lbl_storage_metal:SetCaption(("%.0f"):format(mCurr))
 
-	if options.numbersMode.value then
-		lbl_net_metal:SetCaption(Format(netMetal))
-		lbl_net_energy:SetCaption(Format(netEnergy))
-		
-		lbl_net_metal.tooltip = metalTooltip
-		lbl_net_energy.tooltip = energyTooltip
-		
-		bar_metal:SetCaption(Format(mCurr, WhiteStr) .. "/" .. Format(mStor, WhiteStr))
-		bar_overlay_energy:SetCaption(Format(eCurr, WhiteStr) .. "/" .. Format(eStor, WhiteStr))
+	--// Net income indicator on resource bars.
+	if netMetal < -27.5 then
+		bar_metal:SetCaption(negativeColourStr.."<<<<<<")
+	elseif netMetal < -22.5 then
+		bar_metal:SetCaption(negativeColourStr.."<<<<<")
+	elseif netMetal < -17.5 then
+		bar_metal:SetCaption(negativeColourStr.."<<<<")
+	elseif netMetal < -12.5 then
+		bar_metal:SetCaption(negativeColourStr.."<<<")
+	elseif netMetal < -7.5 then
+		bar_metal:SetCaption(negativeColourStr.."<<")
+	elseif netMetal < -2.5 then
+		bar_metal:SetCaption(negativeColourStr.."<")
+	elseif netMetal < 2.5 then
+		bar_metal:SetCaption("")
+	elseif netMetal < 7.5 then
+		bar_metal:SetCaption(positiveColourStr..">")
+	elseif netMetal < 12.5 then
+		bar_metal:SetCaption(positiveColourStr..">>")
+	elseif netMetal < 17.5 then
+		bar_metal:SetCaption(positiveColourStr..">>>")
+	elseif netMetal < 22.5 then
+		bar_metal:SetCaption(positiveColourStr..">>>>")
+	elseif netMetal < 27.5 then
+		bar_metal:SetCaption(positiveColourStr..">>>>>")
 	else
-		image_metal.tooltip = metalTooltip
-		image_energy.tooltip = energyTooltip
-		
-		lbl_storage_energy:SetCaption(("%.0f"):format(eCurr))
-		lbl_storage_metal:SetCaption(("%.0f"):format(mCurr))
-		
-		--// Net income indicator on resource bars.
-		if netMetal < -27.5 then
-			bar_metal:SetCaption(negativeColourStr.."<<<<<<")
-		elseif netMetal < -22.5 then
-			bar_metal:SetCaption(negativeColourStr.."<<<<<")
-		elseif netMetal < -17.5 then
-			bar_metal:SetCaption(negativeColourStr.."<<<<")
-		elseif netMetal < -12.5 then
-			bar_metal:SetCaption(negativeColourStr.."<<<")
-		elseif netMetal < -7.5 then
-			bar_metal:SetCaption(negativeColourStr.."<<")
-		elseif netMetal < -2.5 then
-			bar_metal:SetCaption(negativeColourStr.."<")
-		elseif netMetal < 2.5 then
-			bar_metal:SetCaption("")
-		elseif netMetal < 7.5 then
-			bar_metal:SetCaption(positiveColourStr..">")
-		elseif netMetal < 12.5 then
-			bar_metal:SetCaption(positiveColourStr..">>")
-		elseif netMetal < 17.5 then
-			bar_metal:SetCaption(positiveColourStr..">>>")
-		elseif netMetal < 22.5 then
-			bar_metal:SetCaption(positiveColourStr..">>>>")
-		elseif netMetal < 27.5 then
-			bar_metal:SetCaption(positiveColourStr..">>>>>")
-		else
-			bar_metal:SetCaption(positiveColourStr..">>>>>>")
-		end
-		
-		if netEnergy < -27.5 then
-			bar_overlay_energy:SetCaption(negativeColourStr.."<<<<<<")
-		elseif netEnergy < -22.5 then
-			bar_overlay_energy:SetCaption(negativeColourStr.."<<<<<")
-		elseif netEnergy < -17.5 then
-			bar_overlay_energy:SetCaption(negativeColourStr.."<<<<")
-		elseif netEnergy < -12.5 then
-			bar_overlay_energy:SetCaption(negativeColourStr.."<<<")
-		elseif netEnergy < -7.5 then
-			bar_overlay_energy:SetCaption(negativeColourStr.."<<")
-		elseif netEnergy < -2.5 then
-			bar_overlay_energy:SetCaption(negativeColourStr.."<")
-		elseif netEnergy < 2.5 then
-			bar_overlay_energy:SetCaption("")
-		elseif netEnergy < 7.5 then
-			bar_overlay_energy:SetCaption(positiveColourStr..">")
-		elseif netEnergy < 12.5 then
-			bar_overlay_energy:SetCaption(positiveColourStr..">>")
-		elseif netEnergy < 17.5 then
-			bar_overlay_energy:SetCaption(positiveColourStr..">>>")
-		elseif netEnergy < 22.5 then
-			bar_overlay_energy:SetCaption(positiveColourStr..">>>>")
-		elseif netEnergy < 27.5 then
-			bar_overlay_energy:SetCaption(positiveColourStr..">>>>>")
-		else
-			bar_overlay_energy:SetCaption(positiveColourStr..">>>>>>")
-		end
+		bar_metal:SetCaption(positiveColourStr..">>>>>>")
+	end
+	
+	if netEnergy < -27.5 then
+		bar_overlay_energy:SetCaption(negativeColourStr.."<<<<<<")
+	elseif netEnergy < -22.5 then
+		bar_overlay_energy:SetCaption(negativeColourStr.."<<<<<")
+	elseif netEnergy < -17.5 then
+		bar_overlay_energy:SetCaption(negativeColourStr.."<<<<")
+	elseif netEnergy < -12.5 then
+		bar_overlay_energy:SetCaption(negativeColourStr.."<<<")
+	elseif netEnergy < -7.5 then
+		bar_overlay_energy:SetCaption(negativeColourStr.."<<")
+	elseif netEnergy < -2.5 then
+		bar_overlay_energy:SetCaption(negativeColourStr.."<")
+	elseif netEnergy < 2.5 then
+		bar_overlay_energy:SetCaption("")
+	elseif netEnergy < 7.5 then
+		bar_overlay_energy:SetCaption(positiveColourStr..">")
+	elseif netEnergy < 12.5 then
+		bar_overlay_energy:SetCaption(positiveColourStr..">>")
+	elseif netEnergy < 17.5 then
+		bar_overlay_energy:SetCaption(positiveColourStr..">>>")
+	elseif netEnergy < 22.5 then
+		bar_overlay_energy:SetCaption(positiveColourStr..">>>>")
+	elseif netEnergy < 27.5 then
+		bar_overlay_energy:SetCaption(positiveColourStr..">>>>>")
+	else
+		bar_overlay_energy:SetCaption(positiveColourStr..">>>>>>")
 	end
 end
 
@@ -1139,22 +1114,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	local barRight  = "4%"
 	local barHeight = "38%"
 	
-	local barFontSize = 20
-	
-	if options.numbersMode.value then
-		barX = 12
-		barRight = "28%"
-		
-		imageX = "73%"
-		imageWidth  = "27%"
-		imageHeight = "70%"
-		
-		incomeX = 16
-		pullX = "35%"
-		
-		barFontSize = 13
-	end
-	
 	--// METAL
 	
 	window_metal = Chili.Panel:New{
@@ -1179,46 +1138,28 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		end },
 	}
 
+	image_metal = Chili.Image:New{
+		parent = window_metal,
+		x      = imageX,
+		y      = imageY,
+		width  = imageWidth,
+		height = imageHeight,
+		keepAspect = true,
+		file   = 'LuaUI/Images/ibeam.png',
+	}
 	
-	if options.numbersMode.value then
-		lbl_net_metal = Chili.Label:New{
-			parent = window_metal,
-			x      = imageX,
-			y      = imageY,
-			width  = imageWidth,
-			height = imageHeight,
-			caption = positiveColourStr.."+0.0",
-			valign = "center",
-			align  = "left",
-			autosize = false,
-			font   = {size = math.floor(1.2*options.fontSize.value), outline = true, outlineWidth = 2, outlineWeight = 2},
-		}
-		image_metal = nil
-		lbl_storage_metal = nil
-	else
-		image_metal = Chili.Image:New{
-			parent = window_metal,
-			x      = imageX,
-			y      = imageY,
-			width  = imageWidth,
-			height = imageHeight,
-			keepAspect = true,
-			file   = 'LuaUI/Images/ibeam.png',
-		}
-		lbl_storage_metal = Chili.Label:New{
-			parent = window_metal,
-			x      = storageX,
-			y      = textY,
-			height = textWidth,
-			width  = textHeight,
-			valign = "center",
-			align  = "left",
-			caption = "0",
-			autosize = false,
-			font   = {size = options.fontSize.value, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
-		}
-		lbl_net_metal = nil
-	end
+	lbl_storage_metal = Chili.Label:New{
+		parent = window_metal,
+		x      = storageX,
+		y      = textY,
+		height = textWidth,
+		width  = textHeight,
+		valign = "center",
+		align  = "left",
+		caption = "0",
+		autosize = false,
+		font   = {size = options.fontSize.value, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
+	}
 	
 	lbl_income_metal = Chili.Label:New{
 		parent = window_metal,
@@ -1291,7 +1232,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		value  = 0,
 		fontShadow = false,
 		font   = {
-			size = barFontSize, 
+			size = 20, 
 			color = {.8,.8,.8,.95}, 
 			outline = true,
 			outlineWidth = 2, 
@@ -1345,45 +1286,28 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		end },
 	}
 	
-	if options.numbersMode.value then
-		lbl_net_energy = Chili.Label:New{
-			parent = window_energy,
-			x      = imageX,
-			y      = imageY,
-			width  = imageWidth,
-			height = imageHeight,
-			caption = positiveColourStr.."+0.0",
-			valign = "center",
-			align  = "left",
-			autosize = false,
-			font   = {size = math.floor(1.2*options.fontSize.value), outline = true, outlineWidth = 2, outlineWeight = 2},
-		}
-		image_energy = nil
-		lbl_storage_energy = nil
-	else
-		image_energy = Chili.Image:New{
-			parent = window_energy,
-			x      = imageX,
-			y      = imageY,
-			width  = imageWidth,
-			height = imageHeight,
-			keepAspect = true,
-			file   = 'LuaUI/Images/energy.png',
-		}
-		lbl_storage_energy = Chili.Label:New{
-			parent = window_energy,
-			x      = storageX,
-			y      = textY,
-			height = textWidth,
-			width  = textHeight,
-			valign = "center",
-			align  = "left",
-			caption = "0",
-			autosize = false,
-			font   = {size = options.fontSize.value, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
-		}
-		lbl_net_energy = nil
-	end
+	image_energy = Chili.Image:New{
+		parent = window_energy,
+		x      = imageX,
+		y      = imageY,
+		width  = imageWidth,
+		height = imageHeight,
+		keepAspect = true,
+		file   = 'LuaUI/Images/energy.png',
+	}	
+	
+	lbl_storage_energy = Chili.Label:New{
+		parent = window_energy,
+		x      = storageX,
+		y      = textY,
+		height = textWidth,
+		width  = textHeight,
+		valign = "center",
+		align  = "left",
+		caption = "0",
+		autosize = false,
+		font   = {size = options.fontSize.value, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
+	}
 	
 	lbl_income_energy = Chili.Label:New{
 		parent = window_energy,
@@ -1456,7 +1380,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		bottom = 0,
 		noSkin = true,
 		font   = {
-			size = barFontSize, 
+			size = 20, 
 			color = {.8,.8,.8,.95}, 
 			outline = true,
 			outlineWidth = 2, 
@@ -1499,18 +1423,12 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	energyNoStorage = GetNoStorageWarning(window_energy, barX, barY, barRight, barHeight, energyBarHolder)
 	
 	-- Activate tooltips for lables and bars, they do not have them in default chili
+	function image_metal:HitTest(x,y) return self end
 	function bar_metal:HitTest(x,y) return self	end
+	function image_energy:HitTest(x,y) return self end
 	function bar_energy:HitTest(x,y) return self end
-	if lbl_net_metal then
-		function lbl_net_metal:HitTest(x,y) return self end
-		function lbl_net_energy:HitTest(x,y) return self end
-	else
-		function image_metal:HitTest(x,y) return self end
-		function image_energy:HitTest(x,y) return self end
-	
-		function lbl_storage_energy:HitTest(x,y) return self end
-		function lbl_storage_metal:HitTest(x,y) return self end
-	end
+	function lbl_storage_energy:HitTest(x,y) return self end
+	function lbl_storage_metal:HitTest(x,y) return self end
 	function lbl_income_energy:HitTest(x,y) return self end
 	function lbl_income_metal:HitTest(x,y) return self end
 	function lbl_expense_energy:HitTest(x,y) return self end
