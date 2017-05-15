@@ -222,7 +222,8 @@ local function ToggleStatsGraph()
 		-- set the togglekey reminder here
 		-- this is dumb but I don't know of a hook for when it's changed in epicmenu
 		-- so this is as good a place as any to make sure it's set correctly
-		local toggleKey = WG.crude.GetHotkey("togglestatsgraph")
+		local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or "no hotkey"
+		if toggleKey == "" then toggleKey = "no hotkey" end
 		toggleButton.caption="Toggle ("..toggleKey..")"
 		toggleButton:Invalidate()
 
@@ -293,10 +294,11 @@ local function SetupControls()
 	
 	local B_HEIGHT = 40
 
-	local toggleKey = WG.crude.GetHotkey("togglestatsgraph")
+	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or "no hotkey"
+	if toggleKey == "" then togglekey = "no hotkey" end
 	toggleButton = Button:New{
 		x=9, y=7,
-		width=125;
+		width=145;
 		height=B_HEIGHT;
 		caption="Toggle ("..toggleKey..")",
 		parent = window_endgame;
@@ -306,7 +308,7 @@ local function SetupControls()
 	}
 
 	awardButton = Button:New{
-		x=145, y=7,
+		x=159, y=7,
 		height=B_HEIGHT;
 		caption="Awards",
 		OnClick = {
@@ -319,7 +321,7 @@ local function SetupControls()
 	SetButtonSelected(awardButton, true)
 	
 	statsButton = Button:New{
-		x=226, y=7,
+		x=236, y=7,
 		height=B_HEIGHT;
 		caption="Statistics",
 		OnClick = {

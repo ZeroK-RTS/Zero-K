@@ -141,6 +141,7 @@ return {
 		{	"movedown",	"Any+pagedown",},
 		{	"showelevation",	"f1",},
 		{	"viewfps",	"C+f1",},
+		{	"togglestatsgraph",	"A+f1"},
 		{	"showpathtraversability",	"f2",},
 		{	"viewta",	"C+f2",},
 		{	"lastmsgpos",	"f3",},
