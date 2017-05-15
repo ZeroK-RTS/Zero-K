@@ -66,6 +66,7 @@ options_order = {
 
 	'lblRotate',
 	'rotatefactor',
+	'rotsmoothness',
 	'targetmouse', 
 	-- 'rotateonedge', 
 	'inverttilt',
@@ -175,10 +176,19 @@ options = {
 	},
 	smoothness = {
 		name = 'Smoothness',
-		desc = "Controls how smooth the camera moves.",
+		desc = "Controls how smoothly the camera moves.",
 		type = 'number',
 		min = 0.0, max = 0.8, step = 0.1,
-		value = 0.2,
+		value = 0.3,
+		-- Applies to the following:
+		-- 	Zoom()
+		--	Altitude()
+		--	SetFOV()
+		--	edge screen scroll
+		--	toggling zoomouttocenter
+		--	and calls to SetCameraTarget() without passing in an explicit smoothness parameter
+		--
+		-- Smoothness for rotation and tilt are handled by the rotsmoothness option instead
 	},
 	
 	
@@ -303,6 +313,14 @@ options = {
 		value = 2,
 		path = rotatePath,
 	},	
+	rotsmoothness = {
+		name = 'Rotation Smoothness',
+		desc = "Controls how smoothly the camera rotates.",
+		type = 'number',
+		min = 0.0, max = 0.8, step = 0.1,
+		value = 0.1,
+		path = rotatePath,
+	},
 	-- rotateonedge = {
 	-- 	name = "Rotate camera at edge",
 	-- 	desc = "Rotate camera when the cursor is at the edge of the screen (edge scroll must be off).",
@@ -1732,7 +1750,7 @@ local function RotateCamera(x, y, dx, dy, smooth, lock, tilt)
 			ls_have = false
 		end
 		-- spSetCameraState(cs, smooth and options.smoothness.value or 0)
-		OverrideSetCameraStateInterpolate(cs,smooth and options.smoothness.value or 0)
+		OverrideSetCameraStateInterpolate(cs,smooth and options.rotsmoothness.value or 0)
 	end
 end
 
@@ -1902,28 +1920,6 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	
 end
 
-local function PeriodicWarning()
-	local c_widgets, c_widgets_list = '', {}
-	for name,data in pairs(widgetHandler.knownWidgets) do
-		if data.active and
-			(
-			name:find('SmoothScroll')
-			or name:find('Hybrid Overhead')
-			or name:find('Complete Control Camera')
-			)
-			then
-			c_widgets_list[#c_widgets_list+1] = name
-		end
-	end
-	for i=1, #c_widgets_list do
-		c_widgets = c_widgets .. c_widgets_list[i] .. ', '
-	end
-	if c_widgets ~= '' then
-		echo('<COFCam> *Periodic warning* Please disable other camera widgets: ' .. c_widgets)
-	end
-end
---==End camera control function^^ (functions that actually do camera control)
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local missedMouseRelease = false
@@ -2020,13 +2016,6 @@ function widget:Update(dt)
 		if WG.alliedCursorsPos then 
 			AutoZoomInOutToCursor()
 		end
-	end
-	
-	
-	-- Periodic warning
-	--cycle = cycle%(32*15) + framePassed --automatically reset "cycle" value to Zero (0) every 32*15th iteration.
-	if cycle == 0 then
-		PeriodicWarning()
 	end
 
 	cs = GetTargetCameraState()
@@ -2567,36 +2556,29 @@ function widget:Initialize()
 	helpText = explode( '\n', options.helpwindow.value )
 	cx = vsx * 0.5
 	cy = vsy * 0.5
-	
-	spSendCommands( 'unbindaction toggleoverview' )
-	spSendCommands( 'unbindaction trackmode' )
-	spSendCommands( 'unbindaction track' )
-	spSendCommands( 'unbindaction mousestate' ) --//disable screen-panning-mode toggled by 'backspace' key
-	
-	--Note: the following is for compatibility with epicmenu.lua's zkkey framework
+
 	if WG.crude then
 		if WG.crude.GetHotkey then
-			epicmenuHkeyComp[1] = WG.crude.GetHotkey("toggleoverview") --get hotkey
+			epicmenuHkeyComp[1] = WG.crude.GetHotkey("toggleoverview")
 			epicmenuHkeyComp[2] = WG.crude.GetHotkey("trackmode")
 			epicmenuHkeyComp[3] = WG.crude.GetHotkey("track")
 			epicmenuHkeyComp[4] = WG.crude.GetHotkey("mousestate")
 		end
-		if 	WG.crude.SetHotkey then
-			WG.crude.SetHotkey("toggleoverview",nil) --unbind hotkey
+		if WG.crude.SetHotkey then
+			WG.crude.SetHotkey("toggleoverview",nil)
 			WG.crude.SetHotkey("trackmode",nil)
 			WG.crude.SetHotkey("track",nil)
 			WG.crude.SetHotkey("mousestate",nil)
 		end
 	end
 
+	WG.COFC_Enabled = true
 	WG.COFC_SetCameraTarget = SetCameraTarget
 	WG.COFC_SetCameraTargetBox = SetCameraTargetBox
 
 	--for external use, so that minimap can scale when zoomed out
 	WG.COFC_SkyBufferProportion = 0 
 	
-	spSendCommands("luaui disablewidget SmoothScroll")
-	spSendCommands("luaui disablewidget SmoothCam")
 	if WG.SetWidgetOption then
 		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC") --tell epicmenu.lua that we select COFC as our default camera (since we enabled it!)
 	end
@@ -2605,14 +2587,9 @@ end
 
 function widget:Shutdown()
 	spSendCommands{"viewta"}
-	spSendCommands( 'bind any+tab toggleoverview' )
-	spSendCommands( 'bind any+t track' )
-	spSendCommands( 'bind ctrl+t trackmode' )
-	spSendCommands( 'bind backspace mousestate' ) --//re-enable screen-panning-mode toggled by 'backspace' key
-	
-	--Note: the following is for compatibility with epicmenu.lua's zkkey framework
+
 	if WG.crude and WG.crude.SetHotkey then
-		WG.crude.SetHotkey("toggleoverview",epicmenuHkeyComp[1]) --rebind hotkey
+		WG.crude.SetHotkey("toggleoverview",epicmenuHkeyComp[1])
 		WG.crude.SetHotkey("trackmode",epicmenuHkeyComp[2])
 		WG.crude.SetHotkey("track",epicmenuHkeyComp[3])
 		WG.crude.SetHotkey("mousestate",epicmenuHkeyComp[4])
@@ -2620,6 +2597,7 @@ function widget:Shutdown()
 
 	WG.COFC_SetCameraTarget = nil
 	WG.COFC_SkyBufferProportion = nil
+	WG.COFC_Enabled = nil
 end
 
 function widget:TextCommand(command)

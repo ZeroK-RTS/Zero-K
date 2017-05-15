@@ -106,7 +106,7 @@ function widget:Update(dt)
 end
 
 function widget:MousePress(x, y, button)
-	if not isEnabled or button ~= 2 or spIsAboveMiniMap(x, y) then
+	if not isEnabled or button ~= 2 or spIsAboveMiniMap(x, y) or WG.COFC_Enabled then
 		return false
 	end
 

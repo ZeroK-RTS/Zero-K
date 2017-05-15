@@ -212,6 +212,7 @@ function gadget:GameFrame(f)
 				if (unitID) then
 					local size = UnitDefNames[resName].xsize
 					spSpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
+					Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, 0)
 					SendToUnsynced("rez_sound", x, y, z);
 				end
 			else
