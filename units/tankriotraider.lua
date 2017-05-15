@@ -134,8 +134,6 @@ unitDef = {
 
       -- damage                  = {
         -- default        = 800,
-        -- empresistant75 = 200,
-        -- empresistant99 = 80,
       -- },
 
 

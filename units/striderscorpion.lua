@@ -158,8 +158,6 @@ unitDef = {
 
       damage                  = {
         default        = 1080,
-        empresistant75 = 270,
-        empresistant99 = 10.8,
       },
 
       duration                = 10,
@@ -203,8 +201,6 @@ unitDef = {
 
       damage                  = {
         default        = 1001,
-        empresistant75 = 250,
-        empresistant99 = 10,
       },
 
       duration                = 8,

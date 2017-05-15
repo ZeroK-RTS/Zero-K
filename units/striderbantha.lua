@@ -156,9 +156,6 @@ unitDef = {
 
       damage                  = {
         default        = 1500,
-        empresistant75 = 375,
-        empresistant99 = 15,
-        planes         = 1500,
       },
 
       dance                   = 20,
@@ -208,8 +205,6 @@ unitDef = {
 
       damage                  = {
         default        = 960,
-        empresistant75 = 240,
-        empresistant99 = 9.6,
       },
 
       duration                = 10,
