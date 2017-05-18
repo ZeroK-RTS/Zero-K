@@ -12,7 +12,7 @@ local colors = {
 	
 	allyColors = {
 	  Range({ 020, 105, 255 }),
-	  Range({ 010, 100, 040 }),
+	  Range({ 011, 100, 040 }),
 	  Range({ 040, 190, 240 }),
 	  Range({ 013, 245, 243 }),
 	  Range({ 130, 255, 210 }),
@@ -51,7 +51,7 @@ local colorsTeal = {
 	
 	allyColors = {
 	  Range({ 020, 105, 255 }),
-	  Range({ 010, 100, 040 }),
+	  Range({ 011, 100, 040 }),
 	  Range({ 040, 190, 240 }),
 	  Range({ 030, 230, 150 }),
 	  Range({ 130, 255, 210 }),
