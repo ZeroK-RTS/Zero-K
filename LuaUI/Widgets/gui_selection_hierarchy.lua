@@ -200,6 +200,7 @@ function widget:CommandNotify(id, params, options)
 	for i = 1, #selectedUnits do
 		selectionRank[selectedUnits[i]] = newRank
 	end
+	return true
 end
 
 --------------------------------------------------------------------------------
