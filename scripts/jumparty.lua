@@ -43,7 +43,7 @@ local SIG_MOVE = 16
 
 local RESTORE_DELAY = 6000
 
-local WALK_RATE = 55
+local WALK_RATE = 38
 
 --------------------------------------------------------------------------------
 -- variables
