@@ -157,7 +157,7 @@
 	"factoryveh" : {
 		"name" : "Light Vehicle Factory",
 		"description" : "Produces Wheeled Vehicles, Builds at 10 m/s",
-		"helptext" : "A traditional favourite, the Vehicle Plant is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Shoverconer, Ravager, Leveler, Slasher"
+		"helptext" : "A traditional favourite, the Vehicle Plant is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Leveler, Slasher"
 	},
 	"turretgauss" : {
 		"name" : "Gauss",
@@ -755,9 +755,9 @@
 		"helptext" : "The Anarchid is like a Starlight, but a Spider"
 	},
 	"vehraid" : {
-		"name" : "Shoverconer",
+		"name" : "Scorcher",
 		"description" : "Raider Vehicle",
-		"helptext" : "Capable of taking damage and dishing it out, the Shoverconer is a versatile unit that remains very useful for more than just raiding, though it pays the price in manueverability and in cost. Though able to hold its own in combat, it is no match for anti-swarm and riot units or defenses. The Shoverconer's heatray deals more damage up close."
+		"helptext" : "Capable of taking damage and dishing it out, the Scorcher is a versatile unit that remains very useful for more than just raiding, though it pays the price in manueverability and in cost. Though able to hold its own in combat, it is no match for anti-swarm and riot units or defenses. The Scorcher's heatray deals more damage up close."
 	},
 	"jumpblackhole2" : {
 		"name" : "Hoarder",

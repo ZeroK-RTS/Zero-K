@@ -770,9 +770,9 @@
         "helptext": "Anarchid to Pajęczy Mesjasz."
     },
     "vehraid": {
-        "name": "Shoverconer",
+        "name": "Scorcher",
         "description": "Lekki pojazd",
-        "helptext": "Shoverconer to lekki pojazd bojowy świetny do bezpośredniej walki; jest jednak dosyć drogi i nie jest w stanie efektywnie radzić sobie z jednostkami wsparcia. Jego broń zadaje tym więcej obrażeń, im bliżej celu się znajduje."
+        "helptext": "Scorcher to lekki pojazd bojowy świetny do bezpośredniej walki; jest jednak dosyć drogi i nie jest w stanie efektywnie radzić sobie z jednostkami wsparcia. Jego broń zadaje tym więcej obrażeń, im bliżej celu się znajduje."
     },
     "jumpblackhole2": {
         "name": "Hoarder",
