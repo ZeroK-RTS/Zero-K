@@ -1739,7 +1739,7 @@ MakeSubWindow = function(path, pause)
 				local escapeSearch = searchedElement and option.desc and option.desc:find(currentPath) and option.isDirectoryButton --this type of button will open sub-level when pressed (defined in "AddOption(path, option, wname )")
 				local disabled = option.DisableFunc and option.DisableFunc()
 				local icon = option.icon
-				local button_height = root and 36 or 30
+				local button_height = root and 30 or 30
 				local button = Button:New{
 					name = option.wname .. " " .. option.name;
 					x=0,
@@ -1756,7 +1756,7 @@ MakeSubWindow = function(path, pause)
 				}
 				
 				if icon then
-					local width = root and 24 or 16
+					local width = root and 16 or 16
 					Image:New{ file= icon, width = width, height = width, parent = button, x=4,y=4,  }
 				end
 				
