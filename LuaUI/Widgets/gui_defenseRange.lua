@@ -235,9 +235,10 @@ local RedoUnitList
 --------------------------------------------------------------------------------
 
 local Chili
-options_path = 'Settings/Interface/Defense Ranges'
+options_path = 'Settings/Interface/Defense and Cloak Ranges'
 
 options = { 
+	label = { type = 'label', name = 'Defense Ranges' },
 	showselectedunitrange = {
 		name = 'Show selected unit(s) range(s)', 
 		type = 'bool', 
@@ -306,6 +307,7 @@ options = {
 }
 
 options_order = {
+	'label',
 	'showselectedunitrange',
 	'allyground',
 	'allyair',

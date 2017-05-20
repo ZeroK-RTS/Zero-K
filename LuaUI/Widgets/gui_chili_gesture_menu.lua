@@ -86,13 +86,11 @@ end
 options_path = 'Settings/Interface/Gesture Menu'
 options_order = { 'markingmenu', 'iconDistance', 'iconSize', 'selectedIconSize', 'mouseMoveThreshold', 'mouseIdleThreshold', 'keyboardOnly', 'onlyOpenWithKeyboard', "qwertz", 'alternateconfig', 'allowMultiple'}
 options = {
-	
 	markingmenu = {
-		name = "Activate Gesture Menu",
+		name = "Open Menu (set a hotkey ->)",
 		type = 'button',
 		--OnChange defined later 
 	},
-	
 	
 	iconDistance = {
 		name = "Icon distance (20-150)",
@@ -171,7 +169,7 @@ options = {
 	allowMultiple = {
 		name = "Allow for multiple selected units",
 		type = "bool",
-		value = false,
+		value = true,
 		desc = "Allows gestures even for multiple units selected",
 		OnChange = OptionsChanged,
 	},
@@ -496,7 +494,7 @@ function widget:MousePress(x,y,button)
 		if (button == 3) then
 			local activeCmdIndex, activeid = Spring.GetActiveCommand()
 			local _, defid = Spring.GetDefaultCommand()
-			if ((activeid == nil or activeid < 0) and (defid == CMD.MOVE or not defid)) then -- nano turrets have no CMD.MOVE active command
+			if ((activeid == nil or activeid < 0) and (defid == CMD.MOVE or defid == CMD_RAW_MOVE or not defid)) then -- nano turrets have no CMD.MOVE active command
 				if SetupMenu(false) then 
 					menu_invisible = true 
 					move_digested = true 
