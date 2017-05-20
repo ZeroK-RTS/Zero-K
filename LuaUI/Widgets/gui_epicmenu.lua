@@ -1431,7 +1431,7 @@ local function GetHotkeyData(path, option)
 end
 
 --Make a stack with control and its hotkey button
-local function MakeHotkeyedControl(control, path, option, icon, noHotkey)
+local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHeight)
 
 	local children = {}
 	if noHotkey then
@@ -1466,7 +1466,7 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey)
 		
 		local hkbutton = Button:New{
 			name = option.wname .. ' hotKeyButton';
-			minHeight = 30,
+			minHeight = minHeight or 30,
 			right=0,
 			width = hklength,
 			caption = hotkeystring, 
@@ -1739,7 +1739,7 @@ MakeSubWindow = function(path, pause)
 				local escapeSearch = searchedElement and option.desc and option.desc:find(currentPath) and option.isDirectoryButton --this type of button will open sub-level when pressed (defined in "AddOption(path, option, wname )")
 				local disabled = option.DisableFunc and option.DisableFunc()
 				local icon = option.icon
-				local button_height = root and 30 or 30
+				local button_height = root and 36 or 30
 				local button = Button:New{
 					name = option.wname .. " " .. option.name;
 					x=0,
@@ -1756,13 +1756,13 @@ MakeSubWindow = function(path, pause)
 				}
 				
 				if icon then
-					local width = root and 16 or 16
+					local width = root and 24 or 16
 					Image:New{ file= icon, width = width, height = width, parent = button, x=4,y=4,  }
 				end
 				
 				Label:New{ parent = button, x=35,y=button_height*0.2,  caption=option.name}
 				
-				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option,nil,option.isDirectoryButton or option.noHotkey)
+				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option,nil,option.isDirectoryButton or option.noHotkey, button_height)
 			end
 			
 		elseif option.type == 'label' then	
