@@ -128,8 +128,8 @@ options = {
 		noHotkey = true,
 	},
 	ctrlDisableGrid = {
-		name = 'Ctrl Disables Grid',
-		tooltip = "When enabled, grid hotkeys will not be used while Ctrl is held. This allows for Ctrl+key hotkeys to be used while viewing a build list or factory queue.",
+		name = 'Ctrl Disables Hotkeys',
+		tooltip = "When enabled, grid and tab hotkeys will deactivate while Ctrl is held. This allows for Ctrl+key hotkeys to be used while a construtor or factory is selected.",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -1635,36 +1635,49 @@ function options.unitsHotkeys2.OnChange(self)
 	end
 end
 
+local function CheckTabHotkeyAllowed()
+	if options.ctrlDisableGrid.value then
+		local _, ctrl = Spring.GetModKeyState()
+		if ctrl then
+			return false
+		end
+	end
+	return true
+end
+
 function options.tab_economy.OnChange()
 	local tab = commandPanelMap.economy.tabButton
-	if tab.IsTabPresent() then
+	if tab.IsTabPresent() and CheckTabHotkeyAllowed() then
 		tab.DoClick()
 	end
 end
 
 local function HotkeyTabDefence()
 	local tab = commandPanelMap.defence.tabButton
-	if tab.IsTabPresent() then
+	if tab.IsTabPresent() and CheckTabHotkeyAllowed() then
 		tab.DoClick()
 	end
 end
 
 local function HotkeyTabSpecial()
 	local tab = commandPanelMap.special.tabButton
-	if tab.IsTabPresent() then
+	if tab.IsTabPresent() and CheckTabHotkeyAllowed() then
 		tab.DoClick()
 	end
 end
 
 local function HotkeyTabFactory()
 	local tab = commandPanelMap.factory.tabButton
-	if tab.IsTabPresent() then
+	if tab.IsTabPresent() and CheckTabHotkeyAllowed() then
 		tab.DoClick()
 	end
 end
 
 local function HotkeyTabUnits()
 	local tab = commandPanelMap.units_mobile.tabButton
+	if not CheckTabHotkeyAllowed() then
+		return
+	end
 	if tab.IsTabPresent() then
 		tab.DoClick()
 		return
