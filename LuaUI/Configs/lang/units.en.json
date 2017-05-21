@@ -64,11 +64,6 @@
 		"description" : "Heavy Combat Commander, Builds at 10 m/s",
 		"helptext" : "The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment."
 	},
-	"jumpimpulse" : {
-		"name" : "Elevator",
-		"description" : "Impulse Shenanigans Jumpbot",
-		"helptext" : "Shenanigans jumpbot."
-	},
 	"cloakbomb" : {
 		"name" : "Tick",
 		"description" : "All Terrain EMP Bomb (Burrows)",
@@ -414,11 +409,6 @@
 		"description" : "Skirmisher/Anti-Heavy Hovercraft",
 		"helptext" : "Use the Scalpel for hit-and-run attacks. Has a long reload time and not too many hit points, and should always be kept at range with the enemy. An arcing projectile allows it to shoot over obstacles and friendly units."
 	},
-	"cobtransport" : {
-		"name" : "Valkyrie",
-		"description" : "Air Transport",
-		"helptext" : "The Valkyrie is the basic air transport. It is ideal to ferry units to the front or make a drop deep behind enemy lines, but should not be used to land in areas with any kind of AA cover."
-	},
 	"jumpbomb" : {
 		"name" : "Skuttle",
 		"description" : "Cloaked Jumping Anti-Heavy Bomb",
@@ -543,11 +533,6 @@
 		"name" : "Krow",
 		"description" : "Flying Fortress",
 		"helptext" : "The Krow may be expensive and ponderous, but its incredible armor allows it do fly into all but the thickest anti-air defenses and engage enemies with its three laser cannons. Best of all, it can drop a large spread of carpet bombs that devastates anything under it."
-	},
-	"jumpriot" : {
-		"name" : "Infernal",
-		"description" : "Riot Jumper",
-		"helptext" : "The Infernal is a fire-based riot jumper."
 	},
 	"neebcomm" : {
 		"name" : "Neeb Comm",
@@ -719,11 +704,6 @@
 		"description" : "Strategic Plasma Cannon",
 		"helptext" : "The Bertha is a massive cannon that fires high-energy plasmoids across the map. Used appropriately, it can effectively suppress enemy operations from the safety of your base. Do not expect it to win battles alone for you, however."
 	},
-	"bomberlaser" : {
-		"name" : "Pheonix with mini-laser",
-		"description" : "Napalm Bomber",
-		"helptext" : "The Phoenix's napalm bombs decimate large clumps of units and light structures."
-	},
 	"cloaksnipe" : {
 		"name" : "Spectre",
 		"description" : "Cloaked Skirmish/Anti-Heavy Artillery Bot",
@@ -758,16 +738,6 @@
 		"name" : "Scorcher",
 		"description" : "Raider Vehicle",
 		"helptext" : "Capable of taking damage and dishing it out, the Scorcher is a versatile unit that remains very useful for more than just raiding, though it pays the price in manueverability and in cost. Though able to hold its own in combat, it is no match for anti-swarm and riot units or defenses. The Scorcher's heatray deals more damage up close."
-	},
-	"jumpblackhole2" : {
-		"name" : "Hoarder",
-		"description" : "Assault/Riot Bot",
-		"helptext" : "The Hoarder is a riot/assault unit. It generates a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off."
-	},
-	"jumpraid2" : {
-		"name" : "Pyro",
-		"description" : "Raider/Riot Jumper",
-		"helptext" : "The Pyro is a cheap, fast walker with a flamethrower. The flamethrower deals increased damage to large units and can hit multiple targets at the same time. When killed, the Pyro sets surrounding units on fire. Additionally, Pyros also come with jetpacks, allowing them to jump over obstacles or get the drop on enemies."
 	},
 	"striderfunnelweb" : {
 		"name" : "Funnelweb",
@@ -854,11 +824,6 @@
 		"description" : "Burrowing Scout/Raider",
 		"helptext" : "The Digger's strong claws can scoop through the hardest rock like gravy. As such, it can burrow and travel underground (very slowly), where the only way to locate it is with sesimic detection equipment."
 	},
-	"tiptest" : {
-		"name" : "TIP test unit",
-		"description" : "bla",
-		"helptext" : "Expensive and powerful, the Ravager is capable of holding its own against most opposition. Though its manueverability is terrible, its strength is when moving at a considerable top speed in a straight line. Due to this, it is almost impossible to skirmish using raiders. In combat, you should attempt to keep travelling forward and not turn too suddenly, so as to maintain top speed. Circling your target at the edge of your range is a good tactic. An arcing projectile allows it to shoot over corpses, other tanks, etc. Vulnerable to crawling bombs when in swarms."
-	},
 	"thicket" : {
 		"name" : "Thicket",
 		"description" : "Barricade",
@@ -874,20 +839,10 @@
 		"description" : "Teleport Bridge Entry Beacon, right click to teleport.",
 		"helptext" : "This is Djinn's entry beacon. Right-click it to teleport units to the parent Djinn."
 	},
-	"tankriotraider" : {
-		"name" : "Panther",
-		"description" : "Riot/Raider Tank",
-		"helptext" : "The Panther is a high-tech raider. Its weapon, a lightning gun, deals mostly paralyze damage. This way, the Panther can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base."
-	},
 	"dynstrike1" : {
 		"name" : "Strike Commander",
 		"description" : "Mobile Assault Commander",
 		"helptext" : "The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration."
-	},
-	"hoverscout" : {
-		"name" : "Dagger",
-		"description" : "Fast Attack Hovercraft",
-		"helptext" : "The Dagger is the hover plant's scout. It provides a cheap, disposable method of getting intel, and can also hit economic targets of opportunity. Its light sonic cannon can attack surface and underwater targets alike."
 	},
 	"bomberdive" : {
 		"name" : "Raven",

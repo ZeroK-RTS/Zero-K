@@ -429,11 +429,6 @@
         "description": "Poduszkowiec harcownik",
         "helptext": "Scalpel to poduszkowiec harcownik z rakietami o dużym zasięgu, obrażeniach i długim czasie przeładowania. Wysoka trajektoria lotu pozwala mu strzelać nad przeszkodami."
     },
-    "cobtransport": {
-        "name": "Valkyrie",
-        "description": "Transportowiec powietrzny",
-        "helptext": "Valkyrie to podstawowa latająca jednostka transportowa. Świetnie radzi sobie w szybkim przenoszeniu jednostek z bazy na front, bądź w desancie głęboko za linie wroga, lecz musi unikać obszaru bronionego przez nawet najmniejszą ilość artylerii przeciwlotniczej."
-    },
     "jumpbomb": {
         "name": "Skuttle",
         "description": "Skacząca niewidzialna bomba",
@@ -563,11 +558,6 @@
         "name": "Krow",
         "description": "Latająca forteca",
         "helptext": "Krow jest drogi i powolny, jednak jego niesamowita wytrzymałość pozwala mu latać nawet nad silną obroną przeciwlotniczą i ostrzeliwać wrogow swoim zestawem działek laserowych. Jego głownym atutem jest możliwość zrzucenia serii niszczycielskich bomb, które zrównują z ziemią obszar znajdujący się bezpośrednio pod nim."
-    },
-    "jumpriot": {
-        "name": "Infernal",
-        "description": "Skoczek wsparcia",
-        "helptext": "Infernal to skoczek wsparcia z ognistym uzbrojeniem."
     },
     "neebcomm": {
         "name": "Dowódca dla ćwoków",
@@ -734,11 +724,6 @@
         "description": "Działo strategiczne",
         "helptext": "Bertha to masywne działo o ogromnym zasięgu. Przy roztropnym doborze celów jest w stanie niweczyć przedsięwzięcia przeciwnika i niszczyć ważne cele z bezpiecznej odległości, jednak nie jest w stanie sama zapewnić zwycięstwa ze względu na bardzo ograniczoną szybkostrzelność."
     },
-    "bomberlaser": {
-        "name": "Phoenix z laserem",
-        "description": "Bombowiec z napalmem",
-        "helptext": "Napalm zrzucany przez Phoenixa dziesiątkuje grupy lekkich jednostek i budynków."
-    },
     "cloaksnipe": {
         "name": "Spectre",
         "description": "Niewidzialny snajper harcownik",
@@ -773,16 +758,6 @@
         "name": "Scorcher",
         "description": "Lekki pojazd",
         "helptext": "Scorcher to lekki pojazd bojowy świetny do bezpośredniej walki; jest jednak dosyć drogi i nie jest w stanie efektywnie radzić sobie z jednostkami wsparcia. Jego broń zadaje tym więcej obrażeń, im bliżej celu się znajduje."
-    },
-    "jumpblackhole2": {
-        "name": "Hoarder",
-        "description": "Szturmowy bot wsparcia",
-        "helptext": "Hoarder to jednostka wsparcia, która zasysa okoliczne jednostki, co ułatwia ich zniszczenie."
-    },
-    "jumpraid2": {
-        "name": "Pyro",
-        "description": "Lekki skoczek wsparcia",
-        "helptext": "Pyro to lekki bot z miotaczem ognia, który zadaje zwiększone obrażenia dużym jednostkom i może razić wiele celów jednocześnie, i możliwością skoku. Chociaż Pyro otrzymuje obrażenia od ognia, to nie da się go podpalić. Ze zniszczonych Pyro wylewa się resztka napalmu, podpalając okoliczne jednostki."
     },
     "striderfunnelweb": {
         "name": "Funnelweb",
@@ -879,11 +854,6 @@
         "description": "Lekki czołg",
         "helptext": "Kodachi to lekki czołg z bombami zapalającymi, które dobrze spisują się przeciwko budynkom. Po wyjściu z walki szybko regeneruje się, co wspiera używanie go zaczepnie."
     },
-    "tiptest": {
-        "name": "sprzedam opla",
-        "description": "Tu byłem. Tony Halik",
-        "helptext": "Drogi, lecz potężny, Ravager jest w stanie poradzić sobie z większoscią przeciwników. Chociaż jego zwrotność jest bardzo niska, ma wysoką prędkość maksymalną, dzięki czemu jest w stanie dogonić i zniszczyć lżejsze jednostki. Jego działo może strzelać nad przeszkodami, na przykład wrakami lub innymi czołgami. Duże grupy Ravagerów można skutecznie niszczyć bombami."
-    },
     "thicket": {
         "name": "Thicket",
         "description": "Blokada",
@@ -908,11 +878,6 @@
         "name": "Shockley",
         "description": "Rakieta EMP",
         "helptext": "Shockley paraliżuje cele w małym obszarze do 45 sekund."
-    },
-    "tankriotraider": {
-        "name": "Panther",
-        "description": "Czołg zaczepny",
-        "helptext": "Panther to lekki czołg uzbrojony w działko EMP, które zadaje niskie obrażenia, ale paraliżuje cel, dzięki czemu może unieszkodliwiać mało ważne cele, by je ominąć i przejść do niszczenia ważniejszych. Zniszczony Panther uwalnia falę EMP."
     },
     "hoversonic": {
         "name": "Morningstar",
@@ -1144,20 +1109,10 @@
         "description": "Ciężka artyleria",
         "helptext": "Zasada działania Tremora jest prosta: zawsze lepiej jest użyć więcej amunicji. Jest to ciężka bateria artyleryjska niszcząca wszystko na danym obszarze przy użyciu gradu pocisków burzących, które przy okazji wyrównują teren."
     },
-    "jumpimpulse": {
-        "name": "Elevator",
-        "description": "Skaczący bot miglanc",
-        "helptext": "Największy miglanc na osiedlu."
-    },
     "cloakcon": {
         "name": "Conjurer",
         "description": "Niewidzialny bot konstruktor, moc 5 m/s",
         "helptext": "Conjurer to niewidzialny konstruktor z zakłócaczem krótkiego zasięgu."
-    },
-    "hoverscout": {
-        "name": "Dagger",
-        "description": "Lekki poduszkowiec",
-        "helptext": "Dagger to lekki poduszkowiec. Nadaje się do zwiadu, jako że jest szybki i tani; może też niszczyć odsłonięte cele. Jego lekkie działko Gaussa może atakować również cele podwodne."
     },
     "shieldassault": {
         "name": "Thug",
