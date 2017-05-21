@@ -403,10 +403,11 @@ local function weapons2Table(cells, ws, unitID)
 
 		local stun_time = 0
 
-		local val = tonumber(cp.statsdamage) or wd.customParams.shield_damage or 0
-		
+		local comm_mult = (unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1
+		local val = (tonumber(cp.statsdamage) or wd.customParams.shield_damage or 0) * comm_mult
+
 		if cp.disarmdamagemult then
-			damd = val * cp.disarmdamagemult * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
+			damd = val * cp.disarmdamagemult
 			if (cp.disarmdamageonly == "1") then
 				val = 0
 			end
@@ -414,7 +415,7 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if cp.timeslow_damagefactor then
-			dams = val * cp.timeslow_damagefactor * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
+			dams = val * cp.timeslow_damagefactor
 			if (cp.timeslow_onlyslow == "1") then
 				val = 0
 			end
@@ -426,19 +427,18 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if cp.extra_damage then
-			dam = cp.extra_damage
+			damw = tonumber(cp.extra_damage) * comm_mult
+			stun_time = tonumber(wd.customParams.extra_paratime)
 		end
 
 		if wd.paralyzer then
-			damw = val * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
+			damw = val
 			if stun_time == 0 then
 				stun_time = wd.damages.paralyzeDamageTime
 			end
 		else
 			dam = val
 		end
-		
-		dam = dam * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
 
 		-- get reloadtime and calculate dps
 		local reloadtime = tonumber(cp.script_reload) or wd.reload

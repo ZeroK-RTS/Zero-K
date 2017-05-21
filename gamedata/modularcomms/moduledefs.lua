@@ -338,11 +338,8 @@ upgrades = {
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if v.customparams.idstring == "commweapon_lightninggun" then
-						for armorname, dmg in pairs(v.damage) do
-							v.damage[armorname] = dmg * 1.25
-						end
-						v.customparams["extra_damage_mult"] = 0.32	-- same real damage
-						v.paralyzetime = 3
+						v.customparams.extra_damage_mult = v.customparams.extra_damage_mult * 1.25
+						v.paralyzetime = v.paralyzetime + 2
 					end
 				end
 			end,	

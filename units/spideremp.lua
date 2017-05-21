@@ -80,14 +80,14 @@ unitDef = {
       craterMult              = 0,
 	  
       customParams            = {
-        extra_damage = [[18]],
+        extra_damage = 600,
 		
 		light_color = [[0.75 0.75 0.56]],
 		light_radius = 190,
       },
 
       damage                  = {
-        default        = 600.5,
+        default        = 18,
       },
 
       duration                = 8,
@@ -99,7 +99,6 @@ unitDef = {
       intensity               = 12,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      paralyzer               = true,
       paralyzeTime            = 3,
       range                   = 240,
       reloadtime              = 1.75,

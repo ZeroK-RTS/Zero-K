@@ -196,7 +196,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        extra_damage = [[320]],
+        extra_damage = 960,
 		
 		light_camera_height = 2200,
 		light_color = [[0.85 0.85 1.2]],
@@ -204,7 +204,7 @@ unitDef = {
       },
 
       damage                  = {
-        default        = 960,
+        default        = 320,
       },
 
       duration                = 10,
@@ -215,8 +215,7 @@ unitDef = {
       impulseFactor           = 0.4,
       intensity               = 12,
       interceptedByShieldType = 1,
-      paralyzer               = true,
-      paralyzeTime            = 1.5,
+      paralyzeTime            = 1,
       range                   = 465,
       reloadtime              = 1,
       rgbColor                = [[0.5 0.5 1]],

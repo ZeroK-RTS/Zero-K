@@ -117,11 +117,11 @@ for name, wd in pairs(DEFS.weaponDefs) do
 
 		if wd.paralyzer then
 			wd.damage.shield = maxDamage * EMP_DAMAGE_MOD
+		end
 
-			-- add extra damage vs shields for mixed EMP damage units
-			if cp.extra_damage then
-				wd.damage.shield = wd.damage.shield + tonumber(cp.extra_damage)
-			end
+		-- add extra damage vs shields for mixed EMP damage units
+		if cp.extra_damage then
+			wd.damage.shield = wd.damage.shield + tonumber(cp.extra_damage) * EMP_DAMAGE_MOD
 		end
 
 		if (cp.timeslow_damagefactor) then
@@ -161,11 +161,6 @@ for name, wd in pairs(DEFS.weaponDefs) do
 		if wd.paralyzer then
 			-- paralyzer is hardcoded in Spring to deal no wreck damage so this handling does nothing.
  			wd.damage.default = 0.001 -- Settings damage default to 0 removes cratering and impulse
-            
-			-- add extra damage vs shields for mixed EMP damage units
-			if cp.extra_damage then
-				wd.damage.default = wd.damage.default + tonumber(cp.extra_damage)
-			end
 		end
 
 		if (cp.timeslow_damagefactor) and (tobool(cp.timeslow_onlyslow)) then

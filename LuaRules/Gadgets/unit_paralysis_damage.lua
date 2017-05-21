@@ -28,15 +28,19 @@ local spAddUnitDamage    = Spring.AddUnitDamage
 
 local normalDamageMult = {}
 local wantedWeaponList = {}
+local paraTime = {}
 
 for wdid = 1, #WeaponDefs do
 	local wd = WeaponDefs[wdid]
 	if wd.paralyzer then
+		wantedWeaponList[#wantedWeaponList + 1] = wdid
+	else
 		local rawDamage = tonumber(wd.customParams.raw_damage or 0)
 		if wd.customParams and wd.customParams.extra_damage and rawDamage > 0 then
 			normalDamageMult[wdid] = wd.customParams.extra_damage/rawDamage
+			paraTime[wdid] = wd.customParams.extra_paratime
+			wantedWeaponList[#wantedWeaponList + 1] = wdid
 		end
-		wantedWeaponList[#wantedWeaponList + 1] = wdid
 	end
 end
 
@@ -48,30 +52,28 @@ function gadget:UnitDamaged_GetWantedWeaponDef()
 	return wantedWeaponList
 end
 
-local already_stunned = false
-
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponDefID, attackerID, attackerDefID, attackerTeam)
 	if paralyzer then -- the weapon deals paralysis damage
-		already_stunned = spGetUnitIsStunned(unitID)
 		local health, maxHealth = spGetUnitHealth(unitID)
-		if normalDamageMult[weaponDefID] then
-			attackerID = attackerID or -1
-			local damageMult = normalDamageMult[weaponDefID]
-			
-			-- Don't apply armour twice
-			local armored, mult = spGetUnitArmored(unitID)
-			if armored then
-				damageMult = damageMult/mult
-			end
-			
-			-- be careful; this line can cause recursion! don't make it do paralyzer damage
-			spAddUnitDamage(unitID, damageMult*damage, 0, attackerID, weaponDefID)
-		end
 		if health and maxHealth and health ~= 0 then -- taking no chances.
 			return damage*maxHealth/health
 		end
 	end
 	
 	return damage
+end
+
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID)
+	local mult = normalDamageMult[weaponDefID]
+	if mult and not paralyzer then
+
+		-- Don't apply armour twice.
+		local armored, armorMult = spGetUnitArmored(unitID)
+		if armored then
+			mult = mult/armorMult
+		end
+
+		spAddUnitDamage(unitID, mult*damage, paraTime[weaponDefID], attackerID, weaponDefID)
+	end
 end

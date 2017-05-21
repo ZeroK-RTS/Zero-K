@@ -80,7 +80,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        extra_damage = [[240]],
+        extra_damage = 600,
 		
 		light_camera_height = 1600,
 		light_color = [[0.85 0.85 1.2]],
@@ -90,7 +90,7 @@ unitDef = {
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 600,
+        default        = 240,
       },
 
       duration                = 10,
@@ -101,7 +101,6 @@ unitDef = {
       impulseFactor           = 0,
       intensity               = 12,
       interceptedByShieldType = 1,
-      paralyzer               = true,
       paralyzeTime            = 1,
       range                   = 280,
       reloadtime              = 2.2,
