@@ -82,15 +82,13 @@ local function SanitizeBoxes (boxes)
 	end
 end
 
-function ParseBoxes (backupSeed)
+function ParseBoxes ()
 	local mapsideBoxes = "mapconfig/map_startboxes.lua"
 	local modsideBoxes = "LuaRules/Configs/StartBoxes/" .. (Game.mapName or "") .. ".lua"
-	backupSeed = backupSeed or 0
 
 	local startBoxConfig
 
-	math.randomseed(Spring.GetGameRulesParam("public_random_seed") or backupSeed)
-	Spring.Echo("read public_random_seed", Spring.GetGameRulesParam("public_random_seed"), backupSeed)
+	math.randomseed(Spring.GetGameRulesParam("public_random_seed"))
 
 	if VFS.FileExists (modsideBoxes) then
 		startBoxConfig = VFS.Include (modsideBoxes)
@@ -220,13 +218,12 @@ function ParseBoxes (backupSeed)
 	return startBoxConfig
 end
 
-function GetRawBoxes(backupSeed)
+function GetRawBoxes()
 	local mapsideBoxes = "mapconfig/map_startboxes.lua"
 	local modsideBoxes = "LuaRules/Configs/StartBoxes/" .. (Game.mapName or "") .. ".lua"
-	backupSeed = backupSeed or 0
 
 	local startBoxConfig
-	math.randomseed(Spring.GetGameRulesParam("public_random_seed") or backupSeed)
+	math.randomseed(Spring.GetGameRulesParam("public_random_seed"))
 
 	if VFS.FileExists (modsideBoxes) then
 		startBoxConfig = VFS.Include (modsideBoxes)
