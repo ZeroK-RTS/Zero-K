@@ -357,13 +357,15 @@ function UpdateCustomParamResourceData()
 	cp.team_metalValue = 0
 	cp.team_metalExcess = 0
 	local allies = Spring.GetTeamList(teamID)
-	for i = 1, #allies do
-		local allyID = allies[i]
-		cp.team_metalReclaimTotal = cp.team_metalReclaimTotal + (spGetTeamRulesParam(allyID, "stats_history_metal_reclaim_current") or 0)
-		cp.team_metalValue        = cp.team_metalValue        + (spGetTeamRulesParam(allyID, "stats_history_unit_value_current")    or 0)
-		cp.team_metalExcess       = cp.team_metalExcess       + (spGetTeamRulesParam(allyID, "stats_history_metal_excess_current")  or 0)
+	if allies then
+		for i = 1, #allies do
+			local allyID = allies[i]
+			cp.team_metalReclaimTotal = cp.team_metalReclaimTotal + (spGetTeamRulesParam(allyID, "stats_history_metal_reclaim_current") or 0)
+			cp.team_metalValue        = cp.team_metalValue        + (spGetTeamRulesParam(allyID, "stats_history_unit_value_current")    or 0)
+			cp.team_metalExcess       = cp.team_metalExcess       + (spGetTeamRulesParam(allyID, "stats_history_metal_excess_current")  or 0)
+		end
 	end
-
+	
 	cp.energyIncome    = spGetTeamRulesParam(teamID, "OD_energyIncome") or 0
 	cp.energyOverdrive = spGetTeamRulesParam(teamID, "OD_energyOverdrive") or 0
 	cp.energyChange    = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
