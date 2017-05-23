@@ -116,6 +116,25 @@ unitDef = {
       weaponVelocity          = 400,
     },
 
+		PANTHER_DEATH = {
+			name = [[Death]],
+			areaOfEffect = 320,
+			craterBoost = 0,
+			craterMult = 0,
+			edgeEffectiveness = 0,
+			explosionGenerator = [[custom:cloakbomb_EXPLOSION]],
+			fireStarter = 0,
+			impulseBoost = 0,
+			impulseFactor = 0,
+			paralyzer = true,
+			paralyzeTime = 4,
+			soundhit = [[explosion/small_emp_explode]],
+
+			damage = {
+				default = 600,
+			},
+		},
+
   },
 
 
