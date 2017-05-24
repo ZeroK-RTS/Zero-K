@@ -809,11 +809,6 @@
         "description": "Szturmowy mech bojowy",
         "helptext": "Dante to ciężki mech bojowy stworzony do walki na krótki dystans. Posiada promień cieplny, miotacz ognia i rakiety zapalające, które może wystrzelić w salwie."
     },
-    "nest": {
-        "name": "Gniazdo",
-        "description": "Wylęgarnia kurczaków",
-        "helptext": "Gniazda takie jak to to wylęgarnie kurczaków."
-    },
     "chickenbroodqueen": {
         "name": "Królowa kurczaków",
         "description": "Dba o gniazdo",
@@ -1028,11 +1023,6 @@
         "name": "Bantha",
         "description": "Mech bojowy",
         "helptext": "Bantha to ciężki mech bojowy, uzbrojony po zęby i bardzo wytrzymały. Posiada rakiety EMP dalekiego zasięgu, ciężki laser oraz działka EMP. Nie ma jednak żadnej obrony przeciwlotniczej i słabo radzi sobie bez wsparcia mniejszych jednostek"
-    },
-    "roostfac": {
-        "name": "Gniazdo",
-        "description": "Wylęgarnia kurczaków",
-        "helptext": "Gniazda takie jak to to wylęgarnie kurczaków."
     },
     "turretaaflak": {
         "name": "Cobra",

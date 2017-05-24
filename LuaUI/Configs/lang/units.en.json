@@ -1034,11 +1034,6 @@
 		"description" : "Cloaked Infiltration Strider",
 		"helptext" : "The Scorpion paralyzes enemies with its lightning sting and then chews them up with its particle beam claws. Its tough carapace shrugs off most enemy fire, and can also turn the Scorpion transparent."
 	},
-	"roostfac" : {
-		"name" : "Roost",
-		"description" : "Spawns Big Chickens",
-		"helptext" : "Roosts such as this one are where the more powerful Thunderbirds are hatched."
-	},
 	"vehcapture" : {
 		"name" : "Dominatrix",
 		"description" : "Capture Vehicle",
@@ -1108,11 +1103,6 @@
 		"name" : "Archer",
 		"description" : "Amphibious Raider/Riot Bot",
 		"helptext" : "The Archer uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water. Archers can float to surface in order to fight naval units."
-	},
-	"nest" : {
-		"name" : "Nest",
-		"description" : "Spawns Chickens",
-		"helptext" : "Nests such as this one are where the basic Thunderbirds are hatched."
 	},
 	"fakeunit" : {
 		"name" : "Fake radar signal",

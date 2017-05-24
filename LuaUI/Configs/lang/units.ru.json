@@ -805,11 +805,6 @@
         "description": "Штурмовой/подавляющий страйдер",
         "name": "Данте"
     },
-    "nest": {
-        "helptext": "Гнезда (Nest), такие, как это - это место вылупления базовых юнитов кудахтающей армии.",
-        "description": "Порождает куриц",
-        "name": "Гнездо"
-    },
     "chickenbroodqueen": {
         "helptext": "Курица-королева, участвующая в создании яйцекладки не настолько смертельная в бою, как другие королевы, но в долгосрочной перспективе она способна представлять ещё более страшную угрозу. Дело в том, что она производит потомство Куриц.",
         "description": "Склонна к размножению",
@@ -882,11 +877,6 @@
         "helptext": "With its powerful twin anti-air laser batteries, the anti-air frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne.",
         "description": "Anti-Air Frigate",
         "name": "Shredder"
-    },
-    "roostfac": {
-        "helptext": "Курятники (Roost) , такие как этот - это место вылупления мощнейших кудахтаюших буревестников.",
-        "description": "Порождает больших Куриц",
-        "name": "Курятник"
     },
     "hoversonic": {
         "helptext": "Утренняя звезда (Morningstar) вооружена звуковой пушкой, для которой абсолютно не имеет значения находится ли цель под водой или на поверхности.",
