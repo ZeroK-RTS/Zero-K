@@ -23,7 +23,6 @@ unitDef = {
       completely_hidden = 1, -- for widget-senpai not to notice me
   },
   
-  explodeAs             = [[TINY_BUILDINGEX]],
   floater               = true,
   footprintX            = 3,
   footprintZ            = 3,

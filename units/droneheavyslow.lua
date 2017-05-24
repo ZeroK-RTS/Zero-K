@@ -31,7 +31,7 @@ unitDef = {
   objectName          = [[battledrone.s3o]],
   reclaimable         = false,
   script              = [[droneheavyslow.lua]],
-  selfDestructAs      = [[SMALL_BUILDINGEX]],
+  selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
 	description_de = [[Kampfdrohne]],
