@@ -27,7 +27,7 @@ local devCompatibility = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
 include("LuaRules/Configs/constants.lua")
 
 local windDefs = {
-	[ UnitDefNames['armwin'].id ] = true,
+	[ UnitDefNames['energywind'].id ] = true,
 }
 
 local windmills = {}

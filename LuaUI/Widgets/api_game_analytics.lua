@@ -41,34 +41,34 @@ VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 local unitCategories = {}
 
 unitCategories.basicEnergyBuildings = {
-	armsolar     = true,
-	armwin       = true,
+	energysolar     = true,
+	energywind       = true,
 }
 
 unitCategories.advancedEnergyBuildings = {
-	amgeo  = true, 
-	armfus = true, 
-	cafus  = true, 
-	geo    = true, 
+	energyheavygeo  = true, 
+	energyfusion = true, 
+	energysingu  = true, 
+	energygeo    = true, 
 }
 
 unitCategories.energyBuildings = Spring.Utilities.MergeTable(	unitCategories.basicEnergyBuildings, 
 																unitCategories.advancedEnergyBuildings)
 
 unitCategories.lightGroundTurrets = {
-	armartic   = true,
-	armdeva    = true,
-	corllt     = true,
-	corrl      = true,
+	turretemp   = true,
+	turretriot    = true,
+	turretlaser     = true,
+	turretmissile      = true,
 	turrettorp = true,
-	corgrav    = true,
+	turretimpulse    = true,
 }              
 
 unitCategories.heavyGroundTurrets = {
-	armanni  = true,
-	corbhmth = true,
-	corhlt   = true,
-	cordoom  = true,
+	turretantiheavy  = true,
+	staticarty = true,
+	turretheavylaser   = true,
+	turretheavy  = true,
 }
 
 unitCategories.basicFactories = {
@@ -93,15 +93,15 @@ unitCategories.factories = Spring.Utilities.MergeTable(	unitCategories.basicFact
 
 unitCategories.builders = {
 	amphcon    = true,
-	armca      = true,
-	-- armcsa  = true,
-	armrectr   = true,
-	arm_spider = true,
-	coracv     = true,
-	corfast    = true,
-	corch      = true,
-	cornecro   = true,
-	corned     = true,
+	planecon      = true,
+	-- athena  = true,
+	cloakcon   = true,
+	spidercon = true,
+	tankcon     = true,
+	jumpcon    = true,
+	hovercon      = true,
+	shieldcon   = true,
+	vehcon     = true,
 	gunshipcon = true,
 	shipcon    = true,
 }
@@ -110,8 +110,8 @@ unitCategories.gameEnder = {
 	zenith    = true,
 	mahlazer  = true,
 	raveparty = true,
-	armbanth  = true, -- Not really a game ender, but beginners shouldn't build it early.
-	armorco   = true,
+	striderbantha  = true, -- Not really a game ender, but beginners shouldn't build it early.
+	striderdetriment   = true,
 }
 
 --------------------------------------------------------------------------------

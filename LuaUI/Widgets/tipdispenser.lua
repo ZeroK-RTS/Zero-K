@@ -402,7 +402,7 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 		if unitDef.canFly and not airSpotted then
 			SetTip(stringAirSpotted)
 			airSpotted = true
-		elseif unitDef.name == "corsilo" and not nukeSpotted then
+		elseif unitDef.name == "staticnuke" and not nukeSpotted then
 			SetTip(stringNukeSpotted)
 			nukeSpotted = true			
 		end

@@ -8,7 +8,7 @@ if addon.InGetInfo then
 		license = "GPL2",
 		layer   = 0,
 		depend  = {"LoadProgress"},
-		enabled = false,
+		enabled = false, -- loading makes it choppy towards the end; also, volume cannot be adjusted
 	}
 end
 

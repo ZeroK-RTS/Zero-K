@@ -1,8 +1,8 @@
--- corpyro_blast_fx
+-- jumpraid_blast_fx
 return {}
 
 --return {
---  ["corpyro_blast_fx"] = {
+--  ["jumpraid_blast_fx"] = {
 --    air                = true,
 --    class              = [[CSimpleParticleSystem]],
 --    count              = 1,

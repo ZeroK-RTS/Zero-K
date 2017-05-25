@@ -256,7 +256,7 @@ end
 local function initialiseNoGoZones()
 
 	do
-		local geoUnitDef = UnitDefNames["geo"]
+		local geoUnitDef = UnitDefNames["energygeo"]
 		local features = Spring.GetAllFeatures()
 		
 		local sX = geoUnitDef.xsize*4
@@ -285,7 +285,7 @@ local function initialiseNoGoZones()
 	end
 
 	do
-		local mexUnitDef = UnitDefNames["cormex"]
+		local mexUnitDef = UnitDefNames["staticmex"]
 		local metalSpots = GG.metalSpots
 		
 		if metalSpots then

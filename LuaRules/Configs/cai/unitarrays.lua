@@ -1,42 +1,42 @@
 local raider = {
-	"armpw",
-	"spherepole",
-	"corak",
+	"cloakraid",
+	"cloakheavyraid",
+	"shieldraid",
 	"armflash",
-	"corfav",
-	"corgator",
-	"amphraider3",
+	"vehscout",
+	"vehraid",
+	"amphraid",
 	
-	"corpyro",
-	"panther",
-	"logkoda",
+	"jumpraid",
+	"tankheavyraid",
+	"tankraid",
 	
 	"armsh",
-	"corsh",
+	"hoverraid",
 	
 	"chicken",
 	"chicken_leaper",
 }
 
 local assault = {
-	"corthud",
-	"corraid",
+	"shieldassault",
+	"vehassault",
 	
-	"armzeus",
-	--"armcrabe",
+	"cloakassault",
+	--"spidercrabe",
 	"spiderassault",
-	"corcan",
-	--"corsumo",
+	"jumpassault",
+	--"jumpsumo",
 	"armbull",
-	"correap",
-	"corgol",
+	"tankassault",
+	"tankheavyassault",
 	"amphassault",
 	
 	"armanac",
 	"hoverassault",
 	
-	--"armbanth",
-	--"armorco",
+	--"striderbantha",
+	--"striderdetriment",
 	--"corkrog",
 	
 	--"chickena",
@@ -45,65 +45,65 @@ local assault = {
 }
 
 local skirm = {
-	"armrock",
-	"corstorm",
+	"cloakskirm",
+	"shieldskirm",
 	"armjanus",
 	"armstump",
 	"amphfloater",
 	
-	"armsptk",
-	"armsnipe",
+	"spiderskirm",
+	"cloaksnipe",
 	"cormort",
-	"slowmort",
+	"jumpskirm",
 	"cormortgold",
-	"armmanni",
+	"hoverarty",
 	
-	"nsaclash",
+	"hoverskirm",
 	
 	"chickens",
 	"chicken_sporeshooter",
-	--"scorpion",
+	--"striderscorpion",
 }
 
 local jumper = { -- uses jump for offense. IE do not put commander or AA here.
-	"corcan",
-	"corsumo",
+	"jumpassault",
+	"jumpsumo",
 }
 
 local riot = {
-	"armwar",
-	"cormak",
-	"corlevlr",
+	"cloakriot",
+	"shieldriot",
+	"vehriot",
 	"spiderriot",
-	"amphraider2",
+	"amphimpulse",
 	"amphriot",
 	
-	"arm_venom",
+	"spideremp",
 	"tawf003",
-	"tawf114",
+	"tankriot",
 
 	"hoverriot",
 	
 	"armraz",
-	"dante",
+	"striderdante",
 	
 	"chickenwurm",
 }
 
 local arty = {
-	"armham",
+	"cloakarty",
 	"punisher",
-	"firewalker",
+	"jumparty",
 	"tawf013",
-	"corgarp",
+	"veharty",
 	
-	"armmerl",
-	--"armmanni",
-	"cormart",
-	"trem",
+	"vehheavyarty",
+	--"hoverarty",
+	"tankarty",
+	"tankheavyarty",
 	
 	"armshock",
-	"armraven",
+	"striderarty",
 	
 	"hoverartillery",
 	
@@ -112,13 +112,13 @@ local arty = {
 }
 
 local counteredByAssaults = {
-	"puppy",
-	"cormist",
+	"jumpscout",
+	"vehsupport",
 }
 
 local prioritySos = {
-	"armfus",
-	"cafus",
+	"energyfusion",
+	"energysingu",
 	"factoryshield",
     "factorycloak",
     "factoryveh",

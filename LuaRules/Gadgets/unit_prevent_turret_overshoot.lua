@@ -10,13 +10,13 @@ function gadget:GetInfo() return {
 } end
 
 local fudgeNames = {
-	corrl  = 45, -- projectile speed is 25 elmo/frame
-	corhlt = 15,
-	corllt = 15,
+	turretmissile  = 45, -- projectile speed is 25 elmo/frame
+	turretheavylaser = 15,
+	turretlaser = 15,
 }
 local sphericals = { -- spherical weapons; rest assumed cylindrical
-	"corhlt",
-	"corllt",
+	"turretheavylaser",
+	"turretlaser",
 }
 
 

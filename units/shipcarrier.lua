@@ -45,7 +45,7 @@ unitDef = {
   objectName             = [[shipcarrier.dae]],
   script                 = [[shipcarrier.lua]],
   radarEmitHeight        = 48,
-  selfDestructAs         = [[BIG_UNITEX]],
+  selfDestructAs         = [[ATOMIC_BLASTSML]],
   sfxtypes               = {
     explosiongenerators = {
       [[custom:xamelimpact]],

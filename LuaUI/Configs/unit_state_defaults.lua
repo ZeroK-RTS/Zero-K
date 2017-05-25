@@ -1,18 +1,18 @@
 local alwaysHoldPos = {
-	[UnitDefNames["armcrabe"].id] = true,
-    [UnitDefNames["cormist"].id] = true,
-    [UnitDefNames["trem"].id] = true,
+	[UnitDefNames["spidercrabe"].id] = true,
+    [UnitDefNames["vehsupport"].id] = true,
+    [UnitDefNames["tankheavyarty"].id] = true,
 }
 
 local holdPosException = {
-	[UnitDefNames["armnanotc"].id] = true,
+	[UnitDefNames["staticcon"].id] = true,
 }
 
 local dontFireAtRadarUnits = {
-	[UnitDefNames["armsnipe"].id] = true,
-	[UnitDefNames["armmanni"].id] = true,
-	[UnitDefNames["armanni"].id] = true,
-	[UnitDefNames["armmerl"].id] = true,
+	[UnitDefNames["cloaksnipe"].id] = true,
+	[UnitDefNames["hoverarty"].id] = true,
+	[UnitDefNames["turretantiheavy"].id] = true,
+	[UnitDefNames["vehheavyarty"].id] = true,
 }
 
 local factoryDefs = { -- Standard factories

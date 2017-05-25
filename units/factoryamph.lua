@@ -11,8 +11,8 @@ unitDef = {
 
   buildoptions     = {
     [[amphcon]],
-    [[amphraider3]],
-    [[amphraider2]],
+    [[amphraid]],
+    [[amphimpulse]],
     [[amphfloater]],
     [[amphriot]],	
     [[amphassault]],

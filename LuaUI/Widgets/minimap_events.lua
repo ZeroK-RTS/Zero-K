@@ -91,7 +91,7 @@ local spIsUnitAllied         = Spring.IsUnitAllied
 --------------------------------------------------------------------------------
 
 local stockpileExceptions = {
-	[UnitDefNames["screamer"].id] = true,
+	[UnitDefNames["turretaaheavy"].id] = true,
 }
 
 --------------------------------------------------------------------------------

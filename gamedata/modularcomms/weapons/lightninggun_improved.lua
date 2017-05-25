@@ -7,7 +7,7 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
-		extra_damage_mult = [[0.266667]],
+		extra_damage_mult = 3.75,
 		slot = [[5]],
 		muzzleEffectFire = [[custom:zeus_fire_fx]],
 		
@@ -19,7 +19,7 @@ local weaponDef = {
 	cylinderTargeting       = 0,
 
 	damage                  = {
-		default = 825,
+		default = 220,
 	},
 
 	explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
@@ -29,7 +29,6 @@ local weaponDef = {
 	impulseFactor           = 0.4,
 	intensity               = 12,
 	interceptedByShieldType = 1,
-	paralyzer               = true,
 	paralyzeTime            = 3,
 	range                   = 300,
 	reloadtime              = 1 + 20/30,

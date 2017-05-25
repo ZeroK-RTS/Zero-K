@@ -1,4 +1,4 @@
-amgeo = {
+energyheavygeo = {
 	radius = 60,
 	height = 30,
 	midpos = {0, 10, 0},
@@ -6,4 +6,4 @@ amgeo = {
 	tex2 = "wreck2.dds",
 }
 
-return amgeo
+return energyheavygeo

@@ -70,7 +70,7 @@ local floatState = {}
 local aimWeapon = {}
 local GRAVITY = Game.gravity/30/30
 local RAD_PER_ROT = (math.pi/(2^15))
-local buildTestUnitDefID = UnitDefNames["armdeva"].id --we use Stardust to check blockage on water surface because on Spring 96 onward amphibious are always buildable under factory.
+local buildTestUnitDefID = UnitDefNames["turretriot"].id --we use Stardust to check blockage on water surface because on Spring 96 onward amphibious are always buildable under factory.
 --------------------------------------------------------------------------------
 -- Communication to script
 

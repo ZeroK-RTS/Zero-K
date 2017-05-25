@@ -166,7 +166,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Team Colors'] 	= imgPath..'map/minimap_colors_simple.png',
 	['Settings/Interface/Common Team Colors'] 	= imgPath..'map/minimap_colors_simple.png',
 	['Settings/Interface/Build ETA'] 			= imgPath..'epicmenu/stop_watch_icon.png',
-	['Settings/Interface/Defense Ranges'] 		= imgPath..'epicmenu/target.png',
+	['Settings/Interface/Defense and Cloak Ranges'] = imgPath..'epicmenu/target.png',
 	['Settings/Interface/Command Visibility'] 	= imgPath..'epicmenu/fingertap.png',
 	['Settings/Interface/Hovering Icons'] 		= imgPath..'epicmenu/halo.png',
 	['Settings/Interface/Selection'] 			= imgPath..'epicmenu/selection.png',
@@ -346,6 +346,8 @@ local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selecti
 	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() spSendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() spSendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
 
+local pathGesture = 'Settings/Interface/Gesture Menu'
+	ShButton(pathGesture, 'Toggle gesture menu', function() spSendCommands{"luaui togglewidget Chili Gesture Menu"} end, "Enable/disable gesture build menu.")
   
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 local pathMisc = 'Settings/Misc'
@@ -389,7 +391,7 @@ local pathMisc = 'Settings/Misc'
 			end
 			Spring.SetConfigInt("ZKuseOldChili", value); --store in Springsettings.txt because api_chili.lua must read it independent of gui_epicmenu.lua
 		end,
-	})	
+	})
 
 
 local pathMiscScreenshots = 'Settings/Misc/Screenshots'	

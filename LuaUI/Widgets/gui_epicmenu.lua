@@ -1431,7 +1431,7 @@ local function GetHotkeyData(path, option)
 end
 
 --Make a stack with control and its hotkey button
-local function MakeHotkeyedControl(control, path, option, icon, noHotkey)
+local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHeight)
 
 	local children = {}
 	if noHotkey then
@@ -1466,7 +1466,7 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey)
 		
 		local hkbutton = Button:New{
 			name = option.wname .. ' hotKeyButton';
-			minHeight = 30,
+			minHeight = minHeight or 30,
 			right=0,
 			width = hklength,
 			caption = hotkeystring, 
@@ -1762,7 +1762,7 @@ MakeSubWindow = function(path, pause)
 				
 				Label:New{ parent = button, x=35,y=button_height*0.2,  caption=option.name}
 				
-				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option,nil,option.isDirectoryButton or option.noHotkey)
+				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option,nil,option.isDirectoryButton or option.noHotkey, button_height)
 			end
 			
 		elseif option.type == 'label' then	

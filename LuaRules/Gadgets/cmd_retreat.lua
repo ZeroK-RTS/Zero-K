@@ -21,8 +21,8 @@ include("LuaRules/Configs/customcmds.h.lua")
 local Tooltips = {
 	'Orders: Never retreat.',
 	'Orders: Retreat at less than 30% health (right-click to cancel).',
-	'Orders: Retreat at less than 60% health (right-click to cancel).',
-	'Orders: Retreat at less than 90% health (right-click to cancel).',
+	'Orders: Retreat at less than 65% health (right-click to cancel).',
+	'Orders: Retreat at less than 99% health (right-click to cancel).',
 }
 
 local DefaultState = 0

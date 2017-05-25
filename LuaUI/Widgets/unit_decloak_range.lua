@@ -13,14 +13,16 @@ end
 VFS.Include("LuaRules/Utilities/glVolumes.lua")
 
 local Chili
-options_path = 'Settings/Interface/Decloak Ranges'
+options_path = 'Settings/Interface/Defense and Cloak Ranges'
 options_order = {
+	"label",
 	"drawranges",
 	"onlyforcloaked",
 	"onlyforselected",
 	"fillcolor"
 }
 options = {
+	label = { type = 'label', name = 'Decloak Ranges' },
 	drawranges = {
 		name = 'Draw decloak ranges', 
 		type = 'bool', 
@@ -44,7 +46,7 @@ options = {
 		value = true,
 	},
 	fillcolor = {
-		name = 'Fill color',
+		name = 'Cloak range color',
 		type = 'colors',
 		value = {0.3,0.3,1.0,0.4},
 	}

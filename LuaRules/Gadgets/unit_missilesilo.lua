@@ -35,7 +35,7 @@ function gadget:GetInfo()
   }
 end
 
-local siloDefID = UnitDefNames.missilesilo.id
+local siloDefID = UnitDefNames.staticmissilesilo.id
 local missileDefIDs = {
 	[UnitDefNames.tacnuke.id] = true,
 	[UnitDefNames.napalmmissile.id] = true,

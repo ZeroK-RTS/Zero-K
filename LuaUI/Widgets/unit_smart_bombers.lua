@@ -30,10 +30,10 @@ local fightingBombers = {}
 local reservedBombers = {}
 
 local bombderDefIDs = {
-	[UnitDefNames["corshad"].id] = true,
-	[UnitDefNames["corhurc2"].id] = true,
-	[UnitDefNames["armstiletto_laser"].id] = true,
-	[UnitDefNames["armcybr"].id] = true,
+	[UnitDefNames["bomberprec"].id] = true,
+	[UnitDefNames["bomberriot"].id] = true,
+	[UnitDefNames["bomberdisarm"].id] = true,
+	[UnitDefNames["bomberheavy"].id] = true,
 }
 
 --------------------------------------------------------------------------------

@@ -24,7 +24,7 @@ function widget:GetInfo()
 end
 
 local constantStockpile = {
-	[UnitDefNames["screamer"].id] = true,
+	[UnitDefNames["turretaaheavy"].id] = true,
 }
 
 local CMD_STOCKPILE = CMD.STOCKPILE

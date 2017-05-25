@@ -17,11 +17,11 @@ end
 --------------------------------------------------------------------------------
 
 local nukeDefs = {
-	[UnitDefNames["corsilo"].id] = true,
+	[UnitDefNames["staticnuke"].id] = true,
 }
 
 local intDefs = {
-	[UnitDefNames["armamd"].id] = {
+	[UnitDefNames["staticantinuke"].id] = {
 		range = 2500,
 		rangeSq = 2500^2,
 		static = true,

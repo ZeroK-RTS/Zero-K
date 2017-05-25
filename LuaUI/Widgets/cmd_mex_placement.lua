@@ -152,11 +152,11 @@ options = {
 -------------------------------------------------------------------------------------
 -- Mexes and builders
 
-local mexDefID = UnitDefNames["cormex"].id
-local lltDefID = UnitDefNames["corllt"].id
-local solarDefID = UnitDefNames["armsolar"].id
+local mexDefID = UnitDefNames["staticmex"].id
+local lltDefID = UnitDefNames["turretlaser"].id
+local solarDefID = UnitDefNames["energysolar"].id
 
-local mexUnitDef = UnitDefNames["cormex"]
+local mexUnitDef = UnitDefNames["staticmex"]
 local mexDefInfo = {
 	extraction = 0.001,
 	oddX = mexUnitDef.xsize % 4 == 2,
@@ -500,10 +500,11 @@ local mexSpotToDraw = false
 local drawMexSpots = false
 
 function widget:Update()
-	if WG.metalSpots and (not wasSpectating) and spGetSpectatingState() then
+	local isSpectating = spGetSpectatingState()
+	if WG.metalSpots and (wasSpectating ~= isSpectating) then
 		spotByID = {}
 		spotData = {}
-		wasSpectating = true
+		wasSpectating = isSpectating
 		local units = spGetAllUnits()
 		for i, unitID in ipairs(units) do 
 			local unitDefID = spGetUnitDefID(unitID)

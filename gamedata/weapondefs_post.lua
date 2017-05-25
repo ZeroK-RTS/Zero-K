@@ -335,7 +335,13 @@ for _, weaponDef in pairs(WeaponDefs) do
 		weaponDef.range = weaponDef.customparams.combatrange
 	end
 end
- 
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.paralyzetime and not weaponDef.paralyzer then
+		weaponDef.customparams.extra_paratime = weaponDef.paralyzetime
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --

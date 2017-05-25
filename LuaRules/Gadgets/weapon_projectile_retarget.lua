@@ -27,7 +27,7 @@ local thereAreProjectiles = false
 
 -- In elmos/frame
 local projectileSpeed = {
-	[WeaponDefNames["armcybr_arm_pidr"].id] = 19, -- empirical
+	[WeaponDefNames["bomberheavy_arm_pidr"].id] = 19, -- empirical
 }
 
 -- Recluse projectile speed at different distances formula is a result of the least squares linear fit

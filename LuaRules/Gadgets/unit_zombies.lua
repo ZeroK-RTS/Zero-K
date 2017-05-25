@@ -73,7 +73,7 @@ local zombies = {}
 local defined = false -- wordaround, because i meet some kind of racing condition, if any gadget spawns gaia BEFORE this gadget can process all the stuff...
 
 local MexDefs = {
-	[UnitDefNames["cormex"].id] = true,
+	[UnitDefNames["staticmex"].id] = true,
 }
 
 local WARNING_TIME = 5; -- seconds to start being scary before actual reanimation event

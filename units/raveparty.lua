@@ -9,7 +9,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
   buildingGroundDecalSizeY      = 6,
-  buildingGroundDecalType       = [[armbrtha_aoplane.dds]],
+  buildingGroundDecalType       = [[staticheavyarty_aoplane.dds]],
   buildPic                      = [[raveparty.png]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
@@ -47,9 +47,9 @@ unitDef = {
   sfxtypes                      = {
 
     explosiongenerators = {
-      [[custom:ARMBRTHA_SHOCKWAVE]],
-      [[custom:ARMBRTHA_SMOKE]],
-      [[custom:ARMBRTHA_FLARE]],
+      [[custom:staticheavyarty_SHOCKWAVE]],
+      [[custom:staticheavyarty_SMOKE]],
+      [[custom:staticheavyarty_FLARE]],
     },
 
   },

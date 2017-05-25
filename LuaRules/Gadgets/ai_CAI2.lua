@@ -48,13 +48,13 @@ local pathfinder = false
 local function InitializePathfinder()
 	-- veh, bot, spider, ship, hover, amph, air
 	return {
-		PathfinderGenerator.CreatePathfinder(UnitDefNames["correap"].id, "tank4", true),
-		PathfinderGenerator.CreatePathfinder(UnitDefNames["dante"].id, "kbot4", true),
-		PathfinderGenerator.CreatePathfinder(UnitDefNames["armcrabe"].id, "tkbot4", true),
-		PathfinderGenerator.CreatePathfinder(UnitDefNames["armmanni"].id, "hover3"),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["tankassault"].id, "tank4", true),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["striderdante"].id, "kbot4", true),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["spidercrabe"].id, "tkbot4", true),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["hoverarty"].id, "hover3"),
 		PathfinderGenerator.CreatePathfinder(UnitDefNames["subraider"].id, "uboat3", true),
 		PathfinderGenerator.CreatePathfinder(UnitDefNames["amphassault"].id, "akbot4", true),
-		PathfinderGenerator.CreatePathfinder(UnitDefNames["armmanni"].id, "hover3"),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["hoverarty"].id, "hover3"),
 		PathfinderGenerator.CreatePathfinder(),
 	}
 end

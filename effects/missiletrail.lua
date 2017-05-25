@@ -390,7 +390,7 @@ return {
   },
 
 
-["screamertrail"] = {
+["turretaaheavytrail"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
     largeflash = {

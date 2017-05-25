@@ -163,19 +163,9 @@ local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimat
 	end
 	Spring.SetGameRulesParam("shuffleMode", shuffleMode)
 
-	--[[ expose a randomness seed
-	this is so that LuaUI can reproduce randomness in the box config as otherwise they use different seeds
-	afterwards, reseed with a secret seed to prevent LuaUI from reproducing the randomness used for shuffling ]]
-
-	-- turns out synced RNG is seeded only *after* the game starts so we have to hack ourselves another source of randomness
-	-- this makes the shuffle result discoverable through a widget with some extra work - hopefully the engine gets fixed sometime
-	local public_seed = 123 * string.len(Spring.GetModOptions().commandertypes or "some string")
-	private_seed = math.random(13,37) * public_seed
-
-	Spring.Echo("Startboxes public_seed", public_seed)
-	Spring.SetGameRulesParam("public_random_seed", public_seed)
-	startboxConfig = ParseBoxes(public_seed)
-	math.randomseed(private_seed)
+	local seed = math.random(1, 1000000) -- ParseBoxes() reseeds with a public value which we don't want to keep using afterwards (would publicize shuffle order)
+	startboxConfig = ParseBoxes()
+	math.randomseed(seed)
 
 	GG.startBoxConfig = startboxConfig
 	GG.GetPlanetwarsBoxes = GetPlanetwarsBoxes
@@ -313,7 +303,9 @@ function gadget:Initialize()
 	Spring.SetGameRulesParam("startbox_max_n", #startboxConfig)
 	Spring.SetGameRulesParam("startbox_recommended_startpos", 1)
 
+	local reseed = math.random(1, 1000000)
 	local rawBoxes = GetRawBoxes()
+	math.randomseed(reseed)
 	for box_id, rawbox in pairs(rawBoxes) do
 		local polygons = rawbox.boxes
 		Spring.SetGameRulesParam("startbox_n_" .. box_id, #polygons)
@@ -335,8 +327,6 @@ function gadget:Initialize()
 			Spring.SetGameRulesParam("startpos_z_" .. box_id .. "_" .. i, startposes[i][2])
 		end
 	end
-
-	math.randomseed(private_seed)
 
 	-- filter out fake teams (empty or Gaia)
 	local allyTeamList = Spring.GetAllyTeamList()

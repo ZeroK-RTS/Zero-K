@@ -436,17 +436,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Massive terraform speed to make ground flattening rapid for construction
---
-
-for name, unitDef in pairs(UnitDefs) do
-	if (unitDef.workertime) then
-		unitDef.terraformspeed = unitDef.workertime * 20
-    end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Set higher default losEmitHeight. Engine default is 20.
 --
 
@@ -714,7 +703,7 @@ end
 --[[
 local disabledunitsstring = modOptions and modOptions.disabledunits or ""
 local disabledunits = { }
-local defenceunits = {"corrl", "corllt", "armdeva", "armartic", "armpb", "corhlt", "corrazor", "missiletower", "corflak", "armcir", "screamer", "corgrav", "turrettorp", "cordoom", "armanni", "corjamt" }
+local defenceunits = {"turretmissile", "turretlaser", "turretriot", "turretemp", "turretgauss", "turretheavylaser", "turretaalaser", "turretaaclose", "turretaaflak", "turretaafar", "turretaaheavy", "turretimpulse", "turrettorp", "turretheavy", "turretantiheavy", "staticshield" }
 
 --Different lock modoptions are compatible
 if modOptions and tobool(modOptions.noair) then

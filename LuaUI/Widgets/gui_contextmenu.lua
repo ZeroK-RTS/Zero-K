@@ -107,8 +107,8 @@ local colorPurple = {0.9, 0.2, 1, 1}
 local colorDisarm = {0.5, 0.5, 0.5, 1}
 local colorCapture = {0.6, 1, 0.6, 1}
 
-local valkMaxMass = UnitDefNames.corvalk.transportMass
-local valkMaxSize = UnitDefNames.corvalk.transportSize * 2
+local valkMaxMass = UnitDefNames.gunshiptrans.transportMass
+local valkMaxSize = UnitDefNames.gunshiptrans.transportSize * 2
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -187,7 +187,7 @@ AddFactoryOfUnits("factoryjump")
 AddFactoryOfUnits("factorytank")
 AddFactoryOfUnits("factoryship")
 AddFactoryOfUnits("striderhub")
-AddFactoryOfUnits("missilesilo")
+AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
 local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
@@ -204,8 +204,8 @@ for i = 1, #buildOpts do
 end
 
 -- Misc stuff without direct buildability
-addUnit(UnitDefNames["amgeo"].id, "Buildings/Economy", true) -- moho geo
-addUnit(UnitDefNames["armcsa"].id, "Units/Misc", true) -- athena
+addUnit(UnitDefNames["energyheavygeo"].id, "Buildings/Economy", true) -- moho geo
+addUnit(UnitDefNames["athena"].id, "Units/Misc", true) -- athena
 addUnit(UnitDefNames["wolverine_mine"].id, "Units/Misc", false) -- maybe should go under LV fac, like wolverine? to consider.
 addUnit(UnitDefNames["tele_beacon"].id, "Units/Misc", false)
 addUnit(UnitDefNames["asteroid"].id, "Units/Misc", false)
@@ -403,10 +403,11 @@ local function weapons2Table(cells, ws, unitID)
 
 		local stun_time = 0
 
-		local val = tonumber(cp.statsdamage) or wd.customParams.shield_damage or 0
-		
+		local comm_mult = (unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1
+		local val = (tonumber(cp.statsdamage) or wd.customParams.shield_damage or 0) * comm_mult
+
 		if cp.disarmdamagemult then
-			damd = val * cp.disarmdamagemult * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
+			damd = val * cp.disarmdamagemult
 			if (cp.disarmdamageonly == "1") then
 				val = 0
 			end
@@ -414,7 +415,7 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if cp.timeslow_damagefactor then
-			dams = val * cp.timeslow_damagefactor * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
+			dams = val * cp.timeslow_damagefactor
 			if (cp.timeslow_onlyslow == "1") then
 				val = 0
 			end
@@ -426,19 +427,18 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if cp.extra_damage then
-			dam = cp.extra_damage
+			damw = tonumber(cp.extra_damage) * comm_mult
+			stun_time = tonumber(wd.customParams.extra_paratime)
 		end
 
 		if wd.paralyzer then
-			damw = val * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
+			damw = val
 			if stun_time == 0 then
 				stun_time = wd.damages.paralyzeDamageTime
 			end
 		else
 			dam = val
 		end
-		
-		dam = dam * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
 
 		-- get reloadtime and calculate dps
 		local reloadtime = tonumber(cp.script_reload) or wd.reload
@@ -1375,7 +1375,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	end
 
 	-- fixme: get a better way to get default buildlist?
-	local default_buildlist = UnitDefNames["cornecro"].buildOptions 
+	local default_buildlist = UnitDefNames["shieldcon"].buildOptions 
 	local this_buildlist = ud.buildOptions
 	if ((#this_buildlist ~= #default_buildlist) and (#this_buildlist > 0)) then
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
