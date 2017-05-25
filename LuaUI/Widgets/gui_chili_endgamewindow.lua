@@ -68,13 +68,20 @@ local awardDescs = VFS.Include("LuaRules/Configs/award_names.lua")
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/HUD Panels/Stats Graph'
-options_order = {'togglestatsgraph'}
+options_order = {'togglestatsgraph', 'toggleendgamewindow'}
 options = { 
 	togglestatsgraph = { type = 'button',
 		name = 'Toggle stats graph',
-		desc = 'Shows and hides the statistics graph, which is normally only displayed at the end of the game.',
+		desc = 'Shows and hides the statistics graph.',
 		action = 'togglestatsgraph',
 		dontRegisterAction = true,
+	},
+	toggleendgamewindow = {
+		name = 'Toggle endgame window',
+		type = 'bool',
+		value = false,
+		desc = "Allows the endgame window to be toggled on and off",
+		noHotkey = true,
 	},
 }
 
@@ -222,10 +229,11 @@ local function ToggleStatsGraph()
 		-- set the togglekey reminder here
 		-- this is dumb but I don't know of a hook for when it's changed in epicmenu
 		-- so this is as good a place as any to make sure it's set correctly
-		local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or "no hotkey"
-		if toggleKey == "" then toggleKey = "no hotkey" end
-		toggleButton.caption="Toggle ("..toggleKey..")"
-		toggleButton:Invalidate()
+		if toggleButton then
+			local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
+			toggleButton.caption="Toggle ("..toggleKey..")"
+			toggleButton:Invalidate()
+		end
 
 		if not gameEnded then
 			showingTab = nil
@@ -241,9 +249,17 @@ local function ToggleStatsGraph()
 end
 
 local function SetupControls()
+
+	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
+	local toggleKeySet = (toggleKey ~= "")
+	local toggleendgamewindow = options.toggleendgamewindow.value
+	local togglewindow = toggleKeySet and (gameEnded and toggleendgamewindow or true)
+	local abx = togglewindow and 159 or 9
+	local sbx = togglewindow and 236 or 89
+
 	window_endgame = Window:New{  
 		name = "GameOver",
-		caption = "Game in progress - Statistics",
+		caption = "Game in Progress",
 		textColor = {0.5,0.5,0.5,1}, 
 		fontSize = 50,
 		x = '20%',
@@ -294,21 +310,21 @@ local function SetupControls()
 	
 	local B_HEIGHT = 40
 
-	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or "no hotkey"
-	if toggleKey == "" then togglekey = "no hotkey" end
-	toggleButton = Button:New{
-		x=9, y=7,
-		width=145;
-		height=B_HEIGHT;
-		caption="Toggle ("..toggleKey..")",
-		parent = window_endgame;
-		OnClick = {
-			ToggleStatsGraph
-		};
-	}
+	if togglewindow then
+		toggleButton = Button:New{
+			x=9, y=7,
+			width=145;
+			height=B_HEIGHT;
+			caption="Toggle ("..toggleKey..")",
+			parent = window_endgame;
+			OnClick = {
+				ToggleStatsGraph
+			};
+		}
+	end
 
 	awardButton = Button:New{
-		x=159, y=7,
+		x=abx, y=7,
 		height=B_HEIGHT;
 		caption="Awards",
 		OnClick = {
@@ -321,7 +337,7 @@ local function SetupControls()
 	SetButtonSelected(awardButton, true)
 	
 	statsButton = Button:New{
-		x=236, y=7,
+		x=sbx, y=7,
 		height=B_HEIGHT;
 		caption="Statistics",
 		OnClick = {
