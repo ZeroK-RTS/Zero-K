@@ -89,6 +89,18 @@ options = {
 --------------------------------------------------------------------------------
 --functions
 
+local function IsToggleable()
+	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
+	local toggleKeySet = (toggleKey ~= "")
+	local toggleendgamewindow = options.toggleendgamewindow.value
+	local togglewindow = toggleKeySet and (not gameEnded or toggleendgamewindow)
+	if togglewindow then
+		return toggleKey
+	else
+		return false
+	end
+end
+
 local function SetTeamNamesAndColors()
   for _,teamID in ipairs(Spring.GetTeamList()) do
 	local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
@@ -214,6 +226,8 @@ local function ShowEndGameWindow()
 end
 
 local function ToggleStatsGraph()
+	local toggleKey = IsToggleable()
+	if not toggleKey then return end
 	if showingEndgameWindow then
 		-- toggle off
 		if not gameEnded then
@@ -223,17 +237,28 @@ local function ToggleStatsGraph()
 			addedStatsSubPanel = false
 		end
 		screen0:RemoveChild(window_endgame)
+
 	else
+
 		-- toggle on
 		
 		-- set the togglekey reminder here
 		-- this is dumb but I don't know of a hook for when it's changed in epicmenu
 		-- so this is as good a place as any to make sure it's set correctly
-		if toggleButton then
-			local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
-			toggleButton.caption="Toggle ("..toggleKey..")"
-			toggleButton:Invalidate()
-		end
+		-- also have to redraw the buttons to make sure they're in the right position
+		-- in case the user bound or unbound the hotkey
+		local abx = 159
+		local sbx = 236
+
+		toggleButton.caption="Toggle ("..toggleKey..")"
+		toggleButton:Invalidate()
+		window_endgame:AddChild(toggleButton)
+
+		awardButton.x=abx
+		awardButton:Invalidate()
+
+		statsButton.x=sbx
+		statsButton:Invalidate()
 
 		if not gameEnded then
 			showingTab = nil
@@ -250,12 +275,9 @@ end
 
 local function SetupControls()
 
-	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
-	local toggleKeySet = (toggleKey ~= "")
-	local toggleendgamewindow = options.toggleendgamewindow.value
-	local togglewindow = toggleKeySet and (gameEnded and toggleendgamewindow or true)
-	local abx = togglewindow and 159 or 9
-	local sbx = togglewindow and 236 or 89
+	local toggleKey = IsToggleable()
+	local abx = toggleKey and 159 or 9
+	local sbx = toggleKey and 236 or 89
 
 	window_endgame = Window:New{  
 		name = "GameOver",
@@ -309,18 +331,21 @@ local function SetupControls()
 	}
 	
 	local B_HEIGHT = 40
-
-	if togglewindow then
-		toggleButton = Button:New{
-			x=9, y=7,
-			width=145;
-			height=B_HEIGHT;
-			caption="Toggle ("..toggleKey..")",
-			parent = window_endgame;
-			OnClick = {
-				ToggleStatsGraph
-			};
-		}
+	
+	local toggleKeyText = toggleKey or ""
+	toggleButton = Button:New{
+		x=9, y=7,
+		width=145;
+		height=B_HEIGHT;
+		caption="Toggle ("..toggleKeyText..")",
+		parent = window_endgame;
+		OnClick = {
+			ToggleStatsGraph
+		};
+	}
+	
+	if not toggleKey then
+		window_endgame:RemoveChild(toggleButton)
 	end
 
 	awardButton = Button:New{
