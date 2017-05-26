@@ -89,18 +89,6 @@ options = {
 --------------------------------------------------------------------------------
 --functions
 
-local function IsToggleable()
-	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
-	local toggleKeySet = (toggleKey ~= "")
-	local toggleendgamewindow = options.toggleendgamewindow.value
-	local togglewindow = toggleKeySet and (not gameEnded or toggleendgamewindow)
-	if togglewindow then
-		return toggleKey
-	else
-		return false
-	end
-end
-
 local function SetTeamNamesAndColors()
   for _,teamID in ipairs(Spring.GetTeamList()) do
 	local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
@@ -226,8 +214,12 @@ local function ShowEndGameWindow()
 end
 
 local function ToggleStatsGraph()
-	local toggleKey = IsToggleable()
-	if not toggleKey then return end
+
+	local toggleendgamewindow = options.toggleendgamewindow.value
+	local togglewindow = (not gameEnded or toggleendgamewindow)
+
+	if not togglewindow then return end
+
 	if showingEndgameWindow then
 		-- toggle off
 		if not gameEnded then
@@ -247,18 +239,26 @@ local function ToggleStatsGraph()
 		-- so this is as good a place as any to make sure it's set correctly
 		-- also have to redraw the buttons to make sure they're in the right position
 		-- in case the user bound or unbound the hotkey
-		local abx = 159
-		local sbx = 236
-
-		toggleButton.caption="Toggle ("..toggleKey..")"
-		toggleButton:Invalidate()
-		window_endgame:AddChild(toggleButton)
-
+		
+		local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
+		local showToggleButton = (toggleKey ~= "")
+		
+		local abx = showToggleButton and 159 or 9
+		local sbx = showToggleButton and 236 or 86
+		
 		awardButton.x=abx
 		awardButton:Invalidate()
 
 		statsButton.x=sbx
 		statsButton:Invalidate()
+
+		if showToggleButton then
+			toggleButton.caption="Toggle ("..toggleKey..")"
+			toggleButton:Invalidate()
+			window_endgame:AddChild(toggleButton)
+		else
+			window_endgame:RemoveChild(toggleButton)
+		end
 
 		if not gameEnded then
 			showingTab = nil
@@ -275,9 +275,12 @@ end
 
 local function SetupControls()
 
-	local toggleKey = IsToggleable()
-	local abx = toggleKey and 159 or 9
-	local sbx = toggleKey and 236 or 89
+	local toggleendgamewindow = options.toggleendgamewindow.value
+	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
+	local showToggleButton = (toggleKey ~= "") and (not gameEnded or toggleendgamewindow)
+		
+	local abx = showToggleButton and 159 or 9
+	local sbx = showToggleButton and 236 or 86
 
 	window_endgame = Window:New{  
 		name = "GameOver",
@@ -332,19 +335,18 @@ local function SetupControls()
 	
 	local B_HEIGHT = 40
 	
-	local toggleKeyText = toggleKey or ""
 	toggleButton = Button:New{
 		x=9, y=7,
 		width=145;
 		height=B_HEIGHT;
-		caption="Toggle ("..toggleKeyText..")",
+		caption="Toggle ("..toggleKey..")",
 		parent = window_endgame;
 		OnClick = {
 			ToggleStatsGraph
 		};
 	}
 	
-	if not toggleKey then
+	if not showToggleButton then
 		window_endgame:RemoveChild(toggleButton)
 	end
 
@@ -423,6 +425,7 @@ function widget:Initialize()
 	SetTeamNamesAndColors()
 	
 	if Spring.IsGameOver() then
+		gameEnded = true
 		window_endgame.caption = "Game aborted"
 		showEndgameWindowTimer = 1
 	end
@@ -478,6 +481,7 @@ function widget:GameOver (winners)
 	end
 	window_endgame.tooltip = ""
 	window_endgame:Invalidate()
+	gameEnded = true
 	showEndgameWindowTimer = 2
 end
 
@@ -497,7 +501,30 @@ function widget:Update(dt)
 	if showEndgameWindowTimer > 0 then
 		return
 	end
+
+
+	local toggleendgamewindow = options.toggleendgamewindow.value
+	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
+	local showToggleButton = (toggleKey ~= "") and (not gameEnded or toggleendgamewindow)
 	
+	local abx = showToggleButton and 159 or 9
+	local sbx = showToggleButton and 236 or 86
+	
+	awardButton.x=abx
+	awardButton:Invalidate()
+
+	statsButton.x=sbx
+	statsButton:Invalidate()
+
+	if showToggleButton then
+		toggleButton.caption="Toggle ("..toggleKey..")"
+		toggleButton:Invalidate()
+		window_endgame:AddChild(toggleButton)
+	else
+		window_endgame:RemoveChild(toggleButton)
+	end
+
+
 	statsPanel:ClearChildren()
 	window_endgame:RemoveChild(awardPanel)
 	window_endgame:RemoveChild(statsPanel)
@@ -515,7 +542,6 @@ function widget:Update(dt)
 	ShowEndGameWindow()
 	showEndgameWindowTimer = nil
 	showingEndgameWindow = true
-	gameEnded = true
 end
 
 function widget:Shutdown()
