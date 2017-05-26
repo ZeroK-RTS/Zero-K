@@ -420,24 +420,11 @@ local function BuildRowButtonFunc(num, cmdid, left, right,addInput,insertMode,cu
 	local pos = 1
 	local numInput = 1	--number of times to send the order
 	
-	local function BooleanMult(int, bool)
-		if bool then return int
-		else return 0 end
-	end
-	
-	--CMD.OPT_META = 4
-	--CMD.OPT_RIGHT = 16
-	--CMD.OPT_SHIFT = 32
-	--CMD.OPT_CTRL = 64
-	--CMD.OPT_ALT = 128
-	
 	--it's not using the options, even though it's receiving them correctly
 	--so we have to do it manually
 	if shift then numInput = numInput * 5 end
 	if ctrl then numInput = numInput * 20 end
 	numInput = numInput + (addInput or 0) -- to insert specific amount without SHIFT or CTRL modifier
-	
-	--local options = BooleanMult(CMD.OPT_SHIFT, shift) + BooleanMult(CMD.OPT_ALT, alt) + BooleanMult(CMD.OPT_CTRL, ctrl) + BooleanMult(CMD.OPT_META, meta) + BooleanMult(CMD.OPT_RIGHT, right)
 	
 	--insertion position is by unit rather than batch, so we need to add up all the units in front of us to get the queue
 	

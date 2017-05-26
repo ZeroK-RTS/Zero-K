@@ -190,12 +190,14 @@ local function SendCommand()
 			spSetActiveCommand(-1)
 		end
 
-		local cmdOpts = {}
+		local cmdOpts = {coded = 0}
 		if s then
-			cmdOpts[#cmdOpts + 1] = "shift"
+			cmdOpts.shift = true
+			cmdOpts.coded = cmdOpts.coded + CMD.OPT_SHIFT
 		end
 		if m then
-			cmdOpts[#cmdOpts + 1] = "meta"
+			cmdOpts.meta = true
+			cmdOpts.coded = cmdOpts.coded + CMD.OPT_META
 		end
 
 		local height = Spring.GetGroundHeight(pointX, pointZ)
