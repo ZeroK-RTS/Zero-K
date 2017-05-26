@@ -16,11 +16,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local spSendCommands			= Spring.SendCommands
-
-local echo = Spring.Echo
-local GetGameSeconds = Spring.GetGameSeconds
-local spec
+local spSendCommands	= Spring.SendCommands
+local echo 		= Spring.Echo
+local GetGameSeconds	= Spring.GetGameSeconds
 
 local Chili
 local Image
@@ -38,31 +36,36 @@ local incolor2color
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local showEndgameWindowTimer
+-- Chili objects
 local window_endgame
 local awardPanel
 local awardSubPanel
 local statsPanel
 local statsSubPanel
-local addedStatsSubPanel = false
 local awardButton = false
 local statsButton = false
 local exitButton = false
 local toggleButton = false
+
+-- Flags and timers
+local spec
 local showingTab
-local teamNames = {}
-local teamColors = {}
 local showingEndgameWindow = false
 local gameEnded = false
+-- local addedStatsSubPanel = false
+local showEndgameWindowTimer
 
+-- Constants and parameters
 local awardPanelHeight = 50
-
 local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
 local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
 local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
 
 local awardDescs = VFS.Include("LuaRules/Configs/award_names.lua")
+
+local teamNames = {}
+local teamColors = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -128,10 +131,10 @@ local function ShowTab(tabName)
 end
 
 local function AddStatsSubPanel()
-	if addedStatsSubPanel then
-		return
-	end
-	addedStatsSubPanel = true
+--	if addedStatsSubPanel then
+--		return
+--	end
+--	addedStatsSubPanel = true
 	statsPanel:AddChild(statsSubPanel)
 	local button = WG.statsPanelEngineButtonClicked or 1
 	statsSubPanel.engineButtons[button].OnClick[1](statsSubPanel.engineButtons[button])
@@ -200,7 +203,6 @@ end
 function SetAwardList(awardList)
 	WG.awardList = awardList
 	SetupAwardsPanel()
---	ShowAwards()
 end
 
 local function ShowEndGameWindow()
@@ -213,8 +215,36 @@ local function ShowEndGameWindow()
 	screen0:AddChild(window_endgame)
 end
 
-local function ToggleStatsGraph()
+local function PrepEndgameWindow()
+	-- Determines whether or not to show the toggle button
+	-- Then updates the window to position the appropriate buttons in the appropriate places
+	-- Also updates the hotkey label on the toggle button
+	--	This is done every time the window is toggled on
+	--	Not a great way to do it, but there's not a hook for when the hotkey is changed
 
+	local toggleendgamewindow = options.toggleendgamewindow.value
+	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
+	local showToggleButton = (toggleKey ~= "") and (not gameEnded or toggleendgamewindow)
+	
+	local abx = showToggleButton and 159 or 9
+	local sbx = showToggleButton and 236 or 86
+	
+	awardButton.x=abx
+	awardButton:Invalidate()
+	
+	statsButton.x=sbx
+	statsButton:Invalidate()
+
+	if showToggleButton then
+		toggleButton.caption="Toggle ("..toggleKey..")"
+		toggleButton:Invalidate()
+		window_endgame:AddChild(toggleButton)
+	else
+		window_endgame:RemoveChild(toggleButton)
+	end
+end
+
+local function ToggleStatsGraph()
 	local toggleendgamewindow = options.toggleendgamewindow.value
 	local togglewindow = (not gameEnded or toggleendgamewindow)
 
@@ -222,44 +252,17 @@ local function ToggleStatsGraph()
 
 	if showingEndgameWindow then
 		-- toggle off
-		if not gameEnded then
+--		if not gameEnded then
 			statsPanel:ClearChildren()
-			window_endgame:RemoveChild(awardPanel)
-			window_endgame:RemoveChild(statsPanel)
-			addedStatsSubPanel = false
-		end
+--			window_endgame:RemoveChild(awardPanel)
+--			window_endgame:RemoveChild(statsPanel)
+--			addedStatsSubPanel = false
+--		end
 		screen0:RemoveChild(window_endgame)
 
 	else
-
 		-- toggle on
-		
-		-- set the togglekey reminder here
-		-- this is dumb but I don't know of a hook for when it's changed in epicmenu
-		-- so this is as good a place as any to make sure it's set correctly
-		-- also have to redraw the buttons to make sure they're in the right position
-		-- in case the user bound or unbound the hotkey
-		
-		local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
-		local showToggleButton = (toggleKey ~= "")
-		
-		local abx = showToggleButton and 159 or 9
-		local sbx = showToggleButton and 236 or 86
-		
-		awardButton.x=abx
-		awardButton:Invalidate()
-
-		statsButton.x=sbx
-		statsButton:Invalidate()
-
-		if showToggleButton then
-			toggleButton.caption="Toggle ("..toggleKey..")"
-			toggleButton:Invalidate()
-			window_endgame:AddChild(toggleButton)
-		else
-			window_endgame:RemoveChild(toggleButton)
-		end
-
+		PrepEndgameWindow()
 		if not gameEnded then
 			showingTab = nil
 			WG.MakeStatsPanel()
@@ -274,14 +277,6 @@ local function ToggleStatsGraph()
 end
 
 local function SetupControls()
-
-	local toggleendgamewindow = options.toggleendgamewindow.value
-	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
-	local showToggleButton = (toggleKey ~= "") and (not gameEnded or toggleendgamewindow)
-		
-	local abx = showToggleButton and 159 or 9
-	local sbx = showToggleButton and 236 or 86
-
 	window_endgame = Window:New{  
 		name = "GameOver",
 		caption = "Game in Progress",
@@ -339,19 +334,13 @@ local function SetupControls()
 		x=9, y=7,
 		width=145;
 		height=B_HEIGHT;
-		caption="Toggle ("..toggleKey..")",
 		parent = window_endgame;
 		OnClick = {
 			ToggleStatsGraph
 		};
 	}
-	
-	if not showToggleButton then
-		window_endgame:RemoveChild(toggleButton)
-	end
-
 	awardButton = Button:New{
-		x=abx, y=7,
+		x=159, y=7,
 		height=B_HEIGHT;
 		caption="Awards",
 		OnClick = {
@@ -364,7 +353,7 @@ local function SetupControls()
 	SetButtonSelected(awardButton, true)
 	
 	statsButton = Button:New{
-		x=sbx, y=7,
+		x=236, y=7,
 		height=B_HEIGHT;
 		caption="Statistics",
 		OnClick = {
@@ -481,11 +470,13 @@ function widget:GameOver (winners)
 	end
 	window_endgame.tooltip = ""
 	window_endgame:Invalidate()
-	gameEnded = true
 	showEndgameWindowTimer = 2
+	gameEnded = true
 end
 
 function widget:Update(dt)
+	
+	-- Redraw the currently-displayed stats graph every fifteen seconds
 	local gameSeconds = GetGameSeconds()
 	if (gameSeconds % 15) == 1 then
 		if showingTab == 'stats' then
@@ -494,6 +485,8 @@ function widget:Update(dt)
 		end
 	end
 
+	-- If the post-endgame countdown timer has not yet started, don't do anything else
+	-- If the post-endgame countdown has started but not elapsed, decrement it and do nothing else
 	if not showEndgameWindowTimer then
 		return
 	end
@@ -502,33 +495,13 @@ function widget:Update(dt)
 		return
 	end
 
-
-	local toggleendgamewindow = options.toggleendgamewindow.value
-	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
-	local showToggleButton = (toggleKey ~= "") and (not gameEnded or toggleendgamewindow)
-	
-	local abx = showToggleButton and 159 or 9
-	local sbx = showToggleButton and 236 or 86
-	
-	awardButton.x=abx
-	awardButton:Invalidate()
-
-	statsButton.x=sbx
-	statsButton:Invalidate()
-
-	if showToggleButton then
-		toggleButton.caption="Toggle ("..toggleKey..")"
-		toggleButton:Invalidate()
-		window_endgame:AddChild(toggleButton)
-	else
-		window_endgame:RemoveChild(toggleButton)
-	end
-
+	-- Otherwise, it's time to show the endgame screen
+	PrepEndgameWindow()
 
 	statsPanel:ClearChildren()
 	window_endgame:RemoveChild(awardPanel)
 	window_endgame:RemoveChild(statsPanel)
-	addedStatsSubPanel = false
+--	addedStatsSubPanel = false
 	screen0:RemoveChild(window_endgame)
 
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
