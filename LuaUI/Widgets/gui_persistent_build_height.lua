@@ -79,6 +79,8 @@ local groundGridColor  = {0.3, 0.2, 1, 0.8} -- grid representing new ground heig
 local lassoColor = {0.2, 1.0, 0.2, 0.8}
 local edgeColor = {0.2, 1.0, 0.2, 0.4}
 
+local SQUARE_BUILDABLE = 2 -- magic constant returned by TestBuildOrder
+
 --------------------------------------------------------------------------------
 -- Local Vars
 --------------------------------------------------------------------------------
@@ -356,7 +358,14 @@ function widget:MousePress(mx, my, button)
 		end
 		return true
 	end
-	if not (buildingPlacementID and (buildingPlacementHeight ~= 0 or floating) and button == 1 and pointX) then
+
+	if not buildingPlacementID then
+		return
+	end
+
+	local unbuildableTerrain = (Spring.TestBuildOrder(buildingPlacementID, pointX, 0, pointZ, Spring.GetBuildFacing()) ~= SQUARE_BUILDABLE)
+
+	if not ((floating or buildingPlacementHeight ~= 0 or (buildingPlacementHeight == 0 and unbuildableTerrain)) and button == 1 and pointX) then
 		return
 	end
 	SendCommand()
@@ -390,7 +399,7 @@ local function DrawRectangleCorners()
 end
 
 function widget:DrawWorld()
-	if not (buildingPlacementID and (buildingPlacementHeight ~= 0 or floating)) then
+	if not buildingPlacementID then
 		widgetHandler:RemoveWidgetCallIn("DrawWorld", self)
 		return
 	end
