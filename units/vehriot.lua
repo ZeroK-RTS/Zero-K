@@ -21,7 +21,7 @@ unitDef = {
 	helptext_de    = [[Seine Riotkanone ist sehr effektiv gegen größere Gruppen von Raidern und, um den gegnerischen Fortschritt aufzuhalten. Die Projektile können nicht bogenförmig abgeschoßen werden, weshalb sie nicht in einem Haufen, sondern entlang einer Frontlinie, ausgerichtet werden sollten. Durch ihren Mangel an Geschwindigkeit und Reichweite, sind sie für die meisten Skirmisher ein gefundenes Fressen.]],
   },
 
-  explodeAs           = [[BIG_UNITEX_LEVELER]],
+  explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[vehicleriot]],
@@ -37,7 +37,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[corleveler_512.s3o]],
-  selfDestructAs      = [[BIG_UNITEX_LEVELER]],
+  selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
 
