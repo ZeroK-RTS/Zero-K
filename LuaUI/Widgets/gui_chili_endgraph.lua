@@ -307,7 +307,6 @@ function widget:GameFrame(n)
 end
 
 function loadpanel()
-	Spring.Echo("Loading Panel!")
 	Chili = WG.Chili
 	local screen0 = Chili.Screen0
 	local selW = 150
@@ -373,9 +372,7 @@ function loadpanel()
 			parent = graphSelect,
 			OnClick = { 
 				function(obj)
-					Spring.Echo("Button clicked: "..i)
 					if WG.statsPanelEngineButtonClicked then
-						Spring.Echo("Previous button: "..WG.statsPanelEngineButtonClicked)
 						SetButtonSelected(window0.engineButtons[WG.statsPanelEngineButtonClicked], false)
 					end
 					WG.statsPanelEngineButtonClicked = i

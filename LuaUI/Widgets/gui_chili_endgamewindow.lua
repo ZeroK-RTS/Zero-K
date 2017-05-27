@@ -16,10 +16,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- Spring aliases
 local spSendCommands	= Spring.SendCommands
 local echo 		= Spring.Echo
 local GetGameSeconds	= Spring.GetGameSeconds
 
+-- Chili classes
 local Chili
 local Image
 local Button
@@ -50,12 +52,12 @@ local toggleButton = false
 -- Flags and timers
 local spec
 local showingTab
-local showingEndgameWindow = false
-local gameEnded = false
--- local addedStatsSubPanel = false
+local showingEndgameWindow
+local gameEnded
 local showEndgameWindowTimer
 
 -- Constants and parameters
+local endgameWindowDelay = 2
 local awardPanelHeight = 50
 local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
 local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
@@ -69,6 +71,7 @@ local teamColors = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--options
 
 options_path = 'Settings/HUD Panels/Stats Graph'
 options_order = {'togglestatsgraph', 'toggleendgamewindow'}
@@ -90,22 +93,37 @@ options = {
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---functions
+--utilities
 
 local function SetTeamNamesAndColors()
-  for _,teamID in ipairs(Spring.GetTeamList()) do
-	local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
-	if isAI then
-		local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
-		teamNames[teamID] = name
-	else
-		local name = Spring.GetPlayerInfo(leader)
-		teamNames[teamID] = name
+	for _,teamID in ipairs(Spring.GetTeamList()) do
+		local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
+		if isAI then
+			local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
+			teamNames[teamID] = name
+		else
+			local name = Spring.GetPlayerInfo(leader)
+			teamNames[teamID] = name
+		end
+	local r,g,b = Spring.GetTeamColor(teamID)
+	teamColors[teamID] = {r,g,b,1}
 	end
-    local r,g,b = Spring.GetTeamColor(teamID)
-    teamColors[teamID] = {r,g,b,1}
-  end
 end
+
+local function SetButtonSelected(button, isSelected)
+	if isSelected then
+		button.backgroundColor = SELECT_BUTTON_COLOR
+		button.focusColor = SELECT_BUTTON_FOCUS_COLOR
+	else
+		button.backgroundColor = BUTTON_COLOR
+		button.focusColor = BUTTON_FOCUS_COLOR
+	end
+	button:Invalidate()
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--awards
 
 local function MakeAwardPanel(awardType, record)
 	local desc = awardDescs[awardType]
@@ -121,105 +139,44 @@ local function MakeAwardPanel(awardType, record)
 	}
 end
 
---[[
-local function AddStatsSubPanel()
-	echo("Adding StatsSubPanel!")
---	if addedStatsSubPanel then
---		return
---	end
---	addedStatsSubPanel = true
---	statsPanel:AddChild(statsSubPanel)
-	local button = WG.statsPanelEngineButtonClicked or 1
-	statsSubPanel.engineButtons[button].OnClick[1](statsSubPanel.engineButtons[button])
-end
---]]
-
-local function SetButtonSelected(button, isSelected)
-	if isSelected then
-		button.backgroundColor = SELECT_BUTTON_COLOR
-		button.focusColor = SELECT_BUTTON_FOCUS_COLOR
-	else
-		button.backgroundColor = BUTTON_COLOR
-		button.focusColor = BUTTON_FOCUS_COLOR
-	end
-	button:Invalidate()
-end
-
-local function ShowAwards()
---	if ShowTab('awards') then return end
-	
---	window_endgame:RemoveChild(statsPanel)
---	window_endgame:AddChild(awardPanel)
-	statsPanel:Hide()
-	awardPanel:Show()
-	
-	SetButtonSelected(awardButton, true)
-	SetButtonSelected(statsButton, false)
-	showingTab = awards
-end
-local function ShowStats()
-	echo("Showing Stats!")
---	statsSubPanel = WG.statsPanel
-	if not statsSubPanel then
-		echo 'Stats Panel not ready yet.'
-		return
-	end
-	
---	if ShowTab('stats') then return end
-	
---	AddStatsSubPanel()
-	local button = WG.statsPanelEngineButtonClicked or 1
-	statsSubPanel.engineButtons[button].OnClick[1](statsSubPanel.engineButtons[button])
-
---	window_endgame:RemoveChild(awardPanel)
---	window_endgame:AddChild(statsPanel)
-	awardPanel:Hide()
-	statsPanel:Show()
-	
-	SetButtonSelected(statsButton, true)
-	SetButtonSelected(awardButton, false)
-	showingTab = stats
-end
-
 local function SetupAwardsPanel()
 	awardSubPanel:ClearChildren()
 	for teamID,awards in pairs(WG.awardList) do
-		--echo(k, v)
-		
 		local playerHasAward
 		for awardType, record in pairs(awards) do
 			playerHasAward = true
 		end
 		if playerHasAward then
-			Label:New{ caption = teamNames[teamID], width=120; fontShadow = true; valign='center'; autosize=false, height=awardPanelHeight; textColor=teamColors[teamID]; 	parent=awardSubPanel }
+			Label:New{
+				caption = teamNames[teamID],
+				width=120; fontShadow = true; valign='center';
+				autosize=false, height=awardPanelHeight; textColor=teamColors[teamID];
+				parent=awardSubPanel
+			}
 		
 			for awardType, record in pairs(awards) do
-				
 				awardSubPanel:AddChild( MakeAwardPanel(awardType, record) )
 			end
 			
-			Label:New{ caption = string.rep('-', 300), textColor = {0.4,0.4,0.4,0.4}; autosize=false; width='100%'; height=5; parent=awardSubPanel } --spacer label to force a "line break"
+			Label:New{
+				caption = string.rep('-', 300), textColor = {0.4,0.4,0.4,0.4};
+				autosize=false; width='100%'; height=5;
+				parent=awardSubPanel
+			} --spacer label to force a "line break"
 		end
 	end
 end
 
 function SetAwardList(awardList)
+	-- Registered as a global
+	-- Called from awards.lua gadget
 	WG.awardList = awardList
 	SetupAwardsPanel()
 end
 
---[[
-local function ShowEndGameWindow()
-	if WG.awardList then
-		ShowAwards()
-	else
-		ShowStats()
-	end
-	
---	screen0:AddChild(window_endgame)
-	window_endgame:Show()
-end
---]]
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--show, hide, and toggle
 
 local function PrepEndgameWindow()
 	-- Determines whether or not to show the toggle button
@@ -231,23 +188,26 @@ local function PrepEndgameWindow()
 	local toggleendgamewindow = options.toggleendgamewindow.value
 	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
 	local showToggleButton = (toggleKey ~= "") and (not gameEnded or toggleendgamewindow)
-	
+
+--[[
+	-- Put the toggle button leftmost, move the awards and stats buttons right
 	local abx = showToggleButton and 159 or 9
 	local sbx = showToggleButton and 236 or 86
-	
-	awardButton.x=abx
-	awardButton:Invalidate()
-	
-	statsButton.x=sbx
-	statsButton:Invalidate()
+	awardButton:SetPos(abx)
+	statsButton:SetPos(sbx)
+--]]	
+---[[
+	-- Put the toggle button rightmost, move the exit button left
+	local ebr = showToggleButton and 259 or 109
+	local we_w = window_endgame.width
+	exitButton:SetPos(we_w - ebr)
+--]]
 
 	if showToggleButton then
 		toggleButton.caption="Toggle ("..toggleKey..")"
-		toggleButton:Invalidate() -- is this necessary, or will Show() also invalidate it?
---		window_endgame:AddChild(toggleButton)
+		toggleButton:Invalidate()
 		toggleButton:Show()
 	else
---		window_endgame:RemoveChild(toggleButton)
 		toggleButton:Hide()
 	end
 end
@@ -255,42 +215,46 @@ end
 local function ToggleStatsGraph()
 	local toggleendgamewindow = options.toggleendgamewindow.value
 	local togglewindow = (not gameEnded or toggleendgamewindow)
-
 	if not togglewindow then return end
 
 	if showingEndgameWindow then
 		-- toggle off
-		echo ("Toggle Off!")
---		if not gameEnded then
---			statsPanel:ClearChildren()
---			window_endgame:RemoveChild(awardPanel)
---			window_endgame:RemoveChild(statsPanel)
---			addedStatsSubPanel = false
---		end
---		screen0:RemoveChild(window_endgame)
 		window_endgame:Hide()
-
 	else
 		-- toggle on
-		echo ("Toggle On!")
 		PrepEndgameWindow()
---		if not gameEnded then
---			showingTab = nil
---			statsPanel:ClearChildren()
---			WG.MakeStatsPanel() -- this probably only needs to be done once, and not here
---			ShowStats()
---			window_endgame:RemoveChild(awardButton)
---			window_endgame:RemoveChild(statsButton)
---			window_endgame:RemoveChild(exitButton)
---			awardButton:Hide()
---			statsButton:Hide()
---			exitButton:Hide()
---		end
---		screen0:AddChild(window_endgame)
 		window_endgame:Show()
 	end
 	showingEndgameWindow = not showingEndgameWindow
 end
+
+local function ShowAwards()
+	statsPanel:Hide()
+	awardPanel:Show()
+	SetButtonSelected(awardButton, true)
+	SetButtonSelected(statsButton, false)
+	showingTab = 'awards'
+end
+
+local function ShowStats()
+	if not statsSubPanel then
+		echo 'Stats Panel not ready yet.'
+		return
+	end
+	
+	local button = WG.statsPanelEngineButtonClicked or 1
+	statsSubPanel.engineButtons[button].OnClick[1](statsSubPanel.engineButtons[button])
+
+	awardPanel:Hide()
+	statsPanel:Show()
+	SetButtonSelected(statsButton, true)
+	SetButtonSelected(awardButton, false)
+	showingTab = 'stats'
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--setup
 
 local function SetupControls()
 	window_endgame = Window:New{  
@@ -304,8 +268,7 @@ local function SetupControls()
 		height = '60%',
 		classname = "main_window",
 		--autosize   = true;
-		--parent = screen0,
-		parent = screen0, -- let's try this
+		parent = screen0,
 		draggable = true,
 		resizable = true,
 		minWidth=500;
@@ -323,8 +286,9 @@ local function SetupControls()
 		hitTestAllowEmpty = true;
 		tooltip = "",
 	}
+
 	statsPanel = ScrollPanel:New{
-		parent = window_endgame, -- and try this
+		parent = window_endgame,
 		x=10;y=50;
 		bottom=10;right=10;
 		backgroundColor  = {1,1,1,1},
@@ -350,7 +314,8 @@ local function SetupControls()
 	local B_HEIGHT = 40
 	
 	toggleButton = Button:New{
-		x=9, y=7,
+--		y=7, x=9,	-- leftmost
+		y=7; right=9;	-- rightmost
 		width=145;
 		height=B_HEIGHT;
 		parent = window_endgame;
@@ -358,8 +323,9 @@ local function SetupControls()
 			ToggleStatsGraph
 		};
 	}
+
 	awardButton = Button:New{
-		x=159, y=7,
+		x=9, y=7,
 		height=B_HEIGHT;
 		caption="Awards",
 		OnClick = {
@@ -367,12 +333,13 @@ local function SetupControls()
 		};
 		parent = window_endgame;
 	}
+
 	BUTTON_COLOR = awardButton.backgroundColor
 	BUTTON_FOCUS_COLOR = awardButton.focusColor
 	SetButtonSelected(awardButton, true)
 	
 	statsButton = Button:New{
-		x=236, y=7,
+		x=86, y=7,
 		height=B_HEIGHT;
 		caption="Statistics",
 		OnClick = {
@@ -403,14 +370,13 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --callins
+
 function widget:Initialize()
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget()
 		return
 	end
-
-	spec = Spring.GetSpectatingState()
-
+	
 	Chili = WG.Chili
 	Image = Chili.Image
 	Button = Chili.Button
@@ -424,21 +390,20 @@ function widget:Initialize()
 	color2incolor = Chili.color2incolor
 	incolor2color = Chili.incolor2color
 	
+	SetTeamNamesAndColors()
+	spec = Spring.GetSpectatingState()
+	Spring.SendCommands("endgraph 0")
+	
+	-- Create the window and configure it to display mid-game stats
+	-- but don't display it yet; wait until toggled on or game over
 	SetupControls()
-	WG.MakeStatsPanel() -- is here the right place for this?
-	statsSubPanel = WG.statsPanel -- and this?
-	statsPanel:AddChild(statsSubPanel) -- and this?
+	WG.MakeStatsPanel()
+	statsSubPanel = WG.statsPanel
+	statsPanel:AddChild(statsSubPanel)
 	awardButton:Hide()
 	statsButton:Hide()
 	exitButton:Hide()
-	ShowStats() -- and this?
-	--- ... seems like it is.
-
-	Spring.SendCommands("endgraph 0")
-	
-	widgetHandler:RegisterGlobal("SetAwardList", SetAwardList)
-	
-	SetTeamNamesAndColors()
+	ShowStats()
 	
 	if Spring.IsGameOver() then
 		gameEnded = true
@@ -446,6 +411,7 @@ function widget:Initialize()
 		showEndgameWindowTimer = 1
 	end
 	
+	widgetHandler:RegisterGlobal("SetAwardList", SetAwardList)
 	widgetHandler:AddAction("togglestatsgraph", ToggleStatsGraph, nil, 'tp')
 end
 
@@ -497,12 +463,11 @@ function widget:GameOver (winners)
 	end
 	window_endgame.tooltip = ""
 	window_endgame:Invalidate()
-	showEndgameWindowTimer = 2
+	showEndgameWindowTimer = endgameWindowDelay
 	gameEnded = true
 end
 
 function widget:Update(dt)
-	
 	-- Redraw the currently-displayed stats graph every fifteen seconds
 	local gameSeconds = GetGameSeconds()
 	if (gameSeconds % 15) == 1 then
@@ -523,28 +488,13 @@ function widget:Update(dt)
 	end
 
 	-- Otherwise, it's time to show the endgame screen
-	PrepEndgameWindow()
-
---	statsPanel:ClearChildren()
---	window_endgame:RemoveChild(awardPanel)
---	window_endgame:RemoveChild(statsPanel)
---	addedStatsSubPanel = false
---	screen0:RemoveChild(window_endgame)
-
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	window_endgame:SetPos(screenWidth*0.2,screenHeight*0.2,screenWidth*0.6,screenHeight*0.6)
-
---	showingTab = nil
---	WG.statsPanelEngineButtonClicked = nil
 	statsSubPanel.engineButtons[1].OnClick[1](statsSubPanel.engineButtons[1])
 	awardButton:Show()
 	statsButton:Show()
 	exitButton:Show()
-
---	window_endgame:AddChild(awardButton)
---	window_endgame:AddChild(statsButton)
---	window_endgame:AddChild(exitButton)
---	ShowEndGameWindow()
+	PrepEndgameWindow()
 
 	if WG.awardList then
 		ShowAwards()
