@@ -1,11 +1,11 @@
 function widget:GetInfo() return {
-	name	= "Unit Marker Zero-K",
-	desc	= "[v1.3.10] Marks spotted buildings of interest and commander corpse.",
-	author	= "Sprung",
-	date	= "2015-04-11",
-	license	= "GNU GPL v2",
-	layer	= -1,
-	enabled	= true,
+	name    = "Unit Marker Zero-K",
+	desc    = "[v1.3.10] Marks spotted buildings of interest and commander corpse.",
+	author  = "Sprung",
+	date    = "2015-04-11",
+	license = "GNU GPL v2",
+	layer   = -1,
+	enabled = true,
 } end
 
 local knownUnits = {}
@@ -114,7 +114,7 @@ function widget:TeamDied ()
 	widget:Initialize ()
 end
 
-function widget:UnitEnteredLos (unitID, unitTeam)
+function widget:UnitEnteredLos (unitID, teamID)
 	if Spring.IsUnitAllied(unitID) or Spring.GetSpectatingState() then return end
 
 	local unitDefID = Spring.GetUnitDefID (unitID)
@@ -127,7 +127,15 @@ function widget:UnitEnteredLos (unitID, unitTeam)
 			knownUnits[unitID] = unitDefID
 		end
 		if unitList[unitDefID].show_owner then
-			local owner_name = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(Spring.GetUnitTeam(unitID)))) or "noname"
+			local _,playerID,_,isAI = Spring.GetTeamInfo(teamID)
+			local owner_name
+			if isAI then
+				local _,botName,_,botType = Spring.GetAIInfo(teamID)
+				owner_name = (botType or "AI") .." - " .. (botName or "unnamed")
+			else
+				owner_name = Spring.GetPlayerInfo(playerID) or "nobody"
+			end
+
 			markerText = markerText .. " (" .. owner_name .. ")"
 		end
 		Spring.MarkerAddPoint (x, y, z, markerText, true)
