@@ -44,21 +44,27 @@ local awardPanel
 local awardSubPanel
 local statsPanel
 local statsSubPanel
-local awardButton = false
-local statsButton = false
-local exitButton = false
-local toggleButton = false
+local awardButton
+local statsButton
+local exitButton
+local toggleButton
+
+-- Forward declarations
+local SetupExitButton
 
 -- Flags and timers
 local spec
 local showingTab
 local showingEndgameWindow
+local endgame_caption
+local endgame_fontcolor
 local gameEnded
 local showEndgameWindowTimer
 
 -- Constants and parameters
 local endgameWindowDelay = 2
 local awardPanelHeight = 50
+local B_HEIGHT = 40
 local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
 local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
 local BUTTON_COLOR
@@ -198,9 +204,9 @@ local function PrepEndgameWindow()
 --]]	
 ---[[
 	-- Put the toggle button rightmost, move the exit button left
-	local ebr = showToggleButton and 259 or 109
-	local we_w = window_endgame.width
-	exitButton:SetPos(we_w - ebr)
+	local ebr = showToggleButton and 159 or 9
+	SetupExitButton(ebr)
+	if not gameEnded then exitButton:Hide() end
 --]]
 
 	if showToggleButton then
@@ -242,7 +248,7 @@ local function ShowStats()
 		return
 	end
 	
-	local button = WG.statsPanelEngineButtonClicked or 1
+	local button = statsSubPanel.buttonPressed or 1
 	statsSubPanel.engineButtons[button].OnClick[1](statsSubPanel.engineButtons[button])
 
 	awardPanel:Hide()
@@ -256,8 +262,35 @@ end
 --------------------------------------------------------------------------------
 --setup
 
+function SetupExitButton(right_val) -- forward-defined as local
+	-- Ugly Workaround: SetPos() can't take a "right" relative value
+	-- so we'll do it here instead by disposing and recreating the exit button
+	if exitButton then
+		exitButton:Dispose()
+	end
+	exitButton = Button:New{
+		parent = window_endgame;
+		caption="Exit",
+		y=7;
+		width=80;
+		right=right_val;
+		height=B_HEIGHT;
+		OnClick = {
+			function() 
+				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
+					Spring.Reload("")
+				else
+					Spring.SendCommands("quit","quitforce")
+				end
+			 end
+		};
+	}
+end
+
 local function SetupControls()
 	window_endgame = Window:New{  
+		parent = screen0,
+		classname = "main_window",
 		name = "GameOver",
 		caption = "Game in Progress",
 		textColor = {0.5,0.5,0.5,1}, 
@@ -266,9 +299,7 @@ local function SetupControls()
 		y = '20%',
 		width  = '60%',
 		height = '60%',
-		classname = "main_window",
 		--autosize   = true;
-		parent = screen0,
 		draggable = true,
 		resizable = true,
 		minWidth=500;
@@ -299,72 +330,101 @@ local function SetupControls()
 		parent = awardPanel,
 		x=0;y=0;
 		bottom=10;right=10;
+		autosize = true,
 		backgroundColor  = {1,1,1,1},
 		borderColor = {1,1,1,1},
 		padding = {10, 10, 10, 10},
 		itemMargin = {1, 1, 1, 1},
 		tooltip = "",
-		autosize = true,
 		
 		resizeItems = false,
 		centerItems = false,
 		orientation = 'horizontal';
 	}
 	
-	local B_HEIGHT = 40
-	
-	toggleButton = Button:New{
---		y=7, x=9,	-- leftmost
-		y=7; right=9;	-- rightmost
-		width=145;
-		height=B_HEIGHT;
-		parent = window_endgame;
-		OnClick = {
-			ToggleStatsGraph
-		};
-	}
-
 	awardButton = Button:New{
+		parent = window_endgame;
+		caption="Awards",
 		x=9, y=7,
 		height=B_HEIGHT;
-		caption="Awards",
 		OnClick = {
 			ShowAwards
 		};
-		parent = window_endgame;
 	}
 
 	BUTTON_COLOR = awardButton.backgroundColor
 	BUTTON_FOCUS_COLOR = awardButton.focusColor
-	SetButtonSelected(awardButton, true)
 	
 	statsButton = Button:New{
+		parent = window_endgame;
+		caption="Statistics",
 		x=86, y=7,
 		height=B_HEIGHT;
-		caption="Statistics",
 		OnClick = {
 			ShowStats
 		};
-		parent = window_endgame;
 	}
 	
-	exitButton = Button:New{
-		y=7;
-		width=80;
-		right=9;
-		height=B_HEIGHT;
-		caption="Exit",
-		OnClick = {
-			function() 
-				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
-					Spring.Reload("")
-				else
-					Spring.SendCommands("quit","quitforce")
-				end
-			 end
-		};
+	SetupExitButton(9)
+
+	toggleButton = Button:New{
 		parent = window_endgame;
+--		y=7, x=9,	-- leftmost
+		y=7; right=9;	-- rightmost
+		width=145;
+		height=B_HEIGHT;
+		OnClick = {
+			ToggleStatsGraph
+		};
 	}
+end
+
+local function SetEndgameCaption(winners)
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+	if #winners > 1 then
+		if spec then
+			endgame_caption = "Game over!"
+			endgame_fontcolor = {1,1,1,1}
+		else
+			local i_win = false
+			for i = 1, #winners do
+				if (winners[i] == Spring.GetMyAllyTeamID()) then
+					i_win = true
+				end
+			end
+
+			if i_win then
+				endgame_caption = "Victory!"
+				endgame_fontcolor = {0,1,0,1}
+			else
+				endgame_caption = "Defeat!"
+				endgame_fontcolor = {1,0,0,1}
+			end
+		end
+	elseif #winners == 1 then
+		local winnerTeamName = Spring.GetGameRulesParam("allyteam_long_name_"  .. winners[1]) or "Team " .. winners[1]
+		if string.len(winnerTeamName) > 10 then
+			winnerTeamName = Spring.GetGameRulesParam("allyteam_short_name_" .. winners[1]) or "Team " .. winners[1]
+		end
+		if spec then
+			if (winners[1] == gaiaAllyTeamID) then
+				endgame_caption = "Draw!"
+				endgame_fontcolor = {1,1,1,1}
+			else
+				endgame_caption = (winnerTeamName .. " wins!")
+				endgame_fontcolor = {1,1,1,1}
+			end
+		elseif (winners[1] == Spring.GetMyAllyTeamID()) then
+			endgame_caption = "Victory!"
+			endgame_fontcolor = {0,1,0,1}
+		elseif (winners[1] == gaiaAllyTeamID) then
+			endgame_caption = "Draw!"
+			endgame_fontcolor = {1,1,0,1}
+		else
+			endgame_caption = "Defeat!" -- could somehow add info on who won (eg. for FFA) but as-is it won't fit
+			endgame_fontcolor = {1,0,0,1}
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -397,9 +457,10 @@ function widget:Initialize()
 	-- Create the window and configure it to display mid-game stats
 	-- but don't display it yet; wait until toggled on or game over
 	SetupControls()
-	WG.MakeStatsPanel()
-	statsSubPanel = WG.statsPanel
-	statsPanel:AddChild(statsSubPanel)
+	statsSubPanel = WG.MakeStatsPanel()
+	if statsSubPanel then
+		statsPanel:AddChild(statsSubPanel)
+	end
 	awardButton:Hide()
 	statsButton:Hide()
 	exitButton:Hide()
@@ -415,54 +476,8 @@ function widget:Initialize()
 	widgetHandler:AddAction("togglestatsgraph", ToggleStatsGraph, nil, 'tp')
 end
 
-function widget:GameOver (winners)
-	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
-	if #winners > 1 then
-		if spec then
-			window_endgame.caption = "Game over!"
-			window_endgame.font.color = {1,1,1,1}
-		else
-			local i_win = false
-			for i = 1, #winners do
-				if (winners[i] == Spring.GetMyAllyTeamID()) then
-					i_win = true
-				end
-			end
-
-			if i_win then
-				window_endgame.caption = "Victory!"
-				window_endgame.font.color = {0,1,0,1}
-			else
-				window_endgame.caption = "Defeat!"
-				window_endgame.font.color = {1,0,0,1}
-			end
-		end
-	elseif #winners == 1 then
-		local winnerTeamName = Spring.GetGameRulesParam("allyteam_long_name_"  .. winners[1]) or "Team " .. winners[1]
-		if string.len(winnerTeamName) > 10 then
-			winnerTeamName = Spring.GetGameRulesParam("allyteam_short_name_" .. winners[1]) or "Team " .. winners[1]
-		end
-		if spec then
-			if (winners[1] == gaiaAllyTeamID) then
-				window_endgame.caption = "Draw!"
-				window_endgame.font.color = {1,1,1,1}
-			else
-				window_endgame.caption = (winnerTeamName .. " wins!")
-				window_endgame.font.color = {1,1,1,1}
-			end
-		elseif (winners[1] == Spring.GetMyAllyTeamID()) then
-			window_endgame.caption = "Victory!"
-			window_endgame.font.color = {0,1,0,1}
-		elseif (winners[1] == gaiaAllyTeamID) then
-			window_endgame.caption = "Draw!"
-			window_endgame.font.color = {1,1,0,1}
-		else
-			window_endgame.caption = "Defeat!" -- could somehow add info on who won (eg. for FFA) but as-is it won't fit
-			window_endgame.font.color = {1,0,0,1}
-		end
-	end
-	window_endgame.tooltip = ""
-	window_endgame:Invalidate()
+function widget:GameOver(winners)
+	SetEndgameCaption(winners)
 	showEndgameWindowTimer = endgameWindowDelay
 	gameEnded = true
 end
@@ -472,7 +487,7 @@ function widget:Update(dt)
 	local gameSeconds = GetGameSeconds()
 	if (gameSeconds % 15) == 1 then
 		if showingTab == 'stats' then
-			local button = WG.statsPanelEngineButtonClicked or 1
+			local button = statsSubPanel.buttonPressed or 1
 			statsSubPanel.engineButtons[button].OnClick[1](statsSubPanel.engineButtons[button])
 		end
 	end
@@ -495,6 +510,10 @@ function widget:Update(dt)
 	statsButton:Show()
 	exitButton:Show()
 	PrepEndgameWindow()
+
+	window_endgame.tooltip = ""
+	window_endgame.caption = endgame_caption
+	window_endgame.font.color = endgame_fontcolor
 
 	if WG.awardList then
 		ShowAwards()

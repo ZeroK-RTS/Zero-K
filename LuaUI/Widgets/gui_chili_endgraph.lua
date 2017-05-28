@@ -1,10 +1,6 @@
---[[
-	TO DO:
-		Add amount label when mouseover line on graph (e.g to see exact metal produced at a certain time),
-		Implement camera control to pan in the background while viewing graph,
-		Add minimize option
-		Come up with better way of handling specs, active players and players who died (currently doesn't show players who have died
-]]
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function widget:GetInfo() 
 	return {
 		name    = "EndGame Stats",
@@ -16,6 +12,20 @@ function widget:GetInfo()
 		enabled = true
 	} 
 end
+
+--[[
+	TO DO:
+		Add amount label when mouseover line on graph (e.g to see exact metal produced at a certain time),
+		Come up with better way of handling specs, active players and players who died (currently doesn't show players who have died
+
+	NOT TO DO ANY MORE, PROBABLY:
+		Adding the toggling functionality renders both of these moot:
+			Implement camera control to pan in the background while viewing graph
+			Add minimize option
+--]]
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local buttons = {
 	{"metalProduced"   , "Metal Produced"},
@@ -59,9 +69,11 @@ local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
 local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
 
-------------------------------------
---formats final stat to fit in label
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--utilities
 
+--formats final stat to fit in label
 local function numFormat(label)
 	if not label then
 		return ''
@@ -140,7 +152,10 @@ local function SetButtonSelected(button, isSelected)
 	button:Invalidate()
 end
 
-------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--draw graphs
+
 --Total package of graph: Draws graph and labels for each nonSpec player
 local function drawGraph(graphArray, graph_m, teamID)
 	if #graphArray == 0 then
@@ -226,8 +241,7 @@ local function drawGraph(graphArray, graph_m, teamID)
 		end
 	}
 end
-----------------------------------------------------------------
-----------------------------------------------------------------
+
 local function getEngineArrays(statistic, labelCaption)
 	local teamScores = {}
 	local teams	= Spring.GetTeamList()
@@ -294,21 +308,12 @@ local function getEngineArrays(statistic, labelCaption)
 	graphPanel:UpdateClientArea()
 end
 
-function widget:GameFrame(n)
-	-- remember people's names in case they leave
-	if n > 0 then
-		local teams	= Spring.GetTeamList()
-		for i = 1, #teams do
-			local teamID = teams[i]
-			playerNames[teamID] = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(teamID)))
-		end
-		widgetHandler:RemoveCallIn("GameFrame")
-	end
-end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--setup
 
-function loadpanel()
+function makePanel()
 	Chili = WG.Chili
-	local screen0 = Chili.Screen0
 	local selW = 150
 
 	window0 = Chili.Control:New {
@@ -316,7 +321,8 @@ function loadpanel()
 		y = "0",
 		width = "100%", 
 		height = "100%",
-		padding = {0,0,0,4}
+		padding = {0,0,0,4},
+		buttonPressed = 1,
 	}
 	lineLabels 	= Chili.Control:New {
 		parent = window0,
@@ -372,10 +378,10 @@ function loadpanel()
 			parent = graphSelect,
 			OnClick = { 
 				function(obj)
-					if WG.statsPanelEngineButtonClicked then
-						SetButtonSelected(window0.engineButtons[WG.statsPanelEngineButtonClicked], false)
+					if obj.parent.parent.buttonPressed then
+						SetButtonSelected(window0.engineButtons[obj.parent.parent.buttonPressed], false)
 					end
-					WG.statsPanelEngineButtonClicked = i
+					obj.parent.parent.buttonPressed = i
 					SetButtonSelected(obj, true)
 					graphPanel:ClearChildren()
 					lineLabels:ClearChildren()
@@ -412,18 +418,26 @@ function loadpanel()
 		align = "right",
 	}
 
-	WG.statsPanel = window0
+	return window0
 end
-WG.MakeStatsPanel = loadpanel
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--callins
 
 function widget:Initialize()
-	if Spring.IsGameOver() then
-		Spring.SendCommands("endgraph 0")
---		loadpanel()
+	WG.MakeStatsPanel = makePanel
+end
+
+function widget:GameFrame(n)
+	-- remember people's names in case they leave
+	if n > 0 then
+		local teams	= Spring.GetTeamList()
+		for i = 1, #teams do
+			local teamID = teams[i]
+			playerNames[teamID] = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(teamID)))
+		end
+		widgetHandler:RemoveCallIn("GameFrame")
 	end
 end
 
-function widget:GameOver()
-	Spring.SendCommands("endgraph 0")
---	loadpanel()
-end
