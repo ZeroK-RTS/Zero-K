@@ -29,10 +29,7 @@ local buttons = {
 	{"damage_dealt"     , "Damage Dealt"},
 	{"damage_received"  , "Damage Received"},
 
-	{"unitsProduced"   , "Units Built"},
 	{"unit_value"      , "Unit Value"},
-	{"unitsKilled"     , "Units Killed"},
-	{"unitsDied"       , "Units Lost"},
 }
 
 local rulesParamStats = {
