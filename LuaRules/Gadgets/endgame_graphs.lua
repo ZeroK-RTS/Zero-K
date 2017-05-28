@@ -94,7 +94,7 @@ function gadget:GameFrame(n)
 		end
 		sum_count = sum_count + 1
 
-		if ((n % 450) == 30) then -- Spring stats history frames
+		if ((n % 450) == 0) then -- Spring stats history frames
 			for i = 1, #teamList do
 				local teamID = teamList[i]
 				Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_"    .. stats_index, damageDealtByTeam[teamID])
@@ -121,7 +121,7 @@ function externalFunctions.AddTeamMetalExcess(teamID, metalExcess)
 end
 
 function gadget:Initialize()
-	stats_index = math.floor((Spring.GetGameFrame() + 870) / 450)
+	stats_index = math.ceil(Spring.GetGameFrame() / 450) + 1
 	sum_count = 0
 	
 	GG.EndgameGraphs = externalFunctions

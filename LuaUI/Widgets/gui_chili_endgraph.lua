@@ -97,13 +97,15 @@ local function drawIntervals(graphMax)
 			width = "100%", 
 			color = {0.1,0.1,0.1,0.1}
 		}
-		local label = Chili.Label:New{
-			parent = graphPanel, 
-			x = 0,
-			bottom = ((i)/5*100 + 1.1) .. "%",
-			width = "100%", 
-			caption = numFormat(graphMax*i/5)
-		}
+		if graphMax then
+			local label = Chili.Label:New{
+				parent = graphPanel, 
+				x = 0,
+				bottom = ((i)/5*100 + 2) .. "%",
+				width = "100%", 
+				caption = numFormat(graphMax*i/5)
+			}
+		end
 	end
 end
 
@@ -259,25 +261,25 @@ local function getEngineArrays(statistic, labelCaption)
 		end
 	end
 
-	if graphMax > 5 then 
-		drawIntervals(graphMax) 
+	if graphMax < 5 then
+		graphMax = 5
 	end
-
 	for k, v in pairs(teamScores) do
 		if k ~= gaia then
 			drawGraph(v, graphMax, k)
 		end
 	end
 	fixLabelAlignment()
-	
+
 	graphPanel:Invalidate()
 	graphPanel:UpdateClientArea()
+	drawIntervals(graphMax)
 end
 
 function widget:GameFrame(n)
 	-- remember people's names in case they leave
 	if n > 0 then
-		local teams	= Spring.GetTeamList()
+		local teams = Spring.GetTeamList()
 		for i = 1, #teams do
 			local teamID = teams[i]
 			playerNames[teamID] = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(teamID)))
@@ -343,6 +345,10 @@ function loadpanel()
 		height = 10,
 		caption = "",
 	}
+
+	drawIntervals()
+	graphPanel:Invalidate()
+	graphPanel:UpdateClientArea()
 
 	for i = 1, #buttons do
 		local engineButton = Chili.Button:New {
