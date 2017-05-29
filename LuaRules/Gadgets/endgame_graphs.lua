@@ -79,6 +79,8 @@ local stats_index
 local sum_count
 local mIncome = {}
 local eIncome = {}
+local mIncomeBase = {}
+local mIncomeOverdrive = {}
 
 function gadget:GameFrame(n)
 	if ((n % 30) == 0) then
@@ -86,6 +88,8 @@ function gadget:GameFrame(n)
 			local teamID = teamList[i]
 			mIncome[teamID] = mIncome[teamID] + GetMetalIncome  (teamID)
 			eIncome[teamID] = eIncome[teamID] + GetEnergyIncome (teamID)
+			mIncomeBase     [teamID] = mIncomeBase     [teamID] + (Spring.GetTeamRulesParam(teamID, "OD_metalBase"     ) or 0)
+			mIncomeOverdrive[teamID] = mIncomeOverdrive[teamID] + (Spring.GetTeamRulesParam(teamID, "OD_metalOverdrive") or 0)
 			Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeam[teamID])
 			Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_current", damageReceivedByTeam[teamID])
 			Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", -reclaimListByTeam[teamID])
@@ -103,9 +107,13 @@ function gadget:GameFrame(n)
 				Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_" .. stats_index, metalExcessByTeam[teamID])
 				Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_" .. stats_index, GetTotalUnitValue(teamID))
 				Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_"  .. stats_index, mIncome[teamID] / sum_count)
+				Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_base_"  .. stats_index, mIncomeBase[teamID] / sum_count)
+				Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_od_"  .. stats_index, mIncomeOverdrive[teamID] / sum_count)
 				Spring.SetTeamRulesParam(teamID, "stats_history_energy_income_" .. stats_index, eIncome[teamID] / sum_count)
-				mIncome[teamID] = 0
-				eIncome[teamID] = 0
+				mIncome         [teamID] = 0
+				mIncomeBase     [teamID] = 0
+				mIncomeOverdrive[teamID] = 0
+				eIncome         [teamID] = 0
 			end
 			sum_count = 0
 			stats_index = stats_index + 1
@@ -129,8 +137,10 @@ function gadget:Initialize()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 
-		mIncome[teamID] = 0
-		eIncome[teamID] = 0
+		mIncome         [teamID] = 0
+		mIncomeBase     [teamID] = 0
+		mIncomeOverdrive[teamID] = 0
+		eIncome         [teamID] = 0
 
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", Spring.GetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0)
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_current", Spring.GetTeamRulesParam(teamID, "stats_history_metal_excess_current") or 0)
