@@ -18,21 +18,33 @@ function widget:GetInfo()
 end
 
 local buttons = {
-	{"metalProduced"   , "Metal Produced"},
-	{"metalUsed"       , "Metal Used"},
-	{"metal_income"    , "Metal Income"},
-	{"metal_reclaim"   , "Metal Reclaimed"},
-	{"metal_excess"     , "Metal Excess"},
+	{"Metal", {
+		{"metalProduced"   , "Metal Produced"},
+		{"metalUsed"       , "Metal Used"},
+		{"metal_income"    , "Metal Income"},
+		{"metal_reclaim"   , "Metal Reclaimed"},
+		{"metal_excess"    , "Metal Excess"},
+		},
+	},
 
-	{"energy_income"   , "Energy Income"},
+	{"Energy", {
+		{"energy_income"   , "Energy Income"},
+		},
+	},
 
-	{"damage_dealt"     , "Damage Dealt"},
-	{"damage_received"  , "Damage Received"},
+	{"Damage", {
+		{"damage_dealt"    , "Damage Dealt"},
+		{"damage_received" , "Damage Received"},
+		},
+	},
 
-	{"unitsProduced"   , "Units Built"},
-	{"unit_value"      , "Unit Value"},
-	{"unitsKilled"     , "Units Killed"},
-	{"unitsDied"       , "Units Lost"},
+	{"Units", {
+		{"unitsProduced"   , "Units Built"},
+		{"unit_value"      , "Unit Value"},
+		{"unitsKilled"     , "Units Killed"},
+		{"unitsDied"       , "Units Lost"},
+		},
+	},
 }
 
 local rulesParamStats = {
@@ -315,6 +327,7 @@ function loadpanel()
 		padding = {0,0,0,0},
 		itemMargin = {0,0,0,0},
 		resizeItems = true,
+		weightedResize = true,
 	}
 	graphPanel = Chili.Panel:New {
 		parent = window0,
@@ -345,18 +358,45 @@ function loadpanel()
 	}
 
 	for i = 1, #buttons do
-		local engineButton = Chili.Button:New {
-			name = buttons[i][1],
-			caption = buttons[i][2],
+		local grouppanel = Chili.Panel:New {
 			parent = graphSelect,
-			OnClick = { 
-				function(obj)
-					graphPanel:ClearChildren()
-					lineLabels:ClearChildren()
-					getEngineArrays(obj.name,obj.caption)
-				end 
-			}
+			weight = #buttons[i][2] + 0.7,
+			padding = {1,1,1,1},
 		}
+		local grouplabel = Chili.Label:New {
+			parent = grouppanel,
+			x = 5,
+			y = 3,
+			caption = buttons[i][1],
+			font = {
+				size          = 16,
+				color         = {1,1,0,1},
+			},
+
+		}
+		local groupstack = Chili.StackPanel:New {
+			parent = grouppanel,
+			x = 0, 
+			y = 16,
+			bottom = 0,
+			width = "100%",
+			itemMargin = {1,2,1,2},
+			resizeItems = true,
+		}
+		for j = 1, #buttons[i][2] do
+			local engineButton = Chili.Button:New {
+				name = buttons[i][2][j][1],
+				caption = buttons[i][2][j][2],
+				parent = groupstack,
+				OnClick = { 
+					function(obj)
+						graphPanel:ClearChildren()
+						lineLabels:ClearChildren()
+						getEngineArrays(obj.name,obj.caption)
+					end 
+				}
+			}
+		end
 	end
 
 	local allyToggle = Chili.Checkbox:New {
