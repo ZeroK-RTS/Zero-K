@@ -271,6 +271,29 @@ local function UpdateTeamActivity(teamID)
 	return resourceShare, teamRank
 end
 
+local function GetRawTeamShare(teamID)
+	local _, _, isDead, isAiTeam = spGetTeamInfo(teamID)
+	if isDead then
+		return 0
+	end
+
+	local shares = 0
+	if isAiTeam then
+		shares = shares + 1
+	end
+
+	local players = spGetPlayerList(teamID)
+	for i = 1, #players do
+		local playerID = players[i]
+		local _, active, spec = spGetPlayerInfo(playerID)
+		if active and not spec then
+			shares = shares + 1
+		end
+	end
+
+	return shares
+end
+
 local function UpdateAllyTeamActivity(allyTeamID)
 	local teamList = Spring.GetTeamList(allyTeamID)
 	
@@ -297,6 +320,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	allyTeamResourceShares[allyTeamID] = totalResourceShares
 	
 	if not recieveTeamID then
+
 		-- Nobody can recieve units so there is not much more to do
 		for i = 1, #giveAwayTeams do
 			local giveTeamID = giveAwayTeams[i]
@@ -304,6 +328,19 @@ local function UpdateAllyTeamActivity(allyTeamID)
 			if giveResigned then
 				spEcho("game_message: " .. GetTeamName(giveTeamID) .. " resigned")
 			end
+		end
+
+		-- a human can have bot teammates; they are not eligible to receive his units but would still drain his income if he goes AFK
+		-- in that case, the human gets to keep his income as well
+		if totalResourceShares > 0 and #giveAwayTeams > 0 then
+			totalResourceShares = 0
+			for i = 1, #teamList do
+				local teamID = teamList[i]
+				local rawShare = GetRawTeamShare(teamID)
+				totalResourceShares = totalResourceShares + rawShare
+				teamResourceShare[teamID] = rawShare
+			end
+			allyTeamResourceShares[allyTeamID] = totalResourceShares
 		end
 		return
 	end

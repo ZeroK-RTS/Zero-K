@@ -183,15 +183,13 @@ end
 --------------------------------------------------------------------------------------
 -- Dynamic Commander Clone Generation
 --------------------------------------------------------------------------------------
-local powerAtLevel = {2000, 3000, 4000, 5000, 6000}
 
-local function MakeClones(levelLimits, moduleNames, fullChassisName, unitName, power, modules, moduleType)
+local function MakeClones(levelLimits, moduleNames, fullChassisName, unitName, modules, moduleType)
 	if moduleType > #levelLimits then
 		comms[unitName] = {
 			chassis = fullChassisName,
 			name = fullChassisName,
 			modules = modules,
-			power = power,
 		}
 		return
 	end
@@ -201,7 +199,7 @@ local function MakeClones(levelLimits, moduleNames, fullChassisName, unitName, p
 		for m = 1, copies do
 			newModules[#newModules + 1] = moduleNames[moduleType]
 		end
-		MakeClones(levelLimits, moduleNames, fullChassisName, unitName .. copies, power, newModules, moduleType + 1)
+		MakeClones(levelLimits, moduleNames, fullChassisName, unitName .. copies, newModules, moduleType + 1)
 	end
 end
 
@@ -209,7 +207,7 @@ local function MakeCommanderChassisClones(chassis, levelLimits, moduleNames)
 	for level = 1, #levelLimits do
 		local fullChassisName = chassis .. level
 		local modules = {}
-		MakeClones(levelLimits[level], moduleNames, fullChassisName, fullChassisName .. "_", powerAtLevel[level], modules, 1)
+		MakeClones(levelLimits[level], moduleNames, fullChassisName, fullChassisName .. "_", modules, 1)
 	end
 end
 
