@@ -32,14 +32,10 @@ local buttons = {
 		},
 	},
 
-	{"Damage", {
-		{"damage_dealt"    , "Damage Dealt"},
-		{"damage_received" , "Damage Received"},
-		},
-	},
-
 	{"Units", {
 		{"unit_value"      , "Unit Value"},
+		{"damage_dealt"    , "Damage Dealt"},
+		{"damage_received" , "Damage Received"},
 		},
 	},
 }
