@@ -119,6 +119,7 @@ local strings = {
 	resbar_waste_total = "",
 	resbar_reclaim_total = "",
 	resbar_unit_value = "",
+	resbar_nano_value = "",
 	metal = "",
 	metal_excess_warning = "",
 	energy_stall_warning = "",
@@ -352,9 +353,13 @@ function UpdateCustomParamResourceData()
     
 	cp.metalReclaimTotal = spGetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0
 	cp.metalValue        = spGetTeamRulesParam(teamID, "stats_history_unit_value_current") or 0
+	cp.nanoframeValue    = spGetTeamRulesParam(teamID, "stats_history_nano_partial_current") or 0
+	cp.nanoframeTotal    = spGetTeamRulesParam(teamID, "stats_history_nano_total_current") or 0
 
 	cp.team_metalReclaimTotal = 0
 	cp.team_metalValue = 0
+	cp.team_nanoframeTotal = 0
+	cp.team_nanoframeValue = 0
 	cp.team_metalExcess = 0
 	local allies = Spring.GetTeamList(teamID)
 	if allies then
@@ -363,6 +368,8 @@ function UpdateCustomParamResourceData()
 			cp.team_metalReclaimTotal = cp.team_metalReclaimTotal + (spGetTeamRulesParam(allyID, "stats_history_metal_reclaim_current") or 0)
 			cp.team_metalValue        = cp.team_metalValue        + (spGetTeamRulesParam(allyID, "stats_history_unit_value_current")    or 0)
 			cp.team_metalExcess       = cp.team_metalExcess       + (spGetTeamRulesParam(allyID, "stats_history_metal_excess_current")  or 0)
+			cp.team_nanoframeValue    = cp.team_nanoframeValue    + (spGetTeamRulesParam(allyID, "stats_history_nano_partial_current")  or 0)
+			cp.team_nanoframeTotal    = cp.team_nanoframeTotal    + (spGetTeamRulesParam(allyID, "stats_history_nano_total_current")    or 0)
 		end
 	end
 	
@@ -737,6 +744,7 @@ function widget:GameFrame(n)
 	"\n " .. 
 	"\n  " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.metalReclaimTotal or 0) ..
 	"\n  " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.metalValue or 0) ..
+	"\n  " .. strings["resbar_nano_value"] .. ": " .. math.ceil(cp.nanoframeValue or 0) .. " / " .. math.ceil(cp.nanoframeTotal or 0) ..
 	"\n " ..
 	"\n" .. strings["team_metal_economy"] .. 
 	"\n  " .. strings["resbar_inc"] .. ": " .. team_metalTotalIncome .. "      " .. strings["resbar_pull"] .. ": " .. team_metalPull ..
@@ -750,6 +758,7 @@ function widget:GameFrame(n)
 	"\n" ..
 	"\n  " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.team_metalReclaimTotal or 0) ..
 	"\n  " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.team_metalValue or 0) ..
+	"\n  " .. strings["resbar_nano_value"] .. ": " .. math.ceil(cp.team_nanoframeValue or 0) .. " / " .. math.ceil(cp.team_nanoframeTotal or 0) ..
 	"\n  " .. strings["resbar_waste_total"] .. ": " .. math.ceil(cp.team_metalExcess or 0)
 	
 	image_energy.tooltip = strings["local_energy_economy"] ..

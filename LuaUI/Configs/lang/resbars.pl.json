@@ -21,6 +21,7 @@
 	"resbar_waste_total" : "Zmarnowano ogółem",
 	"resbar_reclaim_total" : "Zebrano ogółem",
 	"resbar_unit_value" : "Wartość jednostek",
+	"resbar_nano_value" : "Wartość w budowie",
 	"resbar_metal_storage_tooltip" : "Zmagazynowany metal.",
 	"resbar_energy_storage_tooltip" : "Zmagazynowana energia.",
 	"resbar_metal_income_tooltip" : "Twój przychód metalu.\nPochodzi z kopalni, ich podkręcania i zbierania złomu.",
