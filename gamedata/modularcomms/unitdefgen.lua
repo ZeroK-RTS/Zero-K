@@ -284,7 +284,11 @@ local function ProcessComm(name, config)
 		commDefs[name].buildcostenergy = commDefsCost + config.cost
 		commDefs[name].buildtime = commDefsCost + config.cost
 		cp.cost = config.cost
-
+		
+		if config.power then
+			commDefs[name].power = config.power
+		end
+		
 		-- morph
 		if config.morphto then
 			cp.morphto = config.morphto
