@@ -249,7 +249,7 @@ local function ShowStats()
 	end
 	
 	local button = statsSubPanel.buttonPressed or 1
-	statsSubPanel.engineButtons[button].OnClick[1](statsSubPanel.engineButtons[button])
+	statsSubPanel.graphButtons[button].OnClick[1](statsSubPanel.graphButtons[button])
 
 	awardPanel:Hide()
 	statsPanel:Show()
@@ -488,7 +488,7 @@ function widget:Update(dt)
 	if (gameSeconds % 15) == 1 then
 		if showingTab == 'stats' then
 			local button = statsSubPanel.buttonPressed or 1
-			statsSubPanel.engineButtons[button].OnClick[1](statsSubPanel.engineButtons[button])
+			statsSubPanel.graphButtons[button].OnClick[1](statsSubPanel.graphButtons[button])
 		end
 	end
 
@@ -505,7 +505,7 @@ function widget:Update(dt)
 	-- Otherwise, it's time to show the endgame screen
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	window_endgame:SetPos(screenWidth*0.2,screenHeight*0.2,screenWidth*0.6,screenHeight*0.6)
-	statsSubPanel.engineButtons[1].OnClick[1](statsSubPanel.engineButtons[1])
+	statsSubPanel.graphButtons[1].OnClick[1](statsSubPanel.graphButtons[1])
 	awardButton:Show()
 	statsButton:Show()
 	exitButton:Show()

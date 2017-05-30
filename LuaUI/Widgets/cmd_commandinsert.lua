@@ -20,9 +20,6 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local shift_table = {"shift"}
-local alt_table = {"alt"}
-
 local positionCommand = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
@@ -108,15 +105,12 @@ local function GetCommandPos(command) -- get the command position
 end
 
 local function ProcessCommand(id, params, options, sequence_order)
-	local alt, ctrl, meta, shift = Spring.GetModKeyState() 
-	-- Must use this because "options" table turn into different format when right + click. 
-	-- Similar problem with different trigger see: https://code.google.com/p/zero-k/issues/detail?id=1824 
-	-- (options in online game coded different than in local game)
-	
+
 	local cx, cy, cz -- command position
 	local setPositionOverride = false
-	
+
 	-- Structure block checking
+	local shift = options.shift
 	if shift and id < 0 then
 		-- If the command is possibly part of a block of structures
 		if structureSquenceCount then
@@ -126,50 +120,31 @@ local function ProcessCommand(id, params, options, sequence_order)
 			setPositionOverride = true
 			structureSquenceCount = 0
 		end
-		sequence_order = structureSquenceCount + (sequence_order or 0)
+		sequence_order = structureSquenceCount + sequence_order
 	end
 	
 	-- Redefine the way in which modifiers apply to Repair
-	if (ctrl) and not (meta) and id == CMD.REPAIR then
-		local opt = 0
-		if options.alt or alt then 
-			opt = opt + CMD.OPT_ALT 
-		end
-		opt = opt + CMD.OPT_META
-		if options.right then 
-			opt = opt + CMD.OPT_RIGHT 
-		end
-		if options.shift or shift then 
-			opt = opt + CMD.OPT_SHIFT
-		end
-		Spring.GiveOrder(id, params, opt)
+	local ctrl = options.ctrl
+	local meta = options.meta
+	if ctrl and not meta and id == CMD.REPAIR then
+		Spring.GiveOrder(id, params, options.coded - CMD.OPT_CTRL + CMD.OPT_META)
 		return true
 	end
 	
 	-- Command insert
-	if (meta) then
-		local opt = 0
-		local insertfront = false
-		if options.alt or alt then
-			opt = opt + CMD.OPT_ALT
-		end
-		if options.ctrl or ctrl then
-			if id == CMD.REPAIR then
-				opt = opt + CMD.OPT_META
-			else
-				opt = opt + CMD.OPT_CTRL
-			end
-		end
-		if options.right then 
-			opt = opt + CMD.OPT_RIGHT 
-		end
-		if options.shift or shift then 
-			opt = opt + CMD.OPT_SHIFT
+	if meta then
+		local coded = options.coded
+		if id == CMD.REPAIR and ctrl then
+			coded = coded - CMD.OPT_CTRL
 		else
-			Spring.GiveOrder(CMD.INSERT, {sequence_order or 0, id, opt, unpack(params)}, alt_table)
+			coded = coded - CMD.OPT_META
+		end
+
+		if not shift then
+			Spring.GiveOrder(CMD.INSERT, {sequence_order, id, coded, unpack(params)}, CMD.OPT_ALT)
 			return true
 		end
-		
+
 		local my_command = {["id"] = id, ["params"] = params}
 		if not cx then
 			-- cx has a value if it has been overridden
@@ -185,9 +160,10 @@ local function ProcessCommand(id, params, options, sequence_order)
 		
 		-- Insert the command at the appropriate spot in each selected units queue.
 		local units = Spring.GetSelectedUnits()
-		for i, unit_id in ipairs(units) do
-			local commands = Spring.GetCommandQueue(unit_id, -1)
-			local px,py,pz = Spring.GetUnitPosition(unit_id)
+		for i = 1, #units do
+			local unitID = units[i]
+			local commands = Spring.GetCommandQueue(unitID, -1)
+			local px,py,pz = Spring.GetUnitPosition(unitID)
 			local min_dlen = 1000000
 			local insert_pos = 0
 			for j = 1, #commands do
@@ -200,7 +176,7 @@ local function ProcessCommand(id, params, options, sequence_order)
 					--Spring.Echo("dlen", #commands, dlen, min_dlen, px, py, pz, px2, py2, pz2, cx, cy, cz)
 					if dlen < min_dlen then
 						min_dlen = dlen
-						insert_pos = j
+						insert_pos = j - 1
 					end
 					px, py, pz = px2, py2, pz2
 				end	 
@@ -209,10 +185,9 @@ local function ProcessCommand(id, params, options, sequence_order)
 			local dlen = math.sqrt(((px-cx)^2) + ((py-cy)^2) + ((pz-cz)^2))
 			--Spring.Echo("insert_pos", insert_pos, sequence_order, dlen, min_dlen)
 			if dlen < min_dlen then
-				Spring.GiveOrderToUnit(unit_id, id, params, shift_table)
-			else
-				Spring.GiveOrderToUnit(unit_id, CMD.INSERT, {insert_pos - 1 + (sequence_order or 0), id, opt, unpack(params)}, alt_table)
+				insert_pos = #commands
 			end
+			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {insert_pos + sequence_order, id, coded, unpack(params)}, CMD.OPT_ALT)
 		end
 		return true
 	end
@@ -226,11 +201,19 @@ function widget:Update()
 end
 
 function widget:CommandNotify(id, params, options)
-	return ProcessCommand(id, params, options)
+	return ProcessCommand(id, params, options, 0)
 end
 
 function WG.CommandInsert(id, params, options, seq)
-	if not ProcessCommand(id, params, options, seq) then
-		Spring.GiveOrder(id, params, (seq or 0) > 0 and shift_table or options)
+	seq = seq or 0
+	if ProcessCommand(id, params, options, seq) then
+		return
+	end
+
+	local units = Spring.GetSelectedUnits()
+	for i = 1, #units do
+		local unitID = units[i]
+		local commands = Spring.GetCommandQueue(unitID, -1)
+		Spring.GiveOrderToUnit(unitID, CMD.INSERT, {#commands + seq, id, options.coded, unpack(params)}, CMD.OPT_ALT)
 	end
 end

@@ -82,6 +82,7 @@ local positiveColourStr
 local negativeColourStr
 local col_income
 local col_expense
+local col_highlight
 local col_overdrive
 
 local RESERVE_SEND_TIME = 1
@@ -119,6 +120,7 @@ local strings = {
 	resbar_waste_total = "",
 	resbar_reclaim_total = "",
 	resbar_unit_value = "",
+	resbar_nano_value = "",
 	metal = "",
 	metal_excess_warning = "",
 	energy_stall_warning = "",
@@ -210,6 +212,7 @@ local function option_colourBlindUpdate()
 	col_income = (options.colourBlind.value and {.9,.9,.2,1}) or {.1,1,.2,1}
 	col_expense = (options.colourBlind.value and {.2,.3,1,1}) or {1,.3,.2,1}
 	col_overdrive = (options.colourBlind.value and {1,1,1,1}) or {.5,1,0,1}
+	col_highlight = {0.6, 0.6, 0.6, 1}
 end
 
 options_order = {
@@ -352,9 +355,13 @@ function UpdateCustomParamResourceData()
     
 	cp.metalReclaimTotal = spGetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0
 	cp.metalValue        = spGetTeamRulesParam(teamID, "stats_history_unit_value_current") or 0
+	cp.nanoframeValue    = spGetTeamRulesParam(teamID, "stats_history_nano_partial_current") or 0
+	cp.nanoframeTotal    = spGetTeamRulesParam(teamID, "stats_history_nano_total_current") or 0
 
 	cp.team_metalReclaimTotal = 0
 	cp.team_metalValue = 0
+	cp.team_nanoframeTotal = 0
+	cp.team_nanoframeValue = 0
 	cp.team_metalExcess = 0
 	local allies = Spring.GetTeamList(teamID)
 	if allies then
@@ -363,6 +370,8 @@ function UpdateCustomParamResourceData()
 			cp.team_metalReclaimTotal = cp.team_metalReclaimTotal + (spGetTeamRulesParam(allyID, "stats_history_metal_reclaim_current") or 0)
 			cp.team_metalValue        = cp.team_metalValue        + (spGetTeamRulesParam(allyID, "stats_history_unit_value_current")    or 0)
 			cp.team_metalExcess       = cp.team_metalExcess       + (spGetTeamRulesParam(allyID, "stats_history_metal_excess_current")  or 0)
+			cp.team_nanoframeValue    = cp.team_nanoframeValue    + (spGetTeamRulesParam(allyID, "stats_history_nano_partial_current")  or 0)
+			cp.team_nanoframeTotal    = cp.team_nanoframeTotal    + (spGetTeamRulesParam(allyID, "stats_history_nano_total_current")    or 0)
 		end
 	end
 	
@@ -445,7 +454,7 @@ local function UpdateBlink(s)
 		local sawtooth = math.abs(blinkMetal/blinkPeriod - 0.5)*2
 		local blink_alpha = sawtooth*0.95
 		
-		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, blink_alpha))
+		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_highlight, blink_alpha))
 	end
 	
 	if blinkE_status then
@@ -737,6 +746,7 @@ function widget:GameFrame(n)
 	"\n " .. 
 	"\n  " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.metalReclaimTotal or 0) ..
 	"\n  " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.metalValue or 0) ..
+	"\n  " .. strings["resbar_nano_value"] .. ": " .. math.ceil(cp.nanoframeValue or 0) .. " / " .. math.ceil(cp.nanoframeTotal or 0) ..
 	"\n " ..
 	"\n" .. strings["team_metal_economy"] .. 
 	"\n  " .. strings["resbar_inc"] .. ": " .. team_metalTotalIncome .. "      " .. strings["resbar_pull"] .. ": " .. team_metalPull ..
@@ -750,6 +760,7 @@ function widget:GameFrame(n)
 	"\n" ..
 	"\n  " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.team_metalReclaimTotal or 0) ..
 	"\n  " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.team_metalValue or 0) ..
+	"\n  " .. strings["resbar_nano_value"] .. ": " .. math.ceil(cp.team_nanoframeValue or 0) .. " / " .. math.ceil(cp.team_nanoframeTotal or 0) ..
 	"\n  " .. strings["resbar_waste_total"] .. ": " .. math.ceil(cp.team_metalExcess or 0)
 	
 	image_energy.tooltip = strings["local_energy_economy"] ..

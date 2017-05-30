@@ -413,7 +413,7 @@ local behaviourDefaults = {
     defaultLocalJinkOrder = true,
 	defaultSkirmOrderDis = 120,
 	defaultVelocityPrediction = 30,
-	defaultHugRange = 30,
+	defaultHugRange = 50,
 }
 
 local behaviourConfig = { 
@@ -1068,6 +1068,7 @@ local behaviourConfig = {
 		stoppingDistance = -180,
 		velocityPrediction = 0,
 		skirmOrderDis = 250,
+		skirmOnlyNearEnemyRange = 120,
 	},
 	
 	["striderarty"] = {
@@ -1269,6 +1270,31 @@ local behaviourConfig = {
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 40, 
+	},
+	
+	-- chickens
+	["chicken_tiamat"] = {
+		skirms = {},
+		swarms = {},
+		flees = {},
+		hugs = allGround,
+		hugRange = 100,
+	},
+	
+	["chicken_dragon"] = {
+		skirms = {},
+		swarms = {},
+		flees = {},
+		hugs = allGround,
+		hugRange = 150,
+	},
+	
+	["chickenlandqueen"] = {
+		skirms = {},
+		swarms = {},
+		flees = {},
+		hugs = allGround,
+		hugRange = 150,
 	},
 }
 

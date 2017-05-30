@@ -27,22 +27,27 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local buttons = {
-	{"metalProduced"   , "Metal Produced"},
-	{"metalUsed"       , "Metal Used"},
-	{"metal_income"    , "Metal Income"},
-	{"metal_reclaim"   , "Metal Reclaimed"},
-	{"metal_excess"     , "Metal Excess"},
+local buttongroups = {
+	{"Metal", {
+		{"metalProduced"   , "Metal Produced"},
+		{"metalUsed"       , "Metal Used"},
+		{"metal_income"    , "Metal Income"},
+		{"metal_reclaim"   , "Metal Reclaimed"},
+		{"metal_excess"    , "Metal Excess"},
+		},
+	},
 
-	{"energy_income"   , "Energy Income"},
+	{"Energy", {
+		{"energy_income"   , "Energy Income"},
+		},
+	},
 
-	{"damage_dealt"     , "Damage Dealt"},
-	{"damage_received"  , "Damage Received"},
-
-	{"unitsProduced"   , "Units Built"},
-	{"unit_value"      , "Unit Value"},
-	{"unitsKilled"     , "Units Killed"},
-	{"unitsDied"       , "Units Lost"},
+	{"Units", {
+		{"unit_value"      , "Unit Value"},
+		{"damage_dealt"    , "Damage Dealt"},
+		{"damage_received" , "Damage Received"},
+		},
+	},
 }
 
 local rulesParamStats = {
@@ -58,6 +63,9 @@ local rulesParamStats = {
 local graphLength = 0
 local usingAllyteams = false
 local curGraph = {}
+
+-- Spring aliases
+local echo 		= Spring.Echo
 
 -- CHILI CONTROLS
 local Chili, window0, graphPanel, graphSelect, graphLabel, graphTime
@@ -114,13 +122,15 @@ local function drawIntervals(graphMax)
 			width = "100%", 
 			color = {0.1,0.1,0.1,0.1}
 		}
-		local label = Chili.Label:New{
-			parent = graphPanel, 
-			x = 0,
-			bottom = ((i)/5*100 + 1.1) .. "%",
-			width = "100%", 
-			caption = numFormat(graphMax*i/5)
-		}
+		if graphMax then
+			local label = Chili.Label:New{
+				parent = graphPanel, 
+				x = 0,
+				bottom = ((i)/5*100 + 2) .. "%",
+				width = "100%", 
+				caption = numFormat(graphMax*i/5)
+			}
+		end
 	end
 end
 
@@ -293,19 +303,19 @@ local function getEngineArrays(statistic, labelCaption)
 		end
 	end
 
-	if graphMax > 5 then 
-		drawIntervals(graphMax) 
+	if graphMax < 5 then
+		graphMax = 5
 	end
-
 	for k, v in pairs(teamScores) do
 		if k ~= gaia then
 			drawGraph(v, graphMax, k)
 		end
 	end
 	fixLabelAlignment()
-	
+
 	graphPanel:Invalidate()
 	graphPanel:UpdateClientArea()
+	drawIntervals(graphMax)
 end
 
 --------------------------------------------------------------------------------
@@ -341,6 +351,7 @@ function makePanel()
 		padding = {0,0,0,0},
 		itemMargin = {0,0,0,0},
 		resizeItems = true,
+		weightedResize = true,
 	}
 	graphPanel = Chili.Panel:New {
 		parent = window0,
@@ -369,29 +380,63 @@ function makePanel()
 		height = 10,
 		caption = "",
 	}
-	
-	window0.engineButtons = {}
-	for i = 1, #buttons do
-		window0.engineButtons[i] = Chili.Button:New {
-			name = buttons[i][1],
-			caption = buttons[i][2],
+
+	drawIntervals()
+	graphPanel:Invalidate()
+	graphPanel:UpdateClientArea()
+
+	window0.graphButtons = {}
+	local gb_i = 1
+	for i = 1, #buttongroups do
+		local grouppanel = Chili.Panel:New {
 			parent = graphSelect,
-			OnClick = { 
-				function(obj)
-					if obj.parent.parent.buttonPressed then
-						SetButtonSelected(window0.engineButtons[obj.parent.parent.buttonPressed], false)
-					end
-					obj.parent.parent.buttonPressed = i
-					SetButtonSelected(obj, true)
-					graphPanel:ClearChildren()
-					lineLabels:ClearChildren()
-					getEngineArrays(obj.name,obj.caption)
-				end 
-			}
+			weight = #buttongroups[i][2] + 0.7,
+			padding = {1,1,1,1},
 		}
+		local grouplabel = Chili.Label:New {
+			parent = grouppanel,
+			x = 5,
+			y = 3,
+			caption = buttongroups[i][1],
+			font = {
+				size          = 16,
+				color         = {1,1,0,1},
+			},
+
+		}
+		local groupstack = Chili.StackPanel:New {
+			parent = grouppanel,
+			x = 0, 
+			y = 16,
+			bottom = 0,
+			width = "100%",
+			itemMargin = {1,2,1,2},
+			resizeItems = true,
+		}
+		for j = 1, #buttongroups[i][2] do
+			local gb_il = gb_i -- even more local instance than gb_i
+			window0.graphButtons[gb_i] = Chili.Button:New {
+				name = buttongroups[i][2][j][1],
+				caption = buttongroups[i][2][j][2],
+				parent = groupstack,
+				OnClick = { 
+					function(obj)
+						if obj.parent.parent.parent.parent.buttonPressed then
+							SetButtonSelected(window0.graphButtons[obj.parent.parent.parent.parent.buttonPressed], false)
+						end
+						obj.parent.parent.parent.parent.buttonPressed = gb_il -- has to be the very local one
+						SetButtonSelected(obj, true)
+						graphPanel:ClearChildren()
+						lineLabels:ClearChildren()
+						getEngineArrays(obj.name,obj.caption)
+					end 
+				}
+			}
+			gb_i = gb_i + 1
+		end
 	end
-	BUTTON_COLOR = window0.engineButtons[1].backgroundColor
-	BUTTON_FOCUS_COLOR = window0.engineButtons[1].focusColor
+	BUTTON_COLOR = window0.graphButtons[1].backgroundColor
+	BUTTON_FOCUS_COLOR = window0.graphButtons[1].focusColor
 
 	local allyToggle = Chili.Checkbox:New {
 		parent = window0,

@@ -206,7 +206,11 @@ unitDef = {
       cegTag                  = [[queen_trail]],
       craterBoost             = 0,
       craterMult              = 0,
-
+			
+			customParams            = {
+        light_radius = 0,
+      },
+			
       damage                  = {
         default = 1500,
         planes  = 1500,

@@ -45,7 +45,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP STUPIDTARGET MINE]],
   objectName             = [[chicken_dragon.s3o]],
   power                  = 10500,
-  script                 = [[chickenq.cob]],
+  script                 = [[chicken_dragon.cob]],
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {
@@ -123,6 +123,10 @@ unitDef = {
       cegTag                  = [[queen_trail]],
       craterBoost             = 0,
       craterMult              = 0,
+			
+			customParams            = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 500,
@@ -157,9 +161,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 300,
-        planes  = 300,
-        subs    = 300,
+        default = 1200,
+        planes  = 1200,
+        subs    = 1200,
       },
 
       explosionGenerator      = [[custom:NONE]],
@@ -167,7 +171,7 @@ unitDef = {
       impulseFactor           = 1,
       interceptedByShieldType = 0,
       range                   = 160,
-      reloadtime              = 0.6,
+      reloadtime              = 3,
       size                    = 0,
       soundStart              = [[chickens/bigchickenbreath]],
       targetborder            = 1,

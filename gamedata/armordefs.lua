@@ -170,13 +170,6 @@ for name, wd in pairs(DEFS.weaponDefs) do
 		if (cp.disarmdamagemult) and (tobool(cp.disarmdamageonly)) then
 			wd.damage.default = 0.001 -- Settings damage default to 0 removes cratering and impulse
 		end
-
-		-- weapon type bonuses
-		if weaponNameLower:find("flamethrower") or weaponNameLower:find("flame thrower") then
-			wd.damage.default = wd.damage.default * FLAMER_DAMAGE_MOD
-		elseif weaponNameLower:find("gauss") then
-			wd.damage.default = wd.damage.default * GAUSS_DAMAGE_MOD
-		end
 	end
 end
 

@@ -79,6 +79,8 @@ local groundGridColor  = {0.3, 0.2, 1, 0.8} -- grid representing new ground heig
 local lassoColor = {0.2, 1.0, 0.2, 0.8}
 local edgeColor = {0.2, 1.0, 0.2, 0.4}
 
+local SQUARE_BUILDABLE = 2 -- magic constant returned by TestBuildOrder
+
 --------------------------------------------------------------------------------
 -- Local Vars
 --------------------------------------------------------------------------------
@@ -190,12 +192,14 @@ local function SendCommand()
 			spSetActiveCommand(-1)
 		end
 
-		local cmdOpts = {}
+		local cmdOpts = {coded = 0}
 		if s then
-			cmdOpts[#cmdOpts + 1] = "shift"
+			cmdOpts.shift = true
+			cmdOpts.coded = cmdOpts.coded + CMD.OPT_SHIFT
 		end
 		if m then
-			cmdOpts[#cmdOpts + 1] = "meta"
+			cmdOpts.meta = true
+			cmdOpts.coded = cmdOpts.coded + CMD.OPT_META
 		end
 
 		local height = Spring.GetGroundHeight(pointX, pointZ)
@@ -354,7 +358,14 @@ function widget:MousePress(mx, my, button)
 		end
 		return true
 	end
-	if not (buildingPlacementID and (buildingPlacementHeight ~= 0 or floating) and button == 1 and pointX) then
+
+	if not buildingPlacementID then
+		return
+	end
+
+	local unbuildableTerrain = (Spring.TestBuildOrder(buildingPlacementID, pointX, 0, pointZ, Spring.GetBuildFacing()) ~= SQUARE_BUILDABLE)
+
+	if not ((floating or buildingPlacementHeight ~= 0 or (buildingPlacementHeight == 0 and unbuildableTerrain)) and button == 1 and pointX) then
 		return
 	end
 	SendCommand()
@@ -388,7 +399,7 @@ local function DrawRectangleCorners()
 end
 
 function widget:DrawWorld()
-	if not (buildingPlacementID and (buildingPlacementHeight ~= 0 or floating)) then
+	if not buildingPlacementID then
 		widgetHandler:RemoveWidgetCallIn("DrawWorld", self)
 		return
 	end

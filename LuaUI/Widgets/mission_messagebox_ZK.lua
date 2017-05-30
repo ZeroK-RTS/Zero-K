@@ -24,6 +24,8 @@ local textPersistent
 local stackPersistent
 local msgBoxConvo
 
+local nextButton
+
 local convoQueue = {}
 local persistentMsgHistory = {}	-- {text = text, width = width, height = height, fontsize = fontsize, image = imagePath}
 local persistentMsgIndex = {}
@@ -48,6 +50,7 @@ local convoFontsize = 14
 local flashTime
 local convoExpireFrame
 
+local nextButtonLocked = false
 
 local vsx, vsy = gl.GetViewSizes()
 --------------------------------------------------------------------------------
@@ -91,6 +94,9 @@ local function ProcessColorCodes(text)
   return text
 end
 
+local function GetHaveNextButton()
+	return Spring.GetGameRulesParam("tutorial_has_next_button") == 1
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -154,6 +160,27 @@ local function ShowMessageBox(text, width, height, fontsize, pause)
   }
 end
 
+local function CreateNextButton(parent)
+	nextButton = Chili.Button:New {
+		parent = parent,
+		width = 64,
+		height = 24,
+		right = 4,
+		bottom = 8,
+		caption = "Next",
+		font = {size = 14},
+		OnClick = { function(self, x, y, mouse)
+				if mouse == 1 and not nextButtonLocked then
+					Spring.SendLuaRulesMsg("tutorial_next")
+					nextButtonLocked = true -- only allow one click per gameframe, so it doesn't super increment when paused
+				end
+			end
+		},
+	}
+	stackPersistent.right = 72
+	stackPersistent:Invalidate()
+end
+
 local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePath)
 	local vsx, vsy = gl.GetViewSizes()
 	--local x = math.floor((vsx - width)/2)
@@ -161,14 +188,6 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 	
 	width = width or 360
 	height = height or 160
-	
-	-- FIXME temporary hack to fix too-big images for existing missions
-	if width == 320 then
-		width = 360
-	end
-	if height == 100 then
-		height = 160
-	end
 	
 	-- we have an existing box, dispose of it
 	--if msgBoxPersistent then
@@ -221,8 +240,12 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 		}	
 		scrollPersistent:AddChild(textPersistent)
 		
+		if (not nextButton) and GetHaveNextButton() then
+			CreateNextButton(msgBoxPersistent)
+		end
+		
 		scrollPersistent:SetScrollPos(nil, 0)
-		countLabelPersistent:SetCaption(persistentMsgIndex .. "/" .. #persistentMsgHistory)
+		countLabelPersistent:SetCaption(persistentMsgIndex .. " / " .. #persistentMsgHistory)
 		msgBoxPersistent:Invalidate()
 		return	-- done here, exit
 	end
@@ -270,14 +293,15 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 	textPersistent = Chili.TextBox:New{
 		text    = text or '',
 		align   = "left";
-		width = (width - x - 12),
+		x       = 0,
+		right   = 0,
 		padding = {5, 5, 5, 5},
 		font    = {
 			size   = fontsize or 12;
 			shadow = true;
 		},
-	}	
-	scrollPersistent:AddChild(textPersistent)
+		parent = scrollPersistent,
+	}
 	
 	stackPersistent = Chili.StackPanel:New{
 		parent = msgBoxPersistent,
@@ -285,7 +309,8 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 		--itemPadding = {0, 0, 0, 0},
 		itemMargin = {0, 0, 0, 0},
 		columns = 3,
-		width= '100%',
+		x = 0,
+		right = GetHaveNextButton() and 72 or 0,
 		y = height - 6,
 		height = 20,
 		resizeItems = false,
@@ -312,7 +337,7 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 		
 	countLabelPersistent = Chili.Label:New{
 		parent = stackPersistent,
-		caption = persistentMsgIndex .. "/" .. #persistentMsgHistory,
+		caption = persistentMsgIndex .. " / " .. #persistentMsgHistory,
 		y = height,
 		align = center,
 	}
@@ -333,6 +358,10 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 			end
 		}
 	}
+	
+	if GetHaveNextButton() then
+		CreateNextButton(msgBoxPersistent)
+	end
 end
 
 local function ShowPersistentMessageBox(text, width, height, fontsize, imagePath)
@@ -478,9 +507,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:GameFrame(n)
-  if convoExpireFrame and convoExpireFrame <= n then
-    ClearConvoBox(false)
-  end
+	if convoExpireFrame and convoExpireFrame <= n then
+		ClearConvoBox(false)
+	end
+	nextButtonLocked = false
 end
 
 -- the following code handles box flashing
@@ -488,32 +518,25 @@ local UPDATE_FREQUENCY = 0.2
 local timer = 0
 local flashPhase = false
 
+
 function widget:Update(dt)
+	if nextButton then
+		if Spring.GetGameRulesParam("tutorial_show_next_button") == 1 then
+			if not nextButton.visible then
+				nextButton:Show()
+			end
+		else
+			if nextButton.visible then
+				nextButton:Hide()
+			end
+		end
+	end
+	
 	timer = timer + dt
 	if timer < UPDATE_FREQUENCY then
 		return
 	end
-	--[[
-	if convoExpireTime then
-	  convoExpireTime = convoExpireTime - timer
-	  if convoExpireTime <= 0 then
-	    if msgBoxConvo then
-	      msgBoxConvo:Dispose()
-	      msgBoxConvo = nil
-	      
-	      table.remove(convoQueue, 1)
-	    elseif convoString then
-	      convoString = nil
-	      font = nil
-	      table.remove(convoQueue, 1)
-	    end
-	    
-	    if convoQueue[1] then
-	      ShowConvoBox(convoQueue[1])
-	    end
-	  end
-	end
-	]]--
+	
 	flashPhase = not flashPhase
 	if msgBoxPersistent and flashTime then
 		if flashTime > 0 then

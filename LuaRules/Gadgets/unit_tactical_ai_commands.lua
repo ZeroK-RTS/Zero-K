@@ -84,6 +84,7 @@ local function getUnitOrderState(unitID,data,cQueue)
 	-- ret 1: enemy ID, value of -1 means not target and one should be found. Return false means the unit does not want orders from tactical ai.
 	-- ret 2: true if there is a move command at the start of queue which will need removal.
 	-- ret 3: true if the unit is using AI due to a fight or patrol command.
+	-- ret 4: true if the unit has a non-manual attack command.
 	
 	if not cQueue or #cQueue == 0 then
 		local movestate = spGetUnitStates(unitID).movestate
@@ -107,7 +108,7 @@ local function getUnitOrderState(unitID,data,cQueue)
 			if not (cQueue[1].id == CMD_FIGHT or fightTwo) then -- only skirm single target when given the order manually
 				return target, false
 			else
-				return -1, false, true
+				return -1, false, true, true
 			end
 		elseif (cQueue[1].id == 16) then --  if I target the ground and have fight or patrol command
 			return -1, false
@@ -124,7 +125,7 @@ local function getUnitOrderState(unitID,data,cQueue)
 					if not (cQueue[2].id == CMD_FIGHT or fightThree) then -- only skirm single target when given the order manually
 						return target, true
 					else
-						return -1, true, true
+						return -1, true, true, true
 					end
 				elseif (cQueue[2].id == 16) then -- if I target the ground and have fight or patrol command
 					return -1, true, true
@@ -466,10 +467,11 @@ local function updateUnits(frame, start, increment)
 				break
 			end
 			local cQueue = spGetCommandQueue(unitID,3)
-			local enemy, move, haveFight = getUnitOrderState(unitID,data,cQueue) -- returns target enemy and movement state
+			local enemy, move, haveFight, haveAutoAttack = getUnitOrderState(unitID,data,cQueue) -- returns target enemy and movement state
 			--local ux,uy,uz = spGetUnitPosition(unitID)
 			--Spring.MarkerAddPoint(ux,uy,uz,"unit active")
 			if (enemy) then -- if I am fighting/patroling ground or targeting an enemy
+				local particularEnemy = (enemy ~= -1) or haveAutoAttack
 				local behaviour
 				if unitAIBehaviour[data.udID].waterline then
 					local _,by = spGetUnitPosition(unitID, true)
@@ -520,7 +522,7 @@ local function updateUnits(frame, start, increment)
 						local typeSkirm = typeKnown and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
 						if enemy and (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
 							--Spring.Echo("unit checking skirm")
-							if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, frame, (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
+							if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, frame, particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
 								clearOrder(unitID,data,cQueue)
 							end
 						else

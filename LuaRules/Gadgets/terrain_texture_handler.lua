@@ -270,11 +270,20 @@ function gadget:DrawGenesis()
 							fbo = true,
 						}),
 					}
-					
-					spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].orig)
-					--spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].cur)
-					gl.Texture(mapTex[sx][sz].orig)
-					gl.RenderToTexture(mapTex[sx][sz].cur, drawCopySquare)
+					if mapTex[sx][sz].orig and mapTex[sx][sz].cur then
+						spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].orig)
+						--spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].cur)
+						gl.Texture(mapTex[sx][sz].orig)
+						gl.RenderToTexture(mapTex[sx][sz].cur, drawCopySquare)
+					else
+						if mapTex[sx][sz].cur then
+							gl.DeleteTextureFBO(mapTex[sx][sz].cur)
+						end
+						if mapTex[sx][sz].orig then
+							gl.DeleteTextureFBO(mapTex[sx][sz].orig)
+						end
+						mapTex[sx][sz] = nil
+					end
 				end
 				
 				if texturePool[tex] then --if texture (tex: 1,2,3) have been set to this chunk
@@ -322,14 +331,16 @@ function gadget:DrawGenesis()
 			local square = toRestore.data[i]
 			local sx = square.sx
 			local sz = square.sz
-			gl.Texture(mapTex[sx][sz].orig)
-			for j = 1, square.count do
-				local x = square.data[j].x
-				local z = square.data[j].z
-				local sourceX = (x-sx*SQUARE_SIZE)/SQUARE_SIZE
-				local sourceZ = (z-sz*SQUARE_SIZE)/SQUARE_SIZE
-				local sourceSize = BLOCK_SIZE/SQUARE_SIZE
-				gl.RenderToTexture(mapTex[sx][sz].cur, drawTextureOnSquare, x-sx*SQUARE_SIZE,z-sz*SQUARE_SIZE, BLOCK_SIZE, sourceX, sourceZ, sourceSize)
+			if mapTex[sx][sz] then
+				gl.Texture(mapTex[sx][sz].orig)
+				for j = 1, square.count do
+					local x = square.data[j].x
+					local z = square.data[j].z
+					local sourceX = (x-sx*SQUARE_SIZE)/SQUARE_SIZE
+					local sourceZ = (z-sz*SQUARE_SIZE)/SQUARE_SIZE
+					local sourceSize = BLOCK_SIZE/SQUARE_SIZE
+					gl.RenderToTexture(mapTex[sx][sz].cur, drawTextureOnSquare, x-sx*SQUARE_SIZE,z-sz*SQUARE_SIZE, BLOCK_SIZE, sourceX, sourceZ, sourceSize)
+				end
 			end
 		end
 		
@@ -347,7 +358,9 @@ function gadget:DrawGenesis()
 					local sz = block.sz
 					local dx = (x/tex.size)%1
 					local dz = (z/tex.size)%1
-					gl.RenderToTexture(mapTex[sx][sz].cur, drawTextureOnSquare, x-sx*SQUARE_SIZE,z-sz*SQUARE_SIZE, BLOCK_SIZE, dx, dz, tex.tile)
+					if mapTex[sx][sz] then
+						gl.RenderToTexture(mapTex[sx][sz].cur, drawTextureOnSquare, x-sx*SQUARE_SIZE,z-sz*SQUARE_SIZE, BLOCK_SIZE, dx, dz, tex.tile)
+					end
 				end
 			end
 		end
@@ -363,7 +376,7 @@ function gadget:DrawGenesis()
 				local square = squareList.data[i]
 				local sx = square.x
 				local sz = square.z
-				if not (updatedSquareMap[sx] and updatedSquareMap[sx][sz]) then
+				if mapTex[sx][sz] and not (updatedSquareMap[sx] and updatedSquareMap[sx][sz]) then
 					gl.GenerateMipmap(mapTex[sx][sz].cur)
 					spSetMapSquareTexture(sx,sz, mapTex[sx][sz].cur)
 					--Spring.MarkerAddPoint(sx*SQUARE_SIZE,0,sz*SQUARE_SIZE,Spring.GetGameFrame())

@@ -565,11 +565,11 @@ function widget:MouseRelease(x,y,button)
 			end
     
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
-			local keyState = {}
-			if alt   then tinsert(keyState, "alt") end
-			if ctrl  then tinsert(keyState, "ctrl") end
-			if meta  then tinsert(keyState, "meta") end
-			if shift then tinsert(keyState, "shift") end
+			local keyState = {coded = 0}
+			if alt   then keyState.alt   = true; keyState.coded = keyState.coded + CMD.OPT_ALT   end
+			if ctrl  then keyState.ctrl  = true; keyState.coded = keyState.coded + CMD.OPT_CTRL  end
+			if meta  then keyState.meta  = true; keyState.coded = keyState.coded + CMD.OPT_META  end
+			if shift then keyState.shift = true; keyState.coded = keyState.coded + CMD.OPT_SHIFT end
     
 			if meta and WG.CommandInsert then 
 				GiveNotifyingInsertOrder(CMD_RAW_MOVE,pos,keyState)

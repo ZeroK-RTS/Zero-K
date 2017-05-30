@@ -104,7 +104,7 @@
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="lidLeft" name="lidLeft" type="NODE">
-        <matrix sid="transform">1 0 0 6.273691 0 7.54979e-8 -1 12.71277 0 1 7.54979e-8 12.96497 0 0 0 1</matrix>
+        <matrix sid="transform">1 0 0 6.273691 0 0 -1 2.62 0 1 0 12.96497 0 0 0 1</matrix>
         <instance_geometry url="#Cube_013-mesh">
           <bind_material>
             <technique_common>

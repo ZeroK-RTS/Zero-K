@@ -186,7 +186,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(missile, sfxNone)
 		return 1
 	else 
-		Explode(base, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, sfxShatter)
 		Explode(bay, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(gantry, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(clamp1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
