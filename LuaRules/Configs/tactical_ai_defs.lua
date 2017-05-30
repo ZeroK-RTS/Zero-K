@@ -413,7 +413,7 @@ local behaviourDefaults = {
     defaultLocalJinkOrder = true,
 	defaultSkirmOrderDis = 120,
 	defaultVelocityPrediction = 30,
-	defaultHugRange = 30,
+	defaultHugRange = 50,
 }
 
 local behaviourConfig = { 
