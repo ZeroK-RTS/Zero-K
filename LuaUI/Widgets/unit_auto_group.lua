@@ -52,8 +52,7 @@ end
 
 local helpText =
 	'Alt+0-9 sets autogroup# for selected unit type(s).\nNewly built units get added to group# equal to their autogroup#.'..
-	'\nAlt+BACKQUOTE (~) deletes autogrouping for selected unit type(s).' ..
-	'\nThese hotkeys can be changed in the Hotkeys menu below.'
+	'\nAlt+BACKQUOTE (~) deletes autogrouping for selected unit type(s).'
 	--'Ctrl+~ removes nearest selected unit from its group and selects it. '
 	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
 
@@ -121,16 +120,17 @@ options = {
 	},
 }
 
+-- Hidden until working
 for i = 0, 9 do
-	options["autogroup_" .. i] = {
-		name = 'Autogroup ' .. i,
-		type = 'button',
-		OnChange = function() 
-			DoAutogroupAction(i)
-		end,
-		path = hotkeyPath,
-	}
-	options_order[#options_order + 1] = "autogroup_" .. i
+	--options["autogroup_" .. i] = {
+	--	name = 'Autogroup ' .. i,
+	--	type = 'button',
+	--	OnChange = function() 
+	--		DoAutogroupAction(i)
+	--	end,
+	--	path = hotkeyPath,
+	--}
+	--options_order[#options_order + 1] = "autogroup_" .. i
 end
 
 local finiGroup = {}
