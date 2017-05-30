@@ -5,7 +5,7 @@ static-var bMoving, gun_1;
 
 // Signal definitions
 #define SIG_AIM				2
-#define SIG_AIM_2			4
+#define SIG_AIM2			4
 #define SIG_MOVE			8
 
 #include "constants.h"
@@ -215,6 +215,12 @@ AimFromWeapon5(piecenum)
 
 QueryWeapon5(piecenum)
 	{	piecenum=firepoint; }
+	
+AimFromWeapon6(piecenum)
+	{	piecenum=body;	}
+
+QueryWeapon6(piecenum)
+	{	piecenum=body; }
 
 RestoreAfterDelay()
 {
@@ -226,6 +232,7 @@ RestoreAfterDelay()
 AimPrimary(heading,pitch)
 	{
 	signal SIG_AIM;
+	signal SIG_AIM2;
 	set-signal-mask SIG_AIM;
 	turn head to y-axis heading speed <250>;
 	turn head to x-axis 0 -pitch speed <200>;
@@ -251,50 +258,44 @@ AimWeapon4()
 	return(TRUE);
 	}
 
-AimWeapon5()
+AimWeapon5(heading, pitch)
+	{
+	signal SIG_AIM2;
+	set-signal-mask SIG_AIM2;
+	turn head to y-axis heading speed <250>;
+	turn head to x-axis 0 -pitch speed <200>;
+		
+	wait-for-turn head around y-axis;
+	start-script RestoreAfterDelay();
+	
+	return(TRUE);
+	}
+	
+AimWeapon6()
 	{
 	return(TRUE);
 	}
 
 Shot1()
 	{
-	++gun_1;
-	if (gun_1 > 4)
-		{
-		gun_1 = 1;
-		}
-	if (gun_1 == 1)
-		{
-		turn lforearmu to y-axis <-140> speed <600>;
-		turn lbladeu to y-axis <140> speed <600>;
-		wait-for-turn lbladeu around y-axis;
-		turn lforearmu to y-axis <0> speed <120>;
-		turn lbladeu to y-axis <0> speed <120>;
-		}
-	if (gun_1 == 2)
-		{
-		turn lforearml to y-axis <-140> speed <600>;
-		turn lbladel to y-axis <140> speed <600>;
-		wait-for-turn lbladel around y-axis;
-		turn lforearml to y-axis <0> speed <120>;
-		turn lbladel to y-axis <0> speed <120>;
-		}
-	if (gun_1 == 3)
-		{
-		turn rforearmu to y-axis <140> speed <600>;
-		turn rbladeu to y-axis <-140> speed <600>;
-		wait-for-turn rbladeu around y-axis;
-		turn rforearmu to y-axis <0> speed <120>;
-		turn rbladeu to y-axis <0> speed <120>;
-		}
-	if (gun_1 == 4)
-		{
-		turn rforearml to y-axis <140> speed <600>;
-		turn rbladel to y-axis <-140> speed <600>;
+		turn lforearmu to y-axis <-140> speed <720>;
+		turn lbladeu to y-axis <140> speed <720>;
+		turn lforearml to y-axis <-140> speed <720>;
+		turn lbladel to y-axis <140> speed <720>;
+		turn rforearmu to y-axis <140> speed <720>;
+		turn rbladeu to y-axis <-140> speed <720>;
+		turn rforearml to y-axis <140> speed <720>;
+		turn rbladel to y-axis <-140> speed <720>;
 		wait-for-turn rbladel around y-axis;
-		turn rforearml to y-axis <0> speed <120>;
-		turn rbladel to y-axis <0> speed <120>;
-		}
+		
+		turn lforearmu to y-axis <0> speed <60>;
+		turn lbladeu to y-axis <0> speed <60>;
+		turn lforearml to y-axis <0> speed <60>;
+		turn lbladel to y-axis <0> speed <60>;
+		turn rforearmu to y-axis <0> speed <60>;
+		turn rbladeu to y-axis <0> speed <60>;
+		turn rforearml to y-axis <0> speed <60>;
+		turn rbladel to y-axis <0> speed <60>;
 	}
 
 
