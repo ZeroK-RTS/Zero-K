@@ -1,6 +1,6 @@
 return {
 	dyntrainer_strike = {
-		name = "Strike Trainer",
+		name = "Strike",
 		chassis = "strike",
 		modules = {
 			{"commweapon_heavymachinegun", "module_radarnet"},
@@ -13,7 +13,7 @@ return {
 		--images = {overhead = "184"}
 	},
 	dyntrainer_recon = {
-		name = "Recon Trainer",
+		name = "Recon",
 		chassis = "recon",
 		modules = {
 			{"commweapon_heavymachinegun", "module_radarnet"},
@@ -26,7 +26,7 @@ return {
 		--images = {overhead = "184"}
 	},
 	dyntrainer_support = {
-		name = "Engineer Trainer",
+		name = "Engineer",
 		chassis = "support",
 		modules = {
 			{"commweapon_lparticlebeam", "module_radarnet"},
@@ -38,7 +38,7 @@ return {
 		--decorations = {"skin_support_hotrod"},
 	},
 	dyntrainer_assault = {
-		name = "Guardian Trainer",
+		name = "Guardian",
 		chassis = "assault",
 		modules = {
 			{"commweapon_heavymachinegun", "module_radarnet"},
