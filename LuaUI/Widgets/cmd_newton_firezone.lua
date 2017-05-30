@@ -608,8 +608,8 @@ function widget:GameFrame(n)
 		for victimID, _ in pairs (victimLandingLocation) do
 			local x,y,z = spGetUnitPosition(victimID)
 			if x then
-				local grndHeight = spGetGroundHeight(x,z) +30
-				if y<= grndHeight then
+				local grndHeight = math.max(0, spGetGroundHeight(x,z)) + 30
+				if y <= grndHeight then
 					victimLandingLocation[victimID]=nil
 				end
 			else
