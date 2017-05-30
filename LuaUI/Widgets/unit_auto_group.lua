@@ -52,9 +52,12 @@ end
 
 local helpText =
 	'Alt+0-9 sets autogroup# for selected unit type(s).\nNewly built units get added to group# equal to their autogroup#.'..
-	'\nAlt+BACKQUOTE (~) deletes autogrouping for selected unit type(s).'
+	'\nAlt+BACKQUOTE (~) deletes autogrouping for selected unit type(s).' ..
+	'\nThese hotkeys can be changed in the Hotkeys menu below.'
 	--'Ctrl+~ removes nearest selected unit from its group and selects it. '
 	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
+
+local hotkeyPath = 'Settings/Interface/Control Groups/Hotkeys'
 
 options_order = { 'mainlabel', 'help', 'cleargroups', 'loadgroups', 'addall', 'verbose', 'immediate', 'groupnumbers', }
 options_path = 'Settings/Interface/Control Groups'
@@ -114,8 +117,21 @@ options = {
 			unit2group = {} 
 			Spring.Echo('game_message: Cleared Autogroups.')
 		end,
+		path = hotkeyPath,
 	},
 }
+
+for i = 0, 9 do
+	options["autogroup_" .. i] = {
+		name = 'Autogroup ' .. i,
+		type = 'button',
+		OnChange = function() 
+			DoAutogroupAction(i)
+		end,
+		path = hotkeyPath,
+	}
+	options_order[#options_order + 1] = "autogroup_" .. i
+end
 
 local finiGroup = {}
 local myTeam
@@ -245,6 +261,12 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	end
 end
 
+function DoAutogroupAction(gr)
+	Spring.Echo("Todo")
+	-- Do stuff
+	-- The issue is that if you press '1' then the 'Any+1' hotkey for 'select group 1' is done before the more specific hotkey 'Alt+1'
+end
+
 function widget:KeyPress(key, modifier, isRepeat)
 	if ( modifier.alt and not modifier.meta ) then
 		local gr
@@ -308,7 +330,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 				return true 	--key was processed by widget
 			end
 			
-	elseif (modifier.ctrl and not modifier.meta) then	
+	elseif (modifier.ctrl and not modifier.meta) then
 		if (key == KEYSYMS.BACKQUOTE) then
 			local mx,my = GetMouseState()
 			local _,pos = TraceScreenRay(mx,my,true)     
