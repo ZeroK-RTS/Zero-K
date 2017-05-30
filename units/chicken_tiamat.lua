@@ -17,11 +17,11 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Assault lourd]],
-	description_de = [[Schwere Sturm-/Rioteinheit]],
+  description_de = [[Schwere Sturm-/Rioteinheit]],
     fireproof      = 1,
     helptext       = [[The ultimate assault chicken, the Tiamat is a fire-breathing, iron-jawed, spore-spewing monstrosity that knows no fear, no mercy. It even has a mucous shield to protect itself and surrounding chickens from damage.]],
     helptext_fr    = [[L'ultime unit? d'assault pouler, le Tiamat est une monstruosit? crachant des flammes, d?chirant de ses machoires d'acier et lan?ant des spores sur ses victimes. Elle poss?de m?me un bouclier ?nerg?tique r?sultant de sa fureur, lui procurant ? elle et aux unit?s alli?es ? proximit? une protection efficace durant leur progession vers l'adversaire.]],
-	helptext_de    = [[Das ultimative Sturmchicken: Tiamat ist eine feuer-, eisenspuckende und Sporenspeiende Monstrosit‰t, die keine Angst oder Furcht kennt, aber auch keine Gnade. Sie besitzt sogar ein schleimiges Schild, welches sie selbst und nahe, verbÅEdete Einheiten schÅEzt.]],
+  helptext_de    = [[Das ultimative Sturmchicken: Tiamat ist eine feuer-, eisenspuckende und Sporenspeiende Monstrosit‰t, die keine Angst oder Furcht kennt, aber auch keine Gnade. Sie besitzt sogar ein schleimiges Schild, welches sie selbst und nahe, verbÅEdete Einheiten schÅEzt.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -112,18 +112,25 @@ unitDef = {
       craterMult              = 0,
       cegTag                  = [[flamer]],
 
-	  customParams        	  = {
-		flamethrower = [[1]],
-	    setunitsonfire = "1",
-		burntime = [[450]],
-	  },
-	  
+      customParams            = {
+        flamethrower = [[1]],
+        setunitsonfire = "1",
+        burntime = [[450]],
+      
+        light_camera_height = 2800,
+        light_color = [[0.6 0.39 0.18]],
+        light_radius = 260,
+        light_fade_time = 10,
+        light_beam_mult_frames = 5,
+        light_beam_mult = 5,
+      },
+    
       damage                  = {
         default = 12,
         subs    = 0.01,
       },
 
-      duration				  = 0.01,
+      duration          = 0.01,
       explosionGenerator      = [[custom:SMOKE]],
       fallOffRate             = 1,
       fireStarter             = 100,
@@ -134,14 +141,14 @@ unitDef = {
       interceptedByShieldType = 1,
       noExplode               = true,
       noSelfDamage            = true,
-      --predictBoost			  = 1,
+      --predictBoost        = 1,
       range                   = 290,
       reloadtime              = 0.16,
       rgbColor                = [[1 1 1]],
       soundStart              = [[weapon/flamethrower]],
       soundTrigger            = true,
       texture1                = [[flame]],
-      thickness	              = 0,
+      thickness                = 0,
       tolerance               = 5000,
       turret                  = true,
       weaponType              = [[LaserCannon]],

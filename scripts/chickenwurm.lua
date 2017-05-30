@@ -7,7 +7,7 @@ local rsack, rblade, lsack, lblade, fire = piece("rsack","rblade","lsack","lblad
 local smokePiece = {}
 
 --constants
-local digSpeed = 1
+local digSpeed = 2
 local digRotate = 0.6
 
 --variables
@@ -18,7 +18,6 @@ local SIG_Aim = 1
 local SIG_Move = 16
 
 --cob values
-
 
 ----------------------------------------------------------
 local function RestoreAfterDelay()
@@ -38,7 +37,7 @@ local function Dig()
 			EmitSfx(head, 1026)
 			WaitForTurn(tail, y_axis)
 		else return end
-		Sleep(50)
+		Sleep(33)
 		if (isMoving) then
 			Turn(head, y_axis, 0, digSpeed/2)
 			Turn(fbody, y_axis, -digRotate, digSpeed)
@@ -48,7 +47,7 @@ local function Dig()
 			EmitSfx(fbody, 1026)
 			WaitForTurn(fbody, y_axis)
 		else return end
-		Sleep(50)
+		Sleep(33)
 		if (isMoving) then
 			Turn(head, y_axis, digRotate, digSpeed/2)
 			Turn(fbody, y_axis, -digRotate, digSpeed)
@@ -58,7 +57,7 @@ local function Dig()
 			EmitSfx(fbody, 1026)
 			WaitForTurn(mbody, y_axis)
 		else return end
-		Sleep(50)
+		Sleep(33)
 		if (isMoving) then	
 			Turn(head, y_axis, 0, digSpeed/2)
 			Turn(fbody, y_axis, digRotate, digSpeed)
@@ -68,7 +67,7 @@ local function Dig()
 			WaitForTurn(bbody, y_axis)
 			EmitSfx(fbody, 1026)
 		else return end
-		Sleep(50)
+		Sleep(33)
 	end
 end
 

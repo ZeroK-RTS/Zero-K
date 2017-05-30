@@ -92,6 +92,10 @@ unitDef = {
       burstrate               = 0.01,
       craterBoost             = 0,
       craterMult              = 0,
+			
+			customParams            = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 200,
