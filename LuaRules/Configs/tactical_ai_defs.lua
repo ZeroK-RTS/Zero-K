@@ -1068,6 +1068,7 @@ local behaviourConfig = {
 		stoppingDistance = -180,
 		velocityPrediction = 0,
 		skirmOrderDis = 250,
+		skirmOnlyNearEnemyRange = 120,
 	},
 	
 	["striderarty"] = {
