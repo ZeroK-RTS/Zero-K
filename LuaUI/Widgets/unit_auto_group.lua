@@ -1,4 +1,4 @@
-local versionNum = '3.031'
+local versionNum = '3.032'
 
 function widget:GetInfo()
   return {
@@ -49,7 +49,7 @@ for _, v in ipairs( groupableBuildingTypes ) do
 	end
 end
 
-
+local myteam
 local helpText =
 	'Alt+0-9 sets autogroup# for selected unit type(s).\nNewly built units get added to group# equal to their autogroup#.'..
 	'\nAlt+BACKQUOTE (~) deletes autogrouping for selected unit type(s).'
@@ -118,7 +118,6 @@ options = {
 }
 
 local finiGroup = {}
-local myTeam
 local selUnitDefs = {}
 local loadGroups = true
 local createdFrame = {}
@@ -155,7 +154,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return false
 	end
-	myTeam = team
+	myteam = team
 end
 
 function widget:DrawWorld()
@@ -181,7 +180,7 @@ end
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if (unitTeam == myTeam and unitID ~= nil) then
+	if (unitTeam == myteam and unitID ~= nil) then
 		if (createdFrame[unitID] == GetGameFrame()) then
 			local gr = unit2group[unitDefID]
 --printDebug("<AUTOGROUP>: Unit finished " ..  unitID) --
@@ -193,14 +192,14 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
-	if (unitTeam == myTeam) then
+	if (unitTeam == myteam) then
 		createdFrame[unitID] = GetGameFrame()
 	end
 end
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam) 
 	if options.immediate.value or groupableBuildings[unitDefID] then
-		if (unitTeam == myTeam) then
+		if (unitTeam == myteam) then
 			createdFrame[unitID] = GetGameFrame()
 			local gr = unit2group[unitDefID]
 			if gr ~= nil then SetUnitGroup(unitID, gr) end
@@ -216,7 +215,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
-	if (newTeamID == myTeam) then
+	if (newTeamID == myteam) then
 		local gr = unit2group[unitDefID]
 --printDebug("<AUTOGROUP> : Unit given "..  unit2group[unitDefID])
 		if gr ~= nil then SetUnitGroup(unitID, gr) end
@@ -226,7 +225,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	if (teamID == myTeam) then
+	if (teamID == myteam) then
 		local gr = unit2group[unitDefID]
 --printDebug("<AUTOGROUP> : Unit taken "..  unit2group[unitDefID])
 		if gr ~= nil then SetUnitGroup(unitID, gr) end
@@ -236,12 +235,25 @@ function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam) 
-	if (unitTeam == myTeam and finiGroup[unitID]~=nil) then
+	if (unitTeam == myteam and finiGroup[unitID]~=nil) then
 		local gr = unit2group[unitDefID]
 		if gr ~= nil then SetUnitGroup(unitID, gr)
 --printDebug("<AUTOGROUP> : Unit idle " ..  gr)
 		end
 	finiGroup[unitID] = nil
+	end
+end
+
+function widget:PlayerChanged(playerID)
+	local myID = Spring.GetMyPlayerID()
+	if playerID == myID then
+		spec = select(3,Spring.GetPlayerInfo(myID))
+		if spec then
+			widgetHandler:RemoveWidget()
+			Spring.Echo("Spectator mode detected. Removing autogroup.")
+		else
+			myteam = Spring.GetMyTeamID()
+		end
 	end
 end
 
@@ -289,7 +301,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 					end
 				end
 				if options.addall.value then
-					local myUnits = Spring.GetTeamUnits(myTeam)
+					local myUnits = Spring.GetTeamUnits(myteam)
 					for _, unitID in pairs(myUnits) do
 						local curUnitDefID = GetUnitDefID(unitID)
 						if selUnitDefIDs[curUnitDefID] then
