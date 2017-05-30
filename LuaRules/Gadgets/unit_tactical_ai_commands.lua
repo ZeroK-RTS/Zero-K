@@ -470,6 +470,7 @@ local function updateUnits(frame, start, increment)
 			--local ux,uy,uz = spGetUnitPosition(unitID)
 			--Spring.MarkerAddPoint(ux,uy,uz,"unit active")
 			if (enemy) then -- if I am fighting/patroling ground or targeting an enemy
+				local particularEnemy = (enemy ~= -1)
 				local behaviour
 				if unitAIBehaviour[data.udID].waterline then
 					local _,by = spGetUnitPosition(unitID, true)
@@ -520,7 +521,7 @@ local function updateUnits(frame, start, increment)
 						local typeSkirm = typeKnown and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
 						if enemy and (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
 							--Spring.Echo("unit checking skirm")
-							if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, frame, (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
+							if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, frame, particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
 								clearOrder(unitID,data,cQueue)
 							end
 						else
