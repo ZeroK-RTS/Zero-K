@@ -201,6 +201,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	local start            = {spGetUnitPosition(unitID)}
 
 	local startHeight      = spGetGroundHeight(start[1],start[3])
+	start[2] = math.max(start[2], startHeight)
 	
 	local fakeUnitID
 	local unitDefID	       = spGetUnitDefID(unitID)
