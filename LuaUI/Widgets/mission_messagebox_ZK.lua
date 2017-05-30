@@ -212,14 +212,15 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 		textPersistent = Chili.TextBox:New{
 			text    = text or '',
 			align   = "left";
-			width = (width - x - 12),
+			x       = 0,
+			right   = 0,
 			padding = {5, 5, 5, 5},
 			font    = {
 				size   = fontsize or 12;
 				shadow = true;
 			},
-		}	
-		scrollPersistent:AddChild(textPersistent)
+			parent = scrollPersistent,
+		}
 		
 		scrollPersistent:SetScrollPos(nil, 0)
 		countLabelPersistent:SetCaption(persistentMsgIndex .. "/" .. #persistentMsgHistory)
@@ -270,14 +271,15 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 	textPersistent = Chili.TextBox:New{
 		text    = text or '',
 		align   = "left";
-		width = (width - x - 12),
+		x       = 0,
+		right   = 0,
 		padding = {5, 5, 5, 5},
 		font    = {
 			size   = fontsize or 12;
 			shadow = true;
 		},
-	}	
-	scrollPersistent:AddChild(textPersistent)
+		parent = scrollPersistent,
+	}
 	
 	stackPersistent = Chili.StackPanel:New{
 		parent = msgBoxPersistent,
