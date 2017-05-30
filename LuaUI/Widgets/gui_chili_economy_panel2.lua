@@ -82,6 +82,7 @@ local positiveColourStr
 local negativeColourStr
 local col_income
 local col_expense
+local col_highlight
 local col_overdrive
 
 local RESERVE_SEND_TIME = 1
@@ -211,6 +212,7 @@ local function option_colourBlindUpdate()
 	col_income = (options.colourBlind.value and {.9,.9,.2,1}) or {.1,1,.2,1}
 	col_expense = (options.colourBlind.value and {.2,.3,1,1}) or {1,.3,.2,1}
 	col_overdrive = (options.colourBlind.value and {1,1,1,1}) or {.5,1,0,1}
+	col_highlight = {0.6, 0.6, 0.6, 1}
 end
 
 options_order = {
@@ -452,7 +454,7 @@ local function UpdateBlink(s)
 		local sawtooth = math.abs(blinkMetal/blinkPeriod - 0.5)*2
 		local blink_alpha = sawtooth*0.95
 		
-		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, blink_alpha))
+		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_highlight, blink_alpha))
 	end
 	
 	if blinkE_status then
