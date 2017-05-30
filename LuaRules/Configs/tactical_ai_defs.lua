@@ -1270,6 +1270,31 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 40, 
 	},
+	
+	-- chickens
+	["chicken_tiamat"] = {
+		skirms = {},
+		swarms = {},
+		flees = {},
+		hugs = allGround,
+		hugRange = 100,
+	},
+	
+	["chicken_dragon"] = {
+		skirms = {},
+		swarms = {},
+		flees = {},
+		hugs = allGround,
+		hugRange = 150,
+	},
+	
+	["chickenlandqueen"] = {
+		skirms = {},
+		swarms = {},
+		flees = {},
+		hugs = allGround,
+		hugRange = 150,
+	},
 }
 
 return behaviourConfig, behaviourDefaults
