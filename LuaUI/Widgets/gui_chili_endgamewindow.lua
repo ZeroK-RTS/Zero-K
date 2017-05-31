@@ -167,7 +167,6 @@ local function SetupAwardsPanel()
 				awardSubPanel:AddChild( MakeAwardPanel(awardType, record) )
 			end
 			
---			Label:New{ caption = string.rep('-', 300), textColor = {0.4,0.4,0.4,0.4}; autosize=false; width='100%'; height=5; parent=awardSubPanel } --spacer label to force a "line break"
 			Line:New{ width='100%', parent=awardSubPanel } --spacer to force a "line break"
 		end
 	end
