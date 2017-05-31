@@ -50,6 +50,7 @@ local spIsAboveMiniMap      = Spring.IsAboveMiniMap
 local spWorldToScreenCoords = Spring.WorldToScreenCoords
 
 local start
+local screenStartX, screenStartY = 0, 0
 local cannotSelect = false
 local holdingForSelection = false
 local thruMinimap = false
@@ -127,18 +128,18 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 			top = math_max(start[3], here[3])
 			local units = Spring.GetUnitsInRectangle(left, bottom, right, top)
 			if spec and fullselect then
-				return units --nil if empty
+				return (WG.SelectionRank_GetFilteredSelection and WG.SelectionRank_GetFilteredSelection(units)) or units --nil if empty
 			else
 				local myUnits = {}
 				local teamID = 0
-				for i=1, #units do
+				for i = 1, #units do
 					teamID = Spring.GetUnitTeam(units[i])
 					if teamID == myTeamID and not Spring.GetUnitNoSelect(units[i]) then
 						myUnits[#myUnits+1] = units[i]
 					end
 				end
 				if #myUnits > 0 then
-					return myUnits 
+					return (WG.SelectionRank_GetFilteredSelection and WG.SelectionRank_GetFilteredSelection(myUnits)) or myUnits
 				else 
 					return nil 
 				end
@@ -156,16 +157,15 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 			for i=1, #units do
 				local uvx, uvy, uvz = Spring.GetUnitViewPosition(units[i], true)
 				local ux, uy, uz = spWorldToScreenCoords(uvx, uvy, uvz)
-				local startMouseX, startMouseY = spWorldToScreenCoords(start[1], start[2], start[3])
 				local hereMouseX, hereMouseY = x, y
 				if ux and not Spring.GetUnitNoSelect(units[i]) then
-					if ux >= math_min(startMouseX, hereMouseX) and ux < math_max(startMouseX, hereMouseX) and uy >= math_min(startMouseY, hereMouseY) and uy < math_max(startMouseY, hereMouseY) then
+					if ux >= math_min(screenStartX, hereMouseX) and ux < math_max(screenStartX, hereMouseX) and uy >= math_min(screenStartY, hereMouseY) and uy < math_max(screenStartY, hereMouseY) then
 						allBoxedUnits[#allBoxedUnits+1] = units[i]
 					end
 				end
 			end
 			if #allBoxedUnits > 0 then
-				return allBoxedUnits
+				return (WG.SelectionRank_GetFilteredSelection and WG.SelectionRank_GetFilteredSelection(allBoxedUnits)) or allBoxedUnits
 			else
 				return nil
 			end
@@ -201,6 +201,8 @@ function widget:Update()
 end
 
 function widget:MousePress(x, y, button)
+	screenStartX = x
+	screenStartY = y
 	if (button == 1) and Spring.GetActiveCommand() == 0 then
 		thruMinimap = not WG.MinimapDraggingCamera and spIsAboveMiniMap(x, y)
 		_, start = SafeTraceScreenRay(x, y, true, thruMinimap)

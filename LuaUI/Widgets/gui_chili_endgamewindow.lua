@@ -31,6 +31,7 @@ local Panel
 local ScrollPanel
 local StackPanel
 local Label
+local Line
 local screen0
 local color2incolor
 local incolor2color
@@ -154,21 +155,19 @@ local function SetupAwardsPanel()
 		end
 		if playerHasAward then
 			Label:New{
+				parent=awardSubPanel,
+				width=120,
+				height=awardPanelHeight,
 				caption = teamNames[teamID],
-				width=120; fontShadow = true; valign='center';
-				autosize=false, height=awardPanelHeight; textColor=teamColors[teamID];
-				parent=awardSubPanel
+				fontShadow = true,
+				valign='center',
+				autosize=false,
+				textColor=teamColors[teamID],
 			}
-		
 			for awardType, record in pairs(awards) do
 				awardSubPanel:AddChild( MakeAwardPanel(awardType, record) )
 			end
-			
-			Label:New{
-				caption = string.rep('-', 300), textColor = {0.4,0.4,0.4,0.4};
-				autosize=false; width='100%'; height=5;
-				parent=awardSubPanel
-			} --spacer label to force a "line break"
+			Line:New{ width='100%', parent=awardSubPanel } --spacer to force a "line break"
 		end
 	end
 end
@@ -446,6 +445,7 @@ function widget:Initialize()
 	ScrollPanel = Chili.ScrollPanel
 	StackPanel = Chili.StackPanel
 	Label = Chili.Label
+	Line = Chili.Line
 	screen0 = Chili.Screen0
 	color2incolor = Chili.color2incolor
 	incolor2color = Chili.incolor2color
