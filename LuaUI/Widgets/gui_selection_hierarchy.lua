@@ -89,12 +89,27 @@ options = {
 --------------------------------------------------------------------------------
 -- Selection handling
 
-function widget:SelectionChanged(units, subselection)
+local function GetIsSubselection(newSelection, oldSelection)
+	if #newSelection > #oldSelection then
+		return false
+	else
+		local newSeen = 0
+		local oldSelectionMap = {}
+		for i = 1, #oldSelection do
+			oldSelectionMap[oldSelection[i]] = true
+		end
+		for i = 1, #newSelection do
+			if not oldSelectionMap[newSelection[i]] then
+				return false
+			end
+		end
+	end
+	return true
+end
+
+local function RawGetFilteredSelection(units, subselection, subselectionCheckDone)
 	if not useSelectionFiltering then
 		return
-	end
-	if subselection then
-		return -- Don't filter when the change is just that something was deselected
 	end
 	if not units then
 		return
@@ -106,6 +121,14 @@ function widget:SelectionChanged(units, subselection)
 	
 	if selectionFilteringOnlyAlt and not alt then
 		return
+	end
+	
+	if not subselectionCheckDone then
+		subselection = GetIsSubselection(units, Spring.GetSelectedUnits())
+	end
+	
+	if subselection then
+		return -- Don't filter when the change is just that something was deselected
 	end
 	
 	local needsChanging = false
@@ -140,6 +163,21 @@ function widget:SelectionChanged(units, subselection)
 	end
 end
 
+local function GetFilteredSelection(units)
+	if not units then
+		return nil
+	end
+	local newUnits = RawGetFilteredSelection(units)
+	if newUnits then
+		return newUnits
+	end
+	return units
+end
+
+function widget:SelectionChanged(units, subselection)
+	return RawGetFilteredSelection(units, subselection, true)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Unit Handling
@@ -166,6 +204,7 @@ end
 
 function widget:Initialize()
 	WG.SetSelectionRank = SetSelectionRank
+	WG.SelectionRank_GetFilteredSelection = GetFilteredSelection
 end
 
 --------------------------------------------------------------------------------

@@ -127,18 +127,18 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 			top = math_max(start[3], here[3])
 			local units = Spring.GetUnitsInRectangle(left, bottom, right, top)
 			if spec and fullselect then
-				return units --nil if empty
+				return (WG.SelectionRank_GetFilteredSelection and WG.SelectionRank_GetFilteredSelection(units)) or units --nil if empty
 			else
 				local myUnits = {}
 				local teamID = 0
-				for i=1, #units do
+				for i = 1, #units do
 					teamID = Spring.GetUnitTeam(units[i])
 					if teamID == myTeamID and not Spring.GetUnitNoSelect(units[i]) then
 						myUnits[#myUnits+1] = units[i]
 					end
 				end
 				if #myUnits > 0 then
-					return myUnits 
+					return (WG.SelectionRank_GetFilteredSelection and WG.SelectionRank_GetFilteredSelection(myUnits)) or myUnits
 				else 
 					return nil 
 				end
@@ -165,7 +165,7 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 				end
 			end
 			if #allBoxedUnits > 0 then
-				return allBoxedUnits
+				return (WG.SelectionRank_GetFilteredSelection and WG.SelectionRank_GetFilteredSelection(allBoxedUnits)) or allBoxedUnits
 			else
 				return nil
 			end
