@@ -229,7 +229,7 @@ local hotkeysMiscPath = 'Settings/Hotkeys/Misc'
 
 	ShButton(hotkeysMiscPath, 'Pause/Unpause', 'pause', nil, nil, imgPath .. 'epicmenu/media_playback_pause.png')
 		ShButton(hotkeysMiscPath, 'Increase Speed', 'speedup')
-		ShButton(gamePath, 'Decrease Speed', 'slowdown')
+		ShButton(hotkeysMiscPath, 'Decrease Speed', 'slowdown')
 		
 	--ShLabel(hotkeysMiscPath, '')
 	ShButton(hotkeysMiscPath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
@@ -357,6 +357,15 @@ local pathGesture = 'Settings/Interface/Gesture Menu'
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 local pathMisc = 'Settings/Misc'
 	--ShButton( 'Exit Game...', "exitwindow", '', false ) --this breaks the exitwindow, fixme
+	AddOption(pathMisc,
+	{
+		name = 'Show Advanced/Developer Settings',
+		type = 'bool',
+		value = false,
+		OnChange = function (self)
+			WG.Epic_SetShowAdvancedSettings(self.value)
+		end,
+	})
 	ShButton(pathMisc, 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true)
 	AddOption(pathMisc,
 	{

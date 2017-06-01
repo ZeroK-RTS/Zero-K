@@ -197,7 +197,8 @@ local settings = {
 	widgets = {},
 	show_crudemenu = true,
 	music_volume = 0.5,
-	showAdvanced = false,
+	showAdvanced = false, -- Enable to show all settings.
+	simpleSettingsMode = true,
 }
 
 local confLoaded = false
@@ -1650,6 +1651,12 @@ local function SearchElement(termToSearch,path)
 	return filtered_pathOptions,tree_children
 end
 
+local function Epic_SetShowAdvancedSettings(newAdvanced)
+	settings.showAdvanced = newAdvanced
+	RemakeEpicMenu()
+end
+
+WG.Epic_SetShowAdvancedSettings = Epic_SetShowAdvancedSettings
 
 -- Make submenu window based on index from flat window list
 MakeSubWindow = function(path, pause)
@@ -1936,14 +1943,14 @@ MakeSubWindow = function(path, pause)
 	
 	window_children[#window_children+1] = Checkbox:New{ 
 		--x=0,
-		width=180;
+		width=125;
 		right = 5,
 		bottom=B_HEIGHT + 5;
 		
-		caption = 'Show Advanced Settings', 
-		checked = settings.showAdvanced, 
+		caption = 'Simple Settings', 
+		checked = settings.simpleSettingsMode, 
 		OnChange = { function(self)
-			settings.showAdvanced = not self.checked
+			settings.simpleSettingsMode = not settings.simpleSettingsMode
 			RemakeEpicMenu()
 		end }, 
 		textColor = color.sub_fg, 
@@ -3029,6 +3036,8 @@ function widget:SetConfigData(data)
 		end
 		settings.country = myCountry
 	end
+	
+	settings["epic_Settings/Misc_Show_Advanced_Settings"] = settings.showAdvanced
 
 	WG.country = settings.country
 	WG.lang(settings.lang)
