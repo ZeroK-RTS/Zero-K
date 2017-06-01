@@ -677,7 +677,7 @@ local function MakeFlags()
 	local window_height = 300
 	local window_width = 170
 	window_flags = Window:New{
-		caption = 'Choose Your Location...',
+		caption = 'Choose Your Location',
 		x = settings.sub_pos_x,  
 		y = settings.sub_pos_y,  
 		clientWidth  = window_width,
@@ -992,7 +992,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 
 		option = {
 			type='button',
-			name=pathend .. '...',
+			name=pathend,
 			icon = icon,
 			OnChange = function(self)
 				MakeSubWindow(path2, false)  --this made this button open another menu
@@ -1750,7 +1750,7 @@ MakeSubWindow = function(path, pause)
 				local escapeSearch = searchedElement and option.desc and option.desc:find(currentPath) and option.isDirectoryButton --this type of button will open sub-level when pressed (defined in "AddOption(path, option, wname )")
 				local disabled = option.DisableFunc and option.DisableFunc()
 				local icon = option.icon
-				local button_height = root and 36 or 30
+				local button_height = root and 36 or 36 -- was 30
 				local button = Button:New{
 					name = option.wname .. " " .. option.name;
 					x=0,
@@ -1768,7 +1768,8 @@ MakeSubWindow = function(path, pause)
 				
 				if icon then
 					local width = root and 24 or 16
-					Image:New{ file= icon, width = width, height = width, parent = button, x=4,y=4,  }
+					local pos = root and 4 or 8
+					Image:New{ file= icon, width = width, height = width, parent = button, x = pos, y = pos,}
 				end
 				
 				Label:New{ parent = button, x=35,y=button_height*0.2,  caption=option.name}
@@ -1795,7 +1796,8 @@ MakeSubWindow = function(path, pause)
 			
 		elseif option.type == 'bool' then				
 			local chbox = Checkbox:New{ 
-				x=0,
+				x = 0,
+				y = 7,
 				right = 35,
 				caption = option.name, 
 				checked = option.value or false, 
@@ -1810,39 +1812,39 @@ MakeSubWindow = function(path, pause)
 		elseif option.type == 'number' then	
 			settings_height = settings_height + B_HEIGHT
 			local icon = option.icon
+			local numberPanel = Panel:New{
+				width = "100%",
+				height = 42,
+				backgroundColor = {0,0,0,0},
+				padding = {0,0,0,0},
+				margin = {0,0,0,0},
+				--itemMargin = {2,2,2,2},
+				autosize = false,
+			}
 			if icon then
-				tree_children[#tree_children+1] = Panel:New{
-					backgroundColor = {0,0,0,0},
-					padding = {0,0,0,0},
-					margin = {0,0,0,0},
-					--itemMargin = {2,2,2,2},
-					autosize = true,
-					children = {
-						Image:New{ file= icon, width = 16,height = 16, x=4,y=0,  },
-						Label:New{ caption = option.name, textColor = color.sub_fg, x=20,y=0,  },
-					}
-				}
+				numberPanel:AddChild(Image:New{ file= icon, width = 16,height = 16, x=4,y=7,})
+				numberPanel:AddChild(Label:New{ caption = option.name, textColor = color.sub_fg, x=20,y=7,})
 			else
-				tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_fg, }
+				numberPanel:AddChild(Label:New{ padding = {0,0,0,0}, caption = option.name, y = 7, textColor = color.sub_fg, })
 			end
 			if option.valuelist then
 				option.value = GetIndex(option.valuelist, option.value)
 			end
-			tree_children[#tree_children+1] = 
-				Trackbar:New{ 
-					width = "100%",
-					caption = option.name, 
-					value = option.value, 
-					trackColor = color.sub_fg, 
-					min=option.min or 0, 
-					max=option.max or 100, 
-					step=option.step or 1, 
-					OnMouseup = { option.OnChange }, --using onchange triggers repeatedly during slide
-					tooltip=option.desc,
-					--useValueTooltip=true,
-				}
-			
-		elseif option.type == 'list' then	
+			numberPanel:AddChild(Trackbar:New{
+				y = 20,
+				width = "100%",
+				caption = option.name, 
+				value = option.value, 
+				trackColor = color.sub_fg, 
+				min=option.min or 0, 
+				max=option.max or 100, 
+				step=option.step or 1, 
+				OnMouseup = { option.OnChange }, --using onchange triggers repeatedly during slide
+				tooltip=option.desc,
+				--useValueTooltip=true,
+			})
+			tree_children[#tree_children+1] = numberPanel
+		elseif option.type == 'list' then
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_header, }
 			local items = {};
 			for i=1, #option.items do
@@ -1874,6 +1876,7 @@ MakeSubWindow = function(path, pause)
 				local cb = Checkbox:New{
 					--x=0,
 					right = 35,
+					y = 7,
 					caption = '  ' .. item.name, --caption
 					checked = (option.value == item.value), --status
 					OnClick = {function(self) option.OnChange(item) end},
@@ -2611,7 +2614,7 @@ local function MakeQuitButtons()
 	})
 	AddOption('',{
 		type='button',
-		name='Resign...',
+		name='Resign',
 		desc = "Abandon team and become spectator",
 		icon = imgPath..'epicmenu/whiteflag.png',
 		OnChange = function()
@@ -2635,7 +2638,7 @@ local function MakeQuitButtons()
 	})
 	AddOption('',{
 		type='button',
-		name='Quit...',
+		name='Quit',
 		desc = "Leave the game.",
 		icon = imgPath..'epicmenu/exit.png',
 		OnChange = function() 
@@ -2767,7 +2770,7 @@ function widget:Initialize()
 	-- About button
 	--AddOption('Settings',{
 	--	type='text',
-	--	name='About...',
+	--	name='About',
 	--	value=gameInfoText,
 	--	--desc = "about game",
 	--	key='About',

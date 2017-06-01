@@ -166,7 +166,9 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Hovering Icons'] 		= imgPath..'epicmenu/halo.png',
 	['Settings/Interface/Selection'] 			= imgPath..'epicmenu/selection.png',
 	['Settings/Interface/Control Groups'] 		= imgPath..'epicmenu/addusergroup.png',
-	
+	['Settings/Interface/Gesture Menu'] 		= imgPath..'epicmenu/stock_brightness.png',
+	['Settings/Interface/Economy Overlay'] 		= imgPath..'energy.png',
+	['Settings/Interface/Falling Units'] 		= imgPath..'advplayerslist/point2.png',
 	
 	['Settings/HUD Panels/Minimap'] 				= imgPath..'epicmenu/map.png',
 	['Settings/HUD Panels/Economy Panel']	 		= imgPath..'cost.png',
@@ -183,8 +185,8 @@ confdata.subMenuIcons = {
 }
 
 confdata.simpleModeDirectory = {
-	['Interface...'] = true,
-	['Audio...'] = true,
+	['Interface'] = true,
+	['Audio'] = true,
 }
 
 -- SETUP MENU HERE
