@@ -1,10 +1,6 @@
---[[
-	TO DO:
-		Add amount label when mouseover line on graph (e.g to see exact metal produced at a certain time),
-		Implement camera control to pan in the background while viewing graph,
-		Add minimize option
-		Come up with better way of handling specs, active players and players who died (currently doesn't show players who have died
-]]
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function widget:GetInfo() 
 	return {
 		name    = "EndGame Stats",
@@ -17,7 +13,21 @@ function widget:GetInfo()
 	} 
 end
 
-local buttons = {
+--[[
+	TO DO:
+		Add amount label when mouseover line on graph (e.g to see exact metal produced at a certain time),
+		Come up with better way of handling specs, active players and players who died (currently doesn't show players who have died
+
+	NOT TO DO ANY MORE, PROBABLY:
+		Adding the toggling functionality renders both of these moot:
+			Implement camera control to pan in the background while viewing graph
+			Add minimize option
+--]]
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local buttongroups = {
 	{"Metal", {
 		{"metalProduced"   , "Metal Produced"},
 		{"metalUsed"       , "Metal Used"},
@@ -54,14 +64,24 @@ local graphLength = 0
 local usingAllyteams = false
 local curGraph = {}
 
+-- Spring aliases
+local echo 		= Spring.Echo
+
 -- CHILI CONTROLS
 local Chili, window0, graphPanel, graphSelect, graphLabel, graphTime
 local wasActive = {}
 local playerNames = {}
 
-------------------------------------
---formats final stat to fit in label
+local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
+local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
+local BUTTON_COLOR
+local BUTTON_FOCUS_COLOR
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--utilities
+
+--formats final stat to fit in label
 local function numFormat(label)
 	if not label then
 		return ''
@@ -130,7 +150,22 @@ local function fixLabelAlignment()
 		fixLabelAlignment() 
 	end
 end
-------------------------------------------------------------------------
+
+local function SetButtonSelected(button, isSelected)
+	if isSelected then
+		button.backgroundColor = SELECT_BUTTON_COLOR
+		button.focusColor = SELECT_BUTTON_FOCUS_COLOR
+	else
+		button.backgroundColor = BUTTON_COLOR
+		button.focusColor = BUTTON_FOCUS_COLOR
+	end
+	button:Invalidate()
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--draw graphs
+
 --Total package of graph: Draws graph and labels for each nonSpec player
 local function drawGraph(graphArray, graph_m, teamID)
 	if #graphArray == 0 then
@@ -216,8 +251,7 @@ local function drawGraph(graphArray, graph_m, teamID)
 		end
 	}
 end
-----------------------------------------------------------------
-----------------------------------------------------------------
+
 local function getEngineArrays(statistic, labelCaption)
 	local teamScores = {}
 	local teams	= Spring.GetTeamList()
@@ -243,25 +277,28 @@ local function getEngineArrays(statistic, labelCaption)
 
 	for i = 1, #teams do
 		local teamID = teams[i]
-		local effectiveTeam = usingAllyteams
-			and select(6, Spring.GetTeamInfo(teamID))
-			or teamID
+		if Spring.GetTeamStatsHistory(teamID, 0, graphLength) then
 
-		teamScores[effectiveTeam] = teamScores[effectiveTeam] or {}
-		local stats
-		if rulesParamStats[statistic] then
-			stats = {}
-			for i = 0, graphLength do
-				stats[i] = {}
-				stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+			local effectiveTeam = usingAllyteams
+				and select(6, Spring.GetTeamInfo(teamID))
+				or teamID
+
+			teamScores[effectiveTeam] = teamScores[effectiveTeam] or {}
+			local stats
+			if rulesParamStats[statistic] then
+				stats = {}
+				for i = 0, graphLength do
+					stats[i] = {}
+					stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+				end
+			else
+				stats = Spring.GetTeamStatsHistory(teamID, 0, graphLength)
 			end
-		else
-			stats = Spring.GetTeamStatsHistory(teamID, 0, graphLength)
-		end
-		for b = 1, graphLength do
-			teamScores[effectiveTeam][b] = (teamScores[effectiveTeam][b] or 0) + stats[b][statistic]
-			if graphMax < teamScores[effectiveTeam][b] then
-				graphMax = teamScores[effectiveTeam][b]
+			for b = 1, graphLength do
+				teamScores[effectiveTeam][b] = (teamScores[effectiveTeam][b] or 0) + (stats and stats[b][statistic] or 0)
+				if graphMax < teamScores[effectiveTeam][b] then
+					graphMax = teamScores[effectiveTeam][b]
+				end
 			end
 		end
 	end
@@ -281,21 +318,12 @@ local function getEngineArrays(statistic, labelCaption)
 	drawIntervals(graphMax)
 end
 
-function widget:GameFrame(n)
-	-- remember people's names in case they leave
-	if n > 0 then
-		local teams = Spring.GetTeamList()
-		for i = 1, #teams do
-			local teamID = teams[i]
-			playerNames[teamID] = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(teamID)))
-		end
-		widgetHandler:RemoveCallIn("GameFrame")
-	end
-end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--setup
 
-function loadpanel()
+function makePanel()
 	Chili = WG.Chili
-	local screen0 = Chili.Screen0
 	local selW = 150
 
 	window0 = Chili.Control:New {
@@ -303,7 +331,8 @@ function loadpanel()
 		y = "0",
 		width = "100%", 
 		height = "100%",
-		padding = {0,0,0,4}
+		padding = {0,0,0,4},
+		buttonPressed = 1,
 	}
 	lineLabels 	= Chili.Control:New {
 		parent = window0,
@@ -356,17 +385,19 @@ function loadpanel()
 	graphPanel:Invalidate()
 	graphPanel:UpdateClientArea()
 
-	for i = 1, #buttons do
+	window0.graphButtons = {}
+	local gb_i = 1
+	for i = 1, #buttongroups do
 		local grouppanel = Chili.Panel:New {
 			parent = graphSelect,
-			weight = #buttons[i][2] + 0.7,
+			weight = #buttongroups[i][2] + 0.7,
 			padding = {1,1,1,1},
 		}
 		local grouplabel = Chili.Label:New {
 			parent = grouppanel,
 			x = 5,
 			y = 3,
-			caption = buttons[i][1],
+			caption = buttongroups[i][1],
 			font = {
 				size          = 16,
 				color         = {1,1,0,1},
@@ -382,21 +413,30 @@ function loadpanel()
 			itemMargin = {1,2,1,2},
 			resizeItems = true,
 		}
-		for j = 1, #buttons[i][2] do
-			local engineButton = Chili.Button:New {
-				name = buttons[i][2][j][1],
-				caption = buttons[i][2][j][2],
+		for j = 1, #buttongroups[i][2] do
+			local gb_il = gb_i -- even more local instance than gb_i
+			window0.graphButtons[gb_i] = Chili.Button:New {
+				name = buttongroups[i][2][j][1],
+				caption = buttongroups[i][2][j][2],
 				parent = groupstack,
 				OnClick = { 
 					function(obj)
+						if obj.parent.parent.parent.parent.buttonPressed then
+							SetButtonSelected(window0.graphButtons[obj.parent.parent.parent.parent.buttonPressed], false)
+						end
+						obj.parent.parent.parent.parent.buttonPressed = gb_il -- has to be the very local one
+						SetButtonSelected(obj, true)
 						graphPanel:ClearChildren()
 						lineLabels:ClearChildren()
 						getEngineArrays(obj.name,obj.caption)
 					end 
 				}
 			}
+			gb_i = gb_i + 1
 		end
 	end
+	BUTTON_COLOR = window0.graphButtons[1].backgroundColor
+	BUTTON_FOCUS_COLOR = window0.graphButtons[1].focusColor
 
 	local allyToggle = Chili.Checkbox:New {
 		parent = window0,
@@ -423,17 +463,26 @@ function loadpanel()
 		align = "right",
 	}
 
-	WG.statsPanel = window0
+	return window0
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--callins
+
 function widget:Initialize()
-	if Spring.IsGameOver() then
-		Spring.SendCommands("endgraph 0")
-		loadpanel()
+	WG.MakeStatsPanel = makePanel
+end
+
+function widget:GameFrame(n)
+	-- remember people's names in case they leave
+	if n > 0 then
+		local teams	= Spring.GetTeamList()
+		for i = 1, #teams do
+			local teamID = teams[i]
+			playerNames[teamID] = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(teamID)))
+		end
+		widgetHandler:RemoveCallIn("GameFrame")
 	end
 end
 
-function widget:GameOver()
-	Spring.SendCommands("endgraph 0")
-	loadpanel()
-end
