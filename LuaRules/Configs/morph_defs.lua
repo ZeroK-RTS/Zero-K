@@ -5,15 +5,6 @@
 include("LuaRules/Configs/customcmds.h.lua")
 
 local morphDefs = {
-	--// Evil4Zerggin: Revised time requirements. All rank requirements set to 3.
-	--// Time requirements:
-	--// To t1 unit: 10
-	--// To t2 unit: 20
-	--// To t1 structure: 30
-	--// To t2 structure: 60
-
-	--// KR: No longer consistently following tech time requirements, instead it's more correlated to cost difference (since there are no tech levels).
-	--// Hidden Chicken Faction
 
 	chicken_drone = {
 		[1] = {
@@ -22,30 +13,13 @@ local morphDefs = {
 			time = 20,
 		},
 		[2] = {
-			into = 'nest',
-			energy = 30,
-			time = 20,
-		},
-		[3] = {
 			into = 'chickenspire',
 			energy = 600,
 			time = 90,
 		},
-		[4] = {
+		[3] = {
 			into = 'thicket',
 			time = 4,
-		},
-	}, 
-
-	nest = {
-		into = 'roostfac',
-		time = 60,
-	},
-
-	chicken_drone_starter = {
-		{
-			into = 'nest',
-			time = 1,
 		},
 	}, 
 }
