@@ -1438,6 +1438,7 @@ function widget:Update(s)
 			firstSwap = nil
 		elseif initialSwapTime < 0 then
 			SwapBacklog()
+			SetBacklogShow(options.defaultBacklogEnabled.value)
 			initialSwapTime = nil
 		end
 	end
