@@ -59,7 +59,7 @@ options = {
 		name = "Use selection filtering",
 		type = "bool",
 		value = true,
-		desc = "Enable to use selection filtering.",
+		desc = "Filter constructors out of mixed constructor/combat unit selection.",
 		OnChange = function (self)
 			useSelectionFiltering = self.value
 		end

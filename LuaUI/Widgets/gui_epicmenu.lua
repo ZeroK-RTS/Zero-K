@@ -2974,7 +2974,7 @@ function widget:Initialize()
 	
 	--intialize remote option fetcher
 	WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
-		return (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname..key ) ) or {}
+		return (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname .. key ) ) or {}
 	end 
 	
 	--intialize remote option setter
