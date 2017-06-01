@@ -5,7 +5,7 @@ local function CommandClickFunction()
 	if not meta then 
 		return false
 	end
-	WG.crude.OpenPath("Game/Command Hotkeys")
+	WG.crude.OpenPath("Settings/Hotkeys/Commands")
 	WG.crude.ShowMenu() --make epic Chili menu appear.
 	return true
 end 

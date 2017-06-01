@@ -22,7 +22,7 @@ local function CheckEnable()
 	end
 end
 
-options_path = 'Game/Unit Behaviour'
+options_path = 'Settings/Unit Behaviour'
 options_order = { 'enable_cloak_holdfire' }
 options = {
 	enable_cloak_holdfire = {

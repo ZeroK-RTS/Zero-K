@@ -135,25 +135,20 @@ end
 
 local imgPath = LUAUI_DIRNAME  .. 'images/'
 confdata.subMenuIcons = {
-	['Game'] = imgPath..'epicmenu/game.png',
 	['Settings'] = imgPath..'epicmenu/settings.png',
 	['Help'] = imgPath..'epicmenu/questionmark.png',
 	
-	['Game/Game Speed'] 			= imgPath..'epicmenu/speed-test-icon.png',
-	['Game/New Unit States'] 		= imgPath..'epicmenu/robot2.png',
-	['Game/Unit Behaviour'] 		= imgPath..'epicmenu/robot2.png',
-	['Game/Transport AI'] 			= imgPath..'epicmenu/robot2.png',
-	['Game/Worker AI'] 				= imgPath..'commands/Bold/build_light.png',
-	['Game/Unit Marker'] 			= imgPath..'epicmenu/marker.png',
-	['Game/Construction Hotkeys'] 	= imgPath..'epicmenu/keyboard.png',
-	['Game/Selection Hotkeys'] 		= imgPath..'epicmenu/keyboard.png',
-	['Game/Command Hotkeys'] 		= imgPath..'epicmenu/keyboard.png',
+	['Settings/Unit Behaviour/Worker AI'] = imgPath..'commands/Bold/build_light.png',
+	['Settings/Interface/Unit Marker'] 	= imgPath..'epicmenu/marker.png',
+	['Settings/Unit Behaviour'] 	= imgPath..'epicmenu/robot2.png',
+	['Settings/Hotkeys'] 			= imgPath..'epicmenu/keyboard.png',
 	
 	['Settings/Reset Settings'] 	= imgPath..'epicmenu/undo.png',
 	['Settings/Audio'] 				= imgPath..'epicmenu/vol.png',
 	['Settings/Camera'] 			= imgPath..'epicmenu/video_camera.png',
 	['Settings/Graphics'] 			= imgPath..'epicmenu/graphics.png',
 	['Settings/HUD Panels'] 		= imgPath..'epicmenu/control_panel.png',
+	['Settings/HUD Presets'] 		= imgPath..'epicmenu/speed-test-icon.png',
 	['Settings/Interface'] 			= imgPath..'epicmenu/robotarm.png',
 	['Settings/Misc'] 				= imgPath..'epicmenu/misc.png',
 	
@@ -229,18 +224,17 @@ local settingsPath = 'Settings'
 	--]]
 
 
---- GAME --- Stuff for gameplay only. Spectator would never need to open this
-local gamePath = 'Game' 
-local gameSpeedPath = 'Game/Game Speed'
+--- Hotkeys --- 
+local hotkeysMiscPath = 'Settings/Hotkeys/Misc' 
 
-	ShButton(gamePath, 'Pause/Unpause', 'pause', nil, nil, imgPath .. 'epicmenu/media_playback_pause.png')
-		ShButton(gameSpeedPath, 'Increase Speed', 'speedup')
-		ShButton(gameSpeedPath, 'Decrease Speed', 'slowdown')
+	ShButton(hotkeysMiscPath, 'Pause/Unpause', 'pause', nil, nil, imgPath .. 'epicmenu/media_playback_pause.png')
+		ShButton(hotkeysMiscPath, 'Increase Speed', 'speedup')
+		ShButton(gamePath, 'Decrease Speed', 'slowdown')
 		
-	ShLabel(gamePath, '')
-	ShButton(gamePath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
+	ShLabel(hotkeysMiscPath, '')
+	ShButton(hotkeysMiscPath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
 	
-	--ShButton(gamePath, 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end)
+	--ShButton(hotkeysMiscPath, 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end)
 
 --- CAMERA ---
 local cameraPath = 'Settings/Camera'

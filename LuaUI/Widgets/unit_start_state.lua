@@ -41,7 +41,7 @@ local function GetDefaultSelectionRank(ud)
 	return 3
 end
 
-options_path = 'Game/New Unit States'
+options_path = 'Settings/Unit Behaviour/Default States'
 options_order = {
 	'inheritcontrol', 'presetlabel', 
 	'resetMoveStates', 'holdPosition', 
@@ -76,7 +76,7 @@ options = {
 		type = 'button',
 		name = "Clear Move States",
 		desc = "Set all land units to inherit their move state from factory (overrides holdpos for skirms, arty and AA but not crabe, slasher or tremor)",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -95,7 +95,7 @@ options = {
 		type = 'button',
 		name = "Hold Position",
 		desc = "Set all land units to hold position",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -114,7 +114,7 @@ options = {
 		type = 'button',
 		name = "Hold Position (Skirmishers)",
 		desc = "Set all skirmishers to hold position",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -133,7 +133,7 @@ options = {
 		type = 'button',
 		name = "Hold Position (Artillery)",
 		desc = "Set all artillery units to hold position",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -152,7 +152,7 @@ options = {
 		type = 'button',
 		name = "Hold Position (Anti-Air)",
 		desc = "Set all non-flying anti-air units to hold position",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -173,7 +173,7 @@ options = {
 		type = 'button',
 		name = "Disable Tactical AI",
 		desc = "Disables tactical AI (jinking and skirming) for all units.",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -192,7 +192,7 @@ options = {
 		type = 'button',
 		name = "Enable Tactical AI",
 		desc = "Enables tactical AI (jinking and skirming) for all units.",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -211,7 +211,7 @@ options = {
 		type = 'button',
 		name = "Enable Auto Assist",
 		desc = "Enables auto assist for all factories.",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -229,7 +229,7 @@ options = {
 		type = 'button',
 		name = "Disable Auto Assist",
 		desc = "Disables auto assist for all factories.",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -248,7 +248,7 @@ options = {
 		type = 'button',
 		name = "Enable Auto Call Transport",
 		desc = "Enables auto call transport for all factories, sets constructors to inherit.",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -270,7 +270,7 @@ options = {
 		type = 'button',
 		name = "Disable Auto Call Transport",
 		desc = "Disables auto call transport for all factories, sets constructors to inherit.",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -292,7 +292,7 @@ options = {
 		type = 'button',
 		name = "Set Selection Ranks to Default",
 		desc = "Resets selection ranks to default, 1 for structures, 2 for constructors and 3 for combat units (including commander).",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			options.commander_selection_rank.value = 3
 			for i = 1, #options_order do
@@ -311,7 +311,7 @@ options = {
 		type = 'button',
 		name = "Set Selection Ranks to Three",
 		desc = "Effectively disables selection ranking while retaining the ability to manually set ranks.",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			options.commander_selection_rank.value = 3
 			for i = 1, #options_order do
@@ -328,7 +328,7 @@ options = {
 		type = 'button',
 		name = "Set High Factory Selection Rank",
 		desc = "Sets factory selectionrank to three.",
-		path = "Game/New Unit States/Presets",
+		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -349,7 +349,7 @@ options = {
 		name = "label",
 		type = 'label',
 		value = "Commander",
-		path = "Game/New Unit States/Misc",
+		path = "Settings/Unit Behaviour/Default States/Misc",
 	},
 
 	commander_firestate0 = {
@@ -360,7 +360,7 @@ options = {
 		min = 0, -- most firestates are -1 but no factory/unit build comm (yet)
 		max = 2,
 		step = 1,
-		path = "Game/New Unit States/Misc",
+		path = "Settings/Unit Behaviour/Default States/Misc",
 	},
 
 	commander_movestate1 = {
@@ -371,7 +371,7 @@ options = {
 		min = 0,-- no factory/unit build comm (yet)
 		max = 2,
 		step = 1,
-		path = "Game/New Unit States/Misc",
+		path = "Settings/Unit Behaviour/Default States/Misc",
 	},
 
 	commander_constructor_buildpriority = {
@@ -382,7 +382,7 @@ options = {
 		min = 0,
 		max = 2,
 		step = 1,
-		path = "Game/New Unit States/Misc",
+		path = "Settings/Unit Behaviour/Default States/Misc",
 	},
 
 	commander_misc_priority = {
@@ -393,7 +393,7 @@ options = {
 		min = 0,
 		max = 2,
 		step = 1,
-		path = "Game/New Unit States/Misc",
+		path = "Settings/Unit Behaviour/Default States/Misc",
 	},
 
 	commander_retreat = {
@@ -404,7 +404,7 @@ options = {
 		min = 0,
 		max = 3,
 		step = 1,
-		path = "Game/New Unit States/Misc",
+		path = "Settings/Unit Behaviour/Default States/Misc",
 	},
 	
 	commander_auto_call_transport_2 = {
@@ -415,7 +415,7 @@ options = {
 		min = 0,
 		max = 1,
 		step = 1,
-		path = "Game/New Unit States/Misc",
+		path = "Settings/Unit Behaviour/Default States/Misc",
 	},
 	
 	commander_selection_rank = {
@@ -427,7 +427,7 @@ options = {
 		max = 3,
 		step = 1,
 		path = path,
-		path = "Game/New Unit States/Misc",
+		path = "Settings/Unit Behaviour/Default States/Misc",
 	},
 }
 
@@ -442,7 +442,7 @@ end
 local unitAlreadyAdded = {}
 
 local function addLabel(text, path) -- doesn't work with order
-    path = (path and "Game/New Unit States/" .. path) or "Game/New Unit States"
+    path = (path and "Settings/Unit Behaviour/Default States/" .. path) or "Settings/Unit Behaviour/Default States"
     options[text .. "_label"] = {
         name = "label",
         type = 'label',
@@ -460,7 +460,7 @@ local function addUnit(defName, path)
 
 	unitAlreadyAdded[defName] = true
 
-	path = "Game/New Unit States/" .. path
+	path = "Settings/Unit Behaviour/Default States/" .. path
 	local ud = UnitDefNames[defName]
 	if not ud then
 		Spring.Echo("Initial States invalid unit " .. defName)

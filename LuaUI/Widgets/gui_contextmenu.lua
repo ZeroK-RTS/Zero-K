@@ -160,7 +160,7 @@ local function addUnit (unitDefID, path, buildable)
 			type='button',
 			desc = "Build " .. unitName,
 			action = 'buildunit_' .. ud.name,
-			path = 'Game/Construction Hotkeys/' .. path,
+			path = 'Settings/Hotkeys/Construction/' .. path,
 		}
 		options_order[#options_order + 1] = optionName
 	end

@@ -178,14 +178,14 @@ options = {
 		name = 'Commands...',
 		type = 'button',
 		OnChange = function(self)
-			WG.crude.OpenPath('Game/Command Hotkeys')
+			WG.crude.OpenPath('Settings/Hotkeys/Commands')
 		end
 	},
 	goToSelections = {
 		name = 'Selections...',
 		type = 'button',
 		OnChange = function(self)
-			WG.crude.OpenPath('Game/Selection Hotkeys')
+			WG.crude.OpenPath('Settings/Hotkeys/Selection')
 		end
 	},
 	opacity = {
@@ -228,7 +228,7 @@ local function AddHotkeyOptions()
 			name = cmdname_disp,
 			type = 'button',
 			action = cmdData.name or cmdnamel,
-			path = 'Game/Command Hotkeys',
+			path = 'Settings/Hotkeys/Commands',
 		}
 		if number == 2 then
 			options_order_tmp_states[#options_order_tmp_states+1] = cmdnamel
@@ -242,9 +242,9 @@ local function AddHotkeyOptions()
 		end
 	end
 
-	options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Game/Command Hotkeys',}
-	options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Game/Command Hotkeys',}
-	options.lblstate	= { type='label', name='State Commands', path = 'Game/Command Hotkeys',}
+	options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Settings/Hotkeys/Commands',}
+	options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Settings/Hotkeys/Commands',}
+	options.lblstate	= { type='label', name='State Commands', path = 'Settings/Hotkeys/Commands',}
 	
 	
 	table.sort(options_order_tmp_cmd)
@@ -1053,7 +1053,7 @@ local function SetupCommands( modifier )
 	for i = 1, #selections do
 		local selection = selections[i]
 		--local option = options[selection]
-		local option = WG.GetWidgetOption( 'Select Keys','Game/Selection Hotkeys', selection ) --returns empty table if problem
+		local option = WG.GetWidgetOption( 'Select Keys','Settings/Hotkeys/Selection', selection ) --returns empty table if problem
 		if option.action then
 			local hotkey = WG.crude.GetHotkey(option.action) or ''
 			local hotkey_key, hotkey_mod = BreakDownHotkey(hotkey)

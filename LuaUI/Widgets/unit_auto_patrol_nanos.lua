@@ -98,7 +98,7 @@ end
 --------------------------------------------------------------------------------
 -- Settings
 
-options_path = 'Game/Unit Behaviour'
+options_path = 'Settings/Unit Behaviour'
 options = {
 	patrol_idle_nanos = {
 		name = "Caretaker automation",

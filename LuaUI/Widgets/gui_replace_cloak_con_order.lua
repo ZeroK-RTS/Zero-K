@@ -12,7 +12,7 @@ function widget:GetInfo()
   }
 end
 
-options_path = 'Game/Unit AI/Replace Cloak Con Orders'
+options_path = 'Settings/Unit Behaviour/Replace Cloak Con Orders'
 options = { 
 	reclaim = {name='Replace Reclaim', type='bool', value=true},
 	resurrect = {name='Replace Resurrect', type='bool', value=true},

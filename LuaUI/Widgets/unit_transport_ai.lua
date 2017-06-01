@@ -80,7 +80,7 @@ local unitAICmdDesc = {
 	params 	= {0, 'AI Off','AI On'}
 }
 
-options_path = 'Game/Transport AI'
+options_path = 'Settings/Unit Behaviour/Transport AI'
 options = {
 	transportFromFactory = {
 		name = "Transport From Factory",

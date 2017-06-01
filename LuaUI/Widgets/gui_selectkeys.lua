@@ -26,7 +26,7 @@ Please keep them up to date.
 --]]
 --------------------------------------------------------------------------------
 
-options_path = 'Game/Selection Hotkeys'
+options_path = 'Settings/Hotkeys/Selection'
 options_order = {
 	'lbl_visibilty',
 	'select_all_visible',

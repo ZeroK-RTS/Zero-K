@@ -2733,7 +2733,6 @@ function widget:Initialize()
 
 	--this is done to establish order the correct button order
 	local imgPath = LUAUI_DIRNAME  .. 'images/'
-	AddOption('Game')
 	AddOption('Settings/Reset Settings')
 	AddOption('Settings/Audio')
 	AddOption('Settings/Camera')
@@ -2753,13 +2752,15 @@ function widget:Initialize()
 	MakeQuitButtons()
 	
 	AddOption('',{ type='label',name='',value = '',key='',})
-	AddOption('Game',{
-		type='text',
-		name='About...',
-		value=gameInfoText,
-		--desc = "about game",
-		key='About',
-	})
+	
+	-- About button
+	--AddOption('Settings',{
+	--	type='text',
+	--	name='About...',
+	--	value=gameInfoText,
+	--	--desc = "about game",
+	--	key='About',
+	--})
 	
 	-- Clears all saved settings of custom widgets stored in crudemenu's config
 	WG.crude.ResetSettings = function()

@@ -19,7 +19,7 @@ else
 	unitList = VFS.Include("LuaUI/Configs/unit_marker.lua")
 end
 
-options_path = 'Game/Unit Marker'
+options_path = 'Settings/Interface/Unit Marker'
 options_order = { 'enableAll', 'disableAll', 'unitslabel'}
 options = {
 	enableAll = {

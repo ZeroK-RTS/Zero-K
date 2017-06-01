@@ -11,7 +11,7 @@ end
 -- Epic Menu Options
 --------------------------------------------------------------------------------
 
-options_path = 'Game/Unit Behaviour'
+options_path = 'Settings/Unit Behaviour'
 options = {
 	defaultAvoidTrees = {
 		name = "Area reclaim avoids energy",
