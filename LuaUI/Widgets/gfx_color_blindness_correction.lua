@@ -19,6 +19,7 @@ options = {
 		name = "Color Blindness Type",
 		type = "radioButton",
 		value = "none",
+		noHotkey = true,
 		items = {
 			{key = "none", name = "None"},
 			{key = "protanopia", name="Protanopia - misssing RED"},
@@ -35,6 +36,7 @@ options = {
 	cbcOnlySim = {
 		name = 'Only simulate color blindness',
 		type = 'bool',
+		noHotkey = true,
 		value = false,
 		advanced = true,
 	},

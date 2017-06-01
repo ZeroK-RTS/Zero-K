@@ -60,6 +60,7 @@ options = {
 		type = "bool",
 		value = true,
 		desc = "Enable to use selection filtering.",
+		noHotkey = true,
 		OnChange = function (self)
 			useSelectionFiltering = self.value
 		end
@@ -68,6 +69,7 @@ options = {
 		name = "Only filter when Alt is held",
 		type = "bool",
 		value = false,
+		noHotkey = true,
 		desc = "Enable selection filtering when Alt is held. Required the main selection filtering option to be enabled.",
 		OnChange = function (self)
 			selectionFilteringOnlyAlt = self.value

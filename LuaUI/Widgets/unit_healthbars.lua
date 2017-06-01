@@ -108,6 +108,7 @@ options = {
 		name = 'Show Healthbars',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		--OnChange = function() Spring.SendCommands{'showhealthbars'} end,
 	},
 	drawFeatureHealth = {

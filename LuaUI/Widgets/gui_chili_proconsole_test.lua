@@ -215,6 +215,7 @@ options = {
 		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
 		path = filter_path ,
 		advanced = true,
+		noHotkey = true,
 	},
 	
 	enableConsole = {
@@ -569,6 +570,7 @@ options = {
 		desc = "Enable to hide the backlog arrow when not entering chat.",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = function(self)
 			if self.value then
 				if backlogButton and backlogButton.parent then
@@ -586,6 +588,7 @@ options = {
 		desc = "Enable to have the backlog enabled when entering text and disabled when not entering text.",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	backlogArrowOnRight = {
 		name = "Backlong Arrow On Right",
