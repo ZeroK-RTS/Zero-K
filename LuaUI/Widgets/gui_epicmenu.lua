@@ -1727,7 +1727,7 @@ MakeSubWindow = function(path, pause)
 			option.desc = ''
 		end
 		
-		local simpleModeCull = (not root) and (not option.simpleMode and settings.simpleSettingsMode)
+		local simpleModeCull = (not root) and ((not option.simpleMode) == settings.simpleSettingsMode)
 		
 		--if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
 		if option.hidden or (option.advanced and not settings.showAdvanced) or simpleModeCull then
