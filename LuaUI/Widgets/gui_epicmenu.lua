@@ -2966,7 +2966,9 @@ function widget:Initialize()
 	
 	--intialize remote menu trigger
 	WG.crude.OpenPath = function(path, pause) --Note: declared here so that it work in local copy
-		MakeSubWindow(path, pause)	-- FIXME should pause the game
+		if not settings.simpleSettingsMode then -- Menus are mostly empty in simpleSettingsMode
+			MakeSubWindow(path, pause) -- FIXME should pause the game
+		end
 	end
 	
 	--intialize remote menu trigger 2
