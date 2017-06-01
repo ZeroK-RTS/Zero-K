@@ -997,7 +997,6 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 			OnChange = function(self)
 				MakeSubWindow(path2, false)  --this made this button open another menu
 			end,
-			desc=path2,
 			isDirectoryButton = true,
 		}
 		
