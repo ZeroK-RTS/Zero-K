@@ -231,8 +231,19 @@ local hotkeysMiscPath = 'Settings/Hotkeys/Misc'
 		ShButton(hotkeysMiscPath, 'Increase Speed', 'speedup')
 		ShButton(gamePath, 'Decrease Speed', 'slowdown')
 		
-	ShLabel(hotkeysMiscPath, '')
+	--ShLabel(hotkeysMiscPath, '')
 	ShButton(hotkeysMiscPath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
+	ShButton(hotkeysMiscPath, 'Save Screenshot (PNG)', 'screenshot png', 'Find your screenshots under Spring/screenshots') 
+	ShButton(hotkeysMiscPath, 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots')
+	ShButton(hotkeysMiscPath, 
+			'Create Video (risky)', 'createvideo', 'Capture video directly from Spring without sound. Gets saved in the Spring folder. '
+			..'Creates a smooth video framerate without ingame stutter. '
+			..'Caution: It\'s safer to use this in windowed mode because the encoder pop-up menu appears in the foreground window, and could crash the game with a "Fatal Error" after a long recording. '
+			..'\n\nRecommendation (especially for low-end PCs): After activating the video recording select the fastest encoder such as Microsoft Video and record the video in segments. '
+			..' You can then use VirtualDub (opensource software) to do futher compression and editing. Note: there is other opensource video capture software like Taksi that you could try.') 
+	ShButton(hotkeysMiscPath, 'Game Info', "gameinfo", '', true)
+	--ShButton(hotkeysMiscPath, 'Share Dialog...', 'sharedialog', '', true)
+	--ShButton(hotkeysMiscPath, 'FPS Control', "controlunit", 'Control a unit directly in FPS mode.', true)
 	
 	--ShButton(hotkeysMiscPath, 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end)
 
@@ -345,19 +356,8 @@ local pathGesture = 'Settings/Interface/Gesture Menu'
   
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 local pathMisc = 'Settings/Misc'
-	ShButton(pathMisc, 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true)
-	ShButton(pathMisc, 'Game Info', "gameinfo", '', true)
-	ShButton(pathMisc, 'Share Dialog...', 'sharedialog', '', true)
-	ShButton(pathMisc, 'FPS Control', "controlunit", 'Control a unit directly in FPS mode.', true)
 	--ShButton( 'Exit Game...', "exitwindow", '', false ) --this breaks the exitwindow, fixme
-	AddOption(pathMisc,
-	{
-		name = 'Menu pauses in SP',
-		desc = 'Does opening the menu pause the game (and closing unpause it) in single player?',
-		type = 'bool',
-		value = true,
-		noHotkey = true,
-	})
+	ShButton(pathMisc, 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true)
 	AddOption(pathMisc,
 	{
 		name = 'Use uikeys.txt',
@@ -387,17 +387,6 @@ local pathMisc = 'Settings/Misc'
 		end,
 	})
 
-
-local pathMiscScreenshots = 'Settings/Misc/Screenshots'	
-	ShButton(pathMiscScreenshots, 'Save Screenshot (PNG)', 'screenshot png', 'Find your screenshots under Spring/screenshots') 
-	ShButton(pathMiscScreenshots, 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots')
-	ShButton(pathMiscScreenshots, 
-			'Create Video (risky)', 'createvideo', 'Capture video directly from Spring without sound. Gets saved in the Spring folder. '
-			..'Creates a smooth video framerate without ingame stutter. '
-			..'Caution: It\'s safer to use this in windowed mode because the encoder pop-up menu appears in the foreground window, and could crash the game with a "Fatal Error" after a long recording. '
-			..'\n\nRecommendation (especially for low-end PCs): After activating the video recording select the fastest encoder such as Microsoft Video and record the video in segments. '
-			..' You can then use VirtualDub (opensource software) to do futher compression and editing. Note: there is other opensource video capture software like Taksi that you could try.') 
-	
 --- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
 local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 	
@@ -565,7 +554,18 @@ local pathAudio = 'Settings/Audio'
 			if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end 
 		end,
 	})
-		
+
+
+--- HUD ETC ---
+AddOption("Settings/HUD Panels/Pause Screen",
+	{
+		name = 'Menu pauses in SP',
+		desc = 'Does opening the menu pause the game (and closing unpause it) in single player?',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	})
+
 --- HELP ---
 local pathHelp = 'Help'
 	AddOption(pathHelp,
