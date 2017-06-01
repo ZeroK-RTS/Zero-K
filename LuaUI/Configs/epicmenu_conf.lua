@@ -359,7 +359,7 @@ local pathMisc = 'Settings/Misc'
 	--ShButton( 'Exit Game...', "exitwindow", '', false ) --this breaks the exitwindow, fixme
 	AddOption(pathMisc,
 	{
-		name = 'Show Advanced/Developer Settings',
+		name = 'Show Advanced Settings',
 		type = 'bool',
 		value = false,
 		OnChange = function (self)
