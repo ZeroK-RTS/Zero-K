@@ -57,6 +57,8 @@ options = {
 		min = 0,
 		max = 1,
 		step = 0.02,
+		simpleMode = true,
+		everyMode = true,
 	},
 	ordernoisevolume = {
 		name = 'Command Volume',
@@ -65,6 +67,8 @@ options = {
 		min = 0,
 		max = 1,
 		step = 0.02,
+		simpleMode = true,
+		everyMode = true,
 	},
 	attacknoisevolume = {
 		name = 'Commander Under Attack Volume',
@@ -73,6 +77,8 @@ options = {
 		min = 0,
 		max = 1,
 		step = 0.02,
+		simpleMode = true,
+		everyMode = true,
 	},
 }
 

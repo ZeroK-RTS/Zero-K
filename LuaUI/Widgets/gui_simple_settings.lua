@@ -38,6 +38,7 @@ local optionGenerationTable = {
 		desc = "Filter constructors out of mixed constructor/combat unit selection.",
 		type = "bool",
 		default = true,
+		path = "Settings/Interface",
 	},
 	{
 		optionWidget = "Grab Input",
@@ -47,6 +48,7 @@ local optionGenerationTable = {
 		desc = "Prevents the cursor from leaving the Window/Screen.",
 		type = "bool",
 		default = true,
+		path = "Settings/Interface",
 	},
 }
 
@@ -63,6 +65,7 @@ local function AddOption(optionData)
 		end,
 		noHotkey = true,
 		simpleMode = true,
+		path = optionData.path,
 	}
 	
 	options_order[#options_order + 1] = optionData.optionName

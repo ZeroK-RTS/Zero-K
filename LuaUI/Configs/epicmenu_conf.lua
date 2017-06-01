@@ -182,6 +182,11 @@ confdata.subMenuIcons = {
 	['Settings/HUD Panels/Selected Units Panel'] 	= imgPath..'epicmenu/grid.png',
 }
 
+confdata.simpleModeDirectory = {
+	['Interface...'] = true,
+	['Audio...'] = true,
+}
+
 -- SETUP MENU HERE
 
 ShButton('', 'Save Game', (function() if WG.SaveGame then WG.SaveGame.CreateSaveWindow() end end), nil, nil, imgPath .. 'commands/Bold/unload.png')
@@ -541,7 +546,9 @@ local pathAudio = 'Settings/Audio'
 		min = 0, 
 		max = 100,
 		springsetting = 'snd_volmaster',
-		OnChange = function(self) spSendCommands{"set snd_volmaster " .. self.value} end
+		OnChange = function(self) spSendCommands{"set snd_volmaster " .. self.value} end,
+		simpleMode = true,
+		everyMode = true,
 	})
 	AddOption(pathAudio,{
 		name = 'Music Volume',
@@ -562,6 +569,8 @@ local pathAudio = 'Settings/Audio'
 			if (prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end 
 			if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end 
 		end,
+		simpleMode = true,
+		everyMode = true,
 	})
 
 
