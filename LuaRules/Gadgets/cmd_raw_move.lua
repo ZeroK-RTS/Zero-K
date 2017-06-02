@@ -17,8 +17,9 @@ if gadgetHandler:IsSyncedCode() then
 ----------------------------------------------------------------------------------------------
 -- Speedups
 
-local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitPosition   = Spring.GetUnitPosition
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
+local spGetUnitCommands   = Spring.GetUnitCommands
 
 local CMD_STOP   = CMD.STOP
 local CMD_INSERT = CMD.INSERT
@@ -34,6 +35,14 @@ local stopCommand = {
 	[CMD.MOVE] = true,
 }
 
+local queueFrontCommand = {
+	[CMD.WAIT] = true,
+	[CMD.TIMEWAIT] = true,
+	[CMD.DEATHWAIT] = true,
+	[CMD.SQUADWAIT] = true,
+	[CMD.GATHERWAIT] = true,
+}
+
 local canMoveDefs = {}
 local canFlyDefs = {}
 local stopDist = {}
@@ -44,6 +53,10 @@ local stopDistSq = {}
 local stoppingRadiusIncrease = {}
 local stuckTravelOverride = {}
 local startMovingTime = {}
+
+-- Check unit queues because perhaps CMD_RAW_MOVE is not the first command anymore
+local unitQueueCheckRequired = false
+local unitQueuesToCheck = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
@@ -306,6 +319,16 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	return true, false
 end
 
+local function CheckUnitQueues()
+	for unitID,_ in pairs(unitQueuesToCheck) do
+		local queue = spGetUnitCommands(unitID, 1)
+		if (not queue) or (not queue[1]) or (queue[1].id ~= CMD_RAW_MOVE) then
+			StopRawMoveUnit(unitID)
+		end
+		unitQueuesToCheck[unitID] = nil
+	end
+end
+
 function gadget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)
 	if cmdID == CMD_STOP then
 		-- Handling for shift clicking on commands to remove.
@@ -319,6 +342,9 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 			StopRawMoveUnit(unitID)
 		elseif cmdID == CMD_INSERT and (cmdParams[1] == 0 or not cmdOptions.alt) then
 			StopRawMoveUnit(unitID)
+		elseif queueFrontCommand[cmdID] then
+			unitQueueCheckRequired = true
+			unitQueuesToCheck[unitID] = true
 		end
 	else
 		if cmdID == CMD_INSERT then
@@ -352,6 +378,10 @@ function gadget:GameFrame(n)
 	if n%247 == 4 then
 		oldCommandStoppingRadius = commonStopRadius
 		commonStopRadius = {}
+	end
+	if unitQueueCheckRequired then
+		CheckUnitQueues()
+		unitQueueCheckRequired = false
 	end
 end
 
