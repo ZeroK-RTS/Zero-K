@@ -154,5 +154,7 @@ function Spring.SetCameraTarget(x,y,z,transTime)
 		x = x-xDist --add current FreeStyle camera to x-component 
 		z = z-ori_zDist-zDist --remove default FreeStyle z-component, then add current Freestyle camera to z-component
 	end
-	return SetCameraTarget(x,y,z,transTime) --return new results
+	if x and y and z then
+		return SetCameraTarget(x,y,z,transTime) --return new results
+	end
 end
