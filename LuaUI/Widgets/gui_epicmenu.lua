@@ -171,8 +171,7 @@ for k,v in pairs(KEYSYMS) do
 end
 --]]
 local get_key = false
-local kb_path
-local kb_action
+local kb_path, kb_button, kb_control, kb_option, kb_action
 
 local transkey = include("Configs/transkey.lua")
 
@@ -1378,12 +1377,15 @@ WG.crude.ShowFlags = function()
 end
 
 --Make little window to indicate user needs to hit a keycombo to save a keybinding
-local function MakeKeybindWindow( path, option, hotkey ) 
+local function MakeKeybindWindow( path, option, hotkeyButton, optionControl, option ) 
 	local window_height = 80
 	local window_width = 300
 	
 	get_key = true
 	kb_path = path
+	kb_button = hotkeyButton
+	kb_control = optionControl
+	kb_option = option
 	kb_action = GetActionName(path, option)
 	
 	UnassignKeyBind(kb_action, true) -- 2nd param = verbose
@@ -1449,11 +1451,6 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHei
 		children[#children+1] = control	
 	else
 		local hotkeystring = GetHotkeyData(path, option)
-		local kbfunc = function() 
-				if not get_key then
-					MakeKeybindWindow( path, option ) 
-				end
-			end
 
 		local hklength = math.max( hotkeystring:len() * 10, 20)
 		local control2 = control
@@ -1470,7 +1467,13 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHei
 			right=0,
 			width = hklength,
 			caption = hotkeystring, 
-			OnClick = { kbfunc },
+			OnClick = { 
+				function(self)
+					if not get_key then
+						MakeKeybindWindow( path, option, self, control, option ) 
+					end
+				end
+			},
 			--classname = "submenu_navigation_button",
 			--backgroundColor = color.sub_button_bg,
 			--textColor = color.sub_button_fg, 
@@ -3126,8 +3129,15 @@ function widget:KeyPress(key, modifier, isRepeat)
 		end
 		ReApplyKeybinds()
 		
-		if kb_path == curPath then
-			MakeSubWindow(kb_path, false)
+		if kb_path == curPath and kb_button then
+			local hotkeystring = GetHotkeyData(kb_path, kb_option)
+			kb_button:SetCaption(hotkeystring)
+			local hklength = math.max( hotkeystring:len() * 10, 20)
+			if kb_control then
+				kb_button:SetPos(nil, nil, hklength)
+				kb_control._relativeBounds.right = hklength + 2 --room for hotkey button on right side
+				kb_control:UpdateClientArea()
+			end
 		end
 		
 		return true
