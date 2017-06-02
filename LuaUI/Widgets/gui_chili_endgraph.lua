@@ -134,6 +134,27 @@ local function drawIntervals(graphMax)
 	end
 end
 
+
+-- This is broken.
+--
+-- It sets the label's new position in absolute pixels instead of percent, which means
+-- that the label is now in a fixed position; if you resize the window, the repositioned
+-- label moves out of place relative to the graph. And if you resize the window enough,
+-- the repositioned label may move outside the window, creating scrollbars and bogus
+-- blank space below the graphs.
+--
+-- It could set the new position using percentages, but then the problem arises that
+-- the adjustment is in pixels (11 pixels, the height of the text), so you have to convert
+-- that to percent. You could figure out what that is using adjustment_pct = 11 / parent_window_height,
+-- but the parent window height is defined as 100%, and if you query the parent window
+-- for its height, it returns it in pixels... but with the wrong value.
+--
+-- So for now I'm just commenting this out. Even besides the scrollbar issue, it was never
+-- working right before - it couldn't correctly deal with multiple overlapping labels.
+-- Shouldn't be a problem; overlapping labels are rare, and not that big a deal when
+-- they do happen.
+--
+--[[
 local function fixLabelAlignment()
 	local doAgain
 	for a = 1, #lineLabels.children do
@@ -150,6 +171,7 @@ local function fixLabelAlignment()
 		fixLabelAlignment() 
 	end
 end
+--]]
 
 local function SetButtonSelected(button, isSelected)
 	if isSelected then
@@ -167,11 +189,11 @@ end
 --draw graphs
 
 --Total package of graph: Draws graph and labels for each nonSpec player
-local function drawGraph(graphArray, graph_m, teamID)
+local function drawGraph(graphArray, graph_m, teamID, team_num)
 	if #graphArray == 0 then
 		return
 	end
-
+	
 	local r,g,b,a = Spring.GetTeamColor(
 		usingAllyteams 
 		and ((teamID == Spring.GetMyAllyTeamID()) and Spring.GetMyTeamID() or Spring.GetTeamList(teamID)[1]) 
@@ -209,22 +231,24 @@ local function drawGraph(graphArray, graph_m, teamID)
 
 	--adds value to end of graph
 	local label1 = Chili.Label:New{
-		parent = lineLabels, 
-		y = (1 - graphArray[#graphArray]/graph_m) * 88 - 1 .. "%", 
+		parent = lineLabels,
+		y = (1 - graphArray[#graphArray]/graph_m) * 96 + 0.25 .. "%",
 		width = "100%",
 		caption = lineLabel,
-		font = {color = teamColor}
+		font = {color = teamColor},
 	}
 
 	--adds player to Legend
-	local label2 = Chili.Label:New{
-		parent = graphPanel,
-		x = 55, y = (teamID)*20 + 5,
-		width = "100%",
-		height = 20, 
-		caption = name,
-		font = {color = teamColor}
-	}
+	if team_num then
+		local label2 = Chili.Label:New{
+			parent = graphPanel,
+			x = 55, y = (team_num)*20 + 5,
+			width = "100%",
+			height = 20, 
+			caption = name,
+			font = {color = teamColor}
+		}
+	end
 
 	--creates graph element
 	local graph = Chili.Control:New{
@@ -267,6 +291,22 @@ local function getEngineArrays(statistic, labelCaption)
 	graphTime:SetCaption("Total Time: " .. formatTime(totalTime))
 	curGraph.caption = labelCaption
 	curGraph.name = statistic
+	
+	-- If there's not at least two data points then don't draw the graph, labels, intervals, or players
+	if graphLength < 2 then
+		Chili.Label:New{
+			parent = graphPanel,
+			x = "10%",
+			y = "30%",
+			width = "80%",
+			height = "100%",
+			caption = "No Data",
+			align = "center",
+			textColor = {1,1,0,1},
+			fontsize = 60,
+		}
+		return
+	end
 
 	--finds highest stat out all the player stats, i.e. the highest point of the graph
 	local teamScores = {}
@@ -306,12 +346,17 @@ local function getEngineArrays(statistic, labelCaption)
 	if graphMax < 5 then
 		graphMax = 5
 	end
+	
+	local team_i = 1
 	for k, v in pairs(teamScores) do
 		if k ~= gaia then
-			drawGraph(v, graphMax, k)
+			drawGraph(v, graphMax, k, team_i)
 		end
+		team_i = team_i + 1
 	end
-	fixLabelAlignment()
+
+	-- Commented out for now because it's broken; see above
+	-- fixLabelAlignment()
 
 	graphPanel:Invalidate()
 	graphPanel:UpdateClientArea()
@@ -336,10 +381,10 @@ function makePanel()
 	}
 	lineLabels 	= Chili.Control:New {
 		parent = window0,
+		y = 5,
 		right = 0,
-		y = 0,
-		width = 37, 
-		height = "100%",
+		bottom = 40,
+		width = 35, 
 		padding = {0,0,0,0},
 	}
 	graphSelect	= Chili.StackPanel:New {
@@ -356,7 +401,7 @@ function makePanel()
 	graphPanel = Chili.Panel:New {
 		parent = window0,
 		x = selW + 4, 
-		right = 30,
+		right = 40,
 		y = 0, 
 		bottom = 40,
 		padding = {10,10,10,10}
@@ -421,10 +466,10 @@ function makePanel()
 				parent = groupstack,
 				OnClick = { 
 					function(obj)
-						if obj.parent.parent.parent.parent.buttonPressed then
-							SetButtonSelected(window0.graphButtons[obj.parent.parent.parent.parent.buttonPressed], false)
+						if window0.buttonPressed then
+							SetButtonSelected(window0.graphButtons[window0.buttonPressed], false)
 						end
-						obj.parent.parent.parent.parent.buttonPressed = gb_il -- has to be the very local one
+						window0.buttonPressed = gb_il -- has to be the very local one
 						SetButtonSelected(obj, true)
 						graphPanel:ClearChildren()
 						lineLabels:ClearChildren()
