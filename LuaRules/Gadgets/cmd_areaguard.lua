@@ -65,6 +65,7 @@ local oldGuards = {}
 
 local oldcircuitTime = {}
 local newcircuitTime = {}
+local alreadyHandled = {}
 
 local circleDirection = {}
 local lastUpdateTime = {}
@@ -191,6 +192,10 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 		return false
 	end
 	
+	if alreadyHandled[unitID] then
+		return false
+	end
+	
 	-- Options.ctrl removes coordination from the units. They move at their max speed.
 	-- This is similar to how Ctrl with a move order makes units match speed.
 	local ctrl = cmdOptions.ctrl
@@ -200,7 +205,7 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 	
 	ux, uz = ux + vx*PREDICTION, uz + vz*PREDICTION
 	
-	--// First Circling Guarder dpes some bookkeeping
+	--// First Circling Guarder does some bookkeeping
 	if not (newGuards[targetID] or facing) then
 		-- Update guard circle direction. This swaps whenever there is a gap in which
 		-- no guarders are assigned.
@@ -294,6 +299,7 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 	local mz = uz + radius*sin(angle) + perpSize*sin(perpAngle)
 	
 	GiveClampedMoveGoalToUnit(unitID, mx, mz)
+	alreadyHandled[unitID] = true
 	return false
 end
 
@@ -347,11 +353,13 @@ end
 function gadget:GameFrame(f)
 	frame = f
 	if f%15 == 0 then
+		Spring.Utilities.TableEcho(newGuards, "newGuards")
 		oldGuards = newGuards
 		newGuards = {}
 		
 		oldcircuitTime = newcircuitTime
 		newcircuitTime = {}
+		alreadyHandled = {}
 	end
 end
 
