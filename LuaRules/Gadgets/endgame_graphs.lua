@@ -165,6 +165,15 @@ function gadget:Initialize()
 	
 	GG.EndgameGraphs = externalFunctions
 
+	local allUnits = Spring.GetAllUnits()
+	for i = 1, #allUnits do
+		local unitID = allUnits[i]
+		local buildProgress = select(5, Spring.GetUnitHealth(unitID))
+		if buildProgress == 1 then
+			finishedUnits[unitID] = true
+		end
+	end
+
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 
