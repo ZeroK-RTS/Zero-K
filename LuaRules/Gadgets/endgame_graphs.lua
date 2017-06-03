@@ -152,6 +152,13 @@ function gadget:GameFrame(n)
 	end
 end
 
+function gadget:GameOver()
+	gadget:GameFrame(450) -- fake history frame to snapshot end state
+
+	Spring.SetGameRulesParam("gameover_frame", Spring.GetGameFrame())
+	Spring.SetGameRulesParam("gameover_second", math.floor(Spring.GetGameSeconds()))
+	Spring.SetGameRulesParam("gameover_historyframe", stats_index - 1)
+end
 
 local externalFunctions = {}
 
