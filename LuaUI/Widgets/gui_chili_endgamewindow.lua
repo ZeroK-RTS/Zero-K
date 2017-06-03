@@ -483,15 +483,6 @@ function widget:GameOver(winners)
 end
 
 function widget:Update(dt)
-	-- Redraw the currently-displayed stats graph every fifteen seconds
-	local gameSeconds = GetGameSeconds()
-	if (gameSeconds % 15) == 1 then
-		if showingTab == 'stats' then
-			local button = statsSubPanel.buttonPressed or 1
-			statsSubPanel.graphButtons[button].OnClick[1](statsSubPanel.graphButtons[button])
-		end
-	end
-
 	-- If the post-endgame countdown timer has not yet started, don't do anything else
 	-- If the post-endgame countdown has started but not elapsed, decrement it and do nothing else
 	if not showEndgameWindowTimer then
@@ -524,6 +515,17 @@ function widget:Update(dt)
 
 	showEndgameWindowTimer = nil
 	showingEndgameWindow = true
+end
+
+function widget:GameFrame(f)
+	if not window_endgame.visible then
+		return
+	end
+	-- Redraw the currently-displayed stats graph every fifteen seconds
+	if f%450 == 1 and showingTab == 'stats' then
+		local button = statsSubPanel.buttonPressed or 1
+		statsSubPanel.graphButtons[button].OnClick[1](statsSubPanel.graphButtons[button])
+	end
 end
 
 function widget:Shutdown()
