@@ -34,6 +34,7 @@ local positionCommand = {
 	[CMD_LEVEL] = true,
 }
 
+local EMPTY_TABLE = {}
 --[[
 -- use this for debugging:
 function table.val_to_str ( v )
@@ -205,6 +206,13 @@ function widget:CommandNotify(id, params, options)
 end
 
 function WG.CommandInsert(id, params, options, seq)
+
+	if not options.shift and not options.meta then
+		Spring.GiveOrder (CMD.STOP, EMPTY_TABLE, 0)
+		options.shift = true
+		options.coded = options.coded + CMD.OPT_SHIFT
+	end
+
 	seq = seq or 0
 	if ProcessCommand(id, params, options, seq) then
 		return

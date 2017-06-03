@@ -23,8 +23,9 @@ function widget:CommandNotify(cmdID, params, options)
 	end
 
 	if not options.shift and not options.meta then
-		Spring.GiveOrder (CMD.STOP, {}, CMD.OPT_RIGHT)
+		Spring.GiveOrder (CMD.STOP, {}, 0)
 		options.shift = true
+		options.coded = options.coded + CMD.OPT_SHIFT
 	end
 
 	local myAllyTeam = Spring.GetMyAllyTeamID()

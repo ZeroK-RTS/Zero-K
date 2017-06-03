@@ -41,10 +41,19 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 			return 
 		end
 
-		cmdOptions.ctrl = true
+		if not cmdOptions.ctrl then
+			cmdOptions.ctrl = true
+			cmdOptions.coded = cmdOptions.coded + CMD.OPT_CTRL
+		end
 		WG.CommandInsert(cmdID, cmdParams, cmdOptions)
 	else
-		cmdOptions.ctrl = not cmdOptions.ctrl
+		if not cmdOptions.ctrl then
+			cmdOptions.ctrl = true
+			cmdOptions.coded = cmdOptions.coded + CMD.OPT_CTRL
+		else
+			cmdOptions.ctrl = false
+			cmdOptions.coded = cmdOptions.coded - CMD.OPT_CTRL
+		end
 		WG.CommandInsert(cmdID, cmdParams, cmdOptions)
 	end
 	return true	
