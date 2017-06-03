@@ -192,7 +192,10 @@ local function PrepEndgameWindow()
 
 	local toggleendgamewindow = options.toggleendgamewindow.value
 	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
-	local showToggleButton = (toggleKey ~= "") and (not gameEnded or toggleendgamewindow)
+	if toggleKey ~= "" then
+		toggleKey = " (\255\0\255\0"..toggleKey.."\255\255\255\255)"
+	end
+	local showToggleButton = (not gameEnded or toggleendgamewindow)
 
 --[[
 	-- Put the toggle button leftmost, move the awards and stats buttons right
@@ -209,7 +212,7 @@ local function PrepEndgameWindow()
 --]]
 
 	if showToggleButton then
-		toggleButton.caption="Toggle ("..toggleKey..")"
+		toggleButton.caption="Toggle" .. toggleKey
 		toggleButton:Invalidate()
 		toggleButton:Show()
 	else
