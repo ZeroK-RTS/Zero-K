@@ -231,6 +231,8 @@ local function ToggleStatsGraph()
 	else
 		-- toggle on
 		PrepEndgameWindow()
+		local button = statsSubPanel.buttonPressed or 1
+		if statsSubPanel then statsSubPanel.graphButtons[button].OnClick[1](statsSubPanel.graphButtons[button]) end
 		window_endgame:Show()
 	end
 	showingEndgameWindow = not showingEndgameWindow
