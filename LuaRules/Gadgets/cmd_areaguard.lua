@@ -353,7 +353,6 @@ end
 function gadget:GameFrame(f)
 	frame = f
 	if f%15 == 0 then
-		Spring.Utilities.TableEcho(newGuards, "newGuards")
 		oldGuards = newGuards
 		newGuards = {}
 		
