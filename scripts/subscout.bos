@@ -40,9 +40,20 @@ Killed(severity, corpsetype)
 		explode enginel type SHATTER;
 		explode enginer type SHATTER;
 		explode tail type SHATTER;
-		return (0);
+		return 1;
 	}
 	if( severity <= 50 )
+	{
+		corpsetype = 1;
+		explode body type SHATTER | EXPLODE_ON_HIT;
+		explode wingl type SHATTER;
+		explode wingr type SHATTER;
+		explode enginel type SHATTER | EXPLODE_ON_HIT;
+		explode enginer type SHATTER | EXPLODE_ON_HIT;
+		explode tail type SHATTER;
+		return 1;
+	}
+	if( severity <= 99 )
 	{
 		corpsetype = 2;
 		explode body type SHATTER | EXPLODE_ON_HIT;
@@ -51,25 +62,14 @@ Killed(severity, corpsetype)
 		explode enginel type SHATTER | EXPLODE_ON_HIT;
 		explode enginer type SHATTER | EXPLODE_ON_HIT;
 		explode tail type SHATTER;
-		return (0);
+		return 2;
 	}
-	if( severity <= 99 )
-	{
-		corpsetype = 3;
-		explode body type SHATTER | EXPLODE_ON_HIT;
-		explode wingl type SHATTER;
-		explode wingr type SHATTER;
-		explode enginel type SHATTER | EXPLODE_ON_HIT;
-		explode enginer type SHATTER | EXPLODE_ON_HIT;
-		explode tail type SHATTER;
-		return (0);
-	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode body type SHATTER | EXPLODE_ON_HIT;
 	explode wingl type SHATTER;
 	explode wingr type SHATTER;
 	explode enginel type SHATTER | EXPLODE_ON_HIT;
 	explode enginer type SHATTER | EXPLODE_ON_HIT;
 	explode tail type SHATTER;
-	return (0);
+	return 2;
 }

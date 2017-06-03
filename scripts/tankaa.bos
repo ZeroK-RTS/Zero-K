@@ -1,4 +1,4 @@
-//linear 65536
+//linear constant 65536
 
 #include "constants.h"
 
@@ -195,6 +195,7 @@ Killed(severity, corpsetype)
 		explode turret type BITMAPONLY | BITMAP1;
 		explode barrel1 type BITMAPONLY | BITMAP5;
 		explode barrel2 type BITMAPONLY | BITMAP4;
+		return 1;
 	} else if (severity < 50) {
 		corpsetype = 1;
 		explode base type BITMAPONLY | BITMAP5;
@@ -204,6 +205,7 @@ Killed(severity, corpsetype)
 		explode turret type FALL | BITMAP1;
 		explode barrel1 type FALL | BITMAP5;
 		explode barrel2 type FALL | BITMAP4;
+		return 1;
 	} else {
 		corpsetype = 2;
 		explode base type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
@@ -213,5 +215,6 @@ Killed(severity, corpsetype)
 		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
 		explode barrel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
 		explode barrel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+		return 2;
 	}
 }

@@ -1,3 +1,4 @@
+// linear constant 65536
 #define TAK
 #include "constants.h"
 
@@ -178,7 +179,7 @@ Killed(severity, corpsetype)
 		explode gun type BITMAPONLY | BITMAP;
 		explode base type BITMAPONLY | BITMAP;
 		explode turret type BITMAPONLY | BITMAP;
-		return (0);
+		return 1;
 	}
 	if(severity <= 50)
 	{
@@ -188,7 +189,7 @@ Killed(severity, corpsetype)
 		explode gun type FALL | BITMAP;
 		explode base type BITMAPONLY | BITMAP;
 		explode turret type SHATTER | BITMAP;
-		return (0);
+		return 1;
 	}
 	if(severity < 100)
 	{
@@ -198,14 +199,15 @@ Killed(severity, corpsetype)
 		explode gun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode base type BITMAPONLY | BITMAP;
 		explode turret type SHATTER | BITMAP;
-		return (0);
+		return 2;
 	}
 	corpsetype = 2;
 	explode arm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 	explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 	explode gun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 	explode base type SHATTER | BITMAP;
-	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;	
+	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	return 2;
 }
 
 Create()

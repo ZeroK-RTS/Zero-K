@@ -1,3 +1,4 @@
+// linear constant 163840
 #include "constants.h"
 
 piece		base, body, turret, sleeve, barrel, firepoint,
@@ -298,7 +299,7 @@ Killed(severity, corpsetype)
 		explode sleeve type BITMAPONLY | BITMAP;
 		explode body type BITMAPONLY | BITMAP;
 		explode turret type BITMAPONLY | BITMAP;
-		return (0);
+		return 1;
 	}
 	if(severity <= 50)
 	{
@@ -307,7 +308,7 @@ Killed(severity, corpsetype)
 		explode sleeve type FALL | BITMAP;
 		explode body type BITMAPONLY | BITMAP;
 		explode turret type SHATTER | BITMAP;
-		return (0);
+		return 1;
 	}
 	if(severity < 100)
 	{
@@ -316,13 +317,14 @@ Killed(severity, corpsetype)
 		explode sleeve type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode body type BITMAPONLY | BITMAP;
 		explode turret type SHATTER | BITMAP;
-		return (0);
+		return 2;
 	}
 	corpsetype = 2;
 	explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 	explode sleeve type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 	explode body type SHATTER | BITMAP;
 	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	return 2;
 }
 
 Create()

@@ -126,17 +126,17 @@ unitDef = {
     DEAD  = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 4,
+      footprintZ       = 4,
       object           = [[catapult_wreck.s3o]],
     },
 
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[debris3x3b.s3o]],
+      footprintX       = 4,
+      footprintZ       = 4,
+      object           = [[debris4x4b.s3o]],
     },
 
   },
