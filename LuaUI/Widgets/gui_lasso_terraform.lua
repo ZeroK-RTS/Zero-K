@@ -349,21 +349,23 @@ local function SendCommand()
 	end
 	
 	if not handledExternally then
-		local cmdOpts = {}
-		if s then
-			cmdOpts[#cmdOpts + 1] = "shift"
-		end
-	
+		local cmdOpts = {
+			alt = a,
+			shift = s,
+			ctrl = c,
+			meta = m,
+			coded = (a and CMD.OPT_ALT   or 0)
+			      + (m and CMD.OPT_META  or 0)
+			      + (s and CMD.OPT_SHIFT or 0)
+			      + (c and CMD.OPT_CTRL  or 0)
+		}
+
 		local height = Spring.GetGroundHeight(pointAveX, pointAveZ)
-		for i = 1, #constructor do
-			spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandTag}, cmdOpts)
-		end
-		
-		if buildToGive then
-			if currentlyActiveCommand == CMD_LEVEL then
-				for i = 1, #constructor do
-					spGiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
-				end
+		WG.CommandInsert(commandMap[terraform_type], {pointAveX, height, pointAveZ, commandTag}, cmdOpts, 0)
+
+		if buildToGive and currentlyActiveCommand == CMD_LEVEL then
+			for i = 1, #constructor do
+				WG.CommandInsert(buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, cmdOpts, 1)
 			end
 		end
 	end
