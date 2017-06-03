@@ -106,7 +106,7 @@ local function doTheCommand(unitID, unitDefID, num)
 			(data.useSpecialReloadFrame and Spring.GetUnitRulesParam(unitID, "specialReloadFrame"))
 		local frame = Spring.GetGameFrame()
 		--if (reloadFrame[unitID][num] <= frame and not spGetUnitIsDead(unitID)) then
-		if ((not currentReload or currentReload <= frame) and select(5, spGetUnitHealth(unitID)) == 1 and not spGetUnitIsDead(unitID)) then
+		if ((not currentReload or currentReload <= frame) and (data.partBuilt or select(5, spGetUnitHealth(unitID)) == 1) and not spGetUnitIsDead(unitID)) then
 			local env = Spring.UnitScript.GetScriptEnv(unitID)
 			local func = env[data.functionToCall]
 			Spring.UnitScript.CallAsUnit(unitID, func)

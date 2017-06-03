@@ -19,9 +19,6 @@ if (not gadgetHandler:IsSyncedCode()) then
   return false  --  no unsynced code
 end
 
-local tickDefID = UnitDefNames["cloakbomb"].id
-
-
 local selfddefs = {}
 for i=1,#UnitDefs do
 	if UnitDefs[i].customParams and UnitDefs[i].customParams.instantselfd then 
@@ -43,9 +40,10 @@ end
 
 local toDestroy 
 
-local function QueueUnitDescruction(unitID)
+local function QueueUnitDescruction(unitID, skipChecks)
+	if not skipChecks then skipChecks = false end --make sure it's not nil
 	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
-	if not stunned_or_inbuild then
+	if ((not stunned_or_inbuild) or skipChecks) then
 		if not toDestroy then
 			toDestroy = {count = 0, data = {}}
 		end
