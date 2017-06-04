@@ -22,6 +22,13 @@ unitDef = {
   canMove          = true,
   canPatrol        = true,
   category         = [[UNARMED FLOAT]],
+  collisionVolumeOffsets = [[0 3 -37]],
+  collisionVolumeScales  = [[120 20 48]],
+  collisionVolumeType    = [[Box]],
+  
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[110 4 110]],
+  selectionVolumeType    = [[Box]],
   corpse           = [[DEAD]],
 
   customParams     = {
@@ -29,9 +36,6 @@ unitDef = {
     helptext       = [[The Hovercraft Platform is fast and deadly, offering the ability to cross sea and plains alike and outmaneuver the enemy. Key units: Dagger, Halberd, Scalpel, Mace, Penetrator]],
 	helptext_de    = [[Die Hovercraft Platform ist schnell und tödlich und eröffnet dir die Möglichkeit Wasser und Boden gleichzeitig zu überqueren und somit deinen Gegner geschickt zu überlisten. Wichtigste Einheiten: Dagger, Halberd, Scalpel, Mace, Penetrator]],
     sortName = [[8]],
-	aimposoffset   = [[0 0 0]],
-	midposoffset   = [[0 -25 0]],
-	modelradius    = [[60]],
   },
 
   energyUse        = 0,
@@ -48,14 +52,15 @@ unitDef = {
   minCloakDistance = 150,
   moveState        = 1,
   noAutoFire       = false,
-  objectName       = [[ARMFHP.s3o]],
+  objectName       = [[factoryhover.s3o]],
+  script           = [[factoryhover.lua]],
   selfDestructAs   = [[LARGE_BUILDINGEX]],
   showNanoSpray    = false,
   sightDistance    = 273,
   turnRate         = 0,
   waterline        = 1,
   workerTime       = 10,
-  yardMap          = [[xoooooox ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo xoccccox]],
+  yardMap          = [[oooooooo oooooooo oooooooo cccccccc cccccccc cccccccc cccccccc cccccccc]],
 
   featureDefs      = {
 
@@ -63,8 +68,11 @@ unitDef = {
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 8,
-      footprintZ       = 7,
-      object           = [[ARMFHP_DEAD.s3o]],
+      footprintZ       = 8,
+      collisionVolumeOffsets = [[0 3 -37]],
+      collisionVolumeScales  = [[120 20 48]],
+      collisionVolumeType    = [[Box]],
+      object           = [[factoryhover_dead.s3o]],
     },
 
 
