@@ -1095,7 +1095,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		if playerNameLabel then
 			local playerName = teamID and GetPlayerCaption(teamID)
 			if playerName then
-				playerNameLabel:SetCaption()
+				playerNameLabel:SetCaption(playerName)
 			end
 			playerNameLabel:SetVisibility((playerName and true) or false)
 		end
@@ -1169,6 +1169,31 @@ local function GetTooltipWindow()
 	
 	function externalFunctions.SetPosition(x, y)
 		y = screenHeight - y
+		
+		local map = WG.MinimapPosition
+		if map then
+			-- Only move tooltip up and/or left if it overlaps the minimap. This is because the
+			-- minimap does not have tooltips.
+			if x < map[1] + map[3] and y < map[2] + map[4] then
+				local inX = x + window.width - map[1] + 2
+				local inY = y + window.height - map[2] + 2
+				if inX > 0 and inY > 0 then
+					if inX > inY then
+						y = y - inY
+					else
+						x = x - inX
+					end
+				end
+			end
+		end
+		
+		if x + window.width > screenWidth - 2 then
+			x = screenWidth - window.width - 2
+		end
+		if y + window.height > screenHeight - 2 then
+			y = screenHeight - window.height - 2
+		end
+		
 		window:SetPos(x, y)
 		window:BringToFront()
 	end
