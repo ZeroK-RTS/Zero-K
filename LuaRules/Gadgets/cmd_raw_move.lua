@@ -45,11 +45,11 @@ local queueFrontCommand = {
 
 local canMoveDefs = {}
 local canFlyDefs = {}
-local stopDist = {}
 local goalDist = {}
 local turnDiameterSq = {}
 local turnPeriods = {}
 local stopDistSq = {}
+local loneStopDistSq = {}
 local stoppingRadiusIncrease = {}
 local stuckTravelOverride = {}
 local startMovingTime = {}
@@ -62,7 +62,8 @@ for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if ud.canMove then
 		canMoveDefs[i] = true
-		stopDist[i] = 16
+		local stopDist = ud.xsize*8
+		local loneStopDist = 16
 		local turningDiameter = 2*(ud.speed*2195/(ud.turnRate * 2 * math.pi))
 		if turningDiameter > 20 then
 			turnDiameterSq[i] = turningDiameter*turningDiameter
@@ -77,18 +78,20 @@ for i = 1, #UnitDefs do
 			stuckTravelOverride[i] = 5
 			startMovingTime[i] = 12 -- May take longer to start moving
 			-- Lower stopping distance for more precise placement on terrain
-			stopDist[i] = 4
+			loneStopDist = 4
 		end
 		if ud.canFly then
 			canFlyDefs[i] = true
-			stopDist[i] = ud.speed*0.66
+			stopDist = ud.speed
+			loneStopDist = ud.speed*0.66
 			goalDist[i] = 8
 		end
-		if stopDist[i] then
-			stopDistSq[i] = stopDist[i]*stopDist[i]
+		if stopDist then
+			stopDistSq[i] = stopDist*stopDist
 		end
-		if stopDist[i] and not goalDist[i] then
-			goalDist[i] = stopDist[i]
+		loneStopDistSq[i] = (loneStopDist and loneStopDist*loneStopDist) or stopDistSq[i] or 256
+		if stopDist and not goalDist[i] then
+			goalDist[i] = loneStopDist*2
 		end
 		stoppingRadiusIncrease[i] = ud.xsize*250
 	end
@@ -123,7 +126,7 @@ local GIVE_UP_STUCK_DIST_SQ = 250^2
 local STOP_STOPPING_RADIUS = 10000000
 local RAW_CHECK_SPACING = 500
 local MAX_COMM_STOP_RADIUS = 400^2
-local COMMON_STOP_RADIUS_ACTIVE_DIST_SQ = 180^2 -- Commanders shorter than this do not activate common stop radius.
+local COMMON_STOP_RADIUS_ACTIVE_DIST_SQ = 120^2 -- Commands shorter than this do not activate common stop radius.
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
@@ -132,6 +135,8 @@ local COMMON_STOP_RADIUS_ACTIVE_DIST_SQ = 180^2 -- Commanders shorter than this 
 local rawMoveUnit = {}
 local commonStopRadius = {}
 local oldCommandStoppingRadius = {}
+local commandCount = {}
+local oldCommandCount = {}
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
@@ -209,22 +214,26 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	
 	if not unitData.cx then
 		unitData.cx, unitData.cz = cmdParams[1], cmdParams[3]
-		if distSq > COMMON_STOP_RADIUS_ACTIVE_DIST_SQ then
-			unitData.commandString = cmdParams[1] .. "_" .. cmdParams[3]
-		end
+		unitData.commandString = cmdParams[1] .. "_" .. cmdParams[3]
+		commandCount[unitData.commandString] = (commandCount[unitData.commandString] or 0) + 1
+		unitData.preventGoalClumping = (distSq > COMMON_STOP_RADIUS_ACTIVE_DIST_SQ)
 	end
-	if unitData.commandString and not commonStopRadius[unitData.commandString] then
+	if unitData.preventGoalClumping and unitData.commandString and not commonStopRadius[unitData.commandString] then
 		commonStopRadius[unitData.commandString] = oldCommandStoppingRadius[unitData.commandString] or 0
 	end
+	if unitData.commandString and not commandCount[unitData.commandString] then
+		commandCount[unitData.commandString] = oldCommandCount[unitData.commandString] or 1
+	end
 	
-	local myStopDistSq = stopDistSq[unitDefID] or 256
-	if unitData.commandString then
+	local alone = (commandCount[unitData.commandString] <= 1)
+	local myStopDistSq = (alone and loneStopDistSq[unitDefID]) or stopDistSq[unitDefID] or 256
+	if unitData.preventGoalClumping then
 		myStopDistSq = myStopDistSq + commonStopRadius[unitData.commandString]
 	end
 	
 	if distSq < myStopDistSq then
 		Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
-		if unitData.commandString then
+		if unitData.preventGoalClumping then
 			commonStopRadius[unitData.commandString] = (commonStopRadius[unitData.commandString] or 0) + stoppingRadiusIncrease[unitDefID]
 			if commonStopRadius[unitData.commandString] > MAX_COMM_STOP_RADIUS then
 				commonStopRadius[unitData.commandString] = MAX_COMM_STOP_RADIUS
@@ -378,6 +387,9 @@ function gadget:GameFrame(n)
 	if n%247 == 4 then
 		oldCommandStoppingRadius = commonStopRadius
 		commonStopRadius = {}
+		
+		oldCommandCount = commandCount
+		commandCount = {}
 	end
 	if unitQueueCheckRequired then
 		CheckUnitQueues()
