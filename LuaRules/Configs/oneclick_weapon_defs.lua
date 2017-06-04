@@ -3,6 +3,9 @@
 local oneClickWepDefs = {}
 
 local oneClickWepDefNames = {
+	terraunit = {
+		{ functionToCall = "Detonate", name = "Cancel", tooltip = "Cancel selected terraform units.", texture = "LuaUI/Images/Commands/Bold/cancel.png", partBuilt = true},
+	},
 	gunshipkrow = {
 		{ functionToCall = "ClusterBomb", reloadTime = 854, name = "Carpet Bomb", tooltip = "Drop a huge number of bombs in a circle under the Krow", weaponToReload = 3, texture = "LuaUI/Images/Commands/Bold/bomb.png",},
 	},

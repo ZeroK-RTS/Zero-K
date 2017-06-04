@@ -338,6 +338,7 @@ Killed(severity, corpsetype)
 		explode bottom1 type BITMAPONLY | BITMAP;
 		explode bottom2 type BITMAPONLY | BITMAP;
 		explode bottom3 type BITMAPONLY | BITMAP;
+		return 1;
 	}
 	else if(severity >= 25 AND severity < 50)
 	{
@@ -352,10 +353,11 @@ Killed(severity, corpsetype)
 		explode bottom1 type BITMAPONLY | BITMAP;
 		explode bottom2 type BITMAPONLY | BITMAP;
 		explode bottom3 type BITMAPONLY | BITMAP;
-		explode bay1a type FALL | BITMAP;;
-		explode bay2a type FALL | BITMAP;;
-		explode bay1b type FALL | BITMAP;;
-		explode bay2b type FALL | BITMAP;;
+		explode bay1a type FALL | BITMAP;
+		explode bay2a type FALL | BITMAP;
+		explode bay1b type FALL | BITMAP;
+		explode bay2b type FALL | BITMAP;
+		return 1;
 	}
 	else if(severity >= 50 AND severity < 100)
 	{
@@ -376,7 +378,7 @@ Killed(severity, corpsetype)
 		explode bay2b type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 		explode door2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 		explode door1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
-		
+		return 2;		
 	}
 	// D-Gunned/Self-D
 	else if(severity >= 100)
@@ -398,5 +400,6 @@ Killed(severity, corpsetype)
 		explode bay2b type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 		explode door2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 		explode door1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		return 2;
 	}
 }

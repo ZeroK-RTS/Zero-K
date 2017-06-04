@@ -20,6 +20,7 @@ unitDef = {
     dontcount      = [[1]],
     mobilebuilding = [[1]],
 	cannotcloak    = [[1]],
+	instantselfd   = [[1]],
   },
 
   footprintX             = 2,
@@ -37,8 +38,8 @@ unitDef = {
   minCloakDistance       = 0,
   objectName             = [[sphere.s3o]],
   reclaimable            = false,
-  script                 = [[nullscript.lua]],
-  selfDestructCountdown  = 1,
+  script                 = [[terraunit.lua]],
+  selfDestructCountdown  = 0,
   sightDistance          = 0,
   stealth                = true,
   turnRate               = 0,

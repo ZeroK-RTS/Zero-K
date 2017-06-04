@@ -1,3 +1,4 @@
+// linear constant 163840
 piece base, waist, dish, torso, center, sidecenter, barrel, flare, lthigh, lknee, lshin, lankle, lheel, ltoe, rthigh, rknee, rshin, rankle, rheel,rtoe;
 
 static-var isMoving, isAiming,shooting_num;
@@ -7,8 +8,7 @@ static-var isMoving, isAiming,shooting_num;
 #define SIG_AIM_2			4
 #define SIG_MOVE			16
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 DamageControl()
 {
@@ -232,7 +232,7 @@ Killed( severity, corpsetype )
 		corpsetype = 1;
 		explode waist type		SHATTER;
 		explode torso type		SHATTER;
-		return( 0 );
+		return 1;
 	}
 
 	if (severity <= 50)
@@ -241,7 +241,7 @@ Killed( severity, corpsetype )
 		explode waist type		SHATTER;
 		explode torso type		SHATTER;
 		explode barrel type		FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		return( 0 );
+		return 2;
 	}
 
 	corpsetype = 2;
@@ -251,6 +251,5 @@ Killed( severity, corpsetype )
 	explode barrel type	SHATTER;
 	explode lshin type	FALL |  FIRE | BITMAP2;
 	explode lthigh type		FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-	
-	return( 0 );
+	return 2;
 }

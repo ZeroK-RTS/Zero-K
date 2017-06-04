@@ -171,7 +171,7 @@ Killed(severity, corpsetype)
 		explode jetl type BITMAPONLY | BITMAP2;
 		explode jetr type BITMAPONLY | BITMAP3;
 		explode jetb type BITMAPONLY | BITMAP4;
-		return (0);
+		return 1;
 	}
 	if( severity <= 50 )
 	{
@@ -181,7 +181,7 @@ Killed(severity, corpsetype)
 		explode jetl type BITMAPONLY | BITMAP1;
 		explode jetb type BITMAPONLY | BITMAP3;
 		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
-		return (0);
+		return 1;
 	}
 	if( severity <= 99 )
 	{
@@ -191,12 +191,13 @@ Killed(severity, corpsetype)
 		explode jetl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
 		explode jetb type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
 		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
-		return (0);
+		return 2;
 	}
 	corpsetype = 2;
-		explode body type BITMAPONLY | BITMAP2;
-		explode jetr type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
-		explode jetl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
-		explode jetb type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+	explode body type BITMAPONLY | BITMAP2;
+	explode jetr type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+	explode jetl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+	explode jetb type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+	return 2;
 }

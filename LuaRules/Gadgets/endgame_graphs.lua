@@ -152,6 +152,13 @@ function gadget:GameFrame(n)
 	end
 end
 
+function gadget:GameOver()
+	gadget:GameFrame(450) -- fake history frame to snapshot end state
+
+	Spring.SetGameRulesParam("gameover_frame", Spring.GetGameFrame())
+	Spring.SetGameRulesParam("gameover_second", math.floor(Spring.GetGameSeconds()))
+	Spring.SetGameRulesParam("gameover_historyframe", stats_index - 1)
+end
 
 local externalFunctions = {}
 
@@ -164,6 +171,15 @@ function gadget:Initialize()
 	sum_count = 0
 	
 	GG.EndgameGraphs = externalFunctions
+
+	local allUnits = Spring.GetAllUnits()
+	for i = 1, #allUnits do
+		local unitID = allUnits[i]
+		local buildProgress = select(5, Spring.GetUnitHealth(unitID))
+		if buildProgress == 1 then
+			finishedUnits[unitID] = true
+		end
+	end
 
 	for i = 1, #teamList do
 		local teamID = teamList[i]

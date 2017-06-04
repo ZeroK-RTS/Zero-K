@@ -278,13 +278,13 @@ end
 
 local function getEngineArrays(statistic, labelCaption)
 	local teamScores = {}
-	local teams	= Spring.GetTeamList()
-	local graphLength = Spring.GetTeamStatsHistory(0) - 1
+	local teams = Spring.GetTeamList()
+	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(0) - 1)
 	local generalHistory = Spring.GetTeamStatsHistory(0, 0, graphLength)
-	local totalTime = 0
-	if generalHistory and generalHistory[graphLength] then
-		totalTime = generalHistory[graphLength]["time"] or 0
-	end
+	local totalTime = Spring.GetGameRulesParam("gameover_second")
+		or (generalHistory and generalHistory[graphLength] and generalHistory[graphLength]["time"])
+		or 0
+
 	--Applies label of the selected graph at bottom of window
 	graphLabel:SetCaption(labelCaption)
 	
