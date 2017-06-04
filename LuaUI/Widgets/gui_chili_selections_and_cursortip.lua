@@ -966,7 +966,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 	end
 	
-	function externalFunctions.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY)
+	function externalFunctions.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
 		local teamID
 		local addedName
 		local ud
@@ -977,14 +977,16 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		if prevUnitID == unitID and prevUnitDefID == unitDefID and prevFeatureID == featureID and prevFeatureDefID == featureDefID and 
 				prevMorphTime == morphTime and prevMorphCost == morphCost and prevMousePlace == ((mousePlaceX and true) or false) then
 			
-			if unitID and unitDefID then
-				UpdateDynamicUnitAttributes(unitID, unitDefID, UnitDefs[unitDefID])
-			end
-			if featureID then
-				UpdateDynamicFeatureAttributes(featureID, prevUnitDefID)
-			end
-			if unitDefID and not (unitID or featureID) and econStructureDefs[unitDefID] then
-				UpdateDynamicEconInfo(unitDefID, mousePlaceX, mousePlaceY)
+			if not requiredOnly then
+				if unitID and unitDefID then
+					UpdateDynamicUnitAttributes(unitID, unitDefID, UnitDefs[unitDefID])
+				end
+				if featureID then
+					UpdateDynamicFeatureAttributes(featureID, prevUnitDefID)
+				end
+				if unitDefID and not (unitID or featureID) and econStructureDefs[unitDefID] then
+					UpdateDynamicEconInfo(unitDefID, mousePlaceX, mousePlaceY)
+				end
 			end
 			return
 		end
@@ -1178,8 +1180,8 @@ local function GetTooltipWindow()
 		unitDisplay.SetVisible(false)
 	end
 	
-	function externalFunctions.SetUnitishTooltip(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY)
-		unitDisplay.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY)
+	function externalFunctions.SetUnitishTooltip(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
+		unitDisplay.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
 		textTooltip:SetVisibility(false)
 		unitDisplay.SetVisible(true)
 	end
@@ -1218,7 +1220,7 @@ local function ShowFeatureCheck(holdingSpace, featureDefID)
 	end
 end
 
-local function UpdateTooltipContent(mx, my, dt)
+local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	local holdingDrawKey = GetIsHoldingDrawKey()
 	local holdingSpace = select(3, Spring.GetModKeyState())
 	UpdateMouseCursor(holdingDrawKey)
@@ -1289,7 +1291,7 @@ local function UpdateTooltipContent(mx, my, dt)
 	
 	-- Placing structure tooltip (spring.GetActiveCommand)
 	if cmdID and cmdID < 0 then
-		tooltipWindow.SetUnitishTooltip(nil, -cmdID, nil, nil, nil, nil, mx, my)
+		tooltipWindow.SetUnitishTooltip(nil, -cmdID, nil, nil, nil, nil, mx, my, requiredOnly)
 		return true
 	end
 	
@@ -1304,12 +1306,12 @@ local function UpdateTooltipContent(mx, my, dt)
 				local thingDefID = (thingIsUnit and Spring.GetUnitDefID(thingID)) or Spring.GetFeatureDefID(thingID)
 				if thingIsUnit then
 					if ShowUnitCheck(holdingSpace) then
-						tooltipWindow.SetUnitishTooltip(thingID, thingDefID)
+						tooltipWindow.SetUnitishTooltip(thingID, thingDefID, nil, nil, nil, nil, nil, nil, requiredOnly)
 						return true
 					end
 				else
 					if ShowFeatureCheck(holdingSpace, thingDefID) then
-						tooltipWindow.SetUnitishTooltip(nil, nil, thingID, thingDefID)
+						tooltipWindow.SetUnitishTooltip(nil, nil, thingID, thingDefID, nil, nil, nil, nil, requiredOnly)
 						return true
 					end
 				end
@@ -1340,9 +1342,9 @@ local function UpdateTooltipContent(mx, my, dt)
 	return false
 end
 
-local function UpdateTooltip(dt)
+local function UpdateTooltip(dt, requiredOnly)
 	local mx, my = spGetMouseState()
-	local visible = UpdateTooltipContent(mx, my, dt)
+	local visible = UpdateTooltipContent(mx, my, dt, requiredOnly)
 	tooltipWindow.SetVisible(visible)
 	if visible then
 		tooltipWindow.SetPosition(mx + 20, my - 20)
@@ -1403,15 +1405,26 @@ local function GetSelectionWindow()
 	mainPanel:Hide()
 	
 	local singleUnitDisplay = GetSingleUnitInfoPanel(mainPanel, false)
+	local singleUnitID, singleUnitDefID
 	
 	local externalFunctions = {}
 	
 	function externalFunctions.ShowSingleUnit(unitID)
+		singleUnitID, singleUnitDefID = unitID, Spring.GetUnitDefID(unitID)
 		singleUnitDisplay.SetDisplay(unitID, Spring.GetUnitDefID(unitID))
 		singleUnitDisplay.SetVisible(true)
 	end
 	
+	function externalFunctions.Update()
+		if singleUnitID then
+			singleUnitDisplay.SetDisplay(singleUnitID, singleUnitDefID)
+		end
+	end
+	
 	function externalFunctions.SetVisible(newVisible)
+		if not newVisible then
+			singleUnitID = nil
+		end
 		mainPanel:SetVisibility(newVisible)
 	end
 	
@@ -1465,8 +1478,15 @@ local function InitializeWindParameters()
 	windGroundSlope = spGetGameRulesParam("WindSlope")
 end
 
+local updateTimer = 0
 function widget:Update(dt)
-	UpdateTooltip(dt)
+	updateTimer = updateTimer + dt
+	UpdateTooltip(dt, updateTimer <= 0.1)
+	
+	if updateTimer > 0.1 then
+		selectionWindow.Update()
+		updateTimer = 0
+	end
 end
 
 function widget:SelectionChanged(newSelection)
