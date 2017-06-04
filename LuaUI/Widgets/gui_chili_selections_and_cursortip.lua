@@ -32,10 +32,12 @@ local screen0
 local screenWidth, screenHeight = Spring.GetWindowGeometry()
 
 local tooltipWindow
+local selectionWindow
 
 local ICON_SIZE = 20
 local BAR_SIZE = 22
 local BAR_FONT = 13
+local BAR_SPACING = 24
 local IMAGE_FONT = 10
 local DESC_FONT = 10
 local TOOLTIP_FONT = 12
@@ -54,6 +56,8 @@ local white = '\255\255\255\255'
 local yellow = '\255\255\255\1'
 
 local HEALTH_IMAGE = 'LuaUI/images/commands/bold/health.png'
+local SHIELD_IMAGE = 'LuaUI/Images/commands/Bold/guard.png'
+local BUILD_IMAGE = 'LuaUI/Images/commands/Bold/buildsmall.png'
 local COST_IMAGE = 'LuaUI/images/cost.png'
 local TIME_IMAGE = 'LuaUI/images/clock.png'
 local METAL_IMAGE = 'LuaUI/images/ibeam.png'
@@ -149,8 +153,8 @@ options_order = {
 	'showDrawTools',
 	
 	--selected units
-	--'selection_opacity', 'groupalways', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin',
-	--'fancySkinning', 'leftPadding',
+	'selection_opacity', 'groupbehaviour', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar',
+	'fancySkinning', 'leftPadding',
 }
 
 options = {
@@ -213,98 +217,87 @@ options = {
 	},
 
 	--selection_opacity = {
-	--	name = "Opacity",
-	--	type = "number",
-	--	value = 0.8, min = 0, max = 1, step = 0.01,
-	--	OnChange = function(self)
-	--		window_corner.backgroundColor = {1,1,1,self.value}
-	--		window_corner:Invalidate()
-	--	end,
-	--	path = selPath,
-	--},
-	--groupalways = {name='Always Group Units', type='bool', value=false, OnChange = option_Deselect,
-	--	path = selPath,
-	--},
-	--showgroupinfo = {name='Show Group Info', type='bool', value=true, OnChange = option_Deselect,
-	--	path = selPath,
-	--},
-	--squarepics = {name='Square Buildpics', type='bool', value=false, OnChange = option_Deselect,
-	--	path = selPath,
-	--},
-	--unitCommand = {
-	--	name="Show Unit's Command",
-	--	type='bool',
-	--	value= false,
-	--	noHotkey = true,
-	--	desc = "Display current command on unit's icon (only for ungrouped unit selection)",
-	--	path = selPath,
-	--},
-	--uniticon_size = {
-	--	name = 'Icon size on selection list',
-	--	--desc = 'Determines how small the icon in selection list need to be.',
-	--	type = 'number',
-	--	OnChange = function(self) 
-	--		option_Deselect()
-	--		unitIcon_size = math.modf(self.value)
-	--	end,
-	--	min=30,max=50,step=1,
-	--	value = 50,
-	--	path = selPath,
-	--},
-	--manualWeaponReloadBar = {
-	--	name="Show Unit's Special Weapon Status",
-	--	type='bool',
-	--	value= true,
-	--	noHotkey = true,
-	--	desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
-	--	path = selPath,
-	--	OnChange = option_Deselect,
-	--},
-	--fancySkinning = {
-	--	name = 'Fancy Skinning',
-	--	type = 'radioButton',
-	--	value = 'panel',
-	--	path = selPath,
-	--	items = {
-	--		{key = 'panel', name = 'None'},
-	--		{key = 'panel_1120', name = 'Bottom Left Flush',},
-	--		{key = 'panel_0120', name = 'Bot Mid Left Flush',},
-	--		{key = 'panel_2120', name = 'Bot Mid Both Flush',},
-	--	},
-	--	OnChange = function (self)
-	--		local currentSkin = Chili.theme.skin.general.skinName
-	--		local skin = Chili.SkinHandler.GetSkin(currentSkin)
-	--		
-	--		local className = self.value
-	--		local newClass = skin.panel
-	--		if skin[className] then
-	--			newClass = skin[className]
-	--		end
-	--		
-	--		window_corner.tiles = newClass.tiles
-	--		window_corner.TileImageFG = newClass.TileImageFG
-	--		--window_corner.backgroundColor = newClass.backgroundColor
-	--		window_corner.TileImageBK = newClass.TileImageBK
-	--		if newClass.padding then
-	--			window_corner.padding = newClass.padding
-	--			window_corner:UpdateClientArea()
-	--		end
-	--		window_corner:Invalidate()
-	--	end,
-	--	hidden = true,
-	--	noHotkey = true,
-	--},
-	--leftPadding = {
-	--	name = "Left Padding",
-	--	type = "number",
-	--	value = 0, min = 0, max = 500, step = 1,
-	--	OnChange = function(self)
-	--		window_corner.padding[1] = 8 + self.value
-	--		window_corner:UpdateClientArea()
-	--	end,
-	--	hidden = true,
-	--	path = selPath,
-	--},
+	selection_opacity = {
+		name = "Opacity",
+		type = "number",
+		value = 0.8, min = 0, max = 1, step = 0.01,
+		OnChange = function(self)
+			selectionWindow.SetOpacity(self.value)
+		end,
+		path = selPath,
+	},
+	groupbehaviour = {name='Unit Grouping Behaviour', type='radioButton', 
+		value='overflow', 
+		items = {
+			{key = 'overflow',	name = 'On window overflow'},
+			{key = 'multitype',	name = 'With multiple unit types'},
+			{key = 'always',		name = 'Always'},
+		},
+		OnChange = option_Deselect,
+		path = selPath,
+	},
+	showgroupinfo = {name='Show Group Info', type='bool', value=true, OnChange = option_Deselect,
+		path = selPath,
+	},
+	squarepics = {name='Square Buildpics', type='bool', value=false, OnChange = option_Deselect,
+		path = selPath,
+	},
+	unitCommand = {
+		name="Show Unit's Command",
+		type='bool',
+		value= false,
+		noHotkey = true,
+		desc = "Display current command on unit's icon (only for ungrouped unit selection)",
+		path = selPath,
+	},
+	uniticon_size = {
+		name = 'Icon size on selection list',
+		--desc = 'Determines how small the icon in selection list need to be.',
+		type = 'number',
+		OnChange = function(self) 
+			option_Deselect()
+			unitIcon_size = math.modf(self.value)
+		end,
+		min=30,max=50,step=1,
+		value = 50,
+		path = selPath,
+	},
+	manualWeaponReloadBar = {
+		name="Show Unit's Special Weapon Status",
+		type='bool',
+		value= true,
+		noHotkey = true,
+		desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
+		path = selPath,
+		OnChange = option_Deselect,
+	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'radioButton',
+		value = 'panel',
+		path = selPath,
+		items = {
+			{key = 'panel', name = 'None'},
+			{key = 'panel_1120', name = 'Bottom Left Flush',},
+			{key = 'panel_0120', name = 'Bot Mid Left Flush',},
+			{key = 'panel_2120', name = 'Bot Mid Both Flush',},
+		},
+		OnChange = function (self)
+			selectionWindow.SetSkin(self.value)
+		end,
+		hidden = true,
+		noHotkey = true,
+	},
+	leftPadding = {
+		name = "Left Padding",
+		type = "number",
+		value = 0, min = 0, max = 500, step = 1,
+		OnChange = function(self)
+			selectionWindow.SetLeftPadding(self.value)
+		end,
+		hidden = true,
+		path = selPath,
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -361,6 +354,25 @@ local function GetHealthColor(fraction, returnString)
 		return string.char(255, math.floor(255*r), math.floor(255*g), 0)
 	end
 	return {r, g, 0, 1}
+end
+
+local function SetPanelSkin(targetPanel, className)
+	local currentSkin = Chili.theme.skin.general.skinName
+	local skin = Chili.SkinHandler.GetSkin(currentSkin)
+	local newClass = skin.panel
+	if skin[className] then
+		newClass = skin[className]
+	end
+	
+	targetPanel.tiles = newClass.tiles
+	targetPanel.TileImageFG = newClass.TileImageFG
+	--targetPanel.backgroundColor = newClass.backgroundColor
+	targetPanel.TileImageBK = newClass.TileImageBK
+	if newClass.padding then
+		targetPanel.padding = newClass.padding
+		targetPanel:UpdateClientArea()
+	end
+	targetPanel:Invalidate()
 end
 
 local iconTypeCache = {}
@@ -723,7 +735,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local metalInfo
 	local energyInfo
 	
-	local spaceClickLabel, shieldBar, buildBar, morphInfo, playerNameLabel, maxHealthLabel, morphInfo
+	local spaceClickLabel, shieldBarUpdate, buildBarUpdate, morphInfo, playerNameLabel, maxHealthLabel, morphInfo
 	if isTooltipVersion then
 		playerNameLabel = Chili.Label:New{
 			name = "playerNameLabel",
@@ -746,16 +758,16 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		maxHealthLabel = GetImageWithText(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, nil, NAME_FONT, ICON_SIZE, 3)
 		morphInfo = GetMorphInfo(rightPanel, PIC_HEIGHT + LEFT_SPACE + 3)
 	else
-		--shieldBar
-		--buildBar
+		shieldBarUpdate = GetBar(rightPanel, PIC_HEIGHT + 4, SHIELD_IMAGE, {0.3,0,0.9,1})
+		buildBarUpdate = GetBar(rightPanel, PIC_HEIGHT + 58, BUILD_IMAGE, {0.8,0.8,0.2,1})
 	end
 
 	local externalFunctions = {}
-	local ud
 	
 	function externalFunctions.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost)
 		local teamID
 		local addedName
+		local ud
 		local metalInfoShown = false
 		local maxHealthShown = false
 		local morphShown = false
@@ -786,14 +798,18 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			
 			healthBarUpdate(false)
 			if unitDefID then
-				playerNameLabel:SetPos(nil, PIC_HEIGHT + 10)
-				spaceClickLabel:SetPos(nil, PIC_HEIGHT + 34)
+				if playerNameLabel then
+					playerNameLabel:SetPos(nil, PIC_HEIGHT + 10)
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 34)
+				end
 			else
 				leftOffset = 1
 				costInfoUpdate(false)
 				unitNameUpdate(true, fd.tooltip, nil)
-				playerNameLabel:SetPos(nil, PIC_HEIGHT - 10)
-				spaceClickLabel:SetPos(nil, PIC_HEIGHT + 14)
+				if playerNameLabel then
+					playerNameLabel:SetPos(nil, PIC_HEIGHT - 10)
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 14)
+				end
 			end
 			
 			local metal, _, energy, _, _ = Spring.GetFeatureResources(featureID)
@@ -821,8 +837,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitNameUpdate(true, unitName, GetUnitIcon(unitDefID))
 			
 			if unitID then
-				playerNameLabel:SetPos(nil, PIC_HEIGHT + 31)
-				spaceClickLabel:SetPos(nil, PIC_HEIGHT + 55)
+				if playerNameLabel then
+					playerNameLabel:SetPos(nil, PIC_HEIGHT + 31)
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 55)
+				end
 			elseif not featureDefID then
 				healthBarUpdate(false)
 				maxHealthLabel(true, ud.health, HEALTH_IMAGE)
@@ -830,8 +848,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				if morphTime then
 					morphInfo(true, morphTime, morphCost)
 					morphShown = true
-					spaceClickLabel:SetPos(nil, PIC_HEIGHT + LEFT_SPACE + 31)
-				else
+					if spaceClickLabel then
+						spaceClickLabel:SetPos(nil, PIC_HEIGHT + LEFT_SPACE + 31)
+					end
+				elseif spaceClickLabel then
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 30)
 				end
 			end
@@ -847,8 +867,36 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				metalInfoShown = true
 			end
 			
+			local healthPos
+			if shieldBarUpdate then
+				if ud and (ud.shieldPower > 0 or ud.level) then
+					local shieldPower = Spring.GetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower
+					local _, shieldCurrentPower = Spring.GetUnitShieldState(unitID, -1)
+					shieldBarUpdate(true, nil, shieldCurrentPower, shieldPower)
+					healthPos = PIC_HEIGHT + 4 + BAR_SPACING
+				else
+					shieldBarUpdate(false)
+					healthPos = PIC_HEIGHT + 4
+				end
+			end
+			
 			local health, maxHealth = spGetUnitHealth(unitID)
-			healthBarUpdate(true, nil, health, maxHealth, (health < maxHealth) and GetUnitRegenString(unitID, ud))
+			healthBarUpdate(true, healthPos, health, maxHealth, (health < maxHealth) and GetUnitRegenString(unitID, ud))
+			
+			if buildBarUpdate then
+				if ud and ud.buildSpeed > 0 then
+					local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(unitID)
+					
+					local buildSpeed = ud.buildSpeed
+					if ud.level then
+						buildSpeed = buildSpeed*(Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+					end
+					buildBarUpdate(true, (healthPos or (PIC_HEIGHT + 4)) + BAR_SPACING, metalUse or 0, buildSpeed)
+				else
+					buildBarUpdate(false)
+				end
+			end
+			
 		end
 		
 		if not metalInfoShown then
@@ -856,10 +904,12 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			energyInfoUpdate(false)
 		end
 		
-		if playerNameLabel and teamID then
-			playerNameLabel:SetCaption(GetPlayerCaption(teamID))
+		if playerNameLabel then
+			if teamID then
+				playerNameLabel:SetCaption(GetPlayerCaption(teamID))
+			end
+			playerNameLabel:SetVisibility((playerNameLabel and teamID and true) or false)
 		end
-		playerNameLabel:SetVisibility((playerNameLabel and teamID and true) or false)
 		
 		local visibleUnitDefID = (unitDefID and true) or false
 		unitImage:SetVisibility(visibleUnitDefID)
@@ -887,6 +937,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Tooltip window handler
 
 local function GetTooltipWindow()
 	local window = Chili.Window:New{
@@ -948,6 +999,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Tooltip updates
 
 local function GetUnitTooltip()
 	local externalFunctions
@@ -1100,11 +1152,108 @@ local function UpdateTooltip(dt)
 	end
 end
 
-function widget:SelectionChanged(newSelection)
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Selection window handler
+
+local function GetSelectionWindow()
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
+	local x = integralWidth
+	local height = integralHeight*0.84
+
+	local holderWindow = Chili.Window:New{
+		name      = 'selections2',
+		x         = x, 
+		bottom    = 0,
+		width     = 450,
+		height    = height,
+        minWidth  = 450, 
+		minHeight = 120,
+		dockable  = true,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
+		padding = {0, 0, 0, -1},
+		color = {0, 0, 0, 0},
+		parent = screen0,
+	}
+	holderWindow:SendToBack()
+	
+	local mainPanel = Chili.Panel:New{
+		classname = options.fancySkinning.value,
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		padding = {8 + options.leftPadding.value, 6, 4, 4},
+		backgroundColor = {1, 1, 1, options.selection_opacity.value},
+		OnMouseDown = {
+			function(self)
+				local _,_, meta,_ = spGetModKeyState()
+				if not meta then 
+					return false 
+				end
+				WG.crude.OpenPath('Settings/HUD Panels/Selected Units Window')
+				WG.crude.ShowMenu() 
+				return true --skip button function, else clicking on build pic will also select the unit.
+			end 
+		},
+		parent = holderWindow
+	}
+	mainPanel:Hide()
+	
+	local singleUnitDisplay = GetSingleUnitInfoPanel(mainPanel, false)
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.ShowSingleUnit(unitID)
+		singleUnitDisplay.SetDisplay(unitID, Spring.GetUnitDefID(unitID))
+		singleUnitDisplay.SetVisible(true)
+	end
+	
+	function externalFunctions.SetVisible(newVisible)
+		mainPanel:SetVisibility(newVisible)
+	end
+	
+	function externalFunctions.SetOpacity(opacity)
+		mainPanel.backgroundColor = {1,1,1,opacity}
+		mainPanel:Invalidate()
+	end
+	
+	function externalFunctions.SetSkin(className)
+		SetPanelSkin(mainPanel, className)
+	end
+	
+	function externalFunctions.SetLeftPadding(padding)
+		mainPanel.padding[1] = 8 + padding
+		mainPanel:UpdateClientArea()
+	end
+	
+	return externalFunctions
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Selection update
+
+local function UpdateSelection(newSelection)
 	-- Check if selection is 0, hide window. Return
 	-- Check if selection is 1, get unit tooltip
 	-- Check if selection is many, get unit list tooltip
 	-- Update group info.
+	if (not newSelection) or (#newSelection == 0) then
+		selectionWindow.SetVisible(false)
+		return
+	end
+	
+	selectionWindow.SetVisible(true)
+	if #newSelection == 1 then
+		selectionWindow.ShowSingleUnit(newSelection[1])
+		return
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -1113,6 +1262,10 @@ end
 
 function widget:Update(dt)
 	UpdateTooltip(dt)
+end
+
+function widget:SelectionChanged(newSelection)
+	UpdateSelection(newSelection)
 end
 
 function widget:ViewResize(vsx, vsy)
@@ -1134,5 +1287,6 @@ function widget:Initialize()
 		drawHotkeyBytes[drawHotkeyBytesCount] = v:byte(-1)
 	end
 	
+	selectionWindow = GetSelectionWindow()
 	tooltipWindow = GetTooltipWindow()
 end
