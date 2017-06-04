@@ -20,6 +20,9 @@ end
 -- TODO:
 --
 --	- Finalize the layout
+--		- Bring in the number formatter
+--		- Add the unit value icons
+--		- Adjust font sizes
 --	- Consistentize capitalization of parameters
 --	- Skin the panels, including background image
 --	- Put a nice frame around the unitpics, like the selections widget uses
@@ -64,6 +67,13 @@ local screen0
 
 local specPanel
 
+local col_metal = {136/255,214/255,251/255,1}
+local col_energy = {.93,.93,0,1}
+
+-- hardcoding these for now, will add colourblind options later
+local positiveColourStr = GreenStr
+local negativeColourStr = RedStr
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Options Functions
@@ -73,6 +83,44 @@ local specPanel
 -- Options
 
 options_path = 'Settings/HUD Panels/Spectator Panels'
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Utilities
+
+local function Format(input, override)
+
+	-- Leaving out the sign to save space
+	-- For this panel, the direction is always implied
+	-- and will still be colorcoded when needed
+	--
+	-- local leadingString = positiveColourStr .. "+"
+	local leadingString = positiveColourStr
+	if input < 0 then
+		-- leadingString = negativeColourStr .. "-"
+		leadingString = negativeColourStr
+	end
+	leadingString = override or leadingString
+	input = math.abs(input)
+	
+	if input < 0.05 then
+		if override then
+			return override .. "0.0"
+		end
+		return WhiteStr .. "0"
+	elseif input < 10 - 0.05 then
+		return leadingString .. ("%.1f"):format(input) .. WhiteStr
+	elseif input < 10^3 - 0.5 then
+		return leadingString .. ("%.0f"):format(input) .. WhiteStr
+	elseif input < 10^4 then
+		return leadingString .. ("%.1f"):format(input/1000) .. "k" .. WhiteStr
+	elseif input < 10^5 then
+		return leadingString .. ("%.0f"):format(input/1000) .. "k" .. WhiteStr
+	else
+		return leadingString .. ("%.0f"):format(input/1000) .. "k" .. WhiteStr
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -209,7 +257,6 @@ local function CreateSpecPanel()
 			color = {1,0,0,1},
 		}
 	end
-
 	
 	data.playerlabel = Chili.Label:New{
 		parent = data.window,
@@ -221,48 +268,25 @@ local function CreateSpecPanel()
 		valign = 'center',
 		caption = "West - 2 Players",
 	}
-
---[[
-	data.resourcepanel = Chili.Panel:New{
-		parent = data.window,
-		padding = {0,0,0,0},
-		y = topheight,
-		right = (windowWidth + balancepanelwidth)/2 + unitpanelwidth,
-		width = resourcepanelwidth,
-		height = rowheight * 2,
-	}
-	data.metalbar = Chili.Progressbar:New{
-		parent = data.resourcepanel,
-		x = '10%',
-		y = '10%',
-		height = '35%',
-		right = '10%',
-		value = 25,
-	}
-	data.energybar = Chili.Progressbar:New{
-		parent = data.resourcepanel,
-		x = '10%',
-		y = '55%',
-		height = '35%',
-		right = '10%',
-		value = 55,
-	}
---]]
 	
 	local resource_stats = {
 		{
 			total = 155,
 			bar = 25,
-			{ name = "Mex", value = 100 },
-			{ name = "Re", value = 15 },
-			{ name = "OD", value = 20 },
+			icon = 'LuaUI/Images/ibeam.png',
+			color = col_metal,
+			{ name = "Extraction", value = 100, label = "E", label_x = 65, },
+			{ name = "Reclaim", value = 15, label = "R", label_x = 110, },
+			{ name = "Overdrive", value = 20, label = "O", label_x = 150, },
 		},
 		{
-			total = 195,
+			total = 1955,
 			bar = 66,
-			{ name = "Gen", value = 123 },
-			{ name = "Re", value = 33 },
-			{ name = "OD", value = 43 },
+			icon = 'LuaUI/Images/energy.png',
+			color = col_energy,
+			{ name = "Generation", value = 1234, label = "G", label_x = 65, },
+			{ name = "Reclaim", value = 133, label = "R", label_x = 110, },
+			{ name = "Overdrive", value = 543, label = "O", label_x = 150, },
 		},
 	}
 	data.resource_stats = {}
@@ -300,23 +324,33 @@ local function CreateSpecPanel()
 			width = resourcestatpanelwidth,
 			height = '100%',
 		}
-		data.resource_stats[i].labels = {}
-		data.resource_stats[i].labels.total = Chili.Label:New{
+		data.resource_stats[i].total = Chili.Label:New{
 			parent = data.resource_stats[i].statpanel,
-			x = 0,
+			x = 18,
 			height = '100%',
 			width = 20,
 			valign = 'center',
-			caption = resource_stats[i].total,
+			fontsize = 20,
+			textColor = resource_stats[i].color,
+			caption = Format(resource_stats[i].total, ""),
 		}
+		data.resource_stats[i].icon = Chili.Image:New{
+			parent = data.resource_stats[i].statpanel,
+			x = 0,
+			height = 18,
+			width = 18,
+			file = resource_stats[i].icon,
+		}
+		data.resource_stats[i].labels = {}
 		for j,stat in ipairs(resource_stats[i]) do
 			data.resource_stats[i].labels[j] = Chili.Label:New{
 				parent = data.resource_stats[i].statpanel,
-				x = (25 * j) .. '%',
+				x = resource_stats[i][j].label_x,
 				height = '100%',
 				width = 20,
 				valign = 'center',
-				caption = resource_stats[i][j].name .. ": " .. resource_stats[i][j].value,
+				textColor = resource_stats[i].color,
+				caption = resource_stats[i][j].label .. ":" .. Format(resource_stats[i][j].value, ""),
 			}
 		end
 	end
@@ -329,10 +363,10 @@ local function CreateSpecPanel()
 		width = unitpanelwidth,
 	}
 	local unit_stats = {
-		total = 2500,
-		{ name = "O", value = 1500 },
-		{ name = "D", value = 500 },
-		{ name = "E", value = 250 },
+		total = 25379,
+		{ name = "Offense", value = 1500, icon = 'LuaUI/Images/commands/Bold/attack.png', icon_x = 0, },
+		{ name = "Defense", value = 5000, icon = 'LuaUI/Images/commands/Bold/guard.png', icon_x = 50, },
+		{ name = "Economy", value = 12550, icon = 'LuaUI/Images/energy.png', icon_x = 100, },
 	}
 	data.unit_stats = {}
 	data.unit_stats.total = Chili.Label:New{
@@ -342,17 +376,31 @@ local function CreateSpecPanel()
 		width = '100%',
 		align = 'center',
 		valign = 'center',
-		caption = "Unit Value: " .. unit_stats.total,
+		fontsize = 16,
+		textColor = { 0.85, 0.85, 0.85, 1.0 },
+		caption = "Unit Value: " .. Format(unit_stats.total, ""),
 	}
 	for i,stat in ipairs(unit_stats) do
-		data.unit_stats[i] = Chili.Label:New{
+		data.unit_stats[i] = {}
+		data.unit_stats[i].icon = Chili.Image:New{
 			parent = data.unitpanel,
-			x = (33 * (i-1)) .. '%',
+--			x = unitpanelwidth * .33 * (i-1),
+			x = unit_stats[i].icon_x,
+			y = '60%',
+			height = 18,
+			width = 18,
+			file = unit_stats[i].icon,
+		}
+		data.unit_stats[i].label = Chili.Label:New{
+			parent = data.unitpanel,
+--			x = unitpanelwidth * .33 * (i-1) + 18,
+			x = unit_stats[i].icon_x + 18,
 			y = '50%',
 			height = '50%',
 			width = 20,
 			valign = 'center',
-			caption = unit_stats[i].name .. ": " .. unit_stats[i].value,
+			textColor = { 0.7, 0.7, 0.7, 1.0 },
+			caption = Format(unit_stats[i].value, ""),
 		}
 	end
 	
