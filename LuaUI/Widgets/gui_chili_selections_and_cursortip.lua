@@ -21,6 +21,7 @@ local spTraceScreenRay = Spring.TraceScreenRay
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitHealth = Spring.GetUnitHealth
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetGameRulesParam = Spring.GetGameRulesParam
 
 local strFormat = string.format
 --------------------------------------------------------------------------------
@@ -126,6 +127,27 @@ local DRAWING_TOOLTIP =
 	green.. 'Right click'..white..': Erase. \n' ..
 	green.. 'Middle click'..white..': Place marker. \n' ..
 	green.. 'Double click'..white..': Place marker with label.'
+
+-- TODO, autogenerate
+local energyStructureDefs = {
+	[UnitDefNames["energywind"].id] = {cost = 35, income = 1.25, isWind = true},
+	[UnitDefNames["energysolar"].id] = {cost = 70, income = 2},
+	[UnitDefNames["energygeo"].id] = {cost = 500, income = 25},
+	[UnitDefNames["energyheavygeo"].id] = {cost = 1000, income = 75},
+	[UnitDefNames["energyfusion"].id] = {cost = 1000, income = 35},
+	[UnitDefNames["energysingu"].id] = {cost = 4000, income = 225},
+}
+
+local WIND_TITAL_HEIGHT = -10
+local windMin = 0
+local windMax = 2.5
+local windGroundMin = 0
+local windGroundExtreme = 1
+local windGroundSlope = 1
+local windTidalThreashold = -10
+
+local mexDefID = UnitDefNames["staticmex"] and UnitDefNames["staticmex"].id
+local mexCost = UnitDefNames["staticmex"] and UnitDefNames["staticmex"].cost or 4
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -340,6 +362,14 @@ local function FormatPlusMinus(num)
 	return Format(num)
 end
 
+local function SecondsToMinutesSeconds(seconds)
+	if seconds%60 < 10 then
+		return math.floor(seconds/60) ..":0" .. math.floor(seconds%60)
+	else
+		return math.floor(seconds/60) ..":" .. math.floor(seconds%60)
+	end
+end
+
 local function GetHealthColor(fraction, returnString)
 	local midpt = (fraction > 0.5)
 	local r, g
@@ -441,6 +471,101 @@ local function GetUnitRegenString(unitID, ud)
 				end
 			end
 		end
+	end
+end
+
+local function GetUnitShieldRegenString(unitID, ud)
+	-- TODO: Surely actual rate should be used, taking into account energy stalling and stun state.
+	local wd = WeaponDefs[ud.shieldWeaponDef]
+	return " (+" .. (wd.customParams.shield_rate or wd.shieldPowerRegen) .. ")"
+end
+
+local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
+	if mousePlaceX and mexDefID == unitDefID and WG.mouseoverMexIncome then
+		local extraText = ", ".. WG.Translate("interface", "income") .. " +" .. string.format("%.2f", WG.mouseoverMexIncome)
+		if WG.mouseoverMexIncome > 0 then
+			return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. SecondsToMinutesSeconds(mexCost/WG.mouseoverMexIncome)
+		else
+			return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. WG.Translate("interface", "never")
+		end
+	end
+	
+	local energyDef = energyStructureDefs[unitDefID]
+	if energyDef then
+		local income = energyDef.income
+		local cost = energyDef.cost
+		local extraText = ""
+		local healthOverride = false
+		if energyDef.isWind and mousePlaceX and mousePlaceY then
+			local _, pos = spTraceScreenRay(mousePlaceX, mousePlaceY, true)
+			if pos and pos[1] and pos[3] then
+				local x,z = math.floor(pos[1]/16)*16,  math.floor(pos[3]/16)*16
+				local y = Spring.GetGroundHeight(x,z)
+
+				if y then
+					if y <= WIND_TITAL_HEIGHT then
+						extraText = ", " .. WG.Translate("interface", "tidal_income") .. " +1.2"
+						income = 1.2
+						healthOverride = 400
+					else
+						local minWindIncome = windMin + (windMax - windMin)*windGroundSlope*(y - windGroundMin)/windGroundExtreme
+						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax)
+						income = (minWindIncome+2.5)/2
+					end
+				end
+			end
+		end
+		
+		local teamID = Spring.GetLocalTeamID()
+		local metalOD = Spring.GetTeamRulesParam(teamID, "OD_team_metalOverdrive") or 0
+		local energyOD = Spring.GetTeamRulesParam(teamID, "OD_team_energyOverdrive") or 0
+		
+		if metalOD and metalOD > 0 and energyOD and energyOD > 0 then 
+			-- Best case payback assumes that extra energy will make
+			-- metal at the current energy:metal ratio. Note that if
+			-- grids are linked better then better payback may be
+			-- achieved.
+			--local bestCasePayback = cost/(income*metalOD/energyOD)
+			
+			-- Uniform case payback assumes that all mexes are being
+			-- overdriven equally and figures out their multiplier
+			-- from the base mex income. It then figures out how many
+			-- mexes there are and adds a portion of the new enginer to
+			-- them.
+			--local totalMexIncome = WG.mexIncome
+			--if not totalMexIncome then
+			--	local singleMexMult = math.sqrt(energyOD)/4
+			--	totalMexIncome = metalOD/singleMexMult
+			--end
+			--local overdriveMult = metalOD/totalMexIncome
+			--local energyPerMex = 16*overdriveMult^2
+			--local mexCount = energyOD/energyPerMex
+			--local incomePerMex = income/mexCount
+			--local overdrivePerMex = metalOD/mexCount
+			--local extraMetalPerMex = totalMexIncome/mexCount*math.sqrt(energyPerMex+incomePerMex)/4 - overdrivePerMex
+			--local extraMetal = extraMetalPerMex*mexCount
+			--local unitformCasePayback = cost/extraMetal
+			
+			-- Worst case payback assumes that all your OD metal is from
+			-- a single mex and you are going to link your new energy to it.
+			-- It seems to be equal to Uniform case payback and quite accurate.
+			local singleMexMult = math.sqrt(energyOD)/4
+			local mexIncome = metalOD/singleMexMult
+			local worstCasePayback = cost/(mexIncome*math.sqrt(energyOD+income)/4 - metalOD)
+			
+			--extraText = extraText 
+			--.. "\n overdriveMult: " .. overdriveMult 
+			--.. "\n energyPerMex: " .. energyPerMex 
+			--.. "\n mexCount: " .. mexCount 
+			--.. "\n incomePerMex: " .. incomePerMex 
+			--.. "\n overdrivePerMex: " .. overdrivePerMex 
+			--.. "\n extraMetalPerMex: " .. extraMetalPerMex
+			--.. "\n extraMetal: " .. extraMetalza
+			--.. "\n unitformCasePayback: " .. unitformCasePayback 
+			--.. "\n worstCasePayback: " .. worstCasePayback 
+			return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " .. SecondsToMinutesSeconds(worstCasePayback), healthOverride
+		end
+		return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " ..  WG.Translate("interface", "unknown"), healthOverride
 	end
 end
 
@@ -764,7 +889,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 
 	local externalFunctions = {}
 	
-	function externalFunctions.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost)
+	function externalFunctions.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY)
 		local teamID
 		local addedName
 		local ud
@@ -827,7 +952,15 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			
 			costInfoUpdate(true, cyan .. Spring.Utilities.GetUnitCost(unitID, unitDefID), COST_IMAGE, PIC_HEIGHT + 4)
 			
-			unitDesc:SetText(Spring.Utilities.GetDescription(ud, unitID))
+			local extraTooltip, healthOverride
+			if not unitID then
+				extraTooltip, healthOverride = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
+			end
+			if extraTooltip then
+				unitDesc:SetText(Spring.Utilities.GetDescription(ud, unitID) .. extraTooltip)
+			else
+				unitDesc:SetText(Spring.Utilities.GetDescription(ud, unitID))
+			end
 			unitDesc:Invalidate()
 			
 			local unitName = Spring.Utilities.GetHumanName(ud, unitID)
@@ -843,7 +976,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				end
 			elseif not featureDefID then
 				healthBarUpdate(false)
-				maxHealthLabel(true, ud.health, HEALTH_IMAGE)
+				maxHealthLabel(true, healthOverride or ud.health, HEALTH_IMAGE)
 				maxHealthShown = true
 				if morphTime then
 					morphInfo(true, morphTime, morphCost)
@@ -872,7 +1005,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				if ud and (ud.shieldPower > 0 or ud.level) then
 					local shieldPower = Spring.GetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower
 					local _, shieldCurrentPower = Spring.GetUnitShieldState(unitID, -1)
-					shieldBarUpdate(true, nil, shieldCurrentPower, shieldPower)
+					shieldBarUpdate(true, nil, shieldCurrentPower, shieldPower, (shieldCurrentPower < shieldPower) and GetUnitShieldRegenString(unitID, ud))
 					healthPos = PIC_HEIGHT + 4 + BAR_SPACING
 				else
 					shieldBarUpdate(false)
@@ -988,8 +1121,8 @@ local function GetTooltipWindow()
 		unitDisplay.SetVisible(false)
 	end
 	
-	function externalFunctions.SetUnitishTooltip(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost)
-		unitDisplay.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost)
+	function externalFunctions.SetUnitishTooltip(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY)
+		unitDisplay.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY)
 		textTooltip:SetVisibility(false)
 		unitDisplay.SetVisible(true)
 	end
@@ -1057,6 +1190,13 @@ local function UpdateTooltipContent(mx, my, dt)
 			tooltipWindow.SetUnitishTooltip(nil, ud.id)
 			return true
 		end
+	elseif chiliTooltip and string.find(chiliTooltip, "Build") then
+		local name = string.sub(chiliTooltip, 6)
+		local ud = name and UnitDefNames[name]
+		if ud then
+			tooltipWindow.SetUnitishTooltip(nil, ud.id)
+			return true
+		end
 	end
 	
 	-- Mouseover morph tooltip (screen0.currentTooltip)
@@ -1092,7 +1232,7 @@ local function UpdateTooltipContent(mx, my, dt)
 	
 	-- Placing structure tooltip (spring.GetActiveCommand)
 	if cmdID and cmdID < 0 then
-		tooltipWindow.SetUnitishTooltip(nil, -cmdID)
+		tooltipWindow.SetUnitishTooltip(nil, -cmdID, nil, nil, nil, nil, mx, my)
 		return true
 	end
 	
@@ -1260,6 +1400,14 @@ end
 --------------------------------------------------------------------------------
 -- Widget Interface
 
+local function InitializeWindParameters()
+	windMin = spGetGameRulesParam("WindMin")
+	windMax = spGetGameRulesParam("WindMax")
+	windGroundMin = spGetGameRulesParam("WindGroundMin")
+	windGroundExtreme = spGetGameRulesParam("WindGroundExtreme")
+	windGroundSlope = spGetGameRulesParam("WindSlope")
+end
+
 function widget:Update(dt)
 	UpdateTooltip(dt)
 end
@@ -1289,4 +1437,5 @@ function widget:Initialize()
 	
 	selectionWindow = GetSelectionWindow()
 	tooltipWindow = GetTooltipWindow()
+	InitializeWindParameters()
 end
