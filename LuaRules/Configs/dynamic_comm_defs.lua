@@ -534,7 +534,7 @@ local moduleDefs = {
 	{
 		name = "weaponmod_napalm_warhead",
 		humanName = "Napalm Warhead",
-		description = "Napalm Warhead - Riot Cannon, Rocket Launcher and Plasma Artillery set targets on fire. Reduced direct damage.",
+		description = "Napalm Warhead - Riot Cannon and Rocket Launcher set targets on fire. Reduced direct damage.",
 		image = moduleImagePath .. "weaponmod_napalm_warhead.png",
 		limit = 1,
 		cost = 350 * COST_MULT,
