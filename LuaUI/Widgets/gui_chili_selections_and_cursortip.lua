@@ -29,6 +29,8 @@ local strFormat = string.format
 local Chili
 local screen0
 
+local screenWidth, screenHeight = Spring.GetWindowGeometry()
+
 local tooltipWindow
 
 local ICON_SIZE = 20
@@ -39,6 +41,7 @@ local DESC_FONT = 10
 local TOOLTIP_FONT = 12
 local NAME_FONT = 14
 local LEFT_SPACE = 24
+local LEFT_LABEL_HEIGHT = 16
 
 local LEFT_WIDTH = 55
 local PIC_HEIGHT = LEFT_WIDTH*4/5
@@ -126,6 +129,11 @@ local DRAWING_TOOLTIP =
 
 local drawHotkeyBytes = {}
 local drawHotkeyBytesCount = 0
+local oldMouseX, oldMouseY = 0, 0
+local stillCursorTime = 0
+
+local sameObjectID
+local sameObjectIDTime = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -137,7 +145,7 @@ local selPath = 'Settings/HUD Panels/Selected Units Panel'
 options_order = {
 	--tooltip
 	'tooltip_delay', 'independant_world_tooltip_delay',
-	'show_for_units', 'show_for_wreckage', 'show_for_unreclaimable', 'show_position', 'show_unit_text', 'showdrawtooltip','showterratooltip',
+	'show_for_units', 'show_for_wreckage', 'show_for_unreclaimable', 'showdrawtooltip','showterratooltip',
 	'showDrawTools',
 	
 	--selected units
@@ -153,7 +161,7 @@ options = {
 		min=0,max=4,step=0.05,
 		value = 0,
 	},
-	independant_world_tooltip_delay = {
+	independant_world_tooltip_delay = { -- Done
 		name = 'Unit and Feature tooltip delay (0 - 4s)',
 		--desc = 'Determines how long you can leave the mouse over a unit or feature until the tooltip is displayed.',
 		type = 'number',
@@ -181,22 +189,6 @@ options = {
 		value = false,
 		noHotkey = true,
 		desc = 'Show the tooltip for unreclaimable features.',
-	},
-	show_position = {
-		name = "Show Position Tooltip",
-		type = 'bool',
-		advanced = true,
-		value = true,
-		noHotkey = true,
-		desc = 'Show the position tooltip, even when showing extended tooltips.',
-	},
-	show_unit_text = {
-		name = "Show Unit Text Tooltips",
-		type = 'bool',
-		advanced = true,
-		value = true,
-		noHotkey = true,
-		desc = 'Show the text-only tooltips for units selected but not pointed at, even when showing extended tooltips.',
 	},
 	showdrawtooltip = {
 		name = "Show Map-drawing Tooltip",
@@ -414,7 +406,7 @@ end
 local function GetUnitRegenString(unitID, ud)
 	if unitID and (not select(3, spGetUnitIsStunned(unitID))) then
 		local regen_timer = Spring.GetUnitRulesParam(unitID, "idleRegenTimer")
-		if regen_timer then
+		if regen_timer and ud then
 			if ((ud.idleTime <= 300) and (regen_timer > 0)) then
 				return "  (" .. math.ceil(regen_timer / 30) .. "s)"
 			else
@@ -470,7 +462,7 @@ local function GetIsHoldingDrawKey()
 end
 
 local function UpdateMouseCursor(holdingDrawKey)
-	if not holdingDrawKey then
+	if not (holdingDrawKey and options.showDrawTools.value) then
 		return
 	end
 	local x, y, drawing, addingPoint, erasing = Spring.GetMouseState()
@@ -574,7 +566,7 @@ local function GetImageWithText(parentControl, initY, imageFile, caption, fontSi
 		x = iconSize + 2,
 		y = initY + (textOffset or 0),
 		right = 0,
-		height = BAR_SIZE,
+		height = LEFT_LABEL_HEIGHT,
 		caption = IMAGE_FONT,
 		fontSize = fontSize,
 		parent = parentControl,
@@ -746,7 +738,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			x = 4,
 			y = PIC_HEIGHT + 55,
 			right = 0,
-			height = DESC_FONT,
+			height = 18,
 			fontSize = DESC_FONT,
 			caption = green .. WG.Translate("interface", "space_click_show_stats"),
 			parent = rightPanel,
@@ -759,6 +751,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	end
 
 	local externalFunctions = {}
+	local ud
 	
 	function externalFunctions.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost)
 		local teamID
@@ -810,7 +803,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		
 		if unitDefID then
-			local ud = UnitDefs[unitDefID]
+			ud = UnitDefs[unitDefID]
 			
 			unitImage.file = "#" .. unitDefID
 			unitImage.file2 = GetUnitBorder(unitDefID)
@@ -905,8 +898,10 @@ local function GetTooltipWindow()
 		draggable = false,
 		autosize  = true,
 		minWidth = RIGHT_WIDTH,
+		padding = {8,8,8,5},
 		parent = screen0
 	}
+	window:Hide()
 	
 	local textTooltip = Chili.TextBox:New{
 		name = "textTooltip",
@@ -924,6 +919,16 @@ local function GetTooltipWindow()
 	local unitDisplay = GetSingleUnitInfoPanel(window, true)
 	
 	local externalFunctions = {}
+	
+	function externalFunctions.SetVisible(newVisible)
+		window:SetVisibility(newVisible)
+	end
+	
+	function externalFunctions.SetPosition(x, y)
+		y = screenHeight - y
+		window:SetPos(x, y)
+		window:BringToFront()
+	end
 	
 	function externalFunctions.SetTextTooltip(text)
 		textTooltip:SetText(text)
@@ -950,21 +955,55 @@ local function GetUnitTooltip()
 	return externalFunctions
 end
 
-local function UpdateTooltip()
+local function ShowUnitCheck(holdingSpace)
+	if holdingSpace or options.show_for_units.value then
+		return true
+	end
+end
+
+local function ShowFeatureCheck(holdingSpace, featureDefID)
+	if holdingSpace then
+		return true
+	end
+	if options.show_for_wreckage.value then
+		if options.show_for_unreclaimable.value then
+			local fd = FeatureDefs[thingDefID]
+			if not fd.reclaimable  then
+				return false
+			end
+		end
+		return true
+	end
+end
+
+local function UpdateTooltipContent(mx, my, dt)
 	local holdingDrawKey = GetIsHoldingDrawKey()
 	local holdingSpace = select(3, Spring.GetModKeyState())
 	UpdateMouseCursor(holdingDrawKey)
 	
-	local mx, my = spGetMouseState()
+	if not (holdingSpace or (options.tooltip_delay.value == 0)) then
+		local mouseMoved = (mx ~= oldMouseX or my ~= oldMouseY)
+		if not mouseMoved then
+			stillCursorTime = stillCursorTime + dt
+			if stillCursorTime < options.tooltip_delay.value then
+				return false
+			end
+		else
+			stillCursorTime = 0
+			oldMouseX = mx
+			oldMouseY = my
+			return false
+		end
+	end
 	
 	-- Mouseover build option tooltip (screen0.currentTooltip)
 	local chiliTooltip = screen0.currentTooltip
-	if chiliTooltip and string.find(chiliTooltip, "Build") then
-		local name = string.sub(chiliTooltip, 6)
+	if chiliTooltip and string.find(chiliTooltip, "BuildUnit") then
+		local name = string.sub(chiliTooltip, 10)
 		local ud = name and UnitDefNames[name]
 		if ud then
 			tooltipWindow.SetUnitishTooltip(nil, ud.id)
-			return
+			return true
 		end
 	end
 	
@@ -977,55 +1016,67 @@ local function UpdateTooltip()
 		if unitDefID and morphTime and morphCost then
 			tooltipWindow.SetUnitishTooltip(nil, unitDefID, nil, nil, morphTime, morphCost)
 		end
-		return
+		return true
 	end
 	
 	-- Generic chili text tooltip
 	if chiliTooltip then
 		tooltipWindow.SetTextTooltip(chiliTooltip)
-		return
+		return true
 	end
 	
 	-- Map drawing tooltip
-	if holdingDrawKey then
+	if holdingDrawKey and (holdingSpace or options.showdrawtooltip.value) then
 		tooltipWindow.SetTextTooltip(DRAWING_TOOLTIP)
-		return
+		return true
 	end
-	
 	
 	-- Terraform tooltip (spring.GetActiveCommand)
 	local index, cmdID, cmdType, cmdName = Spring.GetActiveCommand()
-	if cmdID and terraCmdTip[cmdID] then -- options.showterratooltip.value and
+	if cmdID and terraCmdTip[cmdID] and (holdingSpace or options.showterratooltip.value) then
 		tooltipWindow.SetTextTooltip(terraCmdTip[cmdID])
-		return
+		return true
 	end
 	
 	-- Placing structure tooltip (spring.GetActiveCommand)
 	if cmdID and cmdID < 0 then
 		tooltipWindow.SetUnitishTooltip(nil, -cmdID)
-		return
+		return true
 	end
 	
-	-- Unit tooltip (trace screen ray (surely))
+	-- Unit or feature tooltip 
 	local mx, my = spGetMouseState()
-	local thingType, thingParam = spTraceScreenRay(mx,my)
-	if thingType == "unit" then
-		local unitDefID = Spring.GetUnitDefID(thingParam)
-		tooltipWindow.SetUnitishTooltip(thingParam, unitDefID)
-		return
-	end
-	
-	-- Feature tooltip (trace screen ray (surely))
-	if thingType == "feature" then
-		local featureDefID = Spring.GetFeatureDefID(thingParam)
-		tooltipWindow.SetUnitishTooltip(nil, nil, thingParam, featureDefID)
-		return
+	local thingType, thingID = spTraceScreenRay(mx,my)
+	local thingIsUnit = (thingType == "unit")
+	if thingIsUnit or (thingType == "feature") then
+		local ignoreDelay = holdingSpace or (options.independant_world_tooltip_delay.value == 0)
+		if ignoreDelay or (thingID == sameObjectID) then
+			if ignoreDelay or (sameObjectIDTime > options.independant_world_tooltip_delay.value) then
+				local thingDefID = (thingIsUnit and Spring.GetUnitDefID(thingID)) or Spring.GetFeatureDefID(thingID)
+				if thingIsUnit then
+					if ShowUnitCheck(holdingSpace) then
+						tooltipWindow.SetUnitishTooltip(thingID, thingDefID)
+						return true
+					end
+				else
+					if ShowFeatureCheck(holdingSpace, thingDefID) then
+						tooltipWindow.SetUnitishTooltip(nil, nil, thingID, thingDefID)
+						return true
+					end
+				end
+			else
+				sameObjectIDTime = sameObjectIDTime + dt
+			end
+		else
+			sameObjectID = thingID
+			sameObjectIDTime = 0
+		end
 	end
 	
 	-- Ground position tooltip (spGetCurrentTooltip())
 	if holdingSpace then
 		tooltipWindow.SetTextTooltip(Spring.GetCurrentTooltip())
-		return
+		return true
 	end
 	
 	-- Start position tooltip (really bad widget interface)
@@ -1033,8 +1084,19 @@ local function UpdateTooltip()
 	
 	-- Geothermal tooltip (WG.mouseAboveGeo)
 	if WG.mouseAboveGeo then
-		WG.Translate("interface", "geospot")
-		return
+		tooltipWindow.SetTextTooltip(WG.Translate("interface", "geospot"))
+		return true
+	end
+	
+	return false
+end
+
+local function UpdateTooltip(dt)
+	local mx, my = spGetMouseState()
+	local visible = UpdateTooltipContent(mx, my, dt)
+	tooltipWindow.SetVisible(visible)
+	if visible then
+		tooltipWindow.SetPosition(mx + 20, my - 20)
 	end
 end
 
@@ -1050,7 +1112,12 @@ end
 -- Widget Interface
 
 function widget:Update(dt)
-	UpdateTooltip()
+	UpdateTooltip(dt)
+end
+
+function widget:ViewResize(vsx, vsy)
+	screenWidth = vsx
+	screenHeight = vsy
 end
 
 function widget:Initialize()
