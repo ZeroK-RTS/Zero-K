@@ -274,7 +274,8 @@ function SetupExitButton(right_val) -- forward-defined as local
 	end
 	exitButton = Button:New{
 		parent = window_endgame;
-		caption="Exit",
+		caption="Quit",
+		fontsize = 18,
 		y=7;
 		width=80;
 		right=right_val;
