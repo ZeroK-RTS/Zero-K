@@ -7,7 +7,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 8,
   buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[factoryjump_aoplane.dds]],  
+  buildingGroundDecalType       = [[generic_fac_decal.png]],  
 
   buildoptions     = {
     [[amphcon]],
