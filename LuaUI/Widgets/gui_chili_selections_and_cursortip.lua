@@ -49,6 +49,7 @@ local LEFT_LABEL_HEIGHT = 16
 local LEFT_WIDTH = 55
 local PIC_HEIGHT = LEFT_WIDTH*4/5
 local RIGHT_WIDTH = 235
+local GROUP_STATS_WIDTH = 180
 
 local green = '\255\1\255\1'
 local red = '\255\255\1\1'
@@ -813,6 +814,22 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Group window
+
+local function GetGroupUnitInfoPanel(parentControl)
+	
+	local holder = Chili.Panel:New{
+		x = 0,
+		y = 0,
+		right = GROUP_STATS_WIDTH,
+		bottom = 0,
+		padding = {0,0,0,0},
+		parent = parentControl,
+	}
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Unit tooltip window
 
 local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
@@ -1531,6 +1548,7 @@ function widget:Initialize()
 	Spring.AssignMouseCursor(CURSOR_POINT_NAME, CURSOR_POINT, true, true)
 	Spring.AssignMouseCursor(CURSOR_DRAW_NAME, CURSOR_DRAW, true, true)
 	
+	Spring.SendCommands({"tooltip 0"})
 	local hotkeys = WG.crude.GetHotkeys("drawinmap")
 	for k,v in pairs(hotkeys) do
 		drawHotkeyBytesCount = drawHotkeyBytesCount + 1
@@ -1540,4 +1558,8 @@ function widget:Initialize()
 	selectionWindow = GetSelectionWindow()
 	tooltipWindow = GetTooltipWindow()
 	InitializeWindParameters()
+end
+
+function widget:Shutdown()
+	Spring.SendCommands({"tooltip 1"})
 end
