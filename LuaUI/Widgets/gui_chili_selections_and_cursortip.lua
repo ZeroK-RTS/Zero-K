@@ -431,7 +431,7 @@ local function GetUnitBorder(unitDefID)
 	return unitBorderCache[unitDefID]
 end
 
-local function GetUnitResources(unitID)		
+local function GetUnitResources(unitID)
 	local mm, mu, em, eu = Spring.GetUnitResources(unitID)
 	
 	mm = (mm or 0) + (spGetUnitRulesParam(unitID, "current_metalIncome") or 0)
@@ -576,7 +576,10 @@ local function GetPlayerCaption(teamID)
 		local _, aiName, _, shortName = Spring.GetAIInfo(teamID)
 		playerName = aiName ..' ('.. shortName .. ')'
 	else
-		playerName = player and Spring.GetPlayerInfo(player) or 'noname'
+		playerName = player and Spring.GetPlayerInfo(player)
+		if not playerName then
+			return false
+		end
 	end
 	local teamColor = Chili.color2incolor(Spring.GetTeamColor(teamID))
 	return WG.Translate("interface", "player") .. ': ' .. teamColor .. playerName
@@ -887,7 +890,60 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		buildBarUpdate = GetBar(rightPanel, PIC_HEIGHT + 58, BUILD_IMAGE, {0.8,0.8,0.2,1})
 	end
 
+	local prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID, prevMorphTime, prevMorphCost, prevMousePlace
 	local externalFunctions = {}
+	
+	local function UpdateDynamicUnitAttributes(unitID, unitDefID, ud)
+		local mm, mu, em, eu = GetUnitResources(unitID)
+		local showMetalInfo = false
+		if mm then
+			metalInfoUpdate(true, FormatPlusMinus(mm - mu), METAL_IMAGE, PIC_HEIGHT + LEFT_SPACE + 4)
+			energyInfoUpdate(true, FormatPlusMinus(em - eu), ENERGY_IMAGE, PIC_HEIGHT + 2*LEFT_SPACE + 4)
+			showMetalInfo = true
+		end
+		
+		local healthPos
+		if shieldBarUpdate then
+			if ud and (ud.shieldPower > 0 or ud.level) then
+				local shieldPower = Spring.GetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower
+				local _, shieldCurrentPower = Spring.GetUnitShieldState(unitID, -1)
+				shieldBarUpdate(true, nil, shieldCurrentPower, shieldPower, (shieldCurrentPower < shieldPower) and GetUnitShieldRegenString(unitID, ud))
+				healthPos = PIC_HEIGHT + 4 + BAR_SPACING
+			else
+				shieldBarUpdate(false)
+				healthPos = PIC_HEIGHT + 4
+			end
+		end
+		
+		local health, maxHealth = spGetUnitHealth(unitID)
+		healthBarUpdate(true, healthPos, health, maxHealth, (health < maxHealth) and GetUnitRegenString(unitID, ud))
+		
+		if buildBarUpdate then
+			if ud and ud.buildSpeed > 0 then
+				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(unitID)
+				
+				local buildSpeed = ud.buildSpeed
+				if ud.level then
+					buildSpeed = buildSpeed*(Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+				end
+				buildBarUpdate(true, (healthPos or (PIC_HEIGHT + 4)) + BAR_SPACING, metalUse or 0, buildSpeed)
+			else
+				buildBarUpdate(false)
+			end
+		end
+		
+		return showMetalInfo
+	end
+	
+	local function UpdateDynamicFeatureAttributes(featureID, unitDefID)
+		local metal, _, energy, _, _ = Spring.GetFeatureResources(featureID)
+		local leftOffset = 1
+		if unitDefID then
+			leftOffset = PIC_HEIGHT + LEFT_SPACE
+		end
+		metalInfoUpdate(true, Format(metal), METAL_RECLAIM_IMAGE, leftOffset + 4)
+		energyInfoUpdate(true, Format(energy), ENERGY_RECLAIM_IMAGE, leftOffset + LEFT_SPACE + 4)
+	end
 	
 	function externalFunctions.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY)
 		local teamID
@@ -897,11 +953,22 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local maxHealthShown = false
 		local morphShown = false
 		
+		if prevUnitID == unitID and prevUnitDefID == unitDefID and prevFeatureID == featureID and prevFeatureDefID == featureDefID and 
+				prevMorphTime == morphTime and prevMorphCost == morphCost and prevMousePlace == ((mousePlaceX and true) or false) then
+			
+			if unitID and unitDefID then
+				UpdateDynamicUnitAttributes(unitID, unitDefID, UnitDefs[unitDefID])
+			end
+			if featureID then
+				UpdateDynamicFeatureAttributes(featureID, prevUnitDefID)
+			end
+			return
+		end
+		
 		if featureID then
 			teamID = Spring.GetFeatureTeam(featureID)
-			local fd = FeatureDefs[featureDefID]
 			
-			local leftOffset = PIC_HEIGHT + LEFT_SPACE
+			local fd = FeatureDefs[featureDefID]
 			
 			local featureName = fd and fd.name
 			local unitName
@@ -928,7 +995,6 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 34)
 				end
 			else
-				leftOffset = 1
 				costInfoUpdate(false)
 				unitNameUpdate(true, fd.tooltip, nil)
 				if playerNameLabel then
@@ -937,9 +1003,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				end
 			end
 			
-			local metal, _, energy, _, _ = Spring.GetFeatureResources(featureID)
-			metalInfoUpdate(true, Format(metal), METAL_RECLAIM_IMAGE, leftOffset + 4)
-			energyInfoUpdate(true, Format(energy), ENERGY_RECLAIM_IMAGE, leftOffset + LEFT_SPACE + 4)
+			UpdateDynamicFeatureAttributes(featureID, unitDefID)
 			metalInfoShown = true
 		end
 		
@@ -992,44 +1056,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		if unitID then
 			teamID = Spring.GetUnitTeam(unitID)
-			
-			local mm, mu, em, eu = GetUnitResources(unitID)
-			if mm then
-				metalInfoUpdate(true, FormatPlusMinus(mm - mu), METAL_IMAGE, PIC_HEIGHT + LEFT_SPACE + 4)
-				energyInfoUpdate(true, FormatPlusMinus(em - eu), ENERGY_IMAGE, PIC_HEIGHT + 2*LEFT_SPACE + 4)
+			if UpdateDynamicUnitAttributes(unitID, unitDefID, ud) then
 				metalInfoShown = true
 			end
-			
-			local healthPos
-			if shieldBarUpdate then
-				if ud and (ud.shieldPower > 0 or ud.level) then
-					local shieldPower = Spring.GetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower
-					local _, shieldCurrentPower = Spring.GetUnitShieldState(unitID, -1)
-					shieldBarUpdate(true, nil, shieldCurrentPower, shieldPower, (shieldCurrentPower < shieldPower) and GetUnitShieldRegenString(unitID, ud))
-					healthPos = PIC_HEIGHT + 4 + BAR_SPACING
-				else
-					shieldBarUpdate(false)
-					healthPos = PIC_HEIGHT + 4
-				end
-			end
-			
-			local health, maxHealth = spGetUnitHealth(unitID)
-			healthBarUpdate(true, healthPos, health, maxHealth, (health < maxHealth) and GetUnitRegenString(unitID, ud))
-			
-			if buildBarUpdate then
-				if ud and ud.buildSpeed > 0 then
-					local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(unitID)
-					
-					local buildSpeed = ud.buildSpeed
-					if ud.level then
-						buildSpeed = buildSpeed*(Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
-					end
-					buildBarUpdate(true, (healthPos or (PIC_HEIGHT + 4)) + BAR_SPACING, metalUse or 0, buildSpeed)
-				else
-					buildBarUpdate(false)
-				end
-			end
-			
 		end
 		
 		if not metalInfoShown then
@@ -1038,10 +1067,11 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		
 		if playerNameLabel then
-			if teamID then
-				playerNameLabel:SetCaption(GetPlayerCaption(teamID))
+			local playerName = teamID and GetPlayerCaption(teamID)
+			if playerName then
+				playerNameLabel:SetCaption()
 			end
-			playerNameLabel:SetVisibility((playerNameLabel and teamID and true) or false)
+			playerNameLabel:SetVisibility((playerName and true) or false)
 		end
 		
 		local visibleUnitDefID = (unitDefID and true) or false
@@ -1058,6 +1088,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		if morphInfo and not morphShown then
 			morphInfo(false)
 		end
+		
+		prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID = unitID, unitDefID, featureID, featureDefID
+		prevMorphTime, prevMorphCost, prevMousePlace = morphTime, morphCost, ((mousePlaceX and true) or false)
 	end
 	
 	function externalFunctions.SetVisible(newVisible)
