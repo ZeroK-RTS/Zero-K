@@ -37,6 +37,7 @@ setmetatable(DebugHandler.objectsOwnedByWidgets, {
 --// holds all created chili objects (uses a weaktable to do so)
 --// hint: because it is a weaktable you still need to use pairs() to iterate it!
 DebugHandler.allObjects = {}
+DebugHandler.widgetCreationLoad = {}
 setmetatable(DebugHandler.allObjects, {
   __mode="v",
 })
@@ -432,6 +433,11 @@ function DebugHandler:RegisterObject(obj)
     obj._widget = w
     local t = self.objectsOwnedByWidgets[w]
     t[#t+1] = obj
+    --local name = w:GetInfo().name
+    --if name ~= "Chili Pro Console" then
+    --  self.widgetCreationLoad[name] = (self.widgetCreationLoad[name] or 0) + 1
+    --  Spring.Echo("Obj created", name, obj.classname, self.widgetCreationLoad[name])
+    --end
   end
   local ta = self.allObjects
   ta[#ta+1] = obj
