@@ -19,6 +19,9 @@ end
 --
 -- TODO:
 --
+--	- Finalize the layout
+--	- Consistentize capitalization of parameters
+--	- Skin the panels, including background image
 --	- Put a nice frame around the unitpics, like the selections widget uses
 --	- Deal with padding in all the objects
 --	- Parameterize the colors
@@ -44,6 +47,7 @@ end
 --	- Make it tweakable and dockable? Nah, design decision.
 --		It's top center and you can't change that.
 --		Don't like it? Don't use it!
+--	- Consider making small / medium / large versions
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -81,26 +85,31 @@ options_path = 'Settings/HUD Panels/Spectator Panels'
 local function CreateSpecPanel()
 	local data = {}
 	
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
-	local screenHorizCentre = screenWidth / 2
-	local windowWidth = 1500
-
 	local topcenterwidth = 200
 	local balancepanelwidth = 100
 
 	local balancelabelheight = 20
 	local balancebarheight = 10
 	local balanceheight = balancelabelheight + balancebarheight
+	local balancepanelheight = balanceheight * 4 + 5
 
 	local rowheight = 30
-	local topheight = rowheight * 2
-	local picsize = rowheight * 1.5
+	local topheight = rowheight * 1.5
+	local picsize = rowheight * 1.8
 
 	local playerlabelwidth = 300
-	local unitpanelwidth = 250
-	local resourcepanelwidth = 150
-	local resourcestatpanelwidth = 250
+	local unitpanelwidth = 150
+	local resourcebarwidth = 100
+	local resourcestatpanelwidth = 200
+	local resourcepanelwidth = resourcestatpanelwidth + resourcebarwidth
+	local compics = 3
+	local unitpics = 5
 	
+	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenHorizCentre = screenWidth / 2
+	local windowWidth = (resourcepanelwidth + unitpanelwidth) * 2 + balancepanelwidth
+	local windowheight = topheight + balancepanelheight
+
 	data.window = Chili.Panel:New{
 		backgroundColor = {0.2, 0.2, 0.2, 0.2},
 		color = {0.7, 0.7, 0, 0},
@@ -109,7 +118,7 @@ local function CreateSpecPanel()
 		x = screenHorizCentre - windowWidth/2,
 		y = 0,
 		clientWidth  = windowWidth,
-		clientHeight = 500,
+		clientHeight = windowheight,
 		draggable = false,
 		resizable = false,
 		minimizable = false,
@@ -159,7 +168,7 @@ local function CreateSpecPanel()
 		x = (windowWidth - balancepanelwidth)/2,
 		y = topheight,
 		width = balancepanelwidth,
-		height = 250,
+		height = balancepanelheight,
 	}
 	local balancebars = {
 		{ name = "Income", value = 22 },
@@ -212,14 +221,13 @@ local function CreateSpecPanel()
 		valign = 'center',
 		caption = "West - 2 Players",
 	}
-	
+
+--[[
 	data.resourcepanel = Chili.Panel:New{
 		parent = data.window,
 		padding = {0,0,0,0},
 		y = topheight,
---		y = 0,
-		right = (windowWidth + balancepanelwidth)/2,
---		right = (windowWidth + topcenterwidth)/2,
+		right = (windowWidth + balancepanelwidth)/2 + unitpanelwidth,
 		width = resourcepanelwidth,
 		height = rowheight * 2,
 	}
@@ -239,16 +247,19 @@ local function CreateSpecPanel()
 		right = '10%',
 		value = 55,
 	}
+--]]
 	
 	local resource_stats = {
 		{
 			total = 155,
+			bar = 25,
 			{ name = "Mex", value = 100 },
 			{ name = "Re", value = 15 },
 			{ name = "OD", value = 20 },
 		},
 		{
 			total = 195,
+			bar = 66,
 			{ name = "Gen", value = 123 },
 			{ name = "Re", value = 33 },
 			{ name = "OD", value = 43 },
@@ -260,15 +271,38 @@ local function CreateSpecPanel()
 		data.resource_stats[i].panel = Chili.Panel:New{
 			parent = data.window,
 			y = topheight + rowheight * (i-1),
---			y = rowheight * (i-1),
-			right = (windowWidth + balancepanelwidth)/2 + resourcepanelwidth,
---			right = (windowWidth + topcenterwidth)/2 + resourcepanelwidth,
-			width = resourcestatpanelwidth,
+			right = (windowWidth + balancepanelwidth)/2 + unitpanelwidth,
+			width = resourcepanelwidth,
 			height = rowheight,
+		}
+		data.resource_stats[i].barpanel = Chili.Control:New{
+			parent = data.resource_stats[i].panel,
+			padding = {0,0,0,0},
+			y = 0,
+			right = 0,
+			width = resourcebarwidth,
+			height = '100%',
+		}
+		data.resource_stats[i].bar = Chili.Progressbar:New{
+			parent = data.resource_stats[i].barpanel,
+			padding = {0,0,0,0},
+			x = '5%',
+			y = '10%',
+			height = '80%',
+			right = '0%',
+			value = resource_stats[i].bar,
+		}
+		data.resource_stats[i].statpanel = Chili.Control:New{
+			parent = data.resource_stats[i].panel,
+			padding = {0,0,0,0},
+			x = 0,
+			y = 0,
+			width = resourcestatpanelwidth,
+			height = '100%',
 		}
 		data.resource_stats[i].labels = {}
 		data.resource_stats[i].labels.total = Chili.Label:New{
-			parent = data.resource_stats[i].panel,
+			parent = data.resource_stats[i].statpanel,
 			x = 0,
 			height = '100%',
 			width = 20,
@@ -277,7 +311,7 @@ local function CreateSpecPanel()
 		}
 		for j,stat in ipairs(resource_stats[i]) do
 			data.resource_stats[i].labels[j] = Chili.Label:New{
-				parent = data.resource_stats[i].panel,
+				parent = data.resource_stats[i].statpanel,
 				x = (25 * j) .. '%',
 				height = '100%',
 				width = 20,
@@ -287,8 +321,50 @@ local function CreateSpecPanel()
 		end
 	end
 	
+	data.unitpanel = Chili.Panel:New{
+		parent = data.window,
+		y = topheight,
+		right = (windowWidth + balancepanelwidth)/2,
+		height = rowheight * 2,
+		width = unitpanelwidth,
+	}
+	local unit_stats = {
+		total = 2500,
+		{ name = "O", value = 1500 },
+		{ name = "D", value = 500 },
+		{ name = "E", value = 250 },
+	}
+	data.unit_stats = {}
+	data.unit_stats.total = Chili.Label:New{
+		parent = data.unitpanel,
+		x = 0,
+		height = '50%',
+		width = '100%',
+		align = 'center',
+		valign = 'center',
+		caption = "Unit Value: " .. unit_stats.total,
+	}
+	for i,stat in ipairs(unit_stats) do
+		data.unit_stats[i] = Chili.Label:New{
+			parent = data.unitpanel,
+			x = (33 * (i-1)) .. '%',
+			y = '50%',
+			height = '50%',
+			width = 20,
+			valign = 'center',
+			caption = unit_stats[i].name .. ": " .. unit_stats[i].value,
+		}
+	end
+	
+	local unitpics_mock = {
+		{ name = "cloakcon", value = "2" },
+		{ name = "cloakraid", value = "18" },
+		{ name = "cloakriot", value = "3" },
+		{ name = "cloakskirm", value = "10" },
+		{ name = "cloakassault", value = "7" },
+	}
 	data.unitpics = {}
-	for i = 1,5 do
+	for i = 1,unitpics do
 		data.unitpics[i] = {}
 		data.unitpics[i].text = Chili.Label:New{
 			parent = data.window,
@@ -298,7 +374,7 @@ local function CreateSpecPanel()
 			width = picsize,
 			align = 'right',
 			valign = 'bottom',
-			caption = "2",
+			caption = unitpics_mock[i].value,
 		}
 		data.unitpics[i].unitpic = Chili.Image:New{
 			parent = data.window,
@@ -306,65 +382,35 @@ local function CreateSpecPanel()
 			right = (windowWidth + balancepanelwidth)/2 + picsize * (i-1),
 			height = picsize,
 			width = picsize,
-			file = 'unitpics/' .. 'cloakraid.png',
+			file = 'unitpics/' .. unitpics_mock[i].name .. '.png',
 		}
 	end
 	
+	local compics_mock = {
+		{ name = "commassault", value = "Lvl 6" },
+		{ name = "commstrike", value = "Lvl 4" },
+		{ name = "commrecon", value = "+2 more" },
+	}
 	data.compics = {}
-	for i = 1,3 do
+	for i = 1,compics do
 		data.compics[i] = {}
 		data.compics[i].text = Chili.Label:New{
 			parent = data.window,
-			y = rowheight * 1,
-			right = (windowWidth + topcenterwidth)/2 + playerlabelwidth + rowheight * 2 * (i-1),
+			y = topheight + rowheight * 2,
+			right = (windowWidth + balancepanelwidth)/2 + picsize * (i-1) + picsize * unitpics,
 			height = picsize,
 			width = picsize,
 			align = 'right',
 			valign = 'bottom',
-			caption = "2",
+			caption = compics_mock[i].value,
 		}
 		data.compics[i].unitpic = Chili.Image:New{
 			parent = data.window,
-			y = rowheight * 1,
-			right = (windowWidth + topcenterwidth)/2 + playerlabelwidth + rowheight * 2 * (i-1),
+			y = topheight + rowheight * 2,
+			right = (windowWidth + balancepanelwidth)/2 + picsize * (i-1) + picsize * unitpics,
 			height = picsize,
 			width = picsize,
-			file = 'unitpics/' .. 'cloakraid.png',
-		}
-	end
-
-	data.unitpanel = Chili.Panel:New{
-		parent = data.window,
---		y = topheight + rowheight * 2,
-		y = 0,
---		right = (windowWidth + balancepanelwidth)/2,
-		right = (windowWidth + topcenterwidth)/2 + playerlabelwidth,
-		height = rowheight,
-		width = unitpanelwidth,
-	}
-	local unit_stats = {
-		total = 2500,
-		{ name = "Off", value = 1500 },
-		{ name = "Def", value = 500 },
-		{ name = "Eco", value = 250 },
-	}
-	data.unit_stats = {}
-	data.unit_stats.total = Chili.Label:New{
-		parent = data.unitpanel,
-		x = 0,
-		height = '100%',
-		width = 20,
-		valign = 'center',
-		caption = unit_stats.total,
-	}
-	for i,stat in ipairs(unit_stats) do
-		data.unit_stats[i] = Chili.Label:New{
-			parent = data.unitpanel,
-			x = (25 * i) .. '%',
-			height = '100%',
-			width = 20,
-			valign = 'center',
-			caption = unit_stats[i].name .. ": " .. unit_stats[i].value,
+			file = 'unitpics/' .. compics_mock[i].name .. '.png',
 		}
 	end
 
