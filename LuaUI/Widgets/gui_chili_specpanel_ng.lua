@@ -19,14 +19,10 @@ end
 --
 -- TODO:
 --
---	- Finalize the layout
---		- Bring in the number formatter
---		- Add the unit value icons
---		- Adjust font sizes
---	- Consistentize capitalization of parameters
 --	- Skin the panels, including background image
 --	- Put a nice frame around the unitpics, like the selections widget uses
 --	- Deal with padding in all the objects
+--	- Consistentize capitalization of parameters
 --	- Parameterize the colors
 --		- Balance Bar colors, including writing a function to attenuate them
 --	- Mirror the player panels
@@ -122,6 +118,23 @@ local function Format(input, override)
 	end
 end
 
+local function GetTimeString()
+  local secs = math.floor(Spring.GetGameSeconds())
+  if (timeSecs ~= secs) then
+    timeSecs = secs
+    local h = math.floor(secs / 3600)
+    local m = math.floor((secs % 3600) / 60)
+    local s = math.floor(secs % 60)
+    if (h > 0) then
+      timeString = string.format('%02i:%02i:%02i', h, m, s)
+    else
+      timeString = string.format('%02i:%02i', m, s)
+    end
+  end
+  return timeString
+end
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Update Panel Data
@@ -134,7 +147,7 @@ local function CreateSpecPanel()
 	local data = {}
 	
 	local topcenterwidth = 200
-	local balancepanelwidth = 100
+	local balancepanelwidth = 80
 
 	local balancelabelheight = 20
 	local balancebarheight = 10
@@ -145,7 +158,6 @@ local function CreateSpecPanel()
 	local topheight = rowheight * 1.5
 	local picsize = rowheight * 1.8
 
-	local playerlabelwidth = 300
 	local unitpanelwidth = 150
 	local resourcebarwidth = 100
 	local resourcestatpanelwidth = 200
@@ -157,27 +169,30 @@ local function CreateSpecPanel()
 	local screenHorizCentre = screenWidth / 2
 	local windowWidth = (resourcepanelwidth + unitpanelwidth) * 2 + balancepanelwidth
 	local windowheight = topheight + balancepanelheight
+	local playerlabelwidth = (windowWidth - topcenterwidth) / 2
 
 	data.window = Chili.Panel:New{
-		backgroundColor = {0.2, 0.2, 0.2, 0.2},
-		color = {0.7, 0.7, 0, 0},
+		classname = "main_window_small_flat",
+--		backgroundColor = {0.2, 0.2, 0.2, 0.2},
+--		color = {0.7, 0.7, 0, 0},
 		name = "SpecPanel",
 		padding = {0,0,0,0},
 		x = screenHorizCentre - windowWidth/2,
 		y = 0,
 		clientWidth  = windowWidth,
 		clientHeight = windowheight,
-		draggable = false,
-		resizable = false,
-		minimizable = false,
 	}
 	
 	data.topcenterpanel = Chili.Panel:New{
 		parent = data.window,
-		padding = {0,0,0,0},
+		classname = "main_window_small_flat",
+		padding = {5,5,5,5},
 		x = (windowWidth - topcenterwidth)/2,
 		width = topcenterwidth,
 		height = topheight,
+		dockable = false;
+		draggable = false,
+		resizable = false,
 	}
 	data.clocklabel = Chili.Label:New{
 		parent = data.topcenterpanel,
@@ -186,14 +201,16 @@ local function CreateSpecPanel()
 		height = '100%',
 		align = 'center',
 		valign = 'center',
-		caption = "12:34",
+		fontsize = 24,
+		textColor = {0.95, 1.0, 1.0, 1},
+		caption = GetTimeString(),
 	}
 	data.winslabel_top = Chili.Label:New{
 		parent = data.topcenterpanel,
 		padding = {0,0,0,0},
-		x = 0,
-		width = 100,
-		height = '40%',
+		y = '5%',
+		width = 50,
+		height = '30%',
 		align = 'center',
 		valign = 'center',
 		caption = "Wins:",
@@ -202,16 +219,19 @@ local function CreateSpecPanel()
 		parent = data.topcenterpanel,
 		padding = {0,0,0,0},
 		x = 0,
-		y = '40%',
-		width = 100,
-		height = '60%',
+		y = '30%',
+		width = 50,
+		height = '70%',
 		align = 'center',
 		valign = 'center',
+		fontsize = 20,
+		textColor = Colors.blue,
 		caption = "2",
 	}
 
 	data.balancepanel = Chili.Panel:New{
 		parent = data.window,
+		classname = "main_window_small_flat",
 		padding = {0,0,0,0},
 		x = (windowWidth - balancepanelwidth)/2,
 		y = topheight,
@@ -266,6 +286,8 @@ local function CreateSpecPanel()
 		height = topheight,
 		align = 'center',
 		valign = 'center',
+		textColor = Colors.blue,
+		fontsize = 24,
 		caption = "West - 2 Players",
 	}
 	
@@ -298,6 +320,11 @@ local function CreateSpecPanel()
 			right = (windowWidth + balancepanelwidth)/2 + unitpanelwidth,
 			width = resourcepanelwidth,
 			height = rowheight,
+			skin = nil,
+			skinName = 'default',
+			backgroundColor = {0,0,0,0.4},
+			borderColor = {1,1,1,0.5},
+			borderThickness = 1,
 		}
 		data.resource_stats[i].barpanel = Chili.Control:New{
 			parent = data.resource_stats[i].panel,
@@ -361,6 +388,11 @@ local function CreateSpecPanel()
 		right = (windowWidth + balancepanelwidth)/2,
 		height = rowheight * 2,
 		width = unitpanelwidth,
+		skin = nil,
+		skinName = 'default',
+		backgroundColor = {0,0,0,0.4},
+		borderColor = {1,1,1,0.5},
+		borderThickness = 1,
 	}
 	local unit_stats = {
 		total = 25379,
@@ -384,7 +416,6 @@ local function CreateSpecPanel()
 		data.unit_stats[i] = {}
 		data.unit_stats[i].icon = Chili.Image:New{
 			parent = data.unitpanel,
---			x = unitpanelwidth * .33 * (i-1),
 			x = unit_stats[i].icon_x,
 			y = '60%',
 			height = 18,
@@ -393,7 +424,6 @@ local function CreateSpecPanel()
 		}
 		data.unit_stats[i].label = Chili.Label:New{
 			parent = data.unitpanel,
---			x = unitpanelwidth * .33 * (i-1) + 18,
 			x = unit_stats[i].icon_x + 18,
 			y = '50%',
 			height = '50%',
@@ -461,6 +491,16 @@ local function CreateSpecPanel()
 			file = 'unitpics/' .. compics_mock[i].name .. '.png',
 		}
 	end
+--[[
+	data.bg_image = Chili.Image:New{
+		padding = {5,5,5,5},
+		parent = data.window,
+		width  = windowWidth,
+		height = windowheight,
+		keepAspect = false,
+		file = 'LuaUI/Images/specpanel_ng/bg_mock1.png',
+	}
+--]]
 
 	return data
 end
