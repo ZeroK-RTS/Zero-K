@@ -27,6 +27,13 @@ unitDef = {
   canMove                       = true,
   canPatrol                     = true,
   category                      = [[SINK UNARMED]],
+  collisionVolumeOffsets        = [[0 16 -30]],
+  collisionVolumeScales         = [[150 32 70]],
+  collisionVolumeType           = [[Box]],
+  
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[150 4 110]],
+  selectionVolumeType           = [[Box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -51,7 +58,7 @@ unitDef = {
   minCloakDistance              = 150,
   moveState        				= 1,
   noAutoFire                    = false,
-  objectName                    = [[coravp2.s3o]],
+  objectName                    = [[factorytank.s3o]],
   script                        = [[factorytank.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
@@ -59,16 +66,19 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = "oooooooooo oooooooooo oooooooooo ooccccccoo ooccccccoo yoccccccoy yoccccccoy yyccccccyy",
+  yardMap                       = "oooooooooo oooooooooo oooooooooo ooccccccoo ooccccccoo cccccccccc cccccccccc cccccccccc",
 
   featureDefs                   = {
 
     DEAD = {
       blocking         = true,
+      collisionVolumeOffsets        = [[0 16 -30]],
+      collisionVolumeScales         = [[150 32 70]],
+      collisionVolumeType           = [[Box]],
       featureDead      = [[HEAP]],
-      footprintX       = 6,
-      footprintZ       = 6,
-      object           = [[CORAVP_DEAD.s3o]],
+      footprintX       = 10,
+      footprintZ       = 8,
+      object           = [[factorytank_dead.s3o]],
     },
 
 
