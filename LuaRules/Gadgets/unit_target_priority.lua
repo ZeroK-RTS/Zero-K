@@ -30,7 +30,7 @@ local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
 
-local targetTable, stunWeaponDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult = 
+local targetTable, disarmWeaponDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult = 
 	include("LuaRules/Configs/target_priority_defs.lua")
 
 -- Low return number = more worthwhile target
@@ -240,6 +240,15 @@ local function GetGravityWeaponPriorityModifier(unitID)
 		return false
 	end
 end
+
+local function GetDisarmWeaponPriorityModifier(unitID)
+	local stunned = GetUnitStunnedOrInBuild(unitID)
+	if stunned == 0 then
+		return GetNormalWeaponPriorityModifier(unitID)
+	end
+	return 10 + GetNormalWeaponPriorityModifier(unitID)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Priority callin
@@ -259,7 +268,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	end
 	
 	if GG.GetUnitTarget(unitID) == targetID then
-		if stunWeaponDefs[attackerWeaponDefID] then
+		if disarmWeaponDefs[attackerWeaponDefID] then
 			if (remStunAttackers[targetID] or 0) < STUN_ATTACKERS_IDLE_REQUIREMENT then
 				local stunned, buildProgress = GetUnitStunnedOrInBuild(targetID)
 				if stunned ~= 0 then
@@ -330,6 +339,8 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			return false
 		end
 		defPrio = defPrio + gravityPriority
+	elseif disarmWeaponDefs[attackerWeaponDefID] then
+		defPrio = defPrio + GetDisarmWeaponPriorityModifier(targetID)
 	else
 		defPrio = defPrio + GetNormalWeaponPriorityModifier(targetID)
 	end
