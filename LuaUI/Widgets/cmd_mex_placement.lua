@@ -96,12 +96,6 @@ local MAP_SIZE_X_SCALED = MAP_SIZE_X / METAL_MAP_SQUARE_SIZE
 local MAP_SIZE_Z = Game.mapSizeZ
 local MAP_SIZE_Z_SCALED = MAP_SIZE_Z / METAL_MAP_SQUARE_SIZE
 
-local allyMexColor = {[1] = {0, 1, 1, 0.7}, [2] = {0, 1, 1, 1}}
-local neutralMexColor = {[1] = {1.0, 1.0, 1.0, 0.7}, [2] = {1.0, 1.0, 1.0, 1}}
-local enemyMexColor = {[1] = {1, 0, 0, 0.7}, [2] = {1, 0, 0, 1}}
-
-local allyTeams = {}	-- [id] = {team1, team2, ...}
-
 ------------------------------------------------------------
 -- Config
 ------------------------------------------------------------
@@ -112,7 +106,7 @@ local TEXT_CORRECT_Y = 1.25
 local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 
 options_path = 'Settings/Interface/Map/Metal Spots'
-options_order = { 'drawicons', 'size', 'specPlayerColours', 'rounding'}
+options_order = { 'drawicons', 'size', 'rounding'}
 options = {
 	
 	drawicons = {
@@ -140,12 +134,6 @@ options = {
 		advanced = true,
 		OnChange = function() updateMexDrawList() end
 	},
-	specPlayerColours = {
-		name = "Use player colours when spectating",
-		type = "bool",
-		value = false,
-		OnChange = function() updateMexDrawList() end
-	}
 }
 
 -------------------------------------------------------------------------------------
@@ -418,32 +406,100 @@ function widget:CommandNotify(cmdID, params, options)
   
 end
 
-function widget:UnitCreated(unitID, unitDefID)
-	if mexBuilderDefs[unitDefID] then
-		mexBuilder[unitID] = true
+
+function widget:UnitEnteredLos(unitID, teamID)
+	if spGetSpectatingState() then
+		return
+	end
+
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if unitDefID ~= mexDefID or not WG.metalSpots then
+		return
+	end
+
+	local x,_,z = Spring.GetUnitPosition(unitID)
+	local spotID = WG.metalSpotsByPos[x] and WG.metalSpotsByPos[x][z]
+	if not spotID then
+		return
+	end
+
+	spotByID[unitID] = spotID
+	spotData[spotID] = {unitID = unitID, team = teamID, enemy = true}
+	updateMexDrawList()
+end
+
+local function DidMexDie(unitID, expectedSpotID) --> dead, idReusedForAnotherMex
+
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if unitDefID ~= mexDefID then -- not just a nil check, the unitID could have gotten recycled for another unit
+		return true, false
+	end
+
+	local spotID = spotByID[unitID]
+	if spotID ~= expectedSpotID then
+		return true, true -- the original died, unitID was recycled to another mex
+	end
+
+	return false
+end
+
+local function CheckEnemyMexes(spotID)
+	local spotD = spotData[spotID]
+	if not spotD or not spotD.enemy then
+		return
+	end
+
+	local spotM = WG.metalSpots[spotID]
+	local x = spotM.x
+	local z = spotM.z
+	local los = Spring.GetPositionLosState(x, 0, z)
+	if not los then
+		return
+	end
+
+	local unitID = spotD.unitID
+	local dead, idReusedForAnotherMex = DidMexDie(unitID, spotID)
+	if not dead then
+		return
+	end
+
+	if not idReusedForAnotherMex then
+		spotByID[unitID] = nil
+	end
+
+	spotData[spotID] = nil
+	updateMexDrawList()
+end
+
+function widget:GameFrame(n)
+	if not WG.metalSpots or (n % 30) ~= 0 then
+		return
+	end
+
+	for i = 1, #WG.metalSpots do
+		CheckEnemyMexes(i)
 	end
 end
 
-function widget:UnitFinished(unitID, unitDefID, teamID)
-	if unitDefID == mexDefID and WG.metalSpots then
-		if spGetSpectatingState() then
-			local x,_,z = Spring.GetUnitPosition(unitID)
-			local spotID = WG.metalSpotsByPos[x] and WG.metalSpotsByPos[x][z]
-			if spotID then
-				spotByID[unitID] = spotID
-				spotData[spotID] = {unitID = unitID, team = Spring.GetUnitTeam(unitID), allyTeam = spGetUnitAllyTeam(unitID)}
-				updateMexDrawList()
-			end
-		elseif spGetUnitAllyTeam(unitID) == myAllyTeam then
-			local x,_,z = Spring.GetUnitPosition(unitID)
-			local spotID = WG.metalSpotsByPos[x] and WG.metalSpotsByPos[x][z]
-			if spotID then
-				spotByID[unitID] = spotID
-				spotData[spotID] = {unitID = unitID}
-				updateMexDrawList()
-			end
-		end
+function widget:UnitCreated(unitID, unitDefID, teamID)
+	if mexBuilderDefs[unitDefID] then
+		mexBuilder[unitID] = true
+		return
 	end
+
+	if unitDefID ~= mexDefID or not WG.metalSpots then
+		return
+	end
+
+	local x,_,z = Spring.GetUnitPosition(unitID)
+	local spotID = WG.metalSpotsByPos[x] and WG.metalSpotsByPos[x][z]
+	if not spotID then
+		return
+	end
+
+	spotByID[unitID] = spotID
+	spotData[spotID] = {unitID = unitID, team = teamID}
+	updateMexDrawList()
 end
 
 function widget:UnitDestroyed(unitID, unitDefID)
@@ -478,13 +534,8 @@ local function Initialize()
 	local units = spGetAllUnits()
 	for i, unitID in ipairs(units) do 
 		local unitDefID = spGetUnitDefID(unitID)
-		widget:UnitCreated(unitID, unitDefID)
-		if unitDefID == mexDefID then
-			local done = select(5, spGetUnitHealth(unitID))
-			if done == 1 then
-				widget:UnitFinished(unitID, unitDefID,team)
-			end
-		end
+		local teamID = Spring.GetUnitTeam(unitID)
+		widget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	if WG.metalSpots then
 		Spring.Echo("Mex Placement Initialised with " .. #WG.metalSpots .. " spots.")
@@ -552,39 +603,9 @@ local extraction = 0
 local mainMexDrawList = 0
 local miniMexDrawList = 0
 
-local function getSpotColor(x,y,z,id, specatate, t)
-	if specatate then
-		if spotData[id] then
-			if options.specPlayerColours.value then
-				local r, g, b = Spring.GetTeamColor(spotData[id].team)
-				local alpha = t == 1 and 0.7 or 1.0 --Judging by colours set up top
-				return {r, g, b, alpha}
-			else
-				-- local r, g, b = Spring.GetTeamColor(allyTeams[spotData[id].allyTeam][1])
-				local r, g, b = Spring.GetTeamColor(Spring.GetTeamList(spotData[id].allyTeam)[1])
-				local alpha = t == 1 and 0.7 or 1.0 --Judging by colours set up top
-				return {r, g, b, alpha}
-				-- if spotData[id].allyTeam == spGetMyAllyTeamID() then
-				-- 	return allyMexColor[t]
-				-- else
-				-- 	return enemyMexColor[t]
-				-- end
-			end
-		else
-			return neutralMexColor[t]
-		end
-	else
-		if spotData[id] then
-			return allyMexColor[t]
-		else
-			--local _, inLos = spGetPositionLosState(x,y,z, myAllyTeam)
-			--if inLos then
-				return neutralMexColor[t]
-			--else
-			--	return enemyMexColor
-			--end
-		end
-	end
+local function getSpotColor(id)
+	local teamID = spotData[id] and spotData[id].team or Spring.GetGaiaTeamID()
+	return Spring.GetTeamColor(teamID)
 end
 
 function calcMainMexDrawList()
@@ -597,7 +618,7 @@ function calcMainMexDrawList()
 			local y = spGetGroundHeight(x,z)
 			if y < 0 then y = 0 end
 
-			local mexColor = getSpotColor(x,y+45,z,i,specatate,1)
+			local r, g, b = getSpotColor(i)
 			local metal = spot.metal
 		
 
@@ -609,7 +630,7 @@ function calcMainMexDrawList()
 			-- glDepthTest(false)
 			glLineWidth(spot.metal*2.4)
 			glDrawGroundCircle(x, 1, z, 40, 21)
-			glColor(mexColor)
+			glColor(r,g,b,0.7)
 			glLineWidth(spot.metal*1.5)
 			glDrawGroundCircle(x, 1, z, 40, 21)	
 			
@@ -678,10 +699,10 @@ function calcMiniMexDrawList()
 		local x,z = spot.x, spot.z
 		local y = spGetGroundHeight(x,z)
 
-		local mexColor = getSpotColor(x,y,z,i,specatate)
+		local r, g, b = getSpotColor(i)
 		
 		glLineWidth(spot.metal)
-		glColor(mexColor)
+		glColor(r, g, b)
 		
 		glDrawGroundCircle(x, 0, z, 40, 32)
 		
@@ -815,14 +836,14 @@ function widget:DrawInMiniMap()
 			local x,z = spot.x, spot.z
 			local y = spGetGroundHeight(x,z)
 
-			local mexColor = getSpotColor(x,y,z,i,specatate,2)
+			local r,g,b = getSpotColor(i)
 			
 			glLighting(false)
 			glColor(0,0,0,1)
 			glLineWidth(((spot.metal > 0 and spot.metal) or 0.1)*2.0)
 			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
 			glLineWidth((spot.metal > 0 and spot.metal) or 0.1)
-			glColor(mexColor)
+			glColor(r,g,b,1.0)
 			
 			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
 		end
