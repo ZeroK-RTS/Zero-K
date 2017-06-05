@@ -41,6 +41,7 @@ unitDef = {
     helptext       = [[The Heavy Tank Factory is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Pillager, Reaper, Banisher, Goliath]],
 	helptext_de    = [[Die Heavy Tank Factory ist das Ultimum für brachiale Gewalt. Nicht erledigt den Auftrag zu gut, wie ein anhaltendes Artilleriefeuer, gefolgt von einem entscheidenen Vorstoß mit den größten Panzern auf dem Feld. Wichtigste Einheiten: Pillager, Reaper, Banisher, Goliath]],
     sortName = [[6]],
+    solid_factory = 3,
   },
 
   energyUse                     = 0,
@@ -66,7 +67,7 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = "oooooooooo oooooooooo oooooooooo ooccccccoo ooccccccoo cccccccccc cccccccccc cccccccccc",
+  yardMap                       = "oooooooooo oooooooooo oooooooooo cccccccccc oocccccccc cccccccccc cccccccccc cccccccccc",
 
   featureDefs                   = {
 
