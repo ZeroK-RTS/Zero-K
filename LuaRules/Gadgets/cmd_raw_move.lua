@@ -20,6 +20,7 @@ if gadgetHandler:IsSyncedCode() then
 local spGetUnitPosition   = Spring.GetUnitPosition
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spGetUnitCommands   = Spring.GetUnitCommands
+local spGetUnitStates     = Spring.GetUnitStates
 
 local CMD_STOP   = CMD.STOP
 local CMD_INSERT = CMD.INSERT
@@ -91,7 +92,7 @@ for i = 1, #UnitDefs do
 		end
 		loneStopDistSq[i] = (loneStopDist and loneStopDist*loneStopDist) or stopDistSq[i] or 256
 		if stopDist and not goalDist[i] then
-			goalDist[i] = loneStopDist*2
+			goalDist[i] = loneStopDist
 		end
 		stoppingRadiusIncrease[i] = ud.xsize*250
 	end
@@ -216,7 +217,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		unitData.cx, unitData.cz = cmdParams[1], cmdParams[3]
 		unitData.commandString = cmdParams[1] .. "_" .. cmdParams[3]
 		commandCount[unitData.commandString] = (commandCount[unitData.commandString] or 0) + 1
-		unitData.preventGoalClumping = (distSq > COMMON_STOP_RADIUS_ACTIVE_DIST_SQ)
+		unitData.preventGoalClumping = (distSq > COMMON_STOP_RADIUS_ACTIVE_DIST_SQ) and not (spGetUnitStates(unitID) or {})["repeat"]
 	end
 	if unitData.preventGoalClumping and unitData.commandString and not commonStopRadius[unitData.commandString] then
 		commonStopRadius[unitData.commandString] = oldCommandStoppingRadius[unitData.commandString] or 0
