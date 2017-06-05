@@ -15,6 +15,7 @@ end
 --------------------------------------------------------------------------------
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+include("Widgets/COFCTools/ExportUtilities.lua")
 
 local spGetMouseState = Spring.GetMouseState
 local spTraceScreenRay = Spring.TraceScreenRay
@@ -22,8 +23,18 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitHealth = Spring.GetUnitHealth
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetGameRulesParam = Spring.GetGameRulesParam
+local spGetModKeyState = Spring.GetModKeyState
+local spSelectUnitArray = Spring.SelectUnitArray
+
+local GetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
+local GetHumanName = Spring.Utilities.GetHumanName
+local GetUnitCost = Spring.Utilities.GetUnitCost
+local GetDescription = Spring.Utilities.GetDescription
 
 local strFormat = string.format
+
+local selectionTooltip = "\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") .. "\n" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect") .. "\n" .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type") .. "\n" .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type") .. "\n" .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -148,6 +159,8 @@ local windGroundExtreme = 1
 local windGroundSlope = 1
 local windTidalThreashold = -10
 
+local GAIA_TEAM = Spring.GetGaiaTeamID()
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Variables
@@ -159,6 +172,8 @@ local stillCursorTime = 0
 
 local sameObjectID
 local sameObjectIDTime = 0
+
+local selectedUnitsList = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -279,8 +294,8 @@ options = {
 			option_Deselect()
 			unitIcon_size = math.modf(self.value)
 		end,
-		min=30,max=50,step=1,
-		value = 50,
+		min=30,max=100,step=1,
+		value = 52,
 		path = selPath,
 	},
 	manualWeaponReloadBar = {
@@ -369,6 +384,20 @@ local function SecondsToMinutesSeconds(seconds)
 	end
 end
 
+local function UnitDefTableSort(a,b) 
+	return a and b and UnitDefs[a].name < UnitDefs[b].name 
+end
+
+local function IsGroupingRequired(selectedUnits, selectionSortOrder, selectionSpace)
+	if options.groupbehaviour.value == 'overflow' then
+		return #selectedUnits > selectionSpace 
+	elseif options.groupbehaviour.value == 'multitype' then
+		return not (#selectedUnits <= selectionSpace and #selectionSortOrder <= 1)
+	else
+		return true
+	end
+end
+
 local function GetHealthColor(fraction, returnString)
 	local midpt = (fraction > 0.5)
 	local r, g
@@ -428,6 +457,17 @@ local function GetUnitBorder(unitDefID)
 	end
 	unitBorderCache[unitDefID] = WG.GetBuildIconFrame and WG.GetBuildIconFrame(ud)
 	return unitBorderCache[unitDefID]
+end
+
+local unitSelectionTooltipCache = {}
+local function GetUnitSelectionTooltip(ud, unitDefID, unitID)
+	if ud.level then
+		return GetHumanName(ud, unitID) .. " - " .. GetDescription(ud, unitID) .. selectionTooltip
+	end
+	if not unitSelectionTooltipCache[unitDefID] then
+		unitSelectionTooltipCache[unitDefID] = GetHumanName(ud, unitID) .. " - " .. GetDescription(ud, unitID) .. selectionTooltip
+	end
+	return unitSelectionTooltipCache[unitDefID]
 end
 
 local function GetUnitResources(unitID)
@@ -578,9 +618,9 @@ local function GetPlayerCaption(teamID)
 	local playerName
 	if isAI then
 		local _, aiName, _, shortName = Spring.GetAIInfo(teamID)
-		playerName = aiName ..' ('.. shortName .. ')'
+		playerName = aiName -- .. ' (' .. shortName .. ')'
 	else
-		playerName = player and Spring.GetPlayerInfo(player)
+		playerName = (player and Spring.GetPlayerInfo(player)) or (teamID ~= GAIA_TEAM and "noname")
 		if not playerName then
 			return false
 		end
@@ -638,11 +678,61 @@ local function GetUnitDefByHumanName(humanName)
 	return false
 end
 
+local function SelectionsIconClick(button, unitID, unitList, unitDefID)
+	unitID = unitID or (unitList and unitList[1])
+	
+	if not unitID then 
+		return
+	end
+	local alt, ctrl, meta, shift = spGetModKeyState()
+	
+	-- selectedUnitsList is global and has the same ordering as unitList
+	local newSelectedUnits
+	
+	if (button == 3) then
+		if shift then
+			--// deselect a whole unitdef block
+			newSelectedUnits = {}
+			local j = 1
+			for i = 1, #selectedUnitsList do
+				if not unitList[j] then
+					break
+				end
+				if selectedUnitsList[i] == unitList[j] then
+					j = j + 1
+				else
+					newSelectedUnits[#newSelectedUnits + 1] = selectedUnitsList[i]
+				end
+			end
+		else
+			--// deselect a single unit
+			for i = 1, #selectedUnitsList do
+				if selectedUnitsList[i] == unitID then
+					selectedUnitsList[i] = selectedUnitsList[#selectedUnitsList]
+					selectedUnitsList[#selectedUnitsList] = nil
+				end
+			end
+			newSelectedUnits = selectedUnitsList
+		end
+		spSelectUnitArray(newSelectedUnits)
+		widget:SelectionChanged(newSelectedUnits)
+	elseif button == 1 then
+		if shift then
+			spSelectUnitArray(unitList) -- select all
+		else
+			spSelectUnitArray({unitID})  -- only 1	
+		end
+	else --button2 (middle)
+		local x,y,z = Spring.GetUnitPosition(unitID)
+		SetCameraTarget(x, y, z, 1)
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Unit tooltip window components
 
-local function GetBar(parentControl, initY, imageFile, color, colorFunc)
+local function GetBarWithImage(parentControl, initY, imageFile, color, colorFunc)
 	local image = Chili.Image:New{
 		x = 0,
 		y = initY,
@@ -814,9 +904,156 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Group buttons window
+
+local function GetUnitGroupIconButton(parentControl)
+	
+	local unitDefID
+	local unitID
+	local unitList
+	local unitCount
+	
+	local size = options.uniticon_size.value
+	
+	local holder = Chili.Control:New{
+		x = 0,
+		y = 0,
+		width = size,
+		height = size,
+		padding = {1,1,1,1},
+		parent = parentControl,
+	}
+	
+	local healthbar = Chili.Progressbar:New {
+		x = 0,
+		y = "80%",
+		right = 0,
+		height = 0,
+		max = 1,
+		caption = '',
+		parent = holder
+	}
+	
+	local unitImage = Chili.Image:New{
+		keepAspect = false,
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = "20%",
+		padding = {0,0,0,0},
+		parent = holder,
+		OnClick = {
+			function(_,_,_,button)
+				SelectionsIconClick(button, unitID, unitList, unitDefID)
+			end
+		}
+	}
+	
+	local groupLabel = Chili.Label:New{
+		x = 0,
+		right = 2,
+		bottom = 0,
+		height = 25,
+		align  = "right",
+		valign = "top",
+		fontsize = 20,
+		fontshadow = true,
+		fontOutline = true,
+		parent = unitImage
+	}
+	
+	local function UpdateUnitHealth()
+		if unitID then
+			local health, maxhealth = spGetUnitHealth(unitID)
+			if health then
+				healthbar.color = GetHealthColor(health/maxhealth)
+				healthbar:SetValue(health/maxhealth)
+			end
+			return
+		end
+		
+		local totalHealth, totalMax = 0, 0
+		for i = 1, #unitList do
+			local health, maxhealth = spGetUnitHealth(unitList[i])
+			if health and maxhealth then
+				totalHealth = totalHealth + health
+				totalMax = totalMax + maxhealth
+			end
+		end
+		
+		if totalMax > 0 then
+			healthbar.color = GetHealthColor(totalHealth/totalMax)
+			healthbar:SetValue(totalHealth/totalMax)
+		end
+	end
+	
+	local function UpdateUnitDefID(newUnitDefID)
+		if newUnitDefID == unitDefID then
+			return
+		end
+		unitDefID = newUnitDefID
+		
+		local ud = UnitDefs[unitDefID]
+		if not ud then
+			return
+		end
+		
+		unitImage.tooltip = GetUnitSelectionTooltip(ud, unitDefID, unitID)
+		unitImage.file = "#" .. unitDefID
+		unitImage.file2 = GetUnitBorder(unitDefID)
+		unitImage:Invalidate()
+	end
+	
+	local function UpdateUnits(newUnitID, newUnitList)
+		unitID = newUnitID
+		unitList = newUnitList
+		local newCount = (not unitID) and newUnitList and #newUnitList
+		if newCount and newCount < 1 then
+			newCount = false
+		end
+		if newCount == unitCount then
+			return
+		end
+		unitCount = newCount
+		
+		groupLabel._relativeBounds.left = 0
+		groupLabel._relativeBounds.right = 2
+		groupLabel:SetCaption(unitCount or "")
+	end
+	
+	local externalStuff = {
+		visible = true
+	}
+	
+	function externalStuff.SetPosition(x,y,size)
+		holder:SetPos(x*size,y*size,size,size)
+	end
+	
+	function externalStuff.SetHidden()
+		holder:SetVisibility(false)
+		visible = false
+	end
+	
+	function externalStuff.UpdateUnitButton()
+		UpdateUnitHealth()
+	end
+	
+	function externalStuff.SetGroupIconUnits(newUnitID, newUnitList, newUnitDefID)
+		holder:SetVisibility(true)
+		visible = true
+		UpdateUnitDefID(newUnitDefID)
+		UpdateUnits(newUnitID, newUnitList)
+		UpdateUnitHealth()
+	end
+	
+	return externalStuff
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Group window
 
-local function GetGroupUnitInfoPanel(parentControl)
+local function GetMultiUnitInfoPanel(parentControl)
 	
 	local holder = Chili.Panel:New{
 		x = 0,
@@ -826,6 +1063,114 @@ local function GetGroupUnitInfoPanel(parentControl)
 		padding = {0,0,0,0},
 		parent = parentControl,
 	}
+	
+	local displayRows = 3
+	local displayColumns = 5
+	
+	local displayUnits
+	local displayButtons = {}
+	
+	local function UpdateButtonPosition(index)
+		local col = (index - 1)%displayColumns
+		local row = (index - 1 - col)/displayColumns
+		displayButtons[index].SetPosition(col, row, options.uniticon_size.value)
+	end
+	
+	local function GetButton(index)
+		if not displayButtons[index] then
+			displayButtons[index] = GetUnitGroupIconButton(holder)
+			UpdateButtonPosition(index)
+		end
+		return displayButtons[index]
+	end
+	
+	local function HideButtonsFromIndex(index)
+		while displayButtons[index] and displayButtons[index].visible do
+			displayButtons[index].SetHidden()
+			index = index + 1
+		end
+	end
+	
+	local function StaticButtonUpdate(selectionSortOrder, displayUnitsByDefID)
+		local displaySpace = displayRows*displayColumns
+		
+		local groupRequired = IsGroupingRequired(displayUnits, selectionSortOrder, displaySpace)
+		local buttonIndex = 1
+		for i = 1, #selectionSortOrder do
+			if displaySpace < buttonIndex then
+				return false
+			end
+			local unitDefID = selectionSortOrder[i]
+			local unitList = displayUnitsByDefID[unitDefID]
+			
+			if groupRequired then
+				local button = GetButton(buttonIndex)
+				button.SetGroupIconUnits(nil, unitList, unitDefID)
+				buttonIndex = buttonIndex + 1
+			else
+				for j = 1, #unitList do
+					if displaySpace < buttonIndex then
+						return false
+					end
+					local button = GetButton(buttonIndex)
+					button.SetGroupIconUnits(unitList[j], unitList, unitDefID)
+					buttonIndex = buttonIndex + 1
+				end
+			end
+		end
+		return buttonIndex
+	end
+	
+	local function DynamicButtonUpdate()
+		for i = 1, #displayButtons do
+			local button = displayButtons[i]
+			if button.visible then
+				button.UpdateUnitButton()
+			end
+		end
+	end
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.UpdateUnitDisplay()
+		if displayUnits then
+			DynamicButtonUpdate()
+		end
+	end
+	
+	function externalFunctions.SetUnitDisplay(newDisplayUnits)
+		if not newDisplayUnits then
+			displayUnits = false
+			holder:SetVisibility(false)
+			return
+		end
+		holder:SetVisibility(true)
+		
+		displayUnits = newDisplayUnits
+		local unitDefAdded = {}
+		local displayUnitsByDefID = {}
+		local selectionSortOrder = {}
+		for i = 1, #displayUnits do
+			local unitID = displayUnits[i]
+			local unitDefID = Spring.GetUnitDefID(unitID) or 0
+			local byDefID = displayUnitsByDefID[unitDefID] or {}
+			byDefID[#byDefID + 1] = unitID
+			displayUnitsByDefID[unitDefID] = byDefID
+			if not unitDefAdded[unitDefID] then
+				selectionSortOrder[#selectionSortOrder + 1] = unitDefID
+				unitDefAdded[unitDefID] = true
+			end
+		end
+		
+		table.sort(selectionSortOrder, UnitDefTableSort)
+		
+		local buttonIndex = StaticButtonUpdate(selectionSortOrder, displayUnitsByDefID)
+		if buttonIndex then
+			HideButtonsFromIndex(buttonIndex)
+		end
+	end
+	
+	return externalFunctions
 end
 
 --------------------------------------------------------------------------------
@@ -878,7 +1223,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local metalInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + LEFT_SPACE + 4, METAL_IMAGE, nil, nil, ICON_SIZE, 5)
 	local energyInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 2*LEFT_SPACE + 4, ENERGY_IMAGE, nil, nil, ICON_SIZE, 5)
 	
-	local healthBarUpdate = GetBar(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, {0, 1, 0, 1}, GetHealthColor)
+	local healthbarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, {0, 1, 0, 1}, GetHealthColor)
 	
 	local metalInfo
 	local energyInfo
@@ -906,8 +1251,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		maxHealthLabel = GetImageWithText(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, nil, NAME_FONT, ICON_SIZE, 3)
 		morphInfo = GetMorphInfo(rightPanel, PIC_HEIGHT + LEFT_SPACE + 3)
 	else
-		shieldBarUpdate = GetBar(rightPanel, PIC_HEIGHT + 4, SHIELD_IMAGE, {0.3,0,0.9,1})
-		buildBarUpdate = GetBar(rightPanel, PIC_HEIGHT + 58, BUILD_IMAGE, {0.8,0.8,0.2,1})
+		shieldBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, SHIELD_IMAGE, {0.3,0,0.9,1})
+		buildBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 58, BUILD_IMAGE, {0.8,0.8,0.2,1})
 	end
 
 	local prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID, prevMorphTime, prevMorphCost, prevMousePlace
@@ -936,7 +1281,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		
 		local health, maxHealth = spGetUnitHealth(unitID)
-		healthBarUpdate(true, healthPos, health, maxHealth, (health < maxHealth) and GetUnitRegenString(unitID, ud))
+		healthbarUpdate(true, healthPos, health, maxHealth, (health < maxHealth) and GetUnitRegenString(unitID, ud))
 		
 		if buildBarUpdate then
 			if ud and ud.buildSpeed > 0 then
@@ -972,9 +1317,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			extraTooltip, healthOverride = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
 		end
 		if extraTooltip then
-			unitDesc:SetText(Spring.Utilities.GetDescription(ud, unitID) .. extraTooltip)
+			unitDesc:SetText(GetDescription(ud, unitID) .. extraTooltip)
 		else
-			unitDesc:SetText(Spring.Utilities.GetDescription(ud, unitID))
+			unitDesc:SetText(GetDescription(ud, unitID))
 		end
 		unitDesc:Invalidate()
 		
@@ -1031,7 +1376,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				addedName = " (" .. WG.Translate("interface", "wreckage") .. ")"
 			end
 			
-			healthBarUpdate(false)
+			healthbarUpdate(false)
 			if unitDefID then
 				if playerNameLabel then
 					playerNameLabel:SetPos(nil, PIC_HEIGHT + 10)
@@ -1057,20 +1402,20 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitImage.file2 = GetUnitBorder(unitDefID)
 			unitImage:Invalidate()
 			
-			costInfoUpdate(true, cyan .. Spring.Utilities.GetUnitCost(unitID, unitDefID), COST_IMAGE, PIC_HEIGHT + 4)
+			costInfoUpdate(true, cyan .. GetUnitCost(unitID, unitDefID), COST_IMAGE, PIC_HEIGHT + 4)
 			
 			local extraTooltip, healthOverride
 			if not (unitID or featureID) then
 				extraTooltip, healthOverride = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
 			end
 			if extraTooltip then
-				unitDesc:SetText(Spring.Utilities.GetDescription(ud, unitID) .. extraTooltip)
+				unitDesc:SetText(GetDescription(ud, unitID) .. extraTooltip)
 			else
-				unitDesc:SetText(Spring.Utilities.GetDescription(ud, unitID))
+				unitDesc:SetText(GetDescription(ud, unitID))
 			end
 			unitDesc:Invalidate()
 			
-			local unitName = Spring.Utilities.GetHumanName(ud, unitID)
+			local unitName = GetHumanName(ud, unitID)
 			if addedName then
 				unitName = unitName .. addedName
 			end
@@ -1082,7 +1427,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 55)
 				end
 			elseif not featureDefID then
-				healthBarUpdate(false)
+				healthbarUpdate(false)
 				maxHealthLabel(true, healthOverride or ud.health, HEALTH_IMAGE)
 				maxHealthShown = true
 				if morphTime then
@@ -1447,6 +1792,7 @@ local function GetSelectionWindow()
 	mainPanel:Hide()
 	
 	local singleUnitDisplay = GetSingleUnitInfoPanel(mainPanel, false)
+	local multiUnitDisplay = GetMultiUnitInfoPanel(mainPanel)
 	local singleUnitID, singleUnitDefID
 	
 	local externalFunctions = {}
@@ -1455,11 +1801,20 @@ local function GetSelectionWindow()
 		singleUnitID, singleUnitDefID = unitID, Spring.GetUnitDefID(unitID)
 		singleUnitDisplay.SetDisplay(unitID, Spring.GetUnitDefID(unitID))
 		singleUnitDisplay.SetVisible(true)
+		multiUnitDisplay.SetUnitDisplay()
 	end
 	
-	function externalFunctions.Update()
+	function externalFunctions.ShowMultiUnit(newSelection)
+		singleUnitID = nil
+		multiUnitDisplay.SetUnitDisplay(newSelection)
+		singleUnitDisplay.SetVisible(false)
+	end
+	
+	function externalFunctions.UpdateSelectionWindow()
 		if singleUnitID then
 			singleUnitDisplay.SetDisplay(singleUnitID, singleUnitDefID)
+		else
+			multiUnitDisplay.UpdateUnitDisplay()
 		end
 	end
 	
@@ -1496,6 +1851,9 @@ local function UpdateSelection(newSelection)
 	-- Check if selection is 1, get unit tooltip
 	-- Check if selection is many, get unit list tooltip
 	-- Update group info.
+	
+	selectedUnitsList = newSelection
+	
 	if (not newSelection) or (#newSelection == 0) then
 		selectionWindow.SetVisible(false)
 		return
@@ -1504,7 +1862,8 @@ local function UpdateSelection(newSelection)
 	selectionWindow.SetVisible(true)
 	if #newSelection == 1 then
 		selectionWindow.ShowSingleUnit(newSelection[1])
-		return
+	else
+		selectionWindow.ShowMultiUnit(newSelection)
 	end
 end
 
@@ -1526,7 +1885,7 @@ function widget:Update(dt)
 	UpdateTooltip(dt, updateTimer <= 0.1)
 	
 	if updateTimer > 0.1 then
-		selectionWindow.Update()
+		selectionWindow.UpdateSelectionWindow()
 		updateTimer = 0
 	end
 end
@@ -1549,6 +1908,8 @@ function widget:Initialize()
 	Spring.AssignMouseCursor(CURSOR_DRAW_NAME, CURSOR_DRAW, true, true)
 	
 	Spring.SendCommands({"tooltip 0"})
+	Spring.SetDrawSelectionInfo(false)
+	
 	local hotkeys = WG.crude.GetHotkeys("drawinmap")
 	for k,v in pairs(hotkeys) do
 		drawHotkeyBytesCount = drawHotkeyBytesCount + 1
@@ -1562,4 +1923,6 @@ end
 
 function widget:Shutdown()
 	Spring.SendCommands({"tooltip 1"})
+	Spring.SetDrawSelectionInfo(true)
+	Spring.SetDrawSelectionInfo(true)
 end
