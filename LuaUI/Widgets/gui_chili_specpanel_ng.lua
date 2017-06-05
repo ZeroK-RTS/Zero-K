@@ -162,19 +162,19 @@ local function CreateSpecPanel()
 	local resourcebarwidth = 100
 	local resourcestatpanelwidth = 200
 	local resourcepanelwidth = resourcestatpanelwidth + resourcebarwidth
-	local compics = 3
+	local compics = 1
 	local unitpics = 5
 	
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local screenHorizCentre = screenWidth / 2
-	local windowWidth = (resourcepanelwidth + unitpanelwidth) * 2 + balancepanelwidth
+	local windowWidth = (resourcepanelwidth + unitpanelwidth) * 2 + balancepanelwidth + 24
 	local windowheight = topheight + balancepanelheight
 	local playerlabelwidth = (windowWidth - topcenterwidth) / 2
-
+	
+	
 	data.window = Chili.Panel:New{
-		classname = "main_window_small_flat",
---		backgroundColor = {0.2, 0.2, 0.2, 0.2},
---		color = {0.7, 0.7, 0, 0},
+		classname = 'main_window',
+		parent = data.superwindow,
 		name = "SpecPanel",
 		padding = {0,0,0,0},
 		x = screenHorizCentre - windowWidth/2,
@@ -185,7 +185,7 @@ local function CreateSpecPanel()
 	
 	data.topcenterpanel = Chili.Panel:New{
 		parent = data.window,
-		classname = "main_window_small_flat",
+		classname = 'main_window_small',
 		padding = {5,5,5,5},
 		x = (windowWidth - topcenterwidth)/2,
 		width = topcenterwidth,
@@ -225,13 +225,13 @@ local function CreateSpecPanel()
 		align = 'center',
 		valign = 'center',
 		fontsize = 20,
-		textColor = Colors.blue,
+		textColor = {0.5,0.5,1,1},
 		caption = "2",
 	}
 
 	data.balancepanel = Chili.Panel:New{
 		parent = data.window,
-		classname = "main_window_small_flat",
+		classname = 'main_window_small',
 		padding = {0,0,0,0},
 		x = (windowWidth - balancepanelwidth)/2,
 		y = topheight,
@@ -263,7 +263,7 @@ local function CreateSpecPanel()
 			y = balanceheight * (i-1) + balancelabelheight,
 			width = '60%',
 			height = balancebarheight,
-			color = {0,0,1,1},
+			color = {0.5,0.5,1,1},
 			backgroundColor = {1,0,0,0},
 		}
 		data.balancebars[i].bar_bg = Chili.Progressbar:New{
@@ -286,9 +286,11 @@ local function CreateSpecPanel()
 		height = topheight,
 		align = 'center',
 		valign = 'center',
-		textColor = Colors.blue,
-		fontsize = 24,
-		caption = "West - 2 Players",
+		textColor = {0.5,0.5,1,1},
+		fontsize = 28,
+		fontShadow = true,
+		fontOutline = false,
+		caption = "West",
 	}
 	
 	local resource_stats = {
@@ -322,8 +324,8 @@ local function CreateSpecPanel()
 			height = rowheight,
 			skin = nil,
 			skinName = 'default',
-			backgroundColor = {0,0,0,0.4},
-			borderColor = {1,1,1,0.5},
+			backgroundColor = {0,0,0,0},
+			borderColor = {1,1,1,1},
 			borderThickness = 1,
 		}
 		data.resource_stats[i].barpanel = Chili.Control:New{
@@ -341,6 +343,7 @@ local function CreateSpecPanel()
 			y = '10%',
 			height = '80%',
 			right = '0%',
+			color = resource_stats[i].color,
 			value = resource_stats[i].bar,
 		}
 		data.resource_stats[i].statpanel = Chili.Control:New{
@@ -390,8 +393,8 @@ local function CreateSpecPanel()
 		width = unitpanelwidth,
 		skin = nil,
 		skinName = 'default',
-		backgroundColor = {0,0,0,0.4},
-		borderColor = {1,1,1,0.5},
+		backgroundColor = {0,0,0,0},
+		borderColor = {1,1,1,1},
 		borderThickness = 1,
 	}
 	local unit_stats = {
@@ -446,12 +449,13 @@ local function CreateSpecPanel()
 		data.unitpics[i] = {}
 		data.unitpics[i].text = Chili.Label:New{
 			parent = data.window,
-			y = topheight + rowheight * 2,
-			right = (windowWidth + balancepanelwidth)/2 + picsize * (i-1),
-			height = picsize,
-			width = picsize,
+			y = topheight + rowheight * 2 + 5,
+			right = (windowWidth + balancepanelwidth)/2 + picsize * (i-1) + 5,
+			height = picsize - 10,
+			width = picsize - 10,
 			align = 'right',
 			valign = 'bottom',
+			fontsize = 16,
 			caption = unitpics_mock[i].value,
 		}
 		data.unitpics[i].unitpic = Chili.Image:New{
@@ -462,22 +466,37 @@ local function CreateSpecPanel()
 			width = picsize,
 			file = 'unitpics/' .. unitpics_mock[i].name .. '.png',
 		}
+		local framepic
+		if i == 1 then
+			framepic = 'bitmaps/icons/frame_cons.png'
+		else
+			framepic = 'bitmaps/icons/frame_unit.png'
+		end
+		data.unitpics[i].unitpicframe = Chili.Image:New{
+			parent = data.window,
+			y = topheight + rowheight * 2,
+			right = (windowWidth + balancepanelwidth)/2 + picsize * (i-1),
+			height = picsize,
+			width = picsize,
+			keepAspect = false,
+			file = framepic,
+		}
 	end
 	
 	local compics_mock = {
 		{ name = "commassault", value = "Lvl 6" },
 		{ name = "commstrike", value = "Lvl 4" },
-		{ name = "commrecon", value = "+2 more" },
+		{ name = "commrecon", value = "2 more" },
 	}
 	data.compics = {}
 	for i = 1,compics do
 		data.compics[i] = {}
 		data.compics[i].text = Chili.Label:New{
 			parent = data.window,
-			y = topheight + rowheight * 2,
-			right = (windowWidth + balancepanelwidth)/2 + picsize * (i-1) + picsize * unitpics,
-			height = picsize,
-			width = picsize,
+			y = topheight + rowheight * 2 + 5,
+			right = (windowWidth + balancepanelwidth)/2 + picsize * (compics - i) + picsize * unitpics +5,
+			height = picsize - 10,
+			width = picsize - 10,
 			align = 'right',
 			valign = 'bottom',
 			caption = compics_mock[i].value,
@@ -485,22 +504,63 @@ local function CreateSpecPanel()
 		data.compics[i].unitpic = Chili.Image:New{
 			parent = data.window,
 			y = topheight + rowheight * 2,
-			right = (windowWidth + balancepanelwidth)/2 + picsize * (i-1) + picsize * unitpics,
+			right = (windowWidth + balancepanelwidth)/2 + picsize * (compics - i) + picsize * unitpics,
 			height = picsize,
 			width = picsize,
 			file = 'unitpics/' .. compics_mock[i].name .. '.png',
 		}
+		local framepic = 'bitmaps/icons/frame_unit.png'
+		data.compics[i].unitpicframe = Chili.Image:New{
+			parent = data.window,
+			y = topheight + rowheight * 2,
+			right = (windowWidth + balancepanelwidth)/2 + picsize * (compics - i) + picsize * unitpics,
+			height = picsize,
+			width = picsize,
+			keepAspect = false,
+			file = framepic,
+		}
 	end
---[[
-	data.bg_image = Chili.Image:New{
-		padding = {5,5,5,5},
+	
+	data.bg_top = Chili.Panel:New{
 		parent = data.window,
-		width  = windowWidth,
-		height = windowheight,
-		keepAspect = false,
-		file = 'LuaUI/Images/specpanel_ng/bg_mock1.png',
+		x = 12,
+		y = 0,
+		width  = (windowWidth - 24) / 2,
+		height = topheight,
+		skin = nil,
+		skinName = 'default',
+		backgroundColor = {0,0,0,0.3},
+		borderColor = {0,0,0,0},
 	}
---]]
+	data.bg_bottom = Chili.Panel:New{
+		parent = data.window,
+		x = 12,
+		y = topheight,
+		width  = (windowWidth - 24) / 2,
+		height = windowheight - topheight,
+		skin = nil,
+		skinName = 'default',
+		backgroundColor = {0,0,0,0.5},
+		borderColor = {0,0,0,0},
+	}
+	data.bg_image = Chili.Image:New{
+		parent = data.window,
+		x = 12,
+		y = 7,
+		width  = (windowWidth - 24) / 2,
+		height = windowheight - 14,
+		keepAspect = false,
+		file = 'LuaUI/Images/specpanel_ng/bg_mock3.png',
+	}
+	data.bg_image_right_temp = Chili.Image:New{
+		parent = data.window,
+		right = 12,
+		y = 7,
+		width  = (windowWidth - 24) / 2,
+		height = windowheight - 14,
+		keepAspect = false,
+		file = 'LuaUI/Images/specpanel_ng/bg_mock2.png',
+	}
 
 	return data
 end
