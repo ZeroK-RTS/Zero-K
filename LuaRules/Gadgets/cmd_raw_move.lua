@@ -21,6 +21,7 @@ local spGetUnitPosition   = Spring.GetUnitPosition
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spGetUnitCommands   = Spring.GetUnitCommands
 local spGetUnitStates     = Spring.GetUnitStates
+local spMoveCtrlGetTag    = Spring.MoveCtrl.GetTag
 
 local CMD_STOP   = CMD.STOP
 local CMD_INSERT = CMD.INSERT
@@ -194,6 +195,9 @@ end
 function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions) -- Only calls for custom commands
 	if (cmdID ~= CMD_RAW_MOVE) then
 		return false
+	end
+	if spMoveCtrlGetTag(unitID) then
+		return true, false
 	end
 	if not rawMoveUnit[unitID] then
 		rawMoveUnit[unitID] = {}
