@@ -35,6 +35,7 @@ local spGetUnitTeam     = Spring.GetUnitTeam
 -- Global Variables
 
 local PREDICTION = 30
+local RAW_MOVE_MODE = false
 
 local areaGuardCmd = {
     id      = CMD_AREA_GUARD,
@@ -183,11 +184,17 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 	
 	--// Check command validity
 	if not (ud and targetID and Spring.ValidUnitID(targetID)) then
+		if RAW_MOVE_MODE then
+			GG.RemoveRawMoveUnit(unitID)
+		end
 		return true
 	end
 
 	local targetTeamID = spGetUnitTeam(targetID)
 	if not spAreTeamsAllied(teamID, targetTeamID) then
+		if RAW_MOVE_MODE then
+			GG.RemoveRawMoveUnit(unitID)
+		end
 		return true -- remove
 	end
 	
@@ -313,10 +320,16 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 	--// Set new position
 	local perpAngle = angle + pi/2
 	
-	local mx = ux + radius*cos(angle) + perpSize*cos(perpAngle)
-	local mz = uz + radius*sin(angle) + perpSize*sin(perpAngle)
+	local gX = ux + radius*cos(angle) + perpSize*cos(perpAngle)
+	local gZ = uz + radius*sin(angle) + perpSize*sin(perpAngle)
 	
-	GiveClampedMoveGoalToUnit(unitID, mx, mz)
+	if RAW_MOVE_MODE then
+		local myX, _, myZ = spGetUnitPosition(unitID)
+		GiveClampedMoveGoalToUnit(unitID, gX, gZ, nil, GG.RawMove_IsPathFree(unitDefID, myX, myZ, gX, gZ))
+		GG.AddRawMoveUnit(unitID)
+	else
+		GiveClampedMoveGoalToUnit(unitID, gX, gZ)
+	end
 	alreadyHandled[unitID] = true
 	return false
 end

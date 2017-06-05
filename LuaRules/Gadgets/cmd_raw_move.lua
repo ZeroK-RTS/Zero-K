@@ -371,11 +371,25 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	return true
 end
 
+local function AddRawMoveUnit(unitID)
+	rawMoveUnit[unitID] = true
+end
+
+local function RawMove_IsPathFree(unitDefID, sX, sZ, gX, gZ)
+	local vX = gX - sX
+	local vZ = gZ - sZ
+	return IsPathFree(unitDefID, sX, sZ, gX, gZ, math.sqrt(vX*vX + vZ*vZ), TEST_MOVE_SPACING)
+end
+
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_RAW_MOVE)
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
 	end
+	
+	GG.AddRawMoveUnit = AddRawMoveUnit
+	GG.StopRawMoveUnit = StopRawMoveUnit
+	GG.RawMove_IsPathFree = RawMove_IsPathFree
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
