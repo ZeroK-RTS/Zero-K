@@ -279,7 +279,7 @@ end
 local function getEngineArrays(statistic, labelCaption)
 	local teamScores = {}
 	local teams = Spring.GetTeamList()
-	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(0) - 1)
+	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(Spring.GetMyTeamID()) - 1)
 	local generalHistory = Spring.GetTeamStatsHistory(0, 0, graphLength)
 	local totalTime = Spring.GetGameRulesParam("gameover_second")
 		or (generalHistory and generalHistory[graphLength] and generalHistory[graphLength]["time"])
