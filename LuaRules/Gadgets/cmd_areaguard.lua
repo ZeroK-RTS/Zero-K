@@ -67,6 +67,10 @@ local oldcircuitTime = {}
 local newcircuitTime = {}
 local alreadyHandled = {}
 
+local keepOrder = {}
+local nextKeepOrder = {}
+local unitOrder = {}
+
 local circleDirection = {}
 local lastUpdateTime = {}
 
@@ -284,11 +288,25 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 		
 		-- Update the number of units in the circle
 		local guards = (oldGuards[targetID] and oldGuards[targetID][radGroup]) or 1
-		local newG = newGuards[targetID][radGroup] or 0
-		newGuards[targetID][radGroup] = newG + 1
+		local circleOrder = newGuards[targetID][radGroup] or 0
+		newGuards[targetID][radGroup] = circleOrder + 1
+		
+		if unitOrder[unitID] and keepOrder[targetID] and keepOrder[targetID][radGroup] then
+			circleOrder = unitOrder[unitID]
+		else
+			unitOrder[unitID] = circleOrder
+		end
+		
+		-- Update whether the number of orbiters has changed
+		if circleOrder == guards - 1 then
+			nextKeepOrder[targetID] = nextKeepOrder[targetID] or {}
+			nextKeepOrder[targetID][radGroup] = true
+		elseif circleOrder >= guards and nextKeepOrder[targetID] and nextKeepOrder[targetID][radGroup] then
+			nextKeepOrder[targetID][radGroup] = false
+		end
 		
 		-- Calculate my own angle
-		angle = ((guardAngle[targetID] and guardAngle[targetID][radGroup]) or 0) + 2*pi*newG/guards
+		angle = ((guardAngle[targetID] and guardAngle[targetID][radGroup]) or 0) + 2*pi*circleOrder/guards
 		perpSize = circleDirection[targetID]*50
 	end
 	
@@ -355,6 +373,9 @@ function gadget:GameFrame(f)
 	if f%15 == 0 then
 		oldGuards = newGuards
 		newGuards = {}
+		
+		keepOrder = nextKeepOrder
+		nextKeepOrder = {}
 		
 		oldcircuitTime = newcircuitTime
 		newcircuitTime = {}
