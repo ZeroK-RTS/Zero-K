@@ -32,6 +32,7 @@ local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
 local spGetUnitCommands     = Spring.GetUnitCommands
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
+local spGetUnitShieldState  = Spring.GetUnitShieldState
 
 local pmap = VFS.Include("LuaRules/Utilities/pmap.lua")
 
@@ -99,6 +100,16 @@ local HandledUnitDefIDs = {
 	--[UnitDefNames["cloakarty"].id] = 1,
 }
 
+local shieldPowerDef = {}
+local shieldRegenDef = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.customParams.shield_power then
+		shieldPowerDef[i] = ud.customParams.shield_power
+		shieldRegenDef[i] = ud.customParams.shield_rate/30
+	end
+end
+
 include("LuaRules/Configs/customcmds.h.lua")
 
 local preventOverkillCmdDesc = {
@@ -160,9 +171,8 @@ end
 local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout, fastMult, radarMult, staticOnly)
 	
 	-- Modify timeout based on unit speed and fastMult
-	local unitDefID
+	local unitDefID = Spring.GetUnitDefID(targetID)
 	if fastMult and fastMult ~= 1 then
-		unitDefID = Spring.GetUnitDefID(targetID)
 		if fastUnitDefs[unitDefID] then
 			timeout = timeout * (fastMult or 1)
 		end
@@ -188,20 +198,26 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
 		adjHealth = spGetUnitHealth(targetID)/armor -- adjusted health after incoming damage is dealt
 		
+		if shieldPowerDef[unitDefID] then
+			local shieldEnabled, currentPower = spGetUnitShieldState(targetID)
+			if shieldEnabled and currentPower then
+				adjHealth = adjHealth + currentPower + shieldRegenDef[unitDefID]*timeout
+			end
+		end
+		
 		disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
 		if disarmFrame == -1 then
 			--no disarm damage on targetID yet(already)
 			disarmFrame = gameFrame 
-		end 	
+		end 
 	else
 		timeout = timeout * (radarMult or 1)
 		
-		unitDefID = unitDefID or Spring.GetUnitDefID(targetID)
 		local ud = UnitDefs[unitDefID]
-		adjHealth = ud.health/ud.armoredMultiple
+		adjHealth = ud.health/ud.armoredMultiple + (shieldPowerDef[unitDefID] or 0)
 		disarmFrame = -1
 	end
-
+	
 	local incData = incomingDamage[targetID]
 	local targetFrame = gameFrame + timeout
 	local block = false

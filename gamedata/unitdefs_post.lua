@@ -207,6 +207,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Units with shields cannot cloak
+-- Set easily readible shield power
 --
 --Spring.Echo("Shield Weapon Def")
 for name, ud in pairs(UnitDefs) do
@@ -216,6 +217,8 @@ for name, ud in pairs(UnitDefs) do
 			for _, wd in pairs(ud.weapondefs) do      
 				if wd.weapontype == "Shield" then
 					hasShield = true
+					ud.customparams.shield_power = wd.shieldpower
+					ud.customparams.shield_rate = (wd.customparams or {}).shield_rate or wd.shieldpowerregen
 					break
 				end
 			end
