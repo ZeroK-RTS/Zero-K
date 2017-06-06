@@ -189,8 +189,10 @@ end
 local keybounditems = {}
 local keybind_date = 0
 
+local EPIC_SETTINGS_VERSION = 51
+
 local settings = {
-	versionmin = 50,
+	versionmin = EPIC_SETTINGS_VERSION,
 	lang = 'en',
 	country = 'wut',
 	widgets = {},
@@ -3033,8 +3035,13 @@ end
 function widget:SetConfigData(data)
 	confLoaded = true
 	if (data and type(data) == 'table') then
-		if data.versionmin and data.versionmin >= 50 then
+		if data.versionmin and data.versionmin >= EPIC_SETTINGS_VERSION then
 			settings = data
+		else
+			for key, value in pairs(data) do
+				settings[key] = value
+			end
+			settings.versionmin = EPIC_SETTINGS_VERSION
 		end
 	end
 
