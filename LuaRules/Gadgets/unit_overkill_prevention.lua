@@ -37,6 +37,7 @@ local spGetUnitShieldState  = Spring.GetUnitShieldState
 local pmap = VFS.Include("LuaRules/Utilities/pmap.lua")
 
 local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0 (taken from unit_boolean_disable.lua)
+local DISARM_DAMAGE_MOD = 1/3 -- from armordefs.lua
 
 local FAST_SPEED = 5.5*30 -- Speed which is considered fast.
 local fastUnitDefs = {}
@@ -80,7 +81,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["shiptorpraider"].id] = 1,
 	[UnitDefNames["shipskirm"].id] = 1,
 	[UnitDefNames["subraider"].id] = 1,
-	
+
 	-- Static only OKP below
 	[UnitDefNames["amphfloater"].id] = 1,
 	[UnitDefNames["vehheavyarty"].id] = 1,
@@ -92,7 +93,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["striderdetriment"].id] = 1,
 	[UnitDefNames["shipassault"].id] = 1,
 	[UnitDefNames["shiparty"].id] = 1,
-	
+
 	-- Needs LUS
 	--[UnitDefNames["tankassault"].id] = 1,
 	--[UnitDefNames["vehassault"].id] = 1,
@@ -169,7 +170,7 @@ end
 	radarMult -- Multiplier to timeout if the taget is a radar dot
 ]]--
 local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout, fastMult, radarMult, staticOnly)
-	
+
 	-- Modify timeout based on unit speed and fastMult
 	local unitDefID = Spring.GetUnitDefID(targetID)
 	if fastMult and fastMult ~= 1 then
@@ -177,51 +178,56 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 			timeout = timeout * (fastMult or 1)
 		end
 	end
-	
+
 	-- Get unit health and status effects. An unseen unit is assumed to be fully healthy and armored.
 	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
-	
+
 	local targetVisiblityState = Spring.GetUnitLosState(targetID, allyTeamID, true)
 	local targetInLoS = (targetVisiblityState == 15)
 	local targetIdentified = (targetVisiblityState > 2)
-	
+
 	-- When true, the projectile damage will be added to the damage to be taken by the unit.
 	-- When false, it will only check whether the shot should be blocked.
 	local addToIncomingDamage = true
-	
+
 	if staticOnly then
 		addToIncomingDamage = IsUnitIdentifiedStructure(targetIdentified, targetID)
 	end
-	
+
 	local adjHealth, disarmFrame
+	local shieldPower
 	if targetInLoS then
-		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
+		local armor = select(2, Spring.GetUnitArmored(targetID)) or 1
 		adjHealth = spGetUnitHealth(targetID)/armor -- adjusted health after incoming damage is dealt
-		
+
 		if shieldPowerDef[unitDefID] then
 			local shieldEnabled, currentPower = spGetUnitShieldState(targetID)
+			shieldEnabled = shieldEnabled and spGetUnitRulesParam(targetID, "disarmed") ~= 1
 			if shieldEnabled and currentPower then
-				adjHealth = adjHealth + currentPower + shieldRegenDef[unitDefID]*timeout
+				shieldPower = currentPower
+			else
+				shieldPower = 0
 			end
 		end
-		
+
 		disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
 		if disarmFrame == -1 then
 			--no disarm damage on targetID yet(already)
-			disarmFrame = gameFrame 
-		end 
+			disarmFrame = gameFrame
+		end
 	else
 		timeout = timeout * (radarMult or 1)
-		
+
 		local ud = UnitDefs[unitDefID]
-		adjHealth = ud.health/ud.armoredMultiple + (shieldPowerDef[unitDefID] or 0)
+		adjHealth = ud.health/ud.armoredMultiple
+		shieldPower = (shieldPowerDef[unitDefID] or 0)
 		disarmFrame = -1
 	end
-	
+
 	local incData = incomingDamage[targetID]
 	local targetFrame = gameFrame + timeout
 	local block = false
-	
+
 	if incData then --seen this target
 		local startIndex, endIndex = incData.frames:GetIdxs()
 		for i = startIndex, endIndex do
@@ -233,17 +239,38 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 			else
 				local disarmDamage = data.disarmDamage
 				local fullDamage = data.fullDamage
-				
-				local disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
-				adjHealth = adjHealth - fullDamage
-				
+
+				--in rare case disarm and regular damages expected same frame, then disarm is applied first (arbitrary convention)
+				local disarmExtra = 0
+				local disarmShieldDamage = disarmDamage * DISARM_DAMAGE_MOD
+
+				local expectedShieldPower
+
+				expectedShieldPower = math.min(shieldPower + (frame - gameFrame) * shieldRegenDef[unitDefID], shieldPowerDef[unitDefID])
+				if disarmShieldDamage > expectedShieldPower then --disarming damage has passed through the shield
+					local disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
+				else --otherwise the damage is absorbed
+					shieldPower = shieldPower - disarmShieldDamage --this can go below 0, but it's virtual, since calculus is done @frame (future)
+				end
+
 				disarmFrame = disarmFrame + disarmExtra
-				if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then 
-					disarmFrame = frame + DECAY_FRAMES + disarmTimeout 
+				if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then
+					disarmFrame = frame + DECAY_FRAMES + disarmTimeout
+				end
+
+				if disarmFrame - gameFrame >= DECAY_FRAMES then --shot above will disable shields, don't bother tracking when the shielded unit will become armed again
+					shieldPower = 0
+				end
+
+				expectedShieldPower = math.min(shieldPower + (frame - gameFrame) * shieldRegenDef[unitDefID], shieldPowerDef[unitDefID])
+				if fullDamage > expectedShieldPower then --regular damage has passed through the shield
+					adjHealth = adjHealth - fullDamage
+				else --damage is absorbed
+					shieldPower = shieldPower - fullDamage --this can go below 0, but it's virtual, since calculus is done @frame (future)
 				end
 			end
 		end
-	else --new targe
+	else --new target
 		if not addToIncomingDamage then
 			lastShot[unitID] = targetID
 			return false
@@ -251,21 +278,21 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		incomingDamage[targetID] = {frames = pmap()}
 		incData = incomingDamage[targetID]
 	end
-	
+
 	local doomed = targetIdentified and (adjHealth < 0) and (fullDamage > 0) --for regular projectile
 	local disarmed = targetIdentified and (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) and (disarmDamage > 0) --for disarming projectile
-	
+
 	incomingDamage[targetID].doomed = doomed
 	incomingDamage[targetID].disarmed = disarmed
-	
-	block = doomed or disarmed --assume function is not called with both regular and disarming damage types	
-	
+
+	block = doomed or disarmed --assume function is not called with both regular and disarming damage types
+
 	if not block then
 		--Spring.Echo("^^^^SHOT^^^^")
 		if addToIncomingDamage then
 			local frameData = incData.frames:Get(targetFrame)
-			if frameData then 
-				-- here we have a rare case when few different projectiles (from different attack units) 
+			if frameData then
+				-- here we have a rare case when few different projectiles (from different attack units)
 				-- are arriving to the target at the same frame. Their powers must be accumulated/harmonized
 				frameData.fullDamage = frameData.fullDamage + fullDamage
 				frameData.disarmDamage = frameData.disarmDamage + disarmDamage
@@ -292,11 +319,11 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 			else
 				spSetUnitTarget(unitID, 0)
 			end
-			
+
 			return true
 		end
 	end
-	
+
 	lastShot[unitID] = targetID
 	return false
 end
@@ -306,7 +333,7 @@ function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeou
 	if not (unitID and targetID and units[unitID]) then
 		return false
 	end
-	
+
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
 		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
@@ -318,11 +345,11 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, fas
 	if not (unitID and targetID and units[unitID]) then
 		return false
 	end
-	
+
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
 		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
-		return CheckBlockCommon(unitID, targetID, gameFrame, damage, 0, 0, timeout, fastMult, radarMult, staticOnly)		
+		return CheckBlockCommon(unitID, targetID, gameFrame, damage, 0, 0, timeout, fastMult, radarMult, staticOnly)
 	end
 	return false
 end
@@ -339,7 +366,7 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	if canHandleUnit[unitID] then
 		local state = cmdParams[1]
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
-		
+
 		if (cmdDescID) then
 			preventOverkillCmdDesc.params[1] = state
 			spEditUnitCmdDesc(unitID, cmdDescID, {params = preventOverkillCmdDesc.params})
@@ -358,19 +385,19 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	return true
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_PREVENT_OVERKILL] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID ~= CMD_PREVENT_OVERKILL) then		
+	if (cmdID ~= CMD_PREVENT_OVERKILL) then
 		return true  -- command was not used
-	end	
-	return PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)  
+	end
+	return PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 end
 
 --------------------------------------------------------------------------------
@@ -396,7 +423,7 @@ end
 function gadget:Initialize()
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_PREVENT_OVERKILL)
-	
+
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
