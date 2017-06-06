@@ -1732,6 +1732,14 @@ MakeSubWindow = function(path, pause)
 		end
 		
 		local simpleModeCull = (not root) and ((not option.simpleMode) == settings.simpleSettingsMode) and (not option.everyMode)
+		if simpleModeCull and confdata.simpleModeFullDirectory then
+			for i = 1, #confdata.simpleModeFullDirectory do
+				if string.find(path, confdata.simpleModeFullDirectory[i]) then
+					simpleModeCull = false
+					break
+				end
+			end
+		end
 		if simpleModeCull and option.isDirectoryButton and confdata.simpleModeDirectory[option.name] then
 			simpleModeCull = false
 		end

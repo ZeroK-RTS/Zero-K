@@ -187,6 +187,10 @@ confdata.subMenuIcons = {
 confdata.simpleModeDirectory = {
 	['Interface'] = true,
 	['Audio'] = true,
+	['Hotkeys'] = true,
+}
+confdata.simpleModeFullDirectory = {
+	'Settings/Hotkeys'
 }
 
 -- SETUP MENU HERE
