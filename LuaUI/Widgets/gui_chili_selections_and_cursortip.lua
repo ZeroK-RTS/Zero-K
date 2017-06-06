@@ -1055,7 +1055,7 @@ end
 
 local function GetMultiUnitInfoPanel(parentControl)
 	
-	local holder = Chili.Panel:New{
+	local holder = Chili.Control:New{
 		x = 0,
 		y = 0,
 		right = GROUP_STATS_WIDTH,
@@ -1064,8 +1064,9 @@ local function GetMultiUnitInfoPanel(parentControl)
 		parent = parentControl,
 	}
 	
-	local displayRows = 3
+	local iconSize = options.uniticon_size.value
 	local displayColumns = 5
+	local displayRows = 3
 	
 	local displayUnits
 	local displayButtons = {}
@@ -1073,7 +1074,7 @@ local function GetMultiUnitInfoPanel(parentControl)
 	local function UpdateButtonPosition(index)
 		local col = (index - 1)%displayColumns
 		local row = (index - 1 - col)/displayColumns
-		displayButtons[index].SetPosition(col, row, options.uniticon_size.value)
+		displayButtons[index].SetPosition(col, row, iconSize)
 	end
 	
 	local function GetButton(index)
@@ -1090,6 +1091,29 @@ local function GetMultiUnitInfoPanel(parentControl)
 			index = index + 1
 		end
 	end
+	
+	local function Resize(self)
+		local sizeX, sizeY = self.clientWidth, self.clientHeight
+		
+		local newIconSize = options.uniticon_size.value
+		local newCols = math.floor(sizeX/iconSize)
+		local newRows = math.floor(sizeY/iconSize)
+		if newCols == displayColumns and newRows == displayRows and newIconSize == iconSize then
+			return
+		end
+		iconSize = newIconSize
+		displayColumns = newCols
+		displayRows = newRows
+		local displaySpace = displayRows*displayColumns
+		
+		local index = 1
+		while displayButtons[index] and index <= displaySpace do
+			UpdateButtonPosition(index)
+			index = index + 1
+		end
+		HideButtonsFromIndex(displaySpace + 1)
+	end
+	holder.OnResize[#holder.OnResize + 1] = Resize
 	
 	local function StaticButtonUpdate(selectionSortOrder, displayUnitsByDefID)
 		local displaySpace = displayRows*displayColumns
@@ -1272,7 +1296,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			if ud and (ud.shieldPower > 0 or ud.level) then
 				local shieldPower = Spring.GetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower
 				local _, shieldCurrentPower = Spring.GetUnitShieldState(unitID, -1)
-				shieldBarUpdate(true, nil, shieldCurrentPower, shieldPower, (shieldCurrentPower < shieldPower) and GetUnitShieldRegenString(unitID, ud))
+				if shieldCurrentPower and shieldPower then
+					shieldBarUpdate(true, nil, shieldCurrentPower, shieldPower, (shieldCurrentPower < shieldPower) and GetUnitShieldRegenString(unitID, ud))
+				end
 				healthPos = PIC_HEIGHT + 4 + BAR_SPACING
 			else
 				shieldBarUpdate(false)
@@ -1281,7 +1307,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		
 		local health, maxHealth = spGetUnitHealth(unitID)
-		healthbarUpdate(true, healthPos, health, maxHealth, (health < maxHealth) and GetUnitRegenString(unitID, ud))
+		if health and maxHealth then
+			healthbarUpdate(true, healthPos, health, maxHealth, (health < maxHealth) and GetUnitRegenString(unitID, ud))
+		end
 		
 		if buildBarUpdate then
 			if ud and ud.buildSpeed > 0 then
