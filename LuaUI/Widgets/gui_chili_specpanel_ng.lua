@@ -19,12 +19,7 @@ end
 --
 -- TODO:
 --
---	- Mirror the player panels
---		- Bring out the bg panels
---		- .. and tweak the screen(s), and get them in the right layer
---		- .. and make some better screenshots
---
---	- Pull out the data and initialize it and pass it in
+--	- Run a multi-player game and get some actual stats to plug in, for fun
 --
 --	- Tweak everything, esp. anything that has asymmetry
 --		- Decide where I want mirroring and where I want asymmetry
@@ -39,6 +34,11 @@ end
 --		- Balance Bar colors, including writing a function to attenuate them
 --	- Deal with padding in all the objects (??)
 --
+--	- Revise the balance bars:
+--		- Make them multibars, stacked on top of each other
+--		- Set the leader to 100%
+--		- Set the lagger whatever percentage they are of the leader
+--
 --	- Logic to enable/disable when appropriate (speccing and not FFA)
 --	- Hotkeyable option to enable and disable
 --	- Handle widget:PlayerChanged
@@ -47,8 +47,11 @@ end
 --	- Handle interactions with (hiding) the standard econ bars
 --
 --	- Hook up to actual data
+--		- This will be a good time to revise the panelData data structure
+--		- It has a lot of redundancy that was there for mocking up the layout
 --	- Get team names and other team data
 --	- Add wins data
+--	- Make more bg screenshots
 --	- Add tooltips to everything.
 --		"What do you mean, everything?"
 --		"EEEEEVVVERYTHIIIING!!!!!!"
@@ -155,6 +158,112 @@ end
 --------------------------------------------------------------------------------
 -- Create Panels
 
+local function SetupMockData()
+	local mock = {}
+	
+	mock.playernames	= { left = "GoogleFrog", right = "Anarchid", }
+	mock.playercolors	= { left = {0.5,0.5,1,1}, right = {1,0.2,0.2,1}, }
+	mock.playerwins		= { left = math.random(0,4), right = math.random(0,4), }
+	mock.bgfac		= { left = "cloakies", right = "hovers", }
+
+	mock.resource_stats = {
+		left = {
+			{
+				total = 156,
+				bar = 25,
+				icon = 'LuaUI/Images/ibeam.png',
+				color = col_metal,
+				{ name = "Extraction", value = 100, label = "E", label_x = 65, },
+				{ name = "Reclaim", value = 15, label = "R", label_x = 110, },
+				{ name = "Overdrive", value = 20, label = "O", label_x = 150, },
+			},
+			{
+				total = 1955,
+				bar = 66,
+				icon = 'LuaUI/Images/energy.png',
+				color = col_energy,
+				{ name = "Generation", value = 1234, label = "G", label_x = 65, },
+				{ name = "Reclaim", value = 133, label = "R", label_x = 110, },
+				{ name = "Overdrive", value = 543, label = "O", label_x = 150, },
+			},
+		},
+		right = {
+			{
+				total = 156,
+				bar = 25,
+				icon = 'LuaUI/Images/ibeam.png',
+				color = col_metal,
+				{ name = "Extraction", value = 100, label = "E", label_x = 65, },
+				{ name = "Reclaim", value = 15, label = "R", label_x = 110, },
+				{ name = "Overdrive", value = 20, label = "O", label_x = 150, },
+			},
+			{
+				total = 1955,
+				bar = 66,
+				icon = 'LuaUI/Images/energy.png',
+				color = col_energy,
+				{ name = "Generation", value = 1234, label = "G", label_x = 65, },
+				{ name = "Reclaim", value = 133, label = "R", label_x = 110, },
+				{ name = "Overdrive", value = 543, label = "O", label_x = 150, },
+			},
+		},
+	}
+	
+	mock.unit_stats = {
+		left = {
+			total = 5447 + 1521 + 12550,
+			{ name = "Offense", value = 5447, icon = 'LuaUI/Images/commands/Bold/attack.png', icon_x = 0, },
+			{ name = "Defense", value = 1521, icon = 'LuaUI/Images/commands/Bold/guard.png', icon_x = 50, },
+			{ name = "Economy", value = 12550, icon = 'LuaUI/Images/energy.png', icon_x = 100, },
+		},
+		right = {
+			total = 3386 + 872 + 10995,
+			{ name = "Offense", value = 3386, icon = 'LuaUI/Images/commands/Bold/attack.png', icon_x = 0, },
+			{ name = "Defense", value = 872, icon = 'LuaUI/Images/commands/Bold/guard.png', icon_x = 50, },
+			{ name = "Economy", value = 10995, icon = 'LuaUI/Images/energy.png', icon_x = 100, },
+		},
+	}
+	
+	mock.balancebars = {
+		{ name = "Income", value = 100 * mock.resource_stats.left[1].total / (mock.resource_stats.left[1].total + mock.resource_stats.right[1].total) },
+		{ name = "Extraction", value = 100 * mock.resource_stats.left[1][1].value / (mock.resource_stats.left[1][1].value + mock.resource_stats.right[1][1].value) },
+		{ name = "Military", value = 100 *
+			(mock.unit_stats.left[1].value + mock.unit_stats.left[2].value) /
+			(mock.unit_stats.left[1].value + mock.unit_stats.left[2].value + mock.unit_stats.right[1].value + mock.unit_stats.right[2].value)
+		},
+		{ name = "Attrition", value = 50 },
+	}
+	
+	mock.unitpics = {
+		left = {
+			{ name = "cloakcon", value = "5" },
+			{ name = "cloakraid", value = "18" },
+			{ name = "cloakriot", value = "3" },
+			{ name = "cloakskirm", value = "10" },
+			{ name = "cloakassault", value = "7" },
+		},
+		right = {
+			{ name = "hovercon", value = "3" },
+			{ name = "hoverassault", value = "8" },
+			{ name = "hoverskirm", value = "15" },
+			{ name = "hoverriot", value = "6" },
+			{ name = "hoverarty", value = "3" },
+		},
+	}
+	mock.compics = {
+		left = {
+			-- { name = "commrecon", value = "2 more" },
+			-- { name = "commstrike", value = "Lvl 4" },
+			{ name = "commassault", value = "Lvl 6" },
+		},
+		right = {
+			{ name = "commstrike", value = "Lvl 9" },
+		},
+	}
+	
+	return mock
+end
+
 local function SetupLayoutParams()
 	local p = {}
 
@@ -174,8 +283,6 @@ local function SetupLayoutParams()
 	p.resourcebarwidth = 100
 	p.resourcestatpanelwidth = 200
 	p.resourcepanelwidth = p.resourcestatpanelwidth + p.resourcebarwidth
-	p.compics = 1
-	p.unitpics = 5
 	
 	p.screenWidth,p.screenHeight = Spring.GetWindowGeometry()
 	p.screenHorizCentre = p.screenWidth / 2
@@ -186,11 +293,21 @@ local function SetupLayoutParams()
 	return p
 end
 
-local function AddCenterPanels(t, p, v)
+local function AddCenterPanels(t, p, d)
 	-- 	t == table of panels; new panels will be added
 	-- 	p == parameters to build layout
-	-- 	v == values to populate panels
+	-- 	d == data to populate panels
 	
+	t.window = Chili.Panel:New{
+		classname = 'main_window',
+		name = "SpecPanel",
+		padding = {0,0,0,0},
+		x = p.screenHorizCentre - p.windowWidth/2,
+		y = 0,
+		clientWidth  = p.windowWidth,
+		clientHeight = p.windowheight,
+	}
+
 	t.topcenterpanel = Chili.Panel:New{
 		parent = t.window,
 		classname = 'main_window_small',
@@ -223,16 +340,8 @@ local function AddCenterPanels(t, p, v)
 		width = p.balancepanelwidth,
 		height = p.balancepanelheight,
 	}
-	-- This needs to come out into the value table, but I'm not there yet
-	--
-	local balancebars = {
-		{ name = "Income", value = 22 },
-		{ name = "Extraction", value = 44 },
-		{ name = "Military", value = 55 },
-		{ name = "Attrition", value = 77 },
-	}
 	t.balancebars = {}
-	for i,bar in ipairs(balancebars) do
+	for i,bar in ipairs(d.balancebars) do
 		t.balancebars[i] = {}
 		t.balancebars[i].label = Chili.Label:New{
 			parent = t.balancepanel,
@@ -246,28 +355,31 @@ local function AddCenterPanels(t, p, v)
 			parent = t.balancepanel,
 			orientation = 'horizontal',
 			value = bar.value,
-			x = '20%',
+			x = '15%',
 			y = p.balanceheight * (i-1) + p.balancelabelheight,
-			width = '60%',
+			width = '70%',
 			height = p.balancebarheight,
-			color = {0.5,0.5,1,1},
+			color = d.playercolors['left'],
 			backgroundColor = {1,0,0,0},
 		}
 		t.balancebars[i].bar_bg = Chili.Progressbar:New{
 			parent = t.balancepanel,
 			orientation = 'horizontal',
 			value = 100,
-			x = '20%',
+			x = '15%',
 			y = p.balanceheight * (i-1) + p.balancelabelheight,
-			width = '60%',
+			width = '70%',
 			height = p.balancebarheight,
-			color = {1,0,0,1},
+			color = d.playercolors['right'],
 		}
 	end
 	
 end
 
-local function AddSidePanels(t, p, v, side)
+local function AddSidePanels(t, p, d, side)
+	-- 	t == table of panels; new panels will be added
+	-- 	p == parameters to build layout
+	-- 	d == data to populate panels
 
 	local x, right
 	if side == 'left' then
@@ -280,7 +392,6 @@ local function AddSidePanels(t, p, v, side)
 		return
 	end
 	
-
 	t.winslabel_top = Chili.Label:New{
 		parent = t.topcenterpanel,
 		padding = {0,0,0,0},
@@ -290,6 +401,7 @@ local function AddSidePanels(t, p, v, side)
 		height = '30%',
 		align = 'center',
 		valign = 'center',
+		textColor = d.playercolors[side],
 		caption = "Wins:",
 	}
 	t.winslabel_bottom = Chili.Label:New{
@@ -302,8 +414,8 @@ local function AddSidePanels(t, p, v, side)
 		align = 'center',
 		valign = 'center',
 		fontsize = 20,
-		textColor = {0.5,0.5,1,1},
-		caption = "2",
+		textColor = d.playercolors[side],
+		caption = d.playerwins[side],
 	}
 
 	t.playerlabel = Chili.Label:New{
@@ -314,37 +426,15 @@ local function AddSidePanels(t, p, v, side)
 		height = p.topheight,
 		align = 'center',
 		valign = 'center',
-		textColor = {0.5,0.5,1,1},
+		textColor = d.playercolors[side],
 		fontsize = 28,
 		fontShadow = true,
 		fontOutline = false,
-		caption = "West End",
+		caption = d.playernames[side],
 	}
 	
-	-- More values to get pulled out
-	--
-	local resource_stats = {
-		{
-			total = 155,
-			bar = 25,
-			icon = 'LuaUI/Images/ibeam.png',
-			color = col_metal,
-			{ name = "Extraction", value = 100, label = "E", label_x = 65, },
-			{ name = "Reclaim", value = 15, label = "R", label_x = 110, },
-			{ name = "Overdrive", value = 20, label = "O", label_x = 150, },
-		},
-		{
-			total = 1955,
-			bar = 66,
-			icon = 'LuaUI/Images/energy.png',
-			color = col_energy,
-			{ name = "Generation", value = 1234, label = "G", label_x = 65, },
-			{ name = "Reclaim", value = 133, label = "R", label_x = 110, },
-			{ name = "Overdrive", value = 543, label = "O", label_x = 150, },
-		},
-	}
 	t.resource_stats = {}
-	for i,resource in ipairs(resource_stats) do
+	for i,resource in ipairs(d.resource_stats[side]) do
 		t.resource_stats[i] = {}
 		t.resource_stats[i].panel = Chili.Panel:New{
 			parent = t.window,
@@ -373,8 +463,8 @@ local function AddSidePanels(t, p, v, side)
 			y = '10%',
 			height = '80%',
 			right = '0%',
-			color = resource_stats[i].color,
-			value = resource_stats[i].bar,
+			color = resource.color,
+			value = resource.bar,
 		}
 		t.resource_stats[i].statpanel = Chili.Control:New{
 			parent = t.resource_stats[i].panel,
@@ -391,26 +481,26 @@ local function AddSidePanels(t, p, v, side)
 			width = 20,
 			valign = 'center',
 			fontsize = 20,
-			textColor = resource_stats[i].color,
-			caption = Format(resource_stats[i].total, ""),
+			textColor = resource.color,
+			caption = Format(resource.total, ""),
 		}
 		t.resource_stats[i].icon = Chili.Image:New{
 			parent = t.resource_stats[i].statpanel,
 			x = 0,
 			height = 18,
 			width = 18,
-			file = resource_stats[i].icon,
+			file = resource.icon,
 		}
 		t.resource_stats[i].labels = {}
-		for j,stat in ipairs(resource_stats[i]) do
+		for j,stat in ipairs(resource) do
 			t.resource_stats[i].labels[j] = Chili.Label:New{
 				parent = t.resource_stats[i].statpanel,
-				x = resource_stats[i][j].label_x,
+				x = resource[j].label_x,
 				height = '100%',
 				width = 20,
 				valign = 'center',
-				textColor = resource_stats[i].color,
-				caption = resource_stats[i][j].label .. ":" .. Format(resource_stats[i][j].value, ""),
+				textColor = resource.color,
+				caption = resource[j].label .. ":" .. Format(resource[j].value, ""),
 			}
 		end
 	end
@@ -427,14 +517,6 @@ local function AddSidePanels(t, p, v, side)
 		borderColor = {1,1,1,1},
 		borderThickness = 1,
 	}
-	-- More values to get pulled out
-	--
-	local unit_stats = {
-		total = 25379,
-		{ name = "Offense", value = 1500, icon = 'LuaUI/Images/commands/Bold/attack.png', icon_x = 0, },
-		{ name = "Defense", value = 5000, icon = 'LuaUI/Images/commands/Bold/guard.png', icon_x = 50, },
-		{ name = "Economy", value = 12550, icon = 'LuaUI/Images/energy.png', icon_x = 100, },
-	}
 	t.unit_stats = {}
 	t.unit_stats.total = Chili.Label:New{
 		parent = t.unitpanel,
@@ -445,41 +527,32 @@ local function AddSidePanels(t, p, v, side)
 		valign = 'center',
 		fontsize = 16,
 		textColor = { 0.85, 0.85, 0.85, 1.0 },
-		caption = "Unit Value: " .. Format(unit_stats.total, ""),
+		caption = "Unit Value: " .. Format(d.unit_stats[side].total, ""),
 	}
-	for i,stat in ipairs(unit_stats) do
+	for i,stat in ipairs(d.unit_stats[side]) do
 		t.unit_stats[i] = {}
 		t.unit_stats[i].icon = Chili.Image:New{
 			parent = t.unitpanel,
-			x = unit_stats[i].icon_x,
+			x = stat.icon_x,
 			y = '60%',
 			height = 18,
 			width = 18,
-			file = unit_stats[i].icon,
+			file = stat.icon,
 		}
 		t.unit_stats[i].label = Chili.Label:New{
 			parent = t.unitpanel,
-			x = unit_stats[i].icon_x + 18,
+			x = stat.icon_x + 18,
 			y = '50%',
 			height = '50%',
 			width = 20,
 			valign = 'center',
 			textColor = { 0.7, 0.7, 0.7, 1.0 },
-			caption = Format(unit_stats[i].value, ""),
+			caption = Format(stat.value, ""),
 		}
 	end
 	
-	-- More values to get pulled out
-	--
-	local unitpics_mock = {
-		{ name = "cloakcon", value = "2" },
-		{ name = "cloakraid", value = "18" },
-		{ name = "cloakriot", value = "3" },
-		{ name = "cloakskirm", value = "10" },
-		{ name = "cloakassault", value = "7" },
-	}
 	t.unitpics = {}
-	for i = 1,p.unitpics do
+	for i,unitpic in ipairs(d.unitpics[side]) do
 		t.unitpics[i] = {}
 		t.unitpics[i].text = Chili.Label:New{
 			parent = t.window,
@@ -490,7 +563,7 @@ local function AddSidePanels(t, p, v, side)
 			align = 'right',
 			valign = 'bottom',
 			fontsize = 16,
-			caption = unitpics_mock[i].value,
+			caption = unitpic.value,
 		}
 		t.unitpics[i].unitpic = Chili.Image:New{
 			parent = t.window,
@@ -498,7 +571,7 @@ local function AddSidePanels(t, p, v, side)
 			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1),
 			height = p.picsize,
 			width = p.picsize,
-			file = 'unitpics/' .. unitpics_mock[i].name .. '.png',
+			file = 'unitpics/' .. unitpic.name .. '.png',
 		}
 		local framepic
 		if i == 1 then
@@ -517,135 +590,73 @@ local function AddSidePanels(t, p, v, side)
 		}
 	end
 	
-	-- More values to get pulled out
-	--
-	local compics_mock = {
-		{ name = "commassault", value = "Lvl 6" },
-		{ name = "commstrike", value = "Lvl 4" },
-		{ name = "commrecon", value = "2 more" },
-	}
 	t.compics = {}
-	for i = 1,p.compics do
+	for i,compic in ipairs(d.compics[side]) do
 		t.compics[i] = {}
 		t.compics[i].text = Chili.Label:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * 2 + 5,
-			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (p.compics - i) + p.picsize * p.unitpics + 5,
+			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * #d.unitpics[side],
 			height = p.picsize - 10,
 			width = p.picsize - 10,
 			align = 'right',
 			valign = 'bottom',
-			caption = compics_mock[i].value,
+			caption = compic.value,
 		}
 		t.compics[i].unitpic = Chili.Image:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * 2,
-			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (p.compics - i) + p.picsize * p.unitpics,
+			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * #d.unitpics[side],
 			height = p.picsize,
 			width = p.picsize,
-			file = 'unitpics/' .. compics_mock[i].name .. '.png',
+			file = 'unitpics/' .. compic.name .. '.png',
 		}
 		local framepic = 'bitmaps/icons/frame_unit.png'
 		t.compics[i].unitpicframe = Chili.Image:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * 2,
-			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (p.compics - i) + p.picsize * p.unitpics,
+			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * #d.unitpics[side],
 			height = p.picsize,
 			width = p.picsize,
 			keepAspect = false,
 			file = framepic,
 		}
 	end
-
-
-end
-
-local function CreateSpecPanel()
-	local data = {}
 	
-	local topcenterwidth = 200
-	local balancepanelwidth = 80
-
-	local balancelabelheight = 20
-	local balancebarheight = 10
-	local balanceheight = balancelabelheight + balancebarheight
-	local balancepanelheight = balanceheight * 4 + 5
-
-	local rowheight = 30
-	local topheight = rowheight * 1.5
-	local picsize = rowheight * 1.8
-
-	local unitpanelwidth = 150
-	local resourcebarwidth = 100
-	local resourcestatpanelwidth = 200
-	local resourcepanelwidth = resourcestatpanelwidth + resourcebarwidth
-	local compics = 1
-	local unitpics = 5
-	
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
-	local screenHorizCentre = screenWidth / 2
-	local windowWidth = (resourcepanelwidth + unitpanelwidth) * 2 + balancepanelwidth + 24
-	local windowheight = topheight + balancepanelheight
-	local playerlabelwidth = (windowWidth - topcenterwidth) / 2
-	
-	
-	data.window = Chili.Panel:New{
-		classname = 'main_window',
-		parent = data.superwindow,
-		name = "SpecPanel",
-		padding = {0,0,0,0},
-		x = screenHorizCentre - windowWidth/2,
+	t.bg_top = Chili.Panel:New{
+		parent = t.window,
+		[x] = 12,
 		y = 0,
-		clientWidth  = windowWidth,
-		clientHeight = windowheight,
-	}
-
-	
---[[	
-	data.bg_top = Chili.Panel:New{
-		parent = data.window,
-		x = 12,
-		y = 0,
-		width  = (windowWidth - 24) / 2,
-		height = topheight,
+		width  = (p.windowWidth - 24) / 2,
+		height = p.topheight,
 		skin = nil,
 		skinName = 'default',
-		backgroundColor = {0,0,0,0.3},
+		backgroundColor = {0,0,0,0.2},
 		borderColor = {0,0,0,0},
 	}
-	data.bg_bottom = Chili.Panel:New{
-		parent = data.window,
-		x = 12,
-		y = topheight,
-		width  = (windowWidth - 24) / 2,
-		height = windowheight - topheight,
+	t.bg_bottom = Chili.Panel:New{
+		parent = t.window,
+		[x] = 12,
+		y = p.topheight,
+		width  = (p.windowWidth - 24) / 2,
+		height = p.windowheight - p.topheight,
 		skin = nil,
 		skinName = 'default',
-		backgroundColor = {0,0,0,0.5},
+		backgroundColor = {0,0,0,0.6},
 		borderColor = {0,0,0,0},
 	}
-	data.bg_image = Chili.Image:New{
-		parent = data.window,
-		x = 12,
+	t.bg_image = Chili.Image:New{
+		parent = t.window,
+		[x] = 12,
 		y = 7,
-		width  = (windowWidth - 24) / 2,
-		height = windowheight - 14,
+		width  = (p.windowWidth - 24) / 2,
+		height = p.windowheight - 14,
 		keepAspect = false,
-		file = 'LuaUI/Images/specpanel_ng/bg_mock3.png',
+		file = 'LuaUI/Images/specpanel_ng/' .. d.bgfac[side] .. '_' .. side .. '.png',
 	}
-	data.bg_image_right_temp = Chili.Image:New{
-		parent = data.window,
-		right = 12,
-		y = 7,
-		width  = (windowWidth - 24) / 2,
-		height = windowheight - 14,
-		keepAspect = false,
-		file = 'LuaUI/Images/specpanel_ng/bg_mock2.png',
-	}
---]]
-
-	return data
+	
 end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -664,8 +675,9 @@ function widget:Initialize()
 	end
 	
 	-- if we should show the panel then
+		specPanel = {}
 		panelParams = SetupLayoutParams()
-		specPanel = CreateSpecPanel()
+		panelData = SetupMockData()
 		AddCenterPanels(specPanel, panelParams, panelData)
 		AddSidePanels(specPanel, panelParams, panelData, 'left')
 		AddSidePanels(specPanel, panelParams, panelData, 'right')
