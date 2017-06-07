@@ -1074,7 +1074,6 @@ return {
         dir                = [[-6 r12,-6 r12,-6 r12]],
         length             = 8,
         width              = 5,
-        ttl                = 1,
       },
     },
     
