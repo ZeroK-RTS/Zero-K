@@ -518,15 +518,8 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 		mexBuilder[unitID] = true
 	end
 	if unitDefID == mexDefID then
-		local done = select(5, spGetUnitHealth(unitID))
-		if done == 1 then
-			widget:UnitFinished(unitID, unitDefID,unitDefID)
-		end
+		widget:UnitCreated(unitID, unitDefID, newTeamID)
 	end
-end
-
-function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	widget:UnitDestroyed(unitID, unitDefID, oldTeamID)
 end
 
 local function Initialize() 
@@ -559,12 +552,10 @@ function widget:Update()
 		local units = spGetAllUnits()
 		for i, unitID in ipairs(units) do 
 			local unitDefID = spGetUnitDefID(unitID)
+			local teamID = Spring.GetUnitTeam(unitID)
 		if unitDefID == mexDefID then
-			local done = select(5, spGetUnitHealth(unitID))
-				if done == 1 then
-					widget:UnitFinished(unitID, unitDefID,team)
-				end
-			end
+			widget:UnitCreated(unitID, unitDefID, teamID)
+		end
 		end
 	end
 	if metalSpotsNil and WG.metalSpots ~= nil then
