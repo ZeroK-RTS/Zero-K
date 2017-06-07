@@ -13,13 +13,10 @@ function widget:GetInfo()
   }
 end
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
 -- TODO:
---
---	- Run a multi-player game and get some actual stats to plug in, for fun
 --
 --	- Tweak everything, esp. anything that has asymmetry
 --		- Decide where I want mirroring and where I want asymmetry
@@ -44,6 +41,7 @@ end
 --	- Handle widget:PlayerChanged
 --	- Colourblind option
 --	- Fancy skinning option? Learn about skins and fancyskins
+--	- Reskin the panels so they look more like Evolved panels (but transparent) and less like buttons
 --	- Handle interactions with (hiding) the standard econ bars
 --
 --	- Hook up to actual data
@@ -51,7 +49,14 @@ end
 --		- It has a lot of redundancy that was there for mocking up the layout
 --	- Get team names and other team data
 --	- Add wins data
+--	- Rip out the mock data and add in initialization data
 --	- Make more bg screenshots
+--	- Add flashing to resbars, including:
+--		- Grey on metal excess - see #1960
+--			- Fast if excessing, slow if close to excessing
+--			- Match implementation in gui_chili_economy_panel2.lua
+--			- ... and also if wasting E? (but not if close to wasting)
+--		- Red on energy stalling
 --	- Add tooltips to everything.
 --		"What do you mean, everything?"
 --		"EEEEEVVVERYTHIIIING!!!!!!"
@@ -60,6 +65,7 @@ end
 --		It's top center and you can't change that.
 --		Don't like it? Don't use it!
 --	- Consider making small / medium / large versions
+--	- Consider smoothing the econ stats and/or increasing the update interval
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -71,15 +77,23 @@ VFS.Include("LuaRules/Configs/constants.lua")
 --------------------------------------------------------------------------------
 
 local echo = Spring.Echo
+local spGetTeamResources = Spring.GetTeamResources
+local spGetTeamRulesParam = Spring.GetTeamRulesParam
+
 local Chili
 local screen0
 
 local specPanel
 local panelParams
 local panelData
+local mockData
+local allyTeams
+local smoothTables = {}
 
 local col_metal = {136/255,214/255,251/255,1}
 local col_energy = {.93,.93,0,1}
+local default_playercolors = { left = {0.5,0.5,1,1}, right = {1,0.2,0.2,1}, }
+local smooth_count = 5
 
 -- hardcoding these for now, will add colourblind options later
 local positiveColourStr = GreenStr
@@ -100,6 +114,28 @@ options_path = 'Settings/HUD Panels/Spectator Panels'
 --------------------------------------------------------------------------------
 -- Utilities
 
+local function pack(...)
+	return { n = select("#", ...), ... }
+end
+
+local function Smooth(tablename, data)
+	local output_table = {}
+	smoothTables[tablename] = smoothTables[tablename] or {}
+	for i,v in ipairs(data) do
+		smoothTables[tablename][i] = smoothTables[tablename][i] or {}
+		table.insert(smoothTables[tablename][i], v)
+		if #smoothTables[tablename][i] > smooth_count then
+			table.remove(smoothTables[tablename][i], 1)
+		end
+		local sum = 0
+		for j,w in ipairs(smoothTables[tablename][i]) do
+			sum = sum + w
+		end
+		output_table[i] = sum / #smoothTables[tablename][i]
+	end
+	return unpack(output_table)
+end
+
 local function Format(input, override)
 
 	-- Leaving out the sign to save space.
@@ -117,11 +153,15 @@ local function Format(input, override)
 	
 	if input < 0.05 then
 		if override then
-			return override .. "0.0"
+			-- Nope. Don't want a decimal point.
+			-- return override .. "0.0"
+			return override .. "0"
 		end
 		return WhiteStr .. "0"
 	elseif input < 10 - 0.05 then
-		return leadingString .. ("%.1f"):format(input) .. WhiteStr
+		-- Nope. Don't want a decimal point.
+		-- return leadingString .. ("%.1f"):format(input) .. WhiteStr
+		return leadingString .. ("%.0f"):format(input) .. WhiteStr
 	elseif input < 10^3 - 0.5 then
 		return leadingString .. ("%.0f"):format(input) .. WhiteStr
 	elseif input < 10^4 then
@@ -154,9 +194,157 @@ end
 --------------------------------------------------------------------------------
 -- Update Panel Data
 
+local function UpdateClock(t)
+	t.clocklabel:SetCaption(GetTimeString())
+end
+
+local function UpdateWins(t)
+	for i,side in ipairs({'left', 'right'}) do
+--		t[side].winslabel_bottom:SetCaption(math.random(0,4))
+	end
+end
+
+local function GetResources(side_num)
+	-- The energy stats seem wrong.
+	-- They were taken from the current spec panels. I've probably translated them
+	-- incorrectly, but what I have here gives results that seem very wrong.
+	--
+	-- For example: Generation 62, Reclaim 0, OD 9 => Income 71.
+	-- 	Surely in this case Income should be 53, yes? Showing that
+	--	9 of the 62 energy generated was used to produce metal and
+	--	therefore was not available to use as energy.
+	--
+	-- This warrants substantial further investigation.
+	
+	local smCurr, smStor, smInco, smOvdr, smRecl, smBase, seCurr, seStor, seInco, seOvdr, seRecl, seBase = 0,0,0,0,0,0,0,0,0,0,0,0
+	local allyTeamID = allyTeams[side_num].allyTeamID
+	local teams = Spring.GetTeamList(allyTeamID)
+	
+	for i = 1, #teams do
+		local mCurr, mStor, _, mInco = spGetTeamResources(teams[i], "metal")
+		local eCurr, eStor, _, eInco = spGetTeamResources(teams[i], "energy")
+		
+		smInco = smInco + (mInco or 0)
+		smBase = smBase + (spGetTeamRulesParam(teams[i], "OD_metalBase") or 0)
+		
+		-- Strange magic
+		smCurr = smCurr + (mCurr or 0)
+		smStor = smStor + (mStor or 0) - HIDDEN_STORAGE
+		seCurr = seCurr + math.min((eCurr or 0), (eStor or 0) - HIDDEN_STORAGE)
+		seStor = seStor + (eStor or 0) - HIDDEN_STORAGE 
+		
+		-- WITCHCRAFT!!
+		local energyChange = spGetTeamRulesParam(teams[i], "OD_energyChange") or 0
+		seRecl = seRecl + (eInco or 0) - math.max(0, energyChange)
+		seBase = seBase + (eInco or 0)
+	end
+
+	smOvdr = spGetTeamRulesParam(teams[1], "OD_team_metalOverdrive") or 0
+	seOvdr = spGetTeamRulesParam(teams[1], "OD_team_energyOverdrive") or 0
+
+	local smRecl = smInco
+			- (spGetTeamRulesParam(teams[1], "OD_team_metalOverdrive") or 0)
+			- (spGetTeamRulesParam(teams[1], "OD_team_metalBase") or 0) 
+			- (spGetTeamRulesParam(teams[1], "OD_team_metalMisc") or 0)
+	
+	-- The other half of the incantation
+	seRecl = math.max(0, seRecl)
+	seInco = (spGetTeamRulesParam(teams[1], "OD_team_energyIncome") or 0) + seRecl
+	
+	return smCurr, smStor, smInco, smOvdr, smRecl, smBase, seCurr, seStor, seInco, seOvdr, seRecl, seBase
+end
+
+local function UpdateResources(t)
+	local mInco_bb = {}
+	local mBase_bb = {}
+	for i,side in ipairs({'left', 'right'}) do
+		local smCurr, smStor, smInco, smOvdr, smRecl, smBase, seCurr, seStor, seInco, seOvdr, seRecl, seBase = Smooth('resources'..side,pack(GetResources(i)))
+		t[side].resource_stats.metal.total:SetCaption(Format(smInco, ""))
+		t[side].resource_stats.metal.labels[1]:SetCaption("E:" .. Format(smBase, ""))
+		t[side].resource_stats.metal.labels[2]:SetCaption("R:" .. Format(smRecl, ""))
+		t[side].resource_stats.metal.labels[3]:SetCaption("O:" .. Format(smOvdr, ""))
+		t[side].resource_stats.metal.bar:SetValue(100 * smCurr / smStor)
+		t[side].resource_stats.energy.total:SetCaption(Format(seInco, ""))
+		t[side].resource_stats.energy.labels[1]:SetCaption("G:" .. Format(seBase, ""))
+		t[side].resource_stats.energy.labels[2]:SetCaption("R:" .. Format(seRecl, ""))
+		t[side].resource_stats.energy.labels[3]:SetCaption("O:" .. Format(seOvdr, ""))
+		t[side].resource_stats.energy.bar:SetValue(100 * seCurr / seStor)
+		-- TODO - Deal with the case of zero storage
+		mInco_bb[side] = smInco
+		mBase_bb[side] = smBase
+	end
+	t.balancebars[1].bar:SetValue(100 * mInco_bb.left / (mInco_bb.left + mInco_bb.right))
+	t.balancebars[2].bar:SetValue(100 * mBase_bb.left / (mBase_bb.left + mBase_bb.right))
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Create Panels
+-- Setup Data
+
+local function GetWinString(name)
+	local winTable = WG.WinCounter_currentWinTable
+	if winTable and winTable[name] and winTable[name].wins then
+		-- TODO - Do something else to mark the winner of the previous game, not this
+		-- return (winTable[name].wonLastGame and "*" or "") .. winTable[name].wins
+		return winTable[name].wins
+	end
+	return ""
+end
+
+local function GetOpposingAllyTeams()
+	local allyteams = {}
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+	local allyTeamList = Spring.GetAllyTeamList()
+
+	for i = 1, #allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		local teamList = Spring.GetTeamList(allyTeamID)
+		if allyTeamID ~= gaiaAllyTeamID and #teamList > 0 then
+
+			local winString
+			local playerName
+			for j = 1, #teamList do
+				local _, playerID, _, isAI = Spring.GetTeamInfo(teamList[j])
+				if not isAI then
+					playerName = Spring.GetPlayerInfo(playerID)
+					winString = GetWinString(playerName)
+					break
+				end
+			end
+
+			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID) or "Unknown"
+			-- Hardcode the long_name length limit, don't make it an option
+			-- TODO - Figure out what the limit should be
+			-- if name and string.len(name) > options.clanNameLengthCutoff.value then
+			-- 	name = Spring.GetGameRulesParam("allyteam_short_name_" .. allyTeamID) or name
+			-- end
+
+			allyteams[#allyteams + 1] = {
+				allyTeamID = allyTeamID, -- allyTeamID for the team
+				name = name, -- Large display name of the team
+				color = {Spring.GetTeamColor(teamList[1])} or {1,1,1,1}, -- color of the teams text (color of first player)
+				playerName = playerName or "AI", -- representitive player name (for win counter)
+				winString = winString or "0", -- Win string from win counter
+				playercount = #teamList,
+			}
+		end
+	end
+
+	if #allyteams ~= 2 then
+		return
+	end
+	
+	if allyteams[1].allyTeamID > allyteams[2].allyTeamID then
+		allyteams[1], allyteams[2] = allyteams[2], allyteams[1]
+	end
+	
+	if allyteams[1].playercount > 1 or allyteams[2].playercount > 1 then
+		allyteams[1].color = default_playercolors.left
+		allyteams[2].color = default_playercolors.right
+	end
+	
+	return allyteams
+end
 
 local function SetupMockData()
 	local mock = {}
@@ -169,6 +357,7 @@ local function SetupMockData()
 	mock.resource_stats = {
 		left = {
 			{
+				type = 'metal',
 				total = 156,
 				bar = 25,
 				icon = 'LuaUI/Images/ibeam.png',
@@ -178,6 +367,7 @@ local function SetupMockData()
 				{ name = "Overdrive", value = 20, label = "O", label_x = 150, },
 			},
 			{
+				type = 'energy',
 				total = 1955,
 				bar = 66,
 				icon = 'LuaUI/Images/energy.png',
@@ -189,6 +379,7 @@ local function SetupMockData()
 		},
 		right = {
 			{
+				type = 'metal',
 				total = 156,
 				bar = 25,
 				icon = 'LuaUI/Images/ibeam.png',
@@ -198,6 +389,7 @@ local function SetupMockData()
 				{ name = "Overdrive", value = 20, label = "O", label_x = 150, },
 			},
 			{
+				type = 'energy',
 				total = 1955,
 				bar = 66,
 				icon = 'LuaUI/Images/energy.png',
@@ -292,6 +484,10 @@ local function SetupLayoutParams()
 	
 	return p
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Create Panels
 
 local function AddCenterPanels(t, p, d)
 	-- 	t == table of panels; new panels will be added
@@ -392,7 +588,10 @@ local function AddSidePanels(t, p, d, side)
 		return
 	end
 	
-	t.winslabel_top = Chili.Label:New{
+	t[side] = t[side] or {}
+	local ts = t[side]
+	
+	ts.winslabel_top = Chili.Label:New{
 		parent = t.topcenterpanel,
 		padding = {0,0,0,0},
 		[x] = 0,
@@ -404,7 +603,7 @@ local function AddSidePanels(t, p, d, side)
 		textColor = d.playercolors[side],
 		caption = "Wins:",
 	}
-	t.winslabel_bottom = Chili.Label:New{
+	ts.winslabel_bottom = Chili.Label:New{
 		parent = t.topcenterpanel,
 		padding = {0,0,0,0},
 		[x] = 0,
@@ -418,7 +617,7 @@ local function AddSidePanels(t, p, d, side)
 		caption = d.playerwins[side],
 	}
 
-	t.playerlabel = Chili.Label:New{
+	ts.playerlabel = Chili.Label:New{
 		parent = t.window,
 		padding = {0,0,0,0},
 		[right] = (p.windowWidth + p.topcenterwidth)/2,
@@ -433,10 +632,12 @@ local function AddSidePanels(t, p, d, side)
 		caption = d.playernames[side],
 	}
 	
-	t.resource_stats = {}
+	ts.resource_stats = {}
 	for i,resource in ipairs(d.resource_stats[side]) do
-		t.resource_stats[i] = {}
-		t.resource_stats[i].panel = Chili.Panel:New{
+		local restype = d.resource_stats[side][i].type
+		ts.resource_stats[restype] = {}
+		local r = ts.resource_stats[restype]
+		r.panel = Chili.Panel:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * (i-1),
 			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.unitpanelwidth,
@@ -448,16 +649,16 @@ local function AddSidePanels(t, p, d, side)
 			borderColor = {1,1,1,1},
 			borderThickness = 1,
 		}
-		t.resource_stats[i].barpanel = Chili.Control:New{
-			parent = t.resource_stats[i].panel,
+		r.barpanel = Chili.Control:New{
+			parent = r.panel,
 			padding = {0,0,0,0},
 			y = 0,
 			right = 0,
 			width = p.resourcebarwidth,
 			height = '100%',
 		}
-		t.resource_stats[i].bar = Chili.Progressbar:New{
-			parent = t.resource_stats[i].barpanel,
+		r.bar = Chili.Progressbar:New{
+			parent = r.barpanel,
 			padding = {0,0,0,0},
 			x = '5%',
 			y = '10%',
@@ -466,16 +667,16 @@ local function AddSidePanels(t, p, d, side)
 			color = resource.color,
 			value = resource.bar,
 		}
-		t.resource_stats[i].statpanel = Chili.Control:New{
-			parent = t.resource_stats[i].panel,
+		r.statpanel = Chili.Control:New{
+			parent = r.panel,
 			padding = {0,0,0,0},
 			x = 0,
 			y = 0,
 			width = p.resourcestatpanelwidth,
 			height = '100%',
 		}
-		t.resource_stats[i].total = Chili.Label:New{
-			parent = t.resource_stats[i].statpanel,
+		r.total = Chili.Label:New{
+			parent = r.statpanel,
 			x = 18,
 			height = '100%',
 			width = 20,
@@ -484,23 +685,36 @@ local function AddSidePanels(t, p, d, side)
 			textColor = resource.color,
 			caption = Format(resource.total, ""),
 		}
-		t.resource_stats[i].icon = Chili.Image:New{
-			parent = t.resource_stats[i].statpanel,
+		r.icon = Chili.Image:New{
+			parent = r.statpanel,
 			x = 0,
 			height = 18,
 			width = 18,
 			file = resource.icon,
 		}
-		t.resource_stats[i].labels = {}
+		r.labels = {}
 		for j,stat in ipairs(resource) do
-			t.resource_stats[i].labels[j] = Chili.Label:New{
-				parent = t.resource_stats[i].statpanel,
-				x = resource[j].label_x,
+			local color, shadow, outline
+			if i == 2 and j == 3 then
+				color = {1,0.3,0.3,1}
+				shadow = false
+				outline = true
+			else
+				color = resource.color
+				shadow = true
+				outline = false
+			end
+			r.labels[j] = Chili.Label:New{
+				parent = r.statpanel,
+				x = stat.label_x,
 				height = '100%',
-				width = 20,
+				width = 50,
 				valign = 'center',
-				textColor = resource.color,
-				caption = resource[j].label .. ":" .. Format(resource[j].value, ""),
+				autosize = false,
+				textColor = color,
+				fontShadow = shadow,
+				fontOutline = outline,
+				caption = stat.label .. ":" .. Format(stat.value, ""),
 			}
 		end
 	end
@@ -657,7 +871,6 @@ local function AddSidePanels(t, p, d, side)
 	
 end
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Call-ins
@@ -674,10 +887,14 @@ function widget:Initialize()
 		return
 	end
 	
+	allyTeams = GetOpposingAllyTeams()
+
 	-- if we should show the panel then
 		specPanel = {}
 		panelParams = SetupLayoutParams()
-		panelData = SetupMockData()
+		mockData = SetupMockData()
+		panelData = mockData
+		panelData.playernames = { left = allyTeams[1].name, right = allyTeams[2].name, }
 		AddCenterPanels(specPanel, panelParams, panelData)
 		AddSidePanels(specPanel, panelParams, panelData, 'left')
 		AddSidePanels(specPanel, panelParams, panelData, 'right')
@@ -692,17 +909,22 @@ function widget:Update(dt)
 	timer = timer + dt
 	-- Update the resource bar flashing status and graphics
 	if timer >= 1 then
-		-- Update the time
+		UpdateClock(specPanel)
 		-- Update the wins counters
+		--	- TBD
+		--	- ALso, why update the wins counter every user frame?
+		--	- Why not update it when the game ends? When else would it ever change?
+--		UpdateWins(specPanel)
 		timer = 0
 	end
 end
 
 function widget:GameFrame(n)
 	if n%TEAM_SLOWUPDATE_RATE == 0 then
-		-- Update the resources
+		UpdateResources(specPanel)
 	end
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
