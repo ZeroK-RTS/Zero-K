@@ -122,7 +122,9 @@ local function DrawGhostSites()
 			else
 				gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID])
 			end
-			gl.UseShader(0)
+			if shaderObj then
+				gl.UseShader(0)
+			end
 
 			gl.PopMatrix()
 		else
