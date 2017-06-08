@@ -50,6 +50,13 @@ end
 --	- Get team names and other team data
 --	- Add wins data
 --	- Rip out the mock data and add in initialization data
+--	- Add an iteration on initialization to get current unit data, even if
+--		the widget was restarted midway through a game
+--	- Hook up the bg screenshots to live data
+--		- For 1v1, I'll need a way to detect and track the facplop
+--		- For teams, I'll need a count of the playerteams on each side
+--		- That probably SHOULD include AI players, which means I'll need to
+--			modify GetOpposingAllyTeams()
 --	- Make more bg screenshots
 --	- Add flashing to resbars, including:
 --		- Grey on metal excess - see #1960
@@ -88,12 +95,23 @@ local panelParams
 local panelData
 local mockData
 local allyTeams
+local teamSides = {}
 local timer_updateclock = 0
 local timer_updatestats = 0
 local smoothTables = {}
 local smoothedTables = {
 	resources_left = {0,0,0,0,0,0,0,0,0,0,0,0,},
 	resources_right = {0,0,0,0,0,0,0,0,0,0,0,0,},
+}
+
+-- This is probably getting refactored away
+local unitStats = {
+	{
+		total = 0,
+	},
+	{
+		total = 0,
+	},
 }
 
 local col_metal = {136/255,214/255,251/255,1}
@@ -290,6 +308,12 @@ local function DisplayUpdatedResources(t)
 	t.balancebars[2].bar:SetValue(100 * mBase_bb.left / (mBase_bb.left + mBase_bb.right))
 end
 
+local function DisplayUpdatedUnitStats(t)
+	for i,side in ipairs({'left', 'right'}) do
+		t[side].unit_stats.total:SetCaption("Unit Value: " .. Format(unitStats[i].total, ""))
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Setup Data
@@ -305,6 +329,9 @@ local function GetWinString(name)
 end
 
 local function GetOpposingAllyTeams()
+	-- TODO - Consider whether this should set up the file-scoped allyTeams directly
+	--        rather than returning the data it as a value to be stored by the caller
+
 	local allyteams = {}
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
 	local allyTeamList = Spring.GetAllyTeamList()
@@ -323,6 +350,12 @@ local function GetOpposingAllyTeams()
 					winString = GetWinString(playerName)
 					break
 				end
+			end
+			
+			-- TODO - This is not a good way to do this
+			--        Merge this with the loop immediately above, and handle them both better
+			for j = 1, #teamList do
+				teamSides[teamList[j]] = i
 			end
 
 			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID) or "Unknown"
@@ -349,6 +382,9 @@ local function GetOpposingAllyTeams()
 	
 	if allyteams[1].allyTeamID > allyteams[2].allyTeamID then
 		allyteams[1], allyteams[2] = allyteams[2], allyteams[1]
+		for i = 1, #teamSides do
+			teamSides[i] = 3 - teamSides[i]
+		end
 	end
 	
 	if allyteams[1].playercount > 1 or allyteams[2].playercount > 1 then
@@ -732,7 +768,7 @@ local function AddSidePanels(t, p, d, side)
 		end
 	end
 	
-	t.unitpanel = Chili.Panel:New{
+	ts.unitpanel = Chili.Panel:New{
 		parent = t.window,
 		y = p.topheight,
 		[right] = (p.windowWidth + p.balancepanelwidth)/2,
@@ -744,30 +780,31 @@ local function AddSidePanels(t, p, d, side)
 		borderColor = {1,1,1,1},
 		borderThickness = 1,
 	}
-	t.unit_stats = {}
-	t.unit_stats.total = Chili.Label:New{
-		parent = t.unitpanel,
+	ts.unit_stats = {}
+	ts.unit_stats.total = Chili.Label:New{
+		parent = ts.unitpanel,
 		[x] = 0,
 		height = '50%',
 		width = '100%',
 		align = 'center',
 		valign = 'center',
+		autosize = false,
 		fontsize = 16,
 		textColor = { 0.85, 0.85, 0.85, 1.0 },
 		caption = "Unit Value: " .. Format(d.unit_stats[side].total, ""),
 	}
 	for i,stat in ipairs(d.unit_stats[side]) do
-		t.unit_stats[i] = {}
-		t.unit_stats[i].icon = Chili.Image:New{
-			parent = t.unitpanel,
+		ts.unit_stats[i] = {}
+		ts.unit_stats[i].icon = Chili.Image:New{
+			parent = ts.unitpanel,
 			x = stat.icon_x,
 			y = '60%',
 			height = 18,
 			width = 18,
 			file = stat.icon,
 		}
-		t.unit_stats[i].label = Chili.Label:New{
-			parent = t.unitpanel,
+		ts.unit_stats[i].label = Chili.Label:New{
+			parent = ts.unitpanel,
 			x = stat.icon_x + 18,
 			y = '50%',
 			height = '50%',
@@ -886,7 +923,143 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Call-ins
+-- Unit Stats Call-ins and Processor
+
+
+local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
+	
+	-- Counters to be updated here:
+	--	Total unit value
+	--	Offense
+	--	Defense
+	--	Eco
+	--	Mobile constructors, not including commanders
+	--	Every individual unit type (needed for unitpics)
+	--		… but will want to filter out unit types that I don't want to include in the unitpics, even if I'm including them in the other counters (like total, eco, cons)
+	
+	local side = teamSides[unitTeam]
+	local ud = UnitDefs[unitDefID]
+	if ud and not (ud.customParams.dontcount or ud.customParams.is_drone) then
+		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
+		if remove then
+			metal = -metal
+		end
+		unitStats[side].total = unitStats[side].total + metal
+		
+		-- Add it to total unit value unless it meets the master universal don't-include criteria, in which case just exit
+		-- Classify it as one of the following:
+		--	Offense
+		--	Defense
+		--	Eco
+		--	Other
+		--	... and then add it to the appropriate counter
+		-- Determine whether it's a mobile constructor or not (independently of the previous classification)
+		--	... and if so, add it to the cons counter
+		-- Filter out any units that I don't want included in the unitpics
+		--	... and then add it to the individual unit counter
+	end
+
+--[[
+	local stats = playerTeamStatsCache[unitTeam]
+	if UnitDefs[unitDefID] and stats then -- shouldn't need to guard against nil here, but I've had it happen
+		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
+		local speed = UnitDefs[unitDefID].speed
+		local unarmed = UnitDefs[unitDefID].springCategories.unarmed
+		local isbuilt = not select(3, spGetUnitIsStunned(unitID))	
+		if metal and metal < 1000000 then -- tforms show up as 1million cost, so ignore them
+			if remove then
+				metal = -metal
+			end
+			-- for mobiles, count only completed units
+			if speed and speed ~= 0 then
+				if remove then
+					finishedUnits[unitID] = nil
+					stats.mMobs = stats.mMobs + metal
+					-- [f=0087651] [cawidgets.lua] Error: Error in UnitGiven(): [string "LuaUI/Widgets/gui_chili_deluxeplayerlist.lu..."]:410: attempt to index local 'stats' (a nil value)
+				elseif isbuilt then
+					finishedUnits[unitID] = true
+					stats.mMobs = stats.mMobs + metal
+				end
+			-- for static defense, include full cost of unfinished units so you can see when your teammates are trying to build too much
+			elseif not unarmed then
+				stats.mDefs = stats.mDefs + metal
+			end
+		end
+	end
+--]]
+end
+
+
+--
+-- Add the add/remove flag to the end of every call to ProcessUnit so that it's explicit and self-documenting
+--	- No, wait, don't.
+--
+
+-- function gadget:UnitFinished(unitID)
+--	finishedUnits[unitID] = true
+-- end
+--
+function widget:UnitFinished(unitID, unitDefID, unitTeam)
+	--
+	-- TODO - Put the initial factory detection and bg picture updating code here
+	--		(but first read through the facplop code to be sure I know how it works)
+	--
+
+	-- Don't do unit filtering here, do it in ProcessUnit()
+	-- local speed = UnitDefs[unitDefID].speed
+	-- local unarmed = UnitDefs[unitDefID].springCategories.unarmed
+	-- if speed and speed ~= 0 and (not finishedUnits[unitID]) then	-- mobile unit
+		ProcessUnit(unitID, unitDefID, unitTeam)
+	-- end
+end
+
+
+-- function gadget:UnitReverseBuilt(unitID)
+--	finishedUnits[unitID] = nil
+-- end
+function widget:UnitReverseBuilt(unitID)
+      ProcessUnit(unitID, unitDefID, unitTeam, true)
+end
+
+
+-- function gadget:UnitDestroyed(unitID)
+--	finishedUnits[unitID] = nil
+-- end
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	-- Don't do unit filtering here, do it in ProcessUnit()
+	-- local speed = UnitDefs[unitDefID].speed
+	-- local unarmed = UnitDefs[unitDefID].springCategories.unarmed
+	-- if speed and speed ~= 0 then	-- mobile unit
+	--     if finishedUnits[unitID] then
+		      ProcessUnit(unitID, unitDefID, unitTeam, true)
+	--     end
+	-- elseif not unarmed then	-- static defense
+	--      ProcessUnit(unitID, unitDefID, unitTeam, true)
+	-- end
+end
+
+
+function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
+	-- doing this twice is a bit inefficient but bah
+	ProcessUnit(unitID, unitDefID, teamID, true)
+	ProcessUnit(unitID, unitDefID, newTeamID)
+end
+
+
+--[[	-- Not going to use this because this widget only counts finished units, not nanoframes
+function widget:UnitCreated(unitID, unitDefID, unitTeam)
+	local speed = UnitDefs[unitDefID].speed
+	local unarmed = UnitDefs[unitDefID].springCategories.unarmed
+	if (speed == nil or speed == 0) and not unarmed then -- is static-d
+		ProcessUnit(unitID, unitDefID, unitTeam)
+	end
+end
+--]]
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- General Call-ins
 
 function widget:Shutdown()
 end
@@ -933,6 +1106,7 @@ function widget:Update(dt)
 	end
 	if timer_updatestats >= 2 then
 		DisplayUpdatedResources(specPanel)
+		DisplayUpdatedUnitStats(specPanel)
 		_,timer_updatestats = math.modf(Spring.GetGameSeconds())
 	end
 end
