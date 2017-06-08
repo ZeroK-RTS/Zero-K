@@ -88,12 +88,18 @@ local panelParams
 local panelData
 local mockData
 local allyTeams
+local timer_updateclock = 0
+local timer_updatestats = 0
 local smoothTables = {}
+local smoothedTables = {
+	resources_left = {0,0,0,0,0,0,0,0,0,0,0,0,},
+	resources_right = {0,0,0,0,0,0,0,0,0,0,0,0,},
+}
 
 local col_metal = {136/255,214/255,251/255,1}
 local col_energy = {.93,.93,0,1}
 local default_playercolors = { left = {0.5,0.5,1,1}, right = {1,0.2,0.2,1}, }
-local smooth_count = 5
+local smooth_count = 3
 
 -- hardcoding these for now, will add colourblind options later
 local positiveColourStr = GreenStr
@@ -204,7 +210,7 @@ local function UpdateWins(t)
 	end
 end
 
-local function GetResources(side_num)
+local function FetchUpdatedResources()
 	-- The energy stats seem wrong.
 	-- They were taken from the current spec panels. I've probably translated them
 	-- incorrectly, but what I have here gives results that seem very wrong.
@@ -214,51 +220,58 @@ local function GetResources(side_num)
 	--	9 of the 62 energy generated was used to produce metal and
 	--	therefore was not available to use as energy.
 	--
-	-- This warrants substantial further investigation.
+	-- This warrants further investigation.
 	
-	local smCurr, smStor, smInco, smOvdr, smRecl, smBase, seCurr, seStor, seInco, seOvdr, seRecl, seBase = 0,0,0,0,0,0,0,0,0,0,0,0
-	local allyTeamID = allyTeams[side_num].allyTeamID
-	local teams = Spring.GetTeamList(allyTeamID)
+	for i,side in ipairs({'left', 'right'}) do
+		local smCurr, smStor, smInco, smOvdr, smRecl, smBase, seCurr, seStor, seInco, seOvdr, seRecl, seBase = 0,0,0,0,0,0,0,0,0,0,0,0
+		local allyTeamID = allyTeams[i].allyTeamID
+		local teams = Spring.GetTeamList(allyTeamID)
 	
-	for i = 1, #teams do
-		local mCurr, mStor, _, mInco = spGetTeamResources(teams[i], "metal")
-		local eCurr, eStor, _, eInco = spGetTeamResources(teams[i], "energy")
+		for j = 1, #teams do
+			local mCurr, mStor, _, mInco = spGetTeamResources(teams[j], "metal")
+			local eCurr, eStor, _, eInco = spGetTeamResources(teams[j], "energy")
 		
-		smInco = smInco + (mInco or 0)
-		smBase = smBase + (spGetTeamRulesParam(teams[i], "OD_metalBase") or 0)
+			smInco = smInco + (mInco or 0)
+			smBase = smBase + (spGetTeamRulesParam(teams[j], "OD_metalBase") or 0)
 		
-		-- Strange magic
-		smCurr = smCurr + (mCurr or 0)
-		smStor = smStor + (mStor or 0) - HIDDEN_STORAGE
-		seCurr = seCurr + math.min((eCurr or 0), (eStor or 0) - HIDDEN_STORAGE)
-		seStor = seStor + (eStor or 0) - HIDDEN_STORAGE 
+			-- Strange magic
+			smCurr = smCurr + (mCurr or 0)
+			smStor = smStor + (mStor or 0) - HIDDEN_STORAGE
+			seCurr = seCurr + math.min((eCurr or 0), (eStor or 0) - HIDDEN_STORAGE)
+			seStor = seStor + (eStor or 0) - HIDDEN_STORAGE 
 		
-		-- WITCHCRAFT!!
-		local energyChange = spGetTeamRulesParam(teams[i], "OD_energyChange") or 0
-		seRecl = seRecl + (eInco or 0) - math.max(0, energyChange)
-		seBase = seBase + (eInco or 0)
+			-- WITCHCRAFT!!
+			local energyChange = spGetTeamRulesParam(teams[j], "OD_energyChange") or 0
+			seRecl = seRecl + (eInco or 0) - math.max(0, energyChange)
+			seBase = seBase + (eInco or 0)
+		end
+
+		smOvdr = spGetTeamRulesParam(teams[1], "OD_team_metalOverdrive") or 0
+		seOvdr = spGetTeamRulesParam(teams[1], "OD_team_energyOverdrive") or 0
+
+		local smRecl = smInco
+				- (spGetTeamRulesParam(teams[1], "OD_team_metalOverdrive") or 0)
+				- (spGetTeamRulesParam(teams[1], "OD_team_metalBase") or 0) 
+				- (spGetTeamRulesParam(teams[1], "OD_team_metalMisc") or 0)
+	
+		-- The other half of the incantation
+		seRecl = math.max(0, seRecl)
+		seInco = (spGetTeamRulesParam(teams[1], "OD_team_energyIncome") or 0) + seRecl
+		
+		smoothedTables['resources_'..side] = pack(
+			Smooth(
+				'resources_'..side,
+				pack(smCurr, smStor, smInco, smOvdr, smRecl, smBase, seCurr, seStor, seInco, seOvdr, seRecl, seBase)
+			)
+		)
 	end
-
-	smOvdr = spGetTeamRulesParam(teams[1], "OD_team_metalOverdrive") or 0
-	seOvdr = spGetTeamRulesParam(teams[1], "OD_team_energyOverdrive") or 0
-
-	local smRecl = smInco
-			- (spGetTeamRulesParam(teams[1], "OD_team_metalOverdrive") or 0)
-			- (spGetTeamRulesParam(teams[1], "OD_team_metalBase") or 0) 
-			- (spGetTeamRulesParam(teams[1], "OD_team_metalMisc") or 0)
-	
-	-- The other half of the incantation
-	seRecl = math.max(0, seRecl)
-	seInco = (spGetTeamRulesParam(teams[1], "OD_team_energyIncome") or 0) + seRecl
-	
-	return smCurr, smStor, smInco, smOvdr, smRecl, smBase, seCurr, seStor, seInco, seOvdr, seRecl, seBase
 end
 
-local function UpdateResources(t)
+local function DisplayUpdatedResources(t)
 	local mInco_bb = {}
 	local mBase_bb = {}
 	for i,side in ipairs({'left', 'right'}) do
-		local smCurr, smStor, smInco, smOvdr, smRecl, smBase, seCurr, seStor, seInco, seOvdr, seRecl, seBase = Smooth('resources'..side,pack(GetResources(i)))
+		local smCurr, smStor, smInco, smOvdr, smRecl, smBase, seCurr, seStor, seInco, seOvdr, seRecl, seBase = unpack(smoothedTables['resources_'..side])
 		t[side].resource_stats.metal.total:SetCaption(Format(smInco, ""))
 		t[side].resource_stats.metal.labels[1]:SetCaption("E:" .. Format(smBase, ""))
 		t[side].resource_stats.metal.labels[2]:SetCaption("R:" .. Format(smRecl, ""))
@@ -904,24 +917,29 @@ function widget:Initialize()
 	-- end
 end
 
-local timer = 0
 function widget:Update(dt)
-	timer = timer + dt
+	timer_updateclock = timer_updateclock + dt
+	timer_updatestats = timer_updatestats + dt
 	-- Update the resource bar flashing status and graphics
-	if timer >= 1 then
+	--	- TBD
+	if timer_updateclock >= 1 then
 		UpdateClock(specPanel)
 		-- Update the wins counters
 		--	- TBD
 		--	- ALso, why update the wins counter every user frame?
 		--	- Why not update it when the game ends? When else would it ever change?
---		UpdateWins(specPanel)
-		timer = 0
+		-- UpdateWins(specPanel)
+		_,timer_updateclock = math.modf(Spring.GetGameSeconds())
+	end
+	if timer_updatestats >= 2 then
+		DisplayUpdatedResources(specPanel)
+		_,timer_updatestats = math.modf(Spring.GetGameSeconds())
 	end
 end
 
 function widget:GameFrame(n)
 	if n%TEAM_SLOWUPDATE_RATE == 0 then
-		UpdateResources(specPanel)
+		FetchUpdatedResources()
 	end
 end
 
