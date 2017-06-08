@@ -472,7 +472,7 @@
 	"hoverriot" : {
 		"name" : "Mace",
 		"description" : "Riot Hover",
-		"helptext" : "The Mace is a mobile laser tower. Its high firepower is useful for killing light enemy units. It is perfectly accurate and is good against gunships and fast units. However, its thin armor makes it vulnerable when targetted directly, especially by skirmishers."
+		"helptext" : "The Mace is a mobile maser tower. Its high firepower is useful for killing light enemy units. It is perfectly accurate and is good against gunships and fast units. However, its thin armor makes it vulnerable when targetted directly, especially by skirmishers."
 	},
 	"veharty" : {
 		"name" : "Wolverine",
