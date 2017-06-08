@@ -246,9 +246,9 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 
 				local expectedShieldPower
 
-				expectedShieldPower = math.min(shieldPower + (frame - gameFrame) * shieldRegenDef[unitDefID], shieldPowerDef[unitDefID])
+				expectedShieldPower = math.min(shieldPower + (frame - gameFrame) * shieldRegenDef[unitDefID], shieldPowerDef[unitDefID] or 0)
 				if disarmShieldDamage > expectedShieldPower then --disarming damage has passed through the shield
-					local disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
+					disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
 				else --otherwise the damage is absorbed
 					shieldPower = shieldPower - disarmShieldDamage --this can go below 0, but it's virtual, since calculus is done @frame (future)
 				end
