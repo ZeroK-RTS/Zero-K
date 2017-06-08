@@ -48,6 +48,7 @@ end
 --	- Hook up to actual data
 --		- This will be a good time to revise the panelData data structure
 --		- It has a lot of redundancy that was there for mocking up the layout
+--	- Wait, I can specify the buildpic filename as "#" .. udid ??? - Go change the others, too.
 --	- Figure out how to deal with attrition
 --	- Get team names and other team data
 --	- Add wins data
@@ -115,18 +116,24 @@ local unitStats = {
 		offense = 0,
 		defense = 0,
 		eco = 0,
-		cons = 0,
 		units = {},
-		metal = {},
+		cons = {
+			count = 0,
+			udids = {},
+		},
+		comms = {},
 	},
 	{
 		total = 0,
 		offense = 0,
 		defense = 0,
 		eco = 0,
-		cons = 0,
 		units = {},
-		metal = {},
+		cons = {
+			count = 0,
+			udids = {},
+		},
+		comms = {},
 	},
 }
 
@@ -145,6 +152,8 @@ local col_metal = {136/255,214/255,251/255,1}
 local col_energy = {.93,.93,0,1}
 local default_playercolors = { left = {0.5,0.5,1,1}, right = {1,0.2,0.2,1}, }
 local smooth_count = 3
+local unitpic_slots = 4
+local compic_slots = 4
 
 -- hardcoding these for now, will add colourblind options later
 local positiveColourStr = GreenStr
@@ -344,26 +353,100 @@ local function DisplayUpdatedUnitStats(t)
 		t[side].unit_stats[3].label:SetCaption(Format(unitStats[i].eco, ""))
 		military_bb[side] = unitStats[i].offense + unitStats[i].defense
 		
-		t[side].unitpics[1].text:SetCaption(unitStats[i].cons)
+--		t[side].unitpics[1].text:SetCaption(unitStats[i].cons)
 		
-		-- Sort the unitpics by metal value
-		-- Pull out the first four after sorting and display them (just the counts for now, later update the pics too)
+		-- These two are parallel enough that I might want to refactor them
+		--	- possibly using a generic iterator function that takes sort functions
 		--
-		-- Holy snow it's working!
-		-- Now I need a function to set the unitpics...
-		-- First thing I need is to get the unitpic filename from the udid
-		-- ... and it looks like it's udid.name
-		
 		local sorted_udids = {}
 		for n in pairs(unitStats[i].units) do table.insert(sorted_udids, n) end
 		if #sorted_udids > 0 then
 			table.sort(sorted_udids, function (a,b) return unitStats[i].units[a].metal > unitStats[i].units[b].metal end)
-			for pic = 1,4 do
+			for pic = 1, unitpic_slots - 1 do
 				local text = sorted_udids[pic] and unitStats[i].units[sorted_udids[pic]].count or ''
 				local filename = sorted_udids[pic] and UnitDefs[sorted_udids[pic]].name or 'fakeunit'
-				t[side].unitpics[6-pic].text:SetCaption(text)
-				t[side].unitpics[6-pic].unitpic.file = 'unitpics/' .. filename .. '.png'
-				t[side].unitpics[6-pic].unitpic:Invalidate()
+				t[side].unitpics[unitpic_slots - pic + 1].text:SetCaption(text)
+				t[side].unitpics[unitpic_slots - pic + 1].unitpic.file = 'unitpics/' .. filename .. '.png'
+				t[side].unitpics[unitpic_slots - pic + 1].unitpic:Invalidate()
+			end
+		end
+		
+		-- Nearly the same as the one above
+		--
+		local sorted_con_udids = {}
+		for n in pairs(unitStats[i].cons.udids) do table.insert(sorted_con_udids, n) end
+		if #sorted_con_udids > 0 then
+			table.sort(sorted_con_udids, function (a,b) return unitStats[i].cons.udids[a].metal > unitStats[i].cons.udids[b].metal end)
+			for pic = 1,1 do
+				local text = unitStats[i].cons.count or ''
+				local filename = sorted_con_udids[pic] and UnitDefs[sorted_con_udids[pic]].name or 'fakeunit'
+				t[side].unitpics[pic].text:SetCaption(text)
+				t[side].unitpics[pic].unitpic.file = 'unitpics/' .. filename .. '.png'
+				t[side].unitpics[pic].unitpic:Invalidate()
+			end
+		end
+		-- Ditto?
+		--
+		local sorted_comm_ids = {}
+		for n in pairs(unitStats[i].comms) do table.insert(sorted_comm_ids, n) end
+		if #sorted_comm_ids > 0 then
+			table.sort(sorted_comm_ids, function (a,b) return unitStats[i].comms[a].level > unitStats[i].comms[b].level end)
+			for pic = 1,compic_slots do
+				
+				if pic == 1 then
+					if #sorted_comm_ids > compic_slots then
+						local text = ("Lvl " .. unitStats[i].comms[sorted_comm_ids[compic_slots]].level) or ''
+						local filename = ("#" .. unitStats[i].comms[sorted_comm_ids[compic_slots]].udid) or 'unitpics/fakeunit.png'
+						local moretext = (#sorted_comm_ids - compic_slots) .. " more"
+						t[side].compics[pic].unitpicframe:Show()
+						t[side].compics[pic].unitpicframe:BringToFront()
+						t[side].compics[pic].unitpic.file = filename
+						t[side].compics[pic].unitpic:Show()
+						t[side].compics[pic].unitpic:BringToFront()
+						t[side].compics[pic].unitpic:Invalidate()
+						t[side].compics[pic].text:SetCaption(text)
+						t[side].compics[pic].text:Show()
+						t[side].compics[pic].text:BringToFront()
+						t[side].compics[pic].moretext:SetCaption(moretext)
+						t[side].compics[pic].moretext:Show()
+						t[side].compics[pic].moretext:BringToFront()
+					else
+						local text = ("Lvl " .. unitStats[i].comms[sorted_comm_ids[#sorted_comm_ids]].level) or ''
+						local filename = ("#" .. unitStats[i].comms[sorted_comm_ids[#sorted_comm_ids]].udid) or 'unitpics/fakeunit.png'
+						t[side].compics[pic].unitpicframe:Show()
+						t[side].compics[pic].unitpicframe:BringToFront()
+						t[side].compics[pic].unitpic.file = filename
+						t[side].compics[pic].unitpic:Show()
+						t[side].compics[pic].unitpic:BringToFront()
+						t[side].compics[pic].unitpic:Invalidate()
+						t[side].compics[pic].text:SetCaption(text)
+						t[side].compics[pic].text:Show()
+						t[side].compics[pic].text:BringToFront()
+					end
+				else
+					if pic <= #sorted_comm_ids then
+						local text = ("Lvl " .. unitStats[i].comms[sorted_comm_ids[math.min(compic_slots, #sorted_comm_ids) - pic + 1]].level) or ''
+						local filename = ("#" .. unitStats[i].comms[sorted_comm_ids[math.min(compic_slots, #sorted_comm_ids) - pic + 1]].udid) or 'unitpics/fakeunit.png'
+						t[side].compics[pic].unitpicframe:Show()
+						t[side].compics[pic].unitpicframe:BringToFront()
+						t[side].compics[pic].unitpic.file = filename
+						t[side].compics[pic].unitpic:Show()
+						t[side].compics[pic].unitpic:BringToFront()
+						t[side].compics[pic].unitpic:Invalidate()
+						t[side].compics[pic].text:SetCaption(text)
+						t[side].compics[pic].text:Show()
+						t[side].compics[pic].text:BringToFront()
+					else
+						local text = ''
+						local filename = 'unitpics/fakeunit.png'
+						t[side].compics[pic].unitpicframe:Hide()
+						t[side].compics[pic].unitpic.file = filename
+						t[side].compics[pic].unitpic:Invalidate()
+						t[side].compics[pic].unitpic:Hide()
+						t[side].compics[pic].text:SetCaption(text)
+						t[side].compics[pic].text:Hide()
+					end
+				end
 			end
 		end
 	end
@@ -376,16 +459,8 @@ end
 
 local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 	
-	-- Counters to be updated here:
-	--	Total unit value
-	--	Offense
-	--	Defense
-	--	Eco
-	--	Mobile constructors, not including commanders
-	--	Every individual unit type (needed for unitpics)
-	--		… but will want to filter out unit types that I don't want to include in the unitpics, even if I'm including them in the other counters (like total, eco, cons)
-	
 	local side = teamSides[unitTeam]
+	local id = unitID
 	local udid = unitDefID
 	local ud = UnitDefs[unitDefID]
 	local cp = ud.customParams
@@ -395,6 +470,7 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 		-- TODO - Not certain these are the right ways to get this information
 		--
 		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
+		local level = (Spring.GetUnitRulesParam(unitID, "comm_level") or 0) + 1
 		local mobile = ud.speed and ud.speed ~= 0
 		local armed = not ud.springCategories.unarmed
 		local generator = cp.income_energy or cp.ismex or cp.windgen
@@ -406,8 +482,10 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 		local eco
 		local other
 		
+		local inc = 1
 		if remove then
 			metal = -metal
+			inc = -inc
 		end
 		
 		unitStats[side].total = unitStats[side].total + metal
@@ -424,34 +502,34 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 			other = true
 		end
 		
-		if con then
-			unitStats[side].cons = unitStats[side].cons + (remove and -1 or 1)
-		end
-		
 		if offense and not (con or comm) then
 			unitStats[side].units[udid] = unitStats[side].units[udid] or {}
-			unitStats[side].units[udid].count = (unitStats[side].units[udid].count or 0) + (remove and -1 or 1)
+			unitStats[side].units[udid].count = (unitStats[side].units[udid].count or 0) + inc
 			unitStats[side].units[udid].metal = (unitStats[side].units[udid].metal or 0) + metal
 			if unitStats[side].units[udid].count == 0 then
 				unitStats[side].units[udid] = nil
 			end
 		end
 		
-		-- Add it to total unit value unless it meets the master universal don't-include criteria, in which case just exit
-		-- Classify it as one of the following:
-		--	Offense
-		--	Defense
-		--	Eco
-		--	Other
-		--	... and then add it to the appropriate counter
-		-- Determine whether it's a mobile constructor or not (independently of the previous classification)
-		--	... and if so, add it to the cons counter
-		-- Filter out any units that I don't want included in the unitpics
-		--	... and then add it to the individual unit counter
-		--
-		-- Individual unit counter must be in both units and metal
-		-- Cons counter must be in units; not sure if there's a reason for them to be in metal as well
-		-- Category counters must be in metal; not sure if there's a reason for them to be in units as well
+		if con then
+			unitStats[side].cons.count = unitStats[side].cons.count + inc
+			unitStats[side].cons.udids[udid] = unitStats[side].cons.udids[udid] or {}
+			unitStats[side].cons.udids[udid].count = (unitStats[side].cons.udids[udid].count or 0) + inc
+			unitStats[side].cons.udids[udid].metal = (unitStats[side].cons.udids[udid].metal or 0) + metal
+			if unitStats[side].cons.udids[udid].count == 0 then
+				unitStats[side].cons.udids[udid] = nil
+			end
+		end
+		
+		if comm then
+			if remove then
+				unitStats[side].comms[id] = nil
+			else
+				unitStats[side].comms[id] = unitStats[side].comms[id] or {}
+				unitStats[side].comms[id].udid = udid or 0
+				unitStats[side].comms[id].level = level or 0
+			end
+		end
 	end
 end
 
@@ -643,28 +721,34 @@ local function SetupMockData()
 	
 	mock.unitpics = {
 		left = {
+--[[
 			{ name = "cloakcon", value = "5" },
 			{ name = "cloakraid", value = "18" },
 			{ name = "cloakriot", value = "3" },
 			{ name = "cloakskirm", value = "10" },
 			{ name = "cloakassault", value = "7" },
+--]]
 		},
 		right = {
+--[[
 			{ name = "hovercon", value = "3" },
 			{ name = "hoverassault", value = "8" },
 			{ name = "hoverskirm", value = "15" },
 			{ name = "hoverriot", value = "6" },
 			{ name = "hoverarty", value = "3" },
+--]]
 		},
 	}
 	mock.compics = {
 		left = {
-			-- { name = "commrecon", value = "2 more" },
-			-- { name = "commstrike", value = "Lvl 4" },
+			{ name = "commrecon", value = "2 more" },
+			{ name = "commstrike", value = "Lvl 4" },
 			{ name = "commassault", value = "Lvl 6" },
 		},
 		right = {
-			{ name = "commstrike", value = "Lvl 9" },
+			{ name = "commrecon", value = "2 more" },
+			{ name = "commstrike", value = "Lvl 4" },
+			{ name = "commassault", value = "Lvl 6" },
 		},
 	}
 	
@@ -737,6 +821,7 @@ local function AddCenterPanels(t, p, d)
 		height = '100%',
 		align = 'center',
 		valign = 'center',
+		autosize = false,
 		fontsize = 24,
 		textColor = {0.95, 1.0, 1.0, 1},
 		caption = GetTimeString(),
@@ -841,6 +926,7 @@ local function AddSidePanels(t, p, d, side)
 		height = p.topheight,
 		align = 'center',
 		valign = 'center',
+		autosize = false,
 		textColor = d.playercolors[side],
 		fontsize = 28,
 		fontShadow = true,
@@ -983,7 +1069,8 @@ local function AddSidePanels(t, p, d, side)
 	end
 	
 	ts.unitpics = {}
-	for i,unitpic in ipairs(d.unitpics[side]) do
+--	for i,unitpic in ipairs(d.unitpics[side]) do
+	for i = 1,unitpic_slots do
 		ts.unitpics[i] = {}
 		ts.unitpics[i].text = Chili.Label:New{
 			parent = t.window,
@@ -995,7 +1082,7 @@ local function AddSidePanels(t, p, d, side)
 			valign = 'bottom',
 			autosize = false,
 			fontsize = 16,
-			caption = unitpic.value,
+			caption = '',
 		}
 		ts.unitpics[i].unitpic = Chili.Image:New{
 			parent = t.window,
@@ -1003,7 +1090,7 @@ local function AddSidePanels(t, p, d, side)
 			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1),
 			height = p.picsize,
 			width = p.picsize,
-			file = 'unitpics/' .. unitpic.name .. '.png',
+			file = 'unitpics/fakeunit.png',
 		}
 		local framepic
 		if i == 1 then
@@ -1023,36 +1110,56 @@ local function AddSidePanels(t, p, d, side)
 	end
 	
 	ts.compics = {}
-	for i,compic in ipairs(d.compics[side]) do
+--	for i,compic in ipairs(d.compics[side]) do
+	for i = 1,compic_slots do
 		ts.compics[i] = {}
+		if i == 1 then
+			ts.compics[i].moretext = Chili.Label:New{
+				parent = t.window,
+				y = p.topheight + p.rowheight * 2 + 5,
+				[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * unitpic_slots,
+				height = p.picsize - 10,
+				width = p.picsize - 10,
+				align = 'center',
+				valign = 'center',
+				textColor = col_energy,
+				autosize = false,
+				caption = '',
+			}
+			ts.compics[i].moretext:Hide()
+		end
 		ts.compics[i].text = Chili.Label:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * 2 + 5,
-			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * #d.unitpics[side],
+			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * unitpic_slots,
 			height = p.picsize - 10,
 			width = p.picsize - 10,
 			align = 'right',
 			valign = 'bottom',
-			caption = compic.value,
+			autosize = false,
+			caption = '',
 		}
 		ts.compics[i].unitpic = Chili.Image:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * 2,
-			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * #d.unitpics[side],
+			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * unitpic_slots,
 			height = p.picsize,
 			width = p.picsize,
-			file = 'unitpics/' .. compic.name .. '.png',
+			file = 'unitpics/fakeunit.png',
 		}
 		local framepic = 'bitmaps/icons/frame_unit.png'
 		ts.compics[i].unitpicframe = Chili.Image:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * 2,
-			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * #d.unitpics[side],
+			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * unitpic_slots,
 			height = p.picsize,
 			width = p.picsize,
 			keepAspect = false,
 			file = framepic,
 		}
+		ts.compics[i].text:Hide()
+		ts.compics[i].unitpic:Hide()
+		ts.compics[i].unitpicframe:Hide()
 	end
 	
 	ts.bg_top = Chili.Panel:New{
