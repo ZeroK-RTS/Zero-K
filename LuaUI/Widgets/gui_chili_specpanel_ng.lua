@@ -30,6 +30,7 @@ end
 --	- Parameterize the colors
 --		- Balance Bar colors, including writing a function to attenuate them
 --	- Deal with padding in all the objects (??)
+--	- Look for any other text that needs autosize = false (all of it?)
 --
 --	- Revise the balance bars:
 --		- Make them multibars, stacked on top of each other
@@ -47,6 +48,7 @@ end
 --	- Hook up to actual data
 --		- This will be a good time to revise the panelData data structure
 --		- It has a lot of redundancy that was there for mocking up the layout
+--	- Figure out how to deal with attrition
 --	- Get team names and other team data
 --	- Add wins data
 --	- Rip out the mock data and add in initialization data
@@ -57,6 +59,7 @@ end
 --		- For teams, I'll need a count of the playerteams on each side
 --		- That probably SHOULD include AI players, which means I'll need to
 --			modify GetOpposingAllyTeams()
+--	- Come up with all the unit category exceptions and edge cases and add them
 --	- Make more bg screenshots
 --	- Add flashing to resbars, including:
 --		- Grey on metal excess - see #1960
@@ -64,6 +67,7 @@ end
 --			- Match implementation in gui_chili_economy_panel2.lua
 --			- ... and also if wasting E? (but not if close to wasting)
 --		- Red on energy stalling
+--		- ... and some kind of indication for zero storage (but what?)
 --	- Add tooltips to everything.
 --		"What do you mean, everything?"
 --		"EEEEEVVVERYTHIIIING!!!!!!"
@@ -108,9 +112,32 @@ local smoothedTables = {
 local unitStats = {
 	{
 		total = 0,
+		offense = 0,
+		defense = 0,
+		eco = 0,
+		cons = 0,
+		units = {},
+		metal = {},
 	},
 	{
 		total = 0,
+		offense = 0,
+		defense = 0,
+		eco = 0,
+		cons = 0,
+		units = {},
+		metal = {},
+	},
+}
+
+local unitCategoryExceptions = {
+	offense = {
+	},
+	defense = {
+	},
+	eco = {
+	},
+	other = {
 	},
 }
 
@@ -309,10 +336,149 @@ local function DisplayUpdatedResources(t)
 end
 
 local function DisplayUpdatedUnitStats(t)
+	local military_bb = {}
 	for i,side in ipairs({'left', 'right'}) do
 		t[side].unit_stats.total:SetCaption("Unit Value: " .. Format(unitStats[i].total, ""))
+		t[side].unit_stats[1].label:SetCaption(Format(unitStats[i].offense, ""))
+		t[side].unit_stats[2].label:SetCaption(Format(unitStats[i].defense, ""))
+		t[side].unit_stats[3].label:SetCaption(Format(unitStats[i].eco, ""))
+		military_bb[side] = unitStats[i].offense + unitStats[i].defense
+		
+		t[side].unitpics[1].text:SetCaption(unitStats[i].cons)
+		
+		-- Sort the unitpics by metal value
+		-- Pull out the first four after sorting and display them (just the counts for now, later update the pics too)
+		--
+		-- Holy snow it's working!
+		-- Now I need a function to set the unitpics...
+		-- First thing I need is to get the unitpic filename from the udid
+		-- ... and it looks like it's udid.name
+		
+		local sorted_udids = {}
+		for n in pairs(unitStats[i].units) do table.insert(sorted_udids, n) end
+		if #sorted_udids > 0 then
+			table.sort(sorted_udids, function (a,b) return unitStats[i].units[a].metal > unitStats[i].units[b].metal end)
+			for pic = 1,4 do
+				local text = sorted_udids[pic] and unitStats[i].units[sorted_udids[pic]].count or ''
+				local filename = sorted_udids[pic] and UnitDefs[sorted_udids[pic]].name or 'fakeunit'
+				t[side].unitpics[6-pic].text:SetCaption(text)
+				t[side].unitpics[6-pic].unitpic.file = 'unitpics/' .. filename .. '.png'
+				t[side].unitpics[6-pic].unitpic:Invalidate()
+			end
+		end
+	end
+	t.balancebars[3].bar:SetValue(100 * military_bb.left / (military_bb.left + military_bb.right))
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Unit Stats Call-ins and Processor
+
+local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
+	
+	-- Counters to be updated here:
+	--	Total unit value
+	--	Offense
+	--	Defense
+	--	Eco
+	--	Mobile constructors, not including commanders
+	--	Every individual unit type (needed for unitpics)
+	--		… but will want to filter out unit types that I don't want to include in the unitpics, even if I'm including them in the other counters (like total, eco, cons)
+	
+	local side = teamSides[unitTeam]
+	local udid = unitDefID
+	local ud = UnitDefs[unitDefID]
+	local cp = ud.customParams
+	local e = unitCategoryExceptions
+
+	if ud and not (cp.dontcount or cp.is_drone) then
+		-- TODO - Not certain these are the right ways to get this information
+		--
+		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
+		local mobile = ud.speed and ud.speed ~= 0
+		local armed = not ud.springCategories.unarmed
+		local generator = cp.income_energy or cp.ismex or cp.windgen
+		local con = ud.isMobileBuilder and not ud.customParams.commtype
+		local comm = ud.customParams.commtype
+
+		local offense
+		local defense
+		local eco
+		local other
+		
+		if remove then
+			metal = -metal
+		end
+		
+		unitStats[side].total = unitStats[side].total + metal
+		if e.offense[udid] or (armed and mobile and not e.defense[udid] and not e.eco[udid] and not e.other[udid]) then
+			offense = true
+			unitStats[side].offense = unitStats[side].offense + metal
+		elseif e.defense[udid] or (armed and not mobile and not e.eco[udid] and not e.other[udid]) then
+			defense = true
+			unitStats[side].defense = unitStats[side].defense + metal
+		elseif e.eco[udid] or (not mobile and generator and not e.other[udid]) then
+			eco = true
+			unitStats[side].eco = unitStats[side].eco + metal
+		else
+			other = true
+		end
+		
+		if con then
+			unitStats[side].cons = unitStats[side].cons + (remove and -1 or 1)
+		end
+		
+		if offense and not (con or comm) then
+			unitStats[side].units[udid] = unitStats[side].units[udid] or {}
+			unitStats[side].units[udid].count = (unitStats[side].units[udid].count or 0) + (remove and -1 or 1)
+			unitStats[side].units[udid].metal = (unitStats[side].units[udid].metal or 0) + metal
+			if unitStats[side].units[udid].count == 0 then
+				unitStats[side].units[udid] = nil
+			end
+		end
+		
+		-- Add it to total unit value unless it meets the master universal don't-include criteria, in which case just exit
+		-- Classify it as one of the following:
+		--	Offense
+		--	Defense
+		--	Eco
+		--	Other
+		--	... and then add it to the appropriate counter
+		-- Determine whether it's a mobile constructor or not (independently of the previous classification)
+		--	... and if so, add it to the cons counter
+		-- Filter out any units that I don't want included in the unitpics
+		--	... and then add it to the individual unit counter
+		--
+		-- Individual unit counter must be in both units and metal
+		-- Cons counter must be in units; not sure if there's a reason for them to be in metal as well
+		-- Category counters must be in metal; not sure if there's a reason for them to be in units as well
 	end
 end
+
+
+function widget:UnitFinished(unitID, unitDefID, unitTeam)
+	--
+	-- TODO - Put the initial factory detection and bg picture updating code here
+	--		(but first read through the facplop code to be sure I know how it works)
+	--
+
+	ProcessUnit(unitID, unitDefID, unitTeam)
+end
+
+function widget:UnitReverseBuilt(unitID)
+      ProcessUnit(unitID, unitDefID, unitTeam, true)
+end
+
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+      ProcessUnit(unitID, unitDefID, unitTeam, true)
+end
+
+function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
+	-- doing this twice is a bit inefficient but bah
+	ProcessUnit(unitID, unitDefID, teamID, true)
+	ProcessUnit(unitID, unitDefID, newTeamID)
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -593,6 +759,7 @@ local function AddCenterPanels(t, p, d)
 			y = p.balanceheight * (i-1) + 4,
 			width = '100%',
 			height = 15,
+			autosize = false,
 			caption = bar.name,
 			align = 'center',
 		}
@@ -815,10 +982,10 @@ local function AddSidePanels(t, p, d, side)
 		}
 	end
 	
-	t.unitpics = {}
+	ts.unitpics = {}
 	for i,unitpic in ipairs(d.unitpics[side]) do
-		t.unitpics[i] = {}
-		t.unitpics[i].text = Chili.Label:New{
+		ts.unitpics[i] = {}
+		ts.unitpics[i].text = Chili.Label:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * 2 + 5,
 			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + 5,
@@ -826,10 +993,11 @@ local function AddSidePanels(t, p, d, side)
 			width = p.picsize - 10,
 			align = 'right',
 			valign = 'bottom',
+			autosize = false,
 			fontsize = 16,
 			caption = unitpic.value,
 		}
-		t.unitpics[i].unitpic = Chili.Image:New{
+		ts.unitpics[i].unitpic = Chili.Image:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * 2,
 			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1),
@@ -843,7 +1011,7 @@ local function AddSidePanels(t, p, d, side)
 		else
 			framepic = 'bitmaps/icons/frame_unit.png'
 		end
-		t.unitpics[i].unitpicframe = Chili.Image:New{
+		ts.unitpics[i].unitpicframe = Chili.Image:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * 2,
 			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1),
@@ -854,10 +1022,10 @@ local function AddSidePanels(t, p, d, side)
 		}
 	end
 	
-	t.compics = {}
+	ts.compics = {}
 	for i,compic in ipairs(d.compics[side]) do
-		t.compics[i] = {}
-		t.compics[i].text = Chili.Label:New{
+		ts.compics[i] = {}
+		ts.compics[i].text = Chili.Label:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * 2 + 5,
 			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * #d.unitpics[side],
@@ -867,7 +1035,7 @@ local function AddSidePanels(t, p, d, side)
 			valign = 'bottom',
 			caption = compic.value,
 		}
-		t.compics[i].unitpic = Chili.Image:New{
+		ts.compics[i].unitpic = Chili.Image:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * 2,
 			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * #d.unitpics[side],
@@ -876,7 +1044,7 @@ local function AddSidePanels(t, p, d, side)
 			file = 'unitpics/' .. compic.name .. '.png',
 		}
 		local framepic = 'bitmaps/icons/frame_unit.png'
-		t.compics[i].unitpicframe = Chili.Image:New{
+		ts.compics[i].unitpicframe = Chili.Image:New{
 			parent = t.window,
 			y = p.topheight + p.rowheight * 2,
 			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * #d.unitpics[side],
@@ -887,7 +1055,7 @@ local function AddSidePanels(t, p, d, side)
 		}
 	end
 	
-	t.bg_top = Chili.Panel:New{
+	ts.bg_top = Chili.Panel:New{
 		parent = t.window,
 		[x] = 12,
 		y = 0,
@@ -898,7 +1066,7 @@ local function AddSidePanels(t, p, d, side)
 		backgroundColor = {0,0,0,0.2},
 		borderColor = {0,0,0,0},
 	}
-	t.bg_bottom = Chili.Panel:New{
+	ts.bg_bottom = Chili.Panel:New{
 		parent = t.window,
 		[x] = 12,
 		y = p.topheight,
@@ -909,7 +1077,7 @@ local function AddSidePanels(t, p, d, side)
 		backgroundColor = {0,0,0,0.6},
 		borderColor = {0,0,0,0},
 	}
-	t.bg_image = Chili.Image:New{
+	ts.bg_image = Chili.Image:New{
 		parent = t.window,
 		[x] = 12,
 		y = 7,
@@ -920,142 +1088,6 @@ local function AddSidePanels(t, p, d, side)
 	}
 	
 end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Unit Stats Call-ins and Processor
-
-
-local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
-	
-	-- Counters to be updated here:
-	--	Total unit value
-	--	Offense
-	--	Defense
-	--	Eco
-	--	Mobile constructors, not including commanders
-	--	Every individual unit type (needed for unitpics)
-	--		… but will want to filter out unit types that I don't want to include in the unitpics, even if I'm including them in the other counters (like total, eco, cons)
-	
-	local side = teamSides[unitTeam]
-	local ud = UnitDefs[unitDefID]
-	if ud and not (ud.customParams.dontcount or ud.customParams.is_drone) then
-		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
-		if remove then
-			metal = -metal
-		end
-		unitStats[side].total = unitStats[side].total + metal
-		
-		-- Add it to total unit value unless it meets the master universal don't-include criteria, in which case just exit
-		-- Classify it as one of the following:
-		--	Offense
-		--	Defense
-		--	Eco
-		--	Other
-		--	... and then add it to the appropriate counter
-		-- Determine whether it's a mobile constructor or not (independently of the previous classification)
-		--	... and if so, add it to the cons counter
-		-- Filter out any units that I don't want included in the unitpics
-		--	... and then add it to the individual unit counter
-	end
-
---[[
-	local stats = playerTeamStatsCache[unitTeam]
-	if UnitDefs[unitDefID] and stats then -- shouldn't need to guard against nil here, but I've had it happen
-		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
-		local speed = UnitDefs[unitDefID].speed
-		local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-		local isbuilt = not select(3, spGetUnitIsStunned(unitID))	
-		if metal and metal < 1000000 then -- tforms show up as 1million cost, so ignore them
-			if remove then
-				metal = -metal
-			end
-			-- for mobiles, count only completed units
-			if speed and speed ~= 0 then
-				if remove then
-					finishedUnits[unitID] = nil
-					stats.mMobs = stats.mMobs + metal
-					-- [f=0087651] [cawidgets.lua] Error: Error in UnitGiven(): [string "LuaUI/Widgets/gui_chili_deluxeplayerlist.lu..."]:410: attempt to index local 'stats' (a nil value)
-				elseif isbuilt then
-					finishedUnits[unitID] = true
-					stats.mMobs = stats.mMobs + metal
-				end
-			-- for static defense, include full cost of unfinished units so you can see when your teammates are trying to build too much
-			elseif not unarmed then
-				stats.mDefs = stats.mDefs + metal
-			end
-		end
-	end
---]]
-end
-
-
---
--- Add the add/remove flag to the end of every call to ProcessUnit so that it's explicit and self-documenting
---	- No, wait, don't.
---
-
--- function gadget:UnitFinished(unitID)
---	finishedUnits[unitID] = true
--- end
---
-function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	--
-	-- TODO - Put the initial factory detection and bg picture updating code here
-	--		(but first read through the facplop code to be sure I know how it works)
-	--
-
-	-- Don't do unit filtering here, do it in ProcessUnit()
-	-- local speed = UnitDefs[unitDefID].speed
-	-- local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-	-- if speed and speed ~= 0 and (not finishedUnits[unitID]) then	-- mobile unit
-		ProcessUnit(unitID, unitDefID, unitTeam)
-	-- end
-end
-
-
--- function gadget:UnitReverseBuilt(unitID)
---	finishedUnits[unitID] = nil
--- end
-function widget:UnitReverseBuilt(unitID)
-      ProcessUnit(unitID, unitDefID, unitTeam, true)
-end
-
-
--- function gadget:UnitDestroyed(unitID)
---	finishedUnits[unitID] = nil
--- end
-function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	-- Don't do unit filtering here, do it in ProcessUnit()
-	-- local speed = UnitDefs[unitDefID].speed
-	-- local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-	-- if speed and speed ~= 0 then	-- mobile unit
-	--     if finishedUnits[unitID] then
-		      ProcessUnit(unitID, unitDefID, unitTeam, true)
-	--     end
-	-- elseif not unarmed then	-- static defense
-	--      ProcessUnit(unitID, unitDefID, unitTeam, true)
-	-- end
-end
-
-
-function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
-	-- doing this twice is a bit inefficient but bah
-	ProcessUnit(unitID, unitDefID, teamID, true)
-	ProcessUnit(unitID, unitDefID, newTeamID)
-end
-
-
---[[	-- Not going to use this because this widget only counts finished units, not nanoframes
-function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	local speed = UnitDefs[unitDefID].speed
-	local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-	if (speed == nil or speed == 0) and not unarmed then -- is static-d
-		ProcessUnit(unitID, unitDefID, unitTeam)
-	end
-end
---]]
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
