@@ -5,7 +5,7 @@ function widget:GetInfo()
   return {
     name      = "Chili SpecPanel - Next Gen",
     desc      = "Displays team information while spectating.",
-    author    = "GoogleFrog, CrazyEddie",
+    author    = "GoogleFrog, KingRaptor, CrazyEddie",
     date      = "3 June 2017",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
@@ -44,6 +44,8 @@ end
 --	- Fancy skinning option? Learn about skins and fancyskins
 --	- Reskin the panels so they look more like Evolved panels (but transparent) and less like buttons
 --	- Handle interactions with (hiding) the standard econ bars
+--	- Stop collecting stats at game over, prior to the losing side self-destroying,
+--		so you can see what the stats were just before they resigned.
 --
 --	- Hook up to actual data
 --		- This will be a good time to revise the panelData data structure
@@ -52,6 +54,7 @@ end
 --	- Figure out how to deal with attrition
 --	- Get team names and other team data
 --	- Add wins data
+--	- Revise wins logic to update at end of game instead of all throughout the game
 --	- Rip out the mock data and add in initialization data
 --	- Add an iteration on initialization to get current unit data, even if
 --		the widget was restarted midway through a game
@@ -73,11 +76,7 @@ end
 --		"What do you mean, everything?"
 --		"EEEEEVVVERYTHIIIING!!!!!!"
 --	- Add context menu / ShowOptions on meta-click
---	- Make it tweakable and dockable? Nah, design decision.
---		It's top center and you can't change that.
---		Don't like it? Don't use it!
 --	- Consider making small / medium / large versions
---	- Consider smoothing the econ stats and/or increasing the update interval
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -152,16 +151,21 @@ local col_metal = {136/255,214/255,251/255,1}
 local col_energy = {.93,.93,0,1}
 local default_playercolors = { left = {0.5,0.5,1,1}, right = {1,0.2,0.2,1}, }
 local smooth_count = 3
-local unitpic_slots = 4
-local compic_slots = 4
+local unitpic_slots = 5
+local compic_slots = 3
 
 -- hardcoding these for now, will add colourblind options later
 local positiveColourStr = GreenStr
 local negativeColourStr = RedStr
 
+-- Forward local declarations
+local GetWinString
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Options Functions
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -260,7 +264,8 @@ end
 
 local function UpdateWins(t)
 	for i,side in ipairs({'left', 'right'}) do
---		t[side].winslabel_bottom:SetCaption(math.random(0,4))
+		local wins = GetWinString(allyTeams[i].name) or 0
+		t[side].winslabel_bottom:SetCaption(wins)
 	end
 end
 
@@ -353,10 +358,8 @@ local function DisplayUpdatedUnitStats(t)
 		t[side].unit_stats[3].label:SetCaption(Format(unitStats[i].eco, ""))
 		military_bb[side] = unitStats[i].offense + unitStats[i].defense
 		
---		t[side].unitpics[1].text:SetCaption(unitStats[i].cons)
-		
-		-- These two are parallel enough that I might want to refactor them
-		--	- possibly using a generic iterator function that takes sort functions
+		-- These two are parallel enough that I might want to refactor them,
+		--	possibly using a generic iterator function that takes sort functions
 		--
 		local sorted_udids = {}
 		for n in pairs(unitStats[i].units) do table.insert(sorted_udids, n) end
@@ -385,6 +388,7 @@ local function DisplayUpdatedUnitStats(t)
 				t[side].unitpics[pic].unitpic:Invalidate()
 			end
 		end
+
 		-- Ditto?
 		--
 		local sorted_comm_ids = {}
@@ -552,7 +556,6 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
-	-- doing this twice is a bit inefficient but bah
 	ProcessUnit(unitID, unitDefID, teamID, true)
 	ProcessUnit(unitID, unitDefID, newTeamID)
 end
@@ -562,14 +565,14 @@ end
 --------------------------------------------------------------------------------
 -- Setup Data
 
-local function GetWinString(name)
+function GetWinString(name) -- forward-declared
 	local winTable = WG.WinCounter_currentWinTable
 	if winTable and winTable[name] and winTable[name].wins then
 		-- TODO - Do something else to mark the winner of the previous game, not this
 		-- return (winTable[name].wonLastGame and "*" or "") .. winTable[name].wins
 		return winTable[name].wins
 	end
-	return ""
+	return
 end
 
 local function GetOpposingAllyTeams()
@@ -721,34 +724,24 @@ local function SetupMockData()
 	
 	mock.unitpics = {
 		left = {
---[[
-			{ name = "cloakcon", value = "5" },
-			{ name = "cloakraid", value = "18" },
-			{ name = "cloakriot", value = "3" },
-			{ name = "cloakskirm", value = "10" },
-			{ name = "cloakassault", value = "7" },
---]]
 		},
 		right = {
---[[
-			{ name = "hovercon", value = "3" },
-			{ name = "hoverassault", value = "8" },
-			{ name = "hoverskirm", value = "15" },
-			{ name = "hoverriot", value = "6" },
-			{ name = "hoverarty", value = "3" },
---]]
 		},
 	}
 	mock.compics = {
 		left = {
+--[[
 			{ name = "commrecon", value = "2 more" },
 			{ name = "commstrike", value = "Lvl 4" },
 			{ name = "commassault", value = "Lvl 6" },
+--]]
 		},
 		right = {
+--[[
 			{ name = "commrecon", value = "2 more" },
 			{ name = "commstrike", value = "Lvl 4" },
 			{ name = "commassault", value = "Lvl 6" },
+--]]
 		},
 	}
 	
@@ -899,6 +892,7 @@ local function AddSidePanels(t, p, d, side)
 		y = '5%',
 		width = 50,
 		height = '30%',
+		autosize = false,
 		align = 'center',
 		valign = 'center',
 		textColor = d.playercolors[side],
@@ -911,6 +905,7 @@ local function AddSidePanels(t, p, d, side)
 		y = '30%',
 		width = 50,
 		height = '70%',
+		autosize = false,
 		align = 'center',
 		valign = 'center',
 		fontsize = 20,
@@ -982,6 +977,7 @@ local function AddSidePanels(t, p, d, side)
 			x = 18,
 			height = '100%',
 			width = 20,
+			autosize = false,
 			valign = 'center',
 			fontsize = 20,
 			textColor = resource.color,
@@ -1069,7 +1065,6 @@ local function AddSidePanels(t, p, d, side)
 	end
 	
 	ts.unitpics = {}
---	for i,unitpic in ipairs(d.unitpics[side]) do
 	for i = 1,unitpic_slots do
 		ts.unitpics[i] = {}
 		ts.unitpics[i].text = Chili.Label:New{
@@ -1078,9 +1073,9 @@ local function AddSidePanels(t, p, d, side)
 			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + 5,
 			height = p.picsize - 10,
 			width = p.picsize - 10,
+			autosize = false,
 			align = 'right',
 			valign = 'bottom',
-			autosize = false,
 			fontsize = 16,
 			caption = '',
 		}
@@ -1110,7 +1105,6 @@ local function AddSidePanels(t, p, d, side)
 	end
 	
 	ts.compics = {}
---	for i,compic in ipairs(d.compics[side]) do
 	for i = 1,compic_slots do
 		ts.compics[i] = {}
 		if i == 1 then
@@ -1120,10 +1114,10 @@ local function AddSidePanels(t, p, d, side)
 				[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * unitpic_slots,
 				height = p.picsize - 10,
 				width = p.picsize - 10,
+				autosize = false,
 				align = 'center',
 				valign = 'center',
 				textColor = col_energy,
-				autosize = false,
 				caption = '',
 			}
 			ts.compics[i].moretext:Hide()
@@ -1134,9 +1128,9 @@ local function AddSidePanels(t, p, d, side)
 			[right] = (p.windowWidth + p.balancepanelwidth)/2 + p.picsize * (i-1) + p.picsize * unitpic_slots,
 			height = p.picsize - 10,
 			width = p.picsize - 10,
+			autosize = false,
 			align = 'right',
 			valign = 'bottom',
-			autosize = false,
 			caption = '',
 		}
 		ts.compics[i].unitpic = Chili.Image:New{
@@ -1220,6 +1214,7 @@ function widget:Initialize()
 		mockData = SetupMockData()
 		panelData = mockData
 		panelData.playernames = { left = allyTeams[1].name, right = allyTeams[2].name, }
+		panelData.playerwins = { left = allyTeams[1].winString, right = allyTeams[2].winString, }
 		AddCenterPanels(specPanel, panelParams, panelData)
 		AddSidePanels(specPanel, panelParams, panelData, 'left')
 		AddSidePanels(specPanel, panelParams, panelData, 'right')
@@ -1236,11 +1231,8 @@ function widget:Update(dt)
 	--	- TBD
 	if timer_updateclock >= 1 then
 		UpdateClock(specPanel)
-		-- Update the wins counters
-		--	- TBD
-		--	- ALso, why update the wins counter every user frame?
-		--	- Why not update it when the game ends? When else would it ever change?
-		-- UpdateWins(specPanel)
+		-- TBD: revise Wins logic so it only updates at game end, not every userframe during play
+		UpdateWins(specPanel)
 		_,timer_updateclock = math.modf(Spring.GetGameSeconds())
 	end
 	if timer_updatestats >= 2 then
