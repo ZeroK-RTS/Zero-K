@@ -18,44 +18,18 @@ end
 --
 -- TODO:
 --
---	- Tweak everything, esp. anything that has asymmetry
---		- Decide where I want mirroring and where I want asymmetry
---	- Make the unitpic frames and labels children of the pic, to make it simpler
---		- Look for other objects that can be nested that way that aren't already
+-- Layout:
+--	- Tweak the layout - reduce space usage, ensure labels are wide enough,
+--		reposition labels, etc
 --	- Deal with padding in all the objects (??)
---
---	- Revise the balance bars:
---		- Make them multibars, stacked on top of each other
+--	- Experiment with making the balance bars multibars
+--		- Stack the two sides on top of each other
 --		- Set the leader to 100%
 --		- Set the lagger whatever percentage they are of the leader
 --
---	- Logic to enable/disable when appropriate (speccing and not FFA)
---	- Hotkeyable option to enable and disable
---	- Handle widget:PlayerChanged
---	- Colourblind option
---	- Fancy skinning option? Learn about skins and fancyskins
+-- Appearance:
 --	- Reskin the panels so they look more like Evolved panels (but transparent) and less like buttons
---	- Handle interactions with (hiding) the standard econ bars
---	- Stop collecting stats at game over, prior to the losing side self-destroying,
---		so you can see what the stats were just before they resigned.
---
---	- Hook up to actual data
---		- This will be a good time to revise the panelData data structure
---		- It has a lot of redundancy that was there for mocking up the layout
---	- Wait, I can specify the buildpic filename as "#" .. udid ??? - Go change the others, too.
---	- Figure out how to deal with attrition
---	- Get team names and other team data
---	- Add wins data
---	- Revise wins logic to update at end of game instead of all throughout the game
---	- Rip out the mock data and add in initialization data
---	- Add an iteration on initialization to get current unit data, even if
---		the widget was restarted midway through a game
---	- Hook up the bg screenshots to live data
---		- For 1v1, I'll need a way to detect and track the facplop
---		- For teams, I'll need a count of the playerteams on each side
---		- That probably SHOULD include AI players, which means I'll need to
---			modify GetOpposingAllyTeams()
---	- Come up with all the unit category exceptions and edge cases and add them
+--	- Add an interesting glowy thing behind the wins counter for the winner of the last game
 --	- Make more bg screenshots
 --	- Add flashing to resbars, including:
 --		- Grey on metal excess - see #1960
@@ -64,11 +38,26 @@ end
 --			- ... and also if wasting E? (but not if close to wasting)
 --		- Red on energy stalling
 --		- ... and some kind of indication for zero storage (but what?)
+--
+-- UI:
+--	- Colourblind option
+--	- Fancy skinning option? Learn about skins and fancyskins
 --	- Add tooltips to everything.
 --		"What do you mean, everything?"
 --		"EEEEEVVVERYTHIIIING!!!!!!"
 --	- Add context menu / ShowOptions on meta-click
 --	- Consider making small / medium / large versions
+--	- When PR is merged, decide on a enable/disable hotkey and put it in zk_keys
+--
+-- Data:
+--	- Find out what the right magic formula is for the energy stats
+--	- Add an iteration on initialization to get current unit data, even if
+--		the widget was restarted midway through a game
+--	- Stop collecting stats at game over, prior to the losing side self-destroying,
+--		so you can see what the stats were just before they resigned.
+--	- Revise wins logic to update at end of game instead of all throughout the game
+--	- Properly account for destroyed unfinished units in the unit value totals
+--	- Properly account for units not destroyed by the enemy in attrition (maybe?)
 --
 -- Code clean-up:
 --	- Alias overlong table chains
@@ -77,10 +66,15 @@ end
 --		- ... and make sure that there's explicitly exactly two in each dimension
 --	- Rearrange all other object parameters into a consistent and pleasing order
 --	- Consistentize capitalization of parameters
---	- Parameterize the colors
---		- Balance Bar colors, including writing a function to attenuate them
 --	- Look for any other text that needs autosize = false (all of it?)
 --	- Add nil guards where needed, remove them where unnecessary
+--	- Make the unitpic frames and labels children of the pic, to make it simpler
+--		- Look for other objects that can be nested that way that aren't already
+--	- Wait, I can specify the buildpic filename as "#" .. udid ??? - Go change the others, too.
+--
+--	- Lots more code general clean-up, organization, and prettification
+--
+-- See also other assorted TODO items annotated throughout the code
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -332,7 +326,7 @@ local function GetTimeString()
   return timeString
 end
 
-function GetWinString(name) -- forward-declared
+function GetWinString(name)
 	local winTable = WG.WinCounter_currentWinTable
 	if winTable and winTable[name] and winTable[name].wins then
 		-- TODO - Do something else to mark the winner of the previous game, not this
@@ -440,8 +434,6 @@ local function DisplayResources(t)
 		mInco_bb[side] = smInco
 		mBase_bb[side] = smBase
 	end
-	-- TODO - Figure out why pregame the income/base/military bars are stuck left
-	--	but the attrition bar goes to the middle like it should
 	local income = (mInco_bb.left == mInco_bb.right) and 50 or 100 * mInco_bb.left / (mInco_bb.left + mInco_bb.right)
 	local base   = (mBase_bb.left == mBase_bb.right) and 50 or 100 * mBase_bb.left / (mBase_bb.left + mBase_bb.right)
 	t.balancebars[1].bar:SetValue(income)
@@ -780,8 +772,7 @@ local function GetOpposingAllyTeams()
 		allyteams[2].color = default_playercolors.right
 	end
 	
-	-- This doesn't belong here
-	-- but refactoring will come later
+	-- TODO - This doesn't belong here
 	for i, side in ipairs({'left', 'right'}) do
 		if allyteams[i].playercount > 4 then
 			unitStats[i].factory = "largeteams"
