@@ -20,17 +20,9 @@ end
 --
 --	- Tweak everything, esp. anything that has asymmetry
 --		- Decide where I want mirroring and where I want asymmetry
---	- Rearrange bounds in this order: x,r,w,y,b,h
---	- Rewrite the bounds to be the simplest possible
---		- ... and make sure that there's explicitly exactly two in each dimension
 --	- Make the unitpic frames and labels children of the pic, to make it simpler
 --		- Look for other objects that can be nested that way that aren't already
---	- Rearrange all other object parameters into a consistent and pleasing order
---	- Consistentize capitalization of parameters
---	- Parameterize the colors
---		- Balance Bar colors, including writing a function to attenuate them
 --	- Deal with padding in all the objects (??)
---	- Look for any other text that needs autosize = false (all of it?)
 --
 --	- Revise the balance bars:
 --		- Make them multibars, stacked on top of each other
@@ -78,6 +70,18 @@ end
 --	- Add context menu / ShowOptions on meta-click
 --	- Consider making small / medium / large versions
 --
+-- Code clean-up:
+--	- Alias overlong table chains
+--	- Rearrange bounds in this order: x,r,w,y,b,h
+--	- Rewrite the bounds to be the simplest possible
+--		- ... and make sure that there's explicitly exactly two in each dimension
+--	- Rearrange all other object parameters into a consistent and pleasing order
+--	- Consistentize capitalization of parameters
+--	- Parameterize the colors
+--		- Balance Bar colors, including writing a function to attenuate them
+--	- Look for any other text that needs autosize = false (all of it?)
+--	- Add nil guards where needed, remove them where unnecessary
+--
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -100,6 +104,8 @@ local panelData
 local mockData
 local allyTeams
 local panel_is_on
+local gaiaTeam
+local deadUnits = {}
 local teamSides = {}
 local timer_updateclock = 0
 local timer_updatestats = 0
@@ -116,6 +122,7 @@ local didonce
 local unitStats = {
 	{
 		total = 0,
+		lost = 0,
 		offense = 0,
 		defense = 0,
 		eco = 0,
@@ -128,6 +135,7 @@ local unitStats = {
 	},
 	{
 		total = 0,
+		lost = 0,
 		offense = 0,
 		defense = 0,
 		eco = 0,
@@ -481,6 +489,13 @@ local function DisplayUpdatedUnitStats(t)
 		end
 	end
 	t.balancebars[3].bar:SetValue(100 * military_bb.left / (military_bb.left + military_bb.right))
+	local attrition
+	if unitStats[1].lost == 0 and unitStats[2].lost == 0 then
+		attrition = 50
+	else
+		attrition = 100 * unitStats[1].lost / (unitStats[1].lost + unitStats[2].lost)
+	end
+	t.balancebars[4].bar:SetValue(attrition)
 end
 
 --------------------------------------------------------------------------------
@@ -505,8 +520,8 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 		local mobile = ud.speed and ud.speed ~= 0
 		local armed = not ud.springCategories.unarmed
 		local generator = cp.income_energy or cp.ismex or cp.windgen
-		local con = ud.isMobileBuilder and not ud.customParams.commtype
 		local comm = ud.customParams.commtype
+		local con = ud.isMobileBuilder and not comm
 
 		local offense
 		local defense
@@ -519,6 +534,9 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 			inc = -inc
 		end
 		
+		-- TODO - Total only gets credited for finished units, but gets debited for
+		--	destroyed units whether they're finished or not. Need to fix that.
+		--
 		unitStats[side].total = unitStats[side].total + metal
 		if e.offense[udid] or (armed and mobile and not e.defense[udid] and not e.eco[udid] and not e.other[udid]) then
 			offense = true
@@ -575,11 +593,36 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitReverseBuilt(unitID)
-      ProcessUnit(unitID, unitDefID, unitTeam, true)
+	ProcessUnit(unitID, unitDefID, unitTeam, true)
 end
 
-function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-      ProcessUnit(unitID, unitDefID, unitTeam, true)
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attUnitID, attDefID, attTeamID)	
+	ProcessUnit(unitID, unitDefID, unitTeam, true)
+	
+	-- TODO - What about units destroyed by environmental damage, or by Gaia?
+	
+	if not panel_is_on then return end
+	
+	if unitTeam == gaiaTeam or Spring.GetUnitHealth(unitID) > 0 then return end
+
+	-- in spec mode UnitDestroyed would sometimes be called twice for the same unit, so we need to prevent it from counting twice
+	-- if its also the same kind of unit, its safe to assume that it is the very same unit
+	-- else it is most likely not the same unit but an old table entry and a re-used unitID. we just keep the entry
+	-- small margin of error remains
+	if deadUnits[unitID] and deadUnits[unitID] == unitDefID then
+		deadUnits[unitID] = nil
+		return 		
+	end
+	deadUnits[unitID] = unitDefID
+	
+	local ud = UnitDefs[unitDefID]
+	if ud.customParams.dontcount or ud.customParams.is_drone then return end
+	
+	local buildProgress = select(5, Spring.GetUnitHealth(unitID))
+	local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
+	
+	local side = teamSides[unitTeam]
+	unitStats[side].lost = unitStats[side].lost + worth
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
@@ -993,7 +1036,7 @@ local function AddSidePanels(t, p, d, side)
 			parent = r.statpanel,
 			x = 18,
 			height = '100%',
-			width = 25,
+			width = 35,
 			autosize = false,
 			valign = 'center',
 			fontsize = 20,
@@ -1281,6 +1324,7 @@ function widget:Initialize()
 		return
 	end
 	screen0 = Chili.Screen0
+	gaiaTeam = Spring.GetGaiaTeamID()
 end
 
 function widget:Update(dt)
