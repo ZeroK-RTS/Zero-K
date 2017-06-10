@@ -5,7 +5,7 @@ function widget:GetInfo()
   return {
     name      = "Chili SpecPanel - Next Gen",
     desc      = "Displays team information while spectating.",
-    author    = "GoogleFrog, KingRaptor, CrazyEddie",
+    author    = "GoogleFrog, KingRaptor, Anarchid, Shadowfury333, CrazyEddie",
     date      = "3 June 2017",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
@@ -429,9 +429,11 @@ local function DisplayUpdatedUnitStats(t)
 		for n in pairs(unitStats[i].comms) do table.insert(sorted_comm_ids, n) end
 		if #sorted_comm_ids > 0 then
 			table.sort(sorted_comm_ids, function (a,b) return unitStats[i].comms[a].level > unitStats[i].comms[b].level end)
-			for pic = 1,compic_slots do
-				
-				if pic == 1 then
+		end
+		for pic = 1,compic_slots do
+			-- TODO - OMG CLEAN THIS GARBAGE UP
+			if pic == 1 then
+				if #sorted_comm_ids > 0 then
 					if #sorted_comm_ids > compic_slots then
 						local text = ("Lvl " .. unitStats[i].comms[sorted_comm_ids[compic_slots]].level) or ''
 						local filename = ("#" .. unitStats[i].comms[sorted_comm_ids[compic_slots]].udid) or 'unitpics/fakeunit.png'
@@ -462,28 +464,39 @@ local function DisplayUpdatedUnitStats(t)
 						t[side].compics[pic].text:BringToFront()
 					end
 				else
-					if pic <= #sorted_comm_ids then
-						local text = ("Lvl " .. unitStats[i].comms[sorted_comm_ids[math.min(compic_slots, #sorted_comm_ids) - pic + 1]].level) or ''
-						local filename = ("#" .. unitStats[i].comms[sorted_comm_ids[math.min(compic_slots, #sorted_comm_ids) - pic + 1]].udid) or 'unitpics/fakeunit.png'
-						t[side].compics[pic].unitpicframe:Show()
-						t[side].compics[pic].unitpicframe:BringToFront()
-						t[side].compics[pic].unitpic.file = filename
-						t[side].compics[pic].unitpic:Show()
-						t[side].compics[pic].unitpic:BringToFront()
-						t[side].compics[pic].unitpic:Invalidate()
-						t[side].compics[pic].text:SetCaption(text)
-						t[side].compics[pic].text:Show()
-						t[side].compics[pic].text:BringToFront()
-					else
-						local text = ''
-						local filename = 'unitpics/fakeunit.png'
-						t[side].compics[pic].unitpicframe:Hide()
-						t[side].compics[pic].unitpic.file = filename
-						t[side].compics[pic].unitpic:Invalidate()
-						t[side].compics[pic].unitpic:Hide()
-						t[side].compics[pic].text:SetCaption(text)
-						t[side].compics[pic].text:Hide()
-					end
+					local text = ''
+					local filename = 'unitpics/fakeunit.png'
+					t[side].compics[pic].unitpicframe:Hide()
+					t[side].compics[pic].unitpic.file = filename
+					t[side].compics[pic].unitpic:Invalidate()
+					t[side].compics[pic].unitpic:Hide()
+					t[side].compics[pic].text:SetCaption(text)
+					t[side].compics[pic].text:Hide()
+					t[side].compics[pic].moretext:SetCaption(text)
+					t[side].compics[pic].moretext:Hide()
+				end
+			else
+				if pic <= #sorted_comm_ids then
+					local text = ("Lvl " .. unitStats[i].comms[sorted_comm_ids[math.min(compic_slots, #sorted_comm_ids) - pic + 1]].level) or ''
+					local filename = ("#" .. unitStats[i].comms[sorted_comm_ids[math.min(compic_slots, #sorted_comm_ids) - pic + 1]].udid) or 'unitpics/fakeunit.png'
+					t[side].compics[pic].unitpicframe:Show()
+					t[side].compics[pic].unitpicframe:BringToFront()
+					t[side].compics[pic].unitpic.file = filename
+					t[side].compics[pic].unitpic:Show()
+					t[side].compics[pic].unitpic:BringToFront()
+					t[side].compics[pic].unitpic:Invalidate()
+					t[side].compics[pic].text:SetCaption(text)
+					t[side].compics[pic].text:Show()
+					t[side].compics[pic].text:BringToFront()
+				else
+					local text = ''
+					local filename = 'unitpics/fakeunit.png'
+					t[side].compics[pic].unitpicframe:Hide()
+					t[side].compics[pic].unitpic.file = filename
+					t[side].compics[pic].unitpic:Invalidate()
+					t[side].compics[pic].unitpic:Hide()
+					t[side].compics[pic].text:SetCaption(text)
+					t[side].compics[pic].text:Hide()
 				end
 			end
 		end
@@ -493,7 +506,7 @@ local function DisplayUpdatedUnitStats(t)
 	if unitStats[1].lost == 0 and unitStats[2].lost == 0 then
 		attrition = 50
 	else
-		attrition = 100 * unitStats[1].lost / (unitStats[1].lost + unitStats[2].lost)
+		attrition = 100 * unitStats[2].lost / (unitStats[1].lost + unitStats[2].lost)
 	end
 	t.balancebars[4].bar:SetValue(attrition)
 end
@@ -849,6 +862,7 @@ local function AddCenterPanels(t, p, d)
 	t.window = Chili.Panel:New{
 		classname = 'main_window',
 		name = "SpecPanel",
+		preserveChildrenOrder = true,
 		padding = {0,0,0,0},
 		x = p.screenHorizCentre - p.windowWidth/2,
 		y = 0,
