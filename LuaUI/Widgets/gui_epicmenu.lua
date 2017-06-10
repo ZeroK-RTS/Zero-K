@@ -2548,8 +2548,8 @@ local function MakeMenuBar()
 	
 	-- A bit evil, but par for the course
 	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={0,5,0,0}, }
-	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', width = 55, height=5, textColor = color.sub_header,  }
-	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
+	lbl_gtime = Label:New{ name='lbl_gtime', caption = '00:00', width = 55, height=5, textColor = color.sub_header,  }
+	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
 	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16, height = 11, OnClick = { MakeFlags }, padding={4,4,4,6}  }
 	
 	local screen_width,screen_height = Spring.GetWindowGeometry()
