@@ -99,8 +99,8 @@ local Chili
 local screen0
 
 local specPanel
-local panelParams
-local panelData
+local panelSetupParams
+local panelSetupData
 local allyTeams
 local panel_is_on
 local restore_ecopanelhs
@@ -150,32 +150,63 @@ local unitStats = {
 	},
 }
 
-local unitCategoryExceptions = {
+local unitCategoryExceptions = {}
+local uce_names = {
 	offense = {
+		-- Superweapons are not mobile but are considered offense
+		-- Antinuke is a super but it's not included here
+		"staticmissilesilo",
+		"staticarty",
+		"staticheavyarty",
+		"staticnuke",
+		"zenith",
+		"raveparty",
+		"mahlazer",
+		
+		-- Some unarmed units are typically part of an offensive force
+		-- so we'll go ahead and include them in the offense totals
+		"cloakjammer",
+		"shieldshield",
+		"gunshiptrans",
+		"amphtele",
+		
+		-- TODO - Not sure if the crawling bombs are armed. If not, add them here.
 	},
 	defense = {
 	},
 	eco = {
 	},
 	other = {
+		-- Freaker and Welder are armed and mobile but are not considered offense
+		"jumpcon",
+		"tankcon",
 	},
 }
+for cat_name,cat in pairs (uce_names) do
+	unitCategoryExceptions[cat_name] = {}
+	for i = 1, #cat do
+		local ud = UnitDefNames[cat[i]]
+		if ud and ud.id then
+			unitCategoryExceptions[cat_name][ud.id] = true
+		end
+	end
+end
 
 -- From LuaRules/Configs/start_setup.lua
-local ploppables = {
-  "factoryhover",
-  "factoryveh",
-  "factorytank",
-  "factoryshield",
-  "factorycloak",
-  "factoryamph",
-  "factoryjump",
-  "factoryspider",
-  "factoryship",
-  "factoryplane",
-  "factorygunship",
-}
 local ploppableDefs = {}
+local ploppables = {
+	"factoryhover",
+	"factoryveh",
+	"factorytank",
+	"factoryshield",
+	"factorycloak",
+	"factoryamph",
+	"factoryjump",
+	"factoryspider",
+	"factoryship",
+	"factoryplane",
+	"factorygunship",
+}
 for i = 1, #ploppables do
 	local ud = UnitDefNames[ploppables[i]]
 	if ud and ud.id then
@@ -327,6 +358,12 @@ local function UpdateWins(t)
 	end
 end
 
+local function DisplayPlayerData(t)
+	for i,side in ipairs({'left', 'right'}) do
+		t[side].playerlabel:SetCaption(allyTeams[i].name)
+	end
+end
+
 local function FetchUpdatedResources()
 	-- The energy stats seem wrong.
 	-- They were taken from the current spec panels. I've probably translated them
@@ -384,7 +421,7 @@ local function FetchUpdatedResources()
 	end
 end
 
-local function DisplayUpdatedResources(t)
+local function DisplayResources(t)
 	local mInco_bb = {}
 	local mBase_bb = {}
 	for i,side in ipairs({'left', 'right'}) do
@@ -411,7 +448,7 @@ local function DisplayUpdatedResources(t)
 	t.balancebars[2].bar:SetValue(base)
 end
 
-local function DisplayUpdatedUnitStats(t)
+local function DisplayUnitStats(t)
 	local military_bb = {}
 	for i,side in ipairs({'left', 'right'}) do
 		t[side].unit_stats.total:SetCaption("Unit Value: " .. Format(unitStats[i].total, ""))
@@ -758,90 +795,42 @@ local function GetOpposingAllyTeams()
 	return allyteams
 end
 
-local function SetupInitData()
-	local init = {}
-	
-	init.playernames = { left = allyTeams[1].name, right = allyTeams[2].name, }
-	init.playercolors = { left = allyTeams[1].color, right = allyTeams[2].color, }
-	init.playerwins = { left = allyTeams[1].winString, right = allyTeams[2].winString, }
-	init.bgfac = { left = "default", right = "default", }
-	
-	init.resource_stats = {
-		left = {
-			{
-				type = 'metal',
-				total = 0,
-				bar = 0,
-				icon = 'LuaUI/Images/ibeam.png',
-				color = col_metal,
-				{ name = "Extraction", value = 0, label = "E", label_x = 65, },
-				{ name = "Reclaim", value = 0, label = "R", label_x = 110, },
-				{ name = "Overdrive", value = 0, label = "O", label_x = 150, },
-			},
-			{
-				type = 'energy',
-				total = 0,
-				bar = 0,
-				icon = 'LuaUI/Images/energy.png',
-				color = col_energy,
-				{ name = "Generation", value = 0, label = "G", label_x = 65, },
-				{ name = "Reclaim", value = 0, label = "R", label_x = 110, },
-				{ name = "Overdrive", value = 0, label = "O", label_x = 150, },
-			},
+local function GetPanelSetupData()
+	local d = {}
+	d.playercolors = { left = allyTeams[1].color, right = allyTeams[2].color, }
+	d.resources = {
+		{
+			type = 'metal',
+			icon = 'LuaUI/Images/ibeam.png',
+			color = col_metal,
+			{ name = "Extraction", label = "E", label_x = 65, },
+			{ name = "Reclaim", label = "R", label_x = 110, },
+			{ name = "Overdrive", label = "O", label_x = 150, },
 		},
-		right = {
-			{
-				type = 'metal',
-				total = 0,
-				bar = 0,
-				icon = 'LuaUI/Images/ibeam.png',
-				color = col_metal,
-				{ name = "Extraction", value = 0, label = "E", label_x = 65, },
-				{ name = "Reclaim", value = 0, label = "R", label_x = 110, },
-				{ name = "Overdrive", value = 0, label = "O", label_x = 150, },
-			},
-			{
-				type = 'energy',
-				total = 0,
-				bar = 0,
-				icon = 'LuaUI/Images/energy.png',
-				color = col_energy,
-				{ name = "Generation", value = 0, label = "G", label_x = 65, },
-				{ name = "Reclaim", value = 0, label = "R", label_x = 110, },
-				{ name = "Overdrive", value = 0, label = "O", label_x = 150, },
-			},
+		{
+			type = 'energy',
+			icon = 'LuaUI/Images/energy.png',
+			color = col_energy,
+			{ name = "Generation", label = "G", label_x = 65, },
+			{ name = "Reclaim", label = "R", label_x = 110, },
+			{ name = "Overdrive", label = "O", label_x = 150, },
 		},
 	}
-	
-	init.unit_stats = {
-		left = {
-			total = 0,
-			{ name = "Offense", value = 0, icon = 'LuaUI/Images/commands/Bold/attack.png', icon_x = 0, },
-			{ name = "Defense", value = 0, icon = 'LuaUI/Images/commands/Bold/guard.png', icon_x = 50, },
-			{ name = "Economy", value = 0, icon = 'LuaUI/Images/energy.png', icon_x = 100, },
-		},
-		right = {
-			total = 0,
-			{ name = "Offense", value = 0, icon = 'LuaUI/Images/commands/Bold/attack.png', icon_x = 0, },
-			{ name = "Defense", value = 0, icon = 'LuaUI/Images/commands/Bold/guard.png', icon_x = 50, },
-			{ name = "Economy", value = 0, icon = 'LuaUI/Images/energy.png', icon_x = 100, },
-		},
+	d.unit_stats = {
+		{ name = "Offense", icon = 'LuaUI/Images/commands/Bold/attack.png', icon_x = 0, },
+		{ name = "Defense", icon = 'LuaUI/Images/commands/Bold/guard.png', icon_x = 50, },
+		{ name = "Economy", icon = 'LuaUI/Images/energy.png', icon_x = 100, },
 	}
-	
-	init.balancebars = {
-		{ name = "Income", value = 100 * init.resource_stats.left[1].total / (init.resource_stats.left[1].total + init.resource_stats.right[1].total) },
-		{ name = "Extraction", value = 100 * init.resource_stats.left[1][1].value / (init.resource_stats.left[1][1].value + init.resource_stats.right[1][1].value) },
-		{ name = "Military", value = 100 *
-			(init.unit_stats.left[1].value + init.unit_stats.left[2].value) /
-			(init.unit_stats.left[1].value + init.unit_stats.left[2].value + init.unit_stats.right[1].value + init.unit_stats.right[2].value)
-		},
-		{ name = "Attrition", value = 50 },
+	d.balancebars = {
+		{ name = "Income", },
+		{ name = "Extraction", },
+		{ name = "Military", },
+		{ name = "Attrition", },
 	}
-	
-	return init
+	return d
 end
 
-local function SetupLayoutParams()
+local function GetPanelSetupParams()
 	local p = {}
 
 	p.topcenterwidth = 200
@@ -950,7 +939,6 @@ local function AddCenterPanels(t, p, d)
 		t.balancebars[i].bar = Chili.Progressbar:New{
 			parent = t.balancepanel,
 			orientation = 'horizontal',
-			value = bar.value,
 			x = '15%',
 			y = p.balanceheight * (i-1) + p.balancelabelheight,
 			width = '70%',
@@ -1016,7 +1004,6 @@ local function AddSidePanels(t, p, d, side)
 		valign = 'center',
 		fontsize = 20,
 		textColor = d.playercolors[side],
-		caption = d.playerwins[side],
 	}
 
 	ts.playerlabel = Chili.Label:New{
@@ -1032,12 +1019,11 @@ local function AddSidePanels(t, p, d, side)
 		fontsize = 28,
 		fontShadow = true,
 		fontOutline = false,
-		caption = d.playernames[side],
 	}
 	
 	ts.resource_stats = {}
-	for i,resource in ipairs(d.resource_stats[side]) do
-		local restype = d.resource_stats[side][i].type
+	for i,resource in ipairs(d.resources) do
+		local restype = resource.type
 		ts.resource_stats[restype] = {}
 		local r = ts.resource_stats[restype]
 		r.panel = Chili.Panel:New{
@@ -1068,7 +1054,6 @@ local function AddSidePanels(t, p, d, side)
 			height = '80%',
 			right = '0%',
 			color = resource.color,
-			value = resource.bar,
 		}
 		r.statpanel = Chili.Control:New{
 			parent = r.panel,
@@ -1087,7 +1072,6 @@ local function AddSidePanels(t, p, d, side)
 			valign = 'center',
 			fontsize = 20,
 			textColor = resource.color,
-			caption = Format(resource.total, ""),
 		}
 		r.icon = Chili.Image:New{
 			parent = r.statpanel,
@@ -1118,7 +1102,6 @@ local function AddSidePanels(t, p, d, side)
 				textColor = color,
 				fontShadow = shadow,
 				fontOutline = outline,
-				caption = stat.label .. ":" .. Format(stat.value, ""),
 			}
 		end
 	end
@@ -1146,9 +1129,8 @@ local function AddSidePanels(t, p, d, side)
 		autosize = false,
 		fontsize = 16,
 		textColor = { 0.85, 0.85, 0.85, 1.0 },
-		caption = "Unit Value: " .. Format(d.unit_stats[side].total, ""),
 	}
-	for i,stat in ipairs(d.unit_stats[side]) do
+	for i,stat in ipairs(d.unit_stats) do
 		ts.unit_stats[i] = {}
 		ts.unit_stats[i].icon = Chili.Image:New{
 			parent = ts.unitpanel,
@@ -1166,7 +1148,6 @@ local function AddSidePanels(t, p, d, side)
 			width = 20,
 			valign = 'center',
 			textColor = { 0.7, 0.7, 0.7, 1.0 },
-			caption = Format(stat.value, ""),
 		}
 	end
 	
@@ -1291,9 +1272,7 @@ local function AddSidePanels(t, p, d, side)
 		width  = (p.windowWidth - 24) / 2,
 		height = p.windowheight - 14,
 		keepAspect = false,
-		file = 'LuaUI/Images/specpanel_ng/' .. d.bgfac[side] .. '_' .. side .. '.png',
 	}
-	
 end
 
 
@@ -1325,23 +1304,24 @@ function SpecPanelStartStop(force)
 			-- while bearing in mind that we could be re-initializing in the middle of the game
 			specPanel = {}
 			allyTeams = GetOpposingAllyTeams()
-			InitializeUnitStats()
-			FetchUpdatedResources()
-			panelData = SetupInitData()
-			panelParams = SetupLayoutParams()
-			AddCenterPanels(specPanel, panelParams, panelData)
-			AddSidePanels(specPanel, panelParams, panelData, 'left')
-			AddSidePanels(specPanel, panelParams, panelData, 'right')
-			if specPanel and specPanel.window then
-				screen0:AddChild(specPanel.window)
-			end
+			panelSetupData = GetPanelSetupData()
+			panelSetupParams = GetPanelSetupParams()
+			AddCenterPanels(specPanel, panelSetupParams, panelSetupData)
+			AddSidePanels(specPanel, panelSetupParams, panelSetupData, 'left')
+			AddSidePanels(specPanel, panelSetupParams, panelSetupData, 'right')
 			
 			local ecopanelhs = WG.GetWidgetOption(econName, econPath, "ecoPanelHideSpec")
 			restore_ecopanelhs = ecopanelhs.value
 			WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", true)
 			
-			DisplayUpdatedResources(specPanel)
-			DisplayUpdatedUnitStats(specPanel)
+			InitializeUnitStats()
+			FetchUpdatedResources()
+			UpdateWins(specPanel)
+			DisplayPlayerData(specPanel)
+			DisplayResources(specPanel)
+			DisplayUnitStats(specPanel)
+
+			screen0:AddChild(specPanel.window)
 			panel_is_on = true
 		end
 	elseif force == 'stop' or (force ~= 'start' and not (options.enableSpecNG.value and spectating)) then
@@ -1391,8 +1371,7 @@ function widget:Update(dt)
 	if panel_is_on then
 		timer_updateclock = timer_updateclock + dt
 		timer_updatestats = timer_updatestats + dt
-		-- Update the resource bar flashing status and graphics
-		--	- TBD
+		-- TBD: Update the resource bar flashing status and graphics
 		if timer_updateclock >= 1 then
 			UpdateClock(specPanel)
 			-- TBD: revise Wins logic so it only updates at game end, not every userframe during play
@@ -1400,8 +1379,8 @@ function widget:Update(dt)
 			_,timer_updateclock = math.modf(Spring.GetGameSeconds())
 		end
 		if timer_updatestats >= 2 then
-			DisplayUpdatedResources(specPanel)
-			DisplayUpdatedUnitStats(specPanel)
+			DisplayResources(specPanel)
+			DisplayUnitStats(specPanel)
 			_,timer_updatestats = math.modf(Spring.GetGameSeconds())
 		end
 	end
