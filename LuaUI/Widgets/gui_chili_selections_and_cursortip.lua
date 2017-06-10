@@ -1850,10 +1850,14 @@ local function GetTooltipWindow()
 	end
 	
 	function externalFunctions.SetTextTooltip(text)
+		if text == "" then
+			return false
+		end
 		textTooltip:SetText(text)
 		textTooltip:Invalidate()
 		textTooltip:SetVisibility(true)
 		unitDisplay.SetVisible(false)
+		return true
 	end
 	
 	function externalFunctions.SetUnitishTooltip(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
@@ -1948,21 +1952,18 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	
 	-- Generic chili text tooltip
 	if chiliTooltip then
-		tooltipWindow.SetTextTooltip(chiliTooltip)
-		return true
+		return tooltipWindow.SetTextTooltip(chiliTooltip)
 	end
 	
 	-- Map drawing tooltip
 	if holdingDrawKey and (holdingSpace or options.showdrawtooltip.value) then
-		tooltipWindow.SetTextTooltip(DRAWING_TOOLTIP)
-		return true
+		return tooltipWindow.SetTextTooltip(DRAWING_TOOLTIP)
 	end
 	
 	-- Terraform tooltip (spring.GetActiveCommand)
 	local index, cmdID, cmdType, cmdName = Spring.GetActiveCommand()
 	if cmdID and terraCmdTip[cmdID] and (holdingSpace or options.showterratooltip.value) then
-		tooltipWindow.SetTextTooltip(terraCmdTip[cmdID])
-		return true
+		return tooltipWindow.SetTextTooltip(terraCmdTip[cmdID])
 	end
 	
 	-- Placing structure tooltip (spring.GetActiveCommand)
@@ -2002,8 +2003,7 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	
 	-- Ground position tooltip (spGetCurrentTooltip())
 	if holdingSpace then
-		tooltipWindow.SetTextTooltip(Spring.GetCurrentTooltip())
-		return true
+		return tooltipWindow.SetTextTooltip(Spring.GetCurrentTooltip())
 	end
 	
 	-- Start position tooltip (really bad widget interface)
@@ -2011,8 +2011,7 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	
 	-- Geothermal tooltip (WG.mouseAboveGeo)
 	if WG.mouseAboveGeo then
-		tooltipWindow.SetTextTooltip(WG.Translate("interface", "geospot"))
-		return true
+		return tooltipWindow.SetTextTooltip(WG.Translate("interface", "geospot"))
 	end
 	
 	return false
