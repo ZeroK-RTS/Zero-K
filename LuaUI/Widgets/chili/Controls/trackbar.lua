@@ -101,14 +101,12 @@ function Trackbar:SetMinMax(min,max)
   self:SetValue(self.value)
 end
 
-
+local floor = math.floor
 function Trackbar:SetValue(v)
-  local r = v % self.step
-  if (r > 0.5*self.step) then
-    v = v + self.step - r
-  else
-    v = v - r
-  end
+
+  local steps = floor((v / self.step) + 0.5)
+  v = steps * self.step
+
   v = self:_Clamp(v)
   local oldvalue = self.value
   self.value = v
