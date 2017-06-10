@@ -60,7 +60,7 @@ local LEFT_LABEL_HEIGHT = 16
 local LEFT_WIDTH = 55
 local PIC_HEIGHT = LEFT_WIDTH*4/5
 local RIGHT_WIDTH = 235
-local GROUP_STATS_WIDTH = 180
+local GROUP_STATS_WIDTH = 150
 
 local green = '\255\1\255\1'
 local red = '\255\255\1\1'
@@ -151,6 +151,10 @@ local econStructureDefs = {
 	[UnitDefNames["energysingu"].id] = {cost = 4000, income = 225},
 }
 
+local filterUnitDefIDs = {
+	[UnitDefNames["terraunit"].id] = true
+}
+
 local WIND_TITAL_HEIGHT = -10
 local windMin = 0
 local windMax = 2.5
@@ -160,6 +164,8 @@ local windGroundSlope = 1
 local windTidalThreashold = -10
 
 local GAIA_TEAM = Spring.GetGaiaTeamID()
+
+local UPDATE_FREQUENCY = 0.2
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -258,7 +264,9 @@ options = {
 		type = "number",
 		value = 0.8, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
-			selectionWindow.SetOpacity(self.value)
+			if selectionWindow then
+				selectionWindow.SetOpacity(self.value)
+			end
 		end,
 		path = selPath,
 	},
@@ -319,7 +327,9 @@ options = {
 			{key = 'panel_2120', name = 'Bot Mid Both Flush',},
 		},
 		OnChange = function (self)
-			selectionWindow.SetSkin(self.value)
+			if selectionWindow then
+				selectionWindow.SetSkin(self.value)
+			end
 		end,
 		hidden = true,
 		noHotkey = true,
@@ -329,7 +339,9 @@ options = {
 		type = "number",
 		value = 0, min = 0, max = 500, step = 1,
 		OnChange = function(self)
-			selectionWindow.SetLeftPadding(self.value)
+			if selectionWindow then
+				selectionWindow.SetLeftPadding(self.value)
+			end
 		end,
 		hidden = true,
 		path = selPath,
@@ -357,8 +369,11 @@ local function Format(amount, displaySign)
 				if displaySign then formatted = strFormat("%+.1f", amount)
 				else formatted = strFormat("%.1f", amount) end 
 			else 
-				if displaySign then formatted = strFormat("%+d", amount)
-				else formatted = strFormat("%d", amount) end 
+				if displaySign then 
+					formatted = strFormat("%+d", amount)
+				else
+					formatted = strFormat("%d", amount)
+				end 
 			end 
 		end
 	else
@@ -1008,7 +1023,7 @@ local function GetUnitGroupIconButton(parentControl)
 		unitID = newUnitID
 		unitList = newUnitList
 		local newCount = (not unitID) and newUnitList and #newUnitList
-		if newCount and newCount < 1 then
+		if newCount and newCount < 2 then
 			newCount = false
 		end
 		if newCount == unitCount then
@@ -1047,6 +1062,137 @@ local function GetUnitGroupIconButton(parentControl)
 	end
 	
 	return externalStuff
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Group info handler
+
+local function GetSelectionStatsDisplay(parentControl)
+
+	local holder = Chili.Control:New{
+		y = 0,
+		right = 0,
+		bottom = 0,
+		width = GROUP_STATS_WIDTH,
+		padding = {0,0,0,0},
+		parent = parentControl,
+	}
+	
+	local selectedUnits
+	local selectedUnitDefID = {}
+	
+	
+	local statLabel = Chili.Label:New{
+		x = 0,
+		y = 3,
+		right = 0,
+		valign  = 'top',
+		fontSize = 12,
+		fontShadow = true,
+		parent = holder,
+	}
+	
+	local total_count = 0 
+	local total_finishedcost = 0
+	local total_totalbp = 0
+	local total_maxhp = 0
+	
+	local function UpdateDynamicGroupInfo()
+		local total_cost = 0
+		local total_hp = 0
+		local total_metalincome = 0
+		local total_metaldrain = 0
+		local total_energyincome = 0
+		local total_energydrain = 0
+		local total_usedbp = 0
+		
+		local unitID, unitDefID, ud --micro optimization, avoiding repeated localization.
+		local name, hp, paradam, cap, build, mm, mu, em, eu
+		local stunned_or_inbuild
+		for i = 1, total_count do
+			id = selectedUnits[i]
+			unitDefID = selectedUnitDefID[i]
+			ud = unitDefID and UnitDefs[unitDefID]
+			if ud then
+				hp, _, paradam, cap, build = spGetUnitHealth(id)
+				mm, mu, em, eu = GetUnitResources(id)
+				
+				if hp then
+					total_cost = total_cost + GetUnitCost(id, unitDefID)*build
+					total_hp = total_hp + hp
+				end
+				
+				stunned_or_inbuild = spGetUnitIsStunned(id)
+				if not stunned_or_inbuild then 
+					if mm then
+						total_metalincome = total_metalincome + mm
+						total_metaldrain = total_metaldrain + mu
+						total_energyincome = total_energyincome + em
+						total_energydrain = total_energydrain + eu
+					end
+					
+					if ud.buildSpeed ~= 0 and mm then
+						total_usedbp = total_usedbp + mu
+					end
+				end
+			end
+		end
+		
+		local unitInfoString = WG.Translate("interface", "selected_units") .. ": " .. Format(total_count) .. "\n" ..
+			WG.Translate("interface", "health") .. ": " .. Format(total_hp) .. " / " ..  Format(total_maxhp) .. "\n" ..
+			WG.Translate("interface", "value") .. ": " .. Format(total_cost) .. " / " ..  Format(total_finishedcost) .. "\n"
+		if total_metalincome ~= 0 or total_metaldrain ~= 0 or total_energyincome ~= 0 or total_energydrain ~= 0 then
+			unitInfoString = unitInfoString ..
+				WG.Translate("interface", "metal") .. ": " .. FormatPlusMinus(total_metalincome) .. white .. " / " ..  FormatPlusMinus(-total_metaldrain) .. white .. "\n" ..
+				WG.Translate("interface", "energy") .. ": " .. FormatPlusMinus(total_energyincome) .. white .. " / " ..  FormatPlusMinus(-total_energydrain) .. white .. "\n"
+		end
+		if total_totalbp ~= 0 then
+			unitInfoString = unitInfoString ..
+				WG.Translate("interface", "buildpower") .. ": " .. Format(total_usedbp) .. " / " .. Format(total_totalbp) .. "\n"
+		end
+		
+		statLabel:SetCaption(unitInfoString)
+	end
+	
+	--updates values that don't change over time for group info
+	local function UpdateStaticGroupInfo()
+		total_count = #selectedUnits
+		total_finishedcost = 0
+		total_totalbp = 0
+		total_maxhp = 0
+		
+		local unitID, unitDefID
+		for i = 1, total_count do
+			unitID = selectedUnits[i]
+			unitDefID = Spring.GetUnitDefID(unitID)
+			if unitDefID and not filterUnitDefIDs[unitDefID] then
+				selectedUnitDefID[i] = unitDefID
+				total_totalbp = total_totalbp + GetUnitBuildSpeed(unitID, unitDefID)
+				total_maxhp = total_maxhp + (select(2, Spring.GetUnitHealth(unitID)) or 0)
+				total_finishedcost = total_finishedcost + GetUnitCost(unitID, unitDefID)
+			end
+		end
+		
+		UpdateDynamicGroupInfo()
+	end
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.ChangeSelection(newSelection)
+		selectedUnits = newSelection
+		if selectedUnits then
+			UpdateStaticGroupInfo()
+		end
+	end
+	
+	function externalFunctions.UpdateStats()
+		if selectedUnits then
+			UpdateDynamicGroupInfo()
+		end
+	end
+	
+	return externalFunctions
 end
 
 --------------------------------------------------------------------------------
@@ -1203,6 +1349,8 @@ end
 
 local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	
+	local selectedUnitID
+	
 	local leftPanel = Chili.Control:New{
 		x = 0,
 		y = 0,
@@ -1231,6 +1379,15 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		file = imageFile,
 		parent = leftPanel,
 	}
+
+	if not isTooltipVersion then
+		unitImage.OnClick[#unitImage.OnClick + 1] = function()
+			if selectedUnitID then
+				local x,y,z = Spring.GetUnitPosition(selectedUnitID)
+				SetCameraTarget(x, y, z, 1)
+			end
+		end
+	end
 	
 	local unitNameUpdate = GetImageWithText(rightPanel, 1, nil, nil, NAME_FONT, nil, 3)
 	
@@ -1475,6 +1632,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			if UpdateDynamicUnitAttributes(unitID, unitDefID, ud) then
 				metalInfoShown = true
 			end
+			selectedUnitID = unitID
+		else
+			selectedUnitID = nil
 		end
 		
 		if not metalInfoShown then
@@ -1821,6 +1981,7 @@ local function GetSelectionWindow()
 	
 	local singleUnitDisplay = GetSingleUnitInfoPanel(mainPanel, false)
 	local multiUnitDisplay = GetMultiUnitInfoPanel(mainPanel)
+	local selectionStatsDisplay = GetSelectionStatsDisplay(mainPanel)
 	local singleUnitID, singleUnitDefID
 	
 	local externalFunctions = {}
@@ -1830,12 +1991,14 @@ local function GetSelectionWindow()
 		singleUnitDisplay.SetDisplay(unitID, Spring.GetUnitDefID(unitID))
 		singleUnitDisplay.SetVisible(true)
 		multiUnitDisplay.SetUnitDisplay()
+		selectionStatsDisplay.ChangeSelection({unitID})
 	end
 	
 	function externalFunctions.ShowMultiUnit(newSelection)
 		singleUnitID = nil
 		multiUnitDisplay.SetUnitDisplay(newSelection)
 		singleUnitDisplay.SetVisible(false)
+		selectionStatsDisplay.ChangeSelection(newSelection)
 	end
 	
 	function externalFunctions.UpdateSelectionWindow()
@@ -1844,6 +2007,7 @@ local function GetSelectionWindow()
 		else
 			multiUnitDisplay.UpdateUnitDisplay()
 		end
+		selectionStatsDisplay.UpdateStats()
 	end
 	
 	function externalFunctions.SetVisible(newVisible)
@@ -1910,9 +2074,10 @@ end
 local updateTimer = 0
 function widget:Update(dt)
 	updateTimer = updateTimer + dt
-	UpdateTooltip(dt, updateTimer <= 0.1)
+	local slowUpdate = updateTimer > UPDATE_FREQUENCY
+	UpdateTooltip(dt, not slowUpdate)
 	
-	if updateTimer > 0.1 then
+	if slowUpdate then
 		selectionWindow.UpdateSelectionWindow()
 		updateTimer = 0
 	end
