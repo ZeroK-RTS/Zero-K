@@ -1526,7 +1526,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		buildBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 58, BUILD_IMAGE, {0.8,0.8,0.2,1})
 	end
 
-	local prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID, prevMorphTime, prevMorphCost, prevMousePlace
+	local prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID, prevVisible, prevMorphTime, prevMorphCost, prevMousePlace
 	local externalFunctions = {}
 		
 	local function UpdateReloadTime(unitID, unitDefID)
@@ -1620,12 +1620,13 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local metalInfoShown = false
 		local maxHealthShown = false
 		local morphShown = false
+		local visible = (unitID and Spring.GetUnitExperience(unitID) and true) or false
 		
 		if prevUnitID == unitID and prevUnitDefID == unitDefID and prevFeatureID == featureID and prevFeatureDefID == featureDefID and 
-				prevMorphTime == morphTime and prevMorphCost == morphCost and prevMousePlace == ((mousePlaceX and true) or false) then
+				prevVisible == visible and prevMorphTime == morphTime and prevMorphCost == morphCost and prevMousePlace == ((mousePlaceX and true) or false) then
 			
 			if not requiredOnly then
-				if unitID and unitDefID then
+				if unitID and unitDefID and visible then
 					UpdateDynamicUnitAttributes(unitID, unitDefID, UnitDefs[unitDefID])
 				end
 				if featureID then
@@ -1711,7 +1712,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					playerNameLabel:SetPos(nil, PIC_HEIGHT + 31)
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 55)
 				end
-			elseif not featureDefID then
+			end
+			if (not (unitID and visible)) and not featureDefID then
 				healthBarUpdate(false)
 				maxHealthLabel(true, healthOverride or ud.health, HEALTH_IMAGE)
 				maxHealthShown = true
@@ -1721,7 +1723,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					if spaceClickLabel then
 						spaceClickLabel:SetPos(nil, PIC_HEIGHT + LEFT_SPACE + 31)
 					end
-				elseif spaceClickLabel then
+				elseif spaceClickLabel and not unitID then
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 30)
 				end
 			end
@@ -1766,6 +1768,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		
 		prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID = unitID, unitDefID, featureID, featureDefID
+		prevVisible = visible
 		prevMorphTime, prevMorphCost, prevMousePlace = morphTime, morphCost, ((mousePlaceX and true) or false)
 	end
 	
@@ -1860,9 +1863,13 @@ local function GetTooltipWindow()
 	end
 	
 	function externalFunctions.SetUnitishTooltip(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
-		unitDisplay.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
-		textTooltip:SetVisibility(false)
-		unitDisplay.SetVisible(true)
+		if unitDefID or featureID or featureDefID then
+			unitDisplay.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
+			textTooltip:SetVisibility(false)
+			unitDisplay.SetVisible(true)
+		else
+			externalFunctions.SetTextTooltip("Enemy unit")
+		end
 	end
 	
 	return externalFunctions
