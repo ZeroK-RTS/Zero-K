@@ -132,7 +132,10 @@ options = {
 		min = 1,
 		max = 4,
 		advanced = true,
-		OnChange = function() updateMexDrawList() end
+		OnChange = function(self)
+			self.value = math.floor(self.value + 0.5) -- string format expects an integer value but this sometimes has float errors (eg 3.99999976 instead of 4). Using `step = 1` does not fix this.
+			updateMexDrawList()
+		end
 	},
 }
 
