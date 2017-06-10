@@ -368,7 +368,6 @@ options = {
 				selectionWindow.SetLeftPadding(self.value)
 			end
 		end,
-		hidden = true,
 		path = selPath,
 	},
 }
@@ -2062,7 +2061,7 @@ local function GetSelectionWindow()
 		y = 0,
 		right = 0,
 		bottom = 0,
-		padding = {8 + options.leftPadding.value, 6, 4, 2},
+		padding = {8, 6, 4, 2},
 		backgroundColor = {1, 1, 1, options.selection_opacity.value},
 		OnMouseDown = {
 			function(self)
@@ -2077,6 +2076,7 @@ local function GetSelectionWindow()
 		},
 		parent = holderWindow
 	}
+	mainPanel.padding[1] = mainPanel.padding[1] + options.leftPadding.value
 	mainPanel:Hide()
 	
 	local singleUnitDisplay = GetSingleUnitInfoPanel(mainPanel, false)
