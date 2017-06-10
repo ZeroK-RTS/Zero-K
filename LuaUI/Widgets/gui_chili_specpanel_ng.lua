@@ -99,6 +99,7 @@ local panelParams
 local panelData
 local mockData
 local allyTeams
+local panel_is_on
 local teamSides = {}
 local timer_updateclock = 0
 local timer_updatestats = 0
@@ -107,6 +108,9 @@ local smoothedTables = {
 	resources_left = {0,0,0,0,0,0,0,0,0,0,0,0,},
 	resources_right = {0,0,0,0,0,0,0,0,0,0,0,0,},
 }
+
+local SpecWindowStartStop
+local didonce
 
 -- This is probably getting refactored away
 local unitStats = {
@@ -158,9 +162,6 @@ local compic_slots = 3
 local positiveColourStr = GreenStr
 local negativeColourStr = RedStr
 
--- Forward local declarations
-local GetWinString
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -171,8 +172,23 @@ local GetWinString
 --------------------------------------------------------------------------------
 -- Options
 
-options_path = 'Settings/HUD Panels/Spectator Panels'
+options_path = 'Settings/HUD Panels/Spectator Panel NG'
 
+options_order = {
+	'enableSpecNG',
+}
+ 
+options = {
+	enableSpecNG = {
+		name  = "Enable as Spec NG",
+		type  = "bool",
+		value = true,
+		OnChange = function(self)
+			SpecWindowStartStop()
+		end,
+		desc = "Enables the spectator resource bars when spectating a game with two teams."
+	},
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -251,6 +267,16 @@ local function GetTimeString()
     end
   end
   return timeString
+end
+
+function GetWinString(name) -- forward-declared
+	local winTable = WG.WinCounter_currentWinTable
+	if winTable and winTable[name] and winTable[name].wins then
+		-- TODO - Do something else to mark the winner of the previous game, not this
+		-- return (winTable[name].wonLastGame and "*" or "") .. winTable[name].wins
+		return winTable[name].wins
+	end
+	return
 end
 
 
@@ -462,6 +488,7 @@ end
 -- Unit Stats Call-ins and Processor
 
 local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
+	if not panel_is_on then return end
 	
 	local side = teamSides[unitTeam]
 	local id = unitID
@@ -564,16 +591,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Setup Data
-
-function GetWinString(name) -- forward-declared
-	local winTable = WG.WinCounter_currentWinTable
-	if winTable and winTable[name] and winTable[name].wins then
-		-- TODO - Do something else to mark the winner of the previous game, not this
-		-- return (winTable[name].wonLastGame and "*" or "") .. winTable[name].wins
-		return winTable[name].wins
-	end
-	return
-end
 
 local function GetOpposingAllyTeams()
 	-- TODO - Consider whether this should set up the file-scoped allyTeams directly
@@ -976,7 +993,7 @@ local function AddSidePanels(t, p, d, side)
 			parent = r.statpanel,
 			x = 18,
 			height = '100%',
-			width = 20,
+			width = 25,
 			autosize = false,
 			valign = 'center',
 			fontsize = 20,
@@ -1190,6 +1207,60 @@ local function AddSidePanels(t, p, d, side)
 	
 end
 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Startup and Shutdown
+
+function SpecWindowStartStop(force)
+	-- TODO - Consider whether it would be better instead to unregister
+	--	the call-ins when the panel is turned off and re-register them
+	--	when turned back on than to use the flag to short-circuit the
+	--	call-ins and in ProcessUnit()
+	
+	-- TODO - Consider whether it would be better to have the option setting
+	--	here to enable/disable the widget's functionality, or just have
+	--	a menu button to enable/disable (i.e. load/unload) the widget
+	--	entirely.
+	--
+	--	Also - is what's desired just a visibility toggle while the stats
+	--	collection continues, or a halt to the stats collection while
+	--	the panel is disabled?
+	
+	local spectating = select(1, Spring.GetSpectatingState())
+	
+	if force == 'start' or (force ~= 'stop' and (options.enableSpecNG.value and spectating)) then
+		if not panel_is_on then
+			-- TODO - Don't forget to re-initialize things like smoothedTables and unitStats
+			-- while bearing in mind that we could be re-initializing in the middle of the game
+			specPanel = {}
+			allyTeams = GetOpposingAllyTeams()
+			panelParams = SetupLayoutParams()
+			mockData = SetupMockData()
+			panelData = mockData
+			panelData.playernames = { left = allyTeams[1].name, right = allyTeams[2].name, }
+			panelData.playerwins = { left = allyTeams[1].winString, right = allyTeams[2].winString, }
+			AddCenterPanels(specPanel, panelParams, panelData)
+			AddSidePanels(specPanel, panelParams, panelData, 'left')
+			AddSidePanels(specPanel, panelParams, panelData, 'right')
+			if specPanel and specPanel.window then
+				screen0:AddChild(specPanel.window)
+			end
+	
+			DisplayUpdatedResources(specPanel)
+			DisplayUpdatedUnitStats(specPanel)
+			panel_is_on = true
+		end
+	elseif force == 'stop' or (force ~= 'start' and not (options.enableSpecNG.value and spectating)) then
+		if panel_is_on then
+			specPanel.window:Dispose()
+			specPanel = nil
+			panel_is_on = false
+		end
+	end
+end
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- General Call-ins
@@ -1197,54 +1268,50 @@ end
 function widget:Shutdown()
 end
 
+function widget:PlayerChanged(pID)
+	if pID == Spring.GetMyPlayerID() then
+		SpecWindowStartStop()
+	end
+end
+
 function widget:Initialize()
 	Chili = WG.Chili
-	screen0 = Chili.Screen0
-	
 	if (not Chili) then
 		widgetHandler:RemoveWidget()
 		return
 	end
-	
-	allyTeams = GetOpposingAllyTeams()
-
-	-- if we should show the panel then
-		specPanel = {}
-		panelParams = SetupLayoutParams()
-		mockData = SetupMockData()
-		panelData = mockData
-		panelData.playernames = { left = allyTeams[1].name, right = allyTeams[2].name, }
-		panelData.playerwins = { left = allyTeams[1].winString, right = allyTeams[2].winString, }
-		AddCenterPanels(specPanel, panelParams, panelData)
-		AddSidePanels(specPanel, panelParams, panelData, 'left')
-		AddSidePanels(specPanel, panelParams, panelData, 'right')
-		if specPanel and specPanel.window then
-			screen0:AddChild(specPanel.window)
-		end
-	-- end
+	screen0 = Chili.Screen0
 end
 
 function widget:Update(dt)
-	timer_updateclock = timer_updateclock + dt
-	timer_updatestats = timer_updatestats + dt
-	-- Update the resource bar flashing status and graphics
-	--	- TBD
-	if timer_updateclock >= 1 then
-		UpdateClock(specPanel)
-		-- TBD: revise Wins logic so it only updates at game end, not every userframe during play
-		UpdateWins(specPanel)
-		_,timer_updateclock = math.modf(Spring.GetGameSeconds())
+	if not didonce then
+		SpecWindowStartStop()
+		didonce = true
 	end
-	if timer_updatestats >= 2 then
-		DisplayUpdatedResources(specPanel)
-		DisplayUpdatedUnitStats(specPanel)
-		_,timer_updatestats = math.modf(Spring.GetGameSeconds())
+	if panel_is_on then
+		timer_updateclock = timer_updateclock + dt
+		timer_updatestats = timer_updatestats + dt
+		-- Update the resource bar flashing status and graphics
+		--	- TBD
+		if timer_updateclock >= 1 then
+			UpdateClock(specPanel)
+			-- TBD: revise Wins logic so it only updates at game end, not every userframe during play
+			UpdateWins(specPanel)
+			_,timer_updateclock = math.modf(Spring.GetGameSeconds())
+		end
+		if timer_updatestats >= 2 then
+			DisplayUpdatedResources(specPanel)
+			DisplayUpdatedUnitStats(specPanel)
+			_,timer_updatestats = math.modf(Spring.GetGameSeconds())
+		end
 	end
 end
 
 function widget:GameFrame(n)
-	if n%TEAM_SLOWUPDATE_RATE == 0 then
-		FetchUpdatedResources()
+	if panel_is_on then
+		if n%TEAM_SLOWUPDATE_RATE == 0 then
+			FetchUpdatedResources()
+		end
 	end
 end
 
