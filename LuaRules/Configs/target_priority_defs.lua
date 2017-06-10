@@ -305,4 +305,13 @@ for weaponDefID, data in pairs(velocityPenaltyDefs) do
 	data[2] = data[2] - data[1]*data[3]
 end
 
-return targetTable, disarmWeaponDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult
+local reloadTimeAlpha = 1.8 --seconds, matches Leveler's reload time
+local highAlphaWeaponDamages = {}
+for wid = 1, #WeaponDefs do
+	local wd = WeaponDefs[wid]
+	if wd.customParams and wd.customParams.shot_damage and wd.reload >= reloadTimeAlpha then
+		highAlphaWeaponDamages[wid] = tonumber(wd.customParams.shot_damage)
+	end
+end
+
+return targetTable, disarmWeaponDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult, highAlphaWeaponDamages

@@ -30,8 +30,7 @@ local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
 
-local targetTable, disarmWeaponDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult = 
-	include("LuaRules/Configs/target_priority_defs.lua")
+local targetTable, disarmWeaponDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult, highAlphaWeaponDamages = include("LuaRules/Configs/target_priority_defs.lua")
 
 -- Low return number = more worthwhile target
 -- This seems to override everything, will need to reimplement emp things, badtargetcats etc...
@@ -40,6 +39,8 @@ local targetTable, disarmWeaponDefs, captureWeaponDefs, gravityWeaponDefs, proxi
 --// Values that reset every slow update
 -- Priority added based on health and capture for non-capture weapons
 local remNormalPriorityModifier = {} 
+local remUnitHealth = {} -- used for overkill avoidance
+local remUnitHealthPriority = {}
 local remSpeed = {}
 
  -- Priority added based on health and capture for capture weapons
@@ -168,7 +169,7 @@ local function GetCaptureWeaponPriorityModifier(unitID)
 		end
 		
 		--// Get priority modifier for health and capture progress.
-		local armored = Spring.GetUnitArmored(unitID)	
+		local armored = Spring.GetUnitArmored(unitID)
 		local hp, maxHP, paralyze, capture = spGetUnitHealth(unitID)
 		if hp and maxHP then
 			priority = priority - (hp/maxHP)*0.1 -- Capture healthy units
@@ -189,7 +190,7 @@ local function GetCaptureWeaponPriorityModifier(unitID)
 	return remCapturePriorityModifer[unitID]
 end
 
-local function GetNormalWeaponPriorityModifier(unitID)
+local function GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
 	if not remNormalPriorityModifier[unitID] then
 		
 		local stunned, buildProgress = GetUnitStunnedOrInBuild(unitID)
@@ -204,10 +205,11 @@ local function GetNormalWeaponPriorityModifier(unitID)
 			priority = priority + 60
 		end
 	
-		local armored = Spring.GetUnitArmored(unitID)	
+		local armored, armor = Spring.GetUnitArmored(unitID)
 		local hp, maxHP, paralyze, capture = spGetUnitHealth(unitID)
+		remUnitHealth[unitID] = hp*((armored and armor and 1/armor) or 1)
 		if hp and maxHP then
-			priority = priority + (hp/maxHP)
+			remUnitHealthPriority[unitID] = hp/maxHP
 		end
 		
 		if armored then
@@ -221,10 +223,15 @@ local function GetNormalWeaponPriorityModifier(unitID)
 		remNormalPriorityModifier[unitID] = priority
 	end
 	
-	return remNormalPriorityModifier[unitID]
+	local alphaDamage = highAlphaWeaponDamages[attackerWeaponDefID]
+	if alphaDamage and remUnitHealth[unitID] and (remUnitHealth[unitID] < alphaDamage) then
+		return remNormalPriorityModifier[unitID] - 0.2 + 0.2*(alphaDamage - remUnitHealth[unitID])/alphaDamage
+	end
+	
+	return remNormalPriorityModifier[unitID] + (remUnitHealthPriority[unitID] or 0)
 end
 
-local function GetGravityWeaponPriorityModifier(unitID)
+local function GetGravityWeaponPriorityModifier(unitID, attackerWeaponDefID)
 	if not remScaledMass[unitID] then
 		local _,_,inbuild = spGetUnitIsStunned(unitID)
 		if inbuild then
@@ -235,18 +242,18 @@ local function GetGravityWeaponPriorityModifier(unitID)
 		end
 	end
 	if remScaledMass[unitID] > 0 then
-		return remScaledMass[unitID] + GetNormalWeaponPriorityModifier(unitID) * 0.3
+		return remScaledMass[unitID] + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID) * 0.3
 	else
 		return false
 	end
 end
 
-local function GetDisarmWeaponPriorityModifier(unitID)
+local function GetDisarmWeaponPriorityModifier(unitID, attackerWeaponDefID)
 	local stunned = GetUnitStunnedOrInBuild(unitID)
 	if stunned == 0 then
-		return GetNormalWeaponPriorityModifier(unitID)
+		return GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
 	end
-	return 10 + GetNormalWeaponPriorityModifier(unitID)
+	return 10 + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
 end
 
 --------------------------------------------------------------------------------
@@ -286,7 +293,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		lastShotBonus = -0.3
 	end
 	
-	local enemyUnitDef = remUnitDefID[targetID]
+	local enemyUnitDefID = remUnitDefID[targetID]
 	
 	--// Get Velocity target penalty
 	local velocityAdd = 0
@@ -305,7 +312,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	if visiblity ~= 2 then
 		local wobbleAdd = 0
 		-- Mobile units get a penalty for radar wobble. Identified statics experience no wobble.
-		if radarWobblePenalty[attackerWeaponDefID] and (visibility == 0 or not remStatic[enemyUnitDef]) then
+		if radarWobblePenalty[attackerWeaponDefID] and (visibility == 0 or not remStatic[enemyUnitDefID]) then
 			wobbleAdd = radarWobblePenalty[attackerWeaponDefID]
 		end
 		
@@ -313,36 +320,36 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			return true, 25 + wobbleAdd + velocityAdd + lastShotBonus
 		elseif visiblity == 1 then
 			-- If the unit type is accessible then it can be included in the priority calculation.
-			return true, (targetTable[enemyUnitDef][attackerWeaponDefID] or 5) + wobbleAdd + velocityAdd + 1.5 + lastShotBonus
+			return true, (targetTable[enemyUnitDefID][attackerWeaponDefID] or 5) + wobbleAdd + velocityAdd + 1.5 + lastShotBonus
 		end
 	end
 	
 	--// Get default priority for weapon type vs unit type. Includes transportation
 	local defPrio
-	if transportMult[enemyUnitDef] then
+	if transportMult[enemyUnitDefID] then
 		local transportiee = GetUnitTransportieeDefID(targetID)
 		if transportiee then
-			defPrio = targetTable[enemyUnitDef][attackerWeaponDefID] or 5
+			defPrio = targetTable[enemyUnitDefID][attackerWeaponDefID] or 5
 		else
-			defPrio = (targetTable[transportiee][attackerWeaponDefID] or 5)*transportMult[enemyUnitDef]
+			defPrio = (targetTable[transportiee][attackerWeaponDefID] or 5)*transportMult[enemyUnitDefID]
 		end
 	else
-		defPrio = targetTable[enemyUnitDef][attackerWeaponDefID] or 5
+		defPrio = targetTable[enemyUnitDefID][attackerWeaponDefID] or 5
 	end
 
 	--// Get priority modifier based on broad weapon type and generic unit status
 	if captureWeaponDefs[attackerWeaponDefID] then
 		defPrio = defPrio + GetCaptureWeaponPriorityModifier(targetID)
 	elseif gravityWeaponDefs[attackerWeaponDefID] then
-		local gravityPriority = GetGravityWeaponPriorityModifier(targetID)
+		local gravityPriority = GetGravityWeaponPriorityModifier(targetID, attackerWeaponDefID)
 		if not gravityPriority then
 			return false
 		end
 		defPrio = defPrio + gravityPriority
 	elseif disarmWeaponDefs[attackerWeaponDefID] then
-		defPrio = defPrio + GetDisarmWeaponPriorityModifier(targetID)
+		defPrio = defPrio + GetDisarmWeaponPriorityModifier(targetID, attackerWeaponDefID)
 	else
-		defPrio = defPrio + GetNormalWeaponPriorityModifier(targetID)
+		defPrio = defPrio + GetNormalWeaponPriorityModifier(targetID, attackerWeaponDefID)
 	end
 	
 	--// Proximity weapon special handling (heatrays).
@@ -353,13 +360,15 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		defPrio = defPrio + distAdd
 	end
 	
-	--Spring.Utilities.UnitEcho(targetID, defPrio .. "  " .. velocityAdd)
+	--Spring.Utilities.UnitEcho(targetID, defPrio)
 	return true, defPrio + velocityAdd + lastShotBonus -- bigger value have lower priority
 end
 
 function gadget:GameFrame(f)
 	if f%16 == 8 then -- f%16 == 0 happens just before AllowWeaponTarget
 		remNormalPriorityModifier = {}
+		remUnitHealth = {}
+		remUnitHealthPriority = {}
 		remSpeed = {}
 		remCapturePriorityModifer = {}
 		remTransportiee = {}
