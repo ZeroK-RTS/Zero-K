@@ -101,7 +101,6 @@ local screen0
 local specPanel
 local panelParams
 local panelData
-local mockData
 local allyTeams
 local panel_is_on
 local restore_ecopanelhs
@@ -116,7 +115,7 @@ local smoothedTables = {
 	resources_right = {0,0,0,0,0,0,0,0,0,0,0,0,},
 }
 
-local SpecWindowStartStop
+local SpecPanelStartStop
 local didonce
 
 -- This is probably getting refactored away
@@ -133,6 +132,7 @@ local unitStats = {
 			udids = {},
 		},
 		comms = {},
+		factory = "default",
 	},
 	{
 		total = 0,
@@ -146,6 +146,7 @@ local unitStats = {
 			udids = {},
 		},
 		comms = {},
+		factory = "default",
 	},
 }
 
@@ -159,6 +160,28 @@ local unitCategoryExceptions = {
 	other = {
 	},
 }
+
+-- From LuaRules/Configs/start_setup.lua
+local ploppables = {
+  "factoryhover",
+  "factoryveh",
+  "factorytank",
+  "factoryshield",
+  "factorycloak",
+  "factoryamph",
+  "factoryjump",
+  "factoryspider",
+  "factoryship",
+  "factoryplane",
+  "factorygunship",
+}
+local ploppableDefs = {}
+for i = 1, #ploppables do
+	local ud = UnitDefNames[ploppables[i]]
+	if ud and ud.id then
+		ploppableDefs[ud.id ] = true
+	end
+end
 
 local col_metal = {136/255,214/255,251/255,1}
 local col_energy = {.93,.93,0,1}
@@ -193,7 +216,7 @@ options = {
 		type  = "bool",
 		value = true,
 		OnChange = function(self)
-			SpecWindowStartStop()
+			SpecPanelStartStop()
 		end,
 		desc = "Enables the spectator resource bars when spectating a game with two teams."
 	},
@@ -380,8 +403,12 @@ local function DisplayUpdatedResources(t)
 		mInco_bb[side] = smInco
 		mBase_bb[side] = smBase
 	end
-	t.balancebars[1].bar:SetValue(100 * mInco_bb.left / (mInco_bb.left + mInco_bb.right))
-	t.balancebars[2].bar:SetValue(100 * mBase_bb.left / (mBase_bb.left + mBase_bb.right))
+	-- TODO - Figure out why pregame the income/base/military bars are stuck left
+	--	but the attrition bar goes to the middle like it should
+	local income = (mInco_bb.left == mInco_bb.right) and 50 or 100 * mInco_bb.left / (mInco_bb.left + mInco_bb.right)
+	local base   = (mBase_bb.left == mBase_bb.right) and 50 or 100 * mBase_bb.left / (mBase_bb.left + mBase_bb.right)
+	t.balancebars[1].bar:SetValue(income)
+	t.balancebars[2].bar:SetValue(base)
 end
 
 local function DisplayUpdatedUnitStats(t)
@@ -392,6 +419,12 @@ local function DisplayUpdatedUnitStats(t)
 		t[side].unit_stats[2].label:SetCaption(Format(unitStats[i].defense, ""))
 		t[side].unit_stats[3].label:SetCaption(Format(unitStats[i].eco, ""))
 		military_bb[side] = unitStats[i].offense + unitStats[i].defense
+		
+		local filename = 'LuaUI/Images/specpanel_ng/' .. unitStats[i].factory .. '_' .. side .. '.png'
+		t[side].bg_image.file = filename
+		t[side].bg_image:Show()
+		t[side].bg_image:SendToBack()
+		t[side].bg_image:Invalidate()
 		
 		-- These two are parallel enough that I might want to refactor them,
 		--	possibly using a generic iterator function that takes sort functions
@@ -502,14 +535,11 @@ local function DisplayUpdatedUnitStats(t)
 			end
 		end
 	end
-	t.balancebars[3].bar:SetValue(100 * military_bb.left / (military_bb.left + military_bb.right))
-	local attrition
-	if unitStats[1].lost == 0 and unitStats[2].lost == 0 then
-		attrition = 50
-	else
-		attrition = 100 * unitStats[2].lost / (unitStats[1].lost + unitStats[2].lost)
-	end
+	local military  = (military_bb.left  == military_bb.right) and 50 or 100 * military_bb.left / (military_bb.left + military_bb.right)
+	local attrition = (unitStats[1].lost == unitStats[2].lost) and 50 or 100 * unitStats[2].lost / (unitStats[1].lost + unitStats[2].lost)
+	t.balancebars[3].bar:SetValue(military)
 	t.balancebars[4].bar:SetValue(attrition)
+	
 end
 
 --------------------------------------------------------------------------------
@@ -536,6 +566,7 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 		local generator = cp.income_energy or cp.ismex or cp.windgen
 		local comm = ud.customParams.commtype
 		local con = ud.isMobileBuilder and not comm
+		local startfac = ploppableDefs[udid]
 
 		local offense
 		local defense
@@ -593,16 +624,15 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 				unitStats[side].comms[id].level = level or 0
 			end
 		end
+		
+		if startfac and allyTeams[side].playercount == 1 and unitStats[side].factory == "default" then
+			unitStats[side].factory = ud.name
+		end
 	end
 end
 
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	--
-	-- TODO - Put the initial factory detection and bg picture updating code here
-	--		(but first read through the facplop code to be sure I know how it works)
-	--
-
 	ProcessUnit(unitID, unitDefID, unitTeam)
 end
 
@@ -713,113 +743,102 @@ local function GetOpposingAllyTeams()
 		allyteams[2].color = default_playercolors.right
 	end
 	
+	-- This doesn't belong here
+	-- but refactoring will come later
+	for i, side in ipairs({'left', 'right'}) do
+		if allyteams[i].playercount > 4 then
+			unitStats[i].factory = "largeteams"
+		elseif allyteams[i].playercount > 1 then
+			unitStats[i].factory = "default"
+		else
+			unitStats[i].factory = "default"
+		end
+	end
+	
 	return allyteams
 end
 
-local function SetupMockData()
-	local mock = {}
+local function SetupInitData()
+	local init = {}
 	
-	mock.playernames	= { left = "GoogleFrog", right = "Anarchid", }
-	mock.playercolors	= { left = {0.5,0.5,1,1}, right = {1,0.2,0.2,1}, }
-	mock.playerwins		= { left = math.random(0,4), right = math.random(0,4), }
-	mock.bgfac		= { left = "cloakies", right = "hovers", }
-
-	mock.resource_stats = {
+	init.playernames = { left = allyTeams[1].name, right = allyTeams[2].name, }
+	init.playercolors = { left = allyTeams[1].color, right = allyTeams[2].color, }
+	init.playerwins = { left = allyTeams[1].winString, right = allyTeams[2].winString, }
+	init.bgfac = { left = "default", right = "default", }
+	
+	init.resource_stats = {
 		left = {
 			{
 				type = 'metal',
-				total = 156,
-				bar = 25,
+				total = 0,
+				bar = 0,
 				icon = 'LuaUI/Images/ibeam.png',
 				color = col_metal,
-				{ name = "Extraction", value = 100, label = "E", label_x = 65, },
-				{ name = "Reclaim", value = 15, label = "R", label_x = 110, },
-				{ name = "Overdrive", value = 20, label = "O", label_x = 150, },
+				{ name = "Extraction", value = 0, label = "E", label_x = 65, },
+				{ name = "Reclaim", value = 0, label = "R", label_x = 110, },
+				{ name = "Overdrive", value = 0, label = "O", label_x = 150, },
 			},
 			{
 				type = 'energy',
-				total = 1955,
-				bar = 66,
+				total = 0,
+				bar = 0,
 				icon = 'LuaUI/Images/energy.png',
 				color = col_energy,
-				{ name = "Generation", value = 1234, label = "G", label_x = 65, },
-				{ name = "Reclaim", value = 133, label = "R", label_x = 110, },
-				{ name = "Overdrive", value = 543, label = "O", label_x = 150, },
+				{ name = "Generation", value = 0, label = "G", label_x = 65, },
+				{ name = "Reclaim", value = 0, label = "R", label_x = 110, },
+				{ name = "Overdrive", value = 0, label = "O", label_x = 150, },
 			},
 		},
 		right = {
 			{
 				type = 'metal',
-				total = 156,
-				bar = 25,
+				total = 0,
+				bar = 0,
 				icon = 'LuaUI/Images/ibeam.png',
 				color = col_metal,
-				{ name = "Extraction", value = 100, label = "E", label_x = 65, },
-				{ name = "Reclaim", value = 15, label = "R", label_x = 110, },
-				{ name = "Overdrive", value = 20, label = "O", label_x = 150, },
+				{ name = "Extraction", value = 0, label = "E", label_x = 65, },
+				{ name = "Reclaim", value = 0, label = "R", label_x = 110, },
+				{ name = "Overdrive", value = 0, label = "O", label_x = 150, },
 			},
 			{
 				type = 'energy',
-				total = 1955,
-				bar = 66,
+				total = 0,
+				bar = 0,
 				icon = 'LuaUI/Images/energy.png',
 				color = col_energy,
-				{ name = "Generation", value = 1234, label = "G", label_x = 65, },
-				{ name = "Reclaim", value = 133, label = "R", label_x = 110, },
-				{ name = "Overdrive", value = 543, label = "O", label_x = 150, },
+				{ name = "Generation", value = 0, label = "G", label_x = 65, },
+				{ name = "Reclaim", value = 0, label = "R", label_x = 110, },
+				{ name = "Overdrive", value = 0, label = "O", label_x = 150, },
 			},
 		},
 	}
 	
-	mock.unit_stats = {
+	init.unit_stats = {
 		left = {
-			total = 5447 + 1521 + 12550,
-			{ name = "Offense", value = 5447, icon = 'LuaUI/Images/commands/Bold/attack.png', icon_x = 0, },
-			{ name = "Defense", value = 1521, icon = 'LuaUI/Images/commands/Bold/guard.png', icon_x = 50, },
-			{ name = "Economy", value = 12550, icon = 'LuaUI/Images/energy.png', icon_x = 100, },
+			total = 0,
+			{ name = "Offense", value = 0, icon = 'LuaUI/Images/commands/Bold/attack.png', icon_x = 0, },
+			{ name = "Defense", value = 0, icon = 'LuaUI/Images/commands/Bold/guard.png', icon_x = 50, },
+			{ name = "Economy", value = 0, icon = 'LuaUI/Images/energy.png', icon_x = 100, },
 		},
 		right = {
-			total = 3386 + 872 + 10995,
-			{ name = "Offense", value = 3386, icon = 'LuaUI/Images/commands/Bold/attack.png', icon_x = 0, },
-			{ name = "Defense", value = 872, icon = 'LuaUI/Images/commands/Bold/guard.png', icon_x = 50, },
-			{ name = "Economy", value = 10995, icon = 'LuaUI/Images/energy.png', icon_x = 100, },
+			total = 0,
+			{ name = "Offense", value = 0, icon = 'LuaUI/Images/commands/Bold/attack.png', icon_x = 0, },
+			{ name = "Defense", value = 0, icon = 'LuaUI/Images/commands/Bold/guard.png', icon_x = 50, },
+			{ name = "Economy", value = 0, icon = 'LuaUI/Images/energy.png', icon_x = 100, },
 		},
 	}
 	
-	mock.balancebars = {
-		{ name = "Income", value = 100 * mock.resource_stats.left[1].total / (mock.resource_stats.left[1].total + mock.resource_stats.right[1].total) },
-		{ name = "Extraction", value = 100 * mock.resource_stats.left[1][1].value / (mock.resource_stats.left[1][1].value + mock.resource_stats.right[1][1].value) },
+	init.balancebars = {
+		{ name = "Income", value = 100 * init.resource_stats.left[1].total / (init.resource_stats.left[1].total + init.resource_stats.right[1].total) },
+		{ name = "Extraction", value = 100 * init.resource_stats.left[1][1].value / (init.resource_stats.left[1][1].value + init.resource_stats.right[1][1].value) },
 		{ name = "Military", value = 100 *
-			(mock.unit_stats.left[1].value + mock.unit_stats.left[2].value) /
-			(mock.unit_stats.left[1].value + mock.unit_stats.left[2].value + mock.unit_stats.right[1].value + mock.unit_stats.right[2].value)
+			(init.unit_stats.left[1].value + init.unit_stats.left[2].value) /
+			(init.unit_stats.left[1].value + init.unit_stats.left[2].value + init.unit_stats.right[1].value + init.unit_stats.right[2].value)
 		},
 		{ name = "Attrition", value = 50 },
 	}
 	
-	mock.unitpics = {
-		left = {
-		},
-		right = {
-		},
-	}
-	mock.compics = {
-		left = {
---[[
-			{ name = "commrecon", value = "2 more" },
-			{ name = "commstrike", value = "Lvl 4" },
-			{ name = "commassault", value = "Lvl 6" },
---]]
-		},
-		right = {
---[[
-			{ name = "commrecon", value = "2 more" },
-			{ name = "commstrike", value = "Lvl 4" },
-			{ name = "commassault", value = "Lvl 6" },
---]]
-		},
-	}
-	
-	return mock
+	return init
 end
 
 local function SetupLayoutParams()
@@ -849,6 +868,18 @@ local function SetupLayoutParams()
 	p.playerlabelwidth = (p.windowWidth - p.topcenterwidth) / 2
 	
 	return p
+end
+
+local function InitializeUnitStats()
+	-- TODO - Iterate through the units to populate unit counts.
+	--	This is needed when the spec panel is started midway
+	--	through the game, either because a player resigned and
+	--	started spectating or the panel was toggled off and on
+	--	or luaui was reloaded.
+	--
+	--	Alas, the attrition counter will still have to start from
+	--	scratch, at least until I incorporate Sprunk's new gadget-based
+	--	attrition tracking.
 end
 
 --------------------------------------------------------------------------------
@@ -1270,7 +1301,7 @@ end
 --------------------------------------------------------------------------------
 -- Startup and Shutdown
 
-function SpecWindowStartStop(force)
+function SpecPanelStartStop(force)
 	-- TODO - Consider whether it would be better instead to unregister
 	--	the call-ins when the panel is turned off and re-register them
 	--	when turned back on than to use the flag to short-circuit the
@@ -1294,11 +1325,10 @@ function SpecWindowStartStop(force)
 			-- while bearing in mind that we could be re-initializing in the middle of the game
 			specPanel = {}
 			allyTeams = GetOpposingAllyTeams()
+			InitializeUnitStats()
+			FetchUpdatedResources()
+			panelData = SetupInitData()
 			panelParams = SetupLayoutParams()
-			mockData = SetupMockData()
-			panelData = mockData
-			panelData.playernames = { left = allyTeams[1].name, right = allyTeams[2].name, }
-			panelData.playerwins = { left = allyTeams[1].winString, right = allyTeams[2].winString, }
 			AddCenterPanels(specPanel, panelParams, panelData)
 			AddSidePanels(specPanel, panelParams, panelData, 'left')
 			AddSidePanels(specPanel, panelParams, panelData, 'right')
@@ -1335,7 +1365,7 @@ end
 
 function widget:PlayerChanged(pID)
 	if pID == Spring.GetMyPlayerID() then
-		SpecWindowStartStop()
+		SpecPanelStartStop()
 	end
 end
 
@@ -1350,10 +1380,14 @@ function widget:Initialize()
 end
 
 function widget:Update(dt)
+
+	-- Start the spec panel in the first userframe. Can't do this during widget:Initialize
+	-- because the option values aren't set yet by epicmenu and they may be wrong.
 	if not didonce then
-		SpecWindowStartStop()
+		SpecPanelStartStop()
 		didonce = true
 	end
+
 	if panel_is_on then
 		timer_updateclock = timer_updateclock + dt
 		timer_updatestats = timer_updatestats + dt
@@ -1383,4 +1417,3 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
