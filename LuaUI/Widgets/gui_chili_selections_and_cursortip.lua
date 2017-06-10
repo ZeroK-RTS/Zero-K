@@ -25,6 +25,7 @@ local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetGameRulesParam = Spring.GetGameRulesParam
 local spGetModKeyState = Spring.GetModKeyState
 local spSelectUnitArray = Spring.SelectUnitArray
+local spGetUnitWeaponState = Spring.GetUnitWeaponState
 
 local GetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
 local GetHumanName = Spring.Utilities.GetHumanName
@@ -145,6 +146,9 @@ local DRAWING_TOOLTIP =
 	green.. 'Middle click'..white..': Place marker. \n' ..
 	green.. 'Double click'..white..': Place marker with label.'
 
+
+local reloadBarColor = {013, 245, 243, 1}
+
 -- TODO, autogenerate
 local econStructureDefs = {
 	[UnitDefNames["staticmex"].id] = {cost = 75, mex = true},
@@ -159,6 +163,16 @@ local econStructureDefs = {
 local filterUnitDefIDs = {
 	[UnitDefNames["terraunit"].id] = true
 }
+
+local manualFireTimeDefs = {}
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+	local unitWeapon = (ud and ud.weapons and ud.weapons[3])
+	--Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
+	if (unitWeapon ~= nil) and WeaponDefs[unitWeapon.weaponDef].manualFire then
+		manualFireTimeDefs[unitDefID] = WeaponDefs[unitWeapon.weaponDef].reload
+	end
+end
 
 local WIND_TITAL_HEIGHT = -10
 local windMin = 0
@@ -200,9 +214,11 @@ options_order = {
 	'showDrawTools',
 	
 	--selected units
-	'selection_opacity', 'groupbehaviour', 'showgroupinfo','uniticon_size',
+	'selection_opacity', 'groupbehaviour', 'showgroupinfo','uniticon_size', 'manualWeaponReloadBar',
 	'fancySkinning', 'leftPadding',
 }
+
+local showManualFire = true
 
 options = {
 	tooltip_delay = {
@@ -313,14 +329,17 @@ options = {
 			end
 		end,
 	},
-	--manualWeaponReloadBar = {
-	--	name="Show Unit's Special Weapon Status",
-	--	type='bool',
-	--	value= true,
-	--	noHotkey = true,
-	--	desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
-	--	path = selPath,
-	--},
+	manualWeaponReloadBar = {
+		name="Show Unit's Special Weapon Status",
+		type='bool',
+		value= true,
+		noHotkey = true,
+		desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
+		path = selPath,
+		OnChange = function(self)
+			showManualFire = self.value
+		end,
+	},
 	fancySkinning = {
 		name = 'Fancy Skinning',
 		type = 'radioButton',
@@ -489,6 +508,17 @@ local function GetUnitSelectionTooltip(ud, unitDefID, unitID)
 		unitSelectionTooltipCache[unitDefID] = GetHumanName(ud, unitID) .. " - " .. GetDescription(ud, unitID) .. selectionTooltip
 	end
 	return unitSelectionTooltipCache[unitDefID]
+end
+
+local function GetWeaponReloadStatus(unitID, weapNum, reloadTime)
+	local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, weapNum) --select weapon no.X
+	if weaponReloadFrame then
+		local currentFrame, _ = Spring.GetGameFrame() 
+		local remainingTime = (weaponReloadFrame - currentFrame)/30
+		local reloadFraction = 1 - remainingTime/reloadTime
+		return reloadFraction, remainingTime
+	end
+	return nil --Note: this mean unit doesn't have weapon number 'weapNum'
 end
 
 local function GetUnitResources(unitID)
@@ -923,6 +953,34 @@ local function GetMorphInfo(parentControl, yPos)
 	return Update
 end
 
+local function UpdateManualFireReload(reloadBar, parentImage, unitID, unitDefID)
+	if not reloadBar then
+		reloadBar = Chili.Progressbar:New {
+			x = "82%",
+			y = 5,
+			right = 5,
+			bottom = 5,
+			minWidth = 4,
+			max = 1,
+			caption = '',
+			color = reloadBarColor,
+			skinName = 'default',
+			orientation = "vertical",
+			reverse = true,
+			parent = parentImage,
+		}
+	end
+	local reloadFraction, remainingTime = GetWeaponReloadStatus(unitID, 3, manualFireTimeDefs[unitDefID])
+	
+	if reloadFraction and reloadFraction < 1 then
+		reloadBar:SetValue(reloadFraction)
+		reloadBar:SetVisibility(true)
+	else
+		reloadBar:SetVisibility(false)
+	end
+	return reloadBar
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Group buttons window
@@ -945,7 +1003,8 @@ local function GetUnitGroupIconButton(parentControl)
 		parent = parentControl,
 	}
 	
-	local healthbar = Chili.Progressbar:New {
+	local reloadBar
+	local healthBar = Chili.Progressbar:New {
 		x = 0,
 		y = "80%",
 		right = 0,
@@ -983,14 +1042,23 @@ local function GetUnitGroupIconButton(parentControl)
 		parent = unitImage
 	}
 	
-	local function UpdateUnitHealth()
+	local function UpdateUnitInfo()
 		if unitID then
 			local health, maxhealth = spGetUnitHealth(unitID)
 			if health then
-				healthbar.color = GetHealthColor(health/maxhealth)
-				healthbar:SetValue(health/maxhealth)
+				healthBar.color = GetHealthColor(health/maxhealth)
+				healthBar:SetValue(health/maxhealth)
+			end
+			if unitDefID and manualFireTimeDefs[unitDefID] and showManualFire then
+				reloadBar = UpdateManualFireReload(reloadBar, unitImage, unitID, unitDefID)
+			elseif reloadBar then
+				reloadBar:SetVisibility(false)
 			end
 			return
+		end
+		
+		if reloadBar then
+			reloadBar:SetVisibility(false)
 		end
 		
 		local totalHealth, totalMax = 0, 0
@@ -1003,8 +1071,8 @@ local function GetUnitGroupIconButton(parentControl)
 		end
 		
 		if totalMax > 0 then
-			healthbar.color = GetHealthColor(totalHealth/totalMax)
-			healthbar:SetValue(totalHealth/totalMax)
+			healthBar.color = GetHealthColor(totalHealth/totalMax)
+			healthBar:SetValue(totalHealth/totalMax)
 		end
 	end
 	
@@ -1056,7 +1124,7 @@ local function GetUnitGroupIconButton(parentControl)
 	end
 	
 	function externalStuff.UpdateUnitButton()
-		UpdateUnitHealth()
+		UpdateUnitInfo()
 	end
 	
 	function externalStuff.SetGroupIconUnits(newUnitID, newUnitList, newUnitDefID)
@@ -1064,7 +1132,7 @@ local function GetUnitGroupIconButton(parentControl)
 		visible = true
 		UpdateUnitDefID(newUnitDefID)
 		UpdateUnits(newUnitID, newUnitList)
-		UpdateUnitHealth()
+		UpdateUnitInfo()
 	end
 	
 	return externalStuff
@@ -1392,6 +1460,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		parent = parentControl,
 	}
 	
+	local reloadBar
 	local unitImage = Chili.Image:New{
 		x = 0,
 		y = 0,
@@ -1426,7 +1495,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local metalInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + LEFT_SPACE + 4, METAL_IMAGE, nil, nil, ICON_SIZE, 5)
 	local energyInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 2*LEFT_SPACE + 4, ENERGY_IMAGE, nil, nil, ICON_SIZE, 5)
 	
-	local healthbarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, {0, 1, 0, 1}, GetHealthColor)
+	local healthBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, {0, 1, 0, 1}, GetHealthColor)
 	
 	local metalInfo
 	local energyInfo
@@ -1460,7 +1529,15 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 
 	local prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID, prevMorphTime, prevMorphCost, prevMousePlace
 	local externalFunctions = {}
-	
+		
+	local function UpdateReloadTime(unitID, unitDefID)
+		if unitDefID and manualFireTimeDefs[unitDefID] and showManualFire then
+			reloadBar = UpdateManualFireReload(reloadBar, unitImage, unitID, unitDefID)
+		elseif reloadBar then
+			reloadBar:SetVisibility(false)
+		end
+	end
+
 	local function UpdateDynamicUnitAttributes(unitID, unitDefID, ud)
 		local mm, mu, em, eu = GetUnitResources(unitID)
 		local showMetalInfo = false
@@ -1487,7 +1564,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		local health, maxHealth = spGetUnitHealth(unitID)
 		if health and maxHealth then
-			healthbarUpdate(true, healthPos, health, maxHealth, (health < maxHealth) and GetUnitRegenString(unitID, ud))
+			healthBarUpdate(true, healthPos, health, maxHealth, (health < maxHealth) and GetUnitRegenString(unitID, ud))
 		end
 		
 		if buildBarUpdate then
@@ -1503,6 +1580,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				buildBarUpdate(false)
 			end
 		end
+		
+		UpdateReloadTime(unitID, unitDefID)
 		
 		return showMetalInfo
 	end
@@ -1583,7 +1662,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				addedName = " (" .. WG.Translate("interface", "wreckage") .. ")"
 			end
 			
-			healthbarUpdate(false)
+			healthBarUpdate(false)
 			if unitDefID then
 				if playerNameLabel then
 					playerNameLabel:SetPos(nil, PIC_HEIGHT + 10)
@@ -1634,7 +1713,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 55)
 				end
 			elseif not featureDefID then
-				healthbarUpdate(false)
+				healthBarUpdate(false)
 				maxHealthLabel(true, healthOverride or ud.health, HEALTH_IMAGE)
 				maxHealthShown = true
 				if morphTime then
