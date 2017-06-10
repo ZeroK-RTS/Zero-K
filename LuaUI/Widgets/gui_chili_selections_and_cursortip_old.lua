@@ -2869,7 +2869,7 @@ function widget:Initialize()
 	local height = integralHeight*0.84
 	
     real_window_corner = Window:New{
-		name  = 'selections_old',
+		name  = 'selections',
 		color = {0, 0, 0, 0},
 		x = x,
 		y = screenHeight - height,
