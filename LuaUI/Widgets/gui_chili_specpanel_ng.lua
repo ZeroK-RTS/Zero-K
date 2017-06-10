@@ -104,6 +104,7 @@ local panelData
 local mockData
 local allyTeams
 local panel_is_on
+local restore_ecopanelhs
 local gaiaTeam
 local deadUnits = {}
 local teamSides = {}
@@ -1285,6 +1286,7 @@ function SpecWindowStartStop(force)
 	--	the panel is disabled?
 	
 	local spectating = select(1, Spring.GetSpectatingState())
+	local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 	
 	if force == 'start' or (force ~= 'stop' and (options.enableSpecNG.value and spectating)) then
 		if not panel_is_on then
@@ -1303,13 +1305,19 @@ function SpecWindowStartStop(force)
 			if specPanel and specPanel.window then
 				screen0:AddChild(specPanel.window)
 			end
-	
+			
+			local ecopanelhs = WG.GetWidgetOption(econName, econPath, "ecoPanelHideSpec")
+			restore_ecopanelhs = ecopanelhs.value
+			WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", true)
+			
 			DisplayUpdatedResources(specPanel)
 			DisplayUpdatedUnitStats(specPanel)
 			panel_is_on = true
 		end
 	elseif force == 'stop' or (force ~= 'start' and not (options.enableSpecNG.value and spectating)) then
 		if panel_is_on then
+			WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", restore_ecopanelhs)
+			restore_ecopanelhs = nil
 			specPanel.window:Dispose()
 			specPanel = nil
 			panel_is_on = false
