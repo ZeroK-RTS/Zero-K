@@ -46,7 +46,7 @@ unitDef = {
   sightDistance                 = 512,
   turnRate                      = 0,
   upright                       = false,
-  useBuildingGroundDecal        = true,
+  useBuildingGroundDecal        = false,
   workerTime                    = 0,
   yardMap                       = [[ooooooooo]],
 
