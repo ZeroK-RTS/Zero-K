@@ -2,14 +2,14 @@
 --------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
-    name      = "Chili Selections & CursorTip",
+    name      = "Chili Selections & CursorTip Old",
     desc      = "v0.098 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --22 December 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
-    enabled   = true,
+    enabled   = false,
   }
 end
 
@@ -2869,7 +2869,7 @@ function widget:Initialize()
 	local height = integralHeight*0.84
 	
     real_window_corner = Window:New{
-		name  = 'selections',
+		name  = 'selections_old',
 		color = {0, 0, 0, 0},
 		x = x,
 		y = screenHeight - height,

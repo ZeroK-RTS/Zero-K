@@ -185,9 +185,10 @@ end
 -- Useful Functions
 ----------------------------------------------------
 local function GetSelectionIconSize(height)
-	local fitNumber = math.floor((height - 20)/(44 + 2))
-	local size = math.floor((height - 20)/fitNumber - 2)
-	return math.min(50, size)
+	local rows = math.floor((height - 25)/50)
+	local size = math.floor((height - 25)/rows)
+	local iconHeight = math.min(53, size) + 4
+	return iconHeight
 end
 
 ----------------------------------------------------
@@ -688,7 +689,8 @@ local function GetBottomSizes(screenWidth, screenHeight, parity)
 	local selectionsHeight = integralHeight*0.85
 	local selectionsWidth = screenWidth - integralWidth - minimapWidth - coreSelectorWidth
 
-	--Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, false)
+	WG.SetWidgetOption(selName, selPath, "uniticon_size", GetSelectionIconSize(selectionsHeight))
+	
 	WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", math.floor(integralHeight*6/7))
 	
 	-- Chat

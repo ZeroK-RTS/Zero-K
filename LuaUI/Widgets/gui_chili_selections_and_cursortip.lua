@@ -1,13 +1,13 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Chili Selections & CursorTip New",
+		name      = "Chili Selections & CursorTip",
 		desc      = "Chili Selection Window and Cursor Tooltip remake.",
 		author    = "GoogleFrog (CarRepairer and jK orginal)",
 		date      = "9 February 2017",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = false,
+		enabled   = true,
 	}
 end
 
@@ -33,7 +33,17 @@ local GetDescription = Spring.Utilities.GetDescription
 
 local strFormat = string.format
 
-local selectionTooltip = "\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") .. "\n" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect") .. "\n" .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type") .. "\n" .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type") .. "\n" .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to")
+local green = '\255\1\255\1'
+local red = '\255\255\1\1'
+local cyan = '\255\1\255\255'
+local white = '\255\255\255\255'
+local yellow = '\255\255\255\1'
+
+local selectionTooltip = "\n" .. green .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") .. "\n" .. 
+	green .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect") .. "\n" ..
+	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type") .. "\n" .. 
+	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type") .. "\n" .. 
+	green .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -56,17 +66,12 @@ local TOOLTIP_FONT = 12
 local NAME_FONT = 14
 local LEFT_SPACE = 24
 local LEFT_LABEL_HEIGHT = 16
+local SEL_BUTTON_SHORTENING = 2
 
 local LEFT_WIDTH = 55
 local PIC_HEIGHT = LEFT_WIDTH*4/5
 local RIGHT_WIDTH = 235
 local GROUP_STATS_WIDTH = 150
-
-local green = '\255\1\255\1'
-local red = '\255\255\1\1'
-local cyan = '\255\1\255\255'
-local white = '\255\255\255\255'
-local yellow = '\255\255\255\1'
 
 local HEALTH_IMAGE = 'LuaUI/images/commands/bold/health.png'
 local SHIELD_IMAGE = 'LuaUI/Images/commands/Bold/guard.png'
@@ -195,7 +200,7 @@ options_order = {
 	'showDrawTools',
 	
 	--selected units
-	'selection_opacity', 'groupbehaviour', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar',
+	'selection_opacity', 'groupbehaviour', 'showgroupinfo','uniticon_size',
 	'fancySkinning', 'leftPadding',
 }
 
@@ -277,44 +282,45 @@ options = {
 			{key = 'multitype',	name = 'With multiple unit types'},
 			{key = 'always',		name = 'Always'},
 		},
-		OnChange = option_Deselect,
 		path = selPath,
 	},
-	showgroupinfo = {name='Show Group Info', type='bool', value=true, OnChange = option_Deselect,
+	showgroupinfo = {name='Show Group Info', type='bool', value=true,
 		path = selPath,
+		OnChange = function(self)
+			if selectionWindow then
+				selectionWindow.SetGroupInfoVisible(self.value)
+			end
+		end,
 	},
-	squarepics = {name='Square Buildpics', type='bool', value=false, OnChange = option_Deselect,
-		path = selPath,
-	},
-	unitCommand = {
-		name="Show Unit's Command",
-		type='bool',
-		value= false,
-		noHotkey = true,
-		desc = "Display current command on unit's icon (only for ungrouped unit selection)",
-		path = selPath,
-	},
+	--unitCommand = {
+	--	name="Show Unit's Command",
+	--	type='bool',
+	--	value= false,
+	--	noHotkey = true,
+	--	desc = "Display current command on unit's icon (only for ungrouped unit selection)",
+	--	path = selPath,
+	--},
 	uniticon_size = {
 		name = 'Icon size on selection list',
 		--desc = 'Determines how small the icon in selection list need to be.',
 		type = 'number',
-		OnChange = function(self) 
-			option_Deselect()
-			unitIcon_size = math.modf(self.value)
-		end,
 		min=30,max=100,step=1,
-		value = 52,
+		value = 57,
 		path = selPath,
+		OnChange = function(self)
+			if selectionWindow then
+				selectionWindow.SetSelectionIconSize(self.value)
+			end
+		end,
 	},
-	manualWeaponReloadBar = {
-		name="Show Unit's Special Weapon Status",
-		type='bool',
-		value= true,
-		noHotkey = true,
-		desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
-		path = selPath,
-		OnChange = option_Deselect,
-	},
+	--manualWeaponReloadBar = {
+	--	name="Show Unit's Special Weapon Status",
+	--	type='bool',
+	--	value= true,
+	--	noHotkey = true,
+	--	desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
+	--	path = selPath,
+	--},
 	fancySkinning = {
 		name = 'Fancy Skinning',
 		type = 'radioButton',
@@ -1041,7 +1047,7 @@ local function GetUnitGroupIconButton(parentControl)
 	}
 	
 	function externalStuff.SetPosition(x,y,size)
-		holder:SetPos(x*size,y*size,size,size)
+		holder:SetPos(x*size,y*size - SEL_BUTTON_SHORTENING*y,size,size)
 	end
 	
 	function externalStuff.SetHidden()
@@ -1081,7 +1087,7 @@ local function GetSelectionStatsDisplay(parentControl)
 	
 	local selectedUnits
 	local selectedUnitDefID = {}
-	
+	local visible = true
 	
 	local statLabel = Chili.Label:New{
 		x = 0,
@@ -1111,19 +1117,19 @@ local function GetSelectionStatsDisplay(parentControl)
 		local name, hp, paradam, cap, build, mm, mu, em, eu
 		local stunned_or_inbuild
 		for i = 1, total_count do
-			id = selectedUnits[i]
+			unitID = selectedUnits[i]
 			unitDefID = selectedUnitDefID[i]
 			ud = unitDefID and UnitDefs[unitDefID]
 			if ud then
-				hp, _, paradam, cap, build = spGetUnitHealth(id)
-				mm, mu, em, eu = GetUnitResources(id)
+				hp, _, paradam, cap, build = spGetUnitHealth(unitID)
+				mm, mu, em, eu = GetUnitResources(unitID)
 				
 				if hp then
-					total_cost = total_cost + GetUnitCost(id, unitDefID)*build
+					total_cost = total_cost + GetUnitCost(unitID, unitDefID)*build
 					total_hp = total_hp + hp
 				end
 				
-				stunned_or_inbuild = spGetUnitIsStunned(id)
+				stunned_or_inbuild = spGetUnitIsStunned(unitID)
 				if not stunned_or_inbuild then 
 					if mm then
 						total_metalincome = total_metalincome + mm
@@ -1181,15 +1187,20 @@ local function GetSelectionStatsDisplay(parentControl)
 	
 	function externalFunctions.ChangeSelection(newSelection)
 		selectedUnits = newSelection
-		if selectedUnits then
+		if visible and selectedUnits then
 			UpdateStaticGroupInfo()
 		end
 	end
 	
 	function externalFunctions.UpdateStats()
-		if selectedUnits then
+		if visible and selectedUnits then
 			UpdateDynamicGroupInfo()
 		end
+	end
+	
+	function externalFunctions.SetVisibile(newVisible)
+		visible = newVisible
+		holder:SetVisibility(newVisible)
 	end
 	
 	return externalFunctions
@@ -1206,7 +1217,7 @@ local function GetMultiUnitInfoPanel(parentControl)
 		y = 0,
 		right = GROUP_STATS_WIDTH,
 		bottom = 0,
-		padding = {0,0,0,0},
+		padding = {-1,-1,0,0},
 		parent = parentControl,
 	}
 	
@@ -1243,7 +1254,7 @@ local function GetMultiUnitInfoPanel(parentControl)
 		
 		local newIconSize = options.uniticon_size.value
 		local newCols = math.floor(sizeX/iconSize)
-		local newRows = math.floor(sizeY/iconSize)
+		local newRows = math.floor(sizeY/(iconSize - SEL_BUTTON_SHORTENING))
 		if newCols == displayColumns and newRows == displayRows and newIconSize == iconSize then
 			return
 		end
@@ -1338,6 +1349,17 @@ local function GetMultiUnitInfoPanel(parentControl)
 		if buttonIndex then
 			HideButtonsFromIndex(buttonIndex)
 		end
+	end
+	
+	function externalFunctions.SetRightPadding(newRightPadding)
+		holder._relativeBounds.left = 0
+		holder._relativeBounds.right = newRightPadding
+		holder:UpdateClientArea()
+	end
+	
+	function externalFunctions.SetIconSize(newIconSize)
+		iconSize = newIconSize
+		Resize(holder)
 	end
 	
 	return externalFunctions
@@ -1938,7 +1960,7 @@ local function GetSelectionWindow()
 	local height = integralHeight*0.84
 
 	local holderWindow = Chili.Window:New{
-		name      = 'selections2',
+		name      = 'selections',
 		x         = x, 
 		bottom    = 0,
 		width     = 450,
@@ -1962,7 +1984,7 @@ local function GetSelectionWindow()
 		y = 0,
 		right = 0,
 		bottom = 0,
-		padding = {8 + options.leftPadding.value, 6, 4, 4},
+		padding = {8 + options.leftPadding.value, 6, 4, 2},
 		backgroundColor = {1, 1, 1, options.selection_opacity.value},
 		OnMouseDown = {
 			function(self)
@@ -2030,6 +2052,19 @@ local function GetSelectionWindow()
 		mainPanel.padding[1] = 8 + padding
 		mainPanel:UpdateClientArea()
 	end
+	
+	function externalFunctions.SetGroupInfoVisible(newVisible)
+		local rightPadding = newVisible and GROUP_STATS_WIDTH or 0
+		multiUnitDisplay.SetRightPadding(rightPadding)
+		selectionStatsDisplay.SetVisibile(newVisible)
+	end
+	
+	function externalFunctions.SetSelectionIconSize(iconSize)
+		multiUnitDisplay.SetIconSize(iconSize)
+	end
+	
+	-- Initialization
+	externalFunctions.SetGroupInfoVisible(options.showgroupinfo.value)
 	
 	return externalFunctions
 end
