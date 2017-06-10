@@ -2,14 +2,14 @@
 --------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
-    name      = "Chili Selections & CursorTip Old",
+    name      = "Chili Selections & CursorTip",
     desc      = "v0.098 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --22 December 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
-    enabled   = false,
+    enabled   = true,
   }
 end
 

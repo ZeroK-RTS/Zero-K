@@ -1,7 +1,7 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Chili Selections & CursorTip",
+		name      = "Chili Selections & CursorTip New",
 		desc      = "Chili Selection Window and Cursor Tooltip remake.",
 		author    = "GoogleFrog (CarRepairer and jK orginal)",
 		date      = "9 February 2017",
