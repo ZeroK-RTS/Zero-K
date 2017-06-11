@@ -13,6 +13,7 @@ function widget:GetInfo()
 	license   = "GNU GPL, v2 or later",
 	layer	 = -1,
 	api = true,
+	alwaysStart = true,
 	enabled   = true,
   }
   --Declares WG.WinCounter_currentWinTable: Table, {string playerName, {"team" = number allyTeam, "wins" = number wins, "wonLastGame" = boolean won previous game}}
