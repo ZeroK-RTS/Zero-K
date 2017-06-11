@@ -1,7 +1,7 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Chili Selections & CursorTip New",
+		name      = "Chili Selections & CursorTip",
 		desc      = "Chili Selection Window and Cursor Tooltip remake.",
 		author    = "GoogleFrog (CarRepairer and jK orginal)",
 		date      = "9 February 2017",
@@ -148,6 +148,7 @@ local DRAWING_TOOLTIP =
 
 
 local reloadBarColor = {013, 245, 243, 1}
+local fullHealthBarColor = {0, 255, 0, 1}
 
 -- TODO, autogenerate
 local econStructureDefs = {
@@ -424,7 +425,7 @@ local function SecondsToMinutesSeconds(seconds)
 end
 
 local function UnitDefTableSort(a,b) 
-	return a and b and UnitDefs[a].name < UnitDefs[b].name 
+	return a and UnitDefs[a] and b and UnitDefs[b] and UnitDefs[a].name < UnitDefs[b].name 
 end
 
 local function IsGroupingRequired(selectedUnits, selectionSortOrder, selectionSpace)
@@ -1010,6 +1011,7 @@ local function GetUnitGroupIconButton(parentControl)
 		height = 0,
 		max = 1,
 		caption = '',
+		color = fullHealthBarColor,
 		parent = holder
 	}
 	
@@ -1119,7 +1121,7 @@ local function GetUnitGroupIconButton(parentControl)
 	
 	function externalStuff.SetHidden()
 		holder:SetVisibility(false)
-		visible = false
+		externalStuff.visible = false
 	end
 	
 	function externalStuff.UpdateUnitButton()
@@ -1128,7 +1130,7 @@ local function GetUnitGroupIconButton(parentControl)
 	
 	function externalStuff.SetGroupIconUnits(newUnitID, newUnitList, newUnitDefID)
 		holder:SetVisibility(true)
-		visible = true
+		externalStuff.visible = true
 		UpdateUnitDefID(newUnitDefID)
 		UpdateUnits(newUnitID, newUnitList)
 		UpdateUnitInfo()
@@ -1493,13 +1495,14 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local costInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 4, COST_IMAGE, nil, nil, ICON_SIZE, 5)
 	local metalInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + LEFT_SPACE + 4, METAL_IMAGE, nil, nil, ICON_SIZE, 5)
 	local energyInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 2*LEFT_SPACE + 4, ENERGY_IMAGE, nil, nil, ICON_SIZE, 5)
+	local maxHealthLabel = GetImageWithText(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, nil, NAME_FONT, ICON_SIZE, 3)
 	
 	local healthBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, {0, 1, 0, 1}, GetHealthColor)
 	
 	local metalInfo
 	local energyInfo
 	
-	local spaceClickLabel, shieldBarUpdate, buildBarUpdate, morphInfo, playerNameLabel, maxHealthLabel, morphInfo
+	local spaceClickLabel, shieldBarUpdate, buildBarUpdate, morphInfo, playerNameLabel, morphInfo
 	if isTooltipVersion then
 		playerNameLabel = Chili.Label:New{
 			name = "playerNameLabel",
@@ -1519,7 +1522,6 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			caption = green .. WG.Translate("interface", "space_click_show_stats"),
 			parent = rightPanel,
 		}
-		maxHealthLabel = GetImageWithText(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, nil, NAME_FONT, ICON_SIZE, 3)
 		morphInfo = GetMorphInfo(rightPanel, PIC_HEIGHT + LEFT_SPACE + 3)
 	else
 		shieldBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, SHIELD_IMAGE, {0.3,0,0.9,1})
@@ -1737,6 +1739,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			selectedUnitID = unitID
 		else
 			selectedUnitID = nil
+			if reloadBar then
+				reloadBar:SetVisibility(false)
+			end
 		end
 		
 		if not metalInfoShown then
@@ -2122,6 +2127,8 @@ local function GetSelectionWindow()
 			singleUnitID = nil
 		end
 		mainPanel:SetVisibility(newVisible)
+		singleUnitDisplay.SetVisible(false)
+		multiUnitDisplay.SetUnitDisplay(false)
 	end
 	
 	function externalFunctions.SetOpacity(opacity)

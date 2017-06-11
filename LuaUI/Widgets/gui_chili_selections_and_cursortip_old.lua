@@ -2,7 +2,7 @@
 --------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
-    name      = "Chili Selections & CursorTip",
+    name      = "Chili Selections & CursorTip Old",
     desc      = "v0.098 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --22 December 2013
