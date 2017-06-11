@@ -15,6 +15,7 @@ function widget:GetInfo()
 	enabled   = true,
   }
   --Declares WG.WinCounter_currentWinTable: Table, {string playerName, {"team" = number allyTeam, "wins" = number wins, "wonLastGame" = boolean won previous game}}
+  --																				| Table, {"hasWins = boolean somePlayerHasWins}
   --		 WG.WinCounter_Increment:  Function, (number allyTeam) -> nil, Increments win counter for selected allyTeam
   --		 WG.WinCounter_Reset:		   Function, () -> nil, Resets the win count table
   --		 WG.WinCounter_Set:			   Function, (string playerName | number playerID, number winCount, boolean forAllyTeam (, boolean wonLastGame)) -> nil, 
