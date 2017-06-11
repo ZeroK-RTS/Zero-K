@@ -1563,8 +1563,8 @@ local function SearchElement(termToSearch,path)
 			elseif option.type == 'button' then
 				local hide = false
 				
-				if option.desc and option.desc:find(currentPath) and option.name:find("...") then --this type of button is defined in AddOption(path,option,wname) (a link into submenu)
-					local menupath = option.desc
+				if option.isDirectoryButton then --this type of button is defined in AddOption(path,option,wname) (a link into submenu)
+					local menupath = currentPath .. ((currentPath == "") and "" or "/") .. option.name
 					if pathoptions[menupath] then
 						if #pathoptions[menupath] >= 1 and menupath ~= "" then
 							DiggDeeper(menupath) --travel into & search into this branch
