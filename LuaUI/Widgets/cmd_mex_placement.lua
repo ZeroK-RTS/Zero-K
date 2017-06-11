@@ -538,6 +538,9 @@ local function Initialize()
 	end
 	
 	WG.GetClosestMetalSpot = GetClosestMetalSpot
+	if WG.LocalColor and WG.LocalColor.RegisterListener then
+		WG.LocalColor.RegisterListener(widget:GetInfo().name, updateMexDrawList)
+	end
 end
 
 local mexSpotToDraw = false
@@ -707,6 +710,10 @@ function calcMiniMexDrawList()
 end
 --]]
 function updateMexDrawList()
+	if not WG.metalSpots then
+		return
+	end
+
 	if (mainMexDrawList) then 
 		gl.DeleteList(mainMexDrawList); 
 		mainMexDrawList = nil 
