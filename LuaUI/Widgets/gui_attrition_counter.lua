@@ -78,6 +78,7 @@ local function languageChanged ()
 	UpdateCounter()
 end
 
+local GetHiddenTeamRulesParam = Spring.Utilities.GetHiddenTeamRulesParam
 local spGetTeamRulesParam = Spring.GetTeamRulesParam
 UpdateCounter = function ()
 
@@ -87,8 +88,8 @@ UpdateCounter = function ()
 		local team = myAllyTeamMembers[i]
 		local teamID = team.teamID
 
-		local pwn = floor(spGetTeamRulesParam(teamID, "stats_history_damage_dealt_current"))
-		local ded = floor(spGetTeamRulesParam(teamID, "stats_history_damage_received_current"))
+		local pwn = floor(GetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0)
+		local ded = floor(spGetTeamRulesParam(teamID, "stats_history_damage_received_current") or 0)
 		kills = kills + pwn
 		losses = losses + ded
 

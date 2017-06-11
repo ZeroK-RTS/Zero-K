@@ -27,6 +27,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local GetHiddenTeamRulesParam = Spring.Utilities.GetHiddenTeamRulesParam
+
 local buttongroups = {
 	{"Metal", {
 		{"metalProduced"   , "Metal Produced"},
@@ -58,6 +60,9 @@ local rulesParamStats = {
 	energy_income = true,
 	damage_dealt = true,
 	damage_received = true,
+}
+local hiddenStats = {
+	damage_dealt = true,
 }
 
 local graphLength = 0
@@ -329,7 +334,11 @@ local function getEngineArrays(statistic, labelCaption)
 				stats = {}
 				for i = 0, graphLength do
 					stats[i] = {}
-					stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+					if hiddenStats[statistic] then
+						stats[i][statistic] = GetHiddenTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+					else
+						stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+					end
 				end
 			else
 				stats = Spring.GetTeamStatsHistory(teamID, 0, graphLength)
