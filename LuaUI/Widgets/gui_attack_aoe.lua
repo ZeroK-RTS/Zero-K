@@ -466,7 +466,7 @@ local function GetBallisticVector(v, mg, dx, dy, dz, trajectory, range)
 	return Normalize(bx, by, bz)
 end
 
-local function GetBallisticImpactPoint(v, fx, fy, fz, bx, by, bz)
+local function GetBallisticImpactPoint(v, mg_f, fx, fy, fz, bx, by, bz)
 	local v_f = v / GAME_SPEED
 	local vx_f = bx * v_f
 	local vy_f = by * v_f
@@ -475,13 +475,13 @@ local function GetBallisticImpactPoint(v, fx, fy, fz, bx, by, bz)
 	local py = fy
 	local pz = fz
 
-	local ttl = 4 * v_f / g_f
+	local ttl = 4 * v_f / mg_f
 
 	for i = 1, ttl do
 		px = px + vx_f
 		py = py + vy_f
 		pz = pz + vz_f
-		vy_f = vy_f - g_f
+		vy_f = vy_f - mg_f
 
 		local gwh = max(GetGroundHeight(px, pz), 0)
 
@@ -543,6 +543,8 @@ local function DrawBallisticScatter(scatter, v, mygravity ,fx, fy, fz, tx, ty, t
 
 	local scatterDiv = scatter / numScatterPoints
 	local vertices = {}
+	
+	local mg_f = mg / GAME_SPEED / GAME_SPEED
 
 	--trace impact points
 	for i = -numScatterPoints, numScatterPoints do
@@ -553,7 +555,7 @@ local function DrawBallisticScatter(scatter, v, mygravity ,fx, fy, fz, tx, ty, t
 		local by_c = by * currScatterCos + br * currScatter
 		local bz_c = bz * rMult
 
-		vertices[i+numScatterPoints+1] = GetBallisticImpactPoint(v, fx, fy, fz, bx_c, by_c, bz_c)
+		vertices[i+numScatterPoints+1] = GetBallisticImpactPoint(v, mg_f, fx, fy, fz, bx_c, by_c, bz_c)
 	end
 
 	glLineWidth(scatterLineWidthMult / mouseDistance)
