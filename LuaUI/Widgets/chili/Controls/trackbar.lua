@@ -21,11 +21,13 @@ local inherited = this.inherited
 
 --//=============================================================================
 
-local function FormatNum(num)
+local strFormat = string.format
+local function FormatNum(num, precFormat)
   if (num == 0) then
     return "0"
+  elseif precFormat then
+	return strFormat(precFormat, num)
   else
-    local strFormat = string.format
     local absNum = math.abs(num)
     if (absNum < 0.01) then
       return strFormat("%.3f", num)
@@ -111,7 +113,7 @@ function Trackbar:SetValue(v)
   local oldvalue = self.value
   self.value = v
   if self.useValueTooltip then
-    self.tooltip = "Current: "..FormatNum(v)
+    self.tooltip = FormatNum(v, self.tooltip_format)
   end
   self:CallListeners(self.OnChange,v,oldvalue)
   self:Invalidate()

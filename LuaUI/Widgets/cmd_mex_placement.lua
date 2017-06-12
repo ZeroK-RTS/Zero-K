@@ -113,25 +113,31 @@ options = {
 		name = 'Show Income as Icon',
 		type = 'bool',
 		value = true,
-		tooltip = "When enabled income is shown pictorially. When disabled income is shown as a number.",
+		noHotkey = true,
+		desc = "Enabled: income is shown pictorially.\nDisabled: income is shown as a number.",
 		OnChange = function() updateMexDrawList() end
 	},
 	size = {
 		name = "Income Display Size", 
+		desc = "How large should the font or icon be?",
 		type = "number", 
 		value = 40, 
 		min = 10,
 		max = 150,
 		step = 5,
+		update_on_the_fly = true,
 		OnChange = function() updateMexDrawList() end
 	},
 	rounding = {
-		name = "Display digits",
+		name = "Display decimal digits",
+		desc = "How precise should the number be?\nNo effect on icons.",
 		type = "number",
 		value = 1,
 		min = 1,
 		max = 4,
+		update_on_the_fly = true,
 		advanced = true,
+		tooltip_format = "%.0f", -- show 1 instead of 1.0 (confusion)
 		OnChange = function() updateMexDrawList() end
 	},
 }

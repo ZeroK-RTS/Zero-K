@@ -148,6 +148,8 @@ local gameInfoText = ''
 	..confdata.description 
 	
 
+local function returnSelf(self) return self end
+
 --------------------------------------------------------------------------------
 -- Key bindings
 -- KEY BINDINGS AND YOU:
@@ -1835,9 +1837,9 @@ MakeSubWindow = function(path, pause)
 			}
 			if icon then
 				numberPanel:AddChild(Image:New{ file= icon, width = 16,height = 16, x=4,y=7,})
-				numberPanel:AddChild(Label:New{ caption = option.name, textColor = color.sub_fg, x=20,y=7,})
+				numberPanel:AddChild(Label:New{ caption = option.name, textColor = color.sub_fg, x=20,y=7, HitTest = returnSelf, })
 			else
-				numberPanel:AddChild(Label:New{ padding = {0,0,0,0}, caption = option.name, y = 7, textColor = color.sub_fg, })
+				numberPanel:AddChild(Label:New{ padding = {0,0,0,0}, caption = option.name, tooltip = option.desc, y = 7, textColor = color.sub_fg, HitTest = returnSelf, })
 			end
 			if option.valuelist then
 				option.value = GetIndex(option.valuelist, option.value)
@@ -1850,10 +1852,10 @@ MakeSubWindow = function(path, pause)
 				trackColor = color.sub_fg, 
 				min=option.min or 0, 
 				max=option.max or 100, 
-				step=option.step or 1, 
-				OnMouseup = { option.OnChange }, --using onchange triggers repeatedly during slide
-				tooltip=option.desc,
-				--useValueTooltip=true,
+				step=option.step or 1,
+				[option.update_on_the_fly and "OnChange" or "OnMouseup"] = { option.OnChange },
+				useValueTooltip=true,
+				tooltip_format = option.tooltip_format,
 			})
 			tree_children[#tree_children+1] = numberPanel
 		elseif option.type == 'list' then
