@@ -19,13 +19,14 @@ include("Widgets/COFCTools/ExportUtilities.lua")
 
 local spGetMouseState = Spring.GetMouseState
 local spTraceScreenRay = Spring.TraceScreenRay
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitHealth = Spring.GetUnitHealth
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetGameRulesParam = Spring.GetGameRulesParam
 local spGetModKeyState = Spring.GetModKeyState
 local spSelectUnitArray = Spring.SelectUnitArray
 local spGetUnitWeaponState = Spring.GetUnitWeaponState
+local spGetUnitCurrentBuildPower = Spring.GetUnitCurrentBuildPower
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 local GetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
 local GetHumanName = Spring.Utilities.GetHumanName
@@ -161,19 +162,17 @@ local econStructureDefs = {
 	[UnitDefNames["energysingu"].id] = {cost = 4000, income = 225},
 }
 
-local filterUnitDefIDs = {
+local dynamicTooltipDefs = {
 	[UnitDefNames["terraunit"].id] = true
 }
 
-local manualFireTimeDefs = {}
-for unitDefID = 1, #UnitDefs do
-	local ud = UnitDefs[unitDefID]
-	local unitWeapon = (ud and ud.weapons and ud.weapons[3])
-	--Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
-	if (unitWeapon ~= nil) and WeaponDefs[unitWeapon.weaponDef].manualFire then
-		manualFireTimeDefs[unitDefID] = WeaponDefs[unitWeapon.weaponDef].reload
-	end
+for unitDefID,_ in pairs(econStructureDefs) do
+	dynamicTooltipDefs[unitDefID] = true
 end
+
+local filterUnitDefIDs = {
+	[UnitDefNames["terraunit"].id] = true
+}
 
 local WIND_TITAL_HEIGHT = -10
 local windMin = 0
@@ -186,6 +185,24 @@ local windTidalThreashold = -10
 local GAIA_TEAM = Spring.GetGaiaTeamID()
 
 local UPDATE_FREQUENCY = 0.2
+
+local isCommander = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.customParams.level or ud.customParams.dynamic_comm then
+		isCommander[i] = true
+	end
+end
+
+local manualFireTimeDefs = {}
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+	local unitWeapon = (ud and ud.weapons and ud.weapons[3])
+	--Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
+	if (unitWeapon ~= nil) and WeaponDefs[unitWeapon.weaponDef].manualFire then
+		manualFireTimeDefs[unitDefID] = WeaponDefs[unitWeapon.weaponDef].reload
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -200,6 +217,7 @@ local sameObjectID
 local sameObjectIDTime = 0
 
 local selectedUnitsList = {}
+local commanderManualFireReload = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -486,6 +504,10 @@ local function GetUnitIcon(unitDefID)
 	return iconTypeCache[unitDefID]
 end
 
+local function GetCurrentBuildSpeed(unitID, buildSpeed)
+	return (Spring.GetUnitCurrentBuildPower(unitID) or 0)*(spGetUnitRulesParam(unitID, "totalEconomyChange") or 1)*buildSpeed
+end
+
 local unitBorderCache = {}
 local function GetUnitBorder(unitDefID)
 	if unitDefID and unitBorderCache[unitDefID] then
@@ -537,7 +559,7 @@ end
 
 local function GetUnitRegenString(unitID, ud)
 	if unitID and (not select(3, spGetUnitIsStunned(unitID))) then
-		local regen_timer = Spring.GetUnitRulesParam(unitID, "idleRegenTimer")
+		local regen_timer = spGetUnitRulesParam(unitID, "idleRegenTimer")
 		if regen_timer and ud then
 			if ((ud.idleTime <= 300) and (regen_timer > 0)) then
 				return "  (" .. math.ceil(regen_timer / 30) .. "s)"
@@ -568,6 +590,54 @@ local function GetUnitShieldRegenString(unitID, ud)
 	-- TODO: Surely actual rate should be used, taking into account energy stalling and stun state.
 	local wd = WeaponDefs[ud.shieldWeaponDef]
 	return " (+" .. (wd.customParams.shield_rate or wd.shieldPowerRegen) .. ")"
+end
+
+local function GetManualFireReload(unitID, unitDefID)
+	if not (unitDefID and showManualFire) then
+		return false
+	end
+	
+	if unitID and commanderManualFireReload[unitID] then
+		local reload = commanderManualFireReload[unitID]
+		if reload[1] == 0 then
+			return false
+		end
+		return reload[1], reload[2]
+	end
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if not unitDefID then
+		return false
+	end
+	
+	if manualFireTimeDefs[unitDefID] then
+		return manualFireTimeDefs[unitDefID], 3
+	end
+	if not (unitID and isCommander[unitDefID]) then
+		return false
+	end
+	
+	local manualFire = spGetUnitRulesParam(unitID, "comm_weapon_manual_2")
+	if manualFire ~= 1 then
+		commanderManualFireReload[unitID] = {0}
+		return false
+	end
+	
+	local weaponNum = spGetUnitRulesParam(unitID, "comm_weapon_num_2")
+	if not weaponNum then
+		commanderManualFireReload[unitID] = {0}
+		return false
+	end
+	
+	local ud = UnitDefs[unitDefID]
+	local unitWeapon = ud and ud.weapons and ud.weapons[weaponNum]
+	if (unitWeapon ~= nil) and WeaponDefs[unitWeapon.weaponDef].manualFire then
+		local reload = WeaponDefs[unitWeapon.weaponDef].reload
+		commanderManualFireReload[unitID] = {reload, weaponNum}
+		return reload, weaponNum
+	end
+	
+	commanderManualFireReload[unitID] = {0}
+	return false
 end
 
 local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
@@ -953,7 +1023,7 @@ local function GetMorphInfo(parentControl, yPos)
 	return Update
 end
 
-local function UpdateManualFireReload(reloadBar, parentImage, unitID, unitDefID)
+local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum, reloadTime)
 	if not reloadBar then
 		reloadBar = Chili.Progressbar:New {
 			x = "82%",
@@ -970,7 +1040,7 @@ local function UpdateManualFireReload(reloadBar, parentImage, unitID, unitDefID)
 			parent = parentImage,
 		}
 	end
-	local reloadFraction, remainingTime = GetWeaponReloadStatus(unitID, 3, manualFireTimeDefs[unitDefID])
+	local reloadFraction, remainingTime = GetWeaponReloadStatus(unitID, weaponNum, reloadTime)
 	
 	if reloadFraction and reloadFraction < 1 then
 		reloadBar:SetValue(reloadFraction)
@@ -1050,8 +1120,9 @@ local function GetUnitGroupIconButton(parentControl)
 				healthBar.color = GetHealthColor(health/maxhealth)
 				healthBar:SetValue(health/maxhealth)
 			end
-			if unitDefID and manualFireTimeDefs[unitDefID] and showManualFire then
-				reloadBar = UpdateManualFireReload(reloadBar, unitImage, unitID, unitDefID)
+			local reloadTime, weaponNum = GetManualFireReload(unitID, unitDefID)
+			if reloadTime then
+				reloadBar = UpdateManualFireReload(reloadBar, unitImage, unitID, weaponNum, reloadTime)
 			elseif reloadBar then
 				reloadBar:SetVisibility(false)
 			end
@@ -1207,8 +1278,8 @@ local function GetSelectionStatsDisplay(parentControl)
 						total_energydrain = total_energydrain + eu
 					end
 					
-					if ud.buildSpeed ~= 0 and mm then
-						total_usedbp = total_usedbp + mu
+					if ud.buildSpeed ~= 0 then
+						total_usedbp = total_usedbp + (GetCurrentBuildSpeed(unitID, GetUnitBuildSpeed(unitID, unitDefID)) or 0)
 					end
 				end
 			end
@@ -1532,8 +1603,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local externalFunctions = {}
 		
 	local function UpdateReloadTime(unitID, unitDefID)
-		if unitDefID and manualFireTimeDefs[unitDefID] and showManualFire then
-			reloadBar = UpdateManualFireReload(reloadBar, unitImage, unitID, unitDefID)
+		local reloadTime, weaponNum = GetManualFireReload(unitID, unitDefID)
+		if reloadTime then
+			reloadBar = UpdateManualFireReload(reloadBar, unitImage, unitID, weaponNum, reloadTime)
 		elseif reloadBar then
 			reloadBar:SetVisibility(false)
 		end
@@ -1551,7 +1623,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local healthPos
 		if shieldBarUpdate then
 			if ud and (ud.shieldPower > 0 or ud.level) then
-				local shieldPower = Spring.GetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower
+				local shieldPower = spGetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower
 				local _, shieldCurrentPower = Spring.GetUnitShieldState(unitID, -1)
 				if shieldCurrentPower and shieldPower then
 					shieldBarUpdate(true, nil, shieldCurrentPower, shieldPower, (shieldCurrentPower < shieldPower) and GetUnitShieldRegenString(unitID, ud))
@@ -1572,14 +1644,16 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			if ud and ud.buildSpeed > 0 then
 				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(unitID)
 				
-				local buildSpeed = ud.buildSpeed
-				if ud.level then
-					buildSpeed = buildSpeed*(Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
-				end
-				buildBarUpdate(true, (healthPos or (PIC_HEIGHT + 4)) + BAR_SPACING, metalUse or 0, buildSpeed)
+				local buildSpeed = GetUnitBuildSpeed(unitID, unitDefID)
+				local currentBuild = GetCurrentBuildSpeed(unitID, buildSpeed)
+				buildBarUpdate(true, (healthPos or (PIC_HEIGHT + 4)) + BAR_SPACING, currentBuild or 0, buildSpeed)
 			else
 				buildBarUpdate(false)
 			end
+		end
+		
+		if dynamicTooltipDefs[unitDefID] then
+			unitDesc:SetText(GetDescription(ud, unitID))
 		end
 		
 		UpdateReloadTime(unitID, unitDefID)
@@ -1690,7 +1764,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitImage.file2 = GetUnitBorder(unitDefID)
 			unitImage:Invalidate()
 			
-			costInfoUpdate(true, cyan .. GetUnitCost(unitID, unitDefID), COST_IMAGE, PIC_HEIGHT + 4)
+			costInfoUpdate(true, cyan .. math.floor(GetUnitCost(unitID, unitDefID) or 0), COST_IMAGE, PIC_HEIGHT + 4)
 			
 			local extraTooltip, healthOverride
 			if not (unitID or featureID) then
@@ -2239,6 +2313,12 @@ function widget:Initialize()
 	selectionWindow = GetSelectionWindow()
 	tooltipWindow = GetTooltipWindow()
 	InitializeWindParameters()
+end
+
+function widget:UnitDestroyed(unitID)
+	if commanderManualFireReload[unitID] then
+		commanderManualFireReload[unitID] = nil
+	end
 end
 
 function widget:Shutdown()
