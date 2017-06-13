@@ -540,7 +540,8 @@ local function AllowPauseOnMenuChange()
 	if Spring.GetSpectatingState() then
 		return false
 	end
-	if settings.config['epic_Settings/Misc_Menu_pauses_in_SP'] == false then
+
+	if settings.config['epic_Settings/HUD_Panels/Pause_Screen_Menu_pauses_in_SP'] == false then
 		return false
 	end
 	local playerlist = Spring.GetPlayerList() or {}
