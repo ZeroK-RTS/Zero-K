@@ -17,12 +17,25 @@ function gadget:GetInfo()
 	}
 end
 
+local CMD_INSERT = CMD.INSERT
+local spValidUnitID = Spring.ValidUnitID
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)
-    if(#cmdParams == 1) then
-        local id = cmdParams[1]
-        if Spring.ValidUnitID(id) and Spring.GetUnitRulesParam(id,"untargetable") == 1 then
-            return false
-        end
-    end
-    return true;
+
+	local numParams = #cmdParams
+	if cmdID == CMD.INSERT then
+		numParams = numParams - 3
+		cmdParams[1] = cmdParams[4]
+	end
+
+	if numParams ~= 1 then
+		return true
+	end
+
+	local targetID = cmdParams[1]
+	if not spValidUnitID(targetID) or spGetUnitRulesParam(targetID, "untargetable") ~= 1 then
+		return true
+	end
+
+	return false
 end
