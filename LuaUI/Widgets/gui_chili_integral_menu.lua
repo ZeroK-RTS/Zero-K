@@ -404,17 +404,20 @@ local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePositio
 	local i = queuePosition
 	local j = 0
 	while commands[i] and ((not inputMult) or j < inputMult) do
-		local thisCmdID = commands[i].id
-		local cmdTag = commands[i].tag
+		local thisCmd = commands[i]
+		local thisCmdID = thisCmd.id
+		local cmdTag = thisCmd.tag
 		if thisCmdID < 0 and not alreadyRemovedTag[cmdTag] then
 			if thisCmdID ~= cmdID then
 				break
 			end
 	
 			alreadyRemovedTag[cmdTag] = true
-			Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {cmdTag}, {"ctrl"})
+			Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {cmdTag}, CMD.OPT_CTRL)
 			if reinsertPosition then
-				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, 0}, {"alt", "ctrl"})
+				local opts = thisCmd.options
+				local coded = opts.coded
+				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, coded}, CMD.OPT_CTRL + CMD.OPT_ALT)
 			end
 			j = j + 1
 		end
