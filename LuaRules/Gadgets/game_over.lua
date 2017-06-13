@@ -519,6 +519,14 @@ function gadget:TeamDied (teamID)
 	end
 end
 
+function gadget:PlayerChanged (playerID)
+	if gameover then
+		return
+	end
+
+	ProcessLastAlly()
+end
+
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if (teamID ~= gaiaTeamID)
 	  and(not doesNotCountList[unitDefID])
