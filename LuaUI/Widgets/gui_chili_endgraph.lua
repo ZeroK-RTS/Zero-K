@@ -65,6 +65,8 @@ local hiddenStats = {
 	damage_dealt = true,
 }
 
+local gameOver = false
+
 local graphLength = 0
 local usingAllyteams = false
 local curGraph = {}
@@ -334,7 +336,7 @@ local function getEngineArrays(statistic, labelCaption)
 				stats = {}
 				for i = 0, graphLength do
 					stats[i] = {}
-					if hiddenStats[statistic] then
+					if hiddenStats[statistic] and gameOver then
 						stats[i][statistic] = GetHiddenTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
 					else
 						stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
@@ -526,6 +528,10 @@ end
 
 function widget:Initialize()
 	WG.MakeStatsPanel = makePanel
+end
+
+function widget:GameOver()
+	gameOver = true
 end
 
 function widget:GameFrame(n)

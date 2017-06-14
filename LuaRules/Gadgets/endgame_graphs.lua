@@ -12,6 +12,7 @@ function gadget:GetInfo() return {
 
 local teamList = Spring.GetTeamList()
 local gaiaTeamID = Spring.GetGaiaTeamID()
+local allyTeamByTeam
 
 local AreTeamsAllied = Spring.AreTeamsAllied
 local GetUnitHealth = Spring.GetUnitHealth
@@ -21,9 +22,12 @@ local SetHiddenTeamRulesParam = Spring.Utilities.SetHiddenTeamRulesParam
 local GetHiddenTeamRulesParam = Spring.Utilities.GetHiddenTeamRulesParam
 
 local reclaimListByTeam = {}
-local damageDealtByTeam = {}
 local metalExcessByTeam = {}
 local damageReceivedByTeam = {}
+
+-- hax disregards LoS. Mostly for gadget use (eg awards), users can see it only after game over. Mid-game they can only see nonhax.
+local damageDealtByTeamHax = {}
+local damageDealtByTeamNonhax = {}
 
 local ALLIED_VISIBLE = {allied = true}
 
@@ -41,6 +45,8 @@ function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, feature
 	return true
 end
 
+local spGetUnitPosition = Spring.GetUnitPosition
+local spIsPosInLos = Spring.IsPosInLos
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if paralyzer then return end
 
@@ -52,7 +58,13 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
 
 	if attackerTeam and not AreTeamsAllied(attackerTeam, unitTeam) then
-		damageDealtByTeam[attackerTeam] = damageDealtByTeam[attackerTeam] + costdamage
+		damageDealtByTeamHax[attackerTeam] = damageDealtByTeamHax[attackerTeam] + costdamage
+
+		local x, y, z = spGetUnitPosition(unitID)
+		local allyTeamID = allyTeamByTeam[attackerTeam]
+		if spIsPosInLos(x, y, z, allyTeamID) then
+			damageDealtByTeamNonhax[attackerTeam] = damageDealtByTeamNonhax[attackerTeam] + costdamage
+		end
 	end
 	damageReceivedByTeam[unitTeam] = damageReceivedByTeam[unitTeam] + costdamage
 end
@@ -123,7 +135,8 @@ function gadget:GameFrame(n)
 		mIncomeOverdrive[teamID] = mIncomeOverdrive[teamID] + (Spring.GetTeamRulesParam(teamID, "OD_metalOverdrive") or 0)
 		local liveValue, nanoPartial, nanoTotal = GetTotalUnitValue(teamID)
 
-		SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeam[teamID])
+		SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeamHax[teamID])
+		Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeamNonhax[teamID], ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_current", damageReceivedByTeam[teamID], ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", -reclaimListByTeam[teamID], ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_current", metalExcessByTeam[teamID], ALLIED_VISIBLE)
@@ -132,7 +145,8 @@ function gadget:GameFrame(n)
 		Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_current", nanoTotal, ALLIED_VISIBLE)
 		
 		if isSpringStatsHistoryFrame then
-			SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_"    .. stats_index, damageDealtByTeam[teamID])
+			SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_"    .. stats_index, damageDealtByTeamHax[teamID])
+			Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_"    .. stats_index, damageDealtByTeamNonhax[teamID])
 			Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_" .. stats_index, damageReceivedByTeam[teamID], ALLIED_VISIBLE)
 			Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_" .. stats_index, -reclaimListByTeam[teamID], ALLIED_VISIBLE)
 			Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_" .. stats_index, metalExcessByTeam[teamID], ALLIED_VISIBLE)
@@ -186,8 +200,10 @@ function gadget:Initialize()
 		end
 	end
 
+	allyTeamByTeam = {}
 	for i = 1, #teamList do
 		local teamID = teamList[i]
+		allyTeamByTeam[teamID] = select(6, Spring.GetTeamInfo(teamID))
 
 		mIncome         [teamID] = 0
 		mIncomeBase     [teamID] = 0
@@ -197,6 +213,7 @@ function gadget:Initialize()
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", Spring.GetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_current", Spring.GetTeamRulesParam(teamID, "stats_history_metal_excess_current") or 0, ALLIED_VISIBLE)
 		SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current", GetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0)
+		Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_current", Spring.GetTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_current", Spring.GetTeamRulesParam(teamID, "stats_history_damage_received_current") or 0, ALLIED_VISIBLE)
 		
 		local liveValue, nanoPartial, nanoTotal = GetTotalUnitValue(teamID)
@@ -204,7 +221,8 @@ function gadget:Initialize()
 		Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_current", nanoPartial, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_current", nanoTotal, ALLIED_VISIBLE)
 
-		SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_0"     , 0)
+		SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_0"      , 0)
+		Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_0"     , 0, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_0"  , 0, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_0"    , 0, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_0"     , 0, ALLIED_VISIBLE)
@@ -218,7 +236,8 @@ function gadget:Initialize()
 
 		reclaimListByTeam   [teamID] = -Spring.GetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0
 		metalExcessByTeam   [teamID] = Spring.GetTeamRulesParam(teamID, "stats_history_metal_excess_current") or 0
-		damageDealtByTeam   [teamID] =  GetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0
+		damageDealtByTeamHax[teamID] =  GetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0
+		damageDealtByTeamNonhax[teamID] =  Spring.GetTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0
 		damageReceivedByTeam[teamID] =  Spring.GetTeamRulesParam(teamID, "stats_history_damage_received_current") or 0
 	end
 end
