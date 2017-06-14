@@ -35,6 +35,7 @@ unitDef = {
     helptext       = [[A traditional favourite, the Vehicle Plant is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Leveler, Slasher]],
 	helptext_de    = [[Der Traditionalist unter den Fabriken. Die Vehicle Plant ist ideal für den Blitzkrieg, denn schnelle und hoch aggressive Einheiten werden hier gebaut. Diese Einheiten machen ihren Mangel an Geschwindigkeit mit reichlich Feuerkraft wieder wett. Wichtigste Einheiten: Dart, Scorcher, Ravager, Leveler, Slasher]],
     sortName       = [[2]],
+    solid_factory = 4,
   },
 
   energyUse                     = 0,
@@ -52,14 +53,15 @@ unitDef = {
   minCloakDistance              = 150,
   moveState        				= 1,
   noAutoFire                    = false,
-  objectName                    = [[corvp.s3o]],
+  objectName                    = [[factoryveh.s3o]],
+  script                        = [[factoryveh.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = "yyoooyy yoooooy ooooooo occccco occccco occccco occccco",
+  yardMap                       = "ooooooo ooooooo ooooooo ccccccc ccccccc ccccccc ccccccc",
 
   featureDefs                   = {
 
@@ -68,7 +70,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 7,
       footprintZ       = 7,
-      object           = [[corvp_dead.s3o]],
+      object           = [[factoryveh_dead.s3o]],
     },
 
 
