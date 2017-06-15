@@ -68,13 +68,14 @@ options = {
 		name = "Only filter when Alt is held",
 		type = "bool",
 		value = false,
-		desc = "Enable selection filtering when Alt is held. Required the main selection filtering option to be enabled.",
+		desc = "Enable selection filtering when Alt is held. Requires the main selection filtering option to be enabled.",
 		OnChange = function (self)
 			selectionFilteringOnlyAlt = self.value
 		end
 	},
 	ctrlFlattenRankOption = {
 		name = 'Hold Ctrl to ignore rank difference above:',
+		desc = "Useful so that global selection hotkeys (such as Ctrl+Z) can expand upon a mixed selection.",
 		type = 'number',
 		value = 1,
 		min = 0, max = 3, step = 1,
