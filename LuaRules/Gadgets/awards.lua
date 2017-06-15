@@ -658,7 +658,7 @@ function gadget:GameFrame(n)
 			local team = teams[i]
 			if team ~= gaiaTeamID then
 				AddAwardPoints('reclaim', team, Spring.GetTeamRulesParam(team, "stats_history_metal_reclaim_current") or 0)
-				AddAwardPoints('pwn', team, Spring.GetTeamRulesParam(team, "stats_history_damage_dealt_current") or 0)
+				AddAwardPoints('pwn', team, Spring.Utilities.GetHiddenTeamRulesParam(team, "stats_history_damage_dealt_current") or 0)
 			end
 		end
 
