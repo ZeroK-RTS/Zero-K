@@ -272,7 +272,6 @@ local function SetupDefaultPreset()
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
-	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
 	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
@@ -407,7 +406,6 @@ local function SetupNewPreset()
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
-	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -614,7 +612,6 @@ local function SetupNewWidgets()
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
-	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -1022,7 +1019,6 @@ local function SetupCraftyPreset()
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
-	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
 	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
@@ -1151,7 +1147,6 @@ local function SetupEnsemblePreset()
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
-	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
 	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
@@ -1279,7 +1274,6 @@ local function SetupWestwoodPreset()
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
-	widgetHandler:DisableWidget("Chili Economy Panel Default")
 	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
@@ -1287,7 +1281,7 @@ local function SetupWestwoodPreset()
 	widgetHandler:EnableWidget("Chili Crude Player List")
 	widgetHandler:EnableWidget("Chili Integral Menu")
 	widgetHandler:EnableWidget("Chili Pro Console")
-	widgetHandler:EnableWidget("Chili Economy Panel with Balance Bar")
+	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
 	
