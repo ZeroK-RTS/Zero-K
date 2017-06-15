@@ -244,6 +244,8 @@ skin.combobox_item = {
 skin.checkbox = {
   TileImageFG = ":cl:checkbox_arrow.png",
   TileImageBK = ":cl:checkbox.png",
+  TileImageFG_round = ":cl:radiobutton_checked.png",
+  TileImageBK_round = ":cl:radiobutton.png",
   tiles       = {3,3,3,3},
   boxsize     = 13,
 

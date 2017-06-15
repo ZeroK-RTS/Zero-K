@@ -772,15 +772,18 @@ function DrawCheckbox(obj)
   else
     gl.Color(1,1,1,1)
   end
-  TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
 
-  local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
+  local imageBK = obj.round and obj.TileImageBK_round or obj.TileImageBK
+  TextureHandler.LoadTexture(0, imageBK, obj)
+
+  local texInfo = gl.TextureInfo(imageBK) or {xsize=1, ysize=1}
   local tw,th = texInfo.xsize, texInfo.ysize
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
   if (obj.state.checked) then
-    TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
+    local imageFG = obj.round and obj.TileImageFG_round or obj.TileImageFG
+    TextureHandler.LoadTexture(0, imageFG, obj)
       gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   end
   gl.Texture(0,false)

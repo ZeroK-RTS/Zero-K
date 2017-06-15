@@ -1897,6 +1897,7 @@ MakeSubWindow = function(path, pause)
 					OnClick = {function(self) option.OnChange(item) end},
 					textColor = color.sub_fg,
 					tooltip = item.desc, --tooltip
+					round = true,
 				}
 				local icon = option.items[i].icon
 				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon, option.noHotkey)
