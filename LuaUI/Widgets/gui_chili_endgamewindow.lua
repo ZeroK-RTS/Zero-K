@@ -58,7 +58,6 @@ local SetupExitButton
 -- Flags and timers
 local spec
 local showingTab
-local showingEndgameWindow
 local endgame_caption
 local endgame_fontcolor
 local gameEnded
@@ -222,22 +221,34 @@ local function PrepEndgameWindow()
 	end
 end
 
+local function ToggleEndgameWindow(wantedState)
+	local currentState = window_endgame.visible
+	if wantedState == nil then
+		wantedState = not currentState
+	end
+
+	if currentState == wantedState then
+		return
+	end
+
+	if currentState == true then
+		window_endgame:Hide()
+		widgetHandler:RemoveCallIn("GameFrame")
+	else
+		PrepEndgameWindow()
+		local button = statsSubPanel.buttonPressed or 1
+		if statsSubPanel then statsSubPanel.graphButtons[button].OnClick[1](statsSubPanel.graphButtons[button]) end
+		window_endgame:Show()
+		widgetHandler:UpdateCallIn("GameFrame")
+	end
+end
+
 local function ToggleStatsGraph()
 	local toggleendgamewindow = options.toggleendgamewindow.value
 	local togglewindow = (not gameEnded or toggleendgamewindow)
 	if not togglewindow then return end
 
-	if showingEndgameWindow then
-		-- toggle off
-		window_endgame:Hide()
-	else
-		-- toggle on
-		PrepEndgameWindow()
-		local button = statsSubPanel.buttonPressed or 1
-		if statsSubPanel then statsSubPanel.graphButtons[button].OnClick[1](statsSubPanel.graphButtons[button]) end
-		window_endgame:Show()
-	end
-	showingEndgameWindow = not showingEndgameWindow
+	ToggleEndgameWindow()
 end
 
 local function ShowAwards()
@@ -312,7 +323,7 @@ local function SetupControls()
 		minWidth=500;
 		minHeight=400;
 	}
-	window_endgame:Hide()
+	ToggleEndgameWindow(false)
 
 	awardPanel = ScrollPanel:New{
 		parent = window_endgame,
@@ -438,6 +449,12 @@ end
 --------------------------------------------------------------------------------
 --callins
 
+local function StartEndgameTimer (delay)
+	gameEnded = true
+	showEndgameWindowTimer = endgameWindowDelay
+	widgetHandler:UpdateCallIn("Update")
+end
+
 function widget:Initialize()
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget()
@@ -473,13 +490,14 @@ function widget:Initialize()
 	statsButton:Hide()
 	exitButton:Hide()
 	ShowStats()
-	
+
+	widgetHandler:RemoveCallIn("Update")
+	widgetHandler:RemoveCallIn("GameFrame")
 	if Spring.IsGameOver() then
-		gameEnded = true
 		window_endgame.caption = "Game aborted"
-		showEndgameWindowTimer = 1
+		StartEndgameTimer(1)
 	end
-	
+
 	widgetHandler:RegisterGlobal("SetAwardList", SetAwardList)
 	widgetHandler:AddAction("togglestatsgraph", ToggleStatsGraph, nil, 'tp')
 
@@ -490,22 +508,15 @@ end
 
 function widget:GameOver(winners)
 	SetEndgameCaption(winners)
-	showEndgameWindowTimer = endgameWindowDelay
-	gameEnded = true
+	StartEndgameTimer(endgameWindowDelay)
 end
 
 function widget:Update(dt)
-	-- If the post-endgame countdown timer has not yet started, don't do anything else
-	-- If the post-endgame countdown has started but not elapsed, decrement it and do nothing else
-	if not showEndgameWindowTimer then
-		return
-	end
 	showEndgameWindowTimer = showEndgameWindowTimer - dt
 	if showEndgameWindowTimer > 0 then
 		return
 	end
 
-	-- Otherwise, it's time to show the endgame screen
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	window_endgame:SetPos(screenWidth*0.2,screenHeight*0.2,screenWidth*0.6,screenHeight*0.6)
 	statsSubPanel.graphButtons[1].OnClick[1](statsSubPanel.graphButtons[1])
@@ -523,16 +534,11 @@ function widget:Update(dt)
 	else
 		ShowStats()
 	end
-	window_endgame:Show()
-
-	showEndgameWindowTimer = nil
-	showingEndgameWindow = true
+	ToggleEndgameWindow(true)
+	widgetHandler:RemoveCallIn("Update")
 end
 
 function widget:GameFrame(f)
-	if not window_endgame.visible then
-		return
-	end
 	-- Redraw the currently-displayed stats graph every fifteen seconds
 	if f%450 == 1 and showingTab == 'stats' then
 		local button = statsSubPanel.buttonPressed or 1

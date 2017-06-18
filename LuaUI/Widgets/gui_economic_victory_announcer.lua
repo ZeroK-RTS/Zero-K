@@ -44,8 +44,13 @@ options = {
 		name  = "Enable economic victory announcer",
 		type  = "bool", 
 		value = false, 
-		OnChange = function(self) 
-			enabled = self.value 
+		OnChange = function(self)
+			enabled = self.value
+			if enabled then
+				widgetHandler:UpdateCallIn("GameFrame")
+			else
+				widgetHandler:RemoveCallIn("GameFrame")
+			end
 		end, 
 		noHotkey = true,
 		desc = "Announces the total assets of the teams at set times. For use with a manually run economic victory condition.."
@@ -161,11 +166,15 @@ end
 -- Callins
 
 function widget:GameFrame(n)
-	if not enabled then
-		return
-	end
-
 	if n == (options.firstCall.value*1800) or n == (options.secondCall.value*1800) then
 		CheckAndReportWinner(options.econMultiplier.value)
+	end
+end
+
+function widget:Initialize()
+	if enabled then
+		widgetHandler:UpdateCallIn("GameFrame")
+	else
+		widgetHandler:RemoveCallIn("GameFrame")
 	end
 end

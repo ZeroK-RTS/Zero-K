@@ -3204,7 +3204,7 @@ do --Set our prefered camera mode when first screen frame is drawn. The engine a
 				
 				option.OnChange(option) --re-apply our settings 
 				Spring.Echo("Epicmenu: Switching to " .. option.value .. " camera mode") --notify in log what happen.
-				widgetHandler:RemoveWidgetCallIn("DrawScreen", self) --stop updating "widget:DrawScreen()" event. Note: this is a special "widgetHandler:RemoveCallin" for widget that use "handler=true".
+				widgetHandler:RemoveWidgetCallIn("DrawScreen", self) --stop updating "widget:DrawScreen()" event. Note: this is a special "widgetHandler:RemoveCallIn" for widget that use "handler=true".
 			end
 			screenFrame = screenFrame+1
 		end
