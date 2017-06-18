@@ -127,7 +127,7 @@ end
 
 local function GetMouseTargetPosition()
 	local mx, my = GetMouseState()
-	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my)
+	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my, false, true)
 
 	if (mouseTargetType == "ground") then
 		return mouseTarget[1], mouseTarget[2], mouseTarget[3]
