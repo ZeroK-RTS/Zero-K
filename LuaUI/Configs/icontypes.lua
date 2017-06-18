@@ -964,18 +964,18 @@ local icontypes = {
     size=2,
   },
   
-  energysuperfus = {
-    bitmap='icons/energysuperfus.dds',
+  energysingu = {
+    bitmap='icons/energysingu.dds',
     size=3.2,
   },
   
   energygeo = {
-    bitmap='icons/geo1.png',
+    bitmap='icons/energygeo.png',
     size=2,
   },
   
-  energymohogeo = {
-    bitmap='icons/geo2.png',
+  energyheavygeo = {
+    bitmap='icons/energyheavygeo.png',
     size=2.4,
   },
   
