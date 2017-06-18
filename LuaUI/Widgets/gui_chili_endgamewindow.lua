@@ -50,6 +50,8 @@ local statsButton
 local exitButton
 local toggleButton
 
+local global_command_button
+
 -- Forward declarations
 local SetupExitButton
 
@@ -480,6 +482,10 @@ function widget:Initialize()
 	
 	widgetHandler:RegisterGlobal("SetAwardList", SetAwardList)
 	widgetHandler:AddAction("togglestatsgraph", ToggleStatsGraph, nil, 'tp')
+
+	if WG.GlobalCommandBar then
+		global_command_button = WG.GlobalCommandBar.AddCommand("LuaUI/Images/graphs_icon.png", "Toggle graphs", ToggleStatsGraph)
+	end
 end
 
 function widget:GameOver(winners)
