@@ -48,12 +48,8 @@ local statsSubPanel
 local awardButton
 local statsButton
 local exitButton
-local toggleButton
 
 local global_command_button
-
--- Forward declarations
-local SetupExitButton
 
 -- Flags and timers
 local spec
@@ -82,20 +78,13 @@ local teamColors = {}
 --options
 
 options_path = 'Settings/HUD Panels/Stats Graph'
-options_order = {'togglestatsgraph', 'toggleendgamewindow'}
+options_order = {'togglestatsgraph'}
 options = { 
 	togglestatsgraph = { type = 'button',
 		name = 'Toggle stats graph',
 		desc = 'Shows and hides the statistics graph.',
 		action = 'togglestatsgraph',
 		dontRegisterAction = true,
-	},
-	toggleendgamewindow = {
-		name = 'Toggle endgame window',
-		type = 'bool',
-		value = false,
-		desc = "Allows the endgame window to be toggled on and off",
-		noHotkey = true,
 	},
 }
 
@@ -184,44 +173,7 @@ end
 --------------------------------------------------------------------------------
 --show, hide, and toggle
 
-local function PrepEndgameWindow()
-	-- Determines whether or not to show the toggle button
-	-- Then updates the window to position the appropriate buttons in the appropriate places
-	-- Also updates the hotkey label on the toggle button
-	--	There's no hook in epicmenu for when the hotkey is changed
-	--	So instead we'll do it here, every time the window is displayed
-
-	local toggleendgamewindow = options.toggleendgamewindow.value
-	local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
-	if toggleKey ~= "" then
-		toggleKey = " (\255\0\255\0"..toggleKey.."\255\255\255\255)"
-	end
-	local showToggleButton = (not gameEnded or toggleendgamewindow)
-
---[[
-	-- Put the toggle button leftmost, move the awards and stats buttons right
-	local abx = showToggleButton and 159 or 9
-	local sbx = showToggleButton and 236 or 86
-	awardButton:SetPos(abx)
-	statsButton:SetPos(sbx)
---]]	
----[[
-	-- Put the toggle button rightmost, move the exit button left
-	local ebr = showToggleButton and 159 or 9
-	SetupExitButton(ebr)
-	if not gameEnded then exitButton:Hide() end
---]]
-
-	if showToggleButton then
-		toggleButton.caption="Toggle" .. toggleKey
-		toggleButton:Invalidate()
-		toggleButton:Show()
-	else
-		toggleButton:Hide()
-	end
-end
-
-local function ToggleEndgameWindow(wantedState)
+local function ToggleStatsGraph(wantedState)
 	local currentState = window_endgame.visible
 	if wantedState == nil then
 		wantedState = not currentState
@@ -235,20 +187,11 @@ local function ToggleEndgameWindow(wantedState)
 		window_endgame:Hide()
 		widgetHandler:RemoveCallIn("GameFrame")
 	else
-		PrepEndgameWindow()
 		local button = statsSubPanel.buttonPressed or 1
 		if statsSubPanel then statsSubPanel.graphButtons[button].OnClick[1](statsSubPanel.graphButtons[button]) end
 		window_endgame:Show()
 		widgetHandler:UpdateCallIn("GameFrame")
 	end
-end
-
-local function ToggleStatsGraph()
-	local toggleendgamewindow = options.toggleendgamewindow.value
-	local togglewindow = (not gameEnded or toggleendgamewindow)
-	if not togglewindow then return end
-
-	ToggleEndgameWindow()
 end
 
 local function ShowAwards()
@@ -279,38 +222,12 @@ end
 --------------------------------------------------------------------------------
 --setup
 
-function SetupExitButton(right_val) -- forward-defined as local
-	-- Ugly Workaround: SetPos() can't take a "right" relative value
-	-- so we'll do it here instead by disposing and recreating the exit button
-	if exitButton then
-		exitButton:Dispose()
-	end
-	exitButton = Button:New{
-		parent = window_endgame;
-		caption="Quit",
-		fontsize = 18,
-		y=7;
-		width=80;
-		right=right_val;
-		height=B_HEIGHT;
-		OnClick = {
-			function() 
-				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
-					Spring.Reload("")
-				else
-					Spring.SendCommands("quit","quitforce")
-				end
-			 end
-		};
-	}
-end
-
 local function SetupControls()
 	window_endgame = Window:New{  
 		parent = screen0,
 		classname = "main_window",
 		name = "GameOver",
-		caption = "Game in Progress",
+		caption = "",
 		textColor = {0.5,0.5,0.5,1}, 
 		fontSize = 50,
 		x = '20%',
@@ -323,7 +240,7 @@ local function SetupControls()
 		minWidth=500;
 		minHeight=400;
 	}
-	ToggleEndgameWindow(false)
+	ToggleStatsGraph(false)
 
 	awardPanel = ScrollPanel:New{
 		parent = window_endgame,
@@ -338,8 +255,8 @@ local function SetupControls()
 
 	statsPanel = ScrollPanel:New{
 		parent = window_endgame,
-		x=10;y=50;
-		bottom=10;right=10;
+		x = 10; y = 10;
+		height = -20; width = -20;
 		backgroundColor  = {1,1,1,1},
 		borderColor = {1,1,1,1},
 	}
@@ -383,16 +300,22 @@ local function SetupControls()
 		};
 	}
 	
-	SetupExitButton(9)
-
-	toggleButton = Button:New{
+	exitButton = Button:New{
 		parent = window_endgame;
---		y=7, x=9,	-- leftmost
-		y=7; right=9;	-- rightmost
-		width=145;
+		caption="Quit",
+		fontsize = 18,
+		y=7;
+		width = 80;
+		x = -89;
 		height=B_HEIGHT;
 		OnClick = {
-			ToggleStatsGraph
+			function() 
+				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
+					Spring.Reload("")
+				else
+					Spring.SendCommands("quit","quitforce")
+				end
+			 end
 		};
 	}
 end
@@ -502,7 +425,11 @@ function widget:Initialize()
 	widgetHandler:AddAction("togglestatsgraph", ToggleStatsGraph, nil, 'tp')
 
 	if WG.GlobalCommandBar then
-		global_command_button = WG.GlobalCommandBar.AddCommand("LuaUI/Images/graphs_icon.png", "Toggle graphs", ToggleStatsGraph)
+		local toggleKey = WG.crude.GetHotkey("togglestatsgraph") or ""
+		if toggleKey ~= "" then
+			toggleKey = " (\255\0\255\0"..toggleKey.."\255\255\255\255)"
+		end
+		global_command_button = WG.GlobalCommandBar.AddCommand("LuaUI/Images/graphs_icon.png", "Toggle graphs" .. toggleKey, ToggleStatsGraph)
 	end
 end
 
@@ -519,11 +446,11 @@ function widget:Update(dt)
 
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	window_endgame:SetPos(screenWidth*0.2,screenHeight*0.2,screenWidth*0.6,screenHeight*0.6)
+	statsPanel:SetPosRelative(10, 50, -(10+10), -(50+10))
 	statsSubPanel.graphButtons[1].OnClick[1](statsSubPanel.graphButtons[1])
 	awardButton:Show()
 	statsButton:Show()
 	exitButton:Show()
-	PrepEndgameWindow()
 
 	window_endgame.tooltip = ""
 	window_endgame.caption = endgame_caption
@@ -534,7 +461,7 @@ function widget:Update(dt)
 	else
 		ShowStats()
 	end
-	ToggleEndgameWindow(true)
+	ToggleStatsGraph(true)
 	widgetHandler:RemoveCallIn("Update")
 end
 
