@@ -94,8 +94,10 @@ end
 options_path = 'Settings/HUD Panels/Commander Selector'
 options = {
 	hideTrainers = {
-		name = 'Hide Trainer Commanders',
-		--desc = '',
+		name = 'Only show custom Commanders',
+		desc = 'You can customize your commanders on the Zero-K site:\n\nhttps://zero-k.info',
+		-- use the below after Chobby replaces site for customisation
+		-- desc = 'You can customize your commanders before the game, in the main menu.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -255,20 +257,22 @@ local function CreateWindow()
 		}
 		local label = Label:New{
 			parent = button,
-			x = "15%",
+			x = 0, right = 0,
 			bottom = 4,
 			caption = option.name,
 			align = "center",
+			autosize = false,
 			font = {size = 14},
 		}
 		buttonLabels[i] = label
 		if option.trainer then
 			local trainerLabel = Label:New{
 				parent = image,
-				x = "25%",
+				x = 0, right = 0,
 				y = "50%",
 				caption = "TRAINER",
 				align = "center",
+				autosize = false,
 				font = {color = {1,0.2,0.2,1}, size=16, outline=true, outlineColor={1,1,1,0.8}},
 			}
 			trainerLabels[i] = trainerLabel
@@ -289,7 +293,8 @@ local function CreateWindow()
 		x = 6,
 		bottom = 5,
 		width = 160,
-		caption = "Hide Trainer Comms",
+		caption = options.hideTrainers.name,
+		tooltip = options.hideTrainers.desc,
 		checked = options.hideTrainers.value,
 		OnChange = { function(self)
 			-- this is called *before* the 'checked' value is swapped, hence negation everywhere
