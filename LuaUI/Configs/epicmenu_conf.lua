@@ -171,7 +171,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Falling Units'] 		= imgPath..'advplayerslist/point2.png',
 	
 	['Settings/HUD Panels/Minimap'] 				= imgPath..'epicmenu/map.png',
-	['Settings/HUD Panels/Economy Panel']	 		= imgPath..'cost.png',
+	['Settings/HUD Panels/Economy Panel']	 		= imgPath..'ibeam.png',
 	['Settings/HUD Panels/Commander Selector'] 		= imgPath..'epicmenu/corcommander.png',
 	['Settings/HUD Panels/Tooltip'] 				= imgPath..'epicmenu/lightbulb.png',
 	['Settings/HUD Panels/Chat'] 					= imgPath..'advplayerslist/chat.png',
