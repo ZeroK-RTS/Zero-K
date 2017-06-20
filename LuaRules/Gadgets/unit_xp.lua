@@ -35,3 +35,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		spSetUnitExperience(attackerID, spGetUnitExperience(attackerID) + ((((hp > 0) and damage or (damage + hp)) / maxHP) * getCost(unitID, unitDefID) / getCost(attackerID, attackerDefID)))
 	end
 end
+
+function gadget:Initialize()
+	Spring.SetExperienceGrade(1.0)
+end
