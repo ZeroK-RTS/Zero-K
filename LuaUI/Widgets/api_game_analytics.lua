@@ -217,6 +217,24 @@ function widget:Initialize()
 	Analytics.SendOnetimeEvent("begin_load")
 end
 
+function widget:GameOver(winners)
 
+	if not winners or #winners == 0 then
+		return -- exited
+	end
 
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+	local localAllyTeamID = Spring.GetLocalAllyTeamID()
+	for i = 1, #winners do
+		local allyTeamID = winners[i]
+		if allyTeamID == localAllyTeamID then
+			Analytics.SendOnetimeEventWithTime("game:end:won")
+			return
+		elseif allyteamID == gaiaAllyTeamID then
+			-- Analytics.SendOnetimeEventWithTime("game:end:draw")
+			return
+		end
+	end
 
+	Analytics.SendOnetimeEventWithTime("game:end:lost")
+end
