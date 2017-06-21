@@ -1,4 +1,4 @@
-local versionNumber = "1.22"
+local versionNumber = "1.337"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:GetInfo()
@@ -60,8 +60,7 @@ local optionData
 
 local noComm = false
 local wantClose = false
-local gameframe = Spring.GetGameFrame()
-local COMM_DROP_FRAME = 450
+
 local WINDOW_WIDTH = 720
 local WINDOW_HEIGHT = 480
 local BUTTON_WIDTH = 128
@@ -164,28 +163,32 @@ local function GetStartZoomBounds()
 	return minX, minZ, maxX, maxZ, maxY
 end
 
-local cameraMoved = false
-function Close(permanently)
+local function RemoveSideButton()
+	if not buttonWindow then
+		return
+	end
+
+	screen0:RemoveChild(buttonWindow)
+	buttonWindow:Dispose()
+	buttonWindow = nil
+	widgetHandler:RemoveAction(actionShow)
+end
+
+local cameraAlreadyMoved = false
+function Close(permanently, wantMoveCamera)
 	if mainWindow then
 		mainWindow:Dispose()
 	end
-	
-	if not cameraMoved then
-		cameraMoved = true
+
+	local moveCamera = wantMoveCamera and not cameraAlreadyMoved and not Spring.GetSpectatingState()
+	if moveCamera then
+		cameraAlreadyMoved = true
 		local minX, minZ, maxX, maxZ, maxY, height, smoothness = GetStartZoomBounds()
 		SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, smoothness or 0.67, true, height)
 	end
 
 	if permanently then
-		if not noComm then
-			widgetHandler:RemoveAction(actionShow)
-			noComm = true
-		end
-
-		if (Spring.GetGameFrame() <= COMM_DROP_FRAME) then
-			widgetHandler:RemoveCallIn('GameFrame')
-			widgetHandler:RemoveCallIn('GameProgress')
-		end
+		RemoveSideButton()
 	end
 end
 
@@ -240,7 +243,7 @@ local function CreateWindow()
 			OnClick = {function()
 				Spring.SendLuaRulesMsg("customcomm:"..option.commProfile)
 				Spring.SendCommands({'say a:I choose: '..option.name..'!'})
-				Close()
+				Close(false, true)
 			end},
 			trainer = option.trainer,
 		}
@@ -286,7 +289,7 @@ local function CreateWindow()
 		x = WINDOW_WIDTH*0.5 + (WINDOW_WIDTH*0.5 - cbWidth)/2,
 		height = 30,
 		bottom = 5,
-		OnClick = {function() Close() end}
+		OnClick = {function() Close(false, false) end}
 	}
 	trainerCheckbox = Chili.Checkbox:New{
 		parent = mainWindow,
@@ -399,31 +402,18 @@ function widget:Update(dt)
 	timer = timer + dt
 	if timer >= 0.01 then
 		if (spGetGameRulesParam("loadedGame") == 1) or wantClose then
-			Close(true)
+			Close(true, wantClose)
 		end
 		widgetHandler:RemoveCallIn('Update')
 	end
 end
 
 function widget:Shutdown()
-	cameraMoved = true -- do not move camera to startbox
-	Close(true)
-end
-
-function widget:GameFrame(n)
-	if n == COMM_DROP_FRAME then
-		Close(true)
-	end
-end
-
-function widget:GameProgress(n)
-	if n == COMM_DROP_FRAME then
-		Close(true)
-	end
+	Close(true, false)
 end
 
 function widget:GameStart()
-	screen0:RemoveChild(buttonWindow)
+	Close(true, false)
 end
 
 -- this a pretty retarded place to put this but:
