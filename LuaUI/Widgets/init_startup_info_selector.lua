@@ -292,7 +292,7 @@ local function CreateWindow()
 		parent = mainWindow,
 		x = 6,
 		bottom = 5,
-		width = 160,
+		width = 220,
 		caption = options.hideTrainers.name,
 		tooltip = options.hideTrainers.desc,
 		checked = options.hideTrainers.value,
