@@ -90,6 +90,7 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 	if ploppableDefs[unitDefID] and (select(5, Spring.GetUnitHealth(unitID)) < 0.1) and (builderID and Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
 		-- (select(5, Spring.GetUnitHealth(unitID)) < 0.1) to prevent ressurect from spending facplop.
 		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
+		Spring.SetUnitRulesParam(unitID,"ploppee",1, {private = true})
 		
 		ordersToRemove = ordersToRemove or {}
 		ordersToRemove[builderID] = unitDefID
