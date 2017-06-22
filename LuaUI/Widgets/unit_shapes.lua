@@ -545,6 +545,9 @@ local HEADING_TO_RAD = 1/32768*math.pi
 local RADIANS_PER_COBANGLE = math.pi / 32768
 
 local function UpdateUnitListScale(unitList)
+	if not unitList then
+		return
+	end
 	local now = Spring.GetTimer()
 	for i=1, #unitList do
 		local startScale = unitList[i].startScale
