@@ -151,11 +151,8 @@ end
 -- Analytics collectors
 
 
-function widget:GameFrame(frameNumber)
-	if frameNumber == 0 then		
-		Analytics.SendOnetimeEventWithTime("start_game_proper")
-		widgetHandler:RemoveCallIn("GameFrame")
-	end
+function widget:GameStart()
+	Analytics.SendOnetimeEventWithTime("start_game_proper")
 end
 
 local loadSent = false
@@ -182,7 +179,8 @@ function widget:Update(dt)
 	
 	if not startposSent then
 		local x,y,z = Spring.GetTeamStartPosition(myTeamID)
-		if x then
+
+		if (x and x ~= 0) or (z and z ~= 0) then
 			startposSent = true
 			Analytics.SendOnetimeEventWithTime("startpoint_placed")
 		end
