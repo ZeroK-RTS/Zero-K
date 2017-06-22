@@ -951,8 +951,8 @@ local icontypes = {
   },
   
   energywind = {
-    bitmap='icons/energywind.dds',
-    size=1.8,
+    bitmap='icons/energywind.png',
+    size=2.5,
   },
   energysolar = {
     bitmap='icons/energysolar.dds',
