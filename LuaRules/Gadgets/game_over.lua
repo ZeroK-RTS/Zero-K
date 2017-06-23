@@ -52,7 +52,7 @@ local ECON_SUPREMACY_MULT = 25
 local MISSION_PLAYER_ALLY_TEAM_ID = 0
 
 local SPARE_PLANETWARS_UNITS = false
-local SPARE_REGULAR_UNITS = true
+local SPARE_REGULAR_UNITS = false
 
 --------------------------------------------------------------------------------
 -- vars
