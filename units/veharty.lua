@@ -14,11 +14,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_fr = [[Vehicule Artilleur]],
-	description_de = [[Artillerie Minenleger Fahrzeug]],
-    helptext       = [[The Wolverine lays mines which are fairly effective but have a limited lifespan from a distance (rather haphazardly). The Wolverine outranges most defenses comfortably, but is lightly armored and cannot flee easily so keep it screened with friendly units, possibly assisted by your own mines.]],
-    helptext_fr    = [[Le Wolverine est l'arme idéale pour prendre d'assaut les zones fortifiées. Une grande portée, des tirs en cloche et une cadence de tir respectable en font une artillerie trcs bon marché. Peu rapide, il faudra cependant la protéger.]],
-	helptext_de    = [[Der Wolverine legt Minen aus der Ferne, die ziemlich effektiv sind, aber nur eine begrenzte Lebensdauer besitzen. Er bedindet sich meist außerhalb der Reichweiten der Verteidigung, aber ist nur schwach gepanzert und kann nicht allzu schnell fliehen. Von daher begleite ihn lieber mit ein paar deiner Einheiten.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

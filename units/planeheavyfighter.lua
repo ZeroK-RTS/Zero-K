@@ -20,11 +20,6 @@ unitDef = {
   cruiseAlt              = 220,
 
   customParams           = {
-    description_fr = [[Chasseur Anti-Air Sup?rieur]],
-	description_de = [[Luftüberlegenheitsjäger]],
-    helptext       = [[The Hawk specializes in bringing down anything else that flies. It is sturdy enough to take limited AA fire, although it has no ground attack capability.]],
-    helptext_fr    = [[le Hawk combine, vitesse, invisibilit? au radar, et puissante force offensive Air/Air, afin d'abatre les aeronefs ennemis. Sans d?fense contre les attaques Sol/Air.]],
-	helptext_de    = [[Der Hawk ist darauf spezialisiert, alles vom Himmel zu holen, was dort umherfliegt. Er ist stabil genung, um begrenztes Flugabwehrfeuer auszuhalten, obwohl er keine Möglichkeit zum Angriff auf Bodenziele besitzt.]],
     midposoffset   = [[0 3 0]],
     aimposoffset   = [[0 3 0]],
 	modelradius    = [[10]],

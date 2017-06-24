@@ -37,9 +37,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Erzeugt Strider, Baut mit 10 M/s]],
-    helptext       = [[The Strider Hub deploys striders, the "humongous mecha" that inspire awe and fear on the battlefield. Unlike a normal factory, the hub is only required to start a project, not to finish it.]],
-	helptext_de    = [[Das Strider Hub erzeugt Strider, welche sehr gefürchtet sind auf dem Schlachtfeld. Anders als normale Fabriken, wird dieser Hub nur benötigt, um ein Projekt zu starten, nicht, um es zu vollenden.]],
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 -10 0]],
 	modelradius    = [[35]],

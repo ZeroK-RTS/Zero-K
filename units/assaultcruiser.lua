@@ -18,7 +18,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The Vanquisher cruiser boasts excellent armor and lethal close-in firepower. Its gauss cannons slice through surface targets like butter, while its missiles support it against enemies above and below the water surface. Its short range and lack of anti-air firepower leaves it vulnerable to standoff units and aircraft.]],
   },
 
   explodeAs              = [[BIG_UNIT]],

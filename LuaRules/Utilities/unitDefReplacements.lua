@@ -126,7 +126,7 @@ end
 
 function Spring.Utilities.GetHelptext(ud, unitID)
 	local name_override = ud.customParams.statsname or ud.name
-	return WG.Translate ("units", name_override .. ".helptext") or ud.customParams.helptext or WG.Translate("interface", "no_helptext")
+	return WG.Translate ("units", name_override .. ".helptext") or WG.Translate("interface", "no_helptext")
 end
 
 function Spring.Utilities.GetUnitHeight(ud)

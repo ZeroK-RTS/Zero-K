@@ -22,11 +22,6 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[1]],
-    description_fr = [[ADAV d'Assaut Terrestre]],
-	description_de = [[Bodenangriff-Kampfhubschrauber]],
-    helptext       = [[The Black Dawn fires a volley of unguided rockets. It has high HP and a huge damage output, but is expensive and inaccurate, especially vs moving targets. It is best for taking on clumps of base structures, slow moving or stationary units. The Black Dawn should disengage between volleys to minimize damage taken.]],
-    helptext_fr    = [[Le Black Dawn est un ADAV Air/Sol au blindage ?pais et aux missiles puissants, cependant ils sont impr?cis. Pratique pour d?truire des cibles mass?es ou non mouvantes.]],
-	helptext_de    = [[Der Black Dawn feuert salvenartig ungelenkte Raketen. Er besitzt eine hohe Lebensenergie und hat einen großen Schadensoutput, aber er ist teuer und unpräzise, vor allem gegen sich bewegende Ziele. Er ist gut, um Basisstrukturen und langsame oder stationäre Einheiten zu zerstören.]],
 	modelradius    = [[10]],
   },
 

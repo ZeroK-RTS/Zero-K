@@ -19,12 +19,6 @@ unitDef = {
     jump_speed         = 4,
     jump_reload        = 10,
     jump_from_midair   = 1,
-
-    description_fr = [[Robot d'Assaut]],
-	description_de = [[Melee Sturmangriff Springer]],
-    helptext       = [[The Jack is a melee assault walker with jumpjets. A few Jacks can easily level most fortification lines. Its small range and very low speed make it very vulnerable to skirmishers.]],
-    helptext_fr    = [[Le Jack est un robot extr?mement bien blind? ?quip? d'un jetpack et d'un lance a syst?me hydrolique. Il ne frappe qu'au corps ? corps, mais il frappe fort. ]],
-	helptext_de    = [[Der Jack ist ein Melee Sturmangriff Roboter mit Sprungdüsen. Ein paar Jacks können schnell die meisten Verteidigungslinien egalisieren. Seine kleine Reichweite und die Langsamkeit machen ihn aber sehr verwundbar gegen Skirmisher.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

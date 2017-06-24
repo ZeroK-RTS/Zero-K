@@ -18,7 +18,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[Stealthy, fast, and fragile, this Submarine can quickly strike unprotected targets. Slow damage allows it to effectively kill lone units. Watch out for anything with anti-sub weaponry, especially Torpedo Boats and Destroyers.]],
 	modelradius    = [[13]],
 	aimposoffset   = [[0 -5 0]],
 	midposoffset   = [[0 -5 0]],

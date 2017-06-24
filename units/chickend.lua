@@ -17,11 +17,6 @@ unitDef = {
   category                      = [[SINK]],
 
   customParams                  = {
-    description_fr = [[Defense d'antres]],
-	description_de = [[Verteidigung und Energiequelle]],
-    helptext       = [[The Tube is the chickens' only defense structure, firing deadly spores at air and ground targets alike.]],
-    helptext_fr    = [[La d?fense basique des antres de poulets, employant des spores ? grande dur?e de vie poursuivant l'adversaire avant de le percuter brutalement.]],
-	helptext_de    = [[Tube ist die einzige Verteidigungsanlage der Chicken und verschießt tödliche Sporen gleichermaßen gegen Luft- und Bodenziele.]],
   },
 
   energyMake                    = 2,

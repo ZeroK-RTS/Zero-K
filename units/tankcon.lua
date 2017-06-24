@@ -22,11 +22,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Tank de Construction Arm?e, Construit ? 7.5 m/s]],
-	description_de = [[Bewaffneter Konstruktionspanzer, Baut mit 7.5 M/s]],
-    helptext       = [[Armed with a small defensive tower, the Welder can defend itself against light enemy attacks.]],
-    helptext_fr    = [[Arm? d'une tourelle laser l?g?re, le Welder saura parfaitement se d?fendre contre les attaques de tirailleurs ou d'?claireurs.]],
-	helptext_de    = [[Mit einem kleinen Verteidigungsturm bewaffnet, kann der Welder sich selbst gegen leichte gegnerische Attacken wehren.]],
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 -10 0]],
 	modelradius    = [[30]],

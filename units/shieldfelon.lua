@@ -14,7 +14,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext       = [[The Felon draws energy from its shield, discharging it in accurate bursts. Link it to other shields to increase its rate of fire.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

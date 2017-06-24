@@ -19,8 +19,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-
-    helptext       = [[The Torpedo Boat is a mobile raider and anti-submarine unit. It is effective against underwater units and large vessels.]],
 	modelradius    = [[14]],
 	turnatfullspeed = [[1]],
   },

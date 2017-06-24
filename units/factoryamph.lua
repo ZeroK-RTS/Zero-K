@@ -33,7 +33,6 @@ unitDef = {
   corpse           = [[DEAD]],
 
   customParams     = {
-    helptext       = [[The Amphibious Operations Plant builds the slow but sturdy amphibious bots, providing an alternative approach to land/sea warfare. Units from this factory typically regenerate while submerged.]],
 	modelradius    = [[38]],
     aimposoffset   = [[0 0 -26]],
     midposoffset   = [[0 0 -26]],

@@ -22,10 +22,6 @@ unitDef = {
     jump_reload        = 10,
     jump_from_midair   = 0,
     jump_spread_exception = 1,
-
-    description_fr = [[]],
-    description_de = [[Behalter voller Dreck]],
-    helptext       = [[The Dirtbag exists to block enemy movement and generally get in the way. They are so dedicated to this task that they release their dirt payload upon death to form little annoying mounds. While waiting for their fate Dirtbags enjoy headbutting and scouting.]],
   },
 
   explodeAs              = [[CLOGGER_EXPLODE]],

@@ -16,7 +16,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[Cheap, fast, and fragile, this Picket Ship is a good scout and spotter for more expensive ships. In numbers, their disarming missiles are effective against larger targets.]],
     modelradius    = [[12]],
     turnatfullspeed = [[1]],
   },

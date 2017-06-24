@@ -13,7 +13,6 @@ unitDef = {
   category                      = [[SINK]],
 
   customParams                  = {
-    helptext       = [[The Rafflesia protects nearby chicken units and structures with its shield.]],
   },
 
   explodeAs                     = [[NOWEAPON]],

@@ -16,7 +16,6 @@ unitDef = {
   customParams           = {
     amph_regen = 10,
     amph_submerged_at = 40,
-    helptext       = [[A typical riot unit, the Scallop is armed with impact explosives for underwater use and a quadruple shotgun when on land.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

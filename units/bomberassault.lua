@@ -22,11 +22,6 @@ unitDef = {
   cruiseAlt           = 250,
 
   customParams        = {
-    helptext       = [[The Eclipse's imposing hull can weather significant punishment while steadily blazing to deliver its massive payload of devastation, but the unguided bomb has problems with hitting mobile targets, and big size makes it an easy target.]],
-    --description_de = [[Implosion Bomber]],
-    --description_fr = [[Bombardier r Implosion]],
-    --helptext_de    = [[Licho ist ein mÃ¤chtiger Bomber, der alles in Schutt und Asche legt. Seine Schlagkraft und Ausdauer ist riesig, doch muss er nach jedem Angriff Munition nachladen, was ihn eher fÃ¼r Angriffe auf einzelne Ziele prÃ¤destiniert.]],
-    --helptext_fr    = [[Le Licho est tout simplement la mort venue du ciel. Ce bombardier lourdement blindÃ© et relativement lent transporte une tete nuclÃ©aire tactique r implosion. Capable de faire des ravages dans les lignes ennemies, ou de dÃ©truire des structures lourdement blindÃ©es. Tout simplement mortel utilisÃ© en petites escadres.]],
     modelradius    = [[10]],
   },
 

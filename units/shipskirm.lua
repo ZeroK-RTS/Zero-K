@@ -18,7 +18,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[This Rocket Boat fires a salvo of four medium-range rockets, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close.]],
 	turnatfullspeed = [[1]],
     modelradius     = [[24]],
   },

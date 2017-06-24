@@ -14,7 +14,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext       = [[The Dampener deploys mines a short distance from itself.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

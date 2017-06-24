@@ -16,9 +16,6 @@ unitDef = {
   category                      = [[SINK UNARMED]],
 
   customParams                  = {
-    description_de = [[Schranke]],
-	helptext       = [[Thickets are the Thunderbirds' perimeter defense.]],
-	helptext_de    = [[Der Thicket ist ein defensiv Poller des Thunderbirds.]],
   },
 
   corpse                        = [[DEAD]],

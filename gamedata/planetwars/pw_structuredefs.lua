@@ -461,7 +461,6 @@ local structureConfig = {
 		unitDef.footprintz = 5
 		
 		--unitDef.customparams.soundselect = "shield_select"
-		unitDef.customparams.helptext = "Stores a large quantity of metal for planetary use."
 		
 		unitDef.collisionvolumescales = [[80 25 60]]
 		unitDef.collisionvolumetype	= [[Box]]
@@ -479,7 +478,6 @@ local structureConfig = {
 		unitDef.footprintz = 3
 		
 		unitDef.customparams.soundselect = "fusion_select"
-		unitDef.customparams.helptext = "A large capacitor bank."
 		
 		unitDef.collisionvolumescales = [[40 45 40]]
 		unitDef.collisionvolumetype	= [[CylY]]
@@ -497,7 +495,6 @@ local structureConfig = {
 		unitDef.footprintz = 3
 		
 		unitDef.customparams.soundselect = "fusion_select"
-		unitDef.customparams.helptext = "A large double capacitor bank."
 		
 		unitDef.collisionvolumescales = [[60 45 40]]
 		unitDef.collisionvolumetype	= [[Box]]

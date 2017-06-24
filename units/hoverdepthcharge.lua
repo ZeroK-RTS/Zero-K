@@ -18,7 +18,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext        = [[The somewhat suicidal Claymore is armed with a heavy depthcharge launcher and has no qualms about dropping it on land.]],
     turnatfullspeed = [[1]],
   },
 

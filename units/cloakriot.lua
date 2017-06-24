@@ -16,11 +16,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Robot émeutier]],
-    description_de = [[Riot Roboter]],
-    helptext       = [[The Warrior's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defense, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Warriors quickly regenerate damage when out of combat.]],
-    helptext_fr    = [[La dévastatrice mitrailleuse à plasma lourde du Warrior est efficace contre la majorité de ses enemis, en particulier les unités de raid. Il est très peu efficace contre les défenses statiques, ne l'utilisez donc pas comme unité d'assaut. Contrez le en restant hors de sa portée, étant donné sa faible vitesse de mouvement.]],
-    helptext_de    = [[Sein schweres Maschingewehr ist gegen die meisten Einheiten effektiv, vor allem gegen Raider. Dennoch versagt es kläglich gegen stationäre Verteidigung. Also nutze ihn nicht als Sturmeinheit. Kontere den Warrior, indem du aus seiner Reichweite bleibst, sie sind langsam.]],
     modelradius    = [[7]],
   },
 

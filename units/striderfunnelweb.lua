@@ -14,7 +14,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The slow all-terrain Funnelweb features an area shield and a powerful drone complement.]],
 	priority_misc  = 1, -- Medium
   },
 

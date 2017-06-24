@@ -14,11 +14,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_fr = [[Artillerie Mobile]],
-	description_de = [[Allzweck Artillerie]],
-    helptext       = [[The heavy, long-ranging gun of the Pillager makes it the unit of choice for standoff shelling of enemy mobiles or structures. As always, it should be wary of anything that gets close to it.]],
-    helptext_fr    = [[Le Pillager est équipé d'un canon plasma lourd r trcs grande portée. C'est une artillerie r forte puissance de feu et précise. Elle est capable de toucher certaines cibles en mouvement mais reste plus efficace sur les structures immobiles. Sa cadence et son angle de tir sont ses principaux défauts.]],
-	helptext_de    = [[Die schwere, weitreichende Kanone des Pillagers macht ih zur pefekten Wahl, wenn es um einen Stellungskrieg geht und du Bauwerke usw. zerstören willst. Wie immer bei Artillerieeinheiten, musst du alledings alle feindlichen Einheiten von dem Pillager fernhalten.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

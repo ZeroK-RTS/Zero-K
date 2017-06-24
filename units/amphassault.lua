@@ -21,7 +21,6 @@ unitDef = {
     amph_submerged_at = 40,
 	sink_on_emp    = 0,
     floattoggle    = [[1]],
-    helptext       = [[The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a high power laser beam with high range and damage, ineffective against swarmers and fast aircraft but not much else. While its weapon cannot fire underwater, the Grizzly can float to surface in order to shoot.]],
     aimposoffset   = [[0 30 0]],
     midposoffset   = [[0 6 0]],
     modelradius    = [[42]],

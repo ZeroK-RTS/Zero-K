@@ -15,9 +15,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_de = [[Kurzstrahl Roboter]],
-    helptext       = [[The Moderator's disruptor beam reduces enemy speed and rate of fire by up to 50% in addition to dealing damage, making it effective against almost all targets.]],
-    helptext_de    = [[Seine verlangsamender Strahl reduziert die Geschwindigkeit feindlicher Einheiten und die Feuerrate um bis zu 50%, deshalb sind sie effektiv gegen fast alle Ziele.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

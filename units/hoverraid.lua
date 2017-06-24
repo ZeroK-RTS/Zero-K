@@ -18,11 +18,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_fr = [[Hovercraft d'Attaque Éclair]],
-    description_de = [[Schnellangriff Luftkissenboot]],
-    helptext       = [[The Dagger is the hover plant's scout. It provides a cheap, disposable method of getting intel, and can also hit economic targets of opportunity. Its light Gauss gun can also hit underwater targets.]],
-    helptext_fr    = [[Le Dagger est petit, maniable, rapide et n'a qu'une faible puissance de feu. Idéal pour les attaques surprises depuis la mer, il surprendra bien des ennemis. Son blindage est cependant trop faible pour faire face r une quelquonque résistance.]],
-    helptext_de    = [[Der Dagger ist der Aufklärer unter den Luftkissenbooten. Es bietet dir eine kostengünstige, entbehrliche Möglichkeit deinen Feind frühzeitig um seine Rohstoffquellen zu bringen. Es kann auch U-Booten schiessen.]],
   },
 
   explodeAs           = [[SMALL_UNITEX]],

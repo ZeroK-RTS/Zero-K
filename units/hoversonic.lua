@@ -15,7 +15,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext       = [[The Morningstar comes armed with a sonic pulse cannon which completely doesn't care whether target is above or under water.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

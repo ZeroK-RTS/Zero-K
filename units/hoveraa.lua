@@ -18,9 +18,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_de = [[Fulgabwehrgleiter]],
-    helptext       = [[The Flail launches a single large, short-medium range SAM that does heavy damage.]],
-	helptext_de    = [[Der Flail verschießt eine einzige, große Flugabwehrrakete auf mittlerer Distanz, die wirklich großen Schaden anrichtet.]],
 	modelradius    = [[20]],
 	midposoffset   = [[0 8 0]],
   },

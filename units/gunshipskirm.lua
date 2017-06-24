@@ -20,11 +20,6 @@ unitDef = {
 
   customParams           = {
     airstrafecontrol = [[1]],
-    description_fr = [[ADAV Pilleur]],
-    description_de = [[Skirmisher/Flugabwehr Hubschrauber]],
-    helptext       = [[The Rapier is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets.]],
-    --helptext_fr    = [[des missiles pr?cis et une vitesse de vol appr?ciable, le Rapier saura vous d?fendre contre d'autres pilleurs ou mener des assauts rapides.]],
-    --helptext_de    = [[Der Rapier ist ein leichter Raiderhubschrauber. Seine Raketen sind akkurat und treffen auch Lufteinheiten. Des Weiteren erweist er sich gegen kleine Ziele und als Gegenwehr gegen andere Raider als sehr nützlich.]],
     modelradius    = [[16]],
   },
 

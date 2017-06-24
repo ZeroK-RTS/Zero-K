@@ -17,7 +17,6 @@ unitDef = {
   corpse                = [[DEAD]],
 
   customParams          = {
-    helptext       = [[The Placeholder is a support unit. Its projectiles create a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.]],
     midposoffset   = [[0 10 0]],
   },
 
