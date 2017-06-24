@@ -959,8 +959,8 @@ local icontypes = {
     size=2,
   },
   
-  energyfus = {
-    bitmap='icons/energyfus.dds',
+  energyfusion = {
+    bitmap='icons/energyfusion.dds',
     size=2,
   },
   

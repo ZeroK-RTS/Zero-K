@@ -8,7 +8,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
   BuildingGroundDecalSizeY      = 6,
-  BuildingGroundDecalType       = [[arm_fusion_ground.dds]],
+  BuildingGroundDecalType       = [[energyfusion_ground.dds]],
   buildPic                      = [[energyfusion.png]],
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
@@ -29,7 +29,7 @@ unitDef = {
   maxDamage                     = 2200,
   maxSlope                      = 18,
   minCloakDistance              = 150,
-  objectName                    = [[arm_fusion.s3o]],
+  objectName                    = [[energyfusion.s3o]],
   script                        = "energyfusion.lua",
   selfDestructAs                = [[ATOMIC_BLAST]],
   sightDistance                 = 273,
@@ -43,7 +43,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 4,
-      object           = [[arm_fusion_dead.s3o]],
+      object           = [[energyfusion_dead.s3o]],
     },
 
     HEAP  = {
