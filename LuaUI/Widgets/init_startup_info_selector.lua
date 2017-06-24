@@ -139,27 +139,41 @@ local function GetStartZoomBounds()
 		end
 		return x, z, x, z, 0, 1800, 0
 	end
-	
-	local startboxes = GetRawBoxes()
-	local startbox = startboxes[Spring.GetMyAllyTeamID()]
+
 	local minX, minZ, maxX, maxZ, maxY = Game.mapSizeX, Game.mapSizeZ, 0, 0, 0
-	
-	if not (startbox and startbox.boxes) then
+
+	local myBoxID = Spring.GetTeamRulesParam(Spring.GetMyTeamID(), "start_box_id")
+	if not myBoxID then
 		return minX, minZ, maxX, maxZ, maxY
 	end
-	
-	for i = 1, #startbox.boxes do
-		for j = 1, #startbox.boxes[i] do
-			local boxPoint = startbox.boxes[i][j]
-			-- Spring.Echo("startbox["..i.."]: {"..boxPoint[1]..", "..boxPoint[2].."}, Bounds: x: "..minX.." - "..maxX..", z: "..minZ.." - "..maxZ..", maxY: "..maxY)
-			minX = math.min(minX, boxPoint[1])
-			minZ = math.min(minZ, boxPoint[2])
-			maxX = math.max(maxX, boxPoint[1])
-			maxZ = math.max(maxZ, boxPoint[2])
-			maxY = math.max(maxY, Spring.GetGroundHeight(boxPoint[1], boxPoint[2]))
+
+	local rawBoxes = GetRawBoxes()
+	if not rawBoxes then
+		return minX, minZ, maxX, maxZ, maxY
+	end
+
+	local myBox = rawBoxes[myBoxID]
+	if not myBox then
+		return minX, minZ, maxX, maxZ, maxY
+	end
+
+	local polygons = myBox.boxes
+	if not polygons then
+		return minX, minZ, maxX, maxZ, maxY
+	end
+
+	for i = 1, #polygons do
+		local vertices = polygons[i]
+		for j = 1, #vertices do
+			local vertex = vertices[j]
+			minX = math.min(minX, vertex[1])
+			minZ = math.min(minZ, vertex[2])
+			maxX = math.max(maxX, vertex[1])
+			maxZ = math.max(maxZ, vertex[2])
+			maxY = math.max(maxY, Spring.GetGroundHeight(vertex[1], vertex[2]))
 		end
 	end
-	
+
 	return minX, minZ, maxX, maxZ, maxY
 end
 
