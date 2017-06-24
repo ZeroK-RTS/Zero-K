@@ -125,80 +125,32 @@ options = {
 
 local disabledColor = { 0.6,0.7,0.5, drawAlpha}
 local placementColor = { 0.6, 0.7, 0.5, drawAlpha} -- drawAlpha on purpose!
+local worstColor = {1, 0, 0, drawAlpha}
 
-local function HSLtoRGB(ch,cs,cl)
-	local cr, cg, cb
-	if cs == 0 then
-		cr = cl
-		cg = cl
-		cb = cl
-	else
-		local temp2
-		if cl < 0.5 then
-			temp2 = cl * (cl + cs)
-		else
-			temp2 = (cl + cs) - (cl * cs)
-		end
-
-		local temp1 = 2 * cl - temp2
-		local tempr = ch + 1 / 3
-
-		if tempr > 1 then
-			tempr = tempr - 1
-		end
-		local tempg = ch
-		local tempb = ch - 1 / 3
-		if tempb < 0 then
-			tempb = tempb + 1
-		end
-
-		if tempr < 1 / 6 then
-			cr = temp1 + (temp2 - temp1) * 6 * tempr
-		elseif tempr < 0.5 then
-			cr = temp2
-		elseif tempr < 2 / 3 then
-			cr = temp1 + (temp2 - temp1) * ((2 / 3) - tempr) * 6
-		else
-			cr = temp1
-		end
-
-		if tempg < 1 / 6 then
-			cg = temp1 + (temp2 - temp1) * 6 * tempg
-		elseif tempg < 0.5 then
-			cg = temp2
-		elseif tempg < 2 / 3 then
-			cg = temp1 + (temp2 - temp1) * ((2 / 3) - tempg) * 6
-		else
-			cg = temp1
-		end
-
-		if tempb < 1 / 6 then
-			cb = temp1 + (temp2 - temp1) * 6 * tempb
-		elseif tempb < 0.5 then
-			cb = temp2
-		elseif tempb < 2 / 3 then
-			cb = temp1 + (temp2 - temp1) * ((2 / 3) - tempb) * 6
-		else
-			cb = temp1
-		end
-
-	end
-	return {cr,cg,cb, drawAlpha}
-end --HSLtoRGB
-
-
+local retColor = {1,1,1, drawAlpha} -- static so as not to spam table allocs
 local function GetGridColor(efficiency)
- 	local n = efficiency
-	-- mex has no esource/esource has no mex
-	if n==0 then
-		return {1, .25, 1, drawAlpha}
-	else
-		if n < 3.5 then
-			h = 5760/(3.5+2)^2
-		else
-			h=5760/(n+2)^2
+	if efficiency ~= -2 then
+		-- raw mexes are blue (eff = 0)
+		if efficiency < 3 then -- cyan; 1 solar for 1 mex is 2.83
+			retColor[1] = 0
+			retColor[2] = 0.5 + (0.166 * efficiency)
+			retColor[3] = 1
+		elseif efficiency < 5.5 then -- green; 4 solars for 1 mex is 5.65
+			retColor[1] = 0
+			retColor[2] = 1
+			retColor[3] = 2.2 - (0.4 * efficiency)
+		elseif efficiency < 7 then -- yellow; 1 fusion for 3 mexes is 6.83
+			retColor[1] = (0.66 * efficiency) - 3.6
+			retColor[2] = 1
+			retColor[3] = 0
+		else -- hits orange at eff = 12; 1 fusion per 1 mex is 11.83
+			retColor[1] = 1
+			retColor[2] = 1 - ((efficiency - 7) / (efficiency - 2))
+			retColor[3] = 0
 		end
-		return HSLtoRGB(h/255,1,0.5)
+		return retColor
+	else
+		return worstColor -- red, infinitely bad efficiency
 	end
 end
 
