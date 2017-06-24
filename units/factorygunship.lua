@@ -7,9 +7,9 @@ unitDef = {
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 9,
-  buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[factorygunship_aoplane.dds]],
+  buildingGroundDecalSizeX      = 8,
+  buildingGroundDecalSizeY      = 8,
+  buildingGroundDecalType       = [[generic_fac_decal.png]],
 
   buildoptions                  = {
     [[gunshipcon]],

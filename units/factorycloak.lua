@@ -7,7 +7,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 7,
   buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[factorycloak_aoplane.dds]],
+  buildingGroundDecalType       = [[generic_fac_decal.png]],
 
   buildoptions                  = {
     [[cloakcon]],

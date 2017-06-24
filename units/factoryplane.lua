@@ -10,7 +10,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 9,
   buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[factoryplane_aoplane.dds]],
+  buildingGroundDecalType       = [[generic_fac_decal.png]],
 
   buildoptions                  = {
     [[planecon]],

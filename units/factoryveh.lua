@@ -7,9 +7,9 @@ unitDef = {
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 8,
-  buildingGroundDecalSizeY      = 8,
-  buildingGroundDecalType       = [[factoryveh_aoplane.dds]],
+  buildingGroundDecalSizeX      = 7,
+  buildingGroundDecalSizeY      = 7,
+  buildingGroundDecalType       = [[generic_fac_decal.png]],
 
   buildoptions                  = {
     [[vehcon]],

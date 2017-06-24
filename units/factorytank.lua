@@ -9,7 +9,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
   buildingGroundDecalSizeY      = 8,
-  buildingGroundDecalType       = [[factorytank_aoplane.dds]],
+  buildingGroundDecalType       = [[generic_fac_decal.png]],
 
   buildoptions                  = {
     [[tankcon]],
