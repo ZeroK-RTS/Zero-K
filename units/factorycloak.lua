@@ -5,9 +5,9 @@ unitDef = {
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 7,
-  buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[factorycloak_aoplane.dds]],
+  buildingGroundDecalSizeX      = 9,
+  buildingGroundDecalSizeY      = 9,
+  buildingGroundDecalType       = [[factorycloak_aoplane.png]],
 
   buildoptions                  = {
     [[cloakcon]],
@@ -34,6 +34,7 @@ unitDef = {
     helptext       = [[Emphasizing guile over brute force, the Cloaky Bot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Warrior, Zeus, Hammer]],
     helptext_de    = [[List statt pure Gewalt lautet hier das Motto. Die Cloaky Bot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Rocko, Warrior, Zeus, Hammer]],
     sortName       = [[1]],
+    solid_factory = 3,
   },
 
   energyUse                     = 0,
@@ -49,7 +50,7 @@ unitDef = {
   minCloakDistance              = 150,
   moveState        				= 1,
   noAutoFire                    = false,
-  objectName                    = [[cremfactory.s3o]],
+  objectName                    = [[factorycloak.s3o]],
   script                        = [[factorycloak.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
@@ -65,7 +66,7 @@ unitDef = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = "ooooooo ooooooo ooooooo occccco occccco occccco occccco",
+  yardMap                       = "ooooooo ooooooo ooooooo ooooooo ccccccc ccccccc ccccccc",
 
   featureDefs                   = {
 
@@ -74,7 +75,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 7,
       footprintZ       = 7,
-      object           = [[cremfactorywreck.s3o]],
+      object           = [[factorycloak_dead.s3o]],
     },
 
     HEAP  = {
