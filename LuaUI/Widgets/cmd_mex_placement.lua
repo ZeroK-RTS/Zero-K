@@ -212,6 +212,24 @@ local function Distance(x1,z1,x2,z2)
 	return dis
 end
 
+local function IsSpotBuildable(index)
+	if not index then
+		return true
+	end
+	local spot = spotData[index]
+	if not spot then
+		return true
+	end
+	
+	local unitID = spot.unitID
+	if unitID and spGetUnitAllyTeam(unitID) == spGetMyAllyTeamID() then
+		local build = select(5, spGetUnitHealth(unitID))
+		if build and build < 1 then
+			return true
+		end
+	end
+	return false
+end
 
 local function IntegrateMetal(x, z, forceUpdate)
 	local newCenterX, newCenterZ
@@ -395,7 +413,11 @@ function widget:CommandNotify(cmdID, params, options)
 			if foundUnit then
 				local build = select(5, spGetUnitHealth(foundUnit))
 				if build ~= 1 then
-					WG.CommandInsert(CMD.REPAIR, {foundUnit}, options)
+					if options.meta then
+						WG.CommandInsert(CMD.REPAIR, {foundUnit}, options)
+					else
+						spGiveOrder(CMD.REPAIR, {foundUnit}, options)
+					end
 				end
 				return true
 			else
@@ -403,7 +425,11 @@ function widget:CommandNotify(cmdID, params, options)
 				local commandHeight = math.max(0, Spring.GetGroundHeight(closestSpot.x, closestSpot.z))
 				local GBC_processed = WG.GlobalBuildCommand and WG.GlobalBuildCommand.CommandNotifyMex(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options, false)
 				if not GBC_processed then
-					WG.CommandInsert(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options)
+					if options.meta then
+						WG.CommandInsert(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options)
+					else
+						spGiveOrder(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options)
+					end
 				end
 				return true
 			end
@@ -777,7 +803,7 @@ function widget:DrawWorld()
 		local bface = Spring.GetBuildFacing()
 		local closestSpot, distance, index = GetClosestMetalSpot(bx, bz)
 		
-		if closestSpot and (-mexDefID == cmdID or not ((CMD_AREA_MEX == cmdID or peruse) and distance > 60)) and (not spotData[index]) then 
+		if closestSpot and (-mexDefID == cmdID or not ((CMD_AREA_MEX == cmdID or peruse) and distance > 60)) and IsSpotBuildable(index) then 
 		
 			mexSpotToDraw = closestSpot
 			

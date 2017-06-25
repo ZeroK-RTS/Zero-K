@@ -40,9 +40,7 @@ function widget:CommandNotify(cmdID, params, options)
 	local paramTable = {-1}
 	for i = 1, #areaUnits do
 		local unitID = areaUnits[i]
-		if Spring.GetUnitDefID(unitID) == unitDefID
-		and Spring.GetUnitAllyTeam(unitID) == myAllyTeam
-		then
+		if Spring.GetUnitDefID(unitID) == unitDefID and Spring.GetUnitAllyTeam(unitID) == myAllyTeam then
 			paramTable[1] = unitID
 			WG.CommandInsert(CMD.RECLAIM, paramTable, options)
 		end
