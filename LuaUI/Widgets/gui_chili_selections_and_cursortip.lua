@@ -75,15 +75,17 @@ local PIC_HEIGHT = LEFT_WIDTH*4/5
 local RIGHT_WIDTH = 235
 local GROUP_STATS_WIDTH = 150
 
-local HEALTH_IMAGE = 'LuaUI/images/commands/bold/health.png'
-local SHIELD_IMAGE = 'LuaUI/Images/commands/Bold/guard.png'
-local BUILD_IMAGE = 'LuaUI/Images/commands/Bold/buildsmall.png'
-local COST_IMAGE = 'LuaUI/images/ibeam.png'
-local TIME_IMAGE = 'LuaUI/images/clock.png'
-local METAL_IMAGE = 'LuaUI/images/metalplus.png'
-local ENERGY_IMAGE = 'LuaUI/images/energyplus.png'
-local METAL_RECLAIM_IMAGE = 'LuaUI/images/ibeamReclaim.png'
-local ENERGY_RECLAIM_IMAGE = 'LuaUI/images/energyReclaim.png'
+local IMAGE = {
+	HEALTH = 'LuaUI/images/commands/bold/health.png',
+	SHIELD = 'LuaUI/Images/commands/Bold/guard.png',
+	BUILD = 'LuaUI/Images/commands/Bold/buildsmall.png',
+	COST = 'LuaUI/images/ibeam.png',
+	TIME = 'LuaUI/images/clock.png',
+	METAL = 'LuaUI/images/metalplus.png',
+	ENERGY = 'LuaUI/images/energyplus.png',
+	METAL_RECLAIM = 'LuaUI/images/ibeamReclaim.png',
+	ENERGY_RECLAIM = 'LuaUI/images/energyReclaim.png',
+}
 
 local CURSOR_ERASE = 'eraser'
 local CURSOR_POINT = 'flagtext'
@@ -593,6 +595,10 @@ local function GetUnitShieldRegenString(unitID, ud)
 end
 
 local function IsUnitInLos(unitID)
+	local spectating, fullView = Spring.GetSpectatingState()
+	if fullView then
+		return true
+	end
 	if not unitID then
 		return false
 	end
@@ -934,6 +940,8 @@ local function GetImageWithText(parentControl, initY, imageFile, caption, fontSi
 		fontSize = fontSize,
 		parent = parentControl,
 	}
+	image:SetVisibility(false)
+	label:SetVisibility(false)
 	
 	local function Update(visible, newCaption, newImage, yPos)
 		image:SetVisibility(visible)
@@ -986,7 +994,7 @@ local function GetMorphInfo(parentControl, yPos)
 		y = 0,
 		width = ICON_SIZE,
 		height = ICON_SIZE,
-		file = TIME_IMAGE,
+		file = IMAGE.TIME,
 		parent = holder,
 	}
 	local timeLabel = Chili.Label:New{
@@ -1003,7 +1011,7 @@ local function GetMorphInfo(parentControl, yPos)
 		y = 0,
 		width = ICON_SIZE,
 		height = ICON_SIZE,
-		file = COST_IMAGE,
+		file = IMAGE.COST,
 		parent = holder,
 	}
 	local costLabel = Chili.Label:New{
@@ -1571,12 +1579,12 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		parent = rightPanel,
 	}
 	
-	local costInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 4, COST_IMAGE, nil, nil, ICON_SIZE, 5)
-	local metalInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + LEFT_SPACE + 4, METAL_IMAGE, nil, nil, ICON_SIZE, 5)
-	local energyInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 2*LEFT_SPACE + 4, ENERGY_IMAGE, nil, nil, ICON_SIZE, 5)
-	local maxHealthLabel = GetImageWithText(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, nil, NAME_FONT, ICON_SIZE, 3)
+	local costInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 4, IMAGE.COST, nil, nil, ICON_SIZE, 5)
+	local metalInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.METAL, nil, nil, ICON_SIZE, 5)
+	local energyInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 2*LEFT_SPACE + 4, IMAGE.ENERGY, nil, nil, ICON_SIZE, 5)
+	local maxHealthLabel = GetImageWithText(rightPanel, PIC_HEIGHT + 4, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 3)
 	
-	local healthBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, {0, 1, 0, 1}, GetHealthColor)
+	local healthBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, IMAGE.HEALTH, {0, 1, 0, 1}, GetHealthColor)
 	
 	local metalInfo
 	local energyInfo
@@ -1603,8 +1611,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		}
 		morphInfo = GetMorphInfo(rightPanel, PIC_HEIGHT + LEFT_SPACE + 3)
 	else
-		shieldBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, SHIELD_IMAGE, {0.3,0,0.9,1})
-		buildBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 58, BUILD_IMAGE, {0.8,0.8,0.2,1})
+		shieldBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, IMAGE.SHIELD, {0.3,0,0.9,1})
+		buildBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 58, IMAGE.BUILD, {0.8,0.8,0.2,1})
 	end
 
 	local prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID, prevVisible, prevMorphTime, prevMorphCost, prevMousePlace
@@ -1623,8 +1631,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local mm, mu, em, eu = GetUnitResources(unitID)
 		local showMetalInfo = false
 		if mm then
-			metalInfoUpdate(true, FormatPlusMinus(mm - mu), METAL_IMAGE, PIC_HEIGHT + LEFT_SPACE + 4)
-			energyInfoUpdate(true, FormatPlusMinus(em - eu), ENERGY_IMAGE, PIC_HEIGHT + 2*LEFT_SPACE + 4)
+			metalInfoUpdate(true, FormatPlusMinus(mm - mu), IMAGE.METAL, PIC_HEIGHT + LEFT_SPACE + 4)
+			energyInfoUpdate(true, FormatPlusMinus(em - eu), IMAGE.ENERGY, PIC_HEIGHT + 2*LEFT_SPACE + 4)
 			showMetalInfo = true
 		end
 		
@@ -1675,8 +1683,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		if unitDefID then
 			leftOffset = PIC_HEIGHT + LEFT_SPACE
 		end
-		metalInfoUpdate(true, Format(metal), METAL_RECLAIM_IMAGE, leftOffset + 4)
-		energyInfoUpdate(true, Format(energy), ENERGY_RECLAIM_IMAGE, leftOffset + LEFT_SPACE + 4)
+		metalInfoUpdate(true, Format(metal), IMAGE.METAL_RECLAIM, leftOffset + 4)
+		energyInfoUpdate(true, Format(energy), IMAGE.ENERGY_RECLAIM, leftOffset + LEFT_SPACE + 4)
 	end
 	
 	local function UpdateDynamicEconInfo(unitDefID, mousePlaceX, mousePlaceY)
@@ -1693,7 +1701,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		unitDesc:Invalidate()
 		
 		if econStructureDefs[unitDefID].isWind then
-			maxHealthLabel(true, healthOverride or ud.health, HEALTH_IMAGE)
+			maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH)
 		end
 	end
 	
@@ -1772,7 +1780,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitImage.file2 = GetUnitBorder(unitDefID)
 			unitImage:Invalidate()
 			
-			costInfoUpdate(true, cyan .. math.floor(GetUnitCost(unitID, unitDefID) or 0), COST_IMAGE, PIC_HEIGHT + 4)
+			costInfoUpdate(true, cyan .. math.floor(GetUnitCost(unitID, unitDefID) or 0), IMAGE.COST, PIC_HEIGHT + 4)
 			
 			local extraTooltip, healthOverride
 			if not (unitID or featureID) then
@@ -1799,7 +1807,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			end
 			if (not (unitID and visible)) and not featureDefID then
 				healthBarUpdate(false)
-				maxHealthLabel(true, healthOverride or ud.health, HEALTH_IMAGE)
+				maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH)
 				maxHealthShown = true
 				if morphTime then
 					morphInfo(true, morphTime, morphCost)
