@@ -1405,15 +1405,29 @@ end
 --  Unit call-ins
 --
 
+local inCreated = false
+local finishedDuringCreated = false -- assumes non-recursive create
 function gadgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+
+  finishedDuringCreated = false
+  inCreated = true
   for _,g in ipairs(self.UnitCreatedList) do
     g:UnitCreated(unitID, unitDefID, unitTeam, builderID)
   end
-  return
+  inCreated = false
+
+  if finishedDuringCreated then
+    finishedDuringCreated = false
+    gadgetHandler:UnitFinished(unitID, unitDefID, unitTeam)
+  end
 end
 
-
 function gadgetHandler:UnitFinished(unitID, unitDefID, unitTeam)
+  if inCreated then
+    finishedDuringCreated = true
+    return
+  end
+
   for _,g in ipairs(self.UnitFinishedList) do
     g:UnitFinished(unitID, unitDefID, unitTeam)
   end
