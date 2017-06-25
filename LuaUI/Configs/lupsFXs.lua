@@ -24,6 +24,7 @@ groundFlashOrange = {
   texture    = "bitmaps/GPL/Lups/groundflash.png",
   colormap   = { {0.85, 0.5, 0.25, 0.3},{0.85, 0.5, 0.25, 0.4},{0.85, 0.5, 0.25, 0.4},{0.85, 0.5, 0.25, 0.3}, },
   repeatEffect = true,
+  quality    = 1, -- Low
 }
 
 groundFlashGreen = {
@@ -64,6 +65,7 @@ groundFlashCorestor = {
   texture    = "bitmaps/GPL/Lups/gf_corestor.png",
   colormap   = { {0.9, 0.9, 0.0, 0.15},{0.9, 0.9, 0.0, 0.20},{0.9, 0.9, 0.0, 0.20},{0.9, 0.9, 0.0, 0.15}, },
   repeatEffect = true,
+  quality = 1, -- Low
 }
 groundFlashenergypylon = {
   life       = 50,
@@ -71,6 +73,7 @@ groundFlashenergypylon = {
   texture    = "bitmaps/GPL/Lups/gf_energypylon.png",
   colormap   = { {0.9, 0.9, 0.0, 0.2},{0.9, 0.9, 0.0, 0.3},{0.9, 0.9, 0.0, 0.3},{0.9, 0.9, 0.0, 0.2}, },
   repeatEffect = true,
+  quality = 1, -- Low
 }
 
 ----------------------------------------------------------------------------
@@ -128,6 +131,7 @@ staticshieldBursts = {
   repeatEffect = true,
   noIconDraw = true,
   count      = 8,
+  quality = 3, -- High
 }
 staticshieldBall = {
 	piece = "glow", 
@@ -136,6 +140,7 @@ staticshieldBall = {
 	colormap1 = {{0.95, 0.1, 0.95, 0.9}}, 
 	repeatEffect = true,
 	noIconDraw = true,
+	quality = 3, -- High
 }
 
 ----------------------------------------------------------------------------
@@ -148,7 +153,8 @@ energysinguShieldSphere = {
   size=24,
   colormap1 = { {0.9, 0.9, 1, 0.75},{0.9, 0.9, 1, 1.0},{0.9, 0.9, 1, 1.0},{0.9, 0.9, 1, 0.75} },
   colormap2 = { {0.2, 0.2, 1, 0.7},{0.2, 0.2, 1, 0.75},{0.2, 0.2, 1, 0.75},{0.2, 0.2, 1, 0.7} },
-  repeatEffect=true
+  repeatEffect=true,
+  quality    = 2, -- Medium
 }
 
 corfusShieldSphere = {
@@ -169,6 +175,7 @@ teleShieldSphere = {
   colormap2 = { {0.2, 0.2, 1, 0.7},{0.2, 0.2, 1, 0.75},{0.2, 0.2, 1, 0.75},{0.2, 0.2, 1, 0.7} },
   repeatEffect=true,
   noIconDraw = true,
+  quality = 3, -- High
 }
 
 valkShieldSphere = {
@@ -179,6 +186,7 @@ valkShieldSphere = {
   colormap2 = { {0.2, 0.2, 1, 0.7},{0.2, 0.2, 1, 0.75},{0.2, 0.2, 1, 0.75},{0.2, 0.2, 1, 0.7} },
   repeatEffect=true,
   noIconDraw = true,
+  quality = 3, -- High
 }
 
 commandShieldSphere = {
@@ -284,6 +292,7 @@ radarBlink = {
   colormap    = { {0.3, 1, 1, 0.005}, {0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005} },
   texture     = 'bitmaps/GPL/smallflare.tga',
   count       = 1,
+  quality     = 1, -- Low
   repeatEffect= true,
   noIconDraw = true,
 }
@@ -298,6 +307,7 @@ warpgateCorona = {
   colormap    = { {0.1, 0.3, 0.8, 0.01} },
   texture     = 'bitmaps/GPL/groundflash.tga',
   count       = 1,
+  quality     = 2, -- Medium
   repeatEffect = true,
 }
 
@@ -310,6 +320,7 @@ warpgateCoronaAlt = {
   colormap    = { {0.1, 0.2, 0.5, 0.01} },
   texture     = 'bitmaps/GPL/groundflash.tga',
   count       = 1,
+  quality     = 2, -- Medium
   repeatEffect = true,
 }
 
@@ -322,6 +333,7 @@ zenithCorona = {
   colormap    = { {0.4, 0.2, 0.9, 0.01} },
   texture     = 'bitmaps/GPL/groundflash.tga',
   count       = 1,
+  quality     = 2, -- Medium
   repeatEffect = true,
 }
 
@@ -334,6 +346,7 @@ teleCorona = {
   colormap    = { {0, 0.4, 1, 0.01} },
   texture     = 'bitmaps/GPL/groundflash.tga',
   count       = 1,
+  quality     = 1, -- Low
   repeatEffect = true,
   noIconDraw = true,
 }
@@ -348,6 +361,7 @@ valkCorona = {
   texture     = 'bitmaps/GPL/groundflash.tga',
   count       = 1,
   repeatEffect = true,
+  quality     = 1, -- Low
   noIconDraw = true,
 }
 
@@ -413,6 +427,7 @@ blinkyLightWhite = {
   colormap    = { {1, 1, 1, 0.02}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0} },
   texture     = 'bitmaps/GPL/smallflare.tga',
   count       = 1,
+  quality     = 1, -- Low
   repeatEffect = true,
   noIconDraw = true,
 }
