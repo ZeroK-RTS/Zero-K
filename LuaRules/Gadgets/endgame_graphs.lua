@@ -14,8 +14,8 @@ local teamList = Spring.GetTeamList()
 local gaiaTeamID = Spring.GetGaiaTeamID()
 local allyTeamByTeam
 
-local AreTeamsAllied = Spring.AreTeamsAllied
-local GetUnitHealth = Spring.GetUnitHealth
+local spAreTeamsAllied = Spring.AreTeamsAllied
+local spGetUnitHealth = Spring.GetUnitHealth
 local GetUnitCost = Spring.Utilities.GetUnitCost
 
 local SetHiddenTeamRulesParam = Spring.Utilities.SetHiddenTeamRulesParam
@@ -24,6 +24,10 @@ local GetHiddenTeamRulesParam = Spring.Utilities.GetHiddenTeamRulesParam
 local reclaimListByTeam = {}
 local metalExcessByTeam = {}
 local damageReceivedByTeam = {}
+
+local unitValueByTeam = {}
+local totalNanoValueByTeam = {}
+local partialNanoValueByTeam = {}
 
 -- hax disregards LoS. Mostly for gadget use (eg awards), users can see it only after game over. Mid-game they can only see nonhax.
 local damageDealtByTeamHax = {}
@@ -50,14 +54,14 @@ local spIsPosInLos = Spring.IsPosInLos
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if paralyzer then return end
 
-	local hp, maxHP = GetUnitHealth(unitID)
+	local hp, maxHP = spGetUnitHealth(unitID)
 	if (hp < 0) then
 		damage = damage + hp
 	end
 
 	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
 
-	if attackerTeam and not AreTeamsAllied(attackerTeam, unitTeam) then
+	if attackerTeam and not spAreTeamsAllied(attackerTeam, unitTeam) then
 		damageDealtByTeamHax[attackerTeam] = damageDealtByTeamHax[attackerTeam] + costdamage
 
 		local x, y, z = spGetUnitPosition(unitID)
@@ -69,38 +73,121 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	damageReceivedByTeam[unitTeam] = damageReceivedByTeam[unitTeam] + costdamage
 end
 
-local finishedUnits = {}
-function gadget:UnitFinished(unitID)
-	finishedUnits[unitID] = true
-end
-function gadget:UnitReverseBuilt(unitID)
-	finishedUnits[unitID] = nil
-end
-function gadget:UnitDestroyed(unitID)
-	finishedUnits[unitID] = nil
-end
+local nanoframeCount = 0
+local nanoframes     = {} -- [index] = unitID
+local nanoframeTeams = {} -- [index] = teamID
+local nanoframeCosts = {} -- [index] = fullCost
+local nanoframesByID = {} -- [unitID] = index
 
-local function GetTotalUnitValue (teamID)
-	local finished, nanoPartial, nanoTotal = 0, 0, 0
-	local teamUnits = Spring.GetTeamUnits(teamID)
-	for i = 1, #teamUnits do
-		local unitID = teamUnits[i]
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		if not dontCountUnits[unitDefID] then
-			local cost = Spring.Utilities.GetUnitCost(unitID, unitDefID)
-			if finishedUnits[unitID] then
-				finished = finished + cost
-			else
-				local buildProgress = select(5, Spring.GetUnitHealth(unitID))
-				nanoPartial = nanoPartial + cost * buildProgress
-				nanoTotal = nanoTotal + cost
-			end
-		end
+function gadget:UnitCreated(unitID, unitDefID, teamID)
+	if dontCountUnits[unitDefID] then
+		return
 	end
 
-	-- things to consider: handle stockpile, morph, facplop?
+	local cost = GetUnitCost(unitID, unitDefID)
+	nanoframeCount = nanoframeCount + 1
+	nanoframeTeams[nanoframeCount] = teamID
+	nanoframeCosts[nanoframeCount] = cost
+	nanoframes[nanoframeCount] = unitID
+	nanoframesByID[unitID] = nanoframeCount
 
-	return finished, nanoPartial, nanoTotal
+	totalNanoValueByTeam[teamID] = totalNanoValueByTeam[teamID] + cost
+end
+
+function gadget:UnitFinished(unitID, unitDefID, teamID)
+	if dontCountUnits[unitDefID] then
+		return
+	end
+
+	local index = nanoframesByID[unitID]
+	local lastUnitID = nanoframes[nanoframeCount]
+	local cost = nanoframeCosts[index]
+
+	nanoframesByID[lastUnitID] = index
+	nanoframesByID[unitID] = nil
+	nanoframeTeams[index] = nanoframeTeams[nanoframeCount]
+	nanoframeCosts[index] = nanoframeCosts[nanoframeCount]
+	nanoframes[index] = lastUnitID
+	nanoframeCount = nanoframeCount - 1
+
+	unitValueByTeam[teamID] = unitValueByTeam[teamID] + cost
+	totalNanoValueByTeam[teamID] = totalNanoValueByTeam[teamID] - cost
+end
+
+function gadget:UnitReverseBuilt(unitID, unitDefID, teamID)
+	if dontCountUnits[unitDefID] then
+		return
+	end
+
+	local cost = GetUnitCost(unitID, unitDefID)
+
+	nanoframeCount = nanoframeCount + 1
+	nanoframeTeams[nanoframeCount] = teamID
+	nanoframeCosts[nanoframeCount] = cost
+	nanoframes[nanoframeCount] = unitID
+	nanoframesByID[unitID] = nanoframeCount
+
+	totalNanoValueByTeam[teamID] = totalNanoValueByTeam[teamID] + cost
+	unitValueByTeam[teamID] = unitValueByTeam[teamID] - cost
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, teamID)
+	if dontCountUnits[unitDefID] then
+		return
+	end
+
+	local index = nanoframesByID[unitID]
+	if index then
+		local lastUnitID = nanoframes[nanoframeCount]
+		local cost = nanoframeCosts[index]
+
+		nanoframesByID[unitID] = nil
+		nanoframesByID[lastUnitID] = index
+		nanoframeTeams[index] = nanoframeTeams[nanoframeCount]
+		nanoframeCosts[index] = nanoframeCosts[nanoframeCount]
+		nanoframes[index] = nanoframes[nanoframeCount]
+		nanoframeCount = nanoframeCount - 1
+
+		totalNanoValueByTeam[teamID] = totalNanoValueByTeam[teamID] - cost
+	else
+		local cost = GetUnitCost(unitID, unitDefID)
+		unitValueByTeam[teamID] = unitValueByTeam[teamID] - cost
+	end
+end
+
+function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
+	if dontCountUnits[unitDefID] then
+		return
+	end
+
+	local index = nanoframesByID[unitID]
+	if index then
+		local cost = nanoframeCosts[index]
+		nanoframeTeams[index] = newTeam
+		totalNanoValueByTeam[oldTeam] = totalNanoValueByTeam[oldTeam] - cost
+		totalNanoValueByTeam[newTeam] = totalNanoValueByTeam[newTeam] + cost
+	else
+		local cost = GetUnitCost(unitID, unitDefID)
+		unitValueByTeam[oldTeam] = unitValueByTeam[oldTeam] - cost
+		unitValueByTeam[newTeam] = unitValueByTeam[newTeam] + cost
+	end
+end
+
+local function RegenerateNanoframeValues ()
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		partialNanoValueByTeam[teamID] = 0
+	end
+
+	for i = 1, nanoframeCount do
+		local unitID = nanoframes[i]
+		local teamID = nanoframeTeams[i]
+		local fullCost = nanoframeCosts[i]
+
+		local buildProgress = select(5, spGetUnitHealth(unitID))
+		local cost = fullCost * buildProgress
+		partialNanoValueByTeam[teamID] = partialNanoValueByTeam[teamID] + cost
+	end
 end
 
 local function GetEnergyIncome (teamID)
@@ -127,22 +214,22 @@ function gadget:GameFrame(n)
 
 	sum_count = sum_count + 1
 	local isSpringStatsHistoryFrame = ((n % 450) == 0)
+	RegenerateNanoframeValues()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		mIncome[teamID] = mIncome[teamID] + GetMetalIncome  (teamID)
 		eIncome[teamID] = eIncome[teamID] + GetEnergyIncome (teamID)
 		mIncomeBase     [teamID] = mIncomeBase     [teamID] + (Spring.GetTeamRulesParam(teamID, "OD_metalBase"     ) or 0)
 		mIncomeOverdrive[teamID] = mIncomeOverdrive[teamID] + (Spring.GetTeamRulesParam(teamID, "OD_metalOverdrive") or 0)
-		local liveValue, nanoPartial, nanoTotal = GetTotalUnitValue(teamID)
 
 		SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeamHax[teamID])
 		Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeamNonhax[teamID], ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_current", damageReceivedByTeam[teamID], ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", -reclaimListByTeam[teamID], ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_current", metalExcessByTeam[teamID], ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_current", liveValue, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_current", nanoPartial, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_current", nanoTotal, ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_current", unitValueByTeam[teamID], ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_current", partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_current", totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
 		
 		if isSpringStatsHistoryFrame then
 			SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_"    .. stats_index, damageDealtByTeamHax[teamID])
@@ -154,9 +241,9 @@ function gadget:GameFrame(n)
 			Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_base_"  .. stats_index, mIncomeBase[teamID] / sum_count, ALLIED_VISIBLE)
 			Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_od_"  .. stats_index, mIncomeOverdrive[teamID] / sum_count, ALLIED_VISIBLE)
 			Spring.SetTeamRulesParam(teamID, "stats_history_energy_income_" .. stats_index, eIncome[teamID] / sum_count, ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_" .. stats_index, liveValue, ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_" .. stats_index, nanoPartial, ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_" .. stats_index, nanoTotal, ALLIED_VISIBLE)
+			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_" .. stats_index, unitValueByTeam[teamID], ALLIED_VISIBLE)
+			Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_" .. stats_index, partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
+			Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_" .. stats_index, totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
 
 			mIncome         [teamID] = 0
 			mIncomeBase     [teamID] = 0
@@ -191,14 +278,25 @@ function gadget:Initialize()
 	
 	GG.EndgameGraphs = externalFunctions
 
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		unitValueByTeam[teamID] = 0
+		totalNanoValueByTeam[teamID] = 0
+	end
+
 	local allUnits = Spring.GetAllUnits()
 	for i = 1, #allUnits do
 		local unitID = allUnits[i]
-		local buildProgress = select(5, Spring.GetUnitHealth(unitID))
-		if buildProgress == 1 then
-			finishedUnits[unitID] = true
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local unitTeam = Spring.GetUnitTeam(unitID)
+		gadget:UnitCreated(unitID, unitDefID, unitTeam)
+		local isNanoframe = select(3, Spring.GetUnitIsStunned(unitID))
+		if not isNanoframe then
+			gadget:UnitFinished(unitID, unitDefID, unitTeam)
 		end
 	end
+
+	RegenerateNanoframeValues()
 
 	allyTeamByTeam = {}
 	for i = 1, #teamList do
@@ -215,11 +313,10 @@ function gadget:Initialize()
 		SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current", GetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0)
 		Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_current", Spring.GetTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_current", Spring.GetTeamRulesParam(teamID, "stats_history_damage_received_current") or 0, ALLIED_VISIBLE)
-		
-		local liveValue, nanoPartial, nanoTotal = GetTotalUnitValue(teamID)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_current", liveValue, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_current", nanoPartial, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_current", nanoTotal, ALLIED_VISIBLE)
+
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_current", unitValueByTeam[teamID], ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_current", partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_current", totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
 
 		SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_0"      , 0)
 		Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_0"     , 0, ALLIED_VISIBLE)
