@@ -286,7 +286,7 @@ effectUnitDefs = {
 	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipl"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipr"}) },
   },
-  fighter = {
+  planefighter = {
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle1", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle2", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
     {class='Ribbon', options={width=1, piece="wingtip1", noIconDraw = true}},
@@ -305,7 +305,7 @@ effectUnitDefs = {
 	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },	
   },
-  fighterheavy = {
+  planeheavyfighter = {
     -- jets done in gadget
     {class='Ribbon', options={width=1, size=8, piece="wingtip1", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=8, piece="wingtip2", noIconDraw = true}},
