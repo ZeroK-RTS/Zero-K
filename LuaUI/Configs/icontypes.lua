@@ -952,7 +952,7 @@ local icontypes = {
   
   energywind = {
     bitmap='icons/energywind.png',
-    size=2.5,
+    size=1.8,
   },
   energysolar = {
     bitmap='icons/energysolar.dds',
