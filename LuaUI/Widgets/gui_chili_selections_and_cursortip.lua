@@ -1,9 +1,9 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Chili Selections & CursorTip",
-		desc      = "Chili Selection Window and Cursor Tooltip remake.",
-		author    = "GoogleFrog (CarRepairer and jK orginal)",
+		name      = "Chili Selections & CursorTip v2",
+		desc      = "Chili Selection Window and Cursor Tooltip remade.",
+		author    = "GoogleFrog", -- (CarRepairer and jK orginal)
 		date      = "9 February 2017",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,

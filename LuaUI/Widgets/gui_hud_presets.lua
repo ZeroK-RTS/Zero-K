@@ -22,14 +22,14 @@ local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Sel
 local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
 local minimapName, minimapPath = "Chili Minimap", "Settings/HUD Panels/Minimap"
 local consoleName, consolePath = "Chili Pro Console", "Settings/HUD Panels/Chat"
-local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
+local selName, selPath = "Chili Selections & CursorTip v2", "Settings/HUD Panels/Selected Units Panel"
 local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
 local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 local specName, specPath = "Chili Spectator Panels", "Settings/HUD Panels/Spectator Panels"
 local dockName, dockPath = "Chili Docking", "Settings/HUD Panels/Extras/Docking"
 
 local function Selections_SetOptions(group, showInfo, square, iconSize, showCommand, showDgun, alwaysShow)
-	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
+	local selName, selPath = "Chili Selections & CursorTip v2", "Settings/HUD Panels/Selected Units Panel"
 	WG.SetWidgetOption(widgetName, path, "groupalways",group)
 	WG.SetWidgetOption(widgetName, path, "showgroupinfo",showInfo)
 	WG.SetWidgetOption(widgetName, path, "squarepics",square)
@@ -281,7 +281,7 @@ local function SetupDefaultPreset()
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	
 	Spring.SendCommands("resbar 0")
 	
@@ -414,7 +414,7 @@ local function SetupNewPreset()
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	widgetHandler:EnableWidget("Chili Global Commands")
 	
 	Spring.SendCommands("resbar 0")
@@ -619,7 +619,7 @@ local function SetupNewWidgets()
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	widgetHandler:EnableWidget("Chili Global Commands")
 
 	if not WG.Chili.Screen0:GetChildByName("Player List") then
@@ -1028,7 +1028,7 @@ local function SetupCraftyPreset()
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	
 	Spring.SendCommands("resbar 0")
 	
@@ -1156,7 +1156,7 @@ local function SetupEnsemblePreset()
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	
 	Spring.SendCommands("resbar 0")
 	
@@ -1283,7 +1283,7 @@ local function SetupWestwoodPreset()
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	
 	Spring.SendCommands("resbar 0")
 	
