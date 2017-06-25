@@ -592,6 +592,14 @@ local function GetUnitShieldRegenString(unitID, ud)
 	return " (+" .. (wd.customParams.shield_rate or wd.shieldPowerRegen) .. ")"
 end
 
+local function IsUnitInLos(unitID)
+	if not unitID then
+		return false
+	end
+	local state = Spring.GetUnitLosState(unitID)
+	return state and state.los
+end
+
 local function GetManualFireReload(unitID, unitDefID)
 	if not (unitDefID and showManualFire) then
 		return false
@@ -1696,7 +1704,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local metalInfoShown = false
 		local maxHealthShown = false
 		local morphShown = false
-		local visible = (unitID and Spring.GetUnitExperience(unitID) and true) or false
+		local visible = IsUnitInLos(unitID)
 		
 		if prevUnitID == unitID and prevUnitDefID == unitDefID and prevFeatureID == featureID and prevFeatureDefID == featureDefID and 
 				prevVisible == visible and prevMorphTime == morphTime and prevMorphCost == morphCost and prevMousePlace == ((mousePlaceX and true) or false) then
