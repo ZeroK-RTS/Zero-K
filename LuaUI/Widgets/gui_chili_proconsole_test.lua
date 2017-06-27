@@ -103,8 +103,9 @@ local DEDUPE_SUFFIX = 'x '
 local MIN_HEIGHT = 50
 local MIN_WIDTH = 300
 local MAX_STORED_MESSAGES = 300
-	
+
 local inputsize = 25
+local CONCURRENT_SOUND_GAP = 0.1 -- seconds
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -138,6 +139,7 @@ local highlightPattern -- currently based on player name -- TODO add configurabl
 
 local firstEnter = true --used to activate ally-chat at game start. To run once
 local noAlly = false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
+local recentSoundTime = false -- Limit the rate at which sounds are played.
 
 local lastMsgChat, lastMsgBackChat, lastMsgConsole
 
@@ -753,12 +755,16 @@ local function escape_lua_pattern(s)
 end
 
 local function PlaySound(id, condition)
+	if recentSoundTime then
+		return
+	end
 	if condition ~= nil and not condition then
 		return
 	end
 	local file = SOUNDS[id]
 	if file then
 		Spring.PlaySoundFile(file, 1, 'ui')
+		recentSoundTime = CONCURRENT_SOUND_GAP
 	end
 end
 
@@ -1390,6 +1396,12 @@ local firstSwap = true
 
 -- FIXME wtf is this obsessive function?
 function widget:Update(s)
+	if recentSoundTime then
+		recentSoundTime = recentSoundTime - s
+		if recentSoundTime < 0 then
+			recentSoundTime = false
+		end
+	end
 	timer = timer + s
 	if timer > 2 then
 		timer = 0
