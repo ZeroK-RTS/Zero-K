@@ -1115,10 +1115,16 @@ function gadget:GameFrame(n)
 
 			--// Calculate Per-Grid Energy
 			local maxGridCapacity = {}
+			local gridHasMex = {}
 			for i = 1, allyTeamData.grids do
 				maxGridCapacity[i] = 0
+				gridHasMex[i] = false
 				if not allyTeamData.nilGrid[i] then
 					for unitID,_ in pairs(allyTeamData.grid[i].pylon) do
+						local pylonData = pylon[allyTeamID][unitID]
+						if pylonData.mex then
+							gridHasMex[i] = true
+						end
 						local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1) or (spGetUnitRulesParam(unitID,"morphDisable") == 1)
 						if (not stunned_or_inbuild) then
 							local income = spGetUnitRulesParam(unitID, "current_energyIncome") or 0
@@ -1256,7 +1262,7 @@ function gadget:GameFrame(n)
 						if gridMetalGain[grid] > 0 then
 							gridEfficiency = gridEnergySpent[grid]/gridMetalGain[grid]
 						else
-							gridEfficiency = 0
+							gridEfficiency = gridHasMex[grid] and 0 or -2
 						end
 					end
 
