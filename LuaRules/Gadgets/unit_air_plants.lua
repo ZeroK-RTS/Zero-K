@@ -64,14 +64,14 @@ local repairCmd = {
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
   if AIRPLANT[unitDefID] then
-	landCmd.params[1] = (AIRPLANT[unitDefID].land and '1') or '0'
+    landCmd.params[1] = (AIRPLANT[unitDefID].land and '1') or '0'
     InsertUnitCmdDesc(unitID, 500, landCmd)
     --InsertUnitCmdDesc(unitID, 500, repairCmd)
     plantList[unitID] = {flyState=(AIRPLANT[unitDefID].land and 1) or 0, repairAt=0}
-	Spring.SetUnitRulesParam(unitID, "landFlyFactory", plantList[unitID].flyState)
+    Spring.SetUnitRulesParam(unitID, "landFlyFactory", plantList[unitID].flyState)
   elseif plantList[builderID] then
-    GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, { plantList[builderID].repairAt }, { })
-	GiveOrderToUnit(unitID, CMD.IDLEMODE, { plantList[builderID].flyState }, { })
+    GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, { plantList[builderID].repairAt }, 0)
+    GiveOrderToUnit(unitID, CMD.IDLEMODE, { plantList[builderID].flyState }, 0)
   end
 end
 

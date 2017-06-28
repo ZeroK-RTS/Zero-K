@@ -416,20 +416,20 @@ local tacticalAIDefs, behaviourDefaults = VFS.Include("LuaRules/Configs/tactical
 local tacticalAIUnits = {}
 
 for unitDefName, behaviourData in pairs(tacticalAIDefs) do
-    tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
+	tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
 end
 
 local unitAlreadyAdded = {}
 
 local function addLabel(text, path) -- doesn't work with order
-    path = (path and "Settings/Unit Behaviour/Default States/" .. path) or "Settings/Unit Behaviour/Default States"
-    options[text .. "_label"] = {
-        name = "label",
-        type = 'label',
-        value = text,
-        path = path,
-    }
-    options_order[#options_order+1] = text .. "_label"
+	path = (path and "Settings/Unit Behaviour/Default States/" .. path) or "Settings/Unit Behaviour/Default States"
+	options[text .. "_label"] = {
+		name = "label",
+		type = 'label',
+		value = text,
+		path = path,
+	}
+	options_order[#options_order+1] = text .. "_label"
 end
 
 local function addUnit(defName, path)
@@ -581,7 +581,7 @@ local function addUnit(defName, path)
 			desc = "Values: Inherit, Low, Normal, High",
 			type = 'number',
 			value = 1,
-			min = -1,
+			min = ud.isBuilding and 0 or -1,
 			max = 2,
 			step = 1,
 			path = path,
@@ -826,7 +826,7 @@ local function QueueState(unitDefName, stateName, cmdID, cmdArray, invertBool)
 	end
 	if type(value) == "boolean" then
 		if invertBool then
-		      value = not value
+			value = not value
 		end
 		value = value and 1 or 0
 	end
@@ -931,11 +931,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				local bdid = Spring.GetUnitDefID(builderID)
 				if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
 					--NOTE: The unit_air_plants gadget deals with inherit
+					trueBuilder = true
 					if value ~= -1 then  --if not inherit
 						orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, SHIFT_TABLE}
-						trueBuilder = true
 					end
-				end	  
+				end
 			end
 			if not trueBuilder then	-- inherit from factory def's start state, not the current state of any specific factory unit
 				value = GetFactoryDefState(name, "flylandstate_1_factory")
