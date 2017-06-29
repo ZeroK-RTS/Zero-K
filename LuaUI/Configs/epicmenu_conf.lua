@@ -466,13 +466,13 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 
 	AddOption(pathGraphicsMap, 
 	{
-		name = 'Terrain geometry detail',
-		desc = 'How detailed the terrain geometry is.',
+		name = 'Terrain detail',
+		desc = 'Control the accuracy of the terrain.',
 		type = 'number',
-		min = 32, 
-		max = 256, 
-		step = 8,
-		value = 128,
+		min = 30, 
+		max = 250, 
+		step = 5,
+		value = 90,
 		OnChange = function(self) spSendCommands{"GroundDetail " .. self.value} end, 
 	})
 
