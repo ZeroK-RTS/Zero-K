@@ -139,7 +139,7 @@ unitDef = {
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:TORPEDOHITHUGE]],
       fixedLauncher           = true,
-      flightTime              = 2,
+      flightTime              = 3,
 	  groundBounce            = true,
 	  heightMod               = 0,
 	  impulseBoost            = 0.4,
@@ -183,11 +183,12 @@ unitDef = {
       flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
-      range                   = 100,
+      range                   = 40,
       reloadtime              = 8,
       size                    = 1E-06,
       smokeTrail              = false,
-
+      targetborder            = 1,
+	  
       textures                = {
         [[null]],
         [[null]],
@@ -196,7 +197,7 @@ unitDef = {
 
       turnrate                = 10000,
       turret                  = true,
-	  waterWeapon             = true,
+      waterWeapon             = true,
       weaponAcceleration      = 200,
       weaponTimer             = 0.1,
       weaponType              = [[StarburstLauncher]],
