@@ -1,11 +1,11 @@
 unitDef = {
   unitname               = [[shipcarrier]],
   name                   = [[Reef]],
-  description            = [[Aircraft Carrier (Bombardment), Stockpiles tacnukes at 10 m/s]],
+  description            = [[Aircraft Carrier (Bombardment), stockpiles disarm missiles at 5 m/s]],
   acceleration           = 0.0354,
   activateWhenBuilt   	 = true,
   brakeRate              = 0.0466,
-  buildCostMetal         = 3500,
+  buildCostMetal         = 3000,
   builder                = false,
   buildPic               = [[shipcarrier.png]],
   canMove                = true,
@@ -19,10 +19,13 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    description_de = [[Flugzeugträger (Bomber)]],
+    description_fr = [[Porte-Avion Bombardier]],
+    helptext       = [[The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire disarming missile launcher for disabling enemy capital ships at range and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets.]],
 	midposoffset   = [[0 -10 0]],
     modelradius    = [[80]],
-	stockpiletime  = [[60]],
-	stockpilecost  = [[600]],
+	stockpiletime  = [[30]],
+	stockpilecost  = [[150]],
 	priority_misc = 2, -- High
 	extradrawrange = 3000,
   },
@@ -66,7 +69,7 @@ unitDef = {
     },
 
 	{
-      def                = [[TACNUKE]],
+      def                = [[DISARM_ROCKET]],
       badTargetCategory  = [[SWIM LAND SUB SHIP HOVER]],
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
@@ -75,41 +78,48 @@ unitDef = {
 
   weaponDefs             = {
 
-	TACNUKE        = {
-      name                    = [[Tactical Nuke]],
-      areaOfEffect            = 256,
+	DISARM_ROCKET        = {
+      name                    = [[Disarm Missile]],
+      areaOfEffect            = 280,
       collideFriendly         = false,
+	  cegTag                  = [[bigdisarmtrail]],
       commandfire             = true,
-      craterBoost             = 4,
-      craterMult              = 3.5,
+      craterBoost             = 0,
+      craterMult              = 0,
 
+	  customParams        = {
+        disarmDamageMult = 1.0,
+        disarmDamageOnly = 1,
+        disarmTimer      = 10, -- seconds
+		
+		light_color = [[1 1 1]],
+      },
+	  
       damage                  = {
-        default = 3500,
-        planes  = 3500,
-        subs    = 175,
+        default = 12000,
       },
 
-      edgeEffectiveness       = 0.4,
-      explosionGenerator      = [[custom:NUKE_150]],
+      edgeEffectiveness       = 1,
+      explosionGenerator      = [[custom:DISARMMISSILE_EXPLOSION]],
       fireStarter             = 0,
       flightTime              = 10,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      model                   = [[wep_tacnuke.s3o]],
+      model                   = [[wep_empmissile.s3o]],
       noSelfDamage            = true,
       range                   = 3000,
-      reloadtime              = 1,
+      reloadtime              = 5,
       smokeTrail              = true,
-      soundHit                = [[explosion/mini_nuke]],
+      soundHit                = [[weapon/missile/emp_missile_hit]],
       soundStart              = [[weapon/missile/tacnuke_launch]],
       stockpile               = true,
       stockpileTime           = 10^5,
       tolerance               = 4000,
-      turnrate                = 18000,
-      waterWeapon             = true,
-      weaponAcceleration      = 180,
-      weaponTimer             = 4,
+      turnrate                = 25000,
+      waterWeapon             = false,
+      weaponAcceleration      = 800,
+      weaponTimer             = 1.75,
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 1200,
     },
