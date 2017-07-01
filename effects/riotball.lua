@@ -193,19 +193,19 @@ return {
   },
   
     
-  ["riotballplus2_purple_UW"] = {
+  ["riotballplus2_purple_limpet"] = {
     usedefaultexplosions = false,
-    groundflash = {
-      alwaysvisible      = true,
-      circlealpha        = 0.4,
-      circlegrowth       = 7,
-      flashalpha         = 0.5,
-      flashsize          = 320,
-      ttl                = 64,
+	
+	groundflash = {
+      circlealpha        = 1,
+      circlegrowth       = 6,
+      flashalpha         = 2.15,
+      flashsize          = 68,
+      ttl                = 6,
       color = {
         [1]  = 1,
-        [2]  = 0,
-        [3]  = 1,
+        [2]  = 0.89999997615814,
+        [3]  = 0.60000002384186,
       },
     },
     sphere = {
@@ -222,6 +222,7 @@ return {
         ttl                = 45,
       },
     },
+	
   },
   
   ["riotballgrav"] = {

@@ -11,7 +11,6 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND TOOFAST]],
-  cloakCost              = 0,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[22 20 22]],
   collisionVolumeType    = [[ellipsoid]],
@@ -21,14 +20,13 @@ unitDef = {
     amph_regen = 10,
     amph_submerged_at = 30,
     helptext       = [[The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them.]],
-	--floattoggle    = [[1]],
  },
 
   explodeAs              = [[AMPHBOMB_DEATH]],
   fireState              = 0,
   footprintX             = 2,
   footprintZ             = 2,
-  iconType               = [[walkerbomb]],
+  iconType               = [[amphbomb]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   kamikaze               = true,
@@ -37,7 +35,6 @@ unitDef = {
   maxDamage              = 300,
   maxSlope               = 36,
   maxVelocity            = 4.1,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[amphbomb.s3o]],
@@ -52,13 +49,31 @@ unitDef = {
       [[custom:RAIDMUZZLE]],
       [[custom:VINDIBACK]],
       [[custom:RIOTBALL]],
-      [[custom:digdig]], --EmitSfx(piece, 1024+3)
     },
 
   },
   sightDistance          = 240,
   sonarDistance          = 240,
   turnRate               = 3000,
+  
+  featureDefs            = {
+
+    DEAD      = {
+      blocking         = false,
+      featureDead      = [[HEAP]],
+      footprintX       = 3,
+      footprintZ       = 3,
+      object           = [[wreck2x2c.s3o]],
+    },
+
+    HEAP      = {
+      blocking         = false,
+      footprintX       = 2,
+      footprintZ       = 2,
+      object           = [[debris2x2b.s3o]],
+    },
+
+  },
 }
 
 local weaponDefs = {
@@ -77,7 +92,7 @@ local weaponDefs = {
     },
 	 
     edgeEffectiveness  = 0.4,
-    explosionGenerator = "custom:riotballplus2_purple_UW",
+    explosionGenerator = "custom:riotballplus2_purple_limpet",
     explosionSpeed     = 7,
     impulseBoost       = 0,
     impulseFactor      = 0.3,
