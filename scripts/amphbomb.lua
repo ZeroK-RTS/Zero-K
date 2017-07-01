@@ -142,6 +142,10 @@ function script.StopMoving()
 	end
 end
 
+function Detonate() -- Giving an order causes recursion.
+	GG.QueueUnitDescruction(unitID)
+end
+
 function script.FireWeapon(num)
 	GG.shotWaterWeapon(unitID)
 end
