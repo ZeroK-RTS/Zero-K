@@ -19,6 +19,8 @@ unitDef = {
     keeptooltip = [[any string I want]],
     neededlink  = 50,
     pylonrange  = 50,
+    aimposoffset   = [[0 26 0]],
+    midposoffset   = [[0 10 0]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
