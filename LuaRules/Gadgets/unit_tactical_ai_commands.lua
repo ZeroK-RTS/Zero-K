@@ -36,6 +36,7 @@ local spGetUnitStates		= Spring.GetUnitStates
 local spValidUnitID			= Spring.ValidUnitID
 local spGetUnitIsStunned    = Spring.GetUnitIsStunned
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
+local spGetUnitWeaponState  = Spring.GetUnitWeaponState
 local random 				= math.random
 local sqrt 					= math.sqrt
 local min                   = math.min
@@ -335,7 +336,16 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, 
 	end
 	
 	local skirmRange = (doHug and behaviour.hugRange) or (GetEffectiveWeaponRange(data.udID, -dy, behaviour.weaponNum) - behaviour.skirmLeeway)
-
+	if behaviour.reloadSkirmLeeway then
+		local reloadState = spGetUnitWeaponState(unitID, behaviour.weaponNum, 'reloadState')
+		if reloadState then
+			local reloadFrames = reloadState - n
+			if reloadFrames > 0 then
+				skirmRange = skirmRange + reloadFrames*behaviour.reloadSkirmLeeway
+			end
+		end
+	end
+	
 	if doHug or skirmRange > predictedDist then
 	
 		if behaviour.skirmOnlyNearEnemyRange then
@@ -612,6 +622,7 @@ local function GetBehaviourTable(behaviourData, ud)
 		skirmLeeway = (behaviourData.skirmLeeway or 0),
 		skirmOnlyNearEnemyRange = (behaviourData.skirmOnlyNearEnemyRange or false),
 		skirmKeepOrder = (behaviourData.skirmKeepOrder or false),
+		reloadSkirmLeeway = (behaviourData.reloadSkirmLeeway or false),
 		jinkTangentLength = (behaviourData.jinkTangentLength or behaviourDefaults.defaultJinkTangentLength),
 		jinkParallelLength =  (behaviourData.jinkParallelLength or behaviourDefaults.defaultJinkParallelLength),
 		alwaysJinkFight = (behaviourData.alwaysJinkFight or false),
