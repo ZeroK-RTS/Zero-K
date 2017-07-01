@@ -96,7 +96,7 @@ unitDef = {
       },
 	  
       damage                  = {
-        default = 12000,
+        default = 15000,
       },
 
       edgeEffectiveness       = 1,
@@ -116,10 +116,11 @@ unitDef = {
       stockpile               = true,
       stockpileTime           = 10^5,
       tolerance               = 4000,
+	  startVelocity			  = 200,
       turnrate                = 25000,
       waterWeapon             = false,
-      weaponAcceleration      = 800,
-      weaponTimer             = 1.75,
+      weaponAcceleration      = 400,
+      weaponTimer             = 1.4,
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 1200,
     },
