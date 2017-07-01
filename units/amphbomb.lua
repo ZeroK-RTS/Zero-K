@@ -1,26 +1,27 @@
 unitDef = {
   unitname               = [[amphbomb]],
   name                   = [[Limpet]],
-  description            = [[Amphibious slow mine]],
+  description            = [[Amphibious Slow Mine]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
-  buildCostMetal         = 100,
-  builder                = false,
+  buildCostMetal         = 300,
   buildPic               = [[AMPHBOMB.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND]],
+  category               = [[LAND TOOFAST]],
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[22 20 22]],
   collisionVolumeType    = [[ellipsoid]],
+  corpse                 = [[DEAD]],
 
   customParams           = {
     amph_regen = 10,
-    amph_submerged_at = 40,
- 	maxwatertank = [[100]],
+    amph_submerged_at = 30,
+    helptext       = [[The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them.]],
+	--floattoggle    = [[1]],
  },
 
   explodeAs              = [[AMPHBOMB_DEATH]],
@@ -30,19 +31,20 @@ unitDef = {
   iconType               = [[walkerbomb]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maxDamage              = 140,
+  kamikaze               = true,
+  kamikazeDistance       = 120,
+  kamikazeUseLOS         = true,
+  maxDamage              = 300,
   maxSlope               = 36,
   maxVelocity            = 4.1,
-  maxWaterDepth          = 15,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
-  noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[amphbomb.s3o]],
   pushResistant          = 0,
   script                 = [[amphbomb.lua]],
   selfDestructAs         = [[AMPHBOMB_DEATH]],
-  selfDestructCountdown  = 1,
+  selfDestructCountdown  = 0,
 
   sfxtypes               = {
 
@@ -55,75 +57,35 @@ unitDef = {
 
   },
   sightDistance          = 240,
-  sonarDistance          = 260,
+  sonarDistance          = 240,
   turnRate               = 3000,
-  workerTime             = 0,
-
-  weapons             = {
-
-    {
-      def                = [[WATERCANNON]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-  },
-
-
-  weaponDefs          = {
-
-    WATERCANNON    = {
-      name                    = [[Disruptor Pulser]],
-      areaOfEffect            = 360,
-      burst		              = 7,
-      burstRate		          = 0.15,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 15,
-        planes  = 15,
-        subs    = 15,
-      },
-
-      customParams           = {
-	    lups_explodespeed = 1,
-	    lups_explodelife = 0.6,
-      },
-
-      explosionGenerator      = [[custom:GIANT_WATER_HIT]],
-		cegTag					= [[sonictrail]],
-      explosionSpeed          = 10000,
-      edgeEffectiveness       = 0.8,
-      fireStarter             = 0,
-      impactOnly              = false,
-      interceptedByShieldType = 1,
-      range                   = 200,
-      reloadtime              = 6.0,
-      size                    = 1E-06,
-      soundStart              = [[weapon/laser/pulse_laser2]],
-      soundStartVolume	      = 0.9,
-      soundTrigger            = true,
-      smokeTrail              = false,
-	  waterweapon             = true,
-	  myGravity               = 8,
-
-      textures                = {
-        [[null]],
-        [[null]],
-        [[null]],
-      },
-
-      turnrate                = 90000,
-      turret                  = true,
-      weaponAcceleration      = 200,
-      weaponTimer             = 0.1,
-      flightTime              = 0.2,
-      weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 800,
-    },
-
-  },
-  
 }
+
+local weaponDefs = {
+  AMPHBOMB_DEATH = {
+    areaOfEffect       = 500,
+    craterBoost        = 1,
+    craterMult         = 3.5,
+	customparams = {
+	    timeslow_damagefactor = 10,
+		light_color = [[1.88 0.63 2.5]],
+		light_radius = 320,
+	 },
+	 
+	damage = {
+      default          = 150.1,
+    },
+	 
+    edgeEffectiveness  = 0.4,
+    explosionGenerator = "custom:riotballplus2_purple_UW",
+    explosionSpeed     = 7,
+    impulseBoost       = 0,
+    impulseFactor      = 0.3,
+    name               = "Slowing Explosion",
+    soundHit           = "weapon/aoe_aura",
+	soundHitVolume     = 0.6,
+  },
+}
+unitDef.weaponDefs = weaponDefs
 
 return lowerkeys({ amphbomb = unitDef })

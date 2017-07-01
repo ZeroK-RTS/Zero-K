@@ -986,8 +986,8 @@
 	},
 	"shipcarrier" : {
 		"name" : "Reef",
-		"description" : "Aircraft Carrier (Bombardment), Stockpiles tacnukes at 10 m/s",
-		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire tactical missile launcher for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
+		"description" : "Aircraft Carrier (Bombardment), stockpiles disarm missiles at 5 m/s",
+		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire disarming missile launcher for disabling enemy capityal ships at range and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
 	},
 	"turretaaflak" : {
 		"name" : "Cobra",
@@ -1104,6 +1104,11 @@
 		"description" : "Amphibious Raider Bot (Anti-Sub)",
 		"helptext" : "The Duck is the basic underwater raider. Armed with short ranged torpedoes, it uses its (relatively) high speed to harass sea targets that cannot shoot back, though it dies to serious opposition. On land it can launch the torpedoes a short distance as a decent short ranged anti-heavy weapon."
 	},
+	"amphbomb" : {
+		"name" : "Limpet",
+		"description" : "Amphibious Slow Mine",
+		"helptext" : "The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them."
+	}
 	"planefighter" : {
 		"name" : "Swift",
 		"description" : "Multi-role Fighter",

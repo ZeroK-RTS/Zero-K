@@ -108,7 +108,6 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 	"chicken_tiamat",
 	"chicken_dragon",
 	"hoverdepthcharge",
-	
 	"vehraid",
 	"spiderscout",
 	"cloakraid",
@@ -120,7 +119,7 @@ local shortRangeSkirmieeArray = NameToDefID({
 	"tankraid",
 	"amphraid",
 	"jumpsumo",
-	
+	"amphbomb",
 	"jumpbomb",
 	"shieldraid",
 })
@@ -442,6 +441,19 @@ local behaviourConfig = {
 		minSwarmLeeway = 100,
 		swarmLeeway = 30, 
 		alwaysJinkFight = true,	
+	},
+	
+	["amphbomb"] = {
+		skirms = {}, 
+		swarms = lowRangeSwarmieeArray, 
+		flees = {},
+		circleStrafe = true, 
+		maxSwarmLeeway = 40, 
+		jinkTangentLength = 100, 
+		minCircleStrafeDistance = 0,
+		minSwarmLeeway = 100,
+		swarmLeeway = 30,
+		alwaysJinkFight = true,		
 	},
 	
 	["jumpscout"] = {
