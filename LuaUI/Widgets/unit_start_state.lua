@@ -578,10 +578,10 @@ local function addUnit(defName, path)
 	if ud.canAssist and ud.buildSpeed ~= 0 then
 		options[defName .. "_constructor_buildpriority"] = {
 			name = "  Constructor Build Priority",
-			desc = "Values: Inherit, Low, Normal, High",
+			desc = "Values: Low, Normal, High",
 			type = 'number',
 			value = 1,
-			min = ud.isBuilding and 0 or -1,
+			min = 0,
 			max = 2,
 			step = 1,
 			path = path,
@@ -1053,6 +1053,9 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 	SetControlGroup(unitID, factID)
 
 	local name = UnitDefs[unitDefID].name
+	
+	-- inherit constructor build priority (not wanted)
+	--[[
 	local value = GetStateValue(name, "constructor_buildpriority")
 	if value then
 		if value == -1 then
@@ -1062,6 +1065,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 			end
 		end
 	end
+	]]
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
