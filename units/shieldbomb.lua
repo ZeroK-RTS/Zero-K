@@ -32,6 +32,7 @@ unitDef = {
   kamikaze               = true,
   kamikazeDistance       = 80,
   kamikazeUseLOS         = true,
+  leaveTracks            = true,
   maxDamage              = 60,
   maxSlope               = 36,
   maxVelocity            = 4,
@@ -60,7 +61,7 @@ unitDef = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
-  trackWidth             = 12,
+  trackWidth             = 14,
   turnRate               = 3000,
   
   featureDefs            = {

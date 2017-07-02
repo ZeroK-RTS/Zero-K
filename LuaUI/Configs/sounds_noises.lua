@@ -495,6 +495,14 @@ local sounds = {
 			volume = 0.7,
 		},
 	},
+	amphbomb = {
+		ok = {
+			[1] = "light_bot_move",
+		},
+		select = {
+			[1] = "crawlie_select",
+		},
+	},
 	
 	-- Mech
 	armraz = {

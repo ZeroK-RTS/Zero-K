@@ -23,6 +23,7 @@ unitDef = {
   iconType            = [[spiderscout]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
+  leaveTracks         = true,
   maxDamage           = 40,
   maxSlope            = 72,
   maxVelocity         = 4.8,

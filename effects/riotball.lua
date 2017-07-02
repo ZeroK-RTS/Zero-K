@@ -198,7 +198,7 @@ return {
 	
 	groundflash = {
       circlealpha        = 1,
-      circlegrowth       = 6,
+      circlegrowth       = 12,
       flashalpha         = 2.15,
       flashsize          = 68,
       ttl                = 6,
@@ -218,8 +218,8 @@ return {
       properties = {
         alpha              = 0.5,
         color              = [[1,0,1]],
-        expansionspeed     = 6,
-        ttl                = 45,
+        expansionspeed     = 12,
+        ttl                = 22,
       },
     },
 	
