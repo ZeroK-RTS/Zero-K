@@ -2,9 +2,9 @@ unitDef = {
   unitname               = [[amphbomb]],
   name                   = [[Limpet]],
   description            = [[Amphibious Slow Mine]],
-  acceleration           = 0.25,
+  acceleration           = 0.15,
   activateWhenBuilt      = true,
-  brakeRate              = 0.4,
+  brakeRate              = 0.2,
   buildCostMetal         = 200,
   buildPic               = [[AMPHBOMB.png]],
   canGuard               = true,
@@ -12,14 +12,14 @@ unitDef = {
   canPatrol              = true,
   category               = [[LAND TOOFAST]],
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[22 20 22]],
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeScales  = [[16 12 22]],
+  collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
   customParams           = {
     amph_regen = 10,
     amph_submerged_at = 30,
-    helptext       = [[The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them.]],
+    midposoffset   = [[0 5 0]],
  },
 
   explodeAs              = [[AMPHBOMB_DEATH]],
@@ -54,6 +54,11 @@ unitDef = {
   },
   sightDistance          = 240,
   sonarDistance          = 240,
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ChickenTrackPointy]],
+  trackWidth             = 26,
   turnRate               = 3000,
   
   featureDefs            = {

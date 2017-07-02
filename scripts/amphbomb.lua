@@ -1,100 +1,113 @@
-local TANK_MAX = 100
---pieces
+-- pieces
+local base = piece "base"
 local body = piece "body"
 local firepoint = piece "firepoint"
-local digger = piece "digger"
 local wheell1 = piece "wheell1"
 local wheell2 = piece "wheell2"
 local wheelr1 = piece "wheelr1"
 local wheelr2 = piece "wheelr2"
 
-
 include "constants.lua"
 
---constants
-local PI = math.pi
-local sa = math.rad(20)
-local ma = math.rad(60)
-local la = math.rad(100)
-local pause = 300
+-- constants
+local pause = 150
 
---variables
+local rollAmount = 0.1
+local rollSpeed = rollAmount*2000/(3*pause)
+
+local turnAmount = math.rad(10)
+local turnSpeed = turnAmount*2000/(2*pause)
+
+-- variables
 local walking = false
 local forward = 8
 local backward = 5
 local up = 8
 
---signals
+-- signals
 local SIG_Walk = 2
 
 local function Walk()
-	while (walking == true) do
-		Turn(body, 2, .1, .5)		 	-- body roll left
-		Turn(body, 3, sa/2, 1.5)		 	-- body turn right
+	Signal(Sig_Walk)
+	SetSignalMask(Sig_Walk)
+	while true do
+		Turn(base, y_axis, rollAmount, rollSpeed)		 	-- body roll left
+		
+		Sleep(pause)
+		Turn(body, z_axis, turnAmount, turnSpeed)		 	-- body turn right
 		
 		Sleep(pause)
 		
-		Turn(body, 2, -.1, .5)			-- body roll right
-		Turn(body, 3, -sa/2, 1.5)			-- body turn left
+		
+		Sleep(pause)
+		Turn(body, z_axis, -turnAmount, turnSpeed)			-- body turn left
+		Turn(base, y_axis, -rollAmount, rollSpeed)			-- body roll right
+		Sleep(pause)
+		
+		
+		Sleep(pause)
+		Turn(body, z_axis, turnAmount, turnSpeed)		 	-- body turn right
+		
+		Sleep(pause)
+		Turn(base, y_axis, rollAmount, rollSpeed)		 	-- body roll left
+		
+		Sleep(pause)
+		Turn(body, z_axis, -turnAmount, turnSpeed)			-- body turn left
+		
+		Sleep(pause)
+		
+		
+		Sleep(pause)
+		Turn(base, y_axis, -rollAmount, rollSpeed)			-- body roll right
+		Turn(body, z_axis, turnAmount, turnSpeed)		 	-- body turn right
+		Sleep(pause)
+		
+		
+		Sleep(pause)
+		Turn(body, z_axis, -turnAmount, turnSpeed)			-- body turn left
 		
 		Sleep(pause)
 	end
 end
 
-local function Talk()
-	Spring.Echo("Hello World! ... Directive: Kill all humans")
-end
-
-function script.Create()
-	
-end
-
-function script.QueryWeapon1()
+function script.QueryWeapon()
 	return firepoint
 end
 
-function script.AimFromWeapon1()
+function script.AimFromWeapon()
 	return firepoint
 end
 
-function script.AimWeapon1()
+function script.AimWeapon()
 	return true
 end
 
-local function Moving()
-	Signal(Sig_Walk)
-	SetSignalMask(Sig_Walk)
-	Spin(wheell1, x_axis, (12))
-	Spin(wheell2, x_axis, (12))
-	Spin(wheelr1, x_axis, (12))
-	Spin(wheelr2, x_axis, (12))
-	walking = true
+function script.StartMoving()
+	Spin(wheell1, x_axis, 12)
+	Spin(wheell2, x_axis, 12)
+	Spin(wheelr1, x_axis, 12)
+	Spin(wheelr2, x_axis, 12)
 	StartThread(Walk)
 end
 
-
-function script.StartMoving()
-	StartThread(Moving)
-end
-
 function script.StopMoving()
-	walking = false
-	StopSpin(wheell1, x_axis, (10))
-	StopSpin(wheell2, x_axis, (10))
-	StopSpin(wheelr1, x_axis, (10))
-	StopSpin(wheelr2, x_axis, (10))
+	Signal(Sig_Walk)
+	
+	StopSpin(wheell1, x_axis, 8)
+	StopSpin(wheell2, x_axis, 8)
+	StopSpin(wheelr1, x_axis, 8)
+	StopSpin(wheelr2, x_axis, 8)
+	
+	Turn(base, y_axis, 0, rollSpeed)
+	Turn(body, z_axis, 0, turnSpeed)
 end
 
 function Detonate() -- Giving an order causes recursion.
 	GG.QueueUnitDescruction(unitID)
 end
 
-function script.FireWeapon(num)
-	GG.shotWaterWeapon(unitID)
-end
-
 function script.Killed(recentDamage, maxHealth)
-	Explode(body, sfxShatter)
+	Explode(body, sfxSmoke + sfxShatter)
 	Explode(wheell1, sfxSmoke + sfxFire)
 	Explode(wheell2, sfxSmoke + sfxFire)
 	Explode(wheelr1, sfxSmoke + sfxFire)

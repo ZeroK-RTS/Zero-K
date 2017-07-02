@@ -45,6 +45,11 @@ unitDef = {
   },
 
   sightDistance       = 560,
+  trackOffset         = 0,
+  trackStrength       = 8,
+  trackStretch        = 1,
+  trackType           = [[ChickenTrackPointy]],
+  trackWidth          = 12,
   turnRate            = 2100,
 
   weapons             = {

@@ -56,6 +56,11 @@ unitDef = {
   },
 
   sightDistance          = 240,
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ChickenTrackPointy]],
+  trackWidth             = 12,
   turnRate               = 3000,
   
   featureDefs            = {
