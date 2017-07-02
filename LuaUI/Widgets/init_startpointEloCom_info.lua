@@ -42,16 +42,6 @@ function widget:GameStart()
 	widgetHandler:RemoveWidget()
 end
 
-function widget:Shutdown()
-	for i=1, #playerInfo do
-		for name, _ in pairs(WG.customToolTip) do
-			if name == ("startpos_" .. playerInfo[i].playerID) then
-				WG.customToolTip[name] = nil
-			end
-		end
-	end
-end
-
 function widget:Initialize()
 
 	if Spring.GetGameFrame()>0 then
@@ -100,9 +90,6 @@ function widget:Update(dt)
 			local validEntry = not (x==y and x==z) and active and (not spec) -- invalidate symmetrical coordinate (since they are not humanly possible, probably indicate issues), and invalidate "nil" elo, and invalidate disconnected players, and invalid spec
 			playerInfo[i].xyz = {x,y,z}
 			playerInfo[i].validEntry = validEntry
-			if comDefName then
-				WG.customToolTip["startpos_" .. playerID] = {box={x1 = x-25, x2 = x+25, z1= z-25, z2= z+25},tooltip="BuildCo".. comDefName .. " - "}
-			end
 		end
 		elapsedSecond = 0
 	end
