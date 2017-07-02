@@ -83,6 +83,7 @@ local weaponDefs = {
     craterMult         = 3.5,
 	customparams = {
 	    timeslow_damagefactor = 10,
+		timeslow_overslow_frames = 5*30, --5 seconds before slow decays
 		light_color = [[1.88 0.63 2.5]],
 		light_radius = 320,
 	 },
