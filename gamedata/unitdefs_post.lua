@@ -206,7 +206,7 @@ end
 -- UnitDefs Dont Repeat Yourself
 --
 local BP2RES = 0.03
-local BP2TERRASPEED = 60 --used to be 60 in most of the cases
+local BP2TERRASPEED = 1000 --used to be 60 in most of the cases
 --local SEISMICSIG = 4 --used to be 4 in most of the cases
 for name, ud in pairs (UnitDefs) do
 		local cost = math.max (ud.buildcostenergy or 0, ud.buildcostmetal or 0, ud.buildtime or 0) --one of these should be set in actual unitdef file

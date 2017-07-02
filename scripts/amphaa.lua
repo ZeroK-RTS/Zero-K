@@ -256,7 +256,7 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+		local speedmult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 		
 		--left leg up, right leg back
 		Turn(lthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)

@@ -286,7 +286,7 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		local speed = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+		local speed = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 		--straighten left leg and draw it back, raise body, center right leg
 		Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED*speed)
 		Turn(pelvis, z_axis, BODY_TILT_ANGLE, BODY_TILT_SPEED*speed)
