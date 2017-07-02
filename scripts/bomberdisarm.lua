@@ -97,7 +97,7 @@ function script.FireWeapon(checkHeight)
 			end
 			i = i + 1
 		end
-		local slowMult = 1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+		local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 		Sleep(35/slowMult) -- fire density
 	end
 	
