@@ -394,6 +394,9 @@ function UpdateUnitAttributes(unitID, frame)
 	
 	-- SLOW --
 	local slowState = spGetUnitRulesParam(unitID,"slowState")
+	if slowState and slowState > 0.5 then
+		slowState = 0.5 -- Maximum slow
+	end
 	local zombieSpeedMult = spGetUnitRulesParam(unitID,"zombieSpeedMult")
 	local buildpowerMult = spGetUnitRulesParam(unitID, "buildpower_mult")
 	

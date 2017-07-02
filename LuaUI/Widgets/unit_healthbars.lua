@@ -912,7 +912,11 @@ do
 		--// SLOW
 		local slowState = GetUnitRulesParam(unitID,"slowState")
 		if (slowState and (slowState>0)) then
-			AddBar(messages.slow,slowState*2,"slow",(fullText and floor(slowState*100)..'%') or '')
+			if slowState > 0.5 then
+				AddBar(messages.slow,1,"slow",(fullText and floor((slowState - 0.5)*25)..'s') or '')
+			else
+				AddBar(messages.slow,slowState*2,"slow",(fullText and floor(slowState*100)..'%') or '')
+			end
 		end
 		
 		--// GOO

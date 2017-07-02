@@ -61,10 +61,11 @@ local function updateSlow(unitID, state)
 	local health = spGetUnitHealth(unitID)
 
 	if health then
-		if state.slowDamage > health*MAX_SLOW_FACTOR then
-			state.slowDamage = health*MAX_SLOW_FACTOR
+		local maxSlow = health*(MAX_SLOW_FACTOR + (state.extraSlowBound or 0))
+		if state.slowDamage > maxSlow then
+			state.slowDamage = maxSlow
 		end
-
+		
 		local percentSlow = state.slowDamage/health
 
 		spSetUnitRulesParam(unitID,"slowState",percentSlow, LOS_ACCESS)
@@ -97,15 +98,20 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			degradeTimer = DEGRADE_TIMER,
 		}
 	end
+	local slowDef = attritionWeaponDefs[weaponID]
 
 	-- add slow damage
-	local slowdown = attritionWeaponDefs[weaponID].slowDamage
-	if attritionWeaponDefs[weaponID].scaleSlow then
+	local slowdown = slowDef.slowDamage
+	if slowDef.scaleSlow then
 		slowdown = slowdown * (damage/WeaponDefs[weaponID].customParams.raw_damage)
 	end	--scale slow damage based on real damage (i.e. take into account armortypes etc.)
 
 	slowedUnits[unitID].slowDamage = slowedUnits[unitID].slowDamage + slowdown
 	slowedUnits[unitID].degradeTimer = DEGRADE_TIMER
+	
+	if slowDef.overslow then
+		slowedUnits[unitID].extraSlowBound = math.max(slowedUnits[unitID].extraSlowBound or 0, slowDef.overslow)
+	end
 
 	if GG.Awards and GG.Awards.AddAwardPoints then
 		local ud = UnitDefs[unitDefID]
@@ -115,9 +121,9 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 
 	-- check if a target change is needed
 	-- only changes target if the target is fully slowed and next order is an attack order
-	if spValidUnitID(attackerID) and attritionWeaponDefs[weaponID].smartRetarget then
+	if spValidUnitID(attackerID) and slowDef.smartRetarget then
 		local health = spGetUnitHealth(unitID)
-		if slowedUnits[unitID].slowDamage > health*attritionWeaponDefs[weaponID].smartRetarget then
+		if slowedUnits[unitID].slowDamage > health*slowDef.smartRetarget then
 
 			local cmd = spGetCommandQueue(attackerID, 3)
 
@@ -167,7 +173,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- write to unit rules param
 	updateSlow( unitID, slowedUnits[unitID])
 
-	if attritionWeaponDefs[weaponID].onlySlow then
+	if slowDef.onlySlow then
 		return 0
 	else
 		return damage
@@ -211,19 +217,24 @@ end
 function gadget:GameFrame(f)
     if (f-1) % UPDATE_PERIOD == 0 then
         for unitID, state in pairs(slowedUnits) do
+			if state.extraSlowBound then
+				state.extraSlowBound = state.extraSlowBound - DEGRADE_FACTOR
+				if state.extraSlowBound <= 0 then
+					state.extraSlowBound = nil
+				end
+			end
 			if state.degradeTimer <= 0 then
 				local health = spGetUnitHealth(unitID) or 0
-				state.slowDamage = state.slowDamage-health*DEGRADE_FACTOR
-				if state.slowDamage < 0 then
-					state.slowDamage = 0
-					updateSlow(unitID, state)
-					removeUnit(unitID)
-				else
-					updateSlow(unitID, state)
-				end
-
+				state.slowDamage = state.slowDamage - health*DEGRADE_FACTOR
 			else
 				state.degradeTimer = state.degradeTimer-1
+			end
+			if state.slowDamage < 0 then
+				state.slowDamage = 0
+				updateSlow(unitID, state)
+				removeUnit(unitID)
+			else
+				updateSlow(unitID, state)
 			end
         end
     end
