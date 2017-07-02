@@ -34,31 +34,31 @@ local getMovetype = Spring.Utilities.getMovetype
   
 VFS.Include("LuaRules/Configs/CAI/accessory/targetReachableTester.lua")
 
-local spGetGroundHeight			= Spring.GetGroundHeight
-local spGetUnitPosition			= Spring.GetUnitPosition
-local spGetTeamInfo			= Spring.GetTeamInfo
-local spGetFeaturePosition		= Spring.GetFeaturePosition
-local spCreateUnit			= Spring.CreateUnit
-local spGetUnitDefID			= Spring.GetUnitDefID
-local GaiaTeamID			= Spring.GetGaiaTeamID()
-local spGetUnitTeam			= Spring.GetUnitTeam
-local spGetAllUnits			= Spring.GetAllUnits
-local spGetGameFrame			= Spring.GetGameFrame
-local spGetAllFeatures			= Spring.GetAllFeatures
-local spGiveOrderToUnit			= Spring.GiveOrderToUnit
-local spGetCommandQueue			= Spring.GetCommandQueue
-local spDestroyFeature			= Spring.DestroyFeature
-local spGetFeatureResurrect		= Spring.GetFeatureResurrect
-local spGetUnitIsDead	  		= Spring.GetUnitIsDead
-local spGiveOrderArrayToUnitArray	= Spring.GiveOrderArrayToUnitArray
-local spGetUnitsInCylinder		= Spring.GetUnitsInCylinder
-local spSetTeamResource			= Spring.SetTeamResource
-local spGetUnitHealth			= Spring.GetUnitHealth
+local spGetGroundHeight           = Spring.GetGroundHeight
+local spGetUnitPosition           = Spring.GetUnitPosition
+local spGetFeaturePosition        = Spring.GetFeaturePosition
+local spCreateUnit                = Spring.CreateUnit
+local spGetUnitDefID              = Spring.GetUnitDefID
+local spGetUnitTeam               = Spring.GetUnitTeam
+local spGetAllUnits               = Spring.GetAllUnits
+local spGetGameFrame              = Spring.GetGameFrame
+local spGetAllFeatures            = Spring.GetAllFeatures
+local spGiveOrderToUnit           = Spring.GiveOrderToUnit
+local spGetCommandQueue           = Spring.GetCommandQueue
+local spDestroyFeature            = Spring.DestroyFeature
+local spGetFeatureResurrect       = Spring.GetFeatureResurrect
+local spGetUnitIsDead             = Spring.GetUnitIsDead
+local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
+local spGetUnitsInCylinder        = Spring.GetUnitsInCylinder
+local spSetTeamResource           = Spring.SetTeamResource
+local spGetUnitHealth             = Spring.GetUnitHealth
+local spSetUnitRulesParam         = Spring.SetUnitRulesParam
 
-local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
-local GaiaAllyTeamID					= select(6,spGetTeamInfo(GaiaTeamID))
+local GaiaTeamID     = Spring.GetGaiaTeamID()
+local GaiaAllyTeamID = select(6,Spring.GetTeamInfo(GaiaTeamID))
 
 local gameframe = 0
+local LOS_ACCESS = {inlos = true}
 
 local random = math.random
 local floor = math.floor
@@ -78,14 +78,27 @@ local MexDefs = {
 
 local WARNING_TIME = 5; -- seconds to start being scary before actual reanimation event
 local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay)
-if (tonumber(ZOMBIES_REZ_MIN)==nil) then ZOMBIES_REZ_MIN = 10 end -- minimum of 10 seconds, max is determined by rez speed
-local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed)
-if (tonumber(ZOMBIES_REZ_SPEED)==nil) then ZOMBIES_REZ_SPEED = 12 end -- 12m/s, big units have a really long time to respawn
-local ZOMBIES_PERMA_SLOW = tonumber(modOptions.zombies_permaslow)
-if (tonumber(ZOMBIES_PERMA_SLOW)==nil) then ZOMBIES_PERMA_SLOW = 1 end -- from 0 to 1, symbolises from 0% to 50% slow which is always on
+if (tonumber(ZOMBIES_REZ_MIN) == nil) then
+	-- minimum of 10 seconds, max is determined by rez speed
+	ZOMBIES_REZ_MIN = 10
+end
 
-local permaSlowDamage = GG.permaSlowDamage
-local addSlowDamage = GG.addSlowDamage
+local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed)
+if (tonumber(ZOMBIES_REZ_SPEED) == nil) then
+	-- 12m/s, big units have a really long time to respawn
+	ZOMBIES_REZ_SPEED = 12
+end
+
+local ZOMBIES_PERMA_SLOW = tonumber(modOptions.zombies_permaslow) 
+if (tonumber(ZOMBIES_PERMA_SLOW) == nil) then 
+	-- from 0 to 1, symbolises from 0% to 50% slow which is always on
+	ZOMBIES_PERMA_SLOW = 1 
+end 
+if ZOMBIES_PERMA_SLOW == 0 then
+	ZOMBIES_PERMA_SLOW = nil
+else
+	ZOMBIES_PERMA_SLOW = 1 - ZOMBIES_PERMA_SLOW*0.5
+end
 
 local CMD_REPEAT = CMD.REPEAT
 local CMD_MOVE_STATE = CMD.MOVE_STATE
@@ -98,6 +111,11 @@ local CEG_SPAWN = [[zombie]];
 
 local function disSQ(x1,y1,x2,y2)
 	return (x1 - x2)^2 + (y1 - y2)^2
+end
+
+local function SetZombieSlow(unitID, slowed)
+	spSetUnitRulesParam(unitID, "zombieSpeedMult", (slowed and 0.5) or 1, LOS_ACCESS)
+	GG.UpdateUnitAttributes(unitID)
 end
 
 local function GetUnitNearestAlly(unitID, range)
@@ -254,8 +272,8 @@ function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
 	if zombies[unitID] and newTeamID~=GaiaTeamID then
 		zombies[unitID] = nil
 		-- taking away zombie from zombie team unpermaslows it
-		if (ZOMBIES_PERMA_SLOW > 0) then
-			permaSlowDamage(unitID, false)
+		if ZOMBIES_PERMA_SLOW then
+			SetZombieSlow(unitID, false)
 		end
 	elseif newTeamID==GaiaTeamID then
 		gadget:UnitFinished(unitID, unitDefID, newTeamID)
@@ -303,13 +321,10 @@ local function ReInit(reinit)
 				spGiveOrderToUnit(unitID,CMD_MOVE_STATE,{2},{})
 				BringingDownTheHeavens(unitID)
 				zombies[unitID] = true
-				if (ZOMBIES_PERMA_SLOW > 0) then
+				if ZOMBIES_PERMA_SLOW then
 					local maxHealth = select(2, spGetUnitHealth(unitID))
 					if maxHealth then
-						local mult = ZOMBIES_PERMA_SLOW
-						if (mult < 0) then mult = 0 end
-						addSlowDamage(unitID,(maxHealth/2)*mult)
-						permaSlowDamage(unitID, true)
+						SetZombieSlow(unitID, true)
 					end
 				end
 			end

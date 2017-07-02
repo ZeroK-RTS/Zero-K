@@ -394,11 +394,14 @@ function UpdateUnitAttributes(unitID, frame)
 	
 	-- SLOW --
 	local slowState = spGetUnitRulesParam(unitID,"slowState")
+	local zombieSpeedMult = spGetUnitRulesParam(unitID,"zombieSpeedMult")
 	local buildpowerMult = spGetUnitRulesParam(unitID, "buildpower_mult")
 	
-	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or buildpowerMult or
+	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or zombieSpeedMult or buildpowerMult or
 			selfTurnSpeedChange or selfIncomeChange or disarmed or morphDisable or selfAccelerationChange then
-		local baseSpeedMult   = 1 - (slowState or 0)
+		
+		local baseSpeedMult   = (1 - (slowState or 0))*(zombieSpeedMult or 1)
+		
 		local econMult   = (baseSpeedMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)
 		local buildMult  = (baseSpeedMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)*(buildpowerMult or 1)
 		local moveMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)*(upgradesSpeedMult or 1)
@@ -408,7 +411,7 @@ function UpdateUnitAttributes(unitID, frame)
 
 		-- Let other gadgets and widgets get the total effect without 
 		-- duplicating the pevious calculations.
-		spSetUnitRulesParam(unitID, "baseSpeedMult", baseSpeedMult, INLOS_ACCESS) -- Guaraneed not to be 0
+		spSetUnitRulesParam(unitID, "baseSpeedMult", baseSpeedMult, INLOS_ACCESS) -- Guaranteed not to be 0
 		spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult, INLOS_ACCESS)
 		spSetUnitRulesParam(unitID, "totalEconomyChange", econMult, INLOS_ACCESS)
 		spSetUnitRulesParam(unitID, "totalBuildPowerChange", buildMult, INLOS_ACCESS)
