@@ -233,7 +233,7 @@ end
 --------------------------------------------------------------------------------
 
 local function GetMorphRate(unitID)
-	return (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+	return (Spring.GetUnitRulesParam(unitID,"totalBuildPowerChange") or 1)
 end
 
 local function StartMorph(unitID, unitDefID, teamID, morphDef)

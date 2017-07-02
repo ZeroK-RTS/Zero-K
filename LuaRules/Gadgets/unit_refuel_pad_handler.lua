@@ -184,9 +184,10 @@ local function SitOnPad(unitID)
 						drainingEnergy = false
 					end
 				else
-					local slowState = 1 - (spGetUnitRulesParam(landData.padID,"slowState") or 0)
+					local buildPowerMult = spGetUnitRulesParam(landData.padID,"totalBuildPowerChange") or 1
+					Spring.Echo("buildPowerMult", buildPowerMult)
 					if reammoProgress then
-						reammoProgress = reammoProgress + slowState
+						reammoProgress = reammoProgress + buildPowerMult
 						local maxProgress = (reammoHalfSeconds[unitDefID] or REAMMO_HALF_SECONDS)
 						if reammoProgress >= maxProgress then
 							reammoProgress = false
@@ -198,13 +199,13 @@ local function SitOnPad(unitID)
 					end
 					if not reammoProgress then
 						if GG.HasCombatRepairPenalty(unitID) then
-							slowState = slowState/4
+							buildPowerMult = buildPowerMult/4
 						end
 						local hp = spGetUnitHealth(unitID)
 						if hp < maxHP then
-							if drainingEnergy ~= slowState then
-								Spring.SetUnitResourcing(unitID, "uue" ,PAD_ENERGY_DRAIN*slowState)
-								drainingEnergy = slowState
+							if drainingEnergy ~= buildPowerMult then
+								Spring.SetUnitResourcing(unitID, "uue" ,PAD_ENERGY_DRAIN*buildPowerMult)
+								drainingEnergy = buildPowerMult
 							end
 							local _,_,_,energyUse = Spring.GetUnitResources(unitID)
 							spSetUnitHealth(unitID, min(maxHP, hp + healPerHalfSecond*energyUse/PAD_ENERGY_DRAIN))

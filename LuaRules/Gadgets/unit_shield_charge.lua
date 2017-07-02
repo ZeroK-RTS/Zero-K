@@ -74,7 +74,7 @@ local function IsShieldEnabled(unitID)
 end
 
 local function GetChargeRate(unitID)
-	return (1 - (spGetUnitRulesParam(unitID,"slowState") or 0))
+	return (spGetUnitRulesParam(unitID,"totalReloadSpeedChange") or 1)
 end
 
 function gadget:GameFrame(n)

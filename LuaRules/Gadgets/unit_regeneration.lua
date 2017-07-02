@@ -40,8 +40,8 @@ function gadget:GameFrame (frame)
 			unitID = unitList[i]
 			data = units[unitID]
 			if (data.idleFrame < frame) and (not spGetUnitIsStunned(unitID)) and (spGetUnitRulesParam(unitID, "disarmed") ~= 1) then
-				slowMult = (1-(spGetUnitRulesParam(unitID,"slowState") or 0))
-				amount = data.rate * slowMult
+				regenRate = spGetUnitRulesParam(unitID,"totalBuildPowerChange") or 1
+				amount = data.rate * regenRate
 				health = spGetUnitHealth(unitID)
 				if health then
 					spSetUnitHealth(unitID, health + amount)
