@@ -3,7 +3,7 @@ unitDef = {
   name                   = [[Reef]],
   description            = [[Aircraft Carrier (Bombardment), stockpiles disarm missiles at 5 m/s]],
   acceleration           = 0.0354,
-  activateWhenBuilt   	 = true,
+  activateWhenBuilt      = true,
   brakeRate              = 0.0466,
   buildCostMetal         = 3000,
   builder                = false,
@@ -88,6 +88,7 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams        = {
+        combatrange = 950,
         disarmDamageMult = 1.0,
         disarmDamageOnly = 1,
         disarmTimer      = 10, -- seconds

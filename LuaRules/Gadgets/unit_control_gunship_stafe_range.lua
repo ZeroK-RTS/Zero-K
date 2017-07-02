@@ -22,7 +22,9 @@ end
 -------------------------------------------------------------------------------------
 local unitDefsToModify = {}	-- [unitDefID] = {[1] = truerange, [2] = truerange, etc.}
 
-for udID=1,#UnitDefs do
+-- NOTE: truerange is set in weapondefs_posts. Set range with combatrange in weapondefs.
+
+for udID = 1, #UnitDefs do
 	local weapons = UnitDefs[udID].weapons
 	for i=1,#weapons do
 		local wd = WeaponDefs[weapons[i].weaponDef]

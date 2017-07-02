@@ -145,6 +145,7 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
+        combatrange = 900,
 		light_color = [[0.65 0.65 0.18]],
 		light_radius = 380,
       },

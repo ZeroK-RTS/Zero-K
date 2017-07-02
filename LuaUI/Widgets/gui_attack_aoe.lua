@@ -196,8 +196,12 @@ local function getWeaponInfo(weaponDef, unitDef)
 	if (weaponDef.cylinderTargetting >= 100) then
 		retData = {type = "orbital", scatter = scatter}
 	elseif (weaponType == "Cannon") then
-		retData = {type = "ballistic", scatter = scatter, v = (weaponDef.customParams.weaponvelocity or 0),range = weaponDef.range,
-		mygravity = weaponDef.customParams and weaponDef.customParams.mygravity and weaponDef.customParams.mygravity*800
+		retData = {
+			type = "ballistic",
+			scatter = scatter,
+			v = (weaponDef.customParams.weaponvelocity or 0),
+			range = weaponDef.range,
+			mygravity = weaponDef.customParams and weaponDef.customParams.mygravity and weaponDef.customParams.mygravity*800
 		}
 	elseif (weaponType == "MissileLauncher") then
 		local turnRate = 0
@@ -283,8 +287,13 @@ local function SetupUnit(unitDef, unitID)
 				local aoe = weaponDef.damageAreaOfEffect
 				if (weaponDef.manualFire and unitDef.canManualFire) or num == manualfireWeapon then
 					retDgunInfo = getWeaponInfo(weaponDef, unitDef)
-					if retDgunInfo.range and rangeMult then
-						retDgunInfo.range = retDgunInfo.range * rangeMult
+					if retDgunInfo.range then
+						if weaponDef.customParams.truerange then
+							retDgunInfo.range = tonumber(weaponDef.customParams.truerange)
+						end
+						if rangeMult then
+							retDgunInfo.range = retDgunInfo.range * rangeMult
+						end
 					end
 				elseif (not weaponDef.isShield 
 						and not ToBool(weaponDef.interceptor) and not ToBool(weaponDef.customParams.hidden)
