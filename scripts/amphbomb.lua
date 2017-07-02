@@ -17,22 +17,15 @@ local sa = math.rad(20)
 local ma = math.rad(60)
 local la = math.rad(100)
 local pause = 300
-local dirtfling = 1024 +3 --explosiongenerators=[[custom:digdig]]
 
 --variables
 local walking = false
-local burrowed = false
 local forward = 8
 local backward = 5
 local up = 8
 
 --signals
-local SIG_BURROW = 1
 local SIG_Walk = 2
-
---cob values
-local cloaked = COB.CLOAKED
-local stealth = COB.STEALTH
 
 local function Walk()
 	while (walking == true) do
@@ -68,47 +61,6 @@ function script.AimWeapon1()
 	return true
 end
 
-local function Burrow()
-	Signal(SIG_BURROW)
-	SetSignalMask(SIG_BURROW)
-	Sleep(400)
-	
-	Signal(SIG_Walk)
-	burrowed = true
-	EmitSfx(digger, dirtfling)
-	
-	--burrow
-	Move(body, y_axis, -1.500000, 1.500000)
-	Turn(body, x_axis, math.rad(-20.000000), math.rad(20.000000))
-	
-	if(burrowed == true) then
-		GG.SetWantedCloaked(unitID, 1)
-		Spring.UnitScript.SetUnitValue(stealth, 1)
-	end
-end
-
-local function UnBurrow()
-	Signal(SIG_BURROW)
-	burrowed = false
-	GG.SetWantedCloaked(unitID, 0)
-	Spring.UnitScript.SetUnitValue(stealth, 0)
-	Move(body, y_axis, 0.000000, 2.000000)
-	Turn(body, x_axis, 0, math.rad(60.000000))
-	
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.2)
-	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 5)
-	GG.UpdateUnitAttributes(unitID)
-	
-	Sleep(600)
-	
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
-	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
-	GG.UpdateUnitAttributes(unitID)
-	EmitSfx(digger, dirtfling)
-	
-	StartThread(Walk)
-end
-
 local function Moving()
 	Signal(Sig_Walk)
 	SetSignalMask(Sig_Walk)
@@ -116,19 +68,13 @@ local function Moving()
 	Spin(wheell2, x_axis, (12))
 	Spin(wheelr1, x_axis, (12))
 	Spin(wheelr2, x_axis, (12))
-	StartThread(UnBurrow)
 	walking = true
 	StartThread(Walk)
 end
 
 
 function script.StartMoving()
-	Signal(SIG_BURROW)
-	if burrowed then
-		StartThread(UnBurrow)
-	else
-		StartThread(Moving)
-	end
+	StartThread(Moving)
 end
 
 function script.StopMoving()
@@ -137,19 +83,26 @@ function script.StopMoving()
 	StopSpin(wheell2, x_axis, (10))
 	StopSpin(wheelr1, x_axis, (10))
 	StopSpin(wheelr2, x_axis, (10))
-	if select(2,Spring.GetUnitPosition(unitID)) > 0 then
-		StartThread(Burrow) --cloaked
-	end
+end
+
+function Detonate() -- Giving an order causes recursion.
+	GG.QueueUnitDescruction(unitID)
 end
 
 function script.FireWeapon(num)
 	GG.shotWaterWeapon(unitID)
 end
 
-function script.Killed()
+function script.Killed(recentDamage, maxHealth)
 	Explode(body, sfxShatter)
 	Explode(wheell1, sfxSmoke + sfxFire)
 	Explode(wheell2, sfxSmoke + sfxFire)
 	Explode(wheelr1, sfxSmoke + sfxFire)
 	Explode(wheelr2, sfxSmoke + sfxFire)
+	local severity = recentDamage / maxHealth
+	if (severity <= 0.5) then
+		return 1 -- corpsetype
+	else
+		return 2 -- corpsetype
+	end
 end

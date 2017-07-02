@@ -148,7 +148,8 @@ local units = {
 		-- No Amph Artillery
 		amphaa = ANTI_AIR,
 		amphassault = HEAVY_SOMETHING,
-		amphtele = SPECIAL,
+		amphbomb = SPECIAL,
+		amphtele = UTILITY,
 	},
 	factoryship = {
 		shipcon = CONSTRUCTOR,

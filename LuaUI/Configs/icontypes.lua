@@ -333,6 +333,10 @@ local icontypes = {
     bitmap='icons/amphtorpriot.png',
     size=2.6,
   },
+  amphbomb = {
+	bitmap='icons/amphbomb.png',
+    size=1.9,
+  },
   amphtransport = {
     bitmap='icons/amphtransport.png',
     size=2.2,

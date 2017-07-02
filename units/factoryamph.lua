@@ -17,6 +17,7 @@ unitDef = {
     [[amphriot]],	
     [[amphassault]],
     [[amphaa]],
+	[[amphbomb]],
     [[amphtele]],
   },
 
