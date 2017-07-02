@@ -185,7 +185,6 @@ local function SitOnPad(unitID)
 					end
 				else
 					local buildPowerMult = spGetUnitRulesParam(landData.padID,"totalBuildPowerChange") or 1
-					Spring.Echo("buildPowerMult", buildPowerMult)
 					if reammoProgress then
 						reammoProgress = reammoProgress + buildPowerMult
 						local maxProgress = (reammoHalfSeconds[unitDefID] or REAMMO_HALF_SECONDS)
