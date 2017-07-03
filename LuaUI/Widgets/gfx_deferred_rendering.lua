@@ -41,8 +41,6 @@ local glCreateShader         = gl.CreateShader
 local glCreateTexture        = gl.CreateTexture
 local glDeleteShader         = gl.DeleteShader
 local glDeleteTexture        = gl.DeleteTexture
-local glDepthMask            = gl.DepthMask
-local glDepthTest            = gl.DepthTest
 local glGetMatrixData        = gl.GetMatrixData
 local glGetShaderLog         = gl.GetShaderLog
 local glGetUniformLocation   = gl.GetUniformLocation
@@ -286,8 +284,14 @@ function widget:Initialize()
 			widgetHandler:RemoveWidget()
 		else
 			fragSrc = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\deferred_lighting.fs", VFS.ZIP)
+
 			--Spring.Echo('gfx_deferred_rendering.lua: Shader code:', fragSrc)
+
 			depthPointShader = depthPointShader or glCreateShader({
+				defines = {
+					"#define BEAM_LIGHT 0\n",
+					"#define GL_CLIP_CONTROL " .. (Platform.glSupportClipSpaceControl and 1 or 0) .. "\n"
+				},
 				vertex = vertSrc,
 				fragment = fragSrc,
 				uniformInt = {
@@ -310,8 +314,12 @@ function widget:Initialize()
 				uniformEyePosPoint     = glGetUniformLocation(depthPointShader, 'eyePos')
 				uniformViewPrjInvPoint = glGetUniformLocation(depthPointShader, 'viewProjectionInv')
 			end
-			fragSrc = "#define BEAM_LIGHT \n" .. fragSrc
+
 			depthBeamShader = depthBeamShader or glCreateShader({
+				defines = {
+					"#define BEAM_LIGHT 1\n",
+					"#define GL_CLIP_CONTROL " .. (Platform.glSupportClipSpaceControl and 1 or 0) .. "\n"
+				},
 				vertex = vertSrc,
 				fragment = fragSrc,
 				uniformInt = {
