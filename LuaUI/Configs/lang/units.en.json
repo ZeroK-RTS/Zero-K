@@ -136,7 +136,7 @@
 	},
 	"amphbomb" : {
 		"name" : "Limpet",
-		"description" : "Amphibious slow mine",
+		"description" : "Amphibious slow bomb",
 		"helptext" : "The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them."
 	},
 	"factoryveh" : {
@@ -1104,11 +1104,6 @@
 		"description" : "Amphibious Raider Bot (Anti-Sub)",
 		"helptext" : "The Duck is the basic underwater raider. Armed with short ranged torpedoes, it uses its (relatively) high speed to harass sea targets that cannot shoot back, though it dies to serious opposition. On land it can launch the torpedoes a short distance as a decent short ranged anti-heavy weapon."
 	},
-	"amphbomb" : {
-		"name" : "Limpet",
-		"description" : "Amphibious Slow Mine",
-		"helptext" : "The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them."
-	}
 	"planefighter" : {
 		"name" : "Swift",
 		"description" : "Multi-role Fighter",
