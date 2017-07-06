@@ -59,7 +59,7 @@ local armsFree = true
 local inBuildAnim = false
 local dgunning = false
 
-local SPEEDUP_FACTOR = 1.0
+local SPEEDUP_FACTOR = 1.15
 local REF_TURN_SPEED = 185  -- deg/s
 local walkTurnSpeed1 = 1
 local walkSleepMult = 1.0
@@ -150,11 +150,10 @@ local function RestoreAfterDelay()
 end
 
 local function Walk()
-	
 	if (bMoving ) then
 		Turn(pelvis, x_axis, math.rad(6), math.rad(30 * animationSpeedMult)) --tilt forward
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(3.335165))
+			Turn(torso, y_axis, math.rad(3.335165), math.rad(walkTurnSpeed1))
 		end
 
 		Move(pelvis, y_axis, 0)
@@ -168,7 +167,7 @@ local function Walk()
 
 	if (bMoving ) then
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(1.681319))
+			Turn(torso, y_axis, math.rad(1.681319), math.rad(walkTurnSpeed1))
 		end
 		Turn(rupleg, x_axis, math.rad(-5.269231)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lupleg, x_axis, math.rad(-20.989011)*walkAngleMult, math.rad(walkTurnSpeed1))
@@ -181,7 +180,7 @@ local function Walk()
 	if (bMoving ) then
 		Turn(pelvis, x_axis, math.rad(0), math.rad(30 * animationSpeedMult))
 		if not bAiming then
-			Turn(torso, y_axis, 0)
+			Turn(torso, y_axis, 0, math.rad(walkTurnSpeed1))
 		end
 		Turn(rupleg, x_axis, math.rad(-9.071429)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lupleg, x_axis, math.rad(-12.670330)*walkAngleMult, math.rad(walkTurnSpeed1))
@@ -193,7 +192,7 @@ local function Walk()
 
 	if (bMoving ) then
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(-1.77))
+			Turn(torso, y_axis, math.rad(-1.77), math.rad(walkTurnSpeed1))
 		end
 		Turn(rupleg, x_axis, math.rad(-21.357143)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lupleg, x_axis, math.rad(2.824176)*walkAngleMult, math.rad(walkTurnSpeed1))
@@ -206,7 +205,7 @@ local function Walk()
 
 	if (bMoving ) then	
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(3.15))
+			Turn(torso, y_axis, math.rad(-3.15), math.rad(walkTurnSpeed1))
 		end
 		Turn(rupleg, x_axis, math.rad(-35.923077)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lupleg, x_axis, math.rad(7.780220)*walkAngleMult, math.rad(walkTurnSpeed1))
@@ -220,7 +219,7 @@ local function Walk()
 	
 		Turn(pelvis, x_axis, math.rad(6), math.rad(30 * animationSpeedMult)) --tilt forward
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(-4.21))
+			Turn(torso, y_axis, math.rad(-4.21), math.rad(walkTurnSpeed1))
 		end
 		Turn(rupleg, x_axis, math.rad(-37.780220)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lupleg, x_axis, math.rad(10.137363)*walkAngleMult, math.rad(walkTurnSpeed1))
@@ -232,7 +231,7 @@ local function Walk()
 	
 	if (bMoving ) then			
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(-3.15))
+			Turn(torso, y_axis, math.rad(-3.15), math.rad(walkTurnSpeed1))
 		end
 		Turn(rupleg, x_axis, math.rad(-28.758242)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lupleg, x_axis, math.rad(12.247253)*walkAngleMult, math.rad(walkTurnSpeed1))
@@ -244,7 +243,7 @@ local function Walk()
 
 	if (bMoving ) then
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(-1.88))
+			Turn(torso, y_axis, math.rad(-1.88), math.rad(walkTurnSpeed1))
 		end
 		Turn(rupleg, x_axis, math.rad(-22.824176)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lupleg, x_axis, math.rad(2.824176)*walkAngleMult, math.rad(walkTurnSpeed1))
@@ -256,7 +255,7 @@ local function Walk()
 	if (bMoving ) then
 		Turn(pelvis, x_axis, math.rad(0), math.rad(30 * animationSpeedMult)) 
 		if not bAiming then
-			Turn(torso, y_axis, 0)
+			Turn(torso, y_axis, 0, math.rad(walkTurnSpeed1))
 		end
 		Turn(rupleg, x_axis, math.rad(-11.604396)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lupleg, x_axis, math.rad(-6.725275)*walkAngleMult, math.rad(walkTurnSpeed1))
@@ -269,7 +268,7 @@ local function Walk()
 	
 	if (bMoving ) then	
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(1.88))
+			Turn(torso, y_axis, math.rad(1.88), math.rad(walkTurnSpeed1))
 		end
 		Turn(rupleg, x_axis, math.rad(1.857143)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lupleg, x_axis, math.rad(-24.357143)*walkAngleMult, math.rad(walkTurnSpeed1))
@@ -282,7 +281,7 @@ local function Walk()
 
 	if (bMoving ) then	
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(3.15))
+			Turn(torso, y_axis, math.rad(3.15), math.rad(walkTurnSpeed1))
 		end
 		Turn(rupleg, x_axis, math.rad(7.148352)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lupleg, x_axis, math.rad(-28.181319)*walkAngleMult, math.rad(walkTurnSpeed1))
@@ -291,14 +290,14 @@ local function Walk()
 	
 	if (bMoving ) then
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(4.20))
+			Turn(torso, y_axis, math.rad(4.20), math.rad(walkTurnSpeed1))
 		end
 		Turn(rupleg, x_axis, math.rad(8.423077)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lupleg, x_axis, math.rad(-32.060440)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lloleg, x_axis, math.rad(27.527473)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(lfoot, x_axis, math.rad(-2.857143)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Turn(rloleg, x_axis, math.rad(24.670330)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rfoot, x_axis, math.rad(-33.313187)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rfoot, x_axis, math.rad(-26.313187)*walkAngleMult, math.rad(walkTurnSpeed1))
 		Sleep(160 * walkSleepMult )
 	end
 end
@@ -306,6 +305,7 @@ end
 
 local function MotionSpeedControl()
 	REF_SPEED = GetUnitValue(COB.MAX_SPEED)
+	Sleep(33)
 	while true do
 
 		sizeSpeedMult = dyncomm.GetPace()

@@ -54,22 +54,27 @@ for key, value in pairs(levelScale) do
 	levelToPace[key] = 1/value
 end
 
+local function GetLevel()
+	local ud = UnitDefs[unitDefID]
+	return Spring.GetUnitRulesParam(unitID, "comm_level") or tonumber(ud.customParams.level) or 0
+end
+
 local function CalculatePaceMult()
-	paceMult = levelToPace[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelToPace[5]
+	paceMult = levelToPace[GetLevel()] or levelToPace[5]
 	return paceMult
 end
 
 local function GetPace()
-	return CalculatePaceMult() --paceMult or CalculatePaceMult()
+	return paceMult or CalculatePaceMult()
 end
 
 local function CalculateScaleMult()
-	scaleMult = levelScale[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelScale[5]
+	scaleMult = levelScale[GetLevel()] or levelScale[5]
 	return scaleMult
 end
 
 local function GetScale()
-	return CalculateScaleMult() --scaleMult or CalculateScaleMult()
+	return scaleMult or CalculateScaleMult()
 end
 
 local function GetWeapon(num)
