@@ -55,21 +55,21 @@ for key, value in pairs(levelScale) do
 end
 
 local function CalculatePaceMult()
-	paceMult = levelScale[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelScale[5]
+	paceMult = levelToPace[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelToPace[5]
 	return paceMult
 end
 
 local function GetPace()
-	return paceMult or CalculatePaceMult()
+	return CalculatePaceMult() --paceMult or CalculatePaceMult()
 end
 
 local function CalculateScaleMult()
-	scaleMult = levelToPace[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelToPace[5]
+	scaleMult = levelScale[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelScale[5]
 	return scaleMult
 end
 
 local function GetScale()
-	return scaleMult or CalculateScaleMult()
+	return CalculateScaleMult() --scaleMult or CalculateScaleMult()
 end
 
 local function GetWeapon(num)
