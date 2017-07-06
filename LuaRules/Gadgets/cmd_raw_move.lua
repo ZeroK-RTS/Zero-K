@@ -86,6 +86,10 @@ for i = 1, #UnitDefs do
 			canFlyDefs[i] = true
 			stopDist = ud.speed
 			loneStopDist = ud.speed*0.66
+			if ud.isHoveringAirUnit then
+				stopDist = math.min(stopDist, 120)
+				loneStopDist = math.min(loneStopDist, 80)
+			end
 			goalDist[i] = 8
 		end
 		if stopDist then
