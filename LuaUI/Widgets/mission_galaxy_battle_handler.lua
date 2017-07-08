@@ -15,6 +15,8 @@ function widget:GetInfo()
 	}
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
 if not campaignBattleID then
 	return
@@ -28,6 +30,7 @@ local Chili
 
 local WIN_MESSAGE = "Campaign_PlanetBattleWon"
 local LOST_MESSAGE = "Campaign_PlanetBattleLost"
+local LOAD_CAMPAIGN_MESSAGE = "Campaign_LoadCampaign"
 local myAllyTeamID = Spring.GetMyAllyTeamID()
 
 local SUCCESS_ICON = LUAUI_DIRNAME .. "images/tick.png"
@@ -263,6 +266,15 @@ local function SendDefeatToLuaMenu(planetID)
 end
 
 function widget:GameOver(winners)
+	if Spring.IsReplay() then
+		return
+	end
+	
+	local campaignSaveName = Spring.GetModOptions().singleplayercampaignsavename
+	if campaignSaveName and campaignSaveName ~= "" then
+		Spring.SendLuaMenuMsg(LOAD_CAMPAIGN_MESSAGE .. campaignSaveName)
+	end
+	
 	if bonusObjectiveBlock then
 		bonusObjectiveBlock.Update()
 	end
