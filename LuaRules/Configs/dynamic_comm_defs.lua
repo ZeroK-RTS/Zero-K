@@ -1,4 +1,11 @@
-local skinDefs = VFS.Include("LuaRules/Configs/dynamic_comm_skins.lua")
+
+local skinDefs
+local SKIN_FILE = "LuaRules/Configs/dynamic_comm_skins.lua"
+if VFS.FileExists(SKIN_FILE) then
+	skinDefs = VFS.Include(SKIN_FILE)
+else
+	skinDefs = {}
+end
 
 local UNBOUNDED_LEVEL = true
 local COST_MULT = 1

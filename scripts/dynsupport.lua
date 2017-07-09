@@ -426,10 +426,10 @@ local function AimRifle(heading, pitch, isDgun)
 		dgunning = true
 	end
 	
-	if pitch < -0.75 then
-		Move(flare, z_axis, -16)
+	if pitch < -0.3 then
+		Move(flare, z_axis, pitch*20 - 10)
 	else
-		Move(flare, z_axis, 0)
+		Move(flare, z_axis, -2)
 	end
 	
 	--torso	
