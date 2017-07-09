@@ -31,7 +31,7 @@ end
 local modOptions = Spring.GetModOptions()
 
 local getMovetype = Spring.Utilities.getMovetype
-  
+
 VFS.Include("LuaRules/Configs/CAI/accessory/targetReachableTester.lua")
 
 local spGetGroundHeight           = Spring.GetGroundHeight
@@ -89,11 +89,11 @@ if (tonumber(ZOMBIES_REZ_SPEED) == nil) then
 	ZOMBIES_REZ_SPEED = 12
 end
 
-local ZOMBIES_PERMA_SLOW = tonumber(modOptions.zombies_permaslow) 
-if (tonumber(ZOMBIES_PERMA_SLOW) == nil) then 
+local ZOMBIES_PERMA_SLOW = tonumber(modOptions.zombies_permaslow)
+if (tonumber(ZOMBIES_PERMA_SLOW) == nil) then
 	-- from 0 to 1, symbolises from 0% to 50% slow which is always on
-	ZOMBIES_PERMA_SLOW = 1 
-end 
+	ZOMBIES_PERMA_SLOW = 1
+end
 if ZOMBIES_PERMA_SLOW == 0 then
 	ZOMBIES_PERMA_SLOW = nil
 else
@@ -215,16 +215,29 @@ local function CheckZombieOrders(unitID)	-- i can't rely on Idle because if for 
 	end
 end
 
+local function myGetFeatureRessurect(fId)
+	local resName,face=spGetFeatureResurrect(fId)
+	if resName=="" then
+		local featureDef = FeatureDefs[Spring.GetFeatureDefID(fId)]
+		local featureName = featureDef.name or ""
+		if featureDef.resurrectable == 1 then
+			resName = featureName:gsub('(.*)_.*', '%1') --filter out _dead
+			face = face or 0
+		end
+	end
+	return resName,face
+end
+
 function gadget:GameFrame(f)
 	gameframe = f
 	if (f%32)==0 then
 		local spSpawnCEG = Spring.SpawnCEG -- putting the localization here because cannot localize in global scope since spring 97
 		for id, time_to_spawn in pairs(zombies_to_spawn) do
 			local x,y,z=spGetFeaturePosition(id)
-			
+
 			if time_to_spawn <= f then
 				zombies_to_spawn[id] = nil
-				local resName,face=spGetFeatureResurrect(id)
+				local resName,face=myGetFeatureRessurect(id)
 				spDestroyFeature(id)
 				local unitID = spCreateUnit(resName,x,y,z,face,GaiaTeamID)
 				if (unitID) then
@@ -235,21 +248,21 @@ function gadget:GameFrame(f)
 				end
 			else
 				local steps_to_spawn = floor((time_to_spawn-f) / 32)
-				local resName,face=spGetFeatureResurrect(id);
+				local resName,face=myGetFeatureRessurect(id);
 				if steps_to_spawn <= WARNING_TIME then
 					local r = Spring.GetFeatureRadius(id);
-					
+
 					spSpawnCEG( CEG_SPAWN,
 						x,y,z,
 						0,0,0,
 						10+r, 10+r
 					);
-					
+
 					if steps_to_spawn == WARNING_TIME then
 						--SendToUnsynced("zombie_sound", x, y, z);
 					end
 				end
-			end 
+			end
 		end
 	end
 	if (f%640)==1 then
@@ -285,13 +298,14 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 end
 
 local UnitFinished = function(_,_,_) end
-  
+
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	UnitFinished(unitID, unitDefID, teamID)
 end
 
 function gadget:FeatureCreated(featureID, allyTeam)
-	local resName, face = spGetFeatureResurrect(featureID)
+	local resName, face = myGetFeatureRessurect(featureID)
+	Spring.Echo(resName)
 	if resName and face and not(zombies_to_spawn[featureID]) then
 		if UnitDefNames[resName] then
 			local rez_time = UnitDefNames[resName].metalCost / ZOMBIES_REZ_SPEED
@@ -347,7 +361,7 @@ local function ReInit(reinit)
 		end
 	end
 end
-		
+
 function gadget:Initialize()
 	Spring.Echo("Initializing gadget");
 	if not (tonumber(modOptions.zombies) == 1) then
