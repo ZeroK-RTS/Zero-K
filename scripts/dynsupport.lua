@@ -59,7 +59,7 @@ local armsFree = true
 local inBuildAnim = false
 local dgunning = false
 
-local SPEEDUP_FACTOR = 1.15
+local SPEEDUP_FACTOR = 1.1
 local REF_TURN_SPEED = 185  -- deg/s
 local walkTurnSpeed1 = 1
 local walkSleepMult = 1.0
