@@ -305,7 +305,6 @@ end
 
 function gadget:FeatureCreated(featureID, allyTeam)
 	local resName, face = myGetFeatureRessurect(featureID)
-	Spring.Echo(resName)
 	if resName and face and not(zombies_to_spawn[featureID]) then
 		if UnitDefNames[resName] then
 			local rez_time = UnitDefNames[resName].metalCost / ZOMBIES_REZ_SPEED
