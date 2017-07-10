@@ -16,7 +16,7 @@ unitDef = {
   customParams           = {
     amph_regen = 20,
     amph_submerged_at = 40,
-	sink_on_emp    = 1,
+    sink_on_emp    = 1,
     floattoggle = [[1]],
   },
 
@@ -40,8 +40,8 @@ unitDef = {
 
   sfxtypes               = {
     explosiongenerators = {
-	  [[custom:STORMMUZZLE]],
-	  [[custom:STORMBACK]],
+      [[custom:STORMMUZZLE]],
+      [[custom:STORMBACK]],
     },
   },
 
@@ -71,7 +71,7 @@ unitDef = {
       name                    = [[Missile Pack]],
       areaOfEffect            = 48,
       burst                   = 4,
-      burstRate               = 0.4,
+      burstRate               = 0.32,
       canAttackGround         = false,
       cegTag                  = [[missiletrailblue]],
       craterBoost             = 1,
@@ -79,9 +79,9 @@ unitDef = {
       cylinderTargeting       = 1,
 
       customParams            = {
-          isaa = [[1]],
-		light_color = [[0.5 0.6 0.6]],
-		light_radius = 380,
+        isaa = [[1]],
+        light_color = [[0.5 0.6 0.6]],
+        light_radius = 380,
       },
 
       damage                  = {
@@ -93,13 +93,13 @@ unitDef = {
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
       flightTime              = 3,
-	  impactOnly              = true,
+      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
-      range                   = 750,
+      range                   = 820,
       reloadtime              = 12,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],
