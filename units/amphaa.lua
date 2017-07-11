@@ -70,8 +70,6 @@ unitDef = {
     MISSILE = {
       name                    = [[Missile Pack]],
       areaOfEffect            = 48,
-      burst                   = 4,
-      burstRate               = 0.32,
       canAttackGround         = false,
       cegTag                  = [[missiletrailblue]],
       craterBoost             = 1,
@@ -80,6 +78,8 @@ unitDef = {
 
       customParams            = {
         isaa = [[1]],
+        script_reload = [[12]],
+        script_burst = [[4]],
         light_color = [[0.5 0.6 0.6]],
         light_radius = 380,
       },
@@ -100,7 +100,7 @@ unitDef = {
       model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
       range                   = 820,
-      reloadtime              = 12,
+      reloadtime              = 0.32,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],
