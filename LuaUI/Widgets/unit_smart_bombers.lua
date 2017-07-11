@@ -59,10 +59,14 @@ local function CheckUnit(unitID, unitDefID)
 	end
 	local cmd = GetFirstCommand(unitID)
 	if cmd and (cmd.id == CMD.FIGHT or cmd.id == CMD.PATROL) then
+		local oldFirestate = Spring.GetUnitStates(unitID).firestate or 0
 		spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, {""}) -- fire at will
-		fightingBombers[unitID] = true
+		fightingBombers[unitID] = oldFirestate
 	else
-		spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {""}) -- hold fire
+		local oldFirestate = fightingBombers[unitID]
+		if oldFirestate then
+			spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {oldFirestate}, {""}) -- restore old firestate
+		end
 		reservedBombers[unitID] = true
 	end
 end
@@ -78,13 +82,16 @@ local function CheckBombers()
 			if cmd and (cmd.id == CMD.FIGHT or cmd.id == CMD.PATROL) then
 				-- do nothing
 			else
-				spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {""})
+				local oldFirestate = fightingBombers[unitID]
+				if oldFirestate then
+					spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {oldFirestate}, {""}) -- restore old firestate
+				end
 				fightingBombers[unitID] = nil
 				reservedBombers[unitID] = true
 			end
 		end
 	end
-	
+
 	for unitID, _ in pairs(reservedBombers) do
 		-- clean dead or captured bombers
 		if (not Spring.ValidUnitID(unitID) or Spring.GetUnitTeam(unitID) ~= myTeamID) then
@@ -93,8 +100,9 @@ local function CheckBombers()
 			-- swap bombers whose commands have changed and update their firestate
 			local cmd = GetFirstCommand(unitID)
 			if cmd and (cmd.id == CMD.FIGHT or cmd.id == CMD.PATROL) then
-				spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, {""})
-				fightingBombers[unitID] = true
+				local oldFirestate = Spring.GetUnitStates(unitID).firestate or 0
+				spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, {""}) -- fire at will
+				fightingBombers[unitID] = oldFirestate
 				reservedBombers[unitID] = nil
 			else
 				-- do nothing
@@ -109,6 +117,10 @@ end
 
 function widget:Initialize()
 	CheckSpec()
+	local myTeamID = Spring.GetMyTeamID()
+	for _, unitID in pairs(Spring.GetTeamUnits(myTeamID)) do
+		widget:UnitFinished(unitID, Spring.GetUnitDefID(unitID), myTeamID)
+	end
 end
 
 function widget:PlayerChanged()
