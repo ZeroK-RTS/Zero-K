@@ -83,10 +83,11 @@ local function ScrapUnit(unitID, unitDefID, team, progress, face)
 			local featureID = spCreateFeature(wreck, x, y, z, face, allyTeam)
 			if featureID then
 				Spring.TransferFeature(featureID, team)
-				local maxHealth = FeatureDefs[wreck].maxHealth
-				spSetFeatureReclaim(featureID, progress)
-				--spSetFeatureResurrect(featureID, UnitDefs[unitDefID].name, face)
-				spSetFeatureHealth(featureID, progress*maxHealth)
+
+				local currentMetal = progress * FeatureDefs[wreck].metal
+				Spring.SetFeatureResources(featureID, currentMetal, 0, currentMetal, progress)
+
+				spSetFeatureHealth(featureID, progress * FeatureDefs[wreck].maxHealth)
 			else
 				Spring.Echo("No featureID", wreck)
 			end
