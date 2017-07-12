@@ -1,16 +1,19 @@
 include "constants.lua"
 
 -- Pieces
-local base = piece 'base' 
-local body = piece 'body' 
-local turret = piece 'turret' 
-local launcher1 = piece 'launcher1' 
-local launcher2 = piece 'launcher2' 
-local firepoint1 = piece 'firepoint1' 
-local firepoint2 = piece 'firepoint2' 
+local base = piece 'base'
+local body = piece 'body'
+local turret = piece 'turret'
+local launcher1 = piece 'launcher1'
+local launcher2 = piece 'launcher2'
+local firepoint1 = piece 'firepoint1'
+local firepoint2 = piece 'firepoint2'
 
-local shotNum = 1
-local firepoint = {firepoint1, firepoint2}
+local shot = 0
+local gun = {
+	[0] = {firepoint = firepoint1, loaded = true},
+	[1] = {firepoint = firepoint2, loaded = true},
+}
 
 local SIG_AIM = 1
 local SIG_SPIN = 2
@@ -21,7 +24,7 @@ local function Spinner()
 	Signal(SIG_SPIN)
 	SetSignalMask(SIG_SPIN)
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do
-		Sleep(1000) 
+		Sleep(1000)
 	end
 	while not aiming do
 		Turn(turret, y_axis, math.rad(45), math.rad(20))
@@ -45,13 +48,13 @@ function script.AimWeapon(num, heading, pitch)
 
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	
+
 	aiming = true
-	
+
 	Turn(turret, y_axis, heading, math.rad(200))
-	Turn(launcher1, x_axis, -pitch, math.rad(100))
-	Turn(launcher2, x_axis, -pitch, math.rad(100))
-	
+	Turn(launcher1, x_axis, -pitch, math.rad(200))
+	Turn(launcher2, x_axis, -pitch, math.rad(200))
+
 	--local _, curHeading = Spring.GetUnitPieceDirection(unitID, turret)
 	--local curPitch = Spring.GetUnitPieceDirection(unitID, launcher1)
 	--
@@ -65,15 +68,30 @@ function script.AimWeapon(num, heading, pitch)
 	--end
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(launcher1, x_axis)
-	
+
 	StartThread(RestoreAfterDelay)
-	
+
 	return true
 end
 
+local function reload(num)
+	gun[num].loaded = false
+
+	local adjustedDuration = 0
+	while adjustedDuration < 15 do --unlock shooting
+		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
+		adjustedDuration = adjustedDuration + reloadMult
+		Sleep(1000)
+	end
+
+	gun[num].loaded = true
+end
+
 function script.Shot()
-	EmitSfx(firepoint[shotNum], UNIT_SFX1)
-	shotNum = 3 - shotNum
+	EmitSfx(gun[shot].firepoint, UNIT_SFX1)
+	StartThread(reload,shot)
+	shot = (shot + 1)%2
 end
 
 
@@ -82,11 +100,15 @@ function script.AimFromWeapon()
 end
 
 function script.QueryWeapon(piecenum)
-	return firepoint[shotNum]
+	return gun[shot].firepoint
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 1050.2, 40)
+	if gun[shot].loaded then
+		local distMult = (Spring.ValidUnitID(targetID) and Spring.GetUnitSeparation(unitID, targetID) or 0)/430
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 600.1, 25 * distMult)
+	end
+	return true
 end
 
 function script.Create()
