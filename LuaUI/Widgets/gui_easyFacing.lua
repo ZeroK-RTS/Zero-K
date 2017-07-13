@@ -296,11 +296,15 @@ function drawOrientation()
 	local function drawFunc()
 		glVertex( 0, 0, -8)
 		glVertex( 0, 0, 8)
-		glVertex( 50, 0, -3)
+		glVertex( 48, 0, -3)
 
 		glVertex( 0, 0,  8)
-		glVertex( 50, 0, 3)
-		glVertex( 50, 0, -3 )
+		glVertex( 48, 0, 3)
+		glVertex( 48, 0, -3 )
+		
+		glVertex( 50, 0,  0)
+		glVertex( 48, 0, 3)
+		glVertex( 48, 0, -3 )
 		
 		glVertex( 50, 0, 0)
 		glVertex( 30, 0, -30 )
