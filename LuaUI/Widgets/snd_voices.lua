@@ -15,6 +15,8 @@ function widget:GetInfo()
 	}
 end
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 --[[
 -- Features:
 _ Add many units replies.
@@ -607,7 +609,7 @@ function widget:CommandNotify(commandID, params ,options)
     end
 
 
-  elseif (commandID == CMD.MOVE) then
+  elseif (commandID == CMD.MOVE or commandID == CMD_RAW_MOVE) then
     if (IsStructure(unitID)) then
       CoolPlay("movef", 3)
     else

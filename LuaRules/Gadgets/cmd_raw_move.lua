@@ -28,6 +28,7 @@ local CMD_INSERT  = CMD.INSERT
 local CMD_REMOVE  = CMD.REMOVE
 local CMD_REPAIR  = CMD.REPAIR
 local CMD_RECLAIM = CMD.RECLAIM
+local CMD_MOVE    = CMD.MOVE
 
 local MAX_UNITS = Game.maxUnits
 
@@ -198,7 +199,8 @@ local constructorCount = 0
 local constructorsPerFrame = 0
 local constructorIndex = 1
 
-local fastConstructorUpdate = {}
+local moveCommandReplacementUnits
+local fastConstructorUpdate
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
@@ -428,6 +430,11 @@ function gadget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	if cmdID == CMD_MOVE and not canFlyDefs[unitDefID] then
+		moveCommandReplacementUnits = moveCommandReplacementUnits or {}
+		moveCommandReplacementUnits[#moveCommandReplacementUnits + 1] = unitID
+	end
+	
 	if constructorBuildDistDefs[unitDefID] and not rawBuildUpdateIgnore[cmdID] then
 		fastConstructorUpdate = fastConstructorUpdate or {}
 		fastConstructorUpdate[#fastConstructorUpdate + 1] = unitID
@@ -563,6 +570,7 @@ local function UpdateConstructors(n)
 				CheckConstructorBuild(fastConstructorUpdate[i])
 			end
 		end
+		fastConstructorUpdate = nil
 	end
 	
 	local count = 0

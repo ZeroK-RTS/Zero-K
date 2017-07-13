@@ -56,6 +56,7 @@ end
 local TargetKeepingCommand = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_BUILD] = true,
 	[CMD_JUMP] = true,
 	[CMD.REPAIR] = true,
 	[CMD.RECLAIM] = true,

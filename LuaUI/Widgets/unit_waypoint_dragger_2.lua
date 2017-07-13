@@ -53,6 +53,7 @@ local cmdColorsTbl = {
 	[CMD_JUMP]         = {0.0, 1.0, 0.0, 0.7},
 }
 
+-- CMD_RAW_BUILD is intentionally not included because it will always be below another command
 local POINT_COMMAND = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,

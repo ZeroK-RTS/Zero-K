@@ -254,7 +254,6 @@ local glCallList	= gl.CallList
 local glDeleteList	= gl.DeleteList
 
 local CMD_WAIT    	= CMD.WAIT
-local CMD_MOVE     	= CMD.MOVE
 local CMD_PATROL  	= CMD.PATROL
 local CMD_REPAIR    = CMD.REPAIR
 local CMD_RESURRECT    = CMD.RESURRECT
@@ -862,7 +861,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			local x,y,z = spGetUnitPosition(unitID)
 			dx = dx*facScale
 			dz = dz*facScale
-			spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- replace the fac rally orders with a short distance move.
+			spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {x+dx, y, z+dz}, {""}) -- replace the fac rally orders with a short distance move.
 		end
 	end
 end
@@ -1008,7 +1007,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		spGiveOrderToUnit(unitID, CMD_REMOVE, {CMD_RECLAIM}, {"alt"})
 		spGiveOrderToUnit(unitID, CMD_STOP, {}, {""})
 		local y = spGetGroundHeight(territoryCenter.x, territoryCenter.z)
-		spGiveOrderToUnit(unitID, CMD_MOVE, {territoryCenter.x, y, territoryCenter.z}, {""})
+		spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {territoryCenter.x, y, territoryCenter.z}, {""})
 		includedBuilders[unitID].cmdtype = commandType.ckn
 		movingUnits[unitID] = frame
 		key = busyUnits[unitID]
@@ -1449,7 +1448,7 @@ function GiveWorkToUnit(unitID)
 		else -- for repair/reclaim/resurrect
 			if not myJob.target then -- for area commands
 				if not spIsPosInLos(myJob.x, myJob.y, myJob.z, spGetMyAllyTeamID()) then -- if the job is outside of LOS, we need to convert it to a move command or else the units won't bother exploring it.
-					spGiveOrderToUnit(unitID, CMD_MOVE, {myJob.x, myJob.y, myJob.z}, {""})
+					spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {myJob.x, myJob.y, myJob.z}, {""})
 					if myJob.alt then -- if alt was held, the job should remain 'permanent'
 						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {"alt", "shift"})
 					else -- for normal area jobs
@@ -1880,11 +1879,11 @@ function CheckMovingUnits()
 				local dx, _, dz = spGetUnitDirection(unitID)
 				dx = dx*-125
 				dz = dz*-125
-				spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- move it in the opposite direction it was facing.
+				spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {x+dx, y, z+dz}, {""}) -- move it in the opposite direction it was facing.
 				movingUnits[unitID] = frame
 			elseif includedBuilders[unitID].cmdtype == commandType.ckn and frame - lastMovFrame > 600 then
 				local x,y,z = spGetUnitPosition(unitID)
-				spGiveOrderToUnit(unitID, CMD_REMOVE, {CMD_MOVE}, {"alt"}) -- remove the current order
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {CMD_RAW_MOVE}, {"alt"}) -- remove the current order
 				-- note: options "alt" with CMD_REMOVE tells it to use params as command ids, which is what we want.
 				spGiveOrderToUnit(unitID, CMD_STOP, {}, {""}) -- and replace it with a stop order
 				includedBuilders[unitID].cmdtype = commandType.idle
@@ -2043,7 +2042,7 @@ function CleanOrders(cmd, isNew)
 					local dx, dz = GetNormalizedDirection(cx, cz, x, z) 
 					dx = dx*75
 					dz = dz*75
-					spGiveOrderToUnit(blockerID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- move it out of the way
+					spGiveOrderToUnit(blockerID, CMD_RAW_MOVE, {x+dx, y, z+dz}, {""}) -- move it out of the way
 					includedBuilders[blockerID].cmdtype = commandType.mov -- and mark it with a special state so the move order doesn't get clobbered
 					movingUnits[blockerID] = frame
 					if busyUnits[blockerID] then -- also remove it from busyUnits if necessary, and remove its assignment listing from buildQueue
