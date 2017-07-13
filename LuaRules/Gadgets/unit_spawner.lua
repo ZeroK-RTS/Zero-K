@@ -927,6 +927,11 @@ local function MorphQueen()
 	-- store values to be copied
 	local tempID = data.queenID
 	local x, y, z = spGetUnitPosition(tempID)
+	if not (x and y and z) then	-- invalid position somehow, try again in a bit
+		data.morphFrame = data.morphFrame + 60
+		return
+	end
+	
 	local oldHealth,oldMaxHealth,paralyzeDamage,captureProgress,buildProgress = Spring.GetUnitHealth(tempID)
 	local xp = Spring.GetUnitExperience(tempID)
 	local heading = Spring.GetUnitHeading(tempID)
