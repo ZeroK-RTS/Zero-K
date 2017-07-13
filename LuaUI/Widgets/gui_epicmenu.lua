@@ -172,7 +172,7 @@ for k,v in pairs(KEYSYMS) do
 	keysyms['' .. k] = v
 end
 --]]
-local get_key = false
+local get_key, get_key_bind_mod = false, false
 local kb_path, kb_button, kb_control, kb_option, kb_action
 
 local transkey = include("Configs/transkey.lua")
@@ -1387,6 +1387,7 @@ local function MakeKeybindWindow( path, option, hotkeyButton, optionControl, opt
 	local window_width = 300
 	
 	get_key = true
+	get_key_bind_mod = option.bindMod
 	kb_path = path
 	kb_button = hotkeyButton
 	kb_control = optionControl
@@ -3110,18 +3111,20 @@ function widget:GameFrame(n)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if key == KEYSYMS.LCTRL 
-		or key == KEYSYMS.RCTRL 
-		or key == KEYSYMS.LALT
-		or key == KEYSYMS.RALT
-		or key == KEYSYMS.LSHIFT
-		or key == KEYSYMS.RSHIFT
-		or key == KEYSYMS.LMETA
-		or key == KEYSYMS.RMETA
-		or key == KEYSYMS.SPACE
-		then
-		
-		return
+	if not get_key_bind_mod then
+		if key == KEYSYMS.LCTRL 
+			or key == KEYSYMS.RCTRL 
+			or key == KEYSYMS.LALT
+			or key == KEYSYMS.RALT
+			or key == KEYSYMS.LSHIFT
+			or key == KEYSYMS.RSHIFT
+			or key == KEYSYMS.LMETA
+			or key == KEYSYMS.RMETA
+			or key == KEYSYMS.SPACE
+			then
+			
+			return
+		end
 	end
 	
 	local modstring = 
@@ -3134,10 +3137,14 @@ function widget:KeyPress(key, modifier, isRepeat)
 	if get_key then
 		get_key = false
 		window_getkey:Dispose()
+		if get_key_bind_mod then
+			modstring = ''
+			get_key_bind_mod = false
+		end
 		translatedkey = transkey[ keysyms[''..key]:lower() ] or keysyms[''..key]:lower()
-		--local hotkey = { key = translatedkey, mod = modstring, }		
+		--local hotkey = { key = translatedkey, mod = modstring, }
 		translatedkey = translatedkey:gsub("n_", "") -- Remove 'n_' prefix from number keys.
-		local hotkey = modstring .. translatedkey	
+		local hotkey = modstring .. translatedkey
 		
 		Spring.Echo("Binding key code", key, "Translated", translatedkey, "Modifer", modstring)
 		

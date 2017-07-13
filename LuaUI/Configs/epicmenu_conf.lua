@@ -89,7 +89,7 @@ local function AddOption(path, option)
 end
 
 --ShortHand for adding a button
-local function ShButton(path, caption, action2, tooltip, advanced, icon, DisableFunc)
+local function ShButton(path, caption, action2, tooltip, advanced, icon, DisableFunc, bindMod)
 	AddOption(path,
 	{
 		type='button',
@@ -98,6 +98,7 @@ local function ShButton(path, caption, action2, tooltip, advanced, icon, Disable
 		action = (type(action2) == 'string' and action2 or nil),
 		OnChange = (type(action2) ~= 'string' and action2 or nil),
 		key=caption,
+		bindMod = bindMod,
 		advanced = advanced,
 		icon = icon,
 		DisableFunc = DisableFunc or nil, --function that trigger grey colour on buttons (not actually disable their functions, only coloured them grey)
@@ -241,6 +242,8 @@ local hotkeysMiscPath = 'Settings/Hotkeys/Misc'
 	ShButton(hotkeysMiscPath, 'Pause/Unpause', 'pause', nil, nil, imgPath .. 'epicmenu/media_playback_pause.png')
 		ShButton(hotkeysMiscPath, 'Increase Speed', 'speedup')
 		ShButton(hotkeysMiscPath, 'Decrease Speed', 'slowdown')
+		ShButton(hotkeysMiscPath, 'Fast Camera Movement', 'movefast', "Increased camera speed while this key is held.", nil, nil, nil, true)
+		ShButton(hotkeysMiscPath, 'Slow Camera Movement', 'moveslow', "Decreased camera speed while this key is held.", nil, nil, nil, true)
 		
 	--ShLabel(hotkeysMiscPath, '')
 	ShButton(hotkeysMiscPath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
