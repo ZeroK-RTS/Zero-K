@@ -327,7 +327,10 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	
 	if not unitData.stuckCheckTimer then
 		unitData.ux, unitData.uz = x, z
-		unitData.stuckCheckTimer = math.floor(math.random()*10) + (startMovingTime[unitDefID] or 6)
+		unitData.stuckCheckTimer = (startMovingTime[unitDefID] or 5)
+		if distSq > GIVE_UP_STUCK_DIST_SQ then
+			unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*10) 
+		end
 	end
 	unitData.stuckCheckTimer = unitData.stuckCheckTimer - timerIncrement
 	
@@ -353,7 +356,10 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 				return true, false
 			end
 		else
-			unitData.stuckCheckTimer = math.floor(math.random()*10) + 6
+			unitData.stuckCheckTimer = math.min(5, math.floor(distSq/500))
+			if distSq > GIVE_UP_STUCK_DIST_SQ then
+				unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*10) 
+			end
 		end
 	end
 	
