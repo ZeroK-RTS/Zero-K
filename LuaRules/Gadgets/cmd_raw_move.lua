@@ -567,7 +567,7 @@ local function UpdateConstructors(n)
 			local unitID = fastConstructorUpdate[i]
 			if not fastUpdates[unitID] then
 				fastUpdates[unitID] = true
-				CheckConstructorBuild(fastConstructorUpdate[i])
+				CheckConstructorBuild(unitID)
 			end
 		end
 		fastConstructorUpdate = nil
@@ -581,6 +581,35 @@ local function UpdateConstructors(n)
 		constructorIndex = constructorIndex + 1
 		count = count + 1
 	end
+end
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+-- Move replacement
+
+local function ReplaceMoveCommand(unitID)
+	local queue = spGetCommandQueue(unitID, 1)
+	local cmd = queue and queue[1]
+	if cmd and cmd.id == CMD_MOVE and cmd.params[3] then
+		Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmd.tag}, {})
+		Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_RAW_MOVE, 0, cmd.params[1], cmd.params[2], cmd.params[3]}, CMD.OPT_ALT)
+	end
+end
+
+local function UpdateMoveReplacement()
+	if not moveCommandReplacementUnits then
+		return
+	end
+	
+	local fastUpdates = {}
+	for i = 1, #moveCommandReplacementUnits do
+		local unitID = moveCommandReplacementUnits[i]
+		if not fastUpdates[unitID] then
+			fastUpdates[unitID] = true
+			ReplaceMoveCommand(unitID)
+		end
+	end
+	moveCommandReplacementUnits = nil
 end
 
 ----------------------------------------------------------------------------------------------
@@ -626,6 +655,7 @@ end
 
 function gadget:GameFrame(n)
 	UpdateConstructors(n)
+	UpdateMoveReplacement()
 	if n%247 == 4 then
 		oldCommandStoppingRadius = commonStopRadius
 		commonStopRadius = {}
