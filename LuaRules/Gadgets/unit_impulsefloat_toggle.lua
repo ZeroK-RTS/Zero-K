@@ -52,6 +52,7 @@ local FLOAT_ALWAYS = 2
 local sinkCommand = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_BUILD] = true,
 	[CMD.GUARD] = true,
 	[CMD.FIGHT] = true,
 	[CMD.PATROL] = true,
@@ -205,7 +206,7 @@ function gadget:GameFrame(f)
 				local cmdQueue = Spring.GetCommandQueue(unitID, 1);
 				if (#cmdQueue>0) then 
 					local cmdOpt = cmdQueue[1].options
-					if (cmdQueue[1].id == CMD.MOVE or cQueue[1].id == CMD_RAW_MOVE) and cmdOpt.coded == 16 and cmdOpt.right then --Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position
+					if (cmdQueue[1].id == CMD.MOVE or cQueue[1].id == CMD_RAW_MOVE or cQueue[1].id == CMD_RAW_BUILD) and cmdOpt.coded == 16 and cmdOpt.right then --Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position
 						--Spring.GiveOrderToUnit(unitID,CMD.REMOVE, {cmdQueue[1].tag}, {}) --clear Spring's command that desire unit to return to old position	
 						Spring.GiveOrderArrayToUnitArray( {unitID},{
 							{CMD.REMOVE, {cmdQueue[1].tag}, {}},--clear Spring's command that desire unit to return to old position	
@@ -263,7 +264,7 @@ function gadget:GameFrame(f)
 					setSurfaceState(unitID, data.unitDefID, not moving)
 				elseif floatState[unitID] == FLOAT_ATTACK then
 					local cQueue = Spring.GetCommandQueue(unitID, 1)
-					local moving = cQueue and #cQueue > 0 and (cQueue[1].id == CMD.MOVE or cQueue[1].id == CMD_RAW_MOVE) and not cQueue[1].options.internal
+					local moving = cQueue and #cQueue > 0 and (cQueue[1].id == CMD.MOVE or cQueue[1].id == CMD_RAW_MOVE or cQueue[1].id == CMD_RAW_BUILD) and not cQueue[1].options.internal
 					setSurfaceState(unitID, data.unitDefID, (not moving and aimWeapon[unitID]) or false)
 				elseif floatState[unitID] == FLOAT_NEVER then
 					setSurfaceState(unitID, data.unitDefID, false)
@@ -428,7 +429,7 @@ function gadget:Initialize()
 		if floatState[unitID] == FLOAT_ATTACK and not select(1, Spring.GetUnitIsStunned(unitID)) then
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			local cQueue = Spring.GetCommandQueue(unitID, 1)
-			local moving = cQueue and #cQueue > 0 and (cQueue[1].id == CMD.MOVE or cQueue[1].id == CMD_RAW_MOVE) and not cQueue[1].options.internal
+			local moving = cQueue and #cQueue > 0 and (cQueue[1].id == CMD.MOVE or cQueue[1].id == CMD_RAW_MOVE or cQueue[1].id == CMD_RAW_BUILD) and not cQueue[1].options.internal
 			if not moving then
 				addFloat(unitID, unitDefID)
 			end

@@ -436,7 +436,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	
     if isRetreating[unitID] and not ignoreAllowCommand and not cmdOptions.shift
 		--need checks here because of random commands like maxwantedspeed, find better way
-		and ( cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD.FIGHT or cmdID == CMD.STOP or cmdID == CMD.ATTACK or cmdID == CMD.GUARD or cmdID == CMD.PATROL )
+		and ( cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD or cmdID == CMD.FIGHT or cmdID == CMD.STOP or cmdID == CMD.ATTACK or cmdID == CMD.GUARD or cmdID == CMD.PATROL )
 		then
 		ResetRetreatData(unitID)
 		if not CheckUnitNextFrame then

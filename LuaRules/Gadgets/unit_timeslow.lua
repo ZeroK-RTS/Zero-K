@@ -159,7 +159,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 							else
 								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},{})
 							end
-						elseif #cmd > 1 and (cmd[1].id == CMD_MOVE or cmd[1].id == CMD_RAW_MOVE) and cmd[2].id == CMD_FIGHT and
+						elseif #cmd > 1 and (cmd[1].id == CMD_MOVE or cmd[1].id == CMD_RAW_MOVE or cmd[1].id == CMD_RAW_BUILD) and cmd[2].id == CMD_FIGHT and
 							cmd[2].options.internal and #cmd[2].params == 1 and cmd[2].params[1] == unitID then
 							spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[2].tag},{})
 						end

@@ -51,6 +51,7 @@ CMD_EXTENDED_UNLOAD = 31204 --unit_transport_pickup_floating_amphib.lua
 CMD_LOADUNITS_SELECTED = 31205
 CMD_AUTO_CALL_TRANSPORT = 31206 --unit_transport_ai_button.lua
 CMD_RAW_MOVE = 31109 --cmd_raw_move.lua
+CMD_RAW_BUILD = 31110 --cmd_raw_move.lua -- unregistered raw move
 CMD_MORPH_UPGRADE_INTERNAL = 31207
 CMD_UPGRADE_STOP = 31208
 CMD_MORPH = 31210 -- up to 32209
