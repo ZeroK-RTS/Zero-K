@@ -39,6 +39,8 @@ local bay = {
 
 include "constants.lua"
 
+local scriptReload = include("scriptReload.lua")
+
 local ammo, missile, missilespeed, mfront
 
 local SIG_AIM = 1
@@ -49,7 +51,7 @@ local lights = 3
 local shotNum = 1
 
 function script.Create()
-
+	scriptReload.SetupScriptReload(3, 30*12.5)
 	StartThread(SmokeUnit, {turret})
 
 	Turn(bay[1].exhaust, x_axis, math.rad(170))
@@ -86,6 +88,7 @@ local function FireAndReload(num)
 	Turn(lever, x_axis, math.rad(-5), math.rad(80))
 	Turn(pod, x_axis, math.rad(7), math.rad(70))
 
+	scriptReload.UpdateReload(num, 0)
 	Sleep(40)
 	
 	shotNum = shotNum + 1
@@ -102,6 +105,7 @@ local function FireAndReload(num)
 	while adjustedDuration < 8 do
 		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
 		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
+		scriptReload.UpdateReload(num, 30*(adjustedDuration + 0.54), reloadMult)
 		adjustedDuration = adjustedDuration + reloadMult
 		Sleep(1000)
 	end
@@ -128,11 +132,13 @@ local function FireAndReload(num)
 	while adjustedDuration < 10 do
 		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
 		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
+		scriptReload.UpdateReload(num, 30*(adjustedDuration + 2.54), reloadMult)
 		adjustedDuration = adjustedDuration + reloadMult
 		Sleep(1000)
 	end
 	Show(bay[num].greenLight)
 	
+	scriptReload.GunLoaded(num)
 	ammo = ammo + 1
 end
 

@@ -174,6 +174,23 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Tell UnitDefs about script_reload
+--
+
+for name, ud in pairs(UnitDefs) do
+	if not ud.customparams.dynamic_comm then
+		if ud.weapondefs then
+			for _, wd in pairs(ud.weapondefs) do      
+				if wd.customparams and wd.customparams.script_reload then 
+					ud.customparams.script_reload = wd.customparams.script_reload
+				end
+			end
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Units with shields cannot cloak
 -- Set easily readible shield power
 --

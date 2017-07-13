@@ -184,28 +184,28 @@ local fhpcolormap = { {0.8, 0.0, 0.0, featureBarAlpha},  {0.8, 0.6, 0.0, feature
 
 local barColors = {
 	-- Units
-	emp     = { 0.50,0.50,1.00,barAlpha },
-	emp_p   = { 0.40,0.40,0.80,barAlpha },
-	emp_b   = { 0.60,0.60,0.90,barAlpha },
-	disarm  = { 0.50,0.50,0.50,barAlpha },
-	disarm_p= { 0.40,0.40,0.40,barAlpha },
-	disarm_b= { 0.60,0.60,0.60,barAlpha },
-	capture = { 1.00,0.50,0.00,barAlpha },
+	emp            = { 0.50,0.50,1.00,barAlpha },
+	emp_p          = { 0.40,0.40,0.80,barAlpha },
+	emp_b          = { 0.60,0.60,0.90,barAlpha },
+	disarm         = { 0.50,0.50,0.50,barAlpha },
+	disarm_p       = { 0.40,0.40,0.40,barAlpha },
+	disarm_b       = { 0.60,0.60,0.60,barAlpha },
+	capture        = { 1.00,0.50,0.00,barAlpha },
 	capture_reload = { 0.00,0.60,0.60,barAlpha },
-	build   = { 0.75,0.75,0.75,barAlpha },
-	stock   = { 0.50,0.50,0.50,barAlpha },
-	reload  = { 0.00,0.60,0.60,barAlpha },
-	reload2 = { 0.80,0.60,0.00,barAlpha },
-	reammo  = { 0.00,0.60,0.60,barAlpha },
-	jump    = { 0.00,0.90,0.00,barAlpha },
-	sheath  = { 0.00,0.20,1.00,barAlpha },
-	fuel    = { 0.70,0.30,0.00,barAlpha },
-	slow    = { 0.50,0.10,0.70,barAlpha },
-	goo     = { 0.40,0.40,0.40,barAlpha },
-	shield  = { 0.30,0.0,0.90,barAlpha },
-	tank    = { 0.10,0.20,0.90,barAlpha },
-	tele    = { 0.00,0.60,0.60,barAlpha },
-	tele_pw = { 0.00,0.60,0.60,barAlpha },
+	build          = { 0.75,0.75,0.75,barAlpha },
+	stock          = { 0.50,0.50,0.50,barAlpha },
+	reload         = { 0.00,0.60,0.60,barAlpha },
+	reload2        = { 0.80,0.60,0.00,barAlpha },
+	reammo         = { 0.00,0.60,0.60,barAlpha },
+	jump           = { 0.00,0.90,0.00,barAlpha },
+	sheath         = { 0.00,0.20,1.00,barAlpha },
+	fuel           = { 0.70,0.30,0.00,barAlpha },
+	slow           = { 0.50,0.10,0.70,barAlpha },
+	goo            = { 0.40,0.40,0.40,barAlpha },
+	shield         = { 0.30,0.0,0.90,barAlpha },
+	tank           = { 0.10,0.20,0.90,barAlpha },
+	tele           = { 0.00,0.60,0.60,barAlpha },
+	tele_pw        = { 0.00,0.60,0.60,barAlpha },
 	
 	-- Features
 	resurrect = { 1.00,0.50,0.00,featureBarAlpha },
@@ -273,7 +273,7 @@ function widget:Initialize()
 		ud.primaryWeapon = 1;
 		ud.shieldPower   = 0;
 
-		for i=1,#ud.weapons do
+		for i = 1, #ud.weapons do
 			local WeaponDefID = ud.weapons[i].weaponDef;
 			local WeaponDef   = WeaponDefs[ WeaponDefID ];
 			if (WeaponDef.reload>ud.reloadTime) then
@@ -666,6 +666,7 @@ do
 				maxShield     = ud.shieldPower - 10,
 				canStockpile  = ud.canStockpile,
 				gadgetStock   = ud.customParams.stockpiletime,
+				scriptReload  = tonumber(ud.customParams.script_reload),
 				reloadTime    = ud.reloadTime,
 				primaryWeapon = ud.primaryWeapon,
 				dyanmicComm   = ud.customParams.dynamic_comm,
@@ -884,7 +885,7 @@ do
 		end
 		
 		--// RELOAD
-		if ci.dyanmicComm or (ci.reloadTime >= options.minReloadTime.value) then
+		if (not ci.scriptReload) and (ci.dyanmicComm or (ci.reloadTime >= options.minReloadTime.value)) then
 			local primaryWeapon = GetUnitRulesParam(unitID, "primary_weapon_override") or ci.primaryWeapon
 			_,reloaded,reloadFrame = GetUnitWeaponState(unitID,primaryWeapon)
 			if (reloaded==false) then
@@ -899,6 +900,16 @@ do
 							AddBar(messages.reload,reload,"reload",(fullText and floor(reload*100)..'%') or '')
 						end
 					end
+				end
+			end
+		end
+		
+		if ci.scriptReload and (ci.scriptReload >= options.minReloadTime.value) then
+			local reloadFrame = GetUnitRulesParam(unitID, "scriptReloadFrame")
+			if reloadFrame and reloadFrame > gameFrame then
+				reload = 1 - ((reloadFrame - gameFrame)/30) / ci.scriptReload
+				if (reload >= 0) then
+					AddBar(messages.reload, reload,"reload",(fullText and floor(reload*100) .. '%') or '')
 				end
 			end
 		end
