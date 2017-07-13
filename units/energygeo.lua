@@ -30,6 +30,7 @@ unitDef = {
     morphtime = [[90]],
 	
 	priority_misc = 1, -- Medium
+	default_spacing = 0,
   },
 
   energyMake                    = 25,

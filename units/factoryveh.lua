@@ -32,6 +32,7 @@ unitDef = {
 
   customParams                  = {
     sortName       = [[2]],
+	default_spacing = 8,
   },
 
   energyUse                     = 0,

@@ -22,6 +22,7 @@ unitDef = {
     midposoffset   = [[0 -6 0]],
     modelradius    = [[24]],
 	removewait     = 1,
+	default_spacing = 41, -- Diagonal connection.
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],

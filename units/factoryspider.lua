@@ -41,6 +41,7 @@ unitDef = {
     sortName       = [[5]],
 	modelradius    = [[38]],
 	solid_factory = [[3]],
+	default_spacing = 8,
   },
 
   energyUse                     = 0,

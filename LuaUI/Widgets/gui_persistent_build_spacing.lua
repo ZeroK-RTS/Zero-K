@@ -11,7 +11,7 @@ function widget:GetInfo()
 end
 
 -- Config
-local defaultSpacing = 2
+local defaultSpacing = 4 -- Big makes for more navigable bases for new players.
 
 -- Globals
 local lastCmdID = nil
@@ -27,13 +27,13 @@ function widget:Update()
     
     local _, cmdID = spGetActiveCommand()
     if cmdID and cmdID < 0 then
-        
+        local unitDefID = -cmdID
         if cmdID ~= lastCmdID then
-            spSetBuildSpacing(buildSpacing[-cmdID] or defaultSpacing)
+            spSetBuildSpacing(buildSpacing[unitDefID] or tonumber(UnitDefs[unitDefID].customParams.default_spacing) or defaultSpacing)
             lastCmdID = cmdID
         end
         
-        buildSpacing[-cmdID] = spGetBuildSpacing()
+        buildSpacing[unitDefID] = spGetBuildSpacing()
     end
 end
 

@@ -29,6 +29,7 @@ unitDef = {
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 -25 0]],
 	modelradius    = [[60]],
+	default_spacing = 8,
   },
 
   energyUse        = 0,

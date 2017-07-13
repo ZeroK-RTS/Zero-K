@@ -21,6 +21,7 @@ unitDef = {
 	midposoffset   = [[0 0 0]],
 	force_close    = 8, -- time in seconds of forced turnoff
 	removewait     = 1,
+	default_spacing = 0,
   },
 
   damageModifier                = 0.25,

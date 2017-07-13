@@ -27,6 +27,7 @@ unitDef = {
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -4 0]],
     modelradius    = [[24]],
+	default_spacing = 1,
   },
 
   explodeAs                     = [[NANOBOOM2]],

@@ -36,6 +36,7 @@ unitDef = {
 	modelradius    = [[50]],
 	midposoffset   = [[0 20 0]],
 	nongroundfac = [[1]],
+	default_spacing = 8,
   },
 
   energyUse                     = 0,

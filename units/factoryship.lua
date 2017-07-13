@@ -39,6 +39,7 @@ unitDef = {
 	solid_factory = [[3]],
 	modelradius    = [[50]],
 	solid_factory_rotation = [[1]], -- 90 degrees counter clockwise
+	default_spacing = 8,
   },
 
   energyUse              = 0,

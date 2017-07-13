@@ -36,6 +36,7 @@ unitDef = {
   customParams                  = {
     modelradius    = [[30]],
 	removewait     = 1,
+	default_spacing = 0,
   },
 
   featureDefs                   = {

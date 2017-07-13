@@ -39,6 +39,7 @@ unitDef = {
     sortName = [[3]],
 	modelradius    = [[43]],
 	nongroundfac = [[1]],
+	default_spacing = 8,
   },
 
   energyUse                     = 0,
