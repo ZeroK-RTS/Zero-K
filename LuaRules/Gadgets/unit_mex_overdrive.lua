@@ -1048,6 +1048,10 @@ function gadget:GameFrame(n)
 				allyTeamExpense = allyTeamExpense + te.exp
 
 				te.spare = te.inc - te.exp
+				if te.max == MIN_STORAGE and te.spare < MIN_STORAGE then
+					te.spare = 0
+				end
+
 				allyTeamEnergySpare = allyTeamEnergySpare + te.spare
 				allyTeamPositiveSpare = allyTeamPositiveSpare + max(0, te.spare)
 				allyTeamNegativeSpare = allyTeamNegativeSpare + max(0, -te.spare)
