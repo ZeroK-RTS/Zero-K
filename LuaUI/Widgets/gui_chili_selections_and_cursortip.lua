@@ -165,7 +165,8 @@ local econStructureDefs = {
 }
 
 local dynamicTooltipDefs = {
-	[UnitDefNames["terraunit"].id] = true
+	[UnitDefNames["terraunit"].id] = true,
+	[UnitDefNames["energypylon"].id] = true,
 }
 
 for unitDefID,_ in pairs(econStructureDefs) do
