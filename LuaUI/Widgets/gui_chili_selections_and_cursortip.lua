@@ -1635,6 +1635,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			metalInfoUpdate(true, FormatPlusMinus(mm - mu), IMAGE.METAL, PIC_HEIGHT + LEFT_SPACE + 4)
 			energyInfoUpdate(true, FormatPlusMinus(em - eu), IMAGE.ENERGY, PIC_HEIGHT + 2*LEFT_SPACE + 4)
 			showMetalInfo = true
+		else
+			metalInfoUpdate(false)
+			energyInfoUpdate(false)
 		end
 		
 		local healthPos
