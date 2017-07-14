@@ -327,9 +327,9 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	
 	if not unitData.stuckCheckTimer then
 		unitData.ux, unitData.uz = x, z
-		unitData.stuckCheckTimer = (startMovingTime[unitDefID] or 5)
+		unitData.stuckCheckTimer = (startMovingTime[unitDefID] or 8)
 		if distSq > GIVE_UP_STUCK_DIST_SQ then
-			unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*10) 
+			unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*8) 
 		end
 	end
 	unitData.stuckCheckTimer = unitData.stuckCheckTimer - timerIncrement
@@ -347,7 +347,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 			else
 				local vx = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
 				local vz = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
-				Spring.SetUnitMoveGoal(unitID, x + vx, y, z + vz, goalDistOverride or goalDist[unitDefID] or 16, nil, false)
+				Spring.SetUnitMoveGoal(unitID, x + vx, y, z + vz, 16, nil, false)
 				unitData.commandHandled = nil
 				unitData.switchedFromRaw = nil
 				unitData.nextTestTime = nil
@@ -356,7 +356,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 				return true, false
 			end
 		else
-			unitData.stuckCheckTimer = math.min(5, math.floor(distSq/500))
+			unitData.stuckCheckTimer = math.min(6, math.floor(distSq/500))
 			if distSq > GIVE_UP_STUCK_DIST_SQ then
 				unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*10) 
 			end
