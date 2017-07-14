@@ -62,7 +62,7 @@ unitDef = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
-  trackWidth             = 14,
+  trackWidth             = 20,
   turnRate               = 3000,
   
   featureDefs            = {

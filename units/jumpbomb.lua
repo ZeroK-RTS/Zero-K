@@ -25,8 +25,8 @@ unitDef = {
     jump_speed       = 6,
     jump_reload      = 10,
     jump_from_midair = 0,
-	aimposoffset   = [[0 0 0]],
-	midposoffset   = [[0 0 0]],
+	aimposoffset   = [[0 2 0]],
+	midposoffset   = [[0 2 0]],
 	modelradius    = [[10]],
     selection_scale = 1, -- Maybe change later
   },
@@ -61,7 +61,7 @@ unitDef = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
-  trackWidth             = 26,
+  trackWidth             = 34,
   turnRate               = 2000,
   workerTime             = 0,
   

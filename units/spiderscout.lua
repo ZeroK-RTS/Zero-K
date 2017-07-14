@@ -11,6 +11,9 @@ unitDef = {
   canPatrol           = true,
   category            = [[LAND TOOFAST]],
   cloakCost           = 0,
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[20 20 20]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
