@@ -10,13 +10,13 @@ unitDef = {
   category               = [[LAND TOOFAST]],
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[16 16 16]],
+  collisionVolumeScales  = [[18 18 18]],
   collisionVolumeType	 = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-
-    modelradius    = [[7]],
+    midposoffset   = [[0 0 -3]],
+    modelradius    = [[9]],
     instantselfd   = [[1]],
     idle_cloak = 1,
     selection_scale = 1, -- Maybe change later
