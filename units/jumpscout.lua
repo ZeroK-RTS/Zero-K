@@ -24,6 +24,7 @@ unitDef = {
 	grey_goo_drain = 5,
 	grey_goo_cost = 75,
 	grey_goo_range = 120,
+    selection_scale = 1, -- Maybe change later
   },
 
   explodeAs              = [[TINY_BUILDINGEX]],
@@ -38,7 +39,7 @@ unitDef = {
   maxVelocity            = 3.5,
   maxWaterDepth          = 15,
   minCloakDistance       = 75,
-  movementClass          = [[KBOT2]],
+  movementClass          = [[SKBOT2]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING]],
   objectName             = [[puppy.s3o]],

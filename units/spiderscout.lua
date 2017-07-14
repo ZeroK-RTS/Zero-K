@@ -15,11 +15,12 @@ unitDef = {
 
   customParams        = {
     idle_cloak = 1,
+    selection_scale = 1, -- Maybe change later
   },
 
   explodeAs           = [[TINY_BUILDINGEX]],
-  footprintX          = 1,
-  footprintZ          = 1,
+  footprintX          = 2,
+  footprintZ          = 2,
   iconType            = [[spiderscout]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
@@ -29,12 +30,12 @@ unitDef = {
   maxVelocity         = 4.8,
   maxWaterDepth       = 15,
   minCloakDistance    = 120,
-  movementClass       = [[TKBOT1]],
+  movementClass       = [[TKBOT2]],
   moveState           = 0,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[arm_flea.s3o]],
   pushResistant       = 0,
-  script	      			= [[spiderscout.lua]],
+  script              = [[spiderscout.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],
 
   sfxtypes            = {

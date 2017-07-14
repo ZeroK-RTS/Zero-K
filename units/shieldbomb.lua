@@ -20,12 +20,13 @@ unitDef = {
   customParams           = {
 	modelradius    = [[7]],
 	idle_cloak = 1,
+    selection_scale = 1, -- Maybe change later
   },
 
   explodeAs              = [[shieldbomb_DEATH]],
   fireState              = 0,
-  footprintX             = 1,
-  footprintZ             = 1,
+  footprintX             = 2,
+  footprintZ             = 2,
   iconType               = [[walkerbomb]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -38,7 +39,7 @@ unitDef = {
   maxVelocity            = 4,
   maxWaterDepth          = 15,
   minCloakDistance       = 75,
-  movementClass          = [[KBOT1]],
+  movementClass          = [[SKBOT2]],
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[logroach.s3o]],
   pushResistant          = 0,
@@ -69,8 +70,8 @@ unitDef = {
     DEAD      = {
       blocking         = false,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 2,
+      footprintZ       = 2,
       object           = [[wreck2x2b.s3o]],
     },
 

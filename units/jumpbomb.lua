@@ -28,12 +28,13 @@ unitDef = {
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 0 0]],
 	modelradius    = [[10]],
+    selection_scale = 1, -- Maybe change later
   },
 
   explodeAs              = [[jumpbomb_DEATH]],
   fireState              = 0,
-  footprintX             = 1,
-  footprintZ             = 1,
+  footprintX             = 2,
+  footprintZ             = 2,
   iconType               = [[jumpjetbomb]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -48,7 +49,7 @@ unitDef = {
   maxVelocity            = 1.5225,
   maxWaterDepth          = 15,
   minCloakDistance       = 180,
-  movementClass          = [[KBOT1]],
+  movementClass          = [[SKBOT2]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[skuttle.s3o]],
@@ -69,8 +70,8 @@ unitDef = {
     DEAD      = {
       blocking         = false,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 2,
+      footprintZ       = 2,
       object           = [[wreck2x2b.s3o]],
     },
 
