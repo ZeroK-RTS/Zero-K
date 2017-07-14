@@ -356,7 +356,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	-- Prioritize nearby units.
 	if proximityWeaponDefs[attackerWeaponDefID] then
 		local unitSeparation = spGetUnitSeparation(unitID,targetID,true)
-		local distAdd = 20 * (unitSeparation/WeaponDefs[attackerWeaponDefID].range)
+		local distAdd = proximityWeaponDefs[attackerWeaponDefID] * (unitSeparation/WeaponDefs[attackerWeaponDefID].range)
 		defPrio = defPrio + distAdd
 	end
 	

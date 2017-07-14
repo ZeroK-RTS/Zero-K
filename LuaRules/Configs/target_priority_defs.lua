@@ -202,8 +202,11 @@ local gravityWeaponDefs = {
 -- for heatrays
 local proximityWeaponDefs = {}
 for wdid = 1, #WeaponDefs do
-	if WeaponDefs[wdid].customParams.dyndamageexp then
-		proximityWeaponDefs[wdid] = true
+	local cp = WeaponDefs[wdid].customParams
+	if cp.proximity_priority then
+		proximityWeaponDefs[wdid] = tonumber(cp.proximity_priority)
+	elseif cp.dyndamageexp then
+		proximityWeaponDefs[wdid] = 20
 	end
 end
 
