@@ -4,7 +4,7 @@ vertex = [[
 	//#define flip_normalmap
 	//#define use_shadows
 	%%VERTEX_GLOBAL_NAMESPACE%%
-	
+
 	uniform mat4 camera;   //ViewMatrix (gl_ModelViewMatrix is ModelMatrix!)
 	uniform vec3 cameraPos;
 	uniform vec3 sunPos;
@@ -13,36 +13,36 @@ vertex = [[
 	uniform vec3 etcLoc;
 	uniform int simFrame;
 	#ifdef flashlights
-		varying float selfIllumMod;
+		out float selfIllumMod;
 	#endif
 	//uniform float frameLoc;
-	
+
 	#ifdef use_treadoffset
 		uniform float treadOffset;
 	#endif
-	
+
 	//The api_custom_unit_shaders supplies this definition:
-	#ifdef use_shadows  
+	#ifdef use_shadows
 		uniform mat4 shadowMatrix;
 		uniform vec4 shadowParams;
 	#endif
-	
+
 	#ifdef use_vertex_ao
-		varying float aoTerm;
+		out float aoTerm;
 	#endif
-	varying vec3 cameraDir;
-	
+	out vec3 cameraDir;
+
 	#ifdef use_normalmapping
-		varying mat3 tbnMatrix;
+		out mat3 tbnMatrix;
 	#else
-		varying vec3 normalv;
+		out vec3 normalv;
 	#endif
 
 	void main(void)
 	{
 		vec4 vertex = gl_Vertex;
 		vec3 normal = gl_Normal;
-		
+
 		%%VERTEX_PRE_TRANSFORM%%
 
 		#ifdef use_normalmapping
@@ -74,7 +74,7 @@ vertex = [[
 		#ifndef use_treadoffset
 			gl_TexCoord[0].st = gl_MultiTexCoord0.st;
 		#endif
-		
+
 		#ifdef flashlights
 			//float unique_value = sin((gl_ModelViewMatrix[3][0]+gl_ModelViewMatrix[3][2])));
 			selfIllumMod = max(-0.2,sin(simFrame *0.063 + (gl_ModelViewMatrix[3][0]+gl_ModelViewMatrix[3][2])*0.1))+0.2;
@@ -106,31 +106,31 @@ vertex = [[
 	#ifndef SPECULARMULT
 		#define SPECULARMULT 2.0
 	#endif
-	
+
 	#ifdef use_shadows
 		uniform sampler2DShadow shadowTex;
 		uniform float shadowDensity;
 	#endif
 	#ifdef use_vertex_ao
-		varying float aoTerm;
+		in float aoTerm;
 	#endif
 	uniform vec4 teamColor;
-	varying vec3 cameraDir;
+	in vec3 cameraDir;
 	//varying float fogFactor;
-	
+
 	#ifdef flashlights
-		varying float selfIllumMod;
+		in float selfIllumMod;
 	#endif
-	
+
 	#ifdef use_normalmapping
-		varying mat3 tbnMatrix;
+		in mat3 tbnMatrix;
 		uniform sampler2D normalMap;
 	#else
-		varying vec3 normalv;
+		in vec3 normalv;
 	#endif
 	float GetShadowCoeff(vec4 shadowCoors){
 		#ifdef use_shadows
-			float coeff = shadow2DProj(shadowTex, shadowCoors+vec4(0.0, 0.0, -0.00005, 0.0)).r;
+			float coeff = textureProj(shadowTex, shadowCoors+vec4(0.0, 0.0, -0.00005, 0.0)).r;
 			coeff  = (1.0 - coeff);
 			coeff *= shadowDensity;
 			return (1.0 - coeff);
@@ -138,7 +138,7 @@ vertex = [[
 			return 1.0;
 		#endif
 	}
-	
+
 	void main(void){
 		%%FRAGMENT_PRE_SHADING%%
 
@@ -147,7 +147,7 @@ vertex = [[
 			#ifdef flip_normalmap
 				tc.t = 1.0 - tc.t;
 			#endif
-			vec4 normaltex=texture2D(normalMap, tc);
+			vec4 normaltex=texture(normalMap, tc);
 			vec3 nvTS   = normalize((normaltex.xyz - 0.5) * 2.0);
 			vec3 normal = tbnMatrix * nvTS;
 		#else
@@ -155,16 +155,16 @@ vertex = [[
 		#endif
 		vec3 light = max(dot(normal, sunPos), 0.0) * sunDiffuse + sunAmbient;
 
-		vec4 diffuseIn  = texture2D(textureS3o1, gl_TexCoord[0].st);
+		vec4 diffuseIn  = texture(textureS3o1, gl_TexCoord[0].st);
 		vec4 outColor   = diffuseIn;
-		vec4 extraColor = texture2D(textureS3o2, gl_TexCoord[0].st);
+		vec4 extraColor = texture(textureS3o2, gl_TexCoord[0].st);
 		vec3 reflectDir = reflect(cameraDir, normal);
-		
+
 		#if (deferred_mode == 0)
-			vec3 specular   = textureCube(specularTex, reflectDir).rgb * extraColor.g * SPECULARMULT;
-			vec3 reflection = textureCube(reflectTex,  reflectDir).rgb;
+			vec3 specular   = texture(specularTex, reflectDir).rgb * extraColor.g * SPECULARMULT;
+			vec3 reflection = texture(reflectTex,  reflectDir).rgb;
 		#endif
-		#if (deferred_mode == 1) 
+		#if (deferred_mode == 1)
 			vec3 specular   = vec3(1.0,1.0,1.0) * extraColor.g * SPECULARMULT;
 			vec3 reflection = vec3(0.0,0.0,0.0);
 		#endif

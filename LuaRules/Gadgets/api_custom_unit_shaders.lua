@@ -140,6 +140,7 @@ local function CompileShader(shader, definitions, plugins)
   --// (this way we can modularize a shader and enable/disable features in it)
   if (definitions or shadows) then
     definitions = definitions or {}
+	table.insert(definitions, 1, "#version 130")
     definitions = table.concat(definitions, "\n")
     if (shadows) then
       definitions = definitions .. "\n" .. "#define use_shadows" .. "\n"
