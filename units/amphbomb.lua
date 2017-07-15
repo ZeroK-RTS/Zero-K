@@ -69,7 +69,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[wreck2x2c.s3o]],
+      object           = [[amphbomb_dead.s3o]],
     },
 
     HEAP      = {
