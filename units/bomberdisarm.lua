@@ -39,7 +39,7 @@ unitDef = {
   script              = [[bomberdisarm.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
-  turnRadius          = 20,
+  turnRadius          = 400,
 
   weapons             = {
 
