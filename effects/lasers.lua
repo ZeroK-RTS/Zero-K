@@ -595,18 +595,6 @@ return {
 
    ["flash1green"] = {
     usedefaultexplosions = false,
-    groundflash = {
-      circlealpha        = 0,
-      circlegrowth       = 0,
-      flashalpha         = 1,
-      flashsize          = 15,
-      ttl                = 3,
-      color = {
-        [1]  = 0,
-        [2]  = 1,
-        [3]  = 0,
-      },
-    },
     meltage = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -626,11 +614,11 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        alpha              = 1,
-        alphadecay         = 0.05,
+        alpha              = 0.75,
+        alphadecay         = 0.075,
         color              = [[0,1,0]],
         dir                = [[-1 r2,-1 r2,-1 r2]],
-        length             = 5,
+        length             = 6,
         width              = 10,
       },
     },
