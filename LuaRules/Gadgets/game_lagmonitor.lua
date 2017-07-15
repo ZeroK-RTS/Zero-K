@@ -144,7 +144,7 @@ local function GetPlayerActivity(playerID)
 		return
 	end
 	
-	return customKeys.elo or 0
+	return customKeys.elo and tonumber(customKeys.elo) or 0
 end
 
 local function UpdateTeamActivity(teamID)
