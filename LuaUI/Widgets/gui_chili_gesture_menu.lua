@@ -572,9 +572,9 @@ function widget:MouseRelease(x,y,button)
 			if shift then keyState.shift = true; keyState.coded = keyState.coded + CMD.OPT_SHIFT end
     
 			if meta and WG.CommandInsert then 
-				GiveNotifyingInsertOrder(CMD_RAW_MOVE,pos,keyState)
+				GiveNotifyingInsertOrder(CMD.MOVE,pos,keyState)
 			else 
-				GiveNotifyingOrder(CMD_RAW_MOVE, pos, keyState)
+				GiveNotifyingOrder(CMD.MOVE, pos, keyState)
 			end 
 		end 
 	end 
