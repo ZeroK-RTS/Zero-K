@@ -17,11 +17,6 @@ end
 	TO DO:
 		Add amount label when mouseover line on graph (e.g to see exact metal produced at a certain time),
 		Come up with better way of handling specs, active players and players who died (currently doesn't show players who have died
-
-	NOT TO DO ANY MORE, PROBABLY:
-		Adding the toggling functionality renders both of these moot:
-			Implement camera control to pan in the background while viewing graph
-			Add minimize option
 --]]
 
 --------------------------------------------------------------------------------
@@ -46,6 +41,8 @@ local buttongroups = {
 
 	{"Units", {
 		{"unit_value"      , "Unit Value"},
+		{"unit_value_killed", "Value Killed"},
+		{"unit_value_lost" , "Value Lost"},
 		{"damage_dealt"    , "Damage Dealt"},
 		{"damage_received" , "Damage Received"},
 		},
@@ -56,6 +53,8 @@ local rulesParamStats = {
 	metal_excess = true,
 	metal_reclaim = true,
 	unit_value = true,
+	unit_value_killed = true,
+	unit_value_lost = true,
 	metal_income = true,
 	energy_income = true,
 	damage_dealt = true,
@@ -63,6 +62,7 @@ local rulesParamStats = {
 }
 local hiddenStats = {
 	damage_dealt = true,
+	unit_value_killed = true,
 }
 
 local gameOver = false
