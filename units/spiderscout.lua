@@ -17,6 +17,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    modelradius    = [[10]],
     idle_cloak = 1,
     selection_scale = 1, -- Maybe change later
   },
@@ -54,7 +55,7 @@ unitDef = {
   trackStrength       = 8,
   trackStretch        = 1,
   trackType           = [[ChickenTrackPointy]],
-  trackWidth          = 12,
+  trackWidth          = 18,
   turnRate            = 2100,
 
   weapons             = {

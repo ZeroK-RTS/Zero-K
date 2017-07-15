@@ -10,13 +10,13 @@ unitDef = {
   category               = [[LAND TOOFAST]],
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[18 18 18]],
+  collisionVolumeScales  = [[16 16 16]],
   collisionVolumeType	 = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    midposoffset   = [[0 0 -3]],
-    modelradius    = [[9]],
+    midposoffset   = [[0 0 -2]],
+    modelradius    = [[8]],
     instantselfd   = [[1]],
     idle_cloak = 1,
     selection_scale = 1, -- Maybe change later
@@ -56,7 +56,7 @@ unitDef = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShortLarge]],
-  trackWidth             = 14,
+  trackWidth             = 20,
   turnRate               = 3000,
   
   featureDefs            = {
