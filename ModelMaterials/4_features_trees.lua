@@ -20,7 +20,6 @@ local materials = {
 		shader    = include("ModelMaterials/Shaders/default.lua"),
 		deferred  = include("ModelMaterials/Shaders/default.lua"),
 		shaderDefinitions = {
-			"#version 130",
 			"#define use_normalmapping",
 			"#define deferred_mode_0",
 		},
