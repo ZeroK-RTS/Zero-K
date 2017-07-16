@@ -6,6 +6,9 @@ local launched = false
 function script.AimWeapon1(heading, pitch) return true end
 
 local function RemoveMissile()
+	GG.MissileSilo.DestroyMissile(unitID, unitDefID)
+	Spring.SetUnitRulesParam(unitID, "do_not_save", 1)
+	
 	Spring.SetUnitNoSelect(unitID, true)
 	Spring.SetUnitNoDraw(unitID, true)
 	Spring.SetUnitNoMinimap(unitID, true)
@@ -22,7 +25,7 @@ local function RemoveMissile()
 	-- instead of immediately. This is to give some command feedback (that the 
 	-- command actually was placed) and to show allies where the launch occurred.
 	Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
-	GG.DestroyMissile(unitID, unitDefID)
+	
 	Sleep(15000)
 	Spring.DestroyUnit(unitID, false, true)
 end
