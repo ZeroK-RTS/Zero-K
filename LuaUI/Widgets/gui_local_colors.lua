@@ -11,7 +11,7 @@ function widget:GetInfo()
 end
 
 local selfName = "Local Team Colors"
-
+local DEBUG_MODE = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -222,3 +222,54 @@ function widget:Shutdown()
 	WG.LocalColor.localTeamColorToggle = nil
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local width = 128
+local height = 48
+
+local friendlyColors
+
+local function LoadFriendlyColors()
+	friendlyColors = {myColor}
+	for i=1,#allyColors do
+		friendlyColors[#friendlyColors + 1] = allyColors[i]
+	end
+end
+
+local function DrawRectangle(x, y)
+	gl.Vertex(x, y, 0)
+	gl.Vertex(x + width, y, 0)
+	gl.Vertex(x + width, y + height, 0)
+	gl.Vertex(x, y + height, 0)
+end
+
+function widget:DrawScreen()
+	if not DEBUG_MODE then
+		return
+	end
+	if friendlyColors == nil then
+		LoadFriendlyColors()
+	end
+	
+	local vsx, vsy = Spring.GetViewGeometry()
+	local x = vsx/2 - width
+	local y = vsy - 160	
+	
+	for i=1,#friendlyColors do
+		gl.Color(friendlyColors[i])
+		gl.BeginEnd(GL.QUADS, DrawRectangle, x, y)
+		gl.Color(1,1,1,1)
+		gl.BeginEnd(GL.LINE_LOOP, DrawRectangle, x, y)
+		y = y - height
+	end
+	
+	y = vsy - 160
+	x = x + width
+	for i=1,#enemyColors do
+		gl.Color(enemyColors[i])
+		gl.BeginEnd(GL.QUADS, DrawRectangle, x, y)
+		gl.Color(1,1,1,1)
+		gl.BeginEnd(GL.LINE_LOOP, DrawRectangle, x, y)
+		y = y - height
+	end
+end
