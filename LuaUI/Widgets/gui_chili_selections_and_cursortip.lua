@@ -233,7 +233,7 @@ options_order = {
 	--tooltip
 	'tooltip_delay', 'independant_world_tooltip_delay',
 	'show_for_units', 'show_for_wreckage', 'show_for_unreclaimable', 'showdrawtooltip','showterratooltip',
-	'showDrawTools',
+	'showDrawTools', 'tooltip_opacity',
 	
 	--selected units
 	'selection_opacity', 'groupbehaviour', 'showgroupinfo','uniticon_size', 'manualWeaponReloadBar',
@@ -300,12 +300,24 @@ options = {
 		noHotkey = true,
 		desc = 'Show pencil or eraser when drawing or erasing.'
 	},
+	tooltip_opacity = {
+		name = "Opacity",
+		type = "number",
+		value = 0.8, min = 0, max = 1, step = 0.01,
+		update_on_the_fly = true,
+		OnChange = function(self)
+			if not tooltipWindow then
+				return
+			end
+			tooltipWindow.SetOpacity(self.value)
+		end,
+	},
 
-	--selection_opacity = {
 	selection_opacity = {
 		name = "Opacity",
 		type = "number",
 		value = 0.8, min = 0, max = 1, step = 0.01,
+		update_on_the_fly = true,
 		OnChange = function(self)
 			if selectionWindow then
 				selectionWindow.SetOpacity(self.value)
@@ -1894,6 +1906,7 @@ local function GetTooltipWindow()
 		autosize  = true,
 		minWidth = RIGHT_WIDTH,
 		padding = {8,8,8,5},
+		color = {1, 1, 1, options.tooltip_opacity.value},
 		parent = screen0
 	}
 	window:Hide()
@@ -1917,6 +1930,11 @@ local function GetTooltipWindow()
 	
 	function externalFunctions.SetVisible(newVisible)
 		window:SetVisibility(newVisible)
+	end
+
+	function externalFunctions.SetOpacity(opacity)
+		window.color[4] = opacity
+		window:Invalidate()
 	end
 	
 	function externalFunctions.SetPosition(x, y)
