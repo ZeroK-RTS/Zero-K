@@ -71,6 +71,7 @@ local function StartRetreat (unitID)
 end
 
 options_path = 'Settings/Interface/Selection'
+local retreatPath = 'Settings/Interface/Retreat Zones'
 options_order = { 'useSelectionFilteringOption', 'selectionFilteringOnlyAltOption', 'ctrlFlattenRankOption', 'retreatOverrideOption', 'retreatingRankOption', 'retreatDeselects' }
 options = {
 	useSelectionFilteringOption = {
@@ -100,27 +101,31 @@ options = {
 		value = 1,
 		min = 0, max = 3, step = 1,
 		noHotkey = true,
+		tooltip_format = "%.0f",
 		OnChange = function (self)
 			ctrlFlattenRank = self.value
 		end
 	},
 	retreatOverrideOption = {
-		name = "Retreat overrides rank",
-		desc = "Retreating units will be treated as a different rank.",
+		name = "Retreat overrides selection rank",
+		desc = "Retreating units will be treated as a different selection rank.",
 		type = "bool",
 		value = true,
 		noHotkey = true,
+		path = retreatPath,
 		OnChange = function (self)
 			retreatOverride = self.value
 		end
 	},
 	retreatingRankOption = {
 		name = 'Retreat override:',
-		desc = "Retreating units are treated as this rank, if override is enabled.",
+		desc = "Retreating units are treated as this selection rank, if override is enabled.",
 		type = 'number',
 		value = 1, -- not 0; this keeps them responsive to Ctrl+A etc (due to flatten) and also keeps 0 only reachable manually by default.
 		min = 0, max = 3, step = 1,
+		tooltip_format = "%.0f",
 		noHotkey = true,
+		path = retreatPath,
 		OnChange = function (self)
 			retreatingRank = self.value
 		end
@@ -131,6 +136,7 @@ options = {
 		type = "bool",
 		value = true,
 		noHotkey = true,
+		path = retreatPath,
 		OnChange = function (self)
 			if self.value and not retreatDeselects then
 				widgetHandler:RegisterGlobal(widget, "StartRetreat", StartRetreat)
