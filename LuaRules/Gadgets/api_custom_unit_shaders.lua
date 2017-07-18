@@ -140,7 +140,13 @@ local function CompileShader(shader, definitions, plugins)
   --// (this way we can modularize a shader and enable/disable features in it)
   if (definitions or shadows) then
     definitions = definitions or {}
-	table.insert(definitions, 1, "#version 130")
+    hasVersion = false
+    for _, def in pairs(definitions) do
+      hasVersion = hasVersion or string.sub(def,1,string.len("#version")) == "#version"
+    end
+    if not hasVersion then
+      table.insert(definitions, 1, "#version 130")
+    end
     definitions = table.concat(definitions, "\n")
     if (shadows) then
       definitions = definitions .. "\n" .. "#define use_shadows" .. "\n"
@@ -613,7 +619,7 @@ function gadget:Initialize()
 
   --// load the materials config files
   local MATERIALS_DIR = "ModelMaterials/"
-  if Spring.Utilities.IsCurrentVersionNewerThan(103, 0) then
+  if not Spring.Utilities.IsCurrentVersionNewerThan(103, 0) then
     MATERIALS_DIR = "ModelMaterials_103/"
   end
   local unitMaterialDefs, featureMaterialDefs = _LoadMaterialConfigFiles(MATERIALS_DIR)

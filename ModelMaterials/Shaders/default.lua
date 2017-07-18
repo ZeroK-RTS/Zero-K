@@ -38,6 +38,9 @@ vertex = [[
 		out vec3 normalv;
 	#endif
 
+	out vec2 tex_coord0;
+	out vec4 tex_coord1;
+
 	void main(void)
 	{
 		vec4 vertex = gl_Vertex;
@@ -58,13 +61,13 @@ vertex = [[
 		cameraDir     = worldPos.xyz - cameraPos;
 
 		#ifdef use_shadows
-			gl_TexCoord[1] =shadowMatrix *gl_ModelViewMatrix*gl_Vertex;
-			gl_TexCoord[1].st = gl_TexCoord[1].st * (inversesqrt( abs(gl_TexCoord[1].st) + shadowParams.z) + shadowParams.w) + shadowParams.xy;
+			tex_coord1 = shadowMatrix *gl_ModelViewMatrix*gl_Vertex;
+			tex_coord1.st = tex_coord1.st * (inversesqrt( abs(tex_coord1.st) + shadowParams.z) + shadowParams.w) + shadowParams.xy;
 		#endif
 		#ifdef use_treadoffset
-			gl_TexCoord[0].st = gl_MultiTexCoord0.st;
+			tex_coord0.st = gl_MultiTexCoord0.st;
 			if (gl_MultiTexCoord0.s < 0.74951171875 && gl_MultiTexCoord0.s > 0.6279296875 && gl_MultiTexCoord0.t > 0.5702890625 && gl_MultiTexCoord0.t <0.6220703125){
-				gl_TexCoord[0].s = gl_MultiTexCoord0.s + etcLoc.z;
+				tex_coord0.s = gl_MultiTexCoord0.s + etcLoc.z;
 			}
 		#endif
 		#ifdef use_vertex_ao
@@ -72,7 +75,7 @@ vertex = [[
 		#endif
 
 		#ifndef use_treadoffset
-			gl_TexCoord[0].st = gl_MultiTexCoord0.st;
+			tex_coord0.st = gl_MultiTexCoord0.st;
 		#endif
 
 		#ifdef flashlights
@@ -128,9 +131,15 @@ vertex = [[
 	#else
 		in vec3 normalv;
 	#endif
+
+	in vec2 tex_coord0;
+	in vec4 tex_coord1;
+
+	out vec4 fragData[4];
+
 	float GetShadowCoeff(vec4 shadowCoors){
 		#ifdef use_shadows
-			float coeff = textureProj(shadowTex, shadowCoors+vec4(0.0, 0.0, -0.00005, 0.0)).r;
+			float coeff = textureProj(shadowTex, shadowCoors+vec4(0.0, 0.0, -0.00005, 0.0));
 			coeff  = (1.0 - coeff);
 			coeff *= shadowDensity;
 			return (1.0 - coeff);
@@ -143,7 +152,7 @@ vertex = [[
 		%%FRAGMENT_PRE_SHADING%%
 
 		#ifdef use_normalmapping
-			vec2 tc = gl_TexCoord[0].st;
+			vec2 tc = tex_coord0.st;
 			#ifdef flip_normalmap
 				tc.t = 1.0 - tc.t;
 			#endif
@@ -155,9 +164,9 @@ vertex = [[
 		#endif
 		vec3 light = max(dot(normal, sunPos), 0.0) * sunDiffuse + sunAmbient;
 
-		vec4 diffuseIn  = texture(textureS3o1, gl_TexCoord[0].st);
+		vec4 diffuseIn  = texture(textureS3o1, tex_coord0.st);
 		vec4 outColor   = diffuseIn;
-		vec4 extraColor = texture(textureS3o2, gl_TexCoord[0].st);
+		vec4 extraColor = texture(textureS3o2, tex_coord0.st);
 		vec3 reflectDir = reflect(cameraDir, normal);
 
 		#if (deferred_mode == 0)
@@ -168,7 +177,7 @@ vertex = [[
 			vec3 specular   = vec3(1.0,1.0,1.0) * extraColor.g * SPECULARMULT;
 			vec3 reflection = vec3(0.0,0.0,0.0);
 		#endif
-		float shadow = GetShadowCoeff(gl_TexCoord[1] + vec4(0.0, 0.0, -0.00005, 0.0));
+		float shadow = GetShadowCoeff(tex_coord1 + vec4(0.0, 0.0, -0.00005, 0.0));
 		light     = mix(sunAmbient, light, shadow);
 		specular *= shadow;
 
@@ -194,12 +203,12 @@ vertex = [[
 		#endif
 
 		#if (deferred_mode == 0)
-			gl_FragColor = outColor;
+			fragData[0] = outColor;
 		#else
-			gl_FragData[0] = vec4((normal + 1.0) * 0.5, 1.0);
-			gl_FragData[1] = outColor;
-			gl_FragData[2] = vec4(specular, extraColor.a);
-			gl_FragData[3] = vec4(extraColor.rrr, 1.0);
+			fragData[0] = vec4((normal + 1.0) * 0.5, 1.0);
+			fragData[1] = outColor;
+			fragData[2] = vec4(specular, extraColor.a);
+			fragData[3] = vec4(extraColor.rrr, 1.0);
 		#endif
 
 		%%FRAGMENT_POST_SHADING%%
