@@ -130,7 +130,7 @@ vertex = [[
 	#endif
 	float GetShadowCoeff(vec4 shadowCoors){
 		#ifdef use_shadows
-			float coeff = textureProj(shadowTex, shadowCoors+vec4(0.0, 0.0, -0.00005, 0.0)).r;
+			float coeff = textureProj(shadowTex, shadowCoors+vec4(0.0, 0.0, -0.00005, 0.0));
 			coeff  = (1.0 - coeff);
 			coeff *= shadowDensity;
 			return (1.0 - coeff);
