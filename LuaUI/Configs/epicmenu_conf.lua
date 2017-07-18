@@ -399,6 +399,7 @@ local pathMisc = 'Settings/Misc'
 		type = 'bool',
 		value = false,
 		noHotkey = true,
+		advanced = true,
 		OnChange = function (self)
 			local value = (self.value and 1) or 0 --true = 1, false = 0
 			if self.value then
@@ -409,6 +410,7 @@ local pathMisc = 'Settings/Misc'
 			Spring.SetConfigInt("ZKuseOldChili", value); --store in Springsettings.txt because api_chili.lua must read it independent of gui_epicmenu.lua
 		end,
 	})
+	ShButton(pathMisc, 'Toggle Widget Profiler', function() spSendCommands{"luaui togglewidget WidgetProfiler"} end, '', true)
 
 --- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
 local pathGraphicsMap = 'Settings/Graphics/Map Detail'
