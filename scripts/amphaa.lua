@@ -2,6 +2,8 @@
 
 include "constants.lua"
 
+local scriptReload = include("scriptReload.lua")
+
 local base, pelvis, torso, vent = piece('base', 'pelvis', 'torso', 'vent')
 local rthigh, rcalf, rfoot, lthigh, lcalf, lfoot = piece('rthigh', 'rcalf', 'rfoot', 'lthigh', 'lcalf', 'lfoot')
 local lgun, lbarrel1, lbarrel2, rgun, rbarrel1, rbarrel2 = piece('lgun', 'lbarrel1', 'lbarrel2', 'rgun', 'rbarrel1', 'rbarrel2')
@@ -37,6 +39,8 @@ local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32
+
+local gameSpeed = Game.gameSpeed
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -301,6 +305,7 @@ function script.StopMoving()
 end
 
 function script.Create()
+	scriptReload.SetupScriptReload(4, 12 * gameSpeed)
 	StartThread(SmokeUnit, smokePiece)
 end
 
@@ -340,26 +345,22 @@ function script.QueryWeapon(num)
 	return gun[shot].firepoint
 end
 
+local SleepAndUpdateReload = scriptReload.SleepAndUpdateReload
+
 local function reload(num)
+	scriptReload.GunStartReload(num)
 	gun[num].loaded = false
 	gun[num].readyToAim = false
 
-	local adjustedDuration = 0
-	while adjustedDuration < 9 do --unlock aiming
-		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
-		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
-		adjustedDuration = adjustedDuration + reloadMult
-		Sleep(1000)
-	end
+	SleepAndUpdateReload(num, 9 * gameSpeed)
+
 	gun[num].readyToAim = true
 
-	while adjustedDuration < 12 do --unlock shooting
-		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
-		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
-		adjustedDuration = adjustedDuration + reloadMult
-		Sleep(1000)
-	end
+	SleepAndUpdateReload(num, 3 * gameSpeed)
 
+	if scriptReload.GunLoaded(num) then
+		shot = 0
+	end
 	gun[num].loaded = true
 end
 
