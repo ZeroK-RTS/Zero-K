@@ -96,7 +96,7 @@ local function TableToString(tbl)
 	    else
 		str = str .. [[["]]..i..[["] = ]]
 	    end
-	    
+
 	    if type(v) == "table" then
 		str = str .. TableToString(v)
 	    elseif type(v) == "boolean" then
@@ -122,7 +122,7 @@ for name, ud in pairs(UnitDefs) do
 	    end
 	end
     end
-end 
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -174,15 +174,18 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Tell UnitDefs about script_reload
+-- Tell UnitDefs about script_reload and script_burst
 --
 
 for name, ud in pairs(UnitDefs) do
 	if not ud.customparams.dynamic_comm then
 		if ud.weapondefs then
-			for _, wd in pairs(ud.weapondefs) do      
-				if wd.customparams and wd.customparams.script_reload then 
+			for _, wd in pairs(ud.weapondefs) do
+				if wd.customparams and wd.customparams.script_reload then
 					ud.customparams.script_reload = wd.customparams.script_reload
+				end
+				if wd.customparams and wd.customparams.script_burst then
+					ud.customparams.script_burst = wd.customparams.script_burst
 				end
 			end
 		end
@@ -199,7 +202,7 @@ for name, ud in pairs(UnitDefs) do
 	if not ud.customparams.dynamic_comm then
 		local hasShield = false
 		if ud.weapondefs then
-			for _, wd in pairs(ud.weapondefs) do      
+			for _, wd in pairs(ud.weapondefs) do
 				if wd.weapontype == "Shield" then
 					hasShield = true
 					ud.customparams.shield_power = wd.shieldpower
@@ -288,7 +291,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Disable smoothmesh; allow use of airpads
--- 
+--
 
 for name, ud in pairs(UnitDefs) do
 	if (ud.canfly) then
@@ -298,7 +301,7 @@ for name, ud in pairs(UnitDefs) do
 			ud.refueltime = ud.refueltime or 1
 		end
 	end
-end 
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -365,13 +368,13 @@ if (modOptions and modOptions.damagemult and modOptions.damagemult ~= 1) then
   for _, unitDef in pairs(UnitDefs) do
     if (unitDef.autoheal) then unitDef.autoheal = unitDef.autoheal * damagemult end
     if (unitDef.idleautoheal) then unitDef.idleautoheal = unitDef.idleautoheal * damagemult end
-    
-    if (unitDef.capturespeed) 
+
+    if (unitDef.capturespeed)
       then unitDef.capturespeed = unitDef.capturespeed * damagemult
       elseif (unitDef.workertime) then unitDef.capturespeed = unitDef.workertime * damagemult
     end
-    
-    if (unitDef.repairspeed) 
+
+    if (unitDef.repairspeed)
       then unitDef.repairspeed = unitDef.repairspeed * damagemult
       elseif (unitDef.workertime) then unitDef.repairspeed = unitDef.workertime * damagemult
     end
@@ -391,16 +394,16 @@ for name, ud in pairs(UnitDefs) do
 		ud.turninplacespeedlimit = ud.turninplacespeedlimit or (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
 		--ud.turninplaceanglelimit = 180
 	end
- 
+
 
 	if ud.category and not (ud.category:find("SHIP",1,true) or ud.category:find("SUB",1,true)) then
-		if (ud.maxvelocity) then 
+		if (ud.maxvelocity) then
 			if not name:find("chicken",1,true) then
-				ud.maxreversevelocity = ud.maxvelocity * 0.33 
+				ud.maxreversevelocity = ud.maxvelocity * 0.33
 			end
 		end
 	end
-end 
+end
 
 -- Set to accelerate towards their destination regardless of heading
 for name, ud in pairs(UnitDefs) do
@@ -417,7 +420,7 @@ end
 for name, unitDef in pairs(UnitDefs) do
 	if (unitDef.repairspeed) then
 		unitDef.repairspeed = unitDef.repairspeed * 2
-	elseif (unitDef.workertime) then 
+	elseif (unitDef.workertime) then
 		unitDef.repairspeed = unitDef.workertime * 2
     end
 end
@@ -436,10 +439,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Avoid firing at unarmed
--- 
+--
 for name, ud in pairs(UnitDefs) do
 	if (ud.weapons and not ud.canfly) then
-		for wName,wDef in pairs(ud.weapons) do     
+		for wName,wDef in pairs(ud.weapons) do
 			if wDef.badtargetcategory then
 				wDef.badtargetcategory = wDef.badtargetcategory .. " STUPIDTARGET"
 			else
@@ -463,7 +466,7 @@ end
 
 --for name, ud in pairs(UnitDefs) do
 --  if (ud.weapondefs) then
---    for wName,wDef in pairs(ud.weapondefs) do      
+--    for wName,wDef in pairs(ud.weapondefs) do
 --      wDef.avoidneutral = true
 --    end
 --  end
@@ -472,7 +475,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Set airLOS
--- 
+--
 for name, ud in pairs(UnitDefs) do
 	ud.airsightdistance = (ud.sightdistance or 0)
 end
@@ -481,7 +484,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Set mass
--- 
+--
 for name, ud in pairs(UnitDefs) do
 	ud.mass = (((ud.buildtime/2) + (ud.maxdamage/8))^0.6)*6.5
 	if ud.customparams.massmult then
@@ -510,7 +513,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Cost Checking
--- 
+--
 
 --for name, ud in pairs(UnitDefs) do
 --	if ud.buildcostmetal ~= ud.buildcostenergy or ud.buildtime ~= ud.buildcostenergy then
@@ -522,7 +525,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Festive units mod option (CarRepairer's WIP)
--- 
+--
 
 if (modOptions and tobool(modOptions.xmas)) then
   local gifts = {"present_bomb1.s3o","present_bomb2.s3o","present_bomb3.s3o"}
@@ -555,7 +558,7 @@ end
 
 
 -- Remove initCloaked because cloak state is no longer used
--- 
+--
 
 for name, ud in pairs(UnitDefs) do
 	if tobool(ud.initcloaked) then
@@ -567,13 +570,13 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Altered unit health mod option
--- 
+--
 
 if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
     local hpMulti = modOptions.hpmult
     for unitDefID, unitDef in pairs(UnitDefs) do
         if unitDef.maxdamage and unitDef.unitname ~= "terraunit" then
-            unitDef.maxdamage = math.max(unitDef.maxdamage*hpMulti, 1) 
+            unitDef.maxdamage = math.max(unitDef.maxdamage*hpMulti, 1)
         end
     end
 end
@@ -581,7 +584,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Remove Restore
--- 
+--
 
 for name, ud in pairs(UnitDefs) do
   if tobool(ud.builder) then
@@ -593,7 +596,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Set chicken cost
--- 
+--
 
 --for name, ud in pairs(UnitDefs) do
 --  if (ud.unitname:sub(1,7) == "chicken") then
@@ -605,7 +608,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Category changes
--- 
+--
 for name, ud in pairs(UnitDefs) do
   if ((ud.maxvelocity or 0) > 0) then
 	ud.category = ud.category .. " MOBILE"
@@ -621,7 +624,7 @@ for name, ud in pairs(UnitDefs) do
 		ud.customparams.aimposoffset = ud.modelcenteroffset
 		ud.customparams.midposoffset = ud.modelcenteroffset
 		ud.modelcenteroffset = "0 0 0"
-    end   
+    end
 end
 
 -- Replace regeneration with Lua

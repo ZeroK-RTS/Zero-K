@@ -1,5 +1,7 @@
 include "constants.lua"
 
+local scriptReload = include("scriptReload.lua")
+
 -- Pieces
 local base = piece 'base'
 local body = piece 'body'
@@ -19,6 +21,8 @@ local SIG_AIM = 1
 local SIG_SPIN = 2
 
 local RESTORE_DELAY = 2000
+
+local gameSpeed = Game.gameSpeed
 
 local function Spinner()
 	Signal(SIG_SPIN)
@@ -74,17 +78,17 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
+local SleepAndUpdateReload = scriptReload.SleepAndUpdateReload
+
 local function reload(num)
+	scriptReload.GunStartReload(num)
 	gun[num].loaded = false
 
-	local adjustedDuration = 0
-	while adjustedDuration < 15 do --unlock shooting
-		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
-		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
-		adjustedDuration = adjustedDuration + reloadMult
-		Sleep(1000)
-	end
+	SleepAndUpdateReload(num, 15 * gameSpeed)
 
+	if scriptReload.GunLoaded(num) then
+		shot = 0
+	end
 	gun[num].loaded = true
 end
 
@@ -112,6 +116,7 @@ function script.BlockShot(num, targetID)
 end
 
 function script.Create()
+	scriptReload.SetupScriptReload(2, 15 * gameSpeed)
 	StartThread(SmokeUnit, {base})
 	StartThread(RestoreAfterDelay)
 end
