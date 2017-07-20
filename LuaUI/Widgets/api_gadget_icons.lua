@@ -105,7 +105,7 @@ end
 local spGetUnitCommands = Spring.GetUnitCommands
 local function isWaiting(unitID)
 	local cmd = spGetUnitCommands(unitID, 1)
-	if #cmd == 0 then
+	if not cmd or #cmd == 0 then
 		return false
 	end
 
