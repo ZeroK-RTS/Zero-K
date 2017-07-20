@@ -125,7 +125,10 @@ local function FireAndReload(num)
 
 	Show(bay[num].greenLight)
 
-	scriptReload.GunLoaded(num)
+	if scriptReload.GunLoaded(num) then
+		shotNum = 0
+	end
+	
 	ammo = ammo + 1
 end
 
@@ -157,11 +160,6 @@ end
 function script.FireWeapon()
 	ammo = ammo - 1
 	lights = lights - 1
-
-	if ammo == 0 then
-		firstFire = true
-	end
-
 	StartThread(FireAndReload, shotNum)
 end
 

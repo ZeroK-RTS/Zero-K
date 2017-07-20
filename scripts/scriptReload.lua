@@ -40,7 +40,6 @@ local function SetReloadFrame()
 	return minReloadGunIdx, minReloadFrame
 end
 
-
 local zeroReloadMultSet
 --only gets called if unit was disabled or slowed down (reloadMult~=1.0)
 local function UpdateReloadPenalty(gunNum, reloadMult)
@@ -52,7 +51,6 @@ local function UpdateReloadPenalty(gunNum, reloadMult)
 		zeroReloadMultSet = (reloadMult == 0.0)
 	end
 end
-
 
 -- returns true if all guns have been reloaded, false otherwise
 function extenalFunctions.GunLoaded(gunNum)

@@ -911,13 +911,10 @@ do
 			local reloadFrame = GetUnitRulesParam(unitID, "scriptReloadFrame")
 			if reloadFrame and reloadFrame > gameFrame then
 				local scriptLoaded = GetUnitRulesParam(unitID, "scriptLoaded") or ci.scriptBurst
-				local auxText = string.format("%i/%i | ", scriptLoaded, ci.scriptBurst)
-
-				reload = Spring.GetUnitRulesParam(unitID, "scriptReloadPercentage") or
-						 (1 - ((reloadFrame - gameFrame)/gameSpeed) / ci.scriptReload)
-
+				local barText = string.format("%i/%i", scriptLoaded, ci.scriptBurst) -- .. ' | ' .. floor(reload*100) .. '%'
+				reload = Spring.GetUnitRulesParam(unitID, "scriptReloadPercentage") or (1 - ((reloadFrame - gameFrame)/gameSpeed) / ci.scriptReload)
 				if (reload >= 0) then
-					AddBar(messages.reload, reload,"reload",(fullText and auxText .. floor(reload*100) .. '%') or '')
+					AddBar(messages.reload, reload,"reload",(fullText and barText) or '')
 				end
 			end
 		end
