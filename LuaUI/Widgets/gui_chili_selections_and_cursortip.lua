@@ -1941,6 +1941,13 @@ local function GetTooltipWindow()
 	function externalFunctions.SetPosition(x, y)
 		y = screenHeight - y
 		
+		if x + window.width > screenWidth - 2 then
+			x = screenWidth - window.width - 2
+		end
+		if y + window.height > screenHeight - 2 then
+			y = screenHeight - window.height - 2
+		end
+		
 		local map = WG.MinimapPosition
 		if map then
 			-- Only move tooltip up and/or left if it overlaps the minimap. This is because the
@@ -1956,13 +1963,13 @@ local function GetTooltipWindow()
 					end
 				end
 			end
-		end
-		
-		if x + window.width > screenWidth - 2 then
-			x = screenWidth - window.width - 2
-		end
-		if y + window.height > screenHeight - 2 then
-			y = screenHeight - window.height - 2
+			
+			if x + window.width > screenWidth - 2 then
+				x = screenWidth - window.width - 2
+			end
+			if y + window.height > screenHeight - 2 then
+				y = screenHeight - window.height - 2
+			end
 		end
 		
 		window:SetPos(x, y)
