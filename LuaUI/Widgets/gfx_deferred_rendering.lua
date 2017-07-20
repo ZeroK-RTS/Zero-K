@@ -291,7 +291,7 @@ function widget:Initialize()
 				defines = {
 				    "#version 120\n",
 					"#define BEAM_LIGHT 0\n",
-					"#define GL_CLIP_CONTROL " .. (Platform.glSupportClipSpaceControl and 1 or 0) .. "\n"
+					"#define CLIP_CONTROL " .. (Platform.glSupportClipSpaceControl and 1 or 0) .. "\n"
 				},
 				vertex = vertSrc,
 				fragment = fragSrc,
@@ -320,7 +320,7 @@ function widget:Initialize()
 				defines = {
 					"#version 120\n",
 					"#define BEAM_LIGHT 1\n",
-					"#define GL_CLIP_CONTROL " .. (Platform.glSupportClipSpaceControl and 1 or 0) .. "\n"
+					"#define CLIP_CONTROL " .. (Platform.glSupportClipSpaceControl and 1 or 0) .. "\n"
 				},
 				vertex = vertSrc,
 				fragment = fragSrc,
