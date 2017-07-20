@@ -109,7 +109,7 @@ function widget:UnitCommandNotify(unitID, cmdID, cmdParams, cmdOpts)
 				Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, cmd[1].params, {internal = true})
 			end
 		elseif TargetCancelingCommand[cmdID] and options.removeTarget.value then
-			Spring.GiveOrderToUnit(unitID, CMD_UNIT_CANCEL_TARGET,params,{})
+			Spring.GiveOrderToUnit(unitID, CMD_UNIT_CANCEL_TARGET,cmdParams,{})
 		end
 	end
 	return false
