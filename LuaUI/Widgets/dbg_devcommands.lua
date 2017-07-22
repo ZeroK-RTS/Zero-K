@@ -17,6 +17,7 @@ end
 --------------------------------------------------------------------------------
 -- Mission Creation
 
+local recentlyExported = false
 local BUILD_RESOLUTION = 16
 
 local function GetUnitFacing(unitID)
@@ -84,10 +85,26 @@ local function ExportTeamUnitsForMission(teamID)
 end
 
 local function ExportUnitsForMission()
+	if recentlyExported then
+		return
+	end
 	local teamList = Spring.GetTeamList()
 	Spring.Echo("================== ExportUnitsForMission ==================")
 	for i = 1, #teamList do
 		ExportTeamUnitsForMission(teamList[i])
+	end
+	recentlyExported = 1
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function widget:Update(dt)
+	if recentlyExported then
+		recentlyExported = recentlyExported - dt
+		if recentlyExported < 0 then
+			recentlyExported = false
+		end
 	end
 end
 
