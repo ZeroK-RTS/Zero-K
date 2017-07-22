@@ -611,14 +611,22 @@ local function ProcessUnitCommand(unitID, command)
 		return
 	end
 	
-	if not command.atPosition then
+	if command.params then
+		local params = {}
+		for i = 1, #command.params do -- Somehow tables lose their order
+			params[i] = command.params[i]
+		end
+		Spring.GiveOrderToUnit(unitID, command.cmdID, params, command.options or {})
 		return
 	end
 	
-	local p = command.atPosition
-	local units = Spring.GetUnitsInRectangle(p[1] - BUILD_RESOLUTION, p[2] - BUILD_RESOLUTION, p[1] + BUILD_RESOLUTION, p[2] + BUILD_RESOLUTION)
-	if units and units[1] then
-		Spring.GiveOrderToUnit(unitID, command.cmdID, {units[1]}, command.options or {})
+	if command.atPosition then
+		local p = command.atPosition
+		local units = Spring.GetUnitsInRectangle(p[1] - BUILD_RESOLUTION, p[2] - BUILD_RESOLUTION, p[1] + BUILD_RESOLUTION, p[2] + BUILD_RESOLUTION)
+		if units and units[1] then
+			Spring.GiveOrderToUnit(unitID, command.cmdID, {units[1]}, command.options or {})
+		end
+		return
 	end
 end
 
