@@ -41,7 +41,7 @@ unitDef = {
     sortName       = [[1]],
     aimposoffset   = [[0 0 -16]],
     midposoffset   = [[0 0 -16]],
-	solid_factory = [[4]],
+	solid_factory = [[3]],
 	default_spacing = 8,
   },
 
@@ -67,7 +67,7 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = [[oooooo oooooo oooooo oooooo cccccc cccccc]],
+  yardMap                       = [[oooooo oooooo oooooo cccccc cccccc cccccc]],
 
   featureDefs                   = {
 

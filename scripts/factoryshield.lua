@@ -51,6 +51,7 @@ end
 function script.Create()
 	StartThread (SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
+	Move(pad, z_axis, -10)
 end
 
 function script.QueryNanoPiece ()
