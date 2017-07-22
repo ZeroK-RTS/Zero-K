@@ -42,6 +42,8 @@ local unitLineage = {}
 local initialUnitData = {}
 local bonusObjectiveList = {}
 
+local commandsToGive = nil -- Give commands just after game start
+
 -- Regeneratable
 local vitalUnits = {}
 local defeatConditionConfig
@@ -138,6 +140,27 @@ local function ComparisionSatisfied(compareType, targetNumber, number)
 		return number <= targetNumber
 	end
 	return false
+end
+
+local function SanitizeBuildPositon(x, z, ud, facing)
+	local oddX = (ud.xsize % 4 == 2)
+	local oddZ = (ud.zsize % 4 == 2)
+	
+	if facing % 2 == 1 then
+		oddX, oddZ = oddZ, oddX
+	end
+	
+	if oddX then
+		x = math.floor((x + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
+	else
+		x = math.floor(x/BUILD_RESOLUTION)*BUILD_RESOLUTION
+	end
+	if oddZ then
+		z = math.floor((z + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
+	else
+		z = math.floor(z/BUILD_RESOLUTION)*BUILD_RESOLUTION
+	end
+	return x, z
 end
 
 --------------------------------------------------------------------------------
@@ -497,23 +520,7 @@ local function PlaceUnit(unitData, teamID)
 	local x, z, facing = unitData.x, unitData.z, unitData.facing
 	
 	if ud.isBuilding or ud.speed == 0 then
-		local oddX = (ud.xsize % 4 == 2)
-		local oddZ = (ud.zsize % 4 == 2)
-		
-		if facing % 2 == 1 then
-			oddX, oddZ = oddZ, oddX
-		end
-		
-		if oddX then
-			x = math.floor((x + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
-		else
-			x = math.floor(x/BUILD_RESOLUTION)*BUILD_RESOLUTION
-		end
-		if oddZ then
-			z = math.floor((z + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
-		else
-			z = math.floor(z/BUILD_RESOLUTION)*BUILD_RESOLUTION
-		end
+		x, z = SanitizeBuildPositon(x, z, ud, facing)
 	end
 	
 	local build = (unitData.buildProgress and unitData.buildProgress < 1) or false
@@ -522,6 +529,15 @@ local function PlaceUnit(unitData, teamID)
 	if not unitID then
 		Spring.MarkerAddPoint(x, 0, z, "Error creating unit " .. (((ud or {}).humanName) or "???"))
 		return 
+	end
+	
+	if unitData.commands then
+		local commands = unitData.commands
+		commandsToGive = commandsToGive or {}
+		commandsToGive[#commandsToGive + 1] = {
+			unitID = unitID,
+			commands = commands,
+		}
 	end
 	
 	AddInitialUnitObjectiveParameters(unitID, unitData)
@@ -564,6 +580,52 @@ local function HandleCommanderCreation(unitID, teamID)
 		return
 	end
 	AddInitialUnitObjectiveParameters(unitID, commParameters)
+end
+
+local function ProcessUnitCommand(unitID, command)
+	if command.unitName then
+		local ud = UnitDefNames[command.unitName]
+		command.cmdID = ud and ud.id and -ud.id
+		if not command.cmdID then
+			return
+		end
+		if command.pos then
+			command.pos[1], command.pos[2] = SanitizeBuildPositon(command.pos[1], command.pos[2], ud, command.facing or 0)
+		else -- Must be a factory production command
+			Spring.GiveOrderToUnit(unitID, command.cmdID, {}, command.options or {})
+			return
+		end
+	end
+	
+	local team = Spring.GetUnitTeam(unitID)
+	
+	if command.pos then
+		local x, z = command.pos[1], command.pos[2]
+		local y = CallAsTeam(team,
+			function ()
+				return Spring.GetGroundHeight(x, z) 
+			end
+		)
+		
+		Spring.GiveOrderToUnit(unitID, command.cmdID, {x, y, z, command.facing or command.radius}, command.options or {})
+		return
+	end
+	
+	if not command.atPosition then
+		return
+	end
+	
+	local p = command.atPosition
+	local units = Spring.GetUnitsInRectangle(p[1] - BUILD_RESOLUTION, p[2] - BUILD_RESOLUTION, p[1] + BUILD_RESOLUTION, p[2] + BUILD_RESOLUTION)
+	if units and units[1] then
+		Spring.GiveOrderToUnit(unitID, command.cmdID, {units[1]}, command.options or {})
+	end
+end
+
+local function GiveCommandsToUnit(unitID, commands)
+	for i = 1, #commands do
+		ProcessUnitCommand(unitID, commands[i])
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -711,6 +773,13 @@ local function DoInitialUnitPlacement()
 		local teamID = teamList[i]
 		local customKeys = select(7, Spring.GetTeamInfo(teamID))
 		PlaceTeamUnits(teamID, customKeys)
+	end
+	
+	if commandsToGive then
+		for i = 1, #commandsToGive do
+			GiveCommandsToUnit(commandsToGive[i].unitID, commandsToGive[i].commands)
+		end
+		commandsToGive = nil
 	end
 end
 

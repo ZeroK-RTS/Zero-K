@@ -20,6 +20,27 @@ end
 local recentlyExported = false
 local BUILD_RESOLUTION = 16
 
+local function SanitizeBuildPositon(x, z, ud, facing)
+	local oddX = (ud.xsize % 4 == 2)
+	local oddZ = (ud.zsize % 4 == 2)
+	
+	if facing % 2 == 1 then
+		oddX, oddZ = oddZ, oddX
+	end
+	
+	if oddX then
+		x = math.floor((x + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
+	else
+		x = math.floor(x/BUILD_RESOLUTION)*BUILD_RESOLUTION
+	end
+	if oddZ then
+		z = math.floor((z + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
+	else
+		z = math.floor(z/BUILD_RESOLUTION)*BUILD_RESOLUTION
+	end
+	return x, z
+end
+
 local function GetUnitFacing(unitID)
 	return math.floor(((Spring.GetUnitHeading(unitID) or 0)/16384 + 0.5)%4)
 end
@@ -32,23 +53,7 @@ local function GetUnitString(unitID, tabs)
 	
 	if ud.isBuilding or ud.speed == 0 then
 		facing = Spring.GetUnitBuildFacing(unitID)
-		local oddX = (ud.xsize % 4 == 2)
-		local oddZ = (ud.zsize % 4 == 2)
-		
-		if facing % 2 == 1 then
-			oddX, oddZ = oddZ, oddX
-		end
-		
-		if oddX then
-			x = math.floor((x + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
-		else
-			x = math.floor(x/BUILD_RESOLUTION)*BUILD_RESOLUTION
-		end
-		if oddZ then
-			z = math.floor((z + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
-		else
-			z = math.floor(z/BUILD_RESOLUTION)*BUILD_RESOLUTION
-		end
+		x, z = SanitizeBuildPositon(x, z, ud, facing)
 	else
 		facing = GetUnitFacing(unitID)
 	end
