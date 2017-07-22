@@ -1,11 +1,18 @@
 -- $Id$
 
-local DRAWTYPE = { NONE = -1, MODEL = 0, TREE = 1 }
+local objects = {
+	"behepine_regular_2.s3o",
+	"behepine_regular_3.s3o",
+	"behepine_regular_1.s3o",
+
+	"behepine_brown_1.s3o",
+	"behepine_brown_2.s3o",
+	"behepine_brown_3.s3o",
+}
 
 local treeDefs = {}
-
-local function CreateTreeDef(type)
-  treeDefs["treetype" .. type] = {
+local function CreateTreeDef(i)
+  treeDefs["treetype" .. i] = {
      description = [[Tree]],
      blocking    = true,
      burnable    = true,
@@ -15,16 +22,15 @@ local function CreateTreeDef(type)
      metal       = 0,
      reclaimTime = 25,
      mass        = 20,
-     drawType    = DRAWTYPE.TREE,
+     object = objects[(i % #objects) + 1] ,
      footprintX  = 2,
      footprintZ  = 2,
-     collisionVolumeTest = 0,
+     collisionVolumeScales = [[20 42 20]],
+     collisionVolumeType = [[cylY]],
 
      customParams = {
        mod = true,
      },
-
-     modelType   = type,
   }
 end
 
