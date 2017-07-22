@@ -28,12 +28,12 @@ local spGetUnitHealth       = Spring.GetUnitHealth
 local spGetSelectedUnits    = Spring.GetSelectedUnits
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
-local spGetUnitPosition     = Spring.GetUnitPosition 
+local spGetUnitPosition     = Spring.GetUnitPosition
 local spGetTeamUnits        = Spring.GetTeamUnits
 local spGetMyTeamID         = Spring.GetMyTeamID
 local spTestBuildOrder      = Spring.TestBuildOrder
 local spGetUnitsInRectangle = Spring.GetUnitsInRectangle
-local spGiveOrder           = Spring.GiveOrder	
+local spGiveOrder           = Spring.GiveOrder
 local spGetGroundInfo       = Spring.GetGroundInfo
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetMapDrawMode      = Spring.GetMapDrawMode
@@ -74,7 +74,7 @@ local GL_GREATER         = GL.GREATER
 local floor = math.floor
 local min, max = math.min, math.max
 local strFind = string.find
-local strFormat = string.format	
+local strFormat = string.format
 
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 
@@ -108,7 +108,7 @@ local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 options_path = 'Settings/Interface/Map/Metal Spots'
 options_order = { 'drawicons', 'size', 'rounding'}
 options = {
-	
+
 	drawicons = {
 		name = 'Show Income as Icon',
 		type = 'bool',
@@ -118,10 +118,10 @@ options = {
 		OnChange = function() updateMexDrawList() end
 	},
 	size = {
-		name = "Income Display Size", 
+		name = "Income Display Size",
 		desc = "How large should the font or icon be?",
-		type = "number", 
-		value = 40, 
+		type = "number",
+		value = 40,
 		min = 10,
 		max = 150,
 		step = 5,
@@ -160,8 +160,8 @@ local mexDefInfo = {
 local mexBuilder = {}
 
 local mexBuilderDefs = {}
-for udid, ud in ipairs(UnitDefs) do 
-	for i, option in ipairs(ud.buildOptions) do 
+for udid, ud in ipairs(UnitDefs) do
+	for i, option in ipairs(ud.buildOptions) do
 		if mexDefID == option then
 			mexBuilderDefs[udid] = true
 		end
@@ -193,7 +193,7 @@ local metalSpotsNil = true
 local function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
 	local bestSpot
 	local bestDist = math.huge
-	local bestIndex 
+	local bestIndex
 	for i = 1, #WG.metalSpots do
 		local spot = WG.metalSpots[i]
 		local dx, dz = x - spot.x, z - spot.z
@@ -220,7 +220,7 @@ local function IsSpotBuildable(index)
 	if not spot then
 		return true
 	end
-	
+
 	local unitID = spot.unitID
 	if unitID and spGetUnitAllyTeam(unitID) == spGetMyAllyTeamID() then
 		local build = select(5, spGetUnitHealth(unitID))
@@ -233,33 +233,33 @@ end
 
 local function IntegrateMetal(x, z, forceUpdate)
 	local newCenterX, newCenterZ
-	
+
 	if (mexDefInfo.oddX) then
 		newCenterX = (floor( x / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
 	else
 		newCenterX = floor( x / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
 	end
-	
+
 	if (mexDefInfo.oddZ) then
 		newCenterZ = (floor( z / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
 	else
 		newCenterZ = floor( z / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
 	end
-	
-	if (centerX == newCenterX and centerZ == newCenterZ and not forceUpdate) then 
-		return 
+
+	if (centerX == newCenterX and centerZ == newCenterZ and not forceUpdate) then
+		return
 	end
-	
+
 	centerX = newCenterX
 	centerZ = newCenterZ
-	
+
 	local startX = floor((centerX - MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
 	local startZ = floor((centerZ - MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
 	local endX = floor((centerX + MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
 	local endZ = floor((centerZ + MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
 	startX, startZ = max(startX, 0), max(startZ, 0)
 	endX, endZ = min(endX, MAP_SIZE_X_SCALED - 1), min(endZ, MAP_SIZE_Z_SCALED - 1)
-	
+
 	local mult = mexDefInfo.extraction
 	local result = 0
 
@@ -283,30 +283,30 @@ end
 -- Command Handling
 ------------------------------------------------------------
 
-function widget:CommandNotify(cmdID, params, options)	
+function widget:CommandNotify(cmdID, params, options)
 	if (cmdID == CMD_AREA_MEX and WG.metalSpots) then
 
 		local cx, cy, cz, cr = params[1], params[2], params[3], math.max((params[4] or 60),60)
-		
+
 		local xmin = cx-cr
 		local xmax = cx+cr
 		local zmin = cz-cr
 		local zmax = cz+cr
-		
+
 		local commands = {}
 		local orderedCommands = {}
 		local dis = {}
-		
+
 		local ux = 0
 		local uz = 0
 		local us = 0
-		
+
 		local aveX = 0
 		local aveZ = 0
-		
+
 		local units = spGetSelectedUnits()
 
-		for i = 1, #units do 
+		for i = 1, #units do
 			local unitID = units[i]
 			if mexBuilder[unitID] then
 				local x,_,z = spGetUnitPosition(unitID)
@@ -315,15 +315,15 @@ function widget:CommandNotify(cmdID, params, options)
 				us = us+1
 			end
 		end
-	
+
 		if (us == 0) then
 			return
 		else
 			aveX = ux/us
 			aveZ = uz/us
 		end
-	
-		for i = 1, #WG.metalSpots do		
+
+		for i = 1, #WG.metalSpots do
 			local mex = WG.metalSpots[i]
 			--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
 			if (Distance(cx,cz,mex.x,mex.z) < cr*cr) then -- circle area, slower
@@ -333,20 +333,20 @@ function widget:CommandNotify(cmdID, params, options)
 
 		local noCommands = #commands
 		while noCommands > 0 do
-	  
+
 			tasort(commands, function(a,b) return a.d < b.d end)
 			orderedCommands[#orderedCommands+1] = commands[1]
 			aveX = commands[1].x
 			aveZ = commands[1].z
 			taremove(commands, 1)
-			for k, com in pairs(commands) do		
+			for k, com in pairs(commands) do
 				com.d = Distance(aveX,aveZ,com.x,com.z)
 			end
 			noCommands = noCommands-1
 		end
-	
+
 		local shift = options.shift
-	
+
 		do --issue ordered order to unit(s)
 			local commandArrayToIssue={}
 			local unitArrayToReceive ={}
@@ -357,7 +357,7 @@ function widget:CommandNotify(cmdID, params, options)
 				end
 			end
 			--prepare command list
-			if not shift then 
+			if not shift then
 				commandArrayToIssue[1] = {CMD.STOP, {} , {}}
 			end
 			for i, command in ipairs(orderedCommands) do
@@ -376,7 +376,7 @@ function widget:CommandNotify(cmdID, params, options)
 						local xx = x+addon[1]
 						local zz = z+addon[2]
 						local yy = Spring.GetGroundHeight(xx, zz)
-						
+
 						-- check if some other widget wants to handle the command before sending it to units.
 						if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-solarDefID, {xx, yy, zz, 0}, options, true) then
 							commandArrayToIssue[#commandArrayToIssue+1] = {-solarDefID, {xx,yy,zz,0}, {"shift"}}
@@ -384,17 +384,17 @@ function widget:CommandNotify(cmdID, params, options)
 					end
 				end
 			end
-			
+
 			if (#commandArrayToIssue > 0) then
 				Spring.GiveOrderArrayToUnitArray(unitArrayToReceive,commandArrayToIssue)
 			end
 		end
-  
+
 		return true
 	end
 
 	if -mexDefID == cmdID and WG.metalSpots then
-		
+
 		local bx, bz = params[1], params[3]
 		local closestSpot = GetClosestMetalSpot(bx, bz)
 		if closestSpot then
@@ -409,7 +409,7 @@ function widget:CommandNotify(cmdID, params, options)
 					break
 				end
 			end
-			
+
 			if foundUnit then
 				local build = select(5, spGetUnitHealth(foundUnit))
 				if build ~= 1 then
@@ -435,7 +435,7 @@ function widget:CommandNotify(cmdID, params, options)
 			end
 		end
 	end
-  
+
 end
 
 
@@ -554,10 +554,10 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 	end
 end
 
-local function Initialize() 
+local function Initialize()
 
 	local units = spGetAllUnits()
-	for i, unitID in ipairs(units) do 
+	for i, unitID in ipairs(units) do
 		local unitDefID = spGetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
 		widget:UnitCreated(unitID, unitDefID, teamID)
@@ -568,7 +568,7 @@ local function Initialize()
 	else
 		Spring.Echo("Mex Placement Initialised with metal map mode.")
 	end
-	
+
 	WG.GetClosestMetalSpot = GetClosestMetalSpot
 	if WG.LocalColor and WG.LocalColor.RegisterListener then
 		WG.LocalColor.RegisterListener(widget:GetInfo().name, updateMexDrawList)
@@ -585,7 +585,7 @@ function widget:Update()
 		spotData = {}
 		wasSpectating = isSpectating
 		local units = spGetAllUnits()
-		for i, unitID in ipairs(units) do 
+		for i, unitID in ipairs(units) do
 			local unitDefID = spGetUnitDefID(unitID)
 			local teamID = Spring.GetUnitTeam(unitID)
 		if unitDefID == mexDefID then
@@ -597,9 +597,9 @@ function widget:Update()
 		Initialize()
 		metalSpotsNil = false
 	end
-	
+
 	WG.mouseoverMexIncome = false
-	
+
 	if mexSpotToDraw and WG.metalSpots then
 		WG.mouseoverMexIncome = mexSpotToDraw.metal
 		WG.mouseoverMex = mexSpotToDraw
@@ -610,8 +610,8 @@ function widget:Update()
 		end
 		local mx, my = spGetMouseState()
 		local _, coords = spTraceScreenRay(mx, my, true, true)
-		if (not coords) then 
-			return 
+		if (not coords) then
+			return
 		end
 		IntegrateMetal(coords[1], coords[3])
 		WG.mouseoverMexIncome = extraction
@@ -622,7 +622,7 @@ end
 -- Drawing
 ------------------------------------------------------------
 
-local centerX 
+local centerX
 local centerZ
 local extraction = 0
 
@@ -646,10 +646,10 @@ function calcMainMexDrawList()
 
 			local r, g, b = getSpotColor(i)
 			local metal = spot.metal
-		
 
-			glPushMatrix()	
-			
+
+			glPushMatrix()
+
 			gl.DepthTest(true)
 
 			glColor(0,0,0,0.7)
@@ -658,16 +658,27 @@ function calcMainMexDrawList()
 			glDrawGroundCircle(x, 1, z, 40, 21)
 			glColor(r,g,b,0.7)
 			glLineWidth(spot.metal*1.5)
-			glDrawGroundCircle(x, 1, z, 40, 21)	
-			
+			glDrawGroundCircle(x, 1, z, 40, 21)
+
 			--glColor(0,1,1)
 			--glRect(x-width/2, z+18, x+width/2, z+20)
 			--glDepthTest(false)
-			glPopMatrix()	
-			
+			glPopMatrix()
+		end
+
+		glColor(1,1,1)
+		glTexture("LuaUI/Images/ibeam.png")
+		glDepthTest(false)
+		for i = 1, #WG.metalSpots do
+			local spot = WG.metalSpots[i]
+			local x,z = spot.x, spot.z
+			local y = spGetGroundHeight(x,z)
+			if y < 0 then y = 0 end
+
+			local metal = spot.metal
+
 			glPushMatrix()
-			
-			glDepthTest(false)
+
 			if options.drawicons.value then
 				local size = 1
 				if metal > 10 then
@@ -679,32 +690,46 @@ function calcMainMexDrawList()
 						size = 2.5
 					end
 				end
-				
+
 				size = options.size.value
-				
-				glRotate(90,1,0,0)	
+
+				glRotate(90,1,0,0)
 				glTranslate(0,0,-y-10)
-				glColor(1,1,1)
-				glTexture("LuaUI/Images/ibeam.png")
+
+
 				local width = metal*size
 				glTexRect(x-width/2, z+40, x+width/2, z+40+size,0,0,metal,1)
-				glTexture(false)
 			else
 				-- Draws a metal bar at the center of the metal spot
 				glRotate(90,1,0,0)
 				glTranslate(0,0,-y)
-				glColor(1,1,1)
-				glTexture("LuaUI/Images/ibeam.png")
+
 				glTexRect(x-25, z-25, x+25, z+25,0,0,1,1)
-				glTexture(false)
-				
-				-- Draws the metal spot's base income "south" of the metal spot
-				glRotate(180,1,0,0)
-				glTranslate(x,-z-40-options.size.value, 0)
+			end
+
+			glPopMatrix()
+		end
+		glTexture(false)
+
+		if not options.drawicons.value then
+			--glColor(1,1,1) --already set
+			for i = 1, #WG.metalSpots do
+				local spot = WG.metalSpots[i]
+				local x,z = spot.x, spot.z
+				local y = spGetGroundHeight(x,z)
+				if y < 0 then y = 0 end
+
+				local metal = spot.metal
+
+				glPushMatrix()
+
+				glTranslate(x, y, z)
+				glRotate(-90, 1, 0, 0)
+				glTranslate(0, -40 - options.size.value, 0)
 				glText("+" .. ("%."..options.rounding.value.."f"):format(metal), 0.0, 0.0, options.size.value , "cno")
-			end	
-	
-			glPopMatrix()	
+
+				glPopMatrix()
+			end
 		end
 
 		glLineWidth(1.0)
@@ -714,7 +739,7 @@ end
 --[[
 function calcMiniMexDrawList()
 	local specatate = spGetSpectatingState()
-	
+
 	glLoadIdentity()
 	glTranslate(0,1,0)
 	glScale(mapXinv , -mapZinv, 1)
@@ -726,14 +751,14 @@ function calcMiniMexDrawList()
 		local y = spGetGroundHeight(x,z)
 
 		local r, g, b = getSpotColor(i)
-		
+
 		glLineWidth(spot.metal)
 		glColor(r, g, b)
-		
+
 		glDrawGroundCircle(x, 0, z, 40, 32)
-		
+
 		glPushMatrix()
-		
+
 		glPopMatrix()
 	end
 
@@ -746,9 +771,9 @@ function updateMexDrawList()
 		return
 	end
 
-	if (mainMexDrawList) then 
-		gl.DeleteList(mainMexDrawList); 
-		mainMexDrawList = nil 
+	if (mainMexDrawList) then
+		gl.DeleteList(mainMexDrawList);
+		mainMexDrawList = nil
 	end --delete previous list if exist (ref:gui_chicken.lua by quantum)
 	mainMexDrawList = glCreateList(calcMainMexDrawList)
 	--miniMexDrawList = glCreateList(calcMiniMexDrawList)
@@ -769,69 +794,69 @@ function widget:DrawWorldPreUnit()
 	local _, cmdID = spGetActiveCommand()
 	local showecoMode = WG.showeco
 	local peruse = spGetGameFrame() < 1 or showecoMode or spGetMapDrawMode() == 'metal'
-	
+
 	drawMexSpots = WG.metalSpots and (-mexDefID == cmdID or CMD_AREA_MEX == cmdID or peruse)
 
 	if drawMexSpots then
-			
+
 			gl.DepthTest(true)
 			gl.DepthMask(true)
 		glCallList(mainMexDrawList)
-			
+
 			gl.DepthTest(false)
 			gl.DepthMask(false)
 	end
 end
 
 function widget:DrawWorld()
-	
+
 	-- Check command is to build a mex
 	local _, cmdID = spGetActiveCommand()
 	local showecoMode = WG.showeco
 	local peruse = spGetGameFrame() < 1 or showecoMode or spGetMapDrawMode() == 'metal'
-	
-	
+
+
 	local mx, my = spGetMouseState()
 	local _, pos = spTraceScreenRay(mx, my, true)
-	
+
 	mexSpotToDraw = false
-	
+
 	if WG.metalSpots and pos and (-mexDefID == cmdID or peruse or CMD_AREA_MEX == cmdID) then
-	
+
 		-- Find build position and check if it is valid (Would get 100% metal)
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])
 		local bface = Spring.GetBuildFacing()
 		local closestSpot, distance, index = GetClosestMetalSpot(bx, bz)
-		
-		if closestSpot and (-mexDefID == cmdID or not ((CMD_AREA_MEX == cmdID or peruse) and distance > 60)) and IsSpotBuildable(index) then 
-		
+
+		if closestSpot and (-mexDefID == cmdID or not ((CMD_AREA_MEX == cmdID or peruse) and distance > 60)) and IsSpotBuildable(index) then
+
 			mexSpotToDraw = closestSpot
-			
+
 			local height = spGetGroundHeight(closestSpot.x,closestSpot.z)
 			height = height > 0 and height or 0
-			
+
 			gl.DepthTest(false)
-			
+
 			gl.LineWidth(1.49)
 			gl.Color(1, 1, 0, 0.5)
 			gl.BeginEnd(GL.LINE_STRIP, DoLine, bx, by, bz, closestSpot.x, height, closestSpot.z)
 			gl.LineWidth(1.0)
-			
+
 			gl.DepthTest(true)
 			gl.DepthMask(true)
-			
+
 			gl.Color(1, 1, 1, 0.5)
 			gl.PushMatrix()
 			gl.Translate(closestSpot.x, height, closestSpot.z)
 			gl.Rotate(90 * bface, 0, 1, 0)
 			gl.UnitShape(mexDefID, Spring.GetMyTeamID(), false, true, false)
 			gl.PopMatrix()
-			
+
 			gl.DepthTest(false)
 			gl.DepthMask(false)
 		end
 	end
-	
+
 	gl.Color(1, 1, 1, 1)
 end
 
@@ -849,13 +874,13 @@ function widget:DrawInMiniMap()
 			glLoadIdentity()
 			glTranslate(0, 1, 0)
 			glScale(mapXinv , -mapZinv, 1)
-			
+
 			widget:DrawWorld()
 		glPopMatrix()
 		--]]
-		
+
 		local specatate = spGetSpectatingState()
-		
+
 		glLoadIdentity()
 		glTranslate(0,1,0)
 		glScale(mapXinv , -mapZinv, 1)
@@ -867,20 +892,20 @@ function widget:DrawInMiniMap()
 			local y = spGetGroundHeight(x,z)
 
 			local r,g,b = getSpotColor(i)
-			
+
 			glLighting(false)
 			glColor(0,0,0,1)
 			glLineWidth(((spot.metal > 0 and spot.metal) or 0.1)*2.0)
 			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
 			glLineWidth((spot.metal > 0 and spot.metal) or 0.1)
 			glColor(r,g,b,1.0)
-			
+
 			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
 		end
 
 		glLineWidth(1.0)
 		glColor(1,1,1,1)
-		
+
 	end
 
 end
@@ -889,7 +914,7 @@ end
 local function DrawTextWithBackground(text, x, y, size, opt)
 	local width = glGetTextWidth(text) * size
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-	
+
 	glColor(0.25, 0.25, 0.25, 0.75)
 	if (opt) then
 		if (strFind(opt, "r")) then
@@ -902,9 +927,9 @@ local function DrawTextWithBackground(text, x, y, size, opt)
 	else
 		glRect(x, y, x + width, y + size * TEXT_CORRECT_Y)
 	end
-	glColor(0.75, 0.75, 0.75, 1)	
+	glColor(0.75, 0.75, 0.75, 1)
 	glText(text, x, y, size, opt)
-	
+
 end
 
 function widget:DrawScreen()
@@ -919,8 +944,8 @@ function widget:DrawScreen()
 		end
 		local mx, my = spGetMouseState()
 		local _, coords = spTraceScreenRay(mx, my, true, true)
-		if (not coords) then 
-			return 
+		if (not coords) then
+			return
 		end
 		IntegrateMetal(coords[1], coords[3])
 		DrawTextWithBackground("\255\255\255\255Metal extraction: " .. strFormat("%.2f", extraction), mx, my, TEXT_SIZE, "d")
