@@ -315,6 +315,9 @@ local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 	
 	-- Check satisfaction
 	local unitCount = SumUnits(objectiveData.units, objectiveData.targetNumber + 1) + (objectiveData.removedUnits or 0)
+	if objectiveData.onlyCountRemovedUnits then
+		unitCount = objectiveData.removedUnits or 0
+	end
 	local satisfied = ComparisionSatisfied(objectiveData.comparisionType, objectiveData.targetNumber, unitCount)
 	if satisfied then
 		if objectiveData.satisfyAtTime or objectiveData.satisfyByTime or objectiveData.satisfyOnce then
@@ -375,7 +378,7 @@ local function RemoveBonusObjectiveUnit(unitID, bonusObjectiveID)
 	end
 	if objectiveData.units[unitID] then
 		local inbuild
-		if objectiveData.countRemovedUnits then
+		if objectiveData.countRemovedUnits or objectiveData.onlyCountRemovedUnits then
 			inbuild = (select(3, Spring.GetUnitIsStunned(unitID)) and 1) or 0
 			if inbuild == 0 then
 				objectiveData.removedUnits = (objectiveData.removedUnits or 0) + 1
