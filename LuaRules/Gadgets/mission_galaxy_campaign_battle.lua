@@ -13,6 +13,7 @@ function gadget:GetInfo()
 end
 
 local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
+local missionDifficulty = tonumber(Spring.GetModOptions().planetmissiondifficulty) or 2
 if not campaignBattleID then
 	return
 end
@@ -510,6 +511,13 @@ local function AddInitialUnitObjectiveParameters(unitID, parameters)
 end
 
 local function PlaceUnit(unitData, teamID)
+	if unitData.difficultyAtLeast and (unitData.difficultyAtLeast > missionDifficulty) then
+		return
+	end
+	if unitData.difficultyAtMost and (unitData.difficultyAtMost < missionDifficulty) then
+		return
+	end
+	
 	local name = unitData.name
 	local ud = UnitDefNames[name]
 	if not (ud and ud.id) then
