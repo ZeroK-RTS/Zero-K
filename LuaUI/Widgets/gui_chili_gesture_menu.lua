@@ -555,15 +555,18 @@ function widget:MouseRelease(x,y,button)
 		if (activeid ~= nil and activeid < 0) then  -- we already had unit selected and menu wasnt visible - cancel previous unit selection
 			Spring.SetActiveCommand(0) 
 		else 
-			inMinimap = Spring.IsAboveMiniMap(x, y)
+			local inMinimap = Spring.IsAboveMiniMap(x, y)
 			local pos
 	
 			if inMinimap then
 				pos = MinimapMouseToWorld(x, y)
 			else
-				_, pos = Spring.TraceScreenRay(x, y, true)
+				pos = select(2, Spring.TraceScreenRay(x, y, true))
 			end
-    
+			if not pos then
+				return
+			end
+
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			local keyState = {coded = 0}
 			if alt   then keyState.alt   = true; keyState.coded = keyState.coded + CMD.OPT_ALT   end
