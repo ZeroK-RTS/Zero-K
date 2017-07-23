@@ -619,15 +619,6 @@ local function ProcessUnitCommand(unitID, command)
 		return
 	end
 	
-	if command.params then
-		local params = {}
-		for i = 1, #command.params do -- Somehow tables lose their order
-			params[i] = command.params[i]
-		end
-		Spring.GiveOrderToUnit(unitID, command.cmdID, params, command.options or {})
-		return
-	end
-	
 	if command.atPosition then
 		local p = command.atPosition
 		local units = Spring.GetUnitsInRectangle(p[1] - BUILD_RESOLUTION, p[2] - BUILD_RESOLUTION, p[1] + BUILD_RESOLUTION, p[2] + BUILD_RESOLUTION)
@@ -636,6 +627,14 @@ local function ProcessUnitCommand(unitID, command)
 		end
 		return
 	end
+	
+	local params = {}
+	if command.params then
+		for i = 1, #command.params do -- Somehow tables lose their order
+			params[i] = command.params[i]
+		end
+	end
+	Spring.GiveOrderToUnit(unitID, command.cmdID, params, command.options or {})
 end
 
 local function GiveCommandsToUnit(unitID, commands)
