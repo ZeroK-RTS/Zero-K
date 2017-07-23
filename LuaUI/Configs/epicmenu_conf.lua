@@ -272,7 +272,7 @@ local cameraPath = 'Settings/Camera'
 	local cofcDisable = "luaui disablewidget Combo Overhead/Free Camera (experimental)"
 	ShRadio( cameraPath,
 		'Camera Type', {
-			{name = 'Total Annihilation', desc='Default camera', hotkey=nil},
+			{name = 'Default camera', key='Total Annihilation', desc='Default camera', hotkey=nil},
 			{name = 'FPS',key='FPS', hotkey=nil},
 			{name = 'Free',key='Free', hotkey=nil},
 			{name = 'Rotatable Overhead',key='Rotatable Overhead', hotkey=nil},
