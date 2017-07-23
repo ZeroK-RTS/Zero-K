@@ -268,6 +268,12 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	SetUnitRulesModuleCounts(unitID, counts)
 	
 	ApplyModuleEffects(unitID, moduleEffectData, totalCost, images or {})
+	
+	if staticLevel then
+		-- Newly created commander, set to full health
+		local _, maxHealth = Spring.GetUnitHealth(unitID)
+		Spring.SetUnitHealth(unitID, maxHealth)
+	end
 end
 
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
