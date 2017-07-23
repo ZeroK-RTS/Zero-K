@@ -1348,6 +1348,14 @@ local sounds = {
 			[1] = "turret_select",
 		},
 	},
+	turretsunlance = {
+		ok = {
+			[1] = "turret_select",
+		},
+		select = {
+			[1] = "turret_select",
+		},
+	},
 	staticheavyarty = {
 		ok = {
 			[1] = "turret_select",

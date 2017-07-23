@@ -741,6 +741,12 @@ local icontypes = {
     size=2,
   },
   
+  -- Sunlance
+  staticassault = {
+    bitmap='icons/staticassault.png',
+    size=1.8,
+  },
+  
   --Penetrator
   mobiletachyon = {
     bitmap='icons/mobiletachyon.dds',
