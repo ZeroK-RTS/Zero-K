@@ -18,6 +18,8 @@ if not campaignBattleID then
 	return
 end
 
+local CRASH_CIRCUIT = Spring.GetModOptions().crashcircuit
+
 local COMPARE = {
 	AT_LEAST = 1,
 	AT_MOST = 2
@@ -904,12 +906,22 @@ function gadget:Initialize()
 	GG.GalaxyCampaignHandler = GalaxyCampaignHandler
 end
 
+if CRASH_CIRCUIT then
+	function gadget:GamePreload(n)
+		if not Spring.GetGameRulesParam("loadedGame") then
+			DoInitialUnitPlacement()
+		end
+	end
+end
+
 function gadget:GameFrame(n)
 	-- Would use GamePreload if it didn't cause Circuit to crash.
 	if firstGameFrame then
 		firstGameFrame = false
-		if not Spring.GetGameRulesParam("loadedGame") then
-			DoInitialUnitPlacement()
+		if not CRASH_CIRCUIT then
+			if not Spring.GetGameRulesParam("loadedGame") then
+				DoInitialUnitPlacement()
+			end
 		end
 	end
 	
