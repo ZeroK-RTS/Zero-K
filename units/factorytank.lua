@@ -9,7 +9,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
   buildingGroundDecalSizeY      = 8,
-  buildingGroundDecalType       = [[factorytank_aoplane.dds]],
+  buildingGroundDecalType       = [[factorytank_decal.png]],
 
   buildoptions                  = {
     [[tankcon]],
@@ -39,7 +39,7 @@ unitDef = {
   customParams                  = {
     description_de = [[Produziert schwere und speziallisierte Fahrzeuge, Baut mit 10 M/s]],
     helptext       = [[The Heavy Tank Factory is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Pillager, Reaper, Banisher, Goliath]],
-	helptext_de    = [[Die Heavy Tank Factory ist das Ultimum für brachiale Gewalt. Nicht erledigt den Auftrag zu gut, wie ein anhaltendes Artilleriefeuer, gefolgt von einem entscheidenen Vorstoß mit den größten Panzern auf dem Feld. Wichtigste Einheiten: Pillager, Reaper, Banisher, Goliath]],
+	helptext_de    = [[Die Heavy Tank Factory ist das Ultimum fÃ¼r brachiale Gewalt. Nicht erledigt den Auftrag zu gut, wie ein anhaltendes Artilleriefeuer, gefolgt von einem entscheidenen Vorstoï¿½ mit den grï¿½ï¿½ten Panzern auf dem Feld. Wichtigste Einheiten: Pillager, Reaper, Banisher, Goliath]],
     sortName = [[6]],
     solid_factory = 3,
   },

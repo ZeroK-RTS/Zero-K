@@ -9,7 +9,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 8,
   buildingGroundDecalSizeY      = 8,
-  buildingGroundDecalType       = [[factoryveh_aoplane.dds]],
+  buildingGroundDecalType       = [[factoryveh_decal.png]],
 
   buildoptions                  = {
     [[vehcon]],
