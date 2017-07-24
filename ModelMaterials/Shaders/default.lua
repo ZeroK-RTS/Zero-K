@@ -91,9 +91,16 @@ vertex = [[
 ]],
 
   fragment = [[
-//#define use_normalmapping
-//#define flip_normalmap
-//#define use_shadows
+	#if (GL_FRAGMENT_PRECISION_HIGH == 1)
+	// ancient GL3 ATI drivers confuse GLSL for GLSL-ES and require this
+	precision highp float;
+	#else
+	precision mediump float;
+	#endif
+
+	//#define use_normalmapping
+	//#define flip_normalmap
+	//#define use_shadows
 
 	%%FRAGMENT_GLOBAL_NAMESPACE%%
 
