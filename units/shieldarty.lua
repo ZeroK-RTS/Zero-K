@@ -56,7 +56,6 @@ unitDef = {
 
     {
       def                = [[EMP_ROCKET]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
