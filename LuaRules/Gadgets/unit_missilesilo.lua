@@ -135,7 +135,7 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID)
 	-- silo destroyed
 	if unitDefID == siloDefID then
-		local missiles = GetSiloEntry(builderID)
+		local missiles = GetSiloEntry(builderID) or {}
 		for index,missileID in pairs(missiles) do
 			missilesToDestroy[#missilesToDestroy + 1] = missileID
 		end
