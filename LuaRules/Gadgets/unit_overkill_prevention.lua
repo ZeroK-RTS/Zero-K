@@ -204,17 +204,18 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 			end
 		end
 
-		disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
-		if disarmFrame == -1 then
-			--no disarm damage on targetID yet(already)
-			disarmFrame = gameFrame
-		end
+		--"or gameframe" means unit has not been hit with disarming shot yet
+		disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or gameframe
 	else
 		timeout = timeout * (radarMult or 1)
 
 		local ud = UnitDefs[unitDefID]
-		adjHealth = ud.health/ud.armoredMultiple + (shieldPowerDef[unitDefID] or 0)
-		disarmFrame = -1
+
+		-- math.huge means we don't know anything about the (unidentified) radar dot's health. Might be flea, might be terrible space monster, so OKP is effectively off
+		adjHealth = (targetIdentified and (ud.health/ud.armoredMultiple + (shieldPowerDef[unitDefID] or 0))) or math.huge
+
+		-- -math.huge means we don't want to speculate on what (unidentified) radar dot disarm status is, so OKP is effectively off
+		disarmFrame = (targetIdentified and gameFrame) or -math.huge
 	end
 
 	local incData = incomingDamage[targetID]
@@ -242,7 +243,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 				end
 			end
 		end
-	else --new targe
+	else --new target
 		if not addToIncomingDamage then
 			lastShot[unitID] = targetID
 			return false
