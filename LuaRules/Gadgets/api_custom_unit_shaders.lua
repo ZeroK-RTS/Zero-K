@@ -147,10 +147,10 @@ local function CompileShader(shader, definitions, plugins)
     if not hasVersion then
       table.insert(definitions, 1, "#version 130")
     end
-    definitions = table.concat(definitions, "\n")
     if (shadows) then
-      definitions = definitions .. "\n" .. "#define use_shadows" .. "\n"
+      table.insert(definitions, "#define use_shadows")
     end
+    definitions = table.concat(definitions, "\n") .. "\n"
     if (shader.vertex)
       then shader.vertex = definitions .. shader.vertex; end
     if (shader.fragment)
