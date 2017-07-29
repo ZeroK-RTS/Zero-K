@@ -379,12 +379,15 @@ local function DoPeriodicBonusObjectiveUpdate(gameSeconds)
 	--DebugPrintBonusObjective()
 end
 
-local function AddBonusObjectiveUnit(unitID, bonusObjectiveID, allyTeamID)
+local function AddBonusObjectiveUnit(unitID, bonusObjectiveID, allyTeamID, isCapture)
 	if gameIsOver then
 		return
 	end
 	local objectiveData = bonusObjectiveList[bonusObjectiveID]
 	if objectiveData.unitsLocked or objectiveData.terminated then
+		return
+	end
+	if isCapture and not objectiveData.capturedUnitsSatisfy then
 		return
 	end
 	objectiveData.units = objectiveData.units or {}
@@ -463,12 +466,12 @@ local function InitializeBonusObjectives()
 	end
 end
 
-local function AddUnitToBonusObjectiveList(unitID, objectiveList)
+local function AddUnitToBonusObjectiveList(unitID, objectiveList, isCapture)
 	if not objectiveList then
 		return
 	end
 	for i = 1, #objectiveList do
-		AddBonusObjectiveUnit(unitID, objectiveList[i])
+		AddBonusObjectiveUnit(unitID, objectiveList[i], nil, isCapture)
 	end
 end
 
@@ -481,11 +484,11 @@ local function RemoveUnitFromBonusObjectiveList(unitID, objectiveList)
 	end
 end
 
-local function BonusObjectiveUnitCreated(unitID, unitDefID, teamID)
+local function BonusObjectiveUnitCreated(unitID, unitDefID, teamID, isCapture)
 	if teamID == PLAYER_TEAM_ID then
-		AddUnitToBonusObjectiveList(unitID, myUnitDefBonusObj[unitDefID])
+		AddUnitToBonusObjectiveList(unitID, myUnitDefBonusObj[unitDefID], isCapture)
 	elseif Spring.GetUnitAllyTeam(unitID) ~= PLAYER_ALLY_TEAM_ID then
-		AddUnitToBonusObjectiveList(unitID, enemyUnitDefBonusObj[unitDefID])
+		AddUnitToBonusObjectiveList(unitID, enemyUnitDefBonusObj[unitDefID], isCapture)
 	end
 end
 
@@ -880,6 +883,10 @@ end
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	LineageUnitCreated(unitID, unitDefID, teamID, builderID)
 	BonusObjectiveUnitCreated(unitID, unitDefID, teamID)
+end
+
+function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
+	BonusObjectiveUnitCreated(unitID, unitDefID, newTeam, true)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
