@@ -55,7 +55,7 @@ local function Create_Beacon_Thread(x,z)
 			stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
 			disarm = spGetUnitRulesParam(unitID,"disarmed") == 1
 		end
-		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
+		Spring.SpawnCEG("teleport_progress", x, y + 14, z, 0, 0, 0, 0)
 		if i == 30 or i == 60 then
 			GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 3, x, y, z)
 		end

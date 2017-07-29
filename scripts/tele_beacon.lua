@@ -72,7 +72,7 @@ end
 function startTeleOutLoop(teleportiee, teleporter)
 	StartThread(startTeleOutLoop_Thread, teleportiee, teleporter)
 end
-	
+
 function endTeleOutLoop()
 	Signal(SIG_CEG_EFFECTS)
 end
