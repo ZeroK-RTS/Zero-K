@@ -68,12 +68,19 @@ local mapHeight
 
 local reclaimed_data = {} -- holds initial gameframe, initial time in seconds, % of feature reclaimed
 local zombies_to_spawn = {}
+local zombiesToSpawnList = {}
+local zombiesToSpawnMap = {}
+local zombiesToSpawnCount = 0
 local zombies = {}
 
 local defined = false -- wordaround, because i meet some kind of racing condition, if any gadget spawns gaia BEFORE this gadget can process all the stuff...
 
 local MexDefs = {
 	[UnitDefNames["staticmex"].id] = true,
+}
+
+local NonZombies = {
+	["asteroid"] = true,
 }
 
 local WARNING_TIME = 5 -- seconds to start being scary before actual reanimation event
@@ -118,6 +125,25 @@ local function SetZombieSlow(unitID, slowed)
 	GG.UpdateUnitAttributes(unitID)
 end
 
+local function RemoveZombieToSpawn(featureID)
+	if not zombiesToSpawnMap[featureID] then
+		return false
+	end
+	zombies_to_spawn[featureID] = nil
+	reclaimed_data[featureID] = nil
+	
+	local index = zombiesToSpawnMap[featureID]
+	
+	zombiesToSpawnList[index] = zombiesToSpawnList[zombiesToSpawnCount]
+	zombiesToSpawnMap[zombiesToSpawnList[zombiesToSpawnCount]] = index
+	
+	zombiesToSpawnList[zombiesToSpawnCount] = nil
+	zombiesToSpawnMap[featureID] = nil
+	zombiesToSpawnCount = zombiesToSpawnCount - 1
+	
+	return true
+end
+
 local function GetUnitNearestAlly(unitID, range)
 	local best_ally
 	local best_dist
@@ -141,10 +167,13 @@ end
 
 local function OpenAllClownSlots(unitID, unitDefID) -- give factory something to do
 	local buildopts = UnitDefs[unitDefID].buildOptions
+	if (not buildopts) or #buildopts <= 0 then
+		return
+	end
 	local orders = {}
 	--local x,y,z = spGetUnitPosition(unitID)
 	for i = 1, random(10, 30) do
-		orders[#orders+1] = {-buildopts[random(1, #buildopts)], {}, {} }
+		orders[#orders + 1] = {-buildopts[random(1, #buildopts)], {}, {} }
 	end
 	if (#orders > 0) then
 		if not spGetUnitIsDead(unitID) then
@@ -232,14 +261,19 @@ function gadget:GameFrame(f)
 	gameframe = f
 	if (f%32) == 0 then
 		local spSpawnCEG = Spring.SpawnCEG -- putting the localization here because cannot localize in global scope since spring 97
-		for id, time_to_spawn in pairs(zombies_to_spawn) do
-			local x, y, z=spGetFeaturePosition(id)
+		local index = 1
+		while index <= zombiesToSpawnCount do
+			local featureID = zombiesToSpawnList[index]
+			local time_to_spawn = zombies_to_spawn[featureID]
+			local x, y, z = spGetFeaturePosition(featureID)
 
 			if time_to_spawn <= f then
-				zombies_to_spawn[id] = nil
-				local resName, face = myGetFeatureRessurect(id)
-				spDestroyFeature(id)
-				local unitID = spCreateUnit(resName,x,y,z,face,GaiaTeamID)
+				if not RemoveZombieToSpawn(featureID) then
+					index = index + 1
+				end
+				local resName, face = myGetFeatureRessurect(featureID)
+				spDestroyFeature(featureID)
+				local unitID = spCreateUnit(resName, x, y, z, face, GaiaTeamID)
 				if (unitID) then
 					local size = UnitDefNames[resName].xsize
 					spSpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
@@ -247,10 +281,10 @@ function gadget:GameFrame(f)
 					SendToUnsynced("rez_sound", x, y, z)
 				end
 			else
-				local steps_to_spawn = floor((time_to_spawn-f) / 32)
-				local resName, face = myGetFeatureRessurect(id)
+				local steps_to_spawn = floor((time_to_spawn - f) / 32)
+				local resName, face = myGetFeatureRessurect(featureID)
 				if steps_to_spawn <= WARNING_TIME then
-					local r = Spring.GetFeatureRadius(id)
+					local r = Spring.GetFeatureRadius(featureID)
 
 					spSpawnCEG(CEG_SPAWN, x, y, z, 0, 0, 0, 10 + r, 10 + r)
 
@@ -258,6 +292,7 @@ function gadget:GameFrame(f)
 						--SendToUnsynced("zombie_sound", x, y, z)
 					end
 				end
+				index = index + 1
 			end
 		end
 	end
@@ -301,22 +336,25 @@ end
 
 function gadget:FeatureCreated(featureID, allyTeam)
 	local resName, face = myGetFeatureRessurect(featureID)
-	if resName and face and not(zombies_to_spawn[featureID]) then
-		if UnitDefNames[resName] then
+	if resName and face and not zombies_to_spawn[featureID] then
+		if UnitDefNames[resName] and not NonZombies[resName] then
 			local rez_time = UnitDefNames[resName].metalCost / ZOMBIES_REZ_SPEED
 			if (rez_time < ZOMBIES_REZ_MIN) then
 				  rez_time = ZOMBIES_REZ_MIN
 			end
-			reclaimed_data[featureID] = {gameframe,rez_time, 0}
-			zombies_to_spawn[featureID] = gameframe+(rez_time*32)
+			reclaimed_data[featureID] = {gameframe, rez_time, 0}
+			zombies_to_spawn[featureID] = gameframe + (rez_time*32)
+			
+			zombiesToSpawnCount = zombiesToSpawnCount + 1
+			zombiesToSpawnList[zombiesToSpawnCount] = featureID
+			zombiesToSpawnMap[featureID] = zombiesToSpawnCount
 		end
 	end
 end
 
 function gadget:FeatureDestroyed(featureID, allyTeam)
 	if (zombies_to_spawn[featureID]) then
-		zombies_to_spawn[featureID]=nil
-		reclaimed_data[featureID]=nil
+		RemoveZombieToSpawn(featureID)
 	end
 end
 
