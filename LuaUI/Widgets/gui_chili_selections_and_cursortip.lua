@@ -2103,8 +2103,7 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 		return true
 	end
 	
-	-- Unit or feature tooltip 
-	local mx, my = spGetMouseState()
+	-- Unit or feature tooltip
 	local thingType, thingID = spTraceScreenRay(mx,my)
 	local thingIsUnit = (thingType == "unit")
 	if thingIsUnit or (thingType == "feature") then
@@ -2149,8 +2148,8 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 end
 
 local function UpdateTooltip(dt, requiredOnly)
-	local mx, my = spGetMouseState()
-	local visible = UpdateTooltipContent(mx, my, dt, requiredOnly)
+	local mx, my, _, _, _, outsideSpring = spGetMouseState()
+	local visible = (not outsideSpring) and UpdateTooltipContent(mx, my, dt, requiredOnly)
 	tooltipWindow.SetVisible(visible)
 	if visible then
 		tooltipWindow.SetPosition(mx + 20, my - 20)
