@@ -284,12 +284,13 @@ for uid = 1, #UnitDefs do
 			targetTable[uid][wid] = unitHealthRatio[uid] + 35
 		elseif unitIsClaw[uid] then
 			targetTable[uid][wid] = unitHealthRatio[uid] + 1000
-		elseif (unitIsFighterOrDrone[uid])
-			or (weaponBadCats[wid].fixedwing and unitIsFixedwing[uid])
+		elseif (weaponBadCats[wid].fixedwing and unitIsFixedwing[uid])
 			or (weaponBadCats[wid].gunship and unitIsGunship[uid])
-			or (weaponBadCats[wid].ground and unitIsGround[uid])
-			or (weaponBadCats[wid].cheap and unitIsCheap[uid])then
+			or (weaponBadCats[wid].ground and unitIsGround[uid]) then
 				targetTable[uid][wid] = unitHealthRatio[uid] + 15
+		elseif (unitIsFighterOrDrone[uid])
+			or (weaponBadCats[wid].cheap and unitIsCheap[uid]) then
+				targetTable[uid][wid] = unitHealthRatio[uid] + 10
 		elseif (unitIsBomber[uid] and weaponIsAA[wid])
 			or (weaponBadCats[wid].heavy and unitIsHeavy[uid]) then
 			targetTable[uid][wid] = unitHealthRatio[uid]*0.3

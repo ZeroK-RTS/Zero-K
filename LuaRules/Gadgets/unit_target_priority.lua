@@ -272,7 +272,7 @@ local function GetDisarmWeaponPriorityModifier(unitID, attackerWeaponDefID)
 	if stunned <= disarmWeaponTimeDefs[attackerWeaponDefID] then
 		return GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
 	end
-	return 10 + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
+	return 20 + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
 end
 
 --------------------------------------------------------------------------------
