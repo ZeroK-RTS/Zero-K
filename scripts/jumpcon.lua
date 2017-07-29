@@ -575,6 +575,7 @@ function halfJump()
 end
 
 function endJump()
+	script.StopMoving()
 	EmitSfx(jump, UNIT_SFX2)
 end
 
