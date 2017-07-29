@@ -1,6 +1,10 @@
 -- Assuming max HP/Cost is 50.
 -- Max useful HP/Cost is 11, Only Dirtbag and Claw are higher at 32.5 and 40 respectively.
 
+local DISARM_BASE = 0.3
+local DISARM_ADD = 0.2
+local DISARM_ADD_TIME = 10*30 -- frames
+
 local weaponBadCats = {}
 local weaponIsAA = {}
 
@@ -181,12 +185,16 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["staticheavyarty_plasma"].id]           = {2.0},
 }
 
-local disarmWeaponDefs = {
-	[WeaponDefNames["shieldarty_emp_rocket"].id] = true,
-	[WeaponDefNames["shipscout_missile"].id] = true,
-	--[WeaponDefNames["turretemp_arm_det_weapon"].id] = true,
-	--[WeaponDefNames["arm_venom_spider"].id] = true,
+-- Do not apply the large already disarmed target penalty if it has disarm less than the times below.
+-- If a unit is disarmed OKP says that it is expected to be disarmed then the large penalty is applied regardless.
+local disarmWeaponTimeDefs = {
+	[WeaponDefNames["shieldarty_emp_rocket"].id] = 5,
+	[WeaponDefNames["shipscout_missile"].id] = 1.5,
 }
+
+for key, value in pairs(disarmWeaponTimeDefs) do
+	disarmWeaponTimeDefs[key] = DISARM_BASE + DISARM_ADD*(value*30)/DISARM_ADD_TIME
+end
 
 local captureWeaponDefs = {
 	[WeaponDefNames["vehcapture_captureray"].id] = true
@@ -317,4 +325,4 @@ for wid = 1, #WeaponDefs do
 	end
 end
 
-return targetTable, disarmWeaponDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult, highAlphaWeaponDamages
+return targetTable, disarmWeaponTimeDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME
