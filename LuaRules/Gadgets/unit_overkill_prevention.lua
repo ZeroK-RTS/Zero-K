@@ -204,42 +204,41 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 			end
 		end
 
-		--"or gameframe" means unit has not been hit with disarming shot yet
-		disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or gameframe
+		disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
+		if disarmFrame == -1 then
+			disarmFrame = gameFrame
+		end
 	else
 		timeout = timeout * (radarMult or 1)
-
 		local ud = UnitDefs[unitDefID]
-
-		-- math.huge means we don't know anything about the (unidentified) radar dot's health. Might be flea, might be terrible space monster, so OKP is effectively off
-		adjHealth = (targetIdentified and (ud.health/ud.armoredMultiple + (shieldPowerDef[unitDefID] or 0))) or math.huge
-
-		-- -math.huge means we don't want to speculate on what (unidentified) radar dot disarm status is, so OKP is effectively off
-		disarmFrame = (targetIdentified and gameFrame) or -math.huge
+		adjHealth = (targetIdentified and (ud.health/ud.armoredMultiple + (shieldPowerDef[unitDefID] or 0))) or false
+		disarmFrame = (targetIdentified and gameFrame) or false
 	end
 
 	local incData = incomingDamage[targetID]
 	local targetFrame = gameFrame + timeout
 	local block = false
 
-	if incData then --seen this target
-		local startIndex, endIndex = incData.frames:GetIdxs()
-		for i = startIndex, endIndex do
-			local keyValue = incData.frames:GetKV(i)
-			local frame, data = keyValue[1], keyValue[2]
-			--Spring.Echo(frame)
-			if frame < gameFrame then
-				incData.frames:TrimFront() --frames should come in ascending order, so it's safe to trim front of array one by one
-			else
-				local disarmDamage = data.disarmDamage
-				local fullDamage = data.fullDamage
+	if incData then -- seen this target
+		if adjHealth and disarmFrame then
+			local startIndex, endIndex = incData.frames:GetIdxs()
+			for i = startIndex, endIndex do
+				local keyValue = incData.frames:GetKV(i)
+				local frame, data = keyValue[1], keyValue[2]
+				--Spring.Echo(frame)
+				if frame < gameFrame then
+					incData.frames:TrimFront() --frames should come in ascending order, so it's safe to trim front of array one by one
+				else
+					local disarmDamage = data.disarmDamage
+					local fullDamage = data.fullDamage
 
-				local disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
-				adjHealth = adjHealth - fullDamage
+					local disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
+					adjHealth = adjHealth - fullDamage
 
-				disarmFrame = disarmFrame + disarmExtra
-				if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then
-					disarmFrame = frame + DECAY_FRAMES + disarmTimeout
+					disarmFrame = disarmFrame + disarmExtra
+					if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then
+						disarmFrame = frame + DECAY_FRAMES + disarmTimeout
+					end
 				end
 			end
 		end
@@ -252,8 +251,8 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		incData = incomingDamage[targetID]
 	end
 
-	local doomed = targetIdentified and (adjHealth < 0) and (fullDamage > 0) --for regular projectile
-	local disarmed = targetIdentified and (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) and (disarmDamage > 0) --for disarming projectile
+	local doomed = targetIdentified and adjHealth and (adjHealth < 0) and (fullDamage > 0) --for regular projectile
+	local disarmed = targetIdentified and disarmFrame and (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) and (disarmDamage > 0) --for disarming projectile
 
 	incomingDamage[targetID].doomed = doomed
 	incomingDamage[targetID].disarmed = disarmed
