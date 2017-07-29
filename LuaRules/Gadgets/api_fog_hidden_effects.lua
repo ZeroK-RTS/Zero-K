@@ -31,7 +31,11 @@ if gadgetHandler:IsSyncedCode() then -- Synced ---------------------------------
 function GG.PlayFogHiddenSound(sound, volume, x, y, z)
 	soundIndex = soundMap[sound]
 	if soundIndex then
-		SendToUnsynced("playSound", soundIndex, volume, x, y, z)
+		if x then
+			SendToUnsynced("playSound", soundIndex, volume, x, y, z)
+		else
+			Spring.Echo("Sound position not found", sound, volume, x, y, z)
+		end
 	else
 		Spring.Echo("Sound not found in gadget-side sound list", sound)
 	end

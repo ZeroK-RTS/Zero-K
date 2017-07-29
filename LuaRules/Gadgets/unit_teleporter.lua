@@ -414,7 +414,7 @@ function gadget:GameFrame(f)
 						ud = ud and UnitDefs[ud]
 						if ud then
 							local size = ud.xsize
-							local ux,uy,uz = Spring.GetUnitPosition(teleportiee)		
+							local ux, uy, uz = Spring.GetUnitPosition(teleportiee)
 							local tx, _, tz = Spring.GetUnitPosition(tid)
 							local dx, dz = tx + offset[tele[tid].offsetIndex].x*(size*4+40), tz + offset[tele[tid].offsetIndex].z*(size*4+40)
 							local dy 
