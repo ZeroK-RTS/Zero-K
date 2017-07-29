@@ -462,6 +462,7 @@ function preJump(turn, distance)
 end
 
 function beginJump() 
+	script.StopMoving()
 	GG.PokeDecloakUnit(unitID, 50)
 	inJumpMode = true
 	--[[
@@ -479,6 +480,7 @@ function halfJump()
 end
 
 function endJump() 
+	script.StopMoving()
 	inJumpMode = false
 	EmitSfx(base, 1029)
 end
