@@ -885,8 +885,9 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	BonusObjectiveUnitCreated(unitID, unitDefID, teamID)
 end
 
-function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
-	BonusObjectiveUnitCreated(unitID, unitDefID, newTeam, true)
+-- note: Taken comes before Given
+function gadget:UnitGiven(unitID, unitDefID, newTeamID, oldTeamID)
+	BonusObjectiveUnitCreated(unitID, unitDefID, newTeamID, true)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
