@@ -1549,7 +1549,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		width = LEFT_WIDTH,
 		minWidth = LEFT_WIDTH,
 		autosize = true,
-		padding = {0,0,0,0},
+		padding = {0,2,0,2},
 		parent = parentControl,
 	}
 	local rightPanel = Chili.Control:New{
@@ -1558,7 +1558,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		width = RIGHT_WIDTH,
 		minWidth = RIGHT_WIDTH,
 		autosize = true,
-		padding = {2,0,0,0},
+		padding = {2,2,0,2},
 		parent = parentControl,
 	}
 	
@@ -1906,7 +1906,7 @@ local function GetTooltipWindow()
 		draggable = false,
 		autosize  = true,
 		minWidth = RIGHT_WIDTH,
-		padding = {8,8,8,5},
+		padding = {6,4,6,2},
 		color = {1, 1, 1, options.tooltip_opacity.value},
 		parent = screen0
 	}
@@ -1915,7 +1915,7 @@ local function GetTooltipWindow()
 	local textTooltip = Chili.TextBox:New{
 		name = "textTooltip",
 		x = 0,
-		y = 0,
+		y = 4,
 		width = RIGHT_WIDTH - 10,
 		height = 5,
 		valign = "ascender", 
