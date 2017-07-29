@@ -192,6 +192,12 @@ local disarmWeaponTimeDefs = {
 	[WeaponDefNames["shipscout_missile"].id] = 1.5,
 }
 
+-- Penalty for shooting at disarmed/disabled units
+local disarmPenaltyDefs = {
+	[WeaponDefNames["shieldarty_emp_rocket"].id] = 200,
+	[WeaponDefNames["shipscout_missile"].id] = 10,
+}
+
 for key, value in pairs(disarmWeaponTimeDefs) do
 	disarmWeaponTimeDefs[key] = DISARM_BASE + DISARM_ADD*(value*30)/DISARM_ADD_TIME
 end
@@ -225,6 +231,10 @@ local radarWobblePenalty = {
 	[WeaponDefNames["turretantiheavy_ata"].id] = 5,
 	[WeaponDefNames["hoverarty_ata"].id] = 5,
 	[WeaponDefNames["cloakarty_hammer_weapon"].id] = 5,
+}
+
+local radarDotPenalty = {
+	[WeaponDefNames["shieldarty_emp_rocket"].id] = 100,
 }
 
 for i = 1, #UnitDefs do
@@ -326,4 +336,4 @@ for wid = 1, #WeaponDefs do
 	end
 end
 
-return targetTable, disarmWeaponTimeDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME
+return targetTable, disarmWeaponTimeDefs, disarmPenaltyDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, radarDotPenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME

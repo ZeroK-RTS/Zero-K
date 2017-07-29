@@ -32,7 +32,7 @@ local spGetUnitSeparation = Spring.GetUnitSeparation
 local spGetGameFrame = Spring.GetGameFrame
 
 
-local targetTable, disarmWeaponTimeDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME = include("LuaRules/Configs/target_priority_defs.lua")
+local targetTable, disarmWeaponTimeDefs, disarmPenaltyDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, radarDotPenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME = include("LuaRules/Configs/target_priority_defs.lua")
 
 local DISARM_DECAY_FRAMES = 1200
 local DISARM_TOTAL = DISARM_BASE + DISARM_ADD
@@ -272,7 +272,7 @@ local function GetDisarmWeaponPriorityModifier(unitID, attackerWeaponDefID)
 	if stunned <= disarmWeaponTimeDefs[attackerWeaponDefID] then
 		return GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
 	end
-	return 20 + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
+	return (disarmPenaltyDefs[attackerWeaponDefID] or 10) + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
 end
 
 --------------------------------------------------------------------------------
@@ -329,7 +329,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	local visiblity = GetUnitVisibility(targetID, allyTeam)
 
 	if visiblity ~= 2 then
-		local wobbleAdd = 0
+		local wobbleAdd = (radarDotPenalty[attackerWeaponDefID] or 0)
 		-- Mobile units get a penalty for radar wobble. Identified statics experience no wobble.
 		if radarWobblePenalty[attackerWeaponDefID] and (visibility == 0 or not remStatic[enemyUnitDefID]) then
 			wobbleAdd = radarWobblePenalty[attackerWeaponDefID]
