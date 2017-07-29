@@ -120,7 +120,7 @@ function widget:Update (dt)
 		local etaFrames = framesLeft / avgCatchupRatePerFrame
 		label_title:SetCaption("Catching up, ETA: " .. ParseFrameTime(etaFrames))
 	else
-		label_title:SetCaption("Performance too low, might never catch up")
+		label_title:SetCaption("Catching up, low performance.")
 	end
 end
 
