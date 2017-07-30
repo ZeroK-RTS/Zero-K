@@ -34,7 +34,8 @@ unitDef = {
   movementClass          = [[KBOT3]],
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP TOOFAST]],
-  objectName             = [[Milo.s3o]],
+  objectName             = [[cloakarty.s3o]],
+  script                 = [[cloakarty.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -113,7 +114,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[milo_dead.s3o]],
+      object           = [[cloakarty_dead.s3o]],
     },
 
     HEAP  = {

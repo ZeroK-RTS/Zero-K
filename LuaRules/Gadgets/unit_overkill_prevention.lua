@@ -88,6 +88,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["shieldassault"].id] = 1,
 	[UnitDefNames["spiderassault"].id] = 1,
 	[UnitDefNames["cloakskirm"].id] = 1,
+	[UnitDefNames["cloakarty"].id] = 1,
 	[UnitDefNames["striderdetriment"].id] = 1,
 	[UnitDefNames["shipassault"].id] = 1,
 	[UnitDefNames["shiparty"].id] = 1,
@@ -96,7 +97,6 @@ local HandledUnitDefIDs = {
 	--[UnitDefNames["tankassault"].id] = 1,
 	--[UnitDefNames["vehassault"].id] = 1,
 	--[UnitDefNames["tankheavyassault"].id] = 1,
-	--[UnitDefNames["cloakarty"].id] = 1,
 }
 
 local shieldPowerDef = {}
