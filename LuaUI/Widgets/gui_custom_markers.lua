@@ -38,6 +38,13 @@ local minimapHighlightLineMax = 10
 
 local useFade = false
 local circleDrawList
+
+local colorPresets = {
+	red = {1, 0.2, 0.2},
+	green = {0.2, 1, 0.2},
+	blue = {0.2, 0.2, 1},
+}
+
 ----------------------------------------------------------------
 --speedups
 ----------------------------------------------------------------
@@ -143,6 +150,10 @@ local function AddPoint(id, x, z, text, color)
 	mapPoints[id] = {color = color, x = x, y = y, z = z, text = text, expiration = expiration, fx = fx}
 end
 
+local function AddPointPresetColor(id, x, z, text, color)
+	AddPoint(id, x, z, text, color and colorPresets[color])
+end
+
 local function ClearPoints()
 	for id in pairs(mapPoints) do
 	      RemovePoint(id) 
@@ -213,6 +224,9 @@ function widget:Initialize()
 	
 	circleDrawList = gl.CreateList(gl.BeginEnd, GL.LINE_LOOP, CircleVertices, 48)
 	
+	widgetHandler:RegisterGlobal('AddCustomMapMarker', AddPointPresetColor)
+	widgetHandler:RegisterGlobal('RemoveCustomMapMarker', RemovePoint)
+	
 	-- debug
 	--WG.CustomMarker.AddPoint("newPoint", Game.mapSizeX/2, Game.mapSizeZ/2, "Custom marker", {0, 1, 0.5, 1})
 end
@@ -221,6 +235,9 @@ function widget:Shutdown()
 	ClearPoints()
 	WG.CustomMarker = nil
 	gl.DeleteList(circleDrawList)
+	
+	widgetHandler:DeregisterGlobal('AddCustomMapMarker', AddPoint)
+	widgetHandler:DeregisterGlobal('RemoveCustomMapMarker', RemovePoint)
 end
 
 function widget:GameFrame(f)

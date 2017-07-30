@@ -207,12 +207,6 @@ local function AddDefeatIfUnitDestroyed(unitID, allyTeamID, objectiveID)
 	local defeatConfig = defeatConditionConfig[allyTeamID]
 	defeatConfig.defeatIfUnitDestroyed = defeatConfig.defeatIfUnitDestroyed or {}
 	defeatConfig.defeatIfUnitDestroyed[unitID] = (objectiveID or true)
-	
-	if allyTeamID == 0 then
-		Spring.Utilities.UnitEcho(unitID, "Protect")
-	else
-		Spring.Utilities.UnitEcho(unitID, "Kill")
-	end
 end
 
 --------------------------------------------------------------------------------
@@ -228,7 +222,9 @@ local function AddVictoryAtLocationUnit(unitID, location, allyTeamID)
 		allyTeamID = allyTeamID
 	}
 	
-	Spring.MarkerAddPoint(location.x, 0, location.z, "Walk Here")
+	if location.mapMarker then
+		SendToUnsynced("AddMarker", math.floor(location.x) .. math.floor(location.z), location.x, location.z, location.mapMarker.text, location.mapMarker.color)
+	end
 end
 
 local function DoVictoryAtLocationCheck(unitID, location)
@@ -492,6 +488,18 @@ local function BonusObjectiveUnitCreated(unitID, unitDefID, teamID, isCapture)
 	end
 end
 
+local function CheckInitialUnitDestroyed(unitID)
+	if not initialUnitData[unitID] then
+		return
+	end
+	
+	if initialUnitData[unitID].mapMarker then
+		SendToUnsynced("RemoveMarker", unitID)
+	end
+	
+	initialUnitData[unitID] = nil
+end
+
 local function BonusObjectiveUnitDestroyed(unitID, unitDefID, teamID)
 	RemoveUnitFromBonusObjectiveList(unitID, myUnitDefBonusObj[unitDefID])
 	RemoveUnitFromBonusObjectiveList(unitID, enemyUnitDefBonusObj[unitDefID])
@@ -551,6 +559,10 @@ local function PlaceUnit(unitData, teamID)
 			unitID = unitID,
 			commands = commands,
 		}
+	end
+	
+	if unitData.mapMarker then
+		SendToUnsynced("AddMarker", unitID, x, z, unitData.mapMarker.text, unitData.mapMarker.color)
 	end
 	
 	AddInitialUnitObjectiveParameters(unitID, unitData)
@@ -876,7 +888,6 @@ end
 function gadget:UnitFinished(unitID, unitDefID, teamID, builderID)
 	if IsVitalUnitType(unitID, unitDefID) then
 		vitalUnits[unitID] = true
-		Spring.Utilities.UnitEcho(unitID, "Vital Unit")
 	end
 end
 
@@ -895,6 +906,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		vitalUnits[unitID] = false
 	end
 	BonusObjectiveUnitDestroyed(unitID, unitDefID, teamID)
+	CheckInitialUnitDestroyed(unitID)
 end
 
 function gadget:Initialize()
@@ -1012,6 +1024,28 @@ function gadget:Save(zip)
 		return
 	end
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, MakeRealTable(SYNCED.saveTable))
+end
+
+local function AddMarker(cmd, markerID, x, z, text, color)
+	if (Script.LuaUI('AddCustomMapMarker')) then
+		Script.LuaUI.AddCustomMapMarker(markerID, x, z, text, color)
+	end
+end
+
+local function RemoveMarker(cmd, markerID)
+	if (Script.LuaUI('RemoveCustomMapMarker')) then
+		Script.LuaUI.RemoveCustomMapMarker(markerID)
+	end
+end
+
+function gadget:Initialize()
+	gadgetHandler:AddSyncAction("AddMarker", AddMarker)
+	gadgetHandler:AddSyncAction("RemoveMarker", RemoveMarker)
+end
+
+function gadget:Shutdown()
+	gadgetHandler:RemoveSyncAction("AddMarker")
+	gadgetHandler:RemoveSyncAction("RemoveMarker")
 end
 
 --------------------------------------------------------------------------------
