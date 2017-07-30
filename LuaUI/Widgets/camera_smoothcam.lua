@@ -44,9 +44,22 @@ local spSetCameraState          = Spring.SetCameraState
 local newHeight = 0
 local maxCameraHeight = 0.7*math.max(Game.mapX, Game.mapY)*625
 
+local smoothCamDelay
+function WG.DelaySmoothCam(seconds)
+	smoothCamDelay = math.max(smoothCamDelay or 0, seconds)
+end
+
 function widget:Update(dt)
 	if (WG.Cutscene and WG.Cutscene.IsInCutscene()) or WG.COFC_Enabled then
 		return
+	end
+	if smoothCamDelay then
+		smoothCamDelay = smoothCamDelay - dt
+		if smoothCamDelay < 0 then
+			smoothCamDelay = false
+		else
+			return
+		end
 	end
 	local state = spGetCameraState()
 	if options.tiltZoom.value ~= 0 then

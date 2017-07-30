@@ -109,6 +109,20 @@ options = {
 			ToggleTrainerButtons(not self.value)
 		end
 	},
+	cameraZoom = {
+		name = 'Zoom camera to start position',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	},
+	cameraZoomDistance = {
+		name = 'Start position zoom distance',
+		desc = "Distance that the start position zoom zooms the camera to.",
+		type = 'number',
+		value = 1100,
+		min = 400, max = 3000, step = 50,
+		noHotkey = true,
+	},
 }
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -137,7 +151,7 @@ local function GetStartZoomBounds()
 		if not x then
 			x, _, z = Spring.GetTeamStartPosition(teamID)
 		end
-		return x, z, x, z, 0, 1800, 0
+		return x, z, x, z, 0, options.cameraZoomDistance.value, 0
 	end
 
 	local minX, minZ, maxX, maxZ, maxY = Game.mapSizeX, Game.mapSizeZ, 0, 0, 0
@@ -199,6 +213,9 @@ function Close(permanently, wantMoveCamera)
 		cameraAlreadyMoved = true
 		local minX, minZ, maxX, maxZ, maxY, height, smoothness = GetStartZoomBounds()
 		SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, smoothness or 0.67, true, height)
+		if WG.DelaySmoothCam then
+			WG.DelaySmoothCam((smoothness or 0.67) + 0.2)
+		end
 	end
 
 	if permanently then
@@ -362,7 +379,7 @@ function widget:Initialize()
 	or (Spring.GetSpectatingState() or Spring.IsReplay() or forcejunior))
 	--and (not Spring.IsCheatingEnabled())
 	then
-		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
+		noComm = true -- will prevent window from auto-appearing; can still be brought up from the button
 	end
 
 	vsx, vsy = widgetHandler:GetViewSizes()
@@ -412,13 +429,33 @@ end
 
 -- hide window if game was loaded
 local timer = 0
+local startPosTimer = 0
 function widget:Update(dt)
-	timer = timer + dt
-	if timer >= 0.01 then
-		if (spGetGameRulesParam("loadedGame") == 1) or wantClose then
-			Close(true, wantClose)
+	if timer then
+		timer = timer + dt
+		if timer >= 0.01 then
+			if (spGetGameRulesParam("loadedGame") == 1) or wantClose then
+				Close(true, wantClose)
+			end
+			timer = false
 		end
-		widgetHandler:RemoveCallIn('Update')
+	end
+	
+	if startPosTimer and options.cameraZoom.value then
+		startPosTimer = startPosTimer + dt
+		if startPosTimer > 0.1 then
+			local _, active, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+			if not spec then
+				local x, y, z = Spring.GetTeamStartPosition(teamID)
+				if not (x == 0 and y == 0 and z == 0) then
+					if WG.DelaySmoothCam then
+						WG.DelaySmoothCam(1)
+					end
+					SetCameraTarget(x, y, z, 0.8, nil, options.cameraZoomDistance.value)
+					startPosTimer = false
+				end
+			end
+		end
 	end
 end
 
@@ -428,6 +465,7 @@ end
 
 function widget:GameStart()
 	Close(true, false)
+	widgetHandler:RemoveCallIn('Update')
 end
 
 -- this a pretty retarded place to put this but:
