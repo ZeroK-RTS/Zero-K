@@ -125,34 +125,36 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
+		local speedMult = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)*dyncomm.GetPace()
+		
 		--left leg up, right leg back
-		Turn(thighL, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(shinL, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
-		Turn(thighR, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(shinR, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
+		Turn(thighL, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED * speedMult)
+		Turn(shinL, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED * speedMult)
+		Turn(thighR, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED * speedMult)
+		Turn(shinR, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED * speedMult)
 		if armsFree then
 			--left arm back, right arm front
-			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(uparmL, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(uparmR, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
-			Turn(forearmL, x_axis, FOREARM_BACK_ANGLE, FOREARM_BACK_SPEED)
-			Turn(forearmR, x_axis, FOREARM_FRONT_ANGLE, FOREARM_FRONT_SPEED)
+			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speedMult)
+			Turn(uparmL, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speedMult)
+			Turn(uparmR, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED * speedMult)
+			Turn(forearmL, x_axis, FOREARM_BACK_ANGLE, FOREARM_BACK_SPEED * speedMult)
+			Turn(forearmR, x_axis, FOREARM_FRONT_ANGLE, FOREARM_FRONT_SPEED * speedMult)
 		end
 		WaitForTurn(thighL, x_axis)
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(thighL, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(shinL, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
-		Turn(thighR, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(shinR, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
+		Turn(thighL, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED * speedMult)
+		Turn(shinL, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED * speedMult)
+		Turn(thighR, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED * speedMult)
+		Turn(shinR, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED * speedMult)
 		if armsFree then
 			--left arm front, right arm back
-			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(uparmL, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
-			Turn(uparmR, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(forearmL, x_axis, FOREARM_FRONT_ANGLE, FOREARM_FRONT_SPEED)
-			Turn(forearmR, x_axis, FOREARM_BACK_ANGLE, FOREARM_BACK_SPEED)			
+			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speedMult)
+			Turn(uparmL, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED * speedMult)
+			Turn(uparmR, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speedMult)
+			Turn(forearmL, x_axis, FOREARM_FRONT_ANGLE, FOREARM_FRONT_SPEED * speedMult)
+			Turn(forearmR, x_axis, FOREARM_BACK_ANGLE, FOREARM_BACK_SPEED * speedMult)
 		end
 		WaitForTurn(thighR, x_axis)		
 		Sleep(0)
