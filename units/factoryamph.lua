@@ -17,6 +17,7 @@ unitDef = {
     [[amphriot]],	
     [[amphassault]],
     [[amphaa]],
+	[[amphbomb]],
     [[amphtele]],
   },
 
@@ -33,12 +34,12 @@ unitDef = {
   corpse           = [[DEAD]],
 
   customParams     = {
-    helptext       = [[The Amphibious Operations Plant builds the slow but sturdy amphibious bots, providing an alternative approach to land/sea warfare. Units from this factory typically regenerate while submerged.]],
 	modelradius    = [[38]],
     aimposoffset   = [[0 0 -26]],
     midposoffset   = [[0 0 -26]],
     sortName = [[8]],
 	solid_factory = [[3]],
+	default_spacing = 8,
   },
 
   energyUse        = 0,

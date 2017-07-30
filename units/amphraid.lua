@@ -16,7 +16,6 @@ unitDef = {
   customParams           = {
     amph_regen = 5,
     amph_submerged_at = 40,
-    helptext       = [[The Duck is the basic underwater raider. Armed with short ranged torpedoes, it uses its (relatively) high speed to harass sea targets that cannot shoot back, though it dies to serious opposition. On land it can launch the torpedoes a short distance as a decent short ranged anti-heavy weapon.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

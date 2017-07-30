@@ -19,10 +19,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_fr = [[Robot de Construction, Construit ? 5 m/s]],
-	description_de = [[Konstruktionsroboter mit Schild, Baut mit 5 M/s]],
-    helptext       = [[The Convict is a fairly standard construction bot with a twist: a light shield to defend itself and support allied shieldbots.]],
-    helptext_de    = [[Der Convict ist ein ziemlich normaler Konstruktionsroboter mit einem Vorteil: er hat ein Schild um sich zu schutzen.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -72,8 +68,8 @@ unitDef = {
 
       exteriorShield          = true,
       shieldAlpha             = 0.2,
-      shieldBadColor          = [[1 0.1 0.1]],
-      shieldGoodColor         = [[0.1 0.1 1]],
+      shieldBadColor          = [[1 0.1 0.1 1]],
+      shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
       shieldPower             = 900,
       shieldPowerRegen        = 9,

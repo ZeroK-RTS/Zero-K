@@ -24,8 +24,10 @@ local pi2    = math.pi*2
 local random = math.random
 local abs    = math.abs
 
-local CMD_STOP = CMD.STOP
-local CMD_WAIT = CMD.WAIT
+local CMD_STOP   = CMD.STOP
+local CMD_WAIT   = CMD.WAIT
+local CMD_MOVE   = CMD.MOVE
+local CMD_REMOVE = CMD.REMOVE
 
 local spGetHeadingFromVector = Spring.GetHeadingFromVector
 local spGetUnitPosition  = Spring.GetUnitPosition
@@ -346,10 +348,6 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			end
 			
 			Sleep()
-			--[[ Slow damage
-			local slowMult = 1-(Spring.GetUnitRulesParam(unitID, "slowState") or 0)
-			i = i + (step*slowMult)
-			]]
 			i = i + step
 		end
 
@@ -585,6 +583,18 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 
 	return true, false -- command was used but don't remove it
+end
+
+function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
+	if jumpDefs[unitDefID] then
+		local queue = spGetCommandQueue(unitID, 2)
+		-- The first command in the queue is a move command added by the engine.
+		if queue and queue[1] and queue[2] then
+			if queue[2].id == CMD_JUMP and queue[1].id == CMD_MOVE then
+				Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {queue[1].tag}, {})
+			end
+		end
+	end
 end
 
 

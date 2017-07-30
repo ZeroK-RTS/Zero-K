@@ -41,8 +41,6 @@ local glCreateShader         = gl.CreateShader
 local glCreateTexture        = gl.CreateTexture
 local glDeleteShader         = gl.DeleteShader
 local glDeleteTexture        = gl.DeleteTexture
-local glDepthMask            = gl.DepthMask
-local glDepthTest            = gl.DepthTest
 local glGetMatrixData        = gl.GetMatrixData
 local glGetShaderLog         = gl.GetShaderLog
 local glGetUniformLocation   = gl.GetUniformLocation
@@ -88,10 +86,10 @@ options_order = {'enableHDR', 'enableBloom', 'illumThreshold', 'maxBrightness'}
 options = {
 	enableHDR      = {type = 'bool',   name = 'Use High Dynamic Range Color',  value = true,},
 	enableBloom    = {type = 'bool',   name = 'Apply Bloom Effect (HDR Only)', value = true,},
-	
+
 	-- how bright does a fragment need to be before being considered a glow source? [0, 1]
 	illumThreshold = {type = 'number', name = 'Illumination Threshold',       value = 0.85, min = 0,    max = 1, step = 0.05,},
-	
+
 	-- maximum brightness of bloom additions [1, n]
 	maxBrightness  = {type = 'number', name = 'Maximum Highlight Brightness', value = 0.35, min = 0.05, max = 1, step = 0.05,},
 }
@@ -112,8 +110,8 @@ end
 --------------------------------------------------------------------------------
 
 local vsx, vsy
-local ivsx = 1.0 
-local ivsy = 1.0 
+local ivsx = 1.0
+local ivsy = 1.0
 local screenratio = 1.0
 local kernelRadius = 32
 
@@ -143,8 +141,8 @@ local lightposlocBeam  = nil
 local lightpos2locBeam  = nil
 local lightcolorlocBeam  = nil
 local lightparamslocBeam  = nil
-local uniformEyePosBeam 
-local uniformViewPrjInvBeam 
+local uniformEyePosBeam
+local uniformViewPrjInvBeam
 
 -- bloom shader uniform locations
 local brightShaderText0Loc = nil
@@ -178,7 +176,7 @@ local combineShaderFragLoc = nil
 local verbose = false
 local function VerboseEcho(...)
 	if verbose then
-		Spring.Echo(...) 
+		Spring.Echo(...)
 	end
 end
 
@@ -199,21 +197,21 @@ function widget:ViewResize()
 		vsx = vsx / 2
 	end
 	screenratio = vsy / vsx --so we dont overdraw and only always draw a square
-	
+
 	glDeleteTexture(brightTexture1 or "")
 	glDeleteTexture(brightTexture2 or "")
 	glDeleteTexture(screenHDR or "")
 	screenHDR, brightTexture1, brightTexture2 = nil, nil, nil
-	
+
 	if options.enableHDR.value then
 		screenHDR = glCreateTexture(vsx, vsy, {
 			fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 			format = GL_RGB32F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 		})
-		
+
 		if options.enableBloom.value then
 			local width, height = vsx/2, vsy/2
-			
+
 			brightTexture1 = glCreateTexture(width, height, {
 				fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 				format = GL_RGB8, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
@@ -222,15 +220,15 @@ function widget:ViewResize()
 				fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 				format = GL_RGB8, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 			})
-			
+
 			if not brightTexture1 or not brightTexture2 then
-				Spring.Echo('Deferred Rendering: Failed to create bloom buffers!') 
+				Spring.Echo('Deferred Rendering: Failed to create bloom buffers!')
 				options.enableBloom.value = false
 			end
 		end
-		
+
 		if not screenHDR then
-			Spring.Echo('Deferred Rendering: Failed to create HDR buffer!') 
+			Spring.Echo('Deferred Rendering: Failed to create HDR buffer!')
 			options.enableHDR.value = false
 		end
 	end
@@ -264,18 +262,18 @@ function widget:Initialize()
 		OnchangeFunc()
 		return
 	end
-	
+
 	if (glCreateShader == nil) then
-		Spring.Echo('Deferred Rendering requires shader support!') 
+		Spring.Echo('Deferred Rendering requires shader support!')
 		widgetHandler:RemoveWidget()
 		return
 	end
-	
+
 	Spring.SetConfigInt("AllowDeferredMapRendering", 1)
 	Spring.SetConfigInt("AllowDeferredModelRendering", 1)
 
 	if (Spring.GetConfigString("AllowDeferredMapRendering") == '0' or Spring.GetConfigString("AllowDeferredModelRendering") == '0') then
-		Spring.Echo('Deferred Rendering (gfx_deferred_rendering.lua) requires  AllowDeferredMapRendering and AllowDeferredModelRendering to be enabled in springsettings.cfg!') 
+		Spring.Echo('Deferred Rendering (gfx_deferred_rendering.lua) requires  AllowDeferredMapRendering and AllowDeferredModelRendering to be enabled in springsettings.cfg!')
 		widgetHandler:RemoveWidget()
 		return
 	end
@@ -286,8 +284,15 @@ function widget:Initialize()
 			widgetHandler:RemoveWidget()
 		else
 			fragSrc = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\deferred_lighting.fs", VFS.ZIP)
+
 			--Spring.Echo('gfx_deferred_rendering.lua: Shader code:', fragSrc)
+
 			depthPointShader = depthPointShader or glCreateShader({
+				defines = {
+				    "#version 120\n",
+					"#define BEAM_LIGHT 0\n",
+					"#define CLIP_CONTROL " .. (Platform.glSupportClipSpaceControl and 1 or 0) .. "\n"
+				},
 				vertex = vertSrc,
 				fragment = fragSrc,
 				uniformInt = {
@@ -310,8 +315,13 @@ function widget:Initialize()
 				uniformEyePosPoint     = glGetUniformLocation(depthPointShader, 'eyePos')
 				uniformViewPrjInvPoint = glGetUniformLocation(depthPointShader, 'viewProjectionInv')
 			end
-			fragSrc = "#define BEAM_LIGHT \n" .. fragSrc
+
 			depthBeamShader = depthBeamShader or glCreateShader({
+				defines = {
+					"#version 120\n",
+					"#define BEAM_LIGHT 1\n",
+					"#define CLIP_CONTROL " .. (Platform.glSupportClipSpaceControl and 1 or 0) .. "\n"
+				},
 				vertex = vertSrc,
 				fragment = fragSrc,
 				uniformInt = {
@@ -335,44 +345,47 @@ function widget:Initialize()
 				uniformEyePosBeam     = glGetUniformLocation(depthBeamShader, 'eyePos')
 				uniformViewPrjInvBeam = glGetUniformLocation(depthBeamShader, 'viewProjectionInv')
 			end
-			
+
 			if options.enableHDR.value and options.enableBloom.value then
 				brightShader = brightShader or glCreateShader({
+					defines = {"#version 120\n"},
 					fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\bloom_bright.fs", VFS.ZIP),
 
 					uniformInt = {texture0 = 0},
 					uniformFloat = {illuminationThreshold, inverseRX, inverseRY}
 				})
-			
+
 				if not brightShader then
 					Spring.Echo('Deferred Rendering Widget: brightShader failed to compile!')
 					Spring.Echo(gl.GetShaderLog())
 				end
-		
+
 				blurShaderH71 = blurShaderH71 or glCreateShader({
+					defines = {"#version 120\n"},
 					fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\bloom_blurH.fs", VFS.ZIP),
 
 					uniformInt = {texture0 = 0},
 					uniformFloat = {inverseRX}
 				})
-			
+
 				if not blurShaderH71 then
 					Spring.Echo('Deferred Rendering Widget: blurshaderH71 failed to compile!')
 					Spring.Echo(gl.GetShaderLog())
 				end
-		
+
 				blurShaderV71 = blurShaderV71 or glCreateShader({
+					defines = {"#version 120\n"},
 					fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\bloom_blurV.fs", VFS.ZIP),
 
 					uniformInt = {texture0 = 0},
 					uniformFloat = {inverseRY}
 				})
-			
+
 				if not blurShaderV71 then
 					Spring.Echo('Deferred Rendering Widget: blueShaderV71 failed to compile!')
 					Spring.Echo(gl.GetShaderLog())
 				end
-		
+
 				if not brightShader or not blurShaderH71 or not blurShaderV71 then
 					Spring.Echo('Deferred Rendering Widget: Failed to create bloom shaders!')
 					options.enableBloom.value = false
@@ -390,15 +403,16 @@ function widget:Initialize()
 					blurShaderV71FragLoc = glGetUniformLocation(blurShaderV71, "fragKernelRadius")
 				end
 			end
-			
+
 			if options.enableHDR.value then
 				combineShader = combineShader or glCreateShader({
+					defines = {"#version 120\n"},
 					fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\bloom_combine.fs", VFS.ZIP),
 
 					uniformInt = { texture0 = 0, texture1 = 1, useBloom = 1, useHDR = 1},
 					uniformFloat = {fragMaxBrightness}
 				})
-			
+
 				if not combineShader then
 					Spring.Echo('Deferred Rendering Widget: combineShader failed to compile!')
 					options.enableHDR.value = false
@@ -410,14 +424,14 @@ function widget:Initialize()
 					combineShaderFragLoc = glGetUniformLocation(combineShader, "fragMaxBrightness")
 				end
 			end
-			
+
 			WG.DeferredLighting_RegisterFunction = DeferredLighting_RegisterFunction
 		end
 		screenratio = vsy / vsx --so we dont overdraw and only always draw a square
 	else
 		GLSLRenderer = false
 	end
-	
+
 	widget:ViewResize()
 end
 
@@ -457,7 +471,7 @@ local function DrawLightType(lights, lightsCount, lighttype) -- point = 0 beam =
 	glTexture(2, "$map_gbuffer_normtex")
 	glTexture(3, "$map_gbuffer_zvaltex")
 	glTexture(4, "$model_gbuffer_spectex")
-	
+
 	local cx, cy, cz = spGetCameraPosition()
 	for i = 1, lightsCount do
 		local light = lights[i]
@@ -475,18 +489,18 @@ local function DrawLightType(lights, lightsCount, lighttype) -- point = 0 beam =
 			local dist_sq = (light.px-cx)^2 + (light.py-cy)^2 + (light.pz-cz)^2
 			local ratio = lightradius / math.sqrt(dist_sq) * 1.5
 			glUniform(lightposlocPoint, light.px, light.py, light.pz, param.radius) --in world space
-			glUniform(lightcolorlocPoint, param.r * light.colMult, param.g * light.colMult, param.b * light.colMult, 1) 
+			glUniform(lightcolorlocPoint, param.r * light.colMult, param.g * light.colMult, param.b * light.colMult, 1)
 			glTexRect(
-				math.max(-1 , (sx-0.5)*2-ratio*screenratio), 
-				math.max(-1 , (sy-0.5)*2-ratio), 
-				math.min( 1 , (sx-0.5)*2+ratio*screenratio), 
-				math.min( 1 , (sy-0.5)*2+ratio), 
-				math.max( 0 , sx - 0.5*ratio*screenratio), 
-				math.max( 0 , sy - 0.5*ratio), 
+				math.max(-1 , (sx-0.5)*2-ratio*screenratio),
+				math.max(-1 , (sy-0.5)*2-ratio),
+				math.min( 1 , (sx-0.5)*2+ratio*screenratio),
+				math.min( 1 , (sy-0.5)*2+ratio),
+				math.max( 0 , sx - 0.5*ratio*screenratio),
+				math.max( 0 , sy - 0.5*ratio),
 				math.min( 1 , sx + 0.5*ratio*screenratio),
 				math.min( 1 , sy + 0.5*ratio)
 			) -- screen size goes from -1, -1 to 1, 1; uvs go from 0, 0 to 1, 1
-		end 
+		end
 		if lighttype == 1 then -- beam
 			local lightradius = 0
 			local px = light.px+light.dx*0.5
@@ -503,15 +517,15 @@ local function DrawLightType(lights, lightsCount, lighttype) -- point = 0 beam =
 
 			glUniform(lightposlocBeam, light.px, light.py, light.pz, param.radius) --in world space
 			glUniform(lightpos2locBeam, light.px+light.dx, light.py+light.dy+24, light.pz+light.dz, param.radius) --in world space, the magic constant of +24 in the Y pos is needed because of our beam distance calculator function in GLSL
-			glUniform(lightcolorlocBeam, param.r * light.colMult, param.g * light.colMult, param.b * light.colMult, 1) 
+			glUniform(lightcolorlocBeam, param.r * light.colMult, param.g * light.colMult, param.b * light.colMult, 1)
 			--TODO: use gl.Shape instead, to avoid overdraw
 			glTexRect(
-				math.max(-1 , (sx-0.5)*2-ratio*screenratio), 
-				math.max(-1 , (sy-0.5)*2-ratio), 
-				math.min( 1 , (sx-0.5)*2+ratio*screenratio), 
-				math.min( 1 , (sy-0.5)*2+ratio), 
-				math.max( 0 , sx - 0.5*ratio*screenratio), 
-				math.max( 0 , sy - 0.5*ratio), 
+				math.max(-1 , (sx-0.5)*2-ratio*screenratio),
+				math.max(-1 , (sy-0.5)*2-ratio),
+				math.min( 1 , (sx-0.5)*2+ratio*screenratio),
+				math.min( 1 , (sy-0.5)*2+ratio),
+				math.max( 0 , sx - 0.5*ratio*screenratio),
+				math.max( 0 , sy - 0.5*ratio),
 				math.min( 1 , sx + 0.5*ratio*screenratio),
 				math.min( 1 , sy + 0.5*ratio)
 			) -- screen size goes from -1, -1 to 1, 1; uvs go from 0, 0 to 1, 1
@@ -532,7 +546,7 @@ end
 
 local function Bloom()
 	gl.Color(1, 1, 1, 1)
-	
+
 	if options.enableHDR.value and options.enableBloom.value then
 		glUseShader(brightShader)
 			glUniformInt(brightShaderText0Loc, 0)
@@ -548,7 +562,7 @@ local function Bloom()
 			glUniform(	 blurShaderH71FragLoc, kernelRadius)
 			mglRenderToTexture(brightTexture2, brightTexture1, 1, -1)
 		glUseShader(0)
-		
+
 		glUseShader(blurShaderV71)
 			glUniformInt(blurShaderV71Text0Loc, 0)
 			glUniform(   blurShaderV71InvRYLoc, ivsy)
@@ -578,22 +592,22 @@ function widget:DrawScreenEffects()
 		widgetHandler:RemoveWidget()
 		return
 	end
-	
+
 	if options.enableHDR.value then
 		glCopyToTexture(screenHDR, 0, 0, 0, 0, vsx, vsy) -- copy the screen to an HDR texture
 	end
-	
+
 	local beamLights = {}
 	local beamLightCount = 0
 	local pointLights = {}
 	local pointLightCount = 0
-	
+
 	for i = 1, collectionFunctionCount do
 		beamLights, beamLightCount, pointLights, pointLightCount = collectionFunctions[i](beamLights, beamLightCount, pointLights, pointLightCount)
 	end
-	
+
 	glBlending(GL.DST_COLOR, GL.ONE) -- Set add blending mode
-	
+
 	if beamLightCount > 0 then
 		if options.enableHDR.value then
 			glRenderToTexture(screenHDR, DrawLightType, beamLights, beamLightCount, 1)
@@ -608,9 +622,9 @@ function widget:DrawScreenEffects()
 			DrawLightType(pointLights, pointLightCount, 0)
 		end
 	end
-	
+
 	glBlending(false)
-	
+
 	if options.enableHDR.value then
 		Bloom()
 	end

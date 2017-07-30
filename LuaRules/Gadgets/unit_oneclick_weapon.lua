@@ -111,11 +111,11 @@ local function doTheCommand(unitID, unitDefID, num)
 			local func = env[data.functionToCall]
 			Spring.UnitScript.CallAsUnit(unitID, func)
 		
-			local slowState = 1 - (spGetUnitRulesParam(unitID,"slowState") or 0)
+			local baseSpeedMult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 		
 			-- reload
 			if (data.reloadTime and data.weaponToReload) then
-				local reloadFrameVal = frame + data.reloadTime/slowState
+				local reloadFrameVal = frame + data.reloadTime/baseSpeedMult
 				--reloadFrame[unitID][num] = reloadFrameVal
 				--scheduledReloadByUnitID[unitID] = math.max(reloadFrameVal, scheduledReloadByUnitID[unitID] or 0)
 				--Spring.SetUnitRulesParam(unitID, "specialReloadFrame", scheduledReloadByUnitID[unitID], {inlos = true})	-- for healthbar

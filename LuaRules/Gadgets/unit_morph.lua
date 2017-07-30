@@ -205,25 +205,36 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- This function is terrible. The data structure of commands does not lend itself to a fundamentally nicer system though.
+
+local unitTargetCommand = {
+	[CMD.GUARD] = true,
+	[CMD_ORBIT] = true,
+}
+
+local singleParamUnitTargetCommand = {
+	[CMD.REPAIR] = true,
+	[CMD.ATTACK] = true,
+}
 
 local function ReAssignAssists(newUnit,oldUnit)
-	local ally = Spring.GetUnitAllyTeam(newUnit)
-	local alliedTeams = Spring.GetTeamList(ally)
-	for n = 1, #alliedTeams do
-		local teamID = alliedTeams[n]
-		local alliedUnits = Spring.GetTeamUnits(teamID)
-		for i = 1, #alliedUnits do
-			local unitID = alliedUnits[i]
-			local cmds = Spring.GetCommandQueue(unitID, -1)
-			for j=1, #cmds do
-				local cmd = cmds[j]
-				local params = cmd.params
-				if (cmd.id == CMD.GUARD or cmd.id == CMD_ORBIT or (cmd.id == CMD.REPAIR and #params == 1 --[[not area repair]])) and (params[1] == oldUnit) then
-					params[1] = newUnit
-					local opts = (cmd.options.meta and 4 or 0) + (cmd.options.ctrl and 64 or 0) + (cmd.options.alt and 128 or 0)
-					Spring.GiveOrderToUnit(unitID,CMD.INSERT,{cmd.tag, cmd.id, opts, params[1], params[2], params[3]},{})
-					Spring.GiveOrderToUnit(unitID,CMD.REMOVE,{cmd.tag},{})
-				end
+	local allUnits = Spring.GetAllUnits(newUnit)
+	for i = 1, #allUnits do
+		local unitID = allUnits[i]
+		
+		if GG.GetUnitTarget(unitID) == oldUnit then
+			GG.SetUnitTarget(unitID, newUnit)
+		end
+		
+		local cmds = Spring.GetCommandQueue(unitID, -1)
+		for j = 1, #cmds do
+			local cmd = cmds[j]
+			local params = cmd.params
+			if (unitTargetCommand[cmd.id] or (singleParamUnitTargetCommand[cmd.id] and #params == 1)) and (params[1] == oldUnit) then
+				params[1] = newUnit
+				local opts = (cmd.options.meta and 4 or 0) + (cmd.options.ctrl and 64 or 0) + (cmd.options.alt and 128 or 0)
+				Spring.GiveOrderToUnit(unitID, CMD.INSERT, {cmd.tag, cmd.id, opts, params[1], params[2], params[3]},{})
+				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag},{})
 			end
 		end
 	end
@@ -233,7 +244,7 @@ end
 --------------------------------------------------------------------------------
 
 local function GetMorphRate(unitID)
-	return (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+	return (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 end
 
 local function StartMorph(unitID, unitDefID, teamID, morphDef)

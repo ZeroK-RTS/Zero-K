@@ -17,15 +17,12 @@ end
 	TO DO:
 		Add amount label when mouseover line on graph (e.g to see exact metal produced at a certain time),
 		Come up with better way of handling specs, active players and players who died (currently doesn't show players who have died
-
-	NOT TO DO ANY MORE, PROBABLY:
-		Adding the toggling functionality renders both of these moot:
-			Implement camera control to pan in the background while viewing graph
-			Add minimize option
 --]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local GetHiddenTeamRulesParam = Spring.Utilities.GetHiddenTeamRulesParam
 
 local buttongroups = {
 	{"Metal", {
@@ -44,6 +41,8 @@ local buttongroups = {
 
 	{"Units", {
 		{"unit_value"      , "Unit Value"},
+		{"unit_value_killed", "Value Killed"},
+		{"unit_value_lost" , "Value Lost"},
 		{"damage_dealt"    , "Damage Dealt"},
 		{"damage_received" , "Damage Received"},
 		},
@@ -54,11 +53,19 @@ local rulesParamStats = {
 	metal_excess = true,
 	metal_reclaim = true,
 	unit_value = true,
+	unit_value_killed = true,
+	unit_value_lost = true,
 	metal_income = true,
 	energy_income = true,
 	damage_dealt = true,
 	damage_received = true,
 }
+local hiddenStats = {
+	damage_dealt = true,
+	unit_value_killed = true,
+}
+
+local gameOver = false
 
 local graphLength = 0
 local usingAllyteams = false
@@ -279,7 +286,7 @@ end
 local function getEngineArrays(statistic, labelCaption)
 	local teamScores = {}
 	local teams = Spring.GetTeamList()
-	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(0) - 1)
+	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(Spring.GetMyTeamID()) - 1)
 	local generalHistory = Spring.GetTeamStatsHistory(0, 0, graphLength)
 	local totalTime = Spring.GetGameRulesParam("gameover_second")
 		or (generalHistory and generalHistory[graphLength] and generalHistory[graphLength]["time"])
@@ -329,7 +336,11 @@ local function getEngineArrays(statistic, labelCaption)
 				stats = {}
 				for i = 0, graphLength do
 					stats[i] = {}
-					stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+					if hiddenStats[statistic] and gameOver then
+						stats[i][statistic] = GetHiddenTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+					else
+						stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+					end
 				end
 			else
 				stats = Spring.GetTeamStatsHistory(teamID, 0, graphLength)
@@ -517,6 +528,10 @@ end
 
 function widget:Initialize()
 	WG.MakeStatsPanel = makePanel
+end
+
+function widget:GameOver()
+	gameOver = true
 end
 
 function widget:GameFrame(n)

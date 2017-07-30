@@ -34,11 +34,9 @@ unitDef = {
   yardMap                       = [[ooo ooo ooo]],
 
   customParams                  = {
-    description_de = [[Lagert Energie und Metall (500)]],
-    helptext       = [[Storages act as a buffer when one expects a big influx of metal, such as reclaiming a vast wreckage field. However, longer periods of increased metal income are better dealt with by acquiring more buildpower.]],
-    helptext_de    = [[Dieser Energie- und Metallspeicher erweitert deine Lagermöglichkeiten um 500.]],
     modelradius    = [[30]],
 	removewait     = 1,
+	default_spacing = 0,
   },
 
   featureDefs                   = {

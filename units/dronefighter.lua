@@ -21,11 +21,6 @@ unitDef = {
   canLand                = false,
 
   customParams           = {
-    description_fr = [[Drone Chasseur]],
-    description_de = [[Kappenjaegerdrohne]],
-    helptext       = [[The Spicula is a fast multirole fighter drone whose particle beam is effective against both land and air targets.]],
-    --helptext_fr    = [[Capable de tirer en l'air ou au sol le Spicula n'est efficace qu'en groupe. Sa puissance de feu limité le rends moins éfficace qu'un aeronef dédié au combat Air/Sol ou au Air/Air.]],
-    helptext_de    = [[Der Spicula ist eine schnelle Kappenjaegerdrohne, der kann Luft- und Landeinheiten schiessen.]],
     modelradius    = [[5]],
     refuelturnradius = [[80]],
     is_drone = 1,

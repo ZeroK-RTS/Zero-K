@@ -1,4 +1,4 @@
-local versionNumber = "1.22"
+local versionNumber = "1.337"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:GetInfo()
@@ -60,8 +60,7 @@ local optionData
 
 local noComm = false
 local wantClose = false
-local gameframe = Spring.GetGameFrame()
-local COMM_DROP_FRAME = 450
+
 local WINDOW_WIDTH = 720
 local WINDOW_HEIGHT = 480
 local BUTTON_WIDTH = 128
@@ -94,8 +93,10 @@ end
 options_path = 'Settings/HUD Panels/Commander Selector'
 options = {
 	hideTrainers = {
-		name = 'Hide Trainer Commanders',
-		--desc = '',
+		name = 'Only show custom Commanders',
+		desc = 'You can customize your commanders on the Zero-K site:\n\nhttps://zero-k.info',
+		-- use the below after Chobby replaces site for customisation
+		-- desc = 'You can customize your commanders before the game, in the main menu.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -138,52 +139,70 @@ local function GetStartZoomBounds()
 		end
 		return x, z, x, z, 0, 1800, 0
 	end
-	
-	local startboxes = GetRawBoxes()
-	local startbox = startboxes[Spring.GetMyAllyTeamID()]
+
 	local minX, minZ, maxX, maxZ, maxY = Game.mapSizeX, Game.mapSizeZ, 0, 0, 0
-	
-	if not (startbox and startbox.boxes) then
+
+	local myBoxID = Spring.GetTeamRulesParam(Spring.GetMyTeamID(), "start_box_id")
+	if not myBoxID then
 		return minX, minZ, maxX, maxZ, maxY
 	end
-	
-	for i = 1, #startbox.boxes do
-		for j = 1, #startbox.boxes[i] do
-			local boxPoint = startbox.boxes[i][j]
-			-- Spring.Echo("startbox["..i.."]: {"..boxPoint[1]..", "..boxPoint[2].."}, Bounds: x: "..minX.." - "..maxX..", z: "..minZ.." - "..maxZ..", maxY: "..maxY)
-			minX = math.min(minX, boxPoint[1])
-			minZ = math.min(minZ, boxPoint[2])
-			maxX = math.max(maxX, boxPoint[1])
-			maxZ = math.max(maxZ, boxPoint[2])
-			maxY = math.max(maxY, Spring.GetGroundHeight(boxPoint[1], boxPoint[2]))
+
+	local rawBoxes = GetRawBoxes()
+	if not rawBoxes then
+		return minX, minZ, maxX, maxZ, maxY
+	end
+
+	local myBox = rawBoxes[myBoxID]
+	if not myBox then
+		return minX, minZ, maxX, maxZ, maxY
+	end
+
+	local polygons = myBox.boxes
+	if not polygons then
+		return minX, minZ, maxX, maxZ, maxY
+	end
+
+	for i = 1, #polygons do
+		local vertices = polygons[i]
+		for j = 1, #vertices do
+			local vertex = vertices[j]
+			minX = math.min(minX, vertex[1])
+			minZ = math.min(minZ, vertex[2])
+			maxX = math.max(maxX, vertex[1])
+			maxZ = math.max(maxZ, vertex[2])
+			maxY = math.max(maxY, Spring.GetGroundHeight(vertex[1], vertex[2]))
 		end
 	end
-	
+
 	return minX, minZ, maxX, maxZ, maxY
 end
 
-local cameraMoved = false
-function Close(permanently)
+local function RemoveSideButton()
+	if not buttonWindow then
+		return
+	end
+
+	screen0:RemoveChild(buttonWindow)
+	buttonWindow:Dispose()
+	buttonWindow = nil
+	widgetHandler:RemoveAction(actionShow)
+end
+
+local cameraAlreadyMoved = false
+function Close(permanently, wantMoveCamera)
 	if mainWindow then
 		mainWindow:Dispose()
 	end
-	
-	if not cameraMoved then
-		cameraMoved = true
+
+	local moveCamera = wantMoveCamera and not cameraAlreadyMoved and not Spring.GetSpectatingState()
+	if moveCamera then
+		cameraAlreadyMoved = true
 		local minX, minZ, maxX, maxZ, maxY, height, smoothness = GetStartZoomBounds()
 		SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, smoothness or 0.67, true, height)
 	end
 
 	if permanently then
-		if not noComm then
-			widgetHandler:RemoveAction(actionShow)
-			noComm = true
-		end
-
-		if (Spring.GetGameFrame() <= COMM_DROP_FRAME) then
-			widgetHandler:RemoveCallIn('GameFrame')
-			widgetHandler:RemoveCallIn('GameProgress')
-		end
+		RemoveSideButton()
 	end
 end
 
@@ -238,7 +257,7 @@ local function CreateWindow()
 			OnClick = {function()
 				Spring.SendLuaRulesMsg("customcomm:"..option.commProfile)
 				Spring.SendCommands({'say a:I choose: '..option.name..'!'})
-				Close()
+				Close(false, true)
 			end},
 			trainer = option.trainer,
 		}
@@ -255,20 +274,22 @@ local function CreateWindow()
 		}
 		local label = Label:New{
 			parent = button,
-			x = "15%",
+			x = 0, right = 0,
 			bottom = 4,
 			caption = option.name,
 			align = "center",
+			autosize = false,
 			font = {size = 14},
 		}
 		buttonLabels[i] = label
 		if option.trainer then
 			local trainerLabel = Label:New{
 				parent = image,
-				x = "25%",
+				x = 0, right = 0,
 				y = "50%",
 				caption = "TRAINER",
 				align = "center",
+				autosize = false,
 				font = {color = {1,0.2,0.2,1}, size=16, outline=true, outlineColor={1,1,1,0.8}},
 			}
 			trainerLabels[i] = trainerLabel
@@ -282,14 +303,15 @@ local function CreateWindow()
 		x = WINDOW_WIDTH*0.5 + (WINDOW_WIDTH*0.5 - cbWidth)/2,
 		height = 30,
 		bottom = 5,
-		OnClick = {function() Close() end}
+		OnClick = {function() Close(false, false) end}
 	}
 	trainerCheckbox = Chili.Checkbox:New{
 		parent = mainWindow,
 		x = 6,
 		bottom = 5,
-		width = 160,
-		caption = "Hide Trainer Comms",
+		width = 220,
+		caption = options.hideTrainers.name,
+		tooltip = options.hideTrainers.desc,
 		checked = options.hideTrainers.value,
 		OnChange = { function(self)
 			-- this is called *before* the 'checked' value is swapped, hence negation everywhere
@@ -394,31 +416,18 @@ function widget:Update(dt)
 	timer = timer + dt
 	if timer >= 0.01 then
 		if (spGetGameRulesParam("loadedGame") == 1) or wantClose then
-			Close(true)
+			Close(true, wantClose)
 		end
 		widgetHandler:RemoveCallIn('Update')
 	end
 end
 
 function widget:Shutdown()
-	cameraMoved = true -- do not move camera to startbox
-	Close(true)
-end
-
-function widget:GameFrame(n)
-	if n == COMM_DROP_FRAME then
-		Close(true)
-	end
-end
-
-function widget:GameProgress(n)
-	if n == COMM_DROP_FRAME then
-		Close(true)
-	end
+	Close(true, false)
 end
 
 function widget:GameStart()
-	screen0:RemoveChild(buttonWindow)
+	Close(true, false)
 end
 
 -- this a pretty retarded place to put this but:

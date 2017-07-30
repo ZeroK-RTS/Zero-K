@@ -142,13 +142,6 @@ local function GenerateBasicComm()
 
 	--RemoveWeapons(def)
 	--ApplyWeapon(def, "commweapon_sonicgun")
-	
-	-- FIXME: not used any more
-	def.customparams.helptext = "The Commander Junior is a basic version of the popular Strike Commander platform, issued to new commanders. "
-			            .."While lacking the glory of its customizable brethren, the Commander Jr. remains an effective tool with full base-building and combat capabilites."
-
-	def.customparams.description_pl = "Podstawowy Dowodca, moc 10 m/s"
-	def.customparams.helptext_pl    = "Junior to podstawowa wersja Dowodcy Strike; jest wydawany nowym dowodcom. Mimo ze nie mozna go modyfikowac, Junior pozostaje efektywny w budowaniu i walce."
 
 	for featureName,array in pairs(def.featuredefs) do
 		local mult = 0.4
@@ -203,9 +196,6 @@ local function ProcessComm(name, config)
 		end
 		if config.description then
 			commDefs[name].description = config.description
-		end
-		if config.helptext then
-			commDefs[name].customparams.helptext = config.helptext
 		end
 		
 		-- store base values

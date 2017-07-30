@@ -16,11 +16,6 @@ unitDef = {
   corpse                = [[DEAD]],
 
   customParams          = {
-    description_de = [[Spion, Anti-Heavy]],
-    description_fr = [[Espion, contre les unités lourdes]],
-    helptext       = [[The Infiltrator is useful in two ways. Firstly it is an excellent scout, and very difficult to detect. It can penetrate deep into enemy lines. It also has the capacity to shoot a paralyzing bolt that will freeze any one target, good against heavy enemies and enemy infrastructure.]],
-    helptext_de    = [[Der Infiltrator ist für zwei Dinge nützlich. Erstens ist er ein exzellenter Aufklärer und sehr schwer zu entdecken. Er kann sich tief hinter die feindlichen Linien begeben. Außerdem besitzt er die Eigentschaft einen paralysierenden Bolzen abzuschießen, der jedes Ziel einfriert, was gegen schwere Einheiten und feindliche Infrastruktur sehr nützlich ist.]],
-    helptext_fr    = [[L'infiltrator est une unité légère invisible. Il peut typiquement être utilisé comme un éclaireur permettant d'espionner la base enemie sans se faire repérer. Il peut aussi libérer une décharge EMP de très haute puissance pour paralyser une cible unique, utile contre les unités lourdes et l'infrastructure. En cas d'échec le temps de recharge très long signifie la perte certaine de cette unité.]],
   },
 
   explodeAs             = [[BIG_UNITEX]],

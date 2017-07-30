@@ -13,9 +13,12 @@ function gadget:GetInfo()
 end
 
 local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
+local missionDifficulty = tonumber(Spring.GetModOptions().planetmissiondifficulty) or 2
 if not campaignBattleID then
 	return
 end
+
+local CRASH_CIRCUIT = Spring.GetModOptions().crashcircuit
 
 local COMPARE = {
 	AT_LEAST = 1,
@@ -41,6 +44,8 @@ if gadgetHandler:IsSyncedCode() then --SYNCED
 local unitLineage = {}
 local initialUnitData = {}
 local bonusObjectiveList = {}
+
+local commandsToGive = nil -- Give commands just after game start
 
 -- Regeneratable
 local vitalUnits = {}
@@ -138,6 +143,27 @@ local function ComparisionSatisfied(compareType, targetNumber, number)
 		return number <= targetNumber
 	end
 	return false
+end
+
+local function SanitizeBuildPositon(x, z, ud, facing)
+	local oddX = (ud.xsize % 4 == 2)
+	local oddZ = (ud.zsize % 4 == 2)
+	
+	if facing % 2 == 1 then
+		oddX, oddZ = oddZ, oddX
+	end
+	
+	if oddX then
+		x = math.floor((x + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
+	else
+		x = math.floor(x/BUILD_RESOLUTION)*BUILD_RESOLUTION
+	end
+	if oddZ then
+		z = math.floor((z + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
+	else
+		z = math.floor(z/BUILD_RESOLUTION)*BUILD_RESOLUTION
+	end
+	return x, z
 end
 
 --------------------------------------------------------------------------------
@@ -315,6 +341,9 @@ local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 	
 	-- Check satisfaction
 	local unitCount = SumUnits(objectiveData.units, objectiveData.targetNumber + 1) + (objectiveData.removedUnits or 0)
+	if objectiveData.onlyCountRemovedUnits then
+		unitCount = objectiveData.removedUnits or 0
+	end
 	local satisfied = ComparisionSatisfied(objectiveData.comparisionType, objectiveData.targetNumber, unitCount)
 	if satisfied then
 		if objectiveData.satisfyAtTime or objectiveData.satisfyByTime or objectiveData.satisfyOnce then
@@ -350,12 +379,15 @@ local function DoPeriodicBonusObjectiveUpdate(gameSeconds)
 	--DebugPrintBonusObjective()
 end
 
-local function AddBonusObjectiveUnit(unitID, bonusObjectiveID, allyTeamID)
+local function AddBonusObjectiveUnit(unitID, bonusObjectiveID, allyTeamID, isCapture)
 	if gameIsOver then
 		return
 	end
 	local objectiveData = bonusObjectiveList[bonusObjectiveID]
 	if objectiveData.unitsLocked or objectiveData.terminated then
+		return
+	end
+	if isCapture and not objectiveData.capturedUnitsSatisfy then
 		return
 	end
 	objectiveData.units = objectiveData.units or {}
@@ -375,7 +407,7 @@ local function RemoveBonusObjectiveUnit(unitID, bonusObjectiveID)
 	end
 	if objectiveData.units[unitID] then
 		local inbuild
-		if objectiveData.countRemovedUnits then
+		if objectiveData.countRemovedUnits or objectiveData.onlyCountRemovedUnits then
 			inbuild = (select(3, Spring.GetUnitIsStunned(unitID)) and 1) or 0
 			if inbuild == 0 then
 				objectiveData.removedUnits = (objectiveData.removedUnits or 0) + 1
@@ -434,12 +466,12 @@ local function InitializeBonusObjectives()
 	end
 end
 
-local function AddUnitToBonusObjectiveList(unitID, objectiveList)
+local function AddUnitToBonusObjectiveList(unitID, objectiveList, isCapture)
 	if not objectiveList then
 		return
 	end
 	for i = 1, #objectiveList do
-		AddBonusObjectiveUnit(unitID, objectiveList[i])
+		AddBonusObjectiveUnit(unitID, objectiveList[i], nil, isCapture)
 	end
 end
 
@@ -452,11 +484,11 @@ local function RemoveUnitFromBonusObjectiveList(unitID, objectiveList)
 	end
 end
 
-local function BonusObjectiveUnitCreated(unitID, unitDefID, teamID)
+local function BonusObjectiveUnitCreated(unitID, unitDefID, teamID, isCapture)
 	if teamID == PLAYER_TEAM_ID then
-		AddUnitToBonusObjectiveList(unitID, myUnitDefBonusObj[unitDefID])
+		AddUnitToBonusObjectiveList(unitID, myUnitDefBonusObj[unitDefID], isCapture)
 	elseif Spring.GetUnitAllyTeam(unitID) ~= PLAYER_ALLY_TEAM_ID then
-		AddUnitToBonusObjectiveList(unitID, enemyUnitDefBonusObj[unitDefID])
+		AddUnitToBonusObjectiveList(unitID, enemyUnitDefBonusObj[unitDefID], isCapture)
 	end
 end
 
@@ -484,6 +516,13 @@ local function AddInitialUnitObjectiveParameters(unitID, parameters)
 end
 
 local function PlaceUnit(unitData, teamID)
+	if unitData.difficultyAtLeast and (unitData.difficultyAtLeast > missionDifficulty) then
+		return
+	end
+	if unitData.difficultyAtMost and (unitData.difficultyAtMost < missionDifficulty) then
+		return
+	end
+	
 	local name = unitData.name
 	local ud = UnitDefNames[name]
 	if not (ud and ud.id) then
@@ -494,23 +533,7 @@ local function PlaceUnit(unitData, teamID)
 	local x, z, facing = unitData.x, unitData.z, unitData.facing
 	
 	if ud.isBuilding or ud.speed == 0 then
-		local oddX = (ud.xsize % 4 == 2)
-		local oddZ = (ud.zsize % 4 == 2)
-		
-		if facing % 2 == 1 then
-			oddX, oddZ = oddZ, oddX
-		end
-		
-		if oddX then
-			x = math.floor((x + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
-		else
-			x = math.floor(x/BUILD_RESOLUTION)*BUILD_RESOLUTION
-		end
-		if oddZ then
-			z = math.floor((z + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
-		else
-			z = math.floor(z/BUILD_RESOLUTION)*BUILD_RESOLUTION
-		end
+		x, z = SanitizeBuildPositon(x, z, ud, facing)
 	end
 	
 	local build = (unitData.buildProgress and unitData.buildProgress < 1) or false
@@ -519,6 +542,15 @@ local function PlaceUnit(unitData, teamID)
 	if not unitID then
 		Spring.MarkerAddPoint(x, 0, z, "Error creating unit " .. (((ud or {}).humanName) or "???"))
 		return 
+	end
+	
+	if unitData.commands then
+		local commands = unitData.commands
+		commandsToGive = commandsToGive or {}
+		commandsToGive[#commandsToGive + 1] = {
+			unitID = unitID,
+			commands = commands,
+		}
 	end
 	
 	AddInitialUnitObjectiveParameters(unitID, unitData)
@@ -561,6 +593,59 @@ local function HandleCommanderCreation(unitID, teamID)
 		return
 	end
 	AddInitialUnitObjectiveParameters(unitID, commParameters)
+end
+
+local function ProcessUnitCommand(unitID, command)
+	if command.unitName then
+		local ud = UnitDefNames[command.unitName]
+		command.cmdID = ud and ud.id and -ud.id
+		if not command.cmdID then
+			return
+		end
+		if command.pos then
+			command.pos[1], command.pos[2] = SanitizeBuildPositon(command.pos[1], command.pos[2], ud, command.facing or 0)
+		else -- Must be a factory production command
+			Spring.GiveOrderToUnit(unitID, command.cmdID, {}, command.options or {})
+			return
+		end
+	end
+	
+	local team = Spring.GetUnitTeam(unitID)
+	
+	if command.pos then
+		local x, z = command.pos[1], command.pos[2]
+		local y = CallAsTeam(team,
+			function ()
+				return Spring.GetGroundHeight(x, z) 
+			end
+		)
+		
+		Spring.GiveOrderToUnit(unitID, command.cmdID, {x, y, z, command.facing or command.radius}, command.options or {})
+		return
+	end
+	
+	if command.atPosition then
+		local p = command.atPosition
+		local units = Spring.GetUnitsInRectangle(p[1] - BUILD_RESOLUTION, p[2] - BUILD_RESOLUTION, p[1] + BUILD_RESOLUTION, p[2] + BUILD_RESOLUTION)
+		if units and units[1] then
+			Spring.GiveOrderToUnit(unitID, command.cmdID, {units[1]}, command.options or {})
+		end
+		return
+	end
+	
+	local params = {}
+	if command.params then
+		for i = 1, #command.params do -- Somehow tables lose their order
+			params[i] = command.params[i]
+		end
+	end
+	Spring.GiveOrderToUnit(unitID, command.cmdID, params, command.options or {})
+end
+
+local function GiveCommandsToUnit(unitID, commands)
+	for i = 1, #commands do
+		ProcessUnitCommand(unitID, commands[i])
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -709,6 +794,13 @@ local function DoInitialUnitPlacement()
 		local customKeys = select(7, Spring.GetTeamInfo(teamID))
 		PlaceTeamUnits(teamID, customKeys)
 	end
+	
+	if commandsToGive then
+		for i = 1, #commandsToGive do
+			GiveCommandsToUnit(commandsToGive[i].unitID, commandsToGive[i].commands)
+		end
+		commandsToGive = nil
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -793,6 +885,11 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	BonusObjectiveUnitCreated(unitID, unitDefID, teamID)
 end
 
+-- note: Taken comes before Given
+function gadget:UnitGiven(unitID, unitDefID, newTeamID, oldTeamID)
+	BonusObjectiveUnitCreated(unitID, unitDefID, newTeamID, true)
+end
+
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if vitalUnits[unitID] then
 		vitalUnits[unitID] = false
@@ -817,12 +914,22 @@ function gadget:Initialize()
 	GG.GalaxyCampaignHandler = GalaxyCampaignHandler
 end
 
+if CRASH_CIRCUIT then
+	function gadget:GamePreload(n)
+		if not Spring.GetGameRulesParam("loadedGame") then
+			DoInitialUnitPlacement()
+		end
+	end
+end
+
 function gadget:GameFrame(n)
 	-- Would use GamePreload if it didn't cause Circuit to crash.
 	if firstGameFrame then
 		firstGameFrame = false
-		if not Spring.GetGameRulesParam("loadedGame") then
-			DoInitialUnitPlacement()
+		if not CRASH_CIRCUIT then
+			if not Spring.GetGameRulesParam("loadedGame") then
+				DoInitialUnitPlacement()
+			end
 		end
 	end
 	

@@ -24,11 +24,8 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	description_de = [[Schwerer Kampfkommandant, Baut mit 10 M/s]],
-	helptext       = [[The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment.]],
-	helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstutzungsausrustung.]],
 	level = [[1]],
-	statsname = [[corcom1]],
+	statsname = [[dynassault1]],
 	soundok = [[heavy_bot_move]],
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],

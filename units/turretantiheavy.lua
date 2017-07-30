@@ -17,11 +17,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_fr = [[Acc?lerateur Tachyon]],
-    description_de = [[Tachyonen Beschleuniger - BenÃ¶tigt ein angeschlossenes Stromnetz von 50 Energie, um feuern zu kÃ¶nnen.]],
-    helptext       = [[Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter.]],
-    helptext_fr    = [[ProtÃ©gÃ© derri?re le blindage lourd de l'Annihilator se trouve le terrible Canon AccÃ©lerateur de Tachyon. Cette arme terrifiante est capable d'envoyer des quantitÃ©s colossales d'Ã©nergie sur un point prÃ©cis, percant tous les blindages aisÃ©ment, le tout ? une distance terrifiante. Son co?t et sa consommation d'Ã©nergie la rendent cependant difficile ? employer.]],
-    helptext_de    = [[Innerhalb der hart gepanzerten HÃ¼lle befindet sich ein verheerender Tachyonen Beschleuniger. Diese furchteinregende Waffe ist imstande in einem riesigen Umkreis punktgenaue ZerstÃ¶rung nach sich zu ziehen, vorausgesetzt du verbindest es mit einer Energiequelle. Beachte aber, dass der Anniilator eine dezidierte UnterstÃ¼tzungswaffe ist; unbewacht wird er schnell von Angreifern Ã¼berrumpelt.]],
 
     keeptooltip    = [[any string I want]],
 

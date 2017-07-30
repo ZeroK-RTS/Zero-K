@@ -44,6 +44,7 @@ local random            = math.random
 local CMD_ATTACK		= CMD.ATTACK
 
 local emptyTable = {}
+local INLOS_ACCESS = {inlos = true}
 
 -- thingsWhichAreDrones is an optimisation for AllowCommand, no longer used but it'll stay here for now
 local carrierDefs, thingsWhichAreDrones, unitRulesCarrierDefs, BUILD_UPDATE_INTERVAL = include "LuaRules/Configs/drone_defs.lua"
@@ -78,6 +79,12 @@ local function RandomPointInUnitCircle()
 	return math.cos(angle)*distance, math.sin(angle)*distance
 end
 
+local function ChangeDroneRulesParam(unitID, diff)
+	local count = Spring.GetUnitRulesParam(unitID, "dronesControlled") or 0
+	count = count + diff
+	Spring.SetUnitRulesParam(unitID, "dronesControlled", count, INLOS_ACCESS)
+end
+
 local function InitCarrier(unitID, carrierData, teamID, maxDronesOverride)
 	local toReturn  = {teamID = teamID, droneSets = {}, occupiedPieces={}, droneInQueue= {}}
 	local unitPieces = GetUnitPieceMap(unitID)
@@ -89,16 +96,22 @@ local function InitCarrier(unitID, carrierData, teamID, maxDronesOverride)
 		end
 		toReturn.pieceIndex = 1
 	end
+	local maxDronesTotal = 0
 	for i = 1, #carrierData do
 		-- toReturn.droneSets[i] = Spring.Utilities.CopyTable(carrierData[i])
 		toReturn.droneSets[i] = {nil}
 		--same as above, but we assign reference to "carrierDefs[i]" table in memory to avoid duplicates, DO NOT CHANGE ITS CONTENT (its constant & config value only).
 		toReturn.droneSets[i].config = carrierData[i]
 		toReturn.droneSets[i].maxDrones = (maxDronesOverride and maxDronesOverride[i]) or carrierData[i].maxDrones
+		maxDronesTotal = maxDronesTotal + toReturn.droneSets[i].maxDrones
 		toReturn.droneSets[i].reload = carrierData[i].reloadTime
 		toReturn.droneSets[i].droneCount = 0
 		toReturn.droneSets[i].drones = {}
 		toReturn.droneSets[i].buildCount = 0
+	end
+	if maxDronesTotal > 0 then
+		Spring.SetUnitRulesParam(unitID, "dronesControlled", 0, INLOS_ACCESS)
+		Spring.SetUnitRulesParam(unitID, "dronesControlledMax", maxDronesTotal, INLOS_ACCESS)
 	end
 	return toReturn
 end
@@ -161,6 +174,7 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		Spring.SetUnitRulesParam(droneID, "parent_unit_id", unitID)
 		local droneSet = carrierEntry.droneSets[setNum]
 		droneSet.droneCount = droneSet.droneCount + 1
+		ChangeDroneRulesParam(unitID, 1)
 		droneSet.drones[droneID] = true
 		
 		--SetUnitPosition(droneID, xS, zS, true)
@@ -621,14 +635,18 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 			for i = 1, #carrier.droneSets do
 				local set = carrier.droneSets[i]
 				local newSetID = -1
+				local droneCount = 0
 				for j = 1, #newCarrier.droneSets do
 					if newCarrier.droneSets[j].config.drone == set.config.drone then --same droneType? copy old drone data
 						newCarrier.droneSets[j].droneCount = set.droneCount
+						droneCount = droneCount + set.droneCount
 						newCarrier.droneSets[j].reload = set.reload
 						newCarrier.droneSets[j].drones = set.drones
 						newSetID = j
 					end
 				end
+				ChangeDroneRulesParam(newUnitID, droneCount)
+
 				for droneID in pairs(set.drones) do
 					droneList[droneID].carrier = newUnitID
 					droneList[droneID].set = newSetID
@@ -651,6 +669,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		if setID > -1 then --is -1 when carrier morphed and drone is incompatible with the carrier
 			local droneSet = carrierList[carrierID].droneSets[setID]
 			droneSet.droneCount = (droneSet.droneCount - 1)
+			ChangeDroneRulesParam(carrierID, -1)
 			droneSet.drones[unitID] = nil
 		end
 		droneList[unitID] = nil

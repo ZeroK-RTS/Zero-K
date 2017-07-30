@@ -26,12 +26,6 @@ unitDef = {
     jump_reload        = 15,
     jump_from_midair   = 0,
     jump_rotate_midair = 0,
-
-    description_fr = [[Robot Émeutier]],
-    description_de = [[Springender Sturm Roboter]],
-    helptext       = [[The Sumo's impressive armor makes it a near-unstoppable sphere of death. It stomps on enemy units to break up their formation and can toss the survivors around with its Gravity Beams. Its stomp is the only way it can damage buildings.]],
-    --helptext_fr    = [[Le rayon r chaleur du Sumo est capable de délivrer une puissance de feu important sur un point précis. Plus la cible est proche, plus les dégâts seront importants. La précision du rayon est idéale pour lutter contre de larges vagues d'ennemis, mais l'imposant blindage du Sumo le restreint r une vitesse réduite.]],
-	--helptext_de    = [[Der Sumo nutzt seinen mächtigen Heat Ray in nächster Nähe, auf größerer Entfernung aber verliert er entsprechend an Feuerkraft. Er eignet sich ideal, um größere Gruppen von billigen, feindlichen Einheiten zu vernichten. Bemerkenswert ist, dass der Sumo in die Luft springen kann und schließlich auf feindlichen Einheiten landet, was diesen enormen Schaden zufügt.]],
 	aimposoffset   = [[0 6 0]],
 	midposoffset   = [[0 6 0]],
 	modelradius    = [[32]],
@@ -226,8 +220,6 @@ unitDef = {
 		
 		light_color = [[0.85 0.2 0.2]],
 		light_radius = 140,
-		light_beam_mult_frames = 9,
-		light_beam_mult = 8,
 	  },
 	  
       damage                  = {

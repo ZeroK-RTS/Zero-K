@@ -51,6 +51,11 @@
 	"viewfow_desc" : "Shows sight distance and radar coverage.",
 	"teamcolor_selector" : "Select team colour mode. Options include simple mode and colorblind mode.",
 	"overlay_selector" : "Set map overlay",
+	"attrition_pwn" : "PWN!",
+	"attrition_na" : "N/A",
+	"attrition_individual_stats" : "Individual stats",
+	"attrition_value_killed" : "Value killed",
+	"attrition_value_lost" : "Value lost",
 	"x_units_in_queue" : {
 		"one" : "%{count} unit in queue",
 		"other" : "%{count} units in queue"

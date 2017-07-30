@@ -50,7 +50,9 @@ local spEcho              = Spring.Echo
 local COMM_VALUE = UnitDefNames.armcom1.metalCost or 1200
 local ECON_SUPREMACY_MULT = 25
 local MISSION_PLAYER_ALLY_TEAM_ID = 0
+
 local SPARE_PLANETWARS_UNITS = false
+local SPARE_REGULAR_UNITS = false
 
 --------------------------------------------------------------------------------
 -- vars
@@ -87,6 +89,7 @@ local doesNotCountList = {
 	[GetUnitDefIdByName("spiderscout")] = true,
 	[GetUnitDefIdByName("shieldbomb")] = true,
 	[GetUnitDefIdByName("cloakbomb")] = true,
+	[GetUnitDefIdByName("amphbomb")] = true,
 	[GetUnitDefIdByName("gunshipbomb")] = true,
 	[GetUnitDefIdByName("terraunit")] = true,
 }
@@ -256,21 +259,30 @@ local function DestroyAlliance(allianceID, skipCheck)
 				local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allianceID)
 				EchoUIMessage(name .. " has been destroyed!")
 			end
+
 			local frame = Spring.GetGameFrame() + 50
+			local function QueueDestruction(unitID)
+				local destroyFrame = frame - math.ceil((math.random()*7)^2)
+				toDestroy[destroyFrame] = toDestroy[destroyFrame] or {}
+				toDestroy[destroyFrame][unitID] = true
+			end
+
 			for i=1,#teamList do
 				local t = teamList[i]
 				local teamUnits = spGetTeamUnits(t) 
 				for j=1,#teamUnits do
 					local unitID = teamUnits[j]
 					local pwUnits = (GG.PlanetWars or {}).unitsByID
-					if SPARE_PLANETWARS_UNITS and pwUnits and pwUnits[unitID] then
-						GG.allowTransfer = true
-						spTransferUnit(unitID, gaiaTeamID, true)		-- don't blow up PW buildings
-						GG.allowTransfer = false
-					else
-						local destroyFrame = frame - math.ceil((math.random()*7)^2)
-						toDestroy[destroyFrame] = toDestroy[destroyFrame] or {}
-						toDestroy[destroyFrame][unitID] = true
+					if pwUnits and pwUnits[unitID] then
+						if SPARE_PLANETWARS_UNITS then
+							GG.allowTransfer = true
+							spTransferUnit(unitID, gaiaTeamID, true)		-- don't blow up PW buildings
+							GG.allowTransfer = false
+						else
+							QueueDestruction(unitID)
+						end
+					elseif not SPARE_REGULAR_UNITS then
+						QueueDestruction(unitID)
 					end
 				end
 				Spring.SetTeamRulesParam(t, "isDead", 1, {public = true})
@@ -517,6 +529,14 @@ function gadget:TeamDied (teamID)
 	if not gameover then
 		ProcessLastAlly()
 	end
+end
+
+function gadget:PlayerChanged (playerID)
+	if gameover then
+		return
+	end
+
+	ProcessLastAlly()
 end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)

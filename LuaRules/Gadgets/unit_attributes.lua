@@ -394,20 +394,27 @@ function UpdateUnitAttributes(unitID, frame)
 	
 	-- SLOW --
 	local slowState = spGetUnitRulesParam(unitID,"slowState")
+	if slowState and slowState > 0.5 then
+		slowState = 0.5 -- Maximum slow
+	end
+	local zombieSpeedMult = spGetUnitRulesParam(unitID,"zombieSpeedMult")
 	local buildpowerMult = spGetUnitRulesParam(unitID, "buildpower_mult")
 	
-	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or buildpowerMult or
+	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or zombieSpeedMult or buildpowerMult or
 			selfTurnSpeedChange or selfIncomeChange or disarmed or morphDisable or selfAccelerationChange then
-		local slowMult   = 1-(slowState or 0)
-		local econMult   = (slowMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)
-		local buildMult  = (slowMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)*(buildpowerMult or 1)
-		local moveMult   = (slowMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)*(upgradesSpeedMult or 1)
-		local turnMult   = (slowMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - morphDisable)
-		local reloadMult = (slowMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - morphDisable)
-		local maxAccMult = (slowMult)*(selfMaxAccelerationChange or 1)*(upgradesSpeedMult or 1)
+		
+		local baseSpeedMult   = (1 - (slowState or 0))*(zombieSpeedMult or 1)
+		
+		local econMult   = (baseSpeedMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)
+		local buildMult  = (baseSpeedMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)*(buildpowerMult or 1)
+		local moveMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)*(upgradesSpeedMult or 1)
+		local turnMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - morphDisable)
+		local reloadMult = (baseSpeedMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - morphDisable)
+		local maxAccMult = (baseSpeedMult)*(selfMaxAccelerationChange or 1)*(upgradesSpeedMult or 1)
 
 		-- Let other gadgets and widgets get the total effect without 
 		-- duplicating the pevious calculations.
+		spSetUnitRulesParam(unitID, "baseSpeedMult", baseSpeedMult, INLOS_ACCESS) -- Guaranteed not to be 0
 		spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult, INLOS_ACCESS)
 		spSetUnitRulesParam(unitID, "totalEconomyChange", econMult, INLOS_ACCESS)
 		spSetUnitRulesParam(unitID, "totalBuildPowerChange", buildMult, INLOS_ACCESS)

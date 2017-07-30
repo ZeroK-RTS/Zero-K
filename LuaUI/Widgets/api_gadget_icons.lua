@@ -34,22 +34,39 @@ local unitDefIDMap = {}
 
 local currentIndex = 0
 
-local myAllyTeamID = 666
+local CMD_WAIT = CMD.WAIT
+
+local CMD_WAITCODE_NONE   = 0
+local CMD_WAITCODE_DEATH  = CMD.WAITCODE_DEATH
+local CMD_WAITCODE_SQUAD  = CMD.WAITCODE_SQUAD
+local CMD_WAITCODE_GATHER = CMD.WAITCODE_GATHER
+local CMD_WAITCODE_TIME   = CMD.WAITCODE_TIME
 
 local powerTexture = 'Luaui/Images/visible_energy.png'
 local facplopTexture = 'Luaui/Images/factory.png'
 local rearmTexture = 'LuaUI/Images/noammo.png'
 local retreatTexture = 'LuaUI/Images/unit_retreat.png'
 
+local waitTexture = {
+	[CMD_WAITCODE_NONE  ] = 'LuaUI/Images/commands/Bold/wait.png',
+	[CMD_WAITCODE_DEATH ] = 'LuaUI/Images/commands/Bold/wait_death.png',
+	[CMD_WAITCODE_SQUAD ] = 'LuaUI/Images/commands/Bold/wait_squad.png',
+	[CMD_WAITCODE_GATHER] = 'LuaUI/Images/commands/Bold/wait_gather.png',
+	[CMD_WAITCODE_TIME  ] = 'LuaUI/Images/commands/Bold/wait_time.png',
+}
+	
+
 local lastLowPower = {}
 local lastFacPlop = {}
 local lastRearm = {}
 local lastRetreat = {}
+local lastWait = {}
 
 local lowPowerUnitDef = {}
 local facPlopUnitDef = {}
 local rearmUnitDef = {}
 local retreatUnitDef = {}
+local waitUnitDef = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	if ud.customParams.neededlink then
@@ -63,6 +80,9 @@ for unitDefID = 1, #UnitDefs do
 	end
 	if not (ud.speed == 0 or ud.isBuilding) then
 		retreatUnitDef[unitDefID] = true
+	end
+	if not ud.customParams.removewait then
+		waitUnitDef[unitDefID] = true
 	end
 end
 
@@ -81,6 +101,21 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+
+local spGetUnitCommands = Spring.GetUnitCommands
+local function isWaiting(unitID)
+	local cmd = spGetUnitCommands(unitID, 1)
+	if not cmd or #cmd == 0 then
+		return false
+	end
+
+	local firstCmd = cmd[1]
+	if firstCmd.id ~= CMD_WAIT then
+		return false
+	end
+
+	return firstCmd.params[1] or CMD_WAITCODE_NONE
+end
 
 function SetIcons(unitID)
 	local limit = math.ceil(unitCount/4)
@@ -153,11 +188,23 @@ function SetIcons(unitID)
 				end
 			end
 		end
+
+		if waitUnitDef[unitDefID] then
+			local wait = isWaiting(unitID)
+			if lastWait[unitID] ~= wait then
+				lastWait[unitID] = wait
+				if wait then
+					WG.icons.SetUnitIcon( unitID, {name='wait', texture=waitTexture[wait]} )
+				else
+					WG.icons.SetUnitIcon( unitID, {name='wait', texture=nil} )
+				end
+			end
+		end
 	end
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	if not (lowPowerUnitDef[unitDefID] or facPlopUnitDef[unitDefID] or rearmUnitDef[unitDefID] or retreatUnitDef[unitDefID]) then
+	if not (lowPowerUnitDef[unitDefID] or facPlopUnitDef[unitDefID] or rearmUnitDef[unitDefID] or retreatUnitDef[unitDefID] or waitUnitDef[unitDefID]) then
 		return
 	end
 	if unitIndex[unitID] then
@@ -175,6 +222,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	WG.icons.SetUnitIcon( unitID, {name='facplop', texture=nil} )
 	WG.icons.SetUnitIcon( unitID, {name='rearm', texture=nil} )
 	WG.icons.SetUnitIcon( unitID, {name='retreat', texture=nil} )
+	WG.icons.SetUnitIcon( unitID, {name='wait', texture=nil} )
 	
 	if unitIndex[unitID] then
 		RemoveUnit(unitID)

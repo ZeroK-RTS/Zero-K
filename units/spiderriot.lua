@@ -16,7 +16,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[A rapid fire spider which excels at picking off fast units.]],
     aimposoffset   = [[0 10 0]],
   },
 

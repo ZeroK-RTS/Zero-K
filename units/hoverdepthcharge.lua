@@ -18,7 +18,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext        = [[The somewhat suicidal Claymore is armed with a heavy depthcharge launcher and has no qualms about dropping it on land.]],
     turnatfullspeed = [[1]],
   },
 
@@ -28,7 +27,7 @@ unitDef = {
   iconType            = [[hoverspecial]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maxDamage           = 1350,
+  maxDamage           = 1650,
   maxSlope            = 36,
   maxVelocity         = 3.3,
   minCloakDistance    = 75,
@@ -140,7 +139,7 @@ unitDef = {
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:TORPEDOHITHUGE]],
       fixedLauncher           = true,
-      flightTime              = 2,
+      flightTime              = 3,
 	  groundBounce            = true,
 	  heightMod               = 0,
 	  impulseBoost            = 0.4,
@@ -184,11 +183,12 @@ unitDef = {
       flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
-      range                   = 100,
+      range                   = 40,
       reloadtime              = 8,
       size                    = 1E-06,
       smokeTrail              = false,
-
+      targetborder            = 1,
+	  
       textures                = {
         [[null]],
         [[null]],
@@ -197,7 +197,7 @@ unitDef = {
 
       turnrate                = 10000,
       turret                  = true,
-	  waterWeapon             = true,
+      waterWeapon             = true,
       weaponAcceleration      = 200,
       weaponTimer             = 0.1,
       weaponType              = [[StarburstLauncher]],

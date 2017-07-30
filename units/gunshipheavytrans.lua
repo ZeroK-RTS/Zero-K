@@ -23,11 +23,6 @@ unitDef = {
   cruiseAlt              = 250,
 
   customParams           = {
-    description_fr = [[Transport Aerien Arm? Lourd]],
-	description_de = [[Schwerer, bewaffneter Lufttransport]],
-    helptext       = [[The Vindicator can haul any land unit in the game. Its twin laser guns and automated cargo ejection system make it ideal for drops into hot LZs.]],
-    helptext_fr    = [[Le Vindicator est le summum du transport aerien. Rapide et puissant il peut transporter toutes vos unit?s sur le champ de bataille, il riposte aux tirs gr?ce ? ses multiples canons laser, et s'il est abattu, il ejecte sa livraison au sol avant d'exploser.]],
-	helptext_de    = [[Der Vindicator kann jede Landeinheit im Spiel befördern. Seine doppelläufige Laserkanone und sein automatisches Frachtauswurfsystem machen ihn ideal für den Transport von Einheiten in umkämpfte Landezonen.]],
 	midposoffset   = [[0 0 0]],
 	aimposoffset   = [[0 10 0]],
 	modelradius    = [[15]],

@@ -22,11 +22,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[V?hicule de Construction, Construit ? 5 m/s]],
-	description_de = [[Konstruktionsfahrzeug, Baut mir 5 M/s]],
-    helptext       = [[Highly mobile and capable of taking a beating, the Mason can quickly expand over a large area.]],
-    helptext_fr    = [[Alliant rapidit? et blindage important, le Mason permet de s'?tendre rapidement en s?curit?.]],
-	helptext_de    = [[Hochmobiles, bewaffnetes Konstruktionsfahrzeug, das sich ideal für schnelle Expansionen über große Flächen eignet.]],
 	modelradius    = [[20]],
   },
 

@@ -62,7 +62,7 @@ local function Walk()
 	local start = 5
 	
 	while (true) do
-		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
+		local speedmult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)*SPEED
 		
 		Move(pelvis, y_axis, 8.2, 4*speedmult*start)
 		

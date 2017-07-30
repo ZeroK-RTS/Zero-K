@@ -9,7 +9,7 @@ function widget:GetInfo()
 		date      = "2009.08.10",
 		license   = "GNU GPL v2",
 		layer     = 0,
-		enabled   = false
+		enabled   = true
 	}
 end
 
@@ -18,10 +18,12 @@ end
 -- CONFIGURATION
 local debug = false
 local updateInt = 1 --seconds for the ::update loop
-local sens = 20	--rotate mouse sensitivity (length of 1 mouse movement vector). Smaller value = higher sensitivity
+local sens = 50 --rotate mouse sensitivity (length of 1 mouse movement vector). Smaller value = higher sensitivity
 local drawForAll = false --draw facing direction also for other buildings than labs
 local drawForTurret = false --draw facing direction for all unit that can attack
-local timesens = 0.100 --rotate mouse time sensitivity (second for 1 mouse movement vector). Bigger value = higher sensitivity
+local timesens = 0.06 --rotate mouse time sensitivity (second for 1 mouse movement vector). Bigger value = higher sensitivity
+
+local USE_META = false -- Meta (space) functionality is disabled
 --------------------------------------------------------------------------------
 local inDrag = false
 local metaStart = false
@@ -182,6 +184,7 @@ end
 function manipulateFacing()	
 	local mx,my,lmb,mmb,rmb = spGetMouseState()
 	local alt,ctrl,meta,shift = spGetModKeyState()
+	meta = meta and USE_META
 	
 	if ( lmb and mouseLbLast == false) or ( meta and not inDrag and not lmb ) then
 		--in
@@ -293,11 +296,15 @@ function drawOrientation()
 	local function drawFunc()
 		glVertex( 0, 0, -8)
 		glVertex( 0, 0, 8)
-		glVertex( 50, 0, -3)
+		glVertex( 48, 0, -3)
 
 		glVertex( 0, 0,  8)
-		glVertex( 50, 0, 3)
-		glVertex( 50, 0, -3 )
+		glVertex( 48, 0, 3)
+		glVertex( 48, 0, -3 )
+		
+		glVertex( 50, 0,  0)
+		glVertex( 48, 0, 3)
+		glVertex( 48, 0, -3 )
 		
 		glVertex( 50, 0, 0)
 		glVertex( 30, 0, -30 )

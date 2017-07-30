@@ -19,11 +19,6 @@ unitDef = {
 
   customParams           = {
     extradrawrange = 465,
-    description_fr = [[Mechwarrior d'Assaut Lourd]],
-	description_de = [[Schwerer Kampfstreicher]],
-	helptext       = [[The Bantha is an even heavier solution to a particularly uncrackable defense line, with a tachyon projector and EMP missiles for stand-off engagements, lightning hand cannons for general purpose combat, and a good deal of armor. Beware though, for it is defenseless against air and cannot be used effectively on its own.]],
-    helptext_de    = [[Der Bantha ist die Lösung für eine besonders schwierig zu knackende Verteidigungslinie. Dazu besitzt er einen Tachyonen Beschleuniger und Marschflugkörper für Pattsituationen, blitzschnelle Handfeuerwaffen für den normalen Kampf und haufenweise Munition. Dennoch gib Acht darauf, dass er gegen Luftangriffe fast schutzlos ist.]],
-    helptext_fr    = [[Le Bantha est aussi cher et lent qu'il est inarretable. Il dispose de canons EMP, d'un canon accelerateur tachyon et de missiles. Courez.]],
     aimposoffset   = [[0 -8 0]],
 	midposoffset   = [[0 -8 0]],
 	modelradius    = [[17]],
@@ -150,6 +145,7 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
+        combatrange = 900,
 		light_color = [[0.65 0.65 0.18]],
 		light_radius = 380,
       },

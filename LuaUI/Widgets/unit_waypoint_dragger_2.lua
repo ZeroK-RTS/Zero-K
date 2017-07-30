@@ -38,7 +38,7 @@ local CMD_JUMP = 38521
 local CMD_BUILD = -1
 local cmdColorsTbl = {
 	[CMD.MOVE]         = {0.5, 1.0, 0.5, 0.7},
-	[CMD_RAW_MOVE]         = {0.5, 1.0, 0.5, 0.7},
+	[CMD_RAW_MOVE]     = {0.5, 1.0, 0.5, 0.7},
 	[CMD.PATROL]       = {0.3, 0.3, 1.0, 0.7},
 	[CMD.RECLAIM]      = {1.0, 0.2, 1.0, 0.7},
 	[CMD.REPAIR]       = {0.3, 1.0, 1.0, 0.7},
@@ -53,6 +53,7 @@ local cmdColorsTbl = {
 	[CMD_JUMP]         = {0.0, 1.0, 0.0, 0.7},
 }
 
+-- CMD_RAW_BUILD is intentionally not included because it will always be below another command
 local POINT_COMMAND = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,

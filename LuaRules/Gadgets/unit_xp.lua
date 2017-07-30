@@ -15,23 +15,48 @@ local spValidUnitID = Spring.ValidUnitID
 local spSetUnitExperience = Spring.SetUnitExperience
 local spGetUnitExperience = Spring.GetUnitExperience
 local getCost = Spring.Utilities.GetUnitCost
+local spAreTeamsAllied = Spring.AreTeamsAllied
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spGetUnitDefID = Spring.GetUnitDefID
+local spGetUnitLosState = Spring.GetUnitLosState
+local allyTeamByTeam = {}
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if (attackerID and spValidUnitID(attackerID) and (not Spring.AreTeamsAllied(unitTeam, attackerTeam))) then
 
-		if paralyzer then return end -- for now, no XP for status effects. Figure out a sensible formula later.
+	if not attackerID or not spValidUnitID(attackerID)
+	or spAreTeamsAllied(unitTeam, attackerTeam)
+	or paralyzer -- requires a sensible formula
+	then
+		return
+	end
 
-		local parentID = Spring.GetUnitRulesParam(attackerID, "parent_unit_id")
-		if parentID then
-			if spValidUnitID(parentID) then
-				attackerID = parentID
-				attackerDefID = Spring.GetUnitDefID(parentID)
-			else
-				return
-			end
+	local canAttackerSeeTarget = spGetUnitLosState(unitID, allyTeamByTeam[attackerTeam])
+	if not canAttackerSeeTarget.los then
+		return
+	end
+
+	local parentID = spGetUnitRulesParam(attackerID, "parent_unit_id")
+	if parentID then
+		if not spValidUnitID(parentID) then
+			return
 		end
 
-		local hp, maxHP = spGetUnitHealth(unitID)
-		spSetUnitExperience(attackerID, spGetUnitExperience(attackerID) + ((((hp > 0) and damage or (damage + hp)) / maxHP) * getCost(unitID, unitDefID) / getCost(attackerID, attackerDefID)))
+		attackerID = parentID
+		attackerDefID = spGetUnitDefID(parentID)
+	end
+
+	local hp, maxHP = spGetUnitHealth(unitID)
+
+	spSetUnitExperience(attackerID, spGetUnitExperience(attackerID) + ((((hp > 0) and damage or (damage + hp)) / maxHP) * getCost(unitID, unitDefID) / getCost(attackerID, attackerDefID)))
+end
+
+function gadget:Initialize()
+	Spring.SetExperienceGrade(1.0)
+
+	local teams = Spring.GetTeamList()
+	for i = 1, #teams do
+		local teamID = teams[i]
+		local allyTeamID = select(6, Spring.GetTeamInfo(teamID))
+		allyTeamByTeam[teamID] = allyTeamID
 	end
 end

@@ -17,11 +17,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Véhicule d'Assaut]],
-	description_de = [[Sturmfahrzeug]],
-    helptext       = [[Expensive and powerful, the Ravager is capable of holding its own against most opposition. Though its maneuverability is terrible, its strength is when moving at a considerable top speed in a straight line. Due to this, it is almost impossible to skirmish using raiders. In combat, you should attempt to keep travelling forward and not turn too suddenly, so as to maintain top speed. Circling your target at the edge of your range is a good tactic. An arcing projectile allows it to shoot over wreckage, other tanks, etc. Vulnerable to crawling bombs when in swarms.]],
-    helptext_fr    = [[Le Ravager est un tank d'assaut. Sont blindage lui permet de faire face r nombre de menaces, et son canon plasma lui permet de tirer au dessus de ses alliés et des carcasses. Son moteur met du temps r atteindre sa vitesse maximale, mais celle ci est assez élevée pour qu'il ne puisse pas se faire harrasser par des tirailleurs qui seront trop occupés r le suivre.  Attention donc, r ne pas lui faire prendre de virages trop secs afin de conserver sa vitesse.]],
-	helptext_de    = [[Zwar teuer, aber auch kraftvoll ist der Ravager, der in der Lage ist, sich selbst gegen die meisten Gegner am Leben zu halten. Obwohl seine Manövrierfähigkeit unglaublich schlecht ist, seine Stärke ist sich mit der Maximalgeschwindigkeit geradeaus zu bewegen. Währenddessen ist es fast unmöglich gegen ihn zu kämpfen. Deshalb solltest du auch darauf achten, dass du ihn im Kampf immer geradeaus bewegst. Das Projektil ermöglicht auch den bogenförmigen Beschuß, um z.B. über Wracks oder Einheiten zu schießen. Anfällig gegen Massen von Crawling Bomben.]],
 	aimposoffset   = [[0 8 0]],
 	midposoffset   = [[0 -2 0]],
 	modelradius    = [[21]],

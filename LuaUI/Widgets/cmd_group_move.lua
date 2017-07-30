@@ -29,7 +29,7 @@ function widget:CommandNotify(id, params, options)
 		return false
 	end
 
-	if (id == CMD.MOVE) and params[3] and (not myOrder) and options.coded then
+	if (id == CMD.MOVE or id == CMD_RAW_MOVE) and params[3] and (not myOrder) and options.coded then
 		local selUnits = GetSelectedUnits()
 		if #selUnits > 1 then
 			myOrder = true
@@ -67,7 +67,7 @@ function widget:CommandNotify(id, params, options)
 					targetX = mx - (math.sin(angle) * maxOffset)
 					targetZ = mz - (math.cos(angle) * maxOffset)
 				end	
-				GiveOrderToUnit(unitID,CMD.MOVE,{targetX,params[2],targetZ},options.coded)
+				GiveOrderToUnit(unitID,CMD_RAW_MOVE,{targetX,params[2],targetZ},options.coded)
 			end
 			myOrder = false
 			return true

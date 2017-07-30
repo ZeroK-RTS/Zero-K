@@ -26,14 +26,15 @@ local modOptions = Spring.GetModOptions()
 local DELAYED_AFK_SPAWN = false
 local COOP_MODE = false
 local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchickens", false, false))
-local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
+local campaignBattleID = modOptions.singleplayercampaignbattleid
+local setAiStartPos = (modOptions.setaispawns == "1")
 
 local gaiateam = Spring.GetGaiaTeamID()
 local gaiaally = select(6, spGetTeamInfo(gaiateam))
 
 local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 
-local fixedStartPos = modOptions.fixedstartpos
+local fixedStartPos = (modOptions.fixedstartpos == "1")
 local ordersToRemove
 
 --------------------------------------------------------------------------------
@@ -90,6 +91,7 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 	if ploppableDefs[unitDefID] and (select(5, Spring.GetUnitHealth(unitID)) < 0.1) and (builderID and Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
 		-- (select(5, Spring.GetUnitHealth(unitID)) < 0.1) to prevent ressurect from spending facplop.
 		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
+		Spring.SetUnitRulesParam(unitID,"ploppee",1, {private = true})
 		
 		ordersToRemove = ordersToRemove or {}
 		ordersToRemove[builderID] = unitDefID
@@ -306,6 +308,39 @@ local function getMiddleOfStartBox(teamID)
 	return x, Spring.GetGroundHeight(x,z), z
 end
 
+local function GetStartPos(teamID, teamInfo, isAI)
+	if luaSetStartPositions[teamID] then
+		return luaSetStartPositions[teamID].x, luaSetStartPositions[teamID].y, luaSetStartPositions[teamID].z
+	end
+	
+	if fixedStartPos then
+		local x, y, z
+		if teamInfo then
+			x, z = tonumber(teamInfo.start_x), tonumber(teamInfo.start_z)
+		end
+		if x then
+			y = Spring.GetGroundHeight(x, z)
+		else
+			x, y, z = Spring.GetTeamStartPosition(teamID)
+		end
+		return x, y, z
+	end
+	
+	if not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI) then
+		local x, y, z = getMiddleOfStartBox(teamID)
+		return x, y, z
+	end
+	
+	local x, y, z = Spring.GetTeamStartPosition(teamID)
+	-- clamp invalid positions
+	-- AIs can place them -- remove this once AIs are able to be filtered through AllowStartPosition
+	local boxID = isAI and Spring.GetTeamRulesParam(teamID, "start_box_id")
+	if boxID and not GG.CheckStartbox(boxID, x, z) then
+		x,y,z = getMiddleOfStartBox(teamID)
+	end
+	return x, y, z
+end
+
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartOfTheGame)
 	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
 	if teamInfo and teamInfo.nocommander then
@@ -340,35 +375,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 
 	if startUnit then
 		-- replace with shuffled position
-		local x,y,z
-		if fixedStartPos then
-			if teamInfo then
-				x, z = tonumber(teamInfo.start_x), tonumber(teamInfo.start_z)
-			end
-			if x then
-				y = Spring.GetGroundHeight(x, z)
-			else
-				x, y, z = Spring.GetTeamStartPosition(teamID)
-			end
-		else
-			local startPosition = luaSetStartPositions[teamID]
-			if not startPosition then
-				if not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI) then
-					x,y,z = getMiddleOfStartBox(teamID)
-				else
-					x,y,z = Spring.GetTeamStartPosition(teamID)
-
-					-- clamp invalid positions
-					-- AIs can place them -- remove this once AIs are able to be filtered through AllowStartPosition
-					local boxID = isAI and Spring.GetTeamRulesParam(teamID, "start_box_id")
-					if boxID and not GG.CheckStartbox(boxID, x, z) then
-						x,y,z = getMiddleOfStartBox(teamID)
-					end
-				end
-			else
-				x,y,z = startPosition.x, startPosition.y, startPosition.z
-			end
-		end
+		local x,y,z = GetStartPos(teamID, teamInfo, isAI)
 		
 		-- get facing direction
 		local facing = GetFacingDirection(x, z, teamID)
@@ -574,7 +581,7 @@ function gadget:GameStart()
 					local customKeys = select(10, Spring.GetPlayerInfo(playerlist[i]))
 					if customKeys and customKeys.extracomm then
 						for j = 1, tonumber(customKeys.extracomm) do
-						Spring.Echo("Spawing a commander")
+							Spring.Echo("Spawing a commander")
 							SpawnStartUnit(team, playerlist[i], false, true)
 						end
 					end
@@ -593,7 +600,12 @@ function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
 			Spring.SendLuaRulesMsg(command..aiTeam..":"..name);
 		end)
 	end
-end	
+end
+
+local function SetStartLocation(teamID, x, z)
+    luaSetStartPositions[teamID] = {x = x, y = Spring.GetGroundHeight(x,z), z = z}
+end
+GG.SetStartLocation = SetStartLocation
 
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("faction:",1,true) then
@@ -615,7 +627,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		
 		local _,_,_,isAI = Spring.GetTeamInfo(teamID)
 		if(isAI) then -- this is actually an AI 
-			local aiid, ainame, aihost = Spring.GetAIInfo(teamID);
+			local aiid, ainame, aihost = Spring.GetAIInfo(teamID)
 			if (aihost == playerID) then -- it's actually controlled by the local host
 				local unitDef = UnitDefNames[name];
 				if unitDef then -- the requested unit actually exists
@@ -625,15 +637,20 @@ function gadget:RecvLuaMsg(msg, playerID)
 				end
 			end
 		end
-
-	end	
+	elseif (msg:find("ai_start_pos:",1,true) and setAiStartPos) then
+		local msg_table = Spring.Utilities.ExplodeString(':', msg)
+		if msg_table then
+			local teamID, x, z = tonumber(msg_table[2]), tonumber(msg_table[3]), tonumber(msg_table[4])
+			if teamID then
+				local _,_,_,isAI = Spring.GetTeamInfo(teamID)
+				if isAI and x and z then
+					SetStartLocation(teamID, x, z)
+					Spring.MarkerAddPoint(x, 0, z, "AI " .. teamID .. " start")
+				end
+			end
+		end
+	end
 end
-
--- used by CAI. Could be extended to allow widgets to set start location? 
-local function SetStartLocation(teamID, x, z)
-    luaSetStartPositions[teamID] = {x = x, y = Spring.GetGroundHeight(x,z), z = z}
-end
-GG.SetStartLocation = SetStartLocation
 
 function gadget:GameFrame(n)
 	CheckOrderRemoval()

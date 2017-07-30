@@ -15,11 +15,6 @@ unitDef = {
   category            = [[LAND]],
 
   customParams        = {
-    description_fr = [[Bouclier mobile/AA l?ger]],
-	description_de = [[Schild/Luftabwehr]],
-    helptext       = [[Protects adjacent chickens.]],
-    helptext_fr    = [[Le Toad est une sorte de crapaud g?ant avec comme particularit? de poss?der un puissant bouclier ?nerg?tique prot?geant les unit?s amies proches des tirs adverses lors de leur progression vers l'adversaire. Il utilise aussi des spores basiques pour se d?fendre des unit?s a?riennes.]],
-	helptext_de    = [[BeschÅEzt nebenstehende Chicken.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -181,8 +176,8 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       shieldAlpha             = 0.15,
-      shieldBadColor          = [[1.0 1 0.1]],
-      shieldGoodColor         = [[0.1 1.0 0.1]],
+      shieldBadColor          = [[1.0 1 0.1 1]],
+      shieldGoodColor         = [[0.1 1.0 0.1 1]],
       shieldInterceptType     = 3,
       shieldPower             = 2500,
       shieldPowerRegen        = 180,

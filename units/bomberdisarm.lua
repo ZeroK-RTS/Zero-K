@@ -17,11 +17,6 @@ unitDef = {
   cruiseAlt           = 180,
 
   customParams        = {
-    description_de = [[Entwaffnungbomber]],
-    description_fr = [[Bombardier desarmant]],
-    helptext       = [[Fast bomber armed with a lightning generator that disarms units in a wide area under it.]],
-    helptext_de    = [[Schneller Entwaffnungbomber, der mit einem Stossspannungsgenerator zum Entwaffnen großflächiger Gebiete bewaffnet ist.]],
-    helptext_fr    = [[Rapide, armé de canons desarmant pouvant désarmer les unités dans une large bande.]],
     modelradius    = [[10]],
     requireammo    = [[1]],
     refuelturnradius = [[170]],
@@ -44,7 +39,7 @@ unitDef = {
   script              = [[bomberdisarm.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
-  turnRadius          = 20,
+  turnRadius          = 400,
 
   weapons             = {
 

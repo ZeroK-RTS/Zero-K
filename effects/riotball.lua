@@ -192,6 +192,39 @@ return {
     },
   },
   
+    
+  ["riotballplus2_purple_limpet"] = {
+    usedefaultexplosions = false,
+	
+	groundflash = {
+      circlealpha        = 1,
+      circlegrowth       = 12,
+      flashalpha         = 2.15,
+      flashsize          = 68,
+      ttl                = 6,
+      color = {
+        [1]  = 1,
+        [2]  = 0.89999997615814,
+        [3]  = 0.60000002384186,
+      },
+    },
+    sphere = {
+      air                = true,
+      class              = [[CSpherePartSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+	  underwater 		 = true,
+      properties = {
+        alpha              = 0.5,
+        color              = [[1,0,1]],
+        expansionspeed     = 12,
+        ttl                = 22,
+      },
+    },
+	
+  },
+  
   ["riotballgrav"] = {
     usedefaultexplosions = false,
     groundflash = {

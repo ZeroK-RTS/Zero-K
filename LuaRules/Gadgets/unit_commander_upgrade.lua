@@ -268,6 +268,12 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	SetUnitRulesModuleCounts(unitID, counts)
 	
 	ApplyModuleEffects(unitID, moduleEffectData, totalCost, images or {})
+	
+	if staticLevel then
+		-- Newly created commander, set to full health
+		local _, maxHealth = Spring.GetUnitHealth(unitID)
+		Spring.SetUnitHealth(unitID, maxHealth)
+	end
 end
 
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
@@ -333,7 +339,7 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 end
 
 local function CreateStaticCommander(dyncommID, commProfileInfo, moduleList, moduleCost, x, y, z, facing, teamID, targetLevel)
-	for i = 1, targetLevel do
+	for i = 0, targetLevel do
 		local levelModules = commProfileInfo.modules[i]
 		if levelModules then
 			for j = 1, #levelModules do
@@ -402,7 +408,7 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	end
 	
 	if staticLevel then
-		return CreateStaticCommander(dyncommID, commProfileInfo, moduleList, moduleCost, x, y, z, facing, teamID, staticLevel - 1)
+		return CreateStaticCommander(dyncommID, commProfileInfo, moduleList, moduleCost, x, y, z, facing, teamID, staticLevel)
 	end
 	
 	local upgradeDef = {

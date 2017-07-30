@@ -735,73 +735,75 @@ local function SaveUnits()
 	local units = Spring.GetAllUnits()
 	for i=1,#units do
 		local unitID = units[i]
-		data[unitID] = {}
-		local unitInfo = data[unitID]
-		
-		-- basic unit information
-		local unitDefID = spGetUnitDefID(unitID)
-		local unitDef = UnitDefs[unitDefID]
-		unitInfo.unitDefName = unitDef.name
-		unitInfo.unitTeam = spGetUnitTeam(unitID)
-		unitInfo.neutral = spGetUnitNeutral(unitID)
-		-- save position/velocity
-		unitInfo.pos = {spGetUnitBasePosition(unitID)}
-		unitInfo.dir = {spGetUnitDirection(unitID)}
-		unitInfo.vel = {spGetUnitVelocity(unitID)}
-		unitInfo.heading = spGetUnitHeading(unitID)
-		-- save health
-		unitInfo.health, unitInfo.maxHealth, unitInfo.paralyzeDamage, unitInfo.captureProgress, unitInfo.buildProgress = spGetUnitHealth(unitID)
-		-- save weapons
-		local weapons = unitDef.weapons
-		unitInfo.weapons = {}
-		unitInfo.shield = {}
-		for i=1,#weapons do
-			unitInfo.weapons[i] = {}
-			unitInfo.weapons[i].reloadState = spGetUnitWeaponState(unitID, i, 'reloadState')
-			local enabled, power = Spring.GetUnitShieldState(unitID, i)
-			if power then
-				unitInfo.shield[i] = {enabled = enabled, power = power}
-			end
-		end
-		unitInfo.stockpile = {}
-		unitInfo.stockpile.num, _, unitInfo.stockpile.progress = spGetUnitStockpile(unitID)
-		
-		-- factory properties
-		if unitDef.isFactory then
-			local factoryCommands = Spring.GetFactoryCommands(unitID) or {}
-			unitInfo.factoryData = { commands = factoryCommands }
-			local producedUnitID = spGetUnitIsBuilding(unitID)
-			if (producedUnitID) then
-				local producedDefID = spGetUnitDefID(producedUnitID)
-				if (producedDefID) then
-					local health, _, paralyze, capture, build = spGetUnitHealth(producedUnitID)
-					unitInfo.factoryData.buildee = {
-						factoryID = unitID,
-						unitID = producedUnitID,
-						unitDefID = producedDefID,
-						health = health,
-						paralyze = paralyze,
-						capture = capture,
-						build = build,
-					}
+		if Spring.GetUnitRulesParam(unitID, "do_not_save") ~= 1 then	
+			data[unitID] = {}
+			local unitInfo = data[unitID]
+			
+			-- basic unit information
+			local unitDefID = spGetUnitDefID(unitID)
+			local unitDef = UnitDefs[unitDefID]
+			unitInfo.unitDefName = unitDef.name
+			unitInfo.unitTeam = spGetUnitTeam(unitID)
+			unitInfo.neutral = spGetUnitNeutral(unitID)
+			-- save position/velocity
+			unitInfo.pos = {spGetUnitBasePosition(unitID)}
+			unitInfo.dir = {spGetUnitDirection(unitID)}
+			unitInfo.vel = {spGetUnitVelocity(unitID)}
+			unitInfo.heading = spGetUnitHeading(unitID)
+			-- save health
+			unitInfo.health, unitInfo.maxHealth, unitInfo.paralyzeDamage, unitInfo.captureProgress, unitInfo.buildProgress = spGetUnitHealth(unitID)
+			-- save weapons
+			local weapons = unitDef.weapons
+			unitInfo.weapons = {}
+			unitInfo.shield = {}
+			for i=1,#weapons do
+				unitInfo.weapons[i] = {}
+				unitInfo.weapons[i].reloadState = spGetUnitWeaponState(unitID, i, 'reloadState')
+				local enabled, power = Spring.GetUnitShieldState(unitID, i)
+				if power then
+					unitInfo.shield[i] = {enabled = enabled, power = power}
 				end
 			end
-		end
-		
-		-- save commands and states
-		local commands = spGetCommandQueue(unitID, -1)
-		for i,v in pairs(commands) do
-			if (type(v) == "table" and v.params) then v.params.n = nil end
-		end
-		unitInfo.commands = commands
-		unitInfo.states = spGetUnitStates(unitID)
-		-- save experience
-		unitInfo.experience = spGetUnitExperience(unitID)
-		-- save rulesparams
-		unitInfo.rulesParams = {}		
-		local params = Spring.GetUnitRulesParams(unitID)
-		for name,value in pairs(params) do
-			unitInfo.rulesParams[name] = value 
+			unitInfo.stockpile = {}
+			unitInfo.stockpile.num, _, unitInfo.stockpile.progress = spGetUnitStockpile(unitID)
+			
+			-- factory properties
+			if unitDef.isFactory then
+				local factoryCommands = Spring.GetFactoryCommands(unitID) or {}
+				unitInfo.factoryData = { commands = factoryCommands }
+				local producedUnitID = spGetUnitIsBuilding(unitID)
+				if (producedUnitID) then
+					local producedDefID = spGetUnitDefID(producedUnitID)
+					if (producedDefID) then
+						local health, _, paralyze, capture, build = spGetUnitHealth(producedUnitID)
+						unitInfo.factoryData.buildee = {
+							factoryID = unitID,
+							unitID = producedUnitID,
+							unitDefID = producedDefID,
+							health = health,
+							paralyze = paralyze,
+							capture = capture,
+							build = build,
+						}
+					end
+				end
+			end
+			
+			-- save commands and states
+			local commands = spGetCommandQueue(unitID, -1)
+			for i,v in pairs(commands) do
+				if (type(v) == "table" and v.params) then v.params.n = nil end
+			end
+			unitInfo.commands = commands
+			unitInfo.states = spGetUnitStates(unitID)
+			-- save experience
+			unitInfo.experience = spGetUnitExperience(unitID)
+			-- save rulesparams
+			unitInfo.rulesParams = {}		
+			local params = Spring.GetUnitRulesParams(unitID)
+			for name,value in pairs(params) do
+				unitInfo.rulesParams[name] = value 
+			end
 		end
 	end
 	return data

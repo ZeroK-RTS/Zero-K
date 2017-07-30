@@ -239,6 +239,7 @@ local function GetLightsFromUnitDefs()
 		
 		-- For long lasers or projectiles
 		if customParams.light_beam_mult then
+			-- Do not use this on projectiles with variable time to live (those with non-spherical ranges).
 			weaponData.beamOffset = 1
 			weaponData.beam = true
 			weaponData.beamMult = tonumber(customParams.light_beam_mult)

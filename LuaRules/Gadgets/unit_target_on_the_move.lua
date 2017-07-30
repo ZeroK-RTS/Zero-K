@@ -53,7 +53,7 @@ local UNSEEN_TIMEOUT = 2
 local validUnits = {}
 local waitWaitUnits = {}
 
-for i=1, #UnitDefs do
+for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if ((not (ud.canFly and (ud.isBomber or ud.isBomberAirUnit))) and 
 			ud.canAttack and ud.canMove and ud.maxWeaponRange and ud.maxWeaponRange > 0) or ud.isFactory then
@@ -79,40 +79,33 @@ local allyTargetUnits = {
 include("LuaRules/Configs/customcmds.h.lua")
 
 local unitSetTargetCmdDesc = {
-	id	  = CMD_UNIT_SET_TARGET,
-	type	= CMDTYPE.ICON_UNIT_OR_RECTANGLE,
-	name	= 'Set Target',
+	id      = CMD_UNIT_SET_TARGET,
+	type    = CMDTYPE.ICON_UNIT_OR_RECTANGLE,
+	name    = 'Set Target',
 	action  = 'settarget',
 	cursor  = 'Attack',
-	tooltip	= 'Sets target for unit, not removed by move commands',
+	tooltip = 'Sets target for unit, not removed by move commands',
 	hidden = true,
 }
 
 local unitSetTargetCircleCmdDesc = {
-	id	  = CMD_UNIT_SET_TARGET_CIRCLE,
-	type	= CMDTYPE.ICON_UNIT_OR_AREA,
-	name	= 'Set Target Circle',
+	id      = CMD_UNIT_SET_TARGET_CIRCLE,
+	type    = CMDTYPE.ICON_UNIT_OR_AREA,
+	name    = 'Set Target Circle',
 	action  = 'settargetcircle',
 	cursor  = 'Attack',
-	tooltip	= 'Sets target for unit, not removed by move commands, circle version',
+	tooltip = 'Sets target for unit, not removed by move commands, circle version',
 	hidden = false,
 }
 
 local unitCancelTargetCmdDesc = {
-	id	  = CMD_UNIT_CANCEL_TARGET,
-	type	= CMDTYPE.ICON,
-	name	= 'Cancel Target',
+	id      = CMD_UNIT_CANCEL_TARGET,
+	type    = CMDTYPE.ICON,
+	name    = 'Cancel Target',
 	action  = 'canceltarget',
-	tooltip	= 'Removes target for unit',
+	tooltip = 'Removes target for unit',
 	hidden = false,
 }
-
---------------------------------------------------------------------------------
--- Gadget Interaction
-
-function GG.GetUnitTarget(unitID)
-	return unitById[unitID] and unit.data[unitById[unitID]] and unit.data[unitById[unitID]].targetID
-end
 
 --------------------------------------------------------------------------------
 -- Target Handling
@@ -392,6 +385,33 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return false  -- command was used
 	end
 	return true  -- command was not used
+end
+
+--------------------------------------------------------------------------------
+-- Gadget Interaction
+
+function GG.GetUnitTarget(unitID)
+	return unitById[unitID] and unit.data[unitById[unitID]] and unit.data[unitById[unitID]].targetID
+end
+
+function GG.SetUnitTarget(unitID, targetID)
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if not (unitDefID and validUnits[unitDefID]) then
+		return
+	end
+	local targetUnitDef = spGetUnitDefID(targetID)
+	local tud = targetUnitDef and UnitDefs[targetUnitDef]
+	
+	if tud then
+		addUnit(unitID, {
+			id = unitID, 
+			targetID = targetID, 
+			allyTeam = spGetUnitAllyTeam(unitID), 
+			allyAllowed = allyTargetUnits[unitDefID],
+			range = UnitDefs[unitDefID].maxWeaponRange,
+			alwaysSeen = tud and (tud.isBuilding == true or tud.maxAcc == 0),
+		})
+	end
 end
 
 --------------------------------------------------------------------------------

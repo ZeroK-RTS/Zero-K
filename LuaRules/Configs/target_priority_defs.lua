@@ -1,6 +1,10 @@
 -- Assuming max HP/Cost is 50.
 -- Max useful HP/Cost is 11, Only Dirtbag and Claw are higher at 32.5 and 40 respectively.
 
+local DISARM_BASE = 0.3
+local DISARM_ADD = 0.2
+local DISARM_ADD_TIME = 10*30 -- frames
+
 local weaponBadCats = {}
 local weaponIsAA = {}
 
@@ -181,12 +185,22 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["staticheavyarty_plasma"].id]           = {2.0},
 }
 
-local stunWeaponDefs = {
-	[WeaponDefNames["shieldarty_emp_rocket"].id] = true,
-	[WeaponDefNames["shipscout_missile"].id] = true,
-	--[WeaponDefNames["turretemp_arm_det_weapon"].id] = true,
-	--[WeaponDefNames["arm_venom_spider"].id] = true,
+-- Do not apply the large already disarmed target penalty if it has disarm less than the times below.
+-- If a unit is disarmed OKP says that it is expected to be disarmed then the large penalty is applied regardless.
+local disarmWeaponTimeDefs = {
+	[WeaponDefNames["shieldarty_emp_rocket"].id] = 5,
+	[WeaponDefNames["shipscout_missile"].id] = 1.5,
 }
+
+-- Penalty for shooting at disarmed/disabled units
+local disarmPenaltyDefs = {
+	[WeaponDefNames["shieldarty_emp_rocket"].id] = 200,
+	[WeaponDefNames["shipscout_missile"].id] = 10,
+}
+
+for key, value in pairs(disarmWeaponTimeDefs) do
+	disarmWeaponTimeDefs[key] = DISARM_BASE + DISARM_ADD*(value*30)/DISARM_ADD_TIME
+end
 
 local captureWeaponDefs = {
 	[WeaponDefNames["vehcapture_captureray"].id] = true
@@ -202,8 +216,11 @@ local gravityWeaponDefs = {
 -- for heatrays
 local proximityWeaponDefs = {}
 for wdid = 1, #WeaponDefs do
-	if WeaponDefs[wdid].customParams.dyndamageexp then
-		proximityWeaponDefs[wdid] = true
+	local cp = WeaponDefs[wdid].customParams
+	if cp.proximity_priority then
+		proximityWeaponDefs[wdid] = tonumber(cp.proximity_priority)
+	elseif cp.dyndamageexp then
+		proximityWeaponDefs[wdid] = 20
 	end
 end
 
@@ -214,6 +231,10 @@ local radarWobblePenalty = {
 	[WeaponDefNames["turretantiheavy_ata"].id] = 5,
 	[WeaponDefNames["hoverarty_ata"].id] = 5,
 	[WeaponDefNames["cloakarty_hammer_weapon"].id] = 5,
+}
+
+local radarDotPenalty = {
+	[WeaponDefNames["shieldarty_emp_rocket"].id] = 100,
 }
 
 for i = 1, #UnitDefs do
@@ -273,12 +294,13 @@ for uid = 1, #UnitDefs do
 			targetTable[uid][wid] = unitHealthRatio[uid] + 35
 		elseif unitIsClaw[uid] then
 			targetTable[uid][wid] = unitHealthRatio[uid] + 1000
-		elseif (unitIsFighterOrDrone[uid])
-			or (weaponBadCats[wid].fixedwing and unitIsFixedwing[uid])
+		elseif (weaponBadCats[wid].fixedwing and unitIsFixedwing[uid])
 			or (weaponBadCats[wid].gunship and unitIsGunship[uid])
-			or (weaponBadCats[wid].ground and unitIsGround[uid])
-			or (weaponBadCats[wid].cheap and unitIsCheap[uid])then
+			or (weaponBadCats[wid].ground and unitIsGround[uid]) then
 				targetTable[uid][wid] = unitHealthRatio[uid] + 15
+		elseif (unitIsFighterOrDrone[uid])
+			or (weaponBadCats[wid].cheap and unitIsCheap[uid]) then
+				targetTable[uid][wid] = unitHealthRatio[uid] + 10
 		elseif (unitIsBomber[uid] and weaponIsAA[wid])
 			or (weaponBadCats[wid].heavy and unitIsHeavy[uid]) then
 			targetTable[uid][wid] = unitHealthRatio[uid]*0.3
@@ -305,4 +327,13 @@ for weaponDefID, data in pairs(velocityPenaltyDefs) do
 	data[2] = data[2] - data[1]*data[3]
 end
 
-return targetTable, stunWeaponDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult
+local reloadTimeAlpha = 1.8 --seconds, matches Leveler's reload time
+local highAlphaWeaponDamages = {}
+for wid = 1, #WeaponDefs do
+	local wd = WeaponDefs[wid]
+	if wd.customParams and wd.customParams.shot_damage and wd.reload >= reloadTimeAlpha then
+		highAlphaWeaponDamages[wid] = tonumber(wd.customParams.shot_damage)
+	end
+end
+
+return targetTable, disarmWeaponTimeDefs, disarmPenaltyDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, radarDotPenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME

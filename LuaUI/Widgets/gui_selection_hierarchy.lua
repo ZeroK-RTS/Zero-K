@@ -50,15 +50,35 @@ end
 -- Epic Menu Options
 
 local ctrlFlattenRank = 1
+local retreatOverride = true
+local retreatingRank = 1
 local useSelectionFiltering = true
 local selectionFilteringOnlyAlt = false
+local retreatDeselects = false
+
+local function StartRetreat (unitID)
+	local selection = Spring.GetSelectedUnits()
+	local count = #selection
+	for i = 1, count do
+		local selUnitID = selection[i]
+		if selUnitID == unitID then
+			selection[i] = selection[count]
+			selection[count] = nil
+			Spring.SelectUnitArray(selection)
+			return
+		end
+	end
+end
 
 options_path = 'Settings/Interface/Selection'
+local retreatPath = 'Settings/Interface/Retreat Zones'
+options_order = { 'useSelectionFilteringOption', 'selectionFilteringOnlyAltOption', 'ctrlFlattenRankOption', 'retreatOverrideOption', 'retreatingRankOption', 'retreatDeselects' }
 options = {
 	useSelectionFilteringOption = {
 		name = "Use selection filtering",
 		type = "bool",
 		value = true,
+		noHotkey = true,
 		desc = "Filter constructors out of mixed constructor/combat unit selection.",
 		OnChange = function (self)
 			useSelectionFiltering = self.value
@@ -68,20 +88,63 @@ options = {
 		name = "Only filter when Alt is held",
 		type = "bool",
 		value = false,
-		desc = "Enable selection filtering when Alt is held. Required the main selection filtering option to be enabled.",
+		noHotkey = true,
+		desc = "Enable selection filtering when Alt is held. Requires the main selection filtering option to be enabled.",
 		OnChange = function (self)
 			selectionFilteringOnlyAlt = self.value
 		end
 	},
 	ctrlFlattenRankOption = {
 		name = 'Hold Ctrl to ignore rank difference above:',
+		desc = "Useful so that global selection hotkeys (such as Ctrl+Z) can expand upon a mixed selection.",
 		type = 'number',
 		value = 1,
 		min = 0, max = 3, step = 1,
 		noHotkey = true,
+		tooltip_format = "%.0f",
 		OnChange = function (self)
 			ctrlFlattenRank = self.value
 		end
+	},
+	retreatOverrideOption = {
+		name = "Retreat overrides selection rank",
+		desc = "Retreating units will be treated as a different selection rank.",
+		type = "bool",
+		value = true,
+		noHotkey = true,
+		path = retreatPath,
+		OnChange = function (self)
+			retreatOverride = self.value
+		end
+	},
+	retreatingRankOption = {
+		name = 'Retreat override:',
+		desc = "Retreating units are treated as this selection rank, if override is enabled.",
+		type = 'number',
+		value = 1, -- not 0; this keeps them responsive to Ctrl+A etc (due to flatten) and also keeps 0 only reachable manually by default.
+		min = 0, max = 3, step = 1,
+		tooltip_format = "%.0f",
+		noHotkey = true,
+		path = retreatPath,
+		OnChange = function (self)
+			retreatingRank = self.value
+		end
+	},
+	retreatDeselects = {
+		name = "Retreat deselects",
+		desc = "Whether a unit that starts retreating will be deselected, so as not to keep accidentally bringing units back into danger.",
+		type = "bool",
+		value = true,
+		noHotkey = true,
+		path = retreatPath,
+		OnChange = function (self)
+			if self.value and not retreatDeselects then
+				widgetHandler:RegisterGlobal(widget, "StartRetreat", StartRetreat)
+			elseif not self.value and retreatDeselects then
+				widgetHandler:DeregisterGlobal(widget, "StartRetreat")
+			end
+			retreatDeselects = self.value
+		end,
 	},
 }
 
@@ -135,7 +198,7 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 	local bestRank, bestUnits 
 	for i = 1, #units do
 		local unitID = units[i]
-		local rank = unitID and selectionRank[unitID]
+		local rank = unitID and ((retreatOverride and (Spring.GetUnitRulesParam(unitID, "retreat") == 1) and retreatingRank) or selectionRank[unitID])
 		if not rank then
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			rank = unitDefID and defaultRank[unitDefID]
@@ -203,6 +266,8 @@ local function SetSelectionRank(unitID, newRank)
 end
 
 function widget:Initialize()
+	options.retreatDeselects.OnChange(options.retreatDeselects)
+
 	WG.SetSelectionRank = SetSelectionRank
 	WG.SelectionRank_GetFilteredSelection = GetFilteredSelection
 end

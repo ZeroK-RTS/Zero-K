@@ -1,6 +1,25 @@
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-local function GetGridTooltip (unitID)
+
+local buildTimes = {}
+local variableCostUnit = {
+	[UnitDefNames["terraunit"].id] = true
+}
+local isCommander = {}
+
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	buildTimes[i] = ud.buildTime
+	if ud.customParams.level or ud.customParams.dynamic_comm then
+		variableCostUnit[i] = true
+		isCommander[i] = true
+	end
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+local function GetGridTooltip(unitID)
 	local gridCurrent = Spring.GetUnitRulesParam(unitID, "OD_gridCurrent")
 	if not gridCurrent then return end
 
@@ -19,7 +38,7 @@ local function GetGridTooltip (unitID)
 	return WG.Translate("interface", "grid") .. ": " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " E => " .. math.round(gridMetal,2) .. " M " .. windStr
 end
 
-local function GetMexTooltip (unitID)
+local function GetMexTooltip(unitID)
 	local metalMult = Spring.GetUnitRulesParam(unitID, "overdrive_proportion")
 	if not metalMult then return end
 
@@ -107,27 +126,16 @@ end
 
 function Spring.Utilities.GetHelptext(ud, unitID)
 	local name_override = ud.customParams.statsname or ud.name
-	return WG.Translate ("units", name_override .. ".helptext") or ud.customParams.helptext or WG.Translate("interface", "no_helptext")
+	return WG.Translate ("units", name_override .. ".helptext") or WG.Translate("interface", "no_helptext")
 end
 
 function Spring.Utilities.GetUnitHeight(ud)
 	local customHeight = ud.customParams.custom_height
 	return (customHeight and tonumber(customHeight)) or ud.height
 end
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
 
-local buildTimes = {}
-local variableCostUnit = {
-	[UnitDefNames["terraunit"].id] = true
-}
-for i = 1, #UnitDefs do
-	local ud = UnitDefs[i]
-	buildTimes[i] = ud.buildTime
-	if ud.customParams.level or ud.customParams.dynamic_comm then
-		variableCostUnit[i] = true
-	end
-end
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)

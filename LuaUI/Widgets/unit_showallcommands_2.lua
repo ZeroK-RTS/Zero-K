@@ -217,6 +217,9 @@ local function getTargetPosition(unitID)
 end
 
 local function drawUnitCommands(unitID)
+	if not unitID then
+		return
+	end
 	spDrawUnitCommands(unitID)
 	
 	local tx,ty,tz = getTargetPosition(unitID)

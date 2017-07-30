@@ -111,6 +111,7 @@ local defaultCommands = { -- commands that is processed by gadget
 	[CMD_FIND_PAD] = true,
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_BUILD] = true,
 	[CMD.REMOVE] = true,
 	[CMD.INSERT] = true,
 }

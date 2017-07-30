@@ -16,7 +16,6 @@ unitDef = {
   customParams           = {
     amph_regen = 10,
     amph_submerged_at = 40,
-      helptext       = [[The Kraken is a mobile short ranged artillery bot, armed with twin-firing cannons. For underwater combat it can rapidly fire unguided charges to kill slow enemies. ]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

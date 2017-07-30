@@ -52,7 +52,7 @@ local function Walk()
 	SetSignalMask(SIG_Walk)
 	while (true) do
 		if walkCycle == 0 then
-			local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+			local speedmult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 			local speed = runspeed*speedmult
 			
 			if not firing then
@@ -76,7 +76,7 @@ local function Walk()
 		end
 		
 		if walkCycle == 1 then
-			local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+			local speedmult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 			local speed = runspeed*speedmult
 			
 			if not firing then

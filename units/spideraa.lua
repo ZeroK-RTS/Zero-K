@@ -13,11 +13,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Araignée AA]],
-	description_de = [[Flugabwehr Spinne]],
-    helptext       = [[An all-terrain AA unit that supports other spiders against air with its medium-range missiles.]],
-    helptext_fr    = [[Une unité araignée lourde anti-air, son missile a décollage vertical est lent à tirer mais très efficace contre des cibles aériennes blindées.]],
-	helptext_de    = [[Eine geländegängige Flugabwehreinheit, die andere Spinnen mit ihren mittellangen Raketen gegen Luftangriffe verteidigt.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

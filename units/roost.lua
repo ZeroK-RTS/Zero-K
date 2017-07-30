@@ -11,9 +11,6 @@ unitDef = {
   category          = [[SINK]],
 
   customParams      = {
-    description_de = [[Erzeugt Chicken]],
-	helptext       = [[Roosts such as this one are the hatching grounds of the Thunderbirds.]],
-	helptext_de    = [[In den Nestern der Chicken wird die Brut herangezogen und nach einer gewissen Zeit auf die restliche Welt losgelassen.]],
   },
   
   energyMake        = 0,

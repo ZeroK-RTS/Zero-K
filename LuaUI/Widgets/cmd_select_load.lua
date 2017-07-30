@@ -32,6 +32,7 @@ local areaTarget -- used to match area command targets
 local goodCommand = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_BUILD] = true,
 	[CMD.SET_WANTED_MAX_SPEED] = true,
 	[CMD.GUARD] = true,
 	[CMD.RECLAIM] = true,

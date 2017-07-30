@@ -36,7 +36,7 @@ unitDef = {
   selfDestructCountdown         = 0,
   sightDistance                 = 0.2,
   turnRate                      = 0,
-  useBuildingGroundDecal        = true,
+  useBuildingGroundDecal        = false,
   workerTime                    = 0,
   yardMap                       = [[o]],
 }

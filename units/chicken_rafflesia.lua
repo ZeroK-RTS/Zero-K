@@ -13,7 +13,6 @@ unitDef = {
   category                      = [[SINK]],
 
   customParams                  = {
-    helptext       = [[The Rafflesia protects nearby chicken units and structures with its shield.]],
   },
 
   explodeAs                     = [[NOWEAPON]],
@@ -46,7 +45,7 @@ unitDef = {
   sightDistance                 = 512,
   turnRate                      = 0,
   upright                       = false,
-  useBuildingGroundDecal        = true,
+  useBuildingGroundDecal        = false,
   workerTime                    = 0,
   yardMap                       = [[ooooooooo]],
 
@@ -73,8 +72,8 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       shieldAlpha             = 0.15,
-      shieldBadColor          = [[1.0 1 0.1]],
-      shieldGoodColor         = [[0.1 1.0 0.1]],
+      shieldBadColor          = [[1.0 1 0.1 1]],
+      shieldGoodColor         = [[0.1 1.0 0.1 1]],
       shieldInterceptType     = 3,
       shieldPower             = 2500,
       shieldPowerRegen        = 180,

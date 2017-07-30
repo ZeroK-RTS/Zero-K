@@ -16,14 +16,12 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Erzeugt Energie (2)]],
-    helptext       = [[Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a quarter and offers excellent protection against raiders.]],
-    helptext_de    = [[Solaranlagen sind von den Energiestrukturen die mit der geringsten Kosteneffizienz, aber sie sind auch die verlässlichsten und stabilsten unter ihnen. Sobald sie angegriffen werden ziehen sie sich in eine gepanzerte Form fur 8 Sekunden zurück, die als exzellenter Schutz gegen Raider fungiert.]],
     pylonrange = 100,
 	aimposoffset   = [[0 16 0]],
 	midposoffset   = [[0 0 0]],
 	force_close    = 8, -- time in seconds of forced turnoff
 	removewait     = 1,
+	default_spacing = 0,
   },
 
   damageModifier                = 0.25,
@@ -41,7 +39,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[arm_solar.s3o]],
-  onoffable                     = true,
+  onoffable                     = false,
   script                        = [[energysolar.lua]],
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 273,

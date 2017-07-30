@@ -230,7 +230,7 @@ local function ClusterBombThread()
 			EmitSfx(subemit[0], FIRE_W3)
 			index = index + 1
 		end
-		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+		local slowState = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 		Sleep(sleepTime/slowState)
 	end
 	Sleep(330)

@@ -59,11 +59,6 @@
         "description": "Zakopany wykrywacz sejsmiczny",
         "helptext": "Listener to wyewoluowana forma Diggera. Chociaż nie ma możliwości bojowych, to jego zmysł słuchu pozwala mu dokładnie lokalizować wrogie jednostki lądowe."
     },
-    "corcom1": {
-        "name": "Dowódca Battle",
-        "description": "Ciężki Dowódca bojowy, moc 10 m/s",
-        "helptext": "Battle to Dowódca reprezentujący brutalną siłę i wytrzymałość; jest jednak wolny i nie może używać większości modułów wsparcia."
-    },
     "jumparty": {
         "name": "Firewalker",
         "description": "Ciężki bot wsparcia artyleryjskiego",
@@ -109,11 +104,6 @@
         "description": "Artyleria",
         "helptext": "Organiczna artyleria. Lobber wypluwa jad na duże odległości, co nie pozwala polegać wyłącznie na wieżyczkach. W bezpośrednim starciu jest bezbronny."
     },
-    "commrecon1": {
-        "name": "Dowódca Recon",
-        "description": "Mobilny Dowódca, moc 10 m/s",
-        "helptext": "Recon to zwinny Dowódca, który może używać większość specjalnych broni i jest w stanie skakać."
-    },
     "turrettorp": {
         "name": "Urchin",
         "description": "Wyrzutnia torped",
@@ -150,7 +140,7 @@
         "helptext": "Screamer to szczyt obrony przeciwlotniczej - ma ogromny zasięg i siłę ognia, co praktycznie uniemożliwia korzystanie z jednostek powietrznych w chronionym przezeń obszarze. Ma jednak ograniczoną amunicję - wytwarza jeden pocisk co 20 sekund."
     },
     "chicken_drone": {
-        "name": "Dron",
+        "name": "Truteń",
         "description": "Przeobraża się w budynki kurczaków",
         "helptext": "Bezbronny kurczak, którego celem życiowym jest przeobrażenie się w jeden z budynków kurczaków."
     },
@@ -319,11 +309,6 @@
         "description": "Bot harcownik (wysoka trajektoria)",
         "helptext": "Rogue używa ciężkich rakiet, które mają długi czas przeładowania, ale zadają wysokie obrażenia. Ich trajektoria pozwala im strzelać nad przeszkodami. Szybkie jednostki są w stanie omijać rakiety i skutecznie niszczyć Rogue."
     },
-    "benzcom1": {
-        "name": "Dowódca Siege",
-        "description": "Dowódca dalekiego zasięgu, moc 10 m/s",
-        "helptext": "Siege to Dowódca nastawiony na ostrzał z dystansu, co zresztą wymuszają jego niska szybkość i wytrzymałość."
-    },
     "dronelight": {
         "name": "Firefly",
         "description": "Dron bojowy",
@@ -474,11 +459,6 @@
         "description": "Niewidzialny zwiadowca / paralizator",
         "helptext": "Infiltrator spełnia dwie role. Przede wszystkim jest świetnym zwiadowcą dzięki niewidzialności, pajęczemu poruszaniu się po klifach i dużemu zasięgowi wzroku. Ponadto może sparaliżować pojedynczy cel, co dobrze jest używać przeciwko ciężkim jednostkom."
     },
-    "corvrad": {
-        "name": "Informant",
-        "description": "Pojazd radarowy",
-        "helptext": "Informant zapewnia radar na polu bitwy."
-    },
     "energywind": {
         "name": "Turbina",
         "description": "Mała elektrownia",
@@ -524,11 +504,6 @@
         "description": "Lekki bot amfibijny",
         "helptext": "Grebe to lekki bot z granatami krótkiego zasięgu, które dobrze sprawdzają się przeciwko cięższym celom. Mimo że jest amfibijny, nie może strzelać w wodzie."
     },
-    "comm_sonic": {
-        "name": "Dowódca Sonic",
-        "description": "Amfibijny Dowódca, moc 10 m/s",
-        "helptext": "Sonic to Dowódca z działkiem dźwiękowym, które pozwala mu walczyć zarówno na ziemi, jak i pod wodą."
-    },
     "hoverarty": {
         "name": "Penetrator",
         "description": "Poduszkowiec precyzyjnej artylerii",
@@ -572,12 +547,7 @@
     "gunshipbomb": {
         "name": "Blastwing",
         "description": "Latająca bomba (zakopuje się)",
-        "helptext": "Blastwing zadaje skromne obrażenia, które wystarczają do zniczenia kopalni lub turbiny. Większa część zniszczeń odbywa się na skutek odłamków lecących po jego torze lotu, toteż należy rozważnie dobierać kierunek ataku. Gdy wyląduje na ziemi, włącza niewidzialność, co czyni z niego minę. Nie powinno się używać zbyt wielu gunshipbombów jednocześnie, ponieważ zniszczenie jednego powoduje reakcję łańcuchową i detonację całej grupy."
-    },
-    "pw_generic": {
-        "name": "Neutralny Budynek",
-        "description": "pusty",
-        "helptext": "Ten budynek daje bonusy frakcji kontrolującej tę planetę."
+        "helptext": "Blastwing zadaje skromne obrażenia, które wystarczają do zniczenia kopalni lub turbiny. Większa część zniszczeń odbywa się na skutek odłamków lecących po jego torze lotu, toteż należy rozważnie dobierać kierunek ataku. Gdy wyląduje na ziemi, włącza niewidzialność, co czyni z niego minę. Nie powinno się używać zbyt wielu Blastwingów jednocześnie, ponieważ zniszczenie jednego powoduje reakcję łańcuchową i detonację całej grupy."
     },
     "napalmmissile": {
         "name": "Inferno",
@@ -601,7 +571,7 @@
     },
     "raveparty": {
         "name": "Disco Rave Party",
-        "description": "Tęczowa niespodzianka",
+        "description": "Destruktywny projektor tęczy",
         "helptext": "Disco Rave Party wystrzeliwuje kolorowe kulki, z których każda zawiera inną niespodziankę. Świetna zabawa dla całej rodziny!"
     },
     "turretlaser": {
@@ -799,11 +769,6 @@
         "description": "Harcownik",
         "helptext": "Ostre niczym brzytwa kolce, wypluwane przez Spikera, są w stanie przebić najtwardszy pancerz. Mimo że nie jest zbyt wytrzymały, stanowi niemałe zagrożenie. Można go łatwo zlikwidować jednostkami lekkimi lub o większym zasięgu."
     },
-    "pw_hq": {
-        "name": "Command Center",
-        "description": "Kwatera główna Wojen Planet (zmienia uzyskiwane wpływy)",
-        "helptext": "Kwatera główna jest kluczowa w utrzymaniu kontroli nad planetą; jeżeli zwycięzca bitwy ją utraci, to czekają go konsekwencje. W wypadku agresora, otrzymuje on dwukrotnie mniejsze wpływy. Utracony przez obrońców powoduje, że agresor otrzymuje 20%% wpływów."
-    },
     "striderdante": {
         "name": "Dante",
         "description": "Szturmowy mech bojowy",
@@ -823,11 +788,6 @@
         "name": "Impaler",
         "description": "Pojazd artylerii precyzyjnej",
         "helptext": "Impaler wystrzeliwuje potężne pociski kinetyczne dalekiego zasięgu, które dzięki wysokiej trajektorii są w stanie omijać większość przeszkód, choć są jednak przez to bezużyteczne przeciw poruszającym się celom. Impaler jest przeznaczony do niszczenia budynków."
-    },
-    "chicken_digger_b": {
-        "name": "Digger (zakopany)",
-        "description": "Podziemny zwiadowca",
-        "helptext": "Digger jest w stanie przekopać się do dowolnego miejsca na mapie bez możliwości uprzedniego wykrycia. Wychodzące spod ziemi Diggery mogą ominąć główne linie obrony, toteż wymuszają bezpośrednią ochronę wewnątrz bazy."
     },
     "zenith": {
         "name": "Zenith",
@@ -858,11 +818,6 @@
         "name": "Pochłaniacz obrażeń",
         "description": "Ma w dupie, że ktoś go bije.",
         "helptext" : "No i co mu zrobisz?"
-    },
-    "bomberdive": {
-        "name": "Raven",
-        "description": "Bombowiec precyzyjny",
-        "helptext": "Raven to bombowiec precyzyjny. Świetnie nadaje się do bombardowania ważnych celów, ale przenosi na pokładzie tylko jedną bombę i musi skorzystać z lądowiska, by można było go ponownie użyć."
     },
     "tele_beacon": {
         "name": "Lamp",
@@ -939,11 +894,6 @@
         "description": "Niewidzialny kosynier",
         "helptext": "Scythe to lekka jednostka do walki w zwarciu, której niewidzialność pozwala zblizyć się do wrogich jednostek lub je ominąć. Po wyjściu z walki Scythe samoczynnie regeneruje się."
     },
-    "armcom1": {
-        "name": "Dowódca Strike",
-        "description": "Dowódca szturmowy, moc 10 m/s",
-        "helptext": "Strike to zrównoważony Dowódca, który może używać większość modułów i ma dobre osiągi. Posiada zwiększoną regenerację w porównaniu do innych Dowódców."
-    },
     "turretheavy": {
         "name": "Doomsday Machine",
         "description": "Forteca średniego zasięgu (działo wymaga sieci energetycznej 50 E)",
@@ -953,11 +903,6 @@
         "name": "Fabryka statków powietrznych",
         "description": "Buduje statki powietrzne, moc 10 m/s",
         "helptext": "W tej fabryce produkuje się statki powietrzne, zarówno bojowe, jak i transportowe."
-    },
-    "chicken_drone_starter": {
-        "name": "Dron",
-        "description": "Przeobraża się w budynki kurczaków",
-        "helptext": "Bezbronny kurczak, którego celem życiowym jest przeobrażenie się w jeden z budynków kurczaków."
     },
     "amphtele": {
         "name": "Djinn",
@@ -973,11 +918,6 @@
         "name": "Cutter",
         "description": "Łódka patrolowa - rozbraja",
         "helptext": "Tania i szybka, łódka patrolowa dobrze nadaje się do najazdów na odkryte tereny wroga i wypatrywania celów dla większych statków. Nie ma siły ognia ani wytrzymałości do poważnej walki."
-    },
-    "chicken_listener_b": {
-        "name": "Listener (zakopany)",
-        "description": "Zakopany wykrywacz sejsmiczny",
-        "helptext": "Listener to wyewoluowana forma Diggera. Chociaż nie ma możliwości bojowych, to jego zmysł słuchu pozwala mu dokładnie lokalizować wrogie jednostki lądowe."
     },
     "assaultcruiser": {
         "name": "Vanquisher",
@@ -1164,11 +1104,6 @@
         "description": "Bombowiec taktyczny",
         "helptext": "Kestrel wystrzeliwuje rakiety krótkiego zasięgu, które mogą trafić cele w powietrzu, na powierzchni lub pod wodą. Spośród bombowców najlepiej nadaje się do niszczenia pojedynczych jednostek."
     },
-    "chickenq": {
-        "name": "Królowa kurczaków",
-        "description": "O kurczę!",
-        "helptext": "Królowa kurnika może zostać powstrzymana tylko dzięki pełnej determinacji i przy udziale wielkiej siły ognia; pluje płonącym kwasem, wystrzeliwuje masę zarodników, rozdeptuje mniejsze jednostki niczym robaki i jest w stanie rozszarpać nawet ciężkie roboty szturmowe."
-    },
     "staticrearm": {
         "name": "Lądowisko",
         "description": "Naprawia i dozbraja samoloty, moc 2.5 e/s na stanowisko",
@@ -1179,25 +1114,10 @@
         "description": "Kurczak szturmowy",
         "helptext": "Tiamat to wytrzymałe, ziejące ogniem i wypuszczające zarodniki monstrum z mocnymi szczękami i śluzową tarcza, ktora chroni okoliczne kurczaki."
     },
-    "chickenflyerqueen": {
-        "name": "Królowa kurczaków",
-        "description": "O kurczę!",
-        "helptext": "Królowa kurnika może zostać powstrzymana tylko dzięki pełnej determinacji i przy udziale wielkiej siły ognia; pluje płonącym kwasem, wystrzeliwuje masę zarodników, rozdeptuje mniejsze jednostki niczym robaki i jest w stanie rozszarpać nawet ciężkie roboty szturmowe."
-    },
     "gunshipemp": {
         "name": "Gnat",
         "description": "Dron paralizator",
         "helptext": "Gnat może paraliżować wrogie jednostki, co czyni go świetną jednostką defensywną, szczególnie w połączeniu z jednostkami zadającymi obrażenia. Jest jednak delikatny i łatwo go zniszczyć."
-    },
-    "cremcom1": {
-        "name": "Dowódca Knight",
-        "description": "Dowódca szturmowy, moc 10 m/s",
-        "helptext": "Knight to zrównoważony Dowódca, który może używać większość modułów i ma dobre osiągi. Posiada zwiększoną regenerację w porównaniu do innych Dowódców."
-    },
-    "commsupport1": {
-        "name": "Dowódca Support",
-        "description": "Dowódca wsparcia, moc 12 m/s",
-        "helptext": "Dowódca Support może korzystać z najbardziej ezoterycznych modułów i broni. Mimo że jego prędkość i wytrzymałość pozostawiają wiele do życzenia, to świetnie nadaje się do budowy z racji zwiększonej mocy i zasięgu konstrukcji."
     },
     "bomberriot": {
         "name": "Phoenix",

@@ -118,7 +118,8 @@ end
 
 
 function widget:IsAbove(x,y)
-  return (not screen0:IsEmpty()) and screen0:IsAbove(x,y)
+  local x, y, lmb, mmb, rmb, outsideSpring = Spring.GetMouseState()
+  return (not outsideSpring) and (not screen0:IsEmpty()) and screen0:IsAbove(x,y)
 end
 
 
@@ -298,7 +299,13 @@ end
 
 
 function widget:IsAbove(x,y)
-	if Spring.IsGUIHidden() then return false end
+	if Spring.IsGUIHidden() then
+		return false
+	end
+	local x, y, lmb, mmb, rmb, outsideSpring = Spring.GetMouseState()
+	if outsideSpring then
+		return false
+	end
 
 	return screen0:IsAbove(x,y)
 end

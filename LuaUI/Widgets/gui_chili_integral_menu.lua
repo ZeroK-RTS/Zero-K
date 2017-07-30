@@ -85,6 +85,8 @@ options_order = {
 	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning'
 }
 
+local commandPanelPath = 'Settings/Hotkeys/Command Panel'
+
 options = {
 	background_opacity = {
 		name = "Opacity",
@@ -106,30 +108,33 @@ options = {
 		},
 		value = 'qwerty',  --default at start of widget
 		noHotkey = true,
+		path = commandPanelPath,
 	},
 	selectionClosesTab = {
 		name = 'Construction Closes Tab',
-		tooltip = "When enabled, issuing or cancelling a construction command will switch back to the Orders tab (except for build options in the factory queue tab).",
+		desc = "When enabled, issuing or cancelling a construction command will switch back to the Orders tab (except for build options in the factory queue tab).",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
 	},
 	altInsertBehind = {
 		name = 'Alt Inserts Behind',
-		tooltip = "When enabled, the Alt modifier will insert construction behind the current item in the queue. When disabled, and if the factory is not set to repeat, Alt will insert the command in front of the current construction (destroying its progress).",
+		desc = "When enabled, the Alt modifier will insert construction behind the current item in the queue. When disabled, and if the factory is not set to repeat, Alt will insert the command in front of the current construction (destroying its progress).",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
 	},
 	unitsHotkeys2 = {
-		name = 'Enable Factory Hotkeys',
+		name = 'Factories use grid',
+		desc = "When enabled, factory unit production uses grid hotkeys.",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
+		path = commandPanelPath,
 	},
 	ctrlDisableGrid = {
 		name = 'Ctrl Disables Hotkeys',
-		tooltip = "When enabled, grid and tab hotkeys will deactivate while Ctrl is held. This allows for Ctrl+key hotkeys to be used while a construtor or factory is selected.",
+		desc = "When enabled, grid and tab hotkeys will deactivate while Ctrl is held. This allows for Ctrl+key hotkeys to be used while a construtor or factory is selected.",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -144,26 +149,31 @@ options = {
 		name = "Economy Tab",
 		desc = "Switches to economy tab.",
 		type = 'button',
+		path = commandPanelPath,
 	},
 	tab_defence = {
 		name = "Defence Tab",
 		desc = "Switches to defence tab.",
 		type = 'button',
+		path = commandPanelPath,
 	},
 	tab_special = {
 		name = "Special Tab",
 		desc = "Switches to special tab.",
 		type = 'button',
+		path = commandPanelPath,
 	},
 	tab_factory = {
 		name = "Factory Tab",
 		desc = "Switches to factory tab.",
 		type = 'button',
+		path = commandPanelPath,
 	},
 	tab_units = {
 		name = "Units Tab",
 		desc = "Switches to units tab.",
 		type = 'button',
+		path = commandPanelPath,
 	},
 	leftPadding = {
 		name = 'Left Padding',
@@ -394,17 +404,20 @@ local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePositio
 	local i = queuePosition
 	local j = 0
 	while commands[i] and ((not inputMult) or j < inputMult) do
-		local thisCmdID = commands[i].id
-		local cmdTag = commands[i].tag
+		local thisCmd = commands[i]
+		local thisCmdID = thisCmd.id
+		local cmdTag = thisCmd.tag
 		if thisCmdID < 0 and not alreadyRemovedTag[cmdTag] then
 			if thisCmdID ~= cmdID then
 				break
 			end
 	
 			alreadyRemovedTag[cmdTag] = true
-			Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {cmdTag}, {"ctrl"})
+			Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {cmdTag}, CMD.OPT_CTRL)
 			if reinsertPosition then
-				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, 0}, {"alt", "ctrl"})
+				local opts = thisCmd.options
+				local coded = opts.coded
+				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, coded}, CMD.OPT_CTRL + CMD.OPT_ALT)
 			end
 			j = j + 1
 		end

@@ -32,9 +32,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Produziert Schiffe, Baut mit 10 M/s]],
-	helptext       = [[Shipyard is where both ships and submarines are built. Other waterborne units such as hovercraft and amphibious bots have separate factories.]],
-	helptext_de    = [[Im Shipyard kannst du Schiffe jeder Art und für jeden Zweck bauen.]],
     sortName       = [[7]],
 	unstick_help   = 1,
     aimposoffset   = [[60 0 -15]],
@@ -42,6 +39,7 @@ unitDef = {
 	solid_factory = [[3]],
 	modelradius    = [[50]],
 	solid_factory_rotation = [[1]], -- 90 degrees counter clockwise
+	default_spacing = 8,
   },
 
   energyUse              = 0,

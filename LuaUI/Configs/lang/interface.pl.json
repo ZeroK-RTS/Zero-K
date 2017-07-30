@@ -53,6 +53,11 @@
 	"viewfow_desc" : "Pokazuje mgłę wojny i zasięg radaru.",
 	"teamcolor_selector" : "Wybierz schemat kolorów drużyn",
 	"overlay_selector" : "Wybierz widok mapy",
+	"attrition_pwn" : "GRUBO!",
+	"attrition_na" : "b/d",
+	"attrition_individual_stats" : "Indywidualnie",
+	"attrition_value_killed" : "Zadane straty",
+	"attrition_value_lost" : "Otrzymane straty",
 	"x_units_in_queue" : {
 		"one" : "%{count} jednostka w kolejce",
 		"few" : "%{count} jednostki w kolejce",

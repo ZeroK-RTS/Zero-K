@@ -103,6 +103,7 @@ local Font
 
 -- elements
 local window, labelStack, background
+local global_command_button
 local label_anger, label_chickens, label_burrows, label_aggro, label_tech, label_mode
 
 --------------------------------------------------------------------------------
@@ -505,6 +506,17 @@ function widget:Initialize()
 	function label_burrows:HitTest(x,y) return self end
 	function label_aggro:HitTest(x,y) return self end
 	function label_tech:HitTest(x,y) return self end
+
+	if WG.GlobalCommandBar then
+		local function ToggleWindow()
+			if window.visible then
+				window:Hide()
+			else
+				window:Show()
+			end
+		end
+		global_command_button = WG.GlobalCommandBar.AddCommand("LuaUI/Images/chicken.png", "Chicken info", ToggleWindow)
+	end
 end
 
 function widget:Shutdown()

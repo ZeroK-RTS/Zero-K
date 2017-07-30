@@ -333,6 +333,10 @@ local icontypes = {
     bitmap='icons/amphtorpriot.png',
     size=2.6,
   },
+  amphbomb = {
+	bitmap='icons/amphbomb.png',
+    size=1.9,
+  },
   amphtransport = {
     bitmap='icons/amphtransport.png',
     size=2.2,
@@ -737,6 +741,12 @@ local icontypes = {
     size=2,
   },
   
+  -- Sunlance
+  staticassault = {
+    bitmap='icons/staticassault.png',
+    size=1.8,
+  },
+  
   --Penetrator
   mobiletachyon = {
     bitmap='icons/mobiletachyon.dds',
@@ -951,31 +961,31 @@ local icontypes = {
   },
   
   energywind = {
-    bitmap='icons/energywind.dds',
-    size=1.8,
+    bitmap='icons/energywind.png',
+    size=2,
   },
   energysolar = {
     bitmap='icons/energysolar.dds',
     size=2,
   },
   
-  energyfus = {
-    bitmap='icons/energyfus.dds',
+  energyfusion = {
+    bitmap='icons/energyfusion.dds',
     size=2,
   },
   
-  energysuperfus = {
-    bitmap='icons/energysuperfus.dds',
+  energysingu = {
+    bitmap='icons/energysingu.dds',
     size=3.2,
   },
   
   energygeo = {
-    bitmap='icons/geo1.png',
+    bitmap='icons/energygeo.png',
     size=2,
   },
   
-  energymohogeo = {
-    bitmap='icons/geo2.png',
+  energyheavygeo = {
+    bitmap='icons/energyheavygeo.png',
     size=2.4,
   },
   

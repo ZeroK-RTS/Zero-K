@@ -892,6 +892,10 @@ local function GetSmoothOrGroundHeight(x,z,checkFreeMode) --only ScrollCam seems
 	else
 		if not (checkFreeMode and options.freemode.value) then
 			return spGetGroundHeight(x, z) or 0
+		else
+			-- in this case `x` and `z` might be off-map due to free mode
+			-- however, GetGroundHeight still works fine (returns closest edge point)
+			return spGetGroundHeight(x, z) or 0
 		end
 	end
 end

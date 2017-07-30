@@ -414,7 +414,7 @@ function gadget:GameFrame(f)
 						ud = ud and UnitDefs[ud]
 						if ud then
 							local size = ud.xsize
-							local ux,uy,uz = Spring.GetUnitPosition(teleportiee)		
+							local ux, uy, uz = Spring.GetUnitPosition(teleportiee)
 							local tx, _, tz = Spring.GetUnitPosition(tid)
 							local dx, dz = tx + offset[tele[tid].offsetIndex].x*(size*4+40), tz + offset[tele[tid].offsetIndex].z*(size*4+40)
 							local dy 
@@ -440,7 +440,6 @@ function gadget:GameFrame(f)
 								Spring.MoveCtrl.Enable(teleportiee)
 								Spring.MoveCtrl.SetPosition(teleportiee, dx, dy, dz)
 								Spring.MoveCtrl.Disable(teleportiee)
-	
 							end
 							
 							local ux, uy, uz = Spring.GetUnitPosition(teleportiee)
@@ -449,10 +448,9 @@ function gadget:GameFrame(f)
 							local mx, mz = tx + offset[tele[tid].offsetIndex].x*(size*4 + 120), tz + offset[tele[tid].offsetIndex].z*(size*4 + 120)
 							GiveClampedMoveGoalToUnit(teleportiee, mx, mz)
 							
-							Spring.GiveOrderToUnit(teleportiee,CMD.REMOVE, {cQueue[1].tag}, {})
-							
-							Spring.GiveOrderToUnit(teleportiee,CMD.WAIT, {}, {})
-							Spring.GiveOrderToUnit(teleportiee,CMD.WAIT, {}, {})
+							Spring.GiveOrderToUnit(teleportiee, CMD.WAIT, {}, {})
+							Spring.GiveOrderToUnit(teleportiee, CMD.WAIT, {}, {})
+							Spring.GiveOrderToUnit(teleportiee, CMD.REMOVE, {cQueue[1].tag}, {})
 						end
 					end
 					

@@ -89,7 +89,7 @@ local function AddOption(path, option)
 end
 
 --ShortHand for adding a button
-local function ShButton(path, caption, action2, tooltip, advanced, icon, DisableFunc)
+local function ShButton(path, caption, action2, tooltip, advanced, icon, DisableFunc, bindMod)
 	AddOption(path,
 	{
 		type='button',
@@ -98,6 +98,7 @@ local function ShButton(path, caption, action2, tooltip, advanced, icon, Disable
 		action = (type(action2) == 'string' and action2 or nil),
 		OnChange = (type(action2) ~= 'string' and action2 or nil),
 		key=caption,
+		bindMod = bindMod,
 		advanced = advanced,
 		icon = icon,
 		DisableFunc = DisableFunc or nil, --function that trigger grey colour on buttons (not actually disable their functions, only coloured them grey)
@@ -171,7 +172,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Falling Units'] 		= imgPath..'advplayerslist/point2.png',
 	
 	['Settings/HUD Panels/Minimap'] 				= imgPath..'epicmenu/map.png',
-	['Settings/HUD Panels/Economy Panel']	 		= imgPath..'cost.png',
+	['Settings/HUD Panels/Economy Panel']	 		= imgPath..'ibeam.png',
 	['Settings/HUD Panels/Commander Selector'] 		= imgPath..'epicmenu/corcommander.png',
 	['Settings/HUD Panels/Tooltip'] 				= imgPath..'epicmenu/lightbulb.png',
 	['Settings/HUD Panels/Chat'] 					= imgPath..'advplayerslist/chat.png',
@@ -187,6 +188,10 @@ confdata.subMenuIcons = {
 confdata.simpleModeDirectory = {
 	['Interface'] = true,
 	['Audio'] = true,
+	['Hotkeys'] = true,
+}
+confdata.simpleModeFullDirectory = {
+	'Settings/Hotkeys'
 }
 
 -- SETUP MENU HERE
@@ -237,6 +242,8 @@ local hotkeysMiscPath = 'Settings/Hotkeys/Misc'
 	ShButton(hotkeysMiscPath, 'Pause/Unpause', 'pause', nil, nil, imgPath .. 'epicmenu/media_playback_pause.png')
 		ShButton(hotkeysMiscPath, 'Increase Speed', 'speedup')
 		ShButton(hotkeysMiscPath, 'Decrease Speed', 'slowdown')
+		ShButton(hotkeysMiscPath, 'Fast Camera Movement', 'movefast', "Increased camera speed while this key is held.", nil, nil, nil, true)
+		ShButton(hotkeysMiscPath, 'Slow Camera Movement', 'moveslow', "Decreased camera speed while this key is held.", nil, nil, nil, true)
 		
 	--ShLabel(hotkeysMiscPath, '')
 	ShButton(hotkeysMiscPath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
@@ -265,7 +272,7 @@ local cameraPath = 'Settings/Camera'
 	local cofcDisable = "luaui disablewidget Combo Overhead/Free Camera (experimental)"
 	ShRadio( cameraPath,
 		'Camera Type', {
-			{name = 'Total Annihilation', desc='Default camera', hotkey=nil},
+			{name = 'Default camera', key='Total Annihilation', desc='Default camera', hotkey=nil},
 			{name = 'FPS',key='FPS', hotkey=nil},
 			{name = 'Free',key='Free', hotkey=nil},
 			{name = 'Rotatable Overhead',key='Rotatable Overhead', hotkey=nil},
@@ -392,6 +399,7 @@ local pathMisc = 'Settings/Misc'
 		type = 'bool',
 		value = false,
 		noHotkey = true,
+		advanced = true,
 		OnChange = function (self)
 			local value = (self.value and 1) or 0 --true = 1, false = 0
 			if self.value then
@@ -402,6 +410,7 @@ local pathMisc = 'Settings/Misc'
 			Spring.SetConfigInt("ZKuseOldChili", value); --store in Springsettings.txt because api_chili.lua must read it independent of gui_epicmenu.lua
 		end,
 	})
+	ShButton(pathMisc, 'Toggle Widget Profiler', function() spSendCommands{"luaui togglewidget WidgetProfiler"} end, '', true)
 
 --- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
 local pathGraphicsMap = 'Settings/Graphics/Map Detail'
@@ -462,13 +471,13 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 
 	AddOption(pathGraphicsMap, 
 	{
-		name = 'Terrain geometry detail',
-		desc = 'How detailed the terrain geometry is.',
+		name = 'Terrain detail',
+		desc = 'Control the accuracy of the terrain.',
 		type = 'number',
-		min = 32, 
-		max = 256, 
-		step = 8,
-		value = 128,
+		min = 30, 
+		max = 250, 
+		step = 5,
+		value = 90,
 		OnChange = function(self) spSendCommands{"GroundDetail " .. self.value} end, 
 	})
 

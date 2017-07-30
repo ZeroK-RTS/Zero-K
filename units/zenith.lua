@@ -18,7 +18,6 @@ unitDef = {
   corpse                        = [[DEAD]],
   
   customParams                  = {
-    helptext       = [[The Zenith collects meteorites from the sky (up to 500), which it can send anywhere to break things or provide a small reclaimable source of metal.]],
     keeptooltip = [[any string I want]],
     --neededlink  = 150,
     --pylonrange  = 150,

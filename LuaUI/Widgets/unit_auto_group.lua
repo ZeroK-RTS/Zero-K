@@ -165,6 +165,21 @@ local Echo				= Spring.Echo
  		end
  	end
 
+function widget:PlayerChanged(playerID)
+	if playerID ~= Spring.GetMyPlayerID() then
+		return
+	end
+
+	local myCurrentTeam = Spring.GetMyTeamID()
+	if myCurrentTeam == myTeam then
+		return
+	end
+	myTeam = myCurrentTeam
+
+	-- units lose their group on team change (technically they keep it but it's only accessible if you go back to the old team)
+	-- but the player is transferred before his units so reassignation happens in UnitGiven
+end
+
 function widget:Initialize() 
 	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 	if spec then

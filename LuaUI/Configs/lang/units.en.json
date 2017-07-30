@@ -59,11 +59,6 @@
 		"description" : "Burrowing Mobile Seismic Detector",
 		"helptext" : "The Listener is an evolved form of the Digger. While it has lost all fighting ability, it has gained a unique sense of hearing that allows it to pinpoint the location of enemy ground forces."
 	},
-	"corcom1" : {
-		"name" : "Battle Commander",
-		"description" : "Heavy Combat Commander, Builds at 10 m/s",
-		"helptext" : "The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment."
-	},
 	"cloakbomb" : {
 		"name" : "Tick",
 		"description" : "All Terrain EMP Bomb (Burrows)",
@@ -98,11 +93,6 @@
 		"name" : "Lobber",
 		"description" : "Artillery",
 		"helptext" : "A form of organic artillery, the Lobber hurls balls of venom at a high trajectory over long distances. It proves a problem for those who rely excessively on static defenses, but is practically helpless when attacked directly."
-	},
-	"commrecon1" : {
-		"name" : "Recon Commander",
-		"description" : "High Mobility Commander, Builds at 10 m/s",
-		"helptext" : "The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules and comes pre-equipped with jumpjets."
 	},
 	"turrettorp" : {
 		"name" : "Urchin",
@@ -146,7 +136,7 @@
 	},
 	"amphbomb" : {
 		"name" : "Limpet",
-		"description" : "Amphibious slow mine",
+		"description" : "Amphibious slow bomb",
 		"helptext" : "The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them."
 	},
 	"factoryveh" : {
@@ -274,11 +264,6 @@
 		"description" : "Shielded Construction Bot, Builds at 5 m/s",
 		"helptext" : "The Convict is a fairly standard construction bot with a twist: a light shield to defend itself and support allied shieldbots."
 	},
-	"armtboat" : {
-		"name" : "Surfboard",
-		"description" : "Transport Platform",
-		"helptext" : "The Surfboard serves as a naval transport and firing platform--that is, any unit on the Surfboard can fire off of it."
-	},
 	"energysingu" : {
 		"name" : "Singularity Reactor",
 		"description" : "Large Powerplant (+225) - HAZARDOUS",
@@ -298,11 +283,6 @@
 		"name" : "Rogue",
 		"description" : "Skirmisher Bot (Indirect Fire)",
 		"helptext" : "The Rogue's arcing rockets have a low rate of fire, but do a lot of damage, making it very good at dodging in and out of range of enemy units or defense, or in a powerful initial salvo. Counter them by attacking them with fast units, or crawling bombs when massed."
-	},
-	"benzcom1" : {
-		"name" : "Siege Commander",
-		"description" : "Standoff Combat Commander, Builds at 10 m/s",
-		"helptext" : "The Siege Commander is optimized for pummeling the enemy from a distance. Its low speed and armor leave it vulnerable in a knife fight."
 	},
 	"dronelight" : {
 		"name" : "Firefly",
@@ -449,11 +429,6 @@
 		"description" : "Cloaked Scout/Anti-Heavy",
 		"helptext" : "The Infiltrator is useful in two ways. Firstly it is an excellent scout, and very difficult to detect. It can penetrate deep into enemy lines. It also has the capacity to shoot a paralyzing bolt that will freeze any one target, good against heavy enemies and enemy infrastructure."
 	},
-	"corvrad" : {
-		"name" : "Informant",
-		"description" : "Radar Vehicle",
-		"helptext" : "The Informant provides radar coverage on the battlefield."
-	},
 	"energywind" : {
 		"name" : "Wind/Tidal Generator",
 		"description" : "Small Powerplant",
@@ -499,11 +474,6 @@
 		"description" : "Amphibious Raider Bot",
 		"helptext" : "The Grebe is a basic raider armed with grenades - a decent short ranged anti-heavy weapon. Despite being amphibious, it cannot shoot while submerged."
 	},
-	"comm_sonic" : {
-		"name" : "Sonic Commander",
-		"description" : "Amphibious Assault Commander, Builds at 10 m/s",
-		"helptext" : "The Sonic Commander is a well-balanced command platform that can mount most modules and fight on land and underwater alike"
-	},
 	"hoverarty" : {
 		"name" : "Penetrator",
 		"description" : "Anti-Heavy Artillery Hovercraft",
@@ -548,11 +518,6 @@
 		"name" : "Blastwing",
 		"description" : "Flying Bomb (Burrows)",
 		"helptext" : "The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more fomidible punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your Blastwing dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed."
-	},
-	"pw_generic" : {
-		"name" : "Generic Neutral Structure",
-		"description" : "Blank",
-		"helptext" : "This structure offers benefits to the faction holding the planet. Only members of the attacking or defending factions can harm it."
 	},
 	"napalmmissile" : {
 		"name" : "Inferno",
@@ -774,11 +739,6 @@
 		"description" : "Skirmisher",
 		"helptext" : "The Spiker's razor sharp projectiles can pierce even the thickest armor. While it doesn't have much health, it remains a potent threat to both air and ground units. Counter with anything that can reliably outrange it."
 	},
-	"pw_hq" : {
-		"name" : "Command Center",
-		"description" : "PlanetWars Field HQ (changes influence gain)",
-		"helptext" : "This building is integral to strategic control of the planet. If the winning team is an attacker and has lost their Command Center, their influence gains are halved. If the defender wins, their loss of the CC causes the attacker to keep 20%% of the influence gain."
-	},
 	"striderdante" : {
 		"name" : "Dante",
 		"description" : "Assault/Riot Strider",
@@ -787,7 +747,7 @@
 	"dynassault1" : {
 		"name" : "Guardian Commander",
 		"description" : "Heavy Combat Commander",
-		"helptext" : "The Guardian Chassis features two main weapon slots and an array of heavy artillery options."
+		"helptext" : "The Guardian Chassis emphasizes armor and firepower at the expense of speed and support equipment."
 	},
 	"chickenbroodqueen" : {
 		"name" : "Chicken Brood Queen",
@@ -819,11 +779,6 @@
 		"description" : "Skirmisher Spider (Indirect Fire)",
 		"helptext" : "An all terrain missile launching unit. Climb walls with this spider walker and take your enemy by surprise. The unguided rockets cannot hit a rapidly jinking target, but they have a fairly long range."
 	},
-	"chicken_digger_b" : {
-		"name" : "Digger (burrowed)",
-		"description" : "Burrowing Scout/Raider",
-		"helptext" : "The Digger's strong claws can scoop through the hardest rock like gravy. As such, it can burrow and travel underground (very slowly), where the only way to locate it is with sesimic detection equipment."
-	},
 	"thicket" : {
 		"name" : "Thicket",
 		"description" : "Barricade",
@@ -843,11 +798,6 @@
 		"name" : "Strike Commander",
 		"description" : "Mobile Assault Commander",
 		"helptext" : "The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration."
-	},
-	"bomberdive" : {
-		"name" : "Raven",
-		"description" : "Precision Bomber",
-		"helptext" : "The Raven drops a single high damage, low AoE bomb. Cost for cost, nothing quite matches it for taking out that antinuke or Reaper, but you should look elsewhere for something to use against smaller mobiles."
 	},
 	"empmissile" : {
 		"name" : "Shockley",
@@ -984,11 +934,6 @@
 		"description" : "Battleship (Heavy Artillery)",
 		"helptext" : "A single salvo from one of these will pummel almost any surface target into submission. The psychological effects of the muzzle flash and the ship recoiling in the water are impressive enough, to say nothing of the effects of a direct hit. Be warned--battleships are not meant to be used on their own, lacking in anti-air and anti-submarine protection as they are."
 	},
-	"armcom1" : {
-		"name" : "Strike Commander",
-		"description" : "Mobile Assault Commander, Builds at 10 m/s",
-		"helptext" : "The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration."
-	},
 	"factorygunship" : {
 		"name" : "Gunship Plant",
 		"description" : "Produces Gunships, Builds at 10 m/s",
@@ -1004,20 +949,10 @@
 		"description" : "Gravity Turret - On to Repulse, Off to Attract",
 		"helptext" : "The Newton is armed with an experimental graviton projector. This weapon does virtually no damage directly, but can push units toward or away from the Newton. You can use it on your own units as well, but beware of friendly fire."
 	},
-	"chicken_drone_starter" : {
-		"name" : "Drone",
-		"description" : "Morphs Into Chicken Structures",
-		"helptext" : "A hapless non-combat organism whose sole purpose in life is to morph into one of the Chicken Hive's structures."
-	},
 	"assaultcruiser" : {
 		"name" : "Vanquisher",
 		"description" : "Heavy Cruiser (Assault)",
 		"helptext" : "The Vanquisher cruiser boasts excellent armor and lethal close-in firepower. Its gauss cannons slice through surface targets like butter, while its missiles support it against enemies above and below the water surface. Its short range and lack of anti-air firepower leaves it vulnerable to standoff units and aircraft."
-	},
-	"chicken_listener_b" : {
-		"name" : "Listener (burrowed)",
-		"description" : "Burrowing Mobile Seismic Detector",
-		"helptext" : "The Listener is an evolved form of the Digger. While it has lost all fighting ability, it has gained a unique sense of hearing that allows it to pinpoint the location of enemy ground forces."
 	},
 	"shieldfelon" : {
 		"name" : "Felon",
@@ -1051,8 +986,8 @@
 	},
 	"shipcarrier" : {
 		"name" : "Reef",
-		"description" : "Aircraft Carrier (Bombardment), Stockpiles tacnukes at 10 m/s",
-		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire tactical missile launcher for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
+		"description" : "Aircraft Carrier (Bombardment), stockpiles disarm missiles at 5 m/s",
+		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire disarming missile launcher for disabling enemy capital ships at range and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
 	},
 	"turretaaflak" : {
 		"name" : "Cobra",
@@ -1199,11 +1134,6 @@
 		"description" : "Tactical Strike Bomber",
 		"helptext" : "The Kestrel launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets."
 	},
-	"chickenq" : {
-		"name" : "Chicken Queen",
-		"description" : "Clucking Hell!",
-		"helptext" : "Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. It can spit acid, spray spores to kill aircraft, and kick land units away from it. Most of all, its jaws can rip apart the largest assault mech in seconds. Only the most determined, focused assault can hope to stop this beast in her tracks."
-	},
 	"staticrearm" : {
 		"name" : "Air Repair/Rearm Pad",
 		"description" : "Repairs and Rearms Aircraft, repairs at 2.5 e/s per pad",
@@ -1214,25 +1144,10 @@
 		"description" : "High Mobility Commander",
 		"helptext" : "The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules and comes pre-equipped with jumpjets."
 	},
-	"chickenflyerqueen" : {
-		"name" : "Chicken Flyer Queen",
-		"description" : "Clucking Hell!",
-		"helptext" : "Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. She can spit immensely powerful acid, drop land chickens, and spray spores to kill aircraft. Only the most determined, focused assault can hope to stop this beast in her tracks."
-	},
 	"gunshipemp" : {
 		"name" : "Gnat",
 		"description" : "Anti-Heavy EMP Drone",
 		"helptext" : "The Gnat can be used to paralyze enemy units. It makes an excellent defensive unit, and when combined with banshees or other units can halt the enemy to give you time to kill him. Offensively it can paralyze even heavily fortified areas, but dies relatively easily to defenders."
-	},
-	"cremcom1" : {
-		"name" : "Knight Commander",
-		"description" : "Mobile Assault Commander, Builds at 10 m/s",
-		"helptext" : "The Knight Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration."
-	},
-	"commsupport1" : {
-		"name" : "Support Commander",
-		"description" : "Econ/Support Commander, Builds at 12 m/s",
-		"helptext" : "The esoteric Support Commander uses a more unorthodox weapon set. Though lacking armor or speed, this chassis is still favored due to its intrinsic buildpower bonus."
 	},
 	"bomberriot" : {
 		"name" : "Phoenix",

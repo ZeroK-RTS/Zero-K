@@ -69,6 +69,7 @@ local rand 		= math.random
 
 local alliedTrueTable = {allied = true}
 
+local interruptedRetreaters = {} -- unit was retreating but got manual orders
 local wantRetreat = {} -- unit wants to retreat, may or may not be retreating
 local isRetreating = {} -- unit has retreat orders (move and wait)
 local retreaterTagsMove = {}
@@ -84,22 +85,6 @@ local RADSQ = RADIUS * RADIUS
 
 local ignoreAllowCommand = false
 
---------------------------------------------------------------------------------
--- functions
-
-local function explode(div,str)
-	if (div=='') then return 
-		false 
-	end
-	local pos,arr = 0,{}
-	-- for each divider found
-	for st,sp in function() return string.find(str,div,pos,true) end do
-		table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
-		pos = sp + 1 -- Jump past current divider
-	end
-	table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
-	return arr
-end
 ----------------------------
 ----- Haven Handling
 ----------------------------
@@ -187,9 +172,11 @@ local function ResetRetreatData(unitID)
 	retreaterTagsMove[unitID] = nil
 	retreaterTagsWait[unitID] = nil
 	retreaterHasRearm[unitID] = nil
+	interruptedRetreaters[unitID] = nil
 end
 
 local function StopRetreating(unitID)
+	SendToUnsynced("StopRetreat", unitID)
 	local cmds = Spring.GetUnitCommands(unitID, -1)
 	if retreaterHasRearm[unitID] then
 		for _,cmd in ipairs(cmds) do
@@ -244,6 +231,8 @@ local function GiveRearmOrders(unitID)
 		if env.RetreatFunction then
 			Spring.UnitScript.CallAsUnit(unitID,env.RetreatFunction, hx, hy, hz)
 		end
+
+		SendToUnsynced("StartRetreat", unitID)
 		return true
 	end
 	return false
@@ -284,6 +273,7 @@ local function StartRetreat(unitID)
 		if dSquared > RADSQ then
 			local insertIndex = 0
 			GiveRetreatOrders(unitID, hx, hz)
+			SendToUnsynced("StartRetreat", unitID)
 		end
 	end
 end
@@ -404,7 +394,7 @@ function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
 end	
 
 function gadget:RecvLuaMsg(msg, playerID)
-	local msg_table = explode('|', msg)
+	local msg_table = Spring.Utilities.ExplodeString('|', msg)
 	if msg_table[1] ~= 'sethaven' then
 		return
 	end
@@ -442,6 +432,18 @@ function gadget:RecvLuaMsg(msg, playerID)
 	ToggleHaven( teamID, x, z )
 end
 
+local interruptingCommands = { -- fixme: some common header should probably contain those?
+	[CMD.STOP]       = true,
+	[CMD_RAW_MOVE]   = true,
+	[CMD_RAW_BUILD]  = true,
+	[CMD.MOVE]       = true,
+	[CMD.FIGHT]      = true,
+	[CMD.ATTACK]     = true,
+	[CMD.MANUALFIRE] = true,
+	[CMD.GUARD]      = true,
+	[CMD_ORBIT]      = true,
+	[CMD.PATROL]     = true,
+}
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	
@@ -449,21 +451,21 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		RetreatCommand(unitID, cmdID, cmdParams, cmdOptions)  
 		return false  -- command was used
 	end
-	
-    if isRetreating[unitID] and not ignoreAllowCommand and not cmdOptions.shift
-		--need checks here because of random commands like maxwantedspeed, find better way
-		and ( cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD.FIGHT or cmdID == CMD.STOP or cmdID == CMD.ATTACK or cmdID == CMD.GUARD or cmdID == CMD.PATROL )
-		then
-		ResetRetreatData(unitID)
-		if not CheckUnitNextFrame then
-			CheckUnitNextFrame = {}
-		end
-		CheckUnitNextFrame[unitID] = true
-    end
-	
+
+	if isRetreating[unitID] and not ignoreAllowCommand and not cmdOptions.shift and interruptingCommands[cmdID] then
+		interruptedRetreaters[unitID] = true
+	end
+
 	return true
 end
 
+function gadget:UnitIdle(unitID)
+	if not interruptedRetreaters[unitID] then
+		return
+	end
+
+	ResetRetreatData(unitID)
+end
 
 function gadget:GameFrame(gameFrame)
 	local frame20 = gameFrame % 20 == 10 -- ~1 second
@@ -475,12 +477,6 @@ function gadget:GameFrame(gameFrame)
 				PeriodicUnitCheck(unitID)
 			end
 		end -- for
-	end 
-	if CheckUnitNextFrame then
-		for unitID, _ in pairs(CheckUnitNextFrame) do
-			PeriodicUnitCheck(unitID)
-		end
-		CheckUnitNextFrame = nil
 	end
 end
 	
@@ -505,7 +501,7 @@ else  -- UNSYNCED
 
 local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
 
-function WrapToLuaUI(_,teamID)
+local function WrapToLuaUI_Haven(_,teamID)
 	local spectating = Spring.GetSpectatingState()
 	if not spectating then
 		local allyTeamID = select(6, Spring.GetTeamInfo(teamID))
@@ -518,8 +514,41 @@ function WrapToLuaUI(_,teamID)
 	end
 end
 
+local function IsUnitWidgetspaceVisible (unitID)
+	local spec = Spring.GetSpectatingState()
+	if spec then
+		return true
+	end
+
+	local localAllyTeamID = Spring.GetLocalAllyTeamID()
+	local unitAllyTeamID = Spring.GetUnitAllyTeam(unitID)
+	if localAllyTeamID == unitAllyTeamID then
+		return true
+	end
+
+	return false
+end
+
+local function WrapToLuaUI_Retreat (cmd, unitID)
+	local vis = IsUnitWidgetspaceVisible(unitID)
+	if not vis then
+		return
+	end
+
+	if not Script.LuaUI(cmd) then
+		return
+	end
+
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	local teamID = Spring.GetUnitTeam(unitID)
+	Script.LuaUI[cmd](unitID, unitDefID, teamID)
+end
+
+
 function gadget:Initialize()
-	gadgetHandler:AddSyncAction('HavenUpdate',WrapToLuaUI)
+	gadgetHandler:AddSyncAction('HavenUpdate',WrapToLuaUI_Haven)
+	gadgetHandler:AddSyncAction('StartRetreat',WrapToLuaUI_Retreat)
+	gadgetHandler:AddSyncAction('StopRetreat',WrapToLuaUI_Retreat)
 end
 
 -------------------------------------------------------------------------------------

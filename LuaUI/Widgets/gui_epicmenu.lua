@@ -148,6 +148,8 @@ local gameInfoText = ''
 	..confdata.description 
 	
 
+local function returnSelf(self) return self end
+
 --------------------------------------------------------------------------------
 -- Key bindings
 -- KEY BINDINGS AND YOU:
@@ -170,7 +172,7 @@ for k,v in pairs(KEYSYMS) do
 	keysyms['' .. k] = v
 end
 --]]
-local get_key = false
+local get_key, get_key_bind_mod = false, false
 local kb_path, kb_button, kb_control, kb_option, kb_action
 
 local transkey = include("Configs/transkey.lua")
@@ -189,8 +191,10 @@ end
 local keybounditems = {}
 local keybind_date = 0
 
+local EPIC_SETTINGS_VERSION = 51
+
 local settings = {
-	versionmin = 50,
+	versionmin = EPIC_SETTINGS_VERSION,
 	lang = 'en',
 	country = 'wut',
 	widgets = {},
@@ -536,7 +540,8 @@ local function AllowPauseOnMenuChange()
 	if Spring.GetSpectatingState() then
 		return false
 	end
-	if settings.config['epic_Settings/Misc_Menu_pauses_in_SP'] == false then
+
+	if settings.config['epic_Settings/HUD_Panels/Pause_Screen_Menu_pauses_in_SP'] == false then
 		return false
 	end
 	local playerlist = Spring.GetPlayerList() or {}
@@ -1382,6 +1387,7 @@ local function MakeKeybindWindow( path, option, hotkeyButton, optionControl, opt
 	local window_width = 300
 	
 	get_key = true
+	get_key_bind_mod = option.bindMod
 	kb_path = path
 	kb_button = hotkeyButton
 	kb_control = optionControl
@@ -1561,8 +1567,8 @@ local function SearchElement(termToSearch,path)
 			elseif option.type == 'button' then
 				local hide = false
 				
-				if option.desc and option.desc:find(currentPath) and option.name:find("...") then --this type of button is defined in AddOption(path,option,wname) (a link into submenu)
-					local menupath = option.desc
+				if option.isDirectoryButton then --this type of button is defined in AddOption(path,option,wname) (a link into submenu)
+					local menupath = currentPath .. ((currentPath == "") and "" or "/") .. option.name
 					if pathoptions[menupath] then
 						if #pathoptions[menupath] >= 1 and menupath ~= "" then
 							DiggDeeper(menupath) --travel into & search into this branch
@@ -1730,6 +1736,14 @@ MakeSubWindow = function(path, pause)
 		end
 		
 		local simpleModeCull = (not root) and ((not option.simpleMode) == settings.simpleSettingsMode) and (not option.everyMode)
+		if simpleModeCull and confdata.simpleModeFullDirectory then
+			for i = 1, #confdata.simpleModeFullDirectory do
+				if string.find(path, confdata.simpleModeFullDirectory[i]) then
+					simpleModeCull = false
+					break
+				end
+			end
+		end
 		if simpleModeCull and option.isDirectoryButton and confdata.simpleModeDirectory[option.name] then
 			simpleModeCull = false
 		end
@@ -1825,9 +1839,9 @@ MakeSubWindow = function(path, pause)
 			}
 			if icon then
 				numberPanel:AddChild(Image:New{ file= icon, width = 16,height = 16, x=4,y=7,})
-				numberPanel:AddChild(Label:New{ caption = option.name, textColor = color.sub_fg, x=20,y=7,})
+				numberPanel:AddChild(Label:New{ caption = option.name, textColor = color.sub_fg, x=20,y=7, HitTest = returnSelf, })
 			else
-				numberPanel:AddChild(Label:New{ padding = {0,0,0,0}, caption = option.name, y = 7, textColor = color.sub_fg, })
+				numberPanel:AddChild(Label:New{ padding = {0,0,0,0}, caption = option.name, tooltip = option.desc, y = 7, textColor = color.sub_fg, HitTest = returnSelf, })
 			end
 			if option.valuelist then
 				option.value = GetIndex(option.valuelist, option.value)
@@ -1840,10 +1854,10 @@ MakeSubWindow = function(path, pause)
 				trackColor = color.sub_fg, 
 				min=option.min or 0, 
 				max=option.max or 100, 
-				step=option.step or 1, 
-				OnMouseup = { option.OnChange }, --using onchange triggers repeatedly during slide
-				tooltip=option.desc,
-				--useValueTooltip=true,
+				step=option.step or 1,
+				[option.update_on_the_fly and "OnChange" or "OnMouseup"] = { option.OnChange },
+				useValueTooltip=true,
+				tooltip_format = option.tooltip_format,
 			})
 			tree_children[#tree_children+1] = numberPanel
 		elseif option.type == 'list' then
@@ -1884,6 +1898,7 @@ MakeSubWindow = function(path, pause)
 					OnClick = {function(self) option.OnChange(item) end},
 					textColor = color.sub_fg,
 					tooltip = item.desc, --tooltip
+					round = true,
 				}
 				local icon = option.items[i].icon
 				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon, option.noHotkey)
@@ -2538,8 +2553,8 @@ local function MakeMenuBar()
 	
 	-- A bit evil, but par for the course
 	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={0,5,0,0}, }
-	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', width = 55, height=5, textColor = color.sub_header,  }
-	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
+	lbl_gtime = Label:New{ name='lbl_gtime', caption = '00:00', width = 55, height=5, textColor = color.sub_header,  }
+	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
 	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16, height = 11, OnClick = { MakeFlags }, padding={4,4,4,6}  }
 	
 	local screen_width,screen_height = Spring.GetWindowGeometry()
@@ -3033,8 +3048,13 @@ end
 function widget:SetConfigData(data)
 	confLoaded = true
 	if (data and type(data) == 'table') then
-		if data.versionmin and data.versionmin >= 50 then
+		if data.versionmin and data.versionmin >= EPIC_SETTINGS_VERSION then
 			settings = data
+		else
+			for key, value in pairs(data) do
+				settings[key] = value
+			end
+			settings.versionmin = EPIC_SETTINGS_VERSION
 		end
 	end
 
@@ -3091,18 +3111,20 @@ function widget:GameFrame(n)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if key == KEYSYMS.LCTRL 
-		or key == KEYSYMS.RCTRL 
-		or key == KEYSYMS.LALT
-		or key == KEYSYMS.RALT
-		or key == KEYSYMS.LSHIFT
-		or key == KEYSYMS.RSHIFT
-		or key == KEYSYMS.LMETA
-		or key == KEYSYMS.RMETA
-		or key == KEYSYMS.SPACE
-		then
-		
-		return
+	if not get_key_bind_mod then
+		if key == KEYSYMS.LCTRL 
+			or key == KEYSYMS.RCTRL 
+			or key == KEYSYMS.LALT
+			or key == KEYSYMS.RALT
+			or key == KEYSYMS.LSHIFT
+			or key == KEYSYMS.RSHIFT
+			or key == KEYSYMS.LMETA
+			or key == KEYSYMS.RMETA
+			or key == KEYSYMS.SPACE
+			then
+			
+			return
+		end
 	end
 	
 	local modstring = 
@@ -3115,10 +3137,14 @@ function widget:KeyPress(key, modifier, isRepeat)
 	if get_key then
 		get_key = false
 		window_getkey:Dispose()
+		if get_key_bind_mod then
+			modstring = ''
+			get_key_bind_mod = false
+		end
 		translatedkey = transkey[ keysyms[''..key]:lower() ] or keysyms[''..key]:lower()
-		--local hotkey = { key = translatedkey, mod = modstring, }		
+		--local hotkey = { key = translatedkey, mod = modstring, }
 		translatedkey = translatedkey:gsub("n_", "") -- Remove 'n_' prefix from number keys.
-		local hotkey = modstring .. translatedkey	
+		local hotkey = modstring .. translatedkey
 		
 		Spring.Echo("Binding key code", key, "Translated", translatedkey, "Modifer", modstring)
 		
@@ -3185,7 +3211,7 @@ do --Set our prefered camera mode when first screen frame is drawn. The engine a
 				
 				option.OnChange(option) --re-apply our settings 
 				Spring.Echo("Epicmenu: Switching to " .. option.value .. " camera mode") --notify in log what happen.
-				widgetHandler:RemoveWidgetCallIn("DrawScreen", self) --stop updating "widget:DrawScreen()" event. Note: this is a special "widgetHandler:RemoveCallin" for widget that use "handler=true".
+				widgetHandler:RemoveWidgetCallIn("DrawScreen", self) --stop updating "widget:DrawScreen()" event. Note: this is a special "widgetHandler:RemoveCallIn" for widget that use "handler=true".
 			end
 			screenFrame = screenFrame+1
 		end

@@ -127,7 +127,7 @@ end
 
 local function GetMouseTargetPosition()
 	local mx, my = GetMouseState()
-	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my)
+	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my, false, true)
 
 	if (mouseTargetType == "ground") then
 		return mouseTarget[1], mouseTarget[2], mouseTarget[3]
@@ -196,8 +196,12 @@ local function getWeaponInfo(weaponDef, unitDef)
 	if (weaponDef.cylinderTargetting >= 100) then
 		retData = {type = "orbital", scatter = scatter}
 	elseif (weaponType == "Cannon") then
-		retData = {type = "ballistic", scatter = scatter, v = (weaponDef.customParams.weaponvelocity or 0),range = weaponDef.range,
-		mygravity = weaponDef.customParams and weaponDef.customParams.mygravity and weaponDef.customParams.mygravity*800
+		retData = {
+			type = "ballistic",
+			scatter = scatter,
+			v = (weaponDef.customParams.weaponvelocity or 0),
+			range = weaponDef.range,
+			mygravity = weaponDef.customParams and weaponDef.customParams.mygravity and weaponDef.customParams.mygravity*800
 		}
 	elseif (weaponType == "MissileLauncher") then
 		local turnRate = 0
@@ -283,8 +287,13 @@ local function SetupUnit(unitDef, unitID)
 				local aoe = weaponDef.damageAreaOfEffect
 				if (weaponDef.manualFire and unitDef.canManualFire) or num == manualfireWeapon then
 					retDgunInfo = getWeaponInfo(weaponDef, unitDef)
-					if retDgunInfo.range and rangeMult then
-						retDgunInfo.range = retDgunInfo.range * rangeMult
+					if retDgunInfo.range then
+						if weaponDef.customParams.truerange then
+							retDgunInfo.range = tonumber(weaponDef.customParams.truerange)
+						end
+						if rangeMult then
+							retDgunInfo.range = retDgunInfo.range * rangeMult
+						end
 					end
 				elseif (not weaponDef.isShield 
 						and not ToBool(weaponDef.interceptor) and not ToBool(weaponDef.customParams.hidden)
@@ -466,7 +475,7 @@ local function GetBallisticVector(v, mg, dx, dy, dz, trajectory, range)
 	return Normalize(bx, by, bz)
 end
 
-local function GetBallisticImpactPoint(v, fx, fy, fz, bx, by, bz)
+local function GetBallisticImpactPoint(v, mg_f, fx, fy, fz, bx, by, bz)
 	local v_f = v / GAME_SPEED
 	local vx_f = bx * v_f
 	local vy_f = by * v_f
@@ -475,13 +484,13 @@ local function GetBallisticImpactPoint(v, fx, fy, fz, bx, by, bz)
 	local py = fy
 	local pz = fz
 
-	local ttl = 4 * v_f / g_f
+	local ttl = 4 * v_f / mg_f
 
 	for i = 1, ttl do
 		px = px + vx_f
 		py = py + vy_f
 		pz = pz + vz_f
-		vy_f = vy_f - g_f
+		vy_f = vy_f - mg_f
 
 		local gwh = max(GetGroundHeight(px, pz), 0)
 
@@ -543,6 +552,8 @@ local function DrawBallisticScatter(scatter, v, mygravity ,fx, fy, fz, tx, ty, t
 
 	local scatterDiv = scatter / numScatterPoints
 	local vertices = {}
+	
+	local mg_f = mg / GAME_SPEED / GAME_SPEED
 
 	--trace impact points
 	for i = -numScatterPoints, numScatterPoints do
@@ -553,7 +564,7 @@ local function DrawBallisticScatter(scatter, v, mygravity ,fx, fy, fz, tx, ty, t
 		local by_c = by * currScatterCos + br * currScatter
 		local bz_c = bz * rMult
 
-		vertices[i+numScatterPoints+1] = GetBallisticImpactPoint(v, fx, fy, fz, bx_c, by_c, bz_c)
+		vertices[i+numScatterPoints+1] = GetBallisticImpactPoint(v, mg_f, fx, fy, fz, bx_c, by_c, bz_c)
 	end
 
 	glLineWidth(scatterLineWidthMult / mouseDistance)

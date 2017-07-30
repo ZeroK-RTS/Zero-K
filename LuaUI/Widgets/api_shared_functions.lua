@@ -25,6 +25,7 @@ local frameTex   = ":n:bitmaps/icons/frame_slate.png"
 Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/unitDefReplacements.lua")
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
+VFS.Include("LuaRules/Utilities/rulesParam.lua")
 
 local function GetBuildIconFrame(udef) 
 	local cp = udef.customParams

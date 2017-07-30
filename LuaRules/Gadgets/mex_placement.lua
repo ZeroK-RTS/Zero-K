@@ -152,10 +152,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 			else
 		        local nearestspot, dist, spotindex = GetClosestMetalSpot(x, z)
 				if spotData[spotindex] == nil and dist < MEX_DISTANCE then
-				    local _,_,_,isAI = Spring.GetTeamInfo(unitTeam)
-				    if not isAI then 
 				        Spring.SetUnitPosition(unitID, nearestspot.x, nearestspot.z)
-				    end
 					spotByID[unitID] = spotindex
 					spotData[spotindex] = {unitID = unitID}
 					Spring.SetUnitRulesParam(unitID, "mexIncome", metalSpots[spotindex].metal, inlosTrueTable)

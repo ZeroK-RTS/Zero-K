@@ -272,6 +272,8 @@ local function LaunchAll(x, z)
 end
 
 function script.Create()
+	Spring.SetUnitRulesParam(unitID, "meteorsControlled", 0, INLOS_ACCESS)
+	Spring.SetUnitRulesParam(unitID, "meteorsControlledMax", METEOR_CAPACITY, INLOS_ACCESS)
 	ux,_, uz = Spring.GetUnitPosition(unitID)
 	uy = Spring.GetGroundHeight(ux, uz)
 	

@@ -148,7 +148,8 @@ local units = {
 		-- No Amph Artillery
 		amphaa = ANTI_AIR,
 		amphassault = HEAVY_SOMETHING,
-		amphtele = SPECIAL,
+		amphbomb = SPECIAL,
+		amphtele = UTILITY,
 	},
 	factoryship = {
 		shipcon = CONSTRUCTOR,
@@ -409,6 +410,7 @@ local overrides = {
 local widgetSpaceHidden = {
 	[60] = true, -- CMD.PAGES
 	[CMD_SETHAVEN] = true,
+	[CMD_SET_AI_START] = true,
 	[CMD_SET_FERRY] = true,
 	[CMD.MOVE] = true,
 }

@@ -14,12 +14,11 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext       = [[The Felon draws energy from its shield, discharging it in accurate bursts. Link it to other shields to increase its rate of fire.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
+  footprintX          = 3,
+  footprintZ          = 3,
   iconType            = [[walkersupport]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
@@ -30,7 +29,7 @@ unitDef = {
   maxVelocity         = 1.5,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
+  movementClass       = [[KBOT3]],
   moveState           = 0,
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[shieldfelon.s3o]],
@@ -79,8 +78,8 @@ unitDef = {
 
       exteriorShield          = true,
       shieldAlpha             = 0.4,
-      shieldBadColor          = [[1 0.1 0.1]],
-      shieldGoodColor         = [[0.1 0.1 1]],
+      shieldBadColor          = [[1 0.1 0.1 1]],
+      shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
       shieldPower             = 1200,
       shieldPowerRegen        = 18,

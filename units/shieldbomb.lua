@@ -18,31 +18,28 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Bombe Rampante]],
-	description_de = [[Crawling Bombe]],
-    helptext       = [[This fast-moving suicide unit is very good against massed units, particularly assault tanks. It features a cloaking device which is automatically activated once the unit stands still, effectifely turning it into a mine. Chain explodes terribly, so best not to mass it. Counter with defenders and missile trucks, or single cheap units to set off a premature detonation.]],
-    helptext_fr    = [[Le Roach est une unité suicide ultra-rapide. Il est indispensable de savoir la manier pour se débarrasser rapidement des nuées ennemies. Des unités lance-missiles ou tirant avec précision pouront cependant le faire exploser prématurément.]],
-	helptext_de    = [[Diese flinke Kamikazeeinheit ist effektiv gegen größere Einheiten, besonderns Sturmpanzer. Sie besitzt eine Tarnvorrichting welche automatisch aktiviert wird sobald diese Einheit still steht. Bewahre Abstand zwischen diesen Einheiten, da sie in einer Kettenreaktion explodieren. Der Defender oder Raketenlaster sind effektiv gegen sie. Außerdem auch billige einzelne Einheiten, um eine frühzeitige Explosion zu erwirken.]],
 	modelradius    = [[7]],
 	idle_cloak = 1,
+    selection_scale = 1, -- Maybe change later
   },
 
   explodeAs              = [[shieldbomb_DEATH]],
   fireState              = 0,
-  footprintX             = 1,
-  footprintZ             = 1,
+  footprintX             = 2,
+  footprintZ             = 2,
   iconType               = [[walkerbomb]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   kamikaze               = true,
   kamikazeDistance       = 80,
   kamikazeUseLOS         = true,
+  leaveTracks            = true,
   maxDamage              = 60,
   maxSlope               = 36,
   maxVelocity            = 4,
   maxWaterDepth          = 15,
   minCloakDistance       = 75,
-  movementClass          = [[KBOT1]],
+  movementClass          = [[SKBOT2]],
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[logroach.s3o]],
   pushResistant          = 0,
@@ -61,6 +58,11 @@ unitDef = {
   },
 
   sightDistance          = 240,
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ChickenTrackPointy]],
+  trackWidth             = 20,
   turnRate               = 3000,
   
   featureDefs            = {
@@ -68,8 +70,8 @@ unitDef = {
     DEAD      = {
       blocking         = false,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 2,
+      footprintZ       = 2,
       object           = [[wreck2x2b.s3o]],
     },
 

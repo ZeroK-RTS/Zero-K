@@ -160,7 +160,7 @@ effectUnitDefs = {
   },  
   
   cloakheavyraid = {
-    {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="blade", onActive=false, noIconDraw = true}},
+    {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="blade", onActive=false, noIconDraw = true, quality = 2}},
   },
   
   pw_warpgate = {
@@ -181,14 +181,14 @@ effectUnitDefs = {
 	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere"})},
 	--{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="sphere", onActive = true, size=18})},
 	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere", onActive = true, size=100})},
-	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=50, strength = .005, precision=50, repeatEffect=true, onActive=true, noIconDraw = true}},
+	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=50, strength = .005, precision=50, repeatEffect=true, onActive=true, noIconDraw = true, quality = 2,}},
   },
 	
   tele_beacon = {
 	{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="sphere"})},
 	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere"})},
 	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere", onActive = true, size=50})},
-	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=20, strength = .005, precision=50, repeatEffect=true, onActive=true, noIconDraw = true}},	
+	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=20, strength = .005, precision=50, repeatEffect=true, onActive=true, noIconDraw = true, quality = 2,}},	
   },
   
   striderbantha = {
@@ -286,7 +286,7 @@ effectUnitDefs = {
 	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipl"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipr"}) },
   },
-  fighter = {
+  planefighter = {
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle1", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle2", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
     {class='Ribbon', options={width=1, piece="wingtip1", noIconDraw = true}},
@@ -305,7 +305,7 @@ effectUnitDefs = {
 	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },	
   },
-  fighterheavy = {
+  planeheavyfighter = {
     -- jets done in gadget
     {class='Ribbon', options={width=1, size=8, piece="wingtip1", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=8, piece="wingtip2", noIconDraw = true}},

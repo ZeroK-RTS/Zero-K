@@ -18,9 +18,6 @@ unitDef = {
   collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
-    helptext       = [[This mine doesn't explode - instead, it releases a flurry of bomblets at trespassing enemies. It deactivates after one minute.]],
-    description_de = [[Mine]],
-    helptext_de    = [[Statt explodieren, diese Mine schiesst Projektile an Eindringlingen.]],
     dontcount = [[1]],
 	mobilebuilding = [[1]],
 	idle_cloak = 1,

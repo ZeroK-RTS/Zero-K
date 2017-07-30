@@ -14,9 +14,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Artillerieroboter für Sättigungsfeuer]],
-    helptext       = [[The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
-	helptext_de    = [[Der Firewalker setzt mit seinem Mörser auf mittlerer Distanz Gebiete in Brand und macht sie somit für kurze Zeit unbrauchbar. Die Einheit selber ist schwerfällig und langsam zu manövrieren.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -77,7 +74,6 @@ unitDef = {
 	  avoidFeature            = false,
       craterBoost             = 1,
       craterMult              = 2,
-      cegTag                  = [[custom:gravityless_flamer]],
 
 	  customParams        	  = {
 	    setunitsonfire = "1",

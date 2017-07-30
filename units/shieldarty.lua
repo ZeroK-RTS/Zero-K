@@ -13,7 +13,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The Racketeer launches long range missiles that can disarm key enemy defenses or units before assaulting them. Only one Racketeer is needed to keep a target disarmed, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields and rendering large units harmless.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -57,7 +56,6 @@ unitDef = {
 
     {
       def                = [[EMP_ROCKET]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 

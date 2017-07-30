@@ -16,8 +16,7 @@ unitDef = {
   customParams           = {
     amph_regen = 20,
     amph_submerged_at = 40,
-	sink_on_emp    = 1,
-    helptext       = [[Angler is amphibious anti-air bot designed to counter the factory's nemesis - Raven. Two of them together can float to the surface and kill a single Raven.]],
+    sink_on_emp    = 1,
     floattoggle = [[1]],
   },
 
@@ -41,8 +40,8 @@ unitDef = {
 
   sfxtypes               = {
     explosiongenerators = {
-	  [[custom:STORMMUZZLE]],
-	  [[custom:STORMBACK]],
+      [[custom:STORMMUZZLE]],
+      [[custom:STORMBACK]],
     },
   },
 
@@ -71,8 +70,6 @@ unitDef = {
     MISSILE = {
       name                    = [[Missile Pack]],
       areaOfEffect            = 48,
-      burst                   = 4,
-      burstRate               = 0.4,
       canAttackGround         = false,
       cegTag                  = [[missiletrailblue]],
       craterBoost             = 1,
@@ -80,9 +77,11 @@ unitDef = {
       cylinderTargeting       = 1,
 
       customParams            = {
-          isaa = [[1]],
-		light_color = [[0.5 0.6 0.6]],
-		light_radius = 380,
+        isaa = [[1]],
+        script_reload = [[12]],
+        script_burst = [[4]],
+        light_color = [[0.5 0.6 0.6]],
+        light_radius = 380,
       },
 
       damage                  = {
@@ -94,14 +93,14 @@ unitDef = {
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
       flightTime              = 3,
-	  impactOnly              = true,
+      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
-      range                   = 750,
-      reloadtime              = 12,
+      range                   = 820,
+      reloadtime              = 0.32,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],

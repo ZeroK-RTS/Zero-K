@@ -45,7 +45,7 @@ local function Create_Beacon_Thread(x,z)
 	
 	GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 3, x, y, z)
 	for i = 1, 90 do
-		local speedMult = (1 - (spGetUnitRulesParam(unitID,"slowState") or 0)) * BEACON_SPAWN_SPEED
+		local speedMult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1) * BEACON_SPAWN_SPEED
 		Turn(body, y_axis, math.rad(i*4), math.rad(40*speedMult))
 		Sleep(100/speedMult)
 		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
@@ -55,7 +55,7 @@ local function Create_Beacon_Thread(x,z)
 			stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
 			disarm = spGetUnitRulesParam(unitID,"disarmed") == 1
 		end
-		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
+		Spring.SpawnCEG("teleport_progress", x, y + 14, z, 0, 0, 0, 0)
 		if i == 30 or i == 60 then
 			GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 3, x, y, z)
 		end
@@ -197,7 +197,7 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
+		local speedmult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)*SPEED
 		
 		Turn(pelvis, z_axis, math.rad(0), math.rad(2)*speedmult)
 		Move(pelvis, y_axis, 2, 1.5*speedmult)

@@ -20,11 +20,6 @@ unitDef = {
   cruiseAlt           = 220,
 
   customParams        = {
-    description_fr = [[Bombardier de Précision]],
-	description_de = [[Präzisionsbomber]],
-    helptext       = [[The Raven drops a single high damage, low AoE bomb. Cost for cost, nothing quite matches it for taking out that antinuke or Reaper, but you should look elsewhere for something to use against smaller mobiles.]],
-    helptext_fr    = [[Le Raven largue des bombes de haute précision, parfait pour les frappes chirurgicales comme une défense antimissile ou une tourelle genante, mais peu efficace contre une armée massive.]],
-	helptext_de    = [[Der Raven wirft eine einzige Bombe mit hohem Schaden ab. Ideal fungiert er dazu, einzelne, strategisch wichtige Gebäude wie z.B. Anti-Atom zu zerstören, um dann mit seinen Haupteinheiten einzufallen. Kleinere Einheiten werden aber nur schwelich getroffen und sollten von daher auf anderem Wege bekämpft werden.]],
 	modelradius    = [[15]],
 	requireammo    = [[1]],
   },
@@ -61,7 +56,7 @@ unitDef = {
 
   },
   sightDistance       = 660,
-  turnRadius          = 160,
+  turnRadius          = 300,
   workerTime          = 0,
 
   weapons             = {

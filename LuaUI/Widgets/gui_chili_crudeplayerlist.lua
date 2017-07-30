@@ -17,10 +17,6 @@ VFS.Include ("LuaRules/Utilities/lobbyStuff.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local spSendCommands			= Spring.SendCommands
-
-local echo = Spring.Echo
-
 local Chili
 local Image
 local Button
@@ -132,7 +128,7 @@ options = {
 		name = 'Font Size (10-18)',
 		type = 'number',
 		value = 13,
-		min=10,max=18,step=1,
+		min = 10, max = 18, step = 1,
 		OnChange = function() SetupPlayerNames() end,
 		advanced = true
 	},
@@ -151,7 +147,10 @@ options = {
 		desc = "Reset the win counts of all players",
 		type = 'button',
 		OnChange = function() 
-		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset(); SetupPlayerNames() end 
+			if WG.WinCounter_Reset ~= nil then 
+				WG.WinCounter_Reset()
+				SetupPlayerNames()
+			end 
 		end,
 	},	
 	inc_wins_1 = {
@@ -159,11 +158,11 @@ options = {
 		desc = "",
 		type = 'button',
 		OnChange = function()
-		if WG.WinCounter_Increment ~= nil then 
-			local allyTeams = Spring.GetAllyTeamList()
-			WG.WinCounter_Increment(allyTeams[1]) 
-			SetupPlayerNames()
-		end
+			if WG.WinCounter_Increment ~= nil then 
+				local allyTeams = Spring.GetAllyTeamList()
+				WG.WinCounter_Increment(allyTeams[1]) 
+				SetupPlayerNames()
+			end
 		end,
 		advanced = true
 	},
@@ -172,11 +171,11 @@ options = {
 		desc = "",
 		type = 'button',
 		OnChange = function()
-		if WG.WinCounter_Increment ~= nil then 
-			local allyTeams = Spring.GetAllyTeamList()
-			WG.WinCounter_Increment(allyTeams[2]) 
-			SetupPlayerNames()
-		end
+			if WG.WinCounter_Increment ~= nil then 
+				local allyTeams = Spring.GetAllyTeamList()
+				WG.WinCounter_Increment(allyTeams[2]) 
+				SetupPlayerNames()
+			end
 		end,
 		advanced = true
 	},
@@ -247,7 +246,7 @@ local function ShareUnits(playername, team)
 		end]]
 		Spring.ShareResources(team, "units")     
 	else
-		echo 'Player List: No units selected to share.'
+		Spring.Echo('Player List: No units selected to share.')
 	end
 end
 
@@ -330,8 +329,8 @@ local function MakeSpecTooltip()
 	local players = Spring.GetPlayerList()
 	
 	local specsSorted = {}
-	for i=1,#players do
-		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(players[i])
+	for i = 1, #players do
+		local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage = Spring.GetPlayerInfo(players[i])
 		if spectator and active then
 			specsSorted[#specsSorted + 1] = {name = name, ping = pingTime, cpu = math.min(cpuUsage,1)}
 			--specsSorted[#specsSorted + 1] = {name = name, ping = pingTime, cpu = cpuUsage}
@@ -354,22 +353,20 @@ end
 
 -- updates ping and CPU for all players; name if needed
 local function UpdatePlayerInfo()
-	for i=1,#entities do
+	for i = 1, #entities do
 		if not entities[i].isAI then
 			local playerID = entities[i].playerID
-			local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID)
+			local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage = Spring.GetPlayerInfo(playerID)
+			--Spring.Echo("Player Update", playerID, name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, #(Spring.GetPlayerList(teamID, true)))
 			
 			local name_out = name or ''
-			if name_out == ''
-				or #(Spring.GetPlayerList(teamID,true)) == 0
-				or spectator and not entities[i].isSpec
-			then
+			if name_out == '' or #(Spring.GetPlayerList(teamID, true)) == 0 or (spectator and not entities[i].isSpec) or Spring.GetTeamRulesParam(teamID, "isDead") == 1 then
 				if Spring.GetGameSeconds() < 0.1 or cpuUsage > 1 then
 					name_out = "<Waiting> " ..(name or '')
-				elseif Spring.GetTeamUnitCount(teamID) > 0  then
-					name_out = "<Aband. units> " ..(name or '')
+				elseif Spring.GetTeamUnitCount(teamID) > 0 then
+					name_out = "<Aband. units> " .. (name or '')
 				else
-					name_out = "<Dead> " ..(name or '')
+					name_out = "<Dead> " .. (name or '')
 				end
 			end
 			if entities[i].nameLabel then 
@@ -403,10 +400,14 @@ local function UpdatePlayerInfo()
 			end
 
 			local wins = 0
-			if name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then wins = WG.WinCounter_currentWinTable[name].wins end
-			if entities[i].winsLabel then entities[i].winsLabel:SetCaption(wins) end
-		end	-- if not isAI
-	end	-- for entities
+			if name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then
+				wins = WG.WinCounter_currentWinTable[name].wins
+			end
+			if entities[i].winsLabel then
+				entities[i].winsLabel:SetCaption(wins)
+			end
+		end -- if not isAI
+	end -- for entities
 	MakeSpecTooltip()
 	
 	for allyTeam, cb in pairs(cfCheckBoxes) do
@@ -741,7 +742,7 @@ SetupPlayerNames = function()
 	localAlliance = Spring.GetMyAllyTeamID()
 	
 	-- register any AIs as entities, assign teams to allyTeams
-	for i=1,#teamsSorted do
+	for i = 1, #teamsSorted do
 		local teamID = teamsSorted[i]
 		if teamID ~= Spring.GetGaiaTeamID() then
 			teams[teamID] = teams[teamID] or {roster = {}}
@@ -761,12 +762,13 @@ SetupPlayerNames = function()
 	end --for each team
 
 	-- go through all players, register as entities, assign to teams
-	for i=1, #playerlist do
+	for i = 1, #playerlist do
 		local playerID = playerlist[i]
-		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
+		local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank = Spring.GetPlayerInfo(playerID)
+		local isSpec = (teamID == 0 and spectator and (not Spring.GetGameRulesParam("initiallyPlayingPlayer_" .. playerID))) 
 		local entityID = #entities + 1
-		entities[entityID] = {name = name, isSpec = spectator, playerID = playerID, teamID = teamID}--(not spectator) and teamID or nil}
-		if teamID == 0 and not spectator or teamID ~= 0 then
+		entities[entityID] = {name = name, isSpec = isSpec, playerID = playerID, teamID = teamID}--(not spectator) and teamID or nil}
+		if not isSpec then
 			local index = #teams[teamID].roster + 1
 			teams[teamID].roster[index] = entities[entityID]
 		end
@@ -776,14 +778,16 @@ SetupPlayerNames = function()
 	end
 	
 	-- sort allyteams: own at top, others in order
-	table.sort(allyTeamsSorted, function(a,b)
+	table.sort(allyTeamsSorted, 
+		function(a,b)
 			if a == localAlliance then return true
 			elseif b == localAlliance then return false end
 			return a < b
-		end)
+		end
+	)
 	
 	row = 1
-	for i=1,#allyTeamsSorted do
+	for i = 1, #allyTeamsSorted do
 		AddAllyTeam(allyTeamsSorted[i])
 	end
 

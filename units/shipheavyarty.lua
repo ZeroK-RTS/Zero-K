@@ -5,7 +5,7 @@ unitDef = {
   acceleration           = 0.039,
   activateWhenBuilt   = true,
   brakeRate              = 0.0475,
-  buildCostMetal         = 3800,
+  buildCostMetal         = 4000,
   builder                = false,
   buildPic               = [[shipheavyarty.png]],
   canGuard               = true,
@@ -19,7 +19,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[A single salvo from one of these will pummel almost any surface target into submission. The psychological effects of the muzzle flash and the ship recoiling in the water are impressive enough, to say nothing of the effects of a direct hit. Be warned--battleships are not meant to be used on their own, lacking in anti-air and anti-submarine protection as they are.]],
     modelradius    = [[80]],
   },
 

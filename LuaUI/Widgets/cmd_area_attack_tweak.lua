@@ -30,6 +30,7 @@ local defaultCommands = {
 	[CMD_FIND_PAD] = true,
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_BUILD] = true,
 	[CMD_UNIT_SET_TARGET] = true,
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true,
 	-- [CMD.REMOVE] = true,
