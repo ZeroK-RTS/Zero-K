@@ -67,7 +67,6 @@ unitDef = {
       avoidFeature            = false,
       burnblow                = true,
       cegTag                  = [[missiletrailpurple]],
-      collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
