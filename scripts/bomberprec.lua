@@ -165,7 +165,7 @@ function script.BlockShot(num, targetID)
 	if num ~= 2 then
 		return false
 	end
-	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
+	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or RearmBlockShot())
 	if not (targetID and ableToFire) then
 		return not ableToFire
 	end
