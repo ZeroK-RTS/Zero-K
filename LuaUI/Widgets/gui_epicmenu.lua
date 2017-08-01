@@ -2655,11 +2655,11 @@ local function MakeQuitButtons()
 	})
 	AddOption('',{
 		type='button',
-		name='Quit',
+		name='Exit to Lobby',
 		desc = "Leave the game.",
 		icon = imgPath..'epicmenu/exit.png',
 		OnChange = function() 
-			MakeExitConfirmWindow("Are you sure you want to quit the game?", function()
+			MakeExitConfirmWindow("Are you sure you want to leave the battle?", function()
 				local paused = select(3, Spring.GetGameSpeed())
 				if (paused) and AllowPauseOnMenuChange() then
 					spSendCommands("pause")
