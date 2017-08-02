@@ -1985,7 +1985,7 @@ MakeSubWindow = function(path, pause)
 	
 	--back button
 	if parent_path then
-		Button:New{ name= 'backButton', caption = '', OnClick = { KillSubWindow, function() filterUserInsertedTerm = ''; MakeSubWindow(parent_path, false) end,  }, 
+		Button:New{ name= 'backButton', caption = '', OnClick = { KillSubWindow, function() filterUserInsertedTerm = ''; if not root then MakeSubWindow(parent_path, false) end end,  }, 
 			--backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, 
 			--classname = "back_button",
 			height=B_HEIGHT,
