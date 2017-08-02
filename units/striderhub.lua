@@ -8,9 +8,9 @@ unitDef = {
   buildDistance                 = 300,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 5,
-  buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[staticcon_aoplane.dds]],
+  buildingGroundDecalSizeX      = 6,
+  buildingGroundDecalSizeY      = 6,
+  buildingGroundDecalType       = [[striderhub_aoplane.dds]],
 
   buildoptions                  = {
     [[striderantiheavy]],
