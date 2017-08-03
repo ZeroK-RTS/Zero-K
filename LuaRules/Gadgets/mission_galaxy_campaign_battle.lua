@@ -699,6 +699,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeamID, cmdID, cmdParams, cm
 	if cmdID == CMD_INSERT and cmdParams and cmdParams[2] then
 		cmdID = cmdParams[2]
 	end
+	local unitTeamID = (unitID and unitLineage[unitID]) or unitTeamID
 	if cmdID < 0 and unlockedUnitsByTeam[unitTeamID] then
 		if not (unlockedUnitsByTeam[unitTeamID][-cmdID]) then 
 			return false
@@ -708,6 +709,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeamID, cmdID, cmdParams, cm
 end
 
 function gadget:AllowUnitCreation(unitDefID, builderID, builderTeamID, x, y, z)
+	local builderTeamID = (builderID and unitLineage[builderID]) or builderTeamID
 	if unlockedUnitsByTeam[builderTeamID] then
 		if not (unlockedUnitsByTeam[builderTeamID][unitDefID]) then 
 			return false
