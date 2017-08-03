@@ -22,6 +22,9 @@ if not campaignBattleID then
 	return
 end
 
+local BUTTON_SIZE = 25
+local BONUS_TOGGLE_IMAGE = 'LuaUI/images/plus_green.png'
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Variables/config
@@ -39,6 +42,8 @@ local OBJECTIVE_ICON = LUAUI_DIRNAME .. "images/bullet.png"
 
 local mainObjectiveBlock, bonusObjectiveBlock
 local globalCommandButton
+
+local SetBonusObjectivesVisibility
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -72,6 +77,24 @@ local function CustomKeyToUsefulTable(dataRaw)
 	if collectgarbage then
 		collectgarbage("collect")
 	end
+end
+
+local function SetWindowSkin(targetPanel, className)
+	local currentSkin = Chili.theme.skin.general.skinName
+	local skin = Chili.SkinHandler.GetSkin(currentSkin)
+	local newClass = skin.panel
+	if skin[className] then
+		newClass = skin[className]
+	end
+	
+	targetPanel.tiles = newClass.tiles
+	targetPanel.TileImage = newClass.TileImage
+	--targetPanel.backgroundColor = newClass.backgroundColor
+	if newClass.padding then
+		targetPanel.padding = newClass.padding
+		targetPanel:UpdateClientArea()
+	end
+	targetPanel:Invalidate()
 end
 
 --------------------------------------------------------------------------------
@@ -174,14 +197,11 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam)
 	return externalFunctions, position
 end
 
-local function InitializeBonusObjectives()
+local function InitializeObjectivesWindow()
 	local objectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().objectiveconfig) or {}
 	local bonusObjectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().bonusobjectiveconfig) or {}
 	
-	local holderHeight = 22 + 16*(#objectiveList)
-	if bonusObjectiveList and #bonusObjectiveList > 0 then
-		holderHeight = holderHeight + 52 + 16*(#bonusObjectiveList)
-	end
+	local thereAreBonusObjectives = (bonusObjectiveList and #bonusObjectiveList > 0)
 	
 	local holderWindow = Chili.Window:New{
 		classname = "main_window_small",
@@ -189,7 +209,7 @@ local function InitializeBonusObjectives()
 		x = 2,
 		y = 50,
 		width = 320,
-		height = holderHeight,
+		height = 22 + 16*(#objectiveList),
 		dockable = true,
 		draggable = false,
 		resizable = false,
@@ -200,9 +220,13 @@ local function InitializeBonusObjectives()
 	
 	local position = 4
 	mainObjectiveBlock, position = GetObjectivesBlock(holderWindow, position, objectiveList,  "objectiveSuccess_")
+	local mainHeight = position + holderWindow.padding[2] + holderWindow.padding[4] + 3 
+	local bonusHeight
+	
 	if #bonusObjectiveList > 0 then
 		position = position + 8
 		bonusObjectiveBlock, position = GetObjectivesBlock(holderWindow, position, bonusObjectiveList, "bonusObjectiveSuccess_")
+		bonusHeight = position + holderWindow.padding[2] + holderWindow.padding[4] + 3 
 	end
 	
 	if WG.GlobalCommandBar then
@@ -215,6 +239,52 @@ local function InitializeBonusObjectives()
 	end
 	
 	holderWindow:SetPos(nil, nil, nil, position + holderWindow.padding[2] + holderWindow.padding[4] + 3)
+	
+	local bonusVisible = true
+	local function SetBonusVisibility(newVisible)
+		if (not thereAreBonusObjectives) or (newVisible == bonusVisible) then
+			return
+		end
+		bonusVisible = newVisible
+		local newHeight = (newVisible and bonusHeight) or mainHeight
+		if newHeight < 120 then
+			SetWindowSkin(holderWindow, "main_window_small_flat")
+		else
+			SetWindowSkin(holderWindow, "main_window_small")
+		end
+		holderWindow:SetPos(nil, nil, nil, newHeight)
+	end
+	SetBonusVisibility(false)
+	
+	local bonusToggleButton
+	if thereAreBonusObjectives then
+		bonusToggleButton = Chili.Button:New{
+			y = 3,
+			right = 3,
+			width = BUTTON_SIZE,
+			height = BUTTON_SIZE,
+			caption = "",
+			tooltip = "Toggle bonus objectives",
+			padding = {0,0,0,0},
+			OnClick = {
+				function ()
+					SetBonusVisibility(not bonusVisible)
+				end
+			},
+			parent = holderWindow,
+			children = {
+				Chili.Image:New{
+					file = BONUS_TOGGLE_IMAGE,
+					x = 0,
+					y = 0,
+					right = 0,
+					bottom = 0,
+				}
+			},
+		}
+	end
+	
+	return SetBonusVisibility
 end
 
 --------------------------------------------------------------------------------
@@ -235,7 +305,7 @@ end
 
 function widget:Initialize()
 	Chili = WG.Chili
-	InitializeBonusObjectives()
+	SetBonusObjectivesVisibility = InitializeObjectivesWindow()
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 end
 
