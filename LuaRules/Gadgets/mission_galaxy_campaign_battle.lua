@@ -523,6 +523,26 @@ local function AddInitialUnitObjectiveParameters(unitID, parameters)
 	end
 end
 
+
+local function SetupInitialUnitParameters(unitID, unitData)
+	AddInitialUnitObjectiveParameters(unitID, unitData)
+	
+	if unitData.invincible then
+		GG.SetUnitInvincible(unitID, true)
+		Spring.SetUnitNeutral(unitID, true) 
+	elseif unitData.notAutoAttacked then
+		Spring.SetUnitNeutral(unitID, true) 
+	end
+	
+	if unitData.mapMarker then
+		if not x then
+			local ux, _, uz = Spring.GetUnitPosition(unitID)
+			x, z = ux, uz
+		end
+		SendToUnsynced("AddMarker", unitID, x, z, unitData.mapMarker.text, unitData.mapMarker.color)
+	end
+end
+
 local function PlaceUnit(unitData, teamID)
 	if unitData.difficultyAtLeast and (unitData.difficultyAtLeast > missionDifficulty) then
 		return
@@ -561,11 +581,7 @@ local function PlaceUnit(unitData, teamID)
 		}
 	end
 	
-	if unitData.mapMarker then
-		SendToUnsynced("AddMarker", unitID, x, z, unitData.mapMarker.text, unitData.mapMarker.color)
-	end
-	
-	AddInitialUnitObjectiveParameters(unitID, unitData)
+	SetupInitialUnitParameters(unitID, unitData, x, z)
 	
 	if build then
 		local _, maxHealth = Spring.GetUnitHealth(unitID)
@@ -780,6 +796,13 @@ local function PlaceTeamUnits(teamID, customKeys)
 	end
 end
 
+local function PlaceNeutralUnits(unitData)
+	local gaiaTeamID = Spring.GetGaiaTeamID() 
+	for i = 1, #unitData do
+		PlaceUnit(unitData[i], gaiaTeamID)
+	end
+end
+
 local function InitializeCommanderParameters(teamID, customKeys)
 	local commParameters = CustomKeyToUsefulTable(customKeys and customKeys.commanderparameters)
 	if not commParameters then
@@ -807,6 +830,11 @@ local function DoInitialUnitPlacement()
 		local teamID = teamList[i]
 		local customKeys = select(7, Spring.GetTeamInfo(teamID))
 		PlaceTeamUnits(teamID, customKeys)
+	end
+	
+	local neutralUnitsToSpawn = CustomKeyToUsefulTable(Spring.GetModOptions().neutralunitstospawn) or false
+	if neutralUnitsToSpawn then
+		PlaceNeutralUnits(neutralUnitsToSpawn)
 	end
 	
 	if commandsToGive then
@@ -1008,7 +1036,7 @@ function gadget:Load(zip)
 	-- Put the units back in the objectives
 	for oldUnitID, data in pairs(loadData.initialUnitData) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		AddInitialUnitObjectiveParameters(unitID, data)
+		SetupInitialUnitParameters(unitID, data)
 	end
 end
 
