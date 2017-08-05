@@ -26,6 +26,8 @@ local COMPARE = {
 }
 
 local alliedTrueTable = {allied = true}
+local publicTrueTable = {public = true}
+
 local CMD_INSERT = CMD.INSERT
 local PLAYER_ALLY_TEAM_ID = 0
 local PLAYER_TEAM_ID = 0
@@ -529,9 +531,11 @@ local function SetupInitialUnitParameters(unitID, unitData)
 	
 	if unitData.invincible then
 		GG.SetUnitInvincible(unitID, true)
+		Spring.SetUnitRulesParam(unitID, "ignoredByCircuitAI", 1, publicTrueTable)
 		Spring.SetUnitNeutral(unitID, true) 
 	elseif unitData.notAutoAttacked then
 		Spring.SetUnitNeutral(unitID, true) 
+		Spring.SetUnitRulesParam(unitID, "ignoredByCircuitAI", 1, publicTrueTable)
 	end
 	
 	if unitData.mapMarker then
