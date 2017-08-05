@@ -1387,7 +1387,7 @@ local function GetMultiUnitInfoPanel(parentControl)
 		y = 0,
 		right = GROUP_STATS_WIDTH,
 		bottom = 0,
-		padding = {-1,-1,0,0},
+		padding = {-1,1,0,0},
 		parent = parentControl,
 	}
 	
@@ -2192,7 +2192,7 @@ local function GetSelectionWindow()
 		y = 0,
 		right = 0,
 		bottom = 0,
-		padding = {8, 6, 4, 2},
+		padding = {8, 4, 4, 2},
 		backgroundColor = {1, 1, 1, options.selection_opacity.value},
 		OnMouseDown = {
 			function(self)
