@@ -22,7 +22,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local spDiffTimers = Spring.DiffTimers
 local spGetTimer = Spring.GetTimer
 
-local selectioRankCmdDesc = {
+local selectionRankCmdDesc = {
 	id      = CMD_SELECTION_RANK,
 	type    = CMDTYPE.ICON_MODE,
 	name    = 'Selection Rank',
@@ -185,6 +185,7 @@ local function GetDoubleClickUnitDefID(units)
 		end
 	else
 		firstClickTimer = false
+		firstClickUnitDefID = false
 	end
 end
 
@@ -321,6 +322,12 @@ function widget:Initialize()
 	WG.SelectionRank_GetFilteredSelection = GetFilteredSelection
 end
 
+function widget:MousePress(x, y, button)
+	if firstClickUnitDefID then
+		firstClickTimer = spGetTimer()
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Command Handling
@@ -337,8 +344,8 @@ function widget:CommandsChanged()
 	end
 	local rank = selectionRank[unitID] or defaultRank[unitDefID]
 	local customCommands = widgetHandler.customCommands
-	selectioRankCmdDesc.params[1] = rank
-	table.insert(customCommands, selectioRankCmdDesc)
+	selectionRankCmdDesc.params[1] = rank
+	table.insert(customCommands, selectionRankCmdDesc)
 end
 
 function widget:CommandNotify(id, params, options)
