@@ -5,9 +5,9 @@ unitDef = {
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 9,
-  buildingGroundDecalSizeY      = 9,
-  buildingGroundDecalType       = [[factorycloak_aoplane.png]],
+  buildingGroundDecalSizeX      = 7,
+  buildingGroundDecalSizeY      = 7,
+  buildingGroundDecalType       = [[factorycloak_aoplane.dds]],
 
   buildoptions                  = {
     [[cloakcon]],
@@ -31,8 +31,7 @@ unitDef = {
 
   customParams                  = {
     sortName       = [[1]],
-    solid_factory = 3,
-    default_spacing = 8,
+	default_spacing = 8,
   },
 
   energyUse                     = 0,
@@ -48,7 +47,7 @@ unitDef = {
   minCloakDistance              = 150,
   moveState        				= 1,
   noAutoFire                    = false,
-  objectName                    = [[factorycloak.s3o]],
+  objectName                    = [[cremfactory.s3o]],
   script                        = [[factorycloak.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
@@ -64,7 +63,7 @@ unitDef = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = "ooooooo ooooooo ooooooo ooooooo ccccccc ccccccc ccccccc",
+  yardMap                       = "ooooooo ooooooo ooooooo occccco occccco occccco occccco",
 
   featureDefs                   = {
 
@@ -73,7 +72,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 7,
       footprintZ       = 7,
-      object           = [[factorycloak_dead.s3o]],
+      object           = [[cremfactorywreck.s3o]],
     },
 
     HEAP  = {
