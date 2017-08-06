@@ -431,7 +431,7 @@ local icontypes = {
   spiderscout = {
     bitmap='icons/spiderscout.dds',
 	distance=0.75,
-    size=1.8,
+    size=1.7,
   },
   spiderraider = {
     bitmap='icons/spiderraider.dds',
@@ -464,6 +464,10 @@ local icontypes = {
   spidersupport = {
     bitmap='icons/spidersupport.dds',
     size=2.4,
+  },
+  spiderspecialscout = {
+    bitmap='icons/spiderspecialscout.dds',
+    size=2,
   },
   --tick
   spiderbomb = {
