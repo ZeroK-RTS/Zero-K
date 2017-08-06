@@ -22,22 +22,14 @@ unitDef = {
   canMove          = true,
   canPatrol        = true,
   category         = [[UNARMED FLOAT]],
-  collisionVolumeOffsets = [[0 3 -37]],
-  collisionVolumeScales  = [[120 20 48]],
-  collisionVolumeType    = [[Box]],
-  
-  selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[110 4 110]],
-  selectionVolumeType    = [[Box]],
   corpse           = [[DEAD]],
 
   customParams     = {
     sortName = [[8]],
-    solid_factory = 3,
-  	aimposoffset   = [[0 0 0]],
-	  midposoffset   = [[0 -25 0]],
-	  modelradius    = [[60]],
-	  default_spacing = 8,
+	aimposoffset   = [[0 0 0]],
+	midposoffset   = [[0 -25 0]],
+	modelradius    = [[60]],
+	default_spacing = 8,
   },
 
   energyUse        = 0,
@@ -54,15 +46,14 @@ unitDef = {
   minCloakDistance = 150,
   moveState        = 1,
   noAutoFire       = false,
-  objectName       = [[factoryhover.s3o]],
-  script           = [[factoryhover.lua]],
+  objectName       = [[ARMFHP.s3o]],
   selfDestructAs   = [[LARGE_BUILDINGEX]],
   showNanoSpray    = false,
   sightDistance    = 273,
   turnRate         = 0,
   waterline        = 1,
   workerTime       = 10,
-  yardMap          = [[oooooooo oooooooo oooooooo cccccccc cccccccc cccccccc cccccccc cccccccc]],
+  yardMap          = [[xoooooox ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo xoccccox]],
 
   featureDefs      = {
 
@@ -70,11 +61,8 @@ unitDef = {
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 8,
-      footprintZ       = 8,
-      collisionVolumeOffsets = [[0 3 -37]],
-      collisionVolumeScales  = [[120 20 48]],
-      collisionVolumeType    = [[Box]],
-      object           = [[factoryhover_dead.s3o]],
+      footprintZ       = 7,
+      object           = [[ARMFHP_DEAD.s3o]],
     },
 
 
