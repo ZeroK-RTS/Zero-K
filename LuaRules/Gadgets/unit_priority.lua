@@ -700,19 +700,19 @@ end
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("mreserve:",1,true) then
 		local _,_,spec,teamID = spGetPlayerInfo(playerID)
-		local amount = msg:sub(10)
+		local amount = tonumber(msg:sub(10))
 		if spec or (not teamID) or (not amount) then
 			return
 		end
-		SetMetalReserved(teamID, amount*1)
+		SetMetalReserved(teamID, amount)
 	end	
 	if msg:find("ereserve:",1,true) then
 		local _,_,spec,teamID = spGetPlayerInfo(playerID)
-		local amount = msg:sub(10)
+		local amount = tonumber(msg:sub(10))
 		if spec or (not teamID) or (not amount) then
 			return
 		end
-		SetEnergyReserved(teamID, amount*1)
+		SetEnergyReserved(teamID, amount)
 	end
 end
 
