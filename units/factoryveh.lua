@@ -9,7 +9,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 8,
   buildingGroundDecalSizeY      = 8,
-  buildingGroundDecalType       = [[factoryveh_decal.png]],
+  buildingGroundDecalType       = [[factoryveh_aoplane.dds]],
 
   buildoptions                  = {
     [[vehcon]],
@@ -32,7 +32,6 @@ unitDef = {
 
   customParams                  = {
     sortName       = [[2]],
-    solid_factory = 4,
 	default_spacing = 8,
   },
 
@@ -51,15 +50,14 @@ unitDef = {
   minCloakDistance              = 150,
   moveState        				= 1,
   noAutoFire                    = false,
-  objectName                    = [[factoryveh.s3o]],
-  script                        = [[factoryveh.lua]],
+  objectName                    = [[corvp.s3o]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = "ooooooo ooooooo ooooooo ccccccc ccccccc ccccccc ccccccc",
+  yardMap                       = "yyoooyy yoooooy ooooooo occccco occccco occccco occccco",
 
   featureDefs                   = {
 
@@ -68,7 +66,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 7,
       footprintZ       = 7,
-      object           = [[factoryveh_dead.s3o]],
+      object           = [[corvp_dead.s3o]],
     },
 
 
