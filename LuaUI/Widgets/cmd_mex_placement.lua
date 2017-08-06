@@ -149,6 +149,7 @@ options = {
 local mexDefID = UnitDefNames["staticmex"].id
 local lltDefID = UnitDefNames["turretlaser"].id
 local solarDefID = UnitDefNames["energysolar"].id
+local windDefID = UnitDefNames["energywind"].id
 
 local mexUnitDef = UnitDefNames["staticmex"]
 local mexDefInfo = {
@@ -376,10 +377,11 @@ function widget:CommandNotify(cmdID, params, options)
 						local xx = x+addon[1]
 						local zz = z+addon[2]
 						local yy = Spring.GetGroundHeight(xx, zz)
+						local buildDefID = (Spring.TestBuildOrder(solarDefID, xx, yy, zz, 0) == 0 and windDefID) or solarDefID
 
 						-- check if some other widget wants to handle the command before sending it to units.
-						if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-solarDefID, {xx, yy, zz, 0}, options, true) then
-							commandArrayToIssue[#commandArrayToIssue+1] = {-solarDefID, {xx,yy,zz,0}, {"shift"}}
+						if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-buildDefID, {xx, yy, zz, 0}, options, true) then
+							commandArrayToIssue[#commandArrayToIssue+1] = {-buildDefID, {xx,yy,zz,0}, {"shift"}}
 						end
 					end
 				end
