@@ -150,6 +150,7 @@ end
 local goodCommand = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_BUILD] = true,
 	[CMD.WAIT] = true,
 	[CMD.SET_WANTED_MAX_SPEED] = true,
 	[CMD.GUARD] = true,
