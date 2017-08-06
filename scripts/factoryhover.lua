@@ -1,30 +1,16 @@
---by Andrew Rapp (luckywaldo7)
-
 include "constants.lua"
 
 local spGetUnitTeam = Spring.GetUnitTeam
 
---pieces
 local base = piece "base"
-
-local wing_2 = piece "wing_2"
-local bay_2 = piece "bay_2"
-local arm_2 = piece "arm_2"
-local nano_2 = piece "nano_2"
-local emit_2 = piece "emit_2"
-local pow_2 = piece "pow_2"
-
-local pipes = piece "pipes"
-
-local blink_1 = piece "blink_1"
-local blink_2 = piece "blink_2"
-
-local pad = piece "pad"
-
+local gate_r = piece "gate_r"
+local nano = piece "nano"
+local beam1 = piece "beam1"
+local beam2 = piece "beam2"
 
 --local vars
-local nanoPieces = {emit_2}
-local smokePiece = { blink_1, blink_2, wing_2 }
+local nanoPieces = {nano, beam1, beam2}
+local smokePiece = { beam1, beam2 }
 
 local animSpeed = 4
 
@@ -34,20 +20,10 @@ local function Open()
 	Signal(SIG_ANIM)
 	SetSignalMask(SIG_ANIM)
 
-	Turn(wing_2, x_axis, -1.57, animSpeed)
-	WaitForTurn(wing_2, x_axis)
-
-	Turn(bay_2, x_axis, 1.57, animSpeed)
-	WaitForTurn(bay_2, x_axis)
-
-	Turn(arm_2, x_axis, 2.25, animSpeed)
-	Turn(nano_2, x_axis, -1.85, animSpeed)
-	WaitForTurn(nano_2, x_axis)
-
-	Turn(pow_2, x_axis, 1.57, animSpeed)
-	WaitForTurn(pow_2, x_axis)
-
-	Sleep(300/animSpeed)
+	Turn (gate_r, x_axis, math.rad(-90), math.rad(135))
+	Sleep (500)
+	Move (nano, y_axis, 7.5, 15)
+	WaitForTurn (gate_r, x_axis)
 
 	SetUnitValue(COB.YARD_OPEN, 1)
 	SetUnitValue(COB.BUGGER_OFF, 1)
@@ -62,17 +38,9 @@ local function Close()
 	SetUnitValue(COB.BUGGER_OFF, 0)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 
-	Turn(pow_2, x_axis, 0, animSpeed)
-	WaitForTurn(pow_2, x_axis)
-
-	Turn(arm_2, x_axis, 0, animSpeed)
-	Turn(nano_2, x_axis, 0, animSpeed)
-	WaitForTurn(arm_2, x_axis)
-
-	Turn(bay_2, x_axis, 0, animSpeed)
-	WaitForTurn(bay_2, x_axis)
-
-	Turn(wing_2, x_axis, 0, animSpeed)
+	Move (nano, y_axis, 0, 15)
+	Sleep(200)
+	Turn (gate_r, x_axis, 0, math.rad(135))
 end
 
 function script.Create()
@@ -80,9 +48,12 @@ function script.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
+local beam_id = 1
 function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,spGetUnitTeam(unitID),emit_2)
-	return emit_2
+	beam_id = (beam_id % 3) + 1
+	local beam = nanoPieces[beam_id]
+	GG.LUPS.QueryNanoPiece(unitID,unitDefID,spGetUnitTeam(unitID),beam)
+	return beam
 end
 
 function script.Activate ()
@@ -94,10 +65,10 @@ function script.Deactivate ()
 end
 
 function script.QueryBuildInfo()
-	return pad
+	return base
 end
 
-local explodables = {wing_2, bay_2, arm_2, nano_2, pow_2}
+local explodables = {gate_r, beam1, beam2} -- baw baw not enough real pieces, needs to use fake ones
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	local brutal = (severity > 0.5)
