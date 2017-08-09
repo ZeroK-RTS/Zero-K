@@ -241,7 +241,9 @@ local function LoadGameByFilename(filename)
 	else
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Save game " .. filename .. " not found")
 	end
-	saveFilenameEdit:SetText(filename)
+	if saveFilenameEdit then
+		saveFilenameEdit:SetText(filename)
+	end
 end
 
 local function DeleteSave(filename)
