@@ -539,11 +539,10 @@ local function SetupInitialUnitParameters(unitID, unitData)
 	end
 	
 	if unitData.mapMarker then
-		if not x then
-			local ux, _, uz = Spring.GetUnitPosition(unitID)
-			x, z = ux, uz
+		local ux, _, uz = Spring.GetUnitPosition(unitID)
+		if ux then
+			SendToUnsynced("AddMarker", unitID, ux, uz, unitData.mapMarker.text, unitData.mapMarker.color)
 		end
-		SendToUnsynced("AddMarker", unitID, x, z, unitData.mapMarker.text, unitData.mapMarker.color)
 	end
 end
 
