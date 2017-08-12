@@ -908,7 +908,7 @@ local behaviourConfig = {
 	
 	-- med range skirms
 	["cloakskirm"] = {
-		skirms = medRangeSkirmieeArray, 
+		skirms = Union(medRangeSkirmieeArray, NameToDefID({"turretriot"})), 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		fightOnlyUnits = medRangeExplodables,
