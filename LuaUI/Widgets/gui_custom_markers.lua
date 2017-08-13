@@ -22,8 +22,7 @@ local highlightLineMax = 40
 local edgeMarkerSize = 16
 local lineWidth = 2
 local maxAlpha = 1
-local fontSize = 24
-local fontSizeLarge = 32
+local fontSize = 32
 local circleFreq = 1
 local circleUpdateFreq = 0.01
 local circleRadius = 150
@@ -43,6 +42,32 @@ local colorPresets = {
 	red = {1, 0.2, 0.2},
 	green = {0.2, 1, 0.2},
 	blue = {0.2, 0.2, 1},
+}
+
+--[[
+-- supported parameters (for both presets and manual args):
+-- color
+-- fontSize	(note: offscreen arrow's text size is hardcoded to 2/3 normal font size)
+-- showArrow [default true]
+-- scaleTextSize (draws text in world instead of on screen) [default false]
+-- noSmoke [default false]
+
+-- technically position, text and even expiry frame can be enforced too but why would you do that?
+]]
+
+local stylePresets = {
+  --[[
+  examplePreset = {
+	color = {0.2, 0.7, 0.1},
+	fontSize = 24,
+	showArrow = false,
+	noSmoke = true,
+	scaleTextSize = true,
+  }
+  ]]
+  small = {
+	fontSize = 24,
+  }
 }
 
 ----------------------------------------------------------------
@@ -67,6 +92,9 @@ local GL_TRIANGLES = GL.TRIANGLES
 local GL_LINE = GL.LINE
 local GL_FRONT_AND_BACK = GL.FRONT_AND_BACK
 local GL_FILL = GL.FILL
+
+local EMPTY_TABLE = {}
+local WHITE = {1, 1, 1, 1}
 
 ----------------------------------------------------------------
 --Lups definition
@@ -138,16 +166,35 @@ local function RemovePoint(id)
 	mapPoints[id] = nil
 end
 
-local function AddPoint(id, x, z, text, color)
+local function AddPoint(id, x, z, text, params)
 	if mapPoints[id] then
 		RemovePoint(id)
 	end
 	
-	color = color or {1, 1, 1}
+	-- reverse compatibility: params can be a color table
+	local isColorArg = (#params == 3) or (#params == 4)
+	
+	local color = WHITE
+	if isColorArg then
+	  color = params
+	end
+	
 	local expiration = (timeNow or 0) + ttl
 	local y = Spring.GetGroundHeight(x, z)
 	
-	mapPoints[id] = {color = color, x = x, y = y, z = z, text = text, expiration = expiration, fx = fx}
+	local pointData = {color = color, x = x, y = y, z = z, text = text, expiration = expiration}
+	
+	-- merge params (preset or manual) into pointData
+	local toMerge = EMPTY_TABLE
+	if type(params) == "string" then
+	  toMerge = stylePresets[params] or EMPTY_TABLE
+	elseif type(params) == "table" and (not isColorArg) then
+	  toMerge = params
+	end
+	
+	pointData = Spring.Utilities.MergeTable(toMerge, pointData, true)
+	
+	mapPoints[id] = pointData
 end
 
 local function AddPointPresetColor(id, x, z, text, color)
@@ -205,6 +252,19 @@ local function DrawCircle(circle)
 	gl.PopMatrix()
 end
 
+local function DrawBillboardedText(point)
+	if not Spring.IsSphereInView(point.x, point.y, point.z, 250) then
+		return
+	end
+	glColor(point.color[1], point.color[2], point.color[3], alpha)
+	gl.PushMatrix()
+	gl.Translate(point.x, point.y + 32, point.z )
+	gl.Billboard()
+	local cChar = GetColorChar(point.color)
+	glText(cChar..point.text.."\008", 0, 16, point.fontSize or fontSize, 'cno')
+	gl.PopMatrix()  
+end
+
 ----------------------------------------------------------------
 --callins
 ----------------------------------------------------------------
@@ -228,7 +288,9 @@ function widget:Initialize()
 	widgetHandler:RegisterGlobal('RemoveCustomMapMarker', RemovePoint)
 	
 	-- debug
-	--WG.CustomMarker.AddPoint("newPoint", Game.mapSizeX/2, Game.mapSizeZ/2, "Custom marker", {0, 1, 0.5, 1})
+	--WG.CustomMarker.AddPoint("newPoint", Game.mapSizeX/2, Game.mapSizeZ/2, "Custom marker", "examplePreset")
+	--WG.CustomMarker.AddPoint("newPoint2", Game.mapSizeX/2 + 300, Game.mapSizeZ/2 - 300, "Custom marker 2", {1, 0.5, 1})
+	--WG.CustomMarker.AddPoint("newPoint3", Game.mapSizeX/2 - 300, Game.mapSizeZ/2 + 300, "Custom marker 3", {fontSize = 48, color = {0, 0.2, 1}})
 end
 
 function widget:Shutdown()
@@ -240,23 +302,27 @@ function widget:Shutdown()
 	widgetHandler:DeregisterGlobal('RemoveCustomMapMarker', RemovePoint)
 end
 
+-- update smoke
 function widget:GameFrame(f)
 	if Lups and f%10 == 0 then
 		local wx, wy, wz = Spring.GetWind()
 		wx, wy, wz = wx*0.05, wy*0.05, wz*0.05
 		smokeFX.force = {wx,wy+2,wz}
 		for id,point in pairs(mapPoints) do
-			local color = point.color
-			smokeFX.pos     = {point.x, point.y, point.z}
-			smokeFX.partpos = "r*sin(alpha),0,r*cos(alpha) | alpha=rand()*2*pi, r=rand()*20"
-			smokeFX.colormap[2] = { color[1], color[2], color[3], smokeFX.colormap[2][4]}
-			smokeFX.colormap[3] = { color[1], color[2], color[3], smokeFX.colormap[3][4]}
-			smokeFX.texture = "bitmaps/smoke/smoke0" .. math.random(1,9) .. ".tga"
-			Lups.AddParticles('SimpleParticles2',smokeFX)
+			if not point.noSmoke then
+				local color = point.color
+				smokeFX.pos     = {point.x, point.y, point.z}
+				smokeFX.partpos = "r*sin(alpha),0,r*cos(alpha) | alpha=rand()*2*pi, r=rand()*20"
+				smokeFX.colormap[2] = { color[1], color[2], color[3], smokeFX.colormap[2][4]}
+				smokeFX.colormap[3] = { color[1], color[2], color[3], smokeFX.colormap[3][4]}
+				smokeFX.texture = "bitmaps/smoke/smoke0" .. math.random(1,9) .. ".tga"
+				Lups.AddParticles('SimpleParticles2',smokeFX)
+			end
 		end
 	end
 end
 
+-- draw rings, scaling text
 function widget:DrawWorldPreUnit()
 	glLineWidth(4)
 	gl.DepthTest(false)
@@ -265,28 +331,34 @@ function widget:DrawWorldPreUnit()
 		local circle = circles[i]
 		DrawCircle(circle)
 	end
+	for id,point in pairs(mapPoints) do
+	  if point.text and point.scaleTextSize then
+		DrawBillboardedText(point)
+	  end
+	end
 	glLineWidth(1)
 	gl.DepthTest(true)
 	gl.Color(1,1,1,1)
 	--gl.LineStipple(false)
 end
 
+-- draw non-scaling text and offscreen markers
 function widget:DrawScreen()
 	if (not on) then return end
 	
 	glLineWidth(lineWidth)
 	
 	for id,point in pairs(mapPoints) do
+		local fontSizeLocal = point.fontSize or fontSize
 		local alpha = maxAlpha * (point.expiration - timeNow) / ttl
 		if (alpha <= 0) then
 			mapPoints[id] = nil
 		else
-			local sx, sy, sz = WorldToScreenCoords(point.x, point.y, point.z)
+			local sx, sy, sz = WorldToScreenCoords(point.x, point.y + 32, point.z)
 			glColor(point.color[1], point.color[2], point.color[3], alpha)
-			if (sx >= 0 and sy >= 0
-					and sx <= vsx and sy <= vsy) then
+			if (sx >= 0 and sy >= 0	and sx <= vsx and sy <= vsy) then
 				--in screen
-				--[[
+				--[[	-- draw a targeting box
 				local vertices = {
 					{v = {sx, sy - highlightLineMin, 0}},
 					{v = {sx, sy - highlightLineMax, 0}},
@@ -302,10 +374,11 @@ function widget:DrawScreen()
 				glShape(GL_LINES, vertices)
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 				]]
-				if point.text then
-					glText(GetColorChar(point.color)..point.text.."\008", sx, sy + 16, fontSizeLarge, 'cno')
+				if point.text and (not point.scaleTextSize) then
+					local cChar = GetColorChar(point.color)
+					glText(cChar..point.text.."\008", sx, sy + 16, fontSizeLocal, 'cno')
 				end
-			else
+			elseif point.showArrow ~= false then
 				--out of screen
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 				--flip if behind screen
@@ -316,6 +389,8 @@ function widget:DrawScreen()
 				local xRatio = sMidX / abs(sx - sMidX)
 				local yRatio = sMidY / abs(sy - sMidY)
 				local edgeDist, vertices, textX, textY, textOptions
+				local smallFontSize = math.floor(fontSizeLocal * 2 / 3 + 0.5)
+				
 				if (xRatio < yRatio) then
 					edgeDist = (sy - sMidY) * xRatio + sMidY
 					if (sx > 0) then
@@ -325,7 +400,7 @@ function widget:DrawScreen()
 							{v = {vsx - edgeMarkerSize, edgeDist - edgeMarkerSize, 0}},
 						}
 						textX = vsx - edgeMarkerSize
-						textY = edgeDist - fontSize * 0.5
+						textY = edgeDist - smallFontSize * 0.5
 						textOptions = "rn"
 					else
 						vertices = {
@@ -334,7 +409,7 @@ function widget:DrawScreen()
 							{v = {edgeMarkerSize, edgeDist + edgeMarkerSize, 0}},
 						}
 						textX = edgeMarkerSize
-						textY = edgeDist - fontSize * 0.5
+						textY = edgeDist - smallFontSize * 0.5
 						textOptions = "n"
 					end
 				else
@@ -346,7 +421,7 @@ function widget:DrawScreen()
 							{v = {edgeDist + edgeMarkerSize, vsy - edgeMarkerSize, 0}},
 						}
 						textX = edgeDist
-						textY = vsy - edgeMarkerSize - fontSize
+						textY = vsy - edgeMarkerSize - smallFontSize
 						textOptions = "cn"
 					else
 						vertices = {
@@ -361,7 +436,8 @@ function widget:DrawScreen()
 				end
 				glShape(GL_TRIANGLES, vertices)
 				if point.text then
-					glText(GetColorChar(point.color)..point.text.."\008", textX, textY, fontSize, textOptions .. 'o')
+					local cChar = GetColorChar(point.color)
+					glText(cChar..point.text.."\008", textX, textY, smallFontSize, textOptions .. 'o')
 				end
 			end
 		end
@@ -379,6 +455,7 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 	sMidY = viewSizeY * 0.5
 end
 
+-- handle points' rings
 local ringPeriod = 0
 local ringUpdatePeriod = 0
 function widget:Update(dt)
