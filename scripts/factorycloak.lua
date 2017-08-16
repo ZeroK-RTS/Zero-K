@@ -2,50 +2,42 @@ include "constants.lua"
 
 -- pieces
 local base = piece "base"
-local pad = piece "pad"
-local doorl = piece "doorl"
-local doorr = piece "doorr"
-local roofl = piece "roofl"
-local roofr = piece "roofr"
+local door = piece "door"
 local arm1 = piece "arm1"
 local arm2 = piece "arm2"
 local claw1 = piece "claw1"
 local claw2 = piece "claw2"
-local pipesr = piece "pipesr"
+local lid1 = piece "lid1"
+local lid2 = piece "lid2"
+local pipesh1 = piece "pipeh1"
+local pipesh2 = piece "pipeh2"
 local pipesl = piece "pipesl"
+local pipesr = piece "pipesr"
 
 -- action pieces
 local nanoPieces = { claw1 }
-local smokePiece = { doorl, doorr, roofr, roofl, arm1, arm2 }
+local smokePiece = { door, arm1, arm2 }
 
 local function Open ()
 	SetSignalMask (1)
 
 	-- move the pieces
-	Turn (roofl, z_axis, math.rad(-90), math.rad(90))
-	Turn (roofr, z_axis, math.rad(90), math.rad(90))
-	Turn (doorl, y_axis, math.rad(90), math.rad(150))
-	Turn (doorr, y_axis, math.rad(-90), math.rad(150))
+	Move (door, y_axis, -30, 15)
+	Turn (lid1, z_axis, math.rad( 90), math.rad(45))
+	Turn (lid2, z_axis, math.rad(-90), math.rad(45))
 	
 	Turn (arm1, x_axis, math.rad(20), math.rad(50))
 	Turn (arm2, x_axis, math.rad(-75), math.rad(50))
 
-	Move (pipesl, x_axis, -18.5, 18.5)
-	Move (pipesr, x_axis, 18.5, 18.5)
-	Move (pipesl, y_axis, 22, 22)
-	Move (pipesr, y_axis, 22, 22)
+	Move (pipesl, y_axis, 0, 20)
+	Move (pipesr, y_axis, 0, 20)
 
 	-- wait for them to move
-	WaitForTurn (roofl, z_axis)
-	WaitForTurn (roofr, z_axis)
-	WaitForTurn (doorl, y_axis)
-	WaitForTurn (doorr, y_axis)
+	WaitForMove (door, y_axis)
 	
 	WaitForTurn (arm1, x_axis)
 	WaitForTurn (arm2, x_axis)
-		
-	WaitForMove (pipesl, x_axis)
-	WaitForMove (pipesr, x_axis)
+
 	WaitForMove (pipesl, y_axis)
 	WaitForMove (pipesr, y_axis)
 
@@ -64,24 +56,23 @@ local function Close()
 	SetUnitValue (COB.INBUILDSTANCE, 0)
 
 	-- move pieces back to original spots
-	Turn (roofl, z_axis, 0, math.rad(30))
-	Turn (roofr, z_axis, 0, math.rad(30))
-	Turn (doorl, y_axis, 0, math.rad(50))
-	Turn (doorr, y_axis, 0, math.rad(50))
+	Move (door, y_axis, 0, 15)
+	Turn (lid1, z_axis, 0, math.rad(45))
+	Turn (lid2, z_axis, 0, math.rad(45))
 
 	Turn (arm1, x_axis, 0, math.rad(50))
 	Turn (arm2, x_axis, 0, math.rad(50))
 
-	Move (pipesl, x_axis, 0, 3.7)
-	Move (pipesr, x_axis, 0, 3.7)
-	Move (pipesl, y_axis, 0, 4.4)
-	Move (pipesr, y_axis, 0, 4.4)
+	Move (pipesl, y_axis, 35, 20)
+	Move (pipesr, y_axis, 35, 20)
 
 end
 
 function script.Create()
-	Turn (pipesl, z_axis, math.rad(40))
-	Turn (pipesr, z_axis, math.rad(-40))
+	Turn (pipesh1, z_axis, math.rad(-56))
+	Turn (pipesh2, z_axis, math.rad( 56))
+	Move (pipesl, y_axis, 35)
+	Move (pipesr, y_axis, 35)
 
 	StartThread (SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
@@ -101,35 +92,24 @@ function script.Deactivate ()
 end
 
 function script.QueryBuildInfo ()
-	return pad
+	return base
 end
 
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
+	local brutal = (severity > 0.5)
 
-	if (severity <= .5) then
-		Explode (base, SFX.SHATTER)
-		Explode (doorr, SFX.SHATTER)
-		Explode (doorl, SFX.SHATTER)
-		Explode (roofl, SFX.SHATTER)
-		Explode (roofr, SFX.SHATTER)
-		
+	local explodables = {arm1, arm2, claw1, claw2, door}
+	for i = 1, #explodables do
+		if (2 * severity) > math.random() then
+			Explode(explodables[i], sfxExplode + (brutal and (sfxSmoke + sfxFire + sfxExplodeOnHit) or 0))
+		end
+	end
+
+	if not brutal then
 		return 1
 	else
-		Explode (base, SFX.SHATTER)
-		Explode (arm1, SFX.SMOKE + SFX.FALL + SFX.FIRE)
-		Explode (arm2, SFX.SMOKE + SFX.FALL + SFX.FIRE)
-		Explode (claw1, SFX.SMOKE + SFX.FALL + SFX.FIRE)
-		Explode (claw2, SFX.SMOKE + SFX.FALL + SFX.FIRE)
-		Explode (pipesl, SFX.SMOKE + SFX.FALL + SFX.FIRE)
-		Explode (pipesr, SFX.SMOKE + SFX.FALL + SFX.FIRE)
-
-		-- giblets
-		Explode (doorr, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-		Explode (doorl, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-		Explode (roofl, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-		Explode (roofr, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-
+		Explode (base, sfxShatter)
 		return 2
 	end
 end
