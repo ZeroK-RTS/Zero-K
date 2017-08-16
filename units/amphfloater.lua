@@ -32,7 +32,6 @@ unitDef = {
   maxVelocity            = 1.4,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT3]],
-  moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName             = [[can.s3o]],
   script                 = [[amphfloater.lua]],

@@ -30,7 +30,6 @@ unitDef = {
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[KBOT3]],
-  moveState           = 0,
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[shieldfelon.s3o]],
   onoffable           = false,

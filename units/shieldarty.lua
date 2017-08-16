@@ -28,7 +28,6 @@ unitDef = {
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
-  moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP UNARMED]],
   objectName             = [[dominator.s3o]],
   script                 = [[shieldarty.lua]],

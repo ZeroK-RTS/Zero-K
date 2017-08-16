@@ -36,7 +36,6 @@ unitDef = {
   minCloakDistance       = 350,
   minWaterDepth          = 10,
   movementClass          = [[BOAT3]],
-  moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[shipskirm.s3o]],
