@@ -646,7 +646,7 @@
     },
     "athena": {
         "name": "Athena",
-        "description": "Konstruktor specjalistyczny, moc 7.5 m/s",
+        "description": "Konstruktor specjalistyczny, moc 15 m/s",
         "helptext": "Athena to technologiczne cacko wyposażone w niewidzialność, zakłócacz radaru i możliwość odbudowy jednostek bezpośrednio ze złomu. Ponadto jest w stanie budować jednostki na polu bitwy bez użycia fabryki i działać jak normalny konstruktor."
     },
     "staticsonar": {

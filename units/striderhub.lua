@@ -13,16 +13,17 @@ unitDef = {
   buildingGroundDecalType       = [[striderhub_aoplane.dds]],
 
   buildoptions                  = {
+    [[athena]],
     [[striderantiheavy]],
-	[[striderscorpion]],
+    [[striderscorpion]],
     [[striderdante]],
     [[striderarty]],
     [[striderfunnelweb]],
     [[striderbantha]],
     [[striderdetriment]],
     [[shipheavyarty]],
-	[[shipcarrier]],
-	[[subtacmissile]],
+    [[shipcarrier]],
+    [[subtacmissile]],
   },
 
   buildPic                      = [[striderhub.png]],
