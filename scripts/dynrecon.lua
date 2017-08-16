@@ -338,7 +338,7 @@ end
 
 function script.Create()
 	dyncomm.Create()
-	sizeSpeedMult = dyncomm.GetPace()*SPEED_MULT
+	sizeSpeedMult = (1 - (1 - dyncomm.GetPace())/2.5) *SPEED_MULT
 	--alert to dirt
 	Turn(armhold, x_axis, math.rad(-45), math.rad(250)) --upspring at -45
 	Turn(ruparm, x_axis, 0, math.rad(250)) 
