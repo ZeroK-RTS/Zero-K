@@ -29,20 +29,14 @@ unitDef = {
   canMove                       = true,
   canPatrol                     = true,
   category                      = [[SINK UNARMED]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[88 70 54]],
-  collisionVolumeType           = [[box]],
-  selectionVolumeOffsets        = [[0 0 16]],
-  selectionVolumeScales         = [[88 70 88]],
-  selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    description_fr = [[Produit des Robots d'Infanterie L. une vitesse de 10 m/s]],
+	description_de = [[Produziert zähe Roboter, Baut mit 10 M/s]],
+    helptext       = [[The Shield Bot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer]],
+	helptext_de    = [[Die Shield Bot Factory ist robust aber flexibel. Diese Einheiten werden gebaut, um all die Schmerzen auf sich zu nehmen und wieder zu verteilen, aber ohne Kompromisse bei der Mobilität. Schlauer Einsatz von Einheitenkombos wird gut belohnt. Wichtigste Einheiten: Bandit, Thug, Outlaw, Roach, Dirtbag]],
     sortName       = [[1]],
-    aimposoffset   = [[0 0 -16]],
-    midposoffset   = [[0 0 -16]],
-	solid_factory = [[3]],
-	default_spacing = 8,
   },
 
   energyUse                     = 0,
@@ -67,7 +61,7 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = [[oooooo oooooo oooooo cccccc cccccc cccccc]],
+  yardMap                       = [[oooooo occcco occcco occcco occcco occcco]],
 
   featureDefs                   = {
 
