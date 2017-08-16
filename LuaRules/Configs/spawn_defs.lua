@@ -193,8 +193,10 @@ difficulties = {
 		queenName        = "chicken_dragon",
 		queenMorphName   = '',
 		miniQueenName    = "chicken_tiamat",
-		maxBurrows       = 6,
+		maxBurrows       = 4,
 		specialPowers    = {},
+		techAccelPerPlayer = 1.3,
+		techTimeFloorFactor = 0.2,
 		scoreMult        = 0.12,
 	},
 	
@@ -209,8 +211,10 @@ difficulties = {
 		queenName		= "chicken_dragon",
 		queenMorphName	 = '',
 		miniQueenName	 = "chicken_tiamat",
-		maxBurrows	   = 12,
+		maxBurrows	   = 10,
 		specialPowers	 = {},
+		techAccelPerPlayer = 2,
+		techTimeFloorFactor = 0.4,
 		scoreMult		 = 0.25,
 	},
 
