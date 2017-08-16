@@ -7,8 +7,8 @@ unitDef = {
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 7,
-  buildingGroundDecalSizeY      = 7,
+  buildingGroundDecalSizeX      = 12,
+  buildingGroundDecalSizeY      = 12,
   buildingGroundDecalType       = [[factoryshield_aoplane.dds]],
 
   buildoptions                  = {
@@ -37,12 +37,14 @@ unitDef = {
     helptext       = [[The Shield Bot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer]],
 	helptext_de    = [[Die Shield Bot Factory ist robust aber flexibel. Diese Einheiten werden gebaut, um all die Schmerzen auf sich zu nehmen und wieder zu verteilen, aber ohne Kompromisse bei der Mobilität. Schlauer Einsatz von Einheitenkombos wird gut belohnt. Wichtigste Einheiten: Bandit, Thug, Outlaw, Roach, Dirtbag]],
     sortName       = [[1]],
+    midposoffset   = [[0 0 -24]],
+    solid_factory  = [[6]],
   },
 
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 6,
-  footprintZ                    = 6,
+  footprintZ                    = 9,
   iconType                      = [[facwalker]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -51,7 +53,7 @@ unitDef = {
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
-  moveState        				= 1,
+  moveState                     = 1,
   noAutoFire                    = false,
   objectName                    = [[factory.s3o]],
   script                        = "factoryshield.lua",
@@ -61,7 +63,7 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = [[oooooo occcco occcco occcco occcco occcco]],
+  yardMap                       = [[oooooo occcco occcco occcco occcco occcco yyyyyy yyyyyy yyyyyy]],
 
   featureDefs                   = {
 
