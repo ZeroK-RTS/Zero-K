@@ -1,19 +1,19 @@
 
 function gadget:GetInfo()
-  return {
-	name 	= "Tactical Unit AI",
-	desc	= "Implements tactial AI for some units. Uses commands.",
-	author	= "Google Frog",
-	date	= "April 20 2010",
-	license	= "GNU GPL, v2 or later",
-	layer	= 0,
-	enabled = true,
-  }
+	return {
+		name     = "Tactical Unit AI",
+		desc    = "Implements tactial AI for some units. Uses commands.",
+		author    = "Google Frog",
+		date    = "April 20 2010",
+		license    = "GNU GPL, v2 or later",
+		layer    = 0,
+		enabled = true,
+	}
 end
 
 --------------------------------------------------------------------------------
 if (not gadgetHandler:IsSyncedCode()) then
-  return false  --  no unsynced code
+	return false  --  no unsynced code
 end
 
 
@@ -21,24 +21,24 @@ end
 -- Speedups
 
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
-local spGetCommandQueue		= Spring.GetCommandQueue
-local spGetUnitDefID		= Spring.GetUnitDefID	
-local spGetUnitPosition		= Spring.GetUnitPosition
-local spGetUnitVelocity		= Spring.GetUnitVelocity
-local spGiveOrderToUnit		= Spring.GiveOrderToUnit
+local spGetCommandQueue     = Spring.GetCommandQueue
+local spGetUnitDefID        = Spring.GetUnitDefID
+local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetUnitVelocity     = Spring.GetUnitVelocity
+local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
-local spGetUnitSeparation 	= Spring.GetUnitSeparation
-local spEditUnitCmdDesc 	= Spring.EditUnitCmdDesc
-local spFindUnitCmdDesc		= Spring.FindUnitCmdDesc
-local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
-local spGetUnitLosState		= Spring.GetUnitLosState
-local spGetUnitStates		= Spring.GetUnitStates
-local spValidUnitID			= Spring.ValidUnitID
+local spGetUnitSeparation   = Spring.GetUnitSeparation
+local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
+local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
+local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
+local spGetUnitLosState     = Spring.GetUnitLosState
+local spGetUnitStates       = Spring.GetUnitStates
+local spValidUnitID         = Spring.ValidUnitID
 local spGetUnitIsStunned    = Spring.GetUnitIsStunned
-local spGetUnitRulesParam	= Spring.GetUnitRulesParam
+local spGetUnitRulesParam   = Spring.GetUnitRulesParam
 local spGetUnitWeaponState  = Spring.GetUnitWeaponState
-local random 				= math.random
-local sqrt 					= math.sqrt
+local random                = math.random
+local sqrt                  = math.sqrt
 local min                   = math.min
 
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
@@ -61,14 +61,14 @@ local unitAIBehaviour = {}
 --------------------------------------------------------------------------------
 -- Commands
 
-local CMD_MOVE			= CMD.MOVE
-local CMD_ATTACK		= CMD.ATTACK
-local CMD_FIGHT			= CMD.FIGHT
-local CMD_WAIT			= CMD.WAIT
-local CMD_OPT_INTERNAL 	= CMD.OPT_INTERNAL
-local CMD_OPT_RIGHT 	= CMD.OPT_RIGHT
-local CMD_INSERT 		= CMD.INSERT
-local CMD_REMOVE 		= CMD.REMOVE
+local CMD_MOVE         = CMD.MOVE
+local CMD_ATTACK       = CMD.ATTACK
+local CMD_FIGHT        = CMD.FIGHT
+local CMD_WAIT         = CMD.WAIT
+local CMD_OPT_INTERNAL = CMD.OPT_INTERNAL
+local CMD_OPT_RIGHT    = CMD.OPT_RIGHT
+local CMD_INSERT       = CMD.INSERT
+local CMD_REMOVE       = CMD.REMOVE
 
 include("LuaRules/Configs/customcmds.h.lua")
 
@@ -77,8 +77,8 @@ local unitAICmdDesc = {
 	type    = CMDTYPE.ICON_MODE,
 	name    = 'Unit AI',
 	action  = 'unitai',
-	tooltip	= 'Toggles smart unit AI for the unit',
-	params 	= {0, 'AI Off','AI On'}
+	tooltip = 'Toggles smart unit AI for the unit',
+	params  = {0, 'AI Off','AI On'}
 }
 --------------------------
 ---- Unit AI
@@ -123,9 +123,8 @@ local function getUnitOrderState(unitID,data,cQueue)
 		elseif (cQueue[1].id == 16) then --  if I target the ground and have fight or patrol command
 			return -1, false
 		end
-	  
-    elseif (cQueue[1].id == CMD_MOVE or cQueue[1].id == CMD_RAW_MOVE) and #cQueue > 1 then -- if I am moving
-	
+	elseif (cQueue[1].id == CMD_MOVE or cQueue[1].id == CMD_RAW_MOVE) and #cQueue > 1 then
+		-- if I am moving
 		local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
 		if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
 			local fightThree = (#cQueue > 2 and cQueue[3].id == CMD_FIGHT)
@@ -150,7 +149,6 @@ end
 local function clearOrder(unitID,data,cQueue)
 	-- removes move order
 	if data.receivedOrder then
-
 		if (#cQueue >= 1 and (cQueue[1].id == CMD_MOVE or cQueue[1].id == CMD_RAW_MOVE)) then -- if I am moving
 			local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
 			if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
@@ -185,16 +183,16 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 					data.jinkDir = data.jinkDir*-1
 					
 					-- jink towards the enemy
-                    if behaviour.localJinkOrder and behaviour.jinkParallelLength < pointDis then
-                        cx = ux+(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-                        cy = uy
-                        cz = uz+(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-                    else
-                        cx = ex+(uz-ez)*data.jinkDir*behaviour.jinkTangentLength/pointDis
-                        cy = ey
-                        cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
-                    end
-                    
+					if behaviour.localJinkOrder and behaviour.jinkParallelLength < pointDis then
+						cx = ux+(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+						cy = uy
+						cz = uz+(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+					else
+						cx = ex+(uz-ez)*data.jinkDir*behaviour.jinkTangentLength/pointDis
+						cy = ey
+						cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
+					end
+					
 					if move then
 						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
@@ -205,8 +203,8 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 					
 					data.receivedOrder = true
 					return true
-				else -- if I can shoot at the enemy
-
+				else 
+					-- if I can shoot at the enemy
 					local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
 					local ux,uy,uz = spGetUnitPosition(unitID) -- my position
 					local cx,cy,cz -- command position
@@ -271,16 +269,16 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 			data.jinkDir = data.jinkDir*-1
 			
 			-- jink towards the enemy
-            if behaviour.localJinkOrder and behaviour.jinkParallelLength < pointDis then
-                cx = ux+(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-                cy = uy
-                cz = uz+(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-            else
-                cx = ex+(uz-ez)*data.jinkDir*behaviour.jinkTangentLength/pointDis
-                cy = ey
-                cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
-            end
-            
+			if behaviour.localJinkOrder and behaviour.jinkParallelLength < pointDis then
+				cx = ux+(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+				cy = uy
+				cz = uz+(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+			else
+				cx = ex+(uz-ez)*data.jinkDir*behaviour.jinkTangentLength/pointDis
+				cy = ey
+				cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
+			end
+			
 			if move then
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
@@ -608,7 +606,6 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	
 	if (cmdID ~= CMD_UNIT_AI) then
 		return true  -- command was not used
 	end
