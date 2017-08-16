@@ -33,7 +33,7 @@ unitDef = {
     sortName       = [[1]],
     default_spacing = 8,
     midposoffset   = [[0 0 -24]],
-	solid_factory = [[3]],
+    solid_factory = [[7]],
   },
 
   energyUse                     = 0,
