@@ -376,6 +376,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- velocityPrediction (defaults in config): number of frames of enemy velocity prediction for skirming and fleeing
 -- selfVelocityPrediction (defaults to false): Whether the unit predicts its own velocity when calculating range.
 -- reloadSkirmLeeway (defaults to false): Increase skirm range by reloadSkirmLeeway*remainingReloadFrames when reloading.
+-- skirmBlockedApproachFrames (defaults to false): Stop skirming after this many frames of being fully reloaded if not set to attack move.
 
 --*** swarms(defaults to empty): the table of units that this unit will jink towards and strafe
 -- maxSwarmLeeway (defaults to Weapon range): (Weapon range - maxSwarmLeeway) = Max range that the unit will begin strafing targets while swarming
@@ -743,7 +744,8 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0, 
 		skirmLeeway = 50, 
-		stoppingDistance = 5
+		stoppingDistance = 5,
+		skirmBlockedApproachFrames = 40,
 	},
 	
 	["hoverriot"] = {
@@ -753,7 +755,8 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0, 
 		skirmLeeway = -30,
-		stoppingDistance = 5
+		stoppingDistance = 5,
+		skirmBlockedApproachFrames = 40,
 	},
 	["tankriot"] = {
 		skirms = lowMedRangeSkirmieeArray, 
@@ -896,7 +899,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 50, 
 		minSwarmLeeway = 120, 
 		skirmLeeway = 40, 
-	},	
+	},
 	["tankassault"] = {
 		skirms = lowMedRangeSkirmieeArray, 
 		swarms = {}, 
@@ -904,7 +907,7 @@ local behaviourConfig = {
 		fightOnlyUnits = shortRangeExplodables,
 		skirmOrderDis = 220,
 		skirmLeeway = 50, 
-	},		
+	},
 	
 	-- med range skirms
 	["cloakskirm"] = {
@@ -914,7 +917,8 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 10, 
+		skirmLeeway = 10,
+		skirmBlockedApproachFrames = 40,
 	},
 	["jumpskirm"] = {
 		skirms = medRangeSkirmieeArray, 
@@ -923,7 +927,8 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 20, 
+		skirmLeeway = 20,
+		skirmBlockedApproachFrames = 40,
 	},
 	["striderdante"] = {
 		skirms = medRangeSkirmieeArray, 
@@ -939,6 +944,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
+		skirmBlockedApproachFrames = 40,
 	},
 	["hoverskirm"] = {
 		skirms = medRangeSkirmieeArray, 
@@ -950,6 +956,16 @@ local behaviourConfig = {
 		skirmLeeway = 30,
 		skirmOrderDis = 200,
 		velocityPrediction = 90,
+		skirmBlockedApproachFrames = 60,
+	},
+	["tankheavyassault"] = {
+		skirms = medRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		fightOnlyUnits = shortRangeExplodables,
+		skirmOrderDis = 220,
+		skirmLeeway = 50, 
+		skirmBlockedApproachFrames = 60,
 	},
 	["gunshipskirm"] = {
 		skirms = medRangeSkirmieeArray, 
@@ -959,13 +975,6 @@ local behaviourConfig = {
 		skirmOrderDis = 120,
 		selfVelocityPrediction = true,
 		velocityPrediction = 30,
-	},
-	["gunshipkrow"] = {
-		skirms = medRangeSkirmieeArray, 
-		swarms = medRangeSwarmieeArray, 
-		flees = {},
-		fightOnlyUnits = medRangeExplodables,
-		skirmLeeway = 30, 
 	},
 	
 	-- long range skirms
@@ -977,6 +986,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 20, 
+		skirmBlockedApproachFrames = 40,
 	},
 	["shieldskirm"] = {
 		skirms = longRangeSkirmieeArray, 
@@ -986,6 +996,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
+		skirmBlockedApproachFrames = 40,
 	},
 	["spiderskirm"] = {
 		skirms = longRangeSkirmieeArray, 
@@ -995,6 +1006,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
+		skirmBlockedApproachFrames = 40,
 	},
 	["amphassault"] = {
 		skirms = longRangeSkirmieeArray, 
@@ -1004,10 +1016,11 @@ local behaviourConfig = {
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 20, 
+		skirmBlockedApproachFrames = 40,
 	},
 	["gunshipkrow"] = {
-		skirms = longRangeSkirmieeArray, 
-		swarms = {}, 
+		skirms = medRangeSkirmieeArray, 
+		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 10, 
@@ -1024,6 +1037,7 @@ local behaviourConfig = {
 		skirmLeeway = 30,
 		skirmOrderDis = 200,
 		velocityPrediction = 60,
+		skirmBlockedApproachFrames = 40,
 	},
 	["shipskirm"] = {
 		skirms = longRangeSkirmieeArray, 
@@ -1035,6 +1049,7 @@ local behaviourConfig = {
 		skirmLeeway = 10, 
 		skirmOrderDis = 200,
 		velocityPrediction = 90,
+		skirmBlockedApproachFrames = 40,
 	},
 	
 	
@@ -1058,6 +1073,7 @@ local behaviourConfig = {
 		swarms = {}, 
 		flees = {},
 		skirmLeeway = 40,
+		skirmBlockedApproachFrames = 120,
 	},
 	
 	["veharty"] = {
@@ -1107,6 +1123,7 @@ local behaviourConfig = {
 		flees = {},
 		skirmRadar = true,
 		skirmLeeway = 40, 
+		skirmBlockedApproachFrames = 40,
 	},
 	["jumparty"] = {
 		skirms = allGround, 
@@ -1116,7 +1133,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 20, 
-	},	
+	},
 	["shieldarty"] = {
 		skirms = Union(artyRangeSkirmieeArray, skirmableAir),
 		swarms = {},
@@ -1126,7 +1143,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 150, 
-	},	
+	},
 	["hoverarty"] = {
 		skirms = allGround, 
 		swarms = {}, 
@@ -1137,14 +1154,14 @@ local behaviourConfig = {
 		skirmOrderDis = 200,
 		stoppingDistance = -100,
 		velocityPrediction = 0,
-	},	
+	},
 	["striderbantha"] = {
 		skirms = allGround, 
 		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
 		skirmLeeway = 120, 
-	},	
+	},
 	["shiparty"] = {
 		skirms = allGround, 
 		swarms = {}, 
