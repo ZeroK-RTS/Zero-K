@@ -73,8 +73,8 @@ local missionWon, missionEndFrame, missionEndTime, missionResultSent
 
 local boxWidth = 240
 local boxHeight = 60
-local autoFadeTime = 2.7
-local continueFadeInTime = 2.8
+local autoFadeTime = 2
+local continueFadeInTime = 2.2
 local wndBorderSize = 4
 local fontSizeHeadline = 84
 local fontSizeAddon = 20
@@ -379,6 +379,7 @@ local function MissionGameOver(newMissionWon)
 	if newMissionWon and missionEndFrame then
 		return
 	end
+	missionWon = newMissionWon
 	missionEndFrame = Spring.GetGameFrame()
 	missionEndTime = osClock()
 	
@@ -450,7 +451,7 @@ local function DrawGameOverScreen(now)
 	outline[4] = outline[4]*factor
 	mouseOverColor[4] = mouseOverColor[4]*factor
 	
-	local secondaryFactor = min(maxTransparency_autoFade, max((diffPauseTime - continueFadeInTime) / 1.5, 0))
+	local secondaryFactor = min(maxTransparency_autoFade, max((diffPauseTime - continueFadeInTime) / 1.2, 0))
 	text2[4] = text2[4]*secondaryFactor
 	
 	--draw window
