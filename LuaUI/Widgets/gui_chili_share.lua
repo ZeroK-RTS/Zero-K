@@ -1500,7 +1500,6 @@ function widget:Initialize()
 	color2incolor = chili.color2incolor
 	screen0 = chili.Screen0
 	if options.fixHotkeys.value then
-		WG.crude.SetHotkey("toggleoverview","ctrl+tab")
 		WG.crude.SetHotkey("sharedialog","")
 		options.fixHotkeys.value = false
 	end
