@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[turretantiheavy]],
   name                          = [[Annihilator]],
-  description                   = [[Tachyon Projector - Requires 50 Power]],
+  description                   = [[Tachyon Projector - Requires connection to a 50 energy grid]],
   activateWhenBuilt             = true,
   buildCostMetal                = 2200,
   builder                       = false,
