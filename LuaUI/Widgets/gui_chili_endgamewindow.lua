@@ -308,7 +308,7 @@ local function SetupControls()
 		caption = "Exit to Lobby",
 		fontsize = 18,
 		OnClick = {
-			function() 
+			function()
 				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
 					Spring.Reload("")
 				else

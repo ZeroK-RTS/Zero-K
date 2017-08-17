@@ -33,18 +33,18 @@ local spGetTeamUnits      = Spring.GetTeamUnits
 local spDestroyUnit       = Spring.DestroyUnit
 local spGetAllUnits       = Spring.GetAllUnits
 local spGetAllyTeamList   = Spring.GetAllyTeamList
-local spGetPlayerInfo	  = Spring.GetPlayerInfo
-local spGetPlayerList	  = Spring.GetPlayerList
+local spGetPlayerInfo     = Spring.GetPlayerInfo
+local spGetPlayerList     = Spring.GetPlayerList
 local spAreTeamsAllied    = Spring.AreTeamsAllied
 local spGetUnitTeam       = Spring.GetUnitTeam
 local spGetUnitDefID      = Spring.GetUnitDefID
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spGetUnitHealth     = Spring.GetUnitHealth
 local spGetUnitAllyTeam   = Spring.GetUnitAllyTeam
-local spTransferUnit	  = Spring.TransferUnit
+local spTransferUnit      = Spring.TransferUnit
 local spGetGameRulesParam = Spring.GetGameRulesParam
-local spKillTeam	      = Spring.KillTeam
-local spGameOver	      = Spring.GameOver
+local spKillTeam          = Spring.KillTeam
+local spGameOver          = Spring.GameOver
 local spEcho              = Spring.Echo
 
 local COMM_VALUE = UnitDefNames.armcom1.metalCost or 1200
@@ -53,6 +53,34 @@ local MISSION_PLAYER_ALLY_TEAM_ID = 0
 
 local SPARE_PLANETWARS_UNITS = false
 local SPARE_REGULAR_UNITS = false
+
+
+--------------------------------------------------------------------------------
+-- Mission handling
+--------------------------------------------------------------------------------
+local isMission = (Spring.GetModOptions().singleplayercampaignbattleid and true) or false
+
+local PLAYER_ALLY_TEAM_ID = 0
+local PLAYER_TEAM_ID = 0
+local function KillTeam(teamID)
+	if isMission then
+		if teamID == PLAYER_TEAM_ID then
+			GG.MissionGameOver(false)
+		end
+	else
+		spKillTeam(teamID)
+	end
+end
+
+local function GameOver(winningAllyTeamID)
+	if isMission then
+		if winningAllyTeamID == PLAYER_ALLY_TEAM_ID then
+			GG.MissionGameOver(true)
+		end
+	else
+		spGameOver({winningAllyTeamID})
+	end
+end
 
 --------------------------------------------------------------------------------
 -- vars
@@ -66,7 +94,7 @@ local aliveValue = {}
 local destroyedAlliances = {}
 local allianceToReveal
 
-local finishedUnits = {}	-- this stores a list of all units that have ever been completed, so it can distinguish between incomplete and partly reclaimed units
+local finishedUnits = {} -- this stores a list of all units that have ever been completed, so it can distinguish between incomplete and partly reclaimed units
 local toDestroy = {}
 
 local modOptions = Spring.GetModOptions() or {}
@@ -182,7 +210,7 @@ local function Draw() -- declares a draw
 		return
 	end
 	EchoUIMessage("The game ended in a draw!")
-	spGameOver({gaiaAllyTeamID}) -- exit uses {} so use Gaia for draw to differentiate
+	GameOver(gaiaAllyTeamID) -- exit uses {} so use Gaia for draw to differentiate
 	gameOverSent = true
 end
 
@@ -209,7 +237,7 @@ local function CheckForVictory()
 				local name = Spring.GetGameRulesParam("allyteam_long_name_" .. lastAllyTeam)
 				EchoUIMessage(name .. " wins!")
 			end
-			spGameOver({lastAllyTeam})
+			GameOver(lastAllyTeam)
 			gameOverSent = true
 		end
 	end
@@ -286,7 +314,7 @@ local function DestroyAlliance(allianceID, skipCheck)
 					end
 				end
 				Spring.SetTeamRulesParam(t, "isDead", 1, {public = true})
-				spKillTeam(t)
+				KillTeam(t)
 			end
 		end
 	end
@@ -302,7 +330,7 @@ local function CauseVictory(allyTeamID)
 			DestroyAlliance(a)
 		end
 	end
-	--spGameOver({lastAllyTeam})
+	--GameOver(lastAllyTeam)
 end
 GG.CauseVictory = CauseVictory
 

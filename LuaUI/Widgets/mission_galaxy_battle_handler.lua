@@ -25,6 +25,26 @@ end
 local BUTTON_SIZE = 25
 local BONUS_TOGGLE_IMAGE = 'LuaUI/images/plus_green.png'
 
+local spGetMouseState = Spring.GetMouseState
+
+local max, min = math.max, math.min
+
+local glColor               = gl.Color
+local glTexture             = gl.Texture
+local glPopMatrix           = gl.PopMatrix
+local glPushMatrix          = gl.PushMatrix
+local glTranslate           = gl.Translate
+local glText                = gl.Text
+local glBeginEnd            = gl.BeginEnd
+local glTexRect             = gl.TexRect
+local glLoadFont            = gl.LoadFont
+local glDeleteFont          = gl.DeleteFont
+local glRect                = gl.Rect
+local glLineWidth           = gl.LineWidth
+local glDepthTest           = gl.DepthTest
+
+local osClock               = os.clock
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Variables/config
@@ -44,6 +64,28 @@ local mainObjectiveBlock, bonusObjectiveBlock
 local globalCommandButton
 
 local SetBonusObjectivesVisibility
+
+local missionWon, missionEndFrame, missionEndTime, missionResultSent
+
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+-- Endgame screen
+
+local boxWidth = 240
+local boxHeight = 60
+local autoFadeTime = 2.7
+local continueFadeInTime = 2.8
+local wndBorderSize = 4
+local fontSizeHeadline = 84
+local fontSizeAddon = 20
+local fontPath = "LuaUI/Fonts/MicrogrammaDBold.ttf"
+local minTransparency_autoFade = 0.1
+local maxTransparency_autoFade = 0.7
+
+local screenx, screeny, myFont
+local screenCenterX, screenCenterY, wndX1, wndY1, wndX2, wndY2
+local victoryTextX, defeatTextX, defeatTextX, lowerTextX
+local textY, lineOffset, yCenter, xCut, mouseOver
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -289,36 +331,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local function languageChanged ()
-	if globalCommandButton then
-		globalCommandButton.tooltip = WG.Translate("interface", "toggle_mission_objectives_name") .. "\n\n" .. WG.Translate("interface", "toggle_mission_objectives_desc")
-		globalCommandButton:Invalidate()
-	end
-	if mainObjectiveBlock then
-		mainObjectiveBlock.UpdateTooltip(WG.Translate("interface", "main_objectives"))
-	end
-	if bonusObjectiveBlock then
-		bonusObjectiveBlock.UpdateTooltip(WG.Translate("interface", "bonus_objectives"))
-	end
-end
-
-function widget:Initialize()
-	Chili = WG.Chili
-	SetBonusObjectivesVisibility = InitializeObjectivesWindow()
-	WG.InitializeTranslation (languageChanged, GetInfo().name)
-end
-
-function widget:GameFrame(n)
-	if n%30 == 0 then
-		if mainObjectiveBlock then
-			mainObjectiveBlock.Update()
-		end
-		if bonusObjectiveBlock then
-			bonusObjectiveBlock.Update()
-		end
-	end
-end
+-- Victory/Defeat
 
 local function SendVictoryToLuaMenu(planetID)
 	local luaMenu = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
@@ -335,10 +348,11 @@ local function SendDefeatToLuaMenu(planetID)
 	end
 end
 
-function widget:GameOver(winners)
-	if Spring.IsReplay() then
+local function SendMissionResult()
+	if missionResultSent or (not missionEndFrame) or Spring.IsReplay() then
 		return
 	end
+	missionResultSent = true
 	
 	local campaignSaveName = Spring.GetModOptions().singleplayercampaignsavename
 	if campaignSaveName and campaignSaveName ~= "" then
@@ -349,11 +363,202 @@ function widget:GameOver(winners)
 		bonusObjectiveBlock.Update()
 	end
 	
-	for i = 1, #winners do
-		if winners[i] == myAllyTeamID then
-			SendVictoryToLuaMenu(campaignBattleID)
-			return
+	if missionWon then
+		SendVictoryToLuaMenu(campaignBattleID)
+	else
+		SendDefeatToLuaMenu(campaignBattleID)
+	end
+end
+
+local function MissionGameOver(newMissionWon)
+	if missionEndFrame and (newMissionWon == missionWon) then
+		return
+	end
+	
+	-- Don't turn lost missions into won missions.
+	if newMissionWon and missionEndFrame then
+		return
+	end
+	missionEndFrame = Spring.GetGameFrame()
+	missionEndTime = osClock()
+	
+	if WG.Music then
+		WG.Music.PlayGameOverMusic(missionWon)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Draw end screen
+
+-- Mostly from pause screen (very_bad_soldier)
+
+
+--Commons
+local function ResetGl() 
+	glColor( { 1.0, 1.0, 1.0, 1.0 } )
+	glLineWidth( 1.0 )
+	glDepthTest(false)
+	glTexture(false)
+end
+
+function IsOverWindow(x, y)
+	if not missionEndTime then
+		return false
+	end
+	if ((x > screenCenterX - boxWidth) and (y < screenCenterY + boxHeight) and 
+		(x < screenCenterX + boxWidth) and (y > screenCenterY - boxHeight)) then	
+		return true
+	end
+	return false
+end
+ 
+function widget:MousePress(x, y, button)
+	local outsideSpring = select(6, spGetMouseState())
+	if (not outsideSpring) and IsOverWindow(x, y) then
+		SendMissionResult()
+		if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
+			Spring.Reload("")
+		else
+			Spring.SendCommands("quitforce")
 		end
 	end
-	SendDefeatToLuaMenu(campaignBattleID)
+end
+
+function widget:Update()
+	local x, y, _, _, _, outsideSpring = spGetMouseState()
+	if (not outsideSpring) and (IsOverWindow(x, y)) then
+		mouseOver = true
+	else
+		mouseOver = false
+	end
+end
+
+local function DrawGameOverScreen(now)
+	local diffPauseTime = (now - missionEndTime)
+	
+	local text =  { 1.0, 1.0, (mouseOver and 0.95) or 1.0, 1.0 }
+	local text2 =  { 0.95, 0.95, (mouseOver and 0.9) or 0.95, 1.0 }
+	local outline =  { 0.4, 0.4, 0.4, 1.0 }
+	local colorWnd = { 0.0, 0.0, 0.0, 0.6 }
+	local mouseOverColor = { 0.015, 0.028, 0.01, 0.6 }
+
+	-- Fade in
+	local factor = min(maxTransparency_autoFade, max(diffPauseTime / autoFadeTime, minTransparency_autoFade))
+	colorWnd[4] = colorWnd[4]*factor
+	text[4] = text[4]*factor
+	outline[4] = outline[4]*factor
+	mouseOverColor[4] = mouseOverColor[4]*factor
+	
+	local secondaryFactor = min(maxTransparency_autoFade, max((diffPauseTime - continueFadeInTime) / 1.5, 0))
+	text2[4] = text2[4]*secondaryFactor
+	
+	--draw window
+	glPushMatrix()
+	
+	if mouseOver then
+		glColor(mouseOverColor)
+	else
+		glColor(colorWnd)
+	end
+	
+	glRect( wndX1, wndY1, wndX2, wndY2 )
+	glRect( wndX1 - wndBorderSize, wndY1 + wndBorderSize, wndX2 + wndBorderSize, wndY2 - wndBorderSize)
+	
+	myFont:Begin()
+	myFont:SetOutlineColor( outline )
+
+	myFont:SetTextColor( text )
+	myFont:Print((missionWon and "Victory") or "Defeat", (missionWon and victoryTextX) or defeatTextX, textY, fontSizeHeadline, "O" )
+	
+	if continueFadeInTime < diffPauseTime then
+		myFont:SetTextColor( text2 )
+		myFont:Print( "Click to continue", lowerTextX, textY - lineOffset, fontSizeAddon, "O" )
+	end
+	
+	myFont:End()
+	
+	glPopMatrix()
+	
+	glTexture(false)
+end
+
+local function UpdateWindowCoords()
+	screenx, screeny = widgetHandler:GetViewSizes()
+	
+	screenCenterX = screenx / 2
+	screenCenterY = screeny / 2
+	wndX1 = screenCenterX - boxWidth
+	wndY1 = screenCenterY + boxHeight
+	wndX2 = screenCenterX + boxWidth
+	wndY2 = screenCenterY - boxHeight
+
+	victoryTextX = wndX1 + (wndX2 - wndX1) * 0.12
+	defeatTextX = wndX1 + (wndX2 - wndX1) * 0.15
+	lowerTextX = wndX1 + (wndX2 - wndX1) * 0.30
+	textY = wndY2 + (wndY1 - wndY2) * 0.3
+	lineOffset = (wndY1 - wndY2) * 0.24
+	
+	yCenter = wndY2 + (wndY1 - wndY2) * 0.5
+	xCut = wndX1 + (wndX2 - wndX1) * 0.19
+end
+
+function widget:ViewResize(viewSizeX, viewSizeY)
+	UpdateWindowCoords()
+end
+
+function widget:DrawScreen()
+	if missionEndTime then
+		local now = osClock()
+		DrawGameOverScreen(now)
+		ResetGl()
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function languageChanged()
+	if globalCommandButton then
+		globalCommandButton.tooltip = WG.Translate("interface", "toggle_mission_objectives_name") .. "\n\n" .. WG.Translate("interface", "toggle_mission_objectives_desc")
+		globalCommandButton:Invalidate()
+	end
+	if mainObjectiveBlock then
+		mainObjectiveBlock.UpdateTooltip(WG.Translate("interface", "main_objectives"))
+	end
+	if bonusObjectiveBlock then
+		bonusObjectiveBlock.UpdateTooltip(WG.Translate("interface", "bonus_objectives"))
+	end
+end
+
+function widget:GameFrame(n)
+	if n%30 == 0 then
+		if mainObjectiveBlock then
+			mainObjectiveBlock.Update()
+		end
+		if bonusObjectiveBlock then
+			bonusObjectiveBlock.Update()
+		end
+	end
+end
+
+function widget:Initialize()
+	Chili = WG.Chili
+	SetBonusObjectivesVisibility = InitializeObjectivesWindow()
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
+	
+	widgetHandler:RegisterGlobal('MissionGameOver', MissionGameOver)
+	
+	myFont = glLoadFont(fontPath, fontSizeHeadline)
+	UpdateWindowCoords()
+	
+	local initMissionGameOver = Spring.GetGameRulesParam("MissionGameOver")
+	if initMissionGameOver then
+		MissionGameOver(initMissionGameOver == 1)
+	end
+end
+
+function widget:Shutdown()
+	SendMissionResult()
+	glDeleteFont(myFont)
 end

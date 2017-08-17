@@ -902,7 +902,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- (Most) callins
+-- Victory/Defeat
 
 local function IsWinner(winners)
 	for i = 1, #winners do
@@ -913,10 +913,16 @@ local function IsWinner(winners)
 	return false
 end
 
-function gadget:GameOver(winners)
+local function MissionGameOver(missionWon)
 	gameIsOver = true
-	SetWinBeforeBonusObjective(IsWinner(winners))
+	SetWinBeforeBonusObjective(missionWon)
+	SendToUnsynced("MissionGameOver", missionWon)
+	Spring.SetGameRulesParam("MissionGameOver", (missionWon and 1) or 0)
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- (Most) callins
 
 function gadget:UnitFinished(unitID, unitDefID, teamID, builderID)
 	if IsVitalUnitType(unitID, unitDefID) then
@@ -946,6 +952,8 @@ function gadget:Initialize()
 	InitializeUnlocks()
 	InitializeVictoryConditions()
 	InitializeBonusObjectives()
+	
+	GG.MissionGameOver = MissionGameOver
 	
 	local allUnits = Spring.GetAllUnits()
 	for _, unitID in pairs(allUnits) do
@@ -1059,6 +1067,12 @@ function gadget:Save(zip)
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, MakeRealTable(SYNCED.saveTable))
 end
 
+local function MissionGameOver(cmd, missionWon)
+	if (Script.LuaUI('MissionGameOver')) then
+		Script.LuaUI.MissionGameOver(missionWon)
+	end
+end
+
 local function AddMarker(cmd, markerID, x, z, text, color)
 	if (Script.LuaUI('AddCustomMapMarker')) then
 		Script.LuaUI.AddCustomMapMarker(markerID, x, z, text, color)
@@ -1072,11 +1086,13 @@ local function RemoveMarker(cmd, markerID)
 end
 
 function gadget:Initialize()
+	gadgetHandler:AddSyncAction("MissionGameOver", MissionGameOver)
 	gadgetHandler:AddSyncAction("AddMarker", AddMarker)
 	gadgetHandler:AddSyncAction("RemoveMarker", RemoveMarker)
 end
 
 function gadget:Shutdown()
+	gadgetHandler:RemoveSyncAction("MissionGameOver")
 	gadgetHandler:RemoveSyncAction("AddMarker")
 	gadgetHandler:RemoveSyncAction("RemoveMarker")
 end
