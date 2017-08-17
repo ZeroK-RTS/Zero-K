@@ -3188,6 +3188,9 @@ end
 function ViewLobby()
 	if Spring.SendLuaMenuMsg then
 		Spring.Echo("SendLuaMenuMsg showLobby")
+		if WG.ShowInterface then
+			WG.ShowInterface()
+		end
 		Spring.SendLuaMenuMsg("showLobby")
 	end
 end

@@ -81,3 +81,10 @@ options = {
 		end,
 	},
 }
+
+function WG.ShowInterface()
+	if Spring.IsGUIHidden() then
+		Spring.SendCommands("HideInterface")
+		ShowCursor()
+	end
+end
