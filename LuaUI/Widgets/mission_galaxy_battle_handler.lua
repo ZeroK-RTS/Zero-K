@@ -67,14 +67,17 @@ local SetBonusObjectivesVisibility
 
 local missionWon, missionEndFrame, missionEndTime, missionResultSent
 
+-- wait this many frames after victory to make sure your commander doesn't die.
+local VICTORY_SUSTAIN_FRAMES = 50 
+
 ----------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------
 -- Endgame screen
 
 local boxWidth = 240
 local boxHeight = 60
-local autoFadeTime = 2
-local continueFadeInTime = 2.2
+local autoFadeTime = 1.9
+local continueFadeInTime = 1.3
 local wndBorderSize = 4
 local fontSizeHeadline = 84
 local fontSizeAddon = 20
@@ -349,7 +352,7 @@ local function SendDefeatToLuaMenu(planetID)
 end
 
 local function SendMissionResult()
-	if missionResultSent or (not missionEndFrame) or Spring.IsReplay() then
+	if missionResultSent or (not missionSustainedTime) or Spring.IsReplay() then
 		return
 	end
 	missionResultSent = true
@@ -380,7 +383,7 @@ local function MissionGameOver(newMissionWon)
 		return
 	end
 	missionWon = newMissionWon
-	missionEndFrame = Spring.GetGameFrame()
+	missionEndFrame = Spring.GetGameFrame() + VICTORY_SUSTAIN_FRAMES
 	missionEndTime = osClock()
 	
 	if WG.Music then
@@ -415,23 +418,27 @@ function IsOverWindow(x, y)
 end
  
 function widget:MousePress(x, y, button)
-	local outsideSpring = select(6, spGetMouseState())
-	if (not outsideSpring) and IsOverWindow(x, y) then
-		SendMissionResult()
-		if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
-			Spring.Reload("")
-		else
-			Spring.SendCommands("quitforce")
+	if missionSustainedTime then
+		local outsideSpring = select(6, spGetMouseState())
+		if (not outsideSpring) and IsOverWindow(x, y) then
+			SendMissionResult()
+			if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
+				Spring.Reload("")
+			else
+				Spring.SendCommands("quitforce")
+			end
 		end
 	end
 end
 
 function widget:Update()
-	local x, y, _, _, _, outsideSpring = spGetMouseState()
-	if (not outsideSpring) and (IsOverWindow(x, y)) then
-		mouseOver = true
-	else
-		mouseOver = false
+	if missionSustainedTime then
+		local x, y, _, _, _, outsideSpring = spGetMouseState()
+		if (not outsideSpring) and (IsOverWindow(x, y)) then
+			mouseOver = true
+		else
+			mouseOver = false
+		end
 	end
 end
 
@@ -451,8 +458,6 @@ local function DrawGameOverScreen(now)
 	outline[4] = outline[4]*factor
 	mouseOverColor[4] = mouseOverColor[4]*factor
 	
-	local secondaryFactor = min(maxTransparency_autoFade, max((diffPauseTime - continueFadeInTime) / 1.2, 0))
-	text2[4] = text2[4]*secondaryFactor
 	
 	--draw window
 	glPushMatrix()
@@ -472,7 +477,9 @@ local function DrawGameOverScreen(now)
 	myFont:SetTextColor( text )
 	myFont:Print((missionWon and "Victory") or "Defeat", (missionWon and victoryTextX) or defeatTextX, textY, fontSizeHeadline, "O" )
 	
-	if continueFadeInTime < diffPauseTime then
+	if missionSustainedTime then
+		local secondaryFactor = min(maxTransparency_autoFade, max((now - missionSustainedTime) / continueFadeInTime, 0))
+		text2[4] = text2[4]*secondaryFactor
 		myFont:SetTextColor( text2 )
 		myFont:Print( "Click to continue", lowerTextX, textY - lineOffset, fontSizeAddon, "O" )
 	end
@@ -540,6 +547,10 @@ function widget:GameFrame(n)
 		if bonusObjectiveBlock then
 			bonusObjectiveBlock.Update()
 		end
+	end
+	if missionEndFrame and missionEndFrame <= n then
+		missionSustainedTime = osClock()
+		missionEndFrame = nil
 	end
 end
 
