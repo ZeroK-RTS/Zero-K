@@ -2643,7 +2643,11 @@ local function MakeQuitButtons()
 						end
 						local frame = Spring.GetGameFrame()
 						if frame and frame > 0 then
-							spSendCommands{"spectator"}
+							if WG.MissionResign then
+								WG.MissionResign()
+							else
+								spSendCommands{"spectator"}
+							end
 						end
 					end)
 				end

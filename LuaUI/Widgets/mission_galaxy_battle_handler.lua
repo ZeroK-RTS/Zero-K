@@ -391,12 +391,16 @@ local function MissionGameOver(newMissionWon)
 	end
 end
 
+-- Resign from within luaUI
+local function MissionResign()
+	Spring.SendLuaRulesMsg("galaxyMissionResign")
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Draw end screen
 
 -- Mostly from pause screen (very_bad_soldier)
-
 
 --Commons
 local function ResetGl() 
@@ -560,6 +564,8 @@ function widget:Initialize()
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 	
 	widgetHandler:RegisterGlobal('MissionGameOver', MissionGameOver)
+	
+	WG.MissionResign = MissionResign
 	
 	myFont = glLoadFont(fontPath, fontSizeHeadline)
 	UpdateWindowCoords()

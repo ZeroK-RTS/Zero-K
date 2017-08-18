@@ -1007,6 +1007,12 @@ function gadget:GameFrame(n)
 	end
 end
 
+function gadget:RecvLuaMsg(msg, playerID)
+	if msg:find("galaxyMissionResign", 1, true) then
+		GG.DestroyAlliance(PLAYER_ALLY_TEAM_ID)
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Load
