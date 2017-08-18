@@ -848,6 +848,41 @@ local function DoInitialUnitPlacement()
 	end
 end
 
+local function DoInitialTerraform()
+	local terraformList = CustomKeyToUsefulTable(Spring.GetModOptions().initalterraform)
+	if not terraformList then
+		return
+	end
+	local gaiaTeamID = Spring.GetGaiaTeamID() 
+	
+	for i = 1, #terraformList do
+		local terraform = terraformList[i]
+		local pos = terraform.position
+		if terraform.terraformShape == 1 then 
+			-- Rectangle
+			local points = {
+				{x = pos[1], z = pos[2]},
+				{x = pos[3] - 8, z = pos[2]},
+				{x = pos[3] - 8, z = pos[4] - 8},
+				{x = pos[1], z = pos[4] - 8},
+				{x = pos[1], z = pos[2]},
+			}
+			GG.Terraform.TerraformArea(terraform.terraformType, points, 5, terraform.height or 0, nil, nil, gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i)
+		elseif terraform.terraformShape == 2 then
+			-- Line
+			local points = {
+				{x = pos[1], z = pos[2]},
+				{x = pos[3], z = pos[4]},
+			}
+			GG.Terraform.TerraformWall(terraform.terraformType, points, 2, terraform.height or 0, nil, nil, gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i)
+		elseif terraform.terraformShape == 3 then
+			-- Ramp
+			GG.Terraform.TerraformRamp(pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], terraform.width, nil, nil, gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[3], i)
+		end
+	end
+	GG.Terraform.ForceTerraformCompletion(true)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Gadget Interface
@@ -967,11 +1002,14 @@ function gadget:Initialize()
 	GG.GalaxyCampaignHandler = GalaxyCampaignHandler
 end
 
-if CRASH_CIRCUIT then
-	function gadget:GamePreload(n)
-		if not Spring.GetGameRulesParam("loadedGame") then
-			DoInitialUnitPlacement()
-		end
+
+function gadget:GamePreload()
+	if Spring.GetGameRulesParam("loadedGame") then
+		return
+	end
+	DoInitialTerraform()
+	if CRASH_CIRCUIT then
+		DoInitialUnitPlacement()
 	end
 end
 

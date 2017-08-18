@@ -485,9 +485,10 @@ local function AddFallbackCommand(teamID, commandTag, terraunits, terraunitList,
 	}
 end
 
-local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag)
-
-	--** Initial constructor processing **
+local function GetUnitAveragePosition(unit, units)
+	if not unit then
+		return
+	end
 	local unitsX = 0
 	local unitsZ = 0
 	local i = 1
@@ -508,9 +509,17 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		return
 	end
 	
-	unitsX = unitsX/units
-	unitsZ = unitsZ/units
+	return unitsX/units, unitsZ/units
+end
 
+local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag)
+
+	--** Initial constructor processing **
+	local unitsX, unitsZ = GetUnitAveragePosition(unit, units)
+	if not unitsX then
+		unitsX, unitsZ = commandX, commandZ
+	end
+	
 	--calculate equations of the 3 lines, left, right and mid
 	
 	local border = {}
@@ -945,28 +954,11 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
 	
 	--** Initial constructor processing **
-	local unitsX = 0
-	local unitsZ = 0
-	local i = 1
-	while i <= units do
-		if (spValidUnitID(unit[i])) then
-			local x,_,z = spGetUnitPosition(unit[i])
-			unitsX = unitsX + x
-			unitsZ = unitsZ + z
-			i = i + 1
-		else
-			unit[i] = unit[units]
-			unit[units] = nil
-			units = units - 1
-		end
-	end
-		
-	if units == 0 then 
-		return
+	local unitsX, unitsZ = GetUnitAveragePosition(unit, units)
+	if not unitsX then
+		unitsX, unitsZ = commandX, commandZ
 	end
 	
-	unitsX = unitsX/units
-	unitsZ = unitsZ/units	
 	
 	--** Convert Mouse Points to a Closed Loop on a Grid **
 
@@ -1396,28 +1388,11 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0} -- border for the entire area
 	
 	--** Initial constructor processing **
-	local unitsX = 0
-	local unitsZ = 0
-	local i = 1
-	while i <= units do
-		if (spValidUnitID(unit[i])) then
-			local x,_,z = spGetUnitPosition(unit[i])
-			unitsX = unitsX + x
-			unitsZ = unitsZ + z
-			i = i + 1
-		else
-			unit[i] = unit[units]
-			unit[units] = nil
-			units = units - 1
-		end
-	end
-		
-	if units == 0 then 
-		return
+	local unitsX, unitsZ = GetUnitAveragePosition(unit, units)
+	if not unitsX then
+		unitsX, unitsZ = commandX, commandZ
 	end
 	
-	unitsX = unitsX/units
-	unitsZ = unitsZ/units
 	
 	--** Convert Mouse Points to a Closed Loop on a Grid **
 	
@@ -3028,30 +3003,17 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	return 1
 end
 
-function gadget:GameFrame(n)
-	
-	--if n % 300 == 0 then
-	--	GG.Terraform_RaiseWater(-20)
-	--end
-	
-	if n >= nextUpdateCheck then
-		updatePeriod = math.max(MIN_UPDATE_PERIOD, math.min(MAX_UPDATE_PERIOD, terraformOperations/60))
-		--Spring.Echo("Terraform operations", terraformOperations, updatePeriod)
-		terraformOperations = 0
-		nextUpdateCheck = n + updatePeriod
-	end
-	
-	
+local function DoTerraformUpdate(n, forceCompletion)
 	local i = 1
 	while i <= terraformUnitCount do
 		local id = terraformUnitTable[i]
 		if (spValidUnitID(id)) then
 		
-			local health,_,_,_,build  = spGetUnitHealth(id)
+			local health = spGetUnitHealth(id)
 			local diffProgress = health/terraUnitHP - terraformUnit[id].progress
 			
 			if diffProgress == 0 then
-				if n % decayCheckFrequency == 0 and terraformUnit[id].decayTime < n then
+				if (not forceCompletion) and (n % decayCheckFrequency == 0 and terraformUnit[id].decayTime < n) then
 					deregisterTerraformUnit(id,i,3)
 					spDestroyUnit(id, false, true)
 				else
@@ -3063,8 +3025,11 @@ function gadget:GameFrame(n)
 					finishInitialisingTerraformUnit(id,i)
 				end
 				
-				if n - terraformUnit[id].lastUpdate >= updatePeriod then
+				if forceCompletion or (n - terraformUnit[id].lastUpdate >= updatePeriod) then
 					local costDiff = health - terraformUnit[id].lastHealth
+					if forceCompletion then
+						costDiff = costDiff + 100000 -- enough?
+					end
 					terraformUnit[id].totalSpent = terraformUnit[id].totalSpent + costDiff
 					SetTooltip(id, terraformUnit[id].totalSpent, terraformUnit[id].pyramidCostEstimate + terraformUnit[id].totalCost)
 					
@@ -3083,7 +3048,9 @@ function gadget:GameFrame(n)
 					end
 					
 					if updateVar == 1 then
-						terraformUnit[id].lastUpdate = n
+						if n then
+							terraformUnit[id].lastUpdate = n
+						end
 						i = i + 1
 					end
 				else
@@ -3095,6 +3062,22 @@ function gadget:GameFrame(n)
 			deregisterTerraformUnit(id,i,4)
 		end
 	end
+end
+
+function gadget:GameFrame(n)
+	
+	--if n % 300 == 0 then
+	--	GG.Terraform_RaiseWater(-20)
+	--end
+	
+	if n >= nextUpdateCheck then
+		updatePeriod = math.max(MIN_UPDATE_PERIOD, math.min(MAX_UPDATE_PERIOD, terraformOperations/60))
+		--Spring.Echo("Terraform operations", terraformOperations, updatePeriod)
+		terraformOperations = 0
+		nextUpdateCheck = n + updatePeriod
+	end
+	
+	DoTerraformUpdate(n)
 	
 	--check constrcutors that are repairing terraform blocks
 	
@@ -3750,6 +3733,28 @@ end
 --------------------------------------------------------------------------------
 -- Initialise, check modoptions and register command
 
+local TerraformFunctions = {}
+
+function TerraformFunctions.ForceTerraformCompletion(pregame)
+	DoTerraformUpdate(Spring.GetGameFrame(), true)
+	if pregame then
+		-- gadget:UnsyncedHeightMapUpdate seems to not be called pregame.
+		GG.TerrainTexture.UpdateAll()
+	end
+end
+
+function TerraformFunctions.TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag)
+	TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag)
+end
+
+function TerraformFunctions.TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag)
+	TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag)
+end
+
+function TerraformFunctions.TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag)
+	TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag)
+end
+
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_TERRAFORM_INTERNAL)
 	
@@ -3772,6 +3777,8 @@ function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_RAISE)
 	gadgetHandler:RegisterCMDID(CMD_SMOOTH)
 	gadgetHandler:RegisterCMDID(CMD_RESTORE)
+	
+	GG.Terraform = TerraformFunctions
 	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
