@@ -97,7 +97,7 @@ end
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local isMoving, armsFree = false, true
+local isMoving, armsFree, inJumpMode = false, true, false
 local restoreHeading = 0
 local gun_num = 0
 
@@ -191,6 +191,27 @@ end
 function script.StopMoving() 
 	isMoving = false
 	StartThread(RestorePose)
+end
+
+function beginJump() 
+	script.StopMoving()
+	GG.PokeDecloakUnit(unitID, 50)
+	inJumpMode = true
+end
+
+function jumping()
+	GG.PokeDecloakUnit(unitID, 50)
+	EmitSfx(pelvis, 1028)
+	EmitSfx(pelvis, 1028)
+end
+
+function halfJump()
+end
+
+function endJump() 
+	script.StopMoving()
+	inJumpMode = false
+	EmitSfx(base, 1029)
 end
 
 function script.AimFromWeapon(num)

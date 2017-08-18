@@ -8,4 +8,16 @@ unitDef.script  = [[dynknight.lua]]
 unitDef.customparams.commtype = "6"
 unitDef.customparams.statsname = "dynknight1"
 
+
+unitDef.sfxtypes = {
+	explosiongenerators = {
+		[[custom:BEAMWEAPON_MUZZLE_BLUE]],
+		[[custom:NONE]],
+		[[custom:RAIDMUZZLE]],
+		[[custom:NONE]],
+		[[custom:VINDIBACK]],
+		[[custom:FLASH64]],
+	}
+}
+
 return lowerkeys({ dynknight1 = unitDef })
