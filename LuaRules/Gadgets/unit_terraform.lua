@@ -2527,12 +2527,12 @@ local function addSteepnessMarker(team, x, z)
 	steepnessMarkers.inner.data[steepnessMarkers.inner.count] = {team = team, x = x, z = z}
 end
 
-local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
+local function updateTerraform(health,id,arrayIndex,costDiff)
 	local terra = terraformUnit[id]
 	
 	if terra.toRemove and (costDiff > 0.1 or terra.baseCostSpent > 0.1) then
 		-- Removing terraform too early enables structure-detecting maphax.
-		deregisterTerraformUnit(id,arrayIndex,2)			
+		deregisterTerraformUnit(id,arrayIndex,2)
 		spDestroyUnit(id, false, true)
 		return 0
 	end
@@ -2652,7 +2652,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					if overlap then
 						if not extraPoint[overlap].pyramid then
 							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
-							deregisterTerraformUnit(id,arrayIndex,2)			
+							deregisterTerraformUnit(id,arrayIndex,2)
 							spDestroyUnit(id, false, true)
 							return 0
 						end
@@ -2697,7 +2697,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					if overlap then
 						if extraPoint[overlap].pyramid then
 							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
-							deregisterTerraformUnit(id,arrayIndex,2)			
+							deregisterTerraformUnit(id,arrayIndex,2)
 							spDestroyUnit(id, false, true)
 							return 0
 						end
@@ -2770,7 +2770,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					if overlap then
 						if not extraPoint[overlap].pyramid then
 							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
-							deregisterTerraformUnit(id,arrayIndex,2)			
+							deregisterTerraformUnit(id,arrayIndex,2)
 							spDestroyUnit(id, false, true)
 							return 0
 						end
@@ -2814,7 +2814,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					if overlap then
 						if extraPoint[overlap].pyramid then
 							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
-							deregisterTerraformUnit(id,arrayIndex,2)			
+							deregisterTerraformUnit(id,arrayIndex,2)
 							spDestroyUnit(id, false, true)
 							return 0
 						end
@@ -2826,7 +2826,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						x = x, 
 						z = z, 
 						orHeight = groundHeight, 
-						heightDiff = newHeight + maxHeightDifferenceLocal - groundHeight,						
+						heightDiff = newHeight + maxHeightDifferenceLocal - groundHeight,
 						cost = -(newHeight + maxHeightDifferenceLocal - groundHeight), 
 						supportX = extraPoint[i].supportX, 
 						supportZ = extraPoint[i].supportZ, 
@@ -2845,9 +2845,9 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						terra.point[extraPoint[i].supportID].structure = 1
 						return -1
 					end
-						
+					
 					addedCost = addedCost + extraPoint[index].cost - overlapCost
-						
+					
 					if not extraPointArea[x] then
 						extraPointArea[x] = {}
 					end
@@ -2879,7 +2879,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 				extraCost = costDiff - terra.cost*(1 - terra.progress)
 				costDiff = (1 - terra.progress)*terra.cost
 			end
-				
+			
 			addedCost = addedCost*volumeCost
 			
 			local edgeTerraCost = (costDiff*addedCost/(costDiff+addedCost))
@@ -2927,14 +2927,14 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Terraform:")
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Strange pyramid construction")
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Destroying Terraform Unit")
-			deregisterTerraformUnit(id,arrayIndex,2)			
+			deregisterTerraformUnit(id,arrayIndex,2)
 			spDestroyUnit(id, false, true)
 			return 0
 		end
 	end
 	
 	local func = function()
-		for i = 1, terra.points do	
+		for i = 1, terra.points do
 			local height = terra.point[i].orHeight+terra.point[i].diffHeight*progress
 			spSetHeightMap(terra.point[i].x,terra.point[i].z, height)
 			terra.point[i].prevHeight = height
@@ -3007,6 +3007,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 		
 		GG.Terrain_Texture_changeBlockList(drawingList)
 	end
+	
 	--Removed Intercept Check
 	--if terraformUnit[id].intercepts ~= 0 then
 	--	local i = 1
@@ -3019,7 +3020,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	--end
 	
 	if terra.progress > 1 then
-		deregisterTerraformUnit(id,arrayIndex,2)			
+		deregisterTerraformUnit(id,arrayIndex,2)
 		spDestroyUnit(id, false, true)
 		return 0
 	end
@@ -3060,7 +3061,6 @@ function gadget:GameFrame(n)
 			
 				if not terraformUnit[id].fullyInitialised then
 					finishInitialisingTerraformUnit(id,i)
-					diffProgress = health/terraUnitHP - terraformUnit[id].progress
 				end
 				
 				if n - terraformUnit[id].lastUpdate >= updatePeriod then
@@ -3072,11 +3072,11 @@ function gadget:GameFrame(n)
 						GG.Awards.AddAwardPoints('terra', terraformUnit[id].team, costDiff)
 					end
 					
-					local updateVar = updateTerraform(diffProgress,health,id,i,costDiff) 
+					local updateVar = updateTerraform(health,id,i,costDiff) 
 					while updateVar == -1 do
 						if updateTerraformCost(id) then
 							updateTerraformEdgePoints(id)
-							updateVar = updateTerraform(diffProgress,health,id,i,costDiff) 
+							updateVar = updateTerraform(health,id,i,costDiff) 
 						else
 							updateVar = 0
 						end
