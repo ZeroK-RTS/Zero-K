@@ -24,6 +24,8 @@ local shieldEmit = piece 'shieldemit'
 local smokePiece = {torso}
 local nanoPieces = {snout}
 
+local jets = {piece 'jet1', piece 'jet2', piece 'jet3', piece 'jet4'}
+
 local flares = {[0] = flareL, [1] = flareR}
 
 --------------------------------------------------------------------------------
@@ -201,8 +203,9 @@ end
 
 function jumping()
 	GG.PokeDecloakUnit(unitID, 50)
-	EmitSfx(pelvis, 1028)
-	EmitSfx(pelvis, 1028)
+	for i=1,4 do
+		EmitSfx(jets[i], 1028)
+	end
 end
 
 function halfJump()
