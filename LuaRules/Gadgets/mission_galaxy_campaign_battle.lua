@@ -18,7 +18,7 @@ if not campaignBattleID then
 	return
 end
 
-local CRASH_CIRCUIT = Spring.GetModOptions().crashcircuit
+local SPAWN_GAME_PRELOAD = true
 
 local COMPARE = {
 	AT_LEAST = 1,
@@ -1008,16 +1008,15 @@ function gadget:GamePreload()
 		return
 	end
 	DoInitialTerraform()
-	if CRASH_CIRCUIT then
+	if SPAWN_GAME_PRELOAD then
 		DoInitialUnitPlacement()
 	end
 end
 
 function gadget:GameFrame(n)
-	-- Would use GamePreload if it didn't cause Circuit to crash.
 	if firstGameFrame then
 		firstGameFrame = false
-		if not CRASH_CIRCUIT then
+		if not SPAWN_GAME_PRELOAD then
 			if not Spring.GetGameRulesParam("loadedGame") then
 				DoInitialUnitPlacement()
 			end
