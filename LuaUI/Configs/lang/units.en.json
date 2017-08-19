@@ -136,7 +136,7 @@
 	},
 	"amphbomb" : {
 		"name" : "Limpet",
-		"description" : "Amphibious slow bomb",
+		"description" : "Amphibious Slow Bomb",
 		"helptext" : "The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them."
 	},
 	"factoryveh" : {
