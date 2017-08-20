@@ -323,11 +323,13 @@ function widget:CommandNotify(cmdID, params, options)
 			aveX = ux/us
 			aveZ = uz/us
 		end
+		
+		local makeMexEnergy = options.alt
 
 		for i = 1, #WG.metalSpots do
 			local mex = WG.metalSpots[i]
 			--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
-			if (Distance(cx,cz,mex.x,mex.z) < cr*cr) then -- circle area, slower
+			if (Distance(cx, cz, mex.x, mex.z) < cr*cr) and (makeMexEnergy or IsSpotBuildable(i)) then -- circle area, slower
 				commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
 			end
 		end
@@ -371,7 +373,7 @@ function widget:CommandNotify(cmdID, params, options)
 					commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
 				end
 
-				if (options["alt"]) then
+				if makeMexEnergy then
 					for i=1, #addons do
 						local addon = addons[i]
 						local xx = x+addon[1]
