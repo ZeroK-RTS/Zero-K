@@ -53,9 +53,11 @@ local UNSEEN_TIMEOUT = 2
 
 local validUnits = {}
 local waitWaitUnits = {}
+local weaponCounts = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
+	weaponCounts[i] = (ud.weapons and #ud.weapons)
 	if ((not (ud.canFly and (ud.isBomber or ud.isBomberAirUnit))) and 
 			ud.canAttack and ud.canMove and ud.maxWeaponRange and ud.maxWeaponRange > 0) or ud.isFactory then
 		if getMovetype(ud) == 0 then
@@ -388,11 +390,12 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			removeUnit(unitID)
 		end
 		return false  -- command was used
-	elseif cmdID == CMD_FIRE_STATE then
+	elseif cmdID == CMD_FIRE_STATE and weaponCounts[unitDefID] then
 		-- Cancel target when firestate is not fire at will
 		if cmdParams and (cmdParams[1] or 0) < 2 then
-			-- Works for all weapons with weapon number 1, for some reason.
-			Spring.UnitWeaponHoldFire(unitID, 1)
+			for i = 1, weaponCounts[unitDefID] do
+				Spring.UnitWeaponHoldFire(unitID, i)
+			end
 		end
 	end
 	return true  -- command was not used
