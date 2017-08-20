@@ -141,6 +141,10 @@ local function SetupUnit(unitID)
 		spSetUnitRulesParam(unitID, "wanted_energyIncome", 1.2, inlosTrueTable)
 		Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
 		Spring.SetUnitMaxHealth(unitID, 400)
+		local health = Spring.GetUnitHealth(unitID)
+		if health == 130 then
+			Spring.SetUnitHealth(unitID, 400)
+		end
 		Spring.SetUnitCollisionVolumeData(unitID, 30, 30, 30, 0, 0, 0, 0, 1, 0)
 		Spring.SetUnitMidAndAimPos(unitID, 0, -5, 0, 0, 2, 0, true)
 		Spring.SetUnitRulesParam(unitID, "midpos_override", -5 - midy)
