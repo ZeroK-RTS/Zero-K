@@ -36,8 +36,8 @@ local myoldteam = {}
 local PlayerNameY = -1
 local mySubjectID = -1
 local fontSize = 18
-local badgeWidth = 59*0.5
-local badgeHeight = 24*0.5
+local badgeWidth = 59*0.6
+local badgeHeight = 24*0.6
 local color2incolor = nil
 local teamZeroPlayers = {}
 local playerInfo = {}
@@ -259,9 +259,11 @@ local function RenderName(subject)
 	local active = subject.ai or subject.active
 	--Spring.Echo("active " .. tostring(active))
 	local spec = not subject.ai and subject.spec
+	local myAllyTeamID = Spring.GetMyAllyTeamID()
+	local mySpec = Spring.GetSpectatingState()
 	--Spring.Echo(tostring(active) .. " " .. tostring(spec))
 	local playerpanel = givemepanel[subject.id]
-	if not spec and active and subject.id ~= mySubjectID and (subject.allyteam == subjects[mySubjectID].allyteam or subjects[mySubjectID].spec) then 
+	if not spec and active and ((subject.allyteam == myAllyTeamID) or mySpec) then 
 		local incomeM, incomeE, pullM, pullE, netM, netE, storedM, storedE, storageM, storageE = getEcoInfo(subject.team)
 		if incomeM then
 			--Spring.Echo("metal: " .. amt .. "/" .. stor)
@@ -317,7 +319,7 @@ local function RenderName(subject)
 			givemebuttons[subject.id]["def"]:SetText(def)
 		end
 	end
-	if (subject.player and subject.player ~= Spring.GetMyPlayerID()) then
+	if (subject.player) then
 		local ping = 1000 * select(6,Spring.GetPlayerInfo(subject.player) )
 		
 		local colorPing = '\255\180\180\180'
@@ -363,8 +365,7 @@ local function UpdatePlayer(subject)
 	end
 	oldSubjects[subject.id] = subject
 	local myPlayerID = Spring.GetMyPlayerID()
-	local mySpec = subjects[mySubjectID].spec
-	local specFullView = mySpec and select(2, Spring.GetSpectatingState())
+	local mySpec, specFullView = Spring.GetSpectatingState()
 	local myteamID = Spring.GetMyTeamID()
 	local myallyteamID = Spring.GetMyAllyTeamID()
 	local amiteamleader = (select(2,Spring.GetTeamInfo(myteamID)) == myPlayerID)
@@ -377,12 +378,14 @@ local function UpdatePlayer(subject)
 	--Spring.Echo("ai: " .. tostring(subject.ai))
 	--Spring.Echo("allyteam: " .. allyteamID)
 	--Spring.Echo("myallyteam: " .. myallyteamID)
-	if subject.player and subject.player == myPlayerID and (teamLeader or sharemode == false or subject.spec) then
-		--Spring.Echo("dec1")
-		givemebuttons[subject.id]["leave"]:SetVisibility(false)
-	elseif subject.player and subject.player == myPlayerID and not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
-		--Spring.Echo("dec2")
-		givemebuttons[subject.id]["leave"]:SetVisibility(true)
+	if subject.player and subject.player == myPlayerID then
+		if (teamLeader or sharemode == false or subject.spec) then
+			givemebuttons[subject.id]["leave"]:SetVisibility(false)
+		end
+		if not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
+			givemebuttons[subject.id]["leave"]:SetVisibility(true)
+		end
+		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
 	elseif subject.ai then
 		--Spring.Echo("dec3")
 		givemebuttons[subject.id]["metalbar"]:SetVisibility(true)
@@ -478,7 +481,7 @@ local function UpdatePlayer(subject)
 			end
 		end
 	end
-	if (subject.spec and subject.player ~= myPlayerID) then
+	if (subject.spec) then
 		givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
 		givemebuttons[subject.id]["offHolder"]:SetVisibility(false)
 		givemebuttons[subject.id]["defHolder"]:SetVisibility(false)
@@ -626,7 +629,7 @@ end
 local function InitName(subject, playerPanel)
 	--Spring.Echo("Initializing " .. subject.name .. " with parent " .. tostring(playerPanel))
 	local buttonsize = fontSize + 4
-	local barWidth = 30
+	local barWidth = 35
 	playerfontsize[subject.id] = fontSize
 	givemebuttons[subject.id] = {}
 	givemepanel[subject.id] = playerPanel
@@ -655,7 +658,7 @@ local function InitName(subject, playerPanel)
 	
 	local bottomRowStartX = 67
 	local bottomRowStartY = 37
-	local bottomInfoStartX = bottomRowStartX + 4*buttonsize + 8
+	local bottomInfoStartX = bottomRowStartX + 4*buttonsize + 6
 	local infoSize = 48
 	
 	if subject.ai or subject.player ~= Spring.GetMyPlayerID() then
@@ -717,155 +720,157 @@ local function InitName(subject, playerPanel)
 			},
 			caption=" "
 		}
-		givemebuttons[subject.id]["ping"] = chili.TextBox:New{
-			file="LuaUI/Images/playerlist/ping.png",
-			width='100%',
-			height='100%',
-			x=11,
-			y=3,
-			textColor={1,1,1,1},
-			fontsize=smallFontSize,
-			margin = {0,0,0,0},
-			padding = {0,0,0,0},
-			text= "100ms"
-		}
-		givemebuttons[subject.id]["off"] = chili.TextBox:New{
-			width='100%',
-			height='100%',
-			x=19,
-			y=5,
-			textColor={1,0.4,0.4,1},
-			fontsize=smallFontSize,
-			margin = {0,0,0,0},
-			padding = {0,0,0,0},
-			text= "1.0K"
-		}
-		givemebuttons[subject.id]["def"] = chili.TextBox:New{
-			width='100%',
-			height='100%',
-			x=19,
-			y=5,
-			textColor={0.4,0.4,1,1},
-			fontsize=smallFontSize,
-			margin = {0,0,0,0},
-			padding = {0,0,0,0},
-			text= "1.0K"
-		}
-		givemebuttons[subject.id]["pingCtrl"] = chili.Control:New{
-			parent=playerPanel,
-			children={
-				chili.Image:New{
-					file="LuaUI/Images/playerlist/ping.png",
-					width=10,
-					height=15,
-					x=0,
-					y=0,
-					margin = {0,0,0,0},
-					padding = {0,0,0,0},
-					color={1,1,1,0.8}
-				},
-				givemebuttons[subject.id]["ping"]
+	end
+	givemebuttons[subject.id]["ping"] = chili.TextBox:New{
+		file="LuaUI/Images/playerlist/ping.png",
+		width='100%',
+		height='100%',
+		x=12,
+		y=3,
+		textColor={1,1,1,1},
+		fontsize=smallFontSize,
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		text= "100ms"
+	}
+	givemebuttons[subject.id]["off"] = chili.TextBox:New{
+		width='100%',
+		height='100%',
+		x=19,
+		y=5,
+		textColor={1,0.4,0.4,1},
+		fontsize=smallFontSize,
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		text= ""
+	}
+	givemebuttons[subject.id]["def"] = chili.TextBox:New{
+		width='100%',
+		height='100%',
+		x=19,
+		y=5,
+		textColor={0.52,0.52,1,1},
+		fontsize=smallFontSize,
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		text= ""
+	}
+	givemebuttons[subject.id]["pingCtrl"] = chili.Control:New{
+		parent=playerPanel,
+		children={
+			chili.Image:New{
+				file="LuaUI/Images/playerlist/ping.png",
+				width=10,
+				height=15,
+				x=0,
+				y=0,
+				margin = {0,0,0,0},
+				padding = {0,0,0,0},
+				color={1,1,1,0.8}
 			},
-			margin = {0,0,0,0},
-			padding = {0,0,0,0},
-			width=60,
-			x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + buttonsize + 4,
-			y = givemebuttons[subject.id]["text"].y - 4,
-			height=buttonsize,
-			tooltip = "This player's network delay (ping)"
-		}
-		
-		givemebuttons[subject.id]["metalbar"] = chili.Progressbar:New{
-			parent = playerPanel,
-			height = 9,
-			autosize= false,
-			min=0,
-			max=1,
-			width = barWidth,
-			x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width,
-			y = bottomRowStartY - 1,
-			color={136/255,214/255,251/255,1},
-			tooltip = "Your ally's metal."
-		}
-		givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{
-			parent = playerPanel,
-			height = 9,
-			autosize= false,
-			min=0,
-			max=1,
-			width = barWidth,
-			x=givemebuttons[subject.id]["metalbar"].x,
-			y=givemebuttons[subject.id]["metalbar"].y + 12,
-			color={.93,.93,0,1},
-			tooltip = "Your ally's energy."
-		}
-		
-		givemebuttons[subject.id]["metalin"] = chili.TextBox:New{
-			parent=playerPanel,
-			height='50%',
-			width=100,
-			fontsize=smallerFontSize,
-			x=givemebuttons[subject.id]["metalbar"].x + givemebuttons[subject.id]["metalbar"].width + 2,
-			y=givemebuttons[subject.id]["metalbar"].y + 1,
-			tooltip = "Your ally's metal income."
-		}
-		givemebuttons[subject.id]["energyin"] = chili.TextBox:New{
-			parent=playerPanel,
-			height='50%',
-			width=100,
-			fontsize=smallerFontSize,
-			x=givemebuttons[subject.id]["energybar"].x + givemebuttons[subject.id]["energybar"].width + 2,
-			y=givemebuttons[subject.id]["energybar"].y + 1,
-			tooltip = "Your ally's energy income."
-		}
-		givemebuttons[subject.id]["offHolder"] = chili.Control:New{
-			parent=playerPanel,
-			children={
-				chili.Image:New{
-					file='LuaUI/Images/commands/Bold/attack.png',
-					width=16,
-					height=16,
-					x=1,
-					y=1,
-					margin = {0,0,0,0},
-					padding = {0,0,0,0},
-					color={1,0.1,0.1,1}
-				},
-				givemebuttons[subject.id]["off"]
+			givemebuttons[subject.id]["ping"]
+		},
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		width=60,
+		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + buttonsize + 3,
+		y = givemebuttons[subject.id]["text"].y - 2,
+		height=buttonsize,
+		tooltip = "This player's network delay (ping)"
+	}
+	
+	givemebuttons[subject.id]["metalbar"] = chili.Progressbar:New{
+		parent = playerPanel,
+		height = 9,
+		autosize= false,
+		min=0,
+		max=1,
+		width = barWidth,
+		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width,
+		y = bottomRowStartY - 1,
+		color={136/255,214/255,251/255,1},
+		tooltip = "Your ally's metal."
+	}
+	givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{
+		parent = playerPanel,
+		height = 9,
+		autosize= false,
+		min=0,
+		max=1,
+		width = barWidth,
+		x=givemebuttons[subject.id]["metalbar"].x,
+		y=givemebuttons[subject.id]["metalbar"].y + 12,
+		color={.93,.93,0,1},
+		tooltip = "Your ally's energy."
+	}
+	
+	givemebuttons[subject.id]["metalin"] = chili.TextBox:New{
+		parent=playerPanel,
+		height='50%',
+		width=100,
+		fontsize=smallerFontSize,
+		x=givemebuttons[subject.id]["metalbar"].x + givemebuttons[subject.id]["metalbar"].width + 2,
+		y=givemebuttons[subject.id]["metalbar"].y + 1,
+		tooltip = "Your ally's metal income."
+	}
+	givemebuttons[subject.id]["energyin"] = chili.TextBox:New{
+		parent=playerPanel,
+		height='50%',
+		width=100,
+		fontsize=smallerFontSize,
+		x=givemebuttons[subject.id]["energybar"].x + givemebuttons[subject.id]["energybar"].width + 2,
+		y=givemebuttons[subject.id]["energybar"].y + 1,
+		tooltip = "Your ally's energy income."
+	}
+	givemebuttons[subject.id]["offHolder"] = chili.Control:New{
+		parent=playerPanel,
+		children={
+			chili.Image:New{
+				file='LuaUI/Images/commands/Bold/attack.png',
+				width=16,
+				height=16,
+				x=1,
+				y=2,
+				margin = {0,0,0,0},
+				padding = {0,0,0,0},
+				color={1,1,1,1}
 			},
-			margin = {0,0,0,0},
-			padding = {0,0,0,0},
-			width=50,
-			x = bottomInfoStartX,
-			y = bottomRowStartY + 1,
-			height=18,
-			tooltip = "This player's offensive units"
-		}
-		givemebuttons[subject.id]["defHolder"] = chili.Control:New{
-			parent=playerPanel,
-			children={
-				chili.Image:New{
-					file='LuaUI/Images/commands/Bold/guard.png',
-					width=16,
-					height=16,
-					x=1,
-					y=1,
-					margin = {0,0,0,0},
-					padding = {0,0,0,0},
-					color={0.5,0.5,1,1}
-				},
-				givemebuttons[subject.id]["def"]
+			givemebuttons[subject.id]["off"]
+		},
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		width=50,
+		x = bottomInfoStartX,
+		y = bottomRowStartY + 1,
+		height=20,
+		tooltip = "This player's offensive units"
+	}
+	givemebuttons[subject.id]["defHolder"] = chili.Control:New{
+		parent=playerPanel,
+		children={
+			chili.Image:New{
+				file='LuaUI/Images/commands/Bold/guard.png',
+				width=16,
+				height=16,
+				x=1,
+				y=2,
+				margin = {0,0,0,0},
+				padding = {0,0,0,0},
+				color={1,1,1,1}
 			},
-			margin = {0,0,0,0},
-			padding = {0,0,0,0},
-			width=50,
-			x = bottomInfoStartX + infoSize,
-			y = bottomRowStartY + 1,
-			height=18,
-			tooltip = "This player's defence"
-		}
-		
-		if (subject.player) then
+			givemebuttons[subject.id]["def"]
+		},
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		width=50,
+		x = bottomInfoStartX + infoSize,
+		y = bottomRowStartY + 1,
+		height=20,
+		tooltip = "This player's defence"
+	}
+	
+	if subject.player ~= Spring.GetMyPlayerID() then
+		if subject.player then
 			local commshareButtonX = givemebuttons[subject.id]["energy"].x + buttonsize
 			local commshareButtonY = givemebuttons[subject.id]["energy"].y
 			
@@ -928,7 +933,7 @@ local function InitName(subject, playerPanel)
 				height = buttonsize,
 				width = buttonsize,
 				x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
-				y= givemebuttons[subject.id]["text"].y - 8,
+				y= givemebuttons[subject.id]["text"].y - 6,
 				OnClick = {function () BattleKickPlayer(subject) end},
 				padding={1,1,1,1},
 				tooltip = "Kick this player from the battle.",
@@ -1113,7 +1118,8 @@ local function InitName(subject, playerPanel)
 						x = 1,
 						bottom = 1 + (i - 1)*badgeHeight,
 						height=badgeHeight,
-						tooltip = "A special award"
+						tooltip = "A special award",
+						color = {1, 1, 1, 0.86},
 					}
 				end
 			end
@@ -1140,8 +1146,8 @@ local function Buildme()
 	local playerpanels = {}
 	local allypanels = {}
 	local allpanels = {}
-	local playerHeight =  64	
-	local playerWidth =  339	
+	local playerHeight =  64
+	local playerWidth =  339
 	local lastAllyTeam = 0
 	for _, subject in ipairs(subjects) do
 		if (not playerpanels[subject.allyteam]) then
