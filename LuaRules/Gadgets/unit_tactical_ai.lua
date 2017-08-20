@@ -472,6 +472,11 @@ local function DoTacticalAI(unitID, cQueue, data, behaviour, enemy, enemyUnitDef
 	-- Apologies for this function.
 	local usefulEnemy = false
 	if not (typeKnown and (not haveFight) and behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef]) then
+		
+		if behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef] and behaviour.fightOnlyOverride then
+			behaviour = behaviour.fightOnlyOverride
+		end
+		
 		local checkSkirm = true
 
 		if alwaysJink or (enemy and typeKnown and behaviour.swarms[enemyUnitDef]) then
@@ -643,49 +648,34 @@ local function GetBehaviourTable(behaviourData, ud)
 		weaponRange = ud.maxWeaponRange
 	end
 	
-	local behaviourTable = {
-		skirms = behaviourData.skirms, 
-		swarms = behaviourData.swarms, 
-		flees  = behaviourData.flees,
-		hugs   = behaviourData.hugs,
-		fightOnlyUnits = behaviourData.fightOnlyUnits,
-		weaponNum = (behaviourData.weaponNum or 1), 
-		circleStrafe = (behaviourData.circleStrafe or false), 
-		skirmRadar = (behaviourData.skirmRadar or false), 
-		skirmEverything = (behaviourData.skirmEverything or false), 
-		maxSwarmRange = weaponRange - (behaviourData.maxSwarmLeeway or 0), 
-		minSwarmRange = weaponRange - (behaviourData.minSwarmLeeway or weaponRange/2),
-		minCircleStrafeDistance = weaponRange - (behaviourData.minCircleStrafeDistance or behaviourDefaults.defaultMinCircleStrafeDistance),
-		skirmRange = weaponRange,
-		skirmLeeway = (behaviourData.skirmLeeway or 0),
-		skirmOnlyNearEnemyRange = (behaviourData.skirmOnlyNearEnemyRange or false),
-		skirmKeepOrder = (behaviourData.skirmKeepOrder or false),
-		reloadSkirmLeeway = (behaviourData.reloadSkirmLeeway or false),
-		skirmBlockedApproachFrames = (behaviourData.skirmBlockedApproachFrames or false),
-		jinkTangentLength = (behaviourData.jinkTangentLength or behaviourDefaults.defaultJinkTangentLength),
-		jinkParallelLength =  (behaviourData.jinkParallelLength or behaviourDefaults.defaultJinkParallelLength),
-		alwaysJinkFight = (behaviourData.alwaysJinkFight or false),
-		localJinkOrder = (behaviourData.alwaysJinkFight or behaviourDefaults.defaultLocalJinkOrder),
-		stoppingDistance = (behaviourData.stoppingDistance or 0),
-		strafeOrderLength = (behaviourData.strafeOrderLength or behaviourDefaults.defaultStrafeOrderLength),
-		fleeCombat = (behaviourData.fleeCombat or false), 
-		fleeLeeway = (behaviourData.fleeLeeway or 100), 
-		fleeDistance = (behaviourData.fleeDistance or 100), 
-		fleeRadar = (behaviourData.fleeRadar or false), 
-		minFleeRange = (behaviourData.minFleeRange or 0), 
-		swarmLeeway = (behaviourData.swarmLeeway or 50), 
-		skirmOrderDis = (behaviourData.skirmOrderDis or behaviourDefaults.defaultSkirmOrderDis),
-		skirmOrderDisMin = behaviourData.skirmOrderDisMin, -- can be nil
-		velocityPrediction = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction),
-		selfVelocityPrediction = behaviourData.selfVelocityPrediction,
-		searchRange = (behaviourData.searchRange or math.max(weaponRange + 100, 800)),
-		fleeOrderDis = (behaviourData.fleeOrderDis or 120),
-		hugRange = (behaviourData.hugRange or behaviourDefaults.defaultHugRange),
-	}
 	
-	behaviourTable.minFleeRange = behaviourTable.minFleeRange - behaviourTable.fleeLeeway
+	behaviourData.weaponNum               = (behaviourData.weaponNum or 1)
+	behaviourData.maxSwarmRange           = weaponRange - (behaviourData.maxSwarmLeeway or 0)
+	behaviourData.minSwarmRange           = weaponRange - (behaviourData.minSwarmLeeway or weaponRange/2)
+	behaviourData.minCircleStrafeDistance = weaponRange - (behaviourData.minCircleStrafeDistance or behaviourDefaults.defaultMinCircleStrafeDistance)
+	behaviourData.skirmRange              = weaponRange
+	behaviourData.skirmLeeway             = (behaviourData.skirmLeeway or 0)
+	behaviourData.jinkTangentLength       = (behaviourData.jinkTangentLength or behaviourDefaults.defaultJinkTangentLength)
+	behaviourData.jinkParallelLength      =  (behaviourData.jinkParallelLength or behaviourDefaults.defaultJinkParallelLength)
+	behaviourData.localJinkOrder          = (behaviourData.alwaysJinkFight or behaviourDefaults.defaultLocalJinkOrder)
+	behaviourData.stoppingDistance        = (behaviourData.stoppingDistance or 0)
+	behaviourData.strafeOrderLength       = (behaviourData.strafeOrderLength or behaviourDefaults.defaultStrafeOrderLength)
+	behaviourData.fleeLeeway              = (behaviourData.fleeLeeway or 100)
+	behaviourData.fleeDistance            = (behaviourData.fleeDistance or 100)
+	behaviourData.minFleeRange            = (behaviourData.minFleeRange or 0)
+	behaviourData.swarmLeeway             = (behaviourData.swarmLeeway or 50)
+	behaviourData.skirmOrderDis           = (behaviourData.skirmOrderDis or behaviourDefaults.defaultSkirmOrderDis)
+	behaviourData.velocityPrediction      = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction)
+	behaviourData.searchRange             = (behaviourData.searchRange or math.max(weaponRange + 100, 800))
+	behaviourData.fleeOrderDis            = (behaviourData.fleeOrderDis or 120)
+	behaviourData.hugRange                = (behaviourData.hugRange or behaviourDefaults.defaultHugRange)
+	behaviourData.minFleeRange            = behaviourData.minFleeRange - behaviourData.fleeLeeway
 	
-	return behaviourTable
+	if behaviourData.fightOnlyOverride then
+		behaviourData.fightOnlyOverride = GetBehaviourTable(behaviourData.fightOnlyOverride, ud)
+	end
+	
+	return behaviourData
 end
 
 local function LoadBehaviour(unitConfigArray, behaviourDefaults)

@@ -403,6 +403,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- hugRange (default in config): Range to close to
 
 --*** fightOnlyUnits(defaults to empty): the table of units that the unit will only interact with when it has a fight command. No AI invoked with manual attack or leashing.
+--*** fightOnlyOverride(defaults to empty): Table tbat overrides parameters when fighting fight only units.
 
 --- Array loaded into gadget 
 local behaviourDefaults = {
@@ -504,6 +505,14 @@ local behaviourConfig = {
 		swarms = lowRangeSwarmieeArray, 
 		flees = fleeables,
 		fightOnlyUnits = veryShortRangeExplodables,
+		fightOnlyOverride = {
+			skirms = veryShortRangeSkirmieeArray, 
+			swarms = lowRangeSwarmieeArray, 
+			flees = fleeables,
+			skirmLeeway = 40,
+			skirmOrderDis = 30,
+			stoppingDistance = 30,
+		},
 		circleStrafe = true,
 		skirmLeeway = 15,
 		strafeOrderLength = 180,
