@@ -227,7 +227,7 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	
-	if teleportingUnit[unitID] and not (cmdID == CMD.INSERT or cmdOptions.shift) and cmdID ~= CMD.REMOVE and cmdID ~= CMD.FIRESTATE and cmdID ~= CMD.MOVESTATE and cmdID ~= CMD_WANT_CLOAK then
+	if teleportingUnit[unitID] and not (cmdID == CMD.INSERT or cmdOptions.shift) and cmdID ~= CMD.REMOVE and cmdID ~= CMD.FIRE_STATE and cmdID ~= CMD.MOVE_STATE and cmdID ~= CMD_WANT_CLOAK then
 		interruptTeleport(teleportingUnit[unitID])
 	end
 	
@@ -400,8 +400,8 @@ function gadget:GameFrame(f)
 						ud = ud and UnitDefs[ud]
 						if ud then
 							local size = ud.xsize
-							local ux, uy, uz = Spring.GetUnitPosition(teleportiee)
-							local tx, _, tz = Spring.GetUnitPosition(tid)
+							local _,_,_,ux, uy, uz = Spring.GetUnitPosition(teleportiee, true)
+							local _,_,_,tx, _, tz = Spring.GetUnitPosition(tid, true)
 							local dx, dz = tx + offset[tele[tid].offsetIndex].x*(size*4+40), tz + offset[tele[tid].offsetIndex].z*(size*4+40)
 							local dy 
 							
@@ -415,7 +415,6 @@ function gadget:GameFrame(f)
 							GG.PlayFogHiddenSound("sounds/misc/teleport2.wav", 10, dx, dy, dz)
 							
 							Spring.SpawnCEG("teleport_out", ux, uy, uz, 0, 0, 0, size)
-							
 							
 							teleportingUnit[teleportiee] = nil
 							tele[tid].teleportiee = nil

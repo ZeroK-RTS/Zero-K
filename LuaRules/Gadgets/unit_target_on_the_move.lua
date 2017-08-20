@@ -34,6 +34,7 @@ local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local getMovetype = Spring.Utilities.getMovetype
 
 local CMD_WAIT = CMD.WAIT
+local CMD_FIRE_STATE = CMD.FIRE_STATE
 
 -- Constans
 local TARGET_NONE   = 0
@@ -299,7 +300,7 @@ local function setTargetClosestFromList(unitID, unitDefID, team, choiceUnits)
 end
 
 function gadget:AllowCommand_GetWantedCommand()
-	return {[CMD_UNIT_CANCEL_TARGET] = true, [CMD_UNIT_SET_TARGET] = true, [CMD_UNIT_SET_TARGET_CIRCLE] = true}
+	return {[CMD_FIRE_STATE] = true, [CMD_UNIT_CANCEL_TARGET] = true, [CMD_UNIT_SET_TARGET] = true, [CMD_UNIT_SET_TARGET_CIRCLE] = true}
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
@@ -336,7 +337,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				
 				local units = CallAsTeam(team,
 					function ()
-					return Spring.GetUnitsInRectangle(left,top,right,bot) end)
+						return Spring.GetUnitsInRectangle(left,top,right,bot)
+					end
+				)
 				
 				setTargetClosestFromList(unitID, unitDefID, team, units)
 				
@@ -360,8 +363,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				
 				local units = CallAsTeam(team,
 					function ()
-					return Spring.GetUnitsInCylinder(cmdParams[1],cmdParams[3],cmdParams[4]) end)
-					
+						return Spring.GetUnitsInCylinder(cmdParams[1],cmdParams[3],cmdParams[4])
+					end
+				)
+				
 				setTargetClosestFromList(unitID, unitDefID, team, units)
 				
 			elseif #cmdParams == 1 then
@@ -383,6 +388,12 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			removeUnit(unitID)
 		end
 		return false  -- command was used
+	elseif cmdID == CMD_FIRE_STATE then
+		-- Cancel target when firestate is not fire at will
+		if cmdParams and (cmdParams[1] or 0) < 2 then
+			-- Works for all weapons with weapon number 1, for some reason.
+			Spring.UnitWeaponHoldFire(unitID, 1)
+		end
 	end
 	return true  -- command was not used
 end
