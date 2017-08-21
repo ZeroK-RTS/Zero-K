@@ -396,7 +396,7 @@
 	},
 	"jumpskirm" : {
 		"name" : "Moderator",
-		"description" : "Distruptor Skirmisher Walker",
+		"description" : "Disruptor Skirmisher Walker",
 		"helptext" : "The Moderator's disruptor beam reduces enemy speed and rate of fire by up to 50%% in addition to dealing damage, making it effective against almost all targets."
 	},
 	"chicken" : {
