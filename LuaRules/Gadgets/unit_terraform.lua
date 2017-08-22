@@ -551,9 +551,11 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	if m == 0 then 
 		m = 0.0001 
 	end 
-  
-	local segLength = dis/(ceil(dis/maxRampLegth))
-	local segWidth = terraform_width/ceil(terraform_width/maxRampWidth)
+	
+	local segmentsAlong = ceil(dis/maxRampLegth)
+	local segmentsAcross = ceil(terraform_width/maxRampWidth)
+	local segLength = dis/segmentsAlong
+	local segWidth = terraform_width/segmentsAcross
 	local widthScale = terraform_width/dis
 	local lengthScale = segLength/dis
   
@@ -660,19 +662,21 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	local n = 1
 	
 	local i = 0
-	while i*segLength < dis do
+	while i < segmentsAlong do
 		local j = 0
-		while j*segWidth < terraform_width do
-		
+		while j < segmentsAcross do
+			local middleSegment = (i > 0) and (j > 0) and (i < segmentsAlong - 1) and (j < segmentsAcross - 1)
+			local offset = (middleSegment and 8) or 0
+			
 			segment[n] = {}
 			segment[n].along = i
 			segment[n].point = {}
 			segment[n].area = {}
 			segment[n].border = {
-				left = floor((leftpoint.x+add.x*i+addPerp.x*j)/8)*8, 
-				right = ceil((rightpoint.x+add.x*i+addPerp.x*j)/8)*8, 
-				top = floor((toppoint.z+add.z*i+addPerp.z*j)/8)*8, 
-				bottom = ceil((botpoint.z+add.z*i+addPerp.z*j)/8)*8
+				left = floor((leftpoint.x+add.x*i+addPerp.x*j)/8)*8 - offset, 
+				right = ceil((rightpoint.x+add.x*i+addPerp.x*j)/8)*8 + offset, 
+				top = floor((toppoint.z+add.z*i+addPerp.z*j)/8)*8 - offset, 
+				bottom = ceil((botpoint.z+add.z*i+addPerp.z*j)/8)*8 + offset
 			}
 			-- end of segment
 			--segment[n].position = {x = (rightRot.x-4+add.x*i+addPerp.x*(j+0.5)-16*(x2-x1)/dis), z = (rightRot.z-4+add.z*i+addPerp.z*(j+0.5)-16*(z2-z1)/dis)}
@@ -681,34 +685,32 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			segment[n].position = {x = rightRot.x+add.x*(i+0.5)+addPerp.x*(j+0.5), z = rightRot.z+add.z*(i+0.5)+addPerp.z*(j+0.5)}
 			local pc = 1
 		  
-			local topline1 = {x = leftpoint.x+add.x*i+addPerp.x*j, z = leftpoint.z+add.z*i+addPerp.z*j, m = topleftGrad}
-			local topline2 = {x = toppoint.x+add.x*i+addPerp.x*j, z = toppoint.z+add.z*i+addPerp.z*j, m = botleftGrad}
-			local botline1 = {x = leftpoint.x+add.x*i+addPerp.x*j, z = leftpoint.z+add.z*i+addPerp.z*j, m = botleftGrad}
-			local botline2 = {x = botpoint.x+add.x*i+addPerp.x*j, z = botpoint.z+add.z*i+addPerp.z*j, m = topleftGrad}
+			local topline1 = {x = leftpoint.x+add.x*i+addPerp.x*j - offset, z = leftpoint.z+add.z*i+addPerp.z*j - offset, m = topleftGrad}
+			local topline2 = {x = toppoint.x+add.x*i+addPerp.x*j + offset, z = toppoint.z+add.z*i+addPerp.z*j - offset, m = botleftGrad}
+			local botline1 = {x = leftpoint.x+add.x*i+addPerp.x*j - offset, z = leftpoint.z+add.z*i+addPerp.z*j + offset, m = botleftGrad}
+			local botline2 = {x = botpoint.x+add.x*i+addPerp.x*j + offset, z = botpoint.z+add.z*i+addPerp.z*j + offset, m = topleftGrad}
 			
 			local topline = topline1
 			local botline = botline1
 			
-			local lx = segment[n].border.left
-			while lx <= segment[n].border.right do
+			local lx = segment[n].border.left - offset
+			while lx <= segment[n].border.right + offset do
 				segment[n].area[lx] = {}
 				local zmin = linearEquation(lx,topline.m,topline.x,topline.z)
 				local zmax = linearEquation(lx,botline.m,botline.x,botline.z)
 				
 				local lz = segment[n].border.top
 				while lz <= zmax do
-				
 					if zmin <= lz then
-						local h = pointHeight(x1, y1, z1, lx, lz, m, heightDiff, xdis)		  
-						segment[n].point[pc] = {x = lx, y = h ,z = lz, orHeight = spGetGroundHeight(lx,lz), prevHeight = spGetGroundHeight(lx,lz)}
-						
-						if checkPointCreation(4, volumeSelection, segment[n].point[pc].orHeight, h, 0, lx, lz) then
+						local h = pointHeight(x1, y1, z1, lx, lz, m, heightDiff, xdis)
+						local orHeight = spGetGroundHeight(lx,lz)
+						if checkPointCreation(4, volumeSelection, orHeight, h, 0, lx, lz) then
+							segment[n].point[pc] = {x = lx, y = h ,z = lz, orHeight = orHeight, prevHeight = spGetGroundHeight(lx,lz)}
 							pc = pc + 1
 						end
 					end
-			  
 					lz = lz+8
-				end	  
+				end
 				lx = lx+8
 			  
 				if topline == topline1 and topline2.x < lx then
@@ -718,14 +720,12 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				if botline == botline1 and botline2.x < lx then
 					botline = botline2
 				end
-			  
 			end  
 			
 			if pc ~= 1 then
 				segment[n].points = pc - 1
 				n = n + 1
 			end
-	 
 			j = j+1
 		end
 		i = i+1
@@ -867,7 +867,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			spSetUnitHealth(id, 0.01)
 			
-			if id then				
+			if id then
 				if segment[i].along ~= rampLevels.data[rampLevels.count].along then
 					rampLevels.count = rampLevels.count + 1
 					rampLevels.data[rampLevels.count] = {along = segment[i].along, count = 0, data = {}}
@@ -875,7 +875,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				rampLevels.data[rampLevels.count].count = rampLevels.data[rampLevels.count].count + 1
 				rampLevels.data[rampLevels.count].data[rampLevels.data[rampLevels.count].count] = id
 			
-				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)				
+				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 				spSetUnitRulesParam(id, "terraformType", 4) --ramp
 			
