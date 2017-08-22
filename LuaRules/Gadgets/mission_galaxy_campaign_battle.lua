@@ -568,7 +568,7 @@ local function PlaceUnit(unitData, teamID)
 	end
 	
 	local build = (unitData.buildProgress and unitData.buildProgress < 1) or false
-	local unitID = Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID, build)
+	local unitID = Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID, build, (ud.isBuilding or ud.speed == 0) and ud.levelGround)
 	
 	if not unitID then
 		Spring.MarkerAddPoint(x, 0, z, "Error creating unit " .. (((ud or {}).humanName) or "???"))
