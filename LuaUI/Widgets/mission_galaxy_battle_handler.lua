@@ -187,6 +187,7 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam)
 			position = position,
 			label = label,
 			image = image,
+			satisfyCount = items[i].satisfyCount,
 		}
 		position = position + (#label.physicalLines)*16
 	end
@@ -200,10 +201,14 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam)
 			return
 		end
 		
-		objectives[index].image.file = (newSuccess == 1 and SUCCESS_ICON) or FAILURE_ICON
+		if satisfyCount and newSuccess < satisfyCount then
+			return
+		end
+		
+		objectives[index].image.file = (newSuccess > 0 and SUCCESS_ICON) or FAILURE_ICON
 		objectives[index].image:Invalidate()
 		
-		objectives[index].success = (newSuccess == 1)
+		objectives[index].success = (newSuccess > 0)
 		objectives[index].terminated = true
 		objectives[index].image = image
 	end

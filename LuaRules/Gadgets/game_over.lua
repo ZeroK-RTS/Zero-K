@@ -54,34 +54,6 @@ local MISSION_PLAYER_ALLY_TEAM_ID = 0
 local SPARE_PLANETWARS_UNITS = false
 local SPARE_REGULAR_UNITS = false
 
-
---------------------------------------------------------------------------------
--- Mission handling
---------------------------------------------------------------------------------
-local isMission = (Spring.GetModOptions().singleplayercampaignbattleid and true) or false
-
-local PLAYER_ALLY_TEAM_ID = 0
-local PLAYER_TEAM_ID = 0
-local function KillTeam(teamID)
-	if isMission then
-		if teamID == PLAYER_TEAM_ID then
-			GG.MissionGameOver(false)
-		end
-	else
-		spKillTeam(teamID)
-	end
-end
-
-local function GameOver(winningAllyTeamID)
-	if isMission then
-		if winningAllyTeamID == PLAYER_ALLY_TEAM_ID then
-			GG.MissionGameOver(true)
-		end
-	else
-		spGameOver({winningAllyTeamID})
-	end
-end
-
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
@@ -143,6 +115,37 @@ local vitalAlive = {}
 local allyTeams = spGetAllyTeamList()
 for i = 1, #allyTeams do
 	vitalAlive[allyTeams[i]] = {}
+end
+
+--------------------------------------------------------------------------------
+-- Mission handling
+--------------------------------------------------------------------------------
+local isMission = (Spring.GetModOptions().singleplayercampaignbattleid and true) or false
+
+local PLAYER_ALLY_TEAM_ID = 0
+local PLAYER_TEAM_ID = 0
+local function KillTeam(teamID)
+	if isMission then
+		if teamID == PLAYER_TEAM_ID then
+			GG.MissionGameOver(false)
+		end
+	else
+		spKillTeam(teamID)
+	end
+end
+
+local function GameOver(winningAllyTeamID)
+	if isMission then
+		if winningAllyTeamID == PLAYER_ALLY_TEAM_ID then
+			GG.MissionGameOver(true)
+		end
+	else
+		spGameOver({winningAllyTeamID})
+	end
+end
+
+function GG.IsAllyTeamAlive(allyTeamID)
+	return not destroyedAlliances[allyTeamID]
 end
 
 --------------------------------------------------------------------------------
@@ -273,7 +276,8 @@ local function DestroyAlliance(allianceID, skipCheck)
 		if GG.GalaxyCampaignHandler then
 			local defeatConfig = GG.GalaxyCampaignHandler.GetDefeatConfig(allianceID)
 			if defeatConfig and defeatConfig.allyTeamLossObjectiveID then
-				Spring.SetGameRulesParam("objectiveSuccess_" .. defeatConfig.allyTeamLossObjectiveID, (allianceID == MISSION_PLAYER_ALLY_TEAM_ID and 0) or 1)
+				local objParameter = "objectiveSuccess_" .. defeatConfig.allyTeamLossObjectiveID
+				Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allianceID == MISSION_PLAYER_ALLY_TEAM_ID and 0) or 1))
 			end
 		end
 		
@@ -356,7 +360,8 @@ local function CheckMissionDefeatOnUnitLoss(unitID, allianceID)
 	end
 	if defeatConfig.defeatIfUnitDestroyed and defeatConfig.defeatIfUnitDestroyed[unitID] then
 		if (not gameOverSent) and type(defeatConfig.defeatIfUnitDestroyed[unitID]) == "number" then
-			Spring.SetGameRulesParam("objectiveSuccess_" .. defeatConfig.defeatIfUnitDestroyed[unitID], (allianceID == MISSION_PLAYER_ALLY_TEAM_ID and 0) or 1)
+			local objParameter = "objectiveSuccess_" .. defeatConfig.defeatIfUnitDestroyed[unitID]
+			Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allianceID == MISSION_PLAYER_ALLY_TEAM_ID and 0) or 1))
 		end
 		return true
 	end

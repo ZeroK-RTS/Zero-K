@@ -250,7 +250,8 @@ local function VictoryAtLocationUpdate()
 	for unitID, data in pairs(victoryAtLocation) do
 		if DoVictoryAtLocationCheck(unitID, data) then
 			if data.objectiveID then
-				Spring.SetGameRulesParam("objectiveSuccess_" .. data.objectiveID, (Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0)
+				local objParameter = "objectiveSuccess_" .. data.objectiveID
+				Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0))
 			end
 			GG.CauseVictory(data.allyTeamID)
 			return
@@ -1031,10 +1032,11 @@ function gadget:GameFrame(n)
 		if checkForLoseAfterSeconds then
 			for i = 1, #allyTeamList do
 				local lostAfterSeconds = defeatConditionConfig[allyTeamList[i]].loseAfterSeconds
-				if lostAfterSeconds and lostAfterSeconds <= gameSeconds then
+				if lostAfterSeconds and lostAfterSeconds <= gameSeconds and GG.IsAllyTeamAlive(allyTeamList[i]) then
 					local defeatConfig = defeatConditionConfig[allyTeamList[i]]
 					if defeatConfig.timeLossObjectiveID then
-						Spring.SetGameRulesParam("objectiveSuccess_" .. defeatConfig.timeLossObjectiveID, (allyTeamList[i] == PLAYER_ALLY_TEAM_ID and 0) or 1)
+						local objParameter = "objectiveSuccess_" .. defeatConfig.timeLossObjectiveID
+						Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allyTeamList[i] == PLAYER_ALLY_TEAM_ID and 0) or 1))
 					end
 					GG.DestroyAlliance(allyTeamList[i])
 				end
