@@ -27,6 +27,7 @@ local function Walk()
 		Turn (foot[i], z_axis, 0, math.rad(135))
 	end
 
+	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 
 	local side = 1
