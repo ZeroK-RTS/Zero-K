@@ -170,6 +170,7 @@ local function AddPoint(id, x, z, text, params)
 	if mapPoints[id] then
 		RemovePoint(id)
 	end
+	params = params or {}
 	
 	-- reverse compatibility: params can be a color table
 	local isColorArg = (#params == 3) or (#params == 4)
