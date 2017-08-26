@@ -238,7 +238,7 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 	if weapon1 ~= 1 and weapon2 ~= 1 then
 		Spring.SetUnitWeaponState(unitID, 1, "range", maxRange)
 	end
-	for i = 2, 16 do
+	for i = 2, 32 do
 		if i ~= weapon1 and i ~= weapon2 then
 			Spring.SetUnitWeaponState(unitID, i, "range", 0)
 		end
