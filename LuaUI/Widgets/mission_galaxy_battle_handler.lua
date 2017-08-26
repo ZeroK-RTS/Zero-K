@@ -304,7 +304,7 @@ local function InitializeObjectivesWindow()
 		end
 		holderWindow:SetPos(nil, nil, nil, newHeight)
 	end
-	SetBonusVisibility(false)
+	SetBonusVisibility(true)
 	
 	local bonusToggleButton
 	if thereAreBonusObjectives then
@@ -313,6 +313,7 @@ local function InitializeObjectivesWindow()
 			right = 3,
 			width = BUTTON_SIZE,
 			height = BUTTON_SIZE,
+			classname = "button_tiny",
 			caption = "",
 			tooltip = "Toggle bonus objectives",
 			padding = {0,0,0,0},
