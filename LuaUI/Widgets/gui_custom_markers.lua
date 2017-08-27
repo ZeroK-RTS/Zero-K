@@ -170,10 +170,10 @@ local function AddPoint(id, x, z, text, params)
 	if mapPoints[id] then
 		RemovePoint(id)
 	end
-	params = params or {}
+	params = params or EMPTY_TABLE
 	
 	-- reverse compatibility: params can be a color table
-	local isColorArg = (#params == 3) or (#params == 4)
+	local isColorArg = type(params) == "table" and ((#params == 3) or (#params == 4))
 	
 	local color = WHITE
 	if isColorArg then
@@ -213,10 +213,10 @@ end
 local function GetColorChar(colorTable)
 	if colorTable == nil then return string.char(255,255,255,255) end
 	local col = {}
-	for i=1,4 do
+	for i=1,3 do
 		col[i] = math.ceil((colorTable[i] or 1)*255)
 	end
-	return string.char(col[4],col[1],col[2],col[3])
+	return string.char(255,col[1],col[2],col[3])
 end
 
 local function CreateCircle(point)
@@ -248,7 +248,7 @@ local function DrawCircle(circle)
 	gl.Translate(circle.x, circle.y + 10, circle.z)
 	gl.Rotate(90, 1, 0, 0)
 	gl.Scale(circle.radius, circle.radius, 1)
-	gl.Color(circle.color[1], circle.color[2], circle.color[3], circle.alpha)
+	gl.Color(circle.color[1], circle.color[2], circle.color[3], circle.alpha * circle.color[4])
 	gl.CallList(circleDrawList)
 	gl.PopMatrix()
 end
@@ -257,13 +257,17 @@ local function DrawBillboardedText(point)
 	if not Spring.IsSphereInView(point.x, point.y, point.z, 250) then
 		return
 	end
-	glColor(point.color[1], point.color[2], point.color[3], alpha)
+	local alpha = maxAlpha * (point.expiration - timeNow) / ttl
+	if (alpha <= 0) then
+		return
+	end
+	glColor(point.color[1], point.color[2], point.color[3], alpha * point.color[4])
 	gl.PushMatrix()
 	gl.Translate(point.x, point.y + 32, point.z )
 	gl.Billboard()
 	local cChar = GetColorChar(point.color)
 	glText(cChar..point.text.."\008", 0, 16, point.fontSize or fontSize, 'cno')
-	gl.PopMatrix()  
+	gl.PopMatrix()
 end
 
 ----------------------------------------------------------------
@@ -356,7 +360,7 @@ function widget:DrawScreen()
 			mapPoints[id] = nil
 		else
 			local sx, sy, sz = WorldToScreenCoords(point.x, point.y + 32, point.z)
-			glColor(point.color[1], point.color[2], point.color[3], alpha)
+			glColor(point.color[1], point.color[2], point.color[3], alpha * point.color[4])
 			if (sx >= 0 and sy >= 0	and sx <= vsx and sy <= vsy) then
 				--in screen
 				--[[	-- draw a targeting box
@@ -518,7 +522,7 @@ function widget:DrawInMiniMap(sx, sy)
 		else
 			local x = point.x * ratioX
 			local y = sy - point.z * ratioY
-			glColor(point.color[1], point.color[2], point.color[3], alpha)
+			glColor(point.color[1], point.color[2], point.color[3], alpha * point.color[4])
 			local vertices = {
 					{v = {x, y - minimapHighlightLineMin, 0}},
 					{v = {x, y - minimapHighlightLineMax, 0}},
