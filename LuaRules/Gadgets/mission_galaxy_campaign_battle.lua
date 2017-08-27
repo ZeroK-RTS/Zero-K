@@ -35,6 +35,8 @@ local PLAYER_TEAM_ID = 0
 local SAVE_FILE = "Gadgets/mission_galaxy_campaign_battle.lua"
 local loadGameFrame = 0
 
+local FACING_TO_HEADING = 2^14
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 if gadgetHandler:IsSyncedCode() then --SYNCED
@@ -593,6 +595,41 @@ local function PlaceUnit(unitData, teamID)
 	end
 end
 
+local function PlaceFeature(featureData, teamID)
+	if featureData.difficultyAtLeast and (featureData.difficultyAtLeast > missionDifficulty) then
+		return
+	end
+	if featureData.difficultyAtMost and (featureData.difficultyAtMost < missionDifficulty) then
+		return
+	end
+	
+	local name = featureData.name
+	local fd = FeatureDefNames[name]
+	if not (fd and fd.id) then
+		Spring.Echo("Missing feature placement", name)
+		return
+	end
+	
+	local x, z, facing = featureData.x, featureData.z, featureData.facing
+	if not facing then
+		facing = math.random()*4
+	end
+	
+	local unitDefName
+	if string.find(name, "_dead") then
+		unitDefName = string.gsub(name, "_dead", "")
+		local ud = UnitDefNames[unitDefName]
+		if ud.isBuilding or ud.speed == 0 then
+			x, z = SanitizeBuildPositon(x, z, ud, facing)
+		end
+	end
+	
+	local featureID = Spring.CreateFeature(fd.id, x, Spring.GetGroundHeight(x,z), z, facing*FACING_TO_HEADING, teamID)
+	if unitDefName then
+		Spring.SetFeatureResurrect(featureID, unitDefName, math.floor(facing + 0.5)%4)
+	end
+end
+
 local function PlaceRetinueUnit(retinueID, range, unitDefName, spawnX, spawnZ, facing, teamID, experience)
 	local unitDefID = UnitDefNames[unitDefName]
 	unitDefID = unitDefID and unitDefID.id
@@ -807,6 +844,13 @@ local function PlaceNeutralUnits(unitData)
 	end
 end
 
+local function PlaceFeatures(featureData)
+	local gaiaTeamID = Spring.GetGaiaTeamID() 
+	for i = 1, #featureData do
+		PlaceFeature(featureData[i], gaiaTeamID)
+	end
+end
+
 local function InitializeCommanderParameters(teamID, customKeys)
 	local commParameters = CustomKeyToUsefulTable(customKeys and customKeys.commanderparameters)
 	if not commParameters then
@@ -839,6 +883,11 @@ local function DoInitialUnitPlacement()
 	local neutralUnitsToSpawn = CustomKeyToUsefulTable(Spring.GetModOptions().neutralunitstospawn) or false
 	if neutralUnitsToSpawn then
 		PlaceNeutralUnits(neutralUnitsToSpawn)
+	end
+	
+	local featuresToSpawn = CustomKeyToUsefulTable(Spring.GetModOptions().featurestospawn) or false
+	if featuresToSpawn then
+		PlaceFeatures(featuresToSpawn)
 	end
 	
 	if commandsToGive then
