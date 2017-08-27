@@ -440,6 +440,7 @@ function widget:MousePress(x, y, button)
 			else
 				Spring.SendCommands("quitforce")
 			end
+			return true
 		end
 	end
 end
@@ -458,11 +459,11 @@ end
 local function DrawGameOverScreen(now)
 	local diffPauseTime = (now - missionEndTime)
 	
-	local text =  { 1.0, 1.0, (mouseOver and 0.95) or 1.0, 1.0 }
-	local text2 =  { 0.95, 0.95, (mouseOver and 0.9) or 0.95, 1.0 }
+	local text =  { 1.0, 1.0, (mouseOver and 0.9) or 1.0, 1.0 }
+	local text2 =  { 0.95, 0.95, (mouseOver and 0.85) or 0.95, 1.0 }
 	local outline =  { 0.4, 0.4, 0.4, 1.0 }
 	local colorWnd = { 0.0, 0.0, 0.0, 0.6 }
-	local mouseOverColor = { 0.015, 0.028, 0.01, 0.6 }
+	local mouseOverColor = { 0.022, 0.036, 0.03, 0.6 }
 
 	-- Fade in
 	local factor = min(maxTransparency_autoFade, max(diffPauseTime / autoFadeTime, minTransparency_autoFade))
