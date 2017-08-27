@@ -32,6 +32,7 @@ local weaponDef = {
 	soundStart              = [[weapon/laser/heavy_laser4]],
 	soundTrigger            = true,
 	turret                  = true,
+	waterWeapon             = true,
 	weaponType              = [[DGun]],
 	weaponVelocity          = 300,
 }
