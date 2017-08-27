@@ -92,6 +92,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["striderdetriment"].id] = 1,
 	[UnitDefNames["shipassault"].id] = 1,
 	[UnitDefNames["shiparty"].id] = 1,
+	[UnitDefNames["spiderskirm"].id] = 1,
 
 	-- Needs LUS
 	--[UnitDefNames["tankassault"].id] = 1,
