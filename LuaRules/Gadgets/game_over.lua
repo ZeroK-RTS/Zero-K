@@ -23,7 +23,7 @@ end
 --	its active players have units left.
 --------------------------------------------------------------------------------
 
-local isMission = VFS.FileExists("mission.lua")
+local isScriptMission = VFS.FileExists("mission.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -111,10 +111,25 @@ for i = 1, #allyTeams do
 	commsAlive[allyTeams[i]] = {}
 end
 
+local aiTeamResign = not (isScriptMission or campaignBattleID or (Spring.GetModOptions().disableAiTeamResign == 1))
+
+local vitalConstructorAllyTeam = {}
 local vitalAlive = {}
 local allyTeams = spGetAllyTeamList()
 for i = 1, #allyTeams do
-	vitalAlive[allyTeams[i]] = {}
+	local allyTeamID = allyTeams[i]
+	vitalAlive[allyTeamID] = {}
+	if aiTeamResign then
+		local teamList = Spring.GetTeamList(allyTeamID)
+		vitalConstructorAllyTeam[allyTeamID] = true
+		for j = 1, #teamList do
+			local isAiTeam = select(4, Spring.GetTeamInfo(teamList[j]))
+			if not isAiTeam then
+				vitalConstructorAllyTeam[allyTeamID] = false
+				break
+			end
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -236,7 +251,7 @@ local function CheckForVictory()
 		if ((not lastAllyTeam) or (count == 0)) then
 			Draw()
 		else
-			if not isMission then
+			if not (isMission or isScriptMission) then
 				local name = Spring.GetGameRulesParam("allyteam_long_name_" .. lastAllyTeam)
 				EchoUIMessage(name .. " wins!")
 			end
@@ -287,7 +302,7 @@ local function DestroyAlliance(allianceID, skipCheck)
 			EchoUIMessage("Game Over: If this is true, then please resign.")
 			return	-- don't perform victory check
 		else -- kaboom
-			if not isMission then
+			if not (isMission or isScriptMission) then
 				local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allianceID)
 				EchoUIMessage(name .. " has been destroyed!")
 			end
@@ -350,6 +365,11 @@ local function AddAllianceUnit(unitID, unitDefID, teamID)
 	
 	if GG.GalaxyCampaignHandler and GG.GalaxyCampaignHandler.VitalUnit(unitID) then
 		vitalAlive[allianceID][unitID] = true
+	elseif vitalConstructorAllyTeam[allianceID] then
+		local ud = UnitDefs[unitDefID]
+		if ud.isBuilder or ud.isFactory then
+			vitalAlive[allianceID][unitID] = true
+		end
 	end
 end
 
@@ -404,6 +424,9 @@ local function RemoveAllianceUnit(unitID, unitDefID, teamID)
 			DestroyAlliance(allianceID)
 		end
 		return
+	elseif vitalConstructorAllyTeam[allianceID] and HasNoVitalUnits(allianceID) then
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Purging allyTeam " .. allianceID)
+		DestroyAlliance(allianceID)
 	end
 	
 	if (CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)) then
