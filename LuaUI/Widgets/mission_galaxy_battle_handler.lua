@@ -252,6 +252,9 @@ local function InitializeObjectivesWindow()
 	local bonusObjectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().bonusobjectiveconfig) or {}
 	
 	local thereAreBonusObjectives = (bonusObjectiveList and #bonusObjectiveList > 0)
+	if #objectiveList <= 0 and (not thereAreBonusObjectives) then
+		return nil
+	end
 	
 	local holderWindow = Chili.Window:New{
 		classname = "main_window_small",
