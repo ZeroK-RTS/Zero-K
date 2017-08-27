@@ -901,7 +901,7 @@ local icontypes = {
   --nanos
   staticbuilder = {
     bitmap='icons/staticbuilder.dds',
-    size=1.8,
+    size=1.5,
   },
 
   --ship icons
