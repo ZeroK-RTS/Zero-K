@@ -1758,8 +1758,10 @@ function externalFunctions.GetCommandButtonPosition(cmdID)
 		return
 	end
 	local button = buttonsByCommand[cmdID]
-	local x, y, w, h = button.GetScreenPosition()
-	return x, y, w, h
+	if button and button.GetCommandID() == cmdID then
+		local x, y, w, h = button.GetScreenPosition()
+		return x, y, w, h
+	end
 end
 
 function externalFunctions.GetTabPosition(tabName)
