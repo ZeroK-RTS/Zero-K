@@ -29,11 +29,10 @@ unitDef = {
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT4]],
-  moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[firewalker.s3o]],
-  script				 = [[jumparty.lua]],
+  script                 = [[jumparty.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {

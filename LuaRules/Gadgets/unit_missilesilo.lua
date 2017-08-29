@@ -33,9 +33,9 @@ local missileDefIDs = {
 	[UnitDefNames.seismic.id] = true,
 }
 
-local silos = {}	-- [siloUnitID] = {[1] = missileID1, [3] = missileID3, ...}
-local missileParents = {}	-- [missileUnitID] = siloUnitID
-local missilesToDestroy = {}
+local silos = {} -- [siloUnitID] = {[1] = missileID1, [3] = missileID3, ...}
+local missileParents = {} -- [missileUnitID] = siloUnitID
+local missilesToDestroy
 local missilesToTransfer = {}
 
 _G.saveTable = {}
@@ -49,7 +49,7 @@ local function GetFirstEmptyPad(unitID)
 	if not silos[unitID] then
 		return nil
 	end
-	for i=1,MISSILES_PER_SILO do
+	for i = 1, MISSILES_PER_SILO do
 		if silos[unitID][i] == nil then
 			return i
 		end
@@ -88,8 +88,10 @@ function gadget:Initialize()
 	-- it'll lose track of any missiles already built (meaning you can stack new missiles on them, and they don't die when the silo does)
 	if Spring.GetGameFrame() > 1 then
 		local unitList = Spring.GetAllUnits()
-		for i,v in pairs(unitList) do
-			if spGetUnitDefID(v) == siloDefID then silos[v] = {} end
+		for i, v in pairs(unitList) do
+			if spGetUnitDefID(v) == siloDefID then
+				silos[v] = {}
+			end
 		end
 	end
 end
@@ -100,10 +102,12 @@ end
 
 function gadget:GameFrame(n)
 	if missilesToDestroy then
-		for i=1,#missilesToDestroy do
-			Spring.DestroyUnit(missilesToDestroy[i], true)
-			missilesToDestroy[i] = nil
+		for i = 1, #missilesToDestroy do
+			if missilesToDestroy[i] and Spring.ValidUnitID(missilesToDestroy[i]) then
+				Spring.DestroyUnit(missilesToDestroy[i], true)
+			end
 		end
+		missilesToDestroy = nil
 	end
 
 	for uid, team in pairs(missilesToTransfer) do
@@ -136,7 +140,8 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	-- silo destroyed
 	if unitDefID == siloDefID then
 		local missiles = GetSiloEntry(unitID)
-		for index,missileID in pairs(missiles) do
+		missilesToDestroy = missilesToDestroy or {}
+		for index, missileID in pairs(missiles) do
 			missilesToDestroy[#missilesToDestroy + 1] = missileID
 		end
 	-- missile destroyed
@@ -144,7 +149,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 		local parent = missileParents[unitID]
 		if parent then
 			local siloEntry = GetSiloEntry(parent)
-			for i=1,MISSILES_PER_SILO do
+			for i = 1, MISSILES_PER_SILO do
 				if siloEntry[i] == unitID then
 					siloEntry[i] = nil
 					break
@@ -161,7 +166,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if unitDefID == siloDefID then
 		silos[unitID] = {}
 	elseif silos[builderID] then
-		Spring.SetUnitBlocking(unitID,false,false)	-- non-blocking, non-collide (try to prevent pad detonations)
+		Spring.SetUnitBlocking(unitID, false, false) -- non-blocking, non-collide (try to prevent pad detonations)
 	end
 end
 
@@ -193,7 +198,7 @@ function gadget:Load(zip)
 	
 	silos = GG.SaveLoad.GetNewUnitIDKeys(loadData.silos or {})
 	for siloID, missiles in pairs(silos) do
-		for i=1,MISSILES_PER_SILO do
+		for i = 1, MISSILES_PER_SILO do
 			if missiles[i] ~= nil then
 				missiles[i] = GG.SaveLoad.GetNewUnitID(missiles[i])
 			end

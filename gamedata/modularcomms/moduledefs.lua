@@ -589,6 +589,18 @@ upgrades = {
 			end,
 	},
 	
+	module_jumpjet = {
+		name = "Jumpjet",
+		description = "Allows the commander to jump",
+		func = function(unitDef)
+				unitDef.customparams.canjump            = 1
+				unitDef.customparams.jump_range         = 400
+				unitDef.customparams.jump_speed         = 6
+				unitDef.customparams.jump_reload        = 20
+				unitDef.customparams.jump_from_midair   = 1
+			end,
+	},
+	
 	module_areashield = {
 		name = "Area Shield",
 		order = 6,

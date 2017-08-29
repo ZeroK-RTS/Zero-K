@@ -43,8 +43,8 @@ function startTeleOutLoop_Thread(teleportiee, teleporter)
 	SetSignalMask(SIG_CEG_EFFECTS)
 	
 	while true do
-		local x, y, z = Spring.GetUnitPosition(teleportiee)
-		local lx, ly, lz = Spring.GetUnitPosition(teleporter)
+		local _,_,_,x, y, z = Spring.GetUnitPosition(teleportiee, true)
+		local _,_,_,lx, ly, lz = Spring.GetUnitPosition(teleporter, true)
 		local teleportieeValid = Spring.ValidUnitID(teleportiee)
 		local teleporterValid = Spring.ValidUnitID(teleporter)
 		if teleportieeValid then

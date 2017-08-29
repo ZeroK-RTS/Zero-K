@@ -37,8 +37,15 @@ if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local TerrainTextureFunctions = {}
+
+function TerrainTextureFunctions.UpdateAll()
+	SendToUnsynced("UpdateAll")
+end
+
 function gadget:Initialize()
 	_G.SentBlockList = {}
+	GG.TerrainTexture = TerrainTextureFunctions
 end
 
 function GG.Terrain_Texture_changeBlockList(blockList)
@@ -401,6 +408,12 @@ function gadget:UnsyncedHeightMapUpdate(x1, z1, x2, z2)
 	UMHU_updatequeue[#UMHU_updatequeue+1] ={x1, z1, x2, z2} --sent to gadget:DrawWorld()
 end
 
+local function UpdateAll()
+	for z = 0, MAP_HEIGHT/8 - 8, 8 do
+		UMHU_updatequeue[#UMHU_updatequeue+1] = {0, z, MAP_WIDTH/8 - 8, z + 8}
+	end
+end
+
 local function Shutdown()
 	-- Iterating over a map here but it's so rare that I don't care!
 	for x = 0, SQUARES_X-1 do
@@ -416,6 +429,7 @@ local function Shutdown()
 	end
 	
 	gadgetHandler.RemoveSyncAction("changeBlockList")
+	gadgetHandler.RemoveSyncAction("UpdateAll")
 	gadgetHandler.RemoveSyncAction("Shutdown")
 end
 
@@ -430,7 +444,9 @@ function gadget:Initialize()
 	--	end
 	--end
 	
+	
 	gadgetHandler:AddSyncAction("changeBlockList", changeBlockList)
+	gadgetHandler:AddSyncAction("UpdateAll", UpdateAll)
 	gadgetHandler:AddSyncAction("Shutdown", Shutdown)
 end
 

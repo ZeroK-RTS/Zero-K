@@ -18,7 +18,7 @@ if not campaignBattleID then
 	return
 end
 
-local CRASH_CIRCUIT = Spring.GetModOptions().crashcircuit
+local SPAWN_GAME_PRELOAD = true
 
 local COMPARE = {
 	AT_LEAST = 1,
@@ -26,12 +26,16 @@ local COMPARE = {
 }
 
 local alliedTrueTable = {allied = true}
+local publicTrueTable = {public = true}
+
 local CMD_INSERT = CMD.INSERT
 local PLAYER_ALLY_TEAM_ID = 0
 local PLAYER_TEAM_ID = 0
 
 local SAVE_FILE = "Gadgets/mission_galaxy_campaign_battle.lua"
 local loadGameFrame = 0
+
+local FACING_TO_HEADING = 2^14
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -248,7 +252,8 @@ local function VictoryAtLocationUpdate()
 	for unitID, data in pairs(victoryAtLocation) do
 		if DoVictoryAtLocationCheck(unitID, data) then
 			if data.objectiveID then
-				Spring.SetGameRulesParam("objectiveSuccess_" .. data.objectiveID, (Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0)
+				local objParameter = "objectiveSuccess_" .. data.objectiveID
+				Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0))
 			end
 			GG.CauseVictory(data.allyTeamID)
 			return
@@ -523,6 +528,27 @@ local function AddInitialUnitObjectiveParameters(unitID, parameters)
 	end
 end
 
+
+local function SetupInitialUnitParameters(unitID, unitData)
+	AddInitialUnitObjectiveParameters(unitID, unitData)
+	
+	if unitData.invincible then
+		GG.SetUnitInvincible(unitID, true)
+		Spring.SetUnitRulesParam(unitID, "ignoredByAI", 1, publicTrueTable)
+		Spring.SetUnitNeutral(unitID, true) 
+	elseif unitData.notAutoAttacked then
+		Spring.SetUnitNeutral(unitID, true) 
+		Spring.SetUnitRulesParam(unitID, "ignoredByAI", 1, publicTrueTable)
+	end
+	
+	if unitData.mapMarker then
+		local ux, _, uz = Spring.GetUnitPosition(unitID)
+		if ux then
+			SendToUnsynced("AddMarker", unitID, ux, uz, unitData.mapMarker.text, unitData.mapMarker.color)
+		end
+	end
+end
+
 local function PlaceUnit(unitData, teamID)
 	if unitData.difficultyAtLeast and (unitData.difficultyAtLeast > missionDifficulty) then
 		return
@@ -545,7 +571,7 @@ local function PlaceUnit(unitData, teamID)
 	end
 	
 	local build = (unitData.buildProgress and unitData.buildProgress < 1) or false
-	local unitID = Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID, build)
+	local unitID = Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID, build, (ud.isBuilding or ud.speed == 0) and ud.levelGround)
 	
 	if not unitID then
 		Spring.MarkerAddPoint(x, 0, z, "Error creating unit " .. (((ud or {}).humanName) or "???"))
@@ -561,15 +587,46 @@ local function PlaceUnit(unitData, teamID)
 		}
 	end
 	
-	if unitData.mapMarker then
-		SendToUnsynced("AddMarker", unitID, x, z, unitData.mapMarker.text, unitData.mapMarker.color)
-	end
-	
-	AddInitialUnitObjectiveParameters(unitID, unitData)
+	SetupInitialUnitParameters(unitID, unitData, x, z)
 	
 	if build then
 		local _, maxHealth = Spring.GetUnitHealth(unitID)
 		Spring.SetUnitHealth(unitID, {build = unitData.buildProgress, health = maxHealth*unitData.buildProgress})
+	end
+end
+
+local function PlaceFeature(featureData, teamID)
+	if featureData.difficultyAtLeast and (featureData.difficultyAtLeast > missionDifficulty) then
+		return
+	end
+	if featureData.difficultyAtMost and (featureData.difficultyAtMost < missionDifficulty) then
+		return
+	end
+	
+	local name = featureData.name
+	local fd = FeatureDefNames[name]
+	if not (fd and fd.id) then
+		Spring.Echo("Missing feature placement", name)
+		return
+	end
+	
+	local x, z, facing = featureData.x, featureData.z, featureData.facing
+	if not facing then
+		facing = math.random()*4
+	end
+	
+	local unitDefName
+	if string.find(name, "_dead") then
+		unitDefName = string.gsub(name, "_dead", "")
+		local ud = UnitDefNames[unitDefName]
+		if ud.isBuilding or ud.speed == 0 then
+			x, z = SanitizeBuildPositon(x, z, ud, facing)
+		end
+	end
+	
+	local featureID = Spring.CreateFeature(fd.id, x, Spring.GetGroundHeight(x,z), z, facing*FACING_TO_HEADING, teamID)
+	if unitDefName then
+		Spring.SetFeatureResurrect(featureID, unitDefName, math.floor(facing + 0.5)%4)
 	end
 end
 
@@ -699,6 +756,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeamID, cmdID, cmdParams, cm
 	if cmdID == CMD_INSERT and cmdParams and cmdParams[2] then
 		cmdID = cmdParams[2]
 	end
+	local unitTeamID = (unitID and unitLineage[unitID]) or unitTeamID
 	if cmdID < 0 and unlockedUnitsByTeam[unitTeamID] then
 		if not (unlockedUnitsByTeam[unitTeamID][-cmdID]) then 
 			return false
@@ -708,6 +766,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeamID, cmdID, cmdParams, cm
 end
 
 function gadget:AllowUnitCreation(unitDefID, builderID, builderTeamID, x, y, z)
+	local builderTeamID = (builderID and unitLineage[builderID]) or builderTeamID
 	if unlockedUnitsByTeam[builderTeamID] then
 		if not (unlockedUnitsByTeam[builderTeamID][unitDefID]) then 
 			return false
@@ -778,6 +837,20 @@ local function PlaceTeamUnits(teamID, customKeys)
 	end
 end
 
+local function PlaceNeutralUnits(unitData)
+	local gaiaTeamID = Spring.GetGaiaTeamID() 
+	for i = 1, #unitData do
+		PlaceUnit(unitData[i], gaiaTeamID)
+	end
+end
+
+local function PlaceFeatures(featureData)
+	local gaiaTeamID = Spring.GetGaiaTeamID() 
+	for i = 1, #featureData do
+		PlaceFeature(featureData[i], gaiaTeamID)
+	end
+end
+
 local function InitializeCommanderParameters(teamID, customKeys)
 	local commParameters = CustomKeyToUsefulTable(customKeys and customKeys.commanderparameters)
 	if not commParameters then
@@ -807,12 +880,57 @@ local function DoInitialUnitPlacement()
 		PlaceTeamUnits(teamID, customKeys)
 	end
 	
+	local neutralUnitsToSpawn = CustomKeyToUsefulTable(Spring.GetModOptions().neutralunitstospawn) or false
+	if neutralUnitsToSpawn then
+		PlaceNeutralUnits(neutralUnitsToSpawn)
+	end
+	
+	local featuresToSpawn = CustomKeyToUsefulTable(Spring.GetModOptions().featurestospawn) or false
+	if featuresToSpawn then
+		PlaceFeatures(featuresToSpawn)
+	end
+	
 	if commandsToGive then
 		for i = 1, #commandsToGive do
 			GiveCommandsToUnit(commandsToGive[i].unitID, commandsToGive[i].commands)
 		end
 		commandsToGive = nil
 	end
+end
+
+local function DoInitialTerraform()
+	local terraformList = CustomKeyToUsefulTable(Spring.GetModOptions().initalterraform)
+	if not terraformList then
+		return
+	end
+	local gaiaTeamID = Spring.GetGaiaTeamID() 
+	
+	for i = 1, #terraformList do
+		local terraform = terraformList[i]
+		local pos = terraform.position
+		if terraform.terraformShape == 1 then 
+			-- Rectangle
+			local points = {
+				{x = pos[1], z = pos[2]},
+				{x = pos[3] - 8, z = pos[2]},
+				{x = pos[3] - 8, z = pos[4] - 8},
+				{x = pos[1], z = pos[4] - 8},
+				{x = pos[1], z = pos[2]},
+			}
+			GG.Terraform.TerraformArea(terraform.terraformType, points, 5, terraform.height or 0, nil, nil, gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i)
+		elseif terraform.terraformShape == 2 then
+			-- Line
+			local points = {
+				{x = pos[1], z = pos[2]},
+				{x = pos[3], z = pos[4]},
+			}
+			GG.Terraform.TerraformWall(terraform.terraformType, points, 2, terraform.height or 0, nil, nil, gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i)
+		elseif terraform.terraformShape == 3 then
+			-- Ramp
+			GG.Terraform.TerraformRamp(pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], terraform.width, nil, nil, gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[3], i)
+		end
+	end
+	GG.Terraform.ForceTerraformCompletion(true)
 end
 
 --------------------------------------------------------------------------------
@@ -869,7 +987,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- (Most) callins
+-- Victory/Defeat
 
 local function IsWinner(winners)
 	for i = 1, #winners do
@@ -880,10 +998,16 @@ local function IsWinner(winners)
 	return false
 end
 
-function gadget:GameOver(winners)
+local function MissionGameOver(missionWon)
 	gameIsOver = true
-	SetWinBeforeBonusObjective(IsWinner(winners))
+	SetWinBeforeBonusObjective(missionWon)
+	SendToUnsynced("MissionGameOver", missionWon)
+	Spring.SetGameRulesParam("MissionGameOver", (missionWon and 1) or 0)
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- (Most) callins
 
 function gadget:UnitFinished(unitID, unitDefID, teamID, builderID)
 	if IsVitalUnitType(unitID, unitDefID) then
@@ -914,6 +1038,8 @@ function gadget:Initialize()
 	InitializeVictoryConditions()
 	InitializeBonusObjectives()
 	
+	GG.MissionGameOver = MissionGameOver
+	
 	local allUnits = Spring.GetAllUnits()
 	for _, unitID in pairs(allUnits) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
@@ -926,19 +1052,21 @@ function gadget:Initialize()
 	GG.GalaxyCampaignHandler = GalaxyCampaignHandler
 end
 
-if CRASH_CIRCUIT then
-	function gadget:GamePreload(n)
-		if not Spring.GetGameRulesParam("loadedGame") then
-			DoInitialUnitPlacement()
-		end
+
+function gadget:GamePreload()
+	if Spring.GetGameRulesParam("loadedGame") then
+		return
+	end
+	DoInitialTerraform()
+	if SPAWN_GAME_PRELOAD then
+		DoInitialUnitPlacement()
 	end
 end
 
 function gadget:GameFrame(n)
-	-- Would use GamePreload if it didn't cause Circuit to crash.
 	if firstGameFrame then
 		firstGameFrame = false
-		if not CRASH_CIRCUIT then
+		if not SPAWN_GAME_PRELOAD then
 			if not Spring.GetGameRulesParam("loadedGame") then
 				DoInitialUnitPlacement()
 			end
@@ -953,16 +1081,23 @@ function gadget:GameFrame(n)
 		if checkForLoseAfterSeconds then
 			for i = 1, #allyTeamList do
 				local lostAfterSeconds = defeatConditionConfig[allyTeamList[i]].loseAfterSeconds
-				if lostAfterSeconds and lostAfterSeconds <= gameSeconds then
+				if lostAfterSeconds and lostAfterSeconds <= gameSeconds and GG.IsAllyTeamAlive(allyTeamList[i]) then
 					local defeatConfig = defeatConditionConfig[allyTeamList[i]]
 					if defeatConfig.timeLossObjectiveID then
-						Spring.SetGameRulesParam("objectiveSuccess_" .. defeatConfig.timeLossObjectiveID, (allyTeamList[i] == PLAYER_ALLY_TEAM_ID and 0) or 1)
+						local objParameter = "objectiveSuccess_" .. defeatConfig.timeLossObjectiveID
+						Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allyTeamList[i] == PLAYER_ALLY_TEAM_ID and 0) or 1))
 					end
 					GG.DestroyAlliance(allyTeamList[i])
 				end
 			end
 		end
 		DoPeriodicBonusObjectiveUpdate(gameSeconds)
+	end
+end
+
+function gadget:RecvLuaMsg(msg, playerID)
+	if msg:find("galaxyMissionResign", 1, true) then
+		GG.DestroyAlliance(PLAYER_ALLY_TEAM_ID)
 	end
 end
 
@@ -1006,7 +1141,7 @@ function gadget:Load(zip)
 	-- Put the units back in the objectives
 	for oldUnitID, data in pairs(loadData.initialUnitData) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		AddInitialUnitObjectiveParameters(unitID, data)
+		SetupInitialUnitParameters(unitID, data)
 	end
 end
 
@@ -1026,6 +1161,12 @@ function gadget:Save(zip)
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, MakeRealTable(SYNCED.saveTable))
 end
 
+local function MissionGameOver(cmd, missionWon)
+	if (Script.LuaUI('MissionGameOver')) then
+		Script.LuaUI.MissionGameOver(missionWon)
+	end
+end
+
 local function AddMarker(cmd, markerID, x, z, text, color)
 	if (Script.LuaUI('AddCustomMapMarker')) then
 		Script.LuaUI.AddCustomMapMarker(markerID, x, z, text, color)
@@ -1039,11 +1180,13 @@ local function RemoveMarker(cmd, markerID)
 end
 
 function gadget:Initialize()
+	gadgetHandler:AddSyncAction("MissionGameOver", MissionGameOver)
 	gadgetHandler:AddSyncAction("AddMarker", AddMarker)
 	gadgetHandler:AddSyncAction("RemoveMarker", RemoveMarker)
 end
 
 function gadget:Shutdown()
+	gadgetHandler:RemoveSyncAction("MissionGameOver")
 	gadgetHandler:RemoveSyncAction("AddMarker")
 	gadgetHandler:RemoveSyncAction("RemoveMarker")
 end

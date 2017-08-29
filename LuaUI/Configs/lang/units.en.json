@@ -136,7 +136,7 @@
 	},
 	"amphbomb" : {
 		"name" : "Limpet",
-		"description" : "Amphibious slow bomb",
+		"description" : "Amphibious Slow Bomb",
 		"helptext" : "The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them."
 	},
 	"factoryveh" : {
@@ -396,7 +396,7 @@
 	},
 	"jumpskirm" : {
 		"name" : "Moderator",
-		"description" : "Distruptor Skirmisher Walker",
+		"description" : "Disruptor Skirmisher Walker",
 		"helptext" : "The Moderator's disruptor beam reduces enemy speed and rate of fire by up to 50%% in addition to dealing damage, making it effective against almost all targets."
 	},
 	"chicken" : {
@@ -621,7 +621,7 @@
 	},
 	"athena" : {
 		"name" : "Athena",
-		"description" : "Airborne SpecOps Engineer, Builds at 7.5 m/s",
+		"description" : "Airborne SpecOps Engineer, Builds at 15 m/s",
 		"helptext" : "The Athena is the pinnacle of stealth strike capability. Equipped with a cloaking device and a radar jammer, it can slip through enemy lines to assemble squads of raiders, inflicting havoc on the opposition's logistics. The Athena can also resurrect wrecks on the battlefield, adding them to your army."
 	},
 	"staticsonar" : {
@@ -676,7 +676,7 @@
 	},
 	"staticarty" : {
 		"name" : "Behemoth",
-		"description" : "Plasma Artillery Battery - Requires 50 Power",
+		"description" : "Plasma Artillery Battery - Power by connecting to a 50 energy grid",
 		"helptext" : "The Behemoth offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly."
 	},
 	"wolverine_mine" : {
@@ -836,7 +836,7 @@
 	},
 	"turretantiheavy" : {
 		"name" : "Annihilator",
-		"description" : "Tachyon Projector - Requires 50 Power",
+		"description" : "Tachyon Projector - Power by connecting to a 50 energy grid",
 		"helptext" : "Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter."
 	},
 	"jumparty" : {
@@ -941,7 +941,7 @@
 	},
 	"turretheavy" : {
 		"name" : "Doomsday Machine",
-		"description" : "Medium Range Defense Fortress - Requires 50 Power",
+		"description" : "Medium Range Defense Fortress - Power by connecting to a 50 energy grid",
 		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Doomsday Machine forms a focal defense point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a quarter, although it cannot fire its weapons while doing so."
 	},
 	"turretimpulse" : {

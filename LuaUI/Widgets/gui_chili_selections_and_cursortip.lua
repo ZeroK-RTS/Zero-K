@@ -107,8 +107,12 @@ local terraformGeneralTip =
 
 local terraCmdTip = {
 	[CMD_RAMP] = 
-		green.. 'Step 1'..white..': Click to start ramp \n    OR click&drag to start a ramp at desired height. \n'..
-		green.. 'Step 2'..white..': Click to set end of ramp \n    OR click&drag to set end of ramp at desired height. \n    Hold '..green..'Alt'..white..' to snap to certain levels of pathability. \n'..
+		green.. 'Click&Drag'..white..': Build a ramp between two locations. Click again to set width. \n'..
+		'\n'..
+		yellow..'[Advanced]\n'..
+		green.. '(Ctrl/Alt)+Click'..white..': Set end heights. \n'..
+		green.. 'Step 1'..white..': Click&drag to start a ramp at desired height. Hold '..green..'Alt'..white..' to snap height.  \n'..
+		green.. 'Step 2'..white..': Click&drag to set end of ramp at desired height. Hold '..green..'Alt'..white..' to snap gradient. \n'..
 		green.. 'Step 3'..white..': Move mouse to set ramp width, click to complete. \n'..
 		'\n'..
 		yellow..'[Any Time]\n'..
@@ -1387,7 +1391,7 @@ local function GetMultiUnitInfoPanel(parentControl)
 		y = 0,
 		right = GROUP_STATS_WIDTH,
 		bottom = 0,
-		padding = {-1,-1,0,0},
+		padding = {-1,1,0,0},
 		parent = parentControl,
 	}
 	
@@ -2192,7 +2196,7 @@ local function GetSelectionWindow()
 		y = 0,
 		right = 0,
 		bottom = 0,
-		padding = {8, 6, 4, 2},
+		padding = {8, 4, 4, 2},
 		backgroundColor = {1, 1, 1, options.selection_opacity.value},
 		OnMouseDown = {
 			function(self)

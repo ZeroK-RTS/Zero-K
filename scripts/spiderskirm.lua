@@ -129,6 +129,15 @@ function script.Shot(num)
 	StartThread(HideMissile, gun_1)
 end
 
+function script.BlockShot(num, targetID)
+	if Spring.ValidUnitID(targetID) then
+		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/570
+		-- Assume that at least one rocket will hit.
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 135.1, 75 * distMult, false, false, true)
+	end
+	return false
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then

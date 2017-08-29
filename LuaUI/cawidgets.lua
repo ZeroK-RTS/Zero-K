@@ -1335,9 +1335,11 @@ do
 		local playerList = Spring.GetPlayerList()
 		for i = 1, #playerList do
 			local playerID = playerList[i]
-			local name, _, spectating = Spring.GetPlayerInfo(playerID)
-			if not spectating then
-				playerNameToID[name] = playerID
+			if playerID then
+				local name, _, spectating = Spring.GetPlayerInfo(playerID)
+				if not spectating then
+					playerNameToID[name] = playerID
+				end
 			end
 		end
 	end

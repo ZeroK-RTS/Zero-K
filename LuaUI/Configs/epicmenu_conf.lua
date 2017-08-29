@@ -296,24 +296,24 @@ local cameraPath = 'Settings/Camera'
 			end
 		end
 		)
-	
-	ShButton(cameraPath, 'Flip the TA Camera', 'viewtaflip')
 
-local oldCameraPath = 'Settings/Camera/Old Camera Shortcuts'	
-	ShButton(oldCameraPath, 'Total Annihilation', 'viewta')
-	ShButton(oldCameraPath, 'FPS', 'viewfps')
-	ShButton(oldCameraPath, 'Free', 'viewfree')
-	ShButton(oldCameraPath, 'Rotatable Overhead', 'viewrot')
-	ShButton(oldCameraPath, 'Total War', 'viewtw')
-	ShLabel(oldCameraPath, '')
-	ShButton(oldCameraPath, 'Move Forward', 'moveforward')	
-	ShButton(oldCameraPath, 'Move Back', 'moveback')	
-	ShButton(oldCameraPath, 'Move Left', 'moveleft')	
-	ShButton(oldCameraPath, 'Move Right', 'moveright')
-	ShLabel(oldCameraPath, ' ')
-	ShButton(oldCameraPath, 'TA camera track unit', 'track')
-	ShButton(oldCameraPath, 'Overview mode', 'toggleoverview')
-	ShButton(oldCameraPath, 'Panning mode','mousestate', 'Note: must be bound to a key for use')
+local camerHotkeys = 'Settings/Hotkeys/Camera'
+	ShButton(camerHotkeys, 'Move Forward', 'moveforward')
+	ShButton(camerHotkeys, 'Move Back', 'moveback')
+	ShButton(camerHotkeys, 'Move Left', 'moveleft')
+	ShButton(camerHotkeys, 'Move Right', 'moveright')
+	ShLabel(camerHotkeys, '')
+	ShButton(camerHotkeys, 'Overview Mode', 'toggleoverview')
+	ShButton(camerHotkeys, 'Track unit', 'track')
+	ShButton(camerHotkeys, 'Flip the Camera', 'viewtaflip')
+
+	ShLabel(camerHotkeys, '')
+	ShButton(camerHotkeys, 'Panning mode','mousestate', 'Note: must be bound to a key for use', true)
+	ShButton(camerHotkeys, 'Switch Default', 'viewta', nil, true)
+	ShButton(camerHotkeys, 'Switch FPS', 'viewfps', nil, true)
+	ShButton(camerHotkeys, 'Switch Free', 'viewfree', nil, true)
+	ShButton(camerHotkeys, 'Switch Rotatable', 'viewrot', nil, true)
+	ShButton(camerHotkeys, 'Switch Total War', 'viewtw', nil, true)
 	
 	
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.

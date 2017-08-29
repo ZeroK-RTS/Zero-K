@@ -1500,6 +1500,13 @@ function widget:Update(dt)
 		options.setToDefault.value = false
 	end
 	
+	if options.updateNewDefaults.value then
+		if not ((options.interfacePreset.value == "minimapRight") or (options.interfacePreset.value == "minimapLeft")) then
+			options.interfacePreset.value = "minimapRight"
+			options.interfacePreset.OnChange(options.interfacePreset)
+		end
+	end
+	
 	if firstUpdate then
 		firstUpdate = false
 		

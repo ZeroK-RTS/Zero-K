@@ -48,7 +48,7 @@ function script.FireWeapon(checkHeight)
 	if doingRun then
 		return
 	end
-	if Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
+	if RearmBlockShot() then
 		return
 	end
 	

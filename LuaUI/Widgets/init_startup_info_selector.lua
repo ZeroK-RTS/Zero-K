@@ -443,18 +443,22 @@ function widget:Update(dt)
 	
 	if startPosTimer and options.cameraZoom.value then
 		startPosTimer = startPosTimer + dt
-		if startPosTimer > 0.1 then
-			local _, active, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
-			if not spec then
-				local x, y, z = Spring.GetTeamStartPosition(teamID)
-				if not (x == 0 and y == 0 and z == 0) then
-					if WG.DelaySmoothCam then
-						WG.DelaySmoothCam(1)
+		if Spring.GetGameFrame() <= 0 then
+			if startPosTimer > 0.1 then
+				local _, active, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+				if not spec then
+					local x, y, z = Spring.GetTeamStartPosition(teamID)
+					if not (x == 0 and y == 0 and z == 0) then
+						if WG.DelaySmoothCam then
+							WG.DelaySmoothCam(1)
+						end
+						SetCameraTarget(x, y, z, 0.8, nil, options.cameraZoomDistance.value)
+						startPosTimer = false
 					end
-					SetCameraTarget(x, y, z, 0.8, nil, options.cameraZoomDistance.value)
-					startPosTimer = false
 				end
 			end
+		else
+			startPosTimer = false
 		end
 	end
 end

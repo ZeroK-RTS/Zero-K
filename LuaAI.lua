@@ -20,6 +20,10 @@ return {
   --  desc = 'Another AI that plays regular Zero-K'
   --},
   {
+    name = 'Chicken: Beginner',
+    desc = 'For PvE in PvP games'
+  },
+  {
     name = 'Chicken: Very Easy',
     desc = 'For PvE in PvP games'
   },

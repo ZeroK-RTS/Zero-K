@@ -38,13 +38,14 @@ noTarget = {
 
 modes = {
 	[0] = 0,
-	[1] = 'Chicken: Very Easy',
-	[2] = 'Chicken: Easy',
-	[3] = 'Chicken: Normal',
-	[4] = 'Chicken: Hard',
-	[5] = 'Chicken: Suicidal',
-	[6] = 'Chicken: Custom',
-	[7] = 'Chicken: Speed'
+	[1] = 'Chicken: Beginner',
+	[2] = 'Chicken: Very Easy',
+	[3] = 'Chicken: Easy',
+	[4] = 'Chicken: Normal',
+	[5] = 'Chicken: Hard',
+	[6] = 'Chicken: Suicidal',
+	[7] = 'Chicken: Custom',
+	[8] = 'Chicken: Speed'
 }
 defaultDifficulty = modes[2]
 testBuilding 	= UnitDefNames["energypylon"].id	--testing to place burrow
@@ -181,6 +182,24 @@ local function SetCustomMiniQueenTime()
 end
 	
 difficulties = {
+	['Chicken: Beginner'] = {
+		chickenSpawnRate = 180,
+		burrowSpawnRate  = 180,
+		gracePeriod      = 450,
+		rampUpTime       = 1200,
+		waveSizeMult     = 0.5,
+		timeSpawnBonus   = 0.010, -- how much each time level increases spawn size
+		queenTime        = 60*60,
+		queenName        = "chicken_dragon",
+		queenMorphName   = '',
+		miniQueenName    = "chicken_tiamat",
+		maxBurrows       = 4,
+		specialPowers    = {},
+		techAccelPerPlayer = 1.3,
+		techTimeFloorFactor = 0.2,
+		scoreMult        = 0.12,
+	},
+	
 	['Chicken: Very Easy'] = {
 		chickenSpawnRate = 90,
 		burrowSpawnRate  = 90,
@@ -192,8 +211,10 @@ difficulties = {
 		queenName		= "chicken_dragon",
 		queenMorphName	 = '',
 		miniQueenName	 = "chicken_tiamat",
-		maxBurrows	   = 12,
+		maxBurrows	   = 10,
 		specialPowers	 = {},
+		techAccelPerPlayer = 2,
+		techTimeFloorFactor = 0.4,
 		scoreMult		 = 0.25,
 	},
 

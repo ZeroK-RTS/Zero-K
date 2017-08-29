@@ -21,6 +21,8 @@ local smokePieces = {turret}
 local gunHeading = 0
 local walking = false
 
+local PACE = 1.9
+
 --Signal definitions
 local SIG_MOVE = 2
 local SIG_AIM = 4
@@ -111,59 +113,64 @@ local function WalkThread()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	walking = true
+	local speedMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)*PACE
 	
 	while true do
 
-		Turn(r_leg, x_axis, math.rad(25), math.rad(50))
-		Turn(r_foot, x_axis, math.rad(-10), math.rad(100))
-		Turn(base, z_axis, math.rad(-(-8)), math.rad(15))
-		Move(l_leg, y_axis, 0.3, 2)
-		Turn(r_foot, z_axis, math.rad(-(8)), math.rad(15))
-		Turn(l_foot, z_axis, math.rad(-(8)), math.rad(15))
-		Move(base, y_axis, 3, 5)
-		Move(r_foot, y_axis, 1.5, 2)
-		Move(l_foot, y_axis, 1.5, 2)
-		Turn(l_leg, x_axis, math.rad(-18), math.rad(50))
-		Turn(l_foot, x_axis, math.rad(12), math.rad(100))
-		Sleep(800)
+		Turn(r_leg, x_axis, math.rad(25), math.rad(50) * speedMult)
+		Turn(r_foot, x_axis, math.rad(-10), math.rad(100) * speedMult)
+		Turn(base, z_axis, math.rad(-(-8)), math.rad(15) * speedMult)
+		Move(l_leg, y_axis, 0.3, 2 * speedMult)
+		Turn(r_foot, z_axis, math.rad(-(8)), math.rad(15) * speedMult)
+		Turn(l_foot, z_axis, math.rad(-(8)), math.rad(15) * speedMult)
+		Move(base, y_axis, 3, 5 * speedMult)
+		Move(r_foot, y_axis, 1.5, 2 * speedMult)
+		Move(l_foot, y_axis, 1.5, 2 * speedMult)
+		Turn(l_leg, x_axis, math.rad(-18), math.rad(50) * speedMult)
+		Turn(l_foot, x_axis, math.rad(12), math.rad(100) * speedMult)
+		Sleep(800/speedMult)
 		
-		Turn(r_leg, x_axis, 0, math.rad(50))
-		Turn(r_foot, x_axis, 0, math.rad(100))
-		Turn(base, z_axis, math.rad(-(0)), math.rad(15))
-		Move(l_leg, y_axis, -1, 1.5)
-		Turn(r_foot, z_axis, math.rad(-(0)), math.rad(15))
-		Turn(l_foot, z_axis, math.rad(-(0)), math.rad(15))
-		Move(base, y_axis, 6, 2)
-		Move(r_foot, y_axis, 0, 2)
-		Move(l_foot, y_axis, 0, 2)
-		Turn(l_leg, x_axis, 0, math.rad(50))
-		Turn(l_foot, x_axis, 0, math.rad(100))
+		speedMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)*PACE
+		
+		Turn(r_leg, x_axis, 0, math.rad(50) * speedMult)
+		Turn(r_foot, x_axis, 0, math.rad(100) * speedMult)
+		Turn(base, z_axis, math.rad(-(0)), math.rad(15) * speedMult)
+		Move(l_leg, y_axis, -1, 1.5 * speedMult)
+		Turn(r_foot, z_axis, math.rad(-(0)), math.rad(15) * speedMult)
+		Turn(l_foot, z_axis, math.rad(-(0)), math.rad(15) * speedMult)
+		Move(base, y_axis, 6, 2 * speedMult)
+		Move(r_foot, y_axis, 0, 2 * speedMult)
+		Move(l_foot, y_axis, 0, 2 * speedMult)
+		Turn(l_leg, x_axis, 0, math.rad(50) * speedMult)
+		Turn(l_foot, x_axis, 0, math.rad(100) * speedMult)
 		--WaitForTurn(r_leg, x_axis)
 		
-		Turn(r_leg, x_axis, math.rad(-18), math.rad(50))
-		Turn(r_foot, x_axis, math.rad(12), math.rad(100))
-		Turn(base, z_axis, math.rad(-(8)), math.rad(15))
-		Move(r_leg, y_axis, 0.1, 2)
-		Turn(r_foot, z_axis, math.rad(-(-8)), math.rad(15))
-		Turn(l_foot, z_axis, math.rad(-(-8)), math.rad(15))
-		Move(base, y_axis, 3, 2)
-		Move(r_foot, y_axis, 1.5, 2)
-		Move(l_foot, y_axis, 1.5, 2)
-		Turn(l_leg, x_axis, math.rad(25), math.rad(50))
-		Turn(l_foot, x_axis, math.rad(-10), math.rad(100))
-		Sleep(800)
+		Turn(r_leg, x_axis, math.rad(-18), math.rad(50) * speedMult)
+		Turn(r_foot, x_axis, math.rad(12), math.rad(100) * speedMult)
+		Turn(base, z_axis, math.rad(-(8)), math.rad(15) * speedMult)
+		Move(r_leg, y_axis, 0.1, 2 * speedMult)
+		Turn(r_foot, z_axis, math.rad(-(-8)), math.rad(15) * speedMult)
+		Turn(l_foot, z_axis, math.rad(-(-8)), math.rad(15) * speedMult)
+		Move(base, y_axis, 3, 2 * speedMult)
+		Move(r_foot, y_axis, 1.5, 2 * speedMult)
+		Move(l_foot, y_axis, 1.5, 2 * speedMult)
+		Turn(l_leg, x_axis, math.rad(25), math.rad(50) * speedMult)
+		Turn(l_foot, x_axis, math.rad(-10), math.rad(100) * speedMult)
+		Sleep(800/speedMult)
 		
-		Turn(r_leg, x_axis, 0, math.rad(50))
-		Turn(r_foot, x_axis, 0, math.rad(100))
-		Turn(base, z_axis, math.rad(-(0)), math.rad(15))
-		Move(r_leg, y_axis, -3, 1.5)
-		Turn(r_foot, z_axis, math.rad(-(0)), math.rad(15))
-		Turn(l_foot, z_axis, math.rad(-(0)), math.rad(15))
-		Move(base, y_axis, 6, 2)
-		Move(r_foot, y_axis, 0, 2)
-		Move(l_foot, y_axis, 0, 2)
-		Turn(l_leg, x_axis, 0, math.rad(50))
-		Turn(l_foot, x_axis, 0, math.rad(100))
+		speedMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)*PACE
+		
+		Turn(r_leg, x_axis, 0, math.rad(50) * speedMult)
+		Turn(r_foot, x_axis, 0, math.rad(100) * speedMult)
+		Turn(base, z_axis, math.rad(-(0)), math.rad(15) * speedMult)
+		Move(r_leg, y_axis, -3, 1.5 * speedMult)
+		Turn(r_foot, z_axis, math.rad(-(0)), math.rad(15) * speedMult)
+		Turn(l_foot, z_axis, math.rad(-(0)), math.rad(15) * speedMult)
+		Move(base, y_axis, 6, 2 * speedMult)
+		Move(r_foot, y_axis, 0, 2 * speedMult)
+		Move(l_foot, y_axis, 0, 2 * speedMult)
+		Turn(l_leg, x_axis, 0, math.rad(50) * speedMult)
+		Turn(l_foot, x_axis, 0, math.rad(100) * speedMult)
 		--WaitForTurn(l_leg, x_axis)
 	end
 end
@@ -174,23 +181,24 @@ local function StopMovingThread()
 	
 	Sleep(50)
 	
+	local speedMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)*PACE
 	Signal(SIG_MOVE)
 	walking = false
 	
 	--move all the pieces to their original spots
-	Turn(l_leg, x_axis, 0, math.rad(90))
-	Turn(l_foot, x_axis, 0, math.rad(90))
-	Turn(l_foot, z_axis, math.rad(-(0)), math.rad(15))
-	Move(l_foot, y_axis, 0, 4)
+	Turn(l_leg, x_axis, 0, math.rad(90) * speedMult)
+	Turn(l_foot, x_axis, 0, math.rad(90) * speedMult)
+	Turn(l_foot, z_axis, math.rad(-(0)), math.rad(15) * speedMult)
+	Move(l_foot, y_axis, 0, 4 * speedMult)
 	
-	Turn(r_leg, x_axis, 0, math.rad(90))
-	Turn(r_foot, x_axis, 0, math.rad(90))
-	Turn(r_foot, z_axis, math.rad(-(0)), math.rad(15))
-	Move(r_foot, y_axis, 0, 4)
+	Turn(r_leg, x_axis, 0, math.rad(90) * speedMult)
+	Turn(r_foot, x_axis, 0, math.rad(90) * speedMult)
+	Turn(r_foot, z_axis, math.rad(-(0)), math.rad(15) * speedMult)
+	Move(r_foot, y_axis, 0, 4 * speedMult)
 	
-	Turn(base, z_axis, math.rad(-(0)), math.rad(90))
-	Turn(base, x_axis, 0, math.rad(90))
-	Move(base, y_axis, 3, 5)
+	Turn(base, z_axis, math.rad(-(0)), math.rad(90) * speedMult)
+	Turn(base, x_axis, 0, math.rad(90) * speedMult)
+	Move(base, y_axis, 3, 5 * speedMult)
 end
 
 function script.StartMoving()

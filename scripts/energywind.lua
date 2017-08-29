@@ -38,9 +38,9 @@ function SpinWind()
 			local st = baseWind + (Spring.GetGameRulesParam("WindStrength") or 0)*rangeWind
 			local direction = Spring.GetGameRulesParam("WindHeading")
 			
-			Spin(fan, z_axis, -st)
+			Spin(fan, z_axis, -st*(0.94 + 0.08*math.random()))
 			Turn(cradle, y_axis, direction - baseDirection + pi, turnSpeed)
-			Sleep(UPDATE_PERIOD)
+			Sleep(UPDATE_PERIOD + 200*math.random())
 		end
 	end
 end

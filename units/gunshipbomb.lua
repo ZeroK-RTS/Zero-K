@@ -21,8 +21,8 @@ unitDef = {
   cruiseAlt              = 30,
 
   customParams           = {
-	landflystate   = [[1]],
-	idle_cloak = 1,
+    landflystate   = [[1]],
+    idle_cloak = 1,
   },
 
   explodeAs              = [[gunshipbomb_EXPLOSION]],
@@ -77,12 +77,12 @@ unitDef = {
 
 local weaponDefs = {
   gunshipbomb_EXPLOSION = {
-    name               = "gunshipbomb Explosion",
+    name               = "Blastwing Explosion",
     areaOfEffect       = 256,
     craterBoost        = 1,
     craterMult         = 3.5,
-	
-	customParams        	  = {
+    
+    customParams          = {
       setunitsonfire = "1",
       burntime = 60,
       
@@ -93,21 +93,21 @@ local weaponDefs = {
       
       --lups_heat_fx = [[firewalker]],
     },
-	
+    
     damage = {
       default = 80,
       planes  = 80,
       subs    = 4,
     },
-	
+    
     edgeeffectiveness  = 0.7,
     explosionGenerator = [[custom:napalm_gunshipbomb]],
     explosionSpeed     = 10000,
-	firestarter        = 180,
+    firestarter        = 180,
     impulseBoost       = 0,
     impulseFactor      = 0.4,
     soundHit           = "explosion/ex_med17",
-	
+    
   },
 }
 unitDef.weaponDefs = weaponDefs

@@ -39,7 +39,7 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num)
-	return (Spring.GetUnitRulesParam(unitID, "noammo") == 1)
+	return RearmBlockShot()
 end
 
 function script.FireWeapon(num)

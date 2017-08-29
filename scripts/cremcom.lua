@@ -24,6 +24,8 @@ local shieldEmit = piece 'shieldemit'
 local smokePiece = {torso}
 local nanoPieces = {snout}
 
+local jets = {piece 'jet1', piece 'jet2', piece 'jet3', piece 'jet4'}
+
 local flares = {[0] = flareL, [1] = flareR}
 
 --------------------------------------------------------------------------------
@@ -97,7 +99,7 @@ end
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local isMoving, armsFree, shieldOn = false, true, true
+local isMoving, armsFree, shieldOn, inJumpMode = false, true, true, false
 local restoreHeading = 0
 local gun_num = 0
 
@@ -189,6 +191,28 @@ end
 function script.StopMoving() 
 	isMoving = false
 	StartThread(RestorePose)
+end
+
+function beginJump() 
+	script.StopMoving()
+	GG.PokeDecloakUnit(unitID, 50)
+	inJumpMode = true
+end
+
+function jumping()
+	GG.PokeDecloakUnit(unitID, 50)
+	for i=1,4 do
+		EmitSfx(jets[i], 1028)
+	end
+end
+
+function halfJump()
+end
+
+function endJump() 
+	script.StopMoving()
+	inJumpMode = false
+	EmitSfx(base, 1029)
 end
 
 function script.AimFromWeapon(num)

@@ -318,6 +318,20 @@ local function GetActionHotkey(actionName)
 	return WG.crude.GetHotkey(actionName)
 end
 
+local function GetButtonTooltip(displayConfig, command, state)
+	local tooltip = displayConfig and displayConfig.stateTooltip and displayConfig.stateTooltip[state]
+	if not tooltip then
+		tooltip = (displayConfig and displayConfig.tooltip) or (command and command.tooltip)
+	end
+	if command and command.action then
+		local hotkey = GetHotkeyText(command.action)
+		if tooltip and hotkey then
+			tooltip = tooltip .. " (\255\0\255\0" .. hotkey .. "\008)"
+		end
+	end
+	return tooltip
+end
+
 local function TabListsAreIdentical(newTabList, tabList)
 	if (not tabList) or (not newTabList) then
 		return false
@@ -884,6 +898,9 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 				local state = command.params[1] + 1
 				local displayConfig = commandDisplayConfig[cmdID]
 				local texture = displayConfig.texture[state]
+				if displayConfig.stateTooltip then
+					button.tooltip = GetButtonTooltip(displayConfig, command, isStateCommand and (command.params[1] + 1))
+				end
 				SetImage(texture)
 			end
 			if command then
@@ -916,22 +933,17 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			return
 		end
 		
-		local displayConfig = commandDisplayConfig[cmdID]
-		local tooltip = (displayConfig and displayConfig.tooltip) or command.tooltip
-		
 		local isStateCommand = (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
+		local displayConfig = commandDisplayConfig[cmdID]
+		button.tooltip = GetButtonTooltip(displayConfig, command, isStateCommand and (command.params[1] + 1))
 		
 		if command.action then
 			local hotkey = GetHotkeyText(command.action)
-			if tooltip and hotkey then
-				tooltip = tooltip .. " (\255\0\255\0" .. hotkey .. "\008)"
-			end
 			if not (isStateCommand or usingGrid) then
 				hotkeyText = hotkey
 				SetText(textConfig.topLeft.name, hotkey)
 			end
 		end
-		button.tooltip = tooltip
 		
 		if isStateCommand then
 			local state = command.params[1] + 1
@@ -1746,8 +1758,10 @@ function externalFunctions.GetCommandButtonPosition(cmdID)
 		return
 	end
 	local button = buttonsByCommand[cmdID]
-	local x, y, w, h = button.GetScreenPosition()
-	return x, y, w, h
+	if button and button.GetCommandID() == cmdID then
+		local x, y, w, h = button.GetScreenPosition()
+		return x, y, w, h
+	end
 end
 
 function externalFunctions.GetTabPosition(tabName)

@@ -330,13 +330,15 @@ local function DrawEtaText(unitID, timeLeft,yoffset, negative)
 		etaStr = "\255\255\255\1" .. string.format('%s %s%d:%02d', build_eta_translation, color, timeLeft / 60, timeLeft % 60)
 	end
 	local x, y, z = spGetUnitViewPosition(unitID)
-
-	gl.PushMatrix()
-		gl.Translate(x, y + yoffset, z)
-		gl.Billboard()
-		gl.Translate(0, 5 ,0)
-		gl.Text(etaStr, 0, 0, fontSize, "co")
-	gl.PopMatrix()
+	
+	if x and y and z then
+		gl.PushMatrix()
+			gl.Translate(x, y + yoffset, z)
+			gl.Billboard()
+			gl.Translate(0, 5 ,0)
+			gl.Text(etaStr, 0, 0, fontSize, "co")
+		gl.PopMatrix()
+	end
 end
 
 function widget:DrawWorld()

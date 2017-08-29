@@ -542,8 +542,8 @@ local function FinishMorph(unitID, morphData)
 	--//transfer command queue
 	for i = 1, #cmds do
 		local cmd = cmds[i]
-		if i == 1 and cmd.id < 0 then -- repair case for construction
-			local units = Spring.GetUnitsInRectangle(cmd.params[1]-32, cmd.params[3]-32, cmd.params[1]+32, cmd.params[3]+32)
+		if cmd.id < 0 then -- repair case for construction
+			local units = Spring.GetUnitsInRectangle(cmd.params[1] - 16, cmd.params[3] - 16, cmd.params[1] + 16, cmd.params[3] + 16)
 			local allyTeam = Spring.GetUnitAllyTeam(unitID)
 			local notFound = true
 			for j = 1, #units do

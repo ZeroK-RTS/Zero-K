@@ -57,6 +57,10 @@ function widget:GameStart()
 	running = true
 end
 
+function widget:GameOver()
+	widgetHandler:RemoveCallIn("Update")
+end
+
 local function ParseFrameTime(frames)
 	local secs = math.floor(frames / gameSpeed)
 	local h = math.floor(secs / 3600)

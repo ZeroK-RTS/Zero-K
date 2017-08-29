@@ -158,6 +158,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
 		nanoframeCount = nanoframeCount - 1
 
 		totalNanoValueByTeam[teamID] = totalNanoValueByTeam[teamID] - cost
+
+		local buildProgress = select(5, spGetUnitHealth(unitID))
+		cost = cost * buildProgress
 	else
 		cost = GetUnitCost(unitID, unitDefID)
 		unitValueByTeam[teamID] = unitValueByTeam[teamID] - cost

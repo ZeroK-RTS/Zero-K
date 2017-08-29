@@ -149,6 +149,7 @@ options = {
 local mexDefID = UnitDefNames["staticmex"].id
 local lltDefID = UnitDefNames["turretlaser"].id
 local solarDefID = UnitDefNames["energysolar"].id
+local windDefID = UnitDefNames["energywind"].id
 
 local mexUnitDef = UnitDefNames["staticmex"]
 local mexDefInfo = {
@@ -322,11 +323,13 @@ function widget:CommandNotify(cmdID, params, options)
 			aveX = ux/us
 			aveZ = uz/us
 		end
+		
+		local makeMexEnergy = options.alt
 
 		for i = 1, #WG.metalSpots do
 			local mex = WG.metalSpots[i]
 			--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
-			if (Distance(cx,cz,mex.x,mex.z) < cr*cr) then -- circle area, slower
+			if (Distance(cx, cz, mex.x, mex.z) < cr*cr) and (makeMexEnergy or IsSpotBuildable(i)) then -- circle area, slower
 				commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
 			end
 		end
@@ -370,16 +373,17 @@ function widget:CommandNotify(cmdID, params, options)
 					commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
 				end
 
-				if (options["alt"]) then
+				if makeMexEnergy then
 					for i=1, #addons do
 						local addon = addons[i]
 						local xx = x+addon[1]
 						local zz = z+addon[2]
 						local yy = Spring.GetGroundHeight(xx, zz)
+						local buildDefID = (Spring.TestBuildOrder(solarDefID, xx, yy, zz, 0) == 0 and windDefID) or solarDefID
 
 						-- check if some other widget wants to handle the command before sending it to units.
-						if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-solarDefID, {xx, yy, zz, 0}, options, true) then
-							commandArrayToIssue[#commandArrayToIssue+1] = {-solarDefID, {xx,yy,zz,0}, {"shift"}}
+						if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-buildDefID, {xx, yy, zz, 0}, options, true) then
+							commandArrayToIssue[#commandArrayToIssue+1] = {-buildDefID, {xx,yy,zz,0}, {"shift"}}
 						end
 					end
 				end
@@ -813,7 +817,8 @@ function widget:DrawWorld()
 	-- Check command is to build a mex
 	local _, cmdID = spGetActiveCommand()
 	local showecoMode = WG.showeco
-	local peruse = spGetGameFrame() < 1 or showecoMode or spGetMapDrawMode() == 'metal'
+	local pregame = (spGetGameFrame() < 1)
+	local peruse = pregame or showecoMode or spGetMapDrawMode() == 'metal'
 
 
 	local mx, my = spGetMouseState()
@@ -821,7 +826,7 @@ function widget:DrawWorld()
 
 	mexSpotToDraw = false
 
-	if WG.metalSpots and pos and (-mexDefID == cmdID or peruse or CMD_AREA_MEX == cmdID) then
+	if WG.metalSpots and pos and (pregame or WG.selectionEntirelyCons) and (-mexDefID == cmdID or peruse or CMD_AREA_MEX == cmdID) then
 
 		-- Find build position and check if it is valid (Would get 100% metal)
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])

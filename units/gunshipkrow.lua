@@ -49,7 +49,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_RED]],
-      [[custom:BEAMWEAPON_MUZZLE_RED]],
+      [[custom:DOT_Pillager_Explo]],
     },
 
   },

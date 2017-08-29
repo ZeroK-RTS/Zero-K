@@ -102,7 +102,8 @@ local requiresAlt = {
 -- If the mouse remains on the same target for both Press/Release then the formation is ignored and original command is issued.
 -- Normal logic will follow after override, i.e. must be a formationCmd to get formation, alt must be held if requiresAlt, etc.
 local overrideCmds = {
-	[CMD.GUARD] = CMD.MOVE,
+	[CMD.GUARD] = CMD_RAW_MOVE,
+	[CMD_WAIT_AT_BEACON] = CMD_RAW_MOVE,
 }
 
 -- What commands are issued at a position or unit/feature ID (Only used by GetUnitPosition)

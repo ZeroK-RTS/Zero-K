@@ -87,3 +87,8 @@ function Reload()
 		GG.InsertCommand(unitID, index, cmdID, areaAttack)
 	end
 end
+
+function RearmBlockShot()
+	local ammoState = Spring.GetUnitRulesParam(unitID, "noammo")
+	return (ammoState == 1) or (ammoState == 2) or (ammoState == 3)
+end

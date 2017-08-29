@@ -1061,13 +1061,17 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 			return
 		end
 		
-		local reserve = (x) / (self.width - self.padding[1] - self.padding[3])
-		if mouse ~= 1 then
-			UpdateReserveBars(true, true, reserve)
-		elseif metal then
-			UpdateReserveBars(true, false, reserve)
-		else
-			UpdateReserveBars(false, true, reserve)
+		local width = (self.width - self.padding[1] - self.padding[3])
+		
+		if width > 0 then
+			local reserve = x/width 
+			if mouse ~= 1 then
+				UpdateReserveBars(true, true, reserve)
+			elseif metal then
+				UpdateReserveBars(true, false, reserve)
+			else
+				UpdateReserveBars(false, true, reserve)
+			end
 		end
 	end
 	

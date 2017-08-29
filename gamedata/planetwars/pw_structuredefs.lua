@@ -262,12 +262,11 @@ local structureConfig = {
 		unitDef.radardistance = 2100
 		unitDef.radaremitheight = 150
 		unitDef.losemitheight = 150
-		unitDef.onoffable = true
-		unitDef.energyuse = 0.8
-		unitDef.customparams.priority_misc = 2
+		unitDef.onoffable = false
+		unitDef.energyuse = 0
 		
 		unitDef.collisionvolumescales = [[100 80 100]]
-		unitDef.collisionvolumetype	= [[Box]]
+		unitDef.collisionvolumetype = [[Box]]
 		
 		unitDef.featuredefs.dead.object = "pw_warpjammer_dead.dae"
 	end,

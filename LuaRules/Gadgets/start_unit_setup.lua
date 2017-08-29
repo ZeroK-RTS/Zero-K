@@ -411,13 +411,13 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 
 		-- add facplop
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
-		local udef = UnitDefs[Spring.GetUnitDefID(unitID)]		
+		local udef = UnitDefs[Spring.GetUnitDefID(unitID)]
 
 		local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
 		local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
 
-		Spring.SetTeamResource(teamID, "energy", START_ENERGY + energy)
-		Spring.SetTeamResource(teamID, "metal", START_METAL + metal)
+		Spring.SetTeamResource(teamID, "energy", teamInfo.start_energy or (START_ENERGY + energy))
+		Spring.SetTeamResource(teamID, "metal", teamInfo.start_metal or (START_METAL + metal))
 
 		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") and 
 			((not campaignBattleID) or GG.GalaxyCampaignHandler.HasFactoryPlop(teamID)) then

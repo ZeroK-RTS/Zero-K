@@ -597,8 +597,8 @@ local function ReplaceMoveCommand(unitID)
 	local queue = spGetCommandQueue(unitID, 1)
 	local cmd = queue and queue[1]
 	if cmd and cmd.id == CMD_MOVE and cmd.params[3] then
-		Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmd.tag}, {})
 		Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_RAW_MOVE, 0, cmd.params[1], cmd.params[2], cmd.params[3]}, CMD.OPT_ALT)
+		Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmd.tag}, {})
 	end
 end
 
