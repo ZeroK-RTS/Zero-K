@@ -148,7 +148,7 @@ ShieldProjectionSphere= {
   pos={0,60,0},
   size=350,
   colormap1 = { {0, 0, 1, 0.2} },
-  colormap2 = { {0.4, 0.4, 0.4, 0.1} },
+  colormap2 = { {0.1, 0.1, 1, 0} },
   repeatEffect=true
 }
 
