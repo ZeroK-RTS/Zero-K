@@ -220,6 +220,9 @@ end
 local function updateTeamName()
 
 	local caption = Spring.GetGameRulesParam("allyteam_long_name_" .. myAllyTeamID)
+	if not caption then
+		return
+	end
 	if string.len(caption) > 10 then
 		caption = Spring.GetGameRulesParam("allyteam_short_name_" .. myAllyTeamID)
 	end
