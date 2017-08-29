@@ -61,6 +61,15 @@ local NO_TEXT = ""
 EPIC_NAME = "epic_chili_integral_menu_"
 EPIC_NAME_UNITS = "epic_chili_integral_menu_tab_units"
 
+local modOptions = Spring.GetModOptions()
+local disabledTabs = {}
+if modOptions.integral_disable_defence == "1" then
+	disabledTabs.defence = true
+end
+if modOptions.integral_disable_special == "1" then
+	disabledTabs.special = true
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Command Handling and lower variables
@@ -1160,9 +1169,10 @@ end
 -- Tab Panel
 
 local function GetTabButton(panel, contentControl, name, humanName, hotkey, loiterable, OnSelect)
+	local disabled = disabledTabs[name]
 	
 	local function DoClick(mouse)
-		if TabClickFunction(mouse) then
+		if disabled or TabClickFunction(mouse) then
 			return
 		end
 		panel.SwitchToTab(name)
@@ -1184,9 +1194,15 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	}
 	button.backgroundColor[4] = 0.4
 	
+	if disabled then
+		button.font.outlineColor = {0, 0, 0, 1}
+		button.font.color = {0.6, 0.6, 0.6, 1}
+		button.supressButtonReaction = true
+	end
+	
 	local hideHotkey = loiterable
 	
-	if hotkey and not hideHotkey then
+	if hotkey and (not hideHotkey) and (not disabled) then
 		button:SetCaption(humanName .. " (\255\0\255\0" .. hotkey .. "\008)")
 		button:Invalidate()
 	end
@@ -1206,7 +1222,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	end
 	
 	function externalFunctionsAndData.SetHotkeyActive(isActive)
-		if (not hotkey) or hideHotkey then
+		if (not hotkey) or hideHotkey or disabled then
 			return
 		end
 		if loiterable then
@@ -1222,7 +1238,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	end
 	
 	function externalFunctionsAndData.SetHideHotkey(newHidden)
-		if not loiterable then
+		if (not loiterable) or disabled then
 			return
 		end
 		hideHotkey = newHidden
@@ -1269,7 +1285,7 @@ local function GetTabPanel(parent, rows, columns)
 		right = 0,
 		bottom = 0,
 		padding = {0, 0, 0, 0},
-		itemMargin  = {1, 1, 1, -1},	
+		itemMargin  = {1, 1, 1, -1},
 		parent = parent,
 		preserveChildrenOrder = true,
 		resizeItems = true,
