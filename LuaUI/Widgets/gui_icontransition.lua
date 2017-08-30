@@ -51,6 +51,7 @@ local spIsUnitSelected	= Spring.IsUnitSelected
 local spGetUnitAllyTeam	= Spring.GetUnitAllyTeam
 local spGetTeamColor	= Spring.GetTeamColor
 local spGetUnitDefID	= Spring.GetUnitDefID
+local spGetUnitTeam	= Spring.GetUnitTeam
 
 local glDepthTest      = gl.DepthTest
 local glDepthMask      = gl.DepthMask
@@ -88,6 +89,7 @@ local textureIcons = {}
 local textureOrdered = {}
 
 local textureColors = {}
+local textureSizes = {}
 
 local hideIcons = {}
 
@@ -272,21 +274,24 @@ local function GetUnitIcon(unitDefID)
 	if not ud then 
 		return 
 	end
-	iconTypeCache[unitDefID] = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/' .. ud.iconType .. iconFormat
+	iconTypeCache[unitDefID] = {}
+	iconTypeCache[unitDefID].bitmap = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/' .. ud.iconType .. iconFormat
+	iconTypeCache[unitDefID].size = icontypes[(ud and ud.iconType or "default")].size or 1.8
 	return iconTypeCache[unitDefID]
 end
 
 function UpdateUnitIcon (unitID)
-	local team, teamcolor, uniticon, udid
+	local team, teamcolor, uniticon, bitmap, size, udid
 	team = unitID and spGetUnitTeam(unitID)
 	teamcolor = team and {spGetTeamColor(team)}
 	udid = unitID and spGetUnitDefID(unitID)
-	uniticon = GetUnitIcon(udid) or 'icons/default.dds'
+	uniticon = GetUnitIcon(udid)
+	bitmap = uniticon and uniticon.bitmap or 'icons/default.dds'
+	size = uniticon and uniticon.size or 1.8
 	SetUnitIcon (unitID, {
 		name = 'radaricon',
---		texture = 'icons/kbotbuilder.png',
---		texture = 'icons/clogger.dds',
-		texture = uniticon,
+		texture = bitmap,
+		size = size,
 		color = teamcolor,
 	})
 end
@@ -318,6 +323,7 @@ function SetUnitIcon( unitID, data )
 	local iconName = data.name
 	local texture = data.texture
 	local color = data.color
+	local size = data.size
 	
 	local oldTexture = iconUnitTexture[iconName] and iconUnitTexture[iconName][unitID]
 	if oldTexture then
@@ -335,14 +341,21 @@ function SetUnitIcon( unitID, data )
 		textureData[texture][iconName] = {}
 	end
 	textureData[texture][iconName][unitID] = 0
-
+	
 	if color then
 		if not textureColors[unitID] then
 			textureColors[unitID] = {}
 		end
 		textureColors[unitID][iconName] = color
 	end
-
+	
+	if size then
+		if not textureSizes[unitID] then
+			textureSizes[unitID] = {}
+		end
+		textureSizes[unitID][iconName] = size
+	end
+	
 	if not iconUnitTexture[iconName] then
 		iconUnitTexture[iconName] = {}
 	end
@@ -370,10 +383,11 @@ local function DrawFuncAtUnitIcon2(unitID, xshift, yshift)
 end
 --]]
 
-local function DrawUnitFunc(xshift, yshift)
+local function DrawUnitFunc(xshift, yshift, size)
+	size = size or 1
 	glTranslate(0,yshift,0)
 	glBillboard()
-	glTexRect(xshift - iconsize*0.5, -iconsize*0.5, xshift + iconsize*0.5, iconsize*0.5)
+	glTexRect(xshift - iconsize*size*0.5, -iconsize*size*0.5, xshift + iconsize*size*0.5, iconsize*size*0.5)
 end
 
 local function DrawWorldFunc()
@@ -402,6 +416,7 @@ local function DrawWorldFunc()
 			glTexture(texture)
 			for unitID,xshift in pairs(units) do
 				local textureColor = textureColors[unitID] and textureColors[unitID][iconName]
+				local size = textureSizes[unitID] and textureSizes[unitID][iconName]
 				if spIsUnitSelected(unitID) then
 					gl.Color(1,1,1,opacity)
 				elseif textureColor then
@@ -411,7 +426,7 @@ local function DrawWorldFunc()
 				end
 				local unitInView = spIsUnitInView(unitID)
 				if unitInView and xshift and unitHeights and unitHeights[unitID] then
-					glDrawFuncAtUnit(unitID, false, DrawUnitFunc,xshift,unitHeights[unitID]/2)
+					glDrawFuncAtUnit(unitID, false, DrawUnitFunc,xshift,unitHeights[unitID]/2,size)
 				end
 				gl.Color(1,1,1,1)
 			end
