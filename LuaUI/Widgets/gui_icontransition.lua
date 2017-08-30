@@ -278,7 +278,7 @@ end
 
 function UpdateUnitIcon (unitID)
 	local team, teamcolor, uniticon, udid
-	team = unitID and spGetUnitAllyTeam(unitID)
+	team = unitID and spGetUnitTeam(unitID)
 	teamcolor = team and {spGetTeamColor(team)}
 	udid = unitID and spGetUnitDefID(unitID)
 	uniticon = GetUnitIcon(udid) or 'icons/default.dds'
