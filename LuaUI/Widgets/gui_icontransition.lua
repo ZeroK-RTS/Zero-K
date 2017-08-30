@@ -38,6 +38,59 @@ local GotHotkeypress = function() end
 local UpdateUnitIcon = function() end
 local SetUnitIcon = function() end
 
+------------------------------
+-- more stuff, clean this up
+--
+local echo = Spring.Echo
+
+local spGetUnitDefID 	= Spring.GetUnitDefID
+local spIsUnitInView 	= Spring.IsUnitInView
+local spGetUnitViewPosition = Spring.GetUnitViewPosition
+local spGetGameFrame 	= Spring.GetGameFrame
+local spIsUnitSelected	= Spring.IsUnitSelected
+local spGetUnitAllyTeam	= Spring.GetUnitAllyTeam
+local spGetTeamColor	= Spring.GetTeamColor
+local spGetUnitDefID	= Spring.GetUnitDefID
+
+local glDepthTest      = gl.DepthTest
+local glDepthMask      = gl.DepthMask
+local glAlphaTest      = gl.AlphaTest
+local glTexture        = gl.Texture
+local glTexRect        = gl.TexRect
+local glTranslate      = gl.Translate
+local glBillboard      = gl.Billboard
+local glDrawFuncAtUnit = gl.DrawFuncAtUnit
+local glPushMatrix     = gl.PushMatrix
+local glPopMatrix      = gl.PopMatrix
+
+local GL_GREATER = GL.GREATER
+
+local min   = math.min
+local max   = math.max
+local floor = math.floor
+local abs 	= math.abs
+
+local iconsize = 25
+-- local forRadarIcons = true
+local forRadarIcons = false
+
+local unitHeights  = {}
+local iconOrders = {}
+local iconOrders_order = {}
+
+-- local iconoffset = 22
+local iconoffset = 0
+
+local iconUnitTexture = {}
+local textureData = {}
+
+local textureIcons = {}
+local textureOrdered = {}
+
+local textureColors = {}
+
+local hideIcons = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -206,31 +259,53 @@ local clearing_table = {
 	texture = nil
 }
 
+local iconTypesPath = LUAUI_DIRNAME .. "Configs/icontypes.lua"
+local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
+local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
+
+local iconTypeCache = {}
+local function GetUnitIcon(unitDefID)
+	if unitDefID and iconTypeCache[unitDefID] then
+		return iconTypeCache[unitDefID]
+	end
+	local ud = UnitDefs[unitDefID]
+	if not ud then 
+		return 
+	end
+	iconTypeCache[unitDefID] = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/' .. ud.iconType .. iconFormat
+	return iconTypeCache[unitDefID]
+end
+
 function UpdateUnitIcon (unitID)
---	WG.icons.SetUnitIcon (unitID, {
+	local team, teamcolor, uniticon, udid
+	team = unitID and spGetUnitAllyTeam(unitID)
+	teamcolor = team and {spGetTeamColor(team)}
+	udid = unitID and spGetUnitDefID(unitID)
+	uniticon = GetUnitIcon(udid) or 'icons/default.dds'
 	SetUnitIcon (unitID, {
 		name = 'radaricon',
-		texture = 'icons/kbotbuilder.png'
+--		texture = 'icons/kbotbuilder.png',
+--		texture = 'icons/clogger.dds',
+		texture = uniticon,
+		color = teamcolor,
 	})
 end
 
-function widget:UnitCreated(unitID, unitDefID, unitTeam)
+function widget:UnitCreated(unitID)
 	UpdateUnitIcon(unitID)
 end
 
-function widget:UnitEnteredLos(unitID, unitTeam)
+function widget:UnitEnteredLos(unitID)
 	UpdateUnitIcon(unitID)
 end
 
-function widget:UnitLeftLos(unitID, unitDefID, unitTeam)
+function widget:UnitLeftLos(unitID)
 	if not spGetSpectatingState() then
---		WG.icons.SetUnitIcon(unitID, clearing_table)
 		SetUnitIcon(unitID, clearing_table)
 	end
 end
 
-function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
---	WG.icons.SetUnitIcon(unitID, clearing_table)
+function widget:UnitDestroyed(unitID)
 	SetUnitIcon(unitID, clearing_table)
 end
 
@@ -238,56 +313,6 @@ end
 -- Okay, here we go
 --
 
-local echo = Spring.Echo
-
-local spGetUnitDefID 	= Spring.GetUnitDefID
-local spIsUnitInView 	= Spring.IsUnitInView
-local spGetUnitViewPosition = Spring.GetUnitViewPosition
-local spGetGameFrame 	= Spring.GetGameFrame
-
-local glDepthTest      = gl.DepthTest
-local glDepthMask      = gl.DepthMask
-local glAlphaTest      = gl.AlphaTest
-local glTexture        = gl.Texture
-local glTexRect        = gl.TexRect
-local glTranslate      = gl.Translate
-local glBillboard      = gl.Billboard
-local glDrawFuncAtUnit = gl.DrawFuncAtUnit
-local glPushMatrix     = gl.PushMatrix
-local glPopMatrix      = gl.PopMatrix
-
-local GL_GREATER = GL.GREATER
-
-local min   = math.min
-local max   = math.max
-local floor = math.floor
-local abs 	= math.abs
-
-local iconsize = 25
--- local forRadarIcons = true
-local forRadarIcons = false
-
-
-
-local unitHeights  = {}
-local iconOrders = {}
-local iconOrders_order = {}
-
--- local iconoffset = 22
-local iconoffset = 0
-
-local iconUnitTexture = {}
-local textureData = {}
-
-local textureIcons = {}
-local textureOrdered = {}
-
-local textureColors = {}
-
-local hideIcons = {}
-local pulseIcons = {}
-
-local updateTime, iconFade = 0, 0
 
 function SetUnitIcon( unitID, data )
 	local iconName = data.name
@@ -377,30 +402,18 @@ local function DrawWorldFunc()
 			glTexture(texture)
 			for unitID,xshift in pairs(units) do
 				local textureColor = textureColors[unitID] and textureColors[unitID][iconName]
-				if textureColor then
-					textureColor[4] = textureColor[4] * opacity
-					gl.Color( textureColor )
-				elseif pulseIcons[iconName] then
-					gl.Color( 1,1,1,iconFade )
+				if spIsUnitSelected(unitID) then
+					gl.Color(1,1,1,opacity)
+				elseif textureColor then
+					gl.Color( textureColor[1], textureColor[2], textureColor[3], textureColor[4] * opacity )
 				else
 					gl.Color(1,1,1,opacity)
 				end
-			
 				local unitInView = spIsUnitInView(unitID)
 				if unitInView and xshift and unitHeights and unitHeights[unitID] then
-
---					if forRadarIcons then
---						DrawFuncAtUnitIcon2(unitID, xshift, unitHeights[unitID])
---					else
---						glDrawFuncAtUnit(unitID, false, DrawUnitFunc,xshift,unitHeights[unitID])
---					end
-
 					glDrawFuncAtUnit(unitID, false, DrawUnitFunc,xshift,unitHeights[unitID]/2)
 				end
-			
---				if textureColor or pulseIcons[iconName] then
-					gl.Color(1,1,1,1)
---				end
+				gl.Color(1,1,1,1)
 			end
 		
 		end
