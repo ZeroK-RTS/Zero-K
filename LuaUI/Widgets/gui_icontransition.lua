@@ -14,13 +14,13 @@ function widget:GetInfo()
   }
 end
 
-include("keysym.h.lua")
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 -- Parameters
 local tolerance = 25
+local iconsize = 25
+local iconoffset = 0
 
 -- Flags and switches
 local waiting_on_double
@@ -32,69 +32,76 @@ local showing_icons
 local kp_timer
 local testHeight = 0
 
+-- Constants
+local clearing_table = {
+	name = 'radaricon',
+	texture = nil
+}
+
+-- Initialized arrays
+local iconTypeCache = {}
+local iconUnitTexture = {}
+local textureData = {}
+local textureColors = {}
+local textureSizes = {}
+local unitHeights = {}
+
 -- Forward function declarations
-local UpdateDynamic = function() end
 local GotHotkeypress = function() end
+local UpdateDynamic = function() end
 local UpdateUnitIcon = function() end
 local SetUnitIcon = function() end
 
-------------------------------
--- more stuff, clean this up
---
+-- Localized Spring functions
 local echo = Spring.Echo
 
-local spGetUnitDefID 	= Spring.GetUnitDefID
-local spIsUnitInView 	= Spring.IsUnitInView
-local spGetUnitViewPosition = Spring.GetUnitViewPosition
-local spGetGameFrame 	= Spring.GetGameFrame
-local spIsUnitSelected	= Spring.IsUnitSelected
-local spGetUnitAllyTeam	= Spring.GetUnitAllyTeam
-local spGetTeamColor	= Spring.GetTeamColor
-local spGetUnitDefID	= Spring.GetUnitDefID
-local spGetUnitTeam	= Spring.GetUnitTeam
+local spGetSpectatingState = Spring.GetSpectatingState
+local spSendCommands	= Spring.SendCommands
+local spGetTimer	= Spring.GetTimer
+local spIsGUIHidden	= Spring.IsGUIHidden
+local spDiffTimers	= Spring.DiffTimers
 
-local glDepthTest      = gl.DepthTest
-local glDepthMask      = gl.DepthMask
-local glAlphaTest      = gl.AlphaTest
-local glTexture        = gl.Texture
-local glTexRect        = gl.TexRect
-local glTranslate      = gl.Translate
-local glBillboard      = gl.Billboard
-local glDrawFuncAtUnit = gl.DrawFuncAtUnit
-local glPushMatrix     = gl.PushMatrix
-local glPopMatrix      = gl.PopMatrix
+local spGetAllUnits	= Spring.GetAllUnits
+local spGetVisibleUnits	= Spring.GetVisibleUnits
+local spGetUnitDefID	= Spring.GetUnitDefID
+local spIsUnitInView	= Spring.IsUnitInView
+local spGetUnitViewPosition = Spring.GetUnitViewPosition
+local spIsUnitSelected	= Spring.IsUnitSelected
+local spGetUnitTeam	= Spring.GetUnitTeam
+local spGetTeamColor	= Spring.GetTeamColor
+
+local spGetUnitHeight	= Spring.GetUnitHeight
+
+local spGetCameraState	= Spring.GetCameraState
+local spGetGroundHeight	= Spring.GetGroundHeight
+
+local glDepthTest	= gl.DepthTest
+local glDepthMask	= gl.DepthMask
+local glAlphaTest	= gl.AlphaTest
+local glTexture		= gl.Texture
+local glTexRect		= gl.TexRect
+local glTranslate	= gl.Translate
+local glBillboard	= gl.Billboard
+local glDrawFuncAtUnit	= gl.DrawFuncAtUnit
+local glPushMatrix	= gl.PushMatrix
+local glPopMatrix	= gl.PopMatrix
 
 local GL_GREATER = GL.GREATER
 
-local min   = math.min
-local max   = math.max
-local floor = math.floor
-local abs 	= math.abs
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Includes
+--
 
-local iconsize = 25
--- local forRadarIcons = true
-local forRadarIcons = false
-
-local unitHeights  = {}
-local iconOrders = {}
-local iconOrders_order = {}
-
--- local iconoffset = 22
-local iconoffset = 0
-
-local iconUnitTexture = {}
-local textureData = {}
-
-local textureIcons = {}
-local textureOrdered = {}
-
-local textureColors = {}
-local textureSizes = {}
-
-local hideIcons = {}
+include("keysym.h.lua")
+local iconTypesPath = LUAUI_DIRNAME .. "Configs/icontypes.lua"
+local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
+local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Options
+--
 
 options_path = 'Settings/Graphics/Unit Visibility'
 
@@ -160,13 +167,14 @@ options = {
 		type = 'button',
 		OnChange = function(self) GotHotkeypress() end,
 	},
-
 }
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Controlling the icon view
+--
 
-GotHotkeypress = function()
+function GotHotkeypress()
 	if waiting_on_double then
 		waiting_on_double = false
 		target_mode = nil
@@ -175,7 +183,7 @@ GotHotkeypress = function()
 		UpdateDynamic()
 	else
 		waiting_on_double = true
-		kp_timer = Spring.GetTimer()
+		kp_timer = spGetTimer()
 		if current_mode == "On" then target_mode = "Off"
 		elseif current_mode == "Off" then target_mode = "On"
 		elseif showing_icons then target_mode = "Off"
@@ -184,88 +192,30 @@ GotHotkeypress = function()
 	end
 end
 
-local UpdateDynamic = function()
-	if showing_icons and testHeight < options.icontransitiontop.value - tolerance then
-		Spring.SendCommands("disticon " .. 100000)
-		showing_icons = false
-	elseif not showing_icons and testHeight > options.icontransitiontop.value + tolerance then
-		Spring.SendCommands("disticon " .. 0)
-		showing_icons = true
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-function widget:Update()
-	
-	if not waiting_on_double and (current_mode == "On" or current_mode == "Off") then return end
-
-	local cs = Spring.GetCameraState()
-	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
+function UpdateDynamic()
+	local cs = spGetCameraState()
+	local gy = spGetGroundHeight(cs.px, cs.pz)
 	testHeight = cs.py - gy
 	if cs.name == "ov" then
 		testHeight = options.icontransitiontop.value * 2
 	elseif cs.name == "ta" then
 		testHeight = cs.height - gy
 	end
-
-	if not waiting_on_double then UpdateDynamic() -- Not waiting, Dynamic mode
-	else
-		-- Waiting to see if there's a double keypress
-		local now_timer = Spring.GetTimer()
-		if kp_timer and Spring.DiffTimers(now_timer, kp_timer) < 0.2 then return end -- keep waiting
-		
-		-- Otherwise, time's up
-		if target_mode == "On" then
-			Spring.SendCommands("disticon " .. 0)
-			showing_icons = true
-			current_mode = "On"
-		else
-			Spring.SendCommands("disticon " .. 100000)
-			showing_icons = false
-			current_mode = "Off"
-		end
-		target_mode = nil
-		kp_timer = nil
-		waiting_on_double = nil
-	end
-
-end
-
-function widget:Initialize()
-	waiting_on_double = false
-	target_mode = nil
-	kp_timer = nil
-	current_mode = "Dynamic"
-	UpdateDynamic()
-
-	WG.icons.SetOrder ('radaricon', 100000)
-
-	local allUnits = Spring.GetAllUnits()
-	for _,unitID in pairs (allUnits) do
-		UpdateUnitIcon (unitID)
+	if showing_icons and testHeight < options.icontransitiontop.value - tolerance then
+		spSendCommands("disticon " .. 100000)
+		showing_icons = false
+	elseif not showing_icons and testHeight > options.icontransitiontop.value + tolerance then
+		spSendCommands("disticon " .. 0)
+		showing_icons = true
 	end
 end
 
--------------
--- For starters we'll use WG.icons.SetUnitIcon
--- but before long we'll have to roll our own draw routine
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Loading the icon data from config files
+-- Setting icon data per unit
 --
--- This doesn't update size and opacity based on camera height
---
 
-local spGetSpectatingState = Spring.GetSpectatingState
-local clearing_table = {
-	name = 'radaricon',
-	texture = nil
-}
-
-local iconTypesPath = LUAUI_DIRNAME .. "Configs/icontypes.lua"
-local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
-local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
-
-local iconTypeCache = {}
 local function GetUnitIcon(unitDefID)
 	if unitDefID and iconTypeCache[unitDefID] then
 		return iconTypeCache[unitDefID]
@@ -295,29 +245,6 @@ function UpdateUnitIcon (unitID)
 		color = teamcolor,
 	})
 end
-
-function widget:UnitCreated(unitID)
-	UpdateUnitIcon(unitID)
-end
-
-function widget:UnitEnteredLos(unitID)
-	UpdateUnitIcon(unitID)
-end
-
-function widget:UnitLeftLos(unitID)
-	if not spGetSpectatingState() then
-		SetUnitIcon(unitID, clearing_table)
-	end
-end
-
-function widget:UnitDestroyed(unitID)
-	SetUnitIcon(unitID, clearing_table)
-end
-
---------------
--- Okay, here we go
---
-
 
 function SetUnitIcon( unitID, data )
 	local iconName = data.name
@@ -366,22 +293,15 @@ function SetUnitIcon( unitID, data )
 		if (ud == nil) then
 			unitHeights[unitID] = nil
 		else
-			unitHeights[unitID] = Spring.GetUnitHeight(unitID) + iconoffset
+			unitHeights[unitID] = spGetUnitHeight(unitID) + iconoffset
 		end
 	end
 end
 
---[[
-local function DrawFuncAtUnitIcon2(unitID, xshift, yshift)
-	local x,y,z = spGetUnitViewPosition(unitID)
-	glPushMatrix()
-		glTranslate(x,y,z)
-		glTranslate(0,yshift,0)
-		glBillboard()
-		glTexRect(xshift -iconsize*0.5, -5, xshift + iconsize*0.5, iconsize-5)
-	glPopMatrix()
-end
---]]
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Drawing
+--
 
 local function DrawUnitFunc(xshift, yshift, size)
 	size = size or 1
@@ -391,14 +311,10 @@ local function DrawUnitFunc(xshift, yshift, size)
 end
 
 local function DrawWorldFunc()
-	if Spring.IsGUIHidden() then return end
+	if spIsGUIHidden() then return end
 	if showing_icons then return end
 	if current_mode ~= "Dynamic" then return end
 	if testHeight < options.icontransitionbottom.value then return end
-	
-	if (next(unitHeights) == nil) then
-		return -- avoid unnecessary GL calls
-	end
 	
 	iconsize = options.icontransitionminsize.value + (options.icontransitionmaxsize.value - options.icontransitionminsize.value) * (testHeight - options.icontransitionbottom.value) / (options.icontransitiontop.value - options.icontransitionbottom.value)
 	opacity = options.icontransitionminopacity.value + (options.icontransitionmaxopacity.value - options.icontransitionminopacity.value) * (testHeight - options.icontransitionbottom.value) / (options.icontransitiontop.value - options.icontransitionbottom.value)
@@ -406,33 +322,39 @@ local function DrawWorldFunc()
 
 	gl.Color(1,1,1,1)
 	glDepthMask(true)
---	glDepthTest(true)
 	glDepthTest(false)
 	glAlphaTest(GL_GREATER, 0.001)
 	
+	-- this is probably faster than spIsUnitInView() for all the units
+	-- but that's probably worth testing to confirm
+	local unitsInView = spGetVisibleUnits()
+	local unitIsInView = {}
+	for k,v in pairs(unitsInView) do
+		unitIsInView[v] = true
+	end
+	
 	for texture, curTextureData in pairs(textureData) do
 		for iconName, units in pairs(curTextureData) do
-		
 			glTexture(texture)
 			for unitID,xshift in pairs(units) do
-				local textureColor = textureColors[unitID] and textureColors[unitID][iconName]
-				local size = textureSizes[unitID] and textureSizes[unitID][iconName]
-				if spIsUnitSelected(unitID) then
-					gl.Color(1,1,1,opacity)
-				elseif textureColor then
-					gl.Color( textureColor[1], textureColor[2], textureColor[3], textureColor[4] * opacity )
-				else
-					gl.Color(1,1,1,opacity)
-				end
-				local unitInView = spIsUnitInView(unitID)
-				if unitInView and xshift and unitHeights and unitHeights[unitID] then
+--				local unitInView = spIsUnitInView(unitID)
+--				if unitInView and xshift and unitHeights and unitHeights[unitID] then
+				if unitIsInView[unitID] and xshift and unitHeights and unitHeights[unitID] then
+					local textureColor = textureColors[unitID] and textureColors[unitID][iconName]
+					local size = textureSizes[unitID] and textureSizes[unitID][iconName]
+					if spIsUnitSelected(unitID) then
+						gl.Color(1,1,1,opacity)
+					elseif textureColor then
+						gl.Color( textureColor[1], textureColor[2], textureColor[3], textureColor[4] * opacity )
+					else
+						gl.Color(1,1,1,opacity)
+					end
 					glDrawFuncAtUnit(unitID, false, DrawUnitFunc,xshift,unitHeights[unitID]/2,size)
+						-- try making this ^ true (boolean midPos) and see what happens
+					gl.Color(1,1,1,1)
 				end
-				gl.Color(1,1,1,1)
 			end
-		
 		end
-	
 	end
 	
 	glTexture(false)
@@ -440,6 +362,82 @@ local function DrawWorldFunc()
 	glAlphaTest(false)
 	glDepthTest(false)
 	glDepthMask(false)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Event Call-ins
+--
+
+function widget:Initialize()
+	waiting_on_double = false
+	target_mode = nil
+	kp_timer = nil
+	current_mode = "Dynamic"
+	UpdateDynamic()
+
+	WG.icons.SetOrder ('radaricon', 100000)
+
+	local allUnits = spGetAllUnits()
+	for _,unitID in pairs (allUnits) do
+		UpdateUnitIcon (unitID)
+	end
+end
+
+function widget:Update()
+	
+	if not waiting_on_double and current_mode ~= "Dynamic" then
+		-- We're not waiting, so there wasn't an earlier single keypress, so don't switch modes
+		-- And the current mode isn't dynamic, so don't check camera height
+		return
+	end
+	
+	-- We're either waiting, or in dynamic mode, or both
+	
+	-- If we're waiting, check to see if the time is up, and if so, then act on the earlier single keypress,
+	-- which means changing the mode to either On or Off (depending on the state when the key was pressed)
+	if waiting_on_double then
+		local now_timer = spGetTimer()
+		if kp_timer and spDiffTimers(now_timer, kp_timer) > 0.2 then
+			if target_mode == "On" then
+				spSendCommands("disticon " .. 0)
+				showing_icons = true
+				current_mode = "On"
+			else
+				spSendCommands("disticon " .. 100000)
+				showing_icons = false
+				current_mode = "Off"
+			end
+			target_mode = nil
+			kp_timer = nil
+			waiting_on_double = nil
+		end
+	end
+	
+	-- If the current mode (potentially after toggling to On or Off above) is dynamic,
+	-- check and set the current height so the draw functions have the right height, and
+	-- check to see if disticon should be changed because of the height
+	if current_mode == "Dynamic" then
+		UpdateDynamic()
+	end
+end
+
+function widget:UnitCreated(unitID)
+	UpdateUnitIcon(unitID)
+end
+
+function widget:UnitEnteredLos(unitID)
+	UpdateUnitIcon(unitID)
+end
+
+function widget:UnitLeftLos(unitID)
+	if not spGetSpectatingState() then
+		SetUnitIcon(unitID, clearing_table)
+	end
+end
+
+function widget:UnitDestroyed(unitID)
+	SetUnitIcon(unitID, clearing_table)
 end
 
 function widget:DrawWorld()
