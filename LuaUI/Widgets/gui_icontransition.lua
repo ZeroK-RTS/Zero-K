@@ -19,8 +19,6 @@ end
 
 -- Parameters
 local tolerance = 25
--- local iconsize = 25
-local iconoffset = 0
 
 -- Flags and switches
 local waiting_on_double
@@ -32,20 +30,8 @@ local showing_icons
 local kp_timer
 local testHeight = 0
 
--- Constants
-local clearing_table = {
-	name = 'radaricon',
-	texture = nil
-}
-
 -- Initialized arrays
 local iconTypeCache = {}
-local iconUnitTexture = {}
-local textureData = {}
-local textureColors = {}
-local textureSizes = {}
-local unitHeights = {}
-
 local unitDefsToRender = {}
 local unitsToRender = {}
 local renderOrders = {}
@@ -53,8 +39,6 @@ local renderOrders = {}
 -- Forward function declarations
 local GotHotkeypress = function() end
 local UpdateDynamic = function() end
-local UpdateUnitIcon = function() end
-local SetUnitIcon = function() end
 
 -- Localized Spring functions
 local echo = Spring.Echo
@@ -73,8 +57,6 @@ local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spIsUnitSelected	= Spring.IsUnitSelected
 local spGetUnitTeam	= Spring.GetUnitTeam
 local spGetTeamColor	= Spring.GetTeamColor
-
-local spGetUnitHeight	= Spring.GetUnitHeight
 
 local spGetCameraState	= Spring.GetCameraState
 local spGetGroundHeight	= Spring.GetGroundHeight
@@ -234,76 +216,6 @@ local function GetUnitIcon(unitDefID)
 	return iconTypeCache[unitDefID]
 end
 
---[[
-function UpdateUnitIcon (unitID)
-	local team, teamcolor, uniticon, bitmap, size, udid
-	team = unitID and spGetUnitTeam(unitID)
-	teamcolor = team and {spGetTeamColor(team)}
-	udid = unitID and spGetUnitDefID(unitID)
-	uniticon = GetUnitIcon(udid)
-	bitmap = uniticon and uniticon.bitmap or 'icons/default.dds'
-	size = uniticon and uniticon.size or 1.8
-	SetUnitIcon (unitID, {
-		name = 'radaricon',
-		texture = bitmap,
-		size = size,
-		color = teamcolor,
-	})
-end
-
-function SetUnitIcon( unitID, data )
-	local iconName = data.name
-	local texture = data.texture
-	local color = data.color
-	local size = data.size
-	
-	local oldTexture = iconUnitTexture[iconName] and iconUnitTexture[iconName][unitID]
-	if oldTexture then
-		textureData[oldTexture][iconName][unitID] = nil
-		iconUnitTexture[iconName][unitID] = nil
-	end
-	if not texture then
-		return
-	end
-	
-	if not textureData[texture] then
-		textureData[texture] = {}
-	end
-	if not textureData[texture][iconName] then
-		textureData[texture][iconName] = {}
-	end
-	textureData[texture][iconName][unitID] = 0
-	
-	if color then
-		if not textureColors[unitID] then
-			textureColors[unitID] = {}
-		end
-		textureColors[unitID][iconName] = color
-	end
-	
-	if size then
-		if not textureSizes[unitID] then
-			textureSizes[unitID] = {}
-		end
-		textureSizes[unitID][iconName] = size
-	end
-	
-	if not iconUnitTexture[iconName] then
-		iconUnitTexture[iconName] = {}
-	end
-	iconUnitTexture[iconName][unitID] = texture
-	
-	if not unitHeights[unitID] then
-		local ud = UnitDefs[spGetUnitDefID(unitID)]
-		if (ud == nil) then
-			unitHeights[unitID] = nil
-		else
-			unitHeights[unitID] = spGetUnitHeight(unitID) + iconoffset
-		end
-	end
-end
---]]
-
 local function addUnitIcon(unitID, unitDefID)
 	if not unitID or not unitDefID then return end
 	if unitsToRender[unitID] and unitsToRender[unitID].udid
@@ -352,20 +264,11 @@ end
 -- Drawing
 --
 
---[[
-local function DrawUnitFunc(xshift, yshift, size)
-	size = size or 1
-	glTranslate(0,yshift,0)
-	glBillboard()
-	glTexRect(xshift - iconsize*size*0.5, -iconsize*size*0.5, xshift + iconsize*size*0.5, iconsize*size*0.5)
-end
---]]
 local function DrawUnitFunc(size)
 	size = size or 1
 	glBillboard()
 	glTexRect(-size*0.5, -size*0.5, size*0.5, size*0.5)
 end
-
 
 local function DrawWorldFunc()
 	if spIsGUIHidden() then return end
@@ -373,8 +276,8 @@ local function DrawWorldFunc()
 	if current_mode ~= "Dynamic" then return end
 	if testHeight < options.icontransitionbottom.value then return end
 	
-	local iconsize, opacity
-	iconsize = options.icontransitionminsize.value + (options.icontransitionmaxsize.value - options.icontransitionminsize.value) * (testHeight - options.icontransitionbottom.value) / (options.icontransitiontop.value - options.icontransitionbottom.value)
+	local scale, opacity
+	scale = options.icontransitionminsize.value + (options.icontransitionmaxsize.value - options.icontransitionminsize.value) * (testHeight - options.icontransitionbottom.value) / (options.icontransitiontop.value - options.icontransitionbottom.value)
 	opacity = options.icontransitionminopacity.value + (options.icontransitionmaxopacity.value - options.icontransitionminopacity.value) * (testHeight - options.icontransitionbottom.value) / (options.icontransitiontop.value - options.icontransitionbottom.value)
 	opacity = opacity / 100
 
@@ -391,32 +294,6 @@ local function DrawWorldFunc()
 		unitIsInView[v] = true
 	end
 	
---[[
-	for texture, curTextureData in pairs(textureData) do
-		for iconName, units in pairs(curTextureData) do
-			glTexture(texture)
-			for unitID,xshift in pairs(units) do
---				local unitInView = spIsUnitInView(unitID)
---				if unitInView and xshift and unitHeights and unitHeights[unitID] then
-				if unitIsInView[unitID] and xshift and unitHeights and unitHeights[unitID] then
-					local textureColor = textureColors[unitID] and textureColors[unitID][iconName]
-					local size = textureSizes[unitID] and textureSizes[unitID][iconName]
-					if spIsUnitSelected(unitID) then
-						gl.Color(1,1,1,opacity)
-					elseif textureColor then
-						gl.Color( textureColor[1], textureColor[2], textureColor[3], textureColor[4] * opacity )
-					else
-						gl.Color(1,1,1,opacity)
-					end
-					glDrawFuncAtUnit(unitID, false, DrawUnitFunc,xshift,unitHeights[unitID]/2,size)
-						-- try making this ^ true (boolean midPos) and see what happens
-					gl.Color(1,1,1,1)
-				end
-			end
-		end
-	end
---]]
-	
 	for unitDefID, iconDef in pairs(unitDefsToRender) do
 		if iconDef then
 			glTexture(iconDef.texture)
@@ -430,7 +307,7 @@ local function DrawWorldFunc()
 					else
 						gl.Color(1,1,1,opacity)
 					end
-					glDrawFuncAtUnit(unitID, true, DrawUnitFunc,iconsize*iconDef.size)
+					glDrawFuncAtUnit(unitID, true, DrawUnitFunc,scale*iconDef.size)
 						-- try making this ^ true (boolean midPos) and see what happens
 					gl.Color(1,1,1,1)
 				end
@@ -456,11 +333,10 @@ function widget:Initialize()
 	current_mode = "Dynamic"
 	UpdateDynamic()
 
-	WG.icons.SetOrder ('radaricon', 100000)
-
 	local allUnits = spGetAllUnits()
 	for _,unitID in pairs (allUnits) do
-		UpdateUnitIcon (unitID)
+		local unitDefID = spGetUnitDefID(unitID)
+		addUnitIcon(unitID, unitDefID)
 	end
 end
 
@@ -503,26 +379,24 @@ function widget:Update()
 end
 
 function widget:UnitCreated(unitID, unitDefID)
---	UpdateUnitIcon(unitID)
 	addUnitIcon(unitID, unitDefID)
 end
 
 function widget:UnitEnteredLos(unitID)
---	UpdateUnitIcon(unitID)
-	-- and maybe later add caching for that
+	-- The unsynced version doesn't provide unitDefID so we have to fetch it
+	-- Maybe later add caching for unitID -> unitDefID to save an engine call
+	-- (but note that the cached value can be wrong under rare circumstances)
 	local unitDefID = unitID and spGetUnitDefID(unitID)
 	addUnitIcon(unitID, unitDefID)
 end
 
 function widget:UnitLeftLos(unitID)
 	if not spGetSpectatingState() then
---		SetUnitIcon(unitID, clearing_table)
 		removeUnitIcon(unitID)
 	end
 end
 
 function widget:UnitDestroyed(unitID)
---	SetUnitIcon(unitID, clearing_table)
 	removeUnitIcon(unitID)
 end
 
