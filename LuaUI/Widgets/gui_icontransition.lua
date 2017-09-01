@@ -19,7 +19,7 @@ end
 
 -- Parameters
 local tolerance = 25
-local iconsize = 25
+-- local iconsize = 25
 local iconoffset = 0
 
 -- Flags and switches
@@ -45,6 +45,10 @@ local textureData = {}
 local textureColors = {}
 local textureSizes = {}
 local unitHeights = {}
+
+local unitDefsToRender = {}
+local unitsToRender = {}
+local renderOrders = {}
 
 -- Forward function declarations
 local GotHotkeypress = function() end
@@ -230,6 +234,7 @@ local function GetUnitIcon(unitDefID)
 	return iconTypeCache[unitDefID]
 end
 
+--[[
 function UpdateUnitIcon (unitID)
 	local team, teamcolor, uniticon, bitmap, size, udid
 	team = unitID and spGetUnitTeam(unitID)
@@ -297,18 +302,70 @@ function SetUnitIcon( unitID, data )
 		end
 	end
 end
+--]]
+
+local function addUnitIcon(unitID, unitDefID)
+	if not unitID or not unitDefID then return end
+	if unitsToRender[unitID] and unitsToRender[unitID].udid
+		and unitsToRender[unitID].udid ~= unitDefID
+		and unitDefsToRender[unitsToRender[unitID].udid]
+		and unitDefsToRender[unitsToRender[unitID].udid].units
+	then
+		unitDefsToRender[unitsToRender[unitID].udid].units[unitID] = nil
+	end
+	local team = unitID and spGetUnitTeam(unitID)
+	local teamcolor = team and {spGetTeamColor(team)}
+	if not unitDefsToRender[unitDefID] then
+		local uniticon = GetUnitIcon(unitDefID)
+		local texture = uniticon and uniticon.bitmap or 'icons/default.dds'
+		local size = uniticon and uniticon.size or 1.8
+--		local render_order =
+		unitDefsToRender[unitDefID] = {
+			texture = texture,
+			size = size,
+--			render_order = render_order,
+		}
+--		renderOrders[render_order][unitDefID] = unitDefsToRender[unitDefID]
+	end
+	if not unitDefsToRender[unitDefID].units then
+		unitDefsToRender[unitDefID].units = {}
+	end
+	unitDefsToRender[unitDefID].units[unitID] = { color = teamcolor }
+	unitsToRender[unitID] = { udid = unitDefID }
+end
+
+local function removeUnitIcon(unitID)
+	if not unitID then return end
+	if unitsToRender[unitID] and unitsToRender[unitID].udid
+		and unitsToRender[unitID].udid ~= unitDefID
+		and unitDefsToRender[unitsToRender[unitID].udid]
+		and unitDefsToRender[unitsToRender[unitID].udid].units
+	then
+		unitDefsToRender[unitsToRender[unitID].udid].units[unitID] = nil
+	end
+	unitsToRender[unitID] = nil
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Drawing
 --
 
+--[[
 local function DrawUnitFunc(xshift, yshift, size)
 	size = size or 1
 	glTranslate(0,yshift,0)
 	glBillboard()
 	glTexRect(xshift - iconsize*size*0.5, -iconsize*size*0.5, xshift + iconsize*size*0.5, iconsize*size*0.5)
 end
+--]]
+local function DrawUnitFunc(size)
+	size = size or 1
+	glBillboard()
+	glTexRect(-size*0.5, -size*0.5, size*0.5, size*0.5)
+end
+
 
 local function DrawWorldFunc()
 	if spIsGUIHidden() then return end
@@ -316,6 +373,7 @@ local function DrawWorldFunc()
 	if current_mode ~= "Dynamic" then return end
 	if testHeight < options.icontransitionbottom.value then return end
 	
+	local iconsize, opacity
 	iconsize = options.icontransitionminsize.value + (options.icontransitionmaxsize.value - options.icontransitionminsize.value) * (testHeight - options.icontransitionbottom.value) / (options.icontransitiontop.value - options.icontransitionbottom.value)
 	opacity = options.icontransitionminopacity.value + (options.icontransitionmaxopacity.value - options.icontransitionminopacity.value) * (testHeight - options.icontransitionbottom.value) / (options.icontransitiontop.value - options.icontransitionbottom.value)
 	opacity = opacity / 100
@@ -333,6 +391,7 @@ local function DrawWorldFunc()
 		unitIsInView[v] = true
 	end
 	
+--[[
 	for texture, curTextureData in pairs(textureData) do
 		for iconName, units in pairs(curTextureData) do
 			glTexture(texture)
@@ -356,9 +415,30 @@ local function DrawWorldFunc()
 			end
 		end
 	end
+--]]
+	
+	for unitDefID, iconDef in pairs(unitDefsToRender) do
+		if iconDef then
+			glTexture(iconDef.texture)
+			for unitID, unitIconDef in pairs(iconDef.units) do
+				local color = unitIconDef and unitIconDef.color
+				if unitIsInView[unitID] then
+					if spIsUnitSelected(unitID) then
+						gl.Color(1,1,1,opacity)
+					elseif color then
+						gl.Color( color[1], color[2], color[3], color[4] * opacity )
+					else
+						gl.Color(1,1,1,opacity)
+					end
+					glDrawFuncAtUnit(unitID, true, DrawUnitFunc,iconsize*iconDef.size)
+						-- try making this ^ true (boolean midPos) and see what happens
+					gl.Color(1,1,1,1)
+				end
+			end
+		end
+	end
 	
 	glTexture(false)
-	
 	glAlphaTest(false)
 	glDepthTest(false)
 	glDepthMask(false)
@@ -422,22 +502,28 @@ function widget:Update()
 	end
 end
 
-function widget:UnitCreated(unitID)
-	UpdateUnitIcon(unitID)
+function widget:UnitCreated(unitID, unitDefID)
+--	UpdateUnitIcon(unitID)
+	addUnitIcon(unitID, unitDefID)
 end
 
 function widget:UnitEnteredLos(unitID)
-	UpdateUnitIcon(unitID)
+--	UpdateUnitIcon(unitID)
+	-- and maybe later add caching for that
+	local unitDefID = unitID and spGetUnitDefID(unitID)
+	addUnitIcon(unitID, unitDefID)
 end
 
 function widget:UnitLeftLos(unitID)
 	if not spGetSpectatingState() then
-		SetUnitIcon(unitID, clearing_table)
+--		SetUnitIcon(unitID, clearing_table)
+		removeUnitIcon(unitID)
 	end
 end
 
 function widget:UnitDestroyed(unitID)
-	SetUnitIcon(unitID, clearing_table)
+--	SetUnitIcon(unitID, clearing_table)
+	removeUnitIcon(unitID)
 end
 
 function widget:DrawWorld()
