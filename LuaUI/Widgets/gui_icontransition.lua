@@ -158,6 +158,7 @@ options = {
 		name = "Icon Mode Hotkey",
 		desc = "Define a hotkey to switch between icon display modes (On/Off/Dynamic).\n\nSingle-press to switch between On/Off.\n\nDouble-press to switch to Dynamic.",
 		type = 'button',
+		hotkey = 'Alt+I',
 		OnChange = function(self) GotHotkeypress() end,
 	},
 }
