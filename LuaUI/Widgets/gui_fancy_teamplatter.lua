@@ -31,7 +31,7 @@ end
 
 local drawWithHiddenGUI                 = false   -- keep widget enabled when graphical user interface is hidden (when pressing F5)
 
-local circleSize                        = 1
+local circleSize                        = 2.7
 local circleDivs                        = 12      -- how precise circle? octagon by default
 local circleOpacity                     = 0.5
 local innerSize                         = 1.35    -- circle scale compared to unit radius
@@ -139,17 +139,17 @@ end
 
 -- Retrieving radius:
 local function GetUnitDefRealRadius(udid)
-   local radius = realRadii[udid]
-   if (radius) then return radius end
-   local ud = UnitDefs[udid]
-   if (ud == nil) then return nil end
-   local dims = spGetUnitDefDimensions(udid)
-   if (dims == nil) then return nil end
-   local scale = ud.hitSphereScale -- missing in 0.76b1+
-   scale = ((scale == nil) or (scale == 0.0)) and 1.0 or scale
-   radius = dims.radius / scale
-   realRadii[udid] = radius*circleSize
-   return radius
+	local radius = realRadii[udid]
+	if (radius) then return radius end
+	local ud = UnitDefs[udid]
+	if (ud == nil) then return nil end
+	--local dims = spGetUnitDefDimensions(udid)
+	--if (dims == nil) then return nil end
+	--local scale = ud.hitSphereScale -- missing in 0.76b1+
+	--scale = ((scale == nil) or (scale == 0.0)) and 1.0 or scale
+	--radius = dims.radius / scale
+	realRadii[udid] = circleSize*(ud.xsize^2 + ud.zsize^2)^0.5
+	return realRadii[udid]
 end
 
 
@@ -162,7 +162,7 @@ function widget:DrawWorldPreUnit()
    if not drawWithHiddenGUI then
       if spIsGUIHidden() then return end
    end
-   glDepthTest(true)
+   glDepthTest(false)
    glPolygonOffset(-100, -2)
    local visibleUnits = spGetVisibleUnits()
    if #visibleUnits then
@@ -172,7 +172,7 @@ function widget:DrawWorldPreUnit()
          if circlePolys[teamID] ~= nil then
             local unitDefIDValue = spGetUnitDefID(unitID)
             if (unitDefIDValue) then
-               local radius = GetUnitDefRealRadius(unitDefIDValue) * circleSize
+               local radius = GetUnitDefRealRadius(unitDefIDValue)
                if (radius) then
                   glDrawListAtUnit(unitID, circlePolys[teamID], false, radius, 1.0, radius)
                end
