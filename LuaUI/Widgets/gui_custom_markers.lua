@@ -38,12 +38,6 @@ local minimapHighlightLineMax = 10
 local useFade = false
 local circleDrawList
 
-local colorPresets = {
-	red = {1, 0.2, 0.2},
-	green = {0.2, 1, 0.2},
-	blue = {0.2, 0.2, 1},
-}
-
 --[[
 -- supported parameters (for both presets and manual args):
 -- color
@@ -56,19 +50,46 @@ local colorPresets = {
 ]]
 
 local stylePresets = {
-  --[[
-  examplePreset = {
-	color = {0.2, 0.7, 0.1},
-	fontSize = 24,
-	showArrow = false,
-	noSmoke = true,
-	scaleTextSize = true,
-  }
-  ]]
-  small = {
-	fontSize = 24,
-  }
+	--[[
+	examplePreset = {
+		color = {0.2, 0.7, 0.1},
+		fontSize = 24,
+		showArrow = false,
+		noSmoke = true,
+		scaleTextSize = true,
+	}
+	]]
+	small = {
+		fontSize = 24,
+	}
 }
+
+local colorPresets = {
+	red = {1, 0.2, 0.2, 1},
+	green = {0.2, 1, 0.2, 1},
+	blue = {0.2, 0.2, 1, 1},
+}
+local sizePresets = {
+	small = {
+		fontSize = 24,
+		showArrow = false,
+	},
+}
+
+for name, color in pairs(colorPresets) do
+	stylePresets[name] = {
+		color = color,
+	}
+	for sizeName, params in pairs(sizePresets) do
+		local new = {
+			color = color,
+		}
+		for key, value in pairs(params) do
+			new[key] = value
+		end
+		stylePresets[name .. "_" .. sizeName] = new
+	end
+end
 
 ----------------------------------------------------------------
 --speedups
@@ -166,40 +187,24 @@ local function RemovePoint(id)
 	mapPoints[id] = nil
 end
 
-local function AddPoint(id, x, z, text, params)
+local function AddPoint(id, x, z, text, styleName)
 	if mapPoints[id] then
 		RemovePoint(id)
-	end
-	params = params or EMPTY_TABLE
-	
-	-- reverse compatibility: params can be a color table
-	local isColorArg = type(params) == "table" and ((#params == 3) or (#params == 4))
-	
-	local color = WHITE
-	if isColorArg then
-	  color = params
 	end
 	
 	local expiration = (timeNow or 0) + ttl
 	local y = Spring.GetGroundHeight(x, z)
 	
-	local pointData = {color = color, x = x, y = y, z = z, text = text, expiration = expiration}
-	
-	-- merge params (preset or manual) into pointData
-	local toMerge = EMPTY_TABLE
-	if type(params) == "string" then
-	  toMerge = stylePresets[params] or EMPTY_TABLE
-	elseif type(params) == "table" and (not isColorArg) then
-	  toMerge = params
+	local pointData = {x = x, y = y, z = z, text = text, expiration = expiration}
+
+	if styleName and stylePresets[styleName] then
+		pointData = Spring.Utilities.MergeTable(stylePresets[styleName], pointData, true)
+	end
+	if not pointData.color then
+		pointData.color = WHITE
 	end
 	
-	pointData = Spring.Utilities.MergeTable(toMerge, pointData, true)
-	
 	mapPoints[id] = pointData
-end
-
-local function AddPointPresetColor(id, x, z, text, color)
-	AddPoint(id, x, z, text, color and colorPresets[color])
 end
 
 local function ClearPoints()
@@ -289,7 +294,7 @@ function widget:Initialize()
 	
 	circleDrawList = gl.CreateList(gl.BeginEnd, GL.LINE_LOOP, CircleVertices, 48)
 	
-	widgetHandler:RegisterGlobal('AddCustomMapMarker', AddPointPresetColor)
+	widgetHandler:RegisterGlobal('AddCustomMapMarker', AddPoint)
 	widgetHandler:RegisterGlobal('RemoveCustomMapMarker', RemovePoint)
 	
 	-- debug
