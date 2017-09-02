@@ -31,7 +31,6 @@ local kp_timer
 local testHeight = 0
 
 -- Initialized arrays
-local iconTypeCache = {}
 local unitDefsToRender = {}
 local unitsToRender = {}
 local renderOrders = {}
@@ -198,23 +197,8 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Loading the icon data from config files
--- Setting icon data per unit
+-- Adding and removing units from the list of units to draw icons for
 --
-
-local function GetUnitIcon(unitDefID)
-	if unitDefID and iconTypeCache[unitDefID] then
-		return iconTypeCache[unitDefID]
-	end
-	local ud = UnitDefs[unitDefID]
-	if not ud then 
-		return 
-	end
-	iconTypeCache[unitDefID] = {}
-	iconTypeCache[unitDefID].bitmap = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/' .. ud.iconType .. iconFormat
-	iconTypeCache[unitDefID].size = icontypes[(ud and ud.iconType or "default")].size or 1.8
-	return iconTypeCache[unitDefID]
-end
 
 local function addUnitIcon(unitID, unitDefID)
 	if not unitID or not unitDefID then return end
@@ -228,9 +212,9 @@ local function addUnitIcon(unitID, unitDefID)
 	local team = unitID and spGetUnitTeam(unitID)
 	local teamcolor = team and {spGetTeamColor(team)}
 	if not unitDefsToRender[unitDefID] then
-		local uniticon = GetUnitIcon(unitDefID)
-		local texture = uniticon and uniticon.bitmap or 'icons/default.dds'
-		local size = uniticon and uniticon.size or 1.8
+		local ud = UnitDefs[unitDefID]
+		local texture = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/' .. ud.iconType .. iconFormat
+		local size = icontypes[(ud and ud.iconType or "default")].size or 1.8
 --		local render_order =
 		unitDefsToRender[unitDefID] = {
 			texture = texture,
