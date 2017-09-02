@@ -2179,6 +2179,7 @@ local function GetSelectionWindow()
 		height    = height,
         minWidth  = 450, 
 		minHeight = 120,
+		bringToFrontOnClick = false,
 		dockable  = true,
 		draggable = false,
 		resizable = false,

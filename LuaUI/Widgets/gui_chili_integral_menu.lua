@@ -1529,6 +1529,7 @@ local function InitializeControls()
 		height    = height,
 		minWidth  = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
+		bringToFrontOnClick = false,
 		dockable  = true,
 		draggable = false,
 		resizable = false,
