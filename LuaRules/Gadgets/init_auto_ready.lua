@@ -50,7 +50,9 @@ local readyCount = 0
 local waitingCount = 0 
 local missingCount = 0
 
-local forceSent = false 
+local forceSent = false
+
+local fixedStartPos = (Spring.GetModOptions().fixedstartpos == "1")
 
 function gadget:Initialize() 
 	startTimer = Spring.GetTimer()
@@ -124,7 +126,10 @@ function gadget:GameSetup(label, ready, playerStates)
 	return true, false
 end
 
-function gadget:DrawScreen() 
+function gadget:DrawScreen()
+	if fixedStartPos then
+		return
+	end
 	local vsx, vsy = gl.GetViewSizes()
 	local text = lastLabel 
 	if text == nil then 

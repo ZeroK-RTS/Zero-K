@@ -85,6 +85,8 @@ local fontPath = "LuaUI/Fonts/MicrogrammaDBold.ttf"
 local minTransparency_autoFade = 0.1
 local maxTransparency_autoFade = 0.7
 
+local gameNotStarted = true
+
 local screenx, screeny, myFont
 local screenCenterX, screenCenterY, wndX1, wndY1, wndX2, wndY2
 local victoryTextX, defeatTextX, defeatTextX, lowerTextX
@@ -454,6 +456,9 @@ function widget:Update()
 			mouseOver = false
 		end
 	end
+	if gameNotStarted then
+		Spring.SendCommands("forcestart")
+	end
 end
 
 local function DrawGameOverScreen(now)
@@ -561,6 +566,7 @@ function widget:GameFrame(n)
 		if bonusObjectiveBlock then
 			bonusObjectiveBlock.Update()
 		end
+		gameNotStarted = false
 	end
 	if missionEndFrame and missionEndFrame <= n then
 		missionSustainedTime = osClock()
@@ -574,6 +580,7 @@ function widget:Initialize()
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 	
 	widgetHandler:RegisterGlobal('MissionGameOver', MissionGameOver)
+	Spring.SendCommands("forcestart")
 	
 	WG.MissionResign = MissionResign
 	
