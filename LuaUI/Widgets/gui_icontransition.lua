@@ -33,7 +33,7 @@ local testHeight = 0
 -- Initialized arrays
 local unitDefsToRender = {}
 local unitsToRender = {}
-local renderOrders = {}
+local renderOrders = { {}, {}, {} }
 local renderAtPos = {}
 
 -- Forward function declarations
@@ -243,9 +243,6 @@ local function addUnitIcon(unitID, unitDefID)
 			render_order = render_order,
 			midPos = midPos,
 		}
-		if not renderOrders[render_order] then
-			renderOrders[render_order] = {}
-		end
 		renderOrders[render_order][unitDefID] = unitDefsToRender[unitDefID]
 	end
 	if not unitDefsToRender[unitDefID].units then
