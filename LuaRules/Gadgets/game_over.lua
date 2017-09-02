@@ -85,23 +85,30 @@ local function GetUnitDefIdByName(defName)
   return (UnitDefNames[defName] or nilUnitDef).id
 end
 
-local doesNotCountList = {
-	[GetUnitDefIdByName("spiderscout")] = true,
-	[GetUnitDefIdByName("shieldbomb")] = true,
-	[GetUnitDefIdByName("cloakbomb")] = true,
-	[GetUnitDefIdByName("amphbomb")] = true,
-	[GetUnitDefIdByName("gunshipbomb")] = true,
-	[GetUnitDefIdByName("terraunit")] = true,
-}
+local doesNotCountList 
+if campaignBattleID then
+	doesNotCountList = {
+		[GetUnitDefIdByName("terraunit")] = true,
+	}
+else
+	doesNotCountList = {
+		[GetUnitDefIdByName("spiderscout")] = true,
+		[GetUnitDefIdByName("shieldbomb")] = true,
+		[GetUnitDefIdByName("cloakbomb")] = true,
+		[GetUnitDefIdByName("amphbomb")] = true,
+		[GetUnitDefIdByName("gunshipbomb")] = true,
+		[GetUnitDefIdByName("terraunit")] = true,
+	}
 
--- auto detection of doesnotcount units
-for name, ud in pairs(UnitDefs) do
-	if (ud.customParams.dontcount) then
-		doesNotCountList[ud.id] = true
-	elseif (ud.isFeature) then
-		doesNotCountList[ud.id] = true
-	elseif (not ud.canAttack) and (not ud.speed) and (not ud.isFactory) then
-		doesNotCountList[ud.id] = true
+	-- auto detection of doesnotcount units
+	for name, ud in pairs(UnitDefs) do
+		if (ud.customParams.dontcount) then
+			doesNotCountList[ud.id] = true
+		elseif (ud.isFeature) then
+			doesNotCountList[ud.id] = true
+		elseif (not ud.canAttack) and (not ud.speed) and (not ud.isFactory) then
+			doesNotCountList[ud.id] = true
+		end
 	end
 end
 
