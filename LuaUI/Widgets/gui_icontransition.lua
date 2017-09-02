@@ -215,13 +215,23 @@ local function addUnitIcon(unitID, unitDefID)
 		local ud = UnitDefs[unitDefID]
 		local texture = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/' .. ud.iconType .. iconFormat
 		local size = icontypes[(ud and ud.iconType or "default")].size or 1.8
---		local render_order =
+		local render_order
+		if ud and ud.isFactory then
+			render_order = 1
+		elseif ud and ud.isAirUnit then
+			render_order = 3
+		else
+			render_order = 2
+		end
 		unitDefsToRender[unitDefID] = {
 			texture = texture,
 			size = size,
---			render_order = render_order,
+			render_order = render_order,
 		}
---		renderOrders[render_order][unitDefID] = unitDefsToRender[unitDefID]
+		if not renderOrders[render_order] then
+			renderOrders[render_order] = {}
+		end
+		renderOrders[render_order][unitDefID] = unitDefsToRender[unitDefID]
 	end
 	if not unitDefsToRender[unitDefID].units then
 		unitDefsToRender[unitDefID].units = {}
@@ -278,22 +288,24 @@ local function DrawWorldFunc()
 		unitIsInView[v] = true
 	end
 	
-	for unitDefID, iconDef in pairs(unitDefsToRender) do
-		if iconDef then
-			glTexture(iconDef.texture)
-			for unitID, unitIconDef in pairs(iconDef.units) do
-				local color = unitIconDef and unitIconDef.color
-				if unitIsInView[unitID] then
-					if spIsUnitSelected(unitID) then
-						gl.Color(1,1,1,opacity)
-					elseif color then
-						gl.Color( color[1], color[2], color[3], color[4] * opacity )
-					else
-						gl.Color(1,1,1,opacity)
+	for i,unitDefIDs in ipairs(renderOrders) do
+		for unitDefID, iconDef in pairs(unitDefIDs) do
+			if iconDef then
+				glTexture(iconDef.texture)
+				for unitID, unitIconDef in pairs(iconDef.units) do
+					local color = unitIconDef and unitIconDef.color
+					if unitIsInView[unitID] then
+						if spIsUnitSelected(unitID) then
+							gl.Color(1,1,1,opacity)
+						elseif color then
+							gl.Color( color[1], color[2], color[3], color[4] * opacity )
+						else
+							gl.Color(1,1,1,opacity)
+						end
+						glDrawFuncAtUnit(unitID, true, DrawUnitFunc,scale*iconDef.size)
+							-- try making this ^ true (boolean midPos) and see what happens
+						gl.Color(1,1,1,1)
 					end
-					glDrawFuncAtUnit(unitID, true, DrawUnitFunc,scale*iconDef.size)
-						-- try making this ^ true (boolean midPos) and see what happens
-					gl.Color(1,1,1,1)
 				end
 			end
 		end
