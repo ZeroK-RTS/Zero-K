@@ -302,8 +302,7 @@ local function DrawWorldFunc()
 						else
 							gl.Color(1,1,1,opacity)
 						end
-						glDrawFuncAtUnit(unitID, true, DrawUnitFunc,scale*iconDef.size)
-							-- try making this ^ true (boolean midPos) and see what happens
+						glDrawFuncAtUnit(unitID, false, DrawUnitFunc,scale*iconDef.size)
 						gl.Color(1,1,1,1)
 					end
 				end
