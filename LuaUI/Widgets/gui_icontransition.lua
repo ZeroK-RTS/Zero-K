@@ -34,6 +34,7 @@ local testHeight = 0
 local unitDefsToRender = {}
 local unitsToRender = {}
 local renderOrders = {}
+local renderAtPos = {}
 
 -- Forward function declarations
 local GotHotkeypress = function() end
@@ -75,13 +76,20 @@ local GL_GREATER = GL.GREATER
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Includes
+-- Includes and initializations
 --
 
 include("keysym.h.lua")
 local iconTypesPath = LUAUI_DIRNAME .. "Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
+
+
+renderAtPos = {
+	[UnitDefNames["staticmex"].id] = true,
+	[UnitDefNames["energywind"].id] = true,
+	[UnitDefNames["energysolar"].id] = true,
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -216,6 +224,7 @@ local function addUnitIcon(unitID, unitDefID)
 		local texture = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/' .. ud.iconType .. iconFormat
 		local size = icontypes[(ud and ud.iconType or "default")].size or 1.8
 		local render_order
+		local midPos
 		if ud and ud.isFactory then
 			render_order = 1
 		elseif ud and ud.isAirUnit then
@@ -223,10 +232,16 @@ local function addUnitIcon(unitID, unitDefID)
 		else
 			render_order = 2
 		end
+		if renderAtPos[unitDefID] then
+			midPos = false
+		else
+			midPos = true
+		end
 		unitDefsToRender[unitDefID] = {
 			texture = texture,
 			size = size,
 			render_order = render_order,
+			midPos = midPos,
 		}
 		if not renderOrders[render_order] then
 			renderOrders[render_order] = {}
@@ -302,7 +317,7 @@ local function DrawWorldFunc()
 						else
 							gl.Color(1,1,1,opacity)
 						end
-						glDrawFuncAtUnit(unitID, false, DrawUnitFunc,scale*iconDef.size)
+						glDrawFuncAtUnit(unitID, iconDef.midPos, DrawUnitFunc,scale*iconDef.size)
 						gl.Color(1,1,1,1)
 					end
 				end
