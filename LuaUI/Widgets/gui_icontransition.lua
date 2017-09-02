@@ -84,11 +84,11 @@ local iconTypesPath = LUAUI_DIRNAME .. "Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
 
-
 renderAtPos = {
 	[UnitDefNames["staticmex"].id] = true,
 	[UnitDefNames["energywind"].id] = true,
 	[UnitDefNames["energysolar"].id] = true,
+	[UnitDefNames["staticradar"].id] = true,
 }
 
 --------------------------------------------------------------------------------
