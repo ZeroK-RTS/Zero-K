@@ -25,7 +25,14 @@ local displayExceptions = {
 local window2
 	
 function widget:Initialize()
+	-- ZK Mission Editor mission
 	if VFS.FileExists("mission.lua") then
+		widgetHandler:RemoveWidget()
+		return
+	end
+	
+	-- Chobby campaign mission
+	if Spring.GetModOptions().singleplayercampaignbattleid then
 		widgetHandler:RemoveWidget()
 		return
 	end
@@ -69,6 +76,7 @@ function widget:Initialize()
 		return
 	end
 	local vsx, vsy = widgetHandler:GetViewSizes()
+	Spring.Echo("wololo")
 
 	local Chili = WG.Chili
 	window2 = Chili.Window:New{
