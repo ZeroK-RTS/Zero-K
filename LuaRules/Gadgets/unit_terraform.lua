@@ -272,7 +272,7 @@ local restoreCmdDesc = {
   name    = 'Restore2',
   cursor  = 'Restore2', 
   action  = 'restoreground',
-  tooltip = 'Restores the terrain to its original shape - Click and drag a line or closed shape.',
+  tooltip = 'Restore the terrain to its original shape - Click and drag a line or closed shape.',
 }
 
 local bumpyCmdDesc = {
