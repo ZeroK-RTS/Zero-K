@@ -1204,6 +1204,11 @@ local icontypes = {
 	distance = 1.6,
     size = 3.2,
   },
+  pw_metal = {
+    bitmap='icons/pw_mex.png',
+	distance = 1.2,
+    size = 2.7,
+  },
   pw_energy = {
     bitmap='icons/pw_energy.png',
 	distance = 1.2,

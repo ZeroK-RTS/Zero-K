@@ -142,6 +142,29 @@ local structureConfig = {
 		unitDef.featuredefs.heap.object = "debris8x8b.s3o"
 	end,
 	
+	pw_metal = function(unitDef)
+		unitDef.maxdamage = 5000
+		unitDef.name = "Ancient Fabricator"
+		unitDef.description = "Produces Metal out of thin air (+10)" 
+		unitDef.objectname = "pw_mine2.obj"
+		unitDef.script = "pw_mine2.lua"
+		unitDef.icontype = [[pw_metal]]
+		
+		unitDef.customparams = unitDef.customparams or {}
+		unitDef.customparams.removewait = 1
+		unitDef.metalmake = 10
+		
+		unitDef.footprintx = 7
+		unitDef.footprintz = 7
+		unitDef.buildcostmetal = 2000
+		
+		unitDef.collisionvolumescales = [[90 125 90]]
+		
+		unitDef.customparams.soundselect = "building_select2"
+		
+		unitDef.featuredefs.dead.object = "pw_mine2_dead.dae"
+	end,
+	
 	pw_mine = function(unitDef)
 		unitDef.maxdamage = 10000
 		unitDef.name = "Power Generator Unit"
@@ -165,7 +188,7 @@ local structureConfig = {
 		
 		unitDef.featuredefs.dead.object = "pw_mine2_dead.dae"
 	end,
-		
+	
 	pw_mine2 = function(unitDef)
 		unitDef.maxdamage = 16000
 		unitDef.name = "Orbital Solar Array"
