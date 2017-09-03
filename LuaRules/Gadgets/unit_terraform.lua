@@ -236,7 +236,7 @@ local rampCmdDesc = {
   name    = 'Ramp',
   cursor  = 'Ramp', 
   action  = 'rampground',
-  tooltip = 'Build a Ramp between 2 positions, click 2 times: start and end of ramp',
+  tooltip = 'Build a Ramp - Click and drag between two positions.',
 }
 
 local levelCmdDesc = {
@@ -245,7 +245,7 @@ local levelCmdDesc = {
   name    = 'Level',
   cursor  = 'Level', 
   action  = 'levelground',
-  tooltip = 'Levels the ground in an area - draw a line or shape while holding mouse',
+  tooltip = 'Level the terrain - Click and drag a line or closed shape.',
 }
 
 local raiseCmdDesc = {
@@ -254,7 +254,7 @@ local raiseCmdDesc = {
   name    = 'Raise',
   cursor  = 'Raise', 
   action  = 'raiseground',
-  tooltip = 'Raises/Lowers the ground in an area',
+  tooltip = 'Raises/Lower terrain -  - Click and drag a line or closed shape.',
 }
 
 local smoothCmdDesc = {
@@ -263,7 +263,7 @@ local smoothCmdDesc = {
   name    = 'Smooth',
   cursor  = 'Smooth', 
   action  = 'smoothground',
-  tooltip = 'Smooths the ground in an area',
+  tooltip = 'Smooth the terrain - Click and drag a line or closed shape.',
 }
 
 local restoreCmdDesc = {
@@ -272,7 +272,7 @@ local restoreCmdDesc = {
   name    = 'Restore2',
   cursor  = 'Restore2', 
   action  = 'restoreground',
-  tooltip = 'Restores the ground to origional height',
+  tooltip = 'Restores the terrain to its original shape - Click and drag a line or closed shape.',
 }
 
 local bumpyCmdDesc = {

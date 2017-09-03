@@ -6,7 +6,7 @@ function gadget:GetInfo() return {
 	enabled = true,
 } end
 
-local DRY_WATERLEVEL = -1000
+local DRY_WATERLEVEL = -50
 local FLOODED_AREA = 0.5 -- (0; 1]
 
 local FLOOD_OFFSET = -72 -- often the median of map height will be some large flat area. Setting waterlevel very close to any flat plane will result in major clipping ugliness. This ofset is intended to make most of the map covered by a decent depth of sea.
