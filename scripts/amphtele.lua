@@ -48,6 +48,10 @@ local function Create_Beacon_Thread(x,z)
 		local speedMult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1) * BEACON_SPAWN_SPEED
 		Turn(body, y_axis, math.rad(i*4), math.rad(40*speedMult))
 		Sleep(100/speedMult)
+		if i == 1 then
+			Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+			Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+		end
 		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
 		local disarm = spGetUnitRulesParam(unitID,"disarmed") == 1
 		while stunnedOrInbuild or disarm do

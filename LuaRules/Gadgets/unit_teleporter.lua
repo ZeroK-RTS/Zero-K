@@ -226,7 +226,6 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	
 	if teleportingUnit[unitID] and not (cmdID == CMD.INSERT or cmdOptions.shift) and cmdID ~= CMD.REMOVE and cmdID ~= CMD.FIRE_STATE and cmdID ~= CMD.MOVE_STATE and cmdID ~= CMD_WANT_CLOAK then
 		interruptTeleport(teleportingUnit[unitID])
 	end
@@ -249,7 +248,6 @@ end
 
 function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting 
                                 cmdID, cmdParams, cmdOptions) -- called until
-	
 	if cmdID == CMD_PLACE_BEACON and tele[unitID] then
 		local f = Spring.GetGameFrame()
 		--if not (tele[unitID].lastSetMove and tele[unitID].lastSetMove + 16 == f) then
@@ -283,8 +281,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 				return true, true -- command was used and remove it
 			end
 			
-			Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
-			Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
 			local func = Spring.UnitScript.GetScriptEnv(unitID).Create_Beacon
 			Spring.UnitScript.CallAsUnit(unitID,func,cx,cz)
 			
