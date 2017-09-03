@@ -74,7 +74,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.3,
-      explosionGenerator      = [[custom:LONDON]],
+      explosionGenerator      = [[custom:LONDON_FLAT]],
       fireStarter             = 0,
       flightTime              = 180,
       impulseBoost            = 0.5,
