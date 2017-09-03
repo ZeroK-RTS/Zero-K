@@ -63,6 +63,9 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
+	if not Spring.GetUnitIsStunned(unitID) then
+		Burrow()
+	end
 end
 
 function script.Activate()

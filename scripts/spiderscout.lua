@@ -333,6 +333,9 @@ end
 function script.Create()
 	StartThread(SmokeUnit, {body})
 	StartThread(StartStopMovingControl, script.StartMoving, script.StopMoving, nil, true)
+	if not Spring.GetUnitIsStunned(unitID) then
+		Burrow()
+	end
 end
 
 local function RestoreAfterDelay()
