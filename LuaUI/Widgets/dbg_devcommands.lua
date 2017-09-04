@@ -45,7 +45,7 @@ local function GetUnitFacing(unitID)
 	return math.floor(((Spring.GetUnitHeading(unitID) or 0)/16384 + 0.5)%4)
 end
 
-local function GetUnitString(unitID, tabs)
+local function GetUnitString(unitID, tabs, sendCommands)
 	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
 	local x, _, z = Spring.GetUnitPosition(unitID)
 	
@@ -70,11 +70,14 @@ local function GetUnitString(unitID, tabs)
 	if build and build < 1 then
 		unitString = unitString .. inTabs .. [[buildProgress = ]] .. math.floor(build*10000)/10000 .. [[,]] .. "\n"
 	end
+	if sendCommands then
+		Spring.Utilities.TableEcho(Spring.GetUnitCommands(unitID, -1), "commands")
+	end
 	return unitString .. tabs .. "\t},\n"
 end
 
 
-local function ExportTeamUnitsForMission(teamID)
+local function ExportTeamUnitsForMission(teamID, sendCommands)
 	local units = Spring.GetTeamUnits(teamID)
 	if not (units and #units > 0) then
 		return
@@ -83,22 +86,26 @@ local function ExportTeamUnitsForMission(teamID)
 	Spring.Echo("====== Unit export team " .. (teamID or "??") .. " ======")
 	local unitsString = tabs .. "startUnits = {\n"
 	for i = 1, #units do
-		unitsString = unitsString .. GetUnitString(units[i], tabs)
+		unitsString = unitsString .. GetUnitString(units[i], tabs, sendCommands)
 	end
 	unitsString = unitsString .. tabs .. "}"
 	Spring.Echo(unitsString)
 end
 
-local function ExportUnitsForMission()
+local function ExportUnitsForMission(sendCommands)
 	if recentlyExported then
 		return
 	end
 	local teamList = Spring.GetTeamList()
 	Spring.Echo("================== ExportUnitsForMission ==================")
 	for i = 1, #teamList do
-		ExportTeamUnitsForMission(teamList[i])
+		ExportTeamUnitsForMission(teamList[i], sendCommands)
 	end
 	recentlyExported = 1
+end
+
+local function ExportUnitsAndCommandsForMission()
+	ExportUnitsForMission(true)
 end
 
 --------------------------------------------------------------------------------
@@ -113,12 +120,21 @@ function widget:Update(dt)
 	end
 end
 
+local doCommandEcho = false
+function widget:CommandNotify(cmdID, params, options)
+	if doCommandEcho then
+		Spring.Echo("cmdID", cmdID)
+		Spring.Utilities.TableEcho(params, "params")
+		Spring.Utilities.TableEcho(options, "options")
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 options_path = 'Settings/Toolbox/Dev Commands'
 options = {
 	
-	cheat = {	
+	cheat = {
 		name = "Cheat",
 		type = 'button',
 		action = 'cheat',
@@ -203,11 +219,25 @@ options = {
 			end
 		end,
 	},
+	echoCommand = {
+		name = 'Echo Given Commands',
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			doCommandEcho = self.value
+		end,
+	},
 	missionexport = {
 		name = "Mission Units Export",
 		type = 'button',
 		action = 'mission_units_export',
 		OnChange = ExportUnitsForMission,
+	},
+	missionexportcommands = {
+		name = "Mission Commands (WIP)",
+		type = 'button',
+		action = 'mission_unit_commands_export',
+		OnChange = ExportUnitsAndCommandsForMission,
 	},
 }
 
