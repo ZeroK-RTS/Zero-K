@@ -206,7 +206,7 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 		end
 		if unitData then
 			--Note: wont be problem when NIL when nanoframe is captured because is always filled with new value when unit finish
-			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or InterableMap.New()
+			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or IterableMap.New()
 			allyTeamShields[allyTeamID].Add(unitID, unitData)
 		end
 	end
