@@ -76,7 +76,6 @@ function widget:Initialize()
 		return
 	end
 	local vsx, vsy = widgetHandler:GetViewSizes()
-	Spring.Echo("wololo")
 
 	local Chili = WG.Chili
 	window2 = Chili.Window:New{
