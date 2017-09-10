@@ -512,7 +512,7 @@ local function GetUnitAveragePosition(unit, units)
 	return unitsX/units, unitsZ/units
 end
 
-local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag)
+local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
 
 	--** Initial constructor processing **
 	local unitsX, unitsZ = GetUnitAveragePosition(unit, units)
@@ -912,7 +912,8 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 					fullyInitialised = false,
 					lastProgress = 0,
 					lastHealth = 0,
-				}				
+					disableForceCompletion = disableForceCompletion,
+				}
 				
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
@@ -949,7 +950,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	AddFallbackCommand(team, commandTag, orderList.count, orderList.data, commandX, commandZ)
 end
 
-local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag)
+local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
 	
@@ -1369,6 +1370,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 					fullyInitialised = false,
 					lastProgress = 0,
 					lastHealth = 0,
+					disableForceCompletion = disableForceCompletion,
 				}
 				
 				terraformUnitTable[terraformUnitCount] = id
@@ -1383,7 +1385,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 	AddFallbackCommand(team, commandTag, blocks, block, commandX, commandZ)
 end
 
-local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag)
+local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0} -- border for the entire area
 	
@@ -1897,6 +1899,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 					fullyInitialised = false,
 					lastProgress = 0,
 					lastHealth = 0,
+					disableForceCompletion = disableForceCompletion,
 				}
 
 				terraformUnitTable[terraformUnitCount] = id
@@ -3008,7 +3011,8 @@ local function DoTerraformUpdate(n, forceCompletion)
 	while i <= terraformUnitCount do
 		local id = terraformUnitTable[i]
 		if (spValidUnitID(id)) then
-		
+			local force = (forceCompletion and not terraformUnit[id].disableForceCompletion)
+			
 			local health = spGetUnitHealth(id)
 			local diffProgress = health/terraUnitHP - terraformUnit[id].progress
 			
@@ -3025,9 +3029,9 @@ local function DoTerraformUpdate(n, forceCompletion)
 					finishInitialisingTerraformUnit(id,i)
 				end
 				
-				if forceCompletion or (n - terraformUnit[id].lastUpdate >= updatePeriod) then
+				if force or (n - terraformUnit[id].lastUpdate >= updatePeriod) then
 					local costDiff = health - terraformUnit[id].lastHealth
-					if forceCompletion then
+					if force then
 						costDiff = costDiff + 100000 -- enough?
 					end
 					terraformUnit[id].totalSpent = terraformUnit[id].totalSpent + costDiff
@@ -3743,16 +3747,16 @@ function TerraformFunctions.ForceTerraformCompletion(pregame)
 	end
 end
 
-function TerraformFunctions.TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag)
-	TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag)
+function TerraformFunctions.TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+	TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
 end
 
-function TerraformFunctions.TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag)
-	TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag)
+function TerraformFunctions.TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+	TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
 end
 
-function TerraformFunctions.TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag)
-	TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag)
+function TerraformFunctions.TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+	TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
 end
 
 function gadget:Initialize()

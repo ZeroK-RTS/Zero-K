@@ -124,7 +124,10 @@ local function GetUnitString(unitID, tabs, sendCommands)
 	
 	if not isMobile then
 		local origHeight = Spring.GetGroundOrigHeight(x, z)
-		if math.abs(origHeight - y) > 3 then
+		if ud.floatOnWater and (origHeight < 0) then
+			origHeight = 0
+		end
+		if math.abs(origHeight - y) > 5 then
 			unitString = unitString .. inTabs .. [[terraformHeight = ]] .. math.floor(y) .. [[,]] .. "\n"
 		end
 	end
@@ -138,7 +141,7 @@ local function GetUnitString(unitID, tabs, sendCommands)
 			end
 		end
 	end
-	return unitString .. tabs .. "\t},\n"
+	return unitString .. tabs .. "\t},"
 end
 
 
@@ -151,10 +154,10 @@ local function ExportTeamUnitsForMission(teamID, sendCommands)
 	Spring.Echo("====== Unit export team " .. (teamID or "??") .. " ======")
 	local unitsString = tabs .. "startUnits = {\n"
 	for i = 1, #units do
-		unitsString = unitsString .. GetUnitString(units[i], tabs, sendCommands)
+		Spring.Echo(GetUnitString(units[i], tabs, sendCommands))
 	end
-	unitsString = unitsString .. tabs .. "}"
-	Spring.Echo(unitsString)
+	--unitsString = unitsString .. tabs .. "}"
+	--Spring.Echo(unitsString)
 end
 
 local function ExportUnitsForMission(sendCommands)

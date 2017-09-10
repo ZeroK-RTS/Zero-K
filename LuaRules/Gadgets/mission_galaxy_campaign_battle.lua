@@ -76,6 +76,8 @@ local firstGameFrame = true
 local gameIsOver = false
 local allyTeamList = Spring.GetAllyTeamList()
 
+local initialUnitDataTable = {}
+
 GG.terraformRequiresUnlock = true
 GG.terraformUnlocked = {}
 
@@ -174,6 +176,35 @@ local function SanitizeBuildPositon(x, z, ud, facing)
 		z = math.floor(z/BUILD_RESOLUTION)*BUILD_RESOLUTION
 	end
 	return x, z
+end
+
+local function GetExtraStartUnits(teamID, customKeys)
+	if initialUnitDataTable[teamID] then
+		return initialUnitDataTable[teamID]
+	end
+	
+	local prefix
+	if Spring.GetGaiaTeamID() == teamID then
+		prefix = "neutralstartunits_"
+	else
+		prefix =  "extrastartunits_"
+	end
+	
+	if not (customKeys and customKeys[prefix .. "1"]) then
+		return
+	end
+	local startUnits = {}
+	
+	local block = 1
+	while customKeys[prefix .. block] do
+		local blockUnits = CustomKeyToUsefulTable(customKeys[prefix .. block])
+		for i = 1, #blockUnits do
+			startUnits[#startUnits + 1] = blockUnits[i]
+		end
+		block = block + 1
+	end
+	initialUnitDataTable[teamID] = startUnits
+	return startUnits
 end
 
 --------------------------------------------------------------------------------
@@ -897,13 +928,13 @@ local function SetTeamAbilities(teamID, customKeys)
 end
 
 local function PlaceTeamUnits(teamID, customKeys)
-	local unitData = CustomKeyToUsefulTable(customKeys and customKeys.extrastartunits)
-	if not unitData then
+	local initialUnits = GetExtraStartUnits(teamID, customKeys)
+	if not initialUnits then
 		return
 	end
 	
-	for i = 1, #unitData do
-		PlaceUnit(unitData[i], teamID)
+	for i = 1, #initialUnits do
+		PlaceUnit(initialUnits[i], teamID)
 	end
 end
 
@@ -954,9 +985,9 @@ local function DoInitialUnitPlacement()
 		PlaceTeamUnits(teamID, customKeys)
 	end
 	
-	local neutralUnitsToSpawn = CustomKeyToUsefulTable(Spring.GetModOptions().neutralunitstospawn) or false
-	if neutralUnitsToSpawn then
-		PlaceNeutralUnits(neutralUnitsToSpawn)
+	local neutralUnits = GetExtraStartUnits(Spring.GetGaiaTeamID(), Spring.GetModOptions())
+	if neutralUnits then
+		PlaceNeutralUnits(neutralUnits)
 	end
 	
 	local featuresToSpawn = CustomKeyToUsefulTable(Spring.GetModOptions().featurestospawn) or false
@@ -981,10 +1012,11 @@ local function DoInitialTerraform()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		local customKeys = select(7, Spring.GetTeamInfo(teamID))
-		local unitData = CustomKeyToUsefulTable(customKeys and customKeys.extrastartunits)
-		if unitData then
-			for i = 1, #unitData do
-				local unitTerra = AddUnitTerraform(unitData[i])
+		local initialUnits = GetExtraStartUnits(teamID, customKeys)
+		initialUnitDataTable[teamID] = initialUnitDataTable[teamID] or CustomKeyToUsefulTable(customKeys and customKeys.extrastartunits)
+		if initialUnits then
+			for i = 1, #initialUnits do
+				local unitTerra = AddUnitTerraform(initialUnits[i])
 				if unitTerra then
 					terraformList[#terraformList + 1] = unitTerra
 				end
@@ -992,10 +1024,10 @@ local function DoInitialTerraform()
 		end
 	end
 	
-	local neutralUnitsToSpawn = CustomKeyToUsefulTable(Spring.GetModOptions().neutralunitstospawn) or false
-	if neutralUnitsToSpawn then
-		for i = 1, #neutralUnitsToSpawn do
-			local unitTerra = AddUnitTerraform(neutralUnitsToSpawn[i])
+	local neutralUnits = GetExtraStartUnits(gaiaTeamID, Spring.GetModOptions())
+	if neutralUnits then
+		for i = 1, #neutralUnits do
+			local unitTerra = AddUnitTerraform(neutralUnits[i])
 			if unitTerra then
 				terraformList[#terraformList + 1] = unitTerra
 			end
@@ -1019,17 +1051,17 @@ local function DoInitialTerraform()
 				{x = pos[1], z = pos[4] - 8},
 				{x = pos[1], z = pos[2]},
 			}
-			GG.Terraform.TerraformArea(terraform.terraformType, points, 5, terraform.height or 0, nil, nil, gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i)
+			GG.Terraform.TerraformArea(terraform.terraformType, points, 5, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction)
 		elseif terraform.terraformShape == 2 then
 			-- Line
 			local points = {
 				{x = pos[1], z = pos[2]},
 				{x = pos[3], z = pos[4]},
 			}
-			GG.Terraform.TerraformWall(terraform.terraformType, points, 2, terraform.height or 0, nil, nil, gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i)
+			GG.Terraform.TerraformWall(terraform.terraformType, points, 2, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction)
 		elseif terraform.terraformShape == 3 then
 			-- Ramp
-			GG.Terraform.TerraformRamp(pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], terraform.width, nil, nil, gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[3], i)
+			GG.Terraform.TerraformRamp(pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], terraform.width, nil, nil, terraform.teamID or gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[3], i, terraform.needConstruction)
 		end
 	end
 	GG.Terraform.ForceTerraformCompletion(true)
