@@ -27,6 +27,9 @@ local oneClickWepDefNames = {
 	amphbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
+	shieldscout = {
+		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+	},
 	bomberdisarm = {
 		{ functionToCall = "StartRun", name = "Start Run", tooltip = "Manually activate Thunderbird run.", texture = "LuaUI/Images/Commands/Bold/bomb.png",},
 	},

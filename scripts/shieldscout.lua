@@ -237,6 +237,10 @@ end
 -----------------------------
 -- Death
 
+function Detonate() -- Giving an order causes recursion.
+	GG.QueueUnitDescruction(unitID)
+end
+
 function script.Killed(recentDamage, maxHealth)
 	Explode(box, sfxShatter + sfxSmoke)
 	
