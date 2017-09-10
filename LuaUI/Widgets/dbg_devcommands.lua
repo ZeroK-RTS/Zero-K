@@ -45,9 +45,58 @@ local function GetUnitFacing(unitID)
 	return math.floor(((Spring.GetUnitHeading(unitID) or 0)/16384 + 0.5)%4)
 end
 
+local commandNameMap = {
+	[CMD.PATROL] = "PATROL",
+}
+
+local function GetCommandString(index, command)
+	local cmdID = command.id
+	if not commandNameMap[cmdID] then
+		return
+	end
+	if not (command.params[1] and command.params[3]) then
+		return
+	end
+	local commandString = [[{cmdID = planetUtilities.COMMAND.]] .. commandNameMap[cmdID]
+	commandString = commandString .. [[, pos = {]] .. math.floor(command.params[1]) .. ", " .. math.floor(command.params[3]) .. [[}]]
+	
+	if index > 1 then
+		commandString = commandString .. [[, options = {"shift"}]]
+	end
+	return commandString .. [[},]]
+end
+
+local function ProcessUnitCommands(inTabs, commands, unitID, mobileUnit)
+	if mobileUnit and ((commands[1] and commands[1].id == CMD.PATROL) or (commands[2] and commands[2].id == CMD.PATROL)) then
+		
+		local fullCommandString
+		for i = 1, #commands do
+			local command = commands[i]
+			if command.id == CMD.PATROL and command.params[1] and command.params[3] then
+				fullCommandString = (fullCommandString or "") .. inTabs .. "\t" .. [[{]] .. math.floor(command.params[1]) .. ", " .. math.floor(command.params[3]) .. [[},]] .. "\n"
+			end
+		end
+		
+		if fullCommandString then
+			return inTabs  .. [[patrolRoute = {]] .. "\n" .. fullCommandString .. inTabs .. "},\n"
+		end
+	end
+
+	local fullCommandString
+	for i = 1, #commands do
+		local commandString = GetCommandString(i, commands[i])
+		if commandString then
+			fullCommandString = (fullCommandString or "") .. inTabs .. "\t" .. commandString .. "\n"
+		end
+	end
+	if fullCommandString then
+		return inTabs  .. [[commands = {]] .. "\n" .. fullCommandString .. inTabs .. "},\n"
+	end
+end
+
 local function GetUnitString(unitID, tabs, sendCommands)
 	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-	local x, _, z = Spring.GetUnitPosition(unitID)
+	local x, y, z = Spring.GetUnitPosition(unitID)
 	
 	local facing = 0
 	
@@ -59,9 +108,11 @@ local function GetUnitString(unitID, tabs, sendCommands)
 	end
 	
 	local build = select(5, Spring.GetUnitHealth(unitID))
+	local isMobile = not (ud.isBuilding or ud.speed == 0)
 	
 	local inTabs = tabs .. "\t\t"
 	local unitString = tabs .. "\t{\n"
+	
 	unitString = unitString .. inTabs .. [[name = "]] .. ud.name .. [[",]] .. "\n"
 	unitString = unitString .. inTabs .. [[x = ]] .. math.floor(x) .. [[,]] .. "\n"
 	unitString = unitString .. inTabs .. [[z = ]] .. math.floor(z) .. [[,]] .. "\n"
@@ -70,8 +121,22 @@ local function GetUnitString(unitID, tabs, sendCommands)
 	if build and build < 1 then
 		unitString = unitString .. inTabs .. [[buildProgress = ]] .. math.floor(build*10000)/10000 .. [[,]] .. "\n"
 	end
+	
+	if not isMobile then
+		local origHeight = Spring.GetGroundOrigHeight(x, z)
+		if math.abs(origHeight - y) > 3 then
+			unitString = unitString .. inTabs .. [[terraformHeight = ]] .. math.floor(y) .. [[,]] .. "\n"
+		end
+	end
+	
 	if sendCommands then
-		Spring.Utilities.TableEcho(Spring.GetUnitCommands(unitID, -1), "commands")
+		local commands = Spring.GetUnitCommands(unitID, -1)
+		if commands and #commands > 0 then
+			local commandString = ProcessUnitCommands(inTabs, commands, unitID, isMobile)
+			if commandString then
+				unitString = unitString .. commandString
+			end
+		end
 	end
 	return unitString .. tabs .. "\t},\n"
 end
@@ -234,7 +299,7 @@ options = {
 		OnChange = ExportUnitsForMission,
 	},
 	missionexportcommands = {
-		name = "Mission Commands (WIP)",
+		name = "Mission Unit Export (Commands)",
 		type = 'button',
 		action = 'mission_unit_commands_export',
 		OnChange = ExportUnitsAndCommandsForMission,

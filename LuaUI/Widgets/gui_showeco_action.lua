@@ -319,12 +319,14 @@ local function makePylonListVolume(onlyActive, onlyDisabled)
 			local unitDefID = spGetUnitDefID(unitID)
 			if UnitDefs[unitDefID].isBuilder then
 				local cmdQueue = Spring.GetCommandQueue(unitID, -1)
-				for i = 1, #cmdQueue do
-					local cmd = cmdQueue[i]
-					local radius = pylonDefs[-cmd.id]
-					if radius then
-						glColor(disabledColor)
-						drawGroundCircle(cmd.params[1], cmd.params[3], radius)
+				if cmdQueue then
+					for i = 1, #cmdQueue do
+						local cmd = cmdQueue[i]
+						local radius = pylonDefs[-cmd.id]
+						if radius then
+							glColor(disabledColor)
+							drawGroundCircle(cmd.params[1], cmd.params[3], radius)
+						end
 					end
 				end
 			end

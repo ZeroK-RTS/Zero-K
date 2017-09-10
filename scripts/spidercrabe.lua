@@ -213,7 +213,7 @@ local function BlinkingLight()
 	end
 end
 
-local function CurlDelay()	--workaround for crabe getting stuck in fac
+local function CurlDelay() --workaround for crabe getting stuck in fac
 	while GetUnitValue(COB.BUILD_PERCENT_LEFT) > 0 do
 		Sleep(330)
 	end
@@ -254,7 +254,12 @@ function script.Create()
 	--StartThread(MotionControl)
 	StartThread(SmokeUnit, smokePiece)
 	--StartThread(BlinkingLight)
-	StartThread(CurlDelay)
+	if Spring.GetUnitIsStunned(unitID) then
+		StartThread(CurlDelay)
+	else
+		nocurl = false
+		StartThread(Curl)
+	end
 end
 
 local function Rock(anglex, anglez)	

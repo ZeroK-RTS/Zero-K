@@ -892,6 +892,9 @@ function widget:MousePress(mx, my, button)
 	if button == 1 and placingRectangle and placingRectangle.legalPos then
 		local activeCmdIndex, activeid = spGetActiveCommand()
 		local index = Spring.GetCmdDescIndex(CMD_LEVEL)
+		if not index then
+			return
+		end
 		spSetActiveCommand(index)
 		currentlyActiveCommand = CMD_LEVEL
 		

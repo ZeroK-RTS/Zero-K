@@ -63,17 +63,20 @@ EPIC_NAME_UNITS = "epic_chili_integral_menu_tab_units"
 
 local modOptions = Spring.GetModOptions()
 local disabledTabs = {}
-if modOptions.integral_disable_economy == "1" then
-	disabledTabs.economy = true
-end
-if modOptions.integral_disable_defence == "1" then
-	disabledTabs.defence = true
-end
-if modOptions.integral_disable_special == "1" then
-	disabledTabs.special = true
-end
-if modOptions.integral_disable_factory == "1" then
-	disabledTabs.factory = true
+
+if Spring.GetModOptions().campaign_debug_units ~= "1" then
+	if modOptions.integral_disable_economy == "1" then
+		disabledTabs.economy = true
+	end
+	if modOptions.integral_disable_defence == "1" then
+		disabledTabs.defence = true
+	end
+	if modOptions.integral_disable_special == "1" then
+		disabledTabs.special = true
+	end
+	if modOptions.integral_disable_factory == "1" then
+		disabledTabs.factory = true
+	end
 end
 
 --------------------------------------------------------------------------------

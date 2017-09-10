@@ -18,6 +18,7 @@ if not campaignBattleID then
 	return
 end
 
+local doNotDisableAnyUnits = (Spring.GetModOptions().campaign_debug_units == "1")
 local SPAWN_GAME_PRELOAD = true
 
 local COMPARE = {
@@ -42,16 +43,21 @@ local FACING_TO_HEADING = 2^14
 if gadgetHandler:IsSyncedCode() then --SYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+include("LuaRules/Configs/customcmds.h.lua")
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Variables
 
--- Variables that require saving
+-- Variables that require saving for save/load
 local unitLineage = {}
 local initialUnitData = {}
 local bonusObjectiveList = {}
 
 local commandsToGive = nil -- Give commands just after game start
 
--- Regeneratable
+-- Regeneratable from other information
 local vitalUnits = {}
 local defeatConditionConfig
 local victoryAtLocation = {}
@@ -585,6 +591,27 @@ local function PlaceUnit(unitData, teamID)
 			unitID = unitID,
 			commands = commands,
 		}
+	elseif unitData.patrolRoute then
+		local patrolRoute = unitData.patrolRoute
+		local patrolCommands = {}
+		
+		patrolCommands[#patrolCommands + 1] = {
+			cmdID = CMD_RAW_MOVE, 
+			pos = patrolRoute[1]
+		}
+		for i = 2, #patrolRoute do
+			patrolCommands[#patrolCommands + 1] = {
+				cmdID = CMD.PATROL,
+				pos = patrolRoute[i],
+				options = {"shift"}
+			}
+		end
+		
+		commandsToGive = commandsToGive or {}
+		commandsToGive[#commandsToGive + 1] = {
+			unitID = unitID,
+			commands = patrolCommands,
+		}
 	end
 	
 	SetupInitialUnitParameters(unitID, unitData, x, z)
@@ -593,6 +620,46 @@ local function PlaceUnit(unitData, teamID)
 		local _, maxHealth = Spring.GetUnitHealth(unitID)
 		Spring.SetUnitHealth(unitID, {build = unitData.buildProgress, health = maxHealth*unitData.buildProgress})
 	end
+end
+
+local function AddUnitTerraform(unitData)
+	if not unitData.terraformHeight then
+		return
+	end
+	
+	local ud = UnitDefNames[unitData.name]
+	if not (ud and ud.id) then
+		return
+	end
+	
+	local x, z, facing = unitData.x, unitData.z, unitData.facing
+	
+	if ud.isBuilding or ud.speed == 0 then
+		x, z = SanitizeBuildPositon(x, z, ud, facing)
+	end
+	
+	local xsize, zsize
+	if (facing == 0) or (facing == 2) then
+		xsize = ud.xsize*4
+		zsize = (ud.zsize or ud.ysize)*4
+	else
+		xsize = (ud.zsize or ud.ysize)*4
+		zsize = ud.xsize*4
+	end
+	
+	local unitTerra = {
+		terraformShape = 1, -- Rectangle
+		terraformType = 1, -- Level
+		position = {
+			x - xsize,
+			z - zsize,
+			x + xsize,
+			z + zsize
+		}, 
+		height = unitData.terraformHeight,
+	}
+	
+	return unitTerra
 end
 
 local function PlaceFeature(featureData, teamID)
@@ -794,6 +861,9 @@ end
 -- Initialization
 
 local function SetTeamUnlocks(teamID, customKeys)
+	if doNotDisableAnyUnits then
+		return
+	end
 	local unlockData = CustomKeyToUsefulTable(customKeys and customKeys.campaignunlocks)
 	if not unlockData then
 		return
@@ -860,7 +930,11 @@ local function InitializeCommanderParameters(teamID, customKeys)
 end
 
 local function InitializeUnlocks()
-	Spring.SetGameRulesParam("terraformRequiresUnlock", 1)
+	if doNotDisableAnyUnits then
+		GG.terraformRequiresUnlock = false
+	else
+		Spring.SetGameRulesParam("terraformRequiresUnlock", 1)
+	end
 	
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
@@ -899,12 +973,40 @@ local function DoInitialUnitPlacement()
 end
 
 local function DoInitialTerraform()
-	local terraformList = CustomKeyToUsefulTable(Spring.GetModOptions().initalterraform)
-	if not terraformList then
-		return
-	end
+	local terraformList = CustomKeyToUsefulTable(Spring.GetModOptions().initalterraform) or {}
 	local gaiaTeamID = Spring.GetGaiaTeamID() 
 	
+	-- Add terraform for structures
+	local teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		local customKeys = select(7, Spring.GetTeamInfo(teamID))
+		local unitData = CustomKeyToUsefulTable(customKeys and customKeys.extrastartunits)
+		if unitData then
+			for i = 1, #unitData do
+				local unitTerra = AddUnitTerraform(unitData[i])
+				if unitTerra then
+					terraformList[#terraformList + 1] = unitTerra
+				end
+			end
+		end
+	end
+	
+	local neutralUnitsToSpawn = CustomKeyToUsefulTable(Spring.GetModOptions().neutralunitstospawn) or false
+	if neutralUnitsToSpawn then
+		for i = 1, #neutralUnitsToSpawn do
+			local unitTerra = AddUnitTerraform(neutralUnitsToSpawn[i])
+			if unitTerra then
+				terraformList[#terraformList + 1] = unitTerra
+			end
+		end
+	end
+	
+	if #terraformList == 0 then
+		return
+	end
+	
+	-- Create terraforms
 	for i = 1, #terraformList do
 		local terraform = terraformList[i]
 		local pos = terraform.position

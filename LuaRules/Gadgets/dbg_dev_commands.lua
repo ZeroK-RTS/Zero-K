@@ -521,6 +521,16 @@ local function clear(cmd,line,words,player)
 	end
 end
 
+local function uclear(cmd,line,words,player)
+	if spIsCheatingEnabled() then
+		local units = Spring.GetAllUnits()
+		for i=1, #units do
+			local unitID = units[i]
+			Spring.DestroyUnit(unitID, false, true)
+		end
+	end
+end
+
 local function restart(cmd,line,words,player)
 	if spIsCheatingEnabled() then
 		local units = Spring.GetAllUnits()
@@ -645,6 +655,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"damage",damage,"Damages everything.")
 	gadgetHandler.actionHandler.AddChatAction(self,"color",ColorTest,"Spawns units for color test.")
 	gadgetHandler.actionHandler.AddChatAction(self,"clear",clear,"Clears all units and wreckage.")
+	gadgetHandler.actionHandler.AddChatAction(self,"uclear",clear,"Clears all units.")
 	gadgetHandler.actionHandler.AddChatAction(self,"serial",serial,"Gives all units in succession.")
 	gadgetHandler.actionHandler.AddChatAction(self,"restart",restart,"Gives some commanders and clears everything else.")
 	gadgetHandler.actionHandler.AddChatAction(self,"nocost",nocost,"Makes everything gadget-implemented free.")
