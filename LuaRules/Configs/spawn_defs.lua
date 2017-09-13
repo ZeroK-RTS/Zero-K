@@ -339,6 +339,9 @@ end
 difficulties['Chicken: Very Easy'].chickenTypes.chicken_pigeon.time = 8*60
 difficulties['Chicken: Very Easy'].chickenTypes.chicken_tiamat.time = 999999
 
+difficulties['Chicken: Beginner'].chickenTypes.chicken_pigeon.time = 11*60
+difficulties['Chicken: Beginner'].chickenTypes.chicken_tiamat.time = 999999
+
 defaultDifficulty = 'Chicken: Normal'
 
 --------------------------------------------------------------------------------
