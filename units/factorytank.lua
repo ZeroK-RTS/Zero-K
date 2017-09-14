@@ -7,19 +7,19 @@ unitDef = {
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 10,
+  buildingGroundDecalSizeX      = 8,
   buildingGroundDecalSizeY      = 8,
-  buildingGroundDecalType       = [[factorytank_aoplane.dds]],
+  -- buildingGroundDecalType       = [[factorytank_aoplane.dds]],
 
   buildoptions                  = {
     [[tankcon]],
     [[tankraid]],
-	[[tankheavyraid]],
+    [[tankheavyraid]],
     [[tankriot]],
-	[[tankassault]],
+    [[tankassault]],
     [[tankheavyassault]],
-	[[tankarty]],
-	[[tankheavyarty]],
+    [[tankarty]],
+    [[tankheavyarty]],
     [[tankaa]],
   },
 
@@ -28,15 +28,22 @@ unitDef = {
   canPatrol                     = true,
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
+  collisionVolumeOffsets        = [[0 14 -34]],
+  collisionVolumeScales         = [[110 28 44]],
+  collisionVolumeType           = [[box]],
+  selectionVolumeOffsets        = [[0 7 0]],
+  selectionVolumeScales         = [[110 14 110]],
+  selectionVolumeType           = [[box]],
 
   customParams                  = {
     sortName = [[6]],
-	default_spacing = 8,
+    solid_factory = [[4]],
+    default_spacing = 8,
   },
 
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
-  footprintX                    = 10,
+  footprintX                    = 8,
   footprintZ                    = 8,
   iconType                      = [[factank]],
   idleAutoHeal                  = 5,
@@ -49,7 +56,7 @@ unitDef = {
   minCloakDistance              = 150,
   moveState        				= 1,
   noAutoFire                    = false,
-  objectName                    = [[coravp2.s3o]],
+  objectName                    = [[factorytank.s3o]],
   script                        = [[factorytank.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
@@ -57,16 +64,19 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = "oooooooooo oooooooooo oooooooooo ooccccccoo ooccccccoo yoccccccoy yoccccccoy yyccccccyy",
+  yardMap                       = "oooooooo oooooooo oooooooo oooooooo cccccccc cccccccc cccccccc cccccccc",
 
   featureDefs                   = {
 
     DEAD = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 6,
-      footprintZ       = 6,
-      object           = [[CORAVP_DEAD.s3o]],
+      footprintX       = 8,
+      footprintZ       = 8,
+      object           = [[factorytank_dead.s3o]],
+      collisionVolumeOffsets = [[0 14 -34]],
+      collisionVolumeScales  = [[110 28 44]],
+      collisionVolumeType    = [[box]],
     },
 
 
