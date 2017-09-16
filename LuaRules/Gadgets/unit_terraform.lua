@@ -3623,7 +3623,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	
 	local ud = UnitDefs[unitDefID]
 	-- add terraform commands to builders
-	if terraformUnitDefIDs[unitDefID] then
+	if terraformUnitDefIDs[unitDefID] and not(GG.terraformRequiresUnlock and not GG.terraformUnlocked[teamID]) then
 		for _, cmdDesc in ipairs(cmdDescsArray) do
 			spInsertUnitCmdDesc(unitID, cmdDesc)
 		end
