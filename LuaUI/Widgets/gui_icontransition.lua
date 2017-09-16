@@ -265,6 +265,19 @@ local function removeUnitIcon(unitID)
 	unitsToRender[unitID] = nil
 end
 
+local function UpdateUnitIconTeam(unitID, unitDefID, newTeamID)
+	if not (unitID and unitDefID and unitDefsToRender[unitDefID]) then
+		return
+	end
+	if not unitDefsToRender[unitDefID].units[unitID] then
+		return
+	end
+	newTeamID = newTeamID or spGetUnitTeam(unitID)
+	if newTeamID then
+		local teamcolor = {spGetTeamColor(newTeamID)}
+		unitDefsToRender[unitDefID].units[unitID].color = teamcolor
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -388,6 +401,10 @@ end
 
 function widget:UnitCreated(unitID, unitDefID)
 	addUnitIcon(unitID, unitDefID)
+end
+
+function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
+	UpdateUnitIconTeam(unitID, unitDefID, teamID)
 end
 
 function widget:UnitEnteredLos(unitID)
