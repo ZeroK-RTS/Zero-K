@@ -416,7 +416,7 @@ function widget:DrawWorldPreUnit()
 		end
 	end
 
-	local selUnits = spGetSelectedUnits()  -- or show it if its selected
+	local selUnits = spGetSelectedUnits() -- or show it if its selected
 	if selUnits then
 		for i=1,#selUnits do
 			local ud = spGetUnitDefID(selUnits[i])

@@ -202,12 +202,14 @@ end
 
 local alliedTrueTable = {allied = true}
 local function SetUnitCloakAndParam(unitID, level, decloakDistance)
+	local newRadius = decloakDistance
 	if level then
 		local cannotCloak = GetUnitRulesParam(unitID, "cannotcloak")
 		if cannotCloak ~= 1 then
 			local changeRadius = true
 			if cloakers[unitID] and cloakers[unitID].radius > 0 then
 				changeRadius = false
+				newRadius = 0
 			end
 			SetUnitCloak(unitID, level, ((changeRadius and decloakDistance) or GetUnitRulesParam(unitID, "comm_decloak_distance") or false))
 		end
@@ -223,6 +225,7 @@ local function SetUnitCloakAndParam(unitID, level, decloakDistance)
 		end
 	end
 	SetUnitRulesParam(unitID, "areacloaked", (level and 1) or 0, alliedTrueTable)
+	SetUnitRulesParam(unitID, "areacloaked_radius", (level and newRadius) or 0, alliedTrueTable)
 end
 
 --------------------------------------------------------------------------------
