@@ -19,7 +19,6 @@ end
 
 -- Parameters
 local tolerance = 25
-local MAX_ICON_SCALE = 64 -- Magic number that prevents icons from drawing larger than spring draws them.
 
 -- Flags and switches
 local waiting_on_double
@@ -98,7 +97,7 @@ renderAtPos = {
 -- Options
 --
 
-options_path = 'Settings/Graphics/Unit Visibility'
+options_path = 'Settings/Graphics/Unit Visibility/Icon Transition'
 
 options_order = { 
 	'lblIconTransition',
@@ -118,28 +117,32 @@ options = {
 		desc = 'If the camera is above this height, units will be icons only.\n\nOnly applies when the icon display mode is set to Dynamic.\n\nThis setting overrides Icon Distance.',
 		type = 'number',
 		min = 0, max = 10000,
-		value = 6200,
+		step = 50,
+		value = 5500,
 	},
 	icontransitionbottom = {
 		name = 'Icon Transition Bottom',
 		desc = 'If the camera is below this height, units will be models only.\n\nOnly applies when the icon display mode is set to Dynamic.\n\nThis setting overrides Icon Distance.',
 		type = 'number',
 		min = 0, max = 10000,
-		value = 1800,
+		step = 50,
+		value = 2400,
 	},
 	icontransitionmaxsize = {
 		name = 'Icon Transition Max Size',
 		desc = 'Size of the icons when the transition begins.',
 		type = 'number',
 		min = 1, max = 250,
-		value = 67,
+		step = 1,
+		value = 62,
 	},
 	icontransitionminsize = {
 		name = 'Icon Transition Min Size',
 		desc = 'Size of the icons when the transition ends.',
 		type = 'number',
 		min = 1, max = 250,
-		value = 7,
+		step = 1,
+		value = 11,
 	},
 	icontransitionmaxopacity = {
 		name = 'Icon Transition Max Opacity',
@@ -324,8 +327,8 @@ local function DrawWorldFunc()
 		unitIsInView[v] = true
 	end
 	
-	if scale > MAX_ICON_SCALE then
-		scale = MAX_ICON_SCALE
+	if scale > options.icontransitionmaxsize.value then
+		scale = options.icontransitionmaxsize.value
 	end
 	
 	for i, unitDefIDs in ipairs(renderOrders) do
