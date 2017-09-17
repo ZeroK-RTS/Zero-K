@@ -19,12 +19,14 @@ end
 
 -- Parameters
 local tolerance = 25
+local MAX_ICON_SCALE = 64 -- Magic number that prevents icons from drawing larger than spring draws them.
 
 -- Flags and switches
 local waiting_on_double
 local current_mode
 local target_mode
 local showing_icons
+local drawIcons = false
 
 -- Variables
 local kp_timer
@@ -198,9 +200,16 @@ function UpdateDynamic()
 	elseif cs.name == "ta" then
 		testHeight = cs.height - gy
 	end
+	
+	-- Leave a one update gap between enabling engine icons and disabling widget drawing.
+	if showing_icons and drawIcons then
+		drawIcons = false
+	end
+	
 	if showing_icons and testHeight < options.icontransitiontop.value - tolerance then
 		spSendCommands("disticon " .. 100000)
 		showing_icons = false
+		drawIcons = true
 	elseif not showing_icons and testHeight > options.icontransitiontop.value + tolerance then
 		spSendCommands("disticon " .. 0)
 		showing_icons = true
@@ -287,12 +296,13 @@ end
 
 local function DrawUnitFunc(size)
 	size = size or 1
+	--glTranslate(0, 50, 0) Some translation is sometimes required.
 	glBillboard()
 	glTexRect(-size*0.5, -size*0.5, size*0.5, size*0.5)
 end
 
 local function DrawWorldFunc()
-	if showing_icons or spIsGUIHidden() or (current_mode ~= "Dynamic") or (testHeight < options.icontransitionbottom.value ) then
+	if (not drawIcons) or (testHeight < options.icontransitionbottom.value) then
 		return
 	end
 	
@@ -312,6 +322,10 @@ local function DrawWorldFunc()
 	local unitIsInView = {}
 	for k, v in pairs(unitsInView) do
 		unitIsInView[v] = true
+	end
+	
+	if scale > MAX_ICON_SCALE then
+		scale = MAX_ICON_SCALE
 	end
 	
 	for i, unitDefIDs in ipairs(renderOrders) do
@@ -381,13 +395,14 @@ function widget:Update()
 				showing_icons = true
 				current_mode = "On"
 			else
-				spSendCommands("disticon " .. 100000)
+				spSendCommands("disticon " .. 50000)
 				showing_icons = false
 				current_mode = "Off"
 			end
 			target_mode = nil
 			kp_timer = nil
 			waiting_on_double = nil
+			drawIcons = false
 		end
 	end
 	
