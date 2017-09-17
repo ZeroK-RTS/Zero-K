@@ -44,33 +44,33 @@ local UpdateDynamic = function() end
 local echo = Spring.Echo
 
 local spGetSpectatingState = Spring.GetSpectatingState
-local spSendCommands	= Spring.SendCommands
-local spGetTimer	= Spring.GetTimer
-local spIsGUIHidden	= Spring.IsGUIHidden
-local spDiffTimers	= Spring.DiffTimers
+local spSendCommands       = Spring.SendCommands
+local spGetTimer           = Spring.GetTimer
+local spIsGUIHidden        = Spring.IsGUIHidden
+local spDiffTimers         = Spring.DiffTimers
 
-local spGetAllUnits	= Spring.GetAllUnits
-local spGetVisibleUnits	= Spring.GetVisibleUnits
-local spGetUnitDefID	= Spring.GetUnitDefID
-local spIsUnitInView	= Spring.IsUnitInView
+local spGetAllUnits         = Spring.GetAllUnits
+local spGetVisibleUnits     = Spring.GetVisibleUnits
+local spGetUnitDefID        = Spring.GetUnitDefID
+local spIsUnitInView        = Spring.IsUnitInView
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
-local spIsUnitSelected	= Spring.IsUnitSelected
-local spGetUnitTeam	= Spring.GetUnitTeam
-local spGetTeamColor	= Spring.GetTeamColor
+local spIsUnitSelected      = Spring.IsUnitSelected
+local spGetUnitTeam         = Spring.GetUnitTeam
+local spGetTeamColor        = Spring.GetTeamColor
 
-local spGetCameraState	= Spring.GetCameraState
-local spGetGroundHeight	= Spring.GetGroundHeight
+local spGetCameraState      = Spring.GetCameraState
+local spGetGroundHeight     = Spring.GetGroundHeight
 
-local glDepthTest	= gl.DepthTest
-local glDepthMask	= gl.DepthMask
-local glAlphaTest	= gl.AlphaTest
-local glTexture		= gl.Texture
-local glTexRect		= gl.TexRect
-local glTranslate	= gl.Translate
-local glBillboard	= gl.Billboard
-local glDrawFuncAtUnit	= gl.DrawFuncAtUnit
-local glPushMatrix	= gl.PushMatrix
-local glPopMatrix	= gl.PopMatrix
+local glDepthTest      = gl.DepthTest
+local glDepthMask      = gl.DepthMask
+local glAlphaTest      = gl.AlphaTest
+local glTexture        = gl.Texture
+local glTexRect        = gl.TexRect
+local glTranslate      = gl.Translate
+local glBillboard      = gl.Billboard
+local glDrawFuncAtUnit = gl.DrawFuncAtUnit
+local glPushMatrix     = gl.PushMatrix
+local glPopMatrix      = gl.PopMatrix
 
 local GL_GREATER = GL.GREATER
 
@@ -110,8 +110,7 @@ options_order = {
 }
 
 options = {
-
-	lblIconTransition = {name='Icon Transition Widget', type='label'},
+	lblIconTransition = {name = 'Icon Transition Widget', type = 'label'},
 	icontransitiontop = {
 		name = 'Icon Transition Top',
 		desc = 'If the camera is above this height, units will be icons only.\n\nOnly applies when the icon display mode is set to Dynamic.\n\nThis setting overrides Icon Distance.',
@@ -178,10 +177,14 @@ function GotHotkeypress()
 	else
 		waiting_on_double = true
 		kp_timer = spGetTimer()
-		if current_mode == "On" then target_mode = "Off"
-		elseif current_mode == "Off" then target_mode = "On"
-		elseif showing_icons then target_mode = "Off"
-		else target_mode = "On"
+		if current_mode == "On" then
+			target_mode = "Off"
+		elseif current_mode == "Off" then
+			target_mode = "On"
+		elseif showing_icons then 
+			target_mode = "Off"
+		else
+			target_mode = "On"
 		end
 	end
 end
@@ -212,10 +215,9 @@ end
 local function addUnitIcon(unitID, unitDefID)
 	if not unitID or not unitDefID then return end
 	if unitsToRender[unitID] and unitsToRender[unitID].udid
-		and unitsToRender[unitID].udid ~= unitDefID
-		and unitDefsToRender[unitsToRender[unitID].udid]
-		and unitDefsToRender[unitsToRender[unitID].udid].units
-	then
+			and unitsToRender[unitID].udid ~= unitDefID
+			and unitDefsToRender[unitsToRender[unitID].udid]
+			and unitDefsToRender[unitsToRender[unitID].udid].units then
 		unitDefsToRender[unitsToRender[unitID].udid].units[unitID] = nil
 	end
 	local team = unitID and spGetUnitTeam(unitID)
@@ -249,17 +251,16 @@ local function addUnitIcon(unitID, unitDefID)
 	if not unitDefsToRender[unitDefID].units then
 		unitDefsToRender[unitDefID].units = {}
 	end
-	unitDefsToRender[unitDefID].units[unitID] = { color = teamcolor }
-	unitsToRender[unitID] = { udid = unitDefID }
+	unitDefsToRender[unitDefID].units[unitID] = {color = teamcolor}
+	unitsToRender[unitID] = {udid = unitDefID}
 end
 
 local function removeUnitIcon(unitID)
 	if not unitID then return end
 	if unitsToRender[unitID] and unitsToRender[unitID].udid
-		and unitsToRender[unitID].udid ~= unitDefID
-		and unitDefsToRender[unitsToRender[unitID].udid]
-		and unitDefsToRender[unitsToRender[unitID].udid].units
-	then
+			and unitsToRender[unitID].udid ~= unitDefID
+			and unitDefsToRender[unitsToRender[unitID].udid]
+			and unitDefsToRender[unitsToRender[unitID].udid].units then
 		unitDefsToRender[unitsToRender[unitID].udid].units[unitID] = nil
 	end
 	unitsToRender[unitID] = nil
@@ -291,10 +292,9 @@ local function DrawUnitFunc(size)
 end
 
 local function DrawWorldFunc()
-	if spIsGUIHidden() then return end
-	if showing_icons then return end
-	if current_mode ~= "Dynamic" then return end
-	if testHeight < options.icontransitionbottom.value then return end
+	if showing_icons or spIsGUIHidden() or (current_mode ~= "Dynamic") or (testHeight < options.icontransitionbottom.value ) then
+		return
+	end
 	
 	local scale, opacity
 	scale = options.icontransitionminsize.value + (options.icontransitionmaxsize.value - options.icontransitionminsize.value) * (testHeight - options.icontransitionbottom.value) / (options.icontransitiontop.value - options.icontransitionbottom.value)
@@ -310,11 +310,11 @@ local function DrawWorldFunc()
 	-- but that's probably worth testing to confirm
 	local unitsInView = spGetVisibleUnits()
 	local unitIsInView = {}
-	for k,v in pairs(unitsInView) do
+	for k, v in pairs(unitsInView) do
 		unitIsInView[v] = true
 	end
 	
-	for i,unitDefIDs in ipairs(renderOrders) do
+	for i, unitDefIDs in ipairs(renderOrders) do
 		for unitDefID, iconDef in pairs(unitDefIDs) do
 			if iconDef then
 				glTexture(iconDef.texture)
@@ -328,7 +328,7 @@ local function DrawWorldFunc()
 						else
 							gl.Color(1,1,1,opacity)
 						end
-						glDrawFuncAtUnit(unitID, iconDef.midPos, DrawUnitFunc,scale*iconDef.size)
+						glDrawFuncAtUnit(unitID, iconDef.midPos, DrawUnitFunc, scale*iconDef.size)
 						gl.Color(1,1,1,1)
 					end
 				end
@@ -432,4 +432,3 @@ end
 function widget:DrawWorldRefraction()
 	DrawWorldFunc()
 end
-
