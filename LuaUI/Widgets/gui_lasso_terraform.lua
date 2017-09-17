@@ -121,7 +121,7 @@ local maxWallPoints = 700 -- max points that makeup a wall
 -- bounding ramp dimensions, reduces slowdown MUST AGREE WITH GADGET VALUES
 local maxRampLength = 3000
 local maxRampWidth = 800
-local minRampLength = 32
+local minRampLength = 40
 local minRampWidth = 24
 
 local startRampWidth = 60
@@ -1273,12 +1273,15 @@ function widget:Update(dt)
 				orHeight = spGetGroundHeight(pos[1],pos[3])
 				storedHeight = orHeight
 				if dis < minRampLength then
-					point[2] = {
-						x = point[1].x+minRampLength*(pos[1]-point[1].x)/dis, 
-						y = orHeight, 
-						z = point[1].z+minRampLength*(pos[3]-point[1].z)/dis, 
-						ground = orHeight
-					}
+					-- Do not draw really short ramps.
+					if dis > minRampLength*0.3 or (point[2].x ~= point[1].x) then
+						point[2] = {
+							x = point[1].x+minRampLength*(pos[1]-point[1].x)/dis, 
+							y = orHeight, 
+							z = point[1].z+minRampLength*(pos[3]-point[1].z)/dis, 
+							ground = orHeight
+						}
+					end
 				elseif dis > maxRampLength then
 					point[2] = {
 						x = point[1].x+maxRampLength*(pos[1]-point[1].x)/dis, 
@@ -1678,11 +1681,18 @@ function widget:MouseRelease(mx, my, button)
 		end
 	
 	elseif simpleDrawingRamp == 1 and button == 1 then
-		mouseX = mx
-		mouseY = my
-		setHeight = true
-		drawingRamp = false
-		simpleDrawingRamp = false
+		if math.abs(point[1].x - point[2].x) + math.abs(point[1].z - point[2].z) < 10 then
+			mouseX = mx
+			mouseY = my
+			drawingRamp = 2
+			simpleDrawingRamp = false
+		else
+			mouseX = mx
+			mouseY = my
+			setHeight = true
+			drawingRamp = false
+			simpleDrawingRamp = false
+		end
 		return true
 	end
 	

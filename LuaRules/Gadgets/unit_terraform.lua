@@ -143,7 +143,7 @@ local perimeterEdgeCost = {
 --ramp dimensions
 local maxTotalRampLength = 3000
 local maxTotalRampWidth = 800
-local minTotalRampLength = 32
+local minTotalRampLength = 40
 local minTotalRampWidth = 24
 
 local checkLoopFrames = 1200 -- how many frames it takes to check through all cons
