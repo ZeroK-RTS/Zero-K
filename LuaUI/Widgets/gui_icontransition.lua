@@ -425,6 +425,10 @@ function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	UpdateUnitIconTeam(unitID, unitDefID, teamID)
 end
 
+function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
+	UpdateUnitIconTeam(unitID, unitDefID, newTeamID)
+end
+
 function widget:UnitEnteredLos(unitID)
 	-- The unsynced version doesn't provide unitDefID so we have to fetch it
 	-- Maybe later add caching for unitID -> unitDefID to save an engine call
