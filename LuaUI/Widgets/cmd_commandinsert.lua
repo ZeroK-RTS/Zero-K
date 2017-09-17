@@ -20,6 +20,12 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+local CMD_OPT_ALT = CMD.OPT_ALT
+local CMD_OPT_CTRL = CMD.OPT_CTRL
+local CMD_OPT_META = CMD.OPT_META
+local CMD_OPT_SHIFT = CMD.OPT_SHIFT
+local CMD_OPT_RIGHT = CMD.OPT_RIGHT
+
 local positionCommand = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
@@ -206,8 +212,18 @@ function widget:CommandNotify(id, params, options)
 	return ProcessCommand(id, params, options, 0)
 end
 
-function WG.CommandInsert(id, params, options, seq)
+local function EncodeOptions(options)
+	local coded = 0
+	if options.alt   then coded = coded + CMD_OPT_ALT   end
+	if options.ctrl  then coded = coded + CMD_OPT_CTRL  end
+	if options.meta  then coded = coded + CMD_OPT_META  end
+	if options.shift then coded = coded + CMD_OPT_SHIFT end
+	if options.right then coded = coded + CMD_OPT_RIGHT end
+	return coded
+end
 
+function WG.CommandInsert(id, params, options, seq)
+	options.coded = (options.coded or EncodeOptions(options))
 	if not options.shift and not options.meta then
 		Spring.GiveOrder (CMD.STOP, EMPTY_TABLE, 0)
 		options.shift = true

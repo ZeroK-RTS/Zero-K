@@ -360,7 +360,7 @@ function widget:CommandNotify(cmdID, params, options)
 				end
 			end
 			--prepare command list
-			if not shift then
+			if not (options.meta or shift) then
 				commandArrayToIssue[1] = {CMD.STOP, {} , {}}
 			end
 			for i, command in ipairs(orderedCommands) do
@@ -388,9 +388,21 @@ function widget:CommandNotify(cmdID, params, options)
 					end
 				end
 			end
-
-			if (#commandArrayToIssue > 0) then
-				Spring.GiveOrderArrayToUnitArray(unitArrayToReceive,commandArrayToIssue)
+			
+			if options.meta then
+				for i = 1, #commandArrayToIssue do
+					local command = commandArrayToIssue[i]
+					local opts = {}
+					for j = 1, #command[3] do
+						opts[command[3][j]] = true
+					end
+					opts.meta = true
+					WG.CommandInsert(command[1], command[2], opts)
+				end
+			else
+				if (#commandArrayToIssue > 0) then
+					Spring.GiveOrderArrayToUnitArray(unitArrayToReceive, commandArrayToIssue)
+				end
 			end
 		end
 
