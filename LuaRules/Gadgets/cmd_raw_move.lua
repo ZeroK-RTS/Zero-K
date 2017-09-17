@@ -171,7 +171,7 @@ local moveRawCmdDesc = {
 local TEST_MOVE_SPACING = 16
 local LAZY_TEST_MOVE_SPACING = 8
 local LAZY_SEARCH_DISTANCE = 450
-local STUCK_TRAVEL = 45
+local STUCK_TRAVEL = 25
 local STUCK_MOVE_RANGE = 140
 local GIVE_UP_STUCK_DIST_SQ = 250^2
 local STOP_STOPPING_RADIUS = 10000000
@@ -339,7 +339,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		local travelled = math.abs(oldX - x) + math.abs(oldZ - z)
 		unitData.ux, unitData.uz = x, z
 		if travelled < (stuckTravelOverride[unitDefID] or STUCK_TRAVEL) then
-			unitData.stuckCheckTimer = math.floor(math.random()*2) + 1
+			unitData.stuckCheckTimer = math.floor(math.random()*6) + 5
 			if distSq < GIVE_UP_STUCK_DIST_SQ then
 				Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
 				rawMoveUnit[unitID] = nil
@@ -347,6 +347,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 			else
 				local vx = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
 				local vz = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
+				Spring.MarkerAddPoint(x + vx, y, z + vz, "stuck")
 				Spring.SetUnitMoveGoal(unitID, x + vx, y, z + vz, 16, nil, false)
 				unitData.commandHandled = nil
 				unitData.switchedFromRaw = nil
@@ -356,7 +357,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 				return true, false
 			end
 		else
-			unitData.stuckCheckTimer = math.min(6, math.floor(distSq/500))
+			unitData.stuckCheckTimer = 4 + math.min(6, math.floor(distSq/500))
 			if distSq > GIVE_UP_STUCK_DIST_SQ then
 				unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*10) 
 			end
