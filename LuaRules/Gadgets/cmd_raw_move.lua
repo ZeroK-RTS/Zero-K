@@ -347,7 +347,6 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 			else
 				local vx = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
 				local vz = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
-				Spring.MarkerAddPoint(x + vx, y, z + vz, "stuck")
 				Spring.SetUnitMoveGoal(unitID, x + vx, y, z + vz, 16, nil, false)
 				unitData.commandHandled = nil
 				unitData.switchedFromRaw = nil
