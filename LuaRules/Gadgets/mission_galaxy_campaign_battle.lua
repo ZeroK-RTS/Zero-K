@@ -56,6 +56,7 @@ local initialUnitData = {}
 local bonusObjectiveList = {}
 
 local commandsToGive = nil -- Give commands just after game start
+local wantLevelGround = nil -- Positions to level
 
 -- Regeneratable from other information
 local vitalUnits = {}
@@ -158,12 +159,12 @@ local function ComparisionSatisfied(compareType, targetNumber, number)
 end
 
 local function SanitizeBuildPositon(x, z, ud, facing)
-	local oddX = (ud.xsize % 4 == 2)
-	local oddZ = (ud.zsize % 4 == 2)
-	
+	local xSize, zSize = ud.xsize, ud.zsize
 	if facing % 2 == 1 then
-		oddX, oddZ = oddZ, oddX
+		xSize, zSize = zSize, xSize
 	end
+	local oddX = (xSize % 4 == 2)
+	local oddZ = (zSize % 4 == 2)
 	
 	if oddX then
 		x = math.floor((x + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
@@ -175,7 +176,7 @@ local function SanitizeBuildPositon(x, z, ud, facing)
 	else
 		z = math.floor(z/BUILD_RESOLUTION)*BUILD_RESOLUTION
 	end
-	return x, z
+	return x, z, xSize, zSize
 end
 
 local function GetExtraStartUnits(teamID, customKeys)
@@ -586,7 +587,7 @@ local function SetupInitialUnitParameters(unitID, unitData)
 	end
 end
 
-local function PlaceUnit(unitData, teamID)
+local function PlaceUnit(unitData, teamID, alliedToPlayer)
 	if unitData.difficultyAtLeast and (unitData.difficultyAtLeast > missionDifficulty) then
 		return
 	end
@@ -601,14 +602,23 @@ local function PlaceUnit(unitData, teamID)
 		return
 	end
 	
-	local x, z, facing = unitData.x, unitData.z, unitData.facing
+	local x, z, facing, xSize, zSize = unitData.x, unitData.z, unitData.facing
 	
 	if ud.isBuilding or ud.speed == 0 then
-		x, z = SanitizeBuildPositon(x, z, ud, facing)
+		x, z, xSize, zSize = SanitizeBuildPositon(x, z, ud, facing)
 	end
 	
 	local build = (unitData.buildProgress and unitData.buildProgress < 1) or false
-	local unitID = Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID, build, (ud.isBuilding or ud.speed == 0) and ud.levelGround)
+	local wantLevel = (ud.isBuilding or ud.speed == 0) and ud.levelGround
+	local unitID = Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID, build, alliedToPlayer and wantLevel)
+	if (not alliedToPlayer) and wantLevel then
+		wantLevelGround = wantLevelGround or {}
+		wantLevelGround[#wantLevelGround + 1] = {
+			pos = {x, Spring.GetGroundHeight(x,z), z},
+			xSize = xSize, 
+			zSize = zSize,
+		}
+	end
 	
 	if not unitID then
 		Spring.MarkerAddPoint(x, 0, z, "Error creating unit " .. (((ud or {}).humanName) or "???"))
@@ -651,6 +661,18 @@ local function PlaceUnit(unitData, teamID)
 		local _, maxHealth = Spring.GetUnitHealth(unitID)
 		Spring.SetUnitHealth(unitID, {build = unitData.buildProgress, health = maxHealth*unitData.buildProgress})
 	end
+end
+
+local function DoStructureLevelGround()
+	if not wantLevelGround then
+		return
+	end
+	for i = 1, #wantLevelGround do
+		local x, y, z = wantLevelGround[i].pos[1], wantLevelGround[i].pos[2], wantLevelGround[i].pos[3]
+		local xSize, zSize = wantLevelGround[i].xSize, wantLevelGround[i].zSize
+		Spring.LevelHeightMap(x - xSize*4, z - zSize*4, x + xSize*4, z + zSize*4, y)
+	end
+	wantLevelGround = nil
 end
 
 local function AddUnitTerraform(unitData)
@@ -927,14 +949,14 @@ local function SetTeamAbilities(teamID, customKeys)
 	end
 end
 
-local function PlaceTeamUnits(teamID, customKeys)
+local function PlaceTeamUnits(teamID, customKeys, alliedToPlayer)
 	local initialUnits = GetExtraStartUnits(teamID, customKeys)
 	if not initialUnits then
 		return
 	end
 	
 	for i = 1, #initialUnits do
-		PlaceUnit(initialUnits[i], teamID)
+		PlaceUnit(initialUnits[i], teamID, alliedToPlayer)
 	end
 end
 
@@ -981,8 +1003,8 @@ local function DoInitialUnitPlacement()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local customKeys = select(7, Spring.GetTeamInfo(teamID))
-		PlaceTeamUnits(teamID, customKeys)
+		local _,_,_,_,_,allyTeamID, customKeys = Spring.GetTeamInfo(teamID)
+		PlaceTeamUnits(teamID, customKeys, allyTeamID == PLAYER_ALLY_TEAM_ID)
 	end
 	
 	local neutralUnits = GetExtraStartUnits(Spring.GetGaiaTeamID(), Spring.GetModOptions())
@@ -1205,6 +1227,7 @@ function gadget:GameFrame(n)
 				DoInitialUnitPlacement()
 			end
 		end
+		DoStructureLevelGround()
 	end
 	
 	-- Check objectives
