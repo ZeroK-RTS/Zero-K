@@ -555,8 +555,9 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 local pathAudio = 'Settings/Audio'
 	AddOption(pathAudio,{
 		name = 'Master Volume',
+		desc = 'Overall volume level, acts on top of the specific levels below.',
 		type = 'number',
-		min = 0, 
+		min = 0,
 		max = 100,
 		springsetting = 'snd_volmaster',
 		OnChange = function(self) spSendCommands{"set snd_volmaster " .. self.value} end,
@@ -564,11 +565,56 @@ local pathAudio = 'Settings/Audio'
 		everyMode = true,
 	})
 	AddOption(pathAudio,{
+		name = 'Battle Volume',
+		desc = 'Combat effects such as weapon fire and explosions.',
+		type = 'number',
+		min = 0,
+		max = 100,
+		springsetting = 'snd_volbattle',
+		OnChange = function(self) spSendCommands{"set snd_volbattle " .. self.value} end,
+		simpleMode = true,
+		everyMode = true,
+	})
+	AddOption(pathAudio,{
+		name = 'UI Volume',
+		desc = 'Interface notifications such as chat.',
+		type = 'number',
+		min = 0,
+		max = 100,
+		springsetting = 'snd_volui',
+		OnChange = function(self) spSendCommands{"set snd_volui " .. self.value} end,
+		simpleMode = true,
+		everyMode = true,
+	})
+	AddOption(pathAudio,{
+		name = 'Unit Reply Volume',
+		desc = 'Noises that units make when being selected or given orders.',
+		type = 'number',
+		min = 0,
+		max = 100,
+		springsetting = 'snd_volunitreply',
+		OnChange = function(self) spSendCommands{"set snd_volunitreply " .. self.value} end,
+		simpleMode = true,
+		everyMode = true,
+	})
+	AddOption(pathAudio,{
+		name = 'Ambient Volume',
+		desc = 'Miscellaneous sounds such as tumbleweed rolling around and makor being stronk.',
+		type = 'number',
+		min = 0,
+		max = 100,
+		springsetting = 'snd_volgeneral',
+		OnChange = function(self) spSendCommands{"set snd_volgeneral " .. self.value} end,
+		simpleMode = true,
+		everyMode = true,
+	})
+	AddOption(pathAudio,{
 		name = 'Music Volume',
 		type = 'number',
-		min = 0, 
+		min = 0,
 		max = 1,
 		step = 0.01,
+		-- springsetting = 'snd_volmusic', -- TODO: we should probably switch from WG to this at some point
 		value = WG.music_volume or 0.5,
 		OnChange = function(self)	
 			if (WG.music_start_volume or 0 > 0) then 
