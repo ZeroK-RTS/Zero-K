@@ -16,6 +16,7 @@ local BUTTON_Y = 0
 local BUTTON_SIZE = 25
 local BUTTON_PLACE_SPACE = 27
 
+local mainWindow
 local contentHolder
 local commandButtonOffset
 
@@ -144,6 +145,24 @@ options = {
 		end,
 		hidden = true,
 		noHotkey = true,
+	},
+	hide = {
+		name = 'Hide GBC',
+		desc = 'Hides the Global Bar of Commands.',
+		type = 'bool',
+		value = false,
+		hidden = true, -- hidden on purpose
+		noHotkey = true,
+		OnChange = function (self)
+			if not mainWindow then
+				return
+			end
+			if self.value then
+				mainWindow:Hide()
+			else
+				mainWindow:Show()
+			end
+		end,
 	},
 }
 
@@ -411,7 +430,7 @@ local function AddCommand(imageFile, tooltip, onClick)
 end
 
 local function InitializeControls()
-	local mainWindow = Window:New{
+	mainWindow = Window:New{
 		name      = 'globalCommandsWindow',
 		x         = 0, 
 		y         = 0,
@@ -428,7 +447,10 @@ local function InitializeControls()
 		color = {0, 0, 0, 0},
 		parent = screen0,
 	}
-	
+	if options.hide.value then
+		mainWindow:Hide()
+	end
+
 	contentHolder = Panel:New{
 		classname = options.fancySkinning.value,
 		x = 0,
