@@ -599,7 +599,7 @@ local pathAudio = 'Settings/Audio'
 	})
 	AddOption(pathAudio,{
 		name = 'Ambient Volume',
-		desc = 'Miscellaneous sounds such as tumbleweed rolling around and makor being stronk.',
+		desc = 'Miscellaneous sounds such as the environment or a busy base.',
 		type = 'number',
 		min = 0,
 		max = 100,

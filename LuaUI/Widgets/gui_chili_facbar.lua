@@ -435,7 +435,7 @@ end
 local function WaypointHandler(x,y,button)
   if (button==1)or(button>3) then
     Spring.Echo("FactoryBar: Exited easy waypoint mode")
-    Spring.PlaySoundFile(sound_waypoint, 1)
+    Spring.PlaySoundFile(sound_waypoint, 1, 'ui')
     waypointFac  = -1
     waypointMode = 0
     return
@@ -674,7 +674,7 @@ function widget:MousePress(x, y, button)
 	end
 	if waypointMode>1 then
 		Spring.Echo("FactoryBar: Exited easy waypoint mode")
-		Spring.PlaySoundFile(sound_waypoint, 1)
+		Spring.PlaySoundFile(sound_waypoint, 1, 'ui')
 	end
 	waypointFac  = -1
 	waypointMode = 0

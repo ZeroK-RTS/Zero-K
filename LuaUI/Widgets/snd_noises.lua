@@ -119,7 +119,7 @@ local function CoolNoisePlay(category, cooldownTime, volume)
 	cooldownTime = cooldownTime or 0
 	local t = GetGameSeconds()
 	if ( (not cooldown[category]) or ((t - cooldown[category]) > cooldownTime) ) then
-		playSound(category, volume or 1, 'userinterface')
+		playSound(category, volume or 1, 'unitreply')
 		cooldown[category] = t
 	end
 end

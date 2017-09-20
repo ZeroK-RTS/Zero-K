@@ -300,7 +300,7 @@ local function CoolNoisePlay(category, cooldownTime)
   local t = GetGameSeconds()
   if ((not cooldown[category]) or
       (t - cooldown[category] > cooldownTime)) then
-    playNoiseSound(category)
+    playNoiseSound(category, 1, "unitreply")
     cooldown[category] = t
   end
 
