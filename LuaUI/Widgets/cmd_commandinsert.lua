@@ -131,19 +131,33 @@ local function ProcessCommand(id, params, options, sequence_order)
 		sequence_order = structureSquenceCount + sequence_order
 	end
 	
-	-- Redefine the way in which modifiers apply to Repair
+	-- Redefine the way in which modifiers apply to Area- Repair and Rez
 	local ctrl = options.ctrl
 	local meta = options.meta
 	if ctrl and not meta and id == CMD.REPAIR then
+		-- Engine CTRL means "keep repairing even when being reclaimed" (now inaccessible)
+		-- Engine META means "only repair live units, don't assist construction" (now CTRL)
 		Spring.GiveOrder(id, params, options.coded - CMD.OPT_CTRL + CMD.OPT_META)
 		return true
 	end
-	
+	if not meta and id == CMD.RESURRECT then
+		-- Engine CTRL means "keep rezzing even when being reclaimed" (now inaccessible)
+		-- Engine META means "only rez fresh wrecks, don't refill partially-reclaimed" (now default, CTRL disables)
+		Spring.GiveOrder(id, params, options.coded - (ctrl and CMD.OPT_CTRL or 0) + (ctrl and 0 or CMD.OPT_META))
+		return true
+	end
+
 	-- Command insert
 	if meta then
 		local coded = options.coded
 		if id == CMD.REPAIR and ctrl then
 			coded = coded - CMD.OPT_CTRL
+		elseif id == CMD.RESURRECT then
+			if ctrl then
+				coded = coded - CMD.OPT_CTRL - CMD.OPT.META
+			else
+				coded = coded
+			end
 		else
 			coded = coded - CMD.OPT_META
 		end
