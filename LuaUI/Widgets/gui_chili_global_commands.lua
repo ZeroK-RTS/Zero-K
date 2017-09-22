@@ -504,7 +504,7 @@ local function InitializeControls()
 	offset = offset + 0.5
 	
 	buttons.place_retreat_zone = MakeCommandButton(contentHolder, offset,
-		'LuaUI/images/commands/Bold/retreat.png', 
+		'LuaUI/images/commands/states/retreat_90.png', 
 		{action = 'sethaven', command = CMD_RETREAT_ZONE}
 	)
 	offset = offset + 1
