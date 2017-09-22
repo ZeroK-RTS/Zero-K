@@ -129,6 +129,9 @@ local function WriteHavenToTeamRulesParam(teamID, havenID)
 end
 
 local function AddHaven(teamID, x, z)
+	if not teamID then
+		return
+	end
 	if not havens[teamID] then
 		havens[teamID] = {count = 0, data = {}}
 	end
