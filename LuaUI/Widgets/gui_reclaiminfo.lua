@@ -108,7 +108,16 @@ function widget:DrawScreen()
 		end
 		
 		if(rangeend == nil) then
-			return 
+			local _, coords = Spring.TraceScreenRay(x,y,true, false, true, false, rangestart[2])
+			if coords[4] then
+				rangeend = {
+					coords[4],
+					coords[5],
+					coords[6]
+				}
+			else
+				return
+			end
 		end
 		metal = 0
 		energy = 0
