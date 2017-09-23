@@ -38,6 +38,9 @@ local loadGameFrame = 0
 
 local FACING_TO_HEADING = 2^14
 
+local mapCenterX = Game.mapSizeX / 2
+local mapCenterZ = Game.mapSizeZ / 2
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 if gadgetHandler:IsSyncedCode() then --SYNCED
@@ -634,12 +637,13 @@ local function PlaceUnit(unitData, teamID, alliedToPlayer)
 		}
 	elseif unitData.patrolRoute then
 		local patrolRoute = unitData.patrolRoute
-		local patrolCommands = {}
-		
-		patrolCommands[#patrolCommands + 1] = {
-			cmdID = CMD_RAW_MOVE, 
-			pos = patrolRoute[1]
+		local patrolCommands = {
+			[1] = {
+				cmdID = CMD_RAW_MOVE, 
+				pos = patrolRoute[1]
+			}
 		}
+		
 		for i = 2, #patrolRoute do
 			patrolCommands[#patrolCommands + 1] = {
 				cmdID = CMD.PATROL,
@@ -647,6 +651,24 @@ local function PlaceUnit(unitData, teamID, alliedToPlayer)
 				options = {"shift"}
 			}
 		end
+		
+		commandsToGive = commandsToGive or {}
+		commandsToGive[#commandsToGive + 1] = {
+			unitID = unitID,
+			commands = patrolCommands,
+		}
+	elseif unitData.selfPatrol then
+		local vx = mapCenterX - x
+		local vz = mapCenterZ - z
+		local cx = x + vx*25/math.abs(vx)
+		local cz = z + vz*25/math.abs(vz)
+		
+		local patrolCommands = {
+			[1] = {
+				cmdID = CMD.PATROL, 
+				pos = {cx, cz}
+			}
+		}
 		
 		commandsToGive = commandsToGive or {}
 		commandsToGive[#commandsToGive + 1] = {
