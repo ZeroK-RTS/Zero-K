@@ -105,10 +105,10 @@ function widget:Update()
 end
 
 local function drawMinimapGeos(x,z)
-	gl.Vertex(x - size,0,z - size)
-	gl.Vertex(x + size,0,z + size)
-	gl.Vertex(x + size,0,z - size)
-	gl.Vertex(x - size,0,z + size)
+	gl.Vertex(x - size, z - size, 0)
+	gl.Vertex(x + size, z + size, 0)
+	gl.Vertex(x + size, z - size, 0)
+	gl.Vertex(x - size, z + size, 0)
 end
 
 function widget:DefaultCommand(type, id)
@@ -125,7 +125,6 @@ function widget:DrawInMiniMap()
 		gl.LoadIdentity()
 		gl.Translate(0,1,0)
 		gl.Scale(mapXinv , -mapZinv, 1)
-		gl.Rotate(270,1,0,0)
 		gl.LineWidth(2)
 		gl.Lighting(false)
 		gl.Color(1,1,0,0.7)
