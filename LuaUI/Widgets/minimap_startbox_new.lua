@@ -8,6 +8,8 @@ function widget:GetInfo() return {
 	enabled   = true,
 } end
 
+local mapX = Game.mapSizeX
+local mapZ = Game.mapSizeZ
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 local startboxConfig = ParseBoxes()
@@ -361,8 +363,7 @@ function widget:DrawScreenEffects()
 end
 
 local boxes_loaded_minimap = false
-local dotSize = math.max(Game.mapSizeX, Game.mapSizeZ) * 0.01
-function widget:DrawInMiniMap(sx, sz)
+function widget:DrawInMiniMap(minimapX, minimapY)
 
 	gl.PushMatrix()
 	gl.CallList(xformList)
@@ -371,22 +372,26 @@ function widget:DrawInMiniMap(sx, sz)
 
 	gl.CallList(boxMinimapList)
 
-	gl.LineWidth(3)
-	gl.Rotate (270,1,0,0)
+	gl.Color(1,1,1,1)
+	gl.LineWidth(1.0)
+	gl.PopMatrix()
 
+	local dotSize = math.max(minimapX, minimapY) * 0.3
+	gl.PushMatrix()
+	gl.LineWidth(3)
+	gl.Translate(0, minimapY, 0)
+	gl.Scale(minimapX/mapX, -minimapY/mapZ, 1)
+	
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local x, y, z = Spring.GetTeamStartPosition(teamID)
 		if ValidStartpos(x, y, z) then
 			local r, g, b = Spring.GetTeamColor(teamID)
 			local i = 2 * math.abs(((Spring.DiffTimers(Spring.GetTimer(), startTimer) * 3) % 1) - 0.5)
 			gl.Color(i, i, i)
-			gl.DrawGroundCircle(x, 0, z, dotSize * 1.2, 16)
+			gl.Utilities.DrawCircle(x, z, dotSize * 1.2)
 			gl.Color(r, g, b)
-			gl.DrawGroundCircle(x, 0, z, dotSize, 16)
+			gl.Utilities.DrawCircle(x, z, dotSize)
 		end
 	end
-
-	gl.Color(1,1,1,1)
-	gl.LineWidth(1.0)
 	gl.PopMatrix()
 end

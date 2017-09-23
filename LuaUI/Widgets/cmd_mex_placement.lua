@@ -49,7 +49,6 @@ local glText             = gl.Text
 local glGetTextWidth     = gl.GetTextWidth
 local glPolygonMode      = gl.PolygonMode
 local glDrawGroundCircle = gl.DrawGroundCircle
-local glDrawCircle
 local glUnitShape        = gl.UnitShape
 local glDepthTest        = gl.DepthTest
 local glLighting         = gl.Lighting
@@ -67,6 +66,7 @@ local glPushMatrix       = gl.PushMatrix
 local glTranslate        = gl.Translate
 local glCallList         = gl.CallList
 local glCreateList       = gl.CreateList
+local glDrawCircle
 
 local GL_FRONT_AND_BACK = GL.FRONT_AND_BACK
 local GL_FILL           = GL.FILL
