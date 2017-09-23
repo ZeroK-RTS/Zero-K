@@ -1135,7 +1135,7 @@ local icontypes = {
   chickena = {
     --bitmap='icons/chickena.dds',
     bitmap='icons/walkerassault.dds',
-    size=1.7,
+    size=2.1,
   },
   chickenc = {
     --bitmap='icons/chickenc.dds',
@@ -1150,7 +1150,7 @@ local icontypes = {
   chickens = {
     --bitmap='icons/chickens.dds',
     bitmap='icons/kbotskirm.dds',
-    size=1.5,
+    size=1.6,
   },
   chickenr = {
     --bitmap='icons/chickenr.dds',
