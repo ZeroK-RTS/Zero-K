@@ -58,6 +58,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["turretmissile"].id] = 1,
 	[UnitDefNames["turretaafar"].id] = 1,
 	[UnitDefNames["hoverskirm"].id] = 1,
+	[UnitDefNames["hoverdepthcharge"].id] = 1,
 	[UnitDefNames["turretaaclose"].id] = 1,
 	[UnitDefNames["turretaaheavy"].id] = 1,
 	[UnitDefNames["amphaa"].id] = 1,
