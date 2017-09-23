@@ -687,8 +687,9 @@ local function SpawnBurrow(number, loc, burrowLevel)
 		end
 
 		unitID = spCreateUnit(burrowName, x, y, z, "n", chickenTeamID)
-		data.burrows[unitID] = {targetID = unitID, targetDistance = 100000}
-		UpdateBurrowTarget(unitID, nil)
+		-- handled in UnitCreated()
+		--data.burrows[unitID] = {targetID = unitID, targetDistance = 100000}
+		--UpdateBurrowTarget(unitID, nil)
 		--Spring.SetUnitBlocking(unitID, false)
 	end
 	return unitID
@@ -1011,6 +1012,10 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	local name = UnitDefs[unitDefID].name
 	if ( chickenTeamID == unitTeam ) then
+		if name == burrowName then
+			data.burrows[unitID] = {targetID = unitID, targetDistance = 100000}
+			UpdateBurrowTarget(unitID, nil)
+		end
 		local n = Spring.GetGameRulesParam(name.."Count") or 0
 		Spring.SetGameRulesParam(name.."Count", n+1)
 	end
