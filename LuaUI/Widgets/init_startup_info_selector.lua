@@ -21,6 +21,7 @@ function CheckForSpec()
 end
 
 include("Widgets/COFCTools/ExportUtilities.lua")
+VFS.Include("LuaRules/Utilities/tobool.lua")
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -31,9 +32,8 @@ _ Show a windows at game start with pictures to choose commander type.
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetGameRulesParam = Spring.GetGameRulesParam
--- FIXME use tobool instead of this string comparison silliness
 local coop = false
-local forcejunior = (Spring.GetModOptions().forcejunior == "1") or false
+local forcejunior = Spring.Utilities.tobool(Spring.GetModOptions().forcejunior)
 
 local Chili
 local Window
