@@ -122,6 +122,7 @@ function widget:DrawInMiniMap()
 
 	if drawGeos then
 	
+		gl.PushMatrix()
 		gl.LoadIdentity()
 		gl.Translate(0,1,0)
 		gl.Scale(mapXinv , -mapZinv, 1)
@@ -135,5 +136,6 @@ function widget:DrawInMiniMap()
 		
 		gl.LineWidth(1.0)
 		gl.Color(1,1,1,1)
+		gl.PopMatrix()
 	end
 end

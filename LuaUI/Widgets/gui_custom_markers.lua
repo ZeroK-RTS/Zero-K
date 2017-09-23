@@ -298,9 +298,9 @@ function widget:Initialize()
 	widgetHandler:RegisterGlobal('RemoveCustomMapMarker', RemovePoint)
 	
 	-- debug
-	--WG.CustomMarker.AddPoint("newPoint", Game.mapSizeX/2, Game.mapSizeZ/2, "Custom marker", "examplePreset")
-	--WG.CustomMarker.AddPoint("newPoint2", Game.mapSizeX/2 + 300, Game.mapSizeZ/2 - 300, "Custom marker 2", {1, 0.5, 1})
-	--WG.CustomMarker.AddPoint("newPoint3", Game.mapSizeX/2 - 300, Game.mapSizeZ/2 + 300, "Custom marker 3", {fontSize = 48, color = {0, 0.2, 1}})
+	WG.CustomMarker.AddPoint("newPoint", Game.mapSizeX/2, Game.mapSizeZ/2, "Custom marker", "examplePreset")
+	WG.CustomMarker.AddPoint("newPoint2", Game.mapSizeX/2 + 300, Game.mapSizeZ/2 - 300, "Custom marker 2", {1, 0.5, 1})
+	WG.CustomMarker.AddPoint("newPoint3", Game.mapSizeX/2 - 300, Game.mapSizeZ/2 + 300, "Custom marker 3", {fontSize = 48, color = {0, 0.2, 1}})
 end
 
 function widget:Shutdown()
@@ -516,6 +516,7 @@ end
 function widget:DrawInMiniMap(sx, sy)
 	if (not on) then return end
 	glLineWidth(lineWidth)
+	gl.Lighting(false)
 	
 	local ratioX = sx / mapX
 	local ratioY = sy / mapY

@@ -888,19 +888,10 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 		if not glDrawCircle then
 			glDrawCircle = gl.Utilities.DrawCircle
 		end
-		
-		--[[
-		glPushMatrix()
-			glLoadIdentity()
-			glTranslate(0, 1, 0)
-			glScale(mapXinv , -mapZinv, 1)
-
-			widget:DrawWorld()
-		glPopMatrix()
-		--]]
 
 		local specatate = spGetSpectatingState()
 
+		glPushMatrix()
 		glTranslate(0,minimapY,0)
 		glScale(minimapX/mapX, -minimapY/mapZ, 1)
 
@@ -923,9 +914,8 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 
 		glLineWidth(1.0)
 		glColor(1,1,1,1)
-
+		glPopMatrix()
 	end
-
 end
 
 --[[

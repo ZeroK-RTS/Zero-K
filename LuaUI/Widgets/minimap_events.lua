@@ -482,7 +482,7 @@ function widget:DrawInMiniMap(xSize, ySize)
 
   glLineWidth(1)
   glColor(1,1,1,1)
-  gl.Lighting(true)
+  --gl.Lighting(true)
   glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
   if glSmoothing then
     glSmoothing(true, true, false)
