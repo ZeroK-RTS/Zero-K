@@ -37,7 +37,7 @@ end
 
 local GetSelectedUnits	= Spring.GetSelectedUnits
 local GetUnitDefID		= Spring.GetUnitDefID
-local GetGameSeconds	= Spring.GetGameSeconds
+local osClock			= os.clock
 local spInView			= Spring.IsUnitInView
 local PlaySoundFile		= Spring.PlaySoundFile
 local spGetUnitHealth	= Spring.GetUnitHealth
@@ -117,7 +117,7 @@ end
 
 local function CoolNoisePlay(category, cooldownTime, volume) 
 	cooldownTime = cooldownTime or 0
-	local t = GetGameSeconds()
+	local t = osClock()
 	if ( (not cooldown[category]) or ((t - cooldown[category]) > cooldownTime) ) then
 		playSound(category, volume or 1, 'userinterface') -- not using 'unitreply' because only 1 can play at a time, the next cutting off the first
 		cooldown[category] = t
