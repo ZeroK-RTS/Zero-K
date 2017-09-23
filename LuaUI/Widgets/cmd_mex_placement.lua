@@ -49,6 +49,7 @@ local glText             = gl.Text
 local glGetTextWidth     = gl.GetTextWidth
 local glPolygonMode      = gl.PolygonMode
 local glDrawGroundCircle = gl.DrawGroundCircle
+local glDrawCircle
 local glUnitShape        = gl.UnitShape
 local glDepthTest        = gl.DepthTest
 local glLighting         = gl.Lighting
@@ -86,8 +87,6 @@ local myAllyTeam = spGetMyAllyTeamID()
 
 local mapX = Game.mapSizeX
 local mapZ = Game.mapSizeZ
-local mapXinv = 1/mapX
-local mapZinv = 1/mapZ
 
 local METAL_MAP_SQUARE_SIZE = 16
 local MEX_RADIUS = Game.extractorRadius
@@ -883,9 +882,13 @@ function widget:DefaultCommand(type, id)
 	end
 end
 
-function widget:DrawInMiniMap()
+function widget:DrawInMiniMap(minimapX, minimapY)
 
 	if drawMexSpots then
+		if not glDrawCircle then
+			glDrawCircle = gl.Utilities.DrawCircle
+		end
+		
 		--[[
 		glPushMatrix()
 			glLoadIdentity()
@@ -898,10 +901,8 @@ function widget:DrawInMiniMap()
 
 		local specatate = spGetSpectatingState()
 
-		glLoadIdentity()
-		glTranslate(0,1,0)
-		glScale(mapXinv , -mapZinv, 1)
-		glRotate(270,1,0,0)
+		glTranslate(0,minimapY,0)
+		glScale(minimapX/mapX, -minimapY/mapZ, 1)
 
 		for i = 1, #WG.metalSpots do
 			local spot = WG.metalSpots[i]
@@ -913,11 +914,11 @@ function widget:DrawInMiniMap()
 			glLighting(false)
 			glColor(0,0,0,1)
 			glLineWidth(((spot.metal > 0 and spot.metal) or 0.1)*2.0)
-			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
-			glLineWidth((spot.metal > 0 and spot.metal) or 0.1)
+			glDrawCircle(x, z, MINIMAP_DRAW_SIZE)
+			glLineWidth(((spot.metal > 0 and spot.metal) or 0.1)*0.8)
 			glColor(r,g,b,1.0)
 
-			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
+			glDrawCircle(x, z, MINIMAP_DRAW_SIZE)
 		end
 
 		glLineWidth(1.0)
