@@ -202,6 +202,15 @@ local function RemoveSideButton()
 	widgetHandler:RemoveAction(actionShow)
 end
 
+function WG.ZoomToStart()
+	cameraAlreadyMoved = true
+	local minX, minZ, maxX, maxZ, maxY, height, smoothness = GetStartZoomBounds()
+	SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, smoothness or 0.67, true, height)
+	if WG.DelaySmoothCam then
+		WG.DelaySmoothCam((smoothness or 0.67) + 0.2)
+	end
+end
+
 local cameraAlreadyMoved = false
 function Close(permanently, wantMoveCamera)
 	if mainWindow then
@@ -210,12 +219,7 @@ function Close(permanently, wantMoveCamera)
 
 	local moveCamera = wantMoveCamera and not cameraAlreadyMoved and not Spring.GetSpectatingState()
 	if moveCamera then
-		cameraAlreadyMoved = true
-		local minX, minZ, maxX, maxZ, maxY, height, smoothness = GetStartZoomBounds()
-		SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, smoothness or 0.67, true, height)
-		if WG.DelaySmoothCam then
-			WG.DelaySmoothCam((smoothness or 0.67) + 0.2)
-		end
+		WG.ZoomToStart()
 	end
 
 	if permanently then

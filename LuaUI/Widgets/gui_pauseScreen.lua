@@ -119,15 +119,17 @@ local SOUND_DIRNAME = 'LuaUI/Sounds/Voices/'
 local pauseSound = "paused_core_1"
 local unpauseSound = "unpaused_core_1"
 local tempDisabled = false
-local doNotDisableActiveSound = false
+local doNotDisableSound = false
+local disablePauseSlideTimestamp = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function WG.PauseScreen_SetEnabled(newEnabled, newDoNotDisableActiveSound)
+function WG.PauseScreen_SetEnabled(newEnabled, newDoNotDisableSound)
 	-- This intentially exists before widgets are fully loaded.
 	tempDisabled = not newEnabled
-	doNotDisableActiveSound = newDoNotDisableActiveSound
+	doNotDisableSound = newDoNotDisableSound
+	disablePauseSlideTimestamp = osClock()
 end
 
 local function playSound(filename, ...)
@@ -165,12 +167,12 @@ function widget:DrawScreen()
 	
 	if ( paused and not lastPause ) then
 		--new pause
-		if not (options.disablesound.value or tempDisabled) then
+		if not (options.disablesound.value or (tempDisabled and not doNotDisableSound)) then
 			playSound(pauseSound, 1, 'ui')
 		end
 		clickTimestamp = nil
 	elseif ( not paused and lastPause ) then
-		if not (options.disablesound.value or (tempDisabled and not doNotDisableActiveSound)) then
+		if not (options.disablesound.value or (tempDisabled and not doNotDisableSound)) then
 			playSound(unpauseSound, 1, 'ui')
 		end
 	end
@@ -178,7 +180,9 @@ function widget:DrawScreen()
 	lastPause = paused
 		
 	if ( (paused or ( ( now - pauseTimestamp) <= slideTime )) and not (options.hideimage.value or tempDisabled)) then
-		drawPause(paused, now)
+		if pauseTimestamp - disablePauseSlideTimestamp > 0.5 then
+			drawPause(paused, now)
+		end
 	end
 	
 	ResetGl()

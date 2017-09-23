@@ -73,6 +73,7 @@ local missionWon, missionEndFrame, missionEndTime, missionResultSent
 local VICTORY_SUSTAIN_FRAMES = 50 
 
 local ADD_GLOBAL_COMMAND_BUTTON = false
+local SCREEN_EDGE = 8
 
 ----------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------
@@ -90,6 +91,8 @@ local minTransparency_autoFade = 0.1
 local maxTransparency_autoFade = 0.7
 
 local gameNotStarted = true
+local wantPause = false
+local firstUpdates = 0
 
 local screenx, screeny, myFont
 local screenCenterX, screenCenterY, wndX1, wndY1, wndX2, wndY2
@@ -146,6 +149,229 @@ local function SetWindowSkin(targetPanel, className)
 		targetPanel:UpdateClientArea()
 	end
 	targetPanel:Invalidate()
+end
+
+local function TakeMouseOffEdge()
+	-- Take off the edge to prevent pregame scroll and commander loss.
+	-- This usually doesn't matter because in other game modes the player starts zoomed out.
+	local mx, my, lmb, mmb, rmb, outsideSpring = Spring.GetMouseState()
+	if outsideSpring then
+		return
+	end
+	
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local changed = false
+	
+	if mx < SCREEN_EDGE then
+		mx = SCREEN_EDGE
+		changed = true
+	elseif mx > screenWidth - SCREEN_EDGE then
+		mx = screenWidth - SCREEN_EDGE
+		changed = true
+	end
+	
+	if my < SCREEN_EDGE then
+		my = SCREEN_EDGE
+		changed = true
+	elseif my > screenHeight - SCREEN_EDGE then
+		my = screenHeight - SCREEN_EDGE
+		changed = true
+	end
+	
+	if changed then
+		Spring.WarpMouse(mx, my)
+	end
+	return changed
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Briefing Window
+
+local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
+	
+	local offset = 0
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.AddEntry(textBody, imageFile)
+		local textPos = 4
+		if imageFile then
+			textPos = imageSize + 10
+			
+			Chili.Image:New{
+				file = BRIEFING_IMAGE,
+				x = 4,
+				y = offset,
+				width = imageSize,
+				height = imageSize,
+				keepAspect = true,
+				file = imageFile,
+				parent = parentControl
+			}
+		end
+		
+		local label = Chili.TextBox:New{
+			x = textPos,
+			y = offset + 6,
+			right = 4,
+			height = textSpacing,
+			align = "left",
+			valign = "top",
+			text = textBody,
+			fontsize = 14,
+			parent = parentControl,
+		}
+		
+		local offsetSize = (#label.physicalLines)*14 + 2
+		if imageFile and (offsetSize < imageSize) then
+			offsetSize = imageSize
+		end
+		
+		offset = offset + offsetSize + paragraphSpacing
+	end
+	
+	return externalFunctions
+end
+
+local function InitializeBriefingWindow()
+	local planetInformation = CustomKeyToUsefulTable(Spring.GetModOptions().planetmissioninformationtext) or {}
+	
+	local BRIEF_WIDTH = 720
+	local BRIEF_HEIGHT = 680
+	
+	local SCROLL_POS = 70
+	local SCROLL_HEIGHT = 170 
+	
+	local externalFunctions = {}
+	
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
+	local briefingWindow = Chili.Window:New{
+		classname = "main_window",
+		name = 'mission_galaxy_brief',
+		x = math.floor((screenWidth - BRIEF_WIDTH)/2),
+		y = math.max(50, math.floor((screenHeight - BRIEF_HEIGHT)/2.5)),
+		width = BRIEF_WIDTH,
+		height = BRIEF_HEIGHT,
+		minWidth = BRIEF_WIDTH,
+		minHeight = BRIEF_HEIGHT,
+		dockable = true,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
+		parent = Chili.Screen0,
+	}
+	briefingWindow:SetVisibility(false)
+	
+	Chili.Label:New{
+		x = 0,
+		y = 12,
+		width = briefingWindow.width - (briefingWindow.padding[2] + briefingWindow.padding[4]),
+		height = 26,
+		fontsize = 44,
+		align = "center",
+		caption = "Planet " .. planetInformation.name,
+		parent = briefingWindow,
+	}
+	
+	local mainHolder = Chili.ScrollPanel:New{
+		x = "4%",
+		y = SCROLL_POS,
+		width = "44%",
+		height = SCROLL_HEIGHT,
+		horizontalScrollbar = false,
+		parent = briefingWindow,
+	}
+	
+	local bonusHolder
+	if bonusObjectiveBlock then
+		bonusHolder = Chili.ScrollPanel:New{
+			right = "4%",
+			y = SCROLL_POS,
+			width = "44%",
+			height = SCROLL_HEIGHT,
+			horizontalScrollbar = false,
+			parent = briefingWindow,
+		}
+	end
+	
+	local textScroll = Chili.ScrollPanel:New{
+		x = "4%",
+		y = SCROLL_POS + SCROLL_HEIGHT + 22,
+		right = "4%",
+		bottom = 80,
+		horizontalScrollbar = false,
+		parent = briefingWindow,
+	}
+	local planetTextHandler = GetNewTextHandler(textScroll, 22, 64)
+	planetTextHandler.AddEntry(planetInformation.description)
+	
+	if planetInformation.tips then
+		local tips = planetInformation.tips
+		for i = 1, #tips do
+			planetTextHandler.AddEntry(tips[i].text, tips[i].image)
+		end
+	end
+	
+	Chili.Button:New{
+		x = "38%",
+		right = "38%",
+		bottom = 10,
+		height = 60,
+		caption = "Continue",
+		fontsize = 26,
+		OnClick = {
+			function ()
+				externalFunctions.Hide()
+				objectivesWindow.Show()
+			end
+		},
+		parent = briefingWindow
+	}
+	
+	local function TakeObjectivesLists()
+		if mainObjectiveBlock then
+			mainObjectiveBlock.SetParent(mainHolder, 0, 0)
+		end
+		if bonusHolder and bonusObjectiveBlock then
+			bonusObjectiveBlock.SetParent(bonusHolder, 0, 0)
+		end
+	end
+	
+	function externalFunctions.Show(withoutPause)
+		if WG.PauseScreen_SetEnabled then
+			WG.PauseScreen_SetEnabled(false, not gameNotStarted)
+		end
+		if not withoutPause then
+			if gameNotStarted then
+				wantPause = true
+			else
+				local paused = select(3, Spring.GetGameSpeed())
+				if not paused then
+					Spring.SendCommands("pause")
+				end
+			end
+		end
+		TakeObjectivesLists()
+		
+		briefingWindow:SetVisibility(true)
+	end
+	
+	function externalFunctions.Hide()
+		if WG.PauseScreen_SetEnabled then
+			WG.PauseScreen_SetEnabled(true)
+		end
+		wantPause = false
+		local paused = select(3, Spring.GetGameSpeed())
+		if paused then
+			Spring.SendCommands("pause")
+		end
+		briefingWindow:SetVisibility(false)
+	end
+
+	return externalFunctions
 end
 
 --------------------------------------------------------------------------------
@@ -206,7 +432,7 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 			image = image,
 			satisfyCount = items[i].satisfyCount,
 		}
-		offset = offset + (#label.physicalLines)*16
+		offset = offset + (#label.physicalLines)*14 + 2
 	end
 	
 	local function UpdateSuccess(index)
@@ -275,131 +501,6 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 	holderControl:SetPos(nil, nil, nil, offset)
 	
 	return externalFunctions, position + offset
-end
-
-local function InitializeBriefingWindow()
-	local BRIEF_WIDTH = 720
-	local BRIEF_HEIGHT = 680
-	
-	local SCROLL_POS = 70
-	local SCROLL_HEIGHT = 170 
-	
-	local externalFunctions = {}
-	
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
-	
-	local briefingWindow = Chili.Window:New{
-		classname = "main_window",
-		name = 'mission_galaxy_brief',
-		x = math.floor((screenWidth - BRIEF_WIDTH)/2),
-		y = math.max(50, math.floor((screenHeight - BRIEF_HEIGHT)/2.5)),
-		width = BRIEF_WIDTH,
-		height = BRIEF_HEIGHT,
-		minWidth = BRIEF_WIDTH,
-		minHeight = BRIEF_HEIGHT,
-		dockable = true,
-		draggable = false,
-		resizable = false,
-		tweakDraggable = true,
-		tweakResizable = true,
-		parent = Chili.Screen0,
-	}
-	briefingWindow:SetVisibility(false)
-	
-	Chili.Label:New{
-		x = 0,
-		y = 16,
-		width = briefingWindow.width - (briefingWindow.padding[2] + briefingWindow.padding[4]),
-		height = 26,
-		fontsize = 44,
-		align = "center",
-		caption = "Planet Hephastus",
-		parent = briefingWindow,
-	}
-	
-	local mainHolder = Chili.ScrollPanel:New{
-		x = "4%",
-		y = SCROLL_POS,
-		width = "44%",
-		height = SCROLL_HEIGHT,
-		horizontalScrollbar = false,
-		parent = briefingWindow,
-	}
-	
-	local bonusHolder
-	if bonusObjectiveBlock then
-		bonusHolder = Chili.ScrollPanel:New{
-			right = "4%",
-			y = SCROLL_POS,
-			width = "44%",
-			height = SCROLL_HEIGHT,
-			horizontalScrollbar = false,
-			parent = briefingWindow,
-		}
-	end
-	
-	local textHolder = Chili.ScrollPanel:New{
-		x = "4%",
-		y = SCROLL_POS + SCROLL_HEIGHT + 20,
-		right = "4%",
-		bottom = 75,
-		horizontalScrollbar = false,
-		parent = briefingWindow,
-	}
-	
-	Chili.Button:New{
-		x = "38%",
-		right = "38%",
-		bottom = 7,
-		height = 60,
-		caption = "Continue",
-		fontsize = 26,
-		OnClick = {
-			function ()
-				externalFunctions.Hide()
-				objectivesWindow.Show()
-			end
-		},
-		parent = briefingWindow
-	}
-	
-	local function TakeObjectivesLists()
-		if mainObjectiveBlock then
-			mainObjectiveBlock.SetParent(mainHolder, 0, 0)
-		end
-		if bonusHolder and bonusObjectiveBlock then
-			bonusObjectiveBlock.SetParent(bonusHolder, 0, 0)
-		end
-	end
-	
-	function externalFunctions.Show(withoutPause)
-		if WG.PauseScreen_SetEnabled then
-			WG.PauseScreen_SetEnabled(false, true)
-		end
-		if not withoutPause then
-			local paused = select(3, Spring.GetGameSpeed())
-			if not paused then
-				Spring.SendCommands("pause")
-			end
-		end
-		TakeObjectivesLists()
-		
-		briefingWindow:SetVisibility(true)
-	end
-	
-	function externalFunctions.Hide()
-		if WG.PauseScreen_SetEnabled then
-			WG.PauseScreen_SetEnabled(true)
-		end
-		local paused = select(3, Spring.GetGameSpeed())
-		if paused then
-			Spring.SendCommands("pause")
-		end
-		briefingWindow:SetVisibility(false)
-	end
-
-	
-	return externalFunctions
 end
 
 local function InitializeObjectivesWindow()
@@ -663,6 +764,15 @@ function widget:Update()
 	if gameNotStarted then
 		Spring.SendCommands("forcestart")
 	end
+	if firstUpdates then
+		if TakeMouseOffEdge() then
+			WG.ZoomToStart()
+		end
+		firstUpdates = firstUpdates + 1
+		if firstUpdates > 30 then
+			firstUpdates = false
+		end
+	end
 end
 
 local function DrawGameOverScreen(now)
@@ -776,13 +886,24 @@ function widget:GameFrame(n)
 		missionSustainedTime = osClock()
 		missionEndFrame = nil
 	end
+	if wantPause then
+		local paused = select(3, Spring.GetGameSpeed())
+		if not paused then
+			Spring.SendCommands("pause")
+		end
+		wantPause = false
+		WG.PauseScreen_SetEnabled(false)
+	end
 end
 
 function widget:Initialize()
 	Chili = WG.Chili
 	objectivesWindow = InitializeObjectivesWindow()
-	briefingWindow = InitializeBriefingWindow()
-	briefingWindow.Show()
+	if objectivesWindow then
+		briefingWindow = InitializeBriefingWindow()
+		briefingWindow.Show()
+	end
+	
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 	
 	widgetHandler:RegisterGlobal('MissionGameOver', MissionGameOver)
