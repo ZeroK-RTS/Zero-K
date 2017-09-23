@@ -64,16 +64,6 @@ local Sounds = {
 			pitchmod = 0.1,
 			gainmod = 0.05,
 		},
-		FirewalkerFire = {
-			file = "sounds/weapon/cannon/wolverine_fire.wav",
-			pitch = 0.7,
-			--gain = 1.2,
-		},
-		FirewalkerHit = {
-			file = "sounds/weapon/cannon/wolverine_hit.wav",
-			pitch = 0.7,
-			--gain = 1.2,
-		},
 	},
 }
 
