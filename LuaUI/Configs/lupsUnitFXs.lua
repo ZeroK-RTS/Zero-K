@@ -168,6 +168,11 @@ effectUnitDefs = {
 --    {class='GroundFlash', options=groundFlashOrange},
   },
   
+  pw_techlab = {
+    {class='StaticParticles', options=warpgateCorona},
+--    {class='GroundFlash', options=groundFlashOrange},
+  },
+  
   pw_warpjammer = {
     {class='StaticParticles', options=MergeTable(warpgateCoronaAlt, {onActive=true})},
   },

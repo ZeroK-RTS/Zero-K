@@ -142,32 +142,6 @@ local structureConfig = {
 		unitDef.featuredefs.heap.object = "debris8x8b.s3o"
 	end,
 	
-	pw_metal = function(unitDef)
-		unitDef.maxdamage = 10000
-		unitDef.name = "Ancient Fabricator"
-		unitDef.description = "Produces Metal out of thin air (+10)" 
-		unitDef.objectname = "pw_mine3.obj"
-		unitDef.script = "pw_mine3.lua"
-		unitDef.icontype = [[pw_metal]]
-		
-		unitDef.customparams = unitDef.customparams or {}
-		unitDef.customparams.removewait = 1
-		unitDef.metalmake = 10
-		
-		unitDef.footprintx = 12
-		unitDef.footprintz = 12
-		unitDef.buildcostmetal = 2000
-		
-		unitDef.explodeas = "NUCLEAR_MISSILE"
-		unitDef.selfdestructas = "NUCLEAR_MISSILE"
-		
-		unitDef.customparams.soundselect = "building_select2"
-		
-		unitDef.collisionvolumescales = [[130 130 130]]
-		
-		unitDef.featuredefs.dead.object = "pw_mine3_dead.dae"
-	end,
-
 	pw_mine = function(unitDef)
 		unitDef.maxdamage = 10000
 		unitDef.name = "Power Generator Unit"
@@ -453,6 +427,54 @@ local structureConfig = {
 		unitDef.collisionvolumetype	= [[CylY]]
 		
 		unitDef.featuredefs.dead.object = "pw_gaspowerstation_dead.dae"
+	end,
+	
+	------------------------------------------------------------------------
+	-- The following are presently just for galaxy missions
+	------------------------------------------------------------------------
+	
+	pw_metal = function(unitDef)
+		unitDef.maxdamage = 10000
+		unitDef.name = "Ancient Fabricator"
+		unitDef.description = "Produces Metal out of thin air (+10)" 
+		unitDef.objectname = "pw_mine3.obj"
+		unitDef.script = "pw_mine3.lua"
+		unitDef.icontype = [[pw_metal]]
+		
+		unitDef.customparams = unitDef.customparams or {}
+		unitDef.customparams.removewait = 1
+		unitDef.metalmake = 10
+		
+		unitDef.footprintx = 12
+		unitDef.footprintz = 12
+		unitDef.buildcostmetal = 2000
+		
+		unitDef.explodeas = "NUCLEAR_MISSILE"
+		unitDef.selfdestructas = "NUCLEAR_MISSILE"
+		
+		unitDef.customparams.soundselect = "building_select2"
+		
+		unitDef.collisionvolumescales = [[130 130 130]]
+		
+		unitDef.featuredefs.dead.object = "pw_mine3_dead.dae"
+	end,
+
+	pw_techlab = function(unitDef)
+		unitDef.maxdamage = 2500
+		unitDef.buildcostmetal = 1000
+		unitDef.name = "Tech Lab"
+		unitDef.description = "Contains powerful ancient technology" 
+		unitDef.objectname = "pw_techlab.obj"
+		unitDef.script = "pw_techlab.lua"
+		unitDef.footprintx = 8
+		unitDef.footprintz = 9
+		
+		unitDef.buildpic = "pw_generic.png"
+		
+		unitDef.customparams = unitDef.customparams or {}
+		unitDef.customparams.removewait = 1
+		
+		unitDef.customparams.soundselect = "radar_select"
 	end,
 	
 	------------------------------------------------------------------------
