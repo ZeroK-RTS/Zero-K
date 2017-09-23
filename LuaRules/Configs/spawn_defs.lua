@@ -22,6 +22,8 @@ eggDecayTime			= 180
 burrowEggs				= 15	   -- number of eggs each burrow spawns
 
 gameMode				= true
+endlessMode				= false
+
 tooltipMessage			= "Kill chickens and collect their eggs to get metal."
 
 mexesUnitDefID = {
@@ -85,10 +87,12 @@ endMiniQueenWaves		= 7		-- waves per miniqueen in PvP endgame
 burrowQueenTime			= 15		-- how much killing a burrow shaves off the queen timer, seconds
 burrowWaveSize			= 1.2		-- size of contribution each burrow makes to wave size (1 = 1 squadSize of chickens)
 burrowRespawnChance 	= 0.15
-burrowRegressTime		= 40		-- direct tech time regress from killing a burrow, divided by playercount
+burrowRegressTime		= 30		-- direct tech time regress from killing a burrow, divided by playercount
 
 humanAggroPerBurrow		= 1			-- divided by playercount
 humanAggroDecay			= 0.25		-- linear rate at which aggro decreases
+humanAggroMin			= -100
+humanAggroMax			= 100
 humanAggroWaveFactor	= 1
 humanAggroWaveMax		= 5
 humanAggroDefenseFactor	= 0.5	-- turrets issued per point of PAR every wave, multiplied by playercount
@@ -100,6 +104,7 @@ humanAggroQueenTimeMax	= 8
 
 techAccelPerPlayer		= 4		-- how much tech accel increases per player over one per wave, seconds
 techTimeFloorFactor		= 0.5	-- tech timer can never be less than this * real time
+techTimeMax				= 999999
 
 scoreMult				= 1
 
@@ -260,7 +265,7 @@ difficulties = {
 		gracePeriod		 = 150,
 		gracePeriodMin	 = 30,
 		burrowRespawnChance = 0.25,
-		burrowRegressTime	= 50,
+		--burrowRegressTime	= 25,
 		queenSpawnMult   = 5,
 		queenTime		 = 50*60,
 		queenHealthMod	 = 2,
@@ -344,5 +349,23 @@ difficulties['Chicken: Beginner'].chickenTypes.chicken_tiamat.time = 999999
 
 defaultDifficulty = 'Chicken: Normal'
 
+-- special config (used by campaign)
+if modoptions.chicken_nominiqueen then
+	for _, d in pairs(difficulties) do
+		d.miniQueenTime = {}
+	end
+end
+if modoptions.chicken_minaggro then
+	humanAggroMin = tonumber(modoptions.chicken_minaggro)
+end
+if modoptions.chicken_maxaggro then
+	humanAggroMax = tonumber(modoptions.chicken_maxaggro)
+end
+if modoptions.chicken_maxtech then
+	techTimeMax = tonumber(modoptions.chicken_maxtech)
+end
+if modoptions.chicken_endless then
+	endlessMode = Spring.Utilities.tobool(modoptions.chicken_endless)
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

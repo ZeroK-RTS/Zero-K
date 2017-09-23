@@ -473,6 +473,24 @@ local function ChooseTarget(unitID)
 	return {spGetUnitPosition(targetID)}
 end
 
+local function IsChickenTechAvailable(chickenName, chickenDef, time, techMod)
+	local currTech = time + techMod
+	local min = time * techTimeFloorFactor	
+	if currTech < min then
+		currTech = min
+	end
+	if currTech > techTimeMax then	-- note max may be lower than min, max takes priority
+		currTech = techTimeMax
+	end
+	
+	if currTech < chickenDef.time then
+		return false
+	end
+	if chickenDef.obsolete and (chickenDef.obsolete < currTech) then
+		return false
+	end
+	return true
+end
 
 local function ChooseChicken(units, useTech)
 	local s = spGetGameSeconds() + math.floor(gameFrameOffset/30)
@@ -480,11 +498,11 @@ local function ChooseChicken(units, useTech)
 	local choices,choisesN = {},0
 	local techMod = 0
 	if useTech then
-		techMod = -data.totalTechAccel
+		techMod = data.totalTechAccel
 	end
 	for chickenName, c in pairs(units) do
-		if (c.time + techMod <= s and (c.obsolete or math.huge) + techMod > s) then
-			local chance = math.floor((c.initialChance or 1) + (s-c.time) * (c.chanceIncrease or 0))
+		if IsChickenTechAvailable(chickenName, c, s, techMod) then
+			local chance = math.floor((c.initialChance or 1) + (s - (c.time/60)) * (c.timeChanceMult or 0))
 			for i=1, chance do
 				choisesN = choisesN + 1
 				choices[choisesN] = chickenName
@@ -853,12 +871,11 @@ local function Wave()
 	--reduce all chicken appearance times
 	local techDecel = 0
 	if data.humanAggro > 0 then
-	techDecel = data.humanAggro * humanAggroTechTimeRegress
+		techDecel = data.humanAggro * humanAggroTechTimeRegress
 	else
-	techDecel = data.humanAggro * humanAggroTechTimeProgress
+		techDecel = data.humanAggro * humanAggroTechTimeProgress
 	end
 	data.totalTechAccel = data.totalTechAccel - techDecel + techAccelPerPlayer*(playerCount-1)
-	data.totalTechAccel = math.max(data.totalTechAccel, -Spring.GetGameSeconds() * (1-techTimeFloorFactor))
 	Spring.SetGameRulesParam("techAccel", data.totalTechAccel)
 	
 	--[[
@@ -918,6 +935,12 @@ local function Wave()
 		SpawnSupport(burrowID, support)
 	end
 	data.humanAggro = data.humanAggro - humanAggroDecay
+	if data.humanAggro > humanAggroMax then
+		data.humanAggro = humanAggroMax
+	elseif data.humanAggro < humanAggroMin then
+		data.humanAggro = humanAggroMin
+	end
+	
 	data.humanAggroDelta = 0
 	Spring.SetGameRulesParam("humanAggro", data.humanAggro)
 	return chicken1Name, chicken2Name, chicken1Number, chicken2Number
@@ -1052,7 +1075,7 @@ function gadget:GameFrame(n)
 			_G.chickenEventArgs = nil
 		end
 	
-		if (t >= data.queenTime) then
+		if (t >= data.queenTime) and (not endlessMode) then
 			if (not data.endgame) then
 				_G.chickenEventArgs = {type="queen"}
 				SendToUnsynced("ChickenEvent")
@@ -1152,14 +1175,18 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		local reduction = burrowQueenTime*humanAggroQueenTimeFactor*aggro
 		reduction = math.max(reduction, 0)
 		data.queenTime = math.max(data.queenTime - reduction, 1)
+		
+		local oldAggro = data.humanAggro
 		data.humanAggro = data.humanAggro + humanAggroPerBurrow
-		data.humanAggroDelta = data.humanAggroDelta + humanAggroPerBurrow
+		if data.humanAggro > humanAggroMax then
+			data.humanAggro = humanAggroMax
+		end
+		data.humanAggroDelta = data.humanAggroDelta + data.humanAggro - oldAggro
 		Spring.SetGameRulesParam("queenTime", data.queenTime)
 		Spring.SetGameRulesParam("humanAggro", data.humanAggro)
 		
 		local techDecel = burrowRegressTime
 		data.totalTechAccel = data.totalTechAccel - techDecel
-		data.totalTechAccel = math.max(data.totalTechAccel, -Spring.GetGameSeconds() * (1-techTimeFloorFactor))
 		Spring.SetGameRulesParam("techAccel", data.totalTechAccel)
 		
 		data.defensePool = data.defensePool + defensePerBurrowKill

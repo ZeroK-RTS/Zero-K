@@ -22,6 +22,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+VFS.Include("LuaRules/Utilities/tobool.lua")
 
 local Spring          = Spring
 local gl, GL          = gl, GL
@@ -35,6 +36,10 @@ local panelTexture    = LUAUI_DIRNAME.."Images/panel.tga"
 
 local viewSizeX, viewSizeY = 0,0
 
+local red             = "\255\255\001\001"
+local white           = "\255\255\255\255"
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local gameInfo		  = {}
 local waveMessage
 local waveSpacingY    = 7
@@ -42,9 +47,8 @@ local waveY           = 800
 local waveSpeed       = 0.2
 local waveCount       = 0
 local waveTime
-
-local red             = "\255\255\001\001"
-local white           = "\255\255\255\255"
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- include the unsynced (widget) config data
 local file 				= LUAUI_DIRNAME .. 'Configs/chickengui_config.lua'
@@ -60,6 +64,9 @@ end
 
 local eggs = (Spring.GetModOptions().eggs == '1')
 local speed = (Spring.GetModOptions().speedchicken == '1')
+
+local hidePanel = Spring.Utilities.tobool(Spring.GetModOptions().chicken_hidepanel)
+local noWaveMessages = Spring.Utilities.tobool(Spring.GetModOptions().chicken_nowavemessages)
 
 -- include the synced (gadget) config data
 VFS.Include("LuaRules/Configs/spawn_defs.lua", nil, VFS.ZIP)
@@ -89,6 +96,9 @@ for chickenName,_ in pairs(chickenColorSet) do
   rules[#rules + 1] = chickenName .. 'Count'
   rules[#rules + 1] = chickenName .. 'Kills'
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local Chili
 local Button
@@ -216,7 +226,7 @@ local function UpdateAnger()
 	local curTime = Spring.GetGameSeconds()
 	local angerPercent = (curTime/gameInfo.queenTime*100)
 	local angerString = "Hive Anger : ".. GetColor( math.min(angerPercent, 100) )..math.floor(angerPercent).."% \008"
-	if angerPercent < 100 then angerString = angerString .. "("..FormatTime(gameInfo.queenTime - curTime) .. " left)" end
+	if (angerPercent < 100) and (not endlessMode) then angerString = angerString .. "("..FormatTime(gameInfo.queenTime - curTime) .. " left)" end
 	label_anger:SetCaption(angerString)
 end
 
@@ -304,6 +314,10 @@ end
 
 function ChickenEvent(chickenEventArgs)
   if (chickenEventArgs.type == "wave") then
+		if noWaveMessages then
+			return
+		end
+		
     local chicken1Name       = chickenEventArgs[1]
     local chicken2Name       = chickenEventArgs[2]
     local chicken1Number     = chickenEventArgs[3]
@@ -506,8 +520,12 @@ function widget:Initialize()
 	function label_burrows:HitTest(x,y) return self end
 	function label_aggro:HitTest(x,y) return self end
 	function label_tech:HitTest(x,y) return self end
+	
+	if hidePanel then
+		window:Hide()
+	end
 
-	if WG.GlobalCommandBar then
+	if WG.GlobalCommandBar and not hidePanel then
 		local function ToggleWindow()
 			if window.visible then
 				window:Hide()
