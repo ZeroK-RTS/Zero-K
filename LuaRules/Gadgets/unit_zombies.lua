@@ -196,42 +196,43 @@ end
 -- in halloween gadget, sometimes giving order to unit would result in crash because unit happened to be dead at the time order was given
 -- TODO probably same units in groups could get same orders...
 local function BringingDownTheHeavens(unitID)
-	if not spGetUnitIsDead(unitID) then
-		local unitDefID = spGetUnitDefID(unitID)
--- 		if (getMovetype(UnitDefs[unitDefID]) ~= false) then
-		local rx,rz,ry
-		local orders = {}
-		local near_ally
-		if (UnitDefs[unitDefID].canAttack) then
-			near_ally = GetUnitNearestAlly(unitID, 300)
-			if (near_ally) then
-				local cQueue = spGetCommandQueue(near_ally, 1)
-				if cQueue and (#cQueue > 0) and cQueue[1].id == CMD_GUARD then -- oh
-					near_ally = nil -- i dont want chain guards...
-				end
+	local unitDefID = (not spGetUnitIsDead(unitID)) and spGetUnitDefID(unitID)
+	if not unitDefID then
+		return
+	end
+	
+	local rx,rz,ry
+	local orders = {}
+	local near_ally
+	if (UnitDefs[unitDefID].canAttack) then
+		near_ally = GetUnitNearestAlly(unitID, 300)
+		if (near_ally) then
+			local cQueue = spGetCommandQueue(near_ally, 1)
+			if cQueue and (#cQueue > 0) and cQueue[1].id == CMD_GUARD then -- oh
+				near_ally = nil -- i dont want chain guards...
 			end
 		end
-		local x,y,z = spGetUnitPosition(unitID)
-		if (near_ally) and random(0, 5) < 4 then -- 60% chance to guard nearest ally
-			orders[#orders + 1] = {CMD_GUARD, {near_ally}, {}}
+	end
+	local x,y,z = spGetUnitPosition(unitID)
+	if (near_ally) and random(0, 5) < 4 then -- 60% chance to guard nearest ally
+		orders[#orders + 1] = {CMD_GUARD, {near_ally}, {}}
+	end
+	for i = 1, random(10, 30) do
+		rx = random(0, mapWidth)
+		rz = random(0, mapHeight)
+		ry = spGetGroundHeight(rx,rz)
+		if IsTargetReallyReachable(unitID, rx, ry, rz, x, y, z) then
+			orders[#orders+1] = {CMD_FIGHT, {rx, ry, rz}, CMD_OPT_SHIFT}
 		end
-		for i = 1, random(10, 30) do
-			rx = random(0, mapWidth)
-			rz = random(0, mapHeight)
-			ry = spGetGroundHeight(rx,rz)
-			if IsTargetReallyReachable(unitID, rx, ry, rz, x, y, z) then
-				orders[#orders+1] = {CMD_FIGHT, {rx, ry, rz}, CMD_OPT_SHIFT}
-			end
+	end
+	if (#orders > 0) then
+		if not spGetUnitIsDead(unitID) then
+			spGiveOrderArrayToUnitArray({unitID},orders)
 		end
-		if (#orders > 0) then
-			if not spGetUnitIsDead(unitID) then
-				spGiveOrderArrayToUnitArray({unitID},orders)
-			end
-		end
-		if (UnitDefs[unitDefID].isFactory) then
-			OpenAllClownSlots(unitID, unitDefID) -- give factory something to do
-			zombies[unitID] = nil -- no need to update factory orders anymore
-		end
+	end
+	if (UnitDefs[unitDefID].isFactory) then
+		OpenAllClownSlots(unitID, unitDefID) -- give factory something to do
+		zombies[unitID] = nil -- no need to update factory orders anymore
 	end
 end
 
