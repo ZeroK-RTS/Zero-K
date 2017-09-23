@@ -402,7 +402,7 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 		fontsize = fontSize + 4,
 		parent = holderControl,
 	}
-	offset = offset + 26
+	offset = offset + 28
 	
 	local objectives = {}
 	
