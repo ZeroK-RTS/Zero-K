@@ -2,22 +2,22 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-    name      = "Chili Chicken Panel",
-    desc      = "Indian cuisine",
-    author    = "quantum, KingRaptor",
-    date      = "May 04, 2008",
-    license   = "GNU GPL, v2 or later",
-    layer     = -9, 
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "Chili Chicken Panel",
+		desc      = "Indian cuisine",
+		author    = "quantum, KingRaptor",
+		date      = "May 04, 2008",
+		license   = "GNU GPL, v2 or later",
+		layer     = -9, 
+		enabled   = true  --  loaded by default?
+	}
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 if (not Spring.GetGameRulesParam("difficulty")) then
-  return false
+	return false
 end
 
 --------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ VFS.Include("LuaRules/Configs/spawn_defs.lua", nil, VFS.ZIP)
 -- totally broken: claims it changes the data but doesn't!
 --[[
 for key, value in pairs(widget.difficulties[modes[Spring.GetGameRulesParam("difficulty")] ]) do
-    widget.key = value
+		widget.key = value
 end
 widget.difficulties = nil
 ]]--
@@ -82,19 +82,19 @@ widget.difficulties = nil
 local difficulty = widget.difficulties[modes[Spring.GetGameRulesParam("difficulty")]]
 
 local rules = {
-  "queenTime",
-  "humanAggro",
-  "lagging",
-  "difficulty",
-  "techAccel",
-  "malus",
-  roostName .. "Count",
-  roostName .. "Kills",
+	"queenTime",
+	"humanAggro",
+	"lagging",
+	"difficulty",
+	"techAccel",
+	"malus",
+	roostName .. "Count",
+	roostName .. "Kills",
 }
 
 for chickenName,_ in pairs(chickenColorSet) do
-  rules[#rules + 1] = chickenName .. 'Count'
-  rules[#rules + 1] = chickenName .. 'Kills'
+	rules[#rules + 1] = chickenName .. 'Count'
+	rules[#rules + 1] = chickenName .. 'Kills'
 end
 
 --------------------------------------------------------------------------------
@@ -126,14 +126,14 @@ local waveFontSize   = fontHandler.GetFontSize()
 --------------------------------------------------------------------------------
 
 local function GetCount(type)
-  local t = {}
-  local total = 0
-  for chickenName,colorInfo in pairs(chickenColorSet) do
-    local subTotal = gameInfo[chickenName..type]
-    t[#t+1] = colorInfo..subTotal
-    total = total + subTotal
-  end
-  return total
+	local t = {}
+	local total = 0
+	for chickenName,colorInfo in pairs(chickenColorSet) do
+		local subTotal = gameInfo[chickenName..type]
+		t[#t+1] = colorInfo..subTotal
+		total = total + subTotal
+	end
+	return total
 end
 
 -- I'm sure there's something to do this automatically but ehhh...
@@ -206,19 +206,19 @@ end
 
 -- generates breakdown of kills and deaths for each chicken type, sorted by appearance order ingame
 local function MakeChickenBreakdown()
-  local chickenTypes = difficulty.chickenTypes
-  local t = {}
-  local tNames = {}	-- reverse direction: get chicken name from final string
-  for chickenName,colorInfo in pairs(chickenColorSet) do
-    local count = gameInfo[chickenName.."Count"]
-	local kills = gameInfo[chickenName.."Kills"]
-	local str = "\n"..chickenNamesPlural[chickenName]..": \255\0\255\0"..count.."\008/\255\255\0\0"..kills
-	t[#t+1] = str
-	tNames[str] = chickenName
-  end
-  table.sort(t, function(a,b) return chickenTypes[tNames[a]]["time"] < chickenTypes[tNames[b]]["time"] end )	-- sort by chicken appearance
-  --table.sort(t, function(a,b) return tNames[a] < tNames[b] end )	-- alphabetical order
-  return table.concat(t)
+	local chickenTypes = difficulty.chickenTypes
+	local t = {}
+	local tNames = {}	-- reverse direction: get chicken name from final string
+	for chickenName,colorInfo in pairs(chickenColorSet) do
+		local count = gameInfo[chickenName.."Count"]
+		local kills = gameInfo[chickenName.."Kills"]
+		local str = "\n"..chickenNamesPlural[chickenName]..": \255\0\255\0"..count.."\008/\255\255\0\0"..kills
+		t[#t+1] = str
+		tNames[str] = chickenName
+	end
+	table.sort(t, function(a,b) return chickenTypes[tNames[a]]["time"] < chickenTypes[tNames[b]]["time"] end )	-- sort by chicken appearance
+	--table.sort(t, function(a,b) return tNames[a] < tNames[b] end )	-- alphabetical order
+	return table.concat(t)
 end
 
 -- done every second
@@ -284,15 +284,15 @@ local function UpdateRules()
 	
 	if (gameInfo.lagging == 1) then label_mode:SetCaption(red.."Anti-Lag Enabled\008")
 	else
-	  local substr = ''
-	  if eggs and speed then
-	    substr = " (Spd Eggs)"
-	  elseif eggs then
-	    substr = " (Eggs)"
-	  elseif speed then
-	    substr = " (Speed)"
-	  end
-	  label_mode:SetCaption("Mode: " .. configs.difficulties[gameInfo.difficulty] .. substr)
+		local substr = ''
+		if eggs and speed then
+			substr = " (Spd Eggs)"
+		elseif eggs then
+			substr = " (Eggs)"
+		elseif speed then
+			substr = " (Speed)"
+		end
+		label_mode:SetCaption("Mode: " .. configs.difficulties[gameInfo.difficulty] .. substr)
 	end
 end
 
@@ -300,84 +300,84 @@ end
 -- wave messages
 --------------------------------------------------------------------------------
 local function WaveRow(n)
-  return n*(waveFontSize+waveSpacingY)
+	return n*(waveFontSize+waveSpacingY)
 end
 
 local function MakeLine(chicken, n)
-  if (n <= 0) then
-    return
-  end
-  local humanName = Spring.Utilities.GetHumanName(UnitDefNames[chicken])
-  local color = chickenColorSet[chicken] or ""
-  return color..humanName.." x"..n
+	if (n <= 0) then
+		return
+	end
+	local humanName = Spring.Utilities.GetHumanName(UnitDefNames[chicken])
+	local color = chickenColorSet[chicken] or ""
+	return color..humanName.." x"..n
 end
 
 function ChickenEvent(chickenEventArgs)
-  if (chickenEventArgs.type == "wave") then
+	if (chickenEventArgs.type == "wave") then
 		if noWaveMessages then
 			return
 		end
 		
-    local chicken1Name       = chickenEventArgs[1]
-    local chicken2Name       = chickenEventArgs[2]
-    local chicken1Number     = chickenEventArgs[3]
-    local chicken2Number     = chickenEventArgs[4]
-    if (gameInfo[roostName .. 'Count'] < 1) then
-      return
-    end
-    waveMessage    = {}
-    waveCount      = waveCount + 1
-    waveMessage[1] = "Wave "..waveCount 
-    if (chicken1Name and chicken2Name and chicken1Name == chicken2Name) then
-      if (chicken2Number and chicken2Number) then
-        waveMessage[2] = 
-          MakeLine(chicken1Name, (chicken2Number+chicken1Number)*gameInfo[roostName .. 'Count'])
-      else
-        waveMessage[2] =
-          MakeLine(chicken1Name, chicken1Number*gameInfo[roostName .. 'Count'])
-      end
-    elseif (chicken1Name and chicken2Name) then
-      waveMessage[2] = MakeLine(chicken1Name, chicken1Number*gameInfo[roostName .. 'Count'])
-      waveMessage[3] = MakeLine(chicken2Name, chicken2Number*gameInfo[roostName .. 'Count'])
-    end
-    
-    waveTime = Spring.GetTimer()
-    
-  -- table.foreachi(waveMessage, print)
-  -- local t = Spring.GetGameSeconds() 
-  -- print(string.format("time %d:%d", t/60, t%60))
-  -- print""
-  elseif (chickenEventArgs.type == "burrowSpawn") then
-    UpdateRules()
-  elseif (chickenEventArgs.type == "miniQueen") then
-    waveMessage    = {}
-    waveMessage[1] = "Here be dragons!"
-	waveTime = Spring.GetTimer()
-  elseif (chickenEventArgs.type == "queen") then
-    waveMessage    = {}
-    waveMessage[1] = "The Hive is angered!"
-    waveTime = Spring.GetTimer()
-  elseif (chickenEventArgs.type == "refresh") then
-    UpdateRules()
-    UpdateAnger()
-  end
+		local chicken1Name       = chickenEventArgs[1]
+		local chicken2Name       = chickenEventArgs[2]
+		local chicken1Number     = chickenEventArgs[3]
+		local chicken2Number     = chickenEventArgs[4]
+		if (gameInfo[roostName .. 'Count'] < 1) then
+			return
+		end
+		waveMessage    = {}
+		waveCount      = waveCount + 1
+		waveMessage[1] = "Wave "..waveCount 
+		if (chicken1Name and chicken2Name and chicken1Name == chicken2Name) then
+			if (chicken2Number and chicken2Number) then
+				waveMessage[2] = 
+					MakeLine(chicken1Name, (chicken2Number+chicken1Number)*gameInfo[roostName .. 'Count'])
+			else
+				waveMessage[2] =
+					MakeLine(chicken1Name, chicken1Number*gameInfo[roostName .. 'Count'])
+			end
+		elseif (chicken1Name and chicken2Name) then
+			waveMessage[2] = MakeLine(chicken1Name, chicken1Number*gameInfo[roostName .. 'Count'])
+			waveMessage[3] = MakeLine(chicken2Name, chicken2Number*gameInfo[roostName .. 'Count'])
+		end
+		
+		waveTime = Spring.GetTimer()
+		
+	-- table.foreachi(waveMessage, print)
+	-- local t = Spring.GetGameSeconds() 
+	-- print(string.format("time %d:%d", t/60, t%60))
+	-- print""
+	elseif (chickenEventArgs.type == "burrowSpawn") then
+		UpdateRules()
+	elseif (chickenEventArgs.type == "miniQueen") then
+		waveMessage    = {}
+		waveMessage[1] = "Here be dragons!"
+		waveTime = Spring.GetTimer()
+	elseif (chickenEventArgs.type == "queen") then
+		waveMessage    = {}
+		waveMessage[1] = "The Hive is angered!"
+		waveTime = Spring.GetTimer()
+	elseif (chickenEventArgs.type == "refresh") then
+		UpdateRules()
+		UpdateAnger()
+	end
 end
 
 function widget:DrawScreen()
-  viewSizeX, viewSizeY = gl.GetViewSizes()
-  if (waveMessage)  then
-    local t = Spring.GetTimer()
-    fontHandler.UseFont(waveFont)
-    local waveY = viewSizeY - Spring.DiffTimers(t, waveTime)*waveSpeed*viewSizeY
-    if (waveY > 0) then
-      for i=1,#waveMessage do
-        fontHandler.DrawCentered(waveMessage[i], viewSizeX/2, waveY-WaveRow(i))
-      end
-    else
-      waveMessage = nil
-      waveY = viewSizeY
-    end
-  end
+	viewSizeX, viewSizeY = gl.GetViewSizes()
+	if (waveMessage)  then
+		local t = Spring.GetTimer()
+		fontHandler.UseFont(waveFont)
+		local waveY = viewSizeY - Spring.DiffTimers(t, waveTime)*waveSpeed*viewSizeY
+		if (waveY > 0) then
+			for i=1,#waveMessage do
+				fontHandler.DrawCentered(waveMessage[i], viewSizeX/2, waveY-WaveRow(i))
+			end
+		else
+			waveMessage = nil
+			waveY = viewSizeY
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -538,14 +538,14 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-  fontHandler.FreeFont(waveFont)
-  widgetHandler:DeregisterGlobal("ChickenEvent")
+	fontHandler.FreeFont(waveFont)
+	widgetHandler:DeregisterGlobal("ChickenEvent")
 end
 
 function widget:GameFrame(n)
-  if (n%60< 1) then UpdateRules() end
-  -- every second for smoother countdown
-  if (n%30< 1) then UpdateAnger() end
+	if (n%60< 1) then UpdateRules() end
+	-- every second for smoother countdown
+	if (n%30< 1) then UpdateAnger() end
 end
 
 --------------------------------------------------------------------------------
