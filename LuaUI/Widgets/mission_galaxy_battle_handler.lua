@@ -514,9 +514,9 @@ local function InitializeObjectivesWindow()
 	
 	local holderWindow = Chili.Window:New{
 		classname = "main_window_small",
-		name = 'mission_galaxy_objectives',
-		x = 2,
-		y = 50,
+		name = 'mission_galaxy_objectives_4',
+		x = 6,
+		y = 44,
 		width = 320,
 		height = 22 + 16*(#objectiveList),
 		dockable = true,
