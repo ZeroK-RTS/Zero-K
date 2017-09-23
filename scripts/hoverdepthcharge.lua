@@ -149,7 +149,7 @@ local function FakeWeaponShoot()
 	end
 end
 
-function script.BlockShot(num)
+function script.BlockShot(num, targetID)
 	if num == 1 then
 		-- Underestimate damage and flight time. The aim here really is just to avoid every Claymore unloading on a single
 		-- target at the same time. They are a bit too random for anything more precise.
