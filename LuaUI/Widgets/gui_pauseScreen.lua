@@ -180,7 +180,7 @@ function widget:DrawScreen()
 	lastPause = paused
 		
 	if ( (paused or ( ( now - pauseTimestamp) <= slideTime )) and not (options.hideimage.value or tempDisabled)) then
-		if pauseTimestamp - disablePauseSlideTimestamp > 0.5 then
+		if now - disablePauseSlideTimestamp > slideTime then
 			drawPause(paused, now)
 		end
 	end
