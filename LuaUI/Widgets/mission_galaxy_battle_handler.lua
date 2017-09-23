@@ -24,6 +24,7 @@ end
 
 local BUTTON_SIZE = 25
 local BONUS_TOGGLE_IMAGE = 'LuaUI/images/plus_green.png'
+local BRIEFING_IMAGE = LUAUI_DIRNAME .. "images/advplayerslist/random.png"
 
 local spGetMouseState = Spring.GetMouseState
 
@@ -63,12 +64,15 @@ local OBJECTIVE_ICON = LUAUI_DIRNAME .. "images/bullet.png"
 local mainObjectiveBlock, bonusObjectiveBlock
 local globalCommandButton
 
-local SetBonusObjectivesVisibility
+local objectivesWindow
+local briefingWindow
 
 local missionWon, missionEndFrame, missionEndTime, missionResultSent
 
 -- wait this many frames after victory to make sure your commander doesn't die.
 local VICTORY_SUSTAIN_FRAMES = 50 
+
+local ADD_GLOBAL_COMMAND_BUTTON = false
 
 ----------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------
@@ -148,50 +152,61 @@ end
 --------------------------------------------------------------------------------
 -- Objectives Handler
 
-local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam)
+local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam, fontSize)
+	fontSize = fontSize or 14
 	
+	local holderControl = Chili.Control:New{
+		x = 0,
+		y = position,
+		right = 0,
+		-- height is set later.
+		padding = {0, 0, 0, 0},
+		parent = holderWindow,
+	}
+	
+	local offset = 0
 	local missionsLabel = Chili.Label:New{
 		x = 8,
-		y = position,
+		y = offset,
 		width = "100%",
 		height = 18,
 		align = "left",
 		valign = "top",
 		caption = "",
-		fontsize = 18,
-		parent = holderWindow,
+		fontsize = fontSize + 4,
+		parent = holderControl,
 	}
-	position = position + 26
+	offset = offset + 26
 	
 	local objectives = {}
 	
 	for i = 1, #items do
 		local label = Chili.TextBox:New{
 			x = 22,
-			y = position,
+			y = offset,
 			right = 4,
 			height = 18,
 			align = "left",
 			valign = "top",
 			text = items[i].description,
-			fontsize = 14,
-			parent = holderWindow,
+			fontsize = fontSize,
+			parent = holderControl,
 		}
 		local image = Chili.Image:New{
 			x = 4,
-			y = position - 3,
+			y = offset - 3,
 			width = 16,
 			height = 16,
 			file = OBJECTIVE_ICON,
-			parent = holderWindow,
+			parent = holderControl,
 		}
 		objectives[i] = {
-			position = position,
+			offset = offset,
 			label = label,
 			image = image,
 			satisfyCount = items[i].satisfyCount,
 		}
-		position = position + (#label.physicalLines)*16
+		offset = offset + (#label.physicalLines)*16
 	end
 	
 	local function UpdateSuccess(index)
@@ -230,8 +245,19 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam)
 	function externalFunctions.Update()
 		UpdateObjectiveSuccess()
 	end
+	
 	function externalFunctions.UpdateTooltip(text)
 		missionsLabel:SetCaption(text)
+	end
+	
+	function externalFunctions.SetParent(newParent, newX, newY)
+		if (not holderControl.parent) or (holderControl.parent.name ~= newParent.name) then
+			if holderControl.parent then
+				holderControl.parent:RemoveChild(holderControl)
+			end
+			newParent:AddChild(holderControl)
+		end
+		holderControl:SetPos(newX, newY)
 	end
 	
 	function externalFunctions.MakeObjectivesString()
@@ -246,7 +272,134 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam)
 		return objectivesString
 	end
 	
-	return externalFunctions, position
+	holderControl:SetPos(nil, nil, nil, offset)
+	
+	return externalFunctions, position + offset
+end
+
+local function InitializeBriefingWindow()
+	local BRIEF_WIDTH = 720
+	local BRIEF_HEIGHT = 680
+	
+	local SCROLL_POS = 70
+	local SCROLL_HEIGHT = 170 
+	
+	local externalFunctions = {}
+	
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
+	local briefingWindow = Chili.Window:New{
+		classname = "main_window",
+		name = 'mission_galaxy_brief',
+		x = math.floor((screenWidth - BRIEF_WIDTH)/2),
+		y = math.max(50, math.floor((screenHeight - BRIEF_HEIGHT)/2.5)),
+		width = BRIEF_WIDTH,
+		height = BRIEF_HEIGHT,
+		minWidth = BRIEF_WIDTH,
+		minHeight = BRIEF_HEIGHT,
+		dockable = true,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
+		parent = Chili.Screen0,
+	}
+	briefingWindow:SetVisibility(false)
+	
+	Chili.Label:New{
+		x = 0,
+		y = 16,
+		width = briefingWindow.width - (briefingWindow.padding[2] + briefingWindow.padding[4]),
+		height = 26,
+		fontsize = 44,
+		align = "center",
+		caption = "Planet Hephastus",
+		parent = briefingWindow,
+	}
+	
+	local mainHolder = Chili.ScrollPanel:New{
+		x = "4%",
+		y = SCROLL_POS,
+		width = "44%",
+		height = SCROLL_HEIGHT,
+		horizontalScrollbar = false,
+		parent = briefingWindow,
+	}
+	
+	local bonusHolder
+	if bonusObjectiveBlock then
+		bonusHolder = Chili.ScrollPanel:New{
+			right = "4%",
+			y = SCROLL_POS,
+			width = "44%",
+			height = SCROLL_HEIGHT,
+			horizontalScrollbar = false,
+			parent = briefingWindow,
+		}
+	end
+	
+	local textHolder = Chili.ScrollPanel:New{
+		x = "4%",
+		y = SCROLL_POS + SCROLL_HEIGHT + 20,
+		right = "4%",
+		bottom = 75,
+		horizontalScrollbar = false,
+		parent = briefingWindow,
+	}
+	
+	Chili.Button:New{
+		x = "38%",
+		right = "38%",
+		bottom = 7,
+		height = 60,
+		caption = "Continue",
+		fontsize = 26,
+		OnClick = {
+			function ()
+				externalFunctions.Hide()
+				objectivesWindow.Show()
+			end
+		},
+		parent = briefingWindow
+	}
+	
+	local function TakeObjectivesLists()
+		if mainObjectiveBlock then
+			mainObjectiveBlock.SetParent(mainHolder, 0, 0)
+		end
+		if bonusHolder and bonusObjectiveBlock then
+			bonusObjectiveBlock.SetParent(bonusHolder, 0, 0)
+		end
+	end
+	
+	function externalFunctions.Show(withoutPause)
+		if WG.PauseScreen_SetEnabled then
+			WG.PauseScreen_SetEnabled(false, true)
+		end
+		if not withoutPause then
+			local paused = select(3, Spring.GetGameSpeed())
+			if not paused then
+				Spring.SendCommands("pause")
+			end
+		end
+		TakeObjectivesLists()
+		
+		briefingWindow:SetVisibility(true)
+	end
+	
+	function externalFunctions.Hide()
+		if WG.PauseScreen_SetEnabled then
+			WG.PauseScreen_SetEnabled(true)
+		end
+		local paused = select(3, Spring.GetGameSpeed())
+		if paused then
+			Spring.SendCommands("pause")
+		end
+		briefingWindow:SetVisibility(false)
+	end
+
+	
+	return externalFunctions
 end
 
 local function InitializeObjectivesWindow()
@@ -272,19 +425,24 @@ local function InitializeObjectivesWindow()
 		tweakResizable = false,
 		parent = Chili.Screen0,
 	}
+	holderWindow:SetVisibility(false)
+	
+	local externalFunctions = {}
 	
 	local position = 4
+	local mainBlockPosition = position
 	mainObjectiveBlock, position = GetObjectivesBlock(holderWindow, position, objectiveList,  "objectiveSuccess_")
 	local mainHeight = position + holderWindow.padding[2] + holderWindow.padding[4] + 3 
-	local bonusHeight
+	local bonusHeight, bonusBlockPosition
 	
 	if #bonusObjectiveList > 0 then
 		position = position + 8
+		bonusBlockPosition = position
 		bonusObjectiveBlock, position = GetObjectivesBlock(holderWindow, position, bonusObjectiveList, "bonusObjectiveSuccess_")
 		bonusHeight = position + holderWindow.padding[2] + holderWindow.padding[4] + 3 
 	end
 	
-	if WG.GlobalCommandBar then
+	if ADD_GLOBAL_COMMAND_BUTTON and WG.GlobalCommandBar then
 		local function ToggleWindow()
 			if holderWindow then
 				holderWindow:SetVisibility(not holderWindow.visible)
@@ -311,11 +469,38 @@ local function InitializeObjectivesWindow()
 	end
 	SetBonusVisibility(true)
 	
+	Chili.Button:New{
+		y = 3,
+		right = 3,
+		width = BUTTON_SIZE,
+		height = BUTTON_SIZE,
+		classname = "button_tiny",
+		caption = "",
+		tooltip = "Show briefing",
+		padding = {2,2,2,2},
+		OnClick = {
+			function ()
+				externalFunctions.Hide()
+				briefingWindow.Show()
+			end
+		},
+		parent = holderWindow,
+		children = {
+			Chili.Image:New{
+				file = BRIEFING_IMAGE,
+				x = 0,
+				y = 0,
+				right = 0,
+				bottom = 0,
+			}
+		},
+	}
+	
 	local bonusToggleButton
 	if thereAreBonusObjectives then
 		bonusToggleButton = Chili.Button:New{
 			y = 3,
-			right = 3,
+			right = 3 + BUTTON_SIZE + 2,
 			width = BUTTON_SIZE,
 			height = BUTTON_SIZE,
 			classname = "button_tiny",
@@ -340,7 +525,26 @@ local function InitializeObjectivesWindow()
 		}
 	end
 	
-	return SetBonusVisibility
+	
+	local function TakeObjectivesLists()
+		if mainObjectiveBlock then
+			mainObjectiveBlock.SetParent(holderWindow, 0, mainBlockPosition)
+		end
+		if bonusObjectiveBlock then
+			bonusObjectiveBlock.SetParent(holderWindow, 0, bonusBlockPosition)
+		end
+	end
+	
+	function externalFunctions.Show()
+		TakeObjectivesLists()
+		holderWindow:SetVisibility(true)
+	end
+	
+	function externalFunctions.Hide()
+		holderWindow:SetVisibility(false)
+	end
+	
+	return externalFunctions
 end
 
 --------------------------------------------------------------------------------
@@ -576,7 +780,9 @@ end
 
 function widget:Initialize()
 	Chili = WG.Chili
-	SetBonusObjectivesVisibility = InitializeObjectivesWindow()
+	objectivesWindow = InitializeObjectivesWindow()
+	briefingWindow = InitializeBriefingWindow()
+	briefingWindow.Show()
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 	
 	widgetHandler:RegisterGlobal('MissionGameOver', MissionGameOver)
