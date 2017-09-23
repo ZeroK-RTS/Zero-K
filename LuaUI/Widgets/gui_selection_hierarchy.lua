@@ -57,7 +57,7 @@ end
 local ctrlFlattenRank = 1
 local doubleClickFlattenRank = 1
 local retreatOverride = true
-local retreatingRank = 1
+local retreatingRank = 0
 local useSelectionFiltering = true
 local selectionFilteringOnlyAlt = false
 local retreatDeselects = false
@@ -136,10 +136,10 @@ options = {
 		end
 	},
 	retreatingRankOption = {
-		name = 'Retreat override:',
+		name = 'Retreat selection override:',
 		desc = "Retreating units are treated as this selection rank, if override is enabled.",
 		type = 'number',
-		value = 1, -- not 0; this keeps them responsive to Ctrl+A etc (due to flatten) and also keeps 0 only reachable manually by default.
+		value = 0, -- This should be 0 because otherwise Ctrl selection keys work on the unit.
 		min = 0, max = 3, step = 1,
 		tooltip_format = "%.0f",
 		noHotkey = true,
@@ -245,10 +245,13 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 	local bestRank, bestUnits 
 	for i = 1, #units do
 		local unitID = units[i]
-		local rank = unitID and ((retreatOverride and (Spring.GetUnitRulesParam(unitID, "retreat") == 1) and retreatingRank) or selectionRank[unitID])
+		local rank = unitID and selectionRank[unitID]
 		if not rank then
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			rank = unitDefID and defaultRank[unitDefID]
+		end
+		if retreatOverride and unitID and (Spring.GetUnitRulesParam(unitID, "retreat") == 1) and (rank > retreatingRank) then
+			rank = retreatingRank
 		end
 		if rank then
 			if ctrl and rank > ctrlFlattenRank then
