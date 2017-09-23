@@ -153,7 +153,7 @@ function script.BlockShot(num)
 	if num == 1 then
 		-- Underestimate damage and flight time. The aim here really is just to avoid every Claymore unloading on a single
 		-- target at the same time. They are a bit too random for anything more precise.
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 450, 40, 0.3)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 600, 60)
 	end
 	FakeWeaponShoot()
 	return true
