@@ -136,22 +136,28 @@ function gadget:DrawScreen()
 		text = "Waiting for people "
 	end 
 	if (next(waitingFor) ~= nil) then 
-		text = text .. "\n\255\255\255\255Waiting for "
-		
-		local cnt = 0 
-		for name, state in pairs(waitingFor) do 
-			if cnt % 6 == 5 then 
-				text = text .. "\n"
+		if singleplayer then
+			text = "\255\255\255\255Choose start position"
+		else
+			text = text .. "\n\255\255\255\255Waiting for "
+			
+			local cnt = 0 
+			for name, state in pairs(waitingFor) do 
+				if cnt % 6 == 5 then 
+					text = text .. "\n"
+				end
+				cnt = cnt + 1
+				if state == "missing" then 
+					text = text .. "\255\255\0\0"
+				else
+					text = text .. "\255\255\255\0"
+				end 
+				text = text .. name .. ", "
 			end
-			cnt = cnt + 1
-			if state == "missing" then 
-				text = text .. "\255\255\0\0"
-			else
-				text = text .. "\255\255\255\0"
-			end 
-			text = text .. name .. ", "
-		end 
-		text = text .. "\n\255\255\255\255 Say !force to start sooner"
+			text = text .. "\n\255\255\255\255 Say !force to start sooner"
+		end
+	elseif singleplayer then
+		text = "\255\255\255\255Starting"
 	end 
 
     glPushMatrix()
