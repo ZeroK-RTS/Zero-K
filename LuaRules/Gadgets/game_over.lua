@@ -295,11 +295,23 @@ local function DestroyAlliance(allianceID, skipCheck)
 			return -- empty allyteam, don't bother
 		end
 		
+		local explodeUnits = true
 		if GG.GalaxyCampaignHandler then
 			local defeatConfig = GG.GalaxyCampaignHandler.GetDefeatConfig(allianceID)
-			if defeatConfig and defeatConfig.allyTeamLossObjectiveID then
-				local objParameter = "objectiveSuccess_" .. defeatConfig.allyTeamLossObjectiveID
-				Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allianceID == MISSION_PLAYER_ALLY_TEAM_ID and 0) or 1))
+			if defeatConfig then
+				if defeatConfig.allyTeamLossObjectiveID then
+					local objParameter = "objectiveSuccess_" .. defeatConfig.allyTeamLossObjectiveID
+					Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allianceID == MISSION_PLAYER_ALLY_TEAM_ID and 0) or 1))
+				end
+				if defeatConfig.defeatOtherAllyTeamsOnLoss then
+					local otherTeams = defeatConfig.defeatOtherAllyTeamsOnLoss
+					for i = 1, #otherTeams do
+						DestroyAlliance(otherTeams[i])
+					end
+				end
+				if defeatConfig.doNotExplodeOnLoss then
+					explodeUnits = false
+				end
 			end
 		end
 		
@@ -321,22 +333,25 @@ local function DestroyAlliance(allianceID, skipCheck)
 				toDestroy[destroyFrame][unitID] = true
 			end
 
-			for i=1,#teamList do
+			for i = 1, #teamList do
 				local t = teamList[i]
-				local teamUnits = spGetTeamUnits(t) 
-				for j=1,#teamUnits do
-					local unitID = teamUnits[j]
-					local pwUnits = (GG.PlanetWars or {}).unitsByID
-					if pwUnits and pwUnits[unitID] then
-						if SPARE_PLANETWARS_UNITS then
-							GG.allowTransfer = true
-							spTransferUnit(unitID, gaiaTeamID, true)		-- don't blow up PW buildings
-							GG.allowTransfer = false
-						else
+				
+				if explodeUnits then
+					local teamUnits = spGetTeamUnits(t) 
+					for j = 1, #teamUnits do
+						local unitID = teamUnits[j]
+						local pwUnits = (GG.PlanetWars or {}).unitsByID
+						if pwUnits and pwUnits[unitID] then
+							if SPARE_PLANETWARS_UNITS then
+								GG.allowTransfer = true
+								spTransferUnit(unitID, gaiaTeamID, true)		-- don't blow up PW buildings
+								GG.allowTransfer = false
+							else
+								QueueDestruction(unitID)
+							end
+						elseif not SPARE_REGULAR_UNITS then
 							QueueDestruction(unitID)
 						end
-					elseif not SPARE_REGULAR_UNITS then
-						QueueDestruction(unitID)
 					end
 				end
 				Spring.SetTeamRulesParam(t, "isDead", 1, {public = true})
