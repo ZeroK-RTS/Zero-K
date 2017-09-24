@@ -108,7 +108,7 @@
 		"name" : "Tech Lab",
 		"description" : "Unlocks tech",
 		"helptext" : "This structure unlocks a specific tech for its owning faction."
-	}
+	},
 	"pw_techlab" : {
 		"name" : "Tech Lab",
 		"description" : "Contains powerful ancient technology" ,
