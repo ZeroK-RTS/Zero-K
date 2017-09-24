@@ -7,7 +7,13 @@ else
 	skinDefs = {}
 end
 
-local UNBOUNDED_LEVEL = true
+local LEVEL_BOUND = math.floor(tonumber(Spring.GetModOptions().max_com_level or 0))
+if LEVEL_BOUND <= 0 then
+	LEVEL_BOUND = nil -- unlimited
+else
+	LEVEL_BOUND = LEVEL_BOUND - 1 -- UI counts from 1 but internals count from 0
+end
+
 local COST_MULT = 1
 local HP_MULT = 1
 
@@ -1774,4 +1780,4 @@ local utilities = {
 -- Return Values
 ------------------------------------------------------------------------
 
-return moduleDefs, chassisDefs, utilities, UNBOUNDED_LEVEL, chassisDefByBaseDef, moduleDefNames, chassisDefNames
+return moduleDefs, chassisDefs, utilities, LEVEL_BOUND, chassisDefByBaseDef, moduleDefNames, chassisDefNames

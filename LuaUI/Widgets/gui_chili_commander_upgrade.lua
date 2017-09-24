@@ -50,7 +50,7 @@ local screen0
 -- * Callins. This block handles widget callins. Does barely anything.
 
 -- Module config
-local moduleDefs, chassisDefs, upgradeUtilities, UNBOUNDED_LEVEL, _, moduleDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, chassisDefs, upgradeUtilities, LEVEL_BOUND, _, moduleDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
@@ -976,7 +976,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	for i = 1, #units do
 		local unitID = units[i]
 		local level, chassis, staticLevel = GetCommanderUpgradeAttributes(unitID, true)
-		if level and (not staticLevel) and chassis and (UNBOUNDED_LEVEL or chassisDefs[chassis].levelDefs[level+1]) then
+		if level and (not staticLevel) and chassis and (not LEVEL_BOUND or level < LEVEL_BOUND) then
 			upgradeID = unitID
 			break
 		end
@@ -1038,7 +1038,7 @@ function widget:CommandsChanged()
 		for i = 1, #units do
 			local unitID = units[i]
 			local level, chassis, staticLevel = GetCommanderUpgradeAttributes(unitID, true)
-			if level and (not staticLevel) and chassis and (UNBOUNDED_LEVEL or chassisDefs[chassis].levelDefs[level+1]) then
+			if level and (not staticLevel) and chassis and (not LEVEL_BOUND or level < LEVEL_BOUND) then
 				foundRulesParams = true
 				break
 			end

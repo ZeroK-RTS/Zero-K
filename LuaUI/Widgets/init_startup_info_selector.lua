@@ -33,7 +33,6 @@ _ Show a windows at game start with pictures to choose commander type.
 --------------------------------------------------------------------------------
 local spGetGameRulesParam = Spring.GetGameRulesParam
 local coop = false
-local forcejunior = Spring.Utilities.tobool(Spring.GetModOptions().forcejunior)
 
 local Chili
 local Window
@@ -380,7 +379,7 @@ function widget:Initialize()
 	
 	if ((coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
 	or (not coop and Spring.GetTeamRulesParam(teamID, "commSpawned") == 1)
-	or (Spring.GetSpectatingState() or Spring.IsReplay() or forcejunior))
+	or Spring.GetSpectatingState() or Spring.IsReplay())
 	--and (not Spring.IsCheatingEnabled())
 	then
 		noComm = true -- will prevent window from auto-appearing; can still be brought up from the button

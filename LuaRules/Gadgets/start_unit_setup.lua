@@ -241,10 +241,6 @@ local function GetStartUnit(teamID, playerID, isAI)
 		return commanderProfile.baseUnitDefID
 	end
 
-	if Spring.GetModOption("forcejunior", true, false) then
-		return UnitDefNames["commbasic"].id
-	end
-
 	local startUnit
 	local commProfileID = nil
 

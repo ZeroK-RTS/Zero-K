@@ -27,7 +27,7 @@ local internalCreationModuleEffectData
 
 local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak, unitCreatedJammingRange, unitCreatedCloakShield, unitCreatedWeaponNums
 
-local moduleDefs, chassisDefs, upgradeUtilities, UNBOUNDED_LEVEL, chassisDefByBaseDef, moduleDefNames, chassisDefNames =  include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, chassisDefs, upgradeUtilities, LEVEL_BOUND, chassisDefByBaseDef, moduleDefNames, chassisDefNames =  include("LuaRules/Configs/dynamic_comm_defs.lua")
 	
 include("LuaRules/Configs/customcmds.h.lua")
 
@@ -536,11 +536,11 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	local newLevel = level + 1
 	local newLevelBounded = math.min(chassisDefs[chassis].maxNormalLevel, level + 1)
 	
-	-- If unbounded level is disallowed then the comm is invalid
-	if newLevel ~= newLevelBounded and not UNBOUNDED_LEVEL then
+	-- If unbounded level is disallowed then the comm might be invalid
+	if LEVEL_BOUND and newLevel > LEVEL_BOUND then
 		return false
 	end
-	
+
 	-- Determine what the command thinks the unit already owns
 	local index = 5
 	local pAlreadyOwned = {}
