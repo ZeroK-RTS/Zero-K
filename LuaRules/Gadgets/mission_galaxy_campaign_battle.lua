@@ -982,13 +982,6 @@ local function PlaceTeamUnits(teamID, customKeys, alliedToPlayer)
 	end
 end
 
-local function PlaceNeutralUnits(unitData)
-	local gaiaTeamID = Spring.GetGaiaTeamID() 
-	for i = 1, #unitData do
-		PlaceUnit(unitData[i], gaiaTeamID)
-	end
-end
-
 local function PlaceFeatures(featureData)
 	local gaiaTeamID = Spring.GetGaiaTeamID() 
 	for i = 1, #featureData do
@@ -1027,11 +1020,6 @@ local function DoInitialUnitPlacement()
 		local teamID = teamList[i]
 		local _,_,_,_,_,allyTeamID, customKeys = Spring.GetTeamInfo(teamID)
 		PlaceTeamUnits(teamID, customKeys, allyTeamID == PLAYER_ALLY_TEAM_ID)
-	end
-	
-	local neutralUnits = GetExtraStartUnits(Spring.GetGaiaTeamID(), Spring.GetModOptions())
-	if neutralUnits then
-		PlaceNeutralUnits(neutralUnits)
 	end
 	
 	local featuresToSpawn = CustomKeyToUsefulTable(Spring.GetModOptions().featurestospawn) or false
