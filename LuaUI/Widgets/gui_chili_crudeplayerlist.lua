@@ -882,7 +882,7 @@ end
 -----------------------------------------------------------------------
 
 function widget:Initialize()
-	if (not WG.Chili) then
+	if (not WG.Chili) or (Spring.GetModOptions().singleplayercampaignbattleid) then
 		widgetHandler:RemoveWidget()
 		return
 	end
