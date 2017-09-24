@@ -5,9 +5,9 @@ unitDef = {
   buildCostMetal   = 600,
   builder          = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 8,
-  buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[factoryjump_aoplane.dds]],  
+  buildingGroundDecalSizeX      = 10,
+  buildingGroundDecalSizeY      = 10,
+  buildingGroundDecalType       = [[factoryamph_aoplane.dds]],  
 
   buildoptions     = {
     [[amphcon]],
@@ -59,6 +59,7 @@ unitDef = {
   selfDestructAs   = [[LARGE_BUILDINGEX]],
   showNanoSpray    = false,
   sightDistance    = 273,
+  useBuildingGroundDecal = true,
   workerTime       = 10,
   yardMap          = [[ooooooo ooooooo ooooooo ccccccc ccccccc ccccccc ccccccc]],
 

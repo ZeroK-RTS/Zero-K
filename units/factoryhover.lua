@@ -6,6 +6,10 @@ unitDef = {
   brakeRate        = 0,
   buildCostMetal   = 600,
   builder          = true,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 11,
+  buildingGroundDecalSizeY      = 11,
+  buildingGroundDecalType       = [[factoryhover_aoplane.dds]],
 
   buildoptions     = {
     [[hovercon]],
@@ -51,6 +55,7 @@ unitDef = {
   showNanoSpray    = false,
   sightDistance    = 273,
   turnRate         = 0,
+  useBuildingGroundDecal = true,
   waterline        = 1,
   workerTime       = 10,
   yardMap          = [[xoooooox ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo xoccccox]],

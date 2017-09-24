@@ -7,8 +7,8 @@ unitDef = {
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 7,
-  buildingGroundDecalSizeY      = 7,
+  buildingGroundDecalSizeX      = 10,
+  buildingGroundDecalSizeY      = 10,
   buildingGroundDecalType       = [[factoryspider_aoplane.dds]],
 
   buildoptions                  = {

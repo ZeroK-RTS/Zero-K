@@ -7,8 +7,8 @@ unitDef = {
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 8,
-  buildingGroundDecalSizeY      = 7,
+  buildingGroundDecalSizeX      = 10,
+  buildingGroundDecalSizeY      = 10,
   buildingGroundDecalType       = [[factoryjump_aoplane.dds]],
 
   buildoptions                  = {
