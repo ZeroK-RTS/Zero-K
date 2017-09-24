@@ -156,7 +156,7 @@ function gadget:DrawScreen()
 			end
 			text = text .. "\n\255\255\255\255 Say !force to start sooner"
 		end
-	elseif singleplayer then
+	elseif string.find(text, "Choose") then
 		text = "\255\255\255\255Starting"
 	end 
 
