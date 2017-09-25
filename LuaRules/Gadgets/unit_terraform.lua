@@ -81,7 +81,8 @@ local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 
 local CMD_OPT_RIGHT = CMD.OPT_RIGHT
-local CMD_OPT_SHIFT = CMD.OPT_SHIFT 
+local CMD_OPT_SHIFT = CMD.OPT_SHIFT
+local CMD_OPT_ALT   = CMD.OPT_ALT
 local CMD_STOP = CMD.STOP
 local CMD_REPAIR = CMD.REPAIR
 local CMD_INSERT = CMD.INSERT
@@ -223,6 +224,11 @@ for i = 1, #UnitDefs do
 		terraformUnitDefIDs[i] = true
 	end
 end
+
+local REPAIR_ORDER_PARAMS = {0, CMD_REPAIR, CMD_OPT_RIGHT, 0} -- static because only the 4th parameter changes
+
+local workaround_recursion_in_cmd_fallback = {}
+local workaround_recursion_in_cmd_fallback_needed = false
 
 --------------------------------------------------------------------------------
 -- Custom Commands
@@ -3069,6 +3075,15 @@ local function DoTerraformUpdate(n, forceCompletion)
 end
 
 function gadget:GameFrame(n)
+
+	if workaround_recursion_in_cmd_fallback_needed then
+		for unitID, terraID in pairs(workaround_recursion_in_cmd_fallback) do
+			REPAIR_ORDER_PARAMS[4] = terraID
+			spGiveOrderToUnit(unitID, CMD_INSERT, REPAIR_ORDER_PARAMS, CMD_OPT_ALT)
+		end
+		workaround_recursion_in_cmd_fallback = {}
+		workaround_recursion_in_cmd_fallback_needed = false
+	end
 	
 	--if n % 300 == 0 then
 	--	GG.Terraform_RaiseWater(-20)
@@ -3200,7 +3215,12 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 	
 	if closestID then
-		spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_REPAIR, CMD_OPT_RIGHT, closestID}, {"alt"})
+		--[[ Recursion not allowed.
+			REPAIR_ORDER_PARAMS[4] = closestID
+			spGiveOrderToUnit(unitID, CMD_INSERT, REPAIR_ORDER_PARAMS, CMD_OPT_ALT)
+		]]
+		workaround_recursion_in_cmd_fallback[unitID] = closestID
+		workaround_recursion_in_cmd_fallback_needed = true
 		return true, false
 	end
 	
