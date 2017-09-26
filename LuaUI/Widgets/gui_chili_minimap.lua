@@ -768,7 +768,7 @@ MakeMinimapWindow = function()
 			
 			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
 			
-			MakeMinimapButton( 'LuaUI/images/commands/states/retreat_90.png', {name = "Place Retreat Zone", action = 'sethaven', command = CMD_RETREAT_ZONE, desc = " (Shift to place multiple zones, overlap to remove)"}),
+			MakeMinimapButton( 'LuaUI/images/commands/Bold/retreat.png', {name = "Place Retreat Zone", action = 'sethaven', command = CMD_RETREAT_ZONE, desc = " (Shift to place multiple zones, overlap to remove)"}),
 			MakeMinimapButton( 'LuaUI/images/commands/Bold/ferry.png', {name = "Place Ferry Route", action = 'setferry', command = CMD_SET_FERRY, desc = " (Shift to queue and edit waypoints, overlap the start to remove)"}),
 			
 			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
