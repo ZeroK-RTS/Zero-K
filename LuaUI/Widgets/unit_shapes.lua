@@ -722,7 +722,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 end
 
 local function DrawCircles(underWorld)
-		--if Spring.IsGUIHidden() then return end
+	if Spring.IsGUIHidden() then return end
 	if (#visibleSelected + #hoveredUnit + #visibleBoxed == 0) and not hasVisibleAllySelections then return end
 	
 	gl.PushAttrib(GL_COLOR_BUFFER_BIT)
