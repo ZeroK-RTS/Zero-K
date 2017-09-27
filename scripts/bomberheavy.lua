@@ -88,6 +88,10 @@ function script.FireWeapon(num)
 	Reload()
 end
 
+function script.AimWeapon(num)
+	return true
+end
+
 function script.QueryWeapon(num)
 	return (gun_1 and flare1) or flare2
 end
