@@ -542,6 +542,7 @@ local function FinishMorph(unitID, morphData)
 	--//transfer command queue
 	for i = 1, #cmds do
 		local cmd = cmds[i]
+		local coded = cmd.options.coded + (cmd.options.shift and 0 or CMD.OPT_SHIFT) -- orders without SHIFT can appear at positions other than the 1st due to CMD.INSERT; they'd cancel any previous commands if added raw
 		if cmd.id < 0 then -- repair case for construction
 			local units = Spring.GetUnitsInRectangle(cmd.params[1] - 16, cmd.params[3] - 16, cmd.params[1] + 16, cmd.params[3] + 16)
 			local allyTeam = Spring.GetUnitAllyTeam(unitID)
@@ -549,16 +550,16 @@ local function FinishMorph(unitID, morphData)
 			for j = 1, #units do
 				local areaUnitID = units[j]
 				if allyTeam == Spring.GetUnitAllyTeam(areaUnitID) and Spring.GetUnitDefID(areaUnitID) == -cmd.id then
-					Spring.GiveOrderToUnit(newUnit, CMD.REPAIR, {areaUnitID}, cmd.options.coded)
+					Spring.GiveOrderToUnit(newUnit, CMD.REPAIR, {areaUnitID}, coded)
 					notFound = false
 					break
 				end
 			end
 			if notFound then
-				Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, cmd.options.coded)
+				Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, coded)
 			end
 		else
-			Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, cmd.options.coded)
+			Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, coded)
 		end
 	end
 end
