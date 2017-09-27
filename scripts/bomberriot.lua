@@ -34,6 +34,10 @@ function script.Create()
 	--StartThread(Lights)
 end
 
+function script.AimWeapon(num)
+	return true
+end
+
 function script.QueryWeapon(num)
 	return base
 end
