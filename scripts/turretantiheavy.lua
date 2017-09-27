@@ -21,7 +21,7 @@ local SIG_AIM = 2
 local SIG_OPEN = 1
 
 local open = true
-
+local firing = false
 
 local function Open()
 	Signal(SIG_OPEN)
@@ -108,12 +108,13 @@ function script.Deactivate()
 end
 
 function script.AimWeapon(weaponNum, heading, pitch)
-	if (not open) or (spGetUnitRulesParam(unitID, "lowpower") == 1) then 
-		return false 
-	end
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	
+
+	while (not open) or firing or (spGetUnitRulesParam(unitID, "lowpower") == 1) do
+		Sleep (100)
+	end
+
 	GG.DontFireRadar_CheckAim(unitID)
 	
 	Turn(turret, y_axis, heading, math.rad(50))
@@ -121,6 +122,13 @@ function script.AimWeapon(weaponNum, heading, pitch)
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(gun, x_axis)
 	return (spGetUnitRulesParam(unitID, "lowpower") == 0)	--checks for sufficient energy in grid
+end
+
+local beam_duration = WeaponDefs[UnitDef.weapons[1].weaponDef].beamtime * 1000
+function script.FireWeapon()
+	firing = true
+	Sleep (beam_duration)
+	firing = false
 end
 
 function script.BlockShot(num, targetID)
