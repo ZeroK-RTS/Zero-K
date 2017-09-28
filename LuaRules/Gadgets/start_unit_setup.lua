@@ -46,35 +46,7 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 -- Functions shared between missions and non-missions
 
-local spGetGroundHeight = Spring.GetGroundHeight
-local spSetHeightMap    = Spring.SetHeightMap
-
-local function FlattenFunc(left, top, right, bottom, height)
-	-- top and bottom
-	for x = left, right, 8 do
-		spSetHeightMap(x, top - 8, height, 0.5)
-		spSetHeightMap(x, bottom + 8, height, 0.5)
-	end
-	
-	-- left and right
-	for z = top, bottom, 8 do
-		spSetHeightMap(left - 8, z, height, 0.5)
-		spSetHeightMap(right + 8, z, height, 0.5)
-	end
-	
-	-- corners
-	spSetHeightMap(left - 8, top - 8, height, 0.5)
-	spSetHeightMap(left - 8, bottom + 8, height, 0.5)
-	spSetHeightMap(right + 8, top - 8, height, 0.5)
-	spSetHeightMap(right + 8, bottom + 8, height, 0.5)
-end
-
-local function FlattenRectangle(left, top, right, bottom, height)
-	Spring.LevelHeightMap(left, top, right, bottom, height)
-	Spring.SetHeightMapFunc(FlattenFunc, left, top, right, bottom, height)
-end
-
-local function CheckOrderRemoval()
+local function CheckOrderRemoval() -- FIXME: maybe we can remove polling every frame and just remove the orders directly
 	if not ordersToRemove then
 		return
 	end
@@ -101,36 +73,12 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
-		
-		-- Flatten ground
-		local ud = UnitDefs[unitDefID]
-		local sX = ud.xsize*4
-		local sZ = ud.zsize*4
-		local facing = Spring.GetUnitBuildFacing(unitID)
-		if facing == 1 or facing == 3 then
-			sX, sZ = sZ, sX
-		end
-		
-		local height
-		if facing == 0 then -- South
-			height = spGetGroundHeight(x, z + 0.8*sZ)
-		elseif facing == 1 then -- East
-			height = spGetGroundHeight(x + 0.8*sX, z)
-		elseif facing == 2 then -- North
-			height = spGetGroundHeight(x, z - 0.8*sZ)
-		else -- West
-			height = spGetGroundHeight(x - 0.8*sX, z)
-		end
-		
-		if height > 0 or (not ud.floatOnWater) then
-			FlattenRectangle(x - sX, z - sZ, x + sX, z + sZ, height)
-		end
-		
+
 		-- Stats collection
 		if GG.mod_stats_AddFactoryPlop then
 			GG.mod_stats_AddFactoryPlop(teamID, unitDefID)
 		end
-		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
+		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- FIXME: performance loss, possibly preload?
 	end
 end
 
