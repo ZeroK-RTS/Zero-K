@@ -18,6 +18,7 @@ local terrainNameToIndex = {}
 local oldTerrain = {}
 
 local IMPASSIBLE_TERRAIN = 137 -- Hope that this does not conflict with any maps
+local NANOFRAMES_BLOCK = false -- Allows for LOS hax.
 
 local externalFunctions = {}
 
@@ -83,7 +84,7 @@ function DestroyImpassibleFootprint(unitID, unitDefID)
 end
 
 function gadget:UnitCreated(unitID, unitDefID)
-	if Spring.Utilities.getMovetype(UnitDefs[unitDefID]) == 2 then
+	if NANOFRAMES_BLOCK and (Spring.Utilities.getMovetype(UnitDefs[unitDefID]) == 2) then
 		local _, _, inBuild = Spring.GetUnitIsStunned(unitID)
 		if inBuild then
 			CreateImpassibleFootprint(unitID, unitDefID)
@@ -92,13 +93,13 @@ function gadget:UnitCreated(unitID, unitDefID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
-	if Spring.Utilities.getMovetype(UnitDefs[unitDefID]) == 2 then
+	if NANOFRAMES_BLOCK and (Spring.Utilities.getMovetype(UnitDefs[unitDefID]) == 2) then
 		DestroyImpassibleFootprint(unitID, unitDefID)
 	end
 end
 
 function gadget:UnitFinished(unitID, unitDefID)
-	if Spring.Utilities.getMovetype(UnitDefs[unitDefID]) == 2 then
+	if NANOFRAMES_BLOCK and (Spring.Utilities.getMovetype(UnitDefs[unitDefID]) == 2) then
 		DestroyImpassibleFootprint(unitID, unitDefID)
 	end
 end
