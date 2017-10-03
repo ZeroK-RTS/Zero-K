@@ -55,5 +55,19 @@
 	"go_to" : "Go to",
 	"x%_done" : "%{x}%% done",
 	"append_to_current_selection" : "Append to current selection",
-	"unit_under_attack" : "is under attack"
+	"unit_under_attack" : "is under attack",
+	"roster_factorycloak" : "Cloakybots",
+	"roster_factoryshield" : "Shieldbots",
+	"roster_factoryveh" : "Vehicles",
+	"roster_factorytank" : "Tanks",
+	"roster_factoryamph" : "Amphbots",
+	"roster_factoryhover" : "Hovercraft",
+	"roster_factoryjump" : "Jumpybots",
+	"roster_factoryspider" : "Spiders",
+	"roster_factorygunship" : "Gunships",
+	"roster_factoryplane" : "Planes",
+	"roster_factoryship" : "Ships",
+	"roster_striderhub" : "Striders",
+	"roster_staticmissilesilo" : "Missiles",
+	"neutral" : "Neutral"
 }
