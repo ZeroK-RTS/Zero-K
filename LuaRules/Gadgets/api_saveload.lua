@@ -508,7 +508,7 @@ function gadget:Load(zip)
 	toCleanupFactory = {}
 	-- get save data
 	Spring.SetGameRulesParam("loadPurge", 1)
-	savedata.unit = ReadFile(zip, "Unit", unitFile) 
+	savedata.unit = ReadFile(zip, "Unit", unitFile) or {}
 	local units = Spring.GetAllUnits()
 	for i=1,#units do
 		Spring.DestroyUnit(units[i], false, true)
@@ -521,7 +521,7 @@ function gadget:Load(zip)
 	end
 	
 	savedata.projectile = ReadFile(zip, "Projectile", projectileFile) or {}
-	savedata.general = ReadFile(zip, "General", generalFile)
+	savedata.general = ReadFile(zip, "General", generalFile) or {}
 	
 	LoadGeneralInfo()
 	LoadFeatures()	-- do features before units so we can change unit orders involving features to point to new ID
