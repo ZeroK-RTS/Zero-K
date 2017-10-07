@@ -518,6 +518,8 @@ end
 
 
 local function SpawnChicken(burrowID, spawnNumber, chickenName)
+	if Spring.IsGameOver() then return end
+	
 	local x, z
 	local bx, by, bz = spGetUnitPosition(burrowID)
 	if (not bx or not by or not bz) then
@@ -550,7 +552,9 @@ end
 
 local function SpawnTurret(burrowID, turret, number, force)
 	if (not turret) or Spring.GetUnitIsDead(burrowID) then return end
-	if data.victory then return end
+	if data.victory or Spring.IsGameOver() then
+		return
+	end
 	
 	local cost = (defenders[turret] and defenders[turret].cost) or 1
 	local squadSize = (defenders[turret] and defenders[turret].squadSize) or 1
@@ -599,6 +603,7 @@ end
 
 local function SpawnSupport(burrowID, support, number, force)
 	if (not support) or Spring.GetUnitIsDead(burrowID) then return end
+	if Spring.IsGameOver() then return end
 	local squadSize = (supporters[support] and supporters[support].squadSize) or 1
 	squadSize = squadSize * waveSizeMult * random(75, 125)/100
 	
@@ -639,6 +644,7 @@ end
 
 local function SpawnBurrow(number, loc, burrowLevel)
 	if (data.victory or data.endgame) then return end
+	if Spring.IsGameOver() then return end
 	
 	local t		 = spGetGameSeconds()
 	local unitID
@@ -849,7 +855,7 @@ end
 local function Wave()
 	local t = spGetGameSeconds()
 	
-	if data.victory then
+	if data.victory or Spring.IsGameOver() then
 		return
 	end
 	
@@ -1134,6 +1140,10 @@ function gadget:GameFrame(n)
 				end
 			end
 		end
+		-- FIXME: don't make chickens lose if they won
+		--if (not data.victory) and Spring.IsGameOver() then
+		--	KillAllComputerUnits()
+		--end
 	end
 	
 	--morphs queen
