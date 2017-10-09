@@ -21,7 +21,7 @@ options = {
 		value = "none",
 		items = {
 			{key = "none", name = "None"},
-			{key = "protanopia", name="Protanopia - misssing RED"},
+			{key = "protanopia", name="Protanopia - missing RED"},
 			{key = "deuteranopia", name="Deuteranopia - missing GREEN"},
 			{key = "tritanopia", name="Tritanopia - missing BLUE"},
 		},
@@ -79,10 +79,6 @@ local function SetupCBCOptions()
 end
 
 ---------------------------------------------------------------------------
-options.cbcType.OnChange = SetupCBCOptions
-options.cbcMethod.OnChange = SetupCBCOptions
-options.cbcOnlySim.OnChange = SetupCBCOptions
----------------------------------------------------------------------------
 
 function widget:Initialize()
 	if (gl.CreateShader == nil) then
@@ -97,7 +93,11 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
-	
+
+	options.cbcType.OnChange    = SetupCBCOptions
+	options.cbcMethod.OnChange  = SetupCBCOptions
+	options.cbcOnlySim.OnChange = SetupCBCOptions
+
 	if (widgetHandler.DrawScreenPost ~= nil) then
 		widgetHandler:RemoveCallIn("DrawScreenEffects")
 	end
