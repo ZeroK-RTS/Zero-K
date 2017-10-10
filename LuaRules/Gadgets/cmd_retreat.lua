@@ -85,6 +85,14 @@ local RADSQ = RADIUS * RADIUS
 
 local ignoreAllowCommand = false
 
+local gunshipDefs = {}
+for unitDefID, unitDef in pairs(UnitDefs) do
+	local movetype = Spring.Utilities.getMovetype(unitDef)
+	if movetype == 1 and not Spring.Utilities.tobool(unitDef.customParams.cantuseairpads) then
+		gunshipDefs[unitDefID] = true
+	end
+end
+
 ----------------------------
 ----- Haven Handling
 ----------------------------
@@ -183,11 +191,13 @@ local function StopRetreating(unitID)
 	local cmds = Spring.GetUnitCommands(unitID, -1)
 	if retreaterHasRearm[unitID] then
 		for _,cmd in ipairs(cmds) do
-			if retreaterHasRearm[unitID] and cmd.id == CMD_REARM then
+			if cmd.id == CMD_REARM then
 				spGiveOrderToUnit(unitID, CMD.REMOVE, { cmd.tag }, {})
 			end
 		end
-	else
+	end
+
+	if retreaterTagsMove[unitID] or retreaterTagsWait[unitID] then
 		local first = true
 		for _,cmd in ipairs(cmds) do
 			if cmd.tag == retreaterTagsMove[unitID] or cmd.tag == retreaterTagsWait[unitID] then
@@ -267,18 +277,38 @@ local function GiveRetreatOrders(unitID, hx,hz)
 	end
 end
 
+local function MaybeLandGunshipAtAirpad(unitID, x, z, r)
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if not gunshipDefs[unitDefID] then
+		return
+	end
+
+	local padID = GG.FindBestAirpadAt(unitID, x, z, r)
+	if not padID then
+		return
+	end
+
+	spGiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, padID}, CMD.OPT_ALT)
+	retreaterHasRearm[unitID] = true
+
+	-- there's some room for improvement, for example check if there's a second pad in the zone if the first is dead or slacking
+end
 
 local function StartRetreat(unitID)
-	if not (isPlane[unitID] and GiveRearmOrders(unitID)) then
-		local hx, hz, dSquared = FindClosestHavenToUnit(unitID)
-		hx = hx + RADIUS - rand(10, DIAM)
-		hz = hz + RADIUS- rand(10, DIAM)
-		if dSquared > RADSQ then
-			local insertIndex = 0
-			GiveRetreatOrders(unitID, hx, hz)
-			SendToUnsynced("StartRetreat", unitID)
-		end
+	if isPlane[unitID] and GiveRearmOrders(unitID) then
+		return
 	end
+
+	local hx, hz, dSquared = FindClosestHavenToUnit(unitID)
+	if dSquared < RADSQ then
+		return
+	end
+
+	GiveRetreatOrders(unitID,
+		hx + RADIUS - rand(10, DIAM),
+		hz + RADIUS - rand(10, DIAM))
+	MaybeLandGunshipAtAirpad(unitID, hx, hz, RADIUS)
+	SendToUnsynced("StartRetreat", unitID)
 end
 
 local function CheckRetreat(unitID)

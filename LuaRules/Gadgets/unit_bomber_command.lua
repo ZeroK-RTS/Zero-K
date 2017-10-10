@@ -259,6 +259,28 @@ local function RefreshEmptyspot_minusBomberLanding()
 	end
 end
 
+local function FindBestAirpadAt(unitID, x, z, r) -- picks the least crowded pad in R radius around X/Z
+	local allyTeam = spGetUnitAllyTeam(unitID)
+	if not airpadsPerAllyteam[allyTeam] then
+		return
+	end
+
+	local bestPadID
+	local bestPadBookFactor = 9001
+	for airpadID, airpadDefID in pairs(airpadsPerAllyteam[allyTeam]) do
+		local bookFactor = airpadsData[airpadID].reservations.count / airpadsData[airpadID].cap
+		if bookFactor < bestPadBookFactor then
+			local ux, uy, uz = Spring.GetUnitPosition(airpadID)
+			if (ux-x)^2 + (uz-z)^2 < r^2 then
+				bestPadID = airpadID
+				bestPadBookFactor = bookFactor
+			end
+		end
+	end
+
+	return bestPadID
+end
+
 local function FindNearestAirpad(unitID, team)
 	--Spring.Echo(unitID.." checking for closest pad")
 	local allyTeam = spGetUnitAllyTeam(unitID)
@@ -358,6 +380,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 end
 
 GG.RequestRearm = RequestRearm
+GG.FindBestAirpadAt = FindBestAirpadAt
 
 function gadget:UnitCreated(unitID, unitDefID, team)
 	if bomberDefs[unitDefID] then
