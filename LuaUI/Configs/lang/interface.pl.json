@@ -62,6 +62,9 @@
 	"attrition_value_lost" : "Otrzymane straty",
 	"cheatsheet_btn_spawn" : "Stwórz wybrane jednostki w docelowym miejscu.",
 	"cheatsheet_btn_atm" : "Dostajesz 1000 metalu i energii.",
+	"cheatsheet_btn_gk" : "Zniszcz wszystkie jednostki, pozostawiąc wraki w miarę możliwości.",
+	"cheatsheet_btn_clear" : "Usuń wszystkie jednostki i obiekty.",
+	"cheatsheet_btn_rez" : "Wskrześ zniszczone jednostki dla ich poprzednich właścicieli.",
 	"cheatsheet_lab_spawn" : "Tworzenie jednostek",
 	"cheatsheet_lab_top" : "Menu Cheatów",
 	"cheatsheet_chb_godmode" : "Globalna kontrola",
@@ -85,6 +88,8 @@
 	"cheatsheet_cat_subunits" : "Pod-jednostki",
 	"cheatsheet_cat_campaign" : "Kampania",
 	"cheatsheet_cat_wacky" : "Dziwolągi",
+	"cheatsheet_cat_planetwars" : "Wojny Planet",
+	"cheatsheet_cat_rejects" : "Techniczne śmieci",
 	"x_units_in_queue" : {
 		"one" : "%{count} jednostka w kolejce",
 		"few" : "%{count} jednostki w kolejce",

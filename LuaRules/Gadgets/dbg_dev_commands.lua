@@ -496,6 +496,27 @@ local function gentleKill(cmd,line,words,player)
 	end
 end
 
+local function rezAll(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+
+	local features = Spring.GetAllFeatures()
+	for i = 1, #features do
+		local featureID = features[i]
+		local defName, facing = Spring.GetFeatureResurrect(featureID)
+		if defName ~= "" then
+			local x, y, z = Spring.GetFeaturePosition(featureID)
+			local teamID = Spring.GetFeatureTeam(featureID)
+			if teamID == -1 then
+				teamID = Spring.GetGaiaTeamID()
+			end
+			Spring.DestroyFeature(featureID)
+			Spring.CreateUnit(defName, x, y, z, facing, teamID)
+		end
+	end
+end
+
 local function damage(cmd,line,words,player)
 	if spIsCheatingEnabled() then
 		local units = Spring.GetAllUnits()
@@ -652,6 +673,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"circle",circleGive,"Gives a bunch of units in a circle.")
 	gadgetHandler.actionHandler.AddChatAction(self,"give",give,"Like give all but without all the crap.")
 	gadgetHandler.actionHandler.AddChatAction(self,"gk",gentleKill,"Gently kills everything.")
+	gadgetHandler.actionHandler.AddChatAction(self,"rez",rezAll,"Resurrects wrecks for former owners.")
 	gadgetHandler.actionHandler.AddChatAction(self,"damage",damage,"Damages everything.")
 	gadgetHandler.actionHandler.AddChatAction(self,"color",ColorTest,"Spawns units for color test.")
 	gadgetHandler.actionHandler.AddChatAction(self,"clear",clear,"Clears all units and wreckage.")

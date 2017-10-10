@@ -60,6 +60,9 @@
 	"attrition_value_lost" : "Value lost",
 	"cheatsheet_btn_spawn" : "Spawn chosen units at target point.",
 	"cheatsheet_btn_atm" : "Gain 1000 metal and energy.",
+	"cheatsheet_btn_gk" : "Kill all units, leaving wreckage if possible.",
+	"cheatsheet_btn_clear" : "Remove all units and features from the map.",
+	"cheatsheet_btn_rez" : "Resurrect wrecks for their former owners.",
 	"cheatsheet_lab_spawn" : "Unit spawning",
 	"cheatsheet_lab_top" : "Cheat Sheet",
 	"cheatsheet_chb_godmode" : "Global spec control",
@@ -83,6 +86,8 @@
 	"cheatsheet_cat_subunits" : "Sub-units",
 	"cheatsheet_cat_campaign" : "Campaign",
 	"cheatsheet_cat_wacky" : "Wacky",
+	"cheatsheet_cat_planetwars" : "Planet Wars",
+	"cheatsheet_cat_rejects" : "Technical junk",
 	"x_units_in_queue" : {
 		"one" : "%{count} unit in queue",
 		"other" : "%{count} units in queue"

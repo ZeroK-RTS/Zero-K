@@ -24,6 +24,8 @@ local setAiPosCommand = {
 
 -- configurables
 local COMBOX_HEIGHT = 26
+local BUTTON_SIZE = 32
+local BUTTON_SPACING = 5
 
 -- not really configurables
 local CHECKBOX_SIZE = 16
@@ -50,8 +52,13 @@ local teamPicker
 
 -- misc derivative stuff
 local categories = {}
+local unitAlreadyProcessed = {}
 
 local function AddCategory(transKey, unitList)
+	for i = 1, #unitList do
+		unitAlreadyProcessed[unitList[i]] = true
+	end
+
 	categories[#categories + 1] = {
 		translation_key = transKey,
 		unitList = unitList,
@@ -162,7 +169,8 @@ AddMiscCategory("campaign", {
 	"hoversonic",
 	"nebula",
 	"turretsunlance",
-	"shiptransport",
+	"spideranarchid",
+	"staticsonar",
 	"subscout",
 })
 AddMiscCategory("wacky", {
@@ -174,10 +182,24 @@ AddMiscCategory("wacky", {
 	"comm_campaign_isonade",
 	"neebcomm",
 	"rocksink",
+	"shiptransport",
 	"starlight_satellite",
 	"thicket",
 })
--- could also add PW metagame buildings here but their defs arent always generated
+
+do
+	local rejects = {}
+	local planetwars = {}
+	for name, ud in pairs (UnitDefNames) do
+		if ud.customParams.planetwars then
+			planetwars[#planetwars + 1] = name
+		elseif not unitAlreadyProcessed[name] then
+			rejects[#rejects + 1] = name
+		end
+	end
+	AddMiscCategory("planetwars", planetwars)
+	AddMiscCategory("rejects", rejects)
+end
 
 -- helpers
 
@@ -195,7 +217,7 @@ end
 
 -- UI stuff creation
 
-local function AddGodmodeButton(parent, offset)
+local function AddGodmodeToggle(parent, offset)
 	chbox.godmode = WG.Chili.Checkbox:New{
 		x = CHECKBOX_SIZE + 2,
 		y = offset[1],
@@ -219,12 +241,12 @@ local function AddGodmodeButton(parent, offset)
 	offset[1] = offset[1] + CHECKBOX_SIZE
 end
 
-local function AddAtmButton(parent, offset)
+local function AddAtmButton(parent, x_offset, y_offset)
 	button.atm = WG.Chili.Button:New{
-		y = offset[1] + 5,
-		right = 0,
-		width = 32,
-		height = 32,
+		y = y_offset[1],
+		right = x_offset[1],
+		width = BUTTON_SIZE,
+		height = BUTTON_SIZE,
 
 		padding = {3,3,3,3},
 		caption = "",
@@ -243,10 +265,95 @@ local function AddAtmButton(parent, offset)
 		parent = button.atm,
 		file = 'LuaUI/Images/metalplus.png',
 	}
-	offset[1] = offset[1] + 40
+
+	x_offset[1] = x_offset[1] + BUTTON_SPACING + BUTTON_SIZE
 end
 
-local function AddNocostButton(parent, offset)
+local function AddClearButton(parent, x_offset, y_offset)
+	button.clear = WG.Chili.Button:New{
+		y = y_offset[1],
+		right = x_offset[1],
+		width = BUTTON_SIZE,
+		height = BUTTON_SIZE,
+
+		padding = {3,3,3,3},
+		caption = "",
+
+		OnClick = { function(self)
+			Spring.SendCommands("luarules clear")
+		end },
+		parent = parent,
+	}
+
+	local pic = WG.Chili.Image:New{
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		parent = button.clear,
+		file = 'LuaUI/Images/drawingcursors/eraser.png',
+	}
+
+	x_offset[1] = x_offset[1] + BUTTON_SPACING + BUTTON_SIZE
+end
+
+local function AddGentleKillButton(parent, x_offset, y_offset)
+	button.gk = WG.Chili.Button:New{
+		y = y_offset[1],
+		right = x_offset[1],
+		width = BUTTON_SIZE,
+		height = BUTTON_SIZE,
+
+		padding = {3,3,3,3},
+		caption = "",
+
+		OnClick = { function(self)
+			Spring.SendCommands("luarules gk")
+		end },
+		parent = parent,
+	}
+
+	local pic = WG.Chili.Image:New{
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		parent = button.gk,
+		file = 'LuaUI/Images/AttritionCounter/Skull.png',
+	}
+
+	x_offset[1] = x_offset[1] + BUTTON_SPACING + BUTTON_SIZE
+end
+
+local function AddRezButton(parent, x_offset, y_offset)
+	button.rez = WG.Chili.Button:New{
+		y = y_offset[1],
+		right = x_offset[1],
+		width = BUTTON_SIZE,
+		height = BUTTON_SIZE,
+
+		padding = {3,3,3,3},
+		caption = "",
+
+		OnClick = { function(self)
+			Spring.SendCommands("luarules rez")
+		end },
+		parent = parent,
+	}
+
+	local pic = WG.Chili.Image:New{
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		parent = button.rez,
+		file = 'LuaUI/Images/commands/Bold/resurrect.png',
+	}
+
+	x_offset[1] = x_offset[1] + BUTTON_SPACING + BUTTON_SIZE
+end
+
+local function AddNocostToggle(parent, offset)
 	chbox.nocost = WG.Chili.Checkbox:New{
 		x = CHECKBOX_SIZE + 2,
 		y = offset[1],
@@ -272,7 +379,7 @@ local function AddNocostButton(parent, offset)
 	offset[1] = offset[1] + CHECKBOX_SIZE
 end
 
-local function AddGloballosButton(parent, offset)
+local function AddGloballosToggle(parent, offset)
 	chbox.globallos = WG.Chili.Checkbox:New{
 		x = CHECKBOX_SIZE + 2,
 		y = offset[1],
@@ -296,7 +403,7 @@ local function AddGloballosButton(parent, offset)
 	offset[1] = offset[1] + CHECKBOX_SIZE
 end
 
-local function AddCheatingButton(parent, offset)
+local function AddCheatingToggle(parent, offset)
 	chbox.cheat = WG.Chili.Checkbox:New{
 		x = 0,
 		y = offset[1],
@@ -314,14 +421,23 @@ local function AddCheatingButton(parent, offset)
 	offset[1] = offset[1] + CHECKBOX_SIZE
 end
 
-local function AddMiscButtons(parent, offset)
-	AddCheatingButton(parent, offset)
+local function AddButtons(parent, y_offset)
+	local x_offset = {BUTTON_SPACING}
+	AddAtmButton       (parent, x_offset, y_offset)
+	AddClearButton     (parent, x_offset, y_offset)
+	AddGentleKillButton(parent, x_offset, y_offset)
+	AddRezButton       (parent, x_offset, y_offset)
+	y_offset[1] = y_offset[1] + BUTTON_SIZE + BUTTON_SPACING
+end
+
+local function AddMiscControls(parent, offset)
+	AddCheatingToggle(parent, offset)
 	offset[1] = offset[1] + CHECKBOX_SIZE
 
-	AddNocostButton   (parent, offset)
-	AddGloballosButton(parent, offset)
-	AddGodmodeButton  (parent, offset)
-	AddAtmButton      (parent, offset)
+	AddNocostToggle   (parent, offset)
+	AddGloballosToggle(parent, offset)
+	AddGodmodeToggle  (parent, offset)
+	AddButtons        (parent, offset)
 end
 
 local function MakeUnitPickerComboxes(parent, offset)
@@ -407,8 +523,8 @@ local function MakeSpawnButton(parent, offset)
 	button.spawn = WG.Chili.Button:New{
 		y = offset[1] + 5,
 		right = 0,
-		width = 32,
-		height = 32,
+		width = BUTTON_SIZE,
+		height = BUTTON_SIZE,
 
 		padding = {3,3,3,3},
 		caption = "",
@@ -495,7 +611,7 @@ local function InitializeControls()
 	}
 
 	local offset = {40}
-	AddMiscButtons   (mainWindow, offset)
+	AddMiscControls  (mainWindow, offset)
 	AddSpawnUnitStuff(mainWindow, offset)
 
 	if WG.GlobalCommandBar then

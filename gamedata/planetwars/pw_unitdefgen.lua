@@ -72,6 +72,7 @@ local function commonDefs(def)
 	local fd = def.featuredefs.dead
 	fd.collisionvolumetype = fd.collisionvolumetype or def.collisionvolumetype
 	fd.collisionvolumescales = fd.collisionvolumescales or def.collisionvolumescales
+	def.customparams.planetwars = 1
 end
 
 --for name in pairs(unitData) do
