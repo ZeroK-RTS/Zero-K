@@ -1893,11 +1893,11 @@ MakeSubWindow = function(path, pause)
 					--x=0,
 					right = 35,
 					y = 7,
-					caption = '  ' .. item.name, --caption
-					checked = (option.value == item.value), --status
-					OnClick = {function(self) option.OnChange(item) end},
+					caption = '  ' .. item.name,
+					checked = (option.value == item.value),
+					OnChange = {function(self) option.OnChange(item) end},
 					textColor = color.sub_fg,
-					tooltip = item.desc, --tooltip
+					tooltip = item.desc,
 					round = true,
 				}
 				local icon = option.items[i].icon
