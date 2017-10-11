@@ -3,13 +3,13 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Display Keys",
+		name      = "Display Keys 2",
 		desc      = "Displays the current key combination.",
 		author    = "GoogleFrog",
 		date      = "12 August 2015",
 		license   = "GNU GPL, v2 or later",
 		layer     = -10000,
-		enabled   = false
+		enabled   = true
 	}
 end
 
@@ -27,10 +27,16 @@ local keyData, mouseData
 options_path = 'Settings/HUD Panels/Extras/Display Keys'
 
 options_order = {
-	'keyReleaseTimeout', 'mouseReleaseTimeout',
+	'enable', 'keyReleaseTimeout', 'mouseReleaseTimeout',
 }
  
 options = {
+	enable = {
+		name = "Show input visualizer",
+		desc = "Shows pressed key combinations and mouse buttons. Useful for video tutorials.",
+		type = "bool",
+		value = false,
+	},
 	keyReleaseTimeout = {
 		name  = "Key Release Timeout",
 		type  = "number",
@@ -225,10 +231,6 @@ end
 -- General Functions
 
 local function DoDelayedUpdate(data, dt)
-	if not data then
-		return
-	end
-	
 	if not data.updateTime then
 		return
 	end
@@ -256,25 +258,11 @@ function widget:Update(dt)
 	DoDelayedUpdate(mouseData, dt)
 end
 
-function widget:Shutdown()
-	if keyData then
-		keyData.Dispose()
-	end
-	if mouseData then
-		mouseData.Dispose()
-	end
-end
-
 function widget:Initialize()
 	Chili = WG.Chili
 	screen0 = Chili.Screen0
-	
-	if (not Chili) then
-		widgetHandler:RemoveWidget()
-		return
-	end
-	mouseData = InitializeMouseButtonControl("Mouse Display", 280)
-	keyData = InitializeDisplayLabelControl("Key Display", 380)
+
+	options.enable.OnChange(options.enable)
 end
 
 --------------------------------------------------------------------------------
@@ -300,10 +288,6 @@ local function Conc(str, add, val)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if not keyData then
-		return
-	end
-	
 	onlyMods = IsMod(key) and not keyData.pressed
 
 	local keyText = Conc(false, "Space", modifier.meta)
@@ -325,10 +309,6 @@ function widget:KeyPress(key, modifier, isRepeat)
 end
 
 function widget:KeyRelease(key, modifier, isRepeat)
-	if not keyData then
-		return
-	end
-	
 	if not IsMod(key) then
 		keyData.pressed = false
 	end
@@ -353,9 +333,6 @@ end
 -- Mouse
 
 function widget:MousePress(x, y, button)
-	if not mouseData then
-		return
-	end
 	mouseData.pressed = true
 	mouseData.UpdateWindow(button)
 	mouseData.updateTime = false
@@ -363,3 +340,43 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local callins = {"Update", "KeyPress", "KeyRelease", "MousePress"}
+
+local function Enable()
+	if not mouseData then
+		mouseData = InitializeMouseButtonControl("Mouse Display")
+	end
+	if not keyData then
+		keyData = InitializeDisplayLabelControl("Key Display")
+	end
+	for _, callin in pairs(callins) do
+		widgetHandler:UpdateCallIn(callin)
+	end
+end
+
+local function Disable()
+	if keyData then
+		keyData.Dispose()
+		keyData = nil
+	end
+	if mouseData then
+		mouseData.Dispose()
+		mouseData = nil
+	end
+	for _, callin in pairs(callins) do
+		widgetHandler:RemoveCallIn(callin)
+	end
+end
+
+options.enable.OnChange = function(self)
+	if self.value then
+		Enable()
+	else
+		Disable()
+	end
+end
+
+function widget:Shutdown()
+	Disable()
+end
