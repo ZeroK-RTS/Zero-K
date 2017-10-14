@@ -80,6 +80,8 @@ if (Game.modShortName == "BA") then local BA = true end
 
 local myTeamID
 
+local EMPTY_TABLE = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -183,9 +185,9 @@ function widget:CommandNotify(id, params, options)
       if (#cQueue > 0) then
         if (cQueue[1].id == CMD.REPAIR) and (cQueue[1].params[1] == targetUnit) then
           if options.shift then
-            GiveOrderToUnit(unitID,CMD.STOP,{},{})
+            GiveOrderToUnit(unitID,CMD.STOP, EMPTY_TABLE, 0)
           else
-            GiveOrderToUnit(unitID,CMD.RECLAIM,{targetUnit},{})
+            GiveOrderToUnit(unitID,CMD.RECLAIM,{targetUnit}, 0)
           end
         end
       end
@@ -202,7 +204,7 @@ function widget:CommandNotify(id, params, options)
       local cQueue = GetCommandQueue(unitID, 1)
       if (#cQueue > 0) then
         if (cQueue[1].id == CMD.RECLAIM) and (cQueue[1].params[1] == targetUnit) then
-          GiveOrderToUnit(unitID,CMD.REPAIR,{targetUnit},{})
+          GiveOrderToUnit(unitID,CMD.REPAIR,{targetUnit}, 0)
         end
       end
     end
@@ -235,7 +237,7 @@ local function processOrderQueue()
     if (type == 1) then
       Spring.GiveOrderToUnitMap(unitMap, CMD.INSERT, {0, id, CMD.OPT_SHIFT, params}, CMD.OPT_ALT)
     else
-      Spring.GiveOrderToUnitMap(unitMap, id, {params}, {"shift"})
+      Spring.GiveOrderToUnitMap(unitMap, id, {params}, CMD.OPT_SHIFT)
     end
   end
   orderQueue = {}

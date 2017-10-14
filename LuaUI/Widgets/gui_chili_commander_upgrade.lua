@@ -884,7 +884,7 @@ function SendUpgradeCommand(newModules)
 			params[index] = newModules[j]
 			index = index + 1
 		end
-		Spring.GiveOrderToUnitArray(upgradableUnits, CMD_MORPH_UPGRADE_INTERNAL, params, {})
+		Spring.GiveOrderToUnitArray(upgradableUnits, CMD_MORPH_UPGRADE_INTERNAL, params, 0)
 	end
 	
 	-- Remove main window

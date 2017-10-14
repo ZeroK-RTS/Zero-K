@@ -267,15 +267,15 @@ local function MoveWayPoints(wpTbl, mx, my, finalize)
 				end
 
 				if (cmdFacRad > 0) then
-					-- sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdNum, cmdID, 0, cx, cy, cz, cmdFacRad}, {"alt"})
-					sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdLink, cmdID, 0, cx+offsetX, cy, cz+offsetZ, cmdFacRad}, {""})
+					-- sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdNum, cmdID, 0, cx, cy, cz, cmdFacRad}, CMD.OPT_ALT)
+					sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdLink, cmdID, 0, cx+offsetX, cy, cz+offsetZ, cmdFacRad}, 0)
 				else
-					-- sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdNum, cmdID, 0, cx, cy, cz}, {"alt"})
-					sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdLink, cmdID, 0, cx+offsetX, cy, cz+offsetZ}, {""})
+					-- sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdNum, cmdID, 0, cx, cy, cz}, CMD.OPT_ALT)
+					sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdLink, cmdID, 0, cx+offsetX, cy, cz+offsetZ}, 0)
 				end
 
 				if (not alt) then
-					sprGiveOrderToUnit(cmdUnitID, CMD.REMOVE, {cmdTag}, {""})
+					sprGiveOrderToUnit(cmdUnitID, CMD.REMOVE, {cmdTag}, 0)
 				end
 			else
 				wpData[1] = cx

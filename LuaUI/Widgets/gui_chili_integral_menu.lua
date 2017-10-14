@@ -561,7 +561,7 @@ local function QueueClickFunc(mouse, right, alt, ctrl, meta, shift, queueCmdID, 
 	end
 	
 	for i = 1, inputMult do
-		Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {queuePosition, queueCmdID, 0 }, {"alt", "ctrl"})
+		Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {queuePosition, queueCmdID, 0 }, CMD.OPT_ALT + CMD.OPT_CTRL)
 	end
 	return true
 end
@@ -581,7 +581,7 @@ local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton
 		if state and not state["repeat"] then
 			local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
 			for i = 1, inputMult do
-				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {1, cmdID, 0 }, {"alt", "ctrl"})
+				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {1, cmdID, 0 }, CMD.OPT_ALT + CMD.OPT_CTRL)
 			end
 			if WG.noises then
 				WG.noises.PlayResponse(factoryUnitID, cmdID)

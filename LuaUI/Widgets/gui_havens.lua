@@ -22,6 +22,8 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 options_path = 'Settings/Interface/Retreat Zones'
 options_order = {'onlyShowMyZones', 'cancelRetreat'}
 
+local RETREAT_OFF_TABLE = {0}
+
 options = {
 	onlyShowMyZones = {
 		name = 'Only Show My Zones',
@@ -37,7 +39,7 @@ options = {
 		desc = 'Set your selected units to not retreat. It might be useful to assign it a hotkey.',
 		type = 'button',
 		OnChange = function(self)
-			Spring.GiveOrder(CMD_RETREAT, {0}, {"right"})
+			Spring.GiveOrder(CMD_RETREAT, RETREAT_OFF_TABLE, CMD.OPT_RIGHT)
 		end,
 	},
 }

@@ -28,6 +28,7 @@ local constantStockpile = {
 }
 
 local CMD_STOCKPILE = CMD.STOCKPILE
+local EMPTY_TABLE = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -43,14 +44,14 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if ((ud ~= nil) and (unitTeam == Spring.GetMyTeamID())) then
 		if (ud.canStockpile) then
 			-- give stockpilers 100 units to build
-			Spring.GiveOrderToUnit(unitID, CMD.STOCKPILE, {}, { "ctrl", "shift" })
+			Spring.GiveOrderToUnit(unitID, CMD.STOCKPILE, EMPTY_TABLE, CMD.OPT_CTRL + CMD.OPT_SHIFT)
 		end
 	end
 end
 
 function widget:StockpileChanged(unitID, unitDefID, unitTeam, weaponNum, oldCount, newCount)
 	if constantStockpile[unitDefID] then
-		Spring.GiveOrderToUnit(unitID, CMD_STOCKPILE, {}, {})
+		Spring.GiveOrderToUnit(unitID, CMD_STOCKPILE, EMPTY_TABLE, 0)
 	end
 end
 

@@ -11,6 +11,7 @@ function widget:GetInfo()
 end
 
 local CMD_STOP = CMD.STOP
+local EMPTY_TABLE = {}
 
 function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
     if cmdID ~= CMD_STOP then return end
@@ -18,6 +19,6 @@ function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpti
     if teamID ~= Spring.GetMyTeamID() then return end
 
     if (Spring.GetUnitSelfDTime(unitID) > 0) then
-        Spring.GiveOrderToUnit(unitID, CMD.SELFD, {}, {})
+        Spring.GiveOrderToUnit(unitID, CMD.SELFD, EMPTY_TABLE, 0)
     end 
 end

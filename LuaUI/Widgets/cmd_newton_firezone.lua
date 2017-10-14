@@ -191,6 +191,9 @@ local transportedUnits = {}
 --local cmdRateS = 0
 local softEnabled = false	--if zero newtons has orders, uses less
 local currentFrame = Spring.GetGameFrame()
+
+local EMPTY_TABLE = {}
+
 --------------
 --METHODS-----
 --------------
@@ -570,7 +573,7 @@ function widget:GameFrame(n)
 							--	break
 							--end
 							--end
-							-- spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitID}, {} )
+							-- spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitID}, 0 )
 							-- groupTarget[g] = unitID
 							-- victim[unitID] = n + 90 --empty whitelist 3 second later
 							--cmdRate = cmdRate +1
@@ -584,7 +587,7 @@ function widget:GameFrame(n)
 						end
 					end
 					if unitToAttack and (groupTarget[g]~=unitToAttack) then --there are target, and target is different than previous target (prevent command spam)? 
-						spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitToAttack}, {} ) --shoot unit
+						spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitToAttack}, 0 ) --shoot unit
 						groupTarget[g] = unitToAttack --flag this group as having a target!
 						victimStillBeingAttacked[g] = nil --clear wait signal
 						victim[unitToAttack] = n + 90 --add UnitDamaged() whitelist, and expire after 3 second later
@@ -592,7 +595,7 @@ function widget:GameFrame(n)
 					if stop and groupTarget[g] then --no unit in the box, and still have target?
 						local orders = spGetCommandQueue(newtons[1],1)[1]
 						if orders and orders.id ==CMD.ATTACK and orders.params[1]==groupTarget[g] then --is currently attacking old target??
-							spGiveOrderToUnitArray(newtons,CMD.STOP, {}, {}) --cancel attacking any out-of-box unit
+							spGiveOrderToUnitArray(newtons,CMD.STOP, EMPTY_TABLE, 0) --cancel attacking any out-of-box unit
 							--cmdRateS = cmdRateS +1
 							--ech("stop")
 						end

@@ -18,7 +18,6 @@ end
 --------------------------------------------------------------------------------
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
-local SHIFT_TABLE = {"shift"}
 
 local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
 local spectatingState = select(1, Spring.GetSpectatingState())
@@ -830,7 +829,7 @@ local function QueueState(unitDefName, stateName, cmdID, cmdArray, invertBool)
 		end
 		value = value and 1 or 0
 	end
-	cmdArray[#cmdArray + 1] = {cmdID, {value}, SHIFT_TABLE}
+	cmdArray[#cmdArray + 1] = {cmdID, {value}, CMD.OPT_SHIFT}
 end
 
 --------------------------------------------------------------------------------
@@ -859,8 +858,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			return
 		end
 
-		orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate0.value}, SHIFT_TABLE}
-		orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, SHIFT_TABLE}
+		orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate0.value}, CMD.OPT_SHIFT}
+		orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, CMD.OPT_SHIFT}
 		if WG.SetAutoCallTransportState and options.commander_auto_call_transport_2.value == 1 then
 			WG.SetAutoCallTransportState(unitID, unitDefID, true)
 		end
@@ -883,7 +882,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
 						local firestate = Spring.GetUnitStates(builderID).firestate
 						if firestate then
-							orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, SHIFT_TABLE}
+							orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, CMD.OPT_SHIFT}
 							trueBuilder = true
 						end
 					end
@@ -891,11 +890,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				if not trueBuilder then	-- inherit from factory def's start state, not the current state of any specific factory unit
 					local firestate = GetFactoryDefState(name, "firestate0")
 					if firestate ~= nil then
-						orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, SHIFT_TABLE}
+						orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, CMD.OPT_SHIFT}
 					end
 				end
 			else
-				orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {value}, SHIFT_TABLE}
+				orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {value}, CMD.OPT_SHIFT}
 			end
 		end
 
@@ -908,7 +907,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
 						local movestate = Spring.GetUnitStates(builderID).movestate
 						if movestate then
-							orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, SHIFT_TABLE}
+							orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, CMD.OPT_SHIFT}
 							trueBuilder = true
 						end
 					end
@@ -916,11 +915,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				if not trueBuilder then	-- inherit from factory def's start state, not the current state of any specific factory unit
 					local movestate = GetFactoryDefState(name, "movestate1")
 					if movestate ~= nil then
-						orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, SHIFT_TABLE}
+						orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, CMD.OPT_SHIFT}
 					end
 				end
 			else
-				orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {value}, SHIFT_TABLE}
+				orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {value}, CMD.OPT_SHIFT}
 			end
 		end
 		
@@ -933,14 +932,14 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					--NOTE: The unit_air_plants gadget deals with inherit
 					trueBuilder = true
 					if value ~= -1 then  --if not inherit
-						orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, SHIFT_TABLE}
+						orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, CMD.OPT_SHIFT}
 					end
 				end
 			end
 			if not trueBuilder then	-- inherit from factory def's start state, not the current state of any specific factory unit
 				value = GetFactoryDefState(name, "flylandstate_1_factory")
 				if value ~= nil then
-					orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, SHIFT_TABLE}
+					orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, CMD.OPT_SHIFT}
 				end
 			end
 			
@@ -962,9 +961,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		if retreat then
 			if retreat == 0 then
-				orderArray[#orderArray + 1] = {CMD_RETREAT, {0}, {"shift", "right"}}  -- to set retreat to 0, "right" option must be used
+				orderArray[#orderArray + 1] = {CMD_RETREAT, {0}, CMD.OPT_SHIFT + CMD.OPT_RIGHT}  -- to set retreat to 0, "right" option must be used
 			else
-				orderArray[#orderArray + 1] = {CMD_RETREAT, {retreat}, SHIFT_TABLE}
+				orderArray[#orderArray + 1] = {CMD_RETREAT, {retreat}, CMD.OPT_SHIFT}
 			end
 		end
 		
@@ -974,21 +973,21 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				if builderID then
 					local priority = Spring.GetUnitRulesParam(builderID,"buildpriority")
 					if priority then
-						orderArray[#orderArray + 1] = {CMD_PRIORITY, {priority}, SHIFT_TABLE}
+						orderArray[#orderArray + 1] = {CMD_PRIORITY, {priority}, CMD.OPT_SHIFT}
 					end
 				else
 					local priority = GetFactoryDefState(name, "constructor_buildpriority")
-					orderArray[#orderArray + 1] = {CMD_PRIORITY, {priority or 1}, SHIFT_TABLE}
+					orderArray[#orderArray + 1] = {CMD_PRIORITY, {priority or 1}, CMD.OPT_SHIFT}
 				end
 			else
-				orderArray[#orderArray + 1] = {CMD_PRIORITY, {value}, SHIFT_TABLE}
+				orderArray[#orderArray + 1] = {CMD_PRIORITY, {value}, CMD.OPT_SHIFT}
 			end
 		end
 		
 		value = GetStateValue(name, "misc_priority")
 		if value then
 			if value ~= 1 then -- Medium is the default
-				orderArray[#orderArray + 1] = {CMD_MISC_PRIORITY, {value}, SHIFT_TABLE}
+				orderArray[#orderArray + 1] = {CMD_MISC_PRIORITY, {value}, CMD.OPT_SHIFT}
 			end
 		end
 		
@@ -1061,7 +1060,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 		if value == -1 then
 			local priority = Spring.GetUnitRulesParam(factID,"buildpriority")
 			if priority then
-				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, SHIFT_TABLE)
+				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, CMD.OPT_SHIFT)
 			end
 		end
 	end
@@ -1075,8 +1074,8 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 
 	local orderArray = {}
 	if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
-		orderArray[1] = {CMD_PRIORITY, {GetStateValue("commander", "constructor_buildpriority")}, SHIFT_TABLE}
-		orderArray[2] = {CMD_MISC_PRIORITY, {GetStateValue("commander", "misc_priority")}, SHIFT_TABLE}
+		orderArray[1] = {CMD_PRIORITY, {GetStateValue("commander", "constructor_buildpriority")}, CMD.OPT_SHIFT}
+		orderArray[2] = {CMD_MISC_PRIORITY, {GetStateValue("commander", "misc_priority")}, CMD.OPT_SHIFT}
 	end
 
 	local name = UnitDefs[unitDefID].name

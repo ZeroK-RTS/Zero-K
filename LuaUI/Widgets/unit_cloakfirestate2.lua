@@ -43,6 +43,8 @@ local GetUnitStates    = Spring.GetUnitStates
 local GetUnitDefID     = Spring.GetUnitDefID
 local GetUnitIsCloaked = Spring.GetUnitIsCloaked
 
+local STATIC_STATE_TABLE = {0}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local myTeam
@@ -71,7 +73,8 @@ function widget:UnitCloaked(unitID, unitDefID, teamID)
 	local states = GetUnitStates(unitID)
 	cloakUnit[unitID] = states.firestate --store last state
 	if states.firestate ~= 0 then
-		GiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {})
+		STATIC_STATE_TABLE[1] = 0
+		GiveOrderToUnit(unitID, CMD.FIRE_STATE, STATIC_STATE_TABLE, 0)
 	end
 end
 
@@ -82,7 +85,8 @@ function widget:UnitDecloaked(unitID, unitDefID, teamID)
 	local states = GetUnitStates(unitID)
 	if states.firestate == 0 then
 		local targetState = cloakUnit[unitID]
-		GiveOrderToUnit(unitID, CMD.FIRE_STATE, {targetState}, {}) --revert to last state
+		STATIC_STATE_TABLE[1] = targetState
+		GiveOrderToUnit(unitID, CMD.FIRE_STATE, STATIC_STATE_TABLE, 0) --revert to last state
 		--Spring.Echo("Unit compromised - weapons free!")
 	end
 	cloakUnit[unitID] = nil

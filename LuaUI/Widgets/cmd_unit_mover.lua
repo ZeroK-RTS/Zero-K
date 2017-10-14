@@ -73,7 +73,7 @@ function widget:Update(deltaTime)
        else
          z = z - math.random(50,100)
        end
-       GiveOrderToUnit(unitID, CMD.FIGHT,  { x, y, z}, { "" })
+       GiveOrderToUnit(unitID, CMD.FIGHT,  { x, y, z},  0)
      end
    end
    moveUnits = {}

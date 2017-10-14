@@ -123,7 +123,7 @@ function RevertAllButOneAttackQueue(unitID,attackList)
 				toRemoveCount = toRemoveCount + 1
 			end
 		end
-		Spring.GiveOrderToUnit (unitID,CMD.REMOVE, queueToRemove,{})
+		Spring.GiveOrderToUnit (unitID,CMD.REMOVE, queueToRemove, 0)
 	end
 end
 

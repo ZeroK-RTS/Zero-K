@@ -522,7 +522,7 @@ function widget:GameFrame(n)
 		
 		for b = 1, #buildQueue do
 			local buildData = buildQueue[b]
-			Spring.GiveOrderToUnit(tasker, -buildData[1], {buildData[2], buildData[3], buildData[4], buildData[5]}, {"shift"})
+			Spring.GiveOrderToUnit(tasker, -buildData[1], {buildData[2], buildData[3], buildData[4], buildData[5]}, CMD.OPT_SHIFT)
 		end
 		if selDefID and UnitDefs[selDefID] and UnitDefs[selDefID].name then
 			WG.InitialActiveCommand = "buildunit_" .. UnitDefs[selDefID].name

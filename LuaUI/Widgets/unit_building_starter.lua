@@ -105,7 +105,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 		    local cz = command.params[3]
 		
 			if (abs(cx-ux) < 16) and (abs(cz-uz) < 16) then
-				spGiveOrderToUnit(unit_id, CMD_REMOVE, {command.tag}, {} )
+				spGiveOrderToUnit(unit_id, CMD_REMOVE, {command.tag}, 0 )
 			end		  
 		
 		end			

@@ -184,7 +184,7 @@ local function SendCommand()
 	
 	local a,c,m,s = spGetModKeyState()
 
-	Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+	Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, 0)
 	
 	-- if global build command is active, check if it wants to handle the orders before giving units any commands.
 	if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyRaiseAndBuild(constructor, -buildingPlacementID, pointX, pointY, pointZ, facing, s) then

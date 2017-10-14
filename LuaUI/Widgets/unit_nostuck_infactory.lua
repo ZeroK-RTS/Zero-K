@@ -34,14 +34,14 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 				--note to self: CMD.OPT_META is spacebar, CMD.OPT_INTERNAL is widget. If we use CMD.OPT_INTERNAL Spring might return unit to where it originally started but the benefit is it don't effected by Repeat state (reference: cmd_retreat.lua widget by CarRepairer).
 				if ( firstCommand.id < 0 ) and (not firstCommand.params[1] ) then --if build-unit-command (which can be accidentally given when you use Chili Integral Menu)
 					Spring.GiveOrderArrayToUnitArray( {unitID},{
-							{CMD.REMOVE, {firstCommand.tag}, {}}, --remove build-unit command since its only valid for factory & it prevent idle status from being called for regular unit (it disturb other widget's logic)
-							{CMD.INSERT, {0, CMD_RAW_MOVE, CMD.OPT_INTERNAL, x+dx, y, z+dz}, {"alt"}},   
-							{CMD.INSERT, {1, CMD.STOP, CMD.OPT_INTERNAL,}, {"alt"}}, --stop unit at end of move command (else it will return to original position).
+							{CMD.REMOVE, {firstCommand.tag}, 0}, --remove build-unit command since its only valid for factory & it prevent idle status from being called for regular unit (it disturb other widget's logic)
+							{CMD.INSERT, {0, CMD_RAW_MOVE, CMD.OPT_INTERNAL, x+dx, y, z+dz}, CMD.OPT_ALT},   
+							{CMD.INSERT, {1, CMD.STOP, CMD.OPT_INTERNAL,}, CMD.OPT_ALT}, --stop unit at end of move command (else it will return to original position).
 							})--insert move-stop command behind existing command
 				else	
 					Spring.GiveOrderArrayToUnitArray( {unitID},{
-							{CMD.INSERT, {0, CMD_RAW_MOVE, CMD.OPT_INTERNAL, x+dx, y, z+dz}, {"alt"}},   
-							{CMD.INSERT, {1, CMD.STOP, CMD.OPT_INTERNAL,}, {"alt"}}, 
+							{CMD.INSERT, {0, CMD_RAW_MOVE, CMD.OPT_INTERNAL, x+dx, y, z+dz}, CMD.OPT_ALT},   
+							{CMD.INSERT, {1, CMD.STOP, CMD.OPT_INTERNAL,}, CMD.OPT_ALT}, 
 							})
 					--Spring.Echo(CMD[firstCommand.id])
 				end
@@ -51,7 +51,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 			local x,y,z = Spring.GetUnitPosition(unitID)
 			dx = dx*100
 			dz = dz*100
-			Spring.GiveOrderToUnit( unitID, CMD_RAW_MOVE, {x+dx, y, z+dz}, {})
+			Spring.GiveOrderToUnit( unitID, CMD_RAW_MOVE, {x+dx, y, z+dz}, 0)
 		end
 		------
 	end

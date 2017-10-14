@@ -60,6 +60,8 @@ local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
 local spGetGroundHeight       = Spring.GetGroundHeight
 local spSetActiveCommand      = Spring.SetActiveCommand
 
+local EMPTY_TABLE = {}
+
 local autoCallTransportCmdDesc = {
 	id      = CMD_AUTO_CALL_TRANSPORT,
 	type    = CMDTYPE.ICON_MODE,
@@ -362,7 +364,7 @@ function RemoveUnit(unitID, unitDefID)
 		else 
 			waitingUnits[tuid] = {ST_ROUTE, spGetUnitDefID(tuid), fact}
 			if (state == ST_STOPPED) then 
-				spGiveOrderToUnit(tuid, CMD.WAIT, {}, {})
+				spGiveOrderToUnit(tuid, CMD.WAIT, EMPTY_TABLE, 0)
 			end
 		end
 		DeleteToPickTran(unitID)
@@ -371,10 +373,10 @@ function RemoveUnit(unitID, unitDefID)
 		local pom = GetToPickTransport(unitID)
 		if (pom~=0) then 
 			DeleteToPickUnit(unitID)
-			spGiveOrderToUnit(pom, CMD.STOP, {}, {})
+			spGiveOrderToUnit(pom, CMD.STOP, EMPTY_TABLE, 0)
 			
 			if toGuard[pom] then
-				spGiveOrderToUnit(pom, CMD.GUARD, {toGuard[pom]}, {})
+				spGiveOrderToUnit(pom, CMD.GUARD, {toGuard[pom]}, 0)
 			end
 		end	-- delete form toPick list
 	end
@@ -460,7 +462,7 @@ function widget:UnitIdle(unitID, unitDefID, teamID)
 			if (marked ~= 0) then	
 --				spEcho("to pick unit idle "..unitID)
 				DeleteToPickTran(marked)
-				spGiveOrderToUnit(marked, CMD.STOP, {}, {})	-- and stop it (when it becomes idle it will be assigned)
+				spGiveOrderToUnit(marked, CMD.STOP, EMPTY_TABLE, 0)	-- and stop it (when it becomes idle it will be assigned)
 			end
 		end
 	end
@@ -545,7 +547,7 @@ function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 		local useful, halting = ProcessCommand(unitID, cmdID, params, false, true)
 		local queue = Spring.GetCommandQueue(unitID, 0)
 		if useful and halting and queue >= 1 then
-			spGiveOrderToUnit(unitID, CMD_EMBARK, {}, {"alt"})
+			spGiveOrderToUnit(unitID, CMD_EMBARK, EMPTY_TABLE, CMD.OPT_ALT)
 		else
 			RemoveUnit(unitDefID, spGetUnitDefID(unitDefID))
 		end
@@ -624,7 +626,7 @@ function StopCloseUnits() -- stops dune units which are close to transport
 				end
 				if canStop then 
 					if not IsWaitCommand(unitID) then 
-						spGiveOrderToUnit(unitID, CMD.WAIT, {},{})
+						spGiveOrderToUnit(unitID, CMD.WAIT, EMPTY_TABLE, 0)
 					end 
 					toPick[transportID][2] = ST_STOPPED
 				end
@@ -692,18 +694,17 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 			if usefulCommand then
 				cnt = cnt +1
 				if cx then 
-					spGiveOrderToUnit(transportID, CMD_RAW_MOVE, {cx, cy, cz}, {"shift"})
+					spGiveOrderToUnit(transportID, CMD_RAW_MOVE, {cx, cy, cz}, CMD.OPT_SHIFT)
 					TableInsert(torev, {cx, cy, cz + 20})
 					lastX, lastY, lastZ = cx, cy, cz
 				end
 				if haltingCommand or (IsDisembark(v)) then 
 					ender = true
 					if haltingCommand then
-						local opts = {}
-						TableInsert(opts, "shift") -- appending
-						if (v.options.alt or alt)	 then TableInsert(opts, "alt")	 end
-						if (v.options.ctrl or ctrl)	then TableInsert(opts, "ctrl")	end
-						if (v.options.right or right) then TableInsert(opts, "right") end
+						local opts = CMD.OPT_SHIFT
+						if (v.options.alt or alt)	 then opts = opts + CMD.OPT_ALT	 end
+						if (v.options.ctrl or ctrl)	then opts = opts + CMD.OPT_CTRL	end
+						if (v.options.right or right) then opts = opts + CMD.OPT_RIGHT end
 						TableInsert(storedQueue[unitID], {v.id, v.params, opts})
 					end
 				end
@@ -712,42 +713,41 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 					ender = true
 				end
 				if (v.ID ~= CMD.WAIT) then
-					local opts = {}
-					TableInsert(opts, "shift") -- appending
-					if (v.options.alt or alt)	 then TableInsert(opts, "alt")	 end
-					if (v.options.ctrl or ctrl)	then TableInsert(opts, "ctrl")	end
-					if (v.options.right or right) then TableInsert(opts, "right") end
+					local opts = CMD.OPT_SHIFT
+					if (v.options.alt or alt)	 then opts = opts + CMD.OPT_ALT	 end
+					if (v.options.ctrl or ctrl)	then opts = opts + CMD.OPT_CTRL	end
+					if (v.options.right or right) then opts = opts + CMD.OPT_RIGHT end
 					TableInsert(storedQueue[unitID], {v.id, v.params, opts})
 				end
 			end
 		end
 	end
 	
-	spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
+	spGiveOrderToUnit(unitID, CMD.STOP, EMPTY_TABLE, 0)
 	
 	if lastX then 
-		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {lastX, lastY, lastZ, CONST_UNLOAD_RADIUS}, {"shift"}) --unload unit at its destination
+		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {lastX, lastY, lastZ, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT) --unload unit at its destination
 		
 		if toGuard[transportID] or ReturnToPickupLocation(unitDefID) then
 			local i = #torev
 			while (i > 0) do 
-				spGiveOrderToUnit(transportID, CMD_RAW_MOVE, torev[i], {"shift"}) -- move in zig zaq (if queued)
+				spGiveOrderToUnit(transportID, CMD_RAW_MOVE, torev[i], CMD.OPT_SHIFT) -- move in zig zaq (if queued)
 				i = i -1
 			end
 
 			local x,y,z = spGetUnitPosition(transportID)
-			spGiveOrderToUnit(transportID, CMD_RAW_MOVE, {x,y,z}, {"shift"})
+			spGiveOrderToUnit(transportID, CMD_RAW_MOVE, {x,y,z}, CMD.OPT_SHIFT)
 			
 			--unload 2nd time at loading point incase transport refuse to drop unit at the intended destination (ie: in water)
-			spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, {"shift"})
+			spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT)
 
 			if toGuard[transportID] then
-				spGiveOrderToUnit(transportID, CMD.GUARD, {toGuard[transportID]}, {"shift"})
+				spGiveOrderToUnit(transportID, CMD.GUARD, {toGuard[transportID]}, CMD.OPT_SHIFT)
 			end
 		end
 	else
 		local x,y,z = Spring.GetUnitPosition(transportID)
-		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, {"shift"}) --unload unit at its destination
+		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT) --unload unit at its destination
 	end
 end
 
@@ -755,7 +755,7 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 	if (teamID ~= myTeamID or storedQueue[unitID] == nil) then
 		return 
 	end
-	spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
+	spGiveOrderToUnit(unitID, CMD.STOP, EMPTY_TABLE, 0)
 	for i=1, #storedQueue[unitID] do
 		local x = storedQueue[unitID][i]
 		spGiveOrderToUnit(unitID, x[1], x[2], x[3])
@@ -764,7 +764,7 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 	local queue = spGetCommandQueue(unitID, 1)
 	if (queue and queue[1] and queue[1].id == CMD.WAIT) then 
 		-- workaround: clears wait order if STOP fails to do so
-		spGiveOrderToUnit(unitID, CMD.WAIT, {}, {}) 
+		spGiveOrderToUnit(unitID, CMD.WAIT, EMPTY_TABLE, 0) 
 	end 
 end
 
@@ -906,7 +906,7 @@ function AssignTransports(transportID, unitID, guardID, guardOnly)
 			end
 			waitingUnits[uid] = nil
 			idleTransports[tid] = nil
-			spGiveOrderToUnit(tid, CMD.LOAD_UNITS, {uid}, {})
+			spGiveOrderToUnit(tid, CMD.LOAD_UNITS, {uid}, 0)
 			
 			return true -- Transport was matched with the unit
 		end
@@ -1012,22 +1012,22 @@ end
 function widget:KeyPress(key, modifier, isRepeat)
 	if (key == KEYSYMS.Q and not modifier.ctrl) then
 		if (not modifier.alt) then
-			local opts = {"alt"}
-			if (modifier.shift) then TableInsert(opts, "shift") end 
+			local opts = CMD.OPT_ALT
+			if (modifier.shift) then opts = opts + CMD.OPT_SHIFT end 
 
 			for _, id in ipairs(spGetSelectedUnits()) do -- embark
 				local def = spGetUnitDefID(id)
 				if (IsTransportable(def) or UnitDefs[def].isFactory) then 
-					spGiveOrderToUnit(id, CMD.WAIT, {}, opts) 
+					spGiveOrderToUnit(id, CMD.WAIT, EMPTY_TABLE, opts) 
 					if (not UnitDefs[def].isFactory) then priorityUnits[id] = def end
 				end
 			end
 		else 
-			local opts = {"alt", "ctrl"}
-			if (modifier.shift) then TableInsert(opts, "shift") end	
+			local opts = CMD.OPT_ALT + CMD.OPT_CTRL
+			if (modifier.shift) then opts = opts + CMD.OPT_SHIFT end	
 			for _, id in ipairs(spGetSelectedUnits()) do --disembark
 				local def = spGetUnitDefID(id)
-				if (IsTransportable(def)	or UnitDefs[def].isFactory) then spGiveOrderToUnit(id, CMD.WAIT, {}, opts) end
+				if (IsTransportable(def)	or UnitDefs[def].isFactory) then spGiveOrderToUnit(id, CMD.WAIT, EMPTY_TABLE, opts) end
 			end
 
 		end

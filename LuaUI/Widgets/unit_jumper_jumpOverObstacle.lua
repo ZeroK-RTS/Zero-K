@@ -158,14 +158,14 @@ function widget:GameFrame(n)
 							cmd.params[1] == effectedUnit[unitID].cmdOne.x and
 							cmd.params[2] == effectedUnit[unitID].cmdOne.y and
 							cmd.params[3] == effectedUnit[unitID].cmdOne.z then
-								extraCmd1 = {CMD.REMOVE, {cmd.tag},{"shift"}}
+								extraCmd1 = {CMD.REMOVE, {cmd.tag}, CMD.OPT_SHIFT}
 								jumpCmdPos = i
 							end
 							if cmd.id == effectedUnit[unitID].cmdTwo.id and
 							cmd.params[1] == effectedUnit[unitID].cmdTwo.x and
 							cmd.params[2] == effectedUnit[unitID].cmdTwo.y and
 							cmd.params[3] == effectedUnit[unitID].cmdTwo.z then
-								extraCmd2 = {CMD.REMOVE, {cmd.tag},{"shift"}}
+								extraCmd2 = {CMD.REMOVE, {cmd.tag}, CMD.OPT_SHIFT}
 								jumpCmdPos = jumpCmdPos or i
 								break
 							end
@@ -203,8 +203,8 @@ function widget:GameFrame(n)
 						if totalTimeWithJump < normalPathTime then	
 							local commandArray = {[1]=nil,[2]=nil,[3]=nil,[4]=nil}
 							if (math.abs(enterPoint_X-px)>50 or math.abs(enterPoint_Z-pz)>50) then
-								commandArray[1]= {CMD.INSERT, {0, CMD_RAW_MOVE, CMD.OPT_INTERNAL, enterPoint_X,enterPoint_Y,enterPoint_Z}, {"alt"}}
-								commandArray[2]= {CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, exitPoint_X,exitPoint_Y,exitPoint_Z}, {"alt"}}
+								commandArray[1]= {CMD.INSERT, {0, CMD_RAW_MOVE, CMD.OPT_INTERNAL, enterPoint_X,enterPoint_Y,enterPoint_Z}, CMD.OPT_ALT}
+								commandArray[2]= {CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, exitPoint_X,exitPoint_Y,exitPoint_Z}, CMD.OPT_ALT}
 								commandArray[3]= extraCmd2
 								commandArray[4]= extraCmd1
 								effectedUnit[unitID].cmdCount = 2
@@ -218,7 +218,7 @@ function widget:GameFrame(n)
 								effectedUnit[unitID].cmdTwo.z = exitPoint_Z
 								issuedOrderTo[unitID] = {CMD_RAW_MOVE,enterPoint_X,enterPoint_Y,enterPoint_Z}
 							else
-								commandArray[1]= {CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, exitPoint_X,exitPoint_Y,exitPoint_Z}, {"alt"}}
+								commandArray[1]= {CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, exitPoint_X,exitPoint_Y,exitPoint_Z}, CMD.OPT_ALT}
 								commandArray[2]= extraCmd2
 								commandArray[3]= extraCmd1
 								effectedUnit[unitID].cmdCount = 1

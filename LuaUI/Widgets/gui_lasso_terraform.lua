@@ -303,7 +303,7 @@ local function SendCommand()
 			i = i + 1
 		end
 		
-		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, 0)
 		if s then
 			originalCommandGiven = true
 		else
@@ -334,7 +334,7 @@ local function SendCommand()
 			i = i + 1
 		end
 		
-		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, 0)
 		if s then
 			originalCommandGiven = true
 		else
