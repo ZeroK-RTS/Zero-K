@@ -366,15 +366,12 @@ local function TabListsAreIdentical(newTabList, tabList)
 end
 
 local prevClass
-local prevRightPadding, prevLeftPadding
 
 local function UpdateBackgroundSkin()
 	local currentSkin = Chili.theme.skin.general.skinName
 	local skin = Chili.SkinHandler.GetSkin(currentSkin)
 	
-	local newClass = skin.panel
-	local newRightPadding = 0
-	local newLeftPadding = 0
+	local newClass
 	
 	if options.fancySkinning.value then
 		local selectedCount = Spring.GetSelectedUnitsCount()
@@ -387,21 +384,10 @@ local function UpdateBackgroundSkin()
 		else
 			if options.flushLeft.value then
 				newClass = skin.panel_0110
-				newLeftPadding = options.leftPadding.value
 			else
 				newClass = skin.panel_1100
-				newRightPadding = options.rightPadding.value
 			end
 		end
-	end
-	
-	if prevRightPadding ~= newRightPadding or prevLeftPadding ~= newLeftPadding then
-		background._relativeBounds.left = newLeftPadding
-		background._givenBounds.left = newLeftPadding
-		background._relativeBounds.right = newRightPadding
-		background:UpdateClientArea()
-		prevRightPadding = newRightPadding
-		prevLeftPadding = newLeftPadding
 	end
 	
 	newClass = newClass or skin.panel
