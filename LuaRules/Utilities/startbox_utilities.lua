@@ -1,6 +1,3 @@
-function cross_product (px, pz, ax, az, bx, bz)
-	return ((px - bx)*(az - bz) - (ax - bx)*(pz - bz))
-end
 
 local function SanitizeBoxes (boxes)
 
@@ -41,7 +38,7 @@ local function SanitizeBoxes (boxes)
 					}
 
 					-- make sure the ear is of proper rotation but then make it counter-clockwise
-					local dir = cross_product(triangle[5], triangle[6], triangle[1], triangle[2], triangle[3], triangle[4])
+					local dir = math.cross_product(triangle[5], triangle[6], triangle[1], triangle[2], triangle[3], triangle[4])
 					if ((dir < 0) == clockwise) then
 						if dir > 0 then
 							local temp = triangle[5]
@@ -57,9 +54,9 @@ local function SanitizeBoxes (boxes)
 						for i = 1, #polygon do
 							if (i ~= c0 and i ~= c1 and i ~= c2) then
 								local current_pt = polygon[i]
-								if  (cross_product(current_pt[1], current_pt[2], triangle[1], triangle[2], triangle[3], triangle[4]) < 0)
-								and (cross_product(current_pt[1], current_pt[2], triangle[3], triangle[4], triangle[5], triangle[6]) < 0)
-								and (cross_product(current_pt[1], current_pt[2], triangle[5], triangle[6], triangle[1], triangle[2]) < 0)
+								if  (math.cross_product(current_pt[1], current_pt[2], triangle[1], triangle[2], triangle[3], triangle[4]) < 0)
+								and (math.cross_product(current_pt[1], current_pt[2], triangle[3], triangle[4], triangle[5], triangle[6]) < 0)
+								and (math.cross_product(current_pt[1], current_pt[2], triangle[5], triangle[6], triangle[1], triangle[2]) < 0)
 								then
 									candidate_ok = false
 								end

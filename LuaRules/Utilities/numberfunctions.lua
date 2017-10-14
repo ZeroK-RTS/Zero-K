@@ -6,7 +6,9 @@ function math.round(num, idp)
 	return ("%." .. (((num==0) and 0) or idp or 0) .. "f"):format(num)
 end
 
-
+function math.cross_product (px, pz, ax, az, bx, bz)
+	return ((px - bx)*(az - bz) - (ax - bx)*(pz - bz))
+end
 
 local abs						= math.abs
 local strFormat 				= string.format

@@ -183,9 +183,9 @@ local function CheckStartbox (boxID, x, z)
 
 	for i = 1, #box do
 		local x1, z1, x2, z2, x3, z3 = unpack(box[i])
-		if (cross_product(x, z, x1, z1, x2, z2) <= 0
-		and cross_product(x, z, x2, z2, x3, z3) <= 0
-		and cross_product(x, z, x3, z3, x1, z1) <= 0
+		if (math.cross_product(x, z, x1, z1, x2, z2) <= 0
+		and math.cross_product(x, z, x2, z2, x3, z3) <= 0
+		and math.cross_product(x, z, x3, z3, x1, z1) <= 0
 		) then
 			return true
 		end
