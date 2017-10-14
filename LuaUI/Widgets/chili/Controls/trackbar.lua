@@ -23,10 +23,10 @@ local inherited = this.inherited
 
 local strFormat = string.format
 local function FormatNum(num, precFormat)
-  if (num == 0) then
-    return "0"
-  elseif precFormat then
+  if precFormat then
 	return strFormat(precFormat, num)
+  elseif (num == 0) then
+    return "0"
   else
     local absNum = math.abs(num)
     if (absNum < 0.01) then
