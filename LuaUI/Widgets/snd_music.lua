@@ -309,6 +309,7 @@ function widget:GameStart()
 	if not gameStarted then
 		gameStarted = true
 		previousTrackType = musicType
+		musicType = "peace"
 		StartTrack()
 	end
 	
