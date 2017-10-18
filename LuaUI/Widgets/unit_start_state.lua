@@ -31,6 +31,18 @@ local function IsGround(ud)
     return not ud.canFly and not ud.isFactory
 end
 
+local impulseUnitDefID = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	for _, w in pairs(ud.weapons) do
+		local wd = WeaponDefs[w.weaponDef]
+		if wd.customParams and wd.customParams.impulse then
+			impulseUnitDefID[i] = true
+			break
+		end
+	end
+end
+
 local function GetDefaultSelectionRank(ud)
 	if (ud.isImmobile or ud.speed == 0) and not ud.isFactory then
 		return 1
@@ -703,15 +715,27 @@ local function addUnit(defName, path)
 	end
 
 	if ud.onOffable then
-		options[defName .. "_activateWhenBuilt"] = {
-			name = "  On/Off State",
-			desc = "Check box to set the unit to On when built.",
-			type = 'bool',
-			value = ud.activateWhenBuilt,
-			path = path,
-			noHotkey = true,
-		}
-		options_order[#options_order+1] = defName .. "_activateWhenBuilt"
+		if impulseUnitDefID[ud.id] then
+			options[defName .. "_impulseMode"] = {
+				name = "  Gravity Gun Push/Pull",
+				desc = "Check box to default to Push.",
+				type = 'bool',
+				value = true,
+				path = path,
+				noHotkey = true,
+			}
+			options_order[#options_order+1] = defName .. "_impulseMode"
+		else
+			options[defName .. "_activateWhenBuilt"] = {
+				name = "  On/Off State",
+				desc = "Check box to set the unit to On when built.",
+				type = 'bool',
+				value = ud.activateWhenBuilt,
+				path = path,
+				noHotkey = true,
+			}
+			options_order[#options_order+1] = defName .. "_activateWhenBuilt"
+		end
 	end
 end
 
@@ -1024,6 +1048,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		
 		QueueState(name, "fire_at_radar", CMD_DONT_FIRE_AT_RADAR, orderArray, true)
 		QueueState(name, "personal_cloak_0", CMD_WANT_CLOAK, orderArray)
+		QueueState(name, "impulseMode", CMD_PUSH_PULL, orderArray)
 	end
 
 	if #orderArray>0 then

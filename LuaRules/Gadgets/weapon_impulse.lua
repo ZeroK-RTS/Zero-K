@@ -50,7 +50,6 @@ local CMD_GUARD = CMD.GUARD
 local CMD_STOP = CMD.STOP
 local CMD_ONOFF = CMD.ONOFF
 
-
 --local BALLISTIC_GUNSHIP_GRAVITY = -0.2
 --local BALLISTIC_GUNSHIP_HEIGHT = 600000
 
@@ -73,6 +72,7 @@ local pushPullCmdDesc = {
 	params  = {0, 'Push','Pull'}
 }
 
+local pushPullState = {}
 
 local impulseWeaponID = {}
 for i, wd in pairs(WeaponDefs) do
@@ -300,17 +300,27 @@ end
 --------------------------------------------------------------------------------
 -- Command Handling
 
-local function PushPullToggleCommand(unitID, unitDefID, cmdParams, cmdOptions)
+local function PushPullToggleCommand(unitID, unitDefID, state)
 	if not impulseUnitDefID[unitDefID] then
 		return
 	end
-
-	local state = cmdParams[1]
 	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PUSH_PULL)
-
-	if (cmdDescID) then
-		pushPullCmdDesc.params[1] = state
-		spEditUnitCmdDesc(unitID, cmdDescID, { params = pushPullCmdDesc.params})
+	if not cmdDescID then
+		return
+	end
+	
+	if state then
+		if state ~= pushPullState[unitID] then
+			pushPullState[unitID] = state
+			pushPullCmdDesc.params[1] = state
+			spEditUnitCmdDesc(unitID, cmdDescID, {params = pushPullCmdDesc.params})
+		end
+	else
+		state = pushPullState[unitID]
+	end
+	
+	if state then
+		spGiveOrderToUnit(unitID, CMD_ONOFF, {state, CMD_PUSH_PULL},{})
 	end
 end
 
@@ -329,8 +339,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if (cmdID ~= CMD_PUSH_PULL) then
 		return true  -- command was not used
 	end
-	PushPullToggleCommand(unitID, unitDefID, cmdParams, cmdOptions)
-	spGiveOrderToUnit(unitID, CMD_ONOFF, {cmdParams[1], CMD_PUSH_PULL},{})
+	PushPullToggleCommand(unitID, unitDefID, cmdParams[1])
 	return false  -- command was used
 end
 
@@ -353,6 +362,16 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	inTransport[unitID] = nil
+	if impulseUnitDefID[unitDefID] then
+		pushPullState[unitID] = nil
+	end
+end
+
+function gadget:UnitFinished(unitID, unitDefID, teamID)
+	if not impulseUnitDefID[unitDefID] then
+		return
+	end
+	PushPullToggleCommand(unitID, unitDefID)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
@@ -361,7 +380,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 
 	spInsertUnitCmdDesc(unitID, pushPullCmdDesc)
-	PushPullToggleCommand(unitID, unitDefID, {1}, {})
+	PushPullToggleCommand(unitID, unitDefID, 1)
 	local onoffDescID = spFindUnitCmdDesc(unitID, CMD_ONOFF)
 	spRemoveUnitCmdDesc(unitID, onoffDescID)
 end
