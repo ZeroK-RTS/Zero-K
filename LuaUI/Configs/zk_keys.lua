@@ -6,7 +6,7 @@ return {
 	["date"] = 20130630,
 
 
-	-- all default ZK keybinds. 
+	-- all default ZK keybinds.
 	["keybinds"] = {
 		{	"togglecammode",	"Ctrl+backspace",},
 		{	"togglecammode",	"Shift+backspace",},
@@ -14,25 +14,25 @@ return {
 		{	"toggleoverview",	"Ctrl+tab",},
 		{	"edit_complete",	"Any+tab",},
 		{
-			"chatally", 			{"Alt+enter", "Alt+numpad_enter"}, 
-		}, 
+			"chatally", 			{"Alt+enter", "Alt+numpad_enter"},
+		},
 		{
-			"chatswitchally", 			{"Alt+enter", "Alt+numpad_enter"}, 
-		}, 
+			"chatswitchally", 			{"Alt+enter", "Alt+numpad_enter"},
+		},
 		{
-			"chatall", 			{"Ctrl+enter", "Ctrl+numpad_enter"}, 
-		}, 
+			"chatall", 			{"Ctrl+enter", "Ctrl+numpad_enter"},
+		},
 		{
-			"chatswitchall", 			{"Ctrl+enter", "Ctrl+numpad_enter"}, 
-		}, 
+			"chatswitchall", 			{"Ctrl+enter", "Ctrl+numpad_enter"},
+		},
 		{	"chatspec",	"None"},
 		{	"chatswitchspec",	"None"},
 		{
-			"chat", 			{"Any+enter", "Any+numpad_enter"}, 
-		}, 
+			"chat", 			{"Any+enter", "Any+numpad_enter"},
+		},
 		{
-			"edit_return", 			{"Any+enter", "Any+numpad_enter"}, 
-		}, 
+			"edit_return", 			{"Any+enter", "Any+numpad_enter"},
+		},
 		{	"pause",	"pause",},
 		{	"crudemenu",	"esc",},
 		{	"exitwindow",	"shift+esc",},
@@ -88,8 +88,8 @@ return {
 		{	"areaattack",	"Alt+a",},
 		{	"debug",	"Alt+n",},
 		{	"debugcolvol",	"Alt+b",},
-		{	"repeat",	"ctrl+r"}, 
-		{	"priority", "ctrl+q"}, 
+		{	"repeat",	"ctrl+r"},
+		{	"priority", "ctrl+q"},
 		{	"selfd",	"C+d",},
 		{	"selectcomm",	"ctrl+c",},
 		{	"manualfire",	"d",},
@@ -118,6 +118,7 @@ return {
 		{	"wait",	"ctrl+w",},
 		{	"areamex",	"w",},
 		{	"onoff",	"o",},
+		{	"pushpull",	"o",},
 		{	"buildspacing dec",	"Any+x",},
 		{	"buildspacing inc",	"Any+z",},
 		{	"edit_delete",	"Any+delete",},
@@ -157,7 +158,7 @@ return {
 		{	"luaui tweakgui",	"C+f11",},
 		{	"epic_chili_widget_selector_widgetlist_2",	"alt+f11",},
 		{	"screenshot png",	"f12",},
-		{	"screenshot jpg", "ctrl+f12"}, 
+		{	"screenshot jpg", "ctrl+f12"},
 		{	"resurrect",	"t",},
 		{	"jump",	"j",},
 		{	"select AllMap++_ClearSelection_SelectAll+",	"ctrl+a",},
@@ -178,7 +179,7 @@ return {
 		{	"epic_chili_integral_menu_tab_units",	"any+n",},
 		{	"exitwindow",	"s+escape",},
 		{	"crudesubmenu",	"f10"},
-		{	"epic_chili_pro_console_enableconsole", "f8"}, 
+		{	"epic_chili_pro_console_enableconsole", "f8"},
 		{	"epic_chili_share_menu_v1.22_sharemenu", "tab"},
 	},
 }

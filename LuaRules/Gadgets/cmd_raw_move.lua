@@ -57,6 +57,7 @@ local rawBuildUpdateIgnore = {
 	[CMD_ABANDON_PW] = true,
 	[CMD_RECALL_DRONES] = true,
 	[CMD_UNIT_KILL_SUBORDINATES] = true,
+	[CMD_PUSH_PULL] = true,
 	[CMD_UNIT_AI] = true,
 	[CMD_WANT_CLOAK] = true,
 	[CMD_DONT_FIRE_AT_RADAR] = true,
@@ -107,7 +108,7 @@ for i = 1, #UnitDefs do
 		if ud.isMobileBuilder and (not ud.isAirUnit) then
 			constructorBuildDistDefs[i] = math.max(50, ud.buildDistance  - 10)
 		end
-		
+
 		canMoveDefs[i] = true
 		local stopDist = ud.xsize*8
 		local loneStopDist = 16
@@ -214,15 +215,15 @@ local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distance, testSpacing, dist
 		return true
 	end
 	vX, vZ = vX/distance, vZ/distance
-	
+
 	if goalDistance then
 		distance = distance - goalDistance
 	end
-	
+
 	if distanceLimit and (distance > distanceLimit) then
 		distance = distanceLimit
 	end
-	
+
 	for test = 0, distance, testSpacing do
 		if not Spring.TestMoveOrder(unitDefID, sX + test*vX, 0, sZ + test*vZ) then
 			return false
@@ -280,10 +281,10 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		end
 		return true, false
 	end
-	
+
 	local x, y, z = spGetUnitPosition(unitID)
 	local distSq = (x - cmdParams[1])*(x - cmdParams[1]) + (z - cmdParams[3])*(z - cmdParams[3])
-	
+
 	if not unitData.cx then
 		unitData.cx, unitData.cz = cmdParams[1], cmdParams[3]
 		unitData.commandString = cmdParams[1] .. "_" .. cmdParams[3]
@@ -296,13 +297,13 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	if unitData.commandString and not commandCount[unitData.commandString] then
 		commandCount[unitData.commandString] = oldCommandCount[unitData.commandString] or 1
 	end
-	
+
 	local alone = (commandCount[unitData.commandString] <= 1)
 	local myStopDistSq = (goalDistOverride and goalDistOverride*goalDistOverride) or (alone and loneStopDistSq[unitDefID]) or stopDistSq[unitDefID] or 256
 	if unitData.preventGoalClumping then
 		myStopDistSq = myStopDistSq + commonStopRadius[unitData.commandString]
 	end
-	
+
 	if distSq < myStopDistSq then
 		Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
 		if unitData.preventGoalClumping then
@@ -314,7 +315,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		rawMoveUnit[unitID] = nil
 		return true, true
 	end
-	
+
 	if canFlyDefs[unitDefID] then
 		if unitData.commandHandled then
 			return true, false
@@ -324,16 +325,16 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		Spring.SetUnitMoveGoal(unitID, cmdParams[1],cmdParams[2],cmdParams[3], goalDistOverride or goalDist[unitDefID] or 16, nil, false)
 		return true, false
 	end
-	
+
 	if not unitData.stuckCheckTimer then
 		unitData.ux, unitData.uz = x, z
 		unitData.stuckCheckTimer = (startMovingTime[unitDefID] or 8)
 		if distSq > GIVE_UP_STUCK_DIST_SQ then
-			unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*8) 
+			unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*8)
 		end
 	end
 	unitData.stuckCheckTimer = unitData.stuckCheckTimer - timerIncrement
-	
+
 	if unitData.stuckCheckTimer <= 0 then
 		local oldX, oldZ = unitData.ux, unitData.uz
 		local travelled = math.abs(oldX - x) + math.abs(oldZ - z)
@@ -358,11 +359,11 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		else
 			unitData.stuckCheckTimer = 4 + math.min(6, math.floor(distSq/500))
 			if distSq > GIVE_UP_STUCK_DIST_SQ then
-				unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*10) 
+				unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*10)
 			end
 		end
 	end
-	
+
 	if unitData and unitData.switchedFromRaw then
 		if unitData.nextRawCheckDistSq and (unitData.nextRawCheckDistSq > distSq) then
 			unitData.switchedFromRaw = nil
@@ -371,7 +372,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 			return true, false
 		end
 	end
-	
+
 	unitData.nextTestTime = (unitData.nextTestTime or 0) - timerIncrement
 	if unitData.nextTestTime <= 0 then
 		local lazy = unitData.doingRawMove
@@ -395,11 +396,11 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		else
 			unitData.nextTestTime = math.floor(math.random()*5) + 6
 		end
-		
+
 		unitData.doingRawMove = freePath
 		unitData.switchedFromRaw = not freePath
 	end
-	
+
 	if not unitData.commandHandled then
 		unitData.commandHandled = true
 	end
@@ -440,13 +441,13 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		moveCommandReplacementUnits = moveCommandReplacementUnits or {}
 		moveCommandReplacementUnits[#moveCommandReplacementUnits + 1] = unitID
 	end
-	
+
 	if constructorBuildDistDefs[unitDefID] and not rawBuildUpdateIgnore[cmdID] then
 		fastConstructorUpdate = fastConstructorUpdate or {}
 		fastConstructorUpdate[#fastConstructorUpdate + 1] = unitID
 		--Spring.Utilities.UnitEcho(unitID, cmdID)
 	end
-	
+
 	if canMoveDefs[unitDefID] then
 		if cmdID == CMD_STOP or ((not cmdOptions.shift) and (cmdID < 0 or stopCommand[cmdID])) then
 			StopRawMoveUnit(unitID)
@@ -478,11 +479,11 @@ local function GetConstructorCommandPos(cmd, secondCmd)
 	if not cmd then
 		return false
 	end
-	
+
 	if cmd.id < 0 then
 		return cmd.params[1], cmd.params[2], cmd.params[3]
 	end
-	
+
 	if cmd.id == CMD_REPAIR then
 		if cmd.params and (#cmd.params == 5 or #cmd.params == 1) then
 			local unitID = cmd.params[1]
@@ -496,7 +497,7 @@ local function GetConstructorCommandPos(cmd, secondCmd)
 			end
 		end
 	end
-	
+
 	if cmd.id == CMD_RECLAIM then
 		if cmd.params and (#cmd.params == 5 or #cmd.params == 1) then
 			local x, y, z = Spring.GetFeaturePosition(cmd.params[1] - MAX_UNITS)
@@ -518,9 +519,9 @@ local function CheckConstructorBuild(unitID)
 	end
 	local cmd = queue[1]
 	local secondCmd = queue[2]
-	
+
 	local cx, cy, cz = GetConstructorCommandPos(cmd, secondCmd)
-	
+
 	if cmd and cmd.id == CMD_RAW_BUILD then
 		if (not cx) or math.abs(cx - cmd.params[1]) > 3 or math.abs(cz - cmd.params[3]) > 3 then
 			Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmd.tag}, {})
@@ -528,7 +529,7 @@ local function CheckConstructorBuild(unitID)
 		end
 		return
 	end
-	
+
 	if cx then
 		local x,_,z = Spring.GetUnitPosition(unitID)
 		local buildDistSq = (buildDist + 30)^2
@@ -544,20 +545,20 @@ local function AddConstructor(unitID, buildDist)
 	constructors[constructorCount] = unitID
 	constructorBuildDist[unitID] = buildDist
 	constructorByID[unitID] = constructorCount
-	
+
 	constructorsPerFrame = math.ceil(constructorCount/CONSTRUCTOR_UPDATE_RATE)
 end
 
 local function RemoveConstructor(unitID)
 	local index = constructorByID[unitID]
 	constructorByID[unitID] = nil
-	
+
 	constructors[index] = constructors[constructorCount]
 	constructorBuildDist[unitID] = nil
 	constructorByID[constructors[constructorCount] ] = index
 	constructors[constructorCount] = nil
 	constructorCount = constructorCount - 1
-	
+
 	constructorsPerFrame = math.ceil(constructorCount/CONSTRUCTOR_UPDATE_RATE)
 end
 
@@ -565,7 +566,7 @@ local function UpdateConstructors(n)
 	if n%CONSTRUCTOR_UPDATE_RATE == 0 then
 		constructorIndex = 1
 	end
-	
+
 	local fastUpdates
 	if fastConstructorUpdate then
 		fastUpdates = {}
@@ -578,7 +579,7 @@ local function UpdateConstructors(n)
 		end
 		fastConstructorUpdate = nil
 	end
-	
+
 	local count = 0
 	while constructors[constructorIndex] and count < constructorsPerFrame do
 		if not (fastUpdates and fastUpdates[unitID]) then
@@ -606,7 +607,7 @@ local function UpdateMoveReplacement()
 	if not moveCommandReplacementUnits then
 		return
 	end
-	
+
 	local fastUpdates = {}
 	for i = 1, #moveCommandReplacementUnits do
 		local unitID = moveCommandReplacementUnits[i]
@@ -637,14 +638,14 @@ function gadget:Initialize()
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
 	end
-	
+
 	GG.AddRawMoveUnit = AddRawMoveUnit
 	GG.StopRawMoveUnit = StopRawMoveUnit
 	GG.RawMove_IsPathFree = RawMove_IsPathFree
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if (canMoveDefs[unitDefID]) then 
+	if (canMoveDefs[unitDefID]) then
 		spInsertUnitCmdDesc(unitID, moveRawCmdDesc)
 	end
 	if constructorBuildDistDefs[unitDefID] and not constructorByID[unitID] then
@@ -665,7 +666,7 @@ function gadget:GameFrame(n)
 	if n%247 == 4 then
 		oldCommandStoppingRadius = commonStopRadius
 		commonStopRadius = {}
-		
+
 		oldCommandCount = commandCount
 		commandCount = {}
 	end
@@ -689,7 +690,7 @@ function gadget:DefaultCommand(targetType, targetID)
 end
 
 function gadget:Initialize()
-	--Note: IMO we must *allow* LUAUI to draw this command. We already used to seeing skirm command, and it is informative to players. 
+	--Note: IMO we must *allow* LUAUI to draw this command. We already used to seeing skirm command, and it is informative to players.
 	--Also, its informative to widget coder and allow player to decide when to manually micro units (like seeing unit stuck on cliff with jink command)
 	gadgetHandler:RegisterCMDID(CMD_RAW_MOVE)
 	Spring.SetCustomCommandDrawData(CMD_RAW_MOVE, "RawMove", {0.5, 1.0, 0.5, 0.7}) -- "" mean there's no MOVE cursor if the command is drawn.

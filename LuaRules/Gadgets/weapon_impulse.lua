@@ -20,6 +20,7 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+include("LuaRules/Configs/customcmds.h.lua")
 
 local GRAVITY = Game.gravity
 local GRAVITY_BASELINE = 120
@@ -29,18 +30,25 @@ local UNSTICK_CONSTANT = 4
 local spSetUnitVelocity = Spring.SetUnitVelocity
 local spAddUnitImpulse = Spring.AddUnitImpulse
 local spGetUnitDefID = Spring.GetUnitDefID
+local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitStates = Spring.GetUnitStates
 local spGetCommandQueue = Spring.GetCommandQueue
+local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
+local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
+local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
+local spRemoveUnitCmdDesc   = Spring.RemoveUnitCmdDesc
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local getMovetype = Spring.Utilities.getMovetype
+local abs = math.abs
+
 local CMD_IDLEMODE = CMD.IDLEMODE
 local CMD_REPEAT = CMD.REPEAT
 local CMD_GUARD = CMD.GUARD
 local CMD_STOP = CMD.STOP
-local spGiveOrderToUnit = Spring.GiveOrderToUnit
-local abs = math.abs
-local getMovetype = Spring.Utilities.getMovetype
+local CMD_ONOFF = CMD.ONOFF
 
 
 --local BALLISTIC_GUNSHIP_GRAVITY = -0.2
@@ -55,15 +63,26 @@ local impulseMult = {
 	[1] = 0.004, -- gunships
 	[2] = 0.0036, -- other
 }
+
+local pushPullCmdDesc = {
+	id      = CMD_PUSH_PULL,
+	type    = CMDTYPE.ICON_MODE,
+	name    = 'Push / Pull',
+	action  = 'pushpull',
+	tooltip = 'Toggles whether gravity weapons push or pull',
+	params  = {0, 'Push','Pull'}
+}
+
+
 local impulseWeaponID = {}
 for i, wd in pairs(WeaponDefs) do
 	if wd.customParams and wd.customParams.impulse then
 		impulseWeaponID[wd.id] = {
-			impulse = tonumber(wd.customParams.impulse), 
+			impulse = tonumber(wd.customParams.impulse),
 			normalDamage = (wd.customParams.normaldamage and true or false),
 			checkLOS = true
 		}
-		
+
 		if wd.customParams.impulsemaxdepth and wd.customParams.impulsedepthmult then
 			impulseWeaponID[wd.id].impulseMaxDepth = -tonumber(wd.customParams.impulsemaxdepth)
 			impulseWeaponID[wd.id].impulseDepthMult = -tonumber(wd.customParams.impulsedepthmult)
@@ -73,11 +92,18 @@ end
 
 local moveTypeByID = {}
 local mass = {}
+local impulseUnitDefID = {}
 
 for i=1,#UnitDefs do
 	local ud = UnitDefs[i]
 	mass[i] = ud.mass
 	moveTypeByID[i] = getMovetype(ud)
+
+	for _, w in pairs(ud.weapons) do
+		if impulseWeaponID[w.weaponDef] then
+			impulseUnitDefID[i] = true
+		end
+	end
 end
 
 -------------------------------------------------------------------------------------
@@ -157,7 +183,7 @@ local function AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, uni
 end
 
 
-local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, pushOffGround, useDummy, myImpulseMult, unitDefID, moveType) 
+local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, pushOffGround, useDummy, myImpulseMult, unitDefID, moveType)
 	if inTransport[unitID] then
 		if not affectTransporter then
 			return
@@ -167,23 +193,23 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, p
 	else
 		unitDefID = unitDefID or spGetUnitDefID(unitID)
 	end
-	
+
 	if not moveTypeByID[unitDefID] then
 		return
 	end
-	
+
 	local _, _, inbuild = Spring.GetUnitIsStunned(unitID)
 	if inbuild then
 		return
 	end
-	
+
 	local dis = math.sqrt(x^2 + y^2 + z^2)
-	
+
 	myImpulseMult = myImpulseMult or {1,1,1}
-	
+
 	local myMass = Spring.GetUnitRulesParam(unitID, "massOverride") or mass[unitDefID]
 	local mag = magnitude*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]*myImpulseMult[moveTypeByID[unitDefID]+1]/myMass
-	
+
 	if moveTypeByID[unitDefID] == 0 then
 		x,y,z = x*mag, y*mag, z*mag
 	elseif moveTypeByID[unitDefID] == 1 then
@@ -194,9 +220,9 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, p
 		pushOffGround = pushOffGround and IsUnitOnGround(unitID)
 		GG.AddSphereicalLOSCheck(unitID, unitDefID)
 	end
-	
+
 	AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, unitDefID, moveType)
-	
+
 	--if moveTypeByID[unitDefID] == 1 and attackerTeam and spAreTeamsAllied(unitTeam, attackerTeam) then
 	--	unit[unitID].allied	= true
 	--end
@@ -229,12 +255,12 @@ local function CheckSpaceGunships(f)
 		local unitID = risingByID.data[i]
 		local data = rising[unitID]
 		local removeEntry = false
-		
+
 		if Spring.ValidUnitID(unitID) then
-		
+
 			local _,_,_, ux, uy, uz = spGetUnitPosition(unitID, true)
 			local groundHeight = spGetGroundHeight(ux,uz)
-			
+
 			if (uy-groundHeight) > BALLISTIC_GUNSHIP_HEIGHT then
 				if not data.inSpace then
 					--Spring.SetUnitRulesParam(unitID, "inSpace", 1)
@@ -256,7 +282,7 @@ local function CheckSpaceGunships(f)
 		else
 			removeEntry = false
 		end
-		
+
 		if removeEntry then
 			risingByID.data[i] = risingByID.data[risingByID.count]
 			risingByID.data[risingByID.count] = nil
@@ -268,15 +294,56 @@ local function CheckSpaceGunships(f)
 	end
 end
 --]]
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Command Handling
+
+local function PushPullToggleCommand(unitID, unitDefID, cmdParams, cmdOptions)
+	if not impulseUnitDefID[unitDefID] then
+		return
+	end
+
+	local state = cmdParams[1]
+	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PUSH_PULL)
+
+	if (cmdDescID) then
+		pushPullCmdDesc.params[1] = state
+		spEditUnitCmdDesc(unitID, cmdDescID, { params = pushPullCmdDesc.params})
+	end
+end
+
+function gadget:AllowCommand_GetWantedCommand()
+	return {[CMD_PUSH_PULL] = true, [CMD_ONOFF] = true}
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()
+	return impulseUnitDefID
+end
+
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if (cmdID == CMD_ONOFF) then
+		return cmdParams[2] == CMD_PUSH_PULL -- we block any on/off that we didn't call ourselves
+	end
+	if (cmdID ~= CMD_PUSH_PULL) then
+		return true  -- command was not used
+	end
+	PushPullToggleCommand(unitID, unitDefID, cmdParams, cmdOptions)
+	spGiveOrderToUnit(unitID, CMD_ONOFF, {cmdParams[1], CMD_PUSH_PULL},{})
+	return false  -- command was used
+end
+
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
--- Transport Handling
+-- Unit Handling
 
 function gadget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
 	if Spring.ValidUnitID(unitID) and not Spring.GetUnitIsDead(transportID) then
 		spSetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
 	end
-	
+
 	inTransport[unitID] = nil
 end
 
@@ -288,16 +355,31 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	inTransport[unitID] = nil
 end
 
+function gadget:UnitCreated(unitID, unitDefID, teamID)
+	if not impulseUnitDefID[unitDefID] then
+		return
+	end
+
+	spInsertUnitCmdDesc(unitID, pushPullCmdDesc)
+	PushPullToggleCommand(unitID, unitDefID, {1}, {})
+	local onoffDescID = spFindUnitCmdDesc(unitID, CMD_ONOFF)
+	spRemoveUnitCmdDesc(unitID, onoffDescID)
+end
+
 function gadget:Initialize()
 	-- load active units
-	for _, transportID in ipairs(Spring.GetAllUnits()) do
-		local transporting = Spring.GetUnitIsTransporting(transportID)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = spGetUnitDefID(unitID)
+		local teamID = spGetUnitTeam(unitID)
+		gadget:UnitCreated(unitID, unitDefID, teamID)
+
+		local transporting = Spring.GetUnitIsTransporting(unitID)
 		if transporting then
 			for i = 1, #transporting do
-				local unitID = transporting[i]
-				local unitDefID = spGetUnitDefID(unitID)
-				if unitDefID then
-					gadget:UnitLoaded(unitID, unitDefID, nil, transportID, nil)
+				local transporteeID = transporting[i]
+				local transporteeDefID = spGetUnitDefID(transporteeID)
+				if transporteeDefID then
+					gadget:UnitLoaded(transporteeID, transporteeDefID, nil, unitID, nil)
 				end
 			end
 		end
@@ -318,7 +400,7 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 		if impulseWeaponID[wdid] then
 			wantedWeaponList[#wantedWeaponList + 1] = wdid
 		end
-	end 
+	end
 	return wantedWeaponList
 end
 
@@ -328,10 +410,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local defData = impulseWeaponID[weaponDefID]
 		local _,_,_,ux, uy, uz = spGetUnitPosition(unitID, true)
 		local_,_,_,ax, ay, az = spGetUnitPosition(attackerID, true)
-		
+
 		local x,y,z = (ux-ax), (uy-ay), (uz-az)
 		local magnitude = defData.impulse
-		
+
 		if defData.impulseMaxDepth then
 			local depth = spGetGroundHeight(ax,az)
 			if depth < 0 then
@@ -341,13 +423,13 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 				magnitude = magnitude + depth*defData.impulseDepthMult
 			end
 		end
-		
-		AddGadgetImpulse(unitID, x, y, z, magnitude, true, false, true, false, unitDefID) 
-		
+
+		AddGadgetImpulse(unitID, x, y, z, magnitude, true, false, true, false, unitDefID)
+
 		if defData.selfImpulse then
-			AddGadgetImpulse(attackerID, x, y, z, -magnitude, true, false, true, false, unitDefID) 
+			AddGadgetImpulse(attackerID, x, y, z, -magnitude, true, false, true, false, unitDefID)
 		end
-		
+
 		if defData.normalDamage then
 			return damage
 		else
@@ -366,13 +448,13 @@ local function AddImpulses()
 				local vx, vy, vz = spGetUnitVelocity(unitID)
 				if vx then
 					spSetUnitVelocity(unitID, vx + data.x, vy + data.y, vz + data.z)
-					
+
 					--if data.allied then
 						local cQueue = spGetCommandQueue(unitID,1)
 						if #cQueue >= 1 and cQueue[1].id == CMD_GUARD then
 							spGiveOrderToUnit(unitID, CMD_STOP, {0},{})
 						end
-						
+
 						local states = spGetUnitStates(unitID)
 						if states["repeat"] then
 							spGiveOrderToUnit(unitID, CMD_REPEAT, {0},{})
