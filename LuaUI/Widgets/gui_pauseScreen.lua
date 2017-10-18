@@ -144,7 +144,7 @@ end
 
 
 function widget:Initialize()
-	myFont = glLoadFont( fontPath, fontSizeHeadline )
+	myFont = glLoadFont( fontPath, fontSizeHeadline, nil, nil ) -- FIXME: nils are for #2564, remove later
 	updateWindowCoords()
 end
 

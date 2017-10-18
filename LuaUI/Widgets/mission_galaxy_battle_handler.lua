@@ -911,7 +911,7 @@ function widget:Initialize()
 	
 	WG.MissionResign = MissionResign
 	
-	myFont = glLoadFont(fontPath, fontSizeHeadline)
+	myFont = glLoadFont(fontPath, fontSizeHeadline, nil, nil) -- FIXME: nils for #2564
 	UpdateWindowCoords()
 	
 	local initMissionGameOver = Spring.GetGameRulesParam("MissionGameOver")
