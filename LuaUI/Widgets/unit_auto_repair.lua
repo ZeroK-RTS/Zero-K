@@ -91,7 +91,7 @@ local function repairNearestDamagedUnit(repairUnitID)
 		if(repairUnitID ~= damagedUnitID) then
 			-- check they're still damaged
 			local hp, maxhp, paradam, cap, build = spGetUnitHealth(damagedUnitID)
-			if((hp and maxhp) and hp >= maxhp) then
+			if(not (hp and maxhp) or hp >= maxhp) then
 				unitsToRepair[damagedUnitID] = nil
 			else
 				local uposx, uposy, uposz = spGetUnitPosition(damagedUnitID)

@@ -693,7 +693,11 @@ function EstimateCrashLocation(victimID, transportID)
 		return
 	end
 	
-	local xVel,yVel,zVel, compositeVelocity= spGetUnitVelocity(transportID or victimID)
+	local xVel,yVel,zVel, compositeVelocity = spGetUnitVelocity(transportID or victimID)
+	if not xVel then
+		return
+	end
+
 	local currentVelocitySQ = (compositeVelocity and compositeVelocity^2 or (xVel^2+yVel^2+zVel^2)) --elmo per second square
 	local gravity = mapGravity
 	if transportID then
