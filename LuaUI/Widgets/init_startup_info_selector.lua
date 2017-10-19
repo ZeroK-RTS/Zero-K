@@ -22,7 +22,7 @@ end
 
 include("Widgets/COFCTools/ExportUtilities.lua")
 VFS.Include("LuaRules/Utilities/tobool.lua")
-VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
+local GetRawBoxes = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --[[

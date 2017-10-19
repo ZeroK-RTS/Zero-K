@@ -12,10 +12,9 @@ function gadget:GetInfo() return {
 
 local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
 local shuffleMode = Spring.GetModOptions().shuffle or "auto"
-local private_seed, startboxConfig
+local startboxConfig
 
-VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
-
+local ParseBoxes, GetRawBoxes = VFS.Include ("LuaRules/Gadgets/Include/startbox_utilities.lua")
 
 local function GetAverageStartpoint(boxID)
 	local box = startboxConfig[boxID]
@@ -155,7 +154,7 @@ end
 
 local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimationMark()
 	if shuffleMode == "auto" then
-		if GetTeamCount() > 2 then
+		if Spring.Utilities.GetTeamCount() > 2 then
 			shuffleMode = "shuffle"
 		else
 			shuffleMode = "off"
@@ -163,9 +162,7 @@ local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimat
 	end
 	Spring.SetGameRulesParam("shuffleMode", shuffleMode)
 
-	local seed = math.random(1, 1000000) -- ParseBoxes() reseeds with a public value which we don't want to keep using afterwards (would publicize shuffle order)
 	startboxConfig = ParseBoxes()
-	math.randomseed(seed)
 
 	GG.startBoxConfig = startboxConfig
 	GG.GetPlanetwarsBoxes = GetPlanetwarsBoxes
@@ -281,7 +278,7 @@ local function GetTeamNames (allyTeamID)
 	end
 
 	if ((shuffleMode == "off")
-		or (GetTeamCount() == 2 and shuffleMode == "shuffle")
+		or (Spring.Utilities.GetTeamCount() == 2 and shuffleMode == "shuffle")
 		or (#startboxConfig == 1 and shuffleMode == "allshuffle")) -- actually means # == 2 since it counts from 0
 	then
 		local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
@@ -303,9 +300,7 @@ function gadget:Initialize()
 	Spring.SetGameRulesParam("startbox_max_n", #startboxConfig)
 	Spring.SetGameRulesParam("startbox_recommended_startpos", 1)
 
-	local reseed = math.random(1, 1000000)
 	local rawBoxes = GetRawBoxes()
-	math.randomseed(reseed)
 	for box_id, rawbox in pairs(rawBoxes) do
 		local polygons = rawbox.boxes
 		Spring.SetGameRulesParam("startbox_n_" .. box_id, #polygons)

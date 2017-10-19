@@ -11,8 +11,8 @@ function widget:GetInfo() return {
 local mapX = Game.mapSizeX
 local mapZ = Game.mapSizeZ
 
-VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
-local startboxConfig = ParseBoxes()
+local GetRawBoxes, GetParsedBoxes = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
+local startboxConfig = GetParsedBoxes()
 
 local rawBoxes = GetRawBoxes()
 for boxID, boxx in pairs(rawBoxes) do

@@ -12,7 +12,7 @@ function widget:GetInfo()
 end
 
 include("Widgets/COFCTools/ExportUtilities.lua")
-VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
+local GetRawBoxes = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
 
 	n=1 --counter just in case there would be more than one unit spawned with only one being the comm but not being the first one. Note that if the Commander is spawned with an offset from the start point the marker may not be erased.
 
