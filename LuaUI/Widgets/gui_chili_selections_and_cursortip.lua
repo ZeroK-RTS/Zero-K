@@ -1796,6 +1796,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		if unitDefID then
 			ud = UnitDefs[unitDefID]
+			if not ud then
+				Spring.Echo("LUA_ERRRUN: invalid unitDefID", unitDefID, debug.traceback()) -- see #2570
+				ud = UnitDefNames.fakeunit
+			end
 			
 			unitImage.file = "#" .. unitDefID
 			unitImage.file2 = GetUnitBorder(unitDefID)
