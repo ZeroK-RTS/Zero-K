@@ -111,6 +111,8 @@ scoreMult				= 1
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.Include("LuaRules/Utilities/tablefunctions.lua")
+
 local function Copy(original)   -- Warning: circular table references lead to
 	local copy = {}			   -- an infinite loop.
 	for k, v in pairs(original) do
@@ -137,7 +139,7 @@ end
 --------------------------------------------------------------------------------
 
 -- times in minutes
-local chickenTypes = CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_offense) or {
+local chickenTypes = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_offense) or {
 	chicken				=  {time = -60,  squadSize = 3, obsolete = 25},
 	chicken_pigeon		=  {time = 6,  squadSize = 1.4, obsolete = 35},
 	chickens			=  {time = 12,  squadSize = 1, obsolete = 35},
@@ -154,13 +156,13 @@ local chickenTypes = CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chic
 	chicken_tiamat		=  {time = 55,  squadSize = 0.2},
 }
 
-local defenders = CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_defense) or {
+local defenders = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_defense) or {
   chickend = {time = 10, squadSize = 0.6, cost = 1 },
   chicken_dodo = {time = 25,  squadSize = 2, cost = 1}, 
   chicken_rafflesia =  {time = 25, squadSize = 0.4, cost = 2 },
 }
 
-local supporters = CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_support) or {
+local supporters = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_support) or {
   --chickenspire =  {time = 50, squadSize = 0.1},
   chicken_shield =  {time = 30, squadSize = 0.4},
   chicken_dodo = {time = 25, squadSize = 2},
