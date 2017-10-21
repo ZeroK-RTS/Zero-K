@@ -41,7 +41,7 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:Roninmuzzle]],
+      [[custom:rockomuzzle]],
     },
 
   },
@@ -119,7 +119,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[Ronin_d.dae]],
+      object           = [[rocko_d.dae]],
     },
 
     HEAP  = {
