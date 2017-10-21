@@ -70,9 +70,9 @@
         "helptext": "Niszczyciel Siren to statek ogólnego przeznaczenia, który łączy silne obszarowe działko soniczne (zdolne razić cele zarówno pod wodą, jak i nad nią), rakiety kinetyczne średniego zasięgu (świetne na budynki) oraz dobry pancerz."
     },
     "cloakbomb": {
-        "name": "Tick",
+        "name": "Imp",
         "description": "Pajęcza bomba EMP (zakopuje się)",
-        "helptext": "Tick zbliża się do przeciwnika, wykorzystując mały rozmiar i szybkość, by unikać niecelnych pocisków harcowników i jednostek szturmowych. Jego wybuch może sparaliżować ciężkie jednostki lub grupę lekkich, co pozwala innym jednostkom bezpiecznie się ich pozbyć. Tick słabo radzi sobie z wieżyczkami i można go zmarnować pojedynczą, tanią jednostką. Gdy jest nieruchomy, włącza niewidzialność."
+        "helptext": "Imp zbliża się do przeciwnika, wykorzystując mały rozmiar i szybkość, by unikać niecelnych pocisków harcowników i jednostek szturmowych. Jego wybuch może sparaliżować ciężkie jednostki lub grupę lekkich, co pozwala innym jednostkom bezpiecznie się ich pozbyć. Imp słabo radzi sobie z wieżyczkami i można go zmarnować pojedynczą, tanią jednostką. Gdy jest nieruchomy, włącza niewidzialność."
     },
     "shieldriot": {
         "name": "Outlaw",
@@ -180,9 +180,9 @@
         "helptext": "Flail jest uzbrojony w ciężkie rakiety ziemia-powietrze średniego zasięgu."
     },
     "cloakarty": {
-        "name": "Hammer",
+        "name": "Sling",
         "description": "Lekki bot artyleryjski",
-        "helptext": "Hammer ma działa plazmowe dalekiego zasięgu, których wysoka trajektoria pozwala im omijać przeszkody. Ma większy zasięg niż podstawowe wieżyczki obronne. Daje radę przeciwko jednostkom bojowym."
+        "helptext": "Sling ma działa plazmowe dalekiego zasięgu, których wysoka trajektoria pozwala im omijać przeszkody. Ma większy zasięg niż podstawowe wieżyczki obronne. Daje radę przeciwko jednostkom bojowym."
     },
     "chickend": {
         "name": "Kurza tuba",
@@ -385,9 +385,9 @@
         "helptext": "Mimo że przez swój rozmiar łatwo go trafić, Eclipse jest w stanie wytrzymać ciężki ostrzał, by spuścić na swój cel potężną bombę, która jednak spada na tyle wolno, że nie można liczyć na trafienie w ruchome jednostki."
     },
     "cloakassault": {
-        "name": "Zeus",
+        "name": "Knight",
         "description": "Bot szturmowy",
-        "helptext": "Zeus jest na tyle wytrzymały, że niska szybkość nie przeszkadza mu podczas podchodzenia pod wrogie jednostki i niszczenia ich mocnym działkiem EMP. Nie jest w stanie dogonić jednostek mających większe szybkość i zasięg, lecz jednostki o mniejszym od niego zasięgu niszczy skutecznie."
+        "helptext": "Knight jest na tyle wytrzymały, że niska szybkość nie przeszkadza mu podczas podchodzenia pod wrogie jednostki i niszczenia ich mocnym działkiem EMP. Nie jest w stanie dogonić jednostek mających większe szybkość i zasięg, lecz jednostki o mniejszym od niego zasięgu niszczy skutecznie."
     },
     "energysolar": {
         "name": "Panel słoneczny",
@@ -695,7 +695,7 @@
         "helptext": "Bertha to masywne działo o ogromnym zasięgu. Przy roztropnym doborze celów jest w stanie niweczyć przedsięwzięcia przeciwnika i niszczyć ważne cele z bezpiecznej odległości, jednak nie jest w stanie sama zapewnić zwycięstwa ze względu na bardzo ograniczoną szybkostrzelność."
     },
     "cloaksnipe": {
-        "name": "Spectre",
+        "name": "Phantom",
         "description": "Niewidzialny snajper harcownik",
         "helptext": "Karabin snajperski Spectra zadaje ciężkie obrażenia pojedynczym celom. Jako jedyna jednostka może strzelać pozostając niewidzialnym; jego naboje są jednak widoczne i mogą pomóc przeciwnikom w znalezieniu go. Utrzymanie niewidzialności kosztuje także spore ilości energii. Najlepszym sposobem na wykrycie Spectra jest przeczesanie okolicy tanimi jednostkami."
     },
@@ -735,9 +735,9 @@
         "helptext": "Funnelweb to ciężki mech-pająk z tarczą obszarową i kontyngentem dronów bojowych."
     },
     "cloakriot": {
-        "name": "Warrior",
+        "name": "Reaver",
         "description": "Bot wsparcia",
-        "helptext": "Warrior ma ciężkie karabiny skuteczne przeciwko większości jednostek, szczególnie lekkim. Słabo spisuje się jednak przeciwko wieżyczkom i harcownikom z racji niewielkiej wytrzymałości i niskiej prędkości. Po wyjściu z walki Warrior samoczynnie naprawia się."
+        "helptext": "Reaver ma ciężkie karabiny skuteczne przeciwko większości jednostek, szczególnie lekkim. Słabo spisuje się jednak przeciwko wieżyczkom i harcownikom z racji niewielkiej wytrzymałości i niskiej prędkości. Po wyjściu z walki Reaver samoczynnie naprawia się."
     },
     "chickenspire": {
         "name": "Szpila kurczaków",

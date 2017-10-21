@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakbomb]],
-  name                   = [[Tick]],
+  name                   = [[Imp]],
   description            = [[All Terrain EMP Bomb (Burrows)]],
   acceleration           = 0.25,
   brakeRate              = 0.6,

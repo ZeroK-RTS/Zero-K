@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[shieldbomb]],
-  name                   = [[Roach]],
+  name                   = [[Snitch]],
   description            = [[Crawling Bomb (Burrows)]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,

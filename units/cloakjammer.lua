@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakjammer]],
-  name                   = [[Eraser]],
+  name                   = [[Iris]],
   description            = [[Area Cloaker/Jammer Walker]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,

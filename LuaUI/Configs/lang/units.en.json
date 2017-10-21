@@ -17,7 +17,7 @@
 	"factorycloak" : {
 		"name" : "Cloakbot Factory",
 		"description" : "Produces Cloaked, Mobile Robots, Builds at 10 m/s",
-		"helptext" : "Emphasizing guile over brute force, the Cloakbot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Ronin, Warrior, Zeus, Hammer"
+		"helptext" : "Emphasizing guile over brute force, the Cloakbot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Ronin, Reaver, Knight, Hammer"
 	},
 	"ampharty" : {
 		"name" : "Kraken",
@@ -60,9 +60,9 @@
 		"helptext" : "The Listener is an evolved form of the Digger. While it has lost all fighting ability, it has gained a unique sense of hearing that allows it to pinpoint the location of enemy ground forces."
 	},
 	"cloakbomb" : {
-		"name" : "Tick",
+		"name" : "Imp",
 		"description" : "All Terrain EMP Bomb (Burrows)",
-		"helptext" : "The Tick relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Warriors or Glaives can then eliminate the helpless enemies without risk. Counter with defenses or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle."
+		"helptext" : "The Imp relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Reavers or Glaives can then eliminate the helpless enemies without risk. Counter with defenses or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle."
 	},
 	"shieldriot" : {
 		"name" : "Outlaw",
@@ -160,9 +160,9 @@
 		"helptext" : "The Flail launches a single large, short-medium range SAM that does heavy damage."
 	},
 	"cloakarty" : {
-		"name" : "Hammer",
+		"name" : "Sling",
 		"description" : "Light Artillery Bot",
-		"helptext" : "The Hammer has a long range plasma cannon that allows indirect fire over obstacles, and outranges static defenses up to heavy laser towers. Although effective versus mobile units, it should be guarded in order to prevent raiders and other fast units from closing range."
+		"helptext" : "The Sling has a long range plasma cannon that allows indirect fire over obstacles, and outranges static defenses up to heavy laser towers. Although effective versus mobile units, it should be guarded in order to prevent raiders and other fast units from closing range."
 	},
 	"chickend" : {
 		"name" : "Chicken Tube",
@@ -360,9 +360,9 @@
 		"helptext" : "The Eclipse's imposing hull can weather significant punishment while steadily blazing to deliver its massive payload of devastation, but the unguided bomb has problems with hitting mobile targets, and big size makes it an easy target."
 	},
 	"cloakassault" : {
-		"name" : "Zeus",
+		"name" : "Knight",
 		"description" : "Lightning Assault Bot",
-		"helptext" : "Slowly and steadily, groups of Zeuses can shrug off heavy fire as they make their way towards enemy fortifications, until they can field their short-range lightning cannon, which damages and stuns entrenched foes. Counter with anything that can reliably kite it, making sure that you don't get paralyzed (in which case you are as good as dead.)"
+		"helptext" : "Slowly and steadily, groups of Knights can shrug off heavy fire as they make their way towards enemy fortifications, until they can field their short-range lightning cannon, which damages and stuns entrenched foes. Counter with anything that can reliably kite it, making sure that you don't get paralyzed (in which case you are as good as dead.)"
 	},
 	"energysolar" : {
 		"name" : "Solar Collector",
@@ -670,9 +670,9 @@
 		"helptext" : "The Bertha is a massive cannon that fires high-energy plasmoids across the map. Used appropriately, it can effectively suppress enemy operations from the safety of your base. Do not expect it to win battles alone for you, however."
 	},
 	"cloaksnipe" : {
-		"name" : "Spectre",
+		"name" : "Phantom",
 		"description" : "Cloaked Skirmish/Anti-Heavy Artillery Bot",
-		"helptext" : "The Spectre's energy rifle inflicts heavy damage to a single target. It can fire while cloaked; however its visible round betrays its position. It requires quite a bit of energy to keep cloaked, especially when moving. The best way to locate a Spectre is by sweeping the area with many cheap units."
+		"helptext" : "The Phantom's energy rifle inflicts heavy damage to a single target. It can fire while cloaked; however its visible round betrays its position. It requires quite a bit of energy to keep cloaked, especially when moving. The best way to locate a Phantom is by sweeping the area with many cheap units."
 	},
 	"staticarty" : {
 		"name" : "Behemoth",
@@ -710,9 +710,9 @@
 		"helptext" : "The slow all-terrain Funnelweb features an area shield and a powerful drone complement."
 	},
 	"cloakriot" : {
-		"name" : "Warrior",
+		"name" : "Reaver",
 		"description" : "Riot Bot",
-		"helptext" : "The Warrior's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defense, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Warriors quickly regenerate damage when out of combat."
+		"helptext" : "The Reaver's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defense, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Reavers quickly regenerate damage when out of combat."
 	},
 	"chickenspire" : {
 		"name" : "Chicken Spire",

@@ -17,7 +17,7 @@
 	"factorycloak" : {
 		"name" : "Cloakbot Factory",
 		"description" : "Produziert Tarnroboter, Baut mit 10 M/s",
-		"helptext" : "List statt pure Gewalt lautet hier das Motto. Die Cloakbot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Ronin, Warrior, Zeus, Hammer"
+		"helptext" : "List statt pure Gewalt lautet hier das Motto. Die Cloakbot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Ronin, Reaver, Knight, Hammer"
 	},
 	"hoverdepthcharge" : {
 		"name" : "Claymore",
@@ -1030,9 +1030,9 @@
 		"helptext" : "The Punisher has a shotgun which shoots a spray of projectiles which are good against large targets or tight clusters of enemies."
 	},
 	"cloakassault" : {
-		"name" : "Zeus",
+		"name" : "Knight",
 		"description" : "Sturmroboter",
-		"helptext" : "Langsam und zuverlässig, Gruppen von Zeus' können sogar starken Beschuss ignorieren und so schnell an die feindliche Festung herankommen, bis sie dort ihre Blitzschlagkanonen mit kurzer Reichweite zum Einsatz bringen können, welche feindliche Einheiten schädigt und betäubt. Kontere den Zeus mit Einheiten, die umherflitzen, damit sie nicht paralysiert werden (denn dann sind sie so gut wie tot)."
+		"helptext" : "Langsam und zuverlässig, Gruppen von Knight' können sogar starken Beschuss ignorieren und so schnell an die feindliche Festung herankommen, bis sie dort ihre Blitzschlagkanonen mit kurzer Reichweite zum Einsatz bringen können, welche feindliche Einheiten schädigt und betäubt. Kontere den Knight mit Einheiten, die umherflitzen, damit sie nicht paralysiert werden (denn dann sind sie so gut wie tot)."
 	},
 	"hoverskirm" : {
 		"name" : "Scalpel",
@@ -1050,9 +1050,9 @@
 		"helptext" : "Die Rakete Quake erzeugt eine akustische Schockwelle, welche die anliegend Boden glatt macht, aber nur minimale Schäden an Einheiten aus Metall und Kohlenstoff-Nanoröhrchen verursacht."
 	},
 	"cloakriot" : {
-		"name" : "Warrior",
+		"name" : "Reaver",
 		"description" : "Riot Roboter",
-		"helptext" : "Sein schweres Maschingewehr ist gegen die meisten Einheiten effektiv, vor allem gegen Raider. Dennoch versagt es kläglich gegen stationäre Verteidigung. Also nutze ihn nicht als Sturmeinheit. Kontere den Warrior, indem du aus seiner Reichweite bleibst, sie sind langsam."
+		"helptext" : "Sein schweres Maschingewehr ist gegen die meisten Einheiten effektiv, vor allem gegen Raider. Dennoch versagt es kläglich gegen stationäre Verteidigung. Also nutze ihn nicht als Sturmeinheit. Kontere den Reaver, indem du aus seiner Reichweite bleibst, sie sind langsam."
 	},
 	"amphraid" : {
 		"name" : "Duck",

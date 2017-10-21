@@ -178,7 +178,7 @@ options = {
 		name = 'Enable for ground units',
 		type = 'bool',
 		value = true,
-		desc = 'Enable for ground units (INCLUDE Commander).\n\nAll ground unit will avoid enemy while being outside camera view and/or while reloading except when hold-position state is used.\n\nTips:\n1) is optimized for masses of Thug or Zeus.\n2) You can use Guard to make your unit swarm the guarded unit in presence of enemy.\nDefault:On',
+		desc = 'Enable for ground units (INCLUDE Commander).\n\nAll ground unit will avoid enemy while being outside camera view and/or while reloading except when hold-position state is used.\n\nTips:\n1) is optimized for masses of Thug or Knight.\n2) You can use Guard to make your unit swarm the guarded unit in presence of enemy.\nDefault:On',
 	},
 	enableGunship = {
 		name = 'Enable for gunships',

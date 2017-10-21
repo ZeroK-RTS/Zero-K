@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakassault]],
-  name                   = [[Zeus]],
+  name                   = [[Knight]],
   description            = [[Lightning Assault Bot]],
   acceleration           = 0.2,
   brakeRate              = 0.6,
