@@ -59,6 +59,7 @@ local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID))
 
 local gameframe = 0
 local LOS_ACCESS = {inlos = true}
+local PRIVATE_ACCESS = {private = true}
 
 local random = math.random
 local floor = math.floor
@@ -101,11 +102,14 @@ if (tonumber(ZOMBIES_PERMA_SLOW) == nil) then
 	-- from 0 to 1, symbolises from 0% to 50% slow which is always on
 	ZOMBIES_PERMA_SLOW = 1
 end
+
 if ZOMBIES_PERMA_SLOW == 0 then
 	ZOMBIES_PERMA_SLOW = nil
 else
 	ZOMBIES_PERMA_SLOW = 1 - ZOMBIES_PERMA_SLOW*0.5
 end
+
+local ZOMBIES_PARTIAL_RECLAIM = (tonumber(modOptions.zombies_partial_reclaim) == 1)
 
 local CMD_REPEAT = CMD.REPEAT
 local CMD_MOVE_STATE = CMD.MOVE_STATE
@@ -273,6 +277,13 @@ function gadget:GameFrame(f)
 					index = index + 1
 				end
 				local resName, face = myGetFeatureRessurect(featureID)
+				local partialReclaim = 1
+				if ZOMBIES_PARTIAL_RECLAIM then
+					local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
+					if currentMetal and maxMetal and (maxMetal > 0) then
+						partialReclaim = currentMetal/maxMetal
+					end
+				end
 				spDestroyFeature(featureID)
 				local unitID = spCreateUnit(resName, x, y, z, face, GaiaTeamID)
 				if (unitID) then
@@ -280,6 +291,13 @@ function gadget:GameFrame(f)
 					spSpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
 					Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, 0)
 					SendToUnsynced("rez_sound", x, y, z)
+					if partialReclaim ~= 1 then
+						local health = Spring.GetUnitHealth(unitID)
+						if health then
+							Spring.SetUnitHealth(unitID, health*partialReclaim)
+							--spSetUnitRulesParam(unitID, "zombie_partialReclaim", partialReclaim, PRIVATE_ACCESS)
+						end
+					end
 				end
 			else
 				local steps_to_spawn = floor((time_to_spawn - f) / 32)
@@ -338,8 +356,9 @@ end
 function gadget:FeatureCreated(featureID, allyTeam)
 	local resName, face = myGetFeatureRessurect(featureID)
 	if resName and face and not zombies_to_spawn[featureID] then
-		if UnitDefNames[resName] and not NonZombies[resName] then
-			local rez_time = UnitDefNames[resName].metalCost / ZOMBIES_REZ_SPEED
+		local ud = resName and UnitDefNames[resName]
+		if ud and not NonZombies[resName] then
+			local rez_time = ud.metalCost / ZOMBIES_REZ_SPEED
 			if (rez_time < ZOMBIES_REZ_MIN) then
 				  rez_time = ZOMBIES_REZ_MIN
 			end

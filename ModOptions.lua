@@ -160,6 +160,14 @@ local options = {
     step=0.01,
   },
   {
+    key    = 'zombies_partial_reclaim',
+    name   = 'Zombies partially reclaimable',
+    desc   = "Partially reclaimed zombies are partially damaged.",
+    type   = 'bool',
+    section= 'silly',
+    def = false,
+  },
+  {
     key = "max_com_level",
     name = "Commander level limit",
     desc = "Choose the commander level limit. 0 for unlimited.",
