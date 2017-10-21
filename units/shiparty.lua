@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[shiparty]],
-  name                   = [[Ronin]],
+  name                   = [[Envoy]],
   description            = [[Cruiser (Artillery)]],
   acceleration           = 0.0417,
   activateWhenBuilt      = true,

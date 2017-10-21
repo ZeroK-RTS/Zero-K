@@ -1,6 +1,6 @@
 starlight_satellite = {
   unitname               = [[starlight_satellite]],
-  name                   = [[Owl]],
+  name                   = [[Glint]],
   description            = [[Starlight relay satellite]],
   acceleration           = 0.152,
   brakeRate              = 0.456,

@@ -1,6 +1,6 @@
 {
 	"starlight_satellite" : {
-		"name" : "Owl",
+		"name" : "Glint",
 		"description" : "Satelita",
 		"helptext" : "Satelita pomocniczy Starlighta."
 	},
@@ -930,9 +930,9 @@
         "helptext": "Stinger to średnia wieża laserowa, która jest w stanie jednym strzałem zniszczyć większość lekkich jednostek, jednak niska szybkostrzelność pozwala dużej ilości tanich jednostek ją zniszczyć."
     },
     "shiparty": {
-        "name": "Ronin",
+        "name": "Envoy",
         "description": "Krążownik artyleryjski",
-        "helptext": "Ronin posiada potężną armatę średniego zasięgu, idealną do bombardowania nieruchomych wieżyczek broniących wybrzeży. Jednostki powietrzne i podwodne oraz lekkie łodzie są dla niego zagrożeniem."
+        "helptext": "Envoy posiada potężną armatę średniego zasięgu, idealną do bombardowania nieruchomych wieżyczek broniących wybrzeży. Jednostki powietrzne i podwodne oraz lekkie łodzie są dla niego zagrożeniem."
     },
     "shieldfelon": {
         "name": "Felon",

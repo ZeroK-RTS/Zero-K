@@ -1,6 +1,6 @@
 {
 	"starlight_satellite" : {
-		"name" : "Owl",
+		"name" : "Glint",
 		"description" : "Starlight relay satellite",
 		"helptext" : "This is the satellite used by Starlight for targeting."
 	},
@@ -915,7 +915,7 @@
 		"helptext" : "This Destroyer is a general-purpose combat vessel, combining a strong area-of-effect sonic cannon, a medium-range vertical launch missile, and strong armor. Use its sonic gun against smaller opponents above and below the water, and its missile against static targets."
 	},
 	"shiparty" : {
-		"name" : "Ronin",
+		"name" : "Envoy",
 		"description" : "Cruiser (Artillery)",
 		"helptext" : "This Cruiser packs a powerful, long-range artillery cannon, useful for bombarding fixed emplacements and shore targets. Beware of aircraft, submarines and raider ships."
 	},
