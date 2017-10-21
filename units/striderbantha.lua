@@ -40,7 +40,7 @@ unitDef = {
   movementClass          = [[KBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING SATELLITE SUB]],
-  objectName             = [[Paladin.s3o]],
+  objectName             = [[Bantha.s3o]],
   selfDestructAs         = [[ATOMIC_BLAST]],
   script                 = [[striderbantha.lua]],
   
