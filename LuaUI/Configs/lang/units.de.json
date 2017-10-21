@@ -145,7 +145,7 @@
 		"helptext" : "Der Dominatrix erobert Einheiten, hetzt sie gegen die ehemaligen Verbündeten auf. Mehrere Dominatrixe können ein Ziel schneller erobern, obwohl nur einer von ihnen der Kontrolleur dieser Einheit wird. Nachdem eine gegnerische Einheit unter Kontrolle gebracht wurde, kann der Dominatrix für fünf Sekunden nicht schießen. Sobald ein Dominatrix zerstört wurde, sind alle Einheiten unter seiner Kontrolle wieder frei."
 	},
 	"factoryjump" : {
-		"name" : "Jump/Specialist Plant",
+		"name" : "Jumpbot Factory",
 		"description" : "Produziert Spezial- und Sprungdüsenroboter, Baut mit 10 M/s",
 		"helptext" : "Hier werden außergewöhnliche Einheiten erzeugt, die durch spezielle Fähigkeiten Distanzen schnell überbrücken können, um in den Nahkampf zu treten oder auch, um Hindernisse schnell zu überbrücken. Wichtigste Einheiten: Pyro, Moderator, Jack, Firewalker, Sumo"
 	},
@@ -970,9 +970,9 @@
 		"helptext" : "Der Owl bietet dir die beispiellose Möglichkeit zur unerkannten, weitläufigen Aufklärung und kann mit seinem Sonar auch Unterwasserziele lokalisieren. Er hat auch ein Stoersender der gegen feindliche Radare wirkt."
 	},
 	"factorytank" : {
-		"name" : "Heavy Tank Factory",
+		"name" : "Tank Foundry",
 		"description" : "Produziert schwere und speziallisierte Fahrzeuge, Baut mit 10 M/s",
-		"helptext" : "Die Heavy Tank Factory ist das Ultimum für brachiale Gewalt. Nicht erledigt den Auftrag zu gut, wie ein anhaltendes Artilleriefeuer, gefolgt von einem entscheidenen Vorstoß mit den größten Panzern auf dem Feld. Wichtigste Einheiten: Pillager, Reaper, Banisher, Goliath"
+		"helptext" : "Die Tank Foundry ist das Ultimum für brachiale Gewalt. Nicht erledigt den Auftrag zu gut, wie ein anhaltendes Artilleriefeuer, gefolgt von einem entscheidenen Vorstoß mit den größten Panzern auf dem Feld. Wichtigste Einheiten: Pillager, Reaper, Banisher, Goliath"
 	},
 	"empmissile" : {
 		"name" : "Shockley",

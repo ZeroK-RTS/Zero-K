@@ -975,9 +975,9 @@
 		"helptext" : "The Dominatrix captures enemies, turning them against their former allies. Multiple Dominatrix can capture a single target faster, although only one becomes the controller. After taking control of a unit the Dominatrix cannot fire for 12 seconds. If a Dominatrix is destroyed all units it controls are freed."
 	},
 	"factorytank" : {
-		"name" : "Heavy Tank Factory",
-		"description" : "Produces Heavy and Specialized Vehicles, Builds at 10 m/s",
-		"helptext" : "The Heavy Tank Factory is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Pillager, Reaper, Banisher, Goliath"
+		"name" : "Tank Foundry",
+		"description" : "Produces Heavy Tracked Vehicles, Builds at 10 m/s",
+		"helptext" : "The Tank Foundry is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Pillager, Reaper, Banisher, Goliath"
 	},
 	"striderbantha" : {
 		"name" : "Bantha",
@@ -995,9 +995,9 @@
 		"helptext" : "The Cobra is a flak cannon with good AoE and a high damage output, letting it swiftly cut enemy gunships to ribbons."
 	},
 	"factoryjump" : {
-		"name" : "Jump/Specialist Plant",
-		"description" : "Produces Jumpjets and Special Walkers, Builds at 10 m/s",
-		"helptext" : "The esoteric Jumpjet/Specialist Plant offers unique tactical options for rapidly closing the distance in a knife fight, or getting over hills and rivers to cut a path through enemy lines. Key units: Pyro, Moderator, Jack, Firewalker, Sumo"
+		"name" : "Jumpbot Factory",
+		"description" : "Produces Jumpjet Equipped Robots, Builds at 10 m/s",
+		"helptext" : "The esoteric Jumpbot Factory offers unique tactical options for rapidly closing the distance in a knife fight, or getting over hills and rivers to cut a path through enemy lines. Key units: Pyro, Moderator, Jack, Firewalker, Sumo"
 	},
 	"jumpsumo" : {
 		"name" : "Sumo",
