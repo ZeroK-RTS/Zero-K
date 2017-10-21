@@ -118,7 +118,7 @@ end
 
 Spring.Utilities.TableEcho = TableEcho
 
-local function Spring.Utilities.CustomKeyToUsefulTable(dataRaw)
+function Spring.Utilities.CustomKeyToUsefulTable(dataRaw)
 	if not dataRaw then
 		return
 	end
