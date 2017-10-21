@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[gunshiptrans]],
-  name                = [[Valkyrie]],
+  name                = [[Charon]],
   description         = [[Air Transport]],
   acceleration        = 0.2,
   brakeRate           = 0.96,

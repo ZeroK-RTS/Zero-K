@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[gunshipskirm]],
-  name                   = [[Rapier]],
+  name                   = [[Harpy]],
   description            = [[Multi-Role Support Gunship]],
   acceleration           = 0.152,
   brakeRate              = 0.1216,

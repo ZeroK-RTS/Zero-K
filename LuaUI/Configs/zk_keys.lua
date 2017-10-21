@@ -165,7 +165,7 @@ return {
 		{	"selectidlecon_all",	"ctrl+b",},
 		{	"select PrevSelection+_Not_RelativeHealth_30+_ClearSelection_SelectAll+",	"ctrl+e",},
 		{	"select AllMap+_Not_Builder_Not_Building+_ClearSelection_SelectAll+",	"ctrl+f",},
-		{	"select AllMap+_NameContain_Hawk+_ClearSelection_SelectAll+",	"ctrl+g",},
+		{	"select AllMap+_NameContain_Raptor+_ClearSelection_SelectAll+",	"ctrl+g",},
 		{	"select PrevSelection+_Idle+_ClearSelection_SelectAll+",	"ctrl+i",},
 		{	"select AllMap+_Not_Builder_Not_Building_Not_Transport_Aircraft_Radar+_ClearSelection_SelectAll+",	"ctrl+s",},
 		{	"select AllMap+_Not_Builder_Not_Building_Transport_Aircraft+_ClearSelection_SelectAll+",	"ctrl+t",},

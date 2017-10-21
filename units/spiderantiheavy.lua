@@ -1,6 +1,6 @@
 unitDef = {
   unitname              = [[spiderantiheavy]],
-  name                  = [[Infiltrator]],
+  name                  = [[Widow]],
   description           = [[Cloaked Scout/Anti-Heavy]],
   acceleration          = 0.3,
   activateWhenBuilt     = true,

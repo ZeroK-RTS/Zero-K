@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[jumpsumo]],
-  name                = [[Sumo]],
+  name                = [[Jugglenaut]],
   description         = [[Heavy Riot Jumper]],
   acceleration        = 0.1,
   activateWhenBuilt   = true,
@@ -367,7 +367,7 @@ unitDef = {
     },
 
     LANDING = {
-      name                    = [[Sumo Landing]],
+      name                    = [[Jugglenaut Landing]],
       areaOfEffect            = 340,
       canattackground         = false,
       craterBoost             = 4,

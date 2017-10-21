@@ -10,9 +10,9 @@
 		"helptext" : "Wasp łączy w sobie mobilność statku powietrznego i wysoką moc budowy."
 	},
     "gunshipskirm": {
-        "name": "Rapier",
+        "name": "Harpy",
         "description": "Wielozadaniowy statek powietrzny",
-        "helptext": "Rapier to lekki bojowy statek powietrzny. Chociaż jego pociski nie zadają wysokich obrażeń, to są celne i spowalniają trafione jednostki."
+        "helptext": "Harpy to lekki bojowy statek powietrzny. Chociaż jego pociski nie zadają wysokich obrażeń, to są celne i spowalniają trafione jednostki."
     },
     "factorycloak": {
         "name": "Fabryka cichociemnych",
@@ -240,9 +240,9 @@
         "helptext": "Asteroidy ściągnięte z orbity miażdżą jednostki, na które spadną; można z nich także odzyskać surowce."
     },
     "planeheavyfighter": {
-        "name": "Hawk",
+        "name": "Raptor",
         "description": "Myśliwiec",
-        "helptext": "Hawk specjalizuje się w zestrzeliwaniu innych jednostek latających. Jest dość wytrzymały i może działać pod lekkim ostrzałem przeciwlotniczym, ale sam nie jest w stanie atakować celów naziemnych."
+        "helptext": "Raptor specjalizuje się w zestrzeliwaniu innych jednostek latających. Jest dość wytrzymały i może działać pod lekkim ostrzałem przeciwlotniczym, ale sam nie jest w stanie atakować celów naziemnych."
     },
     "hoverskirm2": {
         "name": "Trisula",
@@ -360,9 +360,9 @@
         "helptext": "Dodo zawiera w sobie niestabilną mieszankę i jest w stanie wybuchnąć; rozrzucone wokół kolce z jego skorupy także zadają poważne obrażenia."
     },
     "bomberheavy": {
-        "name": "Wyvern",
+        "name": "Likho",
         "description": "Bombowiec implozyjny",
-        "helptext": "Wyvern spuszcza pojedynczą niszczycielską bombę o dużej sile i obszarze rażenia, która może rozrzucić mniejsze jednostki wokół. Jest też wystarczająco wytrzymały, by latać wśród umiarkowanej ilości obrony przeciwlotniczej. Jest jednak bardzo drogi, co nie pozwala na lekkomyślne używanie."
+        "helptext": "Likho spuszcza pojedynczą niszczycielską bombę o dużej sile i obszarze rażenia, która może rozrzucić mniejsze jednostki wokół. Jest też wystarczająco wytrzymały, by latać wśród umiarkowanej ilości obrony przeciwlotniczej. Jest jednak bardzo drogi, co nie pozwala na lekkomyślne używanie."
     },
     "tacnuke": {
         "name": "Eos",
@@ -395,9 +395,9 @@
         "helptext": "Panele słoneczne to najbardziej podstawowe elektrownie. Zaatakowane, zwijają się na 8 sekund, co daje im świetną ochronę przed lekkimi najazdami przez zmniejszenie otrzymywanych obrażeń czterokrotnie. "
     },
     "gunshipheavyskirm": {
-        "name": "Brawler",
+        "name": "Nimbus",
         "description": "Statek powietrzny wsparcia",
-        "helptext": "Brawler to statek powietrzny, którego wysokość lotu sprawia nie lada problem przy próbach zestrzelenia go. Jest wytrzymały i posiada podwójne karabiny o dużym zasięgu."
+        "helptext": "Nimbus to statek powietrzny, którego wysokość lotu sprawia nie lada problem przy próbach zestrzelenia go. Jest wytrzymały i posiada podwójne karabiny o dużym zasięgu."
     },
     "factoryshield": {
         "name": "Fabryka tarczowników",
@@ -455,9 +455,9 @@
         "helptext": "Punisher ma shotguna i jest dobry na ciężkie jednostki lub grupy lekkich."
     },
     "spiderantiheavy": {
-        "name": "Infiltrator",
+        "name": "Widow",
         "description": "Niewidzialny zwiadowca / paralizator",
-        "helptext": "Infiltrator spełnia dwie role. Przede wszystkim jest świetnym zwiadowcą dzięki niewidzialności, pajęczemu poruszaniu się po klifach i dużemu zasięgowi wzroku. Ponadto może sparaliżować pojedynczy cel, co dobrze jest używać przeciwko ciężkim jednostkom."
+        "helptext": "Widow spełnia dwie role. Przede wszystkim jest świetnym zwiadowcą dzięki niewidzialności, pajęczemu poruszaniu się po klifach i dużemu zasięgowi wzroku. Ponadto może sparaliżować pojedynczy cel, co dobrze jest używać przeciwko ciężkim jednostkom."
     },
     "energywind": {
         "name": "Turbina",
@@ -505,9 +505,9 @@
         "helptext": "Grebe to lekki bot z granatami krótkiego zasięgu, które dobrze sprawdzają się przeciwko cięższym celom. Mimo że jest amfibijny, nie może strzelać w wodzie."
     },
     "hoverarty": {
-        "name": "Penetrator",
+        "name": "Lance",
         "description": "Poduszkowiec precyzyjnej artylerii",
-        "helptext": "Broń Penetratora ma wystarczającą siłę i celność, by jednym strzałem zniszczyć lub poważnie uszkodzić większość jednostek. Jest jednak wolny i ma niską wytrzymałość, a zatem warto trzymać go z dala od niebezpieczeństw - ma wystarczająco duży zasięg, by bezpiecznie prowadzić ostrzał."
+        "helptext": "Broń Lancea ma wystarczającą siłę i celność, by jednym strzałem zniszczyć lub poważnie uszkodzić większość jednostek. Jest jednak wolny i ma niską wytrzymałość, a zatem warto trzymać go z dala od niebezpieczeństw - ma wystarczająco duży zasięg, by bezpiecznie prowadzić ostrzał."
     },
     "shieldbomb": {
         "name": "Snitch",
@@ -615,9 +615,9 @@
         "helptext": "Dampener rozstawia wokół siebie miny."
     },
     "gunshiptrans": {
-        "name": "Valkyrie",
+        "name": "Charon",
         "description": "Transportowiec powietrzny",
-        "helptext": "Valkyrie to podstawowa latająca jednostka transportowa. Świetnie radzi sobie w szybkim przenoszeniu jednostek z bazy na front, bądź w desancie głęboko za linie wroga, lecz musi unikać obszaru bronionego przez nawet najmniejszą ilość artylerii przeciwlotniczej."
+        "helptext": "Charon to podstawowa latająca jednostka transportowa. Świetnie radzi sobie w szybkim przenoszeniu jednostek z bazy na front, bądź w desancie głęboko za linie wroga, lecz musi unikać obszaru bronionego przez nawet najmniejszą ilość artylerii przeciwlotniczej."
     },
     "striderdetriment": {
         "name": "Detriment",
@@ -675,9 +675,9 @@
         "helptext": "Pająk wyposażony w rakiety dalekiego zasięgu o niestabilnej trajektorii."
     },
     "gunshipassault": {
-        "name": "Black Dawn",
+        "name": "Revenant",
         "description": "Zaczepny statek powietrzny",
-        "helptext": "Black Dawn wystrzeliwuje niszczycielskie salwy rakiet, które z braku samonaprowadzania mają jednak kłopoty z trafianiem szybkich jednostek. gunshipassault jest wytrzymały, ale też drogi i ma niską szybkostrzelnosc, zatem oczekując między atakami warto oddalić sie, aby nie otrzymywać niepotrzebnie obrażeń."
+        "helptext": "Revenant wystrzeliwuje niszczycielskie salwy rakiet, które z braku samonaprowadzania mają jednak kłopoty z trafianiem szybkich jednostek. gunshipassault jest wytrzymały, ale też drogi i ma niską szybkostrzelnosc, zatem oczekując między atakami warto oddalić sie, aby nie otrzymywać niepotrzebnie obrażeń."
     },
     "tankriot": {
         "name": "Banisher",
@@ -975,9 +975,9 @@
         "helptext": "Najbardziej wielozadaniowy spośród okrętów. Lotniskowiec posiada rakiety taktyczne do bombardowania odległych celów, posiada lądowiska dla samolotów i przede wszystkim produkuje własne drony bojowe."
     },
     "jumpsumo": {
-        "name": "Sumo",
+        "name": "Jugglenaut",
         "description": "Ciężki skoczek grawitacyjny - włączony odpycha, wyłączony przyciąga",
-        "helptext": "Sumo posiada imponującą wytrzymałość i podwójne promienie grawitacyjne, które mogą przyciągać lub odpychać inne jednostki. Może również skakać, co w połączeniu z jego dużą masą pozwala mu zgniatać wrogie jednostki, skacząc na nie."
+        "helptext": "Jugglenaut posiada imponującą wytrzymałość i podwójne promienie grawitacyjne, które mogą przyciągać lub odpychać inne jednostki. Może również skakać, co w połączeniu z jego dużą masą pozwala mu zgniatać wrogie jednostki, skacząc na nie."
     },
     "turretaalaser": {
         "name": "Razor",
@@ -990,9 +990,9 @@
         "helptext": "Quill pozwala na bezproblemową rozbudowę zarówno na ziemi, jak i w wodzie."
     },
     "jumpaa": {
-        "name": "Archangel",
+        "name": "Toad",
         "description": "Ciężki skoczek przeciwlotniczy",
-        "helptext": "Archangel posiada podwójny laser i działko przeciwlotnicze, które szybko zestrzeliwują wrogie lotnictwo. Jest także w stanie skakać, co pozwala mu pokonywać trudny teren lub unikać ostrzału."
+        "helptext": "Toad posiada podwójny laser i działko przeciwlotnicze, które szybko zestrzeliwują wrogie lotnictwo. Jest także w stanie skakać, co pozwala mu pokonywać trudny teren lub unikać ostrzału."
     },
     "staticheavyradar": {
         "name": "Zaawansowany radar",
@@ -1130,9 +1130,9 @@
         "helptext": "Catapult to mech artyleryjski zalewający okolicę falami ciężkich rakiet. Świetny przeciwko ufortyfikowanym pozycjom."
     },
     "gunshipheavytrans": {
-        "name": "Vindicator",
+        "name": "Hercules",
         "description": "Uzbrojony transportowy statek powietrzny",
-        "helptext": "Vindicator jest w stanie przenosić każdą jednostkę. Jego wytrzymałość i lekkie uzbrojenie pomagają mu dostarczać jednostki nawet w wirze walki."
+        "helptext": "Hercules jest w stanie przenosić każdą jednostkę. Jego wytrzymałość i lekkie uzbrojenie pomagają mu dostarczać jednostki nawet w wirze walki."
     },
     "planescout": {
         "name": "Owl",

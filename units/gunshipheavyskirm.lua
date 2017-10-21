@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[gunshipheavyskirm]],
-  name                = [[Brawler]],
+  name                = [[Nimbus]],
   description         = [[Fire Support Gunship]],
   acceleration        = 0.2,
   brakeRate           = 0.16,

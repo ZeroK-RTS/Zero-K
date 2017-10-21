@@ -30,9 +30,9 @@
 		"helptext" : "Schneller Entwaffnungbomber, der mit einem Stossspannungsgenerator zum Entwaffnen großflächiger Gebiete bewaffnet ist."
 	},
 	"gunshipassault" : {
-		"name" : "Black Dawn",
+		"name" : "Revenant",
 		"description" : "Bodenangriff-Kampfhubschrauber",
-		"helptext" : "Der Black Dawn feuert salvenartig ungelenkte Raketen. Er besitzt eine hohe Lebensenergie und hat einen großen Schadensoutput, aber er ist teuer und unpräzise, vor allem gegen sich bewegende Ziele. Er ist gut, um Basisstrukturen und langsame oder stationäre Einheiten zu zerstören."
+		"helptext" : "Der Revenant feuert salvenartig ungelenkte Raketen. Er besitzt eine hohe Lebensenergie und hat einen großen Schadensoutput, aber er ist teuer und unpräzise, vor allem gegen sich bewegende Ziele. Er ist gut, um Basisstrukturen und langsame oder stationäre Einheiten zu zerstören."
 	},
 	"hoverraid" : {
 		"name" : "Dagger",
@@ -147,7 +147,7 @@
 	"factoryjump" : {
 		"name" : "Jumpbot Factory",
 		"description" : "Produziert Spezial- und Sprungdüsenroboter, Baut mit 10 M/s",
-		"helptext" : "Hier werden außergewöhnliche Einheiten erzeugt, die durch spezielle Fähigkeiten Distanzen schnell überbrücken können, um in den Nahkampf zu treten oder auch, um Hindernisse schnell zu überbrücken. Wichtigste Einheiten: Pyro, Moderator, Jack, Firewalker, Sumo"
+		"helptext" : "Hier werden außergewöhnliche Einheiten erzeugt, die durch spezielle Fähigkeiten Distanzen schnell überbrücken können, um in den Nahkampf zu treten oder auch, um Hindernisse schnell zu überbrücken. Wichtigste Einheiten: Pyro, Moderator, Jack, Firewalker, Jugglenaut"
 	},
 	"raveparty" : {
 		"name" : "Disco Rave Party",
@@ -220,9 +220,9 @@
 		"helptext" : "In den Nestern der Chicken wird die Brut herangezogen und nach einer gewissen Zeit auf die restliche Welt losgelassen."
 	},
 	"hoverarty" : {
-		"name" : "Penetrator",
+		"name" : "Lance",
 		"description" : "Mobiler Tachyonen Beschleuniger (Artillerie/Anti-Heavy)",
-		"helptext" : "Penetrators Waffe, genannt \"der Blaue Laser des Todes\", hat die Macht und Präzision die meisten Einheiten mit einem einzigen Schuss zu vernichten. Nutze ihn gegen gut gepanzerte Einheiten, aber halte ihn hinter den Frontlinien - er besitzt nur wenig Durchhaltevermögen und kann nicht ruckartig weglaufen."
+		"helptext" : "Lances Waffe, genannt \"der Blaue Laser des Todes\", hat die Macht und Präzision die meisten Einheiten mit einem einzigen Schuss zu vernichten. Nutze ihn gegen gut gepanzerte Einheiten, aber halte ihn hinter den Frontlinien - er besitzt nur wenig Durchhaltevermögen und kann nicht ruckartig weglaufen."
 	},
 	"dynsupport1" : {
 		"name" : "Engineer Commander",
@@ -300,9 +300,9 @@
 		"helptext" : "Fake unit for technical purposes."
 	},
 	"spiderantiheavy" : {
-		"name" : "Infiltrator",
+		"name" : "Widow",
 		"description" : "Spion, Anti-Heavy",
-		"helptext" : "Der Infiltrator ist für zwei Dinge nützlich. Erstens ist er ein exzellenter Aufklärer und sehr schwer zu entdecken. Er kann sich tief hinter die feindlichen Linien begeben. Außerdem besitzt er die Eigentschaft einen paralysierenden Bolzen abzuschießen, der jedes Ziel einfriert, was gegen schwere Einheiten und feindliche Infrastruktur sehr nützlich ist."
+		"helptext" : "Der Widow ist für zwei Dinge nützlich. Erstens ist er ein exzellenter Aufklärer und sehr schwer zu entdecken. Er kann sich tief hinter die feindlichen Linien begeben. Außerdem besitzt er die Eigentschaft einen paralysierenden Bolzen abzuschießen, der jedes Ziel einfriert, was gegen schwere Einheiten und feindliche Infrastruktur sehr nützlich ist."
 	},
 	"chicken_roc" : {
 		"name" : "Roc",
@@ -310,9 +310,9 @@
 		"helptext" : "Large, angry and capable of fighting both air and land opposition, the Roc is a formidable flying chicken."
 	},
 	"planeheavyfighter" : {
-		"name" : "Hawk",
+		"name" : "Raptor",
 		"description" : "Luftüberlegenheitsjäger",
-		"helptext" : "Der Hawk ist darauf spezialisiert, alles vom Himmel zu holen, was dort umherfliegt. Er ist stabil genung, um begrenztes Flugabwehrfeuer auszuhalten, obwohl er keine Möglichkeit zum Angriff auf Bodenziele besitzt."
+		"helptext" : "Der Raptor ist darauf spezialisiert, alles vom Himmel zu holen, was dort umherfliegt. Er ist stabil genung, um begrenztes Flugabwehrfeuer auszuhalten, obwohl er keine Möglichkeit zum Angriff auf Bodenziele besitzt."
 	},
 	"chicken_blimpy" : {
 		"name" : "Blimpy",
@@ -390,9 +390,9 @@
 		"helptext" : "Der Flail verschießt eine einzige, große Flugabwehrrakete auf mittlerer Distanz, die wirklich großen Schaden anrichtet."
 	},
 	"gunshipheavytrans" : {
-		"name" : "Vindicator",
+		"name" : "Hercules",
 		"description" : "Schwerer, bewaffneter Lufttransport",
-		"helptext" : "Der Vindicator kann jede Landeinheit im Spiel befördern. Seine doppelläufige Laserkanone und sein automatisches Frachtauswurfsystem machen ihn ideal für den Transport von Einheiten in umkämpfte Landezonen."
+		"helptext" : "Der Hercules kann jede Landeinheit im Spiel befördern. Seine doppelläufige Laserkanone und sein automatisches Frachtauswurfsystem machen ihn ideal für den Transport von Einheiten in umkämpfte Landezonen."
 	},
 	"striderfunnelweb" : {
 		"name" : "Funnelweb",
@@ -402,7 +402,7 @@
 	"factoryhover" : {
 		"name" : "Hovercraft Platform",
 		"description" : "Produziert Aerogleiter, Baut mit 10 M/s",
-		"helptext" : "Die Hovercraft Platform ist schnell und tödlich und eröffnet dir die Möglichkeit Wasser und Boden gleichzeitig zu überqueren und somit deinen Gegner geschickt zu überlisten. Wichtigste Einheiten: Dagger, Halberd, Scalpel, Mace, Penetrator"
+		"helptext" : "Die Hovercraft Platform ist schnell und tödlich und eröffnet dir die Möglichkeit Wasser und Boden gleichzeitig zu überqueren und somit deinen Gegner geschickt zu überlisten. Wichtigste Einheiten: Dagger, Halberd, Scalpel, Mace, Lance"
 	},
 	"chickend" : {
 		"name" : "Chicken Tube",
@@ -652,7 +652,7 @@
 	"factoryspider" : {
 		"name" : "Spider Factory",
 		"description" : "Produziert Spinnen, Baut mit 10 M/s",
-		"helptext" : "Ideal für unwegsames Gelände, liegt der Fokus der Spider Factory eher auf Einheiten mit großer Reichweite und Wendigkeit und weniger auf roher Gewalt. Wichtigste Einheiten: Flea, Recluse, Hermit, Crabe"
+		"helptext" : "Ideal für unwegsames Gelände, liegt der Fokus der Spider Factory eher auf Einheiten mit großer Reichweite und Wendigkeit und weniger auf roher Gewalt. Wichtigste Einheiten: Flea, Recluse, Hermit, Crab"
 	},
 	"amphtele" : {
 		"name" : "Djinn",
@@ -695,9 +695,9 @@
 		"helptext" : "Flea kann sich in unerreichbaren Gegenden verstecken, wo ein durchdachter Sensor es ermöglicht weiter zu sehen als Flea gesehen werden kann. In kleinen Gruppen kann es effektiv die gegnerischen Extraktoren überlaufen. Es macht aber nur wenig Schaden und stirbt sofort bei irgendeiner Gegenwehr."
 	},
 	"jumpaa" : {
-		"name" : "Archangel",
+		"name" : "Toad",
 		"description" : "Flugabwehr Springer",
-		"helptext" : "Der Archangel besitzt ein Doppel-Anti-Air-Laser und eine automatische Kanone, um gegnerische Lufteinheiten zu zerstören. Der Archangel kann auch einen Sprung machen."
+		"helptext" : "Der Toad besitzt ein Doppel-Anti-Air-Laser und eine automatische Kanone, um gegnerische Lufteinheiten zu zerstören. Der Toad kann auch einen Sprung machen."
 	},
 	"dynassault1" : {
 		"name" : "Guardian Commander",
@@ -735,7 +735,7 @@
 		"helptext" : "A rapid fire spider which excels at picking off fast units."
 	},
 	"spidercrabe" : {
-		"name" : "Crabe",
+		"name" : "Crab",
 		"description" : "Schwere Riot/Skirmish Spinne - Zieht sich bei Stillstand in seine Panzerung zurück",
 		"helptext" : "Die große Panzerung kann auch große Gruppen von billigen Einheiten wegstecken, sowie grundlegende Verteidigung. Sobald die Spinne zum Stillstand kommt, zieht sie sich in die gepanzerte Form zurück: ein gewaltiger Verteidigungsturm. Der Nachteil ist die große Bewegungseinschränkung."
 	},
@@ -815,9 +815,9 @@
 		"helptext" : "The Kraken is a mobile short ranged artillery bot, armed with twin-firing cannons. For underwater combat it can rapidly fire unguided charges to kill slow enemies. "
 	},
 	"gunshipskirm" : {
-		"name" : "Rapier",
+		"name" : "Harpy",
 		"description" : "Skirmisher/Flugabwehr Hubschrauber",
-		"helptext" : "The Rapier is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets."
+		"helptext" : "The Harpy is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets."
 	},
 	"chickenwurm" : {
 		"name" : "Wurm",
@@ -865,9 +865,9 @@
 		"helptext" : "The Grebe is a basic raider armed with grenades - a decent short ranged anti-heavy weapon. Despite being amphibious, it cannot shoot while submerged."
 	},
 	"jumpsumo" : {
-		"name" : "Sumo",
+		"name" : "Jugglenaut",
 		"description" : "Springender Sturm Roboter",
-		"helptext" : "The Sumo's impressive armor makes it a near-unstoppable sphere of death. It stomps on enemy units to break up their formation and can toss the survivors around with its Gravity Beams. Its stomp is the only way it can damage buildings."
+		"helptext" : "The Jugglenaut's impressive armor makes it a near-unstoppable sphere of death. It stomps on enemy units to break up their formation and can toss the survivors around with its Gravity Beams. Its stomp is the only way it can damage buildings."
 	},
 	"shipaa" : {
 		"name" : "Zephyr",
@@ -1100,9 +1100,9 @@
 		"helptext" : "Der Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit, Panzerung und Selbstreparierung."
 	},
 	"gunshiptrans" : {
-		"name" : "Valkyrie",
+		"name" : "Charon",
 		"description" : "Lufttransport",
-		"helptext" : "Der Valkyrie ist ein einfacher Lufttransport. Er wird benutzt, um Einheiten an die Front zu befördern oder gezielte Abwürfe in das feindliche Territorium zu durchzuführen, allerdings mit der Einschränkung, sich ausdrücklich von jeder Luftabwehr fernzuhalten."
+		"helptext" : "Der Charon ist ein einfacher Lufttransport. Er wird benutzt, um Einheiten an die Front zu befördern oder gezielte Abwürfe in das feindliche Territorium zu durchzuführen, allerdings mit der Einschränkung, sich ausdrücklich von jeder Luftabwehr fernzuhalten."
 	},
 	"hoversonic" : {
 		"name" : "Morningstar",
@@ -1110,9 +1110,9 @@
 		"helptext" : "The Morningstar comes armed with a sonic pulse cannon which completely doesn't care whether target is above or under water."
 	},
 	"gunshipheavyskirm" : {
-		"name" : "Brawler",
+		"name" : "Nimbus",
 		"description" : "Luftnaher Unterstützungskampfhubschrauber",
-		"helptext" : "Der Brawler ist eine Angriffseinheit, die den meisten Bodenrakten ausweichen kann. Der Brawler besitzt genug Munition, um begrenztes Anti-Air Feuer zu überleben und seine Zwillings-EMGs zerfetzen die Panzerung als wäre es Papier."
+		"helptext" : "Der Nimbus ist eine Angriffseinheit, die den meisten Bodenrakten ausweichen kann. Der Nimbus besitzt genug Munition, um begrenztes Anti-Air Feuer zu überleben und seine Zwillings-EMGs zerfetzen die Panzerung als wäre es Papier."
 	},
 	"bomberstrike" : {
 		"name" : "Kestrel",
@@ -1170,8 +1170,8 @@
 		"helptext" : "The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a high power laser beam with high range and damage, ineffective against swarmers and fast aircraft but not much else. While its weapon cannot fire underwater, the Grizzly can float to surface in order to shoot."
 	},
 	"bomberheavy" : {
-		"name" : "Wyvern",
+		"name" : "Likho",
 		"description" : "Implosion Bomber",
-		"helptext" : "Wyvern ist ein mächtiger Bomber, der alles in Schutt und Asche legt. Seine Schlagkraft und Ausdauer ist riesig, doch muss er nach jedem Angriff Munition nachladen, was ihn eher für Angriffe auf einzelne Ziele prädestiniert."
+		"helptext" : "Likho ist ein mächtiger Bomber, der alles in Schutt und Asche legt. Seine Schlagkraft und Ausdauer ist riesig, doch muss er nach jedem Angriff Munition nachladen, was ihn eher für Angriffe auf einzelne Ziele prädestiniert."
 	}
 }

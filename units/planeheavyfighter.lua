@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[planeheavyfighter]],
-  name                   = [[Hawk]],
+  name                   = [[Raptor]],
   description            = [[Air Superiority Fighter]],
   brakerate              = 0.4,
   buildCostMetal         = 300,

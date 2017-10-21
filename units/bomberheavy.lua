@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[bomberheavy]],
-  name                = [[Wyvern]],
+  name                = [[Likho]],
   description         = [[Singularity Bomber]],
   --autoheal          = 25,
   brakerate           = 0.4,

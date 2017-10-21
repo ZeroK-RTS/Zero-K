@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[gunshipheavytrans]],
-  name                   = [[Vindicator]],
+  name                   = [[Hercules]],
   description            = [[Armed Heavy Air Transport]],
   acceleration           = 0.2,
   airStrafe              = 0,
