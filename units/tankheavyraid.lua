@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[tankheavyraid]],
-  name                   = [[Panther]],
+  name                   = [[Blitz]],
   description            = [[Lightning Assault/Raider Tank]],
   acceleration           = 0.125,
   brakeRate              = 0.1375,

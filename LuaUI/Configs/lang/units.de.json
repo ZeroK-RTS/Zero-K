@@ -1,8 +1,8 @@
 {
 	"tankaa" : {
-		"name" : "Copperhead",
+		"name" : "Minotaur",
 		"description" : "Flakpanzer",
-		"helptext" : "Copperheads Flakkanone macht kurzen Prozess mit feindlichen Hubschraubern, aber auch gegen Flugzeuge erweist sie sich als nützlich."
+		"helptext" : "Minotaurs Flakkanone macht kurzen Prozess mit feindlichen Hubschraubern, aber auch gegen Flugzeuge erweist sie sich als nützlich."
 	},
 	"energypylon" : {
 		"name" : "Energy Pylon",
@@ -180,9 +180,9 @@
 		"helptext" : "Der Badger legt Minen aus der Ferne, die ziemlich effektiv sind, aber nur eine begrenzte Lebensdauer besitzen. Er bedindet sich meist außerhalb der Reichweiten der Verteidigung, aber ist nur schwach gepanzert und kann nicht allzu schnell fliehen. Von daher begleite ihn lieber mit ein paar deiner Einheiten."
 	},
 	"staticrearm" : {
-		"name" : "Air Repair/Rearm Pad",
+		"name" : "Airpad",
 		"description" : "Repariert automatisch eigene/verbündete Lufteinheiten, jedes Pad repariert mit 2.5 e/s",
-		"helptext" : "Das Air Repair/Rearm Pad repariert bis zu vier Flugzeuge gleichzeitig. Es befüllt und betankt außerdem die Bomber."
+		"helptext" : "Das Airpad repariert bis zu vier Flugzeuge gleichzeitig. Es befüllt und betankt außerdem die Bomber."
 	},
 	"striderantiheavy" : {
 		"name" : "Ultimatum",
@@ -195,9 +195,9 @@
 		"helptext" : "Der Digger gräbt sich mit seinen scharfen Klauen auch durch das härteste Gestein. So kann er sich eingraben und sich im Untergrund sehr langsam fortbewegen, wo man ihn nur mit seismischen Detektionsgeräten entdecken kann."
 	},
 	"tankriot" : {
-		"name" : "Banisher",
+		"name" : "Ogre",
 		"description" : "Schwerer Riot Unterstützungspanzer",
-		"helptext" : "Erstaunlich beweglich für eine Rioteinheit. Der Banisher ist mit Zwillings-Hochgeschwindigkeits Splitterraketen ausgerüstet, die verheerend für leichte Einheiten und Lufteinheiten sind, obwohl sie nur eine begrenzte Reichweite haben. Der Banisher wird schnell von Sturmeinheiten überrascht und sogar von Raider, weshalb du ihn mit deinen Abschirmungseinheiten beschützen musst. Anders als andere Rioteinheiten besitzt der Banisher die nötige Geschwindigkeit und Reichweite, um sich gegen die meisten Skirmishern zu halten."
+		"helptext" : "Erstaunlich beweglich für eine Rioteinheit. Der Ogre ist mit Zwillings-Hochgeschwindigkeits Splitterraketen ausgerüstet, die verheerend für leichte Einheiten und Lufteinheiten sind, obwohl sie nur eine begrenzte Reichweite haben. Der Ogre wird schnell von Sturmeinheiten überrascht und sogar von Raider, weshalb du ihn mit deinen Abschirmungseinheiten beschützen musst. Anders als andere Rioteinheiten besitzt der Ogre die nötige Geschwindigkeit und Reichweite, um sich gegen die meisten Skirmishern zu halten."
 	},
 	"chicken_leaper" : {
 		"name" : "Leaper",
@@ -245,9 +245,9 @@
 		"helptext" : "Stardust ist ein Geschützturm mit einem lang perfektionierten und tödlichen energetischen Maschinengewehr. Zwar besitzt es nur eine kurze Reichweite, wodurch es sehr verletzbar gegenüber Skirmishern ist, dennoch machen es die hohe Feuerrate und die AoE zu einer guten Verteidigung gegen Schwärme und leichte Einheiten."
 	},
 	"turretmissile" : {
-		"name" : "Defender",
+		"name" : "Picket",
 		"description" : "Leichter Raketenturm (Flugabwehr/Skirmish)",
-		"helptext" : "Der Defender ist ein leichter, multifunktionaler Raketenturm. Er eignet sich gut, um Einheiten aus der Distanz zu töten und bietet ein wenig Flugabwehr. Außerdem zerlegt er feindliche LLT aufgrund seiner größeren Reichweite. Dennoch ist er extrem schwach gepanzert und zerbricht durch jedes Niesen."
+		"helptext" : "Der Picket ist ein leichter, multifunktionaler Raketenturm. Er eignet sich gut, um Einheiten aus der Distanz zu töten und bietet ein wenig Flugabwehr. Außerdem zerlegt er feindliche LLT aufgrund seiner größeren Reichweite. Dennoch ist er extrem schwach gepanzert und zerbricht durch jedes Niesen."
 	},
 	"cloakcon" : {
 		"name" : "Conjurer",
@@ -350,9 +350,9 @@
 		"helptext" : "Der Razor ist ein abgehärteter Flugabwehrturm, dessen hohe Trefferpunkte und Panzerungsbonus es für Gegner, sobald geschlossen, enorm schwer macht, ihn zu zerstören."
 	},
 	"striderbantha" : {
-		"name" : "Bantha",
+		"name" : "Paladin",
 		"description" : "Schwerer Kampfstreicher",
-		"helptext" : "Der Bantha ist die Lösung für eine besonders schwierig zu knackende Verteidigungslinie. Dazu besitzt er einen Tachyonen Beschleuniger und Marschflugkörper für Pattsituationen, blitzschnelle Handfeuerwaffen für den normalen Kampf und haufenweise Munition. Dennoch gib Acht darauf, dass er gegen Luftangriffe fast schutzlos ist."
+		"helptext" : "Der Paladin ist die Lösung für eine besonders schwierig zu knackende Verteidigungslinie. Dazu besitzt er einen Tachyonen Beschleuniger und Marschflugkörper für Pattsituationen, blitzschnelle Handfeuerwaffen für den normalen Kampf und haufenweise Munition. Dennoch gib Acht darauf, dass er gegen Luftangriffe fast schutzlos ist."
 	},
 	"amphbomb" : {
 		"name" : "Limpet",
@@ -430,9 +430,9 @@
 		"helptext" : "Der Thicket ist ein defensiv Poller des Thunderbirds."
 	},
 	"staticjammer" : {
-		"name" : "Sneaky Pete",
+		"name" : "Cornea",
 		"description" : "Verhüllender Turm / Störsender",
-		"helptext" : "Störsender wie diese behindern das feindliche Radar, verschleiern, die von deinen Einheiten ausgelösten, Radarechos. Sneaky Pete bietet außerdem noch ein Deckmantel, um Einheiten in der Nähe vor dem Gegner zu verstecken."
+		"helptext" : "Störsender wie diese behindern das feindliche Radar, verschleiern, die von deinen Einheiten ausgelösten, Radarechos. Cornea bietet außerdem noch ein Deckmantel, um Einheiten in der Nähe vor dem Gegner zu verstecken."
 	},
 	"cloakraid" : {
 		"name" : "Glaive",
@@ -470,9 +470,9 @@
 		"helptext" : "Als Raider opfert der Bandit die rohe Feuerkraft der Überlebensfähigkeit. Er ist etwas stärker als der Glaive, aber immer noch nicht stark genug, um gegen größere Kräfte zu bestehen. Mit Rioteinheiten und LLT entgegenwirken."
 	},
 	"tankheavyassault" : {
-		"name" : "Goliath",
+		"name" : "Cyclops",
 		"description" : "Sehr schwerer Jagdpanzer",
-		"helptext" : "Der Goliath ist der stärkste Panzer auf dem Platz. Seine mächtige Hauptkanone wurde entwickelt, um kleinere Panzer ins Nirvana zu schicken, während der aufgesetzte Flammenwerfer alle Einheiten, die dem Goliath zu nahe kommen, kurz und schmervoll verbrennt. Trotzdem bewegt sich der Panzer wie eine Wasserwanne und seine kurze Reichweite macht ihn zur einfachen Beute von hochentwickelten Skirmishern oder Luftattacken."
+		"helptext" : "Der Cyclops ist der stärkste Panzer auf dem Platz. Seine mächtige Hauptkanone wurde entwickelt, um kleinere Panzer ins Nirvana zu schicken, während der aufgesetzte Flammenwerfer alle Einheiten, die dem Cyclops zu nahe kommen, kurz und schmervoll verbrennt. Trotzdem bewegt sich der Panzer wie eine Wasserwanne und seine kurze Reichweite macht ihn zur einfachen Beute von hochentwickelten Skirmishern oder Luftattacken."
 	},
 	"subscout" : {
 		"name" : "Lancelet",
@@ -505,9 +505,9 @@
 		"helptext" : "Ronins geringer Schaden und die geringe Geschwindigkeit der Raketen wird durch seine Reichweite aufgehoben. Sie sind an Fronten sehr effektiv, da sie dort mit maximaler Reichweite agieren können. Kontere sie, indem du schnelle Einheiten schickst oder Verteidigung hinter einer Terraformmauer baust."
 	},
 	"tankarty" : {
-		"name" : "Pillager",
+		"name" : "Emissary",
 		"description" : "Allzweck Artillerie",
-		"helptext" : "Die schwere, weitreichende Kanone des Pillagers macht ih zur pefekten Wahl, wenn es um einen Stellungskrieg geht und du Bauwerke usw. zerstören willst. Wie immer bei Artillerieeinheiten, musst du alledings alle feindlichen Einheiten von dem Pillager fernhalten."
+		"helptext" : "Die schwere, weitreichende Kanone des Emissaries macht ih zur pefekten Wahl, wenn es um einen Stellungskrieg geht und du Bauwerke usw. zerstören willst. Wie immer bei Artillerieeinheiten, musst du alledings alle feindlichen Einheiten von dem Emissary fernhalten."
 	},
 	"tacnuke" : {
 		"name" : "Eos",
@@ -590,9 +590,9 @@
 		"helptext" : "Der Convict ist ein ziemlich normaler Konstruktionsroboter mit einem Vorteil: er hat ein Schild um sich zu schutzen."
 	},
 	"striderarty" : {
-		"name" : "Catapult",
+		"name" : "Merlin",
 		"description" : "Schwerer Raketen-Artillerie Läufer",
-		"helptext" : "Das Catapult ist ein Läufer mit Mehrfachraketenwerfer-Artilleriesystem. Es kann eine Salve von Raketen starten, was die Zerstörung von fast allem im Zielgebiet garantieren kann. Infolgedessen kann es sich schnell in freundliches Gebiet hinter den Fronteinheiten zurückziehen."
+		"helptext" : "Das Merlin ist ein Läufer mit Mehrfachraketenwerfer-Artilleriesystem. Es kann eine Salve von Raketen starten, was die Zerstörung von fast allem im Zielgebiet garantieren kann. Infolgedessen kann es sich schnell in freundliches Gebiet hinter den Fronteinheiten zurückziehen."
 	},
 	"staticstorage" : {
 		"name" : "Storage",
@@ -665,9 +665,9 @@
 		"helptext" : "Spikers messerscharfe Projektile können auch die dickste Penzerung durchdringen. Zwar besitzen Spiker wenig Lebensenergie, dennoch stellen sie durchauch eine große Gefahr, für sowohl Boden- als auch Lufteinheiten, dar. Wirke den Spikern mit Einheiten entgegen, die eine größere Reichweite als sie besitzen."
 	},
 	"staticnuke" : {
-		"name" : "Silencer",
+		"name" : "Trinity",
 		"description" : "Abschuß für atomare Interkontinentalraketen, Benötigt 18 M/s und 3 Minuten zum Bevorraten",
-		"helptext" : "Der Silencer verschießt verwüstende, atomare Raketen, die ganze Basen in Schutt und Asche legen können. Trotzdem kann es von einem feindlichen Anti-Atomsystem geschlagen werden. Aus diesem Grund solltest du dieses zunächst vernichten, bevor du deine Raketen abschießt."
+		"helptext" : "Der Trinity verschießt verwüstende, atomare Raketen, die ganze Basen in Schutt und Asche legen können. Trotzdem kann es von einem feindlichen Anti-Atomsystem geschlagen werden. Aus diesem Grund solltest du dieses zunächst vernichten, bevor du deine Raketen abschießt."
 	},
 	"staticmissilesilo" : {
 		"name" : "Missile Silo",
@@ -720,14 +720,14 @@
 		"helptext" : "This Rocket Boat fires a salvo of four medium-range rockets, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close."
 	},
 	"staticarty" : {
-		"name" : "Behemoth",
+		"name" : "Tyrant",
 		"description" : "Plasmabatterie - Benötigt ein angeschlossenes Stromnetz von 50 Energie, um feuern zu können.",
-		"helptext" : "Der Behemoth besitzt eine weitreichende (Erwiderungs-)Artilleriefähigkeit, um Zugang zu größeren Arealen zu verhindern. Er wurde nicht als Verteidigungsturm entwickelt und wird bei direktem Angriff in die Knie gezwungen."
+		"helptext" : "Der Tyrant besitzt eine weitreichende (Erwiderungs-)Artilleriefähigkeit, um Zugang zu größeren Arealen zu verhindern. Er wurde nicht als Verteidigungsturm entwickelt und wird bei direktem Angriff in die Knie gezwungen."
 	},
 	"staticantinuke" : {
-		"name" : "Protector",
+		"name" : "Antinuke",
 		"description" : "Antinukleares System (Anti-Nuke)",
-		"helptext" : "Der Protector fängt automatisch gegnerische, atomare Interkontinentalraketen, welche in den, vom System abgedeckten, Bereich zielen, ab."
+		"helptext" : "Der Antinuke fängt automatisch gegnerische, atomare Interkontinentalraketen, welche in den, vom System abgedeckten, Bereich zielen, ab."
 	},
 	"spiderriot" : {
 		"name" : "Redback",
@@ -910,9 +910,9 @@
 		"helptext" : "A single salvo from one of these will pummel almost any surface target into submission. The psychological effects of the muzzle flash and the ship recoiling in the water are impressive enough, to say nothing of the effects of a direct hit. Be warned--battleships are not meant to be used on their own, lacking in anti-air and anti-submarine protection as they are."
 	},
 	"tankheavyraid" : {
-		"name" : "Panther",
+		"name" : "Blitz",
 		"description" : "Blitzschlag Raider Panzer",
-		"helptext" : "Der Panther ist ein hoch entwickelter Raider, dessen Waffe, eine Blitzkanone, hauptsächlich paralysierenden Schaden austeilt. Auf diesem Wege kann der Panther Türme ausschalten und sich so durch die feindlichen Verteidigungslinien walzen, bis zur Egalisierung der feindlichen, ökonimischen Grundversorgung."
+		"helptext" : "Der Blitz ist ein hoch entwickelter Raider, dessen Waffe, eine Blitzkanone, hauptsächlich paralysierenden Schaden austeilt. Auf diesem Wege kann der Blitz Türme ausschalten und sich so durch die feindlichen Verteidigungslinien walzen, bis zur Egalisierung der feindlichen, ökonimischen Grundversorgung."
 	},
 	"factorygunship" : {
 		"name" : "Gunship Plant",
@@ -972,7 +972,7 @@
 	"factorytank" : {
 		"name" : "Tank Foundry",
 		"description" : "Produziert schwere und speziallisierte Fahrzeuge, Baut mit 10 M/s",
-		"helptext" : "Die Tank Foundry ist das Ultimum für brachiale Gewalt. Nicht erledigt den Auftrag zu gut, wie ein anhaltendes Artilleriefeuer, gefolgt von einem entscheidenen Vorstoß mit den größten Panzern auf dem Feld. Wichtigste Einheiten: Pillager, Reaper, Banisher, Goliath"
+		"helptext" : "Die Tank Foundry ist das Ultimum für brachiale Gewalt. Nicht erledigt den Auftrag zu gut, wie ein anhaltendes Artilleriefeuer, gefolgt von einem entscheidenen Vorstoß mit den größten Panzern auf dem Feld. Wichtigste Einheiten: Emissary, Reaper, Ogre, Cyclops"
 	},
 	"empmissile" : {
 		"name" : "Shockley",

@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[staticarty]],
-  name                          = [[Behemoth]],
+  name                          = [[Tyrant]],
   description                   = [[Plasma Artillery Battery - Requires connection to a 50 energy grid]],
   acceleration                  = 0,
   activateWhenBuilt             = true,

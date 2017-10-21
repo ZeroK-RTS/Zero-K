@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[striderbantha]],
-  name                   = [[Bantha]],
+  name                   = [[Paladin]],
   description            = [[Ranged Support Strider]],
   acceleration           = 0.1047,
   brakeRate              = 0.2212,
@@ -40,7 +40,7 @@ unitDef = {
   movementClass          = [[KBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING SATELLITE SUB]],
-  objectName             = [[Bantha.s3o]],
+  objectName             = [[Paladin.s3o]],
   selfDestructAs         = [[ATOMIC_BLAST]],
   script                 = [[striderbantha.lua]],
   

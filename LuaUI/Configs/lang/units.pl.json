@@ -110,9 +110,9 @@
         "helptext": "Wyrzutnia torped to podstawowa wieżyczka do obrony na morzu - atakuje cele pod wodą, na powierzchni i poduszkowce."
     },
     "tankheavyassault": {
-        "name": "Goliath",
+        "name": "Cyclops",
         "description": "Ciężki niszczyciel czołgów",
-        "helptext": "Goliath to najcięższy czołg. Jego główne działo zadaje ciężkie obrażenia i jest w stanie rujnować terraformowane ściany, a promień spowalniający nie pozwala ofiarom uciec. Choć Goliath ma problemy ze zwrotnością, to pod względem wytrzymałości i siły ognia nie ma sobie równych."
+        "helptext": "Cyclops to najcięższy czołg. Jego główne działo zadaje ciężkie obrażenia i jest w stanie rujnować terraformowane ściany, a promień spowalniający nie pozwala ofiarom uciec. Choć Cyclops ma problemy ze zwrotnością, to pod względem wytrzymałości i siły ognia nie ma sobie równych."
     },
     "jumpraid": {
         "name": "Pyro",
@@ -120,9 +120,9 @@
         "helptext": "Pyro to lekki bot z miotaczem ognia, który zadaje zwiększone obrażenia dużym jednostkom i może razić wiele celów jednocześnie, i możliwością skoku. Chociaż Pyro otrzymuje obrażenia od ognia, to nie da się go podpalić. Ze zniszczonych Pyro wylewa się resztka napalmu, podpalając okoliczne jednostki."
     },
     "turretmissile": {
-        "name": "Defender",
+        "name": "Picket",
         "description": "Lekka wieżyczka rakietowa",
-        "helptext": "Defender to lekka, wszechstronna wieżyczka. Jego celne pociski świetnie nadają się do niszczenia jednostek z dala i zapewniają podstawowe możliwości przeciwlotnicze. Główną wadą Defendera jest jego bardzo niska wytrzymałość."
+        "helptext": "Picket to lekka, wszechstronna wieżyczka. Jego celne pociski świetnie nadają się do niszczenia jednostek z dala i zapewniają podstawowe możliwości przeciwlotnicze. Główną wadą Defendera jest jego bardzo niska wytrzymałość."
     },
     "chicken_roc": {
         "name": "Roc",
@@ -145,7 +145,7 @@
         "helptext": "Bezbronny kurczak, którego celem życiowym jest przeobrażenie się w jeden z budynków kurczaków."
     },
     "staticjammer": {
-        "name": "Sneaky Pete",
+        "name": "Cornea",
         "description": "Wieża zakłócająco-maskująca",
         "helptext": "Zakłócacze nie pozwalają radarom wykrywać jednostek na ich obszarze. Sneaky Peet posiada również niewidzialność obszarową, które pozwala ukryć jednostki także przed normalnym widzeniem."
     },
@@ -230,9 +230,9 @@
         "helptext": "Angler to amfibia przeciwlownicza, która najlepiej sprawuje się przeciwko bombowcom Raven.  Anglery są w stanie wypłynąć na powierzchnię i parami je zestrzeliwać."
     },
     "tankaa": {
-        "name": "Copperhead",
+        "name": "Minotaur",
         "description": "Czołg przeciwlotniczy",
-        "helptext": "Copperhead posiada działa przeciwlotnicze, które dobrze sprawdzają się przeciwko samolotom i jeszcze lepiej przeciwko statkom powietrznym."
+        "helptext": "Minotaur posiada działa przeciwlotnicze, które dobrze sprawdzają się przeciwko samolotom i jeszcze lepiej przeciwko statkom powietrznym."
     },
     "asteroid": {
         "name": "Asteroida",
@@ -445,9 +445,9 @@
         "helptext": "Hunter to lekka łódź z torpedami przeznaczona do najazdów i niszczenia łodzi podwodnych. W dużej ilości nieźle się też sprawdza przeciwko bardzo ciężkim okrętom."
     },
     "staticnuke": {
-        "name": "Silencer",
+        "name": "Trinity",
         "description": "Silos rakiet strategicznych, moc 18 m/s, budowa rakiety 3 minuty",
-        "helptext": "Silencer może wystrzelić potężną rakietę z głowicą atomową, która jest w stanie zrównać z ziemią całą bazę wroga. Jednakże przed naciśnięciem czerwonego guzika należy upewnić się, że celu nie broni tarcza antyrakietowa, i w razie potrzeby pozbyć się jej."
+        "helptext": "Trinity może wystrzelić potężną rakietę z głowicą atomową, która jest w stanie zrównać z ziemią całą bazę wroga. Jednakże przed naciśnięciem czerwonego guzika należy upewnić się, że celu nie broni tarcza antyrakietowa, i w razie potrzeby pozbyć się jej."
     },
     "hovershotgun": {
         "name": "Punisher",
@@ -680,14 +680,14 @@
         "helptext": "Revenant wystrzeliwuje niszczycielskie salwy rakiet, które z braku samonaprowadzania mają jednak kłopoty z trafianiem szybkich jednostek. gunshipassault jest wytrzymały, ale też drogi i ma niską szybkostrzelnosc, zatem oczekując między atakami warto oddalić sie, aby nie otrzymywać niepotrzebnie obrażeń."
     },
     "tankriot": {
-        "name": "Banisher",
+        "name": "Ogre",
         "description": "Ciężki czołg wsparcia",
-        "helptext": "Mobilny jak na jednostkę wsparcia, Banisher posiada ciężkie rakiety krótkiego zasięgu, które szybko niszczą grupy lekkich jednostek, są skuteczne przeciw lotnictwu i wyrównują teren. Banishera łatwo zniszczyć jednostkami szturmowymi lub harcownikami."
+        "helptext": "Mobilny jak na jednostkę wsparcia, Ogre posiada ciężkie rakiety krótkiego zasięgu, które szybko niszczą grupy lekkich jednostek, są skuteczne przeciw lotnictwu i wyrównują teren. Ogrea łatwo zniszczyć jednostkami szturmowymi lub harcownikami."
     },
     "staticantinuke": {
-        "name": "Protector",
+        "name": "Antinuke",
         "description": "Tarcza antyrakietowa",
-        "helptext": "Protector automatycznie przechwytuje rakiety z głowicami atomowymi wycelowane w obszar przezeń broniony."
+        "helptext": "Antinuke automatycznie przechwytuje rakiety z głowicami atomowymi wycelowane w obszar przezeń broniony."
     },
     "staticheavyarty": {
         "name": "Big Bertha",
@@ -700,9 +700,9 @@
         "helptext": "Karabin snajperski Spectra zadaje ciężkie obrażenia pojedynczym celom. Jako jedyna jednostka może strzelać pozostając niewidzialnym; jego naboje są jednak widoczne i mogą pomóc przeciwnikom w znalezieniu go. Utrzymanie niewidzialności kosztuje także spore ilości energii. Najlepszym sposobem na wykrycie Spectra jest przeczesanie okolicy tanimi jednostkami."
     },
     "staticarty": {
-        "name": "Behemoth",
+        "name": "Tyrant",
         "description": "Bateria plazmowa - wymaga sieci energetycznej 50 E",
-        "helptext": "Behemoth to skuteczna (przeciw-)artyleria; świetnie chroni okolicę. Nie jest to jednak klasyczna wieża obronna i łatwo ją zniszczyć w bezpośrednim natarciu."
+        "helptext": "Tyrant to skuteczna (przeciw-)artyleria; świetnie chroni okolicę. Nie jest to jednak klasyczna wieża obronna i łatwo ją zniszczyć w bezpośrednim natarciu."
     },
     "wolverine_mine": {
         "name": "Claw",
@@ -960,9 +960,9 @@
         "helptext": "Czołgi specjalizują się w brutalnej sile i wytrzymałości pancerza. Nic tak nie załatwia sporów, jak pancerna pięść na gąsienicach."
     },
     "striderbantha": {
-        "name": "Bantha",
+        "name": "Paladin",
         "description": "Mech bojowy",
-        "helptext": "Bantha to ciężki mech bojowy, uzbrojony po zęby i bardzo wytrzymały. Posiada rakiety EMP dalekiego zasięgu, ciężki laser oraz działka EMP. Nie ma jednak żadnej obrony przeciwlotniczej i słabo radzi sobie bez wsparcia mniejszych jednostek"
+        "helptext": "Paladin to ciężki mech bojowy, uzbrojony po zęby i bardzo wytrzymały. Posiada rakiety EMP dalekiego zasięgu, ciężki laser oraz działka EMP. Nie ma jednak żadnej obrony przeciwlotniczej i słabo radzi sobie bez wsparcia mniejszych jednostek"
     },
     "turretaaflak": {
         "name": "Cobra",
@@ -1010,9 +1010,9 @@
         "helptext": "Szybka jednostka samobójcza dobra do wyborowego niszczenia odsłoniętych celów. Stojąc obok złomu, pobiera z niego metal i replikuje się."
     },
     "tankheavyraid": {
-        "name": "Panther",
+        "name": "Blitz",
         "description": "Lekki czołg szturmowy",
-        "helptext": "Panther to lekki czołg uzbrojony w działko EMP, które zadaje niskie obrażenia, ale paraliżuje cel, dzięki czemu może unieszkodliwiać mało ważne cele, by je ominąć i przejść do niszczenia ważniejszych. Zniszczony Panther uwalnia falę EMP."
+        "helptext": "Blitz to lekki czołg uzbrojony w działko EMP, które zadaje niskie obrażenia, ale paraliżuje cel, dzięki czemu może unieszkodliwiać mało ważne cele, by je ominąć i przejść do niszczenia ważniejszych. Zniszczony Blitz uwalnia falę EMP."
     },
     "turretimpulse": {
         "name": "Newton",
@@ -1125,9 +1125,9 @@
         "helptext": "Napalm zrzucany przez Phoenixa dziesiątkuje grupy lekkich jednostek i budynków."
     },
     "striderarty": {
-        "name": "Catapult",
+        "name": "Merlin",
         "description": "Ciężki rakietowy mech artyleryjski",
-        "helptext": "Catapult to mech artyleryjski zalewający okolicę falami ciężkich rakiet. Świetny przeciwko ufortyfikowanym pozycjom."
+        "helptext": "Merlin to mech artyleryjski zalewający okolicę falami ciężkich rakiet. Świetny przeciwko ufortyfikowanym pozycjom."
     },
     "gunshipheavytrans": {
         "name": "Hercules",

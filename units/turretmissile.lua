@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[turretmissile]],
-  name                          = [[Defender]],
+  name                          = [[Picket]],
   description                   = [[Light Missile Tower]],
   acceleration                  = 0,
   brakeRate                     = 0,

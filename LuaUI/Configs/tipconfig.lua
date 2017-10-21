@@ -38,7 +38,7 @@ unitTips = {
 	jumparty = {"The \255\255\64\0Firewalker\008 creates large clouds of fire which can seriously harm units - friend or foe - standing in them.", 3, 5},
 	jumpbomb = {"The \255\255\64\0Skuttle\008 has a very powerful explosion with a very small blast radius. Use it to jump on enemy heavy targets and kill them in one or two blows.", 3, 5},
 	
-	tankriot = {"The \255\255\64\0Banisher\008 packs a punch against groups of small units, but can be easily rushed - make sure to screen it.", 3, 4},
+	tankriot = {"The \255\255\64\0Ogre\008 packs a punch against groups of small units, but can be easily rushed - make sure to screen it.", 3, 4},
 	hoverarty = {"The \255\255\64\0Lance\008 can split many units apart in one shot, but has no AoE and a 20s reload time, and is itself very flimsy. Use it for pinpoint fire from a distance.", 3, 4},
 }
 

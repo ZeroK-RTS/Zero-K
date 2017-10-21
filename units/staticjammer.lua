@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[staticjammer]],
-  name                          = [[Sneaky Pete]],
+  name                          = [[Cornea]],
   description                   = [[Area Cloaker/Jammer]],
   activateWhenBuilt             = true,
   buildCostMetal                = 420,

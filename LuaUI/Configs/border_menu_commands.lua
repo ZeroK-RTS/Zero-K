@@ -68,7 +68,7 @@ local buildoptions = {
 		{ "turretheavy",  tech=2, notSea=true },
 		{ "turretantiheavy",  tech=3, notSea=true },
 		{ "staticarty",  tech=3, notSea=true },
-		{ "staticantinuke",  tech=3, notSea=true },-- Protector
+		{ "staticantinuke",  tech=3, notSea=true },-- Antinuke
 	},
 
 	{-- air_defense
@@ -85,7 +85,7 @@ local buildoptions = {
 		{ "staticradar" },
 		{ "staticheavyradar",  tech=2 },
 		{ "staticshield",  tech=2 },-- Aegis
-		{ "staticjammer",  tech=2 },-- Sneaky Pete
+		{ "staticjammer",  tech=2 },-- Cornea
 		{ "staticmissilesilo",  tech=2 },
 		{ CMD_RAMP,  tech=3 },
 		{ CMD_LEVEL,  tech=3 },
