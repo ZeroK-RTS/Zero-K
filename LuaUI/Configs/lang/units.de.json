@@ -1095,9 +1095,9 @@
 		"helptext" : "Der Mace ist ein mobiler Laserturm. Seine hohe Feuerkraft ist nützlich, um leichte, feindliche Einheiten zu töten. Er schießt höchst präzise und erweist sich gegen Hubschrauber und schnelle Einheiten als nützlich. Trotzdem macht ihn seine einfache Verteidigung anfällig für direkte Angriffe, vor allem durch Skirmisher."
 	},
 	"dynknight1" : {
-		"name" : "Knight Commander",
+		"name" : "Commander",
 		"description" : "Mobiler Sturmkommandant",
-		"helptext" : "Der Knight Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit, Panzerung und Selbstreparierung."
+		"helptext" : "Der Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit, Panzerung und Selbstreparierung."
 	},
 	"gunshiptrans" : {
 		"name" : "Valkyrie",

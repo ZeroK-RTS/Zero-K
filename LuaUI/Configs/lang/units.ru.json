@@ -1138,9 +1138,9 @@
         "name": "Gnat"
     },
     "dynknight1": {
-        "helptext": "The Knight Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration.",
+        "helptext": "The Knight Commander chassis is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration.",
         "description": "Mobile Assault Commander",
-        "name": "Knight Commander"
+        "name": "Commander"
     },
     "chicken_shield": {
         "helptext": "Protects adjacent chickens.",

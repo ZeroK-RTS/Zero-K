@@ -531,7 +531,7 @@
 	},
 	"factoryship" : {
 		"name" : "Shipyard",
-		"description" : "Produces Ships, Builds at 10 m/s",
+		"description" : "Produces Naval Units, Builds at 10 m/s",
 		"helptext" : "Shipyard is where both ships and submarines are built. Other waterborne units such as hovercraft and amphibious bots have separate factories."
 	},
 	"vehassault" : {
@@ -1175,8 +1175,8 @@
 		"helptext" : "The Buoy works around its inability to shoot while submerged by floating to the surface of the sea. Here it can fire a decently ranged cannon with slow damage. It is unable to move while floating."
 	},
 	"dynknight1" : {
-		"name" : "Knight Commander",
+		"name" : "Commander",
 		"description" : "Mobile Assault Commander",
-		"helptext" : "The Knight Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration."
+		"helptext" : "The Knight Commander chassis is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration."
 	}
 }
