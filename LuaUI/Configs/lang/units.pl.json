@@ -580,9 +580,9 @@
         "helptext": "Lotus to podstawowa wieżyczka. Dobrze chroni przed lekkimi jednostkami, chociaż stosunkowo łatwo zniszczyć go harcownikami, artylerią lub jednostkami szturmowymi."
     },
     "cloakskirm": {
-        "name": "Rocko",
+        "name": "Ronin",
         "description": "Bot harcownik",
-        "helptext": "Rocko jest uzbrojony w powolne rakiety, które mimo niskich obrażeń i braku samonaprowadzania mają duży zasięg. Najlepiej sprawdzają się stojąc w linii prostopadłej do celu, atakując z maksymalnej odległości i nie dając się złapać przeciwnikom. Można go pokonać lekkimi jednostkami, które są w stanie unikać ich rakiet, dogonić go i zniszczyć."
+        "helptext": "Ronin jest uzbrojony w powolne rakiety, które mimo niskich obrażeń i braku samonaprowadzania mają duży zasięg. Najlepiej sprawdzają się stojąc w linii prostopadłej do celu, atakując z maksymalnej odległości i nie dając się złapać przeciwnikom. Można go pokonać lekkimi jednostkami, które są w stanie unikać ich rakiet, dogonić go i zniszczyć."
     },
     "tankcon": {
         "name": "Welder",
@@ -1135,9 +1135,9 @@
         "helptext": "Vindicator jest w stanie przenosić każdą jednostkę. Jego wytrzymałość i lekkie uzbrojenie pomagają mu dostarczać jednostki nawet w wirze walki."
     },
     "planescout": {
-        "name": "Vulture",
+        "name": "Owl",
         "description": "Samolot zwiadowczy z zakłócaczem",
-        "helptext": "Vulture oferuje niezrównane możliwości zwiadowcze, zapewniając radar i sonar. Jest także wyposażony w zakłócacz."
+        "helptext": "Owl oferuje niezrównane możliwości zwiadowcze, zapewniając radar i sonar. Jest także wyposażony w zakłócacz."
     },
 	"dynstrike1" : {
 		"name" : "Dowódca Strike",

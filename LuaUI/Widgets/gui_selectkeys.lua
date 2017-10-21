@@ -184,7 +184,7 @@ options = {
 		action = 'select AllMap+_Not_Builder_Not_Building+_ClearSelection_SelectAll+',
 	},
 	uikey4 = { type = 'button',
-		name = 'Vultures',
+		name = 'Owls',
 		desc = '',
 		action = 'select AllMap+_Not_Builder_Not_Building_Not_Transport_Aircraft_Radar+_ClearSelection_SelectAll+',
 	},

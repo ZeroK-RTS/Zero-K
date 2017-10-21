@@ -17,7 +17,7 @@
 	"factorycloak" : {
 		"name" : "Cloaky Bot Factory",
 		"description" : "Produziert Tarnroboter, Baut mit 10 M/s",
-		"helptext" : "List statt pure Gewalt lautet hier das Motto. Die Cloaky Bot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Rocko, Warrior, Zeus, Hammer"
+		"helptext" : "List statt pure Gewalt lautet hier das Motto. Die Cloaky Bot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Ronin, Warrior, Zeus, Hammer"
 	},
 	"hoverdepthcharge" : {
 		"name" : "Claymore",
@@ -500,9 +500,9 @@
 		"helptext" : "Das Strider Hub erzeugt Strider, welche sehr gefürchtet sind auf dem Schlachtfeld. Anders als normale Fabriken, wird dieser Hub nur benötigt, um ein Projekt zu starten, nicht, um es zu vollenden."
 	},
 	"cloakskirm" : {
-		"name" : "Rocko",
+		"name" : "Ronin",
 		"description" : "Skirmisher Roboter (Direkt-Feuer)",
-		"helptext" : "Rockos geringer Schaden und die geringe Geschwindigkeit der Raketen wird durch seine Reichweite aufgehoben. Sie sind an Fronten sehr effektiv, da sie dort mit maximaler Reichweite agieren können. Kontere sie, indem du schnelle Einheiten schickst oder Verteidigung hinter einer Terraformmauer baust."
+		"helptext" : "Ronins geringer Schaden und die geringe Geschwindigkeit der Raketen wird durch seine Reichweite aufgehoben. Sie sind an Fronten sehr effektiv, da sie dort mit maximaler Reichweite agieren können. Kontere sie, indem du schnelle Einheiten schickst oder Verteidigung hinter einer Terraformmauer baust."
 	},
 	"tankarty" : {
 		"name" : "Pillager",
@@ -965,9 +965,9 @@
 		"helptext" : "Der Swift kann sowohl Land-, als auch Lufteinheiten treffen. Er eignet sich gut zur Verteidigung gegen Lufteinheiten, aber feindliche Flugabwehr und Luftüberlegenheitsjäger werden ihn schnell erlegen. Zuhauf kann er aber Landeinheiten durchaus auf die Nerven gehen."
 	},
 	"planescout" : {
-		"name" : "Vulture",
+		"name" : "Owl",
 		"description" : "Tarnkappen Radar/Sonar Flugzeug",
-		"helptext" : "Der Vulture bietet dir die beispiellose Möglichkeit zur unerkannten, weitläufigen Aufklärung und kann mit seinem Sonar auch Unterwasserziele lokalisieren. Er hat auch ein Stoersender der gegen feindliche Radare wirkt."
+		"helptext" : "Der Owl bietet dir die beispiellose Möglichkeit zur unerkannten, weitläufigen Aufklärung und kann mit seinem Sonar auch Unterwasserziele lokalisieren. Er hat auch ein Stoersender der gegen feindliche Radare wirkt."
 	},
 	"factorytank" : {
 		"name" : "Heavy Tank Factory",

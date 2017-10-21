@@ -17,7 +17,7 @@
 	"factorycloak" : {
 		"name" : "Cloaky Bot Factory",
 		"description" : "Produces Cloaky Robots, Builds at 10 m/s",
-		"helptext" : "Emphasizing guile over brute force, the Cloaky Bot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Warrior, Zeus, Hammer"
+		"helptext" : "Emphasizing guile over brute force, the Cloaky Bot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Ronin, Warrior, Zeus, Hammer"
 	},
 	"ampharty" : {
 		"name" : "Kraken",
@@ -550,9 +550,9 @@
 		"helptext" : "The Lotus is a basic turret. A versatile, solid anti-ground weapon, it does well versus scouts as well as being able to take on one or two raiders. Falls relatively easily to skirmishers, artillery or assault units unless supported."
 	},
 	"cloakskirm" : {
-		"name" : "Rocko",
+		"name" : "Ronin",
 		"description" : "Skirmisher Bot (Direct-Fire)",
-		"helptext" : "The Rocko's low damage, low speed unguided rockets are redeemed by their range. They are most effective in a line formation, firing at maximum range and kiting the enemy. Counter them by attacking them with fast units which can close range and dodge their missiles."
+		"helptext" : "The Ronin's low damage, low speed unguided rockets are redeemed by their range. They are most effective in a line formation, firing at maximum range and kiting the enemy. Counter them by attacking them with fast units which can close range and dodge their missiles."
 	},
 	"tankcon" : {
 		"name" : "Welder",
@@ -1165,9 +1165,9 @@
 		"helptext" : "The Vindicator can haul any land unit in the game. Its twin laser guns and automated cargo ejection system make it ideal for drops into hot LZs."
 	},
 	"planescout" : {
-		"name" : "Vulture",
+		"name" : "Owl",
 		"description" : "Area Jammer, Radar/Sonar Plane",
-		"helptext" : "The Vulture provides an unparalleled means for deep scouting, and can locate underwater targets with its sonar. It is also equipped with an area jammer, which prevents radar from working in the area underneath."
+		"helptext" : "The Owl provides an unparalleled means for deep scouting, and can locate underwater targets with its sonar. It is also equipped with an area jammer, which prevents radar from working in the area underneath."
 	},
 	"amphfloater" : {
 		"name" : "Buoy",

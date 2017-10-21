@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakskirm]],
-  name                   = [[Rocko]],
+  name                   = [[Ronin]],
   description            = [[Skirmisher Bot (Direct-Fire)]],
   acceleration           = 0.32,
   brakeRate              = 0.2,
@@ -41,7 +41,7 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:rockomuzzle]],
+      [[custom:Roninmuzzle]],
     },
 
   },
@@ -119,7 +119,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[rocko_d.dae]],
+      object           = [[Ronin_d.dae]],
     },
 
     HEAP  = {
