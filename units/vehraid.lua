@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehraid]],
   name                   = [[Scorcher]],
-  description            = [[Raider Vehicle]],
+  description            = [[Raider Rover]],
   acceleration           = 0.057,
   brakeRate              = 0.07,
   buildCostMetal         = 130,

@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[veharty]],
   name                = [[Wolverine]],
-  description         = [[Artillery Minelayer Vehicle]],
+  description         = [[Artillery Minelayer Rover]],
   acceleration        = 0.0282,
   brakeRate           = 0.08,
   buildCostMetal      = 260,

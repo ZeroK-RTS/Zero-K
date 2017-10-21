@@ -15,9 +15,9 @@
 		"helptext" : "The Rapier is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets."
 	},
 	"factorycloak" : {
-		"name" : "Cloaky Bot Factory",
-		"description" : "Produces Cloaky Robots, Builds at 10 m/s",
-		"helptext" : "Emphasizing guile over brute force, the Cloaky Bot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Ronin, Warrior, Zeus, Hammer"
+		"name" : "Cloakbot Factory",
+		"description" : "Produces Cloaked, Mobile Robots, Builds at 10 m/s",
+		"helptext" : "Emphasizing guile over brute force, the Cloakbot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Ronin, Warrior, Zeus, Hammer"
 	},
 	"ampharty" : {
 		"name" : "Kraken",
@@ -140,9 +140,9 @@
 		"helptext" : "The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them."
 	},
 	"factoryveh" : {
-		"name" : "Light Vehicle Factory",
-		"description" : "Produces Wheeled Vehicles, Builds at 10 m/s",
-		"helptext" : "A traditional favourite, the Vehicle Plant is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Leveler, Slasher"
+		"name" : "Rover Assembly",
+		"description" : "Produces Light Wheeled Vehicles, Builds at 10 m/s",
+		"helptext" : "A traditional favourite, the Rover Assembly is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Leveler, Slasher"
 	},
 	"turretgauss" : {
 		"name" : "Gauss",
@@ -231,7 +231,7 @@
 	},
 	"vehriot" : {
 		"name" : "Leveler",
-		"description" : "Riot Vehicle",
+		"description" : "Riot Rover",
 		"helptext" : "The Leveler's riot cannon is effective at destroying swarms of raiders and halting enemy advances. The projectile does not arc, so Levelers should avoid clumping and be arranged in a line formation wherever possible. Due to their lack of speed and range, most skirmishers are effective against them. True to its name the Leveler's cannon flattens terrain to enable allied vehicles passage over harsh terrain."
 	},
 	"staticshield" : {
@@ -375,7 +375,7 @@
 		"helptext" : "The Brawler is a fire support gunship that flies out of the reach of most ground mobiles. It is tough enough to survive limited anti-air fire, and its twin EMGs chew through units stupid enough to stay put."
 	},
 	"factoryshield" : {
-		"name" : "Shield Bot Factory",
+		"name" : "Shieldbot Factory",
 		"description" : "Produces Tough Robots, Builds at 10 m/s",
 		"helptext" : "The Shield Bot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer"
 	},
@@ -451,7 +451,7 @@
 	},
 	"veharty" : {
 		"name" : "Wolverine",
-		"description" : "Artillery Minelayer Vehicle",
+		"description" : "Artillery Minelayer Rover",
 		"helptext" : "The Wolverine lays mines which are fairly effective but have a limited lifespan from a distance (rather haphazardly). The Wolverine outranges most defenses comfortably, but is lightly armored and cannot flee easily so keep it screened with friendly units, possibly assisted by your own mines."
 	},
 	"striderantiheavy" : {
@@ -466,7 +466,7 @@
 	},
 	"vehsupport" : {
 		"name" : "Slasher",
-		"description" : "Deployable Missile Vehicle (must stop to fire)",
+		"description" : "Deployable Missile Rover (must stop to fire)",
 		"helptext" : "Keep the Slasher at maximum range to harass the opponent's units. The Slasher's missiles track, so they are ideal to kill fast-moving raiders and crawling bombs. It is able to hit air, but is only really useful against fighters. Cannot fire over obstacles, and does poorly if enemies, particularly assault units, are allowed to close range. Unlike skirmishers, the Slasher cannot fire while moving."
 	},
 	"grebe" : {
@@ -536,7 +536,7 @@
 	},
 	"vehassault" : {
 		"name" : "Ravager",
-		"description" : "Assault Vehicle",
+		"description" : "Assault Rover",
 		"helptext" : "Expensive and powerful, the Ravager is capable of holding its own against most opposition. Though its maneuverability is terrible, its strength is when moving at a considerable top speed in a straight line. Due to this, it is almost impossible to skirmish using raiders. In combat, you should attempt to keep travelling forward and not turn too suddenly, so as to maintain top speed. Circling your target at the edge of your range is a good tactic. An arcing projectile allows it to shoot over wreckage, other tanks, etc. Vulnerable to crawling bombs when in swarms."
 	},
 	"raveparty" : {
@@ -641,7 +641,7 @@
 	},
 	"vehscout" : {
 		"name" : "Dart",
-		"description" : "Raider/Scout Vehicle",
+		"description" : "Raider/Scout Rover",
 		"helptext" : "Cheap and fast, the Dart is deadly in the first minutes of the game if your opponent is caught off-guard. Use missile towers, LLTs or any quick units to stop them."
 	},
 	"factoryhover" : {
@@ -701,7 +701,7 @@
 	},
 	"vehraid" : {
 		"name" : "Scorcher",
-		"description" : "Raider Vehicle",
+		"description" : "Raider Rover",
 		"helptext" : "Capable of taking damage and dishing it out, the Scorcher is a versatile unit that remains very useful for more than just raiding, though it pays the price in manueverability and in cost. Though able to hold its own in combat, it is no match for anti-swarm and riot units or defenses. The Scorcher's heatray deals more damage up close."
 	},
 	"striderfunnelweb" : {
@@ -761,7 +761,7 @@
 	},
 	"vehheavyarty" : {
 		"name" : "Impaler",
-		"description" : "Precision Artillery Vehicle",
+		"description" : "Precision Artillery Rover",
 		"helptext" : "The Impaler fires vertically a high damage, high accuracy kinetic missile at long range. Its high arc makes it able to fire over any obstacle, however that makes the flight time so high that it's useless against moving targets. Use the Impaler to kill specific buildings."
 	},
 	"zenith" : {
@@ -771,7 +771,7 @@
 	},
 	"vehaa" : {
 		"name" : "Crasher",
-		"description" : "Fast Anti-Air Vehicle",
+		"description" : "Fast Anti-Air Rover",
 		"helptext" : "The Crasher is a speedy solution to enemy bomber attacks, and also works well against gunships."
 	},
 	"spiderskirm" : {
@@ -866,7 +866,7 @@
 	},
 	"vehcon" : {
 		"name" : "Mason",
-		"description" : "Construction Vehicle, Builds at 5 m/s",
+		"description" : "Construction Rover, Builds at 5 m/s",
 		"helptext" : "Highly mobile and capable of taking a beating, the Mason can quickly expand over a large area."
 	},
 	"amphtele" : {
@@ -971,7 +971,7 @@
 	},
 	"vehcapture" : {
 		"name" : "Dominatrix",
-		"description" : "Capture Vehicle",
+		"description" : "Capture Rover",
 		"helptext" : "The Dominatrix captures enemies, turning them against their former allies. Multiple Dominatrix can capture a single target faster, although only one becomes the controller. After taking control of a unit the Dominatrix cannot fire for 12 seconds. If a Dominatrix is destroyed all units it controls are freed."
 	},
 	"factorytank" : {

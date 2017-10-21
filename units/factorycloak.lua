@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factorycloak]],
-  name                          = [[Cloaky Bot Factory]],
-  description                   = [[Produces Cloaky Robots, Builds at 10 m/s]],
+  name                          = [[Cloakbot Factory]],
+  description                   = [[Produces Cloaked, Mobile Robots, Builds at 10 m/s]],
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,

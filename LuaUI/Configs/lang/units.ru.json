@@ -396,7 +396,7 @@
         "name": "Скандалист"
     },
     "factoryshield": {
-        "helptext": "The Shield Bot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer",
+        "helptext": "The Shieldbot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer",
         "description": "Производит крепких роботов, строит на 10 m/s",
         "name": "Фабрика роботов со щитом"
     },

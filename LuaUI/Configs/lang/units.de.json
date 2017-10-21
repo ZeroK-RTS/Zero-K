@@ -15,9 +15,9 @@
 		"helptext" : "Der Strike Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit, Panzerung und Selbstreparierung."
 	},
 	"factorycloak" : {
-		"name" : "Cloaky Bot Factory",
+		"name" : "Cloakbot Factory",
 		"description" : "Produziert Tarnroboter, Baut mit 10 M/s",
-		"helptext" : "List statt pure Gewalt lautet hier das Motto. Die Cloaky Bot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Ronin, Warrior, Zeus, Hammer"
+		"helptext" : "List statt pure Gewalt lautet hier das Motto. Die Cloakbot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Ronin, Warrior, Zeus, Hammer"
 	},
 	"hoverdepthcharge" : {
 		"name" : "Claymore",
@@ -360,9 +360,9 @@
 		"helptext" : "The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them."
 	},
 	"factoryveh" : {
-		"name" : "Light Vehicle Factory",
+		"name" : "Rover Assembly",
 		"description" : "Produziert Radfahrzeug, Baut mit 10 M/s",
-		"helptext" : "Der Traditionalist unter den Fabriken. Die Vehicle Plant ist ideal für den Blitzkrieg, denn schnelle und hoch aggressive Einheiten werden hier gebaut. Diese Einheiten machen ihren Mangel an Geschwindigkeit mit reichlich Feuerkraft wieder wett. Wichtigste Einheiten: Dart, Scorcher, Ravager, Leveler, Slasher"
+		"helptext" : "Der Traditionalist unter den Fabriken. Die Rover Assembly ist ideal für den Blitzkrieg, denn schnelle und hoch aggressive Einheiten werden hier gebaut. Diese Einheiten machen ihren Mangel an Geschwindigkeit mit reichlich Feuerkraft wieder wett. Wichtigste Einheiten: Dart, Scorcher, Ravager, Leveler, Slasher"
 	},
 	"turretaaflak" : {
 		"name" : "Cobra",
@@ -895,9 +895,9 @@
 		"helptext" : "Der Aspis bietet den umliegenden, alliierten Einheiten durch seinen energetischen Schild Schutz vor Angriffen. Doch sobald Feinde in den Schild kommen oder sich die Energie dem Ende neigt, verfällt dieser Schutz und deine Einheiten stehen dem Gegner vielleicht schutzlos gegenüber. Mehrere Aspis verbinden sich untereinander zu einem großen Schild, was den Vorteil hat, dass Angriffe besser absorbiert werden können."
 	},
 	"factoryshield" : {
-		"name" : "Shield Bot Factory",
+		"name" : "Shieldbot Factory",
 		"description" : "Produziert zähe Roboter, Baut mit 10 M/s",
-		"helptext" : "Die Shield Bot Factory ist robust aber flexibel. Diese Einheiten werden gebaut, um all die Schmerzen auf sich zu nehmen und wieder zu verteilen, aber ohne Kompromisse bei der Mobilität. Schlauer Einsatz von Einheitenkombos wird gut belohnt. Wichtigste Einheiten: Bandit, Thug, Outlaw, Roach, Dirtbag"
+		"helptext" : "Die Shieldbot Factory ist robust aber flexibel. Diese Einheiten werden gebaut, um all die Schmerzen auf sich zu nehmen und wieder zu verteilen, aber ohne Kompromisse bei der Mobilität. Schlauer Einsatz von Einheitenkombos wird gut belohnt. Wichtigste Einheiten: Bandit, Thug, Outlaw, Roach, Dirtbag"
 	},
 	"shieldscout" : {
 		"name" : "Dirtbag",
