@@ -65,9 +65,9 @@
 		"helptext" : "This fat chicken is presented to you as a reward for your misdeeds. Behave next time!"
 	},
 	"vehsupport" : {
-		"name" : "Slasher",
+		"name" : "Fencer",
 		"description" : "Unterstützung/Flugabwehr Fahrzeug (muss zum Feuern anhalten)",
-		"helptext" : "Halte deinen Slasher immer auf maximaler Distanz zum Feind, um diesen am besten zu belagern. Seine Raketen sind gelenkt und somit ideal, um sich schnell bewegende Einheiten oder Crawling Bomben zu vernichten. Er kann sowohl Land-, als auch Lufteinheiten treffen, aber nicht über Wände und Hügel schießen. Außerdem versagt er kläglich, sobald sich Feinde dicht am ihm befinden. Im Gegensatz zu dem meisten normalen Skirmishern, kann der Slasher nicht Feuern, wenn er sich bewegt."
+		"helptext" : "Halte deinen Fencer immer auf maximaler Distanz zum Feind, um diesen am besten zu belagern. Seine Raketen sind gelenkt und somit ideal, um sich schnell bewegende Einheiten oder Crawling Bomben zu vernichten. Er kann sowohl Land-, als auch Lufteinheiten treffen, aber nicht über Wände und Hügel schießen. Außerdem versagt er kläglich, sobald sich Feinde dicht am ihm befinden. Im Gegensatz zu dem meisten normalen Skirmishern, kann der Fencer nicht Feuern, wenn er sich bewegt."
 	},
 	"factoryplane" : {
 		"name" : "Airplane Plant",
@@ -80,9 +80,9 @@
 		"helptext" : "Der Thug ist zwar für sich alleine ziemlich schwach, doch bietet er für Rogues und Outlaws eine gute Abschirmung. Der sich verbindende Schild erzeugt mehr Stärke, sobald sich mehrere Thugs zusammenschließen, kann aber durch AoE Waffen oder fokusiertes Feuer geschlagen werden."
 	},
 	"cloakbomb" : {
-		"name" : "Tick",
+		"name" : "Imp",
 		"description" : "Geländegängige EMP Kriechbombe",
-		"helptext" : "Geschickt eingesetzt kann Tick sich mehrfach rentieren. Nutze Tick, um gegnerische Verteidigung, schwere Einheiten und gut geschützte Einheiten mit langsamen Waffen zu paralysieren. Andere deiner Einheiten haben so die Möglichkeit die feindlichen Truppen einfach, ohne Risiko zu eleminieren. Konter diese Einheit mit Raketentürmen oder einzelnen, billigen Einheiten. Diese Einheit tarnt sich sobald sie sich nicht mehr bewegt."
+		"helptext" : "Geschickt eingesetzt kann Imp sich mehrfach rentieren. Nutze Imp, um gegnerische Verteidigung, schwere Einheiten und gut geschützte Einheiten mit langsamen Waffen zu paralysieren. Andere deiner Einheiten haben so die Möglichkeit die feindlichen Truppen einfach, ohne Risiko zu eleminieren. Konter diese Einheit mit Raketentürmen oder einzelnen, billigen Einheiten. Diese Einheit tarnt sich sobald sie sich nicht mehr bewegt."
 	},
 	"spidercon" : {
 		"name" : "Weaver",
@@ -90,7 +90,7 @@
 		"helptext" : "Der Weaver ist eine bauende Einheit, die Hindernisse überwinden und somit Verteidigungsanlagen auf Erhöhungen bauen kann. Er hat auch ein Radar."
 	},
 	"vehriot" : {
-		"name" : "Leveler",
+		"name" : "Ripper",
 		"description" : "Riotfahrzeug",
 		"helptext" : "Seine Riotkanone ist sehr effektiv gegen größere Gruppen von Raidern und, um den gegnerischen Fortschritt aufzuhalten. Die Projektile können nicht bogenförmig abgeschoßen werden, weshalb sie nicht in einem Haufen, sondern entlang einer Frontlinie, ausgerichtet werden sollten. Durch ihren Mangel an Geschwindigkeit und Reichweite, sind sie für die meisten Skirmisher ein gefundenes Fressen."
 	},
@@ -175,9 +175,9 @@
 		"helptext" : "Der Scythe ist nicht sehr zäh im Standkampf, aber seine Tarnfähigkeit ermöglicht es ihm hinter die feindliche Verteidigung zu gelangen und so die gegnerische Ökonomie zu beeinträchtigen."
 	},
 	"veharty" : {
-		"name" : "Wolverine",
+		"name" : "Badger",
 		"description" : "Artillerie Minenleger Fahrzeug",
-		"helptext" : "Der Wolverine legt Minen aus der Ferne, die ziemlich effektiv sind, aber nur eine begrenzte Lebensdauer besitzen. Er bedindet sich meist außerhalb der Reichweiten der Verteidigung, aber ist nur schwach gepanzert und kann nicht allzu schnell fliehen. Von daher begleite ihn lieber mit ein paar deiner Einheiten."
+		"helptext" : "Der Badger legt Minen aus der Ferne, die ziemlich effektiv sind, aber nur eine begrenzte Lebensdauer besitzen. Er bedindet sich meist außerhalb der Reichweiten der Verteidigung, aber ist nur schwach gepanzert und kann nicht allzu schnell fliehen. Von daher begleite ihn lieber mit ein paar deiner Einheiten."
 	},
 	"staticrearm" : {
 		"name" : "Air Repair/Rearm Pad",
@@ -362,7 +362,7 @@
 	"factoryveh" : {
 		"name" : "Rover Assembly",
 		"description" : "Produziert Radfahrzeug, Baut mit 10 M/s",
-		"helptext" : "Der Traditionalist unter den Fabriken. Die Rover Assembly ist ideal für den Blitzkrieg, denn schnelle und hoch aggressive Einheiten werden hier gebaut. Diese Einheiten machen ihren Mangel an Geschwindigkeit mit reichlich Feuerkraft wieder wett. Wichtigste Einheiten: Dart, Scorcher, Ravager, Leveler, Slasher"
+		"helptext" : "Der Traditionalist unter den Fabriken. Die Rover Assembly ist ideal für den Blitzkrieg, denn schnelle und hoch aggressive Einheiten werden hier gebaut. Diese Einheiten machen ihren Mangel an Geschwindigkeit mit reichlich Feuerkraft wieder wett. Wichtigste Einheiten: Dart, Scorcher, Ravager, Ripper, Fencer"
 	},
 	"turretaaflak" : {
 		"name" : "Cobra",
@@ -490,9 +490,9 @@
 		"helptext" : "Eine raketenschiessende Einheit, die jedes Terrain betreten kann. Klettere mit der Spinne an Waeden hoch und ueberrasche deine Gegner mit Angriffen aus unmoeglichen Lagen. Die Raketen ohne Zielfuehrung treffen aber selten schnelle Ziele, trotzdem darf man ihre grosse Reichweite nicht vernachlaessigen."
 	},
 	"cloakjammer" : {
-		"name" : "Eraser",
+		"name" : "Iris",
 		"description" : "Tarn-/Störsenderroboter",
-		"helptext" : "Der Eraser besitzt ein Gerät zum Stören feindlicher Radarwellen. Des Weiteren ist er mit einem kleinen Tarnschild ausgestattet, um nahe, freundliche Einheiten zu tarnen."
+		"helptext" : "Der Iris besitzt ein Gerät zum Stören feindlicher Radarwellen. Des Weiteren ist er mit einem kleinen Tarnschild ausgestattet, um nahe, freundliche Einheiten zu tarnen."
 	},
 	"striderhub" : {
 		"name" : "Strider Hub",
@@ -897,7 +897,7 @@
 	"factoryshield" : {
 		"name" : "Shieldbot Factory",
 		"description" : "Produziert zähe Roboter, Baut mit 10 M/s",
-		"helptext" : "Die Shieldbot Factory ist robust aber flexibel. Diese Einheiten werden gebaut, um all die Schmerzen auf sich zu nehmen und wieder zu verteilen, aber ohne Kompromisse bei der Mobilität. Schlauer Einsatz von Einheitenkombos wird gut belohnt. Wichtigste Einheiten: Bandit, Thug, Outlaw, Roach, Dirtbag"
+		"helptext" : "Die Shieldbot Factory ist robust aber flexibel. Diese Einheiten werden gebaut, um all die Schmerzen auf sich zu nehmen und wieder zu verteilen, aber ohne Kompromisse bei der Mobilität. Schlauer Einsatz von Einheitenkombos wird gut belohnt. Wichtigste Einheiten: Bandit, Thug, Outlaw, Snitch, Dirtbag"
 	},
 	"shieldscout" : {
 		"name" : "Dirtbag",
@@ -925,7 +925,7 @@
 		"helptext" : "Der Cockatrice ist wahrlich eine Bestie. Scheinbar unverletzlich, bewegt es sich einfach auf seine Ziele zu und zerstEkelt sie vor Ort mit seinem unglaublich starken Kiefer. GlEklicherweise ist er nicht besonders schnell und intelligent und kann somit von Skirmishern und Schwärmen leicht zerstört werden."
 	},
 	"shieldbomb" : {
-		"name" : "Roach",
+		"name" : "Snitch",
 		"description" : "Crawling Bombe",
 		"helptext" : "Diese flinke Kamikazeeinheit ist effektiv gegen größere Einheiten, besonderns Sturmpanzer. Sie besitzt eine Tarnvorrichting welche automatisch aktiviert wird sobald diese Einheit still steht. Bewahre Abstand zwischen diesen Einheiten, da sie in einer Kettenreaktion explodieren. Der Defender oder Raketenlaster sind effektiv gegen sie. Außerdem auch billige einzelne Einheiten, um eine frühzeitige Explosion zu erwirken."
 	},
@@ -1085,9 +1085,9 @@
 		"helptext" : "Das ultimative Sturmchicken: Tiamat ist eine feuer-, eisenspuckende und Sporenspeiende Monstrosität, die keine Angst oder Furcht kennt, aber auch keine Gnade. Sie besitzt sogar ein schleimiges Schild, welches sie selbst und nahe, verbEdete Einheiten schützt."
 	},
 	"cloakarty" : {
-		"name" : "Hammer",
+		"name" : "Sling",
 		"description" : "Leichter Artillerie/Skirmisher Roboter",
-		"helptext" : "Der Hammer besitzt eine weitreichende Plasmakanone, die es ihm erlaubt über Hindernisse zu schießen und sich dabei außer Reichweite von gegnerischen Verteidigungsanlagen zu finden. Obwohl er auch effektiv gegen mobile Einheiten ist, sollte er beschützt werden, um Raider und andere schnelle Einheiten von ihm Fern zu halten."
+		"helptext" : "Der Sling besitzt eine weitreichende Plasmakanone, die es ihm erlaubt über Hindernisse zu schießen und sich dabei außer Reichweite von gegnerischen Verteidigungsanlagen zu finden. Obwohl er auch effektiv gegen mobile Einheiten ist, sollte er beschützt werden, um Raider und andere schnelle Einheiten von ihm Fern zu halten."
 	},
 	"hoverriot" : {
 		"name" : "Mace",
@@ -1120,7 +1120,7 @@
 		"helptext" : "The Kestrel launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets."
 	},
 	"cloaksnipe" : {
-		"name" : "Spectre",
+		"name" : "Phantom",
 		"description" : "Scharfschützen Walker (Skirmish/Anti-Heavy)",
 		"helptext" : "Sein energetisches Gewehr richtet riesigen Schaden bei einzelnen Zielen an. Er kann auch schießen, wenn er getarnt ist. Dennoch verrät ihn sein sichtbarer Schuss. Um getarnt zu bleiben und schießen zu können, benötigt der Scharfschütze eine Menge Energie. Die einfachst Möglichkeit einen Scharfschützen ausfindig zu machen, ist die, indem man ein Gebiet mit vielen billigen überschwemmt."
 	},

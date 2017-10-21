@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[vehsupport]],
-  name                   = [[Slasher]],
+  name                   = [[Fencer]],
   description            = [[Deployable Missile Rover (must stop to fire)]],
   acceleration           = 0.0354,
   brakeRate              = 0.0358,

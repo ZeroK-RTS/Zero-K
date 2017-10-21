@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[veharty]],
-  name                = [[Wolverine]],
+  name                = [[Badger]],
   description         = [[Artillery Minelayer Rover]],
   acceleration        = 0.0282,
   brakeRate           = 0.08,

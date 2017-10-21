@@ -142,7 +142,7 @@
 	"factoryveh" : {
 		"name" : "Rover Assembly",
 		"description" : "Produces Light Wheeled Vehicles, Builds at 10 m/s",
-		"helptext" : "A traditional favourite, the Rover Assembly is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Leveler, Slasher"
+		"helptext" : "A traditional favourite, the Rover Assembly is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Ripper, Slasher"
 	},
 	"turretgauss" : {
 		"name" : "Gauss",
@@ -230,9 +230,9 @@
 		"helptext" : "The Trisula is a fairly fast, sturdy combatant armed with a scatter beam weapon that can erase multiple small targets or slag a single large one."
 	},
 	"vehriot" : {
-		"name" : "Leveler",
+		"name" : "Ripper",
 		"description" : "Riot Rover",
-		"helptext" : "The Leveler's riot cannon is effective at destroying swarms of raiders and halting enemy advances. The projectile does not arc, so Levelers should avoid clumping and be arranged in a line formation wherever possible. Due to their lack of speed and range, most skirmishers are effective against them. True to its name the Leveler's cannon flattens terrain to enable allied vehicles passage over harsh terrain."
+		"helptext" : "The Ripper's riot cannon is effective at destroying swarms of raiders and halting enemy advances. The projectile does not arc, so Rippers should avoid clumping and be arranged in a line formation wherever possible. Due to their lack of speed and range, most skirmishers are effective against them. The Ripper's cannon flattens terrain to enable allied vehicles passage over harsh terrain."
 	},
 	"staticshield" : {
 		"name" : "Aegis",
@@ -450,9 +450,9 @@
 		"helptext" : "The Mace is a mobile laser tower. Its high firepower is useful for killing light enemy units. It is perfectly accurate and is good against gunships and fast units. However, its thin armor makes it vulnerable when targetted directly, especially by skirmishers."
 	},
 	"veharty" : {
-		"name" : "Wolverine",
+		"name" : "Badger",
 		"description" : "Artillery Minelayer Rover",
-		"helptext" : "The Wolverine lays mines which are fairly effective but have a limited lifespan from a distance (rather haphazardly). The Wolverine outranges most defenses comfortably, but is lightly armored and cannot flee easily so keep it screened with friendly units, possibly assisted by your own mines."
+		"helptext" : "The Badger lays mines which are fairly effective but have a limited lifespan from a distance (rather haphazardly). The Badger outranges most defenses comfortably, but is lightly armored and cannot flee easily so keep it screened with friendly units, possibly assisted by your own mines."
 	},
 	"striderantiheavy" : {
 		"name" : "Ultimatum",
@@ -465,9 +465,9 @@
 		"helptext" : "The metal extractor is the primary means of getting metal. If you have excess energy, metal extractors will automatically use it to extract more metal."
 	},
 	"vehsupport" : {
-		"name" : "Slasher",
+		"name" : "Fencer",
 		"description" : "Deployable Missile Rover (must stop to fire)",
-		"helptext" : "Keep the Slasher at maximum range to harass the opponent's units. The Slasher's missiles track, so they are ideal to kill fast-moving raiders and crawling bombs. It is able to hit air, but is only really useful against fighters. Cannot fire over obstacles, and does poorly if enemies, particularly assault units, are allowed to close range. Unlike skirmishers, the Slasher cannot fire while moving."
+		"helptext" : "Keep the Fencer at maximum range to harass the opponent's units. The Fencer's missiles track, so they are ideal to kill fast-moving raiders and crawling bombs. It is able to hit air, but is only really useful against fighters. Cannot fire over obstacles, and does poorly if enemies, particularly assault units, are allowed to close range. Unlike skirmishers, the Fencer cannot fire while moving."
 	},
 	"grebe" : {
 		"name" : "Grebe",
@@ -480,14 +480,14 @@
 		"helptext" : "The Penetrator's weapon, nicknamed 'the Blue Laser of Death', has the power and accuracy to skewer most units with a single shot. Use it against high armor units, but keep it behind the front lines - it has light armor and can't run from danger."
 	},
 	"shieldbomb" : {
-		"name" : "Roach",
+		"name" : "Snitch",
 		"description" : "Crawling Bomb (Burrows)",
 		"helptext" : "This fast-moving suicide unit is very good against massed units, particularly assault tanks. It features a cloaking device which is automatically activated once the unit stands still, effectifely turning it into a mine. Chain explodes terribly, so best not to mass it. Counter with defenders and missile trucks, or single cheap units to set off a premature detonation."
 	},
 	"cloakjammer" : {
-		"name" : "Eraser",
+		"name" : "Iris",
 		"description" : "Area Cloaker/Jammer Walker",
-		"helptext" : "The Eraser has a jamming device to conceal your units' radar returns. It also has a small cloak shield to hide friendly nearby units from enemy sight."
+		"helptext" : "The Iris has a jamming device to conceal your units' radar returns. It also has a small cloak shield to hide friendly nearby units from enemy sight."
 	},
 	"spidercon" : {
 		"name" : "Weaver",
@@ -681,7 +681,7 @@
 	},
 	"wolverine_mine" : {
 		"name" : "Claw",
-		"description" : "Wolverine Mine",
+		"description" : "Badger Mine",
 		"helptext" : "This mine doesn't explode - instead, it releases a flurry of bomblets at trespassing enemies. It deactivates after one minute."
 	},
 	"staticradar" : {

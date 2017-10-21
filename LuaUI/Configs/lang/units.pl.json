@@ -250,9 +250,9 @@
         "helptext": "Trisula to w miarę szybki, wytrzymały poduszkowiec uzbrojony w rozszczepiany promień, który może zniszczyć kilka mniejszych jednostek lub mocno uszkodzić jedną większą."
     },
     "vehriot": {
-        "name": "Leveler",
+        "name": "Ripper",
         "description": "Pojazd wsparcia",
-        "helptext": "Działo Levelera skutecznie niszczy grupy lżejszych jednostek, jednak musi mieć czystą linię strzału, zatem w miarę możliwości Levelery należy zawsze ustawiać w linii. Słabościami Levelera są niska szybkość i zasięg. Pociski Levelera wyrównują teren, co może ułatwić pojazdom przejazd po grząskim terenie."
+        "helptext": "Działo Levelera skutecznie niszczy grupy lżejszych jednostek, jednak musi mieć czystą linię strzału, zatem w miarę możliwości Rippery należy zawsze ustawiać w linii. Słabościami Rippera są niska szybkość i zasięg. Pociski Rippera wyrównują teren, co może ułatwić pojazdom przejazd po grząskim terenie."
     },
     "staticshield": {
         "name": "Aegis",
@@ -480,9 +480,9 @@
         "helptext": "Mace to ruchoma wieża laserowa. Ma ciągły laser precyzyjny wysokiej mocy, który świetnie nadaje się do niszczenia lekkich jednostek. Jego wytrzymałość i prędkość są jednak przeciętne."
     },
     "veharty": {
-        "name": "Wolverine",
+        "name": "Badger",
         "description": "Pojazd artyleryjski / stawiacz min",
-        "helptext": "Wolverine wystrzeliwuje na wyznaczony obszar miny (które pozostają uzbrojone przez ograniczony czas). Wolverine ma większy zasięg niż większość wieżyczek, jednak z powodu bardzo niskiej wytrzymałości wymaga ochrony innych jednostek lub swoich własnych min."
+        "helptext": "Badger wystrzeliwuje na wyznaczony obszar miny (które pozostają uzbrojone przez ograniczony czas). Badger ma większy zasięg niż większość wieżyczek, jednak z powodu bardzo niskiej wytrzymałości wymaga ochrony innych jednostek lub swoich własnych min."
     },
     "striderantiheavy": {
         "name": "Ultimatum",
@@ -495,9 +495,9 @@
         "helptext": "Kopalnia to główne źródło metalu i najważniejszy nabytek na polu bitwy. Nadmiar energii automatycznie trafia do kopalni, by zwiększyć wydobycie."
     },
     "vehsupport": {
-        "name": "Slasher",
+        "name": "Fencer",
         "description": "Pojazd rakietowy (musi stać w miejscu, by strzelać)",
-        "helptext": "Slasher nie może strzelać w ruchu. Stojące w miejscu Slashery automatycznie rozstawiają swoją dalekosiężną wyrzutnię lekkich rakiet samonaprowadzających, które świetnie nadają się do niszczenia lekkich jednostek i bomb; mogą także służyć jako improwizowana obrona przeciwlotnicza. Slasher nie może jednak strzelać nad przeszkodami i ma niską wytrzymałość."
+        "helptext": "Fencer nie może strzelać w ruchu. Stojące w miejscu Fencery automatycznie rozstawiają swoją dalekosiężną wyrzutnię lekkich rakiet samonaprowadzających, które świetnie nadają się do niszczenia lekkich jednostek i bomb; mogą także służyć jako improwizowana obrona przeciwlotnicza. Fencer nie może jednak strzelać nad przeszkodami i ma niską wytrzymałość."
     },
     "grebe": {
         "name": "Grebe",
@@ -510,14 +510,14 @@
         "helptext": "Broń Penetratora ma wystarczającą siłę i celność, by jednym strzałem zniszczyć lub poważnie uszkodzić większość jednostek. Jest jednak wolny i ma niską wytrzymałość, a zatem warto trzymać go z dala od niebezpieczeństw - ma wystarczająco duży zasięg, by bezpiecznie prowadzić ostrzał."
     },
     "shieldbomb": {
-        "name": "Roach",
+        "name": "Snitch",
         "description": "Bomba (zakopuje się)",
-        "helptext": "Roach to szybka jednostka samobójcza; swietnie niszczy jednostki w grupach, przede wszystkim szturmowe i harcowników. Gdy nie porusza się, staje się niewidzialny, dzięki czemu działa jak mina. Można go skutecznie zniszczyć celnymi jednostkami lub poświęcić lekką jednostkę, aby przedwcześnie go zdetonować."
+        "helptext": "Snitch to szybka jednostka samobójcza; swietnie niszczy jednostki w grupach, przede wszystkim szturmowe i harcowników. Gdy nie porusza się, staje się niewidzialny, dzięki czemu działa jak mina. Można go skutecznie zniszczyć celnymi jednostkami lub poświęcić lekką jednostkę, aby przedwcześnie go zdetonować."
     },
     "cloakjammer": {
-        "name": "Eraser",
+        "name": "Iris",
         "description": "Bot zakłócająco-maskujący",
-        "helptext": "Zakłócacze nie pozwalają radarom wykrywać jednostek na ich obszarze. Eraser posiada również niewidzalność obszarową, które pozwala ukryć jednostki także przed normalnym widzeniem."
+        "helptext": "Zakłócacze nie pozwalają radarom wykrywać jednostek na ich obszarze. Iris posiada również niewidzalność obszarową, które pozwala ukryć jednostki także przed normalnym widzeniem."
     },
     "spidercon": {
         "name": "Weaver",

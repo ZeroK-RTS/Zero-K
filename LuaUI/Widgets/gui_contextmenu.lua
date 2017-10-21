@@ -502,7 +502,7 @@ local function weapons2Table(cells, ws, unitID)
 			show_dps = false
 		end
 		
-		if cp.damage_vs_shield then -- Wolverine
+		if cp.damage_vs_shield then -- Badger
 			dam_str = tostring(cp.damage_vs_shield) .. " (" .. dam .. " + " .. (tonumber(cp.damage_vs_shield)-dam) .. " mine)"
 			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield)/reloadtime))
 		end
