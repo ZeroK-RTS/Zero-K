@@ -117,3 +117,33 @@ function Spring.Utilities.ExplodeString(div,str)
 end
 
 Spring.Utilities.TableEcho = TableEcho
+
+local function Spring.Utilities.CustomKeyToUsefulTable(dataRaw)
+	if not dataRaw then
+		return
+	end
+	if not (dataRaw and type(dataRaw) == 'string') then
+		if dataRaw then
+			Spring.Echo("Customkey data error for team", teamID)
+		end
+	else
+		dataRaw = string.gsub(dataRaw, '_', '=')
+		dataRaw = Spring.Utilities.Base64Decode(dataRaw)
+		local dataFunc, err = loadstring("return " .. dataRaw)
+		if dataFunc then 
+			local success, usefulTable = pcall(dataFunc)
+			if success then
+				if collectgarbage then
+					collectgarbage("collect")
+				end
+				return usefulTable
+			end
+		end
+		if err then
+			Spring.Echo("Customkey error", err)
+		end
+	end
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+end

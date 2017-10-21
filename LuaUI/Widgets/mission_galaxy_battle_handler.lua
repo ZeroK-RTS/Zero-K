@@ -103,35 +103,7 @@ local textY, lineOffset, yCenter, xCut, mouseOver
 --------------------------------------------------------------------------------
 -- Utilities
 
-local function CustomKeyToUsefulTable(dataRaw)
-	if not dataRaw then
-		return
-	end
-	if not (dataRaw and type(dataRaw) == 'string') then
-		if dataRaw then
-			Spring.Echo("Customkey data error for team", teamID)
-		end
-	else
-		dataRaw = string.gsub(dataRaw, '_', '=')
-		dataRaw = Spring.Utilities.Base64Decode(dataRaw)
-		local dataFunc, err = loadstring("return " .. dataRaw)
-		if dataFunc then 
-			local success, usefulTable = pcall(dataFunc)
-			if success then
-				if collectgarbage then
-					collectgarbage("collect")
-				end
-				return usefulTable
-			end
-		end
-		if err then
-			Spring.Echo("Customkey error", err)
-		end
-	end
-	if collectgarbage then
-		collectgarbage("collect")
-	end
-end
+VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
 local function SetWindowSkin(targetPanel, className)
 	local currentSkin = Chili.theme.skin.general.skinName
@@ -235,7 +207,7 @@ local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
 end
 
 local function InitializeBriefingWindow()
-	local planetInformation = CustomKeyToUsefulTable(Spring.GetModOptions().planetmissioninformationtext) or {}
+	local planetInformation = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().planetmissioninformationtext) or {}
 	
 	local BRIEF_WIDTH = 720
 	local BRIEF_HEIGHT = 680
@@ -504,8 +476,8 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 end
 
 local function InitializeObjectivesWindow()
-	local objectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().objectiveconfig) or {}
-	local bonusObjectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().bonusobjectiveconfig) or {}
+	local objectiveList = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().objectiveconfig) or {}
+	local bonusObjectiveList = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().bonusobjectiveconfig) or {}
 	
 	local thereAreBonusObjectives = (bonusObjectiveList and #bonusObjectiveList > 0)
 	if #objectiveList <= 0 and (not thereAreBonusObjectives) then
