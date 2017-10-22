@@ -171,7 +171,7 @@ local supporters = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions(
 
 -- TODO
 -- cooldown is in waves
-local specialPowers = CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_special) or {
+local specialPowers = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_special) or {
 	{name = "Digger Ambush", maxAggro = -2, time = 15, obsolete = 40, unit = "chicken_digger", burrowRatio = 1.25, minDist = 100, maxDist = 450, cooldown = 3, targetHuman = true},
 	--{name = "Wurmsign", maxAggro = -3, time = 40, unit = "chickenwurm", burrowRatio = 0.2, cooldown = 4},
 	{name = "Spire Sprout", maxAggro = -4.5, time = 20, unit = "chickenspire", burrowRatio = 0.15, tieToBurrow = true, cooldown = 3},
