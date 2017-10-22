@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[turretantiheavy]],
-  name                          = [[Annihilator]],
+  name                          = [[Lucifer]],
   description                   = [[Tachyon Projector - Requires connection to a 50 energy grid]],
   activateWhenBuilt             = true,
   buildCostMetal                = 2200,

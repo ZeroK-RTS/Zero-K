@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[gunshipraid]],
-  name                   = [[Banshee]],
+  name                   = [[Locust]],
   description            = [[Raider Gunship]],
   acceleration           = 0.18,
   brakeRate              = 0.16,

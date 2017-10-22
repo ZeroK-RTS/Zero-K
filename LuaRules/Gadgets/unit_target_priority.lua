@@ -256,7 +256,7 @@ local function GetGravityWeaponPriorityModifier(unitID, attackerWeaponDefID)
 		if inbuild then
 			remScaledMass[unitID] = -1
 		else
-			-- Glaive = 1.46, Zeus = 5.24, Reaper = 9.48
+			-- Glaive = 1.46, Zeus = 5.24, Minotaur = 9.48
 			remScaledMass[unitID] = 0.02 * UnitDefs[remUnitDefID[unitID]].mass
 		end
 	end

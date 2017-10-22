@@ -733,7 +733,7 @@ local icontypes = {
     size=2,
   },
   
-  --Annihilator
+  --Lucifer
   fixedtachyon = {
     bitmap='icons/fixedtachyon.dds',
     size=2,

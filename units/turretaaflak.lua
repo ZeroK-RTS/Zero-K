@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[turretaaflak]],
-  name                          = [[Cobra]],
+  name                          = [[Thresher]],
   description                   = [[Anti-Air Flak Gun]],
   acceleration                  = 0,
   brakeRate                     = 0,

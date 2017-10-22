@@ -50,9 +50,9 @@
         "helptext": "Królowa kurnika może zostać powstrzymana tylko dzięki pełnej determinacji i przy udziale wielkiej siły ognia; pluje płonącym kwasem, wystrzeliwuje masę zarodników, rozdeptuje mniejsze jednostki niczym robaki i jest w stanie rozszarpać nawet ciężkie roboty szturmowe."
     },
     "tankassault": {
-        "name": "Reaper",
+        "name": "Minotaur",
         "description": "Czołg szturmowy",
-        "helptext": "Ciężki czołg bojowy. Reaper jest w stanie przyjąć wiele obrażeń w zaciętych walkach, ale jego niska szybkostrzelność powoduje, że słabo radzi sobie z lekkimi jednostkami, a jego ciężki pancerz jest okupiony niską ruchliwością."
+        "helptext": "Ciężki czołg bojowy. Minotaur jest w stanie przyjąć wiele obrażeń w zaciętych walkach, ale jego niska szybkostrzelność powoduje, że słabo radzi sobie z lekkimi jednostkami, a jego ciężki pancerz jest okupiony niską ruchliwością."
     },
     "chicken_listener": {
         "name": "Listener",
@@ -135,9 +135,9 @@
         "helptext": "Corsair to korweta z dwoma shotgunami, którymi ciężko kara wszystko, co się zbliży. Jest jednak bezbronna wobec jednostek podwodnych i ma niski zasięg."
     },
     "turretaaheavy": {
-        "name": "Screamer",
+        "name": "Artemis",
         "description": "Wieża przeciwlotnicza bardzo dalekiego zasięgu",
-        "helptext": "Screamer to szczyt obrony przeciwlotniczej - ma ogromny zasięg i siłę ognia, co praktycznie uniemożliwia korzystanie z jednostek powietrznych w chronionym przezeń obszarze. Ma jednak ograniczoną amunicję - wytwarza jeden pocisk co 20 sekund."
+        "helptext": "Artemis to szczyt obrony przeciwlotniczej - ma ogromny zasięg i siłę ognia, co praktycznie uniemożliwia korzystanie z jednostek powietrznych w chronionym przezeń obszarze. Ma jednak ograniczoną amunicję - wytwarza jeden pocisk co 20 sekund."
     },
     "chicken_drone": {
         "name": "Truteń",
@@ -700,9 +700,9 @@
         "helptext": "Karabin snajperski Spectra zadaje ciężkie obrażenia pojedynczym celom. Jako jedyna jednostka może strzelać pozostając niewidzialnym; jego naboje są jednak widoczne i mogą pomóc przeciwnikom w znalezieniu go. Utrzymanie niewidzialności kosztuje także spore ilości energii. Najlepszym sposobem na wykrycie Spectra jest przeczesanie okolicy tanimi jednostkami."
     },
     "staticarty": {
-        "name": "Tyrant",
+        "name": "Cerberus",
         "description": "Bateria plazmowa - wymaga sieci energetycznej 50 E",
-        "helptext": "Tyrant to skuteczna (przeciw-)artyleria; świetnie chroni okolicę. Nie jest to jednak klasyczna wieża obronna i łatwo ją zniszczyć w bezpośrednim natarciu."
+        "helptext": "Cerberus to skuteczna (przeciw-)artyleria; świetnie chroni okolicę. Nie jest to jednak klasyczna wieża obronna i łatwo ją zniszczyć w bezpośrednim natarciu."
     },
     "wolverine_mine": {
         "name": "Claw",
@@ -850,9 +850,9 @@
         "helptext": "Cicha i śmiercionośna łódź podwodna, która szybko pozbywa się jednostek bez ochrony. Spowalnia trafione cele. Łatwo zniszczyć ją jednak torpedami; należy też wystrzegać się niszczycieli."
     },
     "turretantiheavy": {
-        "name": "Annihilator",
+        "name": "Lucifer",
         "description": "Akcelerator tachionów - wymaga sieci energetycznej 50 E",
-        "helptext": "Annihilator posiada akcelerator tachionów, który zadaje poważne obrażenia ciężkim jednostkom i zmiata z powierzchni ziemi lżejsze, a wszystko to na daleki zasięg. Ma jednak niską szybkostrzelność i wytrzymałość. W razie potrzeby można schować działo, co nie pozwala strzelać, lecz zmniejsza otrzymywane obrażenia czterokrotnie."
+        "helptext": "Lucifer posiada akcelerator tachionów, który zadaje poważne obrażenia ciężkim jednostkom i zmiata z powierzchni ziemi lżejsze, a wszystko to na daleki zasięg. Ma jednak niską szybkostrzelność i wytrzymałość. W razie potrzeby można schować działo, co nie pozwala strzelać, lecz zmniejsza otrzymywane obrażenia czterokrotnie."
     },
     "striderhub": {
         "name": "Strider Hub",
@@ -895,9 +895,9 @@
         "helptext": "Scythe to lekka jednostka do walki w zwarciu, której niewidzialność pozwala zblizyć się do wrogich jednostek lub je ominąć. Po wyjściu z walki Scythe samoczynnie regeneruje się."
     },
     "turretheavy": {
-        "name": "Doomsday Machine",
+        "name": "Desolator",
         "description": "Forteca średniego zasięgu (działo wymaga sieci energetycznej 50 E)",
-        "helptext": "Doomsday Machine to opancerzona forteca uzbrojona w ciężkie działo oraz promień cieplny.  Jest w stanie schować działo, by zmniejszyć otrzymywane obrażenia czterokrotnie."
+        "helptext": "Desolator to opancerzona forteca uzbrojona w ciężkie działo oraz promień cieplny.  Jest w stanie schować działo, by zmniejszyć otrzymywane obrażenia czterokrotnie."
     },
     "factorygunship": {
         "name": "Fabryka statków powietrznych",
@@ -965,9 +965,9 @@
         "helptext": "Paladin to ciężki mech bojowy, uzbrojony po zęby i bardzo wytrzymały. Posiada rakiety EMP dalekiego zasięgu, ciężki laser oraz działka EMP. Nie ma jednak żadnej obrony przeciwlotniczej i słabo radzi sobie bez wsparcia mniejszych jednostek"
     },
     "turretaaflak": {
-        "name": "Cobra",
+        "name": "Thresher",
         "description": "Działo przeciwlotnicze Flak",
-        "helptext": "Cobra to działo przeciwlotnicze które zadaje ciężkie obrażenia na dużym obszarze. Świetnie niszczy wrogie statki powietrzne."
+        "helptext": "Thresher to działo przeciwlotnicze które zadaje ciężkie obrażenia na dużym obszarze. Świetnie niszczy wrogie statki powietrzne."
     },
     "shipcarrier": {
         "name": "Reef",
@@ -1060,9 +1060,9 @@
         "helptext": "Crane to latający konstruktor, który mimo niskiej mocy budowy jest w stanie szybko przelecieć w dowolne miejsce, co czyni go idealnym do zajmowania kopalń, zbierania złomu i innych podobnych zadań."
     },
     "gunshipraid": {
-        "name": "Banshee",
+        "name": "Locust",
         "description": "Lekki statek powietrzny",
-        "helptext": "Banshee ma bardzo dużą prędkość i dość dobre obrażenia, co pozwala na szybkie najazdy w celu zniszczenia ekonomii przeciwnika lub niecelnych jednostek, na przykład szturmowych lub harcowników. Pułap lotu Banshee jest jednak na tyle niski, że może zostać zestrzelona nawet przez jednostki o krótszym zasięgu."
+        "helptext": "Locust ma bardzo dużą prędkość i dość dobre obrażenia, co pozwala na szybkie najazdy w celu zniszczenia ekonomii przeciwnika lub niecelnych jednostek, na przykład szturmowych lub harcowników. Pułap lotu Locust jest jednak na tyle niski, że może zostać zestrzelona nawet przez jednostki o krótszym zasięgu."
     },
     "shieldraid": {
         "name": "Bandit",

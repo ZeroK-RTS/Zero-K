@@ -3,7 +3,7 @@ local versionNumber = "v0.1"
 function gadget:GetInfo()
   return {
     name      = "AA anti-bait",
-    desc      = versionNumber .. " Managed Allowed Weapon Target for Hacksaw and Screamer to ignore bait when other AA is present nearby",
+    desc      = versionNumber .. " Managed Allowed Weapon Target for Hacksaw and Artemis to ignore bait when other AA is present nearby",
     author    = "Jseah",
     date      = "04/26/13",
     license   = "GNU GPL, v2 or later",

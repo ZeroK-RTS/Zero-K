@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[staticarty]],
-  name                          = [[Tyrant]],
+  name                          = [[Cerberus]],
   description                   = [[Plasma Artillery Battery - Requires connection to a 50 energy grid]],
   acceleration                  = 0,
   activateWhenBuilt             = true,

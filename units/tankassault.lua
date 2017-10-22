@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[tankassault]],
-  name                = [[Reaper]],
+  name                = [[Minotaur]],
   description         = [[Assault Tank]],
   acceleration        = 0.0237,
   brakeRate           = 0.04786,
