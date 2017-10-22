@@ -1,8 +1,8 @@
 {
 	"tankaa" : {
-		"name" : "Minotaur",
+		"name" : "Ettin",
 		"description" : "Flakpanzer",
-		"helptext" : "Minotaurs Flakkanone macht kurzen Prozess mit feindlichen Hubschraubern, aber auch gegen Flugzeuge erweist sie sich als nützlich."
+		"helptext" : "Ettin Flakkanone macht kurzen Prozess mit feindlichen Hubschraubern, aber auch gegen Flugzeuge erweist sie sich als nützlich."
 	},
 	"energypylon" : {
 		"name" : "Energy Pylon",

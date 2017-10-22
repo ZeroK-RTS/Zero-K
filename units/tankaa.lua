@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[tankaa]],
-  name                   = [[Minotaur]],
+  name                   = [[Ettin]],
   description            = [[Flak Anti-Air Tank]],
   acceleration           = 0.05952,
   brakeRate              = 0.14875,

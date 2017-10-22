@@ -230,9 +230,9 @@
         "helptext": "Angler to amfibia przeciwlownicza, która najlepiej sprawuje się przeciwko bombowcom Raven.  Anglery są w stanie wypłynąć na powierzchnię i parami je zestrzeliwać."
     },
     "tankaa": {
-        "name": "Minotaur",
+        "name": "Ettin",
         "description": "Czołg przeciwlotniczy",
-        "helptext": "Minotaur posiada działa przeciwlotnicze, które dobrze sprawdzają się przeciwko samolotom i jeszcze lepiej przeciwko statkom powietrznym."
+        "helptext": "Ettin posiada działa przeciwlotnicze, które dobrze sprawdzają się przeciwko samolotom i jeszcze lepiej przeciwko statkom powietrznym."
     },
     "asteroid": {
         "name": "Asteroida",

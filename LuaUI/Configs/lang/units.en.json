@@ -210,9 +210,9 @@
 		"helptext" : "Angler is amphibious anti-air bot designed to counter the factory's nemesis - Raven. Two of them together can float to the surface and kill a single Raven."
 	},
 	"tankaa" : {
-		"name" : "Minotaur",
+		"name" : "Ettin",
 		"description" : "Flak Anti-Air Tank",
-		"helptext" : "The Minotaur's flak cannon makes quick work of enemy gunships, and is also fairly effective against planes."
+		"helptext" : "The Ettin's flak cannon makes quick work of enemy gunships, and is also fairly effective against planes."
 	},
 	"asteroid" : {
 		"name" : "Asteroid",
