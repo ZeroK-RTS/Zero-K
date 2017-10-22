@@ -1140,6 +1140,9 @@ local function MissionGameOver(missionWon)
 	SetWinBeforeBonusObjective(missionWon)
 	SendToUnsynced("MissionGameOver", missionWon)
 	Spring.SetGameRulesParam("MissionGameOver", (missionWon and 1) or 0)
+	local frame = Spring.GetGameFrame()
+	Spring.Echo("set MissionGameOver_frames", frame)
+	Spring.SetGameRulesParam("MissionGameOver_frames", frame)
 end
 
 --------------------------------------------------------------------------------

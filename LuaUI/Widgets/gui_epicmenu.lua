@@ -3105,6 +3105,11 @@ end
 
 function widget:GameFrame(n)
 	if lbl_gtime then
+		local gameOverFrame = Spring.GetGameRulesParam("MissionGameOver_frames")
+		if gameOverFrame then
+			lbl_gtime:SetCaption(GetTimeString((gameOverFrame)/30))
+			widgetHandler:RemoveWidgetCallIn("GameFrame", self)
+		end
 		if not lastSaveGameFrame then
 			lastSaveGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
 		end

@@ -54,6 +54,7 @@ local Chili
 
 local WIN_MESSAGE = "Campaign_PlanetBattleWon"
 local LOST_MESSAGE = "Campaign_PlanetBattleLost"
+local RESIGN_MESSAGE = "Campaign_PlanetBattleResign"
 local LOAD_CAMPAIGN_MESSAGE = "Campaign_LoadCampaign"
 local myAllyTeamID = Spring.GetMyAllyTeamID()
 
@@ -624,23 +625,42 @@ end
 --------------------------------------------------------------------------------
 -- Victory/Defeat
 
+local function GetTimeString()
+	local frames = Spring.GetGameRulesParam("MissionGameOver_frames") or select(1, Spring.GetGameFrame()) or 0
+	return frames
+end
+
 local function SendVictoryToLuaMenu(planetID)
 	local luaMenu = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
 	if luaMenu then
 		local bonusObjectiveString = bonusObjectiveBlock and bonusObjectiveBlock.MakeObjectivesString()
-		Spring.SendLuaMenuMsg(WIN_MESSAGE .. planetID .. " " .. (bonusObjectiveString or ""))
+		Spring.SendLuaMenuMsg(WIN_MESSAGE .. " " .. planetID .. " " .. GetTimeString() .. " " .. (bonusObjectiveString or ""))
 	end
 end
 
 local function SendDefeatToLuaMenu(planetID)
 	local luaMenu = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
 	if luaMenu then
-		Spring.SendLuaMenuMsg(LOST_MESSAGE .. planetID)
+		Spring.SendLuaMenuMsg(LOST_MESSAGE .. " " .. planetID .. " " .. GetTimeString())
 	end
 end
 
-local function SendMissionResult()
-	if missionResultSent or (not missionSustainedTime) or Spring.IsReplay() then
+local function SendResignToLuaMenu(planetID)
+	local luaMenu = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
+	if luaMenu then
+		Spring.SendLuaMenuMsg(RESIGN_MESSAGE .. " " .. planetID .. " " .. GetTimeString())
+	end
+end
+
+local function SendMissionResult(shutdown)
+	if missionResultSent or Spring.IsReplay() then
+		return
+	end
+	
+	if (not missionSustainedTime) then
+		if shutdown then
+			SendResignToLuaMenu(campaignBattleID)
+		end
 		return
 	end
 	missionResultSent = true
@@ -893,6 +913,6 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-	SendMissionResult()
+	SendMissionResult(true)
 	glDeleteFont(myFont)
 end
