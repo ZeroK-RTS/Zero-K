@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[staticantinuke]],
-  name                          = [[Protector]],
+  name                          = [[Antinuke]],
   description                   = [[Strategic Nuke Interception System]],
   acceleration                  = 0,
   activateWhenBuilt             = true,

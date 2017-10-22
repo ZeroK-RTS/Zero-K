@@ -77,7 +77,7 @@ local unitIsFighterOrDrone = {
 	[UnitDefNames["dronecarry"].id] = true,
 }
 
---Wolverine mines are stupid targets.
+--Badger mines are stupid targets.
 local unitIsClaw = {
 	[UnitDefNames["wolverine_mine"].id] = true,
 }
@@ -327,7 +327,7 @@ for weaponDefID, data in pairs(velocityPenaltyDefs) do
 	data[2] = data[2] - data[1]*data[3]
 end
 
-local reloadTimeAlpha = 1.8 --seconds, matches Leveler's reload time
+local reloadTimeAlpha = 1.8 --seconds, matches Ripper's reload time
 local highAlphaWeaponDamages = {}
 for wid = 1, #WeaponDefs do
 	local wd = WeaponDefs[wid]

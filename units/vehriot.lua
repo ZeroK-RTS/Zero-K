@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[vehriot]],
-  name                = [[Leveler]],
-  description         = [[Riot Vehicle]],
+  name                = [[Ripper]],
+  description         = [[Riot Rover]],
   acceleration        = 0.0318,
   brakeRate           = 0.124,
   buildCostMetal      = 240,

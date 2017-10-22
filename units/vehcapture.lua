@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[vehcapture]],
   name                = [[Dominatrix]],
-  description         = [[Capture Vehicle]],
+  description         = [[Capture Rover]],
   acceleration        = 0.0444,
   brakeRate           = 0.0385,
   buildCostMetal      = 420,

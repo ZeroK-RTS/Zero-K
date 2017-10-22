@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakarty]],
-  name                   = [[Hammer]],
+  name                   = [[Sling]],
   description            = [[Light Artillery Bot]],
   acceleration           = 0.25,
   brakeRate              = 0.75,

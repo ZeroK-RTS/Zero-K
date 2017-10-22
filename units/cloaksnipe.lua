@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloaksnipe]],
-  name                   = [[Spectre]],
+  name                   = [[Phantom]],
   description            = [[Cloaked Skirmish/Anti-Heavy Artillery Bot]],
   acceleration           = 0.3,
   brakeRate              = 0.2,

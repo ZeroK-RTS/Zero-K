@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[striderbantha]],
-  name                   = [[Bantha]],
+  name                   = [[Paladin]],
   description            = [[Ranged Support Strider]],
   acceleration           = 0.1047,
   brakeRate              = 0.2212,

@@ -14,7 +14,7 @@ end
 --[[
 Todo:
 - Puppy kamikaziness (is through weapon/gadget, not self-D)
-- Deployability (Crabe, Djinn, Slasher) - needs sensible way to convey these, each one does different thing when static
+- Deployability (Crab, Djinn, Slasher) - needs sensible way to convey these, each one does different thing when static
 - Weapon impulse (no idea how the values relate to applied force, will need research)
 - Drone production (would need some work to do properly because of entanglement)
 - Clogging (Dirtbag)
@@ -502,7 +502,7 @@ local function weapons2Table(cells, ws, unitID)
 			show_dps = false
 		end
 		
-		if cp.damage_vs_shield then -- Wolverine
+		if cp.damage_vs_shield then -- Badger
 			dam_str = tostring(cp.damage_vs_shield) .. " (" .. dam .. " + " .. (tonumber(cp.damage_vs_shield)-dam) .. " mine)"
 			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield)/reloadtime))
 		end

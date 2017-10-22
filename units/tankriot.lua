@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[tankriot]],
-  name                = [[Banisher]],
+  name                = [[Ogre]],
   description         = [[Heavy Riot Support Tank]],
   acceleration        = 0.02181,
   brakeRate           = 0.04282,

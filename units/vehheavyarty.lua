@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[vehheavyarty]],
   name                = [[Impaler]],
-  description         = [[Precision Artillery Vehicle]],
+  description         = [[Precision Artillery Rover]],
   acceleration        = 0.042,
   brakeRate           = 0.08,
   buildCostMetal      = 700,

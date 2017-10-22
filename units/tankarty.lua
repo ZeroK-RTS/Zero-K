@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[tankarty]],
-  name                = [[Pillager]],
+  name                = [[Emissary]],
   description         = [[General-Purpose Artillery]],
   acceleration        = 0.0282,
   brakeRate           = 0.136,

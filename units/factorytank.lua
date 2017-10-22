@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factorytank]],
-  name                          = [[Heavy Tank Factory]],
-  description                   = [[Produces Heavy and Specialized Vehicles, Builds at 10 m/s]],
+  name                          = [[Tank Foundry]],
+  description                   = [[Produces Heavy Tracked Vehicles, Builds at 10 m/s]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = 600,

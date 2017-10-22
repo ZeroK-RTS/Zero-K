@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[hoverarty]],
-  name                = [[Penetrator]],
+  name                = [[Lance]],
   description         = [[Anti-Heavy Artillery Hovercraft]],
   acceleration        = 0.016,
   activateWhenBuilt   = true,

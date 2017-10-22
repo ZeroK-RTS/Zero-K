@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehassault]],
   name                   = [[Ravager]],
-  description            = [[Assault Vehicle]],
+  description            = [[Assault Rover]],
   acceleration           = 0.027,
   brakeRate              = 0.0385,
   buildCostMetal         = 250,

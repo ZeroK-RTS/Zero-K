@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehcon]],
   name                   = [[Mason]],
-  description            = [[Construction Vehicle, Builds at 5 m/s]],
+  description            = [[Construction Rover, Builds at 5 m/s]],
   acceleration           = 0.066,
   brakeRate              = 1.5,
   buildCostMetal         = 140,

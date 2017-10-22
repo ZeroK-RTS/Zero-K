@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[chicken_shield]],
-  name                = [[Toad]],
+  name                = [[Blooper]],
   description         = [[Shield/Anti-Air]],
   acceleration        = 0.36,
   brakeRate           = 0.205,

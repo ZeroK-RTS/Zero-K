@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factoryveh]],
-  name                          = [[Light Vehicle Factory]],
-  description                   = [[Produces Wheeled Vehicles, Builds at 10 m/s]],
+  name                          = [[Rover Assembly]],
+  description                   = [[Produces Light Wheeled Vehicles, Builds at 10 m/s]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = 600,

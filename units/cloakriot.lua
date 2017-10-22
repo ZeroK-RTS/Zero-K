@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakriot]],
-  name                   = [[Warrior]],
+  name                   = [[Reaver]],
   description            = [[Riot Bot]],
   acceleration           = 0.25,
   brakeRate              = 0.2,

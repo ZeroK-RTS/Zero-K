@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[striderarty]],
-  name                   = [[Catapult]],
+  name                   = [[Merlin]],
   description            = [[Heavy Saturation Artillery Strider]],
   acceleration           = 0.1092,
   brakeRate              = 0.1942,

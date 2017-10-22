@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factoryjump]],
-  name                          = [[Jump/Specialist Plant]],
-  description                   = [[Produces Jumpjets and Special Walkers, Builds at 10 m/s]],
+  name                          = [[Jumpbot Factory]],
+  description                   = [[Produces Jumpjet Equipped Robots, Builds at 10 m/s]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = 600,

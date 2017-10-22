@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakskirm]],
-  name                   = [[Rocko]],
+  name                   = [[Ronin]],
   description            = [[Skirmisher Bot (Direct-Fire)]],
   acceleration           = 0.32,
   brakeRate              = 0.2,

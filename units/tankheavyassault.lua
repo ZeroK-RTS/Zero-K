@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[tankheavyassault]],
-  name                = [[Goliath]],
+  name                = [[Cyclops]],
   description         = [[Very Heavy Tank Buster]],
   acceleration        = 0.0282,
   brakeRate           = 0.052,
