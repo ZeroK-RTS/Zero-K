@@ -1,13 +1,15 @@
 if not gadgetHandler:IsSyncedCode() then return end
 
-function gadget:GetInfo() return {
-	name    = "Factory exit flatten",
-	author  = "GoogleFrog (effectively)",
-	date    = "2017-10-01",
-	license = "GNU GPL, v2 or later",
-	layer   = 1, -- after mission_galaxy_campaign_battle_handler (it levels ground for facs and would overwrite ours)
-	enabled = true,
-} end
+function gadget:GetInfo()
+	return {
+		name    = "Factory exit flatten",
+		author  = "GoogleFrog (effectively)",
+		date    = "2017-10-01",
+		license = "GNU GPL, v2 or later",
+		layer   = 1, -- after mission_galaxy_campaign_battle_handler (it levels ground for facs and would overwrite ours)
+		enabled = true,
+	}
+end
 
 include("LuaRules/Configs/start_setup.lua")
 
@@ -62,8 +64,8 @@ function FlattenFactory(unitID, unitDefID)
 	end
 end
 
-local function UnitFinished(unitID, unitDefID)
-	if not ploppableDefs[unitDefID] then
+local function UnitFinished(_, unitID, unitDefID)
+	if not (unitID and unitDefID and ploppableDefs[unitDefID]) then
 		return
 	end
 
