@@ -45,3 +45,26 @@ if Spring.Utilities.IsCurrentVersionNewerThan(100, 0) then
 	Spring.MoveCtrl.SetRotation = newMcSetUnitRotation
 	Spring.MoveCtrl.SetRotationVelocity = newMcSetUnitRotationVelocity
 end
+
+local origGetGroundInfo = Spring.GetGroundInfo
+local function GetGroundInfo(x, z)
+	local r1, r2, r3, r4, r5, r6, r7, r8, r9 = origGetGroundInfo(x, z)
+	if type(r1) == "string" then
+		return r1, r2, r3, r4, r5, r6, r7, r8
+	else
+		return r2, r3, r4, r5, r6, r7, r8, r9, r1
+	end
+end
+Spring.GetGroundInfo = GetGroundInfo
+
+local origGetTerrainTypeData = Spring.GetTerrainTypeData
+local function GetTerrainTypeData(index)
+	local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTerrainTypeData(index)
+	if type(r1) == "string" then
+		return r1, r2, r3, r4, r5, r6, r7
+	else
+		return r2, r3, r4, r5, r6, r7, r8, r1
+	end
+end
+Spring.GetTerrainTypeData = GetTerrainTypeData
+
