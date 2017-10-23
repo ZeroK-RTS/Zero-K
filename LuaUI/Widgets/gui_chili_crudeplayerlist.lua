@@ -13,6 +13,10 @@ function widget:GetInfo()
   }
 end
 
+if Spring.GetModOptions().singleplayercampaignbattleid then
+	return
+end
+
 VFS.Include ("LuaRules/Utilities/lobbyStuff.lua")
 
 --------------------------------------------------------------------------------
@@ -882,7 +886,7 @@ end
 -----------------------------------------------------------------------
 
 function widget:Initialize()
-	if (not WG.Chili) or (Spring.GetModOptions().singleplayercampaignbattleid) then
+	if not WG.Chili then
 		widgetHandler:RemoveWidget()
 		return
 	end
