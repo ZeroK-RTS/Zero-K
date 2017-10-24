@@ -481,7 +481,7 @@ end
 -- there is probably some better way
 function widget:DrawWorld()
 	if (Spring.GetGameFrame() < 1) then
-		PlaySound("LuaUI/Sounds/Voices/initialized_core_1", 1, 'ui')
+		PlaySound("sounds/reply/advisor/command_console_activated", 1, 'ui')
 	end
 	widgetHandler:RemoveCallIn('DrawWorld')
 end

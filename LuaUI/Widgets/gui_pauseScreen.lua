@@ -114,10 +114,10 @@ options = {
 	},
 }
 
-local SOUND_DIRNAME = 'LuaUI/Sounds/Voices/'
+local SOUND_DIRNAME = 'sounds/reply/advisor/'
 
-local pauseSound = "paused_core_1"
-local unpauseSound = "unpaused_core_1"
+local pauseSound = "warzone_paused"
+local unpauseSound = "warzone_active"
 local tempDisabled = false
 local doNotDisableSound = false
 local disablePauseSlideTimestamp = 0
