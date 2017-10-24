@@ -17,6 +17,7 @@ end
 include("keysym.h.lua")
 include("Widgets/COFCTools/ExportUtilities.lua")
 
+local missionMode = Spring.GetModOptions().singleplayercampaignbattleid
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1215,19 +1216,39 @@ local function MakeMessageWindow(name, enabled)
 end
 
 local showingBackchat = false
-local function SwapBacklog()
+local showingNothing = false
+
+local function SetHidden(hidden)
+	if hidden == showingNothing then
+		return
+	end
+	showingNothing = hidden
+	
 	if showingBackchat then
 		window_chat:RemoveChild(scrollpanel_backchat)
+	else
+		window_chat:RemoveChild(scrollpanel_chat)
+	end
+end
+
+local function SwapBacklog()
+	if showingBackchat then
+		if not showingNothing then
+			window_chat:RemoveChild(scrollpanel_backchat)
+		end
 		window_chat:AddChild(scrollpanel_chat)
 		backlogButtonImage.file = 'LuaUI/Images/arrowhead.png'
 		backlogButtonImage:Invalidate()
 	else
-		window_chat:RemoveChild(scrollpanel_chat)
+		if not showingNothing then
+			window_chat:RemoveChild(scrollpanel_chat)
+		end
 		window_chat:AddChild(scrollpanel_backchat)
 		backlogButtonImage.file = 'LuaUI/Images/arrowhead_flipped.png'
 		backlogButtonImage:Invalidate()
 	end
 	showingBackchat = not showingBackchat
+	showingNothing = false
 end
 
 local function SetBacklogShow(newShow)
@@ -1353,9 +1374,7 @@ function widget:AddConsoleMessage(msg)
 		else
 			AddMessage(messages[#messages], 'console')
 		end
-				
 		return
-	
 	end
 	
 	msg.dup = 1
@@ -1421,9 +1440,8 @@ function widget:Update(s)
 				)
 			}
 		)
-	
+		
 		for k,control in pairs(fadeTracker) do
-			
 			fadeTracker[k].fade = math.max( control.fade - sub, 0 ) --removes old lines
 			
 			if control.fade == 0 then
@@ -1440,6 +1458,9 @@ function widget:Update(s)
 		end
 		firstUpdate = false
 		SetInputFontSize(15)
+		if missionMode then
+			SetHidden(true)
+		end
 	end
 	
 	-- Workaround bugged display on first open of the backlog
@@ -1452,6 +1473,9 @@ function widget:Update(s)
 			SwapBacklog()
 			SetBacklogShow(options.defaultBacklogEnabled.value)
 			initialSwapTime = nil
+		end
+		if missionMode then
+			SetHidden(true)
 		end
 	end
 end
