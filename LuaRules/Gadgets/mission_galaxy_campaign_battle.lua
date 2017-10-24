@@ -65,6 +65,7 @@ local wantLevelGround = nil -- Positions to level
 local vitalUnits = {}
 local defeatConditionConfig
 local victoryAtLocation = {}
+local typeVictoryLocations = {}
 
 local unlockedUnitsByTeam = {}
 local teamCommParameters = {}
@@ -231,7 +232,9 @@ end
 
 local function AddVictoryAtLocationUnit(unitID, location, allyTeamID)
 	victoryAtLocation = victoryAtLocation or {}
-	victoryAtLocation[unitID] = {
+	victoryAtLocation[unitID] = victoryAtLocation[unitID] or {}
+	local locations = victoryAtLocation[unitID]
+	locations[#locations + 1] = {
 		x = location.x,
 		z = location.z,
 		radiusSq = location.radius*location.radius,
@@ -262,14 +265,31 @@ local function VictoryAtLocationUpdate()
 		return
 	end
 	for unitID, data in pairs(victoryAtLocation) do
-		if DoVictoryAtLocationCheck(unitID, data) then
-			if data.objectiveID then
-				local objParameter = "objectiveSuccess_" .. data.objectiveID
-				Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0))
+		for i = 1, #data do
+			if DoVictoryAtLocationCheck(unitID, data[i]) then
+				if data[i].objectiveID then
+					local objParameter = "objectiveSuccess_" .. data[i].objectiveID
+					Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0))
+				end
+				GG.CauseVictory(data[i].allyTeamID)
+				return
 			end
-			GG.CauseVictory(data.allyTeamID)
-			return
 		end
+	end
+end
+
+local function MaybeAddTypeVictoryLocation(unitID, unitDefID, teamID)
+	if not typeVictoryLocations[teamID] then
+		return
+	end
+	local name = unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].name
+	local locations = name and typeVictoryLocations[teamID][name]
+	if not locations then
+		return
+	end
+	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	for i = 1, #locations do
+		AddVictoryAtLocationUnit(unitID, locations[i], allyTeamID)
 	end
 end
 
@@ -514,6 +534,7 @@ local function CheckInitialUnitDestroyed(unitID)
 		SendToUnsynced("RemoveMarker", unitID)
 	end
 	
+	victoryAtLocation[unitID] = nil
 	initialUnitData[unitID] = nil
 end
 
@@ -539,7 +560,6 @@ local function AddInitialUnitObjectiveParameters(unitID, parameters)
 		AddBonusObjectiveUnit(unitID, parameters.bonusObjectiveID, initialUnitData[unitID].allyTeamID)
 	end
 end
-
 
 local function SetupInitialUnitParameters(unitID, unitData)
 	AddInitialUnitObjectiveParameters(unitID, unitData)
@@ -942,6 +962,14 @@ local function SetTeamAbilities(teamID, customKeys)
 	end
 end
 
+local function InitializeTeamTypeVictoryLocations(teamID, customKeys)
+	local locations = CustomKeyToUsefulTable(customKeys and customKeys.typevictorylocation)
+	if not locations then
+		return
+	end
+	typeVictoryLocations[teamID] = locations
+end
+
 local function PlaceTeamUnits(teamID, customKeys, alliedToPlayer)
 	local initialUnits = GetExtraStartUnits(teamID, customKeys)
 	if not initialUnits then
@@ -982,6 +1010,26 @@ local function InitializeUnlocks()
 		SetTeamAbilities(teamID, customKeys)
 		SetTeamUnlocks(teamID, customKeys)
 		InitializeCommanderParameters(teamID, customKeys)
+	end
+end
+
+local function InitializeTypeVictoryLocation()
+	local teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		local _,_,_,_,_,allyTeamID, customKeys = Spring.GetTeamInfo(teamID)
+		InitializeTeamTypeVictoryLocations(teamID, customKeys)
+	end
+end
+
+local function InitializeMapMarkers()
+	local mapMarkers = CustomKeyToUsefulTable(Spring.GetModOptions().planetmissionmapmarkers)
+	if not mapMarkers then
+		return
+	end
+	for i = 1, #mapMarkers do
+		local marker = mapMarkers[i]
+		SendToUnsynced("AddMarker", math.floor(marker.x) .. math.floor(marker.z), marker.x, marker.z, marker.text, marker.color)
 	end
 end
 
@@ -1153,6 +1201,7 @@ function gadget:UnitFinished(unitID, unitDefID, teamID, builderID)
 	if IsVitalUnitType(unitID, unitDefID) then
 		vitalUnits[unitID] = true
 	end
+	MaybeAddTypeVictoryLocation(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
@@ -1177,6 +1226,7 @@ function gadget:Initialize()
 	InitializeUnlocks()
 	InitializeVictoryConditions()
 	InitializeBonusObjectives()
+	InitializeTypeVictoryLocation()
 	
 	GG.MissionGameOver = MissionGameOver
 	
@@ -1184,7 +1234,11 @@ function gadget:Initialize()
 	for _, unitID in pairs(allUnits) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		if unitDefID then
-			gadget:UnitCreated(unitID, unitDefID, Spring.GetUnitTeam(unitID))
+			local teamID = Spring.GetUnitTeam(unitID)
+			gadget:UnitCreated(unitID, unitDefID, teamID)
+			if not select(3, Spring.GetUnitIsStunned(unitID)) then
+				gadget:UnitFinished(unitID, unitDefID, teamID)
+			end
 		end
 	end
 	
@@ -1205,6 +1259,7 @@ end
 
 function gadget:GameFrame(n)
 	if firstGameFrame then
+		InitializeMapMarkers()
 		firstGameFrame = false
 		if not SPAWN_GAME_PRELOAD then
 			if not Spring.GetGameRulesParam("loadedGame") then
