@@ -18,6 +18,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
+local missionDifficulty = tonumber(Spring.GetModOptions().planetmissiondifficulty) or 2
 if not campaignBattleID then
 	return
 end
@@ -634,7 +635,7 @@ local function SendVictoryToLuaMenu(planetID)
 	local luaMenu = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
 	if luaMenu then
 		local bonusObjectiveString = bonusObjectiveBlock and bonusObjectiveBlock.MakeObjectivesString()
-		Spring.SendLuaMenuMsg(WIN_MESSAGE .. " " .. planetID .. " " .. GetTimeString() .. " " .. (bonusObjectiveString or ""))
+		Spring.SendLuaMenuMsg(WIN_MESSAGE .. " " .. planetID .. " " .. GetTimeString() .. " " .. (bonusObjectiveString or "") .. " " .. (missionDifficulty or "0"))
 	end
 end
 
