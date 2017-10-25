@@ -565,9 +565,9 @@
 		"helptext" : "Das Sonar ortet nach dem Echoprinzip von Radaranlagen feindliche Einheiten unter Wasser. Dazu strahlen sie selbst ein Signal aus und empfangen das entsprechende Echo, aus dessen Laufzeit auf die Entfernung zu den Einheiten geschlossen wird."
 	},
 	"energywind" : {
-		"name" : "Wind/Tidal Generator",
+		"name" : "Turbine",
 		"description" : "Kleine Kraftwerk (variabel)",
-		"helptext" : "Windräder produzieren eine variable Menge an Energie, je nach Höhenlage und Windgeschwindigkeit. Sie sind extrem verletzlich und explodieren in einer Kettenreaktion, sobald sie zerstört werden. Platziere sie also mit Bedacht."
+		"helptext" : "Die Turbine nützt Gezeiten im Wasser und Wind auf dem Land. Windräder produzieren eine variable Menge an Energie, je nach Höhenlage und Windgeschwindigkeit. Sie sind extrem verletzlich und explodieren in einer Kettenreaktion, sobald sie zerstört werden. Platziere sie also mit Bedacht. Gezeitengenerators sind fester und seine Energieproduktion ist konstant."
 	},
 	"energygeo" : {
 		"name" : "Geothermal Generator",

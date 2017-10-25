@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[energywind]],
-  name                          = [[Wind/Tidal Generator]],
+  name                          = [[Turbine]],
   description                   = [[Small Powerplant]],
   activateWhenBuilt             = true,
   buildCostMetal                = 35,

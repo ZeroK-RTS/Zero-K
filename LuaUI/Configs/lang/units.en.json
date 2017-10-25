@@ -430,9 +430,9 @@
 		"helptext" : "The Widow is useful in two ways. Firstly it is an excellent scout, and very difficult to detect. It can penetrate deep into enemy lines. It also has the capacity to shoot a paralyzing bolt that will freeze any one target, good against heavy enemies and enemy infrastructure."
 	},
 	"energywind" : {
-		"name" : "Wind/Tidal Generator",
+		"name" : "Turbine",
 		"description" : "Small Powerplant",
-		"helptext" : "Wind generators produce a variable amount of energy, depending on altitude and wind speed. They are extremely fragile and chain explode when bunched, so consider their placement carefully. When placed in water, they become somewhat more sturdy tidal generators with a good, constant output."
+		"helptext" : "Turbines produce a variable amount of energy, depending on altitude and wind speed. They are extremely fragile and chain explode when bunched, so consider their placement carefully. When placed in water, they become somewhat sturdier with a good, constant output."
 	},
 	"amphassault" : {
 		"name" : "Grizzly",
