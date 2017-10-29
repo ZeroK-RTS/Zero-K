@@ -95,8 +95,9 @@ local custom_cmd_actions = {
 	antinukezone = {cmdType = 2, name = "Ceasefire Antinuke Zone", states = {'Off', 'On'}},
 	unitai = {cmdType = 2, name = "Unit AI", states = {'Off', 'On'}},
 	selection_rank = {cmdType = 2, name = "Selection Rank", states = {'0', '1', '2', '3'}},
+	autocalltransport = {cmdType = 2, name = "Auto Call Transport", states = {'Off', 'On'}},
 	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Seppuku", states = {'Off', 'On'}},
-	pushpull = {cmdType = 2, name = "Push / Pull", states = {'Pull', 'Push'}},
+	pushpull = {cmdType = 2, name = "Impulse Mode", states = {'Pull', 'Push'}},
 	autoassist = {cmdType = 2, name = "Factory Auto Assist", states = {'Off', 'On'}},
 	airstrafe = {cmdType = 2, name = "Gunship Strafe", states = {'Off', 'On'}},
 	divestate = {cmdType = 2, name = "Raven Dive", states = {'Never', 'Under Shields', 'For Mobiles', 'Always Low'}},
@@ -178,6 +179,7 @@ local usedActions = {
 	["setfirezone"] = true,
 	["cancelfirezone"] = true,
 	["selection_rank"] = true,
+	["pushpull"] = true,
 
 	-- These actions are used, just not by selecting everything with default UI
 	["upgradecommstop"] = true,
