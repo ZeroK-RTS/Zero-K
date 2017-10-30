@@ -52,8 +52,9 @@ local setTargetUnit = {}
 
 local commandLevel = 1 --default at start of widget is to be disabled!
 
-local myAllyTeamID = Spring.GetLocalAllyTeamID()
 local spectating = Spring.GetSpectatingState()
+local myAllyTeamID = Spring.GetLocalAllyTeamID()
+local myTeamID = Spring.GetMyTeamID()
 local myPlayerID = Spring.GetLocalPlayerID()
 
 local gaiaTeamID = Spring.GetGaiaTeamID()
@@ -77,7 +78,7 @@ end
 
 options_path = 'Settings/Interface/Command Visibility'
 options_order = { 
-'showallcommandselection','lbl_filters','includeallies', 'includeneutral'
+'showallcommandselection','lbl_filters','includeallies', 'includealliesunits', 'includeneutral'
 }
 options = {
 	showallcommandselection = {
@@ -116,6 +117,15 @@ options = {
 		desc = 'When showing commands for selected units, show them for both your own and your allies\' selections.',
 		type = 'bool',
 		value = false,
+	},
+	includealliesunits = {
+		name = 'Include ally units',
+		desc = 'When showing commands, show them for both your own and your allies units.',
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			PoolUnit()
+		end,
 	},
 	includeneutral = {
 		name = 'Include Neutral Units',
@@ -163,7 +173,7 @@ function PoolUnit()
 	local units = spGetAllUnits()
 	for _, unitID in ipairs(units) do
 		local teamID = spGetUnitTeam(unitID)
-		if options.includeneutral.value or teamID ~= gaiaTeamID then
+		if (options.includeneutral.value or teamID ~= gaiaTeamID) and (teamID == myTeamID or options.includealliesunits.value) then
 			AddUnit(unitID)
 		else
 			RemoveUnit(unitID)
@@ -296,19 +306,20 @@ end
 function widget:PlayerChanged(playerID) 
 	if myPlayerID == playerID then
 		spectating = Spring.GetSpectatingState()
-		allyTeamID = Spring.GetLocalAllyTeamID()
+		myAllyTeamID = Spring.GetLocalAllyTeamID()
+		myTeamID = Spring.GetMyTeamID()
 		PoolUnit()
 	end
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	if options.includeneutral.value or unitTeam ~= gaiaTeamID then
+	if (options.includeneutral.value or unitTeam ~= gaiaTeamID) and (teamID == myTeamID or options.includealliesunits.value) then
 		AddUnit(unitID)
 	end
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
-	if options.includeneutral.value or newTeam ~= gaiaTeamID then
+	if (options.includeneutral.value or unitTeam ~= gaiaTeamID) and (teamID == myTeamID or options.includealliesunits.value) then
 		AddUnit(unitID)
 	else
 		RemoveUnit(unitID)
