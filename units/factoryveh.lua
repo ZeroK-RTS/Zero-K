@@ -1,14 +1,14 @@
 unitDef = {
   unitname                      = [[factoryveh]],
-  name                          = [[Rover Assembly]],
-  description                   = [[Produces Light Wheeled Vehicles, Builds at 10 m/s]],
+  name                          = [[Rover Factory]],
+  description                   = [[Produces Rovers, Builds at 10 m/s]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 8,
-  buildingGroundDecalSizeY      = 8,
+  buildingGroundDecalSizeY      = 10,
   buildingGroundDecalType       = [[factoryveh_aoplane.dds]],
 
   buildoptions                  = {
@@ -42,7 +42,7 @@ unitDef = {
   iconType                      = [[facvehicle]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  levelGround                   = true,
+  levelGround                   = false,
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
@@ -50,23 +50,24 @@ unitDef = {
   minCloakDistance              = 150,
   moveState        				= 1,
   noAutoFire                    = false,
-  objectName                    = [[corvp.s3o]],
+  objectName                    = [[factoryveh.dae]],
+  script                        = [[factoryrover.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = "yyoooyy yoooooy ooooooo occccco occccco occccco occccco",
+  yardMap                       = "ooocccc ooocccc ooocccc ooocccc ooocccc ooocccc ooocccc ooocccc ooocccc ooocccc",
 
   featureDefs                   = {
 
     DEAD  = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 7,
-      footprintZ       = 7,
-      object           = [[corvp_dead.s3o]],
+      footprintX       = 6,
+      footprintZ       = 8,
+      object           = [[factoryveh_d.dae]],
     },
 
 
