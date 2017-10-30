@@ -36,7 +36,6 @@ local units = {
   [UnitDefNames.factoryshield.id] = {"nanoemit"},
   [UnitDefNames.factoryspider.id] = {"nanoemit"},
   [UnitDefNames.factoryamph.id] = {"nanoemit"},
-  [UnitDefNames.factoryveh.id] = {"beam1", "beam2", "beam3", "beam4"},
   [UnitDefNames.factoryhover.id] = {"beam1", "beam2", "beam3", "beam4", "beam5", "beam6"},
   [UnitDefNames.factorygunship.id] = {"beam1", "beam2"},
 }
