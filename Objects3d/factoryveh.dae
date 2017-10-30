@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.77.0 commit date:2016-04-05, commit time:18:12, hash:abf6f08</authoring_tool>
     </contributor>
-    <created>2017-09-17T22:29:15</created>
-    <modified>2017-09-17T22:29:15</modified>
+    <created>2017-10-30T21:34:19</created>
+    <modified>2017-10-30T21:34:19</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -5637,7 +5637,7 @@
     <visual_scene id="Scene" name="Scene">
       <node id="Root" name="Root" type="NODE">
         <translate sid="location">0 0 0</translate>
-        <rotate sid="rotationZ">0 0 1 90</rotate>
+        <rotate sid="rotationZ">0 0 1 0</rotate>
         <rotate sid="rotationY">0 1 0 0</rotate>
         <rotate sid="rotationX">1 0 0 0</rotate>
         <scale sid="scale">1 1 1</scale>
@@ -5686,7 +5686,7 @@
             <translate sid="location">-8.6077e-6 -40.7314 5.921338</translate>
             <rotate sid="rotationZ">0 0 1 0</rotate>
             <rotate sid="rotationY">0 1 0 2.54444e-14</rotate>
-            <rotate sid="rotationX">1 0 0 -2.60906e-13</rotate>
+            <rotate sid="rotationX">1 0 0 -2.92531e-13</rotate>
             <scale sid="scale">1 1 1</scale>
             <instance_geometry url="#Cylinder_011-mesh" name="CraneWheel">
               <bind_material>
@@ -5699,7 +5699,7 @@
               <translate sid="location">2.40008e-6 10.71515 2.629841</translate>
               <rotate sid="rotationZ">0 0 1 -5.96194e-6</rotate>
               <rotate sid="rotationY">0 1 0 -1.72807e-8</rotate>
-              <rotate sid="rotationX">1 0 0 -8.19679e-13</rotate>
+              <rotate sid="rotationX">1 0 0 -8.51304e-13</rotate>
               <scale sid="scale">1 1 1</scale>
               <instance_geometry url="#Cylinder_013-mesh" name="RailTop">
                 <bind_material>
@@ -5712,7 +5712,7 @@
                 <translate sid="location">-2.62333e-6 -24.22373 0.9881706</translate>
                 <rotate sid="rotationZ">0 0 1 -5.96194e-6</rotate>
                 <rotate sid="rotationY">0 1 0 -4.01614e-7</rotate>
-                <rotate sid="rotationX">1 0 0 -1.6424e-12</rotate>
+                <rotate sid="rotationX">1 0 0 -1.67272e-12</rotate>
                 <scale sid="scale">1 1 1</scale>
                 <instance_geometry url="#Cylinder_007-mesh" name="Train">
                   <bind_material>
@@ -5723,8 +5723,8 @@
                 </instance_geometry>
                 <node id="Nanos" name="Nanos" type="NODE">
                   <translate sid="location">-0.116086 -1.170078 -1.406374</translate>
-                  <rotate sid="rotationZ">0 0 1 4.07111e-13</rotate>
-                  <rotate sid="rotationY">0 1 0 1.23244e-12</rotate>
+                  <rotate sid="rotationZ">0 0 1 4.07252e-13</rotate>
+                  <rotate sid="rotationY">0 1 0 1.65389e-12</rotate>
                   <rotate sid="rotationX">1 0 0 -2.22195e-12</rotate>
                   <scale sid="scale">1 1 1</scale>
                   <instance_geometry url="#Cylinder_014-mesh" name="Nanos">
@@ -5737,14 +5737,14 @@
                   <node id="NanoLeft" name="NanoLeft" type="NODE">
                     <translate sid="location">6.391054 -1.016136 -6.288226</translate>
                     <rotate sid="rotationZ">0 0 1 0</rotate>
-                    <rotate sid="rotationY">0 1 0 -1.90833e-13</rotate>
+                    <rotate sid="rotationY">0 1 0 1.61095e-15</rotate>
                     <rotate sid="rotationX">1 0 0 -2.9622e-12</rotate>
                     <scale sid="scale">1 1 1</scale>
                   </node>
                   <node id="NanoRight" name="NanoRight" type="NODE">
                     <translate sid="location">-5.866881 -1.016136 -6.288226</translate>
                     <rotate sid="rotationZ">0 0 1 0</rotate>
-                    <rotate sid="rotationY">0 1 0 -1.90833e-13</rotate>
+                    <rotate sid="rotationY">0 1 0 1.61095e-15</rotate>
                     <rotate sid="rotationX">1 0 0 -2.9622e-12</rotate>
                     <scale sid="scale">1 1 1</scale>
                   </node>
@@ -5755,7 +5755,7 @@
               <translate sid="location">1.37854e-6 6.352744 -2.60836</translate>
               <rotate sid="rotationZ">0 0 1 -1.62844e-12</rotate>
               <rotate sid="rotationY">0 1 0 -7.88778e-13</rotate>
-              <rotate sid="rotationX">1 0 0 -7.15204e-13</rotate>
+              <rotate sid="rotationX">1 0 0 -7.46829e-13</rotate>
               <scale sid="scale">1 1 1</scale>
               <instance_geometry url="#Cylinder_012-mesh" name="RailBottom">
                 <bind_material>
@@ -5795,10 +5795,10 @@
             </bind_material>
           </instance_geometry>
           <node id="CoverL2" name="CoverL2" type="NODE">
-            <translate sid="location">-0.02624512 0 15.6942</translate>
-            <rotate sid="rotationZ">0 0 1 1.10049e-5</rotate>
-            <rotate sid="rotationY">0 1 0 3.55941e-7</rotate>
-            <rotate sid="rotationX">1 0 0 -1.67781e-14</rotate>
+            <translate sid="location">-0.02624512 1.90735e-6 15.6942</translate>
+            <rotate sid="rotationZ">0 0 1 1.24744e-5</rotate>
+            <rotate sid="rotationY">0 1 0 4.44875e-7</rotate>
+            <rotate sid="rotationX">1 0 0 -1.51397e-14</rotate>
             <scale sid="scale">1 1 1</scale>
             <instance_geometry url="#Cylinder_005-mesh" name="CoverL2">
               <bind_material>
@@ -5809,9 +5809,9 @@
             </instance_geometry>
             <node id="CoverL3" name="CoverL3" type="NODE">
               <translate sid="location">-2.99187 1.90735e-6 2.965618</translate>
-              <rotate sid="rotationZ">0 0 1 -8.04538e-6</rotate>
-              <rotate sid="rotationY">0 1 0 9.07013e-7</rotate>
-              <rotate sid="rotationX">1 0 0 -4.13667e-6</rotate>
+              <rotate sid="rotationZ">0 0 1 -6.02526e-6</rotate>
+              <rotate sid="rotationY">0 1 0 1.28301e-6</rotate>
+              <rotate sid="rotationX">1 0 0 -7.2158e-7</rotate>
               <scale sid="scale">1 1 1</scale>
               <instance_geometry url="#Cylinder_008-mesh" name="CoverL3">
                 <bind_material>
@@ -5838,9 +5838,9 @@
           </instance_geometry>
           <node id="CoverR2" name="CoverR2" type="NODE">
             <translate sid="location">0.01368618 3.8147e-6 15.72996</translate>
-            <rotate sid="rotationZ">0 0 1 8.40874e-6</rotate>
-            <rotate sid="rotationY">0 1 0 8.49644e-8</rotate>
-            <rotate sid="rotationX">1 0 0 -2.55116e-13</rotate>
+            <rotate sid="rotationZ">0 0 1 -5.76036e-7</rotate>
+            <rotate sid="rotationY">0 1 0 -1.58281e-7</rotate>
+            <rotate sid="rotationX">1 0 0 -4.11084e-13</rotate>
             <scale sid="scale">1 1 1</scale>
             <instance_geometry url="#Cylinder_009-mesh" name="CoverR2">
               <bind_material>
@@ -5851,9 +5851,9 @@
             </instance_geometry>
             <node id="CoverR3" name="CoverR3" type="NODE">
               <translate sid="location">2.978377 -1.14441e-5 2.968784</translate>
-              <rotate sid="rotationZ">0 0 1 -6.99814e-6</rotate>
-              <rotate sid="rotationY">0 1 0 1.49412e-5</rotate>
-              <rotate sid="rotationX">1 0 0 -5.12264e-6</rotate>
+              <rotate sid="rotationZ">0 0 1 2.88016e-6</rotate>
+              <rotate sid="rotationY">0 1 0 2.20595e-5</rotate>
+              <rotate sid="rotationX">1 0 0 -8.53773e-6</rotate>
               <scale sid="scale">0.9999999 1 1</scale>
               <instance_geometry url="#Cylinder_006-mesh" name="CoverR3">
                 <bind_material>
@@ -5881,7 +5881,7 @@
         </node>
         <node id="Nanoframe" name="Nanoframe" type="NODE">
           <translate sid="location">0.02964113 -23.49234 0.7451025</translate>
-          <rotate sid="rotationZ">0 0 1 -90</rotate>
+          <rotate sid="rotationZ">0 0 1 6.83019e-6</rotate>
           <rotate sid="rotationY">0 1 0 0</rotate>
           <rotate sid="rotationX">1 0 0 0</rotate>
           <scale sid="scale">1 1 1</scale>
