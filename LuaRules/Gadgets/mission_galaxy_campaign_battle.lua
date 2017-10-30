@@ -67,6 +67,8 @@ local defeatConditionConfig
 local victoryAtLocation = {}
 local typeVictoryLocations = {}
 
+local midgamePlacement = {}
+
 local unlockedUnitsByTeam = {}
 local teamCommParameters = {}
 
@@ -581,7 +583,33 @@ local function SetupInitialUnitParameters(unitID, unitData)
 	end
 end
 
-local function PlaceUnit(unitData, teamID, alliedToPlayer)
+local function GetClearPlacement(unitDefID, centerX, centerZ, spawnRadius, depth)
+	local x, z = centerX, centerZ
+	if spawnRadius then
+		x = centerX + 2*math.random()*spawnRadius - spawnRadius
+		z = centerZ + 2*math.random()*spawnRadius - spawnRadius
+	end
+	local y = Spring.GetGroundHeight(x,z)
+	
+	spawnRadius = spawnRadius or 100
+	local tries = 1
+	while not (y > depth and Spring.TestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, false)) do
+		if tries > 30 then
+			spawnRadius = spawnRadius + 15
+		end
+		if tries > 50 then
+			break
+		end
+		x = centerX + 2*math.random()*spawnRadius - spawnRadius
+		z = centerZ + 2*math.random()*spawnRadius - spawnRadius
+		y = Spring.GetGroundHeight(x,z)
+		tries = tries + 1
+	end
+	
+	return x, z
+end
+
+local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 	if unitData.difficultyAtLeast and (unitData.difficultyAtLeast > missionDifficulty) then
 		return
 	end
@@ -598,14 +626,24 @@ local function PlaceUnit(unitData, teamID, alliedToPlayer)
 	
 	local x, z, facing, xSize, zSize = unitData.x, unitData.z, unitData.facing
 	
+	if findClearPlacement then
+		x, z = GetClearPlacement(ud.id, x, z, unitData.spawnRadius, -ud.maxWaterDepth)
+	end
+	
 	if ud.isBuilding or ud.speed == 0 then
 		x, z, xSize, zSize = SanitizeBuildPositon(x, z, ud, facing)
 	end
 	
 	local build = (unitData.buildProgress and unitData.buildProgress < 1) or false
 	local wantLevel = (ud.isBuilding or ud.speed == 0) and ud.levelGround
-	local unitID = Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID, build, alliedToPlayer and wantLevel)
-	if (not alliedToPlayer) and wantLevel then
+	local unitID
+	if unitData.orbitalDrop then
+		unitID = GG.DropUnit(ud.name, x, Spring.GetGroundHeight(x,z), z, facing, teamID, true)
+	else
+		unitID = Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID, build, doLevelGround and wantLevel)
+	end
+	
+	if (not doLevelGround) and wantLevel then
 		wantLevelGround = wantLevelGround or {}
 		wantLevelGround[#wantLevelGround + 1] = {
 			pos = {x, Spring.GetGroundHeight(x,z), z},
@@ -674,6 +712,26 @@ local function PlaceUnit(unitData, teamID, alliedToPlayer)
 		local _, maxHealth = Spring.GetUnitHealth(unitID)
 		Spring.SetUnitHealth(unitID, {build = unitData.buildProgress, health = maxHealth*unitData.buildProgress})
 	end
+end
+
+local function AddMidgameUnit(unitData, teamID, gameFrame)
+	local n = unitData.delay
+	if gameFrame > n then
+		return -- Loaded game.
+	end
+	if unitData.difficultyAtLeast and (unitData.difficultyAtLeast > missionDifficulty) then
+		return
+	end
+	if unitData.difficultyAtMost and (unitData.difficultyAtMost < missionDifficulty) then
+		return
+	end
+	
+	local unitList = midgamePlacement[n] or {}
+	unitList[#unitList + 1] = {
+		unitData = unitData,
+		teamID = teamID,
+	}
+	midgamePlacement[n] = unitList
 end
 
 local function DoStructureLevelGround()
@@ -1033,6 +1091,35 @@ local function InitializeMapMarkers()
 	end
 end
 
+local function PlaceMidgameUnits(unitList)
+	for i = 1, #unitList do
+		local data = unitList[i]
+		PlaceUnit(data.unitData, data.teamID, true, true)
+	end
+	
+	if commandsToGive then
+		for i = 1, #commandsToGive do
+			GiveCommandsToUnit(commandsToGive[i].unitID, commandsToGive[i].commands)
+		end
+		commandsToGive = nil
+	end
+end
+
+local function InitializeMidgameUnits(gameFrame)
+	local teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		local _,_,_,_,_,allyTeamID, customKeys = Spring.GetTeamInfo(teamID)
+		
+		local midgameUnits = CustomKeyToUsefulTable(customKeys and customKeys.midgameunits)
+		if midgameUnits then
+			for i = 1, #midgameUnits do
+				AddMidgameUnit(midgameUnits[i], teamID, gameFrame)
+			end
+		end
+	end
+end
+
 local function DoInitialUnitPlacement()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
@@ -1258,8 +1345,10 @@ function gadget:GamePreload()
 end
 
 function gadget:GameFrame(n)
+	n = n + loadGameFrame
 	if firstGameFrame then
 		InitializeMapMarkers()
+		InitializeMidgameUnits(n)
 		firstGameFrame = false
 		if not SPAWN_GAME_PRELOAD then
 			if not Spring.GetGameRulesParam("loadedGame") then
@@ -1269,8 +1358,12 @@ function gadget:GameFrame(n)
 		DoStructureLevelGround()
 	end
 	
+	if midgamePlacement[n] then
+		PlaceMidgameUnits(midgamePlacement[n])
+		midgamePlacement[n] = nil
+	end
+	
 	-- Check objectives
-	n = n + loadGameFrame
 	if n%30 == 0 and not gameIsOver then
 		VictoryAtLocationUpdate()
 		local gameSeconds = n/30
