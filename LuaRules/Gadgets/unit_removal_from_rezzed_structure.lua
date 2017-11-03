@@ -30,6 +30,7 @@ local spGetGroundNormal = Spring.GetGroundNormal
 local spSetUnitPosition = Spring.SetUnitPosition
 local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
 local spGetUnitCommands = Spring.GetUnitCommands
+local spGetUnitHeight = Spring.GetUnitHeight
 local gameSquareSize = Game.squareSize
 
 local CMD_RESURRECT = CMD.RESURRECT
@@ -37,14 +38,13 @@ local CMD_RESURRECT = CMD.RESURRECT
 local Abs = math.abs
 local Min = math.min
 local Max = math.max
+local SortTable = table.sort
 
 local gapMin = 20
 
 local maxUnitHeightAboveGround = 1
 local maxUnitHeightAboveSea = 5
 local extraMaxWaterDepth = 5
-
-local elmosPerSizeSide = 8
 
 local extraGatherDistance = 125
 
@@ -90,7 +90,7 @@ local function IsPathTraversable(unitDef, startX, startZ, goalX, goalZ)
     if (goalZ - startZ) < 0 then
         stepZ = -stepZ
     end
-    
+
     -- Spring.MarkerAddPoint(goalX, 0, goalZ, "Possible goal")
 
     for x = startX, goalX, stepX do
@@ -104,10 +104,10 @@ local function IsPathTraversable(unitDef, startX, startZ, goalX, goalZ)
             else
                 --Spring.MarkerAddPoint(x, 0, z, "Slope traversable")
                 --if x >= goalX and z >= goalZ then
-                    --Debug("Slope " .. x .. ", " .. z .. " is traversable")
-                    --Debug("submerged = " .. tostring(submerged))
-                    --Debug("depth = " .. tostring(depth))
-                    --Debug("canMoveInWater = " .. tostring(canMoveInWater))
+                --Debug("Slope " .. x .. ", " .. z .. " is traversable")
+                --Debug("submerged = " .. tostring(submerged))
+                --Debug("depth = " .. tostring(depth))
+                --Debug("canMoveInWater = " .. tostring(canMoveInWater))
                 --end
             end
         end
@@ -115,20 +115,14 @@ local function IsPathTraversable(unitDef, startX, startZ, goalX, goalZ)
     return true
 end
 
-local function FindAccessibleSpot(diffs, unitDef, startX, startZ, requiredGap)
+local function FindAccessibleSpot(diffs, unitDef, startX, startZ)
 
     --Debug("StartX = " .. startX)
     --Debug("StartZ = " .. startZ)
+    --Spring.MarkerAddPoint(startX, 0, startZ, "startX = " .. startX .. ", startZ = " .. startZ)
     local failure = false
-    --Debug("requiredGap is " .. requiredGap)
     for i = 1, #diffs do
-        local offset
-
-        if diffs[i].value >= 0 then
-            offset = diffs[i].value + requiredGap
-        else
-            offset = diffs[i].value - requiredGap
-        end
+        local offset = diffs[i].value
 
         local goalX = startX
         local goalZ = startZ
@@ -153,11 +147,11 @@ end
 
 local function GeomMean(values)
     local product = values[1]
-   
+
     for i = 2, #values do
-       product = product * values[i]
+        product = product * values[i]
     end
-    
+
     return product ^ (1 / #values)
 end
 
@@ -181,17 +175,47 @@ local function EstimateRequiredStructureGap(unitID)
         ", volumeType = " .. volumeTypeInDef .. ", testType = " .. testType .. ", primaryAxis = " .. primaryAxis ..
         ", radius = " .. radius)
     --]]
-    
-    local gMeanScaleRadius = GeomMean{scaleX / 2, scaleY / 2, scaleZ / 2}
-    local gMeanHalfFootprint = GeomMean{def.xsize * elmosPerSizeSide / 2, def.zsize * elmosPerSizeSide / 2}
-    
+
+    --local gMeanScaleRadius = GeomMean{scaleX / 2, scaleY / 2, scaleZ / 2}
+    --local gMeanHalfFootprint = GeomMean{def.xsize * gameSquareSize / 2, def.zsize * gameSquareSize / 2}
+
     --Debug("Unit size info: gMeanScaleRadius = " .. gMeanScaleRadius .. ", gMeanHalfFootprint = " .. gMeanHalfFootprint)
 
-    local estimatedGap = Max(Max(GeomMean({scaleX / 2, scaleY / 2, scaleZ / 2}), radius, GeomMean({def.xsize * elmosPerSizeSide / 2, 
-                    def.zsize * elmosPerSizeSide / 2})), gapMin)
+    local estimatedGap = Max(Max(GeomMean({scaleX / 2, scaleY / 2, scaleZ / 2}), radius, GeomMean({def.xsize * gameSquareSize / 2, 
+                    def.zsize * gameSquareSize / 2})), gapMin)
 
     return estimatedGap
 
+end
+
+local function ShouldUnitBeMoved(targetUnitID, resUnitMinX, resUnitMinZ, resUnitMaxX, resUnitMaxZ)
+    local unitDef = UnitDefs[spGetUnitDefID(targetUnitID)]
+    local humanName = unitDef.humanName
+    local unitX, unitY, unitZ = spGetUnitPosition(targetUnitID)
+    local uHeight = spGetUnitHeight(targetUnitID)
+    local unitGroundY = spGetGroundHeight(unitX, unitZ)
+
+    --Debug("Rectangle unit height is " .. tostring(uHeight))
+    --Debug(humanName .. " is inside the rectangle. Y = " .. unitY .. ", ground Y = " .. unitGroundY)
+    --Debug("floatOnWater = " .. tostring(unitDef.floatOnWater))
+    --Debug("floater = " .. tostring(unitDef.floater))
+    --Debug("Rectangle unit maxSlope is " .. tostring(unitDef.moveDef.maxSlope))
+
+    if not unitDef.isBuilding and unitDef.name ~= "terraunit" and not unitDef.isAirUnit and 
+    ((unitY - unitGroundY <= maxUnitHeightAboveGround) or (CanUnitSwim(unitDef) and 
+            WithinBounds(unitY, -unitDef.waterline - uHeight / 2 - extraMaxWaterDepth, maxUnitHeightAboveSea, true))) then
+        -- per the Spring wiki unit height determines if a ship can go over something that is underwater
+
+        local requiredGap = EstimateRequiredStructureGap(targetUnitID)
+        --Debug("requiredGap is " .. requiredGap)
+
+        if unitX < (resUnitMinX - requiredGap) or unitX > (resUnitMaxX + requiredGap) or
+        unitZ < (resUnitMinZ - requiredGap) or unitZ > (resUnitMaxZ + requiredGap) then
+            return false
+        else
+            return true, requiredGap
+        end
+    end
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
@@ -207,8 +231,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
             --Debug("Created unit radius = " .. dimensions.radius)
             --Debug("Created unit xsize = " .. uDef.xsize)
             --Debug("Created unit zsize = " .. uDef.zsize)
-            local footprintXElmos = uDef.xsize * elmosPerSizeSide
-            local footprintZElmos = uDef.zsize * elmosPerSizeSide
+            local footprintXElmos = uDef.xsize * gameSquareSize
+            local footprintZElmos = uDef.zsize * gameSquareSize
             --local createdUnitGroundY = spGetGroundHeight(ux1, uz1)
 
 
@@ -228,65 +252,42 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
             --Debug("Y of the created unit: " .. uy1)
             --Debug("Ground Y of the created unit: " .. createdUnitGroundY)
             for i = 1, #units do
-                if units[i] ~= unitID then
-                    local rectUDef = UnitDefs[spGetUnitDefID(units[i])]
-                    local humanName = rectUDef.humanName
+                local shouldUnitBeMoved, requiredGap = ShouldUnitBeMoved(units[i], createdUnitMinX, 
+                    createdUnitMinZ, createdUnitMaxX, createdUnitMaxZ)
+                if units[i] ~= unitID and shouldUnitBeMoved then
+
                     local rectUX, rectUY, rectUZ = spGetUnitPosition(units[i])
-                    local rectUnitGroundY = spGetGroundHeight(rectUX, rectUZ)
 
-                    --Debug(humanName .. " is inside the rectangle. Y = " .. rectUY .. ", ground Y = " .. rectUnitGroundY)
-                    --Debug("floatOnWater = " .. tostring(rectUDef.floatOnWater))
-                    --Debug("floater = " .. tostring(rectUDef.floater))
-                    local uHeight = Spring.GetUnitHeight(units[i])
+                    local xDiff1 = rectUX - (createdUnitMinX - requiredGap)
+                    local xDiff2 = rectUX - (createdUnitMaxX + requiredGap)
+                    local zDiff1 = rectUZ - (createdUnitMinZ - requiredGap)
+                    local zDiff2 = rectUZ - (createdUnitMaxZ + requiredGap)
+                    
+                    
 
-                    --Debug("Rectangle unit height is " .. tostring(uHeight)) 
+                    local diffs = {{isX = true, value = xDiff1}, {isX = true, value = xDiff2},
+                        {isX = false, value = zDiff1}, {isX = false, value = zDiff2}}
 
+                    local comp = function(elem1, elem2)
+                        return Abs(elem1.value) < Abs(elem2.value)
+                    end
 
-                    --Debug("Rectangle unit maxSlope is " .. tostring(rectUDef.moveDef.maxSlope))
+                    SortTable(diffs, comp)
 
-                    if not rectUDef.isBuilding and rectUDef.name ~= "terraunit" and not rectUDef.isAirUnit and 
-                    ((rectUY - rectUnitGroundY <= maxUnitHeightAboveGround) or (CanUnitSwim(rectUDef) and 
-                            WithinBounds(rectUY, -rectUDef.waterline - uHeight / 2 - extraMaxWaterDepth, 
-                                maxUnitHeightAboveSea, true))) then
-                        -- per the Spring wiki unit height determines if a ship can go over something that is underwater
+                    local diffsCopy = {}
+                    for j = 1, #diffs do
+                        diffsCopy[j] = {}
+                        diffsCopy[j].isX = diffs[j].isX
+                        diffsCopy[j].value = diffs[j].value
+                    end
 
-                        local requiredGap = EstimateRequiredStructureGap(units[i])
-                        --Debug("requiredGap is " .. requiredGap)
-
-                        if rectUX < (createdUnitMinX - requiredGap) or rectUX > (createdUnitMaxX + requiredGap) or
-                        rectUZ < (createdUnitMinZ - requiredGap) or rectUZ > (createdUnitMaxZ + requiredGap) then
-                            return
-                        end
-
-
-                        local xDiff1 = rectUX - createdUnitMinX
-                        local xDiff2 = rectUX - createdUnitMaxX
-                        local zDiff1 = rectUZ - createdUnitMinZ
-                        local zDiff2 = rectUZ - createdUnitMaxZ
-
-                        local diffs = {{isX = true, value = xDiff1}, {isX = true, value = xDiff2},
-                            {isX = false, value = zDiff1}, {isX = false, value = zDiff2}}
-
-                        local comp = function(elem1, elem2)
-                            return Abs(elem1.value) < Abs(elem2.value)
-                        end
-
-                        table.sort(diffs, comp)
-
-                        local diffsCopy = {}
-                        for j = 1, #diffs do
-                            diffsCopy[j] = {}
-                            diffsCopy[j].isX = diffs[j].isX
-                            diffsCopy[j].value = diffs[j].value
-                        end
-
-                        local targetX, targetZ = FindAccessibleSpot(diffsCopy, rectUDef, rectUX, rectUZ, requiredGap)
-                        if targetX then
-                            spSetUnitPosition(units[i], targetX, targetZ)
-                            -- Spring.MarkerAddPoint(targetX, 0, targetZ, "target")
-                        else
-                            --Debug("Failed to find an accessible spot")
-                        end
+                    local rectUDef = UnitDefs[spGetUnitDefID(units[i])]
+                    local targetX, targetZ = FindAccessibleSpot(diffsCopy, rectUDef, rectUX, rectUZ)
+                    if targetX then
+                        spSetUnitPosition(units[i], targetX, targetZ)
+                        -- Spring.MarkerAddPoint(targetX, 0, targetZ, "target")
+                    else
+                        --Debug("Failed to find an accessible spot")
                     end
                 end
             end
