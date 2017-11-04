@@ -7,8 +7,8 @@ unitDef = {
   buildCostMetal   = 600,
   builder          = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 11,
-  buildingGroundDecalSizeY      = 11,
+  buildingGroundDecalSizeX      = 15,
+  buildingGroundDecalSizeY      = 15,
   buildingGroundDecalType       = [[factoryhover_aoplane.dds]],
 
   buildoptions     = {
@@ -30,16 +30,17 @@ unitDef = {
 
   customParams     = {
     sortName = [[8]],
-	aimposoffset   = [[0 0 0]],
-	midposoffset   = [[0 -25 0]],
 	modelradius    = [[60]],
 	default_spacing = 8,
+	aimposoffset   = [[0 0 -32]],
+    midposoffset    = [[0 -25 -32]],
+    solid_factory   = [[8]],
   },
 
   energyUse        = 0,
   explodeAs        = [[LARGE_BUILDINGEX]],
   footprintX       = 8,
-  footprintZ       = 8,
+  footprintZ       = 12,
   iconType         = [[fachover]],
   idleAutoHeal     = 5,
   idleTime         = 1800,
@@ -58,7 +59,7 @@ unitDef = {
   useBuildingGroundDecal = true,
   waterline        = 1,
   workerTime       = 10,
-  yardMap          = [[xoooooox ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo xoccccox]],
+  yardMap          = [[xoooooox ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo xoccccox yyyyyyyy yyyyyyyy yyyyyyyy yyyyyyyy]],
 
   featureDefs      = {
 
