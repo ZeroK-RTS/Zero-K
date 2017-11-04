@@ -166,6 +166,14 @@ local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
 	
 	local offset = 0
 	
+	local holder = Chili.Control:New{
+		x = 0,
+		y = 0,
+		right = 0,
+		padding = {0,0,0,0},
+		parent = parentControl,
+	}
+	
 	local externalFunctions = {}
 	
 	function externalFunctions.AddEntry(textBody, imageFile)
@@ -181,7 +189,7 @@ local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
 				height = imageSize,
 				keepAspect = true,
 				file = imageFile,
-				parent = parentControl
+				parent = holder
 			}
 		end
 		
@@ -194,7 +202,7 @@ local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
 			valign = "top",
 			text = textBody,
 			fontsize = 14,
-			parent = parentControl,
+			parent = holder,
 		}
 		
 		local offsetSize = (#label.physicalLines)*14 + 2
@@ -203,6 +211,7 @@ local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
 		end
 		
 		offset = offset + offsetSize + paragraphSpacing
+		holder:SetPos(nil, nil, nil, offset - paragraphSpacing/2)
 	end
 	
 	return externalFunctions
