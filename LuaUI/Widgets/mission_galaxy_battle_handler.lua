@@ -23,6 +23,8 @@ if not campaignBattleID then
 	return
 end
 
+--local tipsOverride, textOverride = VFS.Include("LuaUI/Configs/missionTipOverride.lua")
+
 local BUTTON_SIZE = 25
 local BONUS_TOGGLE_IMAGE = 'LuaUI/images/plus_green.png'
 local BRIEFING_IMAGE = LUAUI_DIRNAME .. "images/advplayerslist/random.png"
@@ -289,10 +291,10 @@ local function InitializeBriefingWindow()
 		parent = briefingWindow,
 	}
 	local planetTextHandler = GetNewTextHandler(textScroll, 22, 64)
-	planetTextHandler.AddEntry(planetInformation.description)
+	planetTextHandler.AddEntry(textOverride or planetInformation.description)
 	
 	if planetInformation.tips then
-		local tips = planetInformation.tips
+		local tips = tipsOverride or planetInformation.tips
 		for i = 1, #tips do
 			planetTextHandler.AddEntry(tips[i].text, tips[i].image)
 		end
