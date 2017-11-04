@@ -161,6 +161,14 @@ local moveDefs = {
 		depthmodparams = common_depthmodparams,
 	},
 	
+	HOVER2 = {
+		footprintx = 2,
+		footprintz = 2,
+		maxslope = 18,
+		maxwaterdepth = 5000,
+		slopemod = 40,
+		crushstrength = 50,
+	},
 	HOVER3 = {
 		footprintx = 3,
 		footprintz = 3,
