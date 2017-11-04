@@ -1,3 +1,5 @@
+-- mission editor compatibility
+Spring.GetModOptions = Spring.GetModOptions or function() return {} end
 
 local skinDefs
 local SKIN_FILE = "LuaRules/Configs/dynamic_comm_skins.lua"
