@@ -594,12 +594,11 @@ local function UpdateMorph(unitID, morphData)
 			GG.StartMiscPriorityResourcing(unitID, (newMorphRate*morphData.def.metal/morphData.def.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Modifies resource drain if slowness has changed.
 			morphData.morphRate = newMorphRate
 		end
-		local allow = GG.AllowMiscPriorityBuildStep(unitID, morphData.teamID) --use unit_priority.lua gadget to handle morph priority.
-		
 		local resourceUse = {
 			m = (morphData.def.resTable.m * morphData.morphRate),
 			e = (morphData.def.resTable.e * morphData.morphRate),
 		}
+		local allow = GG.AllowMiscPriorityBuildStep(unitID, morphData.teamID, false, resourceUse) --use unit_priority.lua gadget to handle morph priority.
 		
 		if freeMorph then
 			morphData.progress = 1

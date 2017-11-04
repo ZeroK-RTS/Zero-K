@@ -47,7 +47,7 @@ local emptyTable = {}
 local INLOS_ACCESS = {inlos = true}
 
 -- thingsWhichAreDrones is an optimisation for AllowCommand, no longer used but it'll stay here for now
-local carrierDefs, thingsWhichAreDrones, unitRulesCarrierDefs, BUILD_UPDATE_INTERVAL = include "LuaRules/Configs/drone_defs.lua"
+local carrierDefs, thingsWhichAreDrones, unitRulesCarrierDefs = include "LuaRules/Configs/drone_defs.lua"
 
 local DEFAULT_UPDATE_ORDER_FREQUENCY = 40 -- gameframes
 local IDLE_DISTANCE = 120
@@ -184,7 +184,6 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		Spring.MoveCtrl.Disable(droneID)
 		Spring.SetUnitCOBValue(droneID, 82, (rot - math.pi)*65536/2/math.pi)
 		
-		
 		local states = Spring.GetUnitStates(unitID) or emptyTable
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
 		GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.movestate }, 0)
@@ -196,7 +195,7 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 
 		SetUnitNoSelect(droneID, true)
 
-		droneList[droneID] = {carrier = unitID, set = setNum}		
+		droneList[droneID] = {carrier = unitID, set = setNum}
 	end
 	return droneID, rot
 end
@@ -318,6 +317,15 @@ local mcSetPosition			= Spring.MoveCtrl.SetPosition
 local mcSetRotation			= Spring.MoveCtrl.SetRotation
 local mcDisable				= Spring.MoveCtrl.Disable
 local mcEnable				= Spring.MoveCtrl.Enable
+
+local function GetBuildRate(unitID)
+	local stunned_or_inbuild = GetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
+	if stunned_or_inbuild then
+		return 0
+	end
+	return spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
+end
+
 function SitOnPad(unitID, carrierID, padPieceID, offsets)
 	-- From unit_refuel_pad_handler.lua (author: GoogleFrog)
 	-- South is 0 radians and increases counter-clockwise
@@ -356,24 +364,40 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 		local pitch, yaw, roll, pitch, yaw, roll
 		local px, py, pz, dx, dy, dz, vx, vy, vz, offx, offy, offz
 		-- local magnitude, newPadHeading
-		local landDuration = 0
+		
+		local miscPriorityKey = "drone_" .. unitID
+		local oldBuildRate = false
 		local buildProgress, health
 		local droneType = droneList[unitID].set
 		local droneInfo = carrierList[carrierID].droneSets[droneType] --may persist even after "carrierList[carrierID]" is emptied
 		local build_step = droneInfo.config.buildStep
 		local build_step_health = droneInfo.config.buildStepHealth
+		
+		local buildStepCost = droneInfo.config.buildStepCost
+		local perSecondCost = droneInfo.config.perSecondCost
+		
+		local resTable
+		if buildStepCost then
+			resTable = {
+				m = buildStepCost,
+				e = buildStepCost,
+			}
+		end
+		
 		while true do
 			if (not droneList[unitID]) then --droneList[unitID] became NIL when drone or carrier is destroyed (in UnitDestroyed()). Is NIL at beginning of frame and this piece of code run at end of frame
 				if carrierList[carrierID] then
 					droneInfo.buildCount = droneInfo.buildCount - 1
 					carrierList[carrierID].occupiedPieces[padPieceID] = false
 					AddNextDroneFromQueue(carrierID) --add next drone in this vacant position
+					GG.StopMiscPriorityResourcing(carrierID, miscPriorityKey)
 				end
 				return --nothing else to do
 			elseif (not carrierList[carrierID]) then --carrierList[carrierID] is NIL because it was MORPHED.
 				carrierID = droneList[unitID].carrier
 				padPieceID = (carrierList[carrierID].spawnPieces and carrierList[carrierID].spawnPieces[1]) or 0
 				carrierList[carrierID].occupiedPieces[padPieceID] = true --block pad
+				oldBuildRate = false -- Update MiscPriority for morphed unit.
 			end
 			
 			vx, vy, vz = Spring.GetUnitVelocity(carrierID)
@@ -389,13 +413,19 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 			mcSetPosition(unitID, px + vx + offx, py + vy + offy, pz + vz + offz)
 			mcSetRotation(unitID, -pitch, yaw, -roll) --Spring conveniently rotate Y-axis first, X-axis 2nd, and Z-axis 3rd which allow Yaw, Pitch & Roll control.
 			
-			landDuration = landDuration + 1
-			local stunned_or_inbuild = GetUnitIsStunned(carrierID) or (spGetUnitRulesParam(carrierID, "disarmed") == 1)
-			if (landDuration % BUILD_UPDATE_INTERVAL == 0) and (not stunned_or_inbuild) then
-				local slowMult = spGetUnitRulesParam(carrierID, "totalReloadSpeedChange") or 1
+			local buildRate = GetBuildRate(carrierID) 
+			if perSecondCost and oldBuildRate ~= buildRate then
+				oldBuildRate = buildRate
+				GG.StartMiscPriorityResourcing(carrierID, perSecondCost*buildRate, false, miscPriorityKey)
+				resTable.m = buildStepCost*buildRate
+				resTable.e = buildStepCost*buildRate
+			end
+			
+			-- Check if the change can be carried out
+			if (buildRate > 0) and ((not perSecondCost) or (GG.AllowMiscPriorityBuildStep(carrierID, Spring.GetUnitTeam(carrierID), false, resTable) and Spring.UseUnitResource(carrierID, resTable))) then
 				health, _, _, _, buildProgress = Spring.GetUnitHealth(unitID)
-				buildProgress = buildProgress+(build_step*slowMult) --progress
-				Spring.SetUnitHealth(unitID, {health=health+(build_step_health*slowMult), build = buildProgress }) 
+				buildProgress = buildProgress + (build_step*buildRate) --progress
+				Spring.SetUnitHealth(unitID, {health = health + (build_step_health*buildRate), build = buildProgress}) 
 				if buildProgress >= 1 then 
 					callScript(carrierID, "Carrier_droneCompleted", padPieceID)
 					break
@@ -404,6 +434,9 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 			
 			Sleep()
 		end
+		
+		GG.StopMiscPriorityResourcing(carrierID, miscPriorityKey)
+		
 		droneInfo.buildCount = droneInfo.buildCount - 1
 		carrierList[carrierID].occupiedPieces[padPieceID] = false
 		Spring.SetUnitLeaveTracks(unitID, true)
@@ -726,10 +759,7 @@ function gadget:GameFrame(n)
 							if (set.droneCount >= set.maxDrones) then
 								break
 							end
-							-- Method1: Spawn instantly,
-							-- NewDrone(carrierID, carrier.unitDefID, set.config.drone, i )
 							
-							-- Method2: Build nanoframe,
 							carrierList[carrierID].droneInQueue[ #carrierList[carrierID].droneInQueue+ 1 ] = i
 							if AddUnitToEmptyPad(carrierID, i ) then
 								set.buildCount = set.buildCount + 1;

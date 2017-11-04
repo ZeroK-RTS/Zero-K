@@ -5,7 +5,7 @@ unitDef = {
   acceleration        = 0.3,
   airHoverFactor      = 4,
   brakeRate           = 0.24,
-  buildCostMetal      = 50,
+  buildCostMetal      = 20,
   builder             = false,
   buildPic            = [[dronelight.png]],
   canBeAssisted       = false,
@@ -75,7 +75,7 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
   
-      customParams			= {
+      customParams            = {
 		light_camera_height = 1800,
 		light_color = [[0.25 1 0.25]],
 		light_radius = 130,

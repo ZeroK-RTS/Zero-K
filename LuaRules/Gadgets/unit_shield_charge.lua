@@ -103,7 +103,7 @@ function gadget:GameFrame(n)
 			end
 			
 			-- Deal with overflow
-			local chargeAdd = newChargeRate*def.chargePerUpdate			
+			local chargeAdd = newChargeRate*def.chargePerUpdate
 			if charge + chargeAdd > def.maxCharge then
 				local overProportion = 1 - (charge + chargeAdd - def.maxCharge)/chargeAdd
 				data.resTable.e = data.resTable.e*overProportion
@@ -111,14 +111,14 @@ function gadget:GameFrame(n)
 			end
 
 			-- Check if the change can be carried out
-			if (GG.AllowMiscPriorityBuildStep(unitID, data.teamID, true) and spUseUnitResource(unitID, data.resTable)) then
+			if (GG.AllowMiscPriorityBuildStep(unitID, data.teamID, true, data.resTable) and spUseUnitResource(unitID, data.resTable)) then
 				spSetUnitShieldState(unitID, data.shieldNum, charge + chargeAdd)
 			end
 		else
 			if data.oldChargeRate ~= 0 then
 				GG.StopMiscPriorityResourcing(unitID)
 				data.oldChargeRate = 0
-			end		
+			end
 		end
 		
 		-- Drain shields on paralysis etc..
