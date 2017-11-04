@@ -1306,8 +1306,8 @@ local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 					lockPoint = {}
 					_, x, y, z = VirtTraceRay(cx, cy, cs)
 					cs = ZoomTiltCorrection(cstemp, cs.py > cstemp.py, cx, cy, ls_x, ls_y, ls_z, true, true) 
+					lockPoint.worldEnd = {x = ls_x, y = ls_y, z = ls_z}
 					lockPoint.worldBegin = {x = x, y = y, z = z}
-					lockPoint.worldEnd = {x = lockPoint.worldBegin.x, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z} -- FIXME: this code looks like it was supposed to change previous begin into new end
 				else
 					cs.rx = GetZoomTiltAngle(ls_x, ls_z, cstemp)
 				end
