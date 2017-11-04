@@ -354,7 +354,7 @@ local overrides = {
 	[CMD.RECLAIM] = {texture = imageDir .. 'Bold/reclaim.png'},
 	[CMD.RESURRECT] = {texture = imageDir .. 'Bold/resurrect.png'},
 	[CMD_BUILD] = {texture = imageDir .. 'Bold/build.png'},
-	[CMD.MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png'},
+	[CMD.MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png', tooltip = "Fire Special Weapon: Fire the units special weapon."},
 
 	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png'},
 	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png'},
