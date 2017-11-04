@@ -1,6 +1,6 @@
 -- reloadTime is in seconds
 -- offsets = {x,y,z} , where x is left(-)/right(+), y is up(+)/down(-), z is forward(+)/backward(-)
-local DRONES_COST_RESOURCES = true
+local DRONES_COST_RESOURCES = false
 
 local carrierDefs = {}
 
