@@ -102,6 +102,7 @@ local custom_cmd_actions = {
 	airstrafe = {cmdType = 2, name = "Gunship Strafe", states = {'Off', 'On'}},
 	divestate = {cmdType = 2, name = "Raven Dive", states = {'Never', 'Under Shields', 'For Mobiles', 'Always Low'}},
 	globalbuild = {cmdType = 2, name = "Constructor Global AI", states = {'Off', 'On'}},
+	toggledrones = {cmdType = 2, name = "Drone Construction.", states = {'Off', 'On'}},
 }
 
 -- These actions are created from echoing all actions that appear when all units are selected.
@@ -152,6 +153,7 @@ local usedActions = {
 	--["rearm"] = true, -- Not useful to send directly so unbindable to prevent confusion. Right click on pad is better.
 	["find_pad"] = true,
 	["recalldrones"] = true,
+	["toggledrones"] = true,
 	["divestate"] = true,
 	["wantcloak"] = true,
 	["oneclickwep"] = true,

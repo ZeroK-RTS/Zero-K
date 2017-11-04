@@ -55,6 +55,7 @@ local ACTIVE_DISTANCE = 180
 local DRONE_HEIGHT = 120
 local RECALL_TIMEOUT = 300
 
+local generateDrones = {}
 local carrierList = {}
 local droneList = {}
 local drones_to_move = {}
@@ -70,6 +71,17 @@ local recallDronesCmdDesc = {
 	action  = 'recalldrones',
 	tooltip = 'Recall any owned drones to the mothership.',
 }
+
+local toggleDronesCmdDesc = {
+	id      = CMD_TOGGLE_DRONES,
+	type    = CMDTYPE.ICON_MODE,
+	name    = 'Drone Generation',
+	cursor  = 'Load units',
+	action  = 'toggledrones',
+	tooltip = 'Toggle drone creation.',
+	params  = {1, 'Disabled','Enabled'}
+}
+local toggleParams = {params = {1, 'Disabled','Enabled'}}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -116,6 +128,12 @@ local function InitCarrier(unitID, carrierData, teamID, maxDronesOverride)
 	return toReturn
 end
 
+local function CreateCarrier(unitID)
+	Spring.InsertUnitCmdDesc(unitID, recallDronesCmdDesc)
+	Spring.InsertUnitCmdDesc(unitID, toggleDronesCmdDesc)
+	generateDrones[unitID] = true
+end
+
 local function Drones_InitializeDynamicCarrier(unitID)
 	if carrierList[unitID] then
 		return
@@ -128,7 +146,7 @@ local function Drones_InitializeDynamicCarrier(unitID)
 		if drones then
 			carrierData[#carrierData + 1] = data
 			maxDronesOverride[#maxDronesOverride + 1] = drones
-			Spring.InsertUnitCmdDesc(unitID, recallDronesCmdDesc)
+			CreateCarrier(unitID)
 		end
 	end
 	carrierList[unitID] = InitCarrier(unitID, carrierData, Spring.GetUnitTeam(unitID), maxDronesOverride)
@@ -311,14 +329,17 @@ local sqrt = math.sqrt
 local exp = math.exp
 local min = math.min
 
-local mcSetVelocity			= Spring.MoveCtrl.SetVelocity
-local mcSetRotationVelocity	= Spring.MoveCtrl.SetRotationVelocity
-local mcSetPosition			= Spring.MoveCtrl.SetPosition
-local mcSetRotation			= Spring.MoveCtrl.SetRotation
-local mcDisable				= Spring.MoveCtrl.Disable
-local mcEnable				= Spring.MoveCtrl.Enable
+local mcSetVelocity         = Spring.MoveCtrl.SetVelocity
+local mcSetRotationVelocity = Spring.MoveCtrl.SetRotationVelocity
+local mcSetPosition         = Spring.MoveCtrl.SetPosition
+local mcSetRotation         = Spring.MoveCtrl.SetRotation
+local mcDisable             = Spring.MoveCtrl.Disable
+local mcEnable              = Spring.MoveCtrl.Enable
 
 local function GetBuildRate(unitID)
+	if not generateDrones[unitID] then
+		return 0
+	end
 	local stunned_or_inbuild = GetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 	if stunned_or_inbuild then
 		return 0
@@ -616,6 +637,15 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function ToggleDronesCommand(unitID, newState)
+	local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_TOGGLE_DRONES)
+	if (cmdDescID) then
+		toggleParams.params[1] = newState
+		Spring.EditUnitCmdDesc(unitID, cmdDescID, toggleParams)
+		generateDrones[unitID] = (newState == 1)
+	end
+end
+
 function gadget:AllowCommand_GetWantedCommand()
 	return true
 end
@@ -625,11 +655,24 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (carrierList[unitID] ~= nil and (cmdID == CMD.ATTACK or cmdID == CMD.FIGHT or cmdID == CMD.PATROL or cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE)) then
+	if droneList[unitID] then
+		return false
+	end
+	if not carrierList[unitID] then
+		return true
+	end
+	
+	if cmdID == CMD_TOGGLE_DRONES then
+		ToggleDronesCommand(unitID, cmdParams[1])
+		return false
+	end
+	
+	if (cmdID == CMD.ATTACK or cmdID == CMD.FIGHT or cmdID == CMD.PATROL or cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE) then
 		spSetUnitRulesParam(unitID,"recall_frame_start",nil)
 		return true
 	end
-	if (carrierList[unitID] ~= nil and cmdID == CMD_RECALL_DRONES) then
+	
+	if (cmdID == CMD_RECALL_DRONES) then
 		
 		-- Gives drones a command to recall to the carrier
 		for i = 1, #carrierList[unitID].droneSets do
@@ -652,11 +695,8 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		
 		return false
 	end
-	if (droneList[unitID] ~= nil) then
-		return false
-	else
-		return true
-	end
+	
+	return true
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
@@ -665,6 +705,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		local carrier = carrierList[unitID]
 		if newUnitID and carrierList[newUnitID] then --MORPHED, and MORPHED to another carrier. Note: unit_morph.lua create unit first before destroying it, so "carrierList[]" is already initialized.
 			local newCarrier = carrierList[newUnitID]
+			ToggleDronesCommand(newUnitID, ((generateDrones[unitID] ~= false) and 1) or 0)
 			for i = 1, #carrier.droneSets do
 				local set = carrier.droneSets[i]
 				local newSetID = -1
@@ -695,6 +736,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 				end
 			end
 		end
+		generateDrones[unitID] = nil
 		carrierList[unitID] = nil
 	elseif (droneList[unitID]) then
 		local carrierID = droneList[unitID].carrier
@@ -711,7 +753,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (carrierDefs[unitDefID]) then
-		Spring.InsertUnitCmdDesc(unitID, recallDronesCmdDesc)
+		CreateCarrier(unitID)
 	end
 end
 
@@ -755,18 +797,20 @@ function gadget:GameFrame(n)
 						set.reload = (set.reload - reloadMult)
 						
 					elseif (set.droneCount < set.maxDrones) and set.buildCount < set.config.maxBuild then --not reach max count and finished previous queue
-						for n = 1, set.config.spawnSize do
-							if (set.droneCount >= set.maxDrones) then
-								break
+						if generateDrones[carrierID] then
+							for n = 1, set.config.spawnSize do
+								if (set.droneCount >= set.maxDrones) then
+									break
+								end
+								
+								carrierList[carrierID].droneInQueue[ #carrierList[carrierID].droneInQueue + 1 ] = i
+								if AddUnitToEmptyPad(carrierID, i ) then
+									set.buildCount = set.buildCount + 1;
+									table.remove(carrierList[carrierID].droneInQueue, 1)
+								end
 							end
-							
-							carrierList[carrierID].droneInQueue[ #carrierList[carrierID].droneInQueue+ 1 ] = i
-							if AddUnitToEmptyPad(carrierID, i ) then
-								set.buildCount = set.buildCount + 1;
-								table.remove(carrierList[carrierID].droneInQueue, 1)
-							end
+							set.reload = set.config.reloadTime -- apply reloadtime when queuing construction (not when it actually happens) - helps keep a constant creation rate over time
 						end
-						set.reload = set.config.reloadTime -- apply reloadtime when queuing construction (not when it actually happens) - helps keep a constant creation rate over time
 					end
 				end
 			end
@@ -789,7 +833,8 @@ function gadget:GameFrame(n)
 end
 
 function gadget:Initialize()
-gadgetHandler:RegisterCMDID(CMD_RECALL_DRONES)
+	gadgetHandler:RegisterCMDID(CMD_RECALL_DRONES)
+	gadgetHandler:RegisterCMDID(CMD_TOGGLE_DRONES)
 	GG.Drones_InitializeDynamicCarrier = Drones_InitializeDynamicCarrier
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)

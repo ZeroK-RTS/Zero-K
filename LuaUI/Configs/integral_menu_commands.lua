@@ -338,6 +338,7 @@ local tooltips = {
 	AIR_STRAFE = "Gunship Strafe (_STATE_)\n  Set whether gunships strafe when fighting.",
 	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set the conditions which cause certain ampihibious units to float to the surface.",
 	SELECTION_RANK = "Selection Filtering Rank (_STATE_)\n  Priority for selection with selection filtering.",
+	TOGGLE_DRONES = "Drone Construction (_STATE_)\n  Toggle drone creation."
 }
 
 local overrides = {
@@ -522,6 +523,13 @@ local overrides = {
 			tooltips.SELECTION_RANK:gsub("_STATE_", "1"),
 			tooltips.SELECTION_RANK:gsub("_STATE_", "2"),
 			tooltips.SELECTION_RANK:gsub("_STATE_", "3")
+		}
+	},
+	[CMD_TOGGLE_DRONES] = {
+		texture = {imageDir .. 'states/drones_off.png', imageDir .. 'states/drones_on.png'},
+		stateTooltip = {
+			tooltips.TOGGLE_DRONES:gsub("_STATE_", "Disabled"),
+			tooltips.TOGGLE_DRONES:gsub("_STATE_", "Enabled"),
 		}
 	},
 }
