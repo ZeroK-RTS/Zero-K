@@ -177,6 +177,14 @@ local moveDefs = {
 		slopemod = 40,
 		crushstrength = 50,
 	},
+	HOVER4 = {
+		footprintx = 4,
+		footprintz = 4,
+		maxslope = 18,
+		maxwaterdepth = 5000,
+		slopemod = 40,
+		crushstrength = 50,
+	},
 
 	BHOVER3 = {		--hover with bot slope
 		footprintx = 3,
