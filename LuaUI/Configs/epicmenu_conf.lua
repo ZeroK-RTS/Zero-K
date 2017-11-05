@@ -249,6 +249,8 @@ local hotkeysMiscPath = 'Settings/Hotkeys/Misc'
 	ShButton(hotkeysMiscPath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
 	ShButton(hotkeysMiscPath, 'Save Screenshot (PNG)', 'screenshot png', 'Find your screenshots under Spring/screenshots') 
 	ShButton(hotkeysMiscPath, 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots')
+	ShButton(hotkeysMiscPath, 'Zoom In', 'movedown', 'Key to zoom the camera out.')
+	ShButton(hotkeysMiscPath, 'Zoom Out', 'moveup', 'Key to zoom the camera in.')
 	ShButton(hotkeysMiscPath, 
 			'Create Video (risky)', 'createvideo', 'Capture video directly from Spring without sound. Gets saved in the Spring folder. '
 			..'Creates a smooth video framerate without ingame stutter. '
