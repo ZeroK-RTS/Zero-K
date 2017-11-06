@@ -7,8 +7,8 @@ unitDef = {
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 8,
-  buildingGroundDecalSizeY      = 10,
+  buildingGroundDecalSizeX      = 11,
+  buildingGroundDecalSizeY      = 11,
   buildingGroundDecalType       = [[factoryveh_aoplane.dds]],
 
   buildoptions                  = {
@@ -38,8 +38,8 @@ unitDef = {
 	default_spacing = 8,
 
 	solid_factory  = 3,
-	aimposoffset   = [[0 0 -37]],
-	midposoffset   = [[0 0 -37]],
+	aimposoffset   = [[0 0 -35]],
+	midposoffset   = [[0 0 -35]],
 	modelradius    = [[30]],
   },
 
