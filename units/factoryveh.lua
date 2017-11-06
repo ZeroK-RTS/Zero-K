@@ -38,8 +38,8 @@ unitDef = {
 	default_spacing = 8,
 
 	solid_factory  = 3,
-	aimposoffset   = [[0 0 -60]],
-	midposoffset   = [[0 0 -60]],
+	aimposoffset   = [[0 0 -40]],
+	midposoffset   = [[0 0 -40]],
 	modelradius    = [[30]],
   },
 
