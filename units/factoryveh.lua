@@ -28,8 +28,8 @@ unitDef = {
   canMove                       = true,
   canPatrol                     = true,
   category                      = [[SINK UNARMED]],
-  collisionVolumeOffsets        = [[0 0 -40]],
-  collisionVolumeScales         = [[110 35 35]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[120 40 40]],
   collisionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
@@ -39,8 +39,8 @@ unitDef = {
 
 	solid_factory  = 3,
 	aimposoffset   = [[0 0 -60]],
-	midposoffset   = [[0 0 -20]],
-	modelradius    = [[65]],
+	midposoffset   = [[0 0 -60]],
+	modelradius    = [[30]],
   },
 
   energyUse                     = 0,
@@ -56,7 +56,7 @@ unitDef = {
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
-  moveState        				= 1,
+  moveState                     = 1,
   noAutoFire                    = false,
   objectName                    = [[factoryveh.dae]],
   script                        = [[factoryveh.lua]],
