@@ -28,17 +28,25 @@ unitDef = {
   canMove                       = true,
   canPatrol                     = true,
   category                      = [[SINK UNARMED]],
+  collisionVolumeOffsets        = [[0 0 -40]],
+  collisionVolumeScales         = [[110 35 35]],
+  collisionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    sortName       = [[2]],
+	sortName       = [[2]],
 	default_spacing = 8,
+
+	solid_factory  = 3,
+	aimposoffset   = [[0 0 -60]],
+	midposoffset   = [[0 0 -20]],
+	modelradius    = [[65]],
   },
 
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
-  footprintX                    = 7,
-  footprintZ                    = 7,
+  footprintX                    = 8,
+  footprintZ                    = 8,
   iconType                      = [[facvehicle]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -58,16 +66,19 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = "ooocccc ooocccc ooocccc ooocccc ooocccc ooocccc ooocccc ooocccc ooocccc ooocccc",
+  yardMap                       = "oooooooo oooooooo oooooooo cccccccc cccccccc cccccccc cccccccc cccccccc",
 
   featureDefs                   = {
 
     DEAD  = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 6,
+      footprintX       = 8,
       footprintZ       = 8,
       object           = [[factoryveh_d.dae]],
+      collisionVolumeOffsets = [[0 0 -20]],
+      collisionVolumeScales  = [[110 35 75]],
+      collisionVolumeType    = [[box]],
     },
 
 
