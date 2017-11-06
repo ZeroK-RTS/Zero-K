@@ -147,11 +147,11 @@ function script.Activate()
 	StartThread(Open)
 end
 
-createClose = true
+local firstDeactivate = true
 function script.Deactivate()
-	if createClose then
+	if firstDeactivate then
 		StartThread(DelayedClose)
-		createClose = false
+		firstDeactivate = false
 		return
 	end
 	StartThread(Close)
@@ -162,6 +162,30 @@ function script.QueryBuildInfo()
 end
 
 function script.Killed(recentDamage, maxHealth)
-	return 1
+	local severity = recentDamage / maxHealth
+	if (severity <= 0.5) then
+		Explode(CoverL2, SFX.SHATTER)
+		Explode(CoverR2, SFX.SHATTER)
+		Explode(Lid, SFX.SHATTER)
+		return 1
+	end
+	Explode(Core, SFX.SMOKE + SFX.SHATTER + SFX.FALL)
+	Explode(Slider, SFX.SMOKE + SFX.FALL + SFX.FIRE)
+	Explode(RailTop, SFX.SMOKE + SFX.FALL + SFX.FIRE)
+	Explode(RailBottom, SFX.SMOKE + SFX.FALL + SFX.FIRE)
+	Explode(RailBottom, SFX.SMOKE + SFX.FALL + SFX.FIRE)
+	Explode(Nanoframe, SFX.SMOKE + SFX.FALL + SFX.FIRE)
+
+	-- giblets
+	Explode(CoverL1, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(CoverR1, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(CoverL2, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(CoverR2, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(CoverL3, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(CoverR3, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(Train, SFX.SMOKE)
+	Explode(CraneWheel, SFX.SMOKE)
+
+	return 2
 end
             
