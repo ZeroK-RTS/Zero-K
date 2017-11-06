@@ -127,8 +127,21 @@ local function MoveTrain()
 	end
 end
 
+local function Test()
+	while true do
+		Move(Root, z_axis, -10, 15)
+		WaitForMove(Root, z_axis)
+		Move(Root, z_axis, -60, 15)
+		WaitForMove(Root, z_axis)
+	end
+end
+
 function script.Create()
 	Move(Root, z_axis, -0.1)
+	
+	--Move(Root, z_axis, -40)
+	--StartThread(Test)
+	
 	StartThread(Open)
 	
 	Spring.SetUnitNanoPieces(unitID, {Nano1, Nano2})
