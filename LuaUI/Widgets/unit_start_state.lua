@@ -43,15 +43,6 @@ for i = 1, #UnitDefs do
 	end
 end
 
-local function GetDefaultSelectionRank(ud)
-	if (ud.isImmobile or ud.speed == 0) and not ud.isFactory then
-		return 1
-	elseif ud.isMobileBuilder and not ud.customParams.commtype then
-		return 2
-	end
-	return 3
-end
-
 options_path = 'Settings/Unit Behaviour/Default States'
 options_order = {
 	'inheritcontrol', 'presetlabel', 
@@ -312,7 +303,7 @@ options = {
 				local name = find and string.sub(opt, 0, find - 1)
 				local ud = name and UnitDefNames[name]
 				if ud then
-					options[opt].value = GetDefaultSelectionRank(ud)
+					options[opt].value = (WG.GetDefaultSelectionRank and WG.GetDefaultSelectionRank(ud.id)) or 1
 				end
 			end
 		end,
@@ -658,7 +649,7 @@ local function addUnit(defName, path)
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
 		type = 'number',
-		value = GetDefaultSelectionRank(ud),
+		value = (WG.GetDefaultSelectionRank and WG.GetDefaultSelectionRank(ud.id)) or 1,
 		min = 0,
 		max = 3,
 		step = 1,

@@ -43,11 +43,15 @@ for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if (ud.isImmobile or ud.speed == 0) and not ud.isFactory then
 		defaultRank[i] = 1
-	elseif ud.isMobileBuilder and not ud.customParams.commtype then
+	elseif (ud.isMobileBuilder or ud.isFactory) and not ud.customParams.commtype then
 		defaultRank[i] = 2
 	else
 		defaultRank[i] = 3
 	end
+end
+
+function WG.GetDefaultSelectionRank(id)
+	return defaultRank[id]
 end
 
 --------------------------------------------------------------------------------
