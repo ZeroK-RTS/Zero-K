@@ -12,7 +12,6 @@ function widget:GetInfo()
 		enabled   = true, --  loaded by default?
 		api       = true,
 		alwaysStart = true,
-		hidden    = true,
 	}
 	end
 

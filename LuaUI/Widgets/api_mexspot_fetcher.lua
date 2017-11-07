@@ -9,7 +9,6 @@ function widget:GetInfo()
     layer     = -30000,
     enabled   = true,  --  loaded by default?
     alwaysStart = true,
-	hidden    = true,
   }
 end
 

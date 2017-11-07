@@ -14,7 +14,6 @@ function widget:GetInfo()
 		handler   = true,
 		api       = true,
 		alwaysStart = true,
-		hidden    = true,
 	}
 end
 

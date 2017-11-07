@@ -14,7 +14,6 @@ function widget:GetInfo()
 		layer = 5,
 		enabled = true,
 		api = true,
-		hidden = true,
 	}
 end
 

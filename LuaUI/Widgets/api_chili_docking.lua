@@ -12,7 +12,6 @@ function widget:GetInfo()
     handler   = true, -- to read widget status. eg: "widgetHandler.knownWidgets[name]"
     enabled   = true,  --  loaded by default?
     alwaysStart = true,
-	hidden    = true,
   }
 end
 

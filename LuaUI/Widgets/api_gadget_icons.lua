@@ -11,7 +11,6 @@ function widget:GetInfo()
     layer     = 5,
     enabled   = true,
     alwaysStart = true,
-	hidden    = true,
   }
 end
 
