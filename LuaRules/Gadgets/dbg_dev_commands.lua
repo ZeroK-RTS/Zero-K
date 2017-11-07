@@ -425,32 +425,49 @@ local function circleGive(cmd, line, words, player)
 	end
 end
 
+local function SetupNanoUnit(unitID, nanoAmount)
+	local _, maxHealth = Spring.GetUnitHealth(unitID)
+	Spring.SetUnitHealth(unitID, {build = nanoAmount, health = maxHealth})
+end
+
 local function give(cmd,line,words,player)
-	if spIsCheatingEnabled() then
-		local buildlist = UnitDefNames["armcom1"].buildOptions
-		local INCREMENT = 128
-		local orderUnit = {}
-		for i = 1, #buildlist do
-			local udid = buildlist[i]
-			local x, z = INCREMENT, i*INCREMENT
-			local y = Spring.GetGroundHeight(x,z)
-			Spring.CreateUnit(udid, x, y, z, 0, 0, false)
-			local ud = UnitDefs[udid]
-			if ud.buildOptions and #ud.buildOptions > 0 then
-				local sublist = ud.buildOptions
-				for j = 1, #sublist do
-					local subUdid = sublist[j]
-					local x2, z2 = (j+1)*INCREMENT, i*INCREMENT
-					local y2 = Spring.GetGroundHeight(x2,z2)
-					orderUnit[#orderUnit + 1] = Spring.CreateUnit(subUdid, x2, y2, z2+32, 0, 0, false)
-					--Spring.CreateUnit(subUdid, x2+32, y2, z2, 1, 0, false)
-					--Spring.CreateUnit(subUdid, x2, y2, z2-32, 2, 0, false)
-					--Spring.CreateUnit(subUdid, x2-32, y2, z2, 3, 0, false)
-				end	
-			end
-		end
-		Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
+	if not spIsCheatingEnabled() then
+		return
 	end
+	
+	local nanoAmount = math.max(0.01, math.min(1, tonumber(words[1] or "1") or 1))
+	local build = (nanoAmount < 1)
+	
+	local buildlist = UnitDefNames["armcom1"].buildOptions
+	local INCREMENT = 128
+	local orderUnit = {}
+	for i = 1, #buildlist do
+		local udid = buildlist[i]
+		local x, z = INCREMENT, i*INCREMENT
+		local y = Spring.GetGroundHeight(x,z)
+		local unitID = Spring.CreateUnit(udid, x, y, z, 0, 0, build)
+		if build then
+			SetupNanoUnit(unitID, nanoAmount)
+		end
+		local ud = UnitDefs[udid]
+		if ud.buildOptions and #ud.buildOptions > 0 then
+			local sublist = ud.buildOptions
+			for j = 1, #sublist do
+				local subUdid = sublist[j]
+				local x2, z2 = (j+1)*INCREMENT, i*INCREMENT
+				local y2 = Spring.GetGroundHeight(x2,z2)
+				local subUnitID = Spring.CreateUnit(subUdid, x2, y2, z2+32, 0, 0, build)
+				if build then
+					SetupNanoUnit(subUnitID, nanoAmount)
+				end
+				orderUnit[#orderUnit + 1] = subUnitID
+				--Spring.CreateUnit(subUdid, x2+32, y2, z2, 1, 0, false)
+				--Spring.CreateUnit(subUdid, x2, y2, z2-32, 2, 0, false)
+				--Spring.CreateUnit(subUdid, x2-32, y2, z2, 3, 0, false)
+			end	
+		end
+	end
+	Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
 end
 
 local function ColorTest(cmd,line,words,player)
@@ -493,6 +510,18 @@ local function gentleKill(cmd,line,words,player)
 			Spring.SetUnitHealth(unitID,0.1)
 			Spring.AddUnitDamage(unitID,1, 0, nil, -7)
 		end
+	end
+end
+
+local function nanoFrame(cmd,line,words,player)
+	if not spIsCheatingEnabled() then 
+		return
+	end
+	local nanoAmount = math.max(0.01, math.min(1, tonumber(words[1] or "0.99") or 0.99))
+	local units = Spring.GetAllUnits()
+	for i=1, #units do
+		local unitID = units[i]
+		Spring.SetUnitHealth(unitID, {build = nanoAmount})
 	end
 end
 
@@ -673,6 +702,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"circle",circleGive,"Gives a bunch of units in a circle.")
 	gadgetHandler.actionHandler.AddChatAction(self,"give",give,"Like give all but without all the crap.")
 	gadgetHandler.actionHandler.AddChatAction(self,"gk",gentleKill,"Gently kills everything.")
+	gadgetHandler.actionHandler.AddChatAction(self,"nf",nanoFrame,"Sets nanoframe values.")
 	gadgetHandler.actionHandler.AddChatAction(self,"rez",rezAll,"Resurrects wrecks for former owners.")
 	gadgetHandler.actionHandler.AddChatAction(self,"damage",damage,"Damages everything.")
 	gadgetHandler.actionHandler.AddChatAction(self,"color",ColorTest,"Spawns units for color test.")
