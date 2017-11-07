@@ -62,7 +62,7 @@ unitDef = {
   useBuildingGroundDecal        = true,
   waterline						= 0,
   workerTime                    = 10,
-  yardMap                       = [[oooooooo oooooooo oooooooo occooooo occooooo oooooooo]],
+  yardMap                       = [[oooooooo oooooooo oooooooo occooooo occooooo oooooooo oooooooo]],
 
   featureDefs                   = {
 
