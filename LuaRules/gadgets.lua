@@ -1875,9 +1875,9 @@ function gadgetHandler:Update()
 end
 
 
-function gadgetHandler:DefaultCommand(type, id)
+function gadgetHandler:DefaultCommand(type, id, engineCmd)
   for _,g in ipairs(self.DefaultCommandList) do
-    local id = g:DefaultCommand(type, id)
+    local id = g:DefaultCommand(type, id, engineCmd)
     if (id) then
       return id
     end
