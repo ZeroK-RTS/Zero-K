@@ -78,7 +78,7 @@ if VFS.FileExists("LuaUI/Configs/LocalColors.lua") then
 	}
 end
 
-local myColor, gaiaColor, allyColors, enemyColors
+local myColor, gaiaColor, allyColors, enemyColors, enemiesByAllyTeam
 
 local function UpdateColorConfig(self)
 	if not colorConfig[self.value] then
@@ -89,6 +89,7 @@ local function UpdateColorConfig(self)
 	gaiaColor = colorConfig[self.value].colors.gaiaColor
 	allyColors = colorConfig[self.value].colors.allyColors
 	enemyColors = colorConfig[self.value].colors.enemyColors
+	enemiesByAllyTeam = colorConfig[self.value].colors.enemiesByAllyTeam
 	
 	UpdateColor()
 end
@@ -132,7 +133,9 @@ local function SetNewTeamColors()
 	
 	local myAlly = Spring.GetMyAllyTeamID()
 	local myTeam = Spring.GetMyTeamID()
-
+	
+	local enemyColorMap = enemiesByAllyTeam and {}
+	
 	local a, e = 0, 0
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local _,_,_,_,_,allyID = Spring.GetTeamInfo(teamID)
@@ -142,12 +145,20 @@ local function SetNewTeamColors()
 				Spring.SetTeamColor(teamID, unpack(allyColors[a]))
 			end
 		elseif (teamID ~= gaia) then
-			e = (e % #enemyColors) + 1
-			Spring.SetTeamColor(teamID, unpack(enemyColors[e]))
+			if enemiesByAllyTeam then
+				if not enemyColorMap[allyID] then
+					e = (e % #enemyColors) + 1
+					enemyColorMap[allyID] = enemyColors[e]
+				end
+				Spring.SetTeamColor(teamID, unpack(enemyColorMap[allyID]))
+			else
+				e = (e % #enemyColors) + 1
+				Spring.SetTeamColor(teamID, unpack(enemyColors[e]))
+			end
 		end
 	end
 	if not is_speccing then
-		Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
+		Spring.SetTeamColor(myTeam, unpack(myColor)) -- overrides previously defined color
 	end
 end
 
@@ -255,7 +266,7 @@ function widget:DrawScreen()
 	local x = vsx/2 - width
 	local y = vsy - 160	
 	
-	for i=1,#friendlyColors do
+	for i = 1, #friendlyColors do
 		gl.Color(friendlyColors[i])
 		gl.BeginEnd(GL.QUADS, DrawRectangle, x, y)
 		gl.Color(1,1,1,1)
@@ -265,7 +276,7 @@ function widget:DrawScreen()
 	
 	y = vsy - 160
 	x = x + width
-	for i=1,#enemyColors do
+	for i = 1, #enemyColors do
 		gl.Color(enemyColors[i])
 		gl.BeginEnd(GL.QUADS, DrawRectangle, x, y)
 		gl.Color(1,1,1,1)

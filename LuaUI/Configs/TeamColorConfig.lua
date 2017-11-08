@@ -127,6 +127,14 @@ local simpleColors = {
 	enemyColors = {colors.enemyColors[1]},
 }
 
+local simpleColorsTeams = {
+	myColor = colors.myColor,
+	gaiaColor = colors.gaiaColor,
+	allyColors = {colors.allyColors[1]},
+	enemyColors = colors.enemyColors,
+	enemiesByAllyTeam = true,
+}
+
 local simpleColorblind = {
 	myColor = colorblind.myColor,
 	gaiaColor = colorblind.gaiaColor,
@@ -148,20 +156,26 @@ local colorConfigs = {
 		desc = "Simple colors. Allies are blue, enemies are red, self is green.",
 		colors = simpleColors
 	},
-	defaultTeal = {
+	simpleTeam = {
 		order = 3,
+		name = "Simple Teams",
+		desc = "Simple colors. Allies are blue, each enemy team is a different colour, self is green.",
+		colors = simpleColorsTeams
+	},
+	defaultTeal = {
+		order = 4,
 		name = "Self Teal",
 		desc = "Allies are blue/green-ish, enemies are red/yellow-ish, self is teal.",
 		colors = colorsTeal
 	},
 	colorblind = {
-		order = 4,
+		order = 5,
 		name = "Colorblind",
 		desc = "Allies are blue-ish, enemies are red-ish, self is teal.",
 		colors = colorblind
 	},
 	simpleColorblind = {
-		order = 5,
+		order = 6,
 		name = "Simple Colorblind",
 		desc = "Enemies are red, allies are blue, self is teal.",
 		colors = simpleColorblind
