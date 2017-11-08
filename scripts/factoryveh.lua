@@ -26,6 +26,10 @@ local open = false
 local SIG_OPEN = 1
 local SIG_TRAIN = 2
 
+local function GetDisabled()
+	return Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID,"disarmed") == 1)
+end
+
 local function Open()
 	if open then
 		return
@@ -33,6 +37,11 @@ local function Open()
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_OPEN)
 	open = true
+	
+	while GetDisabled() do
+		Sleep(500)
+	end
+	
 	-- set values
 	SetUnitValue(COB.YARD_OPEN, 1)
 	SetUnitValue(COB.BUGGER_OFF, 1)
@@ -46,9 +55,17 @@ local function Open()
 	
 	WaitForMove(Slider, z_axis)
 	
+	while GetDisabled() do
+		Sleep(500)
+	end
+	
 	Turn(CraneRoot, x_axis, math.rad(-45), math.rad(90))
 	Move(RailTop, y_axis, -11, 35)
 	WaitForMove(RailTop, y_axis)
+	
+	while GetDisabled() do
+		Sleep(500)
+	end
 	
 	Move(RailTop, y_axis, -30.2, 35)
 	Move(RailBottom, y_axis, -11, 35)
@@ -59,10 +76,19 @@ local function Open()
 	Turn(CraneWheel, x_axis, math.rad(45), math.rad(50))
 	
 	WaitForMove(RailBottom, y_axis)
+	
+	while GetDisabled() do
+		Sleep(500)
+	end
+	
 	Turn(CoverL3, y_axis, math.rad(45), math.rad(90))
 	Turn(CoverR3, y_axis, math.rad(-45), math.rad(90))
 	
 	WaitForTurn(CraneWheel, x_axis)
+	
+	while GetDisabled() do
+		Sleep(500)
+	end
 	
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 end
@@ -79,6 +105,10 @@ local function Close()
 	SetUnitValue(COB.YARD_OPEN, 0)
 	SetUnitValue(COB.BUGGER_OFF, 0)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
+	
+	while GetDisabled() do
+		Sleep(500)
+	end
 	
 	Turn(CraneWheel, x_axis, 0, math.rad(90))
 	
@@ -101,6 +131,10 @@ local function Close()
 	Turn(CraneRoot, x_axis, 0, math.rad(90))
 	
 	WaitForTurn(CraneRoot, x_axis)
+	
+	while GetDisabled() do
+		Sleep(500)
+	end
 	
 	Turn(CoverL1, y_axis, 0, math.rad(90))
 	Turn(CoverR1, y_axis, 0, math.rad(90))
