@@ -37,6 +37,13 @@ local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 local fixedStartPos = (modOptions.fixedstartpos == "1")
 local ordersToRemove
 
+local storageUnits = {
+	{
+		unitDefID = UnitDefNames["staticstorage"].id,
+		storeAmount = UnitDefNames["staticstorage"].metalStorage
+	}
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -460,6 +467,14 @@ local function IsTeamResigned(team)
 	return true
 end
 
+local function GetPregameUnitStorage(teamID)
+	local storage = 0
+	for i = 1, #storageUnits do
+		storage = storage + Spring.GetTeamUnitDefCount(teamID, storageUnits[i].unitDefID) * storageUnits[i].storeAmount
+	end
+	return storage
+end
+
 function gadget:GameStart()
 	if Spring.Utilities.tobool(Spring.GetGameRulesParam("loadedGame")) then
 		return
@@ -472,8 +487,10 @@ function gadget:GameStart()
 		-- clear resources
 		-- actual resources are set depending on spawned unit and setup
 		if not loadGame then
-			Spring.SetTeamResource(team, "es", 0 + HIDDEN_STORAGE)
-			Spring.SetTeamResource(team, "ms", 0 + HIDDEN_STORAGE)
+			local pregameUnitStorage = campaignBattleID and GetPregameUnitStorage(team)
+			Spring.Echo("pregameUnitStorage", team, pregameUnitStorage)
+			Spring.SetTeamResource(team, "es", pregameUnitStorage + HIDDEN_STORAGE)
+			Spring.SetTeamResource(team, "ms", pregameUnitStorage + HIDDEN_STORAGE)
 			Spring.SetTeamResource(team, "energy", 0)
 			Spring.SetTeamResource(team, "metal", 0)
 		end
