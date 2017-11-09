@@ -487,7 +487,7 @@ function gadget:GameStart()
 		-- clear resources
 		-- actual resources are set depending on spawned unit and setup
 		if not loadGame then
-			local pregameUnitStorage = campaignBattleID and GetPregameUnitStorage(team)
+			local pregameUnitStorage = (campaignBattleID and GetPregameUnitStorage(team)) or 0
 			Spring.Echo("pregameUnitStorage", team, pregameUnitStorage)
 			Spring.SetTeamResource(team, "es", pregameUnitStorage + HIDDEN_STORAGE)
 			Spring.SetTeamResource(team, "ms", pregameUnitStorage + HIDDEN_STORAGE)
