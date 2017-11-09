@@ -98,13 +98,12 @@ options = {
 		type='radioButton', 
 		name='Predict impact location for',
 		items = {
-			{name = 'All units', key = 'all', desc = "All units will have their impact predicted whenever they take damge.", hotkey=nil},
-			{name = 'Launched units', key = 'newton', desc = "Units hit by a gravity gun will have their impact predited.", hotkey=nil},
-			{name = 'Firezone units', key = 'firezone', desc = "Only units launched with a firezone will have their impact predicted.", hotkey=nil},
-			{name = 'No units', key = 'none', desc = "No impact prediction.", hotkey=nil},
+			{name = 'All units', key = 'all', desc = "All units will have their impact predicted whenever they take damge."},
+			{name = 'Launched units', key = 'newton', desc = "Units hit by a gravity gun will have their impact predited."},
+			{name = 'Firezone units', key = 'firezone', desc = "Only units launched with a firezone will have their impact predicted."},
+			{name = 'No units', key = 'none', desc = "No impact prediction."},
 		},
 		value = 'newton',  --default at start of widget
-		noHotkey = true,
 		OnChange = function(self)
 			local key = self.value
 			if key == 'all' then
@@ -121,8 +120,7 @@ options = {
 	alwaysDrawZones = {
 		name = "Always draw firezones", 
 		desc = "Enable to always draw Newton firezones. Otherwise they are only drawn on selection.",
-		type = 'bool', 
-		noHotkey = true,
+		type = 'bool',
 		value = false,
 		OnChange = function(self)
 			alwaysDrawFireZones = self.value
@@ -133,12 +131,11 @@ options = {
 		type='radioButton', 
 		name='Predict transport drop location for',
 		items = {
-			{name = 'All units', key = 'all', desc = "All units will have their drop location predicted.", hotkey=nil},
-			{name = 'Bombs only', key = 'bomb', desc = "Crawling bombs will have their drop loction predicted.", hotkey=nil},
-			{name = 'No units', key = 'none', desc = "No units will have their impact position predicted.", hotkey=nil},
+			{name = 'All units', key = 'all', desc = "All units will have their drop location predicted."},
+			{name = 'Bombs only', key = 'bomb', desc = "Crawling bombs will have their drop loction predicted."},
+			{name = 'No units', key = 'none', desc = "No units will have their impact position predicted."},
 		},
 		value = 'bomb',  --default at start of widget
-		noHotkey = true,
 		OnChange = function(self)
 			local key = self.value
 			if key == 'all' then
