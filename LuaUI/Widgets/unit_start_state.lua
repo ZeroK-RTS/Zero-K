@@ -20,6 +20,7 @@ end
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
+local defaultSelectionRank = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
 local spectatingState = select(1, Spring.GetSpectatingState())
 
 local unitsToFactory = {}	-- [unitDefName] = factoryDefName
@@ -303,7 +304,7 @@ options = {
 				local name = find and string.sub(opt, 0, find - 1)
 				local ud = name and UnitDefNames[name]
 				if ud then
-					options[opt].value = (WG.GetDefaultSelectionRank and WG.GetDefaultSelectionRank(ud.id)) or 1
+					options[opt].value = defaultSelectionRank[ud.id] or 3
 				end
 			end
 		end,
@@ -649,7 +650,7 @@ local function addUnit(defName, path)
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
 		type = 'number',
-		value = (WG.GetDefaultSelectionRank and WG.GetDefaultSelectionRank(ud.id)) or 1,
+		value = defaultSelectionRank[ud.id] or 3,
 		min = 0,
 		max = 3,
 		step = 1,

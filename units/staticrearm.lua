@@ -22,6 +22,7 @@ unitDef = {
     pad_count = 4,
 	nobuildpower   = 1,
 	notreallyafactory = 1,
+	selection_rank  = [[1]],
   },
 
   explodeAs           = [[LARGE_BUILDINGEX]],
