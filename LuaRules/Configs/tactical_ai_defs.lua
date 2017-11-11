@@ -430,7 +430,7 @@ local behaviourConfig = {
 		minCircleStrafeDistance = 0,
 		minSwarmLeeway = 100,
 		swarmLeeway = 30,
-		alwaysJinkFight = true,		
+		alwaysJinkFight = true,
 	},
 	
 	["shieldbomb"] = {

@@ -630,6 +630,16 @@ function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 	UnitDetected( unitID, true )
 end
 
+function widget:UnitGiven(unitID)
+	widget:UnitDestroyed(unitID)
+	widget:UnitCreated(unitID)
+end
+
+function widget:UnitTaken(unitID)
+	widget:UnitDestroyed(unitID)
+	widget:UnitCreated(unitID)
+end
+
 function widget:UnitDestroyed(unitID)
 	if defences[unitID] then
 		defences[unitID] = nil
