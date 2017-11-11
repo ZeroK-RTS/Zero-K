@@ -653,7 +653,7 @@ end
 -- note: Taken comes before Given
 function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeamID)
 	if (newTeam ~= gaiaTeamID)
-	  and(not doesNotCountList[unitDefID])
+	  and (not doesNotCountList[unitDefID])
 	  and finishedUnits[unitID]
 	then
 		AddAllianceUnit(unitID, unitDefID, newTeam)
@@ -662,10 +662,10 @@ end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeam)
 	if (oldTeamID ~= gaiaTeamID)
-	  and(not doesNotCountList[unitDefID])
+	  and (not doesNotCountList[unitDefID])
 	  and finishedUnits[unitID]
 	then
-		RemoveAllianceUnit(unitID, unitDefID, oldTeamID)	
+		RemoveAllianceUnit(unitID, unitDefID, oldTeamID)
 	end
 end
 
@@ -690,7 +690,10 @@ function gadget:GameFrame(n)
 	if toDestroy[n] then
 		for unitID in pairs(toDestroy[n]) do
 			if Spring.ValidUnitID(unitID) then
-				spDestroyUnit(unitID, true)
+				local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+				if destroyedAlliances[allyTeamID] then
+					spDestroyUnit(unitID, true)
+				end
 			end
 		end
 		toDestroy[n] = nil
