@@ -86,6 +86,7 @@ local allyTeamList = Spring.GetAllyTeamList()
 local initialUnitDataTable = {}
 
 local removedCmdDesc = {} -- Remember commands so they can be readded.
+local disableAiUnitControl
 
 GG.terraformRequiresUnlock = true
 GG.terraformUnlocked = {}
@@ -575,6 +576,16 @@ local function SetupInitialUnitParameters(unitID, unitData)
 	elseif unitData.notAutoAttacked then
 		Spring.SetUnitNeutral(unitID, true) 
 		Spring.SetUnitRulesParam(unitID, "ignoredByAI", 1, publicTrueTable)
+	end
+	
+	if unitData.noControl then
+		local teamID = Spring.GetUnitTeam(unitID)
+		if teamID then
+			disableAiUnitControl = disableAiUnitControl or {}
+			local unitList = disableAiUnitControl[teamID] or {}
+			unitList[#unitList + 1] = unitID
+			disableAiUnitControl[teamID] = unitList
+		end
 	end
 	
 	if unitData.mapMarker then
@@ -1114,6 +1125,22 @@ local function InitializeMapMarkers()
 	end
 end
 
+local function CheckDisableControlAiMessage()
+	if not disableAiUnitControl then
+		return
+	end
+	
+	for teamID, data in pairs(disableAiUnitControl) do
+		local dis_msg = "DISABLE_CONTROL:"
+		for i = 1, #data do
+			dis_msg = dis_msg .. data[i] .. "+"
+		end
+		SendToUnsynced("SendAIEvent", teamID, dis_msg)
+	end
+	
+	disableAiUnitControl = nil
+end
+
 local function PlaceMidgameUnits(unitList)
 	for i = 1, #unitList do
 		local data = unitList[i]
@@ -1126,6 +1153,8 @@ local function PlaceMidgameUnits(unitList)
 		end
 		commandsToGive = nil
 	end
+	
+	CheckDisableControlAiMessage()
 end
 
 local function InitializeMidgameUnits(gameFrame)
@@ -1162,6 +1191,8 @@ local function DoInitialUnitPlacement()
 		end
 		commandsToGive = nil
 	end
+	
+	CheckDisableControlAiMessage()
 end
 
 local function DoInitialTerraform()
@@ -1492,13 +1523,26 @@ local function RemoveMarker(cmd, markerID)
 	end
 end
 
+function SendAIEvent(_, teamID, msg)
+	local localPlayer = Spring.GetLocalPlayerID();
+	-- Send message only to hosted native AI
+	local aiid, ainame, aihost = Spring.GetAIInfo(teamID);
+	if (aihost == localPlayer) then
+		--Spring.Echo("Team:" .. tostring(teamID) .. " | SendAIEvent0 | " .. msg)
+		Spring.SendSkirmishAIMessage(teamID, msg)
+		--Spring.Echo("Team:" .. tostring(teamID) .. " | SendAIEvent1 | END")
+	end
+end
+
 function gadget:Initialize()
+	gadgetHandler:AddSyncAction("SendAIEvent", SendAIEvent)
 	gadgetHandler:AddSyncAction("MissionGameOver", MissionGameOver)
 	gadgetHandler:AddSyncAction("AddMarker", AddMarker)
 	gadgetHandler:AddSyncAction("RemoveMarker", RemoveMarker)
 end
 
 function gadget:Shutdown()
+	gadgetHandler:RemoveSyncAction("SendAIEvent")
 	gadgetHandler:RemoveSyncAction("MissionGameOver")
 	gadgetHandler:RemoveSyncAction("AddMarker")
 	gadgetHandler:RemoveSyncAction("RemoveMarker")
