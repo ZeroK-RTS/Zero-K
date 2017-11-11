@@ -144,7 +144,6 @@ end
 function script.Create()
 	StartThread(SmokeUnit, {pipe, lidh2, piece "smoke_1"})
 	Spring.SetUnitNanoPieces(unitID, {emit})
-	Spring.Echo("Create")
 	StartThread(Open)
 end
 

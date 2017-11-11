@@ -85,6 +85,8 @@ local allyTeamList = Spring.GetAllyTeamList()
 
 local initialUnitDataTable = {}
 
+local removedCmdDesc = {} -- Remember commands so they can be readded.
+
 GG.terraformRequiresUnlock = true
 GG.terraformUnlocked = {}
 
@@ -915,7 +917,18 @@ end
 local function RemoveUnit(unitID, lockDefID)
 	local cmdDescID = Spring.FindUnitCmdDesc(unitID, -lockDefID)
 	if (cmdDescID) then
+		if not removedCmdDesc[lockDefID] then
+			local toRemove = Spring.GetUnitCmdDescs(unitID, cmdDescID, cmdDescID)
+			removedCmdDesc[lockDefID] = toRemove[1]
+		end
 		Spring.RemoveUnitCmdDesc(unitID, cmdDescID)
+	end
+end
+
+local function AddUnit(unitID, lockDefID)
+	local cmdDescID = Spring.FindUnitCmdDesc(unitID, -lockDefID)
+	if (not cmdDescID) and removedCmdDesc[lockDefID] then
+		Spring.InsertUnitCmdDesc(unitID, removedCmdDesc[lockDefID])
 	end
 end
 
@@ -931,39 +944,49 @@ local function SetBuildOptions(unitID, unitDefID, teamID)
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 	local ud = unitDefID and UnitDefs[unitDefID]
 	if ud and ud.isBuilder then
+		local origUnlocks
+		if unitLineage[unitID] and (unitLineage[unitID] ~= teamID) then
+			origUnlocks = unlockedUnitsByTeam[unitLineage[unitID]]
+		end
 		local unlockedUnits = unlockedUnitsByTeam[teamID]
-		if unlockedUnits then
+		if unlockedUnits or origUnlocks then
 			local buildoptions = ud.buildOptions
 			for i = 1, #buildoptions do
-				if not unlockedUnits[buildoptions[i]] then
-					RemoveUnit(unitID, buildoptions[i])
+				local opt = buildoptions[i]
+				if not (unlockedUnits[opt] or (origUnlocks and origUnlocks[opt]))then
+					RemoveUnit(unitID, opt)
+				else
+					AddUnit(unitID, opt)
 				end
 			end
 		end
 	end
 end
 
+local function IsUnlockedForUnit(unitID, teamID, buildUnitDefID)
+	-- Unlock if either my current or original team could build the unit.
+	if not (unlockedUnitsByTeam[teamID] and unlockedUnitsByTeam[teamID][buildUnitDefID]) then
+		local origTeamID = (unitID and unitLineage[unitID])
+		if origTeamID and unlockedUnitsByTeam[origTeamID] and unlockedUnitsByTeam[origTeamID][buildUnitDefID] then
+			return true
+		end
+		return false
+	end
+	return true
+end
+
 function gadget:AllowCommand(unitID, unitDefID, unitTeamID, cmdID, cmdParams, cmdOpts)
 	if cmdID == CMD_INSERT and cmdParams and cmdParams[2] then
 		cmdID = cmdParams[2]
 	end
-	local unitTeamID = (unitID and unitLineage[unitID]) or unitTeamID
-	if cmdID < 0 and unlockedUnitsByTeam[unitTeamID] then
-		if not (unlockedUnitsByTeam[unitTeamID][-cmdID]) then 
-			return false
-		end
+	if cmdID < 0 and not IsUnlockedForUnit(unitID, unitTeamID, -cmdID) then
+		return false
 	end
 	return true
 end
 
 function gadget:AllowUnitCreation(unitDefID, builderID, builderTeamID, x, y, z)
-	local builderTeamID = (builderID and unitLineage[builderID]) or builderTeamID
-	if unlockedUnitsByTeam[builderTeamID] then
-		if not (unlockedUnitsByTeam[builderTeamID][unitDefID]) then 
-			return false
-		end
-	end
-	return true
+	return IsUnlockedForUnit(builderID, builderTeamID, unitDefID)
 end
 
 local function LineageUnitCreated(unitID, unitDefID, teamID, builderID)
@@ -977,7 +1000,7 @@ local function LineageUnitCreated(unitID, unitDefID, teamID, builderID)
 	else
 		unitLineage[unitID] = teamID
 	end
-	SetBuildOptions(unitID, unitDefID, unitLineage[unitID])
+	SetBuildOptions(unitID, unitDefID, teamID)
 end
 
 --------------------------------------------------------------------------------
@@ -1298,6 +1321,7 @@ end
 
 -- note: Taken comes before Given
 function gadget:UnitGiven(unitID, unitDefID, newTeamID, oldTeamID)
+	SetBuildOptions(unitID, unitDefID, newTeamID)
 	BonusObjectiveUnitCreated(unitID, unitDefID, newTeamID, true)
 end
 
@@ -1408,7 +1432,7 @@ function gadget:Load(zip)
 	for oldUnitID, teamID in pairs(loadData.unitLineage) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
 		unitLineage[unitID] = teamID
-		SetBuildOptions(unitID, unitDefID, unitLineage[unitID])
+		SetBuildOptions(unitID, unitDefID, Spring.GetUnitTeam(unitID))
 	end
 	
 	for i = 1, #loadData.bonusObjectiveList do

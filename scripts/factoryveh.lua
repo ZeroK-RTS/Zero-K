@@ -191,13 +191,11 @@ function script.StartBuilding(heading, pitch)
 end
 
 function script.Activate()
-Spring.Echo("Activate")
 	StartThread(Open)
 end
 
 local firstDeactivate = true
 function script.Deactivate()
-Spring.Echo("Deactivate")
 	if firstDeactivate then
 		StartThread(DelayedClose)
 		firstDeactivate = false
