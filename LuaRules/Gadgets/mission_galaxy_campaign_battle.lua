@@ -1311,6 +1311,10 @@ function GalaxyCampaignHandler.HasFactoryPlop(teamID)
 	return teamCommParameters[teamID] and teamCommParameters[teamID].facplop
 end
 
+function GalaxyCampaignHandler.OverrideCommFacing(teamID)
+	return teamCommParameters[teamID] and teamCommParameters[teamID].facing
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Victory/Defeat
