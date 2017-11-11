@@ -7,9 +7,9 @@ unitDef = {
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 8,
-  buildingGroundDecalSizeY      = 8,
-  -- buildingGroundDecalType       = [[factorytank_aoplane.dds]],
+  buildingGroundDecalSizeX      = 11,
+  buildingGroundDecalSizeY      = 11,
+  buildingGroundDecalType       = [[factorytank_aoplane.dds]],
 
   buildoptions                  = {
     [[tankcon]],
@@ -54,7 +54,7 @@ unitDef = {
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
-  moveState        				= 1,
+  moveState                     = 1,
   noAutoFire                    = false,
   objectName                    = [[factorytank.s3o]],
   script                        = [[factorytank.lua]],
