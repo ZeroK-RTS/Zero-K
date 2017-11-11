@@ -67,7 +67,7 @@ options = {
 	hideinterfaceandcursor = {
 		name = 'Hide Interface',
 		desc = 'Toggle to show/hide the interface and mouse cursor.',
-		hotkey = {key = 'f5', mod = ''},
+		hotkey = {key = 'f5', mod = 'C'},
 		type = 'button',
 		action = 'hideinterfaceandcursor',
 		noAutoControlFunc = true,
