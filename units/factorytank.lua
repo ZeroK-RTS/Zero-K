@@ -28,17 +28,20 @@ unitDef = {
   canPatrol                     = true,
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
-  collisionVolumeOffsets        = [[0 14 -34]],
+  collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[110 28 44]],
   collisionVolumeType           = [[box]],
-  selectionVolumeOffsets        = [[0 7 0]],
-  selectionVolumeScales         = [[110 14 110]],
+  selectionVolumeOffsets        = [[0 0 35]],
+  selectionVolumeScales         = [[110 0 110]],
   selectionVolumeType           = [[box]],
 
   customParams                  = {
     sortName = [[6]],
     solid_factory = [[4]],
     default_spacing = 8,
+    aimposoffset   = [[0 15 -35]],
+    midposoffset   = [[0 15 -35]],
+    modelradius    = [[30]],
   },
 
   energyUse                     = 0,
