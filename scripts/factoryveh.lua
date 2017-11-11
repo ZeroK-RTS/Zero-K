@@ -42,10 +42,6 @@ local function Open()
 		Sleep(500)
 	end
 	
-	-- set values
-	SetUnitValue(COB.YARD_OPEN, 1)
-	SetUnitValue(COB.BUGGER_OFF, 1)
-	
 	Turn(CoverL1, y_axis, math.rad(90), math.rad(90))
 	Turn(CoverR1, y_axis, math.rad(-90), math.rad(90))
 	
@@ -90,6 +86,9 @@ local function Open()
 		Sleep(500)
 	end
 	
+	-- set values
+	SetUnitValue(COB.YARD_OPEN, 1)
+	SetUnitValue(COB.BUGGER_OFF, 1)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 end
 
