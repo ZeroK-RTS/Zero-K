@@ -68,6 +68,7 @@ local allianceToReveal
 
 local finishedUnits = {} -- this stores a list of all units that have ever been completed, so it can distinguish between incomplete and partly reclaimed units
 local toDestroy = {}
+local alliancesToDestroy
 
 local modOptions = Spring.GetModOptions() or {}
 local commends = tobool(modOptions.commends)
@@ -287,7 +288,12 @@ local function RevealAllianceUnits(allianceID)
 end
 
 -- purge the alliance! for the horde!
-local function DestroyAlliance(allianceID, skipCheck)
+local function DestroyAlliance(allianceID, delayLossToNextGameFrame)
+	if delayLossToNextGameFrame then
+		alliancesToDestroy = alliancesToDestroy or {}
+		alliancesToDestroy[#alliancesToDestroy + 1] = allianceID
+		return
+	end
 	if not destroyedAlliances[allianceID] then
 		destroyedAlliances[allianceID] = true
 		local teamList = spGetTeamList(allianceID)
@@ -419,7 +425,7 @@ local function CheckMissionDefeatOnUnitLoss(unitID, allianceID)
 	return true
 end
 
-local function RemoveAllianceUnit(unitID, unitDefID, teamID)
+local function RemoveAllianceUnit(unitID, unitDefID, teamID, delayLossToNextGameFrame)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
 	aliveCount[teamID] = aliveCount[teamID] - 1
 	
@@ -443,17 +449,17 @@ local function RemoveAllianceUnit(unitID, unitDefID, teamID)
 	if campaignBattleID then
 		if CheckMissionDefeatOnUnitLoss(unitID, allianceID) then
 			Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Purging allyTeam " .. allianceID)
-			DestroyAlliance(allianceID)
+			DestroyAlliance(allianceID, delayLossToNextGameFrame)
 		end
 		return
 	elseif vitalConstructorAllyTeam[allianceID] and HasNoVitalUnits(allianceID) then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Purging allyTeam " .. allianceID)
-		DestroyAlliance(allianceID)
+		DestroyAlliance(allianceID, delayLossToNextGameFrame)
 	end
 	
 	if (CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)) then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Purging allyTeam " .. allianceID)
-		DestroyAlliance(allianceID)
+		DestroyAlliance(allianceID, delayLossToNextGameFrame)
 	end
 end
 
@@ -665,7 +671,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeam)
 	  and (not doesNotCountList[unitDefID])
 	  and finishedUnits[unitID]
 	then
-		RemoveAllianceUnit(unitID, unitDefID, oldTeamID)
+		RemoveAllianceUnit(unitID, unitDefID, oldTeamID, true)
 	end
 end
 
@@ -697,6 +703,14 @@ function gadget:GameFrame(n)
 			end
 		end
 		toDestroy[n] = nil
+	end
+	
+	
+	if alliancesToDestroy then
+		for i = 1, #alliancesToDestroy do
+			DestroyAlliance(alliancesToDestroy[i])
+		end
+		alliancesToDestroy = nil
 	end
 	
 	-- check for last ally:
