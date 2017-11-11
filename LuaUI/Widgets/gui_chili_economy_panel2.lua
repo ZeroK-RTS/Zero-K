@@ -675,7 +675,7 @@ function widget:GameFrame(n)
 	local netEnergy = eInco - realEnergyPull
 	
 	local metalWarning = (mStor > 1 and mCurr > mStor * options.metalWarning.value) or (mStor <= 1 and netMetal > 0)
-	local energyWarning = eStor > 1 and eCurr < eStor * options.energyWarning.value
+	local energyWarning = (eStor > 1 and eCurr < eStor * options.energyWarning.value) or ((not metalWarning) and eStor <= 1 and eInco < mInco)
 	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
 	energyWarningPanel.ShowWarning(energyWarning)
 	
