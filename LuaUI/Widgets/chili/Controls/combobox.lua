@@ -54,7 +54,7 @@ function ComboBox:Select(itemIdx)
     self.selected = itemIdx
 
     if type(item) == "string" and not self.ignoreItemCaption then
-		self.caption = ""
+        self.caption = ""
         self.caption = item
     end
     self:CallListeners(self.OnSelect, itemIdx, true)
@@ -70,6 +70,7 @@ function ComboBox:Select(itemIdx)
 end
 
 function ComboBox:_CloseWindow()
+  self.labels = nil
   if self._dropDownWindow then
     self:CallListeners(self.OnClose)
     self._dropDownWindow:Dispose()
@@ -84,6 +85,13 @@ end
 
 function ComboBox:FocusUpdate()
   if not self.state.focused then
+    if self.labels then
+      for i = 1, #self.labels do
+        if self.labels[i].state.pressed then
+          return
+        end
+      end
+    end
     self:_CloseWindow()
   end
 end
@@ -92,12 +100,12 @@ function ComboBox:MouseDown(x, y)
   self.state.pressed = true
   if not self._dropDownWindow then
     local sx,sy = self:LocalToScreen(0,0)
-	
-	local selectByName = self.selectByName
+    
+    local selectByName = self.selectByName
     local labels = {}
 
     local width = math.max(self.width, self.minDropDownWidth)
-    local height = 7
+    local height = 10
     for i = 1, #self.items do
       local item = self.items[i]
       if type(item) == "string" then
@@ -105,16 +113,18 @@ function ComboBox:MouseDown(x, y)
             caption = item,
             width = '100%',
             height = self.itemHeight,
-			fontsize = self.itemFontSize,
+            fontsize = self.itemFontSize,
             state = {focused = (i == self.selected), selected = (i == self.selected)},
-            OnMouseUp = { function()
-              if selectByName then
-                self:Select(item)
-			  else
-                self:Select(i)
-              end
-              self:_CloseWindow()
-            end }
+            OnMouseUp = { 
+              function()
+                if selectByName then
+                  self:Select(item)
+                else
+                  self:Select(i)
+                end
+                self:_CloseWindow()
+              end 
+            }
           }
           labels[#labels+1] = newBtn
           height = height + self.itemHeight
@@ -130,6 +140,8 @@ function ComboBox:MouseDown(x, y)
       end
     end
 
+    self.labels = labels
+
     height = math.max(self.minDropDownHeight, height)
     height = math.min(self.maxDropDownHeight, height)
     width = math.min(self.maxDropDownWidth, width)
@@ -144,7 +156,7 @@ function ComboBox:MouseDown(x, y)
       parent = screen,
       width  = width,
       height = height,
-	  minHeight = self.minDropDownHeight,
+      minHeight = self.minDropDownHeight,
       x = math.max(sx, math.min(sx + self.width - width, (sx + x - width/2))) + self.selectionOffsetX,
       y = y + self.selectionOffsetY,
       children = {
