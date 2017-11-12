@@ -50,6 +50,39 @@ local optionGenerationTable = {
 		default = true,
 		path = "Settings/Interface",
 	},
+	{
+		optionWidget = "Showeco and Grid Drawer",
+		optionPath = "Settings/Interface/Economy Overlay",
+		optionName = "start_with_showeco",
+		name = "Start with economy overlay",
+		desc = "Enable the economy overlay when the game starts.",
+		type = "bool",
+		default = false,
+		path = "Settings/Interface",
+	},
+	{
+		optionName = "unitPlatter",
+		optionFunction = function(self) Spring.SendCommands{"luaui togglewidget Fancy Teamplatter"} end,
+		name = "Toggle Unit Platter",
+		desc = "Puts a team-coloured platter-halo below units.",
+		type = "button",
+		path = "Settings/Interface",
+	},
+	{
+		optionWidget = "Color Blindness Correction",
+		optionPath = "Settings/Graphics/Accessibility/Color Blindness Correction",
+		optionName = "cbcType",
+		name = "Color Blindness Correction",
+		type = "radioButton",
+		default = "none",
+		items = {
+			{key = "none", name = "None"},
+			{key = "protanopia", name="Protanopia - missing RED"},
+			{key = "deuteranopia", name="Deuteranopia - missing GREEN"},
+			{key = "tritanopia", name="Tritanopia - missing BLUE"},
+		},
+		path = "Settings/Interface",
+	},
 }
 
 local function AddOption(optionData)
@@ -58,9 +91,14 @@ local function AddOption(optionData)
 		desc = optionData.desc,
 		type = optionData.type,
 		value = optionData.default,
+		items = optionData.items,
 		OnChange = function (self)
 			if initializationComplete then
-				WG.SetWidgetOption(optionData.optionWidget, optionData.optionPath, optionData.optionName, self.value)
+				if optionData.optionFunction then
+					optionData.optionFunction(self)
+				else
+					WG.SetWidgetOption(optionData.optionWidget, optionData.optionPath, optionData.optionName, self.value)
+				end
 			end
 		end,
 		noHotkey = true,
