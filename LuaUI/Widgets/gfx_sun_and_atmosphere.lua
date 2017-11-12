@@ -76,6 +76,11 @@ local function LoadSunAndFogSettings()
 			options[name].value = value
 		end
 	end
+
+	local water = OVERRIDE_CONFIG.water
+	if water then
+		Spring.SetWaterParams(water)
+	end
 end
 
 local function LoadMinimapSettings()
