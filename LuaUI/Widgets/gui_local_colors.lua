@@ -98,12 +98,23 @@ local function UpdateColorConfig(self)
 end
 
 local function UpdateSimpleEnemyColor(self)
-	if self.value == "auto" then
+	if self.value == "auto" or self.value == "autoffa" then
 		if campaignBattleID then
 			colorEnemiesByAllyTeam = true
+		elseif self.value == "autoffa" then
+			local teamList = Spring.GetTeamList()
+			local allyTeamSeen = {}
+			local allyTeamCount = 0
+			for i = 1, #teamList do
+				local allyTeam = select(6, Spring.GetTeamInfo(teamList[i]))
+				if not allyTeamSeen[allyTeam] then
+					allyTeamCount = allyTeamCount + 1
+					allyTeamSeen[allyTeam] = true
+				end
+			end
+			colorEnemiesByAllyTeam = (allyTeamCount > 3)
 		else
-			local allyTeams = Spring.GetAllyTeamList()
-			colorEnemiesByAllyTeam = allyTeams and (#allyTeams > 3)
+			colorEnemiesByAllyTeam = false
 		end
 	else
 		colorEnemiesByAllyTeam = (self.value == "enable")
@@ -135,15 +146,16 @@ options = {
 		type = 'radioButton',
 		value = 'auto',
 		items = {
-			{name = 'Enable', key = 'enable', desc = "Always colour enemies by team."},
-			{name = 'Automatic', key = 'auto', desc = "Colour enemies by team in missions and FFA."},
-			{name = 'Disable', key = 'disable', desc = "Never colour enemies by team."},
+			{name = 'Always', key = 'enable', desc = "Always colour enemies by team."},
+			{name = 'Missions and FFA', key = 'autoffa', desc = "Colour enemies by team in missions and FFA."},
+			{name = 'Missions', key = 'auto', desc = "Colour enemies by team in missions."},
+			{name = 'Never', key = 'disable', desc = "Never colour enemies by team."},
 		},
 		OnChange = function(self)
 			UpdateSimpleEnemyColor(self)
 			UpdateColor()
 		end,
-	}
+	},
 }
 
 --------------------------------------------------------------------------------
