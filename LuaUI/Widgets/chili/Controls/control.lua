@@ -1037,7 +1037,7 @@ function Control:HitTest(x,y)
       end
       --//an option that allow you to mouse click on empty panel
       if self.hitTestAllowEmpty then 
-      	return self 
+        return self 
       end
     end
   end
@@ -1048,7 +1048,11 @@ function Control:HitTest(x,y)
       return nchit
     end
   end
-
+  
+  if self.noClickThrough then
+    return self
+  end
+  
   return false
 end
 
@@ -1076,6 +1080,10 @@ function Control:MouseDown(x, y, ...)
     if (result) then
       return result
     end
+  end
+
+  if self.noClickThrough then
+    return self
   end
 end
 

@@ -552,6 +552,7 @@ local function GetBackground(parent)
 		draggable = false,
 		resizable = false,
 		backgroundColor = {1, 1, 1, opacity},
+		noClickThrough = true,
 		parent = parent,
 	}
 	

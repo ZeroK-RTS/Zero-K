@@ -1280,7 +1280,7 @@ local function GetTabPanel(parent, rows, columns)
 		right = 0,
 		bottom = 0,
 		padding = {0, 0, 0, 0},
-		itemMargin  = {1, 1, 1, -1},
+		itemMargin  = {0, 1, 0, -1},
 		parent = parent,
 		preserveChildrenOrder = true,
 		resizeItems = true,
@@ -1411,6 +1411,16 @@ local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, selectio
 	end
 end
 
+local function SetIntegralVisibility(visible)
+	background:SetVisibility(visible)
+	UpdateBackgroundSkin()
+	
+	WG.IntegralVisible = visible
+	if WG.CoreSelector then
+		WG.CoreSelector.SetSpecSpaceVisible(visible)
+	end
+end
+
 local function ProcessAllCommands(commands, customCommands)
 	local factoryUnitID, factoryUnitDefID, fakeFactory, selectedUnitCount = GetSelectionValues()
 
@@ -1491,15 +1501,8 @@ local function ProcessAllCommands(commands, customCommands)
 		lastTabSelected = tabToSelect
 	end
 	
-	-- Keeps main window for tweak mode.
-	local visible = not (#tabsToShow == 0 and selectedUnitCount == 0)
-	background:SetVisibility(visible)
-	UpdateBackgroundSkin()
-	
-	WG.IntegralVisible = visible
-	if WG.CoreSelector then
-		WG.CoreSelector.SetSpecSpaceVisible(visible)
-	end
+	-- Keeps main window for tweak mode.SetIntegralVisibility(visible)
+	SetIntegralVisibility(not (#tabsToShow == 0 and selectedUnitCount == 0))
 end
 
 --------------------------------------------------------------------------------
@@ -1565,6 +1568,7 @@ local function InitializeControls()
 		resizable = false,
 		padding = {0, 0, 0, 0},
 		backgroundColor = {1, 1, 1, options.background_opacity.value},
+		noClickThrough = true,
 		parent = mainWindow,
 	}
 	
@@ -1638,6 +1642,8 @@ local function InitializeControls()
 	statePanel.holder:SetVisibility(false)
 	
 	statePanel.buttons = GetButtonPanel(statePanel.holder, 5, 3, true, buttonLayoutConfig.command)
+	
+	SetIntegralVisibility(false)
 end
 
 --------------------------------------------------------------------------------

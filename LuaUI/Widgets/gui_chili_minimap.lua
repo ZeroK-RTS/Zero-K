@@ -717,7 +717,8 @@ MakeMinimapWindow = function()
 		
 		margin = {0,0,0,0},
 		padding = {8,8,8,8},
-		backgroundColor = bgColor_panel
+		backgroundColor = bgColor_panel,
+		noClickThrough = true,
 	}
 
 	buttons_panel = Chili.StackPanel:New{
