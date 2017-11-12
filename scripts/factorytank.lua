@@ -15,6 +15,8 @@ local track1, track2, track3 = piece ("track_1", "track_2", "track_3")
 
 local open = false
 
+local SIG_ANIM = 1
+
 local function GetDisabled()
 	return Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID,"disarmed") == 1)
 end
@@ -135,12 +137,6 @@ local function Close()
 	end
 end
 
-local function DelayedClose()
-	SetSignalMask(SIG_ANIM)
-	Sleep(5000)
-	StartThread(Close)
-end
-
 function script.Create()
 	StartThread(SmokeUnit, {pipe, lidh2, piece "smoke_1"})
 	Spring.SetUnitNanoPieces(unitID, {emit})
@@ -159,7 +155,6 @@ end
 local firstDeactivate = true
 function script.Deactivate()
 	if firstDeactivate then
-		StartThread(DelayedClose)
 		firstDeactivate = false
 		return
 	end

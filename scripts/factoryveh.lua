@@ -142,12 +142,6 @@ local function Close()
 	Turn(Lid, x_axis, 0, math.rad(45))
 end
 
-local function DelayedClose()
-	SetSignalMask(SIG_OPEN)
-	Sleep(5000)
-	StartThread(Close)
-end
-
 local function MoveTrain()
 	Signal(SIG_TRAIN)
 	SetSignalMask(SIG_TRAIN)
@@ -196,7 +190,6 @@ end
 local firstDeactivate = true
 function script.Deactivate()
 	if firstDeactivate then
-		StartThread(DelayedClose)
 		firstDeactivate = false
 		return
 	end
