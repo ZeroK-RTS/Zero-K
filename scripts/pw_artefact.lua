@@ -16,22 +16,22 @@ local function Initialize()
 	Spin(turret, y_axis, -1, 0.01)
 
 	while (true) do
-		Move(pumpcylinders, y_axis, -11, 15)
+		Move(pumpcylinders, z_axis, -11, 15)
 		Turn(pump1, x_axis, -1.4, 2)
 		Turn(pump2, z_axis, -1.4, 2)
 		Turn(pump3, z_axis, 1.4, 2)
 
-		WaitForMove(pumpcylinders, y_axis)
+		WaitForMove(pumpcylinders, z_axis)
 		WaitForTurn(pump1, x_axis) 
 		WaitForTurn(pump2, z_axis) 
 		WaitForTurn(pump3, z_axis) 
 
-		Move(pumpcylinders, y_axis, 0, 15)
+		Move(pumpcylinders, z_axis, 0, 15)
 		Turn(pump1, x_axis, 0, 2)
 		Turn(pump2, z_axis, 0, 2)
 		Turn(pump3, z_axis, 0, 2)
 
-		WaitForMove(pumpcylinders, y_axis)
+		WaitForMove(pumpcylinders, z_axis)
 		WaitForTurn(pump1, x_axis)
 		WaitForTurn(pump2, z_axis)
 		WaitForTurn(pump3, z_axis)

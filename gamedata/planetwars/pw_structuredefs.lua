@@ -35,7 +35,7 @@ local fakeWeapons = {
 local structureConfig = {
 	generic_tech = function(unitDef)
 		unitDef.maxdamage = 10000
-		unitDef.objectname = "pw_techlab.obj"
+		unitDef.objectname = "pw_techlab.dae"
 		unitDef.script = "pw_techlab.lua"
 		unitDef.footprintx = 8
 		unitDef.footprintz = 9
@@ -50,7 +50,7 @@ local structureConfig = {
 		unitDef.maxdamage = 100000
 		unitDef.name = "Ancient Artefact"
 		unitDef.description = "Mysterious Relic"
-		unitDef.objectname = "pw_artefact.obj"
+		unitDef.objectname = "pw_artefact.dae"
 		unitDef.script = "pw_artefact.lua"
 		unitDef.icontype = [[pw_special]]
 		
@@ -71,7 +71,7 @@ local structureConfig = {
 		unitDef.maxdamage = 25000
 		unitDef.name = "Dropship Factory"
 		unitDef.description = "Produces dropships"
-		unitDef.objectname = "pw_dropfac.obj"
+		unitDef.objectname = "pw_dropfac.dae"
 		unitDef.icontype = [[pw_dropfac]]
 		unitDef.script = "pw_dropfac.lua"
 		
@@ -107,7 +107,7 @@ local structureConfig = {
 		unitDef.maxdamage = 20000
 		unitDef.name = "Bomber Factory"
 		unitDef.description = "Produces bombers"
-		unitDef.objectname = "pw_dropdepot.obj"
+		unitDef.objectname = "pw_dropdepot.dae"
 		unitDef.script = "pw_bomberfac.lua"
 		unitDef.icontype = [[pw_bomberfac]]
 		unitDef.waterline = 30
@@ -146,7 +146,7 @@ local structureConfig = {
 		unitDef.maxdamage = 10000
 		unitDef.name = "Power Generator Unit"
 		unitDef.description = "Produces 50 energy/turn" 
-		unitDef.objectname = "pw_mine2.obj"
+		unitDef.objectname = "pw_mine2.dae"
 		unitDef.script = "pw_mine2.lua"
 		unitDef.icontype = [[pw_energy]]
 		
@@ -170,7 +170,7 @@ local structureConfig = {
 		unitDef.maxdamage = 16000
 		unitDef.name = "Orbital Solar Array"
 		unitDef.description = "Produces 100 energy/turn" 
-		unitDef.objectname = "pw_mine.obj"
+		unitDef.objectname = "pw_mine.dae"
 		unitDef.script = "pw_mine.lua"
 		
 		unitDef.customparams = unitDef.customparams or {}
@@ -196,7 +196,7 @@ local structureConfig = {
 		unitDef.maxdamage = 24000
 		unitDef.name = "Planetary Geothermal Tap"
 		unitDef.description = "Produces 250 energy/turn" 
-		unitDef.objectname = "pw_mine3.obj"
+		unitDef.objectname = "pw_mine3.dae"
 		unitDef.script = "pw_mine3.lua"
 		unitDef.icontype = [[pw_energy2]]
 		
@@ -223,7 +223,7 @@ local structureConfig = {
 		unitDef.maxdamage = 16000
 		unitDef.name = "Field Garrison"
 		unitDef.description = "Reduces Influence gain"
-		unitDef.objectname = "pw_wormhole.obj"
+		unitDef.objectname = "pw_wormhole.dae"
 		unitDef.icontype = [[pw_defense]]
 		unitDef.script = "pw_wormhole.lua"
 		
@@ -275,7 +275,7 @@ local structureConfig = {
 		unitDef.maxdamage = 20000
 		unitDef.name = "Planetary Defense Grid"
 		unitDef.description = "Defends against everything"
-		unitDef.objectname = "pw_wormhole2.obj"
+		unitDef.objectname = "pw_wormhole2.dae"
 		unitDef.icontype = [[pw_defense2]]
 		unitDef.script = "pw_wormhole2.lua"
 		
@@ -302,7 +302,7 @@ local structureConfig = {
 		unitDef.maxdamage = 12500
 		unitDef.name = "Wormhole Generator"
 		unitDef.description = "Links this planet to nearby planets"
-		unitDef.objectname = "pw_estorage.obj"
+		unitDef.objectname = "pw_estorage.dae"
 		unitDef.icontype = [[pw_wormhole]]
 		
 		unitDef.footprintx = 3
@@ -323,7 +323,7 @@ local structureConfig = {
 		unitDef.maxdamage = 17500
 		unitDef.name = "Improved Wormhole"
 		unitDef.description = "Links this planet to nearby planets"
-		unitDef.objectname = "pw_gaspowerstation.obj"
+		unitDef.objectname = "pw_gaspowerstation.dae"
 		unitDef.script = "pw_gaspowerstation.lua"
 		unitDef.icontype = [[pw_wormhole2]]
 		
@@ -346,7 +346,7 @@ local structureConfig = {
 		unitDef.maxdamage = 15000
 		unitDef.name = "Warp Gate"
 		unitDef.description = "Produces warp cores"
-		unitDef.objectname = "pw_techlab.obj"
+		unitDef.objectname = "pw_techlab.dae"
 		unitDef.script = "pw_techlab.lua"
 		unitDef.icontype = [[pw_warpgate]]
 		
@@ -363,7 +363,7 @@ local structureConfig = {
 		unitDef.maxdamage = 12000
 		unitDef.name = "Warp Jammer"
 		unitDef.description = "Prevents warp attacks"
-		unitDef.objectname = "pw_warpgate.obj"
+		unitDef.objectname = "pw_warpgate.dae"
 		unitDef.script = "pw_warpgate.lua"
 		unitDef.icontype = [[pw_jammer]]
 		
@@ -395,7 +395,7 @@ local structureConfig = {
 		unitDef.maxdamage = 15000
 		unitDef.name = "Wormhole Inhibitor"
 		unitDef.description = "Blocks Influence Spread"
-		unitDef.objectname = "pw_mstorage2.obj"
+		unitDef.objectname = "pw_mstorage2.dae"
 		unitDef.icontype = [[pw_riot]]
 		
 		unitDef.footprintx = 7
@@ -414,7 +414,7 @@ local structureConfig = {
 		unitDef.maxdamage = 15000
 		unitDef.name = "Guerilla Jumpgate"
 		unitDef.description = "Spreads Influence remotely"
-		unitDef.objectname = "pw_gaspowerstation.obj"
+		unitDef.objectname = "pw_gaspowerstation.dae"
 		unitDef.script = "pw_gaspowerstation.lua"
 		
 		unitDef.footprintx = 6
@@ -437,7 +437,7 @@ local structureConfig = {
 		unitDef.maxdamage = 10000
 		unitDef.name = "Ancient Fabricator"
 		unitDef.description = "Produces Metal out of thin air (+10)" 
-		unitDef.objectname = "pw_mine3.obj"
+		unitDef.objectname = "pw_mine3.dae"
 		unitDef.script = "pw_mine3.lua"
 		unitDef.icontype = [[pw_metal]]
 		
@@ -464,7 +464,7 @@ local structureConfig = {
 		unitDef.buildcostmetal = 1000
 		unitDef.name = "Tech Lab"
 		unitDef.description = "Contains powerful ancient technology" 
-		unitDef.objectname = "pw_techlab.obj"
+		unitDef.objectname = "pw_techlab.dae"
 		unitDef.script = "pw_techlab.lua"
 		unitDef.footprintx = 8
 		unitDef.footprintz = 9
@@ -484,7 +484,7 @@ local structureConfig = {
 		unitDef.maxdamage = 15000
 		unitDef.name = "Gas Power Station"
 		unitDef.description = "Produces Energy"
-		unitDef.objectname = "pw_gaspowerstation.obj"
+		unitDef.objectname = "pw_gaspowerstation.dae"
 		unitDef.script = "pw_gaspowerstation.lua"
 		
 		unitDef.footprintx = 6
@@ -502,7 +502,7 @@ local structureConfig = {
 		unitDef.maxdamage = 15000
 		unitDef.name = "Metal Storage"
 		unitDef.description = "Stores metal"
-		unitDef.objectname = "pw_mstorage2.obj"
+		unitDef.objectname = "pw_mstorage2.dae"
 		
 		unitDef.footprintx = 7
 		unitDef.footprintz = 5
@@ -519,7 +519,7 @@ local structureConfig = {
 		unitDef.maxdamage = 10000
 		unitDef.name = "Energy Storage"
 		unitDef.description = "Stores energy"
-		unitDef.objectname = "pw_estorage.obj"
+		unitDef.objectname = "pw_estorage.dae"
 		
 		unitDef.footprintx = 3
 		unitDef.footprintz = 3
@@ -536,7 +536,7 @@ local structureConfig = {
 		unitDef.maxdamage = 15000
 		unitDef.name = "Double Energy Storage"
 		unitDef.description = "Stores energy"
-		unitDef.objectname = "pw_estorage2.obj"
+		unitDef.objectname = "pw_estorage2.dae"
 		
 		unitDef.footprintx = 5
 		unitDef.footprintz = 3
@@ -553,7 +553,7 @@ local structureConfig = {
 		unitDef.maxdamage = 15000
 		unitDef.name = "Warp Gate"
 		unitDef.description = "Produces warp cores"
-		unitDef.objectname = "pw_warpgate.obj"
+		unitDef.objectname = "pw_warpgate.dae"
 		unitDef.script = "pw_warpgate.lua"
 		
 		unitDef.footprintx = 8
@@ -569,6 +569,26 @@ local structureConfig = {
 		unitDef.collisionvolumetype	= [[CylY]]
 		
 		unitDef.featuredefs.dead.object = "pw_warpgate_dead.dae"
+	end,
+	
+	pw_relay = function(unitDef)
+		unitDef.maxdamage = 6000
+		unitDef.name = "Communication Relay"
+		unitDef.description = "Sends messages across the void"
+		unitDef.objectname = "pw_warpgate_alt.dae"
+		unitDef.script = "pw_warpgate_alt.lua"
+		unitDef.icontype = [[pw_relay]]
+		
+		unitDef.footprintx = 4
+		unitDef.footprintz = 4
+		
+		unitDef.customparams.soundselect = "radar_select"
+		unitDef.customparams.statsname = "pw_warpgate_alt"
+		
+		unitDef.collisionvolumescales = [[55 70 55]]
+		unitDef.collisionvolumetype	= [[CylY]]
+		
+		unitDef.featuredefs.dead.object = "pw_warpgate_alt_dead.dae"
 	end,
 }
 

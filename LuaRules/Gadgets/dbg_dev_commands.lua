@@ -470,6 +470,24 @@ local function give(cmd,line,words,player)
 	Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
 end
 
+local function PlanetwarsGive(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	
+	local INCREMENT = 128
+	local index = 1
+	for unitDefID = 1, #UnitDefs do
+		local ud = UnitDefs[unitDefID]
+		if ud and string.find(ud.name, "pw_") then
+			local x, z = INCREMENT, index*INCREMENT
+			local y = Spring.GetGroundHeight(x,z)
+			local unitID = Spring.CreateUnit(unitDefID, x, y, z, 0, 0, build)
+			index = index + 1
+		end
+	end
+end
+
 local function ColorTest(cmd,line,words,player)
 	if not spIsCheatingEnabled() then
 		return
@@ -701,6 +719,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"bisect",bisect,"Bisect gadget disables.")
 	gadgetHandler.actionHandler.AddChatAction(self,"circle",circleGive,"Gives a bunch of units in a circle.")
 	gadgetHandler.actionHandler.AddChatAction(self,"give",give,"Like give all but without all the crap.")
+	gadgetHandler.actionHandler.AddChatAction(self,"pw",PlanetwarsGive,"Spawns all planetwars structures.")
 	gadgetHandler.actionHandler.AddChatAction(self,"gk",gentleKill,"Gently kills everything.")
 	gadgetHandler.actionHandler.AddChatAction(self,"nf",nanoFrame,"Sets nanoframe values.")
 	gadgetHandler.actionHandler.AddChatAction(self,"rez",rezAll,"Resurrects wrecks for former owners.")

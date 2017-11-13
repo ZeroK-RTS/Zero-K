@@ -1224,6 +1224,11 @@ local icontypes = {
 	distance = 1.2,
     size = 3.0,
   },
+  pw_relay = {
+    bitmap='icons/pw_interception.png',
+	distance = 1.2,
+    size = 2.0,
+  },
   pw_jammer = {
     bitmap='icons/pw_jammer.png',
 	distance = 1.0,
