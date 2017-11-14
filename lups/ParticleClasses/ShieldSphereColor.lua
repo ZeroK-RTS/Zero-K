@@ -83,6 +83,9 @@ function ShieldSphereColorParticle:Draw()
   glCallList(sphereList[self.shieldSize])
   if self.drawBack then
     gl.Scale(1,1,-1)
+    if pos[3] ~= 0 then
+      glMultiTexCoord(3, pos[1], pos[2], -pos[3], 0)
+    end
     glMultiTexCoord(1, col1[1],col1[2],col1[3],(col1[4] or 1)*self.drawBack)
     glMultiTexCoord(2, col2[1],col2[2],col2[3],(col2[4] or 1)*self.drawBack)
     if self.drawBackMargin then

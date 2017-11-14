@@ -72,8 +72,13 @@ function ShieldSphereColorFallback:Draw()
   })
 
   gl.Scale(self.size, self.size, self.size)
-  --gl.Texture("bitmaps/PD/shield3mist.png")
+  if self.texture then
+    gl.Texture(self.texture)
+  end
   gl.CallList(self.SphereList[self.shieldSize])
+  if self.texture then
+    gl.Texture(false)
+  end
 end
 
 -----------------------------------------------------------------------------------------------------------------

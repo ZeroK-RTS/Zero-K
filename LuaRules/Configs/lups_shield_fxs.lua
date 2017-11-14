@@ -17,8 +17,8 @@ local SEARCH_SMALL = {
 	{0, -1},
 }
 
-local SEARCH_MULT = 1.05
-local SEARCH_BASE = 20
+local SEARCH_MULT = 1
+local SEARCH_BASE = 16
 local DIAG = 1/math.sqrt(2)
 
 local SEARCH_LARGE = {
@@ -70,7 +70,7 @@ for unitDefID = 1, #UnitDefs do
 		end
 		myShield.size = radius
 		myShield.radius = radius
-		myShield.pos = {0, tonumber(ud.customParams.shield_emit_height) or 0, 0}
+		myShield.pos = {0, tonumber(ud.customParams.shield_emit_height) or 0, tonumber(ud.customParams.shield_emit_offset) or 0}
 		
 		local strengthMult = tonumber(ud.customParams.shield_color_mult)
 		if strengthMult then
@@ -78,10 +78,19 @@ for unitDefID = 1, #UnitDefs do
 			myShield.colormap1[2][4] = strengthMult*myShield.colormap1[2][4]
 		end
 		
+		local fxTable = {
+			{class = 'ShieldSphereColor', options = myShield},
+		}
+		
+		if string.find(ud.name, "chicken_") then
+			myShield.colormap1 = {{0.3, 0.9, 0.2, 1.2}, {0.6, 0.4, 0.1, 1.2}} -- Note that alpha is multiplied by 0.26
+			myShield.hitResposeMult = 0
+			myShield.texture = "bitmaps/GPL/bubbleShield.png"
+			fxTable[1].class = "ShieldSphereColorFallback"
+		end
+		
 		shieldUnitDefs[unitDefID] = { 
-			fx = {
-				{class = 'ShieldSphereColor', options = myShield},
-			},
+			fx = fxTable,
 			search = searchSizes[radius],
 			shieldCapacity = tonumber(ud.customParams.shield_power),
 		}

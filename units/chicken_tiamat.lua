@@ -16,7 +16,9 @@ unitDef = {
   category            = [[LAND FIREPROOF]],
 
   customParams        = {
-    fireproof      = 1,
+    fireproof          = 1,
+    shield_emit_height = 32,
+    shield_emit_offset = -4,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -204,10 +206,12 @@ unitDef = {
       shieldRadius            = 300,
       shieldRepulser          = false,
       smartShield             = true,
-      texture1                = [[wake]],
-      visibleShield           = true,
-      visibleShieldHitFrames  = 30,
+      visibleShield           = false,
       visibleShieldRepulse    = false,
+      --texture1                = [[wake]],
+      --visibleShield           = true,
+      --visibleShieldHitFrames  = 30,
+      --visibleShieldRepulse    = false,
       weaponType              = [[Shield]],
     },
 
