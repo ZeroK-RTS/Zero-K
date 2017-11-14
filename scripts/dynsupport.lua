@@ -6,6 +6,7 @@ local spSetUnitShieldState = Spring.SetUnitShieldState
 
 -- pieces
 local base = piece 'base' 
+local shield = piece 'shield' 
 local pelvis = piece 'pelvis' 
 local turret = piece 'turret' 
 local torso = piece 'torso' 
@@ -418,7 +419,7 @@ function script.QueryWeapon(num)
 	if dyncomm.GetWeapon(num) == 1 or dyncomm.GetWeapon(num) == 2 then 
 		return flare
 	end
-	return pelvis
+	return shield
 end
 
 local function AimRifle(heading, pitch, isDgun)

@@ -38,8 +38,8 @@ local shieldUnitDefs = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	
-	if ud.customParams.shield_radius or ud.customParams.dyn_shield_radius then
-		local radius = tonumber(ud.customParams.shield_radius or ud.customParams.dyn_shield_radius)
+	if ud.customParams.shield_radius then
+		local radius = tonumber(ud.customParams.shield_radius)
 		Spring.Echo(ud.name, radius)
 		if not searchSizes[radius] then
 			local searchType = (radius > 250 and SEARCH_LARGE) or SEARCH_SMALL
@@ -83,7 +83,7 @@ for unitDefID = 1, #UnitDefs do
 				{class = 'ShieldSphereColor', options = myShield},
 			},
 			search = searchSizes[radius],
-			shieldCapacity = tonumber(ud.customParams.shield_power or ud.customParams.dyn_shield_power),
+			shieldCapacity = tonumber(ud.customParams.shield_power),
 		}
 	end
 end

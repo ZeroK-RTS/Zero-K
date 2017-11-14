@@ -19,6 +19,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    shield_emit_height = 17,
   },
 
   explodeAs           = [[BIG_UNITEX]],

@@ -70,7 +70,7 @@ local copy = {
 			mainstats = {maxdamage = 6000, autoheal = 35, objectname = "armcom5.3do", collisionvolumescales  = [[65 70 65]], aimposoffset = [[0 9 0]],},
 			customparams = {modelradius = [[35]],},
 			wreckmodel = "armcom5_dead.s3o",
-		},		
+		},
 	},
 	corcom1 = {
 		corcom0 = {
@@ -99,7 +99,7 @@ local copy = {
 			mainstats = {maxdamage = 7200, objectname = "corcomAlt5.s3o", aimposoffset = [[0 9 0]], },
 			customparams = {damagebonus = "0.1"},
 			wreckmodel = "corcom5_dead.s3o",
-		},		
+		},
 	},
 	commrecon1 = {
 		commrecon0 = {
@@ -128,7 +128,7 @@ local copy = {
 			mainstats = {maxdamage = 3600, objectname = "commrecon5.s3o", aimposoffset = [[0 18 0]]},
 			customparams = {},
 			wreckmodel = "commrecon5_dead.s3o",
-		},		
+		},
 	},
 	commsupport1 = {
 		commsupport0 = {
@@ -157,7 +157,7 @@ local copy = {
 			mainstats = {maxdamage = 4500, workertime = 20, description = "Econ/Support Commander, Builds at 20 m/s", objectname = "commsupport5.s3o", aimposoffset = [[0 25 0]],},
 			customparams = {},
 			wreckmodel = "commsupport5_dead.s3o",
-		},		
+		},
 	},
 	cremcom1 = {
 		cremcom0 = {
@@ -186,7 +186,7 @@ local copy = {
 			mainstats = {maxdamage = 6000, autoheal = 35, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
 			customparams = {modelradius = [[35]],},
 			wreckmodel = "cremcom5_dead.s3o",
-		},			
+		},
 	},
 	benzcom1 = {
 		benzcom0 = {
@@ -244,7 +244,7 @@ local copy = {
 			mainstats = {maxdamage = 6000, objectname = "strikecom_4.dae", collisionvolumescales  = [[60 72 60]],},
 			customparams = {modelradius = [[36]],},
 			wreckmodel = "strikecom_dead_4.dae",
-		},		
+		},
 	},
 	dynstrike1 = {
 		dynstrike0 = {
@@ -273,7 +273,7 @@ local copy = {
 			mainstats = {maxdamage = 6400, objectname = "strikecom_4.dae", collisionvolumescales  = [[60 72 60]],},
 			customparams = {modelradius = [[36]],},
 			wreckmodel = "strikecom_dead_4.dae",
-		},		
+		},
 	},
 	dynrecon1 = {
 		dynrecon0 = {
@@ -302,36 +302,37 @@ local copy = {
 			mainstats = {maxdamage = 4000, objectname = "commrecon5.s3o", aimposoffset = [[0 18 0]]},
 			customparams = {},
 			wreckmodel = "commrecon5_dead.s3o",
-		},		
+		},
 	},
 	dynsupport1 = {
 		dynsupport0 = {
 			level = 0,
+			customparams = {shield_emit_height = 36},
 		},
 		dynsupport2 = {
 			level = 2,
 			mainstats = {maxdamage = 3400, objectname = "commsupport2.s3o", aimposoffset = [[0 17 0]]},
-			customparams = {},
+			customparams = {shield_emit_height = 39.6},
 			wreckmodel = "commsupport2_dead.s3o",
 		},
 		dynsupport3 = {
 			level = 3,
 			mainstats = {maxdamage = 3800, objectname = "commsupport3.s3o", aimposoffset = [[0 19 0]],},
-			customparams = {},
+			customparams = {shield_emit_height = 43.62},
 			wreckmodel = "commsupport3_dead.s3o",
 		},
 		dynsupport4 = {
 			level = 4,
 			mainstats = {maxdamage = 4500, objectname = "commsupport4.s3o", aimposoffset = [[0 22 0]],},
-			customparams = {},
+			customparams = {shield_emit_height = 45},
 			wreckmodel = "commsupport4_dead.s3o",
 		},
 		dynsupport5 = {
 			level = 5,
 			mainstats = {maxdamage = 5000, objectname = "commsupport5.s3o", aimposoffset = [[0 25 0]],},
-			customparams = {},
+			customparams = {shield_emit_height = 46.48},
 			wreckmodel = "commsupport5_dead.s3o",
-		},			
+		},
 	},
 	dynassault1 = {
 		dynassault0 = {
@@ -393,7 +394,7 @@ local copy = {
 			mainstats = {maxdamage = 6400, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
 			customparams = {modelradius = [[35]],},
 			wreckmodel = "cremcom5_dead.s3o",
-		},		
+		},
 	},
 }
 
