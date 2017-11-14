@@ -14,6 +14,8 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+	shield_emit_height = 25,
+	shield_color_mult = 1.5,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -87,10 +89,8 @@ unitDef = {
       shieldRepulser          = false,
       shieldStartingPower     = 800,
       smartShield             = true,
-      texture1                = [[shield3mist]],
-      visibleShield           = true,
-      visibleShieldHitFrames  = 4,
-      visibleShieldRepulse    = true,
+      visibleShield           = false,
+      visibleShieldRepulse    = false,
       weaponType              = [[Shield]],
     },
 

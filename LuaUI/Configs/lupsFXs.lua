@@ -196,6 +196,26 @@ commandShieldSphere = {
   repeatEffect	= true,
 }
 
+shieldBursts350 = {
+  layer      = -35,
+  life       = math.huge,
+  piece      = "base",
+  rotSpeed   = 0.50,
+  rotSpread  = 0,
+  arc        = 50,
+  arcSpread  = 0,
+  size       = 320,
+  radius     = 300,
+  sizeSpread = 50,
+  texture    = "bitmaps/GPL/Lups/shieldbursts5.png",
+  --colormap   = { {1, 0.6, 1, 0.8} },
+  colormap   = { {1, 1, 1, 0.1} },
+  directional= true,
+  repeatEffect = true,
+  count      = 10,
+}
+
+
 ----------------------------------------------------------------------------
 -- LIGHT -------------------------------------------------------------------
 ----------------------------------------------------------------------------

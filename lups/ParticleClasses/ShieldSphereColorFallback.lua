@@ -2,15 +2,15 @@
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-local Sphere = {}
-Sphere.__index = Sphere
+local ShieldSphereColorFallback = {}
+ShieldSphereColorFallback.__index = ShieldSphereColorFallback
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-function Sphere.GetInfo()
+function ShieldSphereColorFallback.GetInfo()
   return {
-    name      = "Sphere",
+    name      = "ShieldSphereColorFallback",
     backup    = "", --// backup class, if this class doesn't work (old cards,ati's,etc.)
     desc      = "",
 
@@ -24,17 +24,22 @@ function Sphere.GetInfo()
   }
 end
 
-Sphere.Default = {
+ShieldSphereColorFallback.Default = {
   pos        = {0,0,0},
   layer      = -24,
   life       = math.huge,
   repeatEffect = true,
+  shieldSize = "large",
 }
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-function Sphere:BeginDraw()
+function ShieldSphereColorFallback:Visible()
+	return self.visibleToMyAllyTeam
+end
+
+function ShieldSphereColorFallback:BeginDraw()
   gl.DepthMask(false)
   gl.Lighting(true)
   gl.Light(0, true )
@@ -45,69 +50,75 @@ function Sphere:BeginDraw()
   --gl.Culling(GL.BACK)
 end
 
-function Sphere:EndDraw()
+function ShieldSphereColorFallback:EndDraw()
   gl.DepthMask(false)
   gl.Lighting(false)
   gl.Light(0, false)
 end
 
-function Sphere:Draw()
+function ShieldSphereColorFallback:Draw()
   local pos  = self.pos
   gl.Translate(pos[1],pos[2],pos[3])
-
-  gl.Color(0.5,0.5,0.5,0.5)
+  
+  local col = GetShieldColor(self.unit, self.colormap1, nil, self.shieldCapacity, true)
+  
+  gl.Color(1, 1, 1, 1)
   gl.Material({
-    ambient   = {0.5,0.5,0.5,1},
-    diffuse   = {1,1,1,0.5},
-    specular  = {1,1,1,0.5},
+    ambient   = {col[1], col[2], col[3], col[4]},
+    diffuse   = {1,1,1,col[4]},
+    specular  = {1,1,1,col[4]},
     shininess = 120,
   })
 
   gl.Scale(self.size, self.size, self.size)
-  gl.CallList(self.SphereList)
+  gl.CallList(self.SphereList[self.shieldSize])
 end
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-function Sphere:Initialize()
-  Sphere.SphereList  = gl.CreateList(DrawSphere,0,0,0,1,30)
+function ShieldSphereColorFallback:Initialize()
+  ShieldSphereColorFallback.SphereList = {
+    large = gl.CreateList(DrawSphere,0,0,0,1, 32),
+    small = gl.CreateList(DrawSphere,0,0,0,1, 20),
+  }
 end
 
-function Sphere:Finalize()
-  gl.DeleteList(Sphere.SphereList)
-end
-
------------------------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------------------
-
-function Sphere:CreateParticle()
-  self.firstGameFrame = Spring.GetGameFrame()
-  self.dieGameFrame   = self.firstGameFrame + self.life
+function ShieldSphereColorFallback:Finalize()
+  for _, list in pairs(ShieldSphereColorFallback.SphereList) do
+    gl.DeleteList(list)
+  end
 end
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-function Sphere:Update()
+function ShieldSphereColorFallback:CreateParticle()
+  self.dieGameFrame = Spring.GetGameFrame() + self.life
+end
+
+-----------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+
+function ShieldSphereColorFallback:Update()
 end
 
 -- used if repeatEffect=true;
-function Sphere:ReInitialize()
+function ShieldSphereColorFallback:ReInitialize()
   self.dieGameFrame = self.dieGameFrame + self.life
 end
 
-function Sphere.Create(Options)
-  local newObject = MergeTable(Options, Sphere.Default)
-  setmetatable(newObject,Sphere)  -- make handle lookup
+function ShieldSphereColorFallback.Create(Options)
+  local newObject = MergeTable(Options, ShieldSphereColorFallback.Default)
+  setmetatable(newObject,ShieldSphereColorFallback)  -- make handle lookup
   newObject:CreateParticle()
   return newObject
 end
 
-function Sphere:Destroy()
+function ShieldSphereColorFallback:Destroy()
 end
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-return Sphere
+return ShieldSphereColorFallback
