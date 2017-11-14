@@ -7,6 +7,7 @@ dyncomm = include('dynamicCommander.lua')
 -- pieces
 --------------------------------------------------------------------------------
 local base = piece 'base' 
+local shield = piece 'shield'
 local pelvis = piece 'pelvis' 
 local turret = piece 'turret' 
 local torso = piece 'torso' 
@@ -458,7 +459,7 @@ function script.AimWeapon(num, heading, pitch)
 		return false
 	end
 
-	return AimRifle(heading, pitch, dyncomm.IsManualFire(num))	
+	return AimRifle(heading, pitch, dyncomm.IsManualFire(num))
 end
 
 function script.Activate()
@@ -472,7 +473,7 @@ end
 local weaponFlares = {
 	[1] = flare,
 	[2] = flare,
-	[3] = pelvis,
+	[3] = shield,
 }
 
 function script.QueryWeapon(num)
