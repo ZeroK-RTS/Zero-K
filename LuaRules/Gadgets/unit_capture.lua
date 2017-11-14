@@ -654,15 +654,18 @@ end
 
 local function UpdateList()
 	if unitCount ~= 0 then
-		local spec, fullview = spGetSpectatingState()
-		spec = spec or fullview
+		local _, fullview = spGetSpectatingState()
 		glDeleteList(drawList)
 		 
 		drawAnything = true
-		drawList = glCreateList(function () glBeginEnd(GL_LINES, DrawWire, drawingUnits, spec) end)
+		drawList = glCreateList(function () glBeginEnd(GL_LINES, DrawWire, drawingUnits, fullview) end)
 	else
 		drawAnything = false
 	end
+end
+
+function gadget:PlayerChanged()
+	myTeam = spGetMyAllyTeamID()
 end
 
 local lastFrame = 0
