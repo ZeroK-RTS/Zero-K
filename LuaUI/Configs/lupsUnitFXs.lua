@@ -81,12 +81,14 @@ effectUnitDefs = {
   --// SHIELDS //---------------------------
   -- Don't raise strength of ShieldJitter recklessly, it can really distort things (including unit icons) under it!
   staticshield = {
-   {class='Bursts', options=staticshieldBursts},
-    {class='ShieldSphere', options=staticshieldBall},
+	{class='ShieldProjector', options=MergeTable({size = 350}, ShieldProjectionSphere)},
+	--{class='Bursts', options=MergeTable({size = 350}, ShieldProjectionBursts)},
+	{class='Bursts', options=staticshieldBursts},
+	{class='ShieldSphere', options=staticshieldBall},
 	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=350, strength = .001, precision=50, repeatEffect=true, quality = 4, onActive = true}},
---	{class='ShieldSphere', options={piece="base", life=math.huge, size=350, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
---	{class='GroundFlash', options=groundFlashShield},
---	{class='UnitPieceLight', options={piece="glow", colormap = {{0,0,1,0.2}},},},
+	--{class='ShieldSphere', options={piece="base", life=math.huge, size=350, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
+	--{class='GroundFlash', options=groundFlashShield},
+	--{class='UnitPieceLight', options={piece="glow", colormap = {{0,0,1,0.2}},},},
   },
   shieldshield = {
     {class='Bursts', options=staticshieldBursts},

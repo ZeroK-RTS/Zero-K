@@ -143,6 +143,32 @@ staticshieldBall = {
 	quality = 3, -- High
 }
 
+ShieldProjectionSphere= {
+  life = 20,
+  pos={0,60,0},
+  size=350,
+  colormap1 = { {0, 0, 1, 0.2} },
+  colormap2 = { {0.1, 0.1, 1, 0} },
+  repeatEffect=true
+}
+
+ShieldProjectionBursts = {
+  life       = math.huge,
+  piece      = "base",
+  rotSpeed   = 0.50,
+  rotSpread  = 0,
+  arc        = 50,
+  arcSpread  = 0,
+  size       = 350,
+  sizeSpread = 50,
+  texture    = "bitmaps/GPL/Lups/shieldbursts5.png",
+  --colormap   = { {1, 0.6, 1, 0.8} },
+  colormap   = { {1, 1, 1, 0.1} },
+  directional= true,
+  repeatEffect = true,
+  count      = 10,
+}
+
 ----------------------------------------------------------------------------
 -- COLORSPHERES ------------------------------------------------------------
 ----------------------------------------------------------------------------
