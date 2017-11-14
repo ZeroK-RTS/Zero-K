@@ -3,8 +3,8 @@ local ShieldSphereBase = {
 	life = 10000,
 	size = 350,
 	radius = 350,
-	colormap1 = {{0.1, 0.1, 1, 0.2}, {1, 0.1, 0.1, 0.2}},
-	colormap2 = {{0.2, 0.2, 1, 0.0}, {1, 0.2, 0.2, 0.0}},
+	colormap1 = {{0.1, 0.1, 1, 0.4}, {1, 0.1, 0.1, 0.4}},
+	colormap2 = {{0.2, 0.9, 1, 0.0}, {1, 0.9, 0.2, 0.0}},
 	repeatEffect = true,
 	drawBack = 0.7,
 }
@@ -37,9 +37,10 @@ local searchSizes = {}
 local shieldUnitDefs = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
-	if ud.customParams.shield_radius then
-		local radius = tonumber(ud.customParams.shield_radius)
-
+	
+	if ud.customParams.shield_radius or ud.customParams.dyn_shield_radius then
+		local radius = tonumber(ud.customParams.shield_radius or ud.customParams.dyn_shield_radius)
+		Spring.Echo(ud.name, radius)
 		if not searchSizes[radius] then
 			local searchType = (radius > 250 and SEARCH_LARGE) or SEARCH_SMALL
 			local search = {}
@@ -49,23 +50,32 @@ for unitDefID = 1, #UnitDefs do
 			searchSizes[radius] = search
 		end
 		
-		local myShield = Spring.Utilities.CopyTable(ShieldSphereBase)
-		myShield.shieldSize = (radius > 250 and "large") or "small"
-		myShield.drawBack = (radius > 250 and 0.5) or 0.9
+		local myShield = Spring.Utilities.CopyTable(ShieldSphereBase, true)
+		if radius > 250 then
+			myShield.shieldSize = "large"
+			myShield.drawBack = 0.6
+			myShield.drawBackMargin = 3
+			myShield.margin = 1.35
+			myShield.hitResposeMult = 0.6
+			myShield.colormap1[1][4] = 0.22
+			myShield.colormap1[2][4] = 0.22
+		else
+			myShield.shieldSize = "small"
+			myShield.drawBack = 0.9
+			myShield.drawBackMargin = 1.9
+			myShield.margin = 1.2
+			myShield.colormap1[1][4] = 0.22
+			myShield.colormap1[2][4] = 0.22
+			myShield.hitResposeMult = 1
+		end
 		myShield.size = radius
 		myShield.radius = radius
 		myShield.pos = {0, tonumber(ud.customParams.shield_emit_height) or 0, 0}
 		
 		local strengthMult = tonumber(ud.customParams.shield_color_mult)
 		if strengthMult then
-			myShield.colormap1[1] = Spring.Utilities.CopyTable(ShieldSphereBase.colormap1[1])
 			myShield.colormap1[1][4] = strengthMult*myShield.colormap1[1][4]
-			myShield.colormap1[2] = Spring.Utilities.CopyTable(ShieldSphereBase.colormap1[1])
 			myShield.colormap1[2][4] = strengthMult*myShield.colormap1[2][4]
-			myShield.colormap2[1] = Spring.Utilities.CopyTable(ShieldSphereBase.colormap2[1])
-			myShield.colormap2[1][4] = strengthMult*myShield.colormap2[1][4]
-			myShield.colormap2[2] = Spring.Utilities.CopyTable(ShieldSphereBase.colormap2[1])
-			myShield.colormap2[2][4] = strengthMult*myShield.colormap2[2][4]
 		end
 		
 		shieldUnitDefs[unitDefID] = { 
@@ -73,7 +83,7 @@ for unitDefID = 1, #UnitDefs do
 				{class = 'ShieldSphereColor', options = myShield},
 			},
 			search = searchSizes[radius],
-			shieldCapacity = tonumber(ud.customParams.shield_power),
+			shieldCapacity = tonumber(ud.customParams.shield_power or ud.customParams.dyn_shield_power),
 		}
 	end
 end

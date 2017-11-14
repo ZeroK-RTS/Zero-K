@@ -60,7 +60,8 @@ function ShieldSphereColorFallback:Draw()
   local pos  = self.pos
   gl.Translate(pos[1],pos[2],pos[3])
   
-  local col = GetShieldColor(self.unit, self.colormap1, nil, self.shieldCapacity, true)
+  local col = GetShieldColor(self.unit, self)
+  col[4] = col[4]*0.26
   
   gl.Color(1, 1, 1, 1)
   gl.Material({
@@ -71,6 +72,7 @@ function ShieldSphereColorFallback:Draw()
   })
 
   gl.Scale(self.size, self.size, self.size)
+  --gl.Texture("bitmaps/PD/shield3mist.png")
   gl.CallList(self.SphereList[self.shieldSize])
 end
 

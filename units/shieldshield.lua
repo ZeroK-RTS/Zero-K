@@ -84,6 +84,10 @@ unitDef = {
       smartShield             = true,
       visibleShield           = false,
       visibleShieldRepulse    = false,
+      --texture1                = [[shield3mist]],
+      --visibleShield           = true,
+      --visibleShieldHitFrames  = 4,
+      --visibleShieldRepulse    = true,
       weaponType              = [[Shield]],
     },
 

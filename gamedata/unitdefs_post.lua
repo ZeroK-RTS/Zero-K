@@ -220,6 +220,19 @@ for name, ud in pairs(UnitDefs) do
 			ud.cancloak = false
 		end
 	end
+	if ud.customparams.dynamic_comm then
+		Spring.Echo("ud.weapondefs", ud.name)
+		if ud.weapondefs then
+			for _, wd in pairs(ud.weapondefs) do
+				if wd.weapontype == "Shield" then
+					Spring.Echo("ud.Shield", ud.name)
+					ud.customparams.dyn_shield_radius = wd.shieldradius
+					ud.customparams.dyn_shield_power = wd.shieldpower
+					break
+				end
+			end
+		end
+	end
 end
 
 --------------------------------------------------------------------------------

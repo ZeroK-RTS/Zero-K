@@ -73,7 +73,7 @@ function ShieldSphereColorParticle:EndDraw()
 end
 
 function ShieldSphereColorParticle:Draw()
-  local col1, col2 = GetShieldColor(self.unit, self.colormap1, self.colormap2, self.shieldCapacity)
+  local col1, col2 = GetShieldColor(self.unit, self)
   glMultiTexCoord(1, col1[1],col1[2],col1[3],col1[4] or 1)
   glMultiTexCoord(2, col2[1],col2[2],col2[3],col2[4] or 1)
   local pos = self.pos
@@ -85,6 +85,9 @@ function ShieldSphereColorParticle:Draw()
     gl.Scale(1,1,-1)
     glMultiTexCoord(1, col1[1],col1[2],col1[3],(col1[4] or 1)*self.drawBack)
     glMultiTexCoord(2, col2[1],col2[2],col2[3],(col2[4] or 1)*self.drawBack)
+    if self.drawBackMargin then
+      glMultiTexCoord(4, self.drawBackMargin, self.size, 1, 1)
+    end
     glCallList(sphereList[self.shieldSize])
   end
 end
