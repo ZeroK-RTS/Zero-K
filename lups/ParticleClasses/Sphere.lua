@@ -1,14 +1,16 @@
--- $Id: gimmick1.lua 3171 2008-11-06 09:06:29Z det $
+-- $Id: Sphere.lua 3171 2008-11-06 09:06:29Z det $
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-local Sphere = {}
-Sphere.__index = Sphere
+local SphereParticle = {}
+SphereParticle.__index = SphereParticle
+
+local SphereList
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-function Sphere.GetInfo()
+function SphereParticle.GetInfo()
   return {
     name      = "Sphere",
     backup    = "", --// backup class, if this class doesn't work (old cards,ati's,etc.)
@@ -24,90 +26,125 @@ function Sphere.GetInfo()
   }
 end
 
-Sphere.Default = {
-  pos        = {0,0,0},
+SphereParticle.Default = {
+  pos        = {0,0,0}, -- start pos
   layer      = -24,
-  life       = math.huge,
-  repeatEffect = true,
+
+  life       = 0,
+
+  size       = 0,
+  sizeGrowth = 0,
+  colormap   = { {0, 0, 0, 0} },
+
+  texture    = 'bitmaps/GPL/Lups/sphere.png',
+  repeatEffect = false,
+  genmipmap    = true,  -- todo
 }
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-function Sphere:BeginDraw()
+function SphereParticle:BeginDraw()
+  gl.DepthMask(true)
+
+  gl.Culling(GL.BACK)
+end
+
+function SphereParticle:EndDraw()
   gl.DepthMask(false)
-  gl.Lighting(true)
-  gl.Light(0, true )
-  gl.Light(0, GL.POSITION, gl.GetSun() )
-  gl.Light(0, GL.AMBIENT, gl.GetSun("ambient","unit") )
-  gl.Light(0, GL.DIFFUSE, gl.GetSun("diffuse","unit") )
-  gl.Light(0, GL.SPECULAR, gl.GetSun("specular") )
-  --gl.Culling(GL.BACK)
+  gl.Texture(false)
+  gl.Color(1,1,1,1)
+  gl.Culling(false)
 end
 
-function Sphere:EndDraw()
-  gl.DepthMask(false)
-  gl.Lighting(false)
-  gl.Light(0, false)
-end
+function SphereParticle:Draw()
+  gl.Texture(self.texture)
+  gl.Color(self.color)
 
-function Sphere:Draw()
-  local pos  = self.pos
-  gl.Translate(pos[1],pos[2],pos[3])
+  gl.TexCoord(0, 0)
+  gl.PushMatrix()
+  gl.Translate(self.pos[1],self.pos[2],self.pos[3])
+  gl.Scale(self.size,self.size,self.size)
 
-  gl.Color(0.5,0.5,0.5,0.5)
-  gl.Material({
-    ambient   = {0.5,0.5,0.5,1},
-    diffuse   = {1,1,1,0.5},
-    specular  = {1,1,1,0.5},
-    shininess = 120,
-  })
+  gl.MatrixMode(GL.TEXTURE)
+  gl.PushMatrix()
+  gl.Translate(-0.5,-0.5,0)
+  gl.Scale(0.5,-0.5,0)
 
-  gl.Scale(self.size, self.size, self.size)
-  gl.CallList(self.SphereList)
-end
+  gl.TexGen(GL.S, GL.TEXTURE_GEN_MODE, GL.REFLECTION_MAP)
+  gl.TexGen(GL.T, GL.TEXTURE_GEN_MODE, GL.REFLECTION_MAP)
+  gl.TexGen(GL.R, GL.TEXTURE_GEN_MODE, GL.REFLECTION_MAP)
 
------------------------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------------------
+  gl.CallList(SphereList)
+  gl.PopMatrix()
+  gl.MatrixMode(GL.MODELVIEW)
 
-function Sphere:Initialize()
-  Sphere.SphereList  = gl.CreateList(DrawSphere,0,0,0,1,30)
-end
-
-function Sphere:Finalize()
-  gl.DeleteList(Sphere.SphereList)
+  gl.TexGen(GL.S, false)
+  gl.TexGen(GL.T, false)
+  gl.TexGen(GL.R, false)
+  gl.PopMatrix()
 end
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-function Sphere:CreateParticle()
+function SphereParticle:Initialize()
+  SphereList = gl.CreateList(DrawSphere,0,0,0,40,25)
+end
+
+function SphereParticle:Finalize()
+  gl.DeleteList(SphereList)
+end
+
+-----------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+
+function SphereParticle:CreateParticle()
+  -- needed for repeat mode
+  self.csize  = self.size
+  self.clife  = self.life
+
+  self.size      = self.csize or self.size
+  self.life_incr = 1/self.life
+  self.life      = 0
+  self.color     = self.colormap[1]
+
   self.firstGameFrame = Spring.GetGameFrame()
-  self.dieGameFrame   = self.firstGameFrame + self.life
+  self.dieGameFrame   = self.firstGameFrame + self.clife
 end
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-function Sphere:Update()
+function SphereParticle:Update(n)
+  if (self.life<1) then
+    self.life     = self.life + n*self.life_incr
+    self.size     = self.size + n*self.sizeGrowth
+    self.color    = {GetColor(self.colormap,self.life)}
+  end
 end
 
 -- used if repeatEffect=true;
-function Sphere:ReInitialize()
-  self.dieGameFrame = self.dieGameFrame + self.life
+function SphereParticle:ReInitialize()
+  self.size     = self.csize
+  self.life     = 0
+  self.color    = self.colormap[1]
+
+  self.dieGameFrame = self.dieGameFrame + self.clife
 end
 
-function Sphere.Create(Options)
-  local newObject = MergeTable(Options, Sphere.Default)
-  setmetatable(newObject,Sphere)  -- make handle lookup
+function SphereParticle.Create(Options)
+  local newObject = MergeTable(Options, SphereParticle.Default)
+  setmetatable(newObject,SphereParticle)  -- make handle lookup
   newObject:CreateParticle()
   return newObject
 end
 
-function Sphere:Destroy()
+function SphereParticle:Destroy()
+  gl.DeleteTexture(self.texture)
 end
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-return Sphere
+return SphereParticle
