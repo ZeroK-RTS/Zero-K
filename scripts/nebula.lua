@@ -3,6 +3,7 @@ include "constants.lua"
 --------------------------------------------------------------------------------
 --pieces
 local hull, facframe = piece ("hull", "facframe")
+local base = piece("base")
 local engines = {}
 local pads = {}
 local docked = {}
@@ -23,7 +24,7 @@ for i=1,4 do
 		sideways = (i >= 3),
 	}
 end
-weapons[5] = {aimFrom = hull, flares = {hull}, gunIndex = 1}
+weapons[5] = {aimFrom = base, flares = {base}, gunIndex = 1}
 
 for i=1,6 do
 	docked[i] = piece("docked"..i)

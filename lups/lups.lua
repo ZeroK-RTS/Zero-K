@@ -490,6 +490,31 @@ end
 local anyFXVisible = false
 local anyDistortionsVisible = false
 
+local function IsUnitPositionKnown(unitID)
+	if LocalAllyTeamID < 0 then
+		return true
+	end
+	local targetVisiblityState = Spring.GetUnitLosState(unitID, LocalAllyTeamID, true) 
+	local inLos = (targetVisiblityState == 15)
+	if inLos then
+		return true
+	end
+	local identified = (targetVisiblityState > 2)
+	
+	if not identified then
+		return false
+	end
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if not (unitDefID and UnitDefs[unitDefID]) then
+		return false
+	end
+	return not Spring.Utilities.getMovetype(UnitDefs[unitDefID])
+end
+
+local function RadarDotCheck(unitID)
+	return true
+end
+
 local function Draw(extension,layer)
   local FxLayer = RenderSequence[layer];
   if (not FxLayer) then return end
@@ -519,7 +544,14 @@ local function Draw(extension,layer)
               -- render in unit/piece space ------------------------------------------------------
               ------------------------------------------------------------------------------------
               glPushMatrix()
-              glUnitMultMatrix(unitID)
+              if gadget and not IsUnitPositionKnown(unitID) then
+                local x, y, z = Spring.GetUnitPosition(unitID)
+                local a11, a12, a13, a14, a21, a22, a23, a24, a31, a32, a33, a34, a41, a42, a43, a44 = Spring.GetUnitTransformMatrix(unitID)
+                gl.MultMatrix(a11, a12, a13, a14, a21, a22, a23, a24, a31, a32, a33, a34, x, y, z , a44)
+              else
+                glUnitMultMatrix(unitID)
+              end
+              
 
               --// render effects
               for i=1,#UnitEffects do

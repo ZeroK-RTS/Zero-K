@@ -13,6 +13,7 @@ unitDef = {
   category                      = [[SINK]],
 
   customParams                  = {
+    shield_emit_offset = -4,
   },
 
   explodeAs                     = [[NOWEAPON]],
@@ -81,10 +82,12 @@ unitDef = {
       shieldRadius            = 300,
       shieldRepulser          = false,
       smartShield             = true,
-      texture1                = [[wakelarge]],
-      visibleShield           = true,
-      visibleShieldHitFrames  = 30,
+      visibleShield           = false,
       visibleShieldRepulse    = false,
+      --texture1                = [[wakelarge]],
+      --visibleShield           = true,
+      --visibleShieldHitFrames  = 30,
+      --visibleShieldRepulse    = false,
       weaponType              = [[Shield]],
     },
 
