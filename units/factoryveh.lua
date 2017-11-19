@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[factoryveh]],
-  name                          = [[Rover Factory]],
+  name                          = [[Rover Assembly]],
   description                   = [[Produces Rovers, Builds at 10 m/s]],
   acceleration                  = 0,
   brakeRate                     = 0,
