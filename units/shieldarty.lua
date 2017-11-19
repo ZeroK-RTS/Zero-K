@@ -86,7 +86,7 @@ unitDef = {
       explosionGenerator      = [[custom:WHITE_LIGHTNING_BOMB]],
       fireStarter             = 0,
       flightTime              = 6,
-	  impactOnly              = true,
+      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 2,
@@ -100,15 +100,15 @@ unitDef = {
       soundStart              = [[weapon/missile/missile_launch_high]],
       soundStartVolume        = 11.0,
       startvelocity           = 250,
-	  --texture1                = [[spark]], --flare
+      --texture1                = [[spark]], --flare
       texture3                = [[spark]], --flame
       tolerance               = 4000,
       tracks                  = true,
-      turnRate                = 54000,
-      weaponAcceleration      = 300,
-      weaponTimer             = 1,
+      turnRate                = 38000,
+      weaponAcceleration      = 275,
+      weaponTimer             = 1.18,
       weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 1500,
+      weaponVelocity          = 800,
     },
   },
 

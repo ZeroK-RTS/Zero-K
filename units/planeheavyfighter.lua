@@ -82,9 +82,9 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-	  },
+      customParams            = {
+        isaa = [[1]],
+      },
 
       damage                  = {
         default = 0.96,
@@ -103,7 +103,7 @@ unitDef = {
       reloadtime              = 0.1,
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/rapid_laser]],
-      soundStartVolume        = 2.2,
+      soundStartVolume        = 1.9,
       thickness               = 1.95,
       tolerance               = 8192,
       turret                  = true,

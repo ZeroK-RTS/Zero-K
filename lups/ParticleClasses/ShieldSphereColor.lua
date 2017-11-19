@@ -86,8 +86,8 @@ function ShieldSphereColorParticle:Draw()
     if pos[3] ~= 0 then
       glMultiTexCoord(3, pos[1], pos[2], -pos[3], 0)
     end
-    glMultiTexCoord(1, col1[1],col1[2],col1[3],(col1[4] or 1)*self.drawBack)
-    glMultiTexCoord(2, col2[1],col2[2],col2[3],(col2[4] or 1)*self.drawBack)
+    glMultiTexCoord(1, col1[1]*self.drawBackCol,col1[2]*self.drawBackCol,col1[3]*self.drawBackCol,(col1[4] or 1)*self.drawBack)
+    glMultiTexCoord(2, col2[1]*self.drawBackCol,col2[2]*self.drawBackCol,col2[3]*self.drawBackCol,(col2[4] or 1)*self.drawBack)
     if self.drawBackMargin then
       glMultiTexCoord(4, self.drawBackMargin, self.size, 1, 1)
     end

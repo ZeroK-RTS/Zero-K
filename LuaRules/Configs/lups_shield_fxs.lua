@@ -55,6 +55,7 @@ for unitDefID = 1, #UnitDefs do
 		if radius > 250 then
 			myShield.shieldSize = "large"
 			myShield.drawBack = 0.55
+			myShield.drawBackCol = 0.3
 			myShield.drawBackMargin = 4.5
 			myShield.margin = 4
 			myShield.hitResposeMult = 0.6
@@ -68,6 +69,7 @@ for unitDefID = 1, #UnitDefs do
 				myShield.shieldSize = "small"
 			end
 			myShield.drawBack = 0.75
+			myShield.drawBackCol = 0.4
 			myShield.drawBackMargin = 1.8
 			myShield.margin = 1.8
 			myShield.colormap1[1][4] = 0.22
