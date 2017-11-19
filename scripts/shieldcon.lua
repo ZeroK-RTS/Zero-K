@@ -115,6 +115,10 @@ function script.StartBuilding(heading, pitch)
 	WaitForTurn(torso, y_axis)
 end
 
+function script.QueryWeapon(num)
+	return centerpoint
+end
+
 function script.StopBuilding()
 	if not isBuilding then
 		return

@@ -6,6 +6,7 @@ function widget:GetInfo()
     date      = "29 December 2008",
     license   = "GNU LGPL, v2.1 or later",
     layer     = -100000.5,	-- lower than minimap but higher than epic (this doesn't actually do anything for the implied purpose)
+    alwaysStart = true,
     enabled   = true  --  loaded by default?
   }
 end

@@ -21,10 +21,8 @@ local weaponDef = {
 	shieldRadius            = 350,
 	shieldRepulser          = false,
 	smartShield             = true,
-	texture1                = [[shield3mist]],
-	visibleShield           = true,
-	visibleShieldHitFrames  = 4,
-	visibleShieldRepulse    = true,
+	visibleShield           = false,
+	visibleShieldRepulse    = false,
 	weaponType              = [[Shield]],
 }
 

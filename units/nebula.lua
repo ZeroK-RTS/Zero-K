@@ -27,6 +27,7 @@ unitDef = {
   customParams           = {
     cantuseairpads = 1,
     modelradius    = [[40]],
+    shield_emit_height = 20,
   },
 
   explodeAs              = [[LARGE_BUILDINGEX]],
@@ -156,10 +157,8 @@ unitDef = {
       shieldRadius            = 350,
       shieldRepulser          = false,
       smartShield             = true,
-      texture1                = [[shield3mist]],
-      visibleShield           = true,
-      visibleShieldHitFrames  = 4,
-      visibleShieldRepulse    = true,
+      visibleShield           = false,
+      visibleShieldRepulse    = false,
       weaponType              = [[Shield]],
     },
   },
