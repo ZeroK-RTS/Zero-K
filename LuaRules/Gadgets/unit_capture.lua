@@ -19,6 +19,7 @@ end
 local RETAKING_DEGRADE_TIMER = 15
 local GENERAL_DEGRADE_TIMER = 5
 local DEGRADE_FACTOR = 0.04
+local CAPTURE_LINGER = 0.95
 
 local DAMAGE_MULT = 3 -- n times faster when target is at 0% health
 
@@ -123,13 +124,13 @@ local function removeThingFromIterable(id, things, thingByID)
 end
 
 -- transfer with trees
-local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID)
+local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID, oldTeamCaptureLinger)
 	if controllers[unitID] then
 		local unitByID = controllers[unitID].unitByID
 		local i = 1
 		while i <= unitByID.count do
 			local cid = unitByID.data[i]
-			recusivelyTransfer(cid, newTeam, newAlly, unitID)
+			recusivelyTransfer(cid, newTeam, newAlly, unitID, oldTeamCaptureLinger)
 			if cid == unitByID.data[i] then
 				i = i + 1
 			end
@@ -177,10 +178,50 @@ local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID)
 		capturedUnits[unitID] = nil
 	end
 	
-	if unitDamage[unitID] then
-		removeThingFromDoubleTable(unitID, unitDamage, damageByID)
+	if oldTeamCaptureLinger then
+		if unitDamage[unitID] then
+			removeThingFromDoubleTable(unitID, unitDamage, damageByID)
+		end
+		
+		damageByID.count = damageByID.count + 1
+		damageByID.data[damageByID.count] = unitID
+		
+		local damageData = {
+			index = damageByID.count,
+			captureHealth = Spring.Utilities.GetUnitCost(unitID, unitDefID),
+			largestDamage = 0,
+			allyTeamByID = {count = 0, data = {}},
+			allyTeams = {},
+		}
+		local allyTeamByID = damageData.allyTeamByID
+		local allyTeams = damageData.allyTeams
+		
+		-- add ally team stats
+		local _,_,_,_,_,attackerAllyTeam = spGetTeamInfo(oldTeamCaptureLinger)
+		if not allyTeams[attackerAllyTeam] then
+			allyTeamByID.count = allyTeamByID.count + 1
+			allyTeamByID.data[allyTeamByID.count] = attackerAllyTeam
+			allyTeams[attackerAllyTeam] = {
+				index = allyTeamByID.count,
+				totalDamage = 0,
+				degradeTimer = GENERAL_DEGRADE_TIMER,
+			}
+		end
+		
+		local allyTeamData = allyTeams[attackerAllyTeam]
+		allyTeamData.degradeTimer = GENERAL_DEGRADE_TIMER
+		allyTeamData.totalDamage = damageData.captureHealth*CAPTURE_LINGER
+		
+		damageData.largestDamage = allyTeamData.totalDamage
+		spSetUnitHealth(unitID, {capture = damageData.largestDamage/damageData.captureHealth} )
+		
+		unitDamage[unitID] = damageData
+	else
+		if unitDamage[unitID] then
+			removeThingFromDoubleTable(unitID, unitDamage, damageByID)
+		end
+		spSetUnitHealth(unitID, {capture = 0})
 	end
-	spSetUnitHealth(unitID, {capture = 0} )
 	
 	spTransferUnit(unitID, newTeam, false)
 	spGiveOrderToUnit(unitID, CMD_STOP, {}, {})
@@ -421,14 +462,14 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	KillToggleCommand(unitID, {0}, {})
 end
 
-function gadget:UnitDestroyed(unitID)
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeamID)
 	if controllers[unitID] then
 		local unitByID = controllers[unitID].unitByID
 		local i = 1
 		while i <= unitByID.count do
 			local cid = unitByID.data[i]
 			local transferTeamID = GetActiveTeam(capturedUnits[cid].originTeam, capturedUnits[cid].originAllyTeam)
-			recusivelyTransfer(cid, transferTeamID, capturedUnits[cid].originAllyTeam, unitID)
+			recusivelyTransfer(cid, transferTeamID, capturedUnits[cid].originAllyTeam, unitID, unitTeamID)
 			if cid == unitByID.data[i] then
 				i = i + 1
 			end
