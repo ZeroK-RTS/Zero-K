@@ -217,14 +217,6 @@ local function isUnitDisabled(unitID)
 	return (Spring.GetUnitRulesParam(unitID, "disarmed") == 1) or select(1, Spring.GetUnitIsStunned(unitID))
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
-	return true
-end
-
-function gadget:AllowCommand_GetWantedUnitDefID()
-	return canTeleport
-end
-
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if teleportingUnit[unitID] and not (cmdID == CMD.INSERT or cmdOptions.shift) and cmdID ~= CMD.REMOVE and cmdID ~= CMD.FIRE_STATE and cmdID ~= CMD.MOVE_STATE and cmdID ~= CMD_WANT_CLOAK then
 		interruptTeleport(teleportingUnit[unitID])
@@ -233,6 +225,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if cmdID == CMD.STOP and not (cmdID == CMD.INSERT or cmdOptions.shift) and tele[unitID] then
 		local func = Spring.UnitScript.GetScriptEnv(unitID).StopCreateBeacon
 		Spring.UnitScript.CallAsUnit(unitID, func)
+	end
+	
+	if cmdID == CMD_WAIT_AT_BEACON and not canTeleport[unitDefID] then
+		return false
 	end
 	
 	return true
