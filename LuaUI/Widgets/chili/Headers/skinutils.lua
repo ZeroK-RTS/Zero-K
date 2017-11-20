@@ -344,7 +344,7 @@ function DrawButton(obj)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    obj.font:Print(obj.caption, x+w*0.5, y+h*0.5, "center", "center")
+    obj.font:Print(obj.caption, x + w*0.5, y + math.floor(h*0.5 - obj.font.size*0.35), "center", "linecenter")
   end
 end
 
@@ -790,7 +790,7 @@ function DrawCheckbox(obj)
 
   gl.Color(1,1,1,1)
   if (obj.caption) then
-    obj.font:Print(obj.caption, obj.x + tx, obj.y + ty, nil, "center")
+    obj.font:Print(obj.caption, obj.x + tx, obj.y + ty  - obj.font.size*0.35, nil, "linecenter")
   end
 end
 
@@ -840,7 +840,7 @@ function DrawProgressbar(obj)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    (obj.font):Print(obj.caption, x+w*0.5, y+h*0.5, "center", "center")
+    (obj.font):Print(obj.caption, x+w*0.5, y+h*0.5 - obj.font.size*0.35, "center", "linecenter")
   end
 end
 
