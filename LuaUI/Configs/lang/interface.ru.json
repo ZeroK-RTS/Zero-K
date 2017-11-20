@@ -29,7 +29,7 @@
 	"toggle_pw_instructions_name" : "Задача",
 	"toggle_pw_instructions_desc" : "Отображает задачу текущего планетарного боя.",
 	"toggle_attrition_counter_name" : "Счетчик потерь",
-	"toggle_attrition_counter_desc" : "Высчитывает стоймость потерянной и уничтоженной техники, демонстрируя вашу эффективность в виде процентного соотношения.",
+	"toggle_attrition_counter_desc" : "Высчитывает стоимость потерянной и уничтоженной техники, демонстрируя вашу эффективность в виде процентного соотношения.",
 	"toggle_mission_objectives_name" : "Задачи",
 	"toggle_mission_objectives_desc" : "Отображает главную и побочные цели миссии.",
 	"toggle_eco_display_name" : "Экономика",
