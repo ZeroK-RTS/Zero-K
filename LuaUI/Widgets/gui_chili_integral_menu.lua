@@ -1180,7 +1180,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	local button = Button:New {
 		classname = "button_tab",
 		caption = humanName,
-		padding = {0, 0, 0, 0},
+		padding = {0, 0, 0, 1},
 		OnClick = {
 			function()
 				DoClick(true)
