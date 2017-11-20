@@ -201,7 +201,7 @@ local function ShouldUnitBeMoved(targetUnitID, resUnitMinX, resUnitMinZ, resUnit
     --Debug("floater = " .. tostring(unitDef.floater))
     --Debug("Rectangle unit maxSlope is " .. tostring(unitDef.moveDef.maxSlope))
 
-    if not unitDef.isBuilding and unitDef.name ~= "terraunit" and not unitDef.isAirUnit and 
+    if not unitDef.isImmobile and unitDef.name ~= "terraunit" and not unitDef.isAirUnit and 
     ((unitY - unitGroundY <= maxUnitHeightAboveGround) or (CanUnitSwim(unitDef) and 
             WithinBounds(unitY, -unitDef.waterline - uHeight / 2 - extraMaxWaterDepth, maxUnitHeightAboveSea, true))) then
         -- per the Spring wiki unit height determines if a ship can go over something that is underwater
@@ -223,7 +223,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
     local uDef = UnitDefs[unitDefID]
     if builderID then 
         local command = spGetUnitCommands(builderID, 1)[1]
-        if command and command.id == CMD_RESURRECT and uDef.isBuilding and
+        if command and command.id == CMD_RESURRECT and uDef.isImmobile and
         uDef.name ~= "terraunit" then
             local ux1, uy1, uz1 = spGetUnitPosition(unitID)
             --local dimensions = spGetUnitDefDimensions(unitDefID)
