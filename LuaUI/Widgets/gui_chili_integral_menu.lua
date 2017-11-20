@@ -1662,7 +1662,7 @@ end
 
 function options.hide_when_spectating.OnChange(self)
 	local isSpec = Spring.GetSpectatingState()
-	background:SetVisibility(not (self.value and isSpec))
+	background:SetVisibility(WG.IntegralVisible and not (self.value and isSpec))
 end
 
 function options.unitsHotkeys2.OnChange(self)
@@ -1842,7 +1842,7 @@ end
 function widget:PlayerChanged(playerID)
 	if options.hide_when_spectating.value then
 		local isSpec = Spring.GetSpectatingState()
-		background:SetVisibility(not isSpec)
+		background:SetVisibility(WG.IntegralVisible and not isSpec)
 	end
 end
 
