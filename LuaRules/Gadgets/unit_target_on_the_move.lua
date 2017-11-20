@@ -1,10 +1,5 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not gadgetHandler:IsSyncedCode() then
-	return
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 function gadget:GetInfo()
   return {
@@ -17,7 +12,19 @@ function gadget:GetInfo()
 	enabled = true,
   }
 end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+include("LuaRules/Configs/customcmds.h.lua")
 
+if not gadgetHandler:IsSyncedCode() then
+	function gadget:Initialize()
+		Spring.SetCustomCommandDrawData(CMD_UNIT_SET_TARGET, "SetTarget", {1.0, 0.75, 0.0, 0.7}, true)
+		Spring.SetCustomCommandDrawData(CMD_UNIT_SET_TARGET_CIRCLE, "SetTarget", {1.0, 0.75, 0.0, 0.7}, true)
+		Spring.AssignMouseCursor("SetTarget", "cursortarget", true, false)
+	end
+	
+	return
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
@@ -79,14 +86,12 @@ local allyTargetUnits = {
 	[UnitDefNames["jumpsumo"].id] = true,
 }
 
-include("LuaRules/Configs/customcmds.h.lua")
-
 local unitSetTargetCmdDesc = {
 	id      = CMD_UNIT_SET_TARGET,
 	type    = CMDTYPE.ICON_UNIT_OR_RECTANGLE,
 	name    = 'Set Target',
 	action  = 'settarget',
-	cursor  = 'Attack',
+	cursor  = 'SetTarget',
 	tooltip = 'Sets target for unit, not removed by move commands',
 	hidden = true,
 }
@@ -96,7 +101,7 @@ local unitSetTargetCircleCmdDesc = {
 	type    = CMDTYPE.ICON_UNIT_OR_AREA,
 	name    = 'Set Target Circle',
 	action  = 'settargetcircle',
-	cursor  = 'Attack',
+	cursor  = 'SetTarget',
 	tooltip = 'Sets target for unit, not removed by move commands, circle version',
 	hidden = false,
 }
