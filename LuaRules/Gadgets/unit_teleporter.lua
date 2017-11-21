@@ -287,12 +287,21 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 	end
 	
 	if cmdID == CMD_WAIT_AT_BEACON then
-		if not (beaconWaiter[unitID] and beaconWaiter[unitID].beaconID == cmdParams[1]) then
-			local bx,by,bz = Spring.GetUnitPosition(cmdParams[1])
+		local beaconID = cmdParams[1]
+
+		if not beaconID
+		or not beacon[beaconID]
+		or not Spring.AreTeamsAllied(teamID, Spring.GetUnitTeam(beaconID))
+		then
+			return true, true
+		end
+
+		if not (beaconWaiter[unitID] and beaconWaiter[unitID].beaconID == beaconID) then
+			local bx,by,bz = Spring.GetUnitPosition(beaconID)
 			if bx then
 				beaconWaiter[unitID] = {
 					lastSetMove = false,
-					beaconID = cmdParams[1],
+					beaconID = beaconID,
 					frame = Spring.GetGameFrame(),
 					bx = bx,
 					by = by,
@@ -303,15 +312,9 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 				return true, true -- command was used and remove it
 			end
 		end
-		
-		local ud = UnitDefs[UnitDefID]
+
 		local waitData = beaconWaiter[unitID]
-		
-		if ud and ((not beacon[waitData.beaconID]) or ud.speed == 0 or getMovetype(ud) == 0) then
-			beaconWaiter[unitID] = nil
-			return true, true -- command was used and remove it
-		end
-		
+
 		local f = Spring.GetGameFrame()
 		if not ((beaconWaiter[unitID].lastSetMove and beaconWaiter[unitID].lastSetMove + 16 == f)) then
 			Spring.SetUnitMoveGoal(unitID, waitData.bx, waitData.by, waitData.bz, BEACON_WAIT_RANGE_MOVE)
