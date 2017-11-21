@@ -226,7 +226,11 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		local func = Spring.UnitScript.GetScriptEnv(unitID).StopCreateBeacon
 		Spring.UnitScript.CallAsUnit(unitID, func)
 	end
-	
+
+	if cmdID == CMD.INSERT then
+		cmdID = cmdParams[2]
+	end
+
 	if cmdID == CMD_WAIT_AT_BEACON and not canTeleport[unitDefID] then
 		return false
 	end
