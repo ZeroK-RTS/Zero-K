@@ -447,7 +447,7 @@ function gadget:GameFrame(f)
 					
 					for i = 1, #units do
 						local nid = units[i]
-						if allyTeam == Spring.GetUnitAllyTeam(nid) then
+						if allyTeam == Spring.GetUnitAllyTeam(nid) and beaconWaiter[nid] then
 							local cQueue = Spring.GetCommandQueue(nid, 1)
 							if #cQueue > 0 and cQueue[1].id == CMD_WAIT_AT_BEACON and cQueue[1].params[1] == bid then
 								local priority = beaconWaiter[nid].frame
@@ -579,6 +579,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		interruptTeleport(beacon[unitID].link)
 		beacon[unitID] = nil
 	end
+
+	beaconWaiter[unitID] = nil
 end
 
 function gadget:Initialize()
