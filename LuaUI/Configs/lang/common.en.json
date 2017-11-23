@@ -27,6 +27,8 @@
 	"selected_units" : "Selected units",
 	"unknown" : "unknown",
 	"buildpower" : "Buildpower",
+	"burst_damage" : "Burst Damage",
+	"burst" : "Burst",
 	"debris" : "debris",
 	"wreckage" : "wreckage",
 	"no_helptext" : "No guide material available for this unit.",

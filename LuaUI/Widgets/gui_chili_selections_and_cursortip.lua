@@ -97,6 +97,7 @@ local CURSOR_DRAW_NAME = "map_draw"
 local iconTypesPath = LUAUI_DIRNAME .. "Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
+local UNIT_BURST_DAMAGES = VFS.Include(LUAUI_DIRNAME .. "Configs/burst_damages.lua" , nil, VFS.RAW_FIRST)
 
 local terraformGeneralTip = 
 	green.. 'Click&Drag'..white..': Free draw terraform. \n'..
@@ -1277,6 +1278,9 @@ local function GetSelectionStatsDisplay(parentControl)
 	local total_finishedcost = 0
 	local total_totalbp = 0
 	local total_maxhp = 0
+	local total_totalburst = 0
+	local unreliableBurst = false
+	local burstClass = 0
 	
 	local function UpdateDynamicGroupInfo()
 		local total_cost = 0
@@ -1331,6 +1335,10 @@ local function GetSelectionStatsDisplay(parentControl)
 			unitInfoString = unitInfoString ..
 				WG.Translate("interface", "buildpower") .. ": " .. Format(total_usedbp) .. " / " .. Format(total_totalbp) .. "\n"
 		end
+		if burstClass and total_totalburst ~= 0 then
+			unitInfoString = unitInfoString ..
+				WG.Translate("interface", "burst_damage") .. ": " .. ((unreliableBurst and "~") or "") .. Format(total_totalburst) .. "\n"
+		end
 		
 		statLabel:SetCaption(unitInfoString)
 	end
@@ -1341,6 +1349,9 @@ local function GetSelectionStatsDisplay(parentControl)
 		total_finishedcost = 0
 		total_totalbp = 0
 		total_maxhp = 0
+		total_totalburst = 0
+		unreliableBurst = false
+		burstClass = 0
 		
 		local unitID, unitDefID
 		for i = 1, total_count do
@@ -1351,6 +1362,18 @@ local function GetSelectionStatsDisplay(parentControl)
 				total_totalbp = total_totalbp + GetUnitBuildSpeed(unitID, unitDefID)
 				total_maxhp = total_maxhp + (select(2, Spring.GetUnitHealth(unitID)) or 0)
 				total_finishedcost = total_finishedcost + GetUnitCost(unitID, unitDefID)
+				local burstData = UNIT_BURST_DAMAGES[unitDefID]
+				if burstData and burstClass then
+					if burstClass == 0 then
+						burstClass = burstData.class
+					end
+					if burstClass == burstData.class then
+						total_totalburst = total_totalburst + burstData.damage
+						unreliableBurst = unreliableBurst or burstData.unreliable
+					else
+						burstClass = false
+					end
+				end
 			end
 		end
 		
