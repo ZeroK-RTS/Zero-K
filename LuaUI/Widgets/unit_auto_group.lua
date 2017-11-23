@@ -72,7 +72,6 @@ options = {
 		OnChange = function(self)
 			if not self.value then
 				unit2group = {}
-				Spring.Echo('game_message: Cleared Autogroups.')
 			end
 		end
 	},
