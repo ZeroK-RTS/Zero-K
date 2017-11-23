@@ -38,7 +38,6 @@ local function DrawWorldFunc()
     return
   end
 
-  gl.Fog(false)
   gl.DepthTest(true)
   gl.PolygonOffset(-2, -2)
   gl.Blending(GL.SRC_ALPHA, GL.ONE)
@@ -70,7 +69,6 @@ local function DrawWorldFunc()
   gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
   gl.PolygonOffset(false)
   gl.DepthTest(false)
-  gl.Fog(true)
 end
 
 function widget:DrawWorld()

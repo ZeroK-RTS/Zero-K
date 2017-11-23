@@ -426,7 +426,6 @@ local function DrawWorldFunc() --is overwritten when not using the shader
         local glUniform = gl.Uniform
         local GamemapSizeZ, GamemapSizeX = Game.mapSizeZ,Game.mapSizeX
         
-        gl.Fog(true)
         gl.FogCoord(1)
         gl.UseShader(mirrorShader)
         gl.PushMatrix()
@@ -485,7 +484,7 @@ local function DrawWorldFunc() --is overwritten when not using the shader
         gl.PopMatrix()
         gl.UseShader(0)
         
-        gl.Fog(false)
+        gl.FogCoord(0)
     end
 end
 

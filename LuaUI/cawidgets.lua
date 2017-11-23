@@ -1535,41 +1535,46 @@ end
 
 function widgetHandler:DrawWorld()
   for _,w in ripairs(self.DrawWorldList) do
+    gl.Fog(true)
     w:DrawWorld()
   end
-  return
+  gl.Fog(false)
 end
 
 
 function widgetHandler:DrawWorldPreUnit()
   for _,w in ripairs(self.DrawWorldPreUnitList) do
+    gl.Fog(true)
     w:DrawWorldPreUnit()
   end
-  return
+  gl.Fog(false)
 end
 
 
 function widgetHandler:DrawWorldShadow()
   for _,w in ripairs(self.DrawWorldShadowList) do
+    gl.Fog(true)
     w:DrawWorldShadow()
   end
-  return
+  gl.Fog(false)
 end
 
 
 function widgetHandler:DrawWorldReflection()
   for _,w in ripairs(self.DrawWorldReflectionList) do
+    gl.Fog(true)
     w:DrawWorldReflection()
   end
-  return
+  gl.Fog(false)
 end
 
 
 function widgetHandler:DrawWorldRefraction()
   for _,w in ripairs(self.DrawWorldRefractionList) do
+    gl.Fog(true)
     w:DrawWorldRefraction()
   end
-  return
+  gl.Fog(false)
 end
 
 
