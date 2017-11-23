@@ -162,7 +162,7 @@ local damages = {
 		class = NORMAL,
 	},
 	gunshipassault = {
-		damage = 1100,
+		damage = 1760,
 		unreliable = true,
 		class = NORMAL,
 	},
