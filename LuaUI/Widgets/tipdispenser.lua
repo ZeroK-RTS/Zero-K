@@ -234,7 +234,7 @@ local function GetTipsList()
 				AddTip("Select your commander and start building your base. You can select something to build by pressing right click and drawing a gesture, or using the buttons in the menu (bottom right)", 1)
 			end
 			local econStr1 = "Metal is the principal game resource. Build some Metal Extractors (mexes) on the metal spots."
-			local econStr2 = "Energy is also essential for your economy to function. Build some Solar Collectors or Wind Generators."
+			local econStr2 = "Energy is also essential for your economy to function. Build some Solar Collectors or Turbines."
 			local econStr3 = "Buildpower, often described as the third resource, is the measure of how much you can spend at once. We'll discuss that later."
 			AddTip(econStr1, 1, 3)
 			AddTip(econStr2, 1, 3, nil, econStr1)

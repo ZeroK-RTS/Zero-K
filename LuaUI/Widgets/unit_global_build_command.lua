@@ -1639,7 +1639,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 			end
 		elseif (unitDef and unitDef.reloadTime > 0) or job.id == CMD_RESURRECT then -- for small defenses and resurrect
 			cost = distance - 150
-		elseif unitDef and (string.match(unitDef.humanName, "Solar") or string.match(unitDef.humanName, "Wind")) then -- for small energy
+		elseif unitDef and (string.match(unitDef.humanName, "Solar") or string.match(unitDef.humanName, "Turbine")) then -- for small energy
 			cost = distance + 100
 		else -- for resurrect and all other small build jobs
 			cost = distance
