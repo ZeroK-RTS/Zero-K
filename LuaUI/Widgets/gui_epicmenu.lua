@@ -624,7 +624,7 @@ local function MakeFlags()
 
 	local countries = {}
 	local flagdir = 'LuaUI/Images/flags/'
-	local files = VFS.DirList(flagdir)
+	local files = VFS.DirList(flagdir, nil, VFS.MOD)
 	for i=1,#files do
 		local file = files[i]
 		local country = file:sub( #flagdir+1, -5 )
