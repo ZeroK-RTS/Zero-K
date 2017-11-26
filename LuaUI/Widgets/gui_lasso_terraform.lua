@@ -6,7 +6,7 @@ function widget:GetInfo()
 		version   = "v1",
 		date      = "Nov, 2009",
 		license   = "GNU GPL, v2 or later",
-		layer     = math.huge,
+		layer     = 999, -- Before Chili
 		enabled   = true,
 		handler   = true,
 	}
@@ -888,7 +888,13 @@ local function snapToHeight(heightArray, snapHeight, arrayCount)
 end
 
 function widget:MousePress(mx, my, button)
-
+	local screen0 = WG.Chili.Screen0
+	if screen0 and screen0.hoveredControl then
+		local classname = screen0.hoveredControl.classname
+		if not (classname == "control" or classname == "object" or classname == "panel" or classname == "window") then
+			return
+		end
+	end
 	if button == 1 and placingRectangle and placingRectangle.legalPos then
 		local activeCmdIndex, activeid = spGetActiveCommand()
 		local index = Spring.GetCmdDescIndex(CMD_LEVEL)
