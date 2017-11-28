@@ -1461,7 +1461,15 @@ function gadget:Load(zip)
 	
 	local loadData = GG.SaveLoad.ReadFile(zip, "Galaxy Campaign Battle Handler", SAVE_FILE) or {}
 	loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame")
-	
+
+	if not loadData.unitLineage
+	or not loadData.bonusObjectiveList
+	or not loadData.initialUnitData
+	then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission load file corrupted")
+		return
+	end
+
 	-- Unit Lineage. Reset because nonsense would be in it from UnitCreated.
 	unitLineage = {}
 	for oldUnitID, teamID in pairs(loadData.unitLineage) do
