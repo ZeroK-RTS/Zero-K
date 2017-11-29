@@ -521,8 +521,13 @@ function gadget:Load(zip)
 	end
 	
 	savedata.projectile = ReadFile(zip, "Projectile", projectileFile) or {}
-	savedata.general = ReadFile(zip, "General", generalFile) or {}
-	
+	savedata.general = ReadFile(zip, "General", generalFile)
+
+	if not savedata.general then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Save file corrupted (no 'general' section)")
+		return
+	end
+
 	LoadGeneralInfo()
 	LoadFeatures()	-- do features before units so we can change unit orders involving features to point to new ID
 	LoadUnits()
