@@ -1046,10 +1046,8 @@ function taiEmbark(unitID, teamID, embark, shift, internal) -- called by gadget
 
 	if not internal then
 		local queue = spGetCommandQueue(unitID, -1)
-		if (queue == nil) and (not shift) then --unit has no command at all?! and not queueing embark/disembark command?!
-			spEcho("Transport: Select destination")
-			spSetActiveCommand("transportto") --Force user to add move command. See unit_transport_ai_buttons.lua for more info.
-			return false --wait until user select destination
+		if (not queue or #queue == 0) and (not shift) then --unit has no command at all and not queueing embark/disembark command
+			return false
 		else
 			local hasMoveCommand
 			for k = 1, #queue do
@@ -1060,10 +1058,8 @@ function taiEmbark(unitID, teamID, embark, shift, internal) -- called by gadget
 					break
 				end
 			end
-			if (not hasMoveCommand) and (not shift) then --unit has no move command?! and not queueing embark/disembark command?!
-				spEcho("Transport: Select destination")
-				spSetActiveCommand("transportto") --Force user to add move command.
-				return false --wait until user select destination
+			if (not hasMoveCommand) and (not shift) then --unit has no move command and not queueing embark/disembark command
+				return false
 			end
 		end
 	end
