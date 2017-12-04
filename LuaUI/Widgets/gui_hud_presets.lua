@@ -841,7 +841,7 @@ local function SetupMinimapLeftPreset()
 		minimapWidth, minimapHeight, 
 		selectionsWidth, selectionsHeight, 
 		chatWidth, chatHeight,
-		playerlistWidth, playerlistHeight = GetBottomSizes(screenWidth, screenHeight, 1)
+		playerlistWidth, playerlistHeight = GetBottomSizes(screenWidth, screenHeight, -1)
 	
 	--local chatX = 0
 	--local chatY = screenHeight - chatHeight - minimapHeight
