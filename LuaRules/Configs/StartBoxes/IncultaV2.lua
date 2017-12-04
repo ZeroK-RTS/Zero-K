@@ -1,4 +1,4 @@
-return {
+local ret = {
 	[0] = {
 		nameLong = "Northwest",
 		nameShort = "NW",
@@ -28,35 +28,42 @@ return {
 				{6554,6144},
 			},
 		},
+	}
+}
+
+if Spring.Utilities.GetTeamCount() == 2 then
+	return ret
+end
+
+ret[2] = {
+	nameLong = "Northeast",
+	nameShort = "NE",
+	startpoints = {
+		{7373,614},
 	},
-	[2] = {
-		nameLong = "Northeast",
-		nameShort = "NE",
-		startpoints = {
-			{7373,614},
-		},
-		boxes = {
-			{
-				{6554,0},
-				{8192,0},
-				{8192,1229},
-				{6554,1229},
-			},
-		},
-	},
-	[3] = {
-		nameLong = "Southwest",
-		nameShort = "SW",
-		startpoints = {
-			{3277,5530},
-		},
-		boxes = {
-			{
-				{0,4915},
-				{6554,4915},
-				{6554,6144},
-				{0,6144},
-			},
+	boxes = {
+		{
+			{6554,0},
+			{8192,0},
+			{8192,1229},
+			{6554,1229},
 		},
 	},
 }
+ret[3] = {
+	nameLong = "Southwest",
+	nameShort = "SW",
+	startpoints = {
+		{3277,5530},
+	},
+	boxes = {
+		{
+			{0,4915},
+			{6554,4915},
+			{6554,6144},
+			{0,6144},
+		},
+	},
+}
+
+return ret
