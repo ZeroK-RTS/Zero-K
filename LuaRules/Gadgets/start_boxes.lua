@@ -157,7 +157,7 @@ local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimat
 		if Spring.Utilities.GetTeamCount() > 2 then
 			shuffleMode = "shuffle"
 		else
-			shuffleMode = "off"
+			shuffleMode = "allshuffle"
 		end
 	end
 	Spring.SetGameRulesParam("shuffleMode", shuffleMode)
