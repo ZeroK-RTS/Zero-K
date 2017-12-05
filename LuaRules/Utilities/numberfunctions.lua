@@ -137,3 +137,61 @@ function math.triangulate(polies)
 
 	return triangles
 end
+
+function math.HSLtoRGB(ch, cs, cl)
+	if cs == 0 then
+		return cl, cl, cl
+	end
+
+	local cr, cg, cb
+	local temp2
+	if cl < 0.5 then
+		temp2 = cl * (cl + cs)
+	else
+		temp2 = (cl + cs) - (cl * cs)
+	end
+
+	local temp1 = 2 * cl - temp2
+	local tempr = ch + 1 / 3
+
+	if tempr > 1 then
+		tempr = tempr - 1
+	end
+	local tempg = ch
+	local tempb = ch - 1 / 3
+	if tempb < 0 then
+		tempb = tempb + 1
+	end
+
+	if tempr < 1 / 6 then
+		cr = temp1 + (temp2 - temp1) * 6 * tempr
+	elseif tempr < 0.5 then
+		cr = temp2
+	elseif tempr < 2 / 3 then
+		cr = temp1 + (temp2 - temp1) * ((2 / 3) - tempr) * 6
+	else
+		cr = temp1
+	end
+
+	if tempg < 1 / 6 then
+		cg = temp1 + (temp2 - temp1) * 6 * tempg
+	elseif tempg < 0.5 then
+		cg = temp2
+	elseif tempg < 2 / 3 then
+		cg = temp1 + (temp2 - temp1) * ((2 / 3) - tempg) * 6
+	else
+		cg = temp1
+	end
+
+	if tempb < 1 / 6 then
+		cb = temp1 + (temp2 - temp1) * 6 * tempb
+	elseif tempb < 0.5 then
+		cb = temp2
+	elseif tempb < 2 / 3 then
+		cb = temp1 + (temp2 - temp1) * ((2 / 3) - tempb) * 6
+	else
+		cb = temp1
+	end
+
+	return cr, cg, cb
+end
