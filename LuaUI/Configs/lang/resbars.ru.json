@@ -5,6 +5,7 @@
 	"team_energy_economy" : "Энергия команды",
 	"resbar_base_extraction" : "Базовая добыча",
 	"resbar_overdrive" : "Разгон",
+	"resbar_overdrive_efficiency" : "Эффективность разгона",
 	"resbar_reclaim" : "Переработка",
 	"resbar_cons" : "Строители",
 	"resbar_sharing" : "Передача",

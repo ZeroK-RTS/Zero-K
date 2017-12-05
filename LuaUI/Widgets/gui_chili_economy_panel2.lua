@@ -40,6 +40,8 @@ local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
 local WARNING_IMAGE = LUAUI_DIRNAME .. "Images/Crystal_Clear_app_error.png"
 
+local GetGridColor = VFS.Include("LuaUI/Headers/overdrive.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -121,6 +123,7 @@ local strings = {
 	resbar_reclaim_total = "",
 	resbar_unit_value = "",
 	resbar_nano_value = "",
+	resbar_overdrive_efficiency = "",
 	metal = "",
 	metal_excess_warning = "",
 	energy_stall_warning = "",
@@ -734,6 +737,10 @@ function widget:GameFrame(n)
 	local team_energyWaste = Format(-cp.team_energyWaste)
 	local team_energyOther = Format(-teamEnergyExp + teamMSpent + cp.team_energyOverdrive)
 
+	local odEff = (cp.team_metalOverdrive > 0) and (cp.team_energyOverdrive / cp.team_metalOverdrive) or 0
+	local odColor = GetGridColor((odEff < 1) and 0 or (odEff < 4.2 and 4.2 or odEff)) -- grids below 4.2 have dark colors which make the text illegible; 0 is okay though
+	local odEffStr = string.char(255, odColor[1] * 255, odColor[2] * 255, odColor[3] * 255) .. ("%.1f"):format(odEff) .. WhiteStr
+
 	image_metal.tooltip = strings["local_metal_economy"] ..
 	"\n  " .. strings["resbar_base_extraction"] .. ": " .. metalBase ..
 	"\n  " .. strings["resbar_overdrive"] .. ": " .. metalOverdrive ..
@@ -780,6 +787,7 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
 	"\n  " .. strings["resbar_other"] .. ": " .. team_energyOther ..
 	"\n  " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
+	"\n  " .. strings["resbar_overdrive_efficiency"] .. ": " .. odEffStr .. " E/M" ..
     "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
 	
 	lbl_expense_metal:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
