@@ -935,6 +935,7 @@ end
 local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 	
 	local function OnClick(mouse)
+		local alt, ctrl, meta, shift = Spring.GetModKeyState()
 		Spring.SelectUnitArray({unitID}, shift)
 		if mouse == ((options.leftMouseCenter.value and 1) or 3) then
 			local x, y, z = Spring.GetUnitPosition(unitID)

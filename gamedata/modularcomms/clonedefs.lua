@@ -383,19 +383,19 @@ local copy = {
 		},
 		dynknight3 = {
 			level = 3,
-			mainstats = {maxdamage = 4600, objectname = "cremcom3.s3o", collisionvolumescales  = [[55 60 55]],},
+			mainstats = {maxdamage = 4400, objectname = "cremcom3.s3o", collisionvolumescales  = [[55 60 55]],},
 			customparams = {modelradius = [[30]], shield_emit_height = 36},
 			wreckmodel = "cremcom3_dead.s3o",
 		},
 		dynknight4 = {
 			level = 4,
-			mainstats = {maxdamage = 5500, objectname = "cremcom4.s3o", collisionvolumescales  = [[60 65 60]],},
+			mainstats = {maxdamage = 5200, objectname = "cremcom4.s3o", collisionvolumescales  = [[60 65 60]],},
 			customparams = {modelradius = [[33]], shield_emit_height = 37.5},
 			wreckmodel = "cremcom4_dead.s3o",
 		},
 		dynknight5 = {
 			level = 5,
-			mainstats = {maxdamage = 6400, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
+			mainstats = {maxdamage = 6000, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
 			customparams = {modelradius = [[35]], shield_emit_height = 39},
 			wreckmodel = "cremcom5_dead.s3o",
 		},
