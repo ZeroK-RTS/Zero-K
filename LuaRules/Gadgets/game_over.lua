@@ -381,13 +381,21 @@ local function CauseVictory(allyTeamID)
 end
 GG.CauseVictory = CauseVictory
 
+local function CanAddCommander()
+	if not isScriptMission then
+		return true
+	end
+	local frame = Spring.GetGameFrame()
+	return frame < 10
+end
+
 local function AddAllianceUnit(unitID, unitDefID, teamID)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
 	aliveCount[teamID] = aliveCount[teamID] + 1
 	
 	aliveValue[teamID] = aliveValue[teamID] + UnitDefs[unitDefID].metalCost
 
-	if UnitDefs[unitDefID].customParams.commtype then
+	if CanAddCommander() and UnitDefs[unitDefID].customParams.commtype then
 		commsAlive[allianceID][unitID] = true
 	end
 	
@@ -409,7 +417,8 @@ local function CheckMissionDefeatOnUnitLoss(unitID, allianceID)
 	if defeatConfig.defeatIfUnitDestroyed and defeatConfig.defeatIfUnitDestroyed[unitID] then
 		if (not gameOverSent) and type(defeatConfig.defeatIfUnitDestroyed[unitID]) == "number" then
 			local objParameter = "objectiveSuccess_" .. defeatConfig.defeatIfUnitDestroyed[unitID]
-			Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allianceID == MISSION_PLAYER_ALLY_TEAM_ID and 0) or 1))
+			local value = (allianceID == MISSION_PLAYER_ALLY_TEAM_ID and 0) or 1
+			Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + value)
 		end
 		return true
 	end

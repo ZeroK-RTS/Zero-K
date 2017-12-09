@@ -861,6 +861,9 @@ local function PlaceRetinueUnit(retinueID, range, unitDefName, spawnX, spawnZ, f
 end
 
 local function HandleCommanderCreation(unitID, teamID)
+	if Spring.GetGameFrame() >= 10 then
+		return
+	end
 	local commParameters = teamCommParameters[teamID]
 	if not commParameters then
 		return
