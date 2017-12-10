@@ -1397,7 +1397,7 @@ function gadget:Save(zip)
 	end
 	
 	local chickenTable = SYNCED.data
-	chickenTable = Spring.Utilities.MakeRealTable(chickenTable)
+	chickenTable = Spring.Utilities.MakeRealTable(chickenTable, "Chicken")
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, chickenTable)
 end
 --------------------------------------------------------------------------------

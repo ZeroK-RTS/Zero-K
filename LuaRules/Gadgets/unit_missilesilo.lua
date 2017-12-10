@@ -223,7 +223,7 @@ function gadget:Save(zip)
 		return
 	end
 	
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.saveTable))
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.saveTable, "Missile silo"))
 end
 
 --------------------------------------------------------------------------------

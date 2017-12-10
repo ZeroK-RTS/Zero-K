@@ -94,10 +94,6 @@ end
 -- Mission Handling
 
 if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage (and enable facplopping)
-	if not gadgetHandler:IsSyncedCode() then
-		return false -- no unsynced code
-	end
-
 	function gadget:Initialize()
 		for _, teamID in ipairs(Spring.GetTeamList()) do
 			Spring.SetTeamResource(teamID, "es", START_STORAGE + HIDDEN_STORAGE)
@@ -699,17 +695,20 @@ end
 local MakeRealTable = Spring.Utilities.MakeRealTable
 
 function gadget:Save(zip)
+	if VFS.FileExists("mission.lua") then	-- nothing to do
+		return		
+	end
 	if not GG.SaveLoad then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Start Unit Setup failed to access save/load API")
 		return
 	end
 	local toSave = {
-		waitingForComm = MakeRealTable(SYNCED.waitingForComm),
-		scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn),
-		playerSides = MakeRealTable(SYNCED.playerSides),
-		teamSides = MakeRealTable(SYNCED.teamSides),
-		commSpawnedPlayer = MakeRealTable(SYNCED.commSpawnedPlayer),
-		commSpawnedTeam = MakeRealTable(SYNCED.commSpawnedTeam),
+		waitingForComm = MakeRealTable(SYNCED.waitingForComm, "Start setup (waitingForComm)"),
+		scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn, "Start setup (scheduledSpawn)"),
+		playerSides = MakeRealTable(SYNCED.playerSides, "Start setup (playerSides)"),
+		teamSides = MakeRealTable(SYNCED.teamSides, "Start setup (teamSides)"),
+		commSpawnedPlayer = MakeRealTable(SYNCED.commSpawnedPlayer, "Start setup (commSpawnedPlayer)"),
+		commSpawnedTeam = MakeRealTable(SYNCED.commSpawnedTeam, "Start setup (commSpawnedTeam)"),
 	}
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, toSave)
 end

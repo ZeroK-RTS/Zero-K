@@ -766,10 +766,10 @@ function gadget:Save(zip)
 		return
 	end
 	local toSave = {
-		unitDamage = MakeRealTable(SYNCED.unitDamage),
-		capturedUnits = MakeRealTable(SYNCED.capturedUnits),
-		controllers = MakeRealTable(SYNCED.controllers),
-		reloading = MakeRealTable(SYNCED.reloading),
+		unitDamage = MakeRealTable(SYNCED.unitDamage, "Capture unit damage"),
+		capturedUnits = MakeRealTable(SYNCED.capturedUnits, "Capture captured units"),
+		controllers = MakeRealTable(SYNCED.controllers, "Capture controllers"),
+		reloading = MakeRealTable(SYNCED.reloading, "Capture reloads"),
 	}
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, toSave)
 end

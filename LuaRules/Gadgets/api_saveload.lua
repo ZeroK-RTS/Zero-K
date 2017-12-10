@@ -213,9 +213,10 @@ local function LoadUnits()
 	for oldID, data in pairs(savedata.unit) do
 		local px, py, pz = unpack(data.pos)
 		local unitDefID = UnitDefNames[data.unitDefName].id
-		if (not UnitDefs[unitDefID].canMove) then
-			py = Spring.GetGroundHeight(px, pz)
-		end
+		-- breaks buildings on terraform (still breaks afterwards, see https://github.com/ZeroK-RTS/Zero-K/issues/1949)
+		--if (not UnitDefs[unitDefID].canMove) then
+		--	py = Spring.GetGroundHeight(px, pz)
+		--end
 		local isNanoFrame = data.buildProgress < 1
 		-- The 9th argument for unitID cannot be used here. If there is already a unit
 		-- with that unitID then the new unit will fail to be created. The old unit
@@ -688,6 +689,13 @@ local function WriteTable(tab, tabName, params)
 		elseif type(v) == "string" then
 			str = str .. string.format("%q", v) .. pairEndLine
 		else
+			if type(v) == "number" then
+				if v == math.huge then
+					v = "math.huge"
+				elseif v == -math.huge then
+					v = "-math.huge"
+				end
+			end
 			str = str .. v .. pairEndLine
 		end
 	end

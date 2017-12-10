@@ -4273,8 +4273,8 @@ function gadget:Save(zip)
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "CAI failed to access save/load API")
 		return
 	end
-	local allyTeamData = MakeRealTable(SYNCED.allyTeamData)
-	local aiTeamData = MakeRealTable(SYNCED.aiTeamData)
+	local allyTeamData = MakeRealTable(SYNCED.allyTeamData, "CAI ally team data")
+	local aiTeamData = MakeRealTable(SYNCED.aiTeamData, "CAI AI team data")
 	local toSave = {allyTeamData = allyTeamData, aiTeamData = aiTeamData}
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, toSave)
 end

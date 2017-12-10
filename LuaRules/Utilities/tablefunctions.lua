@@ -63,7 +63,11 @@ function Spring.Utilities.TableToString(data, key)
 end
 
 -- need this because SYNCED.tables are merely proxies, not real tables
-local function MakeRealTable(proxy)
+local function MakeRealTable(proxy, debugTag)
+	if proxy == nil then
+		Spring.Log("Table Utilities", LOG.ERROR, "Proxy table is nil: " .. (debugTag or "unknown table"))
+		return
+	end
 	local proxyLocal = proxy
 	local ret = {}
 	for i,v in spairs(proxyLocal) do
