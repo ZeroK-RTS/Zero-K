@@ -529,6 +529,13 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	--calculate equations of the 3 lines, left, right and mid
 	
 	local border = {}
+	
+	if abs(x1 - x2) < 0.1 then
+		x2 = x1 + 0.1
+	end
+	if abs(z1 - z2) < 0.1 then
+		z2 = z1 + 0.1
+	end
   
 	local dis = distance(x1,z1,x2,z2)
 	
@@ -548,15 +555,8 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		heightDiff = -maxRampGradient*dis
 	end
 	
-	local m
-	if x1 ~= x2 then
-		m = (z1-z2)/(x1-x2)
-	else
-		m = 100000
-	end
-	if m == 0 then 
-		m = 0.0001 
-	end 
+	-- Due to previous checks, m is not 0 or infinity.
+	local m = (z1-z2)/(x1-x2)
 	
 	local segmentsAlong = ceil(dis/maxRampLegth)
 	local segmentsAcross = ceil(terraform_width/maxRampWidth)
