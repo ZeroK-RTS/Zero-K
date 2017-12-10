@@ -124,7 +124,6 @@ local curSubKey = ''
 local curPath = ''
 
 local init = false
-local myCountry = 'wut'
 
 local pathoptions = {}	
 local actionToOption = {}
@@ -149,6 +148,8 @@ local gameInfoText = ''
 	
 
 local function returnSelf(self) return self end
+
+local languages, flagByLang, langByFlag = VFS.Include("LuaUI/Headers/languages.lua")
 
 --------------------------------------------------------------------------------
 -- Key bindings
@@ -195,8 +196,6 @@ local EPIC_SETTINGS_VERSION = 51
 
 local settings = {
 	versionmin = EPIC_SETTINGS_VERSION,
-	lang = 'en',
-	country = 'wut',
 	widgets = {},
 	show_crudemenu = true,
 	music_volume = 0.5,
@@ -599,89 +598,45 @@ end
 
 VFS.Include("LuaUI/Utilities/json.lua");
 
-local function SetCountry(self) 
-	echo('Setting country: "' .. self.country .. '" ') 
-	
-	WG.country = self.country
-	settings.country = self.country
-	
+local function SetLang(self) 
+	echo('Setting language: "' .. self.lang .. '" ') 
+
+	settings.lang = self.lang
+
 	if WG.lang then
-		WG.lang(self.countryLang)
+		WG.lang(self.lang)
 	end
-	
-	settings.lang = self.countryLang
-	
+
 	if img_flag then
-		img_flag.file = ":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png'
+		img_flag.file = ":cn:".. LUAUI_DIRNAME .. "Images/flags/".. flagByLang[settings.lang] ..'.png'
 		img_flag:Invalidate()
 	end
 end 
 
---Make country chooser window
+--Make language chooser window
 local function MakeFlags()
 
 	if window_flags then return end
 
-	local countries = {}
-	local flagdir = 'LuaUI/Images/flags/'
-	local files = VFS.DirList(flagdir, nil, VFS.MOD)
-	for i=1,#files do
-		local file = files[i]
-		local country = file:sub( #flagdir+1, -5 )
-		countries[#countries+1] = country
-	end
-		
-	local country_langs = {
-		br='bp',
-		de='de',
-		es='es',
-		fi='fi', 
-		fr='fr',
-		it='it',
-		my='my', 
-		pl='pl',
-		pt='pt',
-		pr='es',
-		ru='ru',
-	}
-
 	local flagChildren = {}
-	
-	flagChildren[#flagChildren + 1] = Label:New{ caption='Flag', align='center' }
-	flagChildren[#flagChildren + 1] = Button:New{
-		name = 'flagButton';
-		caption = 'Auto', 
-		country = myCountry, 
-		countryLang = country_langs[myCountry] or 'en',
-		width='50%',
-		--classname = "submenu_navigation_button",
-		--textColor = color.sub_button_fg,
-		--backgroundColor = color.sub_button_bg, 
-		OnClick = { SetCountry }  
-	}
-	
 
-	local flagCount = 0
-	for i=1, #countries do
-		local country = countries[i]
-		local countryLang = country_langs[country] or 'en'
-		flagCount = flagCount + 1
-		flagChildren[#flagChildren + 1] = Image:New{ file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. country ..'.png', }
-		flagChildren[#flagChildren + 1] = Button:New{ caption = country:upper(),
-			name = 'countryButton' .. country;
+	for i = 1, #languages do
+		local langData = languages[i]
+		flagChildren[#flagChildren + 1] = Image:New{
+			file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. langData.flag ..'.png',
+		}
+		flagChildren[#flagChildren + 1] = Button:New{
+			caption = langData.name,
+			name = 'countryButton' .. langData.lang;
 			width='50%',
-			--classname = "submenu_navigation_button",
-			--textColor = color.sub_button_fg,
-			--backgroundColor = color.sub_button_bg,
-			country = country,
-			countryLang = countryLang,
-			OnClick = { SetCountry } 
+			lang = langData.lang,
+			OnClick = { SetLang } 
 		}
 	end
 	local window_height = 300
 	local window_width = 170
 	window_flags = Window:New{
-		caption = 'Choose Your Location',
+		caption = 'Choose Language',
 		x = settings.sub_pos_x,  
 		y = settings.sub_pos_y,  
 		clientWidth  = window_width,
@@ -2555,7 +2510,7 @@ local function MakeMenuBar()
 	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={0,5,0,0}, }
 	lbl_gtime = Label:New{ name='lbl_gtime', caption = '00:00', width = 55, height=5, textColor = color.sub_header,  }
 	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
-	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16, height = 11, OnClick = { MakeFlags }, padding={4,4,4,6}  }
+	img_flag = Image:New{ tooltip='Choose Language', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. flagByLang[settings.lang] ..'.png', width = 16, height = 11, OnClick = { MakeFlags }, padding={4,4,4,6}  }
 	
 	local screen_width,screen_height = Spring.GetWindowGeometry()
 	
@@ -2751,19 +2706,15 @@ function widget:Initialize()
 	end
 
 	if not confLoaded then
-		if not settings.country or settings.country == 'wut' then
-			myCountry = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID()))
-			if not myCountry or myCountry == '' then
-				myCountry = 'wut'
-			end
-			settings.country = myCountry
+		if not settings.lang or not flagByLang[settings.lang] then
+			local flag = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID())):lower()
+			settings.lang = langByFlag[flag]
 		end
 
-		WG.country = settings.country
 		WG.lang(settings.lang)
 	end
 
-		-- add custom widget settings to crudemenu
+	-- add custom widget settings to crudemenu
 	AddAllCustSettings()
 
 	--this is done to establish order the correct button order
@@ -3064,17 +3015,13 @@ function widget:SetConfigData(data)
 
 	-- set language. Needs to be done ASAP, before other widgets are even loaded!
 	-- This is because option paths are done right on load and they can use translations.
-	if not settings.country or settings.country == 'wut' then
-		myCountry = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID()))
-		if not myCountry or myCountry == '' then
-			myCountry = 'wut'
-		end
-		settings.country = myCountry
+	if not settings.lang or not flagByLang[settings.lang] then
+		local flag = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID())):lower()
+		settings.lang = langByFlag[flag]
 	end
-	
+
 	settings["epic_Settings/Misc_Show_Advanced_Settings"] = settings.showAdvanced
 
-	WG.country = settings.country
 	WG.lang(settings.lang)
 
 	WG.music_volume = settings.music_volume or 0.5
