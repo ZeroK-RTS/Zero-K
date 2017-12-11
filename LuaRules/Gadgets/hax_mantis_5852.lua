@@ -148,7 +148,6 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeamID)
 	if data then
 		data.teamID = newTeam
 		data.allyTeamID = Spring.GetUnitAllyTeam(unitID) or data.allyTeamID
-		Spring.Utilities.UnitEcho(unitID, data.allyTeamID .. " " .. data.teamID)
 	end
 end
 
