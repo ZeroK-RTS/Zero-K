@@ -229,8 +229,17 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 			else
 				Spring.SetUnitRulesParam(unitID, "primary_weapon_override",  weapon2, INLOS)
 			end
+			
+			local range1 = Spring.GetUnitWeaponState(unitID, weapon1, 'range')
+			local range2 = Spring.GetUnitWeaponState(unitID, weapon2, 'range')
+			if range1 > range2 then
+				Spring.SetUnitRulesParam(unitID, "primary_weapon_range",  weapon1, INLOS)
+			else
+				Spring.SetUnitRulesParam(unitID, "primary_weapon_range",  weapon2, INLOS)
+			end
 		else
 			Spring.SetUnitRulesParam(unitID, "primary_weapon_override",  weapon1, INLOS)
+			Spring.SetUnitRulesParam(unitID, "primary_weapon_range",  weapon1, INLOS)
 		end
 	end
 	
