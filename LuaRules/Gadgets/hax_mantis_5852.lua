@@ -90,7 +90,7 @@ local function CheckMoveGoalUpdate(unitID, data)
 	end
 	
 	local targetID = cQueue[1].params[1]
-	if not targetID then
+	if not targetID or not Spring.ValidUnitID(targetID) then
 		return
 	end
 	local by, ax, ay, az = GetTargetPositionWithWobble(targetID, data)
