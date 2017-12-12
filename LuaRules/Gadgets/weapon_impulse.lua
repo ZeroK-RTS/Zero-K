@@ -139,6 +139,10 @@ end
 -- General Functionss
 
 local function DetatchFromGround(unitID, threshold, height, doImpulse)
+	if UnitDefs[Spring.GetUnitDefID(unitID)].isImmobile then
+		return
+	end
+
 	threshold = threshold or 0.01
 	height = height or 0.1
 	local x,y,z = spGetUnitPosition(unitID)
