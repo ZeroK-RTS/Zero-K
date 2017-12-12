@@ -2139,12 +2139,16 @@ local function GetMainPanel(parent, width, height)
 	end
 	oldWidth = width
 	oldHeight = height
-	
+
 	local luaMenu = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
+	if luaMenu == "" then
+		luaMenu = nil
+	end
+
 	if luaMenu then
 		Spring.SendLuaMenuMsg("disableLobbyButton")
-	end	
-	
+	end
+
 	local stackChildren = {}
 	local holderWidth = 6
 	local sliderWidth = 100
