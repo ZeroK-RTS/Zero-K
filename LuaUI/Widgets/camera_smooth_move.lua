@@ -24,6 +24,8 @@ options = {
 		OnChange = function(self)
 			isEnabled = self.value
 		end,
+		simpleMode = true,
+		everyMode = true,
 	},
 }
 

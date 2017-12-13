@@ -190,6 +190,7 @@ confdata.simpleModeDirectory = {
 	['Interface'] = true,
 	['Audio'] = true,
 	['Graphics'] = true,
+	['Camera'] = true,
 	['Accessibility'] = true,
 }
 confdata.simpleModeFullDirectory = {

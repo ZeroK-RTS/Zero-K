@@ -25,6 +25,8 @@ options = {
 		min = 0,
 		max = 1,
 		step = 0.01,
+		simpleMode = true,
+		everyMode = true,
 	},
 	tiltZoom = {
 		name = 'Tilt Zoom',

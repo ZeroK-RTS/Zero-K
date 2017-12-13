@@ -1765,7 +1765,6 @@ MakeSubWindow = function(path, pause)
 					name = option.wname .. " " .. option.name;
 					width = "100%",
 					minHeight = 30,
-					caption = option.name, 
 					text = option.value,
 				}
 			
@@ -2738,6 +2737,7 @@ function widget:Initialize()
 	AddOption('Settings/Audio')
 	AddOption('Settings/Camera')
 	AddOption('Settings/Graphics')
+	AddOption('Settings/Accessibility')
 	AddOption('Settings/HUD Panels')
 	AddOption('Settings/HUD Presets')
 	AddOption('Settings/Interface')
