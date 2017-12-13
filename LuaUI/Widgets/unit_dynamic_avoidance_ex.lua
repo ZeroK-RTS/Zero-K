@@ -159,7 +159,7 @@ local allyClusterInfo_gbl = {coords={},age=0}
 --------------------------------------------------------------------------------
 --Methods:
 ---------------------------------Level 0
-options_path = 'Unit Behaviour/Dynamic Avoidance' --//for use 'with gui_epicmenu.lua'
+options_path = 'Settings/Unit Behaviour/Dynamic Avoidance' --//for use 'with gui_epicmenu.lua'
 options_order = {'enableCons','enableCloaky','enableGround','enableGunship','enableReturnToBase','consRetreatTimeoutOption', 'cloakyAlwaysFlee','enableReloadAvoidance','retreatAvoidance','dbg_RemoveAvoidanceSplitSecond', 'dbg_IgnoreSelectedCons'}
 options = {
 	enableCons = {

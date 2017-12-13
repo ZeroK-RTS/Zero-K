@@ -16,7 +16,7 @@ local function ToggleCallins(self)
 	end
 end
 
-options_path = 'Unit Behaviour'
+options_path = 'Settings/Unit Behaviour'
 options = { 
 	enabled = {
 		name = 'Double right-click to attack-move', 

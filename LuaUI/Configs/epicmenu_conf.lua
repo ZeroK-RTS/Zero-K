@@ -139,9 +139,9 @@ confdata.subMenuIcons = {
 	['Settings'] = imgPath..'epicmenu/settings.png',
 	['Help'] = imgPath..'epicmenu/questionmark.png',
 	
-	['Unit Behaviour/Worker AI'] = imgPath..'commands/Bold/build_light.png',
+	['Settings/Unit Behaviour/Worker AI'] = imgPath..'commands/Bold/build_light.png',
 	['Settings/Interface/Unit Marker']     = imgPath..'epicmenu/marker.png',
-	['Unit Behaviour']  = imgPath..'epicmenu/robot2.png',
+	['Settings/Unit Behaviour']  = imgPath..'epicmenu/robot2.png',
 	['Hotkeys']         = imgPath..'epicmenu/keyboard.png',
 	
 	['Settings/Reset Settings']     = imgPath..'epicmenu/undo.png',
@@ -191,6 +191,7 @@ confdata.simpleModeDirectory = {
 	['Audio'] = true,
 	['Graphics'] = true,
 	['Camera'] = true,
+	['Unit Behaviour'] = true,
 	['Accessibility'] = true,
 }
 confdata.simpleModeFullDirectory = {

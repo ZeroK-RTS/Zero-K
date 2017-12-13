@@ -94,7 +94,7 @@ end
 include("keysym.h.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-options_path = 'Unit Behaviour/Worker AI'
+options_path = 'Settings/Unit Behaviour/Worker AI'
 
 options_order = {
 	'updateRate',
