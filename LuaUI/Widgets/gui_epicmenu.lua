@@ -1394,8 +1394,8 @@ local function GetHotkeyData(path, option)
 end
 
 --Make a stack with control and its hotkey button
-local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHeight)
-
+local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHeight, padding)
+	padding = padding or 0
 	local children = {}
 	if noHotkey then
 		control.x = 0
@@ -1460,7 +1460,7 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHei
 		itemMargin = {0,0,0,0},
 		margin = {0,0,0,0},
 		itemPadding = {0,0,0,0}, 
-		padding = {0,0,0,0},
+		padding = {0,0,0,padding},
 		children=children,
 	}
 end
@@ -1721,10 +1721,11 @@ MakeSubWindow = function(path, pause)
 				local escapeSearch = searchedElement and option.desc and option.desc:find(currentPath) and option.isDirectoryButton --this type of button will open sub-level when pressed (defined in "AddOption(path, option, wname )")
 				local disabled = option.DisableFunc and option.DisableFunc()
 				local icon = option.icon
-				local button_height = root and 36 or 36 -- was 30
+				local button_height = 36
 				local button = Button:New{
 					name = option.wname .. " " .. option.name;
-					x=0,
+					x = 0,
+					y = 1,
 					minHeight = button_height,
 					--caption = option.name, 
 					caption = '', 
@@ -1752,23 +1753,20 @@ MakeSubWindow = function(path, pause)
 			tree_children[#tree_children+1] = Label:New{ caption = option.value or option.name, textColor = color.sub_header, }
 			
 		elseif option.type == 'text' then	
+			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_header, }
 			tree_children[#tree_children+1] = 
-				Button:New{
+				TextBox:New{
 					name = option.wname .. " " .. option.name;
 					width = "100%",
 					minHeight = 30,
 					caption = option.name, 
-					OnClick = { function() MakeHelp(option.name, option.value) end },
-					--classname = "submenu_navigation_button",
-					--backgroundColor = color.sub_button_bg,
-					--textColor = color.sub_button_fg, 
-					tooltip=option.desc
+					text = option.value,
 				}
 			
-		elseif option.type == 'bool' then				
+		elseif option.type == 'bool' then
 			local chbox = Checkbox:New{ 
 				x = 0,
-				y = 7,
+				y = 0,
 				right = 35,
 				caption = option.name, 
 				checked = option.value or false, 
@@ -1778,7 +1776,7 @@ MakeSubWindow = function(path, pause)
 				tooltip   = option.desc,
 			}
 			option.epic_reference = chbox
-			tree_children[#tree_children+1] = MakeHotkeyedControl(chbox,  path, option, icon, option.noHotkey)
+			tree_children[#tree_children+1] = MakeHotkeyedControl(chbox,  path, option, icon, option.noHotkey, nil, 8)
 			
 		elseif option.type == 'number' then	
 			settings_height = settings_height + B_HEIGHT
@@ -1847,7 +1845,7 @@ MakeSubWindow = function(path, pause)
 				local cb = Checkbox:New{
 					--x=0,
 					right = 35,
-					y = 7,
+					y = 0,
 					caption = '  ' .. item.name,
 					checked = (option.value == item.value),
 					OnChange = {function(self) option.OnChange(item) end},
@@ -1856,7 +1854,7 @@ MakeSubWindow = function(path, pause)
 					round = true,
 				}
 				local icon = option.items[i].icon
-				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon, option.noHotkey)
+				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon, option.noHotkey, nil, 2)
 					
 			end
 			tree_children[#tree_children+1] = Label:New{ caption = '', }
@@ -2722,6 +2720,11 @@ function widget:Initialize()
 	AddAllCustSettings()
 
 	--this is done to establish order the correct button order
+	AddOption('Settings')
+	AddOption('Hotkeys')
+	AddOption('Unit Behaviour')
+	AddOption('Help')
+	
 	local imgPath = LUAUI_DIRNAME  .. 'images/'
 	AddOption('Settings/Reset Settings')
 	AddOption('Settings/Audio')
@@ -2731,6 +2734,7 @@ function widget:Initialize()
 	AddOption('Settings/HUD Presets')
 	AddOption('Settings/Interface')
 	AddOption('Settings/Misc')
+	
 
 	-- Add pre-configured button/options found in epicmenu config file
 	local options_temp = CopyTable(epic_options, true)

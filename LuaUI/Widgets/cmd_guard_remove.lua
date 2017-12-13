@@ -18,7 +18,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Epic Menu Options
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Unit Behaviour'
+options_path = 'Unit Behaviour'
 options = {
 	keepTarget = {
 		name = "Shift removes constructor guard",

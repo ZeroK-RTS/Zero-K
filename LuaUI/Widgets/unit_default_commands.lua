@@ -7,7 +7,7 @@ function widget:GetInfo() return {
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua") -- for CMD_RAW_MOVE
 
-options_path = 'Settings/Unit Behaviour'
+options_path = 'Unit Behaviour'
 options = {
 	guard_facs = {
 		name = "Rightclick factory Guards",

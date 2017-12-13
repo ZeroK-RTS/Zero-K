@@ -139,10 +139,10 @@ confdata.subMenuIcons = {
 	['Settings'] = imgPath..'epicmenu/settings.png',
 	['Help'] = imgPath..'epicmenu/questionmark.png',
 	
-	['Settings/Unit Behaviour/Worker AI'] = imgPath..'commands/Bold/build_light.png',
+	['Unit Behaviour/Worker AI'] = imgPath..'commands/Bold/build_light.png',
 	['Settings/Interface/Unit Marker'] 	= imgPath..'epicmenu/marker.png',
-	['Settings/Unit Behaviour'] 	= imgPath..'epicmenu/robot2.png',
-	['Settings/Hotkeys'] 			= imgPath..'epicmenu/keyboard.png',
+	['Unit Behaviour'] 	= imgPath..'epicmenu/robot2.png',
+	['Hotkeys'] 			= imgPath..'epicmenu/keyboard.png',
 	
 	['Settings/Reset Settings'] 	= imgPath..'epicmenu/undo.png',
 	['Settings/Audio'] 				= imgPath..'epicmenu/vol.png',
@@ -188,10 +188,12 @@ confdata.subMenuIcons = {
 confdata.simpleModeDirectory = {
 	['Interface'] = true,
 	['Audio'] = true,
-	['Hotkeys'] = true,
+	['Graphics'] = true,
 }
 confdata.simpleModeFullDirectory = {
-	'Settings/Hotkeys'
+	'Hotkeys',
+	'Unit Behaviour',
+	'Help',
 }
 
 -- SETUP MENU HERE
@@ -237,7 +239,7 @@ local settingsPath = 'Settings'
 
 
 --- Hotkeys --- 
-local hotkeysMiscPath = 'Settings/Hotkeys/Misc' 
+local hotkeysMiscPath = 'Hotkeys/Misc' 
 
 	ShButton(hotkeysMiscPath, 'Pause/Unpause', 'pause', nil, nil, imgPath .. 'epicmenu/media_playback_pause.png')
 		ShButton(hotkeysMiscPath, 'Increase Speed', 'speedup')
@@ -299,7 +301,7 @@ local cameraPath = 'Settings/Camera'
 		end
 		)
 
-local camerHotkeys = 'Settings/Hotkeys/Camera'
+local camerHotkeys = 'Hotkeys/Camera'
 	ShButton(camerHotkeys, 'Move Forward', 'moveforward')
 	ShButton(camerHotkeys, 'Move Back', 'moveback')
 	ShButton(camerHotkeys, 'Move Left', 'moveleft')
@@ -644,7 +646,7 @@ AddOption("Settings/HUD Panels/Pause Screen",
 	})
 
 --- HELP ---
-local pathHelp = 'Help'
+local pathHelp = 'Settings/Nag'
 	AddOption(pathHelp,
 	{
 		type='text',
@@ -655,7 +657,7 @@ local pathHelp = 'Help'
 	})
 	ShButton(pathHelp,'Tutorial', function() spSendCommands{"luaui togglewidget Nubtron"} end )
 	ShButton(pathHelp,'Tip Dispenser', function() spSendCommands{"luaui togglewidget Automatic Tip Dispenser"} end, 'An advisor which gives you tips as you play' )
-local pathClippy = 'Help/Clippy Comments'
+local pathClippy = 'Settings/Nag/Clippy Comments'
 	ShButton(pathClippy, 'Toggle Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
 
 --- MISC

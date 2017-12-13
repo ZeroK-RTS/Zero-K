@@ -103,7 +103,7 @@ options_order = {
 	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning'
 }
 
-local commandPanelPath = 'Settings/Hotkeys/Command Panel'
+local commandPanelPath = 'Hotkeys/Command Panel'
 
 options = {
 	background_opacity = {

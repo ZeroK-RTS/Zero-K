@@ -117,7 +117,7 @@ local function MakeStatsWindow()
 end
 
 options_order = {'shortNotation'}
-options_path = 'Help/Guide/Unit List'
+options_path = 'Help/Unit List'
 options = {
 		
 	shortNotation = {
@@ -160,7 +160,7 @@ local function addUnit (unitDefID, path, buildable)
 			type='button',
 			desc = "Build " .. unitName,
 			action = 'buildunit_' .. ud.name,
-			path = 'Settings/Hotkeys/Construction/' .. path,
+			path = 'Hotkeys/Construction/' .. path,
 		}
 		options_order[#options_order + 1] = optionName
 	end
