@@ -81,7 +81,7 @@ local optionGenerationTable = {
 			{key = "deuteranopia", name="Deuteranopia - missing GREEN"},
 			{key = "tritanopia", name="Tritanopia - missing BLUE"},
 		},
-		path = "Settings/Interface",
+		path = "Settings/Accessibility",
 	},
 }
 

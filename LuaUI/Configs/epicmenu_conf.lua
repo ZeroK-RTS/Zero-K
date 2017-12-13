@@ -47,8 +47,8 @@ color.menu_fg = color.null
 color.game_bg = color.null
 color.game_fg = color.null
 
-color.sub_bg	= color.transnull
-color.sub_fg 	= color.null
+color.sub_bg    = color.transnull
+color.sub_fg     = color.null
 color.sub_header = color.yellow
 
 color.sub_button_bg = color.null
@@ -140,55 +140,57 @@ confdata.subMenuIcons = {
 	['Help'] = imgPath..'epicmenu/questionmark.png',
 	
 	['Unit Behaviour/Worker AI'] = imgPath..'commands/Bold/build_light.png',
-	['Settings/Interface/Unit Marker'] 	= imgPath..'epicmenu/marker.png',
-	['Unit Behaviour'] 	= imgPath..'epicmenu/robot2.png',
-	['Hotkeys'] 			= imgPath..'epicmenu/keyboard.png',
+	['Settings/Interface/Unit Marker']     = imgPath..'epicmenu/marker.png',
+	['Unit Behaviour']  = imgPath..'epicmenu/robot2.png',
+	['Hotkeys']         = imgPath..'epicmenu/keyboard.png',
 	
-	['Settings/Reset Settings'] 	= imgPath..'epicmenu/undo.png',
-	['Settings/Audio'] 				= imgPath..'epicmenu/vol.png',
-	['Settings/Camera'] 			= imgPath..'epicmenu/video_camera.png',
-	['Settings/Graphics'] 			= imgPath..'epicmenu/graphics.png',
-	['Settings/HUD Panels'] 		= imgPath..'epicmenu/control_panel.png',
-	['Settings/HUD Presets'] 		= imgPath..'epicmenu/speed-test-icon.png',
-	['Settings/Interface'] 			= imgPath..'epicmenu/robotarm.png',
-	['Settings/Misc'] 				= imgPath..'epicmenu/misc.png',
+	['Settings/Reset Settings']     = imgPath..'epicmenu/undo.png',
+	['Settings/Audio']              = imgPath..'epicmenu/vol.png',
+	['Settings/Camera']             = imgPath..'epicmenu/video_camera.png',
+	['Settings/Graphics']           = imgPath..'epicmenu/graphics.png',
+	['Settings/Accessibility']      = imgPath..'map/minimap_colors_simple.png',
+	['Settings/HUD Panels']         = imgPath..'epicmenu/control_panel.png',
+	['Settings/HUD Presets']        = imgPath..'epicmenu/speed-test-icon.png',
+	['Settings/Interface']          = imgPath..'epicmenu/robotarm.png',
+	['Settings/Misc']               = imgPath..'epicmenu/misc.png',
 	
-	['Settings/Interface/Mouse Cursor'] 		= imgPath..'epicmenu/input_mouse.png',
-	['Settings/Interface/Map'] 					= imgPath..'epicmenu/map.png',
-	['Settings/Interface/Healthbars'] 			= imgPath..'commands/Bold/health.png',
-	['Settings/Interface/Retreat Zones'] 		= imgPath..'commands/Bold/retreat.png',
-	['Settings/Interface/Spectating'] 			= imgPath..'epicmenu/popcorn.png',
-	['Settings/Interface/Building Placement'] 	= imgPath..'factory.png',
-	['Settings/Interface/Team Colors'] 	= imgPath..'map/minimap_colors_simple.png',
-	['Settings/Interface/Common Team Colors'] 	= imgPath..'map/minimap_colors_simple.png',
-	['Settings/Interface/Build ETA'] 			= imgPath..'epicmenu/stop_watch_icon.png',
+	['Settings/Interface/Mouse Cursor']             = imgPath..'epicmenu/input_mouse.png',
+	['Settings/Interface/Map']                      = imgPath..'epicmenu/map.png',
+	['Settings/Interface/Healthbars']               = imgPath..'commands/Bold/health.png',
+	['Settings/Interface/Retreat Zones']            = imgPath..'commands/Bold/retreat.png',
+	['Settings/Interface/Spectating']               = imgPath..'epicmenu/popcorn.png',
+	['Settings/Interface/Building Placement']       = imgPath..'factory.png',
+	['Settings/Interface/Team Colors']              = imgPath..'map/minimap_colors_simple.png',
+	['Settings/Interface/Common Team Colors']       = imgPath..'map/minimap_colors_simple.png',
+	['Settings/Interface/Build ETA']                = imgPath..'epicmenu/stop_watch_icon.png',
 	['Settings/Interface/Defense and Cloak Ranges'] = imgPath..'epicmenu/target.png',
-	['Settings/Interface/Command Visibility'] 	= imgPath..'epicmenu/fingertap.png',
-	['Settings/Interface/Hovering Icons'] 		= imgPath..'epicmenu/halo.png',
-	['Settings/Interface/Selection'] 			= imgPath..'epicmenu/selection.png',
-	['Settings/Interface/Control Groups'] 		= imgPath..'epicmenu/addusergroup.png',
-	['Settings/Interface/Gesture Menu'] 		= imgPath..'epicmenu/stock_brightness.png',
-	['Settings/Interface/Economy Overlay'] 		= imgPath..'energy.png',
-	['Settings/Interface/Falling Units'] 		= imgPath..'advplayerslist/point2.png',
+	['Settings/Interface/Command Visibility']       = imgPath..'epicmenu/fingertap.png',
+	['Settings/Interface/Hovering Icons']           = imgPath..'epicmenu/halo.png',
+	['Settings/Interface/Selection']                = imgPath..'epicmenu/selection.png',
+	['Settings/Interface/Control Groups']           = imgPath..'epicmenu/addusergroup.png',
+	['Settings/Interface/Gesture Menu']             = imgPath..'epicmenu/stock_brightness.png',
+	['Settings/Interface/Economy Overlay']          = imgPath..'energy.png',
+	['Settings/Interface/Falling Units']            = imgPath..'advplayerslist/point2.png',
 	
-	['Settings/HUD Panels/Minimap'] 				= imgPath..'epicmenu/map.png',
-	['Settings/HUD Panels/Economy Panel']	 		= imgPath..'ibeam.png',
-	['Settings/HUD Panels/Commander Selector'] 		= imgPath..'epicmenu/corcommander.png',
-	['Settings/HUD Panels/Tooltip'] 				= imgPath..'epicmenu/lightbulb.png',
-	['Settings/HUD Panels/Chat'] 					= imgPath..'advplayerslist/chat.png',
-	['Settings/HUD Panels/FactoryPanel'] 			= imgPath..'factory.png',
-	['Settings/HUD Panels/Pause Screen'] 			= imgPath..'epicmenu/media_playback_pause.png',
-	['Settings/HUD Panels/Replay Controls'] 		= imgPath..'epicmenu/key_play_pause.png',
-	['Settings/HUD Panels/Unit Stats Help Window'] 	= imgPath..'advplayerslist/random.png',
-	['Settings/HUD Panels/Player List'] 			= imgPath..'epicmenu/people.png',
-	['Settings/HUD Panels/Extras/Docking'] 				= imgPath..'epicmenu/anchor.png',
-	['Settings/HUD Panels/Selected Units Panel'] 	= imgPath..'epicmenu/grid.png',
+	['Settings/HUD Panels/Minimap']                 = imgPath..'epicmenu/map.png',
+	['Settings/HUD Panels/Economy Panel']           = imgPath..'ibeam.png',
+	['Settings/HUD Panels/Commander Selector']      = imgPath..'epicmenu/corcommander.png',
+	['Settings/HUD Panels/Tooltip']                 = imgPath..'epicmenu/lightbulb.png',
+	['Settings/HUD Panels/Chat']                    = imgPath..'advplayerslist/chat.png',
+	['Settings/HUD Panels/FactoryPanel']            = imgPath..'factory.png',
+	['Settings/HUD Panels/Pause Screen']            = imgPath..'epicmenu/media_playback_pause.png',
+	['Settings/HUD Panels/Replay Controls']         = imgPath..'epicmenu/key_play_pause.png',
+	['Settings/HUD Panels/Unit Stats Help Window']  = imgPath..'advplayerslist/random.png',
+	['Settings/HUD Panels/Player List']             = imgPath..'epicmenu/people.png',
+	['Settings/HUD Panels/Extras/Docking']          = imgPath..'epicmenu/anchor.png',
+	['Settings/HUD Panels/Selected Units Panel']    = imgPath..'epicmenu/grid.png',
 }
 
 confdata.simpleModeDirectory = {
 	['Interface'] = true,
 	['Audio'] = true,
 	['Graphics'] = true,
+	['Accessibility'] = true,
 }
 confdata.simpleModeFullDirectory = {
 	'Hotkeys',
@@ -254,11 +256,11 @@ local hotkeysMiscPath = 'Hotkeys/Misc'
 	ShButton(hotkeysMiscPath, 'Zoom In', 'movedown', 'Key to zoom the camera out.')
 	ShButton(hotkeysMiscPath, 'Zoom Out', 'moveup', 'Key to zoom the camera in.')
 	ShButton(hotkeysMiscPath, 
-			'Create Video (risky)', 'createvideo', 'Capture video directly from Spring without sound. Gets saved in the Spring folder. '
-			..'Creates a smooth video framerate without ingame stutter. '
-			..'Caution: It\'s safer to use this in windowed mode because the encoder pop-up menu appears in the foreground window, and could crash the game with a "Fatal Error" after a long recording. '
-			..'\n\nRecommendation (especially for low-end PCs): After activating the video recording select the fastest encoder such as Microsoft Video and record the video in segments. '
-			..' You can then use VirtualDub (opensource software) to do futher compression and editing. Note: there is other opensource video capture software like Taksi that you could try.') 
+	     'Create Video (risky)', 'createvideo', 'Capture video directly from Spring without sound. Gets saved in the Spring folder. '
+	     ..'Creates a smooth video framerate without ingame stutter. '
+	     ..'Caution: It\'s safer to use this in windowed mode because the encoder pop-up menu appears in the foreground window, and could crash the game with a "Fatal Error" after a long recording. '
+	     ..'\n\nRecommendation (especially for low-end PCs): After activating the video recording select the fastest encoder such as Microsoft Video and record the video in segments. '
+	     ..' You can then use VirtualDub (opensource software) to do futher compression and editing. Note: there is other opensource video capture software like Taksi that you could try.') 
 	ShButton(hotkeysMiscPath, 'Game Info', "gameinfo", '', true)
 	--ShButton(hotkeysMiscPath, 'Share Dialog...', 'sharedialog', '', true)
 	--ShButton(hotkeysMiscPath, 'FPS Control', "controlunit", 'Control a unit directly in FPS mode.', true)
@@ -351,20 +353,20 @@ local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 local pathInterface = 'Settings/Interface'
 local pathMouse = 'Settings/Interface/Mouse Cursor'
 	AddOption(pathMouse,
-	{ 	
+	{     
 		name = 'Hardware Cursor',
 		type = 'bool',
 		springsetting = 'HardwareCursor',
 		noHotkey = true,
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end, 
-	})	
+	})    
 	
 local pathSelectionShapes = 'Settings/Interface/Selection/Selection Shapes'
 local pathSelectionXrayHalo = 'Settings/Interface/Selection/Selection XRay&Halo'
 local pathSelectionPlatters = 'Settings/Interface/Selection/Team Platters'
 local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selections'
 	ShButton(pathSelectionShapes, 'Toggle Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes"} end, "Draws coloured shapes under selected units")
-	ShButton(pathSelectionXrayHalo, 'Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected units")	
+	ShButton(pathSelectionXrayHalo, 'Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected units")    
 	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() spSendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() spSendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
 
@@ -397,8 +399,8 @@ local pathMisc = 'Settings/Misc'
 	{
 		name = 'Use Old Chili',
 		desc = 'Enable this if menu element is missing or does not render properly in Spring 96+. '..
-				'Do NOT enable if you see nothing wrong with the menu (it is slower).'..
-				'\n(type "/luaui reload" to apply settings)',
+		       'Do NOT enable if you see nothing wrong with the menu (it is slower).'..
+		       '\n(type "/luaui reload" to apply settings)',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -482,7 +484,7 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 		step = 5,
 		value = 90,
 		OnChange = function(self) spSendCommands{"GroundDetail " .. self.value} end, 
-	})
+	} )
 
 	AddOption(pathGraphicsMap, 
 	{
@@ -618,7 +620,7 @@ local pathAudio = 'Settings/Audio'
 		step = 0.01,
 		-- springsetting = 'snd_volmusic', -- TODO: we should probably switch from WG to this at some point
 		value = WG.music_volume or 0.5,
-		OnChange = function(self)	
+		OnChange = function(self)    
 			if (WG.music_start_volume or 0 > 0) then 
 				Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
 			else 
@@ -651,9 +653,8 @@ local pathHelp = 'Settings/Nag'
 	{
 		type='text',
 		name='Tips',
-		value=[[Hold your meta-key (spacebar by default) while clicking on a unit or corpse for more info and options. 
-			You can also space-click on menu elements to see context settings. 
-			]]
+		value = [[Hold your meta-key (spacebar by default) while clicking on a unit or corpse for more info and options. 
+		          You can also space-click on menu elements to see context settings. ]]
 	})
 	ShButton(pathHelp,'Tutorial', function() spSendCommands{"luaui togglewidget Nubtron"} end )
 	ShButton(pathHelp,'Tip Dispenser', function() spSendCommands{"luaui togglewidget Automatic Tip Dispenser"} end, 'An advisor which gives you tips as you play' )

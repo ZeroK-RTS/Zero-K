@@ -1,16 +1,16 @@
 function widget:GetInfo()
-  return {
-    name      = "EPIC Menu",
-    desc      = "v1.439 Extremely Powerful Ingame Chili Menu.",
-    author    = "CarRepairer",
-    date      = "2009-06-02", --2014-05-3
-    license   = "GNU GPL, v2 or later",
-    layer     = -100001,
-    handler   = true,
-    experimental = false,	
-    enabled   = true,
-	alwaysStart = true,
-  }
+	return {
+		name      = "EPIC Menu",
+		desc      = "v1.439 Extremely Powerful Ingame Chili Menu.",
+		author    = "CarRepairer",
+		date      = "2009-06-02", --2014-05-3
+		license   = "GNU GPL, v2 or later",
+		layer     = -100001,
+		handler   = true,
+		experimental = false,    
+		enabled   = true,
+		alwaysStart = true,
+	}
 end
 
 include("utility_two.lua") --contain file backup function
@@ -29,8 +29,8 @@ include("utility_two.lua") --contain file backup function
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local spGetConfigInt    		= Spring.GetConfigInt
-local spSendCommands			= Spring.SendCommands
+local spGetConfigInt            = Spring.GetConfigInt
+local spSendCommands            = Spring.SendCommands
 local min = math.min
 local max = math.max
 
@@ -125,7 +125,7 @@ local curPath = ''
 
 local init = false
 
-local pathoptions = {}	
+local pathoptions = {}    
 local actionToOption = {}
 
 local exitWindowVisible = false
@@ -135,9 +135,9 @@ local showTidal = false
 if not confdata.description then confdata.description = '' end
 local gameInfoText = ''
 	..Game.modName ..br..br
-	..'Spring Engine version: '..Spring.Utilities.GetEngineVersion()..br..br	
+	..'Spring Engine version: '..Spring.Utilities.GetEngineVersion()..br..br    
 	..'Map: ' ..Game.mapName ..br
-		
+	
 	..'    Size: '..Game.mapX..' x '..Game.mapY..br        
 	..'    Gravity: '..math.round(Game.gravity)..br
 	.. (showTidal and ('    Tidal Power: '..Game.tidal..br) or '')
@@ -145,7 +145,6 @@ local gameInfoText = ''
 	..'    '.. Game.mapDescription..br
 	..br..br
 	..confdata.description 
-	
 
 local function returnSelf(self) return self end
 
@@ -155,18 +154,18 @@ local languages, flagByLang, langByFlag = VFS.Include("LuaUI/Headers/languages.l
 -- Key bindings
 -- KEY BINDINGS AND YOU:
 -- First, Epic Menu checks for a keybind bound to the action in LuaUI/Configs/zk_keys.lua.
--- 	If the local copy has a lower date value than the one in the mod,
--- 	it overwrites ALL conflicting keybinds in the local config.
---	Else it just adds any action-key pairs that are missing from the local config.
---	zk_keys.lua is written to at the end of loading LuaUI and on LuaUI shutdown.
+--     If the local copy has a lower date value than the one in the mod,
+--     it overwrites ALL conflicting keybinds in the local config.
+--    Else it just adds any action-key pairs that are missing from the local config.
+--    zk_keys.lua is written to at the end of loading LuaUI and on LuaUI shutdown.
 -- Next, if it's a widget command, it checks if the widget specified a default keybind.
---	If so, it uses that command.
+--    If so, it uses that command.
 -- Lastly, it checks uikeys.txt (read-only).
 
 include("keysym.h.lua")
 local keysyms = {}
 for k,v in pairs(KEYSYMS) do
-	keysyms['' .. v] = k	
+	keysyms['' .. v] = k    
 end
 --[[
 for k,v in pairs(KEYSYMS) do
@@ -210,42 +209,41 @@ local confLoaded = false
 -- Helper Functions
 -- [[
 local function to_string(data, indent)
-    local str = ""
+	local str = ""
 
-    if(indent == nil) then
-        indent = 0
-    end
+	if(indent == nil) then
+		indent = 0
+	end
 	local indenter = "    "
-    -- Check the type
-    if(type(data) == "string") then
-        str = str .. (indenter):rep(indent) .. data .. "\n"
-    elseif(type(data) == "number") then
-        str = str .. (indenter):rep(indent) .. data .. "\n"
-    elseif(type(data) == "boolean") then
-        if(data == true) then
-            str = str .. "true"
-        else
-            str = str .. "false"
-        end
-    elseif(type(data) == "table") then
-        local i, v
-        for i, v in pairs(data) do
-            -- Check for a table in a table
-            if(type(v) == "table") then
-                str = str .. (indenter):rep(indent) .. i .. ":\n"
-                str = str .. to_string(v, indent + 2)
-            else
-                str = str .. (indenter):rep(indent) .. i .. ": " ..
-to_string(v, 0)
-            end
-        end
+	-- Check the type
+	if(type(data) == "string") then
+		str = str .. (indenter):rep(indent) .. data .. "\n"
+	elseif(type(data) == "number") then
+		str = str .. (indenter):rep(indent) .. data .. "\n"
+	elseif(type(data) == "boolean") then
+		if(data == true) then
+			str = str .. "true"
+		else
+			str = str .. "false"
+		end
+	elseif(type(data) == "table") then
+		local i, v
+		for i, v in pairs(data) do
+			-- Check for a table in a table
+			if(type(v) == "table") then
+				str = str .. (indenter):rep(indent) .. i .. ":\n"
+				str = str .. to_string(v, indent + 2)
+			else
+				str = str .. (indenter):rep(indent) .. i .. ": " .. to_string(v, 0)
+			end
+		end
 	elseif(type(data) == "function") then
 		str = str .. (indenter):rep(indent) .. 'function' .. "\n"
-    else
-        echo(1, "Error: unknown data type: %s", type(data))
-    end
+	else
+		echo(1, "Error: unknown data type: %s", type(data))
+	end
 
-    return str
+	return str
 end
 --]]
 
@@ -262,30 +260,38 @@ end
 
 
 local function explode(div,str)
-  if (div=='') then return false end
-  local pos,arr = 0,{}
-  -- for each divider found
-  for st,sp in function() return string.find(str,div,pos,true) end do
-    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
-    pos = sp + 1 -- Jump past current divider
-  end
-  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
-  return arr
+	if (div=='') then
+		return false
+	end
+	local pos,arr = 0,{}
+	-- for each divider found
+	for st,sp in function() return string.find(str,div,pos,true) end do
+		table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
+		pos = sp + 1 -- Jump past current divider
+	end
+	table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
+	return arr
 end
 
 
-local function GetIndex(t,v) local idx = 1; while (t[idx]<v)and(t[idx+1]) do idx=idx+1; end return idx end
+local function GetIndex(t,v)
+	local idx = 1
+	while (t[idx]<v)and(t[idx+1]) do
+		idx=idx+1
+	end
+	return idx
+end
 
 local function CopyTable(tableToCopy, deep)
-  local copy = {}
-  for key, value in pairs(tableToCopy) do
-    if (deep and type(value) == "table") then
-      copy[key] = Spring.Utilities.CopyTable(value, true)
-    else
-      copy[key] = value
-    end
-  end
-  return copy
+	local copy = {}
+	for key, value in pairs(tableToCopy) do
+		if (deep and type(value) == "table") then
+			copy[key] = Spring.Utilities.CopyTable(value, true)
+		else
+			copy[key] = value
+		end
+	end
+	return copy
 end
 
 --[[
@@ -326,18 +332,18 @@ end
 
 -- function GetTimeString() taken from trepan's clock widget
 local function GetTimeString(secs)
-  if (timeSecs ~= secs) then
-    timeSecs = secs
-    local h = math.floor(secs / 3600)
-    local m = math.floor((secs % 3600) / 60)
-    local s = math.floor(secs % 60)
-    if (h > 0) then
-      timeString = string.format('%02i:%02i:%02i', h, m, s)
-    else
-      timeString = string.format('%02i:%02i', m, s)
-    end
-  end
-  return timeString
+	if (timeSecs ~= secs) then
+		timeSecs = secs
+		local h = math.floor(secs / 3600)
+		local m = math.floor((secs % 3600) / 60)
+		local s = math.floor(secs % 60)
+		if (h > 0) then
+			timeString = string.format('%02i:%02i:%02i', h, m, s)
+		else
+			timeString = string.format('%02i:%02i', m, s)
+		end
+	end
+	return timeString
 end
 
 local function BoolToInt(bool)
@@ -388,15 +394,15 @@ end
 
 WG.crude.SetSkin = function(Skin)
   if Chili then
-    Chili.theme.skin.general.skinName = Skin
+	Chili.theme.skin.general.skinName = Skin
   end
 end
 
 --Reset custom widget settings, defined in Initialize
-WG.crude.ResetSettings 	= function() end
+WG.crude.ResetSettings     = function() end
 
 --Reset hotkeys, defined in Initialized
-WG.crude.ResetKeys 		= function() end
+WG.crude.ResetKeys         = function() end
 
 --Get hotkey by actionname, defined in Initialize()
 WG.crude.GetHotkey = function() end
@@ -434,22 +440,22 @@ local function LoadKeybinds()
 				end
 				
 				loaded = true
-				keybind_date = keybind_date or defaultkeybind_date	-- reverse compat
+				keybind_date = keybind_date or defaultkeybind_date    -- reverse compat
 				if not keybind_date or keybind_date == 0 or (keybind_date+0) < defaultkeybind_date then
 					-- forcibly assign default keybind to actions it finds
 					-- note that it won't do anything to keybinds if the action is not defined in default keybinds
 					-- to overwrite such keys, assign the action's keybind to "None"
 					keybind_date = defaultkeybind_date
 					for _,elem in ipairs(defaultkeybinds) do
-						local action = elem[1]
-						local keybind = elem[2]
-						otset( keybounditems, action, keybind)
+					    local action = elem[1]
+					    local keybind = elem[2]
+					    otset( keybounditems, action, keybind)
 					end
 				else
 					for _, elem in ipairs(defaultkeybinds) do
-						local action = elem[1]
-						local keybind = elem[2]
-						otset( keybounditems, action, otget( keybounditems, action ) or keybind )
+					    local action = elem[1]
+					    local keybind = elem[2]
+					    otset( keybounditems, action, otget( keybounditems, action ) or keybind )
 					end
 				end
 			end
@@ -545,7 +551,7 @@ local function AllowPauseOnMenuChange()
 	end
 	local playerlist = Spring.GetPlayerList() or {}
 	local myPlayerID = Spring.GetMyPlayerID()
- 	for i=1, #playerlist do
+	 for i=1, #playerlist do
 		local playerID = playerlist[i]
 		if myPlayerID ~= playerID then
 			local _,active,spectator = Spring.GetPlayerInfo(playerID)
@@ -652,11 +658,11 @@ local function MakeFlags()
 				
 				children = {
 					Grid:New{
-						columns=2,
-						x=0,y=0,
-						width='100%',
-						height=#flagChildren/2*B_HEIGHT*1,
-						children = flagChildren,
+					    columns=2,
+					    x=0,y=0,
+					    width='100%',
+					    height=#flagChildren/2*B_HEIGHT*1,
+					    children = flagChildren,
 					}
 				}
 			},
@@ -718,7 +724,7 @@ local function GetReadableHotkeyMod(mod)
 		(modlowercase:find('c%+') and 'Ctrl+' or '') ..
 		(modlowercase:find('m%+') and 'Meta+' or '') ..
 		(modlowercase:find('s%+') and 'Shift+' or '') ..
-		''		
+		''        
 end
 
 local function HotKeyBreakdown(hotkey) --convert hotkey string into a standardized hotkey string
@@ -728,10 +734,10 @@ local function HotKeyBreakdown(hotkey) --convert hotkey string into a standardiz
 
 	for i=1, #hotkey_table-1 do
 		local str2 = hotkey_table[i]:lower()
-		if str2 == 'a' or str2 == 'alt' 		then 	alt = true
-		elseif str2 == 'c' or str2 == 'ctrl' 	then ctrl = true
-		elseif str2 == 's' or str2 == 'shift' 	then shift = true
-		elseif str2 == 'm' or str2 == 'meta' 	then meta = true
+		if str2 == 'a' or str2 == 'alt'         then     alt = true
+		elseif str2 == 'c' or str2 == 'ctrl'     then ctrl = true
+		elseif str2 == 's' or str2 == 'shift'     then shift = true
+		elseif str2 == 'm' or str2 == 'meta'     then meta = true
 		end
 	end
 	
@@ -841,7 +847,7 @@ local function CreateOptionAction(path, option)
 			newval = not pathoption.value
 			pathoption.value = newval
 			otset( pathoptions[path], wname..option.key, pathoption )
-						
+					    
 			option.OnChange({checked=newval})
 			
 			if path == curPath then
@@ -998,7 +1004,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 			option.default = option.value
 		else
 			option.default = newval
-		end	
+		end    
 	end
 	
 	
@@ -1010,7 +1016,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	local origOnChange = option.OnChange
 	
 	local controlfunc = function() end
-	if option.type == 'button' and (option.action) and (not option.noAutoControlFunc) then	
+	if option.type == 'button' and (option.action) and (not option.noAutoControlFunc) then    
 		controlfunc =
 			function(self)
 				spSendCommands{option.action}
@@ -1030,27 +1036,27 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 
 	elseif option.type == 'number' then
 		if option.valuelist then
-			option.min 	= 1
-			option.max 	= #(option.valuelist)
-			option.step	= 1
+			option.min     = 1
+			option.max     = #(option.valuelist)
+			option.step    = 1
 		end
-		--option.desc_orig = option.desc or ''	
+		--option.desc_orig = option.desc or ''    
 		controlfunc =
 			function(self) 
 				if self then
 					if option.valuelist then
-						option.value = option.valuelist[self.value]
+					    option.value = option.valuelist[self.value]
 					else
-						option.value = self.value
+					    option.value = self.value
 					end
 					--self.tooltip = option.desc_orig .. ' - Current: ' .. option.value
 				end
 				
 				if option.springsetting then
 					if not option.value then
-						echo ('<EPIC Menu> Error #444', fullkey)
+					    echo ('<EPIC Menu> Error #444', fullkey)
 					else
-						Spring.SetConfigInt( option.springsetting, option.value )
+					    Spring.SetConfigInt( option.springsetting, option.value )
 					end
 				end
 				settings.config[fullkey] = option.value
@@ -1140,7 +1146,7 @@ local function RemOption(path, option, wname )
 		--echo ('<epic menu> ...error #333 ', (option and option.key) )
 		return
 	end
-	RemoveOptionAction(path, option)	
+	RemoveOptionAction(path, option)    
 	otset( pathoptions[path], wname..option.key, nil )
 end
 
@@ -1243,7 +1249,7 @@ local function IntegrateWidget(w, addoptions, index)
 			option.OnChange = 
 				function(self)
 					if self then
-						w.options[k].value = self.value
+					    w.options[k].value = self.value
 					end
 					origOnChange(self)
 				end
@@ -1409,7 +1415,7 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHei
 			local iconImage = Image:New{ file= icon, width = 16,height = 16, }
 			children = { iconImage, }
 		end
-		children[#children+1] = control	
+		children[#children+1] = control    
 	else
 		local hotkeystring = GetHotkeyData(path, option)
 
@@ -1431,7 +1437,7 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHei
 			OnClick = { 
 				function(self)
 					if not get_key then
-						MakeKeybindWindow( path, option, self, control, option ) 
+					    MakeKeybindWindow( path, option, self, control, option ) 
 					end
 				end
 			},
@@ -1525,11 +1531,11 @@ local function SearchElement(termToSearch,path)
 				if option.isDirectoryButton then --this type of button is defined in AddOption(path,option,wname) (a link into submenu)
 					local menupath = currentPath .. ((currentPath == "") and "" or "/") .. option.name
 					if pathoptions[menupath] then
-						if #pathoptions[menupath] >= 1 and menupath ~= "" then
-							DiggDeeper(menupath) --travel into & search into this branch
-						else --dead end
-							hide = true
-						end
+					    if #pathoptions[menupath] >= 1 and menupath ~= "" then
+					        DiggDeeper(menupath) --travel into & search into this branch
+					    else --dead end
+					        hide = true
+					    end
 					end
 				end
 				
@@ -1537,7 +1543,7 @@ local function SearchElement(termToSearch,path)
 					local hotkeystring = GetHotkeyData(currentPath, option)
 					local lowercase_hotkey = hotkeystring:lower()
 					if found_name or lowercase_hotkey:find(termToSearch) then
-						filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}--remember this option and where it is found
+					    filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}--remember this option and where it is found
 					end
 				end
 			elseif option.type == 'label' then
@@ -1553,11 +1559,11 @@ local function SearchElement(termToSearch,path)
 				end
 			elseif option.type == 'bool' then
 				local hotkeystring = GetHotkeyData(currentPath, option)
-				local lowercase_hotkey = hotkeystring:lower()		
+				local lowercase_hotkey = hotkeystring:lower()        
 				if found_name or lowercase_hotkey:find(termToSearch) then
 					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
 				end
-			elseif option.type == 'number' then	
+			elseif option.type == 'number' then    
 				if found_name then
 					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
 				end
@@ -1566,14 +1572,14 @@ local function SearchElement(termToSearch,path)
 					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
 				else
 					for i=1, #option.items do
-						local item = option.items[i]
-						lowercase_name = item.name:lower()
-						lowercase_desc = item.desc and item.desc:lower() or ''
-						local found = SearchInText(lowercase_name,termToSearch) or SearchInText(lowercase_desc,termToSearch)
-						if found then
-							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
-							break;
-						end
+					    local item = option.items[i]
+					    lowercase_name = item.name:lower()
+					    lowercase_desc = item.desc and item.desc:lower() or ''
+					    local found = SearchInText(lowercase_name,termToSearch) or SearchInText(lowercase_desc,termToSearch)
+					    if found then
+					        filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+					        break;
+					    end
 					end
 				end
 			elseif option.type == 'radioButton' then
@@ -1581,16 +1587,16 @@ local function SearchElement(termToSearch,path)
 					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
 				else
 					for i=1, #option.items do
-						local item = option.items[i]
-						lowercase_name = item.name and item.name:lower() or ''
-						lowercase_desc = item.desc and item.desc:lower() or ''
-						local hotkeystring = GetHotkeyData(currentPath, item)
-						local lowercase_hotkey = hotkeystring:lower()
-						local found = SearchInText(lowercase_name,termToSearch) or SearchInText(lowercase_desc,termToSearch) or lowercase_hotkey:find(termToSearch)
-						if found then
-							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
-							break
-						end
+					    local item = option.items[i]
+					    lowercase_name = item.name and item.name:lower() or ''
+					    lowercase_desc = item.desc and item.desc:lower() or ''
+					    local hotkeystring = GetHotkeyData(currentPath, item)
+					    local lowercase_hotkey = hotkeystring:lower()
+					    local found = SearchInText(lowercase_name,termToSearch) or SearchInText(lowercase_desc,termToSearch) or lowercase_hotkey:find(termToSearch)
+					    if found then
+					        filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+					        break
+					    end
 					end
 				end
 			elseif option.type == 'colors' then
@@ -1668,7 +1674,7 @@ MakeSubWindow = function(path, pause)
 					fontsize = 11,
 					caption = "- Location: " .. currentPath, 
 					OnClick = {function() filterUserInsertedTerm = ''; end,function(self)
-						MakeSubWindow(currentPath, false)  --this made this "label" open another path when clicked
+					    MakeSubWindow(currentPath, false)  --this made this "label" open another path when clicked
 					end,},
 					backgroundColor = color.transGray,
 					textColor = color.postit, 
@@ -1749,10 +1755,10 @@ MakeSubWindow = function(path, pause)
 				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option,nil,option.isDirectoryButton or option.noHotkey, button_height)
 			end
 			
-		elseif option.type == 'label' then	
+		elseif option.type == 'label' then    
 			tree_children[#tree_children+1] = Label:New{ caption = option.value or option.name, textColor = color.sub_header, }
 			
-		elseif option.type == 'text' then	
+		elseif option.type == 'text' then    
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_header, }
 			tree_children[#tree_children+1] = 
 				TextBox:New{
@@ -1778,7 +1784,7 @@ MakeSubWindow = function(path, pause)
 			option.epic_reference = chbox
 			tree_children[#tree_children+1] = MakeHotkeyedControl(chbox,  path, option, icon, option.noHotkey, nil, 8)
 			
-		elseif option.type == 'number' then	
+		elseif option.type == 'number' then    
 			settings_height = settings_height + B_HEIGHT
 			local icon = option.icon
 			local numberPanel = Panel:New{
@@ -1821,14 +1827,14 @@ MakeSubWindow = function(path, pause)
 				item.value = item.key --for 'OnClick'
 				settings_height = settings_height + B_HEIGHT
 				tree_children[#tree_children+1] = Button:New{
-						name = option.wname .. " " .. item.name;
-						width = "100%",
-						caption = item.name, 
-						OnClick = { function(self) option.OnChange(item) end },
-						--classname = "submenu_navigation_button",
-						--backgroundColor = color.sub_button_bg,
-						--textColor = color.sub_button_fg, 
-						tooltip=item.desc,
+					    name = option.wname .. " " .. item.name;
+					    width = "100%",
+					    caption = item.name, 
+					    OnClick = { function(self) option.OnChange(item) end },
+					    --classname = "submenu_navigation_button",
+					    --backgroundColor = color.sub_button_bg,
+					    --textColor = color.sub_button_fg, 
+					    tooltip=item.desc,
 					}
 			end
 			--[[
@@ -2003,7 +2009,7 @@ MakeSubWindow = function(path, pause)
 		--clientHeight = window_height+B_HEIGHT*4,
 		height = math.floor(settings.subwindow_height),
 		minWidth = 250,
-		minHeight = 350,		
+		minHeight = 350,        
 		--resizable = false,
 		parent = settings.show_crudemenu and screen0 or nil,
 		backgroundColor = color.sub_bg,
@@ -2095,16 +2101,16 @@ local function MakeExitConfirmWindow(text, action, height)
 		parent = window_exit_confirm,
 		caption = text,
 		width = "100%",
-                --x = "50%",
-                y = 4,
+				--x = "50%",
+				y = 4,
 		align="center",
 		textColor = color.main_fg
 	}
 	Button:New{
 		name = 'confirmExitYesButton';
 		parent = window_exit_confirm,
-                caption = "Yes",
-                OnClick = { function()
+				caption = "Yes",
+				OnClick = { function()
 				action()
 				DisposeExitConfirmWindow()
 			end
@@ -2117,8 +2123,8 @@ local function MakeExitConfirmWindow(text, action, height)
 	Button:New{
 		name = 'confirmExitNoButton';
 		parent = window_exit_confirm,
-                caption = "No",
-                OnClick = { function()
+				caption = "No",
+				OnClick = { function()
 				LeaveExitConfirmWindow()
 			end
 		},
@@ -2210,12 +2216,12 @@ local function GetMainPanel(parent, width, height)
 					trackColor = color.main_fg,
 					value = spGetConfigInt("snd_volmaster", 50),
 					OnChange = {
-						function(self)
-							spSendCommands{"set snd_volmaster " .. self.value}
-							if WG.ttsNotify then 
-								WG.ttsNotify() 
-							end
-						end	
+					    function(self)
+					        spSendCommands{"set snd_volmaster " .. self.value}
+					        if WG.ttsNotify then 
+					            WG.ttsNotify() 
+					        end
+					    end    
 					},
 				},
 				
@@ -2230,44 +2236,44 @@ local function GetMainPanel(parent, width, height)
 					value = settings.music_volume or 0.5,
 					prevValue = settings.music_volume or 0.5,
 					OnChange = { 
-						function(self)
-							if ((WG.music_start_volume or 0) > 0) then 
-								Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
-							else 
-								Spring.SetSoundStreamVolume(self.value) 
-							end 
-							settings.music_volume = self.value
-							WG.music_volume = self.value
-							if (self.prevValue > 0 and self.value <=0) then 
-								widgetHandler:DisableWidget("Music Player") 
-							end 
-							if (self.prevValue <=0 and self.value > 0) then
-								-- Disable first in case widget is already enabled.
-								-- This is required for it to notice the volume
-								-- change from 0 in some cases.
-								widgetHandler:DisableWidget("Music Player")
-								widgetHandler:EnableWidget("Music Player") 
-							end 
-							self.prevValue = self.value
-						end	
+					    function(self)
+					        if ((WG.music_start_volume or 0) > 0) then 
+					            Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
+					        else 
+					            Spring.SetSoundStreamVolume(self.value) 
+					        end 
+					        settings.music_volume = self.value
+					        WG.music_volume = self.value
+					        if (self.prevValue > 0 and self.value <=0) then 
+					            widgetHandler:DisableWidget("Music Player") 
+					        end 
+					        if (self.prevValue <=0 and self.value > 0) then
+					            -- Disable first in case widget is already enabled.
+					            -- This is required for it to notice the volume
+					            -- change from 0 in some cases.
+					            widgetHandler:DisableWidget("Music Player")
+					            widgetHandler:EnableWidget("Music Player") 
+					        end 
+					        self.prevValue = self.value
+					    end    
 					},
 				},
 			},
 		}
 		--stackChildren[#stackChildren + 1] = Trackbar:New{
-		--	tooltip = 'Volume',
-		--	height = 15,
-		--	width = sliderWidth - 25,
-		--	trackColor = color.main_fg,
-		--	value = spGetConfigInt("snd_volmaster", 50),
-		--	OnChange = {
-		--		function(self)
-		--			spSendCommands{"set snd_volmaster " .. self.value}
-		--			if WG.ttsNotify then 
-		--				WG.ttsNotify() 
-		--			end
-		--		end	
-		--	},
+		--    tooltip = 'Volume',
+		--    height = 15,
+		--    width = sliderWidth - 25,
+		--    trackColor = color.main_fg,
+		--    value = spGetConfigInt("snd_volmaster", 50),
+		--    OnChange = {
+		--        function(self)
+		--            spSendCommands{"set snd_volmaster " .. self.value}
+		--            if WG.ttsNotify then 
+		--                WG.ttsNotify() 
+		--            end
+		--        end    
+		--    },
 		--}
 		
 		holderWidth = holderWidth + sliderWidth + 2
@@ -2297,8 +2303,8 @@ local function GetMainPanel(parent, width, height)
 					padding = {0,1,0,0},
 					itemMargin = {2,0,0,0},
 					children = {
-						Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
-						lbl_gtime,
+					    Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
+					    lbl_gtime,
 					},
 				},
 				StackPanel:New{
@@ -2311,8 +2317,8 @@ local function GetMainPanel(parent, width, height)
 					padding = {0,0,0,0},
 					itemMargin = {2,0,0,0},
 					children = {
-						Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 20,  },
-						lbl_clock,
+					    Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 20,  },
+					    lbl_clock,
 					},
 				},
 			},
@@ -2341,12 +2347,12 @@ local function GetMainPanel(parent, width, height)
 					trackColor = color.main_fg,
 					value = spGetConfigInt("snd_volmaster", 50),
 					OnChange = {
-						function(self)
-							spSendCommands{"set snd_volmaster " .. self.value}
-							if WG.ttsNotify then 
-								WG.ttsNotify() 
-							end
-						end	
+					    function(self)
+					        spSendCommands{"set snd_volmaster " .. self.value}
+					        if WG.ttsNotify then 
+					            WG.ttsNotify() 
+					        end
+					    end    
 					},
 				},
 				
@@ -2362,26 +2368,26 @@ local function GetMainPanel(parent, width, height)
 					value = settings.music_volume or 0.5,
 					prevValue = settings.music_volume or 0.5,
 					OnChange = { 
-						function(self)
-							if ((WG.music_start_volume or 0) > 0) then 
-								Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
-							else 
-								Spring.SetSoundStreamVolume(self.value) 
-							end 
-							settings.music_volume = self.value
-							WG.music_volume = self.value
-							if (self.prevValue > 0 and self.value <=0) then 
-								widgetHandler:DisableWidget("Music Player") 
-							end 
-							if (self.prevValue <=0 and self.value > 0) then
-								-- Disable first in case widget is already enabled.
-								-- This is required for it to notice the volume
-								-- change from 0 in some cases.
-								widgetHandler:DisableWidget("Music Player")
-								widgetHandler:EnableWidget("Music Player") 
-							end 
-							self.prevValue = self.value
-						end	
+					    function(self)
+					        if ((WG.music_start_volume or 0) > 0) then 
+					            Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
+					        else 
+					            Spring.SetSoundStreamVolume(self.value) 
+					        end 
+					        settings.music_volume = self.value
+					        WG.music_volume = self.value
+					        if (self.prevValue > 0 and self.value <=0) then 
+					            widgetHandler:DisableWidget("Music Player") 
+					        end 
+					        if (self.prevValue <=0 and self.value > 0) then
+					            -- Disable first in case widget is already enabled.
+					            -- This is required for it to notice the volume
+					            -- change from 0 in some cases.
+					            widgetHandler:DisableWidget("Music Player")
+					            widgetHandler:EnableWidget("Music Player") 
+					        end 
+					        self.prevValue = self.value
+					    end    
 					},
 				},
 			},
@@ -2431,35 +2437,35 @@ local function GetMainPanel(parent, width, height)
 	
 	-- FPS
 	--Grid:New{
-	--	orientation = 'horizontal',
-	--	columns = 1,
-	--	rows = 2,
-	--	width = 60,
-	--	height = '100%',
-	--	--height = 40,
-	--	resizeItems = true,
-	--	autoArrangeV = true,
-	--	autoArrangeH = true,
-	--	padding = {0,0,0,0},
-	--	itemPadding = {0,0,0,0},
-	--	itemMargin = {0,0,0,0},
-	--	
-	--	children = {
-	--		lbl_fps,
-	--		img_flag,
-	--	},
+	--    orientation = 'horizontal',
+	--    columns = 1,
+	--    rows = 2,
+	--    width = 60,
+	--    height = '100%',
+	--    --height = 40,
+	--    resizeItems = true,
+	--    autoArrangeV = true,
+	--    autoArrangeH = true,
+	--    padding = {0,0,0,0},
+	--    itemPadding = {0,0,0,0},
+	--    itemMargin = {0,0,0,0},
+	--    
+	--    children = {
+	--        lbl_fps,
+	--        img_flag,
+	--    },
 	--},
 	
 	-- Game Logo
 	--Image:New{ tooltip = title_text, file = title_image, height=B_HEIGHT, width=B_HEIGHT, },
 	--
 	--Button:New{
-	--	name= 'tweakGuiButton',
-	--	caption = "", OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5, 
-	--	padding = btn_padding, margin = btn_margin, tooltip = "Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)",
-	--	children = {
-	--		Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
-	--	},
+	--    name= 'tweakGuiButton',
+	--    caption = "", OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5, 
+	--    padding = btn_padding, margin = btn_margin, tooltip = "Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)",
+	--    children = {
+	--        Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
+	--    },
 	--},
 	
 	local mainPanel = Panel:New{
@@ -2539,7 +2545,7 @@ local function MakeMenuBar()
 				local newPanel = GetMainPanel(obj, obj.width, obj.height)
 				if newPanel then
 					if panel_crude then
-						panel_crude:Dispose()
+					    panel_crude:Dispose()
 					end
 					panel_crude = newPanel
 				end
@@ -2594,18 +2600,18 @@ local function MakeQuitButtons()
 		OnChange = function()
 				if not (isMission or Spring.GetSpectatingState()) then
 					MakeExitConfirmWindow("Are you sure you want to resign?", function() 
-						local paused = select(3, Spring.GetGameSpeed())
-						if (paused) and AllowPauseOnMenuChange() then
-							spSendCommands("pause")
-						end
-						local frame = Spring.GetGameFrame()
-						if frame and frame > 0 then
-							if WG.MissionResign then
-								WG.MissionResign()
-							else
-								spSendCommands{"spectator"}
-							end
-						end
+					    local paused = select(3, Spring.GetGameSpeed())
+					    if (paused) and AllowPauseOnMenuChange() then
+					        spSendCommands("pause")
+					    end
+					    local frame = Spring.GetGameFrame()
+					    if frame and frame > 0 then
+					        if WG.MissionResign then
+					            WG.MissionResign()
+					        else
+					            spSendCommands{"spectator"}
+					        end
+					    end
 					end)
 				end
 			end,
@@ -2749,11 +2755,11 @@ function widget:Initialize()
 	
 	-- About button
 	--AddOption('Settings',{
-	--	type='text',
-	--	name='About',
-	--	value=gameInfoText,
-	--	--desc = "about game",
-	--	key='About',
+	--    type='text',
+	--    name='About',
+	--    value=gameInfoText,
+	--    --desc = "about game",
+	--    key='About',
 	--})
 	
 	-- Clears all saved settings of custom widgets stored in crudemenu's config
@@ -2990,10 +2996,10 @@ function widget:Shutdown()
 	
 
   if window_crude then
-    screen0:RemoveChild(window_crude)
+	screen0:RemoveChild(window_crude)
   end
   if window_sub_cur then
-    screen0:RemoveChild(window_sub_cur)
+	screen0:RemoveChild(window_sub_cur)
   end
 
   RemoveAction("crudemenu")
