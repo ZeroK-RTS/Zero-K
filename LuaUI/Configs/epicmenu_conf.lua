@@ -530,13 +530,15 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	} )
 	AddOption(pathUnitVisiblity,
 	{
-	  name = 'Icon Distance',
-	  type = 'number',
-	  min = 1, 
-	  max = 1000,
-	  springsetting = 'UnitIconDist',
-	  OnChange = function(self) spSendCommands{"disticon " .. self.value} end 
-	  } )
+		name = 'Icon Distance',
+		type = 'number',
+		min = 1, 
+		max = 1000,
+		springsetting = 'UnitIconDist',
+		OnChange = function(self)
+			spSendCommands{"disticon " .. self.value}
+		end 
+	} )
 	AddOption(pathUnitVisiblity,
 	{
 		name = 'Shiny Units',

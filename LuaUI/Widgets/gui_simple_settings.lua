@@ -15,6 +15,8 @@ end
 local thisWidgetName = "Simple Settings"
 local initializationComplete = false 
 
+local LUAMENU_SETTING = "changeSetting "
+
 ----------------------------------------------------
 -- Utilities
 ----------------------------------------------------
@@ -77,15 +79,15 @@ local optionGenerationTable = {
 		optionName = "minimapScreenSpace",
 		name = "Minimap Size",
 		type = "number",
-		default = 0.19, 
 		min = 0.05, 
 		max = 0.4,
 		step = 0.01,
+		default = 0.19, 
 		path = "Settings/Interface",
 	},
 	{
 		optionName = "unitLabel",
-		name = "Unit Effects",
+		name = "Unit Visibility",
 		type = "label",
 		path = "Settings/Graphics",
 	},
@@ -106,11 +108,59 @@ local optionGenerationTable = {
 		path = "Settings/Graphics",
 	},
 	{
+		optionWidget = "Settings/Graphics/Unit Visibility", -- Special hax for epicmenu options
+		optionPath = "Settings/Graphics/Unit Visibility",
+		optionName = "Icon Distance",
+		name = "Icon Distance",
+		min = 1,
+		max = 500,
+		default = 151,
+		type = "number",
+		path = "Settings/Graphics",
+	},
+	{
 		optionName = "moreOptions",
-		name = "",
-		value = "More graphics options are available in the main menu under Settings -> Graphics.",
+		name = "More Options",
+		value = "More graphics settings are available in the main menu under Settings -> Graphics. These settings require a restart to take effect.",
 		type = "text",
 		path = "Settings/Graphics",
+	},
+	{
+		optionName = "scrollSpeed",
+		chobbyName = "CameraPanSpeed",
+		name = "Scroll Speed",
+		min = 1,
+		max = 200,
+		default = 50,
+		valueOverrideFunc = function ()
+			return Spring.GetConfigInt("OverheadScrollSpeed", 50) or 50
+		end,
+		type = "number",
+		path = "Settings/Camera",
+	},
+	{
+		optionName = "zoomSpeed",
+		chobbyName = "MouseZoomSpeed",
+		name = "Zoom Speed",
+		min = 1,
+		max = 100,
+		default = 25,
+		valueOverrideFunc = function ()
+			return math.abs(Spring.GetConfigInt("ScrollWheelSpeed", 25) or 25)
+		end,
+		type = "number",
+		path = "Settings/Camera",
+	},
+	{
+		optionName = "invertZoom",
+		chobbyName = "InvertZoom",
+		name = "Invert Zoom",
+		default = false,
+		valueOverrideFunc = function ()
+			return (Spring.GetConfigInt("ScrollWheelSpeed", 1) or 1) > 0
+		end,
+		type = "bool",
+		path = "Settings/Camera",
 	},
 }
 
@@ -128,6 +178,12 @@ local function AddOption(optionData)
 			if initializationComplete then
 				if optionData.optionFunction then
 					optionData.optionFunction(self)
+				elseif optionData.chobbyName then
+					if optionData.type == "number" then
+						Spring.SendLuaMenuMsg(LUAMENU_SETTING .. optionData.chobbyName .. " " .. math.floor(self.value or 25))
+					else
+						Spring.SendLuaMenuMsg(LUAMENU_SETTING .. optionData.chobbyName .. " " .. (self.value and "On" or "Off"))
+					end
 				else
 					WG.SetWidgetOption(optionData.optionWidget, optionData.optionPath, optionData.optionName, self.value)
 				end
@@ -149,7 +205,9 @@ function widget:Update()
 	for i = 1, #optionGenerationTable do
 		local optionData = optionGenerationTable[i]
 		local option = WG.GetWidgetOption(optionData.optionWidget, optionData.optionPath, optionData.optionName)
-		if option.value ~= nil then
+		if optionData.valueOverrideFunc then
+			options[optionData.optionName].value = optionData.valueOverrideFunc()
+		elseif option.value ~= nil then
 			options[optionData.optionName].value = option.value
 		end
 	end

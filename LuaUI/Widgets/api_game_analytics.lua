@@ -52,8 +52,7 @@ unitCategories.advancedEnergyBuildings = {
 	energygeo    = true, 
 }
 
-unitCategories.energyBuildings = Spring.Utilities.MergeTable(	unitCategories.basicEnergyBuildings, 
-																unitCategories.advancedEnergyBuildings)
+unitCategories.energyBuildings = Spring.Utilities.MergeTable(unitCategories.basicEnergyBuildings, unitCategories.advancedEnergyBuildings)
 
 unitCategories.lightGroundTurrets = {
 	turretemp   = true,
@@ -88,8 +87,7 @@ unitCategories.advancedFactories = {
 	factorytank    = true,
 }
 
-unitCategories.factories = Spring.Utilities.MergeTable(	unitCategories.basicFactories,
-														unitCategories.advancedFactories)
+unitCategories.factories = Spring.Utilities.MergeTable(unitCategories.basicFactories, unitCategories.advancedFactories)
 
 unitCategories.builders = {
 	amphcon    = true,
