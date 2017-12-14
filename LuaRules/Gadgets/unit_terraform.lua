@@ -308,32 +308,32 @@ local wantedCommands = {
 }
 
 local cmdDescsArray = {
-  rampCmdDesc,
-  levelCmdDesc,
-  raiseCmdDesc,
-  smoothCmdDesc,
-  restoreCmdDesc,
-  --bumpyCmdDesc,
+	rampCmdDesc,
+	levelCmdDesc,
+	raiseCmdDesc,
+	smoothCmdDesc,
+	restoreCmdDesc,
+	--bumpyCmdDesc,
 }
 
 if (not Game.mapDamage) then  -- map has "notDeformable = true", or "disablemapdamage = 1" modoption was set in the startscript
-  include("LuaRules/colors.h.lua")
-  local disabledText = '\n' .. RedStr .. "DISABLED" .. PinkStr .. "  (map not deformable)"
+	include("LuaRules/colors.h.lua")
+	local disabledText = '\n' .. RedStr .. "DISABLED" .. PinkStr .. "  (map not deformable)"
 
-  for _, cmdDesc in ipairs(cmdDescsArray) do
-    cmdDesc.disabled = true
-    cmdDesc.tooltip  = cmdDesc.tooltip .. disabledText
-  end
+	for _, cmdDesc in ipairs(cmdDescsArray) do
+		cmdDesc.disabled = true
+		dDesc.tooltip  = cmdDesc.tooltip .. disabledText
+	end
 elseif modOptions.terrarestoreonly == "1" then
-  include("LuaRules/colors.h.lua")
-  local disabledText = '\n' .. RedStr .. "DISABLED" .. PinkStr .. "  (only restore allowed)"
+	include("LuaRules/colors.h.lua")
+	local disabledText = '\n' .. RedStr .. "DISABLED" .. PinkStr .. "  (only restore allowed)"
 
-  for _, cmdDesc in ipairs(cmdDescsArray) do
-    if cmdDesc ~= restoreCmdDesc then
-      cmdDesc.disabled = true
-      cmdDesc.tooltip  = cmdDesc.tooltip .. disabledText
-    end
-  end
+	for _, cmdDesc in ipairs(cmdDescsArray) do
+		if cmdDesc ~= restoreCmdDesc then
+			cmdDesc.disabled = true
+			cmdDesc.tooltip  = cmdDesc.tooltip .. disabledText
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -361,21 +361,17 @@ end
 --------------------------------------------------------------------------------
 
 local function linearEquation(x,m,x1,y1)
-  return m*(x-x1)+y1
+	return m*(x-x1)+y1
 end
 
 local function distance(x1,y1,x2,y2)
-  return ((x1-x2)^2+(y1-y2)^2)^0.5
+	return ((x1-x2)^2+(y1-y2)^2)^0.5
 end
 
 local function pointHeight(xs, ys, zs, x, z, m, h, xdis)
-
-  local xInt = (z-zs+m*xs+x/m)/(m+1/m)
-  
-  local ratio = abs(xInt-xs)/xdis
-  
-  return ratio*h+ys
-
+	local xInt = (z-zs+m*xs+x/m)/(m+1/m)
+	local ratio = abs(xInt-xs)/xdis
+	return ratio*h+ys
 end
 
 local function bumpyFunc(x,z,bumpyType)
@@ -2000,24 +1996,23 @@ end
 -- Recieve Terraform command from UI widget
 --------------------------------------------------------------------------------
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return wantedCommands
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	
 	-- Don't allow non-constructors to queue terraform fallback.
 	if fallbackableCommands[cmdID] and not terraformUnitDefIDs[unitDefID] then
-		return
+		return false
 	end
 
 	if (cmdID == CMD_TERRAFORM_INTERNAL) then
 		if GG.terraformRequiresUnlock and not GG.terraformUnlocked[teamID] then
-			return
+			return false
 		end
 		
 		local terraform_type = cmdParams[1]
@@ -3196,6 +3191,10 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	local command = fallbackCommands[teamID][cmdParams[4]]
 	if not command then
 		return false
+	end
+	
+	if not terraformUnitDefIDs[unitDefID] then
+		return false, true
 	end
 	
 	local ux,_,uz = spGetUnitPosition(unitID)
