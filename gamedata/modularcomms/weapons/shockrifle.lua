@@ -18,7 +18,7 @@ local weaponDef = {
 		subs    = 75,
 	},
 
-	explosionGenerator      = [[custom:megapartgun]],
+	explosionGenerator      = [[custom:spectre_hit]],
 	impactOnly              = true,
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,
