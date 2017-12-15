@@ -183,7 +183,6 @@ local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
 			textPos = imageSize + 10
 			
 			Chili.Image:New{
-				file = BRIEFING_IMAGE,
 				x = 4,
 				y = offset,
 				width = imageSize,
