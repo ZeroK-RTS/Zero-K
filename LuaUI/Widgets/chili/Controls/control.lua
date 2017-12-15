@@ -320,18 +320,22 @@ function Control:UpdateClientArea()
     --FIXME sometimes this makes self:RequestRealign() redundant! try to reduce the Align() calls somehow
     self.parent:RequestRealign()
   end
+  local needResize = false
   if (self.width ~= self._oldwidth_uca)or(self.height ~= self._oldheight_uca) then
     self:RequestRealign()
+    needResize = true
     self._oldwidth_uca  = self.width
     self._oldheight_uca = self.height
   end
 
-if (self.debug) then
-  Spring.Echo(self.name, self.width, self.height, self._realignRequested)
-end
+  if (self.debug) then
+    Spring.Echo(self.name, self.width, self.height, self._realignRequested)
+  end
 
   self:Invalidate() --FIXME correct place?
-  self:CallListeners(self.OnResize) --FIXME more arguments and filter unchanged resizes
+  if needResize then
+    self:CallListeners(self.OnResize, self.clientWidth, self.clientHeight)
+  end
 end
 
 
