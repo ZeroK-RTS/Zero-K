@@ -126,6 +126,13 @@ local optionGenerationTable = {
 		path = "Settings/Graphics",
 	},
 	{
+		optionName = "moreOptionsButton",
+		optionFunction = function(self) Spring.SendLuaMenuMsg("openSettingsTab Graphics") end,
+		name = "Edit Main Graphics Settings",
+		type = "button",
+		path = "Settings/Graphics",
+	},
+	{
 		optionName = "scrollSpeed",
 		chobbyName = "CameraPanSpeed",
 		name = "Scroll Speed",
