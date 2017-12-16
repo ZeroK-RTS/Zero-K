@@ -568,6 +568,81 @@ for name, ud in pairs(UnitDefs) do
 	end
 end
 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Automatically generate some big selection volumes.
+--
+
+local function Explode(div, str)
+	if div == '' then
+		return false
+	end
+	local pos, arr = 0, {}
+	-- for each divider found
+	for st, sp in function() return string.find(str, div, pos, true) end do
+		table.insert(arr, string.sub(str, pos, st - 1)) -- Attach chars left of current divider
+		pos = sp + 1 -- Jump past current divider
+	end
+	table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
+	return arr
+end
+
+local function GetDimensions(ud)
+	if not ud.collisionvolumescales then
+		return false
+	end
+	local dimensions = Explode(" ", ud.collisionvolumescales)
+	local largest = (dimensions and dimensions[1] and tonumber(dimensions[1])) or 0
+	for i = 2, 3 do
+		largest = math.max(largest, (dimensions and dimensions[i] and tonumber(dimensions[i])) or 0)
+	end
+	return dimensions, largest
+end
+
+local VISUALIZE_SELECTION_VOLUME = false
+local CYL_SCALE = 1.4
+local CYL_ADD = 5
+
+for name, ud in pairs(UnitDefs) do
+	if ud.collisionvolumescales and not ud.selectionvolumescales then
+		-- Do not override default colvol because it is hard to measure.
+		if ud.acceleration and ud.acceleration > 0 and not ud.canfly and ud.canmove then
+			local size = math.max(ud.footprintx or 0, ud.footprintz or 0)*15
+			if size > 0 then
+				local dimensions, largest = GetDimensions(ud)
+				if size > largest then
+					ud.selectionvolumeoffsets = "0 0 0"
+					ud.selectionvolumescales  = size .. " " .. size .. " " .. size
+					ud.selectionvolumetype    = "ellipsoid"
+				elseif string.lower(ud.collisionvolumetype) == "cylx" then
+					ud.selectionvolumeoffsets = ud.collisionvolumeoffsets or "0 0 0"
+					ud.selectionvolumescales  = dimensions[1] .. " " .. math.max(dimensions[2], math.min(size, CYL_ADD + math.ceil(dimensions[2]*CYL_SCALE))) .. " " .. math.max(dimensions[3], math.min(size, CYL_ADD + math.ceil(dimensions[3]*CYL_SCALE)))
+					ud.selectionvolumetype    = ud.collisionvolumetype
+				elseif string.lower(ud.collisionvolumetype) == "cyly" then
+					ud.selectionvolumeoffsets = ud.collisionvolumeoffsets or "0 0 0"
+					ud.selectionvolumescales  = math.max(dimensions[1], math.min(size, CYL_ADD + math.ceil(dimensions[1]*CYL_SCALE))) .. " " .. dimensions[2] .. " " .. math.max(dimensions[3], math.min(size, CYL_ADD + math.ceil(dimensions[3]*CYL_SCALE)))
+					ud.selectionvolumetype    = ud.collisionvolumetype
+				elseif string.lower(ud.collisionvolumetype) == "cylz" then
+					ud.selectionvolumeoffsets = ud.collisionvolumeoffsets or "0 0 0"
+					ud.selectionvolumescales  = math.max(dimensions[1], math.min(size, CYL_ADD + math.ceil(dimensions[1]*CYL_SCALE))) .. " " .. math.max(dimensions[2], math.min(size, CYL_ADD + math.ceil(dimensions[2]*CYL_SCALE))) .. " " .. dimensions[3]
+					ud.selectionvolumetype    = ud.collisionvolumetype
+				end
+			end
+		end
+	end
+	
+	if VISUALIZE_SELECTION_VOLUME then
+		if ud.selectionvolumescales then
+			ud.collisionvolumeoffsets = ud.selectionvolumeoffsets
+			ud.collisionvolumescales  = ud.selectionvolumescales
+			ud.collisionvolumetype    = ud.selectionvolumetype
+		end
+	end
+end
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Altered unit health mod option

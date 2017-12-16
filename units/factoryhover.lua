@@ -26,6 +26,12 @@ unitDef = {
   canMove          = true,
   canPatrol        = true,
   category         = [[UNARMED FLOAT]],
+  collisionVolumeOffsets  = [[0 -2 0]],
+  collisionVolumeScales   = [[124 32 124]],
+  collisionVolumeType     = [[cylY]],
+  selectionVolumeOffsets  = [[0 0 0]],
+  selectionVolumeScales   = [[130 20 130]],
+  selectionVolumeType     = [[box]],
   corpse           = [[DEAD]],
 
   customParams     = {
@@ -33,7 +39,7 @@ unitDef = {
 	modelradius    = [[60]],
 	default_spacing = 8,
 	aimposoffset   = [[0 0 -32]],
-    midposoffset    = [[0 -25 -32]],
+    midposoffset    = [[0 0 -32]],
     solid_factory   = [[8]],
   },
 

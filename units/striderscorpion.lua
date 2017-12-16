@@ -8,12 +8,15 @@ unitDef = {
   builder                = false,
   buildPic               = [[striderscorpion.png]],
   canGuard               = true,
-  canManualFire			 = true,
+  canManualFire          = true,
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
   cloakCost              = 2,
   cloakCostMoving        = 10,
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[85 85 85]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {

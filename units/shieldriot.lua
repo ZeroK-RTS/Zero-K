@@ -12,6 +12,9 @@ unitDef = {
   canPatrol              = true,
   category               = [[LAND]],
   corpse                 = [[DEAD]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeType    = [[ellipsoid]],
 
   customParams           = {
   },

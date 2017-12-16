@@ -13,6 +13,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 1 -1]],
   collisionVolumeScales  = [[26 36 26]],
   collisionVolumeType    = [[cylY]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
