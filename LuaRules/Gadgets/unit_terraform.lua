@@ -3778,6 +3778,12 @@ function TerraformFunctions.TerraformRamp(startX, startY, startZ, endX, endY, en
 	TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
 end
 
+function TerraformFunctions.SetStructureHeight(unitID, height)
+	if structure[unitID] then
+		structure[unitID].h = height
+	end
+end
+
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_TERRAFORM_INTERNAL)
 	

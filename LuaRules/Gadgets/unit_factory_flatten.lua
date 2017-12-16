@@ -61,6 +61,9 @@ function FlattenFactory(unitID, unitDefID)
 
 	if height > 0 or (not ud.floatOnWater) then
 		FlattenRectangle(x - sX, z - sZ, x + sX, z + sZ, height)
+		if GG.Terraform then
+			GG.Terraform.SetStructureHeight(unitID, height)
+		end
 	end
 end
 
