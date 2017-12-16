@@ -2002,7 +2002,7 @@ MakeSubWindow = function(path, pause)
 	KillSubWindow(true)
 	curPath = path -- must be done after KillSubWindow
 	window_sub_cur = Window:New{ 
-		caption = (searchedElement and "Searching in: \"" .. path .. "...\"") or ((not root) and (path) or "MAIN MENU"),
+		caption = (searchedElement and "Searching in: \"" .. path .. "...\"") or ((not root) and (path) or "INGAME MENU"),
 		x = settings.sub_pos_x,  
 		y = math.floor(settings.sub_pos_y), 
 		clientWidth = window_width,
