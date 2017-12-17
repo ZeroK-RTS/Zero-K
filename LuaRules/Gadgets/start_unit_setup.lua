@@ -29,6 +29,8 @@ local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchicke
 local campaignBattleID = modOptions.singleplayercampaignbattleid
 local setAiStartPos = (modOptions.setaispawns == "1")
 
+local CAMPAIGN_SPAWN_DEBUG = (Spring.GetModOptions().campaign_spawn_debug == "1")
+
 local gaiateam = Spring.GetGaiaTeamID()
 local gaiaally = select(6, spGetTeamInfo(gaiateam))
 
@@ -327,6 +329,11 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		-- get facing direction
 		local facing = GetFacingDirection(x, z, teamID)
 
+		if CAMPAIGN_SPAWN_DEBUG then
+			local _, aiName = Spring.GetAIInfo(teamID)
+			Spring.MarkerAddPoint(x, y, z, "Commander " .. (aiName or "Player"))
+			return -- Do not spawn commander
+		end
 		GG.startUnits[teamID] = startUnit
 		GG.CommanderSpawnLocation[teamID] = {x = x, y = y, z = z, facing = facing}
 

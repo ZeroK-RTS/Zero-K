@@ -400,6 +400,9 @@ function UpdateUnitAttributes(unitID, frame)
 	local zombieSpeedMult = spGetUnitRulesParam(unitID,"zombieSpeedMult")
 	local buildpowerMult = spGetUnitRulesParam(unitID, "buildpower_mult")
 	
+	-- Disable
+	local fullDisable = spGetUnitRulesParam(unitID, "fulldisable") == 1
+	
 	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or zombieSpeedMult or buildpowerMult or
 			selfTurnSpeedChange or selfIncomeChange or disarmed or morphDisable or selfAccelerationChange then
 		
@@ -412,6 +415,14 @@ function UpdateUnitAttributes(unitID, frame)
 		local reloadMult = (baseSpeedMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - morphDisable)
 		local maxAccMult = (baseSpeedMult)*(selfMaxAccelerationChange or 1)*(upgradesSpeedMult or 1)
 
+		if fullDisable then
+			buildMult = 0
+			moveMult = 0
+			turnMult = 0
+			reloadMult = 0
+			maxAccMult = 0
+		end
+		
 		-- Let other gadgets and widgets get the total effect without 
 		-- duplicating the pevious calculations.
 		spSetUnitRulesParam(unitID, "baseSpeedMult", baseSpeedMult, INLOS_ACCESS) -- Guaranteed not to be 0

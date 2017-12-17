@@ -21,6 +21,8 @@ end
 local doNotDisableAnyUnits = (Spring.GetModOptions().campaign_debug_units == "1")
 local SPAWN_GAME_PRELOAD = true
 
+local CAMPAIGN_SPAWN_DEBUG = (Spring.GetModOptions().campaign_spawn_debug == "1")
+
 local COMPARE = {
 	AT_LEAST = 1,
 	AT_MOST = 2
@@ -623,13 +625,14 @@ local function GetClearPlacement(unitDefID, centerX, centerZ, spawnRadius, depth
 end
 
 local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
-	if unitData.difficultyAtLeast and (unitData.difficultyAtLeast > missionDifficulty) then
-		return
+	if not CAMPAIGN_SPAWN_DEBUG then
+		if unitData.difficultyAtLeast and (unitData.difficultyAtLeast > missionDifficulty) then
+			return
+		end
+		if unitData.difficultyAtMost and (unitData.difficultyAtMost < missionDifficulty) then
+			return
+		end
 	end
-	if unitData.difficultyAtMost and (unitData.difficultyAtMost < missionDifficulty) then
-		return
-	end
-	
 	local name = unitData.name
 	local ud = UnitDefNames[name]
 	if not (ud and ud.id) then
@@ -654,6 +657,21 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		unitID = GG.DropUnit(ud.name, x, Spring.GetGroundHeight(x,z), z, facing, teamID, true)
 	else
 		unitID = Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID, build, doLevelGround and wantLevel)
+	end
+	
+	if CAMPAIGN_SPAWN_DEBUG then
+		if unitData.difficultyAtLeast then
+			if unitData.difficultyAtMost then
+				Spring.Utilities.UnitEcho(unitID, "At least " .. unitData.difficultyAtLeast .. ". At most " .. unitData.difficultyAtMost)
+			else
+				Spring.Utilities.UnitEcho(unitID, "At least " .. unitData.difficultyAtLeast)
+			end
+		elseif unitData.difficultyAtMost then
+			Spring.Utilities.UnitEcho(unitID, "At most " .. unitData.difficultyAtMost)
+		end
+		
+		Spring.SetUnitRulesParam(unitID, "fulldisable", 1)
+		GG.UpdateUnitAttributes(unitID)
 	end
 	
 	if (not doLevelGround) and wantLevel then
@@ -731,6 +749,9 @@ local function AddMidgameUnit(unitData, teamID, gameFrame)
 	local n = unitData.delay
 	if gameFrame > n then
 		return -- Loaded game.
+	end
+	if CAMPAIGN_SPAWN_DEBUG then
+		return -- Do not spawn any midgame units in spawn debug.
 	end
 	if unitData.difficultyAtLeast and (unitData.difficultyAtLeast > missionDifficulty) then
 		return
@@ -990,6 +1011,9 @@ local function IsUnlockedForUnit(unitID, teamID, buildUnitDefID)
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeamID, cmdID, cmdParams, cmdOpts)
+	if CAMPAIGN_SPAWN_DEBUG then
+		return false
+	end
 	if cmdID == CMD_INSERT and cmdParams and cmdParams[2] then
 		cmdID = cmdParams[2]
 	end

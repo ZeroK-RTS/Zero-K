@@ -176,6 +176,33 @@ local function ExportUnitsAndCommandsForMission()
 	ExportUnitsForMission(true)
 end
 
+local function MoveUnit()
+	local units = Spring.GetSelectedUnits()
+	if not (units and units[1]) then
+		return
+	end
+	
+	local unitDefID = Spring.GetUnitDefID(units[1])
+	local ud = unitDefID and UnitDefs[unitDefID]
+	if not ud then
+		return
+	end
+	
+	local mx, my = Spring.GetMouseState()
+	local trace, pos = Spring.TraceScreenRay(mx, my, true, false, false, true)
+	if not (trace == "ground" and pos) then
+		return
+	end
+	
+	local x, z = math.floor(pos[1]), math.floor(pos[3])
+	if ud.isBuilding or ud.speed == 0 then
+		local facing = Spring.GetUnitBuildFacing(units[1])
+		x, z = SanitizeBuildPositon(x, z, ud, facing)
+	end
+	
+	Spring.SendCommands("luarules moveunit " .. units[1] .. " " .. x .. " " .. z)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -306,6 +333,13 @@ options = {
 		type = 'button',
 		action = 'mission_unit_commands_export',
 		OnChange = ExportUnitsAndCommandsForMission,
+	},
+	missionexportcommands = {
+		name = "Move Unit",
+		desc = "Move selected unit to the mouse cursor.",
+		type = 'button',
+		action = 'debug_move_unit',
+		OnChange = MoveUnit,
 	},
 }
 
