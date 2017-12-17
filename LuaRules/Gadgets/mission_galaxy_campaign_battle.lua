@@ -1039,6 +1039,11 @@ local function LineageUnitCreated(unitID, unitDefID, teamID, builderID)
 		unitLineage[unitID] = teamID
 	end
 	SetBuildOptions(unitID, unitDefID, teamID)
+	
+	if CAMPAIGN_SPAWN_DEBUG then
+		Spring.SetUnitRulesParam(unitID, "fulldisable", 1)
+		GG.UpdateUnitAttributes(unitID)
+	end
 end
 
 --------------------------------------------------------------------------------
