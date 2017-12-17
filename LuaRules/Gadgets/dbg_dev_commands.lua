@@ -440,6 +440,16 @@ local function MoveUnit(cmd, line, words, player)
 	Spring.SetUnitPosition(unitID, x, z)
 end
 
+local function DestroyUnit(cmd, line, words, player)
+	if not (spIsCheatingEnabled() and #words >= 1) then 
+		return
+	end
+	local unitID = tonumber(words[1])
+	if unitID then
+		Spring.DestroyUnit(unitID, false, true)
+	end
+end
+
 local function SetupNanoUnit(unitID, nanoAmount)
 	local _, maxHealth = Spring.GetUnitHealth(unitID)
 	Spring.SetUnitHealth(unitID, {build = nanoAmount, health = maxHealth})
@@ -734,6 +744,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"bisect",bisect,"Bisect gadget disables.")
 	gadgetHandler.actionHandler.AddChatAction(self,"circle",circleGive,"Gives a bunch of units in a circle.")
 	gadgetHandler.actionHandler.AddChatAction(self,"moveunit", MoveUnit, "Moves a unit.")
+	gadgetHandler.actionHandler.AddChatAction(self,"destroyunit", DestroyUnit, "Destroys a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self,"give",give,"Like give all but without all the crap.")
 	gadgetHandler.actionHandler.AddChatAction(self,"pw",PlanetwarsGive,"Spawns all planetwars structures.")
 	gadgetHandler.actionHandler.AddChatAction(self,"gk",gentleKill,"Gently kills everything.")

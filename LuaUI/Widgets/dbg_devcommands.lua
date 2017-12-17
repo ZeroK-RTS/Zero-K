@@ -203,6 +203,17 @@ local function MoveUnit()
 	Spring.SendCommands("luarules moveunit " .. units[1] .. " " .. x .. " " .. z)
 end
 
+local function DestroyUnit()
+	local units = Spring.GetSelectedUnits()
+	if not units then
+		return
+	end
+	
+	for i = 1, #units do
+		Spring.SendCommands("luarules destroyunit " .. units[i])
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -334,12 +345,19 @@ options = {
 		action = 'mission_unit_commands_export',
 		OnChange = ExportUnitsAndCommandsForMission,
 	},
-	missionexportcommands = {
+	moveUnit = {
 		name = "Move Unit",
 		desc = "Move selected unit to the mouse cursor.",
 		type = 'button',
 		action = 'debug_move_unit',
 		OnChange = MoveUnit,
+	},
+	destroyUnit = {
+		name = "Destroy Units",
+		desc = "Destroy selected units (gentle).",
+		type = 'button',
+		action = 'debug_destroy_unit',
+		OnChange = DestroyUnit,
 	},
 }
 
