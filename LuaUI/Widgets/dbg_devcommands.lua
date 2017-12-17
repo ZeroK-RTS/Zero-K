@@ -176,13 +176,24 @@ local function ExportUnitsAndCommandsForMission()
 	ExportUnitsForMission(true)
 end
 
+local unitToMove = 0
+local recentlyMovedUnit = false
 local function MoveUnit()
 	local units = Spring.GetSelectedUnits()
 	if not (units and units[1]) then
 		return
 	end
 	
-	local unitDefID = Spring.GetUnitDefID(units[1])
+	if not recentlyMovedUnit then
+		unitToMove = unitToMove + 1
+		if unitToMove > #units then
+			unitToMove = 1
+		end
+		recentlyMovedUnit = options.moveUnitDelay.value
+	end
+	local unitID = units[unitToMove]
+	
+	local unitDefID = Spring.GetUnitDefID(unitID)
 	local ud = unitDefID and UnitDefs[unitDefID]
 	if not ud then
 		return
@@ -196,11 +207,11 @@ local function MoveUnit()
 	
 	local x, z = math.floor(pos[1]), math.floor(pos[3])
 	if ud.isBuilding or ud.speed == 0 then
-		local facing = Spring.GetUnitBuildFacing(units[1])
+		local facing = Spring.GetUnitBuildFacing(unitID)
 		x, z = SanitizeBuildPositon(x, z, ud, facing)
 	end
 	
-	Spring.SendCommands("luarules moveunit " .. units[1] .. " " .. x .. " " .. z)
+	Spring.SendCommands("luarules moveunit " .. unitID .. " " .. x .. " " .. z)
 end
 
 local function DestroyUnit()
@@ -224,6 +235,12 @@ function widget:Update(dt)
 			recentlyExported = false
 		end
 	end
+	if recentlyMovedUnit then
+		recentlyMovedUnit = recentlyMovedUnit - dt
+		if recentlyMovedUnit < 0 then
+			recentlyMovedUnit = false
+		end
+	end
 end
 
 local doCommandEcho = false
@@ -239,7 +256,6 @@ end
 --------------------------------------------------------------------------------
 options_path = 'Settings/Toolbox/Dev Commands'
 options = {
-	
 	cheat = {
 		name = "Cheat",
 		type = 'button',
@@ -351,6 +367,11 @@ options = {
 		type = 'button',
 		action = 'debug_move_unit',
 		OnChange = MoveUnit,
+	},
+	moveUnitDelay = {
+		name = "Move Unit Repeat",
+		type = "number",
+		value = 0.1, min = 0.01, max = 0.4, step = 0.01,
 	},
 	destroyUnit = {
 		name = "Destroy Units",
