@@ -33,13 +33,13 @@ local spGetUnitLosState = Spring.GetUnitLosState
 local GetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
 
 local UPDATE_PERIOD = 15
-local RANGE_LEEWAY  = 5
+local RANGE_LEEWAY  = 10
 
-local holdPosDefs = {}
+local mobileLandSeaOrGunship = {}
 for i = 1, #UnitDefs do
 	local movetype = Spring.Utilities.getMovetype(UnitDefs[i])
 	if movetype == 1 or movetype == 2 then -- Gunship, land or sea.
-		holdPosDefs[i] = true
+		mobileLandSeaOrGunship[i] = true
 	end
 end
 
@@ -63,6 +63,17 @@ end
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 -- Periodic Checking
+
+local function ValidTargetID(targetID)
+	if not targetID or not Spring.ValidUnitID(targetID) then
+		return false
+	end
+	return true
+	-- I could disable handling against turrets but Spring does not move units close enough
+	-- when they have ballistic trajectories shooting up a hill.
+	--local unitDefID = Spring.GetUnitDefID(targetID)
+	--return unitDefID and mobileLandSeaOrGunship[unitDefID]
+end
 
 local function CheckMoveGoalUpdate(unitID, data)
 	if data.needInit then
@@ -90,7 +101,7 @@ local function CheckMoveGoalUpdate(unitID, data)
 	end
 	
 	local targetID = cQueue[1].params[1]
-	if not targetID or not Spring.ValidUnitID(targetID) then
+	if not ValidTargetID(targetID) then
 		return
 	end
 	local by, ax, ay, az = GetTargetPositionWithWobble(targetID, data)
@@ -106,7 +117,7 @@ local function CheckMoveGoalUpdate(unitID, data)
 	end
 	
 	data.oldX, data.oldY, data.oldZ = x, y, z
-	local range = GetEffectiveWeaponRange(data.unitDefID, data.y, data.weaponNumOverride)
+	local range = GetEffectiveWeaponRange(data.unitDefID, -y, data.weaponNumOverride)
 	if x^2 + z^2 < (range - RANGE_LEEWAY)^2 then
 		return
 	end
@@ -126,7 +137,7 @@ end
 -- Unit Handler
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if holdPosDefs[unitDefID] then
+	if mobileLandSeaOrGunship[unitDefID] then
 		holdPositionUnits.Add(unitID, 
 			{
 				unitDefID = unitDefID,
