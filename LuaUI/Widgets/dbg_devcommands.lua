@@ -152,6 +152,9 @@ local function ExportTeamUnitsForMission(teamID, sendCommands)
 	end
 	local tabs = (teamID == 0 and "\t\t\t\t") or "\t\t\t\t\t"
 	Spring.Echo("====== Unit export team " .. (teamID or "??") .. " ======")
+	for i = 1, 20 do
+		Spring.Echo("= - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - =")
+	end
 	local unitsString = tabs .. "startUnits = {\n"
 	for i = 1, #units do
 		Spring.Echo(GetUnitString(units[i], tabs, sendCommands))
