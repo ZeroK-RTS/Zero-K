@@ -228,6 +228,37 @@ local function DestroyUnit()
 	end
 end
 
+local function RotateUnit(add)
+	Spring.Echo("recentSent", recentSent)
+	local units = Spring.GetSelectedUnits()
+	if not units then
+		return
+	end
+	
+	for i = 1, #units do
+		local unitDefID = Spring.GetUnitDefID(units[i])
+		local ud = unitDefID and UnitDefs[unitDefID]
+		if ud then
+			local facing
+			if ud.isBuilding or ud.speed == 0 then
+				facing = Spring.GetUnitBuildFacing(units[i])
+			else
+				facing = GetUnitFacing(units[i])
+			end
+			facing = (facing + add)%4
+			Spring.SendCommands("luarules rotateunit " .. units[i] .. " " .. facing)
+		end
+	end
+end
+
+local function RotateUnitLeft()
+	RotateUnit(1)
+end
+
+local function RotateUnitRight()
+	RotateUnit(-1)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -382,6 +413,18 @@ options = {
 		type = 'button',
 		action = 'debug_destroy_unit',
 		OnChange = DestroyUnit,
+	},
+	RotateUnitLeft = {
+		name = "Rotate Unit Anticlockwise",
+		type = 'button',
+		action = 'debug_rotate_unit_anticlockwise',
+		OnChange = RotateUnitLeft,
+	},
+	RotateUnitRight = {
+		name = "Rotate Unit Clockwise",
+		type = 'button',
+		action = 'debug_rotate_unit_clockwise',
+		OnChange = RotateUnitRight,
 	},
 }
 

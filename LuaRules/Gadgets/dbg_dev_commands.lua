@@ -338,6 +338,28 @@ local spIsCheatingEnabled = Spring.IsCheatingEnabled
 
 local creationUnitList, creationIndex
 
+local BUILD_RESOLUTION =  16
+local function SanitizeBuildPositon(x, z, ud, facing)
+	local oddX = (ud.xsize % 4 == 2)
+	local oddZ = (ud.zsize % 4 == 2)
+	
+	if facing % 2 == 1 then
+		oddX, oddZ = oddZ, oddX
+	end
+	
+	if oddX then
+		x = math.floor((x + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
+	else
+		x = math.floor(x/BUILD_RESOLUTION)*BUILD_RESOLUTION
+	end
+	if oddZ then
+		z = math.floor((z + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
+	else
+		z = math.floor(z/BUILD_RESOLUTION)*BUILD_RESOLUTION
+	end
+	return x, z
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -448,6 +470,27 @@ local function DestroyUnit(cmd, line, words, player)
 	if unitID then
 		Spring.DestroyUnit(unitID, false, true)
 	end
+end
+
+local function RotateUnit(cmd, line, words, player)
+	if not (spIsCheatingEnabled() and #words >= 2) then 
+		return
+	end
+	local unitID = tonumber(words[1])
+	local facing = tonumber(words[2])
+	if not (unitID and facing and Spring.ValidUnitID(unitID)) or Spring.GetUnitIsDead(unitID) then
+		return
+	end
+	local teamID = Spring.GetUnitTeam(unitID)
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	local ud = unitDefID and UnitDefs[unitDefID]
+	if ud and ud.isBuilding or ud.speed == 0 then
+		x, z = SanitizeBuildPositon(x, z, ud, facing)
+	end
+	
+	Spring.DestroyUnit(unitID, false, true)
+	Spring.CreateUnit(unitDefID, x, y, z, facing, teamID)
 end
 
 local function SetupNanoUnit(unitID, nanoAmount)
@@ -745,6 +788,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"circle",circleGive,"Gives a bunch of units in a circle.")
 	gadgetHandler.actionHandler.AddChatAction(self,"moveunit", MoveUnit, "Moves a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self,"destroyunit", DestroyUnit, "Destroys a unit.")
+	gadgetHandler.actionHandler.AddChatAction(self,"rotateunit", RotateUnit, "Rotates a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self,"give",give,"Like give all but without all the crap.")
 	gadgetHandler.actionHandler.AddChatAction(self,"pw",PlanetwarsGive,"Spawns all planetwars structures.")
 	gadgetHandler.actionHandler.AddChatAction(self,"gk",gentleKill,"Gently kills everything.")
