@@ -181,7 +181,7 @@ end
 
 local unitToMove = 0
 local recentlyMovedUnit = false
-local function MoveUnit()
+local function MoveUnitRaw(snap)
 	local units = Spring.GetSelectedUnits()
 	if not (units and units[1]) then
 		return
@@ -209,12 +209,20 @@ local function MoveUnit()
 	end
 	
 	local x, z = math.floor(pos[1]), math.floor(pos[3])
-	if ud.isBuilding or ud.speed == 0 then
+	if snap or ud.isBuilding or ud.speed == 0 then
 		local facing = Spring.GetUnitBuildFacing(unitID)
 		x, z = SanitizeBuildPositon(x, z, ud, facing)
 	end
 	
 	Spring.SendCommands("luarules moveunit " .. unitID .. " " .. x .. " " .. z)
+end
+
+local function MoveUnit()
+	MoveUnitRaw(false)
+end
+
+local function MoveUnitSnap()
+	MoveUnitRaw(true)
 end
 
 local function DestroyUnit()
@@ -401,8 +409,15 @@ options = {
 		action = 'debug_move_unit',
 		OnChange = MoveUnit,
 	},
+	moveUnitSnap = {
+		name = "Move Unit Snap",
+		desc = "Move selected unit to the mouse cursor. Snaps to grid.",
+		type = 'button',
+		action = 'debug_move_unit_snap',
+		OnChange = MoveUnitSnap,
+	},
 	moveUnitDelay = {
-		name = "Move Unit Repeat",
+		name = "Move Unit Repeat Time",
 		type = "number",
 		value = 0.1, min = 0.01, max = 0.4, step = 0.01,
 	},
