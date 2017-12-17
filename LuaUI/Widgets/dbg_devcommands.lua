@@ -229,7 +229,6 @@ local function DestroyUnit()
 end
 
 local function RotateUnit(add)
-	Spring.Echo("recentSent", recentSent)
 	local units = Spring.GetSelectedUnits()
 	if not units then
 		return
