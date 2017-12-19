@@ -482,7 +482,7 @@ function widget:KeyPress(k)
 end
 
 
-function widget:MousePress(x,y,button)
+function widget:MousePress(x, y, button)
 	if menu then
 		if (button == 3) then
 			EndMenu(false) -- cancel after keyboard menu open
@@ -492,16 +492,19 @@ function widget:MousePress(x,y,button)
 		end
 	elseif (menu == nil) and not KEYBOARD_OPEN_ONLY then
 		if (button == 3) then
-			local activeCmdIndex, activeid = Spring.GetActiveCommand()
-			local _, defid = Spring.GetDefaultCommand()
-			if ((activeid == nil or activeid < 0) and (defid == CMD.MOVE or defid == CMD_RAW_MOVE or not defid)) then -- nano turrets have no CMD.MOVE active command
-				if SetupMenu(false) then 
-					menu_invisible = true 
-					move_digested = true 
-					hold_pos = {x,y} 
-					return true
+			local map = WG.MinimapPositionSpringSpace
+			if (not map) or x < map[1] or x > map[1] + map[3] or y < map[2] or y > map[2] + map[4] then
+				local activeCmdIndex, activeid = Spring.GetActiveCommand()
+				local _, defid = Spring.GetDefaultCommand()
+				if ((activeid == nil or activeid < 0) and (defid == CMD.MOVE or defid == CMD_RAW_MOVE or not defid)) then -- nano turrets have no CMD.MOVE active command
+					if SetupMenu(false) then 
+						menu_invisible = true 
+						move_digested = true 
+						hold_pos = {x,y} 
+						return true
+					end 
 				end 
-			end 
+			end
 		end 
 	end 
 	return false

@@ -1053,6 +1053,7 @@ function widget:DrawScreen()
 		cx,cy = map_panel:LocalToScreen(cx,cy)
 		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
 		WG.MinimapPosition = {cx,cy,cw,ch}
+		WG.MinimapPositionSpringSpace = {cx, vsy - cy - ch,cw,ch}
 	end
 
 	-- Do this even if the fadeShader can't exist, just so that all hiding code still behaves properly
