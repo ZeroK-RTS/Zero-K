@@ -1308,7 +1308,9 @@ SetupPlayerNames = function()
 	-- while we're at it, determine whether or not to show the ally team summary lines
 	--
 	if #allyTeamOrderRank == 0 then
-		if #allyTeams[localAlliance] > 2 then myTeamIsVeryBig = true end -- this appears to be broken
+		if allyTeams[localAlliance] and #allyTeams[localAlliance] > 2 then
+			myTeamIsVeryBig = true
+		end
 		for i=1,#allyTeamsSorted do  -- for every ally team
 			local allyTeamID = allyTeamsSorted[i]
 			allyTeamOrderRank[allyTeamID] = 0
