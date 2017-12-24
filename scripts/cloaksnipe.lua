@@ -74,9 +74,6 @@ local AIM_SPEED = math.rad(210)
 local bAiming, bCanAim, gun_unpacked, idleArmState = false, true, false, false
 local maintainHeading = false
 local torsoHeading = 0
-local baseHeading = nil
-
-local wantedWorldHeading = 0
 
 local function Walk()
 	Signal(SIG_WALK)
@@ -147,47 +144,14 @@ function script.StopMoving()
 	StartThread(Stopping)
 end
 
-local pi = math.pi
-local halfpi = pi/2
-local function ChangeHeading(dh)
-	if dh == 0 then
+
+function script.ChangeHeading(delta)
+	if delta == 0 then
 		return
 	end
-    torsoHeading = torsoHeading + dh
-    Turn(torsoTrue, y_axis, -torsoHeading, AIM_SPEED)
-end
-
-local function NormalizeHeading(heading)
-	if heading > 2*pi then
-		heading = heading - 2 * pi
-	elseif heading < -2*pi then
-		heading = heading + 2 * pi
-	end
-	return heading
-end
-
-local function TorsoHeadingThread()
-	while true do
-		if maintainHeading then
-			local currHeading = NormalizeHeading(Spring.GetUnitHeading(unitID) * headingToRad)
-			if wantedWorldHeading > halfpi and wantedWorldHeading <= pi then
-				Spring.Echo("aiming upper right")
-			elseif wantedWorldHeading > pi and wantedWorldHeading <= halfpi * 3 then
-				Spring.Echo("aiming upper left")
-			elseif wantedWorldHeading > halfpi * 3 and wantedWorldHeading <= pi * 2 then
-				Spring.Echo("aiming lower left")
-			else
-				Spring.Echo("aiming lower right")
-			end
-			
-			if baseHeading ~= nil then
-				ChangeHeading(currHeading - baseHeading)
-			end
-			baseHeading = currHeading
-		else
-			--baseHeading = Spring.GetUnitHeading(unitID) * headingToRad
-		end
-		Sleep(33)
+	if maintainHeading then
+		torsoHeading = torsoHeading + delta * headingToRad
+		Turn(torsoTrue, y_axis, -torsoHeading, AIM_SPEED)
 	end
 end
 
@@ -270,7 +234,7 @@ local function RestoreAfterDelay()
 	--if the gun is unpacked and we\'re not aiming, close it
 	--if gun_unpacked and not bAiming then
 	--
-		--Turn(torsoTrue, y_axis, 0, math.rad(120))
+		Turn(torsoTrue, y_axis, 0, math.rad(120))
 		Turn(torsoPivot, y_axis, 0, math.rad(120))
 		torsoHeading = 0
 		Turn(shoulderr, x_axis, math.rad(-90), math.rad(140))
@@ -286,8 +250,6 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	maintainHeading = true
-	wantedWorldHeading = NormalizeHeading(Spring.GetUnitHeading(unitID) * headingToRad + heading)
-	
 	
 	GG.DontFireRadar_CheckAim(unitID)
 	
@@ -307,12 +269,13 @@ function script.AimWeapon(num, heading, pitch)
 		UnpackGun()
 	end
 	Turn(torsoPivot, y_axis, heading, AIM_SPEED)
-	--Turn(torsoTrue, y_axis, 0, AIM_SPEED)
+	Turn(torsoTrue, y_axis, 0, AIM_SPEED)
 	WaitForTurn(torsoPivot, y_axis)
-	--WaitForTurn(torsoTrue, y_axis)
+	WaitForTurn(torsoTrue, y_axis)
 	WaitForTurn(shoulderr, x_axis)
 	WaitForTurn(forearmr, x_axis)
 	StartThread(RestoreAfterDelay)
+	torsoHeading = 0
 	Turn(camera, y_axis, 0, math.rad(100))
 	bAiming = false
 	return(true)
