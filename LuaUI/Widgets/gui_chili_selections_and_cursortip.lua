@@ -2064,7 +2064,7 @@ end
 
 local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	local holdingDrawKey = GetIsHoldingDrawKey()
-	local holdingSpace = select(3, Spring.GetModKeyState())
+	local holdingSpace = select(3, Spring.GetModKeyState()) and not Spring.IsUserWriting()
 	UpdateMouseCursor(holdingDrawKey)
 	
 	if not (holdingSpace or (options.tooltip_delay.value == 0)) then

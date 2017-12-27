@@ -1,5 +1,10 @@
--- Caching results for Spring.* functions
+-- Poisoning for Spring.* functions (caching, filtering, providing back compat)
 
+if not Spring.IsUserWriting then
+	Spring.IsUserWriting = function()
+		return false
+	end
+end
 
 -- *etTeamColor
 local teamColor = {}
