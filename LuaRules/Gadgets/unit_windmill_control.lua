@@ -34,8 +34,9 @@ local windmills = {}
 local groundMin, groundMax = 0,0
 local groundExtreme = 0
 local slope = 0
+local tidalHeight = -10
 
-local windMin, windMax, windRange
+local windMin, windMax, windRange, tidalStrength
 
 local strength, next_strength, strength_step, step_count = 0,0,0,0
 
@@ -137,8 +138,8 @@ local function SetupUnit(unitID)
 
 	local x, y, z = spGetUnitPosition(unitID)
 	
-	if Spring.GetGroundHeight(x,z) <= -10 then
-		spSetUnitRulesParam(unitID, "wanted_energyIncome", 1.2, inlosTrueTable)
+	if Spring.GetGroundHeight(x,z) <= tidalHeight then
+		spSetUnitRulesParam(unitID, "wanted_energyIncome", tidalStrength, inlosTrueTable)
 		Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
 		Spring.SetUnitMaxHealth(unitID, 400)
 		local health = Spring.GetUnitHealth(unitID)
@@ -177,14 +178,20 @@ GG.SetupWindmill = SetupUnit
 
 function gadget:Initialize()
 
-	windMin = 0
-	windMax = 2.5
+	local energyMult = Spring.GetModOptions().energymult
+	energyMult = energyMult and tonumber(energyMult) or 1
+
+	windMin = 0 * energyMult
+	windMax = 2.5 * energyMult
+	tidalStrength = 1.2 * energyMult
 	windRange = windMax - windMin
 
 	Spring.SetGameRulesParam("WindMin",windMin)
 	Spring.SetGameRulesParam("WindMax",windMax)
+	Spring.SetGameRulesParam("tidalStrength",tidalStrength)
 	Spring.SetGameRulesParam("WindHeading", 0)
 	Spring.SetGameRulesParam("WindStrength", 0)
+	Spring.SetGameRulesParam("tidalHeight", tidalHeight)
 	
 	groundMin, groundMax = Spring.GetGroundExtremes()
 	groundMin, groundMax = math.max(groundMin,0), math.max(groundMax,1)
