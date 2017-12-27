@@ -46,14 +46,14 @@ local spEcho				= Spring.Echo
 local CMD_BUILD_STRUCTURE = 10010
 local ANGLE_TOLERANCE = 22.5
 
-local MINDIST = 50
-local BIG_ICON_SIZE = 32
-local MOVE_THRESHOLD_SQUARED = 900
-local IDLE_THRESHOLD = 0.5 -- after this seconds menu shows if you hold right mouse still
-local SMALL_ICON_SIZE = 20
-local KEYBOARD_ONLY = false 
-local KEYBOARD_OPEN_ONLY = false 
-local ALLOW_MULTIPLE = false 
+local MINDIST
+local BIG_ICON_SIZE
+local MOVE_THRESHOLD_SQUARED
+local IDLE_THRESHOLD
+local SMALL_ICON_SIZE
+local KEYBOARD_ONLY
+local KEYBOARD_OPEN_ONLY
+local ALLOW_MULTIPLE
 
 local mouselessOpen = false
 
@@ -734,6 +734,8 @@ function widget:DrawScreen()
 end
 
 function widget:Initialize()
+
+	OptionsChanged()
 
   -- adding functions because of "handler=true"
   widgetHandler.AddAction    = function (_, cmd, func, data, types)
