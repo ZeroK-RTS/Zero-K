@@ -19,15 +19,17 @@ copy it from infolog to the config
 dont forget to change TEAM to an actual number
 ]]
 
-local pressed = false
-
 local polygon = { }
 local final_polygons = { }
 
 function widget:MousePress(mx, my, button)
-	pressed = true
+	widgetHandler:UpdateCallIn("MapDrawCmd")
 
 	local pos = select(2, Spring.TraceScreenRay(mx, my, true, true))
+	if not pos then
+		return true
+	end
+
 	if (#polygon == 0) then
 		polygon[#polygon+1] = pos
 	else
@@ -46,23 +48,23 @@ function widget:MousePress(mx, my, button)
 end
 
 function widget:MouseRelease(mx, my, button)
-	pressed = false
+	widgetHandler:RemoveCallIn("MapDrawCmd")
 	return true
 end
 
 function widget:MouseMove(mx, my)
-	if not pressed then return false end
 	local pos = select(2, Spring.TraceScreenRay(mx, my, true))
+	if not pos then
+		return
+	end
 
-	if (pos) then
-		if (#polygon == 0) then
-			polygon[1] = pos
-		else
-			local dx = math.abs(pos[1] - polygon[#polygon][1])
-			local dz = math.abs(pos[3] - polygon[#polygon][3])
-			if (dx > 10 or dz > 10) then
-				polygon[#polygon+1] = pos
-			end
+	if (#polygon == 0) then
+		polygon[1] = pos
+	else
+		local dx = math.abs(pos[1] - polygon[#polygon][1])
+		local dz = math.abs(pos[3] - polygon[#polygon][3])
+		if (dx > 10 or dz > 10) then
+			polygon[#polygon+1] = pos
 		end
 	end
 	return true
@@ -129,4 +131,8 @@ function widget:DrawWorld()
 	gl.BeginEnd(GL.LINE_STRIP, DrawLine)
 	gl.LineWidth(1.0)
 	gl.Color(1, 1, 1, 1)
+end
+
+function widget:Initialize()
+	widgetHandler:RemoveCallIn("MapDrawCmd")
 end
