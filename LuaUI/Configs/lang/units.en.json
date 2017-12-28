@@ -325,7 +325,7 @@
 		"helptext" : "The Raven drops a single high damage, low AoE bomb. Cost for cost, nothing quite matches it for taking out that antinuke or Minotaur, but you should look elsewhere for something to use against smaller mobiles."
 	},
 	"chicken_shield" : {
-		"name" : "Toad",
+		"name" : "Blooper",
 		"description" : "Shield/Anti-Air",
 		"helptext" : "Protects adjacent chickens."
 	},

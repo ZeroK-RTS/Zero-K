@@ -1145,7 +1145,7 @@
     "chicken_shield": {
         "helptext": "Protects adjacent chickens.",
         "description": "Shield/AA",
-        "name": "Toad"
+        "name": "Blooper"
     },
     "turretimpulse": {
         "helptext": "Ньютон (Newton) оснащён экспериментальными гравитационным оружием которое не наносит никакого урона, но может притягивать и отталкивать разные объекты. Это оружие можно использовать как на вражеских, так и на своих юнитах.",

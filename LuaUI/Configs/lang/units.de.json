@@ -380,7 +380,7 @@
 		"helptext" : "Die Nebula ist stark und ungeschickt, aber sie hat ein Schild um sich zu schutzen und kann seine einige Jaegerdrohne herstellen."
 	},
 	"chicken_shield" : {
-		"name" : "Toad",
+		"name" : "Blooper",
 		"description" : "Schild/Luftabwehr",
 		"helptext" : "Beschützt nebenstehende Chicken."
 	},
