@@ -254,7 +254,7 @@ function Control:GetRelativeBox(savespace)
   end
 
   local p = self.parent
-  if (not p) then
+  if not p or not UnlinkSafe(p) then
     return t
   end
 
