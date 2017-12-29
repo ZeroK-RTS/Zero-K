@@ -879,7 +879,7 @@ end
 
 
 function Control:IsRectInView(x,y,w,h)
-	if (not self.parent) then 
+	if not self.parent or not UnlinkSafe(self.parent) then 
 		return false
 	end
 
