@@ -18,7 +18,7 @@ local ret = {
 		nameLong = "Southwest",
 		nameShort = "SW",
 		startpoints = {
-			{1741,3789},
+			{307,3789},
 		},
 		boxes = {
 			{
