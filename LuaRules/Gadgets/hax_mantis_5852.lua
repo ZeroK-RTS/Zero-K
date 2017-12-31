@@ -33,7 +33,7 @@ local spGetUnitLosState = Spring.GetUnitLosState
 local GetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
 
 local UPDATE_PERIOD = 15
-local RANGE_LEEWAY  = 10
+local RANGE_LEEWAY  = 5
 
 local mobileLandSeaOrGunship = {}
 for i = 1, #UnitDefs do
@@ -71,8 +71,8 @@ local function ValidTargetID(targetID)
 	return true
 	-- I could disable handling against turrets but Spring does not move units close enough
 	-- when they have ballistic trajectories shooting up a hill.
-	--local unitDefID = Spring.GetUnitDefID(targetID)
-	--return unitDefID and mobileLandSeaOrGunship[unitDefID]
+	local unitDefID = Spring.GetUnitDefID(targetID)
+	return unitDefID and mobileLandSeaOrGunship[unitDefID]
 end
 
 local function CheckMoveGoalUpdate(unitID, data)
