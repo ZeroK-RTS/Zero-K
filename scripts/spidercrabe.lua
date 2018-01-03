@@ -110,6 +110,8 @@ local function Curl()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	
+	Sleep(200)
+	
 	while Spring.GetUnitIsStunned(unitID) do
 		Sleep (100)
 	end
@@ -117,7 +119,7 @@ local function Curl()
 	Sleep(100)
 	bCurling = true
 	--Spring.Echo("slowing down", Spring.GetGameFrame())
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.05)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.1)
 	GG.UpdateUnitAttributes(unitID)
 
 	Move(canon, y_axis, 5, 1.5)
@@ -230,12 +232,12 @@ local function Motion()
 end
 
 function script.StartMoving()
-	--Spring.Echo("Moving")
+	Spring.Utilities.UnitEcho(unitID, "A")
 	StartThread(Motion)
 end
 
 function script.StopMoving()
-	--Spring.Echo("Stopped moving")
+	Spring.Utilities.UnitEcho(unitID, "P")
 	StartThread(Curl)
 end
 

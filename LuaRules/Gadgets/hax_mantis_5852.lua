@@ -35,11 +35,21 @@ local GetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
 local UPDATE_PERIOD = 15
 local RANGE_LEEWAY  = 5
 
+-- Units aim from pieces, not their midpoints.
+local bonusDefs = {
+	spidercrabe = 12
+}
+
+local heightBonus = {}
 local mobileLandSeaOrGunship = {}
 for i = 1, #UnitDefs do
-	local movetype = Spring.Utilities.getMovetype(UnitDefs[i])
+	local ud = UnitDefs[i]
+	local movetype = Spring.Utilities.getMovetype(ud)
 	if movetype == 1 or movetype == 2 then -- Gunship, land or sea.
 		mobileLandSeaOrGunship[i] = true
+		if bonusDefs[ud.name] then
+			heightBonus[i] = bonusDefs[ud.name]
+		end
 	end
 end
 
@@ -68,7 +78,6 @@ local function ValidTargetID(targetID)
 	if not targetID or not Spring.ValidUnitID(targetID) then
 		return false
 	end
-	return true
 	-- I could disable handling against turrets but Spring does not move units close enough
 	-- when they have ballistic trajectories shooting up a hill.
 	local unitDefID = Spring.GetUnitDefID(targetID)
@@ -110,7 +119,7 @@ local function CheckMoveGoalUpdate(unitID, data)
 	if not (ax and ux) then
 		return
 	end
-	local x, y, z = ax - ux, ay - uy, az - uz
+	local x, y, z = ax - ux, ay - uy - (heightBonus[data.unitDefID] or 0), az - uz
 	
 	if data.oldX == x and data.oldY == y and data.oldZ == z then
 		return
@@ -118,10 +127,10 @@ local function CheckMoveGoalUpdate(unitID, data)
 	
 	data.oldX, data.oldY, data.oldZ = x, y, z
 	local range = GetEffectiveWeaponRange(data.unitDefID, -y, data.weaponNumOverride)
+	--Spring.Echo("range", range, math.sqrt(x^2 + z^2))
 	if x^2 + z^2 < (range - RANGE_LEEWAY)^2 then
 		return
 	end
-	
 	Spring.SetUnitMoveGoal(unitID, ax, by, az, range - RANGE_LEEWAY)
 end
 
