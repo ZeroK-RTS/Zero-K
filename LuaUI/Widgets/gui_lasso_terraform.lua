@@ -1333,7 +1333,7 @@ function widget:Update(dt)
 		end
 		if pos and legalPos(pos) and options.holdMouseForStructureTerraform.value then
 			if buildingPress then
-				if pos[1] ~= buildingPress.pos[1] or pos[3] ~= buildingPress.pos[3] then
+				if math.abs(pos[1] - buildingPress.pos[1]) >= 4 or math.abs(pos[3] - buildingPress.pos[3]) >= 4 then
 					local a,c,m,s = spGetModKeyState()
 					if s then
 						buildingPress.frame = false
