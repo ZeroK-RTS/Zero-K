@@ -232,12 +232,12 @@ local function Motion()
 end
 
 function script.StartMoving()
-	Spring.Utilities.UnitEcho(unitID, "A")
+	--Spring.Utilities.UnitEcho(unitID, "A")
 	StartThread(Motion)
 end
 
 function script.StopMoving()
-	Spring.Utilities.UnitEcho(unitID, "P")
+	--Spring.Utilities.UnitEcho(unitID, "P")
 	StartThread(Curl)
 end
 
