@@ -39,13 +39,16 @@ local RANGE_LEEWAY  = 5
 local bonusDefs = {
 	spidercrabe = 12
 }
+local exceptions = {
+	spidercrabe = true
+}
 
 local heightBonus = {}
 local mobileLandSeaOrGunship = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	local movetype = Spring.Utilities.getMovetype(ud)
-	if movetype == 1 or movetype == 2 then -- Gunship, land or sea.
+	if (not exceptions[ud.name]) and (movetype == 1 or movetype == 2) then -- Gunship, land or sea.
 		mobileLandSeaOrGunship[i] = true
 		if bonusDefs[ud.name] then
 			heightBonus[i] = bonusDefs[ud.name]
