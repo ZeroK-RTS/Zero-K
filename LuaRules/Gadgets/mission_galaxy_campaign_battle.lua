@@ -659,6 +659,12 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		unitID = Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID, build, doLevelGround and wantLevel)
 	end
 	
+	if unitData.stunTime then
+		local _, maxHealth = Spring.GetUnitHealth(unitID)
+		local paraFactor = 1 + unitData.stunTime/40
+		Spring.SetUnitHealth(unitID, {paralyze = maxHealth * paraFactor})
+	end
+	
 	if CAMPAIGN_SPAWN_DEBUG then
 		if unitData.difficultyAtLeast then
 			if unitData.difficultyAtMost then
