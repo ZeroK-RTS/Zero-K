@@ -990,6 +990,7 @@ function gadget:GameFrame(n)
 			local allyTeamEnergyCurrent = 0
 			local allyTeamEnergyMax = 0
 			local allyTeamEnergyMaxCurMax = 0
+			local holdBackEnergyFromOverdrive = 0
 
 			local allyTeamMiscMetalIncome = 0
 		
@@ -1047,7 +1048,6 @@ function gadget:GameFrame(n)
 				allyTeamEnergyCurrent = allyTeamEnergyCurrent + te.cur
 				allyTeamEnergyMax = allyTeamEnergyMax + te.max
 				allyTeamExpense = allyTeamExpense + te.exp
-				allyTeamEnergyMaxCurMax = allyTeamEnergyMaxCurMax + math.max(te.max, te.cur) -- This prevents full overdrive until everyone has full energy storage.
 
 				te.spare = te.inc - te.exp
 				if te.max == MIN_STORAGE and te.spare < MIN_STORAGE then
@@ -1060,7 +1060,7 @@ function gadget:GameFrame(n)
 				
 				if debugMode then
 					Spring.Echo("--- Team Economy ---", teamID)
-					Spring.Echo("inc", te.inc, "exp", te.exp, "spare", te.spare)
+					Spring.Echo("inc", te.inc, "exp", te.exp, "spare", te.spare, "pull", te.pull)
 					Spring.Echo("last spend", lastTeamOverdriveNetLoss[teamID], "cur", te.cur, "max", te.max)
 				end
 				
@@ -1083,14 +1083,47 @@ function gadget:GameFrame(n)
 				end
 			end
 			
+			-- Allocate extra energy storage to teams with less energy income than the spare energy of their team.
+			-- This better allows teams to spend at the capacity supported by their team.
+			local averageSpare = allyTeamEnergySpare/energyProducerOrUserCount
+			if debugMode then
+				Spring.Echo("=========== Spare Energy ===========", allyTeamID)
+				Spring.Echo("averageSpare", averageSpare)
+			end
+			for i = 1, allyTeamData.teams do
+				local teamID = allyTeamData.team[i]
+				local te = teamEnergy[teamID]
+				if te.energyProducerOrUser then
+					te.extraFreeStorage = math.max(0, averageSpare - te.inc)
+					
+					-- This prevents full overdrive until everyone has full energy storage.
+					allyTeamEnergyMaxCurMax = allyTeamEnergyMaxCurMax + math.max(te.max + te.extraFreeStorage, te.cur) 
+					
+					-- Save from energy from being sent to overdrive if we are stalling and have below average energy income.
+					local holdBack = math.max(0, te.extraFreeStorage - te.cur)
+					holdBackEnergyFromOverdrive = holdBackEnergyFromOverdrive + holdBack
+					if debugMode then
+						Spring.Echo(teamID, "extraFreeStorage", te.extraFreeStorage, "spare", te.spare, "held back", holdBack)
+					end
+				else
+					te.extraFreeStorage = 0
+					if debugMode then
+						Spring.Echo(teamID, "Not participating")
+					end
+				end
+			end
+			
 			-- This is how much energy will be spent on overdrive. It remains to determine how much
 			-- is spent by each player.
 			local energyForOverdrive = max(0, allyTeamEnergySpare)*((allyTeamEnergyMaxCurMax > 0 and max(0, min(1, allyTeamEnergyCurrent/allyTeamEnergyMaxCurMax))) or 1)
-
+			energyForOverdrive = math.max(0, energyForOverdrive - holdBackEnergyFromOverdrive)
+			
 			if debugMode then
 				Spring.Echo("=========== AllyTeam Economy ===========", allyTeamID)
 				Spring.Echo("inc", allyTeamEnergyIncome, "exp", allyTeamExpense, "spare", allyTeamEnergySpare)
-				Spring.Echo("+spare", allyTeamPositiveSpare, "-spare", allyTeamNegativeSpare, "cur", allyTeamEnergyCurrent, "max", allyTeamEnergyMax, "maxCurMax", allyTeamEnergyMaxCurMax, "energyForOverdrive", energyForOverdrive)
+				Spring.Echo("+spare", allyTeamPositiveSpare, "-spare", allyTeamNegativeSpare, "cur", allyTeamEnergyCurrent, "max", allyTeamEnergyMax)
+				Spring.Echo("energyForOverdrive", energyForOverdrive, "heldBack", holdBackEnergyFromOverdrive)
+				Spring.Echo("maxCurMax", allyTeamEnergyMaxCurMax, "averageSpare", averageSpare)
 			end
 			
 			-- The following inequality holds:
@@ -1170,7 +1203,7 @@ function gadget:GameFrame(n)
 				
 				-- Allow a refund up to the to the average spare energy contributed to the system. This allows
 				-- people with zero storage to build.
-				te.freeStorage = te.max + te.exp - te.cur
+				te.freeStorage = te.max + te.exp - te.cur + te.extraFreeStorage
 				if te.energyProducerOrUser then
 					te.freeStorage = te.freeStorage + allyTeamEnergySpare/energyProducerOrUserCount
 				end
@@ -1193,7 +1226,7 @@ function gadget:GameFrame(n)
 			end
 			
 			if debugMode then
-				Spring.Echo("AllyTeam totalFreeStorage", totalFreeStorage)
+				Spring.Echo("AllyTeam totalFreeStorage", totalFreeStorage, "energyToRefund", energyToRefund)
 			end
 
 			if totalFreeStorage > energyToRefund then
