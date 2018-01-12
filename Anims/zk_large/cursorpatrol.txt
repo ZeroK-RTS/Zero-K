@@ -1,0 +1,19 @@
+hotspot topleft
+frame  anims/zk_large/cursorpatrol_0.png  0.3
+frame  anims/zk_large/cursorpatrol_1.png  0.1
+frame  anims/zk_large/cursorpatrol_2.png  0.1
+frame  anims/zk_large/cursorpatrol_3.png  0.1
+frame  anims/zk_large/cursorpatrol_4.png  0.1
+frame  anims/zk_large/cursorpatrol_5.png  0.1
+frame  anims/zk_large/cursorpatrol_6.png  0.1
+frame  anims/zk_large/cursorpatrol_7.png  0.1
+frame  anims/zk_large/cursorpatrol_8.png  0.1
+frame  anims/zk_large/cursorpatrol_9.png  0.3
+frame  anims/zk_large/cursorpatrol_8.png  0.1
+frame  anims/zk_large/cursorpatrol_7.png  0.1
+frame  anims/zk_large/cursorpatrol_6.png  0.1
+frame  anims/zk_large/cursorpatrol_5.png  0.1
+frame  anims/zk_large/cursorpatrol_4.png  0.1
+frame  anims/zk_large/cursorpatrol_3.png  0.1
+frame  anims/zk_large/cursorpatrol_2.png  0.1
+frame  anims/zk_large/cursorpatrol_1.png  0.1

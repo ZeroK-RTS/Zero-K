@@ -1,0 +1,5 @@
+hotspot topleft
+frame  anims/zk_large/cursormex_0.png  0.2
+frame  anims/zk_large/cursormex_1.png  0.2
+frame  anims/zk_large/cursormex_0.png  0.2
+frame  anims/zk_large/cursormex_2.png  0.2

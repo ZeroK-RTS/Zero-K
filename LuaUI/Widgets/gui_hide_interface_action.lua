@@ -1,7 +1,7 @@
 function widget:GetInfo() 
 	return {
-		name        = "Hide Interface Action",
-		desc        = "Implements a hide interface action that also hides mouse cursor.",
+		name        = "Hide Interface and Mouse Cursor",
+		desc        = "Implements a hide interface action as well as mouse cursor sets.",
 		author      = "CarRepairer",
 		date        = "2012-01-11",
 		license     = "GNU GPL, v2 or later",
@@ -10,6 +10,8 @@ function widget:GetInfo()
 		alwaysStart = true,
 	} 
 end
+
+local cursorDir = ""
 
 local cursorNames = {
 	'cursornormal',
@@ -43,14 +45,15 @@ local cursorNames = {
 	'cursorSmooth',
 }
 
-local function ShowCursor ()
+local function ShowCursor()
 	for i = 1, #cursorNames do
 		local cursor = cursorNames[i]
-		Spring.ReplaceMouseCursor (cursor, cursor)
+		local cursorPath = cursorDir .. cursor
+		Spring.ReplaceMouseCursor(cursor, cursorPath)
 	end
 end
 
-local function HideCursor ()
+local function HideCursor()
 	for i = 1, #cursorNames do
 		Spring.ReplaceMouseCursor(cursorNames[i], "cursorempty")
 	end
@@ -79,6 +82,19 @@ options = {
 				ShowCursor()
 			end
 		end,
+	},
+	cursor_animated = {
+		name = 'Large cursor',
+		desc = 'Double cursor size. WARNING: won\'t render cursors at all on some older graphics cards!',
+		type = 'bool',
+		value = false,
+		OnChange = function (self)
+			cursorDir = (self.value and "zk_large/") or ""
+			if not Spring.IsGUIHidden() then
+				ShowCursor()
+			end
+		end,
+		path = 'Settings/Interface/Mouse Cursor'
 	},
 }
 

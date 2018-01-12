@@ -1,0 +1,22 @@
+hotspot center
+frame  anims/zk_large/cursorunload_0.png 0.1
+frame  anims/zk_large/cursorunload_1.png 0.1
+frame  anims/zk_large/cursorunload_2.png 0.1
+frame  anims/zk_large/cursorunload_3.png 0.1
+frame  anims/zk_large/cursorunload_4.png 0.1
+frame  anims/zk_large/cursorunload_5.png 0.1
+frame  anims/zk_large/cursorunload_6.png 0.1
+frame  anims/zk_large/cursorunload_7.png 0.1
+frame  anims/zk_large/cursorunload_8.png 0.1
+frame  anims/zk_large/cursorunload_9.png 0.1
+frame  anims/zk_large/cursorunload_10.png 0.1
+frame  anims/zk_large/cursorunload_9.png 0.1
+frame  anims/zk_large/cursorunload_8.png 0.1
+frame  anims/zk_large/cursorunload_7.png 0.1
+frame  anims/zk_large/cursorunload_6.png 0.1
+frame  anims/zk_large/cursorunload_5.png 0.1
+frame  anims/zk_large/cursorunload_4.png 0.1
+frame  anims/zk_large/cursorunload_3.png 0.1
+frame  anims/zk_large/cursorunload_2.png 0.1
+frame  anims/zk_large/cursorunload_1.png 0.1
+frame  anims/zk_large/cursorunload_0.png 0.1

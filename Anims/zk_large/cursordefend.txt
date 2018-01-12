@@ -1,0 +1,25 @@
+hotspot center
+frame anims/zk_large/cursordefend_0.png 0.1
+frame anims/zk_large/cursordefend_1.png 0.1
+frame anims/zk_large/cursordefend_2.png 0.1
+frame anims/zk_large/cursordefend_3.png 0.1
+frame anims/zk_large/cursordefend_4.png 0.1
+frame anims/zk_large/cursordefend_5.png 0.1
+frame anims/zk_large/cursordefend_6.png 0.1
+frame anims/zk_large/cursordefend_5.png 0.1
+frame anims/zk_large/cursordefend_4.png 0.1
+frame anims/zk_large/cursordefend_3.png 0.1
+frame anims/zk_large/cursordefend_2.png 0.1
+frame anims/zk_large/cursordefend_1.png 0.1
+frame anims/zk_large/cursordefend_0.png 0.1
+frame anims/zk_large/cursordefend_7.png 0.1
+frame anims/zk_large/cursordefend_8.png 0.1
+frame anims/zk_large/cursordefend_9.png 0.1
+frame anims/zk_large/cursordefend_10.png 0.1
+frame anims/zk_large/cursordefend_11.png 0.1
+frame anims/zk_large/cursordefend_12.png 0.1
+frame anims/zk_large/cursordefend_11.png 0.1
+frame anims/zk_large/cursordefend_10.png 0.1
+frame anims/zk_large/cursordefend_9.png 0.1
+frame anims/zk_large/cursordefend_8.png 0.1
+frame anims/zk_large/cursordefend_7.png 0.1

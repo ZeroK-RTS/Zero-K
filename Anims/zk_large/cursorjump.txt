@@ -1,0 +1,13 @@
+hotspot center
+frame  anims/zk_large/cursorjump_0.png  0.2
+frame  anims/zk_large/cursorjump_1.png  0.05
+frame  anims/zk_large/cursorjump_2.png  0.05
+frame  anims/zk_large/cursorjump_3.png  0.05
+frame  anims/zk_large/cursorjump_4.png  0.05
+frame  anims/zk_large/cursorjump_5.png  0.05
+frame  anims/zk_large/cursorjump_6.png  0.05
+frame  anims/zk_large/cursorjump_5.png  0.05
+frame  anims/zk_large/cursorjump_4.png  0.05
+frame  anims/zk_large/cursorjump_3.png  0.05
+frame  anims/zk_large/cursorjump_2.png  0.05
+frame  anims/zk_large/cursorjump_1.png  0.05
