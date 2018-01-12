@@ -2,7 +2,7 @@
 
 include "constants.lua"
 
-local ground, pelvis, turret, gun1, gun2, lleg, rleg, lfoot, rfoot, firept1, firept2 = piece('ground', 'pelvis', 'turret', 'gun1', 'gun2', 'lleg', 'rleg', 'lfoot', 'rfoot', 'firept1', 'firept2')
+local ground, pelvis, turret, gunbase, gun1, gun2, lleg, rleg, lfoot, rfoot, firept1, firept2 = piece('ground', 'pelvis', 'turret', 'gunbase', 'gun1', 'gun2', 'lleg', 'rleg', 'lfoot', 'rfoot', 'firept1', 'firept2')
 local SIG_AIM = {}
 local firepoints = {[0] = firept1, [1] = firept2}
 local barrels = {[0] = gun1, [1] = gun2}
@@ -24,33 +24,14 @@ local LEG_RAISE_DISPLACEMENT = 2
 local LEG_Y_SPEED = 1100 * LEG_RAISE_DISPLACEMENT/PERIOD * 2
 
 local unitDefID = Spring.GetUnitDefID(unitID)
-local wd = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
-local reloadTime = wd and WeaponDefs[wd].reload*30 or 30
-local torpRange = 440
-local shotRange = 680
-local longRange = true
 
 local smokePiece = {pelvis, turret}
 
-local function WeaponRangeUpdate()
-	while true do
-		local height = select(2, Spring.GetUnitPosition(unitID))
-		if height < -32 then
-			if longRange then
-				Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
-				longRange = false
-			end
-		elseif not longRange then
-			Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
-			longRange = true
-		end
-		Sleep(200)
-	end
-end
-
 function script.Create()
-	StartThread(WeaponRangeUpdate)
 	StartThread(SmokeUnit, smokePiece)	
+	Hide(gunbase)
+	Hide(gun1)
+	Hide(gun2)
 end
 
 local function Walk()
@@ -116,32 +97,6 @@ function script.AimWeapon(num, heading, pitch)
 	WaitForTurn(gun1, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
-end
-
-function script.FireWeapon(num)
-	local toChange = 3 - num
-	local reloadSpeedMult = Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
-	if reloadSpeedMult <= 0 then
-		-- Safety for div0. In theory a unit with reloadSpeedMult = 0 cannot fire because it never reloads.
-		reloadSpeedMult = 1
-	end
-	local reloadTimeMult = 1/reloadSpeedMult
-	Spring.SetUnitWeaponState(unitID, toChange, "reloadFrame", Spring.GetGameFrame() + reloadTime*reloadTimeMult)
-	if num == 2 then
-		local px, py, pz = Spring.GetUnitPosition(unitID)
-		if py < -8 then
-		else
-			Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 5, px, py, pz)
-		end
-	end
-	Sleep(150)
-	Move(gun1, z_axis, 0, 3)
-	Move(gun2, z_axis, 0, 3)
-end
-
-function script.Shot(num)
-	gun_1 = 1 - gun_1
-	Move(barrels[gun_1], z_axis, -2.4)
 end
 
 function script.AimFromWeapon(num)

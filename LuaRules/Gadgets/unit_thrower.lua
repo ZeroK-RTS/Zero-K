@@ -1,0 +1,262 @@
+
+function gadget:GetInfo()
+	return {
+		name      = "Teleport Throw",
+		desc      = "Implements teleportation thrower unit",
+		author    = "Google Frog",
+		date      = "12 Janurary 2018",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true  --  loaded by default?
+	}
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+local teleportWeapons = {
+	[WeaponDefNames["ampharty_teleport_gun"].id] = UnitDefNames["ampharty"].id,
+}
+
+local throwDefs = {
+	[UnitDefNames["ampharty"].id] = {
+		radius = 180
+	},
+}
+
+local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Shared functions
+local spGetUnitDefID = Spring.GetUnitDefID
+local getMovetype = Spring.Utilities.getMovetype
+
+local canBeThrown = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if not (ud.speed == 0 or getMovetype(ud) == 0) then
+		canBeThrown[i] = true
+	end
+end
+
+local function ValidThrowTarget(unitID, targetID)
+	if unitID == targetID then
+		return false
+	end
+	local unitDefID = spGetUnitDefID(targetID)
+	return canBeThrown[unitDefID]
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+if (gadgetHandler:IsSyncedCode()) then
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- SYNCED
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+local function SetUnitDrag(unitID, drag)
+	local ux, uy, uz = Spring.GetUnitPosition(unitID)
+	local rx, ry, rz = Spring.GetUnitRotation(unitID)
+	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
+	Spring.SetUnitPhysics(unitID, ux, uy, uz, vx, vy, vz, rx, ry, rz, drag, drag, drag)
+end
+
+local throwUnits = IterableMap.New()
+local dragRestore = IterableMap.New()
+local UPDATE_PERIOD = 6
+
+function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
+	if not weaponDefID and teleportWeapons[weaponDefID] then
+		return
+	end
+	
+	local data = throwUnits.Get(proOwnerID)
+	if not data then
+		return
+	end
+	
+	local _,_,_, x, y, z = Spring.GetUnitPosition(proOwnerID, true)
+	local px, py, pz = Spring.GetProjectileVelocity(proID)
+	
+	local nearUnits = Spring.GetUnitsInSphere(x, y, z, data.def.radius)
+	if nearUnits then
+		for i = 1, #nearUnits do
+			if ValidThrowTarget(proOwnerID, nearUnits[i]) then
+				SetUnitDrag(nearUnits[i], 0)
+				GG.AddGadgetImpulseRaw(nearUnits[i], px, py, pz, true, true)
+				dragRestore.Add(nearUnits[i], 
+					{
+						drag = -0.6
+					}
+				)
+			end
+		end
+	end
+	
+	Spring.DeleteProjectile(proID)
+end
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+-- Unit Handler
+
+function gadget:UnitCreated(unitID, unitDefID, teamID)
+	if throwDefs[unitDefID] then
+		throwUnits.Add(unitID, 
+			{
+				def = throwDefs[unitDefID],
+			}
+		)
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID)
+	throwUnits.Remove(unitID)
+end
+
+function gadget:Initialize()
+	for _, unitID in pairs(Spring.GetAllUnits()) do
+		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
+	end
+end
+
+local function IncreaseDrag(unitID, data)
+	SetUnitDrag(unitID, math.max(0, math.min(1, data.drag)))
+	data.drag = data.drag + 0.05
+	return data.drag >= 1 -- Return true to remove
+end
+
+function gadget:GameFrame(n)
+	if n%2 == 0 then
+		dragRestore.Apply(IncreaseDrag)
+	end
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+else -- UNSYNCED
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+
+local glVertex           = gl.Vertex
+local spIsUnitInView     = Spring.IsUnitInView
+local spGetUnitPosition  = Spring.GetUnitPosition
+local spGetUnitLosState  = Spring.GetUnitLosState
+local spValidUnitID      = Spring.ValidUnitID
+local spGetMyTeamID      = Spring.GetMyTeamID
+local spGetMyAllyTeamID  = Spring.GetMyAllyTeamID
+local spGetModKeyState   = Spring.GetModKeyState
+local spAreTeamsAllied   = Spring.AreTeamsAllied
+local spGetUnitVectors   = Spring.GetUnitVectors
+local spGetUnitDefID     = Spring.GetUnitDefID
+local spGetSelectedUnits = Spring.GetSelectedUnits
+local spGetUnitTeam      = Spring.GetUnitTeam
+local spGetLocalTeamID   = Spring.GetLocalTeamID
+
+local throwers = IterableMap.New()
+
+local function DrawBezierCurve(pointA, pointB, pointC,pointD, amountOfPoints)
+	local step = 1/amountOfPoints
+	glVertex (pointA[1], pointA[2], pointA[3])
+	for i=0, 1, step do
+		local x = pointA[1]*((1-i)^3) + pointB[1]*(3*i*(1-i)^2) + pointC[1]*(3*i*i*(1-i)) + pointD[1]*(i*i*i)
+		local y = pointA[2]*((1-i)^3) + pointB[2]*(3*i*(1-i)^2) + pointC[2]*(3*i*i*(1-i)) + pointD[2]*(i*i*i)
+		local z = pointA[3]*((1-i)^3) + pointB[3]*(3*i*(1-i)^2) + pointC[3]*(3*i*i*(1-i)) + pointD[3]*(i*i*i)
+		glVertex(x,y,z)
+	end
+	glVertex(pointD[1],pointD[2],pointD[3])
+end
+
+local function GetUnitTop (unitID, x,y,z)
+	local height = Spring.GetUnitHeight(unitID) -- previously hardcoded to 50
+	local top = select(2, spGetUnitVectors(unitID))
+	local offX = top[1]*height
+	local offY = top[2]*height
+	local offZ = top[3]*height
+	return x+offX, y+offY, z+offZ
+end
+
+local function DrawWire(emitUnitID, recUnitID, spec, myTeam, x, y, z)
+	local point = {}
+	if spValidUnitID(recUnitID) then
+		local los = spGetUnitLosState(recUnitID, myTeam, false)
+		if (spec or (los and los.los)) and (spIsUnitInView(emitUnitID) or spIsUnitInView(recUnitID)) then
+			local topX, topY, topZ = GetUnitTop(emitUnitID, x, y, z)
+			point[1] = {x, y, z}
+			point[2] = {topX, topY, topZ}
+			local rX, rY, rZ = Spring.GetUnitPosition(recUnitID, true)
+			topX, topY, topZ = GetUnitTop(recUnitID, rX, rY, rZ)
+			point[3] = {topX,topY,topZ}
+			point[4] = {rX, rY, rZ}
+			gl.PushAttrib(GL.LINE_BITS)
+			gl.DepthTest(true)
+			gl.Color (0, 1, 0.65, math.random()*0.3)
+			gl.LineWidth(3)
+			gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1], point[2], point[3], point[4], 10)
+			gl.DepthTest(false)
+			gl.Color (1,1,1,1)
+			gl.PopAttrib()
+		end
+	end
+end
+
+local function DrawThrowerWires(unitID, data, index, spec, myTeam)
+	for unitID, unitData in throwers.Iterator() do
+		if spValidUnitID(unitID) then
+			local los = spGetUnitLosState(unitID, myTeam, false)
+			if spec or (los and los.los) then
+				local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
+				local nearUnits = Spring.GetUnitsInSphere(x, y, z, data.def.radius)
+				if nearUnits then
+					for i = 1, #nearUnits do
+						if ValidThrowTarget(unitID, nearUnits[i]) then
+							DrawWire(unitID, nearUnits[i], spec, myTeam, x, y, z)
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+function gadget:UnitCreated(unitID, unitDefID)
+	if throwDefs[unitDefID] then
+		throwers.Add(unitID, 
+			{
+				def = throwDefs[unitDefID],
+			}
+		)
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID)
+	throwers.Remove(unitID)
+end
+
+local function DrawWorldFunc()
+	if throwers.GetIndexMax() > 0 then
+		local _, fullview = Spring.GetSpectatingState()
+		throwers.Apply(DrawThrowerWires, fullview, spGetMyTeamID())
+	end
+end
+
+function gadget:DrawWorld()
+	DrawWorldFunc()
+end
+function gadget:DrawWorldRefraction()
+	DrawWorldFunc()
+end
+
+function gadget:Initialize()
+	for _, unitID in pairs(Spring.GetAllUnits()) do
+		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
+	end
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+end

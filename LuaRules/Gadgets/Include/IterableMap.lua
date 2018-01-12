@@ -26,6 +26,7 @@ function IterableMap.New()
 			dataByKey[key] = data
 			return
 		end
+		data = data or true
 		indexMax = indexMax + 1
 		keyByIndex[indexMax] = key
 		dataByKey[key] = data
@@ -76,6 +77,14 @@ function IterableMap.New()
 	
 	function api.InMap(key)
 		return (indexByKey[key] and true) or false
+	end
+	
+	function api.Clear(key)
+		indexByKey = {}
+		dataByKey = {}
+		indexMax = 0
+		unusedKey = 1
+		keyByIndex = {}
 	end
 	
 	-- To use Iterator, write "for unitID, data in interableMap.Iterator() do"
