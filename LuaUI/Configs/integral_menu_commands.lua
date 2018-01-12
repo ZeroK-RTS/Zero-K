@@ -133,6 +133,7 @@ local units = {
 		-- No Amph Artillery
 		amphaa = ANTI_AIR,
 		amphassault = HEAVY_SOMETHING,
+		amphlaunch = ARTILLERY,
 		amphbomb = SPECIAL,
 		amphtele = UTILITY,
 	},

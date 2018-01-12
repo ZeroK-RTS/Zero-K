@@ -2,7 +2,7 @@
 
 include "constants.lua"
 
-local ground, pelvis, turret, gunbase, gun1, gun2, lleg, rleg, lfoot, rfoot, firept1, firept2 = piece('ground', 'pelvis', 'turret', 'gunbase', 'gun1', 'gun2', 'lleg', 'rleg', 'lfoot', 'rfoot', 'firept1', 'firept2')
+local ground, pelvis, turret, turretheading, turretpitch, gunbase, gun1, gun2, lleg, rleg, lfoot, rfoot, firept1, firept2 = piece('ground', 'pelvis', 'turret', 'turretheading', 'turretpitch', 'gunbase', 'gun1', 'gun2', 'lleg', 'rleg', 'lfoot', 'rfoot', 'firept1', 'firept2')
 local SIG_AIM = {}
 local firepoints = {[0] = firept1, [1] = firept2}
 local barrels = {[0] = gun1, [1] = gun2}
@@ -81,8 +81,9 @@ local function RestoreAfterDelay()
 	SetSignalMask(SIG_Restore)
 	Sleep(6000)
 	
-	Turn(turret, y_axis, 0, 2)
-	Turn(turret, x_axis, 0, 2)
+	Turn(turretheading, y_axis, 0, 1.9)
+	Move(turretheading, y_axis, 0, 3.5)
+	Turn(turretpitch, x_axis, 0, 1.9)
 	Turn(gun1, z_axis, 0, 2)
 	Turn(gun2, z_axis, 0, 2)
 end
@@ -95,18 +96,21 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	Turn(turret, y_axis, heading, 1.9)
-	WaitForTurn(turret, y_axis)
+	Turn(turretheading, y_axis, heading, 1.9)
+	Move(turretheading, y_axis, 1.5*math.abs(pitch), 3.5)
+	Turn(turretpitch, x_axis, -pitch, 1.9)
+	WaitForTurn(turretheading, y_axis)
+	WaitForTurn(turretpitch, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
 end
 
 function script.AimFromWeapon(num)
-	return turret
+	return pelvis
 end
 
 function script.QueryWeapon(num)
-	return firepoints[gun_1]
+	return pelvis
 end
 
 function script.Killed(recentDamage, maxHealth)

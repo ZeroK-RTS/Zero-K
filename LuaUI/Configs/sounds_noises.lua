@@ -477,6 +477,15 @@ local sounds = {
 			volume = 0.7,
 		},
 	},
+	amphlaunch = {
+		ok = {
+			[1] = "amph_move",
+		},
+		select = {
+			[1] = "teleport_select",
+			volume = 0.7,
+		},
+	},
 	amphaa = {
 		ok = {
 			[1] = "amph_move",

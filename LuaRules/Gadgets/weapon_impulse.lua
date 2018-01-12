@@ -161,8 +161,9 @@ local function DetatchFromGround(unitID, threshold, height, doImpulse)
 	end
 end
 
-local function AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, unitDefID, moveType) -- could be GG if needed.
-	moveType = moveType or moveTypeByID[unitDefID or spGetUnitDefID(unitID)]
+local function AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, unitDefID, moveType, doLosCheck) -- could be GG if needed.
+	unitDefID = unitDefID or spGetUnitDefID(unitID)
+	moveType = moveType or moveTypeByID[unitDefID]
 	if not unit[unitID] then
 		unit[unitID] = {
 			moveType = moveType,
@@ -182,6 +183,10 @@ local function AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, uni
 		if pushOffGround then
 			unit[unitID].pushOffGround = true
 		end
+	end
+	
+	if doLosCheck and moveType == 2 then -- Only los check for land/sea units.
+		GG.AddSphereicalLOSCheck(unitID, unitDefID)
 	end
 	thereIsStuffToDo = true
 end

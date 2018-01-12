@@ -59,6 +59,12 @@ local Sounds = {
 			in3d = true,
 			rolloff = 4,
 		},
+		Launcher = {
+			file = "sounds/weapon/launcher.wav",
+			pitchmod = 0.05,
+			gainmod = 0,
+			gain = 2.4,
+		},
 		TorpedoHitVariable = {
 			file = "sounds/explosion/wet/ex_underwater.wav",
 			pitchmod = 0.1,

@@ -337,6 +337,10 @@ local icontypes = {
 	bitmap='icons/amphbomb.png',
     size=1.9,
   },
+  ampharty = {
+	bitmap='icons/torparty.png',
+    size=2,
+  },
   amphtransport = {
     bitmap='icons/amphtransport.png',
     size=2.2,

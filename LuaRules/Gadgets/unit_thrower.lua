@@ -45,14 +45,10 @@ local function ValidThrowTarget(unitID, targetID)
 		return false
 	end
 	local _, _, _, speed = Spring.GetUnitVelocity(targetID)
-	if speed > 8 then
+	if speed > 7 then
 		-- Dart speed is 5.1.
 		-- Normal launch speed is 9.9
 		return false 
-	end
-	local dragData = dragRestore and dragRestore.Get(unitID)
-	if dragData and dragData.drag < -0.4 then
-		return false
 	end
 	local unitDefID = spGetUnitDefID(targetID)
 	return canBeThrown[unitDefID]
@@ -94,10 +90,11 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
 	if nearUnits then
 		for i = 1, #nearUnits do
-			if ValidThrowTarget(proOwnerID, nearUnits[i]) then
-				SetUnitDrag(nearUnits[i], 0)
-				GG.AddGadgetImpulseRaw(nearUnits[i], px, py, pz, true, true)
-				dragRestore.Add(nearUnits[i], 
+			local nearID = nearUnits[i]
+			local dragData = dragRestore and dragRestore.Get(nearID)
+			if ((not dragData) or dragData.drag > -0.4) and ValidThrowTarget(proOwnerID, nearID) then
+				GG.AddGadgetImpulseRaw(nearID, px, py, pz, true, true, nil, nil, true)
+				dragRestore.Add(nearID, 
 					{
 						drag = -0.6
 					}
@@ -167,24 +164,30 @@ else -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-
-local glVertex           = gl.Vertex
-local spIsUnitInView     = Spring.IsUnitInView
-local spGetUnitPosition  = Spring.GetUnitPosition
-local spGetUnitLosState  = Spring.GetUnitLosState
-local spValidUnitID      = Spring.ValidUnitID
-local spGetMyTeamID      = Spring.GetMyTeamID
-local spGetMyAllyTeamID  = Spring.GetMyAllyTeamID
-local spGetModKeyState   = Spring.GetModKeyState
-local spAreTeamsAllied   = Spring.AreTeamsAllied
-local spGetUnitVectors   = Spring.GetUnitVectors
-local spGetUnitDefID     = Spring.GetUnitDefID
-local spGetSelectedUnits = Spring.GetSelectedUnits
-local spGetUnitTeam      = Spring.GetUnitTeam
-local spGetLocalTeamID   = Spring.GetLocalTeamID
+local glVertex            = gl.Vertex
+local spIsUnitInView      = Spring.IsUnitInView
+local spGetUnitPosition   = Spring.GetUnitPosition
+local spGetUnitLosState   = Spring.GetUnitLosState
+local spValidUnitID       = Spring.ValidUnitID
+local spGetMyTeamID       = Spring.GetMyTeamID
+local spGetUnitVectors    = Spring.GetUnitVectors
+local spGetUnitDefID      = Spring.GetUnitDefID
+local spGetLocalTeamID    = Spring.GetLocalTeamID
+local spGetUnitIsStunned  = Spring.GetUnitIsStunned
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 local throwers = IterableMap.New()
 local alreadyWired = {}
+
+local function UnitIsActive(unitID)
+	if not spValidUnitID(unitID) then
+		return false
+	end
+	
+	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
+	local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
+	return not (stunned_or_inbuild or disarmed)
+end
 
 local function DrawBezierCurve(pointA, pointB, pointC,pointD, amountOfPoints)
 	local step = 1/amountOfPoints
@@ -221,7 +224,7 @@ local function DrawWire(emitUnitID, recUnitID, spec, myTeam, x, y, z)
 			point[4] = {rX, rY, rZ}
 			gl.PushAttrib(GL.LINE_BITS)
 			gl.DepthTest(true)
-			gl.Color (0, 1, 0.5, math.random()*0.3 + 0.1)
+			gl.Color (0, 1, 0.5, math.random()*0.05 + 0.15)
 			gl.LineWidth(3)
 			gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1], point[2], point[3], point[4], 10)
 			gl.DepthTest(false)
@@ -232,19 +235,19 @@ local function DrawWire(emitUnitID, recUnitID, spec, myTeam, x, y, z)
 end
 
 local function DrawThrowerWires(unitID, data, index, spec, myTeam)
-	for unitID, unitData in throwers.Iterator() do
-		if spValidUnitID(unitID) then
-			local los = spGetUnitLosState(unitID, myTeam, false)
-			if spec or (los and los.los) then
-				local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
-				local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
-				if nearUnits then
-					for i = 1, #nearUnits do
-						if ValidThrowTarget(unitID, nearUnits[i]) and not alreadyWired[nearUnits[i]] then
-							DrawWire(unitID, nearUnits[i], spec, myTeam, x, y, z)
-							alreadyWired[nearUnits[i]] = true
-						end
-					end
+	if not UnitIsActive(unitID) then
+		return
+	end
+	local los = spGetUnitLosState(unitID, myTeam, false)
+	if spec or (los and los.los) then
+		local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
+		local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
+		if nearUnits then
+			for i = 1, #nearUnits do
+				local nearID = nearUnits[i]
+				if UnitIsActive(nearID) and ValidThrowTarget(unitID, nearID) and not alreadyWired[nearID] then
+					DrawWire(unitID, nearID, spec, myTeam, x, y, z)
+					alreadyWired[nearID] = true
 				end
 			end
 		end
