@@ -19,8 +19,10 @@ unitDef = {
   },
 
   explodeAs              = [[BIG_UNITEX]],
+  fireState              = 0,
   footprintX             = 2,
   footprintZ             = 2,
+  highTrajectory         = 2,
   iconType               = [[amphtorpskirm]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -96,7 +98,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 300,
-      waterweapon			  = true,
+      waterweapon             = true,
     },
 
   },
