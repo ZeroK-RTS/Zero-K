@@ -553,7 +553,7 @@ local function weapons2Table(cells, ws, unitID)
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
 		if aoe > 15 and show_aoe then
-			cells[#cells+1] = ' - Area of effect:'
+			cells[#cells+1] = ' - AoE radius:'
 			cells[#cells+1] = numformat(aoe) .. " elmo"
 		end
 
@@ -1401,7 +1401,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 			statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue,2), textColor = color.stats_fg, }
 		end
 
-		statschildren[#statschildren+1] = Label:New{ caption = 'Area of effect: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'AoE radius: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damageAreaOfEffect,2) .. " elmo", textColor = color.stats_fg, }
 		
 		if (weaponStats.customParams.setunitsonfire) then
