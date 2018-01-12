@@ -15,12 +15,12 @@ end
 -------------------------------------------------------------------------------------
 
 local teleportWeapons = {
-	[WeaponDefNames["ampharty_teleport_gun"].id] = UnitDefNames["ampharty"].id,
+	[WeaponDefNames["ampharty_teleport_gun"].id] = true,
 }
 
 local throwDefs = {
 	[UnitDefNames["ampharty"].id] = {
-		radius = 180
+		radius = 150
 	},
 }
 
@@ -35,13 +35,23 @@ local getMovetype = Spring.Utilities.getMovetype
 local canBeThrown = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if not (ud.speed == 0 or getMovetype(ud) == 0) then
+	if ud.speed > 0 and getMovetype(ud) == 2 then -- Only ground or sea units
 		canBeThrown[i] = true
 	end
 end
 
 local function ValidThrowTarget(unitID, targetID)
 	if unitID == targetID then
+		return false
+	end
+	local _, _, _, speed = Spring.GetUnitVelocity(targetID)
+	if speed > 8 then
+		-- Dart speed is 5.1.
+		-- Normal launch speed is 9.9
+		return false 
+	end
+	local dragData = dragRestore and dragRestore.Get(unitID)
+	if dragData and dragData.drag < -0.4 then
 		return false
 	end
 	local unitDefID = spGetUnitDefID(targetID)
@@ -81,7 +91,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	local _,_,_, x, y, z = Spring.GetUnitPosition(proOwnerID, true)
 	local px, py, pz = Spring.GetProjectileVelocity(proID)
 	
-	local nearUnits = Spring.GetUnitsInSphere(x, y, z, data.def.radius)
+	local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
 	if nearUnits then
 		for i = 1, #nearUnits do
 			if ValidThrowTarget(proOwnerID, nearUnits[i]) then
@@ -97,6 +107,22 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	end
 	
 	Spring.DeleteProjectile(proID)
+end
+
+function gadget:UnitPreDamaged_GetWantedWeaponDef()
+	local wantedWeaponList = {}
+	for wdid = 1, #WeaponDefs do
+		if teleportWeapons[wdid] then
+			wantedWeaponList[#wantedWeaponList + 1] = wdid
+		end
+	end 
+	return wantedWeaponList
+end
+
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+	if weaponID and teleportWeapons[weaponID] then
+		return 0
+	end
 end
 
 ----------------------------------------------------------------------------------------------
@@ -194,7 +220,7 @@ local function DrawWire(emitUnitID, recUnitID, spec, myTeam, x, y, z)
 			point[4] = {rX, rY, rZ}
 			gl.PushAttrib(GL.LINE_BITS)
 			gl.DepthTest(true)
-			gl.Color (0, 1, 0.65, math.random()*0.3)
+			gl.Color (0, 1, 0.5, math.random()*0.3 + 0.1)
 			gl.LineWidth(3)
 			gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1], point[2], point[3], point[4], 10)
 			gl.DepthTest(false)
@@ -210,7 +236,7 @@ local function DrawThrowerWires(unitID, data, index, spec, myTeam)
 			local los = spGetUnitLosState(unitID, myTeam, false)
 			if spec or (los and los.los) then
 				local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
-				local nearUnits = Spring.GetUnitsInSphere(x, y, z, data.def.radius)
+				local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
 				if nearUnits then
 					for i = 1, #nearUnits do
 						if ValidThrowTarget(unitID, nearUnits[i]) then

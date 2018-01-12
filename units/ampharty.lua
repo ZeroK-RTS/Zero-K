@@ -38,6 +38,7 @@ unitDef = {
 
   sfxtypes               = {
     explosiongenerators = {
+      [[custom:thrower_shockwave]],
     },
   },
 
@@ -46,8 +47,8 @@ unitDef = {
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
-  trackType              = [[ComTrack]],
-  trackWidth             = 22,
+  trackType              = [[ChickenTrackPointy]],
+  trackWidth             = 28,
   turnRate               = 1000,
   upright                = true,
 
@@ -64,36 +65,31 @@ unitDef = {
     TELEPORT_GUN = {
       name                    = [[Unit Launcher]],
       accuracy                = 350,
-      areaOfEffect            = 300,
+      areaOfEffect            = 220, -- UI
       avoidFeature            = false,
       avoidFriendly           = false,
       burnblow                = true,
       collideFeature          = false,
       collideFriendly         = false,
-      craterBoost             = 100,
-      craterMult              = 2,
+      craterBoost             = 0,
+      craterMult              = 0,
 
 	  customParams            = {
-		light_color = [[0 0.5 1]],
-		light_radius = 500,
+		lups_noshockwave = [[1]],
 	  },
 	  
       damage                  = {
         default = 0,
       },
 
-      explosionGenerator      = [[custom:black_hole_long]],
       explosionSpeed          = 50,
-      impulseBoost            = 150,
-      impulseFactor           = -2.5,
 	  intensity               = 0.9,
       interceptedByShieldType = 1,
       projectiles             = 1,
       range                   = 600,
       reloadtime              = 6,
       rgbColor                = [[0.05 0.45 0.95]],
-      size                    = 16,
-      soundHit                = [[weapon/blackhole_impact]],
+      size                    = 0.005,
       soundStart              = [[weapon/blackhole_fire]],
       soundStartVolume        = 6000,
       soundHitVolume          = 6000,

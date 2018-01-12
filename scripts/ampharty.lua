@@ -87,14 +87,16 @@ local function RestoreAfterDelay()
 	Turn(gun2, z_axis, 0, 2)
 end
 
+function script.FireWeapon(num)
+	EmitSfx(ground, UNIT_SFX1)
+end
+
+
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	Turn(turret, y_axis, heading, 1.9)
-	Turn(gun1, x_axis, -pitch, 1.75)
-	Turn(gun2, x_axis, -pitch, 1.75)
 	WaitForTurn(turret, y_axis)
-	WaitForTurn(gun1, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
 end

@@ -35,7 +35,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[hermit.s3o]],
   selfDestructAs         = [[BIG_UNITEX]],
-  script                = [[spiderassault.lua]],
+  script                 = [[spiderassault.lua]],
 
   sfxtypes               = {
 
