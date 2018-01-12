@@ -20,7 +20,7 @@ local teleportWeapons = {
 
 local throwDefs = {
 	[UnitDefNames["amphlaunch"].id] = {
-		radius = 150
+		radius = 96
 	},
 }
 
