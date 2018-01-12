@@ -15,11 +15,11 @@ end
 -------------------------------------------------------------------------------------
 
 local teleportWeapons = {
-	[WeaponDefNames["ampharty_teleport_gun"].id] = true,
+	[WeaponDefNames["amphlaunch_teleport_gun"].id] = true,
 }
 
 local throwDefs = {
-	[UnitDefNames["ampharty"].id] = {
+	[UnitDefNames["amphlaunch"].id] = {
 		radius = 150
 	},
 }

@@ -17,7 +17,7 @@
 	"factorycloak" : {
 		"name" : "Cloakbot Factory",
 		"description" : "Produziert Tarnroboter, Baut mit 10 M/s",
-		"helptext" : "List statt pure Gewalt lautet hier das Motto. Die Cloakbot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Ronin, Reaver, Knight, Hammer"
+		"helptext" : "List statt pure Gewalt lautet hier das Motto. Die Cloakbot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Ronin, Reaver, Knight, Sling"
 	},
 	"hoverdepthcharge" : {
 		"name" : "Claymore",
@@ -808,11 +808,6 @@
 		"name" : "Firefly",
 		"description" : "Kampfdrohne",
 		"helptext" : "Der Firefly ist eine Kampfdrohne, die seinen Besitzer schutzt."
-	},
-	"ampharty" : {
-		"name" : "Kraken",
-		"description" : "Amphibious Skirmisher/Artillery Bot",
-		"helptext" : "The Kraken is a mobile short ranged artillery bot, armed with twin-firing cannons. For underwater combat it can rapidly fire unguided charges to kill slow enemies. "
 	},
 	"gunshipskirm" : {
 		"name" : "Harpy",

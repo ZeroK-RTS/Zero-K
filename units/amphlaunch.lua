@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[ampharty]],
-  name                   = [[Kraken]],
-  description            = [[Amphibious Skirmisher/Artillery Bot]],
+  unitname               = [[amphlaunch]],
+  name                   = [[Lobster]],
+  description            = [[Amphibious Launcher Bot]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
   buildCostMetal         = 240,
-  buildPic               = [[ampharty.png]],
+  buildPic               = [[amphlaunch.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -35,7 +35,7 @@ unitDef = {
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[behecrash.s3o]],
-  script                 = [[ampharty.lua]],
+  script                 = [[amphlaunch.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -124,4 +124,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ ampharty = unitDef })
+return lowerkeys({ amphlaunch = unitDef })

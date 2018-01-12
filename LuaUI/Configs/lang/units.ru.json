@@ -1167,11 +1167,6 @@
         "description": "Роевик",
         "name": "Курица"
     },
-	"ampharty" : {
-		"name" : "Kraken",
-		"description" : "Amphibious Skirmisher/Artillery Bot",
-		"helptext" : "The Kraken is a mobile short ranged artillery bot, armed with twin-firing cannons. For underwater combat it can rapidly fire unguided charges to kill slow enemies. "
-	},
 	"shipassault" : {
 		"name" : "Сирена",
 		"description" : "Эсминец (Подавление/Штурм)",

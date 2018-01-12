@@ -17,12 +17,12 @@
 	"factorycloak" : {
 		"name" : "Cloakbot Factory",
 		"description" : "Produces Cloaked, Mobile Robots, Builds at 10 m/s",
-		"helptext" : "Emphasizing guile over brute force, the Cloakbot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Ronin, Reaver, Knight, Hammer"
+		"helptext" : "Emphasizing guile over brute force, the Cloakbot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Ronin, Reaver, Knight, Sling"
 	},
-	"ampharty" : {
-		"name" : "Kraken",
-		"description" : "Amphibious Skirmisher/Artillery Bot",
-		"helptext" : "The Kraken is a mobile short ranged artillery bot, armed with twin-firing cannons. For underwater combat it can rapidly fire unguided charges to kill slow enemies. "
+	"amphlaunch" : {
+		"name" : "Lobster",
+		"description" : "Amphibious Launcher Bot",
+		"helptext" : "Lacking armaments of its own, the Lobsters response to threats is to throw other units at the problem. This unit, though originally intended for rapid coastline deployement, has many other uses and can even offensively throw enemies."
 	},
 	"tankarty" : {
 		"name" : "Emissary",

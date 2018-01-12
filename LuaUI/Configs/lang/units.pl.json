@@ -19,11 +19,6 @@
         "description": "Buduje cichociemne boty, moc 10 m/s",
         "helptext": "Jednostki z tej fabryki cechują się zwinnością i nieuchwytnością bardziej niż siłą ognia i wytrzymałością. Wiele z nich posiada maskowanie lub broń EMP, co promuje sprytne podejście do walki."
     },
-    "ampharty": {
-        "name": "Kraken",
-        "description": "Amfibijny bot artyleryjski / harcownik",
-        "helptext": "Kraken to amfibijny bot z podwójnym działem o niedużym zasięgu - jak na artylerię. Pod wodą korzysta z szybkiej wyrzutni bomb głębinowych, które nie są naprowadzane i tym samym najlepiej sprawdzają się przeciwko powolnym celom."
-    },
     "tankarty": {
         "name": "Pillager",
         "description": "Czołg artyleryjski",

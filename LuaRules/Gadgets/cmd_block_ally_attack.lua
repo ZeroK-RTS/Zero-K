@@ -28,6 +28,7 @@ local allyTargetUnits = {
 	[UnitDefNames["jumpsumo"].id] = true,
 	[UnitDefNames["turretimpulse"].id] = true,
 	[UnitDefNames["jumpblackhole"].id] = true,
+	[UnitDefNames["amphlaunch"].id] = true,
 }
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
