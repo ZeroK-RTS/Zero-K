@@ -94,6 +94,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 			local dragData = dragRestore and dragRestore.Get(nearID)
 			if ((not dragData) or dragData.drag > -0.4) and ValidThrowTarget(proOwnerID, nearID) then
 				GG.AddGadgetImpulseRaw(nearID, px, py, pz, true, true, nil, nil, true)
+				SetUnitDrag(nearID, 0)
 				dragRestore.Add(nearID, 
 					{
 						drag = -0.6
