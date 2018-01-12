@@ -286,6 +286,7 @@ unitDef = {
 
       customparams = {
         timeslow_damagefactor = 10,
+        nofriendlyfire = 1,
       },
       
       damage                  = {

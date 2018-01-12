@@ -24,6 +24,9 @@ local forward = 8
 local backward = 5
 local up = 8
 
+local waveWeaponDef = WeaponDefNames["amphbomb_amphbomb_death"]
+local WAVE_TIMEOUT = math.ceil(waveWeaponDef.damageAreaOfEffect / waveWeaponDef.explosionSpeed)* (1000 / Game.gameSpeed) + 200 -- empirically maximum delay of damage was (damageAreaOfEffect / explosionSpeed) - 4 frames
+
 -- signals
 local SIG_Walk = 2
 
@@ -106,7 +109,7 @@ function Detonate() -- Giving an order causes recursion.
 	GG.QueueUnitDescruction(unitID)
 end
 
-function script.Killed(recentDamage, maxHealth)
+local function Killed(recentDamage, maxHealth)
 	Explode(body, sfxSmoke + sfxShatter)
 	Explode(wheell1, sfxSmoke + sfxFire)
 	Explode(wheell2, sfxSmoke + sfxFire)
@@ -119,3 +122,8 @@ function script.Killed(recentDamage, maxHealth)
 		return 2 -- corpsetype
 	end
 end
+
+function script.Killed(recentDamage, maxHealth)
+	return DelayTrueDeath(recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
+end
+
