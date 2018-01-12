@@ -184,6 +184,7 @@ local spGetUnitTeam      = Spring.GetUnitTeam
 local spGetLocalTeamID   = Spring.GetLocalTeamID
 
 local throwers = IterableMap.New()
+local alreadyWired = {}
 
 local function DrawBezierCurve(pointA, pointB, pointC,pointD, amountOfPoints)
 	local step = 1/amountOfPoints
@@ -239,8 +240,9 @@ local function DrawThrowerWires(unitID, data, index, spec, myTeam)
 				local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
 				if nearUnits then
 					for i = 1, #nearUnits do
-						if ValidThrowTarget(unitID, nearUnits[i]) then
+						if ValidThrowTarget(unitID, nearUnits[i]) and not alreadyWired[nearUnits[i]] then
 							DrawWire(unitID, nearUnits[i], spec, myTeam, x, y, z)
+							alreadyWired[nearUnits[i]] = true
 						end
 					end
 				end
@@ -266,6 +268,7 @@ end
 local function DrawWorldFunc()
 	if throwers.GetIndexMax() > 0 then
 		local _, fullview = Spring.GetSpectatingState()
+		alreadyWired = {}
 		throwers.Apply(DrawThrowerWires, fullview, spGetMyTeamID())
 	end
 end
