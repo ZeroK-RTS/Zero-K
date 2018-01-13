@@ -946,7 +946,7 @@
 	},
 	"turretimpulse" : {
 		"name" : "Newton",
-		"description" : "Gravity Turret - On to Repulse, Off to Attract",
+		"description" : "Gravity Turret",
 		"helptext" : "The Newton is armed with an experimental graviton projector. This weapon does virtually no damage directly, but can push units toward or away from the Newton. You can use it on your own units as well, but beware of friendly fire."
 	},
 	"assaultcruiser" : {
@@ -1001,7 +1001,7 @@
 	},
 	"jumpsumo" : {
 		"name" : "Jugglenaut",
-		"description" : "Heavy Riot Jumper - On to Repulse, Off to Attract",
+		"description" : "Heavy Riot Jumper",
 		"helptext" : "The Jugglenaut's impressive armor makes it a near-unstoppable sphere of death. It stomps on enemy units to break up their formation and can toss the survivors around with its Gravity Beams. Its stomp is the only way it can damage buildings."
 	},
 	"jumpscout" : {
