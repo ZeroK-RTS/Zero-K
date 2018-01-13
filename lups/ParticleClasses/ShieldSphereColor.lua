@@ -101,37 +101,36 @@ end
 function ShieldSphereColorParticle:Initialize()
   shieldShader = gl.CreateShader({
     vertex = [[
-      #define pos gl_MultiTexCoord3
-      #define margin gl_MultiTexCoord4.x
-      #define size vec4(gl_MultiTexCoord4.yyy,1.0)
+		#define pos gl_MultiTexCoord3
+		#define margin gl_MultiTexCoord4.x
+		#define size vec4(gl_MultiTexCoord4.yyy,1.0)
 
-      varying float opac;
-      varying vec4 color1;
-      varying vec4 color2;
+		varying float opac;
+		varying vec4 color1;
+		varying vec4 color2;
 
-      void main()
-      {
-          gl_Position = gl_ModelViewProjectionMatrix * (gl_Vertex * size + pos);
-          vec3 normal = gl_NormalMatrix * gl_Normal;
-          vec3 vertex = vec3(gl_ModelViewMatrix * gl_Vertex);
-          float angle = dot(normal,vertex)*inversesqrt( dot(normal,normal)*dot(vertex,vertex) ); //dot(norm(n),norm(v))
-          opac = pow( abs( angle ) , margin);
+		void main()
+		{
+			gl_Position = gl_ModelViewProjectionMatrix * (gl_Vertex * size + pos);
+			vec3 normal = gl_NormalMatrix * gl_Normal;
+			vec3 vertex = vec3(gl_ModelViewMatrix * gl_Vertex);
+			float angle = dot(normal,vertex)*inversesqrt( dot(normal,normal)*dot(vertex,vertex) ); //dot(norm(n),norm(v))
+			opac = pow( abs( angle ) , margin);
 
-          color1 = gl_MultiTexCoord1;
-          color2 = gl_MultiTexCoord2;
-      }
+			color1 = gl_MultiTexCoord1;
+			color2 = gl_MultiTexCoord2;
+		}
     ]],
     fragment = [[
-      varying float opac;
-      varying vec4 color1;
-      varying vec4 color2;
+		varying float opac;
+		varying vec4 color1;
+		varying vec4 color2;
 
-      void main(void)
-      {
-          gl_FragColor =  mix(color1,color2,opac);
-      }
-
-    ]],
+		void main(void)
+		{
+			gl_FragColor =  mix(color1,color2,opac);
+		}
+	]],
     uniform = {
       margin = 1,
     }
