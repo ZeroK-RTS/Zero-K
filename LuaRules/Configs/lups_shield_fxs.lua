@@ -2,6 +2,8 @@ local ShieldSphereBase = {
 	layer = -34,
 	life = 10000,
 	size = 350,
+	uvMul = 1,
+	opacExp = 0.8,
 	radius = 350,
 	colormap1 = {{0.1, 0.1, 1, 0.4}, {1, 0.1, 0.1, 0.4}},
 	colormap2 = {{0.2, 1, 0.7, 0.0}, {0.7, 1, 0.2, 0.0}},
@@ -63,8 +65,12 @@ for unitDefID = 1, #UnitDefs do
 		else
 			myShield.shieldSize = "small"
 			if radius > 100 then
+				myShield.opacExp = 1.5
+				myShield.uvMul = 0.75
 				myShield.shieldSize = "medium"
 			else
+				myShield.opacExp = 2.0
+				myShield.uvMul = 0.5
 				myShield.shieldSize = "small"
 			end
 			myShield.drawBack = 0.75

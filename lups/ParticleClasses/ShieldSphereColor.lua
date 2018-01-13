@@ -83,7 +83,7 @@ function ShieldSphereColorParticle:Draw()
   glMultiTexCoord(2, col2[1],col2[2],col2[3],col2[4] or 1)
   local pos = self.pos
   glMultiTexCoord(3, pos[1], pos[2], pos[3], 0)
-  glMultiTexCoord(4, self.margin, self.size, 1, 1)
+  glMultiTexCoord(4, self.margin, self.size, self.uvMul, self.opacExp)
 
   glCallList(sphereList[self.shieldSize])
   if self.drawBack then
@@ -94,7 +94,7 @@ function ShieldSphereColorParticle:Draw()
     glMultiTexCoord(1, col1[1]*self.drawBackCol,col1[2]*self.drawBackCol,col1[3]*self.drawBackCol,(col1[4] or 1)*self.drawBack)
     glMultiTexCoord(2, col2[1]*self.drawBackCol,col2[2]*self.drawBackCol,col2[3]*self.drawBackCol,(col2[4] or 1)*self.drawBack)
     if self.drawBackMargin then
-      glMultiTexCoord(4, self.drawBackMargin, self.size, 1, 1)
+      glMultiTexCoord(4, self.drawBackMargin, self.size, self.uvMul, self.opacExp)
     end
     glCallList(sphereList[self.shieldSize])
   end
@@ -109,6 +109,9 @@ function ShieldSphereColorParticle:Initialize()
 		#define pos gl_MultiTexCoord3
 		#define margin gl_MultiTexCoord4.x
 		#define size vec4(gl_MultiTexCoord4.yyy,1.0)
+
+		varying float uvMul;
+		varying float opacExp;
 
 		varying float opac;
 		varying vec4 color1;
@@ -126,6 +129,9 @@ function ShieldSphereColorParticle:Initialize()
 
 			color1 = gl_MultiTexCoord1;
 			color2 = gl_MultiTexCoord2;
+
+			uvMul = gl_MultiTexCoord4.z;
+			opacExp = gl_MultiTexCoord4.w;
 		}
     ]],
     fragment = [[
@@ -134,6 +140,9 @@ function ShieldSphereColorParticle:Initialize()
 		varying vec4 color2;
 
 		varying vec3 normal;
+
+		varying float uvMul;
+		varying float opacExp;
 
 		uniform sampler2D tex0;
 
@@ -151,10 +160,10 @@ function ShieldSphereColorParticle:Initialize()
 		void main(void)
 		{
 			vec3 norm = normalize(normal);
-			vec4 texel = texture2D(tex0, RadialCoords(normal));
+			vec4 texel = texture2D(tex0, RadialCoords(normal) * uvMul);
 
-			vec4 color1Tex = vec4( color1.rgb, mix(color1.a, texel.a, 0.4f) );
-			gl_FragColor =  mix(color1Tex, color2, sqrt(opac));
+			vec4 color1Tex = vec4( mix(2.0f * color1.rgb, texel.rgb, 0.5f), color1.a );
+			gl_FragColor =  mix(color1Tex, color2, pow(opac, opacExp));
 		}
 	]],
     uniform = {
