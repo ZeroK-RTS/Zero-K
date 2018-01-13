@@ -56,12 +56,17 @@ end
 function ShieldSphereColorParticle:BeginDraw()
   gl.DepthMask(false)
   gl.UseShader(shieldShader)
+
+  gl.Texture(0, "bitmaps/PD/shield3hex2.png")
+
   gl.Culling(GL.FRONT)
 end
 
 function ShieldSphereColorParticle:EndDraw()
   gl.DepthMask(false)
   gl.UseShader(0)
+
+  gl.Texture(0, false)
 
   gl.Culling(GL.BACK)
   gl.Culling(false)
@@ -109,10 +114,12 @@ function ShieldSphereColorParticle:Initialize()
 		varying vec4 color1;
 		varying vec4 color2;
 
+		varying vec3 normal;
+
 		void main()
 		{
 			gl_Position = gl_ModelViewProjectionMatrix * (gl_Vertex * size + pos);
-			vec3 normal = gl_NormalMatrix * gl_Normal;
+			normal = gl_NormalMatrix * gl_Normal;
 			vec3 vertex = vec3(gl_ModelViewMatrix * gl_Vertex);
 			float angle = dot(normal,vertex)*inversesqrt( dot(normal,normal)*dot(vertex,vertex) ); //dot(norm(n),norm(v))
 			opac = pow( abs( angle ) , margin);
@@ -126,9 +133,28 @@ function ShieldSphereColorParticle:Initialize()
 		varying vec4 color1;
 		varying vec4 color2;
 
+		varying vec3 normal;
+
+		uniform sampler2D tex0;
+
+		#define PI 3.141592653589793
+
+		vec2 RadialCoords(vec3 a_coords)
+		{
+			vec3 a_coords_n = normalize(a_coords);
+			float lon = atan(a_coords_n.z, a_coords_n.x);
+			float lat = acos(a_coords_n.y);
+			vec2 sphereCoords = vec2(lon, lat) * (1.0 / PI);
+			return vec2(sphereCoords.x * 0.5 + 0.5, 1 - sphereCoords.y);
+		}
+
 		void main(void)
 		{
-			gl_FragColor =  mix(color1,color2,opac);
+			vec3 norm = normalize(normal);
+			vec4 texel = texture2D(tex0, RadialCoords(normal));
+
+			vec4 color1Tex = vec4( mix(color1.rgb, texel.rgb, 0.5f), color1.a );
+			gl_FragColor =  mix(color1Tex, color2, opac);
 		}
 	]],
     uniform = {
