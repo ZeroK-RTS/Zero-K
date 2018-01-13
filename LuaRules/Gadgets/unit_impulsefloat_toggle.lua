@@ -174,6 +174,7 @@ local function checkAlwaysFloat(unitID)
 		local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
 		if not moving then
 			addFloat(unitID, unitDefID)
+			return true
 		end
 	end
 end
@@ -192,8 +193,8 @@ function gadget:GameFrame(f)
 		local isValidUnitID = Spring.ValidUnitID(unitID)
 		local isFlying = isValidUnitID and float[unitID]["isFlying"]
 		
+		local data = float[unitID]
 		if isFlying then --check if unit has landed or not
-			local data = float[unitID] --(get reference to data table)
 			data.x,data.y,data.z = Spring.GetUnitPosition(unitID)
 			local height = Spring.GetGroundHeight(data.x, data.z)
 			if data.y == height then --touch down on ground
@@ -218,7 +219,6 @@ function gadget:GameFrame(f)
 			i = i + 1
 			
 		elseif isValidUnitID and not isFlying then --perform float/sink behaviour
-			local data = float[unitID]
 			local def = floatDefs[data.unitDefID]
 			
 			-- This cannot be done when the float is added because that will often be
@@ -335,8 +335,7 @@ function gadget:GameFrame(f)
 					end
 				else --next position is below ground/on the ground?
 					Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
-					Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
-					Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+					GG.WaitWaitMoveUnit(unitID)
 					callScript(unitID, "Float_stopOnFloor")
 					removeFloat(unitID)
 					
@@ -473,6 +472,15 @@ function gadget:Initialize()
 			return true
 		else
 			return false
+		end
+	end
+	
+	
+	GG.Floating_InterruptFloat = function(unitID, frames)
+		if float[unitID] then
+			Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
+			callScript(unitID, "script.StopMoving")
+			removeFloat(unitID)
 		end
 	end
 end

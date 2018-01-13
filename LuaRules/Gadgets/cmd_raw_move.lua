@@ -623,6 +623,15 @@ end
 ----------------------------------------------------------------------------------------------
 -- Gadget Interface
 
+local function WaitWaitMoveUnit(unitID)
+	local unitData = unitID and rawMoveUnit[unitID]
+	if rawMoveUnit then
+		ResetUnitData(unitData)
+	end
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+end
+
 local function AddRawMoveUnit(unitID)
 	rawMoveUnit[unitID] = true
 end
@@ -642,6 +651,7 @@ function gadget:Initialize()
 	GG.AddRawMoveUnit = AddRawMoveUnit
 	GG.StopRawMoveUnit = StopRawMoveUnit
 	GG.RawMove_IsPathFree = RawMove_IsPathFree
+	GG.WaitWaitMoveUnit = WaitWaitMoveUnit
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)

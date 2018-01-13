@@ -21,14 +21,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- CONFIG
-local NeedWaitWait = {
-	[UnitDefNames["chicken"].id] = true,
-}
-
 local NoDamageToSelf = {
 	[UnitDefNames["chicken"].id] = true,
 }
-
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -211,10 +206,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	if weaponDefID == -2 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
 	
 		-- Unit AI and script workarounds.
-		if NeedWaitWait[unitDefID] then
-			Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
-			Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
-		end
+		GG.WaitWaitMoveUnit(unitID)
+			
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
 		if env and env.script.StartMoving then
 			Spring.UnitScript.CallAsUnit(unitID, env.script.StartMoving)

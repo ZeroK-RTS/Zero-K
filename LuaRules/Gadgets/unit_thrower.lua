@@ -109,6 +109,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 						drag = -0.6
 					}
 				)
+				GG.Floating_InterruptFloat(nearID)
 			end
 		end
 	end
