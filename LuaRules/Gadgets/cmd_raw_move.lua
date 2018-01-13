@@ -625,7 +625,7 @@ end
 
 local function WaitWaitMoveUnit(unitID)
 	local unitData = unitID and rawMoveUnit[unitID]
-	if rawMoveUnit then
+	if unitData then
 		ResetUnitData(unitData)
 	end
 	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
