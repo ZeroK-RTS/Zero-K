@@ -153,8 +153,8 @@ function ShieldSphereColorParticle:Initialize()
 			vec3 norm = normalize(normal);
 			vec4 texel = texture2D(tex0, RadialCoords(normal));
 
-			vec4 color1Tex = vec4( mix(color1.rgb, texel.rgb, 0.5f), color1.a );
-			gl_FragColor =  mix(color1Tex, color2, opac);
+			vec4 color1Tex = vec4( color1.rgb, mix(color1.a, texel.a, 0.4f) );
+			gl_FragColor =  mix(color1Tex, color2, sqrt(opac));
 		}
 	]],
     uniform = {
