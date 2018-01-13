@@ -14,15 +14,24 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local teleportWeapons = {
-	[WeaponDefNames["amphlaunch_teleport_gun"].id] = true,
-}
+local throwDefs = {}
+local throwWeaponDef = {}
 
-local throwDefs = {
-	[UnitDefNames["amphlaunch"].id] = {
-		radius = 96
-	},
-}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.customParams.thrower_gather then
+		throwDefs[i] = {
+			radius = tonumber(ud.customParams.thrower_gather),
+		}
+	end
+end
+
+for i = 1, #WeaponDefs do
+	local wd = WeaponDefs[i]
+	if wd.customParams.thower_weapon then
+		throwWeaponDef[i] = true
+	end
+end
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
@@ -45,7 +54,7 @@ local function ValidThrowTarget(unitID, targetID)
 		return false
 	end
 	local _, _, _, speed = Spring.GetUnitVelocity(targetID)
-	if speed > 7 then
+	if speed > 6 then
 		-- Dart speed is 5.1.
 		-- Normal launch speed is 9.9
 		return false 
@@ -75,7 +84,7 @@ local dragRestore = IterableMap.New()
 local UPDATE_PERIOD = 6
 
 function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
-	if not weaponDefID and teleportWeapons[weaponDefID] then
+	if not weaponDefID and throwWeaponDef[weaponDefID] then
 		return
 	end
 	
@@ -110,7 +119,7 @@ end
 function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	local wantedWeaponList = {}
 	for wdid = 1, #WeaponDefs do
-		if teleportWeapons[wdid] then
+		if throwWeaponDef[wdid] then
 			wantedWeaponList[#wantedWeaponList + 1] = wdid
 		end
 	end 
@@ -118,7 +127,7 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if weaponID and teleportWeapons[weaponID] then
+	if weaponID and throwWeaponDef[weaponID] then
 		return 0
 	end
 end
@@ -219,7 +228,7 @@ local function DrawWire(emitUnitID, recUnitID, spec, myTeam, x, y, z)
 			local topX, topY, topZ = GetUnitTop(emitUnitID, x, y, z)
 			point[1] = {x, y, z}
 			point[2] = {topX, topY, topZ}
-			local rX, rY, rZ = Spring.GetUnitPosition(recUnitID, true)
+			local _,_,_, rX, rY, rZ = Spring.GetUnitPosition(recUnitID, true)
 			topX, topY, topZ = GetUnitTop(recUnitID, rX, rY, rZ)
 			point[3] = {topX,topY,topZ}
 			point[4] = {rX, rY, rZ}

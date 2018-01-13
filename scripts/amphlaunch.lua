@@ -14,7 +14,7 @@ local SIG_WALK = 1
 local SIG_AIM = {2, 4}
 local SIG_RESTORE = 8
 
-local PERIOD = 500
+local PERIOD = 350
 local INTERMISSION = 100
 
 local LEG_FRONT_DISPLACEMENT = 4.2

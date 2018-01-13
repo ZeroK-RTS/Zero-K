@@ -5,7 +5,7 @@ unitDef = {
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
-  buildCostMetal         = 240,
+  buildCostMetal         = 340,
   buildPic               = [[amphlaunch.png]],
   canGuard               = true,
   canMove                = true,
@@ -14,8 +14,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen = 10,
+    amph_regen        = 10,
     amph_submerged_at = 40,
+    thrower_gather    = 112,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -27,7 +28,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 440,
+  maxDamage              = 840,
   maxSlope               = 36,
   maxVelocity            = 1.8,
   maxWaterDepth          = 5000,
@@ -67,7 +68,7 @@ unitDef = {
     TELEPORT_GUN = {
       name                    = [[Unit Launcher]],
       accuracy                = 350,
-      areaOfEffect            = 192, -- UI
+      areaOfEffect            = 224, -- UI
       avoidFeature            = false,
       avoidFriendly           = false,
       burnblow                = true,
@@ -78,6 +79,7 @@ unitDef = {
 
 	  customParams            = {
 		lups_noshockwave = [[1]],
+		thower_weapon    = 1,
 	  },
 	  
       damage                  = {
@@ -89,7 +91,7 @@ unitDef = {
       interceptedByShieldType = 1,
       projectiles             = 1,
       range                   = 600,
-      reloadtime              = 6,
+      reloadtime              = 8.5,
       rgbColor                = [[0.05 0.45 0.95]],
       size                    = 0.005,
       soundStart              = [[Launcher]],
