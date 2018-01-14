@@ -6,7 +6,7 @@ function gadget:GetInfo()
     date      = "12 Sep 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -23,6 +23,7 @@ end
 
 local last
 local start, damage
+local attackerUnitDefID
 
 function gadget:UnitDamaged(unitID, unitDefID,  unitTeam, unitDamage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
@@ -44,6 +45,7 @@ function gadget:UnitDamaged(unitID, unitDefID,  unitTeam, unitDamage, paralyzer,
 	
 	--Spring.SetUnitExperience(attackerID,0.001)
     local frame = Spring.GetGameFrame()
+	attackerUnitDefID = attackerDefID
     -- delay
     if last then
         --Spring.Echo(frame-last)
@@ -63,7 +65,12 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
     local frame = Spring.GetGameFrame()
     if start then
-        Spring.Echo("Total DPS: " .. UnitDefs[unitDefID].health/(frame - start)*30)
+		local name = attackerUnitDefID and (UnitDefs[attackerUnitDefID] or {}).humanName
+		if name then
+			Spring.Echo("Total DPS " .. name .. ": " .. UnitDefs[unitDefID].health/(frame - start)*30)
+		else
+			Spring.Echo("Total DPS: " .. UnitDefs[unitDefID].health/(frame - start)*30)
+		end
         start = nil
     end
 end

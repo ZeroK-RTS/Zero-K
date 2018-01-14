@@ -310,7 +310,7 @@ function script.QueryWeapon(num)
 			return gunPieces[gun_1].flare
 		end
 	elseif num == 2 then
-		return torpedo
+		return turret
 	end
 end
 
@@ -318,7 +318,7 @@ function script.AimFromWeapon(num)
 	if num == 1 then
 		return turret
 	elseif num == 2 then
-		return torpedo
+		return turret
 	end
 end
 
