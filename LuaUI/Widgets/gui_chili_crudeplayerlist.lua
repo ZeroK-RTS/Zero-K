@@ -478,10 +478,10 @@ local function AddEntity(entity, teamID, allyTeamID)
 		deadTeam = true
 	end	
 	
-	local name,active,spectator,pingTime,cpuUsage,country,rank, customKeys
+	local name,active,spectator,pingTime,cpuUsage,country,_, customKeys
 	local playerID = entity.playerID or teams[teamID].leader
 	if playerID then
-		name,active,spectator,_,_,pingTime,cpuUsage,country,rank, customKeys = Spring.GetPlayerInfo(playerID)
+		name,active,spectator,_,_,pingTime,cpuUsage,country,_, customKeys = Spring.GetPlayerInfo(playerID)
 	end
 	--Spring.Echo("Entity with team ID " .. teamID .. " is " .. (active and '' or "NOT ") .. "active")
 	if not active then deadTeam = true end
@@ -510,10 +510,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 		elseif (customKeys.faction~=nil and customKeys.faction~="") then
 			icon = "LuaUI/Configs/Factions/" .. customKeys.faction ..".png"
 		end 
-		if customKeys.level and customKeys.level~="" and customKeys.elo and customKeys.elo~="" then
-			local elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(customKeys.elo), tonumber(customKeys.level))
-			icRank = "LuaUI/Images/LobbyRanks/" .. xp .. "_" .. elo .. ".png"
-		end
+		icRank = "LuaUI/Images/LobbyRanks/" .. (customKeys.icon or "0_0") .. ".png"
 	end
 	
 	local min_pingTime = math.min(pingTime, 1)
@@ -768,7 +765,7 @@ SetupPlayerNames = function()
 	-- go through all players, register as entities, assign to teams
 	for i = 1, #playerlist do
 		local playerID = playerlist[i]
-		local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank = Spring.GetPlayerInfo(playerID)
+		local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country = Spring.GetPlayerInfo(playerID)
 		local isSpec = (teamID == 0 and spectator and (not Spring.GetGameRulesParam("initiallyPlayingPlayer_" .. playerID))) 
 		local entityID = #entities + 1
 		entities[entityID] = {name = name, isSpec = isSpec, playerID = playerID, teamID = teamID}--(not spectator) and teamID or nil}
