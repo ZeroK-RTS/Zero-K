@@ -221,10 +221,10 @@ local function GetUnitTop (unitID, x,y,z)
 	return x+offX, y+offY, z+offZ
 end
 
-local function DrawWire(emitUnitID, recUnitID, spec, myTeam, x, y, z)
+local function DrawWire(emitUnitID, recUnitID, spec, myAllyTeam, x, y, z)
 	local point = {}
 	if spValidUnitID(recUnitID) then
-		local los = spGetUnitLosState(recUnitID, myTeam, false)
+		local los = spGetUnitLosState(recUnitID, myAllyTeam, false)
 		if (spec or (los and los.los)) and (spIsUnitInView(emitUnitID) or spIsUnitInView(recUnitID)) then
 			local topX, topY, topZ = GetUnitTop(emitUnitID, x, y, z)
 			point[1] = {x, y, z}
@@ -245,11 +245,11 @@ local function DrawWire(emitUnitID, recUnitID, spec, myTeam, x, y, z)
 	end
 end
 
-local function DrawThrowerWires(unitID, data, index, spec, myTeam)
+local function DrawThrowerWires(unitID, data, index, spec, myAllyTeam)
 	if not UnitIsActive(unitID) then
 		return
 	end
-	local los = spGetUnitLosState(unitID, myTeam, false)
+	local los = spGetUnitLosState(unitID, myAllyTeam, false)
 	if spec or (los and los.los) then
 		local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
 		local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
@@ -257,7 +257,7 @@ local function DrawThrowerWires(unitID, data, index, spec, myTeam)
 			for i = 1, #nearUnits do
 				local nearID = nearUnits[i]
 				if UnitIsActive(nearID) and ValidThrowTarget(unitID, nearID) and not alreadyWired[nearID] then
-					DrawWire(unitID, nearID, spec, myTeam, x, y, z)
+					DrawWire(unitID, nearID, spec, myAllyTeam, x, y, z)
 					alreadyWired[nearID] = true
 				end
 			end
@@ -283,7 +283,7 @@ local function DrawWorldFunc()
 	if throwers.GetIndexMax() > 0 then
 		local _, fullview = Spring.GetSpectatingState()
 		alreadyWired = {}
-		throwers.Apply(DrawThrowerWires, fullview, spGetMyTeamID())
+		throwers.Apply(DrawThrowerWires, fullview, spGetMyAllyTeamID())
 	end
 end
 
