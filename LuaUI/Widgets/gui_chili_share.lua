@@ -509,7 +509,6 @@ local function MergeWithClanMembers()
 	local myclanShort = customKeys.clan     or ""
 	local myclanLong  = customKeys.clanfull or ""
 	if myclanShort ~= "" then
-		--Spring.Echo("[Share menu] Searching for clan members belonging to " .. myclanLong)
 		local teamlist = Spring.GetTeamList(Spring.GetMyAllyTeamID())
 		local clanmembers = {}
 		for i=1, #teamlist do
@@ -968,18 +967,11 @@ local function InitName(subject, playerPanel)
 			caption=" "
 		}
 	end
-	local pdata, country, icon, badges, clan, avatar, elo, xp, faction, admin
+	local country, icon, badges, clan, avatar, faction, admin
 	if (subject.player) then
-		pdata = select(10, Spring.GetPlayerInfo(subject.player))
+		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
 		country = select(8, Spring.GetPlayerInfo(subject.player))
-		if (pdata.elo and pdata.level) then
-			--Spring.Echo("Using elo for " .. subject.name)
-			elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(pdata.elo), tonumber(pdata.level))
-		end
-		if (pdata.icon) then
-			--Spring.Echo("Using icon for " .. subject.name)
-			icon = pdata.icon
-		end
+		icon = pdata.icon
 		badges = pdata.badges
 		clan = pdata.clan
 		avatar = pdata.avatar
@@ -987,7 +979,6 @@ local function InitName(subject, playerPanel)
 	end
 	if (playerInfo[subject.name]) then
 		--Spring.Echo("Using extra info for " .. subject.name)
-		elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(playerInfo[subject.name].elo), tonumber(playerInfo[subject.name].level))
 		country = playerInfo[subject.name].country
 		clan = playerInfo[subject.name].clan
 		icon = playerInfo[subject.name].icon
@@ -996,43 +987,25 @@ local function InitName(subject, playerPanel)
 		faction = playerInfo[subject.name].faction
 		admin = playerInfo[subject.name].admin
 	end
-	
+
+	-- approximate known bots skill (FIXME: bots should probably have their own distinct icon, and chickens another)
 	if subject.ai then
-		elo = 0
-		xp = 0
-		if (string.match(string.lower(subject.name), "chicken")) then			
-			elo = 1
-			xp = 7
-		end
-		if (string.match(string.lower(subject.name), "circuit")) then			
-			elo = 3
-			xp = 7
-		end
-		if (string.match(string.lower(subject.name), "kgb")) then			
-			elo = 5
-			xp = 6
-		end
-		if (string.match(string.lower(subject.name), "csi")) then			
-			elo = 4
-			xp = 5
-		end
-		if (string.match(string.lower(subject.name), "cai")) then			
-			elo = 2
-			xp = 3
-		end
+		icon = "0_0" -- >mfw unknown bot
+
+		if (string.match(string.lower(subject.name), "chicken")) then icon = "7_1" end
+		if (string.match(string.lower(subject.name), "circuit")) then icon = "7_3" end
+		if (string.match(string.lower(subject.name),     "kgb")) then icon = "6_5" end
+		if (string.match(string.lower(subject.name),     "csi")) then icon = "5_4" end
+		if (string.match(string.lower(subject.name),     "cai")) then icon = "3_2" end
 	end
-	local rankImg
+
 	--Spring.Echo("badges: " .. tostring(badges))
 	local countryImg = country and country ~= '' and country ~= '??' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
 	local clanImg = nil
 	local avatarImg = nil
 	local adminImg = nil
 	avatar = avatar or "clogger"
-	if (icon) then
-		rankImg = "LuaUI/Images/LobbyRanks/" .. icon .. ".png"
-	elseif (elo and xp) then
-		rankImg = "LuaUI/Images/LobbyRanks/" .. xp .. "_" .. elo .. ".png"
-	end
+	local rankImg = "LuaUI/Images/LobbyRanks/" .. (icon or "0_0") .. ".png"
 	if clan and clan ~= "" then 
 		clanImg = "LuaUI/Configs/Clans/" .. clan ..".png"
 	elseif faction and faction ~= "" then
