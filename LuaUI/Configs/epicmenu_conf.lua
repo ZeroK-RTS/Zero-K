@@ -187,6 +187,7 @@ confdata.subMenuIcons = {
 }
 
 confdata.simpleModeDirectory = {
+	['Reset Settings'] = true,
 	['Interface'] = true,
 	['Audio'] = true,
 	['Graphics'] = true,
@@ -195,6 +196,7 @@ confdata.simpleModeDirectory = {
 	['Accessibility'] = true,
 }
 confdata.simpleModeFullDirectory = {
+	'Reset Settings',
 	'Hotkeys',
 	'Unit Behaviour',
 	'Help',
@@ -207,8 +209,8 @@ ShButton('', 'Load Game', (function() if WG.SaveGame then WG.SaveGame.CreateLoad
 
 --- GENERAL SETTINGS --- settings about settings
 local generalPath = 'Settings/Reset Settings'
-	ShLabel(generalPath, 'Reset graphic settings to minimum.')
-	ShButton(generalPath, 'Reset graphic settings',function()
+	ShLabel(generalPath, 'Minimal Graphics.')
+	ShButton(generalPath, 'Minimal graphic settings',function()
 					spSendCommands{"water 0",
 						"Shadows 0",
 						"maxparticles 100",
@@ -223,12 +225,12 @@ local generalPath = 'Settings/Reset Settings'
 						"luaui disablewidget SelectionCircle",
 					}
 				end,
-				'Use this if your performance is poor'
+				'Test minimal graphics. Use the main settings menu to make a permanent if necessary.'
 			)
 	ShLabel(generalPath, 'Reset custom settings to default.')
-	ShButton(generalPath, 'Reset custom settings', function() WG.crude.ResetSettings() end)
+	ShButton(generalPath, 'Reset settings', function() WG.crude.ResetSettings() end, 'Reset all interface settings to the default.')
 	ShLabel(generalPath, 'Reset hotkeys.')
-	ShButton(generalPath, 'Reset hotkeys',function() WG.crude.ResetKeys() end)
+	ShButton(generalPath, 'Reset hotkeys',function() WG.crude.ResetKeys() end, 'Reset all hotkeys to the default.')
 
 
 local settingsPath = 'Settings'

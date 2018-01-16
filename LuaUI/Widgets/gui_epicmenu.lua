@@ -1975,6 +1975,7 @@ MakeSubWindow = function(path, pause)
 			OnClick = {function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
 			--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
 			--classname = "navigation_button",
+			tooltip = "Reset the settings within this submenu. Use 'Settings/Reset Settings' to reset all settings.",
 			height = B_HEIGHT,
 			padding = {2, 2, 2, 2},
 			parent = buttonBar,
