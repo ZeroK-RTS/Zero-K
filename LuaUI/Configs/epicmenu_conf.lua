@@ -280,16 +280,16 @@ local cameraPath = 'Settings/Camera'
 	local cofcDisable = "luaui disablewidget Combo Overhead/Free Camera (experimental)"
 	ShRadio( cameraPath,
 		'Camera Type', {
-			{name = 'Default camera', key='Total Annihilation', desc='Default camera', hotkey=nil},
+			{name = 'Default camera', key='Default', desc='Default camera', hotkey=nil},
 			{name = 'FPS',key='FPS', hotkey=nil},
 			{name = 'Free',key='Free', hotkey=nil},
 			{name = 'Rotatable Overhead',key='Rotatable Overhead', hotkey=nil},
 			{name = 'Total War',key='Total War',  hotkey=nil},
 			{name = 'COFC',key='COFC', desc='Combo Overhead/Free Camera', hotkey=nil},
-		},'Total Annihilation',
+		},'Default',
 		function(self)
 			local key = self.value
-			if key == 'Total Annihilation' then
+			if key == 'Default' then
 				spSendCommands{cofcDisable ,"viewta"}
 			elseif key == 'FPS' then
 				spSendCommands{cofcDisable ,"viewfps"}
@@ -301,6 +301,8 @@ local cameraPath = 'Settings/Camera'
 				spSendCommands{cofcDisable ,"viewtw"}
 			elseif key == 'COFC' then
 				spSendCommands{"luaui enablewidget Combo Overhead/Free Camera (experimental)",}
+			else
+				spSendCommands{cofcDisable ,"viewta"} -- Fallback for any issue with settings.
 			end
 		end
 		)
