@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Tiamat]],
   description         = [[Heavy Assault/Riot]],
   acceleration        = 0.36,
+  activateWhenBuilt   = true,
   autoheal            = 20,
   brakeRate           = 0.205,
   buildCostEnergy     = 0,

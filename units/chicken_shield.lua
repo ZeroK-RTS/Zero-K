@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Blooper]],
   description         = [[Shield/Anti-Air]],
   acceleration        = 0.36,
+  activateWhenBuilt   = true,
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
