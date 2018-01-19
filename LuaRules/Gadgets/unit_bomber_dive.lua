@@ -127,8 +127,7 @@ local function GetWantedBomberHeight(unitID, config, underShield)
 		-- Collision volume is always full size for non-nanoframes.
 		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ = Spring.GetUnitCollisionVolumeData(unitID)
 		local horSize = math.min(scaleX, scaleZ)/2
-		local speedMult = (Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult") or 1)
-		local speed = speedMult*UnitDefs[unitDefID].speed/30
+		local speed = UnitDefs[unitDefID].speed/30
 		
 		if speedMult == 0 then
 			hitabilityDef[unitDefID] = 1000
@@ -140,6 +139,8 @@ local function GetWantedBomberHeight(unitID, config, underShield)
 			end
 		end
 	end
+	
+	Spring.Echo("hitabilityDef[unitDefID]", hitabilityDef[unitDefID])
 	
 	local ground = Spring.GetGroundHeight(x,z)
 	local verticalExtent = heightDef[unitDefID] + y - math.max(0, ground)
@@ -162,7 +163,7 @@ local function temporaryDive(unitID, duration, height, distance)
 	-- No distance given for shield collision, dive as soon as possible.
 	if distance then
 		-- The maximum horizontal distance required to dive to that height
-		local diveDistance = (config.orgHeight - height)*config.diveRate
+		local diveDistance = (config.orgHeight - height)*config.diveDistanceMult
 		if diveDistance < distance then
 			return
 		end

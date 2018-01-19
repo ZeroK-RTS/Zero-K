@@ -137,6 +137,7 @@ unitDef = {
       explosionGenerator      = [[custom:xamelimpact]],
       fireStarter             = 70,
       flightTime              = 3,
+	  fixedLauncher			  = true,
 	  heightmod				  = 0,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
