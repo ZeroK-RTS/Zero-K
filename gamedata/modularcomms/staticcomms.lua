@@ -236,8 +236,9 @@ MakeCommanderChassisClones("dynstrike",
 	{"module_personal_shield", "module_areashield"}
 )
 
+-- All modules may be available at any level, depending on campaign layout.
 MakeCommanderChassisClones("dynknight", 
-	{{0, 0, 0, 0}, {1, 0, 1, 0}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}},
+	{{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}},
 	{"module_personal_shield", "module_areashield", "module_resurrect", "module_jumpjet"}
 )
 

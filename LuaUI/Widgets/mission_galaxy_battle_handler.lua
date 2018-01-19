@@ -239,7 +239,7 @@ local function InitializeBriefingWindow()
 		height = BRIEF_HEIGHT,
 		minWidth = BRIEF_WIDTH,
 		minHeight = BRIEF_HEIGHT,
-		dockable = true,
+		dockable = false,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,

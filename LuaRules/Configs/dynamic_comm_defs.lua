@@ -1454,7 +1454,8 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynknight0"].id
+					-- Level 1 is the same as level 0 in stats and has support for clone modules (such as shield).
+					return UnitDefNames["dynknight1_" .. GetKnightCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {},
 			},
