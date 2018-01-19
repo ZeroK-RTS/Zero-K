@@ -84,7 +84,8 @@ end
 
 function script.FireWeapon(num)
 	gun_1 = not gun_1
-	Sleep(33)	-- delay before clearing attack order; else bomb loses target and fails to home
+	SetUnarmedAI()
+	Sleep(50)	-- delay before clearing attack order; else bomb loses target and fails to home
 	Reload()
 end
 

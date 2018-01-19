@@ -209,6 +209,7 @@ end
 
 function script.FireWeapon(num)
 	if num == 2 then
+		SetUnarmedAI()
 		GG.Bomber_Dive_fired(unitID)
 		Sleep(33)	-- delay before clearing attack order; else bomb loses target and fails to home
 		Move(drop, x_axis, 0)

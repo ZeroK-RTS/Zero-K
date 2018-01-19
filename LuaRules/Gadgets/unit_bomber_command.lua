@@ -422,6 +422,8 @@ local function CancelAirpadReservation(unitID)
 	
 	--value greater than 1 for icon state:
 	if spGetUnitRulesParam(unitID, "noammo") == 3 then --repairing
+		local env = Spring.UnitScript.GetScriptEnv(unitID)
+		Spring.UnitScript.CallAsUnit(unitID,env.SetArmedAI)
 		spSetUnitRulesParam(unitID, "noammo", 0)
 	elseif spGetUnitRulesParam(unitID, "noammo") == 2 then --refueling
 		spSetUnitRulesParam(unitID, "noammo", 1)

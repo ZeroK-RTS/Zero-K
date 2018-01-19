@@ -92,3 +92,15 @@ function RearmBlockShot()
 	local ammoState = Spring.GetUnitRulesParam(unitID, "noammo")
 	return (ammoState == 1) or (ammoState == 2) or (ammoState == 3)
 end
+
+function SetUnarmedAI()
+	-- Make bombers think they have much smaller turn radius to make them more responsive.
+	-- This is not applied to armed AI because it can cause infinite circling while trying
+	-- to line up a bombing run.
+	Spring.MoveCtrl.SetAirMoveTypeData(unitID, {turnRadius = 10})
+end
+
+local defaultTurnRadius = UnitDefs[unitDefID].turnRadius 
+function SetArmedAI()
+	Spring.MoveCtrl.SetAirMoveTypeData(unitID, {turnRadius = defaultTurnRadius})
+end

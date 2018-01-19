@@ -47,6 +47,7 @@ function script.BlockShot(num)
 end
 
 function script.FireWeapon(num)
+	SetUnarmedAI()
 	Sleep(400)
 	Reload()
 end

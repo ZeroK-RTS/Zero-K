@@ -140,8 +140,6 @@ local function GetWantedBomberHeight(unitID, config, underShield)
 		end
 	end
 	
-	Spring.Echo("hitabilityDef[unitDefID]", hitabilityDef[unitDefID])
-	
 	local ground = Spring.GetGroundHeight(x,z)
 	local verticalExtent = heightDef[unitDefID] + y - math.max(0, ground)
 	

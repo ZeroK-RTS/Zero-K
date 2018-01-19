@@ -51,6 +51,7 @@ function script.FireWeapon(checkHeight)
 	if RearmBlockShot() then
 		return
 	end
+	SetUnarmedAI()
 	
 	doingRun = true
 	
