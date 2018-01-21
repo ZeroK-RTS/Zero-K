@@ -338,8 +338,8 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					top = cmdParams[3]
 					bot = cmdParams[6]
 				else
-					bot = cmdParams[6]
-					top = cmdParams[3]
+					top = cmdParams[6]
+					bot = cmdParams[3]
 				end
 				
 				local units = CallAsTeam(team,

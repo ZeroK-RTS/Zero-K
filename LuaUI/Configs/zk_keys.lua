@@ -159,6 +159,7 @@ return {
 		{	"epic_chili_widget_selector_widgetlist_2",	"alt+f11",},
 		{	"screenshot png",	"f12",},
 		{	"screenshot jpg", "ctrl+f12"},
+		{	"settargetcircle",	"t",},
 		{	"resurrect",	"t",},
 		{	"jump",	"j",},
 		{	"select AllMap++_ClearSelection_SelectAll+",	"ctrl+a",},
