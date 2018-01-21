@@ -14,7 +14,7 @@ function gadget:GetInfo()
 		date      = "11 December 2017",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = true,
+		enabled   = not Spring.Utilities.IsCurrentVersionNewerThan(104, 92),
 	} 
 end
 
@@ -175,6 +175,7 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeamID)
 end
 
 function gadget:Initialize()
+	Spring.Echo("Hax Mantis 5852 Enabled") -- Intentional
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 	end
