@@ -2,6 +2,7 @@
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- local CMD_REARM = 33410 --get from customcmds.h.lua
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spGetUnitMoveTypeData = Spring.GetUnitMoveTypeData
 local emptyTable = {}
 
 -- old crappy way
@@ -97,10 +98,16 @@ function SetUnarmedAI()
 	-- Make bombers think they have much smaller turn radius to make them more responsive.
 	-- This is not applied to armed AI because it can cause infinite circling while trying
 	-- to line up a bombing run.
-	Spring.MoveCtrl.SetAirMoveTypeData(unitID, {turnRadius = 10})
+	local aircraftState = (spGetUnitMoveTypeData(unitID) or {}).aircraftState
+	if aircraftState then
+		Spring.MoveCtrl.SetAirMoveTypeData(unitID, {turnRadius = 10})
+	end
 end
 
 local defaultTurnRadius = UnitDefs[unitDefID].turnRadius 
 function SetArmedAI()
-	Spring.MoveCtrl.SetAirMoveTypeData(unitID, {turnRadius = defaultTurnRadius})
+	local aircraftState = (spGetUnitMoveTypeData(unitID) or {}).aircraftState
+	if aircraftState then
+		Spring.MoveCtrl.SetAirMoveTypeData(unitID, {turnRadius = defaultTurnRadius})
+	end
 end

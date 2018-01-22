@@ -421,21 +421,21 @@ local function CancelAirpadReservation(unitID)
 	end
 	
 	--value greater than 1 for icon state:
-	if spGetUnitRulesParam(unitID, "noammo") == 3 then --repairing
+	if spGetUnitRulesParam(unitID, "noammo") == 3 then -- repairing
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
 		if env and env.SetArmedAI then
 			Spring.UnitScript.CallAsUnit(unitID, env.SetArmedAI)
 		end
 		spSetUnitRulesParam(unitID, "noammo", 0)
-	elseif spGetUnitRulesParam(unitID, "noammo") == 2 then --refueling
+	elseif spGetUnitRulesParam(unitID, "noammo") == 2 then -- refueling
 		spSetUnitRulesParam(unitID, "noammo", 1)
 	end
 	
 	local targetPad
-	if bomberToPad[unitID] then --unit was going toward an airpad
+	if bomberToPad[unitID] then -- unit was going toward an airpad
 		targetPad = bomberToPad[unitID].padID
 		bomberToPad[unitID] = nil
-	elseif bomberLanding[unitID] then --unit was on the airpad
+	elseif bomberLanding[unitID] then -- unit was on the airpad
 		targetPad = bomberLanding[unitID].padID
 		bomberLanding[unitID] = nil
 	end
