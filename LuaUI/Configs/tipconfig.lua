@@ -140,8 +140,7 @@ artyDefs = {
 	"chickenblobber",
 }
 
-bomberDefs = {
-	"bomberdive",
+bomberDefs = {\
 	"bomberprec",
 	"bomberriot",
 	"bomberdisarm",

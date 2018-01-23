@@ -278,7 +278,6 @@ local antiAir = {
 local air = {
 	bomber = {
 		"bomberprec",
-		"bomberdive",
 		"bomberriot",
 		"bomberdisarm",
 		"bomberheavy",

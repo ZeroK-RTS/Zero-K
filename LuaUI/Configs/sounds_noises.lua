@@ -837,14 +837,6 @@ local sounds = {
 			[1] = "bomber_select",
 		},
 	},
-	bomberdive = {
-		ok = {
-			[1] = "bomber_move",
-		},
-		select = {
-			[1] = "bomber_select",
-		},
-	},
 	bomberriot = {
 		ok = {
 			[1] = "bomber_move",

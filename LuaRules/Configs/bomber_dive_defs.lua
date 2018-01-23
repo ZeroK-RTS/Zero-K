@@ -7,8 +7,6 @@ local unitArray = {}
 local weapons = {
 	bomberprec_bogus_bomb = true,
 	bomberprec_shield_check = true,
-	bomberdive_bogus_bomb = true,
-	bomberdive_shield_check = true,
 }
 
 -- bombers to track
@@ -19,13 +17,6 @@ local units = {
 		diveDistanceMult = 1.75,
 		altPerFlightFrame = 6.25,
 		orgHeight = UnitDefNames["bomberprec"].wantedHeight*FUDGE_FACTOR,
-	},
-	bomberdive = {
-		diveDamage = 600,
-		diveHeight = 25,
-		diveDistanceMult = 1.75,
-		altPerFlightFrame = 6.25,
-		orgHeight = UnitDefNames["bomberdive"].wantedHeight*FUDGE_FACTOR,
 	},
 }
 
