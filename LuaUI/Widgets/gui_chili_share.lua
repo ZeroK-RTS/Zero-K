@@ -156,22 +156,18 @@ end
 
 --returns offensive, defensive metal value
 local function getValueStats(teamID)
-	local def, off
-	def = 0
-	off = 0
+	local def, off = 0, 0
 	for _, unitID in ipairs(Spring.GetTeamUnits(teamID)) do
-		unitDefID = Spring.GetUnitDefID(unitID)
-		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
-		local speed = UnitDefs[unitDefID].speed
-		local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-		local isbuilt = not select(3, Spring.GetUnitIsStunned(unitID))	
-		if metal and metal < 1000000 then -- tforms show up as 1million cost, so ignore them
-			if speed and speed ~= 0 then
-				if isbuilt then
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local ud = unitDefID and UnitDefs[unitDefID]
+		if ud and not ud.customParams.dontcount then
+			local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
+			local isbuilt = not select(3, Spring.GetUnitIsStunned(unitID))	
+			if metal and isbuilt then
+				local unarmed = ud.springCategories.unarmed
+				if ud.speed ~= 0 then
 					off = off + metal
-				end
-			elseif not unarmed then
-				if isbuilt then
+				elseif not unarmed then
 					def = def + metal
 				end
 			end
