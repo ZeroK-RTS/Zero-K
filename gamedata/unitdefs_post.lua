@@ -224,56 +224,68 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Experiment with expensive factories
+--
+
+local FACTORY_COST = 1000
+for name, ud in pairs (UnitDefs) do
+	if string.find(name, "factory") or string.find(name, "striderhub") then
+		ud.buildcostmetal = FACTORY_COST
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- UnitDefs Dont Repeat Yourself
 --
 local BP2RES = 0.03
 local BP2TERRASPEED = 1000 --used to be 60 in most of the cases
 --local SEISMICSIG = 4 --used to be 4 in most of the cases
 for name, ud in pairs (UnitDefs) do
-		local cost = math.max (ud.buildcostenergy or 0, ud.buildcostmetal or 0, ud.buildtime or 0) --one of these should be set in actual unitdef file
+	local cost = math.max (ud.buildcostenergy or 0, ud.buildcostmetal or 0, ud.buildtime or 0) --one of these should be set in actual unitdef file
 
-		--setting uniform buildTime, M/E cost
-		if not ud.buildcostenergy then ud.buildcostenergy = cost end
-		if not ud.buildcostmetal then ud.buildcostmetal = cost end
-		if not ud.buildtime then ud.buildtime = cost end
+	--setting uniform buildTime, M/E cost
+	if not ud.buildcostenergy then ud.buildcostenergy = cost end
+	if not ud.buildcostmetal then ud.buildcostmetal = cost end
+	if not ud.buildtime then ud.buildtime = cost end
 
-		--setting uniform M/E storage
-		local storage = math.max (ud.metalstorage or 0, ud.energystorage or 0)
-		if storage > 0 then
-			if not ud.metalstorage then ud.metalstorage = storage end
-			if not ud.energystorage then ud.energystorage = storage end
+	--setting uniform M/E storage
+	local storage = math.max (ud.metalstorage or 0, ud.energystorage or 0)
+	if storage > 0 then
+		if not ud.metalstorage then ud.metalstorage = storage end
+		if not ud.energystorage then ud.energystorage = storage end
+	end
+
+	--setting metalmake, energymake, terraformspeed for construction units
+	if tobool(ud.builder) and ud.workertime then
+		local bp = ud.workertime
+
+		local mult = (ud.customparams.dynamic_comm and 0) or 1
+		if not ud.metalmake then ud.metalmake = bp * BP2RES * mult end
+		if not ud.energymake then ud.energymake = bp * BP2RES * mult end
+
+		if not ud.terraformspeed then
+			ud.terraformspeed = bp * BP2TERRASPEED
 		end
+	end
 
-		--setting metalmake, energymake, terraformspeed for construction units
-		if tobool(ud.builder) and ud.workertime then
-			local bp = ud.workertime
+	--setting standard seismicSignature
+	--[[
+	if ud.floater or ud.canhover or ud.canfly then
+		if not ud.seismicsignature then ud.seismicsignature = 0 end
+	else
+		if not ud.seismicsignature then ud.seismicsignature = SEISMICSIG end
+	end
+	]]--
 
-			local mult = (ud.customparams.dynamic_comm and 0) or 1
-			if not ud.metalmake then ud.metalmake = bp * BP2RES * mult end
-			if not ud.energymake then ud.energymake = bp * BP2RES * mult end
-
-			if not ud.terraformspeed then
-				ud.terraformspeed = bp * BP2TERRASPEED
-			end
+	--setting levelGround
+	--[[
+	if (ud.isBuilding == true or ud.maxAcc == 0) and (not ud.customParams.mobilebuilding) then --looks like a building
+		if ud.levelGround == nil then
+			ud.levelGround = false -- or true
 		end
-
-		--setting standard seismicSignature
-		--[[
-		if ud.floater or ud.canhover or ud.canfly then
-			if not ud.seismicsignature then ud.seismicsignature = 0 end
-		else
-			if not ud.seismicsignature then ud.seismicsignature = SEISMICSIG end
-		end
-		]]--
-
-		--setting levelGround
-		--[[
-		if (ud.isBuilding == true or ud.maxAcc == 0) and (not ud.customParams.mobilebuilding) then --looks like a building
-			if ud.levelGround == nil then
-				ud.levelGround = false -- or true
-			end
-		end
-		]]--
+	end
+	]]--
 end
 
 --------------------------------------------------------------------------------
