@@ -29,6 +29,7 @@ local buttongroups = {
 		{"metalProduced"   , "Metal Produced"},
 		{"metalUsed"       , "Metal Used"},
 		{"metal_income"    , "Metal Income"},
+		{"metal_overdrive" , "Metal Overdrive"},
 		{"metal_reclaim"   , "Metal Reclaimed"},
 		{"metal_excess"    , "Metal Excess"},
 		},
@@ -51,6 +52,7 @@ local buttongroups = {
 
 local rulesParamStats = {
 	metal_excess = true,
+	metal_overdrive = true,
 	metal_reclaim = true,
 	unit_value = true,
 	unit_value_killed = true,
