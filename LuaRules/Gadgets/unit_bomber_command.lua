@@ -339,7 +339,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	
 	-- Remove fight orders to implement a fight command version of CommandFire if Fight is the last command.
 	local queueLength = spGetCommandQueue(unitID, 0)
-	if queueLength == 2 and (not Spring.GetUnitStates(unitID)["repeat"]) then
+	if queueLength <= 2 and (not Spring.GetUnitStates(unitID)["repeat"]) then
 		spGiveOrderToUnit(unitID, CMD.REMOVE, {CMD.FIGHT}, {"alt"})
 	end
 	

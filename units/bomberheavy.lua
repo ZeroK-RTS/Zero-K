@@ -22,10 +22,11 @@ unitDef = {
   cruiseAlt           = 250,
 
   customParams        = {
-    modelradius    = [[10]],
-    requireammo    = [[1]],
-    reammoseconds  = [[30]],
+    modelradius      = [[10]],
+    requireammo      = [[1]],
+    reammoseconds    = [[30]],
     refuelturnradius = [[150]],
+	nokeeptarget     = [[1]],
   },
 
   explodeAs           = [[GUNSHIPEX]],

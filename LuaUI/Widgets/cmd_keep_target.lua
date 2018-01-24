@@ -48,7 +48,7 @@ local function isValidUnit(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	if unitDefID and Spring.ValidUnitID(unitID) then
 		local ud = UnitDefs[unitDefID]
-		return ud and not (ud.isBomber or ud.isFactory)
+		return ud and not (ud.isBomber or ud.isFactory or ud.customParams.nokeeptarget)
 	end
 	return false
 end
