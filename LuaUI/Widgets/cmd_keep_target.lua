@@ -44,11 +44,19 @@ options = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local keepTargetDefs = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	keepTargetDefs[i] = not (ud.isBomber or ud.isFactory or ud.customParams.reallyabomber)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local function isValidUnit(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	if unitDefID and Spring.ValidUnitID(unitID) then
-		local ud = UnitDefs[unitDefID]
-		return ud and not (ud.isBomber or ud.isFactory or ud.customParams.nokeeptarget)
+		return keepTargetDefs[unitDefID]
 	end
 	return false
 end

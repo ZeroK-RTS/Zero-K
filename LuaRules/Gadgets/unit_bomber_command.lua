@@ -60,19 +60,25 @@ local fixedwingPadRadius = 600
 local gunshipPadRadius = 160
 local DEFAULT_PAD_RADIUS = 300
 
-local bomberDefs = {}
-local boolBomberDefs = {}
-for i=1,#UnitDefs do
+local airDefs = {}
+local boolAirDefs = {}
+for i = 1, #UnitDefs do
 	local unitDef = UnitDefs[i]
 	local movetype = Spring.Utilities.getMovetype(unitDef)
 	if (movetype == 1 or movetype == 0) and (not Spring.Utilities.tobool(unitDef.customParams.cantuseairpads)) then
-		bomberDefs[i] = {
+		airDefs[i] = {
 			builder   = unitDef.isBuilder,
 			fixedwing = (movetype == 0),
 			padRadius = ((movetype == 0) and fixedwingPadRadius) or gunshipPadRadius
 		}
-		boolBomberDefs[i] = true
+		boolAirDefs[i] = true
 	end
+end
+
+local bomberDefs = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	bomberDefs[i] = (ud.isBomber or ud.customParams.reallyabomber)
 end
 
 if (gadgetHandler:IsSyncedCode()) then
@@ -337,19 +343,22 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 		end
 	end
 	
-	-- Remove fight orders to implement a fight command version of CommandFire if Fight is the last command.
-	local queueLength = spGetCommandQueue(unitID, 0)
-	if queueLength <= 2 and (not Spring.GetUnitStates(unitID)["repeat"]) then
-		spGiveOrderToUnit(unitID, CMD.REMOVE, {CMD.FIGHT}, {"alt"})
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if unitDefID and bomberDefs[unitDefID] then
+		-- Remove fight orders to implement a fight command version of CommandFire if Fight is the last command.
+		local queueLength = spGetCommandQueue(unitID, 0)
+		if queueLength <= 2 and (not Spring.GetUnitStates(unitID)["repeat"]) then
+			spGiveOrderToUnit(unitID, CMD.REMOVE, {CMD.FIGHT}, {"alt"})
+		end
 	end
 	
-	--Spring.Echo(unitID.." requesting rearm")
+	Spring.Utilities.UnitEcho(unitID, "requesting rearm")
 	local detectedRearm = false
 	local queue = spGetCommandQueue(unitID, -1) or emptyTable
 	local index = #queue + 1
-	for i=1, #queue do
+	for i = 1, #queue do
 		if combatCommands[queue[i].id] then
-			index = i-1
+			index = i - 1
 			break
 		elseif queue[i].id == CMD_REARM then -- already have set rearm point, we have nothing left to do here
 			detectedRearm = true
@@ -365,8 +374,9 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	end
 	local targetPad = FindNearestAirpad(unitID, team) --UnitID find non-reserved airpad as target
 	if targetPad then
+		Spring.Utilities.UnitEcho(targetPad, "targetPad")
 		cmdIgnoreSelf = true
-		ReserveAirpad(unitID,targetPad)
+		ReserveAirpad(unitID, targetPad)
 		--Spring.Echo(unitID.." directed to airpad "..targetPad)
 		local replaceExistingRearm = (detectedRearm and replaceExisting) --replace existing Rearm (if available)
 		-- InsertCommand(unitID, index, CMD_REARM, {targetPad}, nil, replaceExistingRearm) --UnitID get RE-ARM commandID. airpadID as its Params[1]
@@ -383,7 +393,7 @@ GG.RequestRearm = RequestRearm
 GG.FindBestAirpadAt = FindBestAirpadAt
 
 function gadget:UnitCreated(unitID, unitDefID, team)
-	if bomberDefs[unitDefID] then
+	if airDefs[unitDefID] then
 		Spring.InsertUnitCmdDesc(unitID, 400, rearmCMD)
 		Spring.InsertUnitCmdDesc(unitID, 401, findPadCMD)
 		bomberUnitIDs[unitID] = true
@@ -477,7 +487,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, team)
 			CancelAirpadReservation(bomberID)	-- send anyone who was going here elsewhere
 		end
 		airpadsData[unitID] = nil
-	elseif bomberDefs[unitDefID] then
+	elseif airDefs[unitDefID] then
 		CancelAirpadReservation(unitID)
 		bomberUnitIDs[unitID] = nil
 	end
@@ -529,7 +539,7 @@ function gadget:GameFrame(n)
 			local unitDefID = data.unitDefID
 			local queue = spGetCommandQueue(bomberID, 1)
 			if (queue and queue[1] and queue[1].id == CMD_REARM) and 
-					((Spring.GetUnitSeparation(bomberID, padID, true) or 1000) < ((unitDefID and bomberDefs[unitDefID] and bomberDefs[unitDefID].padRadius) or DEFAULT_PAD_RADIUS)) then
+					((Spring.GetUnitSeparation(bomberID, padID, true) or 1000) < ((unitDefID and airDefs[unitDefID] and airDefs[unitDefID].padRadius) or DEFAULT_PAD_RADIUS)) then
 				if not airpadRefreshEmptyspot then
 					RefreshEmptyspot_minusBomberLanding() --initialize empty pad count once
 					airpadRefreshEmptyspot = true
@@ -614,20 +624,20 @@ function GG.LandComplete(bomberID)
 end
 
 function gadget:UnitIdle(unitID, unitDefID, team)
-	if bomberDefs[unitDefID] and spGetUnitRulesParam(unitID, "noammo") == 1 then
+	if airDefs[unitDefID] and spGetUnitRulesParam(unitID, "noammo") == 1 then
 		rearmRequest[unitID] = true
 	end
 end
 
 --[[
 function gadget:UnitCmdDone(unitID, unitDefID, team, cmdID, cmdTag)
-	if bomberDefs[unitDefID] then RequestRearm(unitID) end
+	if airDefs[unitDefID] then RequestRearm(unitID) end
 end
 ]]--
 
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,cmdTag)
 	if cmdID == CMD_REARM then	-- return to pad
-		if not bomberDefs[unitDefID] then
+		if not airDefs[unitDefID] then
 			return true, true	-- trying to REARM using unauthorized unit
 		end
 		if rearmRemove[unitID] then
@@ -647,7 +657,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 		Spring.SetUnitMoveGoal(unitID, x, y, z) -- try circle the airpad until free airpad allow bomberLanding.
 		return true, false	-- command used, don't remove
 	elseif cmdID == CMD_FIND_PAD then
-		if bomberDefs[unitDefID] then
+		if airDefs[unitDefID] then
 			rearmRequest[unitID] = true
 		end
 		return true,true
@@ -660,7 +670,7 @@ function gadget:AllowCommand_GetWantedCommand()
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
-	return boolBomberDefs --gadget:AllowCommand only check bombers/gunships
+	return boolAirDefs --gadget:AllowCommand only check bombers/gunships
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
@@ -732,7 +742,7 @@ function gadget:DefaultCommand(type, targetID)
 		for i = 1, #selUnits do
 			unitID    = selUnits[i]
 			unitDefID = spGetUnitDefID(unitID)
-			if bomberDefs[unitDefID] and not bomberDefs[unitDefID].builder then
+			if airDefs[unitDefID] and not airDefs[unitDefID].builder then
 				return CMD_REARM
 			end
 		end
@@ -760,7 +770,7 @@ function gadget:DrawWorld()
 	local units = Spring.GetVisibleUnits()
 	for i=1,#units do
 		local id = units[i]
-		if spValidUnitID(id) and bomberDefs[spGetUnitDefID(id)] and ((isSpec and fullView) or spGetUnitAllyTeam(id) == myAllyID) then
+		if spValidUnitID(id) and airDefs[spGetUnitDefID(id)] and ((isSpec and fullView) or spGetUnitAllyTeam(id) == myAllyID) then
 			local ammoState = spGetUnitRulesParam(id, "noammo") or 0
 			if (ammoState ~= 0)  then
 				gl.DrawFuncAtUnit(id, false, DrawUnitFunc, UnitDefs[spGetUnitDefID(id)].height + 30)
