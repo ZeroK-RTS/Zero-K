@@ -849,10 +849,7 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 			newSelectedUnits = {}
 			local j = 1
 			for i = 1, #selectedUnitsList do
-				if not unitList[j] then
-					break
-				end
-				if selectedUnitsList[i] == unitList[j] then
+				if unitList[j] and selectedUnitsList[i] == unitList[j] then
 					j = j + 1
 				else
 					newSelectedUnits[#newSelectedUnits + 1] = selectedUnitsList[i]
