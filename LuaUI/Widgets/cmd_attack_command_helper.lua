@@ -2,8 +2,8 @@ function widget:GetInfo()
 	return {
 		name      = "Attack Command Helper",
 		desc      = "Makes it easier to issue attack commands on moving units. Removes right click area attack.",
-		author    = "Google Frog",
-		date      = "11 August 2015",
+		author    = "GoogleFrog",
+		date      = "24 January 2018",
 		license   = "GNU GPL, v2 or later",
 		layer     = -52,
 		enabled   = true,
@@ -161,18 +161,18 @@ function widget:MouseRelease(x, y, button)
 	
 	if not (clickUnitID and clickCommandID) then
 		Reset()
-		return -1
+		return false
 	end
 	
 	if Spring.GetSelectedUnitsCount() == 0 then
 		Reset()
-		return -1
+		return false
 	end
 	
 	local traceType, targetID = Spring.TraceScreenRay(x, y)
 	if not (targetID == clickUnitID and traceType == TRACE_UNIT) then
 		Reset()
-		return -1
+		return false
 	end
 	
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
