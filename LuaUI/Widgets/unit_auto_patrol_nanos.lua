@@ -112,7 +112,7 @@ options = {
 		end,
 	},
 	stop_disables = {
-		name = "Disable Caretakers with Stop",
+		name = "Disable caretakers with stop",
 		type = 'bool',
 		value = true,
 		noHotkey = true,

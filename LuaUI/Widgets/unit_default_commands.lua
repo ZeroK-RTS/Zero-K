@@ -10,14 +10,14 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua") -- for CMD_RAW_MOVE
 options_path = 'Settings/Unit Behaviour'
 options = {
 	guard_facs = {
-		name = "Rightclick factory Guards",
+		name = "Right click guards factories",
 		type = "bool",
 		value = true,
 		desc = "If enabled, rightclicking a factory will always Guard it.\nIf disabled, the command can be Repair.",
 		noHotkey = true,
 	},
 	guard_cons = {
-		name = "Rightclick constructor Guards",
+		name = "Right click guards constructors",
 		type = "bool",
 		value = true,
 		desc = "If enabled, rightclicking a constructor will always Guard it.\nIf disabled, the command can be Repair.",
