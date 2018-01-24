@@ -112,7 +112,9 @@ function Trackbar:SetValue(v)
   v = self:_Clamp(v)
   local oldvalue = self.value
   self.value = v
-  if self.useValueTooltip then
+  if self.tooltipFunction then
+    self.tooltip = self.tooltipFunction(self, v)
+  elseif self.useValueTooltip then
     self.tooltip = FormatNum(v, self.tooltip_format)
   end
   self:CallListeners(self.OnChange,v,oldvalue)

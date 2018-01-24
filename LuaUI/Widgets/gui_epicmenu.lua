@@ -1804,19 +1804,22 @@ MakeSubWindow = function(path, pause)
 			if option.valuelist then
 				option.value = GetIndex(option.valuelist, option.value)
 			end
-			numberPanel:AddChild(Trackbar:New{
-				y = 20,
-				width = "100%",
-				caption = option.name, 
-				value = option.value, 
-				trackColor = color.sub_fg, 
-				min = option.min or 0, 
-				max = option.max or 100, 
-				step = option.step or 1,
-				[option.update_on_the_fly and "OnChange" or "OnMouseup"] = {option.OnChange },
-				useValueTooltip = true,
-				tooltip_format = option.tooltip_format,
-			})
+			numberPanel:AddChild(
+				Trackbar:New{
+					y = 20,
+					width = "100%",
+					caption = option.name, 
+					value = option.value, 
+					trackColor = color.sub_fg, 
+					min = option.min or 0, 
+					max = option.max or 100, 
+					step = option.step or 1,
+					[option.update_on_the_fly and "OnChange" or "OnMouseup"] = {option.OnChange },
+					useValueTooltip = not option.tooltipFunction,
+					tooltipFunction = option.tooltipFunction,
+					tooltip_format = option.tooltip_format,
+				}
+			)
 			tree_children[#tree_children+1] = numberPanel
 		elseif option.type == 'list' then
 			tree_children[#tree_children+1] = Label:New{caption = option.name, textColor = color.sub_header}

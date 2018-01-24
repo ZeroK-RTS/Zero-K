@@ -28,6 +28,66 @@ local unitsToFactory = {}	-- [unitDefName] = factoryDefName
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local tooltipFunc = {}
+local tooltips = {
+	movestate = {
+		[-1] = "Inherit from factory",
+		[0] = "Hold position",
+		[1] = "Maneuver",
+		[2] = "Roam",
+	},
+	firestate = {
+		[-1] = "Inherit from factory",
+		[0] = "Hold fire",
+		[1] = "Return fire",
+		[2] = "Fire at will",
+	},
+	priority = {
+		[-1] = "Inherit from factory",
+		[0] = "Low priority",
+		[1] = "Normal priority",
+		[2] = "High priority",
+	},
+	retreat = {
+		[-1] = "Inherit from factory",
+		[0] = "Never Retreat",
+		[1] = "Retreat at 30% health",
+		[2] = "Retreat at 65% health",
+		[3] = "Retreat at 99% health",
+	},
+	auto_call_transport = {
+		[-1] = "Inherit from factory",
+		[0] = "Disabled",
+		[1] = "Enabled",
+	},
+	flylandstate = {
+		[-1] = "Inherit from factory",
+		[0] = "Fly when idle",
+		[1] = "Land when idle",
+	},
+	floatstate = {
+		[-1] = "Inherit from factory",
+		[0] = "Never float",
+		[1] = "Float to attack",
+		[2] = "Float to attack or when idle",
+	},
+	selectionrank = {
+		[0] = "0",
+		[1] = "1",
+		[2] = "2",
+		[3] = "3",
+	},
+}
+
+for name, values in pairs(tooltips) do
+	tooltipFunc[name] = function (_, v)
+		return values[v] or "??"
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local function IsGround(ud)
     return not ud.canFly and not ud.isFactory
 end
@@ -344,6 +404,7 @@ options = {
 		max = 2,
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.firestate,
 	},
 
 	commander_movestate1 = {
@@ -355,6 +416,7 @@ options = {
 		max = 2,
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.movestate,
 	},
 
 	commander_constructor_buildpriority = {
@@ -366,6 +428,7 @@ options = {
 		max = 2,
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.priority,
 	},
 
 	commander_misc_priority = {
@@ -377,6 +440,7 @@ options = {
 		max = 2,
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.priority,
 	},
 
 	commander_retreat = {
@@ -388,6 +452,7 @@ options = {
 		max = 3,
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.retreat,
 	},
 	
 	commander_auto_call_transport_2 = {
@@ -399,6 +464,7 @@ options = {
 		max = 1,
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.auto_call_transport,
 	},
 	
 	commander_selection_rank = {
@@ -411,6 +477,7 @@ options = {
 		step = 1,
 		path = path,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.selectionrank,
 	},
 }
 
@@ -468,6 +535,7 @@ local function addUnit(defName, path)
 			max = 2,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.firestate,
 		}
 		options_order[#options_order+1] = defName .. "_firestate0"
 	end
@@ -482,6 +550,7 @@ local function addUnit(defName, path)
 			max = 2,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.movestate,
 		}
 		options_order[#options_order+1] = defName .. "_movestate1"
 	end
@@ -496,6 +565,7 @@ local function addUnit(defName, path)
 			max = 1,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.flylandstate,
 		}
 		options_order[#options_order+1] = defName .. "_flylandstate_1"
 	elseif ud.customParams and ud.customParams.landflystate then
@@ -508,6 +578,7 @@ local function addUnit(defName, path)
 			max = 1,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.flylandstate,
 		}
 		options_order[#options_order+1] = defName .. "_flylandstate_1_factory"
 	end
@@ -551,13 +622,14 @@ local function addUnit(defName, path)
 	if ud.customParams and ud.customParams.floattoggle then
 		options[defName .. "_floattoggle"] = {
 			name = "  Float State",
-			desc = "Values: Never float, float to attack, float when stationary",
+			desc = "Values: Never float, float to attack, float to attack or when idle",
 			type = 'number',
 			value = (ud.customParams and ud.customParams.floattoggle) or 1,
 			min = 0,
 			max = 2,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.floatstate,
 		}
 		options_order[#options_order+1] = defName .. "_floattoggle"
 	end
@@ -571,6 +643,7 @@ local function addUnit(defName, path)
 		max = 2,
 		step = 1,
 		path = path,
+		tooltipFunction = tooltipFunc.priority,
 	}
 	options_order[#options_order+1] = defName .. "_buildpriority_0"
 
@@ -588,6 +661,7 @@ local function addUnit(defName, path)
 			max = 2,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.priority,
 		}
 		options_order[#options_order+1] = defName .. "_constructor_buildpriority"
 	end
@@ -602,6 +676,7 @@ local function addUnit(defName, path)
 			max = 2,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.priority,
 		}
 		options_order[#options_order+1] = defName .. "_misc_priority"
 	end
@@ -616,6 +691,7 @@ local function addUnit(defName, path)
 			max = 1,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.auto_call_transport,
 		}
 		options_order[#options_order+1] = defName .. "_auto_call_transport_2"
 	elseif ud.isFactory and not ud.customParams.nongroundfac then
@@ -628,6 +704,7 @@ local function addUnit(defName, path)
 			max = 1,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.auto_call_transport,
 		}
 		options_order[#options_order+1] = defName .. "_auto_call_transport_2"
 	end
@@ -642,6 +719,7 @@ local function addUnit(defName, path)
 			max = 3,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.retreat,
 		}
 		options_order[#options_order+1] = defName .. "_retreatpercent"
 	end
@@ -655,6 +733,7 @@ local function addUnit(defName, path)
 		max = 3,
 		step = 1,
 		path = path,
+		tooltipFunction = tooltipFunc.selectionrank,
 	}
 	options_order[#options_order+1] = defName .. "_selection_rank"
 	
