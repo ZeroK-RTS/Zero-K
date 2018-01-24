@@ -159,6 +159,33 @@ local function TakeMouseOffEdge()
 	return changed
 end
 
+local function InitializeNewtonFirezones()
+	local newtonFirezones = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().planetmissionnewtonfirezones) or {}
+	if not (newtonFirezones and WG.NewtonFirezone_AddGroup) then
+		return
+	end
+	local newtonDefID = UnitDefNames["turretimpulse"].id
+	
+	for i = 1, #newtonFirezones do
+		local data = newtonFirezones[i]
+		local units = Spring.GetUnitsInRectangle(data.newtons.x1, data.newtons.z1, data.newtons.x2, data.newtons.z2, Spring.GetMyTeamID())
+		local newtons = {}
+		
+		for j = 1, #units do
+			local unitID = units[j]
+			if Spring.GetUnitDefID(unitID) == newtonDefID then
+				newtons[#newtons + 1] = unitID
+			end
+		end
+		
+		if #newtons > 0 then
+			data.firezone.x, data.firezone.z = data.firezone.x1, data.firezone.z1
+			data.firezone.x1, data.firezone.z1 = nil, nil
+			WG.NewtonFirezone_AddGroup(newtons, data.firezone)
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Briefing Window
@@ -895,6 +922,10 @@ function widget:GameFrame(n)
 		end
 		wantPause = false
 		WG.PauseScreen_SetEnabled(false)
+	end
+	
+	if n == 10 then
+		InitializeNewtonFirezones()
 	end
 end
 
