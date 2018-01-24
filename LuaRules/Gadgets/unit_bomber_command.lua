@@ -352,7 +352,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 		end
 	end
 	
-	Spring.Utilities.UnitEcho(unitID, "requesting rearm")
+	--Spring.Utilities.UnitEcho(unitID, "requesting rearm")
 	local detectedRearm = false
 	local queue = spGetCommandQueue(unitID, -1) or emptyTable
 	local index = #queue + 1
@@ -374,7 +374,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	end
 	local targetPad = FindNearestAirpad(unitID, team) --UnitID find non-reserved airpad as target
 	if targetPad then
-		Spring.Utilities.UnitEcho(targetPad, "targetPad")
+		--Spring.Utilities.UnitEcho(targetPad, "targetPad")
 		cmdIgnoreSelf = true
 		ReserveAirpad(unitID, targetPad)
 		--Spring.Echo(unitID.." directed to airpad "..targetPad)
