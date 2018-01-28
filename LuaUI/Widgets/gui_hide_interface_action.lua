@@ -45,7 +45,7 @@ local cursorNames = {
 	'cursorSmooth',
 }
 
-local function ShowCursor()
+function WG.ShowCursor()
 	for i = 1, #cursorNames do
 		local cursor = cursorNames[i]
 		local cursorPath = cursorDir .. cursor
@@ -53,7 +53,7 @@ local function ShowCursor()
 	end
 end
 
-local function HideCursor()
+function WG.HideCursor()
 	for i = 1, #cursorNames do
 		Spring.ReplaceMouseCursor(cursorNames[i], "cursorempty")
 	end
@@ -77,9 +77,9 @@ options = {
 		OnChange = function(self)
 			Spring.SendCommands("HideInterface")
 			if Spring.IsGUIHidden() then
-				HideCursor()
+				WG.HideCursor()
 			else
-				ShowCursor()
+				WG.ShowCursor()
 			end
 		end,
 	},
@@ -91,7 +91,7 @@ options = {
 		OnChange = function (self)
 			cursorDir = (self.value and "zk_large/") or ""
 			if not Spring.IsGUIHidden() then
-				ShowCursor()
+				WG.ShowCursor()
 			end
 		end,
 		path = 'Settings/Interface/Mouse Cursor'
@@ -101,6 +101,13 @@ options = {
 function WG.ShowInterface()
 	if Spring.IsGUIHidden() then
 		Spring.SendCommands("HideInterface")
-		ShowCursor()
+		WG.ShowCursor()
+	end
+end
+
+function WG.HideInterface()
+	if not Spring.IsGUIHidden() then
+		Spring.SendCommands("HideInterface")
+		WG.HideCursor()
 	end
 end
