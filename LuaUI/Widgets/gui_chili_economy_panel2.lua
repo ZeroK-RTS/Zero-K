@@ -98,6 +98,7 @@ local BASE_BLINK_PERIOD = 1.4
 local blinkM_status = false
 local blinkE_status = false
 local excessE = false
+local flashModeEnabled = true
 
 local strings = {
 	local_metal_economy = "",
@@ -632,9 +633,9 @@ function widget:GameFrame(n)
 	eStor = math.max(eStor - HIDDEN_STORAGE, MIN_STORAGE)
 	
 	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
-	if mCurr >= mStor then
+	if flashModeEnabled and mCurr >= mStor then
 		blinkM_status = 3
-	elseif mCurr >= mStor * 0.9 then
+	elseif flashModeEnabled and mCurr >= mStor * 0.9 then
 		-- Blink less fast
 		blinkM_status = 1
 	elseif blinkM_status then
@@ -661,7 +662,7 @@ function widget:GameFrame(n)
 		wastingE = (cp.team_energyWaste > 0)
 	end
 	local stallingE = (eCurr <= eStor * options.energyFlash.value) and (eCurr < 1000) and (eCurr >= 0)
-	if stallingE or wastingE then
+	if flashModeEnabled and (stallingE or wastingE) then
 		blinkE_status = 1
 		bar_energy:SetValue( 100 )
 		excessE = wastingE
@@ -679,8 +680,8 @@ function widget:GameFrame(n)
 	
 	local metalWarning = (mStor > 1 and mCurr > mStor * options.metalWarning.value) or (mStor <= 1 and netMetal > 0)
 	local energyWarning = (eStor > 1 and eCurr < eStor * options.energyWarning.value) or ((not metalWarning) and eStor <= 1 and eInco < mInco)
-	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
-	energyWarningPanel.ShowWarning(energyWarning)
+	metalWarningPanel.ShowWarning(flashModeEnabled and (metalWarning and not energyWarning))
+	energyWarningPanel.ShowWarning(flashModeEnabled and energyWarning)
 	
 	local mPercent, ePercent 
 	if mStor > 1 then
@@ -1022,6 +1023,10 @@ function externalFunctions.SetEconomyPanelVisibility(newVisibility, dispose)
 	else
 		window:SetVisibility(newVisibility)
 	end
+end
+
+function externalFunctions.SetFlashEnabled(newEnabled)
+	flashModeEnabled = newEnabled
 end
 
 --------------------------------------------------------------------------------
