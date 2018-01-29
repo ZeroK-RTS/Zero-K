@@ -452,10 +452,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			end
 		end
 
-		AddGadgetImpulse(unitID, x, y, z, magnitude, true, false, true, false, unitDefID)
+		AddGadgetImpulse(unitID, x, y, z, magnitude*(0.4 + math.random()*1.2), true, false, true, false, unitDefID)
 
 		if defData.selfImpulse then
-			AddGadgetImpulse(attackerID, x, y, z, -magnitude, true, false, true, false, unitDefID)
+			AddGadgetImpulse(attackerID, x, y, z, -magnitude*(0.4 + math.random()*1.2), true, false, true, false, unitDefID)
 		end
 
 		if defData.normalDamage then
