@@ -426,60 +426,67 @@ local sounds = {
 		build = "builder_start",
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphimpulse = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphraid = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphfloater = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphriot = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphassault = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphlaunch = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "teleport_select",
@@ -489,15 +496,17 @@ local sounds = {
 	amphaa = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphtele = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "teleport_select",
@@ -541,9 +550,11 @@ local sounds = {
 	striderbantha = {
 		ok = {
 			[1] = "turret_select",
+			volume = 0.7,
 		},
 		select = {
 			[1] = "turret_select",
+			volume = 0.7,
 		},
 	},
 	striderarty = {
@@ -565,9 +576,11 @@ local sounds = {
 	striderdetriment = {
 		ok = {
 			[1] = "turret_select",
+			volume = 0.7,
 		},
 		select = {
 			[1] = "turret_select",
+			volume = 0.7,
 		},
 	},
 	nebula = {
@@ -576,6 +589,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "heavy_gunship_select",
+			volume = 0.8,
 		},
 	},
 	
@@ -935,6 +949,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "heavy_gunship_select",
+			volume = 0.8,
 		},
 	},
 	gunshipassault = {
@@ -943,6 +958,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "heavy_gunship_select",
+			volume = 0.8,
 		},
 	},
 	gunshipkrow = {
@@ -951,6 +967,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "heavy_gunship_select",
+			volume = 0.8,
 		},
 	},
 	gunshiptrans = {
@@ -967,6 +984,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "heavy_gunship_select",
+			volume = 0.8,
 		},
 	},
 	

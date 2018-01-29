@@ -111,7 +111,7 @@ local weaponDefs = {
     impulseFactor      = 0.3,
     name               = "Slowing Explosion",
     soundHit           = "weapon/aoe_aura",
-	soundHitVolume     = 0.6,
+	soundHitVolume     = 1.2,
   },
 }
 unitDef.weaponDefs = weaponDefs
