@@ -69,7 +69,7 @@ local icon_other_bars
 
 -- local ICON_LOST_FILE = 'luaui/images/AttritionCounter/chicken.png'
 local ICON_KILLS_FILE = 'luaui/images/AttritionCounter/skull.png'
-local ICON_METAL_FILE = 'luaui/images/ibeam.png'
+local ICON_METAL_FILE = 'luaui/images/costIcon.png'
 
 local font -- dummy, need this to call GetTextWidth without looking up an instance
 

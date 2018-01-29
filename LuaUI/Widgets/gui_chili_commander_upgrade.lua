@@ -664,7 +664,7 @@ local function CreateMainWindow()
 	local costImage = Image:New{
 		x = 92,
 		bottom  = 75,
-		file ='LuaUI/images/ibeam.png',
+		file ='LuaUI/images/costIcon.png',
 		height = 24,
 		width = 24, 
 		keepAspect = true,

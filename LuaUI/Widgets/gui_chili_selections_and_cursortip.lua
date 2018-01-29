@@ -79,7 +79,7 @@ local IMAGE = {
 	HEALTH = 'LuaUI/images/commands/bold/health.png',
 	SHIELD = 'LuaUI/Images/commands/Bold/guard.png',
 	BUILD = 'LuaUI/Images/commands/Bold/buildsmall.png',
-	COST = 'LuaUI/images/ibeam.png',
+	COST = 'LuaUI/images/costIcon.png',
 	TIME = 'LuaUI/images/clock.png',
 	METAL = 'LuaUI/images/metalplus.png',
 	ENERGY = 'LuaUI/images/energyplus.png',
@@ -221,6 +221,7 @@ local drawHotkeyBytes = {}
 local drawHotkeyBytesCount = 0
 local oldMouseX, oldMouseY = 0, 0
 local stillCursorTime = 0
+local global_totalBuildPower = 0
 
 local sameObjectID
 local sameObjectIDTime = 0
@@ -1371,6 +1372,8 @@ local function GetSelectionStatsDisplay(parentControl)
 						burstClass = false
 					end
 				end
+				
+				global_totalBuildPower = total_totalbp
 			end
 		end
 		
@@ -1627,7 +1630,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local metalInfo
 	local energyInfo
 	
-	local spaceClickLabel, shieldBarUpdate, buildBarUpdate, morphInfo, playerNameLabel, morphInfo
+	local spaceClickLabel, shieldBarUpdate, buildBarUpdate, morphInfo, playerNameLabel, timeInfoUpdate
 	if isTooltipVersion then
 		playerNameLabel = Chili.Label:New{
 			name = "playerNameLabel",
@@ -1648,6 +1651,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			parent = rightPanel,
 		}
 		morphInfo = GetMorphInfo(rightPanel, PIC_HEIGHT + LEFT_SPACE + 3)
+		timeInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.TIME, nil, nil, ICON_SIZE, 5)
 	else
 		shieldBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, IMAGE.SHIELD, {0.3,0,0.9,1})
 		buildBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 58, IMAGE.BUILD, {0.8,0.8,0.2,1})
@@ -1746,7 +1750,23 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 	end
 	
-	function externalFunctions.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
+	local function UpdateBuildTime(unitDefID)
+		if not timeInfoUpdate then
+			return
+		end
+		if (global_totalBuildPower or 0) < 1 then
+			timeInfoUpdate(true,  cyan .. "??", IMAGE.TIME)
+			return
+		end
+		local buildCost = GetUnitCost(nil, unitDefID)
+		if not buildCost then
+			timeInfoUpdate(false)
+			return
+		end
+		timeInfoUpdate(true, cyan .. SecondsToMinutesSeconds(math.floor(buildCost/global_totalBuildPower)), IMAGE.TIME)
+	end
+	
+	function externalFunctions.SetDisplay(unitID, unitDefID, featureID, featureDefID, blueprint, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
 		local teamID
 		local addedName
 		local ud
@@ -1765,8 +1785,13 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				if featureID then
 					UpdateDynamicFeatureAttributes(featureID, prevUnitDefID)
 				end
-				if unitDefID and not (unitID or featureID) and econStructureDefs[unitDefID] then
-					UpdateDynamicEconInfo(unitDefID, mousePlaceX, mousePlaceY)
+				if unitDefID and not (unitID or featureID) then
+					if blueprint then
+						UpdateBuildTime(unitDefID)
+					end
+					if econStructureDefs[unitDefID] then
+						UpdateDynamicEconInfo(unitDefID, mousePlaceX, mousePlaceY)
+					end
 				end
 			end
 			return
@@ -1854,6 +1879,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				healthBarUpdate(false)
 				maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH)
 				maxHealthShown = true
+				if blueprint then
+					UpdateBuildTime(unitDefID)
+				end
 				if morphTime then
 					morphInfo(true, morphTime, morphCost)
 					morphShown = true
@@ -1864,6 +1892,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 30)
 				end
 			end
+		end
+		
+		if timeInfoUpdate and not blueprint then
+			timeInfoUpdate(false)
 		end
 		
 		if unitID then
@@ -2015,9 +2047,9 @@ local function GetTooltipWindow()
 		return true
 	end
 	
-	function externalFunctions.SetUnitishTooltip(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
+	function externalFunctions.SetUnitishTooltip(unitID, unitDefID, featureID, featureDefID, blueprint, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
 		if unitDefID or featureID or featureDefID then
-			unitDisplay.SetDisplay(unitID, unitDefID, featureID, featureDefID, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
+			unitDisplay.SetDisplay(unitID, unitDefID, featureID, featureDefID, blueprint, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
 			textTooltip:SetVisibility(false)
 			unitDisplay.SetVisible(true)
 		else
@@ -2085,14 +2117,14 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 		local name = string.sub(chiliTooltip, 10)
 		local ud = name and UnitDefNames[name]
 		if ud then
-			tooltipWindow.SetUnitishTooltip(nil, ud.id)
+			tooltipWindow.SetUnitishTooltip(nil, ud.id, nil, nil, true)
 			return true
 		end
 	elseif chiliTooltip and string.find(chiliTooltip, "Build") then
 		local name = string.sub(chiliTooltip, 6)
 		local ud = name and UnitDefNames[name]
 		if ud then
-			tooltipWindow.SetUnitishTooltip(nil, ud.id)
+			tooltipWindow.SetUnitishTooltip(nil, ud.id, nil, nil, true)
 			return true
 		end
 	end
@@ -2104,7 +2136,7 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 		local morphCost = chiliTooltip:gsub('.*metal: (.*)energy.*', '%1'):gsub('[^%d]', '')
 		local unitDefID = GetUnitDefByHumanName(unitHumanName)
 		if unitDefID and morphTime and morphCost then
-			tooltipWindow.SetUnitishTooltip(nil, unitDefID, nil, nil, morphTime, morphCost)
+			tooltipWindow.SetUnitishTooltip(nil, unitDefID, nil, nil, false, morphTime, morphCost)
 		end
 		return true
 	end
@@ -2127,7 +2159,7 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	
 	-- Placing structure tooltip (spring.GetActiveCommand)
 	if cmdID and cmdID < 0 then
-		tooltipWindow.SetUnitishTooltip(nil, -cmdID, nil, nil, nil, nil, mx, my, requiredOnly)
+		tooltipWindow.SetUnitishTooltip(nil, -cmdID, nil, nil, true, nil, nil, mx, my, requiredOnly)
 		return true
 	end
 	
@@ -2141,12 +2173,12 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 				local thingDefID = (thingIsUnit and Spring.GetUnitDefID(thingID)) or Spring.GetFeatureDefID(thingID)
 				if thingIsUnit then
 					if ShowUnitCheck(holdingSpace) then
-						tooltipWindow.SetUnitishTooltip(thingID, thingDefID, nil, nil, nil, nil, nil, nil, requiredOnly)
+						tooltipWindow.SetUnitishTooltip(thingID, thingDefID, nil, nil, false, nil, nil, nil, nil, requiredOnly)
 						return true
 					end
 				else
 					if ShowFeatureCheck(holdingSpace, thingDefID) then
-						tooltipWindow.SetUnitishTooltip(nil, nil, thingID, thingDefID, nil, nil, nil, nil, requiredOnly)
+						tooltipWindow.SetUnitishTooltip(nil, nil, thingID, thingDefID, false, nil, nil, nil, nil, requiredOnly)
 						return true
 					end
 				end
