@@ -291,6 +291,9 @@ local function SetupUnit(unitDef, unitID)
 						if weaponDef.customParams.truerange then
 							retDgunInfo.range = tonumber(weaponDef.customParams.truerange)
 						end
+						if weaponDef.customParams.gui_draw_range then
+							retDgunInfo.range = tonumber(weaponDef.customParams.gui_draw_range)
+						end
 						if rangeMult then
 							retDgunInfo.range = retDgunInfo.range * rangeMult
 						end
@@ -307,6 +310,9 @@ local function SetupUnit(unitDef, unitID)
 
 	if (maxWeaponDef) then 
 		retAoeInfo = getWeaponInfo(maxWeaponDef, unitDef)
+		if maxWeaponDef.customParams.gui_draw_range then
+			retAoeInfo.range = tonumber(maxWeaponDef.customParams.gui_draw_range)
+		end
 		if retAoeInfo.range and rangeMult then
 			retAoeInfo.range = retAoeInfo.range * rangeMult
 		end
