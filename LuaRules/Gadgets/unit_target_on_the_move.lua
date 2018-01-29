@@ -146,7 +146,7 @@ local function setTarget(data, sendToWidget)
 				spSetUnitRulesParam(data.id,"target_z",data.z)
 			end
 		elseif spValidUnitID(data.targetID) and (data.allyAllowed or (spGetUnitAllyTeam(data.targetID) ~= data.allyTeam)) then
-			if (not Spring.GetUnitIsCloaked(data.targetID)) and unitInRange(data.id, data.targetID, data.range) then
+			if (not Spring.GetUnitIsCloaked(data.targetID)) and unitInRange(data.id, data.targetID, data.range) and (data.id ~= data.targetID) then
 				spSetUnitTarget(data.id, data.targetID)
 			end
 			if sendToWidget then
