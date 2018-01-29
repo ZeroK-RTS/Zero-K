@@ -16,6 +16,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 -5]],
   collisionVolumeScales  = [[55 15 70]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[80 25 80]],
+  selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
   cruiseAlt           = 180,
 

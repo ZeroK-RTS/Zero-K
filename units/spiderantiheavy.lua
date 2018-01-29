@@ -13,6 +13,9 @@ unitDef = {
   category              = [[LAND]],
   cloakCost             = 4,
   cloakCostMoving       = 12,
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                = [[DEAD]],
 
   customParams          = {

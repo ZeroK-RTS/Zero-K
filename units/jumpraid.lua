@@ -11,6 +11,9 @@ unitDef = {
   canMove               = true,
   canPatrol             = true,
   category              = [[LAND FIREPROOF]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                = [[DEAD]],
 
   customParams          = {

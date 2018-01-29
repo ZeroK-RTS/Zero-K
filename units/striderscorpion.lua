@@ -15,7 +15,7 @@ unitDef = {
   cloakCost              = 2,
   cloakCostMoving        = 10,
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[85 85 85]],
+  selectionVolumeScales  = [[75 75 75]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 

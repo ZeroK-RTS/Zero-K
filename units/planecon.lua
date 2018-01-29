@@ -7,6 +7,9 @@ unitDef = {
   brakeRate           = 0.08,
   buildCostMetal      = 220,
   buildDistance       = 160,
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeType    = [[ellipsoid]], 
   builder             = true,
 
   buildoptions        = {

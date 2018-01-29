@@ -601,11 +601,11 @@ local function Explode(div, str)
 	return arr
 end
 
-local function GetDimensions(ud)
-	if not ud.collisionvolumescales then
+local function GetDimensions(scale)
+	if not scale then
 		return false
 	end
-	local dimensions = Explode(" ", ud.collisionvolumescales)
+	local dimensions = Explode(" ", scale)
 	local largest = (dimensions and dimensions[1] and tonumber(dimensions[1])) or 0
 	for i = 2, 3 do
 		largest = math.max(largest, (dimensions and dimensions[i] and tonumber(dimensions[i])) or 0)
@@ -614,32 +614,52 @@ local function GetDimensions(ud)
 end
 
 local VISUALIZE_SELECTION_VOLUME = false
-local CYL_SCALE = 1.4
+local CYL_SCALE = 1.1
+local CYL_LENGTH = 0.8
 local CYL_ADD = 5
+local SEL_SCALE = 1.35
 
 for name, ud in pairs(UnitDefs) do
-	if ud.collisionvolumescales and not ud.selectionvolumescales then
+	if ud.collisionvolumescales or ud.selectionvolumescales then
 		-- Do not override default colvol because it is hard to measure.
-		if ud.acceleration and ud.acceleration > 0 and not ud.canfly and ud.canmove then
-			local size = math.max(ud.footprintx or 0, ud.footprintz or 0)*15
-			if size > 0 then
-				local dimensions, largest = GetDimensions(ud)
-				if size > largest then
-					ud.selectionvolumeoffsets = "0 0 0"
-					ud.selectionvolumescales  = size .. " " .. size .. " " .. size
-					ud.selectionvolumetype    = "ellipsoid"
-				elseif string.lower(ud.collisionvolumetype) == "cylx" then
-					ud.selectionvolumeoffsets = ud.collisionvolumeoffsets or "0 0 0"
-					ud.selectionvolumescales  = dimensions[1] .. " " .. math.max(dimensions[2], math.min(size, CYL_ADD + math.ceil(dimensions[2]*CYL_SCALE))) .. " " .. math.max(dimensions[3], math.min(size, CYL_ADD + math.ceil(dimensions[3]*CYL_SCALE)))
-					ud.selectionvolumetype    = ud.collisionvolumetype
-				elseif string.lower(ud.collisionvolumetype) == "cyly" then
-					ud.selectionvolumeoffsets = ud.collisionvolumeoffsets or "0 0 0"
-					ud.selectionvolumescales  = math.max(dimensions[1], math.min(size, CYL_ADD + math.ceil(dimensions[1]*CYL_SCALE))) .. " " .. dimensions[2] .. " " .. math.max(dimensions[3], math.min(size, CYL_ADD + math.ceil(dimensions[3]*CYL_SCALE)))
-					ud.selectionvolumetype    = ud.collisionvolumetype
-				elseif string.lower(ud.collisionvolumetype) == "cylz" then
-					ud.selectionvolumeoffsets = ud.collisionvolumeoffsets or "0 0 0"
-					ud.selectionvolumescales  = math.max(dimensions[1], math.min(size, CYL_ADD + math.ceil(dimensions[1]*CYL_SCALE))) .. " " .. math.max(dimensions[2], math.min(size, CYL_ADD + math.ceil(dimensions[2]*CYL_SCALE))) .. " " .. dimensions[3]
-					ud.selectionvolumetype    = ud.collisionvolumetype
+		if ud.acceleration and ud.acceleration > 0 and ud.canmove then
+			if ud.selectionvolumescales then
+				local dim = GetDimensions(ud.selectionvolumescales)
+				ud.selectionvolumescales  = math.ceil(dim[1]*SEL_SCALE) .. " " .. math.ceil(dim[2]*SEL_SCALE) .. " " .. math.ceil(dim[3]*SEL_SCALE)
+			else
+				local size = math.max(ud.footprintx or 0, ud.footprintz or 0)*15
+				if size > 0 then
+					local dimensions, largest = GetDimensions(ud.collisionvolumescales)
+					local x, y, z = size, size, size
+					if size > largest then
+						ud.selectionvolumeoffsets = "0 0 0"
+						ud.selectionvolumetype    = "ellipsoid"
+					elseif string.lower(ud.collisionvolumetype) == "cylx" then
+						ud.selectionvolumeoffsets = ud.collisionvolumeoffsets or "0 0 0"
+						x = dimensions[1]*CYL_LENGTH
+						y = math.max(dimensions[2], math.min(size, CYL_ADD + dimensions[2]*CYL_SCALE))
+						z = math.max(dimensions[3], math.min(size, CYL_ADD + dimensions[3]*CYL_SCALE))
+						ud.selectionvolumetype    = ud.collisionvolumetype
+					elseif string.lower(ud.collisionvolumetype) == "cyly" then
+						ud.selectionvolumeoffsets = ud.collisionvolumeoffsets or "0 0 0"
+						x = math.max(dimensions[1], math.min(size, CYL_ADD + dimensions[1]*CYL_SCALE))
+						y = dimensions[2]*CYL_LENGTH
+						z = math.max(dimensions[3], math.min(size, CYL_ADD + dimensions[3]*CYL_SCALE))
+						ud.selectionvolumetype    = ud.collisionvolumetype
+					elseif string.lower(ud.collisionvolumetype) == "cylz" then
+						ud.selectionvolumeoffsets = ud.collisionvolumeoffsets or "0 0 0"
+						x = math.max(dimensions[1], math.min(size, CYL_ADD + dimensions[1]*CYL_SCALE))
+						y = math.max(dimensions[2], math.min(size, CYL_ADD + dimensions[2]*CYL_SCALE))
+						z = dimensions[3]*CYL_LENGTH
+						ud.selectionvolumetype    = ud.collisionvolumetype
+					elseif string.lower(ud.collisionvolumetype) == "box" then
+						ud.selectionvolumeoffsets = "0 0 0"
+						x = dimensions[1]
+						y = dimensions[2]
+						z = dimensions[3]
+						ud.selectionvolumetype    = ud.collisionvolumetype
+					end
+					ud.selectionvolumescales  = math.ceil(x*SEL_SCALE) .. " " .. math.ceil(y*SEL_SCALE) .. " " .. math.ceil(z*SEL_SCALE)
 				end
 			end
 		end

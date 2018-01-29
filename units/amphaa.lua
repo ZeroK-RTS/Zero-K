@@ -11,6 +11,9 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND SINK]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeType    = [[ellipsoid]], 
   corpse                 = [[DEAD]],
 
   customParams           = {
