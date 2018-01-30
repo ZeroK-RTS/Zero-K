@@ -794,7 +794,7 @@ function widget:Update()
 		Spring.SendCommands("forcestart")
 	end
 	if firstUpdates then
-		if TakeMouseOffEdge() then
+		if TakeMouseOffEdge() and WG.ZoomToStart then
 			WG.ZoomToStart()
 		end
 		firstUpdates = firstUpdates + 1
