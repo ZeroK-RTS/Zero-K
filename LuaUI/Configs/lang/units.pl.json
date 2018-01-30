@@ -997,7 +997,7 @@
     "amphimpulse": {
         "name": "Archer",
         "description": "Lekki amfibijny bot wsparcia",
-        "helptext": "Archer używa strumienia wody do walki. W miarę strzelania, opróżnia się jego zbiornik wody pod ciśnieniem, co skutkuje zmniejszeniem zasięgu i siły ataku. Zbiorniki można ponownie napełnić stojąc w wodzie. Archer jest w stanie wynurzyć się, by walczyć z jednostkami na powierzchni wody."
+        "helptext": "Archer używa strumienia wody do walki. Archer jest w stanie wynurzyć się, by walczyć z jednostkami na powierzchni wody."
     },
     "jumpscout": {
         "name": "Puppy",
