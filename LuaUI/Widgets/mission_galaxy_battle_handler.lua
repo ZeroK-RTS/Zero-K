@@ -702,9 +702,9 @@ local function SendMissionResult(shutdown)
 	end
 	missionResultSent = true
 	
-	local campaignSaveName = Spring.GetModOptions().singleplayercampaignsavename
-	if campaignSaveName and campaignSaveName ~= "" then
-		Spring.SendLuaMenuMsg(LOAD_CAMPAIGN_MESSAGE .. campaignSaveName)
+	local campaignPartialSaveData = Spring.GetModOptions().campaignpartialsavedata
+	if campaignPartialSaveData and campaignPartialSaveData ~= "" then
+		Spring.SendLuaMenuMsg(LOAD_CAMPAIGN_MESSAGE .. campaignPartialSaveData)
 	end
 	
 	if bonusObjectiveBlock then
