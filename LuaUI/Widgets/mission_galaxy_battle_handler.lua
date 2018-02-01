@@ -781,6 +781,11 @@ function widget:MousePress(x, y, button)
 	end
 end
 
+local function SingleplayerMode()
+	local playerList = Spring.GetPlayerList()
+	return #playerList == 1
+end
+
 function widget:Update()
 	if missionSustainedTime then
 		local x, y, _, _, _, outsideSpring = spGetMouseState()
@@ -790,7 +795,7 @@ function widget:Update()
 			mouseOver = false
 		end
 	end
-	if gameNotStarted then
+	if gameNotStarted and SingleplayerMode() then
 		Spring.SendCommands("forcestart")
 	end
 	if firstUpdates then
