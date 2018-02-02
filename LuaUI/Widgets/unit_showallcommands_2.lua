@@ -187,15 +187,15 @@ end
 local drawList = 0
 
 local function GetDrawLevel()
-	local shift = select(4,spGetModKeyState())
+	local ahiftHeld = select(4,spGetModKeyState())
 	if commandLevel == 1 then
-		return shift, false
+		return ahiftHeld, false
 	elseif commandLevel == 2 then
-		return false, shift
+		return false, ahiftHeld
 	elseif commandLevel == 3 then
 		return true, false
 	elseif commandLevel == 4 then
-		return true, shift
+		return true, ahiftHeld
 	else -- commandLevel == 5
 		return true, true
 	end
@@ -244,7 +244,7 @@ local function drawUnitCommands(unitID)
 end
 
 local function updateDrawing()
-	local drawSelected, drawAll = GetDrawLevel(commandLevel, shift)
+	local drawSelected, drawAll = GetDrawLevel()
 	if drawAll then
 		local count = drawUnit.count
 		local units = drawUnit.data
@@ -253,16 +253,19 @@ local function updateDrawing()
 		end
 	elseif drawSelected then
 		local sel = selectedUnits
+		local alreadyDrawn = {}
 		for i = 1, selectedUnitCount do
 			drawUnitCommands(sel[i])
+			alreadyDrawn[sel[i]] = true
 		end
 		if options.includeallies.value then
 			local count = drawUnit.count
 			local units = drawUnit.data
 			for i = 1, count do
 				local unitID = units[i]
-				if WG.allySelUnits[unitID] then
+				if WG.allySelUnits[unitID] and not alreadyDrawn[sel[i]] then
 					drawUnitCommands(unitID)
+					alreadyDrawn[sel[i]] = true
 				end
 			end
 		end
@@ -312,14 +315,14 @@ function widget:PlayerChanged(playerID)
 	end
 end
 
-function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	if (options.includeneutral.value or unitTeam ~= gaiaTeamID) and (teamID == myTeamID or options.includealliesunits.value) then
+function widget:UnitCreated(unitID, unitDefID, teamID)
+	if (options.includeneutral.value or teamID ~= gaiaTeamID) and (teamID == myTeamID or options.includealliesunits.value) then
 		AddUnit(unitID)
 	end
 end
 
-function widget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
-	if (options.includeneutral.value or unitTeam ~= gaiaTeamID) and (teamID == myTeamID or options.includealliesunits.value) then
+function widget:UnitGiven(unitID, unitDefID, newTeamID, oldTeamID)
+	if (options.includeneutral.value or newTeamID ~= gaiaTeamID) and (newTeamID == myTeamID or options.includealliesunits.value) then
 		AddUnit(unitID)
 	else
 		RemoveUnit(unitID)

@@ -109,13 +109,17 @@ local forceUpdate = false
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 options_path = 'Settings/Interface/Selection/Selection Shapes'
-options_order = {'showally', 'showallyplayercolours', 'showhover', 'showinselectionbox', 'animatehover', 'animateselectionbox'} 
+options_order = {'allyselectionlevel', 'showallyplayercolours', 'showhover', 'showinselectionbox', 'animatehover', 'animateselectionbox'} 
 options = {
-	showally = {
+	allyselectionlevel = {
 		name = 'Show Ally Selections',
-		desc = 'Highlight the units your allies currently have selected.', 
-		type = 'bool',
-		value = false,
+		type = 'radioButton',
+		items = {
+			{name = 'Enabled',key='enabled', desc="Show selected unit of allies."},
+			{name = 'Commshare Only',key='commshare', desc="Show when sharing unit control."},
+			{name = 'Disabled',key='disabled', desc="Do not show any allied selection."},
+		},
+		value = 'commshare',
 		OnChange = function(self) 
 			forceUpdate = true
 			visibleAllySelUnits = {}
@@ -223,6 +227,17 @@ local function HasVisibilityChanged()
 	return false
 end
 
+local function ShowAllySelection(unitID, myTeamID)
+	if options.allyselectionlevel.value == "disabled" or (not WG.allySelUnits[unitID]) then
+		return false
+	end
+	if options.allyselectionlevel.value == "enabled" then
+		return true
+	end
+	local teamID = Spring.GetUnitTeam(unitID)
+	return teamID == myTeamID
+end
+
 local function GetVisibleUnits()
 	local visibleBoxed = {}
 	if options.showinselectionbox.value then
@@ -234,9 +249,9 @@ local function GetVisibleUnits()
 				local unitID = units[i]
 				if boxedUnitsIDs[units[i]] and not WG.drawtoolKeyPressed then
 					visibleBoxed[#visibleBoxed+1] = boxedUnits[boxedUnitsIDs[unitID]]
-	      end
-	    end
-	  end
+				end
+			end
+		end
 
 		lastBoxedUnits = boxedUnits
 		lastBoxedUnitsIDs = boxedUnitsIDs
@@ -247,13 +262,15 @@ local function GetVisibleUnits()
 		--local visibleUnits = {}
 		local visibleAllySelUnits = {}
 		local visibleSelected = {}
+		local myTeamID = Spring.GetMyTeamID()
 		
-		for i=1, #units do
+		for i = 1, #units do
 			local unitID = units[i]
 			if (spIsUnitSelected(unitID)) then
 				visibleSelected[#visibleSelected+1] = {unitID = unitID}
 			end
-			if options.showally.value and WG.allySelUnits[unitID] then
+			
+			if ShowAllySelection(unitID, myTeamID) then 
 				local teamIDIndex = Spring.GetUnitTeam(unitID)
 				if teamIDIndex then --Possible nil check failure if unit is destroyed while selected
 					teamIDIndex = teamIDIndex+1
