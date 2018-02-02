@@ -994,7 +994,7 @@ local function SetBuildOptions(unitID, unitDefID, teamID)
 			local buildoptions = ud.buildOptions
 			for i = 1, #buildoptions do
 				local opt = buildoptions[i]
-				if not (unlockedUnits[opt] or (origUnlocks and origUnlocks[opt]))then
+				if not ((unlockedUnits and unlockedUnits[opt]) or (origUnlocks and origUnlocks[opt]))then
 					RemoveUnit(unitID, opt)
 				else
 					AddUnit(unitID, opt)
