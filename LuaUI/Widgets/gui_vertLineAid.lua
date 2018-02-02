@@ -41,7 +41,7 @@ options = {
 		name = 'Show for enemy underwater',
 		desc = 'Draw a line perpendicular to the surface for enemy submerged units',
 		type = 'radioButton',
-		value = 'always',
+		value = 'radar',
 		items = {
 			{key ='always', name='Always'},
 			{key ='radar',  name='In radar, not in sight'},
@@ -53,7 +53,7 @@ options = {
 		name = 'Show for allied units',
 		desc = 'Draw the lines for allied units',
 		type = 'radioButton',
-		value = 'water',
+		value = 'never',
 		items = {
 			{key ='always', name='Aircraft and Underwater'},
 			{key ='air',    name='Aircraft'},
