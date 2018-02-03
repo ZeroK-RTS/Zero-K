@@ -1841,10 +1841,6 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		if unitDefID then
 			ud = UnitDefs[unitDefID]
-			if not ud then
-				Spring.Echo("LUA_ERRRUN: invalid unitDefID", unitDefID, debug.traceback()) -- see #2570
-				ud = UnitDefNames.fakeunit
-			end
 			
 			unitImage.file = "#" .. unitDefID
 			unitImage.file2 = GetUnitBorder(unitDefID)
@@ -2170,13 +2166,14 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 		local ignoreDelay = holdingSpace or (options.independant_world_tooltip_delay.value == 0)
 		if ignoreDelay or (thingID == sameObjectID) then
 			if ignoreDelay or (sameObjectIDTime > options.independant_world_tooltip_delay.value) then
-				local thingDefID = (thingIsUnit and Spring.GetUnitDefID(thingID)) or Spring.GetFeatureDefID(thingID)
 				if thingIsUnit then
+					local thingDefID = Spring.GetUnitDefID(thingID)
 					if ShowUnitCheck(holdingSpace) then
 						tooltipWindow.SetUnitishTooltip(thingID, thingDefID, nil, nil, false, nil, nil, nil, nil, requiredOnly)
 						return true
 					end
 				else
+					local thingDefID = Spring.GetFeatureDefID(thingID)
 					if ShowFeatureCheck(holdingSpace, thingDefID) then
 						tooltipWindow.SetUnitishTooltip(nil, nil, thingID, thingDefID, false, nil, nil, nil, nil, requiredOnly)
 						return true
