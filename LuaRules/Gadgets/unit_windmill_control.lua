@@ -12,7 +12,7 @@ function gadget:GetInfo()
 		author   = "quantum",
 		date     = "June 29, 2007",
 		license  = "GNU GPL, v2 or later",
-		layer    = 0,
+		layer    = 2, -- after `start_waterlevel.lua` (for map height adjustment)
 		enabled  = true -- loaded by default?
 	}
 end
@@ -192,9 +192,10 @@ function gadget:Initialize()
 	Spring.SetGameRulesParam("WindHeading", 0)
 	Spring.SetGameRulesParam("WindStrength", 0)
 	Spring.SetGameRulesParam("tidalHeight", tidalHeight)
-	
+
 	groundMin, groundMax = Spring.GetGroundExtremes()
-	groundMin, groundMax = math.max(groundMin,0), math.max(groundMax,1)
+	local waterlevel = Spring.GetGameRulesParam("waterlevel")
+	groundMin, groundMax = math.max(groundMin - waterlevel,0), math.max(groundMax - waterlevel,1)
 	groundExtreme = groundMax - groundMin
 	if groundExtreme < 1 then
 		groundExtreme = 1
