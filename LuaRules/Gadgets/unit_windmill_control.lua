@@ -156,10 +156,7 @@ local function SetupUnit(unitID)
 	spSetUnitRulesParam(unitID, "isWind", 1, inlosTrueTable)
 	
 	local altitude = (y - groundMin)/groundExtreme
-	scriptIDs.alt = altitude*slope
-	if (scriptIDs.alt > 1) then
-		scriptIDs.alt = 1
-	end
+	scriptIDs.alt = math.max(0, math.min(1, altitude*slope))
 
 	local unitDef = UnitDefs[unitDefID]
 	spSetUnitRulesParam(unitID,"minWind",windMin+windRange*scriptIDs.alt, inlosTrueTable)
