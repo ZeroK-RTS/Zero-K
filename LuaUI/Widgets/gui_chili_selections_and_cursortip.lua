@@ -708,9 +708,9 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 					income = tidalStrength
 					healthOverride = 400
 				else
-					local minWindIncome = windMin + (windMax - windMin)*windGroundSlope*(y - windGroundMin)/windGroundExtreme
+					local minWindIncome = windMin + (windMax - windMin)*math.max(0, math.min(1, windGroundSlope*(y - windGroundMin)/windGroundExtreme))
 					extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax)
-					income = (minWindIncome+2.5)/2
+					income = (minWindIncome+windMax)/2
 				end
 			end
 		end
