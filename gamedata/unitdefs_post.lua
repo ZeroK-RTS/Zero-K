@@ -224,18 +224,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Experiment with expensive factories
---
-
-local FACTORY_COST = 1000
-for name, ud in pairs (UnitDefs) do
-	if string.find(name, "factory") or string.find(name, "striderhub") then
-		ud.buildcostmetal = FACTORY_COST
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- UnitDefs Dont Repeat Yourself
 --
 local BP2RES = 0.03
