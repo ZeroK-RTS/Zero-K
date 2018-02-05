@@ -33,7 +33,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if unitDefsToModify[unitDefID] then
 		for weaponNum, reaimTime in pairs(unitDefsToModify[unitDefID]) do
-			Spring.SetUnitWeaponState(unitID, weaponNum, {reaimTime = 1})
+			Spring.SetUnitWeaponState(unitID, weaponNum, {reaimTime = reaimTime})
 		end
 	end
 end
