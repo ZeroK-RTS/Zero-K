@@ -112,6 +112,16 @@ function onWater()
 	return false
 end
 
+function NonBlockingWaitTurn(piece, axis, angle, leeway)
+	local rot = select(axis, Spring.UnitScript.GetPieceRotation(piece))
+	leeway = leeway or 0.1
+	
+	angle = (angle - rot)%tau
+	if angle > leeway and angle < tau - leeway then
+		WaitForTurn(piece, axis)
+	end
+end
+
 local function noFunc()
 end
 

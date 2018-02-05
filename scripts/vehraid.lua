@@ -24,8 +24,8 @@ local SIG_AIM = 1
 local ANIM_SPEED = 50
 local RESTORE_DELAY = 2000
 
-local TURRET_TURN_SPEED = 220
-local SLEEVE_TURN_SPEED = 70
+local TURRET_TURN_SPEED = math.rad(220)
+local SLEEVE_TURN_SPEED = math.rad(70)
 
 local SUSPENSION_BOUND = 6
 local WHEEL_TURN_MULT = 3
@@ -162,10 +162,10 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	
-	Turn(turret, y_axis, heading, math.rad(TURRET_TURN_SPEED))
-	Turn(sleeve, x_axis, -pitch, math.rad(SLEEVE_TURN_SPEED))
-	WaitForTurn(turret, y_axis)
-	WaitForTurn(sleeve, y_axis)
+	Turn(turret, y_axis, heading, TURRET_TURN_SPEED)
+	Turn(sleeve, x_axis, -pitch, SLEEVE_TURN_SPEED)
+	NonBlockingWaitTurn(turret, y_axis, heading, TURRET_TURN_SPEED/30)
+	NonBlockingWaitTurn(sleeve, x_axis, -pitch, SLEEVE_TURN_SPEED/30)
 	StartThread(RestoreAfterDelay)
 
 	return (true)
