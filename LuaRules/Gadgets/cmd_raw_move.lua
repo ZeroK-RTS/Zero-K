@@ -673,9 +673,11 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
-	rawMoveUnit[unitID] = nil
-	if constructorBuildDistDefs[unitDefID] and constructorByID[unitID] then
-		RemoveConstructor(unitID)
+	if unitID then
+		rawMoveUnit[unitID] = nil
+		if unitDefID and constructorBuildDistDefs[unitDefID] and constructorByID[unitID] then
+			RemoveConstructor(unitID)
+		end
 	end
 end
 

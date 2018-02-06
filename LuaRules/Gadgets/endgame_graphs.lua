@@ -198,7 +198,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	end
 end
 
-local function RegenerateNanoframeValues ()
+local function RegenerateNanoframeValues()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		partialNanoValueByTeam[teamID] = 0
@@ -210,8 +210,10 @@ local function RegenerateNanoframeValues ()
 		local fullCost = nanoframeCosts[i]
 
 		local buildProgress = select(5, spGetUnitHealth(unitID))
-		local cost = fullCost * buildProgress
-		partialNanoValueByTeam[teamID] = partialNanoValueByTeam[teamID] + cost
+		if buildProgress then
+			local cost = fullCost * buildProgress
+			partialNanoValueByTeam[teamID] = partialNanoValueByTeam[teamID] + cost
+		end
 	end
 end
 
