@@ -74,12 +74,12 @@ end
 local function RestoreLegs()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
-	restoreLegs(leg1, leg2, leg3, leg4, leg5, leg6,
-		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)			
+	restoreLegs(leg1, leg2, leg3, leg4, leg5, leg6, legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)			
 end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
+	Spring.SetUnitWeaponState(unitID, 1, "projectileSpeed", 10)
 end
 
 function script.StartMoving()

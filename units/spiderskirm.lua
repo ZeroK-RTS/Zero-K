@@ -82,6 +82,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[recluse_missile.s3o]],
       noSelfDamage            = true,
+      predictBoost            = 0.75,
       range                   = 570,
       reloadtime              = 4,
       smokeTrail              = true,
