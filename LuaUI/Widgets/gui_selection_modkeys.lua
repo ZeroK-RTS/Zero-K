@@ -99,7 +99,7 @@ local function SelectUnits(unitList)
 	spSelectUnitArray(newSelectedUnits)
 end
 
-local function HandleUnitSelection(targetID)
+local function HandleUnitSelection(targetID, needSelection)
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	
 	local unitDefID = Spring.GetUnitDefID(targetID)
@@ -125,7 +125,11 @@ local function HandleUnitSelection(targetID)
 	elseif shift then
 		if clickSelected then
 			DeselectUnits({targetID})
+		elseif needSelection then
+			SelectUnits({targetID})
 		end
+	elseif needSelection then
+		SelectUnits({targetID})
 	end
 end
 
@@ -178,13 +182,14 @@ local function MouseRelease(x, y)
 	end
 	
 	local targetID = WG.PreSelection_GetUnitUnderCursor(true)
-	if not (targetID == clickUnitID) then
-		Reset()
-		return
+	local needSelection = false
+	if (not targetID) then
+		needSelection = true
+		targetID = clickUnitID
 	end
 	
 	prevTargetID = targetID
-	HandleUnitSelection(targetID)
+	HandleUnitSelection(targetID, needSelection)
 	Reset()
 end
 
