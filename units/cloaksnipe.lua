@@ -61,7 +61,7 @@ unitDef = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2600,
+  turnRate               = 2200,
   upright                = true,
 
   weapons                = {
