@@ -79,6 +79,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams        = {
+        reaim_time = 5, -- COB
+      },
+
       damage                  = {
         default = 320,
         planes  = 320,

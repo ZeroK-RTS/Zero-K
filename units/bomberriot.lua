@@ -88,6 +88,7 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams        	  = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
 	    setunitsonfire = "1",
 		burntime = 300,
 	  },

@@ -83,6 +83,8 @@ unitDef = {
       craterMult              = 0.1,
 	  
 	  customParams            = {
+        reaim_time = 15, -- Some sort of bug prevents firing.
+		
 	    gatherradius     = [[240]],
 	    smoothradius     = [[120]],
 		smoothmult       = [[0.4]],

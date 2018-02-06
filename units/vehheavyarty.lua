@@ -74,6 +74,7 @@ unitDef = {
       craterMult              = 2,
 
 	  customParams        = {
+        reaim_time = 15, -- Some script bug. It does not need fast aim updates anyway.
 		light_camera_height = 2500,
 		light_color = [[1 0.8 0.2]],
 	  },

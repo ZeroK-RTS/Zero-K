@@ -79,6 +79,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
         disarmDamageMult = 1,
         disarmDamageOnly = 1,
         disarmTimer      = 16, -- seconds

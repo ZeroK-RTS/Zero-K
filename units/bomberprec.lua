@@ -93,6 +93,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams        	  = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
+	  },
+
       damage                  = {
         default = 0,
       },
@@ -123,6 +127,7 @@ unitDef = {
 	  cylinderTargeting	      = 1,
 
 	  customParams        	  = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
 		light_color = [[1.1 0.9 0.45]],
 		light_radius = 220,
 	  },
@@ -172,6 +177,10 @@ unitDef = {
 	  collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
+
+	  customParams        	  = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
+	  },
 
       damage                  = {
         default = -1E-06,

@@ -62,8 +62,8 @@ local function Walk()
 	Turn(lshin, x_axis, 0)
 	Turn(lfoot, x_axis, math.rad(-16.868132))
 	if not aiming then
-		--Move(chest, y_axis, 0)
-		--Turn(chest, y_axis, math.rad(-9.137363))
+		Move(chest, y_axis, 0)
+		Turn(chest, y_axis, math.rad(-9.137363))
 		Turn(head, y_axis, math.rad(9.835165))
 	end
 	
@@ -86,8 +86,8 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(10), math.rad(215) * speedMult)
 		Turn(lfoot, x_axis, math.rad(-10), math.rad(136) * speedMult)
 		if not aiming then
-			--Move(chest, y_axis, -0.119989, 2 * speedMult)
-			--Turn(chest, y_axis, math.rad(-7), math.rad(35) * speedMult)
+			Move(chest, y_axis, -0.119989, 2 * speedMult)
+			Turn(chest, y_axis, math.rad(-7), math.rad(35) * speedMult)
 			Turn(head, y_axis, math.rad(7), math.rad(43) * speedMult)
 		end
 		Sleep(49 / speedMult)
@@ -103,8 +103,8 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(21), math.rad(215) * speedMult)
 		Turn(lfoot, x_axis, math.rad(-3), math.rad(136) * speedMult)
 		if not aiming then
-			--Move(chest, y_axis, -0.239990, 2 * speedMult)
-			--Turn(chest, y_axis, math.rad(-5), math.rad(35) * speedMult)
+			Move(chest, y_axis, -0.239990, 2 * speedMult)
+			Turn(chest, y_axis, math.rad(-5), math.rad(35) * speedMult)
 			Turn(head, y_axis, math.rad(5), math.rad(43) * speedMult)
 		end
 		Sleep(49 / speedMult)
@@ -120,8 +120,8 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(27.005495), math.rad(163) * speedMult)
 		Turn(lfoot, x_axis, math.rad(-10), math.rad(163) * speedMult)
 		if not aiming then
-			--Move(chest, y_axis, 0.50, 7 * speedMult)
-			--Turn(chest, y_axis, math.rad(-3), math.rad(46) * speedMult)
+			Move(chest, y_axis, 0.50, 7 * speedMult)
+			Turn(chest, y_axis, math.rad(-3), math.rad(46) * speedMult)
 			Turn(head, y_axis, math.rad(3), math.rad(54) * speedMult)
 		end
 		Sleep(42 / speedMult)
@@ -137,8 +137,8 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(34.005495), math.rad(152) * speedMult)
 		Turn(lfoot, x_axis, math.rad(-17), math.rad(152) * speedMult)
 		if not aiming then
-			--Move(chest, y_axis, 0.35, 6 * speedMult)
-			--Turn(chest, y_axis, math.rad(-1), math.rad(42) * speedMult)
+			Move(chest, y_axis, 0.35, 6 * speedMult)
+			Turn(chest, y_axis, math.rad(-1), math.rad(42) * speedMult)
 			Turn(head, y_axis, math.rad(1), math.rad(50) * speedMult)
 		end
 		Sleep(45 / speedMult)
@@ -151,8 +151,8 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(23.005495), math.rad(158) * speedMult)
 		Turn(lfoot, x_axis, math.rad(-12), math.rad(69) * speedMult)
 		if not aiming then
-			--Move(chest, y_axis, 0.169989, 2 * speedMult)
-			--Turn(chest, y_axis, math.rad(2), math.rad(54) * speedMult)
+			Move(chest, y_axis, 0.169989, 2 * speedMult)
+			Turn(chest, y_axis, math.rad(2), math.rad(54) * speedMult)
 			Turn(head, y_axis, math.rad(-2), math.rad(44) * speedMult)
 		end
 		Sleep(71 / speedMult)
@@ -165,8 +165,8 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(12), math.rad(156) * speedMult)
 		Turn(lfoot, x_axis, math.rad(-7), math.rad(68) * speedMult)
 		if not aiming then
-			--Move(chest, y_axis, 0, 2 * speedMult)
-			--Turn(chest, y_axis, math.rad(5), math.rad(53) * speedMult)
+			Move(chest, y_axis, 0, 2 * speedMult)
+			Turn(chest, y_axis, math.rad(5), math.rad(53) * speedMult)
 			Turn(head, y_axis, math.rad(-5), math.rad(43) * speedMult)
 		end
 		Sleep(72 / speedMult)
@@ -180,7 +180,7 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(14), math.rad(26) * speedMult)
 		Turn(lfoot, x_axis, math.rad(-16), math.rad(100) * speedMult)
 		if not aiming then
-			--Turn(chest, y_axis, math.rad(7), math.rad(18) * speedMult)
+			Turn(chest, y_axis, math.rad(7), math.rad(18) * speedMult)
 			Turn(head, y_axis, math.rad(-7), math.rad(22) * speedMult)
 		end
 		Sleep(93 / speedMult)
@@ -194,7 +194,7 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(17), math.rad(25) * speedMult)
 		Turn(lfoot, x_axis, math.rad(-26.005495), math.rad(98) * speedMult)
 		if not aiming then
-			--Turn(chest, y_axis, math.rad(9), math.rad(18) * speedMult)
+			Turn(chest, y_axis, math.rad(9), math.rad(18) * speedMult)
 			Turn(head, y_axis, math.rad(-9), math.rad(22) * speedMult)
 		end
 		Sleep(95 / speedMult)
@@ -210,8 +210,8 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(13), math.rad(78) * speedMult)
 		Turn(lfoot, x_axis, math.rad(-9), math.rad(344) * speedMult)
 		if not aiming then
-			--Move(chest, y_axis, -0.119989, 2 * speedMult)
-			--Turn(chest, y_axis, math.rad(7), math.rad(39) * speedMult)
+			Move(chest, y_axis, -0.119989, 2 * speedMult)
+			Turn(chest, y_axis, math.rad(7), math.rad(39) * speedMult)
 			Turn(head, y_axis, math.rad(-7), math.rad(35) * speedMult)
 		end
 		Sleep(49 / speedMult)
@@ -227,8 +227,8 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(9), math.rad(78) * speedMult)
 		Turn(lfoot, x_axis, math.rad(7), math.rad(344) * speedMult)
 		if not aiming then
-			--Move(chest, y_axis, -0.239990, 2 * speedMult)
-			--Turn(chest, y_axis, math.rad(5), math.rad(39) * speedMult)
+			Move(chest, y_axis, -0.239990, 2 * speedMult)
+			Turn(chest, y_axis, math.rad(5), math.rad(39) * speedMult)
 			Turn(head, y_axis, math.rad(-5), math.rad(35) * speedMult)
 		end
 		Sleep(49 / speedMult)
@@ -244,8 +244,8 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(7), math.rad(52) * speedMult)
 		Turn(lfoot, x_axis, math.rad(3), math.rad(82) * speedMult)
 		if not aiming then
-			--Move(chest, y_axis, 0.50, 6 * speedMult)
-			--Turn(chest, y_axis, math.rad(3), math.rad(37) * speedMult)
+			Move(chest, y_axis, 0.50, 6 * speedMult)
+			Turn(chest, y_axis, math.rad(3), math.rad(37) * speedMult)
 			Turn(head, y_axis, math.rad(-4), math.rad(41) * speedMult)
 		end
 		Sleep(47 / speedMult)
@@ -261,8 +261,8 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(4), math.rad(51) * speedMult)
 		Turn(lfoot, x_axis, 0, math.rad(80) * speedMult)
 		if not aiming then
-			--Move(chest, y_axis, 0.35, 6 * speedMult)
-			--Turn(chest, y_axis, math.rad(2), math.rad(36) * speedMult)
+			Move(chest, y_axis, 0.35, 6 * speedMult)
+			Turn(chest, y_axis, math.rad(2), math.rad(36) * speedMult)
 			Turn(head, y_axis, math.rad(-2), math.rad(40) * speedMult)
 		end
 		Sleep(48 / speedMult)
@@ -277,8 +277,8 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(4), math.rad(2) * speedMult)
 		Turn(lfoot, x_axis, math.rad(-8), math.rad(109) * speedMult)
 		if not aiming then
-			--Move(chest, y_axis, 0.169989, 2 * speedMult)
-			--Turn(chest, y_axis, math.rad(-1), math.rad(52) * speedMult)
+			Move(chest, y_axis, 0.169989, 2 * speedMult)
+			Turn(chest, y_axis, math.rad(-1), math.rad(52) * speedMult)
 			Turn(head, y_axis, math.rad(1), math.rad(52) * speedMult)
 		end
 		Sleep(74 / speedMult)
@@ -293,8 +293,8 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(4), math.rad(2) * speedMult)
 		Turn(lfoot, x_axis, math.rad(-16), math.rad(106) * speedMult)
 		if not aiming then
-			--Move(chest, y_axis, 0, 2 * speedMult)
-			--Turn(chest, y_axis, math.rad(-5), math.rad(50) * speedMult)
+			Move(chest, y_axis, 0, 2 * speedMult)
+			Turn(chest, y_axis, math.rad(-5), math.rad(50) * speedMult)
 			Turn(head, y_axis, math.rad(5), math.rad(50) * speedMult)
 		end
 		Sleep(76 / speedMult)
@@ -309,7 +309,7 @@ local function Walk()
 		Turn(lshin, x_axis, math.rad(2), math.rad(22) * speedMult)
 		Turn(lfoot, x_axis, math.rad(-16), math.rad(3) * speedMult)
 		if not aiming then
-			--Turn(chest, y_axis, math.rad(-7), math.rad(18) * speedMult)
+			Turn(chest, y_axis, math.rad(-7), math.rad(18) * speedMult)
 			Turn(head, y_axis, math.rad(7), math.rad(22) * speedMult)
 		end
 		Sleep(94 / speedMult)
@@ -326,7 +326,7 @@ local function StopWalk()
 	Turn(lshin, x_axis, 0, math.rad(400))
 	Turn(lfoot, x_axis, 0, math.rad(400))
 	if not aiming then
-		--Turn(chest, y_axis, 0, math.rad(180))
+		Turn(chest, y_axis, 0, math.rad(180))
 		Turn(rshoulder, x_axis, 0, math.rad(400))
 		Turn(rforearm, x_axis, 0, math.rad(400))
 		Turn(lshoulder, x_axis, 0, math.rad(400))
@@ -397,17 +397,17 @@ local function RestoreAim()
 end
 
 function script.AimWeapon(num, heading, pitch)
+
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	aiming = true
-    
+
 	Turn(chest, y_axis, heading, math.rad(800))
 	Turn(rforearm, x_axis, -pitch, math.rad(600))
 	Turn(lforearm, x_axis, -pitch, math.rad(600))
-	
-	NonBlockingWaitTurn(chest, y_axis, heading, math.rad(800)/30)
-	NonBlockingWaitTurn(lforearm, x_axis, -pitch, math.rad(600)/30)
-	NonBlockingWaitTurn(rforearm, x_axis, -pitch, math.rad(600)/30)
+	WaitForTurn(chest, y_axis)
+	WaitForTurn(lforearm, x_axis)
+	WaitForTurn(rforearm, x_axis)
 	StartThread(RestoreAim)
 	return true
 end

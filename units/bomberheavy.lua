@@ -82,6 +82,7 @@ unitDef = {
       craterMult              = 2,
 
       customParams            = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
         light_color = [[1.6 0.85 0.38]],
         light_radius = 750,
       },
