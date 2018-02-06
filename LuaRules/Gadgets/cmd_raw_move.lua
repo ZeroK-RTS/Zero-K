@@ -192,6 +192,7 @@ local commonStopRadius = {}
 local oldCommandStoppingRadius = {}
 local commandCount = {}
 local oldCommandCount = {}
+local fromFactory = {}
 
 local constructors = {}
 local constructorBuildDist = {}
@@ -598,7 +599,11 @@ local function ReplaceMoveCommand(unitID)
 	local queue = spGetCommandQueue(unitID, 1)
 	local cmd = queue and queue[1]
 	if cmd and cmd.id == CMD_MOVE and cmd.params[3] then
-		Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_RAW_MOVE, 0, cmd.params[1], cmd.params[2], cmd.params[3]}, CMD.OPT_ALT)
+		if fromFactory[unitID] then
+			fromFactory[unitID] = nil
+		else
+			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_RAW_MOVE, 0, cmd.params[1], cmd.params[2], cmd.params[3]}, CMD.OPT_ALT)
+		end
 		Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmd.tag}, {})
 	end
 end
@@ -640,6 +645,10 @@ local function RawMove_IsPathFree(unitDefID, sX, sZ, gX, gZ)
 	local vX = gX - sX
 	local vZ = gZ - sZ
 	return IsPathFree(unitDefID, sX, sZ, gX, gZ, math.sqrt(vX*vX + vZ*vZ), TEST_MOVE_SPACING)
+end
+
+function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
+	fromFactory[unitID] = true
 end
 
 function gadget:Initialize()
