@@ -68,7 +68,8 @@ local FOREARM_BACK_SPEED = math.rad(40) * PACE
 local TORSO_ANGLE_MOTION = math.rad(10)
 local TORSO_SPEED_MOTION = math.rad(15)*PACE
 
-local AIM_SPEED = math.rad(210)
+local VERT_AIM_SPEED = math.rad(210)
+local AIM_SPEED = math.rad(360) -- noscope
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local bAiming, bCanAim, gun_unpacked, idleArmState = false, true, false, false
@@ -269,7 +270,7 @@ function script.AimWeapon(num, heading, pitch)
 		UnpackGun()
 	end
 	Turn(torsoPivot, y_axis, heading, AIM_SPEED)
-	Turn(torsoTrue, y_axis, 0, AIM_SPEED)
+	Turn(torsoTrue, y_axis, 0, VERT_AIM_SPEED)
 	WaitForTurn(torsoPivot, y_axis)
 	WaitForTurn(torsoTrue, y_axis)
 	WaitForTurn(shoulderr, x_axis)
