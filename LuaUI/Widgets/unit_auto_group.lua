@@ -435,7 +435,7 @@ local function UnstickUpdate(unitID, unitData)
 		widget:UnitIdle(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 		return true
 	end
-	if commands[1].id < 1000 then -- Only handle engine commands.
+	if commands[1].id == CMD.FIGHT then
 		local x, y, z = Spring.GetUnitPosition(unitID)
 		if not unitData.x then
 			unitData.x, unitData.y, unitData.z = x, y, z
