@@ -79,6 +79,14 @@ local function SetUnitDrag(unitID, drag)
 	Spring.SetUnitPhysics(unitID, ux, uy, uz, vx, vy, vz, rx, ry, rz, drag, drag, drag)
 end
 
+local GRAVITY = (Game.gravity/30/30)
+
+local FEATURE = 102
+local GROUND = 103
+local UNIT = 117
+
+local FLY_TIME = 135
+
 local throwUnits = IterableMap.New()
 local dragRestore = IterableMap.New()
 local UPDATE_PERIOD = 6
@@ -94,7 +102,18 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	end
 	
 	local _,_,_, x, y, z = Spring.GetUnitPosition(proOwnerID, true)
-	local px, py, pz = Spring.GetProjectileVelocity(proID)
+	
+	local targetType, targetPos = Spring.GetProjectileTarget(proID)
+	local tx, ty, tz
+	if targetType == GROUND then
+		tx, ty, tz = targetPos[1], targetPos[2], targetPos[3]
+	else
+		_, _, _, tx, ty, tz = Spring.GetUnitPosition(targetPos, true)
+	end
+	ty = math.max(ty, 0)
+	
+	local dx, dy, dz = tx - x, ty - y, tz - z
+	local px, py, pz = dx/FLY_TIME, FLY_TIME*GRAVITY/2 + dy/FLY_TIME, dz/FLY_TIME
 	
 	local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
 	if nearUnits then
@@ -102,11 +121,12 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 			local nearID = nearUnits[i]
 			local dragData = dragRestore and dragRestore.Get(nearID)
 			if ((not dragData) or dragData.drag > -0.4) and ValidThrowTarget(proOwnerID, nearID) then
-				GG.AddGadgetImpulseRaw(nearID, px, py, pz, true, true, nil, nil, true)
+				local vx, vy, vz = Spring.GetUnitVelocity(nearID)
+				GG.AddGadgetImpulseRaw(nearID, px - vx, py - vy, pz - vz, true, true, nil, nil, true)
 				SetUnitDrag(nearID, 0)
 				dragRestore.Add(nearID, 
 					{
-						drag = -0.6
+						drag = -1.5
 					}
 				)
 				GG.Floating_InterruptFloat(nearID)
@@ -159,12 +179,12 @@ end
 
 local function IncreaseDrag(unitID, data)
 	SetUnitDrag(unitID, math.max(0, math.min(1, data.drag)))
-	data.drag = data.drag + 0.05
+	data.drag = data.drag + 0.03
 	return data.drag >= 1 -- Return true to remove
 end
 
 function gadget:GameFrame(n)
-	if n%2 == 0 then
+	if n%1 == 0 then
 		dragRestore.Apply(IncreaseDrag)
 	end
 end
