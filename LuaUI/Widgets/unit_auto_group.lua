@@ -139,6 +139,9 @@ local createdFrame = {}
 local textColor = {0.7, 1.0, 0.7, 1.0} -- r g b alpha
 local textSize = 13.0
 
+local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
+local screwyWaypointUnits = IterableMap.New()
+
 -- gr = groupe selected/wanted
 
 -- speedups
@@ -231,14 +234,16 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 end
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam) 
-	if options.immediate.value or groupableBuildings[unitDefID] then
-		if (unitTeam == myTeam) then
+	if (unitTeam == myTeam) then
+		if options.immediate.value or groupableBuildings[unitDefID] then
 			createdFrame[unitID] = GetGameFrame()
 			local gr = unit2group[unitDefID]
 			if gr ~= nil then
 				SetUnitGroup(unitID, gr)
 			end
-		--printDebug("<AUTOGROUP>: Unit from factory " ..  unitID)
+			--printDebug("<AUTOGROUP>: Unit from factory " ..  unitID)
+		else
+			screwyWaypointUnits.Add(unitID, {})
 		end
 	end
 end
@@ -246,6 +251,7 @@ end
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	finiGroup[unitID] = nil
 	createdFrame[unitID] = nil
+	screwyWaypointUnits.Remove(unitID)
 	--printDebug("<AUTOGROUP> : Unit destroyed "..  unitID)
 end
 
@@ -268,18 +274,20 @@ function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 		if gr ~= nil then
 			SetUnitGroup(unitID, gr)
 		end
+		screwyWaypointUnits.Remove(unitID)
 	end
 	createdFrame[unitID] = nil
 	finiGroup[unitID] = nil
 end
 
-function widget:UnitIdle(unitID, unitDefID, unitTeam) 
+function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if (unitTeam == myTeam and finiGroup[unitID]~=nil) then
 		local gr = unit2group[unitDefID]
 		if gr ~= nil then
 			SetUnitGroup(unitID, gr)
 			--printDebug("<AUTOGROUP> : Unit idle " ..  gr)
 		end
+		screwyWaypointUnits.Remove(unitID)
 		finiGroup[unitID] = nil
 	end
 end
@@ -415,6 +423,35 @@ function widget:SetConfigData(data)
 				end
 			end
 		end
+	end
+end
+
+local function UnstickUpdate(unitID, unitData)
+	if not Spring.ValidUnitID(unitID) then
+		return true
+	end
+	local commands = Spring.GetCommandQueue(unitID, 1)
+	if #commands == 0 then
+		widget:UnitIdle(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
+		return true
+	end
+	if commands[1].id < 1000 then -- Only handle engine commands.
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		if not unitData.x then
+			unitData.x, unitData.y, unitData.z = x, y, z
+			return
+		end
+		if math.abs(x - unitData.x) < 64 and math.abs(z - unitData.z) < 64 then
+			Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
+			return true
+		end
+		unitData.x, unitData.y, unitData.z = x, y, z
+	end
+end
+
+function widget:GameFrame(n)
+	if n%113 == 7 then
+		screwyWaypointUnits.Apply(UnstickUpdate)
 	end
 end
 
