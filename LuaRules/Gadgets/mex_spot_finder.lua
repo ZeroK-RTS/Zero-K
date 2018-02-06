@@ -210,7 +210,7 @@ function IntegrateMetal(x, z, radius)
 
 			if (dist < radius) then
 				local _, metal = spGetGroundInfo(cx, cz)
-				result = result + metal
+				result = result + (metal or 0)
 			end
 		end
 	end

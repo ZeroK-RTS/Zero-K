@@ -316,7 +316,7 @@ function gadget:GameFrame(frame)
 			for otherID, _ in pairs(unitCollide) do
 				if otherID ~= colliderID then
 					local dist = Spring.GetUnitSeparation(colliderID, otherID, false, true)
-					if dist < 20 and ((not smallestDist) or dist < smallestDist) then
+					if dist and dist < (smallestDist or 20) then
 						smallestDist = dist
 						collidieeID = otherID
 					end
