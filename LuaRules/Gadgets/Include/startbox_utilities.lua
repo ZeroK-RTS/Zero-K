@@ -95,22 +95,22 @@ local function ParseBoxes ()
 			if Game.mapSizeZ > Game.mapSizeX then
 				startBoxConfig[0] = {
 					boxes = {
-						{0, 0, 0, Game.mapSizeZ * 0.3, Game.mapSizeX, Game.mapSizeZ * 0.3},
-						{0, 0, Game.mapSizeX, Game.mapSizeZ * 0.3, Game.mapSizeX, 0}
+						{0, 0, 0, Game.mapSizeZ * 0.2, Game.mapSizeX, Game.mapSizeZ * 0.2},
+						{0, 0, Game.mapSizeX, Game.mapSizeZ * 0.2, Game.mapSizeX, 0}
 					},
 					startpoints = {
-						{Game.mapSizeX / 2, Game.mapSizeZ * 0.15}
+						{Game.mapSizeX * 0.5, Game.mapSizeZ * 0.1}
 					},
 					nameLong = "North",
 					nameShort = "N"
 				}
 				startBoxConfig[1] = {
 					boxes = {
-						{0, Game.mapSizeZ * 0.7, 0, Game.mapSizeZ, Game.mapSizeX, Game.mapSizeZ},
-						{0, Game.mapSizeZ * 0.7, Game.mapSizeX, Game.mapSizeZ, Game.mapSizeX, Game.mapSizeZ * 0.7}
+						{0, Game.mapSizeZ * 0.8, 0, Game.mapSizeZ, Game.mapSizeX, Game.mapSizeZ},
+						{0, Game.mapSizeZ * 0.8, Game.mapSizeX, Game.mapSizeZ, Game.mapSizeX, Game.mapSizeZ * 0.8}
 					},
 					startpoints = {
-						{Game.mapSizeX / 2, Game.mapSizeZ * 0.85}
+						{Game.mapSizeX * 0.5, Game.mapSizeZ * 0.9}
 					},
 					nameLong = "South",
 					nameShort = "S"
@@ -118,22 +118,22 @@ local function ParseBoxes ()
 			else
 				startBoxConfig[0] = {
 					boxes = {
-						{0, 0, Game.mapSizeX * 0.3, Game.mapSizeZ - 1, Game.mapSizeX * 0.3, 0},
-						{0, 0, 0, Game.mapSizeZ - 1, Game.mapSizeX * 0.3, Game.mapSizeZ - 1}
+						{0, 0, Game.mapSizeX * 0.2, Game.mapSizeZ - 1, Game.mapSizeX * 0.2, 0},
+						{0, 0, 0, Game.mapSizeZ - 1, Game.mapSizeX * 0.2, Game.mapSizeZ - 1}
 					},
 					startpoints = {
-						{Game.mapSizeX * 0.15, Game.mapSizeZ / 2}
+						{Game.mapSizeX * 0.1, Game.mapSizeZ * 0.5}
 					},
 					nameLong = "West",
 					nameShort = "W"
 				}
 				startBoxConfig[1] = {
 					boxes = {
-						{Game.mapSizeX * 0.7, 0, Game.mapSizeX, Game.mapSizeZ - 1, Game.mapSizeX, 0},
-						{Game.mapSizeX * 0.7, 0, Game.mapSizeX * 0.7, Game.mapSizeZ - 1, Game.mapSizeX, Game.mapSizeZ - 1}
+						{Game.mapSizeX * 0.8, 0, Game.mapSizeX, Game.mapSizeZ - 1, Game.mapSizeX, 0},
+						{Game.mapSizeX * 0.8, 0, Game.mapSizeX * 0.8, Game.mapSizeZ - 1, Game.mapSizeX, Game.mapSizeZ - 1}
 					},
 					startpoints = {
-						{Game.mapSizeX * 0.85, Game.mapSizeZ / 2}
+						{Game.mapSizeX * 0.9, Game.mapSizeZ * 0.5}
 					},
 					nameLong = "East",
 					nameShort = "E"
@@ -186,8 +186,8 @@ local function GetRawBoxes()
 					boxes = {
 						{
 							{0, 0},
-							{0, Game.mapSizeZ * 0.3},
-							{Game.mapSizeX, Game.mapSizeZ * 0.3},
+							{0, Game.mapSizeZ * 0.2},
+							{Game.mapSizeX, Game.mapSizeZ * 0.2},
 							{Game.mapSizeX, 0}
 						},
 					},
@@ -195,10 +195,10 @@ local function GetRawBoxes()
 				startBoxConfig[1] = {
 					boxes = {
 						{
-							{0, Game.mapSizeZ * 0.7},
+							{0, Game.mapSizeZ * 0.8},
 							{0, Game.mapSizeZ},
 							{Game.mapSizeX, Game.mapSizeZ},
-							{Game.mapSizeX, Game.mapSizeZ * 0.7}
+							{Game.mapSizeX, Game.mapSizeZ * 0.8}
 						},
 					},
 				}
@@ -208,16 +208,16 @@ local function GetRawBoxes()
 						{
 							{0, 0},
 							{0, Game.mapSizeZ - 1},
-							{Game.mapSizeX * 0.3, Game.mapSizeZ - 1},
-							{Game.mapSizeX * 0.3, 0},
+							{Game.mapSizeX * 0.2, Game.mapSizeZ - 1},
+							{Game.mapSizeX * 0.2, 0},
 						},
 					},
 				}
 				startBoxConfig[1] = {
 					boxes = {
 						{
-							{Game.mapSizeX * 0.7, 0},
-							{Game.mapSizeX * 0.7, Game.mapSizeZ - 1},
+							{Game.mapSizeX * 0.8, 0},
+							{Game.mapSizeX * 0.8, Game.mapSizeZ - 1},
 							{Game.mapSizeX, Game.mapSizeZ - 1},
 							{Game.mapSizeX, 0},
 						},
