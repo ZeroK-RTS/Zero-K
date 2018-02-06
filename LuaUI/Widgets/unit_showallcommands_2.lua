@@ -265,7 +265,7 @@ local function updateDrawing()
 				local unitID = units[i]
 				if WG.allySelUnits[unitID] and not alreadyDrawn[sel[i]] then
 					drawUnitCommands(unitID)
-					alreadyDrawn[sel[i]] = true
+					alreadyDrawn[unitID] = true
 				end
 			end
 		end
