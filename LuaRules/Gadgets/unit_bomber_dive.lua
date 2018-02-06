@@ -44,7 +44,9 @@ local spMoveCtrlGetTag = Spring.MoveCtrl.GetTag
 local bomberWeaponNamesDefs, bomberWeaponDefs, bomberUnitDefs = include("LuaRules/Configs/bomber_dive_defs.lua")
 
 local UPDATE_FREQUENCY = 15
+local SQRT_TWO = 0.8 -- All hit tests have leeway so we don't need to be too fussy about the square root of two.
 local bombers = {}
+local VOL_SPHERE = 3
 
 local heightDef     = {}
 local hitabilityDef = {}
@@ -119,16 +121,22 @@ local function GetWantedBomberHeight(unitID, bomberID, config, underShield)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	if not heightDef[unitDefID] then
 		-- Collision volume is always full size for non-nanoframes.
-		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ = Spring.GetUnitCollisionVolumeData(unitID)
+		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ, volType = Spring.GetUnitCollisionVolumeData(unitID)
+		if volType == VOL_SPHERE then
+			scaleY = scaleY*SQRT_TWO
+		end
 		heightDef[unitDefID] = scaleY/2 + offsetY
 	end
 	
 	if not hitabilityDef[unitDefID] then
 		-- Collision volume is always full size for non-nanoframes.
-		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ = Spring.GetUnitCollisionVolumeData(unitID)
+		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ, volType = Spring.GetUnitCollisionVolumeData(unitID)
+		if volType == VOL_SPHERE then
+			scaleX = scaleX*SQRT_TWO
+			scaleZ = scaleZ*SQRT_TWO
+		end
 		local horSize = config.sizeSafetyFactor*(math.min(scaleX, scaleZ)/2 - math.sqrt(offsetX^2 + offsetZ^2))
 		local speed = UnitDefs[unitDefID].speed/30
-		
 		if speedMult == 0 then
 			hitabilityDef[unitDefID] = 1000
 		else
