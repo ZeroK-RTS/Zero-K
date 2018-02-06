@@ -179,12 +179,12 @@ end
 
 local function IncreaseDrag(unitID, data)
 	SetUnitDrag(unitID, math.max(0, math.min(1, data.drag)))
-	data.drag = data.drag + 0.03
+	data.drag = data.drag + 0.05
 	return data.drag >= 1 -- Return true to remove
 end
 
 function gadget:GameFrame(n)
-	if n%1 == 0 then
+	if n%2 == 0 then
 		dragRestore.Apply(IncreaseDrag)
 	end
 end
