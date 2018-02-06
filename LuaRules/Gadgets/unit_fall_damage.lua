@@ -208,15 +208,16 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		-- normal is multiplied by elasticity, tangent by friction
 		-- unit takes damage based on velocity at normal to terrain + TANGENT_DAMAGE of velocity of tangent
 		local att = attributes[unitDefID]
-		local vx,vy,vz = Spring.GetUnitVelocity(unitID)
+		local vx,vy,vz, speed = Spring.GetUnitVelocity(unitID)
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		local nx, ny, nz = Spring.GetGroundNormal(x,z)
 		local nMag = math.sqrt(nx^2 + ny^2 + nz^2)
-		local nx, ny, nz = nx/nMag, ny/nMag, nz/nMag -- normal to unit vector
-		nx, ny, nz = vx*nx, vy*ny, vz*nz -- normal is now a component of velocity
+		nx, ny, nz = nx/nMag, ny/nMag, nz/nMag -- normal to unit vector
+		nx, ny, nz = speed*nx, speed*ny, speed*nz -- normal is now a component of velocity
 		local tx, ty, tz = vx - nx, vy - ny, vz - nz -- tangent is the other component of velocity
 		local nf = att.elasticity
 		local tf = att.friction
+		Spring.Echo(tx*tf + nx*nf, vx, tx, tf, nx, nf)
 		vx, vy, vz = tx*tf + nx*nf - vz, ty*tf + ny*nf - vy, tz*tf + nz*nf - vz
 		GG.AddGadgetImpulseRaw(unitID, vx, vy, vz, true, true)
 		
