@@ -628,6 +628,11 @@ local function weapons2Table(cells, ws, unitID)
 				cells[#cells+1] = cp.spawns_expire .. "s"
 			end
 		end
+		
+		if cp.reload_move_mod_time then
+			cells[#cells+1] = ' - Move mult time: '
+			cells[#cells+1] = cp.reload_move_mod_time .. "s"
+		end
 
 		if cp.area_damage then
 			if (cp.area_damage_is_impulse == "1") then
@@ -1323,6 +1328,11 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	if not (ud.canFly or ud.cantBeTransported) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > valkMaxMass) or (ud.xsize > valkMaxSize) or (ud.zsize > valkMaxSize)) and "Heavy") or "Light"), textColor = color.stats_fg, }
+	end
+	
+	if ud.customParams.reload_move_penalty then
+		statschildren[#statschildren+1] = Label:New{ caption = 'Reload move mult: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(100*tonumber(ud.customParams.reload_move_penalty)) .. "%", textColor = color.stats_fg, }
 	end
 	
 	if legacyModules then
