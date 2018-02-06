@@ -132,6 +132,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 						collisionResistence = -5,
 					}
 				)
+				SendToUnsynced("addFlying", nearID, Spring.GetUnitDefID(nearID))
 				GG.Floating_InterruptFloat(nearID)
 			end
 		end
@@ -196,6 +197,7 @@ local function ReinstatePhysics(unitID, data)
 		data.collisionResistence = data.collisionResistence + 0.066
 		if data.collisionResistence >= 1 then
 			GG.SetCollisionDamageMult(unitID)
+			SendToUnsynced("removeFlying", unitID)
 			return true -- remove unit
 		end
 	end
@@ -212,6 +214,7 @@ end
 else -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+-- Line drawing
 
 local glVertex            = gl.Vertex
 local spIsUnitInView      = Spring.IsUnitInView
@@ -328,14 +331,81 @@ end
 function gadget:DrawWorld()
 	DrawWorldFunc()
 end
+
 function gadget:DrawWorldRefraction()
 	DrawWorldFunc()
 end
 
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Flying lups
+
+local Lups
+local SYNCED = SYNCED
+
+local particleIDs = {}
+
+local flyFX = {
+	{
+		class = 'StaticParticles', 
+		options = {
+			life        = 220,
+			sizeMod     = 4,
+			colormap    = {{0, 0.4, 0.05, 0.006},{0, 0.6, 0.05, 0.006}, {0, 0.4, 0.05, 0.006}, {0, 0.4, 0.05, 0.006}, {0, 0.4, 0.05, 0.006}, {0, 0, 0, 0} , {0, 0, 0, 0} , {0, 0, 0, 0} },
+			texture     = 'bitmaps/GPL/groundflash.tga',
+			count       = 1,
+			quality     = 1, -- Low
+			noIconDraw = true,
+		}
+	}
+} 
+
+local function addFlying(_, unitID, unitDefID)
+	particleIDs[unitID] = {}
+	local teamID = Spring.GetUnitTeam(unitID)
+	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	local radius = Spring.GetUnitRadius(unitID)
+	local height = Spring.GetUnitHeight(unitID)
+	for i,fx in pairs(flyFX) do
+		fx.options.unit = unitID
+		fx.options.unitDefID = unitDefID
+		fx.options.team      = teamID
+		fx.options.allyTeam  = allyTeamID
+		fx.options.size = radius * (fx.options.sizeMod or 1)
+		fx.options.pos = {0, height/2, 0}
+		particleIDs[unitID][#particleIDs[unitID] + 1] = Lups.AddParticles(fx.class,fx.options)
+	end
+end
+
+local function removeFlying(_, unitID)
+	for i = 1, #particleIDs[unitID] do
+		Lups.RemoveParticles(particleIDs[unitID][i])
+	end
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Gadget interface
+
 function gadget:Initialize()
+	gadgetHandler:AddSyncAction("addFlying", addFlying)
+	gadgetHandler:AddSyncAction("removeFlying", removeFlying)
+	
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 	end
+end
+
+function gadget:Update()
+	if (not Lups) then
+		Lups = GG['Lups']
+	end
+end
+
+
+function gadget:Shutdown()
+	gadgetHandler.RemoveSyncAction("addFlying")
+    gadgetHandler.RemoveSyncAction("removeFlying")
 end
 
 -------------------------------------------------------------------------------------
