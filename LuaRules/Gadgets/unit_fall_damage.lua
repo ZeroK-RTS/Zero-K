@@ -270,14 +270,14 @@ local function DoCollisionDamage(colliderID, colliderData, collidieeID, collidie
 		GG.AddGadgetImpulseRaw(collidieeID, aVx - vx, aVy - vy, aVz - vz, true, true)
 		
 		if unitImmune[colliderID] then
-			if unitImmune[colliderID] < frame then
+			if unitImmune[colliderID] < gameframe then
 				unitImmune[colliderID] = nil
 			else
 				colliderImmune = true
 			end
 		end
 		if noDamageToAllyCollidee[collidieeID] then
-			if noDamageToAllyCollidee[collidieeID] < frame then
+			if noDamageToAllyCollidee[collidieeID] < gameframe then
 				noDamageToAllyCollidee[collidieeID] = nil
 			elseif isUnitAllied then
 				colliderImmune = true
@@ -288,14 +288,14 @@ local function DoCollisionDamage(colliderID, colliderData, collidieeID, collidie
 		end
 		local collideeImmune = false
 		if unitImmune[collidieeID] then
-			if unitImmune[collidieeID] < frame then
+			if unitImmune[collidieeID] < gameframe then
 				unitImmune[collidieeID] = nil
 			else
 				collideeImmune = true
 			end
 		end
 		if noDamageToAllyCollidee[colliderID] then
-			if noDamageToAllyCollidee[colliderID] < frame then
+			if noDamageToAllyCollidee[colliderID] < gameframe then
 				noDamageToAllyCollidee[colliderID] = nil
 			elseif isUnitAllied then
 				collideeImmune = true
