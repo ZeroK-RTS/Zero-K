@@ -60,6 +60,7 @@ end
 
 local wantedWeaponList = {-1, -2, -3}
 
+local collisionDamageMult = {}
 local fallDamageImmunityWeaponID = {}
 
 for wdid = 1, #WeaponDefs do
@@ -136,10 +137,15 @@ local function SetNoDamageToAllyCollidee(unitID, frame)
 	end
 end
 
+local function SetCollisionDamageMult(unitID, mult)
+	collisionDamageMult[unitID] = mult
+end
+
 GG.SetUnitPermanentFallDamageImmunity = SetUnitPermanentFallDamageImmunity
 GG.SetUnitFallDamageImmunity = SetUnitFallDamageImmunity
 GG.SetUnitFallDamageImmunityFeature = SetUnitFallDamageImmunityFeature
-GG.SetNoDamageToAllyCollidee=SetNoDamageToAllyCollidee
+GG.SetNoDamageToAllyCollidee = SetNoDamageToAllyCollidee
+GG.SetCollisionDamageMult = SetCollisionDamageMult
 
 -------------------------------------------------------------------
 -------------------------------------------------------------------
@@ -220,7 +226,9 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		end
 		
 		local damgeSpeed = math.sqrt((nx + tx*TANGENT_DAMAGE)^2 + (ny + ty*TANGENT_DAMAGE)^2 + (nz + tz*TANGENT_DAMAGE)^2)
-		return LocalSpeedToDamage(unitID, unitDefID, damgeSpeed) + outsideMapDamage(unitID, unitDefID)
+		local damageTotal = LocalSpeedToDamage(unitID, unitDefID, damgeSpeed) + outsideMapDamage(unitID, unitDefID)
+		damageTotal = damageTotal*(collisionDamageMult[unitID] or 1)
+		return damageTotal
 	end
 	
 	if weaponDefID == -1 then
@@ -276,7 +284,7 @@ local function DoCollisionDamage(colliderID, colliderData, collidieeID, collidie
 			end
 		end
 		if not colliderImmune then
-			spAddUnitDamage(colliderID, damageToDeal, 0, nil, -7)
+			spAddUnitDamage(colliderID, damageToDeal*(collisionDamageMult[colliderID] or 1), 0, nil, -7)
 		end
 		local collideeImmune = false
 		if unitImmune[collidieeID] then
@@ -294,7 +302,7 @@ local function DoCollisionDamage(colliderID, colliderData, collidieeID, collidie
 			end
 		end
 		if not collideeImmune then
-			spAddUnitDamage(collidieeID, damageToDeal, 0, nil, -7)
+			spAddUnitDamage(collidieeID, damageToDeal*(collisionDamageMult[collidieeID] or 1), 0, nil, -7)
 		end
 	end
 end
@@ -324,7 +332,9 @@ function gadget:GameFrame(frame)
 				-- Assume feature collision if collidiee is not found.
 				local vx,vy,vz = Spring.GetUnitVelocity(colliderID)
 				if vx then
-					spAddUnitDamage(colliderID, DEBRIS_SPRING_DAMAGE_MULTIPLIER*colliderData.givenDamage, 0, nil, -7)
+					local damageTotal = DEBRIS_SPRING_DAMAGE_MULTIPLIER*colliderData.givenDamage
+					damageTotal = damageTotal*(collisionDamageMult[colliderID] or 1)
+					spAddUnitDamage(colliderID, damageTotal, 0, nil, -7)
 					GG.AddGadgetImpulseRaw(colliderID, -0.8*vx, -0.8*vy, -0.8*vz, true, true)
 				end
 			end

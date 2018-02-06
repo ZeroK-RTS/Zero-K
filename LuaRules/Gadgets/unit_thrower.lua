@@ -88,7 +88,7 @@ local UNIT = 117
 local FLY_TIME = 135
 
 local throwUnits = IterableMap.New()
-local dragRestore = IterableMap.New()
+local physicsRestore = IterableMap.New()
 local UPDATE_PERIOD = 6
 
 function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
@@ -119,14 +119,17 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	if nearUnits then
 		for i = 1, #nearUnits do
 			local nearID = nearUnits[i]
-			local dragData = dragRestore and dragRestore.Get(nearID)
-			if ((not dragData) or dragData.drag > -0.4) and ValidThrowTarget(proOwnerID, nearID) then
+			local physicsData = physicsRestore and physicsRestore.Get(nearID)
+			if ((not physicsData) or (not physicsData.drag) or physicsData.drag > -0.4) and ValidThrowTarget(proOwnerID, nearID) then
 				local vx, vy, vz = Spring.GetUnitVelocity(nearID)
 				GG.AddGadgetImpulseRaw(nearID, px - vx, py - vy, pz - vz, true, true, nil, nil, true)
 				SetUnitDrag(nearID, 0)
-				dragRestore.Add(nearID, 
+				GG.SetCollisionDamageMult(nearID, 0)
+				Spring.SetUnitLeaveTracks(nearID, false)
+				physicsRestore.Add(nearID, 
 					{
-						drag = -1.5
+						drag = -1.5,
+						collisionResistence = -5,
 					}
 				)
 				GG.Floating_InterruptFloat(nearID)
@@ -177,15 +180,30 @@ function gadget:Initialize()
 	end
 end
 
-local function IncreaseDrag(unitID, data)
-	SetUnitDrag(unitID, math.max(0, math.min(1, data.drag)))
-	data.drag = data.drag + 0.05
-	return data.drag >= 1 -- Return true to remove
+local function ReinstatePhysics(unitID, data)
+	if data.drag then
+		SetUnitDrag(unitID, math.max(0, math.min(1, data.drag)))
+		data.drag = data.drag + 0.05
+		if data.drag >= 1 then
+			Spring.SetUnitLeaveTracks(unitID, true)
+			SetUnitDrag(unitID, 1)
+			data.drag = nil
+		end
+	end
+	
+	if data.collisionResistence then
+		GG.SetCollisionDamageMult(unitID, math.max(0, math.min(1, data.collisionResistence)))
+		data.collisionResistence = data.collisionResistence + 0.066
+		if data.collisionResistence >= 1 then
+			GG.SetCollisionDamageMult(unitID)
+			return true -- remove unit
+		end
+	end
 end
 
 function gadget:GameFrame(n)
 	if n%2 == 0 then
-		dragRestore.Apply(IncreaseDrag)
+		physicsRestore.Apply(ReinstatePhysics)
 	end
 end
 
