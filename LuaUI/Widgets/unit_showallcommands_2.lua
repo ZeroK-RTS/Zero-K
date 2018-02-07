@@ -255,15 +255,17 @@ local function updateDrawing()
 		local sel = selectedUnits
 		local alreadyDrawn = {}
 		for i = 1, selectedUnitCount do
-			drawUnitCommands(sel[i])
-			alreadyDrawn[sel[i]] = true
+			if sel[i] then
+				drawUnitCommands(sel[i])
+				alreadyDrawn[sel[i]] = true
+			end
 		end
 		if options.includeallies.value then
 			local count = drawUnit.count
 			local units = drawUnit.data
 			for i = 1, count do
 				local unitID = units[i]
-				if WG.allySelUnits[unitID] and not alreadyDrawn[sel[i]] then
+				if unitID and WG.allySelUnits[unitID] and not alreadyDrawn[sel[i]] then
 					drawUnitCommands(unitID)
 					alreadyDrawn[unitID] = true
 				end

@@ -465,6 +465,18 @@ function widget:MousePress(mx, my, mButton)
 	inMinimap = spIsAboveMiniMap(mx, my)
 	if inMinimap and not MiniMapFullProxy then return false end
 	
+	if (mButton == 1 or mButton == 3) and fNodes and #fNodes > 0 then
+		-- already issuing command
+		local ownerName = widgetHandler.mouseOwner and widgetHandler.mouseOwner.GetInfo and widgetHandler.mouseOwner.GetInfo()
+		ownerName = ownerName and ownerName.name
+		if ownerName == "CustomFormations2" then
+			widgetHandler.mouseOwner = nil
+		end
+		fNodes = {}
+		fDists = {}
+		return false 
+	end
+	
 	-- Get command that would've been issued
 	local _, activeCmdID = spGetActiveCommand()
 	if activeCmdID then
@@ -532,6 +544,7 @@ function widget:MousePress(mx, my, mButton)
 	-- We handled the mouse press
 	return true
 end
+
 function widget:MouseMove(mx, my, dx, dy, mButton)
 	
 	-- It is possible for MouseMove to fire after MouseRelease
