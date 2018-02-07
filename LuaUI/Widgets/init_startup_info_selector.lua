@@ -51,7 +51,8 @@ local mainWindow
 local scroll
 local grid
 local trainerCheckbox
-local buttons = {}
+local showModulesCheckbox
+local buttonData = {}
 local buttonLabels = {}
 local trainerLabels = {}
 local actionShow = "showstartupinfoselector"
@@ -73,27 +74,41 @@ if (vsx < 1024 or vsy < 768) then
 	BUTTON_HEIGHT = vsy* (BUTTON_HEIGHT/768)
 end
 
+local commTips = {
+	["LuaUI/Images/startup_info_selector/chassis_benzcom.png"] = "Select Guardian Chassis\nA tanky chassis with access to a wide range of weapons. Hampered by its slow speed. Can dual wield.",
+	["LuaUI/Images/startup_info_selector/chassis_commrecon.png"] = "Select Recon Chassis\nA nimble chassis that uses speed and jumpjets to explore the map and avoid opposition. Otherwise has poor survivability.",
+	["LuaUI/Images/startup_info_selector/chassis_commstrike.png"] = "Select Strike Chassis\nAn all-round chassis with decent speed and health. Can dual wield.",
+	["LuaUI/Images/startup_info_selector/chassis_commsupport.png"] = "Select Engineer Chassis\nA chassis focused on economy that uses its high build range and base build power to icrease production. It has relatively poor speed and health.",
+}
+
 --local wantLabelUpdate = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- wait for next screenframe so Grid can resize its elements first	-- doesn't actually work
 local function ToggleTrainerButtons(bool)
-	for i=1,#buttons do
-		if buttons[i].trainer then
+	for i=1,#buttonData do
+		if buttonData[i].trainer then
 			if bool then
-				grid:AddChild(buttons[i])
+				grid:AddChild(buttonData[i].control)
 			else
-				grid:RemoveChild(buttons[i])
+				grid:RemoveChild(buttonData[i].control)
 			end
 		end
+	end
+end
+
+local function ToggleModuleTooltip(bool)
+	for i = 1, #buttonData do
+		buttonData[i].control.tooltip = ((bool and (buttonData[i].tooltip .. "\n\n\n")) or "") .. (commTips[buttonData[i].image] or "")
+		buttonData[i].control:Invalidate()
 	end
 end
 
 options_path = 'Settings/HUD Panels/Commander Selector'
 options = {
 	hideTrainers = {
-		name = 'Only show custom Commanders',
-		desc = 'You can customize your commanders on the Zero-K site:\n\nhttps://zero-k.info',
+		name = 'Hide default commanders',
+		desc = 'You can customize your commanders on the Zero-K site: https://zero-k.info',
 		-- use the below after Chobby replaces site for customisation
 		-- desc = 'You can customize your commanders before the game, in the main menu.',
 		type = 'bool',
@@ -106,6 +121,20 @@ options = {
 				trainerCheckbox:Invalidate()
 			end
 			ToggleTrainerButtons(not self.value)
+		end
+	},
+	showModules = {
+		name = 'Module tooltips',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function(self)
+			if showModulesCheckbox then
+				showModulesCheckbox.checked = self.value
+				showModulesCheckbox.state.checked = self.value
+				showModulesCheckbox:Invalidate()
+			end
+			ToggleModuleTooltip(self.value)
 		end
 	},
 	cameraZoom = {
@@ -263,14 +292,17 @@ local function CreateWindow()
 	}
 	-- add posters
 	local i = 0
-	for index,option in ipairs(optionData) do
+	for index, option in ipairs(optionData) do
 		i = i + 1
 		local hideButton = options.hideTrainers.value and option.trainer
+		
+		local tooltip = ((options.showModules.value and (option.tooltip .. "\n\n\n")) or "") .. (commTips[option.image] or "")
+		
 		local button = Button:New {
 			parent = (not hideButton) and grid or nil,
-			caption = "",	--option.name,	--option.trainer and "TRAINER" or "",
+			caption = "",
 			valign = "bottom",
-			tooltip = option.tooltip, --added comm name under cursor on tooltip too, like for posters
+			tooltip = tooltip, --added comm name under cursor on tooltip too, like for posters
 			width = BUTTON_WIDTH,
 			height = BUTTON_HEIGHT,
 			padding = {5,5,5,5},
@@ -279,9 +311,14 @@ local function CreateWindow()
 				Spring.SendCommands({'say a:I choose: '..option.name..'!'})
 				Close(false, true)
 			end},
-			trainer = option.trainer,
 		}
-		buttons[i] = button
+		
+		buttonData[i] = {
+			control = button,
+			trainer = option.trainer,
+			tooltip = option.tooltip,
+			image = option.image,
+		}
 		
 		local image = Image:New{
 			parent = button,
@@ -301,19 +338,18 @@ local function CreateWindow()
 			autosize = false,
 			font = {size = 14},
 		}
-		buttonLabels[i] = label
-		if option.trainer then
-			local trainerLabel = Label:New{
-				parent = image,
-				x = 0, right = 0,
-				y = "50%",
-				caption = "TRAINER",
-				align = "center",
-				autosize = false,
-				font = {color = {1,0.2,0.2,1}, size=16, outline=true, outlineColor={1,1,1,0.8}},
-			}
-			trainerLabels[i] = trainerLabel
-		end
+		--if option.trainer then
+		--	local trainerLabel = Label:New{
+		--		parent = image,
+		--		x = 0, right = 0,
+		--		y = "50%",
+		--		caption = "TRAINER",
+		--		align = "center",
+		--		autosize = false,
+		--		font = {color = {1,0.2,0.2,1}, size=16, outline=true, outlineColor={1,1,1,0.8}},
+		--	}
+		--	trainerLabels[i] = trainerLabel
+		--end
 	end
 	local cbWidth = WINDOW_WIDTH*0.4
 	local closeButton = Button:New{
@@ -329,7 +365,7 @@ local function CreateWindow()
 		parent = mainWindow,
 		x = 6,
 		bottom = 5,
-		width = 220,
+		width = 180,
 		caption = options.hideTrainers.name,
 		tooltip = options.hideTrainers.desc,
 		checked = options.hideTrainers.value,
@@ -342,6 +378,25 @@ local function CreateWindow()
 			end
 			options.hideTrainers.value = not self.checked
 			ToggleTrainerButtons(self.checked)
+		end },
+	}
+	showModulesCheckbox = Chili.Checkbox:New{
+		parent = mainWindow,
+		x = 220,
+		bottom = 5,
+		width = 115,
+		caption = options.showModules.name,
+		tooltip = options.showModules.desc,
+		checked = options.showModules.value,
+		OnChange = { function(self)
+			-- this is called *before* the 'checked' value is swapped, hence negation everywhere
+			if options.showModules.epic_reference then
+				options.showModules.epic_reference.checked = not self.checked
+				options.showModules.epic_reference.state.checked = not self.checked
+				options.showModules.epic_reference:Invalidate()
+			end
+			options.showModules.value = not self.checked
+			ToggleModuleTooltip(not self.checked)
 		end },
 	}
 	grid:Invalidate()
