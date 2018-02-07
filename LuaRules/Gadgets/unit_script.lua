@@ -347,6 +347,11 @@ function Spring.UnitScript.WaitForTurn(piece, axis)
 	end
 
 	local currRot = select(axis, Spring.UnitScript.GetPieceRotation(piece))
+	if not currRot then
+		-- Unit is probably dead or destroyed.
+		return
+	end
+	
 	local targetRot = activeUnit.pieceRotTargets[piece][axis]
 	local diffRot = (currRot - targetRot) % tau
 	if diffRot < speed or diffRot > (tau - speed) then
