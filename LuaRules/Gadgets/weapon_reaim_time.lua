@@ -17,6 +17,13 @@ if not (gadgetHandler:IsSyncedCode()) then
 end
 -------------------------------------------------------------
 -------------------------------------------------------------
+local useRapidReaim = true
+
+local START_TIME = 20*60*30
+local FLIP_PERIOD =60*30
+
+-------------------------------------------------------------
+-------------------------------------------------------------
 local unitDefsToModify = {}
 
 for udID = 1, #UnitDefs do
@@ -30,10 +37,40 @@ for udID = 1, #UnitDefs do
 	end
 end
 
+-------------------------------------------------------------
+-------------------------------------------------------------
+
+local function UpdateRapidReaim(unitID, unitDefID)
+	if not (unitDefID and unitDefsToModify[unitDefID]) then
+		return
+	end
+	for weaponNum, reaimTime in pairs(unitDefsToModify[unitDefID]) do
+		Spring.SetUnitWeaponState(unitID, weaponNum, {reaimTime = (useRapidReaim and reaimTime) or 15})
+	end
+end
+
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	if unitDefsToModify[unitDefID] then
-		for weaponNum, reaimTime in pairs(unitDefsToModify[unitDefID]) do
-			Spring.SetUnitWeaponState(unitID, weaponNum, {reaimTime = reaimTime})
-		end
+	if useRapidReaim then
+		UpdateRapidReaim(unitID, unitDefID)
+	end
+end
+
+function gadget:Initialize()
+	local units = Spring.GetAllUnits()
+	for i = 1, #units do
+		local unitDefID = Spring.GetUnitDefID(units[i])
+		UpdateRapidReaim(units[i], unitDefID)
+	end
+end
+
+function gadget:GameFrame(n)
+	-- Performance test by switching during games.
+	if n < START_TIME then
+		return
+	end
+	if n%FLIP_PERIOD == 0 then
+		useRapidReaim = not useRapidReaim
+		Spring.Echo("useRapidReaim", useRapidReaim) -- Intentional
+		gadget:Initialize()
 	end
 end

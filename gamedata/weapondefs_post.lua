@@ -114,8 +114,8 @@ end
 --
 -- Apply remaim_time
 
-for _, weaponDef in pairs(WeaponDefs) do
-	if not weaponDef.customparams.reaim_time then
+for name, weaponDef in pairs(WeaponDefs) do
+	if not (weaponDef.customparams.reaim_time or string.find(name, "chicken")) then
 		weaponDef.customparams.reaim_time = 1
 	end
 end
