@@ -47,6 +47,7 @@ local clickX, clickY = false, false
 local clickUnitID = false
 local clickSelected = false
 local prevTargetID = false
+local mousePressed = false
 
 local prevClick = spGetTimer()
 
@@ -58,13 +59,13 @@ local function Reset()
 	clickY = false
 	clickUnitID = false
 	clickSelected = false
+	mousePressed = false
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function DeselectUnits(unitList)
-	local selectedUnits = Spring.GetSelectedUnits()
+local function DeselectUnits(selectedUnits, unitList)
 	local newSelectedUnits = {}
 	
 	local unitMap = {}
@@ -80,9 +81,7 @@ local function DeselectUnits(unitList)
 	spSelectUnitArray(newSelectedUnits)
 end
 
-local function SelectUnits(unitList)
-	local selectedUnits = Spring.GetSelectedUnits()
-	
+local function SelectUnits(selectedUnits, unitList)
 	local newSelectedUnits = unitList
 	local selectedUnitMap = {}
 	for i = 1, #newSelectedUnits do
@@ -96,10 +95,10 @@ local function SelectUnits(unitList)
 		end
 	end
 	
-	spSelectUnitArray(newSelectedUnits)
+	return newSelectedUnits
 end
 
-local function HandleUnitSelection(targetID, needSelection)
+local function HandleUnitSelection(selectedUnits, targetID, needSelection)
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	
 	local unitDefID = Spring.GetUnitDefID(targetID)
@@ -114,22 +113,22 @@ local function HandleUnitSelection(targetID, needSelection)
 		end
 		
 		if clickSelected and shift then
-			DeselectUnits(unitList)
+			return DeselectUnits(selectedUnits, unitList)
 		else
 			if shift then
-				SelectUnits(unitList)
+				return SelectUnits(selectedUnits, unitList)
 			else
-				spSelectUnitArray(unitList)
+				return unitList
 			end
 		end
 	elseif shift then
 		if clickSelected then
-			DeselectUnits({targetID})
+			return DeselectUnits(selectedUnits, {targetID})
 		elseif needSelection then
-			SelectUnits({targetID})
+			return SelectUnits(selectedUnits, {targetID})
 		end
 	elseif needSelection then
-		SelectUnits({targetID})
+		return SelectUnits(selectedUnits, {targetID})
 	end
 end
 
@@ -189,14 +188,40 @@ local function MouseRelease(x, y)
 	end
 	
 	prevTargetID = targetID
-	HandleUnitSelection(targetID, needSelection)
+	local newSel = HandleUnitSelection(Spring.GetSelectedUnits(), targetID, needSelection)
+	if newSel then
+		spSelectUnitArray(newSel)
+	end
 	Reset()
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local mousePressed = false
+function widget:SelectionChanged(selectedUnits)
+	if not (mousePressed and options.enable.value) then
+		return
+	end
+	local x, y = Spring.GetMouseState()
+	
+	if not (clickX and clickY and clickUnitID) or (math.abs(clickX - x) > CLICK_LEEWAY) or (math.abs(clickY - y) > CLICK_LEEWAY) then
+		Reset()
+		return
+	end
+	
+	local targetID = WG.PreSelection_GetUnitUnderCursor(true)
+	local needSelection = true
+	if (not targetID) then
+		needSelection = true
+		targetID = clickUnitID
+	end
+	
+	prevTargetID = targetID
+	local newSel = HandleUnitSelection(selectedUnits, targetID, needSelection)
+	Reset()
+	return newSel
+end
+
 function widget:Update()
 	local x, y, left, middle, right, offscreen = Spring.GetMouseState()
 	if left and not mousePressed then

@@ -2307,7 +2307,7 @@ function widgetHandler:UpdateSelection()
 			if (newSelection[i] ~= oldSelection[i]) then -- it seems the order stays
 				changed = true
 				break
-			end                                          
+			end
 		end
 	else
 		changed = true
