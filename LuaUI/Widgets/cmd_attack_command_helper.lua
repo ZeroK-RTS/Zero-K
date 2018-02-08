@@ -16,9 +16,9 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local LEFT_CLICK = 1
-local RIGHT_CLICK = 3
 local TRACE_UNIT = "unit"
+local CLICK_LEEWAY = 5
+
 local attackishCommandDefs = {
 	[CMD.ATTACK] = true,
 	[CMD_UNIT_SET_TARGET] = true,
@@ -31,45 +31,30 @@ local CMD_OPT_META = CMD.OPT_META
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 
+local clickX, clickY = false, false
 local clickUnitID = false
 local clickCommandID = false
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-options_path = 'Settings/Unit Behaviour'
-options_order = {'useAreaAttack', 'attackOnClick',}
-options = {
-	useAreaAttack = {
-		name = "Right click area attack",
-		type = "bool",
-		value = true,
-		noHotkey = true,
-		desc = "Right click and drag on enemy units to issue area attack.",
-	},
-	attackOnClick = {
-		name = "Attack on mouse press",
-		type = "bool",
-		value = false,
-		noHotkey = true,
-		desc = "Issue attack command on clicking, only work when right click area attack is disabled.",
-	},
-}
+local clickActiveCmdID = false
+local clickRight = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 local function Reset()
+	clickX = false
+	clickY = false
 	clickUnitID = false
 	clickCommandID = false
+	clickActiveCmdID = false
+	clickRight = false
 end
 
-local function GetActionCommand(button)
+local function GetActionCommand(right)
 	local _, activeCmdID = Spring.GetActiveCommand()
-	if activeCmdID and button == LEFT_CLICK then
+	if activeCmdID and not right then
 		return activeCmdID
 	else
-		if button == RIGHT_CLICK then
+		if right then
 			local _, defaultCmdID = Spring.GetDefaultCommand()
 			return defaultCmdID
 		end
@@ -118,64 +103,103 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:MousePress(x, y, button)
-	if options.useAreaAttack.value then
-		return false
-	end
+local function MousePress(x, y, right)
 	Reset()
 	
 	if Spring.GetSelectedUnitsCount() == 0 then
-		return false
+		return
 	end
 	
-	local cmdID = GetActionCommand(button)
+	local cmdID = GetActionCommand(right)
 	if not (cmdID and attackishCommandDefs[cmdID]) then
-		return false
+		return
 	end
 	
 	local traceType, targetID = Spring.TraceScreenRay(x, y)
 	if not (targetID and traceType == TRACE_UNIT) then
-		return false
+		return
 	end
 	
-	local myAllyTeamID = Spring.GetMyAllyTeamID()
-	local targetAllyTeamID = Spring.GetUnitAllyTeam(targetID)
-	if not (myAllyTeamID and targetAllyTeamID and myAllyTeamID ~= targetAllyTeamID) then
-		return false
-	end
-	
-	if options.attackOnClick.value then
-		local alt, ctrl, meta, shift = Spring.GetModKeyState()
-		GiveNotifyingOrder(cmdID, {targetID}, GetCmdOpts(alt, ctrl, meta, shift, button == RIGHT_CLICK))
-	else
-		clickUnitID = targetID
-		clickCommandID = cmdID
-	end
-	return true
+	clickX = x
+	clickY = y
+	clickUnitID = targetID
+	clickCommandID = cmdID
+	clickActiveCmdID = select(2, Spring.GetActiveCommand())
+	clickRight = right
 end
 
-function widget:MouseRelease(x, y, button)
-	if options.useAreaAttack.value then
-		return false
+local function MouseRelease(x, y)
+	local alt, ctrl, meta, shift = Spring.GetModKeyState()
+	
+	if clickRight then
+		if clickActiveCmdID then
+			Reset()
+			return
+		end
+		
+		if not shift then
+			Spring.SetActiveCommand(-1)
+		end
 	end
 	
 	if not (clickUnitID and clickCommandID) then
 		Reset()
-		return false
+		return
+	end
+	
+	if not (clickX and clickY and clickUnitID) or (math.abs(clickX - x) > CLICK_LEEWAY) or (math.abs(clickY - y) > CLICK_LEEWAY) then
+		return
 	end
 	
 	if Spring.GetSelectedUnitsCount() == 0 then
 		Reset()
-		return false
+		return
 	end
 	
 	local traceType, targetID = Spring.TraceScreenRay(x, y)
-	if not (targetID == clickUnitID and traceType == TRACE_UNIT) then
-		Reset()
+	if (traceType == TRACE_UNIT) then
+		return
+	end
+	
+	GiveNotifyingOrder(clickCommandID, {clickUnitID}, GetCmdOpts(alt, ctrl, meta, shift, clickRight))
+	if (not shift) and (not clickRight) then
+		Spring.SetActiveCommand(-1)
+	end
+	Reset()
+	return true
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function widget:CommandNotify(id, params, opts)
+	if not (attackishCommandDefs[id] and id == clickCommandID) then
+		return false
+	end
+	if #params < 3 or (#params >= 4 and params[4] > 10) then
 		return false
 	end
 	
-	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	GiveNotifyingOrder(clickCommandID, {clickUnitID}, GetCmdOpts(alt, ctrl, meta, shift, button == RIGHT_CLICK))
-	Reset()
+	local x, y = Spring.WorldToScreenCoords(params[1], params[2], params[3])
+	if not (x and y) then
+		return false
+	end
+	
+	return MouseRelease(x, y)
 end
+
+local mousePressed = false
+function widget:Update()
+	local x, y, left, middle, right, offscreen = Spring.GetMouseState()
+	if (left or right) and not mousePressed then
+		MousePress(x, y, right)
+		mousePressed = true
+	end
+	if not (left or right) and mousePressed then
+		MouseRelease(x, y)
+		mousePressed = false
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
