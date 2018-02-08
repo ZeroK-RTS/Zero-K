@@ -1006,8 +1006,8 @@ function gadget:GameFrame(n)
 				-- Calculate total energy and misc. metal income from units and structures
 				local genList = generatorList[allyTeamID][teamID]
 				local gen = generator[allyTeamID][teamID]
-				local sumMetal = 1
-				local sumEnergy = 1
+				local sumMetal = 0
+				local sumEnergy = 0
 				for i = 1, genList.count do
 					local unitID = genList.data[i]
 					local data = gen[unitID]
