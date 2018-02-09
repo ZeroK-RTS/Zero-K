@@ -101,24 +101,22 @@ function widget:CommandNotify(id, params, cmdOptions)
 		local units = Spring.GetSelectedUnits()
 		for i = 1, #units do
 			local unitID = units[i]
-			if isValidUnit(unitID) then
-				Spring.GiveOrderToUnit(unitID,CMD_UNIT_CANCEL_TARGET,params,0)
-			end
+			Spring.GiveOrderToUnit(unitID,CMD_UNIT_CANCEL_TARGET,params,0)
 		end
 	end
 	return false
 end
 
 function widget:UnitCommandNotify(unitID, cmdID, cmdParams, cmdOpts)
-	if isValidUnit(unitID) then
-		if TargetKeepingCommand[cmdID] and options.keepTarget.value then
+	if TargetKeepingCommand[cmdID] and options.keepTarget.value then
+		if isValidUnit(unitID) then
 			local cmd = Spring.GetCommandQueue(unitID, 1)
 			if cmd and #cmd ~= 0 and cmd[1].id == CMD.ATTACK and #cmd[1].params == 1 and not cmd[1].options.internal then
 				Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, cmd[1].params, CMD.OPT_INTERNAL)
 			end
-		elseif TargetCancelingCommand[cmdID] and options.removeTarget.value then
-			Spring.GiveOrderToUnit(unitID, CMD_UNIT_CANCEL_TARGET,cmdParams, 0)
 		end
+	elseif TargetCancelingCommand[cmdID] and options.removeTarget.value then
+		Spring.GiveOrderToUnit(unitID, CMD_UNIT_CANCEL_TARGET,cmdParams, 0)
 	end
 	return false
 end

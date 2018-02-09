@@ -84,6 +84,7 @@ local drawPlayerAlways = {}
 
 local allyTargetUnits = {
 	[UnitDefNames["jumpsumo"].id] = true,
+	[UnitDefNames["amphlaunch"].id] = true,
 }
 
 local unitSetTargetCmdDesc = {
@@ -147,7 +148,7 @@ local function setTarget(data, sendToWidget)
 			end
 		elseif spValidUnitID(data.targetID) and (data.allyAllowed or (spGetUnitAllyTeam(data.targetID) ~= data.allyTeam)) then
 			if (not Spring.GetUnitIsCloaked(data.targetID)) and unitInRange(data.id, data.targetID, data.range) and (data.id ~= data.targetID) then
-				spSetUnitTarget(data.id, data.targetID)
+				spSetUnitTarget(data.id, data.targetID, false, true)
 			end
 			if sendToWidget then
 				spSetUnitRulesParam(data.id,"target_type",TARGET_UNIT)
