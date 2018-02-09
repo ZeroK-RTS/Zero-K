@@ -72,14 +72,14 @@ unitDef = {
 	  customParams        = {
 	    disarmDamageMult = 1,
 		disarmDamageOnly = 1,
-		disarmTimer      = 9, -- seconds
+		disarmTimer      = 6, -- seconds
 	  
 		light_camera_height = 1500,
 		light_color = [[1 1 1]],
 	  },
 	  
       damage                  = {
-        default        = 1500,
+        default        = 1800,
       },
 
       edgeEffectiveness       = 0.4,
@@ -93,7 +93,7 @@ unitDef = {
       model                   = [[wep_merl.s3o]],
       noSelfDamage            = true,
       range                   = 940,
-      reloadtime              = 7,
+      reloadtime              = 10,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/vlaunch_emp_hit]],
       soundHitVolume          = 9.0,
