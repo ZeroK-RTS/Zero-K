@@ -131,7 +131,7 @@ local function CheckMoveGoalUpdate(unitID, data)
 	data.oldX, data.oldY, data.oldZ = x, y, z
 	local range = GetEffectiveWeaponRange(data.unitDefID, -y, data.weaponNumOverride)
 	--Spring.Echo("range", range, math.sqrt(x^2 + z^2))
-	if x^2 + z^2 < (range - RANGE_LEEWAY)^2 then
+	if range and (x^2 + z^2 < (range - RANGE_LEEWAY)^2) then
 		return
 	end
 	Spring.SetUnitMoveGoal(unitID, ax, by, az, range - RANGE_LEEWAY)

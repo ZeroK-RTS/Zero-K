@@ -33,6 +33,7 @@ for i = 1, #WeaponDefs do
 	end
 end
 
+local GetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
 -------------------------------------------------------------------------------------
@@ -113,6 +114,15 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	ty = math.max(ty, 0)
 	
 	local dx, dy, dz = tx - x, ty - y, tz - z
+	local maxRange = GetEffectiveWeaponRange(data.unitDefID, -dy, data.weaponNum)
+	local fireDistance = math.sqrt(dx^2 + dz^2)
+	
+	if maxRange and fireDistance > maxRange*1.05 then
+		maxRange = maxRange*1.05
+		dx = dx*maxRange/fireDistance
+		dz = dz*maxRange/fireDistance
+	end
+	
 	local px, py, pz = dx/FLY_TIME, FLY_TIME*GRAVITY/2 + dy/FLY_TIME, dz/FLY_TIME
 	
 	local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
@@ -166,6 +176,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		throwUnits.Add(unitID, 
 			{
 				def = throwDefs[unitDefID],
+				unitDefID = unitDefID,
+				weaponNum = 1,
 			}
 		)
 	end
