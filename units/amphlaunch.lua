@@ -70,14 +70,12 @@ unitDef = {
 
     TELEPORT_GUN = {
       name                    = [[Unit Launcher]],
-      accuracy                = 350,
+      accuracy                = 0,
       areaOfEffect            = 224, -- UI
       avoidFeature            = false,
       avoidFriendly           = false,
       avoidGround             = false,
       burnblow                = true,
-      collideFeature          = false,
-      collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -93,6 +91,7 @@ unitDef = {
       explosionSpeed          = 50,
 	  intensity               = 0.9,
       interceptedByShieldType = 1,
+      leadLimit               = 0,
 	  myGravity               = 0.08,
       projectiles             = 1,
       range                   = 660,
