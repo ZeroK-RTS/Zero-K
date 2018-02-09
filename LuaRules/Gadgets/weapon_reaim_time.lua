@@ -63,14 +63,14 @@ function gadget:Initialize()
 	end
 end
 
-function gadget:GameFrame(n)
-	-- Performance test by switching during games.
-	if n < START_TIME then
-		return
-	end
-	if n%FLIP_PERIOD == 0 then
-		useRapidReaim = not useRapidReaim
-		Spring.Echo("useRapidReaim", useRapidReaim) -- Intentional
-		gadget:Initialize()
-	end
-end
+--function gadget:GameFrame(n)
+--	-- Performance test by switching during games.
+--	if n < START_TIME then
+--		return
+--	end
+--	if n%FLIP_PERIOD == 0 then
+--		useRapidReaim = not useRapidReaim
+--		Spring.Echo("useRapidReaim", useRapidReaim) -- Intentional
+--		gadget:Initialize()
+--	end
+--end
