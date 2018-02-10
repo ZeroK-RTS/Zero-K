@@ -90,6 +90,8 @@ local BUTTON_FOCUS_COLOR
 --------------------------------------------------------------------------------
 --utilities
 
+local teamNames = {}
+
 --formats final stat to fit in label
 local function numFormat(label)
 	if not label then
@@ -215,13 +217,7 @@ local function drawGraph(graphArray, graph_m, teamID, team_num)
 	if usingAllyteams then
 		name = Spring.GetGameRulesParam("allyteam_long_name_" .. teamID)
 	else
-		local _,playerID,_,isAI = Spring.GetTeamInfo(teamID)
-		if isAI then
-			local _,botID,_,shortName = Spring.GetAIInfo(teamID)
-			name = (shortName or "Bot") .." - " .. (botID or "")
-		else
-			name = Spring.GetPlayerInfo(playerID) or playerNames[teamID] or "???"
-		end
+		name = teamNames[teamID] or "???"
 	end
 
 	for i = 1, #graphArray do
@@ -530,6 +526,19 @@ end
 
 function widget:Initialize()
 	WG.MakeStatsPanel = makePanel
+
+	local teams = Spring.GetTeamList()
+	for i = 1, #teams do
+		local teamID = teams[i]
+		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		local name
+		if isAI then
+			name = select(2, Spring.GetAIInfo(teamID))
+		else
+			name = Spring.GetPlayerInfo(playerID)
+		end
+		teamNames[teamID] = name
+	end
 end
 
 function widget:GameOver()
