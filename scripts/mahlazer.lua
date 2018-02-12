@@ -96,7 +96,11 @@ local function CallSatelliteScript(funcName, args)
 	if not satUnitID then
 		return
 	end
-	local func = Spring.UnitScript.GetScriptEnv(satUnitID)[funcName]
+	local env = Spring.UnitScript.GetScriptEnv(satUnitID)
+	if not env then
+		return
+	end
+	local func = env[funcName]
 	if func then
 		Spring.UnitScript.CallAsUnit(satUnitID, func, args)
 	end
