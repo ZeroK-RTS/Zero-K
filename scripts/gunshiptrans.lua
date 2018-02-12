@@ -26,7 +26,7 @@ local SIG_CLOSEDOORS = 2
 local smokePiece = {base, engineEmit}
 
 include "constants.lua"
-
+include "transports.lua"
 
 local function openDoors()
 
@@ -214,7 +214,14 @@ function script.BeginTransport(passengerID)
 		return 
 	end
 	Move(link, y_axis, -Spring.GetUnitHeight(passengerID), nil, true)
-
+	
+	if not TransportAllowed(passengerID) then
+		Sleep(10)
+		unitLoaded = passengerID
+		ForceDropUnit()
+		return
+	end
+	
 	--local px, py, pz = Spring.GetUnitBasePosition(passengerID)
 	SetUnitValue(COB.BUSY, 1)
 

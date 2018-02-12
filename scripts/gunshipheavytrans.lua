@@ -90,6 +90,7 @@ local weaponPieces = {
 local smokePiece = {body, engineEmit}
 
 include "constants.lua"
+include "transports.lua"
 
 local function openDoors()
 
@@ -374,7 +375,7 @@ local function PickupAndDropFixer()
 	end
 end
 
-function script.MoveRate(curRate)	
+function script.MoveRate(curRate)
 	local passengerId = getPassengerId()
 	
 	if doorOpen and not isValidCargo(passengerId,unitLoaded) then
@@ -393,6 +394,13 @@ function script.BeginTransport(passengerID)
 	end
 	Move(link, y_axis, -Spring.GetUnitHeight(passengerID) - 15, nil, true)
 	
+	if not TransportAllowed(passengerID) then
+		Sleep(10)
+		unitLoaded = passengerID
+		ForceDropUnit()
+		return
+	end
+	
 	--local px, py, pz = Spring.GetUnitBasePosition(passengerID)
 	SetUnitValue(COB.BUSY, 1)
 
@@ -400,7 +408,9 @@ function script.BeginTransport(passengerID)
 	unitLoaded = passengerID
 	loaded = true
 	
+	
 	Sleep(500)
+	
 	--StartThread(closeDoors)
 end
 
