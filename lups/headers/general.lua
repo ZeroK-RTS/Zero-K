@@ -52,9 +52,9 @@ function GetShieldColor(unitID, self)
 		local hitTime = Spring.GetUnitRulesParam(unitID, "shieldHitFrame")
 		local frame = Spring.GetGameFrame()
 		if hitTime and (hitTime + HIT_DURATION > frame) then
-			col1[4] = col1[4]*hitOpacityMult[frame - hitTime + 1]*(self.hitResposeMult or 1)
+			col1[4] = (col1[4] or 0.5)*(hitOpacityMult[frame - hitTime + 1] or 1)*(self.hitResposeMult or 1)
 			if col2 then
-				col2[4] = col2[4]*hitOpacityMult[frame - hitTime + 1]*(self.hitResposeMult or 1)
+				col2[4] = (col2[4] or 0.5)*(hitOpacityMult[frame - hitTime + 1] or 1)*(self.hitResposeMult or 1)
 			end
 		end
 	end
