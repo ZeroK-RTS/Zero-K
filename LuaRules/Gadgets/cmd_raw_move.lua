@@ -172,6 +172,7 @@ local moveRawCmdDesc = {
 local TEST_MOVE_SPACING = 16
 local LAZY_TEST_MOVE_SPACING = 8
 local LAZY_SEARCH_DISTANCE = 450
+local BLOCK_RELAX_DISTANCE = 250
 local STUCK_TRAVEL = 25
 local STUCK_MOVE_RANGE = 140
 local GIVE_UP_STUCK_DIST_SQ = 250^2
@@ -208,7 +209,7 @@ local fastConstructorUpdate
 ----------------------------------------------------------------------------------------------
 -- Utilities
 
-local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distance, testSpacing, distanceLimit, goalDistance)
+local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distance, testSpacing, distanceLimit, goalDistance, blockRelaxDistance)
 	local vX = gX - sX
 	local vZ = gZ - sZ
 	-- distance had better be math.sqrt(vX*vX + vZ*vZ) or things will break
@@ -222,15 +223,40 @@ local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distance, testSpacing, dist
 	end
 
 	if distanceLimit and (distance > distanceLimit) then
+		if blockRelaxDistance then
+			blockRelaxDistance = blockRelaxDistance - distance + distanceLimit
+			if blockRelaxDistance < testSpacing then
+				blockRelaxDistance = false
+			end
+		end
 		distance = distanceLimit
 	end
 
+	local blockedDistance = false
 	for test = 0, distance, testSpacing do
 		if not Spring.TestMoveOrder(unitDefID, sX + test*vX, 0, sZ + test*vZ) then
-			return false
+			blockedDistance = test
+			break
 		end
 	end
-	return true
+	
+	
+	if (not blockedDistance) or (not blockRelaxDistance) or (blockedDistance == 0) or ((distance - blockedDistance) > blockRelaxDistance) then
+		return (not blockedDistance)
+	end
+	
+	local relaxX, relaxZ
+	for test = distance, blockedDistance - testSpacing, -testSpacing do
+		if Spring.TestMoveOrder(unitDefID, sX + test*vX, 0, sZ + test*vZ) then
+			if not relaxX then
+				relaxX, relaxZ = sX + test*vX, sZ + test*vZ
+			end
+		elseif relaxX then
+			return false, relaxX, relaxZ
+		end
+	end
+	
+	return true, relaxX, relaxZ
 end
 
 local function ResetUnitData(unitData)
@@ -284,7 +310,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	end
 
 	local x, y, z = spGetUnitPosition(unitID)
-	local distSq = (x - cmdParams[1])*(x - cmdParams[1]) + (z - cmdParams[3])*(z - cmdParams[3])
+	local distSq = (x - (unitData.mx or cmdParams[1]))^2 + (z - (unitData.mz or cmdParams[3]))^2
 
 	if not unitData.cx then
 		unitData.cx, unitData.cz = cmdParams[1], cmdParams[3]
@@ -377,18 +403,23 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	unitData.nextTestTime = (unitData.nextTestTime or 0) - timerIncrement
 	if unitData.nextTestTime <= 0 then
 		local lazy = unitData.doingRawMove
+		local mx, my, mz = cmdParams[1], cmdParams[2], cmdParams[3]
 		local freePath
 		if (turnDiameterSq[unitDefID] or 0) > distSq then
 			freePath = false
 		else
 			local distance = math.sqrt(distSq)
-			freePath = IsPathFree(unitDefID, x, z, cmdParams[1], cmdParams[3], distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE, goalDistOverride and (goalDistOverride - 20))
+			freePath, rx, rz = IsPathFree(unitDefID, x, z, cmdParams[1], cmdParams[3], distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE, goalDistOverride and (goalDistOverride - 20), BLOCK_RELAX_DISTANCE)
+			if rx then
+				mx, my, mz = rx, Spring.GetGroundHeight(rx, rz), rz
+			end
 			if (not freePath) then
 				unitData.nextRawCheckDistSq = (distance - RAW_CHECK_SPACING)*(distance - RAW_CHECK_SPACING)
 			end
 		end
 		if (not unitData.commandHandled) or unitData.doingRawMove ~= freePath then
-			Spring.SetUnitMoveGoal(unitID, cmdParams[1], cmdParams[2], cmdParams[3], goalDist[unitDefID] or 16, nil, freePath)
+			Spring.SetUnitMoveGoal(unitID, mx, my, mz, goalDist[unitDefID] or 16, nil, freePath)
+			unitData.mx, unitData.mz = mx, mz
 			unitData.nextTestTime = math.floor(math.random()*2) + turnPeriods[unitDefID]
 			unitData.possiblyTurning = true
 		elseif unitData.possiblyTurning then

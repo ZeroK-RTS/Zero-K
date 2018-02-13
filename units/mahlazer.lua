@@ -321,16 +321,16 @@ unitDef = {
     DEAD  = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 10,
+      footprintZ       = 10,
       object           = [[starlight_dead.dae]],
     },
 
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 10,
+      footprintZ       = 10,
       object           = [[debris3x3c.s3o]],
     },
 
