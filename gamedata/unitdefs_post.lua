@@ -593,7 +593,12 @@ local function GetDimensions(scale)
 	if not scale then
 		return false
 	end
-	local dimensions = Explode(" ", scale)
+	local dimensionsStr = Explode(" ", scale)
+	-- string conversion (required for MediaWiki export)
+	local dimensions = {}
+	for i,v in pairs(dimensionsStr) do
+		dimensions[i] = tonumber(v)
+	end
 	local largest = (dimensions and dimensions[1] and tonumber(dimensions[1])) or 0
 	for i = 2, 3 do
 		largest = math.max(largest, (dimensions and dimensions[i] and tonumber(dimensions[i])) or 0)
