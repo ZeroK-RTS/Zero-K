@@ -489,6 +489,11 @@ end
 local timer = 0
 local startPosTimer = 0
 function widget:Update(dt)
+	if Spring.GetGameRulesParam("totalSaveGameFrame") then
+		widgetHandler:RemoveWidget()
+		return
+	end
+	
 	if timer then
 		timer = timer + dt
 		if timer >= 0.01 then

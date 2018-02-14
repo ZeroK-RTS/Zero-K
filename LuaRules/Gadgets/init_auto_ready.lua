@@ -126,15 +126,16 @@ function gadget:GameSetup(label, ready, playerStates)
 	return true, false
 end
 
-function gadget:DrawScreen()
-	if fixedStartPos then
-		return
+local function GetStartText()
+	if Spring.GetGameRulesParam("totalSaveGameFrame") then
+		return "Loading game..."
 	end
-	local vsx, vsy = gl.GetViewSizes()
+	
 	local text = lastLabel 
 	if text == nil then 
 		text = "Waiting for people "
-	end 
+	end
+	
 	if (next(waitingFor) ~= nil) then 
 		if singleplayer then
 			text = "\255\255\255\255Choose start position"
@@ -157,13 +158,21 @@ function gadget:DrawScreen()
 			text = text .. "\n\255\255\255\255 Say !force to start sooner"
 		end
 	elseif string.find(text, "Choose") then
-		text = "\255\255\255\255Starting"
-	end 
+		return "\255\255\255\255Starting"
+	end
+	return text
+end
+
+function gadget:DrawScreen()
+	if fixedStartPos then
+		return
+	end
+	local vsx, vsy = gl.GetViewSizes()
 
     glPushMatrix()
     glTranslate((vsx * 0.5), (vsy * 0.5)+150, 0)
     glScale(1.5, 1.5, 1)
-    glText(text, 0, 0, 14, "oc")
+    glText(GetStartText(), 0, 0, 14, "oc")
     glPopMatrix()
 end 
 
