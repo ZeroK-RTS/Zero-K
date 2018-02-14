@@ -21,7 +21,7 @@ local SAVE_DIR_LENGTH = string.len(SAVE_DIR) + 2
 local AUTOSAVE_DIR = SAVE_DIR .. "/auto"
 local MAX_SAVES = 999
 
-local LOAD_GAME_STRING = "load_filename_"
+local LOAD_GAME_STRING = "loadFilename "
 
 --------------------------------------------------------------------------------
 -- Chili elements

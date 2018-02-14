@@ -2583,21 +2583,6 @@ local function MakeQuitButtons()
 
 	AddOption('', {
 		type = 'button',
-		name = 'Restart',
-		desc = "Restart the game",
-		icon = imgPath..'epicmenu/undo.png',
-		OnChange = function()
-				if WG.LocalRestart then
-					WG.LocalRestart.DoRestart()
-				end
-			end,
-		key = 'Restart',
-		DisableFunc = function()
-			return not (WG.LocalRestart and WG.LocalRestart.CheckAllowed())
-		end,
-	})
-	AddOption('', {
-		type = 'button',
 		name = 'Vote Resign',
 		desc = "Ask teammates to resign",
 		icon = imgPath..'epicmenu/whiteflag_check.png',
@@ -2639,6 +2624,32 @@ local function MakeQuitButtons()
 		DisableFunc = function() 
 			return (Spring.GetSpectatingState() or isMission) 
 		end, --function that trigger grey colour on buttons (not actually disable their functions)
+	})
+	AddOption('', {
+		type = 'button',
+		name = 'Restart',
+		desc = "Restart the game",
+		icon = imgPath..'epicmenu/undo.png',
+		OnChange = function()
+				-- Only allow restarting for local games or by the host of steam coop.
+				if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
+					local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+					if myPing and myPing < 40 then
+						MakeExitConfirmWindow("Are you sure you want to restart?", function() 
+							Spring.SendLuaMenuMsg("restartGame")
+						end)
+					end
+				end
+			end,
+		key = 'Restart',
+		DisableFunc = function()
+			-- Only allow restarting for local games or by the host of steam coop.
+			if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
+				local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+				return not (myPing and myPing < 40)
+			end
+			return true
+		end,
 	})
 	AddOption('', {
 		type = 'button',
