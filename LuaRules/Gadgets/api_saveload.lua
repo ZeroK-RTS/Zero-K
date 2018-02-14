@@ -468,6 +468,8 @@ local function LoadGeneralInfo()
 	spSetGameRulesParam("lastSaveGameFrame", savedata.general.gameFrame)
 	-- Total game frame if all saves were stitched together
 	spSetGameRulesParam("totalSaveGameFrame", savedata.general.totalGameFrame)
+	-- Set the gameID of the original game
+	spSetGameRulesParam("save_gameID", savedata.general.save_gameID)
 	
 	-- team data
 	for teamID, teamData in pairs(savedata.general.teams or {}) do
@@ -899,6 +901,7 @@ local function SaveGeneralInfo()
 	
 	data.gameFrame = Spring.GetGameFrame()
 	data.totalGameFrame = data.gameFrame + (Spring.GetGameRulesParam("lastSaveGameFrame") or 0)
+	data.save_gameID = (Spring.GetGameRulesParam("save_gameID") or Game.gameID)
 	
 	-- gameRulesParams
 	data.gameRulesParams = {}

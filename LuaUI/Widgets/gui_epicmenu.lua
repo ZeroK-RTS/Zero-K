@@ -2583,6 +2583,21 @@ local function MakeQuitButtons()
 
 	AddOption('', {
 		type = 'button',
+		name = 'Restart',
+		desc = "Restart the game",
+		icon = imgPath..'epicmenu/undo.png',
+		OnChange = function()
+				if WG.LocalRestart then
+					WG.LocalRestart.DoRestart()
+				end
+			end,
+		key = 'Restart',
+		DisableFunc = function()
+			return not (WG.LocalRestart and WG.LocalRestart.CheckAllowed())
+		end,
+	})
+	AddOption('', {
+		type = 'button',
 		name = 'Vote Resign',
 		desc = "Ask teammates to resign",
 		icon = imgPath..'epicmenu/whiteflag_check.png',
