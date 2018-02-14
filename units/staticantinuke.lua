@@ -71,7 +71,7 @@ unitDef = {
       craterMult              = 2,
 	  
 	  customParams            = {
-        --reaim_time = 15,
+        reaim_time = 15,
         nuke_coverage = 2500,
 	  },
 	  
