@@ -1,1 +1,1 @@
-Shared.FACTORY_COST = 1000
+Shared.FACTORY_COST = 800

@@ -4,7 +4,7 @@ unitDef = {
   description            = [[Raider/Scout Rover]],
   acceleration           = 0.14,
   brakeRate              = 0.1555,
-  buildCostMetal         = 35,
+  buildCostMetal         = 40,
   builder                = false,
   buildPic               = [[vehscout.png]],
   canGuard               = true,
@@ -75,8 +75,8 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
   
-      customParams			= {
-	    timeslow_damagefactor = 3,
+      customParams            = {
+	    timeslow_damagefactor = 4,
 		
 		light_camera_height = 2000,
 		light_color = [[0.85 0.33 1]],
@@ -84,7 +84,7 @@ unitDef = {
       },
 	  
       damage                  = {
-	    default = 45,
+	    default = 35,
       },
   
       explosionGenerator      = [[custom:flash2purple]],
@@ -97,7 +97,7 @@ unitDef = {
       laserFlareSize          = 4.33,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 180,
+      range                   = 150,
       reloadtime              = 1,
       rgbColor                = [[0.3 0 0.4]],
       soundStart              = [[weapon/laser/heavy_laser5]],
