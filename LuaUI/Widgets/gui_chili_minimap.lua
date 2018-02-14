@@ -586,7 +586,8 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		return
 	end
 	if not updateRunOnceRan then
-		if Spring.GetGameFrame() > 0 then
+		local frame = (Spring.GetGameRulesParam("totalSaveGameFrame") or 0) + Spring.GetGameFrame()
+		if frame > 0 then
 			setSensorState(options.initialSensorState.value)
 			updateRadarColors()
 		end
