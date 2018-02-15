@@ -3,8 +3,7 @@
 #ifndef SMOKE_H_
 #define SMOKE_H_
 
-#include "SFXtype.h"
-#include "EXPtype.h"
+#include "constants.h"
 
 // Figure out how many smoking pieces are defined
 
