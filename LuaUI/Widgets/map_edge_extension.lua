@@ -48,9 +48,11 @@ local drawingEnabled = true
 local function ResetWidget()
 	if dList and not drawingEnabled then
 		gl.DeleteList(dList)
+		dList = nil
 	end
 	if mirrorShader and not drawingEnabled then
 		gl.DeleteShader(mirrorShader)
+		mirrorShader = nil
 	end
 	widget:Initialize()
 end
