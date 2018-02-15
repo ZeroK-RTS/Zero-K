@@ -373,6 +373,11 @@ end
 --callins
 
 local function StartEndgameTimer (delay)
+	if Spring.GetModOptions().singleplayercampaignbattleid then
+		-- SP has its own endgame thing
+		return
+	end
+
 	gameEnded = true
 	showEndgameWindowTimer = endgameWindowDelay
 	widgetHandler:UpdateCallIn("Update")
