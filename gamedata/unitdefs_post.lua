@@ -398,7 +398,7 @@ for name, ud in pairs(UnitDefs) do
 
 
 	if ud.category and not (ud.category:find("SHIP",1,true) or ud.category:find("SUB",1,true)) then
-		if (ud.maxvelocity) then
+		if (ud.maxvelocity) and not ud.maxreversevelocity then
 			if not name:find("chicken",1,true) then
 				ud.maxreversevelocity = ud.maxvelocity * 0.33
 			end
