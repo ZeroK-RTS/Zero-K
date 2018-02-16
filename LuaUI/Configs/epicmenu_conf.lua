@@ -81,7 +81,7 @@ local function nullFunc()
 end
 
 local function AddOption(path, option)
-	option.path = path or "Settings\Broken Paths"
+	option.path = path or "Settings/Broken Paths"
 	if not option.key then
 		option.key = option.name
 	end
