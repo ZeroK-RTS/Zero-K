@@ -39,7 +39,7 @@ function widget:RecvLuaMsg(msg)
 		local value = tostring(string.sub(msg, 19))
 		if value then
 			SetUiScale(value/100)
-			local vsx, vsy = widgetHandler:GetViewSizes()
+			local vsx, vsy = Spring.Orig.GetViewSizes()
 			local widgets = widgetHandler.widgets
 			for i = 1, #widgets do
 				local w = widgets[i]

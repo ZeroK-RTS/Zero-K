@@ -2211,7 +2211,7 @@ local function UpdateTooltip(dt, requiredOnly)
 	local visible = (not outsideSpring) and UpdateTooltipContent(worldMx, worldMy, dt, requiredOnly)
 	tooltipWindow.SetVisible(visible)
 	if visible then
-		tooltipWindow.SetPosition(mx + 20*(WG.uiScale or 1), my - 20*(WG.uiScale or 1))
+		tooltipWindow.SetPosition(mx + 20/(WG.uiScale or 1), my - 20/(WG.uiScale or 1))
 	end
 end
 
@@ -2220,7 +2220,6 @@ end
 -- Selection window handler
 
 local function GetSelectionWindow()
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
 	local x = integralWidth
@@ -2397,8 +2396,8 @@ function widget:SelectionChanged(newSelection)
 end
 
 function widget:ViewResize(vsx, vsy)
-	screenWidth = vsx
-	screenHeight = vsy
+	screenWidth = vsx/(WG.uiScale or 1)
+	screenHeight = vsy/(WG.uiScale or 1)
 end
 
 function widget:Initialize()
