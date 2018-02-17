@@ -292,8 +292,8 @@ local function SetupDefaultPreset()
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
 	-- Minimap
-	local minimapWidth = screenWidth*2/11
-	local minimapHeight = screenWidth*2/11 + 20
+	local minimapWidth = math.ceil(screenWidth*2/11)
+	local minimapHeight = math.ceil(screenWidth*2/11 + 20)
 	WG.Minimap_SetOptions("arwindow", 0, false, false, false)
 	WG.SetWindowPosAndSize("Minimap Window", 
 		0, 
@@ -723,6 +723,7 @@ end
 
 local function SetupNewUITop()
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	screenHeight = math.floor(screenHeight)
 	local SIZE_FACTOR = 1
 	if screenWidth > 3000 and USE_SIZE_FACTOR then
 		SIZE_FACTOR = 2
@@ -820,6 +821,7 @@ local function SetupMinimapLeftPreset()
 	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	screenHeight = math.ceil(screenHeight)
 	
 	if screenWidth <= 1650 then
 		fancySkinOverride = SKIN_FLUSH
@@ -924,6 +926,7 @@ local function SetupMinimapRightPreset()
 	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	screenHeight = math.ceil(screenHeight)
 	
 	if screenWidth <= 1650 then
 		fancySkinOverride = SKIN_FLUSH

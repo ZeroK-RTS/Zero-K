@@ -1103,7 +1103,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		parent = Chili.Screen0,
 		dockable = true,
 		name="EconomyPanelDefaultTwo",
-		padding = {0,0,0,0},
+		padding = {0,-1,0,0},
 		-- right = "50%",
 		x = oldX or (screenHorizCentre - economyPanelWidth/2),
 		y = oldY or 0,
@@ -1159,12 +1159,12 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	local storageX    = "18%"
 	local incomeX     = "44%"
 	local pullX       = "70%"
-	local textY       = "46%"
+	local textY       = "47%"
 	local textWidth   = "45%"
 	local textHeight  = "26%"
 	
 	local barX      = "17%"
-	local barY      = "9%"
+	local barY      = "10%"
 	local barRight  = "4%"
 	local barHeight = "38%"
 	

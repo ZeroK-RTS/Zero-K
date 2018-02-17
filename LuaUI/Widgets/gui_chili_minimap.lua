@@ -84,7 +84,7 @@ local function AdjustToMapAspectRatio(w, h, buttonRight)
 	if w/h < mapRatio then
 		return w + wPad, w/mapRatio + hPad
 	end
-	return h*mapRatio + wPad, h + hPad
+	return math.ceil(h*mapRatio + wPad), math.ceil(h + hPad)
 end
 
 local function AdjustMapAspectRatioToWindow(x,y,w,h)

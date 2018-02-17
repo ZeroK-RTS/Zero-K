@@ -27,12 +27,18 @@ local reverseCompatibility = false
 
 local UI_SCALE_MESSAGE = "SetInterfaceScale "
 
-WG.uiScale = (Spring.GetConfigInt("interfaceScale", 100) or 100)/100
+local function SetUiScale(scaleFactor)
+	-- Scale such that width is an integer, because the UI aligns along the bottom of the screen.
+	local realWidth = gl.GetViewSizes()
+	WG.uiScale = realWidth/math.floor(realWidth/scaleFactor)
+end
+SetUiScale((Spring.GetConfigInt("interfaceScale", 100) or 100)/100)
+
 function widget:RecvLuaMsg(msg)
 	if string.find(msg, UI_SCALE_MESSAGE) == 1 then
 		local value = tostring(string.sub(msg, 19))
 		if value then
-			WG.uiScale = value/100
+			SetUiScale(value/100)
 			local vsx, vsy = widgetHandler:GetViewSizes()
 			local widgets = widgetHandler.widgets
 			for i = 1, #widgets do

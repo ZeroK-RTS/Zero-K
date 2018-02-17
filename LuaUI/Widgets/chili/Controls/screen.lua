@@ -30,7 +30,7 @@ function Screen:New(obj)
     obj.width = vsx
   end
   if ((obj.height or -1) <= 0) then
-    obj.height = vsy
+    obj.height = math.ceil(vsy)
   end
 
   obj = inherited.New(self,obj)
@@ -113,8 +113,8 @@ end
 --//=============================================================================
 
 function Screen:Resize(w,h)
-	self.width = w
-	self.height = h
+	self.width = math.ceil(w)
+	self.height = math.ceil(h)
 	self:CallChildren("RequestRealign")
 end
 
