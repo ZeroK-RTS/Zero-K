@@ -245,8 +245,12 @@ end
 function ScrollPanel:_DrawInClientArea(fnc,...)
   local clientX,clientY,clientWidth,clientHeight = unpack4(self.clientArea)
 
+  if WG.uiScale and WG.uiScale ~= 1 then
+    clientWidth, clientHeight = clientWidth*WG.uiScale, clientHeight*WG.uiScale
+  end
+  
   if (self.safeOpengl) then
-    local sx,sy = self:LocalToScreen(clientX,clientY)
+    local sx,sy = self:UnscaledLocalToScreen(clientX,clientY)
     sy = select(2,gl.GetViewSizes()) - (sy + clientHeight)
 
     PushScissor(sx,sy,clientWidth,clientHeight)

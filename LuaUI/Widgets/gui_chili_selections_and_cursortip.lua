@@ -27,6 +27,7 @@ local spSelectUnitArray = Spring.SelectUnitArray
 local spGetUnitWeaponState = Spring.GetUnitWeaponState
 local spGetUnitCurrentBuildPower = Spring.GetUnitCurrentBuildPower
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spScaledGetMouseState = Spring.ScaledGetMouseState
 
 local GetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
 local GetHumanName = Spring.Utilities.GetHumanName
@@ -2205,11 +2206,12 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 end
 
 local function UpdateTooltip(dt, requiredOnly)
-	local mx, my, _, _, _, outsideSpring = spGetMouseState()
-	local visible = (not outsideSpring) and UpdateTooltipContent(mx, my, dt, requiredOnly)
+	local mx, my, _, _, _, outsideSpring = spScaledGetMouseState()
+	local worldMx, worldMy = spGetMouseState()
+	local visible = (not outsideSpring) and UpdateTooltipContent(worldMx, worldMy, dt, requiredOnly)
 	tooltipWindow.SetVisible(visible)
 	if visible then
-		tooltipWindow.SetPosition(mx + 20, my - 20)
+		tooltipWindow.SetPosition(mx + 20*(WG.uiScale or 1), my - 20*(WG.uiScale or 1))
 	end
 end
 

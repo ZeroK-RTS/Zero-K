@@ -1042,7 +1042,7 @@ function widget:DrawScreen()
 		cx,cy,cw,ch = AdjustMapAspectRatioToWindow(cx,cy,cw,ch)
 	end
 	
-	local vsx,vsy = gl.GetViewSizes()
+	local vsx,vsy = Spring.GetViewGeometry()
 	if (lw ~= cw or lh ~= ch or lx ~= cx or ly ~= cy or last_window_x ~= window.x or last_window_y ~= window.y) then
 		lx = cx
 		ly = cy
@@ -1052,11 +1052,11 @@ function widget:DrawScreen()
 		last_window_y = window.y
 		
 		cx,cy = map_panel:LocalToScreen(cx,cy)
-		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
+		gl.ConfigMiniMap(cx*(WG.uiScale or 1),(vsy-ch-cy)*(WG.uiScale or 1),cw*(WG.uiScale or 1),ch*(WG.uiScale or 1))
 		WG.MinimapPosition = {cx,cy,cw,ch}
 		WG.MinimapPositionSpringSpace = {cx, vsy - cy - ch,cw,ch}
 	end
-
+	
 	-- Do this even if the fadeShader can't exist, just so that all hiding code still behaves properly
 	local alpha = 1
 	local alphaMin = options.fadeMinimapOnZoomOut.value == 'full' and 0.0 or 0.3
@@ -1102,24 +1102,22 @@ function widget:DrawScreen()
 	gl.PushMatrix()
 
 	if fbo ~= nil and fadeShader ~= nil then
-
 		gl.ActiveFBO(fbo, DrawMiniMap)
+		gl.Blending(true)
 
-	  gl.Blending(true)
+		-- gl.Color(1,1,1,alpha)
+		gl.Texture(0, offscreentex)
+		gl.UseShader(fadeShader)
+		gl.Uniform(alphaLoc, alpha)
+		local px, py = window.x + lx, vsy - window.y - ly
+		gl.Uniform(boundsLoc, (px/vsx), ((py - lh)/vsy), (lw/vsx), (lh/vsy))
+		gl.Uniform(screenLoc, vsx, vsy)
+		-- Spring.Echo("Bounds: "..(window.x + lx)/vsx..", "..(window.y + ly)/vsy..", "..((window.x + lx) + lw)/vsx..", "..((window.y + ly) + lh)/vsy)
+		gl.TexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
 
-	  -- gl.Color(1,1,1,alpha)
-	  gl.Texture(0, offscreentex)
-	  gl.UseShader(fadeShader)
-	  gl.Uniform(alphaLoc, alpha)
-	  local px, py = window.x + lx, vsy - window.y - ly
-	  gl.Uniform(boundsLoc, px/vsx, (py - lh)/vsy, lw/vsx, lh/vsy)
-	  gl.Uniform(screenLoc, vsx, vsy)
-	  -- Spring.Echo("Bounds: "..(window.x + lx)/vsx..", "..(window.y + ly)/vsy..", "..((window.x + lx) + lw)/vsx..", "..((window.y + ly) + lh)/vsy)
-	  gl.TexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
-
-	  gl.Texture(0, false)
-	  gl.Blending(false)
-	  gl.UseShader(0)
+		gl.Texture(0, false)
+		gl.Blending(false)
+		gl.UseShader(0)
 	elseif (alpha > 0.01) then
 		glDrawMiniMap()
 	end

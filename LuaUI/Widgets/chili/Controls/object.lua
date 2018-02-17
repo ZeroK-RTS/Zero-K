@@ -773,12 +773,26 @@ function Object:LocalToScreen(x,y)
   return (self.parent):ClientToScreen(self:LocalToParent(x,y))
 end
 
+function Object:UnscaledLocalToScreen(x,y)
+  if (not self.parent) then
+    return x,y
+  end
+  --Spring.Echo((not self.parent) and debug.traceback())
+  return (self.parent):UnscaledClientToScreen(self:LocalToParent(x,y))
+end
 
 function Object:ClientToScreen(x,y)
   if (not self.parent) then
     return self:ClientToParent(x,y)
   end
   return (self.parent):ClientToScreen(self:ClientToParent(x,y))
+end
+
+function Object:UnscaledClientToScreen(x,y)
+  if (not self.parent) then
+    return self:ClientToParent(x,y)
+  end
+  return (self.parent):UnscaledClientToScreen(self:ClientToParent(x,y))
 end
 
 
