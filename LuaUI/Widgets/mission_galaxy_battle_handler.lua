@@ -859,7 +859,7 @@ local function DrawGameOverScreen(now)
 end
 
 local function UpdateWindowCoords()
-	screenx, screeny = widgetHandler:GetViewSizes()
+	screenx, screeny = Spring.GetViewGeometry()
 	
 	screenCenterX = screenx / 2
 	screenCenterY = screeny / 2

@@ -43,7 +43,7 @@ local screen0
 local Image
 local Button
 
-local vsx, vsy = widgetHandler:GetViewSizes()
+local vsx, vsy = Spring.GetViewGeometry()
 local modoptions = Spring.GetModOptions() --used in LuaUI\Configs\startup_info_selector.lua for planetwars
 local fixedStartPos = modoptions.fixedstartpos
 local selectorShown = false
@@ -68,10 +68,10 @@ local BUTTON_HEIGHT = 128
 
 if (vsx < 1024 or vsy < 768) then 
 	--shrinker
-	WINDOW_WIDTH = vsx* (WINDOW_WIDTH/1024)
-	WINDOW_HEIGHT = vsy* (WINDOW_HEIGHT/768)
-	BUTTON_WIDTH = vsx* (BUTTON_WIDTH/1024)
-	BUTTON_HEIGHT = vsy* (BUTTON_HEIGHT/768)
+	WINDOW_WIDTH = vsx*(WINDOW_WIDTH/1024)
+	WINDOW_HEIGHT = vsy*(WINDOW_HEIGHT/768)
+	BUTTON_WIDTH = vsx*(BUTTON_WIDTH/1024)
+	BUTTON_HEIGHT = vsy*(BUTTON_HEIGHT/768)
 end
 
 local commTips = {
@@ -440,7 +440,7 @@ function widget:Initialize()
 		noComm = true -- will prevent window from auto-appearing; can still be brought up from the button
 	end
 
-	vsx, vsy = widgetHandler:GetViewSizes()
+	vsx, vsy = Spring.GetViewGeometry()
 
 	if (not noComm) then
 		widgetHandler:AddAction(actionShow, CreateWindow, nil, "t")
