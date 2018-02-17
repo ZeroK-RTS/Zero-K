@@ -129,6 +129,7 @@ function widget:TweakDrawScreen()
 		local vsx,vsy = gl.GetViewSizes()
 		gl.Translate(0,vsy,0)
 		gl.Scale(1,-1,1)
+		gl.Scale(WG.uiScale,WG.uiScale,1)
 		screen0:TweakDraw()
 		gl.PopMatrix()
 	end
