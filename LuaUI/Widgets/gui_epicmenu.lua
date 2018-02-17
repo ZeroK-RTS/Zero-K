@@ -2543,7 +2543,7 @@ local function MakeMenuBar()
 		dockable = true,
 		backgroundColor = color.empty,
 		color = color.empty,
-		padding = {0, 0, 0, 0},
+		padding = {0, -1, 0, 0},
 		parent = screen0,
 		OnResize = {
 			function (obj)

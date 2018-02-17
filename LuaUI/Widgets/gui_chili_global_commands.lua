@@ -443,7 +443,7 @@ local function InitializeControls()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		padding = {0, 0, 0, 0},
+		padding = {0, -1, 0, 0},
 		color = {0, 0, 0, 0},
 		parent = screen0,
 	}
