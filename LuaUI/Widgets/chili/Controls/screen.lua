@@ -25,7 +25,7 @@ local inherited = this.inherited
 --//=============================================================================
 
 function Screen:New(obj)
-  local vsx,vsy = Spring.GetWindowGeometry()
+  local vsx,vsy = Spring.GetViewSizes()
   if ((obj.width or -1) <= 0) then
     obj.width = vsx
   end
@@ -142,7 +142,7 @@ function Screen:Update(...)
 			end
 			return
 		end
-		y = select(2,Spring.GetWindowGeometry()) - y
+		y = select(2,Spring.GetViewSizes()) - y
 		local cx,cy = hoveredControl:ScreenToLocal(x, y)
 		hoveredControl:MouseMove(cx, cy, 0, 0)
 	end
@@ -156,7 +156,7 @@ function Screen:IsAbove(x,y,...)
     return true
   end
 
-  y = select(2,Spring.GetWindowGeometry()) - y
+  y = select(2,Spring.GetViewSizes()) - y
   local hoveredControl = inherited.IsAbove(self,x,y,...)
 
   --// tooltip
@@ -189,7 +189,7 @@ end
 
 
 function Screen:MouseDown(x,y,...)
-  y = select(2,Spring.GetWindowGeometry()) - y
+  y = select(2,Spring.GetViewSizes()) - y
 
   local activeControl = inherited.MouseDown(self,x,y,...)
   self.activeControl = MakeWeakLink(activeControl, self.activeControl)
@@ -211,7 +211,7 @@ end
 
 
 function Screen:MouseUp(x,y,...)
-  y = select(2,Spring.GetWindowGeometry()) - y
+  y = select(2,Spring.GetViewSizes()) - y
 
   local activeControl = UnlinkSafe(self.activeControl)
   if activeControl then
@@ -247,7 +247,7 @@ end
 
 
 function Screen:MouseMove(x,y,dx,dy,...)
-  y = select(2,Spring.GetWindowGeometry()) - y
+  y = select(2,Spring.GetViewSizes()) - y
   local activeControl = UnlinkSafe(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)
@@ -267,7 +267,7 @@ end
 
 
 function Screen:MouseWheel(x,y,...)
-  y = select(2,Spring.GetWindowGeometry()) - y
+  y = select(2,Spring.GetViewSizes()) - y
   local activeControl = UnlinkSafe(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)

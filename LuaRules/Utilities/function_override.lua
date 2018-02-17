@@ -36,20 +36,26 @@ end
 Spring.Orig = Spring.Orig or {}
 Spring.Orig.GetWindowGeometry = Spring.GetWindowGeometry
 Spring.Orig.GetViewGeometry = Spring.GetViewGeometry
+Spring.Orig.GetViewSizes = gl and gl.GetViewSizes
 
 Spring.GetWindowGeometry = function()
 	local vsx, vsy, vx, vy = Spring.Orig.GetWindowGeometry()
-	return vsx/(WG.uiScale or 1), vsy/(WG.uiScale or 1), vx, vy
+	return vsx/((WG and WG.uiScale) or 1), vsy/((WG and WG.uiScale) or 1), vx, vy
 end
 
 Spring.GetViewGeometry = function()
 	local vsx, vsy, vx, vy = Spring.Orig.GetViewGeometry()
+	return vsx/((WG and WG.uiScale) or 1), vsy/((WG and WG.uiScale) or 1), vx, vy
+end
+
+Spring.GetViewSizes = function()
+	local vsx, vsy = Spring.Orig.GetViewSizes()
 	return vsx/(WG.uiScale or 1), vsy/(WG.uiScale or 1), vx, vy
 end
 
 Spring.ScaledGetMouseState = function()
 	local mx, my, left, right, mid, offscreen = Spring.GetMouseState()
-	return mx/(WG.uiScale or 1), my/(WG.uiScale or 1), left, right, mid, offscreen
+	return mx/((WG and WG.uiScale) or 1), my/((WG and WG.uiScale) or 1), left, right, mid, offscreen
 end
 
 -----------------------------------------------------------------------------------
