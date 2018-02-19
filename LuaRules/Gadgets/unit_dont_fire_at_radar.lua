@@ -95,7 +95,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		--Spring.Echo("AllowWeaponTarget frame " .. Spring.GetGameFrame())
 		if spValidUnitID(targetID) and canShootAtUnit(targetID, spGetUnitAllyTeam(unitID)) then
 			--GG.unitEcho(targetID, "target")
-			if wantGoodTarget[unitID] then
+			if (not GG.recursion_GiveOrderToUnit) and wantGoodTarget[unitID] then
 				wantGoodTarget[unitID] = nil
 				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ATTACK, CMD_OPT_INTERNAL, targetID }, {"alt"} )
 				local cQueue = spGetCommandQueue(unitID, 2)

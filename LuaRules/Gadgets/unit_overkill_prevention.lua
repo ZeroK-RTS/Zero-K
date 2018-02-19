@@ -287,7 +287,9 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 				local cmd = queue[1]
 				if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
 					--Spring.Echo("Removing auto-attack command")
+					GG.recursion_GiveOrderToUnit = true
 					spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
+					GG.recursion_GiveOrderToUnit = false
 					--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
 				end
 			else
