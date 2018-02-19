@@ -77,9 +77,11 @@ local function GetAttackTarget(unitID)
 	local cQueue = Spring.GetCommandQueue(unitID,1)
 	if cQueue and #cQueue == 1 and cQueue[1].id == CMD_ATTACK and cQueue[1].params and cQueue[1].params[1] and (not cQueue[1].params[2]) then
 		local targetID = cQueue[1].params[1]
-		local unitDefID = Spring.GetUnitDefID(targetID)
-		local ud = UnitDefs[unitDefID]
-		return targetID, ud and ud.speed ~= 0
+		if Spring.ValidUnitID(targetID) then
+			local unitDefID = Spring.GetUnitDefID(targetID)
+			local ud = UnitDefs[unitDefID]
+			return targetID, ud and ud.speed ~= 0
+		end
 	end
 end
 
@@ -88,7 +90,7 @@ local function GetCollisionDistance(unitID, targetID)
 	local _,_,_,speed = Spring.GetUnitVelocity(targetID)
 	
 	local distance = Spring.GetUnitSeparation(unitID, targetID, true)
-	return distance - speed*60
+	return distance - (speed or 0)*60
 end
 
 --------------------------------------------------------------------------------
