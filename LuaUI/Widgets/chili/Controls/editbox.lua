@@ -99,6 +99,9 @@ end
 --//=============================================================================
 
 local function explode(str)
+	if not str then
+		return {}
+	end
 	local arr = {}
 	local i, j = 1, 1
 	local N = str:len()
