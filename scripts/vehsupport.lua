@@ -324,9 +324,9 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot()
+	shot = 3 - shot
 	EmitSfx(gunPieces[shot].firepoint, UNIT_SFX1)
 	EmitSfx(gunPieces[shot].exhaust, UNIT_SFX2)
-	shot = 3 - shot
 	lastShotFrame = Spring.GetGameFrame() + FIGHT_FIRE_TIME
 end
 
