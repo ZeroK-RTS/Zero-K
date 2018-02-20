@@ -26,8 +26,6 @@ local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) 
 local pwDataRaw = modOptions.planetwarsstructures
 local pwDataFunc, err, success, unitData
 
-pwDataRaw = pwDataRaw
-
 if not (pwDataRaw and type(pwDataRaw) == 'string') then
 	unitData = {}
 else
@@ -39,7 +37,7 @@ else
 	if pwDataFunc then
 		success, unitData = pcall(pwDataFunc)
 		if not success then	-- execute Borat
-			err = pwData
+			err = unitData
 			unitData = {}
 		end
 	end
@@ -55,8 +53,8 @@ end
 --unitData = CopyTable(structureConfig, true)
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-structureDefs = {}	--holds precedurally generated structure defs
-genericStructure = UnitDefs["pw_generic"]
+local structureDefs = {} --holds precedurally generated structure defs
+local genericStructure = UnitDefs["pw_generic"]
 
 local function makeTechStructure(def, name)
 	local techName = string.sub(name,4)

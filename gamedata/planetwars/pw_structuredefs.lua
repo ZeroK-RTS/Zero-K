@@ -11,7 +11,6 @@ local fakeWeapondef = {
 	avoidNeutral            = false,
 	damage                  = {
 		default = 11.34,
-		planes  = 11.34,
 		subs    = 0.567,
 	},
 	explosionGenerator      = [[custom:FLASHPLOSION]],
@@ -92,13 +91,9 @@ local structureConfig = {
 		unitDef.buildoptions = { [[gunshiptrans]], [[gunshipheavytrans]] }
 		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
-		
-		local yardmap = ""
-		for i = 1, (unitDef.footprintx * unitDef.footprintz) do
-			yardmap = yardmap .. "o"
-		end
-		unitDef.yardmap = yardmap
-		
+
+		unitDef.yardmap = string.rep("o", unitDef.footprintx * unitDef.footprintz)
+
 		unitDef.featuredefs.dead.object = "pw_dropfac_dead.dae"
 		unitDef.featuredefs.heap.object = "debris8x8b.s3o"
 	end,
@@ -130,13 +125,9 @@ local structureConfig = {
 		unitDef.buildoptions = { [[bomberprec]], [[bomberriot]], [[bomberdisarm]], [[bomberheavy]] }
 		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
-		
-		local yardmap = ""
-		for i = 1, (unitDef.footprintx * unitDef.footprintz) do
-			yardmap = yardmap .. "o"
-		end
-		unitDef.yardmap = yardmap
-		
+
+		unitDef.yardmap = string.rep("o", unitDef.footprintx * unitDef.footprintz)
+
 		unitDef.buildpic = "pw_dropdepot.png"
 		unitDef.featuredefs.dead.object = "pw_dropdepot_dead.dae"
 		unitDef.featuredefs.heap.object = "debris8x8b.s3o"

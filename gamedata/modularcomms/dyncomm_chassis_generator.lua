@@ -169,12 +169,12 @@ for i = 1, #chassisDefs do
 		unitDef[key] = data
 	end
 	
-	for i = 1, 7 do
-		unitDef.sfxtypes.explosiongenerators[i] = unitDef.sfxtypes.explosiongenerators[i] or [[custom:NONE]]
+	for j = 1, 7 do
+		unitDef.sfxtypes.explosiongenerators[j] = unitDef.sfxtypes.explosiongenerators[j] or [[custom:NONE]]
 	end
 	
 	for num = 1, #chassisDefs[i].weapons do
-		weaponName = chassisDefs[i].weapons[num]
+		local weaponName = chassisDefs[i].weapons[num]
 		DynamicApplyWeapon(unitDef, weaponName, num)
 	end
 	
