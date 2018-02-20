@@ -35,7 +35,7 @@ local weaponDef = {
 
 		stats_hide_damage = 1, -- continuous laser
 		stats_hide_reload = 1,
-		
+
 		light_color = [[0.4 1.1 1.1]],
 		light_radius = 120,
 	},

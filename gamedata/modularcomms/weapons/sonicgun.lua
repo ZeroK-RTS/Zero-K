@@ -18,10 +18,9 @@ local weaponDef = {
 
 	damage                  = {
 		default = 175,
-		planes  = 175,
 		subs    = 175,
 	},
-	
+
 	cegTag			= [[sonictrail]],
 	explosionGenerator	= [[custom:sonic]],
 	edgeEffectiveness       = 0.75,

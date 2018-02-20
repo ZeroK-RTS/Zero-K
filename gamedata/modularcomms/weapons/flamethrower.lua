@@ -16,9 +16,9 @@ local weaponDef = {
 		flamethrower = [[1]],
 		setunitsonfire = "1",
 		burntime = [[450]],
-		
+
 		light_camera_height = 2800,
-        light_color = [[0.6 0.39 0.18]],
+		light_color = [[0.6 0.39 0.18]],
 		light_radius = 260,
 		light_fade_time = 10,
 		light_beam_mult_frames = 5,

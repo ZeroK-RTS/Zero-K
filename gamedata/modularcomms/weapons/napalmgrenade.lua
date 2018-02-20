@@ -19,7 +19,7 @@ local weaponDef = {
 		area_damage_radius = 128,
 		area_damage_dps = 40,
 		area_damage_duration = 45,
-		
+
 		light_camera_height = 3500,
 		light_color = [[0.75 0.4 0.15]],
 		light_radios = 520,
@@ -27,7 +27,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 200,
-		planes  = 200,
 		subs    = 10,
 	},
 

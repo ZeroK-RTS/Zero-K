@@ -18,14 +18,13 @@ local weaponDef = {
 				rgbColor = [[0.2 1 0]],
 			},
 		},
-		
+
 		light_color = [[0.8 0.76 0.38]],
 		light_radius = 180,
 	},
 
 	damage                  = {
 		default = 30,
-		planes  = 30,
 		subs    = 1.5,
 	},
 

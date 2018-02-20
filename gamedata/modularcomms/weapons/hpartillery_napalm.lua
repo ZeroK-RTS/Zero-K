@@ -15,13 +15,12 @@ local weaponDef = {
 		area_damage_radius = 128,
 		area_damage_dps = 20,
 		area_damage_duration = 20,
-		
+
 		light_color = [[1.5 0.7 0.3]],
 	},
 
 	damage                  = {
 		default = 100,
-		planes  = 100,
 		subs    = 5,
 	},
 

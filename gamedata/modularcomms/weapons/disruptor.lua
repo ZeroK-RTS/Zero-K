@@ -12,7 +12,7 @@ local weaponDef = {
 	customParams            = {
 		--timeslow_preset       = [[module_disruptorbeam]],
 		timeslow_damagefactor = [[2]],
-		
+
 		light_color = [[1.88 0.63 2.5]],
 		light_radius = 320,
 	},
