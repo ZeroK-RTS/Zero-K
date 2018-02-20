@@ -44,11 +44,11 @@ else
 		end
 	end
 end
-if err then 
+if err then
 	Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", 'Planetwars warning: ' .. err)
 end
 
-if not unitData then 
+if not unitData then
 	unitData = {}
 end
 
@@ -63,7 +63,7 @@ local function makeTechStructure(def, name)
 	techName = UnitDefs[techName]
 	if techName then
 		def.name = techName.name .. " Technology Facility"
-		def.description = "Gives planet owner the ability to construct " .. techName.name 
+		def.description = "Gives planet owner the ability to construct " .. techName.name
 	end
 	structureConfig["generic_tech"](def)
 end
@@ -92,7 +92,7 @@ for _, info in pairs(unitData) do
 			structureDefs[info.unitname].description = info.description
 		end
 		structureDefs[info.unitname].customparams.canbeevacuated = info.canBeEvacuated
-	end 
+	end
 end
 
 if LOAD_ALL_STRUCTURES then
