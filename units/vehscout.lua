@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehscout]],
   name                   = [[Dart]],
-  description            = [[Raider/Scout Rover]],
+  description            = [[Disruptor Raider/Scout Rover]],
   acceleration           = 0.14,
   brakeRate              = 0.1555,
   buildCostMetal         = 40,

@@ -641,7 +641,7 @@
 	},
 	"vehscout" : {
 		"name" : "Dart",
-		"description" : "Raider/Scout Rover",
+		"description" : "Disruptor Raider/Scout Rover",
 		"helptext" : "Cheap and fast, the Dart is deadly in the first minutes of the game if your opponent is caught off-guard. Use missile towers, LLTs or any quick units to stop them."
 	},
 	"factoryhover" : {
