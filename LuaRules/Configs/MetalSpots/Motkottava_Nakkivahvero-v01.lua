@@ -1,4 +1,4 @@
 return {
-        metalValueOverride = 2.04,
-} 
+	metalValueOverride = 2.04,
+}
 
