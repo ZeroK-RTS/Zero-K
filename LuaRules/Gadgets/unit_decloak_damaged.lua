@@ -60,6 +60,7 @@ end
 
 local DEFAULT_DECLOAK_TIME = 100
 local UPDATE_FREQUENCY = 10
+local CLOAK_MOVE_THRESHOLD = math.sqrt(0.2)
 
 local cloakUnitDefID = {}
 for i = 1, #UnitDefs do
@@ -192,7 +193,12 @@ function gadget:GameFrame(n)
 	end
 end
 
+-- Only called with enemyID if an enemy is within decloak radius.
 function gadget:AllowUnitCloak(unitID, enemyID)
+	if enemyID then
+		return false
+	end
+	
 	local unitDefID = unitID and Spring.GetUnitDefID(unitID)
 	local ud = unitDefID and UnitDefs[unitDefID]
 	if not ud then
@@ -200,14 +206,9 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 	end
 	
 	local areaCloaked = (Spring.GetUnitRulesParam(unitID, "areacloaked") == 1) and ((Spring.GetUnitRulesParam(unitID, "cloak_shield") or 0) == 0)
-	local dist = enemyID and Spring.GetUnitSeparation(unitID, enemyID, false, true)
-	if dist and dist < ((areaCloaked and Spring.GetUnitRulesParam(unitID, "areacloaked_radius")) or ud.decloakDistance) then
-		return false
-	end
-	
 	if not areaCloaked then
 		local speed = select(4, Spring.GetUnitVelocity(unitID))
-		local moving = speed and speed > 0.2
+		local moving = speed and speed > CLOAK_MOVE_THRESHOLD
 		local cost = moving and ud.cloakCostMoving or ud.cloakCost
 		
 		if not Spring.UseUnitResource(unitID, "e", cost) then
