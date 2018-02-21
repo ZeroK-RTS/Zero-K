@@ -378,7 +378,7 @@ local function Initialize()
 	end
 	if not mirrorShader then
 		widget.DrawWorldPreUnit = function()
-			if (not island) or options.drawForIslands.value then
+			if dList and (not island) or options.drawForIslands.value then
 				gl.DepthMask(true)
 				--gl.Texture(tex)
 				gl.CallList(dList)
@@ -423,7 +423,7 @@ function widget:Shutdown()
 end
 
 local function DrawWorldFunc() --is overwritten when not using the shader
-    if (not island) or options.drawForIslands.value then
+    if dList and (not island) or options.drawForIslands.value then
         local glTranslate = gl.Translate
         local glUniform = gl.Uniform
         local GamemapSizeZ, GamemapSizeX = Game.mapSizeZ,Game.mapSizeX
