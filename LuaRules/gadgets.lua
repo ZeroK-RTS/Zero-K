@@ -197,6 +197,8 @@ local callInLists = {
 	"AllowUnitCreation",
 	"AllowUnitTransfer",
 	"AllowUnitBuildStep",
+	"AllowUnitTransport",
+	"AllowUnitCloak",
 	"AllowFeatureBuildStep",
 	"AllowFeatureCreation",
 	"AllowResourceLevel",
@@ -1271,6 +1273,31 @@ function gadgetHandler:AllowUnitBuildStep(builderID, builderTeam,
       return false
     end
   end
+  return true
+end
+
+
+function gadgetHandler:AllowUnitTransport(
+  transporterID, transporterUnitDefID, transporterTeam,
+  transporteeID, transporteeUnitDefID, transporteeTeam
+)
+  for _,g in ipairs(self.AllowUnitTransportList) do
+    if (not g:AllowUnitTransport(transporterID, transporterUnitDefID, transporterTeam,
+                                 transporteeID, transporteeUnitDefID, transporteeTeam)) then
+      return false
+    end
+  end
+  return true
+end
+
+
+function gadgetHandler:AllowUnitCloak(unitID, enemyID)
+  for _,g in ipairs(self.AllowUnitCloakList) do
+    if (not g:AllowUnitCloak(unitID, enemyID)) then
+      return false
+    end
+  end
+
   return true
 end
 

@@ -337,7 +337,7 @@ local tooltips = {
 	PREVENT_OVERKILL = "Overkill Prevention (_STATE_)\n  Prevents units from shooting at already doomed enemies.",
 	TRAJECTORY = "Trajectory (_STATE_)\n  Set whether units fire at a high or low arc.",
 	AIR_STRAFE = "Gunship Strafe (_STATE_)\n  Set whether gunships strafe when fighting.",
-	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set the conditions which cause certain ampihibious units to float to the surface.",
+	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set the conditions which cause certain amphibious units to float to the surface.",
 	SELECTION_RANK = "Selection Rank (_STATE_)\n  Priority for selection filtering.",
 	TOGGLE_DRONES = "Drone Construction (_STATE_)\n  Toggle drone creation."
 }

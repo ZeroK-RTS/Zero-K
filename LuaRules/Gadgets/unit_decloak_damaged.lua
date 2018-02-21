@@ -192,6 +192,32 @@ function gadget:GameFrame(n)
 	end
 end
 
+function gadget:AllowUnitCloak(unitID, enemyID)
+	local unitDefID = unitID and Spring.GetUnitDefID(unitID)
+	local ud = unitDefID and UnitDefs[unitDefID]
+	if not ud then
+		return false
+	end
+	
+	local areaCloaked = (Spring.GetUnitRulesParam(unitID, "areacloaked") == 1) and ((Spring.GetUnitRulesParam(unitID, "cloak_shield") or 0) == 0)
+	local dist = enemyID and Spring.GetUnitSeparation(unitID, enemyID, false, true)
+	if dist and dist < ((areaCloaked and Spring.GetUnitRulesParam(unitID, "areacloaked_radius")) or ud.decloakDistance) then
+		return false
+	end
+	
+	if not areaCloaked then
+		local speed = select(4, Spring.GetUnitVelocity(unitID))
+		local moving = speed and speed > 0.2
+		local cost = moving and ud.cloakCostMoving or ud.cloakCost
+		
+		if not Spring.UseUnitResource(unitID, "e", cost) then
+			return false
+		end
+	end
+	
+	return true
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
