@@ -149,10 +149,12 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 		local parent = missileParents[unitID]
 		if parent then
 			local siloEntry = GetSiloEntry(parent)
-			for i = 1, MISSILES_PER_SILO do
-				if siloEntry[i] == unitID then
-					siloEntry[i] = nil
-					break
+			if siloEntry then
+				for i = 1, MISSILES_PER_SILO do
+					if siloEntry[i] == unitID then
+						siloEntry[i] = nil
+						break
+					end
 				end
 			end
 		end
@@ -177,8 +179,10 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 		missileParents[unitID] = facID
 		-- get the pad the missile was built on from unit script, to make sure there's no discrepancy
 		local env = Spring.UnitScript.GetScriptEnv(facID)
-		local pad = Spring.UnitScript.CallAsUnit(facID, env.GetPadNum)
-		silos[facID][pad] = unitID
+		if env then
+			local pad = Spring.UnitScript.CallAsUnit(facID, env.GetPadNum)
+			silos[facID][pad] = unitID
+		end
 	end
 end
 
