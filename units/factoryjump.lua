@@ -42,8 +42,9 @@ unitDef = {
     canjump  = [[1]],
 	no_jump_handling = [[1]],
     sortName = [[5]],
-	modelradius    = [[38]],
+	modelradius    = [[100]],
 	solid_factory = [[3]],
+	unstick_help   = 1,
   },
 
   energyUse                     = 0,

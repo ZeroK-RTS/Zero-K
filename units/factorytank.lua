@@ -41,7 +41,8 @@ unitDef = {
     default_spacing = 8,
     aimposoffset   = [[0 15 -35]],
     midposoffset   = [[0 15 -10]],
-    modelradius    = [[30]],
+	modelradius    = [[100]],
+	unstick_help   = 1,
   },
 
   energyUse                     = 0,
@@ -67,7 +68,7 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = "oooooooo oooooooo oooooooo oooooooo cccccccc cccccccc cccccccc cccccccc",
+  yardMap                       = "xoooooox xoooooox xoooooox xoooooox xccccccx xccccccx xccccccx xccccccx",
 
   featureDefs                   = {
 

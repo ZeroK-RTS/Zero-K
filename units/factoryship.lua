@@ -37,7 +37,7 @@ unitDef = {
     aimposoffset   = [[60 0 -15]],
     midposoffset   = [[0 0 -15]],
 	solid_factory = [[2]],
-	modelradius    = [[50]],
+	modelradius    = [[100]],
 	solid_factory_rotation = [[1]], -- 90 degrees counter clockwise
 	default_spacing = 8,
   },

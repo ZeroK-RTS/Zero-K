@@ -39,9 +39,10 @@ unitDef = {
     aimposoffset   = [[0 0 -26]],
     midposoffset   = [[0 0 -10]],
     sortName       = [[5]],
-	modelradius    = [[38]],
+	modelradius    = [[100]],
 	solid_factory = [[3]],
 	default_spacing = 8,
+	unstick_help   = 1,
   },
 
   energyUse                     = 0,
