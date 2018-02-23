@@ -196,6 +196,7 @@ end
 -- Only called with enemyID if an enemy is within decloak radius.
 function gadget:AllowUnitCloak(unitID, enemyID)
 	if enemyID then
+		PokeDecloakUnit(unitID)
 		return false
 	end
 	
