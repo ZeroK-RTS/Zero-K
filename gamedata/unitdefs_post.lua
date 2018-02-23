@@ -708,6 +708,25 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Set transportability
+--
+
+local LIGHT_TRANSPORT_COST = 0
+for name, ud in pairs(UnitDefs) do
+	if ud.customparams.transportcost then
+		LIGHT_TRANSPORT_COST = tonumber(ud.customparams.transportcost)
+		break
+	end
+end
+
+for name, ud in pairs(UnitDefs) do
+	if ud.buildcostmetal and ud.buildcostmetal <= LIGHT_TRANSPORT_COST then
+		ud.customparams.light_transportable = 1
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Category changes
 --
 for name, ud in pairs(UnitDefs) do

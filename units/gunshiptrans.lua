@@ -28,6 +28,7 @@ unitDef = {
     airstrafecontrol = [[1]],
 	midposoffset   = [[0 0 0]],
 	modelradius    = [[15]],
+	transportcost  = 1000,
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -57,8 +58,8 @@ unitDef = {
   },
   sightDistance       = 300,
   transportCapacity   = 1,
-  transportMass       = 330,
-  transportSize       = 4,
+  transportMass       = 33000,
+  transportSize       = 400,
   turninplace         = 0,
   turnRate            = 550,
   verticalSpeed       = 30,

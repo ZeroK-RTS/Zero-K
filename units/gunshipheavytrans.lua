@@ -60,7 +60,7 @@ unitDef = {
   },
   sightDistance          = 660,
   transportCapacity      = 1,
-  transportSize          = 25,
+  transportSize          = 2500,
   turninplace            = 0,
   turnRate               = 420,
   upright                = true,

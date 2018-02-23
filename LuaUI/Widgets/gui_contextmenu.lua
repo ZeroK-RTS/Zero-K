@@ -1024,7 +1024,7 @@ local function printAbilities(ud, unitID)
 
 	if ud.transportCapacity and (ud.transportCapacity > 0) then
 		cells[#cells+1] = 'Transport: '
-		cells[#cells+1] = ((ud.transportMass < 365) and "Light" or "Heavy")
+		cells[#cells+1] = (((ud.customParams.transportcost) and ("Light (up to " .. ud.customParams.transportcost .. "m)")) or "Heavy (everything)")
 	end
 
 	if ud.customParams.nuke_coverage then
@@ -1327,7 +1327,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	-- transportability by light or heavy airtrans
 	if not (ud.canFly or ud.cantBeTransported) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > valkMaxMass) or (ud.xsize > valkMaxSize) or (ud.zsize > valkMaxSize)) and "Heavy") or "Light"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = (((ud.customParams.light_transportable) and "Light") or "Heavy"), textColor = color.stats_fg, }
 	end
 	
 	if ud.customParams.reload_move_penalty then
