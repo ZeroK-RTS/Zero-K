@@ -49,6 +49,7 @@ local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitIsDead = Spring.GetUnitIsDead
 
 local recloakUnit = {}
+local recloakFrame = {}
 
 local noFFWeaponDefs = {}
 for i = 1, #WeaponDefs do
@@ -61,6 +62,8 @@ end
 local DEFAULT_DECLOAK_TIME = 100
 local UPDATE_FREQUENCY = 10
 local CLOAK_MOVE_THRESHOLD = math.sqrt(0.2)
+
+local currentFrame = 0
 
 local cloakUnitDefID = {}
 for i = 1, #UnitDefs do
@@ -152,6 +155,7 @@ local function CheckWaterBlockCloak(unitID, pos)
 end
 
 function gadget:GameFrame(n)
+	currentFrame = n
 	if n%UPDATE_FREQUENCY == 2 then
 		for unitID, frames in pairs(recloakUnit) do
 			if frames <= UPDATE_FREQUENCY then
@@ -199,6 +203,13 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 		return false
 	end
 	
+	if recloakFrame[unitID] then
+		if recloakFrame[unitID] > currentFrame then
+			return false
+		end
+		recloakFrame[unitID] = nil
+	end
+	
 	local unitDefID = unitID and Spring.GetUnitDefID(unitID)
 	local ud = unitDefID and UnitDefs[unitDefID]
 	if not ud then
@@ -217,6 +228,10 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 	end
 	
 	return true
+end
+
+function gadget:AllowUnitDecloak(unitID, objectID, weaponID)
+	recloakFrame[unitID] = currentFrame + DEFAULT_DECLOAK_TIME
 end
 
 --------------------------------------------------------------------------------
