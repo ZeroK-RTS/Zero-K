@@ -349,7 +349,8 @@ function gadgetHandler:LoadGadget(filename)
   local gadget = gadgetHandler:NewGadget()
 
   setfenv(chunk, gadget)
-  local success, err = pcall(chunk)
+  local success
+  success, err = pcall(chunk)
   if (not success) then
     Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (' .. err .. ')')
     return nil
@@ -424,7 +425,6 @@ function gadgetHandler:NewGadget()
   -- wrapped calls (closures)
   gadget.gadgetHandler = {}
   local gh = gadget.gadgetHandler
-  local self = self
 
   gh.gadgetHandler = self	-- NOT IN BASE (required for api_subdir_gadgets)
 
@@ -880,21 +880,18 @@ end
 
 
 function gadgetHandler:RegisterCMDID(gadget, id)
-  if not LOG_SECTION then
-    LOG_SECTION = "ERROR"
-  end
   if not id then
-    Spring.Log(LOG_SECTION, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
                'tried to register a NIL CMD_ID')
   else
     if (id < 1000) then
-      Spring.Log(LOG_SECTION, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
+      Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
                  'tried to register a reserved CMD_ID')
       Script.Kill('Reserved CMD_ID code: ' .. id)
     end
 
     if (self.CMDIDs[id] ~= nil) then
-      Spring.Log(LOG_SECTION, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
+      Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
                  'tried to register a duplicated CMD_ID')
       Script.Kill('Duplicate CMD_ID code: ' .. id)
     end
@@ -1503,7 +1500,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 		local g
 		for i = 1, gadgets.count do
 			g = data[i]
-			dam, imp = g:UnitPreDamaged(unitID, unitDefID, unitTeam,
+			local dam, imp = g:UnitPreDamaged(unitID, unitDefID, unitTeam,
 					  rDam, paralyzer, weaponDefID,
 					  attackerID, attackerDefID, attackerTeam,
 					  projectileID)
@@ -1838,9 +1835,9 @@ end
 
 function gadgetHandler:DefaultCommand(type, id, engineCmd)
   for _,g in ipairs(self.DefaultCommandList) do
-    local id = g:DefaultCommand(type, id, engineCmd)
-    if (id) then
-      return id
+    local defCmd = g:DefaultCommand(type, id, engineCmd)
+    if defCmd then
+      return defCmd
     end
   end
   return

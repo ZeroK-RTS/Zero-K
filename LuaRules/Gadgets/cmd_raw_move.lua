@@ -411,6 +411,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 			freePath = false
 		else
 			local distance = math.sqrt(distSq)
+			local rx, rz
 			freePath, rx, rz = IsPathFree(unitDefID, x, z, cmdParams[1], cmdParams[3], distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE, goalDistOverride and (goalDistOverride - 20), BLOCK_RELAX_DISTANCE)
 			if rx then
 				mx, my, mz = rx, Spring.GetGroundHeight(rx, rz), rz

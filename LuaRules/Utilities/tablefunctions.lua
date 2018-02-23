@@ -126,10 +126,8 @@ function Spring.Utilities.CustomKeyToUsefulTable(dataRaw)
 	if not dataRaw then
 		return
 	end
-	if not (dataRaw and type(dataRaw) == 'string') then
-		if dataRaw then
-			Spring.Echo("Customkey data error for team", teamID)
-		end
+	if not type(dataRaw) == 'string' then
+		Spring.Echo("Customkey data error! type == " .. type(dataRaw))
 	else
 		dataRaw = string.gsub(dataRaw, '_', '=')
 		dataRaw = Spring.Utilities.Base64Decode(dataRaw)

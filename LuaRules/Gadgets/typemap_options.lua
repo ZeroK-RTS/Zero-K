@@ -73,12 +73,12 @@ local function GetUnitBounds(unitID, unitDefID)
 	return minx, minz, maxx, maxz
 end
 
-function CreateImpassibleFootprint(unitID, unitDefID)
+local function CreateImpassibleFootprint(unitID, unitDefID)
 	local minx, minz, maxx, maxz = GetUnitBounds(unitID, unitDefID)
 	SetImpassibleTerrain(minx, minz, maxx, maxz)
 end
 
-function DestroyImpassibleFootprint(unitID, unitDefID)
+local function DestroyImpassibleFootprint(unitID, unitDefID)
 	local minx, minz, maxx, maxz = GetUnitBounds(unitID, unitDefID)
 	ResetTerrain(minx, minz, maxx, maxz)
 end

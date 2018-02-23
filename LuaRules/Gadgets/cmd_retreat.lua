@@ -100,6 +100,7 @@ end
 local function FindClosestHaven(teamID, sx, sz)
 	local closestDistSqr = math.huge
 	local cx, cz  --  closest coordinates
+	local cHavenID
 	local havensTeam = havens[teamID]
 	if not havensTeam then
 		return -1, -1, -1 

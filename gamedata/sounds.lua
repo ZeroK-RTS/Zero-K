@@ -48,7 +48,7 @@ local Sounds = {
 			pitch = 1.0,
 			priority = 0,
 			maxconcurrent = 4, --- some reasonable limits
-			maxdist = FLT_MAX, --- no cutoff at all
+			maxdist = nil, --- no cutoff at all (engine defaults to FLT_MAX)
 		},
 		Sparks = {
 			file = "sounds/sparks.wav",

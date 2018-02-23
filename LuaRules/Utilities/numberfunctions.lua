@@ -79,7 +79,7 @@ function math.triangulate(polies)
 			clockwise = clockwise + (polygon[i-1][1] * polygon[i][2]) - (polygon[i-1][2] * polygon[i][1])
 		end
 		polygon[#polygon] = nil
-		local clockwise = (clockwise < 0)
+		clockwise = (clockwise < 0)
 
 		-- the van gogh concave polygon triangulation algorithm: cuts off ears
 		-- is pretty shitty at O(V^3) but was easy to code and it's typically only done once anyway
@@ -87,7 +87,7 @@ function math.triangulate(polies)
 
 			-- get a candidate ear
 			local triangle
-			local c0, c1, c2 = 0, 0, 0
+			local c0, c1, c2 = 0
 			local candidate_ok = false
 			while not candidate_ok do
 

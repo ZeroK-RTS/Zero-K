@@ -437,7 +437,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	if weaponDefID and attackerID and impulseWeaponID[weaponDefID] and Spring.ValidUnitID(attackerID) then
 		local defData = impulseWeaponID[weaponDefID]
 		local _,_,_,ux, uy, uz = spGetUnitPosition(unitID, true)
-		local_,_,_,ax, ay, az = spGetUnitPosition(attackerID, true)
+		local _,_,_,ax, ay, az = spGetUnitPosition(attackerID, true)
 
 		local x,y,z = (ux-ax), (uy-ay), (uz-az)
 		local magnitude = defData.impulse

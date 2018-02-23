@@ -87,7 +87,6 @@ GenerateModuleWrecks()
 
 local mapEnergyMult   = .1  --Used to normalize map features to a mod-specific scale
 local mapMetalMult    = 1
-local mapReclaimMult  = 1
 
 
 -- scale energy/reclaimtime of map's features

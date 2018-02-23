@@ -42,8 +42,8 @@ local function CalculateBallisticConstant(deltaV,myGravity,heightDiff)
 	local denominator = 2*(-a/2)
 	local t1 = (-yVel + discriminant)/denominator ---formula for finding root for quadratic equation (quadratic solver). Ref: http://www.sosmath.com/algebra/quadraticeq/quadraformula/summary/summary.html
 	local t2 = (-yVel - discriminant)/denominator
-	xDist1 = xVel*t1 --distance travelled horizontally in "t" amount of time
-	xDist2 = xVel*t2
+	local xDist1 = xVel*t1 --distance travelled horizontally in "t" amount of time
+	local xDist2 = xVel*t2
 	local maxRange = nil
 	if xDist1>= xDist2 then
 		maxRange=xDist1 --maximum range
