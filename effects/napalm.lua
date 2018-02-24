@@ -2,6 +2,21 @@ Spring = Spring or {}
 Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
+local function GetPloomPos(pos)
+	return {
+	  air                = true,
+	  class              = [[CExpGenSpawner]],
+	  count              = 1,
+	  ground             = true,
+	  water              = true,
+	  properties = {
+		delay              = [[0]],
+		explosiongenerator = [[custom:napalmfireball_450]],
+		pos                = pos,
+	  },
+	}
+end
+
 local cegs = {
   ["napalm_phoenix"] = {
     usedefaultexplosions = false,
@@ -52,18 +67,11 @@ local cegs = {
         pos                = [[-20 r75, 28 r10, -20 r75]],
       },
     },
-    redploom_init = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 5,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = [[0 i5]],
-        explosiongenerator = [[custom:napalmfireball_450]],
-        pos                = [[-20 r75, 28 r10, -20 r75]],
-      },
-    },
+    redploom_1 = GetPloomPos([[-40 r32, 28 r10, -40 r32]]),
+    redploom_2 = GetPloomPos([[-40 r32, 28 r10, 8 r32]]),
+    redploom_3 = GetPloomPos([[8 r32, 28 r10, -40 r32]]),
+    redploom_4 = GetPloomPos([[8 r32, 28 r10, 8 r32]]),
+    redploom_5 = GetPloomPos([[-20 r75, 28 r10, -20 r75]]),
   },
   ["napalm_pyro"] = {
     usedefaultexplosions = false,
@@ -510,8 +518,7 @@ local altforms = {
     source = "napalmfireball_200",
     modifications = {
       rocks = {
-		colormap   = [[0 0 0 0.001   .25 .25 .25 0.04     .25 .25 .25 0.03    .15 .15 .15 0.02   0 0 0 0.001]],
-	    properties = {particlelife = 70, particlelifespread = 70, particlesize = 50, particlesizespread = 20,},
+	    properties = {particlelife = 50, particlelifespread = 80, particlesize = 40, particlesizespread = 20,},
       },
     },
   },
