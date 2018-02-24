@@ -129,7 +129,7 @@ local function GetWantedBomberHeight(unitID, bomberID, config, underShield)
 		-- Only forgo dive on targets with at least 4s of stun time.
 		if paraDamage and maxHealth and (maxHealth > 0) and paraDamage/maxHealth > 1.1 then
 			speedMult = 0
-		else
+		elseif speedMult < 1 then
 			speedMult = 1
 		end
 	end
