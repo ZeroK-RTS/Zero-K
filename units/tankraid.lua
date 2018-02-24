@@ -4,7 +4,7 @@ unitDef = {
   description         = [[Raider Tank]],
   acceleration        = 0.125,
   brakeRate           = 0.1375,
-  buildCostMetal      = 180,
+  buildCostMetal      = 160,
   builder             = false,
   buildPic            = [[tankraid.png]],
   canGuard            = true,
@@ -71,7 +71,7 @@ unitDef = {
 
     NAPALM_BOMBLET = {
       name                    = [[Flame Bomb]],
-      accuracy				  = 1000,
+      accuracy				  = 200,
       areaOfEffect            = 192,
       avoidFeature            = true,
       avoidFriendly           = true,
@@ -106,6 +106,7 @@ unitDef = {
       impulseFactor           = 0.2,
       interceptedByShieldType = 1,
       model                   = [[wep_b_fabby.s3o]],
+	  myGravity               = 1.5,
       noSelfDamage            = true,
       range                   = 225,
       reloadtime              = 6,
@@ -115,7 +116,7 @@ unitDef = {
       soundStartVolume        = 3,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 600,
+      weaponVelocity          = 700,
     },
 	
 	BOGUS_FAKE_NAPALM_BOMBLET = {

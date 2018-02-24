@@ -32,7 +32,7 @@ local cegs = {
     usedefaultexplosions = false,
     groundflash = {
       flashalpha         = 1,
-      flashsize          = 96,
+      flashsize          = 120,
       ttl                = 440,
       color = {
         [1]  = 0.7,
@@ -47,9 +47,21 @@ local cegs = {
       ground             = true,
       water              = true,
       properties = {
-        delay              = [[0 i40]],
-        explosiongenerator = [[custom:NAPALMFIREBALL_200]],
-        pos                = [[-20 r40, 30, -20 r40]],
+        delay              = [[0 i25]],
+        explosiongenerator = [[custom:napalmfireball_450_big]],
+        pos                = [[-20 r75, 28 r10, -20 r75]],
+      },
+    },
+    redploom_init = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 5,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[0 i5]],
+        explosiongenerator = [[custom:napalmfireball_450]],
+        pos                = [[-20 r75, 28 r10, -20 r75]],
       },
     },
   },
@@ -491,6 +503,15 @@ local altforms = {
     modifications = {
       rocks = {
 	properties = {particlelife = 150, particlelifespread = 300},
+      },
+    },
+  },
+  napalmfireball_450_big = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+		colormap   = [[0 0 0 0.001   .25 .25 .25 0.04     .25 .25 .25 0.03    .15 .15 .15 0.02   0 0 0 0.001]],
+	    properties = {particlelife = 70, particlelifespread = 70, particlesize = 50, particlesizespread = 20,},
       },
     },
   },
