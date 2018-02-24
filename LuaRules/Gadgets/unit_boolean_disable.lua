@@ -39,7 +39,7 @@ for wid = 1, #WeaponDefs do
 			disarmTimer = wcp.disarmtimer*FRAMES_PER_SECOND,
 		}
 		wantedWeaponList[#wantedWeaponList + 1] = wid
-	elseif wd.paralyzer then
+	elseif wd.paralyzer or wd.customParams.extra_damage then
 		paraWeapons[wid] = {
 			paraTime = wd.damages.paralyzeDamageTime*FRAMES_PER_SECOND,
 			maxParaDamage = (wd.damages.paralyzeDamageTime+40)/40,
