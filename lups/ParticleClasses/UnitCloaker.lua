@@ -125,6 +125,12 @@ function UnitCloaker:Draw()
 
   gl.Color(Spring.GetTeamColor(self.team))
 
+  
+  local x, y, z = Spring.GetUnitPosition(self.unit)
+  local a11, a12, a13, a14, a21, a22, a23, a24, a31, a32, a33, a34, a41, a42, a43, a44 = Spring.GetUnitTransformMatrix(self.unit)
+  
+  gl.Translate(x - a41, y - a42, z - a43)
+  
   if (self.isS3o) then
     gl.Culling(GL.BACK)
     gl.Unit(self.unit,true,-1)
@@ -270,8 +276,21 @@ function UnitCloaker:Visible()
   end
 
   local _, specFullView = Spring.GetSpectatingState()
+  if specFullView then
+    return true
+  end
+
   local losState = Spring.GetUnitLosState(self.unit, LocalAllyTeamID) or {}
-  return specFullView or (losState and losState.los)
+  if (losState and losState.los) then
+    return true
+  end
+
+  local x,y,z = Spring.GetUnitPosition(self.unit)
+  if (GG or WG).Lups.IsPosInLos(x,y,z) and (Spring.IsSphereInView(x,y,z,(self.radius or 200)+100)) then
+    return true
+  end
+
+  return false
 end
 
 -----------------------------------------------------------------------------------------------------------------

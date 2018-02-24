@@ -763,14 +763,14 @@ local moduleDefs = {
 	{
 		name = "module_high_power_servos",
 		humanName = "High Power Servos",
-		description = "High Power Servos - Increases speed by 10%. Limit: 8",
+		description = "High Power Servos - Increases speed by 8%. Limit: 8",
 		image = moduleImagePath .. "module_high_power_servos.png",
 		limit = 8,
 		cost = 150 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.speedMult = (sharedData.speedMult or 1) + 0.1
+			sharedData.speedMult = (sharedData.speedMult or 1) + 0.08
 		end
 	},
 	{
@@ -886,7 +886,7 @@ end
 local morphCosts = {
 	25,
 	100,
-	400,
+	600,
 	200,
 	300,
 }
