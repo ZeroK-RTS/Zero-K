@@ -4,7 +4,7 @@ unitDef = {
   description            = [[Flak Anti-Air Tank]],
   acceleration           = 0.05952,
   brakeRate              = 0.14875,
-  buildCostMetal         = 550,
+  buildCostMetal         = 500,
   builder                = false,
   buildPic               = [[tankaa.png]],
   canGuard               = true,
@@ -83,15 +83,15 @@ unitDef = {
       cylinderTargeting       = 1,
 
 	  customParams        	  = {
-        reaim_time = 5, -- COB
+        reaim_time = 4, -- COB
 		isaa = [[1]],
 		light_radius = 0,
 	  },
 
       damage                  = {
-        default = 8.2,
-        planes  = 81.5,
-        subs    = 5,
+        default = 9,
+        planes  = 90,
+        subs    = 4.5,
       },
 
       edgeEffectiveness       = 0.85,
