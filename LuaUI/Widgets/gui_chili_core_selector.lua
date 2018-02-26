@@ -179,6 +179,14 @@ end
 -------------------------------------------------------------------------------
 -- Widget options
 
+local defaultFacHotkeys = {
+	{key='Q', mod='alt+'},
+	{key='W', mod='alt+'},
+	{key='E', mod='alt+'},
+	{key='R', mod='alt+'},
+	{key='T', mod='alt+'},
+}
+
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
 options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning'}
 options = { 
@@ -495,6 +503,7 @@ for i = 1, 16 do
 		name = "Select Factory " .. i,
 		desc = "Selects the factory in position " .. i .. " of the selection bar.",
 		type = 'button',
+		hotkey = defaultFacHotkeys[i],
 		path = hotkeyPath,
 		OnChange = function()
 			SelectFactory(i)
