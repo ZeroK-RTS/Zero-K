@@ -6,7 +6,7 @@ function gadget:GetInfo()
     date      = "12 Sep 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = false --  loaded by default?
   }
 end
 
@@ -27,7 +27,10 @@ local attackerUnitDefID
 
 function gadget:UnitDamaged(unitID, unitDefID,  unitTeam, unitDamage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
-    local wd = WeaponDefs[weaponID]
+    if unitDamage < 5 then
+		return
+	end
+	local wd = WeaponDefs[weaponID]
 	if wd then
 	--	local aoe = wd.damageAreaOfEffect
 	--	local dist = 0.09
@@ -48,7 +51,7 @@ function gadget:UnitDamaged(unitID, unitDefID,  unitTeam, unitDamage, paralyzer,
 	attackerUnitDefID = attackerDefID
     -- delay
     if last then
-        --Spring.Echo(frame-last)
+        Spring.Echo(frame-last)
     end
     last = frame
     -- dps
