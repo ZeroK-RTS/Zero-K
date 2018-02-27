@@ -1945,7 +1945,16 @@ MakeSubWindow = function(path, pause)
 	
 	--back button
 	if parent_path then
-		Button:New{name = 'backButton', caption = '', OnClick = {function() KillSubWindow(); filterUserInsertedTerm = ''; if not root then MakeSubWindow(parent_path, false) end end}, 
+		Button:New{name = 'backButton', caption = '', 
+			OnClick = {
+				function()
+					KillSubWindow(not root)
+					filterUserInsertedTerm = ''
+					if not root then 
+						MakeSubWindow(parent_path, false)
+					end
+				end
+			}, 
 			--backgroundColor = color.sub_back_bg, textColor = color.sub_back_fg, 
 			--classname = "back_button",
 			height = B_HEIGHT,
@@ -2676,11 +2685,12 @@ end
 --Remakes crudemenu and remembers last submenu open
 RemakeEpicMenu = function()
 	local lastPath = curPath
-	local subwindowOpen = window_sub_cur ~= nil
-	
-	KillSubWindow(subwindowOpen)
+	local subwindowOpen = (window_sub_cur ~= nil)
+
+	-- Do not change pause state.
+	KillSubWindow(true)
 	if subwindowOpen then
-		MakeSubWindow(lastPath, true)
+		MakeSubWindow(lastPath, false)
 	end
 end
 
