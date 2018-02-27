@@ -974,7 +974,7 @@ function widget:MousePress(mx, my, button)
 					if c and ty == "unit" and c then
 						local ud = UnitDefs[spGetUnitDefID(id)]
 						--if (ud.isBuilding == true or ud.maxAcc == 0) then
-							mouseUnit = {id = id, ud = ud}
+						mouseUnit = {id = id, ud = ud}
 						drawingRectangle = true
 						point[1] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
 						point[2] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
@@ -1454,7 +1454,7 @@ function widget:MouseRelease(mx, my, button)
 				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				if legalPos(pos) then
 					
-					if mouseUnit.id and point[1].x == point[2].x and point[1].z == point[2].z then
+					if mouseUnit.id then
 						local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
 						if ty == "unit" and id == mouseUnit.id then
 							
