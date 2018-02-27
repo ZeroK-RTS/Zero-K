@@ -144,6 +144,13 @@ confdata.subMenuIcons = {
 	['Settings/Unit Behaviour']  = imgPath..'epicmenu/robot2.png',
 	['Hotkeys']         = imgPath..'epicmenu/keyboard.png',
 	
+	['Hotkeys/Misc']                = imgPath..'epicmenu/misc.png',
+	['Hotkeys/Camera']              = imgPath..'epicmenu/video_camera.png',
+	['Hotkeys/Construction']        = imgPath..'factory.png',
+	['Hotkeys/Selection']           = imgPath..'epicmenu/selection.png',
+	['Hotkeys/Commands']            = imgPath..'epicmenu/fingertap.png',
+	['Hotkeys/Command Panel']       = imgPath..'epicmenu/control_panel.png',
+	
 	['Settings/Reset Settings']     = imgPath..'epicmenu/undo.png',
 	['Settings/Audio']              = imgPath..'epicmenu/vol.png',
 	['Settings/Camera']             = imgPath..'epicmenu/video_camera.png',
