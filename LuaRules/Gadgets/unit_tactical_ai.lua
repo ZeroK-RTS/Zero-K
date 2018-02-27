@@ -51,12 +51,17 @@ for i = 1, #UnitDefs do
 	end
 end
 
+local ALLY_TABLE = {
+	ally = true,
+}
+
 --------------------------------------------------------------------------------
 -- Globals
 
 local unit = {}
 local unitList = {count = 0, data = {}}
 local unitAIBehaviour = {}
+local externallyHandledUnit = {}
 
 --------------------------------------------------------------------------------
 -- Commands
@@ -606,14 +611,18 @@ end
 --------------------------------------------------------------------------------
 -- Command Handling
 local function AIToggleCommand(unitID, cmdParams, cmdOptions)
-	if unit[unitID] then
+	if unit[unitID] or externallyHandledUnit[unitID] then
 		local state = cmdParams[1]
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_UNIT_AI)
 		
 		if (cmdDescID) then
 			unitAICmdDesc.params[1] = state
 			spEditUnitCmdDesc(unitID, cmdDescID, { params = unitAICmdDesc.params})
-			unit[unitID].active = (state == 1)
+			if externallyHandledUnit[unitID] then
+				Spring.SetUnitRulesParam(unitID, "tacticalAi_external", state, ALLY_TABLE)
+			else
+				unit[unitID].active = (state == 1)
+			end
 		end
 	end
 end
@@ -633,7 +642,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	AIToggleCommand(unitID, cmdParams, cmdOptions)  
 	return false  -- command was used
 end
-
 
 ------------------------------------------------------
 -- Load Ai behaviour
@@ -679,7 +687,6 @@ local function GetBehaviourTable(behaviourData, ud)
 end
 
 local function LoadBehaviour(unitConfigArray, behaviourDefaults)
-
 	for unitDef, behaviourData in pairs(unitConfigArray) do
 		local ud = UnitDefNames[unitDef]
 		
@@ -732,6 +739,17 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if unitAIBehaviour[unitDefID] then
 		behaviour = unitAIBehaviour[unitDefID]
 		spInsertUnitCmdDesc(unitID, unitAICmdDesc)
+		
+		if behaviour.externallyHandled then
+			externallyHandledUnit[unitID] = true
+			if (behaviour.defaultAIState == 1) then
+				AIToggleCommand(unitID, {1}, {})
+			else
+				AIToggleCommand(unitID, {0}, {})
+			end
+			return
+		end
+		
 		--Spring.Echo("unit added")
 		if not unit[unitID] then
 			unitList.count = unitList.count + 1
@@ -753,8 +771,11 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		else
 			AIToggleCommand(unitID, {0}, {})
 		end
-		--Spring.Echo("")
-		
 	end
-	
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	if externallyHandledUnit[unitID] then
+		externallyHandledUnit[unitID] = nil
+	end
 end

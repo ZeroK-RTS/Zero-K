@@ -16,12 +16,12 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    pylonrange = 100,
-	aimposoffset   = [[0 16 0]],
-	midposoffset   = [[0 0 0]],
-	force_close    = 8, -- time in seconds of forced turnoff
-	removewait     = 1,
-	default_spacing = 0,
+    pylonrange      = 100,
+    aimposoffset    = [[0 16 0]],
+    midposoffset    = [[0 0 0]],
+    auto_close_time = 4, -- Unit AI off time.
+    removewait      = 1,
+    default_spacing = 0,
   },
 
   damageModifier                = 0.25,
@@ -39,7 +39,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[arm_solar.s3o]],
-  onoffable                     = false,
+  onoffable                     = true,
   script                        = [[energysolar.lua]],
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 273,

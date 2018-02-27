@@ -364,6 +364,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- weaponNum(defaults to 1): Weapon to use when skirming
 -- searchRange(defaults to 800): max range of GetNearestEnemy for the unit.
 -- defaultAIState (defaults in config): (1 or 0) state of AI when unit is initialised
+-- externallyHandled (defaults to nil): Enable to disable all tactical AI handling, only the state toggle is added.
 
 --*** skirms(defaults to empty): the table of units that this unit will attempt to keep at max range
 -- skirmEverything (defaults to false): Skirms everything (does not skirm radar with this enabled only)
@@ -1345,6 +1346,11 @@ local behaviourConfig = {
 		flees = {},
 		hugs = allGround,
 		hugRange = 150,
+	},
+	
+	-- Externally handled units
+	["energysolar"] = {
+		externallyHandled = true,
 	},
 }
 
