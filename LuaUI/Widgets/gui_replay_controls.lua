@@ -96,11 +96,11 @@ options = {
 ---------------------------------
 
 function widget:Initialize()
-	if (not Spring.IsReplay()) then
-		Spring.Echo ("<" .. widgetName .. "> Live mode. Widget removed.")
-		widgetHandler:RemoveWidget(self)
-		return
-	end
+	--if (not Spring.IsReplay()) then
+	--	Spring.Echo ("<" .. widgetName .. "> Live mode. Widget removed.")
+	--	widgetHandler:RemoveWidget(self)
+	--	return
+	--end
 	-- setup Chili
 	Chili = WG.Chili
 	Button = Chili.Button
@@ -217,9 +217,6 @@ function CreateTheUI()
 					snapButton(i)
 					progress_target:SetValue(0)
 					setReplaySpeed (speeds[i], i)
-					if isPaused then
-						unpause()
-					end
 				end
 			}
 		}	
@@ -259,7 +256,6 @@ function CreateTheUI()
 	else 
 		--in case reloading luaui mid demo
 		widgetHandler:RemoveCallIn("AddConsoleMessage")
-		widgetHandler:RemoveCallIn("Update")
 	end
 	
 	label_hoverTime = Label:New {
@@ -284,11 +280,11 @@ function CreateTheUI()
 		tooltip = "pause or continue playback";
 		OnClick = {function()
 			if (isPaused) then
-				unpause ()
+				unpause()
 			else
-				pause ()
+				pause()
 			end
-			end}
+		end}
 	}
 	
 	progress_target = Progressbar:New{
@@ -332,18 +328,22 @@ function snapButton(pushButton)
 	button_setspeed[pushButton]:Invalidate()
 end
 
-function pause ()
+function pause (supressCommand)
 	Spring.Echo ("Playback paused")
-	Spring.SendCommands ("pause 1")
+	if supressCommand then
+		Spring.SendCommands ("pause 1")
+	end
 	isPaused = true
 	button_startStop:SetCaption ("play")
 	--window:SetColor ({1,0,0, 1})
 	--window:SetCaption ("trololo")--button stays pressed down and game lags	ANY INVALID CODE MAKES IT LAG, REASON WHY COM MORPH LAGS?
 end
 
-function unpause ()
+function unpause(supressCommand)
 	Spring.Echo ("Playback continued")
-	Spring.SendCommands ("pause 0")
+	if not supressCommand then
+		Spring.SendCommands ("pause 0")
+	end
 	isPaused = false
 	button_startStop:SetCaption ("pause")
 end
@@ -374,7 +374,7 @@ function setReplaySpeed (speed, i)
 		-- while (Spring.GetGameSpeed() > speed and i < 50) do
 			-- Spring.SendCommands ("setminspeed " ..0.1)
 			Spring.SendCommands ("setmaxspeed " .. speed)
-		  Spring.SendCommands ("setmaxspeed " .. 10.0)
+			Spring.SendCommands ("setmaxspeed " .. 10.0)
 			-- Spring.SendCommands ("slowdown")
 			-- i=i+1
 		-- end	
@@ -400,6 +400,14 @@ function widget:Update(dt)
 			lastSkippedTime = lastSkippedTime + dt
 		end
 	end
+	local paused = select(3, Spring.GetGameSpeed())
+	if paused ~= isPaused then
+		if paused then
+			pause(true)
+		else
+			unpause(true)
+		end
+	end
 end
 
 function widget:GameFrame (f)
@@ -420,7 +428,6 @@ function widget:GameFrame (f)
 		skipped = nil
 		lastSkippedTime = nil
 		widgetHandler:RemoveCallIn("AddConsoleMessage")
-		widgetHandler:RemoveCallIn("Update")
 	elseif showProgress and (f%2 ==0)  then
 		progress_speed:SetValue(f)
 		progress_speed:SetCaption(math.modf(f/progress_speed.max*100) .. "%")
