@@ -394,7 +394,7 @@ local function weapons2Table(cells, ws, unitID)
 		local stun_time = 0
 
 		local comm_mult = (unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1
-		local val = (tonumber(cp.statsdamage) or wd.customParams.shield_damage or 0) * comm_mult
+		local val = (tonumber(cp.stats_damage) or wd.customParams.shield_damage or 0) * comm_mult
 
 		if cp.disarmdamagemult then
 			damd = val * cp.disarmdamagemult
@@ -444,7 +444,11 @@ local function weapons2Table(cells, ws, unitID)
 		local dps_str, dam_str = '', ''
 		if dps > 0 then
 			dam_str = dam_str .. numformat(dam,2)
-			dps_str = dps_str .. numformat(dps*mult,2)
+			if wd.customParams.stats_damage_per_second then
+				dps_str = dps_str .. numformat(tonumber(cp.stats_damage_per_second),2)
+			else
+				dps_str = dps_str .. numformat(dps*mult,2)
+			end
 		end
 		if dpsw > 0 then
 			if dps_str ~= '' then

@@ -86,7 +86,7 @@ unitDef = {
         impulsedepthmult = [[0.5]],
         normaldamage = [[1]],
 
-        statsdamage = 10.4,
+        stats_damage = 10.4,
 		stats_hide_damage = 1, -- continuous laser
 		stats_hide_reload = 1,
 		
