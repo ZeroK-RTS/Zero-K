@@ -118,6 +118,7 @@ unitDef = {
 			craterMult = 0,
 			edgeEffectiveness = 0,
 			explosionGenerator = [[custom:cloakbomb_EXPLOSION]],
+			explosionSpeed = 10000,
 			fireStarter = 0,
 			impulseBoost = 0,
 			impulseFactor = 0,
