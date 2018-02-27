@@ -89,6 +89,14 @@ local jumpCmdDesc = {
 	tooltip = 'Jump to selected position.',
 }
 
+local blockingStructure = {}
+for udid = 1, #UnitDefs do
+	local ud = UnitDefs[udid]
+	if ud.isImmobile and not ud.customParams.mobilebuilding then
+		blockingStructure[udid] = true
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -113,8 +121,7 @@ local function GetLandStructureCheckValues(x, z, myRadius)
 	for i = 1, #units do
 		local unitID = units[i]
 		local unitDefID = spGetUnitDefID(unitID)
-		-- Only check immobile units
-		if UnitDefs[unitDefID] and UnitDefs[unitDefID].isImmobile then
+		if blockingStructure[unitDefID] then
 			local radius = spGetUnitRadius(unitID)
 			local sx, sy, sz = spGetUnitPosition(unitID)
 			
@@ -595,7 +602,6 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 		end
 	end
 end
-
 
 function gadget:GameFrame(currFrame)
 	UpdateCoroutines()
