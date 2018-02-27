@@ -11,6 +11,8 @@ function widget:GetInfo()
 	} 
 end
 
+include("keysym.h.lua")
+
 local cursorDir = ""
 
 local cursorNames = {
@@ -118,5 +120,11 @@ function WG.HideInterface()
 	if not Spring.IsGUIHidden() then
 		Spring.SendCommands("HideInterface")
 		HideCursor()
+	end
+end
+
+function widget:KeyPress(key)
+	if key == KEYSYMS.ESCAPE then
+		WG.ShowInterface()
 	end
 end
