@@ -74,6 +74,7 @@ options = {
 		type = 'button',
 		action = 'hideinterfaceandcursor',
 		noAutoControlFunc = true,
+		path = 'Hotkeys/Misc',
 		OnChange = function(self)
 			Spring.SendCommands("HideInterface")
 			if Spring.IsGUIHidden() then
