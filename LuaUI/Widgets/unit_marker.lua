@@ -101,8 +101,9 @@ function widget:Initialize()
 		widgetHandler:RemoveCallIn("UnitEnteredLos")
 	end
 	if Spring.GetSpectatingState() then
-		widgetHandler:RemoveWidget()
-		return
+		widgetHandler:RemoveCallIn("UnitEnteredLos")
+	elseif markingActive then
+		widgetHandler:UpdateCallIn('UnitEnteredLos')
 	end
 end
 
