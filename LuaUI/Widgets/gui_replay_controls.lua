@@ -96,11 +96,11 @@ options = {
 ---------------------------------
 
 function widget:Initialize()
-	--if (not Spring.IsReplay()) then
-	--	Spring.Echo ("<" .. widgetName .. "> Live mode. Widget removed.")
-	--	widgetHandler:RemoveWidget(self)
-	--	return
-	--end
+	if (not Spring.IsReplay()) then
+		Spring.Echo ("<" .. widgetName .. "> Live mode. Widget removed.")
+		widgetHandler:RemoveWidget(self)
+		return
+	end
 	-- setup Chili
 	Chili = WG.Chili
 	Button = Chili.Button
