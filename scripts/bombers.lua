@@ -94,6 +94,13 @@ function RearmBlockShot()
 	return (ammoState == 1) or (ammoState == 2) or (ammoState == 3)
 end
 
+function SetInitialBomberSettings()
+	local aircraftState = (spGetUnitMoveTypeData(unitID) or {}).aircraftState
+	if aircraftState then
+		Spring.MoveCtrl.SetAirMoveTypeData(unitID, {maneuverBlockTime = 0})
+	end
+end
+
 function SetUnarmedAI()
 	-- Make bombers think they have much smaller turn radius to make them more responsive.
 	-- This is not applied to armed AI because it can cause infinite circling while trying

@@ -29,6 +29,7 @@ function script.StopMoving()
 end
 
 function script.Create()
+	SetInitialBomberSettings()
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	--StartThread(Lights)

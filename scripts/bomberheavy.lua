@@ -72,6 +72,7 @@ function script.MoveRate(rate)
 end
 
 function script.Create()
+	SetInitialBomberSettings()
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	StartThread(SmokeUnit, smokePiece)
 	Hide(rearthrust)

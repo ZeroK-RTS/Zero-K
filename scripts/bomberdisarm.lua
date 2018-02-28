@@ -15,6 +15,7 @@ local SIG_TAKEOFF = 1
 local takeoffHeight = UnitDefNames["bomberdisarm"].wantedHeight
 
 function script.Create()
+	SetInitialBomberSettings()
 	Hide(preDrop)
 	Hide(drop)
 	
