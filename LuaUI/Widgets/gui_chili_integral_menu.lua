@@ -901,11 +901,13 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			if isStateCommand then
 				local state = command.params[1] + 1
 				local displayConfig = commandDisplayConfig[cmdID]
-				local texture = displayConfig.texture[state]
-				if displayConfig.stateTooltip then
-					button.tooltip = GetButtonTooltip(displayConfig, command, isStateCommand and (command.params[1] + 1))
+				if displayConfig then
+					local texture = displayConfig.texture[state]
+					if displayConfig.stateTooltip then
+						button.tooltip = GetButtonTooltip(displayConfig, command, isStateCommand and (command.params[1] + 1))
+					end
+					SetImage(texture)
 				end
-				SetImage(texture)
 			end
 			if command then
 				SetDisabled(command.disabled)
@@ -949,18 +951,22 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			end
 		end
 		
-		if isStateCommand then
-			local state = command.params[1] + 1
-			local texture = displayConfig.texture[state]
-			SetImage(texture)
-		else
-			local texture = (displayConfig and displayConfig.texture) or command.texture
-			SetImage(texture)
-			
-			-- Remove stockpile progress
-			if not (command and DRAW_NAME_COMMANDS[command.id] and command.name) then
-				SetText(textConfig.bottomRightLarge.name, nil)
+		if displayConfig then
+			if isStateCommand then
+				local state = command.params[1] + 1
+				local texture = displayConfig.texture[state]
+				SetImage(texture)
+			else
+				local texture = (displayConfig and displayConfig.texture) or command.texture
+				SetImage(texture)
+				
+				-- Remove stockpile progress
+				if not (command and DRAW_NAME_COMMANDS[command.id] and command.name) then
+					SetText(textConfig.bottomRightLarge.name, nil)
+				end
 			end
+		else
+			Spring.Echo("Error, missing command config", cmdID)
 		end
 	end
 	
