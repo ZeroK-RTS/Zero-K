@@ -378,7 +378,7 @@ local function Initialize()
 	end
 	if not mirrorShader then
 		widget.DrawWorldPreUnit = function()
-			if drawingEnabled and dList and type(dList) == "number" and (not island) or options.drawForIslands.value then
+			if dList and ((not island) or options.drawForIslands.value) then
 				gl.DepthMask(true)
 				--gl.Texture(tex)
 				gl.CallList(dList)
