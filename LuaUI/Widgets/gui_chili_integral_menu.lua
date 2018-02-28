@@ -951,22 +951,22 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			end
 		end
 		
-		if displayConfig then
-			if isStateCommand then
+		if isStateCommand then
+			if displayConfig then
 				local state = command.params[1] + 1
 				local texture = displayConfig.texture[state]
 				SetImage(texture)
 			else
-				local texture = (displayConfig and displayConfig.texture) or command.texture
-				SetImage(texture)
-				
-				-- Remove stockpile progress
-				if not (command and DRAW_NAME_COMMANDS[command.id] and command.name) then
-					SetText(textConfig.bottomRightLarge.name, nil)
-				end
+				Spring.Echo("Error, missing command config", cmdID)
 			end
 		else
-			Spring.Echo("Error, missing command config", cmdID)
+			local texture = (displayConfig and displayConfig.texture) or command.texture
+			SetImage(texture)
+			
+			-- Remove stockpile progress
+			if not (command and DRAW_NAME_COMMANDS[command.id] and command.name) then
+				SetText(textConfig.bottomRightLarge.name, nil)
+			end
 		end
 	end
 	

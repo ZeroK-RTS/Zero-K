@@ -262,6 +262,8 @@ end
 local function ResetUnitData(unitData)
 	unitData.cx = nil
 	unitData.cz = nil
+	unitData.mx = nil
+	unitData.mz = nil
 	unitData.switchedFromRaw = nil
 	unitData.nextTestTime = nil
 	unitData.commandHandled = nil
