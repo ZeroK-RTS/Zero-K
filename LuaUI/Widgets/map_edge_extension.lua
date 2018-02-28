@@ -42,6 +42,8 @@ local ubrightness
 local island = nil -- Later it will be checked and set to true of false
 local drawingEnabled = true
 
+local SPACE_CLICK_OUTSIDE = false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -423,7 +425,7 @@ function widget:Shutdown()
 end
 
 local function DrawWorldFunc() --is overwritten when not using the shader
-    if dList and (not island) or options.drawForIslands.value then
+    if dList and ((not island) or options.drawForIslands.value) then
         local glTranslate = gl.Translate
         local glUniform = gl.Uniform
         local GamemapSizeZ, GamemapSizeX = Game.mapSizeZ,Game.mapSizeX
@@ -501,14 +503,16 @@ function widget:DrawWorldRefraction()
 	end
 end
 
-function widget:MousePress(x, y, button)
-	local _, mpos = spTraceScreenRay(x, y, true) --//convert UI coordinate into ground coordinate.
-	if mpos==nil then --//activate epic menu if mouse position is outside the map
-		local _, _, meta, _ = Spring.GetModKeyState()
-		if meta then  --//show epicMenu when user also press the Spacebar
-			WG.crude.OpenPath(options_path) --click + space will shortcut to option-menu
-			WG.crude.ShowMenu() --make epic Chili menu appear.
-			return false
+if SPACE_CLICK_OUTSIDE then
+	function widget:MousePress(x, y, button)
+		local _, mpos = spTraceScreenRay(x, y, true) --//convert UI coordinate into ground coordinate.
+		if mpos == nil then --//activate epic menu if mouse position is outside the map
+			local _, _, meta, _ = Spring.GetModKeyState()
+			if meta then  --//show epicMenu when user also press the Spacebar
+				WG.crude.OpenPath(options_path) --click + space will shortcut to option-menu
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+				return false
+			end
 		end
 	end
 end
