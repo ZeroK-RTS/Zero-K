@@ -99,7 +99,7 @@ end
 
 --//=============================================================================
 
-local function explode(str)
+local function explode(div, str)
 	local arr = {}
 	local i, j = 1, 1
 	local N = str:len()
@@ -108,7 +108,7 @@ local function explode(str)
 		local c = str:sub(j, j)
 		if c == '\255' then
 			j = j + 3
-		elseif c == '\10' then
+		elseif c == div then
 			arr[#arr + 1] = str:sub(i, j - 1)
 			i = j + 1
 		end
