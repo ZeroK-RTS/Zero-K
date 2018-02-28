@@ -84,7 +84,7 @@ options = {
 	drawForIslands = {
 		name = "Draw for islands",
 		type = 'bool',
-		value = true,
+		value = false,
 		desc = "Draws mirror map when map is an island",		
 		noHotkey = true,
 	},
