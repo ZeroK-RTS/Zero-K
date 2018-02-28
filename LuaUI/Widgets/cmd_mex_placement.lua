@@ -791,6 +791,9 @@ function updateMexDrawList()
 		mainMexDrawList = nil
 	end --delete previous list if exist (ref:gui_chicken.lua by quantum)
 	mainMexDrawList = glCreateList(calcMainMexDrawList)
+	if not mainMexDrawList then
+		Spring.Echo("Warning: Failed to update mex draw list.")
+	end
 	--miniMexDrawList = glCreateList(calcMiniMexDrawList)
 end
 
