@@ -99,22 +99,28 @@ end
 
 --//=============================================================================
 
-local function explode(div,str) -- credit: http://richard.warburton.it
-  if (div=='') then
-    return false
-  end
-  if not str then
-    return {}
-  end
-  local pos,arr = 0,{}
-  -- for each divider found
-  for st,sp in function() return string.find(str,div,pos,true) end do
-    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
-    pos = sp + 1 -- Jump past current divider
-  end
-  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
-  return arr
-end
+local function explode(str)
+	local arr = {}
+	local i, j = 1, 1
+	local N = str:len()
+
+	while j <= N do
+		local c = str:sub(j, j)
+		if c == '\255' then
+			j = j + 3
+		elseif c == '\10' then
+			arr[#arr + 1] = str:sub(i, j - 1)
+			i = j + 1
+		end
+		j = j + 1
+	end
+
+	if i <= N then
+		arr[#arr + 1] = str:sub(i, N)
+	end
+
+	return arr
+ end
 
 --- Sets the EditBox text
 -- @string newtext text to be set
