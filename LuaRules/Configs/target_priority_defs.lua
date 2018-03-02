@@ -56,18 +56,6 @@ for i=1, #UnitDefs do
 	end
 end
 
-local unitHealthRatioOverride = {
-	[UnitDefNames["vehscout"].id] = 4,
-	[UnitDefNames["spiderscout"].id] = 4,
-}
-
--- Pregenerate HP ratio
-local unitHealthRatio = {}
-for i=1, #UnitDefs do
-	local ud = UnitDefs[i]
-	unitHealthRatio[i] = unitHealthRatioOverride[i] or ud.health/ud.buildTime
-end
-
 -- Don't shoot at fighters or drones, they are unimportant.
 local unitIsFighterOrDrone = {
 	[UnitDefNames["planefighter"].id] = true,
@@ -257,23 +245,6 @@ for i = 1, #UnitDefs do
 	end
 end
 
--- Uncomment to output expected base priority values.
---[[
-local baseUnitPriority = {}
-for i=1, #UnitDefs do
-	local ud = UnitDefs[i]
-	baseUnitPriority[i] = {
-		priority = unitHealthRatioOverride[i] or ud.health/ud.buildTime,
-		name = ud.name,
-	}
-end
-
-table.sort(baseUnitPriority, function(a,b) return (a.priority > b.priority) end)
-for i=1, #baseUnitPriority do
-	Spring.Echo(baseUnitPriority[i].name .. " = " .. baseUnitPriority[i].priority .. ",")
-end
---]]
-
 -- Generate transport unit table
 local transportMult = {}
 
@@ -288,29 +259,35 @@ end
 local targetTable = {}
 
 for uid = 1, #UnitDefs do
+	local ud = UnitDefs[uid]
+	local unitHealth = ud.health
+	local unitCost = ud.buildTime
+	local armorType = ud.armorType
 	targetTable[uid] = {}
 	for wid = 1, #WeaponDefs do
+		local wd = WeaponDefs[wid]
+		local damage = wd.damages[armorType]
+		local priority = math.max(damage, unitHealth)/unitCost
 		if unitIsUnarmed[uid] then
-			targetTable[uid][wid] = unitHealthRatio[uid] + 35
+			targetTable[uid][wid] = priority + 35
 		elseif unitIsClaw[uid] then
-			targetTable[uid][wid] = unitHealthRatio[uid] + 1000
+			targetTable[uid][wid] = priority + 1000
 		elseif (weaponBadCats[wid].fixedwing and unitIsFixedwing[uid])
 			or (weaponBadCats[wid].gunship and unitIsGunship[uid])
 			or (weaponBadCats[wid].ground and unitIsGround[uid]) then
-				targetTable[uid][wid] = unitHealthRatio[uid] + 15
+				targetTable[uid][wid] = priority + 15
 		elseif (unitIsFighterOrDrone[uid])
 			or (weaponBadCats[wid].cheap and unitIsCheap[uid]) then
-				targetTable[uid][wid] = unitHealthRatio[uid] + 10
+				targetTable[uid][wid] = priority + 10
 		elseif (unitIsBomber[uid] and weaponIsAA[wid])
 			or (weaponBadCats[wid].heavy and unitIsHeavy[uid]) then
-			targetTable[uid][wid] = unitHealthRatio[uid]*0.3
+			targetTable[uid][wid] = priority*0.3
 		else
-			targetTable[uid][wid] = unitHealthRatio[uid]
+			targetTable[uid][wid] = priority
 		end
 		
 		-- Autogenerate some wobble penalties.
 		if not radarWobblePenalty[wid] then
-			local wd = WeaponDefs[wid]
 			local weaponType = wd.type
 			if weaponType == "BeamLaser" or weaponType == "LaserCannon" or weaponType == "LightningCannon" then
 				radarWobblePenalty[wid] = 5
