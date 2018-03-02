@@ -11,7 +11,7 @@ function widget:GetInfo()
 	}
 end
 
-
+local unitCategoryDefs = VFS.Include("LuaRules/Configs/unit_category.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 VFS.Include("LuaUI/Utilities/json.lua");
 
@@ -157,17 +157,16 @@ end
 --returns offensive, defensive metal value
 local function getValueStats(teamID)
 	local def, off = 0, 0
-	for _, unitID in ipairs(Spring.GetTeamUnits(teamID)) do
+	for _, unitID in pairs(Spring.GetTeamUnits(teamID)) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		local ud = unitDefID and UnitDefs[unitDefID]
-		if ud and not ud.customParams.dontcount then
+		if unitDefID then
 			local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
-			local isbuilt = not select(3, Spring.GetUnitIsStunned(unitID))	
+			local isbuilt = not select(3, Spring.GetUnitIsStunned(unitID))
 			if metal and isbuilt then
-				local unarmed = ud.springCategories.unarmed
-				if ud.speed ~= 0 then
+				local cat = unitDefID and unitCategoryDefs[unitDefID]
+				if cat == "army" then
 					off = off + metal
-				elseif not unarmed then
+				elseif cat == "def" then
 					def = def + metal
 				end
 			end

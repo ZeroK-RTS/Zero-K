@@ -10,6 +10,8 @@ function gadget:GetInfo() return {
 	enabled = true,
 } end
 
+local unitCategoryDefs = VFS.Include("LuaRules/Configs/unit_category.lua")
+
 local teamList = Spring.GetTeamList()
 local gaiaTeamID = Spring.GetGaiaTeamID()
 local allyTeamByTeam
@@ -26,6 +28,7 @@ local metalExcessByTeam = {}
 local damageReceivedByTeam = {}
 
 local unitValueByTeam = {}
+local unitCategoryValueByTeam = {}
 local unitValueLostByTeam = {}
 local totalNanoValueByTeam = {}
 local partialNanoValueByTeam = {}
@@ -120,6 +123,11 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 
 	unitValueByTeam[teamID] = unitValueByTeam[teamID] + cost
 	totalNanoValueByTeam[teamID] = totalNanoValueByTeam[teamID] - cost
+	
+	local cat = unitCategoryDefs[unitDefID]
+	if cat and unitCategoryValueByTeam[teamID][cat] then
+		unitCategoryValueByTeam[teamID][cat] = unitCategoryValueByTeam[teamID][cat] + cost
+	end
 end
 
 function gadget:UnitReverseBuilt(unitID, unitDefID, teamID)
@@ -137,6 +145,11 @@ function gadget:UnitReverseBuilt(unitID, unitDefID, teamID)
 
 	totalNanoValueByTeam[teamID] = totalNanoValueByTeam[teamID] + cost
 	unitValueByTeam[teamID] = unitValueByTeam[teamID] - cost
+	
+	local cat = unitCategoryDefs[unitDefID]
+	if cat and unitCategoryValueByTeam[teamID][cat] then
+		unitCategoryValueByTeam[teamID][cat] = unitCategoryValueByTeam[teamID][cat] - cost
+	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeam)
@@ -164,6 +177,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
 	else
 		cost = GetUnitCost(unitID, unitDefID)
 		unitValueByTeam[teamID] = unitValueByTeam[teamID] - cost
+		local cat = unitCategoryDefs[unitDefID]
+		if cat and unitCategoryValueByTeam[teamID][cat] then
+			unitCategoryValueByTeam[teamID][cat] = unitCategoryValueByTeam[teamID][cat] - cost
+		end
 	end
 
 	local morphed = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
@@ -195,6 +212,12 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 		local cost = GetUnitCost(unitID, unitDefID)
 		unitValueByTeam[oldTeam] = unitValueByTeam[oldTeam] - cost
 		unitValueByTeam[newTeam] = unitValueByTeam[newTeam] + cost
+		
+		local cat = unitCategoryDefs[unitDefID]
+		if cat and unitCategoryValueByTeam[teamID][cat] then
+			unitCategoryValueByTeam[oldTeam][cat] = unitCategoryValueByTeam[oldTeam][cat] - cost
+			unitCategoryValueByTeam[newTeam][cat] = unitCategoryValueByTeam[newTeam][cat] + cost
+		end
 	end
 end
 
@@ -259,6 +282,10 @@ function gadget:GameFrame(n)
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", -reclaimListByTeam[teamID], ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_current", metalExcessByTeam[teamID], ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_current", unitValueByTeam[teamID], ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_army_current", unitCategoryValueByTeam[teamID].army, ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_def_current", unitCategoryValueByTeam[teamID].def, ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_econ_current", unitCategoryValueByTeam[teamID].econ, ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_other_current", unitCategoryValueByTeam[teamID].other, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_killed_current", unitValueKilledByTeamNonhax[teamID], ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_lost_current", unitValueLostByTeam[teamID], ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_current", partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
@@ -279,6 +306,10 @@ function gadget:GameFrame(n)
 			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_killed_" .. stats_index, unitValueKilledByTeamNonhax[teamID], ALLIED_VISIBLE)
 			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_lost_" .. stats_index, unitValueLostByTeam[teamID], ALLIED_VISIBLE)
 			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_" .. stats_index, unitValueByTeam[teamID], ALLIED_VISIBLE)
+			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_army_" .. stats_index, unitCategoryValueByTeam[teamID].army, ALLIED_VISIBLE)
+			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_def_" .. stats_index, unitCategoryValueByTeam[teamID].def, ALLIED_VISIBLE)
+			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_econ_" .. stats_index, unitCategoryValueByTeam[teamID].econ, ALLIED_VISIBLE)
+			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_other_" .. stats_index, unitCategoryValueByTeam[teamID].other, ALLIED_VISIBLE)
 			Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_" .. stats_index, partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
 			Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_" .. stats_index, totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
 
@@ -319,6 +350,12 @@ function gadget:Initialize()
 		local teamID = teamList[i]
 		unitValueByTeam[teamID] = 0
 		totalNanoValueByTeam[teamID] = 0
+		unitCategoryValueByTeam[teamID] = {
+			army = 0,
+			def = 0,
+			econ = 0,
+			other = 0,
+		}
 	end
 
 	local allUnits = Spring.GetAllUnits()
@@ -355,6 +392,10 @@ function gadget:Initialize()
 		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_killed_current", Spring.GetTeamRulesParam(teamID, "stats_history_unit_value_killed_current") or 0, ALLIED_VISIBLE)
 
 		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_current", unitValueByTeam[teamID], ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_army_current", unitCategoryValueByTeam[teamID].army, ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_def_current", unitCategoryValueByTeam[teamID].def, ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_econ_current", unitCategoryValueByTeam[teamID].econ, ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_other_current", unitCategoryValueByTeam[teamID].other, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_current", partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_current", totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
 
@@ -369,6 +410,10 @@ function gadget:Initialize()
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_od_0"  , 0, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_energy_income_0"    , 0, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_0"       , 0, ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_army_0"  , 0, ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_def_0"   , 0, ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_econ_0"  , 0, ALLIED_VISIBLE)
+		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_other_0" , 0, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_killed_0", 0, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_lost_0"  , 0, ALLIED_VISIBLE)
 		Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_0"     , 0, ALLIED_VISIBLE)

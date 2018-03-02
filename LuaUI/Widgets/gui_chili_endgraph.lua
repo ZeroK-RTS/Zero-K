@@ -25,27 +25,27 @@ end
 local GetHiddenTeamRulesParam = Spring.Utilities.GetHiddenTeamRulesParam
 
 local buttongroups = {
-	{"Metal", {
-		{"metalProduced"   , "Metal Produced"},
-		{"metalUsed"       , "Metal Used"},
-		{"metal_income"    , "Metal Income"},
-		{"metal_overdrive" , "Metal Overdrive"},
-		{"metal_reclaim"   , "Metal Reclaimed"},
-		{"metal_excess"    , "Metal Excess"},
-		},
-	},
-
-	{"Energy", {
-		{"energy_income"   , "Energy Income"},
+	{"Economy", {
+		{"metalProduced"   , "Metal Produced", "Cumulative total of metal produced."},
+		{"metalUsed"       , "Metal Used", "Cumulative total of metal used."},
+		{"metal_income"    , "Metal Income", "Total metal income."},
+		{"metal_overdrive" , "Metal Overdrive", "Cumulative total of metal produced by overdrive."},
+		{"metal_reclaim"   , "Metal Reclaimed", "Cumulative total of metal reclaimed. Includes wreckage, unit reclaim and construction cancellation."},
+		{"metal_excess"    , "Metal Excess", "Cumulative total of metal lost to excess."},
+		{"energy_income"   , "Energy Income", "Total energy income."},
 		},
 	},
 
 	{"Units", {
-		{"unit_value"      , "Unit Value"},
-		{"unit_value_killed", "Value Killed"},
-		{"unit_value_lost" , "Value Lost"},
-		{"damage_dealt"    , "Damage Dealt"},
-		{"damage_received" , "Damage Received"},
+		{"unit_value"      , "Total Value", "Total value of units and structures."},
+		{"unit_value_army" , "Army Value", "Value of mobile units excluding constructors, commanders, Iris, Owl, Djinn, Charon and Hercules."},
+		{"unit_value_def"  , "Defense Value", "Value of armed structures (and shields) with range up to and including Cerebus and Aretemis."},
+		{"unit_value_econ" , "Economy Value", "Value of economic structures, factories and constructors."},
+		{"unit_value_other", "Other Value", "Value of units and structures that do not fit any other category."},
+		{"unit_value_killed", "Value Killed", "Cumulative total of value of enemy units and structured destroyed by the team. Includes nanoframes."},
+		{"unit_value_lost" , "Value Lost", "Cumulative total of value of the teams destroyed units and structures. Includes nanoframes."},
+		{"damage_dealt"    , "Damage Dealt", "Cumulative damage inflicted measured by the cost of the damaged unit in proportion to damage dealt."},
+		{"damage_received" , "Damage Received", "Cumulative damage received measured by the cost of the damaged unit in proportion to damage dealt."},
 		},
 	},
 }
@@ -55,6 +55,10 @@ local rulesParamStats = {
 	metal_overdrive = true,
 	metal_reclaim = true,
 	unit_value = true,
+	unit_value_army = true,
+	unit_value_def = true,
+	unit_value_econ = true,
+	unit_value_other = true,
 	unit_value_killed = true,
 	unit_value_lost = true,
 	metal_income = true,
@@ -129,15 +133,16 @@ local function drawIntervals(graphMax)
 		local line = Chili.Line:New{
 			parent = graphPanel, 
 			x = 0, 
-			bottom = (i)/5*100 .. "%", 
+			bottom = (0.997*(i)/5*100 - 0.8) .. "%",
+			height = 0,
 			width = "100%", 
 			color = {0.1,0.1,0.1,0.1}
 		}
 		if graphMax then
 			local label = Chili.Label:New{
 				parent = graphPanel, 
-				x = 0,
-				bottom = ((i)/5*100 + 2) .. "%",
+				x = 5,
+				bottom = ((i)/5*100 + 1) .. "%",
 				width = "100%", 
 				caption = numFormat(graphMax*i/5)
 			}
@@ -200,7 +205,7 @@ end
 --draw graphs
 
 --Total package of graph: Draws graph and labels for each nonSpec player
-local function drawGraph(graphArray, graph_m, teamID, team_num)
+local function drawGraph(graphArray, graphMax, teamID, team_num)
 	if #graphArray == 0 then
 		return
 	end
@@ -221,8 +226,8 @@ local function drawGraph(graphArray, graph_m, teamID, team_num)
 	end
 
 	for i = 1, #graphArray do
-		if (graph_m < graphArray[i]) then 
-			graph_m = graphArray[i]
+		if (graphMax < graphArray[i]) then 
+			graphMax = graphArray[i]
 		end
 	end
 
@@ -230,14 +235,14 @@ local function drawGraph(graphArray, graph_m, teamID, team_num)
 	local drawLine = function()
 		for i = 1, #graphArray do
 			local ordinate = graphArray[i]
-			gl.Vertex((i - 1)/(#graphArray - 1), 1 - ordinate/graph_m)
+			gl.Vertex((i - 1)/(#graphArray - 1), 0.9975 - ordinate/graphMax)
 		end
 	end
 
 	--adds value to end of graph
 	local label1 = Chili.Label:New{
 		parent = lineLabels,
-		y = (1 - graphArray[#graphArray]/graph_m) * 96 + 0.25 .. "%",
+		y = (1 - graphArray[#graphArray]/graphMax) * 96 + 0.25 .. "%",
 		width = "100%",
 		caption = lineLabel,
 		font = {color = teamColor},
@@ -355,6 +360,7 @@ local function getEngineArrays(statistic, labelCaption)
 	if graphMax < 5 then
 		graphMax = 5
 	end
+	graphMax = graphMax*1.005
 	
 	local team_i = 1
 	for k, v in pairs(teamScores) do
@@ -378,7 +384,7 @@ end
 
 function makePanel()
 	Chili = WG.Chili
-	local selW = 150
+	local selW = 140
 
 	window0 = Chili.Control:New {
 		x = "0",
@@ -401,7 +407,8 @@ function makePanel()
 		minHeight = 70,
 		x = 0, 
 		y = 0,
-		width = selW, height = "100%",
+		width = selW,
+		height = "100%",
 		padding = {0,0,0,0},
 		itemMargin = {0,0,0,0},
 		resizeItems = true,
@@ -413,7 +420,7 @@ function makePanel()
 		right = 40,
 		y = 0, 
 		bottom = 40,
-		padding = {10,10,10,10}
+		padding = {2, 2, 2, 2},
 	}
 	graphLabel = Chili.Label:New {
 		parent = window0,
@@ -464,7 +471,7 @@ function makePanel()
 			y = 16,
 			bottom = 0,
 			width = "100%",
-			itemMargin = {1,2,1,2},
+			itemMargin = {1,1,1,2},
 			resizeItems = true,
 		}
 		for j = 1, #buttongroups[i][2] do
@@ -472,6 +479,7 @@ function makePanel()
 			window0.graphButtons[gb_i] = Chili.Button:New {
 				name = buttongroups[i][2][j][1],
 				caption = buttongroups[i][2][j][2],
+				tooltip = buttongroups[i][2][j][3],
 				parent = groupstack,
 				OnClick = { 
 					function(obj)
