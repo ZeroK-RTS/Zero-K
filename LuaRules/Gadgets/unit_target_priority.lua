@@ -379,7 +379,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		defPrio = defPrio + distAdd
 	end
 	
-	--Spring.Utilities.UnitEcho(targetID, defPrio)
+	--Spring.Utilities.UnitEcho(targetID, string.format("%.1f", defPrio))
 	return true, defPrio + velocityAdd + lastShotBonus -- bigger value have lower priority
 end
 

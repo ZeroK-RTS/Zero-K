@@ -240,9 +240,11 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 	end
 
 	--adds value to end of graph
+	local labelOffBottom = (graphArray[#graphArray]/graphMax > 0.025)
 	local label1 = Chili.Label:New{
 		parent = lineLabels,
-		y = (1 - graphArray[#graphArray]/graphMax) * 96 + 0.25 .. "%",
+		y = labelOffBottom and ((1 - graphArray[#graphArray]/graphMax) * 100 - 1 .. "%"),
+		bottom = (not labelOffBottom) and 1,
 		width = "100%",
 		caption = lineLabel,
 		font = {color = teamColor},
@@ -360,12 +362,11 @@ local function getEngineArrays(statistic, labelCaption)
 	if graphMax < 5 then
 		graphMax = 5
 	end
-	graphMax = graphMax*1.005
 	
 	local team_i = 1
 	for k, v in pairs(teamScores) do
 		if k ~= gaia then
-			drawGraph(v, graphMax, k, team_i)
+			drawGraph(v, graphMax*1.005, k, team_i)
 		end
 		team_i = team_i + 1
 	end
@@ -394,9 +395,9 @@ function makePanel()
 		padding = {0,0,0,4},
 		buttonPressed = 1,
 	}
-	lineLabels 	= Chili.Control:New {
+	lineLabels = Chili.Control:New {
 		parent = window0,
-		y = 5,
+		y = 0,
 		right = 0,
 		bottom = 40,
 		width = 35, 
