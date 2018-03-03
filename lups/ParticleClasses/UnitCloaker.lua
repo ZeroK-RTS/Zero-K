@@ -127,6 +127,9 @@ function UnitCloaker:Draw()
 
   
   local x, y, z = Spring.GetUnitPosition(self.unit)
+  if not x then
+    return
+  end
   local a11, a12, a13, a14, a21, a22, a23, a24, a31, a32, a33, a34, a41, a42, a43, a44 = Spring.GetUnitTransformMatrix(self.unit)
   
   gl.Translate(x - a41, y - a42, z - a43)
