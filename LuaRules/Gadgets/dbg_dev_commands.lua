@@ -715,6 +715,32 @@ local function serial(cmd,line,words,player)
 	creationUnitList = unitList
 end
 
+local function EchoCrush()
+	if not spIsCheatingEnabled() then
+		return
+	end
+	
+	local features = Spring.GetAllFeatures()
+	for i = 1, #features do
+		local featureID = features[i]
+		local fdid = Spring.GetFeatureDefID(featureID)
+		local mass = fdid and FeatureDefs[fdid] and FeatureDefs[fdid].mass
+		if mass then
+			local crush = 1
+			if mass < 50 then
+				crush = 2
+			elseif mass < 150 then
+				crush = 3
+			elseif mass < 500 then
+				crush = 4
+			else
+				crush = "x"
+			end
+			Spring.Utilities.FeatureEcho(featureID, crush)
+		end
+	end
+end
+
 local function bisect(cmd,line,words,player)
 	local increment = math.abs(tonumber(words[1]) or 1)
 	local offset = math.floor(tonumber(words[2]) or 0)
@@ -785,6 +811,7 @@ end
 
 function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"bisect",bisect,"Bisect gadget disables.")
+	gadgetHandler.actionHandler.AddChatAction(self,"ecrush",EchoCrush,"Echos all crushabilities.")
 	gadgetHandler.actionHandler.AddChatAction(self,"circle",circleGive,"Gives a bunch of units in a circle.")
 	gadgetHandler.actionHandler.AddChatAction(self,"moveunit", MoveUnit, "Moves a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self,"destroyunit", DestroyUnit, "Destroys a unit.")
