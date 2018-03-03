@@ -29,9 +29,6 @@ local PERIOD = 30
 
 local INLOS_ACCESS = {inlos = true}
 
-local spGetUnitShieldState  = Spring.GetUnitShieldState
-local spSetUnitShieldState  = Spring.SetUnitShieldState
-
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spUseUnitResource   = Spring.UseUnitResource
 local spGetUnitRulesParam = Spring.GetUnitRulesParam

@@ -45,13 +45,20 @@ for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	if ud.shieldWeaponDef and not ud.customParams.dynamic_comm then
 		local shieldWep = WeaponDefs[ud.shieldWeaponDef]
-		if shieldWep.customParams and shieldWep.customParams.shield_drain and tonumber(shieldWep.customParams.shield_drain) > 0 then
-			shieldUnitDefID[unitDefID] = {
-				maxCharge = shieldWep.shieldPower,
-				perUpdateCost = PERIOD*tonumber(shieldWep.customParams.shield_drain)/TEAM_SLOWUPDATE_RATE,
-				chargePerUpdate = PERIOD*tonumber(shieldWep.customParams.shield_rate)/TEAM_SLOWUPDATE_RATE,
-				perSecondCost = tonumber(shieldWep.customParams.shield_drain)
-			}
+		if shieldWep.customParams then
+			if shieldWep.customParams.shield_drain and tonumber(shieldWep.customParams.shield_drain) > 0 then
+				shieldUnitDefID[unitDefID] = {
+					maxCharge = shieldWep.shieldPower,
+					perUpdateCost = PERIOD*tonumber(shieldWep.customParams.shield_drain)/TEAM_SLOWUPDATE_RATE,
+					chargePerUpdate = PERIOD*tonumber(shieldWep.customParams.shield_rate)/TEAM_SLOWUPDATE_RATE,
+					perSecondCost = tonumber(shieldWep.customParams.shield_drain),
+					startPower = shieldWep.customParams.shieldstartingpower and tonumber(shieldWep.customParams.shieldstartingpower),
+				}
+			else
+				shieldUnitDefID[unitDefID] = {
+					startPower = shieldWep.customParams.shieldstartingpower and tonumber(shieldWep.customParams.shieldstartingpower),
+				}
+			end
 		end
 	end
 end
@@ -151,23 +158,29 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 				return
 			end
 		end
-		unitCount = unitCount + 1
+		local shieldNum = (GG.Upgrades_UnitShieldDef and select(2, GG.Upgrades_UnitShieldDef(unitID))) or -1
+		if def.startPower then
+			spSetUnitShieldState(unitID, shieldNum, def.startPower)
+		end
 		
-		local data = {
-			unitID = unitID,
-			index = unitCount,
-			unitDefID = unitDefID, 
-			teamID = teamID,  
-			resTable = {
-				m = 0,
-				e = def.perUpdateCost
-			},
-			shieldNum = (GG.Upgrades_UnitShieldDef and select(2, GG.Upgrades_UnitShieldDef(unitID))) or -1,
-			def = def
-		}
-		
-		unitList[unitCount] = data
-		unitMap[unitID] = data
+		if def.perUpdateCost then
+			unitCount = unitCount + 1
+			local data = {
+				unitID = unitID,
+				index = unitCount,
+				unitDefID = unitDefID,
+				teamID = teamID,
+				resTable = {
+					m = 0,
+					e = def.perUpdateCost
+				},
+				shieldNum = shieldNum,
+				def = def
+			}
+			
+			unitList[unitCount] = data
+			unitMap[unitID] = data
+		end
 	end
 end
 

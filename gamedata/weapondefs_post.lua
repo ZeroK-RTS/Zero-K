@@ -123,6 +123,18 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Set shield starting power
+
+for name, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.shieldpower and (weaponDef.shieldpower < 2000) then
+		weaponDef.shieldstartingpower = weaponDef.shieldpower*2/3
+		weaponDef.customparams.shieldstartingpower = weaponDef.shieldstartingpower
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Set lenient fire tolerance
 
 for _, weaponDef in pairs(WeaponDefs) do
