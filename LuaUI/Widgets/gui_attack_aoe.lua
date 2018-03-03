@@ -134,7 +134,12 @@ local function GetMouseTargetPosition()
 	elseif (mouseTargetType == "unit") then
 		return GetUnitPosition(mouseTarget)
 	elseif (mouseTargetType == "feature") then
-		return GetFeaturePosition(mouseTarget)
+		local _, coords = TraceScreenRay(mx, my, true, true)
+		if coords and coords[3] then
+			return coords[1], coords[2], coords[3]
+		else
+			return GetFeaturePosition(mouseTarget)
+		end
 	else
 		return nil
 	end

@@ -139,6 +139,7 @@ local function setTarget(data, sendToWidget)
 		if not data.targetID then
 			if locationInRange(data.id, data.x, data.y, data.z, data.range) then
 				spSetUnitTarget(data.id, data.x, data.y, data.z)
+				GG.UnitSetGroundTarget(data.id)
 			end
 			if sendToWidget then
 				spSetUnitRulesParam(data.id,"target_type",TARGET_GROUND)
@@ -412,6 +413,13 @@ end
 
 function GG.GetUnitTarget(unitID)
 	return unitById[unitID] and unit.data[unitById[unitID]] and unit.data[unitById[unitID]].targetID
+end
+
+function GG.GetUnitTargetGround(unitID)
+	if unitById[unitID] and unit.data[unitById[unitID]] then
+		return not unit.data[unitById[unitID]].targetID
+	end
+	return false
 end
 
 function GG.SetUnitTarget(unitID, targetID)
