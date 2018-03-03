@@ -328,9 +328,9 @@ function snapButton(pushButton)
 	button_setspeed[pushButton]:Invalidate()
 end
 
-function pause (supressCommand)
+function pause(supressCommand)
 	Spring.Echo ("Playback paused")
-	if supressCommand then
+	if not supressCommand then
 		Spring.SendCommands ("pause 1")
 	end
 	isPaused = true
