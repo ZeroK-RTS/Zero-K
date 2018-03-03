@@ -214,7 +214,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 		unitValueByTeam[newTeam] = unitValueByTeam[newTeam] + cost
 		
 		local cat = unitCategoryDefs[unitDefID]
-		if cat and unitCategoryValueByTeam[teamID][cat] then
+		if cat and unitCategoryValueByTeam[oldTeam][cat] and unitCategoryValueByTeam[newTeam][cat] then
 			unitCategoryValueByTeam[oldTeam][cat] = unitCategoryValueByTeam[oldTeam][cat] - cost
 			unitCategoryValueByTeam[newTeam][cat] = unitCategoryValueByTeam[newTeam][cat] + cost
 		end
