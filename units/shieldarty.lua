@@ -4,7 +4,7 @@ unitDef = {
   description            = [[Disarming Artillery]],
   acceleration           = 0.25,
   brakeRate              = 0.75,
-  buildCostMetal         = 360,
+  buildCostMetal         = 350,
   buildPic               = [[SHIELDARTY.png]],
   canGuard               = true,
   canMove                = true,
@@ -79,7 +79,7 @@ unitDef = {
 	  },
 	  
       damage                  = {
-        default        = 1800,
+        default        = 2500,
       },
 
       edgeEffectiveness       = 0.4,
