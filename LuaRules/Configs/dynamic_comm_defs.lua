@@ -790,7 +790,7 @@ local moduleDefs = {
 	{
 		name = "module_adv_nano",
 		humanName = "CarRepairer's Nanolathe",
-		description = "CarRepairer's Nanolathe - Increases build power by 5. Limit: 8",
+		description = "CarRepairer's Nanolathe - Increases build power by 4. Limit: 8",
 		image = moduleImagePath .. "module_adv_nano.png",
 		limit = 8,
 		cost = 150 * COST_MULT,
@@ -798,7 +798,7 @@ local moduleDefs = {
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			-- All comms have 10 BP in their unitDef (even support)
-			sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 5
+			sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 4
 		end
 	},
 	
