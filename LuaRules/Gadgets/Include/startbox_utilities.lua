@@ -11,6 +11,8 @@ local function ParseBoxes ()
 	local mapsideBoxes = "mapconfig/map_startboxes.lua"
 	local modsideBoxes = "LuaRules/Configs/StartBoxes/" .. (Game.mapName or "") .. ".lua"
 
+	local startBoxConfig
+
 	if VFS.FileExists (modsideBoxes) then
 		startBoxConfig = WrappedInclude (modsideBoxes)
 	elseif VFS.FileExists (mapsideBoxes) then

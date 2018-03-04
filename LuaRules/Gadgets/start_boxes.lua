@@ -319,7 +319,7 @@ function gadget:Initialize()
 		end
 	end
 
-	for id, rawbox in pairs(startBoxConfig) do
+	for id, rawbox in pairs(startboxConfig) do
 		rawbox.boxes = math.triangulate(rawbox.boxes)
 	end
 
