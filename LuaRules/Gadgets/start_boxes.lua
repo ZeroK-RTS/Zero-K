@@ -14,7 +14,7 @@ local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
 local shuffleMode = Spring.GetModOptions().shuffle or "auto"
 local startboxConfig
 
-local ParseBoxes, GetRawBoxes = VFS.Include ("LuaRules/Gadgets/Include/startbox_utilities.lua")
+local ParseBoxes = VFS.Include ("LuaRules/Gadgets/Include/startbox_utilities.lua")
 
 local function GetAverageStartpoint(boxID)
 	local box = startboxConfig[boxID]
@@ -152,25 +152,6 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 	}
 end
 
-local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimationMark()
-	if shuffleMode == "auto" then
-		if Spring.Utilities.GetTeamCount() > 2 then
-			shuffleMode = "shuffle"
-		elseif Spring.Utilities.GetTeamCount() == 2 then
-			shuffleMode = "allshuffle"
-		else
-			-- 1 team: chickens
-			shuffleMode = "off"
-		end
-	end
-	Spring.SetGameRulesParam("shuffleMode", shuffleMode)
-
-	startboxConfig = ParseBoxes()
-
-	GG.startBoxConfig = startboxConfig
-	GG.GetPlanetwarsBoxes = GetPlanetwarsBoxes
-end
-
 local function CheckStartbox (boxID, x, z)
 	if not boxID then
 		return true
@@ -297,14 +278,28 @@ local function GetTeamNames (allyTeamID)
 end
 
 function gadget:Initialize()
-	InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimationMark()
+	if shuffleMode == "auto" then
+		if Spring.Utilities.GetTeamCount() > 2 then
+			shuffleMode = "shuffle"
+		elseif Spring.Utilities.GetTeamCount() == 2 then
+			shuffleMode = "allshuffle"
+		else
+			-- 1 team: chickens
+			shuffleMode = "off"
+		end
+	end
+	Spring.SetGameRulesParam("shuffleMode", shuffleMode)
+
+	startboxConfig = ParseBoxes()
+
+	GG.startBoxConfig = startboxConfig
+	GG.GetPlanetwarsBoxes = GetPlanetwarsBoxes
 	GG.CheckStartbox = CheckStartbox
 
 	Spring.SetGameRulesParam("startbox_max_n", #startboxConfig)
 	Spring.SetGameRulesParam("startbox_recommended_startpos", 1)
 
-	local rawBoxes = GetRawBoxes()
-	for box_id, rawbox in pairs(rawBoxes) do
+	for box_id, rawbox in pairs(startboxConfig) do
 		local polygons = rawbox.boxes
 		Spring.SetGameRulesParam("startbox_n_" .. box_id, #polygons)
 		for i = 1, #polygons do
@@ -315,15 +310,17 @@ function gadget:Initialize()
 				Spring.SetGameRulesParam("startbox_polygon_z_" .. box_id .. "_" .. i .. "_" .. j, polygons[i][j][2])
 			end
 		end
-	end
-	
-	for box_id, box in pairs(startboxConfig) do
-		local startposes = box.startpoints
+
+		local startposes = rawbox.startpoints
 		Spring.SetGameRulesParam("startpos_n_" .. box_id, #startposes)
 		for i = 1, #startposes do
 			Spring.SetGameRulesParam("startpos_x_" .. box_id .. "_" .. i, startposes[i][1])
 			Spring.SetGameRulesParam("startpos_z_" .. box_id .. "_" .. i, startposes[i][2])
 		end
+	end
+
+	for id, rawbox in pairs(startBoxConfig) do
+		rawbox.boxes = math.triangulate(rawbox.boxes)
 	end
 
 	-- filter out fake teams (empty or Gaia)
