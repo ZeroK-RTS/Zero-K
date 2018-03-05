@@ -782,6 +782,19 @@ local function nocost(cmd,line,words,player)
 	Spring.Echo("Free morph " .. ((enabled and "enabled") or "disabled") .. ".")
 end
 
+local function EmpiricalDps(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	local enabled = not (tonumber(words[1]) == 0)
+	if enabled then
+		gadgetHandler:GotChatMsg("enablegadget Empirical DPS", 0)
+	else
+		gadgetHandler:GotChatMsg("disablegadget Empirical DPS", 0)
+	end
+	Spring.SetGameRulesParam("enable_EmpiricalDPS", enabled and 1 or 0)
+end
+
 function gadget:GameFrame(n)
 	if (not creationIndex) then
 		return
@@ -810,7 +823,12 @@ function gadget:GameFrame(n)
 end
 
 function gadget:Initialize()
+	if Spring.GetGameRulesParam("enable_EmpiricalDPS") == 1 then
+		gadgetHandler:GotChatMsg("enablegadget Empirical DPS", 0)
+	end
+
 	gadgetHandler.actionHandler.AddChatAction(self,"bisect",bisect,"Bisect gadget disables.")
+	gadgetHandler.actionHandler.AddChatAction(self,"emd",EmpiricalDps,"Toggle empirical DPS.")
 	gadgetHandler.actionHandler.AddChatAction(self,"ecrush",EchoCrush,"Echos all crushabilities.")
 	gadgetHandler.actionHandler.AddChatAction(self,"circle",circleGive,"Gives a bunch of units in a circle.")
 	gadgetHandler.actionHandler.AddChatAction(self,"moveunit", MoveUnit, "Moves a unit.")

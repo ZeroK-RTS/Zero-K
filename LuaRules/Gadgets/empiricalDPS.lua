@@ -27,9 +27,6 @@ local attackerUnitDefID
 
 function gadget:UnitDamaged(unitID, unitDefID,  unitTeam, unitDamage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
-    if unitDamage < 5 then
-		return
-	end
 	local wd = WeaponDefs[weaponID]
 	if wd then
 	--	local aoe = wd.damageAreaOfEffect
