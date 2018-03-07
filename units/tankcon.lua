@@ -87,14 +87,13 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-        reaim_time = 5, -- COB
 		light_camera_height = 1200,
 		light_radius = 120,
       },
 
       damage                  = {
-        default = 18,
-        planes  = 18,
+        default = 14.4,
+        planes  = 14.4,
         subs    = 0.7,
       },
 
