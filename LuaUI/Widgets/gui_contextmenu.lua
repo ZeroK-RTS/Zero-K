@@ -1254,7 +1254,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 			caption = "Edit Behaviour",
 			tooltip = "Edit the default behaviour of " .. Spring.Utilities.GetHumanName(ud) .. ".",
 			OnClick = {function ()
-					WG.crude.OpenPathToLabel(behaviourPath[ud.id], false, Spring.Utilities.GetHumanName(ud))
+					WG.crude.OpenPathToLabel(behaviourPath[ud.id], true, Spring.Utilities.GetHumanName(ud))
 				end,
 			}
 		}
