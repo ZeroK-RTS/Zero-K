@@ -112,6 +112,58 @@ local valkMaxSize = UnitDefNames.gunshiptrans.transportSize * 2
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Generate unit behaviour paths 
+local BEHAVIOUR_PATH = "Settings/Unit Behaviour/Default States/"
+
+local behaviourPath = {}
+local unitAlreadyAdded = {}
+
+local function AddFactoryOfUnits(defName)
+	if unitAlreadyAdded[defName] then
+		return
+	end
+	local ud = UnitDefNames[defName]
+	local name = string.gsub(ud.humanName, "/", "-")
+	local path = BEHAVIOUR_PATH .. name
+	behaviourPath[ud.id] = path
+	for i = 1, #ud.buildOptions do
+		behaviourPath[ud.buildOptions[i]] = path
+	end
+end
+
+AddFactoryOfUnits("factoryshield")
+AddFactoryOfUnits("factorycloak")
+AddFactoryOfUnits("factoryveh")
+AddFactoryOfUnits("factoryplane")
+AddFactoryOfUnits("factorygunship")
+AddFactoryOfUnits("factoryhover")
+AddFactoryOfUnits("factoryamph")
+AddFactoryOfUnits("factoryspider")
+AddFactoryOfUnits("factoryjump")
+AddFactoryOfUnits("factorytank")
+AddFactoryOfUnits("factoryship")
+AddFactoryOfUnits("striderhub")
+AddFactoryOfUnits("staticmissilesilo")
+
+local buildOpts = VFS.Include("gamedata/buildoptions.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+
+for i = 1, #buildOpts do
+	local name = buildOpts[i]
+	local unitDefID = UnitDefNames[name].id
+	if econ_commands[-unitDefID] then
+		behaviourPath[unitDefID] = BEHAVIOUR_PATH .. "Economy"
+	elseif defense_commands[-unitDefID] then
+		behaviourPath[unitDefID] = BEHAVIOUR_PATH .. "Defence"
+	elseif special_commands[-unitDefID] then
+		behaviourPath[unitDefID] = BEHAVIOUR_PATH .. "Special"
+	else
+		behaviourPath[-unitDefID] = BEHAVIOUR_PATH .. "Misc"
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function MakeStatsWindow() 
 end
@@ -1176,18 +1228,36 @@ local function printunitinfo(ud, buttonWidth, unitID)
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
 			file = "#" .. ud.id,
 			keepAspect = false;
-			height  = 64*(4/5);
-			width   = 64;
+			x = 32,
+			y = 0,
+			height  = 88*(4/5);
+			width   = 88;
 		},
 	}
 	if ud.iconType ~= 'default' then
-		icons[#icons + 1] = 
-			Image:New{
-				file=icontypes and icontypes[(ud and ud.iconType or "default")].bitmap
-					or 'icons/'.. ud.iconType ..iconFormat,
-				height=40,
-				width=40,
+		icons[#icons + 1] = Image:New{
+			file=icontypes and icontypes[(ud and ud.iconType or "default")].bitmap
+				or 'icons/'.. ud.iconType ..iconFormat,
+			x = 0,
+			y = 2,
+			height=32,
+			width=32,
+		}
+	end
+	
+	if behaviourPath[ud.id] then
+		icons[#icons + 1] = Button:New{
+			x = 2,
+			right = 2,
+			y = 88*(4/5),
+			height = 30,
+			caption = "Edit Behaviour",
+			tooltip = "Edit the default behaviour of " .. Spring.Utilities.GetHumanName(ud) .. ".",
+			OnClick = {function ()
+					WG.crude.OpenPathToLabel(behaviourPath[ud.id], false, Spring.Utilities.GetHumanName(ud))
+				end,
 			}
+		}
 	end
 
 	local helptextbox = TextBox:New{
@@ -1436,13 +1506,13 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
 	
 	
-	local stack_icons = StackPanel:New{
-		autoArrangeV  = false,
+	local stack_icons = Chili.Control:New{
+		y = 3,
+		right = 1,
+		height = 200,
+		width = 120,
 		padding = {0,0,0,0},
 		itemMargin = {0,4,0,4},
-		height = 100,
-		width = 64,
-		resizeItems = false,
 		children = icons,
 	}
 	
@@ -1466,7 +1536,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		autoArrangeV  = false,
 		autoArrangeH  = false,
 		centerItems  = false,
-		right = 66,
+		right = 128,
 		x = 0,
 		--width = 200,
 		--height = '100%',
@@ -1474,25 +1544,10 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		resizeItems = false,
 		children = { helptextbox, stack_stats, },
 	}
-	return 
-		{
-			StackPanel:New{
-				resizeItems = false,
-				orientation = 'horizontal',
-				autoArrangeV  = false,
-				autoArrangeH  = false,
-				centerItems  = false,
-				padding = {1,1,1,1},
-				itemPadding = {1,1,1,1},
-				itemMargin = {1,1,1,1},
-				--height = 400 ,
-				autosize=true,
-				y = 1,
-				width = '100%',
-				children = { helptext_stack, stack_icons, },
-			},
-		}
-	
+	return {
+		helptext_stack, 
+		stack_icons,
+	}
 end
 
 local function tooltipBreakdown(tooltip)

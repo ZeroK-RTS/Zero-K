@@ -124,6 +124,9 @@ local curSubKey = ''
 local curPath = ''
 
 local init = false
+local scrollTo
+local scrollToInit
+local scrollToPanel
 
 local pathoptions = {}    
 local actionToOption = {}
@@ -413,6 +416,7 @@ WG.crude.SetHotkey =  function() end
 
 --Callin often used for space+click shortcut, defined in Initialize(). Is defined in Initialize() because it help with testing epicmenu.lua in local copy
 WG.crude.OpenPath = function() end
+WG.crude.OpenPathToLabel = function() end
 
 --Allow other widget to toggle-up/show Epic-Menu remotely, defined in Initialize()
 WG.crude.ShowMenu = function() end --// allow other widget to toggle-up Epic-Menu which allow access to game settings' Menu via click on other GUI elements.
@@ -1628,7 +1632,7 @@ end
 WG.Epic_SetShowAdvancedSettings = Epic_SetShowAdvancedSettings
 
 -- Make submenu window based on index from flat window list
-MakeSubWindow = function(path, pause)
+MakeSubWindow = function(path, pause, labelScroll)
 	if pause == nil then
 		pause = true
 	end
@@ -1757,7 +1761,10 @@ MakeSubWindow = function(path, pause)
 			
 		elseif option.type == 'label' then    
 			tree_children[#tree_children+1] = Label:New{caption = option.value or option.name, textColor = color.sub_header}
-			
+			if labelScroll and (labelScroll == (option.value or option.name)) then
+				scrollTo = tree_children[#tree_children]
+				labelScroll = nil
+			end
 		elseif option.type == 'text' then    
 			tree_children[#tree_children+1] = Label:New{caption = option.name, textColor = color.sub_header}
 			tree_children[#tree_children+1] = 
@@ -1912,6 +1919,10 @@ MakeSubWindow = function(path, pause)
 			}
 		}
 	
+	if scrollTo then
+		scrollToPanel = window_children[#window_children]
+	end
+	
 	window_height = window_height + B_HEIGHT
 	
 	local buttonBar = Grid:New{
@@ -2030,6 +2041,7 @@ MakeSubWindow = function(path, pause)
 		children = window_children,
 	}
 	AdjustWindow(window_sub_cur)
+	
 	if pause and AllowPauseOnMenuChange() then
 		local paused = select(3, Spring.GetGameSpeed())
 		if not paused then
@@ -3000,6 +3012,10 @@ function widget:Initialize()
 		end
 	end
 	
+	WG.crude.OpenPathToLabel = function(path, pause, labelName)
+		MakeSubWindow(path, pause, labelName)
+	end
+	
 	--intialize remote menu trigger 2
 	WG.crude.ShowMenu = function()  --// allow other widget to toggle-up Epic-Menu. This'll enable access to game settings' Menu via click on other GUI elements.
 		if not settings.show_crudemenu then 
@@ -3084,6 +3100,19 @@ function widget:SetConfigData(data)
 	LoadKeybinds()
 end
 
+local function HandleScroll()
+	if scrollTo then
+		if not scrollToInit then
+			scrollToInit = true
+			return
+		end
+		scrollToPanel:SetScrollPos(0,scrollTo.y, false, true)
+		scrollTo = false
+		scrollToPanel = false
+		scrollToInit = false
+	end
+end
+
 function widget:Update()
 	cycle = cycle%10 + 1
 	if cycle == 1 then
@@ -3104,6 +3133,8 @@ function widget:Update()
 		ReApplyKeybinds() --unbind all action/key, rebind action/key
 		wantToReapplyBinding = false
 	end
+	
+	HandleScroll()
 end
 
 function widget:GameFrame(n)

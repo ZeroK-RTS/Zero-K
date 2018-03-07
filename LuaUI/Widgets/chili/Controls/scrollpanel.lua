@@ -26,8 +26,8 @@ end
 
 --//=============================================================================
 
-function ScrollPanel:SetScrollPos(x,y,inview)
-  if (self.smoothScroll) then
+function ScrollPanel:SetScrollPos(x,y,inview, forceNotSmooth)
+  if (self.smoothScroll) and not forceNotSmooth then
     self._oldScrollPosX = self.scrollPosX
     self._oldScrollPosY = self.scrollPosY
   end
@@ -51,7 +51,7 @@ function ScrollPanel:SetScrollPos(x,y,inview)
     end
   end
 
-  if (self.smoothScroll) then
+  if (self.smoothScroll) and not forceNotSmooth  then
     if (self._oldScrollPosX ~= self.scrollPosX)or(self._oldScrollPosY ~= self.scrollPosY) then
       self._smoothScrollEnd = Spring.GetTimer()
       self._newScrollPosX = self.scrollPosX
