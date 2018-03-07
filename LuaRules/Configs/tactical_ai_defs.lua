@@ -74,7 +74,6 @@ local lowRangeSwarmieeArray = NameToDefID({
 	"spiderassault",
 	"vehassault",
 	"cloakassault",
-	"tankraid",
 	"hoverassault",
 	
 	"tankassault",
@@ -632,14 +631,15 @@ local behaviourConfig = {
 	},
 	
 	["tankraid"] = {
-		skirms = shortRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
+		skirms = medRangeSkirmieeArray, 
+		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		fightOnlyUnits = shortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE, 
 		maxSwarmLeeway = 40, 
 		swarmLeeway = 30, 
 		stoppingDistance = 8,
+		reloadSkirmLeeway = 1.2,
 		skirmOrderDis = 150,
 	},
   
@@ -771,13 +771,14 @@ local behaviourConfig = {
 		skirmBlockedApproachFrames = 40,
 	},
 	["tankriot"] = {
-		skirms = lowMedRangeSkirmieeArray, 
+		skirms = medRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0, 
 		skirmOrderDis = 220,
 		skirmLeeway = -30, 
+		reloadSkirmLeeway = 2,
 		stoppingDistance = 10
 	},
 	["amphriot"] = {
