@@ -44,6 +44,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[welder.s3o]],
+  script                 = [[tankcon.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
