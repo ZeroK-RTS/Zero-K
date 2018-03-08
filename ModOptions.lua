@@ -186,6 +186,14 @@ local options = {
 	type	= "string",
 	def		= nil,
   },
+	{
+		key = 'globallos',
+		name = 'Full visibility',
+		desc = 'No fog of war, everyone can see the entire map.',
+		type = 'bool',
+		section = 'startconds',
+		def = false,
+	},
   {
     key = "overdrivesharingscheme",
     name = "Economy returns investment",
