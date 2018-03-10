@@ -289,7 +289,7 @@ function UnitCloaker:Visible()
   end
 
   local x,y,z = Spring.GetUnitPosition(self.unit)
-  if (GG or WG).Lups.IsPosInLos(x,y,z) and (Spring.IsSphereInView(x,y,z,(self.radius or 200)+100)) then
+  if z and (GG or WG).Lups.IsPosInLos(x,y,z) and (Spring.IsSphereInView(x,y,z,(self.radius or 200)+100)) then
     return true
   end
 
