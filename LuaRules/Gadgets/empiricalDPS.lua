@@ -48,7 +48,7 @@ function gadget:UnitDamaged(unitID, unitDefID,  unitTeam, unitDamage, paralyzer,
 	attackerUnitDefID = attackerDefID
     -- delay
     if last then
-        Spring.Echo(frame-last)
+        Spring.Echo(frame-last, math.random())
     end
     last = frame
     -- dps

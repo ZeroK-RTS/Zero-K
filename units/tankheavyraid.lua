@@ -21,7 +21,7 @@ unitDef = {
 	stats_show_death_explosion = 1,
   },
 
-  explodeAs              = [[PANTHER_DEATH]],
+  explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[tankraider]],
@@ -38,7 +38,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[corseal.s3o]],
   script                 = [[tankheavyraid.lua]],
-  selfDestructAs         = [[PANTHER_DEATH]],
+  selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
 
@@ -87,7 +87,7 @@ unitDef = {
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 170,
+        default        = 210,
       },
 
       duration                = 10,

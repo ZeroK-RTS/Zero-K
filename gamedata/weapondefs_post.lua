@@ -123,11 +123,11 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- Set shield starting power
+-- Set shield starting power to 100%
 
 for name, weaponDef in pairs(WeaponDefs) do
 	if weaponDef.shieldpower and (weaponDef.shieldpower < 2000) then
-		weaponDef.shieldstartingpower = weaponDef.shieldpower*2/3
+		weaponDef.shieldstartingpower = weaponDef.shieldpower
 		weaponDef.customparams.shieldstartingpower = weaponDef.shieldstartingpower
 	end
 end
