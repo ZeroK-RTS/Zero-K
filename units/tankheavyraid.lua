@@ -87,7 +87,7 @@ unitDef = {
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 210,
+        default        = 200,
       },
 
       duration                = 10,
