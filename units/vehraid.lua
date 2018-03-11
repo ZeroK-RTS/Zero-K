@@ -81,7 +81,6 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-		reaim_time = 1,
 		light_camera_height = 1500,
 		light_color = [[0.9 0.4 0.12]],
 		light_radius = 180,

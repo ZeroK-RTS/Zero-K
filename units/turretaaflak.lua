@@ -77,7 +77,7 @@ unitDef = {
       cylinderTargeting       = 1,
 
 	  customParams        	  = {
-        reaim_time = 5, -- COB
+        reaim_time = 8, -- COB
 		isaa = [[1]],
 		light_radius = 0,
 	  },

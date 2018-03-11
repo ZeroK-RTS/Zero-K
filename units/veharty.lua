@@ -78,7 +78,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        reaim_time = 5, -- COB
+        reaim_time = 8, -- COB
         damage_vs_shield = [[220]],
         damage_vs_feature = [[220]],
 		spawns_name = "wolverine_mine",

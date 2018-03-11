@@ -70,7 +70,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        reaim_time = 5, -- COB
+        reaim_time = 8, -- COB
         impulse = [[-150]],
 
         light_color = [[0.33 0.33 1.28]],
@@ -117,7 +117,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        reaim_time = 5, -- COB
+        reaim_time = 8, -- COB
         impulse = [[150]],
 
         light_color = [[0.85 0.2 0.2]],

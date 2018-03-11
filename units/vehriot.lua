@@ -79,7 +79,7 @@ unitDef = {
       craterMult              = 0.5,
 
       customParams            = {
-        reaim_time = 5, -- COB
+        reaim_time = 8, -- COB
         gatherradius = [[90]],
         smoothradius = [[60]],
         smoothmult   = [[0.08]],

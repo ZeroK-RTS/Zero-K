@@ -80,7 +80,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-        reaim_time = 5, -- COB
+        reaim_time = 8, -- COB
       },
 
       damage                  = {
