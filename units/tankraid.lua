@@ -83,7 +83,6 @@ unitDef = {
 	  customParams        	  = {
 	    setunitsonfire = "1",
 		burnchance     = "1",
-		burntime = 60,
 
 		area_damage = 1,
 		area_damage_radius = 96,
@@ -95,8 +94,8 @@ unitDef = {
 	  },
 	  
       damage                  = {
-        default = 100,
-        planes  = 100,
+        default = 120,
+        planes  = 120,
         subs    = 1,
       },
 
@@ -107,9 +106,9 @@ unitDef = {
       impulseFactor           = 0.2,
       interceptedByShieldType = 1,
       model                   = [[wep_b_fabby.s3o]],
-      myGravity               = 0.2,
+	  myGravity               = 1.5,
       noSelfDamage            = true,
-      range                   = 290,
+      range                   = 225,
       reloadtime              = 6,
       soundHit                = [[explosion/ex_med6]],
       soundHitVolume          = 4,
@@ -117,7 +116,7 @@ unitDef = {
       soundStartVolume        = 3,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 380,
+      weaponVelocity          = 700,
     },
 	
 	BOGUS_FAKE_NAPALM_BOMBLET = {
