@@ -3853,7 +3853,7 @@ end
 
 function gadget:DrawUnit(unitID, drawMode)
 	if terraUnits[unitID] then
-		return true --supress engine drawing
+		return true --suppress engine drawing
 	end
 end
 
