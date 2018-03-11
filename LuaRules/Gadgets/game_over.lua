@@ -629,6 +629,7 @@ function gadget:PlayerChanged (playerID)
 		return
 	end
 
+	Spring.Echo("synced PlayerChanged") -- debug for mantis #5919. This callin seems to work in multiplayer but apparently is not supposed to.
 	ProcessLastAlly()
 end
 
