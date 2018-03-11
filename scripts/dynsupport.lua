@@ -475,7 +475,9 @@ local function AimRifle(heading, pitch, isDgun)
 	Turn(armhold, x_axis, -pitch, math.rad(250))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(armhold, x_axis) --need to make sure not 
-	WaitForTurn(lloarm, x_axis) --stil setting up
+	WaitForTurn(lloarm, x_axis) --still setting up
+	WaitForTurn(rloarm, y_axis) --still setting up
+	
 	StartThread(RestoreAfterDelay)
 	if isDgun then dgunning = false end
 	return true
