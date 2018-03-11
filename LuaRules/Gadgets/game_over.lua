@@ -624,12 +624,13 @@ function gadget:TeamDied (teamID)
 	end
 end
 
+-- supposed to solve game over not being called when resigning during pause
+-- not actually called yet (PlayerChanged is unsynced at present)
 function gadget:PlayerChanged (playerID)
 	if gameover then
 		return
 	end
 
-	Spring.Echo("synced PlayerChanged") -- debug for mantis #5919. This callin seems to work in multiplayer but apparently is not supposed to.
 	ProcessLastAlly()
 end
 
