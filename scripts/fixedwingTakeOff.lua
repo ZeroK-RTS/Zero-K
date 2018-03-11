@@ -16,8 +16,9 @@ function TakeOffThread(height, signal)
 			spSetAirMoveTypeData(unitID, "wantedHeight", 10)
 			Sleep(33)
 		end
-		if spMoveCtrlGetTag(unitID) == nil then
-			spSetAirMoveTypeData(unitID, "wantedHeight", height*FUDGE_FACTOR)
+		while spMoveCtrlGetTag(unitID) do
+			Sleep(500)
 		end
+		spSetAirMoveTypeData(unitID, "wantedHeight", height*FUDGE_FACTOR)
 	end
 end

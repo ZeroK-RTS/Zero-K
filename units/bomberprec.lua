@@ -24,6 +24,7 @@ unitDef = {
 
   customParams        = {
 	modelradius    = [[15]],
+	refuelturnradius = [[120]],
 	requireammo    = [[1]],
   },
 
