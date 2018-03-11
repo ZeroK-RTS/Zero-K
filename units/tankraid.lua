@@ -83,10 +83,11 @@ unitDef = {
 	  customParams        	  = {
 	    setunitsonfire = "1",
 		burnchance     = "1",
+		burntime       = 120,
 
 		area_damage = 1,
 		area_damage_radius = 96,
-		area_damage_dps = 20,
+		area_damage_dps = 25,
 		area_damage_duration = 13.3,
 		
 		light_color = [[1.6 0.8 0.32]],
@@ -94,9 +95,9 @@ unitDef = {
 	  },
 	  
       damage                  = {
-        default = 120,
-        planes  = 120,
-        subs    = 1,
+        default = 150,
+        planes  = 150,
+        subs    = 7.5,
       },
 
       explosionGenerator      = [[custom:napalm_koda]],
