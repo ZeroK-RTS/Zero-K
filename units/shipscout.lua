@@ -168,7 +168,7 @@ unitDef = {
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[debris4x4a.s3o]],
+      object           = [[debris2x2b.s3o]],
     },
 
   },
