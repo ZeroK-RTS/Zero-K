@@ -83,7 +83,7 @@ unitDef = {
 	  customParams        	  = {
 	    setunitsonfire = "1",
 		burnchance     = "1",
-		burntime       = 120,
+		burntime       = 150,
 
 		area_damage = 1,
 		area_damage_radius = 96,
