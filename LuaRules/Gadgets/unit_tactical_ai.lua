@@ -118,7 +118,7 @@ local function getUnitOrderState(unitID, data, cQueue, holdPos)
 	elseif cQueue[1].id == CMD_ATTACK and ((not holdPos) or fightTwo) then -- if I attack 
 		local target,check = cQueue[1].params[1],cQueue[1].params[2]
 		if (not check) and spValidUnitID(target) then -- if I target a unit
-			if not (cQueue[1].id == CMD_FIGHT or fightTwo) then -- only skirm single target when given the order manually
+			if not (cQueue[1].id == CMD_FIGHT or fightTwo or cQueue[1].options.internal) then -- only skirm single target when given the order manually
 				return target, false
 			else
 				return -1, false, true, target
@@ -134,7 +134,7 @@ local function getUnitOrderState(unitID, data, cQueue, holdPos)
 			if fightTwo or (cQueue[2].id == CMD_ATTACK and ((not holdPos) or fightThree)) then -- if the next command is attack, patrol or fight
 				local target,check = cQueue[2].params[1],cQueue[2].params[2]
 				if not check then -- if I target a unit
-					if not (cQueue[2].id == CMD_FIGHT or fightThree) then -- only skirm single target when given the order manually
+					if not (cQueue[2].id == CMD_FIGHT or fightThree or cQueue[2].options.internal) then -- only skirm single target when given the order manually
 						return target, true
 					else
 						return -1, true, true, target
@@ -156,6 +156,7 @@ local function clearOrder(unitID,data,cQueue)
 			local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
 			if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+				GG.StopRawMoveUnit(unitID, true)
 			end
 		end
 		data.receivedOrder = false
