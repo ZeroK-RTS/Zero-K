@@ -46,6 +46,7 @@ local isPaused = false
 -- local wantedSpeed = nil
 local skipped = false
 local fastForwardTo = -1
+local currentFrameTime = 0
 local demoStarted = false
 local showProgress = true
 
@@ -279,6 +280,7 @@ function CreateTheUI()
 		caption="pause", --pause/continue
 		tooltip = "pause or continue playback";
 		OnClick = {function()
+			currentFrameTime = -3
 			if (isPaused) then
 				unpause()
 			else
@@ -400,17 +402,22 @@ function widget:Update(dt)
 			lastSkippedTime = lastSkippedTime + dt
 		end
 	end
-	local paused = select(3, Spring.GetGameSpeed())
-	if paused ~= isPaused then
-		if paused then
-			pause(true)
-		else
-			unpause(true)
+	currentFrameTime = currentFrameTime + dt
+	if currentFrameTime > 0 then
+		if (currentFrameTime > 1) ~= isPaused then
+			if not isPaused then
+				pause(true)
+			else
+				unpause(true)
+			end
 		end
 	end
 end
 
 function widget:GameFrame (f)
+	if currentFrameTime > 0 then
+		currentFrameTime = 0
+	end
 	if (fastForwardTo>0) then
 		if f==fastForwardTo then
 			pause ()
