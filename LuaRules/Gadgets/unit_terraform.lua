@@ -3344,6 +3344,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 			end
 		end
 		
+		local biggestChange = 0
 		if groundPoints > 0 then
 			groundHeight = groundHeight/groundPoints
 			
@@ -3360,26 +3361,37 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 						if not origHeight[i][j] then
 							origHeight[i][j] = spGetGroundHeight(i,j)
 						end
+						local newHeight = (groundHeight - origHeight[i][j]) * maxSmooth * (1 - disSQ/smoothradiusSQ)^2
 						posCount = posCount + 1
 						posX[posCount] = i
-						posY[posCount] = (groundHeight - origHeight[i][j]) * maxSmooth * (1 - disSQ/smoothradiusSQ)^2
+						posY[posCount] = newHeight
 						posZ[posCount] = j
+						local absChange = math.abs(newHeight)
+						if biggestChange and absChange > biggestChange then
+							if absChange > 0.5 then
+								biggestChange = false
+							else
+							end
+							biggestChange = absChange
+						end
 					end
 				end
 			end 
 			
 			local posY = makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
 			
-			spSetHeightMapFunc(
-				function(x,z,h)
-					for i = 1, #x, 1 do
-						spAddHeightMap(x[i],z[i],h[i])
-					end
-				end,
-				posX,
-				posZ,
-				posY
-			) 
+			if (not biggestChange) or (math.random() < biggestChange/2) then
+				spSetHeightMapFunc(
+					function(x,z,h)
+						for i = 1, #x, 1 do
+							spAddHeightMap(x[i],z[i],h[i])
+						end
+					end,
+					posX,
+					posZ,
+					posY
+				)
+			end
 		end
 		
 		if detachmentradius then
