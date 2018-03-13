@@ -226,7 +226,7 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 		local moving = speed and speed > CLOAK_MOVE_THRESHOLD
 		local cost = moving and ud.cloakCostMoving or ud.cloakCost
 		
-		if not Spring.UseUnitResource(unitID, "e", cost) then
+		if not Spring.UseUnitResource(unitID, "e", cost/2) then -- SlowUpdate happens twice a second.
 			return false
 		end
 	end
