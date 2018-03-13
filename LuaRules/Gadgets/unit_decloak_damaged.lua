@@ -136,7 +136,6 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		noFFWeaponDefs[weaponID] and
 		attackerID ~= unitID and
 		spAreTeamsAllied(unitTeam, attackerTeam)) then
-		
 		PokeDecloakUnit(unitID)
 	end
 end
@@ -208,6 +207,11 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 			return false
 		end
 		recloakFrame[unitID] = nil
+	end
+	
+	local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+	if stunnedOrInbuild then
+		return false
 	end
 	
 	local unitDefID = unitID and Spring.GetUnitDefID(unitID)
