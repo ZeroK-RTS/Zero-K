@@ -1762,10 +1762,12 @@ function widget:Update(dt)
 end
 
 -- for "under attack" achtung sign
-function widget:UnitDamaged(unitID, unitDefID, unitTeam)
-	local button = buttonList.GetButton(unitID)
-	if button and button.SetWarning then
-		button.SetWarning(COMM_WARNING_TIME)
+function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
+	if damage > 1 then
+		local button = buttonList.GetButton(unitID)
+		if button and button.SetWarning then
+			button.SetWarning(COMM_WARNING_TIME)
+		end
 	end
 end
 
