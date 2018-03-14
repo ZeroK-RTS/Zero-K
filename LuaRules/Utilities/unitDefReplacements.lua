@@ -6,14 +6,12 @@ local buildTimes = {}
 local variableCostUnit = {
 	[UnitDefNames["terraunit"].id] = true
 }
-local isCommander = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	buildTimes[i] = ud.buildTime
 	if ud.customParams.level or ud.customParams.dynamic_comm then
 		variableCostUnit[i] = true
-		isCommander[i] = true
 	end
 end
 

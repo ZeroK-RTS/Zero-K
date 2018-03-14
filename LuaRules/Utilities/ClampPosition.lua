@@ -5,7 +5,6 @@ local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetGroundHeight = Spring.GetGroundHeight
-local spSetUnitMoveGoal = Spring.SetUnitMoveGoal
 local CMD_INSERT = CMD.INSERT
 
 function Spring.Utilities.IsValidPosition(x, z)

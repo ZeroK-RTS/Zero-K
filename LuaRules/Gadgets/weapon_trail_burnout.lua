@@ -23,7 +23,6 @@ local noExplosionVFX = {}
 local spGetGameFrame     = Spring.GetGameFrame
 local spSetProjectileCeg = Spring.SetProjectileCEG
 local scSetWatchWeapon   = Script.SetWatchWeapon
-local spGetProjectilePosition = Spring.GetProjectilePosition
 local spGetProjectileVelocity = Spring.GetProjectileVelocity
 local spGetProjectileTarget = Spring.GetProjectileTarget
 local spSetProjectileCollision = Spring.SetProjectileCollision
@@ -31,7 +30,6 @@ local spSetProjectileVelocity = Spring.SetProjectileVelocity
 local spSetProjectileGravity  = Spring.SetProjectileGravity 
 local spSpawnProjectile = Spring.SpawnProjectile
 local spSetProjectileTarget = Spring.SetProjectileTarget
-local spGetUnitTeam = Spring.GetUnitTeam
 local spSetPieceProjectileParams = Spring.SetPieceProjectileParams
 local spGetUnitTeam = Spring.GetUnitTeam
 

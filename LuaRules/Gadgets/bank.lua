@@ -21,8 +21,6 @@ if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local spGetAllyTeamList		= Spring.GetAllyTeamList
-
 local bank = {}
 local blockspend = {}
 

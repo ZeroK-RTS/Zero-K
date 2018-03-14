@@ -26,20 +26,6 @@ local function tobool(val)
 end
 
 
-local function disableunits(unitlist)
-  for name, ud in pairs(UnitDefs) do
-    if (ud.buildoptions) then
-      for _, toremovename in ipairs(unitlist) do
-        for index, unitname in pairs(ud.buildoptions) do
-          if (unitname == toremovename) then
-            table.remove(ud.buildoptions, index)
-          end
-        end
-      end
-    end
-  end
-end
-
 --deep not safe with circular tables! defaults To false
 Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
@@ -778,30 +764,3 @@ for name, ud in pairs (UnitDefs) do
 	end
 end
 
--- Disable porc/air/specific units modoptions (see lockunits_modoption.lua)
-
---[[
-local disabledunitsstring = modOptions and modOptions.disabledunits or ""
-local disabledunits = { }
-local defenceunits = {"turretmissile", "turretlaser", "turretriot", "turretemp", "turretgauss", "turretheavylaser", "turretaalaser", "turretaaclose", "turretaaflak", "turretaafar", "turretaaheavy", "turretimpulse", "turrettorp", "turretheavy", "turretantiheavy", "staticshield" }
-
---Different lock modoptions are compatible
-if modOptions and tobool(modOptions.noair) then
-  disabledunits[1]="factoryplane"
-  disabledunits[2]="factorygunship"
-end
-
-if modOptions and tobool(modOptions.nodef) then
-  for i in pairs(defenceunits) do
-    table.insert(disabledunits,defenceunits[i])
-  end
-end
-
-if disabledunitsstring ~= "" then
-  for i in string.gmatch(disabledunitsstring, '([^+]+)') do
-    disabledunits[#disabledunits+1] = i
-  end
-end
-
-disableunits(disabledunits)
-]]

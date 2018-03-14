@@ -55,11 +55,6 @@ pairs = function(...)
 	end
 end
 
-local SAFEWRAP = 0
--- 0: disabled
--- 1: enabled, but can be overriden by gadget.GetInfo().unsafe
--- 2: always enabled
-
 
 local HANDLER_DIR = 'LuaGadgets/'
 local GADGETS_DIR = Script.GetName():gsub('US$', '') .. '/Gadgets/'
@@ -79,16 +74,6 @@ VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
 
 local reverseCompatAllowStartPosition = not Spring.Utilities.IsCurrentVersionNewerThan(103, 629)
---------------------------------------------------------------------------------
-
-function pgl() -- (print gadget list)  FIXME: move this into a gadget
-  for k,v in ipairs(gadgetHandler.gadgets) do
-    Spring.Echo(
-      string.format("%3i  %3i  %s", k, v.ghInfo.layer, v.ghInfo.name)
-    )
-  end
-end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -281,24 +266,6 @@ local function IsSyncedCode()
   return isSyncedCode
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
---  Reverse integer iterator for drawing
---
-
-local function rev_iter(t, key)
-  if (key <= 1) then
-    return nil
-  else
-    local nkey = key - 1
-    return nkey, t[nkey]
-  end
-end
-
-local function ripairs(t)
-  return rev_iter, t, (1 + #t)
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -563,51 +530,6 @@ end
 
 
 --------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local function SafeWrap(func, funcName)
-  local gh = gadgetHandler
-  return function(g, ...)
-    local r = { pcall(func, g, ...) }
-    if (r[1]) then
-      table.remove(r, 1)
-      return unpack(r)
-    else
-      if (funcName ~= 'Shutdown') then
-        gadgetHandler:RemoveGadget(g)
-      else
-        Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Error in Shutdown')
-      end
-      local name = g.ghInfo.name
-      Spring.Echo(r[2])
-      Spring.Echo('Removed gadget: ' .. name)
-      return nil
-    end
-  end
-end
-
-
-local function SafeWrapGadget(gadget)
-  if (SAFEWRAP <= 0) then
-    return
-  elseif (SAFEWRAP == 1) then
-    if (gadget.GetInfo and gadget.GetInfo().unsafe) then
-      Spring.Echo('LuaUI: loaded unsafe gadget: ' .. gadget.ghInfo.name)
-      return
-    end
-  end
-
-  for _,ciName in ipairs(callInLists) do
-    if (gadget[ciName]) then
-      gadget[ciName] = SafeWrap(gadget[ciName], ciName)
-    end
-    if (gadget.Initialize) then
-      gadget.Initialize = SafeWrap(gadget.Initialize, 'Initialize')
-    end
-  end
-end
-
-
 --------------------------------------------------------------------------------
 
 local function ArrayInsert(t, f, g)

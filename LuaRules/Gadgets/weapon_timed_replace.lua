@@ -88,7 +88,6 @@ end
 
 function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 	if weaponLoseTrackingFrames[weaponID] then
-		local x, y, z = Spring.GetProjectilePosition(proID)
 		projectiles[proID] = Spring.GetGameFrame() + weaponLoseTrackingFrames[weaponID]
 		if proOwnerID then
 			projectileAllyTeam[proID] = Spring.GetUnitAllyTeam(proOwnerID)
