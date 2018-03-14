@@ -53,7 +53,6 @@ local waitTexture = {
 	[CMD_WAITCODE_GATHER] = 'LuaUI/Images/commands/Bold/wait_gather.png',
 	[CMD_WAITCODE_TIME  ] = 'LuaUI/Images/commands/Bold/wait_time.png',
 }
-	
 
 local lastLowPower = {}
 local lastFacPlop = {}
@@ -96,6 +95,11 @@ local function RemoveUnit(unitID)
 	unitCount = unitCount - 1
 	unitIndex[unitID] = nil
 	unitDefIDMap[unitID] = nil
+	lastLowPower[unitID] = nil
+	lastFacPlop[unitID] = nil
+	lastRearm[unitID] = nil
+	lastRetreat[unitID] = nil
+	lastWait[unitID] = nil
 end
 
 -------------------------------------------------------------------------------------
@@ -209,6 +213,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if unitIndex[unitID] then
 		return
 	end
+	
 	unitCount = unitCount + 1
 	unitList[unitCount] = unitID
 	unitIndex[unitID] = unitCount
@@ -226,6 +231,14 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if unitIndex[unitID] then
 		RemoveUnit(unitID)
 	end
+end
+
+function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
+	widget:UnitCreated(unitID, unitDefID, unitTeam)
+end
+
+function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
+	widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 -------------------------------------------------------------------------------------
