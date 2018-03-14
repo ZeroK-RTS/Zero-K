@@ -16,6 +16,8 @@ local smokePiece = {base}
 
 local SIG_Activate = 2
 local SIG_Defensive = 4
+local wantActivate = false
+local autoDeactivate = false
 
 -- don't ask daddy difficult questions like "Why does it armor at the START of the animation?"
 local function Open()
@@ -65,6 +67,9 @@ function script.Activate()
 end
 
 function script.Deactivate()
+	if not autoDeactivate then
+		wantActivate = false
+	end
 	StartThread(Close)
 end
 
@@ -82,14 +87,14 @@ local function DefensiveManeuver()
 	if Spring.GetUnitRulesParam(unitID, "tacticalAi_external") ~= 1 then
 		return
 	end
-	if not Spring.GetUnitStates(unitID).active then
-		return
-	end
 	Signal(SIG_Defensive)
 	SetSignalMask(SIG_Defensive)
+	wantActivate = wantActivate or Spring.GetUnitStates(unitID).active
+	autoDeactivate = true
 	SetUnitValue(COB.ACTIVATION, 0)
+	autoDeactivate = false
 	Sleep(auto_close_time)
-	if Spring.GetUnitRulesParam(unitID, "tacticalAi_external") ~= 1 then
+	if not (wantActivate and Spring.GetUnitRulesParam(unitID, "tacticalAi_external") == 1) then
 		return
 	end
 	SetUnitValue(COB.ACTIVATION, 1)
