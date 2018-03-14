@@ -69,13 +69,16 @@ end
 local function RestoreAfterDelay()
 	Sleep (5000)
 	Turn (turret, y_axis, 0, math.rad(10))
+	Turn (gun,    x_axis, 0, math.rad(10))
 end
 
 function script.AimWeapon(num, heading, pitch)
 	Signal (SIG_AIM)
 	SetSignalMask (SIG_AIM)
 	Turn (turret, y_axis, heading, AIM_SPEED)
+	Turn (gun,    x_axis,  -pitch, AIM_SPEED)
 	WaitForTurn (turret, y_axis)
+	WaitForTurn (gun,    x_axis)
 	StartThread (RestoreAfterDelay)
 	return true
 end
@@ -85,10 +88,10 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	return barrel
+	return firepoint
 end
 
-local explodables = {barrel, bwheel, fwheel, turret, gun, barrel}
+local explodables = {barrel, bwheel, fwheel, turret, gun}
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	local brutal = (severity > 0.5)
