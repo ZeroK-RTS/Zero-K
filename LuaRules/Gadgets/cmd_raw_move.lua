@@ -184,6 +184,8 @@ local COMMON_STOP_RADIUS_ACTIVE_DIST_SQ = 120^2 -- Commands shorter than this do
 local CONSTRUCTOR_UPDATE_RATE = 30
 local CONSTRUCTOR_TIMEOUT_RATE = 2
 
+local STOPPING_HAX = not Spring.Utilities.IsCurrentVersionNewerThan(104, 271)
+
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 -- Variables
@@ -283,8 +285,12 @@ local function StopRawMoveUnit(unitID, stopNonRaw)
 		return
 	end
 	if stopNonRaw or not rawMoveUnit[unitID].switchedFromRaw then
-		local x, y, z = spGetUnitPosition(unitID)
-		Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
+		if STOPPING_HAX then
+			local x, y, z = spGetUnitPosition(unitID)
+			Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
+		else
+			Spring.ClearUnitGoal(unitID)
+		end
 	end
 	rawMoveUnit[unitID] = nil
 	--Spring.Echo("StopRawMoveUnit", math.random())
@@ -334,14 +340,13 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	end
 
 	if distSq < myStopDistSq then
-		Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
 		if unitData.preventGoalClumping then
 			commonStopRadius[unitData.commandString] = (commonStopRadius[unitData.commandString] or 0) + stoppingRadiusIncrease[unitDefID]
 			if commonStopRadius[unitData.commandString] > MAX_COMM_STOP_RADIUS then
 				commonStopRadius[unitData.commandString] = MAX_COMM_STOP_RADIUS
 			end
 		end
-		rawMoveUnit[unitID] = nil
+		StopRawMoveUnit(unitID, true)
 		return true, true
 	end
 
@@ -371,8 +376,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		if travelled < (stuckTravelOverride[unitDefID] or STUCK_TRAVEL) then
 			unitData.stuckCheckTimer = math.floor(math.random()*6) + 5
 			if distSq < GIVE_UP_STUCK_DIST_SQ then
-				Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
-				rawMoveUnit[unitID] = nil
+				StopRawMoveUnit(unitID, true)
 				return true, true
 			else
 				local vx = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
