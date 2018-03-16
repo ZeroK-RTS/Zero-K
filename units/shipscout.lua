@@ -11,7 +11,7 @@ unitDef = {
   canMove                = true,
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 5 0]],
-  collisionVolumeScales  = [[20 20 60]],
+  collisionVolumeScales  = [[25 25 60]],
   collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
@@ -122,7 +122,7 @@ unitDef = {
       },
 	  
       damage                  = {
-        default = 34.1,
+        default = 35,
         subs    = 5,
       },
 
@@ -136,8 +136,8 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_armpt.s3o]],
-      range                   = 330,
-      reloadtime              = 1.5,
+      range                   = 260,
+      reloadtime              = 2.0,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/small_lightning_missile]],
       soundStart              = [[weapon/missile/missile_fire7]],

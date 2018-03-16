@@ -166,6 +166,7 @@ local lowMedRangeSkirmieeArray = NameToDefID({
 	"shieldassault",
 	"vehassault",
 	
+	"shipscout",
 	"shipriot",
 })
 
@@ -185,8 +186,6 @@ local medRangeSkirmieeArray = NameToDefID({
 	"tankriot", -- banisher
 	"striderscorpion",
 	
-	
-	"shipscout",
 	"shipassault",
 })
 
@@ -834,7 +833,7 @@ local behaviourConfig = {
 		},
 	},
 	["shipscout"] = { -- scout boat
-		skirms = medRangeSkirmieeArray, 
+		skirms = lowMedRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = subfleeables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE, 
