@@ -70,7 +70,7 @@ function IterableMap.New()
 		
 	function api.Set(key, data)
 		if not indexByKey[key] then
-			Add(key, data)
+			api.Add(key, data)
 		else
 			dataByKey[key] = data
 		end
