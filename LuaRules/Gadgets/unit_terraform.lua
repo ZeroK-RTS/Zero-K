@@ -3371,8 +3371,8 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 							if absChange > 0.5 then
 								biggestChange = false
 							else
+								biggestChange = absChange
 							end
-							biggestChange = absChange
 						end
 					end
 				end
