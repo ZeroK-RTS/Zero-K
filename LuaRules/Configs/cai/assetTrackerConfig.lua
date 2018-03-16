@@ -79,7 +79,6 @@ local heatmapNames = {
 		["cloakriot"] = {mult = 1},
 		["shieldriot"] = {mult = 1},
 		["vehriot"] = {mult = 1},
-		["spiderriot"] = {mult = 1},
 		["amphimpulse"] = {mult = 1},
 		["amphriot"] = {mult = 1, range = 300},
 		["shieldfelon"] = {mult = 1},
