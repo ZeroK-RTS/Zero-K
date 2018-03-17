@@ -13,6 +13,8 @@ function widget:GetInfo()
   }
 end
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Mission Creation
@@ -45,8 +47,18 @@ local function GetUnitFacing(unitID)
 	return math.floor(((Spring.GetUnitHeading(unitID) or 0)/16384 + 0.5)%4)
 end
 
+local function GetFeatureFacing(unitID)
+	return math.floor(((Spring.GetFeatureHeading(unitID) or 0)/16384 + 0.5)%4)
+end
+
 local commandNameMap = {
 	[CMD.PATROL] = "PATROL",
+	[CMD_RAW_MOVE] = "RAW_MOVE",
+	[CMD_JUMP] = "JUMP",
+	[CMD.ATTACK] = "ATTACK",
+	[CMD.MOVE] = "MOVE",
+	[CMD.GUARD] = "GUARD",
+	[CMD.FIGHT] = "FIGHT",
 }
 
 local function GetCommandString(index, command)
@@ -144,6 +156,20 @@ local function GetUnitString(unitID, tabs, sendCommands)
 	return unitString .. tabs .. "\t},"
 end
 
+local function GetFeatureString(fID)
+	local fx, _, fz = Spring.GetFeaturePosition(fID)
+	local fd = FeatureDefs[Spring.GetFeatureDefID(fID)]
+	local tabs = "\t\t\t"
+	local inTabs = tabs .. "\t"
+	local unitString = tabs .. "{\n"
+	
+	unitString = unitString .. inTabs .. [[name = "]] .. fd.name .. [[",]] .. "\n"
+	unitString = unitString .. inTabs .. [[x = ]] .. math.floor(fx) .. [[,]] .. "\n"
+	unitString = unitString .. inTabs .. [[z = ]] .. math.floor(fz) .. [[,]] .. "\n"
+	unitString = unitString .. inTabs .. [[facing = ]] .. GetFeatureFacing(fID) .. [[,]] .. "\n"
+	
+	return unitString .. tabs .. "\t},"
+end
 
 local function ExportTeamUnitsForMission(teamID, sendCommands)
 	local units = Spring.GetTeamUnits(teamID)
@@ -177,6 +203,14 @@ end
 
 local function ExportUnitsAndCommandsForMission()
 	ExportUnitsForMission(true)
+end
+
+local function ExportFeaturesForMission()
+	Spring.Echo("================== ExportFeaturesForMission ==================")
+	local features = Spring.GetAllFeatures()
+	for i = 1, #features do
+		Spring.Echo(GetFeatureString(features[i]))
+	end
 end
 
 local unitToMove = 0
@@ -401,6 +435,12 @@ options = {
 		type = 'button',
 		action = 'mission_unit_commands_export',
 		OnChange = ExportUnitsAndCommandsForMission,
+	},
+	missionexportfeatures = {
+		name = "Mission Feature Export",
+		type = 'button',
+		action = 'mission_features_export',
+		OnChange = ExportFeaturesForMission,
 	},
 	moveUnit = {
 		name = "Move Unit",
