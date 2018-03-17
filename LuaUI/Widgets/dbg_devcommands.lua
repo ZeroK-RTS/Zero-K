@@ -159,7 +159,7 @@ end
 local function GetFeatureString(fID)
 	local fx, _, fz = Spring.GetFeaturePosition(fID)
 	local fd = FeatureDefs[Spring.GetFeatureDefID(fID)]
-	local tabs = "\t\t\t"
+	local tabs = "\t\t\t\t"
 	local inTabs = tabs .. "\t"
 	local unitString = tabs .. "{\n"
 	
@@ -168,7 +168,7 @@ local function GetFeatureString(fID)
 	unitString = unitString .. inTabs .. [[z = ]] .. math.floor(fz) .. [[,]] .. "\n"
 	unitString = unitString .. inTabs .. [[facing = ]] .. GetFeatureFacing(fID) .. [[,]] .. "\n"
 	
-	return unitString .. tabs .. "\t},"
+	return unitString .. tabs.. "},"
 end
 
 local function ExportTeamUnitsForMission(teamID, sendCommands)
