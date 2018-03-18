@@ -557,7 +557,7 @@ function gadget:Load(zip)
 	reloading = {}
 	
 	-- Load the data
-	for oldUnitID, data in pairs(loadData.unitDamage) do
+	for oldUnitID, data in pairs(loadData.unitDamage or {}) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
 		damageByID.count = damageByID.count + 1
 		damageByID.data[damageByID.count] = unitID
@@ -565,13 +565,13 @@ function gadget:Load(zip)
 		unitDamage[unitID].index = damageByID.count
 	end
 	
-	for oldUnitID, data in pairs(loadData.capturedUnits) do
+	for oldUnitID, data in pairs(loadData.capturedUnits or {}) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
 		capturedUnits[unitID] = data
 		capturedUnits[unitID].controllerID = GG.SaveLoad.GetNewUnitID(data.controllerID)
 	end
 	
-	for oldUnitID, data in pairs(loadData.controllers) do
+	for oldUnitID, data in pairs(loadData.controllers or {}) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
 		
 		controllers[unitID] = {
@@ -587,7 +587,7 @@ function gadget:Load(zip)
 		KillToggleCommand(unitID, {(data.killSubordinates and 1) or 0}, {})
 	end
 	
-	for frame, data in pairs(loadData.reloading) do
+	for frame, data in pairs(loadData.reloading or {}) do
 		local newFrame = frame - loadGameFrame
 		if newFrame >= 0 then
 			reloading[newFrame] = {
