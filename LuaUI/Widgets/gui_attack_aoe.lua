@@ -194,7 +194,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 	local weaponType = weaponDef.type
 	local scatter = weaponDef.accuracy + weaponDef.sprayAngle
 	local aoe = weaponDef.damageAreaOfEffect
-	local cost = unitDef.cost
+	local cost = unitDef.metalCost
 	local mobile = unitDef.speed > 0
 	local waterWeapon = weaponDef.waterWeapon
 	local ee = weaponDef.edgeEffectiveness
@@ -367,7 +367,7 @@ local function UpdateSelection()
 			end
 
 			if (aoeDefInfo[unitDefID]) then
-				local currCost = UnitDefs[unitDefID].cost * #unitIDs
+				local currCost = UnitDefs[unitDefID].metalCost * #unitIDs
 				if (currCost > maxCost) then
 					maxCost = currCost
 					aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])

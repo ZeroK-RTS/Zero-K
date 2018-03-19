@@ -290,7 +290,7 @@ local function AddEvent(unitID, unitDefID, color, cost)
     eventMap[unitID] = {
       x = px,
       z = pz,
-      v = cost or (ud.cost * eventScale),
+      v = cost or (ud.metalCost * eventScale),
       u = unitID,
       c = color,
 --      t = GetGameSeconds()

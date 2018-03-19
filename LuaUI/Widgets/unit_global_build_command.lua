@@ -1618,7 +1618,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	local metalCost = false
 	
 	if job.id < 0 then -- for build jobs, get the metal cost
-		metalCost = unitDef.cost
+		metalCost = unitDef.metalCost
 	end
 	
 	if costMod == 1 then -- for starting new jobs
@@ -1718,7 +1718,7 @@ function FlatCost(unitID, hash, ux, uz, jx, jz)
 	local metalCost = false
 	
 	if job.id < 0 then -- for build jobs, get the metal cost
-		metalCost = unitDef.cost
+		metalCost = unitDef.metalCost
 	end
 	
 	if costMod == 1 then -- for starting new jobs
