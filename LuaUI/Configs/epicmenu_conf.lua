@@ -344,6 +344,7 @@ local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 	{
 		name = 'Skin Sets (Requires LuaUI Reload)',
 		type = 'list',
+		advanced = true,
 		OnChange = function (self)
 			WG.crude.SetSkin( self.value );
 		end,
@@ -359,7 +360,7 @@ local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 			{ key = 'Twilight', name = 'Twilight', },
 		},
 	})
-	ShButton(HUDSkinPath, 'Reload LuaUI', 'luaui reload', 'Reloads the entire UI. NOTE: This button will not work. You must bind a hotkey to this command and use the hotkey.')
+	ShButton(HUDSkinPath, 'Reload LuaUI', 'luaui reload', 'Reloads the entire UI. NOTE: This button will not work. You must bind a hotkey to this command and use the hotkey.', true)
 
 
 --- Interface --- anything that's an interface but not a HUD Panel
