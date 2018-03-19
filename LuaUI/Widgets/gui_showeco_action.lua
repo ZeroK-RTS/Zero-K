@@ -93,10 +93,10 @@ options_path = 'Settings/Interface/Economy Overlay'
 options_order = {'start_with_showeco', 'mergeCircles', 'drawQueued'}
 options = {
 	start_with_showeco = {
-		name = "Start with economy overly",
+		name = "Start with economy overlay",
 		desc = "Game starts with Economy Overlay enabled",
 		type = 'bool',
-		value = false,
+		value = true,
 		noHotkey = true,
 		OnChange = function(self)
 			if (self.value) then
