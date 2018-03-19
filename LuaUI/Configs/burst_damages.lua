@@ -54,7 +54,7 @@ local damages = {
 		class = NORMAL,
 	},
 	shieldarty = {
-		damage = 1500,
+		damage = 2500,
 		class = EMP_OR_DISARM,
 	},
 	vehheavyarty = {
@@ -94,7 +94,7 @@ local damages = {
 		class = NORMAL,
 	},
 	tankheavyraid = {
-		damage = 190,
+		damage = 200,
 		class = NORMAL,
 	},
 	hoverraid = {
