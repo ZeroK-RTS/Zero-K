@@ -39,7 +39,7 @@ local doubleClickToleranceTime = (Spring.GetConfigInt('DoubleClickTime', 300) * 
 local selectionRank = {}
 local defaultRank = {}
 
-local defaultRank = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
+local defaultRank, morphRankTransfer = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -289,18 +289,19 @@ end
 --------------------------------------------------------------------------------
 -- Unit Handling
 
-local function PossiblyTransferRankThroughMorph(unitID)
-	local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
-	if not morphedTo then
-		return
+local function PossiblyTransferRankThroughMorph(unitID, unitDefID)
+	if morphRankTransfer[unitDefID] then
+		local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+		if not morphedTo then
+			return
+		end
+		selectionRank[morphedTo] = selectionRank[unitID]
 	end
-
-	selectionRank[morphedTo] = selectionRank[unitID]
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	if unitID and selectionRank[unitID] then
-		PossiblyTransferRankThroughMorph(unitID)
+		PossiblyTransferRankThroughMorph(unitID, unitDefID)
 		selectionRank[unitID] = nil
 	end
 end

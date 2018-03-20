@@ -1,5 +1,6 @@
 
 local defaultRank = {}
+local morphRankTransfer = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
@@ -13,6 +14,9 @@ for i = 1, #UnitDefs do
 			defaultRank[i] = 3
 		end
 	end
+	if ud.customParams.commtype then
+		morphRankTransfer[i] = true
+	end
 end
 
-return defaultRank
+return defaultRank, morphRankTransfer
