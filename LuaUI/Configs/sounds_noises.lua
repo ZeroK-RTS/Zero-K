@@ -91,6 +91,7 @@ local sounds = {
 		build = "builder_start",
 		ok = {
 			[1] = "spider_move",
+			volume = 0.95,
 		},
 		select = {
 			[1] = "spider_select2",
@@ -99,9 +100,11 @@ local sounds = {
 	spiderassault = {
 		ok = {
 			[1] = "spider_move",
+			volume = 0.95,
 		},
 		select = {
 			[1] = "spider_select",
+			volume = 0.95,
 		},
 	},
 	spiderscout = {
@@ -115,33 +118,41 @@ local sounds = {
 	spiderskirm = {
 		ok = {
 			[1] = "spider_move",
+			volume = 0.95,
 		},
 		select = {
 			[1] = "spider_select",
+			volume = 0.95,
 		},
 	},
 	spiderriot = {
 		ok = {
 			[1] = "spider_move",
+			volume = 0.95,
 		},
 		select = {
 			[1] = "spider_select",
+			volume = 0.95,
 		},
 	},
 	spideremp = {
 		ok = {
 			[1] = "spider_move",
+			volume = 0.95,
 		},
 		select = {
 			[1] = "spider_select",
+			volume = 0.95,
 		},
 	},
 	spideraa = {
 		ok = {
 			[1] = "spider_move",
+			volume = 0.95,
 		},
 		select = {
 			[1] = "spider_select",
+			volume = 0.95,
 		},
 	},
 
