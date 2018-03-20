@@ -88,7 +88,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-		light_color = [[0.6 0.6 1.8]],
+		light_color = [[0.5 0.5 1.5]],
 		light_radius = 180,
       },
 
