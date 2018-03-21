@@ -1007,7 +1007,13 @@ local function InitName(subject, playerPanel)
 		clanImg = "LuaUI/Configs/Factions/" .. faction ..".png"
 	end
 	if avatar then
-		avatarImg = "LuaUI/Configs/Avatars/" .. avatar .. ".png"
+		avatar = avatar .. ".png"
+		local unitpic = "unitpics/" .. avatar
+		if VFS.FileExists(unitpic, VFS.GAME) then
+			avatarImg = unitpic
+		else
+			avatarImg = "LuaUI/Configs/Avatars/" .. avatar
+		end
 	end
 	if admin then
 		adminImg = "LuaUI/Images/playerlist/police.png"
