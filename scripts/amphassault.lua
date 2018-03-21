@@ -350,8 +350,12 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	beamCount = 0
-	return false
+	-- Block for less than full damage and time because the target may dodge.
+	local block = (targetID and (GG.DontFireRadar_CheckBlock(unitID, targetID) or GG.OverkillPrevention_CheckBlock(unitID, targetID, 1200.1, 18))) or false
+	if not block then
+		beamCount = 0
+	end
+	return block
 end
 
 function script.Shot(num)

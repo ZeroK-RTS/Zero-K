@@ -114,6 +114,11 @@ function script.FireWeapon(num)
 	firing = false
 end
 
+function script.BlockShot(num, targetID)
+	-- Block for less than full damage and time because the target may dodge.
+	return (targetID and (GG.DontFireRadar_CheckBlock(unitID, targetID) or GG.OverkillPrevention_CheckBlock(unitID, targetID, 680.1, 18))) or false
+end
+
 
 ----------------------------------------------------------------------------------------------
 -- Death Animation
