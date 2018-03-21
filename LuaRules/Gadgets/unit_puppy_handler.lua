@@ -117,6 +117,7 @@ local function RestorePuppy(unitID, x, y, z)
 	spSetUnitNoMinimap(unitID, false)
 	spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
 	spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
+	GG.WaitWaitMoveUnit(unitID)
 	--spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
 end
 
