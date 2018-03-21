@@ -544,28 +544,30 @@ function gadget:GameFrame(n)
 					RefreshEmptyspot_minusBomberLanding() --initialize empty pad count once
 					airpadRefreshEmptyspot = true
 				end
-				local spotCount = #airpadsData[padID].emptySpot
-				if spotCount>0 then
-					local padPiece = airpadsData[padID].emptySpot[spotCount]
-					table.remove(airpadsData[padID].emptySpot) --remove used spot
-					if Spring.GetUnitStates(bomberID)["repeat"] then 
-						cmdIgnoreSelf = true
-						-- InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
-						spGiveOrderToUnit(bomberID, CMD.INSERT, {-1, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, {"alt"}) --Internal to avoid repeat
-						cmdIgnoreSelf = false
-					end
-					if GG.SendBomberToPad then
-						GG.SendBomberToPad(bomberID, padID, padPiece)
-					end
-					bomberToPad[bomberID] = nil
-					bomberLanding[bomberID] = {padID=padID,padPiece=padPiece}
-					
-					--value greater than 1 is for icon state, and it block bomber from firing while on airpad:
-					local noAmmo = spGetUnitRulesParam(bomberID, "noammo")
-					if noAmmo == 1 then
-						spSetUnitRulesParam(bomberID, "noammo", 2)	-- mark bomber as refuelling
-					elseif not noAmmo or noAmmo==0 then
-						spSetUnitRulesParam(bomberID, "noammo", 3)	-- mark bomber as repairing
+				if airpadsData[padID] then
+					local spotCount = #airpadsData[padID].emptySpot
+					if spotCount>0 then
+						local padPiece = airpadsData[padID].emptySpot[spotCount]
+						table.remove(airpadsData[padID].emptySpot) --remove used spot
+						if Spring.GetUnitStates(bomberID)["repeat"] then 
+							cmdIgnoreSelf = true
+							-- InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
+							spGiveOrderToUnit(bomberID, CMD.INSERT, {-1, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, {"alt"}) --Internal to avoid repeat
+							cmdIgnoreSelf = false
+						end
+						if GG.SendBomberToPad then
+							GG.SendBomberToPad(bomberID, padID, padPiece)
+						end
+						bomberToPad[bomberID] = nil
+						bomberLanding[bomberID] = {padID=padID,padPiece=padPiece}
+						
+						--value greater than 1 is for icon state, and it block bomber from firing while on airpad:
+						local noAmmo = spGetUnitRulesParam(bomberID, "noammo")
+						if noAmmo == 1 then
+							spSetUnitRulesParam(bomberID, "noammo", 2)	-- mark bomber as refuelling
+						elseif not noAmmo or noAmmo==0 then
+							spSetUnitRulesParam(bomberID, "noammo", 3)	-- mark bomber as repairing
+						end
 					end
 				end
 			end
