@@ -1173,7 +1173,6 @@ local chassisDefs = {
 				morphBaseCost = 0,
 				chassisApplicationFunction = function (modules, sharedData)
 					-- All comms have 10 BP in their unitDef (even support)
-					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 2
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5 
 				end,
 				morphUnitDefFunction = function(modulesByDefID)

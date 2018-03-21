@@ -56,7 +56,7 @@ unitDef = {
   },
 
   showNanoSpray          = false,
-  sightDistance          = 280,
+  sightDistance          = 300,
   trackOffset            = 3,
   trackStrength          = 6,
   trackStretch           = 1,
