@@ -68,14 +68,18 @@ local function UpdateTargets(unitID, unitData)
 	
 	for i = 1, unitData.weapons do
 		unitData.oldFlags = unitData.oldFlags or {}
+		unitData.needChange = unitData.needChange or {}
 		if not unitData.oldFlags[i] then
 			unitData.oldFlags[i] = spGetUnitWeaponState(unitID, i, "avoidFlags")
+			unitData.needChange[i] = ((unitData.oldFlags[i]%(featureFlag*2)) < featureFlag)
 		end
 		
-		if attackGround then
-			spSetUnitWeaponState(unitID, i, "avoidFlags", unitData.oldFlags[i] + featureFlag)
-		else
-			spSetUnitWeaponState(unitID, i, "avoidFlags", unitData.oldFlags[i])
+		if unitData.needChange[i] then
+			if attackGround then
+				spSetUnitWeaponState(unitID, i, "avoidFlags", unitData.oldFlags[i] + featureFlag)
+			else
+				spSetUnitWeaponState(unitID, i, "avoidFlags", unitData.oldFlags[i])
+			end
 		end
 	end
 	
