@@ -395,5 +395,11 @@ do
 	end
 end
 
+for _, wd in pairs (WeaponDefs) do
+	if wd.reloadtime then -- shields and death explosions don't have reloadtime
+		wd.reloadtime = (math.floor(wd.reloadtime * 30 + 1E-5) / 30) + 1E-6 -- sanitize to whole frames (plus leeways because float arithmetic is bonkers)
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
