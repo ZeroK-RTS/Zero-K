@@ -2223,6 +2223,7 @@ local function GetSelectionWindow()
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
 	local x = integralWidth
+	local visible = true
 	local height = integralHeight*0.84
 
 	local holderWindow = Chili.Window:New{
@@ -2293,6 +2294,9 @@ local function GetSelectionWindow()
 	end
 	
 	function externalFunctions.UpdateSelectionWindow()
+		if not visible then
+			return
+		end
 		if singleUnitID then
 			singleUnitDisplay.SetDisplay(singleUnitID, singleUnitDefID)
 		else
@@ -2305,6 +2309,7 @@ local function GetSelectionWindow()
 		if not newVisible then
 			singleUnitID = nil
 		end
+		visible = newVisible
 		mainPanel:SetVisibility(newVisible)
 		singleUnitDisplay.SetVisible(false)
 		multiUnitDisplay.SetUnitDisplay(false)
