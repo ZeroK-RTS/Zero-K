@@ -171,7 +171,7 @@ local function CreateTeleportWindow()
 	local holderHeight = 78 + structureCount*STRUCTURE_HEIGHT
 	
 	local holderWindow = Chili.Window:New{
-		classname = "main_window_small",
+		classname = ((holderHeight > 130) and "main_window_small") or "main_window_small_flat",
 		name   = 'pw_teleport_meter',
 		x = 2,
 		y = 50,
