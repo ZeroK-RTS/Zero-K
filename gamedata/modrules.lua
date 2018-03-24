@@ -124,7 +124,7 @@ local modrules  = {
   },
   
   system = {
-    pathFinderSystem = (Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "qtpfs") and 1) or 0,
+    pathFinderSystem = 0, --(Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "qtpfs") and 1) or 0, -- QTPFS causes desync https://springrts.com/mantis/view.php?id=5936
 	pathFinderUpdateRate = 0.0000001,
 	pathFinderRawDistMult = 1.25,
 	allowTake = false,
