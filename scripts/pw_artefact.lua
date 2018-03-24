@@ -59,9 +59,10 @@ function script.Deactivate()
 	StartThread(Deinitialize)
 end
 
-function script.HitByWeapon()
-	return 0
-end
+-- Invulnerability
+--function script.HitByWeapon()
+--	return 0
+--end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
