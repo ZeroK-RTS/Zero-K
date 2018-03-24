@@ -53,6 +53,7 @@ local TELEPORT_CHARGE_NEEDED = 10*60 -- seconds
 local TELEPORT_FRAMES = 30*60 -- 1 minute
 local TELEPORT_CHARGE_PERIOD = 30 -- Frames
 local TELEPORT_CHARGE_RATE = TELEPORT_CHARGE_PERIOD/30 -- per update
+local BATTLE_TIME_LIMIT = 30*60*60*2 -- Defenders win after 2 hours
 local teleportChargeNeededMult = 1
 
 local STRUCTURE_SPACING = 192
@@ -164,6 +165,10 @@ local function UpdateEvacState()
 	RemoveEvacCommands()
 	
 	Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NOTHING_TO_EVAC)
+end
+
+local function MakeDefendersWinBattle()
+	GG.CauseVictory(DEFENDER_ALLYTEAM)
 end
 
 --------------------------------------------------------------------------------
@@ -622,6 +627,9 @@ function gadget:GameFrame(frame)
 				Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 2, x, y, z)
 			end
 		end
+	end
+	if frame >= BATTLE_TIME_LIMIT then
+		MakeDefendersWinBattle()
 	end
 end
 
