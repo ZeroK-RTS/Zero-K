@@ -186,7 +186,7 @@ local function AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, uni
 	end
 	
 	if doLosCheck and moveType == 2 then -- Only los check for land/sea units.
-		GG.AddSphereicalLOSCheck(unitID, unitDefID)
+		GG.AddSphericalLOSCheck(unitID, unitDefID)
 	end
 	thereIsStuffToDo = true
 end
@@ -227,7 +227,7 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, p
 		x,y,z = x*mag, y*mag, z*mag
 		y = y + abs(magnitude)/(20*myMass)
 		pushOffGround = pushOffGround and IsUnitOnGround(unitID)
-		GG.AddSphereicalLOSCheck(unitID, unitDefID)
+		GG.AddSphericalLOSCheck(unitID, unitDefID)
 	end
 
 	AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, unitDefID, moveType)

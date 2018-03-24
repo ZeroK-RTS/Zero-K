@@ -28,7 +28,7 @@ local units = {count = 0, data = {}}
 local unitsByID = {}
 local frame = Spring.GetGameFrame()
 
-local function AddSphereicalLOSCheck(unitID, unitDefID)
+local function AddSphericalLOSCheck(unitID, unitDefID)
 	if unitsByID[unitID] then
 		local index = unitsByID[unitID]
 		units.data[index].removeAfter = frame + 40
@@ -46,7 +46,8 @@ local function AddSphereicalLOSCheck(unitID, unitDefID)
 	end
 end
 
-GG.AddSphereicalLOSCheck = AddSphereicalLOSCheck
+GG.AddSphereicalLOSCheck = AddSphericalLOSCheck	-- deprecated typo'd version, left in for any reverse compatibility that might be needed
+GG.AddSphericalLOSCheck = AddSphericalLOSCheck 
 
 local function checkUnit(unitID, los, airLos)
 	if not Spring.ValidUnitID(unitID) then
