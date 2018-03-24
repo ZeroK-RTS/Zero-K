@@ -56,12 +56,17 @@ end
 function ShieldSphereColorParticle:BeginDraw()
   gl.DepthMask(false)
   gl.UseShader(shieldShader)
+
+  gl.Texture(0, "bitmaps/PD/shield3hex2.png")
+
   gl.Culling(GL.FRONT)
 end
 
 function ShieldSphereColorParticle:EndDraw()
   gl.DepthMask(false)
   gl.UseShader(0)
+
+  gl.Texture(0, false)
 
   gl.Culling(GL.BACK)
   gl.Culling(false)
@@ -78,7 +83,7 @@ function ShieldSphereColorParticle:Draw()
   glMultiTexCoord(2, col2[1],col2[2],col2[3],col2[4] or 1)
   local pos = self.pos
   glMultiTexCoord(3, pos[1], pos[2], pos[3], 0)
-  glMultiTexCoord(4, self.margin, self.size, 1, 1)
+  glMultiTexCoord(4, self.margin, self.size, self.uvMul, self.opacExp)
 
   glCallList(sphereList[self.shieldSize])
   if self.drawBack then
@@ -89,7 +94,7 @@ function ShieldSphereColorParticle:Draw()
     glMultiTexCoord(1, col1[1]*self.drawBackCol,col1[2]*self.drawBackCol,col1[3]*self.drawBackCol,(col1[4] or 1)*self.drawBack)
     glMultiTexCoord(2, col2[1]*self.drawBackCol,col2[2]*self.drawBackCol,col2[3]*self.drawBackCol,(col2[4] or 1)*self.drawBack)
     if self.drawBackMargin then
-      glMultiTexCoord(4, self.drawBackMargin, self.size, 1, 1)
+      glMultiTexCoord(4, self.drawBackMargin, self.size, self.uvMul, self.opacExp)
     end
     glCallList(sphereList[self.shieldSize])
   end
@@ -101,37 +106,66 @@ end
 function ShieldSphereColorParticle:Initialize()
   shieldShader = gl.CreateShader({
     vertex = [[
-      #define pos gl_MultiTexCoord3
-      #define margin gl_MultiTexCoord4.x
-      #define size vec4(gl_MultiTexCoord4.yyy,1.0)
+		#define pos gl_MultiTexCoord3
+		#define margin gl_MultiTexCoord4.x
+		#define size vec4(gl_MultiTexCoord4.yyy,1.0)
 
-      varying float opac;
-      varying vec4 color1;
-      varying vec4 color2;
+		varying float uvMul;
+		varying float opacExp;
 
-      void main()
-      {
-          gl_Position = gl_ModelViewProjectionMatrix * (gl_Vertex * size + pos);
-          vec3 normal = gl_NormalMatrix * gl_Normal;
-          vec3 vertex = vec3(gl_ModelViewMatrix * gl_Vertex);
-          float angle = dot(normal,vertex)*inversesqrt( dot(normal,normal)*dot(vertex,vertex) ); //dot(norm(n),norm(v))
-          opac = pow( abs( angle ) , margin);
+		varying float opac;
+		varying vec4 color1;
+		varying vec4 color2;
 
-          color1 = gl_MultiTexCoord1;
-          color2 = gl_MultiTexCoord2;
-      }
+		varying vec3 normal;
+
+		void main()
+		{
+			gl_Position = gl_ModelViewProjectionMatrix * (gl_Vertex * size + pos);
+			normal = gl_NormalMatrix * gl_Normal;
+			vec3 vertex = vec3(gl_ModelViewMatrix * gl_Vertex);
+			float angle = dot(normal,vertex)*inversesqrt( dot(normal,normal)*dot(vertex,vertex) ); //dot(norm(n),norm(v))
+			opac = pow( abs( angle ) , margin);
+
+			color1 = gl_MultiTexCoord1;
+			color2 = gl_MultiTexCoord2;
+
+			uvMul = gl_MultiTexCoord4.z;
+			opacExp = gl_MultiTexCoord4.w;
+		}
     ]],
     fragment = [[
-      varying float opac;
-      varying vec4 color1;
-      varying vec4 color2;
+		varying float opac;
+		varying vec4 color1;
+		varying vec4 color2;
 
-      void main(void)
-      {
-          gl_FragColor =  mix(color1,color2,opac);
-      }
+		varying vec3 normal;
 
-    ]],
+		varying float uvMul;
+		varying float opacExp;
+
+		uniform sampler2D tex0;
+
+		#define PI 3.141592653589793
+
+		vec2 RadialCoords(vec3 a_coords)
+		{
+			vec3 a_coords_n = normalize(a_coords);
+			float lon = atan(a_coords_n.z, a_coords_n.x);
+			float lat = acos(a_coords_n.y);
+			vec2 sphereCoords = vec2(lon, lat) * (1.0 / PI);
+			return vec2(sphereCoords.x * 0.5 + 0.5, 1 - sphereCoords.y);
+		}
+
+		void main(void)
+		{
+			vec3 norm = normalize(normal);
+			vec4 texel = texture2D(tex0, RadialCoords(normal) * uvMul);
+
+			vec4 color1Tex = vec4( mix(2.0f * color1.rgb, texel.rgb, 0.5f), color1.a );
+			gl_FragColor =  mix(color1Tex, color2, pow(opac, opacExp));
+		}
+	]],
     uniform = {
       margin = 1,
     }
