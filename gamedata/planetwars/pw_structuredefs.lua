@@ -46,7 +46,7 @@ local structureConfig = {
 	end,
 
 	pw_artefact = function(unitDef)
-		unitDef.maxdamage = 100000
+		unitDef.maxdamage = 50000
 		unitDef.name = "Ancient Artefact"
 		unitDef.description = "Mysterious Relic"
 		unitDef.objectname = "pw_artefact.dae"
@@ -55,9 +55,8 @@ local structureConfig = {
 
 		unitDef.footprintx = 4
 		unitDef.footprintz = 4
-		unitDef.buildcostmetal = 5000*STRUCTURE_COST_MULT
+		unitDef.buildcostmetal = 600*STRUCTURE_COST_MULT
 
-		unitDef.customparams.invincible = "1"
 		unitDef.customparams.soundselect = "cloaker_select"
 
 		unitDef.collisionvolumescales = [[60 70 60]]
