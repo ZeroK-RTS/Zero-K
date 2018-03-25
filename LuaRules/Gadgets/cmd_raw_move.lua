@@ -153,7 +153,7 @@ end
 --local oldSetMoveGoal = Spring.SetUnitMoveGoal
 --function Spring.SetUnitMoveGoal(unitID, x, y, z, radius, speed, raw)
 --	oldSetMoveGoal(unitID, x, y, z, radius, speed, raw)
---	Spring.MarkerAddPoint(x, y, z, (raw and "r") or "")
+--	Spring.MarkerAddPoint(x, y, z, ((raw and "r") or "") .. (radius or 0))
 --end
 
 ----------------------------------------------------------------------------------------------
@@ -219,7 +219,7 @@ local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distance, testSpacing, dist
 		return true
 	end
 	vX, vZ = vX/distance, vZ/distance
-
+	local orginDistance = distance
 	if goalDistance then
 		distance = distance - goalDistance
 	end
@@ -247,6 +247,8 @@ local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distance, testSpacing, dist
 		return (not blockedDistance)
 	end
 	
+	-- Don't take goalDistance into account when stopping early due to blockage.
+	distance = orginDistance
 	local relaxX, relaxZ
 	for test = distance, blockedDistance - testSpacing, -testSpacing do
 		if Spring.TestMoveOrder(unitDefID, sX + test*vX, 0, sZ + test*vZ) then
