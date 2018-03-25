@@ -1498,7 +1498,7 @@ function gadget:Load(zip)
 	end
 	
 	local loadData = GG.SaveLoad.ReadFile(zip, "Galaxy Campaign Battle Handler", SAVE_FILE) or {}
-	loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame")
+	loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
 
 	if not loadData.unitLineage
 	or not loadData.bonusObjectiveList

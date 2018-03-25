@@ -547,7 +547,7 @@ function gadget:Load(zip)
 	
 	local loadData = GG.SaveLoad.ReadFile(zip, "Capture", SAVE_FILE) or {}
 
-	local loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame")
+	local loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
 	
 	-- Reset data (something may have triggered during unit creation).
 	damageByID = {data = {}, count = 0}
