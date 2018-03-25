@@ -93,6 +93,7 @@ unitDef = {
 			miscEffectFire   = [[custom:RIOT_SHELL_L]],
 			lups_explodelife = 1.5,
 			lups_explodespeed = 0.8,
+			light_radius = 240,
 		},
 
 		damage                  = {
