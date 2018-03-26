@@ -299,7 +299,7 @@ local structureConfig = {
 		unitDef.footprintz = 3
 		unitDef.buildcostmetal = 75*STRUCTURE_COST_MULT
 
-		unitDef.customparams.evacuation_speed = "1"
+		unitDef.customparams.evacuation_speed = "1.25" -- 8 minutes
 
 		unitDef.customparams.soundselect = "shield_select"
 
@@ -321,7 +321,7 @@ local structureConfig = {
 		unitDef.footprintz = 6
 		unitDef.buildcostmetal = 250*STRUCTURE_COST_MULT
 
-		unitDef.customparams.evacuation_speed = "2"
+		unitDef.customparams.evacuation_speed = "2" -- 5 minutes
 
 		unitDef.customparams.pw_replaces = "pw_wormhole"
 		unitDef.customparams.soundselect = "shield_select"
