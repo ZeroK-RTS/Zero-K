@@ -24,6 +24,7 @@ local factionDisplayWindow, teleportWindow
 local imageDir = "LuaUI/Configs/Factions/"
 
 local STRUCTURE_HEIGHT = 16
+local DEBUG_MODE = false
 
 local EVAC_STATE = {
 	ACTIVE = 1,
@@ -172,12 +173,13 @@ local function CreateTeleportWindow()
 	
 	local holderWindow = Chili.Window:New{
 		classname = ((holderHeight > 130) and "main_window_small") or "main_window_small_flat",
-		name   = 'pw_teleport_meter',
-		x = 2,
-		y = 50,
+		name   = 'pw_teleport_meter_1',
+		y = 48,
+		right = 2, 
 		width = 240,
 		height = holderHeight,
 		dockable = true,
+		dockableSavePositionOnly = true,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -321,12 +323,13 @@ local function CreateFactionDisplayWindow()
 	
 	factionDisplayWindow = Chili.Window:New{
 		classname = "main_window_small",
-		name   = 'pwinfo',
+		name   = 'pwinfo_1',
 		width = WINDOW_WIDTH,
 		height = WINDOW_HEIGHT,
-		y = "20%",
-		right = 0, 
+		x = 2,
+		y = 48,
 		dockable = true,
+		dockableSavePositionOnly = true,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -440,10 +443,10 @@ local function CreateGoalWindow()
 		return
 	end
 	local customKeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID())) or {}
-	if not customKeys.pwinstructions then
+	if (not DEBUG_MODE) and (not customKeys.pwinstructions) then
 		return
 	end
-	local instructions = Spring.Utilities.Base64Decode(customKeys.pwinstructions)
+	local instructions = (DEBUG_MODE and "bla") or Spring.Utilities.Base64Decode(customKeys.pwinstructions)
 	if not instructions then
 		return
 	end
@@ -453,12 +456,13 @@ local function CreateGoalWindow()
 	
 	local instructionWindow =  Chili.Window:New{
 		classname = "main_window_small",
-		name   = 'pw_instructions',
-		x = 0,
-		y = 250, 
+		name   = 'pw_instructions_1',
+		x = 2,
+		y = 178, 
 		width = WINDOW_WIDTH,
 		height = WINDOW_HEIGHT,
 		dockable = true,
+		dockableSavePositionOnly = true,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -520,7 +524,7 @@ end
 --------------------------------------------------------------------------------
 function widget:GameFrame(n)
 	if n%120 == 1 and (not IsSpec()) then
-		if factionDisplayWindow then
+		if factionDisplayWindow and (not DEBUG_MODE) then
 			factionDisplayWindow:Dispose()
 		end
 	end
@@ -558,7 +562,7 @@ local function languageChanged ()
 end
 
 function widget:Initialize()
-	if not Spring.GetModOptions().planet then
+	if (not DEBUG_MODE) and (not Spring.GetModOptions().planet) then
 		widgetHandler:RemoveWidget()
 		return
 	end

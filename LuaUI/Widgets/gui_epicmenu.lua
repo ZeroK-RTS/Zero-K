@@ -2586,6 +2586,8 @@ local function MakeMenuBar()
 		y = 0,
 		right = 0,
 		bottom = 0,
+		backgroundColor = {1, 1, 1, 1},
+		color = {1, 1, 1, 1},
 		parent = window_crude,
 	}
 	settings.show_crudemenu = true
