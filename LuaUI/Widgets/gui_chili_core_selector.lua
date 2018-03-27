@@ -692,7 +692,7 @@ end
 --------------------------------------------------------------------------------
 -- Button Handling
 
-local function GetNewButton(parent, onClick, category, index, backgroundColor, imageFile, imageFile2)
+local function GetNewButton(parent, name, onClick, category, index, backgroundColor, imageFile, imageFile2)
 	local position = 1
 	
 	local hotkeyLabel, buildProgress, repeatImage, healthBar, hotkeyText, bottomLabel
@@ -700,6 +700,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 	-- Controls
 	local button = Button:New{
 		parent = parent,
+		name = name .. "_button" .. index,
 		x = "5%", -- Makes the button relative
 		y = "5%",
 		right = "5%",
@@ -958,6 +959,7 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 	
 	local button = GetNewButton(
 		parent,
+		"factory",
 		OnClick, 
 		FACTORY_ORDER,
 		categoryOrder,
@@ -990,13 +992,19 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 		button.SetRepeat(repeatState)
 	end
 	
+	local oldConstructionCount, oldConstructionDefID, oldBuildProgress
 	local function UpdateTooltip(constructionCount)
+		if constructionCount == oldConstructionCount and constructionDefID == oldConstructionDefID and buildProgress == oldBuildProgress then
+			return
+		end
+		oldConstructionCount, oldConstructionDefIDoldBuildProgress, oldBuildProgress = constructionCount, constructionDefID, buildProgress
+		
 		local tooltip = WG.Translate("interface", "factory") .. ": ".. Spring.Utilities.GetHumanName(UnitDefs[unitDefID]) .. "\n" .. WG.Translate("interface", "x_units_in_queue", {count = constructionCount})
 		if repeatState then
 			tooltip = tooltip .. "\255\0\255\255 (" .. WG.Translate("interface", "repeating") .. ")\008"
 		end
 		if constructionDefID then
-			tooltip = tooltip .. "\n" .. WG.Translate("interface", "current_project") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[constructionDefID]) .." (".. WG.Translate("interface", "x%_done", {x = math.floor(buildProgress*100)}) .. ")"
+			tooltip = tooltip .. "\n" .. WG.Translate("interface", "current_project") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[constructionDefID]) .. " (".. WG.Translate("interface", "x%_done", {x = math.floor(buildProgress*100)}) .. ")"
 		end
 		tooltip = tooltip .. standardFactoryTooltip
 		
@@ -1106,6 +1114,7 @@ local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 	
 	local button = GetNewButton(
 		parent, 
+		"commander",
 		OnClick, 
 		COMMANDER_ORDER,
 		categoryOrder,
@@ -1121,7 +1130,12 @@ local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 		button.SetHealthbar(healthProp ~= 1 and healthProp)
 	end
 	
-	local function UpdateTooltip(constructionCount)
+	local oldHealth, oldMaxHealth
+	local function UpdateTooltip()
+		if health == oldHealth and maxHealth == oldMaxHealth then
+			return
+		end
+		oldHealth, oldMaxHealth = health, maxHealth
 		local tooltip = WG.Translate("interface", "commander") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[unitDefID], unitID) ..
 			"\n\255\0\255\255" .. WG.Translate("interface", "health") .. ":\008 "..GetHealthColor(health/maxHealth, true)..math.floor(health).."/"..maxHealth.."\008"..
 			"\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("interface", "select_and_go_to") or WG.Translate("interface", "select")) ..
@@ -1164,7 +1178,7 @@ local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 			button.SetBackgroundColor((warningPhase and BUTTON_COLOR_WARNING) or BUTTON_COLOR)
 		end
 		
-		UpdateTooltip(constructionCount)
+		UpdateTooltip()
 		return true
 	end
 	
@@ -1205,6 +1219,7 @@ local function GetConstructorButton(parent)
 	
 	local button = GetNewButton(
 		parent, 
+		"con",
 		OnClick, 
 		CONSTRUCTOR_ORDER,
 		0,
@@ -1231,13 +1246,19 @@ local function GetConstructorButton(parent)
 		SetImageVisible = button.SetImageVisible,
 	}
 	
+	local oldTotal
 	function externalFunctions.UpdateButton()
 		local total = 0
 		for unitID in pairs(idleCons) do
 			total = total + 1
 		end
 		idleConCount = total
-
+		
+		if total == oldTotal then
+			return true
+		end
+		oldTotal = total
+		
 		button.SetTooltip(WG.Translate("interface", "idle_cons", {count = total}) ..
 						"\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") ..
 						"\n\255\0\255\0" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "select_all") .. "\008")

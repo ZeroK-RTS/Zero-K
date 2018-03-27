@@ -978,9 +978,9 @@ local function GetImageWithText(parentControl, name, initY, imageFile, caption, 
 		label:SetCaption(newCaption)
 		if newImage ~= imageFile then
 			if imageFile == nil then
-				label:SetPos(iconSize + 2)
+				label:SetPos(iconSize + 2, nil, nil, nil, nil, true)
 			elseif newImage == nil then
-				label:SetPos(2)
+				label:SetPos(2, nil, nil, nil, nil, true)
 			end
 			imageFile = newImage
 			image.file = imageFile
@@ -1052,7 +1052,7 @@ local function GetMorphInfo(parentControl, yPos)
 			return
 		end
 		if yPos then
-			holder:SetPos(nil, yPos)
+			holder:SetPos(nil, yPos, nil, nil, nil, true)
 		end
 		timeLabel:SetCaption(cyan .. newTime)
 		costLabel:SetCaption(cyan .. newCost)
@@ -1835,15 +1835,15 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			healthBarUpdate(false)
 			if unitDefID then
 				if playerNameLabel then
-					playerNameLabel:SetPos(nil, PIC_HEIGHT + 10)
-					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 34)
+					playerNameLabel:SetPos(nil, PIC_HEIGHT + 10, nil, nil, nil, true)
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 34, nil, nil, nil, true)
 				end
 			else
 				costInfoUpdate(false)
 				unitNameUpdate(true, fd.tooltip, nil)
 				if playerNameLabel then
-					playerNameLabel:SetPos(nil, PIC_HEIGHT - 10)
-					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 14)
+					playerNameLabel:SetPos(nil, PIC_HEIGHT - 10, nil, nil, nil, true)
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 14, nil, nil, nil, true)
 				end
 			end
 			
@@ -1879,8 +1879,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			
 			if unitID then
 				if playerNameLabel then
-					playerNameLabel:SetPos(nil, PIC_HEIGHT + 31)
-					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 55)
+					playerNameLabel:SetPos(nil, PIC_HEIGHT + 31, nil, nil, nil, true)
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 55, nil, nil, nil, true)
 				end
 			end
 			if (not (unitID and visible)) and not featureDefID then
@@ -1894,10 +1894,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					morphInfo(true, morphTime, morphCost)
 					morphShown = true
 					if spaceClickLabel then
-						spaceClickLabel:SetPos(nil, PIC_HEIGHT + LEFT_SPACE + 31)
+						spaceClickLabel:SetPos(nil, PIC_HEIGHT + LEFT_SPACE + 31, nil, nil, nil, true)
 					end
 				elseif spaceClickLabel and not unitID then
-					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 30)
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 30, nil, nil, nil, true)
 				end
 			end
 		end
