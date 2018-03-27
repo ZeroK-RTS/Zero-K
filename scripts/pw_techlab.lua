@@ -65,6 +65,10 @@ local function moveslider()
 end
 
 function script.Create()
+	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 then
+		return
+	end
+	
 	StartThread(armmove, armabase, arma, armapick)
 	StartThread(armmove, armbbase, armb, armbpick)
 	StartThread(armmove, armcbase, armc, armcpick)

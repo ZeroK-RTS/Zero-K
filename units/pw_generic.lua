@@ -16,7 +16,8 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-  	dontcount = [[1]],
+    dontcount = [[1]],
+    planetwars_structure = [[1]],
   },
 
   energyUse                     = 0,

@@ -55,6 +55,10 @@ local function Deinitialize()
 end
 
 function script.Activate()
+	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 then
+		return
+	end
+	
 	StartThread(Initialize)
 end
 

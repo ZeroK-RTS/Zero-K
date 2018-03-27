@@ -11,8 +11,10 @@ function script.Create()
 end
 
 function script.Activate()
-	Spin(cylinder, y_axis, spin*2, spinAccel)
-	Spin(radars, y_axis, -spin*2, spinAccel)
+	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") ~= 1 then
+		Spin(cylinder, y_axis, spin*2, spinAccel)
+		Spin(radars, y_axis, -spin*2, spinAccel)
+	end
 end
 
 function script.Deactivate()

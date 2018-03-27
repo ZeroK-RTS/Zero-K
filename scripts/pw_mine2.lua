@@ -13,6 +13,10 @@ local wheels = {wheel1, wheel2, wheel3, wheel4}
 local smokePiece = {base, wheel1, wheel2, wheel3, wheel4}
 
 function script.Activate()
+	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 then
+		return
+	end
+	
 	Spin(cylinder1, y_axis, 0.4, 0.001)
 	Spin(cylinder2, y_axis, -0.4, 0.001)
 	Spin(wheel1, z_axis, 0.3, 0.1)

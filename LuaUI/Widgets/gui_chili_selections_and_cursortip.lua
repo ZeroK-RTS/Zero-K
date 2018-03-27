@@ -2072,12 +2072,6 @@ end
 --------------------------------------------------------------------------------
 -- Tooltip updates
 
-local function GetUnitTooltip()
-	local externalFunctions
-	
-	return externalFunctions
-end
-
 local function ShowUnitCheck(holdingSpace)
 	if holdingSpace or options.show_for_units.value then
 		return true

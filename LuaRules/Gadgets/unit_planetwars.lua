@@ -45,6 +45,7 @@ local spAreTeamsAllied  = Spring.AreTeamsAllied
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 local lava = (Game.waterDamage > 0)
+local INLOS_ACCESS = {inlos = true}
 local DEFENDER_ALLYTEAM = 1
 
 local gaiaTeamID = Spring.GetGaiaTeamID()
@@ -91,6 +92,7 @@ local hqsDestroyed = {}
 local destroyedStructures = {data = {}, count = 0}
 local evacuateStructureString = false
 local haveEvacuable = false
+local applyPlanetwarsDisable = false
 
 local flattenAreas = {}
 
@@ -192,7 +194,7 @@ end
 local function CheckSetWormhole(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	local chargeMult = wormholeDefs[unitDefID]
-	if not chargeMult then
+	if (not chargeMult) or (Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1) then
 		return
 	end
 	if chargeMult > (teleportChargeNeededMult or 0) then
@@ -502,7 +504,13 @@ local function SpawnStructure(info, teamID, boxData)
 		flattenAreas[#flattenAreas + 1] = {x-sX, z-sZ, x+sX, z+sZ, y}
 	end
 	
+	if info.isInactive then
+		applyPlanetwarsDisable = true
+	end
 	local unitID = Spring.CreateUnit(info.unitname, x, y, z, direction, teamID, false, false)
+	if info.isInactive then
+		applyPlanetwarsDisable = false
+	end
 	CheckSetWormhole(unitID)
 	
 	AddNoGoZone(x, z, math.max(sX, sZ) + STRUCTURE_SPACING)
@@ -657,6 +665,13 @@ function gadget:GameFrame(frame)
 	end
 	if frame >= BATTLE_TIME_LIMIT then
 		MakeDefendersWinBattle()
+	end
+end
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam)
+	if applyPlanetwarsDisable then
+		Spring.SetUnitRulesParam(unitID, "planetwarsDisable", 1, INLOS_ACCESS)
+		GG.UpdateUnitAttributes(unitID)
 	end
 end
 

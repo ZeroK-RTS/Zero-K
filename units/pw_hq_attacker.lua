@@ -15,6 +15,7 @@ unitDef = {
   customParams                  = {
     dontcount = [[1]],
     soundselect = "building_select1",
+    planetwars_structure = [[1]],
   },
 
   energyUse                     = 0,

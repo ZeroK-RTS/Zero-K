@@ -20,6 +20,10 @@ local function SliderAnim(piece, reverse)
 end
 
 function script.Create()
+	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 then
+		return
+	end
+	
     Spin(wheel1, x_axis, spin)
     Spin(wheel2, x_axis, spin)
     --StartThread(SliderAnim, slider1)
