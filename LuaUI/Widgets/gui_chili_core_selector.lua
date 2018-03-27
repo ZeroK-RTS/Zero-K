@@ -692,7 +692,7 @@ end
 --------------------------------------------------------------------------------
 -- Button Handling
 
-local function GetNewButton(parent, name, onClick, category, index, backgroundColor, imageFile, imageFile2)
+local function GetNewButton(parent, onClick, category, index, backgroundColor, imageFile, imageFile2)
 	local position = 1
 	
 	local hotkeyLabel, buildProgress, repeatImage, healthBar, hotkeyText, bottomLabel
@@ -700,7 +700,6 @@ local function GetNewButton(parent, name, onClick, category, index, backgroundCo
 	-- Controls
 	local button = Button:New{
 		parent = parent,
-		name = name .. "_button" .. index,
 		x = "5%", -- Makes the button relative
 		y = "5%",
 		right = "5%",
@@ -959,7 +958,6 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 	
 	local button = GetNewButton(
 		parent,
-		"factory",
 		OnClick, 
 		FACTORY_ORDER,
 		categoryOrder,
@@ -1113,8 +1111,7 @@ local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 	local warningPhase = true
 	
 	local button = GetNewButton(
-		parent, 
-		"commander",
+		parent,
 		OnClick, 
 		COMMANDER_ORDER,
 		categoryOrder,
@@ -1218,8 +1215,7 @@ local function GetConstructorButton(parent)
 	local active = true
 	
 	local button = GetNewButton(
-		parent, 
-		"con",
+		parent,
 		OnClick, 
 		CONSTRUCTOR_ORDER,
 		0,
