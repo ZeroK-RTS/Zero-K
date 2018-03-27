@@ -49,7 +49,7 @@ unitDef = {
   trackStrength       = 8,
   trackStretch        = 1,
   trackType           = [[StdTank]],
-  trackWidth          = 40,
+  trackWidth          = 44,
   turninplace         = 0,
   turnRate            = 460,
 

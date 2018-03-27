@@ -1469,6 +1469,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
 
 		local weaponStats = GetWeapon( ud.deathExplosion:lower() )
+		local wepCp = weaponStats.customParams
 		local damageValue = tonumber(weaponStats.customParams.statsdamage) or weaponStats.damages[1] or 0
 
 		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
@@ -1477,7 +1478,18 @@ local function printunitinfo(ud, buttonWidth, unitID)
 			statschildren[#statschildren+1] = Label:New{ caption = 'Max EMP time: ', textColor = color.stats_fg, }
 			statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages.paralyzeDamageTime,2) .. "s", textColor = color.stats_fg, }
 		else
-			statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue,2), textColor = color.stats_fg, }
+			local damageSlow = (wepCp.timeslow_damagefactor or 0)*damageValue
+			local damageText
+			if damageSlow > 0 then
+				if wepCp.timeslow_onlyslow == "1" then
+					 damageText = color2incolor(colorPurple) .. numformat(damageSlow,2) .. " (S)\008"
+				else
+					damageText = numformat(damageValue,2) .. " + " .. color2incolor(colorPurple) .. numformat(damageSlow,2) .. " (S)\008"
+				end
+			else
+				damageText = numformat(damageValue,2)
+			end
+			statschildren[#statschildren+1] = Label:New{ caption = damageText, textColor = color.stats_fg, }
 		end
 
 		statschildren[#statschildren+1] = Label:New{ caption = 'AoE radius: ', textColor = color.stats_fg, }

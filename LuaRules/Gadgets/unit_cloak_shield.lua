@@ -336,10 +336,10 @@ local function UpdateCloakees(data)
         cloakees[cloakee] = true
       end
     end
-  -- the GetUnitsInSphere() call uses unit midPos's, which can
-  -- differ from the unit's position while being transported.
-  -- here we do a direct check to see what units the cloakees are
-  -- transporting. this does not fix nested transports
+    -- the GetUnitsInSphere() call uses unit midPos's, which can
+    -- differ from the unit's position while being transported.
+    -- here we do a direct check to see what units the cloakees are
+    -- transporting. this does not fix nested transports
     if (UnitDefs[udid].transportCapacity >= 1) then
       local transported = Spring.GetUnitIsTransporting(cloakee)
       if transported ~= nil then
