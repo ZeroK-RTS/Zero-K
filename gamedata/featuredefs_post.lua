@@ -162,7 +162,9 @@ local function ProcessUnitDef(udName, ud)
     local fullName = udName .. '_' .. ud.corpse:lower()
     local fd = FeatureDefs[fullName]
     if (fd) then
-      fd.resurrectable = 1
+      if fd.resurrectable ~= 0 then
+        fd.resurrectable = 1
+      end
       ud.corpse = fullName
 	  --if fd.metal ~= ud.buildcostmetal*0.4 or fd.damage ~= ud.maxdamage then
 	  --  Spring.Echo(ud.name)
