@@ -197,12 +197,14 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 						cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
 					end
 					
+					GG.recursion_GiveOrderToUnit = true
 					if move then
 						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 					else
 						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 					end
+					GG.recursion_GiveOrderToUnit = false
 					data.cx,data.cy,data.cz = cx,cy,cz
 					
 					data.receivedOrder = true
@@ -242,12 +244,14 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 						end
 					end
 					
+					GG.recursion_GiveOrderToUnit = true
 					if move then
 						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 					else
 						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 					end
+					GG.recursion_GiveOrderToUnit = false
 					data.cx,data.cy,data.cz = cx,cy,cz
 					data.receivedOrder = true
 				end
@@ -390,13 +394,14 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, 
 		local cy = uy
 		local cz = uz - wantedDis*ez/eDist
 		
+		GG.recursion_GiveOrderToUnit = true
 		if move then
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 		else
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 		end
-		
+		GG.recursion_GiveOrderToUnit = false
 		data.cx,data.cy,data.cz = cx,cy,cz
 		data.receivedOrder = true
 		return true
@@ -445,6 +450,7 @@ local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move
 		local cy = uy
 		local cz = uz+(uz-ez)*f
 
+		GG.recursion_GiveOrderToUnit = true
 		if #cQueue > 0 then
 			if move then
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
@@ -455,7 +461,7 @@ local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move
 		else
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_FIGHT, {cx,cy,cz }, CMD_OPT_RIGHT )
 		end
-		
+		GG.recursion_GiveOrderToUnit = false
 		data.cx,data.cy,data.cz = cx,cy,cz
 		data.receivedOrder = true
 		return true

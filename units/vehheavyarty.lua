@@ -16,7 +16,7 @@ unitDef = {
 
   customParams        = {
 
-    dontfireatradarcommand = '1',
+    dontfireatradarcommand = '0',
   },
 
   explodeAs           = [[BIG_UNITEX_MERL]],

@@ -206,6 +206,10 @@ function script.AimWeapon(num, heading, pitch)
 	StartThread(RestoreAfterDelay)
 	aiming = true
 	
+	-- The aim check messes with unit targeting. This is not required for Moderator as
+	-- it very rarely shoots at radar dots.
+	--GG.DontFireRadar_CheckAim(unitID)
+	
 	Turn(torso, y_axis, heading, math.rad(300))
 	Turn(head, x_axis, -pitch, math.rad(150))
 	WaitForTurn(torso, y_axis)
@@ -231,6 +235,10 @@ end
 
 function script.AimFromWeapon()
 	return head
+end
+
+function script.BlockShot(num, targetID)
+	return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) or false
 end
 
 function script.Killed(recentDamage, maxHealth)

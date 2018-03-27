@@ -185,14 +185,15 @@ end
 -- Unit Handling
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if UnitDefs[unitDefID].customParams.dontfireatradarcommand=="1" then
+	local manageKey = UnitDefs[unitDefID].customParams.dontfireatradarcommand
+	if manageKey then
 		--Spring.SetUnitSensorRadius(unitID,"los",0)
 		--Spring.SetUnitSensorRadius(unitID,"airLos",0)
 		
 		spInsertUnitCmdDesc(unitID, dontFireAtRadarCmdDesc)
 		canHandleUnit[unitID] = true
 		
-		DontFireAtRadarToggleCommand(unitID, {1})
+		DontFireAtRadarToggleCommand(unitID, {((manageKey == "1") and 1) or 0})
 	end
 end
 

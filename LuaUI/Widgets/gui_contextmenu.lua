@@ -1122,11 +1122,6 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	if cp.dontfireatradarcommand then
-		cells[#cells+1] = 'Can ignore unidentified targets'
-		cells[#cells+1] = ''
-	end
-
 	if ud.metalStorage > 0 then
 		cells[#cells+1] = 'Stores metal: '
 		cells[#cells+1] = ud.metalStorage .. " M"

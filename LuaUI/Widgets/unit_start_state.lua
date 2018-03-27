@@ -761,12 +761,12 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_tactical_ai_transport"
 	end
 
-	if dontFireAtRadarUnits[ud.id] then
+	if dontFireAtRadarUnits[ud.id] ~= nil then
 		options[defName .. "_fire_at_radar"] = {
 			name = "  Fire at radar",
 			desc = "Check box to make these units fire at radar. All other units fire at radar but these have the option not to.",
 			type = 'bool',
-			value = true,
+			value = dontFireAtRadarUnits[ud.id],
 			path = path,
 			noHotkey = true,
 		}

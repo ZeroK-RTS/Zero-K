@@ -16,6 +16,7 @@ unitDef = {
   customParams        = {
 	shield_emit_height = 25,
 	shield_color_mult = 1.35,
+	dontfireatradarcommand = '1',
   },
 
   explodeAs           = [[BIG_UNITEX]],

@@ -22,7 +22,7 @@ unitDef = {
 
   customParams           = {
 	modelradius    = [[15]],
-	dontfireatradarcommand = '1',
+	dontfireatradarcommand = '0',
   },
 
   decloakOnFire          = false,
