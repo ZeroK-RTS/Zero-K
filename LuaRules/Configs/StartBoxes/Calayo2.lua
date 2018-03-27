@@ -48,7 +48,7 @@ return {
 		nameLong = "Southwest",
 		nameShort = "SW",
 		startpoints = {
-			{1843,3891},
+			{205,3891},
 		},
 		boxes = {
 			{
