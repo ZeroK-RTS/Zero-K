@@ -64,10 +64,9 @@ end
 
 local function GetZenithTooltip (unitID)
 	local meteorsControlled = Spring.GetUnitRulesParam(unitID, "meteorsControlled")
-	if not meteorsControlled then return end
-
-	local name_override = ud.customParams.statsname or ud.name
-	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
+	if not meteorsControlled then
+		return
+	end
 	
 	return (WG.Translate("units", "zenith.description") or "Meteor Controller") .. " - " .. (WG.Translate("interface", "meteors_controlled") or "Meteors controlled") .. " " .. (meteorsControlled or "0") .. "/500"
 end
