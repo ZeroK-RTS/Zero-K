@@ -323,7 +323,6 @@ local structureConfig = {
 
 		unitDef.customparams.evacuation_speed = "2" -- 5 minutes
 
-		unitDef.customparams.pw_replaces = "pw_wormhole"
 		unitDef.customparams.soundselect = "shield_select"
 
 		unitDef.collisionvolumescales = [[70 60 70]]

@@ -54,7 +54,7 @@ local TELEPORT_FRAMES = 30*60 -- 1 minute
 local TELEPORT_CHARGE_PERIOD = 30 -- Frames
 local TELEPORT_CHARGE_RATE = TELEPORT_CHARGE_PERIOD/30 -- per update
 local BATTLE_TIME_LIMIT = 30*60*60*2 -- Defenders win after 2 hours
-local teleportChargeNeededMult = 1
+local teleportChargeNeededMult = false
 
 local STRUCTURE_SPACING = 192
 
@@ -98,7 +98,7 @@ local planetwarsStructureCount = 0 -- For GameRulesParams structure list
 local destroyedStructureCount = 0
 local evacStructureCount = 0
 
-local wormholeUnitID
+local wormholeList = {}
 local planetwarsBoxes = {}
 
 local vector = Spring.Utilities.Vector
@@ -195,10 +195,16 @@ local function CheckSetWormhole(unitID)
 	if not chargeMult then
 		return
 	end
-	wormholeUnitID = unitID
-	teleportChargeNeededMult = chargeMult
-	
-	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
+	if chargeMult > (teleportChargeNeededMult or 0) then
+		if wormholeList[1] then
+			wormholeList[#wormholeList + 1] = wormholeList[1]
+		end
+		wormholeList[1] = unitID
+		teleportChargeNeededMult = chargeMult
+		Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
+	else
+		wormholeList[#wormholeList + 1] = unitID
+	end
 end
 
 local function CancelTeleport()
@@ -211,28 +217,49 @@ local function CancelTeleport()
 end
 
 local function CheckRemoveWormhole(unitID, unitDefID)
-	if wormholeUnitID ~= unitID then
+	if not wormholeDefs[unitDefID] then
 		return
 	end
-	if teleportingUnit == wormholeUnitID then
-		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NO_WORMHOLE)
-	else
-		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.WORMHOLE_DESTROYED)
+	
+	if wormholeList[1] ~= unitID then
+		for i = 2, #wormholeList do
+			if unitID == wormholeList[i] then
+				wormholeList[i] = wormholeList[#wormholeList]
+				wormholeList[#wormholeList] = nil
+				return
+			end
+		end
+		Spring.Echo("PlanetWars error: wormhole not found", i)
+		return
 	end
-	RemoveEvacCommands()
-	wormholeUnitID = nil
+	
 	if teleportingUnit then
 		CancelTeleport()
+	end
+	
+	if #wormholeList == 1 then
+		RemoveEvacCommands()
+		wormholeList[1] = nil
+		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NO_WORMHOLE)
+		return
+	end
+	
+	local survivingWormholes = Spring.Utilities.CopyTable(wormholeList)
+	teleportChargeNeededMult = false
+	wormholeList = {}
+	
+	for i = 2, #survivingWormholes do
+		CheckSetWormhole(survivingWormholes[i])
 	end
 end
 
 local function TeleportChargeTick()
-	if not wormholeUnitID then
+	if not wormholeList[1] then
 		return
 	end
-	local stunnedOrInbuild = Spring.GetUnitIsStunned(wormholeUnitID)
-	local allyTeamID = Spring.GetUnitAllyTeam(wormholeUnitID)
-	local chargeFactor = ((stunnedOrInbuild or (allyTeamID ~= DEFENDER_ALLYTEAM)) and 0) or Spring.GetUnitRulesParam(wormholeUnitID, "totalReloadSpeedChange") or 1
+	local stunnedOrInbuild = Spring.GetUnitIsStunned(wormholeList[1])
+	local allyTeamID = Spring.GetUnitAllyTeam(wormholeList[1])
+	local chargeFactor = ((stunnedOrInbuild or (allyTeamID ~= DEFENDER_ALLYTEAM)) and 0) or Spring.GetUnitRulesParam(wormholeList[1], "totalReloadSpeedChange") or 1
 	
 	if teleportingUnit then
 		if chargeFactor == 0 then
@@ -684,7 +711,7 @@ function gadget:GamePreload()
 	SetTeleportCharge(0)
 	
 	if haveEvacuable then
-		if wormholeUnitID then
+		if wormholeList[1] then
 			Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.ACTIVE)
 		else
 			Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NO_WORMHOLE)
