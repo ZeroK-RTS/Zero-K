@@ -885,8 +885,9 @@ end
 --------------------------------------------------------------------------------
 -- Unit tooltip window components
 
-local function GetBarWithImage(parentControl, initY, imageFile, color, colorFunc)
+local function GetBarWithImage(parentControl, name, initY, imageFile, color, colorFunc)
 	local image = Chili.Image:New{
+		name = name .. "_image",
 		x = 0,
 		y = initY,
 		width = ICON_SIZE,
@@ -896,6 +897,7 @@ local function GetBarWithImage(parentControl, initY, imageFile, color, colorFunc
 	}
 	
 	local bar = Chili.Progressbar:New {
+		name = name .. "_bar",
 		x = ICON_SIZE + 1,
 		y = initY,
 		right = 0,
@@ -917,8 +919,8 @@ local function GetBarWithImage(parentControl, initY, imageFile, color, colorFunc
 			return
 		end
 		if yPos then
-			image:SetPos(nil, yPos)
-			bar:SetPos(nil, yPos)
+			image:SetPos(nil, yPos, nil, nil, nil, true)
+			bar:SetPos(nil, yPos, nil, nil, nil, true)
 		end
 		if not newCaption then
 			newCaption = Format(currentValue) .. ' / ' .. Format(maxValue)
@@ -937,11 +939,12 @@ local function GetBarWithImage(parentControl, initY, imageFile, color, colorFunc
 	return UpdateBar
 end
 
-local function GetImageWithText(parentControl, initY, imageFile, caption, fontSize, iconSize, textOffset)
+local function GetImageWithText(parentControl, name, initY, imageFile, caption, fontSize, iconSize, textOffset)
 	fontSize = fontSize or IMAGE_FONT
 	iconSize = iconSize or ICON_SIZE
 	
 	local image = Chili.Image:New{
+		name = name .. "_image",
 		x = 0,
 		y = initY,
 		width = iconSize,
@@ -950,6 +953,7 @@ local function GetImageWithText(parentControl, initY, imageFile, caption, fontSi
 		parent = parentControl,
 	}
 	local label = Chili.Label:New{
+		name = name .. "_label",
 		x = iconSize + 2,
 		y = initY + (textOffset or 0),
 		right = 0,
@@ -968,8 +972,8 @@ local function GetImageWithText(parentControl, initY, imageFile, caption, fontSi
 			return
 		end
 		if yPos then
-			image:SetPos(nil, yPos)
-			label:SetPos(nil, yPos + textOffset)
+			image:SetPos(nil, yPos, nil, nil, nil, true)
+			label:SetPos(nil, yPos + textOffset, nil, nil, nil, true)
 		end
 		label:SetCaption(newCaption)
 		if newImage ~= imageFile then
@@ -1251,6 +1255,7 @@ end
 local function GetSelectionStatsDisplay(parentControl)
 
 	local holder = Chili.Control:New{
+		name = "holder",
 		y = 0,
 		right = 0,
 		bottom = 0,
@@ -1264,6 +1269,7 @@ local function GetSelectionStatsDisplay(parentControl)
 	local visible = true
 	
 	local statLabel = Chili.Label:New{
+		name = "statLabel",
 		x = 0,
 		y = 3,
 		right = 0,
@@ -1572,6 +1578,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local selectedUnitID
 	
 	local leftPanel = Chili.Control:New{
+		name = "leftPanel",
 		x = 0,
 		y = 0,
 		width = LEFT_WIDTH,
@@ -1581,6 +1588,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		parent = parentControl,
 	}
 	local rightPanel = Chili.Control:New{
+		name = "rightPanel",
 		x = LEFT_WIDTH,
 		y = 0,
 		width = RIGHT_WIDTH,
@@ -1592,6 +1600,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	
 	local reloadBar
 	local unitImage = Chili.Image:New{
+		name = "unitImage",
 		x = 0,
 		y = 0,
 		right = 0,
@@ -1610,9 +1619,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 	end
 	
-	local unitNameUpdate = GetImageWithText(rightPanel, 1, nil, nil, NAME_FONT, nil, 3)
+	local unitNameUpdate = GetImageWithText(rightPanel, "unitNameUpdate", 1, nil, nil, NAME_FONT, nil, 3)
 	
 	local unitDesc = Chili.TextBox:New{
+		name = "unitDesc",
 		x = 4,
 		y = 25,
 		right = 0,
@@ -1621,12 +1631,12 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		parent = rightPanel,
 	}
 	
-	local costInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 4, IMAGE.COST, nil, nil, ICON_SIZE, 5)
-	local metalInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.METAL, nil, nil, ICON_SIZE, 5)
-	local energyInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 2*LEFT_SPACE + 4, IMAGE.ENERGY, nil, nil, ICON_SIZE, 5)
-	local maxHealthLabel = GetImageWithText(rightPanel, PIC_HEIGHT + 4, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 3)
+	local costInfoUpdate = GetImageWithText(leftPanel, "costInfoUpdate", PIC_HEIGHT + 4, IMAGE.COST, nil, nil, ICON_SIZE, 5)
+	local metalInfoUpdate = GetImageWithText(leftPanel, "metalInfoUpdate", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.METAL, nil, nil, ICON_SIZE, 5)
+	local energyInfoUpdate = GetImageWithText(leftPanel, "energyInfoUpdate", PIC_HEIGHT + 2*LEFT_SPACE + 4, IMAGE.ENERGY, nil, nil, ICON_SIZE, 5)
+	local maxHealthLabel = GetImageWithText(rightPanel, "maxHealthLabel", PIC_HEIGHT + 4, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 3)
 	
-	local healthBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, IMAGE.HEALTH, {0, 1, 0, 1}, GetHealthColor)
+	local healthBarUpdate = GetBarWithImage(rightPanel, "healthBarUpdate", PIC_HEIGHT + 4, IMAGE.HEALTH, {0, 1, 0, 1}, GetHealthColor)
 	
 	local metalInfo
 	local energyInfo
@@ -1643,6 +1653,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			parent = rightPanel,
 		}
 		spaceClickLabel = Chili.Label:New{
+			name = "spaceClickLabel",
 			x = 4,
 			y = PIC_HEIGHT + 55,
 			right = 0,
@@ -1652,10 +1663,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			parent = rightPanel,
 		}
 		morphInfo = GetMorphInfo(rightPanel, PIC_HEIGHT + LEFT_SPACE + 3)
-		timeInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.TIME, nil, nil, ICON_SIZE, 5)
+		timeInfoUpdate = GetImageWithText(leftPanel, "timeInfoUpdate", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.TIME, nil, nil, ICON_SIZE, 5)
 	else
-		shieldBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 4, IMAGE.SHIELD, {0.3,0,0.9,1})
-		buildBarUpdate = GetBarWithImage(rightPanel, PIC_HEIGHT + 58, IMAGE.BUILD, {0.8,0.8,0.2,1})
+		shieldBarUpdate = GetBarWithImage(rightPanel, "shieldBarUpdate", PIC_HEIGHT + 4, IMAGE.SHIELD, {0.3,0,0.9,1})
+		buildBarUpdate = GetBarWithImage(rightPanel, "buildBarUpdate", PIC_HEIGHT + 58, IMAGE.BUILD, {0.8,0.8,0.2,1})
 	end
 
 	local prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID, prevVisible, prevMorphTime, prevMorphCost, prevMousePlace
@@ -2029,7 +2040,7 @@ local function GetTooltipWindow()
 			end
 		end
 		
-		window:SetPos(x, y)
+		window:SetPos(x, y, nil, nil, nil, true)
 		window:BringToFront()
 	end
 	
@@ -2247,6 +2258,7 @@ local function GetSelectionWindow()
 	holderWindow:SendToBack()
 	
 	local mainPanel = Chili.Panel:New{
+		name = "mainPanel",
 		classname = options.fancySkinning.value,
 		x = 0,
 		y = 0,
