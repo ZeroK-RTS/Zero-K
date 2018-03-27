@@ -26,8 +26,8 @@ unitDef = {
 
   explodeAs           = [[SMALL_UNITEX]],
   floater             = true,
-  footprintX          = 2,
-  footprintZ          = 2,
+  footprintX          = 3,
+  footprintZ          = 3,
   iconType            = [[shiptorpraider]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
