@@ -1625,18 +1625,6 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
--- External functions
-
-local externalFunctions = {}
-
-function externalFunctions.SetSpecSpaceVisible(newVisible)
-	if mainBackground then
-		mainBackground.UpdateSpecSpace(newVisible)
-	end
-end
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
 -- Callins
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
@@ -1791,6 +1779,26 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
 		end
 	end
 end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- External functions
+
+local externalFunctions = {}
+
+function externalFunctions.SetSpecSpaceVisible(newVisible)
+	if mainBackground then
+		mainBackground.UpdateSpecSpace(newVisible)
+	end
+end
+
+function externalFunctions.ForceUpdate()
+	buttonList.UpdateButtons(timer)
+	timer = 0
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
 function widget:Shutdown()
 	if mainWindow then

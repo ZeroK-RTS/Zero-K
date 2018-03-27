@@ -1458,6 +1458,9 @@ local function ProcessAllCommands(commands, customCommands)
 					data.queue.ClearFactory()
 				else
 					data.queue.UpdateFactory(factoryUnitID, factoryUnitID, selectionIndex)
+					if WG.CoreSelector then
+						WG.CoreSelector.ForceUpdate()
+					end
 				end
 			end
 		end
@@ -1867,6 +1870,9 @@ function widget:GameFrame(n)
 		local unitsFactoryPanel = commandPanelMap.units_factory
 		if unitsFactoryPanel and unitsFactoryPanel.tabButton.IsTabSelected() then
 			unitsFactoryPanel.queue.UpdateBuildProgress()
+			if WG.CoreSelector then
+				WG.CoreSelector.ForceUpdate()
+			end
 		end
 	end
 end
