@@ -674,7 +674,7 @@ local function GetBackground(parent)
 			mainWindow:Invalidate()
 		end
 	end
-		
+	
 	function externalFunctions.UpdateSpecSpace(newSpecShow)
 		if newSpecShow == specShow then
 			return
@@ -683,6 +683,10 @@ local function GetBackground(parent)
 		if specShowMode then
 			externalFunctions.SetVisible(specShow)
 		end
+	end
+	
+	function externalFunctions.GetSpecMode()
+		return specShowMode
 	end
 	
 	return externalFunctions
@@ -1669,8 +1673,8 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
-  widget:UnitCreated(unitID, unitDefID, unitTeam)
-  widget:UnitFinished(unitID, unitDefID, unitTeam)  
+	widget:UnitCreated(unitID, unitDefID, unitTeam)
+	widget:UnitFinished(unitID, unitDefID, unitTeam)  
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
@@ -1694,7 +1698,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
-  widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
@@ -1742,6 +1746,10 @@ end
 
 local timer = 0
 function widget:Update(dt)
+	if mainBackground and mainBackground.GetSpecMode() then
+		return
+	end
+	
 	if oldButtonList then
 		oldButtonList.Destroy()
 		buttonList.SetImagesVisible(true)
@@ -1789,6 +1797,9 @@ function externalFunctions.SetSpecSpaceVisible(newVisible)
 end
 
 function externalFunctions.ForceUpdate()
+	if mainBackground and mainBackground.GetSpecMode() then
+		return
+	end
 	buttonList.UpdateButtons(timer)
 	timer = 0
 end
