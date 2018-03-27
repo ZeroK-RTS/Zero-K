@@ -383,23 +383,29 @@ local function UpdatePlayerInfo()
 				cpuUsage = cpuUsage or 0
 				local min_pingTime = math.min(pingTime, 1)
 				local min_cpuUsage = math.min(cpuUsage, 1)
-				local cpuCol = pingCpuColors[ math.ceil( min_cpuUsage * 5 ) ] 
-				local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
+				local cpuColIndex = math.ceil( min_cpuUsage * 5 )
+				local pingColIndex = math.ceil( min_pingTime * 5 )
 				local pingTime_readable = PingTimeOut(pingTime)
-				
 				local blank = not active
 				
 				local cpuImg = entities[i].cpuImg
 				if cpuImg then
-					cpuImg.color = cpuCol
 					cpuImg.tooltip = (blank and nil or 'CPU: ' .. math.round(cpuUsage*100) .. '%')
-					cpuImg:Invalidate()
+					if cpuColIndex ~= entities[i].cpuIndexOld then
+						entities[i].cpuIndexOld = cpuColIndex
+						cpuImg.color = pingCpuColors[cpuColIndex]
+						cpuImg:Invalidate()
+					end
 				end
+				
 				local pingImg = entities[i].pingImg
 				if pingImg then
-					pingImg.color = pingCol
 					pingImg.tooltip = (blank and nil or 'Ping: ' .. pingTime_readable)
-					pingImg:Invalidate()
+					if pingColIndex ~= entities[i].pingIndexOld then
+						entities[i].pingIndexOld = pingColIndex
+						pingImg.color = pingCpuColors[pingColIndex]
+						pingImg:Invalidate()
+					end
 				end
 			end
 
