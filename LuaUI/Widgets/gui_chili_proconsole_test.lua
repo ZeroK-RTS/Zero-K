@@ -868,7 +868,12 @@ local function AddMessage(msg, target, remake)
 		size = options.text_height_chat.value
 		stack = stack_backchat
 		lastMsg = lastMsgBackChat
-	end	
+	end
+	
+	if not stack then
+		-- stack_console may not yet be created.
+		return
+	end
 	
 	--if msg.highlight and options.highlighted_text_height.value
 	
@@ -1077,12 +1082,14 @@ local function setup()
 end
 
 local function removeToMaxLines()
-	while #stack_console.children > options.max_lines.value do
-		-- stack:RemoveChild(stack.children[1]) --disconnect children
-		if stack_console.children[1] then
-			stack_console.children[1]:Dispose() --dispose/disconnect children (safer)
+	if stack_console then
+		while #stack_console.children > options.max_lines.value do
+			-- stack:RemoveChild(stack.children[1]) --disconnect children
+			if stack_console.children[1] then
+				stack_console.children[1]:Dispose() --dispose/disconnect children (safer)
+			end
+			--stack:UpdateLayout()
 		end
-		--stack:UpdateLayout()
 	end
 	while #stack_backchat.children > options.max_lines.value do
 		-- stack:RemoveChild(stack.children[1]) --disconnect children
@@ -1097,8 +1104,10 @@ end
 function RemakeConsole()
 	setup()
 	-- stack_console:ClearChildren() --disconnect from all children
-	for i=1, #stack_console.children do
-		stack_console.children[1]:Dispose() --dispose/disconnect all children (safer)
+	if stack_console then
+		for i=1, #stack_console.children do
+			stack_console.children[1]:Dispose() --dispose/disconnect all children (safer)
+		end
 	end
 	
 	for i=1, #stack_backchat.children do
@@ -1157,7 +1166,7 @@ local function MakeMessageStack(margin)
 	}
 end
 
-local function MakeMessageWindow(name, enabled)
+local function MakeMessageWindow(name, enabled, ParentFunc)
 
 	local x,y,bottom,width,height
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
@@ -1180,6 +1189,10 @@ local function MakeMessageWindow(name, enabled)
 		if maxWidth < width then
 			y = 50 -- resource bar height
 		end
+	end
+	
+	if enabled and ParentFunc then
+		ParentFunc()
 	end
 	
 	return WG.Chili.Window:New{
@@ -1211,6 +1224,9 @@ local function MakeMessageWindow(name, enabled)
 				WG.crude.ShowMenu() --make epic Chili menu appear.
 				return true
 			end
+		},
+		OnParent = ParentFunc and {
+			ParentFunc
 		},
 	}
 end
@@ -1504,6 +1520,20 @@ end
 
 -----------------------------------------------------------------------
 
+local function InitializeConsole()
+	if stack_console then
+		return
+	end
+	stack_console = MakeMessageStack(1)
+	scrollpanel_console:AddChild(stack_console)
+
+	for i = 1, #consoleMessages do 
+		local msg = consoleMessages[i]
+		AddMessage(msg, 'console', true )
+	end
+	removeToMaxLines()
+end
+
 function widget:Initialize()
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget()
@@ -1521,8 +1551,6 @@ function widget:Initialize()
 	color2incolor = WG.Chili.color2incolor
 	
 	Spring.SendCommands("bind Any+enter  chat")
-	
-	stack_console = MakeMessageStack(1)
 	
 	stack_chat = MakeMessageStack(0)
 	
@@ -1616,7 +1644,6 @@ function widget:Initialize()
 		
 		--ignoreMouseWheel = not options.mousewheel.value,
 		children = {
-			stack_console,
 		},
 	}
 	
@@ -1627,7 +1654,7 @@ function widget:Initialize()
 		window_chat:AddChild(inputspace)
 	end
 	
-	window_console = MakeMessageWindow("ProConsole", options.enableConsole.value)
+	window_console = MakeMessageWindow("ProConsole", options.enableConsole.value, InitializeConsole)
 	window_console:AddChild(scrollpanel_console)
 	
 	RemakeConsole()

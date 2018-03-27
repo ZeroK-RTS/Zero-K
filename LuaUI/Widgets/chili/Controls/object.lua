@@ -30,6 +30,11 @@ Object = {
   OnKeyPress      = {},
   OnTextInput     = {},
   OnFocusUpdate   = {},
+  OnHide          = {},
+  OnShow          = {},
+  OnOrphan        = {},
+  OnParent        = {},
+  OnParentPost    = {}, -- Called after parent is set
 
   disableChildrenHitTest = false, --// if set childrens are not clickable/draggable etc - their mouse events are not processed
 }
@@ -207,8 +212,11 @@ function Object:SetParent(obj)
 
   if (typ ~= "table") then
     self.parent = nil
+    self:CallListeners(self.OnOrphan, self)
     return
   end
+  
+  self:CallListeners(self.OnParent, self)
   
   -- Children always appear to visible when they recieve new parents because they
   -- are added to the visible child list.
@@ -218,6 +226,8 @@ function Object:SetParent(obj)
   self.parent = MakeWeakLink(obj, self.parent)
 
   self:Invalidate()
+
+  self:CallListeners(self.OnParentPost, self)
 end
 
 
@@ -434,12 +444,20 @@ end
 
 
 function Object:Hide()
+  local wasHidden = self.hidden
   self:SetVisibility(false)
+  if not wasHidden then
+    self:CallListeners(self.OnHide, self)
+  end
 end
 
 
 function Object:Show()
+  local wasVisible = not self.hidden
   self:SetVisibility(true)
+  if not wasVisible then
+    self:CallListeners(self.OnShow, self)
+  end
 end
 
 
