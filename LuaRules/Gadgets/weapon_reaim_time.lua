@@ -55,12 +55,41 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Debug
+
+local function ToggleReaimTime(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then 
+		return
+	end
+	
+	if words[1] then
+		useRapidReaim = (tonumber(words[1]) == 1)
+	else
+		useRapidReaim = not useRapidReaim
+	end
+	
+	Spring.Echo("Rapid reaim " .. ((useRapidReaim and "enabled.") or "disabled."))
+	local units = Spring.GetAllUnits()
+	for i = 1, #units do
+		local unitDefID = Spring.GetUnitDefID(units[i])
+		UpdateRapidReaim(units[i], unitDefID)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Init
+
 function gadget:Initialize()
 	local units = Spring.GetAllUnits()
 	for i = 1, #units do
 		local unitDefID = Spring.GetUnitDefID(units[i])
 		UpdateRapidReaim(units[i], unitDefID)
 	end
+	
+	gadgetHandler:AddChatAction("debugreaim", ToggleReaimTime, "Debugs reaim time.")
 end
 
 --function gadget:GameFrame(n)
