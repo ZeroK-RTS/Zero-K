@@ -18,7 +18,6 @@ unitDef = {
 
   customParams           = {
 	modelradius    = [[10]],
-	stats_show_death_explosion = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
