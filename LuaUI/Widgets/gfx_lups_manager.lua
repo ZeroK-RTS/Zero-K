@@ -56,26 +56,6 @@ include("Configs/lupsUnitFXs.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function blendColor(c1,c2,mix)
-  if (mix>1) then mix=1 end
-  local mixInv = 1-mix
-  return {
-    c1[1]*mixInv + c2[1]*mix,
-    c1[2]*mixInv + c2[2]*mix,
-    c1[3]*mixInv + c2[3]*mix,
-    (c1[4] or 1)*mixInv + (c2[4] or 1)*mix
-  }
-end
-
-
-local function blend(a,b,mix)
-  if (mix>1) then mix=1 end
-  return a*(1-mix) + b*mix
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 local UnitEffects = {}
 local registeredUnits = {}	-- all finished units - prevents partial unbuild then rebuild from being treated as two UnitFinished events
 
@@ -289,29 +269,7 @@ end
 local color1 = {0,0,0}
 local color2 = {1,0.5,0}
 
-local function GameFrame(_,n)
-  if (((n+3)%10)<1 and (next(staticmexes))) then
-    --//Update Overdrive Fx
-    for unitID,strength in pairs(staticmexes) do
-      local cur_strength = spGetUnitRulesParam(unitID,"overdrive") or 1
-      cur_strength = math.min(4, cur_strength)
-      local diff         = abs(cur_strength - strength)
-      if (diff>0.01) then
-        cur_strength = 0.3*cur_strength + 0.7*strength
-
-        local a = min(1,max(0,(cur_strength-1)*0.35));
-        ClearFxs(unitID)
-        staticmexFX.unit     = unitID
-        staticmexFX.colormap = {blendColor(staticmexFX.color1,staticmexFX.color2, a)}
-
-        staticmexFX.size     = blend(staticmexFX.size1,staticmexFX.size2, a)
-        AddFxs( unitID, LupsAddFX("StaticParticles",staticmexFX) )
-        staticmexes[unitID]  = cur_strength
-      end
-    end
-    staticmexFX.colormap = {staticmexFX.color1}
-    staticmexFX.size   = staticmexFX.size1
-  end
+local function GameFrame()
 end
 
 --------------------------------------------------------------------------------
@@ -388,7 +346,7 @@ function widget:Update()
     local allPlayers = Spring.GetPlayerList()
     for i=1,#allPlayers do
       local playerName = Spring.GetPlayerInfo(allPlayers[i])
-      if (playerName == "[LCC]jK") then
+      if (playerName == "[LCC]jK" or playerName == "GoogleFrog") then
         local errorLog = Lups.GetErrorLog(1)
         if (errorLog~="") then
           local cmds = {

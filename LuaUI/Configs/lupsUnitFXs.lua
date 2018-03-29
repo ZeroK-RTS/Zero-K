@@ -127,6 +127,11 @@ effectUnitDefs = {
   },
 
   --// PYLONS // ----------------------------------
+  staticmex = {
+    {class='OverdriveParticles', options=staticmexGlow},
+  },
+  
+  --// PYLONS // ----------------------------------
   mexpylon = {
     {class='GroundFlash', options=groundFlashCorestor},
   },
