@@ -1212,6 +1212,7 @@ end
 
 
 function gadgetHandler:AllowUnitCloak(unitID, enemyID)
+  -- The case can be that unitID == enemyID. This is for engine stunned unitID, they are their own enemies.
   for _,g in ipairs(self.AllowUnitCloakList) do
     if (not g:AllowUnitCloak(unitID, enemyID)) then
       return false
