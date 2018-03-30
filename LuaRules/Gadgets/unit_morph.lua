@@ -174,8 +174,7 @@ local function GetMorphToolTip(unitID, unitDefID, teamID, morphDef)
 end
 
 local function AddMorphCmdDesc(unitID, unitDefID, teamID, morphDef, teamTech)
-	
-	if GG.Unlocks and not GG.Unlocks.GetIsUnitUnlocked(teamID, morphDef) then
+	if GG.Unlocks and not GG.Unlocks.GetIsUnitUnlocked(teamID, morphDef.into) then
 		return
 	end
 	
