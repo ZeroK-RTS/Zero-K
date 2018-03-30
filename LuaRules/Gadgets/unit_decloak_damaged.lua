@@ -199,6 +199,11 @@ end
 -- Only called with enemyID if an enemy is within decloak radius.
 function gadget:AllowUnitCloak(unitID, enemyID)
 	if enemyID then
+		local transID = Spring.GetUnitTransporter(unitID)
+		if transID then
+			-- For some reason enemyID indicates that the unit is being transported.
+			return Spring.GetUnitIsCloaked(transID)
+		end
 		return false
 	end
 	
