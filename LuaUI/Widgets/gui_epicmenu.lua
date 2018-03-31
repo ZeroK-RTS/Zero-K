@@ -591,13 +591,11 @@ local function KillSubWindow(makingNew)
 		window_sub_cur = nil
 		curPath = ''
 		if not makingNew and AllowPauseOnMenuChange() then
-			local paused = select(3, Spring.GetGameSpeed())
-			if paused then
-				spSendCommands("pause")
-			end
+			spSendCommands("pause 0")
 		end
 	end
 end
+WG.crude.KillSubWindow = KillSubWindow
 
 -- Update colors for labels of widget checkboxes in widgetlist window
 local function checkWidget(widget)
@@ -2101,7 +2099,13 @@ local function LeaveExitConfirmWindow()
 	KillSubWindow(true)
 end
 
-local function MakeExitConfirmWindow(text, action, height)
+local function UnpauseFromExitConfirmWindow()
+	if AllowPauseOnMenuChange() then
+		spSendCommands("pause 0")
+	end
+end
+
+local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpauseOnNo)
 	local screen_width, screen_height = Spring.GetWindowGeometry()
 	local menu_width = 320
 	local menu_height = height or 64
@@ -2138,7 +2142,10 @@ local function MakeExitConfirmWindow(text, action, height)
 		OnClick = {
 			function()
 				action()
-				DisposeExitConfirmWindow()
+				LeaveExitConfirmWindow()
+				if unpauseOnYes then
+					UnpauseFromExitConfirmWindow()
+				end
 			end
 		},
 		height = 32,
@@ -2153,6 +2160,9 @@ local function MakeExitConfirmWindow(text, action, height)
 		OnClick = {
 			function()
 				LeaveExitConfirmWindow()
+				if unpauseOnNo then
+					UnpauseFromExitConfirmWindow()
+				end
 			end
 		},
 		height = 32,
@@ -2640,7 +2650,7 @@ local function MakeQuitButtons()
 								spSendCommands{"spectator"}
 							end
 						end
-					end)
+					end, nil, true, true)
 				end
 			end,
 		key = 'Resign',
@@ -2660,7 +2670,7 @@ local function MakeQuitButtons()
 					if myPing and myPing < 40 then
 						MakeExitConfirmWindow("Are you sure you want to restart?", function() 
 							Spring.SendLuaMenuMsg("restartGame")
-						end)
+						end, nil, false, true)
 					end
 				end
 			end,
@@ -2690,7 +2700,7 @@ local function MakeQuitButtons()
 				else
 					spSendCommands{"quit", "quitforce"} 
 				end
-			end)
+			end, nil, false, true)
 		end,
 		key = 'Exit to Desktop',
 	})

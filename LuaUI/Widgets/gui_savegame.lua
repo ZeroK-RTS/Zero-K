@@ -288,7 +288,7 @@ local function SaveLoadConfirmationDialogPopup(filename, saveMode, description)
 				LoadGameByFilename(filename)
 			end
 		end
-	WG.crude.MakeExitConfirmWindow(text, yesFunc, 78)
+	WG.crude.MakeExitConfirmWindow(text, yesFunc, 78, true, false)
 end
 
 local function PromptSave(filename, description)
@@ -300,6 +300,18 @@ local function PromptSave(filename, description)
 		SaveLoadConfirmationDialogPopup(filename, true)
 	else
 		SaveGame(filename, description)
+		WG.crude.KillSubWindow(false)
+	end
+end
+
+local function GetButtonYPos(index)
+	return (index - 1)*SAVEGAME_BUTTON_HEIGHT + 4
+end
+
+local function UpdateSaveButtonPositions(container) 
+	for i = 1, #container.children do
+		local child = container.children[i]
+		child:SetPos(child.x, GetButtonYPos(#container.children - i + 1))	-- assume reverse order, to match the ordering of the original save buttons
 	end
 end
 
@@ -311,7 +323,7 @@ local function AddSaveEntryButton(parent, saveFile, position, saveMode)
 		name = "save_" .. saveFile.filename,
 		height = SAVEGAME_BUTTON_HEIGHT,
 		width = "100%",
-		y = (position - 1)*SAVEGAME_BUTTON_HEIGHT + 4,
+		y =  GetButtonYPos(position),
 		x = 0,
 		parent = parent,
 	}
@@ -369,7 +381,8 @@ local function AddSaveEntryButton(parent, saveFile, position, saveMode)
 				WG.crude.MakeExitConfirmWindow("Are you sure you want to delete this save?", function() 
 					DeleteSave(saveFile.filename)
 					holder:Dispose()
-				end, 78)
+					UpdateSaveButtonPositions(parent)
+				end, 78, false, false)
 			end
 		}
 	}
