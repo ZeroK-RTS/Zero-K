@@ -73,14 +73,14 @@ local unitsCount = 0
 
 function gadget:GameFrame(n)
 	for i=unitsCount, 1,-1 do
-		-- Step backwards as a nill index will be filled by the end index
+		-- Step backwards as a nil index will be filled by the end index
 		local health,_,_,_,build = spGetUnitHealth(units[i].id)
 			
 		if health then -- check if it's a valid unit
 			if build < units[i].lastBuild then
 				spSetUnitHealth(units[i].id, health + (units[i].lastBuild - build)*units[i].maxHealth)
-				units[i].lastBuild = build
 			end
+			units[i].lastBuild = build
 		else
 			reclaimedUnit[units[i].id] = nil
 			units[i] = units[unitsCount]
