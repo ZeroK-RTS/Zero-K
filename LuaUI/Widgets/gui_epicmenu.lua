@@ -2098,7 +2098,7 @@ end
 
 local function LeaveExitConfirmWindow()
 	DisposeExitConfirmWindow()
-	KillSubWindow()
+	KillSubWindow(true)
 end
 
 local function MakeExitConfirmWindow(text, action, height)
