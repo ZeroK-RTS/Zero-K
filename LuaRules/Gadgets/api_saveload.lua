@@ -369,11 +369,15 @@ local function LoadFeatures()
 		local newID = spCreateFeature(data.featureDefName, px, py, pz, data.heading, data.allyTeam)
 		data.newID = newID
 		
-		spSetFeatureDirection(newID, unpack(data.dir))
-		-- health
-		spSetFeatureHealth(newID, data.health)
-		-- resources
-		spSetFeatureReclaim(newID, data.reclaimLeft)
+		if data.dir then
+			spSetFeatureDirection(newID, unpack(data.dir))
+		end
+		if data.health then
+			spSetFeatureHealth(newID, data.health)
+		end
+		if data.reclaimLeft then
+			spSetFeatureReclaim(newID, data.reclaimLeft)
+		end
 	end
 end
 
