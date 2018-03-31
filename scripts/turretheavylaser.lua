@@ -6,7 +6,7 @@ include "aimPosTerraform.lua"
 -- Model Pieces
 
 local basebottom, basemid, basetop, holder, housing, spindle, aim = piece('basebottom', 'basemid', 'basetop', 'holder', 'housing', 'spindle', 'aim')
-local flare = piece('flare1')
+local flares = {piece('flare1', 'flare2', 'flare3')}
 
 local smokePiece = {basebottom, basemid, basetop}
 
@@ -19,7 +19,7 @@ local HOUSING_TURN_SPEED = rad(200)
 local SPINDLE_TURN_SPEED = rad(120 / 0.8)
 
 local firing = false
-local index = 1
+local index = 2
 
 local stuns = {false, false, false}
 local disarmed = false
@@ -59,7 +59,7 @@ end
 ----------------------------------------------------------------------------------------------
 -- Weapon Animations
 
-function script.QueryWeapon(num) return flare end
+function script.QueryWeapon(num) return flares[index] end
 function script.AimFromWeapon(num) return holder end
 
 local function StunThread ()
@@ -106,11 +106,15 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
+	index = index - 1
+	if index == 0 then
+		index = #flares
+	end
 	firing = true
-	EmitSfx(flare, UNIT_SFX2)
+	EmitSfx(flares[index], UNIT_SFX2)
+	Sleep(800)
 	local rz = select(3, GetPieceRotation(spindle))
 	Turn(spindle, z_axis, rz + rad(120),SPINDLE_TURN_SPEED)
-	Sleep(800)
 	firing = false
 end
 
