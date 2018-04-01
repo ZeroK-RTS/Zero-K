@@ -170,7 +170,7 @@ local function GetSaveDescText(saveFile)
 	return (saveFile.description or "no description")
 		.. "\n" .. saveFile.gameName .. " " .. saveFile.gameVersion
 		.. "\n" .. saveFile.map
-		.. "\n" .. (WG.Translate("interface", "time_ingame") or "Ingame time").. ": " ..  SecondsToClock(saveFile.gameframe/30)
+		.. "\n" .. (WG.Translate("interface", "time_ingame") or "Ingame time").. ": " ..  SecondsToClock(saveFile.totalGameframe/30)
 		.. "\n" .. WriteDate(saveFile.date)
 end
 
@@ -199,7 +199,7 @@ local function SaveGame(filename, description, requireOverwrite)
 			saveData.map = Game.mapName
 			saveData.gameID = (Spring.GetGameRulesParam("save_gameID") or Game.gameID)
 			saveData.gameframe = Spring.GetGameFrame()
-			saveData.totalGameframe = Spring.GetGameFrame() + (Spring.GetGameRulesParam("lastSaveGameFrame") or 0)
+			saveData.totalGameframe = Spring.GetGameFrame() + (Spring.GetGameRulesParam("totalSaveGameFrame") or 0)
 			saveData.playerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 			table.save(saveData, path)
 			

@@ -67,7 +67,7 @@ local title_text = confdata.title
 local title_image = confdata.title_image
 local subMenuIcons = confdata.subMenuIcons  
 local useUiKeys = false
-local lastSaveGameFrame
+local lastSaveGameFrame, totalSaveGameFrame
 
 --file_return = nil
 
@@ -3159,8 +3159,12 @@ function widget:GameFrame(n)
 		if not lastSaveGameFrame then
 			lastSaveGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
 		end
-		if (n + lastSaveGameFrame)%30 == 0 then
-			lbl_gtime:SetCaption(GetTimeString((n + lastSaveGameFrame)/30))
+		if not totalSaveGameFrame then
+			totalSaveGameFrame = Spring.GetGameRulesParam("totalSaveGameFrame") or 0
+		end
+		
+		if (n + totalSaveGameFrame)%30 == 0 then
+			lbl_gtime:SetCaption(GetTimeString((n + totalSaveGameFrame)/30))
 		end
 	end
 end
