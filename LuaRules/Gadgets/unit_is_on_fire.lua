@@ -198,7 +198,7 @@ function gadget:Load(zip)
 		entry.endFrame = entry.endFrame - currGameFrame
 		entry.attackerID = GG.SaveLoad.GetNewUnitID(entry.attackerID)
 		unitsOnFire[newID] = entry
-		SetUnitRulesParam(unitID, "on_fire", 1, LOS_ACCESS)
+		SetUnitRulesParam(newID, "on_fire", 1, LOS_ACCESS)
 		GG.UpdateUnitAttributes(newID)
 	end
 	_G.unitsOnFire = unitsOnFire
