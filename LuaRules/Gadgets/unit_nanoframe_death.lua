@@ -5,7 +5,7 @@
 function gadget:GetInfo()
 	return {
 		name     = "Nano Frame Death Handeling",
-		desc     = "Makes nanoframes explode if above X% completetion and makes dying nanoframes leave wrecks.",
+		desc     = "Makes nanoframes explode if above X% completion and makes dying nanoframes leave wrecks.",
 		author	 = "Google Frog",
 		date     = "Mar 29, 2009",
 		license	 = "GNU GPL, v2 or later",
