@@ -176,7 +176,7 @@ function gadget:Initialize()
 	Spring.SetGameRulesParam("unitsOnFire",1)
 	local allUnits = Spring.GetAllUnits()
 	for i=1,#allUnits do
-		local unitID = units[i]
+		local unitID = allUnits[i]
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		if y < 0 then
 			gadget:UnitEnteredWater(unitID)
