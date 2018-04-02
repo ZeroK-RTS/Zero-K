@@ -150,6 +150,9 @@ function IterableMap.New()
 	function api.GetIndexMax()
 		return indexMax
 	end
+	function api.IsEmpty()
+		return (indexMax == 0)
+	end
 	function api.GetKeyByIndex(index)
 		return keyByIndex[index]
 	end

@@ -279,11 +279,11 @@ function NanoLasers:CreateParticle()
 
   if (self.flare) then
     --[[if you add those flares, then the laser is slower as the engine, so it needs some tweaking]]--
-    if (self.flare1id and particles[self.flare1id] and particles[self.flare2id]) then
-      local flare1 = particles[self.flare1id]
+    if (self.flare1id and particles.Get(self.flare1id) and particles.Get(self.flare2id)) then
+      local flare1 = particles.Get(self.flare1id)
       flare1.size  = self.count*0.1
       flare1:ReInitialize()
-      local flare2 = particles[self.flare2id]
+      local flare2 = particles.Get(self.flare2id)
       flare2.size  = self.count*0.75
       flare2:ReInitialize()
       return

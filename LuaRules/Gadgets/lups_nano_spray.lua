@@ -336,7 +336,7 @@ function gadget:GameFrame(frame)
 							allyID       = allyID,
 							nanopiece    = nanoPieceID,
 							targetpos    = endpos,
-							count        = strength * 30,
+							count        = strength*30,
 							color        = teamColor,
 							type         = type,
 							targetradius = radius,
