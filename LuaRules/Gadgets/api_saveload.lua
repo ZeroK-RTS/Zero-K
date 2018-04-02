@@ -263,6 +263,11 @@ local function LoadUnits()
 			-- is neutral
 			spSetUnitNeutral(newID, data.neutral or false)
 			
+			-- cloaked?
+			if data.cloak then
+				Spring.SetUnitCloak(newID, data.cloak)
+			end
+			
 			--Spring.Echo("unitID check", oldID, newID)
 		end
 	end
@@ -274,6 +279,19 @@ local function LoadUnits()
 			-- rulesparams
 			for name,value in pairs(data.rulesParams) do
 				Spring.SetUnitRulesParam(newID, name, ValidateUnitRule(name, value))
+			end
+			
+			-- transport
+			if data.transporter then
+				local transporterID = GetNewUnitID(data.transporter)
+				data.transporter = transporterID
+				
+				local env = Spring.UnitScript.GetScriptEnv(transporterID)
+				if env and env.script.BeginTransport then
+					Spring.UnitScript.CallAsUnit(transporterID, env.script.BeginTransport, newID)
+				else
+					Spring.UnitAttach(data.transporter, newID, 0)	-- FIXME: no way to get the proper piece atm
+				end
 			end
 		end
 	end
@@ -565,6 +583,7 @@ function gadget:GameFrame(n)
 		end
 		cleanupFrame = nil
 		toCleanupFactory = nil
+		--Spring.SendCommands("pause 1")
 	end
 end
 
@@ -786,6 +805,10 @@ local function SaveUnits()
 			unitInfo.stockpile = {}
 			unitInfo.stockpile.num, _, unitInfo.stockpile.progress = spGetUnitStockpile(unitID)
 			
+			unitInfo.cloak = Spring.GetUnitIsCloaked(unitID)
+			
+			unitInfo.transporter = Spring.GetUnitTransporter(unitID)
+			
 			-- factory properties
 			if unitDef.isFactory then
 				local factoryCommands = Spring.GetFactoryCommands(unitID) or {}
@@ -904,7 +927,7 @@ local function SaveGeneralInfo()
 	local data = {}
 	
 	data.gameFrame = Spring.GetGameFrame()
-	data.totalGameFrame = data.gameFrame + (Spring.GetGameRulesParam("lastSaveGameFrame") or 0)
+	data.totalGameFrame = data.gameFrame + (Spring.GetGameRulesParam("totalSaveGameFrame") or 0)
 	data.save_gameID = (Spring.GetGameRulesParam("save_gameID") or Game.gameID)
 	
 	-- gameRulesParams
