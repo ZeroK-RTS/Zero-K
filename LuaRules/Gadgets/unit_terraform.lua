@@ -3829,6 +3829,18 @@ function gadget:Initialize()
 end
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Save/Load
+
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		if Spring.GetUnitDefID(unitID) == terraunitDefID then
+			spDestroyUnit(unitID)
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
 -- SYNCED
 --------------------------------------------------------------------------------
 
