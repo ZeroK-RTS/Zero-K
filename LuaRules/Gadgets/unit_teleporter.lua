@@ -167,16 +167,18 @@ function tele_undeployTeleport(unitID)
 	Spring.SetUnitRulesParam(unitID, "deploy", 0)
 end
 
-function tele_createBeacon(unitID,x,z)
+function tele_createBeacon(unitID, x, z, beaconID)
 	local y = Spring.GetGroundHeight(x,z)
 	local place, feature = Spring.TestBuildOrder(beaconDef, x, y, z, 1)
 	changeSpeed(unitID, nil, 1)
-	if place == 2 and feature == nil then
+	if beaconID or (place == 2 and feature == nil) then
 		if tele[unitID].link and Spring.ValidUnitID(tele[unitID].link) then
 			Spring.DestroyUnit(tele[unitID].link, true)
 		end
-		GG.PlayFogHiddenSound("sounds/misc/teleport2.wav", 10, x, Spring.GetGroundHeight(x,z) or 0, z)
-		local beaconID = Spring.CreateUnit(beaconDef, x, y, z, 1, Spring.GetUnitTeam(unitID))
+		if not beaconID then
+			GG.PlayFogHiddenSound("sounds/misc/teleport2.wav", 10, x, Spring.GetGroundHeight(x,z) or 0, z)
+		end
+		local beaconID = beaconID or Spring.CreateUnit(beaconDef, x, y, z, 1, Spring.GetUnitTeam(unitID))
 		if beaconID then
 			Spring.SetUnitPosition(beaconID, x, y, z)
 			Spring.SetUnitNeutral(beaconID,true)
@@ -605,6 +607,23 @@ function gadget:Initialize()
 	end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Save/Load
+
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local parentID = Spring.GetUnitRulesParam(unitID, "connectto")
+		if parentID then
+			parentID = GG.SaveLoad.GetNewUnitID(parentID)
+			if parentID then
+				local x,_,z = Spring.GetUnitPosition(unitID)
+				tele_createBeacon(parentID, x, z, unitID)
+				callScript(parentID, "DeployTeleport")
+			end
+		end
+	end
+end
 
 else
 -------------------------------------------------------------------------------------
