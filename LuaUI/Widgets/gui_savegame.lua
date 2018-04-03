@@ -111,7 +111,7 @@ local function SortSavesByFilename(a, b)
 		return false
 	end
 	if a.filename and b.filename then
-		return a.filename > b.filename
+		return a.filename < b.filename
 	end
 	return false
 end
