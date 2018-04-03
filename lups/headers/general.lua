@@ -92,5 +92,21 @@ function CreateSubTables(startTable,SubIndexes)
   return startTable
 end
 
+function BlendColor(c1,c2,mix)
+  if (mix>1) then mix=1 end
+  local mixInv = 1-mix
+  return {
+    c1[1]*mixInv + c2[1]*mix,
+    c1[2]*mixInv + c2[2]*mix,
+    c1[3]*mixInv + c2[3]*mix,
+    (c1[4] or 1)*mixInv + (c2[4] or 1)*mix
+  }
+end
+
+function Blend(a,b,mix)
+  if (mix>1) then mix=1 end
+  return a*(1-mix) + b*mix
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

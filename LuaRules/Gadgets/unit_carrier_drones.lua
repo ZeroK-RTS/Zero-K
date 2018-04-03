@@ -190,6 +190,7 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 	local droneID = CreateUnit(droneName, xS, yS, zS, 1, carrierList[unitID].teamID, droneBuiltExternally and true, false, nil, unitID)
 	if droneID then
 		Spring.SetUnitRulesParam(droneID, "parent_unit_id", unitID)
+		Spring.SetUnitRulesParam(droneID, "drone_set_index", setNum)
 		local droneSet = carrierEntry.droneSets[setNum]
 		droneSet.droneCount = droneSet.droneCount + 1
 		ChangeDroneRulesParam(unitID, 1)
@@ -849,3 +850,18 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Save/Load
+
+local function LoadDrone(unitID, parentID)
+	Spring.DestroyUnit(unitID)
+end
+
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local parentID = Spring.GetUnitRulesParam(unitID, "parent_unit_id")
+		if parentID then
+			LoadDrone(unitID, parentID)
+		end
+	end
+end
+

@@ -1,10 +1,5 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not gadgetHandler:IsSyncedCode() then
-	return
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
 		name = "Area Denial",
@@ -17,11 +12,24 @@ function gadget:GetInfo()
 	}
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local SAVE_FILE = "Gadgets/weapon_area_damage.lua"
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if gadgetHandler:IsSyncedCode() then
+--------------------------------------------------------------------------------
+-- SYNCED
+--------------------------------------------------------------------------------
+
 local frameNum
 local DAMAGE_PERIOD, weaponInfo = include("LuaRules/Configs/area_damage_defs.lua")
 
 local explosionList = {}
 local explosionCount = 0
+
+_G.explosionList = explosionList
 
 function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	local wantedWeaponList = {}
@@ -108,3 +116,35 @@ function gadget:Initialize()
 		Script.SetWatchWeapon(w, true)
 	end
 end
+
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	local savedGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame")
+	local loadData = GG.SaveLoad.ReadFile(zip, "Weapon area damage", SAVE_FILE) or {}
+	explosionList = loadData
+	for i=1,#explosionList do
+		local explo = explosionList[i]
+		explo.ownerID = GG.SaveLoad.GetNewUnitID(explo.ownerID)
+		explo.expiry = explo.expiry - savedGameFrame
+	end
+	
+	_G.explosionList = explosionList
+	explosionCount = #explosionList
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+else
+--------------------------------------------------------------------------------
+-- unsynced
+--------------------------------------------------------------------------------
+function gadget:Save(zip)
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.explosionList, "Weapon area damage"))
+end
+--------------------------------------------------------------------------------
+end
+--------------------------------------------------------------------------------

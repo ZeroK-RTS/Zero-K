@@ -74,6 +74,7 @@ local function SecondsToClock(seconds)
 			return mins..":"..secs
 		end
 	end
+	return "unknown"
 end
 
 local function DisposeWindow()
@@ -110,7 +111,7 @@ local function SortSavesByFilename(a, b)
 		return false
 	end
 	if a.filename and b.filename then
-		return a.filename > b.filename
+		return a.filename < b.filename
 	end
 	return false
 end
@@ -170,7 +171,7 @@ local function GetSaveDescText(saveFile)
 	return (saveFile.description or "no description")
 		.. "\n" .. saveFile.gameName .. " " .. saveFile.gameVersion
 		.. "\n" .. saveFile.map
-		.. "\n" .. (WG.Translate("interface", "time_ingame") or "Ingame time").. ": " ..  SecondsToClock(saveFile.gameframe/30)
+		.. "\n" .. (WG.Translate("interface", "time_ingame") or "Ingame time").. ": " ..  SecondsToClock((saveFile.totalGameframe or saveFile.gameframe or 0)/30)
 		.. "\n" .. WriteDate(saveFile.date)
 end
 
@@ -199,7 +200,7 @@ local function SaveGame(filename, description, requireOverwrite)
 			saveData.map = Game.mapName
 			saveData.gameID = (Spring.GetGameRulesParam("save_gameID") or Game.gameID)
 			saveData.gameframe = Spring.GetGameFrame()
-			saveData.totalGameframe = Spring.GetGameFrame() + (Spring.GetGameRulesParam("lastSaveGameFrame") or 0)
+			saveData.totalGameframe = Spring.GetGameFrame() + (Spring.GetGameRulesParam("totalSaveGameFrame") or 0)
 			saveData.playerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 			table.save(saveData, path)
 			
@@ -288,7 +289,7 @@ local function SaveLoadConfirmationDialogPopup(filename, saveMode, description)
 				LoadGameByFilename(filename)
 			end
 		end
-	WG.crude.MakeExitConfirmWindow(text, yesFunc, 78)
+	WG.crude.MakeExitConfirmWindow(text, yesFunc, 78, true, false)
 end
 
 local function PromptSave(filename, description)
@@ -300,6 +301,18 @@ local function PromptSave(filename, description)
 		SaveLoadConfirmationDialogPopup(filename, true)
 	else
 		SaveGame(filename, description)
+		WG.crude.KillSubWindow(false)
+	end
+end
+
+local function GetButtonYPos(index)
+	return (index - 1)*SAVEGAME_BUTTON_HEIGHT + 4
+end
+
+local function UpdateSaveButtonPositions(container) 
+	for i = 1, #container.children do
+		local child = container.children[i]
+		child:SetPos(child.x, GetButtonYPos(#container.children - i + 1))	-- assume reverse order, to match the ordering of the original save buttons
 	end
 end
 
@@ -311,7 +324,7 @@ local function AddSaveEntryButton(parent, saveFile, position, saveMode)
 		name = "save_" .. saveFile.filename,
 		height = SAVEGAME_BUTTON_HEIGHT,
 		width = "100%",
-		y = (position - 1)*SAVEGAME_BUTTON_HEIGHT + 4,
+		y =  GetButtonYPos(position),
 		x = 0,
 		parent = parent,
 	}
@@ -369,7 +382,8 @@ local function AddSaveEntryButton(parent, saveFile, position, saveMode)
 				WG.crude.MakeExitConfirmWindow("Are you sure you want to delete this save?", function() 
 					DeleteSave(saveFile.filename)
 					holder:Dispose()
-				end, 78)
+					UpdateSaveButtonPositions(parent)
+				end, 78, false, false)
 			end
 		}
 	}

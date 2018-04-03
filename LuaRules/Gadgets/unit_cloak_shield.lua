@@ -232,8 +232,7 @@ end
 
 function gadget:Initialize()
   -- get the cloakShieldDefs
-  cloakShieldDefs, uncloakableDefs =
-    include("LuaRules/Configs/cloak_shield_defs.lua")
+  cloakShieldDefs, uncloakableDefs = include("LuaRules/Configs/cloak_shield_defs.lua")
 
   if (not cloakShieldDefs) then
     gadgetHandler:RemoveGadget()
@@ -247,10 +246,7 @@ function gadget:Initialize()
   -- add the CloakShield command to existing units
   for _,unitID in ipairs(Spring.GetAllUnits()) do
     local unitDefID = GetUnitDefID(unitID)
-    local cloakShieldDef = cloakShieldDefs[unitDefID] or GG.Upgrades_UnitCloakShieldDef(unitID)
-    if (cloakShieldDef) then
-      AddCloakShieldUnit(unitID, cloakShieldDef)
-    end
+    gadget:UnitCreated(unitID, unitDefID)
   end
 end
 
@@ -265,7 +261,6 @@ function gadget:Shutdown()
     end
   end
 end
-
 
 --------------------------------------------------------------------------------
 
@@ -384,6 +379,7 @@ local function GrowRadius(cloaker)
   r = math.sqrt(r)
   r = (r >= cloaker.maxrad) and cloaker.maxrad or r
   cloaker.radius = r
+  Spring.SetUnitRulesParam(cloaker.id, "cloakerRadius", r)
 
   if (cloaker.draw) then
     SendToUnsynced(SYNCSTR, cloaker.id, r)
@@ -401,6 +397,7 @@ local function ShrinkRadius(cloaker)
   r = (r * r) - cloaker.def.shrinkRate
   r = (r < 0) and 0 or math.sqrt(r)
   cloaker.radius = r
+  Spring.SetUnitRulesParam(cloaker.id, "cloakerRadius", r)
   if (cloaker.draw) then
     SendToUnsynced(SYNCSTR, cloaker.id, r)
   end
@@ -458,6 +455,18 @@ function gadget:GameFrame(frameNum)
   end
 end
 
+function gadget:Load(zip)
+  for unitID, data in pairs(cloakers) do
+    local radius = Spring.GetUnitRulesParam(unitID, "cloakerRadius") or 0
+	if radius > 0 then
+	  data.radius = radius
+	  if (data.draw) then
+		SendToUnsynced(SYNCSTR, data.id, radius)
+	  end
+	  UpdateCloakees(data)
+	end
+  end
+end
 
 --------------------------------------------------------------------------------
 

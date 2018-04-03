@@ -353,7 +353,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_clusterbomb",
 		humanName = "Cluster Bomb",
-		description = "Cluster Bomb",
+		description = "Cluster Bomb - Manually fired burst of bombs.",
 		image = moduleImagePath .. "commweapon_clusterbomb.png",
 		limit = 1,
 		cost = 150 * COST_MULT,
@@ -374,7 +374,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_concussion",
 		humanName = "Concussion Shell",
-		description = "Concussion Shell",
+		description = "Concussion Shell - Manually fired high impulse projectile.",
 		image = moduleImagePath .. "commweapon_concussion.png",
 		limit = 1,
 		cost = 150 * COST_MULT,
@@ -395,7 +395,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_disintegrator",
 		humanName = "Disintegrator",
-		description = "Disintegrator",
+		description = "Disintegrator - Manually fired weapon that destroys almost everything it touches.",
 		image = moduleImagePath .. "commweapon_disintegrator.png",
 		limit = 1,
 		cost = 150 * COST_MULT,
@@ -416,7 +416,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_disruptorbomb",
 		humanName = "Disruptor Bomb",
-		description = "Disruptor Bomb",
+		description = "Disruptor Bomb - Manually fired bomb that slows enemies in a large area.",
 		image = moduleImagePath .. "commweapon_disruptorbomb.png",
 		limit = 1,
 		cost = 150 * COST_MULT,
@@ -437,7 +437,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_multistunner",
 		humanName = "Multistunner",
-		description = "Multistunner",
+		description = "Multistunner - Manually fired sustained burst of lightning.",
 		image = moduleImagePath .. "commweapon_multistunner.png",
 		limit = 1,
 		cost = 150 * COST_MULT,
@@ -459,7 +459,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_napalmgrenade",
 		humanName = "Hellfire Grenade",
-		description = "Hellfire Grenade",
+		description = "Hellfire Grenade - Manually fired bomb that inflames a large area.",
 		image = moduleImagePath .. "commweapon_napalmgrenade.png",
 		limit = 1,
 		cost = 150 * COST_MULT,
@@ -480,7 +480,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_slamrocket",
 		humanName = "S.L.A.M. Rocket",
-		description = "S.L.A.M. Rocket - Minature tactical nuke.",
+		description = "S.L.A.M. Rocket - Manually fired miniature tactical nuke.",
 		image = moduleImagePath .. "commweapon_slamrocket.png",
 		limit = 1,
 		cost = 150 * COST_MULT,
@@ -748,7 +748,7 @@ local moduleDefs = {
 	{
 		name = "module_dmg_booster",
 		humanName = "Damage Booster",
-		description = "Damage Booster - Increases damage by 10%, increased weapon weight reduces speed by 2.5%.  Limit: 8",
+		description = "Damage Booster - Increases damage by 10% but reduces speed by 2.5%.  Limit: 8",
 		image = moduleImagePath .. "module_dmg_booster.png",
 		limit = 8,
 		cost = 150 * COST_MULT,
@@ -776,7 +776,7 @@ local moduleDefs = {
 	{
 		name = "module_adv_targeting",
 		humanName = "Adv. Targeting System",
-		description = "Advanced Targeting System - Increases range by 7.5%, increased weapon weight reduces speed by 2.5%. Limit: 8",
+		description = "Advanced Targeting System - Increases range by 7.5% but reduces speed by 2.5%. Limit: 8",
 		image = moduleImagePath .. "module_adv_targeting.png",
 		limit = 8,
 		cost = 150 * COST_MULT,

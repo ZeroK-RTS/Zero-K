@@ -106,3 +106,14 @@ function gadget:Initialize()
 		gadget:UnitCreated(unitID, unitDefID)
 	end
 end
+
+function gadget:Load(zip)
+	local allUnits = Spring.GetAllUnits()
+	for i=1, #allUnits do
+		local unitID = allUnits[i]
+		local param = Spring.GetUnitRulesParam(unitID, "idleRegenTimer")
+		if param and units[unitID] then
+			units[unitID].idleFrame = param
+		end
+	end
+end

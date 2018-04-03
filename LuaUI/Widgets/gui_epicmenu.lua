@@ -67,7 +67,7 @@ local title_text = confdata.title
 local title_image = confdata.title_image
 local subMenuIcons = confdata.subMenuIcons  
 local useUiKeys = false
-local lastSaveGameFrame
+local lastSaveGameFrame, totalSaveGameFrame
 
 --file_return = nil
 
@@ -591,13 +591,11 @@ local function KillSubWindow(makingNew)
 		window_sub_cur = nil
 		curPath = ''
 		if not makingNew and AllowPauseOnMenuChange() then
-			local paused = select(3, Spring.GetGameSpeed())
-			if paused then
-				spSendCommands("pause")
-			end
+			spSendCommands("pause 0")
 		end
 	end
 end
+WG.crude.KillSubWindow = KillSubWindow
 
 -- Update colors for labels of widget checkboxes in widgetlist window
 local function checkWidget(widget)
@@ -2098,10 +2096,16 @@ end
 
 local function LeaveExitConfirmWindow()
 	DisposeExitConfirmWindow()
-	KillSubWindow()
+	KillSubWindow(true)
 end
 
-local function MakeExitConfirmWindow(text, action, height)
+local function UnpauseFromExitConfirmWindow()
+	if AllowPauseOnMenuChange() then
+		spSendCommands("pause 0")
+	end
+end
+
+local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpauseOnNo)
 	local screen_width, screen_height = Spring.GetWindowGeometry()
 	local menu_width = 320
 	local menu_height = height or 64
@@ -2138,7 +2142,10 @@ local function MakeExitConfirmWindow(text, action, height)
 		OnClick = {
 			function()
 				action()
-				DisposeExitConfirmWindow()
+				LeaveExitConfirmWindow()
+				if unpauseOnYes then
+					UnpauseFromExitConfirmWindow()
+				end
 			end
 		},
 		height = 32,
@@ -2153,6 +2160,9 @@ local function MakeExitConfirmWindow(text, action, height)
 		OnClick = {
 			function()
 				LeaveExitConfirmWindow()
+				if unpauseOnNo then
+					UnpauseFromExitConfirmWindow()
+				end
 			end
 		},
 		height = 32,
@@ -2640,7 +2650,7 @@ local function MakeQuitButtons()
 								spSendCommands{"spectator"}
 							end
 						end
-					end)
+					end, nil, true, true)
 				end
 			end,
 		key = 'Resign',
@@ -2660,7 +2670,7 @@ local function MakeQuitButtons()
 					if myPing and myPing < 40 then
 						MakeExitConfirmWindow("Are you sure you want to restart?", function() 
 							Spring.SendLuaMenuMsg("restartGame")
-						end)
+						end, nil, false, true)
 					end
 				end
 			end,
@@ -2690,7 +2700,7 @@ local function MakeQuitButtons()
 				else
 					spSendCommands{"quit", "quitforce"} 
 				end
-			end)
+			end, nil, false, true)
 		end,
 		key = 'Exit to Desktop',
 	})
@@ -3149,8 +3159,12 @@ function widget:GameFrame(n)
 		if not lastSaveGameFrame then
 			lastSaveGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
 		end
-		if (n + lastSaveGameFrame)%30 == 0 then
-			lbl_gtime:SetCaption(GetTimeString((n + lastSaveGameFrame)/30))
+		if not totalSaveGameFrame then
+			totalSaveGameFrame = Spring.GetGameRulesParam("totalSaveGameFrame") or 0
+		end
+		
+		if (n + totalSaveGameFrame)%30 == 0 then
+			lbl_gtime:SetCaption(GetTimeString((n + totalSaveGameFrame)/30))
 		end
 	end
 end

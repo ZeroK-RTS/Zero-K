@@ -16,12 +16,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local SAVE_FILE = "Gadgets/unit_timeslow.lua"
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --SYNCED
-if (not gadgetHandler:IsSyncedCode()) then
-   return false
-end
-
-
+if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetUnitDefID        = Spring.GetUnitDefID
@@ -53,6 +53,8 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 
 local attritionWeaponDefs, MAX_SLOW_FACTOR, DEGRADE_TIMER, DEGRADE_FACTOR, UPDATE_PERIOD = include("LuaRules/Configs/timeslow_defs.lua")
 local slowedUnits = {}
+
+_G.slowedUnits = slowedUnits
 
 Spring.SetGameRulesParam("slowState",1)
 
@@ -242,8 +244,40 @@ end
 
 
 function gadget:UnitDestroyed(unitID)
-	removeUnit(unitID)
+   removeUnit(unitID)
+end
+
+function gadget:Load(zip)
+   if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	local loadData = GG.SaveLoad.ReadFile(zip, "Time Slow", SAVE_FILE) or {}
+	slowedUnits = {}
+	for oldID, entry in pairs(loadData) do
+		local newID = GG.SaveLoad.GetNewUnitID(oldID)
+		slowedUnits[newID] = entry
+		GG.UpdateUnitAttributes(newID)
+	end
+	_G.slowedUnits = slowedUnits
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+else
+-- UNSYNCED
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.slowedUnits, "Time Slow"))
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+end

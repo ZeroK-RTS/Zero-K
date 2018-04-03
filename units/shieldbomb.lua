@@ -75,7 +75,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[wreck2x2b.s3o]],
+      object           = [[logroach_dead.s3o]],
     },
 
     HEAP      = {
