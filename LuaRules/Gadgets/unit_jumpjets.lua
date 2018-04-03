@@ -15,6 +15,8 @@ if (not gadgetHandler:IsSyncedCode()) then return end
 include("LuaRules/Configs/customcmds.h.lua")
 -- needed for checks
 
+local SAVE_FILE = "Gadgets/unit_jumpjets.lua"
+
 local Spring    = Spring
 local MoveCtrl  = Spring.MoveCtrl
 local coroutine = coroutine
@@ -30,6 +32,7 @@ local CMD_STOP   = CMD.STOP
 local CMD_WAIT   = CMD.WAIT
 local CMD_MOVE   = CMD.MOVE
 local CMD_REMOVE = CMD.REMOVE
+local privateTable = {private = true}
 
 local spGetHeadingFromVector = Spring.GetHeadingFromVector
 local spGetUnitPosition      = Spring.GetUnitPosition
@@ -206,7 +209,7 @@ local function StartScript(fn)
 	coroutines[#coroutines + 1] = co
 end
 
-local function Jump(unitID, goal, cmdTag, origCmdParams)
+local function Jump(unitID, goal, origCmdParams, mustJump)
 	goal[2]                = spGetGroundHeight(goal[1],goal[3])
 	local start            = {spGetUnitPosition(unitID)}
 
@@ -223,7 +226,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	local reloadTime       = (jumpDef.reload or 0)*30
 	local teamID           = spGetUnitTeam(unitID)
 	
-	if (cannotJumpMidair and abs(startHeight - start[2]) > 1) or (startHeight < -UnitDefs[unitDefID].maxWaterDepth) then
+	if (not mustJump) and ((cannotJumpMidair and abs(startHeight - start[2]) > 1) or (startHeight < -UnitDefs[unitDefID].maxWaterDepth)) then
 		return false, true
 	end
 	
@@ -246,14 +249,16 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	local speed = speed * lineDist/flightDist
 	local step = speed/lineDist
 	local duration = math.ceil(1/step)+1
-	
-	-- check if there is no wall in between
-	local x,z = start[1],start[3]
-	for i=0, 1, step do
-		x = x + vector[1]*step
-		z = z + vector[3]*step
-		if ( (spGetGroundHeight(x,z) - 30) > (start[2] + vector[2]*i + (1-(2*i-1)^2)*height)) then
-			return false, false -- FIXME: should try to use SetMoveGoal instead of jumping!
+
+	if not mustJump then
+		-- check if there is no wall in between
+		local x,z = start[1],start[3]
+		for i=0, 1, step do
+			x = x + vector[1]*step
+			z = z + vector[3]*step
+			if ( (spGetGroundHeight(x,z) - 30) > (start[2] + vector[2]*i + (1-(2*i-1)^2)*height)) then
+				return false, false -- FIXME: should try to use SetMoveGoal instead of jumping!
+			end
 		end
 	end
 
@@ -271,9 +276,13 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	jumping[unitID] = {vector[1]*step, vector[2]*step, vector[3]*step}
 
 	mcEnable(unitID)
-	Spring.SetUnitRulesParam(unitID, "is_jumping", 1)
 	Spring.SetUnitVelocity(unitID,0,0,0)
 	SetLeaveTracks(unitID, false)
+	
+	Spring.SetUnitRulesParam(unitID, "is_jumping", 1)
+	Spring.SetUnitRulesParam(unitID, "jump_goal_x", goal[1], privateTable)
+	Spring.SetUnitRulesParam(unitID, "jump_goal_z", goal[3], privateTable)
+	
 
 	env = Spring.UnitScript.GetScriptEnv(unitID)
 	
@@ -561,7 +570,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				end
 			end
 			if (not jumps[coords]) or jumpDefs[unitDefID].JumpSpreadException then
-				local didJump, removeCommand = Jump(unitID, cmdParams, cmdTag, cmdParams)
+				local didJump, removeCommand = Jump(unitID, cmdParams, cmdParams)
 				if not didJump then
 					return true, removeCommand -- command was used
 				end
@@ -573,7 +582,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 					cmdParams[1] + random(-r, r),
 					cmdParams[2],
 					cmdParams[3] + random(-r, r)}
-				local didJump, removeCommand = Jump(unitID, randpos, cmdTag, cmdParams)
+				local didJump, removeCommand = Jump(unitID, randpos, cmdParams)
 				if not didJump then
 					return true, removeCommand -- command was used
 				end
@@ -608,6 +617,23 @@ function gadget:GameFrame(currFrame)
 	for coords, queue_n_age in pairs(jumps) do 
 		if currFrame-queue_n_age[2] > 300 then
 			jumps[coords] = nil
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Save/Load
+
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		if Spring.GetUnitRulesParam(unitID, "is_jumping") == 1 then
+			local goalX = Spring.GetUnitRulesParam(unitID, "jump_goal_x")
+			local goalZ = Spring.GetUnitRulesParam(unitID, "jump_goal_z")
+			if goalX and goalZ then
+				local goal = {goalX, 0, goalZ}
+				Jump(unitID, goal, goal, true)
+			end
 		end
 	end
 end

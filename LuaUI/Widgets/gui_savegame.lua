@@ -74,6 +74,7 @@ local function SecondsToClock(seconds)
 			return mins..":"..secs
 		end
 	end
+	return "unknown"
 end
 
 local function DisposeWindow()
@@ -170,7 +171,7 @@ local function GetSaveDescText(saveFile)
 	return (saveFile.description or "no description")
 		.. "\n" .. saveFile.gameName .. " " .. saveFile.gameVersion
 		.. "\n" .. saveFile.map
-		.. "\n" .. (WG.Translate("interface", "time_ingame") or "Ingame time").. ": " ..  SecondsToClock(saveFile.totalGameframe/30)
+		.. "\n" .. (WG.Translate("interface", "time_ingame") or "Ingame time").. ": " ..  SecondsToClock((saveFile.totalGameframe or saveFile.gameframe or 0)/30)
 		.. "\n" .. WriteDate(saveFile.date)
 end
 
