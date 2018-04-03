@@ -737,6 +737,18 @@ function gadget:GameFrame(n)
 	end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Save/Load
+
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		if UnitDefs[Spring.GetUnitDefID(unitID)].isAirUnit then
+			WaitWaitMoveUnit(unitID)
+		end
+	end
+end
+
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 else --UNSYNCED--
