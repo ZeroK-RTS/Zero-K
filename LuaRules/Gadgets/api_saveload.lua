@@ -267,8 +267,7 @@ local function LoadUnits()
 			if data.cloak then
 				Spring.SetUnitCloak(newID, data.cloak)
 			end
-			
-			--Spring.Echo("unitID check", oldID, newID)
+			GG.UpdateUnitAttributes(newID)
 		end
 	end
 	

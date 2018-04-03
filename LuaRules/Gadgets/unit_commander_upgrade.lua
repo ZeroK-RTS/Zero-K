@@ -109,9 +109,9 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, dama
 		weapon2 = "commweapon_peashooter"
 	end
 	
-	rangeMult = rangeMult or 1
+	rangeMult = rangeMult or Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1
 	Spring.SetUnitRulesParam(unitID, "comm_range_mult", rangeMult,  INLOS)
-	damageMult = damageMult or 1
+	damageMult = damageMult or Spring.GetUnitRulesParam(unitID, "comm_damage_mult") or 1
 	Spring.SetUnitRulesParam(unitID, "comm_damage_mult", damageMult,  INLOS)
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
@@ -119,6 +119,7 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, dama
 end
 
 local function ApplyModuleEffects(unitID, data, totalCost, images)
+	-- Update ApplyModuleEffectsFromUnitRulesParams if any non-unitRulesParams changes are made.
 	if data.speedMult then
 		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", data.speedMult, INLOS)
 	end
@@ -141,7 +142,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		Spring.SetUnitCloak(unitID, false, data.decloakDistance)
 		Spring.SetUnitRulesParam(unitID, "comm_decloak_distance", data.decloakDistance, INLOS)
 	end
-		
+	
 	if data.personalCloak then
 		Spring.SetUnitRulesParam(unitID, "comm_personal_cloak", 1, INLOS)
 	end
@@ -159,6 +160,8 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	Spring.SetUnitRulesParam(unitID, "buildpower_mult", buildPower/10, INLOS)
 	
 	if data.metalIncome and GG.Overdrive then
+		Spring.SetUnitRulesParam(unitID, "comm_income_metal", data.metalIncome, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_income_energy", data.energyIncome, INLOS)
 		GG.Overdrive.AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
 	end
 	
@@ -202,6 +205,44 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	Spring.SetUnitRulesParam(unitID, "massOverride", effectiveMass, INLOS)
 	
 	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult, data.damageMult)
+	
+	-- Do this all the time as it will be needed almost always.
+	GG.UpdateUnitAttributes(unitID)
+end
+
+local function ApplyModuleEffectsFromUnitRulesParams(unitID)
+	if not Spring.GetUnitRulesParam(unitID, "jammingRangeOverride") then
+		local onOffCmd = Spring.FindUnitCmdDesc(unitID, CMD.ONOFF)
+		if onOffCmd then
+			Spring.RemoveUnitCmdDesc(unitID, onOffCmd)
+		end
+	end
+	
+	local decloakDist = Spring.GetUnitRulesParam(unitID, "comm_decloak_distance")
+	if decloakDist then
+		Spring.SetUnitCloak(unitID, false, decloakDist)
+	end
+	
+	if GG.Overdrive then
+		local mInc = Spring.GetUnitRulesParam(unitID, "comm_income_metal")
+		local eInc = Spring.GetUnitRulesParam(unitID, "comm_income_energy")
+		GG.Overdrive.AddUnitResourceGeneration(unitID, mInc or 0, eInc or 0)
+	end
+	
+	if Spring.GetUnitRulesParam(unitID, "carrier_count_drone") or Spring.GetUnitRulesParam(unitID, "carrier_count_droneheavyslow") then
+		if GG.Drones_InitializeDynamicCarrier then
+			GG.Drones_InitializeDynamicCarrier(unitID)
+		end
+	end
+	
+	local autoRegen = Spring.GetUnitRulesParam(unitID, "comm_autorepair_rate")
+	if autoRegen and GG.SetUnitIdleRegen then
+		GG.SetUnitIdleRegen(unitID, 0, autoRegen / 2)
+	end
+	
+	ApplyWeaponData(unitID, Spring.GetUnitRulesParam(unitID, "comm_weapon_name_1"), 
+		Spring.GetUnitRulesParam(unitID, "comm_weapon_name_2"),
+		Spring.GetUnitRulesParam(unitID, "comm_shield_name"))
 	
 	-- Do this all the time as it will be needed almost always.
 	GG.UpdateUnitAttributes(unitID)
@@ -705,4 +746,17 @@ function gadget:Initialize()
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Save/Load
+
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		if Spring.GetUnitRulesParam(unitID, "comm_level") then
+			ApplyModuleEffectsFromUnitRulesParams(unitID)
+		end
+	end
 end
