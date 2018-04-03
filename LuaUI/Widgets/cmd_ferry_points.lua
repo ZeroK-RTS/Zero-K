@@ -162,10 +162,16 @@ end
 -------------------------------------------------------------------
 --- COMMAND HANDLING
 
+local function GiveUnloadOrder(transportID, x, y, z)
+	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, UNLOAD_RADIUS}, 0)
+	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, UNLOAD_RADIUS*2}, CMD.OPT_SHIFT)
+	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, UNLOAD_RADIUS*4}, CMD.OPT_SHIFT)
+end
+
 function widget:CommandsChanged()
 	local customCommands = widgetHandler.customCommands
 
-	customCommands[#customCommands+1] = {			
+	customCommands[#customCommands+1] = {
 		id      = CMD_SET_FERRY,
 		type    = CMDTYPE.ICON_MAP,
 		tooltip = 'Places a ferry route',
@@ -177,7 +183,6 @@ function widget:CommandsChanged()
 		pos = {CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT}, 
 	}
 end
-
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	
@@ -212,8 +217,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				for i = 1, route.transportCount do
 					local trans = transport[route.transporters[i]]
 					if trans.waypoint > route.pointcount then
-						Spring.GiveOrderToUnit(route.transporters[i], CMD.UNLOAD_UNITS, 
-							{route.finish.x, route.finish.y, route.finish.z, UNLOAD_RADIUS}, 0 )
+						GiveUnloadOrder(route.transporters[i], route.finish.x, route.finish.y, route.finish.z)
 					end
 				end
 			end
@@ -409,8 +413,7 @@ function widget:GameFrame(frame)
 						if trans.waypoint == 0 or disSQ(x, z, route.points[trans.waypoint].x, route.points[trans.waypoint].z) < NEAR_WAYPOINT_RANGE_SQ then
 							trans.waypoint = trans.waypoint + 1
 							if trans.waypoint > route.pointcount then
-								Spring.GiveOrderToUnit(unitID, CMD.UNLOAD_UNITS, 
-									{route.finish.x, route.finish.y, route.finish.z, UNLOAD_RADIUS}, 0 )
+								GiveUnloadOrder(unitID, route.finish.x, route.finish.y, route.finish.z)
 							else
 								GiveClampedOrderToUnit(unitID, CMD.MOVE, 
 									{route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, 0 )

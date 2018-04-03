@@ -425,6 +425,12 @@ local function PossiblyTransferAutoCallThroughMorph(unitID)
 	end
 end
 
+local function GiveUnloadOrder(transportID, x, y, z)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, CONST_UNLOAD_RADIUS*2}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, CONST_UNLOAD_RADIUS*4}, CMD.OPT_SHIFT)
+end
+
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	if teamID == myTeamID then
 		PossiblyTransferAutoCallThroughMorph(unitID)
@@ -727,7 +733,7 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 	spGiveOrderToUnit(unitID, CMD.STOP, EMPTY_TABLE, 0)
 
 	if lastX then
-		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {lastX, lastY, lastZ, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT) --unload unit at its destination
+		GiveUnloadOrder(transportID, lastX, lastY, lastZ)
 
 		if toGuard[transportID] or ReturnToPickupLocation(unitDefID) then
 			local i = #torev
@@ -740,7 +746,7 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 			spGiveOrderToUnit(transportID, CMD_RAW_MOVE, {x,y,z}, CMD.OPT_SHIFT)
 
 			--unload 2nd time at loading point incase transport refuse to drop unit at the intended destination (ie: in water)
-			spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT)
+			GiveUnloadOrder(transportID, x, y, z)
 
 			if toGuard[transportID] then
 				spGiveOrderToUnit(transportID, CMD.GUARD, {toGuard[transportID]}, CMD.OPT_SHIFT)
@@ -748,7 +754,7 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 		end
 	else
 		local x,y,z = Spring.GetUnitPosition(transportID)
-		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT) --unload unit at its destination
+		GiveUnloadOrder(transportID, x, y, z)
 	end
 end
 
