@@ -356,7 +356,7 @@ function NanoParticles:ReInitialize()
 end
 
 function NanoParticles:CreateParticle()
-	self.count = self.count * self.particles
+	self.count = math.floor(self.count * self.particles)
 	self.color = Vmul(self.color,self.alpha)
 
 	self.urot  = 0
@@ -428,9 +428,10 @@ function NanoParticles.Create(Options)
 		reuse.life            = -1 --//auto adjusted on initialization
 		
 		--// internal used
-		reuse.dlist       = 0
-		reuse.stopframe   = 1e9
-		reuse._dead       = false
+		reuse.dlist         = 0
+		reuse.stopframe     = 1e9
+		reuse._dead         = false
+		reuse._staticTarget = false
 		
 		reuse.targetID     = Options.targetID
 		reuse.isFeature    = Options.isFeature

@@ -23,6 +23,25 @@ local function GetFeatureMidPos(featureID)
 	return x, y, z
 end
 
+local function GetUnitIsMobile(self, unitID)
+	if self.inversed then
+		return false
+	end
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	local ud = unitDefID and UnitDefs[unitDefID]
+	if not ud then
+		return false
+	end
+	if ud.isBuilding or ud.speed == 0 then
+		return false
+	end
+	local build = select(5, Spring.GetUnitHealth(unitID))
+	if (build or 0) < 1 then
+		return false
+	end
+	return true
+end
+
 local function GetCmdTag(unitID) 
 		local cmdTag = 0
 		local cmds = Spring.GetFactoryCommands(unitID,1)
@@ -46,14 +65,13 @@ end
 
 
 function UpdateNanoParticles(self)
-	if (self.frame ~= 0) and self.frame + self.reuseLinger >= self.maxLife then
+	if self.reuseLinger and self.frame and self.frame ~= 0 and self.frame + self.reuseLinger >= self.maxLife then
 		self.visibility = 0
 		return not self.reuseDead
 	end
 	
 	--// UPDATE START- & FINALPOS
-	local lastup = self._lastupdate or (thisGameFrame - 1)
-	if (self.frame == 0) and (not self._dead)and(thisGameFrame - lastup >= 1) then
+	if (self._staticTarget ~= 1) and (not self._dead) and ((not self._lastupdate) or (thisGameFrame - self._lastupdate >= 1)) then
 		self._lastupdate = thisGameFrame
 
 		--// UPDATE STARTPOS
@@ -74,7 +92,11 @@ function UpdateNanoParticles(self)
 			if (not self.isFeature) then
 				if Spring.ValidUnitID(tid) then
 					self.targetpos = {GetUnitMidPos(tid)}
+					if (not self._staticTarget) then
+						self._staticTarget = (GetUnitIsMobile(self,tid) and 0) or 1
+					end
 				else
+					self._staticTarget = 1
 					if (not self._dead) then
 						--// assigned target unit died
 						self._dead = true
@@ -82,17 +104,20 @@ function UpdateNanoParticles(self)
 					end
 				end
 			else
+				self._staticTarget = 1
 				if Spring.ValidFeatureID(tid) then
 					self.targetpos = {GetFeatureMidPos(tid)}
 					self.targetpos[2] = self.targetpos[2] + 25
 				else
 					if (not self._dead) then
 						--// assigned target feature died
-						self._dead = true
+						self._dead = 1
 						return
 					end
 				end
 			end
+		else
+			self._staticTarget = 1
 		end
 
 		local cmdTag = GetCmdTag(self.unitID)
