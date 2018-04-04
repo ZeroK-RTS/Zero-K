@@ -257,9 +257,9 @@ end
 --------------------------------------------------------------------------------
 
 --// saves all particles
-local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
-particles = IterableMap.New()
+particles = {}
 local particles = particles
+local particlesCount = 0
 
 local RenderSequence = {}  --// mult-dim table with: [layer][partClass][unitID][fx]
 local effectsInDelay = {}  --// fxs which use the delay tag, and waiting for their spawn
@@ -329,13 +329,14 @@ function AddParticles(Class,Options   ,__id)
 
 	local newParticles,reusedFxID = particleClass.Create(Options)
 	if (newParticles) then
+		particlesCount = particlesCount + 1
 		if (__id) then
 			newParticles.id = __id
 		else
 			partIDCount = partIDCount+1
 			newParticles.id = partIDCount
 		end
-		particles.Add(newParticles.id, newParticles)
+		particles[ newParticles.id ] = newParticles
 
 		local space = ((not newParticles.worldspace) and newParticles.unit) or (-1)
 		local fxTable = CreateSubTables(RenderSequence,{newParticles.layer,particleClass,space})
@@ -367,11 +368,11 @@ function AddParticlesArray(array)
 end
 
 function GetParticles(particlesID)
-	return particles.Get(particlesID) -- ??
+	return particles[particlesID]
 end
 
 function RemoveParticles(particlesID)
-	local fx = particles.Get(particlesID)
+	local fx = particles[particlesID]
 	if (fx) then
 		if (type(fx.fxTable)=="table") then
 			for j,w in pairs(fx.fxTable) do
@@ -381,7 +382,8 @@ function RemoveParticles(particlesID)
 			end
 		end
 		fx:Destroy()
-		particles.Remove(particlesID)
+		particles[particlesID] = nil
+		particlesCount = particlesCount-1;
 		return
 	else
 		local status,err = pcall(function()
@@ -406,7 +408,7 @@ function RemoveParticles(particlesID)
 end
 
 function GetStats()
-	local count   = particles.GetIndexMax()
+	local count   = particlesCount
 	local effects = {}
 	local layers  = 0
 
@@ -811,10 +813,7 @@ local function CreateVisibleFxList()
 	local removeFX = {}
 	local removeCnt = 1
 
-	--for _, fx in particles.Iterator() do
-	local fxCount, keyByIndex, dataByKey = particles.GetBarbarianData()
-	for i = 1, fxCount do
-		local fx = dataByKey[keyByIndex[i]]
+	for _,fx in pairs(particles) do
 		if ((fx.unit or -1) > -1) then
 			fx.visible = IsUnitFXVisible(fx)
 			if (fx.visible) then
@@ -894,7 +893,7 @@ local lastGameFrame = 0
 
 local function GameFrame(_,n)
 	thisGameFrame = n
-	if (particles.IsEmpty() and (not effectsInDelay[1])) then return end
+	if ((not next(particles)) and (not effectsInDelay[1])) then return end
 
 	UpdateAllyTeamStatus()
 	--// create delayed FXs
@@ -908,7 +907,7 @@ local function GameFrame(_,n)
 			else
 				AddParticles(fx.class,fx.options, fx.id)
 				if (fx.frame-thisGameFrame>0) then
-					particles.Get(fx.id):Update(fx.frame-thisGameFrame)
+					particles[fx.id]:Update(fx.frame-thisGameFrame)
 				end
 			end
 		end
@@ -920,10 +919,7 @@ local function GameFrame(_,n)
 
 	--// update FXs
 	framesToUpdate = thisGameFrame - lastGameFrame
-	--for _, partFx in particles.Iterator() do
-	local fxCount, keyByIndex, dataByKey = particles.GetBarbarianData()
-	for i = 1, fxCount do
-		local partFx = dataByKey[keyByIndex[i]]
+	for _,partFx in pairs(particles) do
 		if (n>=partFx.dieGameFrame) then
 			--// lifetime ended
 			if (partFx.repeatEffect) then
@@ -971,7 +967,7 @@ local function Update(_,dt)
 	--// check which fxs are visible
 	anyFXVisible = false
 	anyDistortionsVisible = false
-	if not particles.IsEmpty() then
+	if (next(particles)) then
 		CreateVisibleFxList()
 	end
 end
