@@ -811,9 +811,10 @@ local function CreateVisibleFxList()
 	local removeFX = {}
 	local removeCnt = 1
 
-	local foo = 0
-	for _, fx in particles.Iterator() do
-		foo = foo + 1
+	--for _, fx in particles.Iterator() do
+	local fxCount, keyByIndex, dataByKey = particles.GetBarbarianData()
+	for i = 1, fxCount do
+		local fx = dataByKey[keyByIndex[i]]
 		if ((fx.unit or -1) > -1) then
 			fx.visible = IsUnitFXVisible(fx)
 			if (fx.visible) then
@@ -837,7 +838,7 @@ local function CreateVisibleFxList()
 			end
 		end
 	end
-	--Spring.Echo("Lups fx cnt", foo)
+	--Spring.Echo("Lups fx cnt", particles.GetIndexMax())
 
 	for i=1,removeCnt-1 do
 		RemoveParticles(removeFX[i])
@@ -919,7 +920,10 @@ local function GameFrame(_,n)
 
 	--// update FXs
 	framesToUpdate = thisGameFrame - lastGameFrame
-	for _, partFx in particles.Iterator() do
+	--for _, partFx in particles.Iterator() do
+	local fxCount, keyByIndex, dataByKey = particles.GetBarbarianData()
+	for i = 1, fxCount do
+		local partFx = dataByKey[keyByIndex[i]]
 		if (n>=partFx.dieGameFrame) then
 			--// lifetime ended
 			if (partFx.repeatEffect) then

@@ -5,6 +5,9 @@
 local NanoParticles = {}
 NanoParticles.__index = NanoParticles
 
+NanoParticles.reusableDead = {}
+NanoParticles.reusableDeadCount = 0
+
 local billShader
 
 local lastTexture = ""
@@ -43,6 +46,9 @@ NanoParticles.Default = {
 	terraform    = false,   --// for terraform (2d target)
 	unit         = -1,
 	nanopiece    = -1,
+
+	reuseLinger  = 32,
+	reuseDead    = false,
 
 	--// some unit informations
 	targetID  = -1,
@@ -201,14 +207,14 @@ function NanoParticles:Draw()
 	glMultiTexCoord(2, endPosOld[1], endPosOld[2], endPosOld[3], 1)
 
 	glMultiTexCoord(6,self.size,self.sizeSpread,self.sizeGrowth,self.targetradius)
-	glMultiTexCoord(7,self.delaySpread,1/self.life)
+	glMultiTexCoord(7,self.delaySpread,1/(self.life - self.reuseLinger))
 
 	local color = self.color
 	glColor(color[1],color[2],color[3],color[4])
 
 	if (self.inversed)
-		then glMultiTexCoord(3, self.urot, self.life - self.frame - Spring.GetFrameTimeOffset(), self.maxLife, self.stopframe)
-		else glMultiTexCoord(3, self.urot, self.frame + Spring.GetFrameTimeOffset(), self.maxLife, self.stopframe) end
+		then glMultiTexCoord(3, self.urot, self.life - self.reuseLinger - self.frame - Spring.GetFrameTimeOffset(), self.maxLife - self.reuseLinger, self.stopframe)
+		else glMultiTexCoord(3, self.urot, self.frame + Spring.GetFrameTimeOffset(), self.maxLife - self.reuseLinger, self.stopframe) end
 
 	glCallList(self.dlist)
 end
@@ -315,7 +321,11 @@ function NanoParticles:Update(n)
 	self.urot  = self.urot  + n*self.rotSpeed
 	self.frame = self.frame + n
 
-	UpdateNanoParticles(self)
+	if UpdateNanoParticles(self) then
+		NanoParticles.reusableDeadCount = NanoParticles.reusableDeadCount + 1
+		NanoParticles.reusableDead[NanoParticles.reusableDeadCount] = self
+		self.reuseDead = NanoParticles.reusableDeadCount
+	end
 
 	if (self._dead)and(self.stopframe == NanoParticles.Default.stopframe) then
 		self.stopframe = self.frame
@@ -374,7 +384,7 @@ function NanoParticles:CreateParticle()
 
 	--// defines the speed of the particles (life = time in gameframe the particles need for startpos->finalpos)
 	local distance = Vlength(self.dir)
-	self.life = 40 * math.log10(distance/136+1) / math.log10(2)
+	self.life = 40 * math.log10(distance/136+1) / math.log10(2) + self.reuseLinger
 
 	--// create the DisplayList
 	self.dlist = GetParticlesDList(self)
@@ -391,12 +401,57 @@ end
 
 function NanoParticles:Destroy()
 	--gl.DeleteList(self.dlist)
+	if self.reuseDead then
+		local other = NanoParticles.reusableDead[NanoParticles.reusableDeadCount]
+		other.reuseDead = self.reuseDead
+		NanoParticles.reusableDead[self.reuseDead] = other
+		NanoParticles.reusableDead[NanoParticles.reusableDeadCount] = nil
+		NanoParticles.reusableDeadCount = NanoParticles.reusableDeadCount - 1
+	end
 end
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
 function NanoParticles.Create(Options)
+	if NanoParticles.reusableDeadCount ~= 0 then
+		local reuse = NanoParticles.reusableDead[NanoParticles.reusableDeadCount]
+		NanoParticles.reusableDead[NanoParticles.reusableDeadCount] = nil
+		NanoParticles.reusableDeadCount = NanoParticles.reusableDeadCount - 1
+		
+		--// shared options with all nanofx
+		reuse.pos             = {0,0,0} --// start pos
+		reuse.unit            = -1
+		reuse.reuseDead       = false
+		reuse._lastupdate_los = nil
+		reuse._lastupdate     = nil
+		reuse.life            = -1 --//auto adjusted on initialization
+		
+		--// internal used
+		reuse.dlist       = 0
+		reuse.stopframe   = 1e9
+		reuse._dead       = false
+		
+		reuse.targetID     = Options.targetID
+		reuse.isFeature    = Options.isFeature
+		reuse.unitpiece    = Options.unitpiece
+		reuse.unitID       = Options.unitID
+		reuse.unitDefID    = Options.unitDefID
+		reuse.teamID       = Options.teamID
+		reuse.allyID       = Options.allyID
+		reuse.nanopiece    = Options.nanopiece
+		reuse.targetpos    = Options.targetpos
+		reuse.count        = Options.count
+		reuse.color        = Options.color
+		reuse.type         = Options.type
+		reuse.targetradius = Options.targetradius
+		reuse.terraform    = Options.terraform
+		reuse.inversed     = Options.inversed
+		reuse.cmdTag       = Options.cmdTag
+		
+		local reusedSuccess = reuse:CreateParticle()
+		return nil, reusedSuccess and reuse.id
+	end
 	local newObject = MergeTable(Options, NanoParticles.Default)
 	setmetatable(newObject,NanoParticles)  --// make handle lookup
 	return newObject:CreateParticle() and newObject

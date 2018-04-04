@@ -343,7 +343,6 @@ function gadget:GameFrame(frame)
 							terraform    = terraform,
 							inversed     = inversed,
 							cmdTag       = cmdTag, --//used to end the fx when the command is finished
-							life = 60,
 						}
 
 						local nanoSettings = CopyMergeTables(factionsNanoFx[faction] or factionsNanoFx.default, nanoParams)

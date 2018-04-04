@@ -14,13 +14,13 @@
 ---------------------------------------------------------------------------------------------
 
 local function GetUnitMidPos(unitID)
-		local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
-		return x, y, z
+	local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
+	return x, y, z
 end
 
 local function GetFeatureMidPos(featureID)
-		local _,_,_, x, y, z = Spring.GetFeaturePosition(featureID, true)
-		return x, y, z
+	local _,_,_, x, y, z = Spring.GetFeaturePosition(featureID, true)
+	return x, y, z
 end
 
 local function GetCmdTag(unitID) 
@@ -46,9 +46,14 @@ end
 
 
 function UpdateNanoParticles(self)
+	if (self.frame ~= 0) and self.frame + self.reuseLinger >= self.maxLife then
+		self.visibility = 0
+		return not self.reuseDead
+	end
+	
 	--// UPDATE START- & FINALPOS
 	local lastup = self._lastupdate or (thisGameFrame - 1)
-	if (not self._dead)and(thisGameFrame - lastup >= 1) then
+	if (self.frame == 0) and (not self._dead)and(thisGameFrame - lastup >= 1) then
 		self._lastupdate = thisGameFrame
 
 		--// UPDATE STARTPOS
@@ -92,8 +97,8 @@ function UpdateNanoParticles(self)
 
 		local cmdTag = GetCmdTag(self.unitID)
 		if (cmdTag == 0 or cmdTag ~= self.cmdTag) then
-				self._dead = true
-				return
+			self._dead = true
+			return
 		end
 	end
 
@@ -102,10 +107,7 @@ function UpdateNanoParticles(self)
 	--// UPDATE LOS
 	local allied = (self.allyID==LocalAllyTeamID)or(LocalAllyTeamID==Script.ALL_ACCESS_TEAM)
 	local lastup_los = self._lastupdate_los or (thisGameFrame - 16)
-	if
-		(not self._lastupdate_los) or
-		((thisGameFrame - lastup_los > 16)and(not allied))
-	then
+	if (not self._lastupdate_los) or ((thisGameFrame - lastup_los > 16)and(not allied)) then
 		self._lastupdate_los = thisGameFrame
 
 		local startPos = self.pos
