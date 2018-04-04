@@ -1053,6 +1053,13 @@ local function Initialize()
 		end
 	end
 
+	if GetLupsSetting("enablerefraction", 0) ~= 1 then
+		(gadgetHandler or widgetHandler):RemoveCallIn("DrawWorldRefraction")
+	end
+	if GetLupsSetting("enablereflection", 0) ~= 1 then
+		(gadgetHandler or widgetHandler):RemoveCallIn("DrawWorldReflection")
+	end
+
 	--// link backup FXClasses
 	for className,backupName in pairs(linkBackupFXClasses) do
 		fxClasses[className]=fxClasses[backupName]
