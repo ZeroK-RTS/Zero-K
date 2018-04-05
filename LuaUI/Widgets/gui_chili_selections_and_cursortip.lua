@@ -881,6 +881,41 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 	end
 end
 
+local cacheFeatureTooltip = {}
+local cacheFeatureUnitDefID = {}
+local function GetFeatureDisplayAttributes(featureDefID)
+	if cacheFeatureTooltip[featureDefID] or cacheFeatureUnitDefID[featureDefID] then
+		return cacheFeatureTooltip[featureDefID], cacheFeatureUnitDefID[featureDefID]
+	end
+	local fd = FeatureDefs[featureDefID]
+	
+	local featureName = fd and fd.name
+	local unitName
+	if fd and fd.customParams and fd.customParams.unit then
+		unitName = fd.customParams.unit
+	else
+		unitName = featureName:gsub('(.*)_.*', '%1') --filter out _dead or _dead2 or _anything
+	end
+	
+	local unitDefID
+	if unitName and UnitDefNames[unitName] then
+		unitDefID = UnitDefNames[unitName].id
+	end
+	
+	if featureName:find("dead2") or featureName:find("heap") then
+		addedName = " (" .. WG.Translate("interface", "debris") .. ")"
+	elseif featureName:find("dead") then
+		addedName = " (" .. WG.Translate("interface", "wreckage") .. ")"
+	end
+	
+	if unitDefID then
+		cacheFeatureUnitDefID[featureDefID] = unitDefID
+		return nil, cacheFeatureUnitDefID[featureDefID]
+	end
+	cacheFeatureTooltip[featureDefID] = fd.tooltip
+	return cacheFeatureTooltip[featureDefID]
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Unit tooltip window components
@@ -1811,43 +1846,24 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		if featureID then
 			teamID = Spring.GetFeatureTeam(featureID)
-			
-			local fd = FeatureDefs[featureDefID]
-			
-			local featureName = fd and fd.name
-			local unitName
-			if fd and fd.customParams and fd.customParams.unit then
-				unitName = fd.customParams.unit
-			else
-				unitName = featureName:gsub('(.*)_.*', '%1') --filter out _dead or _dead2 or _anything
-			end
-			
-			if unitName and UnitDefNames[unitName] then
-				unitDefID = UnitDefNames[unitName].id
-			end
-			
-			if featureName:find("dead2") or featureName:find("heap") then
-				addedName = " (" .. WG.Translate("interface", "debris") .. ")"
-			elseif featureName:find("dead") then
-				addedName = " (" .. WG.Translate("interface", "wreckage") .. ")"
-			end
-			
+			local featureTooltip, featureUnitDefID = GetFeatureDisplayAttributes(featureDefID)
 			healthBarUpdate(false)
-			if unitDefID then
+			if featureUnitDefID then
+				unitDefID = featureUnitDefID
 				if playerNameLabel then
 					playerNameLabel:SetPos(nil, PIC_HEIGHT + 10, nil, nil, nil, true)
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 34, nil, nil, nil, true)
 				end
 			else
 				costInfoUpdate(false)
-				unitNameUpdate(true, fd.tooltip, nil)
+				unitNameUpdate(true, featureTooltip, nil)
 				if playerNameLabel then
 					playerNameLabel:SetPos(nil, PIC_HEIGHT - 10, nil, nil, nil, true)
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 14, nil, nil, nil, true)
 				end
 			end
 			
-			UpdateDynamicFeatureAttributes(featureID, unitDefID)
+			UpdateDynamicFeatureAttributes(featureID, featureUnitDefID)
 			metalInfoShown = true
 		end
 		

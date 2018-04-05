@@ -26,6 +26,29 @@ local function GetRangeModType(weaponDef)
 	return modType
 end
 
+local weaponAttributes = {}
+for i = 1, #WeaponDefs do
+	local weaponDef = WeaponDefs[i]
+	weaponAttributes[i] = {
+		modType = GetRangeModType(weaponDef),
+		customMaxRange = weaponDef.range,
+		customHeightMod = weaponDef.heightMod,
+		customCylinderTargeting  = weaponDef.cylinderTargeting,
+		customHeightBoost = weaponDef.heightBoostFactor,
+		myGravity = weaponDef.myGravity,
+		projectilespeed = (weaponDef.projectilespeed or 30),
+	}
+end
+
+local unitWeapon = {}
+local unitWeaponList = {}
+for i = 1, #UnitDefs do
+	local weaponList = UnitDefs[i].weapons
+	if #weaponList > 0 then
+		unitWeapon[i] = weaponList[1].weaponDef
+	end
+end
+
 local spGetGroundHeight = Spring.GetGroundHeight
 local cos45degree = math.cos(math.pi/4) --use test range of 45 degree for optimal launch
 local sin45degree = math.sin(math.pi/4)
@@ -55,41 +78,37 @@ local function CalculateBallisticConstant(deltaV,myGravity,heightDiff)
 	return maxRange, t --return maximum range and flight time.
 end
 
-local function CalculateModdedMaxRange(heightDiff,weaponDef,modType)
-	local customMaxRange = weaponDef.range
-	local customHeightMod = weaponDef.heightMod
-	local customCylinderTargeting  = weaponDef.cylinderTargeting
-	local customHeightBoost = weaponDef.heightBoostFactor
-	local heightModded = (heightDiff)*customHeightMod
+local function CalculateModdedMaxRange(heightDiff, weapon)
 	local effectiveRange = 0
+	local heightModded = (heightDiff)*weapon.customHeightMod
 	--equivalent to: GetRange2D():
-	if modType == 0 then --Ballistic
-		local myGravity = (weaponDef.myGravity > 0 and weaponDef.myGravity*888.888888) or (Game.gravity) or 0
-		local deltaV = weaponDef.projectilespeed*30
+	if weapon.modType == 0 then --Ballistic
+		local myGravity = (weapon.myGravity > 0 and weapon.myGravity*888.888888) or (Game.gravity) or 0
+		local deltaV = weapon.projectilespeed*30
 		local maxFlatRange = CalculateBallisticConstant(deltaV,myGravity,0)
-		local scaleDown = customMaxRange/maxFlatRange --Example: UpdateRange() in Spring\rts\Sim\Weapons\Cannon.cpp
-		local heightBoostFactor = customHeightBoost
+		local scaleDown = weapon.customMaxRange/maxFlatRange --Example: UpdateRange() in Spring\rts\Sim\Weapons\Cannon.cpp
+		local heightBoostFactor = weapon.customHeightBoost
 		if heightBoostFactor < 0 and scaleDown > 0 then
 			heightBoostFactor = (2 - scaleDown) / math.sqrt(scaleDown) --such that: heightBoostFactor == 1 when scaleDown == 1
 		end
 		heightModded = heightModded*heightBoostFactor
 		local moddedRange = CalculateBallisticConstant(deltaV,myGravity,heightModded)
 		effectiveRange = moddedRange*scaleDown --Example: GetRange2D() in Spring\rts\Sim\Weapons\Cannon.cpp
-	elseif modType == 1 then 
+	elseif weapon.modType == 1 then 
 		--SPHERE
-		effectiveRange = math.sqrt(customMaxRange^2 - heightModded^2) --Pythagoras theorem. Example: GetRange2D() in Spring\rts\Sim\Weapons\Weapon.cpp
-	elseif modType == 2 then 
+		effectiveRange = math.sqrt(weapon.customMaxRange^2 - heightModded^2) --Pythagoras theorem. Example: GetRange2D() in Spring\rts\Sim\Weapons\Weapon.cpp
+	elseif weapon.modType == 2 then 
 		--CYLINDER
-		effectiveRange = customMaxRange - heightModded*customHeightMod --Example: GetRange2D() in Spring\rts\Sim\Weapons\StarburstLauncher.cpp
+		effectiveRange = weapon.customMaxRange - heightModded*weapon.customHeightMod --Example: GetRange2D() in Spring\rts\Sim\Weapons\StarburstLauncher.cpp
 		--Note: for unknown reason we must "Minus the heightMod" instead of adding it. This is the opposite of what shown on the source-code, but ingame test suggest "Minus heightMod" and not adding.
 	end
-	if customCylinderTargeting >= 0.01 then --See Example: TestRange() in Spring\rts\Sim\Weapons\Weapon.cpp
+	if weapon.customCylinderTargeting >= 0.01 then --See Example: TestRange() in Spring\rts\Sim\Weapons\Weapon.cpp
 		--STRICT CYLINDER
-		if customCylinderTargeting * customMaxRange > math.abs(heightModded) then
-			if modType == 0 then
-				effectiveRange = math.min(effectiveRange,customMaxRange) --Ballistic is more complex, physically it have limited range when shooting upward
+		if weapon.customCylinderTargeting * weapon.customMaxRange > math.abs(heightModded) then
+			if weapon.modType == 0 then
+				effectiveRange = math.min(effectiveRange, weapon.customMaxRange) --Ballistic is more complex, physically it have limited range when shooting upward
 			else
-				effectiveRange = customMaxRange --other weapon have no physic limit and should obey cylinder
+				effectiveRange = weapon.customMaxRange --other weapon have no physic limit and should obey cylinder
 			end
 		else
 			effectiveRange = 0 --out of Strict Cylinder bound
@@ -106,19 +125,20 @@ function Spring.Utilities.GetEffectiveWeaponRange(unitDefID, heightDiff, weaponN
 	if not unitDefID or not UnitDefs[unitDefID] then
 		return 0
 	end
-	local weaponNumber = weaponNumOverride and math.modf(weaponNumOverride) or 1
-	heightDiff = heightDiff or 0
-	local weaponList = UnitDefs[unitDefID].weapons
-	local effectiveMaxRange = 0
-	if #weaponList > 0 then
-		if weaponNumber > #weaponList then
-			Spring.Echo("Warning: No weapon no " .. weaponNumber .. " in unit's weapon list.") 
-			weaponNumber = 1
+	local weaponNumber = weaponNumOverride and math.modf(weaponNumOverride)
+	local weaponDefID
+	if weaponNumber then
+		if not unitWeaponList[unitDefID] then
+			unitWeaponList[unitDefID] = UnitDefs[unitDefID].weapons
 		end
-		local weaponDefID = weaponList[weaponNumber].weaponDef
-		local weaponDef = WeaponDefs[weaponDefID]
-		local modType = GetRangeModType(weaponDef)
-		effectiveMaxRange = CalculateModdedMaxRange(heightDiff,weaponDef,modType)
+		weaponDefID = unitWeaponList[unitDefID][weaponNumber].weaponDef
+	else
+		weaponDefID = unitWeapon[unitDefID]
+	end
+	local effectiveMaxRange = 0
+	if weaponDefID then
+		heightDiff = heightDiff or 0
+		effectiveMaxRange = CalculateModdedMaxRange(heightDiff, weaponAttributes[weaponDefID])
 	end
 	return effectiveMaxRange
 end

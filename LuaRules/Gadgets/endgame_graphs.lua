@@ -57,9 +57,15 @@ for unitDefID = 1, #UnitDefs do
 	end
 end
 
+local featureMetal = {}
+for i = 1, #FeatureDefs do
+	local featureDef = FeatureDefs[i]
+	featuremetal[i] = fdef.metal
+end
+
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
 	if (part < 0) then
-		reclaimListByTeam[builderTeam] = reclaimListByTeam[builderTeam] + (part * FeatureDefs[featureDefID].metal)
+		reclaimListByTeam[builderTeam] = reclaimListByTeam[builderTeam] + (part * featureMetal[featureDefID])
 	end
 	return true
 end

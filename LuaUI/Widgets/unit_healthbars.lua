@@ -61,6 +61,13 @@ local stockpileW = 12
 local captureReloadTime = 360
 local DISARM_DECAY_FRAMES = 1200
 
+local destructableFeature = {}
+local drawnFeature = {}
+for i = 1, #FeatureDefs do
+	destructableFeature[i] = FeatureDefs[i].destructable
+	drawnFeature[i] = (FeatureDefs[i].drawTypeString=="model") 
+end
+
 --------------------------------------------------------------------------------
 -- LOCALISATION
 --------------------------------------------------------------------------------
@@ -619,7 +626,7 @@ do
 	local customInfo = {}
 	local ci
 
-	function JustGetOverlayInfos(unitID,unitDefID, ud)
+	function JustGetOverlayInfos(unitID,unitDefID)
 		ux, uy, uz = GetUnitViewPosition(unitID)
 		if not ux then
 			return
@@ -643,7 +650,7 @@ do
 			onFireUnits[#onFireUnits+1]=unitID
 		end
 
-			--// PARALYZE
+		--// PARALYZE
 		local stunned, _, inbuild = GetUnitIsStunned(unitID)
 		if (emp>0) and ((not morph) or morph.combatMorph) and (emp<1e8) and (paralyzeDamage >= empHP) then
 			if (stunned) then
@@ -660,8 +667,9 @@ do
 		end
 	end
 
-	function DrawUnitInfos(unitID,unitDefID, ud)
+	function DrawUnitInfos(unitID,unitDefID)
 		if (not customInfo[unitDefID]) then
+			local ud = UnitDefs[unitDefID]
 			customInfo[unitDefID] = {
 				height        = Spring.Utilities.GetUnitHeight(ud) + 14,
 				canJump       = (ud.customParams.canjump=="1")or(GetUnitRulesParam(unitID,"jumpReload")),
@@ -675,6 +683,7 @@ do
 				dyanmicComm   = ud.customParams.dynamic_comm,
 				maxWaterTank  = ud.customParams.maxwatertank,
 				freeStockpile = (ud.customParams.freestockpile and true) or nil,
+				specialReload = ud.customParams.specialreloadtime,
 			}
 		end
 		ci = customInfo[unitDefID]
@@ -840,11 +849,13 @@ do
 		end
 
 		--// WATER TANK
-		local waterTank = GetUnitRulesParam(unitID,"watertank")
-		if (ci.maxWaterTank and waterTank) then
-			local prog = waterTank/ci.maxWaterTank
-			if prog < 1 then
-				AddBar(messages.water_tank,prog,"tank",(fullText and floor(prog*100)..'%') or '')
+		if ci.maxWaterTank then
+			local waterTank = GetUnitRulesParam(unitID,"watertank")
+			if waterTank then
+				local prog = waterTank/ci.maxWaterTank
+				if prog < 1 then
+					AddBar(messages.water_tank,prog,"tank",(fullText and floor(prog*100)..'%') or '')
+				end
 			end
 		end
 
@@ -875,10 +886,12 @@ do
 		end
 
 		--// SPECIAL WEAPON
-		local specialReloadState = GetUnitRulesParam(unitID,"specialReloadFrame")
-		if (specialReloadState and specialReloadState > gameFrame) then
-			local special = 1-(specialReloadState-gameFrame)/(ud.customParams.specialreloadtime or 1*gameSpeed)
-			AddBar(messages.ability,special,"reload2",(fullText and floor(special*100)..'%') or '')
+		if ci.specialReload then
+			local specialReloadState = GetUnitRulesParam(unitID,"specialReloadFrame")
+			if (specialReloadState and specialReloadState > gameFrame) then
+				local special = 1-(specialReloadState-gameFrame)/(ci.specialReload*gameSpeed)
+				AddBar(messages.ability,special,"reload2",(fullText and floor(special*100)..'%') or '')
+			end
 		end
 
 		--// REAMMO
@@ -1002,7 +1015,7 @@ do
 
 	function DrawFeatureInfos(featureID,featureDefID,fullText,fx,fy,fz)
 		if (not customInfo[featureDefID]) then
-			local featureDef   = FeatureDefs[featureDefID or -1] or {height=0,name=''}
+			local featureDef = FeatureDefs[featureDefID or -1] or {height = 0, name = ''}
 			customInfo[featureDefID] = {
 				height = featureDef.height+14,
 				wall   = walls[featureDef.name],
@@ -1201,10 +1214,7 @@ do
 				unitID    = visibleUnits[i]
 				unitDefID = GetUnitDefID(unitID)
 				if (unitDefID) then
-					unitDef   = UnitDefs[unitDefID]
-					if (unitDef) then
-						DrawUnitInfos(unitID, unitDefID, unitDef)
-					elseif debugMode then
+					if DrawUnitInfos(unitID, unitDefID) then
 						local x,y,z = Spring.GetUnitPosition(unitID)
 						if not (x and y and z) then
 							Spring.Log("HealthBars", "error", "missing position and unitDef of unit " .. unitID)
@@ -1243,14 +1253,14 @@ do
 				end
 			end
 		else
-			local unitID,unitDefID,unitDef
+			local unitID,unitDefID
 			for i = 1, #visibleUnits do
 				unitID    = visibleUnits[i]
 				unitDefID = GetUnitDefID(unitID)
 				if (unitDefID) then
 					unitDef   = UnitDefs[unitDefID]
 					if (unitDef) then
-						JustGetOverlayInfos(unitID, unitDefID, unitDef)
+						JustGetOverlayInfos(unitID, unitDefID)
 					end
 				end
 			end
@@ -1297,11 +1307,8 @@ do
 			for i=cnt,1,-1 do
 				featureID    = visibleFeatures[i]
 				featureDefID = GetFeatureDefID(featureID) or -1
-				featureDef   = FeatureDefs[featureDefID]
 				--// filter trees and none destructable features
-				if (featureDef)and(featureDef.destructable)and(
-					 (featureDef.drawTypeString=="model")or(select(5,GetFeatureResources(featureID))<1)
-				) then
+				if destructableFeature[featureDefID] and (drawnFeature[featureDefID] or (select(5,GetFeatureResources(featureID))<1)) then
 					local fx,fy,fz = GetFeaturePosition(featureID)
 					visibleFeatures[i] = {fx,fy,fz, featureID, featureDefID}
 				else

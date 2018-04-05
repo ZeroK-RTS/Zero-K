@@ -1,0 +1,207 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+--  file:    setupdefs.lua
+--  brief:   setup some custom UnitDefs parameters,
+--           and UnitDefNames, FeatureDefNames, WeaponDefNames
+--  author:  Dave Rodgers
+--
+--  Copyright (C) 2007.
+--  Licensed under the terms of the GNU GPL, v2 or later.
+--
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+--local ReplaceUDefsByLua = true --Spring.GetConfigString("WH_ReplaceAllUnitDefsWithLuaCache") ~= "false"
+--Spring.SetConfigString("WH_ReplaceAllUnitDefsWithLuaCache", ReplaceUDefsByLua and "true" or "false")
+--
+--local ProfileUnitDefsTable = true --Spring.GetConfigString("WH_ProfileUnitDefsTable") ~= "false"
+--Spring.SetConfigString("WH_ProfileUnitDefsTable", ProfileUnitDefsTable and "true" or "false")
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+--
+--if ReplaceUDefsByLua then
+--  _origWeaponDefs = WeaponDefs
+--  WeaponDefs = {}
+--  Spring.Echo("Retarted engine error spam starts >>")
+--else
+--  _origWeaponDefs = WeaponDefs
+--end
+--
+--for id,udo in pairs(_origWeaponDefs or {}) do
+--  local ud
+--  if ReplaceUDefsByLua then
+--    WeaponDefs[id] = {}
+--    ud = WeaponDefs[id]
+--    for name,param in udo:pairs() do --TODO check how sub tables should be copied (if some has a metatable)
+--	ud[name] = param --BUG fuckingErrorSpamByRetartedRetards
+--    end
+--    ud.pairs = pairs
+--  else
+--    ud = udo
+--  end
+--  if ReplaceUDefsByLua then
+--    ud["maxVelocity"] = ud.projectilespeed
+--    ud.projectilespeed = nil
+--    ud["areaOfEffect"] = ud["damageAreaOfEffect"]
+--    ud["damageAreaOfEffect"] = nil
+--  end
+--end
+--
+--_origWeaponDefs = nil
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+--
+--if ReplaceUDefsByLua then
+--  _origUnitDefs = UnitDefs
+--  UnitDefs = {}
+--else
+--  _origUnitDefs = UnitDefs
+--end
+--
+--local emptyTable = {}
+--
+--for id,udo in pairs(_origUnitDefs or {}) do
+--  local ud
+--  if ReplaceUDefsByLua then
+--    UnitDefs[id] = {}
+--    ud = UnitDefs[id]
+--    for name,param in udo:pairs() do --TODO check how sub tables should be copied (if some has a metatable)
+--      ud[name] = param
+--    end
+--    ud.pairs = pairs
+--  else
+--    ud = udo
+--  end
+--  -- set the cost value  (same as shown in the tooltip)
+--  ud.cost = ud.metalCost + (ud.energyCost / 60.0)
+--  if ReplaceUDefsByLua then
+--    ud.maxSlope = ud.maxHeightDif
+--    ud.maxHeightDif = nil
+--    ud.canHover = ud.floatOnWater or nil  --set possible false values to nil to get smaller tables and remove retarted incompatible renames
+--    ud.floater = ud.floatOnWater or nil
+--    ud.floatOnWater = nil
+--    ud.isBuilder = ud.builder or nil
+--    ud.canDGun = ud.canManualFire or nil
+--    ud.canManualFire = nil
+--    ud.canCrash = ud.canLoopbackAttack or nil
+--    ud.canLoopbackAttack = nil
+--  end
+--  --isCommander = 
+--  ud.isMetalExtractor = ud.extractsMetal and ud.extractsMetal > 0 or nil
+--  
+--  if ud.weapons and #ud.weapons > 0 then
+--    ud.wDefs = {}
+--    for i, wt in ipairs(ud.weapons) do
+--      local wd = WeaponDefs[wt.weaponDef]
+--      ud.wDefs[i] = wd
+--      if (wd) then
+--	if (wd.isShield)    then ud.hasShield      = true end
+--	if (wd.paralyzer)   then ud.canParalyze    = true end
+--	if (wd.stockpile)   then ud.canStockpile   = true end
+--	if (wd.waterWeapon) then ud.canAttackWater = true end
+--      end
+--    end
+--  else
+--    ud.wDefs = emptyTable
+--    if ReplaceUDefsByLua then
+--      ud.weapons = emptyTable
+--    end
+--  end
+--end
+--
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+--
+---- setup the UnitDefNames{} table
+--do
+--  local tbl = {}
+--  for _,def in pairs(UnitDefs or {}) do
+--    tbl[def.name] = def
+--  end
+--  UnitDefNames = tbl
+--end
+--
+---- setup the FeatureDefNames{} table
+--do
+--  local tbl = {}
+--  for _,def in pairs(FeatureDefs or {}) do
+--    tbl[def.name] = def
+--  end
+--  FeatureDefNames = tbl
+--end
+--
+---- setup the WeaponDefNames{} table
+--do
+--  local tbl = {}
+--  for _,def in pairs(WeaponDefs or {}) do
+--    tbl[def.name] = def
+--  end
+--  WeaponDefNames = tbl
+--end
+--
+--if ReplaceUDefsByLua then
+--  UnitDefs._origUnitDefs = _origUnitDefs --access to the original engine table!!!BUG!
+--  Spring.Echo("Retarted engine error spam ends <<")
+--end
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+--_origUnitDefs = nil
+--
+----------------------------------------------------------------------------------
+--
+--
+--if ProfileUnitDefsTable then
+--
+--	local EchoAccessEvery = 1
+--
+--	Spring.Echo("ProfileUnitDefsTable enabled, disable this for production!")
+--	
+--	local function AddAccessEcho(defTable, name)
+--		local accesCounts = {}
+--		local accessingWidgets = {} --["name"] = total access
+--
+--		for id,udo in pairs(defTable or {}) do
+--			local llllUnitDefs = udo
+--
+--			local metaIndexproxy = {__index =
+--				function(self, key)
+--					accesCounts[key] = accesCounts[key] and accesCounts[key] + 1 or 1
+--					if(accesCounts[key]%EchoAccessEvery==0)then 
+--						Spring.Echo("UnitDef Access",key,accesCounts[key]) 
+--					end
+--					--// get caller's enviroment
+--					local _level = 2
+--					local success, Widg
+--					for i=_level,_level+10 do
+--						success, Widg = pcall(getfenv, i+1) --// +1 cause of pcall!
+--						if success then
+--							if Widg.GetInfo then success = Widg.GetInfo().name;
+--								break 
+--							end
+--						end
+--					end
+--				   
+--					if success then
+--						accessingWidgets[success] = accessingWidgets[success] and accessingWidgets[success]+1 or 1
+--						if(accessingWidgets[success]%EchoAccessEvery==0)then
+--							Spring.Echo(name .. " Access by widget",success,accessingWidgets[success],key,accesCounts[key], id)
+--						end
+--					end
+--				   
+--					return llllUnitDefs[key]
+--				end
+--			}
+--			defTable[id] = setmetatable({}, metaIndexproxy)
+--		end
+-- 
+--		defTable.Profiling = {accesCounts,accessingWidgets}
+--	end
+--	
+--	AddAccessEcho(UnitDefs, "UnitDefs")
+--	AddAccessEcho(UnitDefNames, "UnitDefNames")
+--	AddAccessEcho(WeaponDefs, "WeaponDefs")
+--	AddAccessEcho(WeaponDefNames, "WeaponDefNames")
+--	AddAccessEcho(FeatureDefs, "FeatureDefs")
+--	AddAccessEcho(FeatureDefNames, "FeatureDefNames")
+--end
+--
