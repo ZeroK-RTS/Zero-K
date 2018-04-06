@@ -242,7 +242,7 @@ local function CheckRemoveWormhole(unitID, unitDefID)
 	if #wormholeList == 1 then
 		RemoveEvacCommands()
 		wormholeList[1] = nil
-		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NO_WORMHOLE)
+		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.WORMHOLE_DESTROYED)
 		return
 	end
 	
