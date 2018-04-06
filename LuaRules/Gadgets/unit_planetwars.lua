@@ -691,7 +691,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 		unitsByID[unitID] = nil
 		UpdateEvacState()
-		CheckRemoveWormhole(unitID)
+		CheckRemoveWormhole(unitID, unitDefID)
 	end
 	if hqs[unitID] then
 		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam))
