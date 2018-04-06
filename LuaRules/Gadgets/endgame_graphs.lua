@@ -60,7 +60,7 @@ end
 local featureMetal = {}
 for i = 1, #FeatureDefs do
 	local featureDef = FeatureDefs[i]
-	featuremetal[i] = fdef.metal
+	featureMetal[i] = featureDef.metal
 end
 
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
