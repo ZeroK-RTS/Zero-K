@@ -344,12 +344,34 @@ function widget:DrawWorld()
 	gl.Fog(true)
 end
 
+local function GetTeamName(teamID)
+	local _, leaderID, _, isAiTeam = Spring.GetTeamInfo(teamID)
+	if isAiTeam then
+		local aiName = select(2, Spring.GetAIInfo(teamID))
+		if aiName then
+			return aiName
+		end
+	end
+
+	if not leaderID then
+		return
+	end
+	local playerName = Spring.GetPlayerInfo(leaderID)
+	if not playerName then
+		return
+	end
+	if isAiTeam then
+		return "AI (" .. playerName .. ")"
+	end
+	return playerName
+end
+
 function widget:DrawScreenEffects()
 	gl.Fog(false)
 	gl.BeginText()
 
 	for _, teamID in ipairs(Spring.GetTeamList()) do
-		local name = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(teamID)))
+		local name = GetTeamName(teamID)
 		local x, y, z = Spring.GetTeamStartPosition(teamID)
 		if name and ValidStartpos(x, y, z) then
 			local sx, sy, sz = Spring.WorldToScreenCoords(x, y + 120, z)
