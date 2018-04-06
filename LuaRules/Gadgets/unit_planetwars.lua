@@ -817,7 +817,7 @@ function gadget:Initialize()
 	--end
 	
 	Spring.SetGameRulesParam("pw_teleport_time", TELEPORT_FRAMES)
-	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
+	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*(teleportChargeNeededMult or 1))
 end
 
 function gadget:AllowCommand_GetWantedCommand()
