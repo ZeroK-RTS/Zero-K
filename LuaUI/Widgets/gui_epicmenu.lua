@@ -2104,6 +2104,7 @@ local function UnpauseFromExitConfirmWindow()
 		spSendCommands("pause 0")
 	end
 end
+WG.crude.UnpauseFromExitConfirmWindow = UnpauseFromExitConfirmWindow
 
 local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpauseOnNo)
 	local screen_width, screen_height = Spring.GetWindowGeometry()
@@ -2605,12 +2606,12 @@ local function MakeMenuBar()
 end
 
 local function MakeQuitButtons()
-	AddOption('', {
-		type = 'label',
-		name = 'Quit game',
-		value = 'Quit game',
-		key = 'Quit game',
-	})
+	--AddOption('', {
+	--	type = 'label',
+	--	name = 'Quit game',
+	--	value = 'Quit game',
+	--	key = 'Quit game',
+	--})
 	
 	local imgPath = LUAUI_DIRNAME  .. 'images/'
 
@@ -3249,6 +3250,12 @@ function ViewLobby()
 		Spring.Echo("SendLuaMenuMsg showLobby")
 		if WG.ShowInterface then
 			WG.ShowInterface()
+		end
+		if AllowPauseOnMenuChange() then
+			local paused = select(3, Spring.GetGameSpeed())
+			if not paused then
+				spSendCommands("pause")
+			end
 		end
 		Spring.SendLuaMenuMsg("showLobby")
 	end

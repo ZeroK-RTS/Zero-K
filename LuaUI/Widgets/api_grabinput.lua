@@ -105,5 +105,8 @@ function widget:RecvLuaMsg(msg)
 		if options.lobbyDisables.value and options.grabinput.value then
 			Spring.SendCommands("grabinput 1")
 		end
+		if WG.crude and WG.crude.UnpauseFromExitConfirmWindow then
+			WG.crude.UnpauseFromExitConfirmWindow()
+		end
 	end
 end
