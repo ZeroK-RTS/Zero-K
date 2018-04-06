@@ -45,6 +45,7 @@ local Button
 
 local vsx, vsy = Spring.GetViewGeometry()
 local modoptions = Spring.GetModOptions() --used in LuaUI\Configs\startup_info_selector.lua for planetwars
+local campaignBattleID = modoptions.singleplayercampaignbattleid
 local fixedStartPos = modoptions.fixedstartpos
 local selectorShown = false
 local mainWindow
@@ -504,7 +505,7 @@ function widget:Update(dt)
 		end
 	end
 	
-	if startPosTimer and options.cameraZoom.value then
+	if startPosTimer and options.cameraZoom.value and (not campaignBattleID) then
 		startPosTimer = startPosTimer + dt
 		if Spring.GetGameFrame() <= 0 then
 			if startPosTimer > 0.1 then
