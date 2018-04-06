@@ -33,9 +33,10 @@ local EVAC_STATE = {
 	WORMHOLE_DESTROYED = 4,
 }
 
+-- FIXME: post feature freeze, rewrite to use data provided by infra. See #2877
 local factions = {
 	Cybernetic = {name = "Cybernetic Front", color = {136,170,255} },
-	--Dynasty = {name = "Dynasty of Earth", color = {255, 170, 32} },
+	Federation = {name = "Federation", color = {0, 226, 0} },
 	Dynasty = {name = "Dynasty of Man", color = {255, 191, 0} },
 	Machines = {name = "Free Machines", color = {170, 0, 0} },
 	Empire = {name = "Empire Reborn", color = {96, 16, 255} },
