@@ -130,8 +130,13 @@ function Spring.Utilities.GetEffectiveWeaponRange(unitDefID, heightDiff, weaponN
 	if weaponNumber then
 		if not unitWeaponList[unitDefID] then
 			unitWeaponList[unitDefID] = UnitDefs[unitDefID].weapons
+			if #(unitWeaponList[unitDefID] or {}) < 1 then
+				unitWeaponList[unitDefID] = 0
+			end
 		end
-		weaponDefID = unitWeaponList[unitDefID][weaponNumber].weaponDef
+		if unitWeaponList[unitDefID] ~= 0 then
+			weaponDefID = (unitWeaponList[unitDefID][weaponNumber] or {}).weaponDef
+		end
 	else
 		weaponDefID = unitWeapon[unitDefID]
 	end
