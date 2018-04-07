@@ -184,7 +184,7 @@ local options = {
 	desc	= "Prevents specified units from being built ingame. Specify multiple units by using + ",
 	section	= 'startconds',
 	type	= "string",
-	def		= nil,
+	def		= "",
   },
 	{
 		key = 'globallos',
