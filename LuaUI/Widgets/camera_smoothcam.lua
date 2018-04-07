@@ -65,6 +65,10 @@ function widget:Update(dt)
 		end
 	end
 	local state = spGetCameraState()
+	if state.mode ~= 1 then
+		-- Only apply to default camera.
+		return
+	end
 	if options.tiltZoom.value ~= 0 then
 		if math.abs(state.height - newHeight) > 50 then
 			newHeight = newHeight + (state.height - newHeight)*0.18
