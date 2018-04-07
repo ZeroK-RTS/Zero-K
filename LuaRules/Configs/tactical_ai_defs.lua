@@ -36,6 +36,7 @@ end
 
 -- general arrays
 local allGround = {}
+local allMobileGround = {}
 local armedLand = {}
 
 for name,data in pairs(UnitDefNames) do
@@ -43,6 +44,9 @@ for name,data in pairs(UnitDefNames) do
 		allGround[data.id] = true
 		if data.canAttack and data.weapons[1] and data.weapons[1].onlyTargets.land then
 			armedLand[data.id] = true
+		end
+		if data.speed > 0 then
+			allMobileGround[data.id] = true
 		end
 	end
 end
@@ -1081,7 +1085,7 @@ local behaviourConfig = {
 	
 	-- arty range skirms
 	["cloaksnipe"] = {
-		skirms = allGround,
+		skirms = allMobileGround,
 		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
@@ -1090,7 +1094,7 @@ local behaviourConfig = {
 	},
 	
 	["veharty"] = {
-		skirms = allGround,
+		skirms = allMobileGround,
 		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
@@ -1100,7 +1104,7 @@ local behaviourConfig = {
 	},
 	
 	["vehheavyarty"] = {
-		skirms = allGround,
+		skirms = allMobileGround,
 		skirmRadar = true, 
 		swarms = {}, 
 		flees = {},
@@ -1110,7 +1114,7 @@ local behaviourConfig = {
 	},
 	
 	["tankarty"] = {
-		skirms = allGround,
+		skirms = allMobileGround,
 		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
@@ -1123,7 +1127,7 @@ local behaviourConfig = {
 	},
 	
 	["striderarty"] = {
-		skirms = allGround,
+		skirms = allMobileGround,
 		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
@@ -1131,7 +1135,7 @@ local behaviourConfig = {
 	},
 	
 	["cloakarty"] = {
-		skirms = allGround, 
+		skirms = allMobileGround, 
 		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
@@ -1139,7 +1143,7 @@ local behaviourConfig = {
 		skirmBlockedApproachFrames = 40,
 	},
 	["jumparty"] = {
-		skirms = allGround, 
+		skirms = allMobileGround, 
 		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
@@ -1158,7 +1162,7 @@ local behaviourConfig = {
 		skirmLeeway = 150, 
 	},
 	["hoverarty"] = {
-		skirms = allGround, 
+		skirms = allMobileGround, 
 		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
@@ -1169,14 +1173,14 @@ local behaviourConfig = {
 		velocityPrediction = 0,
 	},
 	["striderbantha"] = {
-		skirms = allGround, 
+		skirms = allMobileGround, 
 		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
 		skirmLeeway = 120, 
 	},
 	["shiparty"] = {
-		skirms = allGround, 
+		skirms = allMobileGround, 
 		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
