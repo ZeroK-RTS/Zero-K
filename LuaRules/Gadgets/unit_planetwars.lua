@@ -197,7 +197,7 @@ local function CheckSetWormhole(unitID)
 	if (not chargeMult) or (Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1) then
 		return
 	end
-	if chargeMult < (teleportChargeNeededMult or 0) then
+	if (not teleportChargeNeededMult) or chargeMult < teleportChargeNeededMult then
 		if wormholeList[1] then
 			wormholeList[#wormholeList + 1] = wormholeList[1]
 		end
@@ -256,7 +256,7 @@ local function CheckRemoveWormhole(unitID, unitDefID)
 end
 
 local function TeleportChargeTick()
-	if not wormholeList[1] then
+	if not (wormholeList[1] and teleportChargeNeededMult) then
 		return
 	end
 	local stunnedOrInbuild = Spring.GetUnitIsStunned(wormholeList[1])
