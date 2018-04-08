@@ -197,7 +197,7 @@ local function CheckSetWormhole(unitID)
 	if (not chargeMult) or (Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1) then
 		return
 	end
-	if chargeMult > (teleportChargeNeededMult or 0) then
+	if chargeMult < (teleportChargeNeededMult or 0) then
 		if wormholeList[1] then
 			wormholeList[#wormholeList + 1] = wormholeList[1]
 		end
