@@ -278,6 +278,7 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 			local circuitTime = oldcircuitTime[targetID] and oldcircuitTime[targetID][radGroup]
 			-- Update circuit positon
 			if circuitTime then
+				guardAngle[targetID] = guardAngle[targetID] or {}
 				guardAngle[targetID][radGroup] = ((guardAngle[targetID] and guardAngle[targetID][radGroup]) or 0) + circleDirection[targetID]*CIRC_MULT/circuitTime
 			end
 		end
