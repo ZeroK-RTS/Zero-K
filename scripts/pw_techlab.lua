@@ -65,7 +65,7 @@ local function moveslider()
 end
 
 function script.Create()
-	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 then
+	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 or GG.applyPlanetwarsDisable then
 		return
 	end
 	

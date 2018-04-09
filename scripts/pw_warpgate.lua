@@ -11,7 +11,7 @@ function script.Create()
 end
 
 function script.Activate ()
-	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") ~= 1 then
+	if (Spring.GetUnitRulesParam(unitID, "planetwarsDisable") ~= 1) and not GG.applyPlanetwarsDisable then
 		Spin(gen1, y_axis, 1, 0.01)
 		Spin(gen2, y_axis, -1, 0.01)
 	end

@@ -15,7 +15,7 @@ function script.Create()
 	Turn(coolers[1], y_axis, math.rad(60))
 	Turn(coolers[3], y_axis, math.rad(-60))
 	
-	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 then
+	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 or GG.applyPlanetwarsDisable then
 		return
 	end
 	

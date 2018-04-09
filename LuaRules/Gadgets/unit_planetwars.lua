@@ -92,7 +92,6 @@ local hqsDestroyed = {}
 local destroyedStructures = {data = {}, count = 0}
 local evacuateStructureString = false
 local haveEvacuable = false
-local applyPlanetwarsDisable = false
 
 local flattenAreas = {}
 
@@ -505,11 +504,11 @@ local function SpawnStructure(info, teamID, boxData)
 	end
 	
 	if info.isInactive then
-		applyPlanetwarsDisable = true
+		GG.applyPlanetwarsDisable = true
 	end
 	local unitID = Spring.CreateUnit(info.unitname, x, y, z, direction, teamID, false, false)
 	if info.isInactive then
-		applyPlanetwarsDisable = false
+		GG.applyPlanetwarsDisable = false
 	end
 	CheckSetWormhole(unitID)
 	
@@ -669,7 +668,7 @@ function gadget:GameFrame(frame)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	if applyPlanetwarsDisable then
+	if GG.applyPlanetwarsDisable then
 		Spring.SetUnitRulesParam(unitID, "planetwarsDisable", 1, INLOS_ACCESS)
 		GG.UpdateUnitAttributes(unitID)
 	end
@@ -747,7 +746,9 @@ local function InitializeUnitsToSpawn()
 	else
 		pwDataRaw = string.gsub(pwDataRaw, '_', '=')
 		pwDataRaw = Spring.Utilities.Base64Decode(pwDataRaw)
-		pwDataFunc, err = loadstring("return "..pwDataRaw)
+		pwDataRaw = pwDataRaw:gsub("True,", "true,")
+		pwDataRaw = pwDataRaw:gsub("False,", "false,")
+		pwDataFunc, err = loadstring("return ".. pwDataRaw)
 		if pwDataFunc then
 			success, unitData = pcall(pwDataFunc)
 			if not success then	-- execute Borat

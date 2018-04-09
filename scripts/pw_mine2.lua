@@ -13,7 +13,7 @@ local wheels = {wheel1, wheel2, wheel3, wheel4}
 local smokePiece = {base, wheel1, wheel2, wheel3, wheel4}
 
 function script.Activate()
-	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 then
+	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 or GG.applyPlanetwarsDisable then
 		return
 	end
 	
