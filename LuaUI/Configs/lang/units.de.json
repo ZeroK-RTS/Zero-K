@@ -106,8 +106,8 @@
 	},
 	"starlight_satellite" : {
 		"name" : "Glint",
-		"description" : "Starlight relay satellite",
-		"helptext" : "This is the satellite used by Starlight for targeting."
+		"description" : "Starlight Überbrückungssatellit",
+		"helptext" : "Dieser Satellit lenkt den tödlichen Energiestrahl des Starlights auf seine Feinde."
 	},
 	"vehheavyarty" : {
 		"name" : "Impaler",
@@ -131,8 +131,8 @@
 	},
 	"factoryamph" : {
 		"name" : "Amphbot Factory",
-		"description" : "Produces Amphibious Bots, Builds at 10 m/s",
-		"helptext" : "The Amphibot Factory builds the slow but sturdy amphibious bots, providing an alternative approach to land/sea warfare. Units from this factory typically regenerate while submerged."
+		"description" : "Produziert amhpibische Roboter, Baut mit 10 M/s",
+		"helptext" : "Diese Fabrik stellt langsame jedoch robuste, amphibische Roboter her. Unterwasser reparieren sich diese Roboter meist automatisch. "
 	},
 	"factoryship" : {
 		"name" : "Shipyard",
@@ -167,7 +167,7 @@
 	"dronecarry" : {
 		"name" : "Gull",
 		"description" : "Trägerdrohne",
-		"helptext" : "The Gull is a small, aggressive drone armed with an energy MG."
+		"helptext" : "Diese kleine, aggressive Drohne verfügt über ein Plasma-Maschinengewehr, welches in Schwärmen auch grösseren Einheiten gefährlich werden kann."
 	},
 	"cloakheavyraid" : {
 		"name" : "Scythe",
@@ -526,13 +526,13 @@
 	},
 	"amphaa" : {
 		"name" : "Angler",
-		"description" : "Amphibious Anti-Air Bot",
-		"helptext" : "Angler is amphibious anti-air bot designed to counter the factory's nemesis - Raven. Two of them together can float to the surface and kill a single Raven."
+		"description" : "Amphibischer Luftabwehrroboter",
+		"helptext" : "Angler ist eine amphibischer Luftabwehrroboter ausgelegt auf den Abschuss von Präzisionsbombern. Zwei davon können auftauchen und einen Präzisionsbomber in einer einzigen Salve zerstören."
 	},
 	"gunshipcon" : {
 		"name" : "Wasp",
-		"description" : "Heavy Construction Aircraft, Builds at 7.5 m/s",
-		"helptext" : "A heavy constructor which combines the convenience of flying with high buildpower."
+		"description" : "Schwere Konstruktionsdrohne, baut mit 7.5 m/s",
+		"helptext" : "Eine schwere Konstruktionsdrohne, welche flugtauglich ist und schnell baut."
 	},
 	"subraider" : {
 		"name" : "Seawolf",
@@ -552,7 +552,7 @@
 	"spideranarchid" : {
 		"name" : "Anarchid",
 		"description" : "Drohnengestell",
-		"helptext" : "<placeholder; German translation is still WHIP>"
+		"helptext" : "Peitscht seine Feinde mit einem Energiestrahl!"
 	},
 	"asteroid" : {
 		"name" : "Asteroid",
@@ -566,12 +566,12 @@
 	},
 	"energywind" : {
 		"name" : "Wind/Tidal Generator",
-		"description" : "Kleine Kraftwerk (variabel)",
-		"helptext" : "Windräder produzieren eine variable Menge an Energie, je nach Höhenlage und Windgeschwindigkeit. Sie sind extrem verletzlich und explodieren in einer Kettenreaktion, sobald sie zerstört werden. Platziere sie also mit Bedacht."
+		"description" : "Kleines Wind-/Wasserkraftwerk (variabel)",
+		"helptext" : "Windräder produzieren eine variable Menge an Energie, je nach Höhenlage und Windgeschwindigkeit. Sie sind extrem verletzlich und explodieren in einer Kettenreaktion, sobald sie zerstört werden. Platziere sie also mit Bedacht. Wasserkraftwerke sind um einiges robuster und erzeugen konstant Energie."
 	},
 	"energygeo" : {
 		"name" : "Geothermal Generator",
-		"description" : "Kraftwerk (+25)",
+		"description" : "Geothermisches Kraftwerk (+25)",
 		"helptext" : "Geothermische Anlagen sind hocheffiziente Energiequellen, die nur auf Thermalquellen auf der Karte gebaut werden können. Sie explodieren heftig, wenn sie zerstört werden. Von daher vermeide es, sie in unmittelbarer Nähe zu deiner Basis zu bauen."
 	},
 	"striderdetriment" : {
@@ -601,7 +601,7 @@
 	},
 	"energysolar" : {
 		"name" : "Solar Collector",
-		"description" : "Kleine Kraftwerk (+2)",
+		"description" : "Kleines Solarkraftwerk (+2)",
 		"helptext" : "Solaranlagen sind von den Energiestrukturen die mit der geringsten Kosteneffizienz, aber sie sind auch die verlässlichsten und stabilsten unter ihnen. Sobald sie angegriffen werden ziehen sie sich in eine gepanzerte Form fur 8 Sekunden zurück, die als exzellenter Schutz gegen Raider fungiert."
 	},
 	"empiricaldpser" : {
@@ -716,8 +716,8 @@
 	},
 	"shipskirm" : {
 		"name" : "Mistral",
-		"description" : "Rocket Boat (Skirmisher)",
-		"helptext" : "This Rocket Boat fires a salvo of four medium-range rockets, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close."
+		"description" : "Raketenboot (Skirmisher)",
+		"helptext" : "Dieses Boot feuert eine Salve von vier Mittelreichweitenraketen, praktisch um See- sowie Landziele zu bombardieren. Einzig U-Boote und schnellere Einheiten sollten vermieden werden, da das Boot über keine Nahkampfwaffen verfügt."
 	},
 	"staticarty" : {
 		"name" : "Cerberus",
@@ -731,8 +731,8 @@
 	},
 	"spiderriot" : {
 		"name" : "Redback",
-		"description" : "Riot Spider",
-		"helptext" : "A rapid fire spider which excels at picking off fast units."
+		"description" : "Riot Spinne",
+		"helptext" : "Diese Spinne benutzt einen schnellfeuernden Teilchenbeschleunigerstrahl um kleine, flinke Einheiten effektiv zu bekämpfen."
 	},
 	"spidercrabe" : {
 		"name" : "Crab",
@@ -751,8 +751,8 @@
 	},
 	"terraunit" : {
 		"name" : "Terraform",
-		"description" : "Spent: 0",
-		"helptext" : "This unit represents an area being terraformed."
+		"description" : "Ausgegeben: 0",
+		"helptext" : "Hier wird geschaufelt."
 	},
 	"chickenf" : {
 		"name" : "Talon",
@@ -781,8 +781,8 @@
 	},
 	"amphfloater" : {
 		"name" : "Buoy",
-		"description" : "Heavy Amphibious Skirmisher Bot",
-		"helptext" : "The Buoy works around its inability to shoot while submerged by floating to the surface of the sea. Here it can fire a decently ranged cannon with slow damage. It is unable to move while floating."
+		"description" : "Schwerer Amphibischer Skirmisher Roboter",
+		"helptext" : "Diese Einheit verfügt über eine Kanone, welche nicht nur über eine gute Reichweite verfügt, sondern zusätzlich den Feind mit jedem Treffer verlangsamt. Dies erschwert es dem Feind, zurückzufeuern oder abzuhauen. Da sie im Wasser nicht funktioniert, muss diese Einheit auftauchen um die Kanone abzufeuern."
 	},
 	"chicken_dodo" : {
 		"name" : "Dodo",
@@ -812,7 +812,7 @@
 	"gunshipskirm" : {
 		"name" : "Harpy",
 		"description" : "Skirmisher/Flugabwehr Hubschrauber",
-		"helptext" : "The Harpy is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets."
+		"helptext" : "Dieser leichte Kampfhubschrauber bekämpft seine Feinde mit präzisen Verfolgungsraketen. Diese verursachen zwar nicht den meisten Schaden, verlangsamen den Feind jedoch und verfehlen ihr Ziel fast nie. Die Reichweite und Geschwindigkeit dieses Hubschraubers sind eher begrenzt, dafür ist er relativ robust gebaut und kann die meisten Luft- und Bodeneinheiten effektiv bekämpfen."
 	},
 	"chickenwurm" : {
 		"name" : "Wurm",
@@ -821,7 +821,7 @@
 	},
 	"energyfusion" : {
 		"name" : "Fusion Reactor",
-		"description" : "Kraftwerk (+35)",
+		"description" : "Fusionskraftwerk (+35)",
 		"helptext" : "Der Fusionsreaktor liefert eine gute Menge an konstanter Energie zu einem fairen Preis. Sie sind aber attraktive Ziele und schlecht gepanzert, also beschütze sie gut. Sobald ein Reaktor zerstört wird, werden Einheiten in der Nähe beschädigt."
 	},
 	"shipcon" : {
@@ -837,7 +837,7 @@
 	"amphcon" : {
 		"name" : "Conch",
 		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s",
-		"helptext" : "The Conch is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land."
+		"helptext" : "Ein robuster und effizienter Konstruktionsroboter der sowohl im Wasser als auch an Land seine Arbeit verrichtet."
 	},
 	"bomberassault" : {
 		"name" : "Eclipse",
@@ -1121,8 +1121,8 @@
 	},
 	"energyheavygeo" : {
 		"name" : "Advanced Geothermal",
-		"description" : "Groß Kraftwerk (+100) - GEFÄHRLICH",
-		"helptext" : "Das Verbessert Geothermisches Kraftwerk erzeugt eine große Menge an Energie, doch stellt es auch ein lohnendes Angriffsziel dar."
+		"description" : "Großes geothermisches Kraftwerk (+100) - GEFÄHRLICH",
+		"helptext" : "Das verbesserte geothermische Kraftwerk erzeugt eine große Menge an Energie, doch stellt es auch ein lohnendes Angriffsziel dar."
 	},
 	"fakeunit_aatarget" : {
 		"name" : "Fake AA target",
@@ -1146,8 +1146,8 @@
 	},
 	"energysingu" : {
 		"name" : "Singularity Reactor",
-		"description" : "Groß Kraftwerk (+225) - GEFÄHRLICH",
-		"helptext" : "Dieser singuläre Reaktor erzeugt eine riesige Menge an Energie, wozu er ein kontrolliertes Schwarzes Loch nutzt - was genauso sicher ist, wie es sich anhört. Wird der Reaktor zerstört, wird eine riesige Menge an Energie frei, die sich in einer Explosion ungeheuren Ausmaßes, vergleichbar mit einer Atomexplosion, äußert. Ein ganzer Kontinent, auf dem der Reaktor gebaut wird, sollte von nun an als unsicherer Boden betrachtet werden."
+		"description" : "Großes Kraftwerk (+225) - GEFÄHRLICH",
+		"helptext" : "Dieser Reaktor erzeugt eine riesige Menge an Energie, wozu er ein kontrolliertes Schwarzes Loch nutzt - was genauso sicher ist, wie es sich anhört. Wird der Reaktor zerstört, wird eine riesige Menge an Energie frei, die sich in einer Explosion ungeheuren Ausmaßes, vergleichbar mit einer Atomexplosion, äußert. Ein ganzer Kontinent, auf dem der Reaktor gebaut wird, sollte von nun an als unsicherer Boden betrachtet werden."
 	},
 	"turretaafar" : {
 		"name" : "Chainsaw",
