@@ -2212,7 +2212,10 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	
 	-- Ground position tooltip (spGetCurrentTooltip())
 	if holdingSpace then
-		return tooltipWindow.SetTextTooltip(Spring.GetCurrentTooltip())
+		local springTooltip = Spring.GetCurrentTooltip()
+		if springTooltip and string.find(springTooltip, "Terrain type:") then
+			return tooltipWindow.SetTextTooltip(springTooltip)
+		end
 	end
 	
 	-- Start position tooltip (really bad widget interface)

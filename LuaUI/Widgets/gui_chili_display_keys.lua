@@ -154,7 +154,7 @@ local function InitializeMouseButtonControl(name)
 		parent = window,
 		padding = {0,0,0,0},
 		y      = 0,
-		x      = "40shou%",
+		x      = "40%",
 		right  = "40%",
 		bottom = 0,
 		classname = "panel_button_rounded",
