@@ -49,7 +49,7 @@ options = {
 	},
 }
 
-local panelColor = {1,1,1,0.7}
+local panelColor = {1,1,1,0.8}
 local highlightColor = {1,0.7, 0, 1}
 
 --------------------------------------------------------------------------------
@@ -140,9 +140,9 @@ local function InitializeMouseButtonControl(name)
 		padding = {0,0,0,0},
 		y      = 0,
 		x      = 0,
-		right  = "62%",
+		right  = "60%",
 		bottom = 0,
-		classname = "panel_button",
+		classname = "panel_button_rounded",
 		dockable = false;
 		draggable = false,
 		resizable = false,
@@ -154,10 +154,10 @@ local function InitializeMouseButtonControl(name)
 		parent = window,
 		padding = {0,0,0,0},
 		y      = 0,
-		x      = "38%",
-		right  = "38%",
+		x      = "40shou%",
+		right  = "40%",
 		bottom = 0,
-		classname = "panel_button",
+		classname = "panel_button_rounded",
 		dockable = false;
 		draggable = false,
 		resizable = false,
@@ -169,14 +169,47 @@ local function InitializeMouseButtonControl(name)
 		parent = window,
 		padding = {0,0,0,0},
 		y      = 0,
-		x      = "62%",
+		x      = "60%",
 		right  = 0,
 		bottom = 0,
-		classname = "panel_button",
+		classname = "panel_button_rounded",
 		dockable = false;
 		draggable = false,
 		resizable = false,
 		OnMouseDown = ShowOptions,
+	}
+	
+	local leftLabel = Chili.Label:New{
+		parent = leftPanel,
+		x      = 15,
+		y      = 10,
+		right  = 10,
+		bottom = 12,
+		caption = "",
+ 		align  = "center",
+		autosize = false,
+		font   = {
+			size = 36, 
+			outline = true, 
+			outlineWidth = 2, 
+			outlineWeight = 2,
+		},
+	}
+	local rightLabel = Chili.Label:New{
+		parent = rightPanel,
+		x      = 15,
+		y      = 10,
+		right  = 10,
+		bottom = 12,
+		caption = "",
+ 		align  = "center",
+		autosize = false,
+		font   = {
+			size = 36, 
+			outline = true, 
+			outlineWidth = 2, 
+			outlineWeight = 2,
+		},
 	}
 	
 	local function UpdateWindow(val)
@@ -187,6 +220,8 @@ local function InitializeMouseButtonControl(name)
 			middlePanel.color = panelColor
 			rightPanel.backgroundColor = panelColor
 			rightPanel.color = panelColor
+			leftLabel:SetCaption("Left")
+			rightLabel:SetCaption("")
 		elseif val == 2 then
 			leftPanel.backgroundColor = panelColor
 			leftPanel.color = panelColor
@@ -194,6 +229,8 @@ local function InitializeMouseButtonControl(name)
 			middlePanel.color = highlightColor
 			rightPanel.backgroundColor = panelColor
 			rightPanel.color = panelColor
+			leftLabel:SetCaption("")
+			rightLabel:SetCaption("")
 		elseif val == 3 then
 			leftPanel.backgroundColor = panelColor
 			leftPanel.color = panelColor
@@ -201,6 +238,8 @@ local function InitializeMouseButtonControl(name)
 			middlePanel.color = panelColor
 			rightPanel.backgroundColor = highlightColor
 			rightPanel.color = highlightColor
+			leftLabel:SetCaption("")
+			rightLabel:SetCaption("Right")
 		else
 			leftPanel.backgroundColor = panelColor
 			leftPanel.color = panelColor
@@ -208,6 +247,8 @@ local function InitializeMouseButtonControl(name)
 			middlePanel.color = panelColor
 			rightPanel.backgroundColor = panelColor
 			rightPanel.color = panelColor
+			leftLabel:SetCaption("")
+			rightLabel:SetCaption("")
 		end
 		leftPanel:Invalidate()
 		middlePanel:Invalidate()
