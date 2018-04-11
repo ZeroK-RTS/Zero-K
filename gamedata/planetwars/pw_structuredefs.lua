@@ -46,7 +46,7 @@ local structureConfig = {
 	end,
 
 	pw_artefact = function(unitDef)
-		unitDef.maxdamage = 50000
+		unitDef.maxdamage = 20000
 		unitDef.name = "Ancient Artefact"
 		unitDef.description = "Mysterious Relic"
 		unitDef.objectname = "pw_artefact.dae"
@@ -66,7 +66,7 @@ local structureConfig = {
 	end,
 
 	pw_dropfac = function(unitDef)
-		unitDef.maxdamage = 25000
+		unitDef.maxdamage = 16000
 		unitDef.name = "Dropship Factory"
 		unitDef.description = "Produces dropships"
 		unitDef.objectname = "pw_dropfac.dae"
@@ -98,7 +98,7 @@ local structureConfig = {
 	end,
 
 	pw_bomberfac = function(unitDef)
-		unitDef.maxdamage = 20000
+		unitDef.maxdamage = 16000
 		unitDef.name = "Bomber Factory"
 		unitDef.description = "Produces bombers"
 		unitDef.objectname = "pw_dropdepot.dae"
@@ -289,7 +289,7 @@ local structureConfig = {
 	end,
 
 	pw_wormhole = function(unitDef)
-		unitDef.maxdamage = 12500
+		unitDef.maxdamage = 12000
 		unitDef.name = "Wormhole Generator"
 		unitDef.description = "Links this planet to nearby planets"
 		unitDef.objectname = "pw_estorage.dae"
@@ -299,7 +299,7 @@ local structureConfig = {
 		unitDef.footprintz = 3
 		unitDef.buildcostmetal = 75*STRUCTURE_COST_MULT
 
-		unitDef.customparams.evacuation_speed = "1.25" -- 8 minutes
+		unitDef.customparams.evacuation_speed = "1" -- 10 minutes
 
 		unitDef.customparams.soundselect = "shield_select"
 
@@ -310,7 +310,7 @@ local structureConfig = {
 	end,
 
 	pw_wormhole2 = function(unitDef)
-		unitDef.maxdamage = 17500
+		unitDef.maxdamage = 15000
 		unitDef.name = "Improved Wormhole"
 		unitDef.description = "Links this planet to nearby planets"
 		unitDef.objectname = "pw_gaspowerstation.dae"
@@ -321,7 +321,7 @@ local structureConfig = {
 		unitDef.footprintz = 6
 		unitDef.buildcostmetal = 250*STRUCTURE_COST_MULT
 
-		unitDef.customparams.evacuation_speed = "2" -- 5 minutes
+		unitDef.customparams.evacuation_speed = "1.25" -- 8 minutes
 
 		unitDef.customparams.soundselect = "shield_select"
 
