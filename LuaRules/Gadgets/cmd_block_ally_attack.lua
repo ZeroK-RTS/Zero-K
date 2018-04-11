@@ -75,8 +75,10 @@ else -- UNSYNCED
 -------------------------------------------------------------------------------------
 
 function gadget:DefaultCommand(targetType, targetID)
-	if (targetType == 'unit') and targetID and Spring.GetUnitNeutral(targetID) and Spring.GetUnitRulesParam(targetID, "avoidAttackingNeutral") == 1 then
-		return CMD_RAW_MOVE
+	if (targetType == 'unit') and targetID and Spring.GetUnitNeutral(targetID) then
+		if (Spring.GetUnitRulesParam(targetID, "avoidAttackingNeutral") == 1) or (Spring.GetUnitRulesParam(targetID, "avoidRightClickAttack") == 1) then
+			return CMD_RAW_MOVE
+		end
 	end
 end
 

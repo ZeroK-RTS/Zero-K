@@ -138,7 +138,7 @@ local function IsValidTargetBasedOnAllyTeam(targetID, myAllyTeamID)
 	if Spring.GetUnitNeutral(targetID) then
 		return Spring.GetUnitRulesParam(targetID, "avoidAttackingNeutral") ~= 1
 	end
-	return spGetUnitAllyTeam(targetID) ~= data.allyTeam
+	return spGetUnitAllyTeam(targetID) ~= myAllyTeamID
 end
 
 local function setTarget(data, sendToWidget)
