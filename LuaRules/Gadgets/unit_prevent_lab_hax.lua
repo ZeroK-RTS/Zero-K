@@ -146,7 +146,7 @@ local function CheckLabs(checkFeatures, onlyUnstick)
 			for i = 1, #features do
 				local featureID = features[i]
 				local fx, fy, fz = spGetFeaturePosition(featureID)
-				if fy > clearFeatures[5] and fy < clearFeatures[6] then
+				if fy and fy > clearFeatures[5] and fy < clearFeatures[6] then
 					local l = abs(fx - clearFeatures[1])
 					local t = abs(fz - clearFeatures[2])
 					local r = abs(fx - clearFeatures[3])
