@@ -285,7 +285,6 @@ end
 
 function widget:CommandNotify(cmdID, params, options)
 	if (cmdID == CMD_AREA_MEX and WG.metalSpots) then
-
 		local cx, cy, cz, cr = params[1], params[2], params[3], math.max((params[4] or 60),60)
 
 		local xmin = cx-cr
@@ -389,14 +388,9 @@ function widget:CommandNotify(cmdID, params, options)
 			end
 			
 			if options.meta then
-				for i = 1, #commandArrayToIssue do
+				for i = #commandArrayToIssue, 1, -1 do
 					local command = commandArrayToIssue[i]
-					local opts = {}
-					for j = 1, #command[3] do
-						opts[command[3][j]] = true
-					end
-					opts.meta = true
-					WG.CommandInsert(command[1], command[2], opts)
+					WG.CommandInsert(command[1], command[2], options)
 				end
 			else
 				if (#commandArrayToIssue > 0) then
