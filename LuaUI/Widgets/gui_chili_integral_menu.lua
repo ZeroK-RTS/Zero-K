@@ -476,6 +476,8 @@ local function MoveCommandBlock(factoryUnitID, queueCmdID, moveBlock, insertBloc
 					-- Prevent canceling construction of identical units
 					if cmdID == queueCmdID then
 						insertPos = insertPos + 1
+					elseif insertBlock > moveBlock then
+						insertPos = insertPos - 1
 					end
 				end
 				lastBlockCmdID = cmdID
