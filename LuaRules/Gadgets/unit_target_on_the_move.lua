@@ -134,6 +134,13 @@ local function clearTarget(unitID)
 	spSetUnitRulesParam(unitID,"target_type",TARGET_NONE)
 end
 
+local function IsValidTargetBasedOnAllyTeam(targetID, myAllyTeamID)
+	if Spring.GetUnitNeutral(targetID) then
+		return Spring.GetUnitRulesParam(targetID, "avoidAttackingNeutral") ~= 1
+	end
+	return spGetUnitAllyTeam(targetID) ~= data.allyTeam
+end
+
 local function setTarget(data, sendToWidget)
 	if spValidUnitID(data.id) then
 		if not data.targetID then
@@ -147,7 +154,7 @@ local function setTarget(data, sendToWidget)
 				spSetUnitRulesParam(data.id,"target_y",data.y)
 				spSetUnitRulesParam(data.id,"target_z",data.z)
 			end
-		elseif spValidUnitID(data.targetID) and (data.allyAllowed or (spGetUnitAllyTeam(data.targetID) ~= data.allyTeam)) then
+		elseif spValidUnitID(data.targetID) and (data.allyAllowed or IsValidTargetBasedOnAllyTeam(data.targetID, data.allyTeam)) then
 			if (not Spring.GetUnitIsCloaked(data.targetID)) and unitInRange(data.id, data.targetID, data.range) and (data.id ~= data.targetID) then
 				spSetUnitTarget(data.id, data.targetID, false, true)
 			end

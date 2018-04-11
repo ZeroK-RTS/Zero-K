@@ -573,11 +573,13 @@ local function SetupInitialUnitParameters(unitID, unitData)
 	
 	if unitData.invincible then
 		GG.SetUnitInvincible(unitID, true)
+		Spring.SetUnitNeutral(unitID, true)
 		Spring.SetUnitRulesParam(unitID, "ignoredByAI", 1, publicTrueTable)
-		Spring.SetUnitNeutral(unitID, true) 
+		Spring.SetUnitRulesParam(unitID, "avoidAttackingNeutral", 1)
 	elseif unitData.notAutoAttacked then
 		Spring.SetUnitNeutral(unitID, true) 
 		Spring.SetUnitRulesParam(unitID, "ignoredByAI", 1, publicTrueTable)
+		Spring.SetUnitRulesParam(unitID, "avoidAttackingNeutral", 1)
 	end
 	
 	if unitData.noControl then

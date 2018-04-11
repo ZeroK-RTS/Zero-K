@@ -519,7 +519,8 @@ local function SpawnStructure(info, teamID, boxData)
 	
 	if unitDef.customParams.invincible or teamID == gaiaTeamID then
 		-- Makes structures not auto-attacked.
-		Spring.SetUnitNeutral(unitID,true) 
+		Spring.SetUnitNeutral(unitID,true)
+		Spring.SetUnitRulesParam(unitID, "avoidAttackingNeutral", 1)
 	end
 	
 	if GetUnitCanEvac(unitDef) then

@@ -1,11 +1,8 @@
-if not gadgetHandler:IsSyncedCode() then
-	return
-end
 
 function gadget:GetInfo()
 	return {
-		name    = "Block Ally Attack",
-		desc    = "Blocks attack command from being issued on allies.",
+		name    = "Block Ally and Neutral Attack",
+		desc    = "Blocks attack command from being issued on allies and neutrals.",
 		author  = "GoogleFrog",
 		date    = "29 July 2017",
 		license = "GNU GPL, v2 or later",
@@ -14,6 +11,7 @@ function gadget:GetInfo()
 	}
 end
 
+include("LuaRules/Configs/customcmds.h.lua")
 local allyTeamByTeam = {}
 local teamList = Spring.GetTeamList()
 for i = 1, #teamList do
@@ -30,6 +28,12 @@ local allyTargetUnits = {
 	[UnitDefNames["jumpblackhole"].id] = true,
 	[UnitDefNames["amphlaunch"].id] = true,
 }
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+if gadgetHandler:IsSyncedCode() then -- SYNCED
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if allyTargetUnits[unitDefID] then
@@ -49,10 +53,31 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return true
 	end
 	
+	if Spring.GetUnitNeutral(targetID) then
+		if Spring.GetUnitRulesParam(targetID, "avoidAttackingNeutral") == 1 then
+			return false
+		end
+		return true
+	end
+	
 	local allyTeamID = Spring.GetUnitAllyTeam(targetID)
 	if allyTeamID and allyTeamID == allyTeamByTeam[teamID] then
 		return false
 	end
 	
 	return true
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+else -- UNSYNCED
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+function gadget:DefaultCommand(targetType, targetID)
+	if (targetType == 'unit') and targetID and Spring.GetUnitNeutral(targetID) and Spring.GetUnitRulesParam(targetID, "avoidAttackingNeutral") == 1 then
+		return CMD_RAW_MOVE
+	end
+end
+
 end
