@@ -244,7 +244,7 @@ options_order = {
 	'showDrawTools', 'tooltip_opacity',
 	
 	--selected units
-	'selection_opacity', 'groupbehaviour', 'showgroupinfo','uniticon_size', 'manualWeaponReloadBar',
+	'selection_opacity', 'allowclickthrough', 'groupbehaviour', 'showgroupinfo','uniticon_size', 'manualWeaponReloadBar',
 	'fancySkinning', 'leftPadding',
 }
 
@@ -332,6 +332,15 @@ options = {
 			end
 		end,
 		path = selPath,
+	},
+	allowclickthrough = {
+		name='Allow clicking through', type='bool', value=true,
+		path = selPath,
+		OnChange = function(self)
+			if selectionWindow then
+				selectionWindow.SetAllowClickThrough(self.value)
+			end
+		end,
 	},
 	groupbehaviour = {name='Unit Grouping Behaviour', type='radioButton', 
 		value='overflow', 
@@ -2290,7 +2299,7 @@ local function GetSelectionWindow()
 				return true --skip button function, else clicking on build pic will also select the unit.
 			end 
 		},
-		noClickThrough = true,
+		noClickThrough = false,
 		parent = holderWindow
 	}
 	mainPanel.padding[1] = mainPanel.padding[1] + options.leftPadding.value
@@ -2352,6 +2361,10 @@ local function GetSelectionWindow()
 	function externalFunctions.SetLeftPadding(padding)
 		mainPanel.padding[1] = 8 + padding
 		mainPanel:UpdateClientArea()
+	end
+	
+	function externalFunctions.SetAllowClickThrough(allowClickThrough)
+		mainPanel.noClickThrough = not allowClickThrough
 	end
 	
 	function externalFunctions.SetGroupInfoVisible(newVisible)
