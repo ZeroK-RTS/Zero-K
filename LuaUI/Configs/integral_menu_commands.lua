@@ -350,7 +350,7 @@ local overrides = {
 	[CMD.MOVE] = { texture = imageDir .. 'Bold/move.png'},
 	[CMD_RAW_MOVE] = { texture = imageDir .. 'Bold/move.png'},
 	[CMD.PATROL] = { texture = imageDir .. 'Bold/patrol.png'},
-	[CMD.WAIT] = { texture = imageDir .. 'Bold/wait.png'},
+	[CMD.WAIT] = { texture = imageDir .. 'Bold/wait.png', tooltip = "Wait: Pause the units command queue and have it hold its current position."},
 
 	[CMD.REPAIR] = {texture = imageDir .. 'Bold/repair.png'},
 	[CMD.RECLAIM] = {texture = imageDir .. 'Bold/reclaim.png'},
