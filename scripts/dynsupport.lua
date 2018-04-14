@@ -394,6 +394,10 @@ function script.Create()
 	Hide(flare)
 	Hide(ac1)
 	Hide(ac2)
+	
+	Move(nanospray, z_axis, 1*dyncomm.GetScale())
+	Move(nanospray, y_axis, 1.8*dyncomm.GetScale())
+	Move(nanospray, x_axis, 1.5*dyncomm.GetScale())
 
 	StartThread(MotionSpeedControl)
 	StartThread(MotionControl)
