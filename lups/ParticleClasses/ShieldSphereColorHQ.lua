@@ -360,9 +360,9 @@ function ShieldSphereColorHQParticle:Initialize()
 	hitPointsUniform = gl.GetUniformLocation(shieldShader, 'hitPoints')
 
 	sphereList = {
-		large = gl.CreateList(DrawSphere, 0, 0, 0, 1, 60, false),
-		medium = gl.CreateList(DrawSphere, 0, 0, 0, 1, 50, false),
-		small = gl.CreateList(DrawSphere, 0, 0, 0, 1, 40, false),
+		large = gl.CreateList(DrawSphere, 0, 0, 0, 1, 60),
+		medium = gl.CreateList(DrawSphere, 0, 0, 0, 1, 50),
+		small = gl.CreateList(DrawSphere, 0, 0, 0, 1, 40),
 	}
 end
 

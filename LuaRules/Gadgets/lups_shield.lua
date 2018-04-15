@@ -199,7 +199,7 @@ local function GetMagAoE(dmg, capacity, first)
 	return mag, aoe
 end
 
-local AOE_SAME_SPOT = 0.05
+local AOE_SAME_SPOT = (AOE_MIN + AOE_MAX) / 2
 
 local function DoAddShieldHitData(unitData, hitFrame, dmg, theta, phi)
 	local hitData = unitData.hitData
@@ -261,7 +261,8 @@ local function ProcessHitTable(unitData, gameFrame)
 	local hitData = unitData.hitData
 
 	--apply decay over time first
-	for i, hitInfo in pairs(hitData) do
+	for i = #hitData, 1, -1 do
+		local hitInfo = hitData[i]
 		if hitInfo then
 			local mult = math.exp(-DECAY_FACTOR*(gameFrame - hitInfo.hitFrame))
 			--Spring.Echo(gameFrame, hitInfo.dmg, mult, hitInfo.dmg * mult)
@@ -276,7 +277,8 @@ local function ProcessHitTable(unitData, gameFrame)
 			if hitInfo.dmg <= MIN_DAMAGE then
 			--if hitInfo.aoe <= 0 then
 				--Spring.Echo("MIN_DAMAGE", tostring(unitData), i, hitInfo.dmg)
-				hitData[i] = nil
+				table.remove(hitData, i)
+				hitInfo = nil
 			else
 				unitData.needsUpdate = true
 			end
