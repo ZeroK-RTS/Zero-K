@@ -207,6 +207,11 @@ local function ValidateUnitRule(name, value)
 	return value
 end
 
+local function IsWithinRange(x1, z1, x2, z2, range)
+	range = range * range
+	return math.pow(x1 - x2, 2) + math.pow(z1 - z2, 2) <= range
+end
+
 local function LoadUnits()
 	local factoryBuildeesToDelete = {}
 	-- prep units
@@ -258,6 +263,7 @@ local function LoadUnits()
 			spGiveOrderToUnit(newID, CMD.CLOAK, {boolToNum(data.states.cloak)}, {})
 			spGiveOrderToUnit(newID, CMD.ONOFF, {boolToNum(data.states.active)}, {})
 			spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory)}, {})
+			spGiveOrderToUnit(newID, CMD.IDLEMODE, {boolToNum(data.states.autoland)}, {})
 			spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel)}, {})
 			
 			-- is neutral
@@ -297,6 +303,8 @@ local function LoadUnits()
 	
 	-- second pass for orders
 	for oldID, data in pairs(savedata.unit) do
+		local px, py, pz = unpack(data.pos)
+		local isNanoTurret = data.unitDefName == "staticcon"
 		for i=1,#data.commands do
 			local command = data.commands[i]
 			if (#command.params == 1 and data.newID and not(IsCMDTypeIconModeOrNumber(data.newID, command.id))) then
@@ -315,7 +323,6 @@ local function LoadUnits()
 					--Spring.Echo("\tType: " .. savedata.feature[targetID].featureDefName)
 					command.params[1] = GetNewFeatureID(targetID) + FEATURE_ID_CONSTANT
 				end
-				
 			end
 			
 			-- workaround for stupid bug where the coordinates are all mixed up
@@ -324,10 +331,20 @@ local function LoadUnits()
 				params[i] = command.params[i]
 			end
 			
+			
 			local opts = command.options
 			local alt, ctrl, shift, right = opts.alt, opts.ctrl, opts.shift, opts.right
-			opts = {(alt and "alt"), (shift and "shift"), (ctrl and "ctrl"), (right and "right")} 
-			Spring.GiveOrderToUnit(data.newID, command.id, params, opts)
+			opts = {(alt and "alt"), (shift and "shift"), (ctrl and "ctrl"), (right and "right")}
+			
+			-- don't issue a patrol command for a nanoturret if it's where we're standing, to avoid deleting existing patrol commands
+			-- hack solution for nano patrol bug in ZeroK-RTS/Zero-K/issues/2905
+			if command.id == CMD.PATROL and isNanoTurret then
+				if (not IsWithinRange(params[1], params[3], px, pz, 8)) then
+					Spring.GiveOrderToUnit(data.newID, command.id, params, opts)
+				end
+			else			
+				Spring.GiveOrderToUnit(data.newID, command.id, params, opts)
+			end
 		end
 		
 		if data.factoryData then
@@ -335,14 +352,16 @@ local function LoadUnits()
 				local facCmd = data.factoryData.commands[i]
 				local opts = facCmd.options
 				local alt, ctrl, shift, right = opts.alt, opts.ctrl, opts.shift, opts.right
-				opts = {(alt and "alt"), (shift and "shift"), (ctrl and "ctrl"), (right and "right")} 
+				-- we don't need to use the options again, as they have already taken form as "size of build queue" (or build order, in the case of alt)
+				-- otherwise we'd be double counting the opts
+				opts = {} --{(alt and "alt"), (shift and "shift"), (ctrl and "ctrl"), (right and "right")} 
 				Spring.GiveOrderToUnit(data.newID, facCmd.id, facCmd.params, opts)
 			end
 			if data.factoryData.buildee then
 				local buildeeData = data.factoryData.buildee
 				local index = #factoryBuildeesToDelete+1
 				buildeeData.unitID = GetNewUnitID(buildeeData.unitID)
-				buildeeData.factoryID =  GetNewUnitID(buildeeData.factoryID)
+				buildeeData.factoryID = GetNewUnitID(buildeeData.factoryID)
 				factoryBuildeesToDelete[index] = buildeeData
 				
 				Spring.SetUnitCOBValue(data.newID, COB.YARD_OPEN, 1)
