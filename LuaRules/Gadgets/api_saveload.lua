@@ -251,7 +251,7 @@ local function LoadUnits()
 					spSetUnitWeaponState(newID, i, 'reloadState', v.reloadState - GetSavedGameFrame())
 				end
 				if data.shield[i] then
-					spSetUnitShieldState(newID, i, data.shield[i].enabled, data.shield[i].power)
+					spSetUnitShieldState(newID, i, Spring.Utilities.tobool(data.shield[i].enabled), data.shield[i].power)
 				end
 			end
 			spSetUnitStockpile(newID, data.stockpile.num or 0, data.stockpile.progress or 0)
@@ -817,7 +817,7 @@ local function SaveUnits()
 				unitInfo.weapons[i].reloadState = spGetUnitWeaponState(unitID, i, 'reloadState')
 				local enabled, power = Spring.GetUnitShieldState(unitID, i)
 				if power then
-					unitInfo.shield[i] = {enabled = enabled, power = power}
+					unitInfo.shield[i] = {enabled = Spring.Utilities.tobool(enabled), power = power}
 				end
 			end
 			unitInfo.stockpile = {}
