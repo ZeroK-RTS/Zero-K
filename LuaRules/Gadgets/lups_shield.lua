@@ -78,7 +78,8 @@ local LupsAddParticles
 local LOS_UPDATE_PERIOD = 10
 local HIT_UPDATE_PERIOD = 2
 
-local highQuality = false
+--local highQuality = false
+local ultraQuality = false
 
 local hitUpdateNeeded = false
 
@@ -142,7 +143,7 @@ local function AddUnit(unitID, unitDefID)
 		allyTeamID = Spring.GetUnitAllyTeam(unitID)
 	}
 
-	if highQuality then
+	if ultraQuality then
 		unitData.hitData = {}
 		unitData.needsUpdate = false
 	end
@@ -190,18 +191,15 @@ local LOGMUL = AOE_MAX / BIASLOG
 
 local function GetMagAoE(dmg, capacity, first)
 	local ratio = dmg / capacity
-
-	--local aoe = math.log(LOGBIAS + ratio) * LOGMUL
 	local aoe = (BIASLOG + math.log(ratio)/LOG10) * LOGMUL
-	local aoeU = aoe
 	aoe = math.max(0, aoe)
+
 	local mag = 2
 
-	--Spring.Echo(ratio, mag, aoe, aoeU)
 	return mag, aoe
 end
 
-local AOE_SAME_SPOT = (AOE_MAX + AOE_MIN) / 2
+local AOE_SAME_SPOT = 0.05
 
 local function DoAddShieldHitData(unitData, hitFrame, dmg, theta, phi)
 	local hitData = unitData.hitData
@@ -286,7 +284,7 @@ local function ProcessHitTable(unitData, gameFrame)
 	end
 	if unitData.needsUpdate then
 		hitUpdateNeeded = true
-		table.sort(hitData, function(a, b) return (((a and b) and a.dmg > b.dmg) or 1) end)
+		table.sort(hitData, function(a, b) return (((a and b) and a.dmg > b.dmg) or false) end)
 	end
 	return unitData.needsUpdate
 end
@@ -331,16 +329,20 @@ function gadget:GameFrame(n)
 			LupsAddParticles = Lups.AddParticles
 		end
 
-		highQuality = (Lups.Config.quality or 3) >= 3 --Require High or Ultra quality
-		--highQuality = true
+		local highQuality = (Lups.Config.quality or 3) >= 3 --Require High or Ultra quality to render HQ shield
+		--highQuality = false
 
 		if highQuality then
 			shieldUnitDefs = include("LuaRules/Configs/lups_shield_fxs_HQ.lua")
 		else
 			shieldUnitDefs = include("LuaRules/Configs/lups_shield_fxs.lua")
+
 		end
 
-		if highQuality then
+		ultraQuality = (Lups.Config.quality or 3) >= 4 --Require Ultra quality to render hit positions
+		--ultraQuality = false
+
+		if ultraQuality then
 			gadgetHandler:AddSyncAction("AddShieldHitDataHandler", AddShieldHitData)
 			GG.GetShieldHitPositions = GetShieldHitPositions
 		end
@@ -355,7 +357,7 @@ function gadget:GameFrame(n)
 		startup = false
 	end
 
-	if highQuality and hitUpdateNeeded and (n % HIT_UPDATE_PERIOD == 0) then
+	if ultraQuality and hitUpdateNeeded and (n % HIT_UPDATE_PERIOD == 0) then
 		hitUpdateNeeded = false
 		for unitID, unitData in shieldUnits.Iterator() do
 			if unitData and unitData.hitData then
@@ -375,7 +377,7 @@ function gadget:GameFrame(n)
 end
 
 function gadget:Shutdown()
-	if highQuality then
+	if ultraQuality then
 		gadgetHandler:RemoveSyncAction("AddShieldHitDataHandler", AddShieldHitData)
 		GG.GetShieldHitPositions = nil
 	end

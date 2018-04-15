@@ -78,6 +78,7 @@ local PACE = 1200
 local lastTexture = ""
 
 function ShieldSphereColorHQParticle:BeginDraw()
+	--gl.Clear(GL.STENCIL_BUFFER_BIT, 0)
 	gl.DepthMask(false)
 	gl.UseShader(shieldShader)
 
@@ -132,17 +133,18 @@ function ShieldSphereColorHQParticle:Draw()
 	gl.Uniform(uvMulUniform, self.uvMul)
 
 	if hitTable then
-		local hitPointCount = math.min(#hitTable, 8)
+		local hitPointCount = math.min(#hitTable, MAX_POINTS)
 		gl.UniformInt(hitPointCountUniform, hitPointCount)
 
 		local hitArray = {}
 		if hitPointCount > 0 then
+			--Spring.Echo("hitPointCount", hitPointCount)
 			for i = 1, hitPointCount do
 				table.insert(hitArray, hitTable[i].dx)
 				table.insert(hitArray, hitTable[i].dy)
 				table.insert(hitArray, hitTable[i].dz)
 				table.insert(hitArray, hitTable[i].mag)
-				table.insert(hitArray, hitTable[i].aoe)				
+				table.insert(hitArray, hitTable[i].aoe)
 			end
 		end
 		gl.UniformArray(hitPointsUniform, 2, hitArray)
@@ -293,42 +295,15 @@ function ShieldSphereColorHQParticle:Initialize()
 
 			vec2 offset2 = vec2(0.0);
 
-//			!!!!!!!!!!!   THIS DOESN'T WORK IN "FOR LOOP" ON MY GPU, THUS UNWRAP  !!!!!!!!!
-
-			if (hitPointCount > 0) {
-				vec3 impactPoint = vec3(hitPoints[0], hitPoints[1], hitPoints[2]);
-				vec3 impactPointAdj = (vec4(impactPoint, 1.0) * viewMatrixI).xyz;
-				vec2 impactPointUV = RadialCoords(impactPointAdj) * uvMulS;
-				float mag = hitPoints[3];
-				float aoe = hitPoints[4];
-				offset2 += GetRippleLinearFallOffCoord(uv, impactPointUV, mag, 320.0, 600.0, aoe, timer);
-			}
-
-			if (hitPointCount > 1) {
-				vec3 impactPoint = vec3(hitPoints[5], hitPoints[6], hitPoints[7]);
-				vec3 impactPointAdj = (vec4(impactPoint, 1.0) * viewMatrixI).xyz;
-				vec2 impactPointUV = RadialCoords(impactPointAdj) * uvMulS;
-				float mag = hitPoints[8];
-				float aoe = hitPoints[9];
-				offset2 += GetRippleLinearFallOffCoord(uv, impactPointUV, mag, 320.0, 600.0, aoe, timer);
-			}
-
-			if (hitPointCount > 2) {
-				vec3 impactPoint = vec3(hitPoints[10], hitPoints[11], hitPoints[12]);
-				vec3 impactPointAdj = (vec4(impactPoint, 1.0) * viewMatrixI).xyz;
-				vec2 impactPointUV = RadialCoords(impactPointAdj) * uvMulS;
-				float mag = hitPoints[13];
-				float aoe = hitPoints[14];
-				offset2 += GetRippleLinearFallOffCoord(uv, impactPointUV, mag, 320.0, 600.0, aoe, timer);
-			}
-
-			if (hitPointCount > 3) {
-				vec3 impactPoint = vec3(hitPoints[15], hitPoints[16], hitPoints[17]);
-				vec3 impactPointAdj = (vec4(impactPoint, 1.0) * viewMatrixI).xyz;
-				vec2 impactPointUV = RadialCoords(impactPointAdj) * uvMulS;
-				float mag = hitPoints[18];
-				float aoe = hitPoints[19];
-				offset2 += GetRippleLinearFallOffCoord(uv, impactPointUV, mag, 320.0, 600.0, aoe, timer);
+			for (int hitPointIdx = 0; hitPointIdx < MAX_POINTS; ++hitPointIdx) {
+				if (hitPointIdx < hitPointCount) {
+					vec3 impactPoint = vec3(hitPoints[5 * hitPointIdx + 0], hitPoints[5 * hitPointIdx + 1], hitPoints[5 * hitPointIdx + 2]);
+					vec3 impactPointAdj = (vec4(impactPoint, 1.0) * viewMatrixI).xyz;
+					vec2 impactPointUV = RadialCoords(impactPointAdj) * uvMulS;
+					float mag = hitPoints[5 * hitPointIdx + 3];
+					float aoe = hitPoints[5 * hitPointIdx + 4];
+					offset2 += GetRippleLinearFallOffCoord(uv, impactPointUV, mag, 320.0, 600.0, aoe, timer);
+				}
 			}
 
 			vec4 texel;
