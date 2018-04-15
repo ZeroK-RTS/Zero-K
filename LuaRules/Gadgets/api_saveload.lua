@@ -208,6 +208,9 @@ local function ValidateUnitRule(name, value)
 end
 
 local function IsWithinRange(x1, z1, x2, z2, range)
+	if not (x1 and z1 and x2 and z2 and range) then
+		return false
+	end
 	range = range * range
 	return math.pow(x1 - x2, 2) + math.pow(z1 - z2, 2) <= range
 end

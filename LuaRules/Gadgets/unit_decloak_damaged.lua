@@ -225,8 +225,8 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 		return false
 	end
 	
-	local areaCloakieeOrCloaker = (Spring.GetUnitRulesParam(unitID, "areacloaked") == 1) or ((Spring.GetUnitRulesParam(unitID, "cloak_shield") or 0) ~= 0)
-	if not areaCloakieeOrCloaker then
+	local areaCloaked = (Spring.GetUnitRulesParam(unitID, "areacloaked") == 1) and ((Spring.GetUnitRulesParam(unitID, "cloak_shield") or 0) == 0)
+	if not areaCloaked then
 		local speed = select(4, Spring.GetUnitVelocity(unitID))
 		local moving = speed and speed > CLOAK_MOVE_THRESHOLD
 		local cost = moving and ud.cloakCostMoving or ud.cloakCost
