@@ -2663,7 +2663,7 @@ local function MakeQuitButtons()
 		type = 'button',
 		name = 'Restart',
 		desc = "Restart the game",
-		icon = imgPath..'epicmenu/undo.png',
+		icon = imgPath..'epicmenu/restart.png',
 		OnChange = function()
 				-- Only allow restarting for local games or by the host of steam coop.
 				if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
