@@ -430,6 +430,7 @@ local pathMisc = 'Settings/Misc'
 		end,
 	})
 	ShButton(pathMisc, 'Toggle Widget Profiler', function() spSendCommands{"luaui togglewidget WidgetProfiler"} end, '', true)
+	ShButton(pathMisc, 'Toggle New Widget Profiler', function() spSendCommands{"luaui togglewidget Widget Profiler New"} end, '', true)
 
 --- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
 local pathGraphicsMap = 'Settings/Graphics/Map Detail'

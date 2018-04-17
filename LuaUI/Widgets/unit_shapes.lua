@@ -569,6 +569,18 @@ function widget:Shutdown()
 	end
 end
 
+function widget:PlayerChanged(playerID)
+	if playerID ~= Spring.GetMyPlayerID() then
+		return
+	end
+	Spring.Echo("PlayerChanged Unit Shapes")
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local teamID = Spring.GetUnitTeam(unitID)
+		widget:UnitCreated(unitID, unitDefID, teamID)
+	end
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
