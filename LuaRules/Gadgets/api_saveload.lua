@@ -702,15 +702,21 @@ local function IsDictOrContainsDict(tab)
 	return false
 end
 
-local function WriteTable(tab, tabName, params)
+local function WriteTable(concatTable, tab, tabName, params)
 	params = params or {}
 	local processed = {}
+	concatTable = concatTable or {}
 	
 	params.numIndents = params.numIndents or 0
 	local isDict = IsDictOrContainsDict(tab)
 	local comma = params.raw and "" or ", "
 	local endLine = comma .. "\n"
 	local str = ""
+	
+	local function NewLine()
+		concatTable[#concatTable + 1] = str
+		str = ""
+	end
 	
 	local function ProcessKeyValuePair(i,v, isArray, lastItem)
 		local pairEndLine = (lastItem and "") or (isArray and comma) or endLine
@@ -729,7 +735,8 @@ local function WriteTable(tab, tabName, params)
 		
 		if type(v) == "table" then
 			local arg = {numIndents = (params.numIndents + 1), endOfFile = false}
-			str = str .. WriteTable(v, nil, arg)
+			NewLine()
+			WriteTable(concatTable, v, nil, arg)
 		elseif type(v) == "boolean" then
 			str = str .. tostring(v) .. pairEndLine
 		elseif type(v) == "string" then
@@ -744,6 +751,7 @@ local function WriteTable(tab, tabName, params)
 			end
 			str = str .. v .. pairEndLine
 		end
+		NewLine()
 	end
 	
 	if not params.raw then
@@ -754,6 +762,7 @@ local function WriteTable(tab, tabName, params)
 		end
 		str = str .. (isDict and "{\n" or "{")
 	end
+	NewLine()
 	
 	-- do array component first (ensures order is preserved)
 	for i=0,#tab do
@@ -776,13 +785,16 @@ local function WriteTable(tab, tabName, params)
 	if params.endOfFile == false then
 		str = str .. endLine
 	end
+	NewLine()
 	
-	return str
+	return concatTable
 end
 
 local function WriteSaveData(zip, filename, data)
 	zip:open(filename)
-	zip:write(WriteTable(data, nil, {prefixReturn = true}))
+	local concat = WriteTable({}, data, nil, {prefixReturn = true})
+	local str = table.concat(concat, "")
+	zip:write(str)
 end
 GG.SaveLoad.WriteSaveData = WriteSaveData
 
