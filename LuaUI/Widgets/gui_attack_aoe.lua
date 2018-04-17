@@ -38,7 +38,6 @@ local unitAoeDefs = {}
 local unitDgunDefs = {}
 local unitHasBeenSetup = {} 
 
-local hasSelectionCallin = false
 local aoeUnitInfo
 local dgunUnitInfo
 local aoeUnitID
@@ -704,10 +703,6 @@ function widget:Shutdown()
 end
 
 function widget:DrawWorld()
-	if (not hasSelectionCallin) then
-		UpdateSelection()
-	end
-
 	mouseDistance = GetMouseDistance() or 1000
 
 	local tx, ty, tz = GetMouseTargetPosition()
@@ -806,7 +801,6 @@ function widget:UnitDestroyed(unitID)
 end
 
 function widget:SelectionChanged(sel)
-	hasSelectionCallin = true
 	UpdateSelection()
 end
 

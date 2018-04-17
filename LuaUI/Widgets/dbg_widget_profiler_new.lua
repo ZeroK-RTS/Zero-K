@@ -16,9 +16,9 @@ return {
 end
 
 local usePrefixedNames = true
-local PROFILE_POS_X = 400
+local PROFILE_POS_X = 425
 local PROFILE_POS_Y = 80
-
+local COL_SPACING = 420
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -461,7 +461,7 @@ function widget:DrawScreen()
 		x,j = DrawWidgetList(gameList,"GAME",x,y,j)
 		x,j = DrawWidgetList(userList,"USER",x,y,j)
 
-		if j>=maxLines-15 then x = x - 350; j = 0; end
+		if j>=maxLines-15 then x = x - COL_SPACING; j = 0; end
 		j = j + 1
 		gl.Text(title_colour.."ALL", x+152, y-1-(12)*j, 10, "no")
 		j = j + 1
