@@ -316,7 +316,7 @@ function gadget:GameFrame(f)
 
 					if steps_to_spawn == WARNING_TIME then
 						local z_sound = ZOMBIE_SOUNDS[math.random(#ZOMBIE_SOUNDS)]
-						GG.PlayFogHiddenSound(z_sound, 10 x, y, z)
+						GG.PlayFogHiddenSound(z_sound, 10, x, y, z)
 					end
 				end
 				index = index + 1
