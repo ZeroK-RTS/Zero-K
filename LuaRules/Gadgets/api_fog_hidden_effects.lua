@@ -17,6 +17,10 @@ local soundList = {
 	"sounds/misc/teleport.wav",
 	"sounds/misc/teleport2.wav",
 	"sounds/misc/teleport_loop.wav",
+	"sounds/misc/zombie_1.wav",
+	"sounds/misc/zombie_2.wav",
+	"sounds/misc/zombie_3.wav",
+	"sounds/misc/resurrect.wav"
 }
 
 local soundMap = {}
