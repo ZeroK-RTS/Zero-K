@@ -74,6 +74,13 @@ local zombiesToSpawnMap = {}
 local zombiesToSpawnCount = 0
 local zombies = {}
 
+local ZOMBIE_SOUNDS = {
+	"sounds/misc/zombie_1.wav",
+	"sounds/misc/zombie_2.wav",
+	"sounds/misc/zombie_3.wav",
+}
+local REZ_SOUND = "sounds/misc/resurrect.wav"
+
 local defined = false -- wordaround, because i meet some kind of racing condition, if any gadget spawns gaia BEFORE this gadget can process all the stuff...
 
 local MexDefs = {
@@ -290,7 +297,7 @@ function gadget:GameFrame(f)
 					local size = UnitDefNames[resName].xsize
 					spSpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
 					Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, 0)
-					SendToUnsynced("rez_sound", x, y, z)
+					GG.PlayFogHiddenSound(REZ_SOUND, 12, x, y, z)
 					if partialReclaim ~= 1 then
 						local health = Spring.GetUnitHealth(unitID)
 						if health then
@@ -308,7 +315,8 @@ function gadget:GameFrame(f)
 					spSpawnCEG(CEG_SPAWN, x, y, z, 0, 0, 0, 10 + r, 10 + r)
 
 					if steps_to_spawn == WARNING_TIME then
-						--SendToUnsynced("zombie_sound", x, y, z)
+						local z_sound = ZOMBIE_SOUNDS[math.random(#ZOMBIE_SOUNDS)]
+						GG.PlayFogHiddenSound(z_sound, 4, x, y, z)
 					end
 				end
 				index = index + 1
