@@ -310,11 +310,17 @@ local function UpdateReturnToOrders(cmdID)
 end
 
 local function GenerateGridKeyMap(name)
-	local gridMap = include("Configs/keyboard_layout.lua")[name]
+	local keyboardLayouts = include("Configs/keyboard_layout.lua")
+	local gridMap = (name and keyboardLayouts[name]) or {}
 	local ret = {}
 	for i = 1, #gridMap do
 		for j = 1, #gridMap[i] do
-			ret[KEYSYMS[gridMap[i][j]]] = {i, j}
+			local key = KEYSYMS[gridMap[i][j]]
+			if key then
+				ret[key] = {i, j}
+			else
+				Spring.Echo("LUA_ERRRUN", "Integral menu missing key for", i, j, name)
+			end
 		end
 	end
 	return ret, gridMap

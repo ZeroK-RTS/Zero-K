@@ -594,12 +594,12 @@ end
 
 local function ResetConstructors()
 	if alreadyResetConstructors then
-		Spring.Echo("ResetConstructors already reset")
+		Spring.Echo("LUA_ERRRUN", "ResetConstructors already reset")
 		return
 	end
 	
 	alreadyResetConstructors = true
-	Spring.Echo("ResetConstructors", constructorCount, constructorsPerFrame, constructorIndex)
+	Spring.Echo("LUA_ERRRUN", "ResetConstructors", constructorCount, constructorsPerFrame, constructorIndex)
 	Spring.Utilities.TableEcho(constructorBuildDist, "constructorBuildDist")
 	Spring.Utilities.TableEcho(constructorByID, "constructorByID")
 	
