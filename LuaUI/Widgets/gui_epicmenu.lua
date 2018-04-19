@@ -2001,7 +2001,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			padding = {2, 2, 2, 2},
 			parent = buttonBar,
 			children = {
-				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/undo.png', width = 16, height = 16, parent = button, x = 4, y = 2},
+				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/undo_white.png', width = 16, height = 16, parent = button, x = 4, y = 2},
 				Label:New{caption = 'Reset', x = 24, y = 4}
 			}
 		}
