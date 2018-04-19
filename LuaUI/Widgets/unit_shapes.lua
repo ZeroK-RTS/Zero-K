@@ -19,9 +19,6 @@ local function SetupCommandColors(state)
 	Spring.LoadCmdColorsConfig('unitBox  0 1 0 ' .. alpha)
 end
 
-local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
-local allUnits = IterableMap.New()
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local math_acos				= math.acos
@@ -37,7 +34,7 @@ local GL_REPLACE   = 0x1E01
 local spGetUnitIsDead        = Spring.GetUnitIsDead
 local spGetUnitHeading       = Spring.GetUnitHeading
 
-local spIsUnitVisible        = Spring.IsUnitVisible
+local spGetVisibleUnits      = Spring.GetVisibleUnits
 local spGetSelectedUnits     = Spring.GetSelectedUnits
 local spGetUnitDefID         = Spring.GetUnitDefID
 local spIsUnitSelected       = Spring.IsUnitSelected
@@ -215,9 +212,9 @@ local function HasVisibilityChanged()
 	local camX, camY, camZ = spGetCameraPosition()
 	local gameFrame = spGetGameFrame()
 	if forceUpdate or (camX ~= lastCamX) or (camY ~= lastCamY) or (camZ ~= lastCamZ) or
-	        ((gameFrame - lastGameFrame) >= 15) or (#lastVisibleSelected > 0) then
+		((gameFrame - lastGameFrame) >= 15) or (#lastVisibleSelected > 0) or
+		(#spGetSelectedUnits() > 0) then
 		
-		forceUpdate = false
 		lastGameFrame = gameFrame
 		lastCamX, lastCamY, lastCamZ = camX, camY, camZ
 		return true
@@ -246,8 +243,14 @@ local function GetVisibleUnits()
 	if options.showinselectionbox.value then
 		local boxedUnits, boxedUnitsIDs = GetBoxedUnits()
 
-		if IsSelectionBoxActive() then
-			visibleBoxed = boxedUnits
+		if IsSelectionBoxActive() then --It's not worth rebuilding visible selected lists for selection box, but selection box needs to be updated per-frame
+			local units = spGetVisibleUnits(-1, 30, true)
+			for i=1, #units do
+				local unitID = units[i]
+				if boxedUnitsIDs[units[i]] and not WG.drawtoolKeyPressed then
+					visibleBoxed[#visibleBoxed+1] = boxedUnits[boxedUnitsIDs[unitID]]
+				end
+			end
 		end
 
 		lastBoxedUnits = boxedUnits
@@ -255,29 +258,30 @@ local function GetVisibleUnits()
 	end
 
 	if (HasVisibilityChanged()) then
+		local units = spGetVisibleUnits(-1, 30, true)
+		--local visibleUnits = {}
 		local visibleAllySelUnits = {}
 		local visibleSelected = {}
 		local myTeamID = Spring.GetMyTeamID()
 		
-		for unitID, _ in allUnits.Iterator() do
-			if spIsUnitVisible(unitID) then
-				if spIsUnitSelected(unitID) then
-					visibleSelected[#visibleSelected+1] = {unitID = unitID}
-				end
-				
-				if ShowAllySelection(unitID, myTeamID) then 
-					local teamIDIndex = Spring.GetUnitTeam(unitID)
-					if teamIDIndex then --Possible nil check failure if unit is destroyed while selected
-						teamIDIndex = teamIDIndex+1
-						if Spring.GetSpectatingState() and not options.showallyplayercolours.value then
-							teamIDIndex = 1
-						end
-						if not visibleAllySelUnits[teamIDIndex] then
-							visibleAllySelUnits[teamIDIndex] = {}
-						end
-						visibleAllySelUnits[teamIDIndex][#visibleAllySelUnits[teamIDIndex]+1] = {unitID = unitID, scale = 0.92}
-						hasVisibleAllySelections = true
+		for i = 1, #units do
+			local unitID = units[i]
+			if (spIsUnitSelected(unitID)) then
+				visibleSelected[#visibleSelected+1] = {unitID = unitID}
+			end
+			
+			if ShowAllySelection(unitID, myTeamID) then 
+				local teamIDIndex = Spring.GetUnitTeam(unitID)
+				if teamIDIndex then --Possible nil check failure if unit is destroyed while selected
+					teamIDIndex = teamIDIndex+1
+					if Spring.GetSpectatingState() and not options.showallyplayercolours.value then
+						teamIDIndex = 1
 					end
+					if not visibleAllySelUnits[teamIDIndex] then
+						visibleAllySelUnits[teamIDIndex] = {}
+					end
+					visibleAllySelUnits[teamIDIndex][#visibleAllySelUnits[teamIDIndex]+1] = {unitID = unitID, scale = 0.92}
+					hasVisibleAllySelections = true
 				end
 			end
 		end
@@ -480,21 +484,6 @@ local function DestroyShape(shape)
 	gl.DeleteList(shape.shape)
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-function widget:UnitCreated(unitID)
-	allUnits.Add(unitID)
-end
-
-function widget:UnitDestroyed(unitID)
-	allUnits.Remove(unitID)
-end
-
-function widget:UnitTaken(unitID)
-	widget:UnitCreated(unitID)
-end
-
 function widget:Initialize()
 	if not WG.allySelUnits then
 		WG.allySelUnits = {}
@@ -551,12 +540,6 @@ function widget:Initialize()
 		end)
 	end)
 	SetupCommandColors(false)
-	
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		local teamID = Spring.GetUnitTeam(unitID)
-		widget:UnitCreated(unitID, unitDefID, teamID)
-	end
 end
 
 function widget:Shutdown()
@@ -566,18 +549,6 @@ function widget:Shutdown()
 	
 	for _, shape in pairs(shapes) do
 		DestroyShape(shape)
-	end
-end
-
-function widget:PlayerChanged(playerID)
-	if playerID ~= Spring.GetMyPlayerID() then
-		return
-	end
-	Spring.Echo("PlayerChanged Unit Shapes")
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		local teamID = Spring.GetUnitTeam(unitID)
-		widget:UnitCreated(unitID, unitDefID, teamID)
 	end
 end
 
@@ -814,9 +785,6 @@ function widget:DrawWorld()
 	DrawCircles(false)
 end
 
-function widget:SelectionChanged(sel)
-	forceUpdate = true
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
