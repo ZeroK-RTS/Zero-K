@@ -219,7 +219,7 @@ local overrides = {
 
 	[CMD_PLACE_BEACON] = {caption= '', texture = imageDir .. 'Bold/drop_beacon.png'},
 
-	[CMD_RECALL_DRONES] = {caption= '', texture = imageDir .. 'Bold/recall_drones.png'},
+	[CMD_RECALL_DRONES] = {caption= '', texture = imageDir .. 'Bold/recall_drones_new.png'},
 
 	-- states
 	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, caption=''},
