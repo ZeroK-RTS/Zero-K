@@ -99,7 +99,7 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType',  'selectionClosesTab', 'altInsertBehind',
+	'background_opacity', 'keyboardType2',  'selectionClosesTab', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning', 
@@ -118,7 +118,7 @@ options = {
 			background:Invalidate()
 		end,
 	},
-	keyboardType = {
+	keyboardType2 = {
 		type='radioButton', 
 		name='Grid Keyboard Layout',
 		items = {
@@ -1671,7 +1671,7 @@ local function InitializeControls()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
 
-	gridKeyMap, gridMap, gridCustomOverrides = GenerateGridKeyMap(options.keyboardType.value)
+	gridKeyMap, gridMap, gridCustomOverrides = GenerateGridKeyMap(options.keyboardType2.value)
 	
 	local mainWindow = Window:New{
 		name      = 'integralwindow',
@@ -1815,12 +1815,12 @@ local function UpdateGrid(name)
 
 end
 
-function options.keyboardType.OnChange(self)
+function options.keyboardType2.OnChange(self)
 	UpdateGrid(self.value)
 end
 
 function options.applyCustomGrid.OnChange()
-	UpdateGrid(options.keyboardType.value)
+	UpdateGrid(options.keyboardType2.value)
 end
 
 function options.hide_when_spectating.OnChange(self)
