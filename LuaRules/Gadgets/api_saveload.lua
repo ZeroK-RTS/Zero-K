@@ -34,6 +34,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local generalFile = "general.lua"
+local heightMapFile = "heightMap.lua"
 local unitFile = "units.lua"
 local featureFile = "features.lua"
 local projectileFile = "projectiles.lua"
@@ -72,6 +73,7 @@ local cmdTypeIconModeOrNumber = {
 -- vars
 local savedata = {
 	general = {},
+	heightMap = {},
 	unit = {},
 	feature = {},
 	projectile = {},
@@ -213,6 +215,16 @@ local function IsWithinRange(x1, z1, x2, z2, range)
 	end
 	range = range * range
 	return math.pow(x1 - x2, 2) + math.pow(z1 - z2, 2) <= range
+end
+
+local function LoadHeightMap()
+	Spring.SetHeightMapFunc(function()
+		for x, rest in pairs(savedata.heightMap) do
+			for z, y in pairs(rest) do
+				Spring.SetHeightMap(x, z, y)
+			end
+		end
+	end)
 end
 
 local function LoadUnits()
@@ -545,6 +557,7 @@ end
 function gadget:Load(zip)
 	savedata = {
 		general = {},
+		heightMap = {},
 		unit = {},
 		feature = {},
 		projectile = {},
@@ -554,6 +567,9 @@ function gadget:Load(zip)
 	toCleanupFactory = {}
 	-- get save data
 	Spring.SetGameRulesParam("loadPurge", 1)
+
+	savedata.heightMap = ReadFile(zip, "Height Map", heightMapFile) or {}
+
 	savedata.unit = ReadFile(zip, "Unit", unitFile) or {}
 	local units = Spring.GetAllUnits()
 	for i=1,#units do
@@ -575,6 +591,7 @@ function gadget:Load(zip)
 	end
 
 	LoadGeneralInfo()
+	LoadHeightMap()
 	LoadFeatures()	-- do features before units so we can change unit orders involving features to point to new ID
 	LoadUnits()
 	LoadProjectiles() -- do projectiles after units so they can home onto units.
@@ -801,6 +818,25 @@ GG.SaveLoad.WriteSaveData = WriteSaveData
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 
+local minHeightDiff = 0.1 --tune me
+local function SaveHeightMap()
+	local data = {}
+	local mapX, mapZ = Game.mapSizeX, Game.mapSizeZ
+	local step = Game.squareSize
+
+	for x = 0, mapX, step do
+		for z = 0, mapZ, step do
+			local y = Spring.GetGroundHeight(x, z)
+			local dy = y - Spring.GetGroundOrigHeight(x, z)
+			if math.abs(dy) > minHeightDiff then
+				if not data[x] then data[x] = {} end
+				data[x][z] = y --save the actual height to avoid extra calls on Load()
+			end
+		end
+	end
+	return data
+end
+
 local function SaveUnits()
 	local data = {}
 	local units = Spring.GetAllUnits()
@@ -997,11 +1033,19 @@ end
 -----------------------------------------------------------------------------------
 -- callins
 function gadget:Save(zip)
+	if collectgarbage then
+		collectgarbage("collect")
+	end
 	WriteSaveData(zip, generalFile, SaveGeneralInfo())
 	if collectgarbage then
 		collectgarbage("collect")
 	end
 	Spring.Echo("SaveGeneralInfo - Done")
+	WriteSaveData(zip, heightMapFile, SaveHeightMap())
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+	Spring.Echo("SaveHeightMap - Done")
 	WriteSaveData(zip, unitFile, SaveUnits())
 	if collectgarbage then
 		collectgarbage("collect")
