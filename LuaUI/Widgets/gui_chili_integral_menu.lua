@@ -99,11 +99,13 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType', 'selectionClosesTab', 'altInsertBehind', 'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating',
-	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning'
+	'background_opacity', 'keyboardType',  'selectionClosesTab', 'altInsertBehind', 'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid',
+	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
+	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning', 
 }
 
 local commandPanelPath = 'Hotkeys/Command Panel'
+local customGridPath = 'Hotkeys/Command Panel/Custom Grid'
 
 options = {
 	background_opacity = {
@@ -122,6 +124,7 @@ options = {
 			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
 			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey = nil},
 			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
+			{name = 'Configurable in "Custom Grid"', key = 'custom', hotkey = nil},
 			{name = 'Disable Grid Keys', key = 'none', hotkey = nil},
 		},
 		value = 'qwerty',  --default at start of widget
@@ -162,6 +165,17 @@ options = {
 		type = 'bool',
 		value = false,
 		noHotkey = true,
+	},
+	applyCustomGrid = {
+		name = "Apply Changes",
+		type = 'button',
+		path = customGridPath,
+		noHotkey = true,
+	},
+	label_tab = {
+		type = 'label',
+		name = 'Tab Hotkeys',
+		path = commandPanelPath
 	},
 	tab_economy = {
 		name = "Economy Tab",
@@ -216,7 +230,7 @@ options = {
 		min = 0, max = 500, step=1,
 		OnChange = function() 
 			ClearData(true)
-		end,	
+		end,
 	},
 	flushLeft = {
 		name = 'Flush Left',
@@ -233,6 +247,20 @@ options = {
 		noHotkey = true,
 	},
 }
+
+for i = 1, 3 do
+	for j = 1, 6 do
+		local optName = "customgrid" .. i .. j
+		options[optName] = {
+			name = "Column " .. j .. ", row " .. i,
+			type = 'button',
+			path = customGridPath,
+			dontRegisterAction = true,
+			bindWithoutMod = true,
+		}
+		options_order[#options_order + 1] = optName
+	end
+end
 
 local function TabClickFunction(mouse)
 	if not mouse then
@@ -310,6 +338,24 @@ local function UpdateReturnToOrders(cmdID)
 end
 
 local function GenerateGridKeyMap(name)
+	if name == "custom" then
+		local ret = {}
+		local gridMap = {}
+		for i = 1, 3 do
+			gridMap[i] = {}
+			for j = 1, 6 do
+				local key = WG.crude.GetHotkeyRaw("epic_chili_integral_menu_customgrid" .. i .. j)
+				key = key and key[1] and string.upper(key[1])
+				local code = key and KEYSYMS[key]
+				if code then
+					gridMap[i][j] = key
+					ret[code] = {i, j}
+				end
+			end
+		end
+		return ret, gridMap
+	end
+	
 	local keyboardLayouts = include("Configs/keyboard_layout.lua")
 	local gridMap = (name and keyboardLayouts[name]) or {}
 	local ret = {}
@@ -1667,14 +1713,23 @@ end
 --------------------------------------------------------------------------------
 -- Epic Menu Configuration and Hotkey Functions
 
-function options.keyboardType.OnChange(self)
-	gridKeyMap, gridMap = GenerateGridKeyMap(self.value)
+local function UpdateGrid(name)
+	gridKeyMap, gridMap = GenerateGridKeyMap(name)
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
 			data.buttons.ApplyGridHotkeys(gridMap)
 		end
 	end
+
+end
+
+function options.keyboardType.OnChange(self)
+	UpdateGrid(self.value)
+end
+
+function options.applyCustomGrid.OnChange()
+	UpdateGrid(options.keyboardType.value)
 end
 
 function options.hide_when_spectating.OnChange(self)

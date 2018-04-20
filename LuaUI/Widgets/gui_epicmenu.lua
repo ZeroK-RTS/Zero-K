@@ -175,7 +175,7 @@ for k, v in pairs(KEYSYMS) do
 	keysyms['' .. k] = v
 end
 --]]
-local get_key, get_key_bind_mod = false, false
+local get_key, get_key_bind_mod, get_key_bind_without_mod = false, false, false
 local kb_path, kb_button, kb_control, kb_option, kb_action
 
 local transkey = include("Configs/transkey.lua")
@@ -410,6 +410,7 @@ WG.crude.ResetKeys         = function() end
 --Get hotkey by actionname, defined in Initialize()
 WG.crude.GetHotkey = function() end
 WG.crude.GetHotkeys = function() end
+WG.crude.GetHotkeyRaw = function() end
 
 --Set hotkey by actionname, defined in Initialize(). Is defined in Initialize() because trying to iterate pathoptions table here (at least if running epicmenu.lua in local copy) will return empty pathoptions table.
 WG.crude.SetHotkey =  function() end 
@@ -1351,6 +1352,7 @@ local function MakeKeybindWindow( path, option, hotkeyButton, optionControl, opt
 	
 	get_key = true
 	get_key_bind_mod = option.bindMod
+	get_key_bind_without_mod = option.bindWithoutMod
 	kb_path = path
 	kb_button = hotkeyButton
 	kb_control = optionControl
@@ -2885,10 +2887,35 @@ function widget:Initialize()
 			return ret
 		end
 	end
+	
 	WG.crude.GetHotkeys = function(actionName)
 		return WG.crude.GetHotkey(actionName, true)
 	end
 	
+	WG.crude.GetHotkeyRaw = function(actionName, all) --Note: declared here because keybounditems must not be empty
+		local actionHotkey = GetActionHotkey(actionName)
+		--local hotkey = keybounditems[actionName] or actionHotkey
+		local hotkey = otget(keybounditems, actionName ) or actionHotkey
+		if not hotkey or hotkey == 'None' then
+			return
+		end
+		if not all then
+			if type(hotkey) ~= 'table' then
+				hotkey = {hotkey}
+			end
+			return hotkey
+		else
+			local ret = {}
+			if type(hotkey) == 'table' then
+				for k, v in pairs(hotkey) do
+					ret[#ret+1] = v
+				end
+			else
+				ret[#ret+1] = hotkey
+			end
+			return ret
+		end
+	end
 	
 	-- set hotkey
 	WG.crude.SetHotkey =  function(actionName, hotkey, func) --Note: declared here because pathoptions must not be empty
@@ -3197,9 +3224,12 @@ function widget:KeyPress(key, modifier, isRepeat)
 	if get_key then
 		get_key = false
 		window_getkey:Dispose()
-		if get_key_bind_mod then
+		if get_key_bind_mod or get_key_bind_without_mod then
+			-- get_key_bind_mod allows mod keys to be directly bound to an action.
+			-- get_key_bind_without_mod gets the key bind without any modifiers.
 			modstring = ''
 			get_key_bind_mod = false
+			get_key_bind_without_mod = false
 		end
 		translatedkey = transkey[ keysyms[''..key]:lower() ] or keysyms[''..key]:lower()
 		--local hotkey = {key = translatedkey, mod = modstring}
