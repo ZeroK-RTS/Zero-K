@@ -125,7 +125,7 @@ options = {
 			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
 			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey = nil},
 			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
-			{name = 'Configurable in "Custom" below', key = 'custom', hotkey = nil},
+			{name = 'Configure in "Custom" (below)', key = 'custom', hotkey = nil},
 			{name = 'Disable Grid Keys', key = 'none', hotkey = nil},
 		},
 		value = 'qwerty',  --default at start of widget
@@ -254,7 +254,7 @@ options = {
 	},
 	label_super_grid_config = {
 		type = 'label',
-		name = 'Set tab specific overrides',
+		name = 'Tab specific overrides',
 		path = customGridPath
 	},
 }
@@ -284,7 +284,6 @@ local function AddCustomGridOptions()
 		{"factory", "Factory"},
 		{"economy", "Economy"},
 		{"units_factory", "Units"},
-		{"units_mobile", "Units (non-factory)"},
 	}
 
 	for name = 1, #hotkeyTabNames do
@@ -395,14 +394,16 @@ end
 local function GenerateCustomKeyMap()
 	local ret = {}
 	local gridMap = {}
+	local keyAlreadyUsed = {}
 	for i = 1, 3 do
 		gridMap[i] = {}
 		for j = 1, 6 do
 			local key = WG.crude.GetHotkeyRaw("epic_chili_integral_menu_customgrid" .. i .. j)
 			local code, humanName = ToKeysyms(key and key[1])
-			if code then
+			if code and not keyAlreadyUsed[code] then
 				gridMap[i][j] = humanName
 				ret[code] = {i, j}
+				keyAlreadyUsed[code] = true
 			end
 		end
 	end
@@ -413,15 +414,17 @@ local function GenerateCustomKeyMap()
 			local name = commandPanels[panel].name
 			if options["customgrid_override_" .. name .. "11"] then
 				local actionName = "epic_chili_integral_menu_customgrid_override_" .. name
+				keyAlreadyUsed = {}
 				for i = 1, 3 do
 					for j = 1, 6 do
 						local key = WG.crude.GetHotkeyRaw(actionName .. i .. j)
 						local code, humanName = ToKeysyms(key and key[1])
-						if code then
+						if code and not keyAlreadyUsed[code] then
 							overrides[name] = overrides[name] or {keyMap = {}, gridMap = {}}
 							overrides[name].gridMap[i] = overrides[name].gridMap[i] or {}
 							overrides[name].gridMap[i][j] = humanName
 							overrides[name].keyMap[code] = {i, j}
+							keyAlreadyUsed[code] = true
 						end
 					end
 				end
