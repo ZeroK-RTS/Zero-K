@@ -180,7 +180,7 @@ local teleportingUnit, teleportFrame
 local removingTeleportingUnit = false -- set to true prior to DestroyUnit call when teleporting out, then false immediately after
 
 local function SetTeleportCharge(newCharge)
-	if newCharge > TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
+	if teleportChargeNeededMult and newCharge > TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
 		newCharge = TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult
 	end
 	if newCharge == teleportCharge then
@@ -241,7 +241,9 @@ local function CheckRemoveWormhole(unitID, unitDefID)
 	if #wormholeList == 1 then
 		RemoveEvacCommands()
 		wormholeList[1] = nil
-		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.WORMHOLE_DESTROYED)
+		-- The wormhole may be teleported away. More details would be needed to
+		-- mark it as destroyed.
+		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NO_WORMHOLE)
 		return
 	end
 	
