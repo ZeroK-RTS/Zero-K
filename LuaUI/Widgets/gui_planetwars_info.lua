@@ -43,6 +43,7 @@ local factions = {
 	Liberty = {name = "Liberated Humanity", color = {85, 187, 85} },
 	SynPact = {name = "Synthetic Pact", color = {83, 136, 235} },
 }
+local NEUTRAL_FACTION = "Mercenary"
 
 for faction, data in pairs(factions) do
 	for i = 1, 3 do
@@ -56,6 +57,7 @@ local global_button_evacuation
 local global_button_instructions
 local lbl_battle_instructions
 local lbl_planet
+local instruction_textbox
 
 local strings = {
 	evac_ready = "",
@@ -439,19 +441,67 @@ end
 --------------------------------------------------------------------------------
 -- Info Window
 
+local function PrettyNum(str_num)
+	return string.format("%.1f", str_num)
+end
+
+local function HexToColorCode(hexcode)
+	local str = string.char(255)
+	for i = 1, 3 do
+		str = str .. string.char(tonumber(hexcode:sub(2*i, 2*i+1), 16))
+	end
+	return str
+end
+
+local function GetInstructions()
+	local modOpts = Spring.GetModOptions()
+	local customKeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+
+	local myRole = "defender"
+	if Spring.GetSpectatingState() or not customKeys then
+		myRole = "spec"
+	elseif customKeys.faction == modOpts.attackingfaction then
+		myRole = "attacker"
+	end
+
+	local isNeutral = (modOpts.defendingfaction == NEUTRAL_FACTION)
+	local battleType = isNeutral and "neutral" or "pvp"
+
+	local baseTotalIP = math.max(0, tonumber(modOpts.pw_dropshipip) + tonumber(modOpts.pw_baseip) - tonumber(modOpts.pw_defenseip))
+	local attLostCC = PrettyNum(baseTotalIP * tonumber(modOpts.pw_attackerwinlosecc))
+	local defLostCC = PrettyNum(baseTotalIP * tonumber(modOpts.pw_defenderwinkillcc))
+	baseTotalIP = PrettyNum(baseTotalIP)
+
+	local defender = HexToColorCode(modOpts.defendingfactioncolor) .. modOpts.defendingfactionname .. "\255\255\255\255"
+	local attacker = HexToColorCode(modOpts.attackingfactioncolor) .. modOpts.attackingfactionname .. "\255\255\255\255"
+
+	return WG.Translate("interface", "pw_instruction_who_" .. battleType .. "_" .. myRole, {
+		planet   = modOpts.planet,
+
+		defender = defender,
+		attacker = attacker,
+
+		ip = PrettyNum(modOpts.pw_attackerip),
+		needed = PrettyNum(modOpts.pw_neededip),
+
+	}) .. "\n\n\n" .. WG.Translate("interface", "pw_instruction_ip_" .. myRole, {
+		att_kept_cc = baseTotalIP,
+		att_lost_cc = attLostCC,
+		def_lost_cc = defLostCC,
+		def_kept_cc = 0,
+
+		base      = PrettyNum(modOpts.pw_baseip),
+		dropships = PrettyNum(modOpts.pw_dropshipip),
+		defense   = PrettyNum(modOpts.pw_defenseip),
+
+		defender = defender,
+		attacker = attacker,
+
+	}) .. ((isNeutral or myRole == "spec") and "" or ("\n\n\n" .. WG.Translate("interface", "pw_instruction_buildings_" .. myRole, {
+	})))
+end
+
 local function CreateGoalWindow()
-	if IsSpec() then
-		return
-	end
-	local customKeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID())) or {}
-	if (not DEBUG_MODE) and (not customKeys.pwinstructions) then
-		return
-	end
-	local instructions = (DEBUG_MODE and "bla") or Spring.Utilities.Base64Decode(customKeys.pwinstructions)
-	if not instructions then
-		return
-	end
-	
 	local WINDOW_HEIGHT = 320
 	local WINDOW_WIDTH = 480
 	
@@ -488,12 +538,12 @@ local function CreateGoalWindow()
 		parent = instructionWindow,
 	}
 	
-	Chili.TextBox:New {
+	instruction_textbox = Chili.TextBox:New {
 		x = 6,
 		y = 35,
 		right = 6,
 		bottom = 6,
-		text = instructions,
+		text = GetInstructions(),
 		fontsize = 14,
 		parent = instructionWindow,
 	}
@@ -553,6 +603,9 @@ local function languageChanged ()
 	end
 	if lbl_battle_instructions then
 		lbl_battle_instructions:SetCaption(strings.pw_battle_instructions)
+	end
+	if instruction_textbox then
+		instruction_textbox:SetText(GetInstructions())
 	end
 	if lbl_planet then
 		lbl_planet:SetCaption(WG.Translate("interface", "planet", {planet = Spring.GetModOptions().planet}))
