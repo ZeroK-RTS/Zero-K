@@ -99,13 +99,14 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType',  'selectionClosesTab', 'altInsertBehind', 'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid',
+	'background_opacity', 'keyboardType',  'selectionClosesTab', 'altInsertBehind',
+	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning', 
 }
 
 local commandPanelPath = 'Hotkeys/Command Panel'
-local customGridPath = 'Hotkeys/Command Panel/Custom Grid'
+local customGridPath = 'Hotkeys/Command Panel/Custom'
 
 options = {
 	background_opacity = {
@@ -124,7 +125,7 @@ options = {
 			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
 			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey = nil},
 			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
-			{name = 'Configurable in "Custom Grid"', key = 'custom', hotkey = nil},
+			{name = 'Configurable in "Custom" below', key = 'custom', hotkey = nil},
 			{name = 'Disable Grid Keys', key = 'none', hotkey = nil},
 		},
 		value = 'qwerty',  --default at start of widget
@@ -171,6 +172,11 @@ options = {
 		type = 'button',
 		path = customGridPath,
 		noHotkey = true,
+	},
+	label_apply = {
+		type = 'label',
+		name = 'Changes require application or restart',
+		path = customGridPath
 	},
 	label_tab = {
 		type = 'label',
@@ -246,21 +252,60 @@ options = {
 		hidden = true,
 		noHotkey = true,
 	},
+	label_super_grid_config = {
+		type = 'label',
+		name = 'Set tab specific overrides',
+		path = customGridPath
+	},
 }
 
-for i = 1, 3 do
-	for j = 1, 6 do
-		local optName = "customgrid" .. i .. j
-		options[optName] = {
-			name = "Column " .. j .. ", row " .. i,
-			type = 'button',
-			path = customGridPath,
-			dontRegisterAction = true,
-			bindWithoutMod = true,
-		}
-		options_order[#options_order + 1] = optName
+local function AddCustomGridOptions()
+	for i = 1, 3 do
+		for j = 1, 6 do
+			local optName = "customgrid" .. i .. j
+			options[optName] = {
+				name = "Column " .. j .. ", row " .. i,
+				type = 'button',
+				path = customGridPath,
+				dontRegisterAction = true,
+				bindWithoutMod = true,
+			}
+			options_order[#options_order + 1] = optName
+		end
+	end
+
+	options_order[#options_order + 1] = "label_super_grid_config"
+
+	-- Needed now for epicmenu loading
+	local hotkeyTabNames = {
+		{"economy", "Economy"},
+		{"defence", "Defence"},
+		{"special", "Special"},
+		{"factory", "Factory"},
+		{"economy", "Economy"},
+		{"units_factory", "Units"},
+		{"units_mobile", "Units (non-factory)"},
+	}
+
+	for name = 1, #hotkeyTabNames do
+		local optPrefix = "customgrid_override_" .. hotkeyTabNames[name][1]
+		local pathName = customGridPath .. "/" .. hotkeyTabNames[name][2]
+		for i = 1, 3 do
+			for j = 1, 6 do
+				local optName = optPrefix .. i .. j
+				options[optName] = {
+					name = "Column " .. j .. ", row " .. i,
+					type = 'button',
+					path = pathName,
+					dontRegisterAction = true,
+					bindWithoutMod = true,
+				}
+				options_order[#options_order + 1] = optName
+			end
+		end
 	end
 end
+AddCustomGridOptions()
 
 local function TabClickFunction(mouse)
 	if not mouse then
@@ -337,23 +382,60 @@ local function UpdateReturnToOrders(cmdID)
 	end
 end
 
-local function GenerateGridKeyMap(name)
-	if name == "custom" then
-		local ret = {}
-		local gridMap = {}
-		for i = 1, 3 do
-			gridMap[i] = {}
-			for j = 1, 6 do
-				local key = WG.crude.GetHotkeyRaw("epic_chili_integral_menu_customgrid" .. i .. j)
-				key = key and key[1] and string.upper(key[1])
-				local code = key and KEYSYMS[key]
-				if code then
-					gridMap[i][j] = key
-					ret[code] = {i, j}
+local function ToKeysyms(key)
+	if not key then
+		return
+	end
+	if tonumber(key) then
+		return KEYSYMS["N_" .. key], key
+	end
+	return KEYSYMS[string.upper(key)], string.upper(key)
+end
+
+local function GenerateCustomKeyMap()
+	local ret = {}
+	local gridMap = {}
+	for i = 1, 3 do
+		gridMap[i] = {}
+		for j = 1, 6 do
+			local key = WG.crude.GetHotkeyRaw("epic_chili_integral_menu_customgrid" .. i .. j)
+			local code, humanName = ToKeysyms(key and key[1])
+			if code then
+				gridMap[i][j] = humanName
+				ret[code] = {i, j}
+			end
+		end
+	end
+	
+	local overrides = {}
+	if commandPanels then
+		for panel = 1, #commandPanels do
+			local name = commandPanels[panel].name
+			if options["customgrid_override_" .. name .. "11"] then
+				local actionName = "epic_chili_integral_menu_customgrid_override_" .. name
+				for i = 1, 3 do
+					for j = 1, 6 do
+						local key = WG.crude.GetHotkeyRaw(actionName .. i .. j)
+						local code, humanName = ToKeysyms(key and key[1])
+						if code then
+							overrides[name] = overrides[name] or {keyMap = {}, gridMap = {}}
+							overrides[name].gridMap[i] = overrides[name].gridMap[i] or {}
+							overrides[name].gridMap[i][j] = humanName
+							overrides[name].keyMap[code] = {i, j}
+						end
+					end
 				end
 			end
 		end
-		return ret, gridMap
+	end
+	
+	return ret, gridMap, overrides
+end
+
+local function GenerateGridKeyMap(name)
+	if name == "custom" then
+		local ret, gridMap, overrides = GenerateCustomKeyMap()
+		return ret, gridMap, overrides
 	end
 	
 	local keyboardLayouts = include("Configs/keyboard_layout.lua")
@@ -861,8 +943,13 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		end
 	end
 	
-	function externalFunctionsAndData.UpdateGridHotkey(gridMap)
-		local key = gridMap[y] and gridMap[y][x]
+	function externalFunctionsAndData.UpdateGridHotkey(myGridMap, myOverride)
+		local key
+		if myOverride then
+			key = myOverride[y] and myOverride[y][x]
+		else
+			key = myGridMap[y] and myGridMap[y][x]
+		end
 		if not key then
 			externalFunctionsAndData.RemoveGridHotkey()
 			return
@@ -1047,7 +1134,7 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 	local width = tostring(100/columns) .. "%"
 	local height = tostring(100/rows) .. "%"
 	
-	local gridMap
+	local gridMap, override
 	local gridEnabled = true
 	
 	local externalFunctions = {}
@@ -1094,7 +1181,7 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 		
 		buttonList[#buttonList + 1] = newButton
 		if gridMap and gridEnabled then
-			newButton.UpdateGridHotkey(gridMap)
+			newButton.UpdateGridHotkey(gridMap, override and override.gridMap)
 		end
 		
 		buttons[x][y] = newButton
@@ -1114,11 +1201,12 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 		end
 	end
 	
-	function externalFunctions.ApplyGridHotkeys(newGridMap)
+	function externalFunctions.ApplyGridHotkeys(newGridMap, newOverride)
 		gridMap = newGridMap or gridMap
+		override = newOverride or override
 		gridEnabled = true
 		for i = 1, #buttonList do
-			buttonList[i].UpdateGridHotkey(gridMap)
+			buttonList[i].UpdateGridHotkey(gridMap, override and override.gridMap)
 		end
 	end
 	
@@ -1572,7 +1660,7 @@ end
 --------------------------------------------------------------------------------
 -- Initialization
 
-local gridKeyMap, gridMap -- Configuration requires this
+local gridKeyMap, gridMap, gridCustomOverrides -- Configuration requires this
 
 local function InitializeControls()
 	-- Set the size for the default settings.
@@ -1580,7 +1668,7 @@ local function InitializeControls()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
 
-	gridKeyMap, gridMap = GenerateGridKeyMap(options.keyboardType.value)
+	gridKeyMap, gridMap, gridCustomOverrides = GenerateGridKeyMap(options.keyboardType.value)
 	
 	local mainWindow = Window:New{
 		name      = 'integralwindow',
@@ -1690,7 +1778,7 @@ local function InitializeControls()
 		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect)
 	
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
-			data.buttons.ApplyGridHotkeys(gridMap)
+			data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
 		end
 	end
 	
@@ -1714,11 +1802,11 @@ end
 -- Epic Menu Configuration and Hotkey Functions
 
 local function UpdateGrid(name)
-	gridKeyMap, gridMap = GenerateGridKeyMap(name)
+	gridKeyMap, gridMap, gridCustomOverrides = GenerateGridKeyMap(name)
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
-			data.buttons.ApplyGridHotkeys(gridMap)
+			data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
 		end
 	end
 
@@ -1744,7 +1832,7 @@ function options.unitsHotkeys2.OnChange(self)
 			if not options.unitsHotkeys2.value then
 				data.buttons.RemoveGridHotkeys()
 			else
-				data.buttons.ApplyGridHotkeys(gridMap)
+				data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
 			end
 		end
 	end
@@ -1893,7 +1981,12 @@ function widget:KeyPress(key, modifier, isRepeat)
 		return false
 	end
 	
-	local pos = gridKeyMap[key]
+	local currentKeyMap = gridKeyMap
+	if gridCustomOverrides and gridCustomOverrides[currentTab] then
+		currentKeyMap = gridCustomOverrides[currentTab].keyMap
+	end
+	
+	local pos = currentKeyMap[key]
 	if pos then
 		local x, y = pos[2], pos[1]
 		local button = commandPanel.buttons.GetButton(x, y)
@@ -1902,7 +1995,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		end
 	end
 
-	if (key == KEYSYMS.ESCAPE or gridKeyMap[key]) and commandPanel.onClick then
+	if (key == KEYSYMS.ESCAPE or currentKeyMap[key]) and commandPanel.onClick then
 		if commandPanelMap.orders then
 			commandPanelMap.orders.tabButton.DoClick()
 		end
