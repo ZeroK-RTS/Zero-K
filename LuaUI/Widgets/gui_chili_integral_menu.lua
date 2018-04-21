@@ -393,7 +393,10 @@ local function ToKeysyms(key)
 	if keyCode == nil then
 		keyCode = specialKeyCodes[key]
 	end
-	return keyCode, string.upper(key)
+	key = string.upper(key) or key
+	key = string.gsub(key, "NUMPAD", "NP") or key
+	key = string.gsub(key, "KP", "NP") or key
+	return keyCode, key
 end
 
 local function GenerateCustomKeyMap()
