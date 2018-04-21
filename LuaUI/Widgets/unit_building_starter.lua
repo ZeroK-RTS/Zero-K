@@ -37,7 +37,7 @@ options = {
 	},
 	hotkey = {
 		name = 'Place Nanoframes',
-		desc = 'Hold this key to queue structures which are to placed but not constructed.',
+		desc = 'Hold this key during structure placement to queue structures which are to placed but not constructed.',
 		type = 'button',
 		hotkey = "Q",
 		bindWithAny = true,
@@ -62,6 +62,7 @@ function widget:Initialize()
 		Spring.Echo("<Building Starter>: disabled for spectators")
 		widgetHandler:RemoveWidget()
 	end
+	HotkeyChangeNotification()
 end
 
 function widget:CommandNotify(id, params, options)
@@ -135,4 +136,3 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 	end
 end
-
