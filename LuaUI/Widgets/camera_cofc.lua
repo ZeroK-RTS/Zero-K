@@ -2681,7 +2681,12 @@ local groupNumber = {
 	[KEYSYMS.N_7] = 7,
 	[KEYSYMS.N_8] = 8,
 	[KEYSYMS.N_9] = 9,
+	[KEYSYMS.N_0] = 0,
 }
+
+function WG.COFC_UpdateGroupNumbers(newNumber)
+	groupNumber = newNumber
+end
 
 function GroupRecallFix(key, modifier, isRepeat)
 	if ( not modifier.ctrl and not modifier.alt and not modifier.meta) then --check key for group. Reference: unit_auto_group.lua by Licho

@@ -176,6 +176,7 @@ for k, v in pairs(KEYSYMS) do
 end
 --]]
 local get_key, get_key_bind_mod, get_key_bind_without_mod = false, false, false
+local get_key_bind_with_any, get_key_bind_notify_function = false
 local kb_path, kb_button, kb_control, kb_option, kb_action
 
 local transkey = include("Configs/transkey.lua")
@@ -1353,6 +1354,8 @@ local function MakeKeybindWindow( path, option, hotkeyButton, optionControl, opt
 	get_key = true
 	get_key_bind_mod = option.bindMod
 	get_key_bind_without_mod = option.bindWithoutMod
+	get_key_bind_with_any = option.bindWithAny
+	get_key_bind_notify_function = option.OnHotkeyChange
 	kb_path = path
 	kb_button = hotkeyButton
 	kb_control = optionControl
@@ -3224,12 +3227,17 @@ function widget:KeyPress(key, modifier, isRepeat)
 	if get_key then
 		get_key = false
 		window_getkey:Dispose()
-		if get_key_bind_mod or get_key_bind_without_mod then
+		if get_key_bind_mod or get_key_bind_without_mod or get_key_bind_with_any then
 			-- get_key_bind_mod allows mod keys to be directly bound to an action.
 			-- get_key_bind_without_mod gets the key bind without any modifiers.
-			modstring = ''
+			if get_key_bind_with_any then
+				modstring = 'Any+'
+			else
+				modstring = ''
+			end
 			get_key_bind_mod = false
 			get_key_bind_without_mod = false
+			get_key_bind_with_any = false
 		end
 		translatedkey = transkey[ keysyms[''..key]:lower() ] or keysyms[''..key]:lower()
 		--local hotkey = {key = translatedkey, mod = modstring}
@@ -3254,6 +3262,11 @@ function widget:KeyPress(key, modifier, isRepeat)
 				kb_control._relativeBounds.right = hklength + 2 --room for hotkey button on right side
 				kb_control:UpdateClientArea()
 			end
+		end
+		
+		if get_key_bind_notify_function then
+			get_key_bind_notify_function()
+			get_key_bind_notify_function = false
 		end
 		
 		return true

@@ -29,4 +29,17 @@ local specialKeys = {
 	["pause"] = KEYSYMS.BREAK,
 }
 
-return specialKeys
+local function ToKeysyms(key)
+	if not key then
+		return
+	end
+	key = string.upper(key)
+	key = string.gsub(key, "ANY%+", "")
+	if tonumber(key) then
+		return KEYSYMS["N_" .. key]
+	end
+	local keyCode = KEYSYMS[string.upper(key)]
+	return keyCode or specialKeyCodes[key]
+end
+
+return specialKeys, ToKeysyms
