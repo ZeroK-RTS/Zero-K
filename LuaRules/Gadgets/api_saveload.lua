@@ -289,6 +289,11 @@ local function LoadUnits()
 				Spring.SetUnitCloak(newID, data.cloak)
 			end
 			GG.UpdateUnitAttributes(newID)
+			
+			-- control group
+			if data.ctrlGroup then
+				SendToUnsynced("saveLoad_SetControlGroup", newID, data.unitTeam, data.ctrlGroup)
+			end
 		end
 	end
 	
@@ -683,6 +688,8 @@ local savedata = {
 	gadgets = {},
 }
 
+local myTeamID = Spring.GetMyTeamID()
+
 --------------------------------------------------------------------------------
 -- I/O utility functions
 --------------------------------------------------------------------------------
@@ -920,6 +927,12 @@ local function SaveUnits()
 			for name,value in pairs(params) do
 				unitInfo.rulesParams[name] = value 
 			end
+			
+			-- control group
+			local ctrlGroup = Spring.GetUnitGroup(unitID)
+			if ctrlGroup then
+			    unitInfo.ctrlGroup = ctrlGroup
+			end
 		end
 	end
 	return data
@@ -1039,6 +1052,13 @@ end
 local function ModifyUnitData(unitID)
 end
 
+local function SetControlGroup(_, unitID, teamID, ctrlGroup)
+	if teamID ~= myTeamID then
+		return
+	end
+	Spring.SetUnitGroup(unitID, ctrlGroup)
+end
+
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 -- callins
@@ -1082,7 +1102,11 @@ function gadget:Save(zip)
 end
 
 function gadget:Initialize()
+	gadgetHandler:AddSyncAction("saveLoad_SetControlGroup", SetControlGroup)
+end
 
+function gadget:Shutdown()
+	gadgetHandler:RemoveSyncAction("saveLoad_SetControlGroup")
 end
 -----------------------------------------------------------------------------------
 --  END UNSYNCED
