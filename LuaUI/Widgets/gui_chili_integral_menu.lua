@@ -19,6 +19,7 @@ end
 -- Configuration
 
 include("keysym.h.lua")
+local specialKeyCodes = include("Configs/integral_menu_special_keys.lua")
 
 -- Chili classes
 local Chili
@@ -390,7 +391,7 @@ local function ToKeysyms(key)
 	end
 	local keyCode = KEYSYMS[string.upper(key)]
 	if keyCode == nil then
-		keyCode = include("Configs/integral_menu_special_keys.lua")[key]
+		keyCode = specialKeyCodes[key]
 	end
 	return keyCode, string.upper(key)
 end
