@@ -39,7 +39,7 @@ local function ToKeysyms(key)
 		return KEYSYMS["N_" .. key]
 	end
 	local keyCode = KEYSYMS[string.upper(key)]
-	return keyCode or specialKeyCodes[key]
+	return keyCode or specialKeys[key]
 end
 
 return specialKeys, ToKeysyms
