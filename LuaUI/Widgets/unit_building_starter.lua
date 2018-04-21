@@ -17,11 +17,37 @@ local numBuildings = 0
 
 local team = Spring.GetMyTeamID()
 include("keysym.h.lua")
+local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 
 local CMD_REMOVE = CMD.REMOVE
 
--- Speedups
+local buildingStartKey = KEYSYMS.Q
+local function HotkeyChangeNotification()
+	local key = WG.crude.GetHotkeyRaw("epic_building_starter_hotkey")
+	buildingStartKey = ToKeysyms(key and key[1])
+end
 
+options_order = {'lbl_mod', 'hotkey'}
+options_path = 'Hotkeys/Construction'
+options = {
+	lbl_mod = {
+		name = 'Placement Modifiers',
+		type = 'label',
+		path = 'Hotkeys/Construction',
+	},
+	hotkey = {
+		name = 'Place Nanoframes',
+		desc = 'Hold this key to queue structures which are to placed but not constructed.',
+		type = 'button',
+		hotkey = "Q",
+		bindWithAny = true,
+		dontRegisterAction = true,
+		OnHotkeyChange = HotkeyChangeNotification,
+		path = hotkeyPath,
+	},
+}
+
+-- Speedups
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetTeamUnits = Spring.GetTeamUnits
 local spGetCommandQueue = Spring.GetCommandQueue
@@ -42,13 +68,13 @@ function widget:CommandNotify(id, params, options)
 	if (id < 0) then
 		local ux = params[1]
 		local uz = params[3]
-		if (spGetKeyState(KEYSYMS.Q)) then
+		if buildingStartKey and spGetKeyState(buildingStartKey) then
 			buildings[numBuildings] = { x = ux, z = uz}
 			numBuildings = numBuildings+1
 		else
-			for j, i in pairs(buildings) do   
-				if (i.x) then	  
-					if (i.x == ux) and (i.z == uz) then	    
+			for j, i in pairs(buildings) do
+				if (i.x) then
+					if (i.x == ux) and (i.z == uz) then
 						buildings[j] = nil
 					end
 				end

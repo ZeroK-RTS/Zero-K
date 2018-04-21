@@ -54,7 +54,6 @@ local removeAutogroupKey = KEYSYMS.BACKQUOTE
 local function HotkeyChangeNotification()
 	local key = WG.crude.GetHotkeyRaw("epic_auto_group_removefromgroup")
 	removeAutogroupKey = ToKeysyms(key and key[1])
-	Spring.Echo("removeAutogroupKey", key, key and key[1])
 end
 
 local helpText =
