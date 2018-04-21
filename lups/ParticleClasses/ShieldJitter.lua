@@ -70,11 +70,8 @@ function ShieldJitter:DrawDistortion()
 	gl.Uniform(strengthUniform,  self.strength )
 
 	gl.Texture(0,self.texture)
-	gl.PushMatrix()
-	gl.Translate(pos[1],pos[2],pos[3])
-	gl.Scale(size,size,size)
+	gl.MultiTexCoord(1, pos[1], pos[2], pos[3], size)
 	gl.CallList(sphereList)
-	gl.PopMatrix()
 end
 
 -----------------------------------------------------------------------------------------------------------------
@@ -89,9 +86,12 @@ function ShieldJitter.Initialize()
 			varying float scale;
 			varying vec2 texCoord;
 
+			#define pos vec4(gl_MultiTexCoord1.xyz, 0.0)
+			#define size vec4(gl_MultiTexCoord1.www, 1.0)
+
 	void main()
 	{
-					gl_Position    = ftransform();
+					gl_Position = gl_ModelViewProjectionMatrix * (gl_Vertex * size + pos);
 					texCoord       = gl_MultiTexCoord0.st + timer;
 
 					vec3 normal  = normalize(gl_NormalMatrix * gl_Normal);
@@ -124,8 +124,9 @@ function ShieldJitter.Initialize()
 		}
 	})
 
-	if (warpShader == nil) then
-		print(PRIO_MAJOR,"LUPS->ShieldJitter: shader error: "..gl.GetShaderLog())
+	local shLog = gl.GetShaderLog()
+	if (warpShader == nil or string.len(shLog or "") > 0) then
+		print(PRIO_MAJOR,"LUPS->ShieldJitter: shader error: "..shLog)
 		return false
 	end
 
