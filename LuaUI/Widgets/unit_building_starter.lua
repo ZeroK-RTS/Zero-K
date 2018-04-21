@@ -27,14 +27,9 @@ local function HotkeyChangeNotification()
 	buildingStartKey = ToKeysyms(key and key[1])
 end
 
-options_order = {'text_hotkey', 'hotkey'}
+options_order = {'hotkey'}
 options_path = 'Hotkeys/Construction'
 options = {
-	text_hotkey = {
-		name = 'Placement Modifiers',
-		type = 'text',
-		value = "No modifiers (Shift, Alt, Ctrl, Space) can be applied to these keys due to conflicts. For example, Shift can be held to queue a line of structures.",
-	},
 	hotkey = {
 		name = 'Place Nanoframes',
 		desc = 'Hold this key during structure placement to queue structures which are to placed but not constructed.',

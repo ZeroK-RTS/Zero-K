@@ -10,6 +10,44 @@ function widget:GetInfo()
   }
 end
 
+options_order = {'text_hotkey', 'hotkey_inc', 'hotkey_dec', 'hotkey_facing_inc', 'hotkey_facing_dec'}
+options_path = 'Hotkeys/Construction'
+options = {
+	text_hotkey = {
+		name = 'Placement Modifiers',
+		type = 'text',
+		value = "Hotkeys for adjusting structure placement.",
+	},
+	hotkey_inc = {
+		name = 'Increase Build Spacing',
+		desc = 'Increase the spacing between structures queued in a line or rectangle. Hold Shift to queue a line of structures. Add Alt to queue a rectangle. Add Ctrl to queue a hollow rectangle.',
+		type = 'button',
+		action = "buildspacing inc",
+		bindWithAny = true,
+	},
+	hotkey_dec = {
+		name = 'Decrease Build Spacing',
+		desc = 'Decrease the spacing between structures queued in a line or rectangle. Hold Shift to queue a line of structures. Add Alt to queue a rectangle. Add Ctrl to queue a hollow rectangle.',
+		type = 'button',
+		action = "buildspacing dec",
+		bindWithAny = true,
+	},
+	hotkey_facing_inc = {
+		name = 'Rotate Counterclockwise',
+		desc = 'Rotate the structure placement blueprint counterclockwise.',
+		type = 'button',
+		action = "buildfacing inc",
+		bindWithAny = true,
+	},
+	hotkey_facing_dec = {
+		name = 'Rotate Clockwise',
+		desc = 'Rotate the structure placement blueprint clockwise.',
+		type = 'button',
+		action = "buildfacing dec",
+		bindWithAny = true,
+	},
+}
+
 -- Config
 local defaultSpacing = 4 -- Big makes for more navigable bases for new players.
 
