@@ -313,6 +313,11 @@ local function LoadUnits()
 					Spring.UnitAttach(data.transporter, newID, 0)	-- FIXME: no way to get the proper piece atm
 				end
 			end
+			
+			local env = Spring.UnitScript.GetScriptEnv(newID)
+			if env and env.OnLoadGame then
+				Spring.UnitScript.CallAsUnit(newID, env.OnLoadGame)
+			end
 		end
 	end
 	
@@ -953,6 +958,12 @@ local function GetProjectileSaveInfo(projectileID)
 	local projectileInfo = {}
 	-- basic projectile information
 	local projectileDefID = spGetProjectileDefID(projectileID)
+	local wd = WeaponDefs[projectileDefID]
+	
+	if wd and wd.customParams and wd.customParams.do_not_save then
+		return
+	end
+	
 	projectileInfo.projectileDefID = projectileDefID
 	projectileInfo.teamID = spGetProjectileTeamID(projectileID)
 	projectileInfo.ownerID = spGetProjectileOwnerID(projectileID)
@@ -967,7 +978,6 @@ local function GetProjectileSaveInfo(projectileID)
 	projectileInfo.target = target
 	projectileInfo.isIntercepted = spGetProjectileIsIntercepted(projectileID)
 	
-	local wd = WeaponDefs[projectileDefID]
 	if wd and wd.type == "StarburstLauncher" and wd.customParams then
 		local cp = wd.customParams
 		-- Some crazyness with how these values are interpreted:

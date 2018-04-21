@@ -140,11 +140,41 @@ local function RegainControlOfMeteors()
 	Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
 end
 
+local function SpawnMeteor()
+	local sourcePos = Vector.PolarToCart(SOURCE_RANGE*(1 - math.random()^2), 2*math.pi*math.random())
+	local hoverPos = Vector.PolarToCart(HOVER_RANGE*math.random()^2, 2*math.pi*math.random())
+	local proID = Spring.SpawnProjectile(floatWeaponDefID, {
+		pos = {ux + sourcePos[1], uy + SOURCE_HEIGHT, uz + sourcePos[2]}, 
+		tracking = true, 
+		speed = {0, -1, 0}, 
+		ttl = 18000, -- 18000 = 10 minutes
+		gravity = meteorGravity,
+		team = gaiaTeam,
+	})
+	Spring.SetProjectileTarget(proID, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
+	
+	-- Drop meteor if there are too many. It is more fun this way.
+	if projectileCount >= METEOR_CAPACITY then
+		DropSingleMeteor(oldestProjectile)
+		projectiles[oldestProjectile] = proID
+		oldestProjectile = oldestProjectile + 1
+		if oldestProjectile > projectileCount then
+			oldestProjectile = 1
+		end
+	else
+		projectileCount = projectileCount + 1
+		projectiles[projectileCount] = proID
+		
+		tooltipProjectileCount = tooltipProjectileCount + 1
+		Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
+	end
+end
+
 local function SpawnProjectileThread()
 	
 	local reloadMult = 1
 	
-	while true do		
+	while true do
 		reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
 		
 		--Spring.SpawnProjectile(gravityWeaponDefID, {
@@ -157,7 +187,7 @@ local function SpawnProjectileThread()
 		--// Handle stun and slow
 		-- reloadMult should be 0 only when disabled.
 		Sleep(SPAWN_PERIOD/((reloadMult > 0 and reloadMult) or 1))
-		while IsDisabled() do			
+		while IsDisabled() do
 			if not currentlyStunned then
 				LoseControlOfMeteors()
 				currentlyStunned = true
@@ -171,36 +201,7 @@ local function SpawnProjectileThread()
 			currentlyStunned = false
 		end
 		
-		--// Handle Meteors 
-		-- Call a new meteor
-		local sourcePos = Vector.PolarToCart(SOURCE_RANGE*(1 - math.random()^2), 2*math.pi*math.random())
-		local hoverPos = Vector.PolarToCart(HOVER_RANGE*math.random()^2, 2*math.pi*math.random())
-		local proID = Spring.SpawnProjectile(floatWeaponDefID, {
-			pos = {ux + sourcePos[1], uy + SOURCE_HEIGHT, uz + sourcePos[2]}, 
-			tracking = true, 
-			speed = {0, -1, 0}, 
-			ttl = 18000, -- 18000 = 10 minutes
-			gravity = meteorGravity,
-			team = gaiaTeam,
-		})
-		Spring.SetProjectileTarget(proID, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
-		
-		-- Drop meteor if there are too many. It is more fun this way.
-		if projectileCount >= METEOR_CAPACITY then
-			DropSingleMeteor(oldestProjectile)
-			projectiles[oldestProjectile] = proID
-			oldestProjectile = oldestProjectile + 1
-			if oldestProjectile > projectileCount then
-				oldestProjectile = 1
-			end
-		else
-			projectileCount = projectileCount + 1
-			projectiles[projectileCount] = proID
-			
-			tooltipProjectileCount = tooltipProjectileCount + 1
-			Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
-		
-		end
+		SpawnMeteor()
 	end
 end
 
@@ -250,7 +251,7 @@ local function LaunchAll(x, z)
 	oldestProjectile = 1
 	
 	tooltipProjectileCount = 0
-	Spring.SetUnitRulesParam(unitID, "meteorsControlled", projectileCount, INLOS_ACCESS)
+	Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
 	
 	-- Sleep to give time for the aim projectiles to turn
 	Sleep(1500)
@@ -271,8 +272,17 @@ local function LaunchAll(x, z)
 	launchInProgress = false
 end
 
+function OnLoadGame()
+	local meteorCount = Spring.GetUnitRulesParam(unitID, "meteorsControlled") or 0
+	for i = 1, meteorCount do
+		SpawnMeteor()
+	end
+end
+
 function script.Create()
-	Spring.SetUnitRulesParam(unitID, "meteorsControlled", 0, INLOS_ACCESS)
+	if Spring.GetGameRulesParam("loadPurge") ~= 1 then
+		Spring.SetUnitRulesParam(unitID, "meteorsControlled", 0, INLOS_ACCESS)
+	end
 	Spring.SetUnitRulesParam(unitID, "meteorsControlledMax", METEOR_CAPACITY, INLOS_ACCESS)
 	ux,_, uz = Spring.GetUnitPosition(unitID)
 	uy = Spring.GetGroundHeight(ux, uz)
