@@ -27,7 +27,6 @@ for id, def in pairs(UnitDefs) do
 end
 
 local currentFrame
-
 function gadget:GameFrame (frame)
 	currentFrame = frame
 	if ((frame % 15) == 7) then
