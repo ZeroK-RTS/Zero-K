@@ -2,16 +2,16 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-    name      = "Default Group Recall Fix",
-    desc      = "Fix to the group recall problem.",
-    author    = "msafwan, GoogleFrog",
-    date      = "30 Jan 2014",
-    license   = "GNU GPL, v2 or later",
-    layer     = 1002,
-	handler   = true,
-    enabled   = true,
-  }
+	return {
+		name      = "Default Group Recall Fix",
+		desc      = "Fix to the group recall problem.",
+		author    = "msafwan, GoogleFrog",
+		date      = "30 Jan 2014",
+		license   = "GNU GPL, v2 or later",
+		layer     = 1002,
+		handler   = true,
+		enabled   = true,
+	}
 end
 
 include("keysym.h.lua")
@@ -40,10 +40,10 @@ options = {
 }
 
 
-local spGetUnitGroup = Spring.GetUnitGroup
-local spGetGroupList  = Spring.GetGroupList 
-local spGetTimer 			= Spring.GetTimer
-local spDiffTimers 			= Spring.DiffTimers
+local spGetUnitGroup     = Spring.GetUnitGroup
+local spGetGroupList     = Spring.GetGroupList 
+local spGetTimer         = Spring.GetTimer
+local spDiffTimers       = Spring.DiffTimers
 local spGetSelectedUnits = Spring.GetSelectedUnits
 
 local previousGroup = 99
@@ -66,7 +66,7 @@ local function GroupRecallFix(key, modifier, isRepeat)
 	if (not modifier.ctrl and not modifier.alt and not modifier.meta) then --check key for group. Reference: unit_auto_group.lua by Licho
 		local group
 		if (key ~= nil and groupNumber[key]) then 
-			group = groupNumber[key]	
+			group = groupNumber[key]
 		end
 		if (group ~= nil) then
 			local selectedUnit = spGetSelectedUnits()

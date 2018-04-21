@@ -216,7 +216,7 @@ ShButton('', 'Load Game', (function() if WG.SaveGame then WG.SaveGame.CreateLoad
 
 --- GENERAL SETTINGS --- settings about settings
 local generalPath = 'Settings/Reset Settings'
-	ShLabel(generalPath, 'Minimal Graphics.')
+	ShLabel(generalPath, 'Minimal Graphics - Requires restart.')
 	ShButton(generalPath, 'Minimal graphic settings',function()
 					spSendCommands{"water 0",
 						"Shadows 0",
@@ -234,10 +234,10 @@ local generalPath = 'Settings/Reset Settings'
 				end,
 				'Test minimal graphics. Use the main settings menu to make a permanent if necessary.'
 			)
-	ShLabel(generalPath, 'Reset custom settings to default.')
-	ShButton(generalPath, 'Reset settings', function() WG.crude.ResetSettings() end, 'Reset all interface settings to the default.')
-	ShLabel(generalPath, 'Reset hotkeys.')
-	ShButton(generalPath, 'Reset hotkeys',function() WG.crude.ResetKeys() end, 'Reset all hotkeys to the default.')
+	ShLabel(generalPath, 'Reset settings - Requires restart.')
+	ShButton(generalPath, 'Reset settings', function() WG.crude.ResetSettings() end, 'Reset all interface settings to the default. Restart the battle to apply.')
+	ShLabel(generalPath, 'Reset hotkeys - Requires restart.')
+	ShButton(generalPath, 'Reset hotkeys',function() WG.crude.ResetKeys() end, 'Reset all hotkeys to the default. Restart the battle to apply.')
 
 
 local settingsPath = 'Settings'
