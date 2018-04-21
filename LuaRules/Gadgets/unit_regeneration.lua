@@ -27,9 +27,6 @@ for id, def in pairs(UnitDefs) do
 end
 
 local currentFrame
-function gadget:Initialize()
-	currentFrame = Spring.GetGameFrame()
-end
 
 function gadget:GameFrame (frame)
 	currentFrame = frame
@@ -99,6 +96,7 @@ function gadget:UnitDestroyed(unitID)
 end
 
 function gadget:Initialize()
+	currentFrame = Spring.GetGameFrame()
 	GG.SetUnitIdleRegen = SetUnitIdleRegen
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do

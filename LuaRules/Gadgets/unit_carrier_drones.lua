@@ -853,7 +853,7 @@ end
 -- Save/Load
 
 local function LoadDrone(unitID, parentID)
-	Spring.DestroyUnit(unitID)
+	Spring.DestroyUnit(unitID, false, true)
 end
 
 function gadget:Load(zip)
