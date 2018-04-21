@@ -27,13 +27,13 @@ local function HotkeyChangeNotification()
 	buildingStartKey = ToKeysyms(key and key[1])
 end
 
-options_order = {'lbl_mod', 'hotkey'}
+options_order = {'text_hotkey', 'hotkey'}
 options_path = 'Hotkeys/Construction'
 options = {
-	lbl_mod = {
+	text_hotkey = {
 		name = 'Placement Modifiers',
-		type = 'label',
-		path = 'Hotkeys/Construction',
+		type = 'text',
+		value = "No modifiers (Shift, Alt, Ctrl, Space) can be applied to these keys due to conflicts. For example, Shift can be held to queue a line of structures.",
 	},
 	hotkey = {
 		name = 'Place Nanoframes',

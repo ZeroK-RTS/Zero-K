@@ -57,14 +57,14 @@ local function HotkeyChangeNotification()
 end
 
 local helpText =
-	'Alt+0-9 sets autogroup# for selected unit type(s).\nNewly built units get added to group# equal to their autogroup#.'..
-	'\nAlt+BACKQUOTE (~) deletes autogrouping for selected unit type(s).'
+	'Alt + Group Hotkey sets autogroup number for selected unit type(s).\nNewly built units get added to the group equal to their autogroup.'..
+	'\n (~) deletes autogrouping for selected unit type(s).'
 	--'Ctrl+~ removes nearest selected unit from its group and selects it. '
 	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
 
 local hotkeyPath = 'Hotkeys/Selection/Control Groups'
 
-options_order = { 'mainlabel', 'help', 'cleargroups', 'removefromgroup', 'loadgroups', 'addall', 'verbose', 'immediate', 'groupnumbers', }
+options_order = { 'mainlabel', 'text_hotkey', 'cleargroups', 'removefromgroup', 'loadgroups', 'addall', 'verbose', 'immediate', 'groupnumbers', }
 options_path = 'Settings/Interface/Control Groups'
 options = {
 	mainlabel = {name='Auto Group', type='label'},
@@ -107,10 +107,11 @@ options = {
 		noHotkey = true,
 	},
 	
-	help = {
-		name = 'Help',
+	text_hotkey = {
+		name = 'Auto Groups',
 		type = 'text',
-		value = helpText,
+		value = "Alt + <Group Number> sets all selected unit types to automatically be assigned to the group upon completion.\nAlt + <Remove From Autogroup> removes the selected unit types from their auto group. Auto groups persist across games by default.",
+		path = hotkeyPath,
 	},
 	
 	cleargroups = {
