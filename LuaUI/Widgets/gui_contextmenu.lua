@@ -184,7 +184,7 @@ options = {
 	text_hotkey = {
 		name = 'Global Construction Hotkeys',
 		type = 'text',
-		value = [[These hotkey are active even not visible. To edit the in-tab hotkeys look in "Hotkeys/Command Panel" to set your own grid layout. Each tab can even have their own layout.]],
+		value = [[These hotkey are always active. To edit the in-tab hotkeys look in "Hotkeys/Command Panel". Each tab can even have their own layout.]],
 		path = 'Hotkeys/Construction',
 	},
 }
