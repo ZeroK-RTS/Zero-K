@@ -544,7 +544,10 @@ local function CreateGoalWindow()
 		right = 6,
 		bottom = 6,
 		text = GetInstructions(),
-		fontsize = 14,
+		font = {
+			size = 14,
+			autoOutlineColor = false,
+		},
 		parent = instructionWindow,
 	}
 	
