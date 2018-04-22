@@ -254,7 +254,7 @@ local function LoadUnits()
 			spSetUnitVelocity(newID, unpack(data.vel))
 			--spSetUnitDirection(newID, unpack(data.dir))	-- FIXME: callin does not exist
 			
-			if not UnitDefNames[data.unitDefName].isBuilding then
+			if UnitDefNames[data.unitDefName].canMove then
 				Spring.MoveCtrl.Enable(newID)
 				Spring.MoveCtrl.SetHeading(newID, data.heading)	-- workaround?
 				Spring.MoveCtrl.Disable(newID)
