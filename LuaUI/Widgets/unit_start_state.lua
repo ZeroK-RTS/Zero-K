@@ -944,6 +944,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		return
 	end
+	
+	if oldID then
+		return
+	end
 
 	local ud = UnitDefs[unitDefID]
 	local orderArray = {}
@@ -971,7 +975,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local name = ud.name
 	if unitAlreadyAdded[name] then
 		local value = GetStateValue(name, "firestate0")
-		if value ~= nil and (not oldID) then
+		if value ~= nil then
 			if value == -1 then
 				local trueBuilder = false
 				if builderID then
@@ -996,7 +1000,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 
 		value = GetStateValue(name, "movestate1")
-		if value ~= nil and (not oldID) then
+		if value ~= nil then
 			if value == -1 then
 				local trueBuilder = false
 				if builderID then
@@ -1021,7 +1025,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		
 		value = GetStateValue(name, "flylandstate_1")
-		if value and (not oldID) then
+		if value then
 			local trueBuilder = false
 			if builderID then
 				local bdid = Spring.GetUnitDefID(builderID)
@@ -1042,9 +1046,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			
 		end
 		
-		if (not oldID) then
-			QueueState(name, "repeat", CMD.REPEAT, orderArray)
-		end
+		QueueState(name, "repeat", CMD.REPEAT, orderArray)
 		QueueState(name, "flylandstate_1_factory", CMD_AP_FLY_STATE, orderArray)
 		QueueState(name, "auto_assist", CMD_FACTORY_GUARD, orderArray)
 		QueueState(name, "airstrafe1", CMD_AIR_STRAFE, orderArray)
@@ -1169,6 +1171,11 @@ end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1) then
+		return
+	end
+	
+	local oldID = Spring.GetUnitRulesParam(unitID, "saveload_oldID")	
+	if oldID then
 		return
 	end
 

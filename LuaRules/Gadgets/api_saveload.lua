@@ -70,6 +70,10 @@ local cmdTypeIconModeOrNumber = {
 	[CMD.SET_WANTED_MAX_SPEED] = true,
 }
 
+include("LuaRules/Configs/customcmds.h.lua")
+
+local OPT_RIGHT = {"right"}
+
 -- vars
 local savedata = {
 	general = {},
@@ -272,23 +276,37 @@ local function LoadUnits()
 			spSetUnitStockpile(newID, data.stockpile.num or 0, data.stockpile.progress or 0)
 			
 			-- states
-			spGiveOrderToUnit(newID, CMD.FIRE_STATE, {data.states.firestate or 2}, {})
-			spGiveOrderToUnit(newID, CMD.MOVE_STATE, {data.states.movestate or 1}, {})
-			spGiveOrderToUnit(newID, CMD.REPEAT, {boolToNum(data.states["repeat"])}, {})
-			spGiveOrderToUnit(newID, CMD.CLOAK, {boolToNum(data.states.cloak)}, {})
-			spGiveOrderToUnit(newID, CMD.ONOFF, {boolToNum(data.states.active)}, {})
-			spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory)}, {})
-			spGiveOrderToUnit(newID, CMD.IDLEMODE, {boolToNum(data.states.autoland)}, {})
-			spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel)}, {})
+			spGiveOrderToUnit(newID, CMD.FIRE_STATE, {data.states.firestate or 2}, 0)
+			spGiveOrderToUnit(newID, CMD.MOVE_STATE, {data.states.movestate or 1}, 0)
+			spGiveOrderToUnit(newID, CMD.REPEAT, {boolToNum(data.states["repeat"])}, 0)
+			spGiveOrderToUnit(newID, CMD.CLOAK, {boolToNum(data.states.cloak)}, 0)
+			spGiveOrderToUnit(newID, CMD.ONOFF, {boolToNum(data.states.active)}, 0)
+			spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory)}, 0)
+			spGiveOrderToUnit(newID, CMD.IDLEMODE, {boolToNum(data.states.autoland)}, 0)
+			spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel)}, 0)
+			
+			if data.states.custom then
+				for cmdID, state in pairs(data.states.custom) do
+					state = tonumber(state)
+					local opt = 0
+					if cmdID == CMD_RETREAT and state == 0 then
+						opt = OPT_RIGHT
+					end
+					spGiveOrderToUnit(newID, cmdID, {state}, opt)
+				end
+			end
+			
+			if data.cloak then
+				-- restored on its own by gadgets, but without this code line there is a delay where units are uncloaked and enemy tracks them
+				-- ...actually they track it even with this line, comment it out
+				-- at least the unit should get back under cloak before the attacker can actually fire
+				--Spring.SetUnitCloak(newID, data.cloak)
+			else
+				Spring.SetUnitCloak(newID, false)	-- workaround cloak persisting even when unit's "want cloak" state is false
+			end
 			
 			-- is neutral
 			spSetUnitNeutral(newID, data.neutral or false)
-			
-			-- cloaked?
-			if data.cloak then
-				Spring.SetUnitCloak(newID, data.cloak)
-			end
-			GG.UpdateUnitAttributes(newID)
 			
 			-- control group
 			if data.ctrlGroup then
@@ -297,7 +315,7 @@ local function LoadUnits()
 		end
 	end
 	
-	-- Things that rely on unitID remapping
+	-- Things that rely on unitID remapping, and/or rulesparams
 	for oldID, data in pairs(savedata.unit) do
 		if data.newID then
 			local newID = data.newID
@@ -919,6 +937,17 @@ local function SaveUnits()
 			end
 			unitInfo.commands = commands
 			unitInfo.states = spGetUnitStates(unitID)
+			
+			unitInfo.states.custom = {}
+			local custom = unitInfo.states.custom
+			local cmdDescs = Spring.GetUnitCmdDescs(unitID)
+			for i=1,#cmdDescs do
+				local cmdDesc = cmdDescs[i]
+				if cmdDesc["type"] == CMDTYPE.ICON_MODE and (not CMD[cmdDesc.id]) then
+					custom[cmdDesc.id] = cmdDesc.params and tonumber(cmdDesc.params[1])
+				end
+			end
+			
 			-- save experience
 			unitInfo.experience = spGetUnitExperience(unitID)
 			-- save rulesparams
