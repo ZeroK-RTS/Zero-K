@@ -304,6 +304,7 @@ local function LoadUnits()
 			else
 				Spring.SetUnitCloak(newID, false)	-- workaround cloak persisting even when unit's "want cloak" state is false
 			end
+			GG.UpdateUnitAttributes(newID)
 			
 			-- is neutral
 			spSetUnitNeutral(newID, data.neutral or false)
