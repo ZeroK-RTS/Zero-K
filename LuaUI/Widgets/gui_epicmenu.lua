@@ -2638,7 +2638,7 @@ local function MakeSaveLoadButtons()
 	{
 		type='button',
 		name='Save Game',
-		desc = 'Save game (disabled in multiplayer and tutorials)',
+		desc = 'Save game (not available in multiplayer and tutorials).',
 		OnChange = function()
 				if WG.SaveGame and CanSaveGame() then
 					WG.SaveGame.CreateSaveWindow()
