@@ -796,6 +796,10 @@ function gadget:Initialize()
 
 	local edgePadding = math.max(200, math.min(math.min(Game.mapSizeX, Game.mapSizeZ)/4 - 800, 800))
 	planetwarsBoxes = GG.GetPlanetwarsBoxes(0.2, 0.25, 0.3, edgePadding)
+	if not planetwarsBoxes then
+		gadgetHandler:RemoveGadget()
+		return
+	end
 	
 	initialiseNoGoZones()
 	structureSpawnData, spawningAnything = InitializeUnitsToSpawn()
