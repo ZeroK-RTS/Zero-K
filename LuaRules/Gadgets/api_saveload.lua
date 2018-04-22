@@ -385,7 +385,7 @@ local function LoadUnits()
 				if (not IsWithinRange(params[1], params[3], px, pz, 8)) then
 					Spring.GiveOrderToUnit(data.newID, command.id, params, opts)
 				end
-			else			
+			else
 				Spring.GiveOrderToUnit(data.newID, command.id, params, opts)
 			end
 		end
@@ -872,7 +872,7 @@ local function SaveUnits()
 	local units = Spring.GetAllUnits()
 	for i=1,#units do
 		local unitID = units[i]
-		if Spring.GetUnitRulesParam(unitID, "do_not_save") ~= 1 then	
+		if Spring.GetUnitRulesParam(unitID, "do_not_save") ~= 1 then
 			data[unitID] = {}
 			local unitInfo = data[unitID]
 			
@@ -951,7 +951,7 @@ local function SaveUnits()
 			-- save experience
 			unitInfo.experience = spGetUnitExperience(unitID)
 			-- save rulesparams
-			unitInfo.rulesParams = {}		
+			unitInfo.rulesParams = {}
 			local params = Spring.GetUnitRulesParams(unitID)
 			for name,value in pairs(params) do
 				unitInfo.rulesParams[name] = value 
@@ -983,7 +983,7 @@ local function SaveFeatures()
 		-- save position/velocity
 		featureInfo.pos = {spGetFeaturePosition(featureID)}
 		featureInfo.dir = {spGetFeatureDirection(featureID)}
-		featureInfo.heading = spGetFeatureHeading(featureID)		
+		featureInfo.heading = spGetFeatureHeading(featureID)
 		-- save health
 		featureInfo.health, featureInfo.maxHealth, featureInfo.resurrectProgress = spGetFeatureHealth(featureID)
 		featureInfo.reclaimLeft = select(5, spGetFeatureResources(featureID))

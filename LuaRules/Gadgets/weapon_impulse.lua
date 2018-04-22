@@ -9,7 +9,7 @@ end
 function gadget:GetInfo()
   return {
     name      = "Weapon Impulse",
-    desc      = "Implements impulse reliant weapons because engine impelementation is prettymuch broken.",
+    desc      = "Implements impulse reliant weapons because engine implementation is pretty much broken.",
     author    = "Google Frog",
     date      = "1 April 2012",
     license   = "GNU GPL, v2 or later",
