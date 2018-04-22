@@ -142,6 +142,7 @@ local function AddUnit(unitID, unitDefID)
 	}
 
 	if highEnoughQuality then
+		unitData.shieldPos  = def.shieldPos
 		unitData.hitData = {}
 		unitData.needsUpdate = false
 	end
@@ -293,7 +294,8 @@ local function AddShieldHitData(_, hitFrame, unitID, dmg, dx, dy, dz)
 	local unitData = shieldUnits.Get(unitID)
 	if unitData and unitData.hitData then
 		--Spring.Echo(hitFrame, unitID, dmg)
-		local _, theta, phi = cart2spherical(dx, dy, dz)
+		local rdx, rdy, rdz = dx - unitData.shieldPos[1], dy - unitData.shieldPos[2], dz - unitData.shieldPos[3]
+		local _, theta, phi = cart2spherical(rdx, rdy, rdz)
 		DoAddShieldHitData(unitData, hitFrame, dmg, theta, phi)
 	end
 end

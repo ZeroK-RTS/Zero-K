@@ -138,6 +138,7 @@ for unitDefID = 1, #UnitDefs do
 			fx = fxTable,
 			search = searchSizes[radius],
 			shieldCapacity = tonumber(ud.customParams.shield_power),
+			shieldPos = myShield.pos,
 			shieldRadius = radius,
 		}
 	end
