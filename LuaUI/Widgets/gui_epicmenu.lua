@@ -354,7 +354,7 @@ local function BoolToInt(bool)
 	return bool and 1 or 0
 end
 local function IntToBool(int)
-	return int ~= 0
+	return int ~= nil and int ~= 0
 end
 
 -- cool new framework for ordered table that has keys
@@ -545,16 +545,7 @@ local function WidgetEnabled(wname)
 	return order and (order > 0)
 end
 
--- by default it allows if player is not spectating and there are no other players
-
-local function AllowPauseOnMenuChange()
-	if Spring.GetSpectatingState() then
-		return false
-	end
-
-	if settings.config['epic_Settings/HUD_Panels/Pause_Screen_Menu_pauses_in_SP'] == false then
-		return false
-	end
+local function IsSinglePlayer()
 	local playerlist = Spring.GetPlayerList() or {}
 	local myPlayerID = Spring.GetMyPlayerID()
 	 for i = 1, #playerlist do
@@ -569,6 +560,22 @@ local function AllowPauseOnMenuChange()
 	return true
 end
 
+-- by default it allows if player is not spectating and there are no other players
+local function AllowPauseOnMenuChange()
+	if Spring.GetSpectatingState() then
+		return false
+	end
+
+	if settings.config['epic_Settings/HUD_Panels/Pause_Screen_Menu_pauses_in_SP'] == false then
+		return false
+	end
+	if IsSinglePlayer() == false then
+		return false
+	end
+	
+	return true
+end
+
 local function PlayingButNoTeammate() --I am playing and playing alone with no teammate
 	if Spring.GetSpectatingState() then
 		return false
@@ -580,6 +587,21 @@ local function PlayingButNoTeammate() --I am playing and playing alone with no t
 	end
 	return false
 end
+
+local function CanSaveGame()
+	if Spring.IsCheatingEnabled() then
+		return true
+	end
+	
+	if isMission then
+		return IntToBool(Spring.GetModOptions().cansavegame)
+	end
+	
+	return IsSinglePlayer()
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- Kill submenu window
 local function KillSubWindow(makingNew)
@@ -2610,6 +2632,38 @@ local function MakeMenuBar()
 	--ShowHideCrudeMenu()
 end
 
+local function MakeSaveLoadButtons()
+	local imgPath = LUAUI_DIRNAME  .. 'images/'
+	AddOption('',
+	{
+		type='button',
+		name='Save Game',
+		desc = 'Save game (disabled in multiplayer and tutorials)',
+		OnChange = function()
+				if WG.SaveGame and CanSaveGame() then
+					WG.SaveGame.CreateSaveWindow()
+				end
+			end,
+		key='Save Game',
+		icon = imgPath .. 'commands/Bold/unload.png',
+		DisableFunc = function() return not CanSaveGame() end
+	})
+	
+	AddOption('',
+	{
+		type='button',
+		name='Load Game',
+		desc = '',
+		OnChange = function()
+				if WG.SaveGame then
+					WG.SaveGame.CreateLoadWindow()
+				end
+			end,
+		key='Load Game',
+		icon = imgPath .. 'commands/Bold/load.png',
+	})
+end
+
 local function MakeQuitButtons()
 	--AddOption('', {
 	--	type = 'label',
@@ -2821,6 +2875,7 @@ function widget:Initialize()
 		AddOption(option.path, option)
 	end
 	
+	MakeSaveLoadButtons()
 	MakeQuitButtons()
 	
 	AddOption('', {type = 'label', name = '', value = '', key = ''})
