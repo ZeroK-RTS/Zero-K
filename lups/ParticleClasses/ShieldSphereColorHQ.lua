@@ -129,7 +129,7 @@ function ShieldSphereColorHQParticle:Draw()
 
 	gl.Uniform(shieldSizeUniform, self.size)
 	gl.Uniform(shieldSizeDriftUniform, self.sizeDrift)
-	gl.Uniform(marginUniform, self.margin)
+	gl.Uniform(marginUniform, self.marginHQ)
 	gl.Uniform(uvMulUniform, self.uvMul)
 
 	if hitTable then
@@ -152,10 +152,10 @@ function ShieldSphereColorHQParticle:Draw()
 
 	glCallList(sphereList[self.shieldSize])
 
-	if self.drawBack then
+	if self.drawBackHQ then
 		gl.Culling(GL.BACK)
 
-		gl.Uniform(colorMultUniform, self.drawBack[1], self.drawBack[2], self.drawBack[3], self.drawBack[4])
+		gl.Uniform(colorMultUniform, self.drawBackHQ[1], self.drawBackHQ[2], self.drawBackHQ[3], self.drawBackHQ[4])
 
 		if self.drawBackMargin then
 			gl.Uniform(marginUniform, self.drawBackMargin)

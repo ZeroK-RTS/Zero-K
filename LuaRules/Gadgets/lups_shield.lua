@@ -8,7 +8,7 @@ function gadget:GetInfo()
 		author  = "GoogleFrog",
 		date    = "14 November 2017",
 		license = "GNU GPL, v2 or later",
-		layer   = 500, -- Call ShieldPreDamaged after gadgets which change whether interception occurs
+		layer   = 1500, -- Call ShieldPreDamaged after gadgets which change whether interception occurs
 		enabled = true,
 	}
 end
@@ -78,15 +78,13 @@ local LupsAddParticles
 local LOS_UPDATE_PERIOD = 10
 local HIT_UPDATE_PERIOD = 2
 
---local highQuality = false
-local ultraQuality = false
+local highEnoughQuality = false
 
 local hitUpdateNeeded = false
 
 local myAllyTeamID = spGetMyAllyTeamID()
 
 local shieldUnits = IterableMap.New()
-local startup = true
 
 local function GetVisibleSearch(x, z, search)
 	if not x then
@@ -143,7 +141,7 @@ local function AddUnit(unitID, unitDefID)
 		allyTeamID = Spring.GetUnitAllyTeam(unitID)
 	}
 
-	if ultraQuality then
+	if highEnoughQuality then
 		unitData.hitData = {}
 		unitData.needsUpdate = false
 	end
@@ -325,41 +323,7 @@ function gadget:PlayerChanged()
 end
 
 function gadget:GameFrame(n)
-	if startup then --because GG.Lups is unavailable in Initialize()
-		if (not Lups) then
-			Lups = GG.Lups
-			LupsAddParticles = Lups.AddParticles
-		end
-
-		local highQuality = (Lups.Config.quality or 3) >= 3 --Require High or Ultra quality to render HQ shield
-		--highQuality = false
-
-		if highQuality then
-			shieldUnitDefs = include("LuaRules/Configs/lups_shield_fxs_HQ.lua")
-		else
-			shieldUnitDefs = include("LuaRules/Configs/lups_shield_fxs.lua")
-
-		end
-
-		ultraQuality = (Lups.Config.quality or 3) >= 4 --Require Ultra quality to render hit positions
-		--ultraQuality = false
-
-		if ultraQuality then
-			gadgetHandler:AddSyncAction("AddShieldHitDataHandler", AddShieldHitData)
-			GG.GetShieldHitPositions = GetShieldHitPositions
-		end
-
-		local allUnits = Spring.GetAllUnits()
-		for i = 1, #allUnits do
-			local unitID = allUnits[i]
-			local unitDefID = Spring.GetUnitDefID(unitID)
-			gadget:UnitCreated(unitID, unitDefID)
-		end
-
-		startup = false
-	end
-
-	if ultraQuality and hitUpdateNeeded and (n % HIT_UPDATE_PERIOD == 0) then
+	if highEnoughQuality and hitUpdateNeeded and (n % HIT_UPDATE_PERIOD == 0) then
 		hitUpdateNeeded = false
 		for unitID, unitData in shieldUnits.Iterator() do
 			if unitData and unitData.hitData then
@@ -378,8 +342,31 @@ function gadget:GameFrame(n)
 	end
 end
 
+function gadget:Initialize(n)
+	if (not Lups) then
+		Lups = GG.Lups
+		LupsAddParticles = Lups.AddParticles
+	end
+
+	shieldUnitDefs = include("LuaRules/Configs/lups_shield_fxs.lua")
+	highEnoughQuality = (Lups.Config.quality or 2) >= 3 --Require High(or Ultra?) quality to render hit positions
+	--highEnoughQuality = false
+
+	if highEnoughQuality then
+		gadgetHandler:AddSyncAction("AddShieldHitDataHandler", AddShieldHitData)
+		GG.GetShieldHitPositions = GetShieldHitPositions
+	end
+
+	local allUnits = Spring.GetAllUnits()
+	for i = 1, #allUnits do
+		local unitID = allUnits[i]
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		gadget:UnitCreated(unitID, unitDefID)
+	end
+end
+
 function gadget:Shutdown()
-	if ultraQuality then
+	if highEnoughQuality then
 		gadgetHandler:RemoveSyncAction("AddShieldHitDataHandler", AddShieldHitData)
 		GG.GetShieldHitPositions = nil
 	end
