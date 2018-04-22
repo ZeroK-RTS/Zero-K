@@ -54,6 +54,9 @@ end
 
 local function GetBoxID(allyTeamID)
 	local teamID = Spring.GetTeamList(allyTeamID)[1]
+	if not teamID then
+		return
+	end
 	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
 	return boxID
 end
@@ -61,6 +64,9 @@ end
 local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDist)
 	local attackerBoxID = GetBoxID(0)
 	local defenderBoxID = GetBoxID(1)
+	if not attackerBoxID or not defenderBoxID then
+		return
+	end
 
 	local attackerX, attackerZ = GetAverageStartpoint(attackerBoxID)
 	local defenderX, defenderZ = GetAverageStartpoint(defenderBoxID)
