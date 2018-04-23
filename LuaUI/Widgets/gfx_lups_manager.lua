@@ -288,6 +288,7 @@ local function PlayerChanged(_,playerID)
 			end
 		end
 		particleIDs = {}
+		registeredUnits = {}
 
 		widgetHandler:UpdateWidgetCallIn("Update",widget)
 	end
