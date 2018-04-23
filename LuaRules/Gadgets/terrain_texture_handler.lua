@@ -65,6 +65,7 @@ function gadget:Load(zip)
 	if loadData and #loadData > 0 then
 		GG.Terrain_Texture_changeBlockList(loadData)
 	end
+	SendToUnsynced("UpdateAll")
 end
 
 function gadget:Shutdown()
@@ -433,11 +434,23 @@ function gadget:Save(zip)
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
 		return
 	end
-
+	
 	local blockList = {}
+	-- Save the current texture
 	for x, rest in pairs(blockStateMap) do
 		for z, tex in pairs(rest) do
 			table.insert(blockList, {x = x, z = z, tex = tex})
+		end
+	end
+	
+	-- Save the pending changes
+	for _, chunkCols in pairs(chunkMap) do
+		for _, chunk in pairs(chunkCols) do
+			local chunkBlocks = chunk.blockList
+			for i = 1, chunkBlocks.count do
+				local b = chunkBlocks.data[i]
+				table.insert(blockList, {x = b.x, z = b.z, tex = b.tex})
+			end
 		end
 	end
 
