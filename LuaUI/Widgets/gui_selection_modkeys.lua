@@ -16,6 +16,7 @@ end
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local spSelectUnitArray = Spring.SelectUnitArray
+local spTraceScreenRay  = Spring.TraceScreenRay
 local spDiffTimers      = Spring.DiffTimers
 local spGetTimer        = Spring.GetTimer
 
@@ -26,7 +27,7 @@ local LEFT_CLICK = 1
 local RIGHT_CLICK = 3
 local TRACE_UNIT = "unit"
 
-local CLICK_LEEWAY = 2
+local CLICK_LEEWAY = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -59,7 +60,6 @@ local function Reset()
 	clickY = false
 	clickUnitID = false
 	clickSelected = false
-	mousePressed = false
 end
 
 --------------------------------------------------------------------------------
@@ -168,6 +168,7 @@ local function MousePress(x, y)
 	clickSelected = Spring.IsUnitSelected(targetID)
 	
 	prevClick = spGetTimer()
+	Spring.Echo("MousePress", left, clickX, clickY, clickUnitID, math.random())
 end
 
 local function MouseRelease(x, y)
@@ -175,13 +176,24 @@ local function MouseRelease(x, y)
 		return
 	end
 	
-	if not (clickX and clickY and clickUnitID) or (math.abs(clickX - x) > CLICK_LEEWAY) or (math.abs(clickY - y) > CLICK_LEEWAY) then
+	Spring.Echo("Update", left, clickX, clickY, clickUnitID, math.random())
+	if not (clickX and clickY and clickUnitID) then
 		Reset()
 		return
 	end
 	
-	local targetID = WG.PreSelection_GetUnitUnderCursor(true)
-	local needSelection = false
+	local pointedType, targetID = spTraceScreenRay(x, y, false, true)
+	if pointedType ~= 'unit' or (not Spring.ValidUnitID(targetID)) or WG.drawtoolKeyPressed then
+		targetID = false
+	end
+	Spring.Echo("targetID", targetID, clickUnitID)
+	
+	local needSelection = ((math.abs(clickX - x) > CLICK_LEEWAY) or (math.abs(clickY - y) > CLICK_LEEWAY))
+	if (targetID ~= clickUnitID) and needSelection then
+		Reset()
+		return
+	end
+	
 	if (not targetID) then
 		needSelection = true
 		targetID = clickUnitID
@@ -189,6 +201,7 @@ local function MouseRelease(x, y)
 	
 	prevTargetID = targetID
 	local newSel = HandleUnitSelection(Spring.GetSelectedUnits(), targetID, needSelection)
+		Spring.Utilities.TableEcho(newSel, "newSel")
 	if newSel then
 		spSelectUnitArray(newSel)
 	end
@@ -227,8 +240,7 @@ function widget:Update()
 	if left and not mousePressed then
 		MousePress(x, y)
 		mousePressed = true
-	end
-	if not left and mousePressed then
+	elseif not left and mousePressed then
 		MouseRelease(x, y)
 		mousePressed = false
 	end
