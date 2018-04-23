@@ -628,6 +628,15 @@ function widget:MouseRelease(mx, my, mButton)
 		return false
 	end
 	
+	-- Modkeys / command reset
+	local alt, ctrl, meta, shift = GetModKeys()
+	if not usingRMB then
+		if shift then
+			endShift = true -- Reset on release of shift
+		else
+			spSetActiveCommand(0) -- Reset immediately
+		end
+	end
 	-- Are we going to use the drawn formation?
 	local usingFormation = true
 	
@@ -735,7 +744,13 @@ function widget:MouseRelease(mx, my, mButton)
 		widgetHandler:UpdateWidgetCallIn("Update", self)
 	end
 	
-	StopCommandAndRelinquishMouse()
+	fNodes = {}
+	fDists = {}
+	local ownerName = widgetHandler.mouseOwner and widgetHandler.mouseOwner.GetInfo and widgetHandler.mouseOwner.GetInfo()
+	ownerName = ownerName and ownerName.name
+	if ownerName == "CustomFormations2" then
+		widgetHandler.mouseOwner = nil
+	end
 	return true
 end
 
