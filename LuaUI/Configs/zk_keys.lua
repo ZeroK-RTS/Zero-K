@@ -100,7 +100,7 @@ return {
 		{	"forcestart",	"Alt+f",},
 		--{	"guard",	"g",},
 		{	"areaguard",	"g",},
-		{	"gameinfo",	"Ctrl+i",},
+		{	"gameinfo",	"None",},
 		{	"wantcloak",	"k",},
 		{	"togglelos",	"Ctrl+l",},
 		{	"loadunits",	"l",},
