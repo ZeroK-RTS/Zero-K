@@ -195,8 +195,8 @@ effectUnitDefs = {
 	{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="sphere"})},
 	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere"})},
 	--{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="sphere", onActive = true, size=18})},
-	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere", onActive = true, size=100})},
-	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=50, strength = .005, precision=50, repeatEffect=true, onActive=true, noIconDraw = true, quality = 2,}},
+	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere", onUnitRulesParam = "teleActive", size=100})},
+	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=50, strength = .005, precision=50, repeatEffect=true, onUnitRulesParam = "teleActive", noIconDraw = true, quality = 2,}},
   },
   amphlaunch = {
 	{class='ShieldSphere', options=MergeTable(throwShieldSphere, {piece="gunbase"})},

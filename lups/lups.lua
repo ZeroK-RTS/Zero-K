@@ -762,9 +762,11 @@ local function IsUnitFXVisible(fx)
 	local unitID = fx.unit
 	if fx.onActive then
 		unitActive = GetUnitIsActive(unitID)
+	elseif fx.onUnitRulesParam then
+		unitActive = (spGetUnitRulesParam(unitID, fx.onUnitRulesParam) == 1)
 	end
 	--Spring.Utilities.UnitEcho(unitID, "w")
-	if (not fx.onActive) or (unitActive) then
+	if (unitActive) then
 		if fx.alwaysVisible then
 			return true
 		elseif (fx.Visible) then

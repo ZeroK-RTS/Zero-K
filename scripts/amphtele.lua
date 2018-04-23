@@ -18,6 +18,7 @@ local SIG_DEPLOY = 2
 local SIG_BEACON = 2
 
 local PRIVATE = {private = true}
+local INLOS = {inlos = true}
 
 local deployed = false
 local beaconCreateX, beaconCreateZ
@@ -173,9 +174,9 @@ local mode
 function activity_mode(n)
 	if (not mode) or mode ~= n then
 		if n < 2 then
-			SetUnitValue(COB.ACTIVATION, 0)
+			Spring.SetUnitRulesParam(unitID, "teleActive", 0, INLOS)
 		elseif mode < 2 then
-			SetUnitValue(COB.ACTIVATION, 1)
+			Spring.SetUnitRulesParam(unitID, "teleActive", 1, INLOS)
 		end
 
 		Spin(holder, z_axis, math.rad(spinmodes[n].holder*holderDirection))
