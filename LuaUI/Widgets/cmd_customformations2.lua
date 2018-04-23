@@ -459,17 +459,23 @@ end
 -- Mouse/keyboard Callins
 --------------------------------------------------------------------------------
 function widget:MousePress(mx, my, mButton)
-	-- Where did we click
-	inMinimap = spIsAboveMiniMap(mx, my)
-	if inMinimap and not MiniMapFullProxy then
-		return false
-	end
-	if (mButton == 1 or mButton == 3) and fNodes and #fNodes > 0 then
-		-- already issuing command
-		return true 
-	end
 	
 	lineLength = 0
+	-- Where did we click
+	inMinimap = spIsAboveMiniMap(mx, my)
+	if inMinimap and not MiniMapFullProxy then return false end
+	
+	if (mButton == 1 or mButton == 3) and fNodes and #fNodes > 0 then
+		-- already issuing command
+		local ownerName = widgetHandler.mouseOwner and widgetHandler.mouseOwner.GetInfo and widgetHandler.mouseOwner.GetInfo()
+		ownerName = ownerName and ownerName.name
+		if ownerName == "CustomFormations2" then
+			widgetHandler.mouseOwner = nil
+		end
+		fNodes = {}
+		fDists = {}
+		return false 
+	end
 	
 	-- Get command that would've been issued
 	local _, activeCmdID = spGetActiveCommand()
@@ -595,16 +601,12 @@ function widget:MouseMove(mx, my, dx, dy, mButton)
 	
 	return false
 end
-
-local function StopCommandAndRelinquishMouse()
-	local ownerName = widgetHandler.mouseOwner and widgetHandler.mouseOwner.GetInfo and widgetHandler.mouseOwner.GetInfo()
-	ownerName = ownerName and ownerName.name
-	if ownerName == "CustomFormations2" then
-		widgetHandler.mouseOwner = nil
+function widget:MouseRelease(mx, my, mButton)
+	
+	-- It is possible for MouseRelease to fire after MouseRelease
+	if #fNodes == 0 then
+		return false
 	end
-	-- Cancel the command
-	fNodes = {}
-	fDists = {}
 	
 	-- Modkeys / command reset
 	local alt, ctrl, meta, shift = GetModKeys()
@@ -614,18 +616,6 @@ local function StopCommandAndRelinquishMouse()
 		else
 			spSetActiveCommand(0) -- Reset immediately
 		end
-	end
-end
-
-function widget:MouseRelease(mx, my, mButton)
-	if (mButton == 1 or mButton == 3) and (not usingRMB) == (mButton == 3) then
-		StopCommandAndRelinquishMouse()
-		return false
-	end
-	
-	-- It is possible for MouseRelease to fire after MouseRelease
-	if #fNodes == 0 then
-		return false
 	end
 	
 	-- Are we going to use the drawn formation?
@@ -735,10 +725,11 @@ function widget:MouseRelease(mx, my, mButton)
 		widgetHandler:UpdateWidgetCallIn("Update", self)
 	end
 	
-	StopCommandAndRelinquishMouse()
+	fNodes = {}
+	fDists = {}
+	
 	return true
 end
-
 function widget:KeyRelease(key)
 	if (key == keyShift) and endShift then
 		spSetActiveCommand(0)
