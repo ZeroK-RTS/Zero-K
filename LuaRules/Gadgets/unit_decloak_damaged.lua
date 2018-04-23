@@ -330,5 +330,24 @@ function gadget:Initialize()
 	end
 end
 
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+	  -- restore cloak for dyncomms during a loaded savegame
+	  -- the CMD_CLOAK cmd desc ID was already removed during the UnitCreated() call, so we can't use the detection method used there
+	  -- instead we do this
+		if GG.Upgrades_UnitCanCloak(unitID) then
+			Spring.InsertUnitCmdDesc(unitID, unitWantCloakCommandDesc)
+			local wantedState = spGetUnitRulesParam(unitID, "wantcloak")
+			spSetUnitRulesParam(unitID, "wantcloak", 0, alliedTrueTable)
+			SetWantedCloaked(unitID, wantedState)
+			-- unit_commander_upgrade runs after us and decloaks us while setting our decloak radius,
+			-- so reset at earliest opportunity
+			if wantedState == 1 then
+				recloakUnit[unitID] = 0
+			end
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
