@@ -315,7 +315,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		end
 		
 		-- destroy the unit if the controller is set to destroy units
-		if controllers[attackerID].killSubordinates and attackerAllyTeam ~= capturedUnits[unitID].originAllyTeam then
+		if controllers[attackerID].killSubordinates and attackerAllyTeam ~= (capturedUnits[unitID] or {}).originAllyTeam then
 			spGiveOrderToUnit(unitID, CMD_SELFD, {}, {})
 		end
 		return 0
