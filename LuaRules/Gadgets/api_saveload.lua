@@ -34,7 +34,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local generalFile = "general.lua"
-local heightMapFile = "heightMap.lua"
 local unitFile = "units.lua"
 local featureFile = "features.lua"
 local projectileFile = "projectiles.lua"
@@ -612,8 +611,6 @@ function gadget:Load(zip)
 	-- get save data
 	Spring.SetGameRulesParam("loadPurge", 1)
 
-	savedata.heightMap = ReadFile(zip, "Height Map", heightMapFile) or {}
-
 	savedata.unit = ReadFile(zip, "Unit", unitFile) or {}
 	local units = Spring.GetAllUnits()
 	for i=1,#units do
@@ -1116,11 +1113,6 @@ function gadget:Save(zip)
 		collectgarbage("collect")
 	end
 	Spring.Echo("SaveGeneralInfo - Done")
-	WriteSaveData(zip, heightMapFile, SaveHeightMap())
-	if collectgarbage then
-		collectgarbage("collect")
-	end
-	Spring.Echo("SaveHeightMap - Done")
 	WriteSaveData(zip, unitFile, SaveUnits())
 	if collectgarbage then
 		collectgarbage("collect")
