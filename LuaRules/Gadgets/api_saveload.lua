@@ -150,7 +150,10 @@ GG.SaveLoad.GetNewUnitID = GetNewUnitID
 local function GetNewUnitIDKeys(data)
 	local ret = {}
 	for i, v in pairs(data) do
-		ret[GetNewUnitID(i)] = v
+		local id = GetNewUnitID(i)
+		if id then
+			ret[id] = v
+		end
 	end
 	return ret
 end
@@ -159,7 +162,10 @@ GG.SaveLoad.GetNewUnitIDKeys = GetNewUnitIDKeys
 local function GetNewUnitIDValues(data)
 	local ret = {}
 	for i, v in pairs(data) do
-		ret[i] = GetNewUnitID(v)
+		local id = GetNewUnitID(v)
+		if id then
+			ret[i] = id
+		end
 	end
 	return ret
 end
