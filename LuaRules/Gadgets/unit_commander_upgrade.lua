@@ -226,7 +226,7 @@ local function ApplyModuleEffectsFromUnitRulesParams(unitID)
 	if GG.Overdrive then
 		local mInc = Spring.GetUnitRulesParam(unitID, "comm_income_metal")
 		local eInc = Spring.GetUnitRulesParam(unitID, "comm_income_energy")
-		GG.Overdrive.AddUnitResourceGeneration(unitID, mInc or 0, eInc or 0)
+		GG.Overdrive.AddUnitResourceGeneration(unitID, mInc or 0, eInc or 0, true)
 	end
 	
 	if Spring.GetUnitRulesParam(unitID, "carrier_count_drone") or Spring.GetUnitRulesParam(unitID, "carrier_count_droneheavyslow") then

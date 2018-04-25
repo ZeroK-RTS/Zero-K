@@ -1719,7 +1719,7 @@ end
 
 local externalFunctions = {}
 
-function externalFunctions.AddUnitResourceGeneration(unitID, metal, energy)
+function externalFunctions.AddUnitResourceGeneration(unitID, metal, energy, override)
 	if not unitID then
 		return
 	end
@@ -1736,8 +1736,8 @@ function externalFunctions.AddUnitResourceGeneration(unitID, metal, energy)
 
 	local genData = generator[allyTeamID][teamID][unitID]
 
-	local metalIncome = math.max(0, genData.metalIncome + (metal * (Spring.GetModOptions().metalmult or 1)))
-	local energyIncome = math.max(0, genData.energyIncome + (energy * (Spring.GetModOptions().energymult or 1)))
+	local metalIncome = math.max(0, ((override and 0) or genData.metalIncome) + (metal * (Spring.GetModOptions().metalmult or 1)))
+	local energyIncome = math.max(0, ((override and 0) or genData.energyIncome) + (energy * (Spring.GetModOptions().energymult or 1)))
 
 	genData.metalIncome = metalIncome
 	genData.energyIncome = energyIncome
