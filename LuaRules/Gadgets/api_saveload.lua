@@ -266,7 +266,11 @@ local function LoadUnits()
 			spSetUnitVelocity(newID, unpack(data.vel))
 			--spSetUnitDirection(newID, unpack(data.dir))	-- FIXME: callin does not exist
 
-			if not UnitDefNames[data.unitDefName].isImmobile then
+			if UnitDefNames[data.unitDefName].isImmobile then
+				if data.groundHeight and GG.Terraform then
+					GG.Terraform.SetStructureHeight(newID, data.groundHeight)
+				end
+			else
 				Spring.MoveCtrl.Enable(newID)
 				Spring.MoveCtrl.SetHeading(newID, data.heading)	-- workaround?
 				Spring.MoveCtrl.Disable(newID)
@@ -900,6 +904,11 @@ local function SaveUnits()
 			unitInfo.dir = {spGetUnitDirection(unitID)}
 			unitInfo.vel = {spGetUnitVelocity(unitID)}
 			unitInfo.heading = spGetUnitHeading(unitID)
+			
+			if unitDef.isImmobile and unitInfo.pos then
+				unitInfo.groundHeight = Spring.GetGroundHeight(unitInfo.pos[1], unitInfo.pos[3])
+			end
+			
 			-- save health
 			unitInfo.health, unitInfo.maxHealth, unitInfo.paralyzeDamage, unitInfo.captureProgress, unitInfo.buildProgress = spGetUnitHealth(unitID)
 			-- save weapons
