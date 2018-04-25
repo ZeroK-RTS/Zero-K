@@ -122,6 +122,19 @@ function script.HitByWeapon(x, z, weaponDefID, damage)
 	end
 end
 
+local function LoadGameThread()
+	Sleep(2000)
+	if Spring.GetUnitStates(unitID).active then
+		return
+	end
+	if Spring.GetUnitRulesParam(unitID, "tacticalAi_external") == 1 then
+		SetUnitValue(COB.ACTIVATION, 1)
+	end
+end
+
+function OnLoadGame()
+	StartThread(LoadGameThread)
+end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth

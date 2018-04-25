@@ -147,12 +147,15 @@ local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
 
 -- allow gadget:Save (unsynced) to reach them
-_G.waitingForComm = waitingForComm
-_G.scheduledSpawn = scheduledSpawn
-_G.playerSides = playerSides
-_G.teamSides = teamSides
-_G.commSpawnedTeam = commSpawnedTeam
-_G.commSpawnedPlayer = commSpawnedPlayer
+local function UpdateSaveReferences()
+	_G.waitingForComm = waitingForComm
+	_G.scheduledSpawn = scheduledSpawn
+	_G.playerSides = playerSides
+	_G.teamSides = teamSides
+	_G.commSpawnedTeam = commSpawnedTeam
+	_G.commSpawnedPlayer = commSpawnedPlayer
+end
+UpdateSaveReferences()
 
 local loadGame = false	-- was this loaded from a savegame?
 
@@ -668,6 +671,8 @@ function gadget:Load(zip)
 	teamSides = data.teamSides or {}
 	commSpawnedPlayer = data.commSpawnedPlayer or {}
 	commSpawnedTeam = data.commSpawnedTeam or {}
+	
+	UpdateSaveReferences()
 end
 
 --------------------------------------------------------------------

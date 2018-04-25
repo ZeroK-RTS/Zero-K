@@ -143,7 +143,11 @@ end
 -- The unitID/featureID parameter in creation does not make these remapping functions obselete.
 -- That parameter is unreliable.
 local function GetNewUnitID(oldUnitID)
-	return savedata.unit[oldUnitID] and savedata.unit[oldUnitID].newID
+	local newUnitID = savedata.unit[oldUnitID] and savedata.unit[oldUnitID].newID
+	if not newUnitID then
+		Spring.Echo("SaveLoad Cannot get new unit ID", oldUnitID)
+	end
+	return newUnitID
 end
 GG.SaveLoad.GetNewUnitID = GetNewUnitID
 
@@ -319,6 +323,8 @@ local function LoadUnits()
 			if data.ctrlGroup then
 				SendToUnsynced("saveLoad_SetControlGroup", newID, data.unitTeam, data.ctrlGroup)
 			end
+		else
+			Spring.MarkerAddPoint(px, py, pz, "Cannot load " .. data.unitDefName)
 		end
 	end
 	

@@ -38,7 +38,6 @@ local missileParents = {} -- [missileUnitID] = siloUnitID
 local missilesToDestroy
 local missilesToTransfer = {}
 
-_G.saveTable = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function GetSiloEntry(unitID)
@@ -67,14 +66,16 @@ local function SetSiloPadNum(siloID, padNum)
 end
 
 -- this makes sure the object references are up to date
-local function GenerateSaveTable()
-	_G.saveTable = {
+local function UpdateSaveReferences()
+	_G.missileSiloSaveTable = {
 		silos = silos,
 		missileParents = missileParents,
 		missilesToDestroy = missilesToDestroy,
 		missilesToTransfer = missilesToTransfer
 	}
 end
+UpdateSaveReferences()
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function gadget:Initialize()
@@ -210,7 +211,7 @@ function gadget:Load(zip)
 		SetSiloPadNum(siloID, GetFirstEmptyPad(siloID))
 	end
 	
-	GenerateSaveTable()
+	UpdateSaveReferences()
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -227,7 +228,7 @@ function gadget:Save(zip)
 		return
 	end
 	
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.saveTable, "Missile silo"))
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.missileSiloSaveTable, "Missile silo"))
 end
 
 --------------------------------------------------------------------------------

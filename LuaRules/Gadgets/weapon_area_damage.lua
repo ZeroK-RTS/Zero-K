@@ -128,7 +128,7 @@ function gadget:Load(zip)
 	explosionList = loadData
 	for i=1,#explosionList do
 		local explo = explosionList[i]
-		explo.ownerID = GG.SaveLoad.GetNewUnitID(explo.ownerID)
+		explo.owner = GG.SaveLoad.GetNewUnitID(explo.ownerID)
 		explo.expiry = explo.expiry - savedGameFrame
 	end
 	

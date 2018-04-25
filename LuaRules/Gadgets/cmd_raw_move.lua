@@ -757,7 +757,14 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
 end
 
+local needGlobalWaitWait = false
 function gadget:GameFrame(n)
+	if needGlobalWaitWait then
+		for _, unitID in ipairs(Spring.GetAllUnits()) do
+			WaitWaitMoveUnit(unitID)
+		end
+		needGlobalWaitWait = false
+	end
 	UpdateConstructors(n)
 	UpdateMoveReplacement()
 	if n%247 == 4 then
@@ -782,11 +789,7 @@ end
 -- Save/Load
 
 function gadget:Load(zip)
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		if UnitDefs[Spring.GetUnitDefID(unitID)].isAirUnit then
-			WaitWaitMoveUnit(unitID)
-		end
-	end
+	needGlobalWaitWait = true
 end
 
 ----------------------------------------------------------------------------------------------

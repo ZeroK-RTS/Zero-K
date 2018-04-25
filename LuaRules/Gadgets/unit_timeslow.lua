@@ -257,8 +257,10 @@ function gadget:Load(zip)
 	slowedUnits = {}
 	for oldID, entry in pairs(loadData) do
 		local newID = GG.SaveLoad.GetNewUnitID(oldID)
-		slowedUnits[newID] = entry
-		GG.UpdateUnitAttributes(newID)
+		if newID then
+			slowedUnits[newID] = entry
+			GG.UpdateUnitAttributes(newID)
+		end
 	end
 	_G.slowedUnits = slowedUnits
 end
