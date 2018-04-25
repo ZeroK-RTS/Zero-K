@@ -42,7 +42,12 @@ local projectileFile = "projectiles.lua"
 local AUTOSAVE_FREQUENCY = 30*60*5	-- 5 minutes
 local FEATURE_ID_CONSTANT = 32000	-- when featureID is x, param of command issued on feature is x + this
 
+include("LuaRules/Configs/customcmds.h.lua")
 GG.SaveLoad = GG.SaveLoad or {}
+
+local nonSavedCommands = {
+	[CMD_PUSH_PULL] = true
+}
 
 if (gadgetHandler:IsSyncedCode()) then
 -----------------------------------------------------------------------------------
@@ -69,8 +74,6 @@ local cmdTypeIconModeOrNumber = {
 	[CMD.AUTOREPAIRLEVEL] = true,
 	[CMD.SET_WANTED_MAX_SPEED] = true,
 }
-
-include("LuaRules/Configs/customcmds.h.lua")
 
 local OPT_RIGHT = {"right"}
 
@@ -102,7 +105,7 @@ local function ReadFile(zip, name, file)
 		dataFunc, err = loadstring(dataRaw)
 		if dataFunc then
 			success, data = pcall(dataFunc)
-			if not success then	-- execute Borat
+			if not success then -- execute Borat
 				err = data
 			end
 		end
@@ -956,7 +959,7 @@ local function SaveUnits()
 			local cmdDescs = Spring.GetUnitCmdDescs(unitID)
 			for i=1,#cmdDescs do
 				local cmdDesc = cmdDescs[i]
-				if cmdDesc["type"] == CMDTYPE.ICON_MODE and (not CMD[cmdDesc.id]) then
+				if cmdDesc["type"] == CMDTYPE.ICON_MODE and not (CMD[cmdDesc.id] or nonSavedCommands[cmdDesc.id]) then
 					custom[cmdDesc.id] = cmdDesc.params and tonumber(cmdDesc.params[1])
 				end
 			end
