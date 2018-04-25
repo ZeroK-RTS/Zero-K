@@ -283,6 +283,7 @@ local function SaveLoadConfirmationDialogPopup(filename, saveMode, description)
 	
 	local yesFunc = function()
 			if (saveMode) then
+				DeleteSave(filename)
 				SaveGame(filename, description, true)
 				-- TODO refresh UI
 			else
