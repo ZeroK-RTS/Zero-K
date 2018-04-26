@@ -9,11 +9,9 @@ end
 
 local singleplayer = false
 do
-	if Spring.GetModOptions().coopcampaignenabled ~= "true" then
-		local playerlist = Spring.GetPlayerList() or {}
-		if (#playerlist <= 1) then
-			singleplayer = true
-		end
+	local playerlist = Spring.GetPlayerList() or {}
+	if (#playerlist <= 1) then
+		singleplayer = true
 	end
 end
 --------------------------------------------------------------------------------

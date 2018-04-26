@@ -17,7 +17,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
-local coopCampaignEnabled = Spring.GetModOptions().coopcampaignenabled == "true"
 local missionDifficulty = tonumber(Spring.GetModOptions().planetmissiondifficulty) or 2
 if not campaignBattleID then
 	return
@@ -784,7 +783,7 @@ end
 
 local function SingleplayerMode()
 	local playerList = Spring.GetPlayerList()
-	return (not coopCampaignEnabled) and (#playerList == 1)
+	return #playerList == 1
 end
 
 function widget:Update()
