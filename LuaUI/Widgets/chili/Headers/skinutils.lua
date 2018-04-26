@@ -1170,7 +1170,7 @@ function NCHitTestWithPadding(obj,mx,my)
     return obj
   end
 
-  if obj.noClickThrough then
+  if obj.noClickThrough and not IsTweakMode() then
     return obj
   end
 end
@@ -1215,7 +1215,7 @@ function WindowNCMouseDownPostChildren(obj,x,y)
     return obj
   end
 
-  if obj.noClickThrough then
+  if obj.noClickThrough and not IsTweakMode() then
     return obj
   end
 end
