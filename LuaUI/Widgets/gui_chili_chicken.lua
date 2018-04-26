@@ -224,8 +224,9 @@ end
 -- done every second
 local function UpdateAnger()
 	local curTime = Spring.GetGameSeconds()
-	local angerPercent = (curTime/gameInfo.queenTime*100)
-	local angerString = "Hive Anger : ".. GetColor( math.min(angerPercent, 100) )..math.floor(angerPercent).."% \008"
+	local saveOffset = Spring.GetGameRulesParam("totalSaveGameFrame") or 0
+	local angerPercent = ((curTime + (saveOffset / 30)) / (gameInfo.queenTime + saveOffset / 30) * 100)
+    local angerString = "Hive Anger : ".. GetColor( math.min(angerPercent, 100) )..math.floor(angerPercent).."% \008"
 	if (angerPercent < 100) and (not endlessMode) then angerString = angerString .. "("..FormatTime(gameInfo.queenTime - curTime) .. " left)" end
 	label_anger:SetCaption(angerString)
 end
