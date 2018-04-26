@@ -193,7 +193,7 @@ local function GetMagAoE(dmg, capacity, first)
 	local aoe = (BIASLOG + math.log(ratio)/LOG10) * LOGMUL
 	aoe = math.max(0, aoe)
 
-	local mag = 2
+	local mag = 1.5
 
 	return mag, aoe
 end
