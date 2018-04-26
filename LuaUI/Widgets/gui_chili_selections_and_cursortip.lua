@@ -2309,7 +2309,7 @@ local function GetSelectionWindow()
 				return true --skip button function, else clicking on build pic will also select the unit.
 			end 
 		},
-		noClickThrough = false,
+		noClickThrough = if widgetHandler.tweakMode then true else false end,
 		parent = holderWindow
 	}
 	mainPanel.padding[1] = mainPanel.padding[1] + options.leftPadding.value
