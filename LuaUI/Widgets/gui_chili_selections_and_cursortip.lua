@@ -2309,7 +2309,14 @@ local function GetSelectionWindow()
 				return true --skip button function, else clicking on build pic will also select the unit.
 			end 
 		},
-		noClickThrough = if widgetHandler.tweakMode then true else false end,
+		noClickThrough = {
+			function(self)
+				if widgetHandler.tweakMode then 
+				return true
+				else return false
+				end
+			end
+		},
 		parent = holderWindow
 	}
 	mainPanel.padding[1] = mainPanel.padding[1] + options.leftPadding.value
@@ -2376,6 +2383,13 @@ local function GetSelectionWindow()
 	function externalFunctions.SetAllowClickThrough(allowClickThrough)
 		mainPanel.noClickThrough = not allowClickThrough
 	end
+
+	function externalFunctions.UpdateAllowClickThrough()
+		if widgetHandler.tweakMode then 
+		mainPanel.noClickThrough = true
+		else mainPanel.noClickThrough = false
+		end
+	end
 	
 	function externalFunctions.SetGroupInfoVisible(newVisible)
 		local rightPadding = newVisible and GROUP_STATS_WIDTH or 0
@@ -2404,12 +2418,13 @@ local function UpdateSelection(newSelection)
 	-- Update group info.
 	
 	selectedUnitsList = newSelection
-	
+
+	selectionWindow.UpdateAllowClickThrough()
+
 	if (not newSelection) or (#newSelection == 0) then
 		selectionWindow.SetVisible(false)
 		return
 	end
-	
 	selectionWindow.SetVisible(true)
 	if #newSelection == 1 then
 		selectionWindow.ShowSingleUnit(newSelection[1])
