@@ -28,7 +28,7 @@ local presets = {
 	},
 
 	commAreaShield = {
-		{class='ShieldJitter', options={delay=0, life=math.huge, heightFactor = 0.75, size=350, strength = .001, precision=50, repeatEffect=true, quality=4}},
+		--{class='ShieldJitter', options={delay=0, life=math.huge, heightFactor = 0.75, size=350, strength = .001, precision=50, repeatEffect=true, quality=4}},
 	},
 
 	commandShieldRed = {
@@ -84,7 +84,7 @@ effectUnitDefs = {
 		{class='Bursts', options=staticshieldBursts},
 		{class='ShieldSphere', options=staticshieldBall},
 --		{class='Bursts',options=shieldBursts350, quality = 3},
-		{class='ShieldJitter', options={delay = 0, life=math.huge, pos={0,15,0}, size=355, precision =0, strength	 = 0.001, repeatEffect = true, quality = 4}},
+--		{class='ShieldJitter', options={delay = 0, life=math.huge, pos={0,15,0}, size=355, precision =0, strength	 = 0.001, repeatEffect = true, quality = 4}},
 --		{class='ShieldSphere', options={piece="base", life=math.huge, size=350, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
 --		{class='GroundFlash', options=groundFlashShield},
 --		{class='UnitPieceLight', options={piece="glow", colormap = {{0,0,1,0.2}},},},
@@ -94,7 +94,7 @@ effectUnitDefs = {
 		{class='ShieldSphere', options= staticshieldBall},
 
 --		{class='Bursts',options=shieldBursts350, quality = 3},
-		{class='ShieldJitter', options={delay = 0, life=math.huge, pos={0,15,0}, size=355, precision =0, strength	 = 0.001, repeatEffect = true, quality = 4}},
+--		{class='ShieldJitter', options={delay = 0, life=math.huge, pos={0,15,0}, size=355, precision =0, strength	 = 0.001, repeatEffect = true, quality = 4}},
 
 --		{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=355, strength = .001, precision=50, repeatEffect=true, quality = 1, onActive = true}},
 --		{class='ShieldSphere', options={piece="base", life=math.huge, size=360, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
@@ -106,7 +106,7 @@ effectUnitDefs = {
 	},
 
 	striderfunnelweb = {
-		{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4, onActive = true}},
+--		{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4, onActive = true}},
 		{class='Bursts', options=MergeTable(staticshieldBursts, {piece="aimpoint"})},
 		{class='ShieldSphere', options=staticshieldBall},
 	},
