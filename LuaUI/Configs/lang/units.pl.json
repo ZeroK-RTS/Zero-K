@@ -117,7 +117,7 @@
     "turretmissile": {
         "name": "Picket",
         "description": "Lekka wieżyczka rakietowa",
-        "helptext": "Picket to lekka, wszechstronna wieżyczka. Jego celne pociski świetnie nadają się do niszczenia jednostek z dala i zapewniają podstawowe możliwości przeciwlotnicze. Główną wadą Defendera jest jego bardzo niska wytrzymałość."
+        "helptext": "Picket to lekka, wszechstronna wieżyczka. Jego celne pociski świetnie nadają się do niszczenia jednostek z dala i zapewniają podstawowe możliwości przeciwlotnicze. Główną wadą Picketa jest jego bardzo niska wytrzymałość."
     },
     "chicken_roc": {
         "name": "Roc",
