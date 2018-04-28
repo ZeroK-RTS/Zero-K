@@ -45,6 +45,9 @@ include("LuaRules/Configs/customcmds.h.lua")
 GG.SaveLoad = GG.SaveLoad or {}
 
 local nonSavedCommands = {
+	--[CMD_PUSH_PULL] = true
+}
+local nonLoadedCommands = {
 	[CMD_PUSH_PULL] = true
 }
 
@@ -213,6 +216,11 @@ local function IsCMDTypeIconModeOrNumber(unitID, cmdID)
 	end
 	return false
 end
+
+local function GetSavedUnitsCopy()
+	return Spring.Utilities.CopyTable(savedata.unit, true)
+end
+GG.SaveLoad.GetSavedUnitsCopy = GetSavedUnitsCopy
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 local function ValidateUnitRule(name, value)
@@ -303,12 +311,14 @@ local function LoadUnits()
 			
 			if data.states.custom then
 				for cmdID, state in pairs(data.states.custom) do
-					state = tonumber(state)
-					local opt = 0
-					if cmdID == CMD_RETREAT and state == 0 then
-						opt = OPT_RIGHT
+					if not nonLoadedCommands[cmdID] then
+						state = tonumber(state)
+						local opt = 0
+						if cmdID == CMD_RETREAT and state == 0 then
+							opt = OPT_RIGHT
+						end
+						spGiveOrderToUnit(newID, cmdID, {state}, opt)
 					end
-					spGiveOrderToUnit(newID, cmdID, {state}, opt)
 				end
 			end
 			
