@@ -388,7 +388,7 @@ function DrawEditBox(obj)
 	gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, 0, obj.width, obj.height,  skLeft,skTop,skRight,skBottom, tw,th)
 	gl.Texture(0,false)
 
-	local text = tostring(obj.text)
+	local text = obj.text and tostring(obj.text)
 	local font = obj.font
 	local displayHint = false
 	
