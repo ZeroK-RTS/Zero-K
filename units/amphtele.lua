@@ -21,7 +21,7 @@ unitDef = {
     amph_submerged_at = 40,
 
 	teleporter = 1,
-	teleporter_throughput = 7.5, -- mass per second
+	teleporter_throughput = 120, -- mass per second
 	teleporter_beacon_spawn_time = 9,
   },
 

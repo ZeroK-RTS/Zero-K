@@ -491,7 +491,7 @@ function gadget:GameFrame(f)
 
 							local mass = Spring.GetUnitRulesParam(teleportiee, "massOverride") or ud.mass
 
-							local cost = math.floor(mass*tele[tid].throughput)
+							local cost = math.floor(mass/tele[tid].throughput)
 							--Spring.Echo(cost/30)
 							tele[tid].teleportiee = teleportiee
 							Spring.SetUnitRulesParam(tid, "teleportiee", teleportiee)
@@ -544,7 +544,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 			deployed = false,
 			cost = false,
 			stunned = isUnitDisabled(unitID),
-			throughput = tonumber(UnitDefs[unitDefID].customParams.teleporter_throughput) / 30,
+			throughput = tonumber(UnitDefs[unitDefID].customParams.teleporter_throughput) / Game.gameSpeed,
 		}
 	end
 	if canTeleport[unitDefID] then
