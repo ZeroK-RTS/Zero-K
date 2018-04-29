@@ -684,7 +684,9 @@ function gadget:GameFrame(n)
 		end
 		cleanupFrame = nil
 		toCleanupFactory = nil
-		--Spring.SendCommands("pause 1")
+		if Game.gameVersion == "$VERSION" then
+			Spring.SendCommands("pause 1")
+		end
 	end
 end
 
