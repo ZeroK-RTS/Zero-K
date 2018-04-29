@@ -144,6 +144,34 @@ function DeployTeleport()
 	end
 end
 
+function DeployTeleportInstant()
+	if GG.tele_ableToDeploy(unitID) then
+		deployed = true
+		Turn(rthigh, x_axis, 0)
+		Turn(rshin, x_axis, 0)
+		Turn(rfoot, x_axis, 0)
+		Turn(lthigh, x_axis, 0)
+		Turn(lshin, x_axis, 0)
+		Turn(lfoot, x_axis, 0)
+		Turn(pelvis, z_axis, 0)
+		Move(pelvis, y_axis, 0)
+		
+		Turn(body, x_axis, math.rad(90))
+		Move(pelvis, y_axis, 11)
+		Move(pelvis, z_axis, -6)
+		
+		Turn(rthigh, x_axis, math.rad(-50))
+		Turn(rshin, x_axis, math.rad(70))
+		Turn(rfoot, x_axis, math.rad(-15))
+		
+		Turn(lthigh, x_axis, math.rad(-50))
+		Turn(lshin, x_axis, math.rad(70))
+		Turn(lfoot, x_axis, math.rad(-15))
+		
+		GG.tele_deployTeleport(unitID)
+	end
+end
+
 function UndeployTeleport()
 	deployed = false
 	Turn(body, x_axis, math.rad(0), math.rad(90))
