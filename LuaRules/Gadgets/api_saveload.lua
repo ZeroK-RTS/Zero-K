@@ -905,6 +905,13 @@ end
 
 local function SaveUnits()
 	local data = {}
+	
+	local retreatTagsMove, retreatTagsWait = {}, {}
+	if GG.Retreat then
+		retreatTagsMove = GG.Retreat.GetRetreaterTagsMoveCopy()
+		retreatTagsWait = GG.Retreat.GetRetreaterTagsWaitCopy()
+	end
+	
 	local units = Spring.GetAllUnits()
 	for i=1,#units do
 		local unitID = units[i]
@@ -972,9 +979,20 @@ local function SaveUnits()
 			end
 			
 			-- save commands and states
-			local commands = spGetCommandQueue(unitID, -1)
-			for i,v in pairs(commands) do
+			
+			
+			local commandsTemp = spGetCommandQueue(unitID, -1)
+			local commands = {}
+			for i,v in ipairs(commandsTemp) do
 				if (type(v) == "table" and v.params) then v.params.n = nil end
+				
+				-- don't save commands from retreat, we'll regenerate those at load)
+				if (retreatTagsMove[unitID] and retreatTagsMove[unitID] == v.tag) or (retreatTagsWait[unitID] and retreatTagsWait[unitID] == v.tag) then
+					-- do nothing
+					--Spring.Echo("Disregarding retreat command", unitID, CMD[v.id] or (v.id == CMD_RAW_MOVE and "raw_move"))
+				else
+					commands[#commands+1] = v
+				end
 			end
 			unitInfo.commands = commands
 			unitInfo.states = spGetUnitStates(unitID)
