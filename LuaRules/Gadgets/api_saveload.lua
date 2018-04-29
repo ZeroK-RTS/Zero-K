@@ -13,8 +13,6 @@
 --	- gadgets which wish to save/load their data must either submit a table and
 --		filename to save, or else handle it themselves
 --	TODO
---	- handle fac command queues
---	- handle gadget data (CAI and chicken are particularly important)
 --	- handle nonexistent unitDefs
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -251,6 +249,58 @@ local function LoadHeightMap()
 	end)
 end
 
+local function LoadOrdersForUnit(oldID, data)
+	data = data or savedata.unit[oldID]
+	if not data then
+		return
+	end
+	
+	local px, py, pz = unpack(data.pos)
+	local isNanoTurret = data.unitDefName == "staticcon"
+	for i=1,#data.commands do
+		local command = data.commands[i]
+		if (#command.params == 1 and data.newID and not(IsCMDTypeIconModeOrNumber(data.newID, command.id))) then
+			local targetID = command.params[1]
+			local isFeature = false
+			if targetID > FEATURE_ID_CONSTANT then
+				isFeature = true
+				targetID = targetID - FEATURE_ID_CONSTANT
+			end
+			--Spring.Echo(CMD[command.id], command.params[1], GetNewUnitID(command.params[1]))
+			--Spring.Echo("Order on entity " .. targetID)
+			if (not isFeature) and GetNewUnitID(targetID) then
+				--Spring.Echo("\tType: " .. savedata.unit[targetID].featureDefName)
+				command.params[1] = GetNewUnitID(targetID)
+			elseif isFeature and GetNewFeatureID(targetID) then
+				--Spring.Echo("\tType: " .. savedata.feature[targetID].featureDefName)
+				command.params[1] = GetNewFeatureID(targetID) + FEATURE_ID_CONSTANT
+			end
+		end
+		
+		-- workaround for stupid bug where the coordinates are all mixed up
+		local params = {}
+		for i=1,#command.params do
+			params[i] = command.params[i]
+		end
+		
+		
+		local opts = command.options
+		local alt, ctrl, shift, right = opts.alt, opts.ctrl, opts.shift, opts.right
+		opts = {(alt and "alt"), (shift and "shift"), (ctrl and "ctrl"), (right and "right")}
+		
+		-- don't issue a patrol command for a nanoturret if it's where we're standing, to avoid deleting existing patrol commands
+		-- hack solution for nano patrol bug in ZeroK-RTS/Zero-K/issues/2905
+		if command.id == CMD.PATROL and isNanoTurret then
+			if (not IsWithinRange(params[1], params[3], px, pz, 8)) then
+				Spring.GiveOrderToUnit(data.newID, command.id, params, opts)
+			end
+		else
+			Spring.GiveOrderToUnit(data.newID, command.id, params, opts)
+		end
+	end
+end
+--GG.SaveLoad.LoadOrdersForUnit = LoadOrdersForUnit
+
 local function LoadUnits()
 	local factoryBuildeesToDelete = {}
 	-- prep units
@@ -375,49 +425,7 @@ local function LoadUnits()
 	
 	-- second pass for orders
 	for oldID, data in pairs(savedata.unit) do
-		local px, py, pz = unpack(data.pos)
-		local isNanoTurret = data.unitDefName == "staticcon"
-		for i=1,#data.commands do
-			local command = data.commands[i]
-			if (#command.params == 1 and data.newID and not(IsCMDTypeIconModeOrNumber(data.newID, command.id))) then
-				local targetID = command.params[1]
-				local isFeature = false
-				if targetID > FEATURE_ID_CONSTANT then
-					isFeature = true
-					targetID = targetID - FEATURE_ID_CONSTANT
-				end
-				--Spring.Echo(CMD[command.id], command.params[1], GetNewUnitID(command.params[1]))
-				--Spring.Echo("Order on entity " .. targetID)
-				if (not isFeature) and GetNewUnitID(targetID) then
-					--Spring.Echo("\tType: " .. savedata.unit[targetID].featureDefName)
-					command.params[1] = GetNewUnitID(targetID)
-				elseif isFeature and GetNewFeatureID(targetID) then
-					--Spring.Echo("\tType: " .. savedata.feature[targetID].featureDefName)
-					command.params[1] = GetNewFeatureID(targetID) + FEATURE_ID_CONSTANT
-				end
-			end
-			
-			-- workaround for stupid bug where the coordinates are all mixed up
-			local params = {}
-			for i=1,#command.params do
-				params[i] = command.params[i]
-			end
-			
-			
-			local opts = command.options
-			local alt, ctrl, shift, right = opts.alt, opts.ctrl, opts.shift, opts.right
-			opts = {(alt and "alt"), (shift and "shift"), (ctrl and "ctrl"), (right and "right")}
-			
-			-- don't issue a patrol command for a nanoturret if it's where we're standing, to avoid deleting existing patrol commands
-			-- hack solution for nano patrol bug in ZeroK-RTS/Zero-K/issues/2905
-			if command.id == CMD.PATROL and isNanoTurret then
-				if (not IsWithinRange(params[1], params[3], px, pz, 8)) then
-					Spring.GiveOrderToUnit(data.newID, command.id, params, opts)
-				end
-			else
-				Spring.GiveOrderToUnit(data.newID, command.id, params, opts)
-			end
-		end
+		LoadOrdersForUnit(unitID, data)
 		
 		if data.factoryData then
 			for i=1,#data.factoryData.commands do
@@ -776,10 +784,11 @@ local function IsDictOrContainsDict(tab)
 	return false
 end
 
-local function WriteTable(concatTable, tab, tabName, params)
+-- Returns an array of strings to be concatenated
+local function WriteTable(concatArray, tab, tabName, params)
 	params = params or {}
 	local processed = {}
-	concatTable = concatTable or {}
+	concatArray = concatArray or {}
 	
 	params.numIndents = params.numIndents or 0
 	local isDict = IsDictOrContainsDict(tab)
@@ -788,7 +797,7 @@ local function WriteTable(concatTable, tab, tabName, params)
 	local str = ""
 	
 	local function NewLine()
-		concatTable[#concatTable + 1] = str
+		concatArray[#concatArray + 1] = str
 		str = ""
 	end
 	
@@ -810,7 +819,7 @@ local function WriteTable(concatTable, tab, tabName, params)
 		if type(v) == "table" then
 			local arg = {numIndents = (params.numIndents + 1), endOfFile = false}
 			NewLine()
-			WriteTable(concatTable, v, nil, arg)
+			WriteTable(concatArray, v, nil, arg)
 		elseif type(v) == "boolean" then
 			str = str .. tostring(v) .. pairEndLine
 		elseif type(v) == "string" then
@@ -861,7 +870,7 @@ local function WriteTable(concatTable, tab, tabName, params)
 	end
 	NewLine()
 	
-	return concatTable
+	return concatArray
 end
 
 local function WriteSaveData(zip, filename, data)
