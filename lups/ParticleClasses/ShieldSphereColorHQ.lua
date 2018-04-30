@@ -189,7 +189,7 @@ function ShieldSphereColorHQParticle:Initialize()
 
 		#define PI 3.141592653589793
 
-		#define nsin(x) (sin(x) + 0.5)
+		#define nsin(x) (0.5 * sin(x) + 0.5)
 
 		void main()
 		{
@@ -244,7 +244,7 @@ function ShieldSphereColorHQParticle:Initialize()
 
 		#define SZDRIFTTOUV 7.0
 
-		#define nsin(x) (sin(x) + 0.5)
+		#define nsin(x) (0.5 * sin(x) + 0.5)
 
 		float hex(vec2 p, float width, float coreSize)
 		{
@@ -302,19 +302,21 @@ function ShieldSphereColorHQParticle:Initialize()
 					vec2 impactPointUV = RadialCoords(impactPointAdj) * uvMulS;
 					float mag = hitPoints[5 * hitPointIdx + 3];
 					float aoe = hitPoints[5 * hitPointIdx + 4];
-					offset2 += GetRippleLinearFallOffCoord(uv, impactPointUV, mag, 320.0, 600.0, aoe, timer);
+					offset2 += GetRippleLinearFallOffCoord(uv, impactPointUV, mag, 100.0, -120.0, aoe, timer);
 				}
 			}
 
+			vec2 uvo = uv + offset + offset2; //this is to trick GLSL compiler, otherwise shot-induced ripple is not drawn. Silly....
+
 			vec4 texel;
 			if (method == 0)
-				texel = vec4(1.0 - hex((uv + offset + offset2)*HEXSCALE, 0.2, 0.01));
+				texel = vec4(1.0 - hex(uvo * HEXSCALE, 0.2, 0.01));
 			else if (method == 1)
-				texel = texture2D(tex0, uv + offset + offset2);
+				texel = texture2D(tex0, uvo);
 			else
 				texel = vec4(0.0);
 
-			vec4 colorMultAdj = colorMult * (1.0 + length(offset2) * 100.0);
+			vec4 colorMultAdj = colorMult * (1.0 + length(offset2) * 50.0);
 			//float colorMultAdj = colorMult;
 			//vec4 color1M = color1 * colorMultAdj;
 			vec4 color2M = color2 * colorMultAdj;
