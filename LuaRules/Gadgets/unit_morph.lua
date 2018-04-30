@@ -316,7 +316,6 @@ local function StopMorph(unitID, morphData)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 
 	Spring.SetUnitResourcing(unitID,"e", UnitDefs[unitDefID].energyMake)
-	Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { 1 }, { "alt" })
 	local usedMetal	= morphData.def.metal	* scale
 	Spring.AddUnitResource(unitID, 'metal',	usedMetal)
 	--local usedEnergy = morphData.def.energy * scale

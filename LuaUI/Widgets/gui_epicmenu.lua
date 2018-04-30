@@ -2755,6 +2755,9 @@ local function MakeQuitButtons()
 				if (paused) and AllowPauseOnMenuChange() then
 					spSendCommands("pause")
 				end
+				if not (IsSinglePlayer() or Spring.GetSpectatingState()) then
+					spSendCommands("spectator")
+				end
 				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
 					Spring.Reload("")
 				else

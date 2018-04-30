@@ -482,7 +482,7 @@
 	"shieldbomb" : {
 		"name" : "Snitch",
 		"description" : "Crawling Bomb (Burrows)",
-		"helptext" : "This fast-moving suicide unit is very good against massed units, particularly assault tanks. It features a cloaking device which is automatically activated once the unit stands still, effectively turning it into a mine. Chain explodes terribly, so best not to mass it. Counter with defenders and missile trucks, or single cheap units to set off a premature detonation."
+		"helptext" : "This fast-moving suicide unit is very good against massed units, particularly assault tanks. It features a cloaking device which is automatically activated once the unit stands still, effectively turning it into a mine. Chain explodes terribly, so best not to mass it. Counter with Pickets and missile trucks, or single cheap units to set off a premature detonation."
 	},
 	"cloakjammer" : {
 		"name" : "Iris",
@@ -1147,7 +1147,7 @@
 	"gunshipemp" : {
 		"name" : "Gnat",
 		"description" : "Anti-Heavy EMP Drone",
-		"helptext" : "The Gnat can be used to paralyze enemy units. It makes an excellent defensive unit, and when combined with banshees or other units can halt the enemy to give you time to kill him. Offensively it can paralyze even heavily fortified areas, but dies relatively easily to defenders."
+		"helptext" : "The Gnat can be used to paralyze enemy units. It makes an excellent defensive unit, and when combined with banshees or other units can halt the enemy to give you time to kill him. Offensively it can paralyze even heavily fortified areas, but dies relatively easily to Pickets."
 	},
 	"bomberriot" : {
 		"name" : "Phoenix",

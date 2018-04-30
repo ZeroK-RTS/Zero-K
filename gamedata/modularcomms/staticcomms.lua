@@ -43,7 +43,7 @@ local commsCampaign = {
     chassis = "benzcom2",	-- TODO get a properly organic model
     name = "Lord Isonade",
     --modules = { "commweapon_sonicgun", "module_heavy_armor", "module_dmg_booster", "module_autorepair", "module_autorepair" },
-    decorations = { "skin_bombard_steel" },
+    decorations = { "skin_assault_steel" },
   },
 
   comm_campaign_legion = {

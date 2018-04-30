@@ -319,7 +319,7 @@ function DrawEditBox(obj)
 
 		--// make cursor pos always visible (when text is longer than editbox!)
 		repeat
-			local txt = obj.text:sub(obj.offset, obj.cursor)
+			local txt = tostring(obj.text):sub(obj.offset, obj.cursor)
 			local wt = obj.font:GetTextWidth(txt)
 			if (wt <= clientWidth) then
 				break
@@ -330,7 +330,7 @@ function DrawEditBox(obj)
 			obj.offset = obj.offset + 1
 		until (false)
 
-		local txt = obj.text:sub(obj.offset)
+		local txt = tostring(obj.text):sub(obj.offset)
 
 		--// strip part at the end that exceeds the editbox
 		local lsize = math.max(0, obj.font:WrapText(txt, clientWidth, clientHeight):len() - 3) -- find a good start (3 dots at end if stripped)
@@ -347,7 +347,7 @@ function DrawEditBox(obj)
 		obj.font:DrawInBox(txt, obj.x + clientX, obj.y + clientY, clientWidth, clientHeight, obj.align, obj.valign)
 
 		if obj.state.focused then
-			local cursorTxt = obj.text:sub(obj.offset, obj.cursor - 1)
+			local cursorTxt = tostring(obj.text):sub(obj.offset, obj.cursor - 1)
 			local cursorX = obj.font:GetTextWidth(cursorTxt)
 
 			local dt = Spring.DiffTimers(Spring.GetTimer(), obj._interactedTime)

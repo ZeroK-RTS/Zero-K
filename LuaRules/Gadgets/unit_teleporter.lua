@@ -648,6 +648,7 @@ local spGetUnitTeam      = Spring.GetUnitTeam
 local spGetLocalTeamID   = Spring.GetLocalTeamID
 
 local myTeam = spGetMyTeamID()
+local myAllyTeam = spGetMyAllyTeamID()
 
 local beaconDef = UnitDefNames["tele_beacon"].id
 local beacons = {}
@@ -717,8 +718,8 @@ local function DrawWire(spec)
 			local point = {nil, nil, nil, nil}
 			local teleportiee = Spring.GetUnitRulesParam(tid, "teleportiee")
 			if (teleportiee >= 0) and spValidUnitID(teleportiee) and spValidUnitID(bid) then
-				local los1 = spGetUnitLosState(teleportiee, myTeam, false)
-				local los2 = spGetUnitLosState(bid, myTeam, false)
+				local los1 = spGetUnitLosState(teleportiee, myAllyTeam, false)
+				local los2 = spGetUnitLosState(bid, myAllyTeam, false)
 				if (spec or (los1 and los1.los) or (los2 and los2.los)) and (spIsUnitInView(teleportiee) or spIsUnitInView(bid)) then
 					local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(bid, true)
 					local topX, topY, topZ = GetUnitTop(bid, xxx, yyy, zzz)
