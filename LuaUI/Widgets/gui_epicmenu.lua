@@ -2707,6 +2707,7 @@ local function MakeQuitButtons()
 							if WG.MissionResign then
 								WG.MissionResign()
 							else
+								Spring.SendLuaRulesMsg("forceresign")
 								spSendCommands{"spectator"}
 							end
 						end
@@ -2756,6 +2757,7 @@ local function MakeQuitButtons()
 					spSendCommands("pause")
 				end
 				if not (IsSinglePlayer() or Spring.GetSpectatingState()) then
+					Spring.SendLuaRulesMsg("forceresign")
 					spSendCommands("spectator")
 				end
 				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then

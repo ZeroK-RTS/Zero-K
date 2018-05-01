@@ -1386,7 +1386,7 @@ function Control:HitTest(x,y)
     return self
   end
 
-  if self.noClickThrough then
+  if self.noClickThrough and not IsTweakMode() then
     return self
   end
   
@@ -1419,7 +1419,7 @@ function Control:MouseDown(x, y, ...)
     end
   end
 
-  if self.noClickThrough then
+  if self.noClickThrough and not IsTweakMode() then
     return self
   end
 end

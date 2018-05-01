@@ -58,12 +58,9 @@ local FROM_AFK_THRESHOLD = 5 -- going below this marks you non-AFK
 --------------------------------------------------------------------------------
 -- Utilities
 
+local teamNames = {}
 local function GetTeamName(teamID)
-	local _, leaderID, _, isAiTeam = Spring.GetTeamInfo(teamID)
-	if isAiTeam then
-		return select(2, Spring.GetAIInfo(teamID)) or "Unknown AI on team " .. (teamID or "???")
-	end
-	return select(1, Spring.GetPlayerInfo(leaderID)) or ("Unknown Player on team " .. (teamID or "???"))
+	return teamNames[teamID] or ("Unknown Player on team " .. (teamID or "???"))
 end
 
 local function PlayerIDToTeamID(playerID)
@@ -350,6 +347,13 @@ function gadget:Initialize()
 		local allyTeamID = select(6, spGetTeamInfo(teamID))
 		teamResourceShare[teamID] = 1
 		allyTeamResourceShares[allyTeamID] = (allyTeamResourceShares[allyTeamID] or 0) + 1
+
+		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		if isAI then
+			teamNames[teamID] = select(2, Spring.GetAIInfo(teamID))
+		else
+			teamNames[teamID] = Spring.GetPlayerInfo(playerID)
+		end
 	end
 
 	GG.Lagmonitor = externalFunctions
