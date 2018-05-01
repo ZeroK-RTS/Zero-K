@@ -414,6 +414,28 @@ function gadget:Initialize()
 	end
 end
 
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	local units = GG.SaveLoad.GetSavedUnitsCopy()
+	for oldID, data in pairs(units) do
+		local newID = GG.SaveLoad.GetNewUnitID(oldID)
+		if newID and data.states.custom then
+			local state = data.states.custom[CMD_PUSH_PULL]
+			if state then
+				local unitDefID = Spring.GetUnitDefID(newID)
+				PushPullToggleCommand(newID, unitDefID, tonumber(state))
+			end
+		end
+	end
+	if collectgarbage then
+		units = nil
+		collectgarbage("collect")
+	end
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Main Impulse Handling
