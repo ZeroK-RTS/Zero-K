@@ -7,7 +7,7 @@ local presets = {
 			colormap={ {1, 0.2, 0.2, 1},{1, 0.2, 0.2, 0.85},{1, 0.2, 0.2, 1} }})},
 	},
 	commandAuraOrange = {
-	    {class='StaticParticles', options=commandCoronaOrange},
+			{class='StaticParticles', options=commandCoronaOrange},
 		{class='GroundFlash', options=MergeTable(groundFlashOrange, {radiusFactor=3.5,mobile=true,life=math.huge,
 			colormap={ {0.8, 0, 0.2, 1},{0.8, 0, 0.2, 0.85},{0.8, 0, 0.2, 1} }})},
 	},
@@ -20,35 +20,35 @@ local presets = {
 		{class='StaticParticles', options=commandCoronaBlue},
 		{class='GroundFlash', options=MergeTable(groundFlashBlue, {radiusFactor=3.5,mobile=true,life=math.huge,
 			colormap={ {0.2, 0.2, 1, 1},{0.2, 0.2, 1, 0.85},{0.2, 0.2, 1, 1} }})},
-	},	
+	},
 	commandAuraViolet = {
 		{class='StaticParticles', options=commandCoronaViolet},
 		{class='GroundFlash', options=MergeTable(groundFlashViolet, {radiusFactor=3.5,mobile=true,life=math.huge,
 			colormap={ {0.8, 0, 0.8, 1},{0.8, 0, 0.8, 0.85},{0.8, 0, 0.8, 1} }})},
-	},	
-	
-	commAreaShield = {
-		{class='ShieldJitter', options={delay=0, life=math.huge, heightFactor = 0.75, size=350, strength = .001, precision=50, repeatEffect=true, quality=4}},
 	},
-	
+
+	commAreaShield = {
+		--{class='ShieldJitter', options={delay=0, life=math.huge, heightFactor = 0.75, size=350, strength = .001, precision=50, repeatEffect=true, quality=4}},
+	},
+
 	commandShieldRed = {
 		{class='ShieldSphere', options=MergeTable({colormap1 = {{1, 0.1, 0.1, 0.6}}, colormap2 = {{1, 0.1, 0.1, 0.15}}}, commandShieldSphere)},
 --		{class='StaticParticles', options=commandCoronaRed},
 --		{class='GroundFlash', options=MergeTable(groundFlashRed, {radiusFactor=3.5,mobile=true,life=60,
---			colormap={ {1, 0.2, 0.2, 1},{1, 0.2, 0.2, 0.85},{1, 0.2, 0.2, 1} }})},	
+--			colormap={ {1, 0.2, 0.2, 1},{1, 0.2, 0.2, 0.85},{1, 0.2, 0.2, 1} }})},
 	},
 	commandShieldOrange = {
 		{class='ShieldSphere', options=MergeTable({colormap1 = {{0.8, 0.3, 0.1, 0.6}}, colormap2 = {{0.8, 0.3, 0.1, 0.15}}}, commandShieldSphere)},
-	},	
+	},
 	commandShieldGreen = {
 		{class='ShieldSphere', options=MergeTable({colormap1 = {{0.1, 1, 0.1, 0.6}}, colormap2 = {{0.1, 1, 0.1, 0.15}}}, commandShieldSphere)},
 	},
 	commandShieldBlue= {
 		{class='ShieldSphere', options=MergeTable({colormap1 = {{0.1, 0.1, 0.8, 0.6}}, colormap2 = {{0.1, 0.1, 1, 0.15}}}, commandShieldSphere)},
-	},	
+	},
 	commandShieldViolet = {
 		{class='ShieldSphere', options=MergeTable({colormap1 = {{0.6, 0.1, 0.75, 0.6}}, colormap2 = {{0.6, 0.1, 0.75, 0.15}}}, commandShieldSphere)},
-	},	
+	},
 }
 
 effectUnitDefs = {
@@ -84,7 +84,7 @@ effectUnitDefs = {
 	{class='Bursts', options=staticshieldBursts},
 	{class='ShieldSphere', options=staticshieldBall},
 	--{class='Bursts',options=shieldBursts350, quality = 3},
-	{class='ShieldJitter', options={delay = 0, life=math.huge, pos={0,15,0}, size=355, precision =0, strength   = 0.001, repeatEffect = true, quality = 4, onActive = true}},
+	--{class='ShieldJitter', options={delay = 0, life=math.huge, pos={0,15,0}, size=355, precision =0, strength   = 0.001, repeatEffect = true, quality = 4, onActive = true}},
 --	{class='ShieldSphere', options={piece="base", life=math.huge, size=350, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
 --	{class='GroundFlash', options=groundFlashShield},
 --	{class='UnitPieceLight', options={piece="glow", colormap = {{0,0,1,0.2}},},},
@@ -94,7 +94,7 @@ effectUnitDefs = {
     {class='ShieldSphere', options= staticshieldBall},
 	
 	--{class='Bursts',options=shieldBursts350, quality = 3},
-    {class='ShieldJitter', options={delay = 0, life=math.huge, pos={0,15,0}, size=355, precision =0, strength   = 0.001, repeatEffect = true, quality = 4, onActive = true}},
+  --{class='ShieldJitter', options={delay = 0, life=math.huge, pos={0,15,0}, size=355, precision =0, strength   = 0.001, repeatEffect = true, quality = 4, onActive = true}},
 	
 	--{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=355, strength = .001, precision=50, repeatEffect=true, quality = 1, onActive = true}},
 --	{class='ShieldSphere', options={piece="base", life=math.huge, size=360, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
@@ -106,7 +106,7 @@ effectUnitDefs = {
   },
   
   striderfunnelweb = {
-	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4, onActive = true}},
+	--{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4, onActive = true}},
 	{class='Bursts', options=MergeTable(staticshieldBursts, {piece="aimpoint"})},
 	{class='ShieldSphere', options=staticshieldBall},
   },
@@ -378,44 +378,44 @@ effectUnitDefs = {
 effectUnitDefsXmas = {}
 
 local levelScale = {
-    [0] = 1,
-    [1] = 1,
-    [2] = 1.1,
-    [3] = 1.2,
-    [4] = 1.25,
-    [5] = 1.3,
+		[0] = 1,
+		[1] = 1,
+		[2] = 1.1,
+		[3] = 1.2,
+		[4] = 1.25,
+		[5] = 1.3,
 }
 
 -- load presets from unitdefs
 for i=1,#UnitDefs do
 	local unitDef = UnitDefs[i]
-	
+
 	if unitDef.customParams and unitDef.customParams.commtype then
 		local s = levelScale[tonumber(unitDef.customParams.level) or 1]
 		if unitDef.customParams.commtype == "1" then
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={pos={0.3*s,1.1*s,-6 - 3*s}, emitVector={-1,0,-0.08}, width=3.6*s, height=6.2*s, ballSize=0.9*s, piece="Head"}},
-			}  
+			}
 		elseif unitDef.customParams.commtype == "2" then
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={pos={0,6*s,2*s}, emitVector={0.4,1,0.2}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="head"}},
 			}
-		elseif unitDef.customParams.commtype == "3" then 
+		elseif unitDef.customParams.commtype == "3" then
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={color={0,0.7,0,1}, pos={1.5*s,4*s,0.5*s}, emitVector={0.7,1.6,0.2}, width=2.5*s, height=6*s, ballSize=0.7*s, piece="head"}},
 			}
-		elseif unitDef.customParams.commtype == "4" then 
+		elseif unitDef.customParams.commtype == "4" then
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={pos={0,3.8*s,0.35*s}, emitVector={0,1,0}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="head"}},
 			}
-		elseif unitDef.customParams.commtype == "5" then 
+		elseif unitDef.customParams.commtype == "5" then
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={color={0,0.7,0,1}, pos={0,0,0}, emitVector={0,1,0.1}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="hat"}},
-			}	    
-		elseif unitDef.customParams.commtype == "6" then 
+			}
+		elseif unitDef.customParams.commtype == "6" then
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={color={0,0,0.7,1}, pos={0,0,0}, emitVector={0,1,-0.1}, width=4.05*s, height=9*s, ballSize=1.05*s, piece="hat"}},
-			}   
+			}
 		end
 	end
 	if unitDef.customParams then
