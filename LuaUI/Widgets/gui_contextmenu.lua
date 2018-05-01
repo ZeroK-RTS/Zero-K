@@ -168,7 +168,7 @@ end
 local function MakeStatsWindow() 
 end
 
-options_order = {'shortNotation'}
+options_order = {'shortNotation', 'text_hotkey'}
 options_path = 'Help/Unit List'
 options = {
 		
@@ -181,7 +181,12 @@ options = {
 		path = 'Settings/HUD Panels/Unit Stats Help Window'
 	},
 	
-	
+	text_hotkey = {
+		name = 'Global Construction Hotkeys',
+		type = 'text',
+		value = [[These hotkey are always active. To edit the in-tab hotkeys look in "Hotkeys/Command Panel". Each tab can even have their own layout.]],
+		path = 'Hotkeys/Construction',
+	},
 }
 
 local alreadyAdded = {}

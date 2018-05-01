@@ -9,7 +9,7 @@ end
 function gadget:GetInfo()
   return {
     name      = "Weapon Impulse",
-    desc      = "Implements impulse relaint weapons because engine impelementation is prettymuch broken.",
+    desc      = "Implements impulse reliant weapons because engine implementation is pretty much broken.",
     author    = "Google Frog",
     date      = "1 April 2012",
     license   = "GNU GPL, v2 or later",
@@ -411,6 +411,28 @@ function gadget:Initialize()
 				end
 			end
 		end
+	end
+end
+
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	local units = GG.SaveLoad.GetSavedUnitsCopy()
+	for oldID, data in pairs(units) do
+		local newID = GG.SaveLoad.GetNewUnitID(oldID)
+		if newID and data.states.custom then
+			local state = data.states.custom[CMD_PUSH_PULL]
+			if state then
+				local unitDefID = Spring.GetUnitDefID(newID)
+				PushPullToggleCommand(newID, unitDefID, tonumber(state))
+			end
+		end
+	end
+	if collectgarbage then
+		units = nil
+		collectgarbage("collect")
 	end
 end
 

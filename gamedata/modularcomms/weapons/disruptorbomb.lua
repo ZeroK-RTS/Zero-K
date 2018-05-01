@@ -33,7 +33,6 @@ local weaponDef = {
 	impulseFactor           = 0,
 	interceptedByShieldType = 2,
 	model                   = [[wep_b_fabby.s3o]],
-    noSelfDamage            = false,
 	range                   = 450,
 	reloadtime              = 25,
 	smokeTrail              = true,

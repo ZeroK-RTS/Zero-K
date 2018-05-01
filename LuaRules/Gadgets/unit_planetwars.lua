@@ -180,7 +180,7 @@ local teleportingUnit, teleportFrame
 local removingTeleportingUnit = false -- set to true prior to DestroyUnit call when teleporting out, then false immediately after
 
 local function SetTeleportCharge(newCharge)
-	if newCharge > TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
+	if teleportChargeNeededMult and newCharge > TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
 		newCharge = TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult
 	end
 	if newCharge == teleportCharge then
@@ -241,7 +241,7 @@ local function CheckRemoveWormhole(unitID, unitDefID)
 	if #wormholeList == 1 then
 		RemoveEvacCommands()
 		wormholeList[1] = nil
-		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.WORMHOLE_DESTROYED)
+		Spring.SetGameRulesParam("pw_evacuable_state", removingTeleportingUnit and EVAC_STATE.NO_WORMHOLE or EVAC_STATE.WORMHOLE_DESTROYED)
 		return
 	end
 	
@@ -796,6 +796,10 @@ function gadget:Initialize()
 
 	local edgePadding = math.max(200, math.min(math.min(Game.mapSizeX, Game.mapSizeZ)/4 - 800, 800))
 	planetwarsBoxes = GG.GetPlanetwarsBoxes(0.2, 0.25, 0.3, edgePadding)
+	if not planetwarsBoxes then
+		gadgetHandler:RemoveGadget()
+		return
+	end
 	
 	initialiseNoGoZones()
 	structureSpawnData, spawningAnything = InitializeUnitsToSpawn()

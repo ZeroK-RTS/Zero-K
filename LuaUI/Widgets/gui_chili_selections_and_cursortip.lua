@@ -596,6 +596,11 @@ local function GetUnitRegenString(unitID, ud)
 			if ((ud.idleTime <= 300) and (regen_timer > 0)) then
 				return "  (" .. math.ceil(regen_timer / 30) .. "s)"
 			else
+				local regenMult = spGetUnitRulesParam(unitID,"totalBuildPowerChange") or 1
+				if regenMult == 0 then
+					return
+				end
+
 				local regen = 0
 				if (regen_timer <= 0) then
 					regen = regen + (spGetUnitRulesParam(unitID, "comm_autorepair_rate") or ud.customParams.idle_regen)
@@ -611,7 +616,7 @@ local function GetUnitRegenString(unitID, ud)
 					regen = regen + ud.customParams.armored_regen
 				end
 				if (regen > 0) then
-					return "  (+" .. math.ceil(regen) .. ")"
+					return "  (+" .. math.ceil(regenMult*regen) .. ")"
 				end
 			end
 		end
@@ -619,9 +624,14 @@ local function GetUnitRegenString(unitID, ud)
 end
 
 local function GetUnitShieldRegenString(unitID, ud)
-	-- TODO: Surely actual rate should be used, taking into account energy stalling and stun state.
+	local mult = spGetUnitRulesParam(unitID,"totalReloadSpeedChange") or 1 * (1 - (spGetUnitRulesParam(unitID, "shieldChargeDisabled") or 0))
+	if mult == 0 then
+		return ""
+	end
+
+	-- FIXME: take energy stall into account
 	local wd = WeaponDefs[ud.shieldWeaponDef]
-	return " (+" .. (wd.customParams.shield_rate or wd.shieldPowerRegen) .. ")"
+	return " (+" .. math.ceil(mult * (wd.customParams.shield_rate or wd.shieldPowerRegen)) .. ")"
 end
 
 local function IsUnitInLos(unitID)

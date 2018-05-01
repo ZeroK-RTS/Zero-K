@@ -207,7 +207,7 @@ function gadget:GameFrame(f)
 				local cmdQueue = Spring.GetCommandQueue(unitID, 1);
 				if (#cmdQueue>0) then 
 					local cmdOpt = cmdQueue[1].options
-					if (cmdQueue[1].id == CMD.MOVE or cQueue[1].id == CMD_RAW_MOVE or cQueue[1].id == CMD_RAW_BUILD) and cmdOpt.coded == 16 and cmdOpt.right then --Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position
+					if (cmdQueue[1].id == CMD.MOVE or cmdQueue[1].id == CMD_RAW_MOVE or cmdQueue[1].id == CMD_RAW_BUILD) and cmdOpt.coded == 16 and cmdOpt.right then --Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position
 						--Spring.GiveOrderToUnit(unitID,CMD.REMOVE, {cmdQueue[1].tag}, {}) --clear Spring's command that desire unit to return to old position	
 						Spring.GiveOrderArrayToUnitArray( {unitID},{
 							{CMD.REMOVE, {cmdQueue[1].tag}, {}},--clear Spring's command that desire unit to return to old position	

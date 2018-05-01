@@ -76,7 +76,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_beamlaser",
 		humanName = "Beam Laser",
-		description = "Beam Laser",
+		description = "Beam Laser: An effective short-range cutting tool",
 		image = moduleImagePath .. "commweapon_beamlaser.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -97,7 +97,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_flamethrower",
 		humanName = "Flamethrower",
-		description = "Flamethrower",
+		description = "Flamethrower: Good for deep-frying swarmers and large targets alike",
 		image = moduleImagePath .. "commweapon_flamethrower.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -118,7 +118,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_heatray",
 		humanName = "Heatray",
-		description = "Heatray",
+		description = "Heatray: Rapidly melts anything at short range; steadily loses all of its damage over distance",
 		image = moduleImagePath .. "commweapon_heatray.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -139,7 +139,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_heavymachinegun",
 		humanName = "Machine Gun",
-		description = "Machine Gun",
+		description = "Machine Gun: Close-in automatic weapon with AoE",
 		image = moduleImagePath .. "commweapon_heavymachinegun.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -183,7 +183,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_lightninggun",
 		humanName = "Lightning Rifle",
-		description = "Lightning Rifle",
+		description = "Lightning Rifle: Paralyzes and damages annoying bugs",
 		image = moduleImagePath .. "commweapon_lightninggun.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -205,7 +205,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_lparticlebeam",
 		humanName = "Light Particle Beam",
-		description = "Light Particle Beam",
+		description = "Light Particle Beam: Fast, light pulsed energy weapon",
 		image = moduleImagePath .. "commweapon_lparticlebeam.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -227,7 +227,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_missilelauncher",
 		humanName = "Missile Launcher",
-		description = "Missile Launcher",
+		description = "Missile Launcher: Lightweight seeker missile with good range",
 		image = moduleImagePath .. "commweapon_missilelauncher.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -248,7 +248,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_riotcannon",
 		humanName = "Riot Cannon",
-		description = "Riot Cannon",
+		description = "Riot Cannon: The weapon of choice for crowd control",
 		image = moduleImagePath .. "commweapon_riotcannon.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -270,7 +270,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_rocketlauncher",
 		humanName = "Rocket Launcher",
-		description = "Rocket Launcher",
+		description = "Rocket Launcher: Medium-range, low-velocity hitter",
 		image = moduleImagePath .. "commweapon_rocketlauncher.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -292,7 +292,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_shotgun",
 		humanName = "Shotgun",
-		description = "Shotgun",
+		description = "Shotgun: Can hammer a single large target or shred several small ones",
 		image = moduleImagePath .. "commweapon_shotgun.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -314,7 +314,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_hparticlebeam",
 		humanName = "Heavy Particle Beam",
-		description = "Heavy Particle Beam - Replaces other weapons.",
+		description = "Heavy Particle Beam - Replaces other weapons. Short range, high-power beam weapon with moderate reload time",
 		image = moduleImagePath .. "conversion_hparticlebeam.png",
 		limit = 1,
 		cost = 150 * COST_MULT,
@@ -334,7 +334,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_shockrifle",
 		humanName = "Shock Rifle",
-		description = "Shock Rifle - Replaces other weapons.",
+		description = "Shock Rifle - Replaces other weapons. Long range sniper rifle",
 		image = moduleImagePath .. "conversion_shockrifle.png",
 		limit = 1,
 		cost = 150 * COST_MULT,

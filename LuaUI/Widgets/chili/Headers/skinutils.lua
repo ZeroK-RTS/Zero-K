@@ -388,7 +388,7 @@ function DrawEditBox(obj)
 	gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, 0, obj.width, obj.height,  skLeft,skTop,skRight,skBottom, tw,th)
 	gl.Texture(0,false)
 
-	local text = obj.text	
+	local text = obj.text and tostring(obj.text)
 	local font = obj.font
 	local displayHint = false
 	
@@ -444,7 +444,7 @@ function DrawEditBox(obj)
 				local scrollPosY = obj.parent.scrollPosY
 				local scrollHeight = obj.parent.clientArea[4]
 				
-				local h, d, numLines = obj.font:GetTextHeight(obj.text);
+				local h, d, numLines = obj.font:GetTextHeight(tostring(obj.text));
 				local minDrawY = scrollPosY - (h or 0)
 				local maxDrawY = scrollPosY + scrollHeight + (h or 0)
 				
@@ -1170,7 +1170,7 @@ function NCHitTestWithPadding(obj,mx,my)
     return obj
   end
 
-  if obj.noClickThrough then
+  if obj.noClickThrough and not IsTweakMode() then
     return obj
   end
 end
@@ -1215,7 +1215,7 @@ function WindowNCMouseDownPostChildren(obj,x,y)
     return obj
   end
 
-  if obj.noClickThrough then
+  if obj.noClickThrough and not IsTweakMode() then
     return obj
   end
 end

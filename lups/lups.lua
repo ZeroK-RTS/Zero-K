@@ -176,7 +176,7 @@ end
 --------------------------------------------------------------------------------
 
 --// some global vars (so the effects can use them)
-vsx, vsy, vpx, vpy = Spring.GetViewGeometry() --// screen pos & view pos (view pos only unequal zero if dualscreen+minimapOnTheLeft) 
+vsx, vsy, vpx, vpy = Spring.Orig.GetViewGeometry() --// screen pos & view pos (view pos only unequal zero if dualscreen+minimapOnTheLeft)
 LocalAllyTeamID = 0
 thisGameFrame   = 0
 frameOffset     = 0
@@ -620,7 +620,7 @@ end
 local function DrawParticlesOpaque()
 	if ( not anyFXVisible ) then return end
 
-	vsx, vsy, vpx, vpy = Spring.GetViewGeometry()
+	vsx, vsy, vpx, vpy = Spring.Orig.GetViewGeometry()
 	if (vsx~=oldVsx)or(vsy~=oldVsy) then
 		for _,partClass in pairs(fxClasses) do
 			if partClass.ViewResize then partClass.ViewResize(vsx, vsy) end
@@ -762,9 +762,11 @@ local function IsUnitFXVisible(fx)
 	local unitID = fx.unit
 	if fx.onActive then
 		unitActive = GetUnitIsActive(unitID)
+	elseif fx.onUnitRulesParam then
+		unitActive = (spGetUnitRulesParam(unitID, fx.onUnitRulesParam) == 1)
 	end
 	--Spring.Utilities.UnitEcho(unitID, "w")
-	if (not fx.onActive) or (unitActive) then
+	if (unitActive) then
 		if fx.alwaysVisible then
 			return true
 		elseif (fx.Visible) then

@@ -203,6 +203,7 @@ local constructorByID = {}
 local constructorCount = 0
 local constructorsPerFrame = 0
 local constructorIndex = 1
+local alreadyResetConstructors = false
 
 local moveCommandReplacementUnits
 local fastConstructorUpdate
@@ -582,15 +583,50 @@ local function CheckConstructorBuild(unitID)
 end
 
 local function AddConstructor(unitID, buildDist)
-	constructorCount = constructorCount + 1
-	constructors[constructorCount] = unitID
+	if not constructorByID[unitID] then
+		constructorCount = constructorCount + 1
+		constructors[constructorCount] = unitID
+		constructorByID[unitID] = constructorCount
+	end
 	constructorBuildDist[unitID] = buildDist
-	constructorByID[unitID] = constructorCount
-
 	constructorsPerFrame = math.ceil(constructorCount/CONSTRUCTOR_UPDATE_RATE)
 end
 
+local function ResetConstructors()
+	if alreadyResetConstructors then
+		Spring.Echo("LUA_ERRRUN", "ResetConstructors already reset")
+		return
+	end
+	
+	alreadyResetConstructors = true
+	Spring.Echo("LUA_ERRRUN", "ResetConstructors", constructorCount, constructorsPerFrame, constructorIndex)
+	Spring.Utilities.TableEcho(constructorBuildDist, "constructorBuildDist")
+	Spring.Utilities.TableEcho(constructorByID, "constructorByID")
+	
+	constructors = {}
+	constructorBuildDist = {}
+	constructorByID = {}
+	constructorCount = 0
+	constructorsPerFrame = 0
+	constructorIndex = 1
+	
+	for _, unitID in pairs(Spring.GetAllUnits()) do
+		if constructorBuildDistDefs[unitDefID] then
+			AddConstructor(unitID, constructorBuildDistDefs[unitDefID])
+		end
+	end
+end
+
 local function RemoveConstructor(unitID)
+	if not constructorByID[unitID] then
+		return
+	end
+	
+	if not constructors[constructorCount] then
+		ResetConstructors()
+		return
+	end
+	
 	local index = constructorByID[unitID]
 	constructorByID[unitID] = nil
 
@@ -721,7 +757,14 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
 end
 
+local needGlobalWaitWait = false
 function gadget:GameFrame(n)
+	if needGlobalWaitWait then
+		for _, unitID in ipairs(Spring.GetAllUnits()) do
+			WaitWaitMoveUnit(unitID)
+		end
+		needGlobalWaitWait = false
+	end
 	UpdateConstructors(n)
 	UpdateMoveReplacement()
 	if n%247 == 4 then
@@ -730,6 +773,10 @@ function gadget:GameFrame(n)
 
 		oldCommandCount = commandCount
 		commandCount = {}
+		
+		if alreadyResetConstructors then
+			alreadyResetConstructors = false
+		end
 	end
 	if unitQueueCheckRequired then
 		CheckUnitQueues()
@@ -742,11 +789,7 @@ end
 -- Save/Load
 
 function gadget:Load(zip)
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		if UnitDefs[Spring.GetUnitDefID(unitID)].isAirUnit then
-			WaitWaitMoveUnit(unitID)
-		end
-	end
+	needGlobalWaitWait = true
 end
 
 ----------------------------------------------------------------------------------------------

@@ -480,7 +480,7 @@ local function GetUnitVisibleInformation(unitID, allyTeamID)
 	return spGetUnitDefID(unitID), states and states.typed
 end
 
-local function DoTacticalAI(unitID, cQueue, data, behaviour, enemy, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, cQueue, frame)
+local function DoTacticalAI(unitID, cQueue, data, behaviour, enemy, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, cQueue, frame, alwaysJink)
 	-- Apologies for this function.
 	local usefulEnemy = false
 	if not (typeKnown and (not haveFight) and behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef]) then
@@ -576,7 +576,7 @@ local function updateUnits(frame, start, increment)
 					behaviour = unitAIBehaviour[data.udID]
 				end
 				
-				local alwaysJink = (((#cQueue > 0 and cQueue[1].id == CMD_FIGHT) or move) and behaviour.alwaysJinkFight)
+				local alwaysJink = (behaviour.alwaysJinkFight and ((#cQueue > 0 and cQueue[1].id == CMD_FIGHT) or move))
 				local enemyUnitDef = false
 				local typeKnown = false
 				
@@ -593,11 +593,11 @@ local function updateUnits(frame, start, increment)
 					enemyUnitDef, typeKnown = GetUnitVisibleInformation(enemy, data.allyTeam)
 				end
 				
-				local usefulEnemy = DoTacticalAI(unitID, cQueue, data, behaviour, enemy, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, cQueue, frame)
+				local usefulEnemy = DoTacticalAI(unitID, cQueue, data, behaviour, enemy, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, cQueue, frame, alwaysJink)
 				
 				if autoAttackEnemyID and not usefulEnemy then 
 					enemyUnitDef, typeKnown = GetUnitVisibleInformation(autoAttackEnemyID, data.allyTeam)
-					DoTacticalAI(unitID, cQueue, data, behaviour, autoAttackEnemyID, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, cQueue, frame)
+					DoTacticalAI(unitID, cQueue, data, behaviour, autoAttackEnemyID, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, cQueue, frame, alwaysJink)
 				end
 			end
 		end
@@ -671,7 +671,7 @@ local function GetBehaviourTable(behaviourData, ud)
 	behaviourData.skirmRange              = weaponRange
 	behaviourData.skirmLeeway             = (behaviourData.skirmLeeway or 0)
 	behaviourData.jinkTangentLength       = (behaviourData.jinkTangentLength or behaviourDefaults.defaultJinkTangentLength)
-	behaviourData.jinkParallelLength      =  (behaviourData.jinkParallelLength or behaviourDefaults.defaultJinkParallelLength)
+	behaviourData.jinkParallelLength      = (behaviourData.jinkParallelLength or behaviourDefaults.defaultJinkParallelLength)
 	behaviourData.localJinkOrder          = (behaviourData.alwaysJinkFight or behaviourDefaults.defaultLocalJinkOrder)
 	behaviourData.stoppingDistance        = (behaviourData.stoppingDistance or 0)
 	behaviourData.strafeOrderLength       = (behaviourData.strafeOrderLength or behaviourDefaults.defaultStrafeOrderLength)

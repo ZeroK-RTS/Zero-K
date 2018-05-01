@@ -185,7 +185,7 @@ function gadget:Initialize()
 end
 
 function gadget:Load(zip)
-   if not GG.SaveLoad then
+    if not GG.SaveLoad then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
 		return
 	end

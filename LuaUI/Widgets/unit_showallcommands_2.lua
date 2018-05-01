@@ -109,6 +109,12 @@ options = {
 				commandLevel = 1
 				UpdateSelection(spGetSelectedUnits())
 			end
+			
+			if key == 'showminimal' or key == 'showallonshift' then
+				Spring.LoadCmdColorsConfig("alwaysDrawQueue 0")
+			else
+				Spring.LoadCmdColorsConfig("alwaysDrawQueue 1")
+			end
 		end,
 	},
 	lbl_filters = {name='Filters', type='label'},

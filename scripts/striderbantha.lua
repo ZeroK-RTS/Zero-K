@@ -56,7 +56,7 @@ local SIG_Aim3 = 16
 local SIG_Idle = 32
 local armgun = false
 local missilegun = 1
-local PACE = 1.4
+local PACE = 1.25
 
 local LEG_FRONT_ANGLES	= { thigh=math.rad(-35), shin=math.rad(5), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(25) }
 local LEG_FRONT_SPEEDS	= { thigh=math.rad(90)*PACE, shin=math.rad(150)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }

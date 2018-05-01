@@ -77,10 +77,13 @@ local reloading = {}
 --------------------------------------------------------------------------------
 -- For gadget:Save
 --------------------------------------------------------------------------------
-_G.unitDamage    = unitDamage
-_G.capturedUnits = capturedUnits
-_G.controllers   = controllers
-_G.reloading     = reloading
+local function UpdateSaveReferences()
+	_G.unitDamage    = unitDamage
+	_G.capturedUnits = capturedUnits
+	_G.controllers   = controllers
+	_G.reloading     = reloading
+end
+UpdateSaveReferences()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -315,7 +318,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		end
 		
 		-- destroy the unit if the controller is set to destroy units
-		if controllers[attackerID].killSubordinates and attackerAllyTeam ~= capturedUnits[unitID].originAllyTeam then
+		if controllers[attackerID].killSubordinates and attackerAllyTeam ~= (capturedUnits[unitID] or {}).originAllyTeam then
 			spGiveOrderToUnit(unitID, CMD_SELFD, {}, {})
 		end
 		return 0
@@ -559,32 +562,37 @@ function gadget:Load(zip)
 	-- Load the data
 	for oldUnitID, data in pairs(loadData.unitDamage or {}) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		damageByID.count = damageByID.count + 1
-		damageByID.data[damageByID.count] = unitID
-		unitDamage[unitID] = data
-		unitDamage[unitID].index = damageByID.count
+		if unitID then
+			damageByID.count = damageByID.count + 1
+			damageByID.data[damageByID.count] = unitID
+			unitDamage[unitID] = data
+			unitDamage[unitID].index = damageByID.count
+		end
 	end
 	
 	for oldUnitID, data in pairs(loadData.capturedUnits or {}) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		capturedUnits[unitID] = data
-		capturedUnits[unitID].controllerID = GG.SaveLoad.GetNewUnitID(data.controllerID)
+		if unitID then
+			capturedUnits[unitID] = data
+			capturedUnits[unitID].controllerID = GG.SaveLoad.GetNewUnitID(data.controllerID)
+		end
 	end
 	
 	for oldUnitID, data in pairs(loadData.controllers or {}) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		
-		controllers[unitID] = {
-			postCaptureReload = data.postCaptureReload,
-			units = GG.SaveLoad.GetNewUnitIDKeys(data.units),
-			unitByID = {
-				count = data.unitByID.count, 
-				data = GG.SaveLoad.GetNewUnitIDValues(data.unitByID.data)
-			},
-			killSubordinates = data.killSubordinates,
-		}
-		
-		KillToggleCommand(unitID, {(data.killSubordinates and 1) or 0}, {})
+		if unitID then
+			controllers[unitID] = {
+				postCaptureReload = data.postCaptureReload,
+				units = GG.SaveLoad.GetNewUnitIDKeys(data.units),
+				unitByID = {
+					count = data.unitByID.count, 
+					data = GG.SaveLoad.GetNewUnitIDValues(data.unitByID.data)
+				},
+				killSubordinates = data.killSubordinates,
+			}
+			
+			KillToggleCommand(unitID, {(data.killSubordinates and 1) or 0}, {})
+		end
 	end
 	
 	for frame, data in pairs(loadData.reloading or {}) do
@@ -596,6 +604,8 @@ function gadget:Load(zip)
 			}
 		end
 	end
+	
+	UpdateSaveReferences()
 end
 
 --------------------------------------------------------------------------------

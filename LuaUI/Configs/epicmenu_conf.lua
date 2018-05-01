@@ -210,13 +210,13 @@ confdata.simpleModeFullDirectory = {
 }
 
 -- SETUP MENU HERE
-
-ShButton('', 'Save Game', (function() if WG.SaveGame then WG.SaveGame.CreateSaveWindow() end end), nil, nil, imgPath .. 'commands/Bold/unload.png')
-ShButton('', 'Load Game', (function() if WG.SaveGame then WG.SaveGame.CreateLoadWindow() end end), nil, nil, imgPath .. 'commands/Bold/load.png')
+-- moved to epicmenu itself
+--ShButton('', 'Save Game', (function() if WG.SaveGame then WG.SaveGame.CreateSaveWindow() end end), nil, nil, imgPath .. 'commands/Bold/unload.png', CanSaveGame)
+--ShButton('', 'Load Game', (function() if WG.SaveGame then WG.SaveGame.CreateLoadWindow() end end), nil, nil, imgPath .. 'commands/Bold/load.png')
 
 --- GENERAL SETTINGS --- settings about settings
 local generalPath = 'Settings/Reset Settings'
-	ShLabel(generalPath, 'Minimal Graphics.')
+	ShLabel(generalPath, 'Minimal Graphics - Requires restart.')
 	ShButton(generalPath, 'Minimal graphic settings',function()
 					spSendCommands{"water 0",
 						"Shadows 0",
@@ -234,10 +234,10 @@ local generalPath = 'Settings/Reset Settings'
 				end,
 				'Test minimal graphics. Use the main settings menu to make a permanent if necessary.'
 			)
-	ShLabel(generalPath, 'Reset custom settings to default.')
-	ShButton(generalPath, 'Reset settings', function() WG.crude.ResetSettings() end, 'Reset all interface settings to the default.')
-	ShLabel(generalPath, 'Reset hotkeys.')
-	ShButton(generalPath, 'Reset hotkeys',function() WG.crude.ResetKeys() end, 'Reset all hotkeys to the default.')
+	ShLabel(generalPath, 'Reset settings - Requires restart.')
+	ShButton(generalPath, 'Reset settings', function() WG.crude.ResetSettings() end, 'Reset all interface settings to the default. Restart the battle to apply.')
+	ShLabel(generalPath, 'Reset hotkeys - Requires restart.')
+	ShButton(generalPath, 'Reset hotkeys',function() WG.crude.ResetKeys() end, 'Reset all hotkeys to the default. Restart the battle to apply.')
 
 
 local settingsPath = 'Settings'
@@ -430,6 +430,7 @@ local pathMisc = 'Settings/Misc'
 		end,
 	})
 	ShButton(pathMisc, 'Toggle Widget Profiler', function() spSendCommands{"luaui togglewidget WidgetProfiler"} end, '', true)
+	ShButton(pathMisc, 'Toggle New Widget Profiler', function() spSendCommands{"luaui togglewidget Widget Profiler New"} end, '', true)
 
 --- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
 local pathGraphicsMap = 'Settings/Graphics/Map Detail'

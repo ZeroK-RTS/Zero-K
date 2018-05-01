@@ -272,10 +272,11 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function NanoLasers:CreateParticle()
-	self.life           = self.life + 1 --// so we can reuse existing fx's
-	self.firstGameFrame = thisGameFrame
-	self.dieGameFrame   = self.firstGameFrame + self.life
-	self._staticTarget  = false
+	self.life            = self.life + 1 --// so we can reuse existing fx's
+	self.firstGameFrame  = thisGameFrame
+	self.dieGameFrame    = self.firstGameFrame + self.life
+	self._staticTarget   = false
+	self._lastupdate_los = nil
 
 
 	if (self.flare) then

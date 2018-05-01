@@ -100,6 +100,7 @@ end
 --//=============================================================================
 
 local function explode(div, str)
+	str = tostring(str)
 	local arr = {}
 	local i, j = 1, 1
 	local N = str:len()

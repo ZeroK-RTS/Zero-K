@@ -102,6 +102,11 @@ local function ReloadPenaltyAndAnimation()
 	end
 end
 
+function OnLoadGame()
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	GG.UpdateUnitAttributes(unitID)
+end
+
 function script.AimFromWeapon(num)
 	return gunemit
 end

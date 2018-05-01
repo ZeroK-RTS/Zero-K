@@ -687,7 +687,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 		local unitID = unitList[i].unitID
 		local udid = spGetUnitDefID(unitID)
 		local unit = unitConf[udid]
-		local scale = unitList[i].scale
+		local scale = unitList[i].scale or 1
 
 		if (unit) then
 			gl.DrawListAtUnit(unitID, unit.shape.select, false, unit.xscale * scale, 1.0, unit.zscale * scale, degrot[unitID], 0, degrot[unitID], 0)
@@ -704,7 +704,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 		local unitID = unitList[i].unitID
 		local udid = spGetUnitDefID(unitID)
 		local unit = unitConf[udid]
-		local scale = unitList[i].scale
+		local scale = unitList[i].scale or 1
 
 		if (unit) then
 			gl.DrawListAtUnit(unitID, unit.shape.large, false, unit.xscale * scale, 1.0, unit.zscale * scale, degrot[unitID], 0, degrot[unitID], 0)

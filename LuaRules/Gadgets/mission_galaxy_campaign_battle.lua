@@ -96,12 +96,14 @@ GG.terraformUnlocked = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- For gadget:Save
-
-_G.saveTable = {
-	unitLineage        = unitLineage,
-	initialUnitData    = initialUnitData,
-	bonusObjectiveList = bonusObjectiveList,
-}
+local function UpdateSaveReferences()
+	_G.missionGalaxySaveTable = {
+		unitLineage        = unitLineage,
+		initialUnitData    = initialUnitData,
+		bonusObjectiveList = bonusObjectiveList,
+	}
+end
+UpdateSaveReferences()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1406,6 +1408,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
 	BonusObjectiveUnitDestroyed(unitID, unitDefID, teamID)
 	CheckInitialUnitDestroyed(unitID)
+	if unitLineage[unitID] then
+		unitLineage[unitID] = nil
+	end
 end
 
 function gadget:Initialize()
@@ -1514,8 +1519,10 @@ function gadget:Load(zip)
 	unitLineage = {}
 	for oldUnitID, teamID in pairs(loadData.unitLineage) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		unitLineage[unitID] = teamID
-		SetBuildOptions(unitID, unitDefID, Spring.GetUnitTeam(unitID))
+		if unitID then
+			unitLineage[unitID] = teamID
+			SetBuildOptions(unitID, unitDefID, Spring.GetUnitTeam(unitID))
+		end
 	end
 	
 	for i = 1, #loadData.bonusObjectiveList do
@@ -1525,7 +1532,9 @@ function gadget:Load(zip)
 			bonusObjectiveList[i].units = {}
 			for oldUnitID, allyTeamID in pairs(oldUnits) do
 				local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-				bonusObjectiveList[i].units[unitID] = allyTeamID
+				if unitID then
+					bonusObjectiveList[i].units[unitID] = allyTeamID
+				end
 			end
 		end
 	end
@@ -1537,8 +1546,12 @@ function gadget:Load(zip)
 	-- Put the units back in the objectives
 	for oldUnitID, data in pairs(loadData.initialUnitData) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		SetupInitialUnitParameters(unitID, data)
+		if unitID then
+			SetupInitialUnitParameters(unitID, data)
+		end
 	end
+	
+	UpdateSaveReferences()
 end
 
 --------------------------------------------------------------------------------
@@ -1554,7 +1567,7 @@ function gadget:Save(zip)
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission failed to access save/load API")
 		return
 	end
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, MakeRealTable(SYNCED.saveTable, "Campaign"))
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, MakeRealTable(SYNCED.missionGalaxySaveTable, "Campaign"))
 end
 
 local function MissionGameOver(cmd, missionWon)

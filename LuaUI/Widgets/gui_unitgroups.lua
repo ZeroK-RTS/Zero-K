@@ -173,7 +173,7 @@ function widget:Shutdown()
 end
 
 function widget:GroupChanged(groupId)
-  --echo("GroupChanged " .. groupId)
+  --Spring.Echo("GroupChanged " .. groupId)
   groupId = GetNumFromGroupId(groupId)
   if groupId <= 10 and groupId >=1 then
     updated = true

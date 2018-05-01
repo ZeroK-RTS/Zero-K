@@ -175,7 +175,8 @@ for k, v in pairs(KEYSYMS) do
 	keysyms['' .. k] = v
 end
 --]]
-local get_key, get_key_bind_mod = false, false
+local get_key, get_key_bind_mod, get_key_bind_without_mod = false, false, false
+local get_key_bind_with_any, get_key_bind_notify_function = false
 local kb_path, kb_button, kb_control, kb_option, kb_action
 
 local transkey = include("Configs/transkey.lua")
@@ -353,7 +354,7 @@ local function BoolToInt(bool)
 	return bool and 1 or 0
 end
 local function IntToBool(int)
-	return int ~= 0
+	return int ~= nil and int ~= 0
 end
 
 -- cool new framework for ordered table that has keys
@@ -410,6 +411,7 @@ WG.crude.ResetKeys         = function() end
 --Get hotkey by actionname, defined in Initialize()
 WG.crude.GetHotkey = function() end
 WG.crude.GetHotkeys = function() end
+WG.crude.GetHotkeyRaw = function() end
 
 --Set hotkey by actionname, defined in Initialize(). Is defined in Initialize() because trying to iterate pathoptions table here (at least if running epicmenu.lua in local copy) will return empty pathoptions table.
 WG.crude.SetHotkey =  function() end 
@@ -543,16 +545,7 @@ local function WidgetEnabled(wname)
 	return order and (order > 0)
 end
 
--- by default it allows if player is not spectating and there are no other players
-
-local function AllowPauseOnMenuChange()
-	if Spring.GetSpectatingState() then
-		return false
-	end
-
-	if settings.config['epic_Settings/HUD_Panels/Pause_Screen_Menu_pauses_in_SP'] == false then
-		return false
-	end
+local function IsSinglePlayer()
 	local playerlist = Spring.GetPlayerList() or {}
 	local myPlayerID = Spring.GetMyPlayerID()
 	 for i = 1, #playerlist do
@@ -567,6 +560,22 @@ local function AllowPauseOnMenuChange()
 	return true
 end
 
+-- by default it allows if player is not spectating and there are no other players
+local function AllowPauseOnMenuChange()
+	if Spring.GetSpectatingState() then
+		return false
+	end
+
+	if settings.config['epic_Settings/HUD_Panels/Pause_Screen_Menu_pauses_in_SP'] == false then
+		return false
+	end
+	if IsSinglePlayer() == false then
+		return false
+	end
+	
+	return true
+end
+
 local function PlayingButNoTeammate() --I am playing and playing alone with no teammate
 	if Spring.GetSpectatingState() then
 		return false
@@ -578,6 +587,21 @@ local function PlayingButNoTeammate() --I am playing and playing alone with no t
 	end
 	return false
 end
+
+local function CanSaveGame()
+	if Spring.IsCheatingEnabled() then
+		return true
+	end
+	
+	if isMission then
+		return IntToBool(Spring.GetModOptions().cansavegame)
+	end
+	
+	return IsSinglePlayer()
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- Kill submenu window
 local function KillSubWindow(makingNew)
@@ -1351,6 +1375,9 @@ local function MakeKeybindWindow( path, option, hotkeyButton, optionControl, opt
 	
 	get_key = true
 	get_key_bind_mod = option.bindMod
+	get_key_bind_without_mod = option.bindWithoutMod
+	get_key_bind_with_any = option.bindWithAny
+	get_key_bind_notify_function = option.OnHotkeyChange
 	kb_path = path
 	kb_button = hotkeyButton
 	kb_control = optionControl
@@ -2001,7 +2028,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			padding = {2, 2, 2, 2},
 			parent = buttonBar,
 			children = {
-				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/undo.png', width = 16, height = 16, parent = button, x = 4, y = 2},
+				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/undo_white.png', width = 16, height = 16, parent = button, x = 4, y = 2},
 				Label:New{caption = 'Reset', x = 24, y = 4}
 			}
 		}
@@ -2605,6 +2632,38 @@ local function MakeMenuBar()
 	--ShowHideCrudeMenu()
 end
 
+local function MakeSaveLoadButtons()
+	local imgPath = LUAUI_DIRNAME  .. 'images/'
+	AddOption('',
+	{
+		type='button',
+		name='Save Game',
+		desc = 'Save game (not available in multiplayer and tutorials).',
+		OnChange = function()
+				if WG.SaveGame and CanSaveGame() then
+					WG.SaveGame.CreateSaveWindow()
+				end
+			end,
+		key='Save Game',
+		icon = imgPath .. 'commands/Bold/unload.png',
+		DisableFunc = function() return not CanSaveGame() end
+	})
+	
+	AddOption('',
+	{
+		type='button',
+		name='Load Game',
+		desc = '',
+		OnChange = function()
+				if WG.SaveGame then
+					WG.SaveGame.CreateLoadWindow()
+				end
+			end,
+		key='Load Game',
+		icon = imgPath .. 'commands/Bold/load.png',
+	})
+end
+
 local function MakeQuitButtons()
 	--AddOption('', {
 	--	type = 'label',
@@ -2648,6 +2707,7 @@ local function MakeQuitButtons()
 							if WG.MissionResign then
 								WG.MissionResign()
 							else
+								Spring.SendLuaRulesMsg("forceresign")
 								spSendCommands{"spectator"}
 							end
 						end
@@ -2695,6 +2755,10 @@ local function MakeQuitButtons()
 				local paused = select(3, Spring.GetGameSpeed())
 				if (paused) and AllowPauseOnMenuChange() then
 					spSendCommands("pause")
+				end
+				if not (IsSinglePlayer() or Spring.GetSpectatingState()) then
+					Spring.SendLuaRulesMsg("forceresign")
+					spSendCommands("spectator")
 				end
 				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
 					Spring.Reload("")
@@ -2816,6 +2880,7 @@ function widget:Initialize()
 		AddOption(option.path, option)
 	end
 	
+	MakeSaveLoadButtons()
 	MakeQuitButtons()
 	
 	AddOption('', {type = 'label', name = '', value = '', key = ''})
@@ -2885,10 +2950,35 @@ function widget:Initialize()
 			return ret
 		end
 	end
+	
 	WG.crude.GetHotkeys = function(actionName)
 		return WG.crude.GetHotkey(actionName, true)
 	end
 	
+	WG.crude.GetHotkeyRaw = function(actionName, all) --Note: declared here because keybounditems must not be empty
+		local actionHotkey = GetActionHotkey(actionName)
+		--local hotkey = keybounditems[actionName] or actionHotkey
+		local hotkey = otget(keybounditems, actionName ) or actionHotkey
+		if not hotkey or hotkey == 'None' then
+			return
+		end
+		if not all then
+			if type(hotkey) ~= 'table' then
+				hotkey = {hotkey}
+			end
+			return hotkey
+		else
+			local ret = {}
+			if type(hotkey) == 'table' then
+				for k, v in pairs(hotkey) do
+					ret[#ret+1] = v
+				end
+			else
+				ret[#ret+1] = hotkey
+			end
+			return ret
+		end
+	end
 	
 	-- set hotkey
 	WG.crude.SetHotkey =  function(actionName, hotkey, func) --Note: declared here because pathoptions must not be empty
@@ -3197,9 +3287,17 @@ function widget:KeyPress(key, modifier, isRepeat)
 	if get_key then
 		get_key = false
 		window_getkey:Dispose()
-		if get_key_bind_mod then
-			modstring = ''
+		if get_key_bind_mod or get_key_bind_without_mod or get_key_bind_with_any then
+			-- get_key_bind_mod allows mod keys to be directly bound to an action.
+			-- get_key_bind_without_mod gets the key bind without any modifiers.
+			if get_key_bind_with_any then
+				modstring = 'Any+'
+			else
+				modstring = ''
+			end
 			get_key_bind_mod = false
+			get_key_bind_without_mod = false
+			get_key_bind_with_any = false
 		end
 		translatedkey = transkey[ keysyms[''..key]:lower() ] or keysyms[''..key]:lower()
 		--local hotkey = {key = translatedkey, mod = modstring}
@@ -3224,6 +3322,11 @@ function widget:KeyPress(key, modifier, isRepeat)
 				kb_control._relativeBounds.right = hklength + 2 --room for hotkey button on right side
 				kb_control:UpdateClientArea()
 			end
+		end
+		
+		if get_key_bind_notify_function then
+			get_key_bind_notify_function()
+			get_key_bind_notify_function = false
 		end
 		
 		return true
