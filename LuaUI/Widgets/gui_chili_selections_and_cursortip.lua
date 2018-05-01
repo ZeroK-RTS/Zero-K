@@ -2404,12 +2404,11 @@ local function UpdateSelection(newSelection)
 	-- Update group info.
 	
 	selectedUnitsList = newSelection
-	
+
 	if (not newSelection) or (#newSelection == 0) then
 		selectionWindow.SetVisible(false)
 		return
 	end
-	
 	selectionWindow.SetVisible(true)
 	if #newSelection == 1 then
 		selectionWindow.ShowSingleUnit(newSelection[1])
