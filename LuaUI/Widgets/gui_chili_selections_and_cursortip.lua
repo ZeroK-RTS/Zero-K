@@ -119,9 +119,9 @@ local terraCmdTip = {
 		'3: ' .. green.. 'Click' ..white..' again to set width. \n'..
 		'\n'..
 		yellow..'[Modifiers]\n'..
-		'Hold '.. green..'Ctrl or Alt'..white..' and '.. green..'drag' ..white..' in Step 1 to set start height. \n'..
-		'Hold '.. green..'Alt'..white..' to snap height or gradient. \n'..
-		'Press '..green.. 'Space'..white..' to Cycle only raise/lower \n'..
+		'- Hold '.. green..'Ctrl or Alt'..white..' and '.. green..'drag' ..white..' in Step 1 to set start height. \n'..
+		'- Hold '.. green..'Alt'..white..' to snap height or gradient. \n'..
+		'- Press '..green.. 'Space'..white..' to cycle raise/lower. \n'..
 		'\n'..
 		yellow..'[Wireframe indicator colors]\n'..
 		green.. 'Green'..white..': All units can traverse. \n'..
