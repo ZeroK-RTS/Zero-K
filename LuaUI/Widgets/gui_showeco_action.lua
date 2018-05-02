@@ -88,9 +88,10 @@ end
 -- Menu Options
 
 local drawAlpha = 0.2
+WG.showeco_always_mexes = true -- No OnChange when not changed from the default.
 
 options_path = 'Settings/Interface/Economy Overlay'
-options_order = {'start_with_showeco', 'mergeCircles', 'drawQueued'}
+options_order = {'start_with_showeco', 'always_show_mexes', 'mergeCircles', 'drawQueued'}
 options = {
 	start_with_showeco = {
 		name = "Start with economy overly",
@@ -102,6 +103,15 @@ options = {
 			if (self.value) then
 				WG.showeco = self.value
 			end
+		end,
+	},
+	always_show_mexes = {
+		name = "Always show Mexes",
+		desc = "Show metal extractors even when the full economy overlay is not enabled.",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			WG.showeco_always_mexes = self.value
 		end,
 	},
 	mergeCircles = {
