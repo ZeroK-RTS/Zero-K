@@ -87,7 +87,7 @@ return {
 		{	"attack",	"f",},
 		{	"areaattack",	"Alt+a",},
 		{	"debug",	"Alt+n",},
-		{	"debugcolvol",	"Alt+b",},
+		{	"debugcolvol",	"None",},
 		{	"repeat",	"ctrl+r"},
 		{	"priority", "ctrl+q"},
 		{	"selfd",	"C+d",},
