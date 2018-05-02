@@ -63,6 +63,16 @@ local optionGenerationTable = {
 		path = "Settings/Interface",
 	},
 	{
+		optionWidget = "Showeco and Grid Drawer",
+		optionPath = "Settings/Interface/Economy Overlay",
+		optionName = "always_show_mexes",
+		name = "Always show Mexes",
+		desc = "Show metal extractors even when the full economy overlay is not enabled.",
+		type = "bool",
+		default = true,
+		path = "Settings/Interface",
+	},
+	{
 		optionName = "minimapRight",
 		optionFunction = function (self)
 			WG.SetWidgetOption("HUD Presets", "Settings/HUD Presets", "interfacePreset", (self.value and "minimapRight") or "minimapLeft")
