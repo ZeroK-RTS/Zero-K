@@ -216,7 +216,15 @@ local function MakeChickenBreakdown()
 		t[#t+1] = str
 		tNames[str] = chickenName
 	end
-	table.sort(t, function(a,b) return chickenTypes[tNames[a]]["time"] < chickenTypes[tNames[b]]["time"] end )	-- sort by chicken appearance
+	-- sort by chicken appearance
+	table.sort(t,
+				function(a,b)
+					if (not chickenTypes[tNames[a]]) or (not chickenTypes[tNames[b]]) then
+						return false
+					end
+					return chickenTypes[tNames[a]]["time"] < chickenTypes[tNames[b]]["time"]
+				end
+			)
 	--table.sort(t, function(a,b) return tNames[a] < tNames[b] end )	-- alphabetical order
 	return table.concat(t)
 end
