@@ -221,6 +221,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return false
 	end
+	HotkeyChangeNotification()
 	myTeam = team
 end
 
