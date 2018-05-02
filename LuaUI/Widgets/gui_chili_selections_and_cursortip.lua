@@ -109,21 +109,24 @@ local terraformGeneralTip =
 
 local terraCmdTip = {
 	[CMD_RAMP] = 
-		green.. 'Click&Drag'..white..': Build a ramp between two locations. Click again to set width. \n'..
+		yellow..'[Ramp between two points]\n'..
+		'1: ' .. green.. 'Click&Drag'..white..' from start to end. \n' ..
+		'2: ' .. green.. 'Click' ..white..' again to set width. \n'..
 		'\n'..
-		yellow..'[Advanced]\n'..
-		green.. '(Ctrl/Alt)+Click'..white..': Set end heights. \n'..
-		green.. 'Step 1'..white..': Click&drag to start a ramp at desired height. Hold '..green..'Alt'..white..' to snap height.  \n'..
-		green.. 'Step 2'..white..': Click&drag to set end of ramp at desired height. Hold '..green..'Alt'..white..' to snap gradient. \n'..
-		green.. 'Step 3'..white..': Move mouse to set ramp width, click to complete. \n'..
+		yellow..'[Ramp with raised end]\n'..
+		'1: ' .. green.. 'Click'..white..' at start. \n'..
+		'2: ' .. green.. 'Click&Drag'..white..' at end to set height. \n'..
+		'3: ' .. green.. 'Click' ..white..' again to set width. \n'..
 		'\n'..
-		yellow..'[Any Time]\n'..
-		green.. 'Space'..white..': Cycle through only raise/lower \n'..
+		yellow..'[Modifiers]\n'..
+		'Hold '.. green..'Ctrl or Alt'..white..' and '.. green..'drag' ..white..' in Step 1 to set start height. \n'..
+		'Hold '.. green..'Alt'..white..' to snap height or gradient. \n'..
+		'Press '..green.. 'Space'..white..' to Cycle only raise/lower \n'..
 		'\n'..
 		yellow..'[Wireframe indicator colors]\n'..
 		green.. 'Green'..white..': All units can traverse. \n'..
 		green.. 'Yellow'..white..': Vehicles cannot traverse. \n'..
-		green.. 'Red'..white..': Only all-terrain / spiders can traverse.',
+		green.. 'Red'..white..': Only all-terrain units can traverse.',
 	[CMD_LEVEL] = terraformGeneralTip ..
 		yellow..'[During Terraform Draw]\n'..
 		green.. 'Ctrl'..white..': Draw straight line segment. \n'..
