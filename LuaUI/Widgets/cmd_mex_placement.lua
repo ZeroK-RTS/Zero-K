@@ -636,14 +636,14 @@ local centerZ
 local extraction = 0
 
 local mainMexDrawList = 0
-local miniMexDrawList = 0
+local circleOnlyMexDrawList = 0
 
 local function getSpotColor(id)
 	local teamID = spotData[id] and spotData[id].team or Spring.GetGaiaTeamID()
 	return Spring.GetTeamColor(teamID)
 end
 
-function calcMainMexDrawList()
+function calcMainMexDrawList(onlyDrawCircle)
 	local specatate = spGetSpectatingState()
 
 	if WG.metalSpots then
@@ -676,52 +676,9 @@ function calcMainMexDrawList()
 		end
 
 		glColor(1,1,1)
-		glTexture("LuaUI/Images/ibeam.png")
-		glDepthTest(false)
-		for i = 1, #WG.metalSpots do
-			local spot = WG.metalSpots[i]
-			local x,z = spot.x, spot.z
-			local y = spGetGroundHeight(x,z)
-			if y < 0 then y = 0 end
-
-			local metal = spot.metal
-
-			glPushMatrix()
-
-			if options.drawicons.value then
-				local size = 1
-				if metal > 10 then
-					if metal > 100 then
-						metal = metal*0.01
-						size = 5
-					else
-						metal = metal*0.1
-						size = 2.5
-					end
-				end
-
-				size = options.size.value
-
-				glRotate(90,1,0,0)
-				glTranslate(0,0,-y-10)
-
-
-				local width = metal*size
-				glTexRect(x-width/2, z+40, x+width/2, z+40+size,0,0,metal,1)
-			else
-				-- Draws a metal bar at the center of the metal spot
-				glRotate(90,1,0,0)
-				glTranslate(0,0,-y)
-
-				glTexRect(x-25, z-25, x+25, z+25,0,0,1,1)
-			end
-
-			glPopMatrix()
-		end
-		glTexture(false)
-
-		if not options.drawicons.value then
-			--glColor(1,1,1) --already set
+		if not onlyDrawCircle then
+			glTexture("LuaUI/Images/ibeam.png")
+			glDepthTest(false)
 			for i = 1, #WG.metalSpots do
 				local spot = WG.metalSpots[i]
 				local x,z = spot.x, spot.z
@@ -732,12 +689,57 @@ function calcMainMexDrawList()
 
 				glPushMatrix()
 
-				glTranslate(x, y, z)
-				glRotate(-90, 1, 0, 0)
-				glTranslate(0, -40 - options.size.value, 0)
-				glText("+" .. ("%."..options.rounding.value.."f"):format(metal), 0.0, 0.0, options.size.value , "cno")
+				if options.drawicons.value then
+					local size = 1
+					if metal > 10 then
+						if metal > 100 then
+							metal = metal*0.01
+							size = 5
+						else
+							metal = metal*0.1
+							size = 2.5
+						end
+					end
+
+					size = options.size.value
+
+					glRotate(90,1,0,0)
+					glTranslate(0,0,-y-10)
+
+
+					local width = metal*size
+					glTexRect(x-width/2, z+40, x+width/2, z+40+size,0,0,metal,1)
+				else
+					-- Draws a metal bar at the center of the metal spot
+					glRotate(90,1,0,0)
+					glTranslate(0,0,-y)
+
+					glTexRect(x-25, z-25, x+25, z+25,0,0,1,1)
+				end
 
 				glPopMatrix()
+			end
+			glTexture(false)
+		
+			if not options.drawicons.value then
+				--glColor(1,1,1) --already set
+				for i = 1, #WG.metalSpots do
+					local spot = WG.metalSpots[i]
+					local x,z = spot.x, spot.z
+					local y = spGetGroundHeight(x,z)
+					if y < 0 then y = 0 end
+
+					local metal = spot.metal
+
+					glPushMatrix()
+
+					glTranslate(x, y, z)
+					glRotate(-90, 1, 0, 0)
+					glTranslate(0, -40 - options.size.value, 0)
+					glText("+" .. ("%."..options.rounding.value.."f"):format(metal), 0.0, 0.0, options.size.value , "cno")
+
+					glPopMatrix()
+				end
 			end
 		end
 
@@ -781,18 +783,23 @@ function updateMexDrawList()
 	end
 
 	if (mainMexDrawList) then
-		gl.DeleteList(mainMexDrawList);
+		gl.DeleteList(mainMexDrawList)
 		mainMexDrawList = nil
-	end --delete previous list if exist (ref:gui_chicken.lua by quantum)
+	end
+	if (circleOnlyMexDrawList) then
+		gl.DeleteList(circleOnlyMexDrawList)
+		circleOnlyMexDrawList = nil
+	end
 	mainMexDrawList = glCreateList(calcMainMexDrawList)
+	circleOnlyMexDrawList = glCreateList(calcMainMexDrawList, true)
 	if not mainMexDrawList then
 		Spring.Echo("Warning: Failed to update mex draw list.")
 	end
-	--miniMexDrawList = glCreateList(calcMiniMexDrawList)
 end
 
 function widget:Shutdown()
 	gl.DeleteList(mainMexDrawList)
+	gl.DeleteList(circleOnlyMexDrawList)
 end
 
 local function DoLine(x1, y1, z1, x2, y2, z2)
@@ -804,16 +811,20 @@ function widget:DrawWorldPreUnit()
 
 	-- Check command is to build a mex
 	local _, cmdID = spGetActiveCommand()
-	local showecoMode = WG.showeco or WG.showeco_always_mexes
+	local showecoMode = WG.showeco
 	local peruse = spGetGameFrame() < 1 or showecoMode or spGetMapDrawMode() == 'metal'
 
 	drawMexSpots = WG.metalSpots and (-mexDefID == cmdID or CMD_AREA_MEX == cmdID or peruse)
 
-	if drawMexSpots then
+	if drawMexSpots or WG.showeco_always_mexes then
 
 			gl.DepthTest(true)
 			gl.DepthMask(true)
-		glCallList(mainMexDrawList)
+			if drawMexSpots then
+				glCallList(mainMexDrawList)
+			else
+				glCallList(circleOnlyMexDrawList)
+			end
 
 			gl.DepthTest(false)
 			gl.DepthMask(false)
@@ -881,7 +892,7 @@ end
 
 function widget:DrawInMiniMap(minimapX, minimapY)
 
-	if drawMexSpots then
+	if drawMexSpots or WG.showeco_always_mexes then
 		if not glDrawCircle then
 			glDrawCircle = gl.Utilities.DrawCircle
 		end
