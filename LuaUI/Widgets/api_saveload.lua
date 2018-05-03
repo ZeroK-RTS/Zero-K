@@ -17,7 +17,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Save/Load",
+    name      = "Save/Load API",
     desc      = "General save/load stuff",
     author    = "KingRaptor (L.J. Lim)",
     date      = "25 September 2011",
@@ -103,7 +103,7 @@ end
 local function GetNewUnitID(oldUnitID)
 	local newUnitID = savedata.unit[oldUnitID] and savedata.unit[oldUnitID].newID
 	if not newUnitID then
-		Spring.Echo("SaveLoad Cannot get new unit ID", oldUnitID)
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Cannot get new unit ID:" .. oldUnitID)
 	end
 	return newUnitID
 end
@@ -143,7 +143,10 @@ WG.SaveLoad.GetNewFeatureID = GetNewFeatureID
 local function GetNewFeatureIDKeys(data)
 	local ret = {}
 	for i, v in pairs(data) do
-		ret[GetNewFeatureID(i)] = v
+		local id = GetNewFeatureID(i)
+		if id then
+			ret[id] = v
+		end
 	end
 	return ret
 end
