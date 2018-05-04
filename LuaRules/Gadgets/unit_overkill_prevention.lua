@@ -37,6 +37,7 @@ local spGetUnitShieldState  = Spring.GetUnitShieldState
 local pmap = VFS.Include("LuaRules/Utilities/pmap.lua")
 
 local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0 (taken from unit_boolean_disable.lua)
+local HEALTH_FRAME_TIMEOUT = 300 -- 10 seconds.
 
 local FAST_SPEED = 5.5*30 -- Speed which is considered fast.
 local fastUnitDefs = {}
@@ -49,6 +50,9 @@ end
 local canHandleUnit = {}
 local units = {}
 local lastShot = {} -- List of the last targets, to stop target switching
+local lastHealth = {}
+local lastHealthFrame = {}
+local lastGain = {}
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -162,6 +166,34 @@ local function IsUnitIdentifiedStructure(identified, unitID)
 	return not Spring.Utilities.getMovetype(UnitDefs[unitDefID])
 end
 
+local function GetRepairModifiedHealth(targetID, health, gameFrame, timeout)
+	if lastHealthFrame[targetID] and (gameFrame - lastHealthFrame[targetID]) > HEALTH_FRAME_TIMEOUT then
+		lastHealth[targetID] = false
+		lastHealthFrame[targetID] = false
+		lastGain[targetID] = false
+	end
+	
+	if not lastHealth[targetID] then
+		lastHealth[targetID] = health
+		lastHealthFrame[targetID] = gameFrame
+		return health
+	end
+	
+	local lastHealthAge = (gameFrame - lastHealthFrame[targetID])
+	local gain = health - lastHealth[targetID]
+	
+	if lastHealthAge > 2 then
+		lastHealth[targetID] = health
+		lastHealthFrame[targetID] = gameFrame
+	end
+	
+	if (lastGain[targetID] or 0)/2 + gain > 0.01 then
+		health = health + timeout*(gain + (lastGain[targetID] or 0))/(lastHealthAge + 2)
+		lastGain[targetID] = (lastGain[targetID] or 0)/2 + gain
+	end
+	return health
+end
+
 --[[
 	unitID, targetID - unit IDs. Self explainatory
 	fullDamage - regular damage of salvo
@@ -199,8 +231,8 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 	local adjHealth, disarmFrame
 	if targetInLoS then
 		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
-		adjHealth = spGetUnitHealth(targetID)/armor -- adjusted health after incoming damage is dealt
-
+		adjHealth = GetRepairModifiedHealth(targetID, spGetUnitHealth(targetID), gameFrame, timeout)/armor
+		
 		if shieldPowerDef[unitDefID] then
 			local shieldEnabled, currentPower = spGetUnitShieldState(targetID)
 			if shieldEnabled and currentPower then
@@ -332,12 +364,6 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, fas
 	return false
 end
 
-function gadget:UnitDestroyed(unitID)
-	if incomingDamage[unitID] then
-		incomingDamage[unitID] = nil
-	end
-end
-
 --------------------------------------------------------------------------------
 -- Command Handling
 local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
@@ -396,6 +422,10 @@ function gadget:UnitDestroyed(unitID)
 		end
 		canHandleUnit[unitID] = nil
 	end
+	incomingDamage[unitID] = nil
+	lastHealth[unitID] = nil
+	lastHealthFrame[unitID] = nil
+	lastGain[unitID] = nil
 end
 
 function gadget:Initialize()
