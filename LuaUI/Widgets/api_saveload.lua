@@ -103,7 +103,7 @@ end
 local function GetNewUnitID(oldUnitID)
 	local newUnitID = savedata.unit[oldUnitID] and savedata.unit[oldUnitID].newID
 	if not newUnitID then
-		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Cannot get new unit ID:" .. oldUnitID)
+		Spring.Log(widget:GetInfo().name, LOG.WARNING, "Cannot get new unit ID", oldUnitID)
 	end
 	return newUnitID
 end
