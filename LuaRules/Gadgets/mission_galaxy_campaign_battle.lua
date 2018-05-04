@@ -240,6 +240,7 @@ end
 -- Victory at location units
 
 local function AddVictoryAtLocationUnit(unitID, location, allyTeamID)
+	Spring.Echo("Adding victory at location unit", unitID)
 	victoryAtLocation = victoryAtLocation or {}
 	victoryAtLocation[unitID] = victoryAtLocation[unitID] or {}
 	local locations = victoryAtLocation[unitID]
@@ -1548,6 +1549,19 @@ function gadget:Load(zip)
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
 		if unitID then
 			SetupInitialUnitParameters(unitID, data)
+		end
+	end
+	
+	-- restore victoryAtLocation units
+	-- needed for any units that weren't created at start; e.g. Dantes on planet 21 (Vis Ragstrom)
+	local units = Spring.GetAllUnits()
+	for i=1,#units do
+		local unitID = units[i]
+		local finished = select(5, Spring.GetUnitHealth(unitID)) == 1
+		if finished and not victoryAtLocation[unitID] then
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			local unitTeam = Spring.GetUnitTeam(unitID)
+			gadget:UnitFinished(unitID, unitDefID, unitTeam)
 		end
 	end
 	
