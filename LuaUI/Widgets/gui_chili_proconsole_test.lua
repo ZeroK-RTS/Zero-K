@@ -139,7 +139,6 @@ local chatMessages = {} -- message buffer
 local highlightPattern -- currently based on player name -- TODO add configurable list of highlight patterns
 
 local firstEnter = true --used to activate ally-chat at game start. To run once
-local noAlly = false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
 local recentSoundTime = false -- Limit the rate at which sounds are played.
 
 local lastMsgChat, lastMsgBackChat, lastMsgConsole
@@ -659,6 +658,14 @@ local function SetInputFontSize(size)
 		Spring.SendCommands('font ' .. WG.Chili.EditBox.font.font)
 	end
 end	
+
+local function HaveAllyOrSpectating()
+	local spectating = Spring.GetSpectatingState()
+	local myAllyTeamID = Spring.GetMyAllyTeamID() -- get my alliance ID
+	local teams = Spring.GetTeamList(myAllyTeamID) -- get list of teams in my alliance
+	-- if I'm alone and playing (no ally), then no need to set default-ally-chat during gamestart . eg: 1vs1
+	return not (#teams == 1 and (not spectating))
+end
 
 --------------------------------------------------------------------------------
 -- TODO : should these pattern/escape functions be moved to some shared file/library?
@@ -1287,11 +1294,8 @@ function widget:KeyPress(key, modifier, isRepeat)
 		keypadEnterPressed = true
 	end
 	if (key == KEYSYMS.RETURN) or (key == KEYSYMS.KP_ENTER) then
-		if noAlly then
-			firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
-		end
 		if firstEnter then
-			if (not (modifier.Shift or modifier.Ctrl)) and options.defaultAllyChat.value then
+			if HaveAllyOrSpectating() and (not (modifier.Shift or modifier.Ctrl)) and options.defaultAllyChat.value then
 				Spring.SendCommands("chatally")
 			end
 			firstEnter = false
@@ -1538,13 +1542,6 @@ function widget:Initialize()
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget()
 		return
-	end
-	
-	local spectating = Spring.GetSpectatingState()
-	local myAllyTeamID = Spring.GetMyAllyTeamID() -- get my alliance ID
-	local teams = Spring.GetTeamList(myAllyTeamID) -- get list of teams in my alliance
-	if #teams == 1 and (not spectating) then -- if I'm alone and playing (no ally), then no need to set default-ally-chat during gamestart . eg: 1vs1
-		noAlly = true
 	end
 
 	screen0 = WG.Chili.Screen0
