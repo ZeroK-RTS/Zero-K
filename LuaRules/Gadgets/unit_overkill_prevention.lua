@@ -231,7 +231,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 	local adjHealth, disarmFrame
 	if targetInLoS then
 		local armored, armorMultiple = Spring.GetUnitArmored(targetID)
-		local armor = ((armored and (armorMultiple or 1)) or 1)
+		local armor = ((armored and armorMultiple) or 1)
 		adjHealth = GetRepairModifiedHealth(targetID, spGetUnitHealth(targetID), gameFrame, timeout)/armor
 
 		if shieldPowerDef[unitDefID] then
