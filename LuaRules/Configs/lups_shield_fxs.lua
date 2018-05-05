@@ -63,7 +63,7 @@ for unitDefID = 1, #UnitDefs do
 			myShield.margin = 4
 			myShield.hitResposeMult = 0.6
 			--==  HQ  ==--
-			myShield.sizeDrift = 0.006;
+			myShield.sizeDrift = 0.008;
 			myShield.marginHQ = 8
 			myShield.uvMul = 1.0
 			--== /HQ  ==--
@@ -72,16 +72,16 @@ for unitDefID = 1, #UnitDefs do
 			if radius > 100 then
 				myShield.shieldSize = "medium"
 				--==  HQ  ==--
-				myShield.sizeDrift = 0.008;
+				myShield.sizeDrift = 0.01;
 				myShield.marginHQ = 6.5
-				myShield.uvMul = 0.6
+				myShield.uvMul = 0.55
 				--== /HQ  ==--
 			else
 				myShield.shieldSize = "small"
 				--==  HQ  ==--
-				myShield.sizeDrift = 0.012;
+				myShield.sizeDrift = 0.014;
 				myShield.marginHQ = 5.5
-				myShield.uvMul = 0.4
+				myShield.uvMul = 0.3
 				--== /HQ  ==--
 			end
 			myShield.drawBack = 0.75
@@ -109,7 +109,7 @@ for unitDefID = 1, #UnitDefs do
 			--myShield.texture = "bitmaps/GPL/bubbleShield.png"
 			myShield.texture = "bitmaps/PD/shield.png"
 			--==  HQ  ==--
-			myShield.sizeDrift = 0.01;
+			myShield.sizeDrift = 0.03;
 			myShield.drawBackHQ = {1.0, 1.0, 1.0, 0.1} --more alpha makes visual polar artifacts
 			--myShield.mix = {0.5, 0.5, 0.5, 0.9}
 			myShield.mix = {0.5, 0.5, 0.5, 0.7}

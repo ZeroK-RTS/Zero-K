@@ -17,7 +17,7 @@ unitDef = {
 
   customParams        = {
     shield_emit_height = 26,
-    shield_emit_offset = 22,
+    shield_emit_offset = 0,
   },
 
   explodeAs           = [[NOWEAPON]],
