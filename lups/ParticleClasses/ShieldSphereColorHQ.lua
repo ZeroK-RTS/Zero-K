@@ -240,7 +240,7 @@ function ShieldSphereColorHQParticle:Initialize()
 
 		#define PI 3.141592653589793
 
-		#define HEXSCALE 100.0
+		#define HEXSCALE 80.0
 
 		#define SZDRIFTTOUV 7.0
 
