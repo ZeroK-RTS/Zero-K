@@ -427,9 +427,8 @@ end
 local function RedrawDrawRanges()
 	for _, def in pairs(defences) do
 		local configData = unitConfig[def.unitDefID]
-		if     spectating and configData.wantedSpec
-		or     def.isAlly and configData.wantedAlly
-		or not def.isAlly and configData.wantedEnemy
+		if spectating and configData.wantedSpec
+		or not spectating and ((def.isAlly and configData.wantedAlly) or (not def.isAlly and configData.wantedEnemy))
 		then
 			glCallList(def.drawList)
 		end
