@@ -172,21 +172,21 @@ local function GetRepairModifiedHealth(targetID, health, gameFrame, timeout)
 		lastHealthFrame[targetID] = false
 		lastGain[targetID] = false
 	end
-	
+
 	if not lastHealth[targetID] then
 		lastHealth[targetID] = health
 		lastHealthFrame[targetID] = gameFrame
 		return health
 	end
-	
+
 	local lastHealthAge = (gameFrame - lastHealthFrame[targetID])
 	local gain = health - lastHealth[targetID]
-	
+
 	if lastHealthAge > 2 then
 		lastHealth[targetID] = health
 		lastHealthFrame[targetID] = gameFrame
 	end
-	
+
 	if (lastGain[targetID] or 0)/2 + gain > 0.01 then
 		health = health + timeout*(gain + (lastGain[targetID] or 0))/(lastHealthAge + 2)
 		lastGain[targetID] = (lastGain[targetID] or 0)/2 + gain
@@ -230,9 +230,10 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 
 	local adjHealth, disarmFrame
 	if targetInLoS then
-		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
+		local armored, armorMultiple = Spring.GetUnitArmored(targetID)
+		local armor = ((armored and armorMultiple) or 1)
 		adjHealth = GetRepairModifiedHealth(targetID, spGetUnitHealth(targetID), gameFrame, timeout)/armor
-		
+
 		if shieldPowerDef[unitDefID] then
 			local shieldEnabled, currentPower = spGetUnitShieldState(targetID)
 			if shieldEnabled and currentPower then
