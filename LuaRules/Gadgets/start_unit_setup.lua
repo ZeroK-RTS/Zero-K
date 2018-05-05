@@ -83,10 +83,23 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
 
-		-- Stats collection
+		-- Stats collection (acuelly not, see below)
 		if GG.mod_stats_AddFactoryPlop then
 			GG.mod_stats_AddFactoryPlop(teamID, unitDefID)
 		end
+
+		-- FIXME: temporary hack because I'm in a hurry
+		-- proper way: get rid of all the useless shit in modstats, reenable and collect plop stats that way (see above)
+		local str = "SPRINGIE:facplop," .. UnitDefs[unitDefID].name .. "," .. teamID .. "," .. select(6, Spring.GetTeamInfo(teamID)) .. ","
+		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		if isAI then
+			str = str .. "Nightwatch" -- existing account just in case infra explodes otherwise
+		else
+			str = str .. (Spring.GetPlayerInfo(playerID) or "ChanServ") -- ditto, different acc to differentiate
+		end
+		str = str .. ",END_PLOP"
+		Spring.SendCommands("wbynum 255 " .. str)
+
 		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- FIXME: performance loss, possibly preload?
 	end
 end
