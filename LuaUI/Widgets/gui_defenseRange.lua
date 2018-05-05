@@ -255,7 +255,7 @@ options = {
 	enemyradar = {
 		name = 'Show Enemy Radar Coverage',
 		type = 'bool',
-		value = true,
+		value = false,
 	},
 	specground = {
 		name = 'Show Ground Defence as Spectator',
