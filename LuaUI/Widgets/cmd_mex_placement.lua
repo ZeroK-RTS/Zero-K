@@ -851,6 +851,9 @@ function widget:DrawWorld()
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])
 		local bface = Spring.GetBuildFacing()
 		local closestSpot, distance, index = GetClosestMetalSpot(bx, bz)
+		if -mexDefID ~= cmdID then
+			bx, by, bz = pos[1], pos[2], pos[3]
+		end
 
 		if closestSpot and (-mexDefID == cmdID or not ((CMD_AREA_MEX == cmdID or peruse) and distance > 60)) and IsSpotBuildable(index) then
 

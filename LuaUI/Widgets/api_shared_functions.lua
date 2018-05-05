@@ -283,7 +283,7 @@ for udid, ud in ipairs(UnitDefs) do
 end
 
 function widget:SelectionChanged(units)
-	if not units then
+	if (not units) or #units == 0 then
 		WG.selectionEntirelyCons = false
 		return
 	end

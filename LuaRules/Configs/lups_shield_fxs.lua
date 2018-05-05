@@ -64,7 +64,7 @@ for unitDefID = 1, #UnitDefs do
 			myShield.hitResposeMult = 0.6
 			--==  HQ  ==--
 			myShield.sizeDrift = 0.008;
-			myShield.marginHQ = 2.5
+			myShield.marginHQ = 2.8
 			myShield.uvMul = 1.0
 			--== /HQ  ==--
 		else
