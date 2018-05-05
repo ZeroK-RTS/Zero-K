@@ -17,6 +17,7 @@ local AIR    = 2
 local ANTI   = 3
 local MIXED  = 4
 local SHIELD = 5
+local RADAR  = 6
 
 local CYLINDER_HEIGHTMOD = { heightMod = 0, }
 local SPHERE_HEIGHTMOD = { heightMod = 1, }
@@ -114,13 +115,29 @@ for unitName, conf in pairs({
 		color = {1, 0, 1},
 		class = SHIELD,
 	},
+	staticradar = {
+		color = {0, 0.8, 0},
+		lineWidth = 3,
+		class = RADAR,
+	},
+	staticheavyradar = {
+		color = {0, 0.8, 0},
+		lineWidth = 3,
+		class = RADAR,
+	},
 }) do
 	local unitDef = UnitDefNames[unitName]
-	local weaponDef = WeaponDefs[unitDef.weapons[1].weaponDef]
+	local weaponDef
+	if conf.class ~= RADAR then
+		weaponDef = WeaponDefs[unitDef.weapons[1].weaponDef]
+	end
 
 	if conf.class == ANTI then
 		conf.weaponDef = CYLINDER_HEIGHTMOD
 		conf.radius = weaponDef.customParams.nuke_coverage
+	elseif conf.class == RADAR then
+		conf.weaponDef = CYLINDER_HEIGHTMOD
+		conf.radius = unitDef.radarRadius
 	elseif conf.class == SHIELD then
 		conf.weaponDef = SPHERE_HEIGHTMOD
 		conf.radius = weaponDef.shieldRadius
@@ -232,6 +249,11 @@ options = {
 	},
 	enemyshield = {
 		name = 'Show Enemy Shields',
+		type = 'bool',
+		value = true,
+	},
+	enemyradar = {
+		name = 'Show Enemy Radar Coverage',
 		type = 'bool',
 		value = true,
 	},
@@ -355,6 +377,10 @@ RedoUnitList = function()
 			def.wantedAlly = options.allynuke.value
 			def.wantedEnemy = options.enemynuke.value
 			def.wantedSpec = options.specnuke.value
+		elseif def.class == RADAR then
+			def.wantedAlly = false
+			def.wantedEnemy = options.enemyradar.value
+			def.wantedSpec = false
 		elseif def.class == SHIELD then
 			def.wantedAlly = false
 			def.wantedEnemy = options.enemyshield.value
@@ -479,7 +505,7 @@ local function SetupChiliStuff()
 		x         =  50,
 		y         = 150,
 		width     = 120,
-		height    = 144,
+		height    = 168,
 		padding = {12, 12, 12, 12},
 		dockable  = true,
 		dockableSavePositionOnly = true,
@@ -493,6 +519,7 @@ local function SetupChiliStuff()
 	pics.air    = WG.Chili.Image:New { x = 0, y = 24*2, file = 'LuaUI/Images/defense_ranges/air.png'    }
 	pics.nuke   = WG.Chili.Image:New { x = 0, y = 24*3, file = 'LuaUI/Images/defense_ranges/nuke.png'   }
 	pics.shield = WG.Chili.Image:New { x = 0, y = 24*4, file = 'LuaUI/Images/defense_ranges/shield.png' }
+	pics.radar  = WG.Chili.Image:New { x = 0, y = 24*5, file = 'LuaUI/Images/defense_ranges/radar.png'  }
 
 	pics.ally  = WG.Chili.Image:New { x = 24*1, y = 0, file = 'LuaUI/Images/defense_ranges/defense_ally.png'  }
 	pics.enemy = WG.Chili.Image:New { x = 24*2, y = 0, file = 'LuaUI/Images/defense_ranges/defense_enemy.png' }
@@ -516,6 +543,9 @@ local function SetupChiliStuff()
 	-- no allyshield
 	checkboxes.enemyshield = WG.Chili.Checkbox:New { x = 50, y = 100, }
 	-- no specshield
+	-- no allyradar
+	checkboxes.enemyradar  = WG.Chili.Checkbox:New { x = 50, y = 124, }
+	-- no specradar
 
 	local function OnCheckboxChangeFunc(self)
 		-- called *before* the 'checked' value is swapped, hence negation everywhere
