@@ -97,6 +97,7 @@ options = {
 				window:SetVisibility(true)
 			end
 		end,
+		path = 'Hotkeys/Misc',
 	},
 }
 
