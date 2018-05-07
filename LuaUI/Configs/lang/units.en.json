@@ -779,11 +779,6 @@
 		"description" : "Skirmisher Spider (Indirect Fire)",
 		"helptext" : "An all terrain missile launching unit. Climb walls with this spider walker and take your enemy by surprise. The unguided rockets cannot hit a rapidly jinking target, but they have a fairly long range."
 	},
-	"thicket" : {
-		"name" : "Thicket",
-		"description" : "Barricade",
-		"helptext" : "Thickets are the Thunderbirds' perimeter defense."
-	},
 	"fakeunit_los" : {
 		"name" : "LOS Provider",
 		"description" : "Knows all and sees all",

@@ -804,11 +804,6 @@
         "description": "Lekki czołg",
         "helptext": "Kodachi to lekki czołg z bombami zapalającymi, które dobrze spisują się przeciwko budynkom. Po wyjściu z walki szybko regeneruje się, co wspiera używanie go zaczepnie."
     },
-    "thicket": {
-        "name": "Thicket",
-        "description": "Blokada",
-        "helptext": "Thicket to barykada używana przez kurczaki."
-    },
     "damagesink": {
         "name": "Pochłaniacz obrażeń",
         "description": "Ma w dupie, że ktoś go bije.",

@@ -424,11 +424,6 @@
 		"description" : "Napalmbomber",
 		"helptext" : "Die Napalmbomben des Firestorms dezimieren große Haufen an Einheiten und leichten Bauwerken."
 	},
-	"thicket" : {
-		"name" : "Thicket",
-		"description" : "Schranke",
-		"helptext" : "Der Thicket ist ein defensiv Poller des Thunderbirds."
-	},
 	"staticjammer" : {
 		"name" : "Cornea",
 		"description" : "Verhüllender Turm / Störsender",

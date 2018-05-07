@@ -809,11 +809,6 @@
         "description": "Knows all and sees all",
         "name": "LOS Provider"
     },
-    "thicket": {
-        "helptext": "Thickets are the Thunderbirds' perimeter defense.",
-        "description": "Barricade",
-        "name": "Thicket"
-    },
     "damagesink": {
         "description": "Does not care if you shoot at it.",
         "name": "Damage Sink thing"

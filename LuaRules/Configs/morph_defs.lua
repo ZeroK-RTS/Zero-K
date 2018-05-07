@@ -17,10 +17,6 @@ local morphDefs = {
 			energy = 600,
 			time = 90,
 		},
-		[3] = {
-			into = 'thicket',
-			time = 4,
-		},
 	}, 
 }
 
