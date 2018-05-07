@@ -2122,8 +2122,8 @@ local function ShowFeatureCheck(holdingSpace, featureDefID)
 	end
 	if options.show_for_wreckage.value then
 		if options.show_for_unreclaimable.value then
-			local fd = FeatureDefs[thingDefID]
-			if not fd.reclaimable  then
+			local fd = FeatureDefs[featureDefID]
+			if not (fd and fd.reclaimable) then
 				return false
 			end
 		end
