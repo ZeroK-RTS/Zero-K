@@ -187,17 +187,19 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		else
 			local _,_,_,_,_,_, x, y, z = Spring.GetUnitPosition(targetData, true, true)
 			local gameFrame = Spring.GetGameFrame()
-			local data = {
-				x = x,
-				y = y,
-				z = z,
-				targetID = targetData,
-				posUpdateFrame = gameFrame + 10,
-			}
+			if z then
+				data = {
+					x = x,
+					y = y,
+					z = z,
+					targetID = targetData,
+					posUpdateFrame = gameFrame + 10,
+				}
+			end
 		end
 	elseif targetType == FEATURE then
 		local x, y, z = Spring.GetFeaturePosition(targetData)
-		data = {	
+		data = {
 			x = x,
 			y = y,
 			z = z,
@@ -208,6 +210,10 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 			y = targetData[2],
 			z = targetData[3],
 		}
+	end
+	
+	if not data then
+		return
 	end
 	
 	local teamID = Spring.GetProjectileTeamID(proID)
