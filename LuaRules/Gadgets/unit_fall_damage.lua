@@ -217,7 +217,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local tx, ty, tz = vx - nx, vy - ny, vz - nz -- tangent is the other component of velocity
 		local nf = att.elasticity
 		local tf = att.friction
-		vx, vy, vz = tx*tf + nx*nf - vz, ty*tf + ny*nf - vy, tz*tf + nz*nf - vz
+		vx, vy, vz = tx*tf + nx*nf - vx, ty*tf + ny*nf - vy, tz*tf + nz*nf - vz
 		GG.AddGadgetImpulseRaw(unitID, vx, vy, vz, true, true)
 		
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
