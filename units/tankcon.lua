@@ -4,7 +4,7 @@ unitDef = {
   description            = [[Armed Construction Tank, Builds at 7.5 m/s]],
   acceleration           = 0.066,
   brakeRate              = 1.5,
-  buildCostMetal         = 220,
+  buildCostMetal         = 230,
   buildDistance          = 180,
   builder                = true,
 
@@ -92,8 +92,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 14.4,
-        planes  = 14.4,
+        default = 9,
+        planes  = 9,
         subs    = 0.7,
       },
 

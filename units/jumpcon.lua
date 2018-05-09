@@ -1,10 +1,10 @@
 unitDef = {
   unitname            = [[jumpcon]],
   name                = [[Constable]],
-  description         = [[Jumpjet Constructor, Builds at 5 m/s]],
+  description         = [[Jumpjet Constructor, Builds at 4 m/s]],
   acceleration        = 0.26,
   brakeRate           = 0.78,
-  buildCostMetal      = 160,
+  buildCostMetal      = 130,
   buildDistance       = 128,
   builder             = true,
 
@@ -67,7 +67,7 @@ unitDef = {
   trackWidth          = 22,
   turnRate            = 1400,
   upright             = true,
-  workerTime          = 5,
+  workerTime          = 4,
  
   weapons             = {
 

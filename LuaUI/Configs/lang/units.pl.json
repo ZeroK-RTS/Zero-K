@@ -626,7 +626,7 @@
     },
     "jumpcon": {
         "name": "Constable",
-        "description": "Skoczek konstruktor, moc 5 m/s",
+        "description": "Skoczek konstruktor, moc 4 m/s",
         "helptext": "Szybki konstruktor z możliwością skoku, Constable świetnie nadaje się do zajmowania trudno dostępnych obszarów. Zapewnia też wsparcie bojowe - jest uzbrojony w lekki promień spowalniający."
     },
     "chicken_blimpy": {

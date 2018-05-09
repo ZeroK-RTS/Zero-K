@@ -53,13 +53,13 @@ function gadget:UnitDamaged(unitID, unitDefID,  unitTeam, unitDamage, paralyzer,
     last = frame
     -- dps
     if start then
-        --Spring.Echo(damage/(frame-start)*30)
+        Spring.Echo(damage/(frame-start)*30)
         damage = damage + unitDamage
     else
         start = frame
         damage = unitDamage
     end
-	--Spring.Echo("Damage: " .. damage)
+	Spring.Echo("Damage: " .. damage)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)

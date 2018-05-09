@@ -986,7 +986,7 @@
 	},
 	"jumpcon" : {
 		"name" : "Constable",
-		"description" : "Konstruktionsjumpjet, Baut mit 5 M/s",
+		"description" : "Konstruktionsjumpjet, Baut mit 4 M/s",
 		"helptext" : "Schnell und mit der Möglichkeit ausgestattet über kurze Distanzen oder Höhen zu springen, eignet sich der Constable als ideale Konstruktionseinheit für rasche Expansion."
 	},
 	"jumparty" : {
