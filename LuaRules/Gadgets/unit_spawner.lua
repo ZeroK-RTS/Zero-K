@@ -423,11 +423,11 @@ local function UpdateBurrowTarget(burrowID, targetArg)
 	local validUnitID = spValidUnitID(data.targetID) --in case multiple UnitDestroyed() is called at same frame and burrow happen to choose a target before all Destroyed unit is registered.
 	if validUnitID and targetData.targetID ~= oldTarget then
 		targetData.targetTeam = spGetUnitTeam(data.targets[data.targetID])
-		--spGiveOrderToUnit(burrowID, CMD_ATTACK, {data.targetID}, emptyTable)
+		--spGiveOrderToUnit(burrowID, CMD_ATTACK, {data.targetID}, 0)
 		--echo("Target for burrow ID ".. burrowID .." updated to target ID " .. data.targetID)
 	elseif not validUnitID then
 		targetData.targetID = nil
-		--spGiveOrderToUnit(burrowID, CMD_STOP, {}, emptyTable)
+		--spGiveOrderToUnit(burrowID, CMD_STOP, {}, 0)
 		--echo("Target for burrow ID ".. burrowID .." lost, waiting")
 	end
 end
@@ -436,7 +436,7 @@ local function AttackNearestEnemy(unitID)
 	local targetID = Spring.GetUnitNearestEnemy(unitID)
 	if (targetID) then
 		local tx, ty, tz = spGetUnitPosition(targetID)
-		spGiveOrderToUnit(unitID, CMD_FIGHT, {tx, ty, tz}, emptyTable)
+		spGiveOrderToUnit(unitID, CMD_FIGHT, {tx, ty, tz}, 0)
 	end
 end
 
@@ -545,8 +545,8 @@ local function SpawnChicken(burrowID, spawnNumber, chickenName)
 		until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
 		local unitID = spCreateUnit(chickenName, x, by, z, "n", chickenTeamID)
 		if unitID then
-			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, emptyTable) --// set moveState to roam
-			if (tloc) then spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable) end
+			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, 0) --// set moveState to roam
+			if (tloc) then spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, 0) end
 			data.chickenBirths[unitID] = now 
 		end
 	end
@@ -594,7 +594,7 @@ local function SpawnTurret(burrowID, turret, number, force)
 			if (burrowTarget) then
 				local tloc = ChooseTarget(burrowTarget)
 				if tloc then
-					spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable)
+					spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, 0)
 				end
 			end
 		--else
@@ -638,7 +638,7 @@ local function SpawnSupport(burrowID, support, number, force)
 		if unitID and (burrowTarget) then
 			local tloc = ChooseTarget(burrowTarget)
 			if tloc then
-				spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable)
+				spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, 0)
 			end
 		end
 	end
@@ -753,7 +753,7 @@ local function SpawnUnit(unitName, number, minDist, maxDist, target)
 	for i=1, (number or 1) do
 		local unitID = spCreateUnit(unitName, x + random(-spawnSquare, spawnSquare), y, z + random(-spawnSquare, spawnSquare), "n", chickenTeamID)
 		if unitID then
-			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, emptyTable) --// set moveState to roam
+			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, 0) --// set moveState to roam
 		end
 	end
 end
@@ -817,7 +817,7 @@ local function SpawnMiniQueen()
 		local miniQueenTarget	= Spring.GetUnitNearestEnemy(unitID, 20000, false)
 		local tloc
 		if (miniQueenTarget) then tloc = ChooseTarget(miniQueenTarget) end
-		if (tloc) then spGiveOrderToUnit(unitID, CMD_RAW_MOVE, tloc, emptyTable) end
+		if (tloc) then spGiveOrderToUnit(unitID, CMD_RAW_MOVE, tloc, 0) end
 	end
 end
 
@@ -1010,7 +1010,7 @@ local function MorphQueen()
 	Spring.SetUnitExperience(data.queenID, xp)
 	if (cmdQueue and cmdQueue[1]) then		--copy order queue
 		for i=1,#cmdQueue do
-			spGiveOrderToUnit(data.queenID, cmdQueue[i].id, cmdQueue[i].params, cmdQueue[i].options)
+			spGiveOrderToUnit(data.queenID, cmdQueue[i].id, cmdQueue[i].params, cmdQueue[i].options.coded)
 		end
 	end
 end
@@ -1143,9 +1143,9 @@ function gadget:GameFrame(n)
 				if (not (cmdQueue and cmdQueue[1])) then
 					--AttackNearestEnemy(unitID)
 					if (difficulty > 1) and (unitID == data.queenID) then
-						spGiveOrderToUnit(unitID, CMD_RAW_MOVE, data.targetCache, {"shift"})
+						spGiveOrderToUnit(unitID, CMD_RAW_MOVE, data.targetCache, CMD.OPT_SHIFT)
 					else
-						spGiveOrderToUnit(unitID, CMD_FIGHT, data.targetCache, {"shift"})
+						spGiveOrderToUnit(unitID, CMD_FIGHT, data.targetCache, CMD.OPT_SHIFT)
 					end
 				end
 			end

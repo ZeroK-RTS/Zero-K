@@ -155,7 +155,7 @@ local function clearOrder(unitID,data,cQueue)
 		if (#cQueue >= 1 and (cQueue[1].id == CMD_MOVE or cQueue[1].id == CMD_RAW_MOVE)) then -- if I am moving
 			local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
 			if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
-				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0)
 				GG.StopRawMoveUnit(unitID, true)
 			end
 		end
@@ -199,10 +199,10 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 					
 					GG.recursion_GiveOrderToUnit = true
 					if move then
-						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0 )
+						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 					else
-						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 					end
 					GG.recursion_GiveOrderToUnit = false
 					data.cx,data.cy,data.cz = cx,cy,cz
@@ -246,10 +246,10 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 					
 					GG.recursion_GiveOrderToUnit = true
 					if move then
-						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0 )
+						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 					else
-						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 					end
 					GG.recursion_GiveOrderToUnit = false
 					data.cx,data.cy,data.cz = cx,cy,cz
@@ -288,10 +288,10 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 			end
 			
 			if move then
-				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0 )
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 			else
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 			end
 			--Spring.SetUnitMoveGoal(unitID, cx,cy,cz)
 			data.cx,data.cy,data.cz = cx,cy,cz
@@ -380,7 +380,7 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, 
 			-- If a unit has not fired then it has been loaded since frame zero.
 			if reloadFrames and (behaviour.skirmBlockedApproachFrames < -reloadFrames) then
 				if #cQueue > 0 and move and not behaviour.skirmKeepOrder then
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0 )
 				end
 				return behaviour.skirmKeepOrder
 			end
@@ -396,17 +396,17 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, 
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0 )
+			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		else
-			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		end
 		GG.recursion_GiveOrderToUnit = false
 		data.cx,data.cy,data.cz = cx,cy,cz
 		data.receivedOrder = true
 		return true
 	elseif #cQueue > 0 and move and not behaviour.skirmKeepOrder then
-		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0 )
 	end
 
 	return behaviour.skirmKeepOrder
@@ -453,10 +453,10 @@ local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move
 		GG.recursion_GiveOrderToUnit = true
 		if #cQueue > 0 then
 			if move then
-				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-				cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0 )
+				cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 			else
-				cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+				cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 			end
 		else
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_FIGHT, {cx,cy,cz }, CMD_OPT_RIGHT )
@@ -466,7 +466,7 @@ local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move
 		data.receivedOrder = true
 		return true
 	elseif #cQueue > 0 and move then
-		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0 )
 	end
 
 	return false

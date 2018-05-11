@@ -76,7 +76,7 @@ local cmdTypeIconModeOrNumber = {
 	[CMD.IDLEMODE] = true,
 }
 
-local OPT_RIGHT = {"right"}
+local OPT_RIGHT = CMD.OPT_RIGHT
 
 -- vars
 local savedata = {
@@ -288,9 +288,7 @@ local function LoadOrdersForUnit(oldID, data)
 		end
 		
 		
-		local opts = command.options
-		local alt, ctrl, shift, right = opts.alt, opts.ctrl, opts.shift, opts.right
-		opts = {(alt and "alt"), (shift and "shift"), (ctrl and "ctrl"), (right and "right")}
+		local opts = command.options.coded
 		
 		-- don't issue a patrol command for a nanoturret if it's where we're standing, to avoid deleting existing patrol commands
 		-- hack solution for nano patrol bug in ZeroK-RTS/Zero-K/issues/2905
@@ -434,12 +432,7 @@ local function LoadUnits()
 		if data.factoryData then
 			for i=1,#data.factoryData.commands do
 				local facCmd = data.factoryData.commands[i]
-				local opts = facCmd.options
-				local alt, ctrl, shift, right = opts.alt, opts.ctrl, opts.shift, opts.right
-				-- we don't need to use the options again, as they have already taken form as "size of build queue" (or build order, in the case of alt)
-				-- otherwise we'd be double counting the opts
-				opts = {} --{(alt and "alt"), (shift and "shift"), (ctrl and "ctrl"), (right and "right")} 
-				Spring.GiveOrderToUnit(data.newID, facCmd.id, facCmd.params, opts)
+				Spring.GiveOrderToUnit(data.newID, facCmd.id, facCmd.params, 0) -- don't pass options, they were already translated when given
 			end
 			if data.factoryData.buildee then
 				local buildeeData = data.factoryData.buildee
@@ -458,8 +451,8 @@ local function LoadUnits()
 	-- WAIT WAIT everything
 	for oldID, data in pairs(savedata.unit) do
 		if data.newID then
-			spGiveOrderToUnit(data.newID, CMD.WAIT, {}, {})
-			spGiveOrderToUnit(data.newID, CMD.WAIT, {}, {})
+			spGiveOrderToUnit(data.newID, CMD.WAIT, {}, 0)
+			spGiveOrderToUnit(data.newID, CMD.WAIT, {}, 0)
 		end
 	end
 	
@@ -468,7 +461,7 @@ local function LoadUnits()
 		--Spring.DestroyUnit(buildeeData.unitID, false, true)	-- clear the unit so factory can build it again
 		Spring.SetUnitBlocking(buildeeData.unitID, false, false, false)
 		toCleanupFactory[#toCleanupFactory + 1] = buildeeData
-		--Spring.GiveOrderToUnit(buildeeData.factoryID, CMD.INSERT, {0, -buildeeData.unitDefID, CMD.OPT_ALT}, {"alt", "ctrl"})
+		--Spring.GiveOrderToUnit(buildeeData.factoryID, CMD.INSERT, {0, -buildeeData.unitDefID, CMD.OPT_ALT}, CMD.OPT_ALT + CMD.OPT_CTRL)
 	end
 	cleanupFrame = Spring.GetGameFrame() + 2	-- needs to be some time to allow for factory opening animations
 end

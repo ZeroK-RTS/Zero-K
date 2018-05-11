@@ -177,7 +177,7 @@ local function OpenAllClownSlots(unitID, unitDefID) -- give factory something to
 	local orders = {}
 	--local x,y,z = spGetUnitPosition(unitID)
 	for i = 1, random(10, 30) do
-		orders[#orders + 1] = {-buildopts[random(1, #buildopts)], {}, {} }
+		orders[#orders + 1] = {-buildopts[random(1, #buildopts)], {}, 0 }
 	end
 	if (#orders > 0) then
 		if not spGetUnitIsDead(unitID) then
@@ -219,7 +219,7 @@ local function BringingDownTheHeavens(unitID)
 	end
 	local x,y,z = spGetUnitPosition(unitID)
 	if (near_ally) and random(0, 5) < 4 then -- 60% chance to guard nearest ally
-		orders[#orders + 1] = {CMD_GUARD, {near_ally}, {}}
+		orders[#orders + 1] = {CMD_GUARD, {near_ally}, 0}
 	end
 	for i = 1, random(10, 30) do
 		rx = random(0, mapWidth)
@@ -384,8 +384,8 @@ local function ReInit(reinit)
 	if not (defined) then
 		UnitFinished = function(unitID, unitDefID, teamID, builderID)
 			if (teamID == GaiaTeamID) and not (zombies[unitID]) then
-				spGiveOrderToUnit(unitID, CMD_REPEAT, {1}, {})
-				spGiveOrderToUnit(unitID, CMD_MOVE_STATE, {2}, {})
+				spGiveOrderToUnit(unitID, CMD_REPEAT, {1}, 0)
+				spGiveOrderToUnit(unitID, CMD_MOVE_STATE, {2}, 0)
 				BringingDownTheHeavens(unitID)
 				zombies[unitID] = true
 				if ZOMBIES_PERMA_SLOW then

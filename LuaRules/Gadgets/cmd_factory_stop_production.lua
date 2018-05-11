@@ -25,7 +25,7 @@ end
 
 local spInsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 
-local cmdOpts = {"ctrl"}
+local cmdOpts = CMD.OPT_CTRL
 
 include("LuaRules/Configs/customcmds.h.lua")
 

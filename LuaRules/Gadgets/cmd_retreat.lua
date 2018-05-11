@@ -213,7 +213,7 @@ local function StopRetreating(unitID)
 	if retreaterHasRearm[unitID] then
 		for _,cmd in ipairs(cmds) do
 			if cmd.id == CMD_REARM then
-				spGiveOrderToUnit(unitID, CMD.REMOVE, { cmd.tag }, {})
+				spGiveOrderToUnit(unitID, CMD.REMOVE, { cmd.tag }, 0)
 			end
 		end
 	end
@@ -222,9 +222,9 @@ local function StopRetreating(unitID)
 		local first = true
 		for _,cmd in ipairs(cmds) do
 			if cmd.tag == retreaterTagsMove[unitID] or cmd.tag == retreaterTagsWait[unitID] then
-				spGiveOrderToUnit(unitID, CMD.REMOVE, { cmd.tag }, {})
+				spGiveOrderToUnit(unitID, CMD.REMOVE, { cmd.tag }, 0)
 			elseif first and cmd.id == CMD.WAIT then
-				spGiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+				spGiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
 			end
 			first = false
 		end
@@ -258,7 +258,7 @@ local function GiveRearmOrders(unitID)
 		
 		if unitIsIdle then
 			local ux, uy, uz = spGetUnitPosition(unitID)
-			GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {ux, uy, uz}, {"shift"})
+			GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {ux, uy, uz}, CMD.OPT_SHIFT)
 		end
 		
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
@@ -277,8 +277,8 @@ local function GiveRetreatOrders(unitID, hx,hz)
 	local insertIndex = 0
 	local hy = Spring.GetGroundHeight(hx, hz)
 	
-	spGiveOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD.WAIT, CMD.OPT_SHIFT}, {"alt"}) --SHIFT W
-	GiveClampedOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD_RAW_MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, {"alt"}) -- ALT makes the 0 positional
+	spGiveOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD.WAIT, CMD.OPT_SHIFT}, CMD.OPT_ALT) --SHIFT W
+	GiveClampedOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD_RAW_MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, CMD.OPT_ALT) -- ALT makes the 0 positional
 	
 	local cmds = Spring.GetUnitCommands(unitID,2)
 	local tag1, tag2 = cmds[1].tag, cmds[2] and cmds[2].tag
@@ -289,7 +289,7 @@ local function GiveRetreatOrders(unitID, hx,hz)
 	
 	if unitIsIdle then
 		local ux, uy, uz = spGetUnitPosition(unitID)
-		GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {ux, uy, uz}, {"shift"})
+		GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {ux, uy, uz}, CMD.OPT_SHIFT)
 	end
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)

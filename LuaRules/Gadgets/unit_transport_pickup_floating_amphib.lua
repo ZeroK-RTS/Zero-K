@@ -129,7 +129,7 @@ end
 local function ClearUnitCommandQueue(unitID,cmds)
 	cmds = cmds or spGetCommandQueue(unitID, -1)
 	for i=1,#cmds do
-		spGiveOrderToUnit(unitID,CMD.REMOVE,{cmds[i].tag},{})
+		spGiveOrderToUnit(unitID,CMD.REMOVE,{cmds[i].tag},0)
 	end
 end
 
@@ -171,7 +171,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					index = 0
 				end
 				
-				spGiveOrderToUnit(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,cmdParams[1]}, {"alt"}) --insert LOAD-Extension command at current index in queue
+				spGiveOrderToUnit(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,cmdParams[1]}, CMD.OPT_ALT) --insert LOAD-Extension command at current index in queue
 				--"PHASE A"--
 				--Spring.Echo("A")
 				return false --replace LOAD with LOAD-Extension command
@@ -197,7 +197,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					transportPhase[unitID] = nil
 					index = 0
 				end
-				spGiveOrderToUnit(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,unpack(cmdParams)}, {"alt"})
+				spGiveOrderToUnit(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,unpack(cmdParams)}, CMD.OPT_ALT)
 				return false
 			end
 		end
@@ -212,8 +212,8 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			index = 0
 		end
 		local orderToSandwich = {
-			{CMD.INSERT,{index,CMD.UNLOAD_UNITS,CMD.OPT_SHIFT,unpack(cmdParams)}, {"alt"}},
-			{CMD.INSERT,{index+1,CMD_EXTENDED_UNLOAD,CMD.OPT_SHIFT,unpack(cmdParams)}, {"alt"}},
+			{CMD.INSERT,{index,CMD.UNLOAD_UNITS,CMD.OPT_SHIFT,unpack(cmdParams)}, CMD.OPT_ALT},
+			{CMD.INSERT,{index+1,CMD_EXTENDED_UNLOAD,CMD.OPT_SHIFT,unpack(cmdParams)}, CMD.OPT_ALT},
 		}
 		spGiveOrderArrayToUnitArray ({unitID},orderToSandwich)
 		return false
@@ -247,7 +247,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 				local isRepeat = spGetUnitStates(unitID)["repeat"]
 				local options = isRepeat and CMD.OPT_INTERNAL or CMD.OPT_SHIFT 
 				transportPhase[unitID] = "INTERNAL_LOAD_UNITS " .. cargoID
-				giveLOAD_order[#giveLOAD_order+1] = {unitID,CMD.INSERT,{1,CMD.LOAD_UNITS,options,cargoID}, {"alt"}}
+				giveLOAD_order[#giveLOAD_order+1] = {unitID,CMD.INSERT,{1,CMD.LOAD_UNITS,options,cargoID}, CMD.OPT_ALT}
 				-- return true,true --remove this command
 				return true,false --hold this command (removed in next frame after giveLOAD_order have inserted command (this avoid unit trigger UnitIdle)
 			end
@@ -279,7 +279,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 				local isRepeat = spGetUnitStates(unitID)["repeat"]
 				local options = isRepeat and CMD.OPT_INTERNAL or CMD.OPT_SHIFT 
 				transportPhase[unitID] = "INTERNAL_LOAD_UNITS " .. cmdParams[1]+cmdParams[3]
-				giveLOAD_order[#giveLOAD_order+1] = {unitID,CMD.INSERT,{1,CMD.LOAD_UNITS,options,unpack(cmdParams)}, {"alt"}}
+				giveLOAD_order[#giveLOAD_order+1] = {unitID,CMD.INSERT,{1,CMD.LOAD_UNITS,options,unpack(cmdParams)}, CMD.OPT_ALT}
 				-- return true,true --remove this command
 				return true,false --hold this command (removed in next frame after giveLOAD_order have inserted command (this avoid unit trigger UnitIdle)
 			end
@@ -306,7 +306,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			local cargoDefID = spGetUnitDefID(cargo[1])
 			if gy < 0 and (UnitDefs[cargoDefID].customParams.commtype or floatDefs[cargoDefID] or dropableUnits[cargoDefID]) then
 				transportPhase[unitID] = "INTERNAL_UNLOAD_UNITS"
-				giveDROP_order[#giveDROP_order+1] = {unitID,CMD.INSERT,{1,CMD_ONECLICK_WEAPON,CMD.OPT_INTERNAL}, {"alt"}}
+				giveDROP_order[#giveDROP_order+1] = {unitID,CMD.INSERT,{1,CMD_ONECLICK_WEAPON,CMD.OPT_INTERNAL}, CMD.OPT_ALT}
 				-- Spring.Echo("E")
 				--"PHASE E"--
 				return true,false --hold this command (removed in next frame after giveLOAD_order have inserted command (this avoid unit trigger UnitIdle)

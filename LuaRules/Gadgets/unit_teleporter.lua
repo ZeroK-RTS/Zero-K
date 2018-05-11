@@ -187,8 +187,8 @@ function tele_createBeacon(unitID, x, z, beaconID)
 			Spring.SetUnitRulesParam(beaconID, "connectto", unitID)
 		end
 	end
-	Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
-	Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+	Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, 0)
+	Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, 0)
 end
 
 local function undeployTeleport(unitID)
@@ -453,9 +453,9 @@ function gadget:GameFrame(f)
 							local mx, mz = tx + offset[tele[tid].offsetIndex].x*(size*4 + 120), tz + offset[tele[tid].offsetIndex].z*(size*4 + 120)
 							GiveClampedMoveGoalToUnit(teleportiee, mx, mz)
 							
-							Spring.GiveOrderToUnit(teleportiee, CMD.WAIT, {}, {})
-							Spring.GiveOrderToUnit(teleportiee, CMD.WAIT, {}, {})
-							Spring.GiveOrderToUnit(teleportiee, CMD.REMOVE, {cQueue[1].tag}, {})
+							Spring.GiveOrderToUnit(teleportiee, CMD.WAIT, {}, 0)
+							Spring.GiveOrderToUnit(teleportiee, CMD.WAIT, {}, 0)
+							Spring.GiveOrderToUnit(teleportiee, CMD.REMOVE, {cQueue[1].tag}, 0)
 						end
 					end
 					

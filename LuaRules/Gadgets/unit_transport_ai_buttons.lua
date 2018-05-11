@@ -161,7 +161,7 @@ end
 
 
 function gadget:UnitGiven(unitID) -- minor hack unrelated to transport ai - enable captured unit
-    GiveOrderToUnit(unitID, CMD_ONOFF, { 1 }, { })
+    GiveOrderToUnit(unitID, CMD_ONOFF, { 1 }, 0)
 end
 
 
@@ -197,14 +197,14 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if cmdID == CMD_TRANSPORTTO and (cmdOptions.shift) then
 		return true --transportTo cannot properly support queue, block when in SHIFT
 	end
-    local opt = {"alt"}
+    local opt = CMD.OPT_ALT
 	local embark = true
     if (cmdID == CMD_DISEMBARK and cmdOptions.shift) then 
-		opt[#opt+1] = "ctrl"  --Note: Disembark only when in SHIFT mode ("ctrl" is used to mark disembark point)
+		opt = opt + CMD.OPT_CTRL  --Note: Disembark only when in SHIFT mode (ctrl is used to mark disembark point)
 		embark = false --prevent enter into priority queue
 	end
 	if (cmdOptions.shift) then
-		opt[#opt+1] = "shift"
+		opt = opt + CMD.OPT_SHIFT
 	end
 	if cmdID == CMD_TRANSPORTTO then --only CMD_TRANSPORTTO have coordinate parameter.
 		GiveOrderToUnit(unitID, CMD_RAW_MOVE, {cmdParams[1],cmdParams[2],cmdParams[3]}, opt) -- This move command determine transport_AI destination.

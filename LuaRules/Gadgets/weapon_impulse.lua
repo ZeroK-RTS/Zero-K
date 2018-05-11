@@ -329,7 +329,7 @@ local function PushPullToggleCommand(unitID, unitDefID, state)
 	end
 	
 	if state then
-		spGiveOrderToUnit(unitID, CMD_ONOFF, {state, CMD_PUSH_PULL},{})
+		spGiveOrderToUnit(unitID, CMD_ONOFF, {state, CMD_PUSH_PULL}, 0)
 	end
 end
 
@@ -502,12 +502,12 @@ local function AddImpulses()
 					--if data.allied then
 						local cQueue = spGetCommandQueue(unitID,1)
 						if #cQueue >= 1 and cQueue[1].id == CMD_GUARD then
-							spGiveOrderToUnit(unitID, CMD_STOP, {0},{})
+							spGiveOrderToUnit(unitID, CMD_STOP, {0}, 0)
 						end
 
 						local states = spGetUnitStates(unitID)
 						if states["repeat"] then
-							spGiveOrderToUnit(unitID, CMD_REPEAT, {0},{})
+							spGiveOrderToUnit(unitID, CMD_REPEAT, {0}, 0)
 						end
 					--end
 					--[[

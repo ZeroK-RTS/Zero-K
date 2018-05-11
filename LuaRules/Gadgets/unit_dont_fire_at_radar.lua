@@ -97,10 +97,10 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			--GG.unitEcho(targetID, "target")
 			if (not GG.recursion_GiveOrderToUnit) and wantGoodTarget[unitID] then
 				wantGoodTarget[unitID] = nil
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ATTACK, CMD_OPT_INTERNAL, targetID }, {"alt"} )
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ATTACK, CMD_OPT_INTERNAL, targetID }, CMD.OPT_ALT )
 				local cQueue = spGetCommandQueue(unitID, 2)
 				if isTheRightSortOfCommand(cQueue, 2)  then
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[2].tag}, {} )
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[2].tag}, 0 )
 				end
 			end
 			return true, defPriority
@@ -119,9 +119,9 @@ function GG.DontFireRadar_CheckAim(unitID)
 		local data = units[unitID]
 		if isTheRightSortOfCommand(cQueue, 1) and not canShootAtUnit(cQueue[1].params[1], spGetUnitAllyTeam(unitID)) then
 			local firestate = spGetUnitStates(unitID).firestate
-			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {0}, {} )
-			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {firestate}, {} )
+			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {0}, 0 )
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0 )
+			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {firestate}, 0 )
 			wantGoodTarget[unitID] = {command = true}
 			spSetUnitTarget(unitID,0)
 		end

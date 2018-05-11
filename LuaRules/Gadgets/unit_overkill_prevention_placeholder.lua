@@ -160,8 +160,8 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 			local cmd = queue[1]
 			if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
 				--Spring.Echo("Removing auto-attack command")
-				spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
-				--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
+				spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, 0 )
+				--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0 )
 			end
 		else
 			spSetUnitTarget(unitID, 0)

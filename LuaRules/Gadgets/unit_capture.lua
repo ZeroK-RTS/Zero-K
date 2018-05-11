@@ -227,7 +227,7 @@ local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID, old
 	end
 	
 	spTransferUnit(unitID, newTeam, false)
-	spGiveOrderToUnit(unitID, CMD_STOP, {}, {})
+	spGiveOrderToUnit(unitID, CMD_STOP, {}, 0)
 end
 
 --------------------------------------------------------------------------------
@@ -319,7 +319,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		
 		-- destroy the unit if the controller is set to destroy units
 		if controllers[attackerID].killSubordinates and attackerAllyTeam ~= (capturedUnits[unitID] or {}).originAllyTeam then
-			spGiveOrderToUnit(unitID, CMD_SELFD, {}, {})
+			spGiveOrderToUnit(unitID, CMD_SELFD, {}, 0)
 		end
 		return 0
 	end

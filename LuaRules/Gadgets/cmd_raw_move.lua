@@ -566,7 +566,7 @@ local function CheckConstructorBuild(unitID)
 
 	if cmd and cmd.id == CMD_RAW_BUILD then
 		if (not cx) or math.abs(cx - cmd.params[1]) > 3 or math.abs(cz - cmd.params[3]) > 3 then
-			Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmd.tag}, {})
+			Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmd.tag}, 0)
 			StopRawMoveUnit(unitID, true)
 		end
 		return
@@ -680,7 +680,7 @@ local function ReplaceMoveCommand(unitID)
 		else
 			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_RAW_MOVE, 0, cmd.params[1], cmd.params[2], cmd.params[3]}, CMD.OPT_ALT)
 		end
-		Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmd.tag}, {})
+		Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmd.tag}, 0)
 	end
 end
 
@@ -709,8 +709,8 @@ local function WaitWaitMoveUnit(unitID)
 	if unitData then
 		ResetUnitData(unitData)
 	end
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
 end
 
 local function AddRawMoveUnit(unitID)

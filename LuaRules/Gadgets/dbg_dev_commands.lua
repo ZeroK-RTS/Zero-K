@@ -409,12 +409,12 @@ local ORDERS_PASSIVE = {
 	{
 		CMD.FIRE_STATE,
 		{0},
-		{},
+		0,
 	},
 	{
 		CMD.MOVE_STATE,
 		{0},
-		{},
+		0,
 	},
 }
 

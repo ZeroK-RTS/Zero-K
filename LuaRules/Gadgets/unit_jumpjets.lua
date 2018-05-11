@@ -376,8 +376,8 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		mcDisable(unitID)
 
 		if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
+			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
+			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
 		end
 		
 		if hitStructure then
@@ -606,7 +606,7 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 		-- The first command in the queue is a move command added by the engine.
 		if queue and queue[1] and queue[2] then
 			if queue[2].id == CMD_JUMP and queue[1].id == CMD_MOVE then
-				Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {queue[1].tag}, {})
+				Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {queue[1].tag}, 0)
 			end
 		end
 	end

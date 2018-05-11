@@ -30,16 +30,12 @@ local function ReloadQueue(queue, cmdTag)
 	for i=start,#queue do
 		local cmd = queue[i]
 		local cmdOpt = cmd.options
-		local opts = {"shift"} -- appending
-		if (cmdOpt.alt) then opts[#opts+1] = "alt" end
-		if (cmdOpt.ctrl) then opts[#opts+1] = "ctrl" end
-		if (cmdOpt.right) then opts[#opts+1] = "right" end
-		Spring.GiveOrderToUnit(unitID, cmd.id, cmd.params, opts)
+		Spring.GiveOrderToUnit(unitID, cmd.id, cmd.params, cmdOpt.coded + (cmdOpt.shift and 0 or CMD.OPT_SHIFT))
 	end
 	
 	if re and start == 2 then
 		local cmd = queue[1]
-		spGiveOrderToUnit(unitID, cmd.id, cmd.params, {"shift"})
+		spGiveOrderToUnit(unitID, cmd.id, cmd.params, CMD.OPT_SHIFT)
 	end
 	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, 0)
 	
@@ -61,7 +57,7 @@ local function ReloadQueue(queue, cmd)
 	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, 0)
 	
 	if re then
-		spGiveOrderToUnit(unitID, cmd.id, cmd.params, {"shift"})
+		spGiveOrderToUnit(unitID, cmd.id, cmd.params, CMD.OPT_SHIFT)
 	end
 	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, 0)
 	

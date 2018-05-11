@@ -214,8 +214,8 @@ local function removeUnit(unitID)
 	if unitDefID and validUnits[unitDefID] and unitById[unitID] then
 		if waitWaitUnits[unitDefID] then
 			clearTarget(unitID)
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
+			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
+			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
 		end
 		if unitById[unitID] ~= unit.count then
 			unit.data[unitById[unitID]] = unit.data[unit.count]
