@@ -40,7 +40,9 @@ local SIG_AIM = 2
 -- main code
 --------------------------------------------------------------------------------
 function SetPadNum(num)
-	padnum = num
+	if num ~= nil then
+		padnum = num
+	end
 end
 
 function GetPadNum(num)
