@@ -170,6 +170,9 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		silos[unitID] = {}
 	elseif silos[builderID] then
 		Spring.SetUnitBlocking(unitID, false, false) -- non-blocking, non-collide (try to prevent pad detonations)
+		Spring.SetUnitRulesParam(unitID, "missile_parentSilo", builderID)
+		local spawnedFrame = (Spring.GetGameRulesParam("totalSaveGameFrame") or 0) + Spring.GetGameFrame()
+		Spring.SetUnitRulesParam(unitID, "missile_spawnedFrame", spawnedFrame)
 	end
 end
 
@@ -206,6 +209,7 @@ function gadget:Load(zip)
 		for i = 1, MISSILES_PER_SILO do
 			if missiles[i] ~= nil then
 				missiles[i] = GG.SaveLoad.GetNewUnitID(missiles[i])
+				Spring.SetUnitRulesParam(missiles[i], "missile_parentSilo", siloID)
 			end
 		end
 		SetSiloPadNum(siloID, GetFirstEmptyPad(siloID))
