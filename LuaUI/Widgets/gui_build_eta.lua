@@ -34,10 +34,17 @@ local displayETA = true
 local previousFullview = false
 
 options_path = 'Settings/Interface/Build ETA'
-options_order = { 'showonlyonshift', 'fontsize', 'drawHeight'}
+options_order = { 'showonlyonshift', 'showforicons', 'fontsize', 'drawHeight'}
 options = {
 	showonlyonshift = {
 		name = 'Show only on shift',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+	},
+	showforicons = {
+		name = 'Show for icons',
+		desc = 'Whether to show for radar icons during strategic zoom.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -308,7 +315,13 @@ function widget:Update()
 	end
 end
 
-local function DrawEtaText(timeLeft,yoffset, negative)
+local spGetUnitViewPosition = Spring.GetUnitViewPosition
+local spIsUnitIcon = Spring.IsUnitIcon
+local function DrawEtaText(unitID, timeLeft,yoffset, negative)
+	if not options.showforicons.value and spIsUnitIcon(unitID) then
+		return
+	end
+
 	local etaStr
 	if (timeLeft == nil) then
 		etaStr = '\255\255\255\1' .. build_eta_translation .. ' \255\1\1\255???'
@@ -316,11 +329,16 @@ local function DrawEtaText(timeLeft,yoffset, negative)
 		local color = negative and '\255\255\1\1' or '\255\1\255\1'
 		etaStr = "\255\255\255\1" .. string.format('%s %s%d:%02d', build_eta_translation, color, timeLeft / 60, timeLeft % 60)
 	end
-
-	gl.Translate(0, yoffset,0)
-	gl.Billboard()
-	gl.Translate(0, 5 ,0)
-	gl.Text(etaStr, 0, 0, fontSize, "co")
+	local x, y, z = spGetUnitViewPosition(unitID)
+	
+	if x and y and z then
+		gl.PushMatrix()
+			gl.Translate(x, y + yoffset, z)
+			gl.Billboard()
+			gl.Translate(0, 5 ,0)
+			gl.Text(etaStr, 0, 0, fontSize, "co")
+		gl.PopMatrix()
+	end
 end
 
 function widget:DrawWorld()
@@ -334,13 +352,13 @@ function widget:DrawWorld()
 	gl.Color(1, 1, 1)
 
 	for unitID, bi in pairs(etaTable) do
-		gl.DrawFuncAtUnit(unitID, false, DrawEtaText, bi.timeLeft,bi.yoffset, bi.negative)
+		DrawEtaText(unitID, bi.timeLeft,bi.yoffset, bi.negative)
 	end
 
 	for unitID, bi in pairs(stockpileEtaTable) do
 		local stocked, wanted = Spring.GetUnitStockpile(unitID)
 		if (stocked < wanted) then
-			gl.DrawFuncAtUnit(unitID, false, DrawEtaText, bi.timeLeft,bi.yoffset, false)
+			DrawEtaText(unitID, bi.timeLeft, bi.yoffset, false)
 		end
 	end
 

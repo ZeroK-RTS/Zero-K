@@ -19,10 +19,10 @@ end
 -------------------------------------------------------------
 
 local depthcharge = {
-		seaHold = 2*30,
-		landHold = 2*30,
-		maxHeight = 20,
-	}
+	seaHold = 2*30,
+	landHold = 4*30,
+	maxHeight = 20,
+}
 
 local projectileDefs = {
 	[WeaponDefNames["hoverdepthcharge_depthcharge"].id] = depthcharge,

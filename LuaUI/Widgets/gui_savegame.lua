@@ -20,6 +20,9 @@ local SAVE_DIR = "Saves"
 local SAVE_DIR_LENGTH = string.len(SAVE_DIR) + 2
 local AUTOSAVE_DIR = SAVE_DIR .. "/auto"
 local MAX_SAVES = 999
+
+local LOAD_GAME_STRING = "loadFilename "
+
 --------------------------------------------------------------------------------
 -- Chili elements
 --------------------------------------------------------------------------------
@@ -71,6 +74,7 @@ local function SecondsToClock(seconds)
 			return mins..":"..secs
 		end
 	end
+	return "unknown"
 end
 
 local function DisposeWindow()
@@ -107,7 +111,7 @@ local function SortSavesByFilename(a, b)
 		return false
 	end
 	if a.filename and b.filename then
-		return a.filename > b.filename
+		return a.filename < b.filename
 	end
 	return false
 end
@@ -139,7 +143,7 @@ local function GetSaves()
 	Spring.CreateDir(SAVE_DIR)
 	local saves = {}
 	local savefiles = VFS.DirList(SAVE_DIR, "*.lua")
-	for i=1,#savefiles do
+	for i = 1, #savefiles do
 		local path = savefiles[i]
 		local saveData = GetSave(path)
 		if saveData then
@@ -153,7 +157,7 @@ end
 -- e.g. if save slots 1, 2, 5, and 7 are used, return 3
 -- only use for save name fallback
 local function FindFirstEmptySaveSlot()
-	for i=0,MAX_SAVES do
+	for i = 0, MAX_SAVES do
 		local num = string.format("%03d", i)
 		if not VFS.FileExists(SAVE_DIR .. "/save" .. num .. ".lua") then
 			return i
@@ -167,7 +171,7 @@ local function GetSaveDescText(saveFile)
 	return (saveFile.description or "no description")
 		.. "\n" .. saveFile.gameName .. " " .. saveFile.gameVersion
 		.. "\n" .. saveFile.map
-		.. "\n" .. (WG.Translate("interface", "time_ingame") or "Ingame time").. ": " ..  SecondsToClock(saveFile.gameframe/30)
+		.. "\n" .. (WG.Translate("interface", "time_ingame") or "Ingame time").. ": " ..  SecondsToClock((saveFile.totalGameframe or saveFile.gameframe or 0)/30)
 		.. "\n" .. WriteDate(saveFile.date)
 end
 
@@ -194,7 +198,9 @@ local function SaveGame(filename, description, requireOverwrite)
 			saveData.gameVersion = Game.gameVersion
 			saveData.engineVersion = Spring.Utilities.GetEngineVersion()
 			saveData.map = Game.mapName
+			saveData.gameID = (Spring.GetGameRulesParam("save_gameID") or Game.gameID)
 			saveData.gameframe = Spring.GetGameFrame()
+			saveData.totalGameframe = Spring.GetGameFrame() + (Spring.GetGameRulesParam("totalSaveGameFrame") or 0)
 			saveData.playerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 			table.save(saveData, path)
 			
@@ -216,32 +222,38 @@ end
 local function LoadGameByFilename(filename)
 	local saveData = GetSave(SAVE_DIR .. '/' .. filename .. ".lua")
 	if saveData then
-		local success, err = pcall(
-			function()
-				-- This should perhaps be handled in chobby first?
-				--Spring.Log(widget:GetInfo().name, LOG.INFO, "Save file " .. path .. " loaded")
-				
-				local script = [[
-[GAME]
-{
-	SaveFile=__FILE__;
-	IsHost=1;
-	OnlyLocal=1;
-	MyPlayerName=__PLAYERNAME__;
-}
-]]
-				script = script:gsub("__FILE__", filename .. ".slsf")
-				script = script:gsub("__PLAYERNAME__", saveData.playerName)
-				Spring.Reload(script)
+		if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
+			Spring.SendLuaMenuMsg(LOAD_GAME_STRING .. filename)
+		else
+			local success, err = pcall(
+				function()
+					-- This should perhaps be handled in chobby first?
+					--Spring.Log(widget:GetInfo().name, LOG.INFO, "Save file " .. path .. " loaded")
+					
+					local script = [[
+	[GAME]
+	{
+		SaveFile=__FILE__;
+		IsHost=1;
+		OnlyLocal=1;
+		MyPlayerName=__PLAYERNAME__;
+	}
+	]]
+					script = script:gsub("__FILE__", filename .. ".slsf")
+					script = script:gsub("__PLAYERNAME__", saveData.playerName)
+					Spring.Reload(script)
+				end
+			)
+			if (not success) then
+				Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error loading game: " .. err)
 			end
-		)
-		if (not success) then
-			Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error loading game: " .. err)
 		end
 	else
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Save game " .. filename .. " not found")
 	end
-	saveFilenameEdit:SetText(filename)
+	if saveFilenameEdit then
+		saveFilenameEdit:SetText(filename)
+	end
 end
 
 local function DeleteSave(filename)
@@ -271,13 +283,14 @@ local function SaveLoadConfirmationDialogPopup(filename, saveMode, description)
 	
 	local yesFunc = function()
 			if (saveMode) then
+				DeleteSave(filename)
 				SaveGame(filename, description, true)
 				-- TODO refresh UI
 			else
 				LoadGameByFilename(filename)
 			end
 		end
-	WG.crude.MakeExitConfirmWindow(text, yesFunc, 78)
+	WG.crude.MakeExitConfirmWindow(text, yesFunc, 78, true, false)
 end
 
 local function PromptSave(filename, description)
@@ -289,6 +302,18 @@ local function PromptSave(filename, description)
 		SaveLoadConfirmationDialogPopup(filename, true)
 	else
 		SaveGame(filename, description)
+		WG.crude.KillSubWindow(false)
+	end
+end
+
+local function GetButtonYPos(index)
+	return (index - 1)*SAVEGAME_BUTTON_HEIGHT + 4
+end
+
+local function UpdateSaveButtonPositions(container) 
+	for i = 1, #container.children do
+		local child = container.children[i]
+		child:SetPos(child.x, GetButtonYPos(#container.children - i + 1))	-- assume reverse order, to match the ordering of the original save buttons
 	end
 end
 
@@ -300,7 +325,7 @@ local function AddSaveEntryButton(parent, saveFile, position, saveMode)
 		name = "save_" .. saveFile.filename,
 		height = SAVEGAME_BUTTON_HEIGHT,
 		width = "100%",
-		y = (position - 1)*SAVEGAME_BUTTON_HEIGHT + 4,
+		y =  GetButtonYPos(position),
 		x = 0,
 		parent = parent,
 	}
@@ -358,7 +383,8 @@ local function AddSaveEntryButton(parent, saveFile, position, saveMode)
 				WG.crude.MakeExitConfirmWindow("Are you sure you want to delete this save?", function() 
 					DeleteSave(saveFile.filename)
 					holder:Dispose()
-				end, 78)
+					UpdateSaveButtonPositions(parent)
+				end, 78, false, false)
 			end
 		}
 	}

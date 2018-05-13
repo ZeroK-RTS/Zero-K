@@ -50,19 +50,17 @@ local spSetUnitHealth     = Spring.SetUnitHealth
 
 include("LuaRules/Configs/constants.lua")
 
-local LAG_THRESHOLD = 25000
-local AFK_THRESHOLD = 30 -- In seconds
+-- in seconds. The delay considered is (ping + time spent afk)
+local TO_AFK_THRESHOLD = 30 -- going above this marks you AFK
+local FROM_AFK_THRESHOLD = 5 -- going below this marks you non-AFK
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utilities
 
+local teamNames = {}
 local function GetTeamName(teamID)
-	local _, leaderID, _, isAiTeam = Spring.GetTeamInfo(teamID)
-	if isAiTeam then
-		return select(2, Spring.GetAIInfo(teamID)) or "Unknown AI on team " .. (teamID or "???")
-	end
-	return select(1, Spring.GetPlayerInfo(leaderID)) or ("Unknown Player on team " .. (teamID or "???"))
+	return teamNames[teamID] or ("Unknown Player on team " .. (teamID or "???"))
 end
 
 local function PlayerIDToTeamID(playerID)
@@ -131,6 +129,7 @@ end
 --------------------------------------------------------------------------------
 -- Activity updates
 
+local playerIsAfk = {}
 local function GetPlayerActivity(playerID)
 	local name, active, spec, team, allyTeam, ping, _, _, _, customKeys = spGetPlayerInfo(playerID)
 	
@@ -140,11 +139,14 @@ local function GetPlayerActivity(playerID)
 	
 	local lastActionTime = spGetGameSeconds() - (mouseActivityTime[playerID] or 0)
 	
-	if lastActionTime >= AFK_THRESHOLD then
-		return
+	if lastActionTime >= TO_AFK_THRESHOLD
+	or lastActionTime >= FROM_AFK_THRESHOLD and playerIsAfk[playerID] then
+		playerIsAfk[playerID] = true
+		return false
 	end
-	
-	return customKeys.elo or 0
+
+	playerIsAfk[playerID] = false
+	return customKeys.elo and tonumber(customKeys.elo) or 0
 end
 
 local function UpdateTeamActivity(teamID)
@@ -345,6 +347,13 @@ function gadget:Initialize()
 		local allyTeamID = select(6, spGetTeamInfo(teamID))
 		teamResourceShare[teamID] = 1
 		allyTeamResourceShares[allyTeamID] = (allyTeamResourceShares[allyTeamID] or 0) + 1
+
+		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		if isAI then
+			teamNames[teamID] = select(2, Spring.GetAIInfo(teamID))
+		else
+			teamNames[teamID] = Spring.GetPlayerInfo(playerID)
+		end
 	end
 
 	GG.Lagmonitor = externalFunctions

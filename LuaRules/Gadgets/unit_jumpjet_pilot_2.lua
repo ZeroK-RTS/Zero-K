@@ -51,7 +51,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		return true
 	end
 	
-	if unitDefID == leaperDefID and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD.FIGHT) then
+	if unitDefID == leaperDefID and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD or cmdID == CMD.FIGHT) then
 		local startX, startZ, startY
 		if cmdOptions.shift then -- queue, use last queue position
 			local queue = Spring.GetCommandQueue(unitID, -1)
@@ -81,7 +81,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 			leapersCommand = leapersCommand or {}
 			leapersCommand[unitID] = {}
 			if not cmdOptions.shift then
-				leapersCommand[unitID][1] = {CMD.STOP, {}, {}}
+				leapersCommand[unitID][1] = {CMD.STOP, {}, 0}
 			end
 			local d = 0
 			local way1,way2,way3 = startX,startY,startZ
@@ -90,21 +90,21 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 				d = d + Dist(way1,way2,way3, waypoints[i][1],waypoints[i][2],waypoints[i][3])
 				way1,way2,way3 = waypoints[i][1],waypoints[i][2],waypoints[i][3]
 				if d >= gridSize then
-					leapersCommand[unitID][idx] = {CMD_JUMP, {waypoints[i][1],waypoints[i][2],waypoints[i][3]}, {"shift"}}
+					leapersCommand[unitID][idx] = {CMD_JUMP, {waypoints[i][1],waypoints[i][2],waypoints[i][3]}, CMD.OPT_SHIFT}
 					idx = idx + 1
-					leapersCommand[unitID][idx] = {CMD.FIGHT, {waypoints[i][1],waypoints[i][2],waypoints[i][3]}, {"shift"}}
+					leapersCommand[unitID][idx] = {CMD.FIGHT, {waypoints[i][1],waypoints[i][2],waypoints[i][3]}, CMD.OPT_SHIFT}
 					idx = idx + 1
 					d = 0
 				end
 			end
-			leapersCommand[unitID][idx] = {CMD_JUMP, {way1, way2, way3}, {"shift"}}
+			leapersCommand[unitID][idx] = {CMD_JUMP, {way1, way2, way3}, CMD.OPT_SHIFT}
 			idx = idx + 1
-			leapersCommand[unitID][idx] = {CMD.FIGHT, {way1, way2, way3}, {"shift"}}
+			leapersCommand[unitID][idx] = {CMD.FIGHT, {way1, way2, way3}, CMD.OPT_SHIFT}
 			idx = idx + 1
-			leapersCommand[unitID][idx] = {CMD_JUMP, {cmdParams[1], cmdParams[2], cmdParams[3]}, {"shift"}}
+			leapersCommand[unitID][idx] = {CMD_JUMP, {cmdParams[1], cmdParams[2], cmdParams[3]}, CMD.OPT_SHIFT}
 		else -- if the computed path shows "no path found" (false), abort
 			leapersCommand = leapersCommand or {}
-			leapersCommand[unitID] = {[1]={CMD.STOP, {}, cmdOptions.shift and {"shift"} or {}}}
+			leapersCommand[unitID] = {[1]={CMD.STOP, {}, cmdOptions.shift and CMD.OPT_SHIFT or 0}}
 			return false;
 		end
 		return false -- reject original command, we're handling it

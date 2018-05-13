@@ -151,7 +151,7 @@ function Spring.Utilities.QuadField(quadSize)
 	for k, v in pairs(quadFieldMethods) do
 		qf[k] = v
 	end
-	Spring.Echo("Total: " .. qf.sizeX * qf.sizeZ .. " quads")
+	--Spring.Echo("Total: " .. qf.sizeX * qf.sizeZ .. " quads")
 
 	for i = 1, qf.sizeX * qf.sizeZ do
 		qf.field[i] = {1} -- first value is array size (number of objects + 1)

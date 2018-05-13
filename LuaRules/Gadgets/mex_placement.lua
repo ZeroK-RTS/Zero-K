@@ -1,10 +1,3 @@
---------------------------------------------------------------------------------
--- SYNCED
---------------------------------------------------------------------------------
-if (not gadgetHandler:IsSyncedCode()) then
-	return
-end
-
 
 function gadget:GetInfo()
   return {
@@ -18,23 +11,30 @@ function gadget:GetInfo()
   }
 end
 
-include("LuaRules/Configs/customcmds.h.lua")
-
 --------------------------------------------------------------------------------
 -- Command Definition
 --------------------------------------------------------------------------------
 
-local mexDefID = UnitDefNames["staticmex"].id
+include("LuaRules/Configs/customcmds.h.lua")
 
 local cmdMex = {
 	id      = CMD_AREA_MEX,
 	type    = CMDTYPE.ICON_AREA,
 	tooltip = 'Area Mex: Click and drag to queue metal extractors in an area.',
 	name    = 'Mex',
-	cursor  = 'Repair',
+	cursor  = 'Mex',
 	action  = 'areamex',
 	params  = {}, 
 }
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+-- SYNCED
+if gadgetHandler:IsSyncedCode() then
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+
+local mexDefID = UnitDefNames["staticmex"].id
 
 local canMex = {}
 for udid, ud in ipairs(UnitDefs) do 
@@ -187,4 +187,19 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		spotData[spotByID[unitID]] = nil
 		spotByID[unitID] = nil
 	end
+end
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+else --UNSYNCED--
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+
+function gadget:Initialize()
+	--Note: IMO we must *allow* LUAUI to draw this command. We already used to seeing skirm command, and it is informative to players. 
+	--Also, its informative to widget coder and allow player to decide when to manually micro units (like seeing unit stuck on cliff with jink command)
+	--gadgetHandler:RegisterCMDID(CMD_RAW_MOVE)
+	--Spring.SetCustomCommandDrawData(CMD_RAW_MOVE, "RawMove", {0.5, 1.0, 0.5, 0.7}) -- "" mean there's no MOVE cursor if the command is drawn.
+	Spring.AssignMouseCursor("Mex", "cursormex", true, true)
+end
+
 end

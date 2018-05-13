@@ -26,8 +26,6 @@ local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) 
 local pwDataRaw = modOptions.planetwarsstructures
 local pwDataFunc, err, success, unitData
 
-pwDataRaw = pwDataRaw
-
 if not (pwDataRaw and type(pwDataRaw) == 'string') then
 	unitData = {}
 else
@@ -39,31 +37,31 @@ else
 	if pwDataFunc then
 		success, unitData = pcall(pwDataFunc)
 		if not success then	-- execute Borat
-			err = pwData
+			err = unitData
 			unitData = {}
 		end
 	end
 end
-if err then 
+if err then
 	Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", 'Planetwars warning: ' .. err)
 end
 
-if not unitData then 
+if not unitData then
 	unitData = {}
 end
 
 --unitData = CopyTable(structureConfig, true)
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-structureDefs = {}	--holds precedurally generated structure defs
-genericStructure = UnitDefs["pw_generic"]
+local structureDefs = {} --holds precedurally generated structure defs
+local genericStructure = UnitDefs["pw_generic"]
 
 local function makeTechStructure(def, name)
 	local techName = string.sub(name,4)
 	techName = UnitDefs[techName]
 	if techName then
 		def.name = techName.name .. " Technology Facility"
-		def.description = "Gives planet owner the ability to construct " .. techName.name 
+		def.description = "Gives planet owner the ability to construct " .. techName.name
 	end
 	structureConfig["generic_tech"](def)
 end
@@ -72,6 +70,7 @@ local function commonDefs(def)
 	local fd = def.featuredefs.dead
 	fd.collisionvolumetype = fd.collisionvolumetype or def.collisionvolumetype
 	fd.collisionvolumescales = fd.collisionvolumescales or def.collisionvolumescales
+	def.customparams.planetwars = 1
 end
 
 --for name in pairs(unitData) do
@@ -91,7 +90,7 @@ for _, info in pairs(unitData) do
 			structureDefs[info.unitname].description = info.description
 		end
 		structureDefs[info.unitname].customparams.canbeevacuated = info.canBeEvacuated
-	end 
+	end
 end
 
 if LOAD_ALL_STRUCTURES then

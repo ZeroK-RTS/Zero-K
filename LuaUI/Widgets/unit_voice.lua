@@ -16,6 +16,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local EMPTY_TABLE = {}
+local TABLE_1 = {1}
+
 local factories = {}
 
 --------------------------------------------------------------------------------
@@ -57,10 +60,10 @@ function widget:VoiceCommand(commandName, voiceCommandParams)
       local builtUnitID = UnitDefNames[voiceCommandParams.unit].id
       for i=1, voiceCommandParams.number do
         -- todo: send large build orders with "shift" and "ctrl" to reduce network usage
-        Spring.GiveOrderToUnit(unitID, -builtUnitID, {}, voiceCommandParams.insert and {"alt"} or {})
+        Spring.GiveOrderToUnit(unitID, -builtUnitID, EMPTY_TABLE, voiceCommandParams.insert and CMD.OPT_ALT or 0)
       end
       if voiceCommandParams["repeat"] then
-        Spring.GiveOrderToUnit(unitID, CMD.REPEAT, {1}, {})
+        Spring.GiveOrderToUnit(unitID, CMD.REPEAT, TABLE_1, 0)
       end
     end
   end

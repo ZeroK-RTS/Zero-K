@@ -1,0 +1,1 @@
+Shared.FACTORY_COST = 800

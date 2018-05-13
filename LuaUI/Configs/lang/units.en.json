@@ -1,6 +1,6 @@
 {
 	"starlight_satellite" : {
-		"name" : "Owl",
+		"name" : "Glint",
 		"description" : "Starlight relay satellite",
 		"helptext" : "This is the satellite used by Starlight for targeting."
 	},
@@ -10,24 +10,24 @@
 		"helptext" : "A heavy constructor which combines the convenience of flying with high buildpower."
 	},
 	"gunshipskirm" : {
-		"name" : "Rapier",
+		"name" : "Harpy",
 		"description" : "Multi-Role Support Gunship",
-		"helptext" : "The Rapier is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets."
+		"helptext" : "The Harpy is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets."
 	},
 	"factorycloak" : {
-		"name" : "Cloaky Bot Factory",
-		"description" : "Produces Cloaky Robots, Builds at 10 m/s",
-		"helptext" : "Emphasizing guile over brute force, the Cloaky Bot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Warrior, Zeus, Hammer"
+		"name" : "Cloakbot Factory",
+		"description" : "Produces Cloaked, Mobile Robots, Builds at 10 m/s",
+		"helptext" : "Emphasizing guile over brute force, the Cloakbot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Ronin, Reaver, Knight, Sling"
 	},
-	"ampharty" : {
-		"name" : "Kraken",
-		"description" : "Amphibious Skirmisher/Artillery Bot",
-		"helptext" : "The Kraken is a mobile short ranged artillery bot, armed with twin-firing cannons. For underwater combat it can rapidly fire unguided charges to kill slow enemies. "
+	"amphlaunch" : {
+		"name" : "Lobster",
+		"description" : "Amphibious Launcher Bot",
+		"helptext" : "Lacking armaments of its own, the Lobsters response to threats is to throw other units at the problem. Though originally intended for rapid coastline deployement, the Lobster has a variety of uses and can even offensively throw enemies units."
 	},
 	"tankarty" : {
-		"name" : "Pillager",
+		"name" : "Emissary",
 		"description" : "General-Purpose Artillery",
-		"helptext" : "The heavy, long-ranging gun of the Pillager makes it the unit of choice for standoff shelling of enemy mobiles or structures. As always, it should be wary of anything that gets close to it."
+		"helptext" : "The heavy, long-ranging gun of the Emissary makes it the unit of choice for standoff shelling of enemy mobiles or structures. As always, it should be wary of anything that gets close to it."
 	},
 	"staticmissilesilo" : {
 		"name" : "Missile Silo",
@@ -50,9 +50,9 @@
 		"helptext" : "Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. It can spit fiery napalm, spray spores to kill aircraft, and kick land units away from it. Most of all, its jaws can rip apart the largest assault mech in seconds. Only the most determined, focused assault can hope to stop this beast in her tracks."
 	},
 	"tankassault" : {
-		"name" : "Reaper",
+		"name" : "Minotaur",
 		"description" : "Assault Tank",
-		"helptext" : "A heavy duty battle tank. The Reaper excels at absorbing damage in pitched battles, but its low rate of fire means it is not so good at dealing with swarms, and its heavy armor comes at the price of manuverability."
+		"helptext" : "A heavy duty battle tank. The Minotaur excels at absorbing damage in pitched battles, but its low rate of fire means it is not so good at dealing with swarms, and its heavy armor comes at the price of manuverability."
 	},
 	"chicken_listener" : {
 		"name" : "Listener",
@@ -60,9 +60,9 @@
 		"helptext" : "The Listener is an evolved form of the Digger. While it has lost all fighting ability, it has gained a unique sense of hearing that allows it to pinpoint the location of enemy ground forces."
 	},
 	"cloakbomb" : {
-		"name" : "Tick",
+		"name" : "Imp",
 		"description" : "All Terrain EMP Bomb (Burrows)",
-		"helptext" : "The Tick relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Warriors or Glaives can then eliminate the helpless enemies without risk. Counter with defenses or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle."
+		"helptext" : "The Imp relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Reavers or Glaives can then eliminate the helpless enemies without risk. Counter with defenses or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle."
 	},
 	"shieldriot" : {
 		"name" : "Outlaw",
@@ -100,9 +100,9 @@
 		"helptext" : "This Torpedo Launcher provides defense against both surface and submerged vessels."
 	},
 	"tankheavyassault" : {
-		"name" : "Goliath",
+		"name" : "Cyclops",
 		"description" : "Very Heavy Tank Buster",
-		"helptext" : "The Goliath is the single heaviest tank on the field. Its main gun is a hefty cannon designed to smash lesser tanks into oblivion, while mounted on the turret is a short-range slowgun to prevent quicker foes escaping its grasp. However, it turns like a tub of water, its short range makes it easy prey for advanced skirmishers or air attacks, and its slow rate of fire makes it vulnerable to massed raider attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications."
+		"helptext" : "The Cyclops is the single heaviest tank on the field. Its main gun is a hefty cannon designed to smash lesser tanks into oblivion, while mounted on the turret is a short-range slowgun to prevent quicker foes escaping its grasp. However, it turns like a tub of water, its short range makes it easy prey for advanced skirmishers or air attacks, and its slow rate of fire makes it vulnerable to massed raider attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications."
 	},
 	"damagesink" : {
 		"name" : "Damage Sink thing",
@@ -110,9 +110,9 @@
 		"helptext" : "\"I sink, therefore I am.\""
 	},
 	"turretmissile" : {
-		"name" : "Defender",
+		"name" : "Picket",
 		"description" : "Light Missile Tower",
-		"helptext" : "The Defender is a light multi-purpose missile tower. It is good for sniping units from a distance, providing some degree of anti-air protection, and skirmishing enemy LLTs from outside their range. However, it breaks when you sneeze on it."
+		"helptext" : "The Picket is a light multi-purpose missile tower. It is good for sniping units from a distance, providing some degree of anti-air protection, and skirmishing enemy LLTs from outside their range. However, it breaks when you sneeze on it."
 	},
 	"chicken_roc" : {
 		"name" : "Roc",
@@ -120,9 +120,9 @@
 		"helptext" : "Large, angry and capable of fighting both air and land opposition, the Roc is a formidable flying chicken."
 	},
 	"turretaaheavy" : {
-		"name" : "Screamer",
+		"name" : "Artemis",
 		"description" : "Very Long-Range Anti-Air Missile Tower",
-		"helptext" : "The Screamer is an extremely long-ranging first strike anti-air weapon that sends a clear message to enemy aircraft - can't go here, sonny. Each shot must be stockpiled for 20 seconds, but is well worth the time, for a quick salvo of missiles will wipe out almost any air attack without fuss."
+		"helptext" : "The Artemis is an extremely long-ranging first strike anti-air weapon that sends a clear message to enemy aircraft - can't go here, sonny. Each shot must be stockpiled for 20 seconds, but is well worth the time, for a quick salvo of missiles will wipe out almost any air attack without fuss."
 	},
 	"chicken_drone" : {
 		"name" : "Drone",
@@ -130,19 +130,19 @@
 		"helptext" : "A hapless non-combat organism whose sole purpose in life is to morph into one of the Chicken Hive's structures."
 	},
 	"staticjammer" : {
-		"name" : "Sneaky Pete",
+		"name" : "Cornea",
 		"description" : "Area Cloaker/Jammer",
-		"helptext" : "Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. Sneaky Pete is also equipped with a cloak shield to hide nearby units from enemy sight."
+		"helptext" : "Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. The Cornea is also equipped with a cloak shield to hide nearby units from enemy sight."
 	},
 	"amphbomb" : {
 		"name" : "Limpet",
-		"description" : "Amphibious slow bomb",
+		"description" : "Amphibious Slow Bomb",
 		"helptext" : "The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them."
 	},
 	"factoryveh" : {
-		"name" : "Light Vehicle Factory",
-		"description" : "Produces Wheeled Vehicles, Builds at 10 m/s",
-		"helptext" : "A traditional favourite, the Vehicle Plant is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Leveler, Slasher"
+		"name" : "Rover Assembly",
+		"description" : "Produces Light Wheeled Vehicles, Builds at 10 m/s",
+		"helptext" : "A traditional favourite, the Rover Assembly is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Ripper, Slasher"
 	},
 	"turretgauss" : {
 		"name" : "Gauss",
@@ -160,9 +160,9 @@
 		"helptext" : "The Flail launches a single large, short-medium range SAM that does heavy damage."
 	},
 	"cloakarty" : {
-		"name" : "Hammer",
+		"name" : "Sling",
 		"description" : "Light Artillery Bot",
-		"helptext" : "The Hammer has a long range plasma cannon that allows indirect fire over obstacles, and outranges static defenses up to heavy laser towers. Although effective versus mobile units, it should be guarded in order to prevent raiders and other fast units from closing range."
+		"helptext" : "The Sling has a long range plasma cannon that allows indirect fire over obstacles, and outranges static defenses up to heavy laser towers. Although effective versus mobile units, it should be guarded in order to prevent raiders and other fast units from closing range."
 	},
 	"chickend" : {
 		"name" : "Chicken Tube",
@@ -185,9 +185,9 @@
 		"helptext" : "This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases."
 	},
 	"spidercrabe" : {
-		"name" : "Crabe",
+		"name" : "Crab",
 		"description" : "Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary",
-		"helptext" : "The Crabe's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crabe curls up into armored form reducing incoming damage to a third. The Crabe's main weakness is its lack of mobility."
+		"helptext" : "The Crab's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crab curls up into armored form reducing incoming damage to a third. The Crab's main weakness is its lack of mobility."
 	},
 	"subscout" : {
 		"name" : "Lancelet",
@@ -210,9 +210,9 @@
 		"helptext" : "Angler is amphibious anti-air bot designed to counter the factory's nemesis - Raven. Two of them together can float to the surface and kill a single Raven."
 	},
 	"tankaa" : {
-		"name" : "Copperhead",
+		"name" : "Ettin",
 		"description" : "Flak Anti-Air Tank",
-		"helptext" : "The Copperhead's flak cannon makes quick work of enemy gunships, and is also fairly effective against planes."
+		"helptext" : "The Ettin's flak cannon makes quick work of enemy gunships, and is also fairly effective against planes."
 	},
 	"asteroid" : {
 		"name" : "Asteroid",
@@ -220,9 +220,9 @@
 		"helptext" : "Asteroids can be manipulated to fall onto the planet by the Meteor Controller; they serve primarily as a weapon to crush the units they fall on, but they can also be reclaimed for resources."
 	},
 	"planeheavyfighter" : {
-		"name" : "Hawk",
+		"name" : "Raptor",
 		"description" : "Air Superiority Fighter",
-		"helptext" : "The Hawk specializes in bringing down anything else that flies. It is sturdy enough to take limited AA fire, although it has no ground attack capability."
+		"helptext" : "The Raptor specializes in bringing down anything else that flies. It is sturdy enough to take limited AA fire, although it has no ground attack capability."
 	},
 	"hoverskirm2" : {
 		"name" : "Trisula",
@@ -230,9 +230,9 @@
 		"helptext" : "The Trisula is a fairly fast, sturdy combatant armed with a scatter beam weapon that can erase multiple small targets or slag a single large one."
 	},
 	"vehriot" : {
-		"name" : "Leveler",
-		"description" : "Riot Vehicle",
-		"helptext" : "The Leveler's riot cannon is effective at destroying swarms of raiders and halting enemy advances. The projectile does not arc, so Levelers should avoid clumping and be arranged in a line formation wherever possible. Due to their lack of speed and range, most skirmishers are effective against them. True to its name the Leveler's cannon flattens terrain to enable allied vehicles passage over harsh terrain."
+		"name" : "Ripper",
+		"description" : "Riot Rover",
+		"helptext" : "The Ripper's riot cannon is effective at destroying swarms of raiders and halting enemy advances. The projectile does not arc, so Rippers should avoid clumping and be arranged in a line formation wherever possible. Due to their lack of speed and range, most skirmishers are effective against them. The Ripper's cannon flattens terrain to enable allied vehicles passage over harsh terrain."
 	},
 	"staticshield" : {
 		"name" : "Aegis",
@@ -322,10 +322,10 @@
 	"bomberprec" : {
 		"name" : "Raven",
 		"description" : "Precision Bomber",
-		"helptext" : "The Raven drops a single high damage, low AoE bomb. Cost for cost, nothing quite matches it for taking out that antinuke or Reaper, but you should look elsewhere for something to use against smaller mobiles."
+		"helptext" : "The Raven drops a single high damage, low AoE bomb. Cost for cost, nothing quite matches it for taking out that antinuke or Minotaur, but you should look elsewhere for something to use against smaller mobiles."
 	},
 	"chicken_shield" : {
-		"name" : "Toad",
+		"name" : "Blooper",
 		"description" : "Shield/Anti-Air",
 		"helptext" : "Protects adjacent chickens."
 	},
@@ -335,9 +335,9 @@
 		"helptext" : "The Dodo's body contains a volatile mixture of organic explosives. At the slightest provocation, it explodes spectacularly, with the resulting shockwave throwing nearby units into the air. Beware as its flying limbs and spikes will do residual damage."
 	},
 	"bomberheavy" : {
-		"name" : "Wyvern",
+		"name" : "Likho",
 		"description" : "Singularity Bomber",
-		"helptext" : "The Wyvern drops a single powerful bomb that can send units flying. It is sturdy enough to penetrate moderate AA and escape to repair, but should not be used recklessly - it's too expensive for that."
+		"helptext" : "The Likho drops a single powerful bomb that can send units flying. It is sturdy enough to penetrate moderate AA and escape to repair, but should not be used recklessly - it's too expensive for that."
 	},
 	"tacnuke" : {
 		"name" : "Eos",
@@ -360,9 +360,9 @@
 		"helptext" : "The Eclipse's imposing hull can weather significant punishment while steadily blazing to deliver its massive payload of devastation, but the unguided bomb has problems with hitting mobile targets, and big size makes it an easy target."
 	},
 	"cloakassault" : {
-		"name" : "Zeus",
+		"name" : "Knight",
 		"description" : "Lightning Assault Bot",
-		"helptext" : "Slowly and steadily, groups of Zeuses can shrug off heavy fire as they make their way towards enemy fortifications, until they can field their short-range lightning cannon, which damages and stuns entrenched foes. Counter with anything that can reliably kite it, making sure that you don't get paralyzed (in which case you are as good as dead.)"
+		"helptext" : "Slowly and steadily, groups of Knights can shrug off heavy fire as they make their way towards enemy fortifications, until they can field their short-range lightning cannon, which damages and stuns entrenched foes. Counter with anything that can reliably kite it, making sure that you don't get paralyzed (in which case you are as good as dead.)"
 	},
 	"energysolar" : {
 		"name" : "Solar Collector",
@@ -370,12 +370,12 @@
 		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a quarter and offers excellent protection against raiders."
 	},
 	"gunshipheavyskirm" : {
-		"name" : "Brawler",
+		"name" : "Nimbus",
 		"description" : "Fire Support Gunship",
-		"helptext" : "The Brawler is a fire support gunship that flies out of the reach of most ground mobiles. It is tough enough to survive limited anti-air fire, and its twin EMGs chew through units stupid enough to stay put."
+		"helptext" : "The Nimbus is a fire support gunship that flies out of the reach of most ground mobiles. It is tough enough to survive limited anti-air fire, and its twin EMGs chew through units stupid enough to stay put."
 	},
 	"factoryshield" : {
-		"name" : "Shield Bot Factory",
+		"name" : "Shieldbot Factory",
 		"description" : "Produces Tough Robots, Builds at 10 m/s",
 		"helptext" : "The Shield Bot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer"
 	},
@@ -396,7 +396,7 @@
 	},
 	"jumpskirm" : {
 		"name" : "Moderator",
-		"description" : "Distruptor Skirmisher Walker",
+		"description" : "Disruptor Skirmisher Walker",
 		"helptext" : "The Moderator's disruptor beam reduces enemy speed and rate of fire by up to 50%% in addition to dealing damage, making it effective against almost all targets."
 	},
 	"chicken" : {
@@ -415,9 +415,9 @@
 		"helptext" : "The Chainsaw is a long range anti-air turret, dealing out massive damage, able to knock bombers out of the sky very quickly. It can't take very much damage in return, though, and does poorly when attacked directly."
 	},
 	"staticnuke" : {
-		"name" : "Silencer",
+		"name" : "Trinity",
 		"description" : "Strategic Nuclear Launcher, Drains 18 m/s, 3 minute stockpile",
-		"helptext" : "The Silencer launches devastating nuclear missiles that can obliterate entire bases. However, it is easily defeated by enemy anti-nuke systems, which must be removed from the desired target area beforehand."
+		"helptext" : "The Trinity launches devastating nuclear missiles that can obliterate entire bases. However, it is easily defeated by enemy anti-nuke systems, which must be removed from the desired target area beforehand."
 	},
 	"hovershotgun" : {
 		"name" : "Punisher",
@@ -425,9 +425,9 @@
 		"helptext" : "The Punisher has a shotgun which shoots a spray of projectiles which are good against large targets or tight clusters of enemies."
 	},
 	"spiderantiheavy" : {
-		"name" : "Infiltrator",
+		"name" : "Widow",
 		"description" : "Cloaked Scout/Anti-Heavy",
-		"helptext" : "The Infiltrator is useful in two ways. Firstly it is an excellent scout, and very difficult to detect. It can penetrate deep into enemy lines. It also has the capacity to shoot a paralyzing bolt that will freeze any one target, good against heavy enemies and enemy infrastructure."
+		"helptext" : "The Widow is useful in two ways. Firstly it is an excellent scout, and very difficult to detect. It can penetrate deep into enemy lines. It also has the capacity to shoot a paralyzing bolt that will freeze any one target, good against heavy enemies and enemy infrastructure."
 	},
 	"energywind" : {
 		"name" : "Wind/Tidal Generator",
@@ -450,9 +450,9 @@
 		"helptext" : "The Mace is a mobile laser tower. Its high firepower is useful for killing light enemy units. It is perfectly accurate and is good against gunships and fast units. However, its thin armor makes it vulnerable when targetted directly, especially by skirmishers."
 	},
 	"veharty" : {
-		"name" : "Wolverine",
-		"description" : "Artillery Minelayer Vehicle",
-		"helptext" : "The Wolverine lays mines which are fairly effective but have a limited lifespan from a distance (rather haphazardly). The Wolverine outranges most defenses comfortably, but is lightly armored and cannot flee easily so keep it screened with friendly units, possibly assisted by your own mines."
+		"name" : "Badger",
+		"description" : "Artillery Minelayer Rover",
+		"helptext" : "The Badger lays mines which are fairly effective but have a limited lifespan from a distance (rather haphazardly). The Badger outranges most defenses comfortably, but is lightly armored and cannot flee easily so keep it screened with friendly units, possibly assisted by your own mines."
 	},
 	"striderantiheavy" : {
 		"name" : "Ultimatum",
@@ -465,9 +465,9 @@
 		"helptext" : "The metal extractor is the primary means of getting metal. If you have excess energy, metal extractors will automatically use it to extract more metal."
 	},
 	"vehsupport" : {
-		"name" : "Slasher",
-		"description" : "Deployable Missile Vehicle (must stop to fire)",
-		"helptext" : "Keep the Slasher at maximum range to harass the opponent's units. The Slasher's missiles track, so they are ideal to kill fast-moving raiders and crawling bombs. It is able to hit air, but is only really useful against fighters. Cannot fire over obstacles, and does poorly if enemies, particularly assault units, are allowed to close range. Unlike skirmishers, the Slasher cannot fire while moving."
+		"name" : "Fencer",
+		"description" : "Deployable Missile Rover (must stop to fire)",
+		"helptext" : "Keep the Fencer at maximum range to harass the opponent's units. The Fencer's missiles track, so they are ideal to kill fast-moving raiders and crawling bombs. It is able to hit air, but is only really useful against fighters. Cannot fire over obstacles, and does poorly if enemies, particularly assault units, are allowed to close range. Unlike skirmishers, the Fencer cannot fire while moving."
 	},
 	"grebe" : {
 		"name" : "Grebe",
@@ -475,19 +475,19 @@
 		"helptext" : "The Grebe is a basic raider armed with grenades - a decent short ranged anti-heavy weapon. Despite being amphibious, it cannot shoot while submerged."
 	},
 	"hoverarty" : {
-		"name" : "Penetrator",
+		"name" : "Lance",
 		"description" : "Anti-Heavy Artillery Hovercraft",
-		"helptext" : "The Penetrator's weapon, nicknamed 'the Blue Laser of Death', has the power and accuracy to skewer most units with a single shot. Use it against high armor units, but keep it behind the front lines - it has light armor and can't run from danger."
+		"helptext" : "The Lance's weapon, nicknamed 'the Blue Laser of Death', has the power and accuracy to skewer most units with a single shot. Use it against high armor units, but keep it behind the front lines - it has light armor and can't run from danger."
 	},
 	"shieldbomb" : {
-		"name" : "Roach",
+		"name" : "Snitch",
 		"description" : "Crawling Bomb (Burrows)",
-		"helptext" : "This fast-moving suicide unit is very good against massed units, particularly assault tanks. It features a cloaking device which is automatically activated once the unit stands still, effectifely turning it into a mine. Chain explodes terribly, so best not to mass it. Counter with defenders and missile trucks, or single cheap units to set off a premature detonation."
+		"helptext" : "This fast-moving suicide unit is very good against massed units, particularly assault tanks. It features a cloaking device which is automatically activated once the unit stands still, effectively turning it into a mine. Chain explodes terribly, so best not to mass it. Counter with Pickets and missile trucks, or single cheap units to set off a premature detonation."
 	},
 	"cloakjammer" : {
-		"name" : "Eraser",
+		"name" : "Iris",
 		"description" : "Area Cloaker/Jammer Walker",
-		"helptext" : "The Eraser has a jamming device to conceal your units' radar returns. It also has a small cloak shield to hide friendly nearby units from enemy sight."
+		"helptext" : "The Iris has a jamming device to conceal your units' radar returns. It also has a small cloak shield to hide friendly nearby units from enemy sight."
 	},
 	"spidercon" : {
 		"name" : "Weaver",
@@ -502,7 +502,7 @@
 	"gunshipkrow" : {
 		"name" : "Krow",
 		"description" : "Flying Fortress",
-		"helptext" : "The Krow may be expensive and ponderous, but its incredible armor allows it do fly into all but the thickest anti-air defenses and engage enemies with its three laser cannons. Best of all, it can drop a large spread of carpet bombs that devastates anything under it."
+		"helptext" : "The Krow may be expensive and ponderous, but its incredible armor allows it to fly into all but the thickest anti-air defenses and engage enemies with its three laser cannons. Best of all, it can unleash a deluge of carpet bombs to devastate anything underneath it."
 	},
 	"neebcomm" : {
 		"name" : "Neeb Comm",
@@ -525,18 +525,18 @@
 		"helptext" : "The Inferno is a large AoE fire weapon. Its direct damage is modest, but the cloud of fire it creates lasts for a very long time."
 	},
 	"factoryamph" : {
-		"name" : "Amphibious Bot Plant",
+		"name" : "Amphbot Factory",
 		"description" : "Produces Amphibious Bots, Builds at 10 m/s",
 		"helptext" : "The Amphibious Operations Plant builds the slow but sturdy amphibious bots, providing an alternative approach to land/sea warfare. Units from this factory typically regenerate while submerged."
 	},
 	"factoryship" : {
 		"name" : "Shipyard",
-		"description" : "Produces Ships, Builds at 10 m/s",
+		"description" : "Produces Naval Units, Builds at 10 m/s",
 		"helptext" : "Shipyard is where both ships and submarines are built. Other waterborne units such as hovercraft and amphibious bots have separate factories."
 	},
 	"vehassault" : {
 		"name" : "Ravager",
-		"description" : "Assault Vehicle",
+		"description" : "Assault Rover",
 		"helptext" : "Expensive and powerful, the Ravager is capable of holding its own against most opposition. Though its maneuverability is terrible, its strength is when moving at a considerable top speed in a straight line. Due to this, it is almost impossible to skirmish using raiders. In combat, you should attempt to keep travelling forward and not turn too suddenly, so as to maintain top speed. Circling your target at the edge of your range is a good tactic. An arcing projectile allows it to shoot over wreckage, other tanks, etc. Vulnerable to crawling bombs when in swarms."
 	},
 	"raveparty" : {
@@ -550,9 +550,9 @@
 		"helptext" : "The Lotus is a basic turret. A versatile, solid anti-ground weapon, it does well versus scouts as well as being able to take on one or two raiders. Falls relatively easily to skirmishers, artillery or assault units unless supported."
 	},
 	"cloakskirm" : {
-		"name" : "Rocko",
+		"name" : "Ronin",
 		"description" : "Skirmisher Bot (Direct-Fire)",
-		"helptext" : "The Rocko's low damage, low speed unguided rockets are redeemed by their range. They are most effective in a line formation, firing at maximum range and kiting the enemy. Counter them by attacking them with fast units which can close range and dodge their missiles."
+		"helptext" : "The Ronin's low damage, low speed unguided rockets are redeemed by their range. They are most effective in a line formation, firing at maximum range and kiting the enemy. Counter them by attacking them with fast units which can close range and dodge their missiles."
 	},
 	"tankcon" : {
 		"name" : "Welder",
@@ -590,9 +590,9 @@
 		"helptext" : "The Dampener deploys mines a short distance from itself."
 	},
 	"gunshiptrans" : {
-		"name" : "Valkyrie",
+		"name" : "Charon",
 		"description" : "Air Transport",
-		"helptext" : "The Valkyrie is the basic air transport. It is ideal to ferry units to the front or make a drop deep behind enemy lines, but should not be used to land in areas with any kind of AA cover."
+		"helptext" : "The Charon is the basic air transport. It is ideal to ferry units to the front or make a drop deep behind enemy lines, but should not be used to land in areas with any kind of AA cover."
 	},
 	"striderdetriment" : {
 		"name" : "Detriment",
@@ -606,7 +606,7 @@
 	},
 	"jumpcon" : {
 		"name" : "Constable",
-		"description" : "Jumpjet Constructor, Builds at 5 m/s",
+		"description" : "Jumpjet Constructor, Builds at 4 m/s",
 		"helptext" : "Fast and capable of jumping over short distances or heights, the Constable is the ideal constructor for rapid expansion. Armed with a light slowbeam, it can also provide combat support."
 	},
 	"chicken_blimpy" : {
@@ -621,7 +621,7 @@
 	},
 	"athena" : {
 		"name" : "Athena",
-		"description" : "Airborne SpecOps Engineer, Builds at 7.5 m/s",
+		"description" : "Airborne SpecOps Engineer, Builds at 15 m/s",
 		"helptext" : "The Athena is the pinnacle of stealth strike capability. Equipped with a cloaking device and a radar jammer, it can slip through enemy lines to assemble squads of raiders, inflicting havoc on the opposition's logistics. The Athena can also resurrect wrecks on the battlefield, adding them to your army."
 	},
 	"staticsonar" : {
@@ -641,28 +641,28 @@
 	},
 	"vehscout" : {
 		"name" : "Dart",
-		"description" : "Raider/Scout Vehicle",
+		"description" : "Disruptor Raider/Scout Rover",
 		"helptext" : "Cheap and fast, the Dart is deadly in the first minutes of the game if your opponent is caught off-guard. Use missile towers, LLTs or any quick units to stop them."
 	},
 	"factoryhover" : {
 		"name" : "Hovercraft Platform",
 		"description" : "Produces Hovercraft, Builds at 10 m/s",
-		"helptext" : "The Hovercraft Platform is fast and deadly, offering the ability to cross sea and plains alike and outmaneuver the enemy. Key units: Dagger, Halberd, Scalpel, Mace, Penetrator"
+		"helptext" : "The Hovercraft Platform is fast and deadly, offering the ability to cross sea and plains alike and outmaneuver the enemy. Key units: Dagger, Halberd, Scalpel, Mace, Lance"
 	},
 	"gunshipassault" : {
-		"name" : "Black Dawn",
+		"name" : "Revenant",
 		"description" : "Heavy Raider/Assault Gunship",
-		"helptext" : "The Black Dawn fires a volley of unguided rockets. It has high HP and a huge damage output, but is expensive and inaccurate, especially vs moving targets. It is best for taking on clumps of base structures, slow moving or stationary units. The Black Dawn should disengage between volleys to minimize damage taken."
+		"helptext" : "The Revenant fires a volley of unguided rockets. It has high HP and a huge damage output, but is expensive and inaccurate, especially vs moving targets. It is best for taking on clumps of base structures, slow moving or stationary units. The Revenant should disengage between volleys to minimize damage taken."
 	},
 	"tankriot" : {
-		"name" : "Banisher",
+		"name" : "Ogre",
 		"description" : "Heavy Riot Support Tank",
-		"helptext" : "Remarkably mobile for a riot platform, the Banisher packs twin high-velocity fragmentation missiles that are devastating to light units and aircraft alike, although they have limited range. Like other riot units, the Banisher does not have the range and speed to hold its own against most skirmishers. The missile is quite effective at flattening terrain so it is particularly useful at knocking down walls that Welders cannot reach."
+		"helptext" : "Remarkably mobile for a riot platform, the Ogre packs twin high-velocity fragmentation missiles that are devastating to light units and aircraft alike, although they have limited range. Like other riot units, the Ogre does not have the range and speed to hold its own against most skirmishers. The missile is quite effective at flattening terrain so it is particularly useful at knocking down walls that Welders cannot reach."
 	},
 	"staticantinuke" : {
-		"name" : "Protector",
+		"name" : "Antinuke",
 		"description" : "Strategic Nuke Interception System",
-		"helptext" : "The Protector automatically intercepts enemy nuclear ICBMs aimed within its coverage radius."
+		"helptext" : "The Antinuke automatically intercepts enemy nuclear ICBMs aimed within its coverage radius."
 	},
 	"staticheavyarty" : {
 		"name" : "Big Bertha",
@@ -670,18 +670,18 @@
 		"helptext" : "The Bertha is a massive cannon that fires high-energy plasmoids across the map. Used appropriately, it can effectively suppress enemy operations from the safety of your base. Do not expect it to win battles alone for you, however."
 	},
 	"cloaksnipe" : {
-		"name" : "Spectre",
+		"name" : "Phantom",
 		"description" : "Cloaked Skirmish/Anti-Heavy Artillery Bot",
-		"helptext" : "The Spectre's energy rifle inflicts heavy damage to a single target. It can fire while cloaked; however its visible round betrays its position. It requires quite a bit of energy to keep cloaked, especially when moving. The best way to locate a Spectre is by sweeping the area with many cheap units."
+		"helptext" : "The Phantom's energy rifle inflicts heavy damage to a single target. It can fire while cloaked; however its visible round betrays its position. It requires quite a bit of energy to keep cloaked, especially when moving. The best way to locate a Phantom is by sweeping the area with many cheap units."
 	},
 	"staticarty" : {
-		"name" : "Behemoth",
-		"description" : "Plasma Artillery Battery - Requires 50 Power",
-		"helptext" : "The Behemoth offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly."
+		"name" : "Cerberus",
+		"description" : "Plasma Artillery Battery - Power by connecting to a 50 energy grid",
+		"helptext" : "The Cerberus offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly."
 	},
 	"wolverine_mine" : {
 		"name" : "Claw",
-		"description" : "Wolverine Mine",
+		"description" : "Badger Mine",
 		"helptext" : "This mine doesn't explode - instead, it releases a flurry of bomblets at trespassing enemies. It deactivates after one minute."
 	},
 	"staticradar" : {
@@ -701,7 +701,7 @@
 	},
 	"vehraid" : {
 		"name" : "Scorcher",
-		"description" : "Raider Vehicle",
+		"description" : "Raider Rover",
 		"helptext" : "Capable of taking damage and dishing it out, the Scorcher is a versatile unit that remains very useful for more than just raiding, though it pays the price in manueverability and in cost. Though able to hold its own in combat, it is no match for anti-swarm and riot units or defenses. The Scorcher's heatray deals more damage up close."
 	},
 	"striderfunnelweb" : {
@@ -710,9 +710,9 @@
 		"helptext" : "The slow all-terrain Funnelweb features an area shield and a powerful drone complement."
 	},
 	"cloakriot" : {
-		"name" : "Warrior",
+		"name" : "Reaver",
 		"description" : "Riot Bot",
-		"helptext" : "The Warrior's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defense, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Warriors quickly regenerate damage when out of combat."
+		"helptext" : "The Reaver's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defense, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Reavers quickly regenerate damage when out of combat."
 	},
 	"chickenspire" : {
 		"name" : "Chicken Spire",
@@ -727,7 +727,7 @@
 	"factoryspider" : {
 		"name" : "Spider Factory",
 		"description" : "Produces Spiders, Builds at 10 m/s",
-		"helptext" : "Optimized for rough terrain, the Spider Factory relies primarily on range and maneuverability rather than brute force. Key units: Flea, Recluse, Hermit, Crabe"
+		"helptext" : "Optimized for rough terrain, the Spider Factory relies primarily on range and maneuverability rather than brute force. Key units: Flea, Recluse, Hermit, Crab"
 	},
 	"chicken_dragon" : {
 		"name" : "White Dragon",
@@ -761,7 +761,7 @@
 	},
 	"vehheavyarty" : {
 		"name" : "Impaler",
-		"description" : "Precision Artillery Vehicle",
+		"description" : "Precision Artillery Rover",
 		"helptext" : "The Impaler fires vertically a high damage, high accuracy kinetic missile at long range. Its high arc makes it able to fire over any obstacle, however that makes the flight time so high that it's useless against moving targets. Use the Impaler to kill specific buildings."
 	},
 	"zenith" : {
@@ -771,18 +771,13 @@
 	},
 	"vehaa" : {
 		"name" : "Crasher",
-		"description" : "Fast Anti-Air Vehicle",
+		"description" : "Fast Anti-Air Rover",
 		"helptext" : "The Crasher is a speedy solution to enemy bomber attacks, and also works well against gunships."
 	},
 	"spiderskirm" : {
 		"name" : "Recluse",
 		"description" : "Skirmisher Spider (Indirect Fire)",
 		"helptext" : "An all terrain missile launching unit. Climb walls with this spider walker and take your enemy by surprise. The unguided rockets cannot hit a rapidly jinking target, but they have a fairly long range."
-	},
-	"thicket" : {
-		"name" : "Thicket",
-		"description" : "Barricade",
-		"helptext" : "Thickets are the Thunderbirds' perimeter defense."
 	},
 	"fakeunit_los" : {
 		"name" : "LOS Provider",
@@ -835,9 +830,9 @@
 		"helptext" : "The Hermit can take an incredible beating, and is useful as a shield for the weaker, more-damaging Recluses."
 	},
 	"turretantiheavy" : {
-		"name" : "Annihilator",
-		"description" : "Tachyon Projector - Requires 50 Power",
-		"helptext" : "Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter."
+		"name" : "Lucifer",
+		"description" : "Tachyon Projector - Power by connecting to a 50 energy grid",
+		"helptext" : "Inside the heavily armored shell of the Lucifer lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Lucifer is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter."
 	},
 	"jumparty" : {
 		"name" : "Firewalker",
@@ -866,7 +861,7 @@
 	},
 	"vehcon" : {
 		"name" : "Mason",
-		"description" : "Construction Vehicle, Builds at 5 m/s",
+		"description" : "Construction Rover, Builds at 5 m/s",
 		"helptext" : "Highly mobile and capable of taking a beating, the Mason can quickly expand over a large area."
 	},
 	"amphtele" : {
@@ -915,7 +910,7 @@
 		"helptext" : "This Destroyer is a general-purpose combat vessel, combining a strong area-of-effect sonic cannon, a medium-range vertical launch missile, and strong armor. Use its sonic gun against smaller opponents above and below the water, and its missile against static targets."
 	},
 	"shiparty" : {
-		"name" : "Ronin",
+		"name" : "Envoy",
 		"description" : "Cruiser (Artillery)",
 		"helptext" : "This Cruiser packs a powerful, long-range artillery cannon, useful for bombarding fixed emplacements and shore targets. Beware of aircraft, submarines and raider ships."
 	},
@@ -940,13 +935,13 @@
 		"helptext" : "The Gunship Plant is designed for close air support. It includes a selection of transports for hauling land units around, and combat gunships which can perform a variety of offensive or defensive roles."
 	},
 	"turretheavy" : {
-		"name" : "Doomsday Machine",
-		"description" : "Medium Range Defense Fortress - Requires 50 Power",
-		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Doomsday Machine forms a focal defense point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a quarter, although it cannot fire its weapons while doing so."
+		"name" : "Desolator",
+		"description" : "Medium Range Defense Fortress - Power by connecting to a 50 energy grid",
+		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Desolator forms a focal defense point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a quarter, although it cannot fire its weapons while doing so."
 	},
 	"turretimpulse" : {
 		"name" : "Newton",
-		"description" : "Gravity Turret - On to Repulse, Off to Attract",
+		"description" : "Gravity Turret",
 		"helptext" : "The Newton is armed with an experimental graviton projector. This weapon does virtually no damage directly, but can push units toward or away from the Newton. You can use it on your own units as well, but beware of friendly fire."
 	},
 	"assaultcruiser" : {
@@ -971,18 +966,18 @@
 	},
 	"vehcapture" : {
 		"name" : "Dominatrix",
-		"description" : "Capture Vehicle",
+		"description" : "Capture Rover",
 		"helptext" : "The Dominatrix captures enemies, turning them against their former allies. Multiple Dominatrix can capture a single target faster, although only one becomes the controller. After taking control of a unit the Dominatrix cannot fire for 12 seconds. If a Dominatrix is destroyed all units it controls are freed."
 	},
 	"factorytank" : {
-		"name" : "Heavy Tank Factory",
-		"description" : "Produces Heavy and Specialized Vehicles, Builds at 10 m/s",
-		"helptext" : "The Heavy Tank Factory is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Pillager, Reaper, Banisher, Goliath"
+		"name" : "Tank Foundry",
+		"description" : "Produces Heavy Tracked Vehicles, Builds at 10 m/s",
+		"helptext" : "The Tank Foundry is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Emissary, Minotaur, Ogre, Cyclops"
 	},
 	"striderbantha" : {
-		"name" : "Bantha",
+		"name" : "Paladin",
 		"description" : "Ranged Support Strider",
-		"helptext" : "The Bantha is an even heavier solution to a particularly uncrackable defense line, with a tachyon projector and EMP missiles for stand-off engagements, lightning hand cannons for general purpose combat, and a good deal of armor. Beware though, for it is defenseless against air and cannot be used effectively on its own."
+		"helptext" : "The Paladin is an even heavier solution to a particularly uncrackable defense line, with a tachyon projector and EMP missiles for stand-off engagements, lightning hand cannons for general purpose combat, and a good deal of armor. Beware though, for it is defenseless against air and cannot be used effectively on its own."
 	},
 	"shipcarrier" : {
 		"name" : "Reef",
@@ -990,19 +985,19 @@
 		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire disarming missile launcher for disabling enemy capital ships at range and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
 	},
 	"turretaaflak" : {
-		"name" : "Cobra",
+		"name" : "Thresher",
 		"description" : "Anti-Air Flak Gun",
-		"helptext" : "The Cobra is a flak cannon with good AoE and a high damage output, letting it swiftly cut enemy gunships to ribbons."
+		"helptext" : "The Thresher is a flak cannon with good AoE and a high damage output, letting it swiftly cut enemy gunships to ribbons."
 	},
 	"factoryjump" : {
-		"name" : "Jump/Specialist Plant",
-		"description" : "Produces Jumpjets and Special Walkers, Builds at 10 m/s",
-		"helptext" : "The esoteric Jumpjet/Specialist Plant offers unique tactical options for rapidly closing the distance in a knife fight, or getting over hills and rivers to cut a path through enemy lines. Key units: Pyro, Moderator, Jack, Firewalker, Sumo"
+		"name" : "Jumpbot Factory",
+		"description" : "Produces Jumpjet Equipped Robots, Builds at 10 m/s",
+		"helptext" : "The esoteric Jumpbot Factory offers unique tactical options for rapidly closing the distance in a knife fight, or getting over hills and rivers to cut a path through enemy lines. Key units: Pyro, Moderator, Jack, Firewalker, Jugglenaut"
 	},
 	"jumpsumo" : {
-		"name" : "Sumo",
-		"description" : "Heavy Riot Jumper - On to Repulse, Off to Attract",
-		"helptext" : "The Sumo's impressive armor makes it a near-unstoppable sphere of death. It stomps on enemy units to break up their formation and can toss the survivors around with its Gravity Beams. Its stomp is the only way it can damage buildings."
+		"name" : "Jugglenaut",
+		"description" : "Heavy Riot Jumper",
+		"helptext" : "The Jugglenaut's impressive armor makes it a near-unstoppable sphere of death. It stomps on enemy units to break up their formation and can toss the survivors around with its Gravity Beams. Its stomp is the only way it can damage buildings."
 	},
 	"jumpscout" : {
 		"name" : "Puppy",
@@ -1020,14 +1015,14 @@
 		"helptext" : "The Quill allows smooth expansion across both land and sea."
 	},
 	"jumpaa" : {
-		"name" : "Archangel",
+		"name" : "Toad",
 		"description" : "Heavy Anti-Air Jumper",
-		"helptext" : "The Archangel packs twin anti-air lasers and an autocannon for slaying enemy aircraft rapidly. It can also jump to quickly access high ground or to escape."
+		"helptext" : "The Toad packs twin anti-air lasers and an autocannon for slaying enemy aircraft rapidly. It can also jump to quickly access high ground or to escape."
 	},
 	"tankheavyraid" : {
-		"name" : "Panther",
+		"name" : "Blitz",
 		"description" : "Lightning Assault/Raider Tank",
-		"helptext" : "The Panther is a high-tech raider. Its weapon, a lightning gun, deals mostly paralyze damage. This way, the Panther can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base. When killed, it sets off an EMP explosion that can stun surrounding raiders."
+		"helptext" : "The Blitz is a high-tech raider. Its weapon, a lightning gun, deals mostly paralyze damage. This way, the Blitz can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base. When killed, it sets off an EMP explosion that can stun surrounding raiders."
 	},
 	"staticheavyradar" : {
 		"name" : "Advanced Radar",
@@ -1037,7 +1032,7 @@
 	"amphimpulse" : {
 		"name" : "Archer",
 		"description" : "Amphibious Raider/Riot Bot",
-		"helptext" : "The Archer uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water. Archers can float to surface in order to fight naval units."
+		"helptext" : "The Archer uses a powerful water cutting jet to hit enemies. Archers can float to surface in order to fight naval units."
 	},
 	"fakeunit" : {
 		"name" : "Fake radar signal",
@@ -1090,9 +1085,9 @@
 		"helptext" : "The Crane flies quickly over any terrain, but is fragile to any AA. Though it has relatively poor nano power compared to other constructors, it is able to build in many hard to reach places and expand an air players territory in a nonlinear fashion. Due to its mobility, it is ideal for reclaiming wrecks and other repetetitive tasks."
 	},
 	"gunshipraid" : {
-		"name" : "Banshee",
+		"name" : "Locust",
 		"description" : "Raider Gunship",
-		"helptext" : "The Banshee is a light gunship. Its high speed and decent damage makes it excellent for quickly taking out enemy economy or inaccurate units like assaults. However, it flies close to the ground and has a short range, meaning even other raiders can engage it on an equal footing. Like any raider, the Banshee should avoid riots and static defense."
+		"helptext" : "The Locust is a light gunship. Its high speed and decent damage makes it excellent for quickly taking out enemy economy or inaccurate units like assaults. However, it flies close to the ground and has a short range, meaning even other raiders can engage it on an equal footing. Like any raider, the Locust should avoid riots and static defense."
 	},
 	"shieldraid" : {
 		"name" : "Bandit",
@@ -1135,9 +1130,9 @@
 		"helptext" : "The Kestrel launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets."
 	},
 	"staticrearm" : {
-		"name" : "Air Repair/Rearm Pad",
+		"name" : "Airpad",
 		"description" : "Repairs and Rearms Aircraft, repairs at 2.5 e/s per pad",
-		"helptext" : "The Air Repair/Rearm Pad repairs up to four aircraft at a time. It also refuels/rearms bombers."
+		"helptext" : "The Airpad repairs up to four aircraft at a time. It also refuels/rearms bombers."
 	},
 	"dynrecon1" : {
 		"name" : "Recon Commander",
@@ -1147,7 +1142,7 @@
 	"gunshipemp" : {
 		"name" : "Gnat",
 		"description" : "Anti-Heavy EMP Drone",
-		"helptext" : "The Gnat can be used to paralyze enemy units. It makes an excellent defensive unit, and when combined with banshees or other units can halt the enemy to give you time to kill him. Offensively it can paralyze even heavily fortified areas, but dies relatively easily to defenders."
+		"helptext" : "The Gnat can be used to paralyze enemy units. It makes an excellent defensive unit, and when combined with banshees or other units can halt the enemy to give you time to kill him. Offensively it can paralyze even heavily fortified areas, but dies relatively easily to Pickets."
 	},
 	"bomberriot" : {
 		"name" : "Phoenix",
@@ -1155,19 +1150,19 @@
 		"helptext" : "The Phoenix's napalm bombs decimate large clumps of units and light structures."
 	},
 	"striderarty" : {
-		"name" : "Catapult",
+		"name" : "Merlin",
 		"description" : "Heavy Saturation Artillery Strider",
-		"helptext" : "The Catapult is an MLRS strider. It can launch a volley of rockets that guarantees the destruction of almost anything in the target area, then quickly retreat behind friendly forces."
+		"helptext" : "The Merlin is an MLRS strider. It can launch a volley of rockets that guarantees the destruction of almost anything in the target area, then quickly retreat behind friendly forces."
 	},
 	"gunshipheavytrans" : {
-		"name" : "Vindicator",
+		"name" : "Hercules",
 		"description" : "Armed Heavy Air Transport",
-		"helptext" : "The Vindicator can haul any land unit in the game. Its twin laser guns and automated cargo ejection system make it ideal for drops into hot LZs."
+		"helptext" : "The Hercules can haul any land unit in the game. Its twin laser guns and automated cargo ejection system make it ideal for drops into hot LZs."
 	},
 	"planescout" : {
-		"name" : "Vulture",
+		"name" : "Owl",
 		"description" : "Area Jammer, Radar/Sonar Plane",
-		"helptext" : "The Vulture provides an unparalleled means for deep scouting, and can locate underwater targets with its sonar. It is also equipped with an area jammer, which prevents radar from working in the area underneath."
+		"helptext" : "The Owl provides an unparalleled means for deep scouting, and can locate underwater targets with its sonar. It is also equipped with an area jammer, which prevents radar from working in the area underneath."
 	},
 	"amphfloater" : {
 		"name" : "Buoy",
@@ -1175,8 +1170,8 @@
 		"helptext" : "The Buoy works around its inability to shoot while submerged by floating to the surface of the sea. Here it can fire a decently ranged cannon with slow damage. It is unable to move while floating."
 	},
 	"dynknight1" : {
-		"name" : "Knight Commander",
+		"name" : "Commander",
 		"description" : "Mobile Assault Commander",
-		"helptext" : "The Knight Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration."
+		"helptext" : "The Knight Commander chassis is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration."
 	}
 }

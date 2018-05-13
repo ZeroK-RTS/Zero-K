@@ -19,6 +19,7 @@ end
 local RETAKING_DEGRADE_TIMER = 15
 local GENERAL_DEGRADE_TIMER = 5
 local DEGRADE_FACTOR = 0.04
+local CAPTURE_LINGER = 0.95
 
 local DAMAGE_MULT = 3 -- n times faster when target is at 0% health
 
@@ -76,10 +77,13 @@ local reloading = {}
 --------------------------------------------------------------------------------
 -- For gadget:Save
 --------------------------------------------------------------------------------
-_G.unitDamage    = unitDamage
-_G.capturedUnits = capturedUnits
-_G.controllers   = controllers
-_G.reloading     = reloading
+local function UpdateSaveReferences()
+	_G.unitDamage    = unitDamage
+	_G.capturedUnits = capturedUnits
+	_G.controllers   = controllers
+	_G.reloading     = reloading
+end
+UpdateSaveReferences()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -123,13 +127,13 @@ local function removeThingFromIterable(id, things, thingByID)
 end
 
 -- transfer with trees
-local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID)
+local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID, oldTeamCaptureLinger)
 	if controllers[unitID] then
 		local unitByID = controllers[unitID].unitByID
 		local i = 1
 		while i <= unitByID.count do
 			local cid = unitByID.data[i]
-			recusivelyTransfer(cid, newTeam, newAlly, unitID)
+			recusivelyTransfer(cid, newTeam, newAlly, unitID, oldTeamCaptureLinger)
 			if cid == unitByID.data[i] then
 				i = i + 1
 			end
@@ -177,13 +181,53 @@ local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID)
 		capturedUnits[unitID] = nil
 	end
 	
-	if unitDamage[unitID] then
-		removeThingFromDoubleTable(unitID, unitDamage, damageByID)
+	if oldTeamCaptureLinger then
+		if unitDamage[unitID] then
+			removeThingFromDoubleTable(unitID, unitDamage, damageByID)
+		end
+		
+		damageByID.count = damageByID.count + 1
+		damageByID.data[damageByID.count] = unitID
+		
+		local damageData = {
+			index = damageByID.count,
+			captureHealth = Spring.Utilities.GetUnitCost(unitID, unitDefID),
+			largestDamage = 0,
+			allyTeamByID = {count = 0, data = {}},
+			allyTeams = {},
+		}
+		local allyTeamByID = damageData.allyTeamByID
+		local allyTeams = damageData.allyTeams
+		
+		-- add ally team stats
+		local _,_,_,_,_,attackerAllyTeam = spGetTeamInfo(oldTeamCaptureLinger)
+		if not allyTeams[attackerAllyTeam] then
+			allyTeamByID.count = allyTeamByID.count + 1
+			allyTeamByID.data[allyTeamByID.count] = attackerAllyTeam
+			allyTeams[attackerAllyTeam] = {
+				index = allyTeamByID.count,
+				totalDamage = 0,
+				degradeTimer = GENERAL_DEGRADE_TIMER,
+			}
+		end
+		
+		local allyTeamData = allyTeams[attackerAllyTeam]
+		allyTeamData.degradeTimer = GENERAL_DEGRADE_TIMER
+		allyTeamData.totalDamage = damageData.captureHealth*CAPTURE_LINGER
+		
+		damageData.largestDamage = allyTeamData.totalDamage
+		spSetUnitHealth(unitID, {capture = damageData.largestDamage/damageData.captureHealth} )
+		
+		unitDamage[unitID] = damageData
+	else
+		if unitDamage[unitID] then
+			removeThingFromDoubleTable(unitID, unitDamage, damageByID)
+		end
+		spSetUnitHealth(unitID, {capture = 0})
 	end
-	spSetUnitHealth(unitID, {capture = 0} )
 	
 	spTransferUnit(unitID, newTeam, false)
-	spGiveOrderToUnit(unitID, CMD_STOP, {}, {})
+	spGiveOrderToUnit(unitID, CMD_STOP, {}, 0)
 end
 
 --------------------------------------------------------------------------------
@@ -274,8 +318,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		end
 		
 		-- destroy the unit if the controller is set to destroy units
-		if controllers[attackerID].killSubordinates and attackerAllyTeam ~= capturedUnits[unitID].originAllyTeam then
-			spGiveOrderToUnit(unitID, CMD_SELFD, {}, {})
+		if controllers[attackerID].killSubordinates and attackerAllyTeam ~= (capturedUnits[unitID] or {}).originAllyTeam then
+			spGiveOrderToUnit(unitID, CMD_SELFD, {}, 0)
 		end
 		return 0
 	end
@@ -421,14 +465,14 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	KillToggleCommand(unitID, {0}, {})
 end
 
-function gadget:UnitDestroyed(unitID)
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeamID)
 	if controllers[unitID] then
 		local unitByID = controllers[unitID].unitByID
 		local i = 1
 		while i <= unitByID.count do
 			local cid = unitByID.data[i]
 			local transferTeamID = GetActiveTeam(capturedUnits[cid].originTeam, capturedUnits[cid].originAllyTeam)
-			recusivelyTransfer(cid, transferTeamID, capturedUnits[cid].originAllyTeam, unitID)
+			recusivelyTransfer(cid, transferTeamID, capturedUnits[cid].originAllyTeam, unitID, unitTeamID)
 			if cid == unitByID.data[i] then
 				i = i + 1
 			end
@@ -506,7 +550,7 @@ function gadget:Load(zip)
 	
 	local loadData = GG.SaveLoad.ReadFile(zip, "Capture", SAVE_FILE) or {}
 
-	local loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame")
+	local loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
 	
 	-- Reset data (something may have triggered during unit creation).
 	damageByID = {data = {}, count = 0}
@@ -516,37 +560,42 @@ function gadget:Load(zip)
 	reloading = {}
 	
 	-- Load the data
-	for oldUnitID, data in pairs(loadData.unitDamage) do
+	for oldUnitID, data in pairs(loadData.unitDamage or {}) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		damageByID.count = damageByID.count + 1
-		damageByID.data[damageByID.count] = unitID
-		unitDamage[unitID] = data
-		unitDamage[unitID].index = damageByID.count
+		if unitID then
+			damageByID.count = damageByID.count + 1
+			damageByID.data[damageByID.count] = unitID
+			unitDamage[unitID] = data
+			unitDamage[unitID].index = damageByID.count
+		end
 	end
 	
-	for oldUnitID, data in pairs(loadData.capturedUnits) do
+	for oldUnitID, data in pairs(loadData.capturedUnits or {}) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		capturedUnits[unitID] = data
-		capturedUnits[unitID].controllerID = GG.SaveLoad.GetNewUnitID(data.controllerID)
+		if unitID then
+			capturedUnits[unitID] = data
+			capturedUnits[unitID].controllerID = GG.SaveLoad.GetNewUnitID(data.controllerID)
+		end
 	end
 	
-	for oldUnitID, data in pairs(loadData.controllers) do
+	for oldUnitID, data in pairs(loadData.controllers or {}) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		
-		controllers[unitID] = {
-			postCaptureReload = data.postCaptureReload,
-			units = GG.SaveLoad.GetNewUnitIDKeys(data.units),
-			unitByID = {
-				count = data.unitByID.count, 
-				data = GG.SaveLoad.GetNewUnitIDValues(data.unitByID.data)
-			},
-			killSubordinates = data.killSubordinates,
-		}
-		
-		KillToggleCommand(unitID, {(data.killSubordinates and 1) or 0}, {})
+		if unitID then
+			controllers[unitID] = {
+				postCaptureReload = data.postCaptureReload,
+				units = GG.SaveLoad.GetNewUnitIDKeys(data.units),
+				unitByID = {
+					count = data.unitByID.count, 
+					data = GG.SaveLoad.GetNewUnitIDValues(data.unitByID.data)
+				},
+				killSubordinates = data.killSubordinates,
+			}
+			
+			KillToggleCommand(unitID, {(data.killSubordinates and 1) or 0}, {})
+		end
 	end
 	
-	for frame, data in pairs(loadData.reloading) do
+	for frame, data in pairs(loadData.reloading or {}) do
 		local newFrame = frame - loadGameFrame
 		if newFrame >= 0 then
 			reloading[newFrame] = {
@@ -555,6 +604,8 @@ function gadget:Load(zip)
 			}
 		end
 	end
+	
+	UpdateSaveReferences()
 end
 
 --------------------------------------------------------------------------------
@@ -654,15 +705,18 @@ end
 
 local function UpdateList()
 	if unitCount ~= 0 then
-		local spec, fullview = spGetSpectatingState()
-		spec = spec or fullview
+		local _, fullview = spGetSpectatingState()
 		glDeleteList(drawList)
 		 
 		drawAnything = true
-		drawList = glCreateList(function () glBeginEnd(GL_LINES, DrawWire, drawingUnits, spec) end)
+		drawList = glCreateList(function () glBeginEnd(GL_LINES, DrawWire, drawingUnits, fullview) end)
 	else
 		drawAnything = false
 	end
+end
+
+function gadget:PlayerChanged()
+	myTeam = spGetMyAllyTeamID()
 end
 
 local lastFrame = 0
@@ -722,10 +776,10 @@ function gadget:Save(zip)
 		return
 	end
 	local toSave = {
-		unitDamage = MakeRealTable(SYNCED.unitDamage),
-		capturedUnits = MakeRealTable(SYNCED.capturedUnits),
-		controllers = MakeRealTable(SYNCED.controllers),
-		reloading = MakeRealTable(SYNCED.reloading),
+		unitDamage = MakeRealTable(SYNCED.unitDamage, "Capture unit damage"),
+		capturedUnits = MakeRealTable(SYNCED.capturedUnits, "Capture captured units"),
+		controllers = MakeRealTable(SYNCED.controllers, "Capture controllers"),
+		reloading = MakeRealTable(SYNCED.reloading, "Capture reloads"),
 	}
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, toSave)
 end

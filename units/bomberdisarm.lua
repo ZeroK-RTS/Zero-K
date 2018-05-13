@@ -13,6 +13,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 4]],
   collisionVolumeScales  = [[45 20 50]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[70 25 70]],
+  selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
   cruiseAlt           = 180,
 
@@ -20,6 +23,7 @@ unitDef = {
     modelradius    = [[10]],
     requireammo    = [[1]],
     refuelturnradius = [[170]],
+    reammoseconds    = [[15]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -39,7 +43,7 @@ unitDef = {
   script              = [[bomberdisarm.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
-  turnRadius          = 20,
+  turnRadius          = 400,
 
   weapons             = {
 
@@ -76,6 +80,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
         disarmDamageMult = 1,
         disarmDamageOnly = 1,
         disarmTimer      = 16, -- seconds

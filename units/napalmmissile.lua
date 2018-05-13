@@ -15,6 +15,7 @@ unitDef = {
   collisionVolumeType	        = [[CylY]],
 
   customParams                  = {
+    mobilebuilding = [[1]],
   },
 
   explodeAs                     = [[WEAPON]],

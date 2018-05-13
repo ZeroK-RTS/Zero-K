@@ -155,7 +155,7 @@ local gunPieces = {
 local gun_1 = 0
 local beamCount = 0
 
-local SPEED = 2
+local SPEED = 1.85
 
 local function Walk()
 	Signal(SIG_WALK)
@@ -296,7 +296,7 @@ end
 
 function script.QueryWeapon(num)
 	if num == 1 then
-		if beamCount < 6 then
+		if beamCount <= 2 or beamCount >= 48 then
 			if beamCount == 1 then
 				--Spring.SetUnitWeaponState(unitID, 1, "range", 1)
 			elseif beamCount == 2 then
@@ -304,13 +304,10 @@ function script.QueryWeapon(num)
 			end
 			return mflare
 		else
-			if beamCount >= 24*5 then
-				beamCount = 0
-			end
 			return gunPieces[gun_1].flare
 		end
 	elseif num == 2 then
-		return torpedo
+		return turret
 	end
 end
 
@@ -318,7 +315,7 @@ function script.AimFromWeapon(num)
 	if num == 1 then
 		return turret
 	elseif num == 2 then
-		return torpedo
+		return turret
 	end
 end
 
@@ -352,12 +349,18 @@ function script.AimWeapon(num, heading, pitch)
 	end
 end
 
+function script.BlockShot(num, targetID)
+	-- Block for less than full damage and time because the target may dodge.
+	local block = (targetID and (GG.DontFireRadar_CheckBlock(unitID, targetID) or GG.OverkillPrevention_CheckBlock(unitID, targetID, 1200.1, 18))) or false
+	if not block then
+		beamCount = 0
+	end
+	return block
+end
+
 function script.Shot(num)
 	if num == 1 then
 		beamCount = beamCount + 1
-		if beamCount > 24*5 then
-			beamCount = 0
-		end
 		gun_1 = 1 - gun_1
 --		for i=1,12 do
 --			EmitSfx(gunPieces[gun_1].flare, 1024)

@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[gunshipraid]],
-  name                   = [[Banshee]],
+  name                   = [[Locust]],
   description            = [[Raider Gunship]],
   acceleration           = 0.18,
   brakeRate              = 0.16,
@@ -13,6 +13,9 @@ unitDef = {
   canPatrol              = true,
   canSubmerge            = false,
   category               = [[GUNSHIP]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeType    = [[ellipsoid]],
   collide                = true,
   corpse                 = [[DEAD]],
   cruiseAlt              = 100,
@@ -54,7 +57,7 @@ unitDef = {
     {
       def                = [[LASER]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 90,
+      maxAngleDif        = 135,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 

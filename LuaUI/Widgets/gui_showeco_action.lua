@@ -88,9 +88,10 @@ end
 -- Menu Options
 
 local drawAlpha = 0.2
+WG.showeco_always_mexes = true -- No OnChange when not changed from the default.
 
 options_path = 'Settings/Interface/Economy Overlay'
-options_order = {'start_with_showeco', 'mergeCircles', 'drawQueued'}
+options_order = {'start_with_showeco', 'always_show_mexes', 'mergeCircles', 'drawQueued'}
 options = {
 	start_with_showeco = {
 		name = "Start with economy overly",
@@ -102,6 +103,15 @@ options = {
 			if (self.value) then
 				WG.showeco = self.value
 			end
+		end,
+	},
+	always_show_mexes = {
+		name = "Always show Mexes",
+		desc = "Show metal extractors even when the full economy overlay is not enabled.",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			WG.showeco_always_mexes = self.value
 		end,
 	},
 	mergeCircles = {
@@ -126,81 +136,7 @@ options = {
 local disabledColor = { 0.6,0.7,0.5, drawAlpha}
 local placementColor = { 0.6, 0.7, 0.5, drawAlpha} -- drawAlpha on purpose!
 
-local function HSLtoRGB(ch,cs,cl)
-	local cr, cg, cb
-	if cs == 0 then
-		cr = cl
-		cg = cl
-		cb = cl
-	else
-		local temp2
-		if cl < 0.5 then
-			temp2 = cl * (cl + cs)
-		else
-			temp2 = (cl + cs) - (cl * cs)
-		end
-
-		local temp1 = 2 * cl - temp2
-		local tempr = ch + 1 / 3
-
-		if tempr > 1 then
-			tempr = tempr - 1
-		end
-		local tempg = ch
-		local tempb = ch - 1 / 3
-		if tempb < 0 then
-			tempb = tempb + 1
-		end
-
-		if tempr < 1 / 6 then
-			cr = temp1 + (temp2 - temp1) * 6 * tempr
-		elseif tempr < 0.5 then
-			cr = temp2
-		elseif tempr < 2 / 3 then
-			cr = temp1 + (temp2 - temp1) * ((2 / 3) - tempr) * 6
-		else
-			cr = temp1
-		end
-
-		if tempg < 1 / 6 then
-			cg = temp1 + (temp2 - temp1) * 6 * tempg
-		elseif tempg < 0.5 then
-			cg = temp2
-		elseif tempg < 2 / 3 then
-			cg = temp1 + (temp2 - temp1) * ((2 / 3) - tempg) * 6
-		else
-			cg = temp1
-		end
-
-		if tempb < 1 / 6 then
-			cb = temp1 + (temp2 - temp1) * 6 * tempb
-		elseif tempb < 0.5 then
-			cb = temp2
-		elseif tempb < 2 / 3 then
-			cb = temp1 + (temp2 - temp1) * ((2 / 3) - tempb) * 6
-		else
-			cb = temp1
-		end
-
-	end
-	return {cr,cg,cb, drawAlpha}
-end --HSLtoRGB
-
-
-local function GetGridColor(efficiency)
- 	local n = efficiency
-	-- mex has no esource/esource has no mex
-	if n==0 then
-		return {1, .25, 1, drawAlpha}
-	else
-		if n < 3.5 then
-			h = 5760/(3.5+2)^2
-		else
-			h=5760/(n+2)^2
-		end
-		return HSLtoRGB(h/255,1,0.5)
-	end
-end
+local GetGridColor = VFS.Include("LuaUI/Headers/overdrive.lua")
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -300,7 +236,7 @@ local function makePylonListVolume(onlyActive, onlyDisabled)
 				glColor(disabledColor)
 				drawGroundCircle(data.x, data.z, data.range)
 			elseif efficiency ~= -1 and not onlyDisabled then
-				local color = GetGridColor(efficiency)
+				local color = GetGridColor(efficiency, drawAlpha)
 				glColor(color)
 				drawGroundCircle(data.x, data.z, data.range)
 			end
@@ -319,12 +255,14 @@ local function makePylonListVolume(onlyActive, onlyDisabled)
 			local unitDefID = spGetUnitDefID(unitID)
 			if UnitDefs[unitDefID].isBuilder then
 				local cmdQueue = Spring.GetCommandQueue(unitID, -1)
-				for i = 1, #cmdQueue do
-					local cmd = cmdQueue[i]
-					local radius = pylonDefs[-cmd.id]
-					if radius then
-						glColor(disabledColor)
-						drawGroundCircle(cmd.params[1], cmd.params[3], radius)
+				if cmdQueue then
+					for i = 1, #cmdQueue do
+						local cmd = cmdQueue[i]
+						local radius = pylonDefs[-cmd.id]
+						if radius then
+							glColor(disabledColor)
+							drawGroundCircle(cmd.params[1], cmd.params[3], radius)
+						end
 					end
 				end
 			end
@@ -414,7 +352,7 @@ function widget:DrawWorldPreUnit()
 		end
 	end
 
-	local selUnits = spGetSelectedUnits()  -- or show it if its selected
+	local selUnits = spGetSelectedUnits() -- or show it if its selected
 	if selUnits then
 		for i=1,#selUnits do
 			local ud = spGetUnitDefID(selUnits[i])

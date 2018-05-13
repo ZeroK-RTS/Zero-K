@@ -1,12 +1,12 @@
 unitDef = {
   unitname            = [[athena]],
   name                = [[Athena]],
-  description         = [[Airborne SpecOps Engineer, Builds at 7.5 m/s]],
+  description         = [[Airborne SpecOps Engineer, Builds at 15 m/s]],
   acceleration        = 0.1,
   airStrafe           = 0,
   autoHeal            = 20,
   brakeRate           = 0.08,
-  buildCostMetal      = 500,
+  buildCostMetal      = 600,
   buildDistance       = 180,
   builder             = true,
 
@@ -79,9 +79,9 @@ unitDef = {
   showNanoSpray       = false,
   sightDistance       = 380,
   sonarDistance       = 600,
-  resurrectSpeed      = 3.75,
+  resurrectSpeed      = 7.5,
   turnRate            = 148,
-  workerTime          = 7.5,
+  workerTime          = 15,
 
   featureDefs         = {
 

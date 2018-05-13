@@ -1,11 +1,6 @@
 -- $Id: unit_is_on_fire.lua 3309 2008-11-28 04:25:20Z google frog $
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not gadgetHandler:IsSyncedCode() then
-	return
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 function gadget:GetInfo()
   return {
@@ -20,6 +15,14 @@ function gadget:GetInfo()
 end
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local SAVE_FILE = "Gadgets/unit_is_on_fire.lua"
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+if (gadgetHandler:IsSyncedCode()) then
+--------------------------------------------------------------------------------
+-- SYNCED
 --------------------------------------------------------------------------------
 
 --// customparams values
@@ -70,7 +73,7 @@ end
 -- NOTE: fireStarter is divided by 100 somewhere in the engine between weapon defs and here.
 
 local flamerWeaponDefs = {}
-for i=1,#WeaponDefs do
+for i = 1, #WeaponDefs do
 	local wcp = WeaponDefs[i].customParams or {}
 	if (wcp.setunitsonfire) then -- stupid tdf
 		--// (fireStarter-tag: 1.0->always flame trees, 2.0->always flame units/buildings too) -- citation needed
@@ -91,15 +94,16 @@ local unitsOnFire = {}
 local inWater = {}
 local inGameFrame = false
 
+_G.unitsOnFire = unitsOnFire
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function CheckImmersion(unitID)
-    local pos = select(2, Spring.GetUnitBasePosition(unitID))
-    local height = Spring.GetUnitHeight(unitID)
-    if pos < -(height * MIN_IMMERSION_FOR_EXTINGUISH) then
-	return true
-    end
-    return false
+	local pos = select(2, Spring.GetUnitBasePosition(unitID))
+	local height = Spring.GetUnitHeight(unitID)
+	if pos < -(height * MIN_IMMERSION_FOR_EXTINGUISH) then
+		return true
+	end
+	return false
 end
 
 --------------------------------------------------------------------------------
@@ -170,4 +174,53 @@ end
 
 function gadget:Initialize()
 	Spring.SetGameRulesParam("unitsOnFire",1)
+	local allUnits = Spring.GetAllUnits()
+	for i=1,#allUnits do
+		local unitID = allUnits[i]
+		local x,y,z = Spring.GetUnitPosition(unitID)
+		if y < 0 then
+			gadget:UnitEnteredWater(unitID)
+		end
+	end
+end
+
+function gadget:Load(zip)
+    if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	local loadData = GG.SaveLoad.ReadFile(zip, "Units on Fire", SAVE_FILE) or {}
+	local currGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
+	unitsOnFire = {}
+	for oldID, entry in pairs(loadData) do
+		local newID = GG.SaveLoad.GetNewUnitID(oldID)
+		entry.endFrame = entry.endFrame - currGameFrame
+		entry.attackerID = GG.SaveLoad.GetNewUnitID(entry.attackerID)
+		unitsOnFire[newID] = entry
+		SetUnitRulesParam(newID, "on_fire", 1, LOS_ACCESS)
+		GG.UpdateUnitAttributes(newID)
+	end
+	_G.unitsOnFire = unitsOnFire
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+else
+--------------------------------------------------------------------------------
+-- UNSYNCED
+--------------------------------------------------------------------------------
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	local onFire = Spring.Utilities.MakeRealTable(SYNCED.unitsOnFire, "Units on Fire")
+	--local inWater = {}	-- regenerate on init
+	
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, onFire)
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 end

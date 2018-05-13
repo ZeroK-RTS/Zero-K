@@ -41,7 +41,7 @@ options = {
 		name = 'Show for enemy underwater',
 		desc = 'Draw a line perpendicular to the surface for enemy submerged units',
 		type = 'radioButton',
-		value = 'never',
+		value = 'radar',
 		items = {
 			{key ='always', name='Always'},
 			{key ='radar',  name='In radar, not in sight'},

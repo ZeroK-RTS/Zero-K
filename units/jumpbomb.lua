@@ -16,6 +16,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[20 20 20]],
   collisionVolumeType    = [[ellipsoid]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[28 28 28]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -25,15 +28,16 @@ unitDef = {
     jump_speed       = 6,
     jump_reload      = 10,
     jump_from_midair = 0,
-	aimposoffset   = [[0 0 0]],
-	midposoffset   = [[0 0 0]],
+	aimposoffset   = [[0 2 0]],
+	midposoffset   = [[0 2 0]],
 	modelradius    = [[10]],
+    selection_scale = 1, -- Maybe change later
   },
 
   explodeAs              = [[jumpbomb_DEATH]],
   fireState              = 0,
-  footprintX             = 1,
-  footprintZ             = 1,
+  footprintX             = 2,
+  footprintZ             = 2,
   iconType               = [[jumpjetbomb]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -48,7 +52,7 @@ unitDef = {
   maxVelocity            = 1.5225,
   maxWaterDepth          = 15,
   minCloakDistance       = 180,
-  movementClass          = [[KBOT1]],
+  movementClass          = [[SKBOT2]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[skuttle.s3o]],
@@ -60,7 +64,7 @@ unitDef = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
-  trackWidth             = 26,
+  trackWidth             = 34,
   turnRate               = 2000,
   workerTime             = 0,
   
@@ -69,9 +73,9 @@ unitDef = {
     DEAD      = {
       blocking         = false,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[wreck2x2b.s3o]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      object           = [[skuttle_dead.s3o]],
     },
 
     HEAP      = {

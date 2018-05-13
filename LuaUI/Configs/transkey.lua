@@ -36,6 +36,12 @@ local transkey = {
 	kp8				= 'numpad8',
 	kp9				= 'numpad9',
 	
+	lshift = 'shift',
+	rshift = 'shift',
+	lctrl = 'ctrl',
+	rctrl = 'ctrl',
+	lalt = 'alt',
+	ralt = 'alt',
 
     -- for french keyboard
 	--groupping

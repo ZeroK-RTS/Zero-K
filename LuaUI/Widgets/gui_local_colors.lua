@@ -11,6 +11,9 @@ function widget:GetInfo()
 end
 
 local selfName = "Local Team Colors"
+local DEBUG_MODE = false
+
+local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -78,19 +81,44 @@ if VFS.FileExists("LuaUI/Configs/LocalColors.lua") then
 	}
 end
 
-local myColor, gaiaColor, allyColors, enemyColors
+local myColor, gaiaColor, allyColors, enemyColors, enemyByTeamColors, colorEnemiesByAllyTeam
 
 local function UpdateColorConfig(self)
 	if not colorConfig[self.value] then
 		return
 	end
-	Spring.Echo("UpdateColorConfig", self.value)
+	
 	myColor = colorConfig[self.value].colors.myColor
 	gaiaColor = colorConfig[self.value].colors.gaiaColor
 	allyColors = colorConfig[self.value].colors.allyColors
 	enemyColors = colorConfig[self.value].colors.enemyColors
+	enemyByTeamColors = colorConfig[self.value].colors.enemyByTeamColors or enemyColors
 	
 	UpdateColor()
+end
+
+local function UpdateSimpleEnemyColor(self)
+	if self.value == "auto" or self.value == "autoffa" then
+		if campaignBattleID then
+			colorEnemiesByAllyTeam = true
+		elseif self.value == "autoffa" then
+			local teamList = Spring.GetTeamList()
+			local allyTeamSeen = {}
+			local allyTeamCount = 0
+			for i = 1, #teamList do
+				local allyTeam = select(6, Spring.GetTeamInfo(teamList[i]))
+				if not allyTeamSeen[allyTeam] then
+					allyTeamCount = allyTeamCount + 1
+					allyTeamSeen[allyTeam] = true
+				end
+			end
+			colorEnemiesByAllyTeam = (allyTeamCount > 3)
+		else
+			colorEnemiesByAllyTeam = false
+		end
+	else
+		colorEnemiesByAllyTeam = (self.value == "enable")
+	end
 end
 
 local function UpdateColorNotify()
@@ -112,7 +140,22 @@ options = {
 		type = 'bool',
 		value = false,
 		OnChange = UpdateColorNotify
-	}
+	},
+	simpleEnemyAllyTeam = {
+		name = 'Colour Enemies By Team',
+		type = 'radioButton',
+		value = 'auto',
+		items = {
+			{name = 'Always', key = 'enable', desc = "Always colour enemies by team."},
+			{name = 'Missions and FFA', key = 'autoffa', desc = "Colour enemies by team in missions and FFA."},
+			{name = 'Missions', key = 'auto', desc = "Colour enemies by team in missions."},
+			{name = 'Never', key = 'disable', desc = "Never colour enemies by team."},
+		},
+		OnChange = function(self)
+			UpdateSimpleEnemyColor(self)
+			UpdateColor()
+		end,
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -132,7 +175,9 @@ local function SetNewTeamColors()
 	
 	local myAlly = Spring.GetMyAllyTeamID()
 	local myTeam = Spring.GetMyTeamID()
-
+	
+	local enemyColorMap = colorEnemiesByAllyTeam and {}
+	
 	local a, e = 0, 0
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local _,_,_,_,_,allyID = Spring.GetTeamInfo(teamID)
@@ -142,12 +187,20 @@ local function SetNewTeamColors()
 				Spring.SetTeamColor(teamID, unpack(allyColors[a]))
 			end
 		elseif (teamID ~= gaia) then
-			e = (e % #enemyColors) + 1
-			Spring.SetTeamColor(teamID, unpack(enemyColors[e]))
+			if colorEnemiesByAllyTeam then
+				if not enemyColorMap[allyID] then
+					e = (e % #enemyByTeamColors) + 1
+					enemyColorMap[allyID] = enemyByTeamColors[e]
+				end
+				Spring.SetTeamColor(teamID, unpack(enemyColorMap[allyID]))
+			else
+				e = (e % #enemyColors) + 1
+				Spring.SetTeamColor(teamID, unpack(enemyColors[e]))
+			end
 		end
 	end
 	if not is_speccing then
-		Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
+		Spring.SetTeamColor(myTeam, unpack(myColor)) -- overrides previously defined color
 	end
 end
 
@@ -197,6 +250,7 @@ function UpdateColor(doNotNotify)
 end
 
 function widget:Initialize()
+	UpdateSimpleEnemyColor(options.simpleEnemyAllyTeam)
 	UpdateColorConfig(options.colorSetting)
 end
 
@@ -217,8 +271,58 @@ function widget:PlayerChanged()
 end
 
 function widget:Shutdown()
-	ResetOldTeamColors()
-	NotifyColorChange()
+	-- don't restore the original colours, they're useless. This only really matters for /luaui disable
 	WG.LocalColor.localTeamColorToggle = nil
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local width = 128
+local height = 48
+
+local friendlyColors
+
+local function LoadFriendlyColors()
+	friendlyColors = {myColor}
+	for i=1,#allyColors do
+		friendlyColors[#friendlyColors + 1] = allyColors[i]
+	end
+end
+
+local function DrawRectangle(x, y)
+	gl.Vertex(x, y, 0)
+	gl.Vertex(x + width, y, 0)
+	gl.Vertex(x + width, y + height, 0)
+	gl.Vertex(x, y + height, 0)
+end
+
+function widget:DrawScreen()
+	if not DEBUG_MODE then
+		return
+	end
+	if friendlyColors == nil then
+		LoadFriendlyColors()
+	end
+	
+	local vsx, vsy = Spring.GetViewGeometry()
+	local x = vsx/2 - width
+	local y = vsy - 160	
+	
+	for i = 1, #friendlyColors do
+		gl.Color(friendlyColors[i])
+		gl.BeginEnd(GL.QUADS, DrawRectangle, x, y)
+		gl.Color(1,1,1,1)
+		gl.BeginEnd(GL.LINE_LOOP, DrawRectangle, x, y)
+		y = y - height
+	end
+	
+	y = vsy - 160
+	x = x + width
+	for i = 1, #enemyColors do
+		gl.Color(enemyColors[i])
+		gl.BeginEnd(GL.QUADS, DrawRectangle, x, y)
+		gl.Color(1,1,1,1)
+		gl.BeginEnd(GL.LINE_LOOP, DrawRectangle, x, y)
+		y = y - height
+	end
+end

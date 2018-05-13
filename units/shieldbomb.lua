@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[shieldbomb]],
-  name                   = [[Roach]],
+  name                   = [[Snitch]],
   description            = [[Crawling Bomb (Burrows)]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
@@ -14,18 +14,22 @@ unitDef = {
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[16 16 16]],
-  collisionVolumeType	 = [[ellipsoid]],
+  collisionVolumeType    = [[ellipsoid]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[28 28 28]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
 	modelradius    = [[7]],
 	idle_cloak = 1,
+    selection_scale = 1, -- Maybe change later
   },
 
   explodeAs              = [[shieldbomb_DEATH]],
   fireState              = 0,
-  footprintX             = 1,
-  footprintZ             = 1,
+  footprintX             = 2,
+  footprintZ             = 2,
   iconType               = [[walkerbomb]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -38,7 +42,7 @@ unitDef = {
   maxVelocity            = 4,
   maxWaterDepth          = 15,
   minCloakDistance       = 75,
-  movementClass          = [[KBOT1]],
+  movementClass          = [[SKBOT2]],
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[logroach.s3o]],
   pushResistant          = 0,
@@ -61,7 +65,7 @@ unitDef = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
-  trackWidth             = 14,
+  trackWidth             = 20,
   turnRate               = 3000,
   
   featureDefs            = {
@@ -69,9 +73,9 @@ unitDef = {
     DEAD      = {
       blocking         = false,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[wreck2x2b.s3o]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      object           = [[logroach_dead.s3o]],
     },
 
     HEAP      = {

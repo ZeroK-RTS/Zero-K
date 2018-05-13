@@ -77,22 +77,22 @@ end
 
 local CloakedHitEffect = { class='UnitJitter',options={ life=50, pos={0,0,0}, enemyHit=true, repeatEffect=false} }
 local CloakEffect      = {
-  { class='UnitCloaker',options={ life=50 } },
-  { class='UnitJitter',options={ delay=24, life=math.huge } },
+  { class='UnitCloaker',options={ life=30 } },
+  { class='UnitJitter',options={ delay=20, life=math.huge } },
   { class='Sound',options={ file="sounds/cloak.wav",volume=0.9 } },
 }
 local EnemyCloakEffect      = {
-  { class='UnitCloaker',options={ life=20 } },
+  { class='UnitCloaker',options={ life=30} },
   { class='Sound',options={ file="sounds/cloak.wav",volume=0.9 } },
 }
 
 local DecloakEffect    = {
-  { class='UnitCloaker',options={ inverse=true, life=50 } },
-  { class='UnitJitter',options={ life=24 } },
+  { class='UnitCloaker',options={ inverse=true, life=16 } },
+  { class='UnitJitter',options={ life=8 } },
   { class='Sound',options={ file="sounds/cloak.wav",volume=0.9 } },
 }
 local EnemyDecloakEffect      = {
-  { class='UnitCloaker',options={ inverse=true, life=60 } },
+  { class='UnitCloaker',options={ inverse=true, life=16 } },
   { class='Sound',options={ file="sounds/cloak.wav",volume=0.9 } },
 }
 

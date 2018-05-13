@@ -90,37 +90,47 @@ options = {
 		desc = 'Remember to not display pause-screen anymore. \n\nRemainder: you can revisit this configuration page at any time later at "Settings/HUD Panels/Pause Screen" if needed.',
 		value=false,
 		noHotkey = true,
-		},
+	},
 	disablesound = {
 		name='Disable Voice',
 		type='bool',
 		desc = 'Remember to not play voice-over for pausing anymore.',
 		value=false,
 		noHotkey = true,
-		},
+	},
 	autofade = {
 		name='Pause Screen automatically fade out',
 		type='bool',
 		desc = 'Automatically fade to background without needing to click it.',
 		value=true,
 		noHotkey = true,
-		},
+	},
 	nopicture = {
 		name='Disable Logo',
 		type='bool',
 		desc = 'Only display pause text.',
 		value=true,
 		noHotkey = true,
-		},			
+	},
 }
 
-local SOUND_DIRNAME = 'LuaUI/Sounds/Voices/'
+local SOUND_DIRNAME = 'sounds/reply/advisor/'
 
-local pauseSound = "paused_core_1"
-local unpauseSound = "unpaused_core_1"
+local pauseSound = "warzone_paused"
+local unpauseSound = "warzone_active"
+local tempDisabled = false
+local doNotDisableSound = false
+local disablePauseSlideTimestamp = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+function WG.PauseScreen_SetEnabled(newEnabled, newDoNotDisableSound)
+	-- This intentially exists before widgets are fully loaded.
+	tempDisabled = not newEnabled
+	doNotDisableSound = newDoNotDisableSound
+	disablePauseSlideTimestamp = osClock()
+end
 
 local function playSound(filename, ...)
 	local path = SOUND_DIRNAME..filename..".WAV"
@@ -134,7 +144,7 @@ end
 
 
 function widget:Initialize()
-	myFont = glLoadFont( fontPath, fontSizeHeadline )
+	myFont = glLoadFont( fontPath, fontSizeHeadline, nil, nil ) -- FIXME: nils are for #2564, remove later
 	updateWindowCoords()
 end
 
@@ -157,20 +167,22 @@ function widget:DrawScreen()
 	
 	if ( paused and not lastPause ) then
 		--new pause
-		if not options.disablesound.value then
+		if not (options.disablesound.value or (tempDisabled and not doNotDisableSound)) then
 			playSound(pauseSound, 1, 'ui')
 		end
 		clickTimestamp = nil
 	elseif ( not paused and lastPause ) then
-		if not options.disablesound.value then
+		if not (options.disablesound.value or (tempDisabled and not doNotDisableSound)) then
 			playSound(unpauseSound, 1, 'ui')
 		end
 	end
 
 	lastPause = paused
 		
-	if ( (paused or ( ( now - pauseTimestamp) <= slideTime )) and not options.hideimage.value) then
-		drawPause(paused, now)
+	if ( (paused or ( ( now - pauseTimestamp) <= slideTime )) and not (options.hideimage.value or tempDisabled)) then
+		if now - disablePauseSlideTimestamp > slideTime then
+			drawPause(paused, now)
+		end
 	end
 	
 	ResetGl()
@@ -185,10 +197,10 @@ function isOverWindow(x, y)
  end
 
 function widget:MousePress(x, y, button)
-  if ( not clickTimestamp and (not options.hideimage.value and not options.autofade.value)) then
+  if ( not clickTimestamp and (not (options.hideimage.value or tempDisabled) and not options.autofade.value)) then
 	if ( isOverWindow(x, y)) then	
 		--do not update clickTimestamp any more after right mouse button click
-		if ( not options.hideimage.value ) then
+		if ( not (options.hideimage.value or tempDisabled) ) then
 			clickTimestamp = osClock()
 		end
 		
@@ -215,7 +227,7 @@ end
 
 function widget:IsAbove(x,y)
 	local _, _, paused = spGetGameSpeed()
-	if ( paused and not options.autofade.value and not options.hideimage.value and not clickTimestamp and isOverWindow( x, y ) ) then
+	if ( paused and not options.autofade.value and not (options.hideimage.value or tempDisabled) and not clickTimestamp and isOverWindow( x, y ) ) then
 		return true
 	end
 	return false
@@ -231,7 +243,7 @@ function widget:Update()
 end
 
 function widget:GetTooltip(x, y)
-	if ( ( clickTimestamp == nil and (options.hideimage.value == false or options.autofade.value==false)) and isOverWindow(x, y) ) then
+	if ( ( clickTimestamp == nil and (options.hideimage.value == false or options.autofade.value==false or (not tempDisabled))) and isOverWindow(x, y) ) then
 		return "Click here to hide pause window.\nSpace+Click here to show option menu."
 	end
 end
@@ -265,7 +277,7 @@ function drawPause(paused, now)
 	end
 
 	--adjust transparency when clicked
-	if ( clickTimestamp ~= nil or options.hideimage.value) then
+	if ( clickTimestamp ~= nil or (options.hideimage.value or tempDisabled)) then
 		local factor = 0.0
 		if ( clickTimestamp ) then		
 			factor = ( 1.0 - ( now - clickTimestamp ) / fadeTime )
@@ -317,7 +329,7 @@ function drawPause(paused, now)
 	
 	--draw close icon
 	glColor(  iconColor2 )
-	if ( mouseOverClose and clickTimestamp == nil and (options.hideimage.value == false and options.autofade.value==false)) then
+	if ( mouseOverClose and clickTimestamp == nil and (options.hideimage.value == false and options.autofade.value==false and (not tempDisabled))) then
 		glColor( mouseOverColor )
 	end
 	

@@ -139,7 +139,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
   if noRecursion then
     return true
   end
-  if unitDefID == leaperDefID and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD.FIGHT) then
+  if unitDefID == leaperDefID and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD or cmdID == CMD.FIGHT) then
     local startX, startZ
     if cmdOptions.shift then -- queue, use last queue position
       local queue = Spring.GetCommandQueue(unitID, -1)
@@ -178,22 +178,22 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 
       -- if the computed path shows "no path found" (false), abort
       if Spring.GetUnitIsDead(unitID) and not path then
-        Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, cmdOptions.shift and {"shift"} or {})
+        Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, cmdOptions.shift and CMD.OPT_SHIFT or 0)
         return
       end
 
       -- give the orders
       if Spring.GetUnitIsDead(unitID) and not cmdOptions.shift then
-        Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
+        Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
       end
       for nodeIndex=2, #path do -- skip first node
         local node = path[nodeIndex]
         local x, z = aStar.ToCoords(node)
         x, z = x*gridSize, z*gridSize
         local y = Spring.GetGroundHeight(x, z)
-        if Spring.GetUnitIsDead(unitID) then Spring.GiveOrderToUnit(unitID, CMD_JUMP, {x, y, z}, {"shift"}) end
+        if Spring.GetUnitIsDead(unitID) then Spring.GiveOrderToUnit(unitID, CMD_JUMP, {x, y, z}, CMD.OPT_SHIFT) end
       end
-      if Spring.GetUnitIsDead(unitID) then Spring.GiveOrderToUnit(unitID, CMD_JUMP, {cmdParams[1], cmdParams[2], cmdParams[3]}, {"shift"}) end
+      if Spring.GetUnitIsDead(unitID) then Spring.GiveOrderToUnit(unitID, CMD_JUMP, {cmdParams[1], cmdParams[2], cmdParams[3]}, CMD.OPT_SHIFT) end
     end)
     return false -- reject original command, we're handling it
   end

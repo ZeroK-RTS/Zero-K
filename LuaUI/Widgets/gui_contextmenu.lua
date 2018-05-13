@@ -14,7 +14,7 @@ end
 --[[
 Todo:
 - Puppy kamikaziness (is through weapon/gadget, not self-D)
-- Deployability (Crabe, Djinn, Slasher) - needs sensible way to convey these, each one does different thing when static
+- Deployability (Crab, Djinn, Slasher) - needs sensible way to convey these, each one does different thing when static
 - Weapon impulse (no idea how the values relate to applied force, will need research)
 - Drone production (would need some work to do properly because of entanglement)
 - Clogging (Dirtbag)
@@ -112,12 +112,64 @@ local valkMaxSize = UnitDefNames.gunshiptrans.transportSize * 2
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Generate unit behaviour paths 
+local BEHAVIOUR_PATH = "Settings/Unit Behaviour/Default States/"
+
+local behaviourPath = {}
+local unitAlreadyAdded = {}
+
+local function AddFactoryOfUnits(defName)
+	if unitAlreadyAdded[defName] then
+		return
+	end
+	local ud = UnitDefNames[defName]
+	local name = string.gsub(ud.humanName, "/", "-")
+	local path = BEHAVIOUR_PATH .. name
+	behaviourPath[ud.id] = path
+	for i = 1, #ud.buildOptions do
+		behaviourPath[ud.buildOptions[i]] = path
+	end
+end
+
+AddFactoryOfUnits("factoryshield")
+AddFactoryOfUnits("factorycloak")
+AddFactoryOfUnits("factoryveh")
+AddFactoryOfUnits("factoryplane")
+AddFactoryOfUnits("factorygunship")
+AddFactoryOfUnits("factoryhover")
+AddFactoryOfUnits("factoryamph")
+AddFactoryOfUnits("factoryspider")
+AddFactoryOfUnits("factoryjump")
+AddFactoryOfUnits("factorytank")
+AddFactoryOfUnits("factoryship")
+AddFactoryOfUnits("striderhub")
+AddFactoryOfUnits("staticmissilesilo")
+
+local buildOpts = VFS.Include("gamedata/buildoptions.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+
+for i = 1, #buildOpts do
+	local name = buildOpts[i]
+	local unitDefID = UnitDefNames[name].id
+	if econ_commands[-unitDefID] then
+		behaviourPath[unitDefID] = BEHAVIOUR_PATH .. "Economy"
+	elseif defense_commands[-unitDefID] then
+		behaviourPath[unitDefID] = BEHAVIOUR_PATH .. "Defence"
+	elseif special_commands[-unitDefID] then
+		behaviourPath[unitDefID] = BEHAVIOUR_PATH .. "Special"
+	else
+		behaviourPath[-unitDefID] = BEHAVIOUR_PATH .. "Misc"
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function MakeStatsWindow() 
 end
 
-options_order = {'shortNotation'}
-options_path = 'Help/Guide/Unit List'
+options_order = {'shortNotation', 'text_hotkey'}
+options_path = 'Help/Unit List'
 options = {
 		
 	shortNotation = {
@@ -129,7 +181,12 @@ options = {
 		path = 'Settings/HUD Panels/Unit Stats Help Window'
 	},
 	
-	
+	text_hotkey = {
+		name = 'Global Construction Hotkeys',
+		type = 'text',
+		value = [[These hotkey are always active. To edit the in-tab hotkeys look in "Hotkeys/Command Panel". Each tab can even have their own layout.]],
+		path = 'Hotkeys/Construction',
+	},
 }
 
 local alreadyAdded = {}
@@ -160,7 +217,7 @@ local function addUnit (unitDefID, path, buildable)
 			type='button',
 			desc = "Build " .. unitName,
 			action = 'buildunit_' .. ud.name,
-			path = 'Settings/Hotkeys/Construction/' .. path,
+			path = 'Hotkeys/Construction/' .. path,
 		}
 		options_order[#options_order + 1] = optionName
 	end
@@ -235,16 +292,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local function tobool(val)
-  local t = type(val)
-  if (t == 'nil') then return false
-  elseif (t == 'boolean') then	return val
-  elseif (t == 'number') then	return (val ~= 0)
-  elseif (t == 'string') then	return ((val ~= '0') and (val ~= 'false'))
-  end
-  return false
-end
 
 function comma_value(amount, displayPlusMinus)
 	local formatted
@@ -404,7 +451,7 @@ local function weapons2Table(cells, ws, unitID)
 		local stun_time = 0
 
 		local comm_mult = (unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1
-		local val = (tonumber(cp.statsdamage) or wd.customParams.shield_damage or 0) * comm_mult
+		local val = (tonumber(cp.stats_damage) or wd.customParams.shield_damage or 0) * comm_mult
 
 		if cp.disarmdamagemult then
 			damd = val * cp.disarmdamagemult
@@ -454,7 +501,11 @@ local function weapons2Table(cells, ws, unitID)
 		local dps_str, dam_str = '', ''
 		if dps > 0 then
 			dam_str = dam_str .. numformat(dam,2)
-			dps_str = dps_str .. numformat(dps*mult,2)
+			if wd.customParams.stats_damage_per_second then
+				dps_str = dps_str .. numformat(tonumber(cp.stats_damage_per_second),2)
+			else
+				dps_str = dps_str .. numformat(dps*mult,2)
+			end
 		end
 		if dpsw > 0 then
 			if dps_str ~= '' then
@@ -512,7 +563,7 @@ local function weapons2Table(cells, ws, unitID)
 			show_dps = false
 		end
 		
-		if cp.damage_vs_shield then -- Wolverine
+		if cp.damage_vs_shield then -- Badger
 			dam_str = tostring(cp.damage_vs_shield) .. " (" .. dam .. " + " .. (tonumber(cp.damage_vs_shield)-dam) .. " mine)"
 			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield)/reloadtime))
 		end
@@ -563,7 +614,7 @@ local function weapons2Table(cells, ws, unitID)
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
 		if aoe > 15 and show_aoe then
-			cells[#cells+1] = ' - Area of effect:'
+			cells[#cells+1] = ' - AoE radius:'
 			cells[#cells+1] = numformat(aoe) .. " elmo"
 		end
 
@@ -637,6 +688,11 @@ local function weapons2Table(cells, ws, unitID)
 				cells[#cells+1] = ' - Spawn life: '
 				cells[#cells+1] = cp.spawns_expire .. "s"
 			end
+		end
+		
+		if cp.reload_move_mod_time then
+			cells[#cells+1] = ' - Move mult time: '
+			cells[#cells+1] = cp.reload_move_mod_time .. "s"
 		end
 
 		if cp.area_damage then
@@ -1071,11 +1127,6 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	if cp.dontfireatradarcommand then
-		cells[#cells+1] = 'Can ignore unidentified targets'
-		cells[#cells+1] = ''
-	end
-
 	if ud.metalStorage > 0 then
 		cells[#cells+1] = 'Stores metal: '
 		cells[#cells+1] = ud.metalStorage .. " M"
@@ -1177,18 +1228,36 @@ local function printunitinfo(ud, buttonWidth, unitID)
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
 			file = "#" .. ud.id,
 			keepAspect = false;
-			height  = 64*(4/5);
-			width   = 64;
+			x = 32,
+			y = 0,
+			height  = 88*(4/5);
+			width   = 88;
 		},
 	}
 	if ud.iconType ~= 'default' then
-		icons[#icons + 1] = 
-			Image:New{
-				file=icontypes and icontypes[(ud and ud.iconType or "default")].bitmap
-					or 'icons/'.. ud.iconType ..iconFormat,
-				height=40,
-				width=40,
+		icons[#icons + 1] = Image:New{
+			file=icontypes and icontypes[(ud and ud.iconType or "default")].bitmap
+				or 'icons/'.. ud.iconType ..iconFormat,
+			x = 0,
+			y = 2,
+			height=32,
+			width=32,
+		}
+	end
+	
+	if behaviourPath[ud.id] then
+		icons[#icons + 1] = Button:New{
+			x = 2,
+			right = 2,
+			y = 88*(4/5),
+			height = 30,
+			caption = "Edit Behaviour",
+			tooltip = "Edit the default behaviour of " .. Spring.Utilities.GetHumanName(ud) .. ".",
+			OnClick = {function ()
+					WG.crude.OpenPathToLabel(behaviourPath[ud.id], true, Spring.Utilities.GetHumanName(ud))
+				end,
 			}
+		}
 	end
 
 	local helptextbox = TextBox:New{
@@ -1335,6 +1404,11 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > valkMaxMass) or (ud.xsize > valkMaxSize) or (ud.zsize > valkMaxSize)) and "Heavy") or "Light"), textColor = color.stats_fg, }
 	end
 	
+	if ud.customParams.reload_move_penalty then
+		statschildren[#statschildren+1] = Label:New{ caption = 'Reload move mult: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(100*tonumber(ud.customParams.reload_move_penalty)) .. "%", textColor = color.stats_fg, }
+	end
+	
 	if legacyModules then
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
@@ -1400,6 +1474,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
 
 		local weaponStats = GetWeapon( ud.deathExplosion:lower() )
+		local wepCp = weaponStats.customParams
 		local damageValue = tonumber(weaponStats.customParams.statsdamage) or weaponStats.damages[1] or 0
 
 		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
@@ -1408,10 +1483,21 @@ local function printunitinfo(ud, buttonWidth, unitID)
 			statschildren[#statschildren+1] = Label:New{ caption = 'Max EMP time: ', textColor = color.stats_fg, }
 			statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages.paralyzeDamageTime,2) .. "s", textColor = color.stats_fg, }
 		else
-			statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue,2), textColor = color.stats_fg, }
+			local damageSlow = (wepCp.timeslow_damagefactor or 0)*damageValue
+			local damageText
+			if damageSlow > 0 then
+				if wepCp.timeslow_onlyslow == "1" then
+					 damageText = color2incolor(colorPurple) .. numformat(damageSlow,2) .. " (S)\008"
+				else
+					damageText = numformat(damageValue,2) .. " + " .. color2incolor(colorPurple) .. numformat(damageSlow,2) .. " (S)\008"
+				end
+			else
+				damageText = numformat(damageValue,2)
+			end
+			statschildren[#statschildren+1] = Label:New{ caption = damageText, textColor = color.stats_fg, }
 		end
 
-		statschildren[#statschildren+1] = Label:New{ caption = 'Area of effect: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'AoE radius: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damageAreaOfEffect,2) .. " elmo", textColor = color.stats_fg, }
 		
 		if (weaponStats.customParams.setunitsonfire) then
@@ -1432,13 +1518,13 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
 	
 	
-	local stack_icons = StackPanel:New{
-		autoArrangeV  = false,
+	local stack_icons = Chili.Control:New{
+		y = 3,
+		right = 1,
+		height = 200,
+		width = 120,
 		padding = {0,0,0,0},
 		itemMargin = {0,4,0,4},
-		height = 100,
-		width = 64,
-		resizeItems = false,
 		children = icons,
 	}
 	
@@ -1462,7 +1548,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		autoArrangeV  = false,
 		autoArrangeH  = false,
 		centerItems  = false,
-		right = 66,
+		right = 128,
 		x = 0,
 		--width = 200,
 		--height = '100%',
@@ -1470,25 +1556,10 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		resizeItems = false,
 		children = { helptextbox, stack_stats, },
 	}
-	return 
-		{
-			StackPanel:New{
-				resizeItems = false,
-				orientation = 'horizontal',
-				autoArrangeV  = false,
-				autoArrangeH  = false,
-				centerItems  = false,
-				padding = {1,1,1,1},
-				itemPadding = {1,1,1,1},
-				itemMargin = {1,1,1,1},
-				--height = 400 ,
-				autosize=true,
-				y = 1,
-				width = '100%',
-				children = { helptext_stack, stack_icons, },
-			},
-		}
-	
+	return {
+		helptext_stack, 
+		stack_icons,
+	}
 end
 
 local function tooltipBreakdown(tooltip)

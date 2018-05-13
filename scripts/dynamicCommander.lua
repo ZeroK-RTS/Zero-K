@@ -54,22 +54,27 @@ for key, value in pairs(levelScale) do
 	levelToPace[key] = 1/value
 end
 
+local function GetLevel()
+	local ud = UnitDefs[unitDefID]
+	return Spring.GetUnitRulesParam(unitID, "comm_level") or tonumber(ud.customParams.level) or 0
+end
+
 local function CalculatePaceMult()
-	paceMult = levelToPace[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelToPace[5]
+	paceMult = levelToPace[GetLevel()] or levelToPace[5]
 	return paceMult
 end
 
 local function GetPace()
-	return CalculatePaceMult() --paceMult or CalculatePaceMult()
+	return paceMult or CalculatePaceMult()
 end
 
 local function CalculateScaleMult()
-	scaleMult = levelScale[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelScale[5]
+	scaleMult = levelScale[GetLevel()] or levelScale[5]
 	return scaleMult
 end
 
 local function GetScale()
-	return CalculateScaleMult() --scaleMult or CalculateScaleMult()
+	return scaleMult or CalculateScaleMult()
 end
 
 local function GetWeapon(num)
@@ -224,8 +229,17 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 			else
 				Spring.SetUnitRulesParam(unitID, "primary_weapon_override",  weapon2, INLOS)
 			end
+			
+			local range1 = Spring.GetUnitWeaponState(unitID, weapon1, 'range')
+			local range2 = Spring.GetUnitWeaponState(unitID, weapon2, 'range')
+			if range1 > range2 then
+				Spring.SetUnitRulesParam(unitID, "primary_weapon_range",  weapon1, INLOS)
+			else
+				Spring.SetUnitRulesParam(unitID, "primary_weapon_range",  weapon2, INLOS)
+			end
 		else
 			Spring.SetUnitRulesParam(unitID, "primary_weapon_override",  weapon1, INLOS)
+			Spring.SetUnitRulesParam(unitID, "primary_weapon_range",  weapon1, INLOS)
 		end
 	end
 	
@@ -233,7 +247,7 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 	if weapon1 ~= 1 and weapon2 ~= 1 then
 		Spring.SetUnitWeaponState(unitID, 1, "range", maxRange)
 	end
-	for i = 2, 16 do
+	for i = 2, 32 do
 		if i ~= weapon1 and i ~= weapon2 then
 			Spring.SetUnitWeaponState(unitID, i, "range", 0)
 		end

@@ -40,6 +40,8 @@ local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
 local WARNING_IMAGE = LUAUI_DIRNAME .. "Images/Crystal_Clear_app_error.png"
 
+local GetGridColor = VFS.Include("LuaUI/Headers/overdrive.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -92,10 +94,11 @@ local updateOpacity = false
 local reserveSentTimer = false
 local blinkMetal = 0
 local blinkEnergy = 0
-local BASE_BLINK_PERIOD = 1.4
+local BLINK_UPDATE_RATE = 0.1
 local blinkM_status = false
 local blinkE_status = false
 local excessE = false
+local flashModeEnabled = true
 
 local strings = {
 	local_metal_economy = "",
@@ -121,6 +124,7 @@ local strings = {
 	resbar_reclaim_total = "",
 	resbar_unit_value = "",
 	resbar_nano_value = "",
+	resbar_overdrive_efficiency = "",
 	metal = "",
 	metal_excess_warning = "",
 	energy_stall_warning = "",
@@ -212,7 +216,7 @@ local function option_colourBlindUpdate()
 	col_income = (options.colourBlind.value and {.9,.9,.2,1}) or {.1,1,.2,1}
 	col_expense = (options.colourBlind.value and {.2,.3,1,1}) or {1,.3,.2,1}
 	col_overdrive = (options.colourBlind.value and {1,1,1,1}) or {.5,1,0,1}
-	col_highlight = {0.6, 0.6, 0.6, 1}
+	col_highlight = {1, 0.5, 0.5, 1}
 end
 
 options_order = {
@@ -447,28 +451,46 @@ local function Mix(startColour, endColour, interpParam)
 	endColour[4] * interpParam + startColour[4] * (1 - interpParam), }
 end
 
-local function UpdateBlink(s)
+local BlinkStatusFunc = {
+	[1] = function (index)
+		index = index%12
+		if index < 6 then
+			return index*0.8/5
+		else
+			return (11 - index)*0.8/5
+		end
+	end,
+	[2] = function (index)
+		index = index%8
+		if index < 4 then
+			return 0.25 + index*0.75/3
+		else
+			return 0.25 + (7 - index)*0.75/3
+		end
+	end,
+}
+
+local timer = 0
+local blinkIndex = 0
+local function UpdateBlink(dt)
+	timer = timer + dt
+	if timer < BLINK_UPDATE_RATE then
+		return
+	end
+	timer = timer - BLINK_UPDATE_RATE
+	blinkIndex = (blinkIndex + 1)%24
+	
 	if blinkM_status then
-		local blinkPeriod = BASE_BLINK_PERIOD/blinkM_status
-		blinkMetal = (blinkMetal + s)%blinkPeriod
-		local sawtooth = math.abs(blinkMetal/blinkPeriod - 0.5)*2
-		local blink_alpha = sawtooth*0.95
-		
-		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_highlight, blink_alpha))
+		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_highlight, BlinkStatusFunc[blinkM_status](blinkIndex)))
 	end
 	
 	if blinkE_status then
-		local blinkPeriod = BASE_BLINK_PERIOD/blinkE_status
-		blinkEnergy = (blinkEnergy + s)%blinkPeriod
-		local sawtooth = math.abs(blinkEnergy/blinkPeriod - 0.5)*2
-		local blink_alpha = sawtooth*0.95
-		
-		bar_overlay_energy:SetColor(col_expense[1], col_expense[2], col_expense[3], blink_alpha)
+		bar_overlay_energy:SetColor(col_expense[1], col_expense[2], col_expense[3], BlinkStatusFunc[blinkE_status](blinkIndex))
 	end
 	
-	metalNoStorage.UpdateFlash(s)
-	energyNoStorage.UpdateFlash(s)
-end	
+	metalNoStorage.UpdateFlash(blinkIndex)
+	energyNoStorage.UpdateFlash(blinkIndex)
+end
 
 local function UpdateWindowOpacity()
 	if updateOpacity then
@@ -628,10 +650,16 @@ function widget:GameFrame(n)
 	mStor = math.max(mStor - HIDDEN_STORAGE, MIN_STORAGE)
 	eStor = math.max(eStor - HIDDEN_STORAGE, MIN_STORAGE)
 	
-	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
-	if mCurr >= mStor then
-		blinkM_status = 3
-	elseif mCurr >= mStor * 0.9 then
+	-- Waste
+	local teamMetalWaste = math.min(0, teamTotalMetalCapacity - teamTotalMetalStored)
+	if teamTotalMetalStored > teamTotalMetalCapacity then
+		teamTotalMetalStored = teamTotalMetalCapacity
+	end
+	
+	-- Metal Blink
+	if flashModeEnabled and (mCurr >= mStor or teamMetalWaste > 0) then
+		blinkM_status = 2
+	elseif flashModeEnabled and mCurr >= mStor * 0.9 then
 		-- Blink less fast
 		blinkM_status = 1
 	elseif blinkM_status then
@@ -646,20 +674,27 @@ function widget:GameFrame(n)
 	if mCurr > mStor then 
 		mCurr = mStor
 	end
-	local teamMetalWaste = math.min(0, teamTotalMetalCapacity - teamTotalMetalStored)
-	if teamTotalMetalStored > teamTotalMetalCapacity then
-		teamTotalMetalStored = teamTotalMetalCapacity
-	end
 	
 	local ODEFlashThreshold = 0.1
 
+	--// Storage, income and pull numbers
+	local realEnergyPull = ePull
+
+	local netMetal = mInco - mPull + mReci
+	local netEnergy = eInco - realEnergyPull
+	
+	-- Energy Blink
 	local wastingE = false
 	if options.eExcessFlash.value then
 		wastingE = (cp.team_energyWaste > 0)
 	end
 	local stallingE = (eCurr <= eStor * options.energyFlash.value) and (eCurr < 1000) and (eCurr >= 0)
-	if stallingE or wastingE then
-		blinkE_status = 1
+	if flashModeEnabled and (stallingE or wastingE) then
+		if stallingE and netEnergy < 0 then
+			blinkE_status = 2
+		else
+			blinkE_status = 1
+		end
 		bar_energy:SetValue( 100 )
 		excessE = wastingE
 	elseif blinkE_status then
@@ -668,16 +703,11 @@ function widget:GameFrame(n)
 		bar_overlay_energy:SetColor({0,0,0,0})
 	end
 
-	--// Storage, income and pull numbers
-	local realEnergyPull = ePull
-
-	local netMetal = mInco - mPull + mReci
-	local netEnergy = eInco - realEnergyPull
-	
+	-- Warnings
 	local metalWarning = (mStor > 1 and mCurr > mStor * options.metalWarning.value) or (mStor <= 1 and netMetal > 0)
-	local energyWarning = eStor > 1 and eCurr < eStor * options.energyWarning.value
-	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
-	energyWarningPanel.ShowWarning(energyWarning)
+	local energyWarning = (eStor > 1 and eCurr < eStor * options.energyWarning.value) or ((not metalWarning) and eStor <= 1 and eInco < mInco)
+	metalWarningPanel.ShowWarning(flashModeEnabled and (metalWarning and not energyWarning))
+	energyWarningPanel.ShowWarning(flashModeEnabled and energyWarning)
 	
 	local mPercent, ePercent 
 	if mStor > 1 then
@@ -734,6 +764,10 @@ function widget:GameFrame(n)
 	local team_energyWaste = Format(-cp.team_energyWaste)
 	local team_energyOther = Format(-teamEnergyExp + teamMSpent + cp.team_energyOverdrive)
 
+	local odEff = (cp.team_metalOverdrive > 0) and (cp.team_energyOverdrive / cp.team_metalOverdrive) or 0
+	local odColor = GetGridColor((odEff < 1) and 0 or (odEff < 4.2 and 4.2 or odEff)) -- grids below 4.2 have dark colors which make the text illegible; 0 is okay though
+	local odEffStr = string.char(255, odColor[1] * 255, odColor[2] * 255, odColor[3] * 255) .. ("%.1f"):format(odEff) .. WhiteStr
+
 	image_metal.tooltip = strings["local_metal_economy"] ..
 	"\n  " .. strings["resbar_base_extraction"] .. ": " .. metalBase ..
 	"\n  " .. strings["resbar_overdrive"] .. ": " .. metalOverdrive ..
@@ -780,6 +814,7 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
 	"\n  " .. strings["resbar_other"] .. ": " .. team_energyOther ..
 	"\n  " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
+	"\n  " .. strings["resbar_overdrive_efficiency"] .. ": " .. odEffStr .. " E/M" ..
     "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
 	
 	lbl_expense_metal:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
@@ -984,18 +1019,20 @@ local function GetNoStorageWarning(parentControl, x, y, right, height, barHolder
 		end
 	end
 	
-	function externalFunctions.UpdateFlash(s)
+	function externalFunctions.UpdateFlash(blinkIndex)
 		if not flash then
 			return
 		end
-		blinkValue = (blinkValue + s)%BASE_BLINK_PERIOD
-		local sawtooth = math.abs(blinkValue/BASE_BLINK_PERIOD - 0.5)*2
-		local blink_alpha = sawtooth*0.95
+		local blink_alpha
+		if blinkIndex%12 < 6 then
+			blink_alpha = (blinkIndex%12)*0.20
+		else
+			blink_alpha = (11 - blinkIndex%12)*0.20
+		end
 		
-		line.borderColor = Mix({col_line[1], col_line[2], col_line[3], 0.65}, col_expense, blink_alpha)
+		line.borderColor = Mix(col_line, col_expense, blink_alpha)
 		line:Invalidate()
 	end
-	
 	
 	return externalFunctions
 end
@@ -1014,6 +1051,10 @@ function externalFunctions.SetEconomyPanelVisibility(newVisibility, dispose)
 	else
 		window:SetVisibility(newVisibility)
 	end
+end
+
+function externalFunctions.SetFlashEnabled(newEnabled)
+	flashModeEnabled = newEnabled
 end
 
 --------------------------------------------------------------------------------
@@ -1061,13 +1102,17 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 			return
 		end
 		
-		local reserve = (x) / (self.width - self.padding[1] - self.padding[3])
-		if mouse ~= 1 then
-			UpdateReserveBars(true, true, reserve)
-		elseif metal then
-			UpdateReserveBars(true, false, reserve)
-		else
-			UpdateReserveBars(false, true, reserve)
+		local width = (self.width - self.padding[1] - self.padding[3])
+		
+		if width > 0 then
+			local reserve = x/width 
+			if mouse ~= 1 then
+				UpdateReserveBars(true, true, reserve)
+			elseif metal then
+				UpdateReserveBars(true, false, reserve)
+			else
+				UpdateReserveBars(false, true, reserve)
+			end
 		end
 	end
 	
@@ -1086,7 +1131,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		parent = Chili.Screen0,
 		dockable = true,
 		name="EconomyPanelDefaultTwo",
-		padding = {0,0,0,0},
+		padding = {0,-1,0,0},
 		-- right = "50%",
 		x = oldX or (screenHorizCentre - economyPanelWidth/2),
 		y = oldY or 0,
@@ -1142,12 +1187,12 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	local storageX    = "18%"
 	local incomeX     = "44%"
 	local pullX       = "70%"
-	local textY       = "46%"
+	local textY       = "47%"
 	local textWidth   = "45%"
 	local textHeight  = "26%"
 	
 	local barX      = "17%"
-	local barY      = "9%"
+	local barY      = "10%"
 	local barRight  = "4%"
 	local barHeight = "38%"
 	
@@ -1268,7 +1313,8 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		bottom = 0,
 		value  = 0,
 		fontShadow = false,
-		font   = {
+		fontOffset = -2,
+		font = {
 			size = 20, 
 			color = {.8,.8,.8,.95}, 
 			outline = true,
@@ -1416,6 +1462,8 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		right = 0,
 		bottom = 0,
 		noSkin = true,
+		fontShadow = false,
+		fontOffset = -2,
 		font   = {
 			size = 20, 
 			color = {.8,.8,.8,.95}, 

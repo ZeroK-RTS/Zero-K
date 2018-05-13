@@ -4,145 +4,160 @@ include "constants.lua"
 
 local spGetUnitTeam = Spring.GetUnitTeam
 
---pieces
-local base = piece "base"
+local base, elevator, turret, emit, barrel, pipe, pad = piece ("base", "elevator", "turret", "emit", "barrel", "pipe", "pad")
 
-local wing_1 = piece "wing_1"
-local bay_1 = piece "bay_1"
-local arm_1 = piece "arm_1"
-local nano_1 = piece "nano_1"
-local emit_1 = piece "emit_1"
-local pow_1 = piece "pow_1"
+local spinners = {}
+for i = 1, 4 do spinners[i] = piece ("spinner_" .. i) end
 
-local wing_2 = piece "wing_2"
-local bay_2 = piece "bay_2"
-local arm_2 = piece "arm_2"
-local nano_2 = piece "nano_2"
-local emit_2 = piece "emit_2"
-local pow_2 = piece "pow_2"
+local lidh1, lidh2 = piece ("lid_h_1", "lid_h_2")
+local lid1, lid2 = piece ("lid_1", "lid_2")
+local track1, track2, track3 = piece ("track_1", "track_2", "track_3")
 
-local wing_3 = piece "wing_3"
-local bay_3 = piece "bay_3"
-local arm_3 = piece "arm_3"
-local nano_3 = piece "nano_3"
-local emit_3 = piece "emit_3"
-local pow_3 = piece "pow_3"
+local open = false
 
-local pipes = piece "pipes"
+local SIG_ANIM = 1
 
-local blink_1 = piece "blink_1"
-local blink_2 = piece "blink_2"
-
-local pad = piece "pad"
-
-
---local vars
-local nanoPieces = {emit_1,emit_2,emit_3}
-local nanoIdx = 1
-local smokePiece = { piece "wing_1", piece "wing_2", piece "wing_3" }
-
-local animSpeed = 4
-
---opening animation of the factory
-local function Open()
-	Signal(2) --kill the closing animation if it is in process
-	--SetSignalMask(1) --set the signal to kill the opening animation
-
-	Turn(wing_1, 3, -1.57, animSpeed)
-	Turn(wing_2, 1, -1.57, animSpeed)
-	Turn(wing_3, 3, 1.57, animSpeed)
-
-	WaitForTurn(wing_1,3)
-
-	Turn(bay_1, 3, 1.57, animSpeed)
-	Turn(bay_2, 1, 1.57, animSpeed)
-	Turn(bay_3, 3, -1.57, animSpeed)
-
-	WaitForTurn(bay_1, 3)
-
-	Turn(arm_1, 3, 2.25, animSpeed)
-	Turn(arm_2, 1, 2.25, animSpeed)
-	Turn(arm_3, 3, -2.25, animSpeed)
-
-	Turn(nano_1, 3, -1.85, animSpeed)
-	Turn(nano_2, 1, -1.85, animSpeed)
-	Turn(nano_3, 3, 1.85, animSpeed)
-
-	WaitForTurn(nano_1,3)
-
-	Turn(pow_1, 3, 1.57, animSpeed)
-	Turn(pow_2, 1, 1.57, animSpeed)
-	Turn(pow_3, 3, -1.57, animSpeed)
-
-	WaitForTurn(pow_1, 3)
-	Sleep(300/animSpeed)
-
---	SetUnitValue(COB.YARD_OPEN, 1) --Tobi said its not necessary
-	SetUnitValue(COB.BUGGER_OFF, 1)
-	SetUnitValue(COB.INBUILDSTANCE, 1)
+local function GetDisabled()
+	return Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID,"disarmed") == 1)
 end
 
---closing animation of the factory
-local function Close()
-	Signal(1) --kill the opening animation if it is in process
-	SetSignalMask(2) --set the signal to kill the closing animation
+local function Open()
+	if open then
+		return
+	end
+	Signal(SIG_ANIM)
+	SetSignalMask(SIG_ANIM)
+	open = true
 
---	SetUnitValue(COB.YARD_OPEN, 0)
+	while GetDisabled() do
+		Sleep(500)
+	end
+	
+	for i = 1, #spinners do
+		Spin(spinners[i], x_axis, math.rad(180))
+	end
+	Turn(lidh1, z_axis, math.rad( 90), math.rad(100))
+	Turn(lidh2, z_axis, math.rad(-90), math.rad(100))
+	Move(track1, z_axis, -18, 36)
+
+	WaitForMove (track1, z_axis)
+	while GetDisabled() do
+		Sleep(500)
+	end
+	
+	Move(elevator, y_axis, 20, 20)
+	Move(track2, z_axis, -22, 44)
+
+	WaitForMove (track2, z_axis)
+	while GetDisabled() do
+		Sleep(500)
+	end
+	
+	Move(track3, z_axis, -26, 52)
+	Move(barrel, z_axis, 8, 16)
+
+	WaitForTurn (lidh1, z_axis)
+	while GetDisabled() do
+		Sleep(500)
+	end
+	
+	Move(lid1, x_axis, -13, 28)
+	Move(lid2, x_axis, 13, 28)
+	
+	WaitForMove (track3, z_axis)
+	while GetDisabled() do
+		Sleep(500)
+	end
+	
+	for i = 1, #spinners do
+		StopSpin(spinners[i], x_axis)
+	end
+	
+	SetUnitValue(COB.BUGGER_OFF, 1)
+	SetUnitValue(COB.INBUILDSTANCE, 1)
+	SetUnitValue(COB.YARD_OPEN, 1)
+end
+
+local function Close()
+	if not open then
+		return
+	end
+	Signal(SIG_ANIM)
+	SetSignalMask(SIG_ANIM)
+	open = false
+
 	SetUnitValue(COB.BUGGER_OFF, 0)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
+	SetUnitValue(COB.YARD_OPEN, 0)
+	
+	while GetDisabled() do
+		Sleep(500)
+	end
 
-	Turn(pow_1, 3, 0, animSpeed)
-	Turn(pow_2, 1, 0, animSpeed)
-	Turn(pow_3, 3, 0, animSpeed)
+	for i = 1, #spinners do
+		Spin(spinners[i], x_axis, math.rad(-180))
+	end
 
-	WaitForTurn(pow_1,3)
+	Move(lid1, x_axis, 0, 28)
+	Move(lid2, x_axis, 0, 28)
+	
+	Move(barrel, z_axis, 0, 16)
+	Move(track3, z_axis, 0, 52)
+	Move(elevator, y_axis, 0, 20)
+	
+	WaitForMove (lid1, x_axis)
+	while GetDisabled() do
+		Sleep(500)
+	end
+	
+	Turn(lidh1, z_axis, 0, math.rad(100))
+	Turn(lidh2, z_axis, 0, math.rad(100))
 
-	Turn(arm_1, 3, 0, animSpeed)
-	Turn(arm_2, 1, 0, animSpeed)
-	Turn(arm_3, 3, 0, animSpeed)
+	WaitForMove (track3, z_axis)
+	while GetDisabled() do
+		Sleep(500)
+	end
+	
+	Move(track2, z_axis, 0, 44)
 
-	Turn(nano_1, 3, 0, animSpeed)
-	Turn(nano_2, 1, 0, animSpeed)
-	Turn(nano_3, 3, 0, animSpeed)
+	WaitForMove (track2, z_axis)
+	while GetDisabled() do
+		Sleep(500)
+	end
+	
+	Move(track1, z_axis, 0, 36)
 
-	WaitForTurn(arm_1, 3)
-
-	Turn(bay_1, 3, 0, animSpeed)
-	Turn(bay_2, 1, 0, animSpeed)
-	Turn(bay_3, 3, 0, animSpeed)
-
-	WaitForTurn(bay_1,3)
-
-	Turn(wing_1, 3, 0, animSpeed)
-	Turn(wing_2, 1, 0, animSpeed)
-	Turn(wing_3, 3, 0, animSpeed)
+	WaitForMove (track1, z_axis)
+	while GetDisabled() do
+		Sleep(500)
+	end
+	
+	for i = 1, #spinners do
+		StopSpin(spinners[i], x_axis)
+	end
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
-	Spring.SetUnitNanoPieces(unitID, nanoPieces)
+	StartThread(SmokeUnit, {pipe, lidh2, piece "smoke_1"})
+	Spring.SetUnitNanoPieces(unitID, {emit})
+	StartThread(Open)
 end
 
 function script.QueryNanoPiece()
-	if (nanoIdx == 3) then
-		nanoIdx = 1
-	else
-		nanoIdx = nanoIdx + 1
-	end
-
-	local nano = nanoPieces[nanoIdx]
-
-	--// send to LUPS
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,spGetUnitTeam(unitID),nano)
-
+	GG.LUPS.QueryNanoPiece(unitID, unitDefID, spGetUnitTeam(unitID), emit)
 	return nano
 end
 
 function script.Activate ()
-	StartThread(Open) --animation needs its own thread because Sleep and WaitForTurn will not work otherwise
+	StartThread(Open)
 end
 
-function script.Deactivate ()
+local firstDeactivate = true
+function script.Deactivate()
+	if firstDeactivate then
+		firstDeactivate = false
+		return
+	end
 	StartThread(Close)
 end
 
@@ -150,82 +165,21 @@ function script.QueryBuildInfo()
 	return pad
 end
 
---death and wrecks
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
+	local brutal = (severity > 0.5)
 
-	if (severity <= .25) then
-		Explode(bay_1, SFX.EXPLODE)
-		Explode(bay_2, SFX.EXPLODE)
-		Explode(bay_3, SFX.EXPLODE)
+	local explodables = {barrel, turret, pipe, spinners[1], spinners[4], piece "lid_1"}
+	for i = 1, #explodables do
+		if math.random() < severity then
+			Explode (explodables[i], sfxFall + (brutal and (sfxSmoke + sfxFire) or 0))
+		end
+	end
 
-		Explode(arm_1, SFX.EXPLODE_ON_HIT)
-		Explode(arm_2, SFX.EXPLODE_ON_HIT)
-		Explode(arm_3, SFX.EXPLODE_ON_HIT)
-
-		Explode(nano_1, SFX.EXPLODE_ON_HIT)
-		Explode(nano_2, SFX.EXPLODE_ON_HIT)
-		Explode(nano_3, SFX.EXPLODE_ON_HIT)
-
-		Explode(pow_1, SFX.EXPLODE_ON_HIT)
-		Explode(pow_2, SFX.EXPLODE_ON_HIT)
-		Explode(pow_3, SFX.EXPLODE_ON_HIT)
-
-		Explode(pipes, SFX.EXPLODE_ON_HIT)
-
-		return 1 -- corpsetype
-
-	elseif (severity <= .5) then
-		Explode(base, SFX.SHATTER)
-
-		Explode(wing_1, SFX.EXPLODE)
-		Explode(wing_2, SFX.EXPLODE)
-		Explode(wing_3, SFX.EXPLODE)
-
-		Explode(bay_1, SFX.EXPLODE)
-		Explode(bay_2, SFX.EXPLODE)
-		Explode(bay_3, SFX.EXPLODE)
-
-		Explode(arm_1, SFX.EXPLODE_ON_HIT)
-		Explode(arm_2, SFX.EXPLODE_ON_HIT)
-		Explode(arm_3, SFX.EXPLODE_ON_HIT)
-
-		Explode(nano_1, SFX.EXPLODE_ON_HIT)
-		Explode(nano_2, SFX.EXPLODE_ON_HIT)
-		Explode(nano_3, SFX.EXPLODE_ON_HIT)
-
-		Explode(pow_1, SFX.EXPLODE_ON_HIT)
-		Explode(pow_2, SFX.EXPLODE_ON_HIT)
-		Explode(pow_3, SFX.EXPLODE_ON_HIT)
-
-		Explode(pipes, SFX.EXPLODE_ON_HIT)
-
-		return 1 -- corpsetype
+	if not brutal then
+		return 1
 	else
-		Explode(base, SFX.SHATTER)
-
-		Explode(wing_1, SFX.SHATTER)
-		Explode(wing_2, SFX.SHATTER)
-		Explode(wing_3, SFX.SHATTER)
-
-		Explode(bay_1, SFX.EXPLODE_ON_HIT)
-		Explode(bay_2, SFX.EXPLODE_ON_HIT)
-		Explode(bay_3, SFX.EXPLODE_ON_HIT)
-
-		Explode(arm_1, SFX.EXPLODE_ON_HIT)
-		Explode(arm_2, SFX.EXPLODE_ON_HIT)
-		Explode(arm_3, SFX.EXPLODE_ON_HIT)
-
-		Explode(nano_1, SFX.EXPLODE_ON_HIT)
-		Explode(nano_2, SFX.EXPLODE_ON_HIT)
-		Explode(nano_3, SFX.EXPLODE_ON_HIT)
-
-		Explode(pow_1, SFX.EXPLODE_ON_HIT)
-		Explode(pow_2, SFX.EXPLODE_ON_HIT)
-		Explode(pow_3, SFX.EXPLODE_ON_HIT)
-
-		Explode(pipes, SFX.EXPLODE_ON_HIT)
-
-		return 2 -- corpsetype
+		Explode (base, sfxShatter)
+		return 2
 	end
 end

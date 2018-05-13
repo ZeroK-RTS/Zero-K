@@ -29,7 +29,7 @@ local function Activate()
 	SetSignalMask(SIG_OPEN)
 	
 	Sleep(1000)
-	Move(dish, y_axis, 11, 7)
+	Move(dish, y_axis, 30, 7)
 	WaitForMove(dish, y_axis)
 	Turn(ant, z_axis, rad(-100), rad(60))
 	Turn(arm, z_axis, rad(30), rad(40))

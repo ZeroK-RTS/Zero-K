@@ -4,12 +4,13 @@ configs.roostName = 'roost'
 
 configs.difficulties = {
     [0] = 0,
-    [1] = 'Very Easy',
-    [2] = 'Easy',
-    [3] = 'Normal',
-    [4] = 'Hard',
-    [5] = 'Suicidal',
-    [6] = 'Custom',
+    [1] = 'Beginner',
+    [2] = 'Very Easy',
+    [3] = 'Easy',
+    [4] = 'Normal',
+    [5] = 'Hard',
+    [6] = 'Suicidal',
+    [7] = 'Custom',
 }
 
 configs.colorSet = {

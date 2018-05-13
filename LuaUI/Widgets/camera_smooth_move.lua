@@ -16,14 +16,16 @@ options_order = { 'smooth_mmb_scroll'}
 options = {
 	smooth_mmb_scroll = {
 		name = 'MMB scrolls instead of dragging',
-		desc = "When enabled, MMB scrolls the map in that direction.\n" ..
-		       "When disabled, MMB drags the map instead.",
+		desc = "When enabled hold middle mouse button to scroll the map in a direction.\n" ..
+		       "When disabled click and drag the map with middle mouse button.",
 		type = 'bool', 
 		noHotkey = true,
 		value = false,
 		OnChange = function(self)
 			isEnabled = self.value
 		end,
+		simpleMode = true,
+		everyMode = true,
 	},
 }
 

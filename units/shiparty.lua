@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[shiparty]],
-  name                   = [[Ronin]],
+  name                   = [[Envoy]],
   description            = [[Cruiser (Artillery)]],
   acceleration           = 0.0417,
   activateWhenBuilt      = true,
@@ -30,7 +30,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 25,
-  maxDamage              = 2500,
+  maxDamage              = 2000,
   maxVelocity            = 1.7,
   minCloakDistance       = 75,
   minWaterDepth          = 10,

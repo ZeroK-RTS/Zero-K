@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakassault]],
-  name                   = [[Zeus]],
+  name                   = [[Knight]],
   description            = [[Lightning Assault Bot]],
   acceleration           = 0.2,
   brakeRate              = 0.6,
@@ -13,6 +13,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 7]],
   collisionVolumeScales  = [[35 50 35]],
   collisionVolumeType    = [[cylY]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {

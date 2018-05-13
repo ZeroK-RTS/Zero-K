@@ -198,8 +198,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function GotChatMsg(msg, playerID)
-  local words = MakeWords(msg)
+local function GotChatMsg(rawMsg, playerID)
+  local words = MakeWords(rawMsg)
   local cmd = words[1]
   if (cmd == nil) then
     return false
@@ -216,7 +216,7 @@ local function GotChatMsg(msg, playerID)
 
   -- remove the command from the words list and the raw line
   table.remove(words, 1)
-  local _,_,msg = msg:find("[%s]*[^%s]+[%s]+(.*)")
+  local _,_,msg = rawMsg:find("[%s]*[^%s]+[%s]+(.*)")
   if (msg == nil) then
     msg = ""  -- no args
   end

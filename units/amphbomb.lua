@@ -14,6 +14,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[16 12 22]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -69,7 +72,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[wreck2x2c.s3o]],
+      object           = [[amphbomb_dead.s3o]],
     },
 
     HEAP      = {
@@ -92,6 +95,7 @@ local weaponDefs = {
         lups_explodelife = 0.88,
 	    timeslow_damagefactor = 10,
 		timeslow_overslow_frames = 5*30, --5 seconds before slow decays
+        nofriendlyfire = 1,
 		light_color = [[1.88 0.63 2.5]],
 		light_radius = 320,
 	 },
@@ -107,7 +111,7 @@ local weaponDefs = {
     impulseFactor      = 0.3,
     name               = "Slowing Explosion",
     soundHit           = "weapon/aoe_aura",
-	soundHitVolume     = 0.6,
+	soundHitVolume     = 1.2,
   },
 }
 unitDef.weaponDefs = weaponDefs

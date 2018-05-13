@@ -26,7 +26,7 @@ local SIG_CLOSEDOORS = 2
 local smokePiece = {base, engineEmit}
 
 include "constants.lua"
-
+include "transports.lua"
 
 local function openDoors()
 
@@ -106,17 +106,12 @@ function getCommandId()
 	return nil
 end
 
---fetch unit id of passenger (from the load command)
 function getDropPoint() 
-	local cmd=Spring.GetCommandQueue(unitID, 1)
-	local dropx, dropy,dropz = nil	
-	
-	if cmd and cmd[1] then					
-		if cmd[1]['id'] == 81 then -- CMDTYPE.LOAD_UNITS = 75
-			dropx, dropy,dropz = cmd[1]['params'][1], cmd[1]['params'][2], cmd[1]['params'][3]				
-		end
+	local cmd = Spring.GetCommandQueue(unitID, 1)
+	if cmd and cmd[1] and cmd[1].id == 81 then -- CMDTYPE.LOAD_UNITS = 75
+		return cmd[1]['params'][1], cmd[1]['params'][2], cmd[1]['params'][3]
 	end
-	return {dropx, dropy,dropz}
+	return false
 end
 
 function isNearPickupPoint(passengerId, requiredDist)
@@ -152,8 +147,13 @@ function isNearDropPoint(transportUnitId, requiredDist)
 	end
 
 	local px, py, pz = Spring.GetUnitBasePosition(transportUnitId)
-	local dropPoint = getDropPoint()
-	local px2, py2, pz2 = dropPoint[1], dropPoint[2], dropPoint[3]
+	if not px then
+		return false
+	end
+	local px2, py2, pz2 = getDropPoint()
+	if not px2 then
+		return false
+	end
 	
 	local dx = px - px2
 	local dz = pz - pz2 
@@ -214,7 +214,14 @@ function script.BeginTransport(passengerID)
 		return 
 	end
 	Move(link, y_axis, -Spring.GetUnitHeight(passengerID), nil, true)
-
+	
+	if not TransportAllowed(passengerID) then
+		Sleep(10)
+		unitLoaded = passengerID
+		ForceDropUnit()
+		return
+	end
+	
 	--local px, py, pz = Spring.GetUnitBasePosition(passengerID)
 	SetUnitValue(COB.BUSY, 1)
 

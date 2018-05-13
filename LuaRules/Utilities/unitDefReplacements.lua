@@ -3,17 +3,19 @@
 -------------------------------------------------------------------------------------
 
 local buildTimes = {}
+local planetwarsStructure = {}
 local variableCostUnit = {
 	[UnitDefNames["terraunit"].id] = true
 }
-local isCommander = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	buildTimes[i] = ud.buildTime
 	if ud.customParams.level or ud.customParams.dynamic_comm then
 		variableCostUnit[i] = true
-		isCommander[i] = true
+	end
+	if ud.customParams.planetwars_structure then
+		planetwarsStructure[i] = true
 	end
 end
 
@@ -62,8 +64,10 @@ end
 
 local function GetZenithTooltip (unitID)
 	local meteorsControlled = Spring.GetUnitRulesParam(unitID, "meteorsControlled")
-	if not meteorsControlled then return end
-
+	if not meteorsControlled then
+		return
+	end
+	
 	return (WG.Translate("units", "zenith.description") or "Meteor Controller") .. " - " .. (WG.Translate("interface", "meteors_controlled") or "Meteors controlled") .. " " .. (meteorsControlled or "0") .. "/500"
 end
 
@@ -73,12 +77,26 @@ local function GetAvatarTooltip(unitID)
 	return commOwner or ""
 end
 
-local function GetCustomTooltip (unitID)
+local function GetPlanetwarsTooltip(unitID, ud)
+	if not planetwarsStructure[ud.id] then
+		return false
+	end
+	local disabled = (Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1)
+	if not disabled then
+		return
+	end
+	local name_override = ud.customParams.statsname or ud.name
+	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
+	return desc .. " - Disabled"
+end
+
+local function GetCustomTooltip (unitID, ud)
 	return GetGridTooltip(unitID)
 	or GetMexTooltip(unitID)
 	or GetTerraformTooltip(unitID)
 	or GetZenithTooltip(unitID)
 	or GetAvatarTooltip(unitID)
+	or GetPlanetwarsTooltip(unitID, ud)
 end
 
 function Spring.Utilities.GetHumanName(ud, unitID)
@@ -110,7 +128,7 @@ function Spring.Utilities.GetDescription(ud, unitID)
 	local name_override = ud.customParams.statsname or ud.name
 	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
 	if Spring.ValidUnitID(unitID) then
-		local customTooltip = GetCustomTooltip(unitID)
+		local customTooltip = GetCustomTooltip(unitID, ud)
 		if customTooltip then
 			return customTooltip
 		end
@@ -185,6 +203,18 @@ function Spring.Utilities.UnitEcho(unitID, st)
 	else
 		Spring.Echo("Invalid unitID")
 		Spring.Echo(unitID)
+		Spring.Echo(st)
+	end
+end
+
+function Spring.Utilities.FeatureEcho(featureID, st)
+	st = st or featureID
+	if Spring.ValidFeatureID(featureID) then
+		local x,y,z = Spring.GetFeaturePosition(featureID)
+		Spring.MarkerAddPoint(x,y,z, st)
+	else
+		Spring.Echo("Invalid featureID")
+		Spring.Echo(featureID)
 		Spring.Echo(st)
 	end
 end

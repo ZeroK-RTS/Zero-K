@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[striderarty]],
-  name                   = [[Catapult]],
+  name                   = [[Merlin]],
   description            = [[Heavy Saturation Artillery Strider]],
   acceleration           = 0.1092,
   brakeRate              = 0.1942,
@@ -73,6 +73,7 @@ unitDef = {
       craterMult              = 2,
 	  
 	  customParams        	  = {
+        reaim_time = 8, -- COB
 		light_camera_height = 2500,
 		light_color = [[0.35 0.17 0.04]],
 		light_radius = 400,

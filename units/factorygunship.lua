@@ -4,11 +4,11 @@ unitDef = {
   description                   = [[Produces Gunships, Builds at 10 m/s]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildCostMetal                = 600,
+  buildCostMetal                = Shared.FACTORY_COST,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 9,
-  buildingGroundDecalSizeY      = 7,
+  buildingGroundDecalSizeX      = 10,
+  buildingGroundDecalSizeY      = 10,
   buildingGroundDecalType       = [[factorygunship_aoplane.dds]],
 
   buildoptions                  = {
@@ -32,6 +32,9 @@ unitDef = {
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[86 86 86]],
   collisionVolumeType           = [[ellipsoid]],
+  selectionVolumeOffsets        = [[0 10 0]],
+  selectionVolumeScales         = [[104 60 96]],
+  selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -39,6 +42,7 @@ unitDef = {
     sortName = [[3]],
 	modelradius    = [[43]],
 	nongroundfac = [[1]],
+	default_spacing = 8,
   },
 
   energyUse                     = 0,

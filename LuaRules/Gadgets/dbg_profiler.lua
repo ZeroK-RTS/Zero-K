@@ -185,7 +185,7 @@ end
 if (gadgetHandler:IsSyncedCode()) then
 
   function gadget:Initialize()
-    gadgetHandler.actionHandler.AddChatAction(gadget, 'profile', StartHook,
+    gadgetHandler.actionHandler.AddChatAction(gadget, 'sprofile', StartHook,
       " : starts the gadget profiler (for debugging issues)"
     )
     --StartHook()
@@ -310,7 +310,7 @@ else
     gadgetHandler.actionHandler.AddSyncAction(gadget, "prf_finished",SyncedCallinFinished) 
 
     gadgetHandler.actionHandler.AddChatAction(gadget, 'uprofile', Start, " : starts the gadget profiler (for debugging issues)")
-    gadgetHandler.actionHandler.AddChatAction(gadget, 'profile', StartSYNCED,"")
+    gadgetHandler.actionHandler.AddChatAction(gadget, 'sprofile', StartSYNCED,"")
 	gadgetHandler.actionHandler.AddChatAction(gadget, 'ap', StartBoth,"")
 	gadgetHandler.actionHandler.AddChatAction(gadget, 'fprofile', FilterLowValueToggle," : filter out low values")
 	gadgetHandler.actionHandler.AddChatAction(gadget, 'profilegadget', ToggleTargetGadget," : profilegadget <gadget_name> <how_much_second_to_profile>.")

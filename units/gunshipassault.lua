@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[gunshipassault]],
-  name                = [[Black Dawn]],
+  name                = [[Revenant]],
   description         = [[Heavy Raider/Assault Gunship]],
   acceleration        = 0.135,
   brakeRate           = 0.108,

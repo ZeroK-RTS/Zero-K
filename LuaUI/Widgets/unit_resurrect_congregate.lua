@@ -95,7 +95,7 @@ function widget:Update(n)
 				if closestCoordinate[1] then
 					local x,y,z = closestCoordinate[1],closestCoordinate[2],closestCoordinate[3]
 					local currentIndex = #orderArray+1
-					orderArray[currentIndex]={CMD_RAW_MOVE, {x,y,z}, { "" }}
+					orderArray[currentIndex]={CMD_RAW_MOVE, {x,y,z}, 0}
 					unitArray[currentIndex] = unitToMove_gbl[unitIndex][4] --unitID
 				end
 			end

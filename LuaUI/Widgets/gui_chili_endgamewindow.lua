@@ -301,22 +301,22 @@ local function SetupControls()
 	}
 	
 	exitButton = Button:New{
-		parent = window_endgame;
-		caption="Quit",
+		x = -169, -- This is is a high class nonsense here
+		y = 7,
+		width = 160,
+		height = B_HEIGHT,
+		caption = "Exit to Lobby",
 		fontsize = 18,
-		y=7;
-		width = 80;
-		x = -89;
-		height=B_HEIGHT;
 		OnClick = {
-			function() 
+			function()
 				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
 					Spring.Reload("")
 				else
 					Spring.SendCommands("quit","quitforce")
 				end
 			 end
-		};
+		},
+		parent   = window_endgame,
 	}
 end
 
@@ -373,6 +373,11 @@ end
 --callins
 
 local function StartEndgameTimer (delay)
+	if Spring.GetModOptions().singleplayercampaignbattleid then
+		-- SP has its own endgame thing
+		return
+	end
+
 	gameEnded = true
 	showEndgameWindowTimer = endgameWindowDelay
 	widgetHandler:UpdateCallIn("Update")

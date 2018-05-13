@@ -56,7 +56,7 @@ local SIG_Aim3 = 16
 local SIG_Idle = 32
 local armgun = false
 local missilegun = 1
-local PACE = 1.4
+local PACE = 1.25
 
 local LEG_FRONT_ANGLES	= { thigh=math.rad(-35), shin=math.rad(5), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(25) }
 local LEG_FRONT_SPEEDS	= { thigh=math.rad(90)*PACE, shin=math.rad(150)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
@@ -86,6 +86,7 @@ local ARM_BACK_SPEED = math.rad(35) * PACE
 local ARM_SIDE_ANGLE = math.rad(5)
 
 local isFiring = false
+local isFiringBeam = false
 
 local CHARGE_TIME = 60	-- frames
 local FIRE_TIME = 120
@@ -318,11 +319,25 @@ function script.AimFromWeapon(num)
 	end
 end
 
+local beam_duration = WeaponDefs[UnitDef.weapons[1].weaponDef].beamtime * 1000
+function script.FireWeapon(num)
+	if num ~= 1 then
+		return
+	end
+
+	isFiringBeam = true
+	Sleep(beam_duration)
+	isFiringBeam = false
+end
+
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Idle)
 	if num == 1 then
 		Signal(SIG_Aim)
 		SetSignalMask(SIG_Aim)
+		while isFiringBeam do
+			Sleep(100)
+		end
 		Turn(head, y_axis, heading, 3)
 		Turn(headflare, x_axis, -pitch, 3)
 		WaitForTurn(head, y_axis)

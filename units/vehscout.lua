@@ -1,10 +1,10 @@
 unitDef = {
   unitname               = [[vehscout]],
   name                   = [[Dart]],
-  description            = [[Raider/Scout Vehicle]],
+  description            = [[Disruptor Raider/Scout Rover]],
   acceleration           = 0.14,
   brakeRate              = 0.1555,
-  buildCostMetal         = 35,
+  buildCostMetal         = 40,
   builder                = false,
   buildPic               = [[vehscout.png]],
   canGuard               = true,
@@ -14,6 +14,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 2]],
   collisionVolumeScales  = [[14 14 40]],
   collisionVolumeType    = [[cylZ]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[25 25 30]],
+  selectionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -36,12 +39,13 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[corfav.s3o]],
+  objectName             = [[vehscout.s3o]],
+  script                 = [[vehscout.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
   sightDistance          = 580,
   trackOffset            = 0,
-  trackStrength          = 4,
-  trackStretch           = 1,
+  trackStrength          = 1,
+  trackStretch           = 0.1,
   trackType              = [[Motorbike]],
   trackWidth             = 24,
   turninplace            = 0,
@@ -51,7 +55,7 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[LASER]],
+      def                = [[DISRUPTOR]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -61,43 +65,54 @@ unitDef = {
 
   weaponDefs             = {
 
-    LASER = {
-      name                    = [[Laser]],
-      areaOfEffect            = 8,
-      coreThickness           = 0.5,
+    DISRUPTOR      = {
+      name                    = [[Disruptor Pulse Beam]],
+      areaOfEffect            = 24,
+      beamdecay               = 0.9,
+      beamTime                = 1/30,
+      beamttl                 = 50,
+      coreThickness           = 0.25,
       craterBoost             = 0,
       craterMult              = 0,
-
-      customParams        = {
-		light_camera_height = 1000,
+  
+      customParams            = {
+	    timeslow_damagefactor = 4,
+		
+		light_camera_height = 2000,
+		light_color = [[0.85 0.33 1]],
+		light_radius = 120,
       },
-
+	  
       damage                  = {
-        default = 55,
-        planes  = 55,
-        subs    = 3,
+	    default = 35,
       },
-
-      duration                = 0.02,
-      explosionGenerator      = [[custom:beamweapon_hit_yellow_small]],
-      fireStarter             = 50,
-	  hardStop                = false,
-      heightMod               = 1,
+  
+      explosionGenerator      = [[custom:flash2purple]],
+      fireStarter             = 30,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 4.33,
+      minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 180,
+      range                   = 150,
       reloadtime              = 1,
-      rgbColor                = [[1 1 0]],
-      soundStart              = [[weapon/laser/small_laser_fire]],
+      rgbColor                = [[0.3 0 0.4]],
+      soundStart              = [[weapon/laser/heavy_laser5]],
+      soundStartVolume        = 3,
       soundTrigger            = true,
-      thickness               = 5.3619026473818,
-      tolerance               = 10000,
+      sweepfire               = false,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 8,
+      tolerance               = 18000,
       turret                  = true,
-      weaponType              = [[LaserCannon]],
-      weaponVelocity          = 1800,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 500,
     },
 
   },
@@ -110,7 +125,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[CORFAV_DEAD.s3o]],
+      object           = [[vehscout_dead.s3o]],
     },
 
     HEAP  = {

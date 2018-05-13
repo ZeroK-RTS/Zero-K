@@ -28,13 +28,13 @@ local CEG_SPAWN = [[feature_poof_spawner]];
 function gadget:FeatureDestroyed(id, allyTeam)
 	local _,_,_,x,y,z = spGetFeaturePosition(id, true);
 	local r = spGetFeatureRadius(id);
-	
-	spSpawnCEG( CEG_SPAWN,
-		x,y,z,
-		0,0,0,
-		2+(r/3), 2+(r/3)
-	);
-
+	if r then
+		spSpawnCEG( CEG_SPAWN,
+			x,y,z,
+			0,0,0,
+			2+(r/3), 2+(r/3)
+		)
+	end
 	--This could be used to later play sounds without betraying events or positions of destroyed features
 	--SendToUnsynced("feature_destroyed", x, y, z);
 end

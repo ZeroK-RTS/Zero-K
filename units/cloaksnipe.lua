@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloaksnipe]],
-  name                   = [[Spectre]],
+  name                   = [[Phantom]],
   description            = [[Cloaked Skirmish/Anti-Heavy Artillery Bot]],
   acceleration           = 0.3,
   brakeRate              = 0.2,
@@ -15,11 +15,14 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[30 60 30]],
   collisionVolumeType    = [[cylY]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
 	modelradius    = [[15]],
-	dontfireatradarcommand = '1',
+	dontfireatradarcommand = '0',
   },
 
   decloakOnFire          = false,
@@ -38,7 +41,6 @@ unitDef = {
   maxWaterDepth          = 22,
   minCloakDistance       = 155,
   movementClass          = [[KBOT3]],
-  moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[sharpshooter.s3o]],
   script                 = [[cloaksnipe.lua]],
@@ -59,7 +61,7 @@ unitDef = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2600,
+  turnRate               = 2200,
   upright                = true,
 
   weapons                = {

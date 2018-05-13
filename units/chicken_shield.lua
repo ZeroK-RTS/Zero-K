@@ -1,8 +1,9 @@
 unitDef = {
   unitname            = [[chicken_shield]],
-  name                = [[Toad]],
+  name                = [[Blooper]],
   description         = [[Shield/Anti-Air]],
   acceleration        = 0.36,
+  activateWhenBuilt   = true,
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -15,6 +16,8 @@ unitDef = {
   category            = [[LAND]],
 
   customParams        = {
+    shield_emit_height = 26,
+    shield_emit_offset = 0,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -176,8 +179,8 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       shieldAlpha             = 0.15,
-      shieldBadColor          = [[1.0 1 0.1]],
-      shieldGoodColor         = [[0.1 1.0 0.1]],
+      shieldBadColor          = [[1.0 1 0.1 1]],
+      shieldGoodColor         = [[0.1 1.0 0.1 1]],
       shieldInterceptType     = 3,
       shieldPower             = 2500,
       shieldPowerRegen        = 180,
@@ -185,10 +188,12 @@ unitDef = {
       shieldRadius            = 300,
       shieldRepulser          = false,
       smartShield             = true,
-      texture1                = [[wakelarge]],
-      visibleShield           = true,
-      visibleShieldHitFrames  = 30,
+      visibleShield           = false,
       visibleShieldRepulse    = false,
+      --texture1                = [[wakelarge]],
+      --visibleShield           = true,
+      --visibleShieldHitFrames  = 30,
+      --visibleShieldRepulse    = false,
       weaponType              = [[Shield]],
     },
 

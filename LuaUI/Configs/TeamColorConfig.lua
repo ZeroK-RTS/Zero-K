@@ -12,15 +12,15 @@ local colors = {
 	
 	allyColors = {
 	  Range({ 020, 105, 255 }),
-	  Range({ 011, 100, 040 }),
-	  Range({ 040, 190, 240 }),
-	  Range({ 013, 245, 243 }),
-	  Range({ 130, 255, 210 }),
-	  Range({ 170, 190, 220 }),
+	  Range({ 010, 250, 250 }),
 	  Range({ 120, 120, 255 }),
+	  Range({ 005, 120, 005 }),
+	  Range({ 120, 175, 050 }),
 	  Range({ 090, 040, 255 }),
 	  Range({ 030, 120, 110 }),
-	  Range({ 120, 175, 050 }),
+	  Range({ 130, 255, 210 }),
+	  Range({ 170, 190, 220 }),
+	  Range({ 060, 170, 190 }),
 	},
 
 	enemyColors = {
@@ -125,6 +125,14 @@ local simpleColors = {
 	gaiaColor = colors.gaiaColor,
 	allyColors = {colors.allyColors[1]},
 	enemyColors = {colors.enemyColors[1]},
+	enemyByTeamColors = colors.enemyColors,
+}
+
+local simpleColorsTeams = {
+	myColor = colors.myColor,
+	gaiaColor = colors.gaiaColor,
+	allyColors = {colors.allyColors[1]},
+	enemyColors = colors.enemyColors,
 }
 
 local simpleColorblind = {
@@ -132,6 +140,7 @@ local simpleColorblind = {
 	gaiaColor = colorblind.gaiaColor,
 	allyColors = {colorblind.allyColors[1]},
 	enemyColors = {colorblind.enemyColors[1]},
+	enemyByTeamColors = colorblind.enemyColors,
 }
 
 -- If order is non-sequential then things break.

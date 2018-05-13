@@ -11,18 +11,21 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND SINK]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeType    = [[ellipsoid]], 
   corpse                 = [[DEAD]],
 
   customParams           = {
     amph_regen = 20,
     amph_submerged_at = 40,
-	sink_on_emp    = 1,
+    sink_on_emp    = 1,
     floattoggle = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
-  footprintX             = 2,
-  footprintZ             = 2,
+  footprintX             = 3,
+  footprintZ             = 3,
   iconType               = [[amphaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -31,7 +34,7 @@ unitDef = {
   maxSlope               = 36,
   maxVelocity            = 1.6,
   minCloakDistance       = 75,
-  movementClass          = [[AKBOT2]],
+  movementClass          = [[AKBOT3]],
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[amphaa.s3o]],
@@ -40,8 +43,8 @@ unitDef = {
 
   sfxtypes               = {
     explosiongenerators = {
-	  [[custom:STORMMUZZLE]],
-	  [[custom:STORMBACK]],
+      [[custom:STORMMUZZLE]],
+      [[custom:STORMBACK]],
     },
   },
 
@@ -70,8 +73,6 @@ unitDef = {
     MISSILE = {
       name                    = [[Missile Pack]],
       areaOfEffect            = 48,
-      burst                   = 4,
-      burstRate               = 0.4,
       canAttackGround         = false,
       cegTag                  = [[missiletrailblue]],
       craterBoost             = 1,
@@ -79,9 +80,11 @@ unitDef = {
       cylinderTargeting       = 1,
 
       customParams            = {
-          isaa = [[1]],
-		light_color = [[0.5 0.6 0.6]],
-		light_radius = 380,
+        isaa = [[1]],
+        script_reload = [[12]],
+        script_burst = [[4]],
+        light_color = [[0.5 0.6 0.6]],
+        light_radius = 380,
       },
 
       damage                  = {
@@ -93,14 +96,14 @@ unitDef = {
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
       flightTime              = 3,
-	  impactOnly              = true,
+      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
-      range                   = 750,
-      reloadtime              = 12,
+      range                   = 820,
+      reloadtime              = 0.32,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],

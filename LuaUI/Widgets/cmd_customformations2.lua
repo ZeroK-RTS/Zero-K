@@ -2,8 +2,8 @@ function widget:GetInfo()
 	return {
 		name      = "CustomFormations2",
 		desc      = "Allows you to draw a formation line:"..
-					"\n• mouse drag draw various command on ground."..
-					"\n• ALT+Attack draw attack command on the ground.",
+					"\n mouse drag draw various command on ground."..
+					"\n ALT+Attack draw attack command on the ground.",
 		author    = "Niobium, modified by Skasi", -- Based on 'Custom Formations' by jK and gunblob
 		version   = "v3.4", -- With modified dot drawing from v4.3
 		date      = "Mar, 2010",
@@ -102,12 +102,13 @@ local requiresAlt = {
 -- If the mouse remains on the same target for both Press/Release then the formation is ignored and original command is issued.
 -- Normal logic will follow after override, i.e. must be a formationCmd to get formation, alt must be held if requiresAlt, etc.
 local overrideCmds = {
-	[CMD.GUARD] = CMD.MOVE,
+	[CMD.GUARD] = CMD_RAW_MOVE,
+	[CMD_WAIT_AT_BEACON] = CMD_RAW_MOVE,
 }
 
 -- What commands are issued at a position or unit/feature ID (Only used by GetUnitPosition)
 local positionCmds = {
-	[CMD.MOVE]=true,		[CMD_RAW_MOVE]=true,	[CMD.ATTACK]=true,		[CMD.RECLAIM]=true,		[CMD.RESTORE]=true,		[CMD.RESURRECT]=true,
+	[CMD.MOVE]=true,		[CMD_RAW_MOVE]=true,	[CMD_RAW_BUILD]=true,	[CMD.ATTACK]=true,		[CMD.RECLAIM]=true,		[CMD.RESTORE]=true,		[CMD.RESURRECT]=true,
 	[CMD.PATROL]=true,		[CMD.CAPTURE]=true,		[CMD.FIGHT]=true, 		[CMD.MANUALFIRE]=true,		[CMD_JUMP]=true, -- jump
 	[CMD.UNLOAD_UNIT]=true,	[CMD.UNLOAD_UNITS]=true,[CMD.LOAD_UNITS]=true,	[CMD.GUARD]=true,		[CMD.AREA_ATTACK] = true,
 }
@@ -269,12 +270,13 @@ local function GetUnitFinalPosition(uID)
 end
 local function SetColor(cmdID, alpha)
 	if     cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE then glColor(0.5, 1.0, 0.5, alpha) -- Green
-	elseif cmdID == CMD_ATTACK     then glColor(1.0, 0.2, 0.2, alpha) -- Red
-	elseif cmdID == CMD.MANUALFIRE then glColor(1.0, 1.0, 1.0, alpha) -- White
-	elseif cmdID == CMD_UNLOADUNIT then glColor(1.0, 1.0, 0.0, alpha) -- Yellow
-	elseif cmdID == CMD_UNIT_SET_TARGET then glColor(1, 0.75, 0, alpha) -- Orange
-	elseif cmdID == CMD_UNIT_SET_TARGET_CIRCLE then glColor(1, 0.75, 0, alpha) -- Orange
-	else                                glColor(0.5, 0.5, 1.0, alpha) -- Blue
+	elseif cmdID == CMD_ATTACK                 then glColor(1.0, 0.2, 0.2, alpha) -- Red
+	elseif cmdID == CMD.MANUALFIRE             then glColor(1.0, 1.0, 1.0, alpha) -- White
+	elseif cmdID == CMD_UNLOADUNIT             then glColor(1.0, 1.0, 0.0, alpha) -- Yellow
+	elseif cmdID == CMD_UNIT_SET_TARGET        then glColor(1.0, 0.75, 0.0, alpha) -- Orange
+	elseif cmdID == CMD_UNIT_SET_TARGET_CIRCLE then glColor(1.0, 0.75, 0.0, alpha) -- Orange
+	elseif cmdID == CMD_JUMP                   then glColor(0.2, 1.0, 0.2, alpha) -- Deeper Green
+	else                                            glColor(0.5, 0.5, 1.0, alpha) -- Blue
 	end
 end
 local function CanUnitExecute(uID, cmdID)
@@ -414,6 +416,7 @@ local function GetInterpNodes(mUnits)
 	
 	return interpNodes
 end
+
 local function GetCmdOpts(alt, ctrl, meta, shift, right)
 	
 	local opts = { alt=alt, ctrl=ctrl, meta=meta, shift=shift, right=right }
@@ -456,11 +459,17 @@ end
 -- Mouse/keyboard Callins
 --------------------------------------------------------------------------------
 function widget:MousePress(mx, my, mButton)
-	
-	lineLength = 0
 	-- Where did we click
 	inMinimap = spIsAboveMiniMap(mx, my)
-	if inMinimap and not MiniMapFullProxy then return false end
+	if inMinimap and not MiniMapFullProxy then
+		return false
+	end
+	if (mButton == 1 or mButton == 3) and fNodes and #fNodes > 0 then
+		-- already issuing command
+		return true 
+	end
+	
+	lineLength = 0
 	
 	-- Get command that would've been issued
 	local _, activeCmdID = spGetActiveCommand()
@@ -529,6 +538,7 @@ function widget:MousePress(mx, my, mButton)
 	-- We handled the mouse press
 	return true
 end
+
 function widget:MouseMove(mx, my, dx, dy, mButton)
 	
 	-- It is possible for MouseMove to fire after MouseRelease
@@ -585,7 +595,33 @@ function widget:MouseMove(mx, my, dx, dy, mButton)
 	
 	return false
 end
+
+local function StopCommandAndRelinquishMouse()
+	local ownerName = widgetHandler.mouseOwner and widgetHandler.mouseOwner.GetInfo and widgetHandler.mouseOwner.GetInfo()
+	ownerName = ownerName and ownerName.name
+	if ownerName == "CustomFormations2" then
+		widgetHandler.mouseOwner = nil
+	end
+	-- Cancel the command
+	fNodes = {}
+	fDists = {}
+	
+	-- Modkeys / command reset
+	local alt, ctrl, meta, shift = GetModKeys()
+	if not usingRMB then
+		if shift then
+			endShift = true -- Reset on release of shift
+		else
+			spSetActiveCommand(0) -- Reset immediately
+		end
+	end
+end
+
 function widget:MouseRelease(mx, my, mButton)
+	if (mButton == 1 or mButton == 3) and (not usingRMB) == (mButton == 3) then
+		StopCommandAndRelinquishMouse()
+		return false
+	end
 	
 	-- It is possible for MouseRelease to fire after MouseRelease
 	if #fNodes == 0 then
@@ -601,7 +637,6 @@ function widget:MouseRelease(mx, my, mButton)
 			spSetActiveCommand(0) -- Reset immediately
 		end
 	end
-	
 	-- Are we going to use the drawn formation?
 	local usingFormation = true
 	
@@ -711,9 +746,14 @@ function widget:MouseRelease(mx, my, mButton)
 	
 	fNodes = {}
 	fDists = {}
-	
+	local ownerName = widgetHandler.mouseOwner and widgetHandler.mouseOwner.GetInfo and widgetHandler.mouseOwner.GetInfo()
+	ownerName = ownerName and ownerName.name
+	if ownerName == "CustomFormations2" then
+		widgetHandler.mouseOwner = nil
+	end
 	return true
 end
+
 function widget:KeyRelease(key)
 	if (key == keyShift) and endShift then
 		spSetActiveCommand(0)
@@ -900,6 +940,7 @@ function widget:Initialize()
 	InitFilledCircle(CMD_UNLOADUNIT)
 	InitFilledCircle(CMD_UNIT_SET_TARGET)
 	InitFilledCircle(CMD_UNIT_SET_TARGET_CIRCLE)
+	InitFilledCircle(CMD_JUMP)
 	InitFilledCircle(0)
 end
 

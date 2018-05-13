@@ -1,5 +1,5 @@
 return {
-	spots = {	
+	spots = {
 		{x = 87, z = 109, metal = 2.3},
 		{x = 414, z = 297, metal = 2.3},
 		{x = 539, z = 43, metal = 2.3},

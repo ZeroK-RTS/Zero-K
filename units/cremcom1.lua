@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cremcom1]],
-  name                   = [[Knight Commander]],
+  name                   = [[Commander]],
   description            = [[Mobile Assault Commander, Builds at 10 m/s]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,

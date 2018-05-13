@@ -8,19 +8,20 @@ unitDef = {
   buildCostMetal                = 70,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 4,
-  buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[arm_solar_ground.dds]],
+  buildingGroundDecalSizeX      = 6,
+  buildingGroundDecalSizeY      = 6,
+  buildingGroundDecalType       = [[energysolar_aoplane.dds]],
   buildPic                      = [[energysolar.png]],
   category                      = [[SINK UNARMED STUPIDTARGET SOLAR]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    pylonrange = 100,
-	aimposoffset   = [[0 16 0]],
-	midposoffset   = [[0 0 0]],
-	force_close    = 8, -- time in seconds of forced turnoff
-	removewait     = 1,
+    pylonrange      = 100,
+    aimposoffset    = [[0 16 0]],
+    midposoffset    = [[0 0 0]],
+    auto_close_time = 4, -- Unit AI off time.
+    removewait      = 1,
+    default_spacing = 0,
   },
 
   damageModifier                = 0.25,

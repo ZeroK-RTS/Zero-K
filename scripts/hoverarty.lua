@@ -20,6 +20,7 @@ local SIG_MOVE = 4
 
 local curTerrainType = 4
 local wobble = false
+local firing = false
 
 local function Tilt()
 	while true do
@@ -92,6 +93,11 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
+
+	while firing do
+		Sleep(100)
+	end
+
 	GG.DontFireRadar_CheckAim(unitID)
 	
 	Turn(turret, y_axis, heading, math.rad(70))
@@ -114,6 +120,12 @@ function script.QueryWeapon(num)
 	return flare
 end
 
+local beam_duration = WeaponDefs[UnitDef.weapons[1].weaponDef].beamtime * 1000
+function script.FireWeapon()
+	firing = true
+	Sleep (beam_duration)
+	firing = false
+end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth

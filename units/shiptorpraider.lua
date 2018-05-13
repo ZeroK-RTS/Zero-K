@@ -13,8 +13,8 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[SHIP]],
-  collisionVolumeOffsets = [[0 -1 0]],
-  collisionVolumeScales  = [[20 20 40]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[28 28 55]],
   collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
@@ -26,8 +26,8 @@ unitDef = {
 
   explodeAs           = [[SMALL_UNITEX]],
   floater             = true,
-  footprintX          = 2,
-  footprintZ          = 2,
+  footprintX          = 3,
+  footprintZ          = 3,
   iconType            = [[shiptorpraider]],
   idleAutoHeal        = 5,
   idleTime            = 1800,

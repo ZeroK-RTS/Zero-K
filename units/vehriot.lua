@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[vehriot]],
-  name                = [[Leveler]],
-  description         = [[Riot Vehicle]],
+  name                = [[Ripper]],
+  description         = [[Riot Rover]],
   acceleration        = 0.0318,
   brakeRate           = 0.124,
   buildCostMetal      = 240,
@@ -11,6 +11,9 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,	
   category            = [[LAND]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeType    = [[ellipsoid]], 
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -48,7 +51,7 @@ unitDef = {
   trackStrength       = 6,
   trackStretch        = 1,
   trackType           = [[StdTank]],
-  trackWidth          = 30,
+  trackWidth          = 28,
   turninplace         = 0,
   turnRate            = 442,
   workerTime          = 0,
@@ -76,6 +79,7 @@ unitDef = {
       craterMult              = 0.5,
 
       customParams            = {
+        reaim_time = 8, -- COB
         gatherradius = [[90]],
         smoothradius = [[60]],
         smoothmult   = [[0.08]],

@@ -1,3 +1,5 @@
+if not gadgetHandler:IsSyncedCode() then return end
+
 function gadget:GetInfo()
 	return {
 		name = "Trail Burnout",
@@ -10,9 +12,6 @@ function gadget:GetInfo()
 	}
 end
 
------- SYNCED -------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then
-
 local defaultCeg = ''
 local burnoutWeapon = {}
 local burnoutProjectile = {}
@@ -23,7 +22,6 @@ local noExplosionVFX = {}
 local spGetGameFrame     = Spring.GetGameFrame
 local spSetProjectileCeg = Spring.SetProjectileCEG
 local scSetWatchWeapon   = Script.SetWatchWeapon
-local spGetProjectilePosition = Spring.GetProjectilePosition
 local spGetProjectileVelocity = Spring.GetProjectileVelocity
 local spGetProjectileTarget = Spring.GetProjectileTarget
 local spSetProjectileCollision = Spring.SetProjectileCollision
@@ -31,7 +29,6 @@ local spSetProjectileVelocity = Spring.SetProjectileVelocity
 local spSetProjectileGravity  = Spring.SetProjectileGravity 
 local spSpawnProjectile = Spring.SpawnProjectile
 local spSetProjectileTarget = Spring.SetProjectileTarget
-local spGetUnitTeam = Spring.GetUnitTeam
 local spSetPieceProjectileParams = Spring.SetPieceProjectileParams
 local spGetUnitTeam = Spring.GetUnitTeam
 
@@ -89,15 +86,10 @@ function gadget:Explosion(weaponDefID, px, py, pz, ownerID)
 	end
 end
 
-function gadget:GameFrame(f)
-	StartBurnoutTrail(f)
-	if f % 7 == 0 then
-		ConvertWeaponUnderwater()
-	end
-end
 -------------------------------------------
 -------------------------------------------
-function StartBurnoutTrail(frame)
+
+local function StartBurnoutTrail(frame)
 	for id, proj in pairs(burnoutProjectile) do
 		if proj.startFrame+proj.burnout <= frame then
 			spSetProjectileCeg(id, proj.burnoutCeg)
@@ -106,7 +98,7 @@ function StartBurnoutTrail(frame)
 	end
 end
 
-function ConvertWeaponUnderwater()
+local function ConvertWeaponUnderwater()
 	for id,proj in pairs(underwaterProjectile) do
 		if spSpawnProjectile and proj.torpName and WeaponDefNames[proj.torpName] then
 			local px,py,pz = Spring.GetProjectilePosition(id)
@@ -149,5 +141,10 @@ function ConvertWeaponUnderwater()
 		end
 	end
 end
+
+function gadget:GameFrame(f)
+	StartBurnoutTrail(f)
+	if f % 7 == 0 then
+		ConvertWeaponUnderwater()
+	end
 end
------ END SYNCED ---------------------------------------------------

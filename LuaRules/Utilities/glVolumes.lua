@@ -156,6 +156,18 @@ function gl.Utilities.DrawMyCylinder(x,y,z, height,radius,divs)
 end
 
 
+function gl.Utilities.DrawMyCircle(x,y,radius,divs)
+  divs = divs or 25
+  local sinTable, cosTable = CreateSinCosTable(divs)
+
+  gl.BeginEnd(GL.LINE_LOOP, function()
+    for i = #sinTable, 1, -1 do
+      glVertex(x + radius*sinTable[i], y + radius*cosTable[i], 0)
+    end
+  end)
+end
+
+
 function gl.Utilities.DrawMyHollowCylinder(x,y,z, height,radius,inRadius,divs)
   divs = divs or 25
   local sinTable, cosTable = CreateSinCosTable(divs)
@@ -236,6 +248,15 @@ function gl.Utilities.DrawGroundCircle(x,z,radius)
   gl.Translate(x, averageGroundHeight, z)
   gl.Scale(radius, shapeHeight, radius)
   gl.Utilities.DrawVolume(cylinder)
+  gl.PopMatrix()
+end
+
+local circle = gl.CreateList(gl.Utilities.DrawMyCircle,0,0,1,35)
+function gl.Utilities.DrawCircle(x,y,radius)
+  gl.PushMatrix()
+  gl.Translate(x, y, 0)
+  gl.Scale(radius, radius, 1)
+  gl.Utilities.DrawVolume(circle)
   gl.PopMatrix()
 end
 

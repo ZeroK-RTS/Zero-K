@@ -1,6 +1,6 @@
 -- reloadTime is in seconds
 -- offsets = {x,y,z} , where x is left(-)/right(+), y is up(+)/down(-), z is forward(+)/backward(-)
-local BUILD_UPDATE_INTERVAL = 15
+local DRONES_COST_RESOURCES = false
 
 local carrierDefs = {}
 
@@ -189,10 +189,18 @@ local thingsWhichAreDrones = {
 }
 
 local function ProcessCarrierDef(carrierData)
+	local ud = UnitDefs[carrierData.drone]
 	-- derived from: time_to_complete = (1.0/build_step_fraction)*build_interval
-	local buildUpProgress = 1/(carrierData.buildTime)*(BUILD_UPDATE_INTERVAL/30)
+	local buildUpProgress = 1/(carrierData.buildTime)*(1/30)
 	carrierData.buildStep = buildUpProgress
-	carrierData.buildStepHealth = buildUpProgress*UnitDefs[carrierData.drone].health
+	carrierData.buildStepHealth = buildUpProgress*ud.health
+	
+	if DRONES_COST_RESOURCES then
+		carrierData.buildCost = ud.metalCost
+		carrierData.buildStepCost = buildUpProgress*carrierData.buildCost
+		carrierData.perSecondCost = carrierData.buildCost/carrierData.buildTime
+	end
+	
 	carrierData.colvolTweaked = carrierData.offsets.colvolMidX ~= 0 or carrierData.offsets.colvolMidY ~= 0
 									or carrierData.offsets.colvolMidZ ~= 0 or carrierData.offsets.aimX ~= 0
 										or carrierData.offsets.aimY ~= 0 or carrierData.offsets.aimZ ~= 0
@@ -209,4 +217,4 @@ for name, carrierData in pairs(unitRulesCarrierDefs) do
 	carrierData = ProcessCarrierDef(carrierData)
 end
 
-return carrierDefs, thingsWhichAreDrones, unitRulesCarrierDefs, BUILD_UPDATE_INTERVAL
+return carrierDefs, thingsWhichAreDrones, unitRulesCarrierDefs

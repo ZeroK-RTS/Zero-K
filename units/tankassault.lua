@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[tankassault]],
-  name                = [[Reaper]],
+  name                = [[Minotaur]],
   description         = [[Assault Tank]],
   acceleration        = 0.0237,
   brakeRate           = 0.04786,
@@ -78,6 +78,10 @@ unitDef = {
       burstRate               = 0.2,
       craterBoost             = 0,
       craterMult              = 0,
+
+      customParams        = {
+        reaim_time = 8, -- COB
+      },
 
       damage                  = {
         default = 320,

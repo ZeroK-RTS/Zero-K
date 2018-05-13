@@ -15,15 +15,15 @@ local common_depthmodparams = {
 
 local moveDefs = {
 
-	KBOT1 = {
-		footprintx = 1,
-		footprintz = 1,
+	SKBOT2 = { -- Small 
+		footprintx = 2,
+		footprintz = 2,
 		maxwaterdepth = 16,
 		maxslope = 36,
 		crushstrength = 5,
 		depthmodparams = common_depthmodparams,
 	},
-
+	
 	KBOT2 = {
 		footprintx = 2,
 		footprintz = 2,
@@ -96,9 +96,9 @@ local moveDefs = {
 		crushstrength = 5000,
 	},
 	
-	TKBOT1 = {		--allterrain
-		footprintx = 1,
-		footprintz = 1,
+	TKBOT2 = {		--allterrain
+		footprintx = 2,
+		footprintz = 2,
 		maxwaterdepth = 16,
 		maxslope = 70,
 		crushstrength = 5,
@@ -161,9 +161,25 @@ local moveDefs = {
 		depthmodparams = common_depthmodparams,
 	},
 	
+	HOVER2 = {
+		footprintx = 2,
+		footprintz = 2,
+		maxslope = 18,
+		maxwaterdepth = 5000,
+		slopemod = 40,
+		crushstrength = 50,
+	},
 	HOVER3 = {
 		footprintx = 3,
 		footprintz = 3,
+		maxslope = 18,
+		maxwaterdepth = 5000,
+		slopemod = 40,
+		crushstrength = 50,
+	},
+	HOVER4 = {
+		footprintx = 4,
+		footprintz = 4,
 		maxslope = 18,
 		maxwaterdepth = 5000,
 		slopemod = 40,
@@ -218,6 +234,7 @@ local array = {}
 local i = 1
 for k,v in pairs(moveDefs) do
 	v.heatmapping = false -- disable heatmapping
+	v.allowRawMovement = true
 	array[i] = v
 	v.name = k
 	i = i + 1

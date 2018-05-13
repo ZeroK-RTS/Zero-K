@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[turretantiheavy]],
-  name                          = [[Annihilator]],
-  description                   = [[Tachyon Projector - Requires 50 Power]],
+  name                          = [[Lucifer]],
+  description                   = [[Tachyon Projector - Requires connection to a 50 energy grid]],
   activateWhenBuilt             = true,
   buildCostMetal                = 2200,
   builder                       = false,
@@ -27,7 +27,7 @@ unitDef = {
     midposoffset   = [[0 0 0]],
     modelradius    = [[40]],
 
-    dontfireatradarcommand = '1',
+    dontfireatradarcommand = '0',
   },
 
   damageModifier                = 0.25,
@@ -99,7 +99,7 @@ unitDef = {
       reloadtime              = 10,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser6]],
-      soundStartVolume        = 3,
+      soundStartVolume        = 15,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],

@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[tankheavyassault]],
-  name                = [[Goliath]],
+  name                = [[Cyclops]],
   description         = [[Very Heavy Tank Buster]],
   acceleration        = 0.0282,
   brakeRate           = 0.052,
@@ -47,7 +47,7 @@ unitDef = {
   trackStrength       = 10,
   trackStretch        = 1,
   trackType           = [[StdTank]],
-  trackWidth          = 45,
+  trackWidth          = 50,
   turninplace         = 0,
   turnRate            = 312,
   workerTime          = 0,
@@ -76,6 +76,8 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
+        reaim_time = 8, -- COB
+		
 	    gatherradius = [[105]],
 	    smoothradius = [[70]],
 	    smoothmult   = [[0.4]],
@@ -114,6 +116,8 @@ unitDef = {
       craterMult              = 0,
 
       customparams = {
+        reaim_time = 8, -- COB
+		
         timeslow_damagefactor = 1,
         timeslow_onlyslow = 1,
         timeslow_smartretarget = 0.33,

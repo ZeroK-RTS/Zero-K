@@ -24,6 +24,8 @@ local shieldEmit = piece 'shieldemit'
 local smokePiece = {torso}
 local nanoPieces = {snout}
 
+local jets = {piece 'jet1', piece 'jet2', piece 'jet3', piece 'jet4'}
+
 local flares = {[0] = flareL, [1] = flareR}
 
 --------------------------------------------------------------------------------
@@ -97,7 +99,7 @@ end
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local isMoving, armsFree = false, true
+local isMoving, armsFree, inJumpMode = false, true, false
 local restoreHeading = 0
 local gun_num = 0
 
@@ -125,34 +127,36 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
+		local speedMult = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)*dyncomm.GetPace()
+		
 		--left leg up, right leg back
-		Turn(thighL, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(shinL, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
-		Turn(thighR, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(shinR, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
+		Turn(thighL, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED * speedMult)
+		Turn(shinL, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED * speedMult)
+		Turn(thighR, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED * speedMult)
+		Turn(shinR, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED * speedMult)
 		if armsFree then
 			--left arm back, right arm front
-			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(uparmL, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(uparmR, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
-			Turn(forearmL, x_axis, FOREARM_BACK_ANGLE, FOREARM_BACK_SPEED)
-			Turn(forearmR, x_axis, FOREARM_FRONT_ANGLE, FOREARM_FRONT_SPEED)
+			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speedMult)
+			Turn(uparmL, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speedMult)
+			Turn(uparmR, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED * speedMult)
+			Turn(forearmL, x_axis, FOREARM_BACK_ANGLE, FOREARM_BACK_SPEED * speedMult)
+			Turn(forearmR, x_axis, FOREARM_FRONT_ANGLE, FOREARM_FRONT_SPEED * speedMult)
 		end
 		WaitForTurn(thighL, x_axis)
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(thighL, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(shinL, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
-		Turn(thighR, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(shinR, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
+		Turn(thighL, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED * speedMult)
+		Turn(shinL, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED * speedMult)
+		Turn(thighR, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED * speedMult)
+		Turn(shinR, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED * speedMult)
 		if armsFree then
 			--left arm front, right arm back
-			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(uparmL, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
-			Turn(uparmR, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(forearmL, x_axis, FOREARM_FRONT_ANGLE, FOREARM_FRONT_SPEED)
-			Turn(forearmR, x_axis, FOREARM_BACK_ANGLE, FOREARM_BACK_SPEED)			
+			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speedMult)
+			Turn(uparmL, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED * speedMult)
+			Turn(uparmR, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speedMult)
+			Turn(forearmL, x_axis, FOREARM_FRONT_ANGLE, FOREARM_FRONT_SPEED * speedMult)
+			Turn(forearmR, x_axis, FOREARM_BACK_ANGLE, FOREARM_BACK_SPEED * speedMult)
 		end
 		WaitForTurn(thighR, x_axis)		
 		Sleep(0)
@@ -189,6 +193,28 @@ end
 function script.StopMoving() 
 	isMoving = false
 	StartThread(RestorePose)
+end
+
+function beginJump() 
+	script.StopMoving()
+	GG.PokeDecloakUnit(unitID, 50)
+	inJumpMode = true
+end
+
+function jumping()
+	GG.PokeDecloakUnit(unitID, 50)
+	for i=1,4 do
+		EmitSfx(jets[i], 1028)
+	end
+end
+
+function halfJump()
+end
+
+function endJump() 
+	script.StopMoving()
+	inJumpMode = false
+	EmitSfx(base, 1029)
 end
 
 function script.AimFromWeapon(num)

@@ -8,7 +8,6 @@ function widget:GetInfo()
     layer     = -10,
     enabled   = true,
     alwaysStart = true,
-	hidden    = true,
   }
 end
 

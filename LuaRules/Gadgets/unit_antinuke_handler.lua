@@ -56,7 +56,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		-- Inserted attack command with 1 param is a unit target
 		if Spring.ValidUnitID(cmdParams[4]) then
 			local x,y,z = Spring.GetUnitPosition(cmdParams[4])
-			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {cmdParams[1], cmdParams[2], cmdParams[3], x, y, z}, cmdOptions)
+			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {cmdParams[1], cmdParams[2], cmdParams[3], x, y, z}, cmdOptions.coded)
 			return false
 		end
 	end
@@ -65,7 +65,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		-- Attack command with 1 param is a unit target
 		if Spring.ValidUnitID(cmdParams[1]) then
 			local x,y,z = Spring.GetUnitPosition(cmdParams[1])
-			Spring.GiveOrderToUnit(unitID, CMD.ATTACK, { x, y, z}, cmdOptions)
+			Spring.GiveOrderToUnit(unitID, CMD.ATTACK, { x, y, z}, cmdOptions.coded)
 			return false
 		end
 	end

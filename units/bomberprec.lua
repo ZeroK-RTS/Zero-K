@@ -16,11 +16,15 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[80 10 30]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[95 25 60]],
+  selectionVolumeType    = [[box]],
   corpse              = [[DEAD]],
   cruiseAlt           = 220,
 
   customParams        = {
 	modelradius    = [[15]],
+	refuelturnradius = [[120]],
 	requireammo    = [[1]],
   },
 
@@ -56,7 +60,7 @@ unitDef = {
 
   },
   sightDistance       = 660,
-  turnRadius          = 160,
+  turnRadius          = 300,
   workerTime          = 0,
 
   weapons             = {
@@ -90,6 +94,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams        	  = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
+	  },
+
       damage                  = {
         default = 0,
       },
@@ -120,6 +128,7 @@ unitDef = {
 	  cylinderTargeting	      = 1,
 
 	  customParams        	  = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
 		light_color = [[1.1 0.9 0.45]],
 		light_radius = 220,
 	  },
@@ -141,6 +150,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+	  leadlimit               = 0,
       model                   = [[wep_b_paveway.s3o]],
 	  leadLimit               = 20,
       range                   = 150,
@@ -169,6 +179,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams        	  = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
+	  },
+
       damage                  = {
         default = -1E-06,
       },
@@ -180,7 +194,7 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
 	  model                   = [[emptyModel.s3o]],
-      range                   = 460,
+      range                   = 600,
       reloadtime              = 0.1,
       rgbColor                = [[0 0 0]],
 	  startVelocity           = 2000,

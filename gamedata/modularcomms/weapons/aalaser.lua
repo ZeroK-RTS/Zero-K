@@ -13,7 +13,7 @@ local weaponDef = {
 
 	customParams            = {
 		slot = [[5]],
-		
+
 		light_color = [[0.2 1.2 1.2]],
 		light_radius = 120,
 	},

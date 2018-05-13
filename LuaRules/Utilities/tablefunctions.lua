@@ -63,7 +63,11 @@ function Spring.Utilities.TableToString(data, key)
 end
 
 -- need this because SYNCED.tables are merely proxies, not real tables
-local function MakeRealTable(proxy)
+local function MakeRealTable(proxy, debugTag)
+	if proxy == nil then
+		Spring.Log("Table Utilities", LOG.ERROR, "Proxy table is nil: " .. (debugTag or "unknown table"))
+		return
+	end
 	local proxyLocal = proxy
 	local ret = {}
 	for i,v in spairs(proxyLocal) do
@@ -117,3 +121,31 @@ function Spring.Utilities.ExplodeString(div,str)
 end
 
 Spring.Utilities.TableEcho = TableEcho
+
+function Spring.Utilities.CustomKeyToUsefulTable(dataRaw)
+	if not dataRaw then
+		return
+	end
+	if not type(dataRaw) == 'string' then
+		Spring.Echo("Customkey data error! type == " .. type(dataRaw))
+	else
+		dataRaw = string.gsub(dataRaw, '_', '=')
+		dataRaw = Spring.Utilities.Base64Decode(dataRaw)
+		local dataFunc, err = loadstring("return " .. dataRaw)
+		if dataFunc then 
+			local success, usefulTable = pcall(dataFunc)
+			if success then
+				if collectgarbage then
+					collectgarbage("collect")
+				end
+				return usefulTable
+			end
+		end
+		if err then
+			Spring.Echo("Customkey error", err)
+		end
+	end
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+end

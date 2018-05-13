@@ -11,6 +11,9 @@ unitDef = {
   canMove               = true,
   canPatrol             = true,
   category              = [[LAND FIREPROOF]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                = [[DEAD]],
 
   customParams          = {
@@ -82,7 +85,7 @@ unitDef = {
       areaOfEffect            = 64,
       avoidGround             = false,
       avoidFeature            = false,
-      avoidFriendly           = false,
+      avoidFriendly           = true,
       collideFeature          = false,
       collideGround           = false,
       coreThickness           = 0,
@@ -93,14 +96,15 @@ unitDef = {
       customParams            = {
         flamethrower = [[1]],
         setunitsonfire = "1",
+        burnchance = "0.4", -- Per-impact
         burntime = [[450]],
           
         light_camera_height = 2800,
         light_color = [[0.6 0.39 0.18]],
         light_radius = 260,
-		light_fade_time = 10,
-		light_beam_mult_frames = 5,
-		light_beam_mult = 5,
+        light_fade_time = 10,
+        light_beam_mult_frames = 5,
+        light_beam_mult = 5,
       
         combatrange = 280,
       },
@@ -110,7 +114,7 @@ unitDef = {
         subs    = 0.01,
       },
 
-      duration				  = 0.01,
+      duration                = 0.01,
       explosionGenerator      = [[custom:SMOKE]],
       fallOffRate             = 1,
       fireStarter             = 100,

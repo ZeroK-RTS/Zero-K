@@ -20,7 +20,6 @@ local materials = {
 		shader    = include("ModelMaterials/Shaders/default.lua"),
 		deferred  = include("ModelMaterials/Shaders/default.lua"),
 		shaderDefinitions = {
-			"#version 130",
 			"#define use_normalmapping",
 			"#define deferred_mode_0",
 		},
@@ -114,7 +113,7 @@ local tex1_to_normaltex = {}
 -- All feature defs that contain the string "aleppo" will be affected by it
 for id, featureDef in pairs(FeatureDefs) do
 	for _,stubData in ipairs (featureNameStubs) do
-		if featureDef.name:find(stubData.str) and
+		if featureDef.name and featureDef.name:find(stubData.str) and
 			((not stubData.prefix) or featureDef.name:find(stubData.str) == 1) then
 			--if featureDef.customParam.normaltex then
 			if featureDef.model.textures and featureDef.model.textures.tex1 then

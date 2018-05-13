@@ -96,7 +96,11 @@ local function CallSatelliteScript(funcName, args)
 	if not satUnitID then
 		return
 	end
-	local func = Spring.UnitScript.GetScriptEnv(satUnitID)[funcName]
+	local env = Spring.UnitScript.GetScriptEnv(satUnitID)
+	if not env then
+		return
+	end
+	local func = env[funcName]
 	if func then
 		Spring.UnitScript.CallAsUnit(satUnitID, func, args)
 	end
@@ -162,26 +166,27 @@ function Dock()
 	Sleep(100)
 	
 	local dx, _, dz = Spring.GetUnitDirection(unitID)
-	local heading = Vector.Angle(dx, dz)
-	
-	CallSatelliteScript('mahlazer_Dock')
-	
-	Sleep(100)
+	if dx then
+		local heading = Vector.Angle(dx, dz)
 		
-	for i = 1, 4 do
-		Turn(DocksClockwise[i]	   ,z_axis,math.rad(0),1)
-		Turn(DocksCounterClockwise[i],z_axis,math.rad(0),1)
+		CallSatelliteScript('mahlazer_Dock')
 		
-		Turn(ActuatorBaseClockwise[i],z_axis,math.rad(0),2)
-		Turn(ActuatorBaseCCW[i]	  ,z_axis,math.rad(0),2)
+		Sleep(100)
 		
-		Turn(ActuatorMidCW [i],z_axis,math.rad( 0),1.5)
-		Turn(ActuatorMidCCW[i],z_axis,math.rad( 0),1.5)
-		
-		Turn(ActuatorTipCW [i],z_axis,math.rad( 0),2.2)
-		Turn(ActuatorTipCCW[i],z_axis,math.rad( 0),2.2)
+		for i = 1, 4 do
+			Turn(DocksClockwise[i]	   ,z_axis,math.rad(0),1)
+			Turn(DocksCounterClockwise[i],z_axis,math.rad(0),1)
+			
+			Turn(ActuatorBaseClockwise[i],z_axis,math.rad(0),2)
+			Turn(ActuatorBaseCCW[i]	  ,z_axis,math.rad(0),2)
+			
+			Turn(ActuatorMidCW [i],z_axis,math.rad( 0),1.5)
+			Turn(ActuatorMidCCW[i],z_axis,math.rad( 0),1.5)
+			
+			Turn(ActuatorTipCW [i],z_axis,math.rad( 0),2.2)
+			Turn(ActuatorTipCCW[i],z_axis,math.rad( 0),2.2)
+		end
 	end
-
 end
 
 function SpiralDown()
@@ -196,6 +201,9 @@ function SpiralDown()
 		end
 		
 		local dx, _, dz = Spring.GetUnitDirection(satUnitID)
+		if not dx then
+			break
+		end
 		local currentHeading  = Vector.Angle(dx, dz)
 		local closestMultiple = math.round(currentHeading/(math.pi/2))*math.pi/2
 		local aimOff = closestMultiple - currentHeading
@@ -228,53 +236,55 @@ function TargetingLaser()
 		if not isStunned then
 			--// Aiming
 			local dx, _, dz = Spring.GetUnitDirection(satUnitID)
-			local currentHeading = Vector.Angle(dx, dz)
-			
-			local aimOff = (currentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi
-			
-			if aimOff < 0 then
-				if aimOff < -ROTATION_SPEED then
-					aimOff = -ROTATION_SPEED
-					aimingDone = false
+			if dx then
+				local currentHeading = Vector.Angle(dx, dz)
+				
+				local aimOff = (currentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi
+				
+				if aimOff < 0 then
+					if aimOff < -ROTATION_SPEED then
+						aimOff = -ROTATION_SPEED
+						aimingDone = false
+					else
+						aimingDone = true
+					end
 				else
-					aimingDone = true
+					if aimOff > ROTATION_SPEED then
+						aimOff = ROTATION_SPEED
+						aimingDone = false
+					else
+						aimingDone = true
+					end
 				end
-			else
-				if aimOff > ROTATION_SPEED then
-					aimOff = ROTATION_SPEED
-					aimingDone = false
+				
+				Spring.SetUnitRotation(satUnitID, 0, currentHeading - aimOff - math.pi/2, 0)
+				
+				--// Relay range
+				local _, flashY = Spring.GetUnitPiecePosition(unitID, EmitterMuzzle)
+				local _, SatelliteMuzzleY = Spring.GetUnitPiecePosition(unitID, SatelliteMuzzle)
+				newHeight = max(SatelliteMuzzleY-flashY, 1)
+				if newHeight ~= oldHeight then
+					Spring.SetUnitWeaponState(unitID, 3, "range", newHeight)
+					Spring.SetUnitWeaponState(unitID, 5, "range", newHeight)
+					oldHeight = newHeight
+				end
+				
+				--// Sound effects
+				if soundTime < 0 then
+					local px, py, pz = Spring.GetUnitPosition(unitID)
+					Spring.PlaySoundFile("sounds/weapon/laser/laser_burn6.wav", 10, px, (py + flashY)/2, pz)
+					soundTime = 46
 				else
-					aimingDone = true
+					soundTime = soundTime - 1
 				end
-			end
-			
-			Spring.SetUnitRotation(satUnitID, 0, currentHeading - aimOff - math.pi/2, 0)
-			
-			--// Relay range
-			local _, flashY = Spring.GetUnitPiecePosition(unitID, EmitterMuzzle)
-			local _, SatelliteMuzzleY = Spring.GetUnitPiecePosition(unitID, SatelliteMuzzle)
-			newHeight = max(SatelliteMuzzleY-flashY, 1)
-			if newHeight ~= oldHeight then
-				Spring.SetUnitWeaponState(unitID, 3, "range", newHeight)
-				Spring.SetUnitWeaponState(unitID, 5, "range", newHeight)
-				oldHeight = newHeight
-			end
-			
-			--// Sound effects
-			if soundTime < 0 then
-				local px, py, pz = Spring.GetUnitPosition(unitID)
-				Spring.PlaySoundFile("sounds/weapon/laser/laser_burn6.wav", 10, px, (py + flashY)/2, pz)
-				soundTime = 46
-			else
-				soundTime = soundTime - 1
-			end
-			
-			--// Shooting
-			if shooting ~= 0 then
-				EmitSfx(EmitterMuzzle, FIRE_W3)
-				shooting = shooting - 1
-			else
-				EmitSfx(EmitterMuzzle, FIRE_W5)
+				
+				--// Shooting
+				if shooting ~= 0 then
+					EmitSfx(EmitterMuzzle, FIRE_W3)
+					shooting = shooting - 1
+				else
+					EmitSfx(EmitterMuzzle, FIRE_W5)
+				end
 			end
 		end
 		
@@ -307,6 +317,9 @@ function DeferredActivate()
 	
 	local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount)
 	local dx, _, dz = Spring.GetUnitDirection(unitID)
+	if not dx then
+		return
+	end
 	local heading = Vector.Angle(dx, dz)
 	
 	while not Spring.ValidUnitID(satUnitID) do
@@ -357,6 +370,9 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask(SIG_AIM)
 		
 		local dx, _, dz = Spring.GetUnitDirection(unitID)
+		if not dx then
+			return false
+		end
 		local currentHeading = Vector.Angle(dx, dz)
 		
 		wantedDirection = currentHeading - heading + math.pi

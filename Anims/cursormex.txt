@@ -1,0 +1,5 @@
+hotspot topleft
+frame  anims/cursormex_0.png  0.2
+frame  anims/cursormex_1.png  0.2
+frame  anims/cursormex_0.png  0.2
+frame  anims/cursormex_2.png  0.2

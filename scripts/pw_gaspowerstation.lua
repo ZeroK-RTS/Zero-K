@@ -12,18 +12,22 @@ end
 local spin = math.rad(60)
 
 function script.Create()
-	local rand = math.random(0,1)
-	if rand == 1 then spin = -spin end
-	for i=1,3 do
-	local rot = math.rad(120*i - 120)
-	Turn(wheels[i], y_axis, rot)
-	Spin(wheels[i], x_axis, spin)
+	Turn(coolers[1], y_axis, math.rad(60))
+	Turn(coolers[3], y_axis, math.rad(-60))
 	
-	if i == 1 then
-		Turn(coolers[i], y_axis, math.rad(60))
-	elseif i == 3 then
-		Turn(coolers[i], y_axis, math.rad(-60))
+	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 or GG.applyPlanetwarsDisable then
+		return
 	end
+	
+	local rand = math.random(0,1)
+	if rand == 1 then
+		spin = -spin
+	end
+	
+	for i = 1, 3 do
+		local rot = math.rad(120*i - 120)
+		Turn(wheels[i], y_axis, rot)
+		Spin(wheels[i], x_axis, spin)
 	end
 end
 

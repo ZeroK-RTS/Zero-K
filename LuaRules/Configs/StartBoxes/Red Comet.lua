@@ -1,10 +1,12 @@
-return {
+local ret = {
 	[0] = {
-		startpoints = {
-			{461,2048},
-		},
 		nameLong = "West",
 		nameShort = "W",
+		startpoints = {
+			{ 898, 3314},
+			{ 677, 1922},
+			{ 876,  411},
+		},
 		boxes = {
 			{
 				{0,0},
@@ -15,18 +17,22 @@ return {
 		},
 	},
 	[1] = {
-		startpoints = {
-			{5683,2048},
-		},
 		nameLong = "East",
 		nameShort = "E",
-		boxes = {
-			{
-				{5222,0},
-				{6144,0},
-				{6144,4096},
-				{5222,4096},
-			},
-		},
+		boxes = { },
+		startpoints = { },
 	},
 }
+
+-- mirror west into east
+for i = 1, #ret[0].startpoints do
+	ret[1].startpoints[i] = {Game.mapSizeX - ret[0].startpoints[i][1], Game.mapSizeZ - ret[0].startpoints[i][2]}
+end
+for i = 1, #ret[0].boxes do
+	ret[1].boxes[i] = {}
+	for j = 1, #ret[0].boxes[i] do
+		ret[1].boxes[i][j] = {Game.mapSizeX - ret[0].boxes[i][j][1], Game.mapSizeZ - ret[0].boxes[i][j][2]}
+	end
+end
+
+return ret

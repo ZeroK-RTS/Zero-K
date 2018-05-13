@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehraid]],
   name                   = [[Scorcher]],
-  description            = [[Raider Vehicle]],
+  description            = [[Raider Rover]],
   acceleration           = 0.057,
   brakeRate              = 0.07,
   buildCostMetal         = 130,
@@ -14,6 +14,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 -5 0]],
   collisionVolumeScales  = [[26 26 36]],
   collisionVolumeType    = [[cylZ]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[28 28 34]],
+  selectionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -51,7 +54,7 @@ unitDef = {
   trackStrength          = 5,
   trackStretch           = 1,
   trackType              = [[StdTank]],
-  trackWidth             = 21,
+  trackWidth             = 28,
   turninplace            = 0,
   turnRate               = 703,
   workerTime             = 0,

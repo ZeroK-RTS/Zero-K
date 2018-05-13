@@ -11,6 +11,9 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND SINK]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -21,8 +24,8 @@ unitDef = {
   },
 
   explodeAs              = [[BIG_UNITEX]],
-  footprintX             = 2,
-  footprintZ             = 2,
+  footprintX             = 3,
+  footprintZ             = 3,
   iconType               = [[amphskirm]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -31,8 +34,7 @@ unitDef = {
   maxSlope               = 36,
   maxVelocity            = 1.4,
   minCloakDistance       = 75,
-  movementClass          = [[AKBOT2]],
-  moveState              = 0,
+  movementClass          = [[AKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName             = [[can.s3o]],
   script                 = [[amphfloater.lua]],

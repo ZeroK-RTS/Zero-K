@@ -337,6 +337,10 @@ local icontypes = {
 	bitmap='icons/amphbomb.png',
     size=1.9,
   },
+  ampharty = {
+	bitmap='icons/torparty.png',
+    size=2,
+  },
   amphtransport = {
     bitmap='icons/amphtransport.png',
     size=2.2,
@@ -431,7 +435,7 @@ local icontypes = {
   spiderscout = {
     bitmap='icons/spiderscout.dds',
 	distance=0.75,
-    size=1.8,
+    size=1.7,
   },
   spiderraider = {
     bitmap='icons/spiderraider.dds',
@@ -464,6 +468,10 @@ local icontypes = {
   spidersupport = {
     bitmap='icons/spidersupport.dds',
     size=2.4,
+  },
+  spiderspecialscout = {
+    bitmap='icons/spiderspecialscout.dds',
+    size=2,
   },
   --tick
   spiderbomb = {
@@ -580,6 +588,10 @@ local icontypes = {
   shipbuilder = {
     bitmap='icons/shipbuilder.png',
     size=1.8,
+  },
+  shipbuilder_alt = {
+    bitmap='icons/shipbuilder_alt.png',
+    size=2.2,
   },
   spiderbuilder = {
     bitmap='icons/spiderbuilder.png',
@@ -729,7 +741,7 @@ local icontypes = {
     size=2,
   },
   
-  --Annihilator
+  --Lucifer
   fixedtachyon = {
     bitmap='icons/fixedtachyon.dds',
     size=2,
@@ -741,7 +753,13 @@ local icontypes = {
     size=2,
   },
   
-  --Penetrator
+  -- Sunlance
+  staticassault = {
+    bitmap='icons/staticassault.png',
+    size=1.8,
+  },
+  
+  --Lance
   mobiletachyon = {
     bitmap='icons/mobiletachyon.dds',
     size=2.3,
@@ -891,7 +909,7 @@ local icontypes = {
   --nanos
   staticbuilder = {
     bitmap='icons/staticbuilder.dds',
-    size=1.8,
+    size=1.5,
   },
 
   --ship icons
@@ -903,13 +921,25 @@ local icontypes = {
     bitmap='icons/shipscout.dds',
     size=2.2,
   },
+  shipscout_alt = {
+    bitmap='icons/shipscout_alt.png',
+    size=1.7,
+  },
   shipskirm = {
     bitmap='icons/shipskirm.dds',
     size=2.8,
   },
+  shipskirm_alt = {
+    bitmap='icons/shipskirm_alt.png',
+    size=2.0,
+  },
   shiptorpraider = {
 	bitmap='icons/shiptorpraider.dds',
     size=2.2,
+  },
+  shipraider_alt = {
+	bitmap='icons/shipraider_alt.png',
+    size=2,
   },
   subraider = {
 	bitmap='icons/subraider.dds',
@@ -919,17 +949,33 @@ local icontypes = {
     bitmap='icons/shipriot.dds',
 	size=2.8,
   },
+  shipriot_alt = {
+    bitmap='icons/shipriot_alt.png',
+	size=2.2,
+  },
   shipassault = {
     bitmap='icons/shipassault.png',
 	size=2.8,
+  },
+  shipassault_alt = {
+    bitmap='icons/shipassault_alt.png',
+	size=2.4,
   },
   shiparty = {
     bitmap='icons/shiparty.dds',
 	size=3.0,
   },
+  shiparty_alt = {
+    bitmap='icons/shiparty_alt.png',
+	size=2.3,
+  },
   shipaa = {
     bitmap='icons/shipaa.dds',
 	size=3.0,
+  },
+  shipaa_alt = {
+    bitmap='icons/shipaa_alt.png',
+	size=2.0,
   },
   shiptransport = {
     bitmap='icons/shiptransport.dds',
@@ -1125,7 +1171,7 @@ local icontypes = {
   chickena = {
     --bitmap='icons/chickena.dds',
     bitmap='icons/walkerassault.dds',
-    size=1.7,
+    size=2.1,
   },
   chickenc = {
     --bitmap='icons/chickenc.dds',
@@ -1140,7 +1186,7 @@ local icontypes = {
   chickens = {
     --bitmap='icons/chickens.dds',
     bitmap='icons/kbotskirm.dds',
-    size=1.5,
+    size=1.6,
   },
   chickenr = {
     --bitmap='icons/chickenr.dds',
@@ -1194,6 +1240,11 @@ local icontypes = {
 	distance = 1.6,
     size = 3.2,
   },
+  pw_metal = {
+    bitmap='icons/pw_mex.png',
+	distance = 1.2,
+    size = 2.7,
+  },
   pw_energy = {
     bitmap='icons/pw_energy.png',
 	distance = 1.2,
@@ -1208,6 +1259,11 @@ local icontypes = {
     bitmap='icons/pw_interception.png',
 	distance = 1.2,
     size = 3.0,
+  },
+  pw_relay = {
+    bitmap='icons/pw_interception.png',
+	distance = 1.2,
+    size = 2.0,
   },
   pw_jammer = {
     bitmap='icons/pw_jammer.png',

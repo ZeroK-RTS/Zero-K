@@ -124,9 +124,23 @@ return {
 			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
 			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
 		},
-		decorations = {"skin_recon_dark", "banner_overhead"},
+		decorations = {"skin_recon_dark"},
+	},
+	dynfancy_recon2 = {
+		name = "Recon Trainer",
+		chassis = "recon",
+		modules = {
+			{"commweapon_beamlaser", "module_ablative_armor"},
+			{"module_high_power_servos", "commweapon_personal_shield"},
+			{"commweapon_clusterbomb", "module_dmg_booster", "module_ablative_armor"},
+			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
+			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
+		},
+		decorations = {"skin_recon_leopard", "banner_overhead"},
 		images = {overhead = "184"}
 	},
+	
+	
 	dynfancy_support = {
 		name = "Engineer Trainer",
 		chassis = "support",
@@ -135,6 +149,39 @@ return {
 		},
 		decorations = {"skin_support_zebra", "banner_overhead"},
 		images = {overhead = "184"}
+	},
+	dynfancy_support2 = {
+		name = "Engineer Trainer",
+		chassis = "support",
+		modules = {
+			{"commweapon_beamlaser", "module_ablative_armor"},
+		},
+		decorations = {"skin_support_hotrod"},
+	},
+	dynfancy_support3 = {
+		name = "Engineer Trainer",
+		chassis = "support",
+		modules = {
+			{"commweapon_beamlaser", "module_ablative_armor"},
+		},
+		decorations = {"skin_support_green"},
+	},
+	dynfancy_support4 = {
+		name = "Engineer Trainer",
+		chassis = "support",
+		modules = {
+			{"commweapon_beamlaser", "module_ablative_armor"},
+		},
+		decorations = {"skin_support_dark", "banner_overhead"},
+		images = {overhead = "175"}
+	},
+	dynfancy_guardian = {
+		name = "Guardian Trainer",
+		chassis = "assault",
+		modules = {
+			{"commweapon_beamlaser", "module_ablative_armor"},
+		},
+		decorations = {"skin_assault_steel"},
 	},
 	dynfancy_strike = {
 		name = "Strike Trainer",

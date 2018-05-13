@@ -1,6 +1,6 @@
 local center = {Game.mapSizeX / 2, Game.mapSizeZ / 2}
 local radius = 2340
-local teams = GetTeamCount()
+local teams = Spring.Utilities.GetTeamCount()
 local slice = 2 * math.pi / teams
 
 local layout = {}

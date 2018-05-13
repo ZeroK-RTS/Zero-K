@@ -81,7 +81,7 @@ function Multiprogressbar:DrawControl()
 			totalPercent = totalPercent + (b.percent or 0)
 		end 
 		
-		local resize = self.scaleFunction(totalPercent) / totalPercent
+		local resize = ((totalPercent > 0) and self.scaleFunction(totalPercent) / totalPercent) or 1
 		for _,b in ipairs(self.bars) do 
 			b._drawPercent = b.percent * resize
 		end 

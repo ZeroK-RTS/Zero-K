@@ -45,7 +45,7 @@ local starting_doubles = {
 -- there are 17 triple starts and 16 double starts
 -- for now, we only use doubles if there are not enough triples, but they could sustain <=16 matches on their own
 -- if we do that, randomly pick either set (cannot rely on mapoption since MM has no customizability)
-local teams = GetTeamCount()
+local teams = Spring.Utilities.GetTeamCount()
 if teams > 17 then
 	for i = 1, #starting_doubles do
 		starting_triples [#starting_triples + 1] = starting_doubles[i]

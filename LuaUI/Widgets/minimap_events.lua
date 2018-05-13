@@ -167,14 +167,14 @@ function widget:GameStart()
 end
 
 local function CreateLists() 
-circleList = glCreateList(function()
+  circleList = glCreateList(function()
     glBeginEnd(GL_TRIANGLE_FAN, function()
       for i = 0, circleDivs - 1 do
         local r = 2.0 * math.pi * (i / circleDivs)
         local cosv = math.cos(r)
         local sinv = math.sin(r)
         --glTexCoord(cosv, sinv)
-        glVertex(cosv, 0, sinv)
+        glVertex(cosv, sinv, 0)
       end
     end)
     if (lineWidth > 0) then
@@ -184,28 +184,28 @@ circleList = glCreateList(function()
           local cosv = math.cos(r)
           local sinv = math.sin(r)
           --glTexCoord(cosv, sinv)
-          glVertex(cosv, 0, sinv)
+          glVertex(cosv, sinv, 0)
         end
       end)
     end
   end)
-  pointList = glCreateList(function()
-    glBeginEnd(GL_POINTS, function()
-      glVertex(0, 0, 0)
-    end)
-  end)
-  rectList = glCreateList(function()
-    glBeginEnd(GL_QUADS, function()
-      --glTexCoord(0, 0); 
-	  glVertex(-1, 0, -1)
-      --glTexCoord(1, 0); 
-	  glVertex( 1, 0, -1)
-      --glTexCoord(1, 1); 
-	  glVertex( 1, 0,  1)
-      --glTexCoord(0, 1); 
-	  glVertex(-1, 0,  1)
-    end)
-  end)
+  --pointList = glCreateList(function()
+  --  glBeginEnd(GL_POINTS, function()
+  --    glVertex(0, 0, 0)
+  --  end)
+  --end)
+  --rectList = glCreateList(function()
+  --  glBeginEnd(GL_QUADS, function()
+  --    --glTexCoord(0, 0); 
+  --    glVertex(-1, -1, 0)
+  --    --glTexCoord(1, 0); 
+  --    glVertex( 1, -1, 0)
+  --    --glTexCoord(1, 1); 
+  --    glVertex( 1,  1, 0)
+  --    --glTexCoord(0, 1); 
+  --    glVertex(-1,  1, 0)
+  --  end)
+  --end)
 end 
 
 function widget:Initialize()
@@ -218,8 +218,8 @@ end
 
 
 function widget:Shutdown()
-  glDeleteList(rectList)
-  glDeleteList(pointList)
+  --glDeleteList(rectList)
+  --glDeleteList(pointList)
   glDeleteList(circleList)
 end
 
@@ -290,7 +290,7 @@ local function AddEvent(unitID, unitDefID, color, cost)
     eventMap[unitID] = {
       x = px,
       z = pz,
-      v = cost or (ud.cost * eventScale),
+      v = cost or (ud.metalCost * eventScale),
       u = unitID,
       c = color,
 --      t = GetGameSeconds()
@@ -393,8 +393,8 @@ local function DrawEvent(event)
   local scale = minPixels + pixels
   
   glPushMatrix()
-  glTranslate(event.x, 0, event.z)
-  glScale(scale * pxScale, 1, scale * pyScale)
+  glTranslate(event.x, event.z, 0)
+  glScale(scale * pxScale, scale * pyScale, 1)
   glColor(color)
   glCallList(circleList)
   glPopMatrix()
@@ -416,8 +416,8 @@ local function DrawDamage(damage)
 	local scale = minPixels + pixels
 	
     glPushMatrix()
-    glTranslate(px, 0, pz)
-    glScale(scale * pxScale, 1, scale * pyScale)
+    glTranslate(px, pz, 0)
+    glScale(scale * pxScale, scale * pyScale, 1)
     glColor(damageColor)
 	glCallList(circleList)
     glPopMatrix()
@@ -429,8 +429,8 @@ local function DrawDamage(damage)
     local scale = minPixels + pixels
 
     glPushMatrix()
-    glTranslate(px, 0, pz)
-    glScale(scale * pxScale, 1, scale * pyScale)
+    glTranslate(px, pz, 0)
+    glScale(scale * pxScale, scale * pyScale, 1)
 	glColor(paralyzeColor)
     glCallList(circleList)
     glPopMatrix()
@@ -468,7 +468,6 @@ function widget:DrawInMiniMap(xSize, ySize)
   glLoadIdentity()
   glTranslate(0, 1, 0)
   glScale(1 / xMapSize, -1 / yMapSize,1)
-  glRotate(270, 1, 0, 0)
   
   -- draw damages before events
   for _,damage in pairs(damageMap) do
@@ -483,7 +482,7 @@ function widget:DrawInMiniMap(xSize, ySize)
 
   glLineWidth(1)
   glColor(1,1,1,1)
-  gl.Lighting(true)
+  --gl.Lighting(true)
   glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
   if glSmoothing then
     glSmoothing(true, true, false)

@@ -75,6 +75,7 @@ unitDef = {
 	  customparams = {
 		light_color = [[0.8 0.76 0.38]],
 		light_radius = 180,
+		proximity_priority = 5, -- Don't use this unless required as it causes O(N^2) seperation checks per slow update.
 	  },
 
       damage                  = {
@@ -91,7 +92,7 @@ unitDef = {
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       range                   = 410,
-      reloadtime              = 0.12,
+      reloadtime              = 0.1,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
       soundHit                = [[weapon/cannon/emg_hit]],

@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[planeheavyfighter]],
-  name                   = [[Hawk]],
+  name                   = [[Raptor]],
   description            = [[Air Superiority Fighter]],
   brakerate              = 0.4,
   buildCostMetal         = 300,
@@ -15,6 +15,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 5]],
   collisionVolumeScales  = [[30 12 50]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 10]],
+  selectionVolumeScales  = [[60 60 80]],
+  selectionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
   crashDrag              = 0.01,
   cruiseAlt              = 220,
@@ -82,9 +85,9 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-	  },
+      customParams            = {
+        isaa = [[1]],
+      },
 
       damage                  = {
         default = 0.96,
@@ -103,7 +106,7 @@ unitDef = {
       reloadtime              = 0.1,
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/rapid_laser]],
-      soundStartVolume        = 2.2,
+      soundStartVolume        = 1.9,
       thickness               = 1.95,
       tolerance               = 8192,
       turret                  = true,

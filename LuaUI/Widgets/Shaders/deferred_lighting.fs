@@ -34,7 +34,7 @@ void main(void)
 	float mapDepth = texture2D(  mapdepths, gl_TexCoord[0].st).x;
 	float mdlDepth = texture2D(modeldepths, gl_TexCoord[0].st).x;
 
-	#if (GL_CLIP_CONTROL == 1)
+	#if (CLIP_CONTROL == 1)
 	vec4 mappos4   = vec4(  vec3(gl_TexCoord[0].st * 2.0 - 1.0, mapDepth),  1.0);
 	vec4 modelpos4 = vec4(  vec3(gl_TexCoord[0].st * 2.0 - 1.0, mdlDepth),  1.0);
 	#else
@@ -113,7 +113,7 @@ void main(void)
 		// float attenuation = max(0.0, (1.0 * LIGHT_CONSTANT - LIGHT_SQUARED * (dist_light_here * dist_light_here) / (LIGHTRADIUS * LIGHTRADIUS) - LIGHT_LINEAR * (dist_light_here) / (LIGHTRADIUS)));
 		float attenuation = attenuate(dist_light_here, LIGHTRADIUS);
 	#endif
-	
+
 	vec3 viewDirection = normalize(vec3(eyePos - mappos4.xyz));
 
 	// light source on the wrong side?

@@ -26,7 +26,7 @@ Please keep them up to date.
 --]]
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Hotkeys/Selection'
+options_path = 'Hotkeys/Selection'
 options_order = {
 	'lbl_visibilty',
 	'select_all_visible',
@@ -169,14 +169,14 @@ options = {
 	
 	----
 	uikey1 = { type = 'button',
-		name = 'Non-transport non-Hawk armed air',
+		name = 'Non-transport non-Raptor armed air',
 		desc = '',
-		action = 'select AllMap+_Not_Builder_Not_Building_Not_Transport_Aircraft_Weapons_Not_NameContain_Hawk_Not_Radar+_ClearSelection_SelectAll+',
+		action = 'select AllMap+_Not_Builder_Not_Building_Not_Transport_Aircraft_Weapons_Not_NameContain_Raptor_Not_Radar+_ClearSelection_SelectAll+',
 	},
 	uikey2 = { type = 'button',
-		name = 'Hawks',
+		name = 'Raptors',
 		desc = '',
-		action = 'select AllMap+_NameContain_Hawk+_ClearSelection_SelectAll+',
+		action = 'select AllMap+_NameContain_Raptor+_ClearSelection_SelectAll+',
 	},
 	uikey3 = { type = 'button',
 		name = 'Mobile non-builders',
@@ -184,7 +184,7 @@ options = {
 		action = 'select AllMap+_Not_Builder_Not_Building+_ClearSelection_SelectAll+',
 	},
 	uikey4 = { type = 'button',
-		name = 'Vultures',
+		name = 'Owls',
 		desc = '',
 		action = 'select AllMap+_Not_Builder_Not_Building_Not_Transport_Aircraft_Radar+_ClearSelection_SelectAll+',
 	},

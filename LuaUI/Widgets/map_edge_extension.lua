@@ -42,15 +42,19 @@ local ubrightness
 local island = nil -- Later it will be checked and set to true of false
 local drawingEnabled = true
 
+local SPACE_CLICK_OUTSIDE = false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 local function ResetWidget()
 	if dList and not drawingEnabled then
 		gl.DeleteList(dList)
+		dList = nil
 	end
 	if mirrorShader and not drawingEnabled then
 		gl.DeleteShader(mirrorShader)
+		mirrorShader = nil
 	end
 	widget:Initialize()
 end
@@ -80,7 +84,7 @@ options = {
 	drawForIslands = {
 		name = "Draw for islands",
 		type = 'bool',
-		value = true,
+		value = false,
 		desc = "Draws mirror map when map is an island",		
 		noHotkey = true,
 	},
@@ -376,7 +380,7 @@ local function Initialize()
 	end
 	if not mirrorShader then
 		widget.DrawWorldPreUnit = function()
-			if (not island) or options.drawForIslands.value then
+			if dList and ((not island) or options.drawForIslands.value) then
 				gl.DepthMask(true)
 				--gl.Texture(tex)
 				gl.CallList(dList)
@@ -421,12 +425,11 @@ function widget:Shutdown()
 end
 
 local function DrawWorldFunc() --is overwritten when not using the shader
-    if (not island) or options.drawForIslands.value then
+    if dList and ((not island) or options.drawForIslands.value) then
         local glTranslate = gl.Translate
         local glUniform = gl.Uniform
         local GamemapSizeZ, GamemapSizeX = Game.mapSizeZ,Game.mapSizeX
         
-        gl.Fog(true)
         gl.FogCoord(1)
         gl.UseShader(mirrorShader)
         gl.PushMatrix()
@@ -485,7 +488,7 @@ local function DrawWorldFunc() --is overwritten when not using the shader
         gl.PopMatrix()
         gl.UseShader(0)
         
-        gl.Fog(false)
+        gl.FogCoord(0)
     end
 end
 
@@ -500,14 +503,16 @@ function widget:DrawWorldRefraction()
 	end
 end
 
-function widget:MousePress(x, y, button)
-	local _, mpos = spTraceScreenRay(x, y, true) --//convert UI coordinate into ground coordinate.
-	if mpos==nil then --//activate epic menu if mouse position is outside the map
-		local _, _, meta, _ = Spring.GetModKeyState()
-		if meta then  --//show epicMenu when user also press the Spacebar
-			WG.crude.OpenPath(options_path) --click + space will shortcut to option-menu
-			WG.crude.ShowMenu() --make epic Chili menu appear.
-			return false
+if SPACE_CLICK_OUTSIDE then
+	function widget:MousePress(x, y, button)
+		local _, mpos = spTraceScreenRay(x, y, true) --//convert UI coordinate into ground coordinate.
+		if mpos == nil then --//activate epic menu if mouse position is outside the map
+			local _, _, meta, _ = Spring.GetModKeyState()
+			if meta then  --//show epicMenu when user also press the Spacebar
+				WG.crude.OpenPath(options_path) --click + space will shortcut to option-menu
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+				return false
+			end
 		end
 	end
 end

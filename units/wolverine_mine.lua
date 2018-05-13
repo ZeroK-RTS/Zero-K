@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[wolverine_mine]],
   name                   = [[Claw]],
-  description            = [[Wolverine Mine]],
+  description            = [[Badger Mine]],
   acceleration           = 0,
   activateWhenBuilt      = false,
   brakeRate              = 0,

@@ -1,10 +1,5 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not gadgetHandler:IsSyncedCode() then
-	return
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
 		name = "Area Denial",
@@ -17,14 +12,24 @@ function gadget:GetInfo()
 	}
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local SAVE_FILE = "Gadgets/weapon_area_damage.lua"
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if gadgetHandler:IsSyncedCode() then
+--------------------------------------------------------------------------------
+-- SYNCED
+--------------------------------------------------------------------------------
+
 local frameNum
-local explosionList = {}
 local DAMAGE_PERIOD, weaponInfo = include("LuaRules/Configs/area_damage_defs.lua")
 
---misc
-local rowCount = 0 --remember the lenght of explosionList table
-local emptyRow = {count=0} --remember empty position in explosionList table.
---
+local explosionList = {}
+local explosionCount = 0
+
+_G.explosionList = explosionList
 
 function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	local wantedWeaponList = {}
@@ -53,7 +58,8 @@ end
 
 function gadget:Explosion(weaponID, px, py, pz, ownerID)
 	if (weaponInfo[weaponID]) then
-		local w = {
+		explosionCount = explosionCount + 1
+		explosionList[explosionCount] = {
 			radius = weaponInfo[weaponID].radius,
 			damage = weaponInfo[weaponID].damage,
 			impulse = weaponInfo[weaponID].impulse,
@@ -64,51 +70,42 @@ function gadget:Explosion(weaponID, px, py, pz, ownerID)
 			pos = {x = px, y = py, z = pz},
 			owner=ownerID,
 		}
-		if emptyRow.count > 0 then
-			local emptyPos = emptyRow[emptyRow.count]
-			emptyRow.count = emptyRow.count-1
-			if emptyPos then -- sometimes emptyPos is nil and this is worrying.
-				emptyRow[emptyPos] = nil
-				explosionList[emptyPos] = w --insert new data at empty position in explosionList table
-			end
-		else
-			rowCount = rowCount + 1
-			explosionList[rowCount] = w --insert new data at a new position at end of explosionList table
-		end
 	end
 	return false
 end
 
-local totalDamage = 0
-
 function gadget:GameFrame(f)
-	frameNum=f
+	frameNum = f
 	if (f%DAMAGE_PERIOD == 0) then
-		for i,w in pairs(explosionList) do
-			local pos = w.pos
-			local ulist = Spring.GetUnitsInSphere(pos.x, pos.y, pos.z, w.radius)
+		local i = 1
+		while i <= explosionCount do
+			local data = explosionList[i]
+			local pos = data.pos
+			local ulist = Spring.GetUnitsInSphere(pos.x, pos.y, pos.z, data.radius)
 			if (ulist) then
-				for j=1, #ulist do
+				for j = 1, #ulist do
 					local u = ulist[j]
 					local ux, uy, uz = Spring.GetUnitPosition(u)
-					local damage = w.damage
-					if w.rangeFall ~= 0 then
-						damage = damage - damage*w.rangeFall*math.sqrt((ux-pos.x)^2 + (uy-pos.y)^2 + (uz-pos.z)^2)/w.radius
+					local damage = data.damage
+					if data.rangeFall ~= 0 then
+						damage = damage - damage*data.rangeFall*math.sqrt((ux-pos.x)^2 + (uy-pos.y)^2 + (uz-pos.z)^2)/data.radius
 					end
-					if w.impulse then
+					if data.impulse then
 						GG.AddGadgetImpulse(u, pos.x - ux, pos.y - uy, pos.z - uz, damage, false, true, false, {0.22,0.7,1})
 						GG.SetUnitFallDamageImmunity(u, f + 10)
 						GG.DoAirDrag(u, damage)
 					else
-						Spring.AddUnitDamage(u, damage, 0, w.owner, w.id, 0, 0, 0)
+						Spring.AddUnitDamage(u, damage, 0, data.owner, data.id, 0, 0, 0)
 					end
 				end
 			end
-			w.damage = w.damage - w.timeLoss
-			if f >= w.expiry then
-				explosionList[i] = nil
-				emptyRow.count = emptyRow.count + 1
-				emptyRow[emptyRow.count] = i --remember where is all empty position in explosionList table
+			data.damage = data.damage - data.timeLoss
+			if f >= data.expiry then
+				explosionList[i] = explosionList[explosionCount]
+				explosionList[explosionCount] = nil
+				explosionCount = explosionCount - 1
+			else
+				i = i + 1
 			end
 		end
 	end
@@ -119,3 +116,35 @@ function gadget:Initialize()
 		Script.SetWatchWeapon(w, true)
 	end
 end
+
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	local savedGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame")
+	local loadData = GG.SaveLoad.ReadFile(zip, "Weapon area damage", SAVE_FILE) or {}
+	explosionList = loadData
+	for i=1,#explosionList do
+		local explo = explosionList[i]
+		explo.owner = GG.SaveLoad.GetNewUnitID(explo.ownerID)
+		explo.expiry = explo.expiry - savedGameFrame
+	end
+	
+	_G.explosionList = explosionList
+	explosionCount = #explosionList
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+else
+--------------------------------------------------------------------------------
+-- unsynced
+--------------------------------------------------------------------------------
+function gadget:Save(zip)
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.explosionList, "Weapon area damage"))
+end
+--------------------------------------------------------------------------------
+end
+--------------------------------------------------------------------------------

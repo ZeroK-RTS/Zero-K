@@ -29,6 +29,8 @@ local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchicke
 local campaignBattleID = modOptions.singleplayercampaignbattleid
 local setAiStartPos = (modOptions.setaispawns == "1")
 
+local CAMPAIGN_SPAWN_DEBUG = (Spring.GetModOptions().campaign_spawn_debug == "1")
+
 local gaiateam = Spring.GetGaiaTeamID()
 local gaiaally = select(6, spGetTeamInfo(gaiateam))
 
@@ -36,6 +38,13 @@ local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 
 local fixedStartPos = (modOptions.fixedstartpos == "1")
 local ordersToRemove
+
+local storageUnits = {
+	{
+		unitDefID = UnitDefNames["staticstorage"].id,
+		storeAmount = UnitDefNames["staticstorage"].metalStorage
+	}
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -46,42 +55,14 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 -- Functions shared between missions and non-missions
 
-local spGetGroundHeight = Spring.GetGroundHeight
-local spSetHeightMap    = Spring.SetHeightMap
-
-local function FlattenFunc(left, top, right, bottom, height)
-	-- top and bottom
-	for x = left, right, 8 do
-		spSetHeightMap(x, top - 8, height, 0.5)
-		spSetHeightMap(x, bottom + 8, height, 0.5)
-	end
-	
-	-- left and right
-	for z = top, bottom, 8 do
-		spSetHeightMap(left - 8, z, height, 0.5)
-		spSetHeightMap(right + 8, z, height, 0.5)
-	end
-	
-	-- corners
-	spSetHeightMap(left - 8, top - 8, height, 0.5)
-	spSetHeightMap(left - 8, bottom + 8, height, 0.5)
-	spSetHeightMap(right + 8, top - 8, height, 0.5)
-	spSetHeightMap(right + 8, bottom + 8, height, 0.5)
-end
-
-local function FlattenRectangle(left, top, right, bottom, height)
-	Spring.LevelHeightMap(left, top, right, bottom, height)
-	Spring.SetHeightMapFunc(FlattenFunc, left, top, right, bottom, height)
-end
-
-local function CheckOrderRemoval()
+local function CheckOrderRemoval() -- FIXME: maybe we can remove polling every frame and just remove the orders directly
 	if not ordersToRemove then
 		return
 	end
 	for unitID, factoryDefID in pairs(ordersToRemove) do
 		local cQueue = Spring.GetCommandQueue(unitID, 1)
 		if cQueue and cQueue[1] and cQueue[1].id == -factoryDefID then
-			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, {"alt"})
+			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, CMD.OPT_ALT)
 		end
 	end
 	ordersToRemove = nil
@@ -101,36 +82,25 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
-		
-		-- Flatten ground
-		local ud = UnitDefs[unitDefID]
-		local sX = ud.xsize*4
-		local sZ = ud.zsize*4
-		local facing = Spring.GetUnitBuildFacing(unitID)
-		if facing == 1 or facing == 3 then
-			sX, sZ = sZ, sX
-		end
-		
-		local height
-		if facing == 0 then -- South
-			height = spGetGroundHeight(x, z + 0.8*sZ)
-		elseif facing == 1 then -- East
-			height = spGetGroundHeight(x + 0.8*sX, z)
-		elseif facing == 2 then -- North
-			height = spGetGroundHeight(x, z - 0.8*sZ)
-		else -- West
-			height = spGetGroundHeight(x - 0.8*sX, z)
-		end
-		
-		if height > 0 or (not ud.floatOnWater) then
-			FlattenRectangle(x - sX, z - sZ, x + sX, z + sZ, height)
-		end
-		
-		-- Stats collection
+
+		-- Stats collection (acuelly not, see below)
 		if GG.mod_stats_AddFactoryPlop then
 			GG.mod_stats_AddFactoryPlop(teamID, unitDefID)
 		end
-		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
+
+		-- FIXME: temporary hack because I'm in a hurry
+		-- proper way: get rid of all the useless shit in modstats, reenable and collect plop stats that way (see above)
+		local str = "SPRINGIE:facplop," .. UnitDefs[unitDefID].name .. "," .. teamID .. "," .. select(6, Spring.GetTeamInfo(teamID)) .. ","
+		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		if isAI then
+			str = str .. "Nightwatch" -- existing account just in case infra explodes otherwise
+		else
+			str = str .. (Spring.GetPlayerInfo(playerID) or "ChanServ") -- ditto, different acc to differentiate
+		end
+		str = str .. ",END_PLOP"
+		Spring.SendCommands("wbynum 255 " .. str)
+
+		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- FIXME: performance loss, possibly preload?
 	end
 end
 
@@ -139,10 +109,6 @@ end
 -- Mission Handling
 
 if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage (and enable facplopping)
-	if not gadgetHandler:IsSyncedCode() then
-		return false -- no unsynced code
-	end
-
 	function gadget:Initialize()
 		for _, teamID in ipairs(Spring.GetTeamList()) do
 			Spring.SetTeamResource(teamID, "es", START_STORAGE + HIDDEN_STORAGE)
@@ -194,12 +160,15 @@ local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
 
 -- allow gadget:Save (unsynced) to reach them
-_G.waitingForComm = waitingForComm
-_G.scheduledSpawn = scheduledSpawn
-_G.playerSides = playerSides
-_G.teamSides = teamSides
-_G.commSpawnedTeam = commSpawnedTeam
-_G.commSpawnedPlayer = commSpawnedPlayer
+local function UpdateSaveReferences()
+	_G.waitingForComm = waitingForComm
+	_G.scheduledSpawn = scheduledSpawn
+	_G.playerSides = playerSides
+	_G.teamSides = teamSides
+	_G.commSpawnedTeam = commSpawnedTeam
+	_G.commSpawnedPlayer = commSpawnedPlayer
+end
+UpdateSaveReferences()
 
 local loadGame = false	-- was this loaded from a savegame?
 
@@ -239,10 +208,6 @@ local function GetStartUnit(teamID, playerID, isAI)
 		local commanderLevel = teamInfo.staticcomm_level or 1
 		local commanderProfile = GG.ModularCommAPI.GetCommProfileInfo(commanderName)
 		return commanderProfile.baseUnitDefID
-	end
-
-	if Spring.GetModOption("forcejunior", true, false) then
-		return UnitDefNames["commbasic"].id
 	end
 
 	local startUnit
@@ -380,9 +345,18 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		-- get facing direction
 		local facing = GetFacingDirection(x, z, teamID)
 
+		if CAMPAIGN_SPAWN_DEBUG then
+			local _, aiName = Spring.GetAIInfo(teamID)
+			Spring.MarkerAddPoint(x, y, z, "Commander " .. (aiName or "Player"))
+			return -- Do not spawn commander
+		end
 		GG.startUnits[teamID] = startUnit
 		GG.CommanderSpawnLocation[teamID] = {x = x, y = y, z = z, facing = facing}
 
+		if GG.GalaxyCampaignHandler then
+			facing = GG.GalaxyCampaignHandler.OverrideCommFacing(teamID) or facing
+		end
+		
 		-- CREATE UNIT
 		local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, _, _, _, _, _, GG.ModularCommAPI.GetProfileIDByBaseDefID(startUnit), teamInfo and tonumber(teamInfo.static_level), true)
 		
@@ -411,13 +385,13 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 
 		-- add facplop
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
-		local udef = UnitDefs[Spring.GetUnitDefID(unitID)]		
+		local udef = UnitDefs[Spring.GetUnitDefID(unitID)]
 
 		local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
 		local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
 
-		Spring.SetTeamResource(teamID, "energy", START_ENERGY + energy)
-		Spring.SetTeamResource(teamID, "metal", START_METAL + metal)
+		Spring.SetTeamResource(teamID, "energy", teamInfo.start_energy or (START_ENERGY + energy))
+		Spring.SetTeamResource(teamID, "metal", teamInfo.start_metal or (START_METAL + metal))
 
 		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") and 
 			((not campaignBattleID) or GG.GalaxyCampaignHandler.HasFactoryPlop(teamID)) then
@@ -516,6 +490,14 @@ local function IsTeamResigned(team)
 	return true
 end
 
+local function GetPregameUnitStorage(teamID)
+	local storage = 0
+	for i = 1, #storageUnits do
+		storage = storage + Spring.GetTeamUnitDefCount(teamID, storageUnits[i].unitDefID) * storageUnits[i].storeAmount
+	end
+	return storage
+end
+
 function gadget:GameStart()
 	if Spring.Utilities.tobool(Spring.GetGameRulesParam("loadedGame")) then
 		return
@@ -528,8 +510,9 @@ function gadget:GameStart()
 		-- clear resources
 		-- actual resources are set depending on spawned unit and setup
 		if not loadGame then
-			Spring.SetTeamResource(team, "es", 0 + HIDDEN_STORAGE)
-			Spring.SetTeamResource(team, "ms", 0 + HIDDEN_STORAGE)
+			local pregameUnitStorage = (campaignBattleID and GetPregameUnitStorage(team)) or 0
+			Spring.SetTeamResource(team, "es", pregameUnitStorage + HIDDEN_STORAGE)
+			Spring.SetTeamResource(team, "ms", pregameUnitStorage + HIDDEN_STORAGE)
 			Spring.SetTeamResource(team, "energy", 0)
 			Spring.SetTeamResource(team, "metal", 0)
 		end
@@ -701,6 +684,8 @@ function gadget:Load(zip)
 	teamSides = data.teamSides or {}
 	commSpawnedPlayer = data.commSpawnedPlayer or {}
 	commSpawnedTeam = data.commSpawnedTeam or {}
+	
+	UpdateSaveReferences()
 end
 
 --------------------------------------------------------------------
@@ -735,17 +720,20 @@ end
 local MakeRealTable = Spring.Utilities.MakeRealTable
 
 function gadget:Save(zip)
+	if VFS.FileExists("mission.lua") then	-- nothing to do
+		return		
+	end
 	if not GG.SaveLoad then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Start Unit Setup failed to access save/load API")
 		return
 	end
 	local toSave = {
-		waitingForComm = MakeRealTable(SYNCED.waitingForComm),
-		scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn),
-		playerSides = MakeRealTable(SYNCED.playerSides),
-		teamSides = MakeRealTable(SYNCED.teamSides),
-		commSpawnedPlayer = MakeRealTable(SYNCED.commSpawnedPlayer),
-		commSpawnedTeam = MakeRealTable(SYNCED.commSpawnedTeam),
+		waitingForComm = MakeRealTable(SYNCED.waitingForComm, "Start setup (waitingForComm)"),
+		scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn, "Start setup (scheduledSpawn)"),
+		playerSides = MakeRealTable(SYNCED.playerSides, "Start setup (playerSides)"),
+		teamSides = MakeRealTable(SYNCED.teamSides, "Start setup (teamSides)"),
+		commSpawnedPlayer = MakeRealTable(SYNCED.commSpawnedPlayer, "Start setup (commSpawnedPlayer)"),
+		commSpawnedTeam = MakeRealTable(SYNCED.commSpawnedTeam, "Start setup (commSpawnedTeam)"),
 	}
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, toSave)
 end

@@ -1,10 +1,10 @@
 unitDef = {
   unitname               = [[factoryship]],
   name                   = [[Shipyard]],
-  description            = [[Produces Ships, Builds at 10 m/s]],
+  description            = [[Produces Naval Units, Builds at 10 m/s]],
   acceleration           = 0,
   brakeRate              = 0,
-  buildCostMetal         = 600,
+  buildCostMetal         = Shared.FACTORY_COST,
   builder                = true,
 
   buildoptions           = {
@@ -36,9 +36,10 @@ unitDef = {
 	unstick_help   = 1,
     aimposoffset   = [[60 0 -15]],
     midposoffset   = [[0 0 -15]],
-	solid_factory = [[3]],
-	modelradius    = [[50]],
+	solid_factory = [[2]],
+	modelradius    = [[100]],
 	solid_factory_rotation = [[1]], -- 90 degrees counter clockwise
+	default_spacing = 8,
   },
 
   energyUse              = 0,
@@ -62,7 +63,7 @@ unitDef = {
   turnRate               = 0,
   waterline              = 0,
   workerTime             = 10,
-  yardMap                = [[oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc]],
+  yardMap                = [[oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc]],
 
   featureDefs            = {
 

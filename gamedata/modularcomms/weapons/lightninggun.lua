@@ -10,7 +10,7 @@ local weaponDef = {
 		extra_damage_mult = 2.5,
 		slot = [[5]],
 		muzzleEffectFire = [[custom:zeus_fire_fx]],
-		
+
 		light_camera_height = 1600,
 		light_color = [[0.85 0.85 1.2]],
 		light_radius = 200,
@@ -31,7 +31,7 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	paralyzeTime            = 1,
 	range                   = 300,
-	reloadtime              = 1 + 20/30,
+	reloadtime              = 1 + 25/30,
 	rgbColor                = [[0.5 0.5 1]],
 	soundStart              = [[weapon/more_lightning_fast]],
 	soundTrigger            = true,

@@ -179,6 +179,14 @@ end
 -------------------------------------------------------------------------------
 -- Widget options
 
+local defaultFacHotkeys = {
+	{key='Q', mod='alt+'},
+	{key='W', mod='alt+'},
+	{key='E', mod='alt+'},
+	{key='R', mod='alt+'},
+	{key='T', mod='alt+'},
+}
+
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
 options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning'}
 options = { 
@@ -245,32 +253,32 @@ options = {
 		value = false,		
 		noHotkey = true,
 	},
-	lblSelectionIdle = { type='label', name='Idle Units', path='Settings/Hotkeys/Selection', },
+	lblSelectionIdle = { type='label', name='Idle Units', path='Hotkeys/Selection', },
 	selectprecbomber = { type = 'button',
 		name = 'Select idle precision bomber',
 		desc = 'Selects an idle, armed precision bomber. Use multiple times to select more. Deselects any units which are not idle, armed precision bombers.',
 		action = 'selectprecbomber',
-		path = 'Settings/Hotkeys/Selection',
+		path = 'Hotkeys/Selection',
 		dontRegisterAction = true,
 	},
 	selectidlecon = { type = 'button',
 		name = 'Select idle constructor',
 		desc = 'Selects an idle constructor. Use multiple times to select more. Deselects any units which are not idle constructors.',
 		action = 'selectidlecon',
-		path = 'Settings/Hotkeys/Selection',
+		path = 'Hotkeys/Selection',
 		dontRegisterAction = true,
 	},
 	selectidlecon_all = { type = 'button',
 		name = 'Select all idle constructors',
 		action = 'selectidlecon_all',
-		path = 'Settings/Hotkeys/Selection',
+		path = 'Hotkeys/Selection',
 		dontRegisterAction = true,
 	},
-	lblSelection = { type='label', name='Commander', path='Settings/Hotkeys/Selection', },
+	lblSelection = { type='label', name='Commander', path='Hotkeys/Selection', },
 	selectcomm = { type = 'button',
 		name = 'Select Commander',
 		action = 'selectcomm',
-		path = 'Settings/Hotkeys/Selection',
+		path = 'Hotkeys/Selection',
 		dontRegisterAction = true,
 	},
 	horPaddingLeft = {
@@ -495,6 +503,7 @@ for i = 1, 16 do
 		name = "Select Factory " .. i,
 		desc = "Selects the factory in position " .. i .. " of the selection bar.",
 		type = 'button',
+		hotkey = defaultFacHotkeys[i],
 		path = hotkeyPath,
 		OnChange = function()
 			SelectFactory(i)
@@ -552,6 +561,7 @@ local function GetBackground(parent)
 		draggable = false,
 		resizable = false,
 		backgroundColor = {1, 1, 1, opacity},
+		noClickThrough = true,
 		parent = parent,
 	}
 	
@@ -664,7 +674,7 @@ local function GetBackground(parent)
 			mainWindow:Invalidate()
 		end
 	end
-		
+	
 	function externalFunctions.UpdateSpecSpace(newSpecShow)
 		if newSpecShow == specShow then
 			return
@@ -673,6 +683,10 @@ local function GetBackground(parent)
 		if specShowMode then
 			externalFunctions.SetVisible(specShow)
 		end
+	end
+	
+	function externalFunctions.GetSpecMode()
+		return specShowMode
 	end
 	
 	return externalFunctions
@@ -934,6 +948,7 @@ end
 local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 	
 	local function OnClick(mouse)
+		local alt, ctrl, meta, shift = Spring.GetModKeyState()
 		Spring.SelectUnitArray({unitID}, shift)
 		if mouse == ((options.leftMouseCenter.value and 1) or 3) then
 			local x, y, z = Spring.GetUnitPosition(unitID)
@@ -979,13 +994,19 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 		button.SetRepeat(repeatState)
 	end
 	
+	local oldConstructionCount, oldConstructionDefID, oldBuildProgress
 	local function UpdateTooltip(constructionCount)
+		if constructionCount == oldConstructionCount and constructionDefID == oldConstructionDefID and buildProgress == oldBuildProgress then
+			return
+		end
+		oldConstructionCount, oldConstructionDefIDoldBuildProgress, oldBuildProgress = constructionCount, constructionDefID, buildProgress
+		
 		local tooltip = WG.Translate("interface", "factory") .. ": ".. Spring.Utilities.GetHumanName(UnitDefs[unitDefID]) .. "\n" .. WG.Translate("interface", "x_units_in_queue", {count = constructionCount})
 		if repeatState then
 			tooltip = tooltip .. "\255\0\255\255 (" .. WG.Translate("interface", "repeating") .. ")\008"
 		end
 		if constructionDefID then
-			tooltip = tooltip .. "\n" .. WG.Translate("interface", "current_project") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[constructionDefID]) .." (".. WG.Translate("interface", "x%_done", {x = math.floor(buildProgress*100)}) .. ")"
+			tooltip = tooltip .. "\n" .. WG.Translate("interface", "current_project") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[constructionDefID]) .. " (".. WG.Translate("interface", "x%_done", {x = math.floor(buildProgress*100)}) .. ")"
 		end
 		tooltip = tooltip .. standardFactoryTooltip
 		
@@ -1094,7 +1115,7 @@ local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 	local warningPhase = true
 	
 	local button = GetNewButton(
-		parent, 
+		parent,
 		OnClick, 
 		COMMANDER_ORDER,
 		categoryOrder,
@@ -1110,7 +1131,12 @@ local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 		button.SetHealthbar(healthProp ~= 1 and healthProp)
 	end
 	
-	local function UpdateTooltip(constructionCount)
+	local oldHealth, oldMaxHealth
+	local function UpdateTooltip()
+		if health == oldHealth and maxHealth == oldMaxHealth then
+			return
+		end
+		oldHealth, oldMaxHealth = health, maxHealth
 		local tooltip = WG.Translate("interface", "commander") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[unitDefID], unitID) ..
 			"\n\255\0\255\255" .. WG.Translate("interface", "health") .. ":\008 "..GetHealthColor(health/maxHealth, true)..math.floor(health).."/"..maxHealth.."\008"..
 			"\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("interface", "select_and_go_to") or WG.Translate("interface", "select")) ..
@@ -1153,7 +1179,7 @@ local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 			button.SetBackgroundColor((warningPhase and BUTTON_COLOR_WARNING) or BUTTON_COLOR)
 		end
 		
-		UpdateTooltip(constructionCount)
+		UpdateTooltip()
 		return true
 	end
 	
@@ -1193,7 +1219,7 @@ local function GetConstructorButton(parent)
 	local active = true
 	
 	local button = GetNewButton(
-		parent, 
+		parent,
 		OnClick, 
 		CONSTRUCTOR_ORDER,
 		0,
@@ -1220,13 +1246,19 @@ local function GetConstructorButton(parent)
 		SetImageVisible = button.SetImageVisible,
 	}
 	
+	local oldTotal
 	function externalFunctions.UpdateButton()
 		local total = 0
 		for unitID in pairs(idleCons) do
 			total = total + 1
 		end
 		idleConCount = total
-
+		
+		if total == oldTotal then
+			return true
+		end
+		oldTotal = total
+		
 		button.SetTooltip(WG.Translate("interface", "idle_cons", {count = total}) ..
 						"\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") ..
 						"\n\255\0\255\0" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "select_all") .. "\008")
@@ -1593,18 +1625,6 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
--- External functions
-
-local externalFunctions = {}
-
-function externalFunctions.SetSpecSpaceVisible(newVisible)
-	if mainBackground then
-		mainBackground.UpdateSpecSpace(newVisible)
-	end
-end
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
 -- Callins
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
@@ -1653,8 +1673,8 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
-  widget:UnitCreated(unitID, unitDefID, unitTeam)
-  widget:UnitFinished(unitID, unitDefID, unitTeam)  
+	widget:UnitCreated(unitID, unitDefID, unitTeam)
+	widget:UnitFinished(unitID, unitDefID, unitTeam)  
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
@@ -1678,7 +1698,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
-  widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
@@ -1726,6 +1746,10 @@ end
 
 local timer = 0
 function widget:Update(dt)
+	if mainBackground and mainBackground.GetSpecMode() then
+		return
+	end
+	
 	if oldButtonList then
 		oldButtonList.Destroy()
 		buttonList.SetImagesVisible(true)
@@ -1751,12 +1775,37 @@ function widget:Update(dt)
 end
 
 -- for "under attack" achtung sign
-function widget:UnitDamaged(unitID, unitDefID, unitTeam)
-	local button = buttonList.GetButton(unitID)
-	if button and button.SetWarning then
-		button.SetWarning(COMM_WARNING_TIME)
+function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
+	if damage > 1 then
+		local button = buttonList.GetButton(unitID)
+		if button and button.SetWarning then
+			button.SetWarning(COMM_WARNING_TIME)
+		end
 	end
 end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- External functions
+
+local externalFunctions = {}
+
+function externalFunctions.SetSpecSpaceVisible(newVisible)
+	if mainBackground then
+		mainBackground.UpdateSpecSpace(newVisible)
+	end
+end
+
+function externalFunctions.ForceUpdate()
+	if mainBackground and mainBackground.GetSpecMode() then
+		return
+	end
+	buttonList.UpdateButtons(timer)
+	timer = 0
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
 function widget:Shutdown()
 	if mainWindow then

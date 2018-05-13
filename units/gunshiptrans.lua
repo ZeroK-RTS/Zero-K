@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[gunshiptrans]],
-  name                = [[Valkyrie]],
+  name                = [[Charon]],
   description         = [[Air Transport]],
   acceleration        = 0.2,
   brakeRate           = 0.96,
@@ -18,6 +18,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[28 16 35]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 16 45]],
+  selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
   cruiseAlt           = 140,
 

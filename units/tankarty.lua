@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[tankarty]],
-  name                = [[Pillager]],
+  name                = [[Emissary]],
   description         = [[General-Purpose Artillery]],
   acceleration        = 0.0282,
   brakeRate           = 0.136,
@@ -11,6 +11,9 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -40,7 +43,7 @@ unitDef = {
   trackStrength       = 8,
   trackStretch        = 1,
   trackType           = [[StdTank]],
-  trackWidth          = 31,
+  trackWidth          = 34,
   turninplace         = 0,
   turnRate            = 400,
   workerTime          = 0,
@@ -69,6 +72,7 @@ unitDef = {
       craterMult              = 2,
 
       customParams            = {
+        reaim_time = 8, -- COB
 		light_color = [[1.4 0.8 0.3]],
       },
 

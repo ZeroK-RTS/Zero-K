@@ -2,7 +2,7 @@
 	"pw_artefact" : {
 		"name" : "Starożytny artefakt",
 		"description" : "Tajemniczy relikt",
-		"helptext" : "Ten tajemniczy obiekt skrywa niebywałą moc. Choć jest słabo zrozumiany przez naukowców, uważa się, że można go użyć jako broni na skalę galaktyczną. Jest niewrażliwy na wszystkie znane ataki."
+		"helptext" : "Ten tajemniczy obiekt skrywa niebywałą moc. Choć jest słabo zrozumiany przez naukowców, uważa się, że można go użyć jako broni na skalę galaktyczną."
 	},
 	"pw_bomberfac" : {
 		"name" : "Fabryka bombowców",

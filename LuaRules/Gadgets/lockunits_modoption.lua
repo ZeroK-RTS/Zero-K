@@ -19,8 +19,11 @@ if (disabledunitsstring == "") then --no unit to disable, exit
 	return
 end
 
+local CMD_INSERT = CMD.INSERT
+
 local disabledCount = 0
 local disabledUnits = {}
+local removedBuildOptions = {}
 
 local UnitDefBothNames = {} -- Includes humanName and name
 
@@ -59,6 +62,9 @@ local function UnlockUnit(unitID, lockDefID)
 	if (cmdDescID) then
 		local cmdArray = {disabled = false}
 		Spring.EditUnitCmdDesc(unitID, cmdDescID, cmdArray)
+		if removedBuildOptions[unitID] and removedBuildOptions[unitID][lockDefID] then
+			removedBuildOptions[unitID][lockDefID] = nil
+		end
 	end
 end
 
@@ -74,6 +80,8 @@ local function RemoveUnit(unitID, lockDefID)
 	local cmdDescID = Spring.FindUnitCmdDesc(unitID, -lockDefID)
 	if (cmdDescID) then
 		Spring.RemoveUnitCmdDesc(unitID, cmdDescID)
+		removedBuildOptions[unitID] = removedBuildOptions[unitID] or {}
+		removedBuildOptions[unitID][lockDefID] = true
 	end
 end
 
@@ -88,8 +96,27 @@ local function SetBuildOptions(unitID, unitDefID)
 	end
 end
 
+-- The AllowCommand block is only needed for multiplayer and breaks circuit if you
+-- disable a unit it often wants to build.
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	local removed = removedBuildOptions[unitID]
+	if removed then
+		if cmdID == CMD_INSERT then
+			cmdID = cmdParams[2]
+		end
+		if removed[-cmdID] then
+			return false
+		end
+	end
+	return true
+end
+
 function gadget:UnitCreated(unitID, unitDefID)
 	SetBuildOptions(unitID, unitDefID)
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID)
+	removedBuildOptions[unitID] = nil
 end
 
 function gadget:Initialize()

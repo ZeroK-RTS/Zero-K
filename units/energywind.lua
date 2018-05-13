@@ -21,6 +21,7 @@ unitDef = {
     windgen        = true,
     modelradius    = [[15]],
 	removewait     = 1,
+	default_spacing = 2,
   },
 
   energyMake                    = 1.2,

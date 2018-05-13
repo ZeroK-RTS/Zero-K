@@ -286,6 +286,9 @@ unitConfigs = {
   [UnitDefNames.spiderassault.id] = {
     unfold = true,
   },  
+  [UnitDefNames.amphlaunch.id] = {
+    unfold = true,
+  },  
   [UnitDefNames.spidercon.id] = {
     scale    = 3,
     attempts = 10,

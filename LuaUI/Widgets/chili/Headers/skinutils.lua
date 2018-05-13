@@ -344,7 +344,7 @@ function DrawButton(obj)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    obj.font:Print(obj.caption, x+w*0.5, y+h*0.5, "center", "center")
+    obj.font:Print(obj.caption, x + w*0.5, y + math.floor(h*0.5 - obj.font.size*0.35), "center", "linecenter")
   end
 end
 
@@ -388,7 +388,7 @@ function DrawEditBox(obj)
 	gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, 0, obj.width, obj.height,  skLeft,skTop,skRight,skBottom, tw,th)
 	gl.Texture(0,false)
 
-	local text = obj.text	
+	local text = obj.text and tostring(obj.text)
 	local font = obj.font
 	local displayHint = false
 	
@@ -444,7 +444,7 @@ function DrawEditBox(obj)
 				local scrollPosY = obj.parent.scrollPosY
 				local scrollHeight = obj.parent.clientArea[4]
 				
-				local h, d, numLines = obj.font:GetTextHeight(obj.text);
+				local h, d, numLines = obj.font:GetTextHeight(tostring(obj.text));
 				local minDrawY = scrollPosY - (h or 0)
 				local maxDrawY = scrollPosY + scrollHeight + (h or 0)
 				
@@ -790,7 +790,7 @@ function DrawCheckbox(obj)
 
   gl.Color(1,1,1,1)
   if (obj.caption) then
-    obj.font:Print(obj.caption, obj.x + tx, obj.y + ty, nil, "center")
+    obj.font:Print(obj.caption, obj.x + tx, obj.y + ty  - obj.font.size*0.35, nil, "linecenter")
   end
 end
 
@@ -840,7 +840,7 @@ function DrawProgressbar(obj)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    (obj.font):Print(obj.caption, x+w*0.5, y+h*0.5, "center", "center")
+    (obj.font):Print(obj.caption, x+w*0.5, y+h*0.5 - obj.font.size*0.35 + (obj.fontOffset or 0), "center", "linecenter")
   end
 end
 
@@ -1169,6 +1169,10 @@ function NCHitTestWithPadding(obj,mx,my)
   elseif (draggable) then
     return obj
   end
+
+  if obj.noClickThrough and not IsTweakMode() then
+    return obj
+  end
 end
 
 function WindowNCMouseDown(obj,x,y)
@@ -1208,6 +1212,10 @@ function WindowNCMouseDownPostChildren(obj,x,y)
 
   if (draggable and not dragUseGrip) then
     obj:StartDragging()
+    return obj
+  end
+
+  if obj.noClickThrough and not IsTweakMode() then
     return obj
   end
 end

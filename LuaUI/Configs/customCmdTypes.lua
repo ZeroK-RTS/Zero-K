@@ -6,7 +6,7 @@ local custom_cmd_actions = {
 	-- 1: Targeted commands (eg attack)
 	-- 2: State commands (eg on/off). Parameter 'state' creates actions to set a particular state
 	-- 3: Instant commands (eg self-d)
-	
+
 	--SPRING COMMANDS
 	selfd = {cmdType = 3, name = "Self Destruct"},
 	attack = {cmdType = 1, name = "Force Fire"},
@@ -27,9 +27,9 @@ local custom_cmd_actions = {
 	loadunits = {cmdType = 1, name = "Load Units"},
 	unloadunits = {cmdType = 1, name = "Unload Units"},
 	areaattack = {cmdType = 1, name = "Area Attack"},
-	
+
 	rawmove = {cmdType = 1, name = "Move"},
-	
+
 	-- states
 	onoff = {cmdType = 2, name = "On/Off", states = {'Off', 'On'}},
 	['repeat'] = {cmdType = 2, name = "Repeat", states = {'Off', 'On'}},
@@ -39,8 +39,8 @@ local custom_cmd_actions = {
 	idlemode = {cmdType = 2, name = "Land/Fly", states = {'Land', 'Fly'}},
 	autorepairlevel = {cmdType = 2, name = "Air Retreat Threshold", states = {'Off', '30%', '50%', '80%'}},
 	preventoverkill = {cmdType = 2, name = "Prevent Overkill", states = {'Off', 'On'}},
-	
-	      
+
+
 	--CUSTOM COMMANDS
 	sethaven = {cmdType = 1, name = "Add Retreat Zone"},
 	--build = {cmdType = 1, name = "--build"},
@@ -53,10 +53,10 @@ local custom_cmd_actions = {
 	disembark = {cmdType = 3, name = "Disembark"},
 	loadselected = {cmdType = 3, name = "Load Selected Units"},
 	oneclickwep = {cmdType = 3, name = "Activate Special"},
-	settarget = {cmdType = 1, name = "Set Target"},
-	settargetcircle = {cmdType = 1, name = "Set Target (circle selection)"},
+	settargetcircle = {cmdType = 1, name = "Set Target"},
+	settarget = {cmdType = 1, name = "Set Target (rectangle)"},
 	canceltarget = {cmdType = 3, name = "Cancel Target"},
-	setferry = {cmdType = 1, name = "Create Ferry Route"}, 
+	setferry = {cmdType = 1, name = "Create Ferry Route"},
 	setfirezone = {cmdType = 1, name = "Set Newton Fire Zone"},
 	cancelfirezone = {cmdType = 3, name = "Cancel Newton Fire Zone"},
 	radialmenu = {cmdType = 3, name = "Open Radial Build Menu"},
@@ -69,7 +69,8 @@ local custom_cmd_actions = {
 	upgradecommstop  = {cmdType = 3, name = "Stop Upgrade Commander"},
 	stopproduction  = {cmdType = 3, name = "Stop Factory Production"},
 	globalbuildcancel  = {cmdType = 1, name = "Cancel Global Build Tasks"},
-	
+	evacuate  = {cmdType = 3, name = "Evacuate"},
+
 	-- terraform
 	rampground = {cmdType = 1, name = "Terraform Ramp"},
 	levelground = {cmdType = 1, name = "Terraform Level"},
@@ -77,10 +78,10 @@ local custom_cmd_actions = {
 	smoothground = {cmdType = 1, name = "Terraform Smooth"},
 	restoreground = {cmdType = 1, name = "Terraform Restore"},
 	--terraform_internal = {cmdType = 1, name = "--terraform_internal"},
-	
+
 	resetfire = {cmdType = 3, name = "Reset Fire"},
 	resetmove = {cmdType = 3, name = "Reset Move"},
-	
+
 	--states
 --	stealth = {cmdType = 2, name = "stealth"}, --no longer applicable
 	cloak_shield = {cmdType = 2, name = "Area Cloaker", states = {'Off', 'On'}},
@@ -95,11 +96,14 @@ local custom_cmd_actions = {
 	antinukezone = {cmdType = 2, name = "Ceasefire Antinuke Zone", states = {'Off', 'On'}},
 	unitai = {cmdType = 2, name = "Unit AI", states = {'Off', 'On'}},
 	selection_rank = {cmdType = 2, name = "Selection Rank", states = {'0', '1', '2', '3'}},
+	autocalltransport = {cmdType = 2, name = "Auto Call Transport", states = {'Off', 'On'}},
 	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Seppuku", states = {'Off', 'On'}},
+	pushpull = {cmdType = 2, name = "Impulse Mode", states = {'Pull', 'Push'}},
 	autoassist = {cmdType = 2, name = "Factory Auto Assist", states = {'Off', 'On'}},
 	airstrafe = {cmdType = 2, name = "Gunship Strafe", states = {'Off', 'On'}},
 	divestate = {cmdType = 2, name = "Raven Dive", states = {'Never', 'Under Shields', 'For Mobiles', 'Always Low'}},
 	globalbuild = {cmdType = 2, name = "Constructor Global AI", states = {'Off', 'On'}},
+	toggledrones = {cmdType = 2, name = "Drone Construction.", states = {'Off', 'On'}},
 }
 
 -- These actions are created from echoing all actions that appear when all units are selected.
@@ -150,6 +154,7 @@ local usedActions = {
 	--["rearm"] = true, -- Not useful to send directly so unbindable to prevent confusion. Right click on pad is better.
 	["find_pad"] = true,
 	["recalldrones"] = true,
+	["toggledrones"] = true,
 	["divestate"] = true,
 	["wantcloak"] = true,
 	["oneclickwep"] = true,
@@ -177,10 +182,12 @@ local usedActions = {
 	["setfirezone"] = true,
 	["cancelfirezone"] = true,
 	["selection_rank"] = true,
-	
+	["pushpull"] = true,
+
 	-- These actions are used, just not by selecting everything with default UI
 	["upgradecommstop"] = true,
 	["autoeco"] = true,
+	["evacuate"] = true,
 }
 
 -- Clear unused actions.

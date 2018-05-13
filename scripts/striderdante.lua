@@ -421,6 +421,11 @@ function script.FireWeapon(num)
 	end
 end
 
+function OnLoadGame()
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
+	GG.UpdateUnitAttributes(unitID)
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	dead = true

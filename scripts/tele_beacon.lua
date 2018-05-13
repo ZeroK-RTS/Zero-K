@@ -43,20 +43,26 @@ function startTeleOutLoop_Thread(teleportiee, teleporter)
 	SetSignalMask(SIG_CEG_EFFECTS)
 	
 	while true do
-		local x, y, z = Spring.GetUnitPosition(teleportiee)
-		local lx, ly, lz = Spring.GetUnitPosition(teleporter)
-		if Spring.ValidUnitID(teleportiee) then
+		local _,_,_,x, y, z = Spring.GetUnitPosition(teleportiee, true)
+		local _,_,_,lx, ly, lz = Spring.GetUnitPosition(teleporter, true)
+		local teleportieeValid = Spring.ValidUnitID(teleportiee)
+		local teleporterValid = Spring.ValidUnitID(teleporter)
+		if teleportieeValid then
 			Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
 			GG.PokeDecloakUnit(teleportiee)
 		end
-		if Spring.ValidUnitID(teleporter) then
+		if teleporterValid then
 			GG.PokeDecloakUnit(teleporter)
 		end
 		GG.PokeDecloakUnit(unitID)
 		soundIndex = soundIndex + 1
 		if soundIndex > 8 then
-			GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 2.5, x, y, z)
-			GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 2.5, lx, ly, lz)
+			if teleportieeValid then
+				GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 2.5, x, y, z)
+			end
+			if teleporterValid then
+				GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 2.5, lx, ly, lz)
+			end
 			soundIndex = 0
 		end
 		Sleep(200)
@@ -66,7 +72,7 @@ end
 function startTeleOutLoop(teleportiee, teleporter)
 	StartThread(startTeleOutLoop_Thread, teleportiee, teleporter)
 end
-	
+
 function endTeleOutLoop()
 	Signal(SIG_CEG_EFFECTS)
 end

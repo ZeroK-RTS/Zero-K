@@ -11,7 +11,7 @@ local SIG_AIM = 1
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	Turn(turret, y_axis, heading, math.rad(180))
+	Turn(turret, y_axis, heading, math.rad(80))
 	Turn(breech, x_axis, 0 - pitch, math.rad(60))
 	WaitForTurn(breech, x_axis)
 	WaitForTurn(turret, y_axis)

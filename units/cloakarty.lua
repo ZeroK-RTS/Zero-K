@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakarty]],
-  name                   = [[Hammer]],
+  name                   = [[Sling]],
   description            = [[Light Artillery Bot]],
   acceleration           = 0.25,
   brakeRate              = 0.75,
@@ -20,8 +20,8 @@ unitDef = {
   },
 
   explodeAs              = [[BIG_UNITEX]],
-  footprintX             = 2,
-  footprintZ             = 2,
+  footprintX             = 3,
+  footprintZ             = 3,
   iconType               = [[kbotarty]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -31,10 +31,10 @@ unitDef = {
   maxVelocity            = 1.62,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
-  movementClass          = [[KBOT2]],
-  moveState              = 0,
+  movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP TOOFAST]],
-  objectName             = [[Milo.s3o]],
+  objectName             = [[cloakarty.s3o]],
+  script                 = [[cloakarty.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -113,7 +113,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[milo_dead.s3o]],
+      object           = [[cloakarty_dead.s3o]],
     },
 
     HEAP  = {

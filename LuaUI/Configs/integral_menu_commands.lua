@@ -2,21 +2,6 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 --FIXME: use this table until state tooltip detection is fixed
 --SIDENOTE: using this table is preferable than editing command description directly because this maintain tooltip's compatibility with other build menu too.(eg: color text is not supported by stock gui)
-local tooltips = {
-	priority = "Priority: Set construction priority (low, normal, high)",
-	miscpriority = "Misc Priority: Set priority for non-construction spending (low, normal, high)",
-	retreat = "Retreat: Retreat to closest retreat point or airpad at 30/65/99% of health (right-click to disable). Airpad for aircraft only.",
-	landat = "Repair level: set the HP % at which this aircraft will go to a repair pad (0, 30, 50, 80)",
-	factoryGuard = "Auto Assist: Newly built constructors automatically assist their factory",
-	globalBuild = "Global Build Command: toggle using worker AI.",
-	diveBomb = "\255\90\255\90Green\255\255\255\255:Dive For Shielded or Mobile Target\n\255\255\255\90Yellow\255\255\255\255:Dive For Mobile Target\n\255\255\90\90Red\255\255\255\255:Always Fly Low\n\255\90\90\90Grey\255\255\255\255:Always Fly High", --override tooltip supplied by unit_bomber_dive.lua gadget.
-	floatState = "\255\90\255\90Green\255\255\255\255:Always float \n\255\90\90\90Grey\255\255\255\255:Float to fire\n\255\255\90\90Red\255\255\255\255:Never float",
-	fireState = "Fire State: Sets under what conditions a unit will fire without an explicit attack order (never, when attacked, always)",
-	moveState = "Move State: Sets how far out of its way a unit will move to attack enemies",
-	["repeat"] = "Repeat: if on the unit will continously push finished orders to the end of its order queue",
-	dropflag = "Drop flag on the ground.",
-	autoCallTransport = "Automatically call transports between constructor tasks."
-}
 
 local CONSTRUCTOR     = {order = 1, row = 1, col = 1}
 local RAIDER          = {order = 2, row = 1, col = 2}
@@ -56,7 +41,7 @@ local units = {
 		shieldassault = ASSAULT,
 		shieldfelon = HEAVY_SOMETHING,
 		shieldbomb = SPECIAL,
-		shieldshield = UTILITY,	
+		shieldshield = UTILITY,
 	},
 	factoryveh = {
 		vehcon = CONSTRUCTOR,
@@ -148,6 +133,7 @@ local units = {
 		-- No Amph Artillery
 		amphaa = ANTI_AIR,
 		amphassault = HEAVY_SOMETHING,
+		amphlaunch = ARTILLERY,
 		amphbomb = SPECIAL,
 		amphtele = UTILITY,
 	},
@@ -230,8 +216,8 @@ local econ = {
 }
 
 local defense = {
-	turretmissile =    {order = 0, row = 1, col = 1},
-	turretlaser =   {order = 1, row = 1, col = 2},
+	turretlaser =   {order = 2, row = 1, col = 1},
+	turretmissile =    {order = 1, row = 1, col = 2},
 	turretriot =  {order = 2, row = 1, col = 3},
 	turretemp = {order = 3, row = 1, col = 4},
 	turretgauss =    {order = 5, row = 1, col = 5},
@@ -313,6 +299,49 @@ end
 -- You can specify texture, text,tooltip, color
 local imageDir = 'LuaUI/Images/commands/'
 
+-- Old tooltips
+--priority = ,
+--miscpriority = "Misc Priority: Set priority for non-construction spending (low, normal, high)",
+--retreat = "Retreat: Retreat to closest retreat point or airpad at 30/65/99% of health (right-click to disable). Airpad for aircraft only.",
+--landat = "Repair level: set the HP % at which this aircraft will go to a repair pad (0, 30, 50, 80)",
+--factoryGuard = "Auto Assist: Newly built constructors automatically assist their factory",
+--globalBuild =
+--diveBomb = "\255\90\255\90Green\255\255\255\255:Dive For Shielded or Mobile Target\n\255\255\255\90Yellow\255\255\255\255:Dive For Mobile Target\n\255\255\90\90Red\255\255\255\255:Always Fly Low\n\255\90\90\90Grey\255\255\255\255:Always Fly High", --override tooltip supplied by unit_bomber_dive.lua gadget.
+--floatState = "\255\90\255\90Green\255\255\255\255:Always float \n\255\90\90\90Grey\255\255\255\255:Float to fire\n\255\255\90\90Red\255\255\255\255:Never float",
+--fireState = "Fire State: Sets under what conditions a unit will fire without an explicit attack order (never, when attacked, always)",
+--moveState = "Move State: Sets how far out of its way a unit will move to attack enemies",
+--["repeat"] = "Repeat: if on the unit will continously push finished orders to the end of its order queue",
+--dropflag = "Drop flag on the ground.",
+--autoCallTransport =
+
+local tooltips = {
+	ONOFF = "Activation (_STATE_)\n  Toggles some unit abilities.",
+	UNIT_AI = "Unit AI (_STATE_)\n  Move intelligently in combat.",
+	REPEAT = "Repeat (_STATE_)\n  Loop command queue. Construction queue for factories.",
+	WANT_CLOAK = "Cloak (_STATE_)\n  Makes the unit invisible, unless it fires, takes damage, or is too close to an enemy unit.",
+	CLOAK_SHIELD = "Area Cloaker (_STATE_)\n  Cloaks all friendly units in an area.",
+	PRIORITY = "Construction Priority (_STATE_)\n  Higher priority constructors receive resources before those of lower priority.",
+	MISC_PRIORITY = "Misc. Priority (_STATE_)\n  Priority for non-constructor resource usage (morph, stockpile, and energy upkeep).",
+	FACTORY_GUARD = "Auto Assist (_STATE_)\n  Newly built constructors automatically assist their factory.",
+	AUTO_CALL_TRANSPORT = "Call Transports (_STATE_)\n  Automatically call transports between constructor tasks.",
+	GLOBAL_BUILD = "Global Build Command (_STATE_)\n  Sets constructors to execute global build orders.",
+	MOVE_STATE = "Move State (_STATE_)\n  Sets how far out of its way a unit will move to attack enemies.",
+	FIRE_STATE = "Fire State (_STATE_)\n  Sets when a unit will automatically shoot.",
+	RETREAT = "Retreat (_STATE_)\n  Automatically retreat to closest retreat point or airpad when damaged. Right click to disable.",
+	IDLEMODE = "Idle State (_STATE_)\n  Set whether aircraft lands when idle.",
+	AP_FLY_STATE = "Idle State (_STATE_)\n  Set whether aircraft lands when idle.",
+	UNIT_BOMBER_DIVE_STATE = "Dive State (_STATE_)\n  Set when Ravens dive.",
+	UNIT_KILL_SUBORDINATES = "Kill Captured (_STATE_)\n  Set whether to kill captured units.",
+	PUSH_PULL = "Impulse Mode (_STATE_)\n  Set whether gravity guns push or pull.",
+	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire at radar dots.",
+	PREVENT_OVERKILL = "Overkill Prevention (_STATE_)\n  Prevents units from shooting at already doomed enemies.",
+	TRAJECTORY = "Trajectory (_STATE_)\n  Set whether units fire at a high or low arc.",
+	AIR_STRAFE = "Gunship Strafe (_STATE_)\n  Set whether gunships strafe when fighting.",
+	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set the conditions which cause certain amphibious units to float to the surface.",
+	SELECTION_RANK = "Selection Rank (_STATE_)\n  Priority for selection filtering.",
+	TOGGLE_DRONES = "Drone Construction (_STATE_)\n  Toggle drone creation."
+}
+
 local overrides = {
 	[CMD.ATTACK] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Force Fire: Shoot at a particular target or position."},
 	[CMD.STOP] = { texture = imageDir .. 'Bold/cancel.png'},
@@ -321,89 +350,189 @@ local overrides = {
 	[CMD.MOVE] = { texture = imageDir .. 'Bold/move.png'},
 	[CMD_RAW_MOVE] = { texture = imageDir .. 'Bold/move.png'},
 	[CMD.PATROL] = { texture = imageDir .. 'Bold/patrol.png'},
-	[CMD.WAIT] = { texture = imageDir .. 'Bold/wait.png'},
-	
+	[CMD.WAIT] = { texture = imageDir .. 'Bold/wait.png', tooltip = "Wait: Pause the units command queue and have it hold its current position."},
+
 	[CMD.REPAIR] = {texture = imageDir .. 'Bold/repair.png'},
 	[CMD.RECLAIM] = {texture = imageDir .. 'Bold/reclaim.png'},
 	[CMD.RESURRECT] = {texture = imageDir .. 'Bold/resurrect.png'},
 	[CMD_BUILD] = {texture = imageDir .. 'Bold/build.png'},
-	[CMD.MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png'},
+	[CMD.MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png', tooltip = "Fire Special Weapon: Fire the unit's special weapon."},
 
 	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png'},
 	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png'},
 	[CMD.AREA_ATTACK] = { texture = imageDir .. 'Bold/areaattack.png'},
-	
+
 	[CMD_RAMP] = {texture = imageDir .. 'ramp.png'},
 	[CMD_LEVEL] = {texture = imageDir .. 'level.png'},
 	[CMD_RAISE] = {texture = imageDir .. 'raise.png'},
 	[CMD_SMOOTH] = {texture = imageDir .. 'smooth.png'},
 	[CMD_RESTORE] = {texture = imageDir .. 'restore.png'},
 	[CMD_BUMPY] = {texture = imageDir .. 'bumpy.png'},
-	
-	[CMD_AREA_GUARD] = { texture = imageDir .. 'Bold/guard.png'},
-	
-	[CMD_AREA_MEX] = {text = ' ', texture = imageDir .. 'Bold/mex.png'},
-	
-	[CMD_JUMP] = {texture = imageDir .. 'Bold/jump.png'},	
-	
-	[CMD_FIND_PAD] = {text = ' ', texture = imageDir .. 'Bold/rearm.png'},
-	
-	[CMD_EMBARK] = {text = ' ', texture = imageDir .. 'Bold/embark.png'},	
-	[CMD_DISEMBARK] = {text = ' ', texture = imageDir .. 'Bold/disembark.png'},
-	
+
+	[CMD_AREA_GUARD] = { texture = imageDir .. 'Bold/guard.png', tooltip = "Guard: Protect the target and assist its production."},
+
+	[CMD_AREA_MEX] = {texture = imageDir .. 'Bold/mex.png'},
+
+	[CMD_JUMP] = {texture = imageDir .. 'Bold/jump.png'},
+
+	[CMD_FIND_PAD] = {texture = imageDir .. 'Bold/rearm.png', tooltip = "Resupply: Return to nearest repair pad for health and ammo."},
+
+	[CMD_EMBARK] = {texture = imageDir .. 'Bold/embark.png'},
+	[CMD_DISEMBARK] = {texture = imageDir .. 'Bold/disembark.png'},
+
 	[CMD_ONECLICK_WEAPON] = {},--texture = imageDir .. 'Bold/action.png'},
-	[CMD_UNIT_SET_TARGET_CIRCLE] = {text='', texture = imageDir .. 'Bold/settarget.png'},
-	[CMD_UNIT_CANCEL_TARGET] = {text='', texture = imageDir .. 'Bold/canceltarget.png'},
-	
-	[CMD_ABANDON_PW] = {text= '', texture = imageDir .. 'Bold/drop_beacon.png'},
-	
-	[CMD_PLACE_BEACON] = {text= '', texture = imageDir .. 'Bold/drop_beacon.png'},
+	[CMD_UNIT_SET_TARGET_CIRCLE] = {texture = imageDir .. 'Bold/settarget.png'},
+	[CMD_UNIT_CANCEL_TARGET] = {texture = imageDir .. 'Bold/canceltarget.png'},
+
+	[CMD_ABANDON_PW] = {texture = imageDir .. 'Bold/drop_beacon.png'},
+
+	[CMD_PLACE_BEACON] = {texture = imageDir .. 'Bold/drop_beacon.png'},
 	[CMD_UPGRADE_STOP] = { texture = imageDir .. 'Bold/cancelupgrade.png'},
 	[CMD_STOP_PRODUCTION] = { texture = imageDir .. 'Bold/stopbuild.png'},
 	[CMD_GBCANCEL] = { texture = imageDir .. 'Bold/stopbuild.png'},
-	
+
 	[CMD_RECALL_DRONES] = {texture = imageDir .. 'Bold/recall_drones.png'},
-	
+
 	-- states
-	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, text=''},
-	[CMD_UNIT_AI] = { texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'}, text=''},
-	[CMD.REPEAT] = { texture = {imageDir .. 'states/repeat_off.png', imageDir .. 'states/repeat_on.png'}, text='', tooltip = tooltips["repeat"]},
-	[CMD_WANT_CLOAK] = { texture = {imageDir .. 'states/cloak_off.png', imageDir .. 'states/cloak_on.png'},
-		text ='', tooltip =  'Desired cloak state'},
-	[CMD.CLOAK] = { texture = {imageDir .. 'states/cloak_off.png', imageDir .. 'states/cloak_on.png'},
-		text ='', tooltip =  'Desired cloak state'},
-	[CMD_CLOAK_SHIELD] = { texture = {imageDir .. 'states/areacloak_off.png', imageDir .. 'states/areacloak_on.png'}, 
-		text ='',	tooltip = 'Area Cloaker State'},
-	[CMD_STEALTH] = { texture = {imageDir .. 'states/stealth_off.png', imageDir .. 'states/stealth_on.png'}, text ='', },
-	[CMD_PRIORITY] = { texture = {imageDir .. 'states/wrench_low.png', imageDir .. 'states/wrench_med.png', imageDir .. 'states/wrench_high.png'},
-		text='', tooltip = tooltips.priority},
-	[CMD_MISC_PRIORITY] = { texture = {imageDir .. 'states/wrench_low_other.png', imageDir .. 'states/wrench_med_other.png', imageDir .. 'states/wrench_high_other.png'},
-		text='', tooltip = tooltips.miscpriority},
-	[CMD_FACTORY_GUARD] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
-		text='', tooltip = tooltips.factoryGuard,},
-	[CMD_AUTO_CALL_TRANSPORT] = { texture = {imageDir .. 'states/auto_call_off.png', imageDir .. 'states/auto_call_on.png'},
-		text='', tooltip = tooltips.autoCallTransport,},
-	[CMD_GLOBAL_BUILD] = { texture = {imageDir .. 'Bold/buildgrey.png', imageDir .. 'Bold/build_light.png'},
-		text='', tooltip = tooltips.globalBuild,},
-	[CMD.MOVE_STATE] = { texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'}, text='', tooltip = tooltips.moveState},
-	[CMD.FIRE_STATE] = { texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'}, text='', tooltip = tooltips.fireState},
-	[CMD_RETREAT] = { texture = {imageDir .. 'states/retreat_off.png', imageDir .. 'states/retreat_30.png', imageDir .. 'states/retreat_60.png', imageDir .. 'states/retreat_90.png'},
-		text='', tooltip = tooltips.retreat,},
-	[CMD.IDLEMODE] = { texture = {imageDir .. 'states/fly_on.png', imageDir .. 'states/fly_off.png'}, text=''},	
-	[CMD_AP_FLY_STATE] = { texture = {imageDir .. 'states/fly_on.png', imageDir .. 'states/fly_off.png'}, text=''},
-	[CMD.AUTOREPAIRLEVEL] = { texture = {imageDir .. 'states/landat_off.png', imageDir .. 'states/landat_30.png', imageDir .. 'states/landat_50.png', imageDir .. 'states/landat_80.png'},
-		text = '', tooltip = tooltips.landat,},
-	[CMD_AP_AUTOREPAIRLEVEL] = { texture = {imageDir .. 'states/landat_off.png', imageDir .. 'states/landat_30.png', imageDir .. 'states/landat_50.png', imageDir .. 'states/landat_80.png'},
-		text = ''},
-	[CMD_UNIT_BOMBER_DIVE_STATE] = { texture = {imageDir .. 'states/divebomb_off.png', imageDir .. 'states/divebomb_shield.png', imageDir .. 'states/divebomb_attack.png', imageDir .. 'states/divebomb_always.png'},
-		text = '', tooltip = tooltips.diveBomb},
-	[CMD_UNIT_KILL_SUBORDINATES] = {texture = {imageDir .. 'states/capturekill_off.png', imageDir .. 'states/capturekill_on.png'}, text=''},
-	[CMD_DONT_FIRE_AT_RADAR] = {texture = {imageDir .. 'states/stealth_on.png', imageDir .. 'states/stealth_off.png'}, text=''},
-	[CMD_PREVENT_OVERKILL] = {texture = {imageDir .. 'states/overkill_off.png', imageDir .. 'states/overkill_on.png'}, text=''},
-	[CMD.TRAJECTORY] = { texture = {imageDir .. 'states/traj_low.png', imageDir .. 'states/traj_high.png'}, text=''},
-	[CMD_AIR_STRAFE] = { texture = {imageDir .. 'states/strafe_off.png', imageDir .. 'states/strafe_on.png'}, text=''},
-	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, text='', tooltip=tooltips.floatState},
-	[CMD_SELECTION_RANK] = { texture = {imageDir .. 'states/selection_rank_0.png', imageDir .. 'states/selection_rank_1.png', imageDir .. 'states/selection_rank_2.png', imageDir .. 'states/selection_rank_3.png'}, text=''},
+	[CMD.ONOFF] = {
+		texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'},
+		stateTooltip = {tooltips.ONOFF:gsub("_STATE_", "Off"), tooltips.ONOFF:gsub("_STATE_", "On")}
+	},
+	[CMD_UNIT_AI] = {
+		texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'},
+		stateTooltip = {tooltips.UNIT_AI:gsub("_STATE_", "Disabled"), tooltips.UNIT_AI:gsub("_STATE_", "Enabled")},
+	},
+	[CMD.REPEAT] = {
+		texture = {imageDir .. 'states/repeat_off.png', imageDir .. 'states/repeat_on.png'},
+		stateTooltip = {tooltips.REPEAT:gsub("_STATE_", "Disabled"), tooltips.REPEAT:gsub("_STATE_", "Enabled")}
+	},
+	[CMD_WANT_CLOAK] = {
+		texture = {imageDir .. 'states/cloak_off.png', imageDir .. 'states/cloak_on.png'},
+		stateTooltip = {tooltips.WANT_CLOAK:gsub("_STATE_", "Disabled"), tooltips.WANT_CLOAK:gsub("_STATE_", "Enabled")}
+	},
+	[CMD_CLOAK_SHIELD] = {
+		texture = {imageDir .. 'states/areacloak_off.png', imageDir .. 'states/areacloak_on.png'},
+		stateTooltip = {tooltips.CLOAK_SHIELD:gsub("_STATE_", "Disabled"), tooltips.CLOAK_SHIELD:gsub("_STATE_", "Enabled")}
+	},
+	[CMD_PRIORITY] = {
+		texture = {imageDir .. 'states/wrench_low.png', imageDir .. 'states/wrench_med.png', imageDir .. 'states/wrench_high.png'},
+		stateTooltip = {
+			tooltips.PRIORITY:gsub("_STATE_", "Low"),
+			tooltips.PRIORITY:gsub("_STATE_", "Normal"),
+			tooltips.PRIORITY:gsub("_STATE_", "High")
+		}
+	},
+	[CMD_MISC_PRIORITY] = {
+		texture = {imageDir .. 'states/wrench_low_other.png', imageDir .. 'states/wrench_med_other.png', imageDir .. 'states/wrench_high_other.png'},
+		stateTooltip = {
+			tooltips.MISC_PRIORITY:gsub("_STATE_", "Low"),
+			tooltips.MISC_PRIORITY:gsub("_STATE_", "Normal"),
+			tooltips.MISC_PRIORITY:gsub("_STATE_", "High")
+		}
+	},
+	[CMD_FACTORY_GUARD] = {
+		texture = {imageDir .. 'states/autoassist_off.png',
+		imageDir .. 'states/autoassist_on.png'},
+		stateTooltip = {tooltips.FACTORY_GUARD:gsub("_STATE_", "Disabled"), tooltips.FACTORY_GUARD:gsub("_STATE_", "Enabled")}
+	},
+	[CMD_AUTO_CALL_TRANSPORT] = {
+		texture = {imageDir .. 'states/auto_call_off.png', imageDir .. 'states/auto_call_on.png'},
+		stateTooltip = {tooltips.AUTO_CALL_TRANSPORT:gsub("_STATE_", "Disabled"), tooltips.AUTO_CALL_TRANSPORT:gsub("_STATE_", "Enabled")}
+	},
+	[CMD_GLOBAL_BUILD] = {
+		texture = {imageDir .. 'Bold/buildgrey.png', imageDir .. 'Bold/build_light.png'},
+		stateTooltip = {tooltips.GLOBAL_BUILD:gsub("_STATE_", "Disabled"), tooltips.GLOBAL_BUILD:gsub("_STATE_", "Enabled")}
+	},
+	[CMD.MOVE_STATE] = {
+		texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'},
+		stateTooltip = {
+			tooltips.MOVE_STATE:gsub("_STATE_", "Hold Position"),
+			tooltips.MOVE_STATE:gsub("_STATE_", "Maneuver"),
+			tooltips.MOVE_STATE:gsub("_STATE_", "Roam")
+		}
+	},
+	[CMD.FIRE_STATE] = {
+		texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'},
+		stateTooltip = {
+			tooltips.FIRE_STATE:gsub("_STATE_", "Hold Fire"),
+			tooltips.FIRE_STATE:gsub("_STATE_", "Return Fire"),
+			tooltips.FIRE_STATE:gsub("_STATE_", "Fire At Will")
+		}
+	},
+	[CMD_RETREAT] = {
+		texture = {imageDir .. 'states/retreat_off.png', imageDir .. 'states/retreat_30.png', imageDir .. 'states/retreat_60.png', imageDir .. 'states/retreat_90.png'},
+		stateTooltip = {
+			tooltips.RETREAT:gsub("_STATE_", "Disabled"),
+			tooltips.RETREAT:gsub("_STATE_", "30%% Health"),
+			tooltips.RETREAT:gsub("_STATE_", "65%% Health"),
+			tooltips.RETREAT:gsub("_STATE_", "99%% Health")
+		}
+	},
+	[CMD.IDLEMODE] = {
+		texture = {imageDir .. 'states/fly_on.png', imageDir .. 'states/fly_off.png'},
+		stateTooltip = {tooltips.IDLEMODE:gsub("_STATE_", "Fly"), tooltips.IDLEMODE:gsub("_STATE_", "Land")}
+	},
+	[CMD_AP_FLY_STATE] = {
+		texture = {imageDir .. 'states/fly_on.png', imageDir .. 'states/fly_off.png'},
+		stateTooltip = {tooltips.AP_FLY_STATE:gsub("_STATE_", "Fly"), tooltips.AP_FLY_STATE:gsub("_STATE_", "Land")}
+	},
+	[CMD_UNIT_BOMBER_DIVE_STATE] = {
+		texture = {imageDir .. 'states/divebomb_off.png', imageDir .. 'states/divebomb_shield.png', imageDir .. 'states/divebomb_attack.png', imageDir .. 'states/divebomb_always.png'},
+		stateTooltip = {
+			tooltips.UNIT_BOMBER_DIVE_STATE:gsub("_STATE_", "Always Fly High"),
+			tooltips.UNIT_BOMBER_DIVE_STATE:gsub("_STATE_", "Against Shields and Units"),
+			tooltips.UNIT_BOMBER_DIVE_STATE:gsub("_STATE_", "Against Units"),
+			tooltips.UNIT_BOMBER_DIVE_STATE:gsub("_STATE_", "Always Fly Low")
+		}
+	},
+	[CMD_UNIT_KILL_SUBORDINATES] = {
+		texture = {imageDir .. 'states/capturekill_off.png', imageDir .. 'states/capturekill_on.png'},
+		stateTooltip = {tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", "Keep"), tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", "Kill")}
+	},
+	[CMD_PUSH_PULL] = {
+		texture = {imageDir .. 'states/pull_alt.png', imageDir .. 'states/push_alt.png'},
+		stateTooltip = {tooltips.PUSH_PULL:gsub("_STATE_", "Pull"), tooltips.PUSH_PULL:gsub("_STATE_", "Push")}
+	},
+	[CMD_DONT_FIRE_AT_RADAR] = {
+		texture = {imageDir .. 'states/stealth_on.png', imageDir .. 'states/stealth_off.png'},
+		stateTooltip = {tooltips.DONT_FIRE_AT_RADAR:gsub("_STATE_", "Fire"), tooltips.DONT_FIRE_AT_RADAR:gsub("_STATE_", "Hold Fire")}
+	},
+	[CMD_PREVENT_OVERKILL] = {
+		texture = {imageDir .. 'states/overkill_off.png', imageDir .. 'states/overkill_on.png'},
+		stateTooltip = {tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Disabled"), tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Enabled")}
+	},
+	[CMD.TRAJECTORY] = {
+		texture = {imageDir .. 'states/traj_low.png', imageDir .. 'states/traj_high.png'},
+		stateTooltip = {tooltips.TRAJECTORY:gsub("_STATE_", "Low"), tooltips.TRAJECTORY:gsub("_STATE_", "High")}
+	},
+	[CMD_AIR_STRAFE] = {
+		texture = {imageDir .. 'states/strafe_off.png', imageDir .. 'states/strafe_on.png'},
+		stateTooltip = {tooltips.AIR_STRAFE:gsub("_STATE_", "No Strafe"), tooltips.AIR_STRAFE:gsub("_STATE_", "Strafe")}
+	},
+	[CMD_UNIT_FLOAT_STATE] = {
+		texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'},
+		stateTooltip = {
+			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", "Never Float"),
+			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", "Float To Fire"),
+			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", "Always Float")
+		}
+	},
+	[CMD_SELECTION_RANK] = {
+		texture = {imageDir .. 'states/selection_rank_0.png', imageDir .. 'states/selection_rank_1.png', imageDir .. 'states/selection_rank_2.png', imageDir .. 'states/selection_rank_3.png'},
+		stateTooltip = {
+			tooltips.SELECTION_RANK:gsub("_STATE_", "0"),
+			tooltips.SELECTION_RANK:gsub("_STATE_", "1"),
+			tooltips.SELECTION_RANK:gsub("_STATE_", "2"),
+			tooltips.SELECTION_RANK:gsub("_STATE_", "3")
+		}
+	},
+	[CMD_TOGGLE_DRONES] = {
+		texture = {imageDir .. 'states/drones_off.png', imageDir .. 'states/drones_on.png'},
+		stateTooltip = {
+			tooltips.TOGGLE_DRONES:gsub("_STATE_", "Disabled"),
+			tooltips.TOGGLE_DRONES:gsub("_STATE_", "Enabled"),
+		}
+	},
 }
 
 -- Commands that only exist in LuaUI cannot have a hidden param. Therefore those that should be hidden are placed in this table.
@@ -411,6 +540,7 @@ local widgetSpaceHidden = {
 	[60] = true, -- CMD.PAGES
 	[CMD_SETHAVEN] = true,
 	[CMD_SET_AI_START] = true,
+	[CMD_CHEAT_GIVE] = true,
 	[CMD_SET_FERRY] = true,
 	[CMD.MOVE] = true,
 }

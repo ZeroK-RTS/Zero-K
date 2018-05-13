@@ -141,7 +141,7 @@ unitDef = {
       craterMult              = 8,
 
 	  customParams        	  = {
-		stats_damage = 3000,
+		stats_damage = 5400,
 
 		light_color = [[5 0.3 6]],
 		light_radius = 2000,
@@ -238,6 +238,9 @@ unitDef = {
 		light_color = [[3 0.2 4]],
 		light_radius = 1200,
 		light_beam_start = 0.8,
+		stats_damage_per_second = 5400,
+		stats_hide_reload = 1,
+		stats_hide_damage = 1,
 	  },
 	  
       damage                  = {
@@ -321,16 +324,16 @@ unitDef = {
     DEAD  = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 10,
+      footprintZ       = 10,
       object           = [[starlight_dead.dae]],
     },
 
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 10,
+      footprintZ       = 10,
       object           = [[debris3x3c.s3o]],
     },
 

@@ -304,7 +304,7 @@ function script.Killed(recentDamage, maxHealth)
 	Explode(rightShin, sfxFall)
 end
 
-function script.HitByWeaponId()
+function script.HitByWeapon(x, z, weaponID, damage)
 	EmitSfx(body, 1024)
 	--return 100
 end

@@ -1,12 +1,12 @@
 unitDef = {
   unitname                      = [[factorycloak]],
-  name                          = [[Cloaky Bot Factory]],
-  description                   = [[Produces Cloaky Robots, Builds at 10 m/s]],
-  buildCostMetal                = 600,
+  name                          = [[Cloakbot Factory]],
+  description                   = [[Produces Cloaked, Mobile Robots, Builds at 10 m/s]],
+  buildCostMetal                = Shared.FACTORY_COST,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 7,
-  buildingGroundDecalSizeY      = 7,
+  buildingGroundDecalSizeX      = 13,
+  buildingGroundDecalSizeY      = 13,
   buildingGroundDecalType       = [[factorycloak_aoplane.dds]],
 
   buildoptions                  = {
@@ -30,13 +30,16 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    sortName       = [[1]],
+    sortName        = [[1]],
+    default_spacing = 8,
+    midposoffset    = [[0 0 -24]],
+    solid_factory   = [[7]],
   },
 
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 7,
-  footprintZ                    = 7,
+  footprintZ                    = 10,
   iconType                      = [[fackbot]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -62,7 +65,7 @@ unitDef = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = "ooooooo ooooooo ooooooo occccco occccco occccco occccco",
+  yardMap                       = "ooooooo ooooooo ooooooo occccco occccco occccco occccco yyyyyyy yyyyyyy yyyyyyy",
 
   featureDefs                   = {
 

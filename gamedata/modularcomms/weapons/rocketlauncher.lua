@@ -9,7 +9,7 @@ local weaponDef = {
 	customParams            = {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:STORMMUZZLE]],
-		
+
 		light_camera_height = 2200,
 		light_color = [[0.95 0.65 0.30]],
 		light_radius = 280,
@@ -17,7 +17,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 360,
-		planes  = 360,
 		subs    = 18,
 	},
 

@@ -62,6 +62,11 @@ function Sprint()
 	GG.UpdateUnitAttributes(unitID)
 end
 
+function OnLoadGame()
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	GG.UpdateUnitAttributes(unitID)
+end
+
 ----------------------------------------------------------
 
 local WING_DISTANCE = 8

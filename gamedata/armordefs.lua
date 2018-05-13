@@ -106,7 +106,7 @@ for name, wd in pairs(DEFS.weaponDefs) do
 	wd.damage.shield = maxDamage
 
 	-- Stats
-	wd.customparams.statsdamage = wd.customparams.statsdamage or maxDamage
+	wd.customparams.stats_damage = wd.customparams.stats_damage or maxDamage
 	
 	-- raw_damage is damage per frame. shot_damage is full damage per reload.
 	wd.customparams.raw_damage = maxDamage/((wd.customparams.effective_beam_time or wd.beamtime or 1/30) * 30)

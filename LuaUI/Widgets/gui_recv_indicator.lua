@@ -289,7 +289,10 @@ end
 function widget:Initialize()
 	local myPlayerID=Spring.GetMyPlayerID()
 	local _, _, spec = Spring.GetPlayerInfo(myPlayerID)
-	if spec then widgetHandler:RemoveWidget() return false end --//widget will not load if we are a spectator.
+	if spec or Spring.GetModOptions().campaign_disable_share_marker then
+		widgetHandler:RemoveWidget()
+		return false
+	end
 	
 	----- localize global variable:
 	local gameID_to_playerName = gameID_to_playerName_gbl

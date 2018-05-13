@@ -26,8 +26,8 @@ end
 
 --//=============================================================================
 
-function ScrollPanel:SetScrollPos(x,y,inview)
-  if (self.smoothScroll) then
+function ScrollPanel:SetScrollPos(x,y,inview, forceNotSmooth)
+  if (self.smoothScroll) and not forceNotSmooth then
     self._oldScrollPosX = self.scrollPosX
     self._oldScrollPosY = self.scrollPosY
   end
@@ -51,7 +51,7 @@ function ScrollPanel:SetScrollPos(x,y,inview)
     end
   end
 
-  if (self.smoothScroll) then
+  if (self.smoothScroll) and not forceNotSmooth  then
     if (self._oldScrollPosX ~= self.scrollPosX)or(self._oldScrollPosY ~= self.scrollPosY) then
       self._smoothScrollEnd = Spring.GetTimer()
       self._newScrollPosX = self.scrollPosX
@@ -245,8 +245,12 @@ end
 function ScrollPanel:_DrawInClientArea(fnc,...)
   local clientX,clientY,clientWidth,clientHeight = unpack4(self.clientArea)
 
+  if WG.uiScale and WG.uiScale ~= 1 then
+    clientWidth, clientHeight = clientWidth*WG.uiScale, clientHeight*WG.uiScale
+  end
+  
   if (self.safeOpengl) then
-    local sx,sy = self:LocalToScreen(clientX,clientY)
+    local sx,sy = self:UnscaledLocalToScreen(clientX,clientY)
     sy = select(2,gl.GetViewSizes()) - (sy + clientHeight)
 
     PushScissor(sx,sy,clientWidth,clientHeight)

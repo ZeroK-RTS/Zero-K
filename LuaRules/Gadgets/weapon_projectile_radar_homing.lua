@@ -18,9 +18,7 @@ end
 -------------------------------------------------------------
 -------------------------------------------------------------
 
-local FEATURE = 102
-local GROUND = 103
-local UNIT = 117
+local UNIT = string.byte('u')
 
 local projectiles = {}
 

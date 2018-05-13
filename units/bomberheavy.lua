@@ -1,8 +1,8 @@
 unitDef = {
   unitname            = [[bomberheavy]],
-  name                = [[Wyvern]],
+  name                = [[Likho]],
   description         = [[Singularity Bomber]],
-  --autoheal			  = 25,
+  --autoheal          = 25,
   brakerate           = 0.4,
   buildCostMetal      = 2000,
   builder             = false,
@@ -17,15 +17,19 @@ unitDef = {
   collisionVolumeOffsets = [[-2 0 0]],
   collisionVolumeScales  = [[32 12 40]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[65 25 65]],
+  selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
   crashDrag           = 0.02,
   cruiseAlt           = 250,
 
   customParams        = {
-    modelradius    = [[10]],
-    requireammo    = [[1]],
-    reammoseconds  = [[30]],
-	refuelturnradius = [[150]],
+    modelradius      = [[10]],
+    requireammo      = [[1]],
+    reammoseconds    = [[30]],
+    refuelturnradius = [[150]],
+	reallyabomber    = [[1]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -45,8 +49,8 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[ARMCYBR]],
-  refuelTime		  = 20,
-  script			  = [[bomberheavy.lua]],
+  refuelTime          = 20,
+  script              = [[bomberheavy.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
   turnRadius          = 20,
@@ -56,7 +60,7 @@ unitDef = {
 
     {
       def                = [[ARM_PIDR]],
-	  badTargetCategory	 = [[GUNSHIP FIXEDWING]],
+      badTargetCategory  = [[GUNSHIP FIXEDWING]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
@@ -70,17 +74,18 @@ unitDef = {
       areaOfEffect            = 192,
       avoidFeature            = false,
       avoidFriendly           = false,
-	  burnblow                = true,
-	  cegTag                  = [[raventrail]],
+      burnblow                = true,
+      cegTag                  = [[raventrail]],
       collideFriendly         = false,
    
       craterBoost             = 1,
       craterMult              = 2,
 
-	  customParams        	  = {
-		light_color = [[1.6 0.85 0.38]],
-		light_radius = 750,
-	  },
+      customParams            = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
+        light_color = [[1.6 0.85 0.38]],
+        light_radius = 750,
+      },
 
       damage                  = {
         default = 2000.1,
@@ -105,7 +110,7 @@ unitDef = {
       tolerance               = 16000,
       tracks                  = true,
       turnRate                = 30000,
-	  weaponAcceleration      = 200,
+      weaponAcceleration      = 200,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 400,
     },

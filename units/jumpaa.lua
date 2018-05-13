@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[jumpaa]],
-  name                = [[Archangel]],
+  name                = [[Toad]],
   description         = [[Heavy Anti-Air Jumper]],
   acceleration        = 0.18,
   brakeRate           = 0.2,

@@ -85,16 +85,27 @@ end
 
 --//=============================================================================
 
-local function explode(div,str) -- credit: http://richard.warburton.it
-  if (div=='') then return false end
-  local pos,arr = 0,{}
-  -- for each divider found
-  for st,sp in function() return string.find(str,div,pos,true) end do
-    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
-    pos = sp + 1 -- Jump past current divider
-  end
-  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
-  return arr
+local function explode(str)
+	local arr = {}
+	local i, j = 1, 1
+	local N = str:len()
+
+	while j <= N do
+		local c = str:sub(j, j)
+		if c == '\255' then
+			j = j + 3
+		elseif c == '\10' then
+			arr[#arr + 1] = str:sub(i, j - 1)
+			i = j + 1
+		end
+		j = j + 1
+	end
+
+	if i <= N then
+		arr[#arr + 1] = str:sub(i, N)
+	end
+
+	return arr
 end
 
 --- Sets the EditBox text
@@ -111,7 +122,7 @@ function EditBox:SetText(newtext)
 	self.selEndY = nil
 	self.lines = {}
 	self.physicalLines = {}
-	for _, line in pairs(explode("\n", self.text)) do
+	for _, line in pairs(explode(self.text)) do
 		self:AddLine(line)
 	end
 	self:UpdateLayout()
@@ -219,7 +230,7 @@ function EditBox:_GeneratePhysicalLines(logicalLineID)
 	local colorPrefix = ""
 	local totalLength = 0
 	-- split the text into physical lines
-	for lineIndex, lineText in pairs(explode("\n", wrappedText)) do
+	for lineIndex, lineText in pairs(explode(wrappedText)) do
 	  local th, td = font:GetTextHeight(lineText)
 	  local _txt = colorPrefix .. lineText
 	  table.insert(self.physicalLines, {

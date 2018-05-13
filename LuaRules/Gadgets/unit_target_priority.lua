@@ -29,8 +29,14 @@ local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
+local spGetGameFrame = Spring.GetGameFrame
 
-local targetTable, disarmWeaponDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult, highAlphaWeaponDamages = include("LuaRules/Configs/target_priority_defs.lua")
+
+local targetTable, disarmWeaponTimeDefs, disarmPenaltyDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, radarDotPenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME = include("LuaRules/Configs/target_priority_defs.lua")
+
+local DISARM_DECAY_FRAMES = 1200
+local DISARM_TOTAL = DISARM_BASE + DISARM_ADD
+local DISARM_TIME_FACTOR = DISARM_DECAY_FRAMES + DISARM_ADD_TIME
 
 -- Low return number = more worthwhile target
 -- This seems to override everything, will need to reimplement emp things, badtargetcats etc...
@@ -126,9 +132,22 @@ local function GetUnitStunnedOrInBuild(unitID)
 		else
 			local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
 			local disarmExpected = GG.OverkillPrevention_IsDisarmExpected(unitID)
+			
 			if disarmed or disarmExpected then
-				remStunned[unitID] = 0.5
-			else
+				if disarmExpected then
+					remStunned[unitID] = DISARM_TOTAL
+				else
+					local disarmframe = spGetUnitRulesParam(unitID, "disarmframe") or -1
+					if disarmframe == -1 then
+						-- Should be impossible to reach this branch.
+						remStunned[unitID] = DISARM_TOTAL
+					else
+						local gameFrame = spGetGameFrame()
+						local frames = disarmframe - gameFrame - DISARM_DECAY_FRAMES
+						remStunned[unitID] = DISARM_BASE + math.max(0, math.min(DISARM_ADD, frames/DISARM_TIME_FACTOR))
+					end
+				end
+			else 
 				remStunned[unitID] = 0
 			end
 		end
@@ -237,7 +256,7 @@ local function GetGravityWeaponPriorityModifier(unitID, attackerWeaponDefID)
 		if inbuild then
 			remScaledMass[unitID] = -1
 		else
-			-- Glaive = 1.46, Zeus = 5.24, Reaper = 9.48
+			-- Glaive = 1.46, Zeus = 5.24, Minotaur = 9.48
 			remScaledMass[unitID] = 0.02 * UnitDefs[remUnitDefID[unitID]].mass
 		end
 	end
@@ -250,19 +269,23 @@ end
 
 local function GetDisarmWeaponPriorityModifier(unitID, attackerWeaponDefID)
 	local stunned = GetUnitStunnedOrInBuild(unitID)
-	if stunned == 0 then
+	if stunned <= disarmWeaponTimeDefs[attackerWeaponDefID] then
 		return GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
 	end
-	return 10 + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
+	return (disarmPenaltyDefs[attackerWeaponDefID] or 10) + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Priority callin
+local DEF_TARGET_TOO_FAR_PRIORITY = 100000 --usually numbers are around several millions, if target is out of range
 
 function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
 
 	--Spring.Echo("TARGET CHECK")
+	if defPriority > DEF_TARGET_TOO_FAR_PRIORITY then
+		return defPriority --hope engine is not that wrong about the best target outside of the range
+	end
 	
 	if (not targetID) or (not unitID) or (not attackerWeaponDefID) then
 		return true, 25
@@ -275,7 +298,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	end
 	
 	if GG.GetUnitTarget(unitID) == targetID then
-		if disarmWeaponDefs[attackerWeaponDefID] then
+		if disarmWeaponTimeDefs[attackerWeaponDefID] then
 			if (remStunAttackers[targetID] or 0) < STUN_ATTACKERS_IDLE_REQUIREMENT then
 				local stunned, buildProgress = GetUnitStunnedOrInBuild(targetID)
 				if stunned ~= 0 then
@@ -310,7 +333,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	local visiblity = GetUnitVisibility(targetID, allyTeam)
 
 	if visiblity ~= 2 then
-		local wobbleAdd = 0
+		local wobbleAdd = (radarDotPenalty[attackerWeaponDefID] or 0)
 		-- Mobile units get a penalty for radar wobble. Identified statics experience no wobble.
 		if radarWobblePenalty[attackerWeaponDefID] and (visibility == 0 or not remStatic[enemyUnitDefID]) then
 			wobbleAdd = radarWobblePenalty[attackerWeaponDefID]
@@ -346,7 +369,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			return false
 		end
 		defPrio = defPrio + gravityPriority
-	elseif disarmWeaponDefs[attackerWeaponDefID] then
+	elseif disarmWeaponTimeDefs[attackerWeaponDefID] then
 		defPrio = defPrio + GetDisarmWeaponPriorityModifier(targetID, attackerWeaponDefID)
 	else
 		defPrio = defPrio + GetNormalWeaponPriorityModifier(targetID, attackerWeaponDefID)
@@ -356,11 +379,11 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	-- Prioritize nearby units.
 	if proximityWeaponDefs[attackerWeaponDefID] then
 		local unitSeparation = spGetUnitSeparation(unitID,targetID,true)
-		local distAdd = 20 * (unitSeparation/WeaponDefs[attackerWeaponDefID].range)
+		local distAdd = proximityWeaponDefs[attackerWeaponDefID] * (unitSeparation/WeaponDefs[attackerWeaponDefID].range)
 		defPrio = defPrio + distAdd
 	end
 	
-	--Spring.Utilities.UnitEcho(targetID, defPrio)
+	--Spring.Utilities.UnitEcho(targetID, string.format("%.1f", defPrio))
 	return true, defPrio + velocityAdd + lastShotBonus -- bigger value have lower priority
 end
 

@@ -18,12 +18,72 @@ end
 --------------------------------------------------------------------------------
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
-local SHIFT_TABLE = {"shift"}
 
 local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
+local defaultSelectionRank = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
 local spectatingState = select(1, Spring.GetSpectatingState())
 
 local unitsToFactory = {}	-- [unitDefName] = factoryDefName
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local tooltipFunc = {}
+local tooltips = {
+	movestate = {
+		[-1] = "Inherit from factory",
+		[0] = "Hold position",
+		[1] = "Maneuver",
+		[2] = "Roam",
+	},
+	firestate = {
+		[-1] = "Inherit from factory",
+		[0] = "Hold fire",
+		[1] = "Return fire",
+		[2] = "Fire at will",
+	},
+	priority = {
+		[-1] = "Inherit from factory",
+		[0] = "Low priority",
+		[1] = "Normal priority",
+		[2] = "High priority",
+	},
+	retreat = {
+		[-1] = "Inherit from factory",
+		[0] = "Never Retreat",
+		[1] = "Retreat at 30% health",
+		[2] = "Retreat at 65% health",
+		[3] = "Retreat at 99% health",
+	},
+	auto_call_transport = {
+		[-1] = "Inherit from factory",
+		[0] = "Disabled",
+		[1] = "Enabled",
+	},
+	flylandstate = {
+		[-1] = "Inherit from factory",
+		[0] = "Fly when idle",
+		[1] = "Land when idle",
+	},
+	floatstate = {
+		[-1] = "Inherit from factory",
+		[0] = "Never float",
+		[1] = "Float to attack",
+		[2] = "Float to attack or when idle",
+	},
+	selectionrank = {
+		[0] = "0",
+		[1] = "1",
+		[2] = "2",
+		[3] = "3",
+	},
+}
+
+for name, values in pairs(tooltips) do
+	tooltipFunc[name] = function (_, v)
+		return values[v] or "??"
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -32,13 +92,16 @@ local function IsGround(ud)
     return not ud.canFly and not ud.isFactory
 end
 
-local function GetDefaultSelectionRank(ud)
-	if (ud.isImmobile or ud.speed == 0) and not ud.isFactory then
-		return 1
-	elseif ud.isMobileBuilder and not ud.customParams.commtype then
-		return 2
+local impulseUnitDefID = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	for _, w in pairs(ud.weapons) do
+		local wd = WeaponDefs[w.weaponDef]
+		if wd.customParams and wd.customParams.impulse then
+			impulseUnitDefID[i] = true
+			break
+		end
 	end
-	return 3
 end
 
 options_path = 'Settings/Unit Behaviour/Default States'
@@ -301,7 +364,7 @@ options = {
 				local name = find and string.sub(opt, 0, find - 1)
 				local ud = name and UnitDefNames[name]
 				if ud then
-					options[opt].value = GetDefaultSelectionRank(ud)
+					options[opt].value = defaultSelectionRank[ud.id] or 3
 				end
 			end
 		end,
@@ -341,6 +404,7 @@ options = {
 		max = 2,
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.firestate,
 	},
 
 	commander_movestate1 = {
@@ -352,6 +416,7 @@ options = {
 		max = 2,
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.movestate,
 	},
 
 	commander_constructor_buildpriority = {
@@ -363,6 +428,7 @@ options = {
 		max = 2,
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.priority,
 	},
 
 	commander_misc_priority = {
@@ -374,6 +440,7 @@ options = {
 		max = 2,
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.priority,
 	},
 
 	commander_retreat = {
@@ -385,6 +452,7 @@ options = {
 		max = 3,
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.retreat,
 	},
 	
 	commander_auto_call_transport_2 = {
@@ -396,6 +464,7 @@ options = {
 		max = 1,
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.auto_call_transport,
 	},
 	
 	commander_selection_rank = {
@@ -408,6 +477,7 @@ options = {
 		step = 1,
 		path = path,
 		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.selectionrank,
 	},
 }
 
@@ -465,6 +535,7 @@ local function addUnit(defName, path)
 			max = 2,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.firestate,
 		}
 		options_order[#options_order+1] = defName .. "_firestate0"
 	end
@@ -479,6 +550,7 @@ local function addUnit(defName, path)
 			max = 2,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.movestate,
 		}
 		options_order[#options_order+1] = defName .. "_movestate1"
 	end
@@ -493,6 +565,7 @@ local function addUnit(defName, path)
 			max = 1,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.flylandstate,
 		}
 		options_order[#options_order+1] = defName .. "_flylandstate_1"
 	elseif ud.customParams and ud.customParams.landflystate then
@@ -505,6 +578,7 @@ local function addUnit(defName, path)
 			max = 1,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.flylandstate,
 		}
 		options_order[#options_order+1] = defName .. "_flylandstate_1_factory"
 	end
@@ -548,13 +622,14 @@ local function addUnit(defName, path)
 	if ud.customParams and ud.customParams.floattoggle then
 		options[defName .. "_floattoggle"] = {
 			name = "  Float State",
-			desc = "Values: Never float, float to attack, float when stationary",
+			desc = "Values: Never float, float to attack, float to attack or when idle",
 			type = 'number',
 			value = (ud.customParams and ud.customParams.floattoggle) or 1,
 			min = 0,
 			max = 2,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.floatstate,
 		}
 		options_order[#options_order+1] = defName .. "_floattoggle"
 	end
@@ -568,6 +643,7 @@ local function addUnit(defName, path)
 		max = 2,
 		step = 1,
 		path = path,
+		tooltipFunction = tooltipFunc.priority,
 	}
 	options_order[#options_order+1] = defName .. "_buildpriority_0"
 
@@ -585,6 +661,7 @@ local function addUnit(defName, path)
 			max = 2,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.priority,
 		}
 		options_order[#options_order+1] = defName .. "_constructor_buildpriority"
 	end
@@ -599,6 +676,7 @@ local function addUnit(defName, path)
 			max = 2,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.priority,
 		}
 		options_order[#options_order+1] = defName .. "_misc_priority"
 	end
@@ -613,6 +691,7 @@ local function addUnit(defName, path)
 			max = 1,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.auto_call_transport,
 		}
 		options_order[#options_order+1] = defName .. "_auto_call_transport_2"
 	elseif ud.isFactory and not ud.customParams.nongroundfac then
@@ -625,6 +704,7 @@ local function addUnit(defName, path)
 			max = 1,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.auto_call_transport,
 		}
 		options_order[#options_order+1] = defName .. "_auto_call_transport_2"
 	end
@@ -639,6 +719,7 @@ local function addUnit(defName, path)
 			max = 3,
 			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.retreat,
 		}
 		options_order[#options_order+1] = defName .. "_retreatpercent"
 	end
@@ -647,11 +728,12 @@ local function addUnit(defName, path)
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
 		type = 'number',
-		value = GetDefaultSelectionRank(ud),
+		value = defaultSelectionRank[ud.id] or 3,
 		min = 0,
 		max = 3,
 		step = 1,
 		path = path,
+		tooltipFunction = tooltipFunc.selectionrank,
 	}
 	options_order[#options_order+1] = defName .. "_selection_rank"
 	
@@ -679,12 +761,12 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_tactical_ai_transport"
 	end
 
-	if dontFireAtRadarUnits[ud.id] then
+	if dontFireAtRadarUnits[ud.id] ~= nil then
 		options[defName .. "_fire_at_radar"] = {
 			name = "  Fire at radar",
 			desc = "Check box to make these units fire at radar. All other units fire at radar but these have the option not to.",
 			type = 'bool',
-			value = true,
+			value = dontFireAtRadarUnits[ud.id],
 			path = path,
 			noHotkey = true,
 		}
@@ -704,15 +786,27 @@ local function addUnit(defName, path)
 	end
 
 	if ud.onOffable then
-		options[defName .. "_activateWhenBuilt"] = {
-			name = "  On/Off State",
-			desc = "Check box to set the unit to On when built.",
-			type = 'bool',
-			value = ud.activateWhenBuilt,
-			path = path,
-			noHotkey = true,
-		}
-		options_order[#options_order+1] = defName .. "_activateWhenBuilt"
+		if impulseUnitDefID[ud.id] then
+			options[defName .. "_impulseMode"] = {
+				name = "  Gravity Gun Push/Pull",
+				desc = "Check box to default to Push.",
+				type = 'bool',
+				value = true,
+				path = path,
+				noHotkey = true,
+			}
+			options_order[#options_order+1] = defName .. "_impulseMode"
+		else
+			options[defName .. "_activateWhenBuilt"] = {
+				name = "  On/Off State",
+				desc = "Check box to set the unit to On when built.",
+				type = 'bool',
+				value = ud.activateWhenBuilt,
+				path = path,
+				noHotkey = true,
+			}
+			options_order[#options_order+1] = defName .. "_activateWhenBuilt"
+		end
 	end
 end
 
@@ -830,7 +924,7 @@ local function QueueState(unitDefName, stateName, cmdID, cmdArray, invertBool)
 		end
 		value = value and 1 or 0
 	end
-	cmdArray[#cmdArray + 1] = {cmdID, {value}, SHIFT_TABLE}
+	cmdArray[#cmdArray + 1] = {cmdID, {value}, CMD.OPT_SHIFT}
 end
 
 --------------------------------------------------------------------------------
@@ -840,12 +934,18 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if not (unitDefID and UnitDefs[unitDefID]) then
 		return
 	end
+	-- don't apply some states to save/loaded unit
+	local oldID = Spring.GetUnitRulesParam(unitID, "saveload_oldID")
 	
 	local myTeam, amLeader = AmITeamLeader(unitTeam)
 	if not amLeader then
 		if myTeam or spectatingState then
 			ApplyUniversalUnitStates(unitID, unitDefID, unitTeam, builderID)
 		end
+		return
+	end
+	
+	if oldID then
 		return
 	end
 
@@ -859,8 +959,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			return
 		end
 
-		orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate0.value}, SHIFT_TABLE}
-		orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, SHIFT_TABLE}
+		orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate0.value}, CMD.OPT_SHIFT}
+		orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, CMD.OPT_SHIFT}
 		if WG.SetAutoCallTransportState and options.commander_auto_call_transport_2.value == 1 then
 			WG.SetAutoCallTransportState(unitID, unitDefID, true)
 		end
@@ -883,7 +983,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
 						local firestate = Spring.GetUnitStates(builderID).firestate
 						if firestate then
-							orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, SHIFT_TABLE}
+							orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, CMD.OPT_SHIFT}
 							trueBuilder = true
 						end
 					end
@@ -891,11 +991,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				if not trueBuilder then	-- inherit from factory def's start state, not the current state of any specific factory unit
 					local firestate = GetFactoryDefState(name, "firestate0")
 					if firestate ~= nil then
-						orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, SHIFT_TABLE}
+						orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, CMD.OPT_SHIFT}
 					end
 				end
 			else
-				orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {value}, SHIFT_TABLE}
+				orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {value}, CMD.OPT_SHIFT}
 			end
 		end
 
@@ -908,7 +1008,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
 						local movestate = Spring.GetUnitStates(builderID).movestate
 						if movestate then
-							orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, SHIFT_TABLE}
+							orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, CMD.OPT_SHIFT}
 							trueBuilder = true
 						end
 					end
@@ -916,11 +1016,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				if not trueBuilder then	-- inherit from factory def's start state, not the current state of any specific factory unit
 					local movestate = GetFactoryDefState(name, "movestate1")
 					if movestate ~= nil then
-						orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, SHIFT_TABLE}
+						orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, CMD.OPT_SHIFT}
 					end
 				end
 			else
-				orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {value}, SHIFT_TABLE}
+				orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {value}, CMD.OPT_SHIFT}
 			end
 		end
 		
@@ -933,21 +1033,21 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					--NOTE: The unit_air_plants gadget deals with inherit
 					trueBuilder = true
 					if value ~= -1 then  --if not inherit
-						orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, SHIFT_TABLE}
+						orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, CMD.OPT_SHIFT}
 					end
 				end
 			end
 			if not trueBuilder then	-- inherit from factory def's start state, not the current state of any specific factory unit
 				value = GetFactoryDefState(name, "flylandstate_1_factory")
 				if value ~= nil then
-					orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, SHIFT_TABLE}
+					orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, CMD.OPT_SHIFT}
 				end
 			end
 			
 		end
 		
-		QueueState(name, "flylandstate_1_factory", CMD_AP_FLY_STATE, orderArray)
 		QueueState(name, "repeat", CMD.REPEAT, orderArray)
+		QueueState(name, "flylandstate_1_factory", CMD_AP_FLY_STATE, orderArray)
 		QueueState(name, "auto_assist", CMD_FACTORY_GUARD, orderArray)
 		QueueState(name, "airstrafe1", CMD_AIR_STRAFE, orderArray)
 		QueueState(name, "floattoggle", CMD_UNIT_FLOAT_STATE, orderArray)
@@ -962,9 +1062,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		if retreat then
 			if retreat == 0 then
-				orderArray[#orderArray + 1] = {CMD_RETREAT, {0}, {"shift", "right"}}  -- to set retreat to 0, "right" option must be used
+				orderArray[#orderArray + 1] = {CMD_RETREAT, {0}, CMD.OPT_SHIFT + CMD.OPT_RIGHT}  -- to set retreat to 0, "right" option must be used
 			else
-				orderArray[#orderArray + 1] = {CMD_RETREAT, {retreat}, SHIFT_TABLE}
+				orderArray[#orderArray + 1] = {CMD_RETREAT, {retreat}, CMD.OPT_SHIFT}
 			end
 		end
 		
@@ -974,21 +1074,21 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				if builderID then
 					local priority = Spring.GetUnitRulesParam(builderID,"buildpriority")
 					if priority then
-						orderArray[#orderArray + 1] = {CMD_PRIORITY, {priority}, SHIFT_TABLE}
+						orderArray[#orderArray + 1] = {CMD_PRIORITY, {priority}, CMD.OPT_SHIFT}
 					end
 				else
 					local priority = GetFactoryDefState(name, "constructor_buildpriority")
-					orderArray[#orderArray + 1] = {CMD_PRIORITY, {priority or 1}, SHIFT_TABLE}
+					orderArray[#orderArray + 1] = {CMD_PRIORITY, {priority or 1}, CMD.OPT_SHIFT}
 				end
 			else
-				orderArray[#orderArray + 1] = {CMD_PRIORITY, {value}, SHIFT_TABLE}
+				orderArray[#orderArray + 1] = {CMD_PRIORITY, {value}, CMD.OPT_SHIFT}
 			end
 		end
 		
 		value = GetStateValue(name, "misc_priority")
 		if value then
 			if value ~= 1 then -- Medium is the default
-				orderArray[#orderArray + 1] = {CMD_MISC_PRIORITY, {value}, SHIFT_TABLE}
+				orderArray[#orderArray + 1] = {CMD_MISC_PRIORITY, {value}, CMD.OPT_SHIFT}
 			end
 		end
 		
@@ -1025,6 +1125,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		
 		QueueState(name, "fire_at_radar", CMD_DONT_FIRE_AT_RADAR, orderArray, true)
 		QueueState(name, "personal_cloak_0", CMD_WANT_CLOAK, orderArray)
+		QueueState(name, "impulseMode", CMD_PUSH_PULL, orderArray)
 	end
 
 	if #orderArray>0 then
@@ -1061,7 +1162,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 		if value == -1 then
 			local priority = Spring.GetUnitRulesParam(factID,"buildpriority")
 			if priority then
-				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, SHIFT_TABLE)
+				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, CMD.OPT_SHIFT)
 			end
 		end
 	end
@@ -1072,11 +1173,16 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1) then
 		return
 	end
+	
+	local oldID = Spring.GetUnitRulesParam(unitID, "saveload_oldID")	
+	if oldID then
+		return
+	end
 
 	local orderArray = {}
 	if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
-		orderArray[1] = {CMD_PRIORITY, {GetStateValue("commander", "constructor_buildpriority")}, SHIFT_TABLE}
-		orderArray[2] = {CMD_MISC_PRIORITY, {GetStateValue("commander", "misc_priority")}, SHIFT_TABLE}
+		orderArray[1] = {CMD_PRIORITY, {GetStateValue("commander", "constructor_buildpriority")}, CMD.OPT_SHIFT}
+		orderArray[2] = {CMD_MISC_PRIORITY, {GetStateValue("commander", "misc_priority")}, CMD.OPT_SHIFT}
 	end
 
 	local name = UnitDefs[unitDefID].name

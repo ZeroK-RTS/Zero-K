@@ -8,9 +8,11 @@ function widget:GetInfo() return {
 	enabled   = true,
 } end
 
+local mapX = Game.mapSizeX
+local mapZ = Game.mapSizeZ
 
-VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
-local startboxConfig = ParseBoxes()
+local GetRawBoxes, GetParsedBoxes = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
+local startboxConfig = GetParsedBoxes()
 
 local rawBoxes = GetRawBoxes()
 for boxID, boxx in pairs(rawBoxes) do
@@ -206,7 +208,7 @@ end
 
 function widget:Initialize()
 	-- only show at the beginning
-	if ((Spring.GetGameFrame() > 1) or (Game.startPosType ~= 2)) then
+	if (Spring.GetGameFrame() > 1) or (Game.startPosType ~= 2) or (Spring.GetModOptions().fixedstartpos == "1") then
 		widgetHandler:RemoveWidget(self)
 		return
 	end
@@ -275,6 +277,13 @@ function widget:Initialize()
 	boxMinimapList = gl.CreateList(drawBoxesMinimap)
 end
 
+function widget:Update()
+	if Spring.GetGameRulesParam("totalSaveGameFrame") then
+		Spring.SendCommands("forcestart")
+		widgetHandler:RemoveWidget()
+	end
+end
+
 function widget:Shutdown()
 	gl.DeleteList(xformList)
 	gl.DeleteList(coneList)
@@ -335,12 +344,34 @@ function widget:DrawWorld()
 	gl.Fog(true)
 end
 
+local function GetTeamName(teamID)
+	local _, leaderID, _, isAiTeam = Spring.GetTeamInfo(teamID)
+	if isAiTeam then
+		local aiName = select(2, Spring.GetAIInfo(teamID))
+		if aiName then
+			return aiName
+		end
+	end
+
+	if not leaderID then
+		return
+	end
+	local playerName = Spring.GetPlayerInfo(leaderID)
+	if not playerName then
+		return
+	end
+	if isAiTeam then
+		return "AI (" .. playerName .. ")"
+	end
+	return playerName
+end
+
 function widget:DrawScreenEffects()
 	gl.Fog(false)
 	gl.BeginText()
 
 	for _, teamID in ipairs(Spring.GetTeamList()) do
-		local name = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(teamID)))
+		local name = GetTeamName(teamID)
 		local x, y, z = Spring.GetTeamStartPosition(teamID)
 		if name and ValidStartpos(x, y, z) then
 			local sx, sy, sz = Spring.WorldToScreenCoords(x, y + 120, z)
@@ -361,8 +392,7 @@ function widget:DrawScreenEffects()
 end
 
 local boxes_loaded_minimap = false
-local dotSize = math.max(Game.mapSizeX, Game.mapSizeZ) * 0.01
-function widget:DrawInMiniMap(sx, sz)
+function widget:DrawInMiniMap(minimapX, minimapY)
 
 	gl.PushMatrix()
 	gl.CallList(xformList)
@@ -371,22 +401,26 @@ function widget:DrawInMiniMap(sx, sz)
 
 	gl.CallList(boxMinimapList)
 
-	gl.LineWidth(3)
-	gl.Rotate (270,1,0,0)
+	gl.Color(1,1,1,1)
+	gl.LineWidth(1.0)
+	gl.PopMatrix()
 
+	local dotSize = math.max(minimapX, minimapY) * 0.3
+	gl.PushMatrix()
+	gl.LineWidth(3)
+	gl.Translate(0, minimapY, 0)
+	gl.Scale(minimapX/mapX, -minimapY/mapZ, 1)
+	
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local x, y, z = Spring.GetTeamStartPosition(teamID)
 		if ValidStartpos(x, y, z) then
 			local r, g, b = Spring.GetTeamColor(teamID)
 			local i = 2 * math.abs(((Spring.DiffTimers(Spring.GetTimer(), startTimer) * 3) % 1) - 0.5)
 			gl.Color(i, i, i)
-			gl.DrawGroundCircle(x, 0, z, dotSize * 1.2, 16)
+			gl.Utilities.DrawCircle(x, z, dotSize * 1.2)
 			gl.Color(r, g, b)
-			gl.DrawGroundCircle(x, 0, z, dotSize, 16)
+			gl.Utilities.DrawCircle(x, z, dotSize)
 		end
 	end
-
-	gl.Color(1,1,1,1)
-	gl.LineWidth(1.0)
 	gl.PopMatrix()
 end

@@ -8,6 +8,8 @@
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local CachedBuildDistance = {}
+
 local function IsFeatureInRange(unitID, featureID, range)
 	range = range + 100 -- fudge factor
     local x,y,z = Spring.GetFeaturePosition(featureID)
@@ -32,8 +34,12 @@ function Spring.Utilities.GetUnitNanoTarget(unitID)
     type   = "building"
     inRange = true
   else
-    local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)] or {}
-    local buildRange = unitDef.buildDistance or 0
+    local unitDefID = Spring.GetUnitDefID(unitID)
+    if not CachedBuildDistance[unitDefID] then
+      local unitDef = UnitDefs[unitDefID] or {}
+      CachedBuildDistance[unitDefID] = unitDef.buildDistance or 0
+    end
+    local buildRange = CachedBuildDistance[unitDefID]
     local cmds = Spring.GetCommandQueue(unitID,1)
     if (cmds)and(cmds[1]) then
       local cmd   = cmds[1]

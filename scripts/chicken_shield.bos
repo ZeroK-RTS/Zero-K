@@ -7,9 +7,8 @@ static-var bMoving, gun_1;
 #define SIG_AIM_2			4
 #define SIG_MOVE			8
 #define SIG_BUILD;
-	
-#include "sfxtype.h"
-#include "exptype.h"
+
+#include "constants.h"
 
 walk()
 {

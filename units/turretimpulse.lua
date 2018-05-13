@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[turretimpulse]],
   name                          = [[Newton]],
-  description                   = [[Gravity Turret - On to Repulse, Off to Attract]],
+  description                   = [[Gravity Turret]],
   activateWhenBuilt             = true,
   buildCostMetal                = 200,
   builder                       = false,
@@ -17,7 +17,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-	modelradius    = [[25]],
+    modelradius    = [[25]],
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
@@ -69,13 +69,14 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams            = {
-	    impulse = [[-150]],
-		
-		light_color = [[0.33 0.33 1.28]],
-		light_radius = 140,
-	  },
-	  
+      customParams            = {
+        reaim_time = 8, -- COB
+        impulse = [[-150]],
+
+        light_color = [[0.33 0.33 1.28]],
+        light_radius = 140,
+      },
+
       damage                  = {
         default = 0.001,
         planes  = 0.001,
@@ -115,13 +116,14 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams            = {
-	    impulse = [[150]],
-		
-		light_color = [[0.85 0.2 0.2]],
-		light_radius = 140,
-	  },
-	  
+      customParams            = {
+        reaim_time = 8, -- COB
+        impulse = [[150]],
+
+        light_color = [[0.85 0.2 0.2]],
+        light_radius = 140,
+      },
+
       damage                  = {
         default = 0.001,
         planes  = 0.001,

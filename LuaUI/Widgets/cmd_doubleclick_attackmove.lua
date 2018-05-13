@@ -35,8 +35,12 @@ local spGetTimer = Spring.GetTimer
 local spGiveOrder = Spring.GiveOrder
 local CMD_FIGHT = CMD.FIGHT
 
-local tolerance = Spring.GetConfigInt('DoubleClickTime', 300) * 0.001 -- no event to notify us if this changes but not really a big deal
-local prev = spGetTimer()
+local toleranceTime = Spring.GetConfigInt('DoubleClickTime', 300) * 0.001 -- no event to notify us if this changes but not really a big deal
+local toleranceDistSq = 50 -- no engine config here at all
+
+local prevT = spGetTimer()
+local prevX = 0
+local prevZ = 0
 
 function widget:CommandNotify(id, params, opts)
 	if id ~= CMD_RAW_MOVE then
@@ -44,10 +48,17 @@ function widget:CommandNotify(id, params, opts)
 	end
 
 	local now = spGetTimer()
-	local doubleClick = (spDiffTimers(now, prev) <= tolerance)
-	prev = now
+	local doubleClickTime = (spDiffTimers(now, prevT) <= toleranceTime)
+	prevT = now
 
-	if not doubleClick then
+	
+	local posX = params[1]
+	local posZ = params[3]
+	local doubleClickDist = ((prevX - posX)^2 + (prevZ - posZ)^2 < toleranceDistSq)
+	prevX = posX
+	prevZ = posZ
+
+	if not (doubleClickTime and doubleClickDist) then
 		return
 	end
 

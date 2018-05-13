@@ -12,13 +12,16 @@ unitDef = {
   canPatrol              = true,
   category               = [[LAND]],
   corpse                 = [[DEAD]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeType    = [[ellipsoid]],
 
   customParams           = {
   },
 
   explodeAs              = [[BIG_UNITEX]],
-  footprintX             = 2,
-  footprintZ             = 2,
+  footprintX             = 3,
+  footprintZ             = 3,
   iconType               = [[walkerriot]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -28,7 +31,7 @@ unitDef = {
   maxVelocity            = 1.9,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
-  movementClass          = [[KBOT2]],
+  movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[behethud.s3o]],
   onoffable              = true,

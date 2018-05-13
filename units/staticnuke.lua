@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[staticnuke]],
-  name                          = [[Silencer]],
+  name                          = [[Trinity]],
   description                   = [[Strategic Nuclear Launcher, Drains 18 m/s, 3 minute stockpile]],
   acceleration                  = 0,
   brakeRate                     = 0,
@@ -74,7 +74,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.3,
-      explosionGenerator      = [[custom:LONDON]],
+      explosionGenerator      = [[custom:LONDON_FLAT]],
       fireStarter             = 0,
       flightTime              = 180,
       impulseBoost            = 0.5,

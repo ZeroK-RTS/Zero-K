@@ -12,6 +12,8 @@ function widget:GetInfo()
   }
 end
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 options_path = 'Settings/Unit Behaviour/Replace Cloak Con Orders'
 options = { 
 	reclaim = {name='Replace Reclaim', type='bool', value=true},
@@ -54,7 +56,7 @@ function widget:CommandNotify(id, params, cmdOptions)
 			if x and y then
 				for i = 1, #selUnits do
 					local unitID = selUnits[i]
-					Spring.GiveOrderToUnit(unitID,CMD.MOVE,{x,y,z},cmdOptions)
+					Spring.GiveOrderToUnit(unitID,CMD_RAW_MOVE,{x,y,z},cmdOptions)
 				end
 			end
 		end

@@ -12,7 +12,7 @@ local weaponDef = {
 		burntime         = 450,
 		burnchance       = 1,
 		setunitsonfire   = [[1]],
-		
+
 		light_camera_height = 1600,
 		light_color = [[0.95 0.5 0.25]],
 		light_radius = 350,
@@ -20,10 +20,9 @@ local weaponDef = {
 
 	damage                  = {
 		default = 360,
-		planes  = 360,
 		subs    = 18,
 	},
-  
+
 	explosiongenerator      = [[custom:napalm_phoenix]],
 	fireStarter             = 180,
 	flightTime              = 3,

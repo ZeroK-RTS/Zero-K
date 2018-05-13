@@ -38,7 +38,6 @@ local unitAoeDefs = {}
 local unitDgunDefs = {}
 local unitHasBeenSetup = {} 
 
-local hasSelectionCallin = false
 local aoeUnitInfo
 local dgunUnitInfo
 local aoeUnitID
@@ -134,7 +133,12 @@ local function GetMouseTargetPosition()
 	elseif (mouseTargetType == "unit") then
 		return GetUnitPosition(mouseTarget)
 	elseif (mouseTargetType == "feature") then
-		return GetFeaturePosition(mouseTarget)
+		local _, coords = TraceScreenRay(mx, my, true, true)
+		if coords and coords[3] then
+			return coords[1], coords[2], coords[3]
+		else
+			return GetFeaturePosition(mouseTarget)
+		end
 	else
 		return nil
 	end
@@ -189,7 +193,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 	local weaponType = weaponDef.type
 	local scatter = weaponDef.accuracy + weaponDef.sprayAngle
 	local aoe = weaponDef.damageAreaOfEffect
-	local cost = unitDef.cost
+	local cost = unitDef.metalCost
 	local mobile = unitDef.speed > 0
 	local waterWeapon = weaponDef.waterWeapon
 	local ee = weaponDef.edgeEffectiveness
@@ -291,6 +295,9 @@ local function SetupUnit(unitDef, unitID)
 						if weaponDef.customParams.truerange then
 							retDgunInfo.range = tonumber(weaponDef.customParams.truerange)
 						end
+						if weaponDef.customParams.gui_draw_range then
+							retDgunInfo.range = tonumber(weaponDef.customParams.gui_draw_range)
+						end
 						if rangeMult then
 							retDgunInfo.range = retDgunInfo.range * rangeMult
 						end
@@ -307,6 +314,9 @@ local function SetupUnit(unitDef, unitID)
 
 	if (maxWeaponDef) then 
 		retAoeInfo = getWeaponInfo(maxWeaponDef, unitDef)
+		if maxWeaponDef.customParams.gui_draw_range then
+			retAoeInfo.range = tonumber(maxWeaponDef.customParams.gui_draw_range)
+		end
 		if retAoeInfo.range and rangeMult then
 			retAoeInfo.range = retAoeInfo.range * rangeMult
 		end
@@ -356,7 +366,7 @@ local function UpdateSelection()
 			end
 
 			if (aoeDefInfo[unitDefID]) then
-				local currCost = UnitDefs[unitDefID].cost * #unitIDs
+				local currCost = UnitDefs[unitDefID].metalCost * #unitIDs
 				if (currCost > maxCost) then
 					maxCost = currCost
 					aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
@@ -693,10 +703,6 @@ function widget:Shutdown()
 end
 
 function widget:DrawWorld()
-	if (not hasSelectionCallin) then
-		UpdateSelection()
-	end
-
 	mouseDistance = GetMouseDistance() or 1000
 
 	local tx, ty, tz = GetMouseTargetPosition()
@@ -795,7 +801,6 @@ function widget:UnitDestroyed(unitID)
 end
 
 function widget:SelectionChanged(sel)
-	hasSelectionCallin = true
 	UpdateSelection()
 end
 

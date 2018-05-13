@@ -5,6 +5,7 @@
 	"team_energy_economy" : "Team Energy Economy",
 	"resbar_base_extraction" : "Base extraction",
 	"resbar_overdrive" : "Overdrive",
+	"resbar_overdrive_efficiency" : "Overdrive Efficiency",
 	"resbar_reclaim" : "Reclaim",
 	"resbar_cons" : "Constructors",
 	"resbar_sharing" : "Sharing",

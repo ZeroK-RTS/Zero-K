@@ -11,6 +11,9 @@ function widget:GetInfo()
 		layer     = 0,
 		enabled   = true,
 		handler   = true,
+
+		api         = true,
+		alwaysStart = true,
 	}
 end
 
@@ -63,10 +66,12 @@ function externalFunctions.SetMouseIcon(newUnitDefID, newSize, newCount, bX, bY,
 	count = newCount
 	badX, badY, badRight, badBottom = bX, bY, bX + bWidth, bY + bHeight
 	badY, badBottom = screenHeight - badBottom, screenHeight - badY
+	widgetHandler:UpdateWidgetCallIn("DrawScreen", widget)
 end
 
 function externalFunctions.ClearMouseIcon()
 	unitDefID = nil
+	widgetHandler:RemoveWidgetCallIn("DrawScreen", widget)
 end
 
 --------------------------------------------------------------------------------
@@ -84,4 +89,5 @@ end
 function widget:Initialize()
 	screenHeight = select(2, Spring.GetWindowGeometry())
 	WG.DrawMouseBuild = externalFunctions
+	widgetHandler:RemoveWidgetCallIn("DrawScreen", widget)
 end

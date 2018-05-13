@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[planescout]],
-  name                = [[Vulture]],
+  name                = [[Owl]],
   description         = [[Area Jammer, Radar/Sonar Plane]],
   brakerate           = 0.4,
   buildCostMetal      = 340,

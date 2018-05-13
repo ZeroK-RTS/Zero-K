@@ -367,6 +367,8 @@ local function RestoreAfterDelay()
 	SetSignalMask(SIG_RESTORE)
 	Sleep(5000)
 	Turn(torso, y_axis, 0, math.rad(65))
+	Turn(lshoulder, x_axis, 0, math.rad(45))
+	Turn(rshoulder, x_axis, 0, math.rad(45))
 end
 
 function script.AimFromWeapon()

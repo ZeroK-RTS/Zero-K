@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[staticrearm]],
-  name                = [[Air Repair/Rearm Pad]],
+  name                = [[Airpad]],
   description         = [[Repairs and Rearms Aircraft, repairs at 2.5 e/s per pad]],
   acceleration        = 0,
   activateWhenBuilt   = true,
@@ -22,6 +22,7 @@ unitDef = {
     pad_count = 4,
 	nobuildpower   = 1,
 	notreallyafactory = 1,
+	selection_rank  = [[1]],
   },
 
   explodeAs           = [[LARGE_BUILDINGEX]],

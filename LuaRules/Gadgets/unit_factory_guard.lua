@@ -96,7 +96,7 @@ local function GuardFactory(unitID, unitDefID, factID, factDefID)
   
 	-- the unit will move itself if it can fly
 	if ud.canFly then
-		spGiveOrderToUnit(unitID, CMD_GUARD, { factID }, { "" })
+		spGiveOrderToUnit(unitID, CMD_GUARD, { factID }, 0)
 		return
 	end
 
@@ -154,11 +154,11 @@ local function GuardFactory(unitID, unitDefID, factID, factDefID)
 		rx, rz =  0,  dist
 	end
 	
-	GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + dx, y, z + dz }, { "" })
-	if not GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + rx, y, z + rz }, { "shift" }, true) then
-		GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x - rx, y, z - rz }, { "shift" })
+	GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + dx, y, z + dz }, 0)
+	if not GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + rx, y, z + rz }, CMD.OPT_SHIFT, true) then
+		GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x - rx, y, z - rz }, CMD.OPT_SHIFT)
 	end
-	spGiveOrderToUnit(unitID, CMD_GUARD, { factID },            { "shift" })
+	spGiveOrderToUnit(unitID, CMD_GUARD, { factID }, CMD.OPT_SHIFT)
 end
 
 --------------------

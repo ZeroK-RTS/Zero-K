@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[spidercrabe]],
-  name                   = [[Crabe]],
+  name                   = [[Crab]],
   description            = [[Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary]],
   acceleration           = 0.22,
   brakeRate              = 0.18,
@@ -65,7 +65,8 @@ unitDef = {
 
     {
       def                = [[ARM_CRABE_GAUSS]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+      badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
   },

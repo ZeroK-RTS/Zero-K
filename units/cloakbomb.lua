@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakbomb]],
-  name                   = [[Tick]],
+  name                   = [[Imp]],
   description            = [[All Terrain EMP Bomb (Burrows)]],
   acceleration           = 0.25,
   brakeRate              = 0.6,
@@ -11,20 +11,21 @@ unitDef = {
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[16 16 16]],
-  collisionVolumeType	 = [[ellipsoid]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-
-    modelradius    = [[7]],
+    midposoffset   = [[0 0 -2]],
+    modelradius    = [[8]],
     instantselfd   = [[1]],
     idle_cloak = 1,
+    selection_scale = 1, -- Maybe change later
   },
 
   explodeAs              = [[cloakbomb_DEATH]],
   fireState              = 0,
-  footprintX             = 1,
-  footprintZ             = 1,
+  footprintX             = 2,
+  footprintZ             = 2,
   iconType               = [[spiderbomb]],
   kamikaze               = true,
   kamikazeDistance       = 80,
@@ -34,7 +35,7 @@ unitDef = {
   maxSlope               = 72,
   maxVelocity            = 4.2,
   minCloakDistance       = 75,
-  movementClass          = [[TKBOT1]],
+  movementClass          = [[TKBOT2]],
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[ARMTICK]],
   pushResistant          = 0,
@@ -55,7 +56,7 @@ unitDef = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShortLarge]],
-  trackWidth             = 14,
+  trackWidth             = 20,
   turnRate               = 3000,
   
   featureDefs            = {
@@ -63,8 +64,8 @@ unitDef = {
     DEAD  = {
       blocking         = false,
       featureDead      = [[HEAP]],
-      footprintX       = 1,
-      footprintZ       = 1,
+      footprintX       = 2,
+      footprintZ       = 2,
       object           = [[wreck2x2b.s3o]],
     },
 

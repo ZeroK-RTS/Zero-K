@@ -15,6 +15,7 @@ local SIG_TAKEOFF = 1
 local takeoffHeight = UnitDefNames["bomberdisarm"].wantedHeight
 
 function script.Create()
+	SetInitialBomberSettings()
 	Hide(preDrop)
 	Hide(drop)
 	
@@ -48,9 +49,10 @@ function script.FireWeapon(checkHeight)
 	if doingRun then
 		return
 	end
-	if Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
+	if RearmBlockShot() then
 		return
 	end
+	SetUnarmedAI()
 	
 	doingRun = true
 	

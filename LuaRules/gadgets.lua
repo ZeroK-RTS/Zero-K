@@ -55,11 +55,6 @@ pairs = function(...)
 	end
 end
 
-local SAFEWRAP = 0
--- 0: disabled
--- 1: enabled, but can be overriden by gadget.GetInfo().unsafe
--- 2: always enabled
-
 
 local HANDLER_DIR = 'LuaGadgets/'
 local GADGETS_DIR = Script.GetName():gsub('US$', '') .. '/Gadgets/'
@@ -79,16 +74,6 @@ VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
 
 local reverseCompatAllowStartPosition = not Spring.Utilities.IsCurrentVersionNewerThan(103, 629)
---------------------------------------------------------------------------------
-
-function pgl() -- (print gadget list)  FIXME: move this into a gadget
-  for k,v in ipairs(gadgetHandler.gadgets) do
-    Spring.Echo(
-      string.format("%3i  %3i  %s", k, v.ghInfo.layer, v.ghInfo.name)
-    )
-  end
-end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -197,6 +182,9 @@ local callInLists = {
 	"AllowUnitCreation",
 	"AllowUnitTransfer",
 	"AllowUnitBuildStep",
+	"AllowUnitTransport",
+	"AllowUnitCloak",
+	"AllowUnitDecloak",
 	"AllowFeatureBuildStep",
 	"AllowFeatureCreation",
 	"AllowResourceLevel",
@@ -278,24 +266,6 @@ local function IsSyncedCode()
   return isSyncedCode
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
---  Reverse integer iterator for drawing
---
-
-local function rev_iter(t, key)
-  if (key <= 1) then
-    return nil
-  else
-    local nkey = key - 1
-    return nkey, t[nkey]
-  end
-end
-
-local function ripairs(t)
-  return rev_iter, t, (1 + #t)
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -379,7 +349,8 @@ function gadgetHandler:LoadGadget(filename)
   local gadget = gadgetHandler:NewGadget()
 
   setfenv(chunk, gadget)
-  local success, err = pcall(chunk)
+  local success
+  success, err = pcall(chunk)
   if (not success) then
     Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (' .. err .. ')')
     return nil
@@ -454,7 +425,6 @@ function gadgetHandler:NewGadget()
   -- wrapped calls (closures)
   gadget.gadgetHandler = {}
   local gh = gadget.gadgetHandler
-  local self = self
 
   gh.gadgetHandler = self	-- NOT IN BASE (required for api_subdir_gadgets)
 
@@ -560,51 +530,6 @@ end
 
 
 --------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local function SafeWrap(func, funcName)
-  local gh = gadgetHandler
-  return function(g, ...)
-    local r = { pcall(func, g, ...) }
-    if (r[1]) then
-      table.remove(r, 1)
-      return unpack(r)
-    else
-      if (funcName ~= 'Shutdown') then
-        gadgetHandler:RemoveGadget(g)
-      else
-        Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Error in Shutdown')
-      end
-      local name = g.ghInfo.name
-      Spring.Echo(r[2])
-      Spring.Echo('Removed gadget: ' .. name)
-      return nil
-    end
-  end
-end
-
-
-local function SafeWrapGadget(gadget)
-  if (SAFEWRAP <= 0) then
-    return
-  elseif (SAFEWRAP == 1) then
-    if (gadget.GetInfo and gadget.GetInfo().unsafe) then
-      Spring.Echo('LuaUI: loaded unsafe gadget: ' .. gadget.ghInfo.name)
-      return
-    end
-  end
-
-  for _,ciName in ipairs(callInLists) do
-    if (gadget[ciName]) then
-      gadget[ciName] = SafeWrap(gadget[ciName], ciName)
-    end
-    if (gadget.Initialize) then
-      gadget.Initialize = SafeWrap(gadget.Initialize, 'Initialize')
-    end
-  end
-end
-
-
 --------------------------------------------------------------------------------
 
 local function ArrayInsert(t, f, g)
@@ -955,21 +880,18 @@ end
 
 
 function gadgetHandler:RegisterCMDID(gadget, id)
-  if not LOG_SECTION then
-    LOG_SECTION = "ERROR"
-  end
   if not id then
-    Spring.Log(LOG_SECTION, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
                'tried to register a NIL CMD_ID')
   else
     if (id < 1000) then
-      Spring.Log(LOG_SECTION, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
+      Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
                  'tried to register a reserved CMD_ID')
       Script.Kill('Reserved CMD_ID code: ' .. id)
     end
 
     if (self.CMDIDs[id] ~= nil) then
-      Spring.Log(LOG_SECTION, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
+      Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
                  'tried to register a duplicated CMD_ID')
       Script.Kill('Duplicate CMD_ID code: ' .. id)
     end
@@ -1275,6 +1197,43 @@ function gadgetHandler:AllowUnitBuildStep(builderID, builderTeam,
 end
 
 
+function gadgetHandler:AllowUnitTransport(
+  transporterID, transporterUnitDefID, transporterTeam,
+  transporteeID, transporteeUnitDefID, transporteeTeam
+)
+  for _,g in ipairs(self.AllowUnitTransportList) do
+    if (not g:AllowUnitTransport(transporterID, transporterUnitDefID, transporterTeam,
+                                 transporteeID, transporteeUnitDefID, transporteeTeam)) then
+      return false
+    end
+  end
+  return true
+end
+
+
+function gadgetHandler:AllowUnitCloak(unitID, enemyID)
+  -- The case can be that unitID == enemyID. This is for engine stunned unitID, they are their own enemies.
+  for _,g in ipairs(self.AllowUnitCloakList) do
+    if (not g:AllowUnitCloak(unitID, enemyID)) then
+      return false
+    end
+  end
+
+  return true
+end
+
+
+function gadgetHandler:AllowUnitDecloak(unitID, objectID, weaponID)
+  for _,g in ipairs(self.AllowUnitDecloakList) do
+    if (not g:AllowUnitDecloak(unitID, objectID, weaponID)) then
+      return false
+    end
+  end
+
+  return true
+end
+
+
 function gadgetHandler:AllowFeatureBuildStep(builderID, builderTeam,
                                              featureID, featureDefID, part)
   for _,g in ipairs(self.AllowFeatureBuildStepList) do
@@ -1542,7 +1501,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 		local g
 		for i = 1, gadgets.count do
 			g = data[i]
-			dam, imp = g:UnitPreDamaged(unitID, unitDefID, unitTeam,
+			local dam, imp = g:UnitPreDamaged(unitID, unitDefID, unitTeam,
 					  rDam, paralyzer, weaponDefID,
 					  attackerID, attackerDefID, attackerTeam,
 					  projectileID)
@@ -1788,11 +1747,11 @@ end
 --  Shield call-ins
 --
 
-function gadgetHandler:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile, beamEmitter, beamCarrierID)
+function gadgetHandler:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile, beamEmitterWeaponNum, beamEmitterUnitID, startX, startY, startZ, hitX, hitY, hitZ)
 
   for _,g in ipairs(self.ShieldPreDamagedList) do
     -- first gadget to handle this consumes the event
-    if (g:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile, beamEmitter, beamCarrierID)) then
+    if (g:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile, beamEmitterWeaponNum, beamEmitterUnitID, startX, startY, startZ, hitX, hitY, hitZ)) then
       return true
     end
   end
@@ -1875,11 +1834,11 @@ function gadgetHandler:Update()
 end
 
 
-function gadgetHandler:DefaultCommand(type, id)
+function gadgetHandler:DefaultCommand(type, id, engineCmd)
   for _,g in ipairs(self.DefaultCommandList) do
-    local id = g:DefaultCommand(type, id)
-    if (id) then
-      return id
+    local defCmd = g:DefaultCommand(type, id, engineCmd)
+    if defCmd then
+      return defCmd
     end
   end
   return

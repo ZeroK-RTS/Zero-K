@@ -30,6 +30,7 @@ local defaultCommands = {
 	[CMD_FIND_PAD] = true,
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_BUILD] = true,
 	[CMD_UNIT_SET_TARGET] = true,
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true,
 	-- [CMD.REMOVE] = true,
@@ -122,7 +123,7 @@ function RevertAllButOneAttackQueue(unitID,attackList)
 				toRemoveCount = toRemoveCount + 1
 			end
 		end
-		Spring.GiveOrderToUnit (unitID,CMD.REMOVE, queueToRemove,{})
+		Spring.GiveOrderToUnit (unitID,CMD.REMOVE, queueToRemove, 0)
 	end
 end
 

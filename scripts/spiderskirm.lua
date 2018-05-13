@@ -74,12 +74,12 @@ end
 local function RestoreLegs()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
-	restoreLegs(leg1, leg2, leg3, leg4, leg5, leg6,
-		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)			
+	restoreLegs(leg1, leg2, leg3, leg4, leg5, leg6, legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)			
 end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
+	Spring.SetUnitWeaponState(unitID, 1, "projectileSpeed", 10)
 end
 
 function script.StartMoving()
@@ -127,6 +127,15 @@ function script.Shot(num)
 	gun_1 = gun_1 + 1
 	if gun_1 > 3 then gun_1 = 1 end
 	StartThread(HideMissile, gun_1)
+end
+
+function script.BlockShot(num, targetID)
+	if Spring.ValidUnitID(targetID) then
+		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/570
+		-- Assume that at least one rocket will hit.
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 135.1, 75 * distMult, false, false, true)
+	end
+	return false
 end
 
 function script.Killed(recentDamage, maxHealth)

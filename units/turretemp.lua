@@ -2,7 +2,7 @@ unitDef = {
   unitname                      = [[turretemp]],
   name                          = [[Faraday]],
   description                   = [[EMP Turret]],
-  buildCostMetal                = 200,
+  buildCostMetal                = 250,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
@@ -27,7 +27,7 @@ unitDef = {
   footprintZ                    = 2,
   iconType                      = [[defensespecial]],
   levelGround                   = false,
-  maxDamage                     = 1000,
+  maxDamage                     = 2200,
   maxSlope                      = 36,
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
@@ -74,7 +74,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 1000,
+        default = 1200,
       },
 
       duration                = 8,
@@ -87,9 +87,9 @@ unitDef = {
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       paralyzer               = true,
-      paralyzeTime            = 2, -- was 2.5 but this can only be int
+      paralyzeTime            = 2,
       range                   = 460,
-      reloadtime              = 2.8,
+      reloadtime              = 2.6,
       rgbColor                = [[1 1 0.25]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,

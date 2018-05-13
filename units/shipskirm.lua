@@ -25,8 +25,8 @@ unitDef = {
 
   explodeAs              = [[SMALL_UNITEX]],
   floater                = true,
-  footprintX             = 2,
-  footprintZ             = 2,
+  footprintX             = 3,
+  footprintZ             = 3,
   iconType               = [[shipskirm]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -36,7 +36,6 @@ unitDef = {
   minCloakDistance       = 350,
   minWaterDepth          = 10,
   movementClass          = [[BOAT3]],
-  moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[shipskirm.s3o]],
@@ -85,9 +84,9 @@ unitDef = {
       },
 	  
       damage                  = {
-        default = 280,
-        planes  = 280,
-        subs    = 28,
+        default = 200,
+        planes  = 200,
+        subs    = 10,
       },
 
       fireStarter             = 70,

@@ -15,10 +15,11 @@ local weaponDef = {
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
 		flamethrower = [[1]],
 		setunitsonfire = "1",
+        burnchance = "0.4", -- Per-impact
 		burntime = [[450]],
-		
+
 		light_camera_height = 2800,
-        light_color = [[0.6 0.39 0.18]],
+		light_color = [[0.6 0.39 0.18]],
 		light_radius = 260,
 		light_fade_time = 10,
 		light_beam_mult_frames = 5,
@@ -26,8 +27,8 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 10,
-		subs    = 0.1,
+		default = 11,
+		subs    = 0.11,
 	},
 
 	explosionGenerator      = [[custom:SMOKE]],

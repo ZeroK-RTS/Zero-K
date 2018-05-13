@@ -13,6 +13,8 @@ local dontFireAtRadarUnits = {
 	[UnitDefNames["hoverarty"].id] = true,
 	[UnitDefNames["turretantiheavy"].id] = true,
 	[UnitDefNames["vehheavyarty"].id] = true,
+	[UnitDefNames["shieldfelon"].id] = false,
+	[UnitDefNames["jumpskirm"].id] = false,
 }
 
 local factoryDefs = { -- Standard factories

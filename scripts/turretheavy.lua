@@ -1,4 +1,5 @@
 include "constants.lua"
+include "QueryWeaponFixHax.lua"
 
 --pieces
 local base = piece "Base"
@@ -22,8 +23,8 @@ local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
 local smokePiece = { shell_1, shell_2, cannonbase, heatray }
 
+
 --variables
-local queryPiece = cannonAim
 local heat = false
 local on = false
 --signals
@@ -182,15 +183,10 @@ end
 function script.Create()
 	on = true
 	StartThread(SmokeUnit, smokePiece)
+	SetupQueryWeaponFixHax(cannonAim, flare1)
 end
 
 local aimFromSet = {cannonAim, heatraybase}
-
-local function AimingDone()
-	queryPiece = flare1
-	Sleep(500)
-	queryPiece = cannonAim
-end
 
 function script.AimFromWeapon(num)
 	return aimFromSet[num] 
@@ -230,7 +226,7 @@ end
 
 function script.QueryWeapon(num)
 	if num == 1 then
-		return queryPiece
+		return GetQueryPiece()
 	elseif num == 2 then
 		if heat then 
 			return flare2

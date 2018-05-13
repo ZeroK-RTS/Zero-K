@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[turretheavy]],
-  name                          = [[Doomsday Machine]],
-  description                   = [[Medium Range Defense Fortress - Requires 50 Power]],
+  name                          = [[Desolator]],
+  description                   = [[Medium Range Defense Fortress - Power by connecting to a 50 energy grid]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,

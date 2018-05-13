@@ -16,6 +16,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 -5]],
   collisionVolumeScales  = [[55 15 70]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[80 25 80]],
+  selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
   cruiseAlt           = 180,
 
@@ -33,7 +36,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maxAcc              = 0.5,
-  maxDamage           = 650,
+  maxDamage           = 720,
   maxAileron          = 0.018,
   maxElevator         = 0.02,
   maxRudder           = 0.008,
@@ -56,7 +59,7 @@ unitDef = {
 
   },
   sightDistance       = 660,
-  turnRadius          = 20,
+  turnRadius          = 200,
   workerTime          = 0,
 
   weapons             = {
@@ -85,6 +88,7 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams        	  = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
 	    setunitsonfire = "1",
 		burntime = 300,
 	  },

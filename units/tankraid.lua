@@ -4,13 +4,16 @@ unitDef = {
   description         = [[Raider Tank]],
   acceleration        = 0.125,
   brakeRate           = 0.1375,
-  buildCostMetal      = 180,
+  buildCostMetal      = 160,
   builder             = false,
   buildPic            = [[tankraid.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -23,7 +26,7 @@ unitDef = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[tankscout]],
-  idleAutoHeal        = 10,
+  idleAutoHeal        = 15,
   idleTime            = 150,
   leaveTracks         = true,
   maxDamage           = 750,
@@ -68,7 +71,7 @@ unitDef = {
 
     NAPALM_BOMBLET = {
       name                    = [[Flame Bomb]],
-      accuracy				  = 1000,
+      accuracy				  = 200,
       areaOfEffect            = 192,
       avoidFeature            = true,
       avoidFriendly           = true,
@@ -80,10 +83,11 @@ unitDef = {
 	  customParams        	  = {
 	    setunitsonfire = "1",
 		burnchance     = "1",
+		burntime       = 150,
 
 		area_damage = 1,
 		area_damage_radius = 96,
-		area_damage_dps = 20,
+		area_damage_dps = 25,
 		area_damage_duration = 13.3,
 		
 		light_color = [[1.6 0.8 0.32]],
@@ -91,9 +95,9 @@ unitDef = {
 	  },
 	  
       damage                  = {
-        default = 120,
-        planes  = 120,
-        subs    = 1,
+        default = 150,
+        planes  = 150,
+        subs    = 7.5,
       },
 
       explosionGenerator      = [[custom:napalm_koda]],
@@ -103,6 +107,7 @@ unitDef = {
       impulseFactor           = 0.2,
       interceptedByShieldType = 1,
       model                   = [[wep_b_fabby.s3o]],
+	  myGravity               = 1.5,
       noSelfDamage            = true,
       range                   = 225,
       reloadtime              = 6,
@@ -112,7 +117,7 @@ unitDef = {
       soundStartVolume        = 3,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 600,
+      weaponVelocity          = 700,
     },
 	
 	BOGUS_FAKE_NAPALM_BOMBLET = {

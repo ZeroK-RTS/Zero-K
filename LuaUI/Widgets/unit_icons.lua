@@ -94,6 +94,7 @@ local textureColors = {}
 local hideIcons = {}
 local pulseIcons = {}
 
+local updateTime, iconFade = 0, 0
 
 WG.icons = {}
 
@@ -276,7 +277,6 @@ local function DrawWorldFunc()
 	
 	local gameFrame = spGetGameFrame()
 	
-	local fade = min( abs((gameFrame % 60) - 20) / 20, 1 )
 	
 	gl.Color(1,1,1,1)
 	glDepthMask(true)
@@ -296,7 +296,7 @@ local function DrawWorldFunc()
 			if textureColor then
 				gl.Color( textureColor )
 			elseif pulseIcons[iconName] then
-				gl.Color( 1,1,1,fade )
+				gl.Color( 1,1,1,iconFade )
 			end
 			
 			local unitInView = spIsUnitInView(unitID)
@@ -333,6 +333,10 @@ function widget:DrawWorldRefraction()
 	DrawWorldFunc()
 end
 
+function widget:Update(dt)
+	updateTime = (updateTime + dt)%2
+	iconFade = min(abs(((updateTime*30) % 60) - 20) / 20, 1 )
+end
 
 -- drawscreen method
 -- the problem with this one is it draws at same size regardless of how far away the unit is

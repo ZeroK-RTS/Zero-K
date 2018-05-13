@@ -7,8 +7,6 @@ local unitArray = {}
 local weapons = {
 	bomberprec_bogus_bomb = true,
 	bomberprec_shield_check = true,
-	bomberdive_bogus_bomb = true,
-	bomberdive_shield_check = true,
 }
 
 -- bombers to track
@@ -16,20 +14,14 @@ local units = {
 	bomberprec = {
 		diveDamage = 600,
 		diveHeight = 25,
-		diveRate = 1.55,
+		diveDistanceMult = 1.7,
 		altPerFlightFrame = 6.25,
+		sizeSafetyFactor = 0.95,
 		orgHeight = UnitDefNames["bomberprec"].wantedHeight*FUDGE_FACTOR,
-	},
-	bomberdive = {
-		diveDamage = 600,
-		diveHeight = 25,
-		diveRate = 1.55,
-		altPerFlightFrame = 6.25,
-		orgHeight = UnitDefNames["bomberdive"].wantedHeight*FUDGE_FACTOR,
 	},
 }
 
-for i=1,#WeaponDefs do
+for i = 1, #WeaponDefs do
 	for weapon, data in pairs(weapons) do
 		if WeaponDefs[i].name == weapon then 
 			weaponArray[i] = data 
@@ -37,7 +29,7 @@ for i=1,#WeaponDefs do
 	end
 end
 
-for i=1,#UnitDefs do
+for i = 1, #UnitDefs do
 	for unit, data in pairs(units) do
 		if UnitDefs[i].name == unit then 
 			unitArray[i] = data 

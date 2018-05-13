@@ -102,6 +102,10 @@ end
 local function doTheCommand(unitID, unitDefID, num)
 	local data = defs[unitDefID] and defs[unitDefID][num]
 	if (data) then
+		if data.dummy then
+			return true
+		end
+		
 		local currentReload = (data.weaponToReload and Spring.GetUnitWeaponState(unitID, data.weaponToReload, "reloadState")) or
 			(data.useSpecialReloadFrame and Spring.GetUnitRulesParam(unitID, "specialReloadFrame"))
 		local frame = Spring.GetGameFrame()
@@ -135,30 +139,52 @@ end
 -- process command
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_ONECLICK_WEAPON then
-		return true, doTheCommand(unitID, unitDefID, cmdParams[1] or 1)	
+		return true, doTheCommand(unitID, unitDefID, cmdParams[1] or 1)
 	end
 	return false -- command not used
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_ONECLICK_WEAPON] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
-function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_ONECLICK_WEAPON and not cmdOptions.shift then
+		if defs[unitDefID] and defs[unitDefID].dummy then
+			return true
+		end
+		
 		local cmd = Spring.GetCommandQueue(unitID, 1)
 		if cmd and cmd[1] and cmd[1].id and cmd[1].id == CMD_ONECLICK_WEAPON then
-			Spring.GiveOrderToUnit(unitID,CMD.REMOVE,{cmd[1].tag},{})
+			Spring.GiveOrderToUnit(unitID,CMD.REMOVE,{cmd[1].tag}, 0)
 			return false
 		end
-		Spring.GiveOrderToUnit(unitID,CMD.INSERT,{0,CMD_ONECLICK_WEAPON,cmdParams[1] or 1},{"alt"})
+		Spring.GiveOrderToUnit(unitID,CMD.INSERT,{0,CMD_ONECLICK_WEAPON,cmdParams[1] or 1}, CMD.OPT_ALT)
 		return false
 	end
 	return true
+end
+
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		return
+	end
+	
+	local offset = GG.SaveLoad.GetSavedGameFrame()
+	local units = Spring.GetAllUnits()
+	for i=1,#units do
+		local unitID = units[i]
+		local specialReload = Spring.GetUnitRulesParam(unitID, "specialReloadFrame")
+		if specialReload then
+			local specialReloadStart = Spring.GetUnitRulesParam(unitID, "specialReloadStart") or specialReload
+			Spring.SetUnitRulesParam(unitID, "specialReloadStart", specialReloadStart - offset, LOS_ACCESS)
+			Spring.SetUnitRulesParam(unitID, "specialReloadFrame", specialReload - offset, LOS_ACCESS)
+		end
+	end
 end
 
 else

@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[staticarty]],
-  name                          = [[Behemoth]],
-  description                   = [[Plasma Artillery Battery - Requires 50 Power]],
+  name                          = [[Cerberus]],
+  description                   = [[Plasma Artillery Battery - Requires connection to a 50 energy grid]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,

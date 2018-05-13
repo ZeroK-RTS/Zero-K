@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[staticantinuke]],
-  name                          = [[Protector]],
+  name                          = [[Antinuke]],
   description                   = [[Strategic Nuke Interception System]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
@@ -60,13 +60,18 @@ unitDef = {
     AMD_ROCKET = {
       name                    = [[Anti-Nuke Missile Fake]],
       areaOfEffect            = 420,
+      avoidFriendly           = false,
+      avoidGround             = false,
+      avoidFeature           = false,
       collideFriendly         = false,
       collideGround           = false,
+      collideFeature          = false,
       coverage                = 100000,
       craterBoost             = 1,
       craterMult              = 2,
 	  
 	  customParams            = {
+        reaim_time = 15,
         nuke_coverage = 2500,
 	  },
 	  

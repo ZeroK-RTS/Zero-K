@@ -124,7 +124,7 @@ local function Walk()
 end
 
 local function WalkLegs()
-	while true do	
+	while true do
 		Move( lrupleg , y_axis, 1.1  )
 		Move( lrupleg , y_axis, 0.7 , 2 )
 		Move( rfupleg , y_axis, 0.75  )
@@ -242,7 +242,7 @@ local function WalkControl()
 		else
 			Walk()
 		end
-		Sleep(100)	
+		Sleep(100)
 	end
 end
 
@@ -253,12 +253,44 @@ local function Burrow()
 	burrowed = true
 	EmitSfx(digger, dirtfling)
 	burrowed = true
-	Move( body , y_axis, -7.5, 7.5 )
-	Turn( body , x_axis, math.rad(-20), math.rad(20) )
-	if burrowed then
-		GG.SetWantedCloaked(unitID, 1)
-		--Spring.SetUnitStealth(true)
+	
+	Turn( rrleg   , x_axis, 0, 1 )
+	Turn( rrupleg , x_axis, 0, 2 )
+	Move( rrupleg , y_axis, 0, 2 )
+	
+	Turn( rfleg   , x_axis, 0, 1 )
+	Turn( rfupleg , x_axis, 0, 2 )
+	Move( rfupleg , y_axis, 0, 2 )
+	
+	Turn( lrleg   , x_axis, 0, 1 )
+	Turn( lrupleg , x_axis, 0, 2 )
+	Move( lrupleg , y_axis, 0, 2 )
+	
+	Turn( lfleg   , x_axis, 0, 1 )
+	Turn( lfupleg , x_axis, 0, 2 )
+	Move( lfupleg , y_axis, 0, 2 )
+	
+	Turn( head , x_axis, 0, math.rad(52) )
+	Move(body, y_axis, 0, 9)
+	Turn(body, x_axis, 0, 9)
+	
+	GG.SetWantedCloaked(unitID, 1)
+	local down = false
+	while true do
+		local cloaked = Spring.GetUnitIsCloaked(unitID)
+		if down ~= cloaked then
+			if cloaked then
+				Move( body , y_axis, -7.5, 7.5 )
+				Turn( body , x_axis, math.rad(-20), math.rad(20) )
+			else
+				Move(body, y_axis, 0, 9)
+				Turn(body, x_axis, 0, 9)
+			end
+			down = cloaked
+		end
+		Sleep(500)
 	end
+	StartThread(BodyControl)
 end
 
 local function UnBurrow()
@@ -267,8 +299,8 @@ local function UnBurrow()
 	burrowed = false
 	GG.SetWantedCloaked(unitID, 0)
 	--Spring.SetUnitStealth(false)
-	Move(body, y_axis, 0, 7.5)
-	Turn(body, x_axis, 0, 7.5)
+	Move(body, y_axis, 0, 9)
+	Turn(body, x_axis, 0, 9)
 
 	--[[
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.2)
@@ -301,6 +333,9 @@ end
 function script.Create()
 	StartThread(SmokeUnit, {body})
 	StartThread(StartStopMovingControl, script.StartMoving, script.StopMoving, nil, true)
+	if not Spring.GetUnitIsStunned(unitID) then
+		Burrow()
+	end
 end
 
 local function RestoreAfterDelay()

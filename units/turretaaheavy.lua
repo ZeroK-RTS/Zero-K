@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[turretaaheavy]],
-  name                          = [[Screamer]],
+  name                          = [[Artemis]],
   description                   = [[Very Long-Range Anti-Air Missile Tower]],
   acceleration                  = 0,
   activateWhenBuilt             = true,

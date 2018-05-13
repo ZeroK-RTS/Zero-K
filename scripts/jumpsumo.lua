@@ -429,6 +429,13 @@ end
 local normal = {0, 1/math.sqrt(2), 1/math.sqrt(2)}
 local radial = {1,0,0} 
 
+local function RestoreAfterDelay(num)
+	SetSignalMask(SIG_Aim[num])
+	Sleep (5000)
+	Turn(weaponPieces[num].turret, y_axis, 0, 4)
+	Turn(weaponPieces[num].sleeve, x_axis, 0, 2)
+end
+
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Aim[num])
 	SetSignalMask(SIG_Aim[num])
@@ -448,6 +455,7 @@ function script.AimWeapon(num, heading, pitch)
 		
 		WaitForTurn(weaponPieces[num].turret, y_axis)
 		WaitForTurn(weaponPieces[num].sleeve, x_axis)
+		StartThread(RestoreAfterDelay, num)
 	end
 	return true
 end

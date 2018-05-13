@@ -126,6 +126,8 @@ local leftTweak, enteredTweak = false, false
 local lmx,lmy=-1,-1
 local showAllPlayers
 
+local EMPTY_TABLE = {}
+
 -------------------------------------------------------------------------------
 -- SOUNDS
 -------------------------------------------------------------------------------
@@ -453,7 +455,7 @@ local function BuildRowButtonFunc(num, cmdid, left, right,addInput,insertMode,cu
 	--Spring.Echo(cmdid)
 	if not right then
 		for i = 1, numInput do
-			Spring.GiveOrderToUnit(targetFactory, CMD.INSERT, {pos, cmdid, 0 }, {"alt", "ctrl"})
+			Spring.GiveOrderToUnit(targetFactory, CMD.INSERT, {pos, cmdid, 0 }, CMD.OPT_ALT + CMD.OPT_CTRL)
 		end
 	else
 		-- delete from back so that the order is not canceled while under construction
@@ -464,7 +466,7 @@ local function BuildRowButtonFunc(num, cmdid, left, right,addInput,insertMode,cu
 		i = i - 1
 		j = 0
 		while commands[i+pos] and commands[i+pos].id == cmdid and j < numInput do
-			Spring.GiveOrderToUnit(targetFactory, CMD.REMOVE, {commands[i+pos].tag}, {"ctrl"})
+			Spring.GiveOrderToUnit(targetFactory, CMD.REMOVE, {commands[i+pos].tag}, CMD.OPT_CTRL)
 			alreadyRemovedTag[commands[i+pos].tag] = true
 			j = j + 1
 			i = i - 1
@@ -497,20 +499,18 @@ local function MakeButton(unitDefID, facID, buttonId, facIndex, bqPos)
 				local rb = button == 3
 				local lb = button == 1
 				if not (lb or rb) then return end
-				
-				local opt = {}
-				if alt   then push(opt,"alt")   end
-				if ctrl  then push(opt,"ctrl")  end
-				if meta  then push(opt,"meta")  end
-				if shift then push(opt,"shift") end
-				
-				if rb then
-					push(opt,"right")
-				end
+
+				local opt = 0
+				if alt   then opt = opt + CMD.OPT_ALT   end
+				if ctrl  then opt = opt + CMD.OPT_CTRL  end
+				if meta  then opt = opt + CMD.OPT_META  end
+				if shift then opt = opt + CMD.OPT_SHIFT end
+				if rb    then opt = opt + CMD.OPT_RIGHT end
+
 				if bqPos and not alt then
 					BuildRowButtonFunc(bqPos, cmdid, lb, rb, nil, nil, facID)
 				else
-					Spring.GiveOrderToUnit(facID, cmdid, {}, opt)
+					Spring.GiveOrderToUnit(facID, cmdid, EMPTY_TABLE, opt)
 				end
 				
 				if rb then
@@ -712,18 +712,18 @@ end
 local function WaypointHandler(x,y,button)
   if (button==1)or(button>3) then
     Spring.Echo("FactoryPanel: Exited Quick Rallypoint mode")
-    Spring.PlaySoundFile(sound_waypoint, 1)
+    Spring.PlaySoundFile(sound_waypoint, 1, 'ui')
     waypointFac  = -1
     waypointMode = 0
     return
   end
 
   local alt, ctrl, meta, shift = Spring.GetModKeyState()
-  local opt = {"right"}
-  if alt   then push(opt,"alt")   end
-  if ctrl  then push(opt,"ctrl")  end
-  if meta  then push(opt,"meta")  end
-  if shift then push(opt,"shift") end
+  local opt = CMD.OPT_RIGHT
+  if alt   then opt = opt + CMD.OPT_ALT   end
+  if ctrl  then opt = opt + CMD.OPT_CTRL  end
+  if meta  then opt = opt + CMD.OPT_META  end
+  if shift then opt = opt + CMD.OPT_SHIFT end
 
   local type,param = Spring.TraceScreenRay(x,y)
   if type=='ground' then
@@ -752,7 +752,7 @@ local function MakeClearButton(unitID, i)
 			function(_,_,_,button)
 				local buildQueue = Spring.GetFactoryCommands (unitID)               
 				for _, buildCommand in ipairs( buildQueue) do
-					Spring.GiveOrderToUnit( unitID, CMD.REMOVE, { buildCommand.tag } , {"ctrl"} )
+					Spring.GiveOrderToUnit( unitID, CMD.REMOVE, { buildCommand.tag } , CMD.OPT_CTRL )
 				end
 				Spring.PlaySoundFile(sound_queue_clear, 0.97, 'ui')
 			end
@@ -1060,7 +1060,7 @@ function widget:MousePress(x, y, button)
 	end
 	if waypointMode>1 then
 		Spring.Echo("FactoryPanel: Exited Quick Rallypoint mode")
-		Spring.PlaySoundFile(sound_waypoint, 1)
+		Spring.PlaySoundFile(sound_waypoint, 1, 'ui')
 	end
 	waypointFac  = -1
 	waypointMode = 0

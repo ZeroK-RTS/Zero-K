@@ -49,9 +49,9 @@ local emptyTable = {} -- for speedups
 --
 -- Thus other gadgets can know which morphing commands are available
 -- Then they can simply issue:
---	Spring.GiveOrderToUnit(u,genericMorphCmdID,{},{})
--- or Spring.GiveOrderToUnit(u,genericMorphCmdID,{targetUnitDefId},{})
--- or Spring.GiveOrderToUnit(u,specificMorphCmdID,{},{})
+--	Spring.GiveOrderToUnit(u,genericMorphCmdID,{}, 0)
+-- or Spring.GiveOrderToUnit(u,genericMorphCmdID,{targetUnitDefId}, 0)
+-- or Spring.GiveOrderToUnit(u,specificMorphCmdID,{}, 0)
 --
 -- where:
 -- genericMorphCmdID is the same unique value, no matter what is the source unit or target unit
@@ -61,11 +61,11 @@ local emptyTable = {} -- for speedups
 --[[ Sample codes that could be used in other gadgets:
 
 	-- Morph unit u
-	Spring.GiveOrderToUnit(u,31210,{},{})
+	Spring.GiveOrderToUnit(u,31210,{}, 0)
 
 	-- Morph unit u into a supertank:
 	local otherDefId=UnitDefNames["supertank"].id
-	Spring.GiveOrderToUnit(u,31210,{otherDefId},{})
+	Spring.GiveOrderToUnit(u,31210,{otherDefId}, 0)
 
 	-- In place of writing 31210 you could use a morphCmdID that you'd read with:
 	local morphCmdID=(GG.MorphInfo or {})["CMD_MORPH_BASE_ID"]
@@ -174,8 +174,7 @@ local function GetMorphToolTip(unitID, unitDefID, teamID, morphDef)
 end
 
 local function AddMorphCmdDesc(unitID, unitDefID, teamID, morphDef, teamTech)
-	
-	if GG.Unlocks and not GG.Unlocks.GetIsUnitUnlocked(teamID, morphDef) then
+	if GG.Unlocks and not GG.Unlocks.GetIsUnitUnlocked(teamID, morphDef.into) then
 		return
 	end
 	
@@ -205,25 +204,36 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- This function is terrible. The data structure of commands does not lend itself to a fundamentally nicer system though.
+
+local unitTargetCommand = {
+	[CMD.GUARD] = true,
+	[CMD_ORBIT] = true,
+}
+
+local singleParamUnitTargetCommand = {
+	[CMD.REPAIR] = true,
+	[CMD.ATTACK] = true,
+}
 
 local function ReAssignAssists(newUnit,oldUnit)
-	local ally = Spring.GetUnitAllyTeam(newUnit)
-	local alliedTeams = Spring.GetTeamList(ally)
-	for n = 1, #alliedTeams do
-		local teamID = alliedTeams[n]
-		local alliedUnits = Spring.GetTeamUnits(teamID)
-		for i = 1, #alliedUnits do
-			local unitID = alliedUnits[i]
-			local cmds = Spring.GetCommandQueue(unitID, -1)
-			for j=1, #cmds do
-				local cmd = cmds[j]
-				local params = cmd.params
-				if (cmd.id == CMD.GUARD or cmd.id == CMD_ORBIT or (cmd.id == CMD.REPAIR and #params == 1 --[[not area repair]])) and (params[1] == oldUnit) then
-					params[1] = newUnit
-					local opts = (cmd.options.meta and 4 or 0) + (cmd.options.ctrl and 64 or 0) + (cmd.options.alt and 128 or 0)
-					Spring.GiveOrderToUnit(unitID,CMD.INSERT,{cmd.tag, cmd.id, opts, params[1], params[2], params[3]},{})
-					Spring.GiveOrderToUnit(unitID,CMD.REMOVE,{cmd.tag},{})
-				end
+	local allUnits = Spring.GetAllUnits(newUnit)
+	for i = 1, #allUnits do
+		local unitID = allUnits[i]
+		
+		if GG.GetUnitTarget(unitID) == oldUnit then
+			GG.SetUnitTarget(unitID, newUnit)
+		end
+		
+		local cmds = Spring.GetCommandQueue(unitID, -1)
+		for j = 1, #cmds do
+			local cmd = cmds[j]
+			local params = cmd.params
+			if (unitTargetCommand[cmd.id] or (singleParamUnitTargetCommand[cmd.id] and #params == 1)) and (params[1] == oldUnit) then
+				params[1] = newUnit
+				local opts = (cmd.options.meta and CMD.OPT_META or 0) + (cmd.options.ctrl and CMD.OPT_CTRL or 0) + (cmd.options.alt and CMD.OPT_ALT or 0)
+				Spring.GiveOrderToUnit(unitID, CMD.INSERT, {cmd.tag, cmd.id, opts, params[1], params[2], params[3]}, 0)
+				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, 0)
 			end
 		end
 	end
@@ -306,7 +316,6 @@ local function StopMorph(unitID, morphData)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 
 	Spring.SetUnitResourcing(unitID,"e", UnitDefs[unitDefID].energyMake)
-	Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { 1 }, { "alt" })
 	local usedMetal	= morphData.def.metal	* scale
 	Spring.AddUnitResource(unitID, 'metal',	usedMetal)
 	--local usedEnergy = morphData.def.energy * scale
@@ -514,15 +523,15 @@ local function FinishMorph(unitID, morphData)
 	
 	--//transfer some state
 	Spring.GiveOrderArrayToUnitArray({ newUnit }, {
-	{CMD.FIRE_STATE, { states.firestate }, emptyTable },
-	{CMD.MOVE_STATE, { states.movestate }, emptyTable },
-	{CMD.REPEAT,	 { states["repeat"] and 1 or 0 }, emptyTable },
-	{CMD_WANT_CLOAK, { wantCloakState or 0 }, emptyTable },
-	{CMD.ONOFF,		{ 1 }, emptyTable},
-	{CMD.TRAJECTORY, { states.trajectory and 1 or 0 }, emptyTable },
-	{CMD_PRIORITY, { states.buildPrio }, emptyTable },
-	{CMD_RETREAT, { states.retreat }, states.retreat == 0 and {"right"} or emptyTable },
-	{CMD_MISC_PRIORITY, { states.miscPrio }, emptyTable },
+	{CMD.FIRE_STATE,    { states.firestate             }, 0 },
+	{CMD.MOVE_STATE,    { states.movestate             }, 0 },
+	{CMD.REPEAT,        { states["repeat"] and 1 or 0  }, 0 },
+	{CMD_WANT_CLOAK,    { wantCloakState or 0          }, 0 },
+	{CMD.ONOFF,         { 1                            }, 0 },
+	{CMD.TRAJECTORY,    { states.trajectory and 1 or 0 }, 0 },
+	{CMD_PRIORITY,      { states.buildPrio             }, 0 },
+	{CMD_RETREAT,       { states.retreat               }, states.retreat == 0 and CMD.OPT_RIGHT or 0 },
+	{CMD_MISC_PRIORITY, { states.miscPrio              }, 0 },
 	})
 	
 	--//reassign assist commands to new unit
@@ -531,23 +540,24 @@ local function FinishMorph(unitID, morphData)
 	--//transfer command queue
 	for i = 1, #cmds do
 		local cmd = cmds[i]
-		if i == 1 and cmd.id < 0 then -- repair case for construction
-			local units = Spring.GetUnitsInRectangle(cmd.params[1]-32, cmd.params[3]-32, cmd.params[1]+32, cmd.params[3]+32)
+		local coded = cmd.options.coded + (cmd.options.shift and 0 or CMD.OPT_SHIFT) -- orders without SHIFT can appear at positions other than the 1st due to CMD.INSERT; they'd cancel any previous commands if added raw
+		if cmd.id < 0 then -- repair case for construction
+			local units = Spring.GetUnitsInRectangle(cmd.params[1] - 16, cmd.params[3] - 16, cmd.params[1] + 16, cmd.params[3] + 16)
 			local allyTeam = Spring.GetUnitAllyTeam(unitID)
 			local notFound = true
 			for j = 1, #units do
 				local areaUnitID = units[j]
 				if allyTeam == Spring.GetUnitAllyTeam(areaUnitID) and Spring.GetUnitDefID(areaUnitID) == -cmd.id then
-					Spring.GiveOrderToUnit(newUnit, CMD.REPAIR, {areaUnitID}, cmd.options.coded)
+					Spring.GiveOrderToUnit(newUnit, CMD.REPAIR, {areaUnitID}, coded)
 					notFound = false
 					break
 				end
 			end
 			if notFound then
-				Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, cmd.options.coded)
+				Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, coded)
 			end
 		else
-			Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, cmd.options.coded)
+			Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, coded)
 		end
 	end
 end
@@ -582,12 +592,11 @@ local function UpdateMorph(unitID, morphData)
 			GG.StartMiscPriorityResourcing(unitID, (newMorphRate*morphData.def.metal/morphData.def.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Modifies resource drain if slowness has changed.
 			morphData.morphRate = newMorphRate
 		end
-		local allow = GG.AllowMiscPriorityBuildStep(unitID, morphData.teamID) --use unit_priority.lua gadget to handle morph priority.
-		
 		local resourceUse = {
 			m = (morphData.def.resTable.m * morphData.morphRate),
 			e = (morphData.def.resTable.e * morphData.morphRate),
 		}
+		local allow = GG.AllowMiscPriorityBuildStep(unitID, morphData.teamID, false, resourceUse) --use unit_priority.lua gadget to handle morph priority.
 		
 		if freeMorph then
 			morphData.progress = 1
@@ -1244,10 +1253,10 @@ function gadget:AICallIn(data)
 					if message[4] then
 						local destDefId=tonumber(message[4])
 						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] into "..UnitDefs[destDefId].name)
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{destDefId},{})
+						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{destDefId}, 0)
 					else
 						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] to auto")
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{},{})
+						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{}, 0)
 					end
 				else
 					Spring.Echo("Not a valid unitID in AICallIn morph request: \""..data.."\"")

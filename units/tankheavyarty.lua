@@ -78,14 +78,16 @@ unitDef = {
       areaOfEffect            = 160,
 	  avoidFeature            = false,
 	  avoidGround             = false,
-	  craterAreaOfEffect      = 240,
+	  craterAreaOfEffect      = 5,
       craterBoost             = 0,
-      craterMult              = 0.1,
+      craterMult              = 0,
 	  
 	  customParams            = {
+        reaim_time = 15, -- Some sort of bug prevents firing.
+		
 	    gatherradius     = [[240]],
 	    smoothradius     = [[120]],
-		smoothmult       = [[0.4]],
+		smoothmult       = [[0.5]],
 		lups_noshockwave = [[1]],
 		
         light_ground_height = 200,

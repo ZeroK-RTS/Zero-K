@@ -1,10 +1,10 @@
 unitDef = {
   unitname                      = [[turretaaflak]],
-  name                          = [[Cobra]],
+  name                          = [[Thresher]],
   description                   = [[Anti-Air Flak Gun]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildCostMetal                = 500,
+  buildCostMetal                = 450,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
@@ -77,8 +77,8 @@ unitDef = {
       cylinderTargeting       = 1,
 
 	  customParams        	  = {
+        reaim_time = 8, -- COB
 		isaa = [[1]],
-		
 		light_radius = 0,
 	  },
 

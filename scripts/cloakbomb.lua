@@ -235,6 +235,9 @@ end
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(StartStopMovingControl, script.StartMoving, script.StopMoving, nil, true)
+	if not Spring.GetUnitIsStunned(unitID) then
+		Burrow()
+	end
 end
 
 function script.Killed(recentDamage, maxHealth)

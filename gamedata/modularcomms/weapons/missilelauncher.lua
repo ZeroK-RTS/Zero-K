@@ -10,14 +10,13 @@ local weaponDef = {
 	customParams            = {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:SLASHMUZZLE]],
-		
+
 		light_camera_height = 2000,
 		light_radius = 200,
 	},
 
 	damage                  = {
 		default = 80,
-		planes  = 80,
 		subs    = 4,
 	},
 

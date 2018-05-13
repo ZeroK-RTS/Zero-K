@@ -1,0 +1,9 @@
+hotspot center
+frame  anims/cursortarget_0.png  0.3
+frame  anims/cursortarget_1.png  0.13
+frame  anims/cursortarget_2.png  0.10
+frame  anims/cursortarget_3.png  0.07
+frame  anims/cursortarget_4.png  0.04
+frame  anims/cursortarget_3.png  0.07
+frame  anims/cursortarget_2.png  0.10
+frame  anims/cursortarget_1.png  0.13

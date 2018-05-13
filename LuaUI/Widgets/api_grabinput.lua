@@ -17,6 +17,7 @@ local ACTIVE_MESSAGE = "LobbyOverlayActive1"
 local INACTIVE_MESSAGE = "LobbyOverlayActive0"
 
 local lobbyOverlayActive = false
+local grabTimer = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -66,7 +67,26 @@ options = {
 -- Widget Interface
 
 function widget:Initialize()
-	Spring.SendCommands("grabinput " .. ((options.grabinput.value and "1") or "0"))
+	if not lobbyOverlayActive then
+		Spring.SendCommands("grabinput " .. ((options.grabinput.value and "1") or "0"))
+	end
+end
+
+function widget:Update(dt)
+	-- Input grabbing is disabled on Alt+Tab and there is no event for this. Therefore it needs to be periodically reenabled if the cursor has left Spring.
+	if options.grabinput.value and (not lobbyOverlayActive) then
+		local _, _, _, _, _, outsideSpring = Spring.GetMouseState()
+		if outsideSpring and not grabTimer then
+			grabTimer = 0
+		end
+		if grabTimer then
+			grabTimer = grabTimer + dt
+			if grabTimer > 1 then
+				Spring.SendCommands("grabinput 1")
+				grabTimer = false
+			end
+		end
+	end
 end
 
 function widget:Shutdown()
@@ -84,6 +104,9 @@ function widget:RecvLuaMsg(msg)
 		lobbyOverlayActive = false
 		if options.lobbyDisables.value and options.grabinput.value then
 			Spring.SendCommands("grabinput 1")
+		end
+		if WG.crude and WG.crude.UnpauseFromExitConfirmWindow then
+			WG.crude.UnpauseFromExitConfirmWindow()
 		end
 	end
 end

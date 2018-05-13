@@ -7,6 +7,7 @@ function IterableMap.New()
 	local indexMax = 0
 	local unusedKey = 1
 	local keyByIndex = {}
+	local nextCounter = 0
 	
 	local api = {}
 
@@ -26,6 +27,7 @@ function IterableMap.New()
 			dataByKey[key] = data
 			return
 		end
+		data = data or true
 		indexMax = indexMax + 1
 		keyByIndex[indexMax] = key
 		dataByKey[key] = data
@@ -68,7 +70,7 @@ function IterableMap.New()
 		
 	function api.Set(key, data)
 		if not indexByKey[key] then
-			Add(key, data)
+			api.Add(key, data)
 		else
 			dataByKey[key] = data
 		end
@@ -76,6 +78,27 @@ function IterableMap.New()
 	
 	function api.InMap(key)
 		return (indexByKey[key] and true) or false
+	end
+	
+	function api.Clear(key)
+		indexByKey = {}
+		dataByKey = {}
+		indexMax = 0
+		unusedKey = 1
+		keyByIndex = {}
+	end
+	
+	-- Use Next to implement iteration spread over many updates. Returns the next
+	-- element using some internal counter.
+	function api.Next()
+		if indexMax < 1 then
+			return false
+		end
+		nextCounter = nextCounter + 1
+		if nextCounter > indexMax then
+			nextCounter = 1
+		end
+		return keyByIndex[nextCounter], dataByKey[keyByIndex[nextCounter]]
 	end
 	
 	-- To use Iterator, write "for unitID, data in interableMap.Iterator() do"
@@ -127,8 +150,20 @@ function IterableMap.New()
 	function api.GetIndexMax()
 		return indexMax
 	end
+	function api.IsEmpty()
+		return (indexMax == 0)
+	end
 	function api.GetKeyByIndex(index)
 		return keyByIndex[index]
+	end
+	function api.GetBarbarianData()
+		return indexMax, keyByIndex, dataByKey
+	end
+	function api.GetDataByIndex(index)
+		if keyByIndex[index] then
+			return dataByKey[keyByIndex[index]]
+		end
+		return false
 	end
 
 	return api

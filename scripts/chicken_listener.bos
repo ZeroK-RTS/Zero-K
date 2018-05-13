@@ -8,8 +8,7 @@ static-var bMoving, bAiming, bCanAim,shooting_num, base_speed, bStayAbove, resto
 #define SIG_MOVE			16
 #define SIG_RESTORE			32
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 #include "StateChg.h"
 
 

@@ -19,6 +19,7 @@ end
 --------------
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+local REAIM_TIME = 8
 local checkRate = 2 -- how fast Newton retarget. Default every 2 frame. Basically you control responsives and accuracy. On big setups checkRate = 1 is not recomended + count your ping in
 local newtonUnitDefID = UnitDefNames["turretimpulse"].id
 local newtonUnitDefRange = UnitDefNames["turretimpulse"].maxWeaponRange
@@ -98,13 +99,12 @@ options = {
 		type='radioButton', 
 		name='Predict impact location for',
 		items = {
-			{name = 'All units', key = 'all', desc = "All units will have their impact predicted whenever they take damge.", hotkey=nil},
-			{name = 'Launched units', key = 'newton', desc = "Units hit by a gravity gun will have their impact predited.", hotkey=nil},
-			{name = 'Firezone units', key = 'firezone', desc = "Only units launched with a firezone will have their impact predicted.", hotkey=nil},
-			{name = 'No units', key = 'none', desc = "No impact prediction.", hotkey=nil},
+			{name = 'All units', key = 'all', desc = "All units will have their impact predicted whenever they take damge."},
+			{name = 'Launched units', key = 'newton', desc = "Units hit by a gravity gun will have their impact predited."},
+			{name = 'Firezone units', key = 'firezone', desc = "Only units launched with a firezone will have their impact predicted."},
+			{name = 'No units', key = 'none', desc = "No impact prediction."},
 		},
 		value = 'newton',  --default at start of widget
-		noHotkey = true,
 		OnChange = function(self)
 			local key = self.value
 			if key == 'all' then
@@ -121,8 +121,7 @@ options = {
 	alwaysDrawZones = {
 		name = "Always draw firezones", 
 		desc = "Enable to always draw Newton firezones. Otherwise they are only drawn on selection.",
-		type = 'bool', 
-		noHotkey = true,
+		type = 'bool',
 		value = false,
 		OnChange = function(self)
 			alwaysDrawFireZones = self.value
@@ -133,12 +132,11 @@ options = {
 		type='radioButton', 
 		name='Predict transport drop location for',
 		items = {
-			{name = 'All units', key = 'all', desc = "All units will have their drop location predicted.", hotkey=nil},
-			{name = 'Bombs only', key = 'bomb', desc = "Crawling bombs will have their drop loction predicted.", hotkey=nil},
-			{name = 'No units', key = 'none', desc = "No units will have their impact position predicted.", hotkey=nil},
+			{name = 'All units', key = 'all', desc = "All units will have their drop location predicted."},
+			{name = 'Bombs only', key = 'bomb', desc = "Crawling bombs will have their drop loction predicted."},
+			{name = 'No units', key = 'none', desc = "No units will have their impact position predicted."},
 		},
 		value = 'bomb',  --default at start of widget
-		noHotkey = true,
 		OnChange = function(self)
 			local key = self.value
 			if key == 'all' then
@@ -191,6 +189,9 @@ local transportedUnits = {}
 --local cmdRateS = 0
 local softEnabled = false	--if zero newtons has orders, uses less
 local currentFrame = Spring.GetGameFrame()
+
+local EMPTY_TABLE = {}
+
 --------------
 --METHODS-----
 --------------
@@ -234,25 +235,23 @@ local function FixRectangle(rect)
 	rect.x2= floor((rect.x2+8)/16)*16
 	rect.z2= floor((rect.z2+8)/16)*16
 
-	rect.y_xy= spGetGroundHeight(rect.x, rect.z)
-	rect.y_x2y2= spGetGroundHeight(rect.x2, rect.z2)
-	rect.y_xy2= spGetGroundHeight(rect.x, rect.z2)
-	rect.y_x2y= spGetGroundHeight(rect.x2, rect.z)
-
 	if (rect.x2 < rect.x) then
 		tmp = rect.x
 		rect.x = rect.x2
 		rect.x2 = tmp
-		--Spring.Echo("fixed X")
 	end
 	if (rect.z2 < rect.z) then
 		tmp = rect.z
 		rect.z = rect.z2
 		rect.z2 = tmp
-		--Spring.Echo("fixed y")
 	end
-	return rect
+	
+	rect.y_xy   = spGetGroundHeight(rect.x, rect.z)
+	rect.y_x2y2 = spGetGroundHeight(rect.x2, rect.z2)
+	rect.y_xy2  = spGetGroundHeight(rect.x, rect.z2)
+	rect.y_x2y  = spGetGroundHeight(rect.x2, rect.z)
 
+	return rect
 end
 
 local function PickColor()
@@ -336,26 +335,41 @@ local function RemoveDeadGroups(units)
 	end
 end
 
-local function NewGroup(points)
+local function NewGroup(groupNewtons, points)
+	points = LimitRectangleSize(points, groupNewtons)
+	points = FixRectangle(points)
+	
+	RemoveDeadGroups(groupNewtons)
+	
+	local reaimPos = {}
+	reaimPos[1] = (points.x + points.x2)/2
+	reaimPos[3] = (points.z + points.z2)/2
+	reaimPos[2] = spGetGroundHeight(reaimPos[1], reaimPos[3])
 	
 	groups.count = groups.count + 1
 	groups.data[groups.count] = {
-		newtons = {count = #selectedNewtons, data = {}},
+		newtons = {count = #groupNewtons, data = {}},
 		points = points,
 		color = PickColor(),
+		reaimPos = reaimPos,
+		needInit = true,
 	}
 	local newtons = groups.data[groups.count].newtons.data
 
-	for i = 1, #selectedNewtons do
-		local unitID = selectedNewtons[i]
+	for i = 1, #groupNewtons do
+		local unitID = groupNewtons[i]
 		newtons[i] = unitID
 		newtonIDs[unitID] = {groupID = groups.count, index = i}
 		local x, y, z = spGetUnitPosition (unitID)
-		newtonTrianglePoints[unitID] = {y,
+		newtonTrianglePoints[unitID] = {
+			y,
 			x - 15, z - 15,
 			x, z + 15,
-			x +15, z -15}
+			x +15, z -15
+		}
 	end
+	
+	softEnabled = true
 end
 
 -------------------------------------------------------------------
@@ -380,13 +394,7 @@ function widget:CommandNotify(cmdID, params, options)
 				points.x2 = pos[1]
 				points.z2 = pos[3]
 			end
-			points = LimitRectangleSize(points,selectedNewtons)
-			points = FixRectangle(points)
-
-			RemoveDeadGroups(selectedNewtons)
-			NewGroup(points)
-			
-			softEnabled = true
+			NewGroup(selectedNewtons, points)
 		elseif (cmdID == CMD_STOP_NEWTON_FIREZONE) then
 			RemoveDeadGroups(selectedNewtons)
 		end
@@ -542,8 +550,9 @@ function widget:GameFrame(n)
 		-- update attack orders
 		if n % checkRate == 0 then
 			for g = 1, groups.count do
-				local points = groups.data[g].points
-				local newtons = groups.data[g].newtons.data
+				local groupData = groups.data[g]
+				local points = groupData.points
+				local newtons = groupData.newtons.data
 				if points ~= nil then
 					local units = spGetUnitsInRectangle(points.x, points.z, points.x2, points.z2)
 					local stop = true
@@ -570,7 +579,7 @@ function widget:GameFrame(n)
 							--	break
 							--end
 							--end
-							-- spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitID}, {} )
+							-- spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitID}, 0 )
 							-- groupTarget[g] = unitID
 							-- victim[unitID] = n + 90 --empty whitelist 3 second later
 							--cmdRate = cmdRate +1
@@ -584,20 +593,27 @@ function widget:GameFrame(n)
 						end
 					end
 					if unitToAttack and (groupTarget[g]~=unitToAttack) then --there are target, and target is different than previous target (prevent command spam)? 
-						spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitToAttack}, {} ) --shoot unit
+						spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitToAttack}, 0 ) --shoot unit
 						groupTarget[g] = unitToAttack --flag this group as having a target!
 						victimStillBeingAttacked[g] = nil --clear wait signal
 						victim[unitToAttack] = n + 90 --add UnitDamaged() whitelist, and expire after 3 second later
 					end
-					if stop and groupTarget[g] then --no unit in the box, and still have target?
-						local orders = spGetCommandQueue(newtons[1],1)[1]
-						if orders and orders.id ==CMD.ATTACK and orders.params[1]==groupTarget[g] then --is currently attacking old target??
-							spGiveOrderToUnitArray(newtons,CMD.STOP, {}, {}) --cancel attacking any out-of-box unit
-							--cmdRateS = cmdRateS +1
-							--ech("stop")
+					if stop then --no unit in the box, and still have target?
+						if groupTarget[g] or groupData.needInit then
+							groupData.reaimTimer = 0
+							groupData.needInit = nil
+							groupTarget[g] = nil --no target
+							victimStillBeingAttacked[g] = nil --clear wait signal
+							spGiveOrderToUnitArray(newtons, CMD.ATTACK, groupData.reaimPos, 0)
 						end
-						groupTarget[g] = nil --no target
-						victimStillBeingAttacked[g] = nil --clear wait signal
+						
+						if groupData.reaimTimer then
+							groupData.reaimTimer = groupData.reaimTimer + 1
+							if groupData.reaimTimer >= REAIM_TIME then
+								spGiveOrderToUnitArray(newtons,CMD.STOP, EMPTY_TABLE, 0) --cancel attacking any out-of-box unit
+								groupData.reaimTimer = nil
+							end
+						end
 					end
 				end
 			end
@@ -690,7 +706,11 @@ function EstimateCrashLocation(victimID, transportID)
 		return
 	end
 	
-	local xVel,yVel,zVel, compositeVelocity= spGetUnitVelocity(transportID or victimID)
+	local xVel,yVel,zVel, compositeVelocity = spGetUnitVelocity(transportID or victimID)
+	if not xVel then
+		return
+	end
+
 	local currentVelocitySQ = (compositeVelocity and compositeVelocity^2 or (xVel^2+yVel^2+zVel^2)) --elmo per second square
 	local gravity = mapGravity
 	if transportID then
@@ -726,12 +746,16 @@ function widget:Initialize()
 		end
 	local circleDraw = 	function() glBeginEnd(GL.LINE_LOOP, circleVertex ) end --Reference: draw a circle , gui_attack_aoe.lua by Evil4Zerggin
 	circleList = gl.CreateList(circleDraw)
+	
+	WG.NewtonFirezone_AddGroup = NewGroup
 end
 
 function widget:Shutdown()
 	if circleList then
 		gl.DeleteList(circleList)
 	end
+	
+	WG.NewtonFirezone_AddGroup = nil
 end
 ---------------------------------
 ---------------------------------

@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[hoverarty]],
-  name                = [[Penetrator]],
+  name                = [[Lance]],
   description         = [[Anti-Heavy Artillery Hovercraft]],
   acceleration        = 0.016,
   activateWhenBuilt   = true,
@@ -18,13 +18,13 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	dontfireatradarcommand = '1',
+	dontfireatradarcommand = '0',
     aimposoffset   = [[0 15 0]],
   },
 
   explodeAs           = [[MEDIUM_BUILDINGEX]],
-  footprintX          = 3,
-  footprintZ          = 3,
+  footprintX          = 4,
+  footprintZ          = 4,
   iconType            = [[mobiletachyon]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
@@ -35,7 +35,7 @@ unitDef = {
   maxVelocity         = 2.2,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
-  movementClass       = [[HOVER3]],
+  movementClass       = [[HOVER4]],
   moveState           = 0,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
@@ -103,7 +103,7 @@ unitDef = {
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser6]],
-	  soundStartVolume        = 3,
+      soundStartVolume        = 15,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],

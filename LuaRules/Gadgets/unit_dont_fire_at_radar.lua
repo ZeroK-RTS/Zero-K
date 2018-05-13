@@ -95,12 +95,12 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		--Spring.Echo("AllowWeaponTarget frame " .. Spring.GetGameFrame())
 		if spValidUnitID(targetID) and canShootAtUnit(targetID, spGetUnitAllyTeam(unitID)) then
 			--GG.unitEcho(targetID, "target")
-			if wantGoodTarget[unitID] then
+			if (not GG.recursion_GiveOrderToUnit) and wantGoodTarget[unitID] then
 				wantGoodTarget[unitID] = nil
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ATTACK, CMD_OPT_INTERNAL, targetID }, {"alt"} )
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ATTACK, CMD_OPT_INTERNAL, targetID }, CMD.OPT_ALT )
 				local cQueue = spGetCommandQueue(unitID, 2)
 				if isTheRightSortOfCommand(cQueue, 2)  then
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[2].tag}, {} )
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[2].tag}, 0 )
 				end
 			end
 			return true, defPriority
@@ -119,9 +119,9 @@ function GG.DontFireRadar_CheckAim(unitID)
 		local data = units[unitID]
 		if isTheRightSortOfCommand(cQueue, 1) and not canShootAtUnit(cQueue[1].params[1], spGetUnitAllyTeam(unitID)) then
 			local firestate = spGetUnitStates(unitID).firestate
-			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {0}, {} )
-			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {firestate}, {} )
+			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {0}, 0 )
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0 )
+			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {firestate}, 0 )
 			wantGoodTarget[unitID] = {command = true}
 			spSetUnitTarget(unitID,0)
 		end
@@ -185,14 +185,15 @@ end
 -- Unit Handling
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if UnitDefs[unitDefID].customParams.dontfireatradarcommand=="1" then
+	local manageKey = UnitDefs[unitDefID].customParams.dontfireatradarcommand
+	if manageKey then
 		--Spring.SetUnitSensorRadius(unitID,"los",0)
 		--Spring.SetUnitSensorRadius(unitID,"airLos",0)
 		
 		spInsertUnitCmdDesc(unitID, dontFireAtRadarCmdDesc)
 		canHandleUnit[unitID] = true
 		
-		DontFireAtRadarToggleCommand(unitID, {1})
+		DontFireAtRadarToggleCommand(unitID, {((manageKey == "1") and 1) or 0})
 	end
 end
 

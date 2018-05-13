@@ -139,7 +139,7 @@ end
 --------------------------------------------------------------------------------
 -- Economy Handling
 
-local function updateEconomy(unitID, ud, factor)	
+local function updateEconomy(unitID, ud, factor)
 	spSetUnitRulesParam(unitID,"resourceGenerationFactor", factor, INLOS_ACCESS)
 end
 
@@ -382,7 +382,10 @@ function UpdateUnitAttributes(unitID, frame)
 	local selfReloadSpeedChange = spGetUnitRulesParam(unitID,"selfReloadSpeedChange")
 	
 	local disarmed = spGetUnitRulesParam(unitID,"disarmed") or 0
-	local morphDisable = spGetUnitRulesParam(unitID,"morphDisable") or 0
+	local completeDisable = (spGetUnitRulesParam(unitID,"morphDisable") or 0)
+	if spGetUnitRulesParam(unitID,"planetwarsDisable") == 1 then
+		completeDisable = 1
+	end
 	local crashing = spGetUnitRulesParam(unitID,"crashing") or 0
 	
 	-- Unit speed change (like sprint) --
@@ -400,18 +403,29 @@ function UpdateUnitAttributes(unitID, frame)
 	local zombieSpeedMult = spGetUnitRulesParam(unitID,"zombieSpeedMult")
 	local buildpowerMult = spGetUnitRulesParam(unitID, "buildpower_mult")
 	
+	-- Disable
+	local fullDisable = spGetUnitRulesParam(unitID, "fulldisable") == 1
+	
 	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or zombieSpeedMult or buildpowerMult or
-			selfTurnSpeedChange or selfIncomeChange or disarmed or morphDisable or selfAccelerationChange then
+			selfTurnSpeedChange or selfIncomeChange or disarmed or completeDisable or selfAccelerationChange then
 		
 		local baseSpeedMult   = (1 - (slowState or 0))*(zombieSpeedMult or 1)
 		
-		local econMult   = (baseSpeedMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)
-		local buildMult  = (baseSpeedMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)*(buildpowerMult or 1)
-		local moveMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)*(upgradesSpeedMult or 1)
-		local turnMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - morphDisable)
-		local reloadMult = (baseSpeedMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - morphDisable)
+		local econMult   = (baseSpeedMult)*(1 - disarmed)*(1 - completeDisable)*(selfIncomeChange or 1)
+		local buildMult  = (baseSpeedMult)*(1 - disarmed)*(1 - completeDisable)*(selfIncomeChange or 1)*(buildpowerMult or 1)
+		local moveMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(1 - completeDisable)*(upgradesSpeedMult or 1)
+		local turnMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - completeDisable)
+		local reloadMult = (baseSpeedMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - completeDisable)
 		local maxAccMult = (baseSpeedMult)*(selfMaxAccelerationChange or 1)*(upgradesSpeedMult or 1)
 
+		if fullDisable then
+			buildMult = 0
+			moveMult = 0
+			turnMult = 0
+			reloadMult = 0
+			maxAccMult = 0
+		end
+		
 		-- Let other gadgets and widgets get the total effect without 
 		-- duplicating the pevious calculations.
 		spSetUnitRulesParam(unitID, "baseSpeedMult", baseSpeedMult, INLOS_ACCESS) -- Guaranteed not to be 0
@@ -450,7 +464,7 @@ function UpdateUnitAttributes(unitID, frame)
 	end
 	
 	local forcedOff = spGetUnitRulesParam(unitID, "forcedOff")
-	local abilityDisabled = (forcedOff == 1 or disarmed == 1 or morphDisable == 1 or crashing == 1)
+	local abilityDisabled = (forcedOff == 1 or disarmed == 1 or completeDisable == 1 or crashing == 1)
 	local setNewState
 	
 	if abilityDisabled ~= unitAbilityDisabled[unitID] then
@@ -478,7 +492,7 @@ function UpdateUnitAttributes(unitID, frame)
 		UpdateSensorAndJamm(unitID, udid, not abilityDisabled, radarOverride, sonarOverride, jammerOverride, sightOverride)
 	end
 
-	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1) or (morphDisable == 1)
+	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1) or (completeDisable == 1)
 	if cloakBlocked then
 		GG.PokeDecloakUnit(unitID, 1)
 	end

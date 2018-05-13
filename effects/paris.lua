@@ -150,7 +150,7 @@ return {
         alpha              = 0.3,
         alwaysvisible      = false,
         color              = [[0.8,0.8,1]],
-        expansionspeed     = 60,
+        expansionspeed     = 58,
         ttl                = 10,
       },
     },

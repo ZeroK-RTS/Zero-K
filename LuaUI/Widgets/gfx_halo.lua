@@ -279,7 +279,7 @@ function widget:Shutdown()
   end
 
   if (gl.DeleteFBO) then
-    gl.DeleteFBO(fbo or 0)
+    gl.DeleteFBO(fbo)
   end
 
   if (gl.DeleteShader) then

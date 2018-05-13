@@ -1,6 +1,6 @@
 unitDef = {
   unitname              = [[spiderantiheavy]],
-  name                  = [[Infiltrator]],
+  name                  = [[Widow]],
   description           = [[Cloaked Scout/Anti-Heavy]],
   acceleration          = 0.3,
   activateWhenBuilt     = true,
@@ -13,6 +13,9 @@ unitDef = {
   category              = [[LAND]],
   cloakCost             = 4,
   cloakCostMoving       = 12,
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                = [[DEAD]],
 
   customParams          = {
@@ -22,7 +25,7 @@ unitDef = {
   fireState             = 0,
   footprintX            = 2,
   footprintZ            = 2,
-  iconType              = [[walkerscout]],
+  iconType              = [[spiderspecialscout]],
   idleAutoHeal          = 5,
   idleTime              = 1800,
   leaveTracks           = true,

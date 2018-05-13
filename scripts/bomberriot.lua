@@ -29,9 +29,14 @@ function script.StopMoving()
 end
 
 function script.Create()
+	SetInitialBomberSettings()
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	--StartThread(Lights)
+end
+
+function script.AimWeapon(num)
+	return true
 end
 
 function script.QueryWeapon(num)
@@ -39,10 +44,11 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num)
-	return (Spring.GetUnitRulesParam(unitID, "noammo") == 1)
+	return RearmBlockShot()
 end
 
 function script.FireWeapon(num)
+	SetUnarmedAI()
 	Sleep(400)
 	Reload()
 end

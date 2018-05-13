@@ -39,7 +39,7 @@ for wid = 1, #WeaponDefs do
 			disarmTimer = wcp.disarmtimer*FRAMES_PER_SECOND,
 		}
 		wantedWeaponList[#wantedWeaponList + 1] = wid
-	elseif wd.paralyzer then
+	elseif wd.paralyzer or wd.customParams.extra_damage then
 		paraWeapons[wid] = {
 			paraTime = wd.damages.paralyzeDamageTime*FRAMES_PER_SECOND,
 			maxParaDamage = (wd.damages.paralyzeDamageTime+40)/40,
@@ -268,5 +268,21 @@ local function InitReload()
 end
 
 function gadget:Initialize()
+	InitReload()
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Save/Load
+
+function gadget:Load(zip)
+	local frameOffset = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local disarmFrame = Spring.GetUnitRulesParam(unitID, "disarmframe")
+		if disarmFrame and (disarmFrame - frameOffset > 0) then
+			gadget:UnitDestroyed(unitID) -- Because units are added in gadget:Initialize()
+			Spring.SetUnitRulesParam(unitID, "disarmframe", disarmFrame - frameOffset, LOS_ACCESS)
+		end
+	end
 	InitReload()
 end

@@ -27,6 +27,7 @@ unitDef = {
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -4 0]],
     modelradius    = [[24]],
+	default_spacing = 1,
   },
 
   explodeAs                     = [[NANOBOOM2]],
@@ -41,7 +42,7 @@ unitDef = {
   maxSlope                      = 15,
   maxVelocity                   = 0,
   minCloakDistance              = 150,
-  movementClass                 = [[KBOT1]],
+  movementClass                 = [[KBOT2]],
   objectName                    = [[armsenan.s3o]],
   script                        = [[staticcon.lua]],
   selfDestructAs                = [[NANOBOOM2]],

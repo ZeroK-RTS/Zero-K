@@ -5,7 +5,7 @@
 function gadget:GetInfo()
 	return {
 		name     = "Nano Frame Death Handeling",
-		desc     = "Makes nanoframes explode if above X% completetion and makes dying nanoframes leave wrecks.",
+		desc     = "Makes nanoframes explode if above X% completion and makes dying nanoframes leave wrecks.",
 		author	 = "Google Frog",
 		date     = "Mar 29, 2009",
 		license	 = "GNU GPL, v2 or later",
@@ -83,10 +83,15 @@ local function ScrapUnit(unitID, unitDefID, team, progress, face)
 			local featureID = spCreateFeature(wreck, x, y, z, face, allyTeam)
 			if featureID then
 				Spring.TransferFeature(featureID, team)
-				local maxHealth = FeatureDefs[wreck].maxHealth
-				spSetFeatureReclaim(featureID, progress)
-				--spSetFeatureResurrect(featureID, UnitDefs[unitDefID].name, face)
-				spSetFeatureHealth(featureID, progress*maxHealth)
+
+				local currentMetal = progress * FeatureDefs[wreck].metal
+				if Spring.SetFeatureResources then -- 103.0 non-dev version compat
+					Spring.SetFeatureResources(featureID, currentMetal, 0, currentMetal, progress)
+				else
+					Spring.SetFeatureReclaim(featureID, progress)
+				end
+
+				spSetFeatureHealth(featureID, progress * FeatureDefs[wreck].maxHealth)
 			else
 				Spring.Echo("No featureID", wreck)
 			end
@@ -106,8 +111,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 
 	local ud = UnitDefs[unitDefID]
 	local face = (spGetUnitBuildFacing(unitID) or 1)
-
-	if (progress > 0.8) then
+	local noWreck = Spring.GetUnitRulesParam(unitID, "noWreck") == 1	-- set by api_saveload to clear stuff from factories
+	
+	if (progress > 0.8 and not noWreck) then
 		local explodeAs = ud.deathExplosion
 		if explodeAs then
 			local wd = WeaponDefNames[explodeAs]
@@ -122,7 +128,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 	end
 	
-	if (progress > 0.05 and not Spring.GetUnitRulesParam(unitID, "noWreck")) then
+	if (progress > 0.05 and not noWreck) then
 		ScrapUnit(unitID, unitDefID, unitTeam, progress, face)
 	end
 	

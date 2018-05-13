@@ -1,0 +1,13 @@
+hotspot topleft
+frame  anims/zk_large/cursormove_0.png  0.2
+frame  anims/zk_large/cursormove_1.png  0.1
+frame  anims/zk_large/cursormove_2.png  0.1
+frame  anims/zk_large/cursormove_3.png  0.1
+frame  anims/zk_large//cursormove_4.png  0.1
+frame  anims/zk_large/cursormove_5.png  0.1
+frame  anims/zk_large/cursormove_6.png  0.1
+frame  anims/zk_large/cursormove_7.png  0.1
+frame  anims/zk_large/cursormove_8.png  0.1
+frame  anims/zk_large/cursormove_9.png  0.1
+frame  anims/zk_large/cursormove_10.png  0.1
+frame  anims/zk_large/cursormove_11.png  0.4

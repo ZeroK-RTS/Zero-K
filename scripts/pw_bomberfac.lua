@@ -27,7 +27,8 @@ end
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
-	Turn(build, y_axis, math.rad(90.001))	-- for some reason if we round this it faces the wrong way
+	Turn(build, x_axis, math.rad(180))
+	Turn(build, z_axis, math.rad(45)) -- Just... don't ask.
 end
 
 function script.QueryBuildInfo()
@@ -53,6 +54,10 @@ function script.QueryLandingPads()
 end
 
 function script.Activate ()
+	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 or GG.applyPlanetwarsDisable then
+		return
+	end
+	
 	StartThread(Open)
 end
 

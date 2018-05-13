@@ -160,12 +160,23 @@ local options = {
     step=0.01,
   },
   {
-    key = "forcejunior",
-    name = "Force Junior",
-    desc = "Choose whether everyone gets a standard Junior Comm chassis.",
-    type = "bool",
-    section= 'startconds',
+    key    = 'zombies_partial_reclaim',
+    name   = 'Zombies partially reclaimable',
+    desc   = "Partially reclaimed zombies are partially damaged.",
+    type   = 'bool',
+    section= 'silly',
     def = false,
+  },
+  {
+    key = "max_com_level",
+    name = "Commander level limit",
+    desc = "Choose the commander level limit. 0 for unlimited.",
+    type = "number",
+    section= 'startconds',
+    def = 0,
+    min = 0,
+    step = 1,
+    max = 20,
   },
   {
 	key		= "disabledunits",
@@ -173,8 +184,16 @@ local options = {
 	desc	= "Prevents specified units from being built ingame. Specify multiple units by using + ",
 	section	= 'startconds',
 	type	= "string",
-	def		= nil,
+	def		= "",
   },
+	{
+		key = 'globallos',
+		name = 'Full visibility',
+		desc = 'No fog of war, everyone can see the entire map.',
+		type = 'bool',
+		section = 'startconds',
+		def = false,
+	},
   {
     key = "overdrivesharingscheme",
     name = "Economy returns investment",
@@ -402,31 +421,31 @@ local options = {
   --  def		= true,
   --  section	= "experimental",
   --},  
-  {
-    key		= "pathfinder",
-    name	= "Pathfinder type",
-    desc	= "Sets the pathfinding system used by units.",
-    type	= "list",
-    def		= "standard",
-    section	= "experimental",
-    items  = {
-      {
-	key  = 'standard',
-	name = 'Standard',
-	desc = 'Standard pathfinder',
-      },
-      {
-	key  = 'qtpfs',
-	name = 'QTPFS',
-	desc = 'New Quadtree Pathfinding System (experimental)',
-      },
-    --  {
-	--	key  = 'classic',
-	--	name = 'Classic',
-	--	desc = 'An older pathfinding system without turninplace or reverse',
-    --  }
-    },	
-  },  
+--  { -- Causes desync https://springrts.com/mantis/view.php?id=5936
+--    key		= "pathfinder",
+--    name	= "Pathfinder type",
+--    desc	= "Sets the pathfinding system used by units.",
+--    type	= "list",
+--    def		= "standard",
+--    section	= "experimental",
+--    items  = {
+--      {
+--	key  = 'standard',
+--	name = 'Standard',
+--	desc = 'Standard pathfinder',
+--      },
+--      {
+--	key  = 'qtpfs',
+--	name = 'QTPFS',
+--	desc = 'New Quadtree Pathfinding System (experimental)',
+--      },
+--    --  {
+--	--	key  = 'classic',
+--	--	name = 'Classic',
+--	--	desc = 'An older pathfinding system without turninplace or reverse',
+--    --  }
+--    },	
+--  },  
   
   {
     key    = 'chicken',

@@ -22,8 +22,6 @@ factory job indexes:
 	5 = gunship
 --]]
 
-local reverseCompat = ((Spring.Utilities.GetEngineVersion():find('91.0') == 1))
-
 factionBuildConfig = {
 	robots = {
 		airDefenceRange = {
@@ -138,8 +136,8 @@ factionBuildConfig = {
 				[5] = { --assault
 					importanceMult = 1,
 					count = 2,
-					[1] = {ID = UnitDefNames['jumpassault'].id, chance = 0.9},
-					[2] = {ID = UnitDefNames['jumpsumo'].id, chance = 0.1},
+					[1] = {ID = UnitDefNames['jumpassault'].id, chance = 1},
+					--[2] = {ID = UnitDefNames['jumpsumo'].id, chance = 0},
 				},
 				
 				[6] = { -- skirm
@@ -542,7 +540,7 @@ factionBuildConfig = {
 				[4] = { -- bomber
 					importanceMult = 1,
 					count = 2,
-					[1] = {ID = UnitDefNames[reverseCompat and 'bomberprec' or 'bomberdive'].id, chance = 0.4},
+					[1] = {ID = UnitDefNames['bomberprec'].id, chance = 0.4},
 					[2] = {ID = UnitDefNames['bomberriot'].id, chance = 0.6},
 				},
 				
@@ -716,9 +714,9 @@ factionBuildConfig = {
 			
 			[2] = {
 				count = 3,
-				[1] = {ID = UnitDefNames['turretriot'].id, chance = 0.4},
-				[2] = {ID = UnitDefNames['turretemp'].id, chance = 0.3},
-				[3] = {ID = UnitDefNames['turretimpulse'].id, chance = 0.3},
+				[1] = {ID = UnitDefNames['turretriot'].id, chance = 0.55},
+				[2] = {ID = UnitDefNames['turretemp'].id, chance = 0.45},
+				--[3] = {ID = UnitDefNames['turretimpulse'].id, chance = 0},
 			},
 			
 			[3] = {

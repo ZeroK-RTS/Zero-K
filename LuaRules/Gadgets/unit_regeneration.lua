@@ -27,10 +27,6 @@ for id, def in pairs(UnitDefs) do
 end
 
 local currentFrame
-function gadget:Initialize()
-	currentFrame = Spring.GetGameFrame()
-end
-
 function gadget:GameFrame (frame)
 	currentFrame = frame
 	if ((frame % 15) == 7) then
@@ -99,10 +95,22 @@ function gadget:UnitDestroyed(unitID)
 end
 
 function gadget:Initialize()
+	currentFrame = Spring.GetGameFrame()
 	GG.SetUnitIdleRegen = SetUnitIdleRegen
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)
+	end
+end
+
+function gadget:Load(zip)
+	local allUnits = Spring.GetAllUnits()
+	for i=1, #allUnits do
+		local unitID = allUnits[i]
+		local param = Spring.GetUnitRulesParam(unitID, "idleRegenTimer")
+		if param and units[unitID] then
+			units[unitID].idleFrame = param
+		end
 	end
 end

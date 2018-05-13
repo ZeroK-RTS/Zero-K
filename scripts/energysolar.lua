@@ -16,40 +16,50 @@ local smokePiece = {base}
 
 local SIG_Activate = 2
 local SIG_Defensive = 4
+local wantActivate = false
+local autoDeactivate = false
 
 -- don't ask daddy difficult questions like "Why does it armor at the START of the animation?"
 local function Open()
 	Signal(SIG_Activate)
 	SetSignalMask(SIG_Activate)
+	
+	Spring.SetUnitArmored(unitID, false)
+	
 	Turn(dish1, x_axis, math.rad(-75), math.rad(60))
 	Turn(dish2, x_axis, math.rad(75), math.rad(60))
 	Turn(dish3, z_axis, math.rad(75), math.rad(60))
 	Turn(dish4, z_axis, math.rad(-75), math.rad(60))
-	WaitForTurn(dish1, z_axis)
-	WaitForTurn(dish2, z_axis)
-	WaitForTurn(dish3, x_axis)
-	WaitForTurn(dish4, x_axis)
-	Spring.SetUnitArmored(unitID,false)
+	
+	WaitForTurn(dish1, x_axis)
+	WaitForTurn(dish2, x_axis)
+	WaitForTurn(dish3, z_axis)
+	WaitForTurn(dish4, z_axis)
+	
 	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 1)
 	GG.UpdateUnitAttributes(unitID)
-	--SetUnitValue(COB.ARMORED,1)	
+	--SetUnitValue(COB.ARMORED,1)
 end
 
 local function Close()
 	Signal(SIG_Activate)
 	SetSignalMask(SIG_Activate)
-	Spring.SetUnitArmored(unitID,true)
+	
 	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 0)
 	GG.UpdateUnitAttributes(unitID)
-	SetUnitValue(COB.ARMORED,1)
+	
 	Turn(dish1, x_axis, 0, math.rad(120))
 	Turn(dish2, x_axis, 0, math.rad(120))
 	Turn(dish3, z_axis, 0, math.rad(120))
 	Turn(dish4, z_axis, 0, math.rad(120))
-	WaitForTurn(dish1, z_axis)
-	WaitForTurn(dish2, z_axis)
-	WaitForTurn(dish3, x_axis)
-	WaitForTurn(dish4, x_axis)
+	
+	WaitForTurn(dish1, x_axis)
+	WaitForTurn(dish2, x_axis)
+	WaitForTurn(dish3, z_axis)
+	WaitForTurn(dish4, z_axis)
+	
+	Spring.SetUnitArmored(unitID, true)
+	SetUnitValue(COB.ARMORED, 1)
 end
 
 function script.Activate()
@@ -57,6 +67,9 @@ function script.Activate()
 end
 
 function script.Deactivate()
+	if not autoDeactivate then
+		wantActivate = false
+	end
 	StartThread(Close)
 end
 
@@ -68,15 +81,22 @@ function script.Create()
 	Turn(base, y_axis, math.rad(45))
 end
 
-local force_close_time = tonumber(UnitDef.customParams.force_close) * 1000
+local auto_close_time = tonumber(UnitDef.customParams.auto_close_time) * 1000
 
 local function DefensiveManeuver()
+	if Spring.GetUnitRulesParam(unitID, "tacticalAi_external") ~= 1 then
+		return
+	end
 	Signal(SIG_Defensive)
 	SetSignalMask(SIG_Defensive)
+	wantActivate = wantActivate or Spring.GetUnitStates(unitID).active
+	autoDeactivate = true
 	SetUnitValue(COB.ACTIVATION, 0)
-	spSetUnitRulesParam(unitID, "force_close", 1)
-	Sleep(force_close_time)
-	spSetUnitRulesParam(unitID, "force_close", 0)
+	autoDeactivate = false
+	Sleep(auto_close_time)
+	if not (wantActivate and Spring.GetUnitRulesParam(unitID, "tacticalAi_external") == 1) then
+		return
+	end
 	SetUnitValue(COB.ACTIVATION, 1)
 end
 
@@ -102,6 +122,19 @@ function script.HitByWeapon(x, z, weaponDefID, damage)
 	end
 end
 
+local function LoadGameThread()
+	Sleep(2000)
+	if Spring.GetUnitStates(unitID).active then
+		return
+	end
+	if Spring.GetUnitRulesParam(unitID, "tacticalAi_external") == 1 then
+		SetUnitValue(COB.ACTIVATION, 1)
+	end
+end
+
+function OnLoadGame()
+	StartThread(LoadGameThread)
+end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth

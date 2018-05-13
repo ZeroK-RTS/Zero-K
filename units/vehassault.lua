@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehassault]],
   name                   = [[Ravager]],
-  description            = [[Assault Vehicle]],
+  description            = [[Assault Rover]],
   acceleration           = 0.027,
   brakeRate              = 0.0385,
   buildCostMetal         = 250,
@@ -11,14 +11,14 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeOffsets = [[0 -5 0]],
   collisionVolumeScales  = [[42 42 42]],
   collisionVolumeType    = [[ellipsoid]], 
   corpse                 = [[DEAD]],
 
   customParams           = {
 	aimposoffset   = [[0 8 0]],
-	midposoffset   = [[0 -2 0]],
+	midposoffset   = [[0 3 0]],
 	modelradius    = [[21]],
   },
 
@@ -54,7 +54,7 @@ unitDef = {
   trackStrength          = 5,
   trackStretch           = 1,
   trackType              = [[StdTank]],
-  trackWidth             = 30,
+  trackWidth             = 38,
   turninplace            = 0,
   turnRate               = 430,
   workerTime             = 0,
@@ -79,6 +79,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
+        reaim_time = 8, -- COB
 		light_camera_height = 1500,
       },
 

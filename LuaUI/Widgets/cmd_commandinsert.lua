@@ -14,15 +14,21 @@ function widget:GetInfo()
 		layer = 5,
 		enabled = true,
 		api = true,
-		hidden = true,
 	}
 end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+local CMD_OPT_ALT = CMD.OPT_ALT
+local CMD_OPT_CTRL = CMD.OPT_CTRL
+local CMD_OPT_META = CMD.OPT_META
+local CMD_OPT_SHIFT = CMD.OPT_SHIFT
+local CMD_OPT_RIGHT = CMD.OPT_RIGHT
+
 local positionCommand = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_BUILD] = true,
 	[CMD.REPAIR] = true,
 	[CMD.RECLAIM] = true,
 	[CMD.RESURRECT] = true,
@@ -124,19 +130,33 @@ local function ProcessCommand(id, params, options, sequence_order)
 		sequence_order = structureSquenceCount + sequence_order
 	end
 	
-	-- Redefine the way in which modifiers apply to Repair
+	-- Redefine the way in which modifiers apply to Area- Repair and Rez
 	local ctrl = options.ctrl
 	local meta = options.meta
 	if ctrl and not meta and id == CMD.REPAIR then
+		-- Engine CTRL means "keep repairing even when being reclaimed" (now inaccessible)
+		-- Engine META means "only repair live units, don't assist construction" (now CTRL)
 		Spring.GiveOrder(id, params, options.coded - CMD.OPT_CTRL + CMD.OPT_META)
 		return true
 	end
-	
+	if not meta and id == CMD.RESURRECT then
+		-- Engine CTRL means "keep rezzing even when being reclaimed" (now inaccessible)
+		-- Engine META means "only rez fresh wrecks, don't refill partially-reclaimed" (now default, CTRL disables)
+		Spring.GiveOrder(id, params, options.coded - (ctrl and CMD.OPT_CTRL or 0) + (ctrl and 0 or CMD.OPT_META))
+		return true
+	end
+
 	-- Command insert
 	if meta then
 		local coded = options.coded
 		if id == CMD.REPAIR and ctrl then
 			coded = coded - CMD.OPT_CTRL
+		elseif id == CMD.RESURRECT then
+			if ctrl then
+				coded = coded - CMD.OPT_CTRL - CMD.OPT.META
+			else
+				coded = coded
+			end
 		else
 			coded = coded - CMD.OPT_META
 		end
@@ -205,8 +225,18 @@ function widget:CommandNotify(id, params, options)
 	return ProcessCommand(id, params, options, 0)
 end
 
-function WG.CommandInsert(id, params, options, seq)
+local function EncodeOptions(options)
+	local coded = 0
+	if options.alt   then coded = coded + CMD_OPT_ALT   end
+	if options.ctrl  then coded = coded + CMD_OPT_CTRL  end
+	if options.meta  then coded = coded + CMD_OPT_META  end
+	if options.shift then coded = coded + CMD_OPT_SHIFT end
+	if options.right then coded = coded + CMD_OPT_RIGHT end
+	return coded
+end
 
+function WG.CommandInsert(id, params, options, seq)
+	options.coded = (options.coded or EncodeOptions(options))
 	if not options.shift and not options.meta then
 		Spring.GiveOrder (CMD.STOP, EMPTY_TABLE, 0)
 		options.shift = true
@@ -221,7 +251,9 @@ function WG.CommandInsert(id, params, options, seq)
 	local units = Spring.GetSelectedUnits()
 	for i = 1, #units do
 		local unitID = units[i]
-		local commands = Spring.GetCommandQueue(unitID, -1)
-		Spring.GiveOrderToUnit(unitID, CMD.INSERT, {#commands + seq, id, options.coded, unpack(params)}, CMD.OPT_ALT)
+		local commands = Spring.GetCommandQueue(unitID, 0)
+		if commands then
+			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {commands + seq, id, options.coded, unpack(params)}, CMD.OPT_ALT)
+		end
 	end
 end

@@ -41,8 +41,6 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local abs = math.abs
 
-local reverseCompat = not Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
-
 local mapCenterX = Game.mapSizeX / 2
 local mapCenterZ = Game.mapSizeZ / 2
 
@@ -68,8 +66,8 @@ end
 local function SetupUnit(unitID)
 	-- set immobile builders (nanotowers?) to the ROAM movestate,
 	-- and give them a PATROL order (does not matter where, afaict)
-	local queueLength = spGetCommandQueue(unitID, 0)
-	if not (queueLength and (queueLength == 0)) then
+	local cQueue = spGetCommandQueue(unitID, 1)
+	if (not cQueue) or ((#cQueue > 0) and cQueue[1].id ~= CMD_PATROL) then
 		return
 	end
 	
@@ -114,7 +112,7 @@ options = {
 		end,
 	},
 	stop_disables = {
-		name = "Disable Caretakers with Stop",
+		name = "Disable caretakers with stop",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -153,7 +151,7 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 	if not IsImmobileBuilder(UnitDefs[unitDefID]) then
 		return
 	end
-	if cmdID == CMD_PATROL and ((reverseCompat and (math.bit_and(cmdOptions,CMD.OPT_SHIFT) <= 0)) or ((not reverseCompat) and not cmdOptions.shift)) then
+	if cmdID == CMD_PATROL and (not cmdOptions.shift) then
 		local x, y, z = spGetUnitPosition(unitID)
 		if math.abs(x - cmdParams[1]) > 30 or math.abs(z - cmdParams[3]) > 30 then
 			SetupUnit(unitID)
