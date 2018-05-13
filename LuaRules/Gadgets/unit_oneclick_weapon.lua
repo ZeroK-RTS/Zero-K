@@ -103,7 +103,7 @@ local function doTheCommand(unitID, unitDefID, num)
 	local data = defs[unitDefID] and defs[unitDefID][num]
 	if (data) then
 		if data.dummy then
-			return false
+			return true
 		end
 		
 		local currentReload = (data.weaponToReload and Spring.GetUnitWeaponState(unitID, data.weaponToReload, "reloadState")) or
