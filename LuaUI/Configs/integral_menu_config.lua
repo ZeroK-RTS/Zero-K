@@ -237,7 +237,7 @@ local instantCommands = {
 	
 	[CMD_ONECLICK_WEAPON] = true,
 	[CMD_DETONATE] = true,
-	[CMD_CANCERTERRA] = true,
+	[CMD_CANCELTERRA] = true,
 	[CMD_SPEEDBOOST] = true,
 	[CMD_DROPCARGO] = true,
 	[CMD_SELECTCARGO] = true,

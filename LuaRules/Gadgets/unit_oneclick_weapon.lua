@@ -166,10 +166,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		
 		local cmd = Spring.GetCommandQueue(unitID, 1)
 		if cmd and cmd[1] and cmd[1].id and cmds[cmd[1].id] then
-			Spring.GiveOrderToUnit(unitID,CMD.REMOVE,{cmd[1].tag},{})
+			Spring.GiveOrderToUnit(unitID,CMD.REMOVE,{cmd[1].tag}, 0)
 			return false
 		end
-		Spring.GiveOrderToUnit(unitID,CMD.INSERT,{0,cmdID,cmdParams[1] or 1},{"alt"})
+		Spring.GiveOrderToUnit(unitID,CMD.INSERT,{0,cmdID,cmdParams[1] or 1}, CMD.OPT_ALT)
 		return false
 	end
 	return true

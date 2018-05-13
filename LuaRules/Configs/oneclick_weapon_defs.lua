@@ -3,7 +3,7 @@
 local cmds = {
 	[CMD_ONECLICK_WEAPON] = true,
 	[CMD_DETONATE] = true,
-	[CMD_CANCERTERRA] = true,
+	[CMD_CANCELTERRA] = true,
 	[CMD_SPEEDBOOST] = true,
 	[CMD_DROPCARGO] = true,
 	[CMD_SELECTCARGO] = true
@@ -13,7 +13,7 @@ local oneClickWepDefs = {}
 
 local oneClickWepDefNames = {
 	terraunit = {
-		{ cmdID = CMD_CANCERTERRA, functionToCall = "Detonate", name = "Cancel", action = "cancelterra", tooltip = "Cancel selected terraform units.", texture = "LuaUI/Images/Commands/Bold/cancel.png", partBuilt = true},
+		{ cmdID = CMD_CANCELTERRA, functionToCall = "Detonate", name = "Cancel", action = "cancelterra", tooltip = "Cancel selected terraform units.", texture = "LuaUI/Images/Commands/Bold/cancel.png", partBuilt = true},
 	},
 	gunshipkrow = {
 		{ functionToCall = "ClusterBomb", reloadTime = 854, name = "Carpet Bomb", tooltip = "Drop Bombs: Drop a huge number of bombs in a circle under the Krow", weaponToReload = 3, texture = "LuaUI/Images/Commands/Bold/bomb.png",},

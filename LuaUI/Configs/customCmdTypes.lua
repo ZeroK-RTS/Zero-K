@@ -58,6 +58,7 @@ local custom_cmd_actions = {
 	speedboost = {cmdType = 3, name = "Speed Boost"},
 	dropcargo = {cmdType = 3, name = "Drop Cargo"},
 	selectcargo = {cmdType = 3, name = "Select Cargo"},
+	cancelterra = {cmdType = 3, name = "Cancel Terraform"},
 	
 	settargetcircle = {cmdType = 1, name = "Set Target"},
 	settarget = {cmdType = 1, name = "Set Target (rectangle)"},
@@ -169,6 +170,7 @@ local usedActions = {
 	["speedboost"] = true,
 	["dropcargo"] = true,
 	["selectcargo"] = true,
+	["cancelterra"] = true,
 	
 	["floatstate"] = true,
 	["airstrafe"] = true,
