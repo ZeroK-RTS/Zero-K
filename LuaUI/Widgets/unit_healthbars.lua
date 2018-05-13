@@ -889,7 +889,7 @@ do
 		if ci.specialReload then
 			local specialReloadState = GetUnitRulesParam(unitID,"specialReloadFrame")
 			if (specialReloadState and specialReloadState > gameFrame) then
-				local special = 1-(specialReloadState-gameFrame)/(ci.specialReload*gameSpeed)
+				local special = 1-(specialReloadState-gameFrame)/ci.specialReload	-- don't divide by gamespeed, since specialReload is also in gameframes
 				AddBar(messages.ability,special,"reload2",(fullText and floor(special*100)..'%') or '')
 			end
 		end

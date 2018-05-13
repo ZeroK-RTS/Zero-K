@@ -169,6 +169,24 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	return true
 end
 
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		return
+	end
+	
+	local offset = GG.SaveLoad.GetSavedGameFrame()
+	local units = Spring.GetAllUnits()
+	for i=1,#units do
+		local unitID = units[i]
+		local specialReload = Spring.GetUnitRulesParam(unitID, "specialReloadFrame")
+		if specialReload then
+			local specialReloadStart = Spring.GetUnitRulesParam(unitID, "specialReloadStart") or specialReload
+			Spring.SetUnitRulesParam(unitID, "specialReloadStart", specialReloadStart - offset, LOS_ACCESS)
+			Spring.SetUnitRulesParam(unitID, "specialReloadFrame", specialReload - offset, LOS_ACCESS)
+		end
+	end
+end
+
 else
 --------------------------------------------------------------------------------
 -- UNSYNCED
