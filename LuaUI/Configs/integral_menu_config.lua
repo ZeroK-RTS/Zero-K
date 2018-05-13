@@ -234,7 +234,14 @@ local instantCommands = {
 	[CMD_EMBARK] = true,
 	[CMD_DISEMBARK] = true,
 	[CMD_LOADUNITS_SELECTED] = true,
+	
 	[CMD_ONECLICK_WEAPON] = true,
+	[CMD_DETONATE] = true,
+	[CMD_CANCERTERRA] = true,
+	[CMD_SPEEDBOOST] = true,
+	[CMD_DROPCARGO] = true,
+	[CMD_SELECTCARGO] = true,
+	
 	[CMD_UNIT_CANCEL_TARGET] = true,
 	[CMD_STOP_NEWTON_FIREZONE] = true,
 	[CMD_RECALL_DRONES] = true,

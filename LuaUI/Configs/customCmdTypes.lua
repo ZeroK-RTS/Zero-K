@@ -52,7 +52,13 @@ local custom_cmd_actions = {
 	embark = {cmdType = 3, name = "Embark"},
 	disembark = {cmdType = 3, name = "Disembark"},
 	loadselected = {cmdType = 3, name = "Load Selected Units"},
+	
 	oneclickwep = {cmdType = 3, name = "Activate Special"},
+	detonate = {cmdType = 3, name = "Detonate"},
+	speedboost = {cmdType = 3, name = "Speed Boost"},
+	dropcargo = {cmdType = 3, name = "Drop Cargo"},
+	selectcargo = {cmdType = 3, name = "Select Cargo"},
+	
 	settargetcircle = {cmdType = 1, name = "Set Target"},
 	settarget = {cmdType = 1, name = "Set Target (rectangle)"},
 	canceltarget = {cmdType = 3, name = "Cancel Target"},
@@ -157,7 +163,13 @@ local usedActions = {
 	["toggledrones"] = true,
 	["divestate"] = true,
 	["wantcloak"] = true,
+	
 	["oneclickwep"] = true,
+	["detonate"] = true,
+	["speedboost"] = true,
+	["dropcargo"] = true,
+	["selectcargo"] = true,
+	
 	["floatstate"] = true,
 	["airstrafe"] = true,
 	["dontfireatradar"] = true,

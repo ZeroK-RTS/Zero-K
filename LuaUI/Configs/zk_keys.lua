@@ -94,6 +94,11 @@ return {
 		{	"selectcomm",	"ctrl+c",},
 		{	"manualfire",	"d",},
 		{	"oneclickwep",	"d",},
+		{	"speedboost",	"d",}, 
+		{	"selectcargo", "d",},
+		{	"dropcargo",	"d",},
+		{	"detonate",		"d",}, 
+		
 		{	"placebeacon",  "d",},
 		{	"reclaim",	"e",},
 		{	"fight",	"a",},

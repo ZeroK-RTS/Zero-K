@@ -306,7 +306,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			local cargoDefID = spGetUnitDefID(cargo[1])
 			if gy < 0 and (UnitDefs[cargoDefID].customParams.commtype or floatDefs[cargoDefID] or dropableUnits[cargoDefID]) then
 				transportPhase[unitID] = "INTERNAL_UNLOAD_UNITS"
-				giveDROP_order[#giveDROP_order+1] = {unitID,CMD.INSERT,{1,CMD_ONECLICK_WEAPON,CMD.OPT_INTERNAL}, CMD.OPT_ALT}
+				giveDROP_order[#giveDROP_order+1] = {unitID,CMD.INSERT,{1,CMD_DROPCARGO, CMD.OPT_INTERNAL}, CMD.OPT_ALT}
 				-- Spring.Echo("E")
 				--"PHASE E"--
 				return true,false --hold this command (removed in next frame after giveLOAD_order have inserted command (this avoid unit trigger UnitIdle)

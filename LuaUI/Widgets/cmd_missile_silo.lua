@@ -2,7 +2,7 @@ function widget:GetInfo()
 	return {
 		name      = "Missile Silo Commands",
 		desc      = "Okay, take a nap. THEN FIRE ZE MISSILES!",
-		author    = "GoogleFrog",
+		author    = "Histidine (L.J. Lim)",
 		date      = "2018-05-12",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
@@ -140,7 +140,7 @@ function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpti
 	if (not silos[unitID]) or cmdOptions.shift then
 		return
 	end
-	if cmdID == CMD_ONECLICK_WEAPON then
+	if cmdID == CMD_SELECTCARGO then
 		AwaitMissileSelection(unitID)
 	elseif cmdID == CMD.ATTACK then
 		--FireOneMissileAtSiloTarget(unitID, cmdParams)

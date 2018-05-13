@@ -25,7 +25,7 @@ local function RetreatThread()
 	Sleep(800)
 	local specialReloadState = Spring.GetUnitRulesParam(unitID,"specialReloadFrame")
 	if (not specialReloadState or (specialReloadState <= Spring.GetGameFrame())) then
-		Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_ONECLICK_WEAPON, CMD.OPT_INTERNAL,}, CMD.OPT_ALT)
+		Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_SPEEDBOOST, CMD.OPT_INTERNAL,}, CMD.OPT_ALT)
 	end
 end
 

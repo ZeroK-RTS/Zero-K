@@ -26,6 +26,8 @@ local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 
 include "LuaRules/Configs/customcmds.h.lua"
 
+local defs, cmds = include "LuaRules/Configs/oneclick_weapon_defs.lua"
+
 if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 -- SYNCED
@@ -43,8 +45,6 @@ local oneClickWepCMD = {
 }
 
 local INITIAL_CMD_DESC_ID = 500
-
-local defs = include "LuaRules/Configs/oneclick_weapon_defs.lua"
 
 --local reloadFrame = {}
 --local scheduledReload = {}
@@ -66,10 +66,13 @@ function gadget:UnitCreated(unitID, unitDefID, team)
 		--reloadFrame[unitID] = {}
 		-- add oneclick weapon commands
 		for i=1, #defs[unitDefID] do
+			local def = defs[unitDefID][i]
 			local desc = Spring.Utilities.CopyTable(oneClickWepCMD)
-			desc.name = defs[unitDefID][i].name
-			desc.tooltip = defs[unitDefID][i].tooltip or desc.tooltip
-			desc.texture = defs[unitDefID][i].texture or desc.texture
+			desc.id = def.cmdID or desc.id
+			desc.name = def.name
+			desc.action = def.action or desc.action
+			desc.tooltip = def.tooltip or desc.tooltip
+			desc.texture = def.texture or desc.texture
 			desc.params = {i}
 			
 			Spring.InsertUnitCmdDesc(unitID, INITIAL_CMD_DESC_ID + (i-1), desc)
@@ -99,10 +102,13 @@ function gadget:GameFrame(n)
 end
 ]]--
 
-local function doTheCommand(unitID, unitDefID, num)
+local function doTheCommand(unitID, unitDefID, cmdID, num)
 	local data = defs[unitDefID] and defs[unitDefID][num]
 	if (data) then
 		if data.dummy then
+			return true
+		end
+		if data.cmdID ~= cmdID then
 			return true
 		end
 		
@@ -138,14 +144,14 @@ end
 
 -- process command
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if cmdID == CMD_ONECLICK_WEAPON then
-		return true, doTheCommand(unitID, unitDefID, cmdParams[1] or 1)
+	if cmds[cmdID] then
+		return true, doTheCommand(unitID, unitDefID, cmdID, cmdParams[1] or 1)
 	end
 	return false -- command not used
 end
 
 function gadget:AllowCommand_GetWantedCommand()
-	return {[CMD_ONECLICK_WEAPON] = true}
+	return cmds
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
@@ -153,17 +159,17 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if cmdID == CMD_ONECLICK_WEAPON and not cmdOptions.shift then
+	if cmds[cmdID] and not cmdOptions.shift then
 		if defs[unitDefID] and defs[unitDefID].dummy then
 			return true
 		end
 		
 		local cmd = Spring.GetCommandQueue(unitID, 1)
-		if cmd and cmd[1] and cmd[1].id and cmd[1].id == CMD_ONECLICK_WEAPON then
-			Spring.GiveOrderToUnit(unitID,CMD.REMOVE,{cmd[1].tag}, 0)
+		if cmd and cmd[1] and cmd[1].id and cmds[cmd[1].id] then
+			Spring.GiveOrderToUnit(unitID,CMD.REMOVE,{cmd[1].tag},{})
 			return false
 		end
-		Spring.GiveOrderToUnit(unitID,CMD.INSERT,{0,CMD_ONECLICK_WEAPON,cmdParams[1] or 1}, CMD.OPT_ALT)
+		Spring.GiveOrderToUnit(unitID,CMD.INSERT,{0,cmdID,cmdParams[1] or 1},{"alt"})
 		return false
 	end
 	return true
@@ -174,8 +180,10 @@ else
 -- UNSYNCED
 --------------------------------------------------------------------------------
 function gadget:Initialize()
-	gadgetHandler:RegisterCMDID(CMD_ONECLICK_WEAPON)
-	Spring.SetCustomCommandDrawData(CMD_ONECLICK_WEAPON, "dgun", {1, 1, 1, 0.7})
+	for cmdID in pairs(cmds) do
+		gadgetHandler:RegisterCMDID(cmdID)
+		Spring.SetCustomCommandDrawData(cmdID, "dgun", {1, 1, 1, 0.7})
+	end
 	Spring.AssignMouseCursor("oneclickwep", "cursordgun", true, true)
 	gadgetHandler:RemoveGadget()
 end
