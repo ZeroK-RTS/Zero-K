@@ -33,23 +33,7 @@ local EVAC_STATE = {
 	WORMHOLE_DESTROYED = 4,
 }
 
--- FIXME: post feature freeze, rewrite to use data provided by infra. See #2877
-local factions = {
-	Cybernetic = {name = "Cybernetic Front", color = {136,170,255} },
-	Federation = {name = "Federation", color = {0, 226, 0} },
-	Dynasty = {name = "Dynasty of Man", color = {255, 191, 0} },
-	Machines = {name = "Free Machines", color = {170, 0, 0} },
-	Empire = {name = "Empire Reborn", color = {96, 16, 255} },
-	Liberty = {name = "Liberated Humanity", color = {85, 187, 85} },
-	SynPact = {name = "Synthetic Pact", color = {83, 136, 235} },
-}
 local NEUTRAL_FACTION = "Mercenary"
-
-for faction, data in pairs(factions) do
-	for i = 1, 3 do
-		data.color[i] = data.color[i]/255
-	end
-end
 
 local flashState = true
 
@@ -356,7 +340,15 @@ local function CreateFactionDisplayWindow()
 		},
 		parent = factionDisplayWindow,
 	}
-	
+
+	local function HexToColorTable(hexcode)
+		local ret = {true, true, true, 1.0}
+		for i = 1, 3 do
+			ret[i] = tonumber(hexcode:sub(2*i, 2*i+1), 16) / 255
+		end
+		return ret
+	end
+
 	if not attacker then
 		Chili.Label:New {
 			x = IMAGE_WIDTH + 20,
@@ -387,11 +379,11 @@ local function CreateFactionDisplayWindow()
 			y = ATTACKER_POS + 6,
 			height = IMAGE_WIDTH,
 			align="left",
-			caption = factions[attacker] and factions[attacker].name or attacker or "Unknown attacker",
+			caption = modoptions.attackingfactionname,
 			font = {
 				size = 14,
 				shadow = true,
-				color = factions[attacker] and factions[attacker].color,
+				color = HexToColorTable(modoptions.attackingfactioncolor),
 			},
 			parent = factionDisplayWindow,
 		}
@@ -426,11 +418,11 @@ local function CreateFactionDisplayWindow()
 			x = IMAGE_WIDTH + 20,
 			y = DEFENDER_POS + 6,
 			height = IMAGE_WIDTH,
-			caption = factions[defender] and factions[defender].name or defender or "Unknown defender",
+			caption = modoptions.defendingfactionname,
 			font = {
 				size = 14,
 				shadow = true,
-				color = factions[defender] and factions[defender].color,
+				color = HexToColorTable(modoptions.defendingfactioncolor),
 			},
 			parent = factionDisplayWindow,
 		}
