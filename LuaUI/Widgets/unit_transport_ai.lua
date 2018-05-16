@@ -249,7 +249,7 @@ function IsTransportable(unitDefID, unitID)
 	udc = ud.springCategories
 	local _,_,_,_,y = spGetUnitPosition(unitID,true)
 	y = y + Spring.GetUnitRadius(unitID)
-	return (udc~= nil and ud.speed > 0 and not ud.canFly and (y>-20 or floatDefs[unitDefID]))
+	return (udc~= nil and ud.isGroundUnit and (y>-20 or floatDefs[unitDefID]))
 end
 
 function IsDisembark(cmd)

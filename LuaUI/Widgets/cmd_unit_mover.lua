@@ -96,7 +96,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
  end
    
  local ud = UnitDefs[unitDefID]
- if (ud and (not ud.customParams.commtype) and (ud.speed > 0)) then
+ if (ud and (not ud.customParams.commtype) and not ud.isImmobile) then
    checkSpec()
    moveUnits[unitID] = true
    countDown = 0
