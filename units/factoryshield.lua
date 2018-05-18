@@ -62,7 +62,7 @@ unitDef = {
   sightDistance                 = 273,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
-  workerTime                    = 10,
+  workerTime                    = Shared.FACTORY_BUILDPOWER,
   yardMap                       = [[oooooo occcco occcco occcco occcco occcco yyyyyy yyyyyy yyyyyy]],
 
   featureDefs                   = {
