@@ -8,55 +8,37 @@ function gadget:GetInfo() return {
 	enabled   = true,
 } end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Globals because I hear SendToUnsynced is really slow so copying strings
--- needlessly is bad.
+if gadgetHandler:IsSyncedCode() then
+	local SendToUnsync = SendToUnsynced
 
-local soundList = {
-	"sounds/misc/teleport.wav",
-	"sounds/misc/teleport2.wav",
-	"sounds/misc/teleport_loop.wav",
-}
-
-local soundMap = {}
-for i = 1, #soundList do
-	soundMap[soundList[i]] = i
-end
-
---------------------------------------------------------------------------------
-if gadgetHandler:IsSyncedCode() then -- Synced ---------------------------------
---------------------------------------------------------------------------------
-
-function GG.PlayFogHiddenSound(sound, volume, x, y, z)
-	soundIndex = soundMap[sound]
-	if soundIndex then
-		if x then
-			SendToUnsynced("playSound", soundIndex, volume, x, y, z)
-		else
-			Spring.Echo("Sound position not found", sound, volume, x, y, z)
-		end
-	else
-		Spring.Echo("Sound not found in gadget-side sound list", sound)
+	function GG.PlayFogHiddenSound(sound, volume, x, y, z)
+		SendToUnsync("playSound", sound, volume, x, y, z)
 	end
-end
+else
+	local spIsPosInLos    = Spring.IsPosInLos
+	local spPlaySoundFile = Spring.PlaySoundFile
 
---------------------------------------------------------------------------------
-else ----------------------------------Unsynced --------------------------------
---------------------------------------------------------------------------------
-
-local function playSound(_, sound, volume, x, y, z)
-	local _, fullView = select(2, Spring.GetSpectatingState())
 	local myAllyTeam = Spring.GetLocalAllyTeamID()
-	if (fullView or Spring.IsPosInLos(x, y, z, myAllyTeam)) then
-		Spring.PlaySoundFile(soundList[sound], volume, x, y, z)
+	local fullView = select(2, Spring.GetSpectatingState())
+
+	local function playSound(_, sound, volume, x, y, z)
+		if not fullView and not spIsPosInLos(x, y, z, myAllyTeam) then
+			return
+		end
+		spPlaySoundFile(sound, volume, x, y, z)
+	end
+
+	local myPlayerID = Spring.GetLocalPlayerID()
+	function gadget:PlayerChanged(playerID)
+		if playerID ~= myPlayerID then
+			return
+		end
+
+		fullView = select(2, Spring.GetSpectatingState())
+		myAllyTeam = Spring.GetLocalAllyTeamID()
+	end
+
+	function gadget:Initialize()
+		gadgetHandler:AddSyncAction("playSound", playSound)
 	end
 end
-
-function gadget:Initialize()
-	gadgetHandler:AddSyncAction("playSound", playSound)
-end
-
---------------------------------------------------------------------------------
-end -------------------------------- End Unsynced ------------------------------
---------------------------------------------------------------------------------
