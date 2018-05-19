@@ -43,8 +43,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-if (not gl.CreateShader) then
-  return false
+if not gl.CreateShader then
+	Spring.Log("CUS", LOG.WARNING, "Shaders not supported, disabling")
+	return
 end
 
 --------------------------------------------------------------------------------
@@ -161,8 +162,20 @@ local function CompileShader(shader, definitions, plugins)
 
   local GLSLshader = gl.CreateShader(shader)
   local errorLog = gl.GetShaderLog()
-  if (errorLog and errorLog~= "") then
-    Spring.Echo("Custom Unit Shaders:", errorLog)
+  if not GLSLshader or errorLog ~= "" then
+    local function log (x)
+      Spring.Log("CUS", GLSLshader and LOG.NOTICE or LOG.ERROR, x)
+    end
+
+    if not GLSLshader then
+      log("LUA_ERRRUN") -- notice me crashreporter-senpai (ideally it would catch anything with LOG.ERROR by itself, FIXME)
+    end
+
+    log("CUS shader log -----------------------------\n" .. errorLog)
+    log("Vertex -------------------------------------\n" .. (shader.vertex   or "nil"))
+    log("Fragment -----------------------------------\n" .. (shader.fragment or "nil"))
+    log("Geometry -----------------------------------\n" .. (shader.geometry or "nil"))
+    log("CUS end ------------------------------------")
   end
 
   shader.vertex   = shader.vertexOrig
