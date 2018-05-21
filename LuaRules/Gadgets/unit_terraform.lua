@@ -3670,7 +3670,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
 	-- add structure to structure table
-	if ud.isImmobile and not ud.customParams.mobilebuilding then
+    if (ud.isBuilding == true or ud.maxAcc == 0) and (not ud.customParams.mobilebuilding) then
 	    local ux, uy, uz = spGetUnitPosition(unitID)
 		ux = floor((ux+4)/8)*8
 		uz = floor((uz+4)/8)*8

@@ -112,7 +112,7 @@ local function GetUnitString(unitID, tabs, sendCommands)
 	
 	local facing = 0
 	
-	if ud.isImmobile then
+	if ud.isBuilding or ud.speed == 0 then
 		facing = Spring.GetUnitBuildFacing(unitID)
 		x, z = SanitizeBuildPositon(x, z, ud, facing)
 	else
@@ -120,6 +120,7 @@ local function GetUnitString(unitID, tabs, sendCommands)
 	end
 	
 	local build = select(5, Spring.GetUnitHealth(unitID))
+	local isMobile = not (ud.isBuilding or ud.speed == 0)
 	
 	local inTabs = tabs .. "\t\t"
 	local unitString = tabs .. "\t{\n"
@@ -133,7 +134,7 @@ local function GetUnitString(unitID, tabs, sendCommands)
 		unitString = unitString .. inTabs .. [[buildProgress = ]] .. math.floor(build*10000)/10000 .. [[,]] .. "\n"
 	end
 	
-	if ud.isImmobile then
+	if not isMobile then
 		local origHeight = Spring.GetGroundOrigHeight(x, z)
 		if ud.floatOnWater and (origHeight < 0) then
 			origHeight = 0
@@ -146,7 +147,7 @@ local function GetUnitString(unitID, tabs, sendCommands)
 	if sendCommands then
 		local commands = Spring.GetUnitCommands(unitID, -1)
 		if commands and #commands > 0 then
-			local commandString = ProcessUnitCommands(inTabs, commands, unitID, not ud.isImmobile)
+			local commandString = ProcessUnitCommands(inTabs, commands, unitID, isMobile)
 			if commandString then
 				unitString = unitString .. commandString
 			end
@@ -242,7 +243,7 @@ local function MoveUnitRaw(snap)
 	end
 	
 	local x, z = math.floor(pos[1]), math.floor(pos[3])
-	if snap or ud.isImmobile then
+	if snap or ud.isBuilding or ud.speed == 0 then
 		local facing = Spring.GetUnitBuildFacing(unitID)
 		x, z = SanitizeBuildPositon(x, z, ud, facing)
 	end
@@ -280,7 +281,7 @@ local function RotateUnit(add)
 		local ud = unitDefID and UnitDefs[unitDefID]
 		if ud then
 			local facing
-			if ud.isImmobile then
+			if ud.isBuilding or ud.speed == 0 then
 				facing = Spring.GetUnitBuildFacing(units[i])
 			else
 				facing = GetUnitFacing(units[i])

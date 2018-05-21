@@ -651,12 +651,12 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		x, z = GetClearPlacement(ud.id, x, z, unitData.spawnRadius, -ud.maxWaterDepth)
 	end
 	
-	if ud.isImmobile == 0 then
+	if ud.isBuilding or ud.speed == 0 then
 		x, z, xSize, zSize = SanitizeBuildPositon(x, z, ud, facing)
 	end
 	
 	local build = (unitData.buildProgress and unitData.buildProgress < 1) or false
-	local wantLevel = ud.isImmobile and ud.levelGround
+	local wantLevel = (ud.isBuilding or ud.speed == 0) and ud.levelGround
 	local unitID
 	if unitData.orbitalDrop then
 		unitID = GG.DropUnit(ud.name, x, Spring.GetGroundHeight(x,z), z, facing, teamID, true)
@@ -803,7 +803,7 @@ local function AddUnitTerraform(unitData)
 	
 	local x, z, facing = unitData.x, unitData.z, unitData.facing
 	
-	if ud.isImmobile then
+	if ud.isBuilding or ud.speed == 0 then
 		x, z = SanitizeBuildPositon(x, z, ud, facing)
 	end
 	
@@ -855,7 +855,7 @@ local function PlaceFeature(featureData, teamID)
 	if string.find(name, "_dead") then
 		unitDefName = string.gsub(name, "_dead", "")
 		local ud = UnitDefNames[unitDefName]
-		if ud.isImmobile then
+		if ud.isBuilding or ud.speed == 0 then
 			x, z = SanitizeBuildPositon(x, z, ud, facing)
 		end
 	end

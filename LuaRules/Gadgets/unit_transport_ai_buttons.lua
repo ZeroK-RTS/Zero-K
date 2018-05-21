@@ -116,7 +116,7 @@ function IsTransportable(unitDefID)
   ud = UnitDefs[unitDefID]
   if (ud == nil) then return false end
   udc = ud.springCategories
-  return udc~= nil and ud.isGroundUnit and not ud.cantBeTransported
+  return (udc~= nil and ud.speed > 0 and not ud.canFly)
 end
 
 

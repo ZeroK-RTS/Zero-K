@@ -973,7 +973,7 @@ function widget:MousePress(mx, my, button)
 					local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
 					if c and ty == "unit" and c then
 						local ud = UnitDefs[spGetUnitDefID(id)]
-						--if ud.isImmobile then
+						--if (ud.isBuilding == true or ud.maxAcc == 0) then
 						mouseUnit = {id = id, ud = ud}
 						drawingRectangle = true
 						point[1] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}

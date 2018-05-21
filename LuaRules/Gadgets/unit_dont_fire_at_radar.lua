@@ -75,7 +75,7 @@ local function canShootAtUnit(targetID, allyTeam)
 		return true
 	elseif raw and raw > 2 then
 		local unitDefID = spGetUnitDefID(targetID)
-		if unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isImmobile then
+		if unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].speed == 0 then
 			return true
 		end
 	end

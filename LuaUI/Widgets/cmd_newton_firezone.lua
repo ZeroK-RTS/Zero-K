@@ -561,7 +561,7 @@ function widget:GameFrame(n)
 					for i = 1, #units do
 						local unitID = units[i]
 						local targetDefID = spGetUnitDefID(unitID)
-						if (not targetDefID) or not UnitDefs[targetDefID].isImmobile then
+						if (not targetDefID) or UnitDefs[targetDefID].speed > 0 then
 							stop = false
 							if victimStillBeingAttacked[g] == unitID then --wait signal from UnitDamaged() that a unit is still being pushed
 								victimStillBeingAttacked[g] = nil--clear wait signal

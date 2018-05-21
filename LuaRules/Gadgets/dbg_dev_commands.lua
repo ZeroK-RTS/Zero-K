@@ -485,7 +485,7 @@ local function RotateUnit(cmd, line, words, player)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	local ud = unitDefID and UnitDefs[unitDefID]
-	if ud.isImmobile then
+	if ud and ud.isBuilding or ud.speed == 0 then
 		x, z = SanitizeBuildPositon(x, z, ud, facing)
 	end
 	

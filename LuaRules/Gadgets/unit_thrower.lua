@@ -45,7 +45,7 @@ local getMovetype = Spring.Utilities.getMovetype
 local canBeThrown = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ud.isGroundUnit then -- includes sea units
+	if ud.speed > 0 and getMovetype(ud) == 2 then -- Only ground or sea units
 		canBeThrown[i] = true
 	end
 end

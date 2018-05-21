@@ -45,7 +45,7 @@ for name,data in pairs(UnitDefNames) do
 		if data.canAttack and data.weapons[1] and data.weapons[1].onlyTargets.land then
 			armedLand[data.id] = true
 		end
-		if not data.isImmobile then
+		if data.speed > 0 then
 			allMobileGround[data.id] = true
 		end
 	end

@@ -864,7 +864,7 @@ local function printAbilities(ud, unitID)
 		local decloakDistance = (unitID and Spring.GetUnitRulesParam(unitID, "comm_decloak_distance")) or ud.decloakDistance
 		cells[#cells+1] = 'Personal cloak'
 		cells[#cells+1] = ''
-		if not ud.isImmobile then
+		if ud.speed > 0 then
 			cells[#cells+1] = ' - Upkeep mobile: '
 			cells[#cells+1] = numformat(ud.cloakCostMoving) .. " E/s"
 			cells[#cells+1] = ' - Upkeep idle: '
@@ -1339,7 +1339,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	statschildren[#statschildren+1] = Label:New{ caption = 'Mass: ', textColor = color.stats_fg, }
 	statschildren[#statschildren+1] = Label:New{ caption = mass, textColor = color.stats_fg, }
 
-	if not ud.isImmobile then
+	if ud.speed > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Speed: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = speed .. " elmo/s", textColor = color.stats_fg, }
 	end

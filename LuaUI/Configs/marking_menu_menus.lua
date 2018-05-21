@@ -11,7 +11,7 @@ local menu_use = {
 }
 
 for name,udef in pairs(UnitDefNames) do
-	if udef.buildOptions and not menu_use[name] and not udef.isImmobile then
+	if udef.buildOptions and not menu_use[name] and udef.speed ~= 0 then
 		menu_use[name] = menu_armcom
 	end
 end

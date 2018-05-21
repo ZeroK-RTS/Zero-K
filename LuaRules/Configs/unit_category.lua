@@ -33,7 +33,7 @@ local function GetUnitCategory(unitDefID)
 		return "econ"
 	end
 	
-	if not ud.isImmobile then
+	if ud.speed > 0 then
 		return "army"
 	end
 	

@@ -80,7 +80,7 @@ local function GetAttackTarget(unitID)
 		if Spring.ValidUnitID(targetID) then
 			local unitDefID = Spring.GetUnitDefID(targetID)
 			local ud = UnitDefs[unitDefID]
-			return targetID, not ud.isImmobile
+			return targetID, ud and ud.speed ~= 0
 		end
 	end
 end

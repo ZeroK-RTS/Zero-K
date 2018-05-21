@@ -6,7 +6,7 @@ function Spring.Utilities.getMovetype(ud)
 		else
 			return 0 -- fixedwing
 		end
-	elseif not ud.isImmobile then
+	elseif not (ud.isBuilding or ud.isFactory or ud.speed == 0) then
 		return 2 -- ground/sea
 	end
 	return false -- For structures or any other invalid movetype

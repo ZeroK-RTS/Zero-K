@@ -319,10 +319,11 @@ local function DrawSearchlights()
 		  local ecc
 		  local heading
 		  local baseX, baseZ
+		  local speed = unitDef.speed
 		  local leadDist_to_height_ratio = 1
 		  local isAboveNominalHeight = false
 		  
-		  if unitDef.isImmobile then
+		  if (not speed or speed == 0) then
 			cache[defID]= cache[defID] or {}
 			if not cache[defID].leadDist then
 				leadDistance = unitRadius * 2
@@ -364,7 +365,6 @@ local function DrawSearchlights()
 			leadDist_to_height_ratio = cache[defID].lhRatio
 			radius = unitRadius * 2
 		  else
-			local speed = unitDef.speed
 		    cache[defID]= cache[defID] or {}
 			if not cache[defID].leadDist then
 				leadDistance = searchlightGroundLeadTime * speed
@@ -488,7 +488,7 @@ function widget:Initialize()
         or string.find(unitDef.name, "roost") 
         or string.find(unitDef.humanName, "Chicken")
         or string.find(unitDef.humanName, "Montro")
-        or (unitDef.isImmobile and not
+        or (unitDef.speed == 0 and not 
              (unitDef.weapons and unitDef.weapons[1]))
        ) then
       noLightList[unitDefID] = true

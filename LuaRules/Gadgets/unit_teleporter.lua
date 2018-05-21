@@ -21,11 +21,12 @@ local BEACON_WAIT_RANGE_MOVE = 150
 local BEACON_TELEPORT_RADIUS = 200
 local BEACON_TELEPORT_RADIUS_SQR = BEACON_TELEPORT_RADIUS^2
 
+local getMovetype = Spring.Utilities.getMovetype
 -- Used in synced and unsynced
 local canTeleport = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ud.isFactory or not (ud.isImmobile or ud.isStrafingAirUnit) then
+	if ud.isFactory or not (ud.speed == 0 or getMovetype(ud) == 0) then
 		canTeleport[i] = true
 	end
 end

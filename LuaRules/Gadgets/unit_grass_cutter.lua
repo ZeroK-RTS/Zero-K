@@ -22,9 +22,9 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	local ud = UnitDefs[unitDefID]
+	local ud = unitDefID and UnitDefs[unitDefID]
 	
-	if not ud.isImmobile or ud.customParams.mobilebuilding then
+	if not (ud and (ud.isBuilding or ud.speed == 0)) or ud.customParams.mobilebuilding then
 		return
 	end
 	

@@ -647,7 +647,7 @@ local function addUnit(defName, path)
 	}
 	options_order[#options_order+1] = defName .. "_buildpriority_0"
 
-	if ud.isImmobile then
+	if ud.speed == 0 then
 		options[defName .. "_buildpriority_0"].value = 1
 	end
 
@@ -681,7 +681,7 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_misc_priority"
 	end
 	
-	if ud.isMobileBuilder and not ud.isAirUnit and not ud.cantBeTransported then
+	if ud.isBuilder and (not (ud.isBuilding or ud.isFactory or ud.speed == 0)) and (not (ud.canFly or ud.isAirUnit)) and not ud.cantBeTransported then
 		options[defName .. "_auto_call_transport_2"] = {
 			name = "  Auto Call Transport",
 			desc = "Values: Inherit, Disabled, Enabled",

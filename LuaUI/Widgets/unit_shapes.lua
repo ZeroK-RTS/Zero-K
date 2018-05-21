@@ -507,7 +507,7 @@ function widget:Initialize()
 		end
 		
 		
-		if unitDef.isImmobile then
+		if (unitDef.isBuilding or unitDef.isFactory or unitDef.speed==0) then
 			shape = shapes.square
 			xscale, zscale = rectangleFactor * xsize, rectangleFactor * zsize
 		elseif (unitDef.canFly) then

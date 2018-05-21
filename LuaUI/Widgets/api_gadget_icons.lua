@@ -77,7 +77,7 @@ for unitDefID = 1, #UnitDefs do
 	if ud.customParams.requireammo then
 		rearmUnitDef[unitDefID] = true
 	end
-	if not ud.isImmobile then
+	if not (ud.speed == 0 or ud.isBuilding) then
 		retreatUnitDef[unitDefID] = true
 	end
 	if not ud.customParams.removewait then

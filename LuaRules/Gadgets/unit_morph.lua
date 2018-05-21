@@ -373,7 +373,7 @@ local function FinishMorph(unitID, morphData)
 	
 	local newUnit
 
-	if udDst.isImmobile then
+	if udDst.isBuilding or udDst.isFactory then
 		local x = math.floor(px/16)*16
 		local y = py
 		local z = math.floor(pz/16)*16

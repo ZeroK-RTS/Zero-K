@@ -32,7 +32,7 @@ local function GetUnitIsMobile(self, unitID)
 	if not ud then
 		return false
 	end
-	if ud.isImmobile then
+	if ud.isBuilding or ud.speed == 0 then
 		return false
 	end
 	local build = select(5, Spring.GetUnitHealth(unitID))

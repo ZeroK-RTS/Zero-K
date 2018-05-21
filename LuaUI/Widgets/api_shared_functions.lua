@@ -29,7 +29,7 @@ VFS.Include("LuaRules/Utilities/rulesParam.lua")
 
 local function GetBuildIconFrame(udef) 
 	local cp = udef.customParams
-	if udef.isMobileBuilder then
+	if (udef.isBuilder and udef.speed>0) then
 		return consTex
 
 	elseif (udef.isBuilder or udef.isFactory) then
