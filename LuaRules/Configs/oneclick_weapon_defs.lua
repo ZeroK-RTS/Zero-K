@@ -51,10 +51,10 @@ local oneClickWepDefNames = {
 		{ functionToCall = "ForceDropUnit", reloadTime = 7, name = "Drop Cargo", tooltip = "Eject Cargo", useSpecialReloadFrame = true,},
 	},
 	
-	staticmissilesilo = {
-		dummy = true,
-		{ functionToCall = nil, name = "Select Missiles", tooltip = "Select missiles", texture = "LuaUI/Images/Commands/Bold/missile.png"},
-	},
+	--staticmissilesilo = {
+	--	dummy = true,
+	--	{ functionToCall = nil, name = "Select Missiles", tooltip = "Select missiles", texture = "LuaUI/Images/Commands/Bold/missile.png"},
+	--},
 }
 
 
