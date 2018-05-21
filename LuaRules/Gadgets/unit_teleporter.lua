@@ -243,7 +243,7 @@ local function Teleport_AllowCommand(unitID, unitDefID, cmdID, cmdParams, cmdOpt
 	return gadget:AllowCommand(unitID, unitDefID, false, cmdID, cmdParams, cmdOptions)
 end
 
--- pick a point on map to teleport to
+-- pick a point on map (towards random one of 8 directions) to teleport to
 -- ud is teleportiee's unitdef, tx and tz are Djinn's position
 local function GetTeleTargetPos(ud, tx, tz)
 	local size = ud.xsize
