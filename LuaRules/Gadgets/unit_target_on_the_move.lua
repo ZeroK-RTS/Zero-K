@@ -394,7 +394,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					allyTeam = spGetUnitAllyTeam(unitID), 
 					allyAllowed = allyTargetUnits[unitDefID],
 					range = UnitDefs[unitDefID].maxWeaponRange,
-					alwaysSeen = tud.isImmobile,
+					alwaysSeen = tud and tud.isImmobile,
 				})
 			end
 		end
