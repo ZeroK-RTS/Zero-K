@@ -187,6 +187,9 @@ local spotData = {}
 local wasSpectating = spGetSpectatingState()
 local metalSpotsNil = true
 
+local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
+local metalmultInv = 1/math.max(metalmult, 0.01)
+
 ------------------------------------------------------------
 -- Functions
 ------------------------------------------------------------
@@ -654,8 +657,8 @@ function calcMainMexDrawList(onlyDrawCircle)
 			if y < 0 then y = 0 end
 
 			local r, g, b = getSpotColor(i)
-			local metal = spot.metal
-
+			local width = (spot.metal > 0 and spot.metal) or 0.1
+			width = width * metalmultInv
 
 			glPushMatrix()
 
@@ -663,10 +666,10 @@ function calcMainMexDrawList(onlyDrawCircle)
 
 			glColor(0,0,0,0.7)
 			-- glDepthTest(false)
-			glLineWidth(spot.metal*2.4)
+			glLineWidth(width*2.4)
 			glDrawGroundCircle(x, 1, z, 40, 21)
 			glColor(r,g,b,0.7)
-			glLineWidth(spot.metal*1.5)
+			glLineWidth(width*1.5)
 			glDrawGroundCircle(x, 1, z, 40, 21)
 
 			--glColor(0,1,1)
@@ -918,12 +921,14 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 			local y = spGetGroundHeight(x,z)
 
 			local r,g,b = getSpotColor(i)
+			local width = (spot.metal > 0 and spot.metal) or 0.1
+			width = width * metalmultInv
 
 			glLighting(false)
 			glColor(0,0,0,1)
-			glLineWidth(((spot.metal > 0 and spot.metal) or 0.1)*2.0)
+			glLineWidth(width*2.0)
 			glDrawCircle(x, z, MINIMAP_DRAW_SIZE)
-			glLineWidth(((spot.metal > 0 and spot.metal) or 0.1)*0.8)
+			glLineWidth(width*0.8)
 			glColor(r,g,b,1.0)
 
 			glDrawCircle(x, z, MINIMAP_DRAW_SIZE)
