@@ -651,7 +651,7 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		x, z = GetClearPlacement(ud.id, x, z, unitData.spawnRadius, -ud.maxWaterDepth)
 	end
 	
-	if ud.isImmobile == 0 then
+	if ud.isImmobile then
 		x, z, xSize, zSize = SanitizeBuildPositon(x, z, ud, facing)
 	end
 	
