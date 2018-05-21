@@ -599,7 +599,7 @@ local function GetUnitRegenString(unitID, ud)
 			if ((ud.idleTime <= 300) and (regen_timer > 0)) then
 				return "  (" .. math.ceil(regen_timer / 30) .. "s)"
 			else
-				local regenMult = spGetUnitRulesParam(unitID,"totalBuildPowerChange") or 1
+				local regenMult = (1 - (spGetUnitRulesParam(unitID, "slowState") or 0)) * (1 - (spGetUnitRulesParam(unitID,"disarmed") or 0))
 				if regenMult == 0 then
 					return
 				end
