@@ -93,7 +93,7 @@ local pi = math.pi
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	canGuardUnitDefIDs[i] = ud.speed > 0 or ud.isFactory 
+	canGuardUnitDefIDs[i] = not ud.isImmobile or ud.isFactory
 end
 
 --------------------------------------------------------------------------------

@@ -116,7 +116,7 @@ function GG.DropUnit(unitDefName, x, y, z, facing, teamID, useSetUnitVelocity, t
   if (unitDef == nil) then -- dynamic comm
     unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
   end
-  if not unitDef.isBuilding and unitDef.speed > 0 and Spring.GetGameFrame() > 1 and ((not timeToGround) or timeToGround > 0) then
+  if not unitDef.isImmobile and Spring.GetGameFrame() > 1 and ((not timeToGround) or timeToGround > 0) then
 	timeToGround,fallGravity,absSpawnHeight,absBrakeHeight = timeToGround or defTimeToGround,fallGravity or defFallGravity,absSpawnHeight or defSpawnHeight,absBrakeHeight or defBrakeHeight --check input for NIL
     y = gy + absSpawnHeight+10 --spawn height
 	local speedProfile = GetFallProfile(timeToGround, fallGravity,absSpawnHeight,absBrakeHeight)

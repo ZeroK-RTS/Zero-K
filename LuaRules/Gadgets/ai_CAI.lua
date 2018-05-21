@@ -558,7 +558,7 @@ local function isPosThreatened(allyTeam, x, z)
 		if unitAllyTeam ~= allyTeam then
 			local ud = UnitDefs[spGetUnitDefID(unitID)]
 			if ud.maxWeaponRange > MIN_RANGE_TO_THREATEN_SPOT and ud.weapons[1].onlyTargets.land then
-				if ud.speed == 0 then	-- fixed def
+				if ud.isImmobile then -- fixed def
 					local px, py, pz = spGetUnitPosition(unitID)
 					local dist = disSQ(x, z, px, pz)
 					if dist < ud.maxWeaponRange + 50 then
@@ -612,7 +612,7 @@ local function makeReponsiveDefence(team,unitID,eid,eUnitDefID,aidSearchRange)
 	local ex,ey,ez = spGetUnitPosition(eid)
 	local defenceDef = buildDefs.defenceIds[1][1].ID
 	
-	if eud.speed > 0 then
+	if not eud.isImmobile then
 	
 		local range = eud.maxWeaponRange
 		if range > 500 then
@@ -2634,7 +2634,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 		if ud.maxWeaponRange > 0 then -- combat
 			at.enemyForceComposition.totalCost = at.enemyForceComposition.totalCost + ud.metalCost
 			if ud.weapons[1].onlyTargets.land then 
-				if ud.speed > 0 then -- offense
+				if not ud.isImmobile then -- offense
 					addValueToHeatmap(enemyOffense,enemyOffenseHeatmap, ud.metalCost, aX, aZ)
 				else -- defence
 					addValueToHeatmapInArea(enemyDefence,enemyDefenceHeatmap, ud.metalCost, x, z)
@@ -2656,7 +2656,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 		
 		if ud.maxWeaponRange > 0 then -- combat
 			at.enemyForceComposition.totalCost = at.enemyForceComposition.totalCost + ud.metalCost
-			if ud.speed > 0 then -- offense
+			if not ud.isImmobile then -- offense
 				if ud.canFly then
 					at.enemyForceComposition.unit.air = at.enemyForceComposition.unit.air + ud.metalCost
 					at.enemyHasAir = true
@@ -2696,7 +2696,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 		at.fighterTarget = unitID
 	end
 	
-	if ud.maxWeaponRange > 0 and (not ud.weapons[1].onlyTargets.land) and ud.speed > 0 then
+	if ud.maxWeaponRange > 0 and (not ud.weapons[1].onlyTargets.land) and not ud.isImmobile then
 		at.enemyMobileAA[unitID] = {x = x, z = z, rangeSQ = ud.maxWeaponRange^2, range = ud.maxWeaponRange, cost = ud.metalCost, spottedFrame = gameframe}
 	end
 
@@ -2736,7 +2736,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	
 		if a.controlledUnit.conByID[unitID] and not a.controlledUnit.conByID[unitID].makingDefence then
 			local ud = UnitDefs[attackerDefID]
-			if ud.speed == 0 then
+			if ud.isImmobile then
 				makeReponsiveDefence(unitTeam,unitID,attackerID,attackerDefID,200)
 			else
 				runAway(unitID,attackerID,500)
@@ -3026,8 +3026,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 				controlledUnit.factoryByID[controlledUnit.factory[controlledUnit.factory.count]].index = index
 				controlledUnit.factoryByID[unitID] = nil
 				removeIndexFromArray(controlledUnit.factory,index)
-			elseif ud.buildSpeed > 0 then
-				if ud.speed > 0 then -- constructor
+			elseif ud.isMobileBuilder then
 					if controlledUnit.conByID[unitID].finished then
 						a.totalBP = a.totalBP - controlledUnit.conByID[unitID].bp
 						local jobIndex = controlledUnit.conByID[unitID].currentJob
@@ -3045,7 +3044,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					controlledUnit.con.cost = controlledUnit.con.cost - ud.metalCost
 					controlledUnit.con.count = controlledUnit.con.count - 1
 					controlledUnit.conByID[unitID] = nil
-				else -- nano turret
+			elseif ud.isStaticBuilder then
                     controlledUnit.nano.cost = controlledUnit.nano.cost - ud.metalCost
 					local index = controlledUnit.nanoByID[unitID].index
                     controlledUnit.nanoByID[controlledUnit.nano[controlledUnit.nano.count]].index = index
@@ -3055,7 +3054,6 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					end
 					controlledUnit.nanoByID[unitID] = nil
                     removeIndexFromArray(controlledUnit.nano,index)
-				end
 			elseif controlledUnit.anyByID[unitID].isScout then
 				controlledUnit.scout.cost = controlledUnit.scout.cost - ud.metalCost
 				controlledUnit.scout.count = controlledUnit.scout.count - 1
@@ -3084,7 +3082,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					controlledUnit.scout.count = controlledUnit.scout.count - 1
 					controlledUnit.scoutByID[unitID] = nil
 				end
-			elseif ud.maxWeaponRange > 0 and ud.speed > 0 then -- land combat unit
+			elseif ud.maxWeaponRange > 0 and not ud.isImmobile then -- land combat unit
 				
 				if ud.weapons[1].onlyTargets.land then -- land firing combat
 					if ud.speed >= 3*30 then -- raider
@@ -3106,7 +3104,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					controlledUnit.aaByID[unitID] = nil
 				end
 				
-			elseif ud.isBuilding or ud.speed == 0 then -- building
+			elseif ud.isImmobile then -- building
 				if ud.maxWeaponRange > 0 then -- turret
 					a.wantedDefence.count = a.wantedDefence.count + 1
 					a.wantedDefence[a.wantedDefence.count] = {ID = ud.id, 
@@ -3166,7 +3164,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					at.enemyForceComposition.unit.arty = at.enemyForceComposition.unit.arty - ud.metalCost
 				end
 				
-				if ud.maxWeaponRange > 0 and (not ud.weapons[1].onlyTargets.land) and ud.speed > 0 then
+				if ud.maxWeaponRange > 0 and (not ud.weapons[1].onlyTargets.land) and not ud.isImmobile then
 					at.enemyMobileAA[unitID] = nil
 					at.enemyForceComposition.unit.antiAir = at.enemyForceComposition.unit.antiAir - ud.metalCost
 				end
@@ -3175,7 +3173,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					at.enemyForceComposition.unit.air = at.enemyForceComposition.unit.air - ud.metalCost
 				end
 				
-				if ud.maxWeaponRange > 0 and ud.speed == 0 then
+				if ud.maxWeaponRange > 0 and ud.isImmobile then
 					if ud.weapons[1].onlyTargets.land then
 						at.enemyForceComposition.unit.groundDefence = at.enemyForceComposition.unit.groundDefence - ud.metalCost
 					else
@@ -3205,7 +3203,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					at.enemyForceComposition.unit.arty = at.enemyForceComposition.unit.arty - ud.metalCost
 				end
 				
-				if ud.maxWeaponRange > 0 and (not ud.weapons[1].onlyTargets.land) and ud.speed > 0 then
+				if ud.maxWeaponRange > 0 and (not ud.weapons[1].onlyTargets.land) and not ud.isImmobile then
 					at.enemyMobileAA[unitID] = nil
 					at.enemyForceComposition.unit.antiAir = at.enemyForceComposition.unit.antiAir - ud.metalCost
 				end
@@ -3214,7 +3212,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					at.enemyForceComposition.unit.air = at.enemyForceComposition.unit.air - ud.metalCost
 				end
 				
-				if ud.maxWeaponRange > 0 and ud.speed == 0 then
+				if ud.maxWeaponRange > 0 and ud.isImmobile then
 					if ud.weapons[1].onlyTargets.land then
 						at.enemyForceComposition.unit.groundDefence = at.enemyForceComposition.unit.groundDefence - ud.metalCost
 					else
@@ -3290,7 +3288,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 					ud = ud,bp = ud.buildSpeed, x = x, y = y, z = z, cost = ud.metalCost, producingScout = false, producingRaider = false,
 					wayX = mx, wayY = my, wayZ = mz, nanoX = amx, nanoY = amy, nanoZ = amz, onDefenceHeatmap = not built}
 			elseif ud.buildSpeed > 0 then
-				if ud.speed > 0 then -- constructor
+				if not ud.isImmobile then -- constructor
 					controlledUnit.con.count = controlledUnit.con.count + 1
 					controlledUnit.con.cost = controlledUnit.con.cost + ud.metalCost
 					controlledUnit.conByID[unitID] = {ud = ud,bp = ud.buildSpeed, finished = false, index = controlledUnit.con.count, idle = true, currentJob = 0, oldJob = 0, makingDefence  = false}
@@ -3351,7 +3349,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 					controlledUnit.scout.count = controlledUnit.scout.count + 1
 					controlledUnit.scoutByID[unitID] = { ud = ud, cost = ud.metalCost, finished = false}
 				end
-			elseif ud.maxWeaponRange > 0 and ud.speed > 0 then -- land combat unit
+			elseif ud.maxWeaponRange > 0 and not ud.isImmobile then -- land combat unit
 	
 				if ud.weapons[1].onlyTargets.land then -- land firing combat
 					if ud.speed >= 3*30 then -- raider
@@ -3374,7 +3372,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 					controlledUnit.aaByID[unitID] = { ud = ud, cost = ud.metalCost, finished = false}
 				end
 				
-			elseif ud.isBuilding or ud.speed == 0 then -- building
+			elseif ud.isImmobile then -- building
 				if ud.maxWeaponRange > 0 then -- turret
 					local x,y,z = spGetUnitPosition(unitID)
 					for i = 1, a.wantedDefence.count do
@@ -3421,9 +3419,9 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 			
 		elseif ud.canFly then -- aircraft
 		
-		elseif ud.maxWeaponRange > 0 and ud.speed > 0 then -- land combat unit
+		elseif ud.maxWeaponRange > 0 and not ud.isImmobile then -- land combat unit
 			
-		elseif ud.isBuilding or ud.speed == 0 then -- building
+		elseif ud.isImmobile then -- building
 			if ud.maxWeaponRange > 0 then 
 				units.turretByID[unitID] = true
 			elseif (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0) then
@@ -3461,7 +3459,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 				a.uncompletedFactory = false
 				controlledUnit.factoryByID[unitID].finished = true
 			elseif ud.buildSpeed > 0 then
-				if ud.speed > 0 then -- constructor
+				if not ud.isImmobile then -- constructor
 					a.totalBP = a.totalBP + controlledUnit.conByID[unitID].bp
 					a.unassignedCons.count = a.unassignedCons.count + 1
 					a.unassignedCons[a.unassignedCons.count] = unitID
@@ -3495,7 +3493,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 				else -- scout plane
 					controlledUnit.scoutByID[unitID].finished = true
 				end
-			elseif ud.maxWeaponRange > 0 and ud.speed > 0 then -- land combat unit
+			elseif ud.maxWeaponRange > 0 and not ud.isImmobile then -- land combat unit
 				spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 1 }, 0)
 				spGiveOrderToUnit(unitID, CMD_FIRE_STATE, { 2 }, 0)
 				if ud.weapons[1].onlyTargets.land then -- land firing combat
@@ -3514,7 +3512,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 					setRetreatState(unitID, unitDefID, unitTeam, 3)
 				end
 				
-			elseif ud.isBuilding or ud.speed == 0 then -- building
+			elseif ud.isImmobile then -- building
 				if ud.maxWeaponRange > 0 then -- turret
 					controlledUnit.turretByID[unitID].finished = true
 				elseif (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0 or (ud.customParams and ud.customParams.windgen)) then

@@ -352,7 +352,7 @@ function widget:Initialize()
 			local unitDefID = spGetUnitDefID(uid)
 			local ud = UnitDefs[unitDefID]
 			local _,_,nanoframe = spGetUnitIsStunned(uid)
-			if (ud.isBuilder and ud.speed > 0) then -- if the unit is a mobile builder
+			if ud.isMobileBuilder then -- if the unit is a mobile builder
 				allBuilders[uid] = {include=true} -- add it to the group of all workers
 				
 				if not nanoframe then -- and add any workers that aren't nanoframes to the active group
@@ -834,7 +834,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	
 	-- add new workers to the tracking group, and commanders to includedBuilders.
 	local ud = UnitDefs[unitDefID]
-	if (ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
+	if ud.isMobileBuilder then -- if the new unit is a mobile builder
 		-- add the builder to the global builder tracking table, initialize as controlled by GBC.
 		allBuilders[unitID] = {include=true}
 		-- init our commander as idle, since the initial queue widget will notify us later when it gives the com commands.
@@ -967,7 +967,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeam, unitTeam)
 	end
 	
 	local ud = UnitDefs[unitDefID]
-	if (ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
+	if ud.isMobileBuilder then -- if the new unit is a mobile builder
 		allBuilders[unitID] = {include=true}
 		local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
 		if cmd and cmd.id then -- if so we mark it as drec
@@ -988,7 +988,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		local hash = BuildHash(myCmd)
 		if not buildQueue[hash] then
 			buildQueue[hash] = myCmd
-			if UnitDefs[unitDefID].speed == 0 then
+			if UnitDefs[unitDefID].isImmobile then
 				UpdateOneJobPathing(hash)
 			end
 		end
@@ -1001,7 +1001,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		local job = buildQueue[busyUnits[unitID]]
 		if job.id == CMD_REPAIR and job.target then
 			unitDef = UnitDefs[spGetUnitDefID(job.target)]
-			if unitDef and unitDef.speed == 0 and unitDef.reloadTime > 0 then
+			if unitDef and unitDef.isImmobile and unitDef.reloadTime > 0 then
 				return -- don't retreat units that are repairing porc, since continuing to repair the porc is safer!
 			end
 		end
@@ -1629,7 +1629,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 		elseif job.id == CMD_REPAIR then -- for repair
 			if job.target then
 				unitDef = UnitDefs[spGetUnitDefID(job.target)]
-				if unitDef.speed == 0 and unitDef.reloadTime > 0 then -- repair orders for porc should be high prio.
+				if unitDef.isImmobile and unitDef.reloadTime > 0 then -- repair orders for porc should be high prio.
 					cost = distance - 150
 				else
 					cost = distance + 400
@@ -1652,7 +1652,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 		elseif job.id == CMD_REPAIR then -- for repair
 			if job.target then
 				unitDef = UnitDefs[spGetUnitDefID(job.target)]
-				if unitDef.speed == 0 and unitDef.reloadTime > 0 then -- repair orders for porc should be high prio.
+				if unitDef.isImmobile and unitDef.reloadTime > 0 then -- repair orders for porc should be high prio.
 					cost = distance - 150 + (800 * (costMod - 2))
 				else
 					cost = distance + (200 * costMod)
@@ -2259,7 +2259,7 @@ function UpdateOneWorkerPathing(unitID)
 				jx, jy, jz = cmd.x, cmd.y, cmd.z --the location of the current job
 			elseif spValidUnitID(cmd.target) and spIsUnitAllied(cmd.target) and not spUnitIsDead(cmd.target) then -- for repair jobs, only cache pathing for buildings, since they don't move.
 				jx, jy, jz = spGetUnitPosition(cmd.target)
-				if UnitDefs[spGetUnitDefID(cmd.target)].speed > 0 then
+				if not UnitDefs[spGetUnitDefID(cmd.target)].isImmobile then
 					valid = false
 				end
 			else
@@ -2284,7 +2284,7 @@ function UpdateOneJobPathing(hash)
 			jx, jy, jz = cmd.x, cmd.y, cmd.z --the location of the current job
 		else
 			jx, jy, jz = spGetUnitPosition(cmd.target)
-			if UnitDefs[spGetUnitDefID(cmd.target)].speed > 0 then
+			if not UnitDefs[spGetUnitDefID(cmd.target)].isImmobile then
 				valid = false
 			end
 		end
