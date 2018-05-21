@@ -173,7 +173,7 @@ function gadget:Initialize()
 	end
 end
 
-local function MakeOptsWithShift(cmdOpt)
+local function MakeOptsWithShift(opts)
 	return opts.coded + (opts.shift and 0 or CMD.OPT_SHIFT)
 end
 
