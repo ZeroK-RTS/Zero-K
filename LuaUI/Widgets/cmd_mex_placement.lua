@@ -188,7 +188,7 @@ local wasSpectating = spGetSpectatingState()
 local metalSpotsNil = true
 
 local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
-local metalmultInv = 1/math.max(metalmult, 0.01)
+local metalmultInv = metalmult > 0 and (1/metalmult) or 1
 
 ------------------------------------------------------------
 -- Functions
