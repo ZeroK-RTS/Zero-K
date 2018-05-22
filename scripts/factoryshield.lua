@@ -140,15 +140,6 @@ function script.Create()
 	StartThread (SmokeUnit, smokePiece)
 end
 
-
-local nozzle = 1
-function script.QueryNanoPiece ()
-	local ret = nozzles[nozzle]
-	nozzle = 3 - nozzle
-	GG.LUPS.QueryNanoPiece (unitID, unitDefID, Spring.GetUnitTeam(unitID), ret)
-	return ret
-end
-
 function script.QueryBuildInfo ()
 	return portal
 end
