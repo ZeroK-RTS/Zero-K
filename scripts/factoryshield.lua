@@ -31,7 +31,7 @@ local nozzles = {piece ('nozzleleft'), piece ('nozzleright')}
 local alholder = piece ('alholder')
 local arholder = piece ('arholder')
 
-local nanoPieces = {nozzleleft, nozzleright}
+local nanoPieces = nozzles
 local smokePiece = {base}
 
 local SIG_BUILD = 1
