@@ -6,6 +6,8 @@ local materials = {
    altSkinS3o = {
        shaderDefinitions = {
        },
+       deferredDefinitions = {
+       },
        shader    = include("ModelMaterials/Shaders/default.lua"),
        deferred  = include("ModelMaterials/Shaders/default.lua"),
        force     = true,
