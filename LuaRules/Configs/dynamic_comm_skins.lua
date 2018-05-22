@@ -51,6 +51,18 @@ local skinDefs = {
 		chassis = "assault",
 		humanName = "bla",
 	},
+	strike_renegade={
+		altskin= [[unittextures/strikecom_renegade.dds]],
+		altskin2 = [[unittextures/strikecom_renegade_2.dds]],
+		chassis= "strike",
+		humanName = "renegade"
+	},
+	strike_chitin={
+		altskin= [[unittextures/strikecom_chitin.dds]],
+		altskin2 = [[unittextures/strikecom_chitin_2.dds]],
+		chassis= "strike",
+		humanName = "chitin"
+	}
 }
 
 return skinDefs
