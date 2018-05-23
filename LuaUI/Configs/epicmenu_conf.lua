@@ -201,6 +201,8 @@ confdata.simpleModeDirectory = {
 	['Camera'] = true,
 	['Unit Behaviour'] = true,
 	['Accessibility'] = true,
+	['Misc'] = true,
+	['Autosave'] = true,
 }
 confdata.simpleModeFullDirectory = {
 	'Reset Settings',

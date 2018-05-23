@@ -41,6 +41,21 @@ local mainWindow
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+options_path = 'Settings/Misc/Autosave'
+options =
+{
+	autosaveFrequency = {
+		name = 'Autosave Frequency (minutes)',
+		type = 'number',
+		min = 0, max = 20, step = 5,
+		value = 10,
+		simpleMode = true,
+		everyMode = true,
+	},
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Makes a control grey for disabled, or whitish for enabled
 local function SetControlGreyout(control, state)
 	if state then
@@ -526,4 +541,17 @@ end
 
 function widget:Shutdown()
 
+end
+
+function widget:GameFrame(n)
+	if options.autosaveFrequency.value == 0 then
+		return
+	end
+	if n % (options.autosaveFrequency.value * 1800) == 0 and n ~= 0 then
+		if Spring.GetSpectatingState() or Spring.IsReplay() or (not WG.crude.IsSinglePlayer()) then
+			return
+		end
+		Spring.Log(widget:GetInfo().name, LOG.INFO, "Autosaving")
+		SaveGame("autosave", "", true)
+	end
 end
