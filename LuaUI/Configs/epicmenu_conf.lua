@@ -660,7 +660,15 @@ local pathAudio = 'Settings/Audio'
 AddOption("Settings/HUD Panels/Pause Screen",
 	{
 		name = 'Menu pauses in SP',
-		desc = 'Does opening the menu pause the game (and closing unpause it) in single player?',
+		desc = 'Does opening the menu pause the game in single player?',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	})
+AddOption("Settings/HUD Panels/Pause Screen",
+	{
+		name = 'Menu unpauses in SP',
+		desc = 'Does closing the menu unpause the game in single player?',
 		type = 'bool',
 		value = true,
 		noHotkey = true,

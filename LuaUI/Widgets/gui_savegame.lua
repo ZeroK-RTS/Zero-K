@@ -219,6 +219,10 @@ local function SaveGame(filename, description, requireOverwrite)
 			saveData.playerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 			table.save(saveData, path)
 			
+			-- TODO: back up existing save?
+			--if VFS.FileExists(SAVE_DIR .. "/" .. filename) then
+			--end
+			
 			if requireOverwrite then
 				Spring.SendCommands("luasave " .. filename .. " -y")
 			else
@@ -424,6 +428,9 @@ end
 
 local function CreateWindow(saveMode)
 	DisposeWindow()
+	if WG.crude and WG.crude.AllowPauseOnMenuChange(true) then
+		Spring.SendCommands("pause 1")
+	end
 	
 	mainWindow = Window:New {
 		name = 'zk_saveUI_saveWindow',

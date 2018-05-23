@@ -559,22 +559,36 @@ local function IsSinglePlayer()
 	end
 	return true
 end
+WG.crude.IsSinglePlayer = IsSinglePlayer
 
 -- by default it allows if player is not spectating and there are no other players
-local function AllowPauseOnMenuChange()
+-- arg: true means trying to pause, false means trying to unpause
+local function AllowPauseOnMenuChange(pause)
+	if pause == nil then
+		pause = true
+	end
+	
 	if Spring.GetSpectatingState() then
 		return false
 	end
-
-	if settings.config['epic_Settings/HUD_Panels/Pause_Screen_Menu_pauses_in_SP'] == false then
-		return false
+	
+	if pause then
+		if settings.config['epic_Settings/HUD_Panels/Pause_Screen_Menu_pauses_in_SP'] == false then
+			return false
+		end
+	else
+		if settings.config['epic_Settings/HUD_Panels/Pause_Screen_Menu_unpauses_in_SP'] == false then
+			return false
+		end
 	end
+	
 	if IsSinglePlayer() == false then
 		return false
 	end
 	
 	return true
 end
+WG.crude.AllowPauseOnMenuChange = AllowPauseOnMenuChange
 
 local function PlayingButNoTeammate() --I am playing and playing alone with no teammate
 	if Spring.GetSpectatingState() then
@@ -614,7 +628,7 @@ local function KillSubWindow(makingNew)
 		window_sub_cur:Dispose()
 		window_sub_cur = nil
 		curPath = ''
-		if not makingNew and AllowPauseOnMenuChange() then
+		if not makingNew and AllowPauseOnMenuChange(false) then
 			spSendCommands("pause 0")
 		end
 	end
@@ -2067,11 +2081,8 @@ MakeSubWindow = function(path, pause, labelScroll)
 	}
 	AdjustWindow(window_sub_cur)
 	
-	if pause and AllowPauseOnMenuChange() then
-		local paused = select(3, Spring.GetGameSpeed())
-		if not paused then
-			spSendCommands("pause")
-		end
+	if pause and AllowPauseOnMenuChange(true) then
+		spSendCommands("pause 1")
 	end
 end
 
@@ -2086,10 +2097,9 @@ local function ShowHideCrudeMenu(dontChangePause)
 		end
 		if window_sub_cur then
 			screen0:AddChild(window_sub_cur)
-			if (not dontChangePause) and AllowPauseOnMenuChange() then
-				local paused = select(3, Spring.GetGameSpeed())
-				if (not paused) and (not window_exit_confirm) then
-					spSendCommands("pause")
+			if (not dontChangePause) and AllowPauseOnMenuChange(true) then
+				if (not window_exit_confirm) then
+					spSendCommands("pause 1")
 				end
 			end
 		end
@@ -2100,10 +2110,9 @@ local function ShowHideCrudeMenu(dontChangePause)
 		end
 		if window_sub_cur then
 			screen0:RemoveChild(window_sub_cur)
-			if (not dontChangePause) and AllowPauseOnMenuChange() then
-				local paused = select(3, Spring.GetGameSpeed())
-				if paused and (not window_exit_confirm) then
-					spSendCommands("pause")
+			if (not dontChangePause) and AllowPauseOnMenuChange(true) then
+				if (not window_exit_confirm) then
+					spSendCommands("pause 1")
 				end
 			end
 		end
@@ -2127,7 +2136,7 @@ local function LeaveExitConfirmWindow()
 end
 
 local function UnpauseFromExitConfirmWindow()
-	if AllowPauseOnMenuChange() then
+	if AllowPauseOnMenuChange(false) then
 		spSendCommands("pause 0")
 	end
 end
@@ -2697,10 +2706,9 @@ local function MakeQuitButtons()
 		icon = imgPath..'epicmenu/whiteflag.png',
 		OnChange = function()
 				if not (isMission or Spring.GetSpectatingState()) then
-					MakeExitConfirmWindow("Are you sure you want to resign?", function() 
-						local paused = select(3, Spring.GetGameSpeed())
-						if (paused) and AllowPauseOnMenuChange() then
-							spSendCommands("pause")
+					MakeExitConfirmWindow("Are you sure you want to resign?", function()
+						if AllowPauseOnMenuChange(true) then
+							spSendCommands("pause 1")
 						end
 						local frame = Spring.GetGameFrame()
 						if frame and frame > 0 then
@@ -2752,9 +2760,8 @@ local function MakeQuitButtons()
 		icon = imgPath..'epicmenu/exit.png',
 		OnChange = function() 
 			MakeExitConfirmWindow("Are you sure you want to leave the battle?", function()
-				local paused = select(3, Spring.GetGameSpeed())
-				if (paused) and AllowPauseOnMenuChange() then
-					spSendCommands("pause")
+				if AllowPauseOnMenuChange(true) then
+					spSendCommands("pause 1")
 				end
 				if not (IsSinglePlayer() or Spring.GetSpectatingState()) then
 					Spring.SendLuaRulesMsg("forceresign")
@@ -3354,11 +3361,8 @@ function ViewLobby()
 		if WG.ShowInterface then
 			WG.ShowInterface()
 		end
-		if AllowPauseOnMenuChange() then
-			local paused = select(3, Spring.GetGameSpeed())
-			if not paused then
-				spSendCommands("pause")
-			end
+		if AllowPauseOnMenuChange(true) then
+			spSendCommands("pause 1")
 		end
 		Spring.SendLuaMenuMsg("showLobby")
 	end
