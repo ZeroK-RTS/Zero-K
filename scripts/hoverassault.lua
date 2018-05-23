@@ -49,17 +49,18 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local firestate = 0
 local firstTime = true
 
+-- use GG.DelegateOrder as a safety, see https://github.com/ZeroK-RTS/Zero-K/issues/3056
 function RetreatFunction()
 	if firstTime then
 		firestate = Spring.GetUnitStates(unitID).firestate
 		firstTime = false
 	end
-	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {})
-	Spring.GiveOrderToUnit(unitID, CMD_UNIT_CANCEL_TARGET, {}, {})
+	GG.DelegateOrder(unitID, CMD.FIRE_STATE, {0}, 0)
+	GG.DelegateOrder(unitID, CMD_UNIT_CANCEL_TARGET, {}, 0)
 end
 
 function StopRetreatFunction()
-	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, {})
+	GG.DelegateOrder(unitID, CMD.FIRE_STATE, {firestate}, 0)
 	firstTime = true
 end
 

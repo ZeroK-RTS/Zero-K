@@ -126,6 +126,7 @@ local function GetCommandLenght(unitID)
 	return lenght, cmds
 end
 
+-- warning: causes recursion?
 local function ClearUnitCommandQueue(unitID,cmds)
 	cmds = cmds or spGetCommandQueue(unitID, -1)
 	for i=1,#cmds do
@@ -171,7 +172,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					index = 0
 				end
 				
-				spGiveOrderToUnit(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,cmdParams[1]}, CMD.OPT_ALT) --insert LOAD-Extension command at current index in queue
+				GG.DelegateOrder(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,cmdParams[1]}, CMD.OPT_ALT) --insert LOAD-Extension command at current index in queue
 				--"PHASE A"--
 				--Spring.Echo("A")
 				return false --replace LOAD with LOAD-Extension command
@@ -197,7 +198,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					transportPhase[unitID] = nil
 					index = 0
 				end
-				spGiveOrderToUnit(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,unpack(cmdParams)}, CMD.OPT_ALT)
+				GG.DelegateOrder(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,unpack(cmdParams)}, CMD.OPT_ALT)
 				return false
 			end
 		end

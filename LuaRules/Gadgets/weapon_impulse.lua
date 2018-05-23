@@ -329,7 +329,7 @@ local function PushPullToggleCommand(unitID, unitDefID, state)
 	end
 	
 	if state then
-		spGiveOrderToUnit(unitID, CMD_ONOFF, {state, CMD_PUSH_PULL}, 0)
+		GG.DelegateOrder(unitID, CMD_ONOFF, {state, CMD_PUSH_PULL}, 0)
 	end
 end
 
