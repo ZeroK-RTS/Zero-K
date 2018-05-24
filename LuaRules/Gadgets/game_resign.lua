@@ -15,15 +15,21 @@ local spKillTeam = Spring.KillTeam
 local spSetTeamRulesParam = Spring.SetTeamRulesParam
 local spGetPlayerList = Spring.GetPlayerList
 
-function gadget:RecvLuaMsg (msg, senderID)
-	if Spring.GetGameFrame() <= 0 then
+function gadget:RecvLuaMsg (msg, playerID)
+	if msg ~= "forceresign"
+	or Spring.GetGameFrame() <= 0 -- causes dedi server to think the game is over (apparently)
+	or Spring.GetPlayerRulesParam(playerID, "initiallyPlayingPlayer") ~= 1
+	then
 		return
 	end
-	if msg == "forceresign" then
-		local team = select(4, spGetPlayerInfo(senderID))
-		spKillTeam(team)
-		spSetTeamRulesParam(team, "WasKilled", 1)
+
+	local _, _, spec, teamID = spGetPlayerInfo(playerID)
+	if spec or #spGetPlayerList(teamID) > 1 then -- don't kill the entire squad until the last member resigns
+		return
 	end
+
+	spKillTeam(teamID)
+	spSetTeamRulesParam(teamID, "WasKilled", 1)
 end
 
 function gadget:GotChatMsg (msg, senderID)
