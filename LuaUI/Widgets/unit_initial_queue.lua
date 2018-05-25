@@ -22,6 +22,7 @@ end
 local buildOptions = VFS.Include("gamedata/buildoptions.lua")
 
 local MAX_QUEUE = 30
+local REDCHAR = string.char(255,255,64,32)
 
 -- Colors
 local buildDistanceColor = {0.3, 1.0, 0.3, 0.7}
@@ -312,7 +313,7 @@ function widget:DrawScreen()
 		--gl.Text(string.format(queueTimeFormat, mCost, buildTime), 0, 0, fontSize, 'cdo')
 		local str = "Queue: " .. num .. "/" .. MAX_QUEUE
 		if num >= MAX_QUEUE then
-			str = string.char(255,255,64,32) .. str
+			str = REDCHAR .. str
 		end
 		gl.Text(str, 0, 0, fontSize, 'cdo')
 	end
