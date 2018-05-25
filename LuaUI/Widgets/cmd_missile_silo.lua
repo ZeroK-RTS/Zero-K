@@ -2,7 +2,7 @@ function widget:GetInfo()
 	return {
 		name      = "Missile Silo Commands",
 		desc      = "Okay, take a nap. THEN FIRE ZE MISSILES!",
-		author    = "GoogleFrog",
+		author    = "Histidine",
 		date      = "2018-05-12",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
