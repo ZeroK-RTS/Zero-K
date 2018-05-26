@@ -51,6 +51,7 @@ local springieName = Spring.GetModOptions().springiename or ''
 
 --local voteAntiSpam = false
 local VOTE_SPAM_DELAY = 1	--seconds
+local CAN_RESIGN_VOTE_WHILE_RESIGNED = true
 
 --[[
 local index_votesHave = 14
@@ -136,7 +137,7 @@ function widget:AddConsoleMessage(msg)
 			if title:find("Resign team ") then
 				local allyTeamID = string.match(title, '%d+') - 1
 				local teamName = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID)
-				if allyTeamID ~= Spring.GetLocalAllyTeamID() or Spring.GetSpectatingState() then
+				if (not CAN_RESIGN_VOTE_WHILE_RESIGNED) and (allyTeamID ~= Spring.GetLocalAllyTeamID() or Spring.GetSpectatingState()) then
 					title =  teamName .. " voting on resign..."
 					button_vote[1]:Hide()
 					button_vote[2]:Hide()
