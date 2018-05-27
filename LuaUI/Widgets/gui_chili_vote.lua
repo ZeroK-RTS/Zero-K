@@ -132,17 +132,21 @@ function widget:AddConsoleMessage(msg)
 				Spring.Log(widget:GetInfo().name, LOG.ERROR, "malformed poll notification text")
 				return
 			end
-
+			
 			local title = line:sub(indexStart, indexEnd - 1)
-			if title:find("Resign team ") then
+			if title:find("Resign team ") then	-- handle resign vote
 				local allyTeamID = string.match(title, '%d+') - 1
 				local teamName = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID)
-				if (not CAN_RESIGN_VOTE_WHILE_RESIGNED) and (allyTeamID ~= Spring.GetLocalAllyTeamID() or Spring.GetSpectatingState()) then
-					title =  teamName .. " voting on resign..."
+				local spec = Spring.GetSpectatingState()
+				
+				local isSameAllyTeam = (not spec) and (allyTeamID == Spring.GetLocalAllyTeamID())
+				local canVoteAsSpec = spec and Spring.GetGameRulesParam("initiallyPlayingPlayer_" .. Spring.GetLocalPlayerID()) and CAN_RESIGN_VOTE_WHILE_RESIGNED
+				if isSameAllyTeam or canVoteAsSpec then
+					title = "Vote: resign?"
+				else
+					title = teamName .. " voting on resign..."
 					button_vote[1]:Hide()
 					button_vote[2]:Hide()
-				else
-					title = "Vote: resign?"
 				end
 			else
 				title = "Vote: " .. title .. "?"
