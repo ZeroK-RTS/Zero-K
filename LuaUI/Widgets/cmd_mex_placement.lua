@@ -903,7 +903,9 @@ function widget:DefaultCommand(type, id)
 end
 
 function widget:DrawInMiniMap(minimapX, minimapY)
-
+	if not WG.metalSpots then
+		return
+	end
 	if drawMexSpots or WG.showeco_always_mexes then
 		if not glDrawCircle then
 			glDrawCircle = gl.Utilities.DrawCircle
