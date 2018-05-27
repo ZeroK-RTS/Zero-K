@@ -16,6 +16,9 @@ local spSetTeamRulesParam = Spring.SetTeamRulesParam
 local spGetPlayerList = Spring.GetPlayerList
 
 function gadget:RecvLuaMsg (msg, senderID)
+	if Spring.GetGameFrame() <= 0 then
+		return
+	end
 	if msg == "forceresign" then
 		local team = select(4, spGetPlayerInfo(senderID))
 		spKillTeam(team)
@@ -24,6 +27,9 @@ function gadget:RecvLuaMsg (msg, senderID)
 end
 
 function gadget:GotChatMsg (msg, senderID)
+	if Spring.GetGameFrame() <= 0 then
+		return
+	end
 	if (string.find(msg, "resignteam") == 1) then
 
 		local allowed = false
