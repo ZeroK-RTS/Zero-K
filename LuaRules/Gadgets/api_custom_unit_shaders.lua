@@ -167,9 +167,10 @@ local function CompileShader(shader, definitions, plugins)
       Spring.Log("CUS", GLSLshader and LOG.NOTICE or LOG.ERROR, x)
     end
 
-    if not GLSLshader then
-      log("LUA_ERRRUN") -- notice me crashreporter-senpai (ideally it would catch anything with LOG.ERROR by itself, FIXME)
-    end
+    if not GLSLshader then -- failing shaders are technically a runtime error
+      log("LUA_ERRSHADER") -- but LUA_ERRRUN gets picked up by crash reporter
+    end                    -- and we don't want to spam people with popups
+                           -- since they aren't likely to lead to any change
 
     log("CUS shader log -----------------------------\n" .. errorLog)
     log("Vertex -------------------------------------\n" .. (shader.vertex   or "nil"))
