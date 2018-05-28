@@ -176,7 +176,7 @@ function widget:CommandNotify(id, params, opts)
 	if not (attackishCommandDefs[id] and id == clickCommandID) then
 		return false
 	end
-	if #params < 3 or (#params >= 4 and params[4] > 10) then
+	if #params < 3 or (#params >= 4 and #params < 6 and params[4] > 10) then
 		return false
 	end
 	
