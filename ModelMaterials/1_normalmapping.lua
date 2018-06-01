@@ -7,6 +7,7 @@ local materials = {
        shaderDefinitions = {
          "#define use_perspective_correct_shadows",
          "#define use_normalmapping",
+         "#define deferred_mode 0",
          --"#define flip_normalmap",
        },
        shader    = include("ModelMaterials/Shaders/default.lua"),
