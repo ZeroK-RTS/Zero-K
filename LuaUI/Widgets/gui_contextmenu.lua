@@ -271,7 +271,7 @@ addUnit(UnitDefNames["asteroid"].id, "Units/Misc", false)
 local lobbyIDs = {} -- stores peoples names by lobbyID to match commanders to owners 
 local players = Spring.GetPlayerList()
 for i = 1, #players do
-	local customkeys = select(10, Spring.GetPlayerInfo(players[i]))
+	local customkeys = select(10, Spring.GetPlayerInfo(players[i])) or {}
 	if customkeys.lobbyid then
 		lobbyIDs[customkeys.lobbyid] = select(1, Spring.GetPlayerInfo(players[i]))
 	end

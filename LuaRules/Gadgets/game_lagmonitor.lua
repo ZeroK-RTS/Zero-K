@@ -146,7 +146,7 @@ local function GetPlayerActivity(playerID)
 	end
 
 	playerIsAfk[playerID] = false
-	return customKeys.elo and tonumber(customKeys.elo) or 0
+	return customKeys and customKeys.elo and tonumber(customKeys.elo) or 0
 end
 
 local function UpdateTeamActivity(teamID)
