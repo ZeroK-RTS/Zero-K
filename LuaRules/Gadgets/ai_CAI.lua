@@ -4161,6 +4161,58 @@ function gadget:Shutdown()
 	GG.CAI = nil
 end
 
+local function ReloadUnitIDs()
+	local GetNewKeys = GG.SaveLoad.GetNewUnitIDKeys
+
+	for teamID, teamData in pairs(aiTeamData) do
+		teamData.unitInBattleGroupByID = GetNewKeys(teamData.unitInBattleGroupByID)
+		for battleGroupID, battleGroupData in pairs(teamData.battleGroup) do
+			if type(battleGroupData) == "table" then
+				battleGroupData.unit = GetNewKeys(battleGroupData.unit)
+				battleGroupData.aa = GetNewKeys(battleGroupData.aa)
+			end
+		end
+		for job, jobData in pairs(teamData.conJob) do
+			jobData.con = GetNewKeys(jobData.con)
+		end
+		for jobIndex, jobData in pairs(teamData.conJobByIndex) do
+			jobData.con = GetNewKeys(jobData.con)
+		end
+		teamData.sosTimeout = GetNewKeys(teamData.sosTimeout)
+		
+		for controlledUnitCategory, controlledUnitData in pairs(teamData.controlledUnit) do
+			local isID = string.sub(controlledUnitCategory, -4) == "ByID"
+			Spring.Echo("category", controlledUnitCategory)
+			if isID then
+				teamData.controlledUnit[controlledUnitCategory] = GetNewKeys(controlledUnitData)
+			else
+				local new = {cost = controlledUnitData.cost, count = controlledUnitData.count}
+				for index, oldID in ipairs(controlledUnitData) do
+					new[index] = GG.SaveLoad.GetNewUnitID(oldID)	
+				end
+				teamData.controlledUnit[controlledUnitCategory] = new
+			end
+		end
+	end
+	
+	for teamID, teamData in pairs(allyTeamData) do
+		for unitCategory, unitData in pairs(teamData.units) do
+			if type(unitData) == "table" then
+				local isID = string.sub(unitCategory, -4) == "ByID"
+				if isID then
+					teamData.units[unitCategory] = GetNewKeys(unitData)
+				else
+					local new = {cost = unitData.cost, count = unitData.count}
+					for index, oldID in ipairs(unitData) do
+						new[index] = GG.SaveLoad.GetNewUnitID(oldID)	
+					end
+					teamData.units[unitCategory] = new
+				end
+			end
+		end	
+	end
+end
+
 function gadget:Load(zip)
 	if not GG.SaveLoad then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "CAI failed to access save/load API")
@@ -4188,7 +4240,9 @@ function gadget:Load(zip)
 		"fighterByID",
 		"bomberByID",
 		"gunshipByID",
-	}	
+	}
+	
+	ReloadUnitIDs()
 	
 	-- reassign function variables and unitDef information
 	for teamID,teamData in pairs(aiTeamData) do
@@ -4205,10 +4259,15 @@ function gadget:Load(zip)
 			for unitID,unitData in pairs(units) do
 				local unitDefID = Spring.GetUnitDefID(unitID)
 				unitData.ud = UnitDefs[unitDefID]
-			end			
+			end
 		end
 	end
 end
+
+--------------------------------------------------------------------------------
+-- UNSYNCED
+--------------------------------------------------------------------------------
+
 
 else
 
