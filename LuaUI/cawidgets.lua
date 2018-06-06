@@ -414,7 +414,7 @@ function widgetHandler:Initialize()
 
   -- Add ignorelist --
   local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
-  if customkeys and customkeys["ignored"] then
+  if customkeys["ignored"] then
     if string.find(customkeys["ignored"],",") then
       local newignorelist = string.gsub(customkeys["ignored"],","," ")
       Spring.Echo("Setting Serverside ignorelist: " .. newignorelist)

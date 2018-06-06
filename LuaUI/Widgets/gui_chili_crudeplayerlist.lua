@@ -510,7 +510,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 	local icCountry = country and country ~= '' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
 	
 	-- clan/faction emblems, level, country
-	if (not entity.isAI) and (customKeys) then 
+	if (not entity.isAI and customKeys ~= nil) then 
 		if (customKeys.clan~=nil and customKeys.clan~="") then 
 			icon = "LuaUI/Configs/Clans/" .. customKeys.clan ..".png"
 		elseif (customKeys.faction~=nil and customKeys.faction~="") then

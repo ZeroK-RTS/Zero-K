@@ -1,5 +1,3 @@
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- WARNING: This is a temporary file. Please modify as you see fit! --
 function widget:GetInfo()
 	return {
@@ -12,9 +10,6 @@ function widget:GetInfo()
 		enabled	= true,
 	}
 end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 local unitCategoryDefs = VFS.Include("LuaRules/Configs/unit_category.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
@@ -970,7 +965,7 @@ local function InitName(subject, playerPanel)
 	end
 	local country, icon, badges, clan, avatar, faction, admin
 	if (subject.player) then
-		local pdata = select(10, Spring.GetPlayerInfo(subject.player)) or {}
+		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
 		country = select(8, Spring.GetPlayerInfo(subject.player))
 		icon = pdata.icon
 		badges = pdata.badges
