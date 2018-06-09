@@ -246,7 +246,7 @@ unitDef = {
       },
 	  
       damage                  = {
-        default = 60,
+        default = 70.01,
         subs    = 3,
       },
 
@@ -258,7 +258,7 @@ unitDef = {
       laserFlareSize          = 7.5,
       minIntensity            = 1,
       range                   = 420,
-      reloadtime              = 0.33,
+      reloadtime              = 0.3 + 1/30,
       rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/mini_laser]],
       soundStartVolume        = 6,

@@ -66,7 +66,7 @@ unitDef = {
 
     ARMBOMBLIGHTNING = {
       name                    = [[Lightning]],
-      areaOfEffect            = 152,
+      areaOfEffect            = 160,
       avoidFeature            = false,
       avoidFriendly           = false,
       beamTime                = 1/30,
@@ -90,7 +90,7 @@ unitDef = {
       },
  
       damage                  = {
-        default        = 675,
+        default        = 650,
       },
 
       edgeEffectiveness       = 0.4,

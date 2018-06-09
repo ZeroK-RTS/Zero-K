@@ -86,7 +86,7 @@ unitDef = {
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 200,
+        default        = 180,
       },
 
       duration                = 10,
@@ -98,7 +98,7 @@ unitDef = {
       intensity               = 12,
       interceptedByShieldType = 1,
       paralyzeTime            = 1,
-      range                   = 260,
+      range                   = 245,
       reloadtime              = 2.7,
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning_fast]],
