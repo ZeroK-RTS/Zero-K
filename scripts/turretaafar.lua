@@ -64,7 +64,7 @@ local TILT_SPEED = 200
 local RELOAD_SPEED = 20
 local MOV_DEL = 50
 
---local inMove = false
+local doingRotation = false
 local gun = true
 local loaded = true
 local lastHeading = 0
@@ -77,7 +77,7 @@ local rotateWise = 1
 -- signals
 --------------------------------------------------------------------------------
 local SIG_AIM = 1
-local SIG_Idle = 2
+local SIG_IDLE = 2
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -86,8 +86,8 @@ local SIG_Idle = 2
 -- Methods and functions
 --------------------------------------------------------------------------------
 local function IdleAnim()
-	Signal(SIG_Idle)
-	SetSignalMask(SIG_Idle)
+	Signal(SIG_IDLE)
+	SetSignalMask(SIG_IDLE)
 	while true do
 		EmitSfx(zelena, 1025)	
 		
@@ -100,8 +100,7 @@ local function IdleAnim()
 		lastHeading = heading
 
 		if(gun and not loaded) then
-			rotate()
-			loaded = true
+			StartThread(DoAmmoRotate)
 		end
 		
 		Spin(gear, y_axis, math.rad(TURN_SPEED) * 5 * rotateWise)
@@ -144,25 +143,21 @@ function script.Create()
 	
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end	
 	StartThread(IdleAnim)
-	
-	--while true do
-	--	if not(inMove) then
-	--		rotate()
-	--	end
-	--end
-	
 
 	--Turn(rotating_bas, y_axis, rad(-90), 0.5)
 end
 
-function rotate()	
-	resetRockets()	
+function DoAmmoRotate()
+	if doingRotation then
+		return
+	end
+	SetSignalMask(0)
+	doingRotation = true
+	resetRockets()
 	
 	Show(raketa014_l)
 	Show(raketa014)
 	
-	--inMove = true	
-		
 	--1
 	Move(raketa014, y_axis, -3.9, RELOAD_SPEED)
 	Move(raketa014, x_axis, -2.5, RELOAD_SPEED)
@@ -292,8 +287,8 @@ function rotate()
 	Move(raketa_l, x_axis, 0.2, RELOAD_SPEED)
 	Move(raketa_l, z_axis, 0, RELOAD_SPEED)
 	
-	--inMove = false
-
+	doingRotation = false
+	loaded = true
 end
 
 function resetRockets()
@@ -349,8 +344,10 @@ function script.AimWeapon(num, heading, pitch)
 	lastHeading = heading
 
 	if(gun and not loaded) then
-		rotate()
-		loaded = true
+		StartThread(DoAmmoRotate)
+		while doingRotation do
+			Sleep(100)
+		end
 	end
 	
 	Turn(rotating_bas, y_axis, heading, math.rad(TURN_SPEED))
