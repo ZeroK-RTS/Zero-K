@@ -66,7 +66,7 @@ unitDef = {
 
     ARMBOMBLIGHTNING = {
       name                    = [[Lightning]],
-      areaOfEffect            = 192,
+      areaOfEffect            = 152,
       avoidFeature            = false,
       avoidFriendly           = false,
       beamTime                = 1/30,
@@ -106,7 +106,7 @@ unitDef = {
       range                   = 730,
       reloadtime              = 1,
       rgbColor                = [[1 1 1]],
-      sprayAngle              = 6000,
+      sprayAngle              = 5000,
       texture1                = [[lightning]],
       texture2                = [[flare]],
       texture3                = [[flare]],
