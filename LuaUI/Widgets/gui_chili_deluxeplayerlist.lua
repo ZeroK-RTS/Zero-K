@@ -496,7 +496,6 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 	local stats = playerTeamStatsCache[unitTeam]
 	if UnitDefs[unitDefID] and stats then -- shouldn't need to guard against nil here, but I've had it happen
 		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
-		local speed = UnitDefs[unitDefID].speed
 		local unarmed = UnitDefs[unitDefID].springCategories.unarmed
 		local isbuilt = not select(3, spGetUnitIsStunned(unitID))	
 		if metal and metal < 1000000 then -- tforms show up as 1million cost, so ignore them
@@ -504,7 +503,7 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 				metal = -metal
 			end
 			-- for mobiles, count only completed units
-			if speed and speed ~= 0 then
+			if not UnitDefs[unitDefID].isImmobile then
 				if remove then
 					finishedUnits[unitID] = nil
 					stats.mMobs = stats.mMobs + metal
@@ -1607,25 +1606,22 @@ end
 -----------------------------------------------------------------------
 -- we need both UnitCreated and UnitFinished because mobiles and static defense aren't treated the same >:<
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	local speed = UnitDefs[unitDefID].speed
 	local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-	if (speed == nil or speed == 0) and not unarmed then -- is static-d
+	if UnitDefs[unitDefID].isImmobile and not unarmed then -- is static-d
 		ProcessUnit(unitID, unitDefID, unitTeam)
 	end
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	local speed = UnitDefs[unitDefID].speed
 	local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-	if speed and speed ~= 0 and (not finishedUnits[unitID]) then	-- mobile unit
+	if not UnitDefs[unitDefID].isImmobile and (not finishedUnits[unitID]) then -- mobile unit
 		ProcessUnit(unitID, unitDefID, unitTeam)
 	end
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	local speed = UnitDefs[unitDefID].speed
 	local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-	if speed and speed ~= 0 then	-- mobile unit
+	if not UnitDefs[unitDefID].isImmobile then -- mobile unit
 	      if finishedUnits[unitID] then
 		      ProcessUnit(unitID, unitDefID, unitTeam, true)
 	      end

@@ -194,7 +194,6 @@ local function getWeaponInfo(weaponDef, unitDef)
 	local scatter = weaponDef.accuracy + weaponDef.sprayAngle
 	local aoe = weaponDef.damageAreaOfEffect
 	local cost = unitDef.metalCost
-	local mobile = unitDef.speed > 0
 	local waterWeapon = weaponDef.waterWeapon
 	local ee = weaponDef.edgeEffectiveness
 	if (weaponDef.cylinderTargetting >= 100) then
@@ -250,7 +249,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 		retData.aoe = 0
 	end
 	retData.cost = cost
-	retData.mobile = mobile
+	retData.mobile = not unitDef.isImmobile
 	retData.waterWeapon = waterWeapon
 	retData.ee = ee
 

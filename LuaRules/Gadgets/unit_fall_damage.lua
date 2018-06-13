@@ -53,7 +53,7 @@ for unitDefID=1,#UnitDefs do
 		velocityDamageScale = ud.mass*0.6,
 		mass = ud.mass,
 	}
-	if ud.speed == 0 then -- buildings are more massive
+	if ud.isImmobile then -- buildings are more massive
 		attributes[unitDefID].velocityDamageScale = attributes[unitDefID].velocityDamageScale*10
 	end
 end

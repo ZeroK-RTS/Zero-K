@@ -29,8 +29,7 @@ function widget:CommandNotify(id, params, cmdOptions)
 		for i = 1, #selUnits do
 			local unitID = selUnits[i]
 			local ud = Spring.GetUnitDefID(unitID)
-			-- assumption here is that everything that can repair or rez can also reclaim
-			if ud and UnitDefs[ud] and UnitDefs[ud].canReclaim and Spring.GetUnitIsCloaked(unitID) and UnitDefs[ud].speed > 0 then
+			if ud and UnitDefs[ud] and UnitDefs[ud].isMobileBuilder and Spring.GetUnitIsCloaked(unitID) then
 				replace = true
 				break
 			end
