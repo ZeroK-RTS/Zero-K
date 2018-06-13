@@ -329,7 +329,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 	incomingDamage[targetID].disarmed = disarmed
 	incomingDamage[targetID].emped = emped
 
-	block = doomed or disarmed or emped --assume function is not called with both regular and disarming and EMP damage types
+	block = doomed or disarmed or emped --assume function is not called with more than one of: regular, disarming and EMP damage types
 
 	if not block then
 		--Spring.Echo("^^^^SHOT^^^^")
