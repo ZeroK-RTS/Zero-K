@@ -94,7 +94,7 @@ local damages = {
 		class = NORMAL,
 	},
 	tankheavyraid = {
-		damage = 200,
+		damage = 180,
 		class = NORMAL,
 	},
 	hoverraid = {
