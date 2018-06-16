@@ -1828,7 +1828,7 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 			--Spring.Echo(spGetUnitAllyTeam(unitID) .. "  " .. newAllyTeam)
 		end
 	else
-		if (mexDefs[unitDefID]) then
+		if mexDefs[unitDefID] and mexByID[unitID] then
 			TransferMexRefund(unitID, teamID)
 		end
 	end
