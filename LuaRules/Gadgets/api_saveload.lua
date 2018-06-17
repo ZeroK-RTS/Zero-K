@@ -471,6 +471,7 @@ local function LoadFeatures()
 	local spSetFeatureDirection	= Spring.SetFeatureDirection
 	local spSetFeatureHealth	= Spring.SetFeatureHealth
 	local spSetFeatureReclaim	= Spring.SetFeatureReclaim
+	local spSetFeatureResurrect	= Spring.SetFeatureResurrect
 
 	for oldID, data in pairs(savedata.feature) do
 		local px, py, pz = unpack(data.pos)
@@ -491,6 +492,9 @@ local function LoadFeatures()
 			end
 			if data.reclaimLeft then
 				spSetFeatureReclaim(newID, data.reclaimLeft)
+			end
+			if data.resurrectDef and data.resurrectDef ~= "" then
+				spSetFeatureResurrect(newID, featureInfo.resurrectDef, featureInfo.resurrectFacing, featureInfo.resurrectProgress)
 			end
 		end
 	end
@@ -1047,6 +1051,7 @@ local function SaveFeatures()
 		-- save health
 		featureInfo.health, featureInfo.maxHealth, featureInfo.resurrectProgress = spGetFeatureHealth(featureID)
 		featureInfo.reclaimLeft = select(5, spGetFeatureResources(featureID))
+		featureInfo.resurrectDef, featureInfo.resurrectFacing = Spring.GetFeatureResurrect(featureID)
 	end
 	return data
 end
