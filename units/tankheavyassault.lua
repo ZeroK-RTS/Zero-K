@@ -76,6 +76,8 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
+		burst = Shared.BURST_RELIABLE,
+
         reaim_time = 8, -- COB
 		
 	    gatherradius = [[105]],

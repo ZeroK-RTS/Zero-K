@@ -140,6 +140,7 @@ unitDef = {
       },
 	  
 	  customParams            = {
+		burst = Shared.BURST_RELIABLE,
 		torp_underwater = [[bomberprec_a_torpedo]],
 	  },
 

@@ -105,6 +105,9 @@ local weaponDefs = {
     damage = {
       default          = 1200.8,
     },
+    customParams = {
+      burst = Shared.BURST_UNRELIABLE,
+    },
   },
 }
 unitDef.weaponDefs = weaponDefs

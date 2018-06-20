@@ -68,6 +68,8 @@ unitDef = {
       craterMult              = 2,
 
 	  customParams            = {
+		burst = Shared.BURST_RELIABLE,
+
 	    gatherradius = [[120]],
 	    smoothradius = [[80]],
 	    smoothmult   = [[0.25]],

@@ -83,6 +83,8 @@ unitDef = {
       cegTag                  = [[torptrailpurple]],
 
       customparams = {
+		burst = Shared.BURST_RELIABLE,
+
         timeslow_damagefactor = 2,
       },
 

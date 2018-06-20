@@ -86,6 +86,7 @@ unitDef = {
 
       --Want to remove engine's FX and rely on CEG??? NOTE: issues with CEG: http://springrts.com/mantis/view.php?id=3401 (invisible CEGs can block all visible CEGs if MaxParticles is low. Not cool...)
       customParams = {
+		burst = Shared.BURST_RELIABLE,
 		--trail_burnout = 64, -- two seconds of vertical ascension
 		--trail_burnout_ceg = [[missiletrailredsmall]],
       },

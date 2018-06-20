@@ -72,6 +72,8 @@ unitDef = {
       craterMult              = 0,
 
       customparams = {
+		burst = Shared.BURST_RELIABLE,
+
         timeslow_damagefactor = 3,
 		
 		light_camera_height = 2500,

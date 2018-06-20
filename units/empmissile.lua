@@ -61,6 +61,8 @@ unitDef = {
       craterMult              = 0,
 
 	  customparams = {
+		burst = Shared.BURST_RELIABLE,
+
 		stats_hide_dps = 1, -- one use
 		stats_hide_reload = 1,
 		

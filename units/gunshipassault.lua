@@ -70,6 +70,8 @@ unitDef = {
       craterMult              = 0.246,
 
       customparams = {
+		burst = Shared.BURST_UNRELIABLE,
+
 		light_camera_height = 2500,
 		light_color = [[0.55 0.27 0.05]],
 		light_radius = 360,

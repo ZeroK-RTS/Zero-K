@@ -88,6 +88,8 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams        = {
+		burst = Shared.BURST_RELIABLE,
+
         combatrange = 950,
         disarmDamageMult = 1.0,
         disarmDamageOnly = 1,

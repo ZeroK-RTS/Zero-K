@@ -104,6 +104,8 @@ local weaponDefs = {
     soundHit           = "explosion/mini_nuke",
 	
 	customParams       = {
+		burst = Shared.BURST_UNRELIABLE,
+
       lups_explodelife = 1.5,
 	},
     damage = {
