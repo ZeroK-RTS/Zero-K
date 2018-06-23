@@ -66,7 +66,7 @@ local damages = {
 		class = AA,
 	},
 	spideraa = {
-		damage = 220,
+		damage = 260,
 		class = AA,
 	},
 	shieldaa = {
@@ -171,7 +171,7 @@ local damages = {
 		class = AA,
 	},
 	gunshipaa = {
-		damage = 200,
+		damage = 600,
 		class = AA,
 	},
 	hoveraa = {
