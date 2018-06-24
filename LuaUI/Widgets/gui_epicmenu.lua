@@ -251,6 +251,21 @@ local function to_string(data, indent)
 end
 --]]
 
+local function CommshareResign() -- work around for forceresign bug
+	local playerList = Spring.GetPlayerList(Spring.GetMyTeamID())
+	if #playerList > 1 then
+		if select(2,Spring.GetTeamInfo(Spring.GetMyTeamID())) == Spring.GetMyPlayerID() then
+			for i=1, #playerList do
+				if playerList[i] ~= Spring.GetMyPlayerID() then
+					Spring.SendLuaRulesMsg("sharemode kick " .. playerList[i])
+				end
+			end
+		else
+			Spring.SendLuaRulesMsg("sharemode unmerge")
+		end
+	end
+end
+
 local function CapCase(str)
 	local str = str:lower()
 	str = str:gsub( '_', ' ' )
@@ -2715,8 +2730,9 @@ local function MakeQuitButtons()
 							if WG.MissionResign then
 								WG.MissionResign()
 							else
+								CommshareResign()
 								Spring.SendLuaRulesMsg("forceresign")
-								spSendCommands{"spectator"}
+								spSendCommands("spectator")
 							end
 						end
 					end, nil, true, true)
@@ -2764,6 +2780,7 @@ local function MakeQuitButtons()
 					spSendCommands("pause 1")
 				end
 				if not (IsSinglePlayer() or Spring.GetSpectatingState()) then
+					CommshareResign()
 					Spring.SendLuaRulesMsg("forceresign")
 					spSendCommands("spectator")
 				end
