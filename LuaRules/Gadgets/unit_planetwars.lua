@@ -613,7 +613,7 @@ end
 local function TeleportOut(unitID)
 	local _,_,_,x,y,z = Spring.GetUnitPosition(unitID, true)
 	Spring.SpawnCEG("gate", x, y, z)
-	Spring.PlaySoundFile("sounds/misc/teleport2.wav", 20, x, y, z)
+	Spring.PlaySoundFile("sounds/misc/teleport_alt.wav", 20, x, y, z)
 	removingTeleportingUnit = true
 	Spring.DestroyUnit(unitID, false, true)
 	removingTeleportingUnit = false

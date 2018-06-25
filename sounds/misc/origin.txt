@@ -9,3 +9,6 @@ teleport_loop.wav
 
 - Meep
 resurrect.wav
+
+ - Alcur (CC-BY)
+teleport_alt.wav
