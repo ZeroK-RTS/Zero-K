@@ -628,11 +628,11 @@ local function RemoveConstructor(unitID)
 	end
 	
 	local index = constructorByID[unitID]
-	constructorByID[unitID] = nil
 
 	constructors[index] = constructors[constructorCount]
 	constructorBuildDist[unitID] = nil
 	constructorByID[constructors[constructorCount] ] = index
+	constructorByID[unitID] = nil
 	constructors[constructorCount] = nil
 	constructorCount = constructorCount - 1
 
