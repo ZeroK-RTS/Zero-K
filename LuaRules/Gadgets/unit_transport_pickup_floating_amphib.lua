@@ -212,11 +212,8 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			transportPhase[unitID] = nil
 			index = 0
 		end
-		local orderToSandwich = {
-			{CMD.INSERT,{index,CMD.UNLOAD_UNITS,CMD.OPT_SHIFT,unpack(cmdParams)}, CMD.OPT_ALT},
-			{CMD.INSERT,{index+1,CMD_EXTENDED_UNLOAD,CMD.OPT_SHIFT,unpack(cmdParams)}, CMD.OPT_ALT},
-		}
-		spGiveOrderArrayToUnitArray ({unitID},orderToSandwich)
+		GG.DelegateOrder(unitID, CMD.INSERT,{index,CMD.UNLOAD_UNITS,CMD.OPT_SHIFT,unpack(cmdParams)}, CMD.OPT_ALT)
+		GG.DelegateOrder(unitID, CMD.INSERT,{index+1,CMD_EXTENDED_UNLOAD,CMD.OPT_SHIFT,unpack(cmdParams)}, CMD.OPT_ALT)
 		return false
 	end
 	return true
