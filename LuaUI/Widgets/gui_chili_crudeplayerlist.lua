@@ -772,7 +772,7 @@ SetupPlayerNames = function()
 	for i = 1, #playerlist do
 		local playerID = playerlist[i]
 		local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country = Spring.GetPlayerInfo(playerID)
-		local isSpec = (teamID == 0 and spectator and (not Spring.GetGameRulesParam("initiallyPlayingPlayer_" .. playerID))) 
+		local isSpec = (teamID == 0 and spectator and Spring.GetPlayerRulesParam(playerID, "initiallyPlayingPlayer") ~= 1)
 		local entityID = #entities + 1
 		entities[entityID] = {name = name, isSpec = isSpec, playerID = playerID, teamID = teamID}--(not spectator) and teamID or nil}
 		if not isSpec then

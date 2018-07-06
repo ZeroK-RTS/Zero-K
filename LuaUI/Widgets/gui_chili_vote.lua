@@ -140,7 +140,7 @@ function widget:AddConsoleMessage(msg)
 				local spec = Spring.GetSpectatingState()
 				
 				local isSameAllyTeam = (not spec) and (allyTeamID == Spring.GetLocalAllyTeamID())
-				local canVoteAsSpec = spec and Spring.GetGameRulesParam("initiallyPlayingPlayer_" .. Spring.GetLocalPlayerID()) and CAN_RESIGN_VOTE_WHILE_RESIGNED
+				local canVoteAsSpec = spec and (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") == 1) and CAN_RESIGN_VOTE_WHILE_RESIGNED
 				if isSameAllyTeam or canVoteAsSpec then
 					title = "Vote: resign?"
 				else

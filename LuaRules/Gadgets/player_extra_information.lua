@@ -30,7 +30,7 @@ function gadget:GameFrame(n)
 			
 			-- Widgets have trouble telling between spectators and the resigned non-spectator who was playing with teamID 0.
 			if not spectator then
-				Spring.SetGameRulesParam("initiallyPlayingPlayer_" .. playerID, 1)
+				Spring.SetPlayerRulesParam(playerID, "initiallyPlayingPlayer", 1)
 			end
 		end
 	end
