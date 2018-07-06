@@ -1,5 +1,5 @@
 {
-	"morph_complete" : "Morph abgeschlossen",
+	"morph_complete" : "Morph abgeschlossen: %{old} -> %{new}",
 	"nuclear_launch_detected" : "Achtung: Atomarwaffe im Flug",
 	"geospot" : "Erdwärmeschacht\nHier lässt sich ein geothermisches Kraftwerk platzieren.",
 	"build_eta" : "ETA:",

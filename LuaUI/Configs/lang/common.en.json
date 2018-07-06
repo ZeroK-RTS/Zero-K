@@ -1,5 +1,5 @@
 {
-	"morph_complete" : "Morph complete",
+	"morph_complete" : "Morph complete: %{old} -> %{new}",
 	"nuclear_launch_detected" : "Warning: Nuke Launched",
 	"geospot" : "Geothermal vent\nCan place a Geothermal Generator here",
 	"build_eta" : "ETA:",
