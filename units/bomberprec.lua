@@ -127,12 +127,6 @@ unitDef = {
       craterMult              = 2,
 	  cylinderTargeting	      = 1,
 
-	  customParams        	  = {
-        reaim_time = 15, -- Fast update not required (maybe dangerous)
-		light_color = [[1.1 0.9 0.45]],
-		light_radius = 220,
-	  },
-
       damage                  = {
         default = 800.1,
         planes  = 800.1,
@@ -140,6 +134,9 @@ unitDef = {
       },
 	  
 	  customParams            = {
+		reaim_time = 15, -- Fast update not required (maybe dangerous)
+		light_color = [[1.1 0.9 0.45]],
+		light_radius = 220,
 		burst = Shared.BURST_RELIABLE,
 		torp_underwater = [[bomberprec_a_torpedo]],
 	  },
