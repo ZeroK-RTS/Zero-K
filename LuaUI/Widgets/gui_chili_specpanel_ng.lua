@@ -665,7 +665,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	ProcessUnit(unitID, unitDefID, unitTeam)
 end
 
-function widget:UnitReverseBuilt(unitID)
+function widget:UnitReverseBuilt(unitID, unitDefID, unitTeam)
 	ProcessUnit(unitID, unitDefID, unitTeam, true)
 end
 
