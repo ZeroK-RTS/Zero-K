@@ -11,7 +11,7 @@ local weaponDef = {
 		slot = [[3]],
 		muzzleEffectFire = [[custom:staticheavyarty_FLARE]],
 		manualfire = 1,
-		
+
 		light_color = [[1.3 1.3 2.3]],
 		light_radius = 180,
 	},

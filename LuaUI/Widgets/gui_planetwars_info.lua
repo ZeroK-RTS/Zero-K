@@ -24,6 +24,7 @@ local factionDisplayWindow, teleportWindow
 local imageDir = "LuaUI/Configs/Factions/"
 
 local STRUCTURE_HEIGHT = 16
+local DEBUG_MODE = false
 
 local EVAC_STATE = {
 	ACTIVE = 1,
@@ -32,21 +33,7 @@ local EVAC_STATE = {
 	WORMHOLE_DESTROYED = 4,
 }
 
-local factions = {
-	Cybernetic = {name = "Cybernetic Front", color = {136,170,255} },
-	--Dynasty = {name = "Dynasty of Earth", color = {255, 170, 32} },
-	Dynasty = {name = "Dynasty of Man", color = {255, 191, 0} },
-	Machines = {name = "Free Machines", color = {170, 0, 0} },
-	Empire = {name = "Empire Reborn", color = {96, 16, 255} },
-	Liberty = {name = "Liberated Humanity", color = {85, 187, 85} },
-	SynPact = {name = "Synthetic Pact", color = {83, 136, 235} },
-}
-
-for faction, data in pairs(factions) do
-	for i = 1, 3 do
-		data.color[i] = data.color[i]/255
-	end
-end
+local NEUTRAL_FACTION = "Mercenary"
 
 local flashState = true
 
@@ -54,6 +41,7 @@ local global_button_evacuation
 local global_button_instructions
 local lbl_battle_instructions
 local lbl_planet
+local instruction_textbox
 
 local strings = {
 	evac_ready = "",
@@ -171,13 +159,14 @@ local function CreateTeleportWindow()
 	local holderHeight = 78 + structureCount*STRUCTURE_HEIGHT
 	
 	local holderWindow = Chili.Window:New{
-		classname = "main_window_small",
-		name   = 'pw_teleport_meter',
-		x = 2,
-		y = 50,
+		classname = ((holderHeight > 130) and "main_window_small") or "main_window_small_flat",
+		name   = 'pw_teleport_meter_1',
+		y = 48,
+		right = 2, 
 		width = 240,
 		height = holderHeight,
 		dockable = true,
+		dockableSavePositionOnly = true,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -321,12 +310,13 @@ local function CreateFactionDisplayWindow()
 	
 	factionDisplayWindow = Chili.Window:New{
 		classname = "main_window_small",
-		name   = 'pwinfo',
+		name   = 'pwinfo_1',
 		width = WINDOW_WIDTH,
 		height = WINDOW_HEIGHT,
-		y = "20%",
-		right = 0, 
+		x = 2,
+		y = 48,
 		dockable = true,
+		dockableSavePositionOnly = true,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -350,7 +340,15 @@ local function CreateFactionDisplayWindow()
 		},
 		parent = factionDisplayWindow,
 	}
-	
+
+	local function HexToColorTable(hexcode)
+		local ret = {true, true, true, 1.0}
+		for i = 1, 3 do
+			ret[i] = tonumber(hexcode:sub(2*i, 2*i+1), 16) / 255
+		end
+		return ret
+	end
+
 	if not attacker then
 		Chili.Label:New {
 			x = IMAGE_WIDTH + 20,
@@ -381,11 +379,11 @@ local function CreateFactionDisplayWindow()
 			y = ATTACKER_POS + 6,
 			height = IMAGE_WIDTH,
 			align="left",
-			caption = factions[attacker] and factions[attacker].name or attacker or "Unknown attacker",
+			caption = modoptions.attackingfactionname,
 			font = {
 				size = 14,
 				shadow = true,
-				color = factions[attacker] and factions[attacker].color,
+				color = HexToColorTable(modoptions.attackingfactioncolor),
 			},
 			parent = factionDisplayWindow,
 		}
@@ -420,11 +418,11 @@ local function CreateFactionDisplayWindow()
 			x = IMAGE_WIDTH + 20,
 			y = DEFENDER_POS + 6,
 			height = IMAGE_WIDTH,
-			caption = factions[defender] and factions[defender].name or defender or "Unknown defender",
+			caption = modoptions.defendingfactionname,
 			font = {
 				size = 14,
 				shadow = true,
-				color = factions[defender] and factions[defender].color,
+				color = HexToColorTable(modoptions.defendingfactioncolor),
 			},
 			parent = factionDisplayWindow,
 		}
@@ -435,30 +433,79 @@ end
 --------------------------------------------------------------------------------
 -- Info Window
 
+local function PrettyNum(str_num)
+	return string.format("%.1f", str_num)
+end
+
+local function HexToColorCode(hexcode)
+	local str = string.char(255)
+	for i = 1, 3 do
+		str = str .. string.char(tonumber(hexcode:sub(2*i, 2*i+1), 16))
+	end
+	return str
+end
+
+local function GetInstructions()
+	local modOpts = Spring.GetModOptions()
+	local customKeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+
+	local myRole = "defender"
+	if Spring.GetSpectatingState() or not customKeys then
+		myRole = "spec"
+	elseif customKeys.faction == modOpts.attackingfaction then
+		myRole = "attacker"
+	end
+
+	local isNeutral = (modOpts.defendingfaction == NEUTRAL_FACTION)
+	local battleType = isNeutral and "neutral" or "pvp"
+
+	local baseTotalIP = math.max(0, tonumber(modOpts.pw_dropshipip) + tonumber(modOpts.pw_baseip) - tonumber(modOpts.pw_defenseip))
+	local attLostCC = PrettyNum(baseTotalIP * tonumber(modOpts.pw_attackerwinlosecc))
+	local defLostCC = PrettyNum(baseTotalIP * tonumber(modOpts.pw_defenderwinkillcc))
+	baseTotalIP = PrettyNum(baseTotalIP)
+
+	local defender = HexToColorCode(modOpts.defendingfactioncolor) .. modOpts.defendingfactionname .. "\255\255\255\255"
+	local attacker = HexToColorCode(modOpts.attackingfactioncolor) .. modOpts.attackingfactionname .. "\255\255\255\255"
+
+	return WG.Translate("interface", "pw_instruction_who_" .. battleType .. "_" .. myRole, {
+		planet   = modOpts.planet,
+
+		defender = defender,
+		attacker = attacker,
+
+		ip = PrettyNum(modOpts.pw_attackerip),
+		needed = PrettyNum(modOpts.pw_neededip),
+
+	}) .. "\n\n\n" .. WG.Translate("interface", "pw_instruction_ip_" .. myRole, {
+		att_kept_cc = baseTotalIP,
+		att_lost_cc = attLostCC,
+		def_lost_cc = defLostCC,
+		def_kept_cc = 0,
+
+		base      = PrettyNum(modOpts.pw_baseip),
+		dropships = PrettyNum(modOpts.pw_dropshipip),
+		defense   = PrettyNum(modOpts.pw_defenseip),
+
+		defender = defender,
+		attacker = attacker,
+
+	}) .. ((isNeutral or myRole == "spec") and "" or ("\n\n\n" .. WG.Translate("interface", "pw_instruction_buildings_" .. myRole, {
+	})))
+end
+
 local function CreateGoalWindow()
-	if IsSpec() then
-		return
-	end
-	local customKeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID())) or {}
-	if not customKeys.pwinstructions then
-		return
-	end
-	local instructions = Spring.Utilities.Base64Decode(customKeys.pwinstructions)
-	if not instructions then
-		return
-	end
-	
 	local WINDOW_HEIGHT = 320
 	local WINDOW_WIDTH = 480
 	
 	local instructionWindow =  Chili.Window:New{
 		classname = "main_window_small",
-		name   = 'pw_instructions',
-		x = 0,
-		y = 250, 
+		name   = 'pw_instructions_1',
+		x = 2,
+		y = 178, 
 		width = WINDOW_WIDTH,
 		height = WINDOW_HEIGHT,
 		dockable = true,
+		dockableSavePositionOnly = true,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -483,13 +530,16 @@ local function CreateGoalWindow()
 		parent = instructionWindow,
 	}
 	
-	Chili.TextBox:New {
+	instruction_textbox = Chili.TextBox:New {
 		x = 6,
 		y = 35,
 		right = 6,
 		bottom = 6,
-		text = instructions,
-		fontsize = 14,
+		text = GetInstructions(),
+		font = {
+			size = 14,
+			autoOutlineColor = false,
+		},
 		parent = instructionWindow,
 	}
 	
@@ -520,7 +570,7 @@ end
 --------------------------------------------------------------------------------
 function widget:GameFrame(n)
 	if n%120 == 1 and (not IsSpec()) then
-		if factionDisplayWindow then
+		if factionDisplayWindow and (not DEBUG_MODE) then
 			factionDisplayWindow:Dispose()
 		end
 	end
@@ -549,6 +599,9 @@ local function languageChanged ()
 	if lbl_battle_instructions then
 		lbl_battle_instructions:SetCaption(strings.pw_battle_instructions)
 	end
+	if instruction_textbox then
+		instruction_textbox:SetText(GetInstructions())
+	end
 	if lbl_planet then
 		lbl_planet:SetCaption(WG.Translate("interface", "planet", {planet = Spring.GetModOptions().planet}))
 	end
@@ -558,7 +611,7 @@ local function languageChanged ()
 end
 
 function widget:Initialize()
-	if not Spring.GetModOptions().planet then
+	if (not DEBUG_MODE) and (not Spring.GetModOptions().planet) then
 		widgetHandler:RemoveWidget()
 		return
 	end

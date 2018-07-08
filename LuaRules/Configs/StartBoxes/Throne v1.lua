@@ -954,7 +954,7 @@ local function combineTables(boxesArray, startpointsArray)
 	return ret
 end
 
-local teams = GetTeamCount()
+local teams = Spring.Utilities.GetTeamCount()
 
 if (teams == 1) then return combineTables({L1}, {S1}), supported_teamcounts
 elseif (teams == 3) then return combineTables({L3}, {S3}), supported_teamcounts

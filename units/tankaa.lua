@@ -1,10 +1,10 @@
 unitDef = {
   unitname               = [[tankaa]],
-  name                   = [[Copperhead]],
+  name                   = [[Ettin]],
   description            = [[Flak Anti-Air Tank]],
   acceleration           = 0.05952,
   brakeRate              = 0.14875,
-  buildCostMetal         = 550,
+  buildCostMetal         = 500,
   builder                = false,
   buildPic               = [[tankaa.png]],
   canGuard               = true,
@@ -17,11 +17,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Tank Anti-Air r Canons Flak]],
-	description_de = [[Flakpanzer]],
-    helptext       = [[The Copperhead's flak cannon makes quick work of enemy gunships, and is also fairly effective against planes.]],
-    helptext_fr    = [[Le Copperhead est doté d'un double canon Flak envoyant des balles explosives en l'air. Il compense son imprécision par les dégâts de zones qu'elles provoquent. Peut efficace contre les cibles rapides, il s'occupera parfaitement des cibles aeriennes groupées en essaim.]],
-	helptext_de    = [[Copperheads Flakkanone macht kurzen Prozess mit feindlichen Hubschraubern, aber auch gegen Flugzeuge erweist sie sich als nützlich.]],
 	modelradius    = [[19]],
   },
 
@@ -57,7 +52,7 @@ unitDef = {
   trackStrength          = 5,
   trackStretch           = 1,
   trackType              = [[StdTank]],
-  trackWidth             = 32,
+  trackWidth             = 38,
   turninplace            = 0,
   turnRate               = 653,
   upright                = false,
@@ -88,15 +83,15 @@ unitDef = {
       cylinderTargeting       = 1,
 
 	  customParams        	  = {
+        reaim_time = 4, -- COB
 		isaa = [[1]],
-		
 		light_radius = 0,
 	  },
 
       damage                  = {
-        default = 8.2,
-        planes  = 81.5,
-        subs    = 5,
+        default = 9,
+        planes  = 90,
+        subs    = 4.5,
       },
 
       edgeEffectiveness       = 0.85,

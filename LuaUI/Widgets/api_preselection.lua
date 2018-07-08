@@ -10,7 +10,6 @@ function widget:GetInfo()
 		enabled   = true,  --  loaded by default?
 		api       = true,
 		alwaysStart = true,
-		hidden    = true,
 	}
 end
 ----------------------------------------------------------------------------
@@ -78,9 +77,15 @@ local function SafeTraceScreenRay(x, y, onlyCoords, useMinimap, includeSky, igno
 end
 
 WG.PreSelection_GetUnitUnderCursor = function (onlySelectable)
-	local x, y, lmb, mmb, rmb = spGetMouseState()
-	if mmb or rmb then cannotSelect = true
-	elseif cannotSelect and not lmb then cannotSelect = false
+	local x, y, lmb, mmb, rmb, outsideSpring = spGetMouseState()
+
+	if mmb or rmb or outsideSpring then 
+		cannotSelect = true
+	elseif cannotSelect and not lmb then 
+		cannotSelect = false
+	end
+	if outsideSpring then
+		return 
 	end
 
 	local aboveMiniMap = spIsAboveMiniMap(x, y)

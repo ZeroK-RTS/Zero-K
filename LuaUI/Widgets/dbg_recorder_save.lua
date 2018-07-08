@@ -66,10 +66,15 @@ function widget:GameFrame(n)
     end
 end
 
+function widget:Initialize()
+	widgetHandler:RemoveCallIn("GameFrame")
+end
+
 function SaveUnits()
     startedRecording = Spring.GetGameFrame()
     stopRecording = Spring.GetGameFrame() + 30*recordTime
     recording = true
+    widgetHandler:UpdateCallIn("GameFrame")
     
     local units = Spring.GetAllUnits()
   

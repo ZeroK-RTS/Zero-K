@@ -243,7 +243,7 @@ local function GetTipsList()
 	
 	-- Beginning: Getting commander) to build the first fac
 	elseif CountMy(energy) >= 3 and CountMy(mex)>= 1 and CountMy(factory) == 0 and spGetGameSeconds() < 60 then
-		AddTip("Use your commander to make a factory. The Shield Bot Factory is a good choice for beginners.\nYour first factory is \255\255\64\0FREE\008.", 1, 5)
+		AddTip("Use your commander to make a factory. The Shieldbot Factory is a good choice for beginners.\nYour first factory is \255\255\64\0FREE\008.", 1, 5)
 
 		-- Once the player has started getting stuff done
 	else

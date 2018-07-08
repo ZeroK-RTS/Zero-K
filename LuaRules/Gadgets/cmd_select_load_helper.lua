@@ -51,8 +51,6 @@ end
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_LOADUNITS_SELECTED)
     for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		--local team = spGetUnitTeam(unitID)
-		gadget:UnitCreated(unitID, unitDefID, team)
+		gadget:UnitCreated(unitID)
     end
 end

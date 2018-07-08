@@ -5,7 +5,7 @@ unitDef = {
   acceleration        = 0.3,
   airHoverFactor      = 4,
   brakeRate           = 0.24,
-  buildCostMetal      = 50,
+  buildCostMetal      = 20,
   builder             = false,
   buildPic            = [[dronelight.png]],
   canBeAssisted       = false,
@@ -35,11 +35,6 @@ unitDef = {
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
-	description_de  = [[Kampfdrohne]],
-	description_fr  = [[Drone d'attaque]],
-	helptext        = [[The Firefly is an attack drone with a weak high precision pulse laser. They can protect their parent unit from light enemy units. They do not share stealth with it though, so they can also betray the presence of a cloaked commander.]],
-	helptext_de	    = [[Der Firefly ist eine Kampfdrohne, die seinen Besitzer schutzt.]],
-	helptext_fr	    = [[La Luciole est un drone miniature d'attaque autonome équipé d'un faible laser pulsé. Un commandant en possède deux qui patrouillent autour de lui et le protêge efficacement des petites unités adverses. Néanmoins leur présence peut trahir un commandant invisible.]],
 
 	is_drone = 1,
   },
@@ -80,7 +75,7 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
   
-      customParams			= {
+      customParams            = {
 		light_camera_height = 1800,
 		light_color = [[0.25 1 0.25]],
 		light_radius = 130,

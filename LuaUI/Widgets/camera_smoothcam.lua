@@ -21,10 +21,12 @@ options = {
 	camSpeed = {
 		name = 'Camera Smoothness',
 		type = "number", 
-		value = 0.15, 
+		value = 0.30, 
 		min = 0,
 		max = 1,
 		step = 0.01,
+		simpleMode = true,
+		everyMode = true,
 	},
 	tiltZoom = {
 		name = 'Tilt Zoom',
@@ -33,6 +35,7 @@ options = {
 		min = 0,
 		max = 1,
 		step = 0.01,
+		advanced = true,
 	},
 }
 --------------------------------------------------------------------------------
@@ -44,11 +47,28 @@ local spSetCameraState          = Spring.SetCameraState
 local newHeight = 0
 local maxCameraHeight = 0.7*math.max(Game.mapX, Game.mapY)*625
 
+local smoothCamDelay
+function WG.DelaySmoothCam(seconds)
+	smoothCamDelay = math.max(smoothCamDelay or 0, seconds)
+end
+
 function widget:Update(dt)
 	if (WG.Cutscene and WG.Cutscene.IsInCutscene()) or WG.COFC_Enabled then
 		return
 	end
+	if smoothCamDelay then
+		smoothCamDelay = smoothCamDelay - dt
+		if smoothCamDelay < 0 then
+			smoothCamDelay = false
+		else
+			return
+		end
+	end
 	local state = spGetCameraState()
+	if state.mode ~= 1 then
+		-- Only apply to default camera.
+		return
+	end
 	if options.tiltZoom.value ~= 0 then
 		if math.abs(state.height - newHeight) > 50 then
 			newHeight = newHeight + (state.height - newHeight)*0.18

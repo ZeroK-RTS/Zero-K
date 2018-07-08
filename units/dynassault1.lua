@@ -6,7 +6,7 @@ unitDef = {
   activateWhenBuilt   = true,
   brakeRate           = 0.375,
   buildCostMetal      = 1200,
-  buildDistance       = 128,
+  buildDistance       = 144,
   builder             = true,
 
   buildoptions        = {
@@ -23,9 +23,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	--description_de = [[Schwerer Kampfkommandant]],
-	helptext       = [[The Guardian Chassis features two main weapon slots and an array of heavy artillery options.]],
-	--helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
 	level = [[1]],
 	statsname = [[dynassault1]],
 	soundok = [[heavy_bot_move]],

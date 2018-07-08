@@ -36,6 +36,7 @@ local fadeProjectiles, fadeProjectileTimes = {}, {}
 -- Config
 local lightsEnabled = true
 local FADE_TIME = 5
+local FPS_WORRY_TIME = 60
 
 local colorOverride = {1, 1, 1}
 local colorBrightness = 1
@@ -239,6 +240,7 @@ local function GetLightsFromUnitDefs()
 		
 		-- For long lasers or projectiles
 		if customParams.light_beam_mult then
+			-- Do not use this on projectiles with variable time to live (those with non-spherical ranges).
 			weaponData.beamOffset = 1
 			weaponData.beam = true
 			weaponData.beamMult = tonumber(customParams.light_beam_mult)
@@ -310,12 +312,12 @@ local function GetCameraHeight()
 	return camY - math.max(Spring.GetGroundHeight(camX, camZ), 0)
 end
 
-local function ProjectileLevelOfDetailCheck(param, proID, fps, height)
+local function ProjectileLevelOfDetailCheck(param, proID, x, y, z, fps, height)
 	if param.cameraHeightLimit and param.cameraHeightLimit < height then
 		if param.cameraHeightLimit*3 > height then
 			local fraction = param.cameraHeightLimit/height
-			if fps < 60 then
-				fraction = fraction*fps/60
+			if fps < FPS_WORRY_TIME then
+				fraction = fraction*fps/FPS_WORRY_TIME
 			end
 			local ratio = 1/fraction
 			return (proID%ratio < 1)
@@ -328,8 +330,8 @@ local function ProjectileLevelOfDetailCheck(param, proID, fps, height)
 		return true
 	end
 	
-	if fps < 60 then
-		local fraction = fps/60
+	if fps < FPS_WORRY_TIME then
+		local fraction = fps/FPS_WORRY_TIME
 		local ratio = 1/fraction
 		return (proID%ratio < 1)
 	end
@@ -445,7 +447,7 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 			if wantLoadParams and lightParams then
 				LoadParams(lightParams)
 			end
-			if lightParams and (not options.useLOD.value or ProjectileLevelOfDetailCheck(lightParams, pID, fps, cameraHeight)) then
+			if lightParams and (not options.useLOD.value or ProjectileLevelOfDetailCheck(lightParams, pID, x, y, z, fps, cameraHeight)) then
 				if lightParams.beam then --BEAM type
 					local drawParams = GetBeamLights(lightParams, pID, x, y, z)
 					beamLightCount = beamLightCount + 1
@@ -473,7 +475,7 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 		if previousProjectileDrawParams then
 			for i = 1, #previousProjectileDrawParams do
 				local pID = previousProjectileDrawParams[i].pID
-				if not projectilePresent[pID] then
+				if not projectilePresent[pID] and not Spring.GetProjectileDefID(pID) then
 					local params = previousProjectileDrawParams[i]
 					params.startColMul = params.colMul or 1
 					params.py = params.py + 10

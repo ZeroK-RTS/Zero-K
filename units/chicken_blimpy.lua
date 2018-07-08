@@ -20,11 +20,6 @@ unitDef = {
   cruiseAlt           = 250,
 
   customParams        = {
-    description_fr = [[Bombardier ? Dodos]],
-	description_de = [[Dodo Bomber]],
-    helptext       = [[Blimpy drops a Dodo on unsuspecting armies and bases.]],
-    helptext_fr    = [[Le Blimpy est une unit? a?rienne ressemblant ? un bourdon dont apparemment la seule vocation soit de l?cher sur l'adversaire le Dodo qu'elle transporte sous son ventre. D?vastateur contre les bases.]],
-	helptext_de    = [[Blimpy wirft Dodos auf ahnungslose Heere und Basen ab.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -44,6 +39,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],
   objectName          = [[chicken_blimpy.s3o]],
   power               = 750,
+	script              = [[chicken_blimpy.lua]],
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

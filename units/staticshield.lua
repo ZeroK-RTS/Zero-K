@@ -41,9 +41,6 @@ unitDef = {
   yardMap                       = [[oooo]],
 
   customParams        = {
-    description_de = [[Leichte Abschirmeinrichtung]],
-    helptext       = [[The Aegis protects a modest area with its bubble shield that stops incoming projectiles (but not AoE effects). The shield has a significant energy upkeep and does not block very powerful weapons.]],
-    helptext_de    = [[Aegis schützt deine Einheiten in mit seinem Schild vor Angriffen, die durch den Schild absorbiert werden können, aber nur solange die nötige Energieversorgung gewährleistet ist und der Beschuss nicht zu stark wird.]],
 	removewait     = 1,
 
     morphto = [[shieldshield]],
@@ -77,8 +74,8 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       shieldAlpha             = 0.2,
-      shieldBadColor          = [[1 0.1 0.1]],
-      shieldGoodColor         = [[0.1 0.1 1]],
+      shieldBadColor          = [[1 0.1 0.1 1]],
+      shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
       shieldPower             = 3600,
       shieldPowerRegen        = 50,
@@ -86,10 +83,8 @@ unitDef = {
       shieldRadius            = 350,
       shieldRepulser          = false,
       smartShield             = true,
-      texture1                = [[shield3mist]],
-      visibleShield           = true,
-      visibleShieldHitFrames  = 4,
-      visibleShieldRepulse    = true,
+      visibleShield           = false,
+      visibleShieldRepulse    = false,
       weaponType              = [[Shield]],
     },
 

@@ -51,15 +51,6 @@ for i = 1, #WeaponDefs do
 	end
 end
 
-local buildTimeChangeNeeded = {}
-for i = 1, #UnitDefs do
-	local ud = UnitDefs[i]
-	local realBuildTime = ud.customParams.real_buildtime
-	if realBuildTime then
-		buildTimeChangeNeeded[i] = tonumber(realBuildTime)
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -90,8 +81,6 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if damagedUnits[unitID] then
 		spSetUnitCosts(unitID, {buildTime = damagedUnits[unitID].bt*REPAIR_PENALTY})
 		spSetUnitRulesParam(unitID, "repairRate", 1/REPAIR_PENALTY, ALLY_ACCESS)
-	elseif buildTimeChangeNeeded[unitDefID] then
-		spSetUnitCosts(unitID, {buildTime = buildTimeChangeNeeded[unitDefID]})
 	end
 end
 

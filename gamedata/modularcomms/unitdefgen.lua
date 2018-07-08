@@ -125,45 +125,6 @@ local function GenerateLevel0DyncommsAndWrecks()
 end
 
 GenerateLevel0DyncommsAndWrecks()
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- generate the baseline comm
--- identical to SP strike comm except it costs 1250
-
-local function GenerateBasicComm()
-	UnitDefs.commbasic = CopyTable(UnitDefs.armcom1, true)
-	local def = UnitDefs.commbasic
-	def.unitname = "commbasic"
-	def.name = "Commander Junior"
-	def.description = "Basic Commander, Builds at 10 m/s"
-	def.buildcostmetal = 1250
-	def.buildcostenergy = 1250
-	def.buildtime = 1250
-
-	--RemoveWeapons(def)
-	--ApplyWeapon(def, "commweapon_sonicgun")
-	
-	-- FIXME: not used any more
-	def.customparams.helptext = "The Commander Junior is a basic version of the popular Strike Commander platform, issued to new commanders. "
-			            .."While lacking the glory of its customizable brethren, the Commander Jr. remains an effective tool with full base-building and combat capabilites."
-
-	def.customparams.description_pl = "Podstawowy Dowodca, moc 10 m/s"
-	def.customparams.helptext_pl    = "Junior to podstawowa wersja Dowodcy Strike; jest wydawany nowym dowodcom. Mimo ze nie mozna go modyfikowac, Junior pozostaje efektywny w budowaniu i walce."
-
-	for featureName,array in pairs(def.featuredefs) do
-		local mult = 0.4
-		local typeName = "Wreckage"
-		if featureName == "heap" then
-			typeName = "Debris"
-			mult = 0.2 
-		end
-		array.description = typeName .. " - Commander Junior"
-		array.metal = 1250 * mult
-		array.reclaimtime = 1250 * mult
-	end
-end
-
-GenerateBasicComm()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -203,9 +164,6 @@ local function ProcessComm(name, config)
 		end
 		if config.description then
 			commDefs[name].description = config.description
-		end
-		if config.helptext then
-			commDefs[name].customparams.helptext = config.helptext
 		end
 		
 		-- store base values

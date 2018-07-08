@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[staticjammer]],
-  name                          = [[Sneaky Pete]],
+  name                          = [[Cornea]],
   description                   = [[Area Cloaker/Jammer]],
   activateWhenBuilt             = true,
   buildCostMetal                = 420,
@@ -18,9 +18,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Verhüllender Turm / Störsender]],
-    helptext       = [[Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. Sneaky Pete is also equipped with a cloak shield to hide nearby units from enemy sight.]],
-    helptext_de    = [[Störsender wie diese behindern das feindliche Radar, verschleiern, die von deinen Einheiten ausgelösten, Radarechos. Sneaky Pete bietet außerdem noch ein Deckmantel, um Einheiten in der Nähe vor dem Gegner zu verstecken.]],
 	removewait     = 1,
 
     morphto = [[cloakjammer]],

@@ -62,7 +62,7 @@ local function Walk()
 	local start = 5
 	
 	while (true) do
-		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
+		local speedmult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)*SPEED
 		
 		Move(pelvis, y_axis, 8.2, 4*speedmult*start)
 		
@@ -186,6 +186,10 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	
+	-- The aim check messes with unit targeting. This is not required for Felon as
+	-- it very rarely shoots at radar dots.
+	--GG.DontFireRadar_CheckAim(unitID)
+	
 	if not bAiming then
 		aimTime = AIM_DELAY
 	end
@@ -201,13 +205,13 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-function script.BlockShot(num)
+function script.BlockShot(num, targetID)
 	if num == 2 then
 		return false
 	end
 
 	if aimTime <= 0 then
-		return GG.DrainShieldAndCheckProjectilePenetrate(unitID, DRAIN, 0)
+		return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) or GG.DrainShieldAndCheckProjectilePenetrate(unitID, DRAIN, 0)
 	end
 	return true
 end

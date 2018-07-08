@@ -1,8 +1,8 @@
 unitDef = {
   unitname            = [[bomberheavy]],
-  name                = [[Wyvern]],
+  name                = [[Likho]],
   description         = [[Singularity Bomber]],
-  --autoheal			  = 25,
+  --autoheal          = 25,
   brakerate           = 0.4,
   buildCostMetal      = 2000,
   builder             = false,
@@ -17,20 +17,19 @@ unitDef = {
   collisionVolumeOffsets = [[-2 0 0]],
   collisionVolumeScales  = [[32 12 40]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[65 25 65]],
+  selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
   crashDrag           = 0.02,
   cruiseAlt           = 250,
 
   customParams        = {
-    helptext       = [[The Wyvern drops a single powerful bomb that can send units flying. It is sturdy enough to penetrate moderate AA and escape to repair, but should not be used recklessly - it's too expensive for that.]],
-    description_de = [[Implosion Bomber]],
-    description_fr = [[Bombardier r Implosion]],
-    helptext_de    = [[Wyvern ist ein mächtiger Bomber, der alles in Schutt und Asche legt. Seine Schlagkraft und Ausdauer ist riesig, doch muss er nach jedem Angriff Munition nachladen, was ihn eher für Angriffe auf einzelne Ziele prädestiniert.]],
-    helptext_fr    = [[Le Wyvern est tout simplement la mort venue du ciel. Ce bombardier lourdement blindé et relativement lent transporte une tete nucléaire tactique r implosion. Capable de faire des ravages dans les lignes ennemies, ou de détruire des structures lourdement blindées. Tout simplement mortel utilisé en petites escadres.]],
-    modelradius    = [[10]],
-    requireammo    = [[1]],
-    reammoseconds  = [[30]],
-	refuelturnradius = [[150]],
+    modelradius      = [[10]],
+    requireammo      = [[1]],
+    reammoseconds    = [[30]],
+    refuelturnradius = [[150]],
+	reallyabomber    = [[1]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -50,8 +49,8 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[ARMCYBR]],
-  refuelTime		  = 20,
-  script			  = [[bomberheavy.lua]],
+  refuelTime          = 20,
+  script              = [[bomberheavy.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
   turnRadius          = 20,
@@ -61,7 +60,7 @@ unitDef = {
 
     {
       def                = [[ARM_PIDR]],
-	  badTargetCategory	 = [[GUNSHIP FIXEDWING]],
+      badTargetCategory  = [[GUNSHIP FIXEDWING]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
@@ -75,17 +74,20 @@ unitDef = {
       areaOfEffect            = 192,
       avoidFeature            = false,
       avoidFriendly           = false,
-	  burnblow                = true,
-	  cegTag                  = [[raventrail]],
+      burnblow                = true,
+      cegTag                  = [[raventrail]],
       collideFriendly         = false,
    
       craterBoost             = 1,
       craterMult              = 2,
 
-	  customParams        	  = {
-		light_color = [[1.6 0.85 0.38]],
-		light_radius = 750,
-	  },
+      customParams            = {
+		burst = Shared.BURST_UNRELIABLE,
+
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
+        light_color = [[1.6 0.85 0.38]],
+        light_radius = 750,
+      },
 
       damage                  = {
         default = 2000.1,
@@ -110,7 +112,7 @@ unitDef = {
       tolerance               = 16000,
       tracks                  = true,
       turnRate                = 30000,
-	  weaponAcceleration      = 200,
+      weaponAcceleration      = 200,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 400,
     },

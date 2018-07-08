@@ -14,7 +14,8 @@ local weaponDef = {
 		timeslow_damagefactor = [[6]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
 		manualfire = 1,
-		
+		nofriendlyfire = 1,
+
 		light_camera_height = 2500,
 		light_color = [[1.5 0.75 1.8]],
 		light_radius = 280,
@@ -22,7 +23,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 350,
-		planes  = 350,
 		subs    = 17.5,
 	},
 
@@ -33,7 +33,6 @@ local weaponDef = {
 	impulseFactor           = 0,
 	interceptedByShieldType = 2,
 	model                   = [[wep_b_fabby.s3o]],
-    noSelfDamage            = false,
 	range                   = 450,
 	reloadtime              = 25,
 	smokeTrail              = true,

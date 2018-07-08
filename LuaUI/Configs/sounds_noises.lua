@@ -91,6 +91,7 @@ local sounds = {
 		build = "builder_start",
 		ok = {
 			[1] = "spider_move",
+			volume = 0.95,
 		},
 		select = {
 			[1] = "spider_select2",
@@ -99,9 +100,11 @@ local sounds = {
 	spiderassault = {
 		ok = {
 			[1] = "spider_move",
+			volume = 0.95,
 		},
 		select = {
 			[1] = "spider_select",
+			volume = 0.95,
 		},
 	},
 	spiderscout = {
@@ -115,33 +118,41 @@ local sounds = {
 	spiderskirm = {
 		ok = {
 			[1] = "spider_move",
+			volume = 0.95,
 		},
 		select = {
 			[1] = "spider_select",
+			volume = 0.95,
 		},
 	},
 	spiderriot = {
 		ok = {
 			[1] = "spider_move",
+			volume = 0.95,
 		},
 		select = {
 			[1] = "spider_select",
+			volume = 0.95,
 		},
 	},
 	spideremp = {
 		ok = {
 			[1] = "spider_move",
+			volume = 0.95,
 		},
 		select = {
 			[1] = "spider_select",
+			volume = 0.95,
 		},
 	},
 	spideraa = {
 		ok = {
 			[1] = "spider_move",
+			volume = 0.95,
 		},
 		select = {
 			[1] = "spider_select",
+			volume = 0.95,
 		},
 	},
 
@@ -426,73 +437,99 @@ local sounds = {
 		build = "builder_start",
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphimpulse = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphraid = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphfloater = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphriot = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphassault = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
+			volume = 0.6,
+		},
+	},
+	amphlaunch = {
+		ok = {
+			[1] = "amph_move",
+			volume = 0.8,
+		},
+		select = {
+			[1] = "teleport_select",
 			volume = 0.7,
 		},
 	},
 	amphaa = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "amph_select",
-			volume = 0.7,
+			volume = 0.6,
 		},
 	},
 	amphtele = {
 		ok = {
 			[1] = "amph_move",
+			volume = 0.8,
 		},
 		select = {
 			[1] = "teleport_select",
 			volume = 0.7,
+		},
+	},
+	amphbomb = {
+		ok = {
+			[1] = "light_bot_move",
+		},
+		select = {
+			[1] = "crawlie_select",
 		},
 	},
 	
@@ -524,9 +561,11 @@ local sounds = {
 	striderbantha = {
 		ok = {
 			[1] = "turret_select",
+			volume = 0.7,
 		},
 		select = {
 			[1] = "turret_select",
+			volume = 0.7,
 		},
 	},
 	striderarty = {
@@ -548,9 +587,11 @@ local sounds = {
 	striderdetriment = {
 		ok = {
 			[1] = "turret_select",
+			volume = 0.7,
 		},
 		select = {
 			[1] = "turret_select",
+			volume = 0.7,
 		},
 	},
 	nebula = {
@@ -559,6 +600,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "heavy_gunship_select",
+			volume = 0.8,
 		},
 	},
 	
@@ -820,14 +862,6 @@ local sounds = {
 			[1] = "bomber_select",
 		},
 	},
-	bomberdive = {
-		ok = {
-			[1] = "bomber_move",
-		},
-		select = {
-			[1] = "bomber_select",
-		},
-	},
 	bomberriot = {
 		ok = {
 			[1] = "bomber_move",
@@ -926,6 +960,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "heavy_gunship_select",
+			volume = 0.8,
 		},
 	},
 	gunshipassault = {
@@ -934,6 +969,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "heavy_gunship_select",
+			volume = 0.8,
 		},
 	},
 	gunshipkrow = {
@@ -942,6 +978,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "heavy_gunship_select",
+			volume = 0.8,
 		},
 	},
 	gunshiptrans = {
@@ -958,6 +995,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "heavy_gunship_select",
+			volume = 0.8,
 		},
 	},
 	
@@ -1333,6 +1371,14 @@ local sounds = {
 		},
 	},
 	turretheavy = {
+		ok = {
+			[1] = "turret_select",
+		},
+		select = {
+			[1] = "turret_select",
+		},
+	},
+	turretsunlance = {
 		ok = {
 			[1] = "turret_select",
 		},

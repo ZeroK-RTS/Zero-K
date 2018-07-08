@@ -20,11 +20,6 @@ unitDef = {
   cruiseAlt           = 200,
 
   customParams        = {
-    description_fr = [[Scout volant]],
-	description_de = [[Fliegender Spore Scout]],
-    helptext       = [[A small flying chicken scout with spore.]],
-    helptext_fr    = [[Le Pigeon est une unit? a?rienne l?g?re mais dot?e d'une attaque ? mi chemin entre la bombe et le missile guid? provoquant des dommages non n?gligeables.]],
-	helptext_de    = [[Ein kleiner, fliegender Chickenaufklärer mit Sporen.]],
   },
 
   explodeAs           = [[NOWEAPON]],

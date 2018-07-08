@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakassault]],
-  name                   = [[Zeus]],
+  name                   = [[Knight]],
   description            = [[Lightning Assault Bot]],
   acceleration           = 0.2,
   brakeRate              = 0.6,
@@ -13,14 +13,12 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 7]],
   collisionVolumeScales  = [[35 50 35]],
   collisionVolumeType    = [[cylY]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Sturmroboter]],
-    description_fr = [[Marcheur d'Assaut]],
-    helptext       = [[Slowly and steadily, groups of Zeuses can shrug off heavy fire as they make their way towards enemy fortifications, until they can field their short-range lightning cannon, which damages and stuns entrenched foes. Counter with anything that can reliably kite it, making sure that you don't get paralyzed (in which case you are as good as dead.)]],
-    helptext_de    = [[Langsam und zuverlässig, Gruppen von Zeus' können sogar starken Beschuss ignorieren und so schnell an die feindliche Festung herankommen, bis sie dort ihre Blitzschlagkanonen mit kurzer Reichweite zum Einsatz bringen können, welche feindliche Einheiten schädigt und betäubt. Kontere den Zeus mit Einheiten, die umherflitzen, damit sie nicht paralysiert werden (denn dann sind sie so gut wie tot).]],
-    helptext_fr    = [[Lentement mais surement, un groupe de Zeus peut encaisser les tirs enemis lourd jusqu'a ce qu'ils atteignent les fortifications et puissent utiliser leur canon éclair courte portée qui peut paralyser et endommager les enemis retranchés.]],
 	modelradius    = [[12]],
   },
 

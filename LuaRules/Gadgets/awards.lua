@@ -47,8 +47,7 @@ local terraformCost  = UnitDefNames["terraunit"].metalCost
 local mexDefID = UnitDefNames["staticmex"].id
 local mexCost  = UnitDefNames["staticmex"].metalCost
 
-local shareListTemp1 = {}
-local shareListTemp2 = {}
+local gameOver = false
 
 local cappedComs = {}
 
@@ -92,9 +91,6 @@ local awardEasyFactors = {
 local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
 
 local awardList = {}
-local sentAwards = false
-
-local shareList_update = TEAM_SLOWUPDATE_RATE*60*5 -- five minute frames
 
 local boats, t3Units, comms = {}, {}, {}
 
@@ -219,11 +215,6 @@ local function CopyTable(original) -- Warning: circular table references lead to
 		end
 	end
 	return copy
-end
-
-local function UpdateShareList()
-	awardData.share = CopyTable(shareListTemp2)
-	shareListTemp2 = CopyTable(shareListTemp1)
 end
 
 local function UpdateResourceStats(t)
@@ -445,9 +436,6 @@ function gadget:Initialize()
 	for _,team in pairs(totalTeamList) do
 		awardList[team] = {}
 
-		shareListTemp1[team] = 0
-		shareListTemp2[team] = 0
-
 		for awardType, _ in pairs(awardDescs) do
 			awardData[awardType][team] = 0
 		end
@@ -509,16 +497,10 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 			end
 		end
 	else -- teams are allied
-		if (unitDefID ~= terraunitDefID) and shareListTemp1[oldTeam] and shareListTemp1[newTeam] then
+		if (unitDefID ~= terraunitDefID) then
 			local mCost = GetUnitCost(unitID, unitDefID)
-
-			shareListTemp1[oldTeam] = shareListTemp1[oldTeam] + mCost
-			shareListTemp1[newTeam] = shareListTemp1[newTeam] - mCost
-
-			--[[
-			AddAwardPoints( 'share', oldTeam, mCost )
-			AddAwardPoints( 'share', newTeam, 0-mCost )
-			--]]
+			AddAwardPoints('share', oldTeam,  mCost)
+			AddAwardPoints('share', newTeam, -mCost)
 		end
 	end
 end
@@ -542,7 +524,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 	if (killerTeam == unitTeam) or (killerTeam == gaiaTeamID) or (unitTeam == gaiaTeamID) or (killerTeam == nil) then
 		return
 	elseif (unitDefID == mexDefID) then
-		if ((not spIsGameOver()) and (select(5, spGetUnitHealth(unitID)) > 0.9) and (not spAreTeamsAllied(killerTeam, unitTeam))) then
+		if ((not gameOver) and (select(5, spGetUnitHealth(unitID)) > 0.9) and (not spAreTeamsAllied(killerTeam, unitTeam))) then
 			AddAwardPoints( 'mexkill', killerTeam, 1 )
 		end
 	else
@@ -635,15 +617,9 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 	end
 end
 
-function gadget:GameFrame(n)
+function gadget:GameOver()
+		gameOver = true
 
-	if n % shareList_update == 1 and not spIsGameOver() then
-		UpdateShareList()
-	end
-
-	if not spIsGameOver() then return end
-
-	if not sentAwards then
 		local units = spGetAllUnits()
 		for i=1,#units do
 			local unitID = units[i]
@@ -658,16 +634,14 @@ function gadget:GameFrame(n)
 			local team = teams[i]
 			if team ~= gaiaTeamID then
 				AddAwardPoints('reclaim', team, Spring.GetTeamRulesParam(team, "stats_history_metal_reclaim_current") or 0)
-				AddAwardPoints('pwn', team, Spring.GetTeamRulesParam(team, "stats_history_damage_dealt_current") or 0)
+				AddAwardPoints('pwn', team, Spring.Utilities.GetHiddenTeamRulesParam(team, "stats_history_damage_dealt_current") or 0)
 			end
 		end
 
 		ProcessAwardData()
 
 		_G.awardList = awardList
-		sentAwards = true
-	end
-end --GameFrame
+end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -676,9 +650,6 @@ else -- UNSYNCED
 -------------------------------------------------------------------------------------
 
 local spSendCommands  = Spring.SendCommands
-
-local gameOver = false
-local sentToPlanetWars = false
 
 local teamNames     = {}
 local awardList
@@ -781,14 +752,6 @@ local function SendEconomyDataToWidget()
 
 end
 
-function gadget:GameOver()
-	gameOver = true
-	--Spring.Echo("Game over (awards unsynced)")
-		
-	--// Resources
-	--SendEconomyDataToWidget()
-end
-
 -- function to convert SYNCED table to regular table. assumes no self referential loops
 local function ConvertToRegularTable(stable)
 	local ret = {}
@@ -802,23 +765,16 @@ local function ConvertToRegularTable(stable)
 	return ret
 end
 
-function gadget:Update()
-	if not gameOver then
-		return
-	end
-	if (not awardList) and SYNCED.awardList then
-		awardList = ConvertToRegularTable( SYNCED.awardList )
-		Script.LuaUI.SetAwardList( awardList )
-	end
-	if awardList and not sentToPlanetWars then
-		for team,awards in pairs(awardList) do
-			for awardType, record in pairs(awards) do
-				local planetWarsData = (teamNames[team] or "no_name") ..' '.. awardType ..' '.. awardDescs[awardType] ..', '.. record
-				Spring.SendCommands("wbynum 255 SPRINGIE:award,".. planetWarsData)
-				--Spring.Echo(planetWarsData)
-			end
+function gadget:GameOver()
+	awardList = ConvertToRegularTable( SYNCED.awardList )
+	Script.LuaUI.SetAwardList( awardList )
+
+	for team,awards in pairs(awardList) do
+		for awardType, record in pairs(awards) do
+			local planetWarsData = (teamNames[team] or "no_name") ..' '.. awardType ..' '.. awardDescs[awardType] ..', '.. record
+			Spring.SendCommands("wbynum 255 SPRINGIE:award,".. planetWarsData)
+			--Spring.Echo(planetWarsData)
 		end
-		sentToPlanetWars = true
 	end
 end
 

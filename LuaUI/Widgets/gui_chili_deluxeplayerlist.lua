@@ -459,6 +459,7 @@ local function FormatElo(elo,full)
 	local elo_out = mult * math.floor((elo/mult) + .5)
 	local eloCol = {}
 
+	-- FIXME mismatch with rank colours
 	local top = 1800
 	local mid = 1600
 	local bot = 1400
@@ -495,7 +496,6 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 	local stats = playerTeamStatsCache[unitTeam]
 	if UnitDefs[unitDefID] and stats then -- shouldn't need to guard against nil here, but I've had it happen
 		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
-		local speed = UnitDefs[unitDefID].speed
 		local unarmed = UnitDefs[unitDefID].springCategories.unarmed
 		local isbuilt = not select(3, spGetUnitIsStunned(unitID))	
 		if metal and metal < 1000000 then -- tforms show up as 1million cost, so ignore them
@@ -503,7 +503,7 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 				metal = -metal
 			end
 			-- for mobiles, count only completed units
-			if speed and speed ~= 0 then
+			if not UnitDefs[unitDefID].isImmobile then
 				if remove then
 					finishedUnits[unitID] = nil
 					stats.mMobs = stats.mMobs + metal
@@ -884,8 +884,8 @@ local function AddTableHeaders()
 	if options.show_stats.value then
 		scroll_cpl:AddChild( Image:New{ x=x_m_mobiles - 10, y=((fontsize+1) * row) + 3,	height = (fontsize)+1, color =	{1, .3, .3, 1},  file = 'LuaUI/Images/commands/Bold/attack.png',} )
 		scroll_cpl:AddChild( Image:New{ x=x_m_defense - 7, y=((fontsize+1) * row) + 3,	height = (fontsize)+1, color = {.3, .3, 1, 1}, file = 'LuaUI/Images/commands/Bold/guard.png',} )
-		scroll_cpl:AddChild( Image:New{ x=x_e_income - 15, y=((fontsize+1) * row) + 3,	height = (fontsize)+1,  file = 'LuaUI/Images/energy.png',} )
-		scroll_cpl:AddChild( Image:New{ x=x_m_income - 15, y=((fontsize+1) * row) + 3,	height = (fontsize)+1, file = 'LuaUI/Images/ibeam.png',} )
+		scroll_cpl:AddChild( Image:New{ x=x_e_income - 15, y=((fontsize+1) * row) + 3,	height = (fontsize)+1,  file = 'LuaUI/Images/energyplus.png',} )
+		scroll_cpl:AddChild( Image:New{ x=x_m_income - 15, y=((fontsize+1) * row) + 3,	height = (fontsize)+1, file = 'LuaUI/Images/metalplus.png',} )
 	end
 	if options.show_cpu_ping.value then
 		scroll_cpl:AddChild( Label:New{ x=x_cpu, y=(fontsize+1) * row,	caption = 'C', 	fontShadow = true,  fontsize = fontsize,} )
@@ -934,10 +934,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 			elseif entity.faction and entity.faction ~= "" then
 				icon = "LuaUI/Configs/Factions/" .. entity.faction ..".png"
 			end
-			if entity.level and entity.level ~= "" and entity.elo and entity.elo ~= "" then 
-				local elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(entity.elo), tonumber(entity.level))
-				icRank = "LuaUI/Images/LobbyRanks/" .. xp .. "_" .. elo .. ".png"
-			end
+			icRank = "LuaUI/Images/LobbyRanks/" .. (entity.rank or "0_0") .. ".png"
 			if icCountry then MakeNewIcon(entity,"countryIcon",{x=x_icon_country,file=icCountry,}) end 
 			if icRank then MakeNewIcon(entity,"rankIcon",{x=x_icon_rank,file=icRank,}) end
 			if icon then MakeNewIcon(entity,"clanIcon",{x=x_icon_clan,file=icon,y=((fontsize+1)*row)+5,width=fontsize-1,height=fontsize-1}) end 
@@ -1167,13 +1164,14 @@ SetupPlayerNames = function()
 	-- also store the data needed later to calculate the team average elo
 	for i=1, #playerlist do
 		local playerID = playerlist[i]
-		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank,customKeys = Spring.GetPlayerInfo(playerID)
-		local clan, faction, level, elo, wins
+		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,_,customKeys = Spring.GetPlayerInfo(playerID)
+		local clan, faction, level, elo, wins, rank
 		if customKeys then
 			clan = customKeys.clan
 			faction = customKeys.faction
 			level = customKeys.level
 			elo = customKeys.elo
+			rank = customKeys.icon
 		end
 
 		if teamID == 0 and not spectator then
@@ -1308,7 +1306,9 @@ SetupPlayerNames = function()
 	-- while we're at it, determine whether or not to show the ally team summary lines
 	--
 	if #allyTeamOrderRank == 0 then
-		if #allyTeams[localAlliance] > 2 then myTeamIsVeryBig = true end -- this appears to be broken
+		if allyTeams[localAlliance] and #allyTeams[localAlliance] > 2 then
+			myTeamIsVeryBig = true
+		end
 		for i=1,#allyTeamsSorted do  -- for every ally team
 			local allyTeamID = allyTeamsSorted[i]
 			allyTeamOrderRank[allyTeamID] = 0
@@ -1606,25 +1606,22 @@ end
 -----------------------------------------------------------------------
 -- we need both UnitCreated and UnitFinished because mobiles and static defense aren't treated the same >:<
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	local speed = UnitDefs[unitDefID].speed
 	local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-	if (speed == nil or speed == 0) and not unarmed then -- is static-d
+	if UnitDefs[unitDefID].isImmobile and not unarmed then -- is static-d
 		ProcessUnit(unitID, unitDefID, unitTeam)
 	end
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	local speed = UnitDefs[unitDefID].speed
 	local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-	if speed and speed ~= 0 and (not finishedUnits[unitID]) then	-- mobile unit
+	if not UnitDefs[unitDefID].isImmobile and (not finishedUnits[unitID]) then -- mobile unit
 		ProcessUnit(unitID, unitDefID, unitTeam)
 	end
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	local speed = UnitDefs[unitDefID].speed
 	local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-	if speed and speed ~= 0 then	-- mobile unit
+	if not UnitDefs[unitDefID].isImmobile then -- mobile unit
 	      if finishedUnits[unitID] then
 		      ProcessUnit(unitID, unitDefID, unitTeam, true)
 	      end

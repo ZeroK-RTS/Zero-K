@@ -16,16 +16,15 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[80 10 30]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[95 25 60]],
+  selectionVolumeType    = [[box]],
   corpse              = [[DEAD]],
   cruiseAlt           = 220,
 
   customParams        = {
-    description_fr = [[Bombardier de Précision]],
-	description_de = [[Präzisionsbomber]],
-    helptext       = [[The Raven drops a single high damage, low AoE bomb. Cost for cost, nothing quite matches it for taking out that antinuke or Reaper, but you should look elsewhere for something to use against smaller mobiles.]],
-    helptext_fr    = [[Le Raven largue des bombes de haute précision, parfait pour les frappes chirurgicales comme une défense antimissile ou une tourelle genante, mais peu efficace contre une armée massive.]],
-	helptext_de    = [[Der Raven wirft eine einzige Bombe mit hohem Schaden ab. Ideal fungiert er dazu, einzelne, strategisch wichtige Gebäude wie z.B. Anti-Atom zu zerstören, um dann mit seinen Haupteinheiten einzufallen. Kleinere Einheiten werden aber nur schwelich getroffen und sollten von daher auf anderem Wege bekämpft werden.]],
 	modelradius    = [[15]],
+	refuelturnradius = [[120]],
 	requireammo    = [[1]],
   },
 
@@ -61,7 +60,7 @@ unitDef = {
 
   },
   sightDistance       = 660,
-  turnRadius          = 160,
+  turnRadius          = 300,
   workerTime          = 0,
 
   weapons             = {
@@ -95,6 +94,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams        	  = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
+	  },
+
       damage                  = {
         default = 0,
       },
@@ -124,11 +127,6 @@ unitDef = {
       craterMult              = 2,
 	  cylinderTargeting	      = 1,
 
-	  customParams        	  = {
-		light_color = [[1.1 0.9 0.45]],
-		light_radius = 220,
-	  },
-
       damage                  = {
         default = 800.1,
         planes  = 800.1,
@@ -136,6 +134,10 @@ unitDef = {
       },
 	  
 	  customParams            = {
+		reaim_time = 15, -- Fast update not required (maybe dangerous)
+		light_color = [[1.1 0.9 0.45]],
+		light_radius = 220,
+		burst = Shared.BURST_RELIABLE,
 		torp_underwater = [[bomberprec_a_torpedo]],
 	  },
 
@@ -146,6 +148,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+	  leadlimit               = 0,
       model                   = [[wep_b_paveway.s3o]],
 	  leadLimit               = 20,
       range                   = 150,
@@ -174,6 +177,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams        	  = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
+	  },
+
       damage                  = {
         default = -1E-06,
       },
@@ -185,7 +192,7 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
 	  model                   = [[emptyModel.s3o]],
-      range                   = 460,
+      range                   = 600,
       reloadtime              = 0.1,
       rgbColor                = [[0 0 0]],
 	  startVelocity           = 2000,

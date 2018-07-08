@@ -135,8 +135,7 @@ function gadget:GameFrame(f)
 		
 			local unitID = unitIndex[i]
 			local unit = units[unitID]
-			local slowMult = 1 - (spGetUnitRulesParam(unitID, "slowState") or 0)
-			local quota = unit.defs.drain * slowMult
+			local quota = unit.defs.drain * (spGetUnitRulesParam(unitID, "totalBuildPowerChange") or 1)
 			local x,y,z = spGetUnitPosition(unitID)
 			local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
 			-- drain metal while quote not fulfilled

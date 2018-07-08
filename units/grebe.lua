@@ -14,7 +14,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-      helptext       = [[The Grebe is a basic raider armed with grenades - a decent short ranged anti-heavy weapon. Despite being amphibious, it cannot shoot while submerged.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

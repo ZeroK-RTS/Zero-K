@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakarty]],
-  name                   = [[Hammer]],
+  name                   = [[Sling]],
   description            = [[Light Artillery Bot]],
   acceleration           = 0.25,
   brakeRate              = 0.75,
@@ -16,17 +16,12 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Leichter Artillerie/Skirmisher Roboter]],
-    description_fr = [[Robot d'Artillerie]],
-    helptext       = [[The Hammer has a long range plasma cannon that allows indirect fire over obstacles, and outranges static defenses up to heavy laser towers. Although effective versus mobile units, it should be guarded in order to prevent raiders and other fast units from closing range.]],
-    helptext_de    = [[Der Hammer besitzt eine weitreichende Plasmakanone, die es ihm erlaubt über Hindernisse zu schießen und sich dabei außer Reichweite von gegnerischen Verteidigungsanlagen zu finden. Obwohl er auch effektiv gegen mobile Einheiten ist, sollte er beschützt werden, um Raider und andere schnelle Einheiten von ihm Fern zu halten.]],
-    helptext_fr    = [[Le Hammer a un canon plasma longue port?e qui lui permet de tirer indirectement au dessus des obstacles, et a une port?e plus grande que les tour de d?fense basic jusqu'au HLT. Bien qu'il soit ?fficace contre les unit?es mobiles, il est n?c?ssaire de le d?fendre avec des Warriors pour le prot?ger des unit?s rapide et de raid.]],
 	modelradius    = [[14]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
-  footprintX             = 2,
-  footprintZ             = 2,
+  footprintX             = 3,
+  footprintZ             = 3,
   iconType               = [[kbotarty]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -36,10 +31,10 @@ unitDef = {
   maxVelocity            = 1.62,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
-  movementClass          = [[KBOT2]],
-  moveState              = 0,
+  movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP TOOFAST]],
-  objectName             = [[Milo.s3o]],
+  objectName             = [[cloakarty.s3o]],
+  script                 = [[cloakarty.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -118,7 +113,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[milo_dead.s3o]],
+      object           = [[cloakarty_dead.s3o]],
     },
 
     HEAP  = {

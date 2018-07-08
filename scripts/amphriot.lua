@@ -40,7 +40,7 @@ local function Walk()
 	SetSignalMask(SIG_WALK)
 	while true do
 	
-		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
+		local speedmult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)*SPEED
 		
 		-- extend left
 		Turn(lfleg, x_axis, math.rad(-50), math.rad(25)*speedmult)

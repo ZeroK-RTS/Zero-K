@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[turretimpulse]],
   name                          = [[Newton]],
-  description                   = [[Gravity Turret - On to Repulse, Off to Attract]],
+  description                   = [[Gravity Turret]],
   activateWhenBuilt             = true,
   buildCostMetal                = 200,
   builder                       = false,
@@ -17,12 +17,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_fr = [[Tourrelle r Gravité Répulsive/Attractive]],
-	description_de = [[Gravitationsturm - An zum Abstoßen, Aus zum Anziehen]],
-    helptext       = [[The Newton is armed with an experimental graviton projector. This weapon does virtually no damage directly, but can push units toward or away from the Newton. You can use it on your own units as well, but beware of friendly fire.]],
-    helptext_fr    = [[Le Newton est un équipement toute dernicre génération utilisant des flux de gravitron densifiés pour repousser ou attirer ses cibles. Régler par défaut sur repousser, il empechera les ennemis de grimper sur une collinne fortifiée par exemple. Il peut également attirer dans l'eau des unités non-amphibies.]],
-	helptext_de    = [[Der Newton ist mit einem experimentellen Gravitonprojektor bewaffnet. Diese Waffe so gut wie keinen direkten Schaden, denn sie kann Einheiten anziehen und abstoßen. Das kann entweder mit deinen eigenen Einheiten passieren oder mit feindlichen.]],
-	modelradius    = [[25]],
+    modelradius    = [[25]],
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
@@ -74,13 +69,14 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams            = {
-	    impulse = [[-150]],
-		
-		light_color = [[0.33 0.33 1.28]],
-		light_radius = 140,
-	  },
-	  
+      customParams            = {
+        reaim_time = 8, -- COB
+        impulse = [[-150]],
+
+        light_color = [[0.33 0.33 1.28]],
+        light_radius = 140,
+      },
+
       damage                  = {
         default = 0.001,
         planes  = 0.001,
@@ -120,13 +116,14 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams            = {
-	    impulse = [[150]],
-		
-		light_color = [[0.85 0.2 0.2]],
-		light_radius = 140,
-	  },
-	  
+      customParams            = {
+        reaim_time = 8, -- COB
+        impulse = [[150]],
+
+        light_color = [[0.85 0.2 0.2]],
+        light_radius = 140,
+      },
+
       damage                  = {
         default = 0.001,
         planes  = 0.001,

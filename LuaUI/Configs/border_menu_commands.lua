@@ -68,7 +68,7 @@ local buildoptions = {
 		{ "turretheavy",  tech=2, notSea=true },
 		{ "turretantiheavy",  tech=3, notSea=true },
 		{ "staticarty",  tech=3, notSea=true },
-		{ "staticantinuke",  tech=3, notSea=true },-- Protector
+		{ "staticantinuke",  tech=3, notSea=true },-- Antinuke
 	},
 
 	{-- air_defense
@@ -85,7 +85,7 @@ local buildoptions = {
 		{ "staticradar" },
 		{ "staticheavyradar",  tech=2 },
 		{ "staticshield",  tech=2 },-- Aegis
-		{ "staticjammer",  tech=2 },-- Sneaky Pete
+		{ "staticjammer",  tech=2 },-- Cornea
 		{ "staticmissilesilo",  tech=2 },
 		{ CMD_RAMP,  tech=3 },
 		{ CMD_LEVEL,  tech=3 },
@@ -218,7 +218,7 @@ local overrides = {
 	[CMD_ABANDON_PW] = {caption= '', texture = 'LuaUI/Images/Crystal_Clear_action_flag_white.png'},
 
 	[CMD_PLACE_BEACON] = {caption= '', texture = imageDir .. 'Bold/drop_beacon.png'},
-	
+
 	[CMD_RECALL_DRONES] = {caption= '', texture = imageDir .. 'Bold/recall_drones.png'},
 
 	-- states
@@ -249,6 +249,7 @@ local overrides = {
 	[CMD_UNIT_BOMBER_DIVE_STATE] = { texture = {imageDir .. 'states/divebomb_off.png', imageDir .. 'states/divebomb_shield.png', imageDir .. 'states/divebomb_attack.png', imageDir .. 'states/divebomb_always.png'},
 		caption = '', tooltip = tooltips.diveBomb,},
 	[CMD_UNIT_KILL_SUBORDINATES] = {texture = {imageDir .. 'states/capturekill_off.png', imageDir .. 'states/capturekill_on.png'}, caption=''},
+	[CMD_PUSH_PULL] = {texture = {imageDir .. 'states/pull_alt.png', imageDir .. 'states/push_alt.png'}, caption=''},
 	[CMD_DONT_FIRE_AT_RADAR] = {texture = {imageDir .. 'states/stealth_on.png', imageDir .. 'states/stealth_off.png'}, caption=''},
 	[CMD.TRAJECTORY] = { texture = {imageDir .. 'states/traj_low.png', imageDir .. 'states/traj_high.png'}, caption=''},
 	[CMD_AIR_STRAFE] = { texture = {imageDir .. 'states/strafe_off.png', imageDir .. 'states/strafe_on.png'}, caption=''},
@@ -278,7 +279,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	areaattack=1,
 
 	rawmove=1,
-	
+
 	-- states
 	onoff=2,
 	['repeat']=2,
@@ -307,6 +308,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	setferry=1,
 	radialmenu=1,
 	placebeacon=1,
+	evacuate=1,
 
 	-- terraform
 	rampground=1,
@@ -332,6 +334,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	antinukezone=2,
 	unitai=2,
 	unit_kill_subordinates=2,
+	pushpull=2,
 	autoassist=2,
 	autocalltransport=2,
 	airstrafe=2,

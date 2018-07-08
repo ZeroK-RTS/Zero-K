@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[jumpsumo]],
-  name                = [[Sumo]],
-  description         = [[Heavy Riot Jumper - On to Repulse, Off to Attract]],
+  name                = [[Jugglenaut]],
+  description         = [[Heavy Riot Jumper]],
   acceleration        = 0.1,
   activateWhenBuilt   = true,
   brakeRate           = 0.3,
@@ -14,7 +14,7 @@ unitDef = {
   category            = [[LAND]],
   collisionVolumeOffsets  = [[0 0 0]],
   collisionVolumeScales   = [[64 64 64]],
-  collisionVolumeType	  = [[ellipsoid]],
+  collisionVolumeType     = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -26,15 +26,9 @@ unitDef = {
     jump_reload        = 15,
     jump_from_midair   = 0,
     jump_rotate_midair = 0,
-
-    description_fr = [[Robot Émeutier]],
-    description_de = [[Springender Sturm Roboter]],
-    helptext       = [[The Sumo's impressive armor makes it a near-unstoppable sphere of death. It stomps on enemy units to break up their formation and can toss the survivors around with its Gravity Beams. Its stomp is the only way it can damage buildings.]],
-    --helptext_fr    = [[Le rayon r chaleur du Sumo est capable de délivrer une puissance de feu important sur un point précis. Plus la cible est proche, plus les dégâts seront importants. La précision du rayon est idéale pour lutter contre de larges vagues d'ennemis, mais l'imposant blindage du Sumo le restreint r une vitesse réduite.]],
-	--helptext_de    = [[Der Sumo nutzt seinen mächtigen Heat Ray in nächster Nähe, auf größerer Entfernung aber verliert er entsprechend an Feuerkraft. Er eignet sich ideal, um größere Gruppen von billigen, feindlichen Einheiten zu vernichten. Bemerkenswert ist, dass der Sumo in die Luft springen kann und schließlich auf feindlichen Einheiten landet, was diesen enormen Schaden zufügt.]],
-	aimposoffset   = [[0 6 0]],
-	midposoffset   = [[0 6 0]],
-	modelradius    = [[32]],
+    aimposoffset   = [[0 6 0]],
+    midposoffset   = [[0 6 0]],
+    modelradius    = [[32]],
   },
 
   explodeAs           = [[BIG_UNIT]],
@@ -77,12 +71,12 @@ unitDef = {
   workerTime          = 0,
 
   weapons             = {
-  
+
     {
       def                = [[FAKELASER]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 30,
-    },  
+    },
     {
       def                = [[GRAVITY_NEG]],
       badTargetCategory  = [[]],
@@ -104,7 +98,7 @@ unitDef = {
       mainDir            = [[-1 0 0]],
       maxAngleDif        = 222,
     },
-	{
+    {
       def                = [[GRAVITY_POS]],
       badTargetCategory  = [[]],
       onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND SHIP GUNSHIP]],
@@ -122,7 +116,7 @@ unitDef = {
 
 
   weaponDefs          = {
-  
+
     FAKELASER     = {
       name                    = [[Fake Laser]],
       areaOfEffect            = 12,
@@ -164,8 +158,8 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
     },
-	
-	GRAVITY_NEG = {
+
+    GRAVITY_NEG = {
       name                    = [[Attractive Gravity]],
       areaOfEffect            = 8,
       avoidFriendly           = false,
@@ -175,13 +169,13 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams            = {
-	    impulse = [[-150]],
-		
-		light_color = [[0.33 0.33 1.28]],
-		light_radius = 140,
-	  },
-	  
+      customParams            = {
+        impulse = [[-150]],
+
+        light_color = [[0.33 0.33 1.28]],
+        light_radius = 140,
+      },
+
       damage                  = {
         default = 0.001,
         planes  = 0.001,
@@ -221,15 +215,13 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams            = {
-	    impulse = [[150]],
-		
-		light_color = [[0.85 0.2 0.2]],
-		light_radius = 140,
-		light_beam_mult_frames = 9,
-		light_beam_mult = 8,
-	  },
-	  
+      customParams            = {
+        impulse = [[150]],
+
+        light_color = [[0.85 0.2 0.2]],
+        light_radius = 140,
+      },
+
       damage                  = {
         default = 0.001,
         planes  = 0.001,
@@ -257,7 +249,7 @@ unitDef = {
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 2200,
     },
-	
+
     HEATRAY = {
       name                    = [[Heat Ray]],
       accuracy                = 512,
@@ -295,7 +287,7 @@ unitDef = {
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 500,
     },
-	
+
     PARTICLEBEAM = {
       name                    = [[Auto Particle Beam]],
       beamDecay               = 0.85,
@@ -327,7 +319,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[BeamLaser]],
     },
-    
+
     DISRUPTOR = {
       name                    = [[Disruptor Pulse Beam]],
       areaOfEffect            = 24,
@@ -337,15 +329,15 @@ unitDef = {
       coreThickness           = 0.25,
       craterBoost             = 0,
       craterMult              = 0,
-  
+
       customparams = {
         timeslow_damagefactor = 2,
       },
- 
+
       damage                  = {
-		default = 250,
+        default = 250,
       },
-  
+
       explosionGenerator      = [[custom:flash2purple]],
       fireStarter             = 30,
       impactOnly              = true,
@@ -371,11 +363,11 @@ unitDef = {
       tolerance               = 18000,
       turret                  = true,
       weaponType              = [[BeamLaser]],
-      weaponVelocity          = 500,    
+      weaponVelocity          = 500,
     },
 
     LANDING = {
-      name                    = [[Sumo Landing]],
+      name                    = [[Jugglenaut Landing]],
       areaOfEffect            = 340,
       canattackground         = false,
       craterBoost             = 4,
@@ -401,7 +393,7 @@ unitDef = {
       turret                  = false,
       weaponType              = [[Cannon]],
       weaponVelocity          = 5,
-      
+
       customParams            = {
         hidden = true
       }

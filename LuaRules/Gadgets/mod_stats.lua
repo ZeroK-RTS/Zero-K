@@ -62,6 +62,7 @@ local weaponIDToUnitDefIDRaw = {
 	striderdante_napalm_rocket_salvo = "striderdante",
 	striderdante_striderdante_flamer = "striderdante",
 	cloakbomb_death = "cloakbomb",
+	amphbomb_death = "amphbomb",
 	tacnuke_weapon = "tacnuke",
 	napalmmissile_weapon = "napalmmissile",
 	seismic_seismic_weapon = "seismic",

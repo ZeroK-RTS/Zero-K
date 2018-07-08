@@ -38,7 +38,6 @@ local unitAoeDefs = {}
 local unitDgunDefs = {}
 local unitHasBeenSetup = {} 
 
-local hasSelectionCallin = false
 local aoeUnitInfo
 local dgunUnitInfo
 local aoeUnitID
@@ -127,14 +126,19 @@ end
 
 local function GetMouseTargetPosition()
 	local mx, my = GetMouseState()
-	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my)
+	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my, false, true)
 
 	if (mouseTargetType == "ground") then
 		return mouseTarget[1], mouseTarget[2], mouseTarget[3]
 	elseif (mouseTargetType == "unit") then
 		return GetUnitPosition(mouseTarget)
 	elseif (mouseTargetType == "feature") then
-		return GetFeaturePosition(mouseTarget)
+		local _, coords = TraceScreenRay(mx, my, true, true)
+		if coords and coords[3] then
+			return coords[1], coords[2], coords[3]
+		else
+			return GetFeaturePosition(mouseTarget)
+		end
 	else
 		return nil
 	end
@@ -189,15 +193,18 @@ local function getWeaponInfo(weaponDef, unitDef)
 	local weaponType = weaponDef.type
 	local scatter = weaponDef.accuracy + weaponDef.sprayAngle
 	local aoe = weaponDef.damageAreaOfEffect
-	local cost = unitDef.cost
-	local mobile = unitDef.speed > 0
+	local cost = unitDef.metalCost
 	local waterWeapon = weaponDef.waterWeapon
 	local ee = weaponDef.edgeEffectiveness
 	if (weaponDef.cylinderTargetting >= 100) then
 		retData = {type = "orbital", scatter = scatter}
 	elseif (weaponType == "Cannon") then
-		retData = {type = "ballistic", scatter = scatter, v = (weaponDef.customParams.weaponvelocity or 0),range = weaponDef.range,
-		mygravity = weaponDef.customParams and weaponDef.customParams.mygravity and weaponDef.customParams.mygravity*800
+		retData = {
+			type = "ballistic",
+			scatter = scatter,
+			v = (weaponDef.customParams.weaponvelocity or 0),
+			range = weaponDef.range,
+			mygravity = weaponDef.customParams and weaponDef.customParams.mygravity and weaponDef.customParams.mygravity*800
 		}
 	elseif (weaponType == "MissileLauncher") then
 		local turnRate = 0
@@ -242,7 +249,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 		retData.aoe = 0
 	end
 	retData.cost = cost
-	retData.mobile = mobile
+	retData.mobile = not unitDef.isImmobile
 	retData.waterWeapon = waterWeapon
 	retData.ee = ee
 
@@ -283,8 +290,16 @@ local function SetupUnit(unitDef, unitID)
 				local aoe = weaponDef.damageAreaOfEffect
 				if (weaponDef.manualFire and unitDef.canManualFire) or num == manualfireWeapon then
 					retDgunInfo = getWeaponInfo(weaponDef, unitDef)
-					if retDgunInfo.range and rangeMult then
-						retDgunInfo.range = retDgunInfo.range * rangeMult
+					if retDgunInfo.range then
+						if weaponDef.customParams.truerange then
+							retDgunInfo.range = tonumber(weaponDef.customParams.truerange)
+						end
+						if weaponDef.customParams.gui_draw_range then
+							retDgunInfo.range = tonumber(weaponDef.customParams.gui_draw_range)
+						end
+						if rangeMult then
+							retDgunInfo.range = retDgunInfo.range * rangeMult
+						end
 					end
 				elseif (not weaponDef.isShield 
 						and not ToBool(weaponDef.interceptor) and not ToBool(weaponDef.customParams.hidden)
@@ -298,6 +313,9 @@ local function SetupUnit(unitDef, unitID)
 
 	if (maxWeaponDef) then 
 		retAoeInfo = getWeaponInfo(maxWeaponDef, unitDef)
+		if maxWeaponDef.customParams.gui_draw_range then
+			retAoeInfo.range = tonumber(maxWeaponDef.customParams.gui_draw_range)
+		end
 		if retAoeInfo.range and rangeMult then
 			retAoeInfo.range = retAoeInfo.range * rangeMult
 		end
@@ -347,7 +365,7 @@ local function UpdateSelection()
 			end
 
 			if (aoeDefInfo[unitDefID]) then
-				local currCost = UnitDefs[unitDefID].cost * #unitIDs
+				local currCost = UnitDefs[unitDefID].metalCost * #unitIDs
 				if (currCost > maxCost) then
 					maxCost = currCost
 					aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
@@ -466,7 +484,7 @@ local function GetBallisticVector(v, mg, dx, dy, dz, trajectory, range)
 	return Normalize(bx, by, bz)
 end
 
-local function GetBallisticImpactPoint(v, fx, fy, fz, bx, by, bz)
+local function GetBallisticImpactPoint(v, mg_f, fx, fy, fz, bx, by, bz)
 	local v_f = v / GAME_SPEED
 	local vx_f = bx * v_f
 	local vy_f = by * v_f
@@ -475,13 +493,13 @@ local function GetBallisticImpactPoint(v, fx, fy, fz, bx, by, bz)
 	local py = fy
 	local pz = fz
 
-	local ttl = 4 * v_f / g_f
+	local ttl = 4 * v_f / mg_f
 
 	for i = 1, ttl do
 		px = px + vx_f
 		py = py + vy_f
 		pz = pz + vz_f
-		vy_f = vy_f - g_f
+		vy_f = vy_f - mg_f
 
 		local gwh = max(GetGroundHeight(px, pz), 0)
 
@@ -543,6 +561,8 @@ local function DrawBallisticScatter(scatter, v, mygravity ,fx, fy, fz, tx, ty, t
 
 	local scatterDiv = scatter / numScatterPoints
 	local vertices = {}
+	
+	local mg_f = mg / GAME_SPEED / GAME_SPEED
 
 	--trace impact points
 	for i = -numScatterPoints, numScatterPoints do
@@ -553,7 +573,7 @@ local function DrawBallisticScatter(scatter, v, mygravity ,fx, fy, fz, tx, ty, t
 		local by_c = by * currScatterCos + br * currScatter
 		local bz_c = bz * rMult
 
-		vertices[i+numScatterPoints+1] = GetBallisticImpactPoint(v, fx, fy, fz, bx_c, by_c, bz_c)
+		vertices[i+numScatterPoints+1] = GetBallisticImpactPoint(v, mg_f, fx, fy, fz, bx_c, by_c, bz_c)
 	end
 
 	glLineWidth(scatterLineWidthMult / mouseDistance)
@@ -682,10 +702,6 @@ function widget:Shutdown()
 end
 
 function widget:DrawWorld()
-	if (not hasSelectionCallin) then
-		UpdateSelection()
-	end
-
 	mouseDistance = GetMouseDistance() or 1000
 
 	local tx, ty, tz = GetMouseTargetPosition()
@@ -784,7 +800,6 @@ function widget:UnitDestroyed(unitID)
 end
 
 function widget:SelectionChanged(sel)
-	hasSelectionCallin = true
 	UpdateSelection()
 end
 

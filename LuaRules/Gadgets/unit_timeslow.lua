@@ -16,12 +16,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local SAVE_FILE = "Gadgets/unit_timeslow.lua"
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --SYNCED
-if (not gadgetHandler:IsSyncedCode()) then
-   return false
-end
-
-
+if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetUnitDefID        = Spring.GetUnitDefID
@@ -54,24 +54,20 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 local attritionWeaponDefs, MAX_SLOW_FACTOR, DEGRADE_TIMER, DEGRADE_FACTOR, UPDATE_PERIOD = include("LuaRules/Configs/timeslow_defs.lua")
 local slowedUnits = {}
 
+_G.slowedUnits = slowedUnits
+
 Spring.SetGameRulesParam("slowState",1)
-
-function gadget:Initialize()
-end
-
-local function checkTargetRandomTarget(unitID)
-
-end
 
 local function updateSlow(unitID, state)
 
 	local health = spGetUnitHealth(unitID)
 
 	if health then
-		if state.slowDamage > health*MAX_SLOW_FACTOR then
-			state.slowDamage = health*MAX_SLOW_FACTOR
+		local maxSlow = health*(MAX_SLOW_FACTOR + (state.extraSlowBound or 0))
+		if state.slowDamage > maxSlow then
+			state.slowDamage = maxSlow
 		end
-
+		
 		local percentSlow = state.slowDamage/health
 
 		spSetUnitRulesParam(unitID,"slowState",percentSlow, LOS_ACCESS)
@@ -102,18 +98,22 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		slowedUnits[unitID] = {
 			slowDamage = 0,
 			degradeTimer = DEGRADE_TIMER,
-			perma = false,
 		}
 	end
+	local slowDef = attritionWeaponDefs[weaponID]
 
 	-- add slow damage
-	local slowdown = attritionWeaponDefs[weaponID].slowDamage
-	if attritionWeaponDefs[weaponID].scaleSlow then
+	local slowdown = slowDef.slowDamage
+	if slowDef.scaleSlow then
 		slowdown = slowdown * (damage/WeaponDefs[weaponID].customParams.raw_damage)
 	end	--scale slow damage based on real damage (i.e. take into account armortypes etc.)
 
 	slowedUnits[unitID].slowDamage = slowedUnits[unitID].slowDamage + slowdown
 	slowedUnits[unitID].degradeTimer = DEGRADE_TIMER
+	
+	if slowDef.overslow then
+		slowedUnits[unitID].extraSlowBound = math.max(slowedUnits[unitID].extraSlowBound or 0, slowDef.overslow)
+	end
 
 	if GG.Awards and GG.Awards.AddAwardPoints then
 		local ud = UnitDefs[unitDefID]
@@ -123,9 +123,9 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 
 	-- check if a target change is needed
 	-- only changes target if the target is fully slowed and next order is an attack order
-	if spValidUnitID(attackerID) and attritionWeaponDefs[weaponID].smartRetarget then
+	if spValidUnitID(attackerID) and slowDef.smartRetarget then
 		local health = spGetUnitHealth(unitID)
-		if slowedUnits[unitID].slowDamage > health*attritionWeaponDefs[weaponID].smartRetarget then
+		if slowedUnits[unitID].slowDamage > health*slowDef.smartRetarget then
 
 			local cmd = spGetCommandQueue(attackerID, 3)
 
@@ -137,13 +137,13 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 				local re = spGetUnitStates(attackerID)["repeat"]
 
 				if cmd[2].id == CMD_SET_WANTED_MAX_SPEED then
-					spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag,cmd[2].tag},{})
+					spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag,cmd[2].tag}, 0)
 				else
-					spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},{})
+					spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},0)
 				end
 
 				if re then
-					spGiveOrderToUnit(attackerID,CMD_ATTACK,cmd[1].params,{"shift"})
+					spGiveOrderToUnit(attackerID,CMD_ATTACK,cmd[1].params,CMD.OPT_SHIFT)
 				end
 
 			end
@@ -157,13 +157,13 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 						spSetUnitTarget(attackerID,newTargetID)
 						if #cmd > 0 and cmd[1].id == CMD_ATTACK then
 							if #cmd > 1 and cmd[2].id == CMD_SET_WANTED_MAX_SPEED then
-								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag,cmd[2].tag},{})
+								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag,cmd[2].tag}, 0)
 							else
-								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},{})
+								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},0)
 							end
-						elseif #cmd > 1 and (cmd[1].id == CMD_MOVE or cmd[1].id == CMD_RAW_MOVE) and cmd[2].id == CMD_FIGHT and
+						elseif #cmd > 1 and (cmd[1].id == CMD_MOVE or cmd[1].id == CMD_RAW_MOVE or cmd[1].id == CMD_RAW_BUILD) and cmd[2].id == CMD_FIGHT and
 							cmd[2].options.internal and #cmd[2].params == 1 and cmd[2].params[1] == unitID then
-							spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[2].tag},{})
+							spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[2].tag},0)
 						end
 					end
 				end
@@ -175,7 +175,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- write to unit rules param
 	updateSlow( unitID, slowedUnits[unitID])
 
-	if attritionWeaponDefs[weaponID].onlySlow then
+	if slowDef.onlySlow then
 		return 0
 	else
 		return damage
@@ -190,7 +190,6 @@ local function addSlowDamage(unitID, damage)
 		slowedUnits[unitID] = {
 			slowDamage = 0,
 			degradeTimer = DEGRADE_TIMER,
-			perma = false,
 		}
 	end
 
@@ -208,16 +207,10 @@ local function getSlowDamage(unitID)
 	return false
 end
 
-local function permaSlowDamage(unitID, perma)
-	if slowedUnits[unitID] then
-		slowedUnits[unitID].perma = perma
-	end
-end
 
 -- morph uses this
 GG.getSlowDamage = getSlowDamage
 GG.addSlowDamage = addSlowDamage
-GG.permaSlowDamage = permaSlowDamage -- true/false whether unit is permaslowed, used by unit_zombies.lua
 
 local function removeUnit(unitID)
 	slowedUnits[unitID] = nil
@@ -226,31 +219,67 @@ end
 function gadget:GameFrame(f)
     if (f-1) % UPDATE_PERIOD == 0 then
         for unitID, state in pairs(slowedUnits) do
-		if not(state.perma) then
-			if state.degradeTimer <= 0 then
-
-				local health = spGetUnitHealth(unitID) or 0
-				state.slowDamage = state.slowDamage-health*DEGRADE_FACTOR
-				if state.slowDamage < 0 then
-					state.slowDamage = 0
-					updateSlow(unitID, state)
-					removeUnit(unitID)
-				else
-					updateSlow(unitID, state)
+			if state.extraSlowBound then
+				state.extraSlowBound = state.extraSlowBound - DEGRADE_FACTOR
+				if state.extraSlowBound <= 0 then
+					state.extraSlowBound = nil
 				end
-
+			end
+			if state.degradeTimer <= 0 then
+				local health = spGetUnitHealth(unitID) or 0
+				state.slowDamage = state.slowDamage - health*DEGRADE_FACTOR
 			else
 				state.degradeTimer = state.degradeTimer-1
 			end
-		end
+			if state.slowDamage < 0 then
+				state.slowDamage = 0
+				updateSlow(unitID, state)
+				removeUnit(unitID)
+			else
+				updateSlow(unitID, state)
+			end
         end
     end
 end
 
 
 function gadget:UnitDestroyed(unitID)
-	removeUnit(unitID)
+   removeUnit(unitID)
+end
+
+function gadget:Load(zip)
+   if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	local loadData = GG.SaveLoad.ReadFile(zip, "Time Slow", SAVE_FILE) or {}
+	slowedUnits = {}
+	for oldID, entry in pairs(loadData) do
+		local newID = GG.SaveLoad.GetNewUnitID(oldID)
+		if newID then
+			slowedUnits[newID] = entry
+			GG.UpdateUnitAttributes(newID)
+		end
+	end
+	_G.slowedUnits = slowedUnits
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+else
+-- UNSYNCED
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.slowedUnits, "Time Slow"))
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+end

@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[vehcapture]],
   name                = [[Dominatrix]],
-  description         = [[Capture Vehicle]],
+  description         = [[Capture Rover]],
   acceleration        = 0.0444,
   brakeRate           = 0.0385,
   buildCostMetal      = 420,
@@ -14,13 +14,13 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[26 26 50]],
   collisionVolumeType    = [[cylZ]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[40 40 50]],
+  selectionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
   customParams        = {
     post_capture_reload = 360,
-    description_de = [[Kaperungsfahrzeug]],
-    helptext       = [[The Dominatrix captures enemies, turning them against their former allies. Multiple Dominatrix can capture a single target faster, although only one becomes the controller. After taking control of a unit the Dominatrix cannot fire for 12 seconds. If a Dominatrix is destroyed all units it controls are freed.]],
-	helptext_de    = [[Der Dominatrix erobert Einheiten, hetzt sie gegen die ehemaligen Verbündeten auf. Mehrere Dominatrixe können ein Ziel schneller erobern, obwohl nur einer von ihnen der Kontrolleur dieser Einheit wird. Nachdem eine gegnerische Einheit unter Kontrolle gebracht wurde, kann der Dominatrix für fünf Sekunden nicht schießen. Sobald ein Dominatrix zerstört wurde, sind alle Einheiten unter seiner Kontrolle wieder frei.]],
 	modelradius    = [[13]],
   },
 
@@ -37,7 +37,6 @@ unitDef = {
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[TANK3]],
-  moveState           = 0,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP]],
   objectName          = [[corvrad_big.s3o]],
@@ -48,7 +47,7 @@ unitDef = {
   trackStrength       = 5,
   trackStretch        = 1,
   trackType           = [[StdTank]],
-  trackWidth          = 26,
+  trackWidth          = 28,
   turninplace         = 0,
   turnRate            = 420,
   workerTime          = 0,

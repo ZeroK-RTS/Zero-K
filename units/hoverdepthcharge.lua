@@ -14,11 +14,10 @@ unitDef = {
   category            = [[HOVER]],
   collisionVolumeOffsets  = [[0 0 0]],
   collisionVolumeScales   = [[55 55 55]],
-  collisionVolumeType	  = [[ellipsoid]],
+  collisionVolumeType     = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext        = [[The somewhat suicidal Claymore is armed with a heavy depthcharge launcher and has no qualms about dropping it on land.]],
     turnatfullspeed = [[1]],
   },
 
@@ -28,7 +27,7 @@ unitDef = {
   iconType            = [[hoverspecial]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maxDamage           = 1350,
+  maxDamage           = 1650,
   maxSlope            = 36,
   maxVelocity         = 3.3,
   minCloakDistance    = 75,
@@ -36,7 +35,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[hoverassault.s3o]],
-  script			  = [[hoverdepthcharge.lua]],
+  script              = [[hoverdepthcharge.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -60,8 +59,8 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP HOVER]],
     },
-	
-	{
+    
+    {
       def                = [[FAKEGUN]],
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
     },
@@ -80,12 +79,15 @@ unitDef = {
       name                    = [[Depth Charge]],
       areaOfEffect            = 290,
       avoidFriendly           = false,
-	  bounceSlip              = 0.4,
-	  bounceRebound           = 0.99,
-      canAttackGround		  = false,	-- it cannot really, this will stop people from being confused.
+      bounceSlip              = 0.94,
+      bounceRebound           = 0.8,
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
+
+			customParams = {
+				burst = Shared.BURST_UNRELIABLE,
+			},
 
       damage                  = {
         default = 900.5,
@@ -94,16 +96,16 @@ unitDef = {
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:TORPEDOHITHUGE]],
       fixedLauncher           = true,
-      flightTime              = 12,
-	  groundBounce            = true,
-	  heightMod               = 0,
-	  impulseBoost            = 0.4,
+      flightTime              = 2.1,
+      groundBounce            = true,
+      heightMod               = 0,
+      impulseBoost            = 0.4,
       impulseFactor           = 1,
       interceptedByShieldType = 1,
       model                   = [[depthcharge_big.s3o]],
-	  myGravity               = 0.2,
+      myGravity               = 0.2,
       noSelfDamage            = false,
-      numbounce               = 4,
+      numbounce               = 3,
       predictBoost            = 0,
       range                   = 270,
       reloadtime              = 8,
@@ -121,35 +123,35 @@ unitDef = {
       weaponType              = [[TorpedoLauncher]],
       weaponVelocity          = 280,
     },
-	
-	FAKE_DEPTHCHARGE = {
+    
+    FAKE_DEPTHCHARGE = {
       name                    = [[Fake Depth Charge]],
       areaOfEffect            = 290,
       avoidFriendly           = false,
-	  bounceSlip              = 0.4,
-	  bounceRebound           = 0.4,
-      canAttackGround		  = false,	-- it cannot really, this will stop people from being confused.
+      bounceSlip              = 0.4,
+      bounceRebound           = 0.4,
+      canAttackGround         = false,
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
 
       damage                  = {
-        default = 1250.5,
+        default = 900.5,
       },
 
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:TORPEDOHITHUGE]],
       fixedLauncher           = true,
-      flightTime              = 2,
-	  groundBounce            = true,
-	  heightMod               = 0,
-	  impulseBoost            = 0.4,
+      flightTime              = 4,
+      groundBounce            = true,
+      heightMod               = 0,
+      impulseBoost            = 0.4,
       impulseFactor           = 1,
       interceptedByShieldType = 1,
       model                   = [[depthcharge_big.s3o]],
-	  myGravity               = 0.2,
+      myGravity               = 0.2,
       noSelfDamage            = false,
-      numbounce               = 4,
+      numbounce               = 1,
       predictBoost            = 0,
       range                   = 270,
       reloadtime              = 8,
@@ -165,8 +167,8 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 5,
     },
-	
-	FAKEGUN = {
+    
+    FAKEGUN = {
       name                    = [[Fake Weapon]],
       areaOfEffect            = 8,
       collideFriendly         = false,
@@ -184,11 +186,12 @@ unitDef = {
       flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
-      range                   = 100,
+      range                   = 75,
       reloadtime              = 8,
       size                    = 1E-06,
       smokeTrail              = false,
-
+      targetborder            = 1,
+      
       textures                = {
         [[null]],
         [[null]],
@@ -197,7 +200,7 @@ unitDef = {
 
       turnrate                = 10000,
       turret                  = true,
-	  waterWeapon             = true,
+      waterWeapon             = true,
       weaponAcceleration      = 200,
       weaponTimer             = 0.1,
       weaponType              = [[StarburstLauncher]],

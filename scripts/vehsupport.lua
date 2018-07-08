@@ -52,7 +52,13 @@ local MAX_PIVOT = math.rad(24)
 local MIN_PIVOT = math.rad(-24)
 local PIVOT_SPEED = math.rad(60)
 
+local CMD_ATTACK = CMD.ATTACK
+local CMD_FIGHT = CMD.FIGHT
+
 local turnTilt = 0
+
+local lastShotFrame = false
+local FIGHT_FIRE_TIME = 45
 
 local SETTLE_PERIODS = 15
 local settleTimer = 0
@@ -77,6 +83,31 @@ local function SetDeploy(wantDeploy)
 		Turn(gun, x_axis, 0,GUN_TURN_SPEED/2)
 		Move(arms, y_axis, 0, ARMS_LOWER_SPEED)
 		deployed = false
+	end
+end
+
+local ableToMove = true
+local function SetAbleToMove(newMove)
+	if ableToMove == newMove then
+		return
+	end
+	ableToMove = newMove
+	
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0)
+	GG.UpdateUnitAttributes(unitID)
+end
+
+local function KeepStatic()
+	while true do
+		local gameFrame = Spring.GetGameFrame()
+		if lastShotFrame and (lastShotFrame > gameFrame) then
+			local cmd = Spring.GetCommandQueue(unitID, 2)
+			SetAbleToMove(not (cmd and cmd[1] and (cmd[1].id == CMD_ATTACK) and (#cmd[1].params == 1) and cmd[2] and (cmd[2].id == CMD_FIGHT) and (#cmd[2].params == 6)))
+		else
+			SetAbleToMove(true)
+		end
+		Sleep(300)
 	end
 end
 
@@ -257,6 +288,9 @@ function script.Create()
 	StartThread(Suspension)
 	StartThread(AnimControl)
 	StartThread(SmokeUnit, smokePiece)
+	--StartThread(KeepStatic)
+	
+	Move(aim, y_axis, 10)
 	
 	Turn(exhaust1, x_axis, math.rad(180))
 	Turn(exhaust2, x_axis, math.rad(180))
@@ -290,15 +324,16 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot()
+	shot = 3 - shot
 	EmitSfx(gunPieces[shot].firepoint, UNIT_SFX1)
 	EmitSfx(gunPieces[shot].exhaust, UNIT_SFX2)
-	shot = 3 - shot
+	lastShotFrame = Spring.GetGameFrame() + FIGHT_FIRE_TIME
 end
 
 function script.BlockShot(num, targetID)
 	if Spring.ValidUnitID(targetID) then
 		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/600
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 30.1, 25 * distMult)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 38, 25 * distMult)
 	end
 	return false
 end

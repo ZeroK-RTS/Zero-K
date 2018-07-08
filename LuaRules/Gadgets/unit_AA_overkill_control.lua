@@ -3,7 +3,7 @@ local versionNumber = "v0.1"
 function gadget:GetInfo()
   return {
     name      = "AA overkill control",
-    desc      = versionNumber .. " Managed Allowed Weapon Target for Defender, Hacksaw, Chainsaw and Screamer to prevent overkill",
+    desc      = versionNumber .. " Managed Allowed Weapon Target for Defender, Hacksaw, Chainsaw and Artemis to prevent overkill",
     author    = "Jseah",
     date      = "03/05/13",
     license   = "GNU GPL, v2 or later",

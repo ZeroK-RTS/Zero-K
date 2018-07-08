@@ -15,11 +15,6 @@ unitDef = {
   collisionVolumeType	        = [[CylY]],
 
   customParams                  = {
-    description_fr = [[Lance Missile Nucléaire Tactique]],
-    description_de = [[Taktische Rakete]],
-    helptext       = [[A long-range precision strike weapon. The Eos' blast radius is small, but lethal.]],
-    helptext_fr    = [[Le Eos est un lance missile nucléaire tactique. Les tetes nucléaires ne sont pas aussi lourdes que celles du Silencer et la portée moindre. Mais bien placé, il peut faire des ravages, et présente un rapport cout/efficacité plus qu'interressant.]],
-    helptext_de    = [[Eine weitreichende, präzise Waffe. Die Druckwelle ist zwar klein, aber tödlich.]],
     mobilebuilding = [[1]],
   },
 
@@ -70,6 +65,8 @@ unitDef = {
       craterMult              = 3.5,
 
       customParams            = {
+		burst = Shared.BURST_RELIABLE,
+
       lups_explodelife = 1.5,
 		stats_hide_dps = 1, -- meaningless
 		stats_hide_reload = 1,
@@ -95,7 +92,7 @@ unitDef = {
       reloadtime              = 10,
       smokeTrail              = false,
       soundHit                = [[explosion/mini_nuke]],
-      soundStart              = [[weapon/missile/tacnuke_launch]],
+      soundStart              = [[weapon/missile/tacnuke_launch2_trimmed]],
       tolerance               = 4000,
       turnrate                = 18000,
       weaponAcceleration      = 180,

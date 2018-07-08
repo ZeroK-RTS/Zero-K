@@ -59,16 +59,27 @@ local function SetupWindow()
 		padding = {0, 0, 0, 0},
 		--itemMargin  = {0, 0, 0, 0},
 	}
+	
 	local label_text = TextBox:New{
-		x = "13%",
-		right = "9%",
-		y = "24%",
-		bottom = "65%",
+		x = 36,
+		right = 20,
+		y = 32,
 		parent = newMainWindow,
 		autosize = false;
 		align  = "center";
 		valign = "top";
-		text   = "Connection problems detected for opponent \n\n     Wait  or";
+		text   = "Connection problems detected for opponent";
+		font   = {size = 20, color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, outlineWidth = 3},
+	}
+	local label_text_lower = TextBox:New{
+		x = 68,
+		right = 30,
+		y = 97,
+		parent = newMainWindow,
+		autosize = false;
+		align  = "center";
+		valign = "top";
+		text   = "Wait  or";
 		font   = {size = 20, color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, outlineWidth = 3},
 	}
 	

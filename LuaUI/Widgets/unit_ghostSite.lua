@@ -122,7 +122,9 @@ local function DrawGhostSites()
 			else
 				gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID])
 			end
-			gl.UseShader(0)
+			if shaderObj then
+				gl.UseShader(0)
+			end
 
 			gl.PopMatrix()
 		else
@@ -243,7 +245,7 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 	local udid = Spring.GetUnitDefID(unitID)
 	local udef = UnitDefs[udid]
 
-	if (udef.isBuilding == true or udef.isFactory == true or udef.speed == 0) and buildProgress ~= 1 then
+	if udef.isImmobile and buildProgress ~= 1 then
 		local x, _, z = Spring.GetUnitPosition(unitID)
 		local facing = Spring.GetUnitBuildFacing(unitID)
 		local y = Spring.GetGroundHeight(x,z) -- every single model is offset by 16, pretty retarded if you ask me.

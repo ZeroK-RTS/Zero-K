@@ -104,7 +104,7 @@ local function Close()
 		local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 		if not stunned_or_inbuild then
 			local hp = spGetUnitHealth(unitID)
-			local slowMult = 1 - (spGetUnitRulesParam(unitID,"slowState") or 0)
+			local slowMult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 			local newHp = hp + slowMult*BUNKERED_AUTOHEAL
 			spSetUnitHealth(unitID, newHp)
 		end
@@ -147,7 +147,7 @@ end
 
 
 function script.QueryWeapon(n)
-	return muzzle
+	return (is_open and muzzle) or aimProxy
 end
 
 function script.AimFromWeapon(n) 

@@ -19,6 +19,8 @@ end
 include("colors.h.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
+local GetFlowStr = VFS.Include("LuaUI/Headers/ecopanels.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -62,6 +64,13 @@ local function UpdateResourceWindowFonts(windowData)
 	windowData.energyPanel.label_overdrive.font.size = options.resourceFontSize.value
 	windowData.energyPanel.label_reclaim.font.size = options.resourceFontSize.value
 	
+	windowData.metalPanel.bar:SetCaption(GetFlowStr(windowData.metalPanel.bar.net, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+	windowData.metalPanel.bar.font.size = options.flowAsArrows.value and 20 or 16
+	windowData.metalPanel.bar.fontOffset = options.flowAsArrows.value and -2 or 1
+	windowData.energyPanel.barOverlay:SetCaption(GetFlowStr(windowData.energyPanel.barOverlay.net, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+	windowData.energyPanel.barOverlay.font.size = options.flowAsArrows.value and 20 or 16
+	windowData.energyPanel.barOverlay.fontOffset = options.flowAsArrows.value and -2 or 1
+
 	windowData.metalPanel.label_income:Invalidate()
 	windowData.metalPanel.label_overdrive:Invalidate()
 	windowData.metalPanel.label_reclaim:Invalidate()
@@ -134,6 +143,7 @@ options_order = {
 	'resourceOpacity',
 	'resourceMainFontSize', 
 	'resourceFontSize',
+	'flowAsArrows',
 	'colourBlind', 
 	'fancySkinning',
 }
@@ -196,7 +206,15 @@ options = {
 		type  = "bool", 
 		value = true, 
 		OnChange = function(self) option_CheckEnableResource(self) end,
-	},	
+	},
+	flowAsArrows = {
+		name  = "Flow as arrows",
+		desc = "Use arrows instead of a number for the flow. Each arrow is 5 resources per second.",
+		type  = "bool",
+		value = true,
+		noHotkey = true,
+		OnChange = option_UpdateFonts,
+	},
 	resourceOpacity = {
 		name  = "Opacity",
 		type  = "number",
@@ -289,27 +307,42 @@ local function Mix(startColour, endColour, interpParam)
 	endColour[4] * interpParam + startColour[4] * (1 - interpParam), }
 end
 
-local blink = 0
-local BLINK_PERIOD = 1.4
+local BlinkStatusFunc = {
+	[1] = function (index)
+		index = index%12
+		if index < 6 then
+			return index*0.8/5
+		else
+			return (11 - index)*0.8/5
+		end
+	end,
+	[2] = function (index)
+		index = index%8
+		if index < 4 then
+			return 0.25 + index*0.75/3
+		else
+			return 0.25 + (7 - index)*0.75/3
+		end
+	end,
+}
 
-local function UpdateResourceWindowFlash(sideID, blinkAlpha)
+local BLINK_UPDATE_RATE = 0.1
+
+local function UpdateResourceWindowFlash(sideID, blinkIndex)
 	local windowData = economyWindowData[sideID]
 	
 	if windowData.metalPanel.flashing then
-		windowData.metalPanel.bar:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, blinkAlpha))
+		windowData.metalPanel.bar:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, BlinkStatusFunc[windowData.metalPanel.flashing](blinkIndex)))
 	end
 
 	if windowData.energyPanel.flashing then
-		windowData.energyPanel.barOverlay:SetColor(col_expense[1], col_expense[2], col_expense[3], blinkAlpha)
+		windowData.energyPanel.barOverlay:SetColor(col_expense[1], col_expense[2], col_expense[3], BlinkStatusFunc[windowData.energyPanel.flashing](blinkIndex)*0.7)
 	end
 end
 
-function UpdateResourceWindowFlashMain(dt)
-	blink = (blink + dt)%BLINK_PERIOD
-	local sawtooth = math.abs(blink/BLINK_PERIOD - 0.5)*2
-	local blinkAlpha = sawtooth*0.92
-	UpdateResourceWindowFlash(1, blinkAlpha)
-	UpdateResourceWindowFlash(2, blinkAlpha)
+function UpdateResourceWindowFlashMain(blinkIndex)
+	UpdateResourceWindowFlash(1, blinkIndex)
+	UpdateResourceWindowFlash(2, blinkIndex)
 end
 
 local function GetFontMult(input)
@@ -347,36 +380,6 @@ local function Format(input, override)
 	end
 end
 
-local function GetBarCaption(net)
-	if net < -27.5 then
-		return negativeColourStr.."<<<<<<"
-	elseif net < -22.5 then
-		return negativeColourStr.."<<<<<"
-	elseif net < -17.5 then
-		return negativeColourStr.."<<<<"
-	elseif net < -12.5 then
-		return negativeColourStr.."<<<"
-	elseif net < -7.5 then
-		return negativeColourStr.."<<"
-	elseif net < -2.5 then
-		return negativeColourStr.."<"
-	elseif net < 2.5 then
-		return ""
-	elseif net < 7.5 then
-		return positiveColourStr..">"
-	elseif net < 12.5 then
-		return positiveColourStr..">>"
-	elseif net < 17.5 then
-		return positiveColourStr..">>>"
-	elseif net < 22.5 then
-		return positiveColourStr..">>>>"
-	elseif net < 27.5 then
-		return positiveColourStr..">>>>>"
-	else
-		return positiveColourStr..">>>>>>"
-	end
-end
-
 local function GetTimeString()
   local secs = math.floor(Spring.GetGameSeconds())
   if (timeSecs ~= secs) then
@@ -407,9 +410,11 @@ local function UpdateResourcePanel(panel, income, net, overdrive, reclaim, stora
 	panel.label_income:SetCaption(Format(income, ""))
 	
 	if panel.barOverlay then
-		panel.barOverlay:SetCaption(GetBarCaption(net))
+		panel.barOverlay:SetCaption(GetFlowStr(net, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+		panel.barOverlay.net = net
 	else
-		panel.bar:SetCaption(GetBarCaption(net))
+		panel.bar:SetCaption(GetFlowStr(net, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+		panel.bar.net = net
 	end
 	
 	panel.label_overdrive:SetCaption("OD: " .. Format(overdrive))
@@ -440,8 +445,7 @@ local function UpdateResourceWindowPanel(sideID)
 	local energyOverdrive = spGetTeamRulesParam(teams[1], "OD_team_energyOverdrive") or 0
 	local energyReclaim = 0
 	local energyStorage = 0
-	local energyStorageMax = 0	
-	
+	local energyStorageMax = 0
 	
 	-- Calculate the values
 	for i = 1, #teams do
@@ -483,17 +487,17 @@ local function UpdateResourceWindowPanel(sideID)
 	
 	--// Flashing
 	local newMetalFlash = (metalIncome - metalSpent + metalStorage >= metalStorageMax)
-	if windowData.metalPanel.flashing and not newFlash then
+	if windowData.metalPanel.flashing and not newMetalFlash then
 		windowData.metalPanel.bar:SetColor(col_metal)
 	end
-	windowData.metalPanel.flashing = newMetalFlash
+	windowData.metalPanel.flashing = newMetalFlash and 1
 	
 	local newEnergyFlash = (energyStorage <= energyStorageMax*0.1) 
 		or (energyWaste > 0)
 	if windowData.energyPanel.flashing and not newEnergyFlash then
 		windowData.energyPanel.barOverlay:SetColor(col_empty)
 	end
-	windowData.energyPanel.flashing = newEnergyFlash
+	windowData.energyPanel.flashing = newEnergyFlash and 1
 
 	--// Update GUI
 	UpdateResourcePanel(windowData.metalPanel, metalIncome, metalNet, 
@@ -558,6 +562,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 			right  = barRight,
 			height = barHeight,
 			noSkin = true,
+			fontOffset = -2,
 			font   = {
 				size = 20, 
 				color = {.8,.8,.8,.95}, 
@@ -565,6 +570,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 				outlineWidth = 2, 
 				outlineWeight = 2
 			},
+			net = 0, -- cache, not a chili thing
 		}
 	end
 	
@@ -578,6 +584,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 		height = barHeight,
 		value  = 0,
 		fontShadow = false,
+		fontOffset = -2,
 		font   = {
 			size = 20, 
 			color = {.8,.8,.8,.95}, 
@@ -585,6 +592,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 			outlineWidth = 2, 
 			outlineWeight = 2
 		},
+		net = 0, -- cache, not a chili thing
 	}
 	
 	data.label_income = Chili.Label:New{
@@ -985,6 +993,8 @@ function option_CheckEnable(self)
 		AddEconomyWindows()
 	end
 	
+	option_UpdateFonts()
+
 	enabled = true
 	return true
 end
@@ -1043,10 +1053,17 @@ function widget:Initialize()
 end
 
 local timer = 0
+local blinkTimer = 0
+local blinkIndex = 0
 function widget:Update(dt)
 	timer = timer + dt
 	if economyWindowData then
-		UpdateResourceWindowFlashMain(dt)
+		blinkTimer = blinkTimer + dt
+		if blinkTimer >= BLINK_UPDATE_RATE then
+			blinkTimer = blinkTimer - BLINK_UPDATE_RATE
+			blinkIndex = (blinkIndex + 1)%24
+			UpdateResourceWindowFlashMain(blinkIndex)
+		end
 	end
 	if timer >= 1 and playerWindow then
 		playerWindow.time:SetCaption(GetTimeString())

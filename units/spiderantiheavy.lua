@@ -1,6 +1,6 @@
 unitDef = {
   unitname              = [[spiderantiheavy]],
-  name                  = [[Infiltrator]],
+  name                  = [[Widow]],
   description           = [[Cloaked Scout/Anti-Heavy]],
   acceleration          = 0.3,
   activateWhenBuilt     = true,
@@ -13,21 +13,19 @@ unitDef = {
   category              = [[LAND]],
   cloakCost             = 4,
   cloakCostMoving       = 12,
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                = [[DEAD]],
 
   customParams          = {
-    description_de = [[Spion, Anti-Heavy]],
-    description_fr = [[Espion, contre les unités lourdes]],
-    helptext       = [[The Infiltrator is useful in two ways. Firstly it is an excellent scout, and very difficult to detect. It can penetrate deep into enemy lines. It also has the capacity to shoot a paralyzing bolt that will freeze any one target, good against heavy enemies and enemy infrastructure.]],
-    helptext_de    = [[Der Infiltrator ist für zwei Dinge nützlich. Erstens ist er ein exzellenter Aufklärer und sehr schwer zu entdecken. Er kann sich tief hinter die feindlichen Linien begeben. Außerdem besitzt er die Eigentschaft einen paralysierenden Bolzen abzuschießen, der jedes Ziel einfriert, was gegen schwere Einheiten und feindliche Infrastruktur sehr nützlich ist.]],
-    helptext_fr    = [[L'infiltrator est une unité légère invisible. Il peut typiquement être utilisé comme un éclaireur permettant d'espionner la base enemie sans se faire repérer. Il peut aussi libérer une décharge EMP de très haute puissance pour paralyser une cible unique, utile contre les unités lourdes et l'infrastructure. En cas d'échec le temps de recharge très long signifie la perte certaine de cette unité.]],
   },
 
   explodeAs             = [[BIG_UNITEX]],
   fireState             = 0,
   footprintX            = 2,
   footprintZ            = 2,
-  iconType              = [[walkerscout]],
+  iconType              = [[spiderspecialscout]],
   idleAutoHeal          = 5,
   idleTime              = 1800,
   leaveTracks           = true,
@@ -70,6 +68,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
+		burst = Shared.BURST_RELIABLE,
 		light_color = [[1.85 1.85 0.45]],
 		light_radius = 300,
       },
@@ -89,7 +88,7 @@ unitDef = {
       interceptedByShieldType = 1,
       paralyzer               = true,
       paralyzeTime            = 30,
-      range                   = 100,
+      range                   = 120,
       reloadtime              = 35,
       rgbColor                = [[1 1 0.25]],
       soundStart              = [[weapon/LightningBolt]],

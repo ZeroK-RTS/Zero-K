@@ -13,14 +13,13 @@ local weaponDef = {
 		muzzleEffectShot = [[custom:WARMUZZLE]],
 		miscEffectShot = [[custom:DEVA_SHELLS]],
 		timeslow_damagefactor = 0.5,
-		
+
 		light_color = [[1.3 0.5 1.6]],
 		light_radius = 180,
 	},
 
 	damage                  = {
 		default = 15,
-		planes  = 15,
 		subs    = 0.825,
 	},
 

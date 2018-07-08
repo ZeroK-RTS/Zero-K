@@ -15,7 +15,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext       = [[The Morningstar comes armed with a sonic pulse cannon which completely doesn't care whether target is above or under water.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -93,9 +92,9 @@ unitDef = {
 		noSelfDamage            = true,
 		range                   = 320,
 		reloadtime              = 1.1,
-		soundStart              = [[weapon/sonicgun]],
+		soundStart              = [[weapon/sonicgun2]],
 		soundHit                = [[weapon/sonicgun_hit]],
-		soundStartVolume        = 12,
+		soundStartVolume        = 6,
 		soundHitVolume			= 10,
 		texture1                = [[sonic_glow]],
 		texture2                = [[null]],

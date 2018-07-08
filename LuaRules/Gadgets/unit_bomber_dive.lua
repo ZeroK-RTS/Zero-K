@@ -44,14 +44,17 @@ local spMoveCtrlGetTag = Spring.MoveCtrl.GetTag
 local bomberWeaponNamesDefs, bomberWeaponDefs, bomberUnitDefs = include("LuaRules/Configs/bomber_dive_defs.lua")
 
 local UPDATE_FREQUENCY = 15
+local SQRT_TWO = 0.8 -- All hit tests have leeway so we don't need to be too fussy about the square root of two.
 local bombers = {}
+local VOL_SPHERE = 3
 
 local heightDef     = {}
 local hitabilityDef = {}
+local gameFrame = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-	
+
 local function setFlyLow(unitID, height)
 	local wantedHeight = bombers[unitID].config.diveHeight + height
 	if wantedHeight > bombers[unitID].config.orgHeight then
@@ -70,13 +73,15 @@ local function setFlyHigh(unitID)
 	end
 end
 
-local function isAttackingMobile(unitID)
+local function GetAttackTarget(unitID)
 	local cQueue = Spring.GetCommandQueue(unitID,1)
 	if cQueue and #cQueue == 1 and cQueue[1].id == CMD_ATTACK and cQueue[1].params and cQueue[1].params[1] and (not cQueue[1].params[2]) then
 		local targetID = cQueue[1].params[1]
-		local unitDefID = Spring.GetUnitDefID(targetID)
-		local ud = UnitDefs[unitDefID]
-		return ud and ud.speed ~= 0 and targetID
+		if Spring.ValidUnitID(targetID) then
+			local unitDefID = Spring.GetUnitDefID(targetID)
+			local ud = UnitDefs[unitDefID]
+			return targetID, not ud.isImmobile
+		end
 	end
 end
 
@@ -85,7 +90,7 @@ local function GetCollisionDistance(unitID, targetID)
 	local _,_,_,speed = Spring.GetUnitVelocity(targetID)
 	
 	local distance = Spring.GetUnitSeparation(unitID, targetID, true)
-	return distance - speed*60
+	return distance - (speed or 0)*60
 end
 
 --------------------------------------------------------------------------------
@@ -105,55 +110,93 @@ local function GetUnitHeight(unitID)
 	return heightDef[unitDefID]
 end
 
-local function GetWantedBomberHeight(unitID, config, underShield)
+local function GetWantedBomberHeight(unitID, bomberID, config, underShield)
 	local _,_,_, x,y,z = Spring.GetUnitPosition(unitID, true)
 	if not x then
-		return 30
+		return 40
 	end
 	
-	local stunned = Spring.GetUnitIsStunned(unitID)
-	if stunned then
+	local _, stunned, inbuild = Spring.GetUnitIsStunned(unitID)
+	if inbuild then
+	end
+	
+	local speedMult = (inbuild and 0) or (stunned and 0) or (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	if (speedMult or 1) ~= 1 then
+		local health, maxHealth, paraDamage,_, buildProgress = Spring.GetUnitHealth(unitID)
+		if buildProgress < 0.9 then
+			return config.orgHeight
+		end
+		-- Only forgo dive on targets with at least 4s of stun time.
+		if paraDamage and maxHealth and (maxHealth > 0) and paraDamage/maxHealth > 1.1 then
+			speedMult = 0
+		elseif speedMult < 1 then
+			speedMult = 1
+		end
+	end
+	
+	if speedMult <= 0 then
 		return config.orgHeight
 	end
 	
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	if not heightDef[unitDefID] then
 		-- Collision volume is always full size for non-nanoframes.
-		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ = Spring.GetUnitCollisionVolumeData(unitID)
+		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ, volType = Spring.GetUnitCollisionVolumeData(unitID)
+		if volType == VOL_SPHERE then
+			scaleY = scaleY*SQRT_TWO
+		end
 		heightDef[unitDefID] = scaleY/2 + offsetY
 	end
 	
 	if not hitabilityDef[unitDefID] then
-		-- Collision volume is always full size for non-nanoframes.
-		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ = Spring.GetUnitCollisionVolumeData(unitID)
-		local horSize = math.min(scaleX, scaleZ)/2
-		local speedMult = (Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult") or 1)
-		local speed = speedMult*UnitDefs[unitDefID].speed/30
-		
-		if speedMult == 0 then
-			hitabilityDef[unitDefID] = 1000
-		else
-			hitabilityDef[unitDefID] = horSize/speed
-			
-			if speed > 3 then
-				hitabilityDef[unitDefID] = math.max(0, hitabilityDef[unitDefID] + 2 - speed*1.5)
-			end
+		-- Collision volume is always full size when buildProgress >- 0.9.
+		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ, volType = Spring.GetUnitCollisionVolumeData(unitID)
+		if volType == VOL_SPHERE then
+			scaleX = scaleX*SQRT_TWO
+			scaleZ = scaleZ*SQRT_TWO
+		end
+		local horSize = config.sizeSafetyFactor*(math.min(scaleX, scaleZ)/2 - math.sqrt(offsetX^2 + offsetZ^2))
+		local speed = UnitDefs[unitDefID].speed/30
+		hitabilityDef[unitDefID] = horSize/speed
+		if speed > 3 then
+			hitabilityDef[unitDefID] = math.max(0, hitabilityDef[unitDefID] + 2 - speed*1.5)
 		end
 	end
 	
-	local ground = Spring.GetGroundHeight(x,z)
+	local ground = Spring.GetGroundHeight(x, z)
 	local verticalExtent = heightDef[unitDefID] + y - math.max(0, ground)
 	
-	if underShield then
-		return verticalExtent
+	local diveHeight = verticalExtent
+	if not underShield then
+		diveHeight = diveHeight + config.altPerFlightFrame*hitabilityDef[unitDefID]/speedMult
 	end
 	
-	local speedMult = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
-	if speedMult <= 0 then
-		return config.orgHeight
+	local _,_,_, bx,by,bz = Spring.GetUnitPosition(bomberID, true)
+	
+	local dx = x - bx
+	local dz = z - bz
+	local mag = math.sqrt(dx*dx + dz*dz)
+	if mag > 1 then
+		dx = dx/mag
+		dz = dz/mag
+		
+		local effectiveHeight = Spring.GetGroundHeight(bx, bz)
+		for i = 140, 350, 70 do
+			local futureHeight = Spring.GetGroundHeight(bx + i*dx, bz + i*dz)
+			effectiveHeight = math.max(effectiveHeight, futureHeight)
+		end
+		
+		if effectiveHeight > ground then
+			diveHeight = math.max(5, diveHeight - (effectiveHeight - ground))
+		elseif mag > 120 and effectiveHeight < ground - 10 then
+			diveHeight = diveHeight + (ground - effectiveHeight) - 10
+		end
 	end
 	
-	return verticalExtent + config.altPerFlightFrame*hitabilityDef[unitDefID]/speedMult
+	if mag > 120 and ground > by then 
+		diveHeight = diveHeight + ground - by
+	end
+	return diveHeight
 end
 
 local function temporaryDive(unitID, duration, height, distance)
@@ -162,7 +205,7 @@ local function temporaryDive(unitID, duration, height, distance)
 	-- No distance given for shield collision, dive as soon as possible.
 	if distance then
 		-- The maximum horizontal distance required to dive to that height
-		local diveDistance = (config.orgHeight - height)*config.diveRate
+		local diveDistance = (config.orgHeight - height)*config.diveDistanceMult
 		if diveDistance < distance then
 			return
 		end
@@ -182,13 +225,16 @@ GG.Bomber_Dive_fired = Bomber_Dive_fired
 
 function Bomber_Dive_fake_fired(unitID)
 	if unitID and Spring.ValidUnitID(unitID) then
-		if bombers[unitID] and (bombers[unitID].diveState == 2 or bombers[unitID].diveState == 1) and
-				((not Spring.GetUnitRulesParam(unitID, "noammo")) or Spring.GetUnitRulesParam(unitID, "noammo") ~= 1) then
-			local mobileID = isAttackingMobile(unitID)
-			if mobileID then
-				local height = GetWantedBomberHeight(mobileID, bombers[unitID].config)
-				local distance = GetCollisionDistance(unitID, mobileID)
-				temporaryDive(unitID, 8, height, distance)
+		local data = bombers[unitID]
+		if data and (data.diveState == 2 or data.diveState == 1) and ((not data.underShield) or data.underShield < gameFrame) then
+			data.underShield = false
+			if ((not Spring.GetUnitRulesParam(unitID, "noammo")) or Spring.GetUnitRulesParam(unitID, "noammo") ~= 1) then
+				local targetID, mobile = GetAttackTarget(unitID)
+				if targetID and mobile then
+					local height = GetWantedBomberHeight(targetID, unitID, bombers[unitID].config)
+					local distance = GetCollisionDistance(unitID, targetID)
+					temporaryDive(unitID, 8, height, distance)
+				end
 			end
 		end
 	end
@@ -206,13 +252,14 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 				local wid = UnitDefs[Spring.GetUnitDefID(shieldCarrierUnitID)].weapons[shieldEmitterWeaponNum].weaponDef
 				if WeaponDefs[wid] and WeaponDefs[wid].shieldPower > bombers[proOwnerID].config.diveDamage 
 						and ((not Spring.GetUnitRulesParam(proOwnerID, "noammo")) or Spring.GetUnitRulesParam(proOwnerID, "noammo") ~= 1) then
-					local mobileID = isAttackingMobile(proOwnerID)
-					if mobileID then
-						local height = GetWantedBomberHeight(mobileID, bombers[proOwnerID].config, true)
-						local distance = GetCollisionDistance(proOwnerID, mobileID)
+					local targetID = GetAttackTarget(proOwnerID)
+					bombers[proOwnerID].underShield = gameFrame + 30
+					if targetID then
+						local height = GetWantedBomberHeight(targetID, proOwnerID, bombers[proOwnerID].config, true)
+						local distance = GetCollisionDistance(proOwnerID, targetID)
 						temporaryDive(proOwnerID, 8, height, distance)
 					else
-						temporaryDive(proOwnerID, 150, 30)
+						temporaryDive(proOwnerID, 8, 40)
 					end
 				end
 			end
@@ -238,6 +285,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 end
 
 function gadget:GameFrame(n)
+	gameFrame = n
 	if n%UPDATE_FREQUENCY == 0 then
 		for unitID, data in pairs(bombers) do
 			if data.resetTime == n then
@@ -264,7 +312,7 @@ local function ToggleDiveCommand(unitID, cmdParams, cmdOptions)
 		end
 		bombers[unitID].diveState = state
 		if state == 3 then
-			setFlyLow(unitID, 30)
+			setFlyLow(unitID, 40)
 			bombers[unitID].resetTime = false
 		elseif state == 0 then
 			setFlyHigh(unitID)

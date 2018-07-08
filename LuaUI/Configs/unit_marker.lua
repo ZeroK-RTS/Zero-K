@@ -28,6 +28,7 @@ local unitlistNames = {
 	cloakjammer = { mark_each_appearance = true, },
 	striderhub = {},
 	zenith = {},
+	turretaaheavy = {},
 }
 
 local unitList = {}

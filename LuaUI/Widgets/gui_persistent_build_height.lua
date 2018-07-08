@@ -12,6 +12,9 @@ function widget:GetInfo()
 	}
 end
 
+include("keysym.h.lua")
+local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
+
 --------------------------------------------------------------------------------
 -- Speedups
 --------------------------------------------------------------------------------
@@ -34,18 +37,32 @@ local glBeginEnd    	= gl.BeginEnd
 local floor = math.floor
 local ceil = math.ceil 
 
+local toggleHeight   = KEYSYMS.B
+local heightIncrease = KEYSYMS.C
+local heightDecrease = KEYSYMS.V
+
+local function HotkeyChangeNotification()
+	local key = WG.crude.GetHotkeyRaw("epic_persistent_build_height_hotkey_toggle")
+	toggleHeight = ToKeysyms(key and key[1])
+	key = WG.crude.GetHotkeyRaw("epic_persistent_build_height_hotkey_raise")
+	heightIncrease = ToKeysyms(key and key[1])
+	key = WG.crude.GetHotkeyRaw("epic_persistent_build_height_hotkey_lower")
+	heightDecrease = ToKeysyms(key and key[1])
+end
+
 ---------------------------------
 -- Epic Menu
 ---------------------------------
+local hotkeyPath = "Hotkeys/Construction"
 options_path = 'Settings/Interface/Building Placement'
-options_order = { 'enterSetHeightWithB', 'altMouseToSetHeight'}
+options_order = { 'enterSetHeightWithB', 'altMouseToSetHeight', 'hotkey_toggle', 'hotkey_raise', 'hotkey_lower'}
 options = {
 	enterSetHeightWithB = {
-		name = "Toggle set height with B",
+		name = "Toggle set height",
 		type = "bool",
 		value = true,
 		noHotkey = true,
-		desc = "Press B while placing a structure to set the height of the structure. Keys C and V increase or decrease height."
+		desc = "Press a hotkey (default B) while placing a structure to set the height of the structure. Keys C and V increase or decrease height."
 	},
 	altMouseToSetHeight = {
 		name = "Alt mouse wheel to set height",
@@ -54,21 +71,47 @@ options = {
 		noHotkey = true,
 		desc = "Hold Alt and mouse wheel to set height."
 	},
+	hotkey_toggle = {
+		name = 'Toggle Structure Terraform',
+		desc = 'Press during structure placement to make a strucutre on a spire or a hold. Alt + MMB also toggles this mode.',
+		type = 'button',
+		hotkey = "B",
+		bindWithAny = true,
+		dontRegisterAction = true,
+		OnHotkeyChange = HotkeyChangeNotification,
+		path = hotkeyPath,
+	},
+	hotkey_raise = {
+		name = 'Raise Structure Teraform',
+		desc = 'Increase the height of structure terraform. Also possible with Alt + Scrollwheel.',
+		type = 'button',
+		hotkey = "C",
+		bindWithAny = true,
+		dontRegisterAction = true,
+		OnHotkeyChange = HotkeyChangeNotification,
+		path = hotkeyPath,
+	},
+	hotkey_lower = {
+		name = 'Lower Structure Terraform',
+		desc = 'Decrease the height of structure terraform. Also possible with Alt + Scrollwheel.',
+		type = 'button',
+		hotkey = "V",
+		bindWithAny = true,
+		dontRegisterAction = true,
+		OnHotkeyChange = HotkeyChangeNotification,
+		path = hotkeyPath,
+	},
 }
 
 --------------------------------------------------------------------------------
 -- Config
 --------------------------------------------------------------------------------
 
-include("keysym.h.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local mexDefID = UnitDefNames["staticmex"].id
 
 local INCREMENT_SIZE = 20
-local heightIncrease = KEYSYMS.C
-local heightDecrease = KEYSYMS.V
-local toggleHeight   = KEYSYMS.B
 
 -- Colours used during height choosing for level and raise
 local negVolume   = {1, 0, 0, 0.1} -- negative volume
@@ -184,7 +227,7 @@ local function SendCommand()
 	
 	local a,c,m,s = spGetModKeyState()
 
-	Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+	Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, 0)
 	
 	-- if global build command is active, check if it wants to handle the orders before giving units any commands.
 	if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyRaiseAndBuild(constructor, -buildingPlacementID, pointX, pointY, pointZ, facing, s) then
@@ -453,4 +496,8 @@ function widget:SetConfigData(data)
 			buildHeight[unitDefID] = spacing
 		end
 	end
+end
+
+function widget:Initialize()
+	HotkeyChangeNotification()
 end

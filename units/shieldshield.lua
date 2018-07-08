@@ -17,11 +17,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Koppelbarer Schildroboter]],
-    description_fr = [[Marcheur Bouclier]],
-    helptext       = [[The Aspis protects surrounding units with its area shield by destroying enemy projectiles and will automatically connect to other shield-equipped units to share charge. The area shield will not stop units and only intercepts projectiles on its perimeter, so enemies can get under the shield and shoot at the units inside. Recharging and maintaining area shields costs energy.]],
-    helptext_fr    = [[Le Aspis est un g?n?rateur ? bouclier d?flecteur portatif capable de prot?ger vos troupes. Le bouclier n'utilisera votre ?nergie que si il est pris pour cible par des tirs ennemis, la zone du bouclier est r?duite et le Aspis n'est pas solide. Malgr? ses d?faut il reste indispensable pour prot?ger vos unit?s les plus fragiles, comme l'artillerie.]],
-    helptext_de    = [[Der Aspis bietet den umliegenden, alliierten Einheiten durch seinen energetischen Schild Schutz vor Angriffen. Doch sobald Feinde in den Schild kommen oder sich die Energie dem Ende neigt, verfällt dieser Schutz und deine Einheiten stehen dem Gegner vielleicht schutzlos gegenüber. Mehrere Aspis verbinden sich untereinander zu einem großen Schild, was den Vorteil hat, dass Angriffe besser absorbiert werden können.]],
     modelradius    = [[17]],
     
     morphto = [[staticshield]],
@@ -78,8 +73,8 @@ unitDef = {
 
       exteriorShield          = true,
       shieldAlpha             = 0.2,
-      shieldBadColor          = [[1 0.1 0.1]],
-      shieldGoodColor         = [[0.1 0.1 1]],
+      shieldBadColor          = [[1 0.1 0.1 1]],
+      shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
       shieldPower             = 3600,
       shieldPowerRegen        = 50,
@@ -87,10 +82,12 @@ unitDef = {
       shieldRadius            = 350,
       shieldRepulser          = false,
       smartShield             = true,
-      texture1                = [[shield3mist]],
-      visibleShield           = true,
-      visibleShieldHitFrames  = 4,
-      visibleShieldRepulse    = true,
+      visibleShield           = false,
+      visibleShieldRepulse    = false,
+      --texture1                = [[shield3mist]],
+      --visibleShield           = true,
+      --visibleShieldHitFrames  = 4,
+      --visibleShieldRepulse    = true,
       weaponType              = [[Shield]],
     },
 

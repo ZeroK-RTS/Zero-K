@@ -41,7 +41,7 @@ options = {
 		name = 'Show for enemy underwater',
 		desc = 'Draw a line perpendicular to the surface for enemy submerged units',
 		type = 'radioButton',
-		value = 'never',
+		value = 'radar',
 		items = {
 			{key ='always', name='Always'},
 			{key ='radar',  name='In radar, not in sight'},
@@ -65,8 +65,10 @@ options = {
 }
 
 local function UpdateSpec ()
-	if Spring.GetSpectatingState() then 
-		disabled = true
+	if Spring.GetSpectatingState() then
+		widgetHandler:RemoveCallIn("DrawWorld")
+	else
+		widgetHandler:UpdateCallIn("DrawWorld")
 	end
 	myAllyTeamID = Spring.GetMyAllyTeamID()
 end
@@ -106,9 +108,6 @@ function widget:UnitCreated (unitID)
 end
 
 function widget:DrawWorld()
-
-	if disabled then return end
-
 	local needs_update = needsUpdate
 	needsUpdate = false
 	local f = Spring.GetGameFrame()

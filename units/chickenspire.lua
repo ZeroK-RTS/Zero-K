@@ -20,11 +20,6 @@ unitDef = {
   collisionVolumeType           = [[CylY]],
 
   customParams                  = {
-    description_fr = [[Artillerie statique]],
-	description_de = [[Stationäre Artillerie]],
-    helptext       = [[Long range static artillery.]],
-    helptext_fr    = [[La terreur verte projette des amas commpos?s de d'acides corrosifs et de germes sur de tr?s longues distances.]],
-	helptext_de    = [[Weitreichende, stationäre Artillerie.]],
   },
 
   energyMake                    = 0,

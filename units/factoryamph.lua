@@ -1,13 +1,13 @@
 unitDef = {
   unitname         = [[factoryamph]],
-  name             = [[Amphibious Bot Plant]],
+  name             = [[Amphbot Factory]],
   description      = [[Produces Amphibious Bots, Builds at 10 m/s]],
-  buildCostMetal   = 600,
+  buildCostMetal   = Shared.FACTORY_COST,
   builder          = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 8,
-  buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[factoryjump_aoplane.dds]],  
+  buildingGroundDecalSizeX      = 10,
+  buildingGroundDecalSizeY      = 10,
+  buildingGroundDecalType       = [[factoryamph_aoplane.dds]],  
 
   buildoptions     = {
     [[amphcon]],
@@ -16,7 +16,9 @@ unitDef = {
     [[amphfloater]],
     [[amphriot]],	
     [[amphassault]],
+	[[amphlaunch]],
     [[amphaa]],
+	[[amphbomb]],
     [[amphtele]],
   },
 
@@ -24,21 +26,22 @@ unitDef = {
   canMove          = true,
   canPatrol        = true,
   category         = [[UNARMED SINK]],
-  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeOffsets = [[0 0 -16]],
   collisionVolumeScales  = [[104 70 36]],
   collisionVolumeType    = [[box]],
-  selectionVolumeOffsets = [[0 0 30]],
+  selectionVolumeOffsets = [[0 0 14]],
   selectionVolumeScales  = [[104 70 96]],
   selectionVolumeType    = [[box]],
   corpse           = [[DEAD]],
 
   customParams     = {
-    helptext       = [[The Amphibious Operations Plant builds the slow but sturdy amphibious bots, providing an alternative approach to land/sea warfare. Units from this factory typically regenerate while submerged.]],
-	modelradius    = [[38]],
+	modelradius    = [[100]],
     aimposoffset   = [[0 0 -26]],
-    midposoffset   = [[0 0 -26]],
+    midposoffset   = [[0 0 -10]],
     sortName = [[8]],
 	solid_factory = [[3]],
+	default_spacing = 8,
+	unstick_help   = 1,
   },
 
   energyUse        = 0,
@@ -58,7 +61,8 @@ unitDef = {
   selfDestructAs   = [[LARGE_BUILDINGEX]],
   showNanoSpray    = false,
   sightDistance    = 273,
-  workerTime       = 10,
+  useBuildingGroundDecal = true,
+  workerTime       = Shared.FACTORY_BUILDPOWER,
   yardMap          = [[ooooooo ooooooo ooooooo ccccccc ccccccc ccccccc ccccccc]],
 
   featureDefs      = {

@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[tankheavyassault]],
-  name                = [[Goliath]],
+  name                = [[Cyclops]],
   description         = [[Very Heavy Tank Buster]],
   acceleration        = 0.0282,
   brakeRate           = 0.052,
@@ -14,11 +14,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_fr = [[Tank Émeutier Lourd]],
-	description_de = [[Sehr schwerer Panzerknacker]],
-    helptext       = [[The Goliath is the single heaviest tank on the field. Its main gun is a hefty cannon designed to smash lesser tanks into oblivion, while mounted on the turret is a short-range slowgun to prevent quicker foes escaping its grasp. However, it turns like a tub of water, its short range makes it easy prey for advanced skirmishers or air attacks, and its slow rate of fire makes it vulnerable to massed raider attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications.]],
-    helptext_fr    = [[Le Goliath est tout simplement le plus gros tank jamais construit. Un blindage lourd, un énorme canon plasma r moyenne portée fera voler en éclat les ennemis apeurés tandis que son lance flamme s'occupera des plus téméraires. Le Goliath est facile r repérer, il ne laisse que des ruines derricre lui.]],
-	helptext_de    = [[Der Goliath ist der stärkste Panzer auf dem Platz. Seine mächtige Hauptkanone wurde entwickelt, um kleinere Panzer ins Nirvana zu schicken, während der aufgesetzte Flammenwerfer alle Einheiten, die dem Goliath zu nahe kommen, kurz und schmervoll verbrennt. Trotzdem bewegt sich der Panzer wie eine Wasserwanne und seine kurze Reichweite macht ihn zur einfachen Beute von hochentwickelten Skirmishern oder Luftattacken.]],
   },
 
   explodeAs           = [[BIG_UNIT]],
@@ -52,7 +47,7 @@ unitDef = {
   trackStrength       = 10,
   trackStretch        = 1,
   trackType           = [[StdTank]],
-  trackWidth          = 45,
+  trackWidth          = 50,
   turninplace         = 0,
   turnRate            = 312,
   workerTime          = 0,
@@ -81,6 +76,10 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
+		burst = Shared.BURST_RELIABLE,
+
+        reaim_time = 8, -- COB
+		
 	    gatherradius = [[105]],
 	    smoothradius = [[70]],
 	    smoothmult   = [[0.4]],
@@ -119,6 +118,8 @@ unitDef = {
       craterMult              = 0,
 
       customparams = {
+        reaim_time = 8, -- COB
+		
         timeslow_damagefactor = 1,
         timeslow_onlyslow = 1,
         timeslow_smartretarget = 0.33,

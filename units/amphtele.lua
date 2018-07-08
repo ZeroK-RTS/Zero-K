@@ -3,7 +3,7 @@ unitDef = {
   name                   = [[Djinn]],
   description            = [[Amphibious Teleport Bridge]],
   acceleration           = 0.25,
-  activateWhenBuilt   = true,
+  activateWhenBuilt      = true,
   brakeRate              = 0.75,
   buildCostMetal         = 750,
   buildPic               = [[amphtele.png]],
@@ -21,10 +21,8 @@ unitDef = {
     amph_submerged_at = 40,
 
 	teleporter = 1,
-	teleporter_throughput = 7.5, -- mass per second
+	teleporter_throughput = 120, -- mass per second
 	teleporter_beacon_spawn_time = 9,
-
-    helptext       = [[Djinn excels at moving large land based armies across bodies of water. When deployed it teleports units from around its pre-placed static beacon to its present location. The teleportation is one-way, so ensure the destination is safe.]],
   },
 
   explodeAs              = [[BIG_UNIT]],

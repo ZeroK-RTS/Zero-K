@@ -18,7 +18,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy.]],
 	modelradius    = [[15]],
 	stockpiletime  = [[30]],
 	stockpilecost  = [[600]],
@@ -112,9 +111,12 @@ unitDef = {
       craterBoost             = 4,
       craterMult              = 3.5,
 
+			customParams = {
+				burst = Shared.BURST_RELIABLE,
+			},
+
       damage                  = {
-        default = 3500,
-        planes  = 3500,
+        default = 3502.5,
         subs    = 175,
       },
 
@@ -131,7 +133,7 @@ unitDef = {
       reloadtime              = 1,
       smokeTrail              = true,
       soundHit                = [[explosion/mini_nuke]],
-      soundStart              = [[weapon/missile/tacnuke_launch]],
+      soundStart              = [[weapon/missile/tacnuke_launch2_trimmed]],
       stockpile               = true,
       stockpileTime           = 10^5,
       tolerance               = 4000,

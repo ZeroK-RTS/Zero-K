@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[gunshipraid]],
-  name                   = [[Banshee]],
+  name                   = [[Locust]],
   description            = [[Raider Gunship]],
   acceleration           = 0.18,
   brakeRate              = 0.16,
@@ -13,17 +13,15 @@ unitDef = {
   canPatrol              = true,
   canSubmerge            = false,
   category               = [[GUNSHIP]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeType    = [[ellipsoid]],
   collide                = true,
   corpse                 = [[DEAD]],
   cruiseAlt              = 100,
 
   customParams           = {
     airstrafecontrol = [[1]],
-    description_fr = [[ADAV Pilleur]],
-	description_de = [[Plünder Kampfhubschrauber]],
-    helptext       = [[The Banshee is a light gunship. Its high speed and decent damage makes it excellent for quickly taking out enemy economy or inaccurate units like assaults. However, it flies close to the ground and has a short range, meaning even other raiders can engage it on an equal footing. Like any raider, the Banshee should avoid riots and static defense.]],
-    helptext_fr    = [[Le Banshee est un ADAV l?ger, un blindage l?ger et peu de d?g?ts en font la hantise des d?buts de conflits. Envoy? dans une base non pr?par?e ou contre une arm?e sans d?fense Anti Air, son attaque rapide est bien souvent fatale.]],
-	helptext_de    = [[Der Banshee ist ein leichter Kampfhubschrauber. Er besitzt nur wenig Ausdauer und macht wenig DPS. Er ist gut für direkte Attacken auf die Verteidiger (z.B. um Luftabwehr auszuschalten). Er trifft bewegte Einheiten sehr gut und erweist sich auch bei Verteidigung gegen Gegner ohne Luftabwehr als sehr nützlich.]],
 	modelradius    = [[18]],
   },
 
@@ -59,7 +57,7 @@ unitDef = {
     {
       def                = [[LASER]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 90,
+      maxAngleDif        = 135,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 

@@ -11,19 +11,21 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND SINK]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
     amph_regen = 60,
     amph_submerged_at = 30,
 	sink_on_emp    = 0,
-    helptext       = [[The Buoy works around its inability to shoot while submerged by floating to the surface of the sea. Here it can fire a decently ranged cannon with slow damage. It is unable to move while floating.]],
     floattoggle    = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
-  footprintX             = 2,
-  footprintZ             = 2,
+  footprintX             = 3,
+  footprintZ             = 3,
   iconType               = [[amphskirm]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -32,8 +34,7 @@ unitDef = {
   maxSlope               = 36,
   maxVelocity            = 1.4,
   minCloakDistance       = 75,
-  movementClass          = [[AKBOT2]],
-  moveState              = 0,
+  movementClass          = [[AKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName             = [[can.s3o]],
   script                 = [[amphfloater.lua]],
@@ -78,6 +79,8 @@ unitDef = {
       craterMult              = 2,
 
       customparams = {
+		burst = Shared.BURST_RELIABLE,
+
         timeslow_damagefactor = 1.667,
 		
 		light_camera_height = 2500,

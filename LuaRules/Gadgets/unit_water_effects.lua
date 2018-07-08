@@ -137,8 +137,8 @@ function gadget:GameFrame(n)
 					end
 					if height < 0 then
 						local hp, maxHp = Spring.GetUnitHealth(unitID)
-						local slowMult = 1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0)
-						local newHp = hp + math.min(-height,effect.submergedAt)*effect.healthRegen*slowMult*SECOND_MULT/effect.submergedAt
+						local regenMult = (Spring.GetUnitRulesParam(unitID,"totalBuildPowerChange") or 1)
+						local newHp = hp + math.min(-height,effect.submergedAt) * effect.healthRegen * regenMult * SECOND_MULT/effect.submergedAt
 						Spring.SetUnitHealth(unitID, newHp) 
 					end
 				end

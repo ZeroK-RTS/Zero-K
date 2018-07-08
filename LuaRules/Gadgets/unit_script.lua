@@ -124,6 +124,7 @@ local sp_WaitForMove = Spring.UnitScript.WaitForMove
 local sp_WaitForTurn = Spring.UnitScript.WaitForTurn
 local sp_SetPieceVisibility = Spring.UnitScript.SetPieceVisibility
 local sp_SetDeathScriptFinished = Spring.UnitScript.SetDeathScriptFinished
+local sp_Turn = Spring.UnitScript.Turn
 
 local LUA_WEAPON_MIN_INDEX = 1
 local LUA_WEAPON_MAX_INDEX = LUA_WEAPON_MIN_INDEX + 31
@@ -289,6 +290,7 @@ end
 local function TurnFinished(piece, axis)
 	local activeUnit = GetActiveUnit()
 	local activeAnim = activeUnit.waitingForTurn
+	activeUnit.pieceRotSpeeds[piece][axis] = 0
 	return AnimFinished(activeAnim, piece, axis)
 end
 
@@ -336,14 +338,39 @@ function Spring.UnitScript.WaitForMove(piece, axis)
 end
 
 -- overwrites engine's WaitForTurn
+local tau = 2 * math.pi
 function Spring.UnitScript.WaitForTurn(piece, axis)
+	local activeUnit = GetActiveUnit()
+	local speed = activeUnit.pieceRotSpeeds[piece][axis]
+	if speed == 0 then
+		return
+	end
+
+	local currRot = select(axis, Spring.UnitScript.GetPieceRotation(piece))
+	if not currRot then
+		-- Unit is probably dead or destroyed.
+		return
+	end
+	
+	local targetRot = activeUnit.pieceRotTargets[piece][axis]
+	local diffRot = (currRot - targetRot) % tau
+	if diffRot < speed or diffRot > (tau - speed) then
+		return
+	end
+
 	if sp_WaitForTurn(piece, axis) then
-		local activeUnit = GetActiveUnit()
 		return WaitForAnim(activeUnit.threads, activeUnit.waitingForTurn, piece, axis)
 	end
 end
 
-
+function Spring.UnitScript.Turn(piece, axis, targetRot, speed)
+	local activeUnit = GetActiveUnit()
+	if speed then
+		activeUnit.pieceRotTargets[piece][axis] = targetRot
+		activeUnit.pieceRotSpeeds[piece][axis] = speed / Game.gameSpeed
+	end
+	return sp_Turn(piece, axis, targetRot, speed)
+end
 
 function Spring.UnitScript.Sleep(milliseconds)
 	local n = floor(milliseconds / 33)
@@ -772,6 +799,14 @@ function gadget:UnitCreated(unitID, unitDefID)
 	-- Register the callins with Spring.
 	Spring.UnitScript.CreateScript(unitID, callins)
 
+	-- cache piece rotation values for WaitForTurn
+	local pieceRotSpeeds = {}
+	local pieceRotTargets = {}
+	for pieceName, pieceID in pairs(pieces) do
+		pieceRotSpeeds[pieceID] = {0, 0, 0}
+		pieceRotTargets[pieceID] = {0, 0, 0}
+	end
+
 	-- Register (must be last: it shouldn't be done in case of error.)
 	units[unitID] = {
 		env = env,
@@ -779,6 +814,8 @@ function gadget:UnitCreated(unitID, unitDefID)
 		waitingForMove = {},
 		waitingForTurn = {},
 		threads = setmetatable({}, {__mode = "kv"}), -- weak table
+		pieceRotSpeeds = pieceRotSpeeds,
+		pieceRotTargets = pieceRotTargets,
 	}
 
 	-- Now it's safe to start a thread which will run Create().

@@ -25,7 +25,14 @@ local displayExceptions = {
 local window2
 	
 function widget:Initialize()
+	-- ZK Mission Editor mission
 	if VFS.FileExists("mission.lua") then
+		widgetHandler:RemoveWidget()
+		return
+	end
+	
+	-- Chobby campaign mission
+	if Spring.GetModOptions().singleplayercampaignbattleid then
 		widgetHandler:RemoveWidget()
 		return
 	end
@@ -72,13 +79,15 @@ function widget:Initialize()
 
 	local Chili = WG.Chili
 	window2 = Chili.Window:New{
-		x = vsx/2-100,
-		y = 3*vsy/4-20,
+		x = 50,
+		y = vsy - 480,
 		width  = 210,
 		classname = "main_window_small_tall",
 		textColor = {1,1,1,0.55}, 
 		height = math.min(112,vsy/2),
 		parent = Chili.Screen0,
+		dockable  = true,
+		dockableSavePositionOnly = true,
 		caption = "Active modoptions:",
 
 		children = {

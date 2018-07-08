@@ -17,17 +17,15 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[20 20 20]],
   collisionVolumeType    = [[ellipsoid]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[32 32 32]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
   cruiseAlt              = 30,
 
   customParams           = {
-	landflystate   = [[1]],
-	description_fr = [[Drône Éxplosif]],
-	description_de = [[Fliegende Bombe]],
-	helptext       = [[The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more fomidible punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your Blastwing dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed.]],
-	helptext_fr    = [[Le Blastwing est un drône kamikaze de faible puissance. Idéal pour détruire les éxtraceurs ou les éoliennes ennemies, profitez de sa vitesse pour projeter des éclats de sa carcasse sur d'autres ennemis.]],
-	helptext_de    = [[Der Blastwing macht sehr wenig Schaden, ideal, um etwa Metallextraktoren, Soloranlagen, Leichte Lasertürme, Windanlagen und Nanotürme auszumerzen. Dennoch können gunshipbombs in Massen durchaus ordentlich Schaden anrichten. Beachte die Geschwindigkeit und Richtung, in die die Drohnen fliegen, denn der größte Schaden wird durch das Schrapnell erzielt, das nach dem Tod der Drohne weiter in Flugrichtung fliegen wird. Auf diese Weise kannst du deinen Gegner trotzdem mit Metallsplittern überhäufen, obwohl deine gunshipbombs schon vorher abgeschossen wurden. Vermeide, dass du die gunshipbombs zu nah aneinander stationiert, da sie in einer Kettenreaktion explodieren können. Kann sich zur Mine entwickeln.]],
-	idle_cloak = 1,
+    landflystate   = [[1]],
+    idle_cloak = 1,
   },
 
   explodeAs              = [[gunshipbomb_EXPLOSION]],
@@ -82,12 +80,12 @@ unitDef = {
 
 local weaponDefs = {
   gunshipbomb_EXPLOSION = {
-    name               = "gunshipbomb Explosion",
+    name               = "Blastwing Explosion",
     areaOfEffect       = 256,
     craterBoost        = 1,
     craterMult         = 3.5,
-	
-	customParams        	  = {
+    
+    customParams          = {
       setunitsonfire = "1",
       burntime = 60,
       
@@ -98,21 +96,21 @@ local weaponDefs = {
       
       --lups_heat_fx = [[firewalker]],
     },
-	
+    
     damage = {
       default = 80,
       planes  = 80,
       subs    = 4,
     },
-	
+    
     edgeeffectiveness  = 0.7,
     explosionGenerator = [[custom:napalm_gunshipbomb]],
     explosionSpeed     = 10000,
-	firestarter        = 180,
+    firestarter        = 180,
     impulseBoost       = 0,
     impulseFactor      = 0.4,
     soundHit           = "explosion/ex_med17",
-	
+    
   },
 }
 unitDef.weaponDefs = weaponDefs

@@ -6,7 +6,7 @@ unitDef = {
   activateWhenBuilt   = true,
   brakeRate           = 0.45,
   buildCostMetal      = 1200,
-  buildDistance       = 128,
+  buildDistance       = 144,
   builder             = true,
 
   buildoptions        = {
@@ -28,10 +28,6 @@ unitDef = {
     jump_speed         = 6,
     jump_reload        = 20,
     jump_from_midair   = 1,
-
-	description_de = [[Hochmobiler Kommandant]],
-	helptext       = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules and comes pre-equipped with jumpjets.]],
-	helptext_de    = [[Bei dem Recon Commander dreht sich alles um Mobilit‰t und List. Dieser schwach gepanzerte Grundsatz kann um viele Spezialwaffen und -module erweitert werden. Er besitzt auﬂerdem einen D?enstrahl zum Springen.]],
 	level = [[1]],
 	statsname = [[dynrecon1]],
 	soundok = [[heavy_bot_move]],

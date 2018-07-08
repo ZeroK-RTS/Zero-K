@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cremcom1]],
-  name                   = [[Knight Commander]],
+  name                   = [[Commander]],
   description            = [[Mobile Assault Commander, Builds at 10 m/s]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
@@ -24,11 +24,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	description_de = [[Mobiler Sturmkommandant, Baut mit 10 M/s]],
-	helptext       = [[The Knight Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration.]],
-	helptext_de    = [[Der Knight Commander bietet ein sehr ausgeglichenes Ger?t, das mit den meisten Modulen ausger?tet werden kann, mit anständiger Geschwindigkeit und Panzerung. Seine Basiswaffe ist ein Allzwecklaser und bei entsprechender Aufr?tung erhält er eine Disintegratorkanone.]],
 	level = [[1]],
-	statsname = [[cremcom1]],
+	statsname = [[dynknight1]],
 	soundok = [[heavy_bot_move]],
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],

@@ -11,7 +11,7 @@ function widget:GetInfo()
 	}
 end
 
-
+local unitCategoryDefs = VFS.Include("LuaRules/Configs/unit_category.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 VFS.Include("LuaUI/Utilities/json.lua");
 
@@ -36,8 +36,8 @@ local myoldteam = {}
 local PlayerNameY = -1
 local mySubjectID = -1
 local fontSize = 18
-local badgeWidth = 59
-local badgeHeight = 24
+local badgeWidth = 59*0.6
+local badgeHeight = 24*0.6
 local color2incolor = nil
 local teamZeroPlayers = {}
 local playerInfo = {}
@@ -97,6 +97,7 @@ options = {
 				window:SetVisibility(true)
 			end
 		end,
+		path = 'Hotkeys/Misc',
 	},
 }
 
@@ -156,22 +157,17 @@ end
 
 --returns offensive, defensive metal value
 local function getValueStats(teamID)
-	local def, off
-	def = 0
-	off = 0
-	for _, unitID in ipairs(Spring.GetTeamUnits(teamID)) do
-		unitDefID = Spring.GetUnitDefID(unitID)
-		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
-		local speed = UnitDefs[unitDefID].speed
-		local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-		local isbuilt = not select(3, Spring.GetUnitIsStunned(unitID))	
-		if metal and metal < 1000000 then -- tforms show up as 1million cost, so ignore them
-			if speed and speed ~= 0 then
-				if isbuilt then
+	local def, off = 0, 0
+	for _, unitID in pairs(Spring.GetTeamUnits(teamID)) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		if unitDefID then
+			local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
+			local isbuilt = not select(3, Spring.GetUnitIsStunned(unitID))
+			if metal and isbuilt then
+				local cat = unitDefID and unitCategoryDefs[unitDefID]
+				if cat == "army" then
 					off = off + metal
-				end
-			elseif not unarmed then
-				if isbuilt then
+				elseif cat == "def" then
 					def = def + metal
 				end
 			end
@@ -181,8 +177,14 @@ local function getValueStats(teamID)
 end
 
 -- returns income, pull, netIncome, storedAmount, storageSize each one is first metal then energy
-local function getEcoInfo(teamID)	
+local function getEcoInfo(teamID)
 	
+	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = Spring.GetTeamResources(teamID, "energy")
+	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = Spring.GetTeamResources(teamID, "metal")
+	
+	if not mCurr then
+		return
+	end
 	
 	local allies               = Spring.GetTeamRulesParam(teamID, "OD_allies") or 1
 	local team_metalBase       = Spring.GetTeamRulesParam(teamID, "OD_team_metalBase") or 0
@@ -201,8 +203,6 @@ local function getEcoInfo(teamID)
 	local energyOverdrive = Spring.GetTeamRulesParam(teamID, "OD_energyOverdrive") or 0
 	local energyChange    = Spring.GetTeamRulesParam(teamID, "OD_energyChange") or 0
 	
-	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = Spring.GetTeamResources(teamID, "energy")
-	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = Spring.GetTeamResources(teamID, "metal")
 	
 	local eReclaim = eInco - math.max(0, energyChange)
 	eInco = eReclaim + energyIncome
@@ -255,64 +255,67 @@ local function RenderName(subject)
 	local active = subject.ai or subject.active
 	--Spring.Echo("active " .. tostring(active))
 	local spec = not subject.ai and subject.spec
+	local myAllyTeamID = Spring.GetMyAllyTeamID()
+	local mySpec = Spring.GetSpectatingState()
 	--Spring.Echo(tostring(active) .. " " .. tostring(spec))
 	local playerpanel = givemepanel[subject.id]
-	if not spec and active and subject.id ~= mySubjectID and (subject.allyteam == subjects[mySubjectID].allyteam or subjects[mySubjectID].spec) then 
+	if not spec and active and ((subject.allyteam == myAllyTeamID) or mySpec) then 
 		local incomeM, incomeE, pullM, pullE, netM, netE, storedM, storedE, storageM, storageE = getEcoInfo(subject.team)
-		--Spring.Echo("metal: " .. amt .. "/" .. stor)
-		local colorIncomeM = '\255\1\255\1'
-		local colorNetM = '\255\1\255\1'
-		local colorIncomeE = '\255\1\255\1'
-		local colorNetE = '\255\1\255\1'
-		if (incomeM < 0) then
-			colorIncomeM = '\255\255\1\1'
+		if incomeM then
+			--Spring.Echo("metal: " .. amt .. "/" .. stor)
+			local colorIncomeM = '\255\1\255\1'
+			local colorNetM = '\255\1\255\1'
+			local colorIncomeE = '\255\1\255\1'
+			local colorNetE = '\255\1\255\1'
+			if (incomeM < 0) then
+				colorIncomeM = '\255\255\1\1'
+			end
+			if (incomeE < 0) then
+				colorIncomeE = '\255\255\1\1'
+			end
+			if (netM < 0) then
+				colorNetM = '\255\255\1\1'
+			end
+			if (netE < 0) then
+				colorNetE = '\255\255\1\1'
+			end
+			if (incomeM < 1000) then
+				incomeM = round(incomeM, 1)
+			else
+				incomeM = round(incomeM / 1000, 1) .. "K"
+			end
+			if (incomeE < 1000) then
+				incomeE = round(incomeE, 1)
+			else
+				incomeE = round(incomeE / 1000, 1) .. "K"
+			end
+			netM = round(netM, 1)
+			netE = round(netE, 1)
+			givemebuttons[subject.id]["metalin"]:SetText(colorIncomeM .. incomeM) --colorNetM .. netM ..'\255\255\255\255' .. " / " ..
+			givemebuttons[subject.id]["energyin"]:SetText( colorIncomeE .. incomeE) --colorNetE .. netE .. '\255\255\255\255'.. " / " ..
+			givemebuttons[subject.id]["metalbar"]:SetValue(math.min(1,storedM / storageM))
+			givemebuttons[subject.id]["energybar"]:SetValue(math.min(1,storedE / storageE))
+			
+			local off, def = getValueStats(subject.team)
+			if (off < 1000) then
+				off = round(off, 0)
+			elseif (off < 10000) then
+				off = round(off/1000, 1).. "K"
+			else
+				off = round(off/1000, 0).. "K"
+			end
+			if (def < 1000) then
+				def = round(def, 0)
+			elseif (def < 10000) then
+				def = round(def/1000, 1).. "K"
+			else
+				def = round(def/1000, 0) .. "K"
+			end
+			givemebuttons[subject.id]["off"]:SetText(off)
+			givemebuttons[subject.id]["def"]:SetText(def)
 		end
-		if (incomeE < 0) then
-			colorIncomeE = '\255\255\1\1'
-		end
-		if (netM < 0) then
-			colorNetM = '\255\255\1\1'
-		end
-		if (netE < 0) then
-			colorNetE = '\255\255\1\1'
-		end
-		if (incomeM < 1000) then
-			incomeM = round(incomeM, 1)
-		else
-			incomeM = round(incomeM / 1000, 1) .. "K"
-		end
-		if (incomeE < 1000) then
-			incomeE = round(incomeE, 1)
-		else
-			incomeE = round(incomeE / 1000, 1) .. "K"
-		end
-		netM = round(netM, 1)
-		netE = round(netE, 1)
-		givemebuttons[subject.id]["metalin"]:SetText(colorIncomeM .. incomeM) --colorNetM .. netM ..'\255\255\255\255' .. " / " ..
-		givemebuttons[subject.id]["energyin"]:SetText( colorIncomeE .. incomeE) --colorNetE .. netE .. '\255\255\255\255'.. " / " ..
-		givemebuttons[subject.id]["metalbar"]:SetValue(math.min(1,storedM / storageM))
-		givemebuttons[subject.id]["energybar"]:SetValue(math.min(1,storedE / storageE))
-		
-		local off, def = getValueStats(subject.team)
-		if (off < 1000) then
-			off = round(off, 0)
-		elseif (off < 10000) then
-			off = round(off/1000, 1).. "K"
-		else
-			off = round(off/1000, 0).. "K"
-		end
-		if (def < 1000) then
-			def = round(def, 0)
-		elseif (def < 10000) then
-			def = round(def/1000, 1).. "K"
-		else
-			def = round(def/1000, 0) .. "K"
-		end
-		givemebuttons[subject.id]["off"]:SetText(off)
-		givemebuttons[subject.id]["def"]:SetText(def)
-		
 	end
-	if (subject.player and subject.player ~= Spring.GetMyPlayerID()) then
+	if (subject.player) then
 		local ping = 1000 * select(6,Spring.GetPlayerInfo(subject.player) )
 		
 		local colorPing = '\255\180\180\180'
@@ -358,7 +361,7 @@ local function UpdatePlayer(subject)
 	end
 	oldSubjects[subject.id] = subject
 	local myPlayerID = Spring.GetMyPlayerID()
-	local mySpec = subjects[mySubjectID].spec
+	local mySpec, specFullView = Spring.GetSpectatingState()
 	local myteamID = Spring.GetMyTeamID()
 	local myallyteamID = Spring.GetMyAllyTeamID()
 	local amiteamleader = (select(2,Spring.GetTeamInfo(myteamID)) == myPlayerID)
@@ -371,40 +374,41 @@ local function UpdatePlayer(subject)
 	--Spring.Echo("ai: " .. tostring(subject.ai))
 	--Spring.Echo("allyteam: " .. allyteamID)
 	--Spring.Echo("myallyteam: " .. myallyteamID)
-	if subject.player and subject.player == myPlayerID and (teamLeader or sharemode == false or subject.spec) then
-		--Spring.Echo("dec1")
-		givemebuttons[subject.id]["leave"]:SetVisibility(false)
-	elseif subject.player and subject.player == myPlayerID and not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
-		--Spring.Echo("dec2")
-		givemebuttons[subject.id]["leave"]:SetVisibility(true)
+	if subject.player and subject.player == myPlayerID then
+		if (teamLeader or sharemode == false or mySpec) then
+			givemebuttons[subject.id]["leave"]:SetVisibility(false)
+		elseif not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
+			givemebuttons[subject.id]["leave"]:SetVisibility(true)
+		end
+		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
 	elseif subject.ai then
 		--Spring.Echo("dec3")
 		givemebuttons[subject.id]["metalbar"]:SetVisibility(true)
 		givemebuttons[subject.id]["energybar"]:SetVisibility(true)
 		givemebuttons[subject.id]["metalin"]:SetVisibility(true)
 		givemebuttons[subject.id]["energyin"]:SetVisibility(true)
-		givemebuttons[subject.id]["off"]:SetVisibility(true)
-		givemebuttons[subject.id]["def"]:SetVisibility(true)
+		givemebuttons[subject.id]["offHolder"]:SetVisibility(true)
+		givemebuttons[subject.id]["defHolder"]:SetVisibility(true)
 		givemebuttons[subject.id]["metal"]:SetVisibility(true)
 		givemebuttons[subject.id]["energy"]:SetVisibility(true)
 		givemebuttons[subject.id]["unit"]:SetVisibility(true)
 		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(false)
-		if subject.allyteam ~= myallyteamID or mySpec then -- hostile ai's stuff.
+		if subject.allyteam ~= myallyteamID or specFullView then -- hostile ai's stuff.
 			--Spring.Echo("dec4")
 			givemebuttons[subject.id]["metal"]:SetVisibility(false)
 			givemebuttons[subject.id]["energy"]:SetVisibility(false)
 			givemebuttons[subject.id]["unit"]:SetVisibility(false)
-			if (not mySpec ) then
+			if (not specFullView ) then
 				--Spring.Echo("dec5")
 				givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
-				givemebuttons[subject.id]["off"]:SetVisibility(false)
-				givemebuttons[subject.id]["def"]:SetVisibility(false)
+				givemebuttons[subject.id]["offHolder"]:SetVisibility(false)
+				givemebuttons[subject.id]["defHolder"]:SetVisibility(false)
 				givemebuttons[subject.id]["energybar"]:SetVisibility(false)
 				givemebuttons[subject.id]["metalin"]:SetVisibility(false)
 				givemebuttons[subject.id]["energyin"]:SetVisibility(false)
 			end
 		end
-	elseif subject.allyteam ~= myallyteamID or mySpec then -- hostile people's stuff.
+	elseif subject.allyteam ~= myallyteamID or specFullView then -- hostile people's stuff.
 		--Spring.Echo("dec6")
 		givemebuttons[subject.id]["kick"]:SetVisibility(false)
 		givemebuttons[subject.id]["commshare"]:SetVisibility(false)
@@ -413,15 +417,22 @@ local function UpdatePlayer(subject)
 		givemebuttons[subject.id]["energy"]:SetVisibility(false)
 		givemebuttons[subject.id]["unit"]:SetVisibility(false)
 		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
-		if (not mySpec or subject.spec) then
+		if (not specFullView or subject.spec) then
 			--Spring.Echo("dec7")
 			givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
-			givemebuttons[subject.id]["off"]:SetVisibility(false)
-			givemebuttons[subject.id]["def"]:SetVisibility(false)
+			givemebuttons[subject.id]["offHolder"]:SetVisibility(false)
+			givemebuttons[subject.id]["defHolder"]:SetVisibility(false)
 			givemebuttons[subject.id]["energybar"]:SetVisibility(false)
 			givemebuttons[subject.id]["metalin"]:SetVisibility(false)
 			givemebuttons[subject.id]["energyin"]:SetVisibility(false)
 		end
+	elseif mySpec then -- Spectator, but not fullview 
+		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
+		givemebuttons[subject.id]["kick"]:SetVisibility(false)
+		givemebuttons[subject.id]["commshare"]:SetVisibility(false)
+		givemebuttons[subject.id]["metal"]:SetVisibility(false)
+		givemebuttons[subject.id]["energy"]:SetVisibility(false)
+		givemebuttons[subject.id]["unit"]:SetVisibility(false)
 	else -- other people's stuff.
 		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
 		if teamID == myteamID then
@@ -465,10 +476,10 @@ local function UpdatePlayer(subject)
 			end
 		end
 	end
-	if (subject.spec and subject.player ~= myPlayerID) then
+	if (subject.spec) then
 		givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
-		givemebuttons[subject.id]["off"]:SetVisibility(false)
-		givemebuttons[subject.id]["def"]:SetVisibility(false)
+		givemebuttons[subject.id]["offHolder"]:SetVisibility(false)
+		givemebuttons[subject.id]["defHolder"]:SetVisibility(false)
 		givemebuttons[subject.id]["energybar"]:SetVisibility(false)
 		givemebuttons[subject.id]["metalin"]:SetVisibility(false)
 		givemebuttons[subject.id]["energyin"]:SetVisibility(false)
@@ -494,7 +505,6 @@ local function MergeWithClanMembers()
 	local myclanShort = customKeys.clan     or ""
 	local myclanLong  = customKeys.clanfull or ""
 	if myclanShort ~= "" then
-		--Spring.Echo("[Share menu] Searching for clan members belonging to " .. myclanLong)
 		local teamlist = Spring.GetTeamList(Spring.GetMyAllyTeamID())
 		local clanmembers = {}
 		for i=1, #teamlist do
@@ -613,11 +623,14 @@ end
 local function InitName(subject, playerPanel)
 	--Spring.Echo("Initializing " .. subject.name .. " with parent " .. tostring(playerPanel))
 	local buttonsize = fontSize + 4
-	local barWidth = 30
+	local barWidth = 35
 	playerfontsize[subject.id] = fontSize
 	givemebuttons[subject.id] = {}
 	givemepanel[subject.id] = playerPanel
 	local sizefont = playerfontsize[subject.id]
+	
+	local smallFontSize = math.floor(sizefont/2) + 4
+	local smallerFontSize = math.floor(sizefont/2) + 2
 	
 	givemebuttons[subject.id]["text"] = chili.TextBox:New{
 		parent=playerPanel,
@@ -625,7 +638,7 @@ local function InitName(subject, playerPanel)
 		width=146,
 		height = sizefont+1,
 		fontsize=sizefont + 1,
-		x=133,
+		x=69 + 2*buttonsize,
 		text=subject.name ,
 		y=13
 	}
@@ -637,16 +650,18 @@ local function InitName(subject, playerPanel)
 		
 	end
 	
-	local topRowStartX = 67
-	local topRowStartY = 37
+	local bottomRowStartX = 67
+	local bottomRowStartY = 37
+	local bottomInfoStartX = bottomRowStartX + 4*buttonsize + 6
+	local infoSize = 48
 	
 	if subject.ai or subject.player ~= Spring.GetMyPlayerID() then
 		givemebuttons[subject.id]["unit"] = chili.Button:New{
 			parent = playerPanel,
 			height = buttonsize,
 			width = buttonsize,
-			x=topRowStartX,
-			y=topRowStartY,
+			x=bottomRowStartX,
+			y=bottomRowStartY,
 			OnClick= {function () GiveUnit(subject.team) end},
 			padding={5,5,5,5},
 			children = {chili.Image:New{file=images.give,
@@ -699,162 +714,166 @@ local function InitName(subject, playerPanel)
 			},
 			caption=" "
 		}
-		givemebuttons[subject.id]["metalbar"] = chili.Progressbar:New{
-			parent = playerPanel,
-			height = 9,
-			autosize= false,
-			min=0,
-			max=1,
-			width = barWidth,
-			x=givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width,
-			y=givemebuttons[subject.id]["text"].y - 4,
-			color={136/255,214/255,251/255,1},
-			tooltip = "Your ally's metal."
-		}
-		givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{
-			parent = playerPanel,
-			height = 9,
-			autosize= false,
-			min=0,
-			max=1,
-			width = barWidth,
-			x=givemebuttons[subject.id]["metalbar"].x,
-			y=givemebuttons[subject.id]["metalbar"].y + 12,
-			color={.93,.93,0,1},
-			tooltip = "Your ally's energy."
-		}
-		
-		givemebuttons[subject.id]["metalin"] = chili.TextBox:New{
-			parent=playerPanel,
-			height='50%',
-			width=100,
-			fontsize=sizefont/2 + 2,
-			x=givemebuttons[subject.id]["metalbar"].x + givemebuttons[subject.id]["metalbar"].width + 2,
-			y=givemebuttons[subject.id]["metalbar"].y + 1,
-			tooltip = "Your ally's metal income."
-		}
-		givemebuttons[subject.id]["energyin"] = chili.TextBox:New{
-			parent=playerPanel,
-			height='50%',
-			width=100,
-			fontsize=sizefont/2 + 2,
-			x=givemebuttons[subject.id]["energybar"].x + givemebuttons[subject.id]["energybar"].width + 2,
-			y=givemebuttons[subject.id]["energybar"].y + 1,
-			tooltip = "Your ally's energy income."
-		}
-		givemebuttons[subject.id]["ping"] = chili.TextBox:New{
-			file="LuaUI/Images/playerlist/ping.png",
-			width='100%',
-			height='100%',
-			x=11,
-			y=4,
-			textColor={1,1,1,1},
-			fontsize=sizefont/2 + 2,
-			margin = {0,0,0,0},
-			padding = {0,0,0,0},
-			text= "100ms"
-		}
-		givemebuttons[subject.id]["off"] = chili.TextBox:New{
-			width='100%',
-			height='100%',
-			x=0,
-			y=4,
-			textColor={1,0.3,0,0.8},
-			fontsize=sizefont/2 + 2,
-			margin = {0,0,0,0},
-			padding = {0,0,0,0},
-			text= "1.0K"
-		}
-		givemebuttons[subject.id]["def"] = chili.TextBox:New{
-			width='100%',
-			height='100%',
-			x=0,
-			y=4,
-			textColor={0.3,0.3,1,1},
-			fontsize=sizefont/2 + 2,
-			margin = {0,0,0,0},
-			padding = {0,0,0,0},
-			text= "1.0K"
-		}
-		givemebuttons[subject.id]["pingCtrl"] = chili.Control:New{
-			parent=playerPanel,
-			children={
-				chili.Image:New{
-					file="LuaUI/Images/playerlist/ping.png",
-					width=10,
-					height=15,
-					x=0,
-					y=0,
-					margin = {0,0,0,0},
-					padding = {0,0,0,0},
-					color={1,1,1,0.8}
-				},
-				givemebuttons[subject.id]["ping"]
+	end
+	givemebuttons[subject.id]["ping"] = chili.TextBox:New{
+		file="LuaUI/Images/playerlist/ping.png",
+		width='100%',
+		height='100%',
+		x=12,
+		y=3,
+		textColor={1,1,1,1},
+		fontsize=smallFontSize,
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		text= "100ms"
+	}
+	givemebuttons[subject.id]["off"] = chili.TextBox:New{
+		width='100%',
+		height='100%',
+		x=19,
+		y=5,
+		textColor={1,0.4,0.4,1},
+		fontsize=smallFontSize,
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		text= ""
+	}
+	givemebuttons[subject.id]["def"] = chili.TextBox:New{
+		width='100%',
+		height='100%',
+		x=19,
+		y=5,
+		textColor={0.52,0.52,1,1},
+		fontsize=smallFontSize,
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		text= ""
+	}
+	givemebuttons[subject.id]["pingCtrl"] = chili.Control:New{
+		parent=playerPanel,
+		children={
+			chili.Image:New{
+				file="LuaUI/Images/playerlist/ping.png",
+				width=10,
+				height=15,
+				x=0,
+				y=0,
+				margin = {0,0,0,0},
+				padding = {0,0,0,0},
+				color={1,1,1,0.8}
 			},
-			margin = {0,0,0,0},
-			padding = {0,0,0,0},
-			width=50,
-			height=8,
-			x = givemebuttons[subject.id]["metalbar"].x ,
-			y = givemebuttons[subject.id]["metalbar"].y + 39,
-			height=badgeHeight,
-			tooltip = "This player's network delay (ping)"
-		}
-		chili.Control:New{
-			parent=playerPanel,
-			children={
-				chili.Image:New{
-					file='LuaUI/Images/commands/Bold/attack.png',
-					width=10,
-					height=15,
-					x=0,
-					y=0,
-					margin = {0,0,0,0},
-					padding = {0,0,0,0},
-					color={1,0.1,0,0}
-				},
-				givemebuttons[subject.id]["off"]
+			givemebuttons[subject.id]["ping"]
+		},
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		width=60,
+		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + buttonsize + 3,
+		y = givemebuttons[subject.id]["text"].y - 2,
+		height=buttonsize,
+		tooltip = "This player's network delay (ping)"
+	}
+	
+	givemebuttons[subject.id]["metalbar"] = chili.Progressbar:New{
+		parent = playerPanel,
+		height = 9,
+		autosize= false,
+		min=0,
+		max=1,
+		width = barWidth,
+		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width,
+		y = bottomRowStartY - 1,
+		color={136/255,214/255,251/255,1},
+		tooltip = "Your ally's metal."
+	}
+	givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{
+		parent = playerPanel,
+		height = 9,
+		autosize= false,
+		min=0,
+		max=1,
+		width = barWidth,
+		x=givemebuttons[subject.id]["metalbar"].x,
+		y=givemebuttons[subject.id]["metalbar"].y + 12,
+		color={.93,.93,0,1},
+		tooltip = "Your ally's energy."
+	}
+	
+	givemebuttons[subject.id]["metalin"] = chili.TextBox:New{
+		parent=playerPanel,
+		height='50%',
+		width=100,
+		fontsize=smallerFontSize,
+		x=givemebuttons[subject.id]["metalbar"].x + givemebuttons[subject.id]["metalbar"].width + 2,
+		y=givemebuttons[subject.id]["metalbar"].y + 1,
+		tooltip = "Your ally's metal income."
+	}
+	givemebuttons[subject.id]["energyin"] = chili.TextBox:New{
+		parent=playerPanel,
+		height='50%',
+		width=100,
+		fontsize=smallerFontSize,
+		x=givemebuttons[subject.id]["energybar"].x + givemebuttons[subject.id]["energybar"].width + 2,
+		y=givemebuttons[subject.id]["energybar"].y + 1,
+		tooltip = "Your ally's energy income."
+	}
+	givemebuttons[subject.id]["offHolder"] = chili.Control:New{
+		parent=playerPanel,
+		children={
+			chili.Image:New{
+				file='LuaUI/Images/commands/Bold/attack.png',
+				width=16,
+				height=16,
+				x=1,
+				y=2,
+				margin = {0,0,0,0},
+				padding = {0,0,0,0},
+				color={1,1,1,1}
 			},
-			margin = {0,0,0,0},
-			padding = {0,0,0,0},
-			width=50,
-			height=8,
-			x = givemebuttons[subject.id]["metalbar"].x + 2,
-			y = givemebuttons[subject.id]["metalbar"].y + 24,
-			height=badgeHeight,
-			tooltip = "This player's network delay (ping)"
-		}
-		chili.Control:New{
-			parent=playerPanel,
-			children={
-				chili.Image:New{
-					file='LuaUI/Images/commands/Bold/guard.png',
-					width=10,
-					height=15,
-					x=0,
-					y=0,
-					margin = {0,0,0,0},
-					padding = {0,0,0,0},
-					color={0.4,0.4,1,0}
-				},
-				givemebuttons[subject.id]["def"]
+			givemebuttons[subject.id]["off"]
+		},
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		width=50,
+		x = bottomInfoStartX,
+		y = bottomRowStartY + 1,
+		height=20,
+		tooltip = "This player's offensive units"
+	}
+	givemebuttons[subject.id]["defHolder"] = chili.Control:New{
+		parent=playerPanel,
+		children={
+			chili.Image:New{
+				file='LuaUI/Images/commands/Bold/guard.png',
+				width=16,
+				height=16,
+				x=1,
+				y=2,
+				margin = {0,0,0,0},
+				padding = {0,0,0,0},
+				color={1,1,1,1}
 			},
-			margin = {0,0,0,0},
-			padding = {0,0,0,0},
-			width=50,
-			height=8,
-			x = givemebuttons[subject.id]["metalin"].x,
-			y = givemebuttons[subject.id]["metalbar"].y + 24,
-			height=badgeHeight,
-			tooltip = "This player's network delay (ping)"
-		}
-		if (subject.player) then
+			givemebuttons[subject.id]["def"]
+		},
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		width=50,
+		x = bottomInfoStartX + infoSize,
+		y = bottomRowStartY + 1,
+		height=20,
+		tooltip = "This player's defence"
+	}
+	
+	if subject.player ~= Spring.GetMyPlayerID() then
+		if subject.player then
+			local commshareButtonX = givemebuttons[subject.id]["energy"].x + buttonsize
+			local commshareButtonY = givemebuttons[subject.id]["energy"].y
+			
 			givemebuttons[subject.id]["accept"] = chili.Button:New{
 				parent = playerPanel,
 				height = buttonsize,
 				width = buttonsize,
-				x= givemebuttons[subject.id]["energy"].x  + givemebuttons[subject.id]["text"].width,
-				y= givemebuttons[subject.id]["energy"].y,
+				x= commshareButtonX,
+				y= commshareButtonY,
 				OnClick = {function () InviteChange(subject.player,true) end},
 				padding={1,1,1,1},
 				tooltip = "Click this to accept this player's invite!",
@@ -871,8 +890,8 @@ local function InitName(subject, playerPanel)
 				parent = playerPanel,
 				height = buttonsize,
 				width = buttonsize,
-				x= givemebuttons[subject.id]["energy"].x  + givemebuttons[subject.id]["text"].width,
-				y= givemebuttons[subject.id]["energy"].y,
+				x= commshareButtonX,
+				y= commshareButtonY,
 				OnClick = {function () InvitePlayer(subject.player,false) end},
 				padding={1,1,1,1},
 				tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!",
@@ -889,8 +908,8 @@ local function InitName(subject, playerPanel)
 				parent = playerPanel,
 				height = buttonsize,
 				width = buttonsize,
-				x= givemebuttons[subject.id]["energy"].x  + givemebuttons[subject.id]["text"].width,
-				y= givemebuttons[subject.id]["energy"].y,
+				x= commshareButtonX,
+				y= commshareButtonY,
 				OnClick = {function () KickPlayer(subject.player) end},
 				padding={1,1,1,1},
 				tooltip = "Kick this player from your squad.",
@@ -907,8 +926,8 @@ local function InitName(subject, playerPanel)
 				parent = playerPanel,
 				height = buttonsize,
 				width = buttonsize,
-				x= givemebuttons[subject.id]["energy"].x  + givemebuttons[subject.id]["text"].width,
-				y= givemebuttons[subject.id]["metalbar"].y,
+				x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+				y= givemebuttons[subject.id]["text"].y - 6,
 				OnClick = {function () BattleKickPlayer(subject) end},
 				padding={1,1,1,1},
 				tooltip = "Kick this player from the battle.",
@@ -927,8 +946,8 @@ local function InitName(subject, playerPanel)
 			parent = playerPanel,
 			height = buttonsize,
 			width = buttonsize,
-			x= topRowStartX + givemebuttons[subject.id]["text"].width + 2 * buttonsize,
-			y= topRowStartY,
+			x=bottomRowStartX,
+			y=bottomRowStartY,
 			OnClick = {function () LeaveMySquad() end},
 			padding={1,1,1,1},
 			tooltip = "Leave your squad.",
@@ -944,18 +963,11 @@ local function InitName(subject, playerPanel)
 			caption=" "
 		}
 	end
-	local pdata, country, icon, badges, clan, avatar, elo, xp, faction, admin
+	local country, icon, badges, clan, avatar, faction, admin
 	if (subject.player) then
-		pdata = select(10, Spring.GetPlayerInfo(subject.player))
+		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
 		country = select(8, Spring.GetPlayerInfo(subject.player))
-		if (pdata.elo and pdata.level) then
-			--Spring.Echo("Using elo for " .. subject.name)
-			elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(pdata.elo), tonumber(pdata.level))
-		end
-		if (pdata.icon) then
-			--Spring.Echo("Using icon for " .. subject.name)
-			icon = pdata.icon
-		end
+		icon = pdata.icon
 		badges = pdata.badges
 		clan = pdata.clan
 		avatar = pdata.avatar
@@ -963,7 +975,6 @@ local function InitName(subject, playerPanel)
 	end
 	if (playerInfo[subject.name]) then
 		--Spring.Echo("Using extra info for " .. subject.name)
-		elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(playerInfo[subject.name].elo), tonumber(playerInfo[subject.name].level))
 		country = playerInfo[subject.name].country
 		clan = playerInfo[subject.name].clan
 		icon = playerInfo[subject.name].icon
@@ -972,75 +983,48 @@ local function InitName(subject, playerPanel)
 		faction = playerInfo[subject.name].faction
 		admin = playerInfo[subject.name].admin
 	end
-	
+
+	-- approximate known bots skill (FIXME: bots should probably have their own distinct icon, and chickens another)
 	if subject.ai then
-		elo = 0
-		xp = 0
-		if (string.match(string.lower(subject.name), "chicken")) then			
-			elo = 1
-			xp = 7
-		end
-		if (string.match(string.lower(subject.name), "circuit")) then			
-			elo = 3
-			xp = 7
-		end
-		if (string.match(string.lower(subject.name), "kgb")) then			
-			elo = 5
-			xp = 6
-		end
-		if (string.match(string.lower(subject.name), "csi")) then			
-			elo = 4
-			xp = 5
-		end
-		if (string.match(string.lower(subject.name), "cai")) then			
-			elo = 2
-			xp = 3
-		end
+		icon = "0_0" -- >mfw unknown bot
+
+		if (string.match(string.lower(subject.name), "chicken")) then icon = "7_1" end
+		if (string.match(string.lower(subject.name), "circuit")) then icon = "7_3" end
+		if (string.match(string.lower(subject.name),     "kgb")) then icon = "6_5" end
+		if (string.match(string.lower(subject.name),     "csi")) then icon = "5_4" end
+		if (string.match(string.lower(subject.name),     "cai")) then icon = "3_2" end
 	end
-	local rankImg
+
 	--Spring.Echo("badges: " .. tostring(badges))
 	local countryImg = country and country ~= '' and country ~= '??' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
 	local clanImg = nil
 	local avatarImg = nil
 	local adminImg = nil
 	avatar = avatar or "clogger"
-	if (icon) then
-		rankImg = "LuaUI/Images/LobbyRanks/" .. icon .. ".png"
-	elseif (elo and xp) then
-		rankImg = "LuaUI/Images/LobbyRanks/" .. xp .. "_" .. elo .. ".png"
-	end
+	local rankImg = "LuaUI/Images/LobbyRanks/" .. (icon or "0_0") .. ".png"
 	if clan and clan ~= "" then 
 		clanImg = "LuaUI/Configs/Clans/" .. clan ..".png"
 	elseif faction and faction ~= "" then
 		clanImg = "LuaUI/Configs/Factions/" .. faction ..".png"
 	end
 	if avatar then
-		avatarImg = "LuaUI/Configs/Avatars/" .. avatar .. ".png"
+		avatar = avatar .. ".png"
+		local unitpic = "unitpics/" .. avatar
+		if VFS.FileExists(unitpic, VFS.GAME) then
+			avatarImg = unitpic
+		else
+			avatarImg = "LuaUI/Configs/Avatars/" .. avatar
+		end
 	end
 	if admin then
 		adminImg = "LuaUI/Images/playerlist/police.png"
-	end
-	if (badges) then
-		for i, badge in ipairs(badges:split(",")) do
-			if (badge ~= "" and i < 3) then
-				local badgeImg = "LuaUI/Images/badges/" .. badge .. ".png"
-				chili.Image:New{parent=playerPanel,
-					file=badgeImg,
-					width=badgeWidth,
-					x = givemebuttons[subject.id]["text"].x + (badgeWidth + 2) * (i-1),
-					y = 36,
-					height=badgeHeight,
-					tooltip = "A special award"
-				}
-			end
-		end
 	end
 	if (rankImg) then
 		chili.Image:New{parent=playerPanel,
 			file=rankImg,
 			width=16,
 			height=16,
-			x = 64 + buttonsize*2 + 5,
+			x = 64 + buttonsize + 5,
 			y = givemebuttons[subject.id]["text"].y - 1
 		}
 	end
@@ -1052,7 +1036,7 @@ local function InitName(subject, playerPanel)
 			parent = playerPanel,
 			height = buttonsize,
 			width = buttonsize,
-			x= topRowStartX + givemebuttons[subject.id]["text"].width + 2 * buttonsize,
+			x= bottomRowStartX + givemebuttons[subject.id]["text"].width + 2 * buttonsize,
 			y= givemebuttons[subject.id]["text"].y - 4,
 			padding={1,1,1,1},
 			tooltip = "Zero-K Administrator",
@@ -1068,15 +1052,15 @@ local function InitName(subject, playerPanel)
 			caption=" "
 		}
 	end
-	if (countryImg) then
-		chili.Image:New{parent=playerPanel,
-			file=countryImg,
-			width=16,
-			height=11,
-			x = 64 + buttonsize*1 + 5,
-			y = givemebuttons[subject.id]["text"].y + 2
-		}
-	end
+	--if (countryImg) then
+	--	chili.Image:New{parent=playerPanel,
+	--		file=countryImg,
+	--		width=16,
+	--		height=11,
+	--		x = 64 + buttonsize*1 + 5,
+	--		y = givemebuttons[subject.id]["text"].y + 2
+	--	}
+	--end
 	if (clanImg) then
 		chili.Image:New{parent=playerPanel,
 			file=clanImg,
@@ -1090,13 +1074,30 @@ local function InitName(subject, playerPanel)
 	givemebuttons[subject.id]["text"].y = givemebuttons[subject.id]["text"].y + (1 + sizefont - givemebuttons[subject.id]["text"].font.size) / 3
 	givemebuttons[subject.id]["text"]:Invalidate()
 	if (avatarImg) then
-		chili.Image:New{parent=playerPanel,
+		local avatarControl = chili.Image:New{parent=playerPanel,
 			file=avatarImg,
 			width=64,
 			height= 64,
 			x = 0,
 			y = 0
 		}
+		if (badges) then
+			for i, badge in ipairs(badges:split(",")) do
+				if (badge ~= "" and i < 3) then
+					local badgeImg = "LuaUI/Images/badges/" .. badge .. ".png"
+					chili.Image:New{
+						parent=avatarControl,
+						file=badgeImg,
+						width=badgeWidth,
+						x = 1,
+						bottom = 1 + (i - 1)*badgeHeight,
+						height=badgeHeight,
+						tooltip = "A special award",
+						color = {1, 1, 1, 0.86},
+					}
+				end
+			end
+		end
 	end
 	--Spring.Echo("Playerpanel size: " .. playerPanel.width .. "x" .. playerPanel.height .. "\nTextbox size: " .. playerPanel.width*0.4 .. "x" .. playerPanel.height)
 	local isSpec = select(3,Spring.GetPlayerInfo(subject.id))
@@ -1119,8 +1120,8 @@ local function Buildme()
 	local playerpanels = {}
 	local allypanels = {}
 	local allpanels = {}
-	local playerHeight =  64	
-	local playerWidth =  339	
+	local playerHeight =  64
+	local playerWidth =  339
 	local lastAllyTeam = 0
 	for _, subject in ipairs(subjects) do
 		if (not playerpanels[subject.allyteam]) then
@@ -1500,7 +1501,6 @@ function widget:Initialize()
 	color2incolor = chili.color2incolor
 	screen0 = chili.Screen0
 	if options.fixHotkeys.value then
-		WG.crude.SetHotkey("toggleoverview","ctrl+tab")
 		WG.crude.SetHotkey("sharedialog","")
 		options.fixHotkeys.value = false
 	end

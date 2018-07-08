@@ -21,6 +21,9 @@ end
 ------------------------------------------------------------
 local buildOptions = VFS.Include("gamedata/buildoptions.lua")
 
+local MAX_QUEUE = 30
+local REDCHAR = string.char(255,255,64,32)
+
 -- Colors
 local buildDistanceColor = {0.3, 1.0, 0.3, 0.7}
 local buildLinesColor = {0.3, 1.0, 0.3, 0.7}
@@ -35,7 +38,7 @@ local energyColor = '\255\255\255\128' -- Light yellow
 local buildColor = '\255\128\255\128' -- Light green
 local whiteColor = '\255\255\255\255' -- White
 
-local fontSize = 14
+local fontSize = 20
 
 ------------------------------------------------------------
 -- Globals
@@ -302,16 +305,20 @@ function widget:Update(dt)
 	end
 end
 
---[[
 function widget:DrawScreen()
 	gl.PushMatrix()
-	gl.Translate(scrW/2, scrH*0.4, 0)
-	if #buildQueue > 0 then	
-		gl.Text(string.format(queueTimeFormat, mCost, buildTime), 0, 0, fontSize, 'cdo')
+	gl.Translate(scrW*0.4, scrH*0.35, 0)
+	local num = #buildQueue
+	if num > 0 then	
+		--gl.Text(string.format(queueTimeFormat, mCost, buildTime), 0, 0, fontSize, 'cdo')
+		local str = "Queue: " .. num .. "/" .. MAX_QUEUE
+		if num >= MAX_QUEUE then
+			str = REDCHAR .. str
+		end
+		gl.Text(str, 0, 0, fontSize, 'cdo')
 	end
 	gl.PopMatrix()
 end
-]]--
 
 local function DrawWorldFunc()
 	--don't draw anything once the game has started; after that engine can draw queues itself
@@ -522,7 +529,7 @@ function widget:GameFrame(n)
 		
 		for b = 1, #buildQueue do
 			local buildData = buildQueue[b]
-			Spring.GiveOrderToUnit(tasker, -buildData[1], {buildData[2], buildData[3], buildData[4], buildData[5]}, {"shift"})
+			Spring.GiveOrderToUnit(tasker, -buildData[1], {buildData[2], buildData[3], buildData[4], buildData[5]}, CMD.OPT_SHIFT)
 		end
 		if selDefID and UnitDefs[selDefID] and UnitDefs[selDefID].name then
 			WG.InitialActiveCommand = "buildunit_" .. UnitDefs[selDefID].name
@@ -674,6 +681,18 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	SetSelDefID(-1*cmdID)
 	local bx,by,bz = cmdParams[1],cmdParams[2],cmdParams[3]
 	local buildFacing = Spring.GetBuildFacing()
+	local msg, msg2
+	
+	local function CheckClash(buildData)
+		for i = #buildQueue, 1, -1 do
+			if DoBuildingsClash(buildData, buildQueue[i]) then
+				table.remove(buildQueue, i)
+				msg = "IQ|2|"..i
+				return true
+			end
+		end
+	end
+	
 	if Spring.TestBuildOrder(selDefID, bx, by, bz, buildFacing) ~= 0 then
 		if isMex[selDefID] and WG.metalSpots then
 			local bestSpot = GetClosestMetalSpot(bx, bz)
@@ -681,26 +700,27 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 			by = math.max(0, Spring.GetGroundHeight(bx, bz))
 		end
 		local buildData = {selDefID, bx, by, bz, buildFacing}
-		local msg
-		if cmdOptions.meta then
-			table.insert(buildQueue, 1, buildData)
-			msg = "IQ|1|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing
-		elseif cmdOptions.shift then
-
-			local anyClashes = false
-			for i = #buildQueue, 1, -1 do
-				if DoBuildingsClash(buildData, buildQueue[i]) then
-					anyClashes = true
-					table.remove(buildQueue, i)
-					msg = "IQ|2|"..i
+		
+		if cmdOptions.meta then	-- space insert at front
+			local anyClashes = CheckClash(buildData)
+			if not anyClashes then
+				table.insert(buildQueue, 1, buildData)
+				msg = "IQ|1|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing
+				if (buildQueue[MAX_QUEUE + 1] ~= nil) then	-- exceeded max queue, remove the one at the end
+					table.remove(buildQueue, MAX_QUEUE + 1)
+					msg2 = msg
+					msg = "IQ|2|".. (MAX_QUEUE + 1)
 				end
 			end
-
+		elseif cmdOptions.shift then	-- shift-queue
+			local anyClashes = CheckClash(buildData)
 			if not anyClashes then
-				buildQueue[#buildQueue + 1] = buildData
-				msg = "IQ|3|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing
+				if #buildQueue < MAX_QUEUE then	-- disallow if already reached max queue
+					buildQueue[#buildQueue + 1] = buildData
+					msg = "IQ|3|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing
+				end
 			end
-		else
+		else	-- normal build
 			buildQueue = {buildData}
 			msg = "IQ|4|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing
 			--msg = "IQ|4|404|648|2|3304|1" --example spoof. This will not work
@@ -708,6 +728,10 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		if msg then
 			Spring.SendLuaUIMsg(msg,'a')
 			Spring.SendLuaUIMsg(msg,'s') --need 2 msg because since Spring 97 LuaUIMsg without parameter is send info to EVERYONE (including enemy)
+		end
+		if msg2 then
+			Spring.SendLuaUIMsg(msg2,'a')
+			Spring.SendLuaUIMsg(msg2,'s')
 		end
 		
 		mCost, eCost, bCost = GetQueueCosts()

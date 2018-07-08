@@ -3,7 +3,7 @@ local name = "commweapon_slamrocket"
 local weaponDef = {
 	name                    = [[S.L.A.M.]],
 	avoidFeature            = false,
-	avoidGround             = false, 
+	avoidGround             = false,
 	collideFriendly         = false,
 	areaOfEffect            = 160,
 	burnblow                = false,
@@ -18,7 +18,7 @@ local weaponDef = {
 		slot = [[3]],
 		muzzleEffectFire = [[custom:SLAM_MUZZLE]],
 		manualfire = 1,
-		
+
 		light_camera_height = 2500,
 		light_color = [[1 0.8 0.2]],
 	},

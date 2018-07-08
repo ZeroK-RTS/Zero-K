@@ -49,7 +49,7 @@ local function AddHotkeyOptions()
 			name = cmdname_disp,
 			type = 'button',
 			action = cmdnamel,
-			path = 'Settings/Hotkeys/Commands',
+			path = 'Hotkeys/Commands',
 		}
 		if number == 2 then
 			options_order_tmp_states[#options_order_tmp_states+1] = cmdname_disp
@@ -63,9 +63,9 @@ local function AddHotkeyOptions()
 		end
 	end
 
-	options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Settings/Hotkeys/Commands',}
-	options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Settings/Hotkeys/Commands',}
-	options.lblstate	= { type='label', name='State Commands', path = 'Settings/Hotkeys/Commands',}
+	options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Hotkeys/Commands',}
+	options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Hotkeys/Commands',}
+	options.lblstate	= { type='label', name='State Commands', path = 'Hotkeys/Commands',}
 	
 	
 	table.sort(options_order_tmp_cmd)

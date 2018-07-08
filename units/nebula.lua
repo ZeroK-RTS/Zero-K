@@ -26,12 +26,8 @@ unitDef = {
 
   customParams           = {
     cantuseairpads = 1,
-   -- description_fr = [[Forteresse Volante]],
-    description_de = [[Lufttraeger]], -- "aerial carrier"
-    helptext       = [[As maneuverable as a brick and only modestly armed itself, the Nebula is still a fearsome force due to its ability to survive long-range attacks due to its shield, as well as shred lesser foes with its fighter-drone complement.]],
-   -- helptext_fr    = [[La Forteresse Volante est l'ADAV le plus solide jamais construit, est ?quip?e de nombreuses tourelles laser, elle est capable de riposter dans toutes les directions et d'encaisser des d?g?ts importants. Id?al pour un appuyer un assaut lourd ou monopiler l'Anti-Air pendant une attaque a?rienne.]],
-    helptext_de    = [[Die Nebula ist stark und ungeschickt, aber sie hat ein Schild um sich zu schutzen und kann seine einige Jaegerdrohne herstellen.]],
     modelradius    = [[40]],
+    shield_emit_height = 20,
   },
 
   explodeAs              = [[LARGE_BUILDINGEX]],
@@ -152,8 +148,8 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       shieldAlpha             = 0.2,
-      shieldBadColor          = [[1 0.1 0.1]],
-      shieldGoodColor         = [[0.1 0.1 1]],
+      shieldBadColor          = [[1 0.1 0.1 1]],
+      shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
       shieldPower             = 3600,
       shieldPowerRegen        = 50,
@@ -161,10 +157,8 @@ unitDef = {
       shieldRadius            = 350,
       shieldRepulser          = false,
       smartShield             = true,
-      texture1                = [[shield3mist]],
-      visibleShield           = true,
-      visibleShieldHitFrames  = 4,
-      visibleShieldRepulse    = true,
+      visibleShield           = false,
+      visibleShieldRepulse    = false,
       weaponType              = [[Shield]],
     },
   },

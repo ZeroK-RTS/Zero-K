@@ -40,7 +40,7 @@ end
 
 local FULL_GROW = 0.4
 local UPDATE_FREQUENCY = 25
-
+local SET_SELECTION_VOLUME = false
 
 local growUnit = {}
 local offsets = {}
@@ -106,9 +106,10 @@ local function UpdateUnitGrow(unitID, growScale)
 		spSetUnitCollisionVolumeData(unitID,
 			unit.scale[1], unit.scale[2], unit.scale[3], 
 			unit.offset[1], unit.offset[2] - growScale*unit.scaleOff, unit.offset[3], 
-			unit.volumeType, unit.testType, unit.primaryAxis)
-			
-		if Spring.SetUnitSelectionVolumeData then
+			unit.volumeType, unit.testType, unit.primaryAxis
+		)
+		
+		if SET_SELECTION_VOLUME and Spring.SetUnitSelectionVolumeData then
 			Spring.SetUnitSelectionVolumeData(unitID,
 				unit.scale[1], unit.scale[2], unit.scale[3], 
 				unit.offset[1], unit.offset[2] - growScale*unit.scaleOff, unit.offset[3], 

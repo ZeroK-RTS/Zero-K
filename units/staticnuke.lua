@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[staticnuke]],
-  name                          = [[Silencer]],
+  name                          = [[Trinity]],
   description                   = [[Strategic Nuclear Launcher, Drains 18 m/s, 3 minute stockpile]],
   acceleration                  = 0,
   brakeRate                     = 0,
@@ -15,11 +15,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_fr = [[Lance Missile Ballistique Intercontinental Nucl?aire (Nuke)]],
-	description_de = [[Abschuß für atomare Interkontinentalraketen, Benötigt 18 M/s und 3 Minuten zum Bevorraten]],
-    helptext       = [[The Silencer launches devastating nuclear missiles that can obliterate entire bases. However, it is easily defeated by enemy anti-nuke systems, which must be removed from the desired target area beforehand.]],
-    helptext_fr    = [[Le Silencer est long a construire, et il faut qui plus est, ordonner la creation de missiles une fois celui-ci construit. Et pourtant, quel bonheur de r?duire tous vos ennemis en poussi?re en une seconde! Pensez ? v?rifier la pr?sence d'une contre mesure AntiNuke.]],
-	helptext_de    = [[Der Silencer verschießt verwüstende, atomare Raketen, die ganze Basen in Schutt und Asche legen können. Trotzdem kann es von einem feindlichen Anti-Atomsystem geschlagen werden. Aus diesem Grund solltest du dieses zunächst vernichten, bevor du deine Raketen abschießt.]],
 	stockpiletime  = [[180]],
 	stockpilecost  = [[3240]],
 	priority_misc  = 1, -- Medium
@@ -79,7 +74,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.3,
-      explosionGenerator      = [[custom:LONDON]],
+      explosionGenerator      = [[custom:LONDON_FLAT]],
       fireStarter             = 0,
       flightTime              = 180,
       impulseBoost            = 0.5,

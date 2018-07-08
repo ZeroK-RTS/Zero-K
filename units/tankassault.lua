@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[tankassault]],
-  name                = [[Reaper]],
+  name                = [[Minotaur]],
   description         = [[Assault Tank]],
   acceleration        = 0.0237,
   brakeRate           = 0.04786,
@@ -17,11 +17,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_fr = [[Tank d'Assaut]],
-	description_de = [[Sturmpanzer]],
-    helptext       = [[A heavy duty battle tank. The Reaper excels at absorbing damage in pitched battles, but its low rate of fire means it is not so good at dealing with swarms, and its heavy armor comes at the price of manuverability.]],
-    helptext_fr    = [[Le Reaper est un tank d'assaut lourd. Lourd par le blindage, lourd par les dégâts. La lente cadence de tir de son double canon plasma ne conviendra pas aux situations d'encerclement et aux nuées d'ennemis et son blindage le rends peu maniable.]],
-	helptext_de    = [[Der Reaper ist ein schwerer Kampfpanzer, der sich durch die Absorbtion von Schaden auszeichnet. Seine niedrige Feuerrate führt dazu, dass er mit großen Gruppen von Einheiten nicht gut klar kommt und seine schwere Panzerung wirkt sich negativ auf die Manövrierfähigkeit aus.]],
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 0 0]],
 	modelradius    = [[25]],
@@ -83,6 +78,10 @@ unitDef = {
       burstRate               = 0.2,
       craterBoost             = 0,
       craterMult              = 0,
+
+      customParams        = {
+        reaim_time = 8, -- COB
+      },
 
       damage                  = {
         default = 320,

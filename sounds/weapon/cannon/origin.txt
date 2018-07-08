@@ -1,3 +1,10 @@
+by Kingstad (CC-BY):
+rhino2.wav
+
+by Apelsinsaft (CC-BY):
+plasma_fire.wav
+plasma_hit.wav
+
 Astro Menace:
 emg_hit.wav
 

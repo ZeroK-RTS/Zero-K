@@ -17,6 +17,7 @@ end
 include("keysym.h.lua")
 include("Widgets/COFCTools/ExportUtilities.lua")
 
+local missionMode = Spring.GetModOptions().singleplayercampaignbattleid
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -103,8 +104,9 @@ local DEDUPE_SUFFIX = 'x '
 local MIN_HEIGHT = 50
 local MIN_WIDTH = 300
 local MAX_STORED_MESSAGES = 300
-	
+
 local inputsize = 25
+local CONCURRENT_SOUND_GAP = 0.1 -- seconds
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -137,7 +139,7 @@ local chatMessages = {} -- message buffer
 local highlightPattern -- currently based on player name -- TODO add configurable list of highlight patterns
 
 local firstEnter = true --used to activate ally-chat at game start. To run once
-local noAlly = false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
+local recentSoundTime = false -- Limit the rate at which sounds are played.
 
 local lastMsgChat, lastMsgBackChat, lastMsgConsole
 
@@ -657,6 +659,14 @@ local function SetInputFontSize(size)
 	end
 end	
 
+local function HaveAllyOrSpectating()
+	local spectating = Spring.GetSpectatingState()
+	local myAllyTeamID = Spring.GetMyAllyTeamID() -- get my alliance ID
+	local teams = Spring.GetTeamList(myAllyTeamID) -- get list of teams in my alliance
+	-- if I'm alone and playing (no ally), then no need to set default-ally-chat during gamestart . eg: 1vs1
+	return not (#teams == 1 and (not spectating))
+end
+
 --------------------------------------------------------------------------------
 -- TODO : should these pattern/escape functions be moved to some shared file/library?
 
@@ -753,12 +763,16 @@ local function escape_lua_pattern(s)
 end
 
 local function PlaySound(id, condition)
+	if recentSoundTime then
+		return
+	end
 	if condition ~= nil and not condition then
 		return
 	end
 	local file = SOUNDS[id]
 	if file then
 		Spring.PlaySoundFile(file, 1, 'ui')
+		recentSoundTime = CONCURRENT_SOUND_GAP
 	end
 end
 
@@ -861,7 +875,12 @@ local function AddMessage(msg, target, remake)
 		size = options.text_height_chat.value
 		stack = stack_backchat
 		lastMsg = lastMsgBackChat
-	end	
+	end
+	
+	if not stack then
+		-- stack_console may not yet be created.
+		return
+	end
 	
 	--if msg.highlight and options.highlighted_text_height.value
 	
@@ -1070,12 +1089,14 @@ local function setup()
 end
 
 local function removeToMaxLines()
-	while #stack_console.children > options.max_lines.value do
-		-- stack:RemoveChild(stack.children[1]) --disconnect children
-		if stack_console.children[1] then
-			stack_console.children[1]:Dispose() --dispose/disconnect children (safer)
+	if stack_console then
+		while #stack_console.children > options.max_lines.value do
+			-- stack:RemoveChild(stack.children[1]) --disconnect children
+			if stack_console.children[1] then
+				stack_console.children[1]:Dispose() --dispose/disconnect children (safer)
+			end
+			--stack:UpdateLayout()
 		end
-		--stack:UpdateLayout()
 	end
 	while #stack_backchat.children > options.max_lines.value do
 		-- stack:RemoveChild(stack.children[1]) --disconnect children
@@ -1090,8 +1111,10 @@ end
 function RemakeConsole()
 	setup()
 	-- stack_console:ClearChildren() --disconnect from all children
-	for i=1, #stack_console.children do
-		stack_console.children[1]:Dispose() --dispose/disconnect all children (safer)
+	if stack_console then
+		for i=1, #stack_console.children do
+			stack_console.children[1]:Dispose() --dispose/disconnect all children (safer)
+		end
 	end
 	
 	for i=1, #stack_backchat.children do
@@ -1150,7 +1173,7 @@ local function MakeMessageStack(margin)
 	}
 end
 
-local function MakeMessageWindow(name, enabled)
+local function MakeMessageWindow(name, enabled, ParentFunc)
 
 	local x,y,bottom,width,height
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
@@ -1173,6 +1196,10 @@ local function MakeMessageWindow(name, enabled)
 		if maxWidth < width then
 			y = 50 -- resource bar height
 		end
+	end
+	
+	if enabled and ParentFunc then
+		ParentFunc()
 	end
 	
 	return WG.Chili.Window:New{
@@ -1205,23 +1232,46 @@ local function MakeMessageWindow(name, enabled)
 				return true
 			end
 		},
+		OnParent = ParentFunc and {
+			ParentFunc
+		},
 	}
 end
 
 local showingBackchat = false
-local function SwapBacklog()
+local showingNothing = false
+
+local function SetHidden(hidden)
+	if hidden == showingNothing then
+		return
+	end
+	showingNothing = hidden
+	
 	if showingBackchat then
 		window_chat:RemoveChild(scrollpanel_backchat)
+	else
+		window_chat:RemoveChild(scrollpanel_chat)
+	end
+end
+
+local function SwapBacklog()
+	if showingBackchat then
+		if not showingNothing then
+			window_chat:RemoveChild(scrollpanel_backchat)
+		end
 		window_chat:AddChild(scrollpanel_chat)
 		backlogButtonImage.file = 'LuaUI/Images/arrowhead.png'
 		backlogButtonImage:Invalidate()
 	else
-		window_chat:RemoveChild(scrollpanel_chat)
+		if not showingNothing then
+			window_chat:RemoveChild(scrollpanel_chat)
+		end
 		window_chat:AddChild(scrollpanel_backchat)
 		backlogButtonImage.file = 'LuaUI/Images/arrowhead_flipped.png'
 		backlogButtonImage:Invalidate()
 	end
 	showingBackchat = not showingBackchat
+	showingNothing = false
 end
 
 local function SetBacklogShow(newShow)
@@ -1244,11 +1294,8 @@ function widget:KeyPress(key, modifier, isRepeat)
 		keypadEnterPressed = true
 	end
 	if (key == KEYSYMS.RETURN) or (key == KEYSYMS.KP_ENTER) then
-		if noAlly then
-			firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
-		end
 		if firstEnter then
-			if (not (modifier.Shift or modifier.Ctrl)) and options.defaultAllyChat.value then
+			if HaveAllyOrSpectating() and (not (modifier.Shift or modifier.Ctrl)) and options.defaultAllyChat.value then
 				Spring.SendCommands("chatally")
 			end
 			firstEnter = false
@@ -1347,9 +1394,7 @@ function widget:AddConsoleMessage(msg)
 		else
 			AddMessage(messages[#messages], 'console')
 		end
-				
 		return
-	
 	end
 	
 	msg.dup = 1
@@ -1390,6 +1435,12 @@ local firstSwap = true
 
 -- FIXME wtf is this obsessive function?
 function widget:Update(s)
+	if recentSoundTime then
+		recentSoundTime = recentSoundTime - s
+		if recentSoundTime < 0 then
+			recentSoundTime = false
+		end
+	end
 	timer = timer + s
 	if timer > 2 then
 		timer = 0
@@ -1409,9 +1460,8 @@ function widget:Update(s)
 				)
 			}
 		)
-	
+		
 		for k,control in pairs(fadeTracker) do
-			
 			fadeTracker[k].fade = math.max( control.fade - sub, 0 ) --removes old lines
 			
 			if control.fade == 0 then
@@ -1428,6 +1478,9 @@ function widget:Update(s)
 		end
 		firstUpdate = false
 		SetInputFontSize(15)
+		if missionMode then
+			SetHidden(true)
+		end
 	end
 	
 	-- Workaround bugged display on first open of the backlog
@@ -1440,6 +1493,9 @@ function widget:Update(s)
 			SwapBacklog()
 			SetBacklogShow(options.defaultBacklogEnabled.value)
 			initialSwapTime = nil
+		end
+		if missionMode then
+			SetHidden(true)
 		end
 	end
 end
@@ -1468,25 +1524,30 @@ end
 
 -----------------------------------------------------------------------
 
+local function InitializeConsole()
+	if stack_console then
+		return
+	end
+	stack_console = MakeMessageStack(1)
+	scrollpanel_console:AddChild(stack_console)
+
+	for i = 1, #consoleMessages do 
+		local msg = consoleMessages[i]
+		AddMessage(msg, 'console', true )
+	end
+	removeToMaxLines()
+end
+
 function widget:Initialize()
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget()
 		return
-	end
-	
-	local spectating = Spring.GetSpectatingState()
-	local myAllyTeamID = Spring.GetMyAllyTeamID() -- get my alliance ID
-	local teams = Spring.GetTeamList(myAllyTeamID) -- get list of teams in my alliance
-	if #teams == 1 and (not spectating) then -- if I'm alone and playing (no ally), then no need to set default-ally-chat during gamestart . eg: 1vs1
-		noAlly = true
 	end
 
 	screen0 = WG.Chili.Screen0
 	color2incolor = WG.Chili.color2incolor
 	
 	Spring.SendCommands("bind Any+enter  chat")
-	
-	stack_console = MakeMessageStack(1)
 	
 	stack_chat = MakeMessageStack(0)
 	
@@ -1580,7 +1641,6 @@ function widget:Initialize()
 		
 		--ignoreMouseWheel = not options.mousewheel.value,
 		children = {
-			stack_console,
 		},
 	}
 	
@@ -1591,7 +1651,7 @@ function widget:Initialize()
 		window_chat:AddChild(inputspace)
 	end
 	
-	window_console = MakeMessageWindow("ProConsole", options.enableConsole.value)
+	window_console = MakeMessageWindow("ProConsole", options.enableConsole.value, InitializeConsole)
 	window_console:AddChild(scrollpanel_console)
 	
 	RemakeConsole()

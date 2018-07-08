@@ -15,11 +15,6 @@ unitDef = {
   corpse              = [[DEAD]],
   
   customParams        = {
-    description_fr = [[Mechwarrior d'Assaut]],
-	description_de = [[Sturm/Riotroboter]],
-    helptext       = [[The Dante is a heavy combat unit that specializes in getting close and melting its target. Its flamethrower and twin heatrays aren't extraordinary, but its incendiary rockets can be fired in a salvo of twenty that devastates a wide swath of terrain.]],
-    helptext_fr    = [[]],
-	helptext_de    = [[Der Dante ist eine schwere Sturmeinheit f? den Fronteinsatz, wenn herkömmliche Mittel versagen. Sein Flammenwerfer und doppelläufiger Heat Ray sind zwar nichts besonderes, doch seine Brandraketen können in 20-Schuss Salven breite Schneisen in das Gelände schlagen.]],
   },
 
   explodeAs           = [[CRAWL_BLASTSML]],
@@ -109,6 +104,7 @@ unitDef = {
 	  customParams        	  = {
 		flamethrower = [[1]],
 	    setunitsonfire = "1",
+        burnchance = "0.4", -- Per-impact
 		burntime = [[450]],
 
 		light_camera_height = 1800,

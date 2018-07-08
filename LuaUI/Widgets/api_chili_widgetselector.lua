@@ -9,8 +9,7 @@ function widget:GetInfo()
     handler   = true,
     experimental = false,	
     enabled   = true,
-	alwaysStart = true,
-	hidden    = true,
+    alwaysStart = true,
   }
 end
 
@@ -94,6 +93,8 @@ local window_y
 
 --------------------------------------------------------------------------------
 --For widget list
+local USERLOCAL = "User local"
+
 local widget_checks = {}
 local green = {0,1,0,1}
 local orange =  {1,0.5,0,1}
@@ -115,6 +116,7 @@ local groupDescs = {
 	test    = "For Developers",
 	unit    = "Units",
 	ungrouped    = "Ungrouped",
+	userlocal    = USERLOCAL,
 }
 ----------------------------------------------------------------
 --May not be needed with new chili functionality
@@ -204,8 +206,6 @@ MakeWidgetList = function()
 	
 	for name,data in pairs(widgetHandler.knownWidgets) do 
 		if not data.alwaysStart then 
-			local name = name
-			local name_display = name .. (data.fromZip and ' (mod)' or '')
 			data.basename = data.basename or ''
 			data.desc = data.desc or '' --become NIL if zipfile/archive corrupted
 			data.author = data.author or ''
@@ -213,35 +213,31 @@ MakeWidgetList = function()
 
 			local lowercase_name = name:lower()
 			local lowercase_category = category:lower()
-			local lowercase_display = name_display:lower()
 			local lowercase_desc = data.desc:lower()
 			local lowercase_author = data.author:lower()
 			
 			if filterUserInsertedTerm == "" or 
 			lowercase_name:find(filterUserInsertedTerm) or
-			lowercase_display:find(filterUserInsertedTerm) or
 			lowercase_desc:find(filterUserInsertedTerm) or
 			lowercase_author:find(filterUserInsertedTerm) or
 			lowercase_category:find(filterUserInsertedTerm) 
 			then
 			
-				if not groupDescs[category] then
+				if not data.fromZip then
+					category = 'userlocal'
+				elseif not groupDescs[category] or not widget_categorize then
 					category = 'ungrouped'
 				end
+
 				local catdesc = groupDescs[category]
-				if not widget_categorize then
-					catdesc = 'Ungrouped'
-				end
 				widgets_cats[catdesc] = widgets_cats[catdesc] or {}
-					
-				widgets_cats[catdesc][#(widgets_cats[catdesc])+1] = 
-				{	
-					catname 		= catdesc,
-					name_display	= name_display,
-					name		 	= name,
-					active 			= data.active,
-					desc 			= data.desc,
-					author 			= data.author,
+
+				widgets_cats[catdesc][#(widgets_cats[catdesc])+1] = {
+					catname      = catdesc,
+					name         = name,
+					active       = data.active,
+					desc         = data.desc,
+					author       = data.author,
 				}
 				listIsEmpty = false
 			end
@@ -255,16 +251,16 @@ MakeWidgetList = function()
 	
 	--Sort widget categories
 	table.sort(widgets_cats_i, function(t1,t2)
-		return t1[1] < t2[1]
+		return (t1[1] == USERLOCAL) or (t2[1] ~= USERLOCAL and t1[1] < t2[1])
 	end)
 	
-	for _, data in pairs(widgets_cats_i) do
+	for _, data in ipairs(widgets_cats_i) do
 		local catdesc = data[1]
 		local catwidgets = data[2]
 	
 		--Sort widget names within this category
 		table.sort(catwidgets, function(t1,t2)
-			return t1.name_display < t2.name_display
+			return t1.name < t2.name
 		end)
 		widget_children[#widget_children + 1] = 
 			Label:New{ caption = '- '.. catdesc ..' -', textColor = color.sub_header, align='center', }
@@ -274,7 +270,7 @@ MakeWidgetList = function()
 			
 			--Add checkbox to table that is used to update checkbox label colors when widget becomes active/inactive
 			widget_checks[wdata.name] = Checkbox:New{ 
-					caption = wdata.name_display, 
+					caption = wdata.name, 
 					checked = enabled,
 					tooltip = '(By ' .. tostring(wdata.author) .. ")\n" .. tostring(wdata.desc),
 					OnChange = { 

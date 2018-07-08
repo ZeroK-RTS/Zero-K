@@ -19,11 +19,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_fr = [[Lazer ? Charge ?liptique]],
-	description_de = [[Planetarischer Energiemeißel]],
-    helptext       = [[This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases.]],
-    helptext_fr    = [[Le Starlight est un b?timent abritant un puissant g?n?rateur de faisceau laser ?liptique, dont l'impact est param?trable. Sa puissance est telle qu'il coupe tout sur son passage, y compris les alli?s. Pensez ? pr?voir un espace d?gag? autour de lui pour ?viter que le laser ne coupe votre base en deux en d?marrant.]],
-	helptext_de    = [[Diese gigantische Waffe nutzt ihren energetischen Strahl, um große Gräben im Terrain zu hinterlassen und dabei alles, was sich ihr in den Weg stellt, auszulöschen. Ebenfalls als Auslöscher von störenden Hindernissen, wie zum Beispiel nervtötende feindliche Enheiten und Basen, sehr nützlich.]],
 	modelradius    = [[80]],
 	aimposoffset   = [[0 35 0]],
 	midposoffset   = [[0 0 0]],
@@ -146,7 +141,7 @@ unitDef = {
       craterMult              = 8,
 
 	  customParams        	  = {
-		stats_damage = 3000,
+		stats_damage = 5400,
 
 		light_color = [[5 0.3 6]],
 		light_radius = 2000,
@@ -243,6 +238,9 @@ unitDef = {
 		light_color = [[3 0.2 4]],
 		light_radius = 1200,
 		light_beam_start = 0.8,
+		stats_damage_per_second = 5400,
+		stats_hide_reload = 1,
+		stats_hide_damage = 1,
 	  },
 	  
       damage                  = {
@@ -326,16 +324,16 @@ unitDef = {
     DEAD  = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 10,
+      footprintZ       = 10,
       object           = [[starlight_dead.dae]],
     },
 
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 10,
+      footprintZ       = 10,
       object           = [[debris3x3c.s3o]],
     },
 

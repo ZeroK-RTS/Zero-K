@@ -1,9 +1,3 @@
--- $Id: main.lua 4534 2009-05-04 23:35:06Z licho $
-
-if (AllowUnsafeChanges) then
-	AllowUnsafeChanges("USE AT YOUR OWN PERIL")
-end
-
 do  --  wrap print() in a closure
   local origPrint = print
   print = function(arg1,...)

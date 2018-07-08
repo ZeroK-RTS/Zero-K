@@ -28,6 +28,7 @@ local constantStockpile = {
 }
 
 local CMD_STOCKPILE = CMD.STOCKPILE
+local EMPTY_TABLE = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -35,6 +36,7 @@ function widget:Initialize()
 	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 		Spring.Echo("<Stockpiler>: disabled for spectators")
 		widgetHandler:RemoveWidget()
+		return
 	end
 end
 
@@ -42,18 +44,29 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	local ud = UnitDefs[unitDefID]
 	if ((ud ~= nil) and (unitTeam == Spring.GetMyTeamID())) then
 		if (ud.canStockpile) then
-			-- give stockpilers 100 units to build
-			Spring.GiveOrderToUnit(unitID, CMD.STOCKPILE, {}, { "ctrl", "shift" })
+			local stocked, queued = Spring.GetUnitStockpile(unitID)
+			if (not queued) or queued < 50 then
+				-- give stockpilers 100 units to build
+				Spring.GiveOrderToUnit(unitID, CMD.STOCKPILE, EMPTY_TABLE, CMD.OPT_CTRL + CMD.OPT_SHIFT)
+			end
 		end
+	end
+end
+
+function widget:GameFrame(n)
+	if n > 1 then
+		for _, unitID in ipairs(Spring.GetAllUnits()) do
+			widget:UnitCreated(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
+		end
+		widgetHandler:RemoveCallIn("GameFrame")
 	end
 end
 
 function widget:StockpileChanged(unitID, unitDefID, unitTeam, weaponNum, oldCount, newCount)
 	if constantStockpile[unitDefID] then
-		Spring.GiveOrderToUnit(unitID, CMD_STOCKPILE, {}, {})
+		Spring.GiveOrderToUnit(unitID, CMD_STOCKPILE, EMPTY_TABLE, 0)
 	end
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

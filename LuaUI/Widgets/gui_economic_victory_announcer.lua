@@ -44,11 +44,16 @@ options = {
 		name  = "Enable economic victory announcer",
 		type  = "bool", 
 		value = false, 
-		OnChange = function(self) 
-			enabled = self.value 
+		OnChange = function(self)
+			enabled = self.value
+			if enabled then
+				widgetHandler:UpdateCallIn("GameFrame")
+			else
+				widgetHandler:RemoveCallIn("GameFrame")
+			end
 		end, 
 		noHotkey = true,
-		desc = "Announces the total assets of the teams at set times. For use with a manually run economic victory condition.."
+		desc = "Announces the total assets of the teams at set times. For use with a manually run economic victory condition."
 	},
 	sayResult = {
 		name  = "Say results publicly (adjudicators only)",
@@ -69,6 +74,7 @@ options = {
 	},
 	econMultiplier = {
 		name  = "Economy multiplier",
+		desc  = "A team wins if it has this times more value than any other team.",
 		type  = "number",
 		value = 2, min = 1, max = 5, step = 0.1,
 	},
@@ -142,6 +148,14 @@ local function SaySomething(thingToSay)
 end
 
 local function CheckAndReportWinner(requiredMultiplier)
+	local spec, specFull = Spring.GetSpectatingState()
+	if not spec then
+		return -- not immediately salvageable, /spectator is synced and takes a round trip
+	end
+	if not specFull then
+		Spring.SendCommands("specfullview 3")
+	end
+
 	local winner, assets = GetWinningAllyTeam(requiredMultiplier)
 	if winner then
 		SaySomething(GetAllyteamName(winner) .. " (team " .. winner .. ") wins!")
@@ -161,11 +175,15 @@ end
 -- Callins
 
 function widget:GameFrame(n)
-	if not enabled then
-		return
-	end
-
 	if n == (options.firstCall.value*1800) or n == (options.secondCall.value*1800) then
 		CheckAndReportWinner(options.econMultiplier.value)
+	end
+end
+
+function widget:Initialize()
+	if enabled then
+		widgetHandler:UpdateCallIn("GameFrame")
+	else
+		widgetHandler:RemoveCallIn("GameFrame")
 	end
 end

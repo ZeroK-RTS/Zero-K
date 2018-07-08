@@ -23,13 +23,11 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Nanoturm, Baut mit 10 M/s]],
-    helptext       = [[The most cost-effective source of buildpower, the Caretaker is ideal for increasing the output of factories or automatically repairing nearby defenses. It cannot start any construction projects itself, however.]],
-    helptext_de    = [[Die effektivste Quelle an Baukraft: der Caretake ist ideal, um die Produktionsrate von Fabriken zu erhöhen oder nahegelegene Verteidigungsanlagen zu reparieren. Der Caretaker kann aber selbst keine neuen Bauten beginnen.]],
 
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -4 0]],
     modelradius    = [[24]],
+	default_spacing = 1,
   },
 
   explodeAs                     = [[NANOBOOM2]],
@@ -44,7 +42,7 @@ unitDef = {
   maxSlope                      = 15,
   maxVelocity                   = 0,
   minCloakDistance              = 150,
-  movementClass                 = [[KBOT1]],
+  movementClass                 = [[KBOT2]],
   objectName                    = [[armsenan.s3o]],
   script                        = [[staticcon.lua]],
   selfDestructAs                = [[NANOBOOM2]],

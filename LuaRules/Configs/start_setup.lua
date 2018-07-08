@@ -1,12 +1,3 @@
-startUnits = {
-	--armcom = 'armcom1',
-	--corcom = 'corcom1',
-	--commsupport = 'commsupport1',
-	--commrecon = 'commrecon1',
-	--benzcom = 'benzcom1',
-	--cremcom = 'cremcom1',
-	commbasic = 'commbasic',
-}
 
 aiCommanders = {
 	[UnitDefNames["dyntrainer_recon_base"].id] = true,
@@ -14,14 +5,6 @@ aiCommanders = {
 	[UnitDefNames["dyntrainer_assault_base"].id] = true,
 	[UnitDefNames["dyntrainer_strike_base"].id] = true,
 }
-
-local trainerComms = VFS.Include("LuaRules/Configs/comm_trainer_defs.lua")
-for name, def in pairs(trainerComms) do
-	startUnits[name] = def[1]
-end
-
---defaultComms = {}
---for i,v in pairs(startUnits) do defaultComms[v] = true end
 
 ploppables = {
   "factoryhover",

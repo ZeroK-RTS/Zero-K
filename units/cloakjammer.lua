@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakjammer]],
-  name                   = [[Eraser]],
+  name                   = [[Iris]],
   description            = [[Area Cloaker/Jammer Walker]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
@@ -12,11 +12,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Tarn-/Störsenderroboter]],
-    description_fr = [[Marcheur Brouille/Camoufleur]],
-    helptext       = [[The Eraser has a jamming device to conceal your units' radar returns. It also has a small cloak shield to hide friendly nearby units from enemy sight.]],
-    helptext_fr    = [[L'Eraser est munis d'un brouilleur d'onde qui permet de cacher vos unités des radars enemis. Il est aussi munis d'un petit bouclier de camouflage qui permet de cacher vos unités du champ de vision enemis]],
-    helptext_de    = [[Der Eraser besitzt ein Gerät zum Stören feindlicher Radarwellen. Des Weiteren ist er mit einem kleinen Tarnschild ausgestattet, um nahe, freundliche Einheiten zu tarnen.]],
 
     morphto = [[staticjammer]],
     morphtime = 30,

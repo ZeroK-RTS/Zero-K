@@ -20,7 +20,6 @@ unitDef = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
-    helptext       = [[This fat chicken is presented to you as a reward for your misdeeds. Behave next time!]],
 	level		   = [[1]],
   },
 

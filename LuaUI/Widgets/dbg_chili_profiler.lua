@@ -106,7 +106,7 @@ end
 local function AddSedateProfiler()
 	if profiling then return end
 	profiling = true
-	profilePeriod = 15000
+	profilePeriod = 2000
 	debug.sethook(trace, "l", 16000000)
 end
 

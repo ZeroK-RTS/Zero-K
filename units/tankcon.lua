@@ -4,7 +4,7 @@ unitDef = {
   description            = [[Armed Construction Tank, Builds at 7.5 m/s]],
   acceleration           = 0.066,
   brakeRate              = 1.5,
-  buildCostMetal         = 250,
+  buildCostMetal         = 230,
   buildDistance          = 180,
   builder                = true,
 
@@ -22,11 +22,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Tank de Construction Arm?e, Construit ? 7.5 m/s]],
-	description_de = [[Bewaffneter Konstruktionspanzer, Baut mit 7.5 M/s]],
-    helptext       = [[Armed with a small defensive tower, the Welder can defend itself against light enemy attacks.]],
-    helptext_fr    = [[Arm? d'une tourelle laser l?g?re, le Welder saura parfaitement se d?fendre contre les attaques de tirailleurs ou d'?claireurs.]],
-	helptext_de    = [[Mit einem kleinen Verteidigungsturm bewaffnet, kann der Welder sich selbst gegen leichte gegnerische Attacken wehren.]],
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 -10 0]],
 	modelradius    = [[30]],
@@ -40,7 +35,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 1900,
+  maxDamage              = 2000,
   maxSlope               = 18,
   maxVelocity            = 2.1,
   maxWaterDepth          = 22,
@@ -49,6 +44,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[welder.s3o]],
+  script                 = [[tankcon.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -60,12 +56,12 @@ unitDef = {
   },
 
   showNanoSpray          = false,
-  sightDistance          = 280,
+  sightDistance          = 300,
   trackOffset            = 3,
   trackStrength          = 6,
   trackStretch           = 1,
   trackType              = [[StdTank]],
-  trackWidth             = 32,
+  trackWidth             = 38,
   turninplace            = 0,
   turnRate               = 625,
   workerTime             = 7.5,
@@ -96,9 +92,9 @@ unitDef = {
       },
 
       damage                  = {
-        default = 10,
-        planes  = 10,
-        subs    = 0.5,
+        default = 9,
+        planes  = 9,
+        subs    = 0.7,
       },
 
       duration                = 0.02,
@@ -110,8 +106,8 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 220,
-      reloadtime              = 0.2 + (1/30),
+      range                   = 240,
+      reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
       soundStart              = [[weapon/laser/lasercannon_fire]],

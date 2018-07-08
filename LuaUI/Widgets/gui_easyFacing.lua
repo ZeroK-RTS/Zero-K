@@ -9,7 +9,7 @@ function widget:GetInfo()
 		date      = "2009.08.10",
 		license   = "GNU GPL v2",
 		layer     = 0,
-		enabled   = false
+		enabled   = true
 	}
 end
 
@@ -18,10 +18,12 @@ end
 -- CONFIGURATION
 local debug = false
 local updateInt = 1 --seconds for the ::update loop
-local sens = 20	--rotate mouse sensitivity (length of 1 mouse movement vector). Smaller value = higher sensitivity
+local sens = 50 --rotate mouse sensitivity (length of 1 mouse movement vector). Smaller value = higher sensitivity
 local drawForAll = false --draw facing direction also for other buildings than labs
 local drawForTurret = false --draw facing direction for all unit that can attack
-local timesens = 0.100 --rotate mouse time sensitivity (second for 1 mouse movement vector). Bigger value = higher sensitivity
+local timesens = 0.06 --rotate mouse time sensitivity (second for 1 mouse movement vector). Bigger value = higher sensitivity
+
+local USE_META = false -- Meta (space) functionality is disabled
 --------------------------------------------------------------------------------
 local inDrag = false
 local metaStart = false
@@ -182,6 +184,7 @@ end
 function manipulateFacing()	
 	local mx,my,lmb,mmb,rmb = spGetMouseState()
 	local alt,ctrl,meta,shift = spGetModKeyState()
+	meta = meta and USE_META
 	
 	if ( lmb and mouseLbLast == false) or ( meta and not inDrag and not lmb ) then
 		--in
@@ -264,8 +267,8 @@ function drawOrientation()
 	local unitDefID = -cmd_id
 	local alt,ctrl,meta,shift = spGetModKeyState()
 	
-	local udef = udefTab[unitDefID]
-	if not (drawForAll or udef["isFactory"] or (drawForTurret and udef.canAttack)) then
+	local ud = udefTab[unitDefID]
+	if not (drawForAll or ud["isFactory"] or (drawForTurret and ud.canAttack)) then
 		return
 	end
 	
@@ -280,12 +283,21 @@ function drawOrientation()
 	local _, coords = spTraceScreenRay(mx, my, true, true)
 	
 	if not coords then return end
-		
+	
 	local centerX = coords[1]
 	local centerY = coords[2]
 	local centerZ = coords[3]
+	local facing = spGetBuildFacing()
 	
-	centerX, centerY, centerZ = spPos2BuildPos( unitDefID, centerX, centerY, centerZ )
+	local footX = ud.xsize/2
+	local footZ = ud.zsize/2
+	if (facing == 1 or facing == 3) then
+		centerX = math.floor((centerX + (1 - footZ%2)*8)/16)*16 + (footZ%2)*8
+		centerZ = math.floor((centerZ + (1 - footX%2)*8)/16)*16 + (footX%2)*8
+	else
+		centerX = math.floor((centerX + (1 - footX%2)*8)/16)*16 + (footX%2)*8
+		centerZ = math.floor((centerZ + (1 - footZ%2)*8)/16)*16 + (footZ%2)*8
+	end
 	
 	glLineWidth(1)
 	glColor( 0.0, 1.0, 0.0, 0.5 )
@@ -293,11 +305,15 @@ function drawOrientation()
 	local function drawFunc()
 		glVertex( 0, 0, -8)
 		glVertex( 0, 0, 8)
-		glVertex( 50, 0, -3)
+		glVertex( 48, 0, -3)
 
 		glVertex( 0, 0,  8)
-		glVertex( 50, 0, 3)
-		glVertex( 50, 0, -3 )
+		glVertex( 48, 0, 3)
+		glVertex( 48, 0, -3 )
+		
+		glVertex( 50, 0,  0)
+		glVertex( 48, 0, 3)
+		glVertex( 48, 0, -3 )
 		
 		glVertex( 50, 0, 0)
 		glVertex( 30, 0, -30 )
@@ -309,10 +325,9 @@ function drawOrientation()
 	end
   
 	--local height = spGetGroundHeight( centerX, centerZ )
-	local transSpace = udef["zsize"] * 4   --should be ysize but its not there?!?
+	local transSpace = ud["zsize"] * 4   --should be ysize but its not there?!?
 
 	local transX, transZ
-	local facing = spGetBuildFacing()
 	if ( facing == 0 ) then
 		transX = 0
 		transZ = transSpace
@@ -328,14 +343,14 @@ function drawOrientation()
 	end
 
 	glPushMatrix()
-	
+	gl.DepthTest(false)
 	glTranslate( centerX + transX, centerY, centerZ + transZ)
 	glRotate( ( 3 + facing ) * 90, 0, 1, 0 )
 	glScale( (transSpace or 70)/70, 1.0, (transSpace or 70)/70)
 	glBeginEnd( GL_TRIANGLES, drawFunc )
-	
 	glScale( 1.0, 1.0, 1.0 )
 	
+	gl.DepthTest(true)
 	glPopMatrix()
 
 	glColor( 1.0, 1.0, 1.0 )

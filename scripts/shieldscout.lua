@@ -14,81 +14,41 @@ local box = piece 'box'
 
 local smokePiece = { box }
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- walk anim constants
-local PACE = 3
-
-local THIGH_FRONT_ANGLE = math.rad(-50)
-local THIGH_FRONT_SPEED = math.rad(60) * PACE
-local THIGH_BACK_ANGLE = math.rad(10)
-local THIGH_BACK_SPEED = math.rad(60) * PACE
-local CALF_RETRACT_ANGLE = math.rad(0)
-local CALF_RETRACT_SPEED = math.rad(90) * PACE
-local CALF_STRAIGHTEN_ANGLE = math.rad(70)
-local CALF_STRAIGHTEN_SPEED = math.rad(90) * PACE
-local FOOT_FRONT_ANGLE = -THIGH_FRONT_ANGLE - math.rad(10)
-local FOOT_FRONT_SPEED = 2*THIGH_FRONT_SPEED
-local FOOT_BACK_ANGLE = -(THIGH_BACK_ANGLE + CALF_STRAIGHTEN_ANGLE)
-local FOOT_BACK_SPEED = THIGH_BACK_SPEED + CALF_STRAIGHTEN_SPEED
-local BODY_TILT_ANGLE = math.rad(5)
-local BODY_TILT_SPEED = math.rad(10)
-local BODY_RISE_HEIGHT = 4
-local BODY_RISE_SPEED = 6*PACE
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- signals
 local SIG_Walk = 1
 local SIG_AIM = 2
 local SIG_RESTORE = 4
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- four-stroke bipedal (reverse-jointed) walkscript
-local function WalkAnim()
-	local speed = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
-	--straighten left leg and draw it back, raise body, center right leg
-	Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED*speed)
-	Turn(pelvis, z_axis, BODY_TILT_ANGLE, BODY_TILT_SPEED*speed)
-	Turn(lthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED*speed)
-	Turn(lcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED*speed)
-	Turn(lfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED*speed)		
-	Turn(rthigh, x_axis, 0, THIGH_FRONT_SPEED*speed)
-	Turn(rcalf, x_axis, 0, CALF_RETRACT_SPEED*speed)
-	Turn(rfoot, x_axis, 0, FOOT_FRONT_SPEED*speed)
-	WaitForTurn(lthigh, x_axis)
-	Sleep(0)
+-- walk animation
+local function Step(front, back)
+	Turn(front.thigh, x_axis, math.rad(70), math.rad(230))
+	Turn(front.calf, x_axis, math.rad(20), math.rad(270))
+	Turn(front.foot, x_axis, math.rad(-100), math.rad(420))
 	
-	-- lower body, draw right leg forwards
-	Move(pelvis, y_axis, 0, BODY_RISE_SPEED*speed)
-	Turn(pelvis, z_axis, 0, BODY_TILT_SPEED*speed)
-	--Turn(lcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
-	Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED*speed)
-	Turn(rfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED*speed)	
-	WaitForMove(pelvis, y_axis)
-	Sleep(0)
+	Turn(back.thigh, x_axis, math.rad(-20), math.rad(420))
+	Turn(back.calf, x_axis, math.rad(50), math.rad(420))
+	Turn(back.foot, x_axis, math.rad(30), math.rad(420))
 	
-	--straighten right leg and draw it back, raise body, center left leg
-	Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED*speed)
-	Turn(pelvis, z_axis, -BODY_TILT_ANGLE, BODY_TILT_SPEED*speed)
-	Turn(lthigh, x_axis, 0, THIGH_FRONT_SPEED*speed)
-	Turn(lcalf, x_axis, 0, CALF_RETRACT_SPEED*speed)
-	Turn(lfoot, x_axis, 0, FOOT_FRONT_SPEED*speed)		
-	Turn(rthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED*speed)
-	Turn(rcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED*speed)
-	Turn(rfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED*speed)		
-	WaitForTurn(rthigh, x_axis)
-	Sleep(0)
+	Turn(pelvis, z_axis, math.rad(-(5)), math.rad(40))
+	Turn(front.thigh, z_axis, math.rad(-(-5)), math.rad(40))
+	Turn(front.thigh, z_axis, math.rad(-(-5)), math.rad(40))
+	Move(pelvis, y_axis, 0.7, 8000)
 	
-	-- lower body, draw left leg forwards
-	Move(pelvis, y_axis, 0, BODY_RISE_SPEED*speed)
-	Turn(pelvis, z_axis, 0, BODY_TILT_SPEED*speed)
-	Turn(lthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED*speed)
-	Turn(lfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED*speed)			
-	--Turn(rcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
-	WaitForMove(pelvis, y_axis)
-	Sleep(0)
+	WaitForTurn(front.thigh, x_axis)
+	
+	Turn(front.thigh, x_axis, math.rad(-10), math.rad(320))
+	Turn(front.calf, x_axis, math.rad(-60), math.rad(500))
+	Turn(front.foot, x_axis, math.rad(70), math.rad(270))
+	
+	Turn(back.thigh, x_axis, math.rad(40), math.rad(270))
+	Turn(back.calf, x_axis, math.rad(-40), math.rad(270))
+	Turn(back.foot, x_axis, 0, math.rad(270))
+	
+	Move(pelvis, y_axis, 0, 8000)
+	Turn(box, x_axis, math.rad(10), math.rad(40))
+	WaitForTurn(front.calf, x_axis)
+	
+	Turn(box, x_axis, math.rad(-10), math.rad(40))
 end
 
 local function Walk()
@@ -96,7 +56,8 @@ local function Walk()
 	SetSignalMask(SIG_Walk)
 	
 	while true do
-		WalkAnim()
+		Step(leftLeg, rightLeg)
+		Step(rightLeg, leftLeg)
 	end
 end
 
@@ -213,14 +174,13 @@ local function Stopping()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 	
-	Turn(rthigh, x_axis, 0, math.rad(80)*PACE)
-	Turn(rcalf, x_axis, 0, math.rad(120)*PACE)
-	Turn(rfoot, x_axis, 0, math.rad(80)*PACE)
-	Turn(lthigh, x_axis, 0, math.rad(80)*PACE)
-	Turn(lcalf, x_axis, 0, math.rad(80)*PACE)
-	Turn(lfoot, x_axis, 0, math.rad(80)*PACE)
-	Turn(pelvis, z_axis, 0, math.rad(20)*PACE)
-	Move(pelvis, y_axis, 0, 12*PACE)
+	Move(pelvis, y_axis, 0.000000, 1.000000)
+	Turn(rightLeg.thigh, x_axis, 0, math.rad(200))
+	Turn(rightLeg.calf, x_axis, 0, math.rad(200))
+	Turn(rightLeg.foot, x_axis, 0, math.rad(200))
+	Turn(leftLeg.thigh, x_axis, 0, math.rad(200))
+	Turn(leftLeg.calf, x_axis, 0, math.rad(200))
+	Turn(leftLeg.foot, x_axis, 0, math.rad(200))
 end
 
 function script.StartMoving()
@@ -276,6 +236,10 @@ end
 
 -----------------------------
 -- Death
+
+function Detonate() -- Giving an order causes recursion.
+	GG.QueueUnitDescruction(unitID)
+end
 
 function script.Killed(recentDamage, maxHealth)
 	Explode(box, sfxShatter + sfxSmoke)

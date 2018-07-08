@@ -15,9 +15,6 @@ unitDef = {
   collisionVolumeType	        = [[CylY]],
 
   customParams                  = {
-    description_de = [[Seismische Rakete]],
-    helptext       = [[The Quake creates a powerful seismic shockwave that smooths a wide area of terrain, while causing minimal harm to units.]],
-    helptext_de    = [[Die Rakete Quake erzeugt eine akustische Schockwelle, welche die anliegend Boden glatt macht, aber nur minimale Schäden an Einheiten aus Metall und Kohlenstoff-Nanoröhrchen verursacht.]],
     mobilebuilding = [[1]],
   },
 
@@ -96,7 +93,7 @@ unitDef = {
       reloadtime              = 10,
       smokeTrail              = false,
       soundHit                = [[explosion/ex_large4]],
-      soundStart              = [[weapon/missile/tacnuke_launch]],
+      soundStart              = [[weapon/missile/tacnuke_launch2_trimmed]],
       tolerance               = 4000,
       turnrate                = 18000,
       waterWeapon             = true,

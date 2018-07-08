@@ -116,7 +116,7 @@ options = {
 		name = "Use Sounds",
 		type = "bool",
 		value = true,
-		desc = "Hides the visible bar",
+		desc = "Voice announcements for events.",
 	},
 	
 }
@@ -124,8 +124,8 @@ options = {
 local timeoutConstant = 60
 
 local sounds = {
-	unitComplete = {file = "LuaUI/sounds/voices/productionc_arm_1.wav"},
-	structureComplete = {file = "LuaUI/sounds/voices/constructionc_arm_1.wav"},
+	unitComplete = {file = "sounds/reply/advisor/unit_operational.wav"},
+	structureComplete = {file = "sounds/reply/advisor/construction_complete.wav"},
 	factoryIdle = {file = "sounds/reply/advisor/factory_idle.wav"},
 	
 	aircraftShotDown = {file = "sounds/reply/advisor/aircraft_shot_down.wav"},
@@ -337,7 +337,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (ud.canFly) then AddEvent(humanName .. " shot down", unitDefID, colorRed, "aircraftShotDown", pos)
 	elseif (ud.isFactory) then AddEvent(humanName .. ": factory destroyed", unitDefID, colorRed, "buildingDestroyed", pos)
 	elseif (ud.customParams.commtype) then AddEvent(humanName .. ": commander lost", unitDefID, colorRed, "commanderLost", pos)
-	elseif (ud.isBuilding) then AddEvent(humanName .. ": building destroyed", unitDefID, colorRed, "buildingDestroyed", pos)
+	elseif (ud.isImmobile) then AddEvent(humanName .. ": building destroyed", unitDefID, colorRed, "buildingDestroyed", pos)
 	elseif (ud.modCategories.ship) or (ud.modCategories.sub) then AddEvent(humanName .. " sunk", unitDefID, colorRed, "unitLost", pos)
 	elseif (ud.isBuilder) then AddEvent(humanName .. ": constructor lost", unitDefID, colorRed, "unitLost", pos)
 	else AddEvent(humanName .. ": unit lost", unitDefID, colorRed, "unitLost", pos)

@@ -16,8 +16,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-
-    helptext       = [[The Anarchid is like a Starlight, but a Spider]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

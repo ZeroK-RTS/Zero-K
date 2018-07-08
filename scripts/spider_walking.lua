@@ -13,7 +13,7 @@ function walk(br, mr, fr, bl, ml, fl,
 		legBackwardAngle, legBackwardOffset, legBackwardSpeed, legBackwardTheta,
 		sleepTime)
 		
-	local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+	local slowState = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 	if slowState ~= 1 then
 		legRaiseSpeed = legRaiseSpeed * slowState
 		legLowerSpeed = legLowerSpeed * slowState

@@ -11,12 +11,11 @@ unitDef = {
   canMove                = true,
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 5 0]],
-  collisionVolumeScales  = [[20 20 60]],
+  collisionVolumeScales  = [[25 25 60]],
   collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[Cheap, fast, and fragile, this Picket Ship is a good scout and spotter for more expensive ships. In numbers, their disarming missiles are effective against larger targets.]],
     modelradius    = [[12]],
     turnatfullspeed = [[1]],
   },
@@ -123,7 +122,7 @@ unitDef = {
       },
 	  
       damage                  = {
-        default = 34.1,
+        default = 35,
         subs    = 5,
       },
 
@@ -137,8 +136,8 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_armpt.s3o]],
-      range                   = 330,
-      reloadtime              = 1.5,
+      range                   = 260,
+      reloadtime              = 2.0,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/small_lightning_missile]],
       soundStart              = [[weapon/missile/missile_fire7]],
@@ -169,7 +168,7 @@ unitDef = {
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[debris4x4a.s3o]],
+      object           = [[debris2x2b.s3o]],
     },
 
   },

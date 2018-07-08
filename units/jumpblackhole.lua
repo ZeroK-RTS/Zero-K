@@ -17,7 +17,6 @@ unitDef = {
   corpse                = [[DEAD]],
 
   customParams          = {
-    helptext       = [[The Placeholder is a support unit. Its projectiles create a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.]],
     midposoffset   = [[0 10 0]],
   },
 
@@ -35,11 +34,10 @@ unitDef = {
   maxWaterDepth         = 22,
   minCloakDistance      = 75,
   movementClass         = [[KBOT2]],
-  moveState             = 0,
   noAutoFire            = false,
   noChaseCategory       = [[FIXEDWING SATELLITE GUNSHIP SUB TURRET UNARMED]],
   objectName            = [[freaker.s3o]],
-  script		        = [[jumpblackhole.lua]],
+  script                = [[jumpblackhole.lua]],
   selfDestructAs        = [[BIG_UNITEX]],
   selfDestructCountdown = 5,
 
@@ -80,7 +78,7 @@ unitDef = {
       name                    = [[Black Hole Launcher]],
       accuracy                = 350,
       areaOfEffect            = 300,
-	  avoidFeature            = false,
+      avoidFeature            = false,
       avoidFriendly           = false,
       burnblow                = true,
       collideFeature          = false,

@@ -154,7 +154,7 @@ local function closeBay(piece)
 end
 
 function Carrier_droneCompleted(piece)
-	if(piece) then	
+	if(piece) then
 		local bay = droneBays[piece];
 		if(bay) then
 			StartThread(closeBay,piece);
@@ -168,18 +168,16 @@ local function ExplodeBay(piece)
 	EmitSfx(piece, 1024)
 end
 
+local function DoSomeHax()
+	Sleep(33)
+	local commands = Spring.GetCommandQueue(unitID, 0)
+	if commands == 0 then
+		Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
+	end
+end
+
 function script.BlockShot(num, targetID)
-	if not targetID then
-		return false
-	end
-	if GG.DontFireRadar_CheckBlock(unitID, targetID) then
-		return true
-	end
-	-- Seperation check is not required as the physics of the missile seems to result in a
-	-- time to impact of between 140 and 150 frames in almost all cases.
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 800.1, 150, false, false, true) then
-		return true
-	end
+	StartThread(DoSomeHax)
 	return false
 end
 
@@ -230,5 +228,3 @@ function script.Killed(recentDamage, maxHealth)
 		return 2
 	end
 end
-
-		

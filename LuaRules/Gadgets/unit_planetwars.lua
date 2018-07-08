@@ -45,6 +45,7 @@ local spAreTeamsAllied  = Spring.AreTeamsAllied
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 local lava = (Game.waterDamage > 0)
+local INLOS_ACCESS = {inlos = true}
 local DEFENDER_ALLYTEAM = 1
 
 local gaiaTeamID = Spring.GetGaiaTeamID()
@@ -53,7 +54,8 @@ local TELEPORT_CHARGE_NEEDED = 10*60 -- seconds
 local TELEPORT_FRAMES = 30*60 -- 1 minute
 local TELEPORT_CHARGE_PERIOD = 30 -- Frames
 local TELEPORT_CHARGE_RATE = TELEPORT_CHARGE_PERIOD/30 -- per update
-local teleportChargeNeededMult = 1
+local BATTLE_TIME_LIMIT = 30*60*60*2 -- Defenders win after 2 hours
+local teleportChargeNeededMult = false
 
 local STRUCTURE_SPACING = 192
 
@@ -97,7 +99,7 @@ local planetwarsStructureCount = 0 -- For GameRulesParams structure list
 local destroyedStructureCount = 0
 local evacStructureCount = 0
 
-local wormholeUnitID
+local wormholeList = {}
 local planetwarsBoxes = {}
 
 local vector = Spring.Utilities.Vector
@@ -166,6 +168,10 @@ local function UpdateEvacState()
 	Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NOTHING_TO_EVAC)
 end
 
+local function MakeDefendersWinBattle()
+	GG.CauseVictory(DEFENDER_ALLYTEAM)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -174,7 +180,7 @@ local teleportingUnit, teleportFrame
 local removingTeleportingUnit = false -- set to true prior to DestroyUnit call when teleporting out, then false immediately after
 
 local function SetTeleportCharge(newCharge)
-	if newCharge > TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
+	if teleportChargeNeededMult and newCharge > TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
 		newCharge = TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult
 	end
 	if newCharge == teleportCharge then
@@ -187,13 +193,19 @@ end
 local function CheckSetWormhole(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	local chargeMult = wormholeDefs[unitDefID]
-	if not chargeMult then
+	if (not chargeMult) or (Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1) then
 		return
 	end
-	wormholeUnitID = unitID
-	teleportChargeNeededMult = chargeMult
-	
-	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
+	if (not teleportChargeNeededMult) or chargeMult < teleportChargeNeededMult then
+		if wormholeList[1] then
+			wormholeList[#wormholeList + 1] = wormholeList[1]
+		end
+		wormholeList[1] = unitID
+		teleportChargeNeededMult = chargeMult
+		Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
+	else
+		wormholeList[#wormholeList + 1] = unitID
+	end
 end
 
 local function CancelTeleport()
@@ -206,28 +218,49 @@ local function CancelTeleport()
 end
 
 local function CheckRemoveWormhole(unitID, unitDefID)
-	if wormholeUnitID ~= unitID then
+	if not wormholeDefs[unitDefID] then
 		return
 	end
-	if teleportingUnit == wormholeUnitID then
-		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NO_WORMHOLE)
-	else
-		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.WORMHOLE_DESTROYED)
+	
+	if wormholeList[1] ~= unitID then
+		for i = 2, #wormholeList do
+			if unitID == wormholeList[i] then
+				wormholeList[i] = wormholeList[#wormholeList]
+				wormholeList[#wormholeList] = nil
+				return
+			end
+		end
+		Spring.Echo("PlanetWars error: wormhole not found", i)
+		return
 	end
-	RemoveEvacCommands()
-	wormholeUnitID = nil
+	
 	if teleportingUnit then
 		CancelTeleport()
+	end
+	
+	if #wormholeList == 1 then
+		RemoveEvacCommands()
+		wormholeList[1] = nil
+		Spring.SetGameRulesParam("pw_evacuable_state", removingTeleportingUnit and EVAC_STATE.NO_WORMHOLE or EVAC_STATE.WORMHOLE_DESTROYED)
+		return
+	end
+	
+	local survivingWormholes = Spring.Utilities.CopyTable(wormholeList)
+	teleportChargeNeededMult = false
+	wormholeList = {}
+	
+	for i = 2, #survivingWormholes do
+		CheckSetWormhole(survivingWormholes[i])
 	end
 end
 
 local function TeleportChargeTick()
-	if not wormholeUnitID then
+	if not (wormholeList[1] and teleportChargeNeededMult) then
 		return
 	end
-	local stunnedOrInbuild = Spring.GetUnitIsStunned(wormholeUnitID)
-	local allyTeamID = Spring.GetUnitAllyTeam(wormholeUnitID)
-	local chargeFactor = ((stunnedOrInbuild or (allyTeamID ~= DEFENDER_ALLYTEAM)) and 0) or Spring.GetUnitRulesParam(wormholeUnitID, "totalReloadSpeedChange") or 1
+	local stunnedOrInbuild = Spring.GetUnitIsStunned(wormholeList[1])
+	local allyTeamID = Spring.GetUnitAllyTeam(wormholeList[1])
+	local chargeFactor = ((stunnedOrInbuild or (allyTeamID ~= DEFENDER_ALLYTEAM)) and 0) or Spring.GetUnitRulesParam(wormholeList[1], "totalReloadSpeedChange") or 1
 	
 	if teleportingUnit then
 		if chargeFactor == 0 then
@@ -470,7 +503,13 @@ local function SpawnStructure(info, teamID, boxData)
 		flattenAreas[#flattenAreas + 1] = {x-sX, z-sZ, x+sX, z+sZ, y}
 	end
 	
+	if info.isInactive then
+		GG.applyPlanetwarsDisable = true
+	end
 	local unitID = Spring.CreateUnit(info.unitname, x, y, z, direction, teamID, false, false)
+	if info.isInactive then
+		GG.applyPlanetwarsDisable = false
+	end
 	CheckSetWormhole(unitID)
 	
 	AddNoGoZone(x, z, math.max(sX, sZ) + STRUCTURE_SPACING)
@@ -480,7 +519,8 @@ local function SpawnStructure(info, teamID, boxData)
 	
 	if unitDef.customParams.invincible or teamID == gaiaTeamID then
 		-- Makes structures not auto-attacked.
-		Spring.SetUnitNeutral(unitID,true) 
+		Spring.SetUnitNeutral(unitID,true)
+		Spring.SetUnitRulesParam(unitID, "avoidRightClickAttack", 1)
 	end
 	
 	if GetUnitCanEvac(unitDef) then
@@ -573,7 +613,7 @@ end
 local function TeleportOut(unitID)
 	local _,_,_,x,y,z = Spring.GetUnitPosition(unitID, true)
 	Spring.SpawnCEG("gate", x, y, z)
-	Spring.PlaySoundFile("sounds/misc/teleport2.wav", 20, x, y, z)
+	Spring.PlaySoundFile("sounds/misc/teleport_alt.wav", 20, x, y, z)
 	removingTeleportingUnit = true
 	Spring.DestroyUnit(unitID, false, true)
 	removingTeleportingUnit = false
@@ -623,6 +663,16 @@ function gadget:GameFrame(frame)
 			end
 		end
 	end
+	if frame >= BATTLE_TIME_LIMIT then
+		MakeDefendersWinBattle()
+	end
+end
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam)
+	if GG.applyPlanetwarsDisable then
+		Spring.SetUnitRulesParam(unitID, "planetwarsDisable", 1, INLOS_ACCESS)
+		GG.UpdateUnitAttributes(unitID)
+	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
@@ -641,7 +691,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 		unitsByID[unitID] = nil
 		UpdateEvacState()
-		CheckRemoveWormhole(unitID)
+		CheckRemoveWormhole(unitID, unitDefID)
 	end
 	if hqs[unitID] then
 		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam))
@@ -676,7 +726,7 @@ function gadget:GamePreload()
 	SetTeleportCharge(0)
 	
 	if haveEvacuable then
-		if wormholeUnitID then
+		if wormholeList[1] then
 			Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.ACTIVE)
 		else
 			Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NO_WORMHOLE)
@@ -697,7 +747,9 @@ local function InitializeUnitsToSpawn()
 	else
 		pwDataRaw = string.gsub(pwDataRaw, '_', '=')
 		pwDataRaw = Spring.Utilities.Base64Decode(pwDataRaw)
-		pwDataFunc, err = loadstring("return "..pwDataRaw)
+		pwDataRaw = pwDataRaw:gsub("True,", "true,")
+		pwDataRaw = pwDataRaw:gsub("False,", "false,")
+		pwDataFunc, err = loadstring("return ".. pwDataRaw)
 		if pwDataFunc then
 			success, unitData = pcall(pwDataFunc)
 			if not success then	-- execute Borat
@@ -744,6 +796,10 @@ function gadget:Initialize()
 
 	local edgePadding = math.max(200, math.min(math.min(Game.mapSizeX, Game.mapSizeZ)/4 - 800, 800))
 	planetwarsBoxes = GG.GetPlanetwarsBoxes(0.2, 0.25, 0.3, edgePadding)
+	if not planetwarsBoxes then
+		gadgetHandler:RemoveGadget()
+		return
+	end
 	
 	initialiseNoGoZones()
 	structureSpawnData, spawningAnything = InitializeUnitsToSpawn()
@@ -767,7 +823,7 @@ function gadget:Initialize()
 	--end
 	
 	Spring.SetGameRulesParam("pw_teleport_time", TELEPORT_FRAMES)
-	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
+	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*(teleportChargeNeededMult or 1))
 end
 
 function gadget:AllowCommand_GetWantedCommand()

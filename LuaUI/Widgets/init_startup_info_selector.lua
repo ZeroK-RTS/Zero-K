@@ -1,4 +1,4 @@
-local versionNumber = "1.22"
+local versionNumber = "1.337"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:GetInfo()
@@ -21,7 +21,8 @@ function CheckForSpec()
 end
 
 include("Widgets/COFCTools/ExportUtilities.lua")
-VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
+VFS.Include("LuaRules/Utilities/tobool.lua")
+local GetRawBoxes = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --[[
@@ -31,9 +32,7 @@ _ Show a windows at game start with pictures to choose commander type.
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetGameRulesParam = Spring.GetGameRulesParam
--- FIXME use tobool instead of this string comparison silliness
 local coop = false
-local forcejunior = (Spring.GetModOptions().forcejunior == "1") or false
 
 local Chili
 local Window
@@ -44,15 +43,17 @@ local screen0
 local Image
 local Button
 
-local vsx, vsy = widgetHandler:GetViewSizes()
+local vsx, vsy = Spring.GetViewGeometry()
 local modoptions = Spring.GetModOptions() --used in LuaUI\Configs\startup_info_selector.lua for planetwars
+local campaignBattleID = modoptions.singleplayercampaignbattleid
 local fixedStartPos = modoptions.fixedstartpos
 local selectorShown = false
 local mainWindow
 local scroll
 local grid
 local trainerCheckbox
-local buttons = {}
+local showModulesCheckbox
+local buttonData = {}
 local buttonLabels = {}
 local trainerLabels = {}
 local actionShow = "showstartupinfoselector"
@@ -60,8 +61,7 @@ local optionData
 
 local noComm = false
 local wantClose = false
-local gameframe = Spring.GetGameFrame()
-local COMM_DROP_FRAME = 450
+
 local WINDOW_WIDTH = 720
 local WINDOW_HEIGHT = 480
 local BUTTON_WIDTH = 128
@@ -69,33 +69,49 @@ local BUTTON_HEIGHT = 128
 
 if (vsx < 1024 or vsy < 768) then 
 	--shrinker
-	WINDOW_WIDTH = vsx* (WINDOW_WIDTH/1024)
-	WINDOW_HEIGHT = vsy* (WINDOW_HEIGHT/768)
-	BUTTON_WIDTH = vsx* (BUTTON_WIDTH/1024)
-	BUTTON_HEIGHT = vsy* (BUTTON_HEIGHT/768)
+	WINDOW_WIDTH = vsx*(WINDOW_WIDTH/1024)
+	WINDOW_HEIGHT = vsy*(WINDOW_HEIGHT/768)
+	BUTTON_WIDTH = vsx*(BUTTON_WIDTH/1024)
+	BUTTON_HEIGHT = vsy*(BUTTON_HEIGHT/768)
 end
+
+local commTips = {
+	["LuaUI/Images/startup_info_selector/chassis_benzcom.png"] = "Select Guardian Chassis\nA tanky chassis with access to a wide range of weapons. Hampered by its slow speed. Can dual wield.",
+	["LuaUI/Images/startup_info_selector/chassis_commrecon.png"] = "Select Recon Chassis\nA nimble chassis that uses speed and jumpjets to explore the map and avoid opposition. Otherwise has poor survivability.",
+	["LuaUI/Images/startup_info_selector/chassis_commstrike.png"] = "Select Strike Chassis\nAn all-round chassis with decent speed and health. Can dual wield.",
+	["LuaUI/Images/startup_info_selector/chassis_commsupport.png"] = "Select Engineer Chassis\nA chassis focused on economy that uses its high build range and base build power to increase production. It has relatively poor speed and health.",
+}
 
 --local wantLabelUpdate = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- wait for next screenframe so Grid can resize its elements first	-- doesn't actually work
 local function ToggleTrainerButtons(bool)
-	for i=1,#buttons do
-		if buttons[i].trainer then
+	for i=1,#buttonData do
+		if buttonData[i].trainer then
 			if bool then
-				grid:AddChild(buttons[i])
+				grid:AddChild(buttonData[i].control)
 			else
-				grid:RemoveChild(buttons[i])
+				grid:RemoveChild(buttonData[i].control)
 			end
 		end
+	end
+end
+
+local function ToggleModuleTooltip(bool)
+	for i = 1, #buttonData do
+		buttonData[i].control.tooltip = ((bool and (buttonData[i].tooltip .. "\n\n\n")) or "") .. (commTips[buttonData[i].image] or "")
+		buttonData[i].control:Invalidate()
 	end
 end
 
 options_path = 'Settings/HUD Panels/Commander Selector'
 options = {
 	hideTrainers = {
-		name = 'Hide Trainer Commanders',
-		--desc = '',
+		name = 'Hide default commanders',
+		desc = 'You can customize your commanders on the Zero-K site: https://zero-k.info',
+		-- use the below after Chobby replaces site for customisation
+		-- desc = 'You can customize your commanders before the game, in the main menu.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -107,6 +123,34 @@ options = {
 			end
 			ToggleTrainerButtons(not self.value)
 		end
+	},
+	showModules = {
+		name = 'Module tooltips',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function(self)
+			if showModulesCheckbox then
+				showModulesCheckbox.checked = self.value
+				showModulesCheckbox.state.checked = self.value
+				showModulesCheckbox:Invalidate()
+			end
+			ToggleModuleTooltip(self.value)
+		end
+	},
+	cameraZoom = {
+		name = 'Zoom camera to start position',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	},
+	cameraZoomDistance = {
+		name = 'Start position zoom distance',
+		desc = "Distance that the start position zoom zooms the camera to.",
+		type = 'number',
+		value = 1100,
+		min = 400, max = 3000, step = 50,
+		noHotkey = true,
 	},
 }
 --------------------------------------------------------------------------------
@@ -136,54 +180,79 @@ local function GetStartZoomBounds()
 		if not x then
 			x, _, z = Spring.GetTeamStartPosition(teamID)
 		end
-		return x, z, x, z, 0, 1800, 0
+		return x, z, x, z, 0, options.cameraZoomDistance.value, 0
 	end
-	
-	local startboxes = GetRawBoxes()
-	local startbox = startboxes[Spring.GetMyAllyTeamID()]
+
 	local minX, minZ, maxX, maxZ, maxY = Game.mapSizeX, Game.mapSizeZ, 0, 0, 0
-	
-	if not (startbox and startbox.boxes) then
+
+	local myBoxID = Spring.GetTeamRulesParam(Spring.GetMyTeamID(), "start_box_id")
+	if not myBoxID then
 		return minX, minZ, maxX, maxZ, maxY
 	end
-	
-	for i = 1, #startbox.boxes do
-		for j = 1, #startbox.boxes[i] do
-			local boxPoint = startbox.boxes[i][j]
-			-- Spring.Echo("startbox["..i.."]: {"..boxPoint[1]..", "..boxPoint[2].."}, Bounds: x: "..minX.." - "..maxX..", z: "..minZ.." - "..maxZ..", maxY: "..maxY)
-			minX = math.min(minX, boxPoint[1])
-			minZ = math.min(minZ, boxPoint[2])
-			maxX = math.max(maxX, boxPoint[1])
-			maxZ = math.max(maxZ, boxPoint[2])
-			maxY = math.max(maxY, Spring.GetGroundHeight(boxPoint[1], boxPoint[2]))
+
+	local rawBoxes = GetRawBoxes()
+	if not rawBoxes then
+		return minX, minZ, maxX, maxZ, maxY
+	end
+
+	local myBox = rawBoxes[myBoxID]
+	if not myBox then
+		return minX, minZ, maxX, maxZ, maxY
+	end
+
+	local polygons = myBox.boxes
+	if not polygons then
+		return minX, minZ, maxX, maxZ, maxY
+	end
+
+	for i = 1, #polygons do
+		local vertices = polygons[i]
+		for j = 1, #vertices do
+			local vertex = vertices[j]
+			minX = math.min(minX, vertex[1])
+			minZ = math.min(minZ, vertex[2])
+			maxX = math.max(maxX, vertex[1])
+			maxZ = math.max(maxZ, vertex[2])
+			maxY = math.max(maxY, Spring.GetGroundHeight(vertex[1], vertex[2]))
 		end
 	end
-	
+
 	return minX, minZ, maxX, maxZ, maxY
 end
 
-local cameraMoved = false
-function Close(permanently)
+local function RemoveSideButton()
+	if not buttonWindow then
+		return
+	end
+
+	screen0:RemoveChild(buttonWindow)
+	buttonWindow:Dispose()
+	buttonWindow = nil
+	widgetHandler:RemoveAction(actionShow)
+end
+
+function WG.ZoomToStart()
+	cameraAlreadyMoved = true
+	local minX, minZ, maxX, maxZ, maxY, height, smoothness = GetStartZoomBounds()
+	SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, smoothness or 0.67, true, height)
+	if WG.DelaySmoothCam then
+		WG.DelaySmoothCam((smoothness or 0.67) + 0.2)
+	end
+end
+
+local cameraAlreadyMoved = false
+function Close(permanently, wantMoveCamera)
 	if mainWindow then
 		mainWindow:Dispose()
 	end
-	
-	if not cameraMoved then
-		cameraMoved = true
-		local minX, minZ, maxX, maxZ, maxY, height, smoothness = GetStartZoomBounds()
-		SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, smoothness or 0.67, true, height)
+
+	local moveCamera = wantMoveCamera and not cameraAlreadyMoved and not Spring.GetSpectatingState()
+	if moveCamera then
+		WG.ZoomToStart()
 	end
 
 	if permanently then
-		if not noComm then
-			widgetHandler:RemoveAction(actionShow)
-			noComm = true
-		end
-
-		if (Spring.GetGameFrame() <= COMM_DROP_FRAME) then
-			widgetHandler:RemoveCallIn('GameFrame')
-			widgetHandler:RemoveCallIn('GameProgress')
-		end
+		RemoveSideButton()
 	end
 end
 
@@ -224,25 +293,33 @@ local function CreateWindow()
 	}
 	-- add posters
 	local i = 0
-	for index,option in ipairs(optionData) do
+	for index, option in ipairs(optionData) do
 		i = i + 1
 		local hideButton = options.hideTrainers.value and option.trainer
+		
+		local tooltip = ((options.showModules.value and (option.tooltip .. "\n\n\n")) or "") .. (commTips[option.image] or "")
+		
 		local button = Button:New {
 			parent = (not hideButton) and grid or nil,
-			caption = "",	--option.name,	--option.trainer and "TRAINER" or "",
+			caption = "",
 			valign = "bottom",
-			tooltip = option.tooltip, --added comm name under cursor on tooltip too, like for posters
+			tooltip = tooltip, --added comm name under cursor on tooltip too, like for posters
 			width = BUTTON_WIDTH,
 			height = BUTTON_HEIGHT,
 			padding = {5,5,5,5},
 			OnClick = {function()
 				Spring.SendLuaRulesMsg("customcomm:"..option.commProfile)
 				Spring.SendCommands({'say a:I choose: '..option.name..'!'})
-				Close()
+				Close(false, true)
 			end},
-			trainer = option.trainer,
 		}
-		buttons[i] = button
+		
+		buttonData[i] = {
+			control = button,
+			trainer = option.trainer,
+			tooltip = option.tooltip,
+			image = option.image,
+		}
 		
 		local image = Image:New{
 			parent = button,
@@ -255,24 +332,25 @@ local function CreateWindow()
 		}
 		local label = Label:New{
 			parent = button,
-			x = "15%",
+			x = 0, right = 0,
 			bottom = 4,
 			caption = option.name,
 			align = "center",
+			autosize = false,
 			font = {size = 14},
 		}
-		buttonLabels[i] = label
-		if option.trainer then
-			local trainerLabel = Label:New{
-				parent = image,
-				x = "25%",
-				y = "50%",
-				caption = "TRAINER",
-				align = "center",
-				font = {color = {1,0.2,0.2,1}, size=16, outline=true, outlineColor={1,1,1,0.8}},
-			}
-			trainerLabels[i] = trainerLabel
-		end
+		--if option.trainer then
+		--	local trainerLabel = Label:New{
+		--		parent = image,
+		--		x = 0, right = 0,
+		--		y = "50%",
+		--		caption = "TRAINER",
+		--		align = "center",
+		--		autosize = false,
+		--		font = {color = {1,0.2,0.2,1}, size=16, outline=true, outlineColor={1,1,1,0.8}},
+		--	}
+		--	trainerLabels[i] = trainerLabel
+		--end
 	end
 	local cbWidth = WINDOW_WIDTH*0.4
 	local closeButton = Button:New{
@@ -282,14 +360,15 @@ local function CreateWindow()
 		x = WINDOW_WIDTH*0.5 + (WINDOW_WIDTH*0.5 - cbWidth)/2,
 		height = 30,
 		bottom = 5,
-		OnClick = {function() Close() end}
+		OnClick = {function() Close(false, false) end}
 	}
 	trainerCheckbox = Chili.Checkbox:New{
 		parent = mainWindow,
 		x = 6,
 		bottom = 5,
-		width = 160,
-		caption = "Hide Trainer Comms",
+		width = 180,
+		caption = options.hideTrainers.name,
+		tooltip = options.hideTrainers.desc,
 		checked = options.hideTrainers.value,
 		OnChange = { function(self)
 			-- this is called *before* the 'checked' value is swapped, hence negation everywhere
@@ -300,6 +379,25 @@ local function CreateWindow()
 			end
 			options.hideTrainers.value = not self.checked
 			ToggleTrainerButtons(self.checked)
+		end },
+	}
+	showModulesCheckbox = Chili.Checkbox:New{
+		parent = mainWindow,
+		x = 220,
+		bottom = 5,
+		width = 115,
+		caption = options.showModules.name,
+		tooltip = options.showModules.desc,
+		checked = options.showModules.value,
+		OnChange = { function(self)
+			-- this is called *before* the 'checked' value is swapped, hence negation everywhere
+			if options.showModules.epic_reference then
+				options.showModules.epic_reference.checked = not self.checked
+				options.showModules.epic_reference.state.checked = not self.checked
+				options.showModules.epic_reference:Invalidate()
+			end
+			options.showModules.value = not self.checked
+			ToggleModuleTooltip(not self.checked)
 		end },
 	}
 	grid:Invalidate()
@@ -337,13 +435,13 @@ function widget:Initialize()
 	
 	if ((coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
 	or (not coop and Spring.GetTeamRulesParam(teamID, "commSpawned") == 1)
-	or (Spring.GetSpectatingState() or Spring.IsReplay() or forcejunior))
+	or Spring.GetSpectatingState() or Spring.IsReplay())
 	--and (not Spring.IsCheatingEnabled())
 	then
-		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
+		noComm = true -- will prevent window from auto-appearing; can still be brought up from the button
 	end
 
-	vsx, vsy = widgetHandler:GetViewSizes()
+	vsx, vsy = Spring.GetViewGeometry()
 
 	if (not noComm) then
 		widgetHandler:AddAction(actionShow, CreateWindow, nil, "t")
@@ -390,35 +488,52 @@ end
 
 -- hide window if game was loaded
 local timer = 0
+local startPosTimer = 0
 function widget:Update(dt)
-	timer = timer + dt
-	if timer >= 0.01 then
-		if (spGetGameRulesParam("loadedGame") == 1) or wantClose then
-			Close(true)
+	if Spring.GetGameRulesParam("totalSaveGameFrame") then
+		widgetHandler:RemoveWidget()
+		return
+	end
+	
+	if timer then
+		timer = timer + dt
+		if timer >= 0.01 then
+			if (spGetGameRulesParam("loadedGame") == 1) or wantClose then
+				Close(true, wantClose)
+			end
+			timer = false
 		end
-		widgetHandler:RemoveCallIn('Update')
+	end
+	
+	if startPosTimer and options.cameraZoom.value and (not campaignBattleID) then
+		startPosTimer = startPosTimer + dt
+		if Spring.GetGameFrame() <= 0 then
+			if startPosTimer > 0.1 then
+				local _, active, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+				if not spec then
+					local x, y, z = Spring.GetTeamStartPosition(teamID)
+					if not (x == 0 and y == 0 and z == 0) then
+						if WG.DelaySmoothCam then
+							WG.DelaySmoothCam(1)
+						end
+						SetCameraTarget(x, y, z, 0.8, nil, options.cameraZoomDistance.value)
+						startPosTimer = false
+					end
+				end
+			end
+		else
+			startPosTimer = false
+		end
 	end
 end
 
 function widget:Shutdown()
-	cameraMoved = true -- do not move camera to startbox
-	Close(true)
-end
-
-function widget:GameFrame(n)
-	if n == COMM_DROP_FRAME then
-		Close(true)
-	end
-end
-
-function widget:GameProgress(n)
-	if n == COMM_DROP_FRAME then
-		Close(true)
-	end
+	Close(true, false)
 end
 
 function widget:GameStart()
-	screen0:RemoveChild(buttonWindow)
+	Close(true, false)
+	widgetHandler:RemoveCallIn('Update')
 end
 
 -- this a pretty retarded place to put this but:
@@ -427,7 +542,7 @@ end
 -- there is probably some better way
 function widget:DrawWorld()
 	if (Spring.GetGameFrame() < 1) then
-		PlaySound("LuaUI/Sounds/Voices/initialized_core_1", 1, 'ui')
+		PlaySound("sounds/reply/advisor/command_console_activated", 1, 'ui')
 	end
 	widgetHandler:RemoveCallIn('DrawWorld')
 end

@@ -20,23 +20,20 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-local unitDefsToModify = {}	-- [unitDefID] = {[1] = truerange, [2] = truerange, etc.}
+local unitDefsToModify = {}	-- [unitDefID] = combatrange
 
-for udID=1,#UnitDefs do
+for udID = 1, #UnitDefs do
 	local weapons = UnitDefs[udID].weapons
 	for i=1,#weapons do
 		local wd = WeaponDefs[weapons[i].weaponDef]
-		if wd and wd.customParams.truerange then
-			unitDefsToModify[udID] = unitDefsToModify[udID] or {}
-			unitDefsToModify[udID][i] = wd.customParams.truerange
+		if wd and wd.customParams.combatrange then
+			unitDefsToModify[udID] = tonumber(wd.customParams.combatrange)
 		end
 	end
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if unitDefsToModify[unitDefID] then
-		for weaponNum, truerange in pairs(unitDefsToModify[unitDefID]) do
-			Spring.SetUnitWeaponState(unitID,weaponNum,{range = truerange})
-		end
+		Spring.SetUnitMaxRange(unitID, unitDefsToModify[unitDefID])
 	end
 end

@@ -5,7 +5,7 @@ unitDef = {
   acceleration        = 0.3,
   airHoverFactor      = 4,
   brakeRate           = 0.24,
-  buildCostMetal      = 75,
+  buildCostMetal      = 15,
   builder             = false,
   buildPic            = [[dronecarry.png]],
   canBeAssisted       = false,
@@ -38,10 +38,6 @@ unitDef = {
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
-	helptext       = [[The Gull is a small, aggressive drone armed with an energy MG.]],
-	description_de = [[Trägerdrohne]],
-	--helptext_de    = [[Die Drohnen schutzen den Traeger und teilen seine Ziele, aber sie koennen nicht zu weit allein gehen. Der Traeger herstellt ein Paar Drohnen jede 15 Sekunden, bis zu 8.]],
-
 	is_drone = 1,
 	modelradius    = [[13]],
   },

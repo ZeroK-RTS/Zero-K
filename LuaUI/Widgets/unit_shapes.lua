@@ -109,13 +109,17 @@ local forceUpdate = false
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 options_path = 'Settings/Interface/Selection/Selection Shapes'
-options_order = {'showally', 'showallyplayercolours', 'showhover', 'showinselectionbox', 'animatehover', 'animateselectionbox'} 
+options_order = {'allyselectionlevel', 'showallyplayercolours', 'showhover', 'showinselectionbox', 'animatehover', 'animateselectionbox'} 
 options = {
-	showally = {
+	allyselectionlevel = {
 		name = 'Show Ally Selections',
-		desc = 'Highlight the units your allies currently have selected.', 
-		type = 'bool',
-		value = false,
+		type = 'radioButton',
+		items = {
+			{name = 'Enabled',key='enabled', desc="Show selected unit of allies."},
+			{name = 'Commshare Only',key='commshare', desc="Show when sharing unit control."},
+			{name = 'Disabled',key='disabled', desc="Do not show any allied selection."},
+		},
+		value = 'commshare',
 		OnChange = function(self) 
 			forceUpdate = true
 			visibleAllySelUnits = {}
@@ -223,6 +227,17 @@ local function HasVisibilityChanged()
 	return false
 end
 
+local function ShowAllySelection(unitID, myTeamID)
+	if options.allyselectionlevel.value == "disabled" or (not WG.allySelUnits[unitID]) then
+		return false
+	end
+	if options.allyselectionlevel.value == "enabled" then
+		return true
+	end
+	local teamID = Spring.GetUnitTeam(unitID)
+	return teamID == myTeamID
+end
+
 local function GetVisibleUnits()
 	local visibleBoxed = {}
 	if options.showinselectionbox.value then
@@ -234,9 +249,9 @@ local function GetVisibleUnits()
 				local unitID = units[i]
 				if boxedUnitsIDs[units[i]] and not WG.drawtoolKeyPressed then
 					visibleBoxed[#visibleBoxed+1] = boxedUnits[boxedUnitsIDs[unitID]]
-	      end
-	    end
-	  end
+				end
+			end
+		end
 
 		lastBoxedUnits = boxedUnits
 		lastBoxedUnitsIDs = boxedUnitsIDs
@@ -247,13 +262,15 @@ local function GetVisibleUnits()
 		--local visibleUnits = {}
 		local visibleAllySelUnits = {}
 		local visibleSelected = {}
+		local myTeamID = Spring.GetMyTeamID()
 		
-		for i=1, #units do
+		for i = 1, #units do
 			local unitID = units[i]
 			if (spIsUnitSelected(unitID)) then
 				visibleSelected[#visibleSelected+1] = {unitID = unitID}
 			end
-			if options.showally.value and WG.allySelUnits[unitID] then
+			
+			if ShowAllySelection(unitID, myTeamID) then 
 				local teamIDIndex = Spring.GetUnitTeam(unitID)
 				if teamIDIndex then --Possible nil check failure if unit is destroyed while selected
 					teamIDIndex = teamIDIndex+1
@@ -490,7 +507,7 @@ function widget:Initialize()
 		end
 		
 		
-		if (unitDef.isBuilding or unitDef.isFactory or unitDef.speed==0) then
+		if unitDef.isImmobile then
 			shape = shapes.square
 			xscale, zscale = rectangleFactor * xsize, rectangleFactor * zsize
 		elseif (unitDef.canFly) then
@@ -545,6 +562,9 @@ local HEADING_TO_RAD = 1/32768*math.pi
 local RADIANS_PER_COBANGLE = math.pi / 32768
 
 local function UpdateUnitListScale(unitList)
+	if not unitList then
+		return
+	end
 	local now = Spring.GetTimer()
 	for i=1, #unitList do
 		local startScale = unitList[i].startScale
@@ -667,7 +687,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 		local unitID = unitList[i].unitID
 		local udid = spGetUnitDefID(unitID)
 		local unit = unitConf[udid]
-		local scale = unitList[i].scale
+		local scale = unitList[i].scale or 1
 
 		if (unit) then
 			gl.DrawListAtUnit(unitID, unit.shape.select, false, unit.xscale * scale, 1.0, unit.zscale * scale, degrot[unitID], 0, degrot[unitID], 0)
@@ -684,7 +704,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 		local unitID = unitList[i].unitID
 		local udid = spGetUnitDefID(unitID)
 		local unit = unitConf[udid]
-		local scale = unitList[i].scale
+		local scale = unitList[i].scale or 1
 
 		if (unit) then
 			gl.DrawListAtUnit(unitID, unit.shape.large, false, unit.xscale * scale, 1.0, unit.zscale * scale, degrot[unitID], 0, degrot[unitID], 0)
@@ -719,7 +739,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 end
 
 local function DrawCircles(underWorld)
-		--if Spring.IsGUIHidden() then return end
+	if Spring.IsGUIHidden() then return end
 	if (#visibleSelected + #hoveredUnit + #visibleBoxed == 0) and not hasVisibleAllySelections then return end
 	
 	gl.PushAttrib(GL_COLOR_BUFFER_BIT)

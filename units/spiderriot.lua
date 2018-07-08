@@ -4,7 +4,7 @@ unitDef = {
   description            = [[Riot Spider]],
   acceleration           = 0.22,
   brakeRate              = 0.66,
-  buildCostMetal         = 280,
+  buildCostMetal         = 250,
   buildPic               = [[spiderriot.png]],
   canGuard               = true,
   canMove                = true,
@@ -16,7 +16,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[A rapid fire spider which excels at picking off fast units.]],
     aimposoffset   = [[0 10 0]],
   },
 
@@ -29,11 +28,11 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 900,
   maxSlope               = 72,
-  maxVelocity            = 1.7,
+  maxVelocity            = 1.8,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
-  noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spiderriot.s3o]],
   script                 = [[spiderriot.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
@@ -72,7 +71,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 60.01,
+        default = 70.01,
         subs    = 3,
       },
 
@@ -84,7 +83,7 @@ unitDef = {
       laserFlareSize          = 7.5,
       minIntensity            = 1,
       range                   = 300,
-      reloadtime              = 0.33,
+      reloadtime              = 0.3 + 1/30,
       rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/mini_laser]],
       soundStartVolume        = 6,

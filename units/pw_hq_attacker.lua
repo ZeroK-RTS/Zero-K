@@ -13,11 +13,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[PlanetWars Hauptquartier (verandert Einflussgewinn)]],
-    helptext       = [[This building is integral to strategic control of the planet. If the Attackers win with a destroyed Command Center they only gain 50% of the influence they would have otherwise gained.]],
-    helptext_de    = [[Dieses Gebäude ist für die strategische Kontrolle des Planeten unerlässlich. Wenn das Gewinnerteam seine Kommandozentrale verloren hat, erhält es nur die Hälfte der Einflusspunkte.]],
     dontcount = [[1]],
     soundselect = "building_select1",
+    planetwars_structure = [[1]],
   },
 
   energyUse                     = 0,

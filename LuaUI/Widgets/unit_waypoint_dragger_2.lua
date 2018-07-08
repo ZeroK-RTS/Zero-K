@@ -38,7 +38,7 @@ local CMD_JUMP = 38521
 local CMD_BUILD = -1
 local cmdColorsTbl = {
 	[CMD.MOVE]         = {0.5, 1.0, 0.5, 0.7},
-	[CMD_RAW_MOVE]         = {0.5, 1.0, 0.5, 0.7},
+	[CMD_RAW_MOVE]     = {0.5, 1.0, 0.5, 0.7},
 	[CMD.PATROL]       = {0.3, 0.3, 1.0, 0.7},
 	[CMD.RECLAIM]      = {1.0, 0.2, 1.0, 0.7},
 	[CMD.REPAIR]       = {0.3, 1.0, 1.0, 0.7},
@@ -53,6 +53,7 @@ local cmdColorsTbl = {
 	[CMD_JUMP]         = {0.0, 1.0, 0.0, 0.7},
 }
 
+-- CMD_RAW_BUILD is intentionally not included because it will always be below another command
 local POINT_COMMAND = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
@@ -266,15 +267,15 @@ local function MoveWayPoints(wpTbl, mx, my, finalize)
 				end
 
 				if (cmdFacRad > 0) then
-					-- sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdNum, cmdID, 0, cx, cy, cz, cmdFacRad}, {"alt"})
-					sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdLink, cmdID, 0, cx+offsetX, cy, cz+offsetZ, cmdFacRad}, {""})
+					-- sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdNum, cmdID, 0, cx, cy, cz, cmdFacRad}, CMD.OPT_ALT)
+					sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdLink, cmdID, 0, cx+offsetX, cy, cz+offsetZ, cmdFacRad}, 0)
 				else
-					-- sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdNum, cmdID, 0, cx, cy, cz}, {"alt"})
-					sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdLink, cmdID, 0, cx+offsetX, cy, cz+offsetZ}, {""})
+					-- sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdNum, cmdID, 0, cx, cy, cz}, CMD.OPT_ALT)
+					sprGiveOrderToUnit(cmdUnitID, CMD.INSERT, {cmdLink, cmdID, 0, cx+offsetX, cy, cz+offsetZ}, 0)
 				end
 
 				if (not alt) then
-					sprGiveOrderToUnit(cmdUnitID, CMD.REMOVE, {cmdTag}, {""})
+					sprGiveOrderToUnit(cmdUnitID, CMD.REMOVE, {cmdTag}, 0)
 				end
 			else
 				wpData[1] = cx

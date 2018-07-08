@@ -13,6 +13,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[34 45 27]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[34 45 34]],
+  selectionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -22,10 +25,6 @@ unitDef = {
     jump_reload        = 10,
     jump_from_midair   = 0,
     jump_spread_exception = 1,
-
-    description_fr = [[]],
-    description_de = [[Behalter voller Dreck]],
-    helptext       = [[The Dirtbag exists to block enemy movement and generally get in the way. They are so dedicated to this task that they release their dirt payload upon death to form little annoying mounds. While waiting for their fate Dirtbags enjoy headbutting and scouting.]],
   },
 
   explodeAs              = [[CLOGGER_EXPLODE]],
@@ -46,7 +45,7 @@ unitDef = {
   script                 = [[shieldscout.lua]],
   selfDestructAs         = [[CLOGGER_EXPLODE]],
   selfDestructCountdown  = 0,
-  sightDistance          = 300,
+  sightDistance          = 350,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

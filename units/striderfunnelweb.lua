@@ -14,8 +14,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The slow all-terrain Funnelweb features an area shield and a powerful drone complement.]],
 	priority_misc  = 1, -- Medium
+	shield_emit_height = 45,
   },
 
   explodeAs              = [[ESTOR_BUILDING]],
@@ -104,8 +104,8 @@ unitDef = {
 
       exteriorShield          = true,
       shieldAlpha             = 0.2,
-      shieldBadColor          = [[1 0.1 0.1]],
-      shieldGoodColor         = [[0.1 0.1 1]],
+      shieldBadColor          = [[1 0.1 0.1 1]],
+      shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
       shieldPower             = 3600,
       shieldPowerRegen        = 50,
@@ -113,10 +113,8 @@ unitDef = {
       shieldRadius            = 350,
       shieldRepulser          = false,
       smartShield             = true,
-      texture1                = [[shield3mist]],
-      visibleShield           = true,
-      visibleShieldHitFrames  = 4,
-      visibleShieldRepulse    = true,
+      visibleShield           = false,
+      visibleShieldRepulse    = false,
       weaponType              = [[Shield]],
     },
 	

@@ -1,0 +1,24 @@
+hotspot topleft
+frame  anims/zk_large/cursornormal_0.png  5
+frame  anims/zk_large/cursornormal_1.png  0.05
+frame  anims/zk_large/cursornormal_2.png  0.05
+frame  anims/zk_large/cursornormal_3.png  0.05
+frame  anims/zk_large/cursornormal_4.png  0.05
+frame  anims/zk_large/cursornormal_5.png  0.05
+frame  anims/zk_large/cursornormal_6.png  0.05
+frame  anims/zk_large/cursornormal_7.png  0.05
+frame  anims/zk_large/cursornormal_8.png  0.05
+frame  anims/zk_large/cursornormal_9.png  0.05
+frame  anims/zk_large/cursornormal_10.png  0.05
+frame  anims/zk_large/cursornormal_11.png  0.05
+frame  anims/zk_large/cursornormal_12.png  0.05
+frame  anims/zk_large/cursornormal_13.png  0.05
+frame  anims/zk_large/cursornormal_14.png  0.05
+frame  anims/zk_large/cursornormal_15.png  0.05
+frame  anims/zk_large/cursornormal_16.png  0.05
+frame  anims/zk_large/cursornormal_17.png  0.05
+frame  anims/zk_large/cursornormal_18.png  0.05
+frame  anims/zk_large/cursornormal_19.png  0.05
+frame  anims/zk_large/cursornormal_20.png  0.05
+frame  anims/zk_large/cursornormal_21.png  0.05
+frame  anims/zk_large/cursornormal_22.png  0.05

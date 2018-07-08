@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[staticantinuke]],
-  name                          = [[Protector]],
+  name                          = [[Antinuke]],
   description                   = [[Strategic Nuke Interception System]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
@@ -19,11 +19,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Antinukleares System (Anti-Nuke)]],
-    description_fr = [[Syst?me de D?fense Anti Missile (AntiNuke)]],
-    helptext       = [[The Protector automatically intercepts enemy nuclear ICBMs aimed within its coverage radius.]],
-    helptext_de    = [[Der Protector fängt automatisch gegnerische, atomare Interkontinentalraketen, welche in den, vom System abgedeckten, Bereich zielen, ab.]],
-    helptext_fr    = [[Le Protector est un b?timent indispensable dans tout conflit qui dure. Il est toujours malvenu de voir sa base r?duite en cendres ? cause d'un missile nucl?aire. Le Protector est un syst?me de contre mesure capable de faire exploser en vol les missiles nucl?aires ennemis.]],
 	removewait     = 1,
     nuke_coverage  = 2500,
   },
@@ -65,13 +60,18 @@ unitDef = {
     AMD_ROCKET = {
       name                    = [[Anti-Nuke Missile Fake]],
       areaOfEffect            = 420,
+      avoidFriendly           = false,
+      avoidGround             = false,
+      avoidFeature           = false,
       collideFriendly         = false,
       collideGround           = false,
+      collideFeature          = false,
       coverage                = 100000,
       craterBoost             = 1,
       craterMult              = 2,
 	  
 	  customParams            = {
+        reaim_time = 15,
         nuke_coverage = 2500,
 	  },
 	  

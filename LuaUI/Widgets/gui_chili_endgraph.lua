@@ -17,48 +17,61 @@ end
 	TO DO:
 		Add amount label when mouseover line on graph (e.g to see exact metal produced at a certain time),
 		Come up with better way of handling specs, active players and players who died (currently doesn't show players who have died
-
-	NOT TO DO ANY MORE, PROBABLY:
-		Adding the toggling functionality renders both of these moot:
-			Implement camera control to pan in the background while viewing graph
-			Add minimize option
 --]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local buttongroups = {
-	{"Metal", {
-		{"metalProduced"   , "Metal Produced"},
-		{"metalUsed"       , "Metal Used"},
-		{"metal_income"    , "Metal Income"},
-		{"metal_reclaim"   , "Metal Reclaimed"},
-		{"metal_excess"    , "Metal Excess"},
-		},
-	},
+local GetHiddenTeamRulesParam = Spring.Utilities.GetHiddenTeamRulesParam
 
-	{"Energy", {
-		{"energy_income"   , "Energy Income"},
+local buttongroups = {
+	{"Economy", {
+		{"metalProduced"   , "Metal Produced", "Cumulative total of metal produced."},
+		{"metalUsed"       , "Metal Used", "Cumulative total of metal used."},
+		{"metal_income"    , "Metal Income", "Total metal income."},
+		{"metal_overdrive" , "Metal Overdrive", "Cumulative total of metal produced by overdrive."},
+		{"metal_reclaim"   , "Metal Reclaimed", "Cumulative total of metal reclaimed. Includes wreckage, unit reclaim and construction cancellation."},
+		{"metal_excess"    , "Metal Excess", "Cumulative total of metal lost to excess."},
+		{"energy_income"   , "Energy Income", "Total energy income."},
 		},
 	},
 
 	{"Units", {
-		{"unit_value"      , "Unit Value"},
-		{"damage_dealt"    , "Damage Dealt"},
-		{"damage_received" , "Damage Received"},
+		{"unit_value"      , "Total Value", "Total value of units and structures."},
+		{"unit_value_army" , "Army Value", "Value of mobile units excluding constructors, commanders, Iris, Owl, Djinn, Charon and Hercules."},
+		{"unit_value_def"  , "Defense Value", "Value of armed structures (and shields) with range up to and including Cerebus and Aretemis."},
+		{"unit_value_econ" , "Economy Value", "Value of economic structures, factories and constructors."},
+		{"unit_value_other", "Other Value", "Value of units and structures that do not fit any other category."},
+		{"unit_value_killed", "Value Killed", "Cumulative total of value of enemy units and structured destroyed by the team. Includes nanoframes."},
+		{"unit_value_lost" , "Value Lost", "Cumulative total of value of the teams destroyed units and structures. Includes nanoframes."},
+		{"damage_dealt"    , "Damage Dealt", "Cumulative damage inflicted measured by the cost of the damaged unit in proportion to damage dealt."},
+		{"damage_received" , "Damage Received", "Cumulative damage received measured by the cost of the damaged unit in proportion to damage dealt."},
 		},
 	},
 }
 
 local rulesParamStats = {
 	metal_excess = true,
+	metal_overdrive = true,
 	metal_reclaim = true,
 	unit_value = true,
+	unit_value_army = true,
+	unit_value_def = true,
+	unit_value_econ = true,
+	unit_value_other = true,
+	unit_value_killed = true,
+	unit_value_lost = true,
 	metal_income = true,
 	energy_income = true,
 	damage_dealt = true,
 	damage_received = true,
 }
+local hiddenStats = {
+	damage_dealt = true,
+	unit_value_killed = true,
+}
+
+local gameOver = false
 
 local graphLength = 0
 local usingAllyteams = false
@@ -80,6 +93,8 @@ local BUTTON_FOCUS_COLOR
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --utilities
+
+local teamNames = {}
 
 --formats final stat to fit in label
 local function numFormat(label)
@@ -118,15 +133,16 @@ local function drawIntervals(graphMax)
 		local line = Chili.Line:New{
 			parent = graphPanel, 
 			x = 0, 
-			bottom = (i)/5*100 .. "%", 
+			bottom = (0.997*(i)/5*100 - 0.8) .. "%",
+			height = 0,
 			width = "100%", 
 			color = {0.1,0.1,0.1,0.1}
 		}
 		if graphMax then
 			local label = Chili.Label:New{
 				parent = graphPanel, 
-				x = 0,
-				bottom = ((i)/5*100 + 2) .. "%",
+				x = 5,
+				bottom = ((i)/5*100 + 1) .. "%",
 				width = "100%", 
 				caption = numFormat(graphMax*i/5)
 			}
@@ -189,7 +205,7 @@ end
 --draw graphs
 
 --Total package of graph: Draws graph and labels for each nonSpec player
-local function drawGraph(graphArray, graph_m, teamID, team_num)
+local function drawGraph(graphArray, graphMax, teamID, team_num)
 	if #graphArray == 0 then
 		return
 	end
@@ -206,18 +222,12 @@ local function drawGraph(graphArray, graph_m, teamID, team_num)
 	if usingAllyteams then
 		name = Spring.GetGameRulesParam("allyteam_long_name_" .. teamID)
 	else
-		local _,playerID,_,isAI = Spring.GetTeamInfo(teamID)
-		if isAI then
-			local _,botID,_,shortName = Spring.GetAIInfo(teamID)
-			name = (shortName or "Bot") .." - " .. (botID or "")
-		else
-			name = Spring.GetPlayerInfo(playerID) or playerNames[teamID] or "???"
-		end
+		name = teamNames[teamID] or "???"
 	end
 
 	for i = 1, #graphArray do
-		if (graph_m < graphArray[i]) then 
-			graph_m = graphArray[i]
+		if (graphMax < graphArray[i]) then 
+			graphMax = graphArray[i]
 		end
 	end
 
@@ -225,14 +235,16 @@ local function drawGraph(graphArray, graph_m, teamID, team_num)
 	local drawLine = function()
 		for i = 1, #graphArray do
 			local ordinate = graphArray[i]
-			gl.Vertex((i - 1)/(#graphArray - 1), 1 - ordinate/graph_m)
+			gl.Vertex((i - 1)/(#graphArray - 1), 0.9975 - ordinate/graphMax)
 		end
 	end
 
 	--adds value to end of graph
+	local labelOffBottom = (graphArray[#graphArray]/graphMax > 0.025)
 	local label1 = Chili.Label:New{
 		parent = lineLabels,
-		y = (1 - graphArray[#graphArray]/graph_m) * 96 + 0.25 .. "%",
+		y = labelOffBottom and ((1 - graphArray[#graphArray]/graphMax) * 100 - 1 .. "%"),
+		bottom = (not labelOffBottom) and 1,
 		width = "100%",
 		caption = lineLabel,
 		font = {color = teamColor},
@@ -279,7 +291,7 @@ end
 local function getEngineArrays(statistic, labelCaption)
 	local teamScores = {}
 	local teams = Spring.GetTeamList()
-	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(0) - 1)
+	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(Spring.GetMyTeamID()) - 1)
 	local generalHistory = Spring.GetTeamStatsHistory(0, 0, graphLength)
 	local totalTime = Spring.GetGameRulesParam("gameover_second")
 		or (generalHistory and generalHistory[graphLength] and generalHistory[graphLength]["time"])
@@ -329,7 +341,11 @@ local function getEngineArrays(statistic, labelCaption)
 				stats = {}
 				for i = 0, graphLength do
 					stats[i] = {}
-					stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+					if hiddenStats[statistic] and gameOver then
+						stats[i][statistic] = GetHiddenTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+					else
+						stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
+					end
 				end
 			else
 				stats = Spring.GetTeamStatsHistory(teamID, 0, graphLength)
@@ -350,7 +366,7 @@ local function getEngineArrays(statistic, labelCaption)
 	local team_i = 1
 	for k, v in pairs(teamScores) do
 		if k ~= gaia then
-			drawGraph(v, graphMax, k, team_i)
+			drawGraph(v, graphMax*1.005, k, team_i)
 		end
 		team_i = team_i + 1
 	end
@@ -369,7 +385,7 @@ end
 
 function makePanel()
 	Chili = WG.Chili
-	local selW = 150
+	local selW = 140
 
 	window0 = Chili.Control:New {
 		x = "0",
@@ -379,9 +395,9 @@ function makePanel()
 		padding = {0,0,0,4},
 		buttonPressed = 1,
 	}
-	lineLabels 	= Chili.Control:New {
+	lineLabels = Chili.Control:New {
 		parent = window0,
-		y = 5,
+		y = 0,
 		right = 0,
 		bottom = 40,
 		width = 35, 
@@ -392,7 +408,8 @@ function makePanel()
 		minHeight = 70,
 		x = 0, 
 		y = 0,
-		width = selW, height = "100%",
+		width = selW,
+		height = "100%",
 		padding = {0,0,0,0},
 		itemMargin = {0,0,0,0},
 		resizeItems = true,
@@ -404,7 +421,7 @@ function makePanel()
 		right = 40,
 		y = 0, 
 		bottom = 40,
-		padding = {10,10,10,10}
+		padding = {2, 2, 2, 2},
 	}
 	graphLabel = Chili.Label:New {
 		parent = window0,
@@ -455,7 +472,7 @@ function makePanel()
 			y = 16,
 			bottom = 0,
 			width = "100%",
-			itemMargin = {1,2,1,2},
+			itemMargin = {1,1,1,2},
 			resizeItems = true,
 		}
 		for j = 1, #buttongroups[i][2] do
@@ -463,6 +480,7 @@ function makePanel()
 			window0.graphButtons[gb_i] = Chili.Button:New {
 				name = buttongroups[i][2][j][1],
 				caption = buttongroups[i][2][j][2],
+				tooltip = buttongroups[i][2][j][3],
 				parent = groupstack,
 				OnClick = { 
 					function(obj)
@@ -517,6 +535,23 @@ end
 
 function widget:Initialize()
 	WG.MakeStatsPanel = makePanel
+
+	local teams = Spring.GetTeamList()
+	for i = 1, #teams do
+		local teamID = teams[i]
+		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		local name
+		if isAI then
+			name = select(2, Spring.GetAIInfo(teamID))
+		else
+			name = Spring.GetPlayerInfo(playerID)
+		end
+		teamNames[teamID] = name
+	end
+end
+
+function widget:GameOver()
+	gameOver = true
 end
 
 function widget:GameFrame(n)

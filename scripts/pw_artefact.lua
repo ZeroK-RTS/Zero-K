@@ -16,22 +16,22 @@ local function Initialize()
 	Spin(turret, y_axis, -1, 0.01)
 
 	while (true) do
-		Move(pumpcylinders, y_axis, -11, 15)
+		Move(pumpcylinders, z_axis, -11, 15)
 		Turn(pump1, x_axis, -1.4, 2)
 		Turn(pump2, z_axis, -1.4, 2)
 		Turn(pump3, z_axis, 1.4, 2)
 
-		WaitForMove(pumpcylinders, y_axis)
+		WaitForMove(pumpcylinders, z_axis)
 		WaitForTurn(pump1, x_axis) 
 		WaitForTurn(pump2, z_axis) 
 		WaitForTurn(pump3, z_axis) 
 
-		Move(pumpcylinders, y_axis, 0, 15)
+		Move(pumpcylinders, z_axis, 0, 15)
 		Turn(pump1, x_axis, 0, 2)
 		Turn(pump2, z_axis, 0, 2)
 		Turn(pump3, z_axis, 0, 2)
 
-		WaitForMove(pumpcylinders, y_axis)
+		WaitForMove(pumpcylinders, z_axis)
 		WaitForTurn(pump1, x_axis)
 		WaitForTurn(pump2, z_axis)
 		WaitForTurn(pump3, z_axis)
@@ -52,6 +52,10 @@ function script.Create()
 end
 
 function script.Activate()
+	if Spring.GetUnitRulesParam(unitID, "planetwarsDisable") == 1 or GG.applyPlanetwarsDisable then
+		return
+	end
+	
 	StartThread(Initialize)
 end
 
@@ -59,9 +63,10 @@ function script.Deactivate()
 	StartThread(Deinitialize)
 end
 
-function script.HitByWeapon()
-	return 0
-end
+-- Invulnerability
+--function script.HitByWeapon()
+--	return 0
+--end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth

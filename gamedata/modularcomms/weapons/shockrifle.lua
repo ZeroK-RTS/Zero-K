@@ -8,17 +8,15 @@ local weaponDef = {
 
 	customParams            = {
 		slot = [[5]],
-		
 		light_radius = 0,
 	},
 
 	damage                  = {
 		default = 1500,
-		planes  = 1500,
 		subs    = 75,
 	},
 
-	explosionGenerator      = [[custom:megapartgun]],
+	explosionGenerator      = [[custom:spectre_hit]],
 	impactOnly              = true,
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,

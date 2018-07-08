@@ -23,11 +23,6 @@ unitDef = {
   cruiseAlt              = 110,
 
   customParams           = {
-    --description_fr = [[ADAV Pilleur]],
-	description_de = [[Flugabwehr Hubschrauber]],
-    helptext       = [[The Trident is a slow gunship that cuts down enemy aircraft with missiles. It is much slower than other gunships, so it is much easier to kill the Trident with ground units than with planes.]],
-    --helptext_fr    = [[des missiles pr?cis et une vitesse de vol appr?ciable, le Rapier saura vous d?fendre contre d'autres pilleurs ou mener des assauts rapides.]],
-	--helptext_de    = [[Der Rapier ist ein leichter Raiderhubschrauber. Seine Raketen sind akkurat und treffen auch Lufteinheiten. Des Weiteren erweist er sich gegen kleine Ziele und als Gegenwehr gegen andere Raider als sehr nützlich.]],
 	modelradius    = [[18]],
 	midposoffset   = [[0 15 0]],
 	selection_velocity_heading = 1,
@@ -85,6 +80,8 @@ unitDef = {
       cylinderTargeting       = 1,
 
 	  customParams        	  = {
+		burst = Shared.BURST_RELIABLE,
+
 		isaa = [[1]],
 		script_reload = [[10]],
 		script_burst = [[3]],

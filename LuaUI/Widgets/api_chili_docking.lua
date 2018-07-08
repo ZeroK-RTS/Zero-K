@@ -12,7 +12,6 @@ function widget:GetInfo()
     handler   = true, -- to read widget status. eg: "widgetHandler.knownWidgets[name]"
     enabled   = true,  --  loaded by default?
     alwaysStart = true,
-	hidden    = true,
   }
 end
 
@@ -460,9 +459,37 @@ function widget:ViewResize(vsx, vsy)
 end
 
 function widget:SetConfigData(data)
+	local vsx, vsy = gl.GetViewSizes()
+	for k, v in pairs (data) do
+		if v[5] then
+			v[1] = v[1] + vsx
+			v[3] = v[3] + vsx
+			v[5] = nil
+		end
+		if v[6] then
+			v[2] = v[2] + vsy
+			v[4] = v[4] + vsy
+			v[6] = nil
+		end
+	end
 	settings = data
 end
 
 function widget:GetConfigData()
-	return settings
+	local data = Spring.Utilities.CopyTable(settings, true)
+	local vsx, vsy = gl.GetViewSizes()
+	for k, v in pairs (data) do
+		-- if closer to the edge opposite 0, save relative to it (to keep stuff at edge if someone migrates to a larger screen)
+		if vsx - v[3] < v[1] then
+			v[1] = v[1] - vsx
+			v[3] = v[3] - vsx
+			v[5] = true
+		end
+		if vsy - v[4] < v[2] then
+			v[2] = v[2] - vsy
+			v[4] = v[4] - vsy
+			v[6] = true
+		end
+	end
+	return data
 end

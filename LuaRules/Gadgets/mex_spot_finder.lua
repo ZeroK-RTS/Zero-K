@@ -103,10 +103,14 @@ end
 ------------------------------------------------------------
 -- Set Game Rules so widgets can read metal spots
 ------------------------------------------------------------
-local function SetMexGameRulesParams(metalSpots)
+local function SetMexGameRulesParams(metalSpots, needMexDrawing)
 	if not metalSpots then -- Mexes can be built anywhere
 		spSetGameRulesParam("mex_count", -1)
 		return
+	end
+	
+	if needMexDrawing then
+		spSetGameRulesParam("mex_need_drawing", 1)
 	end
 	
 	local mexCount = #metalSpots
@@ -156,7 +160,8 @@ function gadget:Initialize()
 		metalSpotsByPos = GetSpotsByPos(metalSpots)
 	end
 	
-	SetMexGameRulesParams(metalSpots)
+	local needMexDrawing = (gameConfig and gameConfig.needMexDrawing) or (mapConfig and mapConfig.needMexDrawing)
+	SetMexGameRulesParams(metalSpots, needMexDrawing)
 
 	GG.metalSpots = metalSpots
 	GG.metalSpotsByPos = metalSpotsByPos
@@ -205,7 +210,7 @@ function IntegrateMetal(x, z, radius)
 
 			if (dist < radius) then
 				local _, metal = spGetGroundInfo(cx, cz)
-				result = result + metal
+				result = result + (metal or 0)
 			end
 		end
 	end

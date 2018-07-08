@@ -50,7 +50,7 @@ local screen0
 -- * Callins. This block handles widget callins. Does barely anything.
 
 -- Module config
-local moduleDefs, chassisDefs, upgradeUtilities, UNBOUNDED_LEVEL, _, moduleDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, chassisDefs, upgradeUtilities, LEVEL_BOUND, _, moduleDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
@@ -185,7 +185,7 @@ local function CreateModuleSelectionWindow()
 		clientWidth = 500,
 		clientHeight = 500,
 		minWidth = 0,
-		minHeight = 0,	
+		minHeight = 0,
 		padding = {0, 0, 0, 0},	
 		resizable = false,
 		draggable = false,
@@ -589,15 +589,15 @@ local function CreateMainWindow()
 	local mainHeight = math.min(420, math.max(325, screenHeight - 450))
 	
 	mainWindow = Window:New{
+		classname = "main_window_small_tall",
 		name = "CommanderUpgradeWindow",
 		fontsize = 20,
 		x = 0,  
 		y = minimapHeight, 
-		clientWidth = 200,
-		clientHeight = 325,
-		minWidth = 200,
-		minHeight = 325,	
-		padding = {0, 0, 0, 0},	
+		width = 201,
+		height = 332,
+		minWidth = 201,
+		minHeight = 332,
 		resizable = false,
 		draggable = false,
 		dockable = true,
@@ -605,7 +605,6 @@ local function CreateMainWindow()
 		tweakDraggable = true,
 		tweakResizable = true,
 		parent = screen0,
-		color = {0,0,0,0},
 	}
 	
 	mainWindowShown = true
@@ -621,12 +620,13 @@ local function CreateMainWindow()
 		caption = "Modules",
 		autosize = false,
 		font   = {size = 20, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
+		parent = mainWindow,
 	}
 	
 	currentModuleList = StackPanel:New{  
-		x = 0,  
-		right = 0,
-		y = 40, 
+		x = 3,  
+		right = 2,
+		y = 36, 
 		bottom = 0,
 		padding = {0, 0, 0, 0},	
 		itemPadding = {2,2,2,2},
@@ -634,54 +634,59 @@ local function CreateMainWindow()
 		backgroundColor = {1, 1, 1, 0.8},
 		resizeItems = false,
 		centerItems = false,
+		parent = mainWindow,
 	}
 	
 	local cyan = {0,1,1,1}
 	
 	local timeImage = Image:New{
 		x = 15,
-		bottom  = 80,
+		bottom  = 75,
 		file ='LuaUI/images/clock.png',
 		height = 24,
 		width = 24, 
 		keepAspect = true,
+		parent = mainWindow,
 	}
 	
 	timeLabel = Chili.Label:New{
-		x = 45,
+		x = 42,
 		right  = 0,
-		bottom  = 83,
+		bottom  = 80,
 		valign = "top",
 		align  = "left",
 		caption = 0,
 		autosize = false,
 		font    = {size = 24, outline = true, color = cyan, outlineWidth = 2, outlineWeight = 2},
+		parent = mainWindow,
 	}
 	
 	local costImage = Image:New{
-		x = 100,
-		bottom  = 80,
-		file ='LuaUI/images/cost.png',
+		x = 92,
+		bottom  = 75,
+		file ='LuaUI/images/costIcon.png',
 		height = 24,
 		width = 24, 
 		keepAspect = true,
+		parent = mainWindow,
 	}
 	
 	costLabel = Chili.Label:New{
-		x = 130,
+		x = 118,
 		right  = 0,
-		bottom  = 83,
+		bottom  = 80,
 		valign = "top",
 		align  = "left",
 		caption = 0,
 		autosize = false,
 		font     = {size = 24, outline = true, color = cyan, outlineWidth = 2, outlineWeight = 2},
+		parent = mainWindow,
 	}
 	
 	local acceptButton = Button:New{
 		caption = "",
-		right = 135,
-		bottom = 15,
+		x = 4,
+		bottom = 5,
 		width = 55,
 		height = 55,
 		padding = {0, 0, 0, 0},	
@@ -694,12 +699,13 @@ local function CreateMainWindow()
 				end
 			end
 		},
+		parent = mainWindow,
 	}
 	
 	viewAlreadyOwnedButton = Button:New{
 		caption = "",
-		right = 75,
-		bottom = 15,
+		x = 63,
+		bottom = 5,
 		width = 55,
 		height = 55,
 		padding = {0, 0, 0, 0},	
@@ -710,12 +716,13 @@ local function CreateMainWindow()
 				AlreadyOwnedModuleClick(self)
 			end
 		},
+		parent = mainWindow,
 	}
 	
 	local cancelButton = Button:New{
 		caption = "",
-		right = 15,
-		bottom = 15,
+		x = 121,
+		bottom = 5,
 		width = 55,
 		height = 55,
 		padding = {0, 0, 0, 0},	
@@ -727,6 +734,7 @@ local function CreateMainWindow()
 				HideMainWindow()
 			end
 		},
+		parent = mainWindow,
 	}
 	
 	Image:New{
@@ -757,18 +765,6 @@ local function CreateMainWindow()
 		keepAspect = true,
 		file = "LuaUI/Images/commands/Bold/cancel.png",
 		parent = cancelButton,
-	}
-	
-	local fakeWindow = Panel:New{
-		parent = mainWindow,
-		fontsize = 20,
-		x = 0,  
-		right = 0,
-		y = 0, 
-		bottom = 0,
-		padding = {0, 0, 0, 0},	
-		backgroundColor = {1, 1, 1, 0.8},
-		children = {topLabel, currentModuleList, timeImage, timeLabel, costImage, costLabel, acceptButton, viewAlreadyOwnedButton, cancelButton}
 	}
 end
 
@@ -888,7 +884,7 @@ function SendUpgradeCommand(newModules)
 			params[index] = newModules[j]
 			index = index + 1
 		end
-		Spring.GiveOrderToUnitArray(upgradableUnits, CMD_MORPH_UPGRADE_INTERNAL, params, {})
+		Spring.GiveOrderToUnitArray(upgradableUnits, CMD_MORPH_UPGRADE_INTERNAL, params, 0)
 	end
 	
 	-- Remove main window
@@ -980,7 +976,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	for i = 1, #units do
 		local unitID = units[i]
 		local level, chassis, staticLevel = GetCommanderUpgradeAttributes(unitID, true)
-		if level and (not staticLevel) and chassis and (UNBOUNDED_LEVEL or chassisDefs[chassis].levelDefs[level+1]) then
+		if level and (not staticLevel) and chassis and (not LEVEL_BOUND or level < LEVEL_BOUND) then
 			upgradeID = unitID
 			break
 		end
@@ -1042,7 +1038,7 @@ function widget:CommandsChanged()
 		for i = 1, #units do
 			local unitID = units[i]
 			local level, chassis, staticLevel = GetCommanderUpgradeAttributes(unitID, true)
-			if level and (not staticLevel) and chassis and (UNBOUNDED_LEVEL or chassisDefs[chassis].levelDefs[level+1]) then
+			if level and (not staticLevel) and chassis and (not LEVEL_BOUND or level < LEVEL_BOUND) then
 				foundRulesParams = true
 				break
 			end

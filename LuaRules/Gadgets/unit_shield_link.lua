@@ -297,8 +297,7 @@ local function DoChargeTransfer(lowID, lowData, lowCharge, highID, highData, hig
 	--charge flow is capable: to reverse flow (IS DISABLED!) when receiver have regen and is full,
 	local chargeFlow = math.min(RECHARGE_KOEF*(highCharge - lowCharge),highCharge, lowData.shieldMaxCharge - lowData.shieldRegen - lowCharge) --minimize positive flow
 	if chargeFlow > 0 then -- Disallow negative flow
-		local slowMult = 1 - (spGetUnitRulesParam(highID, "slowState") or 0)
-		chargeFlow = chargeFlow * slowMult
+		chargeFlow = chargeFlow * (spGetUnitRulesParam(highID, "totalReloadSpeedChange") or 1)
 		spSetUnitShieldState(highID, highData.shieldNum, highCharge - chargeFlow)
 		spSetUnitShieldState(lowID, lowData.shieldNum, lowCharge + chargeFlow)
 		return chargeFlow

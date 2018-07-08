@@ -254,7 +254,6 @@ local glCallList	= gl.CallList
 local glDeleteList	= gl.DeleteList
 
 local CMD_WAIT    	= CMD.WAIT
-local CMD_MOVE     	= CMD.MOVE
 local CMD_PATROL  	= CMD.PATROL
 local CMD_REPAIR    = CMD.REPAIR
 local CMD_RESURRECT    = CMD.RESURRECT
@@ -275,6 +274,8 @@ local sqrt 	= math.sqrt
 local max	= math.max
 local min	= math.min
 local modf	= math.modf
+
+local EMPTY_TABLE = {}
 
 local frame = 0
 local longCount	= 0
@@ -351,7 +352,7 @@ function widget:Initialize()
 			local unitDefID = spGetUnitDefID(uid)
 			local ud = UnitDefs[unitDefID]
 			local _,_,nanoframe = spGetUnitIsStunned(uid)
-			if (ud.isBuilder and ud.speed > 0) then -- if the unit is a mobile builder
+			if ud.isMobileBuilder then -- if the unit is a mobile builder
 				allBuilders[uid] = {include=true} -- add it to the group of all workers
 				
 				if not nanoframe then -- and add any workers that aren't nanoframes to the active group
@@ -833,7 +834,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	
 	-- add new workers to the tracking group, and commanders to includedBuilders.
 	local ud = UnitDefs[unitDefID]
-	if (ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
+	if ud.isMobileBuilder then -- if the new unit is a mobile builder
 		-- add the builder to the global builder tracking table, initialize as controlled by GBC.
 		allBuilders[unitID] = {include=true}
 		-- init our commander as idle, since the initial queue widget will notify us later when it gives the com commands.
@@ -862,7 +863,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			local x,y,z = spGetUnitPosition(unitID)
 			dx = dx*facScale
 			dz = dz*facScale
-			spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- replace the fac rally orders with a short distance move.
+			spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {x+dx, y, z+dz}, 0) -- replace the fac rally orders with a short distance move.
 		end
 	end
 end
@@ -966,7 +967,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeam, unitTeam)
 	end
 	
 	local ud = UnitDefs[unitDefID]
-	if (ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
+	if ud.isMobileBuilder then -- if the new unit is a mobile builder
 		allBuilders[unitID] = {include=true}
 		local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
 		if cmd and cmd.id then -- if so we mark it as drec
@@ -987,7 +988,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		local hash = BuildHash(myCmd)
 		if not buildQueue[hash] then
 			buildQueue[hash] = myCmd
-			if UnitDefs[unitDefID].speed == 0 then
+			if UnitDefs[unitDefID].isImmobile then
 				UpdateOneJobPathing(hash)
 			end
 		end
@@ -1000,15 +1001,15 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		local job = buildQueue[busyUnits[unitID]]
 		if job.id == CMD_REPAIR and job.target then
 			unitDef = UnitDefs[spGetUnitDefID(job.target)]
-			if unitDef and unitDef.speed == 0 and unitDef.reloadTime > 0 then
+			if unitDef and unitDef.isImmobile and unitDef.reloadTime > 0 then
 				return -- don't retreat units that are repairing porc, since continuing to repair the porc is safer!
 			end
 		end
-		spGiveOrderToUnit(unitID, CMD_REMOVE, {CMD_REPAIR}, {"alt"}) -- remove repair/reclaim orders
-		spGiveOrderToUnit(unitID, CMD_REMOVE, {CMD_RECLAIM}, {"alt"})
-		spGiveOrderToUnit(unitID, CMD_STOP, {}, {""})
+		spGiveOrderToUnit(unitID, CMD_REMOVE, {CMD_REPAIR}, CMD.OPT_ALT) -- remove repair/reclaim orders
+		spGiveOrderToUnit(unitID, CMD_REMOVE, {CMD_RECLAIM}, CMD.OPT_ALT)
+		spGiveOrderToUnit(unitID, CMD_STOP, EMPTY_TABLE, 0)
 		local y = spGetGroundHeight(territoryCenter.x, territoryCenter.z)
-		spGiveOrderToUnit(unitID, CMD_MOVE, {territoryCenter.x, y, territoryCenter.z}, {""})
+		spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {territoryCenter.x, y, territoryCenter.z}, 0)
 		includedBuilders[unitID].cmdtype = commandType.ckn
 		movingUnits[unitID] = frame
 		key = busyUnits[unitID]
@@ -1426,7 +1427,7 @@ function GiveWorkToUnit(unitID)
 		end
 		if myJob.id < 0 then -- for build jobs
 			if not myJob.tfparams then -- for normal build jobs, ZK-specific guard, remove if porting
-				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, {""}) -- issue the cheapest job as an order to the unit
+				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, 0) -- issue the cheapest job as an order to the unit
 				busyUnits[unitID] = hash -- save the command info for bookkeeping
 				includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
 				buildQueue[hash].assignedUnits[unitID] = true -- save info for CostOfJob and StopAnyWorker
@@ -1437,11 +1438,11 @@ function GiveWorkToUnit(unitID)
 					local udid = spGetUnitDefID(target)
 					local unitDef = UnitDefs[udid]
 					if string.match(unitDef.humanName, "erraform") and spGetUnitTeam(target) == myTeamID then
-						spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, {""})
+						spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, 0)
 						break
 					end
 				end
-				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, {"shift"}) -- add the build part of the command to the end of the queue with options shift
+				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, CMD.OPT_SHIFT) -- add the build part of the command to the end of the queue with options shift
 				busyUnits[unitID] = hash -- save the command info for bookkeeping
 				includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
 				buildQueue[hash].assignedUnits[unitID] = true
@@ -1449,22 +1450,22 @@ function GiveWorkToUnit(unitID)
 		else -- for repair/reclaim/resurrect
 			if not myJob.target then -- for area commands
 				if not spIsPosInLos(myJob.x, myJob.y, myJob.z, spGetMyAllyTeamID()) then -- if the job is outside of LOS, we need to convert it to a move command or else the units won't bother exploring it.
-					spGiveOrderToUnit(unitID, CMD_MOVE, {myJob.x, myJob.y, myJob.z}, {""})
+					spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {myJob.x, myJob.y, myJob.z}, 0)
 					if myJob.alt then -- if alt was held, the job should remain 'permanent'
-						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {"alt", "shift"})
+						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_ALT + CMD.OPT_SHIFT)
 					else -- for normal area jobs
-						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {"shift"}) -- note: we add options->shift here to add our reclaim job to the unit's queue after the move order, to prevent it from falsely going idle.
+						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_SHIFT) -- note: we add options->shift here to add our reclaim job to the unit's queue after the move order, to prevent it from falsely going idle.
 					end
 				elseif myJob.alt then -- if alt was held, the job should remain 'permanent'
-					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {"alt"})
+					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_ALT)
 				else -- for normal area jobs
-					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {""})
+					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, 0)
 				end
 				busyUnits[unitID] = hash -- save the command info for bookkeeping
 				includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
 				buildQueue[hash].assignedUnits[unitID] = true
 			else -- for single-target commands
-				spGiveOrderToUnit(unitID, myJob.id, {myJob.target}, {""}) -- issue the cheapest job as an order to the unit
+				spGiveOrderToUnit(unitID, myJob.id, {myJob.target}, 0) -- issue the cheapest job as an order to the unit
 				busyUnits[unitID] = hash -- save the command info for bookkeeping
 				includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
 				buildQueue[hash].assignedUnits[unitID] = true
@@ -1617,7 +1618,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	local metalCost = false
 	
 	if job.id < 0 then -- for build jobs, get the metal cost
-		metalCost = unitDef.cost
+		metalCost = unitDef.metalCost
 	end
 	
 	if costMod == 1 then -- for starting new jobs
@@ -1628,7 +1629,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 		elseif job.id == CMD_REPAIR then -- for repair
 			if job.target then
 				unitDef = UnitDefs[spGetUnitDefID(job.target)]
-				if unitDef.speed == 0 and unitDef.reloadTime > 0 then -- repair orders for porc should be high prio.
+				if unitDef.isImmobile and unitDef.reloadTime > 0 then -- repair orders for porc should be high prio.
 					cost = distance - 150
 				else
 					cost = distance + 400
@@ -1651,7 +1652,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 		elseif job.id == CMD_REPAIR then -- for repair
 			if job.target then
 				unitDef = UnitDefs[spGetUnitDefID(job.target)]
-				if unitDef.speed == 0 and unitDef.reloadTime > 0 then -- repair orders for porc should be high prio.
+				if unitDef.isImmobile and unitDef.reloadTime > 0 then -- repair orders for porc should be high prio.
 					cost = distance - 150 + (800 * (costMod - 2))
 				else
 					cost = distance + (200 * costMod)
@@ -1717,7 +1718,7 @@ function FlatCost(unitID, hash, ux, uz, jx, jz)
 	local metalCost = false
 	
 	if job.id < 0 then -- for build jobs, get the metal cost
-		metalCost = unitDef.cost
+		metalCost = unitDef.metalCost
 	end
 	
 	if costMod == 1 then -- for starting new jobs
@@ -1880,13 +1881,13 @@ function CheckMovingUnits()
 				local dx, _, dz = spGetUnitDirection(unitID)
 				dx = dx*-125
 				dz = dz*-125
-				spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- move it in the opposite direction it was facing.
+				spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {x+dx, y, z+dz}, 0) -- move it in the opposite direction it was facing.
 				movingUnits[unitID] = frame
 			elseif includedBuilders[unitID].cmdtype == commandType.ckn and frame - lastMovFrame > 600 then
 				local x,y,z = spGetUnitPosition(unitID)
-				spGiveOrderToUnit(unitID, CMD_REMOVE, {CMD_MOVE}, {"alt"}) -- remove the current order
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {CMD_RAW_MOVE}, CMD.OPT_ALT) -- remove the current order
 				-- note: options "alt" with CMD_REMOVE tells it to use params as command ids, which is what we want.
-				spGiveOrderToUnit(unitID, CMD_STOP, {}, {""}) -- and replace it with a stop order
+				spGiveOrderToUnit(unitID, CMD_STOP, EMPTY_TABLE, 0) -- and replace it with a stop order
 				includedBuilders[unitID].cmdtype = commandType.idle
 				reassignedUnits[unitID] = nil
 			end
@@ -2043,7 +2044,7 @@ function CleanOrders(cmd, isNew)
 					local dx, dz = GetNormalizedDirection(cx, cz, x, z) 
 					dx = dx*75
 					dz = dz*75
-					spGiveOrderToUnit(blockerID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- move it out of the way
+					spGiveOrderToUnit(blockerID, CMD_RAW_MOVE, {x+dx, y, z+dz}, 0) -- move it out of the way
 					includedBuilders[blockerID].cmdtype = commandType.mov -- and mark it with a special state so the move order doesn't get clobbered
 					movingUnits[blockerID] = frame
 					if busyUnits[blockerID] then -- also remove it from busyUnits if necessary, and remove its assignment listing from buildQueue
@@ -2258,7 +2259,7 @@ function UpdateOneWorkerPathing(unitID)
 				jx, jy, jz = cmd.x, cmd.y, cmd.z --the location of the current job
 			elseif spValidUnitID(cmd.target) and spIsUnitAllied(cmd.target) and not spUnitIsDead(cmd.target) then -- for repair jobs, only cache pathing for buildings, since they don't move.
 				jx, jy, jz = spGetUnitPosition(cmd.target)
-				if UnitDefs[spGetUnitDefID(cmd.target)].speed > 0 then
+				if not UnitDefs[spGetUnitDefID(cmd.target)].isImmobile then
 					valid = false
 				end
 			else
@@ -2283,7 +2284,7 @@ function UpdateOneJobPathing(hash)
 			jx, jy, jz = cmd.x, cmd.y, cmd.z --the location of the current job
 		else
 			jx, jy, jz = spGetUnitPosition(cmd.target)
-			if UnitDefs[spGetUnitDefID(cmd.target)].speed > 0 then
+			if not UnitDefs[spGetUnitDefID(cmd.target)].isImmobile then
 				valid = false
 			end
 		end
@@ -2360,7 +2361,7 @@ function RemoveJobs(x, z, r)
 					local udid = spGetUnitDefID(target)
 					local unitDef = UnitDefs[udid]
 					if string.match(unitDef.humanName, "erraform") ~= nil then -- if the target was a 'terraunit', self-destruct it
-						spGiveOrderToUnit(target, 65, {}, {""})
+						spGiveOrderToUnit(target, 65, EMPTY_TABLE, 0)
 					end
 				end
 			end
@@ -2427,9 +2428,9 @@ function StopAnyWorker(key)
 	local myCmd = buildQueue[key]
 	for unit,_ in pairs(myCmd.assignedUnits) do
 		if includedBuilders[unit].cmdtype == commandType.buildQueue then -- for units that are under GBC control
-			spGiveOrderToUnit(unit, CMD_REMOVE, {myCmd.id}, {"alt"}) -- remove the current order
+			spGiveOrderToUnit(unit, CMD_REMOVE, {myCmd.id}, CMD.OPT_ALT) -- remove the current order
 			-- note: options "alt" with CMD_REMOVE tells it to use params as command ids, which is what we want.
-			spGiveOrderToUnit(unit, CMD_STOP, {}, {""}) -- and replace it with a stop order
+			spGiveOrderToUnit(unit, CMD_STOP, EMPTY_TABLE, 0) -- and replace it with a stop order
 			-- note: giving a unit a stop order does not automatically cancel other orders as it does when a player uses it, which is why we also have to use CMD_REMOVE here.
 			includedBuilders[unit].cmdtype = commandType.idle -- mark them as idle
 			busyUnits[unit] = nil -- remove their entries from busyUnits, since the job is done

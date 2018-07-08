@@ -18,27 +18,27 @@ end
 --------------------------------------------------------------------------------
 
 local spGetUnitBasePosition = Spring.GetUnitBasePosition
-local spGetUnitHeading		= Spring.GetUnitHeading
-local spGetUnitDefID 		= Spring.GetUnitDefID
-local spSetUnitVelocity		= Spring.SetUnitVelocity
-local spSetUnitLeaveTracks 	= Spring.SetUnitLeaveTracks 
-local spGetUnitVelocity		= Spring.GetUnitVelocity
-local spGetUnitRotation		= Spring.GetUnitRotation 
-local spGetUnitHealth 		= Spring.GetUnitHealth
-local spSetUnitHealth 		= Spring.SetUnitHealth
-local spGetUnitIsStunned 	= Spring.GetUnitIsStunned
+local spGetUnitHeading      = Spring.GetUnitHeading
+local spGetUnitDefID        = Spring.GetUnitDefID
+local spSetUnitVelocity     = Spring.SetUnitVelocity
+local spSetUnitLeaveTracks  = Spring.SetUnitLeaveTracks 
+local spGetUnitVelocity     = Spring.GetUnitVelocity
+local spGetUnitRotation     = Spring.GetUnitRotation 
+local spGetUnitHealth       = Spring.GetUnitHealth
+local spSetUnitHealth       = Spring.SetUnitHealth
+local spGetUnitIsStunned    = Spring.GetUnitIsStunned
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
 local spGetUnitIsDead       = Spring.GetUnitIsDead
 
 local mcSetVelocity         = Spring.MoveCtrl.SetVelocity
 local mcSetRotationVelocity = Spring.MoveCtrl.SetRotationVelocity
-local mcSetPosition	        = Spring.MoveCtrl.SetPosition
+local mcSetPosition         = Spring.MoveCtrl.SetPosition
 local mcSetRotation         = Spring.MoveCtrl.SetRotation
-local mcDisable	            = Spring.MoveCtrl.Disable
-local mcEnable	            = Spring.MoveCtrl.Enable
+local mcDisable             = Spring.MoveCtrl.Disable
+local mcEnable              = Spring.MoveCtrl.Enable
 
 local coroutine = coroutine
-local Sleep	    = coroutine.yield
+local Sleep     = coroutine.yield
 local assert    = assert
 
 -- South is 0 radians and increases counter-clockwise
@@ -103,12 +103,37 @@ local function StartScript(fn)
 	coroutines[#coroutines + 1] = co
 end
 
+local function AbortCheck(unitID, isLanded)
+	if (not landingUnit[unitID]) or landingUnit[unitID].abort then
+		if not spGetUnitIsDead(unitID) then
+			spSetUnitLeaveTracks(unitID, true)
+			if isLanded then
+				spSetUnitVelocity(unitID, 0, 0, 0)
+				Spring.SetUnitResourcing(unitID, "uue", 0)
+				
+				-- activate unit and its jets. An attempt at the Vulture-losing-radar bug.
+				Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1) 
+			end
+			mcDisable(unitID)
+			unitMovectrled[unitID] = nil
+			GG.UpdateUnitAttributes(unitID)
+		end
+		landingUnit[unitID] = nil
+		return true
+	end
+	
+	return false
+end
+
 local function SitOnPad(unitID)
 	local landData = landingUnit[unitID]
+	local heading = spGetUnitHeading(unitID)
+	if not heading then
+		return
+	end
+	heading = heading*HEADING_TO_RAD
 	
 	local px, py, pz, dx, dy, dz = Spring.GetUnitPiecePosDir(landData.padID, landData.padPieceID)
-	
-	local heading = spGetUnitHeading(unitID)*HEADING_TO_RAD
 	
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	local ud = UnitDefs[unitDefID]
@@ -144,23 +169,12 @@ local function SitOnPad(unitID)
 	
 	local function SitLoop()
 		local landDuration = 0
-		local reammoProgress = GG.RequireRefuel(unitID) and 0
+		local reammoProgress = GG.RequireRefuel(unitID)	-- read unitrulesparam for save/load handling
+			and (Spring.GetUnitRulesParam(unitID, "reammoProgress") or 0) * (reammoHalfSeconds[unitDefID] or REAMMO_HALF_SECONDS)
 		local drainingEnergy = false
 		
 		while true do
-			if (not landingUnit[unitID]) or landingUnit[unitID].abort or (not landingUnit[unitID].landed) then
-				if not spGetUnitIsDead(unitID) then
-					spSetUnitLeaveTracks(unitID, true)
-					spSetUnitVelocity(unitID, 0, 0, 0)
-					Spring.SetUnitResourcing(unitID, "uue" ,0)
-					mcDisable(unitID)
-					unitMovectrled[unitID] = nil
-					GG.UpdateUnitAttributes(unitID)
-					
-					-- activate unit and its jets. An attempt at the Vulture-losing-radar bug.
-					Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
-				end
-				landingUnit[unitID] = nil
+			if AbortCheck(unitID, true) then
 				return
 			end
 			
@@ -184,9 +198,9 @@ local function SitOnPad(unitID)
 						drainingEnergy = false
 					end
 				else
-					local slowState = 1 - (spGetUnitRulesParam(landData.padID,"slowState") or 0)
+					local buildPowerMult = spGetUnitRulesParam(landData.padID,"totalBuildPowerChange") or 1
 					if reammoProgress then
-						reammoProgress = reammoProgress + slowState
+						reammoProgress = reammoProgress + buildPowerMult
 						local maxProgress = (reammoHalfSeconds[unitDefID] or REAMMO_HALF_SECONDS)
 						if reammoProgress >= maxProgress then
 							reammoProgress = false
@@ -198,13 +212,13 @@ local function SitOnPad(unitID)
 					end
 					if not reammoProgress then
 						if GG.HasCombatRepairPenalty(unitID) then
-							slowState = slowState/4
+							buildPowerMult = buildPowerMult/4
 						end
 						local hp = spGetUnitHealth(unitID)
 						if hp < maxHP then
-							if drainingEnergy ~= slowState then
-								Spring.SetUnitResourcing(unitID, "uue" ,PAD_ENERGY_DRAIN*slowState)
-								drainingEnergy = slowState
+							if drainingEnergy ~= buildPowerMult then
+								Spring.SetUnitResourcing(unitID, "uue" ,PAD_ENERGY_DRAIN*buildPowerMult)
+								drainingEnergy = buildPowerMult
 							end
 							local _,_,_,energyUse = Spring.GetUnitResources(unitID)
 							spSetUnitHealth(unitID, min(maxHP, hp + healPerHalfSecond*energyUse/PAD_ENERGY_DRAIN))
@@ -440,14 +454,7 @@ local function CircleToLand(unitID, goal)
 		
 		while currentDistance + currentSpeed < totalDist do
 			
-			if (not landingUnit[unitID]) or landingUnit[unitID].abort then
-				if not spGetUnitIsDead(unitID) then
-					spSetUnitLeaveTracks(unitID, true)
-					mcDisable(unitID)
-					unitMovectrled[unitID] = nil
-					GG.UpdateUnitAttributes(unitID)
-				end
-				landingUnit[unitID] = nil
+			if AbortCheck(unitID) then
 				return
 			end
 			
@@ -489,9 +496,7 @@ local function CircleToLand(unitID, goal)
 			end
 		end
 		
-		local px, pz = DistanceToPosition(totalDist)
-		
-		if landingUnit[unitID] and not landingUnit[unitID].abort then
+		if not AbortCheck(unitID) then
 			landingUnit[unitID].landed = true
 			SitOnPad(unitID)
 		end
@@ -515,7 +520,6 @@ end
 function GG.LandAborted(unitID)
 	if landingUnit[unitID] then
 		landingUnit[unitID].abort = true
- 
 	end
 end
 

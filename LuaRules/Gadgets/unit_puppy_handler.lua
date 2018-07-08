@@ -78,7 +78,7 @@ local function HidePuppy(unitID)
 	spSetUnitCollisionVolumeData(unitID, 20, 20, 20, 0, -3000, 0, 0, 1, 0)
 	--Spring.SetUnitNoSelect(unitID, true)
 	spSetUnitNoMinimap(unitID, true)
-	--spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
+	--spGiveOrderToUnit(unitID, CMD.STOP, {}, 0)
 
 	local frame = spGetGameFrame() + 450
 	cannotBeDamage[unitID] = cannotBeDamage[unitID] or frame
@@ -115,9 +115,10 @@ local function RestorePuppy(unitID, x, y, z)
 	spAddUnitDamage(unitID, 15, 0, -1, WeaponDefNames["jumpscout_missile"].id) -- prevent puppy fountain
 	-- Spring.SetUnitNoSelect(unitID, false)
 	spSetUnitNoMinimap(unitID, false)
-	spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
-	spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
-	--spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
+	spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
+	spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
+	GG.WaitWaitMoveUnit(unitID)
+	--spGiveOrderToUnit(unitID, CMD.STOP, {}, 0)
 end
 
 function GG.PuppyHandler_Shot(unitID)

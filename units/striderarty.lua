@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[striderarty]],
-  name                   = [[Catapult]],
+  name                   = [[Merlin]],
   description            = [[Heavy Saturation Artillery Strider]],
   acceleration           = 0.1092,
   brakeRate              = 0.1942,
@@ -17,11 +17,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Schwerer Raketen-Artillerie Läufer]],
-    description_fr = [[Mechwarrior Lance-Roquette Lourd]],
-    helptext       = [[The Catapult is an MLRS strider. It can launch a volley of rockets that guarantees the destruction of almost anything in the target area, then quickly retreat behind friendly forces.]],
-    helptext_de    = [[Das Catapult ist ein Läufer mit Mehrfachraketenwerfer-Artilleriesystem. Es kann eine Salve von Raketen starten, was die Zerstörung von fast allem im Zielgebiet garantieren kann. Infolgedessen kann es sich schnell in freundliches Gebiet hinter den Fronteinheiten zurückziehen.]],
-    helptext_fr    = [[Le Catapult est le plus fragile des Mechwarriors. Il est cependant trcs rapide et tire un nombre incalculable de roquettes r grande distance grâce r ses deux batteries lance missiles embarquées. Une seule salve peut tapisser une large zone, et rares sont les survivant.]],
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],
@@ -78,6 +73,7 @@ unitDef = {
       craterMult              = 2,
 	  
 	  customParams        	  = {
+        reaim_time = 8, -- COB
 		light_camera_height = 2500,
 		light_color = [[0.35 0.17 0.04]],
 		light_radius = 400,

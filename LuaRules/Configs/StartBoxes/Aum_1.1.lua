@@ -124,7 +124,6 @@ for area = 1, 4 do
 	end
 	local dx = (layout[0].startpoints[1][1] - center[1])
 	local dy = (layout[0].startpoints[1][2] - center[2])
-	local phi = math.pi * area * 0.4
 	layout[area].startpoints[1] = {
 		center[1] + dx*math.cos(phi) + dy*math.sin(-phi),
 		center[2] + dx*math.sin(phi) + dy*math.cos(phi)

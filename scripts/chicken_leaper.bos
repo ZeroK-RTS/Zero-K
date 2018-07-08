@@ -7,8 +7,7 @@ static-var bMoving, lasthit;
 #define SIG_AIM_2			4
 #define SIG_MOVE			8
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 BeginJump()
 {

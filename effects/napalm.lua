@@ -2,6 +2,21 @@ Spring = Spring or {}
 Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
+local function GetPloomPos(pos)
+	return {
+	  air                = true,
+	  class              = [[CExpGenSpawner]],
+	  count              = 1,
+	  ground             = true,
+	  water              = true,
+	  properties = {
+		delay              = [[0]],
+		explosiongenerator = [[custom:napalmfireball_450]],
+		pos                = pos,
+	  },
+	}
+end
+
 local cegs = {
   ["napalm_phoenix"] = {
     usedefaultexplosions = false,
@@ -32,7 +47,7 @@ local cegs = {
     usedefaultexplosions = false,
     groundflash = {
       flashalpha         = 1,
-      flashsize          = 96,
+      flashsize          = 120,
       ttl                = 440,
       color = {
         [1]  = 0.7,
@@ -47,11 +62,16 @@ local cegs = {
       ground             = true,
       water              = true,
       properties = {
-        delay              = [[0 i40]],
-        explosiongenerator = [[custom:NAPALMFIREBALL_200]],
-        pos                = [[-20 r40, 30, -20 r40]],
+        delay              = [[0 i25]],
+        explosiongenerator = [[custom:napalmfireball_450_big]],
+        pos                = [[-20 r75, 28 r10, -20 r75]],
       },
     },
+    redploom_1 = GetPloomPos([[-40 r32, 28 r10, -40 r32]]),
+    redploom_2 = GetPloomPos([[-40 r32, 28 r10, 8 r32]]),
+    redploom_3 = GetPloomPos([[8 r32, 28 r10, -40 r32]]),
+    redploom_4 = GetPloomPos([[8 r32, 28 r10, 8 r32]]),
+    redploom_5 = GetPloomPos([[-20 r75, 28 r10, -20 r75]]),
   },
   ["napalm_pyro"] = {
     usedefaultexplosions = false,
@@ -491,6 +511,14 @@ local altforms = {
     modifications = {
       rocks = {
 	properties = {particlelife = 150, particlelifespread = 300},
+      },
+    },
+  },
+  napalmfireball_450_big = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+	    properties = {particlelife = 50, particlelifespread = 80, particlesize = 40, particlesizespread = 20,},
       },
     },
   },

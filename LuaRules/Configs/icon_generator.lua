@@ -74,12 +74,9 @@ local function IsCoreOrChicken(a)
 	else return false end
 end
 local function IsHover(a)
-	return a and string.find(a.name, "hover") ~= nil
+	return a and a.name and string.find(a.name, "hover") ~= nil
 end
 backgrounds = {
---//chicken queen has air movementtype
-  {check={name="chickenq"},                                  texture="LuaRules/Images/IconGenBkgs/bg_ground_rock.png"},
-
 --// stuff that needs hardcoding
   {check={name="shipcarrier"}, texture="LuaRules/Images/IconGenBkgs/bg_water.png"},
 
@@ -260,11 +257,6 @@ unitConfigs = {
     border = defaults.border,
   }, 
 
-  [UnitDefNames.chickenq.id] = {
-    rot    = 29,
-    angle  = 10,
-    unfold = false,
-  },
   [UnitDefNames.chickenbroodqueen.id] = {
     rot    = 29,
     angle  = 10,
@@ -279,11 +271,6 @@ unitConfigs = {
     angle  = 10,
     unfold = true,
   },
-  [UnitDefNames.armraz.id] = {
-    rot    = 28,
-    angle  = 10,
-    border = 0.09,
-  },
   [UnitDefNames.striderdante.id] = {
     rot    = 28,
     angle  = 10,
@@ -297,6 +284,9 @@ unitConfigs = {
     angle  = 30,
   },
   [UnitDefNames.spiderassault.id] = {
+    unfold = true,
+  },  
+  [UnitDefNames.amphlaunch.id] = {
     unfold = true,
   },  
   [UnitDefNames.spidercon.id] = {

@@ -1,0 +1,2 @@
+hotspot topleft
+frame  anims/zk_large/cursorrestore2_0.png  0.1

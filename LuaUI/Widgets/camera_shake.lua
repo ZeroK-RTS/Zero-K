@@ -35,7 +35,7 @@ local spSetShockFrontFactors = Spring.SetShockFrontFactors
 --------------------------------------------------------------------------------
 ----------------------------Configuration---------------------------------------
 options_path = 'Settings/Camera'
-options_order = { 'camShake'}
+options_order = { 'camShake', 'camShakeMax'}
 options = {
 	camShake = {
 		name = 'Camera Shake (when explosions occur)',
@@ -44,11 +44,21 @@ options = {
 		min = 0,
 		max = 1,
 		step = 0.01,
+		simpleMode = true,
+		everyMode = true,
+	},
+	camShakeMax = {
+		name = 'Camera Shake Limit',
+		type = "number", 
+		value = 0.3, 
+		min = 0,
+		max = 2,
+		step = 0.01,
 	},
 }
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-	
+
 
 local exps = 0
 local shake = 0
@@ -101,6 +111,9 @@ function widget:Update(dt)
     return
   end
   local t = widgetHandler:GetHourTimer()
+  if shake > options.camShakeMax.value then
+    shake = options.camShakeMax.value
+  end
   local pShake = shake * 0.2 * options.camShake.value
   local tShake = shake * 0.05 * options.camShake.value
   local px, py, pz, tx, ty, tz =

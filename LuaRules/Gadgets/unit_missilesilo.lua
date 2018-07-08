@@ -1,39 +1,29 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not gadgetHandler:IsSyncedCode() then
-	return
+function gadget:GetInfo()
+	return {
+		name      = "Missile Silo Controller",
+		desc      = "Handles missile silos",
+		author    = "KingRaptor (L.J. Lim)",
+		date      = "31 August 2010",
+		license   = "Public domain",
+		layer     = 0,
+		enabled   = true --  loaded by default?
+	}
 end
+
+local SAVE_FILE = "Gadgets/unit_missilesilo.lua"
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if gadgetHandler:IsSyncedCode() then
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- SYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetUnitDefID = Spring.GetUnitDefID
 
-------------------------------------------------------------------------------
---	How it works:
---	The system consists of two parts: this gadget and the Missile Silo script (scripts\missilesilo.lua). Each part does different things during four different events:
---		silo built:
---			add silo to array
---		silo destroyed:
---			gadget instructs silo to get all child missiles and blows them up on pad
---			remove silo from array
---		missile built:
---			AllowUnitCreation in gadget asks silo to checks slot.
---			If slot 1 is free, start construction . Slot is marked as filled by missileID once construction finishes, and parent is recorded.
---			If slot 1 is not free, check next slot until an empty one is found.
---			If no slots are free, block construction.
---		missile destroyed (including launch):
---			gadget instructs parent silo to check all slots and remove missile if found
-
-function gadget:GetInfo()
-  return {
-    name      = "Missile Silo Controller",
-    desc      = "Handles missile silos",
-    author    = "KingRaptor (L.J. Lim)",
-    date      = "31 August 2010",
-    license   = "Public domain",
-    layer     = 0,
-    enabled   = true --  loaded by default?
-  }
-end
+local MISSILES_PER_SILO = 4
 
 local siloDefID = UnitDefNames.staticmissilesilo.id
 local missileDefIDs = {
@@ -43,84 +33,208 @@ local missileDefIDs = {
 	[UnitDefNames.seismic.id] = true,
 }
 
-local silos = {}
-local missileParents = {}	--stores the parent silo unitID for each missile unitID
-local scheduleForDestruction
-local scheduleForTransfer = {}
+local silos = {} -- [siloUnitID] = {[1] = missileID1, [3] = missileID3, ...}
+local missileParents = {} -- [missileUnitID] = siloUnitID
+local missilesToDestroy
+local missilesToTransfer = {}
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local function GetSiloEntry(unitID)
+	return silos[unitID]
+end
+
+local function GetFirstEmptyPad(unitID)
+	if not silos[unitID] then
+		return nil
+	end
+	for i = 1, MISSILES_PER_SILO do
+		if silos[unitID][i] == nil then
+			return i
+		end
+	end
+	return nil
+end
+
+local function DestroyMissile(unitID, unitDefID)
+	gadget:UnitDestroyed(unitID, unitDefID)
+end
+
+local function SetSiloPadNum(siloID, padNum)
+	local env = Spring.UnitScript.GetScriptEnv(siloID)
+	Spring.UnitScript.CallAsUnit(siloID, env.SetPadNum, padNum)
+end
+
+-- this makes sure the object references are up to date
+local function UpdateSaveReferences()
+	_G.missileSiloSaveTable = {
+		silos = silos,
+		missileParents = missileParents,
+		missilesToDestroy = missilesToDestroy,
+		missilesToTransfer = missilesToTransfer
+	}
+end
+UpdateSaveReferences()
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function gadget:Initialize()
+	GG.MissileSilo = {
+		GetSiloEntry = GetSiloEntry,
+		GetFirstEmptyPad = GetFirstEmptyPad,
+		DestroyMissile = DestroyMissile
+	}
+	
 	-- partial /luarules reload support
 	-- it'll lose track of any missiles already built (meaning you can stack new missiles on them, and they don't die when the silo does)
 	if Spring.GetGameFrame() > 1 then
 		local unitList = Spring.GetAllUnits()
-		for i,v in pairs(unitList) do
-			if spGetUnitDefID(v) == siloDefID then silos[v] = true end
+		for i, v in pairs(unitList) do
+			if spGetUnitDefID(v) == siloDefID then
+				silos[v] = {}
+			end
 		end
 	end
+end
+
+function gadget:Shutdown()
+	GG.MissileSilo = nil
 end
 
 function gadget:GameFrame(n)
-	if scheduleForDestruction then
-		for i=1,#scheduleForDestruction do
-			Spring.DestroyUnit(scheduleForDestruction[i], true)
+	if missilesToDestroy then
+		for i = 1, #missilesToDestroy do
+			if missilesToDestroy[i] and Spring.ValidUnitID(missilesToDestroy[i]) then
+				Spring.DestroyUnit(missilesToDestroy[i], true)
+			end
 		end
+		missilesToDestroy = nil
 	end
-	scheduleForDestruction = nil
 
-	for uid, team in pairs(scheduleForTransfer) do
+	for uid, team in pairs(missilesToTransfer) do
 		Spring.TransferUnit(uid, team, false)
-		scheduleForTransfer[uid] = nil
+		missilesToTransfer[uid] = nil
 	end
 end
 
+-- check if the silo has a free pad we can use
 function gadget:AllowUnitCreation(udefID, builderID)
 	if (spGetUnitDefID(builderID) ~= siloDefID) then return true end
-	local env = Spring.UnitScript.GetScriptEnv(builderID)
-	return (Spring.UnitScript.CallAsUnit(builderID, env.BuildNewMissile)) --ask silo if it can build the missile
+	local firstPad = GetFirstEmptyPad(builderID)
+	if firstPad ~= nil then
+		SetSiloPadNum(builderID, firstPad)
+		return true
+	end
+	return false
 end
 
 function gadget:UnitGiven(unitID, unitDefID, newTeam)
 	if unitDefID == siloDefID then
-		local env = Spring.UnitScript.GetScriptEnv(unitID)
-		local missiles = Spring.UnitScript.CallAsUnit(unitID, env.GetMissiles)
+		local missiles = GetSiloEntry(unitID)
 		for index, missileID in pairs(missiles) do
-			scheduleForTransfer[missileID] = newTeam
+			missilesToTransfer[missileID] = newTeam
 		end
 	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
+	-- silo destroyed
 	if unitDefID == siloDefID then
-		local env = Spring.UnitScript.GetScriptEnv(unitID)
-		local missiles = Spring.UnitScript.CallAsUnit(unitID, env.GetMissiles)
-		scheduleForDestruction = scheduleForDestruction or {}
-		for index,missileID in pairs(missiles) do
-			scheduleForDestruction[#scheduleForDestruction + 1] = missileID
+		local missiles = GetSiloEntry(unitID)
+		missilesToDestroy = missilesToDestroy or {}
+		for index, missileID in pairs(missiles) do
+			missilesToDestroy[#missilesToDestroy + 1] = missileID
 		end
+	-- missile destroyed
 	elseif missileDefIDs[unitDefID] then
 		local parent = missileParents[unitID]
 		if parent then
-			local env = Spring.UnitScript.GetScriptEnv(parent)
-			if env then Spring.UnitScript.CallAsUnit(parent, env.RemoveMissile, unitID)	end		 --ask silo to remove missile from its inventory
+			local siloEntry = GetSiloEntry(parent)
+			if siloEntry then
+				for i = 1, MISSILES_PER_SILO do
+					if siloEntry[i] == unitID then
+						siloEntry[i] = nil
+						break
+					end
+				end
+			end
 		end
 		missileParents[unitID] = nil
 	end
 end
 
-function GG.DestroyMissile(unitID, unitDefID)
-	gadget:UnitDestroyed(unitID, unitDefID)
-end
 
-function gadget:UnitCreated(unitID, unitDefID)
-	if unitDefID == siloDefID then silos[unitID] = true end
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+	if unitDefID == siloDefID then
+		silos[unitID] = {}
+	elseif silos[builderID] then
+		Spring.SetUnitBlocking(unitID, false, false) -- non-blocking, non-collide (try to prevent pad detonations)
+		Spring.SetUnitRulesParam(unitID, "missile_parentSilo", builderID)
+		local spawnedFrame = (Spring.GetGameRulesParam("totalSaveGameFrame") or 0) + Spring.GetGameFrame()
+		Spring.SetUnitRulesParam(unitID, "missile_spawnedFrame", spawnedFrame)
+	end
 end
 
 --add newly finished missile to silo data
 --this doesn't check half-built missiles, but there's actually no need to
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 	if facDefID == siloDefID then
-		local env = Spring.UnitScript.GetScriptEnv(facID)
-		Spring.UnitScript.CallAsUnit(facID, env.AddMissile, unitID)
 		missileParents[unitID] = facID
+		-- get the pad the missile was built on from unit script, to make sure there's no discrepancy
+		local env = Spring.UnitScript.GetScriptEnv(facID)
+		if env then
+			local pad = Spring.UnitScript.CallAsUnit(facID, env.GetPadNum)
+			silos[facID][pad] = unitID
+		end
 	end
+end
+
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	local loadData = GG.SaveLoad.ReadFile(zip, "Missile Silo", SAVE_FILE) or {}
+	
+	missileParents = GG.SaveLoad.GetNewUnitIDKeys(loadData.missileParents or {})
+	missileParents = GG.SaveLoad.GetNewUnitIDValues(missileParents)
+	
+	missilesToDestroy = GG.SaveLoad.GetNewUnitIDValues(loadData.missilesToDestroy or {})
+	missilesToTransfer = GG.SaveLoad.GetNewUnitIDValues(loadData.missilesToTransfer or {})
+	
+	silos = GG.SaveLoad.GetNewUnitIDKeys(loadData.silos or {})
+	for siloID, missiles in pairs(silos) do
+		for i = 1, MISSILES_PER_SILO do
+			if missiles[i] ~= nil then
+				missiles[i] = GG.SaveLoad.GetNewUnitID(missiles[i])
+				Spring.SetUnitRulesParam(missiles[i], "missile_parentSilo", siloID)
+			end
+		end
+		SetSiloPadNum(siloID, GetFirstEmptyPad(siloID))
+	end
+	
+	UpdateSaveReferences()
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+else
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- UNSYNCED
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.missileSiloSaveTable, "Missile silo"))
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 end

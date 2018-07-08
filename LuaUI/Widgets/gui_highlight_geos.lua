@@ -50,6 +50,7 @@ end
 local geos = {}
 
 local function HighlightGeos()
+	geos = {}
 	local features = Spring.GetAllFeatures()
 	for i = 1, #features do
 		local fID = features[i]
@@ -72,7 +73,14 @@ function widget:Shutdown()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize() -- for cases when there's no GamePreload (eg `/luaui reload`)
+	geoDisplayList = gl.CreateList(HighlightGeos)
+end
+
+function widget:GamePreload() -- for cases when features are not yet spawned at Initialize (eg using feature placer)
+	if geoDisplayList then
+		gl.DeleteList(geoDisplayList)
+	end
 	geoDisplayList = gl.CreateList(HighlightGeos)
 end
 
@@ -105,10 +113,10 @@ function widget:Update()
 end
 
 local function drawMinimapGeos(x,z)
-	gl.Vertex(x - size,0,z - size)
-	gl.Vertex(x + size,0,z + size)
-	gl.Vertex(x + size,0,z - size)
-	gl.Vertex(x - size,0,z + size)
+	gl.Vertex(x - size, z - size, 0)
+	gl.Vertex(x + size, z + size, 0)
+	gl.Vertex(x + size, z - size, 0)
+	gl.Vertex(x - size, z + size, 0)
 end
 
 function widget:DefaultCommand(type, id)
@@ -122,10 +130,10 @@ function widget:DrawInMiniMap()
 
 	if drawGeos then
 	
+		gl.PushMatrix()
 		gl.LoadIdentity()
 		gl.Translate(0,1,0)
 		gl.Scale(mapXinv , -mapZinv, 1)
-		gl.Rotate(270,1,0,0)
 		gl.LineWidth(2)
 		gl.Lighting(false)
 		gl.Color(1,1,0,0.7)
@@ -136,5 +144,6 @@ function widget:DrawInMiniMap()
 		
 		gl.LineWidth(1.0)
 		gl.Color(1,1,1,1)
+		gl.PopMatrix()
 	end
 end

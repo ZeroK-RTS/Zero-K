@@ -112,6 +112,29 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Apply remaim_time
+
+for name, weaponDef in pairs(WeaponDefs) do
+	if not (weaponDef.customparams.reaim_time or string.find(name, "chicken")) then
+		weaponDef.customparams.reaim_time = 1
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Set shield starting power to 100%
+
+for name, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.shieldpower and (weaponDef.shieldpower < 2000) then
+		weaponDef.shieldstartingpower = weaponDef.shieldpower
+		weaponDef.customparams.shieldstartingpower = weaponDef.shieldstartingpower
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Set lenient fire tolerance
 
 for _, weaponDef in pairs(WeaponDefs) do
@@ -327,14 +350,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- Combatrange/truerange handling (see unit_control_gunship_strafe_range.lua)
-
-for _, weaponDef in pairs(WeaponDefs) do
-	if weaponDef.customparams.combatrange then
-		weaponDef.customparams.truerange = weaponDef.range
-		weaponDef.range = weaponDef.customparams.combatrange
-	end
-end
+-- ???
 
 for _, weaponDef in pairs(WeaponDefs) do
 	if weaponDef.paralyzetime and not weaponDef.paralyzer then
@@ -376,6 +392,12 @@ do
 		if not ud.canattack then
 			ud.canattack = CanAttack(ud)
 		end
+	end
+end
+
+for _, wd in pairs (WeaponDefs) do
+	if wd.reloadtime then -- shields and death explosions don't have reloadtime
+		wd.reloadtime = (math.floor(wd.reloadtime * 30 + 1E-5) / 30) + 1E-6 -- sanitize to whole frames (plus leeways because float arithmetic is bonkers)
 	end
 end
 

@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[tankriot]],
-  name                = [[Banisher]],
+  name                = [[Ogre]],
   description         = [[Heavy Riot Support Tank]],
   acceleration        = 0.02181,
   brakeRate           = 0.04282,
@@ -11,14 +11,12 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[55 55 55]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_fr = [[Tank Lance-Missile Lourd]],
-	description_de = [[Schwerer Riot Unterstützungspanzer]],
-    helptext       = [[Remarkably mobile for a riot platform, the Banisher packs twin high-velocity fragmentation missiles that are devastating to light units and aircraft alike, although they have limited range. Like other riot units, the Banisher does not have the range and speed to hold its own against most skirmishers. The missile is quite effective at flattening terrain so it is particularly useful at knocking down walls that Welders cannot reach.]],
-    helptext_fr    = [[Les Banishers sont arm?s de deux lance-missiles lourds ? t?te chercheuse. Capable d'attaquer les cibles au sol ou dans les airs, ils font d'?normes d?g?ts, mais sont lent a recharger. Impuissant contre les nu?es d'ennemis et indispensable contre les grosses cibles, son blindage ne lui permet pas d'?tre en premi?re ligne.]],
-	helptext_de    = [[Erstaunlich beweglich für eine Rioteinheit. Der Banisher ist mit Zwillings-Hochgeschwindigkeits Splitterraketen ausgerüstet, die verheerend für leichte Einheiten und Lufteinheiten sind, obwohl sie nur eine begrenzte Reichweite haben. Der Banisher wird schnell von Sturmeinheiten überrascht und sogar von Raider, weshalb du ihn mit deinen Abschirmungseinheiten beschützen musst. Anders als andere Rioteinheiten besitzt der Banisher die nötige Geschwindigkeit und Reichweite, um sich gegen die meisten Skirmishern zu halten.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -28,7 +26,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  maxDamage           = 1650,
+  maxDamage           = 1850,
   maxSlope            = 18,
   maxVelocity         = 2.3,
   maxWaterDepth       = 22,
@@ -44,7 +42,7 @@ unitDef = {
   trackStrength       = 10,
   trackStretch        = 1,
   trackType           = [[StdTank]],
-  trackWidth          = 48,
+  trackWidth          = 50,
   turninplace         = 0,
   turnRate            = 355,
   workerTime          = 0,
@@ -70,6 +68,8 @@ unitDef = {
       craterMult              = 2,
 
 	  customParams            = {
+		burst = Shared.BURST_RELIABLE,
+
 	    gatherradius = [[120]],
 	    smoothradius = [[80]],
 	    smoothmult   = [[0.25]],

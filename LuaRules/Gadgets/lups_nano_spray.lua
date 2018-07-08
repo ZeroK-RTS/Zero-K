@@ -336,14 +336,13 @@ function gadget:GameFrame(frame)
 							allyID       = allyID,
 							nanopiece    = nanoPieceID,
 							targetpos    = endpos,
-							count        = strength * 30,
+							count        = strength*30,
 							color        = teamColor,
 							type         = type,
 							targetradius = radius,
 							terraform    = terraform,
 							inversed     = inversed,
 							cmdTag       = cmdTag, --//used to end the fx when the command is finished
-							life = 60,
 						}
 
 						local nanoSettings = CopyMergeTables(factionsNanoFx[faction] or factionsNanoFx.default, nanoParams)
@@ -412,7 +411,7 @@ function gadget:Update()
     local factionNanoFx = factionsNanoFx[faction]
     factionNanoFx.delaySpread = 30
     factionNanoFx.fxtype = factionNanoFx.fxtype:lower()
-    if ((Lups.Config["quality"] or 2)>=2)and((factionNanoFx.fxtype=="nanolasers")or(factionNanoFx.fxtype=="nanolasersshader")) then
+    if ((Lups.Config["quality"] or 3)>=3) and ((factionNanoFx.fxtype=="nanolasers") or (factionNanoFx.fxtype=="nanolasersshader")) then
       factionNanoFx.flare = true
     end
 

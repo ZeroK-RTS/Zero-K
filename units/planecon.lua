@@ -7,6 +7,9 @@ unitDef = {
   brakeRate           = 0.08,
   buildCostMetal      = 220,
   buildDistance       = 160,
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeType    = [[ellipsoid]], 
   builder             = true,
 
   buildoptions        = {
@@ -29,11 +32,6 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[0]],
-	description_de = [[Konstruktionsflugzeug, Baut mit 4 m/s]],
-    description_fr = [[Avion de Construction, Construit ? 4 m/s]],
-    helptext       = [[The Crane flies quickly over any terrain, but is fragile to any AA. Though it has relatively poor nano power compared to other constructors, it is able to build in many hard to reach places and expand an air players territory in a nonlinear fashion. Due to its mobility, it is ideal for reclaiming wrecks and other repetetitive tasks.]],
-	helptext_de    = [[Der Crane bewegt sich flink Ã¼ber das Terrain, ist aber auch anfÃ¤llig gegenÃ¼ber AA. Obwohl er ziemlich wenig Baukraft hat, ist er in der Lage auch auf auÃergewÃ¶hnlichen PlÃ¤tzen zu bauen. Durch seine MobilitÃ¤t ist er ideal dafÃ¼r geschaffen, Wracks zu absorbieren und daraus das Metall zu gewinnen.]],
-    helptext_fr    = [[Le Crane vole rapidement au dessus de tous les obstacles. Tr?s vuln?rable ? la d?fense a?rienne, il est id?al pour construire dans des endroits tres difficile d'acces ou pour r?cup?rer le m?tal des carcasses sur le champ de bataille.]],
 	modelradius    = [[10]],
 	midposoffset   = [[0 4 0]],
   },

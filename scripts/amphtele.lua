@@ -18,6 +18,7 @@ local SIG_DEPLOY = 2
 local SIG_BEACON = 2
 
 local PRIVATE = {private = true}
+local INLOS = {inlos = true}
 
 local deployed = false
 local beaconCreateX, beaconCreateZ
@@ -45,9 +46,13 @@ local function Create_Beacon_Thread(x,z)
 	
 	GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 3, x, y, z)
 	for i = 1, 90 do
-		local speedMult = (1 - (spGetUnitRulesParam(unitID,"slowState") or 0)) * BEACON_SPAWN_SPEED
+		local speedMult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1) * BEACON_SPAWN_SPEED
 		Turn(body, y_axis, math.rad(i*4), math.rad(40*speedMult))
 		Sleep(100/speedMult)
+		if i == 1 then
+			Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+			Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+		end
 		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
 		local disarm = spGetUnitRulesParam(unitID,"disarmed") == 1
 		while stunnedOrInbuild or disarm do
@@ -55,7 +60,7 @@ local function Create_Beacon_Thread(x,z)
 			stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
 			disarm = spGetUnitRulesParam(unitID,"disarmed") == 1
 		end
-		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
+		Spring.SpawnCEG("teleport_progress", x, y + 14, z, 0, 0, 0, 0)
 		if i == 30 or i == 60 then
 			GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 3, x, y, z)
 		end
@@ -139,6 +144,34 @@ function DeployTeleport()
 	end
 end
 
+function DeployTeleportInstant()
+	if GG.tele_ableToDeploy(unitID) then
+		deployed = true
+		Turn(rthigh, x_axis, 0)
+		Turn(rshin, x_axis, 0)
+		Turn(rfoot, x_axis, 0)
+		Turn(lthigh, x_axis, 0)
+		Turn(lshin, x_axis, 0)
+		Turn(lfoot, x_axis, 0)
+		Turn(pelvis, z_axis, 0)
+		Move(pelvis, y_axis, 0)
+		
+		Turn(body, x_axis, math.rad(90))
+		Move(pelvis, y_axis, 11)
+		Move(pelvis, z_axis, -6)
+		
+		Turn(rthigh, x_axis, math.rad(-50))
+		Turn(rshin, x_axis, math.rad(70))
+		Turn(rfoot, x_axis, math.rad(-15))
+		
+		Turn(lthigh, x_axis, math.rad(-50))
+		Turn(lshin, x_axis, math.rad(70))
+		Turn(lfoot, x_axis, math.rad(-15))
+		
+		GG.tele_deployTeleport(unitID)
+	end
+end
+
 function UndeployTeleport()
 	deployed = false
 	Turn(body, x_axis, math.rad(0), math.rad(90))
@@ -169,9 +202,9 @@ local mode
 function activity_mode(n)
 	if (not mode) or mode ~= n then
 		if n < 2 then
-			SetUnitValue(COB.ACTIVATION, 0)
+			Spring.SetUnitRulesParam(unitID, "teleActive", 0, INLOS)
 		elseif mode < 2 then
-			SetUnitValue(COB.ACTIVATION, 1)
+			Spring.SetUnitRulesParam(unitID, "teleActive", 1, INLOS)
 		end
 
 		Spin(holder, z_axis, math.rad(spinmodes[n].holder*holderDirection))
@@ -197,7 +230,7 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
+		local speedmult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)*SPEED
 		
 		Turn(pelvis, z_axis, math.rad(0), math.rad(2)*speedmult)
 		Move(pelvis, y_axis, 2, 1.5*speedmult)

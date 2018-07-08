@@ -43,7 +43,7 @@ local commsCampaign = {
     chassis = "benzcom2",	-- TODO get a properly organic model
     name = "Lord Isonade",
     --modules = { "commweapon_sonicgun", "module_heavy_armor", "module_dmg_booster", "module_autorepair", "module_autorepair" },
-    decorations = { "skin_bombard_steel" },
+    decorations = { "skin_assault_steel" },
   },
 
   comm_campaign_legion = {
@@ -236,9 +236,10 @@ MakeCommanderChassisClones("dynstrike",
 	{"module_personal_shield", "module_areashield"}
 )
 
+-- All modules may be available at any level, depending on campaign layout.
 MakeCommanderChassisClones("dynknight", 
-	{{0, 0, 0}, {1, 0, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}},
-	{"module_personal_shield", "module_areashield", "module_resurrect"}
+	{{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}},
+	{"module_personal_shield", "module_areashield", "module_resurrect", "module_jumpjet"}
 )
 
 --[[

@@ -3,8 +3,9 @@
 -- london
 -- london_sphere
 -- london_glow
+-- london_flat
 
-return {
+local effects = {
   ["london_flames"] = {
     rocks = {
       air                = true,
@@ -132,22 +133,22 @@ return {
         [3]  = 0.20000000298023,
       },
     },
-    pikez = {
-      air                = true,
-      class              = [[explspike]],
-      count              = 0,
-      ground             = true,
-      water              = true,
-      underwater         = true,
-      properties = {
-        alpha              = 0.8,
-        alphadecay         = 0.03,
-        color              = [[1.0,1.0,0.8]],
-        dir                = [[-15 r30,-15 r30,-15 r30]],
-        length             = 4000,
-        width              = 15,
-      },
-    },
+    --pikez = {
+    --  air                = true,
+    --  class              = [[explspike]],
+    --  count              = 0,
+    --  ground             = true,
+    --  water              = true,
+    --  underwater         = true,
+    --  properties = {
+    --    alpha              = 0.8,
+    --    alphadecay         = 0.03,
+    --    color              = [[1.0,1.0,0.8]],
+    --    dir                = [[-15 r30,-15 r30,-15 r30]],
+    --    length             = 4000,
+    --    width              = 15,
+    --  },
+    --},
     sphere = {
       air                = true,
       class              = [[CSpherePartSpawner]],
@@ -210,3 +211,205 @@ return {
 
 }
 
+-- london
+--  - LONDON_FLAMES: delay
+--    - 30 flames spawned in a circle.
+--  - LONDON_GFLASH: delay
+--    - Circle flash.
+--  - LONDON_GLOW: iterated delay, count 10
+--    - Ground glow and flash.
+--  - LONDON_SPHERE: delay, pos
+--    - Expanding sphere. Also has a ground flash for some reason.
+--  - ZOE: delay
+--    - ZOE_CAP: Count 50, iterated delay and position.
+--    - ZOE_CAP2: Count 50, iterated delay and position.
+--    - ZOE_CAP3: Count 50, iterated delay and position.
+--    - ZOE_CAP4: Count 50, iterated delay and position.
+--    - ZOE_RING: Count 50, iterated delay and position.
+--    - SOLANGE: Count 1 with pointless iterated delay. Rising fireball into the air.
+--      - SOLANGE_PILLAR: Count 150, iterated delay.
+--    - THEORA: Count 2 with iterated delay. Rising smoke cloud into the air.
+--      - THEORA: Count 150, iterated delay.
+--    - TRANSTHEORA: Count 1. Orange smoke.
+--      - TRANSTHEORA_PILLAR: Count 150, iterated delay.
+
+effects.london_flat = {
+	dustring = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 1,
+		ground             = true,
+		water              = true,
+		underwater         = true,
+		properties = {
+			delay              = 100,
+			explosiongenerator = [[custom:LONDON_FLAMES]],
+			pos                = [[0, 0, 0]],
+		},
+	},
+	gflash = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 1,
+		ground             = true,
+		water              = true,
+		properties = {
+			delay              = 50,
+			explosiongenerator = [[custom:LONDON_GFLASH]],
+			pos                = [[0, 0, 0]],
+		},
+	},
+	glow = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 10,
+		ground             = true,
+		water              = true,
+		underwater         = true,
+		properties = {
+			delay              = [[0 i10]],
+			explosiongenerator = [[custom:LONDON_GLOW]],
+			pos                = [[0, 0, 0]],
+		},
+	},
+	sphere = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 1,
+		ground             = true,
+		water              = true,
+		underwater         = true,
+		properties = {
+			delay              = 50,
+			explosiongenerator = [[custom:LONDON_SPHERE]],
+			pos                = [[0, 5, 0]],
+		},
+	},
+	-- BEGIN ZOE: Delay 100
+	cap = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 50,
+		ground             = true,
+		water              = true,
+		underwater         = true,
+		properties = {
+			delay              = [[100 i4]],
+			explosiongenerator = [[custom:ZOE_CAP]],
+			pos                = [[-10 r20, 0 i20, -10 r20]],
+		},
+	},
+	cap2 = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 50,
+		ground             = true,
+		water              = true,
+		underwater         = true,
+		properties = {
+			delay              = [[300 i4]],
+			explosiongenerator = [[custom:ZOE_CAP2]],
+			pos                = [[-10 r20, 1000 i20, -10 r20]],
+		},
+	},
+	cap3 = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 50,
+		ground             = true,
+		water              = true,
+		underwater         = true,
+		properties = {
+			delay              = [[500 i4]],
+			explosiongenerator = [[custom:ZOE_CAP3]],
+			pos                = [[-10 r20, 2000 i20, -10 r20]],
+		},
+	},
+	cap4 = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 50,
+		ground             = true,
+		water              = true,
+		underwater         = true,
+		properties = {
+			delay              = [[700 i4]],
+			explosiongenerator = [[custom:ZOE_CAP4]],
+			pos                = [[-10 r20, 3100 i5, -10 r20]],
+		},
+	},
+	ring = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 10,
+		ground             = true,
+		water              = true,
+		underwater         = true,
+		properties = {
+			delay              = [[430 i4]],
+			explosiongenerator = [[custom:ZOE_RING]],
+			pos                = [[-10 r20, 1500 i3, -10 r20]],
+		},
+	},
+	-- BEGIN SOLANG: Delay 100
+	zoe_solange_nw = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 150,
+		ground             = true,
+		water              = true,
+		underwater         = true,
+		properties = {
+			delay              = [[100  i4]],
+			explosiongenerator = [[custom:SOLANGE_PILLAR]],
+			pos                = [[20 r40, i20, -20 r40]],
+		},
+	},
+	-- END SOLANG: Delay 100
+	-- BEGIN THEORA 1: Delay 500
+	zoe_theora_nw_1 = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 150,
+		ground             = true,
+		water              = true,
+		underwater         = true,
+		properties = {
+			delay              = [[500  i4]],
+			explosiongenerator = [[custom:THEORA_PILLAR]],
+			pos                = [[20 r40, i20, -20 r40]],
+		},
+	},
+	-- BEGIN THEORA 2: Delay 700
+	zoe_theora_nw_2 = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 150,
+		ground             = true,
+		water              = true,
+		underwater         = true,
+		properties = {
+			delay              = [[700  i4]],
+			explosiongenerator = [[custom:THEORA_PILLAR]],
+			pos                = [[20 r40, i20, -20 r40]],
+		},
+	},
+	-- END THEORA: Delay 100
+	-- BEGIN TRANSTHEORA: Delay 300
+	zoe_transtheora_nw = {
+		air                = true,
+		class              = [[CExpGenSpawner]],
+		count              = 150,
+		ground             = true,
+		water              = true,
+		underwater         = true,
+		properties = {
+			delay              = [[300  i4]],
+			explosiongenerator = [[custom:TRANSTHEORA_PILLAR]],
+			pos                = [[20 r40, i20, -20 r40]],
+		},
+	},
+	-- END ZOE: Delay 0
+}
+
+return effects

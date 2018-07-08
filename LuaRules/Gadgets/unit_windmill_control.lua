@@ -12,7 +12,7 @@ function gadget:GetInfo()
 		author   = "quantum",
 		date     = "June 29, 2007",
 		license  = "GNU GPL, v2 or later",
-		layer    = 0,
+		layer    = 2, -- after `start_waterlevel.lua` (for map height adjustment)
 		enabled  = true -- loaded by default?
 	}
 end
@@ -34,8 +34,9 @@ local windmills = {}
 local groundMin, groundMax = 0,0
 local groundExtreme = 0
 local slope = 0
+local tidalHeight = -10
 
-local windMin, windMax, windRange
+local windMin, windMax, windRange, tidalStrength
 
 local strength, next_strength, strength_step, step_count = 0,0,0,0
 
@@ -44,6 +45,11 @@ local teamEnergy = {}
 
 local alliedTrueTable = {allied = true}
 local inlosTrueTable = {inlos = true}
+
+local MAPSIDE_MAPINFO = "mapinfo.lua"
+local mapInfo = VFS.FileExists(MAPSIDE_MAPINFO) and VFS.Include(MAPSIDE_MAPINFO) or false
+
+
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -137,10 +143,14 @@ local function SetupUnit(unitID)
 
 	local x, y, z = spGetUnitPosition(unitID)
 	
-	if Spring.GetGroundHeight(x,z) <= -10 then
-		spSetUnitRulesParam(unitID, "wanted_energyIncome", 1.2, inlosTrueTable)
+	if Spring.GetGroundHeight(x,z) <= tidalHeight then
+		spSetUnitRulesParam(unitID, "wanted_energyIncome", tidalStrength, inlosTrueTable)
 		Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
 		Spring.SetUnitMaxHealth(unitID, 400)
+		local health = Spring.GetUnitHealth(unitID)
+		if health == 130 then
+			Spring.SetUnitHealth(unitID, 400)
+		end
 		Spring.SetUnitCollisionVolumeData(unitID, 30, 30, 30, 0, 0, 0, 0, 1, 0)
 		Spring.SetUnitMidAndAimPos(unitID, 0, -5, 0, 0, 2, 0, true)
 		Spring.SetUnitRulesParam(unitID, "midpos_override", -5 - midy)
@@ -151,10 +161,7 @@ local function SetupUnit(unitID)
 	spSetUnitRulesParam(unitID, "isWind", 1, inlosTrueTable)
 	
 	local altitude = (y - groundMin)/groundExtreme
-	scriptIDs.alt = altitude*slope
-	if (scriptIDs.alt > 1) then
-		scriptIDs.alt = 1
-	end
+	scriptIDs.alt = math.max(0, math.min(1, altitude*slope))
 
 	local unitDef = UnitDefs[unitDefID]
 	spSetUnitRulesParam(unitID,"minWind",windMin+windRange*scriptIDs.alt, inlosTrueTable)
@@ -173,17 +180,29 @@ GG.SetupWindmill = SetupUnit
 
 function gadget:Initialize()
 
-	windMin = 0
-	windMax = 2.5
+	local energyMult = Spring.GetModOptions().energymult
+	energyMult = energyMult and tonumber(energyMult) or 1
+
+	windMin = 0 * energyMult
+	windMax = 2.5 * energyMult
+	tidalStrength = 1.2 * energyMult
 	windRange = windMax - windMin
 
 	Spring.SetGameRulesParam("WindMin",windMin)
 	Spring.SetGameRulesParam("WindMax",windMax)
+	Spring.SetGameRulesParam("tidalStrength",tidalStrength)
 	Spring.SetGameRulesParam("WindHeading", 0)
 	Spring.SetGameRulesParam("WindStrength", 0)
+	Spring.SetGameRulesParam("tidalHeight", tidalHeight)
+
+	local minWindMult = 1
+	if (mapInfo and mapInfo.custom and tonumber(mapInfo.custom.zkminwindmult) ~= nil ) then
+		minWindMult = tonumber(mapInfo.custom.zkminwindmult)
+	end
 	
 	groundMin, groundMax = Spring.GetGroundExtremes()
-	groundMin, groundMax = math.max(groundMin,0), math.max(groundMax,1)
+	local waterlevel = Spring.GetGameRulesParam("waterlevel")
+	groundMin, groundMax = math.max(groundMin - waterlevel,0), math.max(groundMax - waterlevel,1)
 	groundExtreme = groundMax - groundMin
 	if groundExtreme < 1 then
 		groundExtreme = 1
@@ -191,7 +210,7 @@ function gadget:Initialize()
 
 	--this is a function defined between 0 and 1, so we can adjust the gadget 
 	-- effect between 0% (flat maps) and 100% (mountained maps)
-	slope = 1/(1+math.exp(4 - groundExtreme/105))
+	slope = minWindMult * 1/(1+math.exp(4 - groundExtreme/105))
 	
 	Spring.SetGameRulesParam("WindGroundMin", groundMin)
 	Spring.SetGameRulesParam("WindGroundExtreme", groundExtreme)

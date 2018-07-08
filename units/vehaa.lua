@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehaa]],
   name                   = [[Crasher]],
-  description            = [[Fast Anti-Air Vehicle]],
+  description            = [[Fast Anti-Air Rover]],
   acceleration           = 0.05952,
   brakeRate              = 0.14875,
   buildCostMetal         = 220,
@@ -17,9 +17,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Schnelles Flugabwehr Fahrzeug]],
-    helptext       = [[The Crasher is a speedy solution to enemy bomber attacks, and also works well against gunships.]],
-    helptext_de    = [[Crasher ist eine schnelle Antwort auf Flugzeuge. Er ist also gut genug gegen Hubschrauber.]],
 	modelradius    = [[9]],
   },
 
@@ -85,6 +82,8 @@ unitDef = {
       cylinderTargeting       = 1,
 
 	  customParams        	  = {
+		burst = Shared.BURST_RELIABLE,
+
 		isaa = [[1]],
 		light_color = [[0.5 0.6 0.6]],
 	  },

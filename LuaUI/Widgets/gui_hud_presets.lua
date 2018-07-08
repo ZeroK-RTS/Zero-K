@@ -17,19 +17,20 @@ end
 -- Widget option functions
 
 local CHAT_PADDING = 100
+local USE_SIZE_FACTOR = false
 
 local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Selection Bar"
 local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
 local minimapName, minimapPath = "Chili Minimap", "Settings/HUD Panels/Minimap"
 local consoleName, consolePath = "Chili Pro Console", "Settings/HUD Panels/Chat"
-local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
+local selName, selPath = "Chili Selections & CursorTip v2", "Settings/HUD Panels/Selected Units Panel"
 local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
 local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 local specName, specPath = "Chili Spectator Panels", "Settings/HUD Panels/Spectator Panels"
 local dockName, dockPath = "Chili Docking", "Settings/HUD Panels/Extras/Docking"
 
 local function Selections_SetOptions(group, showInfo, square, iconSize, showCommand, showDgun, alwaysShow)
-	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
+	local selName, selPath = "Chili Selections & CursorTip v2", "Settings/HUD Panels/Selected Units Panel"
 	WG.SetWidgetOption(widgetName, path, "groupalways",group)
 	WG.SetWidgetOption(widgetName, path, "showgroupinfo",showInfo)
 	WG.SetWidgetOption(widgetName, path, "squarepics",square)
@@ -185,9 +186,10 @@ end
 -- Useful Functions
 ----------------------------------------------------
 local function GetSelectionIconSize(height)
-	local fitNumber = math.floor((height - 20)/(44 + 2))
-	local size = math.floor((height - 20)/fitNumber - 2)
-	return math.min(50, size)
+	local rows = math.floor((height - 25)/50)
+	local size = math.floor((height - 25)/rows)
+	local iconHeight = math.min(53, size) + 4
+	return iconHeight
 end
 
 ----------------------------------------------------
@@ -271,7 +273,6 @@ local function SetupDefaultPreset()
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
-	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
 	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
@@ -281,7 +282,7 @@ local function SetupDefaultPreset()
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	
 	Spring.SendCommands("resbar 0")
 	
@@ -291,8 +292,8 @@ local function SetupDefaultPreset()
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
 	-- Minimap
-	local minimapWidth = screenWidth*2/11
-	local minimapHeight = screenWidth*2/11 + 20
+	local minimapWidth = math.ceil(screenWidth*2/11)
+	local minimapHeight = math.ceil(screenWidth*2/11 + 20)
 	WG.Minimap_SetOptions("arwindow", 0, false, false, false)
 	WG.SetWindowPosAndSize("Minimap Window", 
 		0, 
@@ -406,7 +407,6 @@ local function SetupNewPreset()
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
-	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -415,7 +415,7 @@ local function SetupNewPreset()
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	widgetHandler:EnableWidget("Chili Global Commands")
 	
 	Spring.SendCommands("resbar 0")
@@ -613,7 +613,6 @@ local function SetupNewWidgets()
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
-	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -621,7 +620,7 @@ local function SetupNewWidgets()
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	widgetHandler:EnableWidget("Chili Global Commands")
 
 	if not WG.Chili.Screen0:GetChildByName("Player List") then
@@ -632,9 +631,14 @@ local function SetupNewWidgets()
 end
 
 local function GetBottomSizes(screenWidth, screenHeight, parity)
-
+	
+	local SIZE_FACTOR = 1
+	if screenWidth > 3000 and USE_SIZE_FACTOR then
+		SIZE_FACTOR = 2
+	end
+	
 	-- Integral Menu
-	local integralWidth = math.max(350, math.min(500, screenWidth*0.4))
+	local integralWidth = math.max(350 * SIZE_FACTOR, math.min(500 * SIZE_FACTOR, screenWidth*0.4))
 	local integralHeight = 7*math.floor((math.min(screenHeight/4.5, 200*integralWidth/450))/7)
 	
 	if integralWidth/integralHeight > 2.5 then
@@ -643,10 +647,10 @@ local function GetBottomSizes(screenWidth, screenHeight, parity)
 	
 	if integralWidth < 480 then
 		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
-		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", math.floor(13*integralWidth/480))
+		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", math.floor(13*integralWidth/480) * SIZE_FACTOR)
 	else
 		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
-		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", 14)
+		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", 14 * SIZE_FACTOR)
 	end
 	integralWidth = math.floor(integralWidth)
 	
@@ -688,7 +692,8 @@ local function GetBottomSizes(screenWidth, screenHeight, parity)
 	local selectionsHeight = integralHeight*0.85
 	local selectionsWidth = screenWidth - integralWidth - minimapWidth - coreSelectorWidth
 
-	--Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, false)
+	WG.SetWidgetOption(selName, selPath, "uniticon_size", GetSelectionIconSize(selectionsHeight))
+	
 	WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", math.floor(integralHeight*6/7))
 	
 	-- Chat
@@ -718,17 +723,22 @@ end
 
 local function SetupNewUITop()
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	screenHeight = math.floor(screenHeight)
+	local SIZE_FACTOR = 1
+	if screenWidth > 3000 and USE_SIZE_FACTOR then
+		SIZE_FACTOR = 2
+	end
 	
-	local sideHeight = 38
+	local sideHeight = 38 * SIZE_FACTOR
 	local flushTop = (screenWidth <= 1650)
 	
 	-- Resource Bar
-	local resourceBarWidth = math.max(580, math.min(screenWidth - 700, 660))
-	local resourceBarHeight = 110
+	local resourceBarWidth = math.max(580 * SIZE_FACTOR, math.min(screenWidth - 700, 660 * SIZE_FACTOR))
+	local resourceBarHeight = 110 * SIZE_FACTOR
 	
 	-- Chicken
-	local chickenWidth = 189
-	local chickenHeight = 270
+	local chickenWidth = 189 * SIZE_FACTOR
+	local chickenHeight = 270 * SIZE_FACTOR
 	
 	-- Menu
 	local menuWidth, globalWidth
@@ -744,6 +754,7 @@ local function SetupNewUITop()
 		else
 			menuWidth = 347
 		end
+		menuWidth = menuWidth * SIZE_FACTOR
 		globalWidth = menuWidth
 	end
 	
@@ -783,8 +794,8 @@ local function SetupNewUITop()
 	WG.SetWindowPosAndSize("votes",
 		0,
 		resourceBarHeight,
-		300,
-		120
+		300 * SIZE_FACTOR,
+		120 * SIZE_FACTOR
 	)
 	
 	WG.SetWindowPosAndSize("globalCommandsWindow",
@@ -795,7 +806,7 @@ local function SetupNewUITop()
 	)
 	
 	-- Console
-	local consoleWidth = 380
+	local consoleWidth = 380 * SIZE_FACTOR
 	local consoleHeight = screenHeight * 0.20
 	WG.SetWindowPosAndSize("ProConsole",
 		screenWidth - consoleWidth,
@@ -810,6 +821,7 @@ local function SetupMinimapLeftPreset()
 	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	screenHeight = math.ceil(screenHeight)
 	
 	if screenWidth <= 1650 then
 		fancySkinOverride = SKIN_FLUSH
@@ -831,7 +843,7 @@ local function SetupMinimapLeftPreset()
 		minimapWidth, minimapHeight, 
 		selectionsWidth, selectionsHeight, 
 		chatWidth, chatHeight,
-		playerlistWidth, playerlistHeight = GetBottomSizes(screenWidth, screenHeight, 1)
+		playerlistWidth, playerlistHeight = GetBottomSizes(screenWidth, screenHeight, -1)
 	
 	--local chatX = 0
 	--local chatY = screenHeight - chatHeight - minimapHeight
@@ -914,6 +926,7 @@ local function SetupMinimapRightPreset()
 	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	screenHeight = math.ceil(screenHeight)
 	
 	if screenWidth <= 1650 then
 		fancySkinOverride = SKIN_FLUSH
@@ -1020,7 +1033,6 @@ local function SetupCraftyPreset()
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
-	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
 	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
@@ -1030,7 +1042,7 @@ local function SetupCraftyPreset()
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	
 	Spring.SendCommands("resbar 0")
 	
@@ -1149,7 +1161,6 @@ local function SetupEnsemblePreset()
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
-	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
 	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
@@ -1159,7 +1170,7 @@ local function SetupEnsemblePreset()
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	
 	Spring.SendCommands("resbar 0")
 	
@@ -1277,7 +1288,6 @@ local function SetupWestwoodPreset()
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
-	widgetHandler:DisableWidget("Chili Economy Panel Default")
 	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
@@ -1285,9 +1295,9 @@ local function SetupWestwoodPreset()
 	widgetHandler:EnableWidget("Chili Crude Player List")
 	widgetHandler:EnableWidget("Chili Integral Menu")
 	widgetHandler:EnableWidget("Chili Pro Console")
-	widgetHandler:EnableWidget("Chili Economy Panel with Balance Bar")
+	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	
 	Spring.SendCommands("resbar 0")
 	
@@ -1502,6 +1512,13 @@ function widget:Update(dt)
 		options.interfacePreset.value = "minimapRight"
 		options.interfacePreset.OnChange(options.interfacePreset)
 		options.setToDefault.value = false
+	end
+	
+	if options.updateNewDefaults.value then
+		if not ((options.interfacePreset.value == "minimapRight") or (options.interfacePreset.value == "minimapLeft")) then
+			options.interfacePreset.value = "minimapRight"
+			options.interfacePreset.OnChange(options.interfacePreset)
+		end
 	end
 	
 	if firstUpdate then

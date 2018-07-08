@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[staticarty]],
-  name                          = [[Behemoth]],
-  description                   = [[Plasma Artillery Battery - Requires 50 Power]],
+  name                          = [[Cerberus]],
+  description                   = [[Plasma Artillery Battery - Requires connection to a 50 energy grid]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
@@ -16,12 +16,11 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Plasmabatterie - Benötigt ein angeschlossenes Stromnetz von 50 Energie, um feuern zu können.]],
-    helptext       = [[The Behemoth offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly.]],
-	helptext_de    = [[Der Behemoth besitzt eine weitreichende (Erwiderungs-)Artilleriefähigkeit, um Zugang zu größeren Arealen zu verhindern. Er wurde nicht als Verteidigungsturm entwickelt und wird bei direktem Angriff in die Knie gezwungen.]],
     keeptooltip = [[any string I want]],
     neededlink  = 50,
     pylonrange  = 50,
+    aimposoffset   = [[0 26 0]],
+    midposoffset   = [[0 10 0]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

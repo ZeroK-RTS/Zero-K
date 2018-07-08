@@ -548,7 +548,7 @@ local function NanoRestore()
 	Turn(FingerB, x_axis, 0, FINGER_SPEED)
 	Turn(FingerC, x_axis, 0, FINGER_SPEED)
 end
-	
+
 function script.StopBuilding()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 	StartThread(RestoreRightAim, 200)

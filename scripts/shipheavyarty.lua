@@ -4,7 +4,12 @@ include 'constants.lua'
 --pieces
 --------------------------------------------------------------------
 local hull, turret1, turret2, turret3, radar = piece('hull', 'turret1', 'turret2', 'turret3', 'radar')
-local wake1, wake2, ground = piece('wake1', 'wake2', 'ground')
+local ground = piece('ground')
+
+local wake = {}
+for i = 1, 6 do
+	wake[i] = piece('wake' .. i)
+end
 
 local turrets = { turret1, turret2, turret3 }
 
@@ -74,8 +79,10 @@ local function Wake()
 	SetSignalMask(SIG_Move)
 	while true do
 		if not Spring.GetUnitIsCloaked(unitID) then
-			EmitSfx(wake1, 2)
-			EmitSfx(wake2, 2)
+			for i = 1, 6 do
+				Move(wake[i], z_axis, math.random()*50 - 25)
+				EmitSfx(wake[i], 2)
+			end
 		end
 		Sleep(200)
 	end

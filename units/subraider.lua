@@ -5,7 +5,7 @@ unitDef = {
   acceleration           = 0.06,
   activateWhenBuilt      = true,
   brakeRate              = 0.2,
-  buildCostMetal         = 200,
+  buildCostMetal         = 220,
   builder                = false,
   buildPic               = [[subraider.png]],
   canGuard               = true,
@@ -18,7 +18,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[Stealthy, fast, and fragile, this Submarine can quickly strike unprotected targets. Slow damage allows it to effectively kill lone units. Watch out for anything with anti-sub weaponry, especially Torpedo Boats and Destroyers.]],
 	modelradius    = [[13]],
 	aimposoffset   = [[0 -5 0]],
 	midposoffset   = [[0 -5 0]],
@@ -84,6 +83,8 @@ unitDef = {
       cegTag                  = [[torptrailpurple]],
 
       customparams = {
+		burst = Shared.BURST_RELIABLE,
+
         timeslow_damagefactor = 2,
       },
 

@@ -454,7 +454,7 @@ local function VertexList(point)
 	end
 end
 
-local function DrawEnemyInterceptors()
+local function DrawEnemyInterceptors(inMinimap)
 	local px, pz = drawNuke.pos[1], drawNuke.pos[3]
 	local mx, mz = drawNuke.mouse[1], drawNuke.mouse[3]
 
@@ -488,14 +488,18 @@ local function DrawEnemyInterceptors()
 				end
 			end
 			
-			glDrawGroundCircle(ux, 0, uz, def.range, 40 )
+			if inMinimap then
+				gl.Utilities.DrawCircle(ux, uz, def.range)
+			else
+				glDrawGroundCircle(ux, 0, uz, def.range, 40 )
+			end
 		end
 	end
 	
 	return intercepted
 end
 
-local function DrawAllyInterceptors()
+local function DrawAllyInterceptors(inMinimap)
 	glLineWidth(2)
 	for unitID, def in pairs(allyInt) do
 		
@@ -513,7 +517,11 @@ local function DrawAllyInterceptors()
 		end
 		
 		if ux then
-			glDrawGroundCircle(ux, 0, uz, def.range, 40 )
+			if inMinimap then
+				gl.Utilities.DrawCircle(ux, uz, def.range)
+			else
+				glDrawGroundCircle(ux, 0, uz, def.range, 40 )
+			end
 		end
 	end
 end
@@ -548,44 +556,35 @@ local function Draw()
 end
 
 
-local function DrawMinimap()
-	
+local function DrawMinimap(minimapX, minimapY)
 	if drawNuke then
 		glPushMatrix()
-		glLoadIdentity()
-		glTranslate(0,1,0)
-		glScale(1/mapX , -1/mapZ, 1)
-		glRotate(270,1,0,0)
+		glTranslate(0,minimapY,0)
+		glScale(minimapX/mapX, -minimapY/mapZ, 1)
 		
-		DrawEnemyInterceptors()
+		DrawEnemyInterceptors(true)
 		
 		glLineWidth(1)
 		glColor(1, 1, 1, 1)
 		
 		glPopMatrix()
-		
 	elseif drawAnti then
 		glPushMatrix()
-		glLoadIdentity()
-		glTranslate(0,1,0)
-		glScale(1/mapX , -1/mapZ, 1)
-		glRotate(270,1,0,0)
+		glTranslate(0,minimapY,0)
+		glScale(minimapX/mapX, -minimapY/mapZ, 1)
 		
-		DrawAllyInterceptors()
+		DrawAllyInterceptors(true)
 		glLineWidth(1)
 		glColor(1, 1, 1, 1)
 		
 		glPopMatrix()
 	end
-	
-
 end
 
-function widget:DrawInMiniMap()
-	DrawMinimap()
+function widget:DrawInMiniMap(minimapX, minimapY)
+	DrawMinimap(minimapX, minimapY)
 end
 
-	
 function widget:DrawWorldPreUnit()
 	Draw()
 end

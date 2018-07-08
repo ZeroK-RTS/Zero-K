@@ -74,6 +74,7 @@ options = {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
+local EMPTY_TABLE = {}
 
 -- list and interface vars
 local facs = {}
@@ -364,17 +365,14 @@ local function MakeButton(unitDefID, facID, facIndex)
 					local lb = button == 1
 					if not (lb or rb) then return end
 					
-					local opt = {}
-					if alt   then push(opt,"alt")   end
-					if ctrl  then push(opt,"ctrl")  end
-					if meta  then push(opt,"meta")  end
-					if shift then push(opt,"shift") end
+					local opt = 0
+					if alt   then opt = opt + CMD.OPT_ALT   end
+					if ctrl  then opt = opt + CMD.OPT_CTRL  end
+					if meta  then opt = opt + CMD.OPT_META  end
+					if shift then opt = opt + CMD.OPT_SHIFT end
+					if rb    then opt = opt + CMD.OPT_RIGHT end
 					
-					if rb then
-						push(opt,"right")
-					end
-					
-					Spring.GiveOrderToUnit(facID, -(unitDefID), {}, opt)
+					Spring.GiveOrderToUnit(facID, -(unitDefID), EMPTY_TABLE, opt)
 					
 					if rb then
 						Spring.PlaySoundFile(sound_queue_rem, 0.97, 'ui')
@@ -435,18 +433,18 @@ end
 local function WaypointHandler(x,y,button)
   if (button==1)or(button>3) then
     Spring.Echo("FactoryBar: Exited easy waypoint mode")
-    Spring.PlaySoundFile(sound_waypoint, 1)
+    Spring.PlaySoundFile(sound_waypoint, 1, 'ui')
     waypointFac  = -1
     waypointMode = 0
     return
   end
 
   local alt, ctrl, meta, shift = Spring.GetModKeyState()
-  local opt = {"right"}
-  if alt   then push(opt,"alt")   end
-  if ctrl  then push(opt,"ctrl")  end
-  if meta  then push(opt,"meta")  end
-  if shift then push(opt,"shift") end
+  local opt = CMD.OPT_RIGHT
+  if alt   then opt = opt + CMD.OPT_ALT   end
+  if ctrl  then opt = opt + CMD.OPT_CTRL  end
+  if meta  then opt = opt + CMD.OPT_META  end
+  if shift then opt = opt + CMD.OPT_SHIFT end
 
   local type,param = Spring.TraceScreenRay(x,y)
   if type=='ground' then
@@ -674,7 +672,7 @@ function widget:MousePress(x, y, button)
 	end
 	if waypointMode>1 then
 		Spring.Echo("FactoryBar: Exited easy waypoint mode")
-		Spring.PlaySoundFile(sound_waypoint, 1)
+		Spring.PlaySoundFile(sound_waypoint, 1, 'ui')
 	end
 	waypointFac  = -1
 	waypointMode = 0

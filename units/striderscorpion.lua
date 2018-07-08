@@ -8,16 +8,18 @@ unitDef = {
   builder                = false,
   buildPic               = [[striderscorpion.png]],
   canGuard               = true,
-  canManualFire			 = true,
+  canManualFire          = true,
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
   cloakCost              = 2,
   cloakCostMoving        = 10,
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[85 85 85]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The Scorpion paralyzes enemies with its lightning sting and then chews them up with its particle beam claws. Its tough carapace shrugs off most enemy fire, and can also turn the Scorpion transparent.]],
   },
 
   explodeAs              = [[CRAWL_BLASTSML]],
@@ -152,6 +154,7 @@ unitDef = {
 		light_camera_height = 1600,
 		light_color = [[0.85 0.85 1.2]],
 		light_radius = 200,
+        gui_draw_range = 450,
       },
 
       cylinderTargeting      = 0,
@@ -169,7 +172,7 @@ unitDef = {
       intensity               = 12,
       interceptedByShieldType = 1,
       paralyzeTime            = 3,
-      range                   = 470,
+      range                   = 490,
       reloadtime              = 2,
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning_fast]],
@@ -196,6 +199,7 @@ unitDef = {
       customParams            = {
 		light_color = [[0.7 0.7 0.2]],
 		light_radius = 320,
+        gui_draw_range = 450,
       },
 
       damage                  = {
@@ -214,7 +218,7 @@ unitDef = {
       noSelfDamage            = true,
       paralyzer               = true,
       paralyzeTime            = 3,
-      range                   = 470,
+      range                   = 490,
       reloadtime              = 30,
       rgbColor                = [[1 1 0.25]],
       soundStart              = [[weapon/lightning_fire]],
@@ -242,7 +246,7 @@ unitDef = {
       },
 	  
       damage                  = {
-        default = 60,
+        default = 70.01,
         subs    = 3,
       },
 
@@ -254,7 +258,7 @@ unitDef = {
       laserFlareSize          = 7.5,
       minIntensity            = 1,
       range                   = 420,
-      reloadtime              = 0.33,
+      reloadtime              = 0.3 + 1/30,
       rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/mini_laser]],
       soundStartVolume        = 6,

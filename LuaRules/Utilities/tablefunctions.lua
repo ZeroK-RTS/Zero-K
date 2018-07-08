@@ -63,7 +63,11 @@ function Spring.Utilities.TableToString(data, key)
 end
 
 -- need this because SYNCED.tables are merely proxies, not real tables
-local function MakeRealTable(proxy)
+local function MakeRealTable(proxy, debugTag)
+	if proxy == nil then
+		Spring.Log("Table Utilities", LOG.ERROR, "Proxy table is nil: " .. (debugTag or "unknown table"))
+		return
+	end
 	local proxyLocal = proxy
 	local ret = {}
 	for i,v in spairs(proxyLocal) do
@@ -102,4 +106,46 @@ local function TableEcho(data, name, indent, tableChecked)
 	Spring.Echo(indent .. "},")
 end
 
+function Spring.Utilities.ExplodeString(div,str)
+	if (div == '') then 
+		return false 
+	end
+	local pos, arr = 0, {}
+	-- for each divider found
+	for st, sp in function() return string.find(str, div, pos, true) end do
+		table.insert(arr, string.sub(str, pos, st - 1)) -- Attach chars left of current divider
+		pos = sp + 1 -- Jump past current divider
+	end
+	table.insert(arr, string.sub(str,pos)) -- Attach chars right of last divider
+	return arr
+end
+
 Spring.Utilities.TableEcho = TableEcho
+
+function Spring.Utilities.CustomKeyToUsefulTable(dataRaw)
+	if not dataRaw then
+		return
+	end
+	if not type(dataRaw) == 'string' then
+		Spring.Echo("Customkey data error! type == " .. type(dataRaw))
+	else
+		dataRaw = string.gsub(dataRaw, '_', '=')
+		dataRaw = Spring.Utilities.Base64Decode(dataRaw)
+		local dataFunc, err = loadstring("return " .. dataRaw)
+		if dataFunc then 
+			local success, usefulTable = pcall(dataFunc)
+			if success then
+				if collectgarbage then
+					collectgarbage("collect")
+				end
+				return usefulTable
+			end
+		end
+		if err then
+			Spring.Echo("Customkey error", err)
+		end
+	end
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+end

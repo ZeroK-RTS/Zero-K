@@ -21,7 +21,6 @@ unitDef = {
   cruiseAlt           = 150,
 
   customParams        = {
-    helptext       = [[Large, angry and capable of fighting both air and land opposition, the Roc is a formidable flying chicken.]],
   },
 
   explodeAs           = [[NOWEAPON]],

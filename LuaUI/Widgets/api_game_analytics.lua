@@ -52,8 +52,7 @@ unitCategories.advancedEnergyBuildings = {
 	energygeo    = true, 
 }
 
-unitCategories.energyBuildings = Spring.Utilities.MergeTable(	unitCategories.basicEnergyBuildings, 
-																unitCategories.advancedEnergyBuildings)
+unitCategories.energyBuildings = Spring.Utilities.MergeTable(unitCategories.basicEnergyBuildings, unitCategories.advancedEnergyBuildings)
 
 unitCategories.lightGroundTurrets = {
 	turretemp   = true,
@@ -88,8 +87,7 @@ unitCategories.advancedFactories = {
 	factorytank    = true,
 }
 
-unitCategories.factories = Spring.Utilities.MergeTable(	unitCategories.basicFactories,
-														unitCategories.advancedFactories)
+unitCategories.factories = Spring.Utilities.MergeTable(unitCategories.basicFactories, unitCategories.advancedFactories)
 
 unitCategories.builders = {
 	amphcon    = true,
@@ -151,11 +149,8 @@ end
 -- Analytics collectors
 
 
-function widget:GameFrame(frameNumber)
-	if frameNumber == 0 then		
-		Analytics.SendOnetimeEventWithTime("start_game_proper")
-		widgetHandler:RemoveCallIn("GameFrame")
-	end
+function widget:GameStart()
+	Analytics.SendOnetimeEventWithTime("start_game_proper")
 end
 
 local loadSent = false
@@ -182,7 +177,8 @@ function widget:Update(dt)
 	
 	if not startposSent then
 		local x,y,z = Spring.GetTeamStartPosition(myTeamID)
-		if x then
+
+		if (x and x ~= 0) or (z and z ~= 0) then
 			startposSent = true
 			Analytics.SendOnetimeEventWithTime("startpoint_placed")
 		end
@@ -217,6 +213,24 @@ function widget:Initialize()
 	Analytics.SendOnetimeEvent("begin_load")
 end
 
+function widget:GameOver(winners)
 
+	if not winners or #winners == 0 then
+		return -- exited
+	end
 
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+	local localAllyTeamID = Spring.GetLocalAllyTeamID()
+	for i = 1, #winners do
+		local allyTeamID = winners[i]
+		if allyTeamID == localAllyTeamID then
+			Analytics.SendOnetimeEventWithTime("game:end:won")
+			return
+		elseif allyteamID == gaiaAllyTeamID then
+			-- Analytics.SendOnetimeEventWithTime("game:end:draw")
+			return
+		end
+	end
 
+	Analytics.SendOnetimeEventWithTime("game:end:lost")
+end

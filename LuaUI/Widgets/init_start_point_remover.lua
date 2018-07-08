@@ -12,14 +12,16 @@ function widget:GetInfo()
 end
 
 include("Widgets/COFCTools/ExportUtilities.lua")
-VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
+local GetRawBoxes = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
 
-	n=1 --counter just in case there would be more than one unit spawned with only one being the comm but not being the first one. Note that if the Commander is spawned with an offset from the start point the marker may not be erased.
+local unitCount = 1 -- counter just in case there would be more than one unit spawned with only one being the comm but not being the first one. Note that if the Commander is spawned with an offset from the start point the marker may not be erased.
+
+local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
 
 function widget:Initialize()
-
-  if (CheckForSpec()) then return false end
- 
+	if (CheckForSpec()) then
+		return false
+	end
 end
 
 local init = false
@@ -33,10 +35,10 @@ function widget:GameSetup()
 end
 
 function CheckForSpec()
-   if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
-    widgetHandler:RemoveWidget()
-    return true
-  end
+	if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
+		widgetHandler:RemoveWidget()
+		return true
+	end
 end
 
 function widget:GameFrame(f)
@@ -48,10 +50,17 @@ function widget:GameFrame(f)
 			if (unitDef.customParams.commtype) then
 				local x, y, z = Spring.GetUnitPosition(unitID)
 				Spring.MarkerErasePosition(x, y, z)
-				if not cameraMoved then SetCameraTarget(x, y, z, 1, true, 1000) end
-				Spring.SelectUnitArray{teamUnits[n]}
+				if not cameraMoved then
+					SetCameraTarget(x, y, z, 1, true, 1000)
+				end
+				
+				-- Do not select commander at the start of campaign battles. The selection UI can clip into the mission
+				-- objectives popup and often there are many units to select at the start.
+				if not campaignBattleID then
+					Spring.SelectUnitArray{teamUnits[unitCount]}
+				end
 			end
-			n=n+1
+			unitCount = unitCount + 1
 		end
 	end
 	if f == 7 then

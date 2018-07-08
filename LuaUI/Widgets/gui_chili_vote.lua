@@ -51,6 +51,7 @@ local springieName = Spring.GetModOptions().springiename or ''
 
 --local voteAntiSpam = false
 local VOTE_SPAM_DELAY = 1	--seconds
+local CAN_RESIGN_VOTE_WHILE_RESIGNED = true
 
 --[[
 local index_votesHave = 14
@@ -68,11 +69,7 @@ local function GetVotes(line)
 		local index_votesHaveEnd = line:find("/", index_votesHave) - 1
 		local index_votesNeeded = index_votesHaveEnd + 2
 		local index_votesNeededEnd = ( line:find("[,]", index_votesNeeded) or line:find("\]", index_votesNeeded) ) - 1
-		
-		--Spring.Echo(index_votesHave, index_votesHaveEnd, index_votesNeeded, index_votesNeededEnd)
-		--Spring.Echo(line:sub(index_votesHave, index_votesHaveEnd))
-		--Spring.Echo(line:sub(index_votesNeeded, index_votesNeededEnd))
-		
+
 		local numVotes = tonumber(line:sub(index_votesHave, index_votesHaveEnd))
 		local maxVotes = tonumber(line:sub(index_votesNeeded, index_votesNeededEnd))
 		voteCount[i] = numVotes
@@ -101,6 +98,7 @@ local function RemoveWindow()
 		voteMax[i] = 1	-- protection against div0
 		--progress_vote[i]:SetCaption('?/?')
 		progress_vote[i]:SetValue(0)
+		button_vote[i]:Show()
 	end
 end
 
@@ -134,15 +132,27 @@ function widget:AddConsoleMessage(msg)
 				Spring.Log(widget:GetInfo().name, LOG.ERROR, "malformed poll notification text")
 				return
 			end
-
+			
 			local title = line:sub(indexStart, indexEnd - 1)
-			if title:find("Resign team ") then
+			if title:find("Resign team ") then	-- handle resign vote
 				local allyTeamID = string.match(title, '%d+') - 1
-				title = "Resign " .. Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID) .. "?"
+				local teamName = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID)
+				local spec = Spring.GetSpectatingState()
+				
+				local isSameAllyTeam = (not spec) and (allyTeamID == Spring.GetLocalAllyTeamID())
+				local canVoteAsSpec = spec and (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") == 1) and CAN_RESIGN_VOTE_WHILE_RESIGNED
+				if isSameAllyTeam or canVoteAsSpec then
+					title = "Vote: resign?"
+				else
+					title = teamName .. " voting on resign..."
+					button_vote[1]:Hide()
+					button_vote[2]:Hide()
+				end
 			else
+				title = "Vote: " .. title .. "?"
 				votingForceStart = ((title:find("force game"))~=nil)
 			end
-			label_title:SetCaption("Poll: "..title)
+			label_title:SetCaption(title)
 	--elseif line:find(string_vote1) or line:find(string_vote2) then	--apply a vote
 			GetVotes(line)
 		end

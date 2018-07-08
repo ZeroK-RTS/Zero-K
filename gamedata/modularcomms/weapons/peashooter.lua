@@ -6,17 +6,16 @@ local weaponDef = {
 	craterBoost             = 0,
 	craterMult              = 0,
 
-	customParams			= {
+	customParams            = {
 		slot = [[5]],
 		muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_RED]],
-		
+
 		light_camera_height = 1200,
 		light_radius = 120,
 	},
 
 	damage                  = {
 		default = 12,
-		planes  = 12,
 		subs    = 0.6,
 	},
 

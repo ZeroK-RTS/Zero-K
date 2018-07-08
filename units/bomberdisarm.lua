@@ -13,18 +13,17 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 4]],
   collisionVolumeScales  = [[45 20 50]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[70 25 70]],
+  selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
   cruiseAlt           = 180,
 
   customParams        = {
-    description_de = [[Entwaffnungbomber]],
-    description_fr = [[Bombardier desarmant]],
-    helptext       = [[Fast bomber armed with a lightning generator that disarms units in a wide area under it.]],
-    helptext_de    = [[Schneller Entwaffnungbomber, der mit einem Stossspannungsgenerator zum Entwaffnen großflächiger Gebiete bewaffnet ist.]],
-    helptext_fr    = [[Rapide, armé de canons desarmant pouvant désarmer les unités dans une large bande.]],
     modelradius    = [[10]],
     requireammo    = [[1]],
     refuelturnradius = [[170]],
+    reammoseconds    = [[15]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -44,7 +43,7 @@ unitDef = {
   script              = [[bomberdisarm.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
-  turnRadius          = 20,
+  turnRadius          = 400,
 
   weapons             = {
 
@@ -67,7 +66,7 @@ unitDef = {
 
     ARMBOMBLIGHTNING = {
       name                    = [[Lightning]],
-      areaOfEffect            = 192,
+      areaOfEffect            = 160,
       avoidFeature            = false,
       avoidFriendly           = false,
       beamTime                = 1/30,
@@ -81,6 +80,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
         disarmDamageMult = 1,
         disarmDamageOnly = 1,
         disarmTimer      = 16, -- seconds
@@ -90,7 +90,7 @@ unitDef = {
       },
  
       damage                  = {
-        default        = 675,
+        default        = 650,
       },
 
       edgeEffectiveness       = 0.4,
@@ -106,7 +106,7 @@ unitDef = {
       range                   = 730,
       reloadtime              = 1,
       rgbColor                = [[1 1 1]],
-      sprayAngle              = 6000,
+      sprayAngle              = 5000,
       texture1                = [[lightning]],
       texture2                = [[flare]],
       texture3                = [[flare]],

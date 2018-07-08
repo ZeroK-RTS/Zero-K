@@ -8,6 +8,8 @@ function widget:GetInfo() return {
 	enabled = true
 } end
 
+local EMPTY_TABLE = {}
+
 function widget:CommandNotify(cmdID, params, options)
 
 	if not options.ctrl or (cmdID ~= CMD.RECLAIM) or (#params ~= 4) then
@@ -23,7 +25,7 @@ function widget:CommandNotify(cmdID, params, options)
 	end
 
 	if not options.shift and not options.meta then
-		Spring.GiveOrder (CMD.STOP, {}, 0)
+		Spring.GiveOrder (CMD.STOP, EMPTY_TABLE, 0)
 		options.shift = true
 		options.coded = options.coded + CMD.OPT_SHIFT
 	end
@@ -40,9 +42,7 @@ function widget:CommandNotify(cmdID, params, options)
 	local paramTable = {-1}
 	for i = 1, #areaUnits do
 		local unitID = areaUnits[i]
-		if Spring.GetUnitDefID(unitID) == unitDefID
-		and Spring.GetUnitAllyTeam(unitID) == myAllyTeam
-		then
+		if Spring.GetUnitDefID(unitID) == unitDefID and Spring.GetUnitAllyTeam(unitID) == myAllyTeam then
 			paramTable[1] = unitID
 			WG.CommandInsert(CMD.RECLAIM, paramTable, options)
 		end

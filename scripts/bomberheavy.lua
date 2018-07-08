@@ -72,6 +72,7 @@ function script.MoveRate(rate)
 end
 
 function script.Create()
+	SetInitialBomberSettings()
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	StartThread(SmokeUnit, smokePiece)
 	Hide(rearthrust)
@@ -84,8 +85,13 @@ end
 
 function script.FireWeapon(num)
 	gun_1 = not gun_1
-	Sleep(33)	-- delay before clearing attack order; else bomb loses target and fails to home
+	SetUnarmedAI()
+	Sleep(50)	-- delay before clearing attack order; else bomb loses target and fails to home
 	Reload()
+end
+
+function script.AimWeapon(num)
+	return true
 end
 
 function script.QueryWeapon(num)
@@ -93,7 +99,7 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num)
-	return (GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1) 
+	return (GetUnitValue(COB.CRASHING) == 1) or RearmBlockShot()
 end
 
 function script.Killed(recentDamage, maxHealth)

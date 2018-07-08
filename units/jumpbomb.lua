@@ -16,6 +16,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[20 20 20]],
   collisionVolumeType    = [[ellipsoid]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[28 28 28]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -25,21 +28,16 @@ unitDef = {
     jump_speed       = 6,
     jump_reload      = 10,
     jump_from_midair = 0,
-
-    description_fr = [[Bombe Rampante Avancée Camouflable]],
-	description_de = [[Fortgeschrittene, verschleierbare Crawling Bombe]],
-    helptext       = [[This slow-moving, expensive cloaked unit can jump on to enemy units and blast even a heavy tank straight to hell. Counter with swarms of cheap screening units. Be careful of its very small explosion radius when using it.]],
-    helptext_fr    = [[Le Skuttle est une arme redoutable, il s'agit en fait d'un mine armée d'une tete nucléaire légcre, équipée d'un camouflage optique et d'un jetpack. Capable de se faufiler dans les endroits les plus inatendus, le souffle de son explosion est capable de faire des dégâts effroyables. Il se fera cependant détecter si il approche trop d'une cible ennemie. ]],
-	helptext_de    = [[Der Skuttle wirft sich als Kamikazekrieger in die Schlacht und kann dir enorme Vorteile erarbeiten. Hochwirksam gegen schwere Ziele. Der Explosionsradius ist minimal, deshalb gilt: sorgfältig nutzen.]],
-	aimposoffset   = [[0 0 0]],
-	midposoffset   = [[0 0 0]],
+	aimposoffset   = [[0 2 0]],
+	midposoffset   = [[0 2 0]],
 	modelradius    = [[10]],
+    selection_scale = 1, -- Maybe change later
   },
 
   explodeAs              = [[jumpbomb_DEATH]],
   fireState              = 0,
-  footprintX             = 1,
-  footprintZ             = 1,
+  footprintX             = 2,
+  footprintZ             = 2,
   iconType               = [[jumpjetbomb]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -54,7 +52,7 @@ unitDef = {
   maxVelocity            = 1.5225,
   maxWaterDepth          = 15,
   minCloakDistance       = 180,
-  movementClass          = [[KBOT1]],
+  movementClass          = [[SKBOT2]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[skuttle.s3o]],
@@ -66,7 +64,7 @@ unitDef = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
-  trackWidth             = 26,
+  trackWidth             = 34,
   turnRate               = 2000,
   workerTime             = 0,
   
@@ -75,9 +73,9 @@ unitDef = {
     DEAD      = {
       blocking         = false,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[wreck2x2b.s3o]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      object           = [[skuttle_dead.s3o]],
     },
 
     HEAP      = {
@@ -106,6 +104,8 @@ local weaponDefs = {
     soundHit           = "explosion/mini_nuke",
 	
 	customParams       = {
+		burst = Shared.BURST_UNRELIABLE,
+
       lups_explodelife = 1.5,
 	},
     damage = {

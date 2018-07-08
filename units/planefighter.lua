@@ -15,16 +15,14 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 5]],
   collisionVolumeScales  = [[25 8 40]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 10]],
+  selectionVolumeScales  = [[50 50 70]],
+  selectionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
   crashDrag              = 0.02,
   cruiseAlt              = 200,
 
   customParams           = {
-    description_fr = [[Chasseur Multirôle]],
-	description_de = [[Mehrzweck-Tarnkappenjäger]],
-    helptext       = [[The Swift can hit both land and air. It is effective against air units with its guided missiles and lasers, but enemy AA and air superiority fighters will kill it quickly. In numbers, it can harass land units and is suitable for raiding. Perhaps most notably, they are equipped with afterburner jets that can be used to give the Swift a massive speed boost, allowing them to execute incredible combat and evasive maneuvers.]],
-    helptext_fr    = [[Capable de tirer en l'air ou au sol le Swift n'est efficace qu'en groupe. Sa puissance de feu limité le rends moins éfficace qu'un aeronef dédié au combat Air/Sol ou au Air/Air.]],
-	helptext_de    = [[Der Swift kann sowohl Land-, als auch Lufteinheiten treffen. Er eignet sich gut zur Verteidigung gegen Lufteinheiten, aber feindliche Flugabwehr und Luftüberlegenheitsjäger werden ihn schnell erlegen. Zuhauf kann er aber Landeinheiten durchaus auf die Nerven gehen.]],
 
 	specialreloadtime = [[850]],
 	boost_speed_mult = 5,
@@ -152,6 +150,8 @@ unitDef = {
       cylinderTargeting       = 6,
 
 	  customParams        	  = {
+		burst = Shared.BURST_RELIABLE,
+
 		isaa = [[1]],
 		light_color = [[0.5 0.6 0.6]],
 	  },

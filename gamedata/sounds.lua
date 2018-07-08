@@ -48,7 +48,7 @@ local Sounds = {
 			pitch = 1.0,
 			priority = 0,
 			maxconcurrent = 4, --- some reasonable limits
-			maxdist = FLT_MAX, --- no cutoff at all
+			maxdist = nil, --- no cutoff at all (engine defaults to FLT_MAX)
 		},
 		Sparks = {
 			file = "sounds/sparks.wav",
@@ -58,6 +58,12 @@ local Sounds = {
 			preload = false,
 			in3d = true,
 			rolloff = 4,
+		},
+		Launcher = {
+			file = "sounds/weapon/launcher.wav",
+			pitchmod = 0.05,
+			gainmod = 0,
+			gain = 2.4,
 		},
 		TorpedoHitVariable = {
 			file = "sounds/explosion/wet/ex_underwater.wav",

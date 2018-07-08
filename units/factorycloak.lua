@@ -1,12 +1,12 @@
 unitDef = {
   unitname                      = [[factorycloak]],
-  name                          = [[Cloaky Bot Factory]],
-  description                   = [[Produces Cloaky Robots, Builds at 10 m/s]],
-  buildCostMetal                = 600,
+  name                          = [[Cloakbot Factory]],
+  description                   = [[Produces Cloaked, Mobile Robots, Builds at 10 m/s]],
+  buildCostMetal                = Shared.FACTORY_COST,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 7,
-  buildingGroundDecalSizeY      = 7,
+  buildingGroundDecalSizeX      = 13,
+  buildingGroundDecalSizeY      = 13,
   buildingGroundDecalType       = [[factorycloak_aoplane.dds]],
 
   buildoptions                  = {
@@ -30,16 +30,16 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Produziert Tarnroboter, Baut mit 10 M/s]],
-    helptext       = [[Emphasizing guile over brute force, the Cloaky Bot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Warrior, Zeus, Hammer]],
-    helptext_de    = [[List statt pure Gewalt lautet hier das Motto. Die Cloaky Bot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Rocko, Warrior, Zeus, Hammer]],
-    sortName       = [[1]],
+    sortName        = [[1]],
+    default_spacing = 8,
+    midposoffset    = [[0 0 -24]],
+    solid_factory   = [[7]],
   },
 
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 7,
-  footprintZ                    = 7,
+  footprintZ                    = 10,
   iconType                      = [[fackbot]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -64,8 +64,8 @@ unitDef = {
   showNanoSpray                 = false,
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
-  workerTime                    = 10,
-  yardMap                       = "ooooooo ooooooo ooooooo occccco occccco occccco occccco",
+  workerTime                    = Shared.FACTORY_BUILDPOWER,
+  yardMap                       = "ooooooo ooooooo ooooooo occccco occccco occccco occccco yyyyyyy yyyyyyy yyyyyyy",
 
   featureDefs                   = {
 

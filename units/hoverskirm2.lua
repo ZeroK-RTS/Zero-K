@@ -17,7 +17,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext       = [[The Trisula is a fairly fast, sturdy combatant armed with a scatter beam weapon that can erase multiple small targets or slag a single large one.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -30,7 +29,7 @@ unitDef = {
   maxSlope            = 36,
   maxVelocity         = 2.5,
   minCloakDistance    = 75,
-  movementClass       = [[HOVER3]],
+  movementClass       = [[HOVER2]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[hoverskirm.s3o]],
   onoffable           = true,

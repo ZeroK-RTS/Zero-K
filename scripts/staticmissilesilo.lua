@@ -22,12 +22,12 @@ local silo3 = piece 'silo3'
 local silo4 = piece 'silo4' 
 
 local smokePiece = {body, silo1, silo3, scaffold}
+local pads = {silo1, silo2, silo3, silo4}
 
 --------------------------------------------------------------------------------
 -- variables
 --------------------------------------------------------------------------------
 local padnum = 1
-
 local missiles = {}
 
 --------------------------------------------------------------------------------
@@ -39,33 +39,14 @@ local SIG_AIM = 2
 --------------------------------------------------------------------------------
 -- main code
 --------------------------------------------------------------------------------
-function BuildNewMissile()
-	for i=1,4 do
-		if missiles[i] == nil then
-			padnum = i
-			--Spring.Echo("Missile build order confirmed: using pad "..i)
-			return true
-		end
+function SetPadNum(num)
+	if num ~= nil then
+		padnum = num
 	end
-	return false
 end
 
-function AddMissile(missileID)
-	missiles[padnum] = missileID
-end
-
-function GetMissiles()
-	return missiles
-end
-
-function RemoveMissile(deadID)
-	for i=1,4 do
-		if deadID == missiles[i] then
-			missiles[i] = nil
-			--Spring.Echo("Clearing pad "..i)
-			break
-		end		--if this was a missile, clear it from our silo data
-	end
+function GetPadNum(num)
+	return padnum
 end
 
 function script.Create()
@@ -87,19 +68,12 @@ function script.Deactivate()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 end
 
-function script.QueryNanoPiece() return trolleyb end
-
-function script.QueryBuildInfo()
-	if padnum == 1 then return silo1
-	elseif padnum == 2 then return silo2
-	elseif padnum == 3 then return silo3
-	else return silo4 end
+function script.QueryNanoPiece()
+	return trolleyb
 end
 
-function KillAllMissiles()
-	for i=1,4 do
-		if missiles[i] then Spring.DestroyUnit(missiles[i], true) end
-	end
+function script.QueryBuildInfo()
+	return pads[padnum]
 end
 
 function script.Killed(recentDamage, maxHealth)

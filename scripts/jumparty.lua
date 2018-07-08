@@ -60,7 +60,7 @@ local function Walk()
 	SetSignalMask(SIG_MOVE)
 	local pace = WALK_RATE
 	while true do
-		pace = WALK_RATE*(1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+		pace = WALK_RATE*(Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 		
 		Turn(rupleg 	, y_axis, 0, math.rad(pace))
 		Turn(lupleg 	, y_axis, 0, math.rad(pace))
@@ -222,7 +222,7 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	
-	local aimMult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+	local aimMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 	
 	bAiming = true
 	Turn(rflap1, x_axis, 0, math.rad(168)*aimMult)

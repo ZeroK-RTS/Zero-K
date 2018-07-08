@@ -78,7 +78,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local ud = UnitDefs[unitDefID]
-	if (not ud.canFly) and (ud.speed > 0) then
+	if ud.isGroundUnit then
 		Spring.InsertUnitCmdDesc(unitID, 500, turnCmdDesc)
 	end
 end

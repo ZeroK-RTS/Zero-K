@@ -12,8 +12,8 @@ local weaponDef = {
 
 	exteriorShield          = true,
 	shieldAlpha             = 0.2,
-	shieldBadColor          = [[1 0.1 0.1]],
-	shieldGoodColor         = [[0.1 0.1 1]],
+	shieldBadColor          = [[1 0.1 0.1 1]],
+	shieldGoodColor         = [[0.1 0.1 1 1]],
 	shieldInterceptType     = 3,
 	shieldPower             = 1250,
 	shieldPowerRegen        = 16,
@@ -22,10 +22,8 @@ local weaponDef = {
 	shieldRepulser          = false,
 	shieldStartingPower     = 850,
 	smartShield             = true,
-	texture1                = [[shield3mist]],
-	visibleShield           = true,
-	visibleShieldHitFrames  = 4,
-	visibleShieldRepulse    = true,
+	visibleShield           = false,
+	visibleShieldRepulse    = false,
 	weaponType              = [[Shield]],
 }
 

@@ -26,12 +26,14 @@ local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 --------------------------------------------------------------------------------
 -- From transport AI
 
+local EMPTY_TABLE = {}
 local MAX_UNITS = Game.maxUnits
 local areaTarget -- used to match area command targets
 
 local goodCommand = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_BUILD] = true,
 	[CMD.SET_WANTED_MAX_SPEED] = true,
 	[CMD.GUARD] = true,
 	[CMD.RECLAIM] = true,
@@ -127,7 +129,7 @@ local function CopyMoveThenUnload(transportID, unitID)
 	commands[#commandLocations] = {CMD.UNLOAD_UNITS, commandLocations[#commandLocations], CMD.OPT_SHIFT}
 	
 	Spring.GiveOrderArrayToUnitArray({transportID}, commands)
-	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, queueToRemove, {})
+	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, queueToRemove, 0)
 end
 
 local valkMaxMass = UnitDefNames.gunshiptrans.transportMass
@@ -171,14 +173,14 @@ local function DoSelectionLoad()
 	local lightEnd = math.min(#light, #lightTrans)
 	for i = 1, lightEnd do 
 		Spring.GiveOrderToUnit(lightTrans[i], CMD.LOAD_UNITS, {light[i]}, CMD.OPT_RIGHT)
-		Spring.GiveOrderToUnit(light[i], CMD.WAIT, {}, CMD.OPT_RIGHT)
+		Spring.GiveOrderToUnit(light[i], CMD.WAIT, EMPTY_TABLE, CMD.OPT_RIGHT)
 		CopyMoveThenUnload(lightTrans[i], light[i])
 	end
 	
 	local heavyEnd = math.min(#heavy, #heavyTrans)
 	for i = 1, heavyEnd do 
 		Spring.GiveOrderToUnit(heavyTrans[i], CMD.LOAD_UNITS, {heavy[i]}, CMD.OPT_RIGHT)
-		Spring.GiveOrderToUnit(heavy[i], CMD.WAIT, {}, CMD.OPT_RIGHT)
+		Spring.GiveOrderToUnit(heavy[i], CMD.WAIT, EMPTY_TABLE, CMD.OPT_RIGHT)
 		CopyMoveThenUnload(heavyTrans[i], heavy[i])
 	end
 	
@@ -192,7 +194,7 @@ local function DoSelectionLoad()
 		--Spring.Echo("offset", offset)
 		for i = #lightTrans + 1, heavyEnd do 
 			Spring.GiveOrderToUnit(heavyTrans[offset + i], CMD.LOAD_UNITS, {light[i]}, CMD.OPT_RIGHT)
-			Spring.GiveOrderToUnit(light[i], CMD.WAIT, {}, CMD.OPT_RIGHT)
+			Spring.GiveOrderToUnit(light[i], CMD.WAIT, EMPTY_TABLE, CMD.OPT_RIGHT)
 			CopyMoveThenUnload(heavyTrans[offset + i], light[i])
 		end
 	end

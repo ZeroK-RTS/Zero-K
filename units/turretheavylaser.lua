@@ -18,11 +18,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_fr = [[Tourelle Laser Moyenne HLT]],
-	description_de = [[Hochenergetischer Laserturm]],
-    helptext       = [[The Stinger is a medium laser turret. Its three rotating laser guns can kill almost any small unit, but its low rate of fire makes it vulnerable to swarms when unassisted.]],
-    helptext_fr    = [[Le Gaat Gun est compos? de trois canons lasers rotatifs lourd. Oblig?s de se refroidir apr?s chaque tir, il n'en d?livrent pas moins une forte puissance de feu instann?e. Tr?s utile sur des grosses cibles, elle aura besoin d'assistance en cas de nombreux ennemis.]],
-	helptext_de    = [[Der Stinger ist ein durchschnittlicher Lasergesch?zturm. Seine drei rotierenden Laserkanonen können so gut wie jede kleine Einheit töten, aber die langsame Feuerrate macht den Stinger anfällig f? große Gruppen, sobald er nicht gen?end abgesichert ist.]],
     aimposoffset   = [[0 15 0]],
   },
 
@@ -81,6 +76,8 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
+		burst = Shared.BURST_UNRELIABLE,
+
 		light_color = [[1.25 1.25 3.75]],
 		light_radius = 180,
       },

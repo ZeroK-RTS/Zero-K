@@ -33,6 +33,12 @@ function DynamicApplyWeapon(unitDef, weapon, slot)
 	unitDef.weapons = unitDef.weapons or {}
 	--unitDef.weapondefs = unitDef.weapondefs or {}
 	
+	if weapons[weapon].weapontype == "Shield" then
+		unitDef.customparams.shield_radius = weapons[weapon].shieldradius
+		unitDef.customparams.shield_power = weapons[weapon].shieldpower
+		unitDef.customparams.shield_rate = (weapons[weapon].customparams or {}).shield_rate or weapons[weapon].shieldpowerregen
+	end
+	
 	unitDef.weapons[slot] = {
 		def = weapon,
 		badtargetcategory = wcp.badtargetcategory or [[FIXEDWING]],
@@ -59,6 +65,11 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	if (not isDgun) and unitDef.customparams.alreadyhasweapon and not replace then	-- dual wield
 		slot = altslot
 		dualwield = true
+	end
+	if weapons[weapon].weapontype == "Shield" then
+		unitDef.customparams.shield_radius = weapons[weapon].shieldradius
+		unitDef.customparams.shield_power = weapons[weapon].shieldpower
+		unitDef.customparams.shield_rate = (weapons[weapon].customparams or {}).shield_rate or weapons[weapon].shieldpowerregen
 	end
 	
 	slot = forceslot or slot

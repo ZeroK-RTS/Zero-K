@@ -126,7 +126,7 @@ function script.AimWeapon(num, heading, pitch)
 	end
 	spindlePitch = -pitch
 
-	local slowMult = (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 	Turn(turret, y_axis, heading, headingSpeed*slowMult)
 	Turn(spindle, x_axis, spindlePitch+spindleOffset, pitchSpeed*slowMult)
 	WaitForTurn(turret, y_axis)

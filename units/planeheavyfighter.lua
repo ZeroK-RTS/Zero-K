@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[planeheavyfighter]],
-  name                   = [[Hawk]],
+  name                   = [[Raptor]],
   description            = [[Air Superiority Fighter]],
   brakerate              = 0.4,
   buildCostMetal         = 300,
@@ -15,16 +15,14 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 5]],
   collisionVolumeScales  = [[30 12 50]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 10]],
+  selectionVolumeScales  = [[60 60 80]],
+  selectionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
   crashDrag              = 0.01,
   cruiseAlt              = 220,
 
   customParams           = {
-    description_fr = [[Chasseur Anti-Air Sup?rieur]],
-	description_de = [[Luftüberlegenheitsjäger]],
-    helptext       = [[The Hawk specializes in bringing down anything else that flies. It is sturdy enough to take limited AA fire, although it has no ground attack capability.]],
-    helptext_fr    = [[le Hawk combine, vitesse, invisibilit? au radar, et puissante force offensive Air/Air, afin d'abatre les aeronefs ennemis. Sans d?fense contre les attaques Sol/Air.]],
-	helptext_de    = [[Der Hawk ist darauf spezialisiert, alles vom Himmel zu holen, was dort umherfliegt. Er ist stabil genung, um begrenztes Flugabwehrfeuer auszuhalten, obwohl er keine Möglichkeit zum Angriff auf Bodenziele besitzt.]],
     midposoffset   = [[0 3 0]],
     aimposoffset   = [[0 3 0]],
 	modelradius    = [[10]],
@@ -87,9 +85,9 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-	  },
+      customParams            = {
+        isaa = [[1]],
+      },
 
       damage                  = {
         default = 0.96,
@@ -108,7 +106,7 @@ unitDef = {
       reloadtime              = 0.1,
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/rapid_laser]],
-      soundStartVolume        = 2.2,
+      soundStartVolume        = 1.9,
       thickness               = 1.95,
       tolerance               = 8192,
       turret                  = true,

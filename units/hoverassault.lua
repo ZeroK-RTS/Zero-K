@@ -18,10 +18,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_fr = [[Hovecraft d'Assaut Lourd]],
-	description_de = [[Blockadebrecher Gleiter]],
-    helptext       = [[The Halberd buttons down into its armored hull when not firing, offering 4x damage resistance. Its slow, short-ranged weapon is unsuitable for use against highly mobile targets.]],
-	helptext_de    = [[Der Halberd zieht sich in seine gepanzerte Hülle zurück, sobald er nicht mehr feuert, was ihm einen exzellenten Schadenswiderstand bietet. Seine langsame, kurzreichweitige Waffe ist ungeeignet für den Einsatz gegen hochmobile Ziele.]],
 	modelradius    = [[10]],
   },
 

@@ -16,11 +16,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Robot Anti-Air]],
-	description_de = [[Flugabwehr Roboter]],
-    helptext       = [[The Vandal is a cheap, hardy and reliable dedicated anti-air bot. Defenseless vs. land forces.]],
-    helptext_fr    = [[Le Vandal est l'unit? anti-air de base, il tire des missiles guid?s ? une cadence peu rapide. Redoutable en groupe, il sert ? prot?ger bases et troupes.]],
-	helptext_de    = [[Der Vandal ist ein billiger, dedizierter Flugabwehr Roboter, der den Robotern einen bestimmten Vorteil gegenüber Flugzeugen bringt. Schutzlos gegenüber Landstreitkräften.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -81,6 +76,8 @@ unitDef = {
       cylinderTargeting       = 1,
 
 	  customParams        	  = {
+		burst = Shared.BURST_RELIABLE,
+
 		isaa = [[1]],
 		light_color = [[0.5 0.6 0.6]],
 		light_radius = 380,

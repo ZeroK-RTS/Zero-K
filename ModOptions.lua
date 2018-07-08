@@ -160,12 +160,23 @@ local options = {
     step=0.01,
   },
   {
-    key = "forcejunior",
-    name = "Force Junior",
-    desc = "Choose whether everyone gets a standard Junior Comm chassis.",
-    type = "bool",
-    section= 'startconds',
+    key    = 'zombies_partial_reclaim',
+    name   = 'Zombies partially reclaimable',
+    desc   = "Partially reclaimed zombies are partially damaged.",
+    type   = 'bool',
+    section= 'silly',
     def = false,
+  },
+  {
+    key = "max_com_level",
+    name = "Commander level limit",
+    desc = "Choose the commander level limit. 0 for unlimited.",
+    type = "number",
+    section= 'startconds',
+    def = 0,
+    min = 0,
+    step = 1,
+    max = 20,
   },
   {
 	key		= "disabledunits",
@@ -173,8 +184,16 @@ local options = {
 	desc	= "Prevents specified units from being built ingame. Specify multiple units by using + ",
 	section	= 'startconds',
 	type	= "string",
-	def		= nil,
+	def		= "",
   },
+	{
+		key = 'globallos',
+		name = 'Full visibility',
+		desc = 'No fog of war, everyone can see the entire map.',
+		type = 'bool',
+		section = 'startconds',
+		def = false,
+	},
   {
     key = "overdrivesharingscheme",
     name = "Economy returns investment",
@@ -402,31 +421,31 @@ local options = {
   --  def		= true,
   --  section	= "experimental",
   --},  
-  {
-    key		= "pathfinder",
-    name	= "Pathfinder type",
-    desc	= "Sets the pathfinding system used by units.",
-    type	= "list",
-    def		= "standard",
-    section	= "experimental",
-    items  = {
-      {
-	key  = 'standard',
-	name = 'Standard',
-	desc = 'Standard pathfinder',
-      },
-      {
-	key  = 'qtpfs',
-	name = 'QTPFS',
-	desc = 'New Quadtree Pathfinding System (experimental)',
-      },
-    --  {
-	--	key  = 'classic',
-	--	name = 'Classic',
-	--	desc = 'An older pathfinding system without turninplace or reverse',
-    --  }
-    },	
-  },  
+--  { -- Causes desync https://springrts.com/mantis/view.php?id=5936
+--    key		= "pathfinder",
+--    name	= "Pathfinder type",
+--    desc	= "Sets the pathfinding system used by units.",
+--    type	= "list",
+--    def		= "standard",
+--    section	= "experimental",
+--    items  = {
+--      {
+--	key  = 'standard',
+--	name = 'Standard',
+--	desc = 'Standard pathfinder',
+--      },
+--      {
+--	key  = 'qtpfs',
+--	name = 'QTPFS',
+--	desc = 'New Quadtree Pathfinding System (experimental)',
+--      },
+--    --  {
+--	--	key  = 'classic',
+--	--	name = 'Classic',
+--	--	desc = 'An older pathfinding system without turninplace or reverse',
+--    --  }
+--    },	
+--  },  
   
   {
     key    = 'chicken',
@@ -498,6 +517,17 @@ local options = {
     step   = 1,
   },
   {
+    key    = 'wavesizemult',
+    name   = 'Wave size mult',
+    desc   = 'Increases or decreases the size of each chicken wave.',
+    type   = 'number',
+    section= 'chicken',
+    def    = 1,
+    min    = 0.1,
+    max    = 10,
+    step   = 0.05,
+  },
+  {
     key    = 'queentime',
     name   = 'Queen Time',
     desc   = 'How soon the queen appears on her own, minutes.',
@@ -507,6 +537,17 @@ local options = {
     min    = 1,
     max    = 200,
     step   = 1,
+  },
+  {
+    key    = 'queenhealthmod',
+    name   = 'Queen Health Mult',
+    desc   = 'Queen health multiplier',
+    type   = 'number',
+    section= 'chicken',
+    def    = 1,
+    min    = 0.1,
+    max    = 10,
+    step   = 0.05,
   },
   {
     key    = 'graceperiod',
@@ -541,6 +582,17 @@ local options = {
     max    = 5,
     step   = 0.05,
   },
+  {
+    key    = 'chicken_maxtech',
+    name   = 'Max Tech Level',
+    desc   = 'Maximum timer for chicken tech level progression, in seconds. Lowering this value will exclude some or most chicken types. Applies to all difficulties.',
+    type   = 'number',
+    section= 'chicken',
+    def    = 9000,
+    min    = 0,
+    max    = 9000,
+    step   = 60,
+  },
 --[[  
   {
 	key    = 'burrowtechtime',
@@ -557,7 +609,7 @@ local options = {
   {
 	key    = 'burrowqueentime',
 	name   = 'Burrow Queen Time',
-	desc   = 'How much time each burrow death subtracts from queen appearance time, seconds',
+	desc   = 'How much time each burrow death subtracts from queen appearance time, seconds.',
 	type   = 'number',
 	section= 'chicken',
 	def    = 15,

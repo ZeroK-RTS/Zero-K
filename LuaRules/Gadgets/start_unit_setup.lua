@@ -26,15 +26,25 @@ local modOptions = Spring.GetModOptions()
 local DELAYED_AFK_SPAWN = false
 local COOP_MODE = false
 local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchickens", false, false))
-local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
+local campaignBattleID = modOptions.singleplayercampaignbattleid
+local setAiStartPos = (modOptions.setaispawns == "1")
+
+local CAMPAIGN_SPAWN_DEBUG = (Spring.GetModOptions().campaign_spawn_debug == "1")
 
 local gaiateam = Spring.GetGaiaTeamID()
 local gaiaally = select(6, spGetTeamInfo(gaiateam))
 
 local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 
-local fixedStartPos = modOptions.fixedstartpos
+local fixedStartPos = (modOptions.fixedstartpos == "1")
 local ordersToRemove
+
+local storageUnits = {
+	{
+		unitDefID = UnitDefNames["staticstorage"].id,
+		storeAmount = UnitDefNames["staticstorage"].metalStorage
+	}
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -45,42 +55,14 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 -- Functions shared between missions and non-missions
 
-local spGetGroundHeight = Spring.GetGroundHeight
-local spSetHeightMap    = Spring.SetHeightMap
-
-local function FlattenFunc(left, top, right, bottom, height)
-	-- top and bottom
-	for x = left, right, 8 do
-		spSetHeightMap(x, top - 8, height, 0.5)
-		spSetHeightMap(x, bottom + 8, height, 0.5)
-	end
-	
-	-- left and right
-	for z = top, bottom, 8 do
-		spSetHeightMap(left - 8, z, height, 0.5)
-		spSetHeightMap(right + 8, z, height, 0.5)
-	end
-	
-	-- corners
-	spSetHeightMap(left - 8, top - 8, height, 0.5)
-	spSetHeightMap(left - 8, bottom + 8, height, 0.5)
-	spSetHeightMap(right + 8, top - 8, height, 0.5)
-	spSetHeightMap(right + 8, bottom + 8, height, 0.5)
-end
-
-local function FlattenRectangle(left, top, right, bottom, height)
-	Spring.LevelHeightMap(left, top, right, bottom, height)
-	Spring.SetHeightMapFunc(FlattenFunc, left, top, right, bottom, height)
-end
-
-local function CheckOrderRemoval()
+local function CheckOrderRemoval() -- FIXME: maybe we can remove polling every frame and just remove the orders directly
 	if not ordersToRemove then
 		return
 	end
 	for unitID, factoryDefID in pairs(ordersToRemove) do
 		local cQueue = Spring.GetCommandQueue(unitID, 1)
 		if cQueue and cQueue[1] and cQueue[1].id == -factoryDefID then
-			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, {"alt"})
+			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, CMD.OPT_ALT)
 		end
 	end
 	ordersToRemove = nil
@@ -90,6 +72,7 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 	if ploppableDefs[unitDefID] and (select(5, Spring.GetUnitHealth(unitID)) < 0.1) and (builderID and Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
 		-- (select(5, Spring.GetUnitHealth(unitID)) < 0.1) to prevent ressurect from spending facplop.
 		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
+		Spring.SetUnitRulesParam(unitID,"ploppee",1, {private = true})
 		
 		ordersToRemove = ordersToRemove or {}
 		ordersToRemove[builderID] = unitDefID
@@ -99,36 +82,25 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
-		
-		-- Flatten ground
-		local ud = UnitDefs[unitDefID]
-		local sX = ud.xsize*4
-		local sZ = ud.zsize*4
-		local facing = Spring.GetUnitBuildFacing(unitID)
-		if facing == 1 or facing == 3 then
-			sX, sZ = sZ, sX
-		end
-		
-		local height
-		if facing == 0 then -- South
-			height = spGetGroundHeight(x, z + 0.8*sZ)
-		elseif facing == 1 then -- East
-			height = spGetGroundHeight(x + 0.8*sX, z)
-		elseif facing == 2 then -- North
-			height = spGetGroundHeight(x, z - 0.8*sZ)
-		else -- West
-			height = spGetGroundHeight(x - 0.8*sX, z)
-		end
-		
-		if height > 0 or (not ud.floatOnWater) then
-			FlattenRectangle(x - sX, z - sZ, x + sX, z + sZ, height)
-		end
-		
-		-- Stats collection
+
+		-- Stats collection (acuelly not, see below)
 		if GG.mod_stats_AddFactoryPlop then
 			GG.mod_stats_AddFactoryPlop(teamID, unitDefID)
 		end
-		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
+
+		-- FIXME: temporary hack because I'm in a hurry
+		-- proper way: get rid of all the useless shit in modstats, reenable and collect plop stats that way (see above)
+		local str = "SPRINGIE:facplop," .. UnitDefs[unitDefID].name .. "," .. teamID .. "," .. select(6, Spring.GetTeamInfo(teamID)) .. ","
+		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		if isAI then
+			str = str .. "Nightwatch" -- existing account just in case infra explodes otherwise
+		else
+			str = str .. (Spring.GetPlayerInfo(playerID) or "ChanServ") -- ditto, different acc to differentiate
+		end
+		str = str .. ",END_PLOP"
+		Spring.SendCommands("wbynum 255 " .. str)
+
+		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- FIXME: performance loss, possibly preload?
 	end
 end
 
@@ -137,10 +109,6 @@ end
 -- Mission Handling
 
 if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage (and enable facplopping)
-	if not gadgetHandler:IsSyncedCode() then
-		return false -- no unsynced code
-	end
-
 	function gadget:Initialize()
 		for _, teamID in ipairs(Spring.GetTeamList()) do
 			Spring.SetTeamResource(teamID, "es", START_STORAGE + HIDDEN_STORAGE)
@@ -192,12 +160,15 @@ local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
 
 -- allow gadget:Save (unsynced) to reach them
-_G.waitingForComm = waitingForComm
-_G.scheduledSpawn = scheduledSpawn
-_G.playerSides = playerSides
-_G.teamSides = teamSides
-_G.commSpawnedTeam = commSpawnedTeam
-_G.commSpawnedPlayer = commSpawnedPlayer
+local function UpdateSaveReferences()
+	_G.waitingForComm = waitingForComm
+	_G.scheduledSpawn = scheduledSpawn
+	_G.playerSides = playerSides
+	_G.teamSides = teamSides
+	_G.commSpawnedTeam = commSpawnedTeam
+	_G.commSpawnedPlayer = commSpawnedPlayer
+end
+UpdateSaveReferences()
 
 local loadGame = false	-- was this loaded from a savegame?
 
@@ -237,10 +208,6 @@ local function GetStartUnit(teamID, playerID, isAI)
 		local commanderLevel = teamInfo.staticcomm_level or 1
 		local commanderProfile = GG.ModularCommAPI.GetCommProfileInfo(commanderName)
 		return commanderProfile.baseUnitDefID
-	end
-
-	if Spring.GetModOption("forcejunior", true, false) then
-		return UnitDefNames["commbasic"].id
 	end
 
 	local startUnit
@@ -306,6 +273,39 @@ local function getMiddleOfStartBox(teamID)
 	return x, Spring.GetGroundHeight(x,z), z
 end
 
+local function GetStartPos(teamID, teamInfo, isAI)
+	if luaSetStartPositions[teamID] then
+		return luaSetStartPositions[teamID].x, luaSetStartPositions[teamID].y, luaSetStartPositions[teamID].z
+	end
+	
+	if fixedStartPos then
+		local x, y, z
+		if teamInfo then
+			x, z = tonumber(teamInfo.start_x), tonumber(teamInfo.start_z)
+		end
+		if x then
+			y = Spring.GetGroundHeight(x, z)
+		else
+			x, y, z = Spring.GetTeamStartPosition(teamID)
+		end
+		return x, y, z
+	end
+	
+	if not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI) then
+		local x, y, z = getMiddleOfStartBox(teamID)
+		return x, y, z
+	end
+	
+	local x, y, z = Spring.GetTeamStartPosition(teamID)
+	-- clamp invalid positions
+	-- AIs can place them -- remove this once AIs are able to be filtered through AllowStartPosition
+	local boxID = isAI and Spring.GetTeamRulesParam(teamID, "start_box_id")
+	if boxID and not GG.CheckStartbox(boxID, x, z) then
+		x,y,z = getMiddleOfStartBox(teamID)
+	end
+	return x, y, z
+end
+
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartOfTheGame)
 	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
 	if teamInfo and teamInfo.nocommander then
@@ -340,42 +340,23 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 
 	if startUnit then
 		-- replace with shuffled position
-		local x,y,z
-		if fixedStartPos then
-			if teamInfo then
-				x, z = tonumber(teamInfo.start_x), tonumber(teamInfo.start_z)
-			end
-			if x then
-				y = Spring.GetGroundHeight(x, z)
-			else
-				x, y, z = Spring.GetTeamStartPosition(teamID)
-			end
-		else
-			local startPosition = luaSetStartPositions[teamID]
-			if not startPosition then
-				if not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI) then
-					x,y,z = getMiddleOfStartBox(teamID)
-				else
-					x,y,z = Spring.GetTeamStartPosition(teamID)
-
-					-- clamp invalid positions
-					-- AIs can place them -- remove this once AIs are able to be filtered through AllowStartPosition
-					local boxID = isAI and Spring.GetTeamRulesParam(teamID, "start_box_id")
-					if boxID and not GG.CheckStartbox(boxID, x, z) then
-						x,y,z = getMiddleOfStartBox(teamID)
-					end
-				end
-			else
-				x,y,z = startPosition.x, startPosition.y, startPosition.z
-			end
-		end
+		local x,y,z = GetStartPos(teamID, teamInfo, isAI)
 		
 		-- get facing direction
 		local facing = GetFacingDirection(x, z, teamID)
 
+		if CAMPAIGN_SPAWN_DEBUG then
+			local _, aiName = Spring.GetAIInfo(teamID)
+			Spring.MarkerAddPoint(x, y, z, "Commander " .. (aiName or "Player"))
+			return -- Do not spawn commander
+		end
 		GG.startUnits[teamID] = startUnit
 		GG.CommanderSpawnLocation[teamID] = {x = x, y = y, z = z, facing = facing}
 
+		if GG.GalaxyCampaignHandler then
+			facing = GG.GalaxyCampaignHandler.OverrideCommFacing(teamID) or facing
+		end
+		
 		-- CREATE UNIT
 		local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, _, _, _, _, _, GG.ModularCommAPI.GetProfileIDByBaseDefID(startUnit), teamInfo and tonumber(teamInfo.static_level), true)
 		
@@ -404,13 +385,13 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 
 		-- add facplop
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
-		local udef = UnitDefs[Spring.GetUnitDefID(unitID)]		
+		local udef = UnitDefs[Spring.GetUnitDefID(unitID)]
 
 		local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
 		local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
 
-		Spring.SetTeamResource(teamID, "energy", START_ENERGY + energy)
-		Spring.SetTeamResource(teamID, "metal", START_METAL + metal)
+		Spring.SetTeamResource(teamID, "energy", teamInfo.start_energy or (START_ENERGY + energy))
+		Spring.SetTeamResource(teamID, "metal", teamInfo.start_metal or (START_METAL + metal))
 
 		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") and 
 			((not campaignBattleID) or GG.GalaxyCampaignHandler.HasFactoryPlop(teamID)) then
@@ -509,6 +490,14 @@ local function IsTeamResigned(team)
 	return true
 end
 
+local function GetPregameUnitStorage(teamID)
+	local storage = 0
+	for i = 1, #storageUnits do
+		storage = storage + Spring.GetTeamUnitDefCount(teamID, storageUnits[i].unitDefID) * storageUnits[i].storeAmount
+	end
+	return storage
+end
+
 function gadget:GameStart()
 	if Spring.Utilities.tobool(Spring.GetGameRulesParam("loadedGame")) then
 		return
@@ -521,8 +510,9 @@ function gadget:GameStart()
 		-- clear resources
 		-- actual resources are set depending on spawned unit and setup
 		if not loadGame then
-			Spring.SetTeamResource(team, "es", 0 + HIDDEN_STORAGE)
-			Spring.SetTeamResource(team, "ms", 0 + HIDDEN_STORAGE)
+			local pregameUnitStorage = (campaignBattleID and GetPregameUnitStorage(team)) or 0
+			Spring.SetTeamResource(team, "es", pregameUnitStorage + HIDDEN_STORAGE)
+			Spring.SetTeamResource(team, "ms", pregameUnitStorage + HIDDEN_STORAGE)
 			Spring.SetTeamResource(team, "energy", 0)
 			Spring.SetTeamResource(team, "metal", 0)
 		end
@@ -574,7 +564,7 @@ function gadget:GameStart()
 					local customKeys = select(10, Spring.GetPlayerInfo(playerlist[i]))
 					if customKeys and customKeys.extracomm then
 						for j = 1, tonumber(customKeys.extracomm) do
-						Spring.Echo("Spawing a commander")
+							Spring.Echo("Spawing a commander")
 							SpawnStartUnit(team, playerlist[i], false, true)
 						end
 					end
@@ -593,7 +583,12 @@ function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
 			Spring.SendLuaRulesMsg(command..aiTeam..":"..name);
 		end)
 	end
-end	
+end
+
+local function SetStartLocation(teamID, x, z)
+    luaSetStartPositions[teamID] = {x = x, y = Spring.GetGroundHeight(x,z), z = z}
+end
+GG.SetStartLocation = SetStartLocation
 
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("faction:",1,true) then
@@ -615,7 +610,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		
 		local _,_,_,isAI = Spring.GetTeamInfo(teamID)
 		if(isAI) then -- this is actually an AI 
-			local aiid, ainame, aihost = Spring.GetAIInfo(teamID);
+			local aiid, ainame, aihost = Spring.GetAIInfo(teamID)
 			if (aihost == playerID) then -- it's actually controlled by the local host
 				local unitDef = UnitDefNames[name];
 				if unitDef then -- the requested unit actually exists
@@ -625,15 +620,20 @@ function gadget:RecvLuaMsg(msg, playerID)
 				end
 			end
 		end
-
-	end	
+	elseif (msg:find("ai_start_pos:",1,true) and setAiStartPos) then
+		local msg_table = Spring.Utilities.ExplodeString(':', msg)
+		if msg_table then
+			local teamID, x, z = tonumber(msg_table[2]), tonumber(msg_table[3]), tonumber(msg_table[4])
+			if teamID then
+				local _,_,_,isAI = Spring.GetTeamInfo(teamID)
+				if isAI and x and z then
+					SetStartLocation(teamID, x, z)
+					Spring.MarkerAddPoint(x, 0, z, "AI " .. teamID .. " start")
+				end
+			end
+		end
+	end
 end
-
--- used by CAI. Could be extended to allow widgets to set start location? 
-local function SetStartLocation(teamID, x, z)
-    luaSetStartPositions[teamID] = {x = x, y = Spring.GetGroundHeight(x,z), z = z}
-end
-GG.SetStartLocation = SetStartLocation
 
 function gadget:GameFrame(n)
 	CheckOrderRemoval()
@@ -684,6 +684,8 @@ function gadget:Load(zip)
 	teamSides = data.teamSides or {}
 	commSpawnedPlayer = data.commSpawnedPlayer or {}
 	commSpawnedTeam = data.commSpawnedTeam or {}
+	
+	UpdateSaveReferences()
 end
 
 --------------------------------------------------------------------
@@ -718,17 +720,20 @@ end
 local MakeRealTable = Spring.Utilities.MakeRealTable
 
 function gadget:Save(zip)
+	if VFS.FileExists("mission.lua") then	-- nothing to do
+		return		
+	end
 	if not GG.SaveLoad then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Start Unit Setup failed to access save/load API")
 		return
 	end
 	local toSave = {
-		waitingForComm = MakeRealTable(SYNCED.waitingForComm),
-		scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn),
-		playerSides = MakeRealTable(SYNCED.playerSides),
-		teamSides = MakeRealTable(SYNCED.teamSides),
-		commSpawnedPlayer = MakeRealTable(SYNCED.commSpawnedPlayer),
-		commSpawnedTeam = MakeRealTable(SYNCED.commSpawnedTeam),
+		waitingForComm = MakeRealTable(SYNCED.waitingForComm, "Start setup (waitingForComm)"),
+		scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn, "Start setup (scheduledSpawn)"),
+		playerSides = MakeRealTable(SYNCED.playerSides, "Start setup (playerSides)"),
+		teamSides = MakeRealTable(SYNCED.teamSides, "Start setup (teamSides)"),
+		commSpawnedPlayer = MakeRealTable(SYNCED.commSpawnedPlayer, "Start setup (commSpawnedPlayer)"),
+		commSpawnedTeam = MakeRealTable(SYNCED.commSpawnedTeam, "Start setup (commSpawnedTeam)"),
 	}
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, toSave)
 end

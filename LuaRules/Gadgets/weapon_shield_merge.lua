@@ -28,11 +28,6 @@ local spGetUnitTeam			= Spring.GetUnitTeam
 local spGetTeamInfo			= Spring.GetTeamInfo
 local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
 local spGetUnitIsStunned	= Spring.GetUnitIsStunned
-local spGetUnitIsActive		= Spring.GetUnitIsActive
-local spGetUnitShieldState	= Spring.GetUnitShieldState
-local spSetUnitShieldState	= Spring.SetUnitShieldState
-local spSetUnitRulesParam   = Spring.SetUnitRulesParam
-local spGetUnitRulesParam   = Spring.GetUnitRulesParam
 
 local modOptions = Spring.GetModOptions()
 local MERGE_ENABLED = (modOptions.shield_merge == "share")
@@ -179,7 +174,6 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
-	local ud = UnitDefs[unitDefID]
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID].InMap(unitID) then
 		local unitData = allyTeamShields[allyTeamID].Get(unitID)
@@ -191,7 +185,6 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 end
 
 function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
-	local ud = UnitDefs[unitDefID]
 	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if allyTeamID and allyTeamShields[oldAllyTeam] and allyTeamShields[oldAllyTeam].InMap(unitID) then
@@ -206,7 +199,7 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 		end
 		if unitData then
 			--Note: wont be problem when NIL when nanoframe is captured because is always filled with new value when unit finish
-			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or InterableMap.New()
+			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or IterableMap.New()
 			allyTeamShields[allyTeamID].Add(unitID, unitData)
 		end
 	end

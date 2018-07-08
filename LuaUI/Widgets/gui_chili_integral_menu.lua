@@ -19,6 +19,7 @@ end
 -- Configuration
 
 include("keysym.h.lua")
+local specialKeyCodes = include("Configs/integral_menu_special_keys.lua")
 
 -- Chili classes
 local Chili
@@ -61,6 +62,24 @@ local NO_TEXT = ""
 EPIC_NAME = "epic_chili_integral_menu_"
 EPIC_NAME_UNITS = "epic_chili_integral_menu_tab_units"
 
+local modOptions = Spring.GetModOptions()
+local disabledTabs = {}
+
+if Spring.GetModOptions().campaign_debug_units ~= "1" then
+	if modOptions.integral_disable_economy == "1" then
+		disabledTabs.economy = true
+	end
+	if modOptions.integral_disable_defence == "1" then
+		disabledTabs.defence = true
+	end
+	if modOptions.integral_disable_special == "1" then
+		disabledTabs.special = true
+	end
+	if modOptions.integral_disable_factory == "1" then
+		disabledTabs.factory = true
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Command Handling and lower variables
@@ -81,9 +100,14 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType', 'selectionClosesTab', 'altInsertBehind', 'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating',
-	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning'
+	'background_opacity', 'keyboardType2',  'selectionClosesTab', 'altInsertBehind',
+	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
+	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
+	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning', 
 }
+
+local commandPanelPath = 'Hotkeys/Command Panel'
+local customGridPath = 'Hotkeys/Command Panel/Custom'
 
 options = {
 	background_opacity = {
@@ -95,41 +119,45 @@ options = {
 			background:Invalidate()
 		end,
 	},
-	keyboardType = {
+	keyboardType2 = {
 		type='radioButton', 
 		name='Grid Keyboard Layout',
 		items = {
 			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
 			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey = nil},
 			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
+			{name = 'Configure in "Custom" (below)', key = 'custom', hotkey = nil},
 			{name = 'Disable Grid Keys', key = 'none', hotkey = nil},
 		},
 		value = 'qwerty',  --default at start of widget
 		noHotkey = true,
+		path = commandPanelPath,
 	},
 	selectionClosesTab = {
 		name = 'Construction Closes Tab',
-		tooltip = "When enabled, issuing or cancelling a construction command will switch back to the Orders tab (except for build options in the factory queue tab).",
+		desc = "When enabled, issuing or cancelling a construction command will switch back to the Orders tab (except for build options in the factory queue tab).",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
 	},
 	altInsertBehind = {
 		name = 'Alt Inserts Behind',
-		tooltip = "When enabled, the Alt modifier will insert construction behind the current item in the queue. When disabled, and if the factory is not set to repeat, Alt will insert the command in front of the current construction (destroying its progress).",
+		desc = "When enabled, the Alt modifier will insert construction behind the current item in the queue. When disabled, and if the factory is not set to repeat, Alt will insert the command in front of the current construction (destroying its progress).",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
 	},
 	unitsHotkeys2 = {
-		name = 'Enable Factory Hotkeys',
+		name = 'Factories use grid',
+		desc = "When enabled, factory unit production uses grid hotkeys.",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
+		path = commandPanelPath,
 	},
 	ctrlDisableGrid = {
 		name = 'Ctrl Disables Hotkeys',
-		tooltip = "When enabled, grid and tab hotkeys will deactivate while Ctrl is held. This allows for Ctrl+key hotkeys to be used while a construtor or factory is selected.",
+		desc = "When enabled, grid and tab hotkeys will deactivate while Ctrl is held. This allows for Ctrl+key hotkeys to be used while a construtor or factory is selected.",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -140,30 +168,51 @@ options = {
 		value = false,
 		noHotkey = true,
 	},
+	applyCustomGrid = {
+		name = "Apply Changes",
+		type = 'button',
+		path = customGridPath,
+		noHotkey = true,
+	},
+	label_apply = {
+		type = 'label',
+		name = 'Changes require application or restart',
+		path = customGridPath
+	},
+	label_tab = {
+		type = 'label',
+		name = 'Tab Hotkeys',
+		path = commandPanelPath
+	},
 	tab_economy = {
 		name = "Economy Tab",
 		desc = "Switches to economy tab.",
 		type = 'button',
+		path = commandPanelPath,
 	},
 	tab_defence = {
 		name = "Defence Tab",
 		desc = "Switches to defence tab.",
 		type = 'button',
+		path = commandPanelPath,
 	},
 	tab_special = {
 		name = "Special Tab",
 		desc = "Switches to special tab.",
 		type = 'button',
+		path = commandPanelPath,
 	},
 	tab_factory = {
 		name = "Factory Tab",
 		desc = "Switches to factory tab.",
 		type = 'button',
+		path = commandPanelPath,
 	},
 	tab_units = {
 		name = "Units Tab",
 		desc = "Switches to units tab.",
 		type = 'button',
+		path = commandPanelPath,
 	},
 	leftPadding = {
 		name = 'Left Padding',
@@ -188,7 +237,7 @@ options = {
 		min = 0, max = 500, step=1,
 		OnChange = function() 
 			ClearData(true)
-		end,	
+		end,
 	},
 	flushLeft = {
 		name = 'Flush Left',
@@ -204,7 +253,59 @@ options = {
 		hidden = true,
 		noHotkey = true,
 	},
+	label_super_grid_config = {
+		type = 'label',
+		name = 'Tab specific overrides',
+		path = customGridPath
+	},
 }
+
+local function AddCustomGridOptions()
+	for i = 1, 3 do
+		for j = 1, 6 do
+			local optName = "customgrid" .. i .. j
+			options[optName] = {
+				name = "Column " .. j .. ", row " .. i,
+				type = 'button',
+				path = customGridPath,
+				dontRegisterAction = true,
+				bindWithoutMod = true,
+			}
+			options_order[#options_order + 1] = optName
+		end
+	end
+
+	options_order[#options_order + 1] = "label_super_grid_config"
+
+	-- Needed now for epicmenu loading
+	local hotkeyTabNames = {
+		{"economy", "Economy"},
+		{"defence", "Defence"},
+		{"special", "Special"},
+		{"factory", "Factory"},
+		{"economy", "Economy"},
+		{"units_factory", "Units"},
+	}
+
+	for name = 1, #hotkeyTabNames do
+		local optPrefix = "customgrid_override_" .. hotkeyTabNames[name][1]
+		local pathName = customGridPath .. "/" .. hotkeyTabNames[name][2]
+		for i = 1, 3 do
+			for j = 1, 6 do
+				local optName = optPrefix .. i .. j
+				options[optName] = {
+					name = "Column " .. j .. ", row " .. i,
+					type = 'button',
+					path = pathName,
+					dontRegisterAction = true,
+					bindWithoutMod = true,
+				}
+				options_order[#options_order + 1] = optName
+			end
+		end
+	end
+end
+AddCustomGridOptions()
 
 local function TabClickFunction(mouse)
 	if not mouse then
@@ -281,12 +382,84 @@ local function UpdateReturnToOrders(cmdID)
 	end
 end
 
+local function ToKeysyms(key)
+	if not key then
+		return
+	end
+	if tonumber(key) then
+		return KEYSYMS["N_" .. key], key
+	end
+	local keyCode = KEYSYMS[string.upper(key)]
+	if keyCode == nil then
+		keyCode = specialKeyCodes[key]
+	end
+	key = string.upper(key) or key
+	key = string.gsub(key, "NUMPAD", "NP") or key
+	key = string.gsub(key, "KP", "NP") or key
+	return keyCode, key
+end
+
+local function GenerateCustomKeyMap()
+	local ret = {}
+	local gridMap = {}
+	local keyAlreadyUsed = {}
+	for i = 1, 3 do
+		gridMap[i] = {}
+		for j = 1, 6 do
+			local key = WG.crude.GetHotkeyRaw("epic_chili_integral_menu_customgrid" .. i .. j)
+			local code, humanName = ToKeysyms(key and key[1])
+			if code and not keyAlreadyUsed[code] then
+				gridMap[i][j] = humanName
+				ret[code] = {i, j}
+				keyAlreadyUsed[code] = true
+			end
+		end
+	end
+	
+	local overrides = {}
+	if commandPanels then
+		for panel = 1, #commandPanels do
+			local name = commandPanels[panel].name
+			if options["customgrid_override_" .. name .. "11"] then
+				local actionName = "epic_chili_integral_menu_customgrid_override_" .. name
+				keyAlreadyUsed = {}
+				for i = 1, 3 do
+					for j = 1, 6 do
+						local key = WG.crude.GetHotkeyRaw(actionName .. i .. j)
+						local code, humanName = ToKeysyms(key and key[1])
+						if code and not keyAlreadyUsed[code] then
+							overrides[name] = overrides[name] or {keyMap = {}, gridMap = {}}
+							overrides[name].gridMap[i] = overrides[name].gridMap[i] or {}
+							overrides[name].gridMap[i][j] = humanName
+							overrides[name].keyMap[code] = {i, j}
+							keyAlreadyUsed[code] = true
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	return ret, gridMap, overrides
+end
+
 local function GenerateGridKeyMap(name)
-	local gridMap = include("Configs/keyboard_layout.lua")[name]
+	if name == "custom" then
+		local ret, gridMap, overrides = GenerateCustomKeyMap()
+		return ret, gridMap, overrides
+	end
+	
+	local keyboardLayouts = include("Configs/keyboard_layout.lua")
+	local gridMap = (name and keyboardLayouts[name]) or {}
 	local ret = {}
 	for i = 1, #gridMap do
 		for j = 1, #gridMap[i] do
-			ret[KEYSYMS[gridMap[i][j]]] = {i, j}
+			local key = KEYSYMS[gridMap[i][j]]
+			if key then
+				ret[key] = {i, j}
+			else
+				Spring.Echo("LUA_ERRRUN", "Integral menu missing key for", i, j, name)
+			end
 		end
 	end
 	return ret, gridMap
@@ -308,6 +481,20 @@ local function GetActionHotkey(actionName)
 	return WG.crude.GetHotkey(actionName)
 end
 
+local function GetButtonTooltip(displayConfig, command, state)
+	local tooltip = displayConfig and displayConfig.stateTooltip and displayConfig.stateTooltip[state]
+	if not tooltip then
+		tooltip = (displayConfig and displayConfig.tooltip) or (command and command.tooltip)
+	end
+	if command and command.action then
+		local hotkey = GetHotkeyText(command.action)
+		if tooltip and hotkey then
+			tooltip = tooltip .. " (\255\0\255\0" .. hotkey .. "\008)"
+		end
+	end
+	return tooltip
+end
+
 local function TabListsAreIdentical(newTabList, tabList)
 	if (not tabList) or (not newTabList) then
 		return false
@@ -324,15 +511,12 @@ local function TabListsAreIdentical(newTabList, tabList)
 end
 
 local prevClass
-local prevRightPadding, prevLeftPadding
 
 local function UpdateBackgroundSkin()
 	local currentSkin = Chili.theme.skin.general.skinName
 	local skin = Chili.SkinHandler.GetSkin(currentSkin)
 	
-	local newClass = skin.panel
-	local newRightPadding = 0
-	local newLeftPadding = 0
+	local newClass
 	
 	if options.fancySkinning.value then
 		local selectedCount = Spring.GetSelectedUnitsCount()
@@ -345,21 +529,10 @@ local function UpdateBackgroundSkin()
 		else
 			if options.flushLeft.value then
 				newClass = skin.panel_0110
-				newLeftPadding = options.leftPadding.value
 			else
 				newClass = skin.panel_1100
-				newRightPadding = options.rightPadding.value
 			end
 		end
-	end
-	
-	if prevRightPadding ~= newRightPadding or prevLeftPadding ~= newLeftPadding then
-		background._relativeBounds.left = newLeftPadding
-		background._givenBounds.left = newLeftPadding
-		background._relativeBounds.right = newRightPadding
-		background:UpdateClientArea()
-		prevRightPadding = newRightPadding
-		prevLeftPadding = newLeftPadding
 	end
 	
 	newClass = newClass or skin.panel
@@ -394,17 +567,20 @@ local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePositio
 	local i = queuePosition
 	local j = 0
 	while commands[i] and ((not inputMult) or j < inputMult) do
-		local thisCmdID = commands[i].id
-		local cmdTag = commands[i].tag
+		local thisCmd = commands[i]
+		local thisCmdID = thisCmd.id
+		local cmdTag = thisCmd.tag
 		if thisCmdID < 0 and not alreadyRemovedTag[cmdTag] then
 			if thisCmdID ~= cmdID then
 				break
 			end
 	
 			alreadyRemovedTag[cmdTag] = true
-			Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {cmdTag}, {"ctrl"})
+			Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {cmdTag}, CMD.OPT_CTRL)
 			if reinsertPosition then
-				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, 0}, {"alt", "ctrl"})
+				local opts = thisCmd.options
+				local coded = opts.coded
+				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, coded}, CMD.OPT_CTRL + CMD.OPT_ALT)
 			end
 			j = j + 1
 		end
@@ -445,6 +621,8 @@ local function MoveCommandBlock(factoryUnitID, queueCmdID, moveBlock, insertBloc
 					-- Prevent canceling construction of identical units
 					if cmdID == queueCmdID then
 						insertPos = insertPos + 1
+					elseif insertBlock > moveBlock then
+						insertPos = insertPos - 1
 					end
 				end
 				lastBlockCmdID = cmdID
@@ -516,7 +694,7 @@ local function QueueClickFunc(mouse, right, alt, ctrl, meta, shift, queueCmdID, 
 	end
 	
 	for i = 1, inputMult do
-		Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {queuePosition, queueCmdID, 0 }, {"alt", "ctrl"})
+		Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {queuePosition, queueCmdID, 0 }, CMD.OPT_ALT + CMD.OPT_CTRL)
 	end
 	return true
 end
@@ -536,7 +714,7 @@ local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton
 		if state and not state["repeat"] then
 			local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
 			for i = 1, inputMult do
-				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {1, cmdID, 0 }, {"alt", "ctrl"})
+				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {1, cmdID, 0 }, CMD.OPT_ALT + CMD.OPT_CTRL)
 			end
 			if WG.noises then
 				WG.noises.PlayResponse(factoryUnitID, cmdID)
@@ -776,8 +954,13 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		end
 	end
 	
-	function externalFunctionsAndData.UpdateGridHotkey(gridMap)
-		local key = gridMap[y] and gridMap[y][x]
+	function externalFunctionsAndData.UpdateGridHotkey(myGridMap, myOverride)
+		local key
+		if myOverride then
+			key = myOverride[y] and myOverride[y][x]
+		else
+			key = myGridMap[y] and myGridMap[y][x]
+		end
 		if not key then
 			externalFunctionsAndData.RemoveGridHotkey()
 			return
@@ -870,8 +1053,13 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			if isStateCommand then
 				local state = command.params[1] + 1
 				local displayConfig = commandDisplayConfig[cmdID]
-				local texture = displayConfig.texture[state]
-				SetImage(texture)
+				if displayConfig then
+					local texture = displayConfig.texture[state]
+					if displayConfig.stateTooltip then
+						button.tooltip = GetButtonTooltip(displayConfig, command, isStateCommand and (command.params[1] + 1))
+					end
+					SetImage(texture)
+				end
 			end
 			if command then
 				SetDisabled(command.disabled)
@@ -903,27 +1091,26 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			return
 		end
 		
-		local displayConfig = commandDisplayConfig[cmdID]
-		local tooltip = (displayConfig and displayConfig.tooltip) or command.tooltip
-		
 		local isStateCommand = (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
+		local displayConfig = commandDisplayConfig[cmdID]
+		button.tooltip = GetButtonTooltip(displayConfig, command, isStateCommand and (command.params[1] + 1))
 		
 		if command.action then
 			local hotkey = GetHotkeyText(command.action)
-			if tooltip and hotkey then
-				tooltip = tooltip .. " (\255\0\255\0" .. hotkey .. "\008)"
-			end
 			if not (isStateCommand or usingGrid) then
 				hotkeyText = hotkey
 				SetText(textConfig.topLeft.name, hotkey)
 			end
 		end
-		button.tooltip = tooltip
 		
 		if isStateCommand then
-			local state = command.params[1] + 1
-			local texture = displayConfig.texture[state]
-			SetImage(texture)
+			if displayConfig then
+				local state = command.params[1] + 1
+				local texture = displayConfig.texture[state]
+				SetImage(texture)
+			else
+				Spring.Echo("Error, missing command config", cmdID)
+			end
 		else
 			local texture = (displayConfig and displayConfig.texture) or command.texture
 			SetImage(texture)
@@ -958,7 +1145,7 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 	local width = tostring(100/columns) .. "%"
 	local height = tostring(100/rows) .. "%"
 	
-	local gridMap
+	local gridMap, override
 	local gridEnabled = true
 	
 	local externalFunctions = {}
@@ -1005,7 +1192,7 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 		
 		buttonList[#buttonList + 1] = newButton
 		if gridMap and gridEnabled then
-			newButton.UpdateGridHotkey(gridMap)
+			newButton.UpdateGridHotkey(gridMap, override and override.gridMap)
 		end
 		
 		buttons[x][y] = newButton
@@ -1025,11 +1212,12 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 		end
 	end
 	
-	function externalFunctions.ApplyGridHotkeys(newGridMap)
+	function externalFunctions.ApplyGridHotkeys(newGridMap, newOverride)
 		gridMap = newGridMap or gridMap
+		override = newOverride or override
 		gridEnabled = true
 		for i = 1, #buttonList do
-			buttonList[i].UpdateGridHotkey(gridMap)
+			buttonList[i].UpdateGridHotkey(gridMap, override and override.gridMap)
 		end
 	end
 	
@@ -1135,9 +1323,10 @@ end
 -- Tab Panel
 
 local function GetTabButton(panel, contentControl, name, humanName, hotkey, loiterable, OnSelect)
+	local disabled = disabledTabs[name]
 	
 	local function DoClick(mouse)
-		if TabClickFunction(mouse) then
+		if disabled or TabClickFunction(mouse) then
 			return
 		end
 		panel.SwitchToTab(name)
@@ -1150,7 +1339,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	local button = Button:New {
 		classname = "button_tab",
 		caption = humanName,
-		padding = {0, 0, 0, 0},
+		padding = {0, 0, 0, 1},
 		OnClick = {
 			function()
 				DoClick(true)
@@ -1159,9 +1348,15 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	}
 	button.backgroundColor[4] = 0.4
 	
+	if disabled then
+		button.font.outlineColor = {0, 0, 0, 1}
+		button.font.color = {0.6, 0.6, 0.6, 1}
+		button.supressButtonReaction = true
+	end
+	
 	local hideHotkey = loiterable
 	
-	if hotkey and not hideHotkey then
+	if hotkey and (not hideHotkey) and (not disabled) then
 		button:SetCaption(humanName .. " (\255\0\255\0" .. hotkey .. "\008)")
 		button:Invalidate()
 	end
@@ -1181,7 +1376,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	end
 	
 	function externalFunctionsAndData.SetHotkeyActive(isActive)
-		if (not hotkey) or hideHotkey then
+		if (not hotkey) or hideHotkey or disabled then
 			return
 		end
 		if loiterable then
@@ -1197,7 +1392,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	end
 	
 	function externalFunctionsAndData.SetHideHotkey(newHidden)
-		if not loiterable then
+		if (not loiterable) or disabled then
 			return
 		end
 		hideHotkey = newHidden
@@ -1244,7 +1439,7 @@ local function GetTabPanel(parent, rows, columns)
 		right = 0,
 		bottom = 0,
 		padding = {0, 0, 0, 0},
-		itemMargin  = {1, 1, 1, -1},	
+		itemMargin  = {0, 1, 0, -1},
 		parent = parent,
 		preserveChildrenOrder = true,
 		resizeItems = true,
@@ -1375,6 +1570,16 @@ local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, selectio
 	end
 end
 
+local function SetIntegralVisibility(visible)
+	background:SetVisibility(visible)
+	UpdateBackgroundSkin()
+	
+	WG.IntegralVisible = visible
+	if WG.CoreSelector then
+		WG.CoreSelector.SetSpecSpaceVisible(visible)
+	end
+end
+
 local function ProcessAllCommands(commands, customCommands)
 	local factoryUnitID, factoryUnitDefID, fakeFactory, selectedUnitCount = GetSelectionValues()
 
@@ -1406,6 +1611,9 @@ local function ProcessAllCommands(commands, customCommands)
 					data.queue.ClearFactory()
 				else
 					data.queue.UpdateFactory(factoryUnitID, factoryUnitID, selectionIndex)
+					if WG.CoreSelector then
+						WG.CoreSelector.ForceUpdate()
+					end
 				end
 			end
 		end
@@ -1455,22 +1663,15 @@ local function ProcessAllCommands(commands, customCommands)
 		lastTabSelected = tabToSelect
 	end
 	
-	-- Keeps main window for tweak mode.
-	local visible = not (#tabsToShow == 0 and selectedUnitCount == 0)
-	background:SetVisibility(visible)
-	UpdateBackgroundSkin()
-	
-	WG.IntegralVisible = visible
-	if WG.CoreSelector then
-		WG.CoreSelector.SetSpecSpaceVisible(visible)
-	end
+	-- Keeps main window for tweak mode.SetIntegralVisibility(visible)
+	SetIntegralVisibility(not (#tabsToShow == 0 and selectedUnitCount == 0))
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Initialization
 
-local gridKeyMap, gridMap -- Configuration requires this
+local gridKeyMap, gridMap, gridCustomOverrides -- Configuration requires this
 
 local function InitializeControls()
 	-- Set the size for the default settings.
@@ -1478,7 +1679,7 @@ local function InitializeControls()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
 
-	gridKeyMap, gridMap = GenerateGridKeyMap(options.keyboardType.value)
+	gridKeyMap, gridMap, gridCustomOverrides = GenerateGridKeyMap(options.keyboardType2.value)
 	
 	local mainWindow = Window:New{
 		name      = 'integralwindow',
@@ -1488,6 +1689,7 @@ local function InitializeControls()
 		height    = height,
 		minWidth  = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
+		bringToFrontOnClick = false,
 		dockable  = true,
 		draggable = false,
 		resizable = false,
@@ -1528,6 +1730,7 @@ local function InitializeControls()
 		resizable = false,
 		padding = {0, 0, 0, 0},
 		backgroundColor = {1, 1, 1, options.background_opacity.value},
+		noClickThrough = true,
 		parent = mainWindow,
 	}
 	
@@ -1586,7 +1789,7 @@ local function InitializeControls()
 		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect)
 	
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
-			data.buttons.ApplyGridHotkeys(gridMap)
+			data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
 		end
 	end
 	
@@ -1601,25 +1804,36 @@ local function InitializeControls()
 	statePanel.holder:SetVisibility(false)
 	
 	statePanel.buttons = GetButtonPanel(statePanel.holder, 5, 3, true, buttonLayoutConfig.command)
+	
+	SetIntegralVisibility(false)
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Epic Menu Configuration and Hotkey Functions
 
-function options.keyboardType.OnChange(self)
-	gridKeyMap, gridMap = GenerateGridKeyMap(self.value)
+local function UpdateGrid(name)
+	gridKeyMap, gridMap, gridCustomOverrides = GenerateGridKeyMap(name)
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
-			data.buttons.ApplyGridHotkeys(gridMap)
+			data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
 		end
 	end
+
+end
+
+function options.keyboardType2.OnChange(self)
+	UpdateGrid(self.value)
+end
+
+function options.applyCustomGrid.OnChange()
+	UpdateGrid(options.keyboardType2.value)
 end
 
 function options.hide_when_spectating.OnChange(self)
 	local isSpec = Spring.GetSpectatingState()
-	background:SetVisibility(not (self.value and isSpec))
+	background:SetVisibility(WG.IntegralVisible and not (self.value and isSpec))
 end
 
 function options.unitsHotkeys2.OnChange(self)
@@ -1629,7 +1843,7 @@ function options.unitsHotkeys2.OnChange(self)
 			if not options.unitsHotkeys2.value then
 				data.buttons.RemoveGridHotkeys()
 			else
-				data.buttons.ApplyGridHotkeys(gridMap)
+				data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
 			end
 		end
 	end
@@ -1733,8 +1947,10 @@ function externalFunctions.GetCommandButtonPosition(cmdID)
 		return
 	end
 	local button = buttonsByCommand[cmdID]
-	local x, y, w, h = button.GetScreenPosition()
-	return x, y, w, h
+	if button and button.GetCommandID() == cmdID then
+		local x, y, w, h = button.GetScreenPosition()
+		return x, y, w, h
+	end
 end
 
 function externalFunctions.GetTabPosition(tabName)
@@ -1776,7 +1992,12 @@ function widget:KeyPress(key, modifier, isRepeat)
 		return false
 	end
 	
-	local pos = gridKeyMap[key]
+	local currentKeyMap = gridKeyMap
+	if gridCustomOverrides and gridCustomOverrides[currentTab] then
+		currentKeyMap = gridCustomOverrides[currentTab].keyMap
+	end
+	
+	local pos = currentKeyMap[key]
 	if pos then
 		local x, y = pos[2], pos[1]
 		local button = commandPanel.buttons.GetButton(x, y)
@@ -1785,7 +2006,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		end
 	end
 
-	if (key == KEYSYMS.ESCAPE or gridKeyMap[key]) and commandPanel.onClick then
+	if (key == KEYSYMS.ESCAPE or currentKeyMap[key]) and commandPanel.onClick then
 		if commandPanelMap.orders then
 			commandPanelMap.orders.tabButton.DoClick()
 		end
@@ -1797,7 +2018,7 @@ end
 function widget:PlayerChanged(playerID)
 	if options.hide_when_spectating.value then
 		local isSpec = Spring.GetSpectatingState()
-		background:SetVisibility(not isSpec)
+		background:SetVisibility(WG.IntegralVisible and not isSpec)
 	end
 end
 
@@ -1816,6 +2037,9 @@ function widget:GameFrame(n)
 		local unitsFactoryPanel = commandPanelMap.units_factory
 		if unitsFactoryPanel and unitsFactoryPanel.tabButton.IsTabSelected() then
 			unitsFactoryPanel.queue.UpdateBuildProgress()
+			if WG.CoreSelector then
+				WG.CoreSelector.ForceUpdate()
+			end
 		end
 	end
 end

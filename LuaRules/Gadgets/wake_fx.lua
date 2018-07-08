@@ -28,7 +28,7 @@ local fold_frames = 7 -- every seventh frame
 local n_folds = 4 -- check every fourth unit
 local current_fold = 1
 
-function canWade(unitDefID)
+local function canWade(unitDefID)
     local moveDef = UnitDefs[unitDefID].moveDef
     if (moveDef and moveDef.family) then
         local mdFamily = moveDef.family
@@ -39,8 +39,8 @@ function canWade(unitDefID)
     return false
 end
 
-function isMoving(unitID)
-    local _,_,_,velocity = Spring.GetUnitVelocity(unitID)
+local function isMoving(unitID)
+    local velocity = select(4, Spring.GetUnitVelocity(unitID))
     return velocity > 0
 end
 

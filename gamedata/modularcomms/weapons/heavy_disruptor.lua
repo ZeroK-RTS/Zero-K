@@ -4,7 +4,7 @@ local weaponDef = {
 	areaOfEffect            = 32,
 	beamdecay               = 0.9,
 	beamTime                = 1/30,
-	beamttl                 = 50,
+	beamttl                 = 30,
 	coreThickness           = 0.25,
 	craterBoost             = 0,
 	craterMult              = 0,
@@ -12,7 +12,7 @@ local weaponDef = {
 	customParams            = {
 		--timeslow_preset       = [[module_disruptorbeam]],
 		timeslow_damagefactor = [[2]],
-		
+
 		light_color = [[1.88 0.63 2.5]],
 		light_radius = 320,
 	},

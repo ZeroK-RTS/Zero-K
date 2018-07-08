@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[tankheavyraid]],
-  name                   = [[Panther]],
+  name                   = [[Blitz]],
   description            = [[Lightning Assault/Raider Tank]],
   acceleration           = 0.125,
   brakeRate              = 0.1375,
@@ -17,16 +17,10 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Tank Pilleur]],
-	description_de = [[Blitzschlag Raider Panzer]],
-    helptext       = [[The Panther is a high-tech raider. Its weapon, a lightning gun, deals mostly paralyze damage. This way, the Panther can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base. When killed, it sets off an EMP explosion that can stun surrounding raiders.]],
-    helptext_fr    = [[Le Panther est un pilleur high-tech. Son canon principal sert ? paralyser l'ennemi, lui permettant de traverser les d?fenses afin de s'attaquer au coeur ?conomique d'une base]],
-	helptext_de    = [[Der Panther ist ein hoch entwickelter Raider, dessen Waffe, eine Blitzkanone, hauptsächlich paralysierenden Schaden austeilt. Auf diesem Wege kann der Panther Türme ausschalten und sich so durch die feindlichen Verteidigungslinien walzen, bis zur Egalisierung der feindlichen, ökonimischen Grundversorgung.]],
 	modelradius    = [[10]],
-	stats_show_death_explosion = 1,
   },
 
-  explodeAs              = [[PANTHER_DEATH]],
+  explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[tankraider]],
@@ -43,7 +37,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[corseal.s3o]],
   script                 = [[tankheavyraid.lua]],
-  selfDestructAs         = [[PANTHER_DEATH]],
+  selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
 
@@ -57,7 +51,7 @@ unitDef = {
   trackStrength          = 5,
   trackStretch           = 1,
   trackType              = [[StdTank]],
-  trackWidth             = 30,
+  trackWidth             = 32,
   turninplace            = 0,
   turnRate               = 616,
   workerTime             = 0,
@@ -82,6 +76,8 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
+		burst = Shared.BURST_RELIABLE,
+
         extra_damage = 500,
 		
 		light_camera_height = 1600,
@@ -92,7 +88,7 @@ unitDef = {
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 190,
+        default        = 180,
       },
 
       duration                = 10,
@@ -104,8 +100,8 @@ unitDef = {
       intensity               = 12,
       interceptedByShieldType = 1,
       paralyzeTime            = 1,
-      range                   = 260,
-      reloadtime              = 3,
+      range                   = 245,
+      reloadtime              = 2.7,
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning_fast]],
       soundTrigger            = true,
@@ -123,6 +119,7 @@ unitDef = {
 			craterMult = 0,
 			edgeEffectiveness = 0,
 			explosionGenerator = [[custom:cloakbomb_EXPLOSION]],
+			explosionSpeed = 10000,
 			fireStarter = 0,
 			impulseBoost = 0,
 			impulseFactor = 0,

@@ -26,7 +26,7 @@ function gadget:GetInfo()
     date      = "Oct 01, 2008",
     license   = "GNU GPL, v2 or later",
     layer     = -10,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -78,8 +78,8 @@ if (gadgetHandler:IsSyncedCode()) then
 			curTeam = cunit.team;
 
 			Spring.SetUnitNeutral(uid,true);
-			Spring.GiveOrderToUnit(uid,CMD.FIRE_STATE,{0},{});
-			Spring.GiveOrderToUnit(uid,CMD.STOP,{},{});
+			Spring.GiveOrderToUnit(uid,CMD.FIRE_STATE,{0},0);
+			Spring.GiveOrderToUnit(uid,CMD.STOP,{},0);
 
 			local env = Spring.UnitScript.GetScriptEnv(uid)
 			if env then lus = true end

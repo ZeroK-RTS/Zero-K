@@ -15,14 +15,14 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 -5]],
   collisionVolumeScales  = [[40 40 40]],
   collisionVolumeType    = [[ellipsoid]], 
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_de = [[Fulgabwehrgleiter]],
-    helptext       = [[The Flail launches a single large, short-medium range SAM that does heavy damage.]],
-	helptext_de    = [[Der Flail verschießt eine einzige, große Flugabwehrrakete auf mittlerer Distanz, die wirklich großen Schaden anrichtet.]],
-	modelradius    = [[20]],
-	midposoffset   = [[0 8 0]],
+    modelradius    = [[20]],
+    midposoffset   = [[0 8 0]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -33,7 +33,7 @@ unitDef = {
   idleTime            = 1800,
   maxDamage           = 950,
   maxSlope            = 36,
-  maxVelocity         = 3.54,
+  maxVelocity         = 3.5,
   minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   moveState           = 0,
@@ -79,10 +79,12 @@ unitDef = {
       craterMult              = 2,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-		light_color = [[0.5 0.6 0.6]],
-	  },
+      customParams            = {
+		burst = Shared.BURST_RELIABLE,
+
+        isaa = [[1]],
+        light_color = [[0.5 0.6 0.6]],
+      },
 
       damage                  = {
         default = 37.5,
@@ -95,6 +97,7 @@ unitDef = {
       fireStarter             = 100,
       fixedlauncher           = true,
       flightTime              = 3.5,
+      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,

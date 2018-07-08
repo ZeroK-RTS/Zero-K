@@ -1,8 +1,8 @@
 unitDef = {
   unitname               = [[cloakskirm]],
-  name                   = [[Rocko]],
+  name                   = [[Ronin]],
   description            = [[Skirmisher Bot (Direct-Fire)]],
-  acceleration           = 0.32,
+  acceleration           = 0.3,
   brakeRate              = 0.2,
   buildCostMetal         = 90,
   buildPic               = [[cloakskirm.png]],
@@ -16,13 +16,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Skirmisher Roboter (Direkt-Feuer)]],
-    description_fr = [[Robot Tirailleur]],
-    helptext       = [[The Rocko's low damage, low speed unguided rockets are redeemed by their range. They are most effective in a line formation, firing at maximum range and kiting the enemy. Counter them by attacking them with fast units which can close range and dodge their missiles.]],
-    helptext_de    = [[Rockos geringer Schaden und die geringe Geschwindigkeit der Raketen wird durch seine Reichweite aufgehoben. Sie sind an Fronten sehr effektiv, da sie dort mit maximaler Reichweite agieren können. Kontere sie, indem du schnelle Einheiten schickst oder Verteidigung hinter einer Terraformmauer baust.]],
-    helptext_fr    = [[La faible puissance de feux et la lenteur des roquettes non guid?s du Rocko son conpens?es par sa port?e de tire. Ils sont le plus ?fficace en formation de ligne, en tirant ? port?e maximale. Contrez le en attaquant avec des unit?s rapide ou bien placer vos d?fenses derriere un mure t?rraform?.]],
 	modelradius    = [[18]],
 	midposoffset   = [[0 6 0]],
+	reload_move_penalty = 0.75,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -38,7 +34,6 @@ unitDef = {
   maxWaterDepth          = 20,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
-  moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[sphererock.s3o]],
   script                 = "cloakskirm.lua",
@@ -82,9 +77,12 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
+		burst = Shared.BURST_RELIABLE,
+
 		light_camera_height = 1600,
 		light_color = [[0.90 0.65 0.30]],
 		light_radius = 250,
+		reload_move_mod_time = 3,
       },
 
       damage                  = {

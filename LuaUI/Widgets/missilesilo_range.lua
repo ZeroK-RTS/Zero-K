@@ -99,6 +99,7 @@ local glColor               = gl.Color
 local glLineWidth           = gl.LineWidth
 local glDepthTest           = gl.DepthTest
 local glTexture             = gl.Texture
+local glDrawCircle          = gl.Utilities.DrawCircle
 local glDrawGroundCircle    = gl.DrawGroundCircle
 local glPopMatrix           = gl.PopMatrix
 local glPushMatrix          = gl.PushMatrix
@@ -109,6 +110,8 @@ local glScale				= gl.Scale
 local glRotate				= gl.Rotate
 local glLoadIdentity		= gl.LoadIdentity
 local glLineStipple			= gl.LineStipple
+
+local mouseX, mouseZ
 
 ----------------------------
 
@@ -122,15 +125,15 @@ local function DrawActiveCommandRanges()
 	
 	local mx, my = spGetMouseState()
 	local _, mouse = spTraceScreenRay(mx, my, true, true)
-			
+	
 	if not mouse then
 		return
 	end
 	
-	mouse[1] = floor((mouse[1]+8)/16)*16
-	mouse[3] = floor((mouse[3]+8)/16)*16
+	mouseX = floor((mouse[1]+8)/16)*16
+	mouseZ = floor((mouse[3]+8)/16)*16
 	
-	local height = spGetGroundHeight(mouse[1],mouse[3])
+	local height = spGetGroundHeight(mouseX, mouseZ)
 	
 	--handle COFC rotation
 	local cs = spGetCameraState()
@@ -152,10 +155,10 @@ local function DrawActiveCommandRanges()
 			glLineStipple(false)
 		end
 		
-		glDrawGroundCircle(mouse[1], 0, mouse[3], radius.range, circleDivs )
+		glDrawGroundCircle(mouseX, 0, mouseZ, radius.range, circleDivs )
 		
 		glPushMatrix()
-		glTranslate(mouse[1] + radius.range*dx,  height ,mouse[3]-(radius.range*dz)-5 )
+		glTranslate(mouseX + radius.range*dx,  height, mouseZ - (radius.range*dz)-5)
 		glBillboard()
 		glText( radius.text, 0, 0, radius.textSize, "cn")
 		glPopMatrix()  
@@ -168,7 +171,7 @@ local function DrawActiveCommandRanges()
 	
 end
 
-local function DrawActiveCommandRangesMinimap()
+local function DrawActiveCommandRangesMinimap(minimapX, minimapY)
 
 	local _, cmd_id = spGetActiveCommand()
 	
@@ -176,23 +179,14 @@ local function DrawActiveCommandRangesMinimap()
 		return
 	end
 	
-	local mx, my = spGetMouseState()
-	local _, mouse = spTraceScreenRay(mx, my, true, true)
-			
-	if not mouse then
+	if not mouseX then
 		return
 	end
 	
-	mouse[1] = floor((mouse[1]+8)/16)*16
-	mouse[3] = floor((mouse[3]+8)/16)*16
+	local height = spGetGroundHeight(mouseX,mouseZ)
 	
-	local height = spGetGroundHeight(mouse[1],mouse[3])
-	
-	glPushMatrix()
-	glLoadIdentity()
-	glTranslate(0,1,0)
-	glScale(1/mapX , -1/mapZ, 1)
-	glRotate(270,1,0,0)
+	glTranslate(0,minimapY,0)
+	glScale(minimapX/mapX, -minimapY/mapZ, 1)
 	
 	for i = 1, (options.missile_silo_advanced.value and 5 or 2) do
 		local radius = drawRadius[i]
@@ -205,26 +199,18 @@ local function DrawActiveCommandRangesMinimap()
 			glLineStipple(false)
 		end
 		
-		glDrawGroundCircle(mouse[1],0, mouse[3], radius.range, circleDivs )
-			
+		glDrawCircle(mouseX, mouseZ, radius.range)
 	end
 	
-	glPopMatrix()
+	--glPopMatrix()
 end
 
-
-
-function widget:DrawInMiniMap()
-
-	DrawActiveCommandRangesMinimap()
-
+function widget:DrawInMiniMap(minimapX, minimapY)
+	DrawActiveCommandRangesMinimap(minimapX, minimapY)
 end
 
-	
 function widget:DrawWorld()
-	
 	DrawActiveCommandRanges()
-	
 end
 
 local function languageChanged ()

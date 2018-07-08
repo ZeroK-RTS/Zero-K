@@ -24,11 +24,6 @@ unitDef = {
   cruiseAlt              = 120,
 
   customParams           = {
-    description_fr = [[Forteresse Volante]],
-    description_de = [[Schwebendes Bollwerk]],
-    helptext	   = [[The Krow may be expensive and ponderous, but its incredible armor allows it do fly into all but the thickest anti-air defenses and engage enemies with its three laser cannons. Best of all, it can drop a large spread of carpet bombs that devastates anything under it.]],
-    helptext_fr    = [[La Forteresse Volante est l'ADAV le plus solide jamais construit, est ?quip?e de nombreuses tourelles laser, elle est capable de riposter dans toutes les directions et d'encaisser des d?g?ts importants. Id?al pour un appuyer un assaut lourd ou monopiler l'Anti-Air pendant une attaque a?rienne.]],
-	helptext_de    = [[Der Krow scheint teuer und schwerfällig, aber seine unglaubliche Panzerung erlaubt ihm auch durch die größe Flugabwehr zu kommen und alles abzuholzen, was in Sichtweite seiner drei Laserkanonen kommt. Er kann sogar feindliche Jäger vom Himmel holen.]],
 	modelradius    = [[10]],
   },
 
@@ -54,7 +49,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_RED]],
-      [[custom:BEAMWEAPON_MUZZLE_RED]],
+      [[custom:DOT_Pillager_Explo]],
     },
 
   },

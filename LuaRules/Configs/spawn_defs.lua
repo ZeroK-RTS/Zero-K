@@ -22,6 +22,8 @@ eggDecayTime			= 180
 burrowEggs				= 15	   -- number of eggs each burrow spawns
 
 gameMode				= true
+endlessMode				= false
+
 tooltipMessage			= "Kill chickens and collect their eggs to get metal."
 
 mexesUnitDefID = {
@@ -38,13 +40,14 @@ noTarget = {
 
 modes = {
 	[0] = 0,
-	[1] = 'Chicken: Very Easy',
-	[2] = 'Chicken: Easy',
-	[3] = 'Chicken: Normal',
-	[4] = 'Chicken: Hard',
-	[5] = 'Chicken: Suicidal',
-	[6] = 'Chicken: Custom',
-	[7] = 'Chicken: Speed'
+	[1] = 'Chicken: Beginner',
+	[2] = 'Chicken: Very Easy',
+	[3] = 'Chicken: Easy',
+	[4] = 'Chicken: Normal',
+	[5] = 'Chicken: Hard',
+	[6] = 'Chicken: Suicidal',
+	[7] = 'Chicken: Custom',
+	[8] = 'Chicken: Speed'
 }
 defaultDifficulty = modes[2]
 testBuilding 	= UnitDefNames["energypylon"].id	--testing to place burrow
@@ -84,10 +87,12 @@ endMiniQueenWaves		= 7		-- waves per miniqueen in PvP endgame
 burrowQueenTime			= 15		-- how much killing a burrow shaves off the queen timer, seconds
 burrowWaveSize			= 1.2		-- size of contribution each burrow makes to wave size (1 = 1 squadSize of chickens)
 burrowRespawnChance 	= 0.15
-burrowRegressTime		= 40		-- direct tech time regress from killing a burrow, divided by playercount
+burrowRegressTime		= 30		-- direct tech time regress from killing a burrow, divided by playercount
 
 humanAggroPerBurrow		= 1			-- divided by playercount
 humanAggroDecay			= 0.25		-- linear rate at which aggro decreases
+humanAggroMin			= -100
+humanAggroMax			= 100
 humanAggroWaveFactor	= 1
 humanAggroWaveMax		= 5
 humanAggroDefenseFactor	= 0.5	-- turrets issued per point of PAR every wave, multiplied by playercount
@@ -99,11 +104,14 @@ humanAggroQueenTimeMax	= 8
 
 techAccelPerPlayer		= 4		-- how much tech accel increases per player over one per wave, seconds
 techTimeFloorFactor		= 0.5	-- tech timer can never be less than this * real time
+techTimeMax				= 999999
 
 scoreMult				= 1
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
 local function Copy(original)   -- Warning: circular table references lead to
 	local copy = {}			   -- an infinite loop.
@@ -131,7 +139,7 @@ end
 --------------------------------------------------------------------------------
 
 -- times in minutes
-local chickenTypes = {
+local chickenTypes = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_offense) or {
 	chicken				=  {time = -60,  squadSize = 3, obsolete = 25},
 	chicken_pigeon		=  {time = 6,  squadSize = 1.4, obsolete = 35},
 	chickens			=  {time = 12,  squadSize = 1, obsolete = 35},
@@ -148,13 +156,13 @@ local chickenTypes = {
 	chicken_tiamat		=  {time = 55,  squadSize = 0.2},
 }
 
-local defenders = {
+local defenders = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_defense) or {
   chickend = {time = 10, squadSize = 0.6, cost = 1 },
   chicken_dodo = {time = 25,  squadSize = 2, cost = 1}, 
   chicken_rafflesia =  {time = 25, squadSize = 0.4, cost = 2 },
 }
 
-local supporters = {
+local supporters = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_support) or {
   --chickenspire =  {time = 50, squadSize = 0.1},
   chicken_shield =  {time = 30, squadSize = 0.4},
   chicken_dodo = {time = 25, squadSize = 2},
@@ -163,7 +171,7 @@ local supporters = {
 
 -- TODO
 -- cooldown is in waves
-local specialPowers = {
+local specialPowers = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_special) or {
 	{name = "Digger Ambush", maxAggro = -2, time = 15, obsolete = 40, unit = "chicken_digger", burrowRatio = 1.25, minDist = 100, maxDist = 450, cooldown = 3, targetHuman = true},
 	--{name = "Wurmsign", maxAggro = -3, time = 40, unit = "chickenwurm", burrowRatio = 0.2, cooldown = 4},
 	{name = "Spire Sprout", maxAggro = -4.5, time = 20, unit = "chickenspire", burrowRatio = 0.15, tieToBurrow = true, cooldown = 3},
@@ -181,6 +189,24 @@ local function SetCustomMiniQueenTime()
 end
 	
 difficulties = {
+	['Chicken: Beginner'] = {
+		chickenSpawnRate = 180,
+		burrowSpawnRate  = 180,
+		gracePeriod      = 450,
+		rampUpTime       = 1200,
+		waveSizeMult     = 0.5,
+		timeSpawnBonus   = 0.010, -- how much each time level increases spawn size
+		queenTime        = 60*60,
+		queenName        = "chicken_dragon",
+		queenMorphName   = '',
+		miniQueenName    = "chicken_tiamat",
+		maxBurrows       = 4,
+		specialPowers    = {},
+		techAccelPerPlayer = 1.3,
+		techTimeFloorFactor = 0.2,
+		scoreMult        = 0.12,
+	},
+	
 	['Chicken: Very Easy'] = {
 		chickenSpawnRate = 90,
 		burrowSpawnRate  = 90,
@@ -192,8 +218,10 @@ difficulties = {
 		queenName		= "chicken_dragon",
 		queenMorphName	 = '',
 		miniQueenName	 = "chicken_tiamat",
-		maxBurrows	   = 12,
+		maxBurrows	   = 10,
 		specialPowers	 = {},
+		techAccelPerPlayer = 2,
+		techTimeFloorFactor = 0.4,
 		scoreMult		 = 0.25,
 	},
 
@@ -239,7 +267,7 @@ difficulties = {
 		gracePeriod		 = 150,
 		gracePeriodMin	 = 30,
 		burrowRespawnChance = 0.25,
-		burrowRegressTime	= 50,
+		--burrowRegressTime	= 25,
 		queenSpawnMult   = 5,
 		queenTime		 = 50*60,
 		queenHealthMod	 = 2,
@@ -253,6 +281,7 @@ difficulties = {
 	['Chicken: Custom'] = {
 		chickenSpawnRate = modoptions.chickenspawnrate or 50, 
 		burrowSpawnRate  = modoptions.burrowspawnrate or 45,
+		waveSizeMult    = modoptions.wavesizemult or 1,
 		timeSpawnBonus   = .04,
 	--	chickenTypes	 = Copy(chickenTypes),
 	--	defenders		= Copy(defenders),
@@ -261,7 +290,8 @@ difficulties = {
 		gracePeriod		= (modoptions.graceperiod and modoptions.graceperiod * 60) or 180,
 		gracePenalty	= 0,
 		gracePeriodMin	= 30,
-		burrowQueenTime	= (modoptions.burrowqueentime and modoptions.burrowqueentime) or 15,
+		burrowQueenTime	= (modoptions.burrowqueentime) or 15,
+		queenHealthMod	= modoptions.queenhealthmod or 1,
 		timeModifier	= modoptions.techtimemult or 1,
 		scoreMult		= 0,
 	},
@@ -318,7 +348,28 @@ end
 difficulties['Chicken: Very Easy'].chickenTypes.chicken_pigeon.time = 8*60
 difficulties['Chicken: Very Easy'].chickenTypes.chicken_tiamat.time = 999999
 
+difficulties['Chicken: Beginner'].chickenTypes.chicken_pigeon.time = 11*60
+difficulties['Chicken: Beginner'].chickenTypes.chicken_tiamat.time = 999999
+
 defaultDifficulty = 'Chicken: Normal'
 
+-- special config (used by campaign)
+if modoptions.chicken_nominiqueen then
+	for _, d in pairs(difficulties) do
+		d.miniQueenTime = {}
+	end
+end
+if modoptions.chicken_minaggro then
+	humanAggroMin = tonumber(modoptions.chicken_minaggro)
+end
+if modoptions.chicken_maxaggro then
+	humanAggroMax = tonumber(modoptions.chicken_maxaggro)
+end
+if modoptions.chicken_maxtech then
+	techTimeMax = tonumber(modoptions.chicken_maxtech)
+end
+if modoptions.chicken_endless then
+	endlessMode = Spring.Utilities.tobool(modoptions.chicken_endless)
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

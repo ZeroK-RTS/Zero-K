@@ -15,21 +15,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function MergeTable(outtable,intable)
-	for i,v in pairs(intable) do 
-		if (outtable[i]==nil) then
-			if (type(v)=='table') then
-				if (type(outtable[i])~='table') then 
-					outtable[i] = {} 
-				end
-				MergeTable(outtable[i],v)
-			else
-				outtable[i] = v
-			end
-		end
-	end
-end
-
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetAllUnits = Spring.GetAllUnits
 
@@ -37,51 +22,38 @@ local spGetAllUnits = Spring.GetAllUnits
 --------------------------------------------------------------------------------
 
 local flameFX = {
-    layer        = 0,
-    speed        = 0.65,
-    life         = 30,
-    lifeSpread   = 10,
-    delaySpread  = 20,
-    colormap     = { {0, 0, 0, 0.},
-                     {0.4, 0.4, 0.4, 0.01},
-                     {0.35, 0.15, 0.15, 0.20},
-                     {0, 0, 0, 0} },
-    partpos      = "a,b,c | a=10*(rand()-0.5),b=10*(rand()-0.5),c=10*(rand()-0.5)",
-    rotSpeed     = 1,
-    rotSpeedSpread = -2,
-    rotSpread    = 360,
-    size         = 22,
-    sizeSpread   = 1,
-    sizeGrowth   = 0.9,
-    emitVector   = {0,1,0},
-    emitRotSpread = 60,
-    texture      = 'bitmaps/GPL/flame.png',
-    count        = 5,
+	layer        = 0,
+	speed        = 0.65,
+	life         = 30,
+	lifeSpread   = 10,
+	delaySpread  = 20,
+	colormap     = {
+		{0, 0, 0, 0.},
+		{0.4, 0.4, 0.4, 0.01},
+		{0.35, 0.15, 0.15, 0.20},
+		{0, 0, 0, 0}
+	},
+	rotSpeed     = 1,
+	rotSpeedSpread = -2,
+	rotSpread    = 360,
+	sizeSpread   = 1,
+	sizeGrowth   = 0.9,
+	emitVector   = {0, 1, 0},
+	emitRotSpread = 60,
+	texture      = 'bitmaps/GPL/flame.png',
+	count        = 5,
+
+	-- fields that differ per instance (here for reference and static tables)
+	force = {0, 1, 0},
+	pos = {0, 0, 0},
+	partpos = "",
+	size = 1,	
 }
-
-local smokeFX = {
-    layer     = 1,
-
-    life         = 50,
-    lifeSpread   = 20,
-
-    colormap  = { {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0.15, 0.1, 0.1, 0.4}, {0.03, 0.03, 0.03, 0.25}, {0, 0, 0, 0} },
-
-    texture      = 'bitmaps/GPL/smoke_orange.png',
-}
-
---// merge with shared data in flameLarge
-MergeTable(smokeFX, flameFX)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local Lups  -- Lua Particle System
 local AddParticles
-local particleIDs = {}
-
-local random,pi = math.random,math.pi
-local sin,cos   = math.sin,math.cos
 
 local GetWind = Spring.GetWind
 local spGetUnitPosition = Spring.GetUnitPosition
@@ -90,86 +62,53 @@ local spGetUnitRadius   = Spring.GetUnitRadius
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local initialized = false
 function widget:Initialize()
-	initialized = true
-end
-
-function widget:Shutdown()
-	if (initialized) then
-		Lups  = WG['Lups']
-		for _,particleID in pairs(particleIDs) do
-			Lups.RemoveParticles(particleID)
-		end
+	if not WG.Lups then
+		widgetHandler:RemoveCallIn("GameFrame")
+		return
 	end
-end
-
-local t = 1
-local totalFxCount = 0 --// total lups effects
-function widget:Update()
-	if (t>2) then
-		Lups  = WG['Lups']
-		if (Lups) then
-			totalFxCount = Lups.GetStats()
-			AddParticles = Lups.AddParticles
-		end
-		t=1
-	end
-	t=t+1
+	AddParticles = WG.Lups.AddParticles 
 end
 
 local CHECK_INTERVAL = 6
 
+local burningUnits = { count = 0 }
 function widget:GameFrame(n)
-	if n%CHECK_INTERVAL == 1 then
-		local units = spGetAllUnits()
-		local burningUnits = {count = 0}
-		local unitID
-		for i = 1, #units do
-			unitID = units[i]
-			if spGetUnitRulesParam(unitID, "on_fire") == 1 then
-				burningUnits.count = burningUnits.count + 1
-				burningUnits[burningUnits.count] = unitID
-			end
-		end
-		
-		if #burningUnits > 0 then
-			onFire(burningUnits)
-		end
-	end
-end
-
-
-function onFire(burningUnits)
-	if (Lups==nil)or(totalFxCount>175) then 
-		return 
+	if n % CHECK_INTERVAL ~= 0 then
+		return
 	end
 
-	--// get wind and random values
-	local alpha = 2*pi*random()
-	local r = 20*random()
+	burningUnits.count = 0
+	local units = spGetAllUnits()
+	for i = 1, #units do
+		local unitID = units[i]
+		if spGetUnitRulesParam(unitID, "on_fire") == 1 then
+			burningUnits.count = burningUnits.count + 1
+			burningUnits[burningUnits.count] = unitID
+		end
+	end
+
+	if burningUnits.count == 0 then
+		return
+	end
+
 	local wx, wy, wz = GetWind()
-	wx, wy, wz = wx*0.09, wy*0.09, wz*0.09
-	flameFX.force       = {wx,wy+3,wz}
-	smokeFX.force       = flameFX.force
+	flameFX.force[1] = wx * 0.09
+	flameFX.force[2] = wy * 0.09 + 3
+	flameFX.force[3] = wz * 0.09
 
 	for i = 1, burningUnits.count do
 		local unitID = burningUnits[i]
 
-		--// send particles to LUPS
 		local x, y, z = spGetUnitPosition(unitID)
 		local r = spGetUnitRadius(unitID)
-		if (r and x) and math.random(400) < (400 - 2*totalFxCount - burningUnits.count) then
-			flameFX.pos     = {x,y,z}
+		if (r and x) and math.random(400) < (400 - burningUnits.count) then
+			flameFX.pos[1] = x
+			flameFX.pos[2] = y
+			flameFX.pos[3] = z
 			flameFX.partpos = "r*sin(alpha),0,r*cos(alpha) | alpha=rand()*2*pi, r=rand()*0.6*" .. r
 			flameFX.size    = r * 0.35
-			particleIDs[#particleIDs+1] = AddParticles('SimpleParticles2',flameFX)
-
-			--smokeFX.pos     = flameFX.pos 
-			--smokeFX.partpos = flameFX.partpos
-			--smokeFX.size    = flameFX.size
-			--particleIDs[#particleIDs+1] = AddParticles('SimpleParticles2',smokeFX)
+			AddParticles('SimpleParticles2', flameFX)
 		end
-
 	end
 end

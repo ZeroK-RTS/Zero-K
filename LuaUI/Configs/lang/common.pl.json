@@ -1,5 +1,5 @@
 {
-	"morph_complete" : "Ulepszenie zakończone",
+	"morph_complete" : "Ulepszenie zakończone: %{old} -> %{new}",
 	"nuclear_launch_detected" : "Alarm nuklearny",
 	"geospot" : "Gejzer\nMożna postawić elektrownię geotermiczną",
 	"build_eta" : "Gotowe za",
@@ -55,5 +55,19 @@
 	"go_to" : "Przejdź do",
 	"x%_done" : "postęp %{x}%%",
 	"append_to_current_selection" : "Dodaj do zaznaczenia",
-	"unit_under_attack" : "jest pod ostrzałem"
+	"unit_under_attack" : "jest pod ostrzałem",
+	"roster_factorycloak" : "Cichociemni",
+	"roster_factoryshield" : "Tarczowniki",
+	"roster_factoryveh" : "Pojazdy",
+	"roster_factorytank" : "Czołgi",
+	"roster_factoryamph" : "Amfibie",
+	"roster_factoryhover" : "Poduszkowce",
+	"roster_factoryjump" : "Skoczki",
+	"roster_factoryspider" : "Pająki",
+	"roster_factorygunship" : "Statki powietrzne",
+	"roster_factoryplane" : "Samoloty",
+	"roster_factoryship" : "Statki",
+	"roster_striderhub" : "Mechy",
+	"roster_staticmissilesilo" : "Rakiety taktyczne",
+	"neutral" : "Neutralny"
 }

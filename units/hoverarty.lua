@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[hoverarty]],
-  name                = [[Penetrator]],
+  name                = [[Lance]],
   description         = [[Anti-Heavy Artillery Hovercraft]],
   acceleration        = 0.016,
   activateWhenBuilt   = true,
@@ -18,18 +18,13 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_de = [[Mobiler Tachyonen Beschleuniger (Artillerie/Anti-Heavy)]],
-    description_fr = [[Accelerateur Tachyon Mobile]],
-    helptext       = [[The Penetrator's weapon, nicknamed 'the Blue Laser of Death', has the power and accuracy to skewer most units with a single shot. Use it against high armor units, but keep it behind the front lines - it has light armor and can't run from danger.]],
-    helptext_de    = [[Penetrators Waffe, genannt "der Blaue Laser des Todes", hat die Macht und Präzision die meisten Einheiten mit einem einzigen Schuss zu vernichten. Nutze ihn gegen gut gepanzerte Einheiten, aber halte ihn hinter den Frontlinien - er besitzt nur wenig Durchhaltevermögen und kann nicht ruckartig weglaufen.]],
-    helptext_fr    = [[Le surnon du Penetrator est 'le rayon bleu de la mort'. Le Penetrator est le tank le plus devastateur de tous, son laser peut traverser les rangs ennemis et décimer les plus lourds blindages ? grande distance. Il est cependant peu protégé et peu maniable.]],
-	dontfireatradarcommand = '1',
+	dontfireatradarcommand = '0',
     aimposoffset   = [[0 15 0]],
   },
 
   explodeAs           = [[MEDIUM_BUILDINGEX]],
-  footprintX          = 3,
-  footprintZ          = 3,
+  footprintX          = 4,
+  footprintZ          = 4,
   iconType            = [[mobiletachyon]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
@@ -40,7 +35,7 @@ unitDef = {
   maxVelocity         = 2.2,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
-  movementClass       = [[HOVER3]],
+  movementClass       = [[HOVER4]],
   moveState           = 0,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
@@ -84,6 +79,8 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
+		burst = Shared.BURST_RELIABLE,
+
 		light_color = [[1.25 0.8 1.75]],
 		light_radius = 320,
       },
@@ -108,7 +105,7 @@ unitDef = {
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser6]],
-	  soundStartVolume        = 3,
+      soundStartVolume        = 15,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],

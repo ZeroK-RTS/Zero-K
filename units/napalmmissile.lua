@@ -15,9 +15,7 @@ unitDef = {
   collisionVolumeType	        = [[CylY]],
 
   customParams                  = {
-    description_de = [[Napalm-Rakete]],
-    helptext       = [[The Inferno is a large AoE fire weapon. Its direct damage is modest, but the cloud of fire it creates lasts for a very long time.]],
-    helptext_de    = [[Der Inferno ist eine große AoE Feuerwaffe. Sein direkter Schaden ist gering, aber die Flammenhölle erzeugt Verluste für längere Zeit.]],
+    mobilebuilding = [[1]],
   },
 
   explodeAs                     = [[WEAPON]],
@@ -101,7 +99,7 @@ unitDef = {
       reloadtime              = 10,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/nalpalm_missile_hit]],
-      soundStart              = [[weapon/missile/tacnuke_launch]],
+      soundStart              = [[weapon/missile/tacnuke_launch2_trimmed]],
       tolerance               = 4000,
       turnrate                = 18000,
       weaponAcceleration      = 180,

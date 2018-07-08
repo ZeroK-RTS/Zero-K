@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "WidgetProfiler",
+    name      = "Widget Profiler",
     desc      = "",
     author    = "jK",
     version   = "2.0",
@@ -39,7 +39,13 @@ options = {
 		type = 'bool',
 		value = false,
 		desc = "Hide readings for widgets with <0.5% FPS cost",
-	},	
+	},
+	fontSize = {
+		name = 'Font size',
+		type = 'number',
+		min = 6, max = 24,
+		value = 8,
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -362,8 +368,8 @@ end
 
     local vsx, vsy = gl.GetViewSizes()
     local x,y = vsx-780, vsy-60
-	local fSize = 8
-	local fSpacing = 7
+	local fSize = options.fontSize.value
+	local fSpacing = options.fontSize.value - 1
 
     gl.Color(1,1,1,1)
     gl.BeginText()

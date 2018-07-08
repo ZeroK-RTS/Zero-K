@@ -892,6 +892,10 @@ local function GetSmoothOrGroundHeight(x,z,checkFreeMode) --only ScrollCam seems
 	else
 		if not (checkFreeMode and options.freemode.value) then
 			return spGetGroundHeight(x, z) or 0
+		else
+			-- in this case `x` and `z` might be off-map due to free mode
+			-- however, GetGroundHeight still works fine (returns closest edge point)
+			return spGetGroundHeight(x, z) or 0
 		end
 	end
 end
@@ -1302,7 +1306,7 @@ local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 					lockPoint = {}
 					_, x, y, z = VirtTraceRay(cx, cy, cs)
 					cs = ZoomTiltCorrection(cstemp, cs.py > cstemp.py, cx, cy, ls_x, ls_y, ls_z, true, true) 
-					lockPoint.worldEnd = {x = lockPoint.worldBegin.x, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z}
+					lockPoint.worldEnd = {x = ls_x, y = ls_y, z = ls_z}
 					lockPoint.worldBegin = {x = x, y = y, z = z}
 				else
 					cs.rx = GetZoomTiltAngle(ls_x, ls_z, cstemp)
@@ -1802,7 +1806,7 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 			if selUnits and selUnits[1] then --find unit in that area
 				local defID = spGetUnitDefID(unitID)
 				local unitSeparation = spGetUnitSeparation (unitID, thirdperson_trackunit, true)
-				if UnitDefs[defID] and UnitDefs[defID].speed >0 then
+				if UnitDefs[defID] and not UnitDefs[defID].isImmobile then
 					if lowestUnitSeparation > unitSeparation then
 						foundUnit = selUnits[1]
 						lowestUnitSeparation = unitSeparation
@@ -2677,7 +2681,12 @@ local groupNumber = {
 	[KEYSYMS.N_7] = 7,
 	[KEYSYMS.N_8] = 8,
 	[KEYSYMS.N_9] = 9,
+	[KEYSYMS.N_0] = 0,
 }
+
+function WG.COFC_UpdateGroupNumbers(newNumber)
+	groupNumber = newNumber
+end
 
 function GroupRecallFix(key, modifier, isRepeat)
 	if ( not modifier.ctrl and not modifier.alt and not modifier.meta) then --check key for group. Reference: unit_auto_group.lua by Licho

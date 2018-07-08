@@ -17,11 +17,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Anti-Schwarm EMG]],
-    description_fr = [[Mitrailleurs Anti-Nuée]],
-    helptext       = [[The Stardust sports a powerful autocannon. While it has a short range and is thus even more vulnerable to skirmishers than the LLT, its high rate of fire and AoE allow it to quickly chew up swarms of lighter units.]],
-    helptext_de    = [[Stardust ist ein Geschützturm mit einem lang perfektionierten und tödlichen energetischen Maschinengewehr. Zwar besitzt es nur eine kurze Reichweite, wodurch es sehr verletzbar gegenüber Skirmishern ist, dennoch machen es die hohe Feuerrate und die AoE zu einer guten Verteidigung gegen Schwärme und leichte Einheiten.]],
-    helptext_fr    = [[Le Stardust est une tourelle mitrailleuse r haute energie. Son incroyable cadence de tir lui permettent d'arreter quasiment nimporte quelle nuée de Pilleur ou d'unités légcres, cependant sa portée est relativement limitée, et étant prcs du sol nimporte quel obstacle l'empeche de tirer.]],
     aimposoffset   = [[0 12 0]],
     midposoffset   = [[0 4 0]],
   },
@@ -80,6 +75,7 @@ unitDef = {
 	  customparams = {
 		light_color = [[0.8 0.76 0.38]],
 		light_radius = 180,
+		proximity_priority = 5, -- Don't use this unless required as it causes O(N^2) seperation checks per slow update.
 	  },
 
       damage                  = {
@@ -96,7 +92,7 @@ unitDef = {
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       range                   = 410,
-      reloadtime              = 0.12,
+      reloadtime              = 0.1,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
       soundHit                = [[weapon/cannon/emg_hit]],

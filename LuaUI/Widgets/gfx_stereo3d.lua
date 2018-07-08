@@ -353,7 +353,7 @@ options = {
 		name = 'Camera Type',
 		type = 'list',
 		items = {
-			{name = 'Total Annihilation', 	key = 'viewta'},
+			{name = 'Default', 	            key = 'viewta'},
 			{name = 'Free', 				key = 'viewfree'},
 			{name = 'Rotatable Overhead', 	key = 'viewrot'},
 			{name = 'Total War', 			key = 'viewtw'},

@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloaksnipe]],
-  name                   = [[Spectre]],
+  name                   = [[Phantom]],
   description            = [[Cloaked Skirmish/Anti-Heavy Artillery Bot]],
   acceleration           = 0.3,
   brakeRate              = 0.2,
@@ -15,16 +15,14 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[30 60 30]],
   collisionVolumeType    = [[cylY]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Scharfschützen Walker (Skirmish/Anti-Heavy)]],
-    description_fr = [[Marcheur Sniper]],
-    helptext       = [[The Spectre's energy rifle inflicts heavy damage to a single target. It can fire while cloaked; however its visible round betrays its position. It requires quite a bit of energy to keep cloaked, especially when moving. The best way to locate a Spectre is by sweeping the area with many cheap units.]],
-    helptext_de    = [[Sein energetisches Gewehr richtet riesigen Schaden bei einzelnen Zielen an. Er kann auch schießen, wenn er getarnt ist. Dennoch verrät ihn sein sichtbarer Schuss. Um getarnt zu bleiben und schießen zu können, benötigt der Scharfschütze eine Menge Energie. Die einfachst Möglichkeit einen Scharfschützen ausfindig zu machen, ist die, indem man ein Gebiet mit vielen billigen überschwemmt.]],
-    helptext_fr    = [[Le Spectre est une unit? d'artillerie furtive, camouflable et coutant tres cher. Il peut faire feu tout en restant camoufl?. Son tir tres visible peut cependant r?veler sa position. La quantit?e d'?nergie qu'il n?cessite pour tirer et rester camoufler en m?me temps est ?lev?e. Sa destruction ?met une onde de choque EMP qui immobilise les unit?s qui se trouve a proximit?. Il est le plus utile en tant que tireur isol?.]],
 	modelradius    = [[15]],
-	dontfireatradarcommand = '1',
+	dontfireatradarcommand = '0',
   },
 
   decloakOnFire          = false,
@@ -43,7 +41,6 @@ unitDef = {
   maxWaterDepth          = 22,
   minCloakDistance       = 155,
   movementClass          = [[KBOT3]],
-  moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[sharpshooter.s3o]],
   script                 = [[cloaksnipe.lua]],
@@ -64,7 +61,7 @@ unitDef = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2600,
+  turnRate               = 2200,
   upright                = true,
 
   weapons                = {
@@ -87,6 +84,7 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams        	  = {
+		burst = Shared.BURST_RELIABLE,
 		light_radius = 0,
 	  },
 	  

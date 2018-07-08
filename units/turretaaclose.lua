@@ -16,9 +16,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Flugabwehrraketenturm]],
-    helptext       = [[The Hacksaw's twin missiles brutally punish any aircraft that enters their range, but take a considerable amount of time to reload, making them less than ideal against light targets.]],
-    helptext_de    = [[Seine Zwillingsraketen schwer beschaedigen jedes Flugzeug in seine Reichweite, brauchen aber eine beachtliche Zeit zum Nachladen, was sie gegen leichtere Ziele nicht sehr effektiv macht.]],
   },
 
   explodeAs                     = [[SMALL_BUILDINGEX]],
@@ -66,18 +63,20 @@ unitDef = {
     MISSILE = {
       name                    = [[Homing Missiles]],
       areaOfEffect            = 24,
-      burst                   = 2,
-      burstrate               = 0.55,
       canattackground         = false,
       cegTag                  = [[missiletrailbluebig]],
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargeting       = 3,
 
-	  customParams        	  = {
-		isaa = [[1]],
-		light_color = [[0.5 0.6 0.6]],
-	  },
+      customParams = {
+		burst = Shared.BURST_RELIABLE,
+
+        isaa = [[1]],
+        script_reload = [[15]],
+        script_burst = [[2]],
+        light_color = [[0.5 0.6 0.6]],
+      },
 
       damage                  = {
         default = 60.1,
@@ -95,18 +94,18 @@ unitDef = {
       model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
       range                   = 430,
-      reloadtime              = 15,
+      reloadtime              = 0.5,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med11]],
       soundStart              = [[weapon/missile/missile_fire3]],
-      startVelocity           = 700,
+      startVelocity           = 650,
       texture2                = [[AAsmoketrail]],
       tracks                  = true,
       turnRate                = 90000,
       turret                  = true,
       weaponAcceleration      = 200,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 950,
+      weaponVelocity          = 800,
     },
 
   },

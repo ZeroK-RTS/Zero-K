@@ -15,7 +15,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext       = [[The Punisher has a shotgun which shoots a spray of projectiles which are good against large targets or tight clusters of enemies.]],
  },
 
   explodeAs           = [[BIG_UNITEX]],

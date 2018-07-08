@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[jumpaa]],
-  name                = [[Archangel]],
+  name                = [[Toad]],
   description         = [[Heavy Anti-Air Jumper]],
   acceleration        = 0.18,
   brakeRate           = 0.2,
@@ -19,12 +19,6 @@ unitDef = {
     jump_speed         = 6,
     jump_reload        = 10,
     jump_from_midair   = 0,
-
-    description_de = [[Flugabwehr Springer]],
-    description_fr = [[Marcheur Anti-Air Lourd]],
-    helptext       = [[The Archangel packs twin anti-air lasers and an autocannon for slaying enemy aircraft rapidly. It can also jump to quickly access high ground or to escape.]],
-	helptext_de    = [[Der Archangel besitzt ein Doppel-Anti-Air-Laser und eine automatische Kanone, um gegnerische Lufteinheiten zu zerstören. Der Archangel kann auch einen Sprung machen.]],
-    helptext_fr    = [[L'Archangel est munis d'un laser double anti air et d'un autocannon similaire au packo pour pouvoir an?antire les avions enemis.]],
 	modelradius    = [[15]],
   },
 

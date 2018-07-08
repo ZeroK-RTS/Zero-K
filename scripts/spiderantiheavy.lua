@@ -27,24 +27,16 @@ local PI = math.pi
 local sa = math.rad(-10)
 local ma = math.rad(40)
 local la = math.rad(100)
-local pause = 450
+local pause = 280
 
-local forward = 2.5
-local backward = 2.3
-local up = 2
+local forward = 3.6
+local backward = 3.5
+local up = 2.2
+
+local LOWER_LEG_ANGLE = math.rad(14)
+local LOWER_LEG_SPEED = 3
 
 local smokePiece = {base, barrel}
-
-function script.Create()
-
-Turn(lfrontleg, y_axis, math.rad(45)) 
-Turn(rfrontleg, y_axis, math.rad(-45)) 
-Turn(laftleg, y_axis, math.rad(-45)) 
-Turn(raftleg, y_axis, math.rad(45)) 
-
-	StartThread(SmokeUnit,smokePiece)
-end
-
 
 local function RestoreAfterDelay()
 	Sleep(2750)
@@ -56,43 +48,40 @@ local function Walk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 	while (true) do
-
-
 		Turn(lfrontleg, y_axis, 1.5*ma, forward) 	-- right front forward
 		Turn(lfrontleg, z_axis, -ma, up)	 	-- right front up
-		Turn(lfrontleg1, z_axis, -ma/3, up)
-				
+		Turn(lfrontleg1, z_axis, -LOWER_LEG_ANGLE, LOWER_LEG_SPEED)
+			
 		Turn(laftleg, y_axis, -1.5*ma, backward) 	-- right back backward
 		Turn(laftleg, z_axis, 0, 4*up)		 	-- right back down
-		Turn(laftleg1, z_axis, 0, up)
+		Turn(laftleg1, z_axis, 0, LOWER_LEG_SPEED)
 		
 		Turn(rfrontleg, y_axis, sa, backward) 	-- left front backward
 		Turn(rfrontleg, z_axis, 0, 4*up)		 	-- left front down
-		Turn(rfrontleg1, z_axis, 0, up)
+		Turn(rfrontleg1, z_axis, -LOWER_LEG_ANGLE/2, LOWER_LEG_SPEED)
 		
 		Turn(raftleg, y_axis, -sa, forward) 	-- left back forward
 		Turn(raftleg, z_axis, ma, up)	 	-- left back up
-		Turn(raftleg1, z_axis, ma/3, up)
+		Turn(raftleg1, z_axis, LOWER_LEG_ANGLE, LOWER_LEG_SPEED)
 		
 		Sleep(pause)
 		
-
-
+		
 		Turn(lfrontleg, y_axis, -sa, backward) 	-- right front backward
 		Turn(lfrontleg, z_axis, 0, 4*up)		 	-- right front down
-		Turn(lfrontleg1, z_axis, 0, up)
+		Turn(lfrontleg1, z_axis, LOWER_LEG_ANGLE/2, LOWER_LEG_SPEED)
 		
 		Turn(laftleg, y_axis, sa, forward) 	-- right back forward
 		Turn(laftleg, z_axis, -ma, up)	 	-- right back up
-		Turn(laftleg1, z_axis, -ma/3, up)
+		Turn(laftleg1, z_axis, -LOWER_LEG_ANGLE, LOWER_LEG_SPEED)
 		
 		Turn(rfrontleg, y_axis, -1.5*ma, forward) 	-- left front forward
 		Turn(rfrontleg, z_axis, ma, up)	 	-- left front up
-		Turn(rfrontleg1, z_axis, ma/3, up)
+		Turn(rfrontleg1, z_axis, LOWER_LEG_ANGLE, LOWER_LEG_SPEED)
 		
 		Turn(raftleg, y_axis, 1.5*ma, backward) 	-- left back backward
 		Turn(raftleg, z_axis, 0, 4*up)		 	-- left back down
-		Turn(raftleg1, z_axis, 0, up)
+		Turn(raftleg1, z_axis, LOWER_LEG_ANGLE, LOWER_LEG_SPEED)
 		
 		Sleep(pause)
 	
@@ -133,8 +122,18 @@ end
 
 function script.StopMoving()
 	StartThread(StopWalk)
-end	
-	
+end
+
+function script.Create()
+
+	Turn(lfrontleg, y_axis, math.rad(45)) 
+	Turn(rfrontleg, y_axis, math.rad(-45)) 
+	Turn(laftleg, y_axis, math.rad(-45)) 
+	Turn(raftleg, y_axis, math.rad(45)) 
+
+	StartThread(SmokeUnit,smokePiece)
+end
+
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)

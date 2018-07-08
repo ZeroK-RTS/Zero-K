@@ -13,6 +13,7 @@
 -- seismictrail
 -- bigemptrail
 -- emptrail
+-- bigdisarmtrail
 -- disarmtrail
 -- raventrail
 -- banishertrail
@@ -960,6 +961,103 @@ return {
     },
   },
 
+  ["bigdisarmtrail"] = {
+    alwaysvisible           = false,
+    usedefaultexplosions    = false,
+
+	largeflash = {
+      air                   = true,
+      class                 = [[CBitmapMuzzleFlame]],
+      count                 = 1,
+      ground                = true,
+      underwater            = 1,
+      water                 = true,
+      properties = {
+        colormap            = [[1 1 0.25 0.01  0.75 0.75 0.1 0.01  0 0 0 0.01]],
+        dir                 = [[dir]],
+        frontoffset         = 0,
+        fronttexture        = [[muzzlefront]],
+        length              = -42,
+        sidetexture         = [[muzzleside]],
+        size                = -7,
+        sizegrowth          = 0.75,
+        ttl                 = 7,
+      },
+    },
+	
+    smoke_front = {
+      air                   = true,
+      class                 = [[CSimpleParticleSystem]],
+      count                 = 1,
+      ground                = true,
+      water                 = true,
+      properties = {
+        airdrag             = 0.8,
+        colormap            = [[0.9 0.9 0.9 0.4  0.5 0.5 0.5 0.7  0.0 0.0 0.0 0.01]],
+        directional         = false,
+        emitrot             = 0,
+        emitrotspread       = 50,
+        emitvector          = [[dir]],
+        gravity             = [[0.05 r-0.1, 0.05 r-0.1, 0.05 r-0.1]],
+        numparticles        = 3,
+        particlelife        = 15,
+        particlelifespread  = 0,
+        particlesize        = 7,
+        particlesizespread  = 2,
+        particlespeed       = 5,
+        particlespeedspread = -4,
+        pos                 = [[0, 1, 3]],
+        sizegrowth          = 1.3,
+        sizemod             = 1.0,
+        texture             = [[smoke]],
+      },
+    },
+
+    sparks = {
+      air                   = true,
+      class                 = [[CSimpleParticleSystem]],
+      count                 = 1,
+      ground                = true,
+      water                 = true,
+      properties = {
+        airdrag             = 0.97,
+        colormap            = [[1 1 1 0.01   1 1 1 0.01   0.0 0.0 0 0.01]],
+        directional         = true,
+        emitrot             = 0,
+        emitrotspread       = 60,
+        emitvector          = [[0, 1, 0]],
+        gravity             = [[0, 0, 0]],
+        numparticles        = 2,
+        particlelife        = 17,
+        particlelifespread  = 4,
+        particlesize        = 7,
+        particlesizespread  = 0,
+        particlespeed       = 3,
+        particlespeedspread = 0,
+        pos                 = [[0, 0, 0]],
+        sizegrowth          = 0,
+        sizemod             = 1.0,
+        texture             = [[spark]],
+      },
+    },
+
+    spikes = {
+      air                   = true,
+      class                 = [[explspike]],
+      count                 = 4,
+      ground                = true,
+      water                 = true,
+      properties = {
+        alpha               = 0.75,
+        alphadecay          = 0.25,
+        color               = [[0.8, 0.8, 0.8]],
+        dir                 = [[-6 r12,-6 r12,-6 r12]],
+        length              = 12,
+        width               = 5,
+      },
+    },
+  },
+  
   ["disarmtrail"] = {
     alwaysvisible           = false,
     usedefaultexplosions    = false,
@@ -1074,7 +1172,6 @@ return {
         dir                = [[-6 r12,-6 r12,-6 r12]],
         length             = 8,
         width              = 5,
-        ttl                = 1,
       },
     },
     

@@ -11,6 +11,9 @@ unitDef = {
   canMove               = true,
   canPatrol             = true,
   category              = [[LAND FIREPROOF]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                = [[DEAD]],
 
   customParams          = {
@@ -19,13 +22,7 @@ unitDef = {
     jump_speed         = 6,
     jump_reload        = 10,
     jump_from_midair   = 1,
-
-    description_fr = [[Marcheur Pilleur r Jetpack]],
-	description_de = [[Raider Jumpjet Roboter]],
     fireproof      = [[1]],
-    helptext       = [[The Pyro is a cheap, fast walker with a flamethrower. The flamethrower deals increased damage to large units and can hit multiple targets at the same time. When killed, the Pyro sets surrounding units on fire. Additionally, Pyros also come with jetpacks, allowing them to jump over obstacles or get the drop on enemies.]],
-    helptext_fr    = [[Le Pyro est un marcheur facile r produire et rapide. Son lanceflamme fait des ravage au corps r corps et son jetpack lui permet des attaques par des angles surprenants. Les dommages sont plus ?lev?s sur les cibles de gros calibres comme les b?timents, et il peut tirer sur plusieurs cibles r la fois. Attention cependant r ne pas les grouper, car le Pyro explose fortement et peut entrainer une r?action en chaine.]],
-	helptext_de    = [[Der Pyro ist ein günstiger und schneller Roboter, der mit einem Flammenwerfer ausgestattet ist. Dieser fügt großen Zielen erheblichen Schaden zu und kleineren entsprechend weniger. Außerdem können mehrere Ziele gleichzeitig getroffen werden, welche auch im Feuer aufgehen können. Der Pyro explodiert brutalst, sobald er zerstört wird. Zusätzlich besitzt er noch ein Jetpack, welches ihm zum Beispiel das Springen über Hindernisse ermöglicht.]],
 	stats_show_death_explosion = 1,
   },
 
@@ -88,7 +85,7 @@ unitDef = {
       areaOfEffect            = 64,
       avoidGround             = false,
       avoidFeature            = false,
-      avoidFriendly           = false,
+      avoidFriendly           = true,
       collideFeature          = false,
       collideGround           = false,
       coreThickness           = 0,
@@ -99,14 +96,15 @@ unitDef = {
       customParams            = {
         flamethrower = [[1]],
         setunitsonfire = "1",
+        burnchance = "0.4", -- Per-impact
         burntime = [[450]],
           
         light_camera_height = 2800,
         light_color = [[0.6 0.39 0.18]],
         light_radius = 260,
-		light_fade_time = 10,
-		light_beam_mult_frames = 5,
-		light_beam_mult = 5,
+        light_fade_time = 10,
+        light_beam_mult_frames = 5,
+        light_beam_mult = 5,
       
         combatrange = 280,
       },
@@ -116,7 +114,7 @@ unitDef = {
         subs    = 0.01,
       },
 
-      duration				  = 0.01,
+      duration                = 0.01,
       explosionGenerator      = [[custom:SMOKE]],
       fallOffRate             = 1,
       fireStarter             = 100,

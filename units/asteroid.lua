@@ -29,7 +29,6 @@ unitDef = {
   yardMap                       = [[ff ff]],
 
   customParams        = {
-	helptext       = [[Asteroids can be manipulated to fall onto the planet by the Meteor Controller; they serve primarily as a weapon to crush the units they fall on, but they can also be reclaimed for resources.]],
   },
 
   featureDefs                   = {

@@ -17,11 +17,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Schwerer Saturation Artillerie Panzer]],
-    description_fr = [[Artillerie Lourde]],
-    helptext       = [[The principle behind the Tremor is simple: flood an area with enough shots, and you'll hit something at least once. Slow, clumsy, vulnerable and extremely frightening, the Tremor works best against high-density target areas, where its saturation shots are most likely to do damage. It pulverizes shields in seconds and its shells smooth terrain.]],
-    helptext_fr    = [[Le principe du Tremor est simple: inonder une zone de tirs plasma gr?ce ? son triple canon, avec une chance de toucher quelquechose. Par d?finition impr?cis, le Tremor est l'outil indispensable de destruction de toutes les zones ? h'aute densit? d'ennemis.]],
-	helptext_de    = [[Das Prinzip hinter dem Tremor ist einfach: flute ein Areal mit genug Schüssen und du wirst irgendwas, wenigstens einmal, treffen. Langsam, schwerfällig, anfällig und extrem beängstigend ist der Tremor, weshalb er gegen dichbesiedelte Gebiete sinnvoll einzusetzen ist.]],
 	modelradius    = [[17]],
   },
 
@@ -83,14 +78,16 @@ unitDef = {
       areaOfEffect            = 160,
 	  avoidFeature            = false,
 	  avoidGround             = false,
-	  craterAreaOfEffect      = 240,
+	  craterAreaOfEffect      = 5,
       craterBoost             = 0,
-      craterMult              = 0.1,
+      craterMult              = 0,
 	  
 	  customParams            = {
+        reaim_time = 15, -- Some sort of bug prevents firing.
+		
 	    gatherradius     = [[240]],
 	    smoothradius     = [[120]],
-		smoothmult       = [[0.4]],
+		smoothmult       = [[0.5]],
 		lups_noshockwave = [[1]],
 		
         light_ground_height = 200,

@@ -18,7 +18,6 @@ unitDef = {
 
   customParams          = {
     fireproof = [[1]],
-    helptext       = [[The Lancelet is basically a large smart torpedo with scouting functionality. It can remain hidden in the depths to observe enemy movements, then detonate its explosive charge to sink unwary ships.]],
 	turnatfullspeed = [[1]],
   },
 

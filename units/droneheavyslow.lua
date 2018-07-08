@@ -5,7 +5,7 @@ unitDef = {
   acceleration        = 0.3,
   airHoverFactor      = 4,
   brakeRate           = 0.24,
-  buildCostMetal      = 120,
+  buildCostMetal      = 35,
   builder             = false,
   buildPic            = [[droneheavyslow.png]],
   canBeAssisted       = false,
@@ -34,11 +34,6 @@ unitDef = {
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
-	description_de = [[Kampfdrohne]],
-	description_fr = [[Drone de combat avancé]],
-	helptext       = [[The Viper is an advanced battle drone similar to the Firefly but equipped with a Disruptor Pulse Beam, slowing its targets more with each hit.]],
-	helptext_de    = [[Der Viper ist eine Kampfdrohne, die seinen Besitzer schutzt und feindliche Einheiten verlangsamt.]],
-	helptext_fr    = [[Le Viper est un drone de combat agile similair au Firefly mais équipé d'un canon à électrons endommageant non seulement ses cibles mais les ralentissant progressivement, les rendant à chaque tir plus vulnérables.]],
 
 	is_drone = 1,
   },
@@ -72,7 +67,7 @@ unitDef = {
     DISRUPTOR      = {
       name                    = [[Disruptor Pulse Beam]],
       areaOfEffect            = 24,
-      beamdecay 				= 0.9,
+      beamdecay               = 0.9,
       beamTime                = 1/30,
       beamttl                 = 50,
       coreThickness           = 0.25,

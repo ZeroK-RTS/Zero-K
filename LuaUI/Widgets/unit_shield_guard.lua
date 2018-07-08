@@ -263,6 +263,9 @@ local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 local CMD_INSERT = CMD.INSERT
 local CMD_REMOVE = CMD.REMOVE
 
+local EMPTY_TABLE = {}
+local TABLE_1 = {1}
+
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local spGetUnitPosition 	= Spring.GetUnitPosition
@@ -312,8 +315,8 @@ local function updateShields()
 		i.ux,i.uy,i.uz = spGetUnitPosition(unit)
  
 		if i.waits then
-			spGiveOrderToUnit(unit, CMD_REMOVE, {1}, {"alt"} )
-			spGiveOrderToUnit(unit, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, i.maxVel }, {"alt"} )
+			spGiveOrderToUnit(unit, CMD_REMOVE, TABLE_1, CMD.OPT_ALT )
+			spGiveOrderToUnit(unit, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, i.maxVel }, CMD.OPT_ALT )
   
 			local cQueue = spGetCommandQueue(unit, 1) 
 
@@ -332,7 +335,7 @@ local function updateShields()
 					end
 	  
 					if (not wait) then
-						spGiveOrderToUnit(unit,CMD_WAIT,{},CMD_OPT_RIGHT)
+						spGiveOrderToUnit(unit,CMD_WAIT, EMPTY_TABLE, CMD_OPT_RIGHT)
 					end
 				else
 	
@@ -345,7 +348,7 @@ local function updateShields()
 					end
 			
 					if wait then
-						spGiveOrderToUnit(unit,CMD_WAIT,{},CMD_OPT_RIGHT)
+						spGiveOrderToUnit(unit,CMD_WAIT, EMPTY_TABLE, CMD_OPT_RIGHT)
 					end
 				end
 			end
@@ -369,7 +372,7 @@ local function updateFollowers()
 	  elseif (shieldieeStopDis < dis) then
 	    GiveClampedOrderToUnit(unit,CMD_RAW_MOVE,{shields[v.fol].ux,shields[v.fol].uy,shields[v.fol].uz},CMD_OPT_RIGHT)
 	  else
-	    spGiveOrderToUnit(unit,CMD_STOP,{},CMD_OPT_RIGHT)
+	    spGiveOrderToUnit(unit,CMD_STOP, EMPTY_TABLE, CMD_OPT_RIGHT)
 	  end
 	end
 	
@@ -404,7 +407,7 @@ function widget:CommandNotify(id, params, options)
 	  if c.maxVelID == sid then
 	    c.maxVel = c.selfVel
 	    c.maxVelID = -1
-		spGiveOrderToUnit(follower[sid].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, {"alt"} )
+		spGiveOrderToUnit(follower[sid].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD.OPT_ALT)
 	    for cid, j in pairs(c.shieldiees) do
 	      if j.vel < c.maxVel then
 		    c.maxVel = j.vel
@@ -510,7 +513,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if c.maxVelID == unitID then
 	  c.maxVel = c.selfVel
 	  c.maxVelID = -1
-	  spGiveOrderToUnit(follower[unitID].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, {"alt"} )
+	  spGiveOrderToUnit(follower[unitID].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD.OPT_ALT)
 	  for cid, j in pairs(c.shieldiees) do
 	    if j.vel < c.maxVel then
 		  c.maxVel = j.vel

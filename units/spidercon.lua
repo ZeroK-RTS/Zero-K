@@ -23,11 +23,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Konstruktionsspinne, Baut mit 7.5 M/s]],
-    description_fr = [[Araignée de Construction, construit à 7.5 m/s]],
-    helptext       = [[The Weaver is a constructor that can climb over any obstacle and build defenses on high ground. It is also equipped with a short range radar.]],
-    helptext_de    = [[Der Weaver ist eine bauende Einheit, die Hindernisse überwinden und somit Verteidigungsanlagen auf Erhöhungen bauen kann. Er hat auch ein Radar.]],
-    helptext_fr    = [[Le Weaver est un robot de construction arachnide tout terrain pouvant atteindre des zones élevées. Il a un radar.]],
 	modelradius    = [[15]],
   },
 

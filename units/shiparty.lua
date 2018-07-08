@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[shiparty]],
-  name                   = [[Ronin]],
+  name                   = [[Envoy]],
   description            = [[Cruiser (Artillery)]],
   acceleration           = 0.0417,
   activateWhenBuilt      = true,
@@ -16,7 +16,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[This Cruiser packs a powerful, long-range artillery cannon, useful for bombarding fixed emplacements and shore targets. Beware of aircraft, submarines and raider ships.]],
 
     --extradrawrange = 200,
     modelradius    = [[55]],
@@ -31,7 +30,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 25,
-  maxDamage              = 3000,
+  maxDamage              = 2000,
   maxVelocity            = 1.7,
   minCloakDistance       = 75,
   minWaterDepth          = 10,
@@ -67,6 +66,10 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 2,
 
+			customParams = {
+				burst = Shared.BURST_RELIABLE,
+			},
+
       damage                  = {
         default = 601.1,
         planes  = 601.1,
@@ -80,12 +83,12 @@ unitDef = {
 	  myGravity               = 0.1,
       projectiles             = 1,
       range                   = 1200,
-      reloadtime              = 4,
+      reloadtime              = 5,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/heavy_cannon]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 400,
+      weaponVelocity          = 350,
     },
   },
 

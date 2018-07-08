@@ -141,6 +141,7 @@ local function Lights()
 end
 
 function script.Create()
+	SetInitialBomberSettings()
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	FakeUprightInit(xp, zp, drop) 
@@ -165,7 +166,7 @@ function script.BlockShot(num, targetID)
 	if num ~= 2 then
 		return false
 	end
-	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
+	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or RearmBlockShot())
 	if not (targetID and ableToFire) then
 		return not ableToFire
 	end
@@ -209,6 +210,7 @@ end
 
 function script.FireWeapon(num)
 	if num == 2 then
+		SetUnarmedAI()
 		GG.Bomber_Dive_fired(unitID)
 		Sleep(33)	-- delay before clearing attack order; else bomb loses target and fails to home
 		Move(drop, x_axis, 0)

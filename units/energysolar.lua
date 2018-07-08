@@ -8,22 +8,20 @@ unitDef = {
   buildCostMetal                = 70,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 4,
-  buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[arm_solar_ground.dds]],
+  buildingGroundDecalSizeX      = 6,
+  buildingGroundDecalSizeY      = 6,
+  buildingGroundDecalType       = [[energysolar_aoplane.dds]],
   buildPic                      = [[energysolar.png]],
   category                      = [[SINK UNARMED STUPIDTARGET SOLAR]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Erzeugt Energie (2)]],
-    helptext       = [[Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a quarter and offers excellent protection against raiders.]],
-    helptext_de    = [[Solaranlagen sind von den Energiestrukturen die mit der geringsten Kosteneffizienz, aber sie sind auch die verlässlichsten und stabilsten unter ihnen. Sobald sie angegriffen werden ziehen sie sich in eine gepanzerte Form fur 8 Sekunden zurück, die als exzellenter Schutz gegen Raider fungiert.]],
-    pylonrange = 100,
-	aimposoffset   = [[0 16 0]],
-	midposoffset   = [[0 0 0]],
-	force_close    = 8, -- time in seconds of forced turnoff
-	removewait     = 1,
+    pylonrange      = 100,
+    aimposoffset    = [[0 16 0]],
+    midposoffset    = [[0 0 0]],
+    auto_close_time = 4, -- Unit AI off time.
+    removewait      = 1,
+    default_spacing = 0,
   },
 
   damageModifier                = 0.25,

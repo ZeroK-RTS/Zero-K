@@ -6,7 +6,7 @@ function widget:GetInfo()
 		version   = "v1",
 		date      = "Nov, 2009",
 		license   = "GNU GPL, v2 or later",
-		layer     = math.huge,
+		layer     = 999, -- Before Chili
 		enabled   = true,
 		handler   = true,
 	}
@@ -18,59 +18,59 @@ include("keysym.h.lua")
 -- Speedups
 --------------------------------------------------------------------------------
 
-local osclock	= os.clock
+local osclock           = os.clock
 
-local GL_LINE_STRIP		= GL.LINE_STRIP
-local GL_LINES			= GL.LINES
-local glVertex			= gl.Vertex
-local glLineStipple 	= gl.LineStipple
-local glLineWidth   	= gl.LineWidth
-local glColor       	= gl.Color
-local glBeginEnd    	= gl.BeginEnd
-local glPushMatrix		= gl.PushMatrix
-local glPopMatrix		= gl.PopMatrix
-local glScale			= gl.Scale
-local glTranslate		= gl.Translate
-local glLoadIdentity	= gl.LoadIdentity
-local glCallList        = gl.CallList
-local glCreateList      = gl.CreateList
-local glDepthTest		= gl.DepthTest
-local glBillboard       = gl.Billboard
-local glText            = gl.Text
+local GL_LINE_STRIP      = GL.LINE_STRIP
+local GL_LINES           = GL.LINES
+local glVertex           = gl.Vertex
+local glLineStipple      = gl.LineStipple
+local glLineWidth        = gl.LineWidth
+local glColor            = gl.Color
+local glBeginEnd         = gl.BeginEnd
+local glPushMatrix       = gl.PushMatrix
+local glPopMatrix        = gl.PopMatrix
+local glScale            = gl.Scale
+local glTranslate        = gl.Translate
+local glLoadIdentity     = gl.LoadIdentity
+local glCallList         = gl.CallList
+local glCreateList       = gl.CreateList
+local glDepthTest        = gl.DepthTest
+local glBillboard        = gl.Billboard
+local glText             = gl.Text
 
-local spGetActiveCommand 	= Spring.GetActiveCommand
-local spSetActiveCommand	= Spring.SetActiveCommand
-local spGetMouseState       = Spring.GetMouseState
+local spGetActiveCommand = Spring.GetActiveCommand
+local spSetActiveCommand = Spring.SetActiveCommand
+local spGetMouseState    = Spring.GetMouseState
 
-local spIsAboveMiniMap		= Spring.IsAboveMiniMap --
---local spGetMiniMapGeometry	= (Spring.GetMiniMapGeometry or Spring.GetMouseMiniMapState)
+local spIsAboveMiniMap        = Spring.IsAboveMiniMap --
+--local spGetMiniMapGeometry  = (Spring.GetMiniMapGeometry or Spring.GetMouseMiniMapState)
 
-local spGetSelectedUnits	= Spring.GetSelectedUnits
+local spGetSelectedUnits    = Spring.GetSelectedUnits
 
-local spGiveOrder			= Spring.GiveOrder
-local spGetUnitDefID 		= Spring.GetUnitDefID
-local spGiveOrderToUnit   	= Spring.GiveOrderToUnit
-local spGetUnitPosition		= Spring.GetUnitPosition
-local spGetModKeyState		= Spring.GetModKeyState
+local spGiveOrder           = Spring.GiveOrder
+local spGetUnitDefID        = Spring.GetUnitDefID
+local spGiveOrderToUnit     = Spring.GiveOrderToUnit
+local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetModKeyState      = Spring.GetModKeyState
 local spGetUnitBuildFacing  = Spring.GetUnitBuildFacing
 local spGetGameFrame        = Spring.GetGameFrame
 
-local spTraceScreenRay		= Spring.TraceScreenRay
-local spGetGroundHeight		= Spring.GetGroundHeight
-local spGetCurrentTooltip	= Spring.GetCurrentTooltip
+local spTraceScreenRay      = Spring.TraceScreenRay
+local spGetGroundHeight     = Spring.GetGroundHeight
+local spGetCurrentTooltip   = Spring.GetCurrentTooltip
 
-local spSendCommands 		= Spring.SendCommands
+local spSendCommands        = Spring.SendCommands
 
-local mapWidth, mapHeight 	= Game.mapSizeX, Game.mapSizeZ
+local mapWidth, mapHeight   = Game.mapSizeX, Game.mapSizeZ
 local maxUnits = Game.maxUnits
 
 local st_find = string.find
 
-local sqrt	= math.sqrt
+local sqrt  = math.sqrt
 local floor = math.floor
-local ceil = math.ceil 
-local abs = math.abs
-local modf = math.modf
+local ceil  = math.ceil 
+local abs   = math.abs
+local modf  = math.modf
 local string_format = string.format
 
 -- command IDs
@@ -121,7 +121,7 @@ local maxWallPoints = 700 -- max points that makeup a wall
 -- bounding ramp dimensions, reduces slowdown MUST AGREE WITH GADGET VALUES
 local maxRampLength = 3000
 local maxRampWidth = 800
-local minRampLength = 32
+local minRampLength = 40
 local minRampWidth = 24
 
 local startRampWidth = 60
@@ -157,6 +157,7 @@ local placingRectangle = false
 local drawingLasso = false
 local drawingRectangle = false
 local drawingRamp = false
+local simpleDrawingRamp = false
 local setHeight = false
 local terraform_type = 0 -- 1 = level, 2 = raise, 3 = smooth, 4 = ramp, 5 = restore, 6 = bump
 
@@ -218,6 +219,7 @@ local function stopCommand()
 	mouseGridDraw = false
 	placingRectangle = false
 	drawingRamp = false
+	simpleDrawingRamp = false
 	volumeSelection = 0
 	points = 0
 	terraform_type = 0
@@ -242,6 +244,7 @@ local function completelyStopCommand()
 	mouseGridDraw = false
 	placingRectangle = false
 	drawingRamp = false
+	simpleDrawingRamp = false
 	volumeSelection = 0
 	points = 0
 	terraform_type = 0
@@ -300,7 +303,7 @@ local function SendCommand()
 			i = i + 1
 		end
 		
-		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, 0)
 		if s then
 			originalCommandGiven = true
 		else
@@ -331,7 +334,7 @@ local function SendCommand()
 			i = i + 1
 		end
 		
-		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, 0)
 		if s then
 			originalCommandGiven = true
 		else
@@ -885,10 +888,19 @@ local function snapToHeight(heightArray, snapHeight, arrayCount)
 end
 
 function widget:MousePress(mx, my, button)
-
+	local screen0 = WG.Chili.Screen0
+	if screen0 and screen0.hoveredControl then
+		local classname = screen0.hoveredControl.classname
+		if not (classname == "control" or classname == "object" or classname == "panel" or classname == "window") then
+			return
+		end
+	end
 	if button == 1 and placingRectangle and placingRectangle.legalPos then
 		local activeCmdIndex, activeid = spGetActiveCommand()
 		local index = Spring.GetCmdDescIndex(CMD_LEVEL)
+		if not index then
+			return
+		end
 		spSetActiveCommand(index)
 		currentlyActiveCommand = CMD_LEVEL
 		
@@ -947,13 +959,13 @@ function widget:MousePress(mx, my, button)
 	local activeCmdIndex, activeid = spGetActiveCommand()
 	
 	if ((activeid == CMD_LEVEL) or (activeid == CMD_RAISE) or (activeid == CMD_SMOOTH) or (activeid == CMD_RESTORE) or (activeid == CMD_BUMPY)) 
-			and not (setHeight or drawingRectangle or drawingLasso or drawingRamp or placingRectangle) then
+			and not (setHeight or drawingRectangle or drawingLasso or drawingRamp or simpleDrawingRamp or placingRectangle) then
 
 		if button == 1 then
 			if not spIsAboveMiniMap(mx, my) then
 		
 				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
-				if legalPos(pos) then	
+				if legalPos(pos) then
 					widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
 					orHeight = spGetGroundHeight(pos[1],pos[3])
 					
@@ -961,8 +973,8 @@ function widget:MousePress(mx, my, button)
 					local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
 					if c and ty == "unit" and c then
 						local ud = UnitDefs[spGetUnitDefID(id)]
-						--if (ud.isBuilding == true or ud.maxAcc == 0) then
-							mouseUnit = {id = id, ud = ud}
+						--if ud.isImmobile then
+						mouseUnit = {id = id, ud = ud}
 						drawingRectangle = true
 						point[1] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
 						point[2] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
@@ -1006,13 +1018,12 @@ function widget:MousePress(mx, my, button)
 			return true
 		end
 		
-	elseif (activeid == CMD_RAMP) and not (setHeight or drawingRectangle or drawingLasso or drawingRamp or placingRectangle) then
+	elseif (activeid == CMD_RAMP) and not (setHeight or drawingRectangle or drawingLasso or drawingRamp or simpleDrawingRamp or placingRectangle) then
 		if button == 1 then
 			if not spIsAboveMiniMap(mx, my) then
-		
 				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
-				if legalPos(pos) then	
-				
+				if legalPos(pos) then
+					local a,c,m,s = spGetModKeyState()
 					widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
 					orHeight = spGetGroundHeight(pos[1],pos[3])
 					
@@ -1020,7 +1031,11 @@ function widget:MousePress(mx, my, button)
 					point[2] = {x = pos[1], y = point[1].y, z = pos[3], ground = point[1]}
 					storedHeight = orHeight
 					points = 2
-					drawingRamp = 1
+					if c or a then
+						drawingRamp = 1
+					else
+						simpleDrawingRamp = 1
+					end
 					terraform_type = 4
 					terraformHeight = startRampWidth -- width
 					mouseX = mx
@@ -1045,7 +1060,7 @@ function widget:MousePress(mx, my, button)
 		return true
 	end
 
-	if drawingLasso or setHeight or drawingRamp or drawingRectangle or placingRectangle then
+	if drawingLasso or setHeight or drawingRamp or simpleDrawingRamp or drawingRectangle or placingRectangle then
 		if button == 3 then
 			completelyStopCommand()
 			return true
@@ -1255,7 +1270,7 @@ function widget:Update(dt)
 			end
 		end
 	
-	elseif drawingRamp == 2 then
+	elseif drawingRamp == 2 or simpleDrawingRamp == 1 then
 		local mx,my = spGetMouseState()
 		local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 		if legalPos(pos) then
@@ -1264,12 +1279,15 @@ function widget:Update(dt)
 				orHeight = spGetGroundHeight(pos[1],pos[3])
 				storedHeight = orHeight
 				if dis < minRampLength then
-					point[2] = {
-						x = point[1].x+minRampLength*(pos[1]-point[1].x)/dis, 
-						y = orHeight, 
-						z = point[1].z+minRampLength*(pos[3]-point[1].z)/dis, 
-						ground = orHeight
-					}
+					-- Do not draw really short ramps.
+					if dis > minRampLength*0.3 or (point[2].x ~= point[1].x) then
+						point[2] = {
+							x = point[1].x+minRampLength*(pos[1]-point[1].x)/dis, 
+							y = orHeight, 
+							z = point[1].z+minRampLength*(pos[3]-point[1].z)/dis, 
+							ground = orHeight
+						}
+					end
 				elseif dis > maxRampLength then
 					point[2] = {
 						x = point[1].x+maxRampLength*(pos[1]-point[1].x)/dis, 
@@ -1315,7 +1333,7 @@ function widget:Update(dt)
 		end
 		if pos and legalPos(pos) and options.holdMouseForStructureTerraform.value then
 			if buildingPress then
-				if pos[1] ~= buildingPress.pos[1] or pos[3] ~= buildingPress.pos[3] then
+				if math.abs(pos[1] - buildingPress.pos[1]) >= 4 or math.abs(pos[3] - buildingPress.pos[3]) >= 4 then
 					local a,c,m,s = spGetModKeyState()
 					if s then
 						buildingPress.frame = false
@@ -1436,7 +1454,7 @@ function widget:MouseRelease(mx, my, button)
 				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				if legalPos(pos) then
 					
-					if mouseUnit.id and point[1].x == point[2].x and point[1].z == point[2].z then
+					if mouseUnit.id then
 						local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
 						if ty == "unit" and id == mouseUnit.id then
 							
@@ -1668,7 +1686,22 @@ function widget:MouseRelease(mx, my, button)
 			return true
 		end
 	
+	elseif simpleDrawingRamp == 1 and button == 1 then
+		if math.abs(point[1].x - point[2].x) + math.abs(point[1].z - point[2].z) < 10 then
+			mouseX = mx
+			mouseY = my
+			drawingRamp = 2
+			simpleDrawingRamp = false
+		else
+			mouseX = mx
+			mouseY = my
+			setHeight = true
+			drawingRamp = false
+			simpleDrawingRamp = false
+		end
+		return true
 	end
+	
 	return false
 end
 
@@ -1697,7 +1730,7 @@ end
 function widget:KeyPress(key)
 	
 	if key == KEYSYMS.ESCAPE then
-		if drawingLasso or setHeight or drawingRamp or drawingRectangle or placingRectangle then
+		if drawingLasso or setHeight or drawingRamp or simpleDrawingRamp or drawingRectangle or placingRectangle then
 			completelyStopCommand()
 			return true
 		end
@@ -1706,7 +1739,7 @@ function widget:KeyPress(key)
 	if key == KEYSYMS.SPACE and ( 
 		(terraform_type == 1 and (setHeight or drawingLasso or placingRectangle or drawingRectangle)) or 
 		(terraform_type == 3 and (drawingLasso or drawingRectangle)) or 
-		(terraform_type == 4 and (setHeight or drawingRamp or drawingRectangle)) or 
+		(terraform_type == 4 and (setHeight or drawingRamp or simpleDrawingRamp or drawingRectangle)) or 
 		(terraform_type == 5 and (drawingLasso or drawingRectangle))
 	) then
 		volumeSelection = volumeSelection+1
@@ -1853,7 +1886,7 @@ end
 
 
 function widget:DrawWorld()
-	if not (drawingLasso or setHeight or drawingRectangle or drawingRamp or placingRectangle) then
+	if not (drawingLasso or setHeight or drawingRectangle or drawingRamp or simpleDrawingRamp or placingRectangle) then
 		widgetHandler:RemoveWidgetCallIn("DrawWorld", self)
 		return
 	end

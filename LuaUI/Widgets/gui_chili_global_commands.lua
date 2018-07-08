@@ -16,6 +16,7 @@ local BUTTON_Y = 0
 local BUTTON_SIZE = 25
 local BUTTON_PLACE_SPACE = 27
 
+local mainWindow
 local contentHolder
 local commandButtonOffset
 
@@ -145,6 +146,24 @@ options = {
 		hidden = true,
 		noHotkey = true,
 	},
+	hide = {
+		name = 'Hide GBC',
+		desc = 'Hides the Global Bar of Commands.',
+		type = 'bool',
+		value = false,
+		hidden = true, -- hidden on purpose
+		noHotkey = true,
+		OnChange = function (self)
+			if not mainWindow then
+				return
+			end
+			if self.value then
+				mainWindow:Hide()
+			else
+				mainWindow:Show()
+			end
+		end,
+	},
 }
 
 local function languageChanged ()
@@ -203,7 +222,7 @@ local commandButtonMouseDown = {
 		if not meta then 
 			return false
 		end
-		WG.crude.OpenPath("Settings/Hotkeys/Commands")
+		WG.crude.OpenPath("Hotkeys/Commands")
 		WG.crude.ShowMenu() --make epic Chili menu appear.
 		return true
 	end 
@@ -411,7 +430,7 @@ local function AddCommand(imageFile, tooltip, onClick)
 end
 
 local function InitializeControls()
-	local mainWindow = Window:New{
+	mainWindow = Window:New{
 		name      = 'globalCommandsWindow',
 		x         = 0, 
 		y         = 0,
@@ -424,11 +443,14 @@ local function InitializeControls()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		padding = {0, 0, 0, 0},
+		padding = {0, -1, 0, 0},
 		color = {0, 0, 0, 0},
 		parent = screen0,
 	}
-	
+	if options.hide.value then
+		mainWindow:Hide()
+	end
+
 	contentHolder = Panel:New{
 		classname = options.fancySkinning.value,
 		x = 0,
@@ -482,7 +504,7 @@ local function InitializeControls()
 	offset = offset + 0.5
 	
 	buttons.place_retreat_zone = MakeCommandButton(contentHolder, offset,
-		'LuaUI/images/commands/Bold/retreat.png', 
+		'LuaUI/images/commands/Bold/retreat.png',
 		{action = 'sethaven', command = CMD_RETREAT_ZONE}
 	)
 	offset = offset + 1

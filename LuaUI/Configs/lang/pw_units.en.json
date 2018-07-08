@@ -2,7 +2,7 @@
 	"pw_artefact" : {
 		"name" : "Ancient Artefact",
 		"description" : "Mysterious Relic",
-		"helptext" : "This mysterious alien device houses unimaginable powers. Although it remains poorly understood by our scientists, it could potentially be harnessed as a galaxy-dominating superweapon. The artefact is invulnerable to all known weapons."
+		"helptext" : "This mysterious alien device houses unimaginable powers. Although it remains poorly understood by our scientists, it could potentially be harnessed as a galaxy-dominating superweapon."
 	},
 	"pw_bomberfac" : {
 		"name" : "Bomber Factory",
@@ -108,5 +108,10 @@
 		"name" : "Tech Lab",
 		"description" : "Unlocks tech",
 		"helptext" : "This structure unlocks a specific tech for its owning faction."
+	},
+	"pw_techlab" : {
+		"name" : "Tech Lab",
+		"description" : "Contains powerful ancient technology" ,
+		"helptext" : "This structure contains some powerful technology."
 	}
 }

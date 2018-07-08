@@ -19,11 +19,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_de = [[Skirmisher Gleiter (Anti-Heavy)]],
-    description_fr = [[Hovercraft Tirailleur]],
-    helptext       = [[Use the Scalpel for hit-and-run attacks. Has a long reload time and not too many hit points, and should always be kept at range with the enemy. An arcing projectile allows it to shoot over obstacles and friendly units.]],
-    helptext_de    = [[Nutze den Scalpel für Schlag-und-Renn Attacken. Er hat eine lange Nachladezeit und nicht allzu viele Lebenspunkte. Er sollte immer auf Distanz zum Feind gehalten werden. Die bogenförmige Schussbahn ermöglicht es über Hindernisse und freundliche Einheiten zu schießen.]],
-    helptext_fr    = [[Le Scalpel est un tirailleur, il est utile pour harrasser l'ennemi ? l'aide de son lance roquette. Il tire des roquettes ? t?te chercheuse au dessus des obstacles, mais son temps de rechargement, sa maniabilit? et son faible blindage le rendent vuln?rable aux contre attaques.]],
 	modelradius    = [[19]],
 	turnatfullspeed = [[1]],
   },
@@ -41,7 +36,6 @@ unitDef = {
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
-  moveState           = 0,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[nsaclash.s3o]],
@@ -85,6 +79,8 @@ unitDef = {
       craterMult              = 1.4,
 	  
       customParams        = {
+		burst = Shared.BURST_RELIABLE,
+
 		light_camera_height = 3000,
 		light_color = [[1 0.58 0.17]],
 		light_radius = 200,

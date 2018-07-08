@@ -16,6 +16,7 @@ local knee = {piece 'lknee', piece 'rknee'}
 local heel = {piece 'lheel', piece 'rheel'}
 
 local smokePiece = {chest, exhaust, muzzle}
+local RELOAD_PENALTY = tonumber(UnitDefs[unitDefID].customParams.reload_move_penalty)
 
 local SIG_Aim = 1
 local SIG_Walk = 2
@@ -27,19 +28,22 @@ local function Walk()
 		Turn (foot[i], z_axis, 0, math.rad(135))
 	end
 
+	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 
 	local side = 1
+	local speedMult = 1
 	while true do
-		Turn (shin[side], x_axis, math.rad(85), math.rad(260))
-		Turn (thigh[side], x_axis, math.rad(-100), math.rad(135))
-		Turn (thigh[3-side], x_axis, math.rad(30), math.rad(135))
+		speedMult = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+		Turn (shin[side], x_axis, math.rad(85), speedMult*math.rad(260))
+		Turn (thigh[side], x_axis, math.rad(-100), speedMult*math.rad(135))
+		Turn (thigh[3-side], x_axis, math.rad(30), speedMult*math.rad(135))
 
 		WaitForMove (hips, y_axis)
-		Move (hips, y_axis, 3, 9)
+		Move (hips, y_axis, 3, speedMult*9)
 		WaitForMove (hips, y_axis)
-		Turn (shin[side], x_axis, math.rad(10), math.rad(315))
-		Move (hips, y_axis, 0, 9)
+		Turn (shin[side], x_axis, math.rad(10), speedMult*math.rad(315))
+		Move (hips, y_axis, 0, speedMult*9)
 
 		side = 3 - side
 	end
@@ -72,6 +76,37 @@ function script.Create()
 	Turn (chest, y_axis, math.rad(-20))
 end
 
+local function ReloadPenaltyAndAnimation()
+	aimBlocked = true
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", RELOAD_PENALTY)
+	GG.UpdateUnitAttributes(unitID)
+
+	Sleep(200)
+	Turn (gun, x_axis, 1, math.rad(120))
+	Turn (turner, y_axis, 0, math.rad(200))
+	
+	Sleep(2300) -- 3.5 second reload so no point checking earlier.
+	while true do
+		local state = Spring.GetUnitWeaponState(unitID, 1, "reloadState")
+		local gameFrame = Spring.GetGameFrame()
+		if state - 32 < gameFrame then
+			aimBlocked = false
+			
+			Sleep(500)
+			Turn (gun, x_axis, 0, math.rad(100))
+			Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+			GG.UpdateUnitAttributes(unitID)
+			return
+		end
+		Sleep(340)
+	end
+end
+
+function OnLoadGame()
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	GG.UpdateUnitAttributes(unitID)
+end
+
 function script.AimFromWeapon(num)
 	return gunemit
 end
@@ -90,7 +125,10 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
-
+	if aimBlocked then
+		return false
+	end
+	
 	Turn (hips, x_axis, 0)
 	Turn (chest, x_axis, 0)
 	Turn (gun, x_axis, -pitch, math.rad(100))
@@ -106,6 +144,7 @@ end
 
 function script.FireWeapon(num)
 	EmitSfx (exhaust, 1024)
+	StartThread(ReloadPenaltyAndAnimation)
 end
 
 function script.BlockShot(num, targetID)

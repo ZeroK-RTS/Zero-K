@@ -11,12 +11,14 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND SINK]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeType    = [[ellipsoid]], 
   corpse                 = [[DEAD]],
 
   customParams           = {
     amph_regen = 5,
     amph_submerged_at = 40,
-    helptext       = [[The Duck is the basic underwater raider. Armed with short ranged torpedoes, it uses its (relatively) high speed to harass sea targets that cannot shoot back, though it dies to serious opposition. On land it can launch the torpedoes a short distance as a decent short ranged anti-heavy weapon.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -74,6 +76,8 @@ unitDef = {
       craterMult              = 2,
 
 	  customparams = {
+		burst = Shared.BURST_RELIABLE,
+
 		light_color = [[1 0.6 0.2]],
 		light_radius = 180,
 	  },

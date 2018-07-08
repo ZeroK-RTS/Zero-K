@@ -67,8 +67,9 @@ end
 function script.Create()
 	Hide (gunL)
 	Hide (gunR)
-	Move (aimpoint, z_axis, 9)
-	Move (aimpoint, y_axis, 4)
+	Move (aimpoint, z_axis, -4)
+	Move (aimpoint, y_axis, 0)
+	Move (aimpoint, x_axis, -9)
 	StartThread(SmokeUnit, smokePiece)
 end
 

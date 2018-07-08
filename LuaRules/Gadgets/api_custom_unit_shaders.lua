@@ -43,8 +43,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-if (not gl.CreateShader) then
-  return false
+if not gl.CreateShader then
+	Spring.Log("CUS", LOG.WARNING, "Shaders not supported, disabling")
+	return
 end
 
 --------------------------------------------------------------------------------
@@ -140,10 +141,17 @@ local function CompileShader(shader, definitions, plugins)
   --// (this way we can modularize a shader and enable/disable features in it)
   if (definitions or shadows) then
     definitions = definitions or {}
-    definitions = table.concat(definitions, "\n")
-    if (shadows) then
-      definitions = definitions .. "\n" .. "#define use_shadows" .. "\n"
+    hasVersion = false
+    for _, def in pairs(definitions) do
+      hasVersion = hasVersion or string.sub(def,1,string.len("#version")) == "#version"
     end
+    if not hasVersion then
+      table.insert(definitions, 1, "#version 130")
+    end
+    if (shadows) then
+      table.insert(definitions, "#define use_shadows")
+    end
+    definitions = table.concat(definitions, "\n") .. "\n"
     if (shader.vertex)
       then shader.vertex = definitions .. shader.vertex; end
     if (shader.fragment)
@@ -154,8 +162,21 @@ local function CompileShader(shader, definitions, plugins)
 
   local GLSLshader = gl.CreateShader(shader)
   local errorLog = gl.GetShaderLog()
-  if (errorLog and errorLog~= "") then
-    Spring.Echo("Custom Unit Shaders:", errorLog)
+  if not GLSLshader or errorLog ~= "" then
+    local function log (x)
+      Spring.Log("CUS", GLSLshader and LOG.NOTICE or LOG.ERROR, x)
+    end
+
+    if not GLSLshader then -- failing shaders are technically a runtime error
+      log("LUA_ERRSHADER") -- but LUA_ERRRUN gets picked up by crash reporter
+    end                    -- and we don't want to spam people with popups
+                           -- since they aren't likely to lead to any change
+
+    log("CUS shader log -----------------------------\n" .. errorLog)
+    log("Vertex -------------------------------------\n" .. (shader.vertex   or "nil"))
+    log("Fragment -----------------------------------\n" .. (shader.fragment or "nil"))
+    log("Geometry -----------------------------------\n" .. (shader.geometry or "nil"))
+    log("CUS end ------------------------------------")
   end
 
   shader.vertex   = shader.vertexOrig

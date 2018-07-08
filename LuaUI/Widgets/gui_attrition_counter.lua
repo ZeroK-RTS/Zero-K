@@ -69,7 +69,7 @@ local icon_other_bars
 
 -- local ICON_LOST_FILE = 'luaui/images/AttritionCounter/chicken.png'
 local ICON_KILLS_FILE = 'luaui/images/AttritionCounter/skull.png'
-local ICON_METAL_FILE = 'luaui/images/ibeam.png'
+local ICON_METAL_FILE = 'luaui/images/costIcon.png'
 
 local font -- dummy, need this to call GetTextWidth without looking up an instance
 
@@ -406,8 +406,9 @@ function CreateWindow()
 		color = {1,1,1,0.8},
 		parent = Chili.Screen0,
 		dockable = true,
+		dockableSavePositionOnly = true,
 		name = "AttritionCounter",
-		classname = "main_window_small_flat",
+		classname = "main_window_small_very_flat",
 		padding = {0,0,0,0},
 		margin = {0,0,0,0},
 		right = 0,

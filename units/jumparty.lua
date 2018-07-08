@@ -11,12 +11,12 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[55 55 55]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Artillerieroboter für Sättigungsfeuer]],
-    helptext       = [[The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
-	helptext_de    = [[Der Firewalker setzt mit seinem Mörser auf mittlerer Distanz Gebiete in Brand und macht sie somit für kurze Zeit unbrauchbar. Die Einheit selber ist schwerfällig und langsam zu manövrieren.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -32,11 +32,10 @@ unitDef = {
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT4]],
-  moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[firewalker.s3o]],
-  script				 = [[jumparty.lua]],
+  script                 = [[jumparty.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -77,7 +76,6 @@ unitDef = {
 	  avoidFeature            = false,
       craterBoost             = 1,
       craterMult              = 2,
-      cegTag                  = [[custom:gravityless_flamer]],
 
 	  customParams        	  = {
 	    setunitsonfire = "1",
@@ -159,7 +157,7 @@ unitDef = {
       size                    = 5,
       soundHit                = [[weapon/cannon/wolverine_hit]],
       soundStart              = [[weapon/cannon/wolverine_fire]],
-      soundStartVolume        = 3.8,
+      soundStartVolume        = 3.2,
       sprayangle              = 2500,
       turret                  = true,
       weaponType              = [[Cannon]],

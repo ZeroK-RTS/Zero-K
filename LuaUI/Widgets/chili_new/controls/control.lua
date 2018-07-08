@@ -366,14 +366,18 @@ function Control:UpdateClientArea(dontRedraw)
     --FIXME sometimes this makes self:RequestRealign() redundant! try to reduce the Align() calls somehow
     self.parent:RequestRealign()
   end
+  local needResize = false
   if (self.width ~= self._oldwidth_uca)or(self.height ~= self._oldheight_uca) then
     self:RequestRealign()
+    needResize = true
     self._oldwidth_uca  = self.width
     self._oldheight_uca = self.height
   end
 
   if not dontRedraw then self:Invalidate() end --FIXME only when RTT!
-  self:CallListeners(self.OnResize, self.clientWidth, self.clientHeight) --FIXME more arguments and filter unchanged resizes
+  if needResize then
+    self:CallListeners(self.OnResize, self.clientWidth, self.clientHeight)
+  end
 end
 
 
@@ -1382,6 +1386,10 @@ function Control:HitTest(x,y)
     return self
   end
 
+  if self.noClickThrough and not IsTweakMode() then
+    return self
+  end
+  
   return false
 end
 
@@ -1409,6 +1417,10 @@ function Control:MouseDown(x, y, ...)
     if (result) then
       return result
     end
+  end
+
+  if self.noClickThrough and not IsTweakMode() then
+    return self
   end
 end
 

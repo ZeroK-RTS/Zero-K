@@ -73,7 +73,7 @@ function widget:Update(deltaTime)
        else
          z = z - math.random(50,100)
        end
-       GiveOrderToUnit(unitID, CMD.FIGHT,  { x, y, z}, { "" })
+       GiveOrderToUnit(unitID, CMD.FIGHT,  { x, y, z},  0)
      end
    end
    moveUnits = {}
@@ -96,7 +96,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
  end
    
  local ud = UnitDefs[unitDefID]
- if (ud and (not ud.customParams.commtype) and (ud.speed > 0)) then
+ if (ud and (not ud.customParams.commtype) and not ud.isImmobile) then
    checkSpec()
    moveUnits[unitID] = true
    countDown = 0

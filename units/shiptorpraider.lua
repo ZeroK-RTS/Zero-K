@@ -13,14 +13,12 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[SHIP]],
-  collisionVolumeOffsets = [[0 -1 0]],
-  collisionVolumeScales  = [[20 20 40]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[28 28 55]],
   collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
   customParams        = {
-
-    helptext       = [[The Torpedo Boat is a mobile raider and anti-submarine unit. It is effective against underwater units and large vessels.]],
 	modelradius    = [[14]],
 	turnatfullspeed = [[1]],
   },
@@ -28,8 +26,8 @@ unitDef = {
 
   explodeAs           = [[SMALL_UNITEX]],
   floater             = true,
-  footprintX          = 2,
-  footprintZ          = 2,
+  footprintX          = 3,
+  footprintZ          = 3,
   iconType            = [[shiptorpraider]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
@@ -76,6 +74,10 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
+
+			customParams = {
+				burst = Shared.BURST_RELIABLE,
+			},
 
       damage                  = {
 

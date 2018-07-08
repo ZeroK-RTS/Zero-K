@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehraid]],
   name                   = [[Scorcher]],
-  description            = [[Raider Vehicle]],
+  description            = [[Raider Rover]],
   acceleration           = 0.057,
   brakeRate              = 0.07,
   buildCostMetal         = 130,
@@ -14,14 +14,12 @@ unitDef = {
   collisionVolumeOffsets = [[0 -5 0]],
   collisionVolumeScales  = [[26 26 36]],
   collisionVolumeType    = [[cylZ]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[28 28 34]],
+  selectionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[V?hicule Pilleur]],
-	description_de = [[Raiderfahrzeug]],
-    helptext       = [[Capable of taking damage and dishing it out, the Scorcher is a versatile unit that remains very useful for more than just raiding, though it pays the price in manueverability and in cost. Though able to hold its own in combat, it is no match for anti-swarm and riot units or defenses. The Scorcher's heatray deals more damage up close.]],
-    helptext_fr    = [[Le Scorcher est rapide et solide. ?quip? d'une mitrailleuse laser il saura faire face de lui m?me ? un combat et ses nano-robots auto r?g?nerants se chargeront de le remettre sur pied pour la suite. Particuli?rement allergique aux anti-nu?es et au ?meutiers.]],
-    helptext_de    = [[Der Scorcher ist fähig Schaden einzustecken und auszuteilen, was ihn zu einer vielseitigen Einheit macht, welche für mehr als nur Überfälle nützlich ist. All das aber zum Preis der Manövrierfähigkeit und der Kosten. Obwohl er sich im Kampf meist gut schlägt, taugt er nichts gegen Antischwarm- und Rioteinheiten oder Verteidigung. Der Scorcher mehr Schaden verursacht, je naher er ist.]],
 	modelradius    = [[10]],
   },
 
@@ -56,7 +54,7 @@ unitDef = {
   trackStrength          = 5,
   trackStretch           = 1,
   trackType              = [[StdTank]],
-  trackWidth             = 21,
+  trackWidth             = 28,
   turninplace            = 0,
   turnRate               = 703,
   workerTime             = 0,

@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[spidercrabe]],
-  name                   = [[Crabe]],
+  name                   = [[Crab]],
   description            = [[Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary]],
   acceleration           = 0.22,
   brakeRate              = 0.18,
@@ -16,11 +16,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Marcheur arachnide lourd]],
-	description_de = [[Schwere Riot/Skirmish Spinne - Zieht sich bei Stillstand in seine Panzerung zurück]],
-	helptext       = [[The Crabe's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crabe curls up into armored form reducing incoming damage to a third. The Crabe's main weakness is its lack of mobility.]],
-    helptext_de    = [[Die große Panzerung kann auch große Gruppen von billigen Einheiten wegstecken, sowie grundlegende Verteidigung. Sobald die Spinne zum Stillstand kommt, zieht sie sich in die gepanzerte Form zurück: ein gewaltiger Verteidigungsturm. Der Nachteil ist die große Bewegungseinschränkung.]],
-    helptext_fr    = [[Le canon à plasma lourd du Crabe peut éliminer facilement les défenses basiques ainsi que des hordes d'unités énemies légères grâce à son importante aire d'effet. Lorsqu'il s'arrête de marcher, le Crabe se replie sur lui-même, ses pattes formant une carapace blindée autour de lui réduisant les dommages qu'il reçoit à un tier. Sa faiblesse tient en sa lenteur, tant de déplacement que de tir.]],
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 -10 0]],
 	modelradius    = [[30]],
@@ -70,7 +65,8 @@ unitDef = {
 
     {
       def                = [[ARM_CRABE_GAUSS]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+      badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
   },

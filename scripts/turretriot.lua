@@ -17,7 +17,7 @@ local function RestoreAfterDelay()
 	Turn (sleeve, x_axis, 0, math.rad(10))
 end
 
-local function StunThread ()
+local function StunThread()
 	Signal (SigAim)
 	SetSignalMask(SigAim)
 	disarmed = true
@@ -26,20 +26,21 @@ local function StunThread ()
 	StopTurn (sleeve, x_axis)
 end
 
-local function UnstunThread ()
+local function UnstunThread()
 	disarmed = false
 	SetSignalMask(SigAim)
 	RestoreAfterDelay()
 end
 
-function Stunned (stun_type)
+function Stunned(stun_type)
 	stuns[stun_type] = true
-	StartThread (StunThread)
+	StartThread(StunThread)
 end
-function Unstunned (stun_type)
+
+function Unstunned(stun_type)
 	stuns[stun_type] = false
 	if not stuns[1] and not stuns[2] and not stuns[3] then
-		StartThread (UnstunThread)
+		StartThread(UnstunThread)
 	end
 end
 
@@ -48,8 +49,13 @@ function script.Create()
 	Turn (ejector, y_axis, math.rad(-90))
 end
 
-function script.QueryWeapon() return muzzle end
-function script.AimFromWeapon() return turret end
+function script.QueryWeapon()
+	return muzzle
+end
+
+function script.AimFromWeapon()
+	return turret
+end
 
 function script.AimWeapon (num, heading, pitch)
 
@@ -61,7 +67,7 @@ function script.AimWeapon (num, heading, pitch)
 	end
 
 	StartThread (RestoreAfterDelay)
-	local slowMult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 	Turn (turret, y_axis, heading, math.rad(360)*slowMult)
 	Turn (sleeve, x_axis, -pitch, math.rad(360)*slowMult)
 	WaitForTurn (turret, y_axis)

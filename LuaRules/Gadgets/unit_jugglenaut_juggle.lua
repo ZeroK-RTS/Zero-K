@@ -1,7 +1,7 @@
 function gadget:GetInfo()
   return {
-    name      = "Jugglenaut Juggle",
-    desc      = "Implementes special weapon Juggling for Jugglenaut",
+    name      = "Old Jugglenaut Juggle",
+    desc      = "Implementes special weapon Juggling for Old Jugglenaut",
     author    = "Google Frog",
     date      = "1 April 2011",
     license   = "GNU GPL, v2 or later",
@@ -116,7 +116,7 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-function gadget:Explosion(weaponID, px, py, pz, ownerID)	
+function gadget:Explosion(weaponID, px, py, pz, ownerID)
 	if throwWeaponID[weaponID] and ownerID then
 		local frame = Spring.GetGameFrame()
 		local sx,sy,sz = Spring.GetUnitPosition(ownerID)

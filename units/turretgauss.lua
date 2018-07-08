@@ -12,17 +12,15 @@ unitDef = {
   buildPic                      = [[turretgauss.png]],
   canMove                       = false,
   category                      = [[SINK TURRET]],
-  collisionVolumeOffsets        = [[0 20 0]],
+  collisionVolumeOffsets        = [[0 5 0]],
   collisionVolumeScales         = [[28 40 28]],
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Versteckter Gaussturm]],
-    helptext       = [[The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it recieves a quarter of incoming damage as well as small amount of health regeneration. It can also attack underwater targets.]],
-    helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Gausswerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es viermal schwerer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht. Es kann auch U-Booten schiessen.]],
     modelradius    = [[15]],
-	aimposoffset   = [[0 25 0]],
+    midposoffset   = [[0 15 0]],
+    aimposoffset   = [[0 25 0]],
     armored_regen  = [[20]],
   },
 
@@ -84,6 +82,8 @@ unitDef = {
       craterMult              = 0,
 
       customParams = {
+		burst = Shared.BURST_RELIABLE,
+
         single_hit = true,
       },
 
@@ -115,7 +115,7 @@ unitDef = {
       turret                  = true,
       waterweapon			  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 2200,
+      weaponVelocity          = 1200,
     },
 
   },

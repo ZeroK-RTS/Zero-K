@@ -1,4 +1,5 @@
 mini_nuke.wav - Open LieroX
+mini_nuke_2.wav - contributed by Apelsinsaft (CC-BY)
 unit_explosion.wav - Astro Menace and Nanoblobs
 
 

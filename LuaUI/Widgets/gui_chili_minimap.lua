@@ -84,7 +84,7 @@ local function AdjustToMapAspectRatio(w, h, buttonRight)
 	if w/h < mapRatio then
 		return w + wPad, w/mapRatio + hPad
 	end
-	return h*mapRatio + wPad, h + hPad
+	return math.ceil(h*mapRatio + wPad), math.ceil(h + hPad)
 end
 
 local function AdjustMapAspectRatioToWindow(x,y,w,h)
@@ -105,6 +105,7 @@ end
 
 options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
+local hotkeysPath = 'Hotkeys/Misc'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map/Radar Color'
 local radar_path_edit = 'Settings/Interface/Map/Radar Color'
@@ -159,46 +160,52 @@ options_order = {
 	'fancySkinning',
 }
 options = {
-	label_drawing = { type = 'label', name = 'Map Drawing and Messaging', },
+	label_drawing = { type = 'label', name = 'Map Drawing and Messaging', path = hotkeysPath},
 	
 	drawinmap = {
 		name = 'Map Drawing Hotkey',
 		desc = 'Hold this hotkey to draw on the map and write messages. Left click to draw, right click to erase, middle click to place a marker. Double left click to type a marker message.',
 		type = 'button',
 		action = 'drawinmap',
+		path = hotkeysPath,
 	},
 	clearmapmarks = {
 		name = 'Erase Map Drawing',
 		desc = 'Erases all map drawing and markers (for you, not for others on your team).',
 		type = 'button',
 		action = 'clearmapmarks',
+		path = hotkeysPath,
 	},	
 	lastmsgpos = {
 		name = 'Zoom To Last Message',
 		desc = 'Moves the camera to the most recently placed map marker or message.',
 		type = 'button',
 		action = 'lastmsgpos',
+		path = hotkeysPath,
 	},	
 	
-	lblViews = { type = 'label', name = 'Map Overlays', },
+	lblViews = { type = 'label', name = 'Map Overlays', path = hotkeysPath},
 
 	viewstandard = {
 		name = 'Clear Overlays',
 		desc = 'Disables Heightmap, Pathing and Line of Sight overlays.',
 		type = 'button',
 		action = 'showstandard',
+		path = hotkeysPath,
 	},
 	viewheightmap = {
 		name = 'Toggle Height Map',
 		desc = 'Shows contours of terrain elevation.',
 		type = 'button',
 		action = 'showelevation',
+		path = hotkeysPath,
 	},
 	viewblockmap = {
 		name = 'Toggle Pathing Map',
 		desc = 'Select a unit to see where it can go. Select a building blueprint to see where it can be placed.',
 		type = 'button',
 		action = 'showpathtraversability',
+		path = hotkeysPath,
 	},
 	
 	viewfow = {
@@ -206,6 +213,7 @@ options = {
 		desc = 'Shows sight distance and radar coverage.',
 		type = 'button',
 		action = 'togglelos',
+		path = hotkeysPath,
 	},
 	
 	showeco = {
@@ -220,7 +228,8 @@ options = {
 				WG.ToggleShoweco()
 			end
 		end,
-	},	
+		path = hotkeysPath,
+	},
 	
 	lable_initialView = { type = 'label', name = 'Initial Map Overlay', },
 	
@@ -586,7 +595,8 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		return
 	end
 	if not updateRunOnceRan then
-		if Spring.GetGameFrame() > 0 then
+		local frame = (Spring.GetGameRulesParam("totalSaveGameFrame") or 0) + Spring.GetGameFrame()
+		if frame > 0 then
 			setSensorState(options.initialSensorState.value)
 			updateRadarColors()
 		end
@@ -717,7 +727,7 @@ MakeMinimapWindow = function()
 		
 		margin = {0,0,0,0},
 		padding = {8,8,8,8},
-		backgroundColor = bgColor_panel
+		backgroundColor = bgColor_panel,
 	}
 
 	buttons_panel = Chili.StackPanel:New{
@@ -1041,7 +1051,7 @@ function widget:DrawScreen()
 		cx,cy,cw,ch = AdjustMapAspectRatioToWindow(cx,cy,cw,ch)
 	end
 	
-	local vsx,vsy = gl.GetViewSizes()
+	local vsx,vsy = Spring.GetViewSizes()
 	if (lw ~= cw or lh ~= ch or lx ~= cx or ly ~= cy or last_window_x ~= window.x or last_window_y ~= window.y) then
 		lx = cx
 		ly = cy
@@ -1051,9 +1061,11 @@ function widget:DrawScreen()
 		last_window_y = window.y
 		
 		cx,cy = map_panel:LocalToScreen(cx,cy)
-		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
+		gl.ConfigMiniMap(cx*(WG.uiScale or 1),(vsy-ch-cy)*(WG.uiScale or 1),cw*(WG.uiScale or 1),ch*(WG.uiScale or 1))
+		WG.MinimapPosition = {cx,cy,cw,ch}
+		WG.MinimapPositionSpringSpace = {cx, vsy - cy - ch,cw,ch}
 	end
-
+	
 	-- Do this even if the fadeShader can't exist, just so that all hiding code still behaves properly
 	local alpha = 1
 	local alphaMin = options.fadeMinimapOnZoomOut.value == 'full' and 0.0 or 0.3
@@ -1099,24 +1111,22 @@ function widget:DrawScreen()
 	gl.PushMatrix()
 
 	if fbo ~= nil and fadeShader ~= nil then
-
 		gl.ActiveFBO(fbo, DrawMiniMap)
+		gl.Blending(true)
 
-	  gl.Blending(true)
+		-- gl.Color(1,1,1,alpha)
+		gl.Texture(0, offscreentex)
+		gl.UseShader(fadeShader)
+		gl.Uniform(alphaLoc, alpha)
+		local px, py = window.x + lx, vsy - window.y - ly
+		gl.Uniform(boundsLoc, (px/vsx), ((py - lh)/vsy), (lw/vsx), (lh/vsy))
+		gl.Uniform(screenLoc, vsx, vsy)
+		-- Spring.Echo("Bounds: "..(window.x + lx)/vsx..", "..(window.y + ly)/vsy..", "..((window.x + lx) + lw)/vsx..", "..((window.y + ly) + lh)/vsy)
+		gl.TexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
 
-	  -- gl.Color(1,1,1,alpha)
-	  gl.Texture(0, offscreentex)
-	  gl.UseShader(fadeShader)
-	  gl.Uniform(alphaLoc, alpha)
-	  local px, py = window.x + lx, vsy - window.y - ly
-	  gl.Uniform(boundsLoc, px/vsx, (py - lh)/vsy, lw/vsx, lh/vsy)
-	  gl.Uniform(screenLoc, vsx, vsy)
-	  -- Spring.Echo("Bounds: "..(window.x + lx)/vsx..", "..(window.y + ly)/vsy..", "..((window.x + lx) + lw)/vsx..", "..((window.y + ly) + lh)/vsy)
-	  gl.TexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
-
-	  gl.Texture(0, false)
-	  gl.Blending(false)
-	  gl.UseShader(0)
+		gl.Texture(0, false)
+		gl.Blending(false)
+		gl.UseShader(0)
 	elseif (alpha > 0.01) then
 		glDrawMiniMap()
 	end

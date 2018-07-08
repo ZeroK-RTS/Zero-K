@@ -16,8 +16,8 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-	helptext       = [[This structure offers benefits to the faction holding the planet. Only members of the attacking or defending factions can harm it.]],
-  	dontcount = [[1]],
+    dontcount = [[1]],
+    planetwars_structure = [[1]],
   },
 
   energyUse                     = 0,
@@ -33,7 +33,7 @@ unitDef = {
   maxVelocity                   = 0,
   minCloakDistance              = 150,
   noAutoFire                    = false,
-  objectName                    = [[pw_techlab.obj]],
+  objectName                    = [[pw_techlab.dae]],
   reclaimable                   = false,
   script                        = [[nullscriptWithCorpse.lua]],
   selfDestructAs                = [[ATOMIC_BLAST]],

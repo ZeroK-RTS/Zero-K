@@ -29,6 +29,7 @@ local alpha = 1
 local timer = 0
 
 local vsx, vsy, sMidX, sMidY = 0, 0, 0, 0
+local uiScale = 1
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- NOTE: drawArrow can be a number to force an angle
@@ -97,9 +98,9 @@ end
 --------------------------------------------------------------------------------
 
 local function DrawArrow(x, y, controlWidth, controlHeight, color, angle)
-  controlHeight = controlHeight/2 + vsy * 0.02 * alpha
-  local halfWidth = vsx*0.01
-  local height = vsy*0.06
+  controlHeight = (controlHeight/2 + vsy * 0.02 * alpha) * uiScale
+  local halfWidth = vsx*0.01 * uiScale
+  local height = vsy*0.06 * uiScale
   local vertices = {
     {v = {0, controlHeight, 0}},
     {v = {-halfWidth, controlHeight + height, 0}},
@@ -132,11 +133,15 @@ local function DrawCircle(x, y, width, height, color, lineWidth, drawArrow)
   local rectangle = (width/height >= 1.5) or (height/width >= 1.5)
   local sizeMult = rectangle and 1 or CIRCLE_SIZE_MULT
   
-  y = vsy - y
+  x = x * uiScale
+  y = (vsy - y) * uiScale
+  width = width * uiScale
+  height = height * uiScale
+  
   gl.LineWidth(lineWidth)
   gl.PushMatrix()
   gl.Translate(x, y, 0)
-  gl.Scale((width*sizeMult + PADDING_X)/2, (height*sizeMult + PADDING_Y)/2, 1)
+  gl.Scale((width*sizeMult + PADDING_X)/2 , (height*sizeMult + PADDING_Y)/2, 1)
   gl.Color(color[1], color[2], color[3], alpha)
   gl.LineStipple('any')
   if rectangle then
@@ -148,7 +153,6 @@ local function DrawCircle(x, y, width, height, color, lineWidth, drawArrow)
   gl.PopMatrix()
   
   if drawArrow then
-    
     DrawArrow(x, y, width, height, color, type(drawArrow) == "number" and drawArrow)
   end
 end
@@ -166,6 +170,7 @@ function widget:ViewResize(viewSizeX, viewSizeY)
   vsy = viewSizeY
   sMidX = viewSizeX * 0.5
   sMidY = viewSizeY * 0.5
+  uiScale = WG.uiScale or 1
 end
 
 function widget:DrawScreen()
@@ -208,6 +213,8 @@ function widget:Initialize()
     ClearControls = ClearControls,
   }
   
+  widget:ViewResize(Spring.GetViewGeometry())
+  
   circleDrawList = gl.CreateList(gl.BeginEnd, GL.LINE_LOOP, CircleVertices, 18)
   rectangleDrawList = gl.CreateList(gl.BeginEnd, GL.LINE_LOOP, RoundedRectangleVertices, 18)
   --WG.ChiliHighlight.AddControl("Metal", nil, true)
@@ -215,7 +222,6 @@ function widget:Initialize()
   --WG.ChiliHighlight.AddControlFunc("econTab", function() return {WG.IntegralMenu.GetTabPosition("units_mobile")} end, nil, true)
   --WG.ChiliHighlight.AddControlFunc("attackButton", function() return {WG.IntegralMenu.GetCommandButtonPosition(CMD.ATTACK)} end)
   
-  widget:ViewResize(Spring.GetViewGeometry())
   --AddControl("core_backgroundPanel", nil, true)
 end
 

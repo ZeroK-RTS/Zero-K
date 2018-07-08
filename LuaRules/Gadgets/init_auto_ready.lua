@@ -50,7 +50,9 @@ local readyCount = 0
 local waitingCount = 0 
 local missingCount = 0
 
-local forceSent = false 
+local forceSent = false
+
+local fixedStartPos = (Spring.GetModOptions().fixedstartpos == "1")
 
 function gadget:Initialize() 
 	startTimer = Spring.GetTimer()
@@ -124,35 +126,53 @@ function gadget:GameSetup(label, ready, playerStates)
 	return true, false
 end
 
-function gadget:DrawScreen() 
-	local vsx, vsy = gl.GetViewSizes()
+local function GetStartText()
+	if Spring.GetGameRulesParam("totalSaveGameFrame") then
+		return "Loading game..."
+	end
+	
 	local text = lastLabel 
 	if text == nil then 
 		text = "Waiting for people "
-	end 
+	end
+	
 	if (next(waitingFor) ~= nil) then 
-		text = text .. "\n\255\255\255\255Waiting for "
-		
-		local cnt = 0 
-		for name, state in pairs(waitingFor) do 
-			if cnt % 6 == 5 then 
-				text = text .. "\n"
+		if singleplayer then
+			text = "\255\255\255\255Choose start position"
+		else
+			text = text .. "\n\255\255\255\255Waiting for "
+			
+			local cnt = 0 
+			for name, state in pairs(waitingFor) do 
+				if cnt % 6 == 5 then 
+					text = text .. "\n"
+				end
+				cnt = cnt + 1
+				if state == "missing" then 
+					text = text .. "\255\255\0\0"
+				else
+					text = text .. "\255\255\255\0"
+				end 
+				text = text .. name .. ", "
 			end
-			cnt = cnt + 1
-			if state == "missing" then 
-				text = text .. "\255\255\0\0"
-			else
-				text = text .. "\255\255\255\0"
-			end 
-			text = text .. name .. ", "
-		end 
-		text = text .. "\n\255\255\255\255 Say !force to start sooner"
-	end 
+			text = text .. "\n\255\255\255\255 Say !force to start sooner"
+		end
+	elseif string.find(text, "Choose") then
+		return "\255\255\255\255Starting"
+	end
+	return text
+end
+
+function gadget:DrawScreen()
+	if fixedStartPos then
+		return
+	end
+	local vsx, vsy = gl.GetViewSizes()
 
     glPushMatrix()
     glTranslate((vsx * 0.5), (vsy * 0.5)+150, 0)
     glScale(1.5, 1.5, 1)
-    glText(text, 0, 0, 14, "oc")
+    glText(GetStartText(), 0, 0, 14, "oc")
     glPopMatrix()
 end 
 

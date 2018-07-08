@@ -21,16 +21,14 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    
-    helptext       = [[With its powerful twin anti-air laser batteries, this Anti-Air Frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne.]],
 	modelradius    = [[45]],
 	turnatfullspeed = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
   floater                = true,
-  footprintX             = 3,
-  footprintZ             = 3,
+  footprintX             = 4,
+  footprintZ             = 4,
   iconType               = [[shipaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -39,7 +37,7 @@ unitDef = {
   maxVelocity            = 2.84,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
-  movementClass          = [[BOAT3]],
+  movementClass          = [[BOAT4]],
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],

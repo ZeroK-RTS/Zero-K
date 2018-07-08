@@ -6,6 +6,7 @@ local spSetUnitShieldState = Spring.SetUnitShieldState
 
 -- pieces
 local base = piece 'base' 
+local shield = piece 'shield' 
 local pelvis = piece 'pelvis' 
 local turret = piece 'turret' 
 local torso = piece 'torso' 
@@ -58,6 +59,16 @@ local bAiming = false
 local armsFree = true
 local inBuildAnim = false
 local dgunning = false
+
+local SPEEDUP_FACTOR = 1.1
+local REF_TURN_SPEED = 185  -- deg/s
+local walkTurnSpeed1 = 1
+local walkSleepMult = 1.0
+local walkAngleMult = 1.0
+local animationSpeedMult = 1.0
+local currentSpeed = 0
+local REF_SPEED = 1
+local sizeSpeedMult = 1.0	
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -140,127 +151,184 @@ local function RestoreAfterDelay()
 end
 
 local function Walk()
-	if not bAiming then
-		Turn(torso, x_axis, math.rad(12)) --tilt forward
-		Turn(torso, y_axis, math.rad(3.335165))
+	if (bMoving ) then
+		Turn(pelvis, x_axis, math.rad(6), math.rad(30 * animationSpeedMult)) --tilt forward
+		if not bAiming then
+			Turn(torso, y_axis, math.rad(3.335165), math.rad(walkTurnSpeed1))
+		end
+
+		Move(pelvis, y_axis, 0)
+		Turn(rupleg, x_axis, math.rad(5.670330)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lupleg, x_axis, math.rad(-26.467033)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lloleg, x_axis, math.rad(26.967033)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rloleg, x_axis, math.rad(26.967033)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rfoot, x_axis, math.rad(-19.824176)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Sleep(180 * walkSleepMult )
+	end	
+
+	if (bMoving ) then
+		if not bAiming then
+			Turn(torso, y_axis, math.rad(1.681319), math.rad(walkTurnSpeed1))
+		end
+		Turn(rupleg, x_axis, math.rad(-5.269231)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lupleg, x_axis, math.rad(-20.989011)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lloleg, x_axis, math.rad(20.945055)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rloleg, x_axis, math.rad(41.368132)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rfoot, x_axis, math.rad(-15.747253)*walkAngleMult)
+		Sleep(160 * walkSleepMult )
 	end
-	Move(pelvis, y_axis, 0)
-	Turn(rupleg, x_axis, math.rad(5.670330), math.rad(75))
-	Turn(lupleg, x_axis, math.rad(-26.467033), math.rad(75))
-	Turn(lloleg, x_axis, math.rad(26.967033), math.rad(75))
-	Turn(rloleg, x_axis, math.rad(26.967033), math.rad(75))
-	Turn(rfoot, x_axis, math.rad(-19.824176), math.rad(75))
-	Sleep(180) --had to + 20 to all sleeps in walk
 	
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(1.681319))
+	if (bMoving ) then
+		Turn(pelvis, x_axis, math.rad(0), math.rad(30 * animationSpeedMult))
+		if not bAiming then
+			Turn(torso, y_axis, 0, math.rad(walkTurnSpeed1))
+		end
+		Turn(rupleg, x_axis, math.rad(-9.071429)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lupleg, x_axis, math.rad(-12.670330)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lloleg, x_axis, math.rad(12.670330)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rloleg, x_axis, math.rad(43.571429)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rfoot, x_axis, math.rad(-12.016484)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Sleep(140 * walkSleepMult )
 	end
-	Turn(rupleg, x_axis, math.rad(-5.269231), math.rad(75))
-	Turn(lupleg, x_axis, math.rad(-20.989011), math.rad(75))
-	Turn(lloleg, x_axis, math.rad(20.945055), math.rad(75))
-	Turn(rloleg, x_axis, math.rad(41.368132), math.rad(75))
-	Turn(rfoot, x_axis, math.rad(-15.747253))
-	Sleep(160)
+
+	if (bMoving ) then
+		if not bAiming then
+			Turn(torso, y_axis, math.rad(-1.77), math.rad(walkTurnSpeed1))
+		end
+		Turn(rupleg, x_axis, math.rad(-21.357143)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lupleg, x_axis, math.rad(2.824176)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lloleg, x_axis, math.rad(3.560440)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lfoot, x_axis, math.rad(-4.527473)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rloleg, x_axis, math.rad(52.505495)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rfoot, x_axis, 0)
+		Sleep(140 * walkSleepMult )
+	end
+
+	if (bMoving ) then	
+		if not bAiming then
+			Turn(torso, y_axis, math.rad(-3.15), math.rad(walkTurnSpeed1))
+		end
+		Turn(rupleg, x_axis, math.rad(-35.923077)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lupleg, x_axis, math.rad(7.780220)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lloleg, x_axis, math.rad(8.203297)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lfoot, x_axis, math.rad(-12.571429)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rloleg, x_axis, math.rad(54.390110)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Sleep(140 * walkSleepMult )
+	end
+
+	if (bMoving ) then
 	
-	if not bAiming then
-		Turn(torso, y_axis, 0)
+		Turn(pelvis, x_axis, math.rad(6), math.rad(30 * animationSpeedMult)) --tilt forward
+		if not bAiming then
+			Turn(torso, y_axis, math.rad(-4.21), math.rad(walkTurnSpeed1))
+		end
+		Turn(rupleg, x_axis, math.rad(-37.780220)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lupleg, x_axis, math.rad(10.137363)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lloleg, x_axis, math.rad(13.302198)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lfoot, x_axis, math.rad(-16.714286)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rloleg, x_axis, math.rad(32.582418)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Sleep(140 * walkSleepMult )
 	end
-	Turn(rupleg, x_axis, math.rad(-9.071429), math.rad(75))
-	Turn(lupleg, x_axis, math.rad(-12.670330), math.rad(75))
-	Turn(lloleg, x_axis, math.rad(12.670330), math.rad(75))
-	Turn(rloleg, x_axis, math.rad(43.571429), math.rad(75))
-	Turn(rfoot, x_axis, math.rad(-12.016484), math.rad(75))
-	Sleep(140)
 	
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(-1.77))
+	if (bMoving ) then			
+		if not bAiming then
+			Turn(torso, y_axis, math.rad(-3.15), math.rad(walkTurnSpeed1))
+		end
+		Turn(rupleg, x_axis, math.rad(-28.758242)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lupleg, x_axis, math.rad(12.247253)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lloleg, x_axis, math.rad(19.659341)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lfoot, x_axis, math.rad(-19.659341)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rloleg, x_axis, math.rad(28.758242)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Sleep(160 * walkSleepMult )
 	end
-	Turn(rupleg, x_axis, math.rad(-21.357143), math.rad(75))
-	Turn(lupleg, x_axis, math.rad(2.824176), math.rad(75))
-	Turn(lloleg, x_axis, math.rad(3.560440), math.rad(75))
-	Turn(lfoot, x_axis, math.rad(-4.527473), math.rad(75))
-	Turn(rloleg, x_axis, math.rad(52.505495), math.rad(75))
-	Turn(rfoot, x_axis, 0)
-	Sleep(140)
+
+	if (bMoving ) then
+		if not bAiming then
+			Turn(torso, y_axis, math.rad(-1.88), math.rad(walkTurnSpeed1))
+		end
+		Turn(rupleg, x_axis, math.rad(-22.824176)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lupleg, x_axis, math.rad(2.824176)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lloleg, x_axis, math.rad(34.060440)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rfoot, x_axis, math.rad(-6.313187)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Sleep(160 * walkSleepMult )
+	end
 	
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(3.15))
+	if (bMoving ) then
+		Turn(pelvis, x_axis, math.rad(0), math.rad(30 * animationSpeedMult)) 
+		if not bAiming then
+			Turn(torso, y_axis, 0, math.rad(walkTurnSpeed1))
+		end
+		Turn(rupleg, x_axis, math.rad(-11.604396)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lupleg, x_axis, math.rad(-6.725275)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lloleg, x_axis, math.rad(39.401099)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lfoot, x_axis, math.rad(-13.956044)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rloleg, x_axis, math.rad(19.005495)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rfoot, x_axis, math.rad(-7.615385)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Sleep(140 * walkSleepMult )
 	end
-	Turn(rupleg, x_axis, math.rad(-35.923077), math.rad(75))
-	Turn(lupleg, x_axis, math.rad(7.780220), math.rad(75))
-	Turn(lloleg, x_axis, math.rad(8.203297), math.rad(75))
-	Turn(lfoot, x_axis, math.rad(-12.571429), math.rad(75))
-	Turn(rloleg, x_axis, math.rad(54.390110), math.rad(75))
-	Sleep(140)
 	
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(-4.21))
+	if (bMoving ) then	
+		if not bAiming then
+			Turn(torso, y_axis, math.rad(1.88), math.rad(walkTurnSpeed1))
+		end
+		Turn(rupleg, x_axis, math.rad(1.857143)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lupleg, x_axis, math.rad(-24.357143)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lloleg, x_axis, math.rad(45.093407)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lfoot, x_axis, math.rad(-7.703297)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rloleg, x_axis, math.rad(3.560440)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rfoot, x_axis, math.rad(-4.934066)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Sleep(140 * walkSleepMult )
 	end
-	Turn(rupleg, x_axis, math.rad(-37.780220), math.rad(75))
-	Turn(lupleg, x_axis, math.rad(10.137363), math.rad(75))
-	Turn(lloleg, x_axis, math.rad(13.302198), math.rad(75))
-	Turn(lfoot, x_axis, math.rad(-16.714286), math.rad(75))
-	Turn(rloleg, x_axis, math.rad(32.582418), math.rad(75))
-	Sleep(140)
+
+	if (bMoving ) then	
+		if not bAiming then
+			Turn(torso, y_axis, math.rad(3.15), math.rad(walkTurnSpeed1))
+		end
+		Turn(rupleg, x_axis, math.rad(7.148352)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lupleg, x_axis, math.rad(-28.181319)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Sleep(140 * walkSleepMult )
+	end
 	
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(-3.15))
+	if (bMoving ) then
+		if not bAiming then
+			Turn(torso, y_axis, math.rad(4.20), math.rad(walkTurnSpeed1))
+		end
+		Turn(rupleg, x_axis, math.rad(8.423077)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lupleg, x_axis, math.rad(-32.060440)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lloleg, x_axis, math.rad(27.527473)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(lfoot, x_axis, math.rad(-2.857143)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rloleg, x_axis, math.rad(24.670330)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rfoot, x_axis, math.rad(-26.313187)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Sleep(160 * walkSleepMult )
 	end
-	Turn(rupleg, x_axis, math.rad(-28.758242), math.rad(75))
-	Turn(lupleg, x_axis, math.rad(12.247253), math.rad(75))
-	Turn(lloleg, x_axis, math.rad(19.659341), math.rad(75))
-	Turn(lfoot, x_axis, math.rad(-19.659341), math.rad(75))
-	Turn(rloleg, x_axis, math.rad(28.758242), math.rad(75))
-	Sleep(160)
-	
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(-1.88))
+end
+
+
+local function MotionSpeedControl()
+	REF_SPEED = GetUnitValue(COB.MAX_SPEED)
+	Sleep(33)
+	while true do
+
+		sizeSpeedMult = dyncomm.GetPace()
+		animationSpeedMult = GetUnitValue(COB.CURRENT_SPEED) * sizeSpeedMult / REF_SPEED
+		
+		if (animationSpeedMult < 0.7) then
+			animationSpeedMult = 0.7
+		end
+		walkTurnSpeed1 = REF_TURN_SPEED * animationSpeedMult * SPEEDUP_FACTOR
+		walkAngleMult = animationSpeedMult
+		if (walkAngleMult > 1.2) then
+			walkAngleMult = 1.2
+		elseif (walkAngleMult < 0.9) then
+			walkAngleMult = 0.9
+		end
+
+		walkSleepMult = 0.7 * walkAngleMult/(animationSpeedMult * SPEEDUP_FACTOR)
+
+		--Spring.Echo("animationSpeedMult="..animationSpeedMult.." commLevel="..tostring(Spring.GetUnitRulesParam(unitID, "comm_level") or 0).." commScale="..dyncomm.GetScale().." sizeSpeedMult="..sizeSpeedMult)
+
+		Sleep(100)
 	end
-	Turn(rupleg, x_axis, math.rad(-22.824176), math.rad(75))
-	Turn(lupleg, x_axis, math.rad(2.824176), math.rad(75))
-	Turn(lloleg, x_axis, math.rad(34.060440), math.rad(75))
-	Turn(rfoot, x_axis, math.rad(-6.313187), math.rad(75))
-	Sleep(160)
-	
-	if not bAiming then
-		Turn(torso, y_axis, 0)
-	end
-	Turn(rupleg, x_axis, math.rad(-11.604396), math.rad(75))
-	Turn(lupleg, x_axis, math.rad(-6.725275), math.rad(75))
-	Turn(lloleg, x_axis, math.rad(39.401099), math.rad(75))
-	Turn(lfoot, x_axis, math.rad(-13.956044), math.rad(75))
-	Turn(rloleg, x_axis, math.rad(19.005495), math.rad(75))
-	Turn(rfoot, x_axis, math.rad(-7.615385), math.rad(75))
-	Sleep(140)
-	
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(1.88))
-	end
-	Turn(rupleg, x_axis, math.rad(1.857143), math.rad(75))
-	Turn(lupleg, x_axis, math.rad(-24.357143), math.rad(75))
-	Turn(lloleg, x_axis, math.rad(45.093407), math.rad(75))
-	Turn(lfoot, x_axis, math.rad(-7.703297), math.rad(75))
-	Turn(rloleg, x_axis, math.rad(3.560440), math.rad(75))
-	Turn(rfoot, x_axis, math.rad(-4.934066), math.rad(75))
-	Sleep(140)
-	
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(3.15))
-	end
-	Turn(rupleg, x_axis, math.rad(7.148352), math.rad(75))
-	Turn(lupleg, x_axis, math.rad(-28.181319), math.rad(75))
-	Sleep(140)
-	
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(4.20))
-	end
-	Turn(rupleg, x_axis, math.rad(8.423077), math.rad(75))
-	Turn(lupleg, x_axis, math.rad(-32.060440), math.rad(75))
-	Turn(lloleg, x_axis, math.rad(27.527473), math.rad(75))
-	Turn(lfoot, x_axis, math.rad(-2.857143), math.rad(75))
-	Turn(rloleg, x_axis, math.rad(24.670330), math.rad(75))
-	Turn(rfoot, x_axis, math.rad(-33.313187), math.rad(75))
-	Sleep(160)
 end
 
 local function MotionControl(moving, aiming, justmoved)
@@ -268,6 +336,7 @@ local function MotionControl(moving, aiming, justmoved)
 	while true do
 		moving = bMoving
 		aiming = bAiming
+
 		if moving then
 			if aiming then
 				armsFree = true
@@ -279,6 +348,7 @@ local function MotionControl(moving, aiming, justmoved)
 		else
 			armsFree = true
 			if justmoved then
+				Turn(pelvis, x_axis, math.rad(0), math.rad(60))
 				Turn(rupleg, x_axis, 0, math.rad(200.071429))
 				Turn(rloleg, x_axis, 0, math.rad(200.071429))
 				Turn(rfoot, x_axis, 0, math.rad(200.071429))
@@ -324,7 +394,12 @@ function script.Create()
 	Hide(flare)
 	Hide(ac1)
 	Hide(ac2)
+	
+	Move(nanospray, z_axis, 1*dyncomm.GetScale())
+	Move(nanospray, y_axis, 1.8*dyncomm.GetScale())
+	Move(nanospray, x_axis, 1.5*dyncomm.GetScale())
 
+	StartThread(MotionSpeedControl)
 	StartThread(MotionControl)
 	StartThread(RestoreAfterDelay)
 	StartThread(SmokeUnit, smokePiece)
@@ -348,7 +423,7 @@ function script.QueryWeapon(num)
 	if dyncomm.GetWeapon(num) == 1 or dyncomm.GetWeapon(num) == 2 then 
 		return flare
 	end
-	return pelvis
+	return shield
 end
 
 local function AimRifle(heading, pitch, isDgun)
@@ -356,10 +431,10 @@ local function AimRifle(heading, pitch, isDgun)
 		dgunning = true
 	end
 	
-	if pitch < -0.75 then
-		Move(flare, z_axis, -16)
+	if pitch < -0.3 then
+		Move(flare, z_axis, pitch*20 - 10)
 	else
-		Move(flare, z_axis, 0)
+		Move(flare, z_axis, -2)
 	end
 	
 	--torso	
@@ -404,7 +479,9 @@ local function AimRifle(heading, pitch, isDgun)
 	Turn(armhold, x_axis, -pitch, math.rad(250))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(armhold, x_axis) --need to make sure not 
-	WaitForTurn(lloarm, x_axis) --stil setting up
+	WaitForTurn(lloarm, x_axis) --still setting up
+	WaitForTurn(rloarm, y_axis) --still setting up
+	
 	StartThread(RestoreAfterDelay)
 	if isDgun then dgunning = false end
 	return true

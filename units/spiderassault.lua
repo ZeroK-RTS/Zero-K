@@ -16,11 +16,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Geländegängige Sturmspinne]],
-    description_fr = [[Robot d'assaut arachnide]],
-    helptext       = [[The Hermit can take an incredible beating, and is useful as a shield for the weaker, more-damaging Recluses.]],
-    helptext_fr    = [[Le Hermit est extraordinairement résistant pour sa taille. Si son canon ?plasma n'a pas la précision requise pour abattre les cibles rapides il reste néanmoins un bouclier parfait pour des unités moins solides telles que les Recluses.]],
-	helptext_de    = [[Der Hermit kann unglaublich viel Pr?el einstecken und ist als Schutzschild f? schwächere, oder zu schonende Einheiten, hervorragend geeignet.]],
 	modelradius    = [[12]],
   },
 
@@ -40,7 +35,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[hermit.s3o]],
   selfDestructAs         = [[BIG_UNITEX]],
-  script                = [[spiderassault.lua]],
+  script                 = [[spiderassault.lua]],
 
   sfxtypes               = {
 

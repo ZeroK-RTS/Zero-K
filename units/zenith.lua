@@ -18,7 +18,6 @@ unitDef = {
   corpse                        = [[DEAD]],
   
   customParams                  = {
-    helptext       = [[The Zenith collects meteorites from the sky (up to 500), which it can send anywhere to break things or provide a small reclaimable source of metal.]],
     keeptooltip = [[any string I want]],
     --neededlink  = 150,
     --pylonrange  = 150,
@@ -226,6 +225,7 @@ unitDef = {
 
 	  customParams        	  = {
 		light_radius = 0,
+		do_not_save = 1, -- Controlled meteors are regenerated on load.
 	  },
 
       damage                  = {
@@ -280,6 +280,7 @@ unitDef = {
 	  customParams        	  = {
 		light_color = [[2.4 1.5 0.6]],
 		light_radius = 600,
+		do_not_save = 1, -- Controlled meteors are regenerated on load.
       },
 
       damage                  = {

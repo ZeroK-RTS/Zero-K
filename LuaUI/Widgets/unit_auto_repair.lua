@@ -91,7 +91,7 @@ local function repairNearestDamagedUnit(repairUnitID)
 		if(repairUnitID ~= damagedUnitID) then
 			-- check they're still damaged
 			local hp, maxhp, paradam, cap, build = spGetUnitHealth(damagedUnitID)
-			if((hp and maxhp) and hp >= maxhp) then
+			if(not (hp and maxhp) or hp >= maxhp) then
 				unitsToRepair[damagedUnitID] = nil
 			else
 				local uposx, uposy, uposz = spGetUnitPosition(damagedUnitID)
@@ -107,7 +107,7 @@ local function repairNearestDamagedUnit(repairUnitID)
 	end
 	if(closestDamagedUnit) then
 		repairingUnits[repairUnitID] = {posx, posy, posz}
-		spGiveOrderToUnit(repairUnitID, CMD.INSERT, { 0, CMD.REPAIR, 0, closestDamagedUnit}, {"alt"} )
+		spGiveOrderToUnit(repairUnitID, CMD.INSERT, { 0, CMD.REPAIR, 0, closestDamagedUnit}, CMD.OPT_ALT )
 		idleRepairUnits[repairUnitID] = nil
 	end
 end
@@ -155,7 +155,7 @@ function widget:GameFrame(n)
 			local posx, posy, posz = spGetUnitPosition(unitID)
 			if posx then
 				if distSqr(pos[1], pos[2], pos[3], posx, posy, posz) > leashLength*leashLength then
-					spGiveOrderToUnit(unitID, CMD_RAW_MOVE, pos, {})
+					spGiveOrderToUnit(unitID, CMD_RAW_MOVE, pos, 0)
 				end
 			end
 		end

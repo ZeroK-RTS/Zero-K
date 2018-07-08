@@ -244,6 +244,8 @@ skin.combobox_item = {
 skin.checkbox = {
   TileImageFG = ":cl:checkbox_arrow.png",
   TileImageBK = ":cl:checkbox.png",
+  TileImageFG_round = ":cl:radiobutton_checked.png",
+  TileImageBK_round = ":cl:radiobutton.png",
   tiles       = {3,3,3,3},
   boxsize     = 13,
 
@@ -339,6 +341,19 @@ skin.panel_button = {
   padding = {10, 10, 10, 10},
 
   backgroundColor = {0.2, 0.25, 0.35, 0.7},
+  focusColor  = {0.3, 0.375, 0.525, 0.5},
+  borderColor = {1,1,1,0},
+
+  DrawControl = DrawPanel,
+}
+
+skin.panel_button_rounded = {
+  TileImageBK = ":cl:tech_button_rounded.png",
+  TileImageFG = ":cl:tech_buttonbk_rounded.png",
+  tiles = {32, 32, 32, 32}, --// tile widths: left,top,right,bottom
+  padding = {10, 10, 10, 10},
+
+  backgroundColor = {1, 1, 1, 1.0},
   focusColor  = {0.3, 0.375, 0.525, 0.5},
   borderColor = {1,1,1,0},
 

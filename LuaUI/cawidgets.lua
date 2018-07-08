@@ -212,6 +212,8 @@ local flexCallIns = {
   'AddTransmitLine',
   'AddConsoleMessage',
   'VoiceCommand',
+  'Save',
+  'Load',
 }
 local flexCallInMap = {}
 for _,ci in ipairs(flexCallIns) do
@@ -1335,9 +1337,11 @@ do
 		local playerList = Spring.GetPlayerList()
 		for i = 1, #playerList do
 			local playerID = playerList[i]
-			local name, _, spectating = Spring.GetPlayerInfo(playerID)
-			if not spectating then
-				playerNameToID[name] = playerID
+			if playerID then
+				local name, _, spectating = Spring.GetPlayerInfo(playerID)
+				if not spectating then
+					playerNameToID[name] = playerID
+				end
 			end
 		end
 	end
@@ -1533,41 +1537,46 @@ end
 
 function widgetHandler:DrawWorld()
   for _,w in ripairs(self.DrawWorldList) do
+    gl.Fog(true)
     w:DrawWorld()
   end
-  return
+  gl.Fog(false)
 end
 
 
 function widgetHandler:DrawWorldPreUnit()
   for _,w in ripairs(self.DrawWorldPreUnitList) do
+    gl.Fog(true)
     w:DrawWorldPreUnit()
   end
-  return
+  gl.Fog(false)
 end
 
 
 function widgetHandler:DrawWorldShadow()
   for _,w in ripairs(self.DrawWorldShadowList) do
+    gl.Fog(true)
     w:DrawWorldShadow()
   end
-  return
+  gl.Fog(false)
 end
 
 
 function widgetHandler:DrawWorldReflection()
   for _,w in ripairs(self.DrawWorldReflectionList) do
+    gl.Fog(true)
     w:DrawWorldReflection()
   end
-  return
+  gl.Fog(false)
 end
 
 
 function widgetHandler:DrawWorldRefraction()
   for _,w in ripairs(self.DrawWorldRefractionList) do
+    gl.Fog(true)
     w:DrawWorldRefraction()
   end
-  return
+  gl.Fog(false)
 end
 
 
@@ -2300,7 +2309,7 @@ function widgetHandler:UpdateSelection()
 			if (newSelection[i] ~= oldSelection[i]) then -- it seems the order stays
 				changed = true
 				break
-			end                                          
+			end
 		end
 	else
 		changed = true
@@ -2354,6 +2363,20 @@ end
 function widgetHandler:UnsyncedHeightMapUpdate(x1,z1,x2,z2)
   for _,w in ipairs(self.UnsyncedHeightMapUpdateList) do
     w:UnsyncedHeightMapUpdate(x1,z1,x2,z2)
+  end
+  return
+end
+
+function widgetHandler:Save(zip)
+  for _,w in ipairs(self.SaveList) do
+    w:Save(zip)
+  end
+  return
+end
+
+function widgetHandler:Load(zip)
+  for _,w in ipairs(self.LoadList) do
+    w:Load(zip)
   end
   return
 end

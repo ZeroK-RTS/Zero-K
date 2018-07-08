@@ -3,7 +3,7 @@ function widget:GetInfo() return {
 	enabled = true,
 } end
 
-options_path = 'Help/Guide'
+options_path = 'Help'
 
 options = {
 	ingameguide_concept_wreckage = {

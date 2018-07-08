@@ -33,6 +33,8 @@ for i=0,4 do
 	subemit[i] = piece("subemit"..i)
 end
 
+local jets = {jetleft, jetright, jetrear}
+
 local gunpoints = {
 	[1] = {aim = RightTurretSeat, rot = RightTurret, pitch = RightGun, fire = RightFlashPoint},
 	[2] = {aim = LeftTurretSeat, rot = LeftTurret, pitch = LeftGun, fire = LeftFlashPoint},
@@ -52,6 +54,7 @@ gunpoints[4].radial = {0.0040571023710072, -0.25233194231987, -0.96763223409653}
 gunpoints[4].right = {-0.99998968839645, 0.0029705890920013, 0.0034227864816785}
 gunpoints[4].normal = {0.0020107594318688, 0.96760839223862, -0.25231730937958}
 
+--------------------------------------------------------------------------------
 --signals
 local signals = {
 	[1] = 2,
@@ -81,12 +84,43 @@ local UNIT_SPEED = UnitDefNames["gunshipkrow"].speed*SLOWDOWN_FACTOR/30
 
 local sound_index = 0
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function script.Activate()
  isLanded = false
 end
 
 function script.Deactivate()
  isLanded = true
+end
+
+local function IsCrashing()
+	return (Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing"
+end
+
+local ANIM_DEBUG_MODE = false
+local function DeathAnim()
+	local count = 0
+	local index = math.random(1,#jets)
+	while true do
+		if (not IsCrashing()) and (not ANIM_DEBUG_MODE) then
+			Sleep(100)
+		else
+			for i=1,#jets do
+				EmitSfx(jets[i], 258)
+			end
+			if count % 18 == 0 then
+				EmitSfx(jets[index], 1025)
+				index = index + 1
+				if index > #jets then
+					index = 1
+				end
+			end
+			count = count + 1
+			Sleep(33)
+		end
+	end
 end
 
 local function EmitDust()
@@ -182,6 +216,7 @@ function script.Create()
 	--SetDGunCMD()
 	StartThread(SmokeUnit, {RearTurret, RightTurret, LeftTurret})
 	StartThread(EmitDust)
+	StartThread(DeathAnim)
 end
 
 --[[
@@ -230,7 +265,7 @@ local function ClusterBombThread()
 			EmitSfx(subemit[0], FIRE_W3)
 			index = index + 1
 		end
-		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+		local slowState = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 		Sleep(sleepTime/slowState)
 	end
 	Sleep(330)
@@ -247,6 +282,11 @@ function ClusterBomb()
 	--if hSpeed > UNIT_SPEED then
 	--	Spring.SetUnitVelocity(unitID, vx*UNIT_SPEED/hSpeed, vy, vz*UNIT_SPEED/hSpeed)
 	--end
+end
+
+function OnLoadGame()
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	GG.UpdateUnitAttributes(unitID)
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -285,7 +325,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .5 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
+	if severity <= .5 or IsCrashing() then
 		Explode(Base, sfxNone)
 		Explode(RightTurret, sfxNone)
 		Explode(LeftTurret, sfxNone)

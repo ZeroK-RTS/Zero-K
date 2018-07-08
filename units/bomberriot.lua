@@ -16,15 +16,13 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 -5]],
   collisionVolumeScales  = [[55 15 70]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[80 25 80]],
+  selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
   cruiseAlt           = 180,
 
   customParams        = {
-    description_fr = [[Bombardier Napalm]],
-	description_de = [[Napalmbomber]],
-    helptext       = [[The Phoenix's napalm bombs decimate large clumps of units and light structures.]],
-    helptext_fr    = [[Une escardre de Phoenix est une des pires chose qui puisse apparaître sur les radars ennemis. Rapides et efficaces, le Firestorm tapisse le sol de bombes au napalm faisant des dégâts r l'impact et sur la durée.]],
-	helptext_de    = [[Die Napalmbomben des Firestorms dezimieren große Haufen an Einheiten und leichten Bauwerken.]],
 	modelradius    = [[10]],
 	refuelturnradius = [[120]],
 	requireammo    = [[1]],
@@ -38,7 +36,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maxAcc              = 0.5,
-  maxDamage           = 650,
+  maxDamage           = 720,
   maxAileron          = 0.018,
   maxElevator         = 0.02,
   maxRudder           = 0.008,
@@ -61,7 +59,7 @@ unitDef = {
 
   },
   sightDistance       = 660,
-  turnRadius          = 20,
+  turnRadius          = 200,
   workerTime          = 0,
 
   weapons             = {
@@ -90,6 +88,7 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams        	  = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
 	    setunitsonfire = "1",
 		burntime = 300,
 	  },

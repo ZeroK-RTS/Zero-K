@@ -12,17 +12,16 @@ unitDef = {
   canPatrol              = true,
   category               = [[LAND]],
   corpse                 = [[DEAD]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeType    = [[ellipsoid]],
 
   customParams           = {
-    description_fr = [[Robot ?meurier]],
-    description_de = [[Riot Roboter]],
-    helptext       = [[The Outlaw emits an electromagnetic disruption pulse in a wide circle around it that damages and slows enemy units. Friendly units are unaffected.]],
-    helptext_de    = [[Der Outlaw stößt einen elektromagnetischen Störungspuls, in einem weiten Kreis um sich herum, aus, welcher feindliche Einheiten schädigt und verlangsamt. Freundliche Einheiten sind davon aber nicht betroffen.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
-  footprintX             = 2,
-  footprintZ             = 2,
+  footprintX             = 3,
+  footprintZ             = 3,
   iconType               = [[walkerriot]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -32,7 +31,7 @@ unitDef = {
   maxVelocity            = 1.9,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
-  movementClass          = [[KBOT2]],
+  movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[behethud.s3o]],
   onoffable              = true,
@@ -90,10 +89,6 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-		light_radius = 0,
-	  },
-	  
       damage                  = {
         default = 20,
         planes  = 20,
@@ -101,6 +96,7 @@ unitDef = {
       },
 
       customParams           = {
+        light_radius = 0,
         lups_explodespeed = 1,
         lups_explodelife = 0.6,
         nofriendlyfire = 1,

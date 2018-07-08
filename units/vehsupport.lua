@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehsupport]],
-  name                   = [[Slasher]],
-  description            = [[Deployable Missile Vehicle (must stop to fire)]],
+  name                   = [[Fencer]],
+  description            = [[Deployable Missile Rover (must stop to fire)]],
   acceleration           = 0.0354,
   brakeRate              = 0.0358,
   buildCostMetal         = 140,
@@ -14,14 +14,12 @@ unitDef = {
   collisionVolumeOffsets = [[0 5 0]],
   collisionVolumeScales  = [[26 30 36]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Camion Lance-Missile]],
-	description_de = [[Unterstütung/Flugabwehr Laster (muss zum Feuern anhalten)]],
-    helptext       = [[Keep the Slasher at maximum range to harass the opponent's units. The Slasher's missiles track, so they are ideal to kill fast-moving raiders and crawling bombs. It is able to hit air, but is only really useful against fighters. Cannot fire over obstacles, and does poorly if enemies, particularly assault units, are allowed to close range. Unlike skirmishers, the Slasher cannot fire while moving.]],
-    helptext_fr    = [[Le Slasher est un camion Tirailleur. Sa trcs grande portée compense un peu son manque de puissance de feu. Capable de tirer en l'air ou au sol, il saura quand meme trouver sa place dans votre armée.]],
-	helptext_de    = [[Halte deinen Slasher immer auf maximaler Distanz zum Feind, um diesen am besten zu belagern. Seine Raketen sind gelenkt und somit ideal, um sich schnell bewegende Einheiten oder Crawling Bomben zu vernichten. Er kann sowohl Land-, als auch Lufteinheiten treffen, aber nicht über Wände und Hügel schießen. Außerdem versagt er kläglich, sobald sich Feinde dicht am ihm befinden. Im Gegensatz zu dem meisten normalen Skirmishern, kann der Slasher nicht Feuern, wenn er sich bewegt.]],
 	modelradius    = [[13]],
 	chase_everything = [[1]], -- Does not get stupidtarget added to noChaseCats
   },
@@ -60,7 +58,7 @@ unitDef = {
   trackStrength          = 5,
   trackStretch           = 1,
   trackType              = [[StdTank]],
-  trackWidth             = 30,
+  trackWidth             = 34,
   turninplace            = 0,
   turnRate               = 486,
   workerTime             = 0,

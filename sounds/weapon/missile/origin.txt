@@ -1,3 +1,9 @@
+by Apelsinsaft (CC-BY):
+tacnuke_launch2.wav
+
+by Alcur (CC-BY-ND-SA 4.0):
+light_missile_fire.wav
+
 Nexuiz:
 banisher_fire.wav
 

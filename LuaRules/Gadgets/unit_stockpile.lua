@@ -53,7 +53,7 @@ for i=1,#UnitDefs do
 end
 
 local function GetStockSpeed(unitID)
-	return (1 - (spGetUnitRulesParam(unitID,"slowState") or 0))
+	return (spGetUnitRulesParam(unitID,"totalBuildPowerChange") or 1)
 end
 
 function gadget:GameFrame(n)

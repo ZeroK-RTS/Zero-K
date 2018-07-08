@@ -429,13 +429,10 @@ function gadget:GameFrame(n)
 			local level, mStor, fakeMetalPull, income, expense, _, _, recieved = spGetTeamResources(teamID, "metal", true)
 			local elevel, eStor, fakeEnergyPull, eincome, eexpense, _, _, erecieved = spGetTeamResources(teamID, "energy", true)
 			
-			eincome = eincome - math.max(0, spGetTeamRulesParam(teamID, "OD_energyChange") or 0) + (spGetTeamRulesParam(teamID, "OD_energyIncome") or 0)
+			eincome = eincome + (spGetTeamRulesParam(teamID, "OD_energyIncome") or 0)
 			
-			mStor = mStor - HIDDEN_STORAGE
-			eStor = eStor - HIDDEN_STORAGE
-			
-			effectiveTeamMetalReserved[teamID] = math.min(mStor, TeamMetalReserved[teamID] or 0)
-			effectiveTeamEnergyReserved[teamID] = math.min(eStor, TeamEnergyReserved[teamID] or 0)
+			effectiveTeamMetalReserved[teamID] = math.min(mStor - HIDDEN_STORAGE, TeamMetalReserved[teamID] or 0)
+			effectiveTeamEnergyReserved[teamID] = math.min(eStor - HIDDEN_STORAGE, TeamEnergyReserved[teamID] or 0)
 			
 			-- Take away the constant income which was gained this frame (innate, reclaim)
 			-- This is to ensure that level + total income is exactly what will be gained in the next second (if nothing is spent).
@@ -703,19 +700,19 @@ end
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("mreserve:",1,true) then
 		local _,_,spec,teamID = spGetPlayerInfo(playerID)
-		local amount = msg:sub(10)
+		local amount = tonumber(msg:sub(10))
 		if spec or (not teamID) or (not amount) then
 			return
 		end
-		SetMetalReserved(teamID, amount*1)
+		SetMetalReserved(teamID, amount)
 	end	
 	if msg:find("ereserve:",1,true) then
 		local _,_,spec,teamID = spGetPlayerInfo(playerID)
-		local amount = msg:sub(10)
+		local amount = tonumber(msg:sub(10))
 		if spec or (not teamID) or (not amount) then
 			return
 		end
-		SetEnergyReserved(teamID, amount*1)
+		SetEnergyReserved(teamID, amount)
 	end
 end
 

@@ -15,18 +15,19 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[20 20 20]],
   collisionVolumeType    = [[ellipsoid]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[28 28 28]],
+  selectionVolumeType    = [[ellipsoid]],
 
   customParams           = {
-    description_de = [[Wandernde Rakete]],
-    helptext       = [[This fast-moving suicide unit is good for raiding and sniping lightly-armored targets. When standing next to wreckages, it automatically draws metal from them to replicate itself, grey goo style.]],
-	helptext_de    = [[Diese flinke Kamikazeinheit ist ideal, um schlecht gepanzerte Ziele zu überfallen. Sobald sie neben Wracks steht, zieht sie automatisch Metall aus diesen, um sich selbst zu vervielfältigen.]],
-	modelradius    = [[10]],
-
-	grey_goo = 1,
-	grey_goo_spawn = "jumpscout",
-	grey_goo_drain = 5,
-	grey_goo_cost = 75,
-	grey_goo_range = 120,
+    modelradius    = [[10]],
+    
+    grey_goo = 1,
+    grey_goo_spawn = "jumpscout",
+    grey_goo_drain = 5,
+    grey_goo_cost = 50,
+    grey_goo_range = 120,
+    selection_scale = 1, -- Maybe change later
   },
 
   explodeAs              = [[TINY_BUILDINGEX]],
@@ -41,7 +42,7 @@ unitDef = {
   maxVelocity            = 3.5,
   maxWaterDepth          = 15,
   minCloakDistance       = 75,
-  movementClass          = [[KBOT2]],
+  movementClass          = [[SKBOT2]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING]],
   objectName             = [[puppy.s3o]],
@@ -86,6 +87,10 @@ unitDef = {
       cegTag                  = [[VINDIBACK]],
       craterBoost             = 1,
       craterMult              = 2,
+
+			customParams = {
+				burst = Shared.BURST_RELIABLE,
+			},
 
       damage                  = {
         default = 410.1,

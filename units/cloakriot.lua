@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cloakriot]],
-  name                   = [[Warrior]],
+  name                   = [[Reaver]],
   description            = [[Riot Bot]],
   acceleration           = 0.25,
   brakeRate              = 0.2,
@@ -13,14 +13,12 @@ unitDef = {
   collisionVolumeOffsets = [[0 1 -1]],
   collisionVolumeScales  = [[26 36 26]],
   collisionVolumeType    = [[cylY]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Robot émeutier]],
-    description_de = [[Riot Roboter]],
-    helptext       = [[The Warrior's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defense, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Warriors quickly regenerate damage when out of combat.]],
-    helptext_fr    = [[La dévastatrice mitrailleuse à plasma lourde du Warrior est efficace contre la majorité de ses enemis, en particulier les unités de raid. Il est très peu efficace contre les défenses statiques, ne l'utilisez donc pas comme unité d'assaut. Contrez le en restant hors de sa portée, étant donné sa faible vitesse de mouvement.]],
-    helptext_de    = [[Sein schweres Maschingewehr ist gegen die meisten Einheiten effektiv, vor allem gegen Raider. Dennoch versagt es kläglich gegen stationäre Verteidigung. Also nutze ihn nicht als Sturmeinheit. Kontere den Warrior, indem du aus seiner Reichweite bleibst, sie sind langsam.]],
     modelradius    = [[7]],
   },
 
@@ -28,7 +26,7 @@ unitDef = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[kbotriot]],
-  idleAutoHeal           = 30,
+  idleAutoHeal           = 20,
   idleTime               = 150,
   leaveTracks            = true,
   maxDamage              = 820,
@@ -104,7 +102,7 @@ unitDef = {
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       range                   = 270,
-      reloadtime              = 0.45,
+      reloadtime              = 0.4 + 2/30,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
       soundHit                = [[weapon/cannon/emg_hit]],

@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehcon]],
   name                   = [[Mason]],
-  description            = [[Construction Vehicle, Builds at 5 m/s]],
+  description            = [[Construction Rover, Builds at 5 m/s]],
   acceleration           = 0.066,
   brakeRate              = 1.5,
   buildCostMetal         = 140,
@@ -22,11 +22,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[V?hicule de Construction, Construit ? 5 m/s]],
-	description_de = [[Konstruktionsfahrzeug, Baut mir 5 M/s]],
-    helptext       = [[Highly mobile and capable of taking a beating, the Mason can quickly expand over a large area.]],
-    helptext_fr    = [[Alliant rapidit? et blindage important, le Mason permet de s'?tendre rapidement en s?curit?.]],
-	helptext_de    = [[Hochmobiles, bewaffnetes Konstruktionsfahrzeug, das sich ideal für schnelle Expansionen über große Flächen eignet.]],
 	modelradius    = [[20]],
   },
 
@@ -49,8 +44,8 @@ unitDef = {
   objectName             = [[corcv.s3o]],
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,
-  sightDistance          = 255,
-  trackOffset            = 3,
+  sightDistance          = 273,
+  trackOffset            = -3,
   trackStrength          = 6,
   trackStretch           = 1,
   trackType              = [[StdTank]],
