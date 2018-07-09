@@ -745,6 +745,8 @@ local function GetOpposingAllyTeams()
 			-- 	name = Spring.GetGameRulesParam("allyteam_short_name_" .. allyTeamID) or name
 			-- end
 
+			local startboxid = Spring.GetTeamRulesParam(teamList[1], "start_box_id") or 0
+			
 			allyteams[#allyteams + 1] = {
 				allyTeamID = allyTeamID, -- allyTeamID for the team
 				name = name, -- Large display name of the team
@@ -752,6 +754,7 @@ local function GetOpposingAllyTeams()
 				playerName = playerName or "AI", -- representitive player name (for win counter)
 				winString = winString or "0", -- Win string from win counter
 				playercount = #teamList,
+				startboxid = startboxid,
 			}
 		end
 	end
@@ -760,7 +763,8 @@ local function GetOpposingAllyTeams()
 		return
 	end
 	
-	if allyteams[1].allyTeamID > allyteams[2].allyTeamID then
+--	if allyteams[1].allyTeamID > allyteams[2].allyTeamID then
+	if allyteams[1].startboxid > allyteams[2].startboxid then
 		allyteams[1], allyteams[2] = allyteams[2], allyteams[1]
 		for i = 1, #teamSides do
 			teamSides[i] = 3 - teamSides[i]
