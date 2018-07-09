@@ -662,7 +662,7 @@ local moduleDefs = {
 		name = "module_jumpjet",
 		humanName = "Jumpjets",
 		description = "Jumpjets - Leap over obstacles and out of danger.",
-		image = moduleImagePath .. "module_radarnet2.png",
+		image = moduleImagePath .. "module_jumpjet.png",
 		limit = 1,
 		cost = 400 * COST_MULT,
 		requireChassis = {"knight"},
@@ -1443,7 +1443,7 @@ local chassisDefs = {
 		baseUnitDef = UnitDefNames and UnitDefNames["dynknight0"].id,
 		extraLevelCostFunction = extraLevelCostFunction,
 		maxNormalLevel = 5,
-		notSelectable = true,
+		notSelectable = (Spring.GetModOptions().campaign_chassis ~= "1"),
 		secondPeashooter = true,
 		levelDefs = {
 			[0] = {
@@ -1722,11 +1722,18 @@ local function ModuleIsValid(level, chassis, slotAllows, moduleDefID, alreadyOwn
 		end
 	
 	end
-	
+
+	-- cheapass hack to prevent cremcom dual wielding same weapon (not supported atm)
+	-- proper solution: make the second instance of a weapon apply projectiles x2 or reloadtime x0.5 and get cremcoms unit script to work with that
+	local limit = data.limit
+	if chassis == 5 and data.slotType == "basic_weapon" and limit == 2 then
+		limit = 1
+	end
+
 	-- Check that the module limit is not reached
-	if data.limit and (alreadyOwned[moduleDefID] or (alreadyOwned2 and alreadyOwned2[moduleDefID])) then
+	if limit and (alreadyOwned[moduleDefID] or (alreadyOwned2 and alreadyOwned2[moduleDefID])) then
 		local count = (alreadyOwned[moduleDefID] or 0) + ((alreadyOwned2 and alreadyOwned2[moduleDefID]) or 0) 
-		if count > data.limit then
+		if count > limit then
 			return false
 		end
 	end

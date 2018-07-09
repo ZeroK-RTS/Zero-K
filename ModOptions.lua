@@ -254,6 +254,14 @@ local options = {
     def=false,
   },
   {
+    key='campaign_chassis',
+    name='Allow campaign commander chassis',
+    desc='Allows you to choose the campaign commander chassis.',
+    type='bool',
+    section= 'startconds',
+    def=false,
+  },
+  {
     key='typemapsetting',
     name='No roads',
     desc='Some maps have roads that allow faster unit movement. When enabled, units will move at their regular unboosted speed on roads.',
