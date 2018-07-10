@@ -56,7 +56,6 @@ end
 --	- Stop collecting stats at game over, prior to the losing side self-destroying,
 --		so you can see what the stats were just before they resigned.
 --	- Revise wins logic to update at end of game instead of all throughout the game
---	- Properly account for destroyed unfinished units in the unit value totals
 --	- Properly account for units not destroyed by the enemy in attrition (maybe?)
 --
 -- Code clean-up:
@@ -587,6 +586,7 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 	local e = unitCategoryExceptions
 
 	if ud and not (cp.dontcount or cp.is_drone) then
+
 		-- TODO - Not certain these are the right ways to get this information
 		--
 		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
@@ -609,9 +609,6 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 			inc = -inc
 		end
 		
-		-- TODO - Total only gets credited for finished units, but gets debited for
-		--	destroyed units whether they're finished or not. Need to fix that.
-		--
 		unitStats[side].total = unitStats[side].total + metal
 		if e.offense[udid] or (armed and mobile and not e.defense[udid] and not e.eco[udid] and not e.other[udid]) then
 			offense = true
@@ -671,9 +668,10 @@ function widget:UnitReverseBuilt(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attUnitID, attDefID, attTeamID)	
-	ProcessUnit(unitID, unitDefID, unitTeam, true)
 	
 	-- TODO - What about units destroyed by environmental damage, or by Gaia?
+	--        As it stands, that will be credited as attrition by the enemy.
+	--        That may, in fact, be the right thing to do.
 	
 	if not panel_is_on then return end
 	
@@ -688,15 +686,25 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attUnitID, attDefID, 
 		return 		
 	end
 	deadUnits[unitID] = unitDefID
-	
+
 	local ud = UnitDefs[unitDefID]
 	if ud.customParams.dontcount or ud.customParams.is_drone then return end
-	
+
+	-- besides processing the unit to update unit counts etc,
+	-- we also need to update the lost totals for the attrition counter
+	-- but only credit it with a partial kill if it was a partially-built unit
 	local buildProgress = select(5, Spring.GetUnitHealth(unitID))
 	local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
-	
 	local side = teamSides[unitTeam]
 	unitStats[side].lost = unitStats[side].lost + worth
+	
+	-- don't process the unit (i.e. decrement its unit count and metal value) if it wasn't finished being built
+	-- because if it wasn't finished being built then its unit count and metal value were never incremented
+	if buildProgress < 1 then return end
+
+	-- once we've passed the double-destroy check, the dontcount check, the drone check,
+	-- and the not-partial-unit check, THEN we can call ProcessUnit
+	ProcessUnit(unitID, unitDefID, unitTeam, true)
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
@@ -736,7 +744,7 @@ local function GetOpposingAllyTeams()
 			-- TODO - This is not a good way to do this
 			--        Merge this with the loop immediately above, and handle them both better
 			for j = 1, #teamList do
-				teamSides[teamList[j]] = i
+				teamSides[teamList[j]] = #allyteams+1
 			end
 
 			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID) or "Unknown"
@@ -778,8 +786,8 @@ local function GetOpposingAllyTeams()
 	
 	if (allyteams[1].xpos - allyteams[2].xpos) + ((allyteams[1].ypos - allyteams[2].ypos) * 0.2) > 0 then
 		allyteams[1], allyteams[2] = allyteams[2], allyteams[1]
-		for i = 1, #teamSides do
-			teamSides[i] = 3 - teamSides[i]
+		for k,v in pairs(teamSides) do
+			teamSides[k] = 3 - v
 		end
 	end
 	
