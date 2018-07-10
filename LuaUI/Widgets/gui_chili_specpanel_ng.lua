@@ -211,7 +211,7 @@ end
 
 local col_metal = {136/255,214/255,251/255,1}
 local col_energy = {.93,.93,0,1}
-local default_playercolors = { left = {0.5,0.5,1,1}, right = {1,0.2,0.2,1}, }
+local default_playercolors = { cold = {0.5,0.5,1,1}, hot = {1,0.2,0.2,1}, }
 local smooth_count = 3
 local unitpic_slots = 5
 local compic_slots = 3
@@ -784,8 +784,14 @@ local function GetOpposingAllyTeams()
 	end
 	
 	if allyteams[1].playercount > 1 or allyteams[2].playercount > 1 then
-		allyteams[1].color = default_playercolors.left
-		allyteams[2].color = default_playercolors.right
+		local myAlly = Spring.GetMyAllyTeamID()
+		if myAlly == allyteams[1].allyTeamID then
+			allyteams[1].color = default_playercolors.cold
+			allyteams[2].color = default_playercolors.hot
+		else
+			allyteams[1].color = default_playercolors.hot
+			allyteams[2].color = default_playercolors.cold
+		end
 	end
 	
 	-- TODO - This doesn't belong here
