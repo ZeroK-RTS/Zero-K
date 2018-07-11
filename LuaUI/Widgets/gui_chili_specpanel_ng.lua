@@ -575,8 +575,9 @@ end
 --------------------------------------------------------------------------------
 -- Unit Stats Call-ins and Processor
 
-local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
+local function ProcessUnit(unitID, unitDefID, unitTeam, remove, destroy)
 	if not panel_is_on then return end
+	if unitTeam == gaiaTeam then return end
 	
 	local side = teamSides[unitTeam]
 	local id = unitID
@@ -597,11 +598,21 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 		local comm = ud.customParams.commtype
 		local con = ud.isMobileBuilder and not comm
 		local startfac = ploppableDefs[udid]
+		local health,_,_,_,buildProgress = Spring.GetUnitHealth(unitID)
 
 		local offense
 		local defense
 		local eco
 		local other
+		
+		-- Increment attrition, including for partially-built units (pro-rated)
+		-- But don't increment attrition for units that were "destroyed" by upgrading
+		if destroy and not (health > 0) then
+			unitStats[side].lost = unitStats[side].lost + (metal * buildProgress)
+		end
+		
+		-- Don't increment or decrement unit and metal counts for partially-built units
+		if buildProgress < 1 then return end
 		
 		local inc = 1
 		if remove then
@@ -669,14 +680,13 @@ end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attUnitID, attDefID, attTeamID)	
 	
-	-- TODO - What about units destroyed by environmental damage, or by Gaia?
+	-- TODO - What about units destroyed by environmental damage, or by Gaia, or by friendly fire?
 	--        As it stands, that will be credited as attrition by the enemy.
 	--        That may, in fact, be the right thing to do.
+	--        Right now, even cancelled factory builds count as attrition, because
+	--        I'm not sure how to identify them so as to exclude them while not
+	--        excluding friendly fire.
 	
-	if not panel_is_on then return end
-	
-	if unitTeam == gaiaTeam or Spring.GetUnitHealth(unitID) > 0 then return end
-
 	-- in spec mode UnitDestroyed would sometimes be called twice for the same unit, so we need to prevent it from counting twice
 	-- if its also the same kind of unit, its safe to assume that it is the very same unit
 	-- else it is most likely not the same unit but an old table entry and a re-used unitID. we just keep the entry
@@ -686,25 +696,8 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attUnitID, attDefID, 
 		return 		
 	end
 	deadUnits[unitID] = unitDefID
-
-	local ud = UnitDefs[unitDefID]
-	if ud.customParams.dontcount or ud.customParams.is_drone then return end
-
-	-- besides processing the unit to update unit counts etc,
-	-- we also need to update the lost totals for the attrition counter
-	-- but only credit it with a partial kill if it was a partially-built unit
-	local buildProgress = select(5, Spring.GetUnitHealth(unitID))
-	local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
-	local side = teamSides[unitTeam]
-	unitStats[side].lost = unitStats[side].lost + worth
 	
-	-- don't process the unit (i.e. decrement its unit count and metal value) if it wasn't finished being built
-	-- because if it wasn't finished being built then its unit count and metal value were never incremented
-	if buildProgress < 1 then return end
-
-	-- once we've passed the double-destroy check, the dontcount check, the drone check,
-	-- and the not-partial-unit check, THEN we can call ProcessUnit
-	ProcessUnit(unitID, unitDefID, unitTeam, true)
+	ProcessUnit(unitID, unitDefID, unitTeam, true, true)
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
@@ -1400,6 +1393,8 @@ function widget:Update(dt)
 			_,timer_updateclock = math.modf(Spring.GetGameSeconds())
 		end
 		if timer_updatestats >= 2 then
+			unitStats[1].lost = unitStats[1].lost * .95
+			unitStats[2].lost = unitStats[2].lost * .95
 			DisplayResources(specPanel)
 			DisplayUnitStats(specPanel)
 			_,timer_updatestats = math.modf(Spring.GetGameSeconds())
