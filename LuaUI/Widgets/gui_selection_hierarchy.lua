@@ -34,11 +34,6 @@ local selectionRankCmdDesc = {
 
 local doubleClickToleranceTime = (Spring.GetConfigInt('DoubleClickTime', 300) * 0.001) * 2
 
-local numkeys = {}
-for i=0,9 do
-  numkeys[i] = KEYSYMS["N_" .. i]
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -59,7 +54,7 @@ local useSelectionFiltering = true
 local selectionFilteringOnlyAlt = false
 local retreatDeselects = false
 
-local function StartRetreat (unitID)
+local function StartRetreat(unitID)
 	local selection = Spring.GetSelectedUnits()
 	local count = #selection
 	for i = 1, count do
@@ -204,14 +199,12 @@ local function GetIsSubselection(newSelection, oldSelection)
 	return true
 end
 
-local function IsNumberKeyPressed(num)
-	if num then
-		return Spring.GetKeyState(numkeys[num])
-	else
-		for i=0,9 do
-			if Spring.GetKeyState(numkeys[i]) then
-				return true
-			end
+-- returns true if any control group hotkeys are being pressed
+local function CheckControlGroupHotkeys(num)
+	local keys = WG.GetControlGroupHotkeys()
+	for keysym, group in pairs(keys) do
+		if (num == nil or num == group) and Spring.GetKeyState(keysym) then
+			return true
 		end
 	end
 	return false
@@ -241,7 +234,11 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		return -- Don't filter when the change is just that something was deselected
 	end
 	
-	if IsNumberKeyPressed() then
+	if #units <= 1 then
+		return
+	end
+	
+	if CheckControlGroupHotkeys() then
 		return	-- assume the user is selecting a control group
 	end
 	

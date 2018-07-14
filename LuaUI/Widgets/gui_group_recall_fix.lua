@@ -59,6 +59,12 @@ local groupNumber = {
 	[KEYSYMS.N_0] = 0,
 }
 
+local function GetHotkeys()
+	return groupNumber
+end
+
+WG.GetControlGroupHotkeys = GetHotkeys
+
 
 local function GenerateHotkeys()
 	local keyMap = {}
