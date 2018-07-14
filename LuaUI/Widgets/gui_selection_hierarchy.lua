@@ -18,6 +18,7 @@ end
 --------------------------------------------------------------------------------
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+include("keysym.h.lua")
 
 local spDiffTimers = Spring.DiffTimers
 local spGetTimer = Spring.GetTimer
@@ -32,6 +33,11 @@ local selectionRankCmdDesc = {
 }
 
 local doubleClickToleranceTime = (Spring.GetConfigInt('DoubleClickTime', 300) * 0.001) * 2
+
+local numkeys = {}
+for i=0,9 do
+  numkeys[i] = KEYSYMS["N_" .. i]
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -198,6 +204,19 @@ local function GetIsSubselection(newSelection, oldSelection)
 	return true
 end
 
+local function IsNumberKeyPressed(num)
+	if num then
+		return Spring.GetKeyState(numkeys[num])
+	else
+		for i=0,9 do
+			if Spring.GetKeyState(numkeys[i]) then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 local function RawGetFilteredSelection(units, subselection, subselectionCheckDone, doubleClickUnitDefID)
 	if not useSelectionFiltering then
 		return
@@ -220,6 +239,10 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 	
 	if subselection then
 		return -- Don't filter when the change is just that something was deselected
+	end
+	
+	if IsNumberKeyPressed() then
+		return	-- assume the user is selecting a control group
 	end
 	
 	if doubleClickUnitDefID then
