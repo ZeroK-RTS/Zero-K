@@ -108,6 +108,10 @@ local function WriteTable(concatArray, tab, tabName, params)
 	end
 	
 	local function ProcessKeyValuePair(i,v, isArray, lastItem)
+		if type(v) == "function" then
+			return
+		end
+	
 		local pairEndLine = (lastItem and "") or (isArray and comma) or endLine
 		if isDict then
 			str = str .. WriteIndents(params.numIndents + 1)
