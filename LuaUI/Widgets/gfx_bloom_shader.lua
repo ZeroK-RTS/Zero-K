@@ -5,7 +5,7 @@ function widget:GetInfo()
 		author    = "Floris", -- orginal bloom shader: Kloot
 		date      = "24-9-2016",
 		license   = "",
-		layer     = -math.huge,
+		layer     = 9,
 		enabled   = false,
 	}
 end
