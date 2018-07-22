@@ -40,7 +40,6 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	noExplode               = true,
 	noSelfDamage            = true,
-	--predictBoost            = 1,
 	range                   = 270,
 	reloadtime              = 5/30,
 	rgbColor                = [[1 1 1]],

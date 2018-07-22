@@ -31,7 +31,6 @@ local weaponDef = {
 	impulseFactor           = 0,
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
-	predictBoost            = 1,
 	range                   = 860,
 	reloadtime              = 0.8,
 	size                    = 0.01,

@@ -139,7 +139,6 @@ unitDef = {
       interceptedByShieldType = 1,
       noExplode               = true,
       noSelfDamage            = true,
-      --predictBoost        = 1,
       range                   = 290,
       reloadtime              = 0.16,
       rgbColor                = [[1 1 1]],

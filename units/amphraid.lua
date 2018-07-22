@@ -136,7 +136,6 @@ unitDef = {
       model                   = [[wep_m_ajax.s3o]],
       numbounce               = 4,
       noSelfDamage            = true,
-      predictBoost            = 1,
       projectiles	      	  = 2,
       range                   = 150,
       reloadtime              = 4,

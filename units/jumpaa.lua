@@ -98,7 +98,6 @@ unitDef = {
       impulseFactor           = 0.4,
       intensity               = 0.8,
       interceptedByShieldType = 1,
-      predictBoost            = 1,
       proximityPriority       = 4,
       range                   = 1040,
       reloadtime              = 0.1,

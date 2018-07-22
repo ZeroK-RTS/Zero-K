@@ -97,7 +97,6 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_ajax.s3o]],
       noSelfDamage            = true,
-      predictBoost            = 1,
       range                   = 455,
       reloadtime              = 3.5,
       smokeTrail              = true,

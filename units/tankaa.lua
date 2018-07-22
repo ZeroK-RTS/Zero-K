@@ -100,7 +100,6 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      predictBoost            = 1,
       range                   = 900,
       reloadtime              = 0.4,
       size                    = 0.01,
