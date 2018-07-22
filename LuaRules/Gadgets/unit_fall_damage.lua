@@ -213,7 +213,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local nx, ny, nz = Spring.GetGroundNormal(x,z)
 		local nMag = math.sqrt(nx^2 + ny^2 + nz^2)
 		nx, ny, nz = nx/nMag, ny/nMag, nz/nMag -- normal to unit vector
-		nx, ny, nz = speed*nx, speed*ny, speed*nz -- normal is now a component of velocity
+		local dot = nx*vx + ny*vy + nz*vz
+		nx, ny, nz = dot*nx, dot*ny, dot*nz -- normal is now a component of velocity
 		local tx, ty, tz = vx - nx, vy - ny, vz - nz -- tangent is the other component of velocity
 		local nf = att.elasticity
 		local tf = att.friction
