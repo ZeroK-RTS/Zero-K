@@ -494,7 +494,7 @@ local function LoadFeatures()
 				spSetFeatureReclaim(newID, data.reclaimLeft)
 			end
 			if data.resurrectDef and data.resurrectDef ~= "" then
-				spSetFeatureResurrect(newID, featureInfo.resurrectDef, featureInfo.resurrectFacing, featureInfo.resurrectProgress)
+				spSetFeatureResurrect(newID, data.resurrectDef, data.resurrectFacing, data.resurrectProgress)
 			end
 		end
 	end
