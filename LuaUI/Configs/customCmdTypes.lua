@@ -59,6 +59,7 @@ local custom_cmd_actions = {
 	setferry = {cmdType = 1, name = "Create Ferry Route"},
 	setfirezone = {cmdType = 1, name = "Set Newton Fire Zone"},
 	cancelfirezone = {cmdType = 3, name = "Cancel Newton Fire Zone"},
+	--selectmissiles = {cmdType = 3, name = "Select Missiles"},	-- doesn't seem to appear, maybe it doesn't support widget commands?
 	radialmenu = {cmdType = 3, name = "Open Radial Build Menu"},
 	placebeacon = {cmdType = 1, name = "Place Teleport Beacon"},
 	recalldrones = {cmdType = 3, name = "Recall Drones to Carrier"},

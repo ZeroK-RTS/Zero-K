@@ -61,6 +61,9 @@ options_order = {
 	'uikey4',
 	'uikey5',
 	'uikey6',
+	
+	'lbl_other',
+	'select_missiles'
 }
 options = {
 
@@ -68,6 +71,7 @@ options = {
 	lbl_visibilty = { type = 'label', name = 'On Screen'},
 	lbl_same = { type = 'label', name = 'By Type In Selection' },
 	lbl_w = { type = 'label', name = 'Global Selection' },
+	lbl_other = { type = 'label', name = 'Other' },
 	
 	select_all = { type = 'button',
 		name = 'All Units',
@@ -134,6 +138,13 @@ options = {
 		name = 'Deselect non-constructor',
 		desc = 'Deselect all non-constructors.',
 		action = 'select PrevSelection+_Builder+_ClearSelection_SelectAll+',
+	},
+	
+	select_missiles = { type = 'button',
+		name = 'Select missiles',
+		desc = 'Select missiles of all currently selected missile silos.',
+		action = 'selectmissiles',
+		bindWithAny = true,
 	},
 	
 	lowhealth_30 = { type = 'button',
