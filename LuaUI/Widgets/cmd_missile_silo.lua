@@ -8,6 +8,7 @@ function widget:GetInfo()
 		layer     = 0,
 		enabled   = true,
 		--alwaysStart = true,
+		handler   = true,
 	}
 end
 
@@ -17,6 +18,26 @@ end
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local siloDefID = UnitDefNames.staticmissilesilo.id
+local missileDefIDs = {}
+local missileNames = {"tacnuke", "seismic", "empmissile", "napalmmissile"}
+
+for i=1,#missileNames do
+  if UnitDefNames[missileNames[i]] then
+	missileDefIDs[UnitDefNames[missileNames[i]].id] = true
+  end
+end
+
+local selectMissilesCmdDesc = {
+	id      = CMD_SELECT_MISSILES,
+	type    = CMDTYPE.ICON,
+	name    = 'Select Missiles',
+	action  = 'selectmissiles',
+	tooltip = "Select this silo's missiles.",
+	texture = "LuaUI/Images/Commands/Bold/missile.png",
+	params  = {}
+}
+
+local SEARCH_RANGE = 48
 --local FIRE_INTERVAL = 90	-- gameframes
 local UPDATE_INTERVAL = 10
 local EMPTY_TABLE = {}
@@ -32,7 +53,7 @@ local function GetMissiles(siloID, justOne)
 	local oldest, oldestFrame = nil, 999999
 	
 	local x, y, z = Spring.GetUnitPosition(siloID)
-	local units = Spring.GetUnitsInRectangle(x - 64, z - 64, x + 64, z + 64)
+	local units = Spring.GetUnitsInRectangle(x - SEARCH_RANGE, z - SEARCH_RANGE, x + SEARCH_RANGE, z + SEARCH_RANGE)
 	
 	for i=1,#units do
 		local unitID = units[i]
@@ -56,23 +77,6 @@ local function GetMissiles(siloID, justOne)
 		return oldest
 	end
 	return missiles, count
-end
-
--- list all the missiles to select and do the actual selection in Update()
--- this allows us to select missiles from multiple silos at once
-local function AwaitMissileSelection(siloID)
-	if not siloID then
-		return
-	end
-	
-	local missiles, count = GetMissiles(siloID)
-	if count == 0 then
-		return
-	end
-	toSelect = toSelect or {}
-	for i=1,#missiles do
-		toSelect[#toSelect + 1] = missiles[i]	
-	end
 end
 
 local function IsWaiting(unitID)
@@ -137,13 +141,34 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 end
 
 function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (not silos[unitID]) or cmdOptions.shift then
-		return
-	end
-	if cmdID == CMD_ONECLICK_WEAPON then
-		AwaitMissileSelection(unitID)
-	elseif cmdID == CMD.ATTACK then
+	if cmdID == CMD.ATTACK then
 		--FireOneMissileAtSiloTarget(unitID, cmdParams)
+	elseif cmdID == CMD_SELECT_MISSILES then 
+		if unitDefID ~= siloDefID then
+			return false
+		end
+		
+		toSelect = toSelect or {}
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		local missiles = GetMissiles(unitID)
+		for i=1,#missiles do
+			toSelect[#toSelect + 1] = missiles[i]
+		end
+		
+		if (not silos[unitID]) or cmdOptions.shift then
+			return
+		end
+	end
+end
+
+-- add missile selection command
+function widget:CommandsChanged()
+	local selectedUnits = Spring.GetSelectedUnits()
+	local unitID = selectedUnits and selectedUnits[1]
+	local unitDefID = unitID and Spring.GetUnitDefID(unitID)
+	if unitDefID == siloDefID then
+	  local customCommands = widgetHandler.customCommands
+	  table.insert(customCommands, selectMissilesCmdDesc)
 	end
 end
 
