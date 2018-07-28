@@ -45,7 +45,6 @@ local EMPTY_TABLE = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local silos = {}	-- [unitID] = frames before next shot allowed
-local toSelect = nil
 
 local function GetMissiles(siloID, justOne)
 	local missiles = {}
@@ -140,25 +139,39 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 	end
 end
 
+--[[
 function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD.ATTACK then
 		--FireOneMissileAtSiloTarget(unitID, cmdParams)
-	elseif cmdID == CMD_SELECT_MISSILES then 
-		if unitDefID ~= siloDefID then
-			return false
-		end
-		
-		toSelect = toSelect or {}
+	end
+end
+]]--
+
+function widget:CommandNotify(cmdID, params, options)
+	if cmdID ~= CMD_SELECT_MISSILES then
+		return false
+	end
+	
+	local selected = Spring.GetSelectedUnitsSorted()
+	if not selected[siloDefID] then
+		return true
+	end
+	
+	local toSelect = toSelect or {}
+	for i=1,#selected[siloDefID] do
+		local unitID = selected[siloDefID][i]
 		local x, y, z = Spring.GetUnitPosition(unitID)
 		local missiles = GetMissiles(unitID)
 		for i=1,#missiles do
 			toSelect[#toSelect + 1] = missiles[i]
 		end
-		
-		if (not silos[unitID]) or cmdOptions.shift then
-			return
-		end
 	end
+	if #toSelect > 0 then
+		local alt, ctrl, meta, shift = Spring.GetModKeyState()
+		Spring.SelectUnitArray(toSelect, shift)
+	end
+	
+	return true
 end
 
 -- add missile selection command
@@ -185,15 +198,6 @@ end
 function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	silos[unitID] = nil
 	widget:UnitCreated(unitID, unitDefID, unitTeam)
-end
-
-function widget:Update()
-	if toSelect then
-		local alt, ctrl, meta, shift = Spring.GetModKeyState()
-		local append = ctrl or shift	-- can't be always true because selection rank filters out the missiles from selection
-		Spring.SelectUnitArray(toSelect, append)
-		toSelect = nil
-	end
 end
 
 function widget:GameFrame(n)
