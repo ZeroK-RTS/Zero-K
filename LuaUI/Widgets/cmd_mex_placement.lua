@@ -2,13 +2,14 @@
 function widget:GetInfo()
 	return {
 		name      = "Mex Placement Handler",
-		desc      = "Places mexes in the correct position DO NOT DISABLE",
+		desc      = "Places mexes in the correct position",
 		author    = "Google Frog with some from Niobium and Evil4Zerggin.",
 		version   = "v1",
 		date      = "22 April, 2012", --2 April 2013
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
 		enabled   = true,
+		alwaysStart = true,
 		handler   = true
 	}
 end
