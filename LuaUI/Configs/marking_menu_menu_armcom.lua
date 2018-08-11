@@ -45,10 +45,6 @@ local menu_armcom = {
         unit = "factorygunship"
       },
       {
-        angle = -90,
-        unit = "athena"
-      },
-	  {
         angle = -135,
         unit = "factoryamph"
       },
