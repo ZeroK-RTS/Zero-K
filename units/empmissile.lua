@@ -61,6 +61,8 @@ unitDef = {
       craterMult              = 0,
 
 	  customparams = {
+		burst = Shared.BURST_RELIABLE,
+
 		stats_hide_dps = 1, -- one use
 		stats_hide_reload = 1,
 		
@@ -86,7 +88,7 @@ unitDef = {
       reloadtime              = 3,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/emp_missile_hit]],
-      soundStart              = [[weapon/missile/tacnuke_launch]],
+      soundStart              = [[weapon/missile/tacnuke_launch2_trimmed]],
       tolerance               = 4000,
       tracks                  = false,
       turnrate                = 12000,

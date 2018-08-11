@@ -817,10 +817,10 @@ decorations = {
 				unitDef.buildpic = "skin_support_zebra.png"
 			end,
 	},
-	skin_bombard_steel = {
+	skin_assault_steel = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/benzcom_1_steel.dds]]
-				unitDef.buildpic = "skin_bombard_steel.png"
+				unitDef.buildpic = "skin_assault_steel.png"
 			end,
 	},
 	

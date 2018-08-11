@@ -29,7 +29,7 @@ VFS.Include("LuaRules/Utilities/rulesParam.lua")
 
 local function GetBuildIconFrame(udef) 
 	local cp = udef.customParams
-	if (udef.isBuilder and udef.speed>0) then
+	if udef.isMobileBuilder then
 		return consTex
 
 	elseif (udef.isBuilder or udef.isFactory) then
@@ -90,9 +90,11 @@ local function IsDictOrContainsDict(tab)
 	return false
 end
 
-local function WriteTable(tab, tabName, params)
+-- Returns an array of strings to be concatenated
+local function WriteTable(concatArray, tab, tabName, params)
 	params = params or {}
 	local processed = {}
+	concatArray = concatArray or {}
 	
 	params.numIndents = params.numIndents or 0
 	local isDict = IsDictOrContainsDict(tab)
@@ -100,7 +102,16 @@ local function WriteTable(tab, tabName, params)
 	local endLine = comma .. "\n"
 	local str = ""
 	
+	local function NewLine()
+		concatArray[#concatArray + 1] = str
+		str = ""
+	end
+	
 	local function ProcessKeyValuePair(i,v, isArray, lastItem)
+		if type(v) == "function" then
+			return
+		end
+	
 		local pairEndLine = (lastItem and "") or (isArray and comma) or endLine
 		if isDict then
 			str = str .. WriteIndents(params.numIndents + 1)
@@ -117,14 +128,23 @@ local function WriteTable(tab, tabName, params)
 		
 		if type(v) == "table" then
 			local arg = {numIndents = (params.numIndents + 1), endOfFile = false}
-			str = str .. WriteTable(v, nil, arg)
+			NewLine()
+			WriteTable(concatArray, v, nil, arg)
 		elseif type(v) == "boolean" then
 			str = str .. tostring(v) .. pairEndLine
 		elseif type(v) == "string" then
 			str = str .. string.format("%q", v) .. pairEndLine
 		else
+			if type(v) == "number" then
+				if v == math.huge then
+					v = "math.huge"
+				elseif v == -math.huge then
+					v = "-math.huge"
+				end
+			end
 			str = str .. v .. pairEndLine
 		end
+		NewLine()
 	end
 	
 	if not params.raw then
@@ -135,6 +155,7 @@ local function WriteTable(tab, tabName, params)
 		end
 		str = str .. (isDict and "{\n" or "{")
 	end
+	NewLine()
 	
 	-- do array component first (ensures order is preserved)
 	for i=0,#tab do
@@ -157,8 +178,9 @@ local function WriteTable(tab, tabName, params)
 	if params.endOfFile == false then
 		str = str .. endLine
 	end
+	NewLine()
 	
-	return str
+	return concatArray
 end
 
 WG.WriteTable = WriteTable
@@ -171,7 +193,9 @@ function WG.SaveTable(tab, dir, fileName, tabName, params)
 		Spring.Log(widget:GetInfo().name, LOG.WARNING, err)
 		return
 	end
-	file:write(WriteTable(tab, tabName, params))
+	local toConcat = WriteTable({}, tab, tabName, params)
+	local str = table.concat(toConcat)
+	file:write(str)
 	file:flush()
 	file:close()
 end
@@ -263,7 +287,7 @@ for udid, ud in ipairs(UnitDefs) do
 end
 
 function widget:SelectionChanged(units)
-	if not units then
+	if (not units) or #units == 0 then
 		WG.selectionEntirelyCons = false
 		return
 	end

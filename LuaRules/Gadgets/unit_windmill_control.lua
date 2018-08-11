@@ -46,6 +46,11 @@ local teamEnergy = {}
 local alliedTrueTable = {allied = true}
 local inlosTrueTable = {inlos = true}
 
+local MAPSIDE_MAPINFO = "mapinfo.lua"
+local mapInfo = VFS.FileExists(MAPSIDE_MAPINFO) and VFS.Include(MAPSIDE_MAPINFO) or false
+
+
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -190,6 +195,11 @@ function gadget:Initialize()
 	Spring.SetGameRulesParam("WindStrength", 0)
 	Spring.SetGameRulesParam("tidalHeight", tidalHeight)
 
+	local minWindMult = 1
+	if (mapInfo and mapInfo.custom and tonumber(mapInfo.custom.zkminwindmult) ~= nil ) then
+		minWindMult = tonumber(mapInfo.custom.zkminwindmult)
+	end
+	
 	groundMin, groundMax = Spring.GetGroundExtremes()
 	local waterlevel = Spring.GetGameRulesParam("waterlevel")
 	groundMin, groundMax = math.max(groundMin - waterlevel,0), math.max(groundMax - waterlevel,1)
@@ -200,7 +210,7 @@ function gadget:Initialize()
 
 	--this is a function defined between 0 and 1, so we can adjust the gadget 
 	-- effect between 0% (flat maps) and 100% (mountained maps)
-	slope = 1/(1+math.exp(4 - groundExtreme/105))
+	slope = minWindMult * 1/(1+math.exp(4 - groundExtreme/105))
 	
 	Spring.SetGameRulesParam("WindGroundMin", groundMin)
 	Spring.SetGameRulesParam("WindGroundExtreme", groundExtreme)

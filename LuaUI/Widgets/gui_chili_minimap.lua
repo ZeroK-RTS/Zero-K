@@ -105,6 +105,7 @@ end
 
 options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
+local hotkeysPath = 'Hotkeys/Misc'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map/Radar Color'
 local radar_path_edit = 'Settings/Interface/Map/Radar Color'
@@ -159,46 +160,52 @@ options_order = {
 	'fancySkinning',
 }
 options = {
-	label_drawing = { type = 'label', name = 'Map Drawing and Messaging', },
+	label_drawing = { type = 'label', name = 'Map Drawing and Messaging', path = hotkeysPath},
 	
 	drawinmap = {
 		name = 'Map Drawing Hotkey',
 		desc = 'Hold this hotkey to draw on the map and write messages. Left click to draw, right click to erase, middle click to place a marker. Double left click to type a marker message.',
 		type = 'button',
 		action = 'drawinmap',
+		path = hotkeysPath,
 	},
 	clearmapmarks = {
 		name = 'Erase Map Drawing',
 		desc = 'Erases all map drawing and markers (for you, not for others on your team).',
 		type = 'button',
 		action = 'clearmapmarks',
+		path = hotkeysPath,
 	},	
 	lastmsgpos = {
 		name = 'Zoom To Last Message',
 		desc = 'Moves the camera to the most recently placed map marker or message.',
 		type = 'button',
 		action = 'lastmsgpos',
+		path = hotkeysPath,
 	},	
 	
-	lblViews = { type = 'label', name = 'Map Overlays', },
+	lblViews = { type = 'label', name = 'Map Overlays', path = hotkeysPath},
 
 	viewstandard = {
 		name = 'Clear Overlays',
 		desc = 'Disables Heightmap, Pathing and Line of Sight overlays.',
 		type = 'button',
 		action = 'showstandard',
+		path = hotkeysPath,
 	},
 	viewheightmap = {
 		name = 'Toggle Height Map',
 		desc = 'Shows contours of terrain elevation.',
 		type = 'button',
 		action = 'showelevation',
+		path = hotkeysPath,
 	},
 	viewblockmap = {
 		name = 'Toggle Pathing Map',
 		desc = 'Select a unit to see where it can go. Select a building blueprint to see where it can be placed.',
 		type = 'button',
 		action = 'showpathtraversability',
+		path = hotkeysPath,
 	},
 	
 	viewfow = {
@@ -206,6 +213,7 @@ options = {
 		desc = 'Shows sight distance and radar coverage.',
 		type = 'button',
 		action = 'togglelos',
+		path = hotkeysPath,
 	},
 	
 	showeco = {
@@ -220,7 +228,8 @@ options = {
 				WG.ToggleShoweco()
 			end
 		end,
-	},	
+		path = hotkeysPath,
+	},
 	
 	lable_initialView = { type = 'label', name = 'Initial Map Overlay', },
 	

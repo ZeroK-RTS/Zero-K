@@ -138,7 +138,7 @@ options = {
 	resetMoveStates = {
 		type = 'button',
 		name = "Clear Move States",
-		desc = "Set all land units to inherit their move state from factory (overrides holdpos for skirms, arty and AA but not crabe, slasher or tremor)",
+		desc = "Set all land units to inherit their move state from factory (overrides holdpos for skirms, arty and AA but not Crab, Fencer or Tremor)",
 		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
@@ -647,7 +647,7 @@ local function addUnit(defName, path)
 	}
 	options_order[#options_order+1] = defName .. "_buildpriority_0"
 
-	if ud.speed == 0 then
+	if ud.isImmobile then
 		options[defName .. "_buildpriority_0"].value = 1
 	end
 
@@ -681,7 +681,7 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_misc_priority"
 	end
 	
-	if ud.isBuilder and (not (ud.isBuilding or ud.isFactory or ud.speed == 0)) and (not (ud.canFly or ud.isAirUnit)) and not ud.cantBeTransported then
+	if ud.isMobileBuilder and not ud.isAirUnit and not ud.cantBeTransported then
 		options[defName .. "_auto_call_transport_2"] = {
 			name = "  Auto Call Transport",
 			desc = "Values: Inherit, Disabled, Enabled",
@@ -944,6 +944,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		return
 	end
+	
+	if oldID then
+		return
+	end
 
 	local ud = UnitDefs[unitDefID]
 	local orderArray = {}
@@ -971,7 +975,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local name = ud.name
 	if unitAlreadyAdded[name] then
 		local value = GetStateValue(name, "firestate0")
-		if value ~= nil and (not oldID) then
+		if value ~= nil then
 			if value == -1 then
 				local trueBuilder = false
 				if builderID then
@@ -996,7 +1000,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 
 		value = GetStateValue(name, "movestate1")
-		if value ~= nil and (not oldID) then
+		if value ~= nil then
 			if value == -1 then
 				local trueBuilder = false
 				if builderID then
@@ -1021,7 +1025,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		
 		value = GetStateValue(name, "flylandstate_1")
-		if value and (not oldID) then
+		if value then
 			local trueBuilder = false
 			if builderID then
 				local bdid = Spring.GetUnitDefID(builderID)
@@ -1042,9 +1046,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			
 		end
 		
-		if (not oldID) then
-			QueueState(name, "repeat", CMD.REPEAT, orderArray)
-		end
+		QueueState(name, "repeat", CMD.REPEAT, orderArray)
 		QueueState(name, "flylandstate_1_factory", CMD_AP_FLY_STATE, orderArray)
 		QueueState(name, "auto_assist", CMD_FACTORY_GUARD, orderArray)
 		QueueState(name, "airstrafe1", CMD_AIR_STRAFE, orderArray)
@@ -1169,6 +1171,11 @@ end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1) then
+		return
+	end
+	
+	local oldID = Spring.GetUnitRulesParam(unitID, "saveload_oldID")	
+	if oldID then
 		return
 	end
 

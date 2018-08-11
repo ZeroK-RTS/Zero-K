@@ -2,13 +2,14 @@
 function widget:GetInfo()
 	return {
 		name      = "Mex Placement Handler",
-		desc      = "Places mexes in the correct position DO NOT DISABLE",
+		desc      = "Places mexes in the correct position",
 		author    = "Google Frog with some from Niobium and Evil4Zerggin.",
 		version   = "v1",
 		date      = "22 April, 2012", --2 April 2013
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
 		enabled   = true,
+		alwaysStart = true,
 		handler   = true
 	}
 end
@@ -125,6 +126,7 @@ options = {
 		max = 150,
 		step = 5,
 		update_on_the_fly = true,
+		advanced = true,
 		OnChange = function() updateMexDrawList() end
 	},
 	rounding = {
@@ -186,6 +188,9 @@ local spotData = {}
 
 local wasSpectating = spGetSpectatingState()
 local metalSpotsNil = true
+
+local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
+local metalmultInv = metalmult > 0 and (1/metalmult) or 1
 
 ------------------------------------------------------------
 -- Functions
@@ -635,8 +640,7 @@ local centerX
 local centerZ
 local extraction = 0
 
-local mainMexDrawList = 0
-local miniMexDrawList = 0
+local circleOnlyMexDrawList = 0
 
 local function getSpotColor(id)
 	local teamID = spotData[id] and spotData[id].team or Spring.GetGaiaTeamID()
@@ -644,129 +648,30 @@ local function getSpotColor(id)
 end
 
 function calcMainMexDrawList()
-	local specatate = spGetSpectatingState()
-
-	if WG.metalSpots then
-		for i = 1, #WG.metalSpots do
-			local spot = WG.metalSpots[i]
-			local x,z = spot.x, spot.z
-			local y = spGetGroundHeight(x,z)
-			if y < 0 then y = 0 end
-
-			local r, g, b = getSpotColor(i)
-			local metal = spot.metal
-
-
-			glPushMatrix()
-
-			gl.DepthTest(true)
-
-			glColor(0,0,0,0.7)
-			-- glDepthTest(false)
-			glLineWidth(spot.metal*2.4)
-			glDrawGroundCircle(x, 1, z, 40, 21)
-			glColor(r,g,b,0.7)
-			glLineWidth(spot.metal*1.5)
-			glDrawGroundCircle(x, 1, z, 40, 21)
-
-			--glColor(0,1,1)
-			--glRect(x-width/2, z+18, x+width/2, z+20)
-			--glDepthTest(false)
-			glPopMatrix()
-		end
-
-		glColor(1,1,1)
-		glTexture("LuaUI/Images/ibeam.png")
-		glDepthTest(false)
-		for i = 1, #WG.metalSpots do
-			local spot = WG.metalSpots[i]
-			local x,z = spot.x, spot.z
-			local y = spGetGroundHeight(x,z)
-			if y < 0 then y = 0 end
-
-			local metal = spot.metal
-
-			glPushMatrix()
-
-			if options.drawicons.value then
-				local size = 1
-				if metal > 10 then
-					if metal > 100 then
-						metal = metal*0.01
-						size = 5
-					else
-						metal = metal*0.1
-						size = 2.5
-					end
-				end
-
-				size = options.size.value
-
-				glRotate(90,1,0,0)
-				glTranslate(0,0,-y-10)
-
-
-				local width = metal*size
-				glTexRect(x-width/2, z+40, x+width/2, z+40+size,0,0,metal,1)
-			else
-				-- Draws a metal bar at the center of the metal spot
-				glRotate(90,1,0,0)
-				glTranslate(0,0,-y)
-
-				glTexRect(x-25, z-25, x+25, z+25,0,0,1,1)
-			end
-
-			glPopMatrix()
-		end
-		glTexture(false)
-
-		if not options.drawicons.value then
-			--glColor(1,1,1) --already set
-			for i = 1, #WG.metalSpots do
-				local spot = WG.metalSpots[i]
-				local x,z = spot.x, spot.z
-				local y = spGetGroundHeight(x,z)
-				if y < 0 then y = 0 end
-
-				local metal = spot.metal
-
-				glPushMatrix()
-
-				glTranslate(x, y, z)
-				glRotate(-90, 1, 0, 0)
-				glTranslate(0, -40 - options.size.value, 0)
-				glText("+" .. ("%."..options.rounding.value.."f"):format(metal), 0.0, 0.0, options.size.value , "cno")
-
-				glPopMatrix()
-			end
-		end
-
-		glLineWidth(1.0)
-		glColor(1,1,1,1)
+	if not WG.metalSpots then
+		return
 	end
-end
---[[
-function calcMiniMexDrawList()
-	local specatate = spGetSpectatingState()
-
-	glLoadIdentity()
-	glTranslate(0,1,0)
-	glScale(mapXinv , -mapZinv, 1)
-	glRotate(270,1,0,0)
 
 	for i = 1, #WG.metalSpots do
 		local spot = WG.metalSpots[i]
 		local x,z = spot.x, spot.z
 		local y = spGetGroundHeight(x,z)
+		if y < 0 then y = 0 end
 
 		local r, g, b = getSpotColor(i)
-
-		glLineWidth(spot.metal)
-		glColor(r, g, b)
-
-		glDrawGroundCircle(x, 0, z, 40, 32)
+		local width = (spot.metal > 0 and spot.metal) or 0.1
+		width = width * metalmultInv
 
 		glPushMatrix()
+
+		gl.DepthTest(true)
+
+		glColor(0,0,0,0.7)
+		glLineWidth(width*2.4)
+		glDrawGroundCircle(x, 1, z, 40, 21)
+		glColor(r,g,b,0.7)
+		glLineWidth(width*1.5)
+		glDrawGroundCircle(x, 1, z, 40, 21)
 
 		glPopMatrix()
 	end
@@ -774,25 +679,81 @@ function calcMiniMexDrawList()
 	glLineWidth(1.0)
 	glColor(1,1,1,1)
 end
---]]
+
+local function DrawIncomeLabels()
+	glTexture("LuaUI/Images/ibeam.png")
+	glDepthTest(false)
+	glColor(1,1,1)
+
+	local cx, cy, cz = Spring.GetCameraDirection()
+	local dir = ((math.atan2(cx, cz) / math.pi) + 1) * 180
+
+	for i = 1, #WG.metalSpots do
+		local spot = WG.metalSpots[i]
+		local x,z = spot.x, spot.z
+		local y = spGetGroundHeight(x,z)
+		if y < 0 then y = 0 end
+
+		local metal = spot.metal
+
+		glPushMatrix()
+		glTranslate(x,y+5,z)
+		glRotate(90,1,0,0)
+		glRotate(-dir, 0, 0, 1)
+
+		if options.drawicons.value then
+			local size = options.size.value
+			local width = metal*size
+			glTexRect(-width/2, 40, width/2, 40+size,0,0,metal,1)
+		else
+			-- Draws a metal bar at the center of the metal spot
+			glTexRect(-25, -25, 25, 25,0,0,1,1)
+		end
+
+		glPopMatrix()
+	end
+	glTexture(false)
+
+	if not options.drawicons.value then
+		for i = 1, #WG.metalSpots do
+			local spot = WG.metalSpots[i]
+			local x,z = spot.x, spot.z
+			local y = spGetGroundHeight(x,z)
+			if y < 0 then y = 0 end
+
+			local metal = spot.metal
+
+			glPushMatrix()
+
+			glTranslate(x, y, z)
+			glRotate(-90, 1, 0, 0)
+			glRotate(dir, 0, 0, 1)
+			glTranslate(0, -40 - options.size.value, 0)
+			glText("+" .. ("%."..options.rounding.value.."f"):format(metal), 0.0, 0.0, options.size.value , "cno")
+
+			glPopMatrix()
+		end
+	end
+end
+
 function updateMexDrawList()
 	if not WG.metalSpots then
 		return
 	end
 
-	if (mainMexDrawList) then
-		gl.DeleteList(mainMexDrawList);
-		mainMexDrawList = nil
-	end --delete previous list if exist (ref:gui_chicken.lua by quantum)
-	mainMexDrawList = glCreateList(calcMainMexDrawList)
-	if not mainMexDrawList then
+	if circleOnlyMexDrawList then
+		gl.DeleteList(circleOnlyMexDrawList)
+	end
+
+	circleOnlyMexDrawList = glCreateList(calcMainMexDrawList)
+	if not circleOnlyMexDrawList then
 		Spring.Echo("Warning: Failed to update mex draw list.")
 	end
-	--miniMexDrawList = glCreateList(calcMiniMexDrawList)
 end
 
 function widget:Shutdown()
-	gl.DeleteList(mainMexDrawList)
+	gl.DeleteList(circleOnlyMexDrawList)
+	circleOnlyMexDrawList = nil
 end
 
 local function DoLine(x1, y1, z1, x2, y2, z2)
@@ -801,30 +762,39 @@ local function DoLine(x1, y1, z1, x2, y2, z2)
 end
 
 function widget:DrawWorldPreUnit()
+	if Spring.IsGUIHidden() then
+		return false
+	end
 
 	-- Check command is to build a mex
 	local _, cmdID = spGetActiveCommand()
 	local showecoMode = WG.showeco
 	local peruse = spGetGameFrame() < 1 or showecoMode or spGetMapDrawMode() == 'metal'
 
-	drawMexSpots = WG.metalSpots and (-mexDefID == cmdID or CMD_AREA_MEX == cmdID or peruse)
+	drawMexSpots = (-mexDefID == cmdID or CMD_AREA_MEX == cmdID or peruse)
 
-	if drawMexSpots then
+	if WG.metalSpots and (drawMexSpots or WG.showeco_always_mexes) then
+		gl.DepthTest(true)
+		gl.DepthMask(true)
 
-			gl.DepthTest(true)
-			gl.DepthMask(true)
-		glCallList(mainMexDrawList)
+		if drawMexSpots then
+			DrawIncomeLabels() -- ideally this would also be a call list but I don't know how to do rotation that way. Each mex its own call list I guess?
+		end
+		glCallList(circleOnlyMexDrawList)
 
-			gl.DepthTest(false)
-			gl.DepthMask(false)
+		gl.DepthTest(false)
+		gl.DepthMask(false)
 	end
 end
 
 function widget:DrawWorld()
+	if Spring.IsGUIHidden() then
+		return false
+	end
 
 	-- Check command is to build a mex
 	local _, cmdID = spGetActiveCommand()
-	local showecoMode = WG.showeco
+	local showecoMode = WG.showeco or WG.showeco_always_mexes
 	local pregame = (spGetGameFrame() < 1)
 	local peruse = pregame or showecoMode or spGetMapDrawMode() == 'metal'
 
@@ -840,6 +810,9 @@ function widget:DrawWorld()
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])
 		local bface = Spring.GetBuildFacing()
 		local closestSpot, distance, index = GetClosestMetalSpot(bx, bz)
+		if -mexDefID ~= cmdID then
+			bx, by, bz = pos[1], pos[2], pos[3]
+		end
 
 		if closestSpot and (-mexDefID == cmdID or not ((CMD_AREA_MEX == cmdID or peruse) and distance > 60)) and IsSpotBuildable(index) then
 
@@ -880,10 +853,12 @@ function widget:DefaultCommand(type, id)
 end
 
 function widget:DrawInMiniMap(minimapX, minimapY)
-
-	if drawMexSpots then
+	if not WG.metalSpots then
+		return
+	end
+	if drawMexSpots or WG.showeco_always_mexes then
 		if not glDrawCircle then
-			glDrawCircle = gl.Utilities.DrawCircle
+			glDrawCircle = gl.Utilities.DrawCircle -- FIXME make utilities available early enough to do this in init
 		end
 
 		local specatate = spGetSpectatingState()
@@ -898,12 +873,14 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 			local y = spGetGroundHeight(x,z)
 
 			local r,g,b = getSpotColor(i)
+			local width = (spot.metal > 0 and spot.metal) or 0.1
+			width = width * metalmultInv
 
 			glLighting(false)
 			glColor(0,0,0,1)
-			glLineWidth(((spot.metal > 0 and spot.metal) or 0.1)*2.0)
+			glLineWidth(width*2.0)
 			glDrawCircle(x, z, MINIMAP_DRAW_SIZE)
-			glLineWidth(((spot.metal > 0 and spot.metal) or 0.1)*0.8)
+			glLineWidth(width*0.8)
 			glColor(r,g,b,1.0)
 
 			glDrawCircle(x, z, MINIMAP_DRAW_SIZE)
@@ -915,46 +892,3 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 	end
 end
 
---[[
-local function DrawTextWithBackground(text, x, y, size, opt)
-	local width = glGetTextWidth(text) * size
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-
-	glColor(0.25, 0.25, 0.25, 0.75)
-	if (opt) then
-		if (strFind(opt, "r")) then
-			glRect(x, y, x - width, y + size * TEXT_CORRECT_Y)
-		elseif (strFind(opt, "c")) then
-			glRect(x + width * 0.5, y, x - width * 0.5, y + size * TEXT_CORRECT_Y)
-		else
-			glRect(x, y, x + width, y + size * TEXT_CORRECT_Y)
-		end
-	else
-		glRect(x, y, x + width, y + size * TEXT_CORRECT_Y)
-	end
-	glColor(0.75, 0.75, 0.75, 1)
-	glText(text, x, y, size, opt)
-
-end
-
-function widget:DrawScreen()
-	if mexSpotToDraw and WG.metalSpots then
-		local mx, my = spGetMouseState()
-		DrawTextWithBackground("\255\255\255\255Metal extraction: " .. strFormat("%.2f", mexSpotToDraw.metal), mx, my, TEXT_SIZE, "d")
-		glColor(1, 1, 1, 1)
-	else
-		local _, cmd_id = spGetActiveCommand()
-		if -mexDefID ~= cmd_id then
-			return
-		end
-		local mx, my = spGetMouseState()
-		local _, coords = spTraceScreenRay(mx, my, true, true)
-		if (not coords) then
-			return
-		end
-		IntegrateMetal(coords[1], coords[3])
-		DrawTextWithBackground("\255\255\255\255Metal extraction: " .. strFormat("%.2f", extraction), mx, my, TEXT_SIZE, "d")
-		glColor(1, 1, 1, 1)
-	end
-end
---]]

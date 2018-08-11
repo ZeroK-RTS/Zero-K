@@ -209,19 +209,18 @@ end
 
 local function MergeAllHumans(teamlist)
 	local mergeid = -1
-	local AI,teamLeader
 	for i = 1, #teamlist do
-		AI = select(4, spGetTeamInfo(teamlist[i]))
-		if not AI and mergeid ~= -1 then
+		local _, teamLeader, _, AI = spGetTeamInfo(teamlist[i])
+		local human = not AI and teamLeader ~= -1
+		if human and mergeid ~= -1 then
 			spEcho("[Commshare] Merging team " .. teamlist[i])
-			teamLeader = select(2,spGetTeamInfo(teamlist[i])) 
 			-- Needed because of recursion error. Only one player on a team at game start anyways.
 			MergePlayer(teamLeader,mergeid)
-		elseif not AI and mergeid == -1 then
+		elseif human and mergeid == -1 then
 			mergeid = teamlist[i]
 			spEcho("[Commshare] MergeID is " .. mergeid)
 		else
-			spEcho("[Commshare] Skipping team " .. i .. " [AI]")
+			spEcho("[Commshare] Skipping team " .. i .. " [inhuman]")
 		end
 	end
 end

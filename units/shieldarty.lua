@@ -70,6 +70,8 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams        = {
+		burst = Shared.BURST_RELIABLE,
+
 	    disarmDamageMult = 1,
 		disarmDamageOnly = 1,
 		disarmTimer      = 6, -- seconds

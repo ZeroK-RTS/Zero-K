@@ -65,6 +65,8 @@ unitDef = {
       craterMult              = 3.5,
 
       customParams            = {
+		burst = Shared.BURST_RELIABLE,
+
       lups_explodelife = 1.5,
 		stats_hide_dps = 1, -- meaningless
 		stats_hide_reload = 1,
@@ -90,7 +92,7 @@ unitDef = {
       reloadtime              = 10,
       smokeTrail              = false,
       soundHit                = [[explosion/mini_nuke]],
-      soundStart              = [[weapon/missile/tacnuke_launch]],
+      soundStart              = [[weapon/missile/tacnuke_launch2_trimmed]],
       tolerance               = 4000,
       turnrate                = 18000,
       weaponAcceleration      = 180,

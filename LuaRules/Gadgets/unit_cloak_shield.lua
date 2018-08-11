@@ -456,6 +456,23 @@ function gadget:GameFrame(frameNum)
 end
 
 function gadget:Load(zip)
+  -- restore cloak shield for dyncomms
+  for _,unitID in ipairs(Spring.GetAllUnits()) do
+	if not cloakShieldUnits[unitID] then
+	  local unitDefID = Spring.GetUnitDefID(unitID)
+	  local cloakShieldDef = GG.Upgrades_UnitCloakShieldDef(unitID)
+	  if cloakShieldDef then
+		local state = GetUnitRulesParam(unitID, "cloak_shield")
+		local radius = Spring.GetUnitRulesParam(unitID, "cloakerRadius")
+		local isOn = state ~= nil and state > 0
+		
+		AddCloakShieldUnit(unitID, cloakShieldDef)
+		CloakShieldCommand(unitID, {isOn and 1 or 0})
+		Spring.SetUnitRulesParam(unitID, "cloakerRadius", radius)
+	  end
+	end
+  end
+  
   for unitID, data in pairs(cloakers) do
     local radius = Spring.GetUnitRulesParam(unitID, "cloakerRadius") or 0
 	if radius > 0 then

@@ -41,6 +41,7 @@ local spGetTeamRulesParam = Spring.GetTeamRulesParam
 local WARNING_IMAGE = LUAUI_DIRNAME .. "Images/Crystal_Clear_app_error.png"
 
 local GetGridColor = VFS.Include("LuaUI/Headers/overdrive.lua")
+local GetFlowStr = VFS.Include("LuaUI/Headers/ecopanels.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -221,7 +222,7 @@ end
 
 options_order = {
 	'ecoPanelHideSpec', 'eExcessFlash', 'energyFlash', 'energyWarning', 'metalWarning', 'opacity',
-	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve',
+	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve', 'flowAsArrows',
 	'colourBlind','fontSize','warningFontSize', 'fancySkinning'}
  
 options = {
@@ -274,6 +275,31 @@ options = {
 		type  = "number", 
 		value = 0.9, min = 0,max = 1, step = 0.02,
 		desc = "Recieve a warning when metal storage exceeds this value."
+	},
+	flowAsArrows = {
+		name  = "Flow as arrows",
+		desc = "Use arrows instead of a number for the flow. Each arrow is 5 resources per second.",
+		type  = "bool",
+		value = true,
+		noHotkey = true,
+		OnChange = function(self)
+			if bar_metal then
+				bar_metal.font.size = self.value and 20 or 16
+				bar_metal.fontOffset = self.value and -2 or 1
+				if bar_metal.net then
+					bar_metal:SetCaption(GetFlowStr(bar_metal.net, self.value, positiveColourStr, negativeColourStr))
+				end
+				bar_metal:Invalidate()
+			end
+			if bar_overlay_energy then
+				bar_overlay_energy.font.size = self.value and 20 or 16
+				bar_overlay_energy.fontOffset = self.value and -2 or 1
+				if bar_overlay_energy.net then
+					bar_overlay_energy:SetCaption(GetFlowStr(bar_overlay_energy.net, self.value, positiveColourStr, negativeColourStr))
+				end
+				bar_overlay_energy:Invalidate()
+			end
+		end,
 	},
 	opacity = {
 		name  = "Opacity",
@@ -825,61 +851,12 @@ function widget:GameFrame(n)
 	lbl_storage_metal:SetCaption(("%.0f"):format(mCurr))
 
 	--// Net income indicator on resource bars.
-	if netMetal < -27.5 then
-		bar_metal:SetCaption(negativeColourStr.."<<<<<<")
-	elseif netMetal < -22.5 then
-		bar_metal:SetCaption(negativeColourStr.."<<<<<")
-	elseif netMetal < -17.5 then
-		bar_metal:SetCaption(negativeColourStr.."<<<<")
-	elseif netMetal < -12.5 then
-		bar_metal:SetCaption(negativeColourStr.."<<<")
-	elseif netMetal < -7.5 then
-		bar_metal:SetCaption(negativeColourStr.."<<")
-	elseif netMetal < -2.5 then
-		bar_metal:SetCaption(negativeColourStr.."<")
-	elseif netMetal < 2.5 then
-		bar_metal:SetCaption("")
-	elseif netMetal < 7.5 then
-		bar_metal:SetCaption(positiveColourStr..">")
-	elseif netMetal < 12.5 then
-		bar_metal:SetCaption(positiveColourStr..">>")
-	elseif netMetal < 17.5 then
-		bar_metal:SetCaption(positiveColourStr..">>>")
-	elseif netMetal < 22.5 then
-		bar_metal:SetCaption(positiveColourStr..">>>>")
-	elseif netMetal < 27.5 then
-		bar_metal:SetCaption(positiveColourStr..">>>>>")
-	else
-		bar_metal:SetCaption(positiveColourStr..">>>>>>")
-	end
-	
-	if netEnergy < -27.5 then
-		bar_overlay_energy:SetCaption(negativeColourStr.."<<<<<<")
-	elseif netEnergy < -22.5 then
-		bar_overlay_energy:SetCaption(negativeColourStr.."<<<<<")
-	elseif netEnergy < -17.5 then
-		bar_overlay_energy:SetCaption(negativeColourStr.."<<<<")
-	elseif netEnergy < -12.5 then
-		bar_overlay_energy:SetCaption(negativeColourStr.."<<<")
-	elseif netEnergy < -7.5 then
-		bar_overlay_energy:SetCaption(negativeColourStr.."<<")
-	elseif netEnergy < -2.5 then
-		bar_overlay_energy:SetCaption(negativeColourStr.."<")
-	elseif netEnergy < 2.5 then
-		bar_overlay_energy:SetCaption("")
-	elseif netEnergy < 7.5 then
-		bar_overlay_energy:SetCaption(positiveColourStr..">")
-	elseif netEnergy < 12.5 then
-		bar_overlay_energy:SetCaption(positiveColourStr..">>")
-	elseif netEnergy < 17.5 then
-		bar_overlay_energy:SetCaption(positiveColourStr..">>>")
-	elseif netEnergy < 22.5 then
-		bar_overlay_energy:SetCaption(positiveColourStr..">>>>")
-	elseif netEnergy < 27.5 then
-		bar_overlay_energy:SetCaption(positiveColourStr..">>>>>")
-	else
-		bar_overlay_energy:SetCaption(positiveColourStr..">>>>>>")
-	end
+	bar_metal:SetCaption(GetFlowStr(netMetal, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+	bar_overlay_energy:SetCaption(GetFlowStr(netEnergy, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+
+	-- save so that we can switch representation without recalculating
+	bar_metal.net = netMetal
+	bar_overlay_energy.net = netEnergy
 end
 
 --------------------------------------------------------------------------------
@@ -1521,6 +1498,10 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 
 	-- set translatable strings
 	languageChanged ()
+
+	-- update the flow string font settings
+	local opt_flowstr = options.flowAsArrows
+	opt_flowstr.OnChange(opt_flowstr)
 end
 
 function DestroyWindow()

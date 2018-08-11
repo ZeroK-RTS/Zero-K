@@ -9,7 +9,7 @@ end
 function gadget:GetInfo()
   return {
     name      = "Weapon Impulse",
-    desc      = "Implements impulse reliant weapons because engine impelementation is prettymuch broken.",
+    desc      = "Implements impulse reliant weapons because engine implementation is pretty much broken.",
     author    = "Google Frog",
     date      = "1 April 2012",
     license   = "GNU GPL, v2 or later",
@@ -329,7 +329,7 @@ local function PushPullToggleCommand(unitID, unitDefID, state)
 	end
 	
 	if state then
-		spGiveOrderToUnit(unitID, CMD_ONOFF, {state, CMD_PUSH_PULL},{})
+		GG.DelegateOrder(unitID, CMD_ONOFF, {state, CMD_PUSH_PULL}, 0)
 	end
 end
 
@@ -414,6 +414,28 @@ function gadget:Initialize()
 	end
 end
 
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	local units = GG.SaveLoad.GetSavedUnitsCopy()
+	for oldID, data in pairs(units) do
+		local newID = GG.SaveLoad.GetNewUnitID(oldID)
+		if newID and data.states.custom then
+			local state = data.states.custom[CMD_PUSH_PULL]
+			if state then
+				local unitDefID = Spring.GetUnitDefID(newID)
+				PushPullToggleCommand(newID, unitDefID, tonumber(state))
+			end
+		end
+	end
+	if collectgarbage then
+		units = nil
+		collectgarbage("collect")
+	end
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Main Impulse Handling
@@ -480,12 +502,12 @@ local function AddImpulses()
 					--if data.allied then
 						local cQueue = spGetCommandQueue(unitID,1)
 						if #cQueue >= 1 and cQueue[1].id == CMD_GUARD then
-							spGiveOrderToUnit(unitID, CMD_STOP, {0},{})
+							spGiveOrderToUnit(unitID, CMD_STOP, {0}, 0)
 						end
 
 						local states = spGetUnitStates(unitID)
 						if states["repeat"] then
-							spGiveOrderToUnit(unitID, CMD_REPEAT, {0},{})
+							spGiveOrderToUnit(unitID, CMD_REPEAT, {0}, 0)
 						end
 					--end
 					--[[

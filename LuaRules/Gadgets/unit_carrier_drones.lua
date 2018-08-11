@@ -209,8 +209,8 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
 		local rx, rz = RandomPointInUnitCircle()
 		-- Drones intentionall use CMD.MOVE instead of CMD_RAW_MOVE as they do not require any of the features
-		GiveClampedOrderToUnit(droneID, CMD.MOVE, {x + rx*IDLE_DISTANCE, y+DRONE_HEIGHT, z + rz*IDLE_DISTANCE}, {""})
-		GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
+		GiveClampedOrderToUnit(droneID, CMD.MOVE, {x + rx*IDLE_DISTANCE, y+DRONE_HEIGHT, z + rz*IDLE_DISTANCE}, 0)
+		GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , CMD.OPT_SHIFT)
 
 		SetUnitNoSelect(droneID, true)
 
@@ -493,7 +493,7 @@ local function transferCarrierData(unitID, unitDefID, unitTeam, newUnitID)
 			local set = carrier.droneSets[i]
 			for droneID in pairs(set.drones) do
 				droneList[droneID].carrier = newUnitID
-				GiveOrderToUnit(droneID, CMD.GUARD, {newUnitID} , {"shift"})
+				GiveOrderToUnit(droneID, CMD.GUARD, {newUnitID} , CMD.OPT_SHIFT)
 			end
 		end
 		carrierList[unitID] = nil
@@ -601,7 +601,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 				px, py, pz = GetUnitPosition(carrierID)
 				rx, rz = RandomPointInUnitCircle()
 				GiveClampedOrderToUnit(droneID, CMD.MOVE, {px + rx*IDLE_DISTANCE, py+DRONE_HEIGHT, pz + rz*IDLE_DISTANCE}, 0)
-				GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
+				GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , CMD.OPT_SHIFT)
 			elseif droneSendDistance and droneSendDistance < set.config.range then
 				-- attacking
 				if target then
@@ -625,7 +625,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 					px, py, pz = GetUnitPosition(carrierID)
 					rx, rz = RandomPointInUnitCircle()
 					GiveClampedOrderToUnit(droneID, holdfire and CMD.MOVE or CMD.FIGHT, {px + rx*IDLE_DISTANCE, py+DRONE_HEIGHT, pz + rz*IDLE_DISTANCE}, 0)
-					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
+					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , CMD.OPT_SHIFT)
 				end
 			end
 			
@@ -686,7 +686,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
 				local rx, rz = RandomPointInUnitCircle()
 				GiveClampedOrderToUnit(droneID, CMD.MOVE, {px + rx*IDLE_DISTANCE, py+DRONE_HEIGHT, pz + rz*IDLE_DISTANCE}, 0)
-				GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
+				GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , CMD.OPT_SHIFT)
 				droneList[droneID] = temp
 			end
 		end
@@ -725,7 +725,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 				for droneID in pairs(set.drones) do
 					droneList[droneID].carrier = newUnitID
 					droneList[droneID].set = newSetID
-					GiveOrderToUnit(droneID, CMD.GUARD, {newUnitID} , {"shift"})
+					GiveOrderToUnit(droneID, CMD.GUARD, {newUnitID} , CMD.OPT_SHIFT)
 				end
 			end
 		else --Carried died
@@ -853,7 +853,7 @@ end
 -- Save/Load
 
 local function LoadDrone(unitID, parentID)
-	Spring.DestroyUnit(unitID)
+	Spring.DestroyUnit(unitID, false, true)
 end
 
 function gadget:Load(zip)

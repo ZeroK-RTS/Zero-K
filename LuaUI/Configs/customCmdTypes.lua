@@ -59,6 +59,7 @@ local custom_cmd_actions = {
 	setferry = {cmdType = 1, name = "Create Ferry Route"},
 	setfirezone = {cmdType = 1, name = "Set Newton Fire Zone"},
 	cancelfirezone = {cmdType = 3, name = "Cancel Newton Fire Zone"},
+	--selectmissiles = {cmdType = 3, name = "Select Missiles"},	-- doesn't seem to appear, maybe it doesn't support widget commands?
 	radialmenu = {cmdType = 3, name = "Open Radial Build Menu"},
 	placebeacon = {cmdType = 1, name = "Place Teleport Beacon"},
 	recalldrones = {cmdType = 3, name = "Recall Drones to Carrier"},
@@ -69,6 +70,7 @@ local custom_cmd_actions = {
 	upgradecommstop  = {cmdType = 3, name = "Stop Upgrade Commander"},
 	stopproduction  = {cmdType = 3, name = "Stop Factory Production"},
 	globalbuildcancel  = {cmdType = 1, name = "Cancel Global Build Tasks"},
+	evacuate  = {cmdType = 3, name = "Evacuate"},
 
 	-- terraform
 	rampground = {cmdType = 1, name = "Terraform Ramp"},
@@ -186,6 +188,7 @@ local usedActions = {
 	-- These actions are used, just not by selecting everything with default UI
 	["upgradecommstop"] = true,
 	["autoeco"] = true,
+	["evacuate"] = true,
 }
 
 -- Clear unused actions.

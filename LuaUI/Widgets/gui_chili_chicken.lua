@@ -216,7 +216,15 @@ local function MakeChickenBreakdown()
 		t[#t+1] = str
 		tNames[str] = chickenName
 	end
-	table.sort(t, function(a,b) return chickenTypes[tNames[a]]["time"] < chickenTypes[tNames[b]]["time"] end )	-- sort by chicken appearance
+	-- sort by chicken appearance
+	table.sort(t,
+				function(a,b)
+					if (not chickenTypes[tNames[a]]) or (not chickenTypes[tNames[b]]) then
+						return false
+					end
+					return chickenTypes[tNames[a]]["time"] < chickenTypes[tNames[b]]["time"]
+				end
+			)
 	--table.sort(t, function(a,b) return tNames[a] < tNames[b] end )	-- alphabetical order
 	return table.concat(t)
 end
@@ -224,7 +232,8 @@ end
 -- done every second
 local function UpdateAnger()
 	local curTime = Spring.GetGameSeconds()
-	local angerPercent = (curTime/gameInfo.queenTime*100)
+	local saveOffset = (Spring.GetGameRulesParam("totalSaveGameFrame") or 0) / Game.gameSpeed
+	local angerPercent = ((curTime + saveOffset) / (gameInfo.queenTime + saveOffset) * 100)
 	local angerString = "Hive Anger : ".. GetColor( math.min(angerPercent, 100) )..math.floor(angerPercent).."% \008"
 	if (angerPercent < 100) and (not endlessMode) then angerString = angerString .. "("..FormatTime(gameInfo.queenTime - curTime) .. " left)" end
 	label_anger:SetCaption(angerString)

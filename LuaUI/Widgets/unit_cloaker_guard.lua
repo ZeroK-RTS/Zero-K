@@ -32,6 +32,8 @@ local EMPTY_TABLE = {}
 local TABLE_0 = {0}
 local TABLE_1 = {1}
 
+local SAVE_FILE = "Widgets/unit_cloaker_guard.lua"
+
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local spGetUnitPosition 	= Spring.GetUnitPosition
@@ -216,10 +218,10 @@ function widget:CommandNotify(id, params, options)
 			  v.maxVelID = sid
 			end
 		    follower[sid] = {
-			fol = cid, 
-			firestate = firestate, 
-			vel = speed,
-			range = v.range
+			  fol = cid, 
+			  firestate = firestate, 
+			  vel = speed,
+			  range = v.range
 			}
 		    v.cloakiees[sid] = follower[sid]
 			v.folCount = v.folCount+1
@@ -256,13 +258,13 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 		local ux,uy,uz = spGetUnitPosition(unitID)
 		local speed = ud.speed/30
 		cloakers[unitID] = {id = unitID, ux = ux, uy = uy, uz = uz, 
-		range = ud.jammerRadius-cloakRangeSafety, 
-		reactiveRange = ud.jammerRadius-cloakReactivateRange, 
-		cloakiees = {},
-		folCount = 0,
-		selfVel = speed, 
-		maxVel = speed,
-		maxVelID = -1
+		  range = ud.jammerRadius-cloakRangeSafety, 
+		  reactiveRange = ud.jammerRadius-cloakReactivateRange, 
+		  cloakiees = {},
+		  folCount = 0,
+		  selfVel = speed, 
+		  maxVel = speed,
+		  maxVelID = -1
 		}
 		break
 	  end
@@ -328,12 +330,57 @@ end
 --Add cloaker names to array
 
 function widget:Initialize() 
-	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
-		Spring.Echo("<Cloaker Guard>: disabled for spectators")
-		widgetHandler:RemoveWidget()
+  if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
+	Spring.Echo("<Cloaker Guard>: disabled for spectators")
+	widgetHandler:RemoveWidget()
+  end
+  local units = spGetTeamUnits(team)
+  for i, id in ipairs(units) do 
+	widget:UnitCreated(id, spGetUnitDefID(id),team)
+  end
+end
+
+-----------------------
+-- save/load
+function widget:Load(zip)
+  if not WG.SaveLoad then
+	Spring.Log(widget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+	return
+  end
+  
+  local loadData = WG.SaveLoad.ReadFile(zip, "Cloaker Guard", SAVE_FILE)
+  if not loadData then
+	return
+  end
+  
+  -- load cloakers
+  for oldID, data in pairs(loadData.cloakers or {}) do
+	local newID = WG.SaveLoad.GetNewUnitID(oldID)
+	if newID then
+	  data.id = newID
+	  data.cloakiees = WG.SaveLoad.GetNewUnitIDValues(data.cloakiees)
+	  cloakers[newID] = data
 	end
-	local units = spGetTeamUnits(team)
-	for i, id in ipairs(units) do 
-		widget:UnitCreated(id, spGetUnitDefID(id),team)
+  end
+  -- load followers
+  for oldID, data in pairs(loadData.follower or {}) do
+	local newID = WG.SaveLoad.GetNewUnitID(oldID)
+	if newID then
+	  data.id = newID
+	  data.fol = WG.SaveLoad.GetNewUnitID(data.fol)
+	  if data.fol then
+		follower[newID] = data
+	  end
 	end
+  end
+end
+
+function widget:Save(zip)
+  if not WG.SaveLoad then
+	Spring.Log(widget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+	return
+  end
+  
+  local data = {cloakers = cloakers, follower = follower}
+  WG.SaveLoad.WriteSaveData(zip, SAVE_FILE, data)
 end

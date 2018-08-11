@@ -14,10 +14,10 @@ function gadget:GetInfo()
 end
 
 local disabledunitsstring = Spring.GetModOptions().disabledunits or ""
-
 if (disabledunitsstring == "") then --no unit to disable, exit
 	return
 end
+disabledunitsstring = disabledunitsstring:gsub("[%s%+]*%+[%s%+]*","+"):gsub("^%s*",""):gsub("%s*$",""):lower()
 
 local CMD_INSERT = CMD.INSERT
 
@@ -28,6 +28,7 @@ local removedBuildOptions = {}
 local UnitDefBothNames = {} -- Includes humanName and name
 
 local function AddName(name, unitDefId)
+	name = name:lower()
 	UnitDefBothNames[name] = UnitDefBothNames[name] or {}
 	UnitDefBothNames[name][#UnitDefBothNames[name] + 1] = unitDefId
 end
@@ -38,9 +39,7 @@ for unitDefID = 1, #UnitDefs do
 end
 
 local alreadyDisabled = {}
-GG.TableEcho(UnitDefBothNames)
 for name in string.gmatch(disabledunitsstring, '([^+]+)') do
-	Spring.Echo(name)
 	if UnitDefBothNames[name] then
 		for i = 1, #UnitDefBothNames[name] do
 			local unitDefID = UnitDefBothNames[name][i]

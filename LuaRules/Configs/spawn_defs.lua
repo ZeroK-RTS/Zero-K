@@ -281,6 +281,7 @@ difficulties = {
 	['Chicken: Custom'] = {
 		chickenSpawnRate = modoptions.chickenspawnrate or 50, 
 		burrowSpawnRate  = modoptions.burrowspawnrate or 45,
+		waveSizeMult    = modoptions.wavesizemult or 1,
 		timeSpawnBonus   = .04,
 	--	chickenTypes	 = Copy(chickenTypes),
 	--	defenders		= Copy(defenders),
@@ -289,7 +290,8 @@ difficulties = {
 		gracePeriod		= (modoptions.graceperiod and modoptions.graceperiod * 60) or 180,
 		gracePenalty	= 0,
 		gracePeriodMin	= 30,
-		burrowQueenTime	= (modoptions.burrowqueentime and modoptions.burrowqueentime) or 15,
+		burrowQueenTime	= (modoptions.burrowqueentime) or 15,
+		queenHealthMod	= modoptions.queenhealthmod or 1,
 		timeModifier	= modoptions.techtimemult or 1,
 		scoreMult		= 0,
 	},

@@ -1,3 +1,7 @@
+by Apelsinsaft (CC-BY):
+blackhole_impact2.wav
+sonicgun2.wav
+
 TA Weapons Factory:
 bomb_hit.wav
 

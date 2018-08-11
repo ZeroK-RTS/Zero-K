@@ -63,6 +63,8 @@ unitDef = {
       cylinderTargeting       = 1,
 
 	  customParams        	  = {
+		burst = Shared.BURST_RELIABLE,
+
 		isaa = [[1]],
 		light_color = [[0.58 0.7 0.7]],
 	  },

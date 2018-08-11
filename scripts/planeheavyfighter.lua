@@ -114,6 +114,12 @@ function script.BlockShot(num)
 	end
 end
 
+function OnLoadGame()
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
+	GG.UpdateUnitAttributes(unitID)
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.25 then

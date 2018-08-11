@@ -254,6 +254,14 @@ local options = {
     def=false,
   },
   {
+    key='campaign_chassis',
+    name='Allow campaign commander chassis',
+    desc='Allows you to choose the campaign commander chassis.',
+    type='bool',
+    section= 'startconds',
+    def=false,
+  },
+  {
     key='typemapsetting',
     name='No roads',
     desc='Some maps have roads that allow faster unit movement. When enabled, units will move at their regular unboosted speed on roads.',
@@ -517,6 +525,17 @@ local options = {
     step   = 1,
   },
   {
+    key    = 'wavesizemult',
+    name   = 'Wave size mult',
+    desc   = 'Increases or decreases the size of each chicken wave.',
+    type   = 'number',
+    section= 'chicken',
+    def    = 1,
+    min    = 0.1,
+    max    = 10,
+    step   = 0.05,
+  },
+  {
     key    = 'queentime',
     name   = 'Queen Time',
     desc   = 'How soon the queen appears on her own, minutes.',
@@ -526,6 +545,17 @@ local options = {
     min    = 1,
     max    = 200,
     step   = 1,
+  },
+  {
+    key    = 'queenhealthmod',
+    name   = 'Queen Health Mult',
+    desc   = 'Queen health multiplier',
+    type   = 'number',
+    section= 'chicken',
+    def    = 1,
+    min    = 0.1,
+    max    = 10,
+    step   = 0.05,
   },
   {
     key    = 'graceperiod',
@@ -560,6 +590,17 @@ local options = {
     max    = 5,
     step   = 0.05,
   },
+  {
+    key    = 'chicken_maxtech',
+    name   = 'Max Tech Level',
+    desc   = 'Maximum timer for chicken tech level progression, in seconds. Lowering this value will exclude some or most chicken types. Applies to all difficulties.',
+    type   = 'number',
+    section= 'chicken',
+    def    = 9000,
+    min    = 0,
+    max    = 9000,
+    step   = 60,
+  },
 --[[  
   {
 	key    = 'burrowtechtime',
@@ -576,7 +617,7 @@ local options = {
   {
 	key    = 'burrowqueentime',
 	name   = 'Burrow Queen Time',
-	desc   = 'How much time each burrow death subtracts from queen appearance time, seconds',
+	desc   = 'How much time each burrow death subtracts from queen appearance time, seconds.',
 	type   = 'number',
 	section= 'chicken',
 	def    = 15,

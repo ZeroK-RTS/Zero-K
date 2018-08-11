@@ -38,7 +38,6 @@ local missileParents = {} -- [missileUnitID] = siloUnitID
 local missilesToDestroy
 local missilesToTransfer = {}
 
-_G.saveTable = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function GetSiloEntry(unitID)
@@ -67,14 +66,16 @@ local function SetSiloPadNum(siloID, padNum)
 end
 
 -- this makes sure the object references are up to date
-local function GenerateSaveTable()
-	_G.saveTable = {
+local function UpdateSaveReferences()
+	_G.missileSiloSaveTable = {
 		silos = silos,
 		missileParents = missileParents,
 		missilesToDestroy = missilesToDestroy,
 		missilesToTransfer = missilesToTransfer
 	}
 end
+UpdateSaveReferences()
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function gadget:Initialize()
@@ -169,6 +170,9 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		silos[unitID] = {}
 	elseif silos[builderID] then
 		Spring.SetUnitBlocking(unitID, false, false) -- non-blocking, non-collide (try to prevent pad detonations)
+		Spring.SetUnitRulesParam(unitID, "missile_parentSilo", builderID)
+		local spawnedFrame = (Spring.GetGameRulesParam("totalSaveGameFrame") or 0) + Spring.GetGameFrame()
+		Spring.SetUnitRulesParam(unitID, "missile_spawnedFrame", spawnedFrame)
 	end
 end
 
@@ -205,12 +209,13 @@ function gadget:Load(zip)
 		for i = 1, MISSILES_PER_SILO do
 			if missiles[i] ~= nil then
 				missiles[i] = GG.SaveLoad.GetNewUnitID(missiles[i])
+				Spring.SetUnitRulesParam(missiles[i], "missile_parentSilo", siloID)
 			end
 		end
 		SetSiloPadNum(siloID, GetFirstEmptyPad(siloID))
 	end
 	
-	GenerateSaveTable()
+	UpdateSaveReferences()
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -227,7 +232,7 @@ function gadget:Save(zip)
 		return
 	end
 	
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.saveTable, "Missile silo"))
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.missileSiloSaveTable, "Missile silo"))
 end
 
 --------------------------------------------------------------------------------

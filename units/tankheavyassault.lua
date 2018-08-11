@@ -76,6 +76,8 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
+		burst = Shared.BURST_RELIABLE,
+
         reaim_time = 8, -- COB
 		
 	    gatherradius = [[105]],
@@ -190,7 +192,6 @@ unitDef = {
       interceptedByShieldType = 0,
       noExplode               = true,
       noSelfDamage            = true,
-      --predictBoost			  = 1,
       range                   = 280,
       reloadtime              = 0.16,
       rgbColor                = [[1 1 1]],

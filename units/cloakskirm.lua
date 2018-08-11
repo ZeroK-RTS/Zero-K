@@ -77,6 +77,8 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
+		burst = Shared.BURST_RELIABLE,
+
 		light_camera_height = 1600,
 		light_color = [[0.90 0.65 0.30]],
 		light_radius = 250,
@@ -95,7 +97,6 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_ajax.s3o]],
       noSelfDamage            = true,
-      predictBoost            = 1,
       range                   = 455,
       reloadtime              = 3.5,
       smokeTrail              = true,

@@ -117,7 +117,7 @@
     "turretmissile": {
         "name": "Picket",
         "description": "Lekka wieżyczka rakietowa",
-        "helptext": "Picket to lekka, wszechstronna wieżyczka. Jego celne pociski świetnie nadają się do niszczenia jednostek z dala i zapewniają podstawowe możliwości przeciwlotnicze. Główną wadą Defendera jest jego bardzo niska wytrzymałość."
+        "helptext": "Picket to lekka, wszechstronna wieżyczka. Jego celne pociski świetnie nadają się do niszczenia jednostek z dala i zapewniają podstawowe możliwości przeciwlotnicze. Główną wadą Picketa jest jego bardzo niska wytrzymałość."
     },
     "chicken_roc": {
         "name": "Roc",
@@ -626,7 +626,7 @@
     },
     "jumpcon": {
         "name": "Constable",
-        "description": "Skoczek konstruktor, moc 5 m/s",
+        "description": "Skoczek konstruktor, moc 4 m/s",
         "helptext": "Szybki konstruktor z możliwością skoku, Constable świetnie nadaje się do zajmowania trudno dostępnych obszarów. Zapewnia też wsparcie bojowe - jest uzbrojony w lekki promień spowalniający."
     },
     "chicken_blimpy": {
@@ -803,11 +803,6 @@
         "name": "Kodachi",
         "description": "Lekki czołg",
         "helptext": "Kodachi to lekki czołg z bombami zapalającymi, które dobrze spisują się przeciwko budynkom. Po wyjściu z walki szybko regeneruje się, co wspiera używanie go zaczepnie."
-    },
-    "thicket": {
-        "name": "Thicket",
-        "description": "Blokada",
-        "helptext": "Thicket to barykada używana przez kurczaki."
     },
     "damagesink": {
         "name": "Pochłaniacz obrażeń",

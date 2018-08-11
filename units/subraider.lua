@@ -5,7 +5,7 @@ unitDef = {
   acceleration           = 0.06,
   activateWhenBuilt      = true,
   brakeRate              = 0.2,
-  buildCostMetal         = 200,
+  buildCostMetal         = 220,
   builder                = false,
   buildPic               = [[subraider.png]],
   canGuard               = true,
@@ -83,6 +83,8 @@ unitDef = {
       cegTag                  = [[torptrailpurple]],
 
       customparams = {
+		burst = Shared.BURST_RELIABLE,
+
         timeslow_damagefactor = 2,
       },
 

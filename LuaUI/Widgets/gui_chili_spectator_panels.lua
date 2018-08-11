@@ -19,6 +19,8 @@ end
 include("colors.h.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
+local GetFlowStr = VFS.Include("LuaUI/Headers/ecopanels.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -62,6 +64,13 @@ local function UpdateResourceWindowFonts(windowData)
 	windowData.energyPanel.label_overdrive.font.size = options.resourceFontSize.value
 	windowData.energyPanel.label_reclaim.font.size = options.resourceFontSize.value
 	
+	windowData.metalPanel.bar:SetCaption(GetFlowStr(windowData.metalPanel.bar.net, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+	windowData.metalPanel.bar.font.size = options.flowAsArrows.value and 20 or 16
+	windowData.metalPanel.bar.fontOffset = options.flowAsArrows.value and -2 or 1
+	windowData.energyPanel.barOverlay:SetCaption(GetFlowStr(windowData.energyPanel.barOverlay.net, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+	windowData.energyPanel.barOverlay.font.size = options.flowAsArrows.value and 20 or 16
+	windowData.energyPanel.barOverlay.fontOffset = options.flowAsArrows.value and -2 or 1
+
 	windowData.metalPanel.label_income:Invalidate()
 	windowData.metalPanel.label_overdrive:Invalidate()
 	windowData.metalPanel.label_reclaim:Invalidate()
@@ -134,6 +143,7 @@ options_order = {
 	'resourceOpacity',
 	'resourceMainFontSize', 
 	'resourceFontSize',
+	'flowAsArrows',
 	'colourBlind', 
 	'fancySkinning',
 }
@@ -196,7 +206,15 @@ options = {
 		type  = "bool", 
 		value = true, 
 		OnChange = function(self) option_CheckEnableResource(self) end,
-	},	
+	},
+	flowAsArrows = {
+		name  = "Flow as arrows",
+		desc = "Use arrows instead of a number for the flow. Each arrow is 5 resources per second.",
+		type  = "bool",
+		value = true,
+		noHotkey = true,
+		OnChange = option_UpdateFonts,
+	},
 	resourceOpacity = {
 		name  = "Opacity",
 		type  = "number",
@@ -362,36 +380,6 @@ local function Format(input, override)
 	end
 end
 
-local function GetBarCaption(net)
-	if net < -27.5 then
-		return negativeColourStr.."<<<<<<"
-	elseif net < -22.5 then
-		return negativeColourStr.."<<<<<"
-	elseif net < -17.5 then
-		return negativeColourStr.."<<<<"
-	elseif net < -12.5 then
-		return negativeColourStr.."<<<"
-	elseif net < -7.5 then
-		return negativeColourStr.."<<"
-	elseif net < -2.5 then
-		return negativeColourStr.."<"
-	elseif net < 2.5 then
-		return ""
-	elseif net < 7.5 then
-		return positiveColourStr..">"
-	elseif net < 12.5 then
-		return positiveColourStr..">>"
-	elseif net < 17.5 then
-		return positiveColourStr..">>>"
-	elseif net < 22.5 then
-		return positiveColourStr..">>>>"
-	elseif net < 27.5 then
-		return positiveColourStr..">>>>>"
-	else
-		return positiveColourStr..">>>>>>"
-	end
-end
-
 local function GetTimeString()
   local secs = math.floor(Spring.GetGameSeconds())
   if (timeSecs ~= secs) then
@@ -422,9 +410,11 @@ local function UpdateResourcePanel(panel, income, net, overdrive, reclaim, stora
 	panel.label_income:SetCaption(Format(income, ""))
 	
 	if panel.barOverlay then
-		panel.barOverlay:SetCaption(GetBarCaption(net))
+		panel.barOverlay:SetCaption(GetFlowStr(net, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+		panel.barOverlay.net = net
 	else
-		panel.bar:SetCaption(GetBarCaption(net))
+		panel.bar:SetCaption(GetFlowStr(net, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+		panel.bar.net = net
 	end
 	
 	panel.label_overdrive:SetCaption("OD: " .. Format(overdrive))
@@ -580,6 +570,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 				outlineWidth = 2, 
 				outlineWeight = 2
 			},
+			net = 0, -- cache, not a chili thing
 		}
 	end
 	
@@ -601,6 +592,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 			outlineWidth = 2, 
 			outlineWeight = 2
 		},
+		net = 0, -- cache, not a chili thing
 	}
 	
 	data.label_income = Chili.Label:New{
@@ -1001,6 +993,8 @@ function option_CheckEnable(self)
 		AddEconomyWindows()
 	end
 	
+	option_UpdateFonts()
+
 	enabled = true
 	return true
 end

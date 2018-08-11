@@ -284,6 +284,11 @@ function ClusterBomb()
 	--end
 end
 
+function OnLoadGame()
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	GG.UpdateUnitAttributes(unitID)
+end
+
 function script.AimWeapon(num, heading, pitch)
 	if num >= 5 then
 		return false

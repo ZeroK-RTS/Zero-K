@@ -70,10 +70,17 @@ local function DrawMergedDecloakRanges(drawActive, drawDisabled)
 		local wantCloak = (not cloaked) and ((spGetUnitRulesParam(unitID, "wantcloak") == 1) or (spGetUnitRulesParam(unitID, "areacloaked") == 1))
 		if (cloaked and drawActive) or (wantCloak and drawDisabled) then
 			local radius = ud.decloakDistance
+			
+			local commCloaked = spGetUnitRulesParam(unitID, "comm_decloak_distance")
+			if commCloaked and (commCloaked > 0) then
+				radius = commCloaked
+			end
+			
 			local areaCloaked = spGetUnitRulesParam(unitID, "areacloaked_radius")
 			if areaCloaked and (areaCloaked > 0) then
 				radius = areaCloaked
 			end
+			
 			if radius then
 				glColor((wantCloak and disabledColor) or cloakedColor)
 				local x, y, z = spGetUnitPosition(unitID)

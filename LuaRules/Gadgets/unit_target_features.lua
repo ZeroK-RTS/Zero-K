@@ -70,8 +70,11 @@ local function UpdateTargets(unitID, unitData)
 		unitData.oldFlags = unitData.oldFlags or {}
 		unitData.needChange = unitData.needChange or {}
 		if not unitData.oldFlags[i] then
-			unitData.oldFlags[i] = spGetUnitWeaponState(unitID, i, "avoidFlags")
-			unitData.needChange[i] = ((unitData.oldFlags[i]%(featureFlag*2)) < featureFlag)
+			local state = spGetUnitWeaponState(unitID, i, "avoidFlags")
+			if state then
+				unitData.oldFlags[i] = state
+				unitData.needChange[i] = ((state%(featureFlag*2)) < featureFlag)
+			end
 		end
 		
 		if unitData.needChange[i] then

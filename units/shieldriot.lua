@@ -89,10 +89,6 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-		light_radius = 0,
-	  },
-	  
       damage                  = {
         default = 20,
         planes  = 20,
@@ -100,6 +96,7 @@ unitDef = {
       },
 
       customParams           = {
+        light_radius = 0,
         lups_explodespeed = 1,
         lups_explodelife = 0.6,
         nofriendlyfire = 1,

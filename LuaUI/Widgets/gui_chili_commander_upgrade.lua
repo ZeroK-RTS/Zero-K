@@ -365,14 +365,21 @@ local function GetNewReplacementSet(level, chassis, slotAllows, ignoreSlot)
 					end
 				end
 			end
-			
+
+			-- cheapass hack to prevent cremcom dual wielding same weapon (not supported atm)
+			-- proper solution: make the second instance of a weapon apply projectiles x2 or reloadtime x0.5 and get cremcoms unit script to work with that
+			local limit = data.limit
+			if chassis == 5 and data.slotType == "basic_weapon" and limit == 2 then
+				limit = 1
+			end
+
 			-- Check against module limit, not counting ignored slot
-			if accepted and data.limit and (currentModulesByDefID[i] or alreadyOwnedModulesByDefID[i]) then
+			if accepted and limit and (currentModulesByDefID[i] or alreadyOwnedModulesByDefID[i]) then
 				local count = (currentModulesByDefID[i] or 0) + (alreadyOwnedModulesByDefID[i] or 0) 
 				if currentModulesBySlot[ignoreSlot] == i then
 					count = count - 1
 				end
-				if count >= data.limit then
+				if count >= limit then
 					accepted = false
 				end
 			end

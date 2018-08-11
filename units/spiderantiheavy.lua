@@ -68,6 +68,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
+		burst = Shared.BURST_RELIABLE,
 		light_color = [[1.85 1.85 0.45]],
 		light_radius = 300,
       },
@@ -87,7 +88,7 @@ unitDef = {
       interceptedByShieldType = 1,
       paralyzer               = true,
       paralyzeTime            = 30,
-      range                   = 100,
+      range                   = 120,
       reloadtime              = 35,
       rgbColor                = [[1 1 0.25]],
       soundStart              = [[weapon/LightningBolt]],

@@ -102,6 +102,9 @@ local projectiles = {}
 local projectileByID = {}
 local projCount = 0
 function gadget:ProjectileCreated(proID, unitID, weaponID)
+	if not unitID then
+		return
+	end
 	local rangeSq = trackedWeaponDefIDs[weaponID]
 	if not rangeSq then
 		return
@@ -112,9 +115,11 @@ function gadget:ProjectileCreated(proID, unitID, weaponID)
 	end
 
 	local x, y, z = Spring.GetUnitPosition(unitID)
-	projCount = projCount + 1
-	projectiles[projCount] = {proID, rangeSq, x, y, z}
-	projectileByID[proID] = projCount
+	if z then
+		projCount = projCount + 1
+		projectiles[projCount] = {proID, rangeSq, x, y, z}
+		projectileByID[proID] = projCount
+	end
 end
 
 function gadget:ProjectileDestroyed(proID)

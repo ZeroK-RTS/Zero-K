@@ -18,6 +18,7 @@ end
 --------------------------------------------------------------------------------
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+include("keysym.h.lua")
 
 local spDiffTimers = Spring.DiffTimers
 local spGetTimer = Spring.GetTimer
@@ -53,7 +54,7 @@ local useSelectionFiltering = true
 local selectionFilteringOnlyAlt = false
 local retreatDeselects = false
 
-local function StartRetreat (unitID)
+local function StartRetreat(unitID)
 	local selection = Spring.GetSelectedUnits()
 	local count = #selection
 	for i = 1, count do
@@ -198,6 +199,17 @@ local function GetIsSubselection(newSelection, oldSelection)
 	return true
 end
 
+-- returns true if any control group hotkeys are being pressed
+local function CheckControlGroupHotkeys(num)
+	local keys = WG.GetControlGroupHotkeys()
+	for keysym, group in pairs(keys) do
+		if (num == nil or num == group) and Spring.GetKeyState(keysym) then
+			return true
+		end
+	end
+	return false
+end
+
 local function RawGetFilteredSelection(units, subselection, subselectionCheckDone, doubleClickUnitDefID)
 	if not useSelectionFiltering then
 		return
@@ -220,6 +232,14 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 	
 	if subselection then
 		return -- Don't filter when the change is just that something was deselected
+	end
+	
+	if #units <= 1 then
+		return
+	end
+	
+	if CheckControlGroupHotkeys() then
+		return	-- assume the user is selecting a control group
 	end
 	
 	if doubleClickUnitDefID then

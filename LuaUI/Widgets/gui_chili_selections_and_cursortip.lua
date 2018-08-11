@@ -109,21 +109,24 @@ local terraformGeneralTip =
 
 local terraCmdTip = {
 	[CMD_RAMP] = 
-		green.. 'Click&Drag'..white..': Build a ramp between two locations. Click again to set width. \n'..
+		yellow..'[Ramp between two points]\n'..
+		'1: ' .. green.. 'Click&Drag'..white..' from start to end. \n' ..
+		'2: ' .. green.. 'Click' ..white..' again to set width. \n'..
 		'\n'..
-		yellow..'[Advanced]\n'..
-		green.. '(Ctrl/Alt)+Click'..white..': Set end heights. \n'..
-		green.. 'Step 1'..white..': Click&drag to start a ramp at desired height. Hold '..green..'Alt'..white..' to snap height.  \n'..
-		green.. 'Step 2'..white..': Click&drag to set end of ramp at desired height. Hold '..green..'Alt'..white..' to snap gradient. \n'..
-		green.. 'Step 3'..white..': Move mouse to set ramp width, click to complete. \n'..
+		yellow..'[Ramp with raised end]\n'..
+		'1: ' .. green.. 'Click'..white..' at start. \n'..
+		'2: ' .. green.. 'Click&Drag'..white..' at end to set height. \n'..
+		'3: ' .. green.. 'Click' ..white..' again to set width. \n'..
 		'\n'..
-		yellow..'[Any Time]\n'..
-		green.. 'Space'..white..': Cycle through only raise/lower \n'..
+		yellow..'[Modifiers]\n'..
+		'- Hold '.. green..'Ctrl or Alt'..white..' and '.. green..'drag' ..white..' in Step 1 to set start height. \n'..
+		'- Hold '.. green..'Alt'..white..' to snap height or gradient. \n'..
+		'- Press '..green.. 'Space'..white..' to cycle raise/lower. \n'..
 		'\n'..
 		yellow..'[Wireframe indicator colors]\n'..
 		green.. 'Green'..white..': All units can traverse. \n'..
 		green.. 'Yellow'..white..': Vehicles cannot traverse. \n'..
-		green.. 'Red'..white..': Only all-terrain / spiders can traverse.',
+		green.. 'Red'..white..': Only all-terrain units can traverse.',
 	[CMD_LEVEL] = terraformGeneralTip ..
 		yellow..'[During Terraform Draw]\n'..
 		green.. 'Ctrl'..white..': Draw straight line segment. \n'..
@@ -596,6 +599,11 @@ local function GetUnitRegenString(unitID, ud)
 			if ((ud.idleTime <= 300) and (regen_timer > 0)) then
 				return "  (" .. math.ceil(regen_timer / 30) .. "s)"
 			else
+				local regenMult = (1 - (spGetUnitRulesParam(unitID, "slowState") or 0)) * (1 - (spGetUnitRulesParam(unitID,"disarmed") or 0))
+				if regenMult == 0 then
+					return
+				end
+
 				local regen = 0
 				if (regen_timer <= 0) then
 					regen = regen + (spGetUnitRulesParam(unitID, "comm_autorepair_rate") or ud.customParams.idle_regen)
@@ -611,7 +619,7 @@ local function GetUnitRegenString(unitID, ud)
 					regen = regen + ud.customParams.armored_regen
 				end
 				if (regen > 0) then
-					return "  (+" .. math.ceil(regen) .. ")"
+					return "  (+" .. math.ceil(regenMult*regen) .. ")"
 				end
 			end
 		end
@@ -619,9 +627,14 @@ local function GetUnitRegenString(unitID, ud)
 end
 
 local function GetUnitShieldRegenString(unitID, ud)
-	-- TODO: Surely actual rate should be used, taking into account energy stalling and stun state.
+	local mult = spGetUnitRulesParam(unitID,"totalReloadSpeedChange") or 1 * (1 - (spGetUnitRulesParam(unitID, "shieldChargeDisabled") or 0))
+	if mult == 0 then
+		return ""
+	end
+
+	-- FIXME: take energy stall into account
 	local wd = WeaponDefs[ud.shieldWeaponDef]
-	return " (+" .. (wd.customParams.shield_rate or wd.shieldPowerRegen) .. ")"
+	return " (+" .. math.ceil(mult * (wd.customParams.shield_rate or wd.shieldPowerRegen)) .. ")"
 end
 
 local function IsUnitInLos(unitID)
@@ -2109,8 +2122,8 @@ local function ShowFeatureCheck(holdingSpace, featureDefID)
 	end
 	if options.show_for_wreckage.value then
 		if options.show_for_unreclaimable.value then
-			local fd = FeatureDefs[thingDefID]
-			if not fd.reclaimable  then
+			local fd = FeatureDefs[featureDefID]
+			if not (fd and fd.reclaimable) then
 				return false
 			end
 		end

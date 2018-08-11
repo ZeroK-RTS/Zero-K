@@ -1,4 +1,4 @@
-return {
+local ret = {
 	dyntrainer_strike = {
 		name = "Strike",
 		chassis = "strike",
@@ -50,22 +50,6 @@ return {
 		--decorations = {"banner_overhead"},
 		--images = {overhead = "166"}
 	},
-	--[[
-	dyntrainer_knight = {
-		name = "Knight Trainer",
-		--notStarter = true,
-		chassis = "knight",
-		modules = {
-			{"commweapon_lparticlebeam", "module_radarnet"},
-			{"module_ablative_armor", "module_autorepair"},
-			{"commweapon_lightninggun", "module_personal_cloak", "module_ablative_armor"},
-			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
-			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
-		},
-		--decorations = {"banner_overhead"},
-		--images = {overhead = "184"}
-	},
-	]]
 	dynhub_strike = {
 		name = "Strike Support",
 		notStarter = true,
@@ -197,3 +181,20 @@ return {
 		images = {overhead = "184"}
 	},
 }
+
+if Spring.GetModOptions().campaign_chassis == "1" then
+	ret.dyntrainer_knight = {
+		name = "Campaign",
+		chassis = "knight",
+
+		modules = { -- all null because nabs want to personalize
+			{"nullbasicweapon", "nullmodule"},
+			{"nullmodule", "nullmodule"},
+			{"nulladvweapon", "nullmodule", "nullmodule"},
+			{"nullmodule", "nullmodule", "nullmodule"},
+			{"nullmodule", "nullmodule", "nullmodule"},
+		},
+	}
+end
+
+return ret

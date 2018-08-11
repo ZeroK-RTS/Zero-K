@@ -76,6 +76,8 @@ unitDef = {
       craterMult              = 2,
 
 	  customparams = {
+		burst = Shared.BURST_RELIABLE,
+
 		light_color = [[1 0.6 0.2]],
 		light_radius = 180,
 	  },
@@ -134,7 +136,6 @@ unitDef = {
       model                   = [[wep_m_ajax.s3o]],
       numbounce               = 4,
       noSelfDamage            = true,
-      predictBoost            = 1,
       projectiles	      	  = 2,
       range                   = 150,
       reloadtime              = 4,

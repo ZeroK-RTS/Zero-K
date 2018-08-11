@@ -79,6 +79,8 @@ unitDef = {
       craterMult              = 2,
 
       customparams = {
+		burst = Shared.BURST_RELIABLE,
+
         timeslow_damagefactor = 1.667,
 		
 		light_camera_height = 2500,
@@ -98,7 +100,6 @@ unitDef = {
       impulseFactor           = 0.2,
       interceptedByShieldType = 2,
       myGravity               = 0.2,
-      predictBoost            = 1,
       range                   = 450,
       reloadtime              = 1.8,
       rgbcolor                = [[0.9 0.1 0.9]],
@@ -136,7 +137,6 @@ unitDef = {
       impulseFactor           = 0.2,
       interceptedByShieldType = 2,
       myGravity               = 0.2,
-      predictBoost            = 1,
       range                   = 450,
       reloadtime              = 1.8,
       rgbcolor                = [[0.9 0.1 0.9]],

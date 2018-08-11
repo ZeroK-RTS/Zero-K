@@ -13,6 +13,7 @@ function widget:GetInfo()
 end
 
 include("keysym.h.lua")
+local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 
 ---- CHANGELOG -----
 -- versus666,		v3.03	(17dec2011)	: 	Back to alt BACKQUOTE to remove selected units from group
@@ -49,16 +50,21 @@ for _, v in ipairs( groupableBuildingTypes ) do
 	end
 end
 
+local removeAutogroupKey = KEYSYMS.BACKQUOTE
+local function HotkeyChangeNotification()
+	local key = WG.crude.GetHotkeyRaw("epic_auto_group_removefromgroup")
+	removeAutogroupKey = ToKeysyms(key and key[1])
+end
 
 local helpText =
-	'Alt+0-9 sets autogroup# for selected unit type(s).\nNewly built units get added to group# equal to their autogroup#.'..
-	'\nAlt+BACKQUOTE (~) deletes autogrouping for selected unit type(s).'
+	'Alt + Group Hotkey sets autogroup number for selected unit type(s).\nNewly built units get added to the group equal to their autogroup.'..
+	'\n (~) deletes autogrouping for selected unit type(s).'
 	--'Ctrl+~ removes nearest selected unit from its group and selects it. '
 	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
 
-local hotkeyPath = 'Settings/Interface/Control Groups/Hotkeys'
+local hotkeyPath = 'Hotkeys/Selection/Control Groups'
 
-options_order = { 'mainlabel', 'help', 'cleargroups', 'loadgroups', 'addall', 'verbose', 'immediate', 'groupnumbers', }
+options_order = { 'mainlabel', 'text_hotkey', 'cleargroups', 'removefromgroup', 'loadgroups', 'addall', 'verbose', 'immediate', 'groupnumbers', }
 options_path = 'Settings/Interface/Control Groups'
 options = {
 	mainlabel = {name='Auto Group', type='label'},
@@ -101,19 +107,29 @@ options = {
 		noHotkey = true,
 	},
 	
-	help = {
-		name = 'Help',
+	text_hotkey = {
+		name = 'Auto Groups',
 		type = 'text',
-		value = helpText,
+		value = "Alt + <Group Number> sets all selected unit types to automatically be assigned to the group upon completion.\nAlt + <Remove From Autogroup> removes the selected unit types from their auto group. Auto groups persist across games by default.",
+		path = hotkeyPath,
 	},
 	
 	cleargroups = {
-		name = 'Clear Auto Groups',
+		name = 'Clear All Auto Groups',
 		type = 'button',
 		OnChange = function() 
 			unit2group = {} 
 			Spring.Echo('game_message: Cleared Autogroups.')
 		end,
+		path = hotkeyPath,
+	},
+	removefromgroup = {
+		name = 'Remove From Autogroup',
+		type = 'button',
+		hotkey = "`",
+		bindWithAny = true,
+		dontRegisterAction = true,
+		OnHotkeyChange = HotkeyChangeNotification,
 		path = hotkeyPath,
 	},
 }
@@ -161,6 +177,23 @@ local GetGameFrame     = Spring.GetGameFrame
 local IsGuiHidden      = Spring.IsGUIHidden
 local Echo             = Spring.Echo
 
+local groupNumber = {
+	[KEYSYMS.N_1] = 1,
+	[KEYSYMS.N_2] = 2,
+	[KEYSYMS.N_3] = 3,
+	[KEYSYMS.N_4] = 4,
+	[KEYSYMS.N_5] = 5,
+	[KEYSYMS.N_6] = 6,
+	[KEYSYMS.N_7] = 7,
+	[KEYSYMS.N_8] = 8,
+	[KEYSYMS.N_9] = 9,
+	[KEYSYMS.N_0] = 0,
+}
+
+function WG.AutoGroup_UpdateGroupNumbers(newNumber)
+	groupNumber = newNumber
+end
+
 function printDebug( value )
 	if ( debug ) then
 		Echo( value )
@@ -188,6 +221,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return false
 	end
+	HotkeyChangeNotification()
 	myTeam = team
 end
 
@@ -300,18 +334,8 @@ end
 
 function widget:KeyPress(key, modifier, isRepeat)
 	if ( modifier.alt and not modifier.meta ) then
-		local gr
-		if (key == KEYSYMS.N_0) then gr = 0 end
-		if (key == KEYSYMS.N_1) then gr = 1 end
-		if (key == KEYSYMS.N_2) then gr = 2 end 
-		if (key == KEYSYMS.N_3) then gr = 3 end
-		if (key == KEYSYMS.N_4) then gr = 4 end
-		if (key == KEYSYMS.N_5) then gr = 5 end
-		if (key == KEYSYMS.N_6) then gr = 6 end
-		if (key == KEYSYMS.N_7) then gr = 7 end
-		if (key == KEYSYMS.N_8) then gr = 8 end
-		if (key == KEYSYMS.N_9) then gr = 9 end
- 		if (key == KEYSYMS.BACKQUOTE) then gr = -1 end
+		local gr = groupNumber[key]
+ 		if (key == removeAutogroupKey) then gr = -1 end
 		if (gr ~= nil) then
 			if (gr == -1) then
 				gr = nil
@@ -366,7 +390,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			return true 	--key was processed by widget
 		end
 	elseif (modifier.ctrl and not modifier.meta) then
-		if (key == KEYSYMS.BACKQUOTE) then
+		if (key == removeAutogroupKey) then
 			local mx,my = GetMouseState()
 			local _,pos = TraceScreenRay(mx,my,true)     
 			local mindist = math.huge

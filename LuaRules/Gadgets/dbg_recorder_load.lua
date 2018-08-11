@@ -137,7 +137,7 @@ function GiveInitialOrders()
 		end
 		local unitID = keyToUnitID[o.key]
         if Spring.ValidUnitID(unitID) then
-            Spring.GiveOrderToUnit(unitID,CMD.REPEAT,{1},{})
+            Spring.GiveOrderToUnit(unitID,CMD.REPEAT,{1}, 0)
             Spring.GiveOrderToUnit(unitID,o.cmdID,o.params,o.options.coded)
         end
     end

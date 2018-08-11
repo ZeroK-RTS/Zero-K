@@ -6,6 +6,13 @@ aiCommanders = {
 	[UnitDefNames["dyntrainer_strike_base"].id] = true,
 }
 
+if Spring.GetModOptions().campaign_chassis == "1" then
+	--[[ Not sure about this, nabs like to feel special.
+	     We could always limit it to hard/brutal and it's
+	     not that amazing anyway ]]
+	aiCommanders[UnitDefNames["dyntrainer_knight_base"].id] = true
+end
+
 ploppables = {
   "factoryhover",
   "factoryveh",

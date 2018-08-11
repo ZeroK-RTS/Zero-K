@@ -57,7 +57,7 @@ unitDef = {
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
-  moveState        				= 1,
+  moveState                     = 1,
   noAutoFire                    = false,
   objectName                    = [[factory3.s3o]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
@@ -66,7 +66,7 @@ unitDef = {
   sightDistance                 = 273,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
-  workerTime                    = 10,
+  workerTime                    = Shared.FACTORY_BUILDPOWER,
   yardMap                       = [[ooooooo ooooooo ooooooo ccccccc ccccccc ccccccc ccccccc]],
 
   featureDefs                   = {

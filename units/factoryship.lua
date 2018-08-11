@@ -62,7 +62,7 @@ unitDef = {
   sightDistance          = 273,
   turnRate               = 0,
   waterline              = 0,
-  workerTime             = 10,
+  workerTime             = Shared.FACTORY_BUILDPOWER,
   yardMap                = [[oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc]],
 
   featureDefs            = {

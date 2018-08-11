@@ -168,7 +168,7 @@ end
 local function MakeStatsWindow() 
 end
 
-options_order = {'shortNotation'}
+options_order = {'shortNotation', 'text_hotkey'}
 options_path = 'Help/Unit List'
 options = {
 		
@@ -181,7 +181,12 @@ options = {
 		path = 'Settings/HUD Panels/Unit Stats Help Window'
 	},
 	
-	
+	text_hotkey = {
+		name = 'Global Construction Hotkeys',
+		type = 'text',
+		value = [[These hotkey are always active. To edit the in-tab hotkeys look in "Hotkeys/Command Panel". Each tab can even have their own layout.]],
+		path = 'Hotkeys/Construction',
+	},
 }
 
 local alreadyAdded = {}
@@ -859,7 +864,7 @@ local function printAbilities(ud, unitID)
 		local decloakDistance = (unitID and Spring.GetUnitRulesParam(unitID, "comm_decloak_distance")) or ud.decloakDistance
 		cells[#cells+1] = 'Personal cloak'
 		cells[#cells+1] = ''
-		if ud.speed > 0 then
+		if not ud.isImmobile then
 			cells[#cells+1] = ' - Upkeep mobile: '
 			cells[#cells+1] = numformat(ud.cloakCostMoving) .. " E/s"
 			cells[#cells+1] = ' - Upkeep idle: '
@@ -1334,7 +1339,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	statschildren[#statschildren+1] = Label:New{ caption = 'Mass: ', textColor = color.stats_fg, }
 	statschildren[#statschildren+1] = Label:New{ caption = mass, textColor = color.stats_fg, }
 
-	if ud.speed > 0 then
+	if not ud.isImmobile then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Speed: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = speed .. " elmo/s", textColor = color.stats_fg, }
 	end

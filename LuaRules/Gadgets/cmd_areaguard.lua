@@ -93,7 +93,7 @@ local pi = math.pi
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	canGuardUnitDefIDs[i] = ud.speed > 0 or ud.isFactory 
+	canGuardUnitDefIDs[i] = not ud.isImmobile or ud.isFactory
 end
 
 --------------------------------------------------------------------------------
@@ -116,11 +116,7 @@ local function RandomPermutation(n)
 end
 
 local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
-	local cmdOptions2 = {}
-	if (cmdOptions.shift) then table.insert(cmdOptions2, "shift")   end
-	if (cmdOptions.alt)   then table.insert(cmdOptions2, "alt")   end
-	if (cmdOptions.ctrl)  then table.insert(cmdOptions2, "ctrl")  end
-	if (cmdOptions.right) then table.insert(cmdOptions2, "right") end
+	local cmdOptions2 = cmdOptions.coded
 	
     if #cmdParams == 1 then
         Spring.GiveOrderToUnit(unitID, CMD.GUARD, {cmdParams[1]}, cmdOptions2)
@@ -129,7 +125,7 @@ local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 	
 	if (not cmdOptions.shift) then
 		Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, cmdOptions2)
-		table.insert(cmdOptions2, "shift")
+		cmdOptions2 = cmdOptions2 + CMD.OPT_SHIFT
 	end
 	
 	local alreadyGuarding = {}

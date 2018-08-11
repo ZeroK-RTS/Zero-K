@@ -27,22 +27,17 @@ for id, def in pairs(UnitDefs) do
 end
 
 local currentFrame
-function gadget:Initialize()
-	currentFrame = Spring.GetGameFrame()
-end
-
 function gadget:GameFrame (frame)
 	currentFrame = frame
 	if ((frame % 15) == 7) then
 		local setParam = ((frame % 30) == 7)
-		local unitID, data, slowMult, amount, health
 		for i = 1, unitCount do
-			unitID = unitList[i]
-			data = units[unitID]
+			local unitID = unitList[i]
+			local data = units[unitID]
 			if (data.idleFrame < frame) and (not spGetUnitIsStunned(unitID)) and (spGetUnitRulesParam(unitID, "disarmed") ~= 1) then
-				regenRate = spGetUnitRulesParam(unitID,"totalBuildPowerChange") or 1
-				amount = data.rate * regenRate
-				health = spGetUnitHealth(unitID)
+				local regenRate = 1- (spGetUnitRulesParam(unitID, "slowState") or 0)
+				local amount = data.rate * regenRate
+				local health = spGetUnitHealth(unitID)
 				if health then
 					spSetUnitHealth(unitID, health + amount)
 				end
@@ -99,6 +94,7 @@ function gadget:UnitDestroyed(unitID)
 end
 
 function gadget:Initialize()
+	currentFrame = Spring.GetGameFrame()
 	GG.SetUnitIdleRegen = SetUnitIdleRegen
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do

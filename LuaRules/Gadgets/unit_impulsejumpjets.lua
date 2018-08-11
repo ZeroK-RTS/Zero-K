@@ -144,19 +144,15 @@ local function ReloadQueue(unitID, queue, cmdTag)
 		end
 	end
 
-	spGiveOrderToUnit(unitID, CMD_STOP, emptyTable, emptyTable)
+	spGiveOrderToUnit(unitID, CMD_STOP, emptyTable, 0)
 	for i=start,#queue do
 		local cmd = queue[i]
 		local cmdOpt = cmd.options
-		local opts = {"shift"} -- appending
-		if (cmdOpt.alt)	 then opts[#opts+1] = "alt"	 end
-		if (cmdOpt.ctrl)	then opts[#opts+1] = "ctrl"	end
-		if (cmdOpt.right) then opts[#opts+1] = "right" end
-		spGiveOrderToUnit(unitID, cmd.id, cmd.params, opts)
+		spGiveOrderToUnit(unitID, cmd.id, cmd.params, cmdOpt.coded + (cmdOpt.shift and 0 or CMD.OPT_SHIFT))
 	end
 	
 	if re and start == 2 then
-		spGiveOrderToUnit(unitID, CMD_JUMP, {storeParams[1],Spring.GetGroundHeight(storeParams[1],storeParams[3]),storeParams[3]}, {"shift"} )
+		spGiveOrderToUnit(unitID, CMD_JUMP, {storeParams[1],Spring.GetGroundHeight(storeParams[1],storeParams[3]),storeParams[3]}, CMD.OPT_SHIFT )
 	end
 	
 end
@@ -421,8 +417,8 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		SetLeaveTracks(unitID, true)
 		
 		if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
+			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
+			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
 		end
 
 		spSetUnitRulesParam(unitID,"jumpReloadStart",jumpEndTime)

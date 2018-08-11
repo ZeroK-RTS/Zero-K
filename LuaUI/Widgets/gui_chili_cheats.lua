@@ -184,7 +184,6 @@ AddMiscCategory("wacky", {
 	"rocksink",
 	"shiptransport",
 	"starlight_satellite",
-	"thicket",
 })
 
 do

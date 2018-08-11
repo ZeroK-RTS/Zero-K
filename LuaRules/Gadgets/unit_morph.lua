@@ -49,9 +49,9 @@ local emptyTable = {} -- for speedups
 --
 -- Thus other gadgets can know which morphing commands are available
 -- Then they can simply issue:
---	Spring.GiveOrderToUnit(u,genericMorphCmdID,{},{})
--- or Spring.GiveOrderToUnit(u,genericMorphCmdID,{targetUnitDefId},{})
--- or Spring.GiveOrderToUnit(u,specificMorphCmdID,{},{})
+--	Spring.GiveOrderToUnit(u,genericMorphCmdID,{}, 0)
+-- or Spring.GiveOrderToUnit(u,genericMorphCmdID,{targetUnitDefId}, 0)
+-- or Spring.GiveOrderToUnit(u,specificMorphCmdID,{}, 0)
 --
 -- where:
 -- genericMorphCmdID is the same unique value, no matter what is the source unit or target unit
@@ -61,11 +61,11 @@ local emptyTable = {} -- for speedups
 --[[ Sample codes that could be used in other gadgets:
 
 	-- Morph unit u
-	Spring.GiveOrderToUnit(u,31210,{},{})
+	Spring.GiveOrderToUnit(u,31210,{}, 0)
 
 	-- Morph unit u into a supertank:
 	local otherDefId=UnitDefNames["supertank"].id
-	Spring.GiveOrderToUnit(u,31210,{otherDefId},{})
+	Spring.GiveOrderToUnit(u,31210,{otherDefId}, 0)
 
 	-- In place of writing 31210 you could use a morphCmdID that you'd read with:
 	local morphCmdID=(GG.MorphInfo or {})["CMD_MORPH_BASE_ID"]
@@ -231,9 +231,9 @@ local function ReAssignAssists(newUnit,oldUnit)
 			local params = cmd.params
 			if (unitTargetCommand[cmd.id] or (singleParamUnitTargetCommand[cmd.id] and #params == 1)) and (params[1] == oldUnit) then
 				params[1] = newUnit
-				local opts = (cmd.options.meta and 4 or 0) + (cmd.options.ctrl and 64 or 0) + (cmd.options.alt and 128 or 0)
-				Spring.GiveOrderToUnit(unitID, CMD.INSERT, {cmd.tag, cmd.id, opts, params[1], params[2], params[3]},{})
-				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag},{})
+				local opts = (cmd.options.meta and CMD.OPT_META or 0) + (cmd.options.ctrl and CMD.OPT_CTRL or 0) + (cmd.options.alt and CMD.OPT_ALT or 0)
+				Spring.GiveOrderToUnit(unitID, CMD.INSERT, {cmd.tag, cmd.id, opts, params[1], params[2], params[3]}, 0)
+				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, 0)
 			end
 		end
 	end
@@ -316,7 +316,6 @@ local function StopMorph(unitID, morphData)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 
 	Spring.SetUnitResourcing(unitID,"e", UnitDefs[unitDefID].energyMake)
-	Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { 1 }, { "alt" })
 	local usedMetal	= morphData.def.metal	* scale
 	Spring.AddUnitResource(unitID, 'metal',	usedMetal)
 	--local usedEnergy = morphData.def.energy * scale
@@ -374,7 +373,7 @@ local function FinishMorph(unitID, morphData)
 	
 	local newUnit
 
-	if udDst.isBuilding or udDst.isFactory then
+	if udDst.isImmobile then
 		local x = math.floor(px/16)*16
 		local y = py
 		local z = math.floor(pz/16)*16
@@ -524,15 +523,15 @@ local function FinishMorph(unitID, morphData)
 	
 	--//transfer some state
 	Spring.GiveOrderArrayToUnitArray({ newUnit }, {
-	{CMD.FIRE_STATE, { states.firestate }, emptyTable },
-	{CMD.MOVE_STATE, { states.movestate }, emptyTable },
-	{CMD.REPEAT,	 { states["repeat"] and 1 or 0 }, emptyTable },
-	{CMD_WANT_CLOAK, { wantCloakState or 0 }, emptyTable },
-	{CMD.ONOFF,		{ 1 }, emptyTable},
-	{CMD.TRAJECTORY, { states.trajectory and 1 or 0 }, emptyTable },
-	{CMD_PRIORITY, { states.buildPrio }, emptyTable },
-	{CMD_RETREAT, { states.retreat }, states.retreat == 0 and {"right"} or emptyTable },
-	{CMD_MISC_PRIORITY, { states.miscPrio }, emptyTable },
+	{CMD.FIRE_STATE,    { states.firestate             }, 0 },
+	{CMD.MOVE_STATE,    { states.movestate             }, 0 },
+	{CMD.REPEAT,        { states["repeat"] and 1 or 0  }, 0 },
+	{CMD_WANT_CLOAK,    { wantCloakState or 0          }, 0 },
+	{CMD.ONOFF,         { 1                            }, 0 },
+	{CMD.TRAJECTORY,    { states.trajectory and 1 or 0 }, 0 },
+	{CMD_PRIORITY,      { states.buildPrio             }, 0 },
+	{CMD_RETREAT,       { states.retreat               }, states.retreat == 0 and CMD.OPT_RIGHT or 0 },
+	{CMD_MISC_PRIORITY, { states.miscPrio              }, 0 },
 	})
 	
 	--//reassign assist commands to new unit
@@ -1254,10 +1253,10 @@ function gadget:AICallIn(data)
 					if message[4] then
 						local destDefId=tonumber(message[4])
 						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] into "..UnitDefs[destDefId].name)
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{destDefId},{})
+						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{destDefId}, 0)
 					else
 						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] to auto")
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{},{})
+						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{}, 0)
 					end
 				else
 					Spring.Echo("Not a valid unitID in AICallIn morph request: \""..data.."\"")

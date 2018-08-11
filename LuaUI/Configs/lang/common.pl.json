@@ -1,5 +1,5 @@
 {
-	"morph_complete" : "Ulepszenie zakończone",
+	"morph_complete" : "Ulepszenie zakończone: %{old} -> %{new}",
 	"nuclear_launch_detected" : "Alarm nuklearny",
 	"geospot" : "Gejzer\nMożna postawić elektrownię geotermiczną",
 	"build_eta" : "Gotowe za",

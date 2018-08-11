@@ -74,6 +74,8 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
+		burst = Shared.BURST_RELIABLE,
+
 		light_color = [[1.6 1.05 2.25]],
 		light_radius = 320,
       },

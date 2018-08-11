@@ -96,12 +96,14 @@ GG.terraformUnlocked = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- For gadget:Save
-
-_G.saveTable = {
-	unitLineage        = unitLineage,
-	initialUnitData    = initialUnitData,
-	bonusObjectiveList = bonusObjectiveList,
-}
+local function UpdateSaveReferences()
+	_G.missionGalaxySaveTable = {
+		unitLineage        = unitLineage,
+		initialUnitData    = initialUnitData,
+		bonusObjectiveList = bonusObjectiveList,
+	}
+end
+UpdateSaveReferences()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -238,6 +240,7 @@ end
 -- Victory at location units
 
 local function AddVictoryAtLocationUnit(unitID, location, allyTeamID)
+	Spring.Echo("Adding victory at location unit", unitID)
 	victoryAtLocation = victoryAtLocation or {}
 	victoryAtLocation[unitID] = victoryAtLocation[unitID] or {}
 	local locations = victoryAtLocation[unitID]
@@ -648,12 +651,12 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		x, z = GetClearPlacement(ud.id, x, z, unitData.spawnRadius, -ud.maxWaterDepth)
 	end
 	
-	if ud.isBuilding or ud.speed == 0 then
+	if ud.isImmobile then
 		x, z, xSize, zSize = SanitizeBuildPositon(x, z, ud, facing)
 	end
 	
 	local build = (unitData.buildProgress and unitData.buildProgress < 1) or false
-	local wantLevel = (ud.isBuilding or ud.speed == 0) and ud.levelGround
+	local wantLevel = ud.isImmobile and ud.levelGround
 	local unitID
 	if unitData.orbitalDrop then
 		unitID = GG.DropUnit(ud.name, x, Spring.GetGroundHeight(x,z), z, facing, teamID, true)
@@ -800,7 +803,7 @@ local function AddUnitTerraform(unitData)
 	
 	local x, z, facing = unitData.x, unitData.z, unitData.facing
 	
-	if ud.isBuilding or ud.speed == 0 then
+	if ud.isImmobile then
 		x, z = SanitizeBuildPositon(x, z, ud, facing)
 	end
 	
@@ -852,7 +855,7 @@ local function PlaceFeature(featureData, teamID)
 	if string.find(name, "_dead") then
 		unitDefName = string.gsub(name, "_dead", "")
 		local ud = UnitDefNames[unitDefName]
-		if ud.isBuilding or ud.speed == 0 then
+		if ud.isImmobile then
 			x, z = SanitizeBuildPositon(x, z, ud, facing)
 		end
 	end
@@ -910,7 +913,7 @@ local function ProcessUnitCommand(unitID, command)
 		if command.pos then
 			command.pos[1], command.pos[2] = SanitizeBuildPositon(command.pos[1], command.pos[2], ud, command.facing or 0)
 		else -- Must be a factory production command
-			Spring.GiveOrderToUnit(unitID, command.cmdID, {}, command.options or {})
+			Spring.GiveOrderToUnit(unitID, command.cmdID, {}, command.options or 0)
 			return
 		end
 	end
@@ -925,7 +928,7 @@ local function ProcessUnitCommand(unitID, command)
 			end
 		)
 		
-		Spring.GiveOrderToUnit(unitID, command.cmdID, {x, y, z, command.facing or command.radius}, command.options or {})
+		Spring.GiveOrderToUnit(unitID, command.cmdID, {x, y, z, command.facing or command.radius}, command.options or 0)
 		return
 	end
 	
@@ -933,7 +936,7 @@ local function ProcessUnitCommand(unitID, command)
 		local p = command.atPosition
 		local units = Spring.GetUnitsInRectangle(p[1] - BUILD_RESOLUTION, p[2] - BUILD_RESOLUTION, p[1] + BUILD_RESOLUTION, p[2] + BUILD_RESOLUTION)
 		if units and units[1] then
-			Spring.GiveOrderToUnit(unitID, command.cmdID, {units[1]}, command.options or {})
+			Spring.GiveOrderToUnit(unitID, command.cmdID, {units[1]}, command.options or 0)
 		end
 		return
 	end
@@ -944,7 +947,7 @@ local function ProcessUnitCommand(unitID, command)
 			params[i] = command.params[i]
 		end
 	end
-	Spring.GiveOrderToUnit(unitID, command.cmdID, params, command.options or {})
+	Spring.GiveOrderToUnit(unitID, command.cmdID, params, command.options or 0)
 end
 
 local function GiveCommandsToUnit(unitID, commands)
@@ -1406,6 +1409,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
 	BonusObjectiveUnitDestroyed(unitID, unitDefID, teamID)
 	CheckInitialUnitDestroyed(unitID)
+	if unitLineage[unitID] then
+		unitLineage[unitID] = nil
+	end
 end
 
 function gadget:Initialize()
@@ -1514,8 +1520,10 @@ function gadget:Load(zip)
 	unitLineage = {}
 	for oldUnitID, teamID in pairs(loadData.unitLineage) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		unitLineage[unitID] = teamID
-		SetBuildOptions(unitID, unitDefID, Spring.GetUnitTeam(unitID))
+		if unitID then
+			unitLineage[unitID] = teamID
+			SetBuildOptions(unitID, unitDefID, Spring.GetUnitTeam(unitID))
+		end
 	end
 	
 	for i = 1, #loadData.bonusObjectiveList do
@@ -1525,7 +1533,9 @@ function gadget:Load(zip)
 			bonusObjectiveList[i].units = {}
 			for oldUnitID, allyTeamID in pairs(oldUnits) do
 				local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-				bonusObjectiveList[i].units[unitID] = allyTeamID
+				if unitID then
+					bonusObjectiveList[i].units[unitID] = allyTeamID
+				end
 			end
 		end
 	end
@@ -1537,8 +1547,25 @@ function gadget:Load(zip)
 	-- Put the units back in the objectives
 	for oldUnitID, data in pairs(loadData.initialUnitData) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		SetupInitialUnitParameters(unitID, data)
+		if unitID then
+			SetupInitialUnitParameters(unitID, data)
+		end
 	end
+	
+	-- restore victoryAtLocation units
+	-- needed for any units that weren't created at start; e.g. Dantes on planet 21 (Vis Ragstrom)
+	local units = Spring.GetAllUnits()
+	for i=1,#units do
+		local unitID = units[i]
+		local finished = select(5, Spring.GetUnitHealth(unitID)) == 1
+		if finished and not victoryAtLocation[unitID] then
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			local unitTeam = Spring.GetUnitTeam(unitID)
+			gadget:UnitFinished(unitID, unitDefID, unitTeam)
+		end
+	end
+	
+	UpdateSaveReferences()
 end
 
 --------------------------------------------------------------------------------
@@ -1554,7 +1581,7 @@ function gadget:Save(zip)
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission failed to access save/load API")
 		return
 	end
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, MakeRealTable(SYNCED.saveTable, "Campaign"))
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, MakeRealTable(SYNCED.missionGalaxySaveTable, "Campaign"))
 end
 
 local function MissionGameOver(cmd, missionWon)

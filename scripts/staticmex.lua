@@ -1,4 +1,3 @@
-
 local base, bottom, tamper, furnace, door_l, door_r, hinge_l, hinge_r, drill1, drill2, drill3, posts = piece ('base', 'bottom', 'tamper', 'furnace', 'door_l', 'door_r', 'hinge_l', 'hinge_r', 'drill1', 'drill2', 'drill3', 'posts')
 
 include "pieceControl.lua"
@@ -7,6 +6,12 @@ include "constants.lua"
 local SIG_OPEN = 1
 
 local smokePiece = {tamper}
+
+local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
+local metalmultInv = metalmult > 0 and (1/metalmult) or 1
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function Open()
 	Signal(SIG_OPEN)
@@ -22,6 +27,7 @@ local function Open()
 
 	while true do
 		local income = Spring.GetUnitRulesParam(unitID, "current_metalIncome") or 0
+		income = income * metalmultInv 
 		if income > 0 then
 			Spin (furnace, y_axis, income, math.rad(1))
 			Spin (drill1, y_axis, income, math.rad(1))

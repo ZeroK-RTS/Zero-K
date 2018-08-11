@@ -88,7 +88,6 @@ unitDef = {
       intensity               = 0,
       interceptedByShieldType = 0,
       noSelfDamage            = true,
-      predictBoost            = 1,
       range                   = 100,
       reloadtime              = 1,
       rgbColor                = [[0 0 0]],

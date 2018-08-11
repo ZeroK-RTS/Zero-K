@@ -64,7 +64,7 @@ unitDef = {
   showNanoSpray                 = false,
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
-  workerTime                    = 10,
+  workerTime                    = Shared.FACTORY_BUILDPOWER,
   yardMap                       = "ooooooo ooooooo ooooooo occccco occccco occccco occccco yyyyyyy yyyyyyy yyyyyyy",
 
   featureDefs                   = {

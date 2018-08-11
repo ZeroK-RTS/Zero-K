@@ -7,7 +7,7 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
-		extra_damage_mult = 3.75,
+		extra_damage_mult = 3.125,
 		slot = [[5]],
 		muzzleEffectFire = [[custom:zeus_fire_fx]],
 

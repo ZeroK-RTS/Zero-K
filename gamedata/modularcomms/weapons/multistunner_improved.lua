@@ -22,7 +22,7 @@ local weaponDef = {
 	cylinderTargeting       = 0,
 
 	damage                  = {
-		default = 800,
+		default = 687.5,
 	},
 
 	duration                = 8,
@@ -35,7 +35,7 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
 	paralyzer               = true,
-	paralyzeTime            = 12,
+	paralyzeTime            = 10,
 	range                   = 360,
 	reloadtime              = 25,
 	rgbColor                = [[1 1 0.1]],

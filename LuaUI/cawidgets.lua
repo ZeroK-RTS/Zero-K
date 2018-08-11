@@ -212,6 +212,8 @@ local flexCallIns = {
   'AddTransmitLine',
   'AddConsoleMessage',
   'VoiceCommand',
+  'Save',
+  'Load',
 }
 local flexCallInMap = {}
 for _,ci in ipairs(flexCallIns) do
@@ -2361,6 +2363,20 @@ end
 function widgetHandler:UnsyncedHeightMapUpdate(x1,z1,x2,z2)
   for _,w in ipairs(self.UnsyncedHeightMapUpdateList) do
     w:UnsyncedHeightMapUpdate(x1,z1,x2,z2)
+  end
+  return
+end
+
+function widgetHandler:Save(zip)
+  for _,w in ipairs(self.SaveList) do
+    w:Save(zip)
+  end
+  return
+end
+
+function widgetHandler:Load(zip)
+  for _,w in ipairs(self.LoadList) do
+    w:Load(zip)
   end
   return
 end

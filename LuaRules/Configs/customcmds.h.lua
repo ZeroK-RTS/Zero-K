@@ -40,6 +40,8 @@ CMD_GLOBAL_BUILD = 13925 -- global build command state toggle command
 CMD_GBCANCEL = 13926 -- global build command area cancel cmd
 CMD_STOP_PRODUCTION = 13954
 
+CMD_SELECT_MISSILES = 14001
+
 CMD_AREA_MEX = 30100
 CMD_STEALTH = 31100
 CMD_CLOAK_SHIELD = 31101

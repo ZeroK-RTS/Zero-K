@@ -53,7 +53,7 @@ for unitDefID=1,#UnitDefs do
 		velocityDamageScale = ud.mass*0.6,
 		mass = ud.mass,
 	}
-	if ud.speed == 0 then -- buildings are more massive
+	if ud.isImmobile then -- buildings are more massive
 		attributes[unitDefID].velocityDamageScale = attributes[unitDefID].velocityDamageScale*10
 	end
 end
@@ -213,11 +213,12 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local nx, ny, nz = Spring.GetGroundNormal(x,z)
 		local nMag = math.sqrt(nx^2 + ny^2 + nz^2)
 		nx, ny, nz = nx/nMag, ny/nMag, nz/nMag -- normal to unit vector
-		nx, ny, nz = speed*nx, speed*ny, speed*nz -- normal is now a component of velocity
+		local dot = nx*vx + ny*vy + nz*vz
+		nx, ny, nz = dot*nx, dot*ny, dot*nz -- normal is now a component of velocity
 		local tx, ty, tz = vx - nx, vy - ny, vz - nz -- tangent is the other component of velocity
 		local nf = att.elasticity
 		local tf = att.friction
-		vx, vy, vz = tx*tf + nx*nf - vz, ty*tf + ny*nf - vy, tz*tf + nz*nf - vz
+		vx, vy, vz = tx*tf + nx*nf - vx, ty*tf + ny*nf - vy, tz*tf + nz*nf - vz
 		GG.AddGadgetImpulseRaw(unitID, vx, vy, vz, true, true)
 		
 		local env = Spring.UnitScript.GetScriptEnv(unitID)

@@ -795,7 +795,7 @@ function widget:Update()
 			mouseOver = false
 		end
 	end
-	if gameNotStarted and SingleplayerMode() then
+	if gameNotStarted and SingleplayerMode() and not VFS.FileExists("mission.lua") then
 		Spring.SendCommands("forcestart")
 	end
 	if firstUpdates then

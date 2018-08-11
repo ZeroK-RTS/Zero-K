@@ -82,6 +82,8 @@ unitDef = {
 	  craterMult              = 0,
       
 	  customparams = {
+		burst = Shared.BURST_RELIABLE,
+
 	    timeslow_damagefactor = 3,
 		timeslow_overslow_frames = 2*30,
 		

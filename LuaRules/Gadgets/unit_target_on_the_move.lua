@@ -214,8 +214,8 @@ local function removeUnit(unitID)
 	if unitDefID and validUnits[unitDefID] and unitById[unitID] then
 		if waitWaitUnits[unitDefID] then
 			clearTarget(unitID)
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
+			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
+			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
 		end
 		if unitById[unitID] ~= unit.count then
 			unit.data[unitById[unitID]] = unit.data[unit.count]
@@ -310,7 +310,7 @@ local function setTargetClosestFromList(unitID, unitDefID, team, choiceUnits)
 			targetID = bestUnit, 
 			allyTeam = spGetUnitAllyTeam(unitID), 
 			range = UnitDefs[unitDefID].maxWeaponRange,
-			alwaysSeen = tud and (tud.isBuilding == true or tud.maxAcc == 0),
+			alwaysSeen = tud and tud.isImmobile,
 		})
 	end
 end
@@ -394,7 +394,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					allyTeam = spGetUnitAllyTeam(unitID), 
 					allyAllowed = allyTargetUnits[unitDefID],
 					range = UnitDefs[unitDefID].maxWeaponRange,
-					alwaysSeen = tud and (tud.isBuilding == true or tud.maxAcc == 0),
+					alwaysSeen = tud and tud.isImmobile,
 				})
 			end
 		end
@@ -444,7 +444,7 @@ function GG.SetUnitTarget(unitID, targetID)
 			allyTeam = spGetUnitAllyTeam(unitID), 
 			allyAllowed = allyTargetUnits[unitDefID],
 			range = UnitDefs[unitDefID].maxWeaponRange,
-			alwaysSeen = tud and (tud.isBuilding == true or tud.maxAcc == 0),
+			alwaysSeen = tud.isImmobile,
 		})
 	end
 end

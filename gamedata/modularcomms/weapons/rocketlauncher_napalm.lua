@@ -30,7 +30,6 @@ local weaponDef = {
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 2,
 	model                   = [[wep_m_hailstorm.s3o]],
-	predictBoost            = 1,
 	range                   = 430,
 	reloadtime              = 3,
 	smokeTrail              = true,

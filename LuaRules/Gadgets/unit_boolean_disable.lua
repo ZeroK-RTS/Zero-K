@@ -19,9 +19,9 @@ if (not gadgetHandler:IsSyncedCode()) then
   return false  --  no unsynced code
 end
 
-local FRAMES_PER_SECOND = 30
+local FRAMES_PER_SECOND = Game.gameSpeed
 
-local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0
+local DECAY_FRAMES = 40 * FRAMES_PER_SECOND -- time in frames it takes to decay 100% para to 0
 
 local LOS_ACCESS = {inlos = true}
 
@@ -40,10 +40,8 @@ for wid = 1, #WeaponDefs do
 		}
 		wantedWeaponList[#wantedWeaponList + 1] = wid
 	elseif wd.paralyzer or wd.customParams.extra_damage then
-		paraWeapons[wid] = {
-			paraTime = wd.damages.paralyzeDamageTime*FRAMES_PER_SECOND,
-			maxParaDamage = (wd.damages.paralyzeDamageTime+40)/40,
-		}
+		local paraTime = wd.paralyzer and wd.damages.paralyzeDamageTime or wd.customParams.extra_paratime
+		paraWeapons[wid] = paraTime * FRAMES_PER_SECOND
 		wantedWeaponList[#wantedWeaponList + 1] = wid
 	end
 end
@@ -203,11 +201,11 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		addParalysisDamageToUnit(unitID, damage*def.damageMult, def.disarmTimer)
 		return damage*def.normalDamage
 	end
-	
-	if paraWeapons[weaponDefID] and (partialUnitID[unitID] or paraUnitID[unitID]) then
-		local def = paraWeapons[weaponDefID]
-		addParalysisDamageToUnit(unitID, damage, def.paraTime)
+
+	if paralyzer and (partialUnitID[unitID] or paraUnitID[unitID]) then
+		addParalysisDamageToUnit(unitID, damage, paraWeapons[weaponDefID])
 	end
+
 	return damage
 end
 

@@ -38,7 +38,7 @@ local movedefMap = {
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if (ud.isBuilding or ud.isFactory or ud.speed == 0) then
+	if ud.isImmobile then
 		staticUnits[i] = true
 		movetypeDefID[i] = "static"
 	else

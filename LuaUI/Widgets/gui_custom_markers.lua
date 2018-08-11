@@ -5,7 +5,8 @@ function widget:GetInfo()
     author    = "Evil4Zerggin (adapted by KingRaptor)",
     date      = "29 December 2008",
     license   = "GNU LGPL, v2.1 or later",
-    layer     = -100000.5,	-- lower than minimap but higher than epic (this doesn't actually do anything for the implied purpose)
+    --layer     = 1001,	-- more than Chili
+	layer     = -10000001,	-- lower than minimap
     alwaysStart = true,
     enabled   = true  --  loaded by default?
   }
@@ -276,6 +277,29 @@ local function DrawBillboardedText(point)
 	gl.PopMatrix()
 end
 
+local function DrawOnScreenPoint(point, sx, sy, sz, fontSizeLocal)
+	--[[	-- draw a targeting box
+	local vertices = {
+		{v = {sx, sy - highlightLineMin, 0}},
+		{v = {sx, sy - highlightLineMax, 0}},
+		{v = {sx, sy + highlightLineMin, 0}},
+		{v = {sx, sy + highlightLineMax, 0}},
+		{v = {sx - highlightLineMin, sy, 0}},
+		{v = {sx - highlightLineMax, sy, 0}},
+		{v = {sx + highlightLineMin, sy, 0}},
+		{v = {sx + highlightLineMax, sy, 0}},
+	}
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+	glRect(sx - highlightSize, sy - highlightSize, sx + highlightSize, sy + highlightSize)
+	glShape(GL_LINES, vertices)
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+	]]
+	if point.text and (not point.scaleTextSize) then
+		local cChar = GetColorChar(point.color)
+		glText(cChar..point.text.."\008", sx, sy + 16, fontSizeLocal, 'cno')
+	end
+end
+
 ----------------------------------------------------------------
 --callins
 ----------------------------------------------------------------
@@ -369,25 +393,13 @@ function widget:DrawScreen()
 			glColor(point.color[1], point.color[2], point.color[3], alpha * point.color[4])
 			if (sx >= 0 and sy >= 0	and sx <= vsx and sy <= vsy) then
 				--in screen
-				--[[	-- draw a targeting box
-				local vertices = {
-					{v = {sx, sy - highlightLineMin, 0}},
-					{v = {sx, sy - highlightLineMax, 0}},
-					{v = {sx, sy + highlightLineMin, 0}},
-					{v = {sx, sy + highlightLineMax, 0}},
-					{v = {sx - highlightLineMin, sy, 0}},
-					{v = {sx - highlightLineMax, sy, 0}},
-					{v = {sx + highlightLineMin, sy, 0}},
-					{v = {sx + highlightLineMax, sy, 0}},
-				}
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-				glRect(sx - highlightSize, sy - highlightSize, sx + highlightSize, sy + highlightSize)
-				glShape(GL_LINES, vertices)
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-				]]
-				if point.text and (not point.scaleTextSize) then
-					local cChar = GetColorChar(point.color)
-					glText(cChar..point.text.."\008", sx, sy + 16, fontSizeLocal, 'cno')
+				if WG.DrawAfterChili then
+					local func = function()
+						DrawOnScreenPoint(point, sx, sy, sz, fontSizeLocal)
+					end
+					WG.DrawAfterChili(func)
+				else
+					DrawOnScreenPoint(point, sx, sy, sz, fontSizeLocal)
 				end
 			elseif point.showArrow ~= false then
 				--out of screen

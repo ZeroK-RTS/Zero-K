@@ -62,7 +62,7 @@ local function CheckOrderRemoval() -- FIXME: maybe we can remove polling every f
 	for unitID, factoryDefID in pairs(ordersToRemove) do
 		local cQueue = Spring.GetCommandQueue(unitID, 1)
 		if cQueue and cQueue[1] and cQueue[1].id == -factoryDefID then
-			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, {"alt"})
+			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, CMD.OPT_ALT)
 		end
 	end
 	ordersToRemove = nil
@@ -83,10 +83,23 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
 
-		-- Stats collection
+		-- Stats collection (acuelly not, see below)
 		if GG.mod_stats_AddFactoryPlop then
 			GG.mod_stats_AddFactoryPlop(teamID, unitDefID)
 		end
+
+		-- FIXME: temporary hack because I'm in a hurry
+		-- proper way: get rid of all the useless shit in modstats, reenable and collect plop stats that way (see above)
+		local str = "SPRINGIE:facplop," .. UnitDefs[unitDefID].name .. "," .. teamID .. "," .. select(6, Spring.GetTeamInfo(teamID)) .. ","
+		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		if isAI then
+			str = str .. "Nightwatch" -- existing account just in case infra explodes otherwise
+		else
+			str = str .. (Spring.GetPlayerInfo(playerID) or "ChanServ") -- ditto, different acc to differentiate
+		end
+		str = str .. ",END_PLOP"
+		Spring.SendCommands("wbynum 255 " .. str)
+
 		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- FIXME: performance loss, possibly preload?
 	end
 end
@@ -147,12 +160,15 @@ local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
 
 -- allow gadget:Save (unsynced) to reach them
-_G.waitingForComm = waitingForComm
-_G.scheduledSpawn = scheduledSpawn
-_G.playerSides = playerSides
-_G.teamSides = teamSides
-_G.commSpawnedTeam = commSpawnedTeam
-_G.commSpawnedPlayer = commSpawnedPlayer
+local function UpdateSaveReferences()
+	_G.waitingForComm = waitingForComm
+	_G.scheduledSpawn = scheduledSpawn
+	_G.playerSides = playerSides
+	_G.teamSides = teamSides
+	_G.commSpawnedTeam = commSpawnedTeam
+	_G.commSpawnedPlayer = commSpawnedPlayer
+end
+UpdateSaveReferences()
 
 local loadGame = false	-- was this loaded from a savegame?
 
@@ -668,6 +684,8 @@ function gadget:Load(zip)
 	teamSides = data.teamSides or {}
 	commSpawnedPlayer = data.commSpawnedPlayer or {}
 	commSpawnedTeam = data.commSpawnedTeam or {}
+	
+	UpdateSaveReferences()
 end
 
 --------------------------------------------------------------------

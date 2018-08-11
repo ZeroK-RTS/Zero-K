@@ -589,6 +589,10 @@ local icontypes = {
     bitmap='icons/shipbuilder.png',
     size=1.8,
   },
+  shipbuilder_alt = {
+    bitmap='icons/shipbuilder_alt.png',
+    size=2.2,
+  },
   spiderbuilder = {
     bitmap='icons/spiderbuilder.png',
     size=1.8,
@@ -917,13 +921,25 @@ local icontypes = {
     bitmap='icons/shipscout.dds',
     size=2.2,
   },
+  shipscout_alt = {
+    bitmap='icons/shipscout_alt.png',
+    size=1.7,
+  },
   shipskirm = {
     bitmap='icons/shipskirm.dds',
     size=2.8,
   },
+  shipskirm_alt = {
+    bitmap='icons/shipskirm_alt.png',
+    size=2.0,
+  },
   shiptorpraider = {
 	bitmap='icons/shiptorpraider.dds',
     size=2.2,
+  },
+  shipraider_alt = {
+	bitmap='icons/shipraider_alt.png',
+    size=2,
   },
   subraider = {
 	bitmap='icons/subraider.dds',
@@ -933,17 +949,33 @@ local icontypes = {
     bitmap='icons/shipriot.dds',
 	size=2.8,
   },
+  shipriot_alt = {
+    bitmap='icons/shipriot_alt.png',
+	size=2.2,
+  },
   shipassault = {
     bitmap='icons/shipassault.png',
 	size=2.8,
+  },
+  shipassault_alt = {
+    bitmap='icons/shipassault_alt.png',
+	size=2.4,
   },
   shiparty = {
     bitmap='icons/shiparty.dds',
 	size=3.0,
   },
+  shiparty_alt = {
+    bitmap='icons/shiparty_alt.png',
+	size=2.3,
+  },
   shipaa = {
     bitmap='icons/shipaa.dds',
 	size=3.0,
+  },
+  shipaa_alt = {
+    bitmap='icons/shipaa_alt.png',
+	size=2.0,
   },
   shiptransport = {
     bitmap='icons/shiptransport.dds',

@@ -173,12 +173,8 @@ function gadget:Initialize()
 	end
 end
 
-local function MakeOptsWithShift(cmdOpt)
-	local opts = {"shift"} -- appending
-	if (cmdOpt.alt)   then opts[#opts+1] = "alt"   end
-	if (cmdOpt.ctrl)  then opts[#opts+1] = "ctrl"  end
-	if (cmdOpt.right) then opts[#opts+1] = "right" end
-	return opts
+local function MakeOptsWithShift(opts)
+	return opts.coded + (opts.shift and 0 or CMD.OPT_SHIFT)
 end
 
 local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
@@ -191,13 +187,13 @@ local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, 0)
 	spGiveOrderToUnit(unitID, CMD.STOP, emptyTable, 0)
 	if queue then
-		opts = opts or emptyTable
+		local cmdOpt = opts and MakeOptsWithShift(opts) or CMD.OPT_SHIFT
 		local i = 1
 		local toInsert = (index >= 0)
 		local commands = #queue
 		while i <= commands do
 			if i-1 == index and toInsert then
-				spGiveOrderToUnit(unitID, cmdID, params, MakeOptsWithShift(opts))
+				spGiveOrderToUnit(unitID, cmdID, params, cmdOpt)
 				toInsert = false
 				if toReplace then
 					i = i + 1
@@ -210,7 +206,7 @@ local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 			--local cq = spGetCommandQueue(unitID) for i = 1, #cq do Spring.Echo(cq[i].id) end
 		end
 		if toInsert or index < 0 then
-			spGiveOrderToUnit(unitID, cmdID, params, MakeOptsWithShift(opts))
+			spGiveOrderToUnit(unitID, cmdID, params, cmdOpt)
 		end
 	end
 	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, 0)
@@ -348,7 +344,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 		-- Remove fight orders to implement a fight command version of CommandFire if Fight is the last command.
 		local queueLength = spGetCommandQueue(unitID, 0)
 		if queueLength <= 2 and (not Spring.GetUnitStates(unitID)["repeat"]) then
-			spGiveOrderToUnit(unitID, CMD.REMOVE, {CMD.FIGHT}, {"alt"})
+			spGiveOrderToUnit(unitID, CMD.REMOVE, {CMD.FIGHT}, CMD.OPT_ALT)
 		end
 	end
 	
@@ -381,9 +377,9 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 		local replaceExistingRearm = (detectedRearm and replaceExisting) --replace existing Rearm (if available)
 		-- InsertCommand(unitID, index, CMD_REARM, {targetPad}, nil, replaceExistingRearm) --UnitID get RE-ARM commandID. airpadID as its Params[1]
 		if replaceExistingRearm then
-			spGiveOrderToUnit(unitID, CMD.REMOVE, {index}, {""})
+			spGiveOrderToUnit(unitID, CMD.REMOVE, {index}, 0)
 		end
-		spGiveOrderToUnit(unitID, CMD.INSERT, {index, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, {"alt"}) --Internal to avoid repeat
+		spGiveOrderToUnit(unitID, CMD.INSERT, {index, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, CMD.OPT_ALT) --Internal to avoid repeat
 		cmdIgnoreSelf = false
 		return targetPad, index
 	end
@@ -552,7 +548,7 @@ function gadget:GameFrame(n)
 						if Spring.GetUnitStates(bomberID)["repeat"] then 
 							cmdIgnoreSelf = true
 							-- InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
-							spGiveOrderToUnit(bomberID, CMD.INSERT, {-1, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, {"alt"}) --Internal to avoid repeat
+							spGiveOrderToUnit(bomberID, CMD.INSERT, {-1, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, CMD.OPT_ALT) --Internal to avoid repeat
 							cmdIgnoreSelf = false
 						end
 						if GG.SendBomberToPad then
@@ -611,7 +607,7 @@ function GG.LandComplete(bomberID)
 			for i = 1, #padQueue do
 				padQueue[i][1] = padQueue[i].id
 				padQueue[i][2] = padQueue[i].params
-				padQueue[i][3] = padQueue[i].options
+				padQueue[i][3] = padQueue[i].options.coded
 			end
 			spGiveOrderToUnit(bomberID,CMD.STOP, emptyTable, 0)
 			Spring.GiveOrderArrayToUnitArray({bomberID}, padQueue)

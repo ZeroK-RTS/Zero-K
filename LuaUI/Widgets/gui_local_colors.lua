@@ -271,8 +271,7 @@ function widget:PlayerChanged()
 end
 
 function widget:Shutdown()
-	ResetOldTeamColors()
-	NotifyColorChange()
+	-- don't restore the original colours, they're useless. This only really matters for /luaui disable
 	WG.LocalColor.localTeamColorToggle = nil
 end
 

@@ -43,6 +43,8 @@ local drawFeatureHealth  = false
 local featureTitlesAlpha = featureBarAlpha * titlesAlpha/barAlpha
 local featureHpThreshold = 0.85
 
+local barScale = 1
+
 local infoDistance = 700000
 
 local drawStunnedOverlay = true
@@ -107,11 +109,12 @@ end
 local function OptionsChanged()
 	drawFeatureHealth = options.drawFeatureHealth.value
 	drawBarPercentages = options.drawBarPercentages.value
+	barScale = options.barScale.value
 	debugMode = options.debugMode.value
 end
 
 options_path = 'Settings/Interface/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'debugMode', 'minReloadTime'}
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'barScale', 'debugMode', 'minReloadTime'}
 options = {
 	showhealthbars = {
 		name = 'Show Healthbars',
@@ -133,6 +136,15 @@ options = {
 		value = true,
 		noHotkey = true,
 		desc = 'Shows percentages next to bars',
+		OnChange = OptionsChanged,
+	},
+	barScale = {
+		name = 'Bar size scale',
+		type = 'number',
+		value = 1,
+		min = 0.5,
+		max = 3,
+		step = 0.25,
 		OnChange = OptionsChanged,
 	},
 	minReloadTime = {
@@ -889,7 +901,7 @@ do
 		if ci.specialReload then
 			local specialReloadState = GetUnitRulesParam(unitID,"specialReloadFrame")
 			if (specialReloadState and specialReloadState > gameFrame) then
-				local special = 1-(specialReloadState-gameFrame)/(ci.specialReload*gameSpeed)
+				local special = 1-(specialReloadState-gameFrame)/ci.specialReload	-- don't divide by gamespeed, since specialReload is also in gameframes
 				AddBar(messages.ability,special,"reload2",(fullText and floor(special*100)..'%') or '')
 			end
 		end
@@ -970,6 +982,7 @@ do
 		if (barsN>0)or(numStockpiled) then
 			glPushMatrix()
 			glTranslate(ux, uy+ci.height, uz )
+			gl.Scale(barScale, barScale, barScale)
 			glBillboard()
 
 			--// STOCKPILE ICON
@@ -1061,6 +1074,8 @@ do
 		if (barsN>0) then
 			glPushMatrix()
 			glTranslate(fx,fy+ci.height,fz)
+			local scale = options.barScale.value or 1
+			gl.Scale(barScale, barScale, barScale)
 			glBillboard()
 
 			--// DRAW BARS

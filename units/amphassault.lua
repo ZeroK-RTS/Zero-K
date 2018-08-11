@@ -19,7 +19,7 @@ unitDef = {
   customParams        = {
     amph_regen = 40,
     amph_submerged_at = 40,
-	sink_on_emp    = 0,
+    sink_on_emp    = 0,
     floattoggle    = [[1]],
     aimposoffset   = [[0 30 0]],
     midposoffset   = [[0 6 0]],
@@ -88,6 +88,8 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
+		burst = Shared.BURST_UNRELIABLE,
+
 		light_color = [[0.5 0.5 1.5]],
 		light_radius = 180,
       },

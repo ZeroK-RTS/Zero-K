@@ -88,6 +88,8 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams        = {
+		burst = Shared.BURST_RELIABLE,
+
         combatrange = 950,
         disarmDamageMult = 1.0,
         disarmDamageOnly = 1,
@@ -113,7 +115,7 @@ unitDef = {
       reloadtime              = 5,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/emp_missile_hit]],
-      soundStart              = [[weapon/missile/tacnuke_launch]],
+      soundStart              = [[weapon/missile/tacnuke_launch2_trimmed]],
       stockpile               = true,
       stockpileTime           = 10^5,
       tolerance               = 4000,

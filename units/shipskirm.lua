@@ -96,7 +96,6 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_hailstorm.s3o]],
       noSelfDamage            = true,
-      predictBoost            = 1,
       range                   = 610,
       reloadtime              = 8.0,
       smokeTrail              = true,

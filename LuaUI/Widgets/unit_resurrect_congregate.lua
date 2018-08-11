@@ -44,7 +44,7 @@ end
 function widget:UnitCreated(unitID, unitDefID, unitTeamID, builderID)
 	if iNotLagging_gbl and
 	(builderID) and --have builder (not created using /give, not morph)
-	unitTeamID == myTeamID_gbl and UnitDefs[unitDefID].speed > 0 then --is mobile and our own unit
+	unitTeamID == myTeamID_gbl and not UnitDefs[unitDefID].isImmobile then --is mobile and our own unit
 		local _,_,_,x,y,z = spGetUnitPosition(unitID,true)
 		local _,_,inbuild = spGetUnitIsStunned(unitID)
 		if not inbuild then --resurrected unit is instantly full health

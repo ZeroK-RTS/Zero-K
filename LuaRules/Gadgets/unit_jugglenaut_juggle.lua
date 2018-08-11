@@ -116,7 +116,7 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-function gadget:Explosion(weaponID, px, py, pz, ownerID)	
+function gadget:Explosion(weaponID, px, py, pz, ownerID)
 	if throwWeaponID[weaponID] and ownerID then
 		local frame = Spring.GetGameFrame()
 		local sx,sy,sz = Spring.GetUnitPosition(ownerID)

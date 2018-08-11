@@ -76,7 +76,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_beamlaser",
 		humanName = "Beam Laser",
-		description = "Beam Laser",
+		description = "Beam Laser: An effective short-range cutting tool",
 		image = moduleImagePath .. "commweapon_beamlaser.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -97,7 +97,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_flamethrower",
 		humanName = "Flamethrower",
-		description = "Flamethrower",
+		description = "Flamethrower: Good for deep-frying swarmers and large targets alike",
 		image = moduleImagePath .. "commweapon_flamethrower.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -118,7 +118,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_heatray",
 		humanName = "Heatray",
-		description = "Heatray",
+		description = "Heatray: Rapidly melts anything at short range; steadily loses all of its damage over distance",
 		image = moduleImagePath .. "commweapon_heatray.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -139,7 +139,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_heavymachinegun",
 		humanName = "Machine Gun",
-		description = "Machine Gun",
+		description = "Machine Gun: Close-in automatic weapon with AoE",
 		image = moduleImagePath .. "commweapon_heavymachinegun.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -183,7 +183,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_lightninggun",
 		humanName = "Lightning Rifle",
-		description = "Lightning Rifle",
+		description = "Lightning Rifle: Paralyzes and damages annoying bugs",
 		image = moduleImagePath .. "commweapon_lightninggun.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -205,7 +205,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_lparticlebeam",
 		humanName = "Light Particle Beam",
-		description = "Light Particle Beam",
+		description = "Light Particle Beam: Fast, light pulsed energy weapon",
 		image = moduleImagePath .. "commweapon_lparticlebeam.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -227,7 +227,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_missilelauncher",
 		humanName = "Missile Launcher",
-		description = "Missile Launcher",
+		description = "Missile Launcher: Lightweight seeker missile with good range",
 		image = moduleImagePath .. "commweapon_missilelauncher.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -248,7 +248,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_riotcannon",
 		humanName = "Riot Cannon",
-		description = "Riot Cannon",
+		description = "Riot Cannon: The weapon of choice for crowd control",
 		image = moduleImagePath .. "commweapon_riotcannon.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -270,7 +270,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_rocketlauncher",
 		humanName = "Rocket Launcher",
-		description = "Rocket Launcher",
+		description = "Rocket Launcher: Medium-range, low-velocity hitter",
 		image = moduleImagePath .. "commweapon_rocketlauncher.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -292,7 +292,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_shotgun",
 		humanName = "Shotgun",
-		description = "Shotgun",
+		description = "Shotgun: Can hammer a single large target or shred several small ones",
 		image = moduleImagePath .. "commweapon_shotgun.png",
 		limit = 2,
 		cost = 50 * COST_MULT,
@@ -314,7 +314,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_hparticlebeam",
 		humanName = "Heavy Particle Beam",
-		description = "Heavy Particle Beam - Replaces other weapons.",
+		description = "Heavy Particle Beam - Replaces other weapons. Short range, high-power beam weapon with moderate reload time",
 		image = moduleImagePath .. "conversion_hparticlebeam.png",
 		limit = 1,
 		cost = 150 * COST_MULT,
@@ -334,7 +334,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_shockrifle",
 		humanName = "Shock Rifle",
-		description = "Shock Rifle - Replaces other weapons.",
+		description = "Shock Rifle - Replaces other weapons. Long range sniper rifle",
 		image = moduleImagePath .. "conversion_shockrifle.png",
 		limit = 1,
 		cost = 150 * COST_MULT,
@@ -662,7 +662,7 @@ local moduleDefs = {
 		name = "module_jumpjet",
 		humanName = "Jumpjets",
 		description = "Jumpjets - Leap over obstacles and out of danger.",
-		image = moduleImagePath .. "module_radarnet2.png",
+		image = moduleImagePath .. "module_jumpjet.png",
 		limit = 1,
 		cost = 400 * COST_MULT,
 		requireChassis = {"knight"},
@@ -1443,7 +1443,7 @@ local chassisDefs = {
 		baseUnitDef = UnitDefNames and UnitDefNames["dynknight0"].id,
 		extraLevelCostFunction = extraLevelCostFunction,
 		maxNormalLevel = 5,
-		notSelectable = true,
+		notSelectable = (Spring.GetModOptions().campaign_chassis ~= "1"),
 		secondPeashooter = true,
 		levelDefs = {
 			[0] = {
@@ -1722,11 +1722,18 @@ local function ModuleIsValid(level, chassis, slotAllows, moduleDefID, alreadyOwn
 		end
 	
 	end
-	
+
+	-- cheapass hack to prevent cremcom dual wielding same weapon (not supported atm)
+	-- proper solution: make the second instance of a weapon apply projectiles x2 or reloadtime x0.5 and get cremcoms unit script to work with that
+	local limit = data.limit
+	if chassis == 5 and data.slotType == "basic_weapon" and limit == 2 then
+		limit = 1
+	end
+
 	-- Check that the module limit is not reached
-	if data.limit and (alreadyOwned[moduleDefID] or (alreadyOwned2 and alreadyOwned2[moduleDefID])) then
+	if limit and (alreadyOwned[moduleDefID] or (alreadyOwned2 and alreadyOwned2[moduleDefID])) then
 		local count = (alreadyOwned[moduleDefID] or 0) + ((alreadyOwned2 and alreadyOwned2[moduleDefID]) or 0) 
-		if count > data.limit then
+		if count > limit then
 			return false
 		end
 	end
