@@ -2509,7 +2509,7 @@ end
 local function updateTerraform(health,id,arrayIndex,costDiff)
 	local terra = terraformUnit[id]
 	
-	if terra.toRemove and (costDiff > 0.1 or terra.baseCostSpent > 0.1) then
+	if terra.toRemove and terra.totalSpent > 0.1 then
 		-- Removing terraform too early enables structure-detecting maphax.
 		deregisterTerraformUnit(id,arrayIndex,2)
 		spDestroyUnit(id, false, true)
