@@ -149,10 +149,7 @@ function widget:Update(dt)
 	if desiredActive ~= windowVisible then
 		if desiredActive then
 			windowVisible = true
-			local _, _, paused = spGetGameSpeed()
-			if not paused then
-				Spring.SendCommands("pause")
-			end
+			Spring.SendCommands("pause 1")
 			if not mainWindow then
 				mainWindow = SetupWindow()
 			end
@@ -160,10 +157,7 @@ function widget:Update(dt)
 		else
 			windowVisible = false
 			screen0:RemoveChild(mainWindow)
-			local _, _, paused = spGetGameSpeed()
-			if paused then
-				Spring.SendCommands("pause")
-			end
+			Spring.SendCommands("pause 0")
 		end
 	end
 end
