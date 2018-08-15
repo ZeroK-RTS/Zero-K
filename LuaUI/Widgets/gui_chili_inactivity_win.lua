@@ -97,6 +97,7 @@ local function SetupWindow()
 		tooltip = "Stop waiting for dropped players and declare yourself the winner.";
 		OnClick = {
 			function() 
+				Spring.SendCommands("pause 0")
 				Spring.SendCommands("luarules inactivitywin")
 			end
 		}
