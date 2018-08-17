@@ -161,6 +161,10 @@ function widget:Update(dt)
 			Spring.SendCommands("pause 0")
 		end
 	end
+
+	if windowVisible then
+		mainWindow:BringToFront()
+	end
 end
 
 --------------------------------------------------------------------------------
