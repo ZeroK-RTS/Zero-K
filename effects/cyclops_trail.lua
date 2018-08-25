@@ -23,7 +23,6 @@ return {
         ttl                = 5,
       },
     },
-
     spikes = {
       air                = true,
       class              = [[explspike]],
