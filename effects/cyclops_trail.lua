@@ -16,7 +16,7 @@ return {
         dir                = [[dir]],
         frontoffset        = 0,
         fronttexture       = [[muzzlefront]],
-        length             = -2,
+        length             = -1.5,
         sidetexture        = [[muzzleside]],
         size               = 2,
         sizegrowth         = 2,

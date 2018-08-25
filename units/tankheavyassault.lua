@@ -80,7 +80,7 @@ unitDef = {
         smoothmult   = [[0.4]],
 
         light_radius = 320,
-        timeslow_damagefactor = 3,
+        timeslow_damagefactor = 2.1,
         timeslow_overslow_frames = 2*30,
         light_color = [[1.88 0.63 2.5]],
       },
