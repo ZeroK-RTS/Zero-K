@@ -484,6 +484,11 @@ local function DrawLightType(lights, lightsCount, lighttype) -- point = 0 beam =
 			local lightradius = param.radius
 			--Spring.Echo("Drawlighttype position = ", light.px, light.py, light.pz)
 			local sx, sy, sz = spWorldToScreenCoords(light.px, light.py, light.pz) -- returns x, y, z, where x and y are screen pixels, and z is z buffer depth.
+
+			-- prevent sharp cutoffs when projectile is slightly offscreen
+			sx = math.max(0,sx)
+			sx = math.min(sx,vsx)
+
 			sx = sx/vsx
 			sy = sy/vsy --since FOV is static in the Y direction, the Y ratio is the correct one
 			local dist_sq = (light.px-cx)^2 + (light.py-cy)^2 + (light.pz-cz)^2
@@ -509,6 +514,11 @@ local function DrawLightType(lights, lightsCount, lighttype) -- point = 0 beam =
 			local lightradius = param.radius + math.sqrt(light.dx^2 + light.dy^2 + light.dz^2)*0.5
 			VerboseEcho("Drawlighttype position = ", light.px, light.py, light.pz)
 			local sx, sy, sz = spWorldToScreenCoords(px, py, pz) -- returns x, y, z, where x and y are screen pixels, and z is z buffer depth.
+
+			-- prevent sharp cutoffs when beam is slightly offscreen
+			sx = math.max(0,sx)
+			sx = math.min(sx,vsx)
+			
 			sx = sx/vsx
 			sy = sy/vsy --since FOV is static in the Y direction, the Y ratio is the correct one
 			local dist_sq = (px-cx)^2 + (py-cy)^2 + (pz-cz)^2
