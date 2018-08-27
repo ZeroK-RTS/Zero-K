@@ -59,12 +59,6 @@ unitDef = {
 	  badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
-    {
-      def                = [[SLOWBEAM]],
-      badTargetCategory  = [[FIXEDWING UNARMED]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
   },
 
   weaponDefs          = {
@@ -72,141 +66,48 @@ unitDef = {
     COR_GOL             = {
       name                    = [[Tankbuster Cannon]],
       areaOfEffect            = 32,
+      
       craterBoost             = 0,
       craterMult              = 0,
 
       customParams            = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
         reaim_time = 8, -- COB
-		
-	    gatherradius = [[105]],
-	    smoothradius = [[70]],
-	    smoothmult   = [[0.4]],
-		
-		light_color = [[3 2.33 1.5]],
-		light_radius = 150,
-	  },
+
+        gatherradius = [[105]],
+        smoothradius = [[70]],
+        smoothmult   = [[0.4]],
+
+        light_radius = 320,
+        timeslow_damagefactor = 2.1,
+        timeslow_overslow_frames = 2*30,
+        light_color = [[1.88 0.63 2.5]],
+      },
       
       damage                  = {
         default = 1000,
         subs    = 50,
       },
 
-      explosionGenerator      = [[custom:TESS]],
+      cegTag                  = [[cyclopstrail]],
+      stages                  = 20,
+      rgbcolor                = [[1.0 0.2 1.0]],
+      separation              = 2,
+
+      explosionGenerator      = [[custom:cyclops_hit]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       range                   = 450,
       reloadtime              = 3.5,
-      soundHit                = [[weapon/cannon/supergun_bass_boost]],
-      soundStart              = [[weapon/cannon/rhino]],
+      soundHit                = [[weapon/laser/heavy_disrupter_hit]],
+      soundStart              = [[weapon/laser/heavy_disrupter]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 310,
     },
-	
-	SLOWBEAM = {
-      name                    = [[Slowing Beam]],
-      areaOfEffect            = 8,
-      beamDecay               = 0.9,
-      beamTime                = 0.1,
-      beamttl                 = 50,
-      coreThickness           = 0,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      customparams = {
-        reaim_time = 8, -- COB
-		
-        timeslow_damagefactor = 1,
-        timeslow_onlyslow = 1,
-        timeslow_smartretarget = 0.33,
-		
-		light_camera_height = 1800,
-		light_color = [[0.6 0.22 0.8]],
-		light_radius = 200,
-      },
-
-      damage                  = {
-        default = 600,
-      },
-
-      explosionGenerator      = [[custom:flashslow]],
-      fireStarter             = 30,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      largeBeamLaser          = true,
-      laserFlareSize          = 4,
-      minIntensity            = 1,
-      noSelfDamage            = true,
-      range                   = 440,
-      reloadtime              = 1,
-      rgbColor                = [[0.27 0 0.36]],
-      soundStart              = [[weapon/laser/pulse_laser2]],
-      soundStartVolume        = 15,
-      soundTrigger            = true,
-      sweepfire               = false,
-      texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
-      thickness               = 11,
-      tolerance               = 18000,
-      turret                  = true,
-      weaponType              = [[BeamLaser]],
-      weaponVelocity          = 500,
-    },
-
-    tankheavyassault_FLAMETHROWER = {
-      name                    = [[Flamethrower]],
-      areaOfEffect            = 64,
-      avoidFeature            = false,
-      avoidFriendly           = false,
-      collideFeature          = false,
-      collideGround           = false,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-	  customParams        	  = {
-		flamethrower = [[1]],
-	    setunitsonfire = "1",
-		burntime = [[360]],
-	  },
-	  
-      damage                  = {
-        default = 5,
-        subs    = 0.05,
-      },
-
-      duration                = 0.1,
-      explosionGenerator      = [[custom:SMOKE]],
-      fallOffRate             = 1,
-      fireStarter             = 100,
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      intensity               = 0.1,
-      interceptedByShieldType = 0,
-      noExplode               = true,
-      noSelfDamage            = true,
-      range                   = 280,
-      reloadtime              = 0.16,
-      rgbColor                = [[1 1 1]],
-      soundStart              = [[weapon/flamethrower]],
-      soundTrigger            = true,
-      texture1				  = [[fireball]],
-      texture2				  = [[fireball]],
-      thickness	              = 12,
-      tolerance               = 5000,
-      turret                  = true,
-      weaponType              = [[LaserCannon]],
-      weaponVelocity          = 800,
-    },
-
-
   },
 
 
