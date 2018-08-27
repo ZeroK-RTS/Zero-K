@@ -15,6 +15,9 @@ for i = 1,6 do
 	pillars[i] = piece("Pillar"..i);
 end
 
+local pillarHeight = 0;
+local numPillars = 0;
+
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitHealth = Spring.GetUnitHealth
@@ -159,14 +162,14 @@ function script.Create()
 
 	local x,y,z = Spring.GetUnitPosition(unitID);
 	local gy = Spring.GetGroundHeight(x,z);
-	local pillarHeight = y-gy;
+	pillarHeight = y-gy;
 
 	if(pillarHeight > 0) then
 		Show(legs);
 		-- each pillar segment is 45 elmo tall
 		-- legs are 35 elmos tall
 		if(pillarHeight > 35) then
-			local numPillars = math.min(math.ceil((pillarHeight-35)/45), 6)
+			numPillars = math.min(math.ceil((pillarHeight-35)/45), 6)
 			for i = 1, numPillars do
 				Show(pillars[i]);
 			end
@@ -229,6 +232,16 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
+
+	if(pillarHeight > 0) then
+		Explode(legs, sfxShatter)
+	end
+
+	if(numPillars > 0) then
+		for i = 1, numPillars do
+			Explode(pillars[i],sfxShatter);
+		end
+	end
 
 	if (severity <= .25) then
 		return 1 -- corpsetype
