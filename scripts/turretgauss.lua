@@ -7,6 +7,14 @@ local barrel1, barrel2, barrel3, muzzle = piece("Barrel1","Barrel2","Barrel3","M
 local lidLeft, lidRight = piece("lidLeft","lidRight");
 local aimProxy = piece("AimProxy");
 
+local legs = piece("Legs");
+
+local pillars = {}
+
+for i = 1,6 do
+	pillars[i] = piece("Pillar"..i);
+end
+
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitHealth = Spring.GetUnitHealth
@@ -143,6 +151,28 @@ function script.Create()
 	--StartThread(AimBlink);
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(RestoreAfterDelay);
+
+	Hide(legs);
+	for i = 1,6 do
+		Hide(pillars[i]);
+	end
+
+	local x,y,z = Spring.GetUnitPosition(unitID);
+	local gy = Spring.GetGroundHeight(x,z);
+	local pillarHeight = y-gy;
+
+	if(pillarHeight > 0) then
+		Show(legs);
+		-- each pillar segment is 45 elmo tall
+		-- legs are 35 elmos tall
+		if(pillarHeight > 35) then
+			local numPillars = math.min(math.ceil((pillarHeight-35)/45), 6)
+			for i = 1, numPillars do
+				Show(pillars[i]);
+			end
+		end
+	end
+
 end
 
 
