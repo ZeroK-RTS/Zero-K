@@ -177,7 +177,20 @@ local ret = {
 			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
 			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
 		},
-		decorations = {"banner_overhead"},
+		decorations = {"banner_overhead","skin_strike_renegade"},
+		images = {overhead = "184"}
+	},
+	dynfancy_strike_lobster = {
+		name = "Strike Trainer",
+		chassis = "strike",
+		modules = {
+			{"commweapon_beamlaser", "module_ablative_armor"},
+			{"module_high_power_servos", "commweapon_personal_shield"},
+			{"commweapon_clusterbomb", "module_dmg_booster", "module_ablative_armor"},
+			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
+			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
+		},
+		decorations = {"banner_overhead","skin_strike_chitin"},
 		images = {overhead = "184"}
 	},
 }
