@@ -40,15 +40,17 @@ local commsCampaign = {
   },
   
   comm_campaign_isonade = {
-    chassis = "benzcom2",	-- TODO get a properly organic model
+    chassis = "commstrike2",	-- TODO get a properly organic model
     name = "Lord Isonade",
-    --modules = { "commweapon_sonicgun", "module_heavy_armor", "module_dmg_booster", "module_autorepair", "module_autorepair" },
-    decorations = { "skin_assault_steel" },
+    modules = { "commweapon_gaussrifle", "commweapon_gaussrifle", "module_heavy_armor", "module_dmg_booster", "module_autorepair", "module_autorepair" },
+    decorations = { "skin_strike_chitin" },
   },
 
   comm_campaign_legion = {
     chassis = "commstrike2",
     name = "Legate Fidus",
+    decorations = { "skin_strike_renegade" },
+
     --modules = { "commweapon_shotgun", "module_heavy_armor", "weaponmod_autoflechette", "module_adv_targeting", "module_autorepair"},
     --decorations = { "skin_battle_tiger" },
   },  

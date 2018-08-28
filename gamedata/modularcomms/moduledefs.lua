@@ -823,7 +823,20 @@ decorations = {
 				unitDef.buildpic = "skin_assault_steel.png"
 			end,
 	},
-	
+	skin_strike_renegade={
+		func = function(unitDef)
+			unitDef.customparams.altskin = [[unittextures/strikecom_renegade.dds]]
+			unitDef.customparams.altskin2 = [[unittextures/strikecom_renegade_2.dds]]
+			unitDef.buildpic = "skin_strike_renegade.png"
+		end
+	},
+	skin_strike_chitin={
+		func = function(unitDef)
+			unitDef.customparams.altskin = [[unittextures/strikecom_chitin.dds]]
+			unitDef.customparams.altskin2 = [[unittextures/strikecom_chitin_2.dds]]
+			unitDef.buildpic = "skin_strike_chitin.png"
+		end
+	},
 	shield_red = {
 		func = function(unitDef)
 				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
