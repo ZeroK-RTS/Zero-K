@@ -93,6 +93,7 @@ local disableAiUnitControl
 GG.terraformRequiresUnlock = true
 GG.terraformUnlocked = {}
 
+loaded = true
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- For gadget:Save
@@ -1238,33 +1239,35 @@ local function DoInitialUnitPlacement()
 	CheckDisableControlAiMessage()
 end
 
-local function DoInitialTerraform()
+local function DoInitialTerraform(noBuildings)
 	local terraformList = CustomKeyToUsefulTable(Spring.GetModOptions().initalterraform) or {}
 	local gaiaTeamID = Spring.GetGaiaTeamID() 
 	
-	-- Add terraform for structures
-	local teamList = Spring.GetTeamList()
-	for i = 1, #teamList do
-		local teamID = teamList[i]
-		local customKeys = select(7, Spring.GetTeamInfo(teamID))
-		local initialUnits = GetExtraStartUnits(teamID, customKeys)
-		initialUnitDataTable[teamID] = initialUnitDataTable[teamID] or CustomKeyToUsefulTable(customKeys and customKeys.extrastartunits)
-		if initialUnits then
-			for i = 1, #initialUnits do
-				local unitTerra = AddUnitTerraform(initialUnits[i])
-				if unitTerra then
-					terraformList[#terraformList + 1] = unitTerra
+	if not noBuildings then
+		-- Add terraform for structures
+		local teamList = Spring.GetTeamList()
+		for i = 1, #teamList do
+			local teamID = teamList[i]
+			local customKeys = select(7, Spring.GetTeamInfo(teamID))
+			local initialUnits = GetExtraStartUnits(teamID, customKeys)
+			initialUnitDataTable[teamID] = initialUnitDataTable[teamID] or CustomKeyToUsefulTable(customKeys and customKeys.extrastartunits)
+			if initialUnits then
+				for i = 1, #initialUnits do
+					local unitTerra = AddUnitTerraform(initialUnits[i])
+					if unitTerra then
+						terraformList[#terraformList + 1] = unitTerra
+					end
 				end
 			end
 		end
-	end
-	
-	local neutralUnits = GetExtraStartUnits(gaiaTeamID, Spring.GetModOptions())
-	if neutralUnits then
-		for i = 1, #neutralUnits do
-			local unitTerra = AddUnitTerraform(neutralUnits[i])
-			if unitTerra then
-				terraformList[#terraformList + 1] = unitTerra
+
+		local neutralUnits = GetExtraStartUnits(gaiaTeamID, Spring.GetModOptions())
+		if neutralUnits then
+			for i = 1, #neutralUnits do
+				local unitTerra = AddUnitTerraform(neutralUnits[i])
+				if unitTerra then
+					terraformList[#terraformList + 1] = unitTerra
+				end
 			end
 		end
 	end
@@ -1461,6 +1464,9 @@ function gadget:GameFrame(n)
 			end
 		end
 		DoStructureLevelGround()
+		if Spring.GetGameRulesParam("loadedGame") then
+			DoInitialTerraform(true)
+		end
 	end
 	
 	if midgamePlacement[n] then
@@ -1515,6 +1521,8 @@ function gadget:Load(zip)
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission load file corrupted")
 		return
 	end
+	
+	loaded = true
 
 	-- Unit Lineage. Reset because nonsense would be in it from UnitCreated.
 	unitLineage = {}
