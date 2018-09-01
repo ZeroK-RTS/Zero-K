@@ -12,7 +12,8 @@ function widget:GetInfo()
 	}
 end
 
-local buildings = {}
+local buildings = {}	-- {[1] = {x = posX, z = posZ, ud = unitID}}	-- unitID is only set when building is created
+local toClear = {}	-- {[1] = {x = posX, z = posZ, unitID = unitID}}	-- entries created in UnitCreated, iterated in GameFrame
 local numBuildings = 0
 
 local team = Spring.GetMyTeamID()
@@ -80,9 +81,9 @@ function widget:CommandNotify(id, params, options)
 end
 
 function CheckBuilding(ux,uz,ud)
-	for _, i in pairs(buildings) do
+	for index, i in pairs(buildings) do
 		if (i.x) then
-			if (abs(i.x - ux) < 16) and (abs(i.z - uz) < 16) then
+			if (abs(i.x - ux) < 4) and (abs(i.z - uz) < 16) then
 				i.ud = ud
 				return true
 			end
@@ -91,33 +92,55 @@ function CheckBuilding(ux,uz,ud)
 	return false
 end
 
+function widget:GameFrame(f)
+	if f % 2 ~= 1 then
+		return
+	end
+	
+	local newClear = {}
+	for i=1,#toClear do
+		local entry = toClear[i]
+		-- minimum progress requirement is there because otherwise a con can start multiple nanoframes in one gameframe
+		-- (probably as many as it can reach, in fact)
+		local health, _, _, _, buildProgress = Spring.GetUnitHealth(entry.unitID)
+		if health > 3 then
+		--if buildProgress > 0.01 then
+			local ux, uz = entry.x, entry.z
+			local units = spGetTeamUnits(team)
+			for _, unit_id in ipairs(units) do
+				local cQueue = spGetCommandQueue(unit_id, 1)
+				if cQueue and cQueue[1] then
+					local command = cQueue[1]
+					if command.id < 0 then 
+						local cx = command.params[1]
+						local cz = command.params[3]
+						if (abs(cx-ux) < 16) and (abs(cz-uz) < 16) then
+							spGiveOrderToUnit(unit_id, CMD_REMOVE, {command.tag}, 0 )
+						end
+					end
+				end
+			end
+		else
+			newClear[#newClear + 1] = entry
+		end
+	end
+	toClear = newClear
+end
+
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (unitTeam ~= team) then 
 		return
 	end
-
-	local units = spGetTeamUnits(team)
 	local ux, uy, uz  = spGetUnitPosition(unitID)
-
-	if CheckBuilding(ux,uz,unitID) then
-		for _, unit_id in ipairs(units) do
-			local cQueue = spGetCommandQueue(unit_id, 1)
-			if cQueue and cQueue[1] then
-				local command = cQueue[1]
-				if command.id < 0 then 
-					local cx = command.params[1]
-					local cz = command.params[3]
-					if (abs(cx-ux) < 16) and (abs(cz-uz) < 16) then
-						spGiveOrderToUnit(unit_id, CMD_REMOVE, {command.tag}, 0 )
-					end
-				end
-			end
-		end
+	
+	local check = CheckBuilding(ux,uz,unitID)
+	if check then
+		toClear[#toClear + 1] = {unitID = unitID, x = ux, z = uz}
 	end
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	for j, i in ipairs(buildings) do
+	for j, i in pairs(buildings) do
 		if (i.ud) then
 			buildings[j] = nil
 		end
@@ -131,3 +154,5 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 	end
 end
+
+
