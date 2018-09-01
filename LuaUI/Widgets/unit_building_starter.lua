@@ -103,7 +103,7 @@ function widget:GameFrame(f)
 		-- minimum progress requirement is there because otherwise a con can start multiple nanoframes in one gameframe
 		-- (probably as many as it can reach, in fact)
 		local health, _, _, _, buildProgress = Spring.GetUnitHealth(entry.unitID)
-		if health > 3 then
+		if health and health > 3 then
 		--if buildProgress > 0.01 then
 			local ux, uz = entry.x, entry.z
 			local units = spGetTeamUnits(team)
