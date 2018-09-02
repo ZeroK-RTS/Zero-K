@@ -889,6 +889,17 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	return true, processMorph(unitID, unitDefID, teamID, cmdID, cmdParams) -- command was used, process decides if to remove
 end
 
+
+function gadget:Load(zip)
+	-- for now just remove the morphing rules param
+	local units = Spring.GetAllUnits()
+	for i=1,#units do
+		local unitID = units[i]
+		Spring.SetUnitRulesParam(unitID, "morphing", 0)
+		Spring.SetUnitRulesParam(unitID, "morphDisable", 0)
+	end
+end
+
 --------------------------------------------------------------------------------
 --	END SYNCED
 --------------------------------------------------------------------------------
