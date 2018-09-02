@@ -26,6 +26,7 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 
+local SAVE_FILE = "Gadgets/unit_morph.lua"
 local emptyTable = {} -- for speedups
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -132,9 +133,9 @@ local morphDefs	= {} --// make it global in Initialize()
 local extraUnitMorphDefs = {} -- stores mainly planetwars morphs
 local hostName = nil -- planetwars hostname
 local PWUnits = {} -- planetwars units
-local morphUnits = {} --// make it global in Initialize()
+local morphUnits = {} --// make it global in Initialize(); needs save/load
 local reqDefIDs	= {} --// all possible unitDefID's, which are used as a requirement for a morph
-local morphToStart = {} -- morphes to start next frame
+local morphToStart = {} -- morphs to start next frame
 
 GG.wasMorphedTo = {} -- when a unit finishes morphing, a mapping of old unitID to new unitID is recorded here prior to old unit destruction
 
@@ -633,6 +634,7 @@ function gadget:Initialize()
 	_G.morphUnits         = morphUnits
 	_G.morphDefs          = morphDefs
 	_G.extraUnitMorphDefs = extraUnitMorphDefs
+	--_G.morphToStart       = morphToStart
 
 	--// Register CmdIDs
 	for number = 0, MAX_MORPH - 1 do
@@ -889,14 +891,40 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	return true, processMorph(unitID, unitDefID, teamID, cmdID, cmdParams) -- command was used, process decides if to remove
 end
 
-
 function gadget:Load(zip)
-	-- for now just remove the morphing rules param
-	local units = Spring.GetAllUnits()
-	for i=1,#units do
-		local unitID = units[i]
-		Spring.SetUnitRulesParam(unitID, "morphing", 0)
-		Spring.SetUnitRulesParam(unitID, "morphDisable", 0)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	--[[
+	morphUnits[unitID] = {
+		def = morphDef,
+		progress = 0.0,
+		increment = morphDef.increment,
+		morphID = morphID,
+		teamID = teamID,
+		combatMorph = morphDef.combatMorph,
+		morphRate = 0.0,
+	}
+	]]
+	
+	local loadData = GG.SaveLoad.ReadFile(zip, "Morph", SAVE_FILE) or emptyTable
+	for oldID, entry in pairs(loadData.morph or emptyTable) do
+		local newID = GG.SaveLoad.GetNewUnitID(oldID)
+		if newID then
+			morphUnits[newID] = entry
+			
+			local morphDef = entry.def
+			if morphDef.cmd then
+				local cmdDescID = Spring.FindUnitCmdDesc(newID, morphDef.cmd)
+				if (cmdDescID) then
+					Spring.EditUnitCmdDesc(newID, cmdDescID, {id = morphDef.stopCmd, name = RedStr .. "Stop"})
+				end
+			elseif morphDef.stopCmd == CMD_UPGRADE_STOP then
+				Spring.InsertUnitCmdDesc(newID, stopUpgradeCmdDesc)
+			end
+		end
 	end
 end
 
@@ -1283,6 +1311,19 @@ end
 --	gadget:AICallIn("asn|morph|762")
 --	end
 --end
+
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	local morph = Spring.Utilities.MakeRealTable(SYNCED.morphUnits, "Morph")
+	--local morphToStart = Spring.Utilities.MakeRealTable(SYNCED.morphToStart, "Morph (to start)")
+	local save = {morph = morph}	-- {morph = morph, morphToStart = morphToStart}
+	
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, save)
+end
 
 --------------------------------------------------------------------------------
 --	UNSYNCED
