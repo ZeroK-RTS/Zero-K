@@ -420,7 +420,7 @@ function widget:Initialize()
 		return
 	end
 	metalMap = (not Spring.GetGameRulesParam("mex_count") or Spring.GetGameRulesParam("mex_count") == -1)
-	Spring.Echo("Is metal map: " .. tostring(metalMap))
+	--Spring.Echo("Is metal map: " .. tostring(metalMap))
 	-- setup Chili
 	Chili = WG.Chili
 	Label = Chili.Label
