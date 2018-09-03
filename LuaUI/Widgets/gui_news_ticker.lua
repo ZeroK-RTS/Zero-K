@@ -1,7 +1,7 @@
 function widget:GetInfo()
 	return {
 		name	= "News Ticker",
-		desc	= "v1.011 Keeps you up to date on important battlefield events",
+		desc	= "v1.012 Keeps you up to date on important battlefield events",
 		author	= "KingRaptor",
 		date	= "July 26, 2009",
 		license	= "GNU GPL, v2 or later",
@@ -15,7 +15,6 @@ VFS.Include("LuaRules/Configs/constants.lua")
 --[[
 -- Features:
 _ Informs player of unit completion/death events, with sound events depending of incomes ( so no constant 'unit operational unit operational unit operational' when building heaps of peewees).
-
 -- To do:
 _ Maybe fusion this with minimap_events.lua and unit_marker.lua as they have a pretty similar task, maybe even unit_sounds.
 --]]
@@ -50,6 +49,7 @@ local UPDATE_PERIOD_LONG = 0.5	-- seconds
 local UPDATE_PERIOD_RESOURCES = 90	-- gameframes
 local RESOURCE_WARNING_PERIOD = 900	-- gameframes
 local MAX_EVENTS = 20
+local metalMap = false
 
 local mIncome = 0
 
@@ -294,7 +294,7 @@ function widget:GameFrame(n)
 		local mlevel, mstore,mpull,mincome = spGetTeamRes(myTeam, "metal")
 		mstore = mstore - HIDDEN_STORAGE
 		mIncome = mincome	-- global = our local
-		if mstore > 0 and mlevel/mstore >= 0.95 and lastMExcessEvent + RESOURCE_WARNING_PERIOD < n then
+		if mstore > 0 and mlevel/mstore >= 0.95 and (not metalMap) and lastMExcessEvent + RESOURCE_WARNING_PERIOD < n then
 			AddEvent("Excessing metal", nil, colorYellow, "excessMetal")
 			lastMExcessEvent = n
 		end
@@ -419,7 +419,8 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
-
+	metalMap = (not Spring.GetGameRulesParam("mex_count") or Spring.GetGameRulesParam("mex_count") == -1)
+	--Spring.Echo("Is metal map: " .. tostring(metalMap))
 	-- setup Chili
 	Chili = WG.Chili
 	Label = Chili.Label
