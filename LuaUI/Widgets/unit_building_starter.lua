@@ -83,7 +83,7 @@ end
 function CheckBuilding(ux,uz,ud)
 	for index, i in pairs(buildings) do
 		if (i.x) then
-			if (abs(i.x - ux) < 4) and (abs(i.z - uz) < 16) then
+			if (abs(i.x - ux) < 16) and (abs(i.z - uz) < 16) then
 				i.ud = ud
 				return true
 			end
@@ -154,5 +154,3 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 	end
 end
-
-
