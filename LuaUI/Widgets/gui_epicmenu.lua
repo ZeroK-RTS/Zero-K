@@ -2689,14 +2689,14 @@ local function MakeQuitButtons()
 		desc = "Ask teammates to resign",
 		icon = imgPath..'epicmenu/whiteflag_check.png',
 		OnChange = function()
-				if not (Spring.GetSpectatingState() or PlayingButNoTeammate() or isMission) then
+				if not (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission) then
 					spSendCommands("say !poll resign")
 					ActionMenu()
 				end
 			end,
 		key = 'Vote Resign',
 		DisableFunc = function() 
-			return (Spring.GetSpectatingState() or PlayingButNoTeammate() or isMission) 
+			return (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission)
 		end, --function that trigger grey colour on buttons (not actually disable their functions)
 	})
 	AddOption('', {
