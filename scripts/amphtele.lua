@@ -133,8 +133,12 @@ local function DeployTeleport_Thread()
 	Turn(lfoot, x_axis, math.rad(-15), math.rad(15*DEPLOY_SPEED))
 
 	Sleep(1000/DEPLOY_SPEED)
-	
-	GG.tele_deployTeleport(unitID)
+
+	if not Spring.GetUnitIsDead(unitID) then
+		-- script threads, like Cthulhu, can sleep while dead and still perform work after waking up
+		-- this is by design, think death animations
+		GG.tele_deployTeleport(unitID)
+	end
 end
 
 function DeployTeleport()
