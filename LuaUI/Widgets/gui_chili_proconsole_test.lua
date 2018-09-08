@@ -78,7 +78,20 @@ local MESSAGE_RULES = {
 	replay_spec_to_allies = { format = '#s[$playername (replay)] $argument' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
 	replay_spec_to_everyone = { format = '#s[$playername (replay)] #e$argument' },
 
-	label = { format = '#p$playername#e added label: $argument' },
+	label = {
+		name = "Labels",
+		output = {
+			{
+				name = "Show label text in 'ally' color",
+				format = '#p$playername#e added label: #a$argument',
+				default = true
+			},
+			{
+				name = "Show label text in the player's color",
+				format = '#p$playername#e added label: #p$argument'
+			},
+		}
+	},
 	point = { format = '#p$playername#e added point.' },
 	autohost = { format = '#o> $argument', noplayername = true },
 	other = { format = '#o$text' }, -- no pattern... will match anything else
