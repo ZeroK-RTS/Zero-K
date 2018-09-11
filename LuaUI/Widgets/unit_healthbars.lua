@@ -248,10 +248,6 @@ local disarmUnits = {};
 local onFireUnits = {};
 local UnitMorphs  = {};
 
-local barShader;
-local barDList;
-local barFeatureDList;
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -319,85 +315,6 @@ function widget:Initialize()
 	for hp=0,100 do
 		bfcolormap[hp] = {GetColor(hpcolormap,hp*0.01)}
 	end
-
-	--// create bar shader
-	if (gl.CreateShader) then
-		barShader = gl.CreateShader({
-			vertex = [[
-				#define barColor gl_MultiTexCoord1
-				#define progress gl_MultiTexCoord2.x
-				#define offset   gl_MultiTexCoord2.y
-
-				void main()
-				{
-					 // switch between font rendering and bar rendering
-					 if (gl_FogCoord>0.5f) {
-						 gl_TexCoord[0]= gl_TextureMatrix[0]*gl_MultiTexCoord0;
-						 gl_FrontColor = gl_Color;
-						 gl_Position   = ftransform();
-						 return;
-					 }
-
-					 if (gl_Vertex.w>0) {
-						 gl_FrontColor = gl_Color;
-						 if (gl_Vertex.z>0.0) {
-							 gl_Vertex.x -= (1.0-progress)*gl_Vertex.z;
-							 gl_Vertex.z  = 0.0;
-						 }
-					 }else{
-						 if (gl_Vertex.y>0.0) {
-							 gl_FrontColor = vec4(barColor.rgb*1.5,barColor.a);
-						 }else{
-							 gl_FrontColor = barColor;
-						 }
-						 if (gl_Vertex.z>1.0) {
-							 gl_Vertex.x += progress*gl_Vertex.z;
-							 gl_Vertex.z  = 0.0;
-						 }
-						 gl_Vertex.w  = 1.0;
-					 }
-
-					 gl_Vertex.y += offset;
-					 gl_Position  = gl_ModelViewProjectionMatrix*gl_Vertex;
-				 }
-			]],
-		});
-
-		if (barShader) then
-			barDList = gl.CreateList(function()
-				gl.BeginEnd(GL.QUADS,function()
-					gl.Vertex(-barWidth,0,        0,0);
-					gl.Vertex(-barWidth,0,        barWidth*2,0);
-					gl.Vertex(-barWidth,barHeight,barWidth*2,0);
-					gl.Vertex(-barWidth,barHeight,0,0);
-
-					gl.Color(bkBottom);
-					gl.Vertex(barWidth,0,        0,         1);
-					gl.Vertex(barWidth,0,        barWidth*2,1);
-					gl.Color(bkTop);
-					gl.Vertex(barWidth,barHeight,barWidth*2,1);
-					gl.Vertex(barWidth,barHeight,0,         1);
-				end)
-			end)
-
-			barFeatureDList = gl.CreateList(function()
-				gl.BeginEnd(GL.QUADS,function()
-					gl.Vertex(-featureBarWidth,0,               0,0);
-					gl.Vertex(-featureBarWidth,0,               featureBarWidth*2,0);
-					gl.Vertex(-featureBarWidth,featureBarHeight,featureBarWidth*2,0);
-					gl.Vertex(-featureBarWidth,featureBarHeight,0,0);
-
-					gl.Color(fbkBottom);
-					gl.Vertex(featureBarWidth,0,               0,         1);
-					gl.Vertex(featureBarWidth,0,               featureBarWidth*2,1);
-					gl.Color(fbkTop);
-					gl.Vertex(featureBarWidth,featureBarHeight,featureBarWidth*2,1);
-					gl.Vertex(featureBarWidth,featureBarHeight,0,         1);
-				end)
-			end)
-		end
-	end
-
 end
 
 function widget:Shutdown()
@@ -416,14 +333,6 @@ function widget:Shutdown()
 	widgetHandler:DeregisterGlobal('MorphStop', MorphStop)
 
 	widgetHandler:DeregisterGlobal('MorphDrawProgress')
-
-	if (barShader) then
-		gl.DeleteShader(barShader)
-	end
-	if (barDList) then
-		gl.DeleteList(barDList)
-		gl.DeleteList(barFeatureDList)
-	end
 end
 
 --------------------------------------------------------------------------------
@@ -476,13 +385,6 @@ do
 
 	local brightClr = {}
 	function DrawUnitBar(offsetY,percent,color)
-		if (barShader) then
-			glMultiTexCoord(1,color)
-			glMultiTexCoord(2,percent,offsetY)
-			glCallList(barDList)
-			return;
-		end
-
 		brightClr[1] = color[1]*1.5; brightClr[2] = color[2]*1.5; brightClr[3] = color[3]*1.5; brightClr[4] = color[4]
 		local progress_pos= -barWidth+barWidth*2*percent-1
 		local bar_Height  = barHeight+offsetY
@@ -491,13 +393,6 @@ do
 	end
 
 	function DrawFeatureBar(offsetY,percent,color)
-		if (barShader) then
-			glMultiTexCoord(1,color)
-			glMultiTexCoord(2,percent,offsetY)
-			glCallList(barFeatureDList)
-			return;
-		end
-
 		brightClr[1] = color[1]*1.5; brightClr[2] = color[2]*1.5; brightClr[3] = color[3]*1.5; brightClr[4] = color[4]
 		local progress_pos = -featureBarWidth+featureBarWidth*2*percent
 		glBeginEnd(GL_QUADS,DrawGradient,progress_pos, featureBarHeight+offsetY, featureBarWidth, offsetY, fbkTop,fbkBottom)
@@ -560,9 +455,6 @@ do
 			local barInfo = bars[i]
 			DrawUnitBar(yoffset,barInfo.progress,barInfo.color)
 			if (fullText) then
-				if (barShader) then
-					glMyText(1)
-				end
 				if (drawBarPercentages) then
 					glColor(1,1,1,barAlpha)
 					glText(barInfo.text,barStart,yoffset,4,"r")
@@ -571,7 +463,6 @@ do
 					glColor(1,1,1,titlesAlpha)
 					glText(barInfo.title,0,yoffset,2.5,"cd")
 				end
-				if (barShader) then glMyText(0) end
 			end
 			yoffset = yoffset - barHeightL
 		end
@@ -585,9 +476,6 @@ do
 			local barInfo = bars[i]
 			DrawFeatureBar(yoffset,barInfo.progress,barInfo.color)
 			if (fullText) then
-				if (barShader) then
-					glMyText(1)
-				end
 				if (drawBarPercentages) then
 					glColor(1,1,1,featureBarAlpha)
 					glText(barInfo.text,fBarStart,yoffset,4,"r")
@@ -596,7 +484,6 @@ do
 					glColor(1,1,1,featureTitlesAlpha)
 					glText(barInfo.title,0,yoffset,2.5,"cd")
 				end
-				if (barShader) then glMyText(0) end
 			end
 			yoffset = yoffset - fBarHeightL
 		end
@@ -987,13 +874,7 @@ do
 
 			--// STOCKPILE ICON
 			if (numStockpiled) then
-				if (barShader) then
-					glMyText(1)
-					DrawStockpile(numStockpiled,numStockpileQued, ci.freeStockpile)
-					glMyText(0)
-				else
-					DrawStockpile(numStockpiled,numStockpileQued, ci.freeStockpile)
-				end
+				DrawStockpile(numStockpiled,numStockpileQued, ci.freeStockpile)
 			end
 
 			--// DRAW BARS
@@ -1218,11 +1099,6 @@ do
 
 			cx, cy, cz = GetCameraPosition()
 
-			if (barShader) then
-				gl.UseShader(barShader);
-				glMyText(0)
-			end
-
 			--// draw bars of units
 			local unitID,unitDefID,unitDef
 			for i = 1, #visibleUnits do
@@ -1281,9 +1157,6 @@ do
 			end
 		end
 
-		if (barShader) then
-			gl.UseShader(0)
-		end
 		glDepthMask(false)
 
 		DrawOverlays()
