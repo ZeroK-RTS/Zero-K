@@ -161,6 +161,9 @@ local flexCallIns = {
   'GameSetup',
   'TeamDied',
   'TeamChanged',
+  'TeamAfked',
+  'TeamUnafked',
+  'TeamTaken',
   'PlayerAdded',
   'PlayerChanged',
   "PlayerRemoved",
@@ -1928,6 +1931,27 @@ end
 function widgetHandler:TeamChanged(teamID)
   for _,w in ipairs(self.TeamChangedList) do
     w:TeamChanged(teamID)
+  end
+  return
+end
+
+function widgetHandler:TeamAfked(teamID)
+  for _,w in ipairs(self.TeamAfkedList) do
+    w:TeamAfked(teamID)
+  end
+  return
+end
+
+function widgetHandler:TeamUnafked(teamID)
+  for _,w in ipairs(self.TeamUnafkedList) do
+    w:TeamUnafked(teamID)
+  end
+  return
+end
+
+function widgetHandler:TeamTaken(giveTeamID, receiveTeamID)
+  for _,w in ipairs(self.TeamTakenList) do
+    w:TeamTaken(giveTeamID, receiveTeamID)
   end
   return
 end
