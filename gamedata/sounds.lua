@@ -70,6 +70,16 @@ local Sounds = {
 			pitchmod = 0.1,
 			gainmod = 0.05,
 		},
+		Jump = {
+			file = "sounds/jump.wav",
+			pitchmod = 0.1,
+			gainmod = 0.05,
+		},
+		JumpLand = {
+			file = "sounds/jump_land.wav",
+			pitchmod = 0.1,
+			gainmod = 0.05,
+		},
 	},
 }
 

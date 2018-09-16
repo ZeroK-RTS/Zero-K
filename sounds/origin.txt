@@ -41,3 +41,7 @@ place_beep.wav
 
 Audionautics:
 Claw missile launch sound (derived from https://www.freesound.org/people/Audionautics/sounds/171655/)
+
+Apelsinsaft:
+jump.wav
+jump_land.wav
