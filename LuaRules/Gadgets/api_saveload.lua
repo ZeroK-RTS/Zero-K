@@ -235,14 +235,6 @@ local function ValidateUnitRule(name, value)
 	return value
 end
 
-local function IsWithinRange(x1, z1, x2, z2, range)
-	if not (x1 and z1 and x2 and z2 and range) then
-		return false
-	end
-	range = range * range
-	return math.pow(x1 - x2, 2) + math.pow(z1 - z2, 2) <= range
-end
-
 local function LoadHeightMap()
 	Spring.SetHeightMapFunc(function()
 		for x, rest in pairs(savedata.heightMap) do
@@ -287,18 +279,7 @@ local function LoadOrdersForUnit(oldID, data)
 			params[i] = command.params[i]
 		end
 		
-		
-		local opts = command.options.coded
-		
-		-- don't issue a patrol command for a nanoturret if it's where we're standing, to avoid deleting existing patrol commands
-		-- hack solution for nano patrol bug in ZeroK-RTS/Zero-K/issues/2905
-		if command.id == CMD.PATROL and isNanoTurret then
-			if (not IsWithinRange(params[1], params[3], px, pz, 8)) then
-				Spring.GiveOrderToUnit(data.newID, command.id, params, opts)
-			end
-		else
-			Spring.GiveOrderToUnit(data.newID, command.id, params, opts)
-		end
+		Spring.GiveOrderToUnit(data.newID, command.id, params, command.options.coded)
 	end
 end
 --GG.SaveLoad.LoadOrdersForUnit = LoadOrdersForUnit
