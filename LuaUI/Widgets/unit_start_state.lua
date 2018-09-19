@@ -1025,16 +1025,13 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		
 		value = GetStateValue(name, "flylandstate_1")
-		if value then
+		if value == -1 then
 			local trueBuilder = false
 			if builderID then
 				local bdid = Spring.GetUnitDefID(builderID)
 				if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
-					--NOTE: The unit_air_plants gadget deals with inherit
 					trueBuilder = true
-					if value ~= -1 then  --if not inherit
-						orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, CMD.OPT_SHIFT}
-					end
+					-- inheritance handled in unit_air_plants gadget
 				end
 			end
 			if not trueBuilder then	-- inherit from factory def's start state, not the current state of any specific factory unit
@@ -1043,7 +1040,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, CMD.OPT_SHIFT}
 				end
 			end
-			
+		elseif value then
+			orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, CMD.OPT_SHIFT}
 		end
 		
 		QueueState(name, "repeat", CMD.REPEAT, orderArray)
