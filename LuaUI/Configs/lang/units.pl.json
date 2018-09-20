@@ -107,7 +107,7 @@
     "tankheavyassault": {
         "name": "Cyclops",
         "description": "Ciężki niszczyciel czołgów",
-        "helptext": "Cyclops to najcięższy czołg. Jego główne działo zadaje ciężkie obrażenia i jest w stanie rujnować terraformowane ściany, a promień spowalniający nie pozwala ofiarom uciec. Choć Cyclops ma problemy ze zwrotnością, to pod względem wytrzymałości i siły ognia nie ma sobie równych."
+        "helptext": "Cyclops to najcięższy czołg. Jego działo zadaje ciężkie obrażenia, a jednostki, które zdołają przeżyć pierwszy pocisk zostają spowolnione. Dodatkowo działo jest w stanie stopniowo burzyć terraformowane ściany. Choć Cyclops ma problemy ze zwrotnością, to pod względem wytrzymałości i siły ognia nie ma sobie równych."
     },
     "jumpraid": {
         "name": "Pyro",

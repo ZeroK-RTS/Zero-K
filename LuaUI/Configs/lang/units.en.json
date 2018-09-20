@@ -102,7 +102,7 @@
 	"tankheavyassault" : {
 		"name" : "Cyclops",
 		"description" : "Very Heavy Tank Buster",
-		"helptext" : "The Cyclops is the single heaviest tank on the field. Its main gun is a hefty cannon designed to smash lesser tanks into oblivion, while mounted on the turret is a short-range slowgun to prevent quicker foes escaping its grasp. However, it turns like a tub of water, its short range makes it easy prey for advanced skirmishers or air attacks, and its slow rate of fire makes it vulnerable to massed raider attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications."
+		"helptext" : "The Cyclops is the single heaviest tank on the field. Its main gun is a hefty disruptor cannon designed to smash lesser tanks and other heavies alike into oblivion, slowing any survivors down to prevent escaping its grasp. However, it turns like a tub of water, its short range makes it easy prey for advanced skirmishers or air attacks, and its slow rate of fire makes it vulnerable to massed raider attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications."
 	},
 	"damagesink" : {
 		"name" : "Damage Sink thing",
