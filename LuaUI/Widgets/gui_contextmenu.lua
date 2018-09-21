@@ -825,13 +825,14 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Buildpower: '
 		cells[#cells+1] = numformat(buildSpeed)
+		local buildpower_mult = (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
 		if ud.canReclaim and ud.reclaimSpeed ~= ud.buildSpeed then
-			local reclaimSpeed = ud.reclaimSpeed * (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+			local reclaimSpeed = ud.reclaimSpeed * buildpower_mult
 			cells[#cells+1] = ' - Reclaim power:'
 			cells[#cells+1] = numformat(reclaimSpeed)
 		end
 		if ud.canRepair and ud.repairSpeed ~= ud.buildSpeed * 2 then
-			local repairSpeed = ud.repairSpeed * (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+			local repairSpeed = ud.repairSpeed * buildpower_mult
 			cells[#cells+1] = ' - Repair power:'
 			cells[#cells+1] = numformat(repairSpeed)
 		end
@@ -839,7 +840,7 @@ local function printAbilities(ud, unitID)
 			cells[#cells+1] = ' - Can resurrect wreckage'
 			cells[#cells+1] = ''
 			if ud.resurrectSpeed * 2 ~= ud.buildSpeed then
-				local resurrectSpeed = ud.resurrectSpeed * (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+				local resurrectSpeed = ud.resurrectSpeed * buildpower_mult
 				cells[#cells+1] = '   - Resurrect power:'
 				cells[#cells+1] = numformat(resurrectSpeed)
 			end
