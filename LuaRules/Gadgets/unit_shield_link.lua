@@ -133,7 +133,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 				shieldNum    = shieldNum,
 				shieldRadius = shieldWep.shieldRadius,
 				shieldRegen  = shieldRegen,
-				shieldRank   = ((shieldWep.shieldRadius > 200) and 2) or 1,
+				shieldRank   = ((shieldWep.shieldRadius > 400) and 3) or ((shieldWep.shieldRadius > 200) and 2) or 1,
 				unitDefID    = unitDefID,
 				neighbors    = {},
 				neighborList = {count = 0},

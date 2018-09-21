@@ -21,29 +21,6 @@ local carrierDefNames = {
 	},
 	--gunshipkrow = { {drone = UnitDefNames.dronelight.id, reloadTime = 15, maxDrones = 6, spawnSize = 2, range = 900, buildTime=3,
 			-- offsets = {0,0,0,colvolMidX=0, colvolMidY=0,colvolMidZ=0,aimX=0,aimY=0,aimZ=0}},
-	striderfunnelweb = {
-		spawnPieces = {"emitl", "emitr"},
-		{
-			drone = UnitDefNames.dronelight.id, 
-			reloadTime = 15, 
-			maxDrones = 6, 
-			spawnSize = 2, 
-			range = 800, 
-			buildTime = 6, 
-			maxBuild = 1,
-			offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
-		},
-		{
-			drone = UnitDefNames.droneheavyslow.id,
-			reloadTime = 25, 
-			maxDrones = 2, 
-			spawnSize = 1, 
-			range = 800, 
-			buildTime = 9, 
-			maxBuild = 1,
-			offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
-		},
-	},
 	nebula = {
 		spawnPieces = {"pad1", "pad2", "pad3", "pad4"},
 		{

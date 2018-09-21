@@ -706,8 +706,8 @@
 	},
 	"striderfunnelweb" : {
 		"name" : "Funnelweb",
-		"description" : "Drone/Shield Support Strider",
-		"helptext" : "The slow all-terrain Funnelweb features an area shield and a powerful drone complement."
+		"description" : "Shield Support Strider",
+		"helptext" : "The slow all-terrain Funnelweb features an extremely powerful wide-area shield and high nano power for post-battle utility. It is otherwise unarmed."
 	},
 	"cloakriot" : {
 		"name" : "Reaver",

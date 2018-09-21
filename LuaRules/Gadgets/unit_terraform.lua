@@ -215,6 +215,7 @@ local shieldscoutDefID = UnitDefNames["shieldscout"].id
 
 local exceptionArray = {
 	[UnitDefNames["shipcarrier"].id] = true,
+	[UnitDefNames["striderfunnelweb"].id] = true,
 }
 
 local terraformUnitDefIDs = {}

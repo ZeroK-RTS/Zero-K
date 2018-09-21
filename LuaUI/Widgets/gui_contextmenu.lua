@@ -437,6 +437,10 @@ local function weapons2Table(cells, ws, unitID)
 		cells[#cells+1] = regen .. " HP/s"
 		cells[#cells+1] = ' - Regen cost:'
 		cells[#cells+1] = drain .. " E/s"
+		if wd.shieldRechargeDelay and wd.shieldRechargeDelay > 0 then
+			cells[#cells+1] = ' - Regen delay:'
+			cells[#cells+1] = (wd.shieldRechargeDelay / 30) .. " s"
+		end
 		cells[#cells+1] = ' - Radius:'
 		cells[#cells+1] = wd.shieldRadius .. " elmo"
 	else
@@ -815,16 +819,30 @@ local function printAbilities(ud, unitID)
 
 	local cp = ud.customParams
 
-	
 	if ud.buildSpeed > 0 and not cp.nobuildpower then
 		local buildSpeed = ud.buildSpeed * (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
 		cells[#cells+1] = 'Construction'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Buildpower: '
 		cells[#cells+1] = numformat(buildSpeed)
+		if ud.canReclaim and ud.reclaimSpeed ~= ud.buildSpeed then
+			local reclaimSpeed = ud.reclaimSpeed * (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+			cells[#cells+1] = ' - Reclaim power:'
+			cells[#cells+1] = numformat(reclaimSpeed)
+		end
+		if ud.canRepair and ud.repairSpeed ~= ud.buildSpeed * 2 then
+			local repairSpeed = ud.repairSpeed * (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+			cells[#cells+1] = ' - Repair power:'
+			cells[#cells+1] = numformat(repairSpeed)
+		end
 		if ud.canResurrect then
 			cells[#cells+1] = ' - Can resurrect wreckage'
 			cells[#cells+1] = ''
+			if ud.resurrectSpeed * 2 ~= ud.buildSpeed then
+				local resurrectSpeed = ud.resurrectSpeed * (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+				cells[#cells+1] = '   - Resurrect power:'
+				cells[#cells+1] = numformat(resurrectSpeed)
+			end
 		end
 		if (#ud.buildOptions == 0) then
 			cells[#cells+1] = ' - Can only assist'

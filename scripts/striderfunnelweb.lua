@@ -1,5 +1,6 @@
 include "constants.lua"
 include "spider_walking.lua"
+include "nanoaim.h.lua"
 
 local ALLY_ACCESS = {allied = true}
 
@@ -18,8 +19,12 @@ local ml = piece 'thigh_midr' 	-- middle left
 local fl = piece 'thigh_fror' 	-- front left
 
 local smokePiece = {gaster, notum}
+local emitnano = gaster
+local nanopoint = gaster
+local nanoPieces = {nanopoint}
 
 local SIG_WALK = 1
+local SIG_BUILD = 2
 
 local PERIOD = 0.35
 
@@ -43,6 +48,19 @@ local legBackwardAngle = math.rad(12)
 local legBackwardTheta = -math.rad(25)
 local legBackwardOffset = 0
 local legBackwardSpeed = legBackwardAngle/PERIOD
+
+
+function script.StartBuilding()
+	Signal(SIG_BUILD)
+	SetSignalMask(SIG_BUILD)
+	Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 1);
+end
+
+function script.StopBuilding()
+	Signal(SIG_BUILD)
+	Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 0);
+end
+
 
 local function Walk()
 	Signal (SIG_WALK)
@@ -71,6 +89,7 @@ function script.Create()
 	Move (aimpoint, y_axis, 0)
 	Move (aimpoint, x_axis, -9)
 	StartThread(SmokeUnit, smokePiece)
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.Activate()
@@ -91,6 +110,11 @@ end
 
 function script.QueryWeapon (num)
 	return aimpoint
+end
+
+function script.QueryNanoPiece()
+	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanopoint)
+	return nanopoint
 end
 
 function script.AimWeapon (num)

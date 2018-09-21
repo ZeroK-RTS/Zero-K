@@ -7,6 +7,10 @@ unitDef = {
   brakeRate              = 0.1375,
   buildCostMetal         = 4500,
   buildPic               = [[striderfunnelweb.png]],
+  builder                = true,
+  
+  buildDistance          = 550,
+  canResurrect           = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -53,15 +57,12 @@ unitDef = {
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 85,
   turnRate               = 240,
-  workerTime             = 0,
+  resurrectSpeed         = 50,
+  repairSpeed            = 100,
+  reclaimSpeed           = 100,
+  workerTime             = 10,
 
   weapons                = {
-
-    {
-      def                = "BOGUS_FAKE_TARGETER",
-      badTargetCategory  = "FIXEDWING",
-      onlyTargetCategory = "FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER",
-    },
 
     {
       def                = [[SHIELD]],
@@ -72,29 +73,6 @@ unitDef = {
 
   weaponDefs             = {
 
-    BOGUS_FAKE_TARGETER = {
-      name                    = [[Bogus Fake Targeter]],
-      avoidGround             = false, -- avoid nothing, else attempts to move out to clear line of fine
-      avoidFriendly           = false,
-      avoidFeature            = false,
-      avoidNeutral            = false,
-
-      damage                  = {
-        default = 11.34,
-        planes  = 11.34,
-        subs    = 0.567,
-      },
-
-      explosionGenerator      = [[custom:FLASHPLOSION]],
-      noSelfDamage            = true,
-      range                   = 800,
-      reloadtime              = 1,
-      tolerance               = 5000,
-      turret                  = true,
-      weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 500,
-    },
-	
     SHIELD = {
       name                    = [[Energy Shield]],
 
@@ -107,10 +85,11 @@ unitDef = {
       shieldBadColor          = [[1 0.1 0.1 1]],
       shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
-      shieldPower             = 3600,
-      shieldPowerRegen        = 50,
-      shieldPowerRegenEnergy  = 12,
-      shieldRadius            = 350,
+      shieldPower             = 36000,
+      shieldPowerRegen        = 300,
+      rechargeDelay           = 60,
+      shieldPowerRegenEnergy  = 0,
+      shieldRadius            = 550,
       shieldRepulser          = false,
       smartShield             = true,
       visibleShield           = false,
