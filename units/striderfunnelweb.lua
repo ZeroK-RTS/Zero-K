@@ -10,7 +10,6 @@ unitDef = {
   builder                = true,
   
   buildDistance          = 550,
-  canResurrect           = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -57,10 +56,8 @@ unitDef = {
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 85,
   turnRate               = 240,
-  resurrectSpeed         = 50,
-  repairSpeed            = 100,
-  reclaimSpeed           = 100,
-  workerTime             = 10,
+  workerTime             = 100,
+  canAssist              = false,
 
   weapons                = {
 
