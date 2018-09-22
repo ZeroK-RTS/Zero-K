@@ -846,7 +846,11 @@ local function printAbilities(ud, unitID)
 			end
 		end
 		if (#ud.buildOptions == 0) then
-			cells[#cells+1] = ' - Can only assist'
+			if ud.canAssist then
+				cells[#cells+1] = ' - Can only assist'
+			else
+				cells[#cells+1] = ' - Can neither assist nor build'
+			end
 			cells[#cells+1] = ''
 		end
 		cells[#cells+1] = ''
