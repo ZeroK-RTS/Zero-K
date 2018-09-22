@@ -100,6 +100,15 @@ for unitDefID = 1, #UnitDefs do
 			myShield.colormap1[1][4] = strengthMult*myShield.colormap1[1][4]
 			myShield.colormap1[2][4] = strengthMult*myShield.colormap1[2][4]
 		end
+		
+		-- Very powerful non-chicken shields get a different look
+		local shieldPower = tonumber(ud.customParams.shield_power)
+		if shieldPower > 10000 then
+			myShield.texture = "bitmaps/PD/shield3mist.png"  -- Placeholder until a better texture is thought of
+			myShield.colormap1 = {{0.3, 1, 0.3, 0.7}, {0.5, 0.5, 0.1, 0.5}}
+			myShield.hitResposeMult = 0.8
+			myShield.sizeDrift = 0.0004
+		end
 
 		local isChicken = false
 		if string.find(ud.name, "chicken_") then
