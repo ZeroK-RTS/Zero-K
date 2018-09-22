@@ -820,12 +820,12 @@ local function printAbilities(ud, unitID)
 	local cp = ud.customParams
 
 	if ud.buildSpeed > 0 and not cp.nobuildpower then
-		local buildSpeed = ud.buildSpeed * (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+		local buildpower_mult = (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+		local buildSpeed = ud.buildSpeed * buildpower_mult
 		cells[#cells+1] = 'Construction'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Buildpower: '
 		cells[#cells+1] = numformat(buildSpeed)
-		local buildpower_mult = (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
 		if ud.canReclaim and ud.reclaimSpeed ~= ud.buildSpeed then
 			local reclaimSpeed = ud.reclaimSpeed * buildpower_mult
 			cells[#cells+1] = ' - Reclaim power:'
