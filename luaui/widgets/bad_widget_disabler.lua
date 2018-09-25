@@ -1,17 +1,14 @@
---[[Shaman's Policy:
-Do whatever you want with this code.
-]]
-
 function widget:GetInfo()
 	return {
 		name      = "Disable Bad Widgets",
 		desc      = "Disables broken widgets based on config.",
 		author    = "_Shaman",
 		date      = "09/24/18",
-		license   = "Shaman's Policy",
+		license   = "CC0",
 		layer     = 5,
 		enabled   = true,
 		alwaysStart = true,
+		handler = true,
 	}
 end
 
@@ -20,22 +17,29 @@ The table below here controls what widgets are disabled. To add new widgets to i
 (NOT the file name! It's the string in the name field of the widget!).
 
 When the widget is loaded, it sees if widgets included in the table are loaded, and disables them if they are.
-After this is completed, the widget removes itself.]]
+After this is completed, the widget removes itself.
+
+Please also include the reason in the reason table.]]
 
 -- Speed ups --
 local spSendCommands = Spring.SendCommands
 local spEcho = Spring.Echo
 
+-- config --
 local badwidgets = {
-	[1] = "*Mearth Location Tags*1.0",
+	[1] = "*Mearth Location Tags*1.0", -- Map: Mearth_v4.
 }
 
+local reason = {
+	[1] = "Causes black ground on some cards, possible copyright issues.",
+}
+
+-- callins --
 function widget:Initialize()
 	for i=1, #badwidgets do
-		if widgetHandler:FindWidget(badwidgets[i]) then
-			spSendCommands("luaui disablewidget " .. badwidgets[i])
-			spEcho("disabled bad widget " .. badwidgets[i])
+		local test = widgetHandler:DisableWidget(badwidgets[i]) -- if it does get removed, echo a reason. Nonremoval returns false.
+		if test then
+			spEcho("Disabled " .. badwidgets[i] .. "(Reason: " .. tostring(reason[i]) .. ")")
 		end
 	end
-	widgetHandler:RemoveWidget()
 end
