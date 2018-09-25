@@ -984,6 +984,10 @@ end
 
 --------------------------------------------------------------------------------
 
+function widgetHandler:IsWidgetKnown(name)
+	return self.knownWidgets[name] and true or false
+end
+
 function widgetHandler:EnableWidget(name)
   local ki = self.knownWidgets[name]
   if (not ki) then
