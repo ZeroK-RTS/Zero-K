@@ -30,15 +30,16 @@ local badwidgets = {
 }
 
 local reason = {
-	[1] = "Causes black ground on some cards, possible copyright issues.",
+	[1] = "Causes black ground on some graphics cards, possible copyright issues.",
 }
 
 -- callins --
 function widget:Initialize()
 	for i=1, #badwidgets do
-		local test = widgetHandler:DisableWidget(badwidgets[i]) -- if it does get removed, echo a reason. Nonremoval returns false.
-		if test then
+		if widgetHandler:IsWidgetKnown(badwidgets[i]) then -- If this widget is loaded, unload it and echo a reason.
 			spEcho("Disabled '" .. badwidgets[i] .. "' (Reason: " .. tostring(reason[i]) .. ")")
+			widgetHandler:DisableWidget(badwidgets[i])
 		end
 	end
+	widgetHandler:RemoveWidget(widget)
 end
