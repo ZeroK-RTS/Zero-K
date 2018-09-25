@@ -52,6 +52,8 @@ include("LuaRules/Configs/constants.lua")
 local TO_AFK_THRESHOLD = 30 -- going above this marks you AFK
 local FROM_AFK_THRESHOLD = 5 -- going below this marks you non-AFK
 
+local PUBLIC = { public = true }
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utilities
@@ -193,6 +195,7 @@ local function UpdateTeamActivity(teamID)
 		
 		SendToUnsynced("TeamUnafked", teamID)
 		spEcho("TeamUnafked", teamID)
+		Spring.SetTeamRulesParam(teamID, "afk", 0, PUBLIC)
 		if unitsRecieved then
 			spEcho("game_message: Player " .. playerName .. " is no longer lagging or AFK; returning all their units.")
 		end
@@ -316,6 +319,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 		else
 			SendToUnsynced("TeamAfked", giveTeamID)
 			spEcho("TeamAfked", giveTeamID)
+			Spring.SetTeamRulesParam(giveTeamID, "afk", 1, PUBLIC)
 		end
 	end
 
@@ -369,6 +373,7 @@ function gadget:Initialize()
 		else
 			teamNames[teamID] = Spring.GetPlayerInfo(playerID)
 		end
+		Spring.SetTeamRulesParam(teamID, "afk", 0, PUBLIC)
 	end
 
 	GG.Lagmonitor = externalFunctions
