@@ -22,7 +22,6 @@ After this is completed, the widget removes itself.
 Please also include the reason in the reason table.]]
 
 -- Speed ups --
-local spSendCommands = Spring.SendCommands
 local spEcho = Spring.Echo
 
 -- config --
@@ -39,7 +38,7 @@ function widget:Initialize()
 	for i=1, #badwidgets do
 		local test = widgetHandler:DisableWidget(badwidgets[i]) -- if it does get removed, echo a reason. Nonremoval returns false.
 		if test then
-			spEcho("Disabled " .. badwidgets[i] .. "(Reason: " .. tostring(reason[i]) .. ")")
+			spEcho("Disabled '" .. badwidgets[i] .. "' (Reason: " .. tostring(reason[i]) .. ")")
 		end
 	end
 end
