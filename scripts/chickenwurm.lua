@@ -12,6 +12,14 @@ local digRotate = 0.6
 
 --variables
 local isMoving = false
+local underwater = false
+local uwheight = -23
+
+--weapon variables
+local unitDefID = Spring.GetUnitDefID(unitID)
+local wd = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
+local reloadTime = wd and WeaponDefs[wd].reload*30 or 30
+wd,unitDefID = nil
 
 --signals
 local SIG_Aim = 1
@@ -22,6 +30,20 @@ local SIG_Move = 16
 ----------------------------------------------------------
 local function RestoreAfterDelay()
 	Sleep(1000)
+end
+
+local function WeaponUpdate()
+	while true do
+		local height = select(2, Spring.GetUnitPosition(unitID))
+		if height <= uwheight then
+			underwater = true
+			Spring.SetUnitCloak(unitID, 0)
+		elseif height > uwheight and underwater then 
+			underwater = false
+			Spring.SetUnitCloak(unitID, 2) -- free cloak restored.
+		end
+		Sleep(200)
+	end
 end
 
 local function Dig()
@@ -72,7 +94,9 @@ local function Dig()
 end
 
 local function StopDig()
-	Spring.SetUnitCloak(unitID, 2)	--free cloak
+	if not underwater then
+		Spring.SetUnitCloak(unitID, 2)	--free cloak
+	end
 end
 
 function script.StartMoving()
@@ -89,16 +113,43 @@ function script.Create()
 	EmitSfx(mbody, 1026)
 	EmitSfx(head, 1026)
 	EmitSfx(tail, 1026)
+	StartThread(WeaponUpdate)
 	Spring.SetUnitCloak(unitID, 2)	--free cloak
 end
 
 function script.AimFromWeapon(weaponNum) return fire end
 
-function script.AimWeapon(weaponNum, heading, pitch) return true end
+function script.AimWeapon(weaponNum, heading, pitch)
+	if weaponNum == 2 and not underwater then
+		return false
+	elseif weaponNum == 3 and underwater then
+		return false
+	else
+		return true
+	end
+end
 
 function script.QueryWeapon(weaponNum) return fire end
 
-function script.FireWeapon(weaponNum) return true end
+function script.FireWeapon(weaponNum)
+	local frame = Spring.GetGameFrame()
+	local reloadSpeedMult = Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
+	if reloadSpeedMult <= 0 then
+		-- Safety for div0. In theory a unit with reloadSpeedMult = 0 cannot fire because it never reloads.
+		reloadSpeedMult = 1
+	end
+	local reloadTimeMult = 1/reloadSpeedMult
+	if weaponNum == 1 then
+		Spring.SetUnitWeaponState(unitID, 2, "reloadFrame", frame + reloadTime*reloadTimeMult) -- disallow UW stuff/force reload sync w/ napalm blob.
+		Spring.SetUnitWeaponState(unitID, 3, "reloadFrame", frame + reloadTime*reloadTimeMult) -- above water -> UW synced
+	elseif weaponNum == 2 then
+		Spring.SetUnitWeaponState(unitID, 1, "reloadFrame", frame + reloadTime*reloadTimeMult)
+		Spring.SetUnitWeaponState(unitID, 3, "reloadFrame", frame + reloadTime*reloadTimeMult)
+	elseif weaponNum == 3 then
+		Spring.SetUnitWeaponState(unitID, 2, "reloadFrame", frame + reloadTime*reloadTimeMult)
+		Spring.SetUnitWeaponState(unitID, 1, "reloadFrame", frame + reloadTime*reloadTimeMult)
+	end
+end
 
 function script.Killed(recentDamage, maxHealth)
 	EmitSfx(mbody, 1025)

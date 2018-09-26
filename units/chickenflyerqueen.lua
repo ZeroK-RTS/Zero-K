@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Chicken Flyer Queen]],
   description         = [[Clucking Hell!]],
   acceleration        = 1.2,
+  activateWhenBuilt   = true,
   airHoverFactor      = 0,
   brakeRate           = 0.8,
   buildCostEnergy     = 0,
@@ -55,6 +56,7 @@ unitDef = {
 
   },
   sightDistance       = 4096,
+  sonarDistance       = 4096,
   turnRate            = 900,
   workerTime          = 0,
 
@@ -230,6 +232,7 @@ unitDef = {
       tolerance               = 5000,
       turret                  = true,
       weaponType              = [[Cannon]],
+      waterWeapon             = true,
       weaponVelocity          = 600,
     },
 

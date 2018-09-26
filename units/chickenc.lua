@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Basilisk]],
   description         = [[All-Terrain Riot]],
   acceleration        = 0.36,
+  activateWhenBuilt   = true,
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -12,7 +13,7 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  category            = [[LAND]],
+  category            = [[LAND SINK]],
 
   customParams        = {
   },
@@ -31,7 +32,7 @@ unitDef = {
   minCloakDistance    = 75,
   movementClass       = [[ATKBOT3]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB STUPIDTARGET]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],
   objectName          = [[chickenc.s3o]],
   power               = 520,
   selfDestructAs      = [[NOWEAPON]],
@@ -46,7 +47,7 @@ unitDef = {
 
   },
   sightDistance       = 512,
-  sonarDistance       = 450,
+  sonarDistance       = 512,
   trackOffset         = 0.5,
   trackStrength       = 9,
   trackStretch        = 1,
@@ -81,8 +82,6 @@ unitDef = {
 
       damage                  = {
         default = 140,
-        planes  = 140,
-        subs    = 7,
       },
 
       explosionGenerator      = [[custom:green_goo]],
@@ -102,6 +101,7 @@ unitDef = {
       tolerance               = 5000,
       turret                  = true,
       weaponType              = [[Cannon]],
+      waterWeapon             = true,
       weaponVelocity          = 400,
     },
 

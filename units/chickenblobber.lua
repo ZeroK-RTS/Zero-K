@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Blobber]],
   description         = [[Heavy Artillery]],
   acceleration        = 0.36,
+  activateWhenBuilt   = true,
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -48,7 +49,7 @@ unitDef = {
 
   },
   sightDistance       = 1200,
-  sonarDistance       = 450,
+  sonarDistance       = 1200,
   trackOffset         = 6,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -109,6 +110,7 @@ unitDef = {
       tolerance               = 5000,
       turret                  = true,
       weaponType              = [[Cannon]],
+      waterWeapon             = true,
       weaponVelocity          = 350,
     },
 
