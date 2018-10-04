@@ -82,9 +82,13 @@ local MESSAGE_RULES = {
 		name = "Labels",
 		output = {
 			{
+				name = "Show label text in white",
+				format = '#p$playername#e added label: $argument',
+				default = true
+			},
+			{
 				name = "Show label text in 'ally' color",
 				format = '#p$playername#e added label: #a$argument',
-				default = true
 			},
 			{
 				name = "Show label text in the player's color",
