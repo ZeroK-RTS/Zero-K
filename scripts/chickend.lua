@@ -1,0 +1,31 @@
+include 'constants.lua'
+
+local body = piece("body")
+local firepoint = piece("firepoint")
+
+function script.Create()
+	EmitSfx(body, 1024+2)
+	Move(body, y_axis, -20)
+	Move(body, y_axis, 0,30)
+end
+
+function script.AimFromWeapon(weaponNum)
+	return firepoint
+end
+
+function script.AimWeapon(num,_)
+	return Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1
+end
+
+function script.QueryWeapon(weaponNum)
+	return firepoint
+end
+
+function script.HitByWeapon()
+	EmitSfx(body, 1024)
+end
+
+function script.Killed()
+	EmitSfx(body, 1025)
+	Explode(body, sfxShatter)
+end
