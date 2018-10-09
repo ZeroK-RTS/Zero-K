@@ -443,6 +443,10 @@ local function weapons2Table(cells, ws, unitID)
 		end
 		cells[#cells+1] = ' - Radius:'
 		cells[#cells+1] = wd.shieldRadius .. " elmo"
+		if wd.customParams.unlinked then
+			cells[#cells+1] = ' - Does not link with other shields'
+			cells[#cells+1] = ''
+		end
 	else
 		-- calculate damages
 

@@ -76,6 +76,9 @@ unitDef = {
       damage                  = {
         default = 10,
       },
+      customParams            = {
+        unlinked                = true,
+      },
 
       exteriorShield          = true,
       shieldAlpha             = 0.2,
