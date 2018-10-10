@@ -57,7 +57,7 @@ unitDef = {
   trackWidth             = 85,
   turnRate               = 240,
   workerTime             = 50,
-  canAssist              = false,
+  canAssist              = true,
 
   weapons                = {
 
