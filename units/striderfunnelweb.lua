@@ -56,7 +56,7 @@ unitDef = {
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 85,
   turnRate               = 240,
-  workerTime             = 100,
+  workerTime             = 50,
   canAssist              = false,
 
   weapons                = {
