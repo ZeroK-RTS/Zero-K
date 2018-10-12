@@ -36,6 +36,8 @@ local spGetUnitShieldState  = Spring.GetUnitShieldState
 
 local pmap = VFS.Include("LuaRules/Utilities/pmap.lua")
 
+local paralyzeOnMaxHealth = ((VFS.Include("gamedata/modrules.lua") or {}).paralyze or {}).paralyzeOnMaxHealth
+
 local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0 (taken from unit_boolean_disable.lua)
 local HEALTH_FRAME_TIMEOUT = 300 -- 10 seconds.
 
@@ -87,6 +89,9 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["subraider"].id] = 1,
 	[UnitDefNames["turretheavylaser"].id] = 1,
 	[UnitDefNames["amphassault"].id] = 1,
+
+	--EMP
+	[UnitDefNames["turretemp"].id] = 1,
 
 	-- Static only OKP below
 	[UnitDefNames["amphfloater"].id] = 1,
@@ -155,6 +160,18 @@ function GG.OverkillPrevention_IsDisarmExpected(targetID)
 	return false
 end
 
+-- Unlikely required due to instant nature of the EMP projectiles
+--[[
+function GG.OverkillPrevention_IsEMPExpected(targetID)
+	if incomingDamage[targetID] then
+		local gameFrame = spGetGameFrame()
+		local lastFrame = incomingDamage[targetID].lastFrame or 0
+		return (gameFrame <= lastFrame and incomingDamage[targetID].emped)
+	end
+	return false
+end
+]]--
+
 local function IsUnitIdentifiedStructure(identified, unitID)
 	if not identified then
 		return false
@@ -203,7 +220,7 @@ end
 	fastMult -- Multiplier to timeout if the target is fast
 	radarMult -- Multiplier to timeout if the taget is a radar dot
 ]]--
-local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout, fastMult, radarMult, staticOnly)
+local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, empDamage, empTimeout, timeout, fastMult, radarMult, staticOnly)
 
 	-- Modify timeout based on unit speed and fastMult
 	local unitDefID = Spring.GetUnitDefID(targetID)
@@ -228,11 +245,16 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		addToIncomingDamage = IsUnitIdentifiedStructure(targetIdentified, targetID)
 	end
 
-	local adjHealth, disarmFrame
+	local adjHealth, disarmFrame, empFrame
 	if targetInLoS then
 		local armored, armorMultiple = Spring.GetUnitArmored(targetID)
 		local armor = ((armored and armorMultiple) or 1)
-		adjHealth = GetRepairModifiedHealth(targetID, spGetUnitHealth(targetID), gameFrame, timeout)/armor
+
+		local hp, hpMax, paraDamage = spGetUnitHealth(targetID) --paraDamage should not be confused with empDamage. paraDamage is used only to get empFrame, so EMP is handled similarly to Disarm
+		local empHP = ((not paralyzeOnMaxHealth) and hp) or hpMax
+		paraDamage = Spring.GetUnitRulesParam(targetID, "real_para") or paraDamage
+
+		adjHealth = GetRepairModifiedHealth(targetID, hp, gameFrame, timeout)/armor
 
 		if shieldPowerDef[unitDefID] then
 			local shieldEnabled, currentPower = spGetUnitShieldState(targetID)
@@ -245,11 +267,14 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		if disarmFrame == -1 then
 			disarmFrame = gameFrame
 		end
+
+		empFrame = gameFrame + (paraDamage or 0) / empHP * DECAY_FRAMES
 	else
 		timeout = timeout * (radarMult or 1)
 		local ud = UnitDefs[unitDefID]
 		adjHealth = (targetIdentified and (ud.health/ud.armoredMultiple + (shieldPowerDef[unitDefID] or 0))) or false
 		disarmFrame = (targetIdentified and gameFrame) or false
+		empFrame = (targetIdentified and gameFrame) or false
 	end
 
 	local incData = incomingDamage[targetID]
@@ -257,25 +282,32 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 	local block = false
 
 	if incData then -- seen this target
-		if adjHealth and disarmFrame then
+		if adjHealth and disarmFrame and empFrame then
 			local startIndex, endIndex = incData.frames:GetIdxs()
 			for i = startIndex, endIndex do
 				local keyValue = incData.frames:GetKV(i)
 				local frame, data = keyValue[1], keyValue[2]
-				--Spring.Echo(frame)
 				if frame < gameFrame then
 					incData.frames:TrimFront() --frames should come in ascending order, so it's safe to trim front of array one by one
 				else
 					local disarmDamage = data.disarmDamage
+					local empDamage = data.empDamage
 					local fullDamage = data.fullDamage
 
 					local disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
-					adjHealth = adjHealth - fullDamage
 
 					disarmFrame = disarmFrame + disarmExtra
 					if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then
 						disarmFrame = frame + DECAY_FRAMES + disarmTimeout
 					end
+
+					local empExtra = math.floor(empDamage/adjHealth*DECAY_FRAMES)
+					empFrame = empFrame + empExtra
+					if empFrame > frame + DECAY_FRAMES + empTimeout then
+						empFrame = frame + DECAY_FRAMES + empTimeout
+					end
+
+					adjHealth = adjHealth - fullDamage
 				end
 			end
 		end
@@ -290,11 +322,14 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 
 	local doomed = targetIdentified and adjHealth and (adjHealth < 0) and (fullDamage > 0) --for regular projectile
 	local disarmed = targetIdentified and disarmFrame and (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) and (disarmDamage > 0) --for disarming projectile
+	local emped = targetIdentified and empFrame and (empFrame - gameFrame - timeout >= DECAY_FRAMES) and (empDamage > 0) --for EMP projectile
+
 
 	incomingDamage[targetID].doomed = doomed
 	incomingDamage[targetID].disarmed = disarmed
+	incomingDamage[targetID].emped = emped
 
-	block = doomed or disarmed --assume function is not called with both regular and disarming damage types
+	block = doomed or disarmed or emped --assume function is not called with more than one of: regular, disarming and EMP damage types
 
 	if not block then
 		--Spring.Echo("^^^^SHOT^^^^")
@@ -305,9 +340,10 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 				-- are arriving to the target at the same frame. Their powers must be accumulated/harmonized
 				frameData.fullDamage = frameData.fullDamage + fullDamage
 				frameData.disarmDamage = frameData.disarmDamage + disarmDamage
+				frameData.empDamage = frameData.empDamage + empDamage
 				incData.frames:Upsert(targetFrame, frameData)
 			else --this case is much more common: such frame does not exist in incData.frames
-				incData.frames:Insert(targetFrame, {fullDamage = fullDamage, disarmDamage = disarmDamage})
+				incData.frames:Insert(targetFrame, {fullDamage = fullDamage, disarmDamage = disarmDamage, empDamage = empDamage})
 			end
 			incData.lastFrame = math.max(incData.lastFrame or 0, targetFrame)
 		end
@@ -340,6 +376,18 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 end
 
 
+function GG.OverkillPrevention_CheckBlockEMP(unitID, targetID, damage, timeout, empTimer, fastMult, radarMult, staticOnly)
+	if not (unitID and targetID and units[unitID]) then
+		return false
+	end
+
+	if spValidUnitID(unitID) and spValidUnitID(targetID) then
+		local gameFrame = spGetGameFrame()
+		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, empDamage, empTimeout, timeout, fastMult, radarMult, staticOnly)
+		return CheckBlockCommon(unitID, targetID, gameFrame, 0, 0, 0, damage, empTimer, timeout, fastMult, radarMult, staticOnly)
+	end
+end
+
 function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeout, disarmTimer, fastMult, radarMult, staticOnly)
 	if not (unitID and targetID and units[unitID]) then
 		return false
@@ -347,8 +395,8 @@ function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeou
 
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
-		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
-		return CheckBlockCommon(unitID, targetID, gameFrame, 0, damage, disarmTimer, timeout, fastMult, radarMult, staticOnly)
+		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, empDamage, empTimeout, timeout, fastMult, radarMult, staticOnly)
+		return CheckBlockCommon(unitID, targetID, gameFrame, 0, damage, disarmTimer, 0, 0, timeout, fastMult, radarMult, staticOnly)
 	end
 end
 
@@ -359,8 +407,8 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, fas
 
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
-		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
-		return CheckBlockCommon(unitID, targetID, gameFrame, damage, 0, 0, timeout, fastMult, radarMult, staticOnly)
+		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, empDamage, empTimeout, timeout, fastMult, radarMult, staticOnly)
+		return CheckBlockCommon(unitID, targetID, gameFrame, damage, 0, 0, 0, 0, timeout, fastMult, radarMult, staticOnly)
 	end
 	return false
 end

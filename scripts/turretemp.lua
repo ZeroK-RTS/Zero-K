@@ -146,6 +146,12 @@ function script.FireWeapon(num)
 	EmitSfx(flare, 1024 + 1)
 end
 
+function script.BlockShot(num, targetID)
+	-- This call is a form of evil hackery, because EMP weapon is hitting target instantly.
+	-- This forces OKP to release target block when target is 15 frame away from to reach 100% EMP damage.
+	return GG.OverkillPrevention_CheckBlockEMP(unitID, targetID, 1200, 60, 45)
+end
+
 function script.AimFromWeapon(num)
 	return aim
 end
