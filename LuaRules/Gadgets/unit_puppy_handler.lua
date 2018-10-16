@@ -3,42 +3,42 @@
 --------------------------------------------------------------------------------
 
 function gadget:GetInfo()
-  return {
-    name      = "Puppy Handler",
-    desc      = "Handlers the puppy weapon",
-    author    = "quantum",
-    date      = "Dec 2010",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "Puppy Handler",
+		desc      = "Handlers the puppy weapon",
+		author    = "quantum",
+		date      = "Dec 2010",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true  --  loaded by default?
+	}
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 if (not gadgetHandler:IsSyncedCode()) then
-  return false  --  no unsynced code
+	return false  --  no unsynced code
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 -- shortcuts
-local spAreTeamsAllied   = Spring.AreTeamsAllied
-local spGetUnitTeam      = Spring.GetUnitTeam
-local spGetUnitDefID     = Spring.GetUnitDefID
-local spValidUnitID      = Spring.ValidUnitID
-local spGetGroundHeight  = Spring.GetGroundHeight
-local spGetUnitPosition  = Spring.GetUnitPosition
-local spGetGameFrame     = Spring.GetGameFrame
-local spSetUnitNoDraw    = Spring.SetUnitNoDraw
-local spSetUnitNoMinimap = Spring.SetUnitNoMinimap
-local spSetUnitPosition  = Spring.SetUnitPosition
-local spSetUnitBlocking  = Spring.SetUnitBlocking
-local spAddUnitDamage    = Spring.AddUnitDamage
-local spDestroyUnit      = Spring.DestroyUnit
-local spGiveOrderToUnit  = Spring.GiveOrderToUnit
+local spAreTeamsAllied             = Spring.AreTeamsAllied
+local spGetUnitTeam                = Spring.GetUnitTeam
+local spGetUnitDefID               = Spring.GetUnitDefID
+local spValidUnitID                = Spring.ValidUnitID
+local spGetGroundHeight            = Spring.GetGroundHeight
+local spGetUnitPosition            = Spring.GetUnitPosition
+local spGetGameFrame               = Spring.GetGameFrame
+local spSetUnitNoDraw              = Spring.SetUnitNoDraw
+local spSetUnitNoMinimap           = Spring.SetUnitNoMinimap
+local spSetUnitPosition            = Spring.SetUnitPosition
+local spSetUnitBlocking            = Spring.SetUnitBlocking
+local spAddUnitDamage              = Spring.AddUnitDamage
+local spDestroyUnit                = Spring.DestroyUnit
+local spGiveOrderToUnit            = Spring.GiveOrderToUnit
 local spSetUnitCollisionVolumeData = Spring.SetUnitCollisionVolumeData
 
 local spMoveCtrlEnable      = Spring.MoveCtrl.Enable
@@ -108,7 +108,7 @@ local function RestorePuppy(unitID, x, y, z)
 	spMoveCtrlDisable(unitID)
 	spSetUnitBlocking(unitID, true, true)	-- restores normal state once they land
 	-- Spring.SetUnitSensorRadius(unitID, "los", puppyLosRadius)
-	--Spring.SetUnitStealth(unitID, false)
+	-- Spring.SetUnitStealth(unitID, false)
 	spSetUnitNoDraw(unitID, false)
 	spSetUnitCollisionVolumeData(unitID, 20, 20, 20, 0, 0, 0, 0, 1, 0)
 	cannotBeDamage[unitID] = false
@@ -118,7 +118,7 @@ local function RestorePuppy(unitID, x, y, z)
 	spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
 	spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
 	GG.WaitWaitMoveUnit(unitID)
-	--spGiveOrderToUnit(unitID, CMD.STOP, {}, 0)
+	-- spGiveOrderToUnit(unitID, CMD.STOP, {}, 0)
 end
 
 function GG.PuppyHandler_IsHidden(unitID)
@@ -126,21 +126,21 @@ function GG.PuppyHandler_IsHidden(unitID)
 end
 
 function GG.PuppyHandler_Shot(unitID)
-  -- the puppy fired its weapon, hide it
-  HidePuppy(unitID)
+	-- the puppy fired its weapon, hide it
+	HidePuppy(unitID)
 end
 
 function gadget:Initialize()
-  local puppyDef =  UnitDefNames.jumpscout
-  puppyDefID = puppyDef.id
-  puppyWeaponID = puppyDef.weapons[1].weaponDef
-  puppyLosRadius = puppyDef.losRadius
-  wantedList = {puppyWeaponID}
-  Script.SetWatchWeapon(puppyWeaponID, true)
+	local puppyDef =  UnitDefNames.jumpscout
+	puppyDefID = puppyDef.id
+	puppyWeaponID = puppyDef.weapons[1].weaponDef
+	puppyLosRadius = puppyDef.losRadius
+	wantedList = {puppyWeaponID}
+	Script.SetWatchWeapon(puppyWeaponID, true)
 end
 
 function gadget:Shutdown()
-  Script.SetWatchWeapon(puppyWeaponID, false)
+	Script.SetWatchWeapon(puppyWeaponID, false)
 end
 
 -- in event of shield impact, gets data about both units and passes it to UnitPreDamaged
@@ -164,27 +164,26 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	return {puppyWeaponID}
 end
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
-                            weaponDefID, attackerID, attackerDefID, attackerTeam,projectileID)
-  if weaponDefID == puppyWeaponID and attackerID and spValidUnitID(attackerID) then
-    if attackerTeam and unitTeam then
-      -- attacker and attacked units are known (both units are alive)
-      if spAreTeamsAllied(unitTeam, attackerTeam) then
-        -- attacked unit is an ally
-        if unitDefID == puppyDefID then
-          -- attacked unit is an allied puppy, cancel damage
-		  --Spring.Echo("UnitPreDamaged " .. attackerID)
-		  return 0
-        end
-      else
-        -- attacked unit is an enemy, self-destruct the puppy
-        spDestroyUnit(attackerID, false, true)
-        return damage
-      end
-    end    
-  end
-  
-  return damage
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam,projectileID)
+	if weaponDefID == puppyWeaponID and attackerID and spValidUnitID(attackerID) then
+		if attackerTeam and unitTeam then
+			-- attacker and attacked units are known (both units are alive)
+			if spAreTeamsAllied(unitTeam, attackerTeam) then
+				-- attacked unit is an ally
+				if unitDefID == puppyDefID then
+					-- attacked unit is an allied puppy, cancel damage
+					--Spring.Echo("UnitPreDamaged " .. attackerID)
+					return 0
+				end
+			else
+				-- attacked unit is an enemy, self-destruct the puppy
+				spDestroyUnit(attackerID, false, true)
+				return damage
+			end
+		end
+	end
+
+	return damage
 end
 
 function gadget:UnitDestroyed(unitID)
@@ -219,11 +218,12 @@ function gadget:Explosion_GetWantedWeaponDef()
 end
 
 function gadget:Explosion(weaponID, px, py, pz, ownerID)
-  if weaponID == puppyWeaponID and ownerID and spValidUnitID(ownerID) then
-    -- the puppy landed
-    RestorePuppy(ownerID, px, py, pz)
-  end
-  return false
+	if weaponID == puppyWeaponID and ownerID and spValidUnitID(ownerID) then
+		-- the puppy landed
+		RestorePuppy(ownerID, px, py, pz)
+	end
+	return false
 end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
