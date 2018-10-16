@@ -13,12 +13,13 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND]],
+  category               = [[LAND UNARMED]],
   corpse                 = [[DEAD]],
 
   customParams           = {
 	priority_misc  = 1, -- Medium
 	shield_emit_height = 45,
+	unarmed       = true,
   },
 
   explodeAs              = [[ESTOR_BUILDING]],
