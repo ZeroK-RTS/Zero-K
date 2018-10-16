@@ -53,7 +53,7 @@ for unitDefID = 1, #UnitDefs do
 					chargePerUpdate = PERIOD*tonumber(shieldWep.customParams.shield_rate)/TEAM_SLOWUPDATE_RATE,
 					perSecondCost = tonumber(shieldWep.customParams.shield_drain),
 					startPower = shieldWep.customParams.shieldstartingpower and tonumber(shieldWep.customParams.shieldstartingpower),
-					rechargeDelay = tonumber(shieldWep.customParams.shield_recharge_delay),
+					rechargeDelay = shieldWep.customParams.shield_recharge_delay and tonumber(shieldWep.customParams.shield_recharge_delay),
 				}
 			else
 				shieldUnitDefID[unitDefID] = {
@@ -101,7 +101,10 @@ function gadget:GameFrame(n)
 		local def = data.def
 		local hitTime = Spring.GetUnitRulesParam(unitID, "shieldHitFrame") or -999999
 		local currTime = Spring.GetGameFrame()
-		local inCooldown = (hitTime + def.rechargeDelay * 30 - currTime >= 0)
+		local inCooldown = false
+		if def.rechargeDelay then
+			inCooldown = (hitTime + def.rechargeDelay * 30 - currTime >= 0)
+		end
 		if enabled and charge < def.maxCharge and not inCooldown and spGetUnitRulesParam(unitID, "shieldChargeDisabled") ~= 1 then
 			-- Get changed charge rate based on slow
 			local newChargeRate = GetChargeRate(unitID)
