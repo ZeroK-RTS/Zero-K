@@ -121,6 +121,10 @@ local function RestorePuppy(unitID, x, y, z)
 	--spGiveOrderToUnit(unitID, CMD.STOP, {}, 0)
 end
 
+function GG.PuppyHandler_IsHidden(unitID)
+	return (unitID and cannotBeDamage[unitID] and true) or false
+end
+
 function GG.PuppyHandler_Shot(unitID)
   -- the puppy fired its weapon, hide it
   HidePuppy(unitID)
