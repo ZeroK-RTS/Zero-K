@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Spidermonkey]],
   description         = [[All-Terrain Support]],
   acceleration        = 0.36,
+  activateWhenBuilt   = true,
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -46,7 +47,7 @@ unitDef = {
 
   },
   sightDistance       = 700,
-  sonarDistance       = 450,
+  sonarDistance       = 700,
   trackOffset         = 0.5,
   trackStrength       = 9,
   trackStretch        = 1,

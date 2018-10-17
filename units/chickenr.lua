@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Lobber]],
   description         = [[Artillery]],
   acceleration        = 0.36,
+  activateWhenBuilt   = true,
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -47,7 +48,7 @@ unitDef = {
 
   },
   sightDistance       = 1000,
-  sonarDistance       = 450,
+  sonarDistance       = 1000,
   trackOffset         = 6,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -55,7 +56,7 @@ unitDef = {
   trackWidth          = 30,
   turnRate            = 806,
   upright             = false,
-  waterline			  = 16,
+  waterline           = 24,
   workerTime          = 0,
 
   weapons             = {
@@ -85,8 +86,6 @@ unitDef = {
 			
       damage                  = {
         default = 240,
-        planes  = 240,
-        subs    = 8,
       },
 
       explosionGenerator      = [[custom:lobber_goo]],
@@ -108,6 +107,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 300,
+      waterWeapon             = true,
     },
 
   },

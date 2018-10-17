@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Chicken]],
   description         = [[Swarmer]],
   acceleration        = 0.36,
+  activateWhenBuilt   = true,
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -12,7 +13,7 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  category            = [[SWIM]],
+  category            = [[LAND SINK]],
 
   customParams        = {
   },
@@ -28,9 +29,9 @@ unitDef = {
   maxSlope            = 36,
   maxVelocity         = 2.9,
   minCloakDistance    = 75,
-  movementClass       = [[BHOVER3]],
+  movementClass       = [[AKBOT2]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
+  noChaseCategory     = [[SHIP FLOAT SWIM TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[chicken.s3o]],
   power               = 100,
   selfDestructAs      = [[NOWEAPON]],
@@ -45,7 +46,7 @@ unitDef = {
 
   },
   sightDistance       = 256,
-  sonarDistance       = 200,
+  sonarDistance       = 256,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -53,7 +54,6 @@ unitDef = {
   trackWidth          = 18,
   turnRate            = 806,
   upright             = false,
-  waterline           = 16,
   workerTime          = 0,
 
   weapons             = {

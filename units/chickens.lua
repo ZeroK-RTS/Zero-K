@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Spiker]],
   description         = [[Skirmisher]],
   acceleration        = 0.36,
+  activateWhenBuilt   = true,
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -45,7 +46,7 @@ unitDef = {
 
   },
   sightDistance       = 550,
-  sonarDistance       = 500,
+  sonarDistance       = 550,
   trackOffset         = 6,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -53,7 +54,7 @@ unitDef = {
   trackWidth          = 30,
   turnRate            = 806,
   upright             = false,
-  waterline           = 16,
+  waterline           = 22,
   workerTime          = 0,
 
   weapons             = {

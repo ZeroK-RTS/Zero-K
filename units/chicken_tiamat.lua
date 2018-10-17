@@ -34,9 +34,9 @@ unitDef = {
   maxVelocity         = 2.3,
   maxWaterDepth       = 5000,
   minCloakDistance    = 75,
-  movementClass       = [[AKBOT6]],
+  movementClass       = [[AKBOT4]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB STUPIDTARGET MINE]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],
   objectName          = [[chickenbroodqueen.s3o]],
   power               = 350,
   selfDestructAs      = [[NOWEAPON]],
@@ -52,6 +52,7 @@ unitDef = {
 
   },
   sightDistance       = 256,
+  sonarDistance       = 256,
   trackOffset         = 7,
   trackStrength       = 9,
   trackStretch        = 1,
@@ -68,14 +69,14 @@ unitDef = {
       def                = [[JAWS]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 120,
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP SUB HOVER FIXEDWING GUNSHIP]],
     },
 
 
     {
       def                = [[SPORES]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SUB SWIM FLOAT GUNSHIP HOVER]],
     },
 
 
@@ -161,8 +162,6 @@ unitDef = {
 
       damage                  = {
         default = 300,
-        planes  = 300,
-        subs    = 3,
       },
 
       explosionGenerator      = [[custom:NONE]],

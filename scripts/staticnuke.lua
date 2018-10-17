@@ -76,11 +76,25 @@ local function CloseDoors()
 	missileLoaded = true
 end
 
+local function DoorCheckLoop()
+	while true do
+		local stock = Spring.GetUnitStockpile(unitID)
+		if (not missileLoaded) then
+			Sleep(1000)
+		elseif stock > 0 and (not doorsAreOpen) and not (openingDoors or closingDoors) then
+			StartThread(OpenDoors)
+		end
+		Sleep(1000)
+	end
+end
+
 function script.Create()
 	StartThread(SmokeUnit, {base})
 	Hide(tube)
 	Hide(tower)
 	Hide(nuke)
+	
+	StartThread(DoorCheckLoop)
 end
 
 local function RestoreAfterDelay()

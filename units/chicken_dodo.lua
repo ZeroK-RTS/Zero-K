@@ -13,7 +13,7 @@ unitDef = {
   canGuard              = true,
   canMove               = true,
   canPatrol             = true,
-  category              = [[SWIM]],
+  category              = [[LAND SINK]],
 
   customParams          = {
   },
@@ -31,10 +31,10 @@ unitDef = {
   maxSlope              = 36,
   maxVelocity           = 7,
   minCloakDistance      = 75,
-  movementClass         = [[BHOVER3]],
+  movementClass         = [[AKBOT2]],
   movestate             = 2,
   noAutoFire            = false,
-  noChaseCategory       = [[FIXEDWING SATELLITE GUNSHIP SUB]],
+  noChaseCategory       = [[SHIP SWIM FLOAT FIXEDWING SATELLITE GUNSHIP]],
   objectName            = [[chicken_dodo.s3o]],
   onoffable             = true,
   power                 = 170,
@@ -51,6 +51,7 @@ unitDef = {
 
   },
   sightDistance         = 256,
+  sonarDistance         = 256,
   trackOffset           = 1,
   trackStrength         = 6,
   trackStretch          = 1,

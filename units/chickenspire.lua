@@ -42,6 +42,7 @@ unitDef = {
   onoffable                     = true,
   power                         = 2500,
   selfDestructAs                = [[NOWEAPON]],
+  script                        = [[chickenspire.lua]],
 
   sfxtypes                      = {
 
@@ -53,6 +54,7 @@ unitDef = {
 
   },
   sightDistance                 = 512,
+  sonarDistance                 = 512,
   turnRate                      = 0,
   upright                       = false,
   useBuildingGroundDecal        = true,
@@ -136,8 +138,9 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[chickenegggreen_big.s3o]],
-      range                   = 4500,
-      reloadtime              = 10,
+      projectiles             = 4,
+      range                   = 6300,
+      reloadtime              = 14,
       smokeTrail              = true,
       startVelocity           = 40,
       texture1                = [[none]],
@@ -150,8 +153,8 @@ unitDef = {
       waterweapon             = true,
       weaponAcceleration      = 40,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 400,
-	  wobble				  = 24000,
+      weaponVelocity          = 750,
+      wobble                  = 24000,
     },
 
   },

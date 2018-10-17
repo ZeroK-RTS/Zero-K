@@ -215,7 +215,7 @@ function script.Shot()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 407, 15, 0.25)
+	return GG.PuppyHandler_IsHidden(unitID) or GG.OverkillPrevention_CheckBlock(unitID, targetID, 407, 15, 0.25)
 end
 
 function script.Killed(recentDamage, maxHealth)

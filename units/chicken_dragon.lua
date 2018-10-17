@@ -3,6 +3,7 @@ unitDef = {
   name                   = [[White Dragon]],
   description            = [[Prime Assault Chicken]],
   acceleration           = 1,
+  activateWhenBuilt      = true,
   autoHeal               = 0,
   brakeRate              = 3,
   buildCostEnergy        = 0,
@@ -15,7 +16,7 @@ unitDef = {
   canPatrol              = true,
   canSubmerge            = false,
   cantBeTransported      = true,
-  category               = [[LAND]],
+  category               = [[LAND SWIM]],
   collisionSphereScale   = 1,
   collisionVolumeOffsets = [[0 -5 -5]],
   collisionVolumeScales  = [[30 70 70]],
@@ -35,7 +36,7 @@ unitDef = {
   maxSlope               = 36,
   maxVelocity            = 2.1,
   minCloakDistance       = 225,
-  movementClass          = [[AKBOT6]],
+  movementClass          = [[BHOVER5]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP STUPIDTARGET MINE]],
   objectName             = [[chicken_dragon.s3o]],
@@ -53,7 +54,7 @@ unitDef = {
 
   },
   sightDistance          = 1200,
-  sonarDistance          = 450,
+  sonarDistance          = 1200,
   trackOffset            = 18,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -62,6 +63,7 @@ unitDef = {
   turninplace            = 0,
   turnRate               = 399,
   upright                = false,
+  waterLine              = 42,
   workerTime             = 0,
 
   weapons                = {
@@ -125,8 +127,6 @@ unitDef = {
 
       damage                  = {
         default = 500,
-        planes  = 500,
-        subs    = 2.5,
       },
 
       explosionGenerator      = [[custom:large_green_goo]],
@@ -145,6 +145,7 @@ unitDef = {
       tolerance               = 5000,
       turret                  = true,
       weaponType              = [[Cannon]],
+      waterWeapon             = true,
       weaponVelocity          = 600,
     },
 

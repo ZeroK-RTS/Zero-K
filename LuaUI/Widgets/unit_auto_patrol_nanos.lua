@@ -38,6 +38,7 @@ local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitDefID    = Spring.GetUnitDefID
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spGetGameRulesParam = Spring.GetGameRulesParam
 
 local abs = math.abs
 
@@ -136,15 +137,15 @@ function widget:Initialize()
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	if not enableIdleNanos then
+	if not enableIdleNanos
+	or unitTeam ~= spGetMyTeamID()
+	or not IsImmobileBuilder(UnitDefs[unitDefID])
+	or spGetGameRulesParam("loadPurge") == 1
+	then
 		return
 	end
-	if (unitTeam ~= spGetMyTeamID()) then
-		return
-	end
-	if (IsImmobileBuilder(UnitDefs[unitDefID])) then
-		SetupUnit(unitID)
-	end
+
+	SetupUnit(unitID)
 end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions) 
@@ -167,22 +168,20 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam)
-	if not enableIdleNanos then
-		return
-	end
 	widget:UnitCreated(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
-	if not enableIdleNanos then
+	if not enableIdleNanos
+	or stoppedUnit[unitID]
+	or unitTeam ~= spGetMyTeamID()
+	or not IsImmobileBuilder(UnitDefs[unitDefID])
+	or spGetGameRulesParam("loadPurge") == 1
+	then
 		return
 	end
-	if (unitTeam ~= spGetMyTeamID()) then
-		return
-	end
-	if (IsImmobileBuilder(UnitDefs[unitDefID])) and not stoppedUnit[unitID] then
-		SetupUnit(unitID)
-	end
+
+	SetupUnit(unitID)
 end
 
 --------------------------------------------------------------------------------

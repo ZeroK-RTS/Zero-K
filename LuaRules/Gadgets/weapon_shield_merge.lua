@@ -333,15 +333,25 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	return projectilePasses
 end
 
+local function RegenerateData()
+	for _,unitID in ipairs(Spring.GetAllUnits()) do
+		local teamID = spGetUnitTeam(unitID)
+		local unitDefID = spGetUnitDefID(unitID)
+		gadget:UnitCreated(unitID, unitDefID, teamID)
+	end
+end
+
+function gadget:Load()
+	if MERGE_ENABLED then
+		RegenerateData()
+	end
+end
+
 function gadget:Initialize()
 	GG.DrainShieldAndCheckProjectilePenetrate = DrainShieldAndCheckProjectilePenetrate
 	
 	if MERGE_ENABLED then
-		for _,unitID in ipairs(Spring.GetAllUnits()) do
-			local teamID = spGetUnitTeam(unitID)
-			local unitDefID = spGetUnitDefID(unitID)
-			gadget:UnitCreated(unitID, unitDefID, teamID)
-		end
+		RegenerateData()
 	else
 		gadgetHandler:RemoveCallIn("UnitCreated")
 		gadgetHandler:RemoveCallIn("UnitFinished")

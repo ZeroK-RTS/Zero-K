@@ -1475,7 +1475,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 
 		local weaponStats = GetWeapon( ud.deathExplosion:lower() )
 		local wepCp = weaponStats.customParams
-		local damageValue = tonumber(weaponStats.customParams.statsdamage) or weaponStats.damages[1] or 0
+		local damageValue = tonumber(weaponStats.customParams.stats_damage)
 
 		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
 		if (weaponStats.paralyzer) then
