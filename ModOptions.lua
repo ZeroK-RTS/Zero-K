@@ -611,6 +611,14 @@ local options = {
     step   = 0.05,
   },
   {
+    key     = 'chicken_endless',
+    name    = 'Infinite Chicken',
+    desc    = 'Queen does not spawn, waves go on forever.',
+    type    = "bool",
+    def     = false,
+    section = 'chicken',
+  },
+  {
     key    = 'graceperiod',
     name   = 'Grace Period',
     desc   = 'Delay before the first wave appears, minutes.',
