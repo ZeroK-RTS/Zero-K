@@ -1,5 +1,5 @@
 include "constants.lua"
-include "RockPiece.lua"
+include "rockPiece.lua"
 
 local base = piece 'base' 
 local front = piece 'front' 
@@ -40,6 +40,27 @@ local ROCK_MAX = 1.5
 local SIG_MOVE = 1
 local SIG_AIM = 2
 local RESTORE_DELAY = 3000
+
+local rockData = {
+	[x_axis] = {
+		piece  = ROCK_PIECE,
+		speed  = ROCK_SPEED,
+		decay  = ROCK_DECAY,
+		minPos = ROCK_MIN,
+		maxPos = ROCK_MAX,
+		signal = SIG_ROCK_X,
+		axis = x_axis,
+	},
+	[z_axis] = {
+		piece  = ROCK_PIECE,
+		speed  = ROCK_SPEED,
+		decay  = ROCK_DECAY,
+		minPos = ROCK_MIN,
+		maxPos = ROCK_MAX,
+		signal = SIG_ROCK_Z,
+		axis = z_axis,
+	},
+}
 
 local function WobbleUnit()
 	local wobble = true
@@ -86,8 +107,7 @@ function script.Create()
 	StartThread(SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
-	InitializeRock(ROCK_PIECE, ROCK_SPEED, ROCK_DECAY, ROCK_MIN, ROCK_MAX, SIG_ROCK_X, x_axis)
-	InitializeRock(ROCK_PIECE, ROCK_SPEED, ROCK_DECAY, ROCK_MIN, ROCK_MAX, SIG_ROCK_Z, z_axis)
+	InitializeRock(rockData)
 end
 
 local function RestoreAfterDelay()
@@ -121,8 +141,8 @@ function script.QueryWeapon(piecenum)
 end
 
 function script.FireWeapon()
-	StartThread(Rock, gunHeading, ROCK_FIRE_FORCE, z_axis)
-	StartThread(Rock, gunHeading - hpi, ROCK_FIRE_FORCE*0.4, x_axis)
+	StartThread(Rock, z_axis, gunHeading, ROCK_FIRE_FORCE)
+	StartThread(Rock, x_axis, gunHeading - hpi, ROCK_FIRE_FORCE*0.4)
 end
 
 function script.BlockShot(num, targetID)

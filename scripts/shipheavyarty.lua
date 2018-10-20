@@ -39,16 +39,28 @@ local RECOIL_DISTANCE =	-3
 local RECOIL_RESTORE_SPEED = 2.5
 
 --rockz
-include 'RockPiece.lua'
+include "rockPiece.lua"
 
 local ROCK_PIECE = ground		--piece to rock
-local ROCK_Z_SPEED = 1		--number of rock angles per second around z-axis
-local ROCK_Z_DECAY = -0.5	--rocking around z-axis is reduced by this factor each time; should be negative to alternate rocking direction
-local ROCK_Z_MIN = math.rad(3)	--if around z-axis rock is not greater than this amount rocking will stop after returning to center
-local ROCK_Z_MAX = math.rad(15)
+local ROCK_SPEED = 1		--number of rock angles per second around z-axis
+local ROCK_DECAY = -0.5	--rocking around z-axis is reduced by this factor each time; should be negative to alternate rocking direction
+local ROCK_MIN = math.rad(3)	--if around z-axis rock is not greater than this amount rocking will stop after returning to center
+local ROCK_MAX = math.rad(15)
 local SIG_ROCK_Z = 1024		--signal to prevent multiple rocking
 
 local ROCK_FORCE = 0.1
+
+local rockData = {
+	[z_axis] = {
+		piece = ROCK_PIECE,
+		speed = ROCK_SPEED,
+		decay = ROCK_DECAY,
+		minPos = ROCK_MIN,
+		maxPos = ROCK_MAX,
+		signal = SIG_ROCK_Z,
+		axis = z_axis,
+	},
+}
 
 --------------------------------------------------------------------
 --variables
@@ -63,7 +75,7 @@ function script.Create()
 	Turn(turret3, y_axis, math.rad(180))
 	Spin(radar, y_axis, math.rad(100))
 	StartThread(SmokeUnit, smokePiece)
-	InitializeRock(ROCK_PIECE, ROCK_Z_SPEED, ROCK_Z_DECAY, ROCK_Z_MIN, ROCK_Z_MAX, SIG_ROCK_Z, z_axis)
+	InitializeRock(rockData)
 end
 
 local function RestoreAfterDelay()
@@ -105,7 +117,7 @@ function script.AimWeapon(num, heading, pitch)
 	for i=1,3 do
 		Turn(barrels[num][i], x_axis, -pitch, math.rad(40))
 	end
-	WaitForTurn(barrels[num][1], x_axis)	
+	WaitForTurn(barrels[num][1], x_axis)
 	WaitForTurn(turrets[num], y_axis)
 	StartThread(RestoreAfterDelay)
 	gunHeading[num] = heading
@@ -113,7 +125,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	StartThread(Rock, gunHeading[num], ROCK_FORCE, z_axis)
+	StartThread(Rock, z_axis, gunHeading[num], ROCK_FORCE)
 end
 
 function script.Shot(num)
