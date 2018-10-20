@@ -14,6 +14,7 @@ local openingDoors = false
 local doorsAreOpen = false
 local closingDoors = false
 local missileLoaded = true
+local primingQueued = false
 
 -- Signal definitions
 local SIG_AIM = 1
@@ -72,19 +73,25 @@ local function CloseDoors()
 	WaitForMove(doorr, x_axis)
 	Hide(tube)	
 	
+	Sleep(500)	-- keep door from instantly opening after closing
 	closingDoors = false
 	missileLoaded = true
+	
+	if primingQueued or Spring.GetUnitStockpile(unitID) > 0 then
+		primingQueued = false
+		StartThread(OpenDoors)
+	end
 end
 
-local function DoorCheckLoop()
-	while true do
-		local stock = Spring.GetUnitStockpile(unitID)
-		if (not missileLoaded) then
-			Sleep(1000)
-		elseif stock > 0 and (not doorsAreOpen) and not (openingDoors or closingDoors) then
-			StartThread(OpenDoors)
-		end
-		Sleep(1000)
+function StockpileChanged(newStock)
+	if newStock <= 0 then
+		return
+	end
+	
+	if not missileLoaded then
+		primingQueued = true
+	elseif not doorsAreOpen and not openingDoors and not closingDoors then
+		StartThread(OpenDoors)
 	end
 end
 
@@ -93,8 +100,6 @@ function script.Create()
 	Hide(tube)
 	Hide(tower)
 	Hide(nuke)
-	
-	StartThread(DoorCheckLoop)
 end
 
 local function RestoreAfterDelay()
