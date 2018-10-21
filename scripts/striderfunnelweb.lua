@@ -1,6 +1,5 @@
 include "constants.lua"
 include "spider_walking.lua"
-include "nanoaim.h.lua"
 
 local ALLY_ACCESS = {allied = true}
 
@@ -18,10 +17,8 @@ local bl = piece 'thigh_bacr' 	-- back left
 local ml = piece 'thigh_midr' 	-- middle left
 local fl = piece 'thigh_fror' 	-- front left
 
-local smokePiece = {gaster, notum}
-local emitnano = gaster
-local nanopoint = gaster
-local nanoPieces = {nanopoint}
+local smokePiece = {gaster}
+local nanoPieces = {gaster}
 
 local SIG_WALK = 1
 local SIG_BUILD = 2
@@ -113,8 +110,8 @@ function script.QueryWeapon (num)
 end
 
 function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanopoint)
-	return nanopoint
+	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),gaster)
+	return gaster
 end
 
 function script.AimWeapon (num)
