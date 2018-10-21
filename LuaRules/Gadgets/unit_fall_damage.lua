@@ -178,8 +178,8 @@ local function DoCollisionDamage(unitID, unitDefID, otherID)
 		local aVy = myVy*myVelFrac + oVy*(1 - myVelFrac)
 		local aVz = myVz*myVelFrac + oVz*(1 - myVelFrac)
 		
-		--GG.AddGadgetImpulseRaw(unitID, aVx - myVx, aVy - myVy, aVz - myVz, true, true)
-		--GG.AddGadgetImpulseRaw(otherID, aVx - oVx, aVy - oVy, aVz - oVz, true, true)
+		GG.AddGadgetImpulseRaw(unitID, aVx - myVx, aVy - myVy, aVz - myVz, true, true)
+		GG.AddGadgetImpulseRaw(otherID, aVx - oVx, aVy - oVy, aVz - oVz, true, true)
 		
 		if unitImmune[unitID] then
 			if unitImmune[unitID] < gameframe then
