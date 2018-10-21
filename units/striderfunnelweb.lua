@@ -50,6 +50,7 @@ unitDef = {
 
   },
   script                 = [[striderfunnelweb.lua]],
+  showNanoSpray          = false,
   sightDistance          = 650,
   trackOffset            = 0,
   trackStrength          = 8,
@@ -58,7 +59,6 @@ unitDef = {
   trackWidth             = 85,
   turnRate               = 240,
   workerTime             = 50,
-  canAssist              = true,
 
   weapons                = {
 
