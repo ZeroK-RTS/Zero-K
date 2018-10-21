@@ -80,6 +80,7 @@ local function RestoreLegs()
 end
 
 function script.Create()
+	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 1) -- shields shouldn't disappear when turned off
 	Hide (gunL)
 	Hide (gunR)
 	Move (aimpoint, z_axis, -4)
