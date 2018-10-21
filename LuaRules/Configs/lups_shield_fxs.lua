@@ -105,7 +105,7 @@ for unitDefID = 1, #UnitDefs do
 		local shieldPower = tonumber(ud.customParams.shield_power)
 		if shieldPower > 10000 then
 			myShield.texture = "bitmaps/PD/shield3mist.png"  -- Placeholder until a better texture is thought of
-			myShield.colormap1 = {{0.3, 1, 0.3, 0.7}, {0.5, 0.5, 0.1, 0.5}}
+			myShield.colormap1 = {{0.3, 1, 0.3, 0.7}, {0.5, 0.5, 0.1, 0.3}}
 			myShield.hitResposeMult = 0.8
 			myShield.sizeDrift = 0.0004
 		end
