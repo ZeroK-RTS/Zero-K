@@ -23,7 +23,7 @@ local nanoPieces = {gaster}
 local SIG_WALK = 1
 local SIG_BUILD = 2
 
-local PERIOD = 0.35
+local PERIOD = 0.275
 
 local sleepTime = PERIOD*1000
 
@@ -109,6 +109,10 @@ end
 function script.QueryNanoPiece()
 	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),gaster)
 	return gaster
+end
+
+function script.QueryWeapon(num)
+	return shield
 end
 
 function script.Killed (recentDamage, maxHealth)
