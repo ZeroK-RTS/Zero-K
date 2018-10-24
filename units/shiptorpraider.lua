@@ -128,7 +128,7 @@ unitDef = {
 
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[shiptorpraider_dead.s3o]],
+      object           = [[shiptorpraider_dead.dae]],
     },
 
 
