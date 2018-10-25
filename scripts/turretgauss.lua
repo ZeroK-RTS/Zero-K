@@ -4,6 +4,7 @@ include "constants.lua"
 local concrete, belt = piece('Concrete','Belt');
 local wheel, arm, hand, cannon = piece('Wheel', 'Arm','Hand', 'Cannon');
 local barrel1, barrel2, barrel3, muzzle = piece("Barrel1","Barrel2","Barrel3","Muzzle");
+local muzzleProxy = piece("MuzzleProxy")
 local lidLeft, lidRight = piece("lidLeft","lidRight");
 local aimProxy = piece("AimProxy");
 
@@ -180,7 +181,7 @@ end
 
 
 function script.QueryWeapon(n)
-	return (is_open and muzzle) or aimProxy
+	return (is_open and muzzle) or muzzleProxy
 end
 
 function script.AimFromWeapon(n) 
