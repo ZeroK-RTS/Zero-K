@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Roc]],
   description         = [[Heavy Attack Flyer]],
   acceleration        = 1.2,
+  activateWhenBuilt   = true,
   airHoverFactor      = 0,
   brakeRate           = 0.8,
   buildCostEnergy     = 0,
@@ -54,6 +55,7 @@ unitDef = {
 
   },
   sightDistance       = 750,
+  sonarDistance       = 750,
   turnRate            = 1350,
   workerTime          = 0,
 
@@ -98,8 +100,6 @@ unitDef = {
 
       damage                  = {
         default = 200,
-        planes  = 200,
-        subs    = 1,
       },
 
       explosionGenerator      = [[custom:green_goo]],
@@ -119,6 +119,7 @@ unitDef = {
       tolerance               = 5000,
       turret                  = true,
       weaponType              = [[Cannon]],
+      waterweapon             = true,
       weaponVelocity          = 350,
     },
 
@@ -166,7 +167,7 @@ unitDef = {
       tracks                  = true,
       turnRate                = 24000,
       turret                  = true,
-      waterweapon             = true,
+      waterWeapon             = true,
       weaponAcceleration      = 100,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 500,

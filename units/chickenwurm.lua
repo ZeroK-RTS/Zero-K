@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Wurm]],
   description         = [[Burrowing Flamer (Assault/Riot)]],
   acceleration        = 0.36,
+  activateWhenBuilt   = true,
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -32,7 +33,7 @@ unitDef = {
   minCloakDistance    = 75,
   movementClass       = [[ATKBOT3]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB STUPIDTARGET MINE]],
+  noChaseCategory     = [[SHIP FLOAT SWIM TERRAFORM FIXEDWING GUNSHIP SATELLITE STUPIDTARGET MINE]],
   objectName          = [[chickenwurm.s3o]],
   power               = 350,
   script              = [[chickenwurm.lua]],
@@ -48,6 +49,7 @@ unitDef = {
 
   },
   sightDistance       = 384,
+  sonarDistance       = 384,
   stealth             = true,
   turnRate            = 806,
   upright             = false,
@@ -61,6 +63,18 @@ unitDef = {
       mainDir            = [[0 0 1]],
       maxAngleDif        = 120,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT GUNSHIP SHIP HOVER]],
+    },
+    {
+      def                = [[UWGOO]], -- Fired when underwater.
+      mainDir            = [[0 0 1]],
+      maxAngleDif        = 120,
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SUB GUNSHIP SHIP HOVER]],
+    },
+    {
+      def                = [[UWGOO]], -- Above water, fired at submerged units.
+      mainDir            = [[0 0 1]],
+      maxAngleDif        = 120,
+      onlyTargetCategory = [[SINK SUB]],
     },
 
   },
@@ -112,6 +126,38 @@ unitDef = {
       weaponVelocity          = 200,
     },
 
+    UWGOO = {
+      name                    = [[Blob]],
+      areaOfEffect            = 128,
+      craterBoost             = 0,
+      craterMult              = 0,
+	  
+	  customParams        	  = {
+	  },
+
+      damage                  = {
+        default = 250,
+      },
+
+      explosionGenerator      = [[custom:large_green_goo]],
+      fireStarter             = 120,
+      impulseBoost            = 0,
+      impulseFactor           = 0.2,
+      intensity               = 0.7,
+      interceptedByShieldType = 1,
+      range                   = 300,
+      reloadtime              = 6,
+      rgbColor                = [[0.2 0.6 0]],
+      size                    = 8,
+      sizeDecay               = 0,
+      soundHit                = [[chickens/acid_hit]],
+      soundStart              = [[chickens/acid_fire]],
+      tolerance               = 9000,
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 600,
+      waterWeapon	      = true,
+    },
   },
 
 }

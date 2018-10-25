@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Talon]],
   description         = [[Flying Spike Spitter]],
   acceleration        = 0.8,
+  activateWhenBuilt   = true,
   airHoverFactor      = 0,
   brakeRate           = 0.32,
   buildCostEnergy     = 0,
@@ -51,6 +52,7 @@ unitDef = {
 
   },
   sightDistance       = 512,
+  sonarDistance       = 512,
   turnRate            = 6000,
   workerTime          = 0,
 

@@ -1,8 +1,6 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not gadgetHandler:IsSyncedCode() then
-	return
-end
+if gadgetHandler:IsSyncedCode() then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -53,6 +51,8 @@ include("LuaRules/Configs/constants.lua")
 -- in seconds. The delay considered is (ping + time spent afk)
 local TO_AFK_THRESHOLD = 30 -- going above this marks you AFK
 local FROM_AFK_THRESHOLD = 5 -- going below this marks you non-AFK
+
+local PUBLIC = { public = true }
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ end
 
 local mouseActivityTime = {}
 
-function gadget:RecvLuaMsg(msg, playerID)
+local function CheckMouseActivity(msg, playerID)
 	if msg:find("AFK",1,true) then
 		mouseActivityTime[playerID] = tonumber(msg:sub(4))
 	end
@@ -193,6 +193,9 @@ local function UpdateTeamActivity(teamID)
 			end
 		end
 		
+		SendToUnsynced("TeamUnafked", teamID)
+		spEcho("TeamUnafked", teamID)
+		Spring.SetTeamRulesParam(teamID, "afk", 0, PUBLIC)
 		if unitsRecieved then
 			spEcho("game_message: Player " .. playerName .. " is no longer lagging or AFK; returning all their units.")
 		end
@@ -225,13 +228,72 @@ local function GetRawTeamShare(teamID)
 	return shares
 end
 
+local function GiveAwayTeam(giveTeamID, receiveTeamID)
+	local givePlayerID = TeamIDToPlayerID(giveTeamID)
+
+	local units = spGetTeamUnits(giveTeamID) or {}
+	if #units > 0 then -- transfer units when number of units in AFK team is > 0
+		-- Transfer Units
+		GG.allowTransfer = true
+		for j = 1, #units do
+			local unitID = units[j]
+			if allyTeamID == spGetUnitAllyTeam(unitID) then
+				if givePlayerID then
+					-- add this team to the playerLineageUnits list, then send the unit away
+					if playerLineageUnits[unitID] == nil then
+						playerLineageUnits[unitID] = {givePlayerID}
+					else
+						-- this unit belonged to someone else before me, add me to the end of the list
+						playerLineageUnits[unitID][#playerLineageUnits[unitID]+1] = givePlayerID
+					end
+				end
+				TransferUnit(unitID, receiveTeamID)
+			end
+		end
+		GG.allowTransfer = false
+	end
+
+	local receiveName = GetTeamName(receiveTeamID)
+	local giveName = GetTeamName(giveTeamID)
+	local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID))
+
+	SendToUnsynced("TeamTaken", giveTeamID, receiveTeamID)
+	spEcho("TeamTaken", giveTeamID, receiveTeamID)
+	if giveResigned then
+		spEcho("game_message: " .. giveName .. " resigned, giving all units to " .. receiveName)
+	elseif #units > 0 then
+		spEcho("game_message: Giving all units of ".. giveName .. " to " .. receiveName .. " due to lag/AFK")
+	end
+end
+
+local function CheckTake(msg, playerID)
+	local _, _, isSpec, teamID, allyTeamID = Spring.GetPlayerInfo(playerID)
+	if msg ~= "afk_take" or isSpec then
+		return
+	end
+
+	local teamList = Spring.GetTeamList(allyTeamID)
+
+	spEcho("CheckTake p/t", playerID, teamID)
+	for i = 1, #teamList do
+		local giveTeamID = teamList[i]
+		if teamResourceShare[giveTeamID] == 0 and giveTeamID ~= teamID then
+			GiveAwayTeam(giveTeamID, teamID)
+		end
+	end
+end
+
+function gadget:RecvLuaMsg(msg, playerID)
+	CheckMouseActivity(msg, playerID)
+	CheckTake(msg, playerID)
+end
+
 local function UpdateAllyTeamActivity(allyTeamID)
 	local teamList = Spring.GetTeamList(allyTeamID)
 	
 	local totalResourceShares = 0
 	local giveAwayTeams = {}
-	local recieveRank = false
-	local recieveTeamID = false
+	local onlyBotsLeft = true
 	
 	for i = 1, #teamList do
 		local teamID = teamList[i]
@@ -242,80 +304,37 @@ local function UpdateAllyTeamActivity(allyTeamID)
 				-- The team is newly afk.
 				giveAwayTeams[#giveAwayTeams + 1] = teamID
 			end
-		elseif teamRank and ((not recieveRank) or (teamRank > recieveRank)) then
-			recieveRank = teamRank
-			recieveTeamID = teamID
+		elseif teamRank then
+			onlyBotsLeft = false
 		end
 		teamResourceShare[teamID] = resourceShare
 	end
 	allyTeamResourceShares[allyTeamID] = totalResourceShares
-	
-	if not recieveTeamID then
 
-		-- Nobody can recieve units so there is not much more to do
-		for i = 1, #giveAwayTeams do
-			local giveTeamID = giveAwayTeams[i]
-			local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID))
-			if giveResigned then
-				spEcho("game_message: " .. GetTeamName(giveTeamID) .. " resigned")
-			end
-		end
-
-		-- a human can have bot teammates; they are not eligible to receive his units but would still drain his income if he goes AFK
-		-- in that case, the human gets to keep his income as well
-		if totalResourceShares > 0 and #giveAwayTeams > 0 then
-			totalResourceShares = 0
-			for i = 1, #teamList do
-				local teamID = teamList[i]
-				local rawShare = GetRawTeamShare(teamID)
-				totalResourceShares = totalResourceShares + rawShare
-				teamResourceShare[teamID] = rawShare
-			end
-			allyTeamResourceShares[allyTeamID] = totalResourceShares
-		end
-		return
-	end
-	
 	for i = 1, #giveAwayTeams do
 		local giveTeamID = giveAwayTeams[i]
-		local givePlayerID = TeamIDToPlayerID(giveTeamID)
-		
-		-- Energy share is not set because the storage needs to be full for full overdrive.
-		-- Also energy income is mostly private and a large energy influx to the rest of the 
-		-- team is likely to be wasted or overdriven inefficently.
-		
-		local units = spGetTeamUnits(giveTeamID) or {}
-		if #units > 0 then -- transfer units when number of units in AFK team is > 0
-			-- Transfer Units
-			GG.allowTransfer = true
-			for j = 1, #units do
-				local unitID = units[j]
-				if allyTeamID == spGetUnitAllyTeam(unitID) then
-					if givePlayerID then
-						-- add this team to the playerLineageUnits list, then send the unit away
-						if playerLineageUnits[unitID] == nil then
-							playerLineageUnits[unitID] = {givePlayerID}
-						else
-							-- this unit belonged to someone else before me, add me to the end of the list
-							playerLineageUnits[unitID][#playerLineageUnits[unitID]+1] = givePlayerID
-						end
-					end
-					TransferUnit(unitID, recieveTeamID)
-				end
-			end
-			GG.allowTransfer = false
+		if select(3, Spring.GetTeamInfo(giveTeamID)) then
+			-- TODO chat is horrible ui, better make a gui popup (-> PlayerChanged should suffice?)
+			spEcho("game_message: " .. GetTeamName(giveTeamID) .. " resigned")
+		else
+			SendToUnsynced("TeamAfked", giveTeamID)
+			spEcho("TeamAfked", giveTeamID)
+			Spring.SetTeamRulesParam(giveTeamID, "afk", 1, PUBLIC)
 		end
-		
-		local recieveName = GetTeamName(recieveTeamID)
-		local giveName = GetTeamName(giveTeamID)
-		local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID))
-		
-		-- Send message
-		if giveResigned then
-			spEcho("game_message: " .. giveName .. " resigned, giving all units to " .. recieveName)
-		elseif #units > 0 then
-			spEcho("game_message: Giving all units of ".. giveName .. " to " .. recieveName .. " due to lag/AFK")
+	end
+
+	-- a human can have bot teammates; they are not eligible to receive his units but would still drain his income
+	-- in that case, the human gets to keep his income (some people like to queue up a lot of expensive stuff)
+	-- TODO: if there's [1 human afker, 1 human playing, and 1 bot] the playing human should prolly get 2 shares and bot 1
+	if onlyBotsLeft and totalResourceShares > 0 and #giveAwayTeams > 0 then
+		totalResourceShares = 0
+		for i = 1, #teamList do
+			local teamID = teamList[i]
+			local rawShare = GetRawTeamShare(teamID)
+			totalResourceShares = totalResourceShares + rawShare
+			teamResourceShare[teamID] = rawShare
 		end
+		allyTeamResourceShares[allyTeamID] = totalResourceShares
 	end
 end
 
@@ -354,7 +373,29 @@ function gadget:Initialize()
 		else
 			teamNames[teamID] = Spring.GetPlayerInfo(playerID)
 		end
+		Spring.SetTeamRulesParam(teamID, "afk", 0, PUBLIC)
 	end
 
 	GG.Lagmonitor = externalFunctions
+end
+
+else -- unsynced
+	local function WrapToLuaUI(cmd, arg1, arg2)
+		if not Script.LuaUI(cmd) then
+			return
+		end
+		Script.LuaUI[cmd](arg1, arg2)
+	end
+
+	function gadget:Initialize()
+		gadgetHandler:AddSyncAction("TeamAfked",   WrapToLuaUI)
+		gadgetHandler:AddSyncAction("TeamTaken",   WrapToLuaUI)
+		gadgetHandler:AddSyncAction("TeamUnafked", WrapToLuaUI)
+	end
+
+	function gadget:Shutdown()
+		gadgetHandler:RemoveSyncAction("TeamAfked")
+		gadgetHandler:RemoveSyncAction("TeamTaken")
+		gadgetHandler:RemoveSyncAction("TeamUnafked")
+	end
 end

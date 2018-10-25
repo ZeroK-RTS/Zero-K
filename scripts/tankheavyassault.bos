@@ -304,6 +304,11 @@ Create()
 	hide tracks1;
 	hide tracks2;
 
+	// no sidearm at the moment gameplay-wise
+	hide turret2;
+	hide sleeve2;
+	hide gun2;
+
 	while (get BUILD_PERCENT_LEFT)
 		sleep 250;
 

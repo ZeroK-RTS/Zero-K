@@ -29,6 +29,10 @@ local projectileDefs = {
 	[WeaponDefNames["hoverdepthcharge_fake_depthcharge"].id] = depthcharge
 }
 
+local projectileSpeed = {
+	[WeaponDefNames["hoverdepthcharge_depthcharge"].id] = 3, -- empirical
+}
+
 local projectileTimes = {}
 local projectileMoveCtrl = {}
 
@@ -43,6 +47,9 @@ local function ReleaseProjectile(proID)
 		return
 	end
 	Spring.SetProjectileMoveControl(proID, false)
+	if projectileSpeed[weaponDefID] then
+		GG.ProjectileRetarget_AddProjectile(proID, projectileSpeed[weaponDefID], true, true)
+	end
 end
 
 function gadget:GameFrame(n)

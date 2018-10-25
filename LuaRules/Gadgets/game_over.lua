@@ -534,9 +534,9 @@ local function ProcessLastAlly()
 					local playerlist = spGetPlayerList(t) -- active players
 					if playerlist then
 						for j = 1, #playerlist do
-							local name,active,spec = spGetPlayerInfo(playerlist[j])
+							local name,active,spec,_,_,ping = spGetPlayerInfo(playerlist[j])
 							if not spec then
-								if active then
+								if active and ping < 10 then
 									hasActiveTeam = true
 								else
 									hasDroppedTeam = true

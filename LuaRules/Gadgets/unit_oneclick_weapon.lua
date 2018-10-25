@@ -101,39 +101,34 @@ end
 
 local function doTheCommand(unitID, unitDefID, num)
 	local data = defs[unitDefID] and defs[unitDefID][num]
-	if (data) then
-		if data.dummy then
-			return true
-		end
-		
-		local currentReload = (data.weaponToReload and Spring.GetUnitWeaponState(unitID, data.weaponToReload, "reloadState")) or
-			(data.useSpecialReloadFrame and Spring.GetUnitRulesParam(unitID, "specialReloadFrame"))
-		local frame = Spring.GetGameFrame()
-		--if (reloadFrame[unitID][num] <= frame and not spGetUnitIsDead(unitID)) then
-		if ((not currentReload or currentReload <= frame) and (data.partBuilt or select(5, spGetUnitHealth(unitID)) == 1) and not spGetUnitIsDead(unitID)) then
-			local env = Spring.UnitScript.GetScriptEnv(unitID)
-			local func = env[data.functionToCall]
-			Spring.UnitScript.CallAsUnit(unitID, func)
-		
-			local baseSpeedMult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1)
-		
-			-- reload
-			if (data.reloadTime and data.weaponToReload) then
-				local reloadFrameVal = frame + data.reloadTime/baseSpeedMult
-				--reloadFrame[unitID][num] = reloadFrameVal
-				--scheduledReloadByUnitID[unitID] = math.max(reloadFrameVal, scheduledReloadByUnitID[unitID] or 0)
-				--Spring.SetUnitRulesParam(unitID, "specialReloadFrame", scheduledReloadByUnitID[unitID], {inlos = true})	-- for healthbar
-				Spring.SetUnitWeaponState(unitID, data.weaponToReload, "reloadState", reloadFrameVal)
-			end
-			if (data.reloadTime and data.useSpecialReloadFrame) then
-				local reloadFrameVal = frame + data.reloadTime
-				Spring.SetUnitRulesParam(unitID, "specialReloadFrame", reloadFrameVal, LOS_ACCESS)
-				Spring.SetUnitRulesParam(unitID, "specialReloadStart", frame, LOS_ACCESS)
-			end
-			return true
-		end
+	if not data then
+		return true
 	end
-	return false
+
+	local currentReload = (data.weaponToReload and Spring.GetUnitWeaponState(unitID, data.weaponToReload, "reloadState")) or
+		(data.useSpecialReloadFrame and Spring.GetUnitRulesParam(unitID, "specialReloadFrame"))
+	local frame = Spring.GetGameFrame()
+	if (currentReload and currentReload > frame) or (not data.partBuilt and select(5, spGetUnitHealth(unitID)) < 1) or spGetUnitIsDead(unitID) then
+		return true
+	end
+
+	local env = Spring.UnitScript.GetScriptEnv(unitID)
+	local func = env[data.functionToCall]
+	Spring.UnitScript.CallAsUnit(unitID, func)
+
+	local baseSpeedMult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1)
+
+	-- reload
+	if (data.reloadTime and data.weaponToReload) then
+		local reloadFrameVal = frame + data.reloadTime/baseSpeedMult
+		Spring.SetUnitWeaponState(unitID, data.weaponToReload, "reloadState", reloadFrameVal)
+	end
+	if (data.reloadTime and data.useSpecialReloadFrame) then
+		local reloadFrameVal = frame + data.reloadTime
+		Spring.SetUnitRulesParam(unitID, "specialReloadFrame", reloadFrameVal, LOS_ACCESS)
+		Spring.SetUnitRulesParam(unitID, "specialReloadStart", frame, LOS_ACCESS)
+	end
+	return true
 end
 
 -- process command
@@ -152,18 +147,13 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
+local CMD_INSERT = CMD.INSERT
+local CMD_OPT_ALT = CMD.OPT_ALT
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if cmdID == CMD_ONECLICK_WEAPON and not cmdOptions.shift then
-		if defs[unitDefID] and defs[unitDefID].dummy then
-			return true
-		end
-		
-		local cmd = Spring.GetCommandQueue(unitID, 1)
-		if cmd and cmd[1] and cmd[1].id and cmd[1].id == CMD_ONECLICK_WEAPON then
-			Spring.GiveOrderToUnit(unitID,CMD.REMOVE,{cmd[1].tag}, 0)
-			return false
-		end
-		Spring.GiveOrderToUnit(unitID,CMD.INSERT,{0,CMD_ONECLICK_WEAPON,cmdParams[1] or 1}, CMD.OPT_ALT)
+	if cmdID == CMD_INSERT
+	and cmdParams[1] == 0
+	and cmdParams[2] == CMD_ONECLICK_WEAPON
+	and cmdParams[3] == CMD_OPT_ALT then
 		return false
 	end
 	return true

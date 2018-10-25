@@ -2996,7 +2996,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 				controlledUnit.airpad.cost = controlledUnit.airpad.cost - ud.metalCost
 				controlledUnit.airpad.count = controlledUnit.airpad.count - 1
 				controlledUnit.airpadByID[unitID] = nil
-			elseif ud.customParams.ismex then
+			elseif ud.customParams.ismex and buildDefs.econByDefId[unitDefID] then
 				if controlledUnit.mexByID[unitID].onDefenceHeatmap then
 					editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,-1,0)
 				end
@@ -3005,7 +3005,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 				controlledUnit.mexByID[controlledUnit.mex[controlledUnit.mex.count]].index = index
 				controlledUnit.mexByID[unitID] = nil
 				removeIndexFromArray(controlledUnit.mex,index)
-			elseif ud.isFactory then -- factory
+			elseif ud.isFactory and buildDefs.factoryByDefId[unitDefID] then -- factory
 				local data = controlledUnit.factoryByID[unitID]
 				if data.retreatPointSet then
 					GG.Retreat_ToggleHaven(unitTeam, data.nanoX, data.nanoZ)
@@ -3256,7 +3256,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 				controlledUnit.airpad.cost = controlledUnit.airpad.cost + ud.metalCost
 				controlledUnit.airpad.count = controlledUnit.airpad.count + 1
 				controlledUnit.airpadByID[unitID] = { ud = ud, cost = ud.metalCost, finished = false}
-			elseif ud.customParams.ismex then
+			elseif ud.customParams.ismex and buildDefs.econByDefId[unitDefID] then
 				local x,y,z = spGetUnitPosition(unitID)
 				if not built then
 					editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,1,0)
@@ -3265,7 +3265,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 				controlledUnit.mex[controlledUnit.mex.count] = unitID
 				controlledUnit.mexByID[unitID] = {finished = false,index = controlledUnit.mex.count, 
 					ud = ud, x = x, y = y, z = z, cost = ud.metalCost, onDefenceHeatmap = not built}
-			elseif ud.isFactory then -- factory
+			elseif ud.isFactory and buildDefs.factoryByDefId[unitDefID] then -- factory
 				local x,y,z = spGetUnitPosition(unitID)
 				local mx,my,mz = getPositionTowardsMiddle(unitID, 500, 25)
 				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250, -25)
@@ -3451,9 +3451,9 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 			controlledUnit.anyByID[unitID].finished = true
 			if unitDefID == buildDefs.airpadDefID then
 				controlledUnit.airpadByID[unitID].finished = true
-			elseif ud.customParams.ismex then
+			elseif ud.customParams.ismex and buildDefs.econByDefId[unitDefID] then
 				controlledUnit.mexByID[unitID].finished = true
-			elseif ud.isFactory then -- factory
+			elseif ud.isFactory and buildDefs.factoryByDefId[unitDefID] then -- factory
 				a.conJob.factory.assignedBP = a.conJob.factory.assignedBP + ud.buildSpeed
 				a.totalBP = a.totalBP + controlledUnit.factoryByID[unitID].bp
 				a.uncompletedFactory = false

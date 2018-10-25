@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Blimpy]],
   description         = [[Dodo Bomber]],
   airHoverFactor      = 0,
+  activateWhenBuilt   = true,
   brakerate           = 0.4,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -52,6 +53,7 @@ unitDef = {
 
   },
   sightDistance       = 512,
+  sonarDistance       = 512,
   turnRate            = 6000,
   workerTime          = 0,
 

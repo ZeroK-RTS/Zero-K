@@ -19,6 +19,7 @@ local options = VFS.Include("ModOptions.lua")
 
 local displayExceptions = {
 	mutespec = true,
+	mutelobby = true,
 }
 
 -- gui elements

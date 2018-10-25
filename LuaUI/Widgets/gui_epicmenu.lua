@@ -2689,14 +2689,14 @@ local function MakeQuitButtons()
 		desc = "Ask teammates to resign",
 		icon = imgPath..'epicmenu/whiteflag_check.png',
 		OnChange = function()
-				if not (Spring.GetSpectatingState() or PlayingButNoTeammate() or isMission) then
+				if not (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission) then
 					spSendCommands("say !poll resign")
 					ActionMenu()
 				end
 			end,
 		key = 'Vote Resign',
 		DisableFunc = function() 
-			return (Spring.GetSpectatingState() or PlayingButNoTeammate() or isMission) 
+			return (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission)
 		end, --function that trigger grey colour on buttons (not actually disable their functions)
 	})
 	AddOption('', {
@@ -2762,10 +2762,6 @@ local function MakeQuitButtons()
 			MakeExitConfirmWindow("Are you sure you want to leave the battle?", function()
 				if AllowPauseOnMenuChange(true) then
 					spSendCommands("pause 1")
-				end
-				if not (IsSinglePlayer() or Spring.GetSpectatingState()) then
-					Spring.SendLuaRulesMsg("forceresign")
-					spSendCommands("spectator")
 				end
 				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
 					Spring.Reload("")

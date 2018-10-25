@@ -421,6 +421,59 @@ local options = {
     section= 'silly',
     def    = false,
   },
+	{
+		key     = 'maxunits',
+		name    = 'Max units',
+		desc    = 'Determines how many units and buildings a player is allowed to own at a time',
+		type    = 'number',
+		section = 'multipliers',
+		def     = 10000, -- don't change to anything reachable, won't take effect; engine default is ~10K 
+		                 -- (actually 32K / #teams so 1v1+gaia allows ~10K each)
+		min     = 10,
+		max     = 10000,
+		step    = 10,
+	},
+	{
+		key     = 'minspeed',
+		name    = 'Minimum game speed',
+		desc    = 'Sets the minimum speed that the players will be allowed to change to',
+		type    = 'number',
+		section = 'multipliers',
+		def     = 0.3, -- don't change, won't take effect as this is engine value
+		min     = 0.1,
+		max     = 2.0,
+		step    = 0.1,
+	},
+	{
+		key     = 'maxspeed',
+		name    = 'Maximum game speed',
+		desc    = 'Sets the maximum speed that the players will be allowed to change to',
+		type    = 'number',
+		section = 'multipliers',
+		def     = 20.0, -- don't change, won't take effect as this is engine value
+		min     = 0.5,
+		max     = 20.0,
+		step    = 0.1,
+	},
+	{
+		key     = 'disablemapdamage',
+		name    = 'Disable map deformation',
+		desc    = 'Prevents the map shape from being changed by weapons and terraforming',
+		type    = 'bool',
+		section = 'mapsettings',
+		def     = false, -- don't change, won't take effect as this is engine value
+	},
+	--[[ Engine option, would need proper UI before enabling
+	{
+		key     = 'fixedallies',
+		name    = 'Disallow ceasefire',
+		desc    = 'Is ceasefire banned? For FFA.',
+		type    = 'bool',
+		section = 'experimental',
+		def     = true, -- don't change, won't take effect as this is engine value
+	},
+	]]
+
   --{
   --  key		= "enableunlocks",
   --  name	= "Enable unlock system",
@@ -556,6 +609,14 @@ local options = {
     min    = 0.1,
     max    = 10,
     step   = 0.05,
+  },
+  {
+    key     = 'chicken_endless',
+    name    = 'Infinite Chicken',
+    desc    = 'Queen does not spawn, waves go on forever.',
+    type    = "bool",
+    def     = false,
+    section = 'chicken',
   },
   {
     key    = 'graceperiod',

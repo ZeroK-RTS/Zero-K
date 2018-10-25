@@ -814,6 +814,9 @@ local function GetColor(msg)
 	if msg.highlight then
 		return options.color_highlight.value
 	end
+	if msg.point then
+		return options.color_ally.value
+	end
 	return options[ msgTypeColors[msg.msgtype] or 'color_chat' ].value
 end
 

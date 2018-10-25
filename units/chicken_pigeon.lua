@@ -2,6 +2,7 @@ unitDef = {
   unitname            = [[chicken_pigeon]],
   name                = [[Pigeon]],
   description         = [[Flying Spore Scout]],
+  activateWhenBuilt   = true,
   acceleration        = 0.8,
   brakeRate           = 0.32,
   buildCostEnergy     = 0,
@@ -33,7 +34,7 @@ unitDef = {
   maxSlope            = 18,
   maxVelocity         = 10,
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB STUPIDTARGET]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE STUPIDTARGET]],
   objectName          = [[chicken_pigeon.s3o]],
   power               = 50,
   selfDestructAs      = [[NOWEAPON]],
@@ -48,6 +49,7 @@ unitDef = {
 
   },
   sightDistance       = 512,
+  sonarDistance       = 512,
   turnRate            = 6000,
   workerTime          = 0,
 
@@ -113,7 +115,6 @@ unitDef = {
       
       damage                  = {
         default = 75,
-        subs    = 3.75,
       },
 
       dance                   = 60,
@@ -138,7 +139,7 @@ unitDef = {
       tracks                  = true,
       turnRate                = 24000,
       turret                  = true,
-      waterweapon             = false,
+      waterWeapon             = true,
       weaponAcceleration      = 100,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 500,

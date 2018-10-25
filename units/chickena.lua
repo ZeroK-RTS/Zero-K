@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Cockatrice]],
   description         = [[Assault/Anti-Armor]],
   acceleration        = 0.36,
+  activateWhenBuilt   = true,
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -12,7 +13,7 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  category            = [[LAND]],
+  category            = [[LAND SINK]],
 
   customParams        = {
   },
@@ -31,7 +32,7 @@ unitDef = {
   minCloakDistance    = 75,
   movementClass       = [[AKBOT6]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB MINE]],
+  noChaseCategory     = [[SHIP SWIM FLOAT TERRAFORM FIXEDWING SATELLITE GUNSHIP MINE]],
   objectName          = [[chickena.s3o]],
   power               = 420,
   selfDestructAs      = [[NOWEAPON]],
@@ -46,6 +47,7 @@ unitDef = {
 
   },
   sightDistance       = 256,
+  sonarDistance       = 256,
   trackOffset         = 7,
   trackStrength       = 9,
   trackStretch        = 1,
@@ -61,7 +63,7 @@ unitDef = {
       def                = [[WEAPON]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 120,
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER SUB SHIP FIXEDWING GUNSHIP]],
     },
 
   },
@@ -129,8 +131,6 @@ unitDef = {
 
       damage                  = {
         default = 1700,
-        planes  = 1700,
-        subs    = 6,
       },
 
       explosionGenerator      = [[custom:NONE]],

@@ -694,15 +694,21 @@ local function DrawIncomeLabels()
 		local y = spGetGroundHeight(x,z)
 		if y < 0 then y = 0 end
 
-		local metal = spot.metal
-
 		glPushMatrix()
 		glTranslate(x,y+5,z)
 		glRotate(90,1,0,0)
 		glRotate(-dir, 0, 0, 1)
 
 		if options.drawicons.value then
+			local metal = spot.metal
 			local size = options.size.value
+			if metal >= 100 then
+				size = size * 7
+				metal = 1 -- capped so that the icons dont outgrow the map if somebody puts insane values
+			elseif metal >= 10 then
+				size = size * 3
+				metal = metal / 10
+			end
 			local width = metal*size
 			glTexRect(-width/2, 40, width/2, 40+size,0,0,metal,1)
 		else

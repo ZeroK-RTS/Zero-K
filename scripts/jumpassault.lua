@@ -13,7 +13,7 @@ local ram = piece 'ram'
 local spike = piece 'spike' 
 
 include "constants.lua"
-include "RockPiece.lua"
+include "rockPiece.lua"
 include "JumpRetreat.lua"
 
 local smokePieces = {turret}
@@ -36,16 +36,37 @@ local ROCK_FORCE = 0.22
 -- Rock X
 local ROCK_X_SPEED = 10		--Number of half-cycles per second around x-axis.
 local ROCK_X_DECAY = -1/2	--Rocking around x-axis is reduced by this factor each time = piece 'to rock.
-local ROCK_PIECE_X = pre_turret	-- should be negative to alternate rocking direction.
+local ROCK_X_PIECE_X = pre_turret	-- should be negative to alternate rocking direction.
 local ROCK_X_MIN = 0.05 --If around x-axis rock is not greater than this amount, rocking will stop after returning to center.
 local ROCK_X_MAX = 0.5
 
 -- Rock Z
 local ROCK_Z_SPEED = 10		--Number of half-cycles per second around z-axis.
 local ROCK_Z_DECAY = -1/2	--Rocking around z-axis is reduced by this factor each time = piece 'to rock.
-local ROCK_PIECE_Z = pre_turret	-- should be between -1 and 0 to alternate rocking direction.
+local ROCK_Z_PIECE = pre_turret	-- should be between -1 and 0 to alternate rocking direction.
 local ROCK_Z_MIN = 0.05	--If around z-axis rock is not greater than this amount, rocking will stop after returning to center.
 local ROCK_X_MAX = 0.5
+
+local rockData = {
+	[x_axis] = {
+		piece  = ROCK_X_PIECE,
+		speed  = ROCK_X_SPEED,
+		decay  = ROCK_X_DECAY,
+		minPos = ROCK_X_MIN,
+		maxPos = ROCK_X_MAX,
+		signal = SIG_ROCK_X,
+		axis = x_axis,
+	},
+	[z_axis] = {
+		piece  = ROCK_Z_PIECE,
+		speed  = ROCK_Z_SPEED,
+		decay  = ROCK_Z_DECAY,
+		minPos = ROCK_Z_MIN,
+		maxPos = ROCK_Z_MAX,
+		signal = SIG_ROCK_Z,
+		axis = z_axis,
+	},
+}
 
 -- Jumping
 
@@ -216,8 +237,7 @@ function script.Create()
 	Move(base, y_axis, 3)
 	Move(l_rocket, x_axis, 2)
 	Move(r_rocket, x_axis, -2)
-	InitializeRock(ROCK_PIECE_X, ROCK_X_SPEED, ROCK_X_DECAY, ROCK_X_MIN, ROCK_X_MAX, SIG_ROCK_X, x_axis)
-	InitializeRock(ROCK_PIECE_Z, ROCK_Z_SPEED, ROCK_Z_DECAY, ROCK_Z_MIN, ROCK_Z_MAX, SIG_ROCK_Z, z_axis)
+	InitializeRock(rockData)
 	StartThread(SmokeUnit, smokePieces)
 end
 
@@ -251,8 +271,8 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	StartThread(Rock, gunHeading, ROCK_FORCE, z_axis)
-	StartThread(Rock, gunHeading - hpi, ROCK_FORCE, x_axis)
+	StartThread(Rock, z_axis, gunHeading, ROCK_FORCE)
+	StartThread(Rock, x_axis, gunHeading - hpi, ROCK_FORCE)
 	Move(spike, z_axis, 30, 1800)
 	WaitForMove(spike, z_axis)
 	Move(spike, z_axis, 0, 40)

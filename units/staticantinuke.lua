@@ -21,6 +21,7 @@ unitDef = {
   customParams                  = {
 	removewait     = 1,
     nuke_coverage  = 2500,
+    modelradius      = [[75]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

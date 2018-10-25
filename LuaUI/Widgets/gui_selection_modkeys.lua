@@ -18,6 +18,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local spSelectUnitArray = Spring.SelectUnitArray
 local spDiffTimers      = Spring.DiffTimers
 local spGetTimer        = Spring.GetTimer
+local spGetUnitTeam     = Spring.GetUnitTeam
 
 local toleranceTime = Spring.GetConfigInt('DoubleClickTime', 300) * 0.001 -- no event to notify us if this changes but not really a big deal
 toleranceTime = toleranceTime + 0.03 -- fudge for Update
@@ -50,6 +51,11 @@ local prevTargetID = false
 local mousePressed = false
 
 local prevClick = spGetTimer()
+
+local myTeamID
+function widget:PlayerChanged()
+	myTeamID = (not Spring.GetSpectatingState()) and Spring.GetMyTeamID() -- nil if spectating, to be able to select any unit
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -103,7 +109,7 @@ local function HandleUnitSelection(selectedUnits, targetID, needSelection)
 	
 	local unitDefID = Spring.GetUnitDefID(targetID)
 	if unitDefID and ctrl then
-		local typeUnits = Spring.GetTeamUnitsByDefs(Spring.GetMyTeamID(), unitDefID)
+		local typeUnits = Spring.GetTeamUnitsByDefs(myTeamID or spGetUnitTeam(targetID), unitDefID)
 		local unitList = {}
 		for i = 1, #typeUnits do
 			local unitID = typeUnits[i]
@@ -232,4 +238,8 @@ function widget:Update()
 		MouseRelease(x, y)
 		mousePressed = false
 	end
+end
+
+function widget:Initialize()
+	widget:PlayerChanged()
 end

@@ -1332,9 +1332,10 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
 			
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
-			spSetUnitHealth(id, 0.01)
-			
-            if id then			
+			if not id then
+				-- TODO: notify user? SendToUnsynced("terra_failed_unitlimit", team, terraunitX, terraunitZ) -> Script.LuaUI.something -> Spring.MarkerAddPoint
+			else
+				spSetUnitHealth(id, 0.01)
 				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 				spSetUnitRulesParam(id, "terraformType", terraform_type)

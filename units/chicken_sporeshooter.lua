@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Sporeshooter]],
   description         = [[All-Terrain Spores (Anti-Air/Skirm)]],
   acceleration        = 0.36,
+  activateWhenBuilt   = true,
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -46,7 +47,7 @@ unitDef = {
 
   },
   sightDistance       = 512,
-  sonarDistance       = 450,
+  sonarDistance       = 512,
   trackOffset         = 0.5,
   trackStrength       = 9,
   trackStretch        = 1,

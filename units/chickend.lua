@@ -48,6 +48,7 @@ unitDef = {
 
   },
   sightDistance                 = 512,
+  sonarDistance                 = 512,
   turnRate                      = 0,
   upright                       = false,
   useBuildingGroundDecal        = true,

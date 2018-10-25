@@ -393,7 +393,7 @@ function UpdateCustomParamResourceData()
 	cp.team_nanoframeTotal = 0
 	cp.team_nanoframeValue = 0
 	cp.team_metalExcess = 0
-	local allies = Spring.GetTeamList(teamID)
+	local allies = Spring.GetTeamList(Spring.GetMyAllyTeamID())
 	if allies then
 		for i = 1, #allies do
 			local allyID = allies[i]

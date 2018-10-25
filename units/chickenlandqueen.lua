@@ -3,6 +3,7 @@ unitDef = {
   name                   = [[Chicken Queen]],
   description            = [[Clucking Hell!]],
   acceleration           = 1,
+  activateWhenBuilt      = true,
   autoHeal               = 0,
   brakeRate              = 3,
   buildCostEnergy        = 0,
@@ -52,7 +53,7 @@ unitDef = {
 
   },
   sightDistance          = 2048,
-  sonarDistance          = 450,
+  sonarDistance          = 2048,
   trackOffset            = 18,
   trackStrength          = 8,
   trackStretch           = 1,

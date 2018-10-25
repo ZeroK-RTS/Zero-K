@@ -38,6 +38,7 @@ unitDef = {
   objectName          = [[cormart.s3o]],
   pushResistant       = 0,
   selfDestructAs      = [[BIG_UNITEX]],
+  script              = [[tankarty.lua]],
   sightDistance       = 660,
   trackOffset         = 8,
   trackStrength       = 8,
