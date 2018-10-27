@@ -85,7 +85,7 @@ function script.Create()
 	Hide (gunR)
 	Move (aimpoint, z_axis, -4)
 	Move (aimpoint, y_axis, 0)
-	Move (aimpoint, x_axis, -9)
+	Move (aimpoint, x_axis, 0)
 	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
