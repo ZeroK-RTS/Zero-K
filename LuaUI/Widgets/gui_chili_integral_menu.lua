@@ -699,7 +699,7 @@ local function QueueClickFunc(mouse, right, alt, ctrl, meta, shift, queueCmdID, 
 	return true
 end
 
-local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton, queueBlock)
+local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, fakeFactory, isQueueButton, queueBlock)
 	local left, right = mouse == 1, mouse == 3
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	if factoryUnitID and isQueueButton then
@@ -707,8 +707,7 @@ local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton
 		return true
 	end
 
-	
-	if alt and factoryUnitID and options.altInsertBehind.value then
+	if alt and factoryUnitID and options.altInsertBehind.value and (not fakeFactory) then
 		local state = Spring.GetUnitStates(factoryUnitID)
 		-- Repeat alt has to be handled by engine so that the command is removed after completion.
 		if state and not state["repeat"] then
@@ -744,6 +743,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	local cmdID
 	local usingGrid
 	local factoryUnitID
+	local fakeFactory
 	local queueCount
 	local isDisabled = false
 	local isSelected = false
@@ -757,7 +757,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		if isDisabled then
 			return false
 		end
-		local sucess = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton, x)
+		local sucess = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, fakeFactory, isQueueButton, x)
 		if sucess and onClick then
 			-- Don't do the onClick if the command was not eaten by the menu.
 			onClick(cmdID)
@@ -975,8 +975,9 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	end
 	
 	local currentOverflow, onMouseOverFun
-	function externalFunctionsAndData.SetQueueCommandParameter(newFactoryUnitID, overflow)
+	function externalFunctionsAndData.SetQueueCommandParameter(newFactoryUnitID, overflow, newFakeFactory)
 		factoryUnitID = newFactoryUnitID
+		fakeFactory = newFakeFactory
 		if buttonLayout.dotDotOnOverflow then
 			currentOverflow = overflow 
 			if overflow then
@@ -1531,7 +1532,7 @@ local function GetSelectionValues()
 	return false, nil, nil, #selection
 end
 
-local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, selectionIndex)
+local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex)
 	if hiddenCommands[command.id] or command.hidden then
 		return
 	end
@@ -1563,7 +1564,7 @@ local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, selectio
 			
 			button.SetCommand(command)
 			if data.factoryQueue then
-				button.SetQueueCommandParameter(factoryUnitID)
+				button.SetQueueCommandParameter(factoryUnitID, nil, fakeFactory)
 			end
 			return
 		end
@@ -1593,11 +1594,11 @@ local function ProcessAllCommands(commands, customCommands)
 	statePanel.commandCount = 0
 	
 	for i = 1, #commands do
-		ProcessCommand(commands[i], factoryUnitID, factoryUnitDefID, selectionIndex)
+		ProcessCommand(commands[i], factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex)
 	end
 	
 	for i = 1, #customCommands do
-		ProcessCommand(customCommands[i], factoryUnitID, factoryUnitDefID, selectionIndex)
+		ProcessCommand(customCommands[i], factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex)
 	end
 	
 	-- Call factory queue update here because the update will globally
