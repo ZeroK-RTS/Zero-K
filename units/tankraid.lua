@@ -26,7 +26,7 @@ unitDef = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[tankscout]],
-  idleAutoHeal        = 15,
+  idleAutoHeal        = 12,
   idleTime            = 150,
   leaveTracks         = true,
   maxDamage           = 860,
@@ -87,7 +87,7 @@ unitDef = {
 
 		area_damage = 1,
 		area_damage_radius = 108,
-		area_damage_dps = 50,
+		area_damage_dps = 36,
 		area_damage_duration = 20,
 		
 		light_color = [[1.6 0.8 0.32]],
@@ -95,9 +95,9 @@ unitDef = {
 	  },
 	  
       damage                  = {
-        default = 40,
-        planes  = 40,
-        subs    = 2,
+        default = 30,
+        planes  = 30,
+        subs    = 1.5,
       },
 
       explosionGenerator      = [[custom:napalm_koda]],
