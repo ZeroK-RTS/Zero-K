@@ -14,6 +14,7 @@ local breech = piece 'breech'
 local smoke = piece 'smoke'
 
 local gunHeading = 0
+local moving = false
 
 local RESTORE_DELAY = 3000
 
@@ -23,6 +24,7 @@ local SIG_MOVE = 2 --Signal to prevent multiple track motion
 local SIG_TILT = 4
 local SIG_RAISE = 8
 local SIG_PUSH = 16
+local SIG_STOW = 32
 
 local TURRET_SPEED = math.rad(35)
 local TURRET_SPEED_2 = math.rad(70)
@@ -34,11 +36,11 @@ local BREECH_SPEED = 0.5
 
 local smokePiece = {main, smoke}
 
-local ROCK_FIRE_FORCE_TILT = 0.2
-local ROCK_FIRE_FORCE_PUSH = 8
+local ROCK_FIRE_FORCE_TILT = 0.35
+local ROCK_FIRE_FORCE_PUSH = 10
 
 local ROCK_SPEED = 7 --Number of half-cycles per second around x-axis.
-local ROCK_DECAY = -0.3 --Rocking around axis is reduced by this factor each time = piece 'to rock.
+local ROCK_DECAY = -0.25 --Rocking around axis is reduced by this factor each time = piece 'to rock.
 local ROCK_PIECE = main -- should be negative to alternate rocking direction.
 local ROCK_MIN = 0.001 --If around axis rock is not greater than this amount, rocking will stop after returning to center.
 local ROCK_MAX = 40
@@ -54,7 +56,7 @@ local rockData = {
 		minSpeed = 0.05,
 		axis = z_axis,
 		extraEffect = function (pos, speed)
-			Move(main, y_axis, math.abs(pos)*25, speed*25)
+			Move(main, y_axis, math.abs(pos)*25, speed*35)
 		end
 	},
 	[2] = {
@@ -85,6 +87,18 @@ local trackData = {
 	trackPeriod = 50,
 }
 
+local ableToMove = true
+local function SetAbleToMove(newMove)
+	if ableToMove == newMove then
+		return
+	end
+	ableToMove = newMove
+	
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.01)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.01)
+	GG.UpdateUnitAttributes(unitID)
+end
+
 for i = 1, 4 do
 	trackData.tracks[i] = piece ('tracks' .. i)
 end
@@ -92,11 +106,29 @@ for i = 2, 7 do
 	trackData.wheels.large[i-1] = piece ('wheels' .. i)
 end
 
+local function StowGun()
+	Signal(SIG_STOW)
+	SetSignalMask(SIG_STOW)
+	
+	Turn(turret, y_axis, 0, TURRET_SPEED)
+	Turn(outer, x_axis, 0, TURRET_SPEED)
+	Turn(inner, x_axis, 0, TURRET_SPEED_2)
+	Turn(sleeve, x_axis, 0, TURRET_SPEED_2)
+	WaitForTurn(turret, y_axis)
+	WaitForTurn(sleeve, x_axis)
+	SetAbleToMove(true)
+end
+
 function script.StartMoving()
+	moving = true
 	StartThread(TrackControlStartMoving)
+	StartThread(StowGun)
 end
 
 function script.StopMoving()
+	moving = false
+	Signal(SIG_STOW)
+	SetAbleToMove(false)
 	TrackControlStopMoving()
 end
 
@@ -122,6 +154,11 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
+	
+	if moving then
+		return false
+	end
+	
 	Turn(turret, y_axis, heading, TURRET_SPEED)
 	Turn(outer, x_axis, -pitch, TURRET_SPEED)
 	Turn(inner, x_axis, 2 * pitch, TURRET_SPEED_2)
