@@ -87,11 +87,11 @@ local weaponDefs = {
     
     customParams          = {
       setunitsonfire = "1",
-      burntime = 60,
+      burntime = 30,
       
       area_damage = 1,
       area_damage_radius = 128,
-      area_damage_dps = 16,
+      area_damage_dps = 18,
       area_damage_duration = 20,
       
       --lups_heat_fx = [[firewalker]],
