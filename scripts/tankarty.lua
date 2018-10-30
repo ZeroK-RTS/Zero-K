@@ -94,8 +94,8 @@ local function SetAbleToMove(newMove)
 	end
 	ableToMove = newMove
 	
-	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.01)
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.01)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.05)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.05)
 	GG.UpdateUnitAttributes(unitID)
 end
 
@@ -128,7 +128,6 @@ end
 function script.StopMoving()
 	moving = false
 	Signal(SIG_STOW)
-	SetAbleToMove(false)
 	TrackControlStopMoving()
 end
 
@@ -158,6 +157,7 @@ function script.AimWeapon(num, heading, pitch)
 	if moving then
 		return false
 	end
+	SetAbleToMove(false)
 	
 	Turn(turret, y_axis, heading, TURRET_SPEED)
 	Turn(outer, x_axis, -pitch, TURRET_SPEED)
