@@ -27,7 +27,7 @@ unitDef = {
   customParams        = {
     modelradius      = [[10]],
     requireammo      = [[1]],
-    reammoseconds    = [[30]],
+    reammoseconds    = [[20]],
     refuelturnradius = [[150]],
 	reallyabomber    = [[1]],
   },
