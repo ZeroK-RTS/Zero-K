@@ -1051,9 +1051,9 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 30,
+		skirmLeeway = -45,
 		skirmOrderDis = 200,
-		velocityPrediction = 60,
+		velocityPrediction = 120,
 		skirmBlockedApproachFrames = 40,
 	},
 	["shipskirm"] = {

@@ -86,7 +86,7 @@ local FEATURE = 102
 local GROUND = 103
 local UNIT = 117
 
-local FLY_TIME = 135
+local FLY_TIME = 120
 
 local throwUnits = IterableMap.New()
 local physicsRestore = IterableMap.New()

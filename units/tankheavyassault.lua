@@ -80,6 +80,7 @@ unitDef = {
 	    gatherradius = [[105]],
 	    smoothradius = [[70]],
 	    smoothmult   = [[0.4]],
+		force_ignore_ground = [[1]],
 		
 		light_color = [[3 2.33 1.5]],
 		light_radius = 150,
