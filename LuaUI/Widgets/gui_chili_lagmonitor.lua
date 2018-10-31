@@ -115,6 +115,12 @@ function widget:Initialize()
 			teamNames[teamID] = Spring.GetPlayerInfo(playerID)
 		end
 	end
+
+	if isSpectator then
+		widgetHandler:RemoveCallIn("TeamAfked")
+		widgetHandler:RemoveCallIn("TeamUnafked")
+		widgetHandler:RemoveCallIn("TeamTaken")
+	end
 end
 
 local function GetColoredName(teamID)
