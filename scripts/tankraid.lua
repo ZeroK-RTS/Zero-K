@@ -18,8 +18,8 @@ local SIG_AIM1 = 1
 local ANIM_SPEED = 50
 local RESTORE_DELAY = 3000
 
-local TURRET_TURN_SPEED = 550
-local GUN_TURN_SPEED = 220
+local TURRET_TURN_SPEED = math.rad(900)
+local GUN_TURN_SPEED = math.rad(400)
 
 local WHEEL_TURN_SPEED1 = 480
 local WHEEL_TURN_SPEED1_ACCELERATION = 75
@@ -168,8 +168,8 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM1)
 	SetSignalMask(SIG_AIM1)
 	
-	Turn(turret, y_axis, heading, math.rad(TURRET_TURN_SPEED))
-	Turn(sleeve, x_axis, -pitch, math.rad(GUN_TURN_SPEED))
+	Turn(turret, y_axis, heading, TURRET_TURN_SPEED)
+	Turn(sleeve, x_axis, -pitch, GUN_TURN_SPEED)
 	
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(sleeve, x_axis)
