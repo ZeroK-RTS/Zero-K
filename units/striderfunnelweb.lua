@@ -5,7 +5,7 @@ unitDef = {
   acceleration           = 0.0552,
   activateWhenBuilt      = true,
   brakeRate              = 0.1375,
-  buildCostMetal         = 4500,
+  buildCostMetal         = 3000,
   buildPic               = [[striderfunnelweb.png]],
   builder                = true,
   
@@ -58,7 +58,7 @@ unitDef = {
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 85,
   turnRate               = 240,
-  workerTime             = 50,
+  workerTime             = 35,
 
   weapons                = {
 
@@ -86,10 +86,10 @@ unitDef = {
       shieldBadColor          = [[1 0.1 0.1 1]],
       shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
-      shieldPower             = 36000,
-      shieldPowerRegen        = 300,
+      shieldPower             = 24000,
+      shieldPowerRegen        = 200,
       shieldRechargeDelay     = 10,
-      shieldPowerRegenEnergy  = 72,
+      shieldPowerRegenEnergy  = 48,
       shieldRadius            = 550,
       shieldRepulser          = false,
       smartShield             = true,
