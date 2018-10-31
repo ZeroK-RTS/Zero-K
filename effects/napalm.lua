@@ -11,7 +11,7 @@ local function GetPloomPos(pos)
 	  water              = true,
 	  properties = {
 		delay              = [[0]],
-		explosiongenerator = [[custom:napalmfireball_600_small]],
+		explosiongenerator = [[custom:napalmfireball_480_small]],
 		pos                = pos,
 	  },
 	}
@@ -63,7 +63,7 @@ local cegs = {
       water              = true,
       properties = {
         delay              = 0,
-        explosiongenerator = [[custom:napalmfireball_600_main]],
+        explosiongenerator = [[custom:napalmfireball_480_main]],
         pos                = [[0 0 0]],
       },
     },
@@ -544,7 +544,7 @@ local altforms = {
     modifications = {
       rocks = {
 		colormap   = [[0 0 0 0.002   .5 .5 .5 0.010     .5 .5 .5 0.08    .4 .4 .4 0.06   0 0 0 0.003]],
-	    properties = {particlelife = 400, particlelifespread = 200, particlesize = 110, particlesizespread = 25,},
+	    properties = {particlelife = 590, particlelifespread = 50, particlesize = 110, particlesizespread = 25,},
       },
     },
   },
@@ -563,6 +563,24 @@ local altforms = {
       rocks = {
 		colormap   = [[0 0 0 0.001   .3 .3 .3 0.04     .3 .3 .3 0.03    .2 .2 .2 0.02   0 0 0 0.001]],
 	    properties = {particlelife = 200, particlelifespread = 400, particlesize = 28, particlesizespread = 12,},
+      },
+    },
+  },
+  napalmfireball_480_main = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+		colormap   = [[0 0 0 0.002   .5 .5 .5 0.010     .5 .5 .5 0.08    .4 .4 .4 0.06   0 0 0 0.003]],
+	    properties = {particlelife = 470, particlelifespread = 30, particlesize = 110, particlesizespread = 25,},
+      },
+    },
+  },
+  napalmfireball_480_small = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+		colormap   = [[0 0 0 0.001   .3 .3 .3 0.04     .3 .3 .3 0.03    .2 .2 .2 0.02   0 0 0 0.001]],
+	    properties = {particlelife = 200, particlelifespread = 280, particlesize = 28, particlesizespread = 12,},
       },
     },
   },
