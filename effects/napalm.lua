@@ -579,7 +579,7 @@ local altforms = {
     source = "napalmfireball_200",
     modifications = {
       rocks = {
-		colormap   = [[0 0 0 0.001   .3 .3 .3 0.04     .3 .3 .3 0.03    .2 .2 .2 0.02   0 0 0 0.001]],
+		colormap   = [[0 0 0 0.001   .3 .3 .3 0.035     .3 .3 .3 0.025   .2 .2 .2 0.018   0 0 0 0.001]],
 	    properties = {particlelife = 200, particlelifespread = 280, particlesize = 28, particlesizespread = 12,},
       },
     },
