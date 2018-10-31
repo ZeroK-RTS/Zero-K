@@ -209,7 +209,7 @@ function script.BlockShot(num)
 	return flaming
 end
 
-function script.Shot(num)		
+function script.Shot(num)
 	--[[
 	Turn(firepoint, y_axis, math.rad(25))
 	EmitSfx(firepoint, FIRE_W2)
@@ -218,6 +218,10 @@ function script.Shot(num)
 	Turn(firepoint, y_axis, 0)
 	--]]
 	StartThread(Recoil)
+end
+
+function script.BlockShot(num, targetID)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 125, 50)
 end
 
 function script.Killed(severity, corpsetype)

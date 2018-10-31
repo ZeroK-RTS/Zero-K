@@ -557,20 +557,11 @@ local altforms = {
       },
     },
   },
-  napalmfireball_600_small = {
-    source = "napalmfireball_200",
-    modifications = {
-      rocks = {
-		colormap   = [[0 0 0 0.001   .3 .3 .3 0.04     .3 .3 .3 0.03    .2 .2 .2 0.02   0 0 0 0.001]],
-	    properties = {particlelife = 200, particlelifespread = 400, particlesize = 28, particlesizespread = 12,},
-      },
-    },
-  },
   napalmfireball_480_main = {
     source = "napalmfireball_200",
     modifications = {
       rocks = {
-		colormap   = [[0 0 0 0.002   .5 .5 .5 0.010     .5 .5 .5 0.08    .4 .4 .4 0.06   0 0 0 0.003]],
+		colormap   = [[0 0 0 0.002   .35 .35 .35 0.010     .25 .25 .25 0.08    .12 .12 .12 0.06   0 0 0 0.003]],
 	    properties = {particlelife = 470, particlelifespread = 30, particlesize = 110, particlesizespread = 25,},
       },
     },
@@ -579,7 +570,7 @@ local altforms = {
     source = "napalmfireball_200",
     modifications = {
       rocks = {
-		colormap   = [[0 0 0 0.001   .3 .3 .3 0.035     .3 .3 .3 0.025   .2 .2 .2 0.018   0 0 0 0.001]],
+		colormap   = [[0 0 0 0.001   .2 .2 .2 0.035     .2 .2 .2 0.025   .12 .12 .12 0.018   0 0 0 0.001]],
 	    properties = {particlelife = 200, particlelifespread = 280, particlesize = 28, particlesizespread = 12,},
       },
     },
