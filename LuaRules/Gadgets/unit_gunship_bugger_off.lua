@@ -44,7 +44,6 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 		local angle = math.random()*TAU
 		local x, _, z = Spring.GetUnitPosition(unitID)
 		Spring.Utilities.GiveClampedMoveGoalToUnit(unitID, x + RADIUS*math.cos(angle), z + RADIUS*math.sin(angle))
-		spGiveOrderToUnit(unitID, CMD_WAIT, {}, 0)
-		spGiveOrderToUnit(unitID, CMD_WAIT, {}, 0)
+		GG.WaitWaitMoveUnit(unitID)
 	end
 end

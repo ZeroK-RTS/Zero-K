@@ -65,7 +65,7 @@ unitDef = {
   useBuildingGroundDecal = true,
   waterline        = 1,
   workerTime       = Shared.FACTORY_BUILDPOWER,
-  yardMap          = [[xoooooox ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo xoccccox yyyyyyyy yyyyyyyy yyyyyyyy yyyyyyyy]],
+  yardMap          = [[xoooooox oooooooo oooooooo ooccccoo ooccccoo ooccccoo ooccccoo xoccccox yyyyyyyy yyyyyyyy yyyyyyyy yyyyyyyy]],
 
   featureDefs      = {
 

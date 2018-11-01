@@ -196,18 +196,18 @@ function script.Killed (recentDamage, maxHealth)
 		if (math.random() < severity) then 
 			Explode (turret, sfxFall) 
 		end
-		Explode (sleeve, sfxFall)
-		Explode (tracks[1], sfxShatter)
-		Explode (missiles[1], sfxFall + sfxSmoke)
-		Explode (missiles[2], sfxFall + sfxSmoke + sfxFire)
+		Explode(sleeve, sfxFall)
+		Explode(trackData.tracks[1], sfxShatter)
+		Explode(missiles[1], sfxFall + sfxSmoke)
+		Explode(missiles[2], sfxFall + sfxSmoke + sfxFire)
 		return 2
 	else
-		Explode (base, sfxShatter)
-		Explode (turret, sfxFall + sfxSmoke + sfxFire)
-		Explode (sleeve, sfxFall + sfxSmoke + sfxFire)
-		Explode (tracks[1], sfxShatter)
-		Explode (missiles[1], sfxFall + sfxSmoke)
-		Explode (missiles[2], sfxFall + sfxSmoke + sfxFire)
+		Explode(base, sfxShatter)
+		Explode(turret, sfxFall + sfxSmoke + sfxFire)
+		Explode(sleeve, sfxFall + sfxSmoke + sfxFire)
+		Explode(trackData.tracks[1], sfxShatter)
+		Explode(missiles[1], sfxFall + sfxSmoke)
+		Explode(missiles[2], sfxFall + sfxSmoke + sfxFire)
 		return 2
 	end
 end
