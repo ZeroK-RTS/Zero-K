@@ -54,21 +54,21 @@ if (gadgetHandler:IsSyncedCode()) then
 --  SYNCED
 -----------------------------------------------------------------------------------
 -- speedups
-local spSetGameRulesParam	= Spring.SetGameRulesParam
-local spSetTeamRulesParam	= Spring.SetTeamRulesParam
-local spSetTeamResource		= Spring.SetTeamResource
-local spCreateUnit			= Spring.CreateUnit
-local spSetUnitHealth		= Spring.SetUnitHealth
-local spSetUnitMaxHealth	= Spring.SetUnitMaxHealth
-local spSetUnitVelocity		= Spring.SetUnitVelocity
-local spSetUnitRotation		= Spring.SetUnitRotation
-local spSetUnitExperience	= Spring.SetUnitExperience
-local spSetUnitShieldState	= Spring.SetUnitShieldState
-local spSetUnitWeaponState	= Spring.SetUnitWeaponState
-local spSetUnitStockpile	= Spring.SetUnitStockpile
-local spSetUnitNeutral		= Spring.SetUnitNeutral
-local spGetUnitIsBuilding	= Spring.GetUnitIsBuilding
-local spGiveOrderToUnit		= Spring.GiveOrderToUnit
+local spSetGameRulesParam   = Spring.SetGameRulesParam
+local spSetTeamRulesParam   = Spring.SetTeamRulesParam
+local spSetTeamResource     = Spring.SetTeamResource
+local spCreateUnit          = Spring.CreateUnit
+local spSetUnitHealth       = Spring.SetUnitHealth
+local spSetUnitMaxHealth    = Spring.SetUnitMaxHealth
+local spSetUnitVelocity     = Spring.SetUnitVelocity
+local spSetUnitRotation     = Spring.SetUnitRotation
+local spSetUnitExperience   = Spring.SetUnitExperience
+local spSetUnitShieldState  = Spring.SetUnitShieldState
+local spSetUnitWeaponState  = Spring.SetUnitWeaponState
+local spSetUnitStockpile    = Spring.SetUnitStockpile
+local spSetUnitNeutral      = Spring.SetUnitNeutral
+local spGetUnitIsBuilding   = Spring.GetUnitIsBuilding
+local spGiveOrderToUnit    	= Spring.GiveOrderToUnit
 
 local cmdTypeIconModeOrNumber = {
 	[CMD.AUTOREPAIRLEVEL] = true,
