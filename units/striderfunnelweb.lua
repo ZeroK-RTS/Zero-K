@@ -38,6 +38,8 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[funnelweb.s3o]],
+  radarDistance          = 1400,
+  radarEmitHeight        = 32,
   onoffable              = true,
   selfDestructAs         = [[ESTOR_BUILDING]],
 
