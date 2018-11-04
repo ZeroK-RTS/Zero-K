@@ -18,7 +18,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	modelradius    = [[10]],
+    modelradius    = [[25]],
   },
 
   damageModifier      = 0.25,

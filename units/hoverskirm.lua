@@ -19,7 +19,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	modelradius    = [[19]],
+    modelradius    = [[25]],
 	turnatfullspeed = [[1]],
   },
 

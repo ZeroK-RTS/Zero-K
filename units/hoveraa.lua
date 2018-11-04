@@ -21,7 +21,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    modelradius    = [[20]],
+    modelradius    = [[25]],
     midposoffset   = [[0 8 0]],
   },
 
