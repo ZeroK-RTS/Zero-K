@@ -42,6 +42,7 @@ local DEBRIS_SPRING_DAMAGE_MULTIPLIER = 10 --tweaked arbitrarily
 
 local gameframe = Spring.GetGameFrame()
 local attributes = {}
+local unitWantedVelocity
 
 for unitDefID=1,#UnitDefs do
 	local ud = UnitDefs[unitDefID]
@@ -178,8 +179,11 @@ local function DoCollisionDamage(unitID, unitDefID, otherID)
 		local aVy = myVy*myVelFrac + oVy*(1 - myVelFrac)
 		local aVz = myVz*myVelFrac + oVz*(1 - myVelFrac)
 		
-		GG.AddGadgetImpulseRaw(unitID, aVx - myVx, aVy - myVy, aVz - myVz, true, true)
-		GG.AddGadgetImpulseRaw(otherID, aVx - oVx, aVy - oVy, aVz - oVz, true, true)
+		unitWantedVelocity = unitWantedVelocity or {}
+		unitWantedVelocity[#unitWantedVelocity + 1] = {unitID, aVx, aVy, aVz}
+		unitWantedVelocity[#unitWantedVelocity + 1] = {otherID, aVx, aVy, aVz}
+		--GG.AddGadgetImpulseRaw(unitID, aVx - myVx, aVy - myVy, aVz - myVz, true, true)
+		--GG.AddGadgetImpulseRaw(otherID, aVx - oVx, aVy - oVy, aVz - oVz, true, true)
 		
 		if unitImmune[unitID] then
 			if unitImmune[unitID] < gameframe then
@@ -245,7 +249,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 				local damageTotal = DEBRIS_SPRING_DAMAGE_MULTIPLIER*damage -- Why????
 				damageTotal = damageTotal*(collisionDamageMult[unitID] or 1)
 				--spAddUnitDamage(unitID, damageTotal, 0, nil, -7)
-				GG.AddGadgetImpulseRaw(unitID, -0.8*vx, -0.8*vy, -0.8*vz, true, true)
+				
+				unitWantedVelocity = unitWantedVelocity or {}
+				unitWantedVelocity[#unitWantedVelocity + 1] = {unitID, 0.3}
+				--GG.AddGadgetImpulseRaw(unitID, -1*vx, -1*vy, -1*vz, true, true)
 				return damageTotal
 			end
 			return 0
@@ -318,5 +325,27 @@ function gadget:GameFrame(frame)
 	gameframe = frame
 	if unitAlreadyProcessed then
 		unitAlreadyProcessed = nil
+	end
+	if unitWantedVelocity then
+		local alreadySet = {}
+		for i = 1, #unitWantedVelocity do
+			local unitID = unitWantedVelocity[i][1]
+			if not alreadySet[unitID] then
+				alreadySet[unitID] = true
+				local vx, vy, vz, speed = Spring.GetUnitVelocity(unitID)
+				if vx then
+					if unitWantedVelocity[i][4] then
+						-- Set mode
+						local nx, ny, nz = unitWantedVelocity[i][2], unitWantedVelocity[i][3], unitWantedVelocity[i][4]
+						GG.AddGadgetImpulseRaw(unitID, nx - vx, ny - vy, nz - vz, true, true)
+					else
+						-- Scale mode
+						local scale = unitWantedVelocity[i][2] - 1
+						GG.AddGadgetImpulseRaw(unitID, scale*vx, scale*vy, scale*vz, true, true)
+					end
+				end
+			end
+		end
+		unitWantedVelocity = nil
 	end
 end
