@@ -86,7 +86,7 @@ local FEATURE = 102
 local GROUND = 103
 local UNIT = 117
 
-local FLY_TIME = 120
+local MIN_FLY_TIME = 120
 
 local throwUnits = IterableMap.New()
 local physicsRestore = IterableMap.New()
@@ -123,7 +123,10 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		dz = dz*maxRange/fireDistance
 	end
 	
-	local px, py, pz = dx/FLY_TIME, FLY_TIME*GRAVITY/2 + dy/FLY_TIME, dz/FLY_TIME
+	local flyTime = math.max(MIN_FLY_TIME, math.sqrt(math.abs(dy))*10)
+	Spring.Echo("dy", dy, "flyTime", flyTime)
+	
+	local px, py, pz = dx/flyTime, flyTime*GRAVITY/2 + dy/flyTime, dz/flyTime
 	
 	local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
 	if nearUnits then
@@ -139,10 +142,10 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 				physicsRestore.Add(nearID, 
 					{
 						drag = -1.5,
-						collisionResistence = -5,
+						collisionResistence = -5*flyTime/MIN_FLY_TIME,
 					}
 				)
-				SendToUnsynced("addFlying", nearID, Spring.GetUnitDefID(nearID))
+				SendToUnsynced("addFlying", nearID, Spring.GetUnitDefID(nearID), flyTime)
 				GG.Floating_InterruptFloat(nearID)
 			end
 		end
@@ -363,7 +366,7 @@ local flyFX = {
 		options = {
 			life        = 250,
 			sizeMod     = 4,
-			colormap    = {{0, 0.4, 0.05, 0.006},{0, 0.6, 0.05, 0.006}, {0, 0.4, 0.05, 0.006}, {0, 0, 0, 0.006} , {0, 0, 0, 0.006} },
+			colormap    = {{0, 0.4, 0.05, 0.006},{0, 0.6, 0.05, 0.006}, {0, 0.4, 0.05, 0.006}, {0, 0, 0, 0.006}},
 			texture     = 'bitmaps/GPL/groundflash.tga',
 			count       = 1,
 			quality     = 1, -- Low
@@ -372,7 +375,18 @@ local flyFX = {
 	}
 } 
 
-local function addFlying(_, unitID, unitDefID)
+local function removeFlying(_, unitID)
+	if not particleIDs[unitID] then
+		return
+	end
+	for i = 1, #particleIDs[unitID] do
+		Lups.RemoveParticles(particleIDs[unitID][i])
+	end
+	particleIDs[unitID] = nil
+end
+
+local function addFlying(_, unitID, unitDefID, flyTime)
+	removeFlying(nil, unitID)
 	particleIDs[unitID] = {}
 	local teamID = Spring.GetUnitTeam(unitID)
 	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
@@ -385,15 +399,11 @@ local function addFlying(_, unitID, unitDefID)
 		fx.options.allyTeam  = allyTeamID
 		fx.options.size = radius * (fx.options.sizeMod or 1)
 		fx.options.pos = {0, height/2, 0}
+		fx.options.life = flyTime*1.15
 		particleIDs[unitID][#particleIDs[unitID] + 1] = Lups.AddParticles(fx.class,fx.options)
 	end
 end
 
-local function removeFlying(_, unitID)
-	for i = 1, #particleIDs[unitID] do
-		Lups.RemoveParticles(particleIDs[unitID][i])
-	end
-end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
