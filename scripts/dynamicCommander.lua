@@ -185,7 +185,8 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 		else
 			maxRange = range
 		end
-		Spring.SetUnitWeaponState(unitID, weapon1, "range", range)	
+		Spring.SetUnitWeaponState(unitID, weapon1, "range", range)
+		Spring.SetUnitWeaponDamages(unitID, weapon1, "dynDamageRange", range)
 		
 		local damages = WeaponDefs[weaponDef1.weaponDefID].damages
 		for k, v in pairs(damages) do
@@ -211,6 +212,7 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 			maxRange = range
 		end
 		Spring.SetUnitWeaponState(unitID, weapon2, "range", range)
+		Spring.SetUnitWeaponDamages(unitID, weapon2, "dynDamageRange", range)
 		
 		local damages = WeaponDefs[weaponDef2.weaponDefID].damages
 		for k, v in pairs(damages) do
