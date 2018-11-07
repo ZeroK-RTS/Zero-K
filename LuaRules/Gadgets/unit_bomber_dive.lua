@@ -253,18 +253,19 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 				if WeaponDefs[wid] and WeaponDefs[wid].shieldPower > bombers[proOwnerID].config.diveDamage 
 						and ((not Spring.GetUnitRulesParam(proOwnerID, "noammo")) or Spring.GetUnitRulesParam(proOwnerID, "noammo") ~= 1) then
 					local targetID = GetAttackTarget(proOwnerID)
-					bombers[proOwnerID].underShield = gameFrame + 30
+					bombers[proOwnerID].underShield = gameFrame + 50
 					if targetID then
 						local height = GetWantedBomberHeight(targetID, proOwnerID, bombers[proOwnerID].config, true)
 						local distance = GetCollisionDistance(proOwnerID, targetID)
-						temporaryDive(proOwnerID, 8, height, distance)
+						temporaryDive(proOwnerID, 50, height, distance)
 					else
-						temporaryDive(proOwnerID, 8, 40)
+						temporaryDive(proOwnerID, 50, 40)
 					end
 				end
 			end
 		end
-		return 0
+		Spring.DeleteProjectile(proID)
+		return true
 	end
 end
 
