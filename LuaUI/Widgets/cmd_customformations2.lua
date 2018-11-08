@@ -433,9 +433,6 @@ local function GetCmdOpts(alt, ctrl, meta, shift, right)
 end
 
 local function GiveNotifyingOrder(cmdID, cmdParams, cmdOpts)
-	if not cmdID then
-		return
-	end
 	if widgetHandler:CommandNotify(cmdID, cmdParams, cmdOpts) then
 		return
 	end
