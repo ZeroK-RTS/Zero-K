@@ -316,7 +316,10 @@ local function updateShields()
  
 		if i.waits then
 			spGiveOrderToUnit(unit, CMD_REMOVE, TABLE_1, CMD.OPT_ALT )
-			spGiveOrderToUnit(unit, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, i.maxVel }, CMD.OPT_ALT )
+			-- Something should be done to keep the shield from outpacing the guarding units.
+			if CMD_SET_WANTED_MAX_SPEED then
+				spGiveOrderToUnit(unit, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, i.maxVel }, CMD.OPT_ALT )
+			end
   
 			local cQueue = spGetCommandQueue(unit, 1) 
 

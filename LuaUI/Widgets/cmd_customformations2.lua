@@ -197,12 +197,14 @@ local CMD_MOVE = CMD.MOVE
 local CMD_ATTACK = CMD.ATTACK
 local CMD_UNLOADUNIT = CMD.UNLOAD_UNIT
 local CMD_UNLOADUNITS = CMD.UNLOAD_UNITS
-local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
+local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED or 70
 local CMD_OPT_ALT = CMD.OPT_ALT
 local CMD_OPT_CTRL = CMD.OPT_CTRL
 local CMD_OPT_META = CMD.OPT_META
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local CMD_OPT_RIGHT = CMD.OPT_RIGHT
+
+local REMOVED_SET_WANTED_MAX_SPEED = not CMD.SET_WANTED_MAX_SPEED
 
 local keyShift = 304
 
@@ -436,7 +438,14 @@ local function GiveNotifyingOrder(cmdID, cmdParams, cmdOpts)
 	if widgetHandler:CommandNotify(cmdID, cmdParams, cmdOpts) then
 		return
 	end
-	spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
+	if REMOVED_SET_WANTED_MAX_SPEED and cmdID == CMD_SET_WANTED_MAX_SPEED then
+		--local units = Spring.GetSelectedUnits()
+		--for i = 1, #units do
+		--	-- Do something which sets the wanted speed of the units
+		--end
+	else
+		spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
+	end
 end
 
 local function GiveNonNotifyingOrder(cmdID, cmdParams, cmdOpts)

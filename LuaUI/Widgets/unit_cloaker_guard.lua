@@ -92,9 +92,10 @@ local function updateCloakers()
 			if #cQueue > 1 then
 				local id = cQueue[2].id
 				local params = cQueue[2].params
+				-- Something should be done to keep the cloaker from outpacing the guarding units.
 				if id ~= CMD_SET_WANTED_MAX_SPEED then
 					spGiveOrderToUnit(unit, CMD_REMOVE, TABLE_1, CMD_OPT_ALT )
-				elseif math.abs(params[1] - i.maxVel) > 0.1 then
+				elseif CMD_SET_WANTED_MAX_SPEED and math.abs(params[1] - i.maxVel) > 0.1 then
 					spGiveOrderToUnit(unit, CMD_REMOVE, TABLE_1, CMD_OPT_ALT )
 					spGiveOrderToUnit(unit, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, i.maxVel }, CMD_OPT_ALT )
 				end
