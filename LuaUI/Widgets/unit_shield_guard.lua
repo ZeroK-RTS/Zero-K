@@ -313,9 +313,12 @@ local function updateShields()
 		i.ux,i.uy,i.uz = spGetUnitPosition(unit)
 		if i.waits then
 			spGiveOrderToUnit(unit, CMD_REMOVE, TABLE_1, CMD.OPT_ALT)
-			-- Something should be done to keep the shield from outpacing the guarding units.
+			
+			-- Prevent the shield from outpacing its units
 			if CMD_SET_WANTED_MAX_SPEED then
 				spGiveOrderToUnit(unit, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, i.maxVel }, CMD.OPT_ALT)
+			else
+				spGiveOrderToUnit(unit, CMD_WANTED_SPEED, {i.maxVel*30}, 0)
 			end
 			local cQueue = spGetCommandQueue(unit, 1) 
 
@@ -394,7 +397,11 @@ function widget:CommandNotify(id, params, options)
 			if c.maxVelID == sid then
 				c.maxVel = c.selfVel
 				c.maxVelID = -1
-				spGiveOrderToUnit(follower[sid].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD.OPT_ALT)
+				if CMD_SET_WANTED_MAX_SPEED then
+					spGiveOrderToUnit(follower[sid].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD.OPT_ALT)
+				else
+					spGiveOrderToUnit(follower[sid].fol, CMD_WANTED_SPEED, {c.selfVel*30}, 0)
+				end
 				for cid, j in pairs(c.shieldiees) do
 					if j.vel < c.maxVel then
 						c.maxVel = j.vel
@@ -488,7 +495,11 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		if c.maxVelID == unitID then
 			c.maxVel = c.selfVel
 			c.maxVelID = -1
-			spGiveOrderToUnit(follower[unitID].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD.OPT_ALT)
+			if CMD_SET_WANTED_MAX_SPEED then
+				spGiveOrderToUnit(follower[unitID].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD.OPT_ALT)
+			else
+				spGiveOrderToUnit(follower[sid].fol, CMD_WANTED_SPEED, {c.selfVel*30}, 0)
+			end
 			for cid, j in pairs(c.shieldiees) do
 				if j.vel < c.maxVel then
 					c.maxVel = j.vel
