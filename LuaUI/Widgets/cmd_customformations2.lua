@@ -439,11 +439,8 @@ local function GiveNotifyingOrder(cmdID, cmdParams, cmdOpts)
 		return
 	end
 	if REMOVED_SET_WANTED_MAX_SPEED and cmdID == CMD_SET_WANTED_MAX_SPEED then
-		--local units = Spring.GetSelectedUnits()
-		--for i = 1, #units do
-		--	Spring.Utilities.UnitEcho(units[i], cmdParams[1])
-		--	-- Do something which sets the wanted speed of the units
-		--end
+		local units = Spring.GetSelectedUnits()
+		Spring.GiveOrderToUnitArray(units, CMD_WANTED_SPEED, {cmdParams[1]*30}, 0)
 	else
 		spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
 	end
@@ -462,13 +459,16 @@ local function GiveNotifyingOrderToUnit(uID, cmdID, cmdParams, cmdOpts)
 		end
 	end
 	
-	spGiveOrderToUnit(uID, cmdID, cmdParams, cmdOpts.coded)
+	if REMOVED_SET_WANTED_MAX_SPEED and cmdID == CMD_SET_WANTED_MAX_SPEED then
+		Spring.GiveOrderToUnit(uID, CMD_WANTED_SPEED, {cmdParams[1]*30}, 0)
+	else
+		spGiveOrderToUnit(uID, cmdID, cmdParams, cmdOpts.coded)
+	end
 end
 
 local function SendSetWantedMaxSpeed(alt, ctrl, meta, shift)
 	-- Move Speed (Applicable to every order)
 	local wantedSpeed = 99999 -- High enough to exceed all units speed, but not high enough to cause errors (i.e. vs math.huge)
-	
 	if ctrl then
 		local selUnits = spGetSelectedUnits()
 		for i = 1, #selUnits do
@@ -477,6 +477,8 @@ local function SendSetWantedMaxSpeed(alt, ctrl, meta, shift)
 				wantedSpeed = uSpeed
 			end
 		end
+	elseif REMOVED_SET_WANTED_MAX_SPEED then
+		wantedSpeed = -1
 	end
 	
 	-- Directly giving speed order appears to work perfectly, including with shifted orders ...
