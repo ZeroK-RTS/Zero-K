@@ -532,7 +532,7 @@ local behaviourConfig = {
   
 	-- longer ranged swarmers
 	["shieldraid"] = {
-		skirms = shortRangeSkirmieeArray, 
+		skirms = riotRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		fightOnlyUnits = shortRangeExplodables,
