@@ -121,8 +121,8 @@
 	},
 	"turretaaheavy" : {
 		"name" : "Artemis",
-		"description" : "Very Long-Range Anti-Air Missile Tower",
-		"helptext" : "The Artemis is an extremely long-ranging first strike anti-air weapon that sends a clear message to enemy aircraft - can't go here, sonny. Each shot must be stockpiled for 20 seconds, but is well worth the time, for a quick salvo of missiles will wipe out almost any air attack without fuss."
+		"description" : "Very Long-Range Anti-Air Missile Tower, Drains 4 m/s, 20 second stockpile",
+		"helptext" : "The Artemis is an extremely long-ranging first strike anti-air weapon that sends a clear message to enemy aircraft - can't go here, sonny. Each shot costs 80 metal and takes 20 seconds to stockpile, but is well worth the cost, for a quick salvo of missiles will wipe out almost any air attack without fuss."
 	},
 	"chicken_drone" : {
 		"name" : "Drone",
