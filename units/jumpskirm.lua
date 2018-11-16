@@ -28,7 +28,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  maxDamage           = 450,
+  maxDamage           = 480,
   maxSlope            = 36,
   maxVelocity         = 1.9,
   maxWaterDepth       = 22,
@@ -84,7 +84,7 @@ unitDef = {
 	  customparams = {
 		burst = Shared.BURST_RELIABLE,
 
-	    timeslow_damagefactor = 3,
+	    timeslow_damagefactor = 4,
 		timeslow_overslow_frames = 2*30,
 		
 		light_color = [[1.88 0.63 2.5]],
@@ -92,7 +92,7 @@ unitDef = {
 	  },
 
 	  damage                  = {
-	  	default = 500.1,
+	  	default = 460.1,
 	  },
       
 	  explosionGenerator      = [[custom:flash2purple]],
