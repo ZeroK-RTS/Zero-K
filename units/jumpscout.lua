@@ -99,7 +99,6 @@ unitDef = {
       },
 
       fireStarter             = 70,
-      fixedlauncher           = 1,
       flightTime              = 0.8,
       impulseBoost            = 0.75,
       impulseFactor           = 0.3,
