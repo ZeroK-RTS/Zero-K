@@ -92,7 +92,7 @@ unitDef = {
       craterMult              = 0,
 
       customparams = {
-        timeslow_damagefactor = 9,
+        timeslow_damagefactor = 12,
         timeslow_smartretarget = 0.33,
 		
 		light_camera_height = 1800,
@@ -101,7 +101,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 20,
+        default = 15,
       },
 
       explosionGenerator      = [[custom:flashslow]],

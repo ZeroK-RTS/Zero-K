@@ -714,6 +714,15 @@ local behaviourConfig = {
 		skirmLeeway = 20, 
 		velocityPrediction = 20
 	},
+	["jumpcon"] = {
+		skirms = lowMedRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		fightOnlyUnits = medRangeExplodables,
+		maxSwarmLeeway = 0, 
+		skirmLeeway = 0, 
+		velocityPrediction = 20
+	},
 	["spiderriot"] = {
 		skirms = lowMedRangeSkirmieeArray, 
 		swarms = {}, 
