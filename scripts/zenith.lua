@@ -205,7 +205,7 @@ local function SpawnProjectileThread()
 	end
 end
 
-local function LaunchAll(x, z)
+local function LaunchAll(x, y, z)
 	-- Sanitize input
 	x, z = Spring.Utilities.ClampPosition(x, z)
 	local y = math.min(0, Spring.GetGroundHeight(x,z))
@@ -326,7 +326,7 @@ function script.BlockShot(num, targetID)
 	local cQueue = Spring.GetCommandQueue(unitID, 1)
 	if (cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK) then
 		if cQueue[1].params[3] then
-			StartThread(LaunchAll, cQueue[1].params[1], cQueue[1].params[3])
+			StartThread(LaunchAll, cQueue[1].params[1], cQueue[1].params[2], cQueue[1].params[3])
 			return true
 		elseif (#cQueue[1].params == 1) then
 			targetID = cQueue[1].params[1]
@@ -336,7 +336,7 @@ function script.BlockShot(num, targetID)
 	if targetID then
 		local x,y,z = Spring.GetUnitPosition(targetID)
 		if x then
-			local vx,_,vz = Spring.GetUnitVelocity(targetID)
+			local vx,vy,vz = Spring.GetUnitVelocity(targetID)
 			if vx then
 				local dist = Vector.AbsVal(ux - x, uy + HOVER_HEIGHT - y, uz - z)
 				-- Weapon speed is 53 elmos/frame but it has some acceleration.
@@ -345,10 +345,11 @@ function script.BlockShot(num, targetID)
 				-- That was the reasoning, the final equation is just experimentation though.
 				local travelTime = dist/80 + 10 -- in frames
 				x = x + vx*travelTime
+				y = y + vy*travelTime
 				z = z + vz*travelTime
 			end
-			x, z = x + vx*50, z + vz*50
-			StartThread(LaunchAll, x, z)
+			x, y, z = x + vx*50, y + vy*50, z + vz*50
+			StartThread(LaunchAll, x, y, z)
 		end
 	end
 	return true
