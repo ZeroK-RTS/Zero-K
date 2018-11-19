@@ -208,7 +208,6 @@ end
 local function LaunchAll(x, y, z)
 	-- Sanitize input
 	x, z = Spring.Utilities.ClampPosition(x, z)
-	local y = math.min(0, Spring.GetGroundHeight(x,z))
 	
 	if Vector.AbsVal(ux - x, uz - z) > fireRange then
 		return
