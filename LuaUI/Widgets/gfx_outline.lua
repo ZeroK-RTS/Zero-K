@@ -13,15 +13,15 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-    name      = "Outline",
-    desc      = "Displays a nice cartoon like outline around units.",
-    author    = "jK",
-    date      = "Dec 06, 2007",
-    license   = "GNU GPL, v2 or later",
-    layer     = -10,
-    enabled   = false  --  loaded by default?
-  }
+	return {
+		name      = "Outline",
+		desc      = "Displays a nice cartoon like outline around units.",
+		author    = "jK",
+		date      = "Dec 06, 2007",
+		license   = "GNU GPL, v2 or later",
+		layer     = -10,
+		enabled   = false  --  loaded by default?
+	}
 end
 
 local thickness = 1
@@ -54,7 +54,7 @@ options = {
 		type = 'number',
 		min = 0.4, max = 1, step = 0.01,
 		value = 0.7,
-    OnChange = OnchangeFunc,
+	OnChange = OnchangeFunc,
 	},
 	scaleWithHeight = {
 		name = 'Scale With Distance',
@@ -166,195 +166,196 @@ local unbuiltUnits = {}
 
 
 function widget:Initialize()
-  vsx, vsy = widgetHandler:GetViewSizes()
+	vsx, vsy = widgetHandler:GetViewSizes()
 
-  self:ViewResize(widgetHandler:GetViewSizes())
+	self:ViewResize(widgetHandler:GetViewSizes())
 
-  if gl.CreateShader == nil then --For old Intel chips
-    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Outline widget: cannot create shaders. forcing shader-less fallback.")
-    forceLowQuality = true
-    options.lowQualityOutlines.value = true
-    return true
-  end
+	if gl.CreateShader == nil then --For old Intel chips
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Outline widget: cannot create shaders. forcing shader-less fallback.")
+		forceLowQuality = true
+		options.lowQualityOutlines.value = true
+		return true
+	end
 
-  --For cards that can use shaders
-  enter2d = gl.CreateList(function()
-    glUseShader(0)
-    glMatrixMode(GL_PROJECTION); glPushMatrix(); glLoadIdentity()
-    glMatrixMode(GL_MODELVIEW);  glPushMatrix(); glLoadIdentity()
-  end)
-  leave2d = gl.CreateList(function()
-    glMatrixMode(GL_PROJECTION); glPopMatrix()
-    glMatrixMode(GL_MODELVIEW);  glPopMatrix()
-    glTexture(false)
-    glUseShader(0)
-  end)
+	--For cards that can use shaders
+	enter2d = gl.CreateList(function()
+		glUseShader(0)
+		glMatrixMode(GL_PROJECTION); glPushMatrix(); glLoadIdentity()
+		glMatrixMode(GL_MODELVIEW);  glPushMatrix(); glLoadIdentity()
+	end)
+	leave2d = gl.CreateList(function()
+		glMatrixMode(GL_PROJECTION); glPopMatrix()
+		glMatrixMode(GL_MODELVIEW);  glPopMatrix()
+		glTexture(false)
+		glUseShader(0)
+	end)
 
-  depthShader = gl.CreateShader({
-    fragment = [[
-      uniform sampler2D tex0;
-      uniform int useEqualityTest;
-      uniform vec2 screenXY;
+	depthShader = gl.CreateShader({
+		fragment = [[
+			uniform sampler2D tex0;
+			uniform int useEqualityTest;
+			uniform vec2 screenXY;
 
-      void main(void)
-      {
-        vec2 texCoord = vec2( gl_FragCoord.x/screenXY.x , gl_FragCoord.y/screenXY.y );
-        float depth  = texture2D(tex0, texCoord ).z;
+			void main(void)
+			{
+				vec2 texCoord = vec2( gl_FragCoord.x/screenXY.x , gl_FragCoord.y/screenXY.y );
+				float depth  = texture2D(tex0, texCoord ).z;
 
-        if (depth < gl_FragCoord.z) {
-          discard;
-        }
-        gl_FragColor = gl_Color;
-      }
-    ]],
-    uniformInt = {
-      tex0 = 0,
-      useEqualityTest = 1,
-    },
-    uniform = {
-      screenXY = {vsx,vsy},
-    },
-  })
+				if (depth < gl_FragCoord.z) {
+					discard;
+				}
+				gl_FragColor = gl_Color;
+			}
+		]],
+		uniformInt = {
+			tex0 = 0,
+			useEqualityTest = 1,
+		},
+			uniform = {
+			screenXY = {vsx,vsy},
+		},
+	})
 
-  blurShader_h = gl.CreateShader({
-    fragment = [[
-      uniform sampler2D tex0;
-      uniform int screenX;
+	blurShader_h = gl.CreateShader({
+		fragment = [[
+			uniform sampler2D tex0;
+			uniform int screenX;
 
-      const vec2 kernel = vec2(0.6,0.7);
+			const vec2 kernel = vec2(0.6,0.7);
 
-      void main(void) {
-        vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
-        gl_FragColor = vec4(0.0);
+			void main(void) {
+				vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
+				gl_FragColor = vec4(0.0);
 
-        float pixelsize = 1.0/float(screenX);
-        gl_FragColor += kernel[0] * texture2D(tex0, vec2(texCoord.s + 2.0*pixelsize,texCoord.t) );
-        gl_FragColor += kernel[1] * texture2D(tex0, vec2(texCoord.s + pixelsize,texCoord.t) );
+				float pixelsize = 1.0/float(screenX);
+				gl_FragColor += kernel[0] * texture2D(tex0, vec2(texCoord.s + 2.0*pixelsize,texCoord.t) );
+				gl_FragColor += kernel[1] * texture2D(tex0, vec2(texCoord.s + pixelsize,texCoord.t) );
 
-        gl_FragColor += texture2D(tex0, texCoord );
+				gl_FragColor += texture2D(tex0, texCoord );
 
-        gl_FragColor += kernel[1] * texture2D(tex0, vec2(texCoord.s + -1.0*pixelsize,texCoord.t) );
-        gl_FragColor += kernel[0] * texture2D(tex0, vec2(texCoord.s + -2.0*pixelsize,texCoord.t) );
-      }
-    ]],
-    uniformInt = {
-      tex0 = 0,
-      screenX = vsx,
-    },
-  })
+				gl_FragColor += kernel[1] * texture2D(tex0, vec2(texCoord.s + -1.0*pixelsize,texCoord.t) );
+				gl_FragColor += kernel[0] * texture2D(tex0, vec2(texCoord.s + -2.0*pixelsize,texCoord.t) );
+			}
+		]],
+		uniformInt = {
+			tex0 = 0,
+			screenX = vsx,
+		},
+	})
 
 
-  blurShader_v = gl.CreateShader({
-    fragment = [[      uniform sampler2D tex0;
-      uniform int screenY;
+	blurShader_v = gl.CreateShader({
+		fragment = [[
+			uniform sampler2D tex0;
+			uniform int screenY;
 
-      const vec2 kernel = vec2(0.6,0.7);
+			const vec2 kernel = vec2(0.6,0.7);
 
-      void main(void) {
-        vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
-        gl_FragColor = vec4(0.0);
+			void main(void) {
+				vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
+				gl_FragColor = vec4(0.0);
 
-        float pixelsize = 1.0/float(screenY);
-        gl_FragColor += kernel[0] * texture2D(tex0, vec2(texCoord.s,texCoord.t + 2.0*pixelsize) );
-        gl_FragColor += kernel[1] * texture2D(tex0, vec2(texCoord.s,texCoord.t + pixelsize) );
+				float pixelsize = 1.0/float(screenY);
+				gl_FragColor += kernel[0] * texture2D(tex0, vec2(texCoord.s,texCoord.t + 2.0*pixelsize) );
+				gl_FragColor += kernel[1] * texture2D(tex0, vec2(texCoord.s,texCoord.t + pixelsize) );
 
-        gl_FragColor += texture2D(tex0, texCoord );
+				gl_FragColor += texture2D(tex0, texCoord );
 
-        gl_FragColor += kernel[1] * texture2D(tex0, vec2(texCoord.s,texCoord.t + -1.0*pixelsize) );
-        gl_FragColor += kernel[0] * texture2D(tex0, vec2(texCoord.s,texCoord.t + -2.0*pixelsize) );
-      }
-    ]],
-    uniformInt = {
-      tex0 = 0,
-      screenY = vsy,
-    },
-  })
+				gl_FragColor += kernel[1] * texture2D(tex0, vec2(texCoord.s,texCoord.t + -1.0*pixelsize) );
+				gl_FragColor += kernel[0] * texture2D(tex0, vec2(texCoord.s,texCoord.t + -2.0*pixelsize) );
+			}
+		]],
+		uniformInt = {
+			tex0 = 0,
+			screenY = vsy,
+		},
+	})
 
-  if (depthShader == nil) then
-    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Outline widget: depthcheck shader error, forcing shader-less fallback: "..gl.GetShaderLog())
-    -- widgetHandler:RemoveWidget()
-    -- return false
-    forceLowQuality = true
-    options.lowQualityOutlines.value = true
-    return true
-  end
-  if (blurShader_h == nil) then
-    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Outline widget: hblur shader error, forcing shader-less fallback: "..gl.GetShaderLog())
-    -- widgetHandler:RemoveWidget()
-    -- return false
-    forceLowQuality = true
-    options.lowQualityOutlines.value = true
-    return true
-  end
-  if (blurShader_v == nil) then
-    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Outline widget: vblur shader error, forcing shader-less fallback: "..gl.GetShaderLog())
-    -- widgetHandler:RemoveWidget()
-    -- return false
-    forceLowQuality = true
-    options.lowQualityOutlines.value = true
-    return true
-  end
+	if (depthShader == nil) then
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Outline widget: depthcheck shader error, forcing shader-less fallback: "..gl.GetShaderLog())
+		-- widgetHandler:RemoveWidget()
+		-- return false
+		forceLowQuality = true
+		options.lowQualityOutlines.value = true
+		return true
+	end
+	if (blurShader_h == nil) then
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Outline widget: hblur shader error, forcing shader-less fallback: "..gl.GetShaderLog())
+		-- widgetHandler:RemoveWidget()
+		-- return false
+		forceLowQuality = true
+		options.lowQualityOutlines.value = true
+		return true
+	end
+	if (blurShader_v == nil) then
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Outline widget: vblur shader error, forcing shader-less fallback: "..gl.GetShaderLog())
+		-- widgetHandler:RemoveWidget()
+		-- return false
+		forceLowQuality = true
+		options.lowQualityOutlines.value = true
+		return true
+	end
 
-  uniformScreenXY        = gl.GetUniformLocation(depthShader,  'screenXY')
-  uniformScreenX         = gl.GetUniformLocation(blurShader_h, 'screenX')
-  uniformScreenY         = gl.GetUniformLocation(blurShader_v, 'screenY')
+	uniformScreenXY        = gl.GetUniformLocation(depthShader,  'screenXY')
+	uniformScreenX         = gl.GetUniformLocation(blurShader_h, 'screenX')
+	uniformScreenY         = gl.GetUniformLocation(blurShader_v, 'screenY')
 end
 
 function widget:ViewResize(viewSizeX, viewSizeY)
-  vsx = viewSizeX
-  vsy = viewSizeY
+	vsx = viewSizeX
+	vsy = viewSizeY
 
-  gl.DeleteTexture(depthtex or 0)
-  gl.DeleteTextureFBO(offscreentex or 0)
-  gl.DeleteTextureFBO(blurtex or 0)
+	gl.DeleteTexture(depthtex or 0)
+	gl.DeleteTextureFBO(offscreentex or 0)
+	gl.DeleteTextureFBO(blurtex or 0)
 
-  if not forceLowQuality then
-    depthtex = gl.CreateTexture(vsx,vsy, {
-      border = false,
-      format = GL_DEPTH_COMPONENT24,
-      min_filter = GL.NEAREST,
-      mag_filter = GL.NEAREST,
-    })
+	if not forceLowQuality then
+		depthtex = gl.CreateTexture(vsx,vsy, {
+			border = false,
+			format = GL_DEPTH_COMPONENT24,
+			min_filter = GL.NEAREST,
+			mag_filter = GL.NEAREST,
+		})
 
-    offscreentex = gl.CreateTexture(vsx,vsy, {
-      border = false,
-      min_filter = GL.LINEAR,
-      mag_filter = GL.LINEAR,
-      wrap_s = GL.CLAMP,
-      wrap_t = GL.CLAMP,
-      fbo = true,
-      fboDepth = true,
-    })
+		offscreentex = gl.CreateTexture(vsx,vsy, {
+			border = false,
+			min_filter = GL.LINEAR,
+			mag_filter = GL.LINEAR,
+			wrap_s = GL.CLAMP,
+			wrap_t = GL.CLAMP,
+			fbo = true,
+			fboDepth = true,
+		})
 
-    blurtex = gl.CreateTexture(vsx,vsy, {
-      border = false,
-      min_filter = GL.LINEAR,
-      mag_filter = GL.LINEAR,
-      wrap_s = GL.CLAMP,
-      wrap_t = GL.CLAMP,
-      fbo = true,
-    })
-  end
+		blurtex = gl.CreateTexture(vsx,vsy, {
+			border = false,
+			min_filter = GL.LINEAR,
+			mag_filter = GL.LINEAR,
+			wrap_s = GL.CLAMP,
+			wrap_t = GL.CLAMP,
+			fbo = true,
+		})
+	end
 
-  resChanged = true
+	resChanged = true
 end
 
 
 function widget:Shutdown()
-  gl.DeleteTexture(depthtex or 0)
-  if (gl.DeleteTextureFBO) then
-    gl.DeleteTextureFBO(offscreentex or 0)
-    gl.DeleteTextureFBO(blurtex or 0)
-  end
+	gl.DeleteTexture(depthtex or 0)
+	if (gl.DeleteTextureFBO) then
+		gl.DeleteTextureFBO(offscreentex or 0)
+		gl.DeleteTextureFBO(blurtex or 0)
+	end
 
-  if (gl.DeleteShader) then
-    gl.DeleteShader(depthShader or 0)
-    gl.DeleteShader(blurShader_h or 0)
-    gl.DeleteShader(blurShader_v or 0)
-  end
+	if (gl.DeleteShader) then
+		gl.DeleteShader(depthShader or 0)
+		gl.DeleteShader(blurShader_h or 0)
+		gl.DeleteShader(blurShader_v or 0)
+	end
 
-  gl.DeleteList(enter2d or 0)
-  gl.DeleteList(leave2d or 0)
+	gl.DeleteList(enter2d or 0)
+	gl.DeleteList(leave2d or 0)
 end
 
 
@@ -362,91 +363,91 @@ end
 --------------------------------------------------------------------------------
 
 local function DrawVisibleUnits(overrideEngineDraw, perUnitStencil)
-  if (Spring.GetGameFrame() % 15 == 0) then
-        checknow = true
-  end
- 
-  local visibleUnits = GetVisibleUnits(ALL_UNITS,nil,false)
-  for i=1,#visibleUnits do  
-    if checknow then
-      local unitProgress = select(5, GetUnitHealth(visibleUnits[i]))
-      if unitProgress == nil or unitProgress >= 1 then
-        unbuiltUnits[visibleUnits[i]] = nil
-      else
-        unbuiltUnits[visibleUnits[i]] = true
-      end
-    end
- 
-    if not unbuiltUnits[visibleUnits[i]] then
-      if perUnitStencil then
-        gl.Clear(GL.STENCIL_BUFFER_BIT)
-        gl.StencilFunc(GL.ALWAYS, 0x01, 0xFF)
-        gl.StencilOp(GL.REPLACE, GL.REPLACE, GL.REPLACE)
-        gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-        glUnit(visibleUnits[i],true)
-        gl.StencilFunc(GL.NOTEQUAL, 0x01, 0xFF)
-        gl.StencilOp(GL.KEEP, GL.KEEP, GL.KEEP)
-        gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
-        gl.DepthMask(true)
-      end
-      glUnit(visibleUnits[i],overrideEngineDraw)
-      if perUnitStencil then
-        gl.DepthMask(false)
-        gl.StencilFunc(GL.ALWAYS, 0, 0xFF); 
-        gl.StencilOp(GL.REPLACE, GL.REPLACE, GL.REPLACE)
-        gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
-        gl.Unit(visibleUnits[i],true)
-      end
-    end
-  end
+	if (Spring.GetGameFrame() % 15 == 0) then
+		checknow = true
+	end
+
+	local visibleUnits = GetVisibleUnits(ALL_UNITS,nil,false)
+	for i = 1, #visibleUnits do  
+		if checknow then
+			local unitProgress = select(5, GetUnitHealth(visibleUnits[i]))
+			if unitProgress == nil or unitProgress >= 1 then
+				unbuiltUnits[visibleUnits[i]] = nil
+			else
+				unbuiltUnits[visibleUnits[i]] = true
+			end
+		end
+
+		if not unbuiltUnits[visibleUnits[i]] then
+			if perUnitStencil then
+				gl.Clear(GL.STENCIL_BUFFER_BIT)
+				gl.StencilFunc(GL.ALWAYS, 0x01, 0xFF)
+				gl.StencilOp(GL.REPLACE, GL.REPLACE, GL.REPLACE)
+				gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+				glUnit(visibleUnits[i],true)
+				gl.StencilFunc(GL.NOTEQUAL, 0x01, 0xFF)
+				gl.StencilOp(GL.KEEP, GL.KEEP, GL.KEEP)
+				gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
+				gl.DepthMask(true)
+			end
+			glUnit(visibleUnits[i],overrideEngineDraw)
+			if perUnitStencil then
+				gl.DepthMask(false)
+				gl.StencilFunc(GL.ALWAYS, 0, 0xFF); 
+				gl.StencilOp(GL.REPLACE, GL.REPLACE, GL.REPLACE)
+				gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
+				gl.Unit(visibleUnits[i],true)
+			end
+		end
+	end
 end
 
 local MyDrawVisibleUnits = function()
-  glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
-  glPushMatrix()
-  glResetMatrices()
-  glColor(0,0,0,thickness * thicknessMult)
-  DrawVisibleUnits(true)
-  glColor(1,1,1,1)
-  glPopMatrix()
+	glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
+	glPushMatrix()
+	glResetMatrices()
+	glColor(0,0,0,thickness * thicknessMult)
+	DrawVisibleUnits(true)
+	glColor(1,1,1,1)
+	glPopMatrix()
 end
 
-local function DrawVisibleUnitsLines(underwater, frontLines) --This is expected to be a shader-less fallback for low-end machines, though it also works for refraction pass
+--This is expected to be a shader-less fallback for low-end machines, though it also works for refraction pass
+local function DrawVisibleUnitsLines(underwater, frontLines) 
+	gl.DepthTest(GL.LESS)
+	if underwater then
+		gl.LineWidth(3.0 * thickness * thicknessMult)
+		gl.PolygonOffset(8.0, 4.0)
+	else
+		if options.lowQualityOutlines.value then
+			gl.LineWidth(4.0 * thickness * thicknessMult)
+		end
+		if frontLines then
+			gl.LineWidth(3.0 * thickness * thicknessMult)
+			gl.PolygonOffset(10.0, 5.0)
+		end
+	end
+	gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
+	gl.Culling(GL.FRONT)
+	-- gl.DepthMask(false)
+	glColor(0,0,0,1)
 
-  gl.DepthTest(GL.LESS)
-  if underwater then
-    gl.LineWidth(3.0 * thickness * thicknessMult)
-    gl.PolygonOffset(8.0, 4.0)
-  else
-    if options.lowQualityOutlines.value then
-      gl.LineWidth(4.0 * thickness * thicknessMult)
-    end
-    if frontLines then
-      gl.LineWidth(3.0 * thickness * thicknessMult)
-      gl.PolygonOffset(10.0, 5.0)
-    end
-  end
-  gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
-  gl.Culling(GL.FRONT)
-  -- gl.DepthMask(false)
-  glColor(0,0,0,1)
+	glPushMatrix()
+	glResetMatrices()
+	-- gl.StencilTest(true)
+	DrawVisibleUnits(true)--, true)
+	-- gl.StencilTest(false)
+	glPopMatrix()
 
-  glPushMatrix()
-  glResetMatrices()
-  -- gl.StencilTest(true)
-  DrawVisibleUnits(true)--, true)
-  -- gl.StencilTest(false)
-  glPopMatrix()
+	gl.LineWidth(1.0)
+	glColor(1,1,1,1)
+	gl.Culling(false)
+	gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+	gl.DepthTest(false)
 
-  gl.LineWidth(1.0)
-  glColor(1,1,1,1)
-  gl.Culling(false)
-  gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-  gl.DepthTest(false)
-
-  if underwater then
-    gl.PolygonOffset(0.0, 0.0)
-  end
+	if underwater then
+		gl.PolygonOffset(0.0, 0.0)
+	end
 end
 
 local blur_h = function()
@@ -456,61 +457,63 @@ local blur_h = function()
 end
 
 local blur_v = function()
-  glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
-  glUseShader(blurShader_v)
-  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
+	glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
+	glUseShader(blurShader_v)
+	glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
 end
 
 function widget:DrawWorldPreUnit()
-  if (options.lowQualityOutlines.value or forceLowQuality) then
-    DrawVisibleUnitsLines(false)
-    gl.DepthMask(true)
-    DrawVisibleUnitsLines(false, true)
-    gl.DepthMask(false)
-  else
-    glCopyToTexture(depthtex, 0, 0, 0, 0, vsx, vsy)
-    glTexture(depthtex)
+	if (options.lowQualityOutlines.value or forceLowQuality) then
+		DrawVisibleUnitsLines(false)
+		gl.DepthMask(true)
+		DrawVisibleUnitsLines(false, true)
+		gl.DepthMask(false)
+	else
+		glCopyToTexture(depthtex, 0, 0, 0, 0, vsx, vsy)
+		glTexture(depthtex)
 
-    if (resChanged) then
-      resChanged = false
-      if (vsx==1) or (vsy==1) then return end
-      glUseShader(depthShader)
-      glUniform(uniformScreenXY,   vsx,vsy )
-       glUseShader(blurShader_h)
-      glUniformInt(uniformScreenX, vsx )
-       glUseShader(blurShader_v)
-      glUniformInt(uniformScreenY, vsy )
-    end
+		if (resChanged) then
+			resChanged = false
+			if (vsx==1) or (vsy==1) then
+				return
+			end
+			glUseShader(depthShader)
+			glUniform(uniformScreenXY,   vsx,vsy )
+			glUseShader(blurShader_h)
+			glUniformInt(uniformScreenX, vsx )
+			glUseShader(blurShader_v)
+			glUniformInt(uniformScreenY, vsy )
+		end
 
-    glUseShader(depthShader)
-    glRenderToTexture(offscreentex,MyDrawVisibleUnits)
+		glUseShader(depthShader)
+		glRenderToTexture(offscreentex,MyDrawVisibleUnits)
 
-    glTexture(offscreentex)
-    glRenderToTexture(blurtex, blur_v)
-    glTexture(blurtex)
-    glRenderToTexture(offscreentex, blur_h)
+		glTexture(offscreentex)
+		glRenderToTexture(blurtex, blur_v)
+		glTexture(blurtex)
+		glRenderToTexture(offscreentex, blur_h)
 
-    glCallList(enter2d)
-    glTexture(offscreentex)
-    glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
-    glCallList(leave2d)
+		glCallList(enter2d)
+		glTexture(offscreentex)
+		glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
+		glCallList(leave2d)
 
-    gl.DepthMask(true)
-    DrawVisibleUnitsLines(false, true)
-    gl.DepthMask(false)
-  end
+		gl.DepthMask(true)
+		DrawVisibleUnitsLines(false, true)
+		gl.DepthMask(false)
+	end
 end
 
 function widget:DrawWorldRefraction()
-  DrawVisibleUnitsLines(true)
+	DrawVisibleUnitsLines(true)
 end 
 
 function widget:UnitCreated(unitID)
-  unbuiltUnits[unitID] = true
+	unbuiltUnits[unitID] = true
 end
 
 function widget:UnitDestroyed(unitID)
-  unbuiltUnits[unitID] = nil
+	unbuiltUnits[unitID] = nil
 end
 
 function widget:Update(dt)
