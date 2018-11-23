@@ -28,6 +28,11 @@ local thickness = 1
 local thicknessMult = 1
 local forceLowQuality = false
 local scaleWithHeight
+local functionScaleWithHeight
+
+local PI = math.pi
+local SUBTLE_MIN = 500
+local SUBTLE_MAX = 3000
 
 local function OnchangeFunc()
 	thickness = options.thickness.value
@@ -48,7 +53,7 @@ options = {
 		desc = 'How thick the outline appears around objects',
 		type = 'number',
 		min = 0.4, max = 1, step = 0.01,
-		value = 1,
+		value = 0.7,
     OnChange = OnchangeFunc,
 	},
 	scaleWithHeight = {
@@ -60,6 +65,19 @@ options = {
 		OnChange = function (self)
 			scaleWithHeight = self.value
 			if not scaleWithHeight then
+				thicknessMult = 1
+			end
+		end,
+	},
+	functionScaleWithHeight = {
+		name = 'Subtle Scale With Distance',
+		desc = 'Reduces the screen space width of outlines when zoomed out, in a subtle way.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function (self)
+			functionScaleWithHeight = self.value
+			if not functionScaleWithHeight then
 				thicknessMult = 1
 			end
 		end,
@@ -393,7 +411,7 @@ local MyDrawVisibleUnits = function()
   glPopMatrix()
 end
 
-local DrawVisibleUnitsLines = function(underwater, frontLines) --This is expected to be a shader-less fallback for low-end machines, though it also works for refraction pass
+local function DrawVisibleUnitsLines(underwater, frontLines) --This is expected to be a shader-less fallback for low-end machines, though it also works for refraction pass
 
   gl.DepthTest(GL.LESS)
   if underwater then
@@ -496,6 +514,28 @@ function widget:UnitDestroyed(unitID)
 end
 
 function widget:Update(dt)
+	if functionScaleWithHeight then
+		local cs = Spring.GetCameraState()
+		local gy = Spring.GetGroundHeight(cs.px, cs.pz)
+		local cameraHeight
+		if cs.name == "ta" then
+			cameraHeight = cs.height - gy
+		else
+			cameraHeight = cs.py - gy
+		end
+		if cameraHeight < SUBTLE_MIN then
+			thicknessMult = 1
+			return
+		end
+		if cameraHeight > SUBTLE_MAX then
+			thicknessMult = 0.5
+			return
+		end
+		
+		thicknessMult = (math.cos(PI*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/4 + 0.5
+		--Spring.Echo("cameraHeight", cameraHeight, "thicknessMult", thicknessMult)
+		return
+	end
 	if not scaleWithHeight then
 		return
 	end
