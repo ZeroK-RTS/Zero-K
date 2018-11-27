@@ -536,7 +536,7 @@ function widget:Update(dt)
 		end
 		
 		thicknessMult = (((math.cos(PI*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^2)/2 + 0.5
-		Spring.Echo("cameraHeight", cameraHeight, "thicknessMult", thicknessMult)
+		--Spring.Echo("cameraHeight", cameraHeight, "thicknessMult", thicknessMult)
 		return
 	end
 	if not scaleWithHeight then
