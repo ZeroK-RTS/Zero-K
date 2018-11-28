@@ -396,64 +396,9 @@ function script.QueryWeapon(num)
 	return firepoints[gun_1]
 end
 
-function script.FireWeapon(num)
-	soundIndex = soundIndex - 1
-	if soundIndex <= 0 then
-		local proportion = 0
-		local waterTank = Spring.GetUnitRulesParam(unitID,"watertank")
-		if waterTank then
-			proportion = waterTank/TANK_MAX
-		end
-		soundIndex = math.floor(math.random()+1.5)
-		local px, py, pz = Spring.GetUnitPosition(unitID)
-		Spring.PlaySoundFile("sounds/weapon/watershort.wav", 20+proportion*5, px, py, pz)
-	end
-	
-	-- Add Impulse
-	local projectiles = spGetUnitRulesParam(unitID, "water_projectiles") or 8
-
-	local ax, ay, az = Spring.GetUnitPiecePosDir(unitID, forwards)
-	local _,_,_,ux, uy, uz = Spring.GetUnitPosition(unitID, true)
-	local x,y,z = (ux-ax), (uy-ay), (uz-az)
-	
-	local magnitude = impulse
-	
-	local depth = spGetGroundHeight(ux,uz)
-	if depth < 0 then
-		if depth < impulseMaxDepth then
-			depth = impulseMaxDepth
-		end
-		magnitude = magnitude + depth*impulseDepthMult
-	end
-	
-	--if depth < -30 then
-	--	GG.AddGadgetImpulse(unitID, x, y, z, 30*projectiles, true, false, true, false, unitDefID) 
-	--end
-	-- Change Tank
-	GG.shotWaterWeapon(unitID)
-end
-
 function script.Shot(num)
 	GG.Floating_AimWeapon(unitID)
-	if math.random() < 0.2 then
-		EmitSfx(firepoints[gun_1], 1024)
-	end
-	--[[
-	local waterTank = Spring.GetUnitRulesParam(unitID,"watertank")
-	if waterTank then
-		local proportion = waterTank/TANK_MAX
-		if proportion > 0.4 then
-			EmitSfx(firepoints[gun_1], 1024)
-			if math.random() < (proportion-0.4)/0.6 then
-				EmitSfx(firepoints[gun_1], 1024)
-			end
-		else
-			if math.random() < (proportion + 0.2)/0.6 then
-				EmitSfx(firepoints[gun_1], 1024)
-			end
-		end
-	end--]]
-	--Spring.Echo(Spring.GetGameFrame())
+	EmitSfx(firepoints[gun_1], 1024)
 	gun_1 = 1 - gun_1
 end
 
