@@ -155,8 +155,7 @@ options = {
 		type  = "bool", 
 		value = false, 
 		OnChange = function(self)
-			option_CheckEnable(self)
-			WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", self.value)
+			WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", option_CheckEnable(self))
 		end,
 		desc = "Enables the spectator resource bars when spectating a game with two teams."
 	},
@@ -1055,7 +1054,15 @@ end
 local timer = 0
 local blinkTimer = 0
 local blinkIndex = 0
+local loadOrderIndependentSpectatorCheckDone = false
 function widget:Update(dt)
+	--If the Economy Panel loads after this, then option_CheckEnable won't properly
+	--set the Economy Panel's visibility. This check works around that problem.
+	if not loadOrderIndependentSpectatorCheckDone then
+		options.enableSpectator.OnChange(options.enableSpectator)
+		loadOrderIndependentSpectatorCheckDone = true
+	end
+
 	timer = timer + dt
 	if economyWindowData then
 		blinkTimer = blinkTimer + dt
