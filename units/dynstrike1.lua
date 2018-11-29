@@ -52,7 +52,7 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  objectName             = [[strikecom.dae]],
+  objectName             = [[omnicom_gun_prototypes.dae]],
   script                 = [[dynstrike.lua]],
   selfDestructAs         = [[ESTOR_BUILDINGEX]],
 

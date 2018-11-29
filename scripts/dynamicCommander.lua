@@ -41,6 +41,9 @@ local function IsManualFire(num)
 	return isManual[num]
 end
 
+local function onWeaponsUpdate()
+end
+
 local levelScale = {
     [0] = 1,
     [1] = 1,
@@ -272,6 +275,7 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 	end
 	
 	weaponsInitialized = true
+	onWeaponsUpdate();
 end
 
 local function Create()
@@ -340,6 +344,10 @@ local function SpawnWreck(wreckLevel)
 	end
 end
 
+local function SetOnWeaponsUpdate(f)
+	onWeaponsUpdate = f;
+end
+
 return {
 	GetPace           = GetPace,
 	GetScale          = GetScale,
@@ -351,4 +359,5 @@ return {
 	Create            = Create,
 	SpawnModuleWrecks = SpawnModuleWrecks,
 	SpawnWreck        = SpawnWreck,
+	SetOnWeaponsUpdate = SetOnWeaponsUpdate,
 }	

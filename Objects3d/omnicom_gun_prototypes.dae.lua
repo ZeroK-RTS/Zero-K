@@ -1,5 +1,5 @@
 model = {
-      invertteamcolor = false,
+      invertteamcolor = true,
       tex1 = "omnicom_gun_prototypes_1.png",
       tex2 = "omnicom_gun_prototypes_2.png",
       midpos = {0,25,0},

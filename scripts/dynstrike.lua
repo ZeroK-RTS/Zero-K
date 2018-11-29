@@ -15,12 +15,11 @@ local FingerB = piece('FingerB')
 local FingerC = piece('FingerC')
 local FootLeft = piece('FootLeft')
 local FootRight = piece('FootRight')
-local Gun = piece('Gun')
 local HandRight = piece('HandRight')
 local Head = piece('Head')
 local HipLeft = piece('HipLeft')
 local HipRight = piece('HipRight')
-local Muzzle = piece('Muzzle')
+
 local Palm = piece('Palm')
 local Stomach = piece('Stomach')
 local Base = piece('Base')
@@ -32,6 +31,63 @@ local Shield = piece('Shield')
 local FingerTipA = piece('FingerTipA')
 local FingerTipB = piece('FingerTipB')
 local FingerTipC = piece('FingerTipC')
+
+
+-- backwards compatibility for keyframed death - easy to redo but idc atm 
+local Gun = piece('Gun_PS')
+local Muzzle = piece('Muzzle_PS')
+
+local function mkGun(abbr)
+	return {
+		Gun = piece('Gun_'..abbr),
+		Muzzle = {piece('Muzzle_'..abbr)}
+	}
+end
+
+local function mkDualGun(abbr)
+	return {
+		Gun = piece('Gun_'..abbr),
+		Muzzle = {
+			piece('Muzzle_'..abbr.."_1"),
+			piece('Muzzle_'..abbr.."_2"),
+		},
+	}
+end
+
+-- swappable guns
+guns = {
+	commweapon_heavymachinegun = mkGun("HMG"),
+	commweapon_peashooter = mkGun("PS"),
+	commweapon_beamlaser = mkGun("LB"),
+	commweapon_lparticlebeam = mkDualGun("PB"),
+	commweapon_shotgun = mkGun("SG"),
+	commweapon_missilelauncher = mkDualGun("ML"),
+	commweapon_lightninggun = mkGun("LG"),
+}
+
+local function getGun()
+	local urpgun = Spring.GetUnitRulesParam(unitID,"comm_weapon_name_1");
+	if(urpgun) then
+		Spring.Echo("Current equipped weapon: "..tostring(urpgun));
+		if(guns[urpgun]) then
+			return guns[urpgun].Gun
+		end
+		return guns["commweapon_peashooter"].Gun
+	end
+	return guns["commweapon_peashooter"].Gun;
+end
+
+local function getMuzzle()
+	local urpgun = Spring.GetUnitRulesParam(unitID,"comm_weapon_name_1");
+	if(urpgun) then
+		Spring.Echo("Current equipped weapon: "..tostring(urpgun));
+		if(guns[urpgun]) then
+			return guns[urpgun].Muzzle[1]
+		end
+		return guns["commweapon_peashooter"].Muzzle[1]
+	end
+	return guns["commweapon_peashooter"].Muzzle[1];
+end
 
 local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
@@ -356,7 +412,7 @@ local function Walk()
 		
 		if not aiming then
 			Turn(ArmLeft, x_axis, left[1].arm[1],  left[1].arm[2] * speedMult)
-			Turn(Gun, x_axis, left[1].hand[1], left[1].hand[2] * speedMult)
+			Turn(getGun(), x_axis, left[1].hand[1], left[1].hand[2] * speedMult)
 			
 			Turn(ArmRight, x_axis, right[1].arm[1],  right[1].arm[2] * speedMult)
 			Turn(HandRight, x_axis, right[1].hand[1], right[1].hand[2] * speedMult)
@@ -403,7 +459,7 @@ local function RestoreLegs()
 	
 	if not aiming then
 		Turn(ArmLeft, x_axis, math.rad(-5), 2)
-		Turn(Gun, x_axis, math.rad(-5), 2)
+		Turn(getGun(), x_axis, math.rad(-5), 2)
 		
 		Turn(ArmRight, x_axis, math.rad(-5), 2)
 		Turn(HandRight, x_axis, math.rad(-5), 2)
@@ -472,7 +528,7 @@ local function RestoreLeftAim(sleepTime)
 	SetSignalMask(SIG_RESTORE_LEFT)
 	Sleep(sleepTime or RESTORE_DELAY)
 	Turn(ArmLeft, x_axis, math.rad(-5), ARM_SPEED_PITCH)
-	Turn(Gun, x_axis, math.rad(-5), ARM_SPEED_PITCH)
+	Turn(getGun(), x_axis, math.rad(-5), ARM_SPEED_PITCH)
 end
 
 local function AimArm(heading, pitch, arm, hand, wait)
@@ -494,7 +550,7 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask(SIG_LEFT)
 		Signal(SIG_RESTORE_LEFT)
 		Signal(SIG_RESTORE_TORSO)
-		AimArm(heading, pitch, ArmLeft, Gun, true)
+		AimArm(heading, pitch, ArmLeft, getGun(), true)
 		StartThread(RestoreLeftAim)
 		return true
 	elseif weaponNum == 2 then
@@ -514,7 +570,7 @@ end
 function script.FireWeapon(num)
 	local weaponNum = dyncomm.GetWeapon(num)
 	if weaponNum == 1 then
-		dyncomm.EmitWeaponFireSfx(Muzzle, num)
+		dyncomm.EmitWeaponFireSfx(getMuzzle(), num)
 	elseif weaponNum == 2 then
 		dyncomm.EmitWeaponFireSfx(UnderMuzzle, num)
 	end
@@ -523,7 +579,7 @@ end
 function script.Shot(num)
 	local weaponNum = dyncomm.GetWeapon(num)
 	if weaponNum == 1 then
-		dyncomm.EmitWeaponShotSfx(Muzzle, num)
+		dyncomm.EmitWeaponShotSfx(getMuzzle(), num)
 	elseif weaponNum == 2 then
 		dyncomm.EmitWeaponShotSfx(UnderMuzzle, num)
 	end
@@ -575,9 +631,19 @@ end
 ---------------------------------------------------------------------
 -- Creation and Death
 
+local function showGuns()
+	Spring.Echo("Showing guns");
+	for i,g in pairs(guns) do
+		Hide(g.Gun)
+	end
+	Show(getGun());
+end
+
 function script.Create()
     local map = Spring.GetUnitPieceMap(unitID);
-    local offsets = constructSkeleton(unitID,map.Scene, {0,0,0});
+	local offsets = constructSkeleton(unitID,map.Scene, {0,0,0});
+	
+	dyncomm.SetOnWeaponsUpdate(showGuns);
     
     for a,anim in pairs(Animations) do
         for i,keyframe in pairs(anim) do
@@ -591,9 +657,16 @@ function script.Create()
                 end
             end
         end
-    end
+	end
+	
+	-- turn all muzzles 180 because reasons
+	for _,g in pairs(guns) do
+		local m = g.Muzzle;
+		for _,p in pairs(m) do
+			Turn(p, x_axis, math.rad(180))
+		end
+	end
     
-    Turn(Muzzle, x_axis, math.rad(180))
     Turn(UnderMuzzle,x_axis, math.rad(180))
 	
 	dyncomm.Create()
@@ -624,7 +697,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(ArmLeft, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(ArmRight, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(HandRight, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(Gun, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(getGun(), sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(CalfLeft, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(CalfRight, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(HipLeft, sfxFall + sfxFire + sfxSmoke + sfxExplode)
