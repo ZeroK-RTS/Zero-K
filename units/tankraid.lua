@@ -26,12 +26,12 @@ unitDef = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[tankscout]],
-  idleAutoHeal        = 15,
+  idleAutoHeal        = 12,
   idleTime            = 150,
   leaveTracks         = true,
-  maxDamage           = 750,
+  maxDamage           = 860,
   maxSlope            = 18,
-  maxVelocity         = 3.65,
+  maxVelocity         = 4,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[TANK3]],
@@ -47,7 +47,7 @@ unitDef = {
   trackType           = [[StdTank]],
   trackWidth          = 30,
   turninplace         = 0,
-  turnRate            = 750,
+  turnRate            = 880,
   workerTime          = 0,
 
   weapons             = {
@@ -71,8 +71,8 @@ unitDef = {
 
     NAPALM_BOMBLET = {
       name                    = [[Flame Bomb]],
-      accuracy				  = 200,
-      areaOfEffect            = 192,
+      accuracy                = 200,
+      areaOfEffect            = 216,
       avoidFeature            = true,
       avoidFriendly           = true,
       burnblow                = true,
@@ -83,21 +83,21 @@ unitDef = {
 	  customParams        	  = {
 	    setunitsonfire = "1",
 		burnchance     = "1",
-		burntime       = 150,
+		burntime       = 60,
 
 		area_damage = 1,
-		area_damage_radius = 96,
-		area_damage_dps = 25,
-		area_damage_duration = 13.3,
+		area_damage_radius = 108,
+		area_damage_dps = 36,
+		area_damage_duration = 16,
 		
 		light_color = [[1.6 0.8 0.32]],
 		light_radius = 320,
 	  },
 	  
       damage                  = {
-        default = 150,
-        planes  = 150,
-        subs    = 7.5,
+        default = 70,
+        planes  = 70,
+        subs    = 3.5,
       },
 
       explosionGenerator      = [[custom:napalm_koda]],
@@ -107,17 +107,17 @@ unitDef = {
       impulseFactor           = 0.2,
       interceptedByShieldType = 1,
       model                   = [[wep_b_fabby.s3o]],
-	  myGravity               = 1.5,
+      myGravity               = 0.1,
       noSelfDamage            = true,
-      range                   = 225,
-      reloadtime              = 6,
+      range                   = 175,
+      reloadtime              = 4.2,
       soundHit                = [[explosion/ex_med6]],
       soundHitVolume          = 4,
       soundStart              = [[weapon/cannon/cannon_fire3]],
       soundStartVolume        = 3,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 700,
+      weaponVelocity          = 800,
     },
 	
 	BOGUS_FAKE_NAPALM_BOMBLET = {

@@ -32,17 +32,28 @@ local SIG_MOVE = 1
 -- local DEPTHCHARGE_LOAD_ROLL = -460
 
 --rockz
-include 'RockPiece.lua'
+include "rockPiece.lua"
 
 local ROCK_PIECE = base	-- should be negative to alternate rocking direction
-local ROCK_Z_SPEED = 3		--number of quarter-cycles per second around z-axis
-local ROCK_Z_DECAY = -1/2	--rocking around z-axis is reduced by this factor each time' 
-local ROCK_Z_MIN = math.rad(3)	--if around z-axis rock is not greater than this amount rocking will stop after returning to center
-local ROCK_Z_MAX = math.rad(15)
+local ROCK_SPEED = 3		--number of quarter-cycles per second around z-axis
+local ROCK_DECAY = -1/2	--rocking around z-axis is reduced by this factor each time' 
+local ROCK_MIN = math.rad(3)	--if around z-axis rock is not greater than this amount rocking will stop after returning to center
+local ROCK_MAX = math.rad(15)
 local SIG_ROCK_Z = 16		--Signal( to prevent multiple rocking
 
-local ROCK_Z_FIRE_1 = -5
 local ROCK_FORCE = 0.1
+
+local rockData = {
+	[z_axis] = {
+		piece = ROCK_PIECE,
+		speed = ROCK_SPEED,
+		decay = ROCK_DECAY,
+		minPos = ROCK_MIN,
+		maxPos = ROCK_MAX,
+		signal = SIG_ROCK_Z,
+		axis = z_axis,
+	},
+}
 
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd1 = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
@@ -84,7 +95,7 @@ function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 	Spin( sonar , y_axis, math.rad(60) )
 	Spin( radarpole , y_axis, math.rad(-90) )
-	InitializeRock(ROCK_PIECE, ROCK_Z_SPEED, ROCK_Z_DECAY, ROCK_Z_MIN, ROCK_Z_MAX, SIG_ROCK_Z, z_axis)
+	InitializeRock(rockData)
 end
 
 -- SetMaxReloadTime(Func_Var_1)
@@ -214,7 +225,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num) 
-	StartThread(Rock, gun_1_yaw, ROCK_FORCE, z_axis)
+	StartThread(Rock, z_axis, gun_1_yaw, ROCK_FORCE)
 	
 	gun_1 = 1 - gun_1
 	

@@ -70,7 +70,7 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = "xoooooox xoooooox xoooooox xccccccx xccccccx xccccccx xccccccx xccccccx",
+  yardMap                       = "oooooooo oooooooo oooooooo yccccccy yccccccy yccccccy yccccccy yccccccy",
 
   featureDefs                   = {
 

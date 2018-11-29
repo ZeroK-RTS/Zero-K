@@ -106,6 +106,14 @@ function gadget:GameFrame(n)
 	end
 end
 
+
+function gadget:StockpileChanged(unitID, unitDefID, unitTeam, weaponNum, oldCount, newCount)
+	local scriptFunc = Spring.UnitScript.GetScriptEnv(unitID).StockpileChanged
+	if scriptFunc then
+		Spring.UnitScript.CallAsUnit(unitID, scriptFunc, newCount)
+	end
+end
+
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if stockpileUnitDefID[unitDefID] and not unitsByID[unitID] then
 		local def = stockpileUnitDefID[unitDefID]

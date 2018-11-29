@@ -249,22 +249,24 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	if proID and bomberWeaponNamesDefs[Spring.GetProjectileName(proID)] then
 		if proOwnerID and Spring.ValidUnitID(proOwnerID) and bombers[proOwnerID] and bombers[proOwnerID].diveState == 1 then
 			if shieldCarrierUnitID and Spring.ValidUnitID(shieldCarrierUnitID) and shieldEmitterWeaponNum then
-				local wid = UnitDefs[Spring.GetUnitDefID(shieldCarrierUnitID)].weapons[shieldEmitterWeaponNum].weaponDef
-				if WeaponDefs[wid] and WeaponDefs[wid].shieldPower > bombers[proOwnerID].config.diveDamage 
-						and ((not Spring.GetUnitRulesParam(proOwnerID, "noammo")) or Spring.GetUnitRulesParam(proOwnerID, "noammo") ~= 1) then
-					local targetID = GetAttackTarget(proOwnerID)
-					bombers[proOwnerID].underShield = gameFrame + 30
-					if targetID then
-						local height = GetWantedBomberHeight(targetID, proOwnerID, bombers[proOwnerID].config, true)
-						local distance = GetCollisionDistance(proOwnerID, targetID)
-						temporaryDive(proOwnerID, 8, height, distance)
-					else
-						temporaryDive(proOwnerID, 8, 40)
+				--local wid = UnitDefs[Spring.GetUnitDefID(shieldCarrierUnitID)].weapons[shieldEmitterWeaponNum].weaponDef
+				--if WeaponDefs[wid] and WeaponDefs[wid].shieldPower > bombers[proOwnerID].config.diveDamage then
+					if ((not Spring.GetUnitRulesParam(proOwnerID, "noammo")) or Spring.GetUnitRulesParam(proOwnerID, "noammo") ~= 1) then
+						local targetID = GetAttackTarget(proOwnerID)
+						bombers[proOwnerID].underShield = gameFrame + 45
+						if targetID then
+							local height = GetWantedBomberHeight(targetID, proOwnerID, bombers[proOwnerID].config, true)
+							local distance = GetCollisionDistance(proOwnerID, targetID)
+							temporaryDive(proOwnerID, 45, height, distance)
+						else
+							temporaryDive(proOwnerID, 45, 40)
+						end
 					end
-				end
+				--end
 			end
 		end
-		return 0
+		Spring.DeleteProjectile(proID)
+		return true
 	end
 end
 

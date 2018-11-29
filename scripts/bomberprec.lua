@@ -208,6 +208,13 @@ function script.BlockShot(num, targetID)
 	return true
 end
 
+local function SpamFireCheck()
+	for i = 1, 10 do
+		GG.Bomber_Dive_fake_fired(unitID)
+		Sleep(100)
+	end
+end
+
 function script.FireWeapon(num)
 	if num == 2 then
 		SetUnarmedAI()
@@ -218,7 +225,7 @@ function script.FireWeapon(num)
 		Move(drop, y_axis, 0)
 		Reload()
 	elseif num == 3 then
-		GG.Bomber_Dive_fake_fired(unitID)
+		StartThread(SpamFireCheck)
 	end
 end
 

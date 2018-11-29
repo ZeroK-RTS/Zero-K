@@ -274,7 +274,7 @@ options = {
 		path = 'Hotkeys/Selection',
 		dontRegisterAction = true,
 	},
-	lblSelection = { type='label', name='Commander', path='Hotkeys/Selection', },
+	lblSelection = { type='label', name='Quick Selection Bar', path='Hotkeys/Selection', },
 	selectcomm = { type = 'button',
 		name = 'Select Commander',
 		action = 'selectcomm',
@@ -495,7 +495,7 @@ end
 local SELECT_FACTORY = "epic_chili_core_selector_select_factory_"
 
 -- Factory hotkeys
-local hotkeyPath = 'Settings/HUD Panels/Quick Selection Bar/Hotkeys'
+local hotkeyPath = 'Hotkeys/Selection/Factory Selection'
 for i = 1, 16 do
 	local optionName = "select_factory_" .. i
 	options_order[#options_order + 1] = optionName

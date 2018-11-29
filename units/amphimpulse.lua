@@ -16,8 +16,7 @@ unitDef = {
   customParams           = {
     amph_regen = 40,
     amph_submerged_at = 40,
-	sink_on_emp    = 1,
-    maxwatertank   = [[180]],
+    sink_on_emp    = 1,
     floattoggle    = [[1]],
   },
 
@@ -60,7 +59,7 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-	{
+    {
       def                = [[FAKE_WATERCANNON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
@@ -81,14 +80,14 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        impulse = [[30]],
+        impulse = [[500]],
         impulsemaxdepth = [[20]],
         impulsedepthmult = [[0.5]],
         normaldamage = [[1]],
 
-        stats_damage = 10.4,
-		stats_hide_damage = 1, -- continuous laser
-		stats_hide_reload = 1,
+        --stats_damage = 10.4,
+		--stats_hide_damage = 1, -- continuous laser
+		--stats_hide_reload = 1,
 		
 		light_camera_height = 1500,
 		light_color = [[0 0.03 0.07]],
@@ -96,7 +95,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 1.3,
+        default = 15,
         subs    = 1,
       },
 
@@ -107,12 +106,13 @@ unitDef = {
       laserFlareSize          = 0,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 300,
-      reloadtime              = 0.1,
-      rgbColor                = [[0.2 0.2 0.3]],
+      projectiles             = 2,
+      range                   = 280,
+      reloadtime              = 20/30,
+      rgbColor                = [[0.5 0.5 0.65]],
       scrollSpeed             = 10,
---      soundStart              = [[weapon/laser/laser_burn8]],
-      soundTrigger            = true,
+      soundStart              = [[weapon/watershort]],
+      soundStartVolume        = 5,
       sweepfire               = false,
       texture1	              = [[corelaser]],
       texture2                = [[wake]],
@@ -125,7 +125,7 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
     },
-	
+  
     FAKE_WATERCANNON = {
       name                    = [[Fake Water Cutter]],
       areaOfEffect            = 128,
@@ -153,7 +153,7 @@ unitDef = {
       laserFlareSize          = 0,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 300,
+      range                   = 280,
       reloadtime              = 0.1,
       rgbColor                = [[0.2 0.2 0.3]],
       scrollSpeed             = 10,

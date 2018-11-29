@@ -532,7 +532,7 @@ local behaviourConfig = {
   
 	-- longer ranged swarmers
 	["shieldraid"] = {
-		skirms = shortRangeSkirmieeArray, 
+		skirms = riotRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		fightOnlyUnits = shortRangeExplodables,
@@ -712,6 +712,15 @@ local behaviourConfig = {
 		fightOnlyUnits = shortRangeExplodables,
 		maxSwarmLeeway = 0, 
 		skirmLeeway = 20, 
+		velocityPrediction = 20
+	},
+	["jumpcon"] = {
+		skirms = lowMedRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		fightOnlyUnits = medRangeExplodables,
+		maxSwarmLeeway = 0, 
+		skirmLeeway = 0, 
 		velocityPrediction = 20
 	},
 	["spiderriot"] = {
@@ -1051,9 +1060,9 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 30,
+		skirmLeeway = -45,
 		skirmOrderDis = 200,
-		velocityPrediction = 60,
+		velocityPrediction = 120,
 		skirmBlockedApproachFrames = 40,
 	},
 	["shipskirm"] = {

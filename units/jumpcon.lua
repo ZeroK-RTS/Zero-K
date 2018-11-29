@@ -92,9 +92,9 @@ unitDef = {
       craterMult              = 0,
 
       customparams = {
-        timeslow_damagefactor = 1,
-        timeslow_onlyslow = 1,
+        timeslow_damagefactor = 12,
         timeslow_smartretarget = 0.33,
+        timeslow_smartretargethealth = 50,
 		
 		light_camera_height = 1800,
 		light_color = [[0.4 0.15 0.55]],
@@ -102,7 +102,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 180,
+        default = 15,
       },
 
       explosionGenerator      = [[custom:flashslow]],
@@ -119,7 +119,7 @@ unitDef = {
       reloadtime              = 2,
       rgbColor                = [[0.3 0 0.4]],
       soundStart              = [[weapon/laser/pulse_laser2]],
-      soundStartVolume        = 11,
+      soundStartVolume        = 30,
       soundTrigger            = true,
       sweepfire               = false,
       texture1                = [[largelaser]],

@@ -322,7 +322,7 @@ if (not Game.mapDamage) then  -- map has "notDeformable = true", or "disablemapd
 
 	for _, cmdDesc in ipairs(cmdDescsArray) do
 		cmdDesc.disabled = true
-		dDesc.tooltip  = cmdDesc.tooltip .. disabledText
+		cmdDesc.tooltip  = cmdDesc.tooltip .. disabledText
 	end
 elseif modOptions.terrarestoreonly == "1" then
 	include("LuaRules/colors.h.lua")

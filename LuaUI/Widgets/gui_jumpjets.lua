@@ -120,7 +120,7 @@ local function ListToSet(t)
 end
 
 local ignore = {
-  [CMD_SET_WANTED_MAX_SPEED] = true,
+  [CMD_SET_WANTED_MAX_SPEED or 70] = true,
 }
 
 local curve = {CMD_MOVE, CMD_RAW_MOVE, CMD_JUMP, CMD_FIGHT}

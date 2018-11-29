@@ -1,4 +1,5 @@
 local gun = piece 'gun' 
+local yaw = piece 'yaw'
 local pelvis = piece 'pelvis' 
 local fire = piece 'fire' 
 local rcalf = piece 'rcalf' 
@@ -13,6 +14,7 @@ include "constants.lua"
 -- Signal definitions
 local SIG_MOVE = 1
 local SIG_AIM = 2
+local SIG_RESTORE = 4
 
 local function WalkThread()
 
@@ -197,7 +199,22 @@ function script.QueryWeapon()
 	return fire
 end
 
-function script.AimWeapon()
+local function RestoreAfterDelay()
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
+	Sleep(800)
+	Turn(yaw, y_axis, 0, math.rad(80))
+	Turn(gun, x_axis, 0, math.rad(80))
+end
+
+function script.AimWeapon(num, heading, pitch)
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
+	Turn(yaw, y_axis, heading, math.rad(420))
+	Turn(gun, x_axis, -pitch, math.rad(220))
+	WaitForTurn(yaw, y_axis)
+	WaitForTurn(gun, x_axis)
+	StartThread(RestoreAfterDelay)
 	return true
 end
 

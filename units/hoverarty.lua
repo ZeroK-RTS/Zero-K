@@ -18,7 +18,8 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	dontfireatradarcommand = '0',
+    modelradius    = [[32]],
+    dontfireatradarcommand = '0',
     aimposoffset   = [[0 15 0]],
   },
 

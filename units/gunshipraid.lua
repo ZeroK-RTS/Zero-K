@@ -34,7 +34,7 @@ unitDef = {
   idleAutoHeal           = 10,
   idleTime               = 150,
   maxDamage              = 860,
-  maxVelocity            = 6.5,
+  maxVelocity            = 6.9,
   minCloakDistance       = 75,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[banshee.s3o]],
@@ -57,7 +57,7 @@ unitDef = {
     {
       def                = [[LASER]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 135,
+      maxAngleDif        = 160,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
@@ -88,8 +88,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 6.83, -- 6.15
-        subs    = 0.315,
+        default = 7.5,
+        subs    = 0.5,
       },
 
       explosionGenerator      = [[custom:flash1red]],

@@ -18,7 +18,7 @@ local rim1 = piece 'rim1'
 local rim2 = piece 'rim2' 
 
 include "constants.lua"
-include "RockPiece.lua"
+include "rockPiece.lua"
 
 local shootCycle = 0
 local gunHeading = 0
@@ -43,6 +43,27 @@ local ROCK_DECAY = -0.3	--Rocking around axis is reduced by this factor each tim
 local ROCK_PIECE = base	-- should be negative to alternate rocking direction.
 local ROCK_MIN = 0.001 --If around axis rock is not greater than this amount, rocking will stop after returning to center.
 local ROCK_MAX = 1.2
+
+local rockData = {
+	[x_axis] = {
+		piece  = ROCK_PIECE,
+		speed  = ROCK_SPEED,
+		decay  = ROCK_DECAY,
+		minPos = ROCK_MIN,
+		maxPos = ROCK_MAX,
+		signal = SIG_ROCK_X,
+		axis = x_axis,
+	},
+	[z_axis] = {
+		piece  = ROCK_PIECE,
+		speed  = ROCK_SPEED,
+		decay  = ROCK_DECAY,
+		minPos = ROCK_MIN,
+		maxPos = ROCK_MAX,
+		signal = SIG_ROCK_Z,
+		axis = z_axis,
+	},
+}
 
 ----------------------------------------------------------
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
@@ -78,8 +99,8 @@ end
 
 --[[
 function script.HitByWeapon(x, z, weaponID, damage)
-	StartThread(Rock, false, x*ROCK_DAMGE_MULT*damage, z_axis)
-	StartThread(Rock, false, -z*ROCK_DAMGE_MULT*damage, x_axis)
+	StartThread(Rock, z_axis, false, x*ROCK_DAMGE_MULT*damage)
+	StartThread(Rock, x_axis, false, -z*ROCK_DAMGE_MULT*damage)
 end
 ]]
 
@@ -111,8 +132,7 @@ function script.Create()
 	StartThread(SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
-	InitializeRock(ROCK_PIECE, ROCK_SPEED, ROCK_DECAY, ROCK_MIN, ROCK_MAX, SIG_ROCK_X, x_axis)
-	InitializeRock(ROCK_PIECE, ROCK_SPEED, ROCK_DECAY, ROCK_MIN, ROCK_MAX, SIG_ROCK_Z, z_axis)
+	InitializeRock(rockData)
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (100)
 	end
@@ -170,8 +190,8 @@ end
 
 
 function script.FireWeapon(num)
-	StartThread(Rock, gunHeading, ROCK_FIRE_FORCE, z_axis)
-	StartThread(Rock, gunHeading - hpi, ROCK_FIRE_FORCE, x_axis)
+	StartThread(Rock, z_axis, gunHeading, ROCK_FIRE_FORCE)
+	StartThread(Rock, x_axis, gunHeading - hpi, ROCK_FIRE_FORCE)
 	EmitSfx(flareMap[shootCycle], 1025)
 	shootCycle = (shootCycle + 1) % 2
 end

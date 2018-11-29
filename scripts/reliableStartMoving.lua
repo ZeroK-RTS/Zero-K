@@ -11,7 +11,7 @@ function StartStopMovingControl(startFunc, stopFunc, thresholdSpeed, fallingCoun
 		x,y,z = spGetUnitPosition(unitID)
 		height = spGetGroundHeight(x,z)
 		if y - height < 1 then
-			speed = select(4,spGetUnitVelocity(unitID))
+			speed = select(4, spGetUnitVelocity(unitID))
 			if moving then
 				if speed <= thresholdSpeed then
 					moving = false

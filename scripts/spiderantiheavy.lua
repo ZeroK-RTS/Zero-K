@@ -153,6 +153,10 @@ function script.QueryWeapon(num)
 	return flare
 end
 
+function script.BlockShot(num, targetID)
+	return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) or false
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then

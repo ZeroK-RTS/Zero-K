@@ -23,7 +23,7 @@ local CANT_BE_TRANSPORTED_DECAY_TIME = 200
 local COMMAND_MOVE_RADIUS = 80
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
-local CMD_FIGHT		= CMD.FIGHT
+local CMD_FIGHT                = CMD.FIGHT
 local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 
 VFS.Include("LuaRules/Utilities/ClampPosition.lua")
@@ -191,7 +191,6 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	end
 	
 	if cmdID == CMD_SET_FERRY then
-		
 		if movingPoint then
 			local route = ferryRoutes.route[movingPoint.r]
 			if movingPoint.index == 0 then
@@ -296,7 +295,6 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		end
 		
 		return true
-		
 	elseif (cmdID == CMD_RAW_MOVE or cmdID == CMD.MOVE or cmdID == CMD_FIGHT) and cmdParams then
 	
 		local routeID = nearFerryPoint(cmdParams[1], cmdParams[3], COLLECTION_RADIUS_DRAW)
@@ -317,21 +315,18 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				end
 			end
 			return false
-
 		end
 	elseif cmdID == CMD.LOAD_ONTO and transport[cmdParams[1]] and transport[cmdParams[1]].route then
 		removeTransportFromRoute(cmdParams[1])
-	end	
+	end
 	
 	local selected = Spring.GetSelectedUnits()
 	local count = #selected
-	
 	for i = 1, count do
 		if transport[selected[i]] then
 			removeTransportFromRoute(selected[i])
 		end
 	end
-	
 end
 
 function widget:MousePress(mx, my, button)

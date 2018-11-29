@@ -21,7 +21,7 @@ unitDef = {
 	modelradius    = [[30]],
   },
 
-  damageModifier         = 0.33,
+  damageModifier         = 0.25,
   explodeAs              = [[BIG_UNIT]],
   footprintX             = 4,
   footprintZ             = 4,

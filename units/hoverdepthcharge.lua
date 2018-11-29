@@ -19,6 +19,7 @@ unitDef = {
 
   customParams        = {
     turnatfullspeed = [[1]],
+    modelradius    = [[25]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

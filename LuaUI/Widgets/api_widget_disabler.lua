@@ -15,10 +15,8 @@ end
 --[[Documentation:
 The table below here controls what widgets are disabled. To add new widgets to it, simply add the line [2] = "widget human name"
 (NOT the file name! It's the string in the name field of the widget!).
-
 When the widget is loaded, it sees if widgets included in the table are loaded, and disables them if they are.
 After this is completed, the widget removes itself.
-
 Please also include the reason in the reason table.]]
 
 -- Speed ups --

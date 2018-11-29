@@ -197,12 +197,14 @@ local CMD_MOVE = CMD.MOVE
 local CMD_ATTACK = CMD.ATTACK
 local CMD_UNLOADUNIT = CMD.UNLOAD_UNIT
 local CMD_UNLOADUNITS = CMD.UNLOAD_UNITS
-local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
+local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED or 70
 local CMD_OPT_ALT = CMD.OPT_ALT
 local CMD_OPT_CTRL = CMD.OPT_CTRL
 local CMD_OPT_META = CMD.OPT_META
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local CMD_OPT_RIGHT = CMD.OPT_RIGHT
+
+local REMOVED_SET_WANTED_MAX_SPEED = not CMD.SET_WANTED_MAX_SPEED
 
 local keyShift = 304
 
@@ -436,7 +438,12 @@ local function GiveNotifyingOrder(cmdID, cmdParams, cmdOpts)
 	if widgetHandler:CommandNotify(cmdID, cmdParams, cmdOpts) then
 		return
 	end
-	spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
+	if REMOVED_SET_WANTED_MAX_SPEED and cmdID == CMD_SET_WANTED_MAX_SPEED then
+		local units = Spring.GetSelectedUnits()
+		Spring.GiveOrderToUnitArray(units, CMD_WANTED_SPEED, {cmdParams[1]*30}, 0)
+	else
+		spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
+	end
 end
 
 local function GiveNonNotifyingOrder(cmdID, cmdParams, cmdOpts)
@@ -452,7 +459,32 @@ local function GiveNotifyingOrderToUnit(uID, cmdID, cmdParams, cmdOpts)
 		end
 	end
 	
-	spGiveOrderToUnit(uID, cmdID, cmdParams, cmdOpts.coded)
+	if REMOVED_SET_WANTED_MAX_SPEED and cmdID == CMD_SET_WANTED_MAX_SPEED then
+		Spring.GiveOrderToUnit(uID, CMD_WANTED_SPEED, {cmdParams[1]*30}, 0)
+	else
+		spGiveOrderToUnit(uID, cmdID, cmdParams, cmdOpts.coded)
+	end
+end
+
+local function SendSetWantedMaxSpeed(alt, ctrl, meta, shift)
+	-- Move Speed (Applicable to every order)
+	local wantedSpeed = 99999 -- High enough to exceed all units speed, but not high enough to cause errors (i.e. vs math.huge)
+	if ctrl then
+		local selUnits = spGetSelectedUnits()
+		for i = 1, #selUnits do
+			local uSpeed = UnitDefs[spGetUnitDefID(selUnits[i])].speed
+			if uSpeed > 0 and uSpeed < wantedSpeed then
+				wantedSpeed = uSpeed
+			end
+		end
+	elseif REMOVED_SET_WANTED_MAX_SPEED then
+		wantedSpeed = -1
+	end
+	
+	-- Directly giving speed order appears to work perfectly, including with shifted orders ...
+	-- ... But other widgets CMD.INSERT the speed order into the front (Posn 1) of the queue instead (which doesn't work with shifted orders)
+	local speedOpts = GetCmdOpts(alt, ctrl, meta, shift, true)
+	GiveNotifyingOrder(CMD_SET_WANTED_MAX_SPEED, {wantedSpeed / 30}, speedOpts)
 end
 
 --------------------------------------------------------------------------------
@@ -577,6 +609,7 @@ function widget:MouseMove(mx, my, dx, dy, mButton)
 			lastPathPos = pos
 			
 			draggingPath = true
+			SendSetWantedMaxSpeed(alt, ctrl, meta, shift)
 		end
 	else
 		-- Are we dragging a path?
@@ -718,23 +751,7 @@ function widget:MouseRelease(mx, my, mButton)
 			end
 		end
 		
-		-- Move Speed (Applicable to every order)
-		local wantedSpeed = 99999 -- High enough to exceed all units speed, but not high enough to cause errors (i.e. vs math.huge)
-		
-		if ctrl then
-			local selUnits = spGetSelectedUnits()
-			for i = 1, #selUnits do
-				local uSpeed = UnitDefs[spGetUnitDefID(selUnits[i])].speed
-				if uSpeed > 0 and uSpeed < wantedSpeed then
-					wantedSpeed = uSpeed
-				end
-			end
-		end
-		
-		-- Directly giving speed order appears to work perfectly, including with shifted orders ...
-		-- ... But other widgets CMD.INSERT the speed order into the front (Posn 1) of the queue instead (which doesn't work with shifted orders)
-		local speedOpts = GetCmdOpts(alt, ctrl, meta, shift, true)
-		GiveNotifyingOrder(CMD_SET_WANTED_MAX_SPEED, {wantedSpeed / 30}, speedOpts)
+		SendSetWantedMaxSpeed(alt, ctrl, meta, shift)
 	end
 	
 	if #fNodes > 1 then

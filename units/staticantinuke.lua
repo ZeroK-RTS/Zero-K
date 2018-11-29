@@ -14,13 +14,14 @@ unitDef = {
   buildPic                      = [[staticantinuke.png]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[70 70 110]],
-  collisionVolumeType           = [[CylZ]],
+  collisionVolumeScales         = [[70 55 110]],
+  collisionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
 	removewait     = 1,
     nuke_coverage  = 2500,
+    modelradius      = [[50]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

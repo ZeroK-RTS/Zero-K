@@ -5,13 +5,13 @@ local versionName = "v1.0b"
 
 function widget:GetInfo()
   return {
-    name      = "Shield Guard",
-    desc      = versionName .. " Units walking with Area Shield will move at same speed. Area Shield will slow down for slow unit and fast unit will slow down for Area Shield. Work with GUARD (Area Shield) command & MOVE command, but doesn't work with queueing (result only apply to first queue).",
-    author    = "Google Frog, +renovated by msafwan",
-    date      = "9 Mar, 2009, +9 April 2012",
-    license   = "GNU GPL, v2 or later",
-    layer     = 5,
-    enabled   = false --  loaded by default?
+	name	  = "Shield Guard",
+	desc	  = versionName .. " Units walking with Area Shield will move at same speed. Area Shield will slow down for slow unit and fast unit will slow down for Area Shield. Work with GUARD (Area Shield) command & MOVE command, but doesn't work with queueing (result only apply to first queue).",
+	author    = "Google Frog, +renovated by msafwan",
+	date	  = "9 Mar, 2009, +9 April 2012",
+	license   = "GNU GPL, v2 or later",
+	layer	 = 5,
+	enabled   = false --  loaded by default?
   }
 end
 
@@ -23,9 +23,9 @@ local CMD_GUARD = CMD.GUARD
 local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 local CMD_WAITCODE_GATHER = CMD.WAITCODE_GATHER
 
-local spGetSelectedUnits 	= Spring.GetSelectedUnits
-local spGetUnitDefID 		= Spring.GetUnitDefID
-local spGetTeamUnits 		= Spring.GetTeamUnits
+local spGetSelectedUnits     = Spring.GetSelectedUnits
+local spGetUnitDefID 	    = Spring.GetUnitDefID
+local spGetTeamUnits 	    = Spring.GetTeamUnits
 local spSendCommands = Spring.SendCommands
 local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
 
@@ -62,7 +62,7 @@ function widget:CommandNotify(id, params, options)
 		end
 		if #availableAreaShieldUnit > 0 and id == CMD_MOVE then --//perform command substitution when areaShield is part of the selection and is using MOVE command.
 			local maxSpeed=shieldSpeed
-			for i=1, #availableAreaShieldUnit , 1 do --//append "selectedUnit" with the list of unit that guarding the area-Shield. These extra unit will also be given the same move command
+			for i=1, #availableAreaShieldUnit, 1 do --//append "selectedUnit" with the list of unit that guarding the area-Shield. These extra unit will also be given the same move command
 				local areaShieldID = availableAreaShieldUnit[i]
 				local followerList = Deepcopy(areaShieldUnit[areaShieldID].guardedBy) --//NEEDED: because LUA didn't copy the table's value, instead it refer to the table itself and any changes made to the copy is not localized & will propagate to the original table
 				local listLenght = #followerList
@@ -83,7 +83,7 @@ function widget:CommandNotify(id, params, options)
 			--spGiveOrderToUnitArray(selectedUnits, CMD_SET_WANTED_MAX_SPEED, {maxSpeed},{"shift",})
 			--spGiveOrderToUnitArray(selectedUnits, CMD_WAITCODE_GATHER, {},{"shift"}) --// allow units to wait each other before going to next queue (assuming player will queue another command)
 			
-			for i=1, #availableAreaShieldUnit , 1 do --//go over the areaShield's "guardBy" list and queue a (preserve the) GUARD order
+			for i=1, #availableAreaShieldUnit, 1 do --//go over the areaShield's "guardBy" list and queue a (preserve the) GUARD order
 				local areaShieldUnitID = availableAreaShieldUnit[i]
 				local followerList = areaShieldUnit[areaShieldUnitID].guardedBy
 				if enableEcho then Spring.Echo(areaShieldUnitID .. " areaShieldUnitID") end
@@ -131,22 +131,22 @@ end
 -----------------------
 --Add shield
 
-function Deepcopy(object) --//method to actually copy a table instead of refering to the table's object (to fix a bug). Reference: http://lua-users.org/wiki/CopyTable , http://stackoverflow.com/questions/640642/how-do-you-copy-a-lua-table-by-value
-    local lookup_table = {}
-    local function _copy(object)
-        if type(object) ~= "table" then
-            return object
-        elseif lookup_table[object] then
-            return lookup_table[object]
-        end
-        local new_table = {}
-        lookup_table[object] = new_table
-        for index, value in pairs(object) do
-            new_table[_copy(index)] = _copy(value)
-        end
-        return setmetatable(new_table, getmetatable(object))
-    end
-    return _copy(object)
+function Deepcopy(object) --//method to actually copy a table instead of refering to the table's object (to fix a bug). Reference: http://lua-users.org/wiki/CopyTable, http://stackoverflow.com/questions/640642/how-do-you-copy-a-lua-table-by-value
+	local lookup_table = {}
+	local function _copy(object)
+		if type(object) ~= "table" then
+			return object
+		elseif lookup_table[object] then
+			return lookup_table[object]
+		end
+		local new_table = {}
+		lookup_table[object] = new_table
+		for index, value in pairs(object) do
+			new_table[_copy(index)] = _copy(value)
+		end
+		return setmetatable(new_table, getmetatable(object))
+	end
+	return _copy(object)
 end
 
 
@@ -218,7 +218,7 @@ function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
   end
   
   if (oldTeam == team) then
-    widget:UnitDestroyed(unitID, unitDefID, newTeam)
+	widget:UnitDestroyed(unitID, unitDefID, newTeam)
   end
   
 end
@@ -230,7 +230,7 @@ function widget:Initialize()
   
   local units = spGetTeamUnits(team)
   for i, id in ipairs(units) do 
-    widget:UnitCreated(id, spGetUnitDefID(id),team)
+	widget:UnitCreated(id, spGetUnitDefID(id),team)
   end
 	
 end
@@ -238,15 +238,15 @@ end
 --Previous implementation (for future reference). It work by sending several individual command every half a second, but this might be considered a spam by Spring and is causing user command to be delayed (probably able to use "spGiveOrderToUnitArray" to fix but not tested yet).
 
 function widget:GetInfo()
-  return {
-    name      = "Shield Guard",
-    desc      = "Replaces guarding mobile shields with follow. Shields move at speed of slowest unit following and wait for stragglers.",
-    author    = "Google Frog",
-    date      = "9 Mar, 2009",
-    license   = "GNU GPL, v2 or later",
-    layer     = 5,
-    enabled   = true --  loaded by default?
-  }
+	return {
+		name	  = "Shield Guard",
+		desc	  = "Replaces guarding mobile shields with follow. Shields move at speed of slowest unit following and wait for stragglers.",
+		author    = "Google Frog",
+		date	  = "9 Mar, 2009",
+		license   = "GNU GPL, v2 or later",
+		layer	 = 5,
+		enabled   = true --  loaded by default?
+	}
 end
 
 
@@ -268,13 +268,13 @@ local TABLE_1 = {1}
 
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
-local spGetUnitPosition 	= Spring.GetUnitPosition
-local spGetSelectedUnits 	= Spring.GetSelectedUnits
-local spValidUnitID 		= Spring.ValidUnitID
-local spGetUnitDefID 		= Spring.GetUnitDefID
-local spGetCommandQueue 	= Spring.GetCommandQueue
-local spGetTeamUnits 		= Spring.GetTeamUnits
-local spGetUnitSeparation 	= Spring.GetUnitSeparation
+local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetSelectedUnits    = Spring.GetSelectedUnits
+local spValidUnitID         = Spring.ValidUnitID
+local spGetUnitDefID        = Spring.GetUnitDefID
+local spGetCommandQueue     = Spring.GetCommandQueue
+local spGetTeamUnits        = Spring.GetTeamUnits
+local spGetUnitSeparation   = Spring.GetUnitSeparation
 
 VFS.Include("LuaRules/Utilities/ClampPosition.lua")
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
@@ -295,8 +295,8 @@ local shieldRadius = {shieldshield = 300, shieldassault = 80, shieldcon = 80}
 local shieldWait = {shieldshield = true, shieldassault = false, shieldcon = false}
 
 local shieldArray = { 
-  "shieldassault",
-  "shieldcon",
+	"shieldassault",
+	"shieldcon",
 }
 
 
@@ -309,23 +309,22 @@ local shieldArray = {
 -- Update shield info and wait if units are lagging behind
 
 local function updateShields()
-    
 	for unit, i in pairs(shields) do
-     
 		i.ux,i.uy,i.uz = spGetUnitPosition(unit)
- 
 		if i.waits then
-			spGiveOrderToUnit(unit, CMD_REMOVE, TABLE_1, CMD.OPT_ALT )
-			spGiveOrderToUnit(unit, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, i.maxVel }, CMD.OPT_ALT )
-  
+			spGiveOrderToUnit(unit, CMD_REMOVE, TABLE_1, CMD.OPT_ALT)
+			
+			-- Prevent the shield from outpacing its units
+			if CMD_SET_WANTED_MAX_SPEED then
+				spGiveOrderToUnit(unit, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, i.maxVel }, CMD.OPT_ALT)
+			else
+				spGiveOrderToUnit(unit, CMD_WANTED_SPEED, {i.maxVel*30}, 0)
+			end
 			local cQueue = spGetCommandQueue(unit, 1) 
 
 			if (#cQueue ~= 0) and (i.folCount ~= 0) then
-			
 				local wait = (cQueue[1].id == CMD_WAIT)
-	
 				if wait then
-	  
 					wait = false
 					for cid, j in pairs(i.shieldiees) do
 						local dis = spGetUnitSeparation(unit,cid)
@@ -333,12 +332,11 @@ local function updateShields()
 							wait = true
 						end
 					end
-	  
+					
 					if (not wait) then
 						spGiveOrderToUnit(unit,CMD_WAIT, EMPTY_TABLE, CMD_OPT_RIGHT)
 					end
 				else
-	
 					wait = false
 					for cid, j in pairs(i.shieldiees) do
 						local dis = spGetUnitSeparation(unit,cid)
@@ -346,7 +344,7 @@ local function updateShields()
 							wait = true
 						end
 					end
-			
+					
 					if wait then
 						spGiveOrderToUnit(unit,CMD_WAIT, EMPTY_TABLE, CMD_OPT_RIGHT)
 					end
@@ -362,33 +360,27 @@ end
 -- Update shield info and wait if units are lagging behind
 
 local function updateFollowers()
-
-  for unit, v in pairs(follower) do
-
-	if (v.fol) then -- give move orders to shieldiees
-	  local dis = spGetUnitSeparation(unit,v.fol)
-	  if dis > v.range then
-	    GiveClampedOrderToUnit(unit,CMD_RAW_MOVE,{shields[v.fol].ux,shields[v.fol].uy,shields[v.fol].uz},CMD_OPT_RIGHT)
-	  elseif (shieldieeStopDis < dis) then
-	    GiveClampedOrderToUnit(unit,CMD_RAW_MOVE,{shields[v.fol].ux,shields[v.fol].uy,shields[v.fol].uz},CMD_OPT_RIGHT)
-	  else
-	    spGiveOrderToUnit(unit,CMD_STOP, EMPTY_TABLE, CMD_OPT_RIGHT)
-	  end
+	for unit, v in pairs(follower) do
+		if (v.fol) then -- give move orders to shieldiees
+			local dis = spGetUnitSeparation(unit,v.fol)
+			if dis > v.range then
+				GiveClampedOrderToUnit(unit,CMD_RAW_MOVE,{shields[v.fol].ux,shields[v.fol].uy,shields[v.fol].uz},CMD_OPT_RIGHT)
+			elseif (shieldieeStopDis < dis) then
+				GiveClampedOrderToUnit(unit,CMD_RAW_MOVE,{shields[v.fol].ux,shields[v.fol].uy,shields[v.fol].uz},CMD_OPT_RIGHT)
+			else
+				spGiveOrderToUnit(unit,CMD_STOP, EMPTY_TABLE, CMD_OPT_RIGHT)
+			end
+		end
 	end
-	
-  end
-  
 end
 
 -- update following and shield
 
 function widget:GameFrame(n)
-  
-  if (n%15<1) then 
-    updateShields()
-	updateFollowers()
-  end
-  
+	if (n%15<1) then 
+		updateShields()
+		updateFollowers()
+	end
 end 
 
 
@@ -397,162 +389,150 @@ end
 -- Override and add units guarding shields
 
 function widget:CommandNotify(id, params, options)
-  
-  local units = spGetSelectedUnits()
-  
-  for _,sid in ipairs(units) do
-    if follower[sid] then
-      local c = shields[follower[sid].fol]
-	  c.shieldiees[sid] = nil
-	  if c.maxVelID == sid then
-	    c.maxVel = c.selfVel
-	    c.maxVelID = -1
-		spGiveOrderToUnit(follower[sid].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD.OPT_ALT)
-	    for cid, j in pairs(c.shieldiees) do
-	      if j.vel < c.maxVel then
-		    c.maxVel = j.vel
-		    c.maxVelID = cid
-		  end
-	    end
-	  end
-	  c.folCount = c.folCount-1
-	  follower[sid] = nil
-	end
-  end
-
-  if (id == CMD_GUARD) then
-
-    local uid = params[1]
-    for cid,v in pairs(shields) do
-	  if (uid == cid) then
-		for _,sid in ipairs(units) do
-		  local ud = UnitDefs[spGetUnitDefID(sid)]
-		  if ud.canMove and not ud.isFactory and ud.buildSpeed == 0 then
-			local speed = ud.speed/30
-			if speed < v.maxVel then
-			  v.maxVel = speed
-			  v.maxVelID = sid
+	local units = spGetSelectedUnits()
+	for _,sid in ipairs(units) do
+		if follower[sid] then
+			local c = shields[follower[sid].fol]
+			c.shieldiees[sid] = nil
+			if c.maxVelID == sid then
+				c.maxVel = c.selfVel
+				c.maxVelID = -1
+				if CMD_SET_WANTED_MAX_SPEED then
+					spGiveOrderToUnit(follower[sid].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD.OPT_ALT)
+				else
+					spGiveOrderToUnit(follower[sid].fol, CMD_WANTED_SPEED, {c.selfVel*30}, 0)
+				end
+				for cid, j in pairs(c.shieldiees) do
+					if j.vel < c.maxVel then
+						c.maxVel = j.vel
+						c.maxVelID = cid
+					end
+				end
 			end
-		    follower[sid] = {
-			fol = cid, 
-			vel = speed,
-			range = v.range
-			}
-		    v.shieldiees[sid] = follower[sid]
-			v.folCount = v.folCount+1
-		  else
-			spGiveOrderToUnit(sid, id, params, options)	
-		  end
+			c.folCount = c.folCount-1
+			follower[sid] = nil
 		end
-		
-		return true
-		
-      end
-	end 
-  
-  end
- 
+	end
+
+	if (id == CMD_GUARD) then
+		local uid = params[1]
+		for cid,v in pairs(shields) do
+			if (uid == cid) then
+				for _,sid in ipairs(units) do
+					local ud = UnitDefs[spGetUnitDefID(sid)]
+					if ud.canMove and not ud.isFactory and ud.buildSpeed == 0 then
+						local speed = ud.speed/30
+						if speed < v.maxVel then
+							v.maxVel = speed
+							v.maxVelID = sid
+						end
+						follower[sid] = {
+							fol = cid, 
+							vel = speed,
+							range = v.range
+						}
+						v.shieldiees[sid] = follower[sid]
+						v.folCount = v.folCount+1
+					else
+						spGiveOrderToUnit(sid, id, params, options)	
+					end
+				end
+				return true
+			end
+		end
+	end
+
 end
-  
+
 -----------------------
 --Add shield
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-
-  if unitTeam ~= team then
-    return
-  end
-
-  local ud = UnitDefs[unitDefID]
-
-  if (ud ~= nil) then
-    
-    for i, name in pairs(shieldArray) do
-	  if (ud.name == name) then
-		local ux,uy,uz = spGetUnitPosition(unitID)
-		local speed = ud.speed/30
-		local shieldRange = shieldRadius[ud.name]
-		local waits = shieldWait[ud.name]
-		shields[unitID] = {id = unitID, ux = ux, uy = uy, uz = uz, 
-		range = shieldRange-shieldRangeSafety, 
-		reactiveRange = shieldRange-shieldReactivateRange, 
-		shieldiees = {},
-		folCount = 0,
-		waits = waits,
-		selfVel = speed, 
-		maxVel = speed,
-		maxVelID = -1
-		}
-		break
-	  end
+	if unitTeam ~= team then
+		return
 	end
-	
-  end
+	local ud = UnitDefs[unitDefID]
 
+	if (ud ~= nil) then
+		for i, name in pairs(shieldArray) do
+			if (ud.name == name) then
+				local ux,uy,uz = spGetUnitPosition(unitID)
+				local speed = ud.speed/30
+				local shieldRange = shieldRadius[ud.name]
+				local waits = shieldWait[ud.name]
+				shields[unitID] = {
+					id = unitID, ux = ux, uy = uy, uz = uz, 
+					range = shieldRange-shieldRangeSafety, 
+					reactiveRange = shieldRange-shieldReactivateRange, 
+					shieldiees = {},
+					folCount = 0,
+					waits = waits,
+					selfVel = speed, 
+					maxVel = speed,
+					maxVelID = -1
+				}
+				break
+			end
+		end
+	end
 end
 
 -----------------------
 --Remove shield or follower
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-
-  local ud = UnitDefs[unitDefID]
-  
-  if shields[unitID] then -- remove shield
-	for fid, j in pairs(shields[unitID].shieldiees) do
-	  follower[fid] = nil
-	end
-	
-	shields[unitID] = nil
-	
-  end
-  
-  if follower[unitID] then -- remove follower
-	local c = shields[follower[unitID].fol]
-	c.shieldiees[unitID] = nil
-	if c.maxVelID == unitID then
-	  c.maxVel = c.selfVel
-	  c.maxVelID = -1
-	  spGiveOrderToUnit(follower[unitID].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD.OPT_ALT)
-	  for cid, j in pairs(c.shieldiees) do
-	    if j.vel < c.maxVel then
-		  c.maxVel = j.vel
-		  c.maxVelID = cid
+	local ud = UnitDefs[unitDefID]
+	if shields[unitID] then -- remove shield
+		for fid, j in pairs(shields[unitID].shieldiees) do
+			follower[fid] = nil
 		end
-	  end
+		shields[unitID] = nil
 	end
-	c.folCount = c.folCount-1
-	follower[unitID] = nil
-	
-  end
 
+	if follower[unitID] then -- remove follower
+		local c = shields[follower[unitID].fol]
+		c.shieldiees[unitID] = nil
+		if c.maxVelID == unitID then
+			c.maxVel = c.selfVel
+			c.maxVelID = -1
+			if CMD_SET_WANTED_MAX_SPEED then
+				spGiveOrderToUnit(follower[unitID].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD.OPT_ALT)
+			else
+				spGiveOrderToUnit(follower[sid].fol, CMD_WANTED_SPEED, {c.selfVel*30}, 0)
+			end
+			for cid, j in pairs(c.shieldiees) do
+				if j.vel < c.maxVel then
+					c.maxVel = j.vel
+					c.maxVelID = cid
+				end
+			end
+		end
+		c.folCount = c.folCount-1
+		follower[unitID] = nil
+	end
 end
 
 -----------------------
 --Add/Remove shield or follower if given/taken
 
 function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
-  
-  if (newTeam == team) then
-	widget:UnitCreated(unitID, unitDefID, newTeam)
-  end
-  
-  if (oldTeam == team) then
-    widget:UnitDestroyed(unitID, unitDefID, newTeam)
-  end
-  
+	if (newTeam == team) then
+		widget:UnitCreated(unitID, unitDefID, newTeam)
+	end
+
+	if (oldTeam == team) then
+		widget:UnitDestroyed(unitID, unitDefID, newTeam)
+	end
 end
 
 -----------------------
 --Add shield names to array
 
 function widget:Initialize() 
-  
-  local units = spGetTeamUnits(team)
-  for i, id in ipairs(units) do 
-    widget:UnitCreated(id, spGetUnitDefID(id),team)
-  end
-	
+	local units = spGetTeamUnits(team)
+	for i, id in ipairs(units) do 
+		widget:UnitCreated(id, spGetUnitDefID(id),team)
+	end
 end
 
 

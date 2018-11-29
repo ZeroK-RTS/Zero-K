@@ -22,6 +22,7 @@ unitDef = {
   customParams        = {
     post_capture_reload = 360,
 	modelradius    = [[13]],
+	turnatfullspeed = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

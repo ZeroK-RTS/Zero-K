@@ -83,6 +83,7 @@ unitDef = {
         gatherradius = [[90]],
         smoothradius = [[60]],
         smoothmult   = [[0.08]],
+		force_ignore_ground = [[1]],
 
 		light_camera_height = 1500,
       },

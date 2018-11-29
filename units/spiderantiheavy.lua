@@ -19,6 +19,7 @@ unitDef = {
   corpse                = [[DEAD]],
 
   customParams          = {
+    dontfireatradarcommand = '1',
   },
 
   explodeAs             = [[BIG_UNITEX]],

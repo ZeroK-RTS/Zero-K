@@ -123,35 +123,30 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 
 	-- check if a target change is needed
 	-- only changes target if the target is fully slowed and next order is an attack order
+	-- also only change if the units health is above the health threshold smartRetargetHealth
 	if spValidUnitID(attackerID) and slowDef.smartRetarget then
 		local health = spGetUnitHealth(unitID)
-		if slowedUnits[unitID].slowDamage > health*slowDef.smartRetarget then
-
+		if slowedUnits[unitID].slowDamage > health*slowDef.smartRetarget and health > (slowDef.smartRetargetHealth or 0) then
 			local cmd = spGetCommandQueue(attackerID, 3)
-
 			-- set order by player
 			if #cmd > 1 and (cmd[1].id == CMD_ATTACK and #cmd[1].params == 1 and cmd[1].params[1] == unitID
-				and (cmd[2].id == CMD_ATTACK or
-				(#cmd > 2 and cmd[2].id == CMD_SET_WANTED_MAX_SPEED and cmd[3].id == CMD_ATTACK))) then
-
+				and (cmd[2].id == CMD_ATTACK or (#cmd > 2 and cmd[2].id == CMD_SET_WANTED_MAX_SPEED and cmd[3].id == CMD_ATTACK))) then
 				local re = spGetUnitStates(attackerID)["repeat"]
-
 				if cmd[2].id == CMD_SET_WANTED_MAX_SPEED then
 					spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag,cmd[2].tag}, 0)
 				else
 					spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},0)
 				end
-
 				if re then
 					spGiveOrderToUnit(attackerID,CMD_ATTACK,cmd[1].params,CMD.OPT_SHIFT)
 				end
-
 			end
 
 			-- if attack is a non-player command
 			if #cmd == 0 or cmd[1].id ~= CMD_ATTACK or (cmd[1].id == CMD_ATTACK and cmd[1].options.internal) then
 				local newTargetID = spGetUnitNearestEnemy(attackerID,UnitDefs[attackerDefID].range, true)
 				if newTargetID ~= unitID and spValidUnitID(attackerID) and spValidUnitID(newTargetID) then
+					
 					local team = spGetUnitTeam(newTargetID)
 					if (not team) or team ~= gaiaTeamID then
 						spSetUnitTarget(attackerID,newTargetID)
@@ -168,7 +163,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 					end
 				end
 			end
-
 		end
 	end
 

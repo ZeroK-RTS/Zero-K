@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[turretaaheavy]],
   name                          = [[Artemis]],
-  description                   = [[Very Long-Range Anti-Air Missile Tower]],
+  description                   = [[Very Long-Range Anti-Air Missile Tower, Drains 4 m/s 20 second stockpile.]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
@@ -20,9 +20,9 @@ unitDef = {
 
   customParams                  = {
 	modelradius    = [[37]],
-	freestockpile  = [[1]],
-	stockpilecost  = [[0]],
+	stockpilecost  = [[80]],
 	stockpiletime  = [[20]],
+	priority_misc  = 1, -- Medium
   },
 
   explodeAs                     = [[ESTOR_BUILDING]],
@@ -31,7 +31,7 @@ unitDef = {
   iconType                      = [[heavysam]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  maxDamage                     = 1570,
+  maxDamage                     = 3200,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
@@ -39,7 +39,7 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[SCREAMER.s3o]],
   onoffable                     = false,
-  script						= [[turretaaheavy.lua]],
+  script                        = [[turretaaheavy.lua]],
   selfDestructAs                = [[ESTOR_BUILDING]],
   sightDistance                 = 660,
   turnRate                      = 0,
@@ -82,7 +82,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.25,
-      energypershot           = 0,
+      energypershot           = 80,
       explosionGenerator      = [[custom:MISSILE_HIT_SPHERE_120]],
       fireStarter             = 90,
       flightTime              = 4,
@@ -90,7 +90,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
-      metalpershot            = 0,
+      metalpershot            = 80,
       model                   = [[wep_m_avalanche.s3o]],
       noSelfDamage            = true,
       range                   = 2400,
