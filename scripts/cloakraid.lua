@@ -166,6 +166,14 @@ function script.FireWeapon(num)
 	Spin(magazine, y_axis, 2)
 	EmitSfx(ejector, 1024)
 	EmitSfx(flare, 1025)
+	-- Generic attributes testing.
+	--GG.Attributes.RemoveEffect(unitID, math.floor(math.random()*10))
+	--GG.Attributes.AddEffect(unitID, math.floor(math.random()*10), {
+	--	move = 0.5 + math.random(),
+	--	reload = 0.5 + math.random(),
+	--	sense = 0.5 + math.random(),
+	--	range = 0.5 + math.random()
+	--})
 end
 
 function script.Killed(recentDamage, maxHealth)
