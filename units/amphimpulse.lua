@@ -80,7 +80,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        impulse = [[450]],
+        impulse = [[460]],
         impulsemaxdepth = [[20]],
         impulsedepthmult = [[0.5]],
         normaldamage = [[1]],
@@ -95,7 +95,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 20,
+        default = 24,
         subs    = 1,
       },
 
@@ -108,7 +108,7 @@ unitDef = {
       noSelfDamage            = true,
       projectiles             = 2,
       range                   = 275,
-      reloadtime              = 22/30,
+      reloadtime              = 20/30,
       rgbColor                = [[0.5 0.5 0.65]],
       scrollSpeed             = 10,
       soundStart              = [[weapon/watershort]],
