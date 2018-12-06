@@ -95,7 +95,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 15,
+        default = 12,
         subs    = 1,
       },
 
@@ -108,7 +108,7 @@ unitDef = {
       noSelfDamage            = true,
       projectiles             = 2,
       range                   = 280,
-      reloadtime              = 20/30,
+      reloadtime              = 22/30,
       rgbColor                = [[0.5 0.5 0.65]],
       scrollSpeed             = 10,
       soundStart              = [[weapon/watershort]],
