@@ -124,7 +124,6 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	end
 	
 	local flyTime = math.max(MIN_FLY_TIME, math.sqrt(math.abs(dy))*10)
-	Spring.Echo("dy", dy, "flyTime", flyTime)
 	
 	local px, py, pz = dx/flyTime, flyTime*GRAVITY/2 + dy/flyTime, dz/flyTime
 	
