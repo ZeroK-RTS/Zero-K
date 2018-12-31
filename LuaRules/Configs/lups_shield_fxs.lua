@@ -56,17 +56,26 @@ for unitDefID = 1, #UnitDefs do
 
 		local myShield = Spring.Utilities.CopyTable(ShieldSphereBase, true)
 		if radius > 250 then
-			myShield.shieldSize = "large"
+			if radius > 400 then
+				myShield.shieldSize = "huge"
+				--==  HQ  ==--
+				myShield.sizeDrift = 0.0004;
+				myShield.marginHQ = 2.8
+				myShield.uvMul = 1.0
+				--== /HQ  ==--
+			else
+				myShield.shieldSize = "large"
+				--==  HQ  ==--
+				myShield.sizeDrift = 0.008;
+				myShield.marginHQ = 2.8
+				myShield.uvMul = 1.0
+				--== /HQ  ==--
+			end
 			myShield.drawBack = 0.55
 			myShield.drawBackCol = 0.3
 			myShield.drawBackMargin = 4.5
 			myShield.margin = 4
 			myShield.hitResposeMult = 0.6
-			--==  HQ  ==--
-			myShield.sizeDrift = 0.008;
-			myShield.marginHQ = 2.8
-			myShield.uvMul = 1.0
-			--== /HQ  ==--
 		else
 			myShield.shieldSize = "small"
 			if radius > 100 then
@@ -106,8 +115,6 @@ for unitDefID = 1, #UnitDefs do
 		if shieldPower > 10000 then
 			myShield.texture = "bitmaps/PD/shield3mist.png"  -- Placeholder until a better texture is thought of
 			myShield.colormap1 = {{0.3, 1, 0.3, 0.7}, {0.5, 0.5, 0.1, 0.3}}
-			myShield.hitResposeMult = 0.8
-			myShield.sizeDrift = 0.0004
 		end
 
 		local isChicken = false

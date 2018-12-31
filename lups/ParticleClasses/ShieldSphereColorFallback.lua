@@ -86,6 +86,7 @@ end
 
 function ShieldSphereColorFallback:Initialize()
 	ShieldSphereColorFallback.SphereList = {
+		huge = gl.CreateList(DrawSphere,0,0,0,1, 44),
 		large = gl.CreateList(DrawSphere,0,0,0,1, 32),
 		medium = gl.CreateList(DrawSphere,0,0,0,1, 24),
 		small = gl.CreateList(DrawSphere,0,0,0,1, 20),
