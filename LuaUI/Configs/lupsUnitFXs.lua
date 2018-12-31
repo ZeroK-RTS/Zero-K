@@ -107,8 +107,8 @@ effectUnitDefs = {
 	
 	striderfunnelweb = {
 	--{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4, onActive = true}},
-	{class='Bursts', options=MergeTable(staticshieldBursts, {piece="aimpoint"})},
-	{class='ShieldSphere', options=staticshieldBall},
+	--{class='Bursts', options=MergeTable(staticshieldBursts, {piece="aimpoint"})},
+	--{class='ShieldSphere', options=staticshieldBall},
 	},
 
 	--// ENERGY STORAGE //--------------------
