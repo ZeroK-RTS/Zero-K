@@ -17,8 +17,8 @@ local bl = piece 'thigh_bacr' 	-- back left
 local ml = piece 'thigh_midr' 	-- middle left
 local fl = piece 'thigh_fror' 	-- front left
 
-local smokePiece = {gaster}
-local nanoPieces = {gaster}
+local smokePiece = {eye}
+local nanoPieces = {eye}
 
 local SIG_WALK = 1
 local SIG_BUILD = 2
