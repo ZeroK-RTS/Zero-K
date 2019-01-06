@@ -1,5 +1,5 @@
 {
-	"morph_complete" : "Evrim tamamlandı: %{eski} -> %{yeni}",
+	"morph_complete" : "Evrim tamamlandı: %{old} -> %{new}",
 	"nuclear_launch_detected" : "Uyarı: Nükleer Silah Ateşlendi",
 	"geospot" : "Jeotermal Havalandırma\nBuraya Jeotermal Jeneratör Yerleştirebilirsin",
 	"build_eta" : "Zaman:",
