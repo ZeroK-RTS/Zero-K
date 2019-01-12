@@ -27,6 +27,7 @@ local COVER_UNFOLD_ANGLE = math.rad(100)
 local COVER_UNFOLD_SPEED = math.rad(400)
 
 local gun = false
+local aiming = false
 
 -- Signal definitions
 local SIG_AIM = 2
@@ -39,33 +40,48 @@ local SIG_RESTORE = 4
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+
+	local speedmod = 1.0
 	while true do
-		Turn(lshin, x_axis, math.rad(10), math.rad(630))
-		Turn(rshin, x_axis, math.rad(85), math.rad(540))
-		Turn(rthigh, x_axis, math.rad(-100), math.rad(270))
-		Turn(lthigh, x_axis, math.rad(30), math.rad(270))
+		speedmod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1.0)
+		if not aiming then
+			Turn(chest, x_axis, math.rad(20), speedmod*math.rad(40))
+			Turn(chest, y_axis, math.rad(10), speedmod*math.rad(40))
+		end
+		Turn(lshin, x_axis, math.rad(10), speedmod*math.rad(630))
+		Turn(rshin, x_axis, math.rad(85), speedmod*math.rad(540))
+		Turn(rthigh, x_axis, math.rad(-100), speedmod*math.rad(445))
+		Turn(lthigh, x_axis, math.rad(30), speedmod*math.rad(445))
+		Turn(hips, z_axis, 0.1, speedmod*math.rad(45))
 		WaitForTurn(lthigh, x_axis)
-		
-		Turn(rshin, x_axis, math.rad(10), math.rad(630))
-		Turn(lshin, x_axis, math.rad(85), math.rad(540))
-		Turn(lthigh, x_axis, math.rad(-100), math.rad(270))
-		Turn(rthigh, x_axis, math.rad(30), math.rad(270))
+
+		if not aiming then
+			Turn(chest, y_axis, math.rad(-10), speedmod*math.rad(40))
+		end
+		Turn(rshin, x_axis, math.rad(10), speedmod*math.rad(630))
+		Turn(lshin, x_axis, math.rad(85), speedmod*math.rad(540))
+		Turn(lthigh, x_axis, math.rad(-100), speedmod*math.rad(445))
+		Turn(rthigh, x_axis, math.rad(30), speedmod*math.rad(445))
+		Turn(hips, z_axis, -0.1, speedmod*math.rad(45))
 		WaitForTurn(rthigh, x_axis)
 	end
 end
 
 local function StopWalk()
 	Signal(SIG_WALK)
+	Turn(chest, x_axis, 0, math.rad(180))
+	Turn(chest, y_axis, 0, math.rad(180))
+	Turn(hips, z_axis, 0, math.rad(90))
 	Turn(lfoot, x_axis, 0, math.rad(395))
 	Turn(rfoot, x_axis, 0, math.rad(395))
 	Turn(rthigh, x_axis, 0, math.rad(235))
 	Turn(lthigh, x_axis, 0, math.rad(230))
 	Turn(lshin, x_axis, 0, math.rad(235))
 	Turn(rshin, x_axis, 0, math.rad(230))
-	
+
 	Turn(rthigh, y_axis, math.rad(-20), math.rad(135))
 	Turn(lthigh, y_axis, math.rad(20), math.rad(130))
-	
+
 	Turn(hips, x_axis, 0, math.rad(125))
 
 	Turn(rthigh, z_axis, math.rad(-(3)), math.rad(135))
@@ -102,6 +118,7 @@ local function RestoreAfterDelay()
 	Turn(rbcover, x_axis, 0, RESTORE_SPEED)
 	Turn(ltcover, x_axis, 0, RESTORE_SPEED)
 	Turn(lbcover, x_axis, 0, RESTORE_SPEED)
+	aiming = false
 end
 
 function script.AimFromWeapon(num)
@@ -111,6 +128,7 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
+	aiming = true
 	Turn(chest, x_axis, 0) 
 	Turn(chest, y_axis, heading, math.rad(450))
 	Turn(lshoulder, x_axis, -pitch, math.rad(500))
