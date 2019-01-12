@@ -32,8 +32,11 @@ local smokePiece = {head, hips, chest}
 
 
 --constants
-local runspeed = 8
-local steptime = 40
+local runspeed = 16  -- run animation rate
+local steptime = 40  -- how long legs stay extended during stride
+local hangtime = 20 -- how long it takes for "gravity" to accelerate stride descent
+local stride_top = 2.0  -- how high hips go during stride
+local stride_bottom = -2.0  -- how low hips go during stride
 
 -- variables
 local firing = 0
@@ -53,35 +56,61 @@ end
 local function Walk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
+	local speedmod = 1
+	local truespeed = runspeed
 	while (true) do
-		Turn(lshoulder, x_axis, -1.2, runspeed*0.2)
-		Turn(hips, z_axis, 0.1, runspeed*0.05)
-		Turn(rshoulder, x_axis, 0.5, runspeed*0.3)
-		
-		Turn(rthigh, x_axis, -1.5, runspeed*1)
-		Turn(rshin, x_axis, 1.3, runspeed*1)
---		Turn(rfoot, x_axis, 0.5, runspeed*1)
-		
-		Turn(lshin, x_axis, 0.2, runspeed*1)
-		Turn(lthigh, x_axis, 1.2, runspeed*1)
+		speedmod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+		truespeed = runspeed * speedmod
+
+		Turn(lshoulder, x_axis, -1.2, truespeed*0.2)
+		Turn(hips, z_axis, 0.1, truespeed*0.05)
+		Turn(rshoulder, x_axis, 0.5, truespeed*0.3)
+
+		Turn(rthigh, x_axis, -1.5, truespeed*1)
+		Turn(rshin, x_axis, 1.3, truespeed*1)
+
+		Turn(lshin, x_axis, 0.2, truespeed*1)
+		Turn(lthigh, x_axis, 1.2, truespeed*1)
+
+		Move(hips, y_axis, stride_top, truespeed*3)
+
+		WaitForMove(hips, y_axis)
+
+		Move(hips, y_axis, stride_bottom, truespeed*1.0)
+
+		Sleep(hangtime)
+
+		Move(hips, y_axis, stride_bottom, truespeed*3)
 
 		WaitForTurn(rthigh, x_axis)
 
 		Sleep(steptime)
-		
-		Turn(lshoulder, x_axis, -0.6, runspeed*0.2)
-		Turn(hips, z_axis, -0.1, runspeed*0.05)
-		Turn(rshoulder, x_axis, -0.5, runspeed*0.3)
-		
-		Turn(lthigh, x_axis, -1.5, runspeed*1)
-		Turn(lshin, x_axis, 1.3, runspeed*1)
---		Turn(lfoot, x_axis, 0.5, runspeed*1)
-		
-		Turn(rshin, x_axis, 0.2, runspeed*1)
-		Turn(rthigh, x_axis, 1.2, runspeed*1)
-		
+
+		speedmod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+		truespeed = runspeed * speedmod
+
+		Turn(lshoulder, x_axis, -0.6, truespeed*0.2)
+		Turn(hips, z_axis, -0.1, truespeed*0.05)
+		Turn(rshoulder, x_axis, -0.5, truespeed*0.3)
+
+		Turn(lthigh, x_axis, -1.5, truespeed*1)
+		Turn(lshin, x_axis, 1.3, truespeed*1)
+
+		Turn(rshin, x_axis, 0.2, truespeed*1)
+		Turn(rthigh, x_axis, 1.2, truespeed*1)
+
+		Move(hips, y_axis, stride_top, truespeed*3)
+
+		WaitForMove(hips, y_axis)
+
+		Move(hips, y_axis, stride_bottom, truespeed*1.0)
+
+		Sleep(hangtime)
+
+		Move(hips, y_axis, stride_bottom, truespeed*3)
+
 		WaitForTurn(lthigh, x_axis)
-		
+
 		Sleep(steptime)
 
 	end
@@ -92,13 +121,15 @@ local function StopWalk()
 	SetSignalMask(SIG_Walk)
 	Turn(hips, z_axis, 0, 0.5)
 	
-	Turn(lthigh, x_axis, 0, 2)
-	Turn(lshin, x_axis, 0, 2)
-	Turn(lfoot, x_axis, 0, 2)
+	Turn(lthigh, x_axis, 0, 5)
+	Turn(lshin, x_axis, 0, 5)
+	Turn(lfoot, x_axis, 0, 5)
 	
-	Turn(rthigh, x_axis, 0, 2)
-	Turn(rshin, x_axis, 0, 2)
-	Turn(rfoot, x_axis, 0, 2)
+	Turn(rthigh, x_axis, 0, 5)
+	Turn(rshin, x_axis, 0, 5)
+	Turn(rfoot, x_axis, 0, 5)
+
+	Move(hips, y_axis, 0.0, 15.0)
 end
 
 function script.StartMoving()
