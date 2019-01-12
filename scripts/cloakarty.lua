@@ -18,6 +18,7 @@ local function Walk()
 	for i = 1, 2 do
 		Turn (thigh[i], y_axis, 0, math.rad(135))
 		Turn (thigh[i], z_axis, 0, math.rad(135))
+		Turn (ankle[i], x_axis, 0, math.rad(135))
 		Turn (ankle[i], z_axis, 0, math.rad(135))
 	end
 
@@ -26,23 +27,29 @@ local function Walk()
 
 	local side = 1
 	while true do
-		Turn (shin[side], x_axis, math.rad(85), math.rad(210))
-		Turn (thigh[side], x_axis, math.rad(-100), math.rad(135))
-		Turn (thigh[3-side], x_axis, math.rad(30), math.rad(135))
+		Turn (shin[side], x_axis, math.rad(65), math.rad(230))
+		Turn (ankle[side], x_axis, math.rad(30), math.rad(230))
+		Turn (thigh[side], x_axis, math.rad(-45), math.rad(135))
+		Turn (thigh[3-side], x_axis, math.rad(45), math.rad(135))
 		if not isAiming then
+			Turn (torso, x_axis, math.rad(20 - 5*side), math.rad(45))
 			Turn (torso, y_axis, math.rad(30 - 20*side), math.rad(45))
 		end
+		Move (waist, y_axis, 1.0, 12)
 		WaitForMove (waist, y_axis)
-		Move (waist, y_axis, 3, 12)
-		WaitForMove (waist, y_axis)
-		Turn (shin[side], x_axis, math.rad(10), math.rad(315))
-		Move (waist, y_axis, 0, 12)
+		Turn (shin[side], x_axis, math.rad(0), math.rad(420))
+		Turn (ankle[side], x_axis, math.rad(0), math.rad(420))
+		Turn (ankle[3-side], x_axis, math.rad(-30), math.rad(90))
+		Move (waist, y_axis, -2.0, 8)
+		WaitForTurn (thigh[side], x_axis)
 		side = 3 - side
 	end
 end
 
 local function StopWalk()
 	Signal(SIG_Walk)
+
+	Move (waist, y_axis, 0, 16)
 
 	for i = 1, 2 do
 		Turn (ankle[i], x_axis, 0, math.rad(400))
@@ -55,6 +62,7 @@ local function StopWalk()
 
 	if not isAiming then
 		Turn (torso, y_axis, 0, math.rad(45))
+		Turn (torso, x_axis, 0, math.rad(45))
 	end
 end
 
