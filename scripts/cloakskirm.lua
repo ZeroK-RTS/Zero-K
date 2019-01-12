@@ -21,29 +21,35 @@ local RELOAD_PENALTY = tonumber(UnitDefs[unitDefID].customParams.reload_move_pen
 local SIG_Aim = 1
 local SIG_Walk = 2
 
+local runspeed = 25
+
 local function Walk()
+	local speedmod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	local truespeed = runspeed * speedmod
 	for i = 1, 2 do
-		Turn (thigh[i], y_axis, 0, math.rad(135))
-		Turn (thigh[i], z_axis, 0, math.rad(135))
-		Turn (foot[i], z_axis, 0, math.rad(135))
+		Turn (thigh[i], y_axis, 0, truespeed*0.15)
+		Turn (thigh[i], z_axis, 0, truespeed*0.15)
 	end
 
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 
 	local side = 1
-	local speedMult = 1
 	while true do
-		speedMult = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
-		Turn (shin[side], x_axis, math.rad(85), speedMult*math.rad(260))
-		Turn (thigh[side], x_axis, math.rad(-100), speedMult*math.rad(135))
-		Turn (thigh[3-side], x_axis, math.rad(30), speedMult*math.rad(135))
+		speedmod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+		truespeed = runspeed * speedmod
+
+		Turn (shin[side], x_axis, math.rad(85), truespeed*0.25)
+		Turn (thigh[side], x_axis, math.rad(-100), truespeed*0.15)
+		Turn (thigh[3-side], x_axis, math.rad(30), truespeed*0.15)
 
 		WaitForMove (hips, y_axis)
-		Move (hips, y_axis, 3, speedMult*9)
+		Move (hips, y_axis, 0.0, truespeed*0.8)
 		WaitForMove (hips, y_axis)
-		Turn (shin[side], x_axis, math.rad(10), speedMult*math.rad(315))
-		Move (hips, y_axis, 0, speedMult*9)
+		Turn (shin[side], x_axis, math.rad(10), truespeed*0.35)
+		Move (hips, y_axis, -1.0, truespeed*0.35)
+		WaitForMove (hips, y_axis)
+		Move (hips, y_axis, -2.0, truespeed*0.8)
 
 		side = 3 - side
 	end
@@ -52,14 +58,15 @@ end
 local function StopWalk()
 	Signal(SIG_Walk)
 
-	for i = 1, 2 do
-		Turn (foot[i],  x_axis, 0, math.rad(400))
-		Turn (thigh[i], x_axis, 0, math.rad(225))
-		Turn (shin[i],  x_axis, 0, math.rad(225))
+	Move (hips, y_axis, 0, runspeed*1.0)
 
-		Turn (thigh[i], y_axis, math.rad(60 - i*40), math.rad(135))
-		Turn (thigh[i], z_axis, math.rad(6*i - 9), math.rad(135))
-		Turn (foot[i], z_axis, math.rad(9 - 6*i), math.rad(135))
+	for i = 1, 2 do
+		Turn (thigh[i], x_axis, 0, runspeed*0.25)
+		Turn (shin[i],  x_axis, 0, runspeed*0.25)
+
+		Turn (thigh[i], y_axis, math.rad(60 - i*40), runspeed*0.15)
+		Turn (thigh[i], z_axis, math.rad(6*i - 9), runspeed*0.15)
+		--Turn (foot[i], z_axis, math.rad(9 - 6*i), runspeed*0.15)
 	end
 end
 
