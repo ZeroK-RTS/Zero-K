@@ -58,11 +58,15 @@ local ARM_FRONT_ANGLE = -math.rad(20)
 local ARM_FRONT_SPEED = math.rad(22.5) * PACE
 local ARM_BACK_ANGLE = math.rad(10)
 local ARM_BACK_SPEED = math.rad(22.5) * PACE
+
+local GUN_STOWED_ANGLE = math.rad(-45)
+local GUN_STOWED_SPEED = math.rad(45)
+local GUN_READY_SPEED = math.rad(45)
 --[[
-local FOREARM_FRONT_ANGLE = -math.rad(15)
-local FOREARM_FRONT_SPEED = math.rad(40) * PACE
-local FOREARM_BACK_ANGLE = -math.rad(10)
-local FOREARM_BACK_SPEED = math.rad(40) * PACE
+local GUN_FRONT_ANGLE = -math.rad(15)
+local GUN_FRONT_SPEED = math.rad(40) * PACE
+local GUN_BACK_ANGLE = -math.rad(10)
+local GUN_BACK_SPEED = math.rad(40) * PACE
 ]]--
 
 local TORSO_ANGLE_MOTION = math.rad(10)
@@ -86,7 +90,15 @@ local function Walk()
 		Turn(thighr, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(shinr, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		if not(bAiming) then
+			Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
+			Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 		end
+
+		Move(hips, y_axis, 0, 10.0)
+		WaitForMove(hips, y_axis)
+
+		Move(hips, y_axis, 0.5, 10.0)
+
 		WaitForTurn(thighl, x_axis)
 		Sleep(0)
 		
@@ -95,8 +107,12 @@ local function Walk()
 		Turn(shinl, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(thighr, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(shinr, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
-		if not(bAiming) then
-		end
+
+		Move(hips, y_axis, 0, 10.0)
+		WaitForMove(hips, y_axis)
+
+		Move(hips, y_axis, 0.5, 10.0)
+
 		WaitForTurn(thighr, x_axis)		
 		Sleep(0)
 	end	
@@ -110,14 +126,29 @@ local function IdleAnim()
 	end
 	Sleep(3000)
 	while true do
+		if not(bAiming) then
+			Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
+		end
 		Turn(camera, y_axis, math.rad(-30), math.rad(80))
 		Sleep(3500)
+		if not(bAiming) then
+			Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
+			Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
+		end
 		Turn(camera, y_axis, math.rad(30), math.rad(80))
 		Turn(forearmr, x_axis, math.rad(-30), math.rad(60))
 		idleArmState = true
 		Sleep(3500)
+		if not(bAiming) then
+			Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
+			Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
+		end
 		Turn(camera, y_axis, math.rad(-30), math.rad(80))
 		Sleep(3500)
+		if not(bAiming) then
+			Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
+			Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
+		end
 		Turn(camera, y_axis, math.rad(30), math.rad(80))	
 		Turn(forearmr, x_axis, 0, math.rad(60))
 		idleArmState = false
@@ -129,10 +160,15 @@ local function Stopping()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	
+	Move(hips, y_axis, 0, 10.0)
 	Turn(thighl, x_axis, 0, math.rad(60*PACE))
 	Turn(shinl, x_axis, 0, math.rad(60*PACE))
 	Turn(thighr, x_axis, 0, math.rad(60*PACE))
 	Turn(shinr, x_axis, 0, math.rad(60*PACE))	
+	if not(bAiming) then
+		Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
+		Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
+	end
 	StartThread(IdleAnim)	
 end
 
@@ -238,10 +274,11 @@ local function RestoreAfterDelay()
 		Turn(torsoTrue, y_axis, 0, math.rad(120))
 		Turn(torsoPivot, y_axis, 0, math.rad(120))
 		torsoHeading = 0
-		Turn(shoulderr, x_axis, math.rad(-90), math.rad(140))
+		--Turn(shoulderr, x_axis, math.rad(-90), math.rad(140))
 	--	StartThread(PackGun)
 	--end
 	maintainHeading = false
+	bAiming = false
 	StartThread(IdleAnim)
 end
 
@@ -262,15 +299,15 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(hips, x_axis, 0)
 	Turn(torsoTrue, x_axis, 0)
 	Turn(camera, y_axis, 0, math.rad(100))
-	Turn(shoulderr, x_axis, math.rad(-90) - pitch, math.rad(100))
-	Turn(shoulderl, x_axis, math.rad(-90) - pitch, math.rad(100))
-	Turn(forearmr, x_axis, 0, math.rad(100))
-	WaitForTurn(shoulderl, x_axis)
+	Turn(shoulderr, x_axis, math.rad(-90) - pitch, math.rad(180))
+	Turn(shoulderl, x_axis, math.rad(-90) - pitch, math.rad(180))
+	Turn(forearmr, x_axis, 0, math.rad(180))
 	if not gun_unpacked then
 		UnpackGun()
 	end
 	Turn(torsoPivot, y_axis, heading, AIM_SPEED)
 	Turn(torsoTrue, y_axis, 0, VERT_AIM_SPEED)
+	WaitForTurn(shoulderl, x_axis)
 	WaitForTurn(torsoPivot, y_axis)
 	WaitForTurn(torsoTrue, y_axis)
 	WaitForTurn(shoulderr, x_axis)
@@ -278,7 +315,6 @@ function script.AimWeapon(num, heading, pitch)
 	StartThread(RestoreAfterDelay)
 	torsoHeading = 0
 	Turn(camera, y_axis, 0, math.rad(100))
-	bAiming = false
 	return(true)
 end
 
@@ -293,21 +329,12 @@ function script.FireWeapon(num)
 --	Turn(camera, y_axis, math.rad(20), math.rad(400))
 --	Turn(forearmr, y_axis, math.rad(10), math.rad(400))
 	Move(barrel, y_axis, 0)
-	Sleep(1000)
-	Sleep(1000)
-	Turn(forearmr, x_axis, 0, math.rad(50))
+	WaitForTurn(forearmr, x_axis)
+	Turn(forearmr, x_axis, 0, math.rad(-90), math.rad(15))
 --	Turn(torsoTrue, y_axis, 0, math.rad(100))
 --	Turn(camera, y_axis, 0, math.rad(150))
 --	Turn(forearmr, y_axis, 0, math.rad(200))
-	Sleep(600)
-	Turn(forearml, z_axis, math.rad(-60), math.rad(120))
-	Turn(forearmr, z_axis, math.rad(20), math.rad(50))
-	Turn(forearmr, x_axis, math.rad(-20), math.rad(50))
-	WaitForTurn(forearml, z_axis)
-	Sleep(100)
-	Turn(forearml, z_axis, math.rad(-80), math.rad(120))
-	Turn(forearmr, z_axis, 0, math.rad(50))
-	Turn(forearmr, x_axis, 0, math.rad(50))
+	Sleep(15200)
 	Move(barrel, y_axis, -4.2, 4)
 --	bCanAim = true
 end
