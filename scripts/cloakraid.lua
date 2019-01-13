@@ -28,108 +28,141 @@ local rthigh = piece "rthigh"
 local rshin = piece "rshin"
 local rfoot = piece "rfoot"
 
-local smokePiece = {head, hips, chest}
+-- groups
+local shoulder = {lshoulder, rshoulder}
+local forearm = {lforearm, rforearm}
+local thigh = {lthigh, rthigh}
+local shin = {lshin, rshin}
+local foot = {lfoot, rfoot}
 
+local smokePiece = {head, hips, chest}
 
 --constants
 local runspeed = 16  -- run animation rate
 local steptime = 40  -- how long legs stay extended during stride
 local hangtime = 20 -- how long it takes for "gravity" to accelerate stride descent
-local stride_top = 2.0  -- how high hips go during stride
-local stride_bottom = -2.0  -- how low hips go during stride
+local stride_top = 0.75  -- how high hips go during stride
+local stride_bottom = -3.25  -- how low hips go during stride
 
 -- variables
-local firing = 0
+local moving = false
+local aiming = false
 
 --signals
-local SIG_Restore = 1
+local SIG_Idle = 1
 local SIG_Walk = 2
 local SIG_Aim = 4
+
+local function GetSpeedMod()
+	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 	Turn(flare, x_axis, 1.6, 5)
-	Turn(lshoulder, x_axis, -0.9, 5)
-	Turn(lforearm, z_axis, -0.2, 5)
+	Turn(lshoulder, x_axis, math.rad(-10))
+	Turn(lforearm, x_axis, math.rad(-30))
+	Turn(lforearm, z_axis, math.rad(-12))
+	Turn(rshoulder, x_axis, math.rad(0))
+	Turn(rforearm, x_axis, math.rad(-15))
 end
 
 local function Walk()
 	Signal(SIG_Walk)
+	Signal(SIG_Idle)
 	SetSignalMask(SIG_Walk)
-	local speedmod = 1
-	local truespeed = runspeed
-	while (true) do
-		speedmod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
-		truespeed = runspeed * speedmod
 
-		Turn(lshoulder, x_axis, -1.2, truespeed*0.2)
-		Turn(hips, z_axis, 0.1, truespeed*0.05)
-		Turn(rshoulder, x_axis, 0.5, truespeed*0.3)
+	moving = true
 
-		Turn(rthigh, x_axis, -1.5, truespeed*1)
-		Turn(rshin, x_axis, 1.3, truespeed*1)
+	local side = 1
+	local sway = 1
+	-- randomly lead with either foot
+	if math.random() > 0.5 then
+		side = 2
+		sway = -1
+	end
 
-		Turn(lshin, x_axis, 0.2, truespeed*1)
-		Turn(lthigh, x_axis, 1.2, truespeed*1)
+	while true do
+		local speedmod = GetSpeedMod()
+		local truespeed = runspeed * speedmod
 
+		if not aiming then
+			Turn(head, y_axis, 0, 2.0)
+			Turn(lshoulder, x_axis, math.rad(-45)-math.rad(20)*sway, truespeed*0.2)
+			Turn(lforearm, x_axis, math.rad(-35)+math.rad(15)*sway, truespeed*0.2)
+		end
+
+		Turn(rshoulder, x_axis, math.rad(0)+math.rad(30)*sway, truespeed*0.3)
+		Turn(rforearm, x_axis, math.rad(-55)-math.rad(15)*sway, truespeed*0.2)
+
+		Turn(thigh[side], x_axis, math.rad(-85), truespeed*1)
+		Turn(shin[side], x_axis, math.rad(75), truespeed*1)
+		Turn(foot[side], x_axis, math.rad(0), truespeed*0.25)
+
+		Turn(thigh[3-side], x_axis, math.rad(68), truespeed*1)
+		Turn(shin[3-side], x_axis, math.rad(12), truespeed*1)
+
+		Turn(hips, z_axis, math.rad(6)*sway, truespeed*0.05)
 		Move(hips, y_axis, stride_top, truespeed*3)
-
 		WaitForMove(hips, y_axis)
 
 		Move(hips, y_axis, stride_bottom, truespeed*1.0)
-
 		Sleep(hangtime)
 
 		Move(hips, y_axis, stride_bottom, truespeed*3)
+		Turn(foot[side], x_axis, math.rad(-20), truespeed*0.25)
 
-		WaitForTurn(rthigh, x_axis)
-
-		Sleep(steptime)
-
-		speedmod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
-		truespeed = runspeed * speedmod
-
-		Turn(lshoulder, x_axis, -0.6, truespeed*0.2)
-		Turn(hips, z_axis, -0.1, truespeed*0.05)
-		Turn(rshoulder, x_axis, -0.5, truespeed*0.3)
-
-		Turn(lthigh, x_axis, -1.5, truespeed*1)
-		Turn(lshin, x_axis, 1.3, truespeed*1)
-
-		Turn(rshin, x_axis, 0.2, truespeed*1)
-		Turn(rthigh, x_axis, 1.2, truespeed*1)
-
-		Move(hips, y_axis, stride_top, truespeed*3)
-
-		WaitForMove(hips, y_axis)
-
-		Move(hips, y_axis, stride_bottom, truespeed*1.0)
-
-		Sleep(hangtime)
-
-		Move(hips, y_axis, stride_bottom, truespeed*3)
-
-		WaitForTurn(lthigh, x_axis)
+		WaitForTurn(thigh[side], x_axis)
 
 		Sleep(steptime)
 
+		side = 3 - side
+		sway = sway * -1
+	end
+end
+
+local function Idle()
+	Signal(SIG_Idle)
+	SetSignalMask(SIG_Idle)
+
+	if moving or aiming then return end
+
+	local dir = 1
+	if math.random() > 0.5 then dir = -1 end
+	while true do
+		Sleep(2500 + 2500 * math.random())
+
+		Turn(lshoulder, x_axis, math.rad(-10), 0.5)
+		Turn(lforearm, x_axis, math.rad(-30), 0.5)
+
+		Turn(head, y_axis, math.rad(30)*dir, 0.5)
+		dir = dir * -1
 	end
 end
 
 local function StopWalk()
 	Signal(SIG_Walk)
-	SetSignalMask(SIG_Walk)
-	Turn(hips, z_axis, 0, 0.5)
-	
-	Turn(lthigh, x_axis, 0, 5)
-	Turn(lshin, x_axis, 0, 5)
-	Turn(lfoot, x_axis, 0, 5)
-	
-	Turn(rthigh, x_axis, 0, 5)
-	Turn(rshin, x_axis, 0, 5)
-	Turn(rfoot, x_axis, 0, 5)
 
-	Move(hips, y_axis, 0.0, 15.0)
+	moving = false
+
+	Move(hips, y_axis, 0, 15.0)
+	Turn(hips, z_axis, 0, 0.5)
+
+	if not aiming then
+		Turn(lshoulder, x_axis, math.rad(-45), runspeed*0.3)
+		Turn(lforearm, x_axis, math.rad(-12), runspeed*0.3)
+	end
+
+	Turn(rshoulder, x_axis, math.rad(0), runspeed*0.3)
+	Turn(rforearm, x_axis, math.rad(-15), runspeed*0.3)
+
+	for i = 1, 2 do
+		Turn(thigh[i], x_axis, 0, 5)
+		Turn(shin[i], x_axis, 0, 5)
+		Turn(foot[i], x_axis, 0, 5)
+	end
+
+	StartThread(Idle)
 end
 
 function script.StartMoving()
@@ -141,52 +174,38 @@ function script.StopMoving()
 end
 
 local function RestoreAfterDelay()
-	Signal(SIG_Restore)
-	SetSignalMask(SIG_Restore)
 	Sleep(2000)
-	firing = 0
+	aiming = false
+
 	Turn(chest, y_axis, 0, 3)
-	Turn(lshoulder, x_axis, -0.9, 5)
-	Turn(rshoulder, x_axis, 0, 3)
-
-	Turn(lforearm, z_axis, -0.2, 5)
+	Turn(lshoulder, x_axis, math.rad(-45), 5)
 	Turn(lshoulder, z_axis, 0, 3)
-	Turn(rshoulder, z_axis, 0, 3)
-	Turn(head, y_axis, 0, 2)
-	Turn(head, x_axis, 0, 2)
+	Turn(lforearm, z_axis, math.rad(-12), 5)
 	Spin(magazine, y_axis, 0)
+
+	StartThread(Idle)
 end
 
-function script.QueryWeapon(num) 
-	return flare 
+function script.QueryWeapon(num)
+	return flare
 end
 
-function script.AimFromWeapon(num) 
-	return chest 
+function script.AimFromWeapon(num)
+	return chest
 end
 
 function script.AimWeapon(num, heading, pitch)
-	
 	Signal(SIG_Aim)
+	Signal(SIG_Idle)
 	SetSignalMask(SIG_Aim)
-	--[[ Gun Hugger
-	Turn(chest, y_axis, 1.1 + heading, 12)
-	Turn(lshoulder, x_axis, -1 -pitch, 12)
-	Turn(rshoulder, x_axis, -0.9 -pitch, 12)
-	
-	Turn(rshoulder, z_axis, 0.3, 9)
-	Turn(lshoulder, z_axis, -0.3, 9)
-	
-	Turn(head, y_axis, -0.8, 9)
-	Turn(head, x_axis, -pitch, 9)--]]
-	
-	-- Outstreched Arm
-	firing = 1
+	aiming = true
+
+	Turn(head, y_axis, 0, 4.0)
 	Turn(chest, y_axis, heading, 12)
-	Turn(lforearm, z_axis, 0, 5)
-	Turn(lshoulder, x_axis, -pitch - 1.5, 12)
-	
-	
+	Turn(lforearm, z_axis, 0, 6)
+	Turn(lforearm, x_axis, 0, 6)
+	Turn(lshoulder, x_axis, -pitch - math.rad(80), 12)
+
 	WaitForTurn(chest, y_axis)
 	WaitForTurn(lshoulder, x_axis)
 	StartThread(RestoreAfterDelay)
