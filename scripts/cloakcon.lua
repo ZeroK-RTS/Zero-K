@@ -90,7 +90,7 @@ local function Walk()
 		Turn(hips, z_axis, math.rad(-2)*sway, truespeed*math.rad(5))
 
 		if not IsBuilding() then
-			Turn(head, y_axis, math.rad(8)*sway, math.rad(23))
+			Turn(head, y_axis, math.rad(8)*sway, truespeed*math.rad(23))
 			Turn(chest, y_axis, math.rad(-8)*sway, truespeed*math.rad(23))
 			Turn(larm, x_axis, math.rad(35)*sway, truespeed*math.rad(80))
 			Turn(rshoulder, x_axis, math.rad(-20)*sway, truespeed*math.rad(60))
