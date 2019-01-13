@@ -15,6 +15,7 @@ local color2Uniform
 local colorMultUniform
 local colorMixUniform
 local shieldPosUniform
+local shieldRechargingNoiseUniform
 local shieldSizeUniform
 local shieldSizeDriftUniform
 local marginUniform
@@ -116,7 +117,7 @@ function ShieldSphereColorHQParticle:Draw()
 	if (GG and GG.GetShieldHitPositions) then --means high quality shield rendering is in place
 		hitTable = GG.GetShieldHitPositions(self.unit)
 	end
-
+	
 	gl.Uniform(color1Uniform, col1[1], col1[2], col1[3], col1[4])
 	gl.Uniform(color2Uniform, col2[1], col2[2], col2[3], col2[4])
 	gl.Uniform(colorMultUniform, 1, 1, 1, 1)
@@ -127,6 +128,17 @@ function ShieldSphereColorHQParticle:Draw()
 	local pos = self.pos
 	gl.Uniform(shieldPosUniform, pos[1], pos[2], pos[3], 0)
 
+		local noiseLevel = 0
+		if self.rechargeDelay > 0 then
+			local hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
+			local currTime = Spring.GetGameFrame()
+		  local cooldown = hitTime + self.rechargeDelay * 30 - currTime
+			if cooldown > 0 then
+				-- Should vary from 0.3 to 1.0
+			  noiseLevel = 0.2 + 0.8 * cooldown / (self.rechargeDelay * 30.0)
+			end
+		end
+		gl.Uniform(shieldRechargingNoiseUniform, noiseLevel)
 	gl.Uniform(shieldSizeUniform, self.size)
 	gl.Uniform(shieldSizeDriftUniform, self.sizeDrift)
 	gl.Uniform(marginUniform, self.marginHQ)
@@ -229,6 +241,8 @@ ____FS_CODE_DEFS_____
 	uniform vec4 colorMix;
 
 	uniform float uvMul;
+	
+	uniform float noiseLevel;
 
 	uniform float sizeDrift;
 
@@ -316,7 +330,7 @@ ____FS_CODE_DEFS_____
 		else
 			texel = vec4(0.0);
 
-		vec4 colorMultAdj = colorMult * (1.0 + length(offset2) * 50.0);
+		vec4 colorMultAdj = colorMult * (1.0 + length(offset2) * 50.0) * (1 + noiseLevel);
 		//float colorMultAdj = colorMult;
 		//vec4 color1M = color1 * colorMultAdj;
 		vec4 color2M = color2 * colorMultAdj;
@@ -382,6 +396,7 @@ function ShieldSphereColorHQParticle:Initialize()
 	colorMixUniform = gl.GetUniformLocation(shieldShader, 'colorMix')
 	shieldPosUniform = gl.GetUniformLocation(shieldShader, 'pos')
 	shieldSizeUniform = gl.GetUniformLocation(shieldShader, 'size')
+	shieldRechargingNoiseUniform = gl.GetUniformLocation(shieldShader, 'noiseLevel')
 	shieldSizeDriftUniform = gl.GetUniformLocation(shieldShader, 'sizeDrift')
 	marginUniform = gl.GetUniformLocation(shieldShader, 'margin')
 	uvMulUniform = gl.GetUniformLocation(shieldShader, 'uvMul')

@@ -99,6 +99,7 @@ for unitDefID = 1, #UnitDefs do
 			myShield.margin = 1.8
 			myShield.hitResposeMult = 1
 		end
+		myShield.rechargeDelay = tonumber(ud.customParams.shield_recharge_delay) or 0
 
 		myShield.size = radius
 		myShield.radius = radius
@@ -115,6 +116,7 @@ for unitDefID = 1, #UnitDefs do
 		if shieldPower > 10000 then
 			myShield.texture = "bitmaps/PD/shield3mist.png"  -- Placeholder until a better texture is thought of
 			myShield.colormap1 = {{0.3, 1, 0.3, 0.7}, {0.5, 0.5, 0.1, 0.3}}
+			myShield.colormap2 = {{0.2, 0.2, 0.2, 0.1}, {0.2, 0.2, 0.2, 0.05}}
 		end
 
 		local isChicken = false
