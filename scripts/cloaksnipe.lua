@@ -32,6 +32,12 @@ local footl = piece 'footl'
 local footr = piece 'footr' 
 local backpack = piece 'backpack' 
 
+local shoulder = {shoulderl, shoulderr}
+local thigh = {thighl, thighr}
+local shin = {shinl, shinr}
+local ankle = {anklel, ankler}
+local foot = {footl, footr}
+
 local smokePiece = {torsoTrue, backpack}
 --------------------------------------------------------------------------------
 -- constants
@@ -43,34 +49,11 @@ local SIG_WALK = 8
 local SIG_IDLE = 1
 local SIG_RESTORE = 16
 
-local PACE = 1.9
-
-local THIGH_FRONT_ANGLE = -math.rad(50)
-local THIGH_FRONT_SPEED = math.rad(60) * PACE
-local THIGH_BACK_ANGLE = math.rad(30)
-local THIGH_BACK_SPEED = math.rad(60) * PACE
-local SHIN_FRONT_ANGLE = math.rad(45)
-local SHIN_FRONT_SPEED = math.rad(90) * PACE
-local SHIN_BACK_ANGLE = math.rad(10)
-local SHIN_BACK_SPEED = math.rad(90) * PACE
-
-local ARM_FRONT_ANGLE = -math.rad(20)
-local ARM_FRONT_SPEED = math.rad(22.5) * PACE
-local ARM_BACK_ANGLE = math.rad(10)
-local ARM_BACK_SPEED = math.rad(22.5) * PACE
+local PACE = 8.1
 
 local GUN_STOWED_ANGLE = math.rad(-45)
 local GUN_STOWED_SPEED = math.rad(45)
 local GUN_READY_SPEED = math.rad(45)
---[[
-local GUN_FRONT_ANGLE = -math.rad(15)
-local GUN_FRONT_SPEED = math.rad(40) * PACE
-local GUN_BACK_ANGLE = -math.rad(10)
-local GUN_BACK_SPEED = math.rad(40) * PACE
-]]--
-
-local TORSO_ANGLE_MOTION = math.rad(10)
-local TORSO_SPEED_MOTION = math.rad(15)*PACE
 
 local VERT_AIM_SPEED = math.rad(210)
 local AIM_SPEED = math.rad(360) -- noscope
@@ -80,42 +63,49 @@ local bAiming, bCanAim, gun_unpacked, idleArmState = false, true, false, false
 local maintainHeading = false
 local torsoHeading = 0
 
+local function GetSpeedMod()
+	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+end
+
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+
+	local side = 1
 	while true do
-		--left leg up, right leg back
-		Turn(thighl, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(shinl, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
-		Turn(thighr, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(shinr, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
+		local speedmod = GetSpeedMod()
+		local truespeed = PACE * speedmod
+
 		if not(bAiming) then
 			Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 			Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 		end
 
-		Move(hips, y_axis, 0, 10.0)
+		Turn(shin[side], x_axis, math.rad(85), truespeed*0.35)
+		Turn(ankle[side], x_axis, math.rad(0), truespeed*0.25)
+		Turn(foot[side], x_axis, math.rad(0), truespeed*0.25)
+		Turn(thigh[side], x_axis, math.rad(-36), truespeed*0.16)
+		Turn(thigh[3-side], x_axis, math.rad(36), truespeed*0.16)
+		Turn(shin[3-side], x_axis, math.rad(0), truespeed*0.16)
+
+		Move(hips, y_axis, 0, truespeed*1.0)
 		WaitForMove(hips, y_axis)
 
-		Move(hips, y_axis, 0.5, 10.0)
+		Turn(shin[side], x_axis, math.rad(0), truespeed*0.26)
+		Turn(ankle[side], x_axis, math.rad(10), truespeed*0.26)
+		Turn(foot[side], x_axis, math.rad(-20), truespeed*0.25)
+		Turn(foot[3-side], x_axis, math.rad(10), truespeed*0.25)
+		Move(hips, y_axis, -0.75, truespeed*0.2)
 
-		WaitForTurn(thighl, x_axis)
-		Sleep(0)
-		
-		--right leg up, left leg back
-		Turn(thighl, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(shinl, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
-		Turn(thighr, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(shinr, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
-
-		Move(hips, y_axis, 0, 10.0)
 		WaitForMove(hips, y_axis)
 
-		Move(hips, y_axis, 0.5, 10.0)
+		Move(hips, y_axis, -3, truespeed*1.0)
+		Turn(shin[3-side], x_axis, math.rad(10), truespeed*0.15)
 
-		WaitForTurn(thighr, x_axis)		
-		Sleep(0)
-	end	
+		WaitForTurn(thigh[side], x_axis)
+
+		side = 3 - side
+	end
 end
 
 local function IdleAnim()
@@ -149,27 +139,28 @@ local function IdleAnim()
 			Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 			Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 		end
-		Turn(camera, y_axis, math.rad(30), math.rad(80))	
+		Turn(camera, y_axis, math.rad(30), math.rad(80))
 		Turn(forearmr, x_axis, 0, math.rad(60))
 		idleArmState = false
 		Sleep(3500)
 	end
 end
-	
+
 local function Stopping()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
-	
-	Move(hips, y_axis, 0, 10.0)
-	Turn(thighl, x_axis, 0, math.rad(60*PACE))
-	Turn(shinl, x_axis, 0, math.rad(60*PACE))
-	Turn(thighr, x_axis, 0, math.rad(60*PACE))
-	Turn(shinr, x_axis, 0, math.rad(60*PACE))	
-	if not(bAiming) then
-		Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
-		Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
+
+	Move(hips, y_axis, 0, 8.0)
+	for side = 1, 2 do
+		Turn(thigh[side], x_axis, 0, math.rad(90))
+		Turn(shin[side], x_axis, 0, math.rad(90))
+		Turn(foot[side], x_axis, 0, math.rad(90))
+		Turn(ankle[side], x_axis, 0, math.rad(90))
+		if not(bAiming) then
+			Turn(shoulder[side], x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
+		end
 	end
-	StartThread(IdleAnim)	
+	StartThread(IdleAnim)
 end
 
 function script.StartMoving()
@@ -213,8 +204,8 @@ function script.Create()
 	UnpackGunInstant()
 	StartThread(IdleAnim)
 	--StartThread(TorsoHeadingThread)
-	end
-	
+end
+
 function script.AimFromWeapon(num)
 	return shoulderr
 end
@@ -230,19 +221,19 @@ local function PackGun()
 	Signal(SIG_IDLE)
 	Signal(SIG_PACK)
 	SetSignalMask(SIG_PACK)
-	
+
 	bCanAim = false
 	Move(barrel, y_axis, 0, 900)
 	Move(stock, y_axis, 0, 1400)
 
 	WaitForMove(barrel, y_axis)
 	WaitForMove(stock, y_axis)
-		
+
 	Turn(forearmr, x_axis, 0, math.rad(140))
 	--Turn(torsoTrue, y_axis, 0, math.rad(120))
 	Turn(forearml, z_axis, 0, math.rad(250))
 	Turn(handl, y_axis, 0, math.rad(250))
-		
+
 	WaitForTurn(forearml, z_axis)
 	Turn(shoulderl, x_axis, 0, math.rad(250))
 	gun_unpacked = false
@@ -253,7 +244,7 @@ local function UnpackGun()
 	Signal(SIG_IDLE)
 	Signal(SIG_PACK)
 	SetSignalMask(SIG_PACK)
-	
+
 	Turn(forearmr, x_axis, 0, math.rad(200))
 	Turn(forearml, z_axis, math.rad(-80), math.rad(200))
 	Turn(handl, y_axis, math.rad(90), math.rad(200))
@@ -263,7 +254,7 @@ local function UnpackGun()
 	WaitForMove(barrel, y_axis)
 	gun_unpacked = true
 end
-	
+
 local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
@@ -282,15 +273,14 @@ local function RestoreAfterDelay()
 	StartThread(IdleAnim)
 end
 
-	
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_IDLE)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	maintainHeading = true
-	
+
 	GG.DontFireRadar_CheckAim(unitID)
-	
+
 	-- Announce that we would like to aim, and wait until we can
 	while not bCanAim do
 		Sleep(100)
@@ -338,7 +328,7 @@ function script.FireWeapon(num)
 	Move(barrel, y_axis, -4.2, 4)
 --	bCanAim = true
 end
-	
+
 function script.Killed(recentDamage, maxHealth)
 	Signal(SIG_MOVE)
 	local severity = recentDamage/maxHealth
@@ -363,7 +353,7 @@ function script.Killed(recentDamage, maxHealth)
 
 		WaitForMove(hips, y_axis)		
 		Sleep(2000)]]
-		
+
 		Explode(shoulderl, sfxNone)
 		Explode(shoulderr, sfxNone)
 		Explode(hips, sfxNone)
@@ -376,12 +366,12 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(camera, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 --		Sleep(200)
 		Explode(torsoTrue, sfxShatter)
-		
+
 --		Turn(base, x_axis, math.rad(-90), math.rad(50))
 --		Turn(hips, x_axis, math.rad(90), math.rad(50))
 --		WaitForTurn(base, x_axis)
 --		Sleep(1000)
-	
+
 		Explode(hips, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 1
 	elseif severity <= .99 then
