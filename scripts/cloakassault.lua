@@ -45,7 +45,7 @@ local function walk()
 	local truespeed = runspeed
 	while true do
 		speedmod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
-                truespeed = runspeed * speedmod
+		truespeed = runspeed * speedmod
 		Turn(hips, z_axis, 0.08, truespeed*0.15)
 
 		Turn(rthigh, x_axis, -0.65, truespeed*1.25)
@@ -87,7 +87,7 @@ local function walk()
 		Sleep(steptime)
 
 		speedmod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
-                truespeed = runspeed * speedmod
+		truespeed = runspeed * speedmod
 		Turn(hips, z_axis, -0.08, truespeed*0.15)
 
 		Turn(lthigh, x_axis, -0.65, truespeed*1.25)
