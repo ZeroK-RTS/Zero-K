@@ -55,13 +55,18 @@ local function Idle()
 
 	if moving or aiming then return end
 
+	Sleep(3000)
+
+	local rand = math.random()
 	local dir = 1
-	if math.random() > 0.5 then dir = -1 end
+	if rand > 0.5 then dir = -1 end
 	while true do
-		Sleep(2500 + 2500 + math.random())
+		Sleep(3000 * rand)
 
 		Turn(head, y_axis, math.rad(30)*dir, 0.5)
 		dir = dir * -1
+
+		Sleep(3000)
 	end
 end
 
