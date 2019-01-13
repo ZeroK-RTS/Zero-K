@@ -21,7 +21,8 @@ local RELOAD_PENALTY = tonumber(UnitDefs[unitDefID].customParams.reload_move_pen
 local SIG_Aim = 1
 local SIG_Walk = 2
 
-local runspeed = 25
+-- future-proof running animation against balance tweaks
+local runspeed = 25 * (UnitDefs[unitDefID].speed / 69)
 
 local aimBlocked = false
 

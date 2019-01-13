@@ -30,7 +30,7 @@ local smokePiece = {head, hips, chest}
 
 
 --constants
-local runspeed = 8.5  -- run animation rate
+local runspeed = 8.5 * (UnitDefs[unitDefID].speed / 90) -- run animation rate, future-proofed
 local steptime = 40  -- how long legs stay extended during stride
 local hangtime = 50  -- how long it takes for "gravity" to accelerate stride descent
 local stride_top = 1.0  -- how high hips go during stride
@@ -43,6 +43,10 @@ local firing = 0
 local SIG_Restore = 1
 local SIG_Walk = 2
 local SIG_Aim = 4
+
+local function GetSpeedMod()
+	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
@@ -59,11 +63,9 @@ local function Walk()
 
 	Turn(chest, x_axis, 0.25, 0.08)
 
-	local speedmod = 1
-	local truespeed = runspeed
 	while (true) do
-		speedmod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
-		truespeed = runspeed * speedmod
+		local speedmod = GetSpeedMod()
+		local truespeed = runspeed * speedmod
 
 		Turn(lshoulder, x_axis, -1.2, truespeed*0.2)
 		Turn(hips, z_axis, 0.1, truespeed*0.05)

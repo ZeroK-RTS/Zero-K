@@ -39,7 +39,8 @@ local SIG_WALK = 1
 local SIG_AIM = 2
 local SIG_IDLE = 4
 
-local runspeed = 0.56
+-- future-proof running animation against balance tweaks
+local runspeed = 0.56 * (UnitDefs[unitDefID].speed / 87)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

@@ -38,7 +38,7 @@ local foot = {lfoot, rfoot}
 local smokePiece = {head, hips, chest}
 
 --constants
-local runspeed = 16  -- run animation rate
+local runspeed = 16  * (UnitDefs[unitDefID].speed / 115)  -- run animation rate, future-proofed
 local steptime = 40  -- how long legs stay extended during stride
 local hangtime = 20 -- how long it takes for "gravity" to accelerate stride descent
 local stride_top = 0.75  -- how high hips go during stride

@@ -49,7 +49,8 @@ local SIG_WALK = 8
 local SIG_IDLE = 1
 local SIG_RESTORE = 16
 
-local PACE = 8.1
+-- future-proof running animation against balance tweaks
+local PACE = 8.1 * (UnitDefs[unitDefID].speed / 43)
 
 local GUN_STOWED_ANGLE = math.rad(-45)
 local GUN_STOWED_SPEED = math.rad(45)

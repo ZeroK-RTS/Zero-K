@@ -30,12 +30,17 @@ local SIG_STOPMOVE = 8
 
 local RESTORE_DELAY = 3000
 
-local runspeed = 1.9
+-- future-proof running animation against balance tweaks
+local runspeed = 1.8 * (UnitDefs[unitDefID].speed / 51)
+
 local hangtime = 32
 local steptime = 10
 local stride_top = -0.5
 local stride_bottom = -2.75
 
+local function GetSpeedMod()
+	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+end
 
 local function walk()
 	Signal(SIG_MOVE)
@@ -44,8 +49,9 @@ local function walk()
 	local speedmod = 1
 	local truespeed = runspeed
 	while true do
-		speedmod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+		speedmod = GetSpeedMod()
 		truespeed = runspeed * speedmod
+
 		Turn(hips, z_axis, 0.08, truespeed*0.15)
 
 		Turn(rthigh, x_axis, -0.65, truespeed*1.25)

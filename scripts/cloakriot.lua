@@ -45,7 +45,8 @@ local SIG_AIM = 4
 
 local RESTORE_DELAY = 3000
 
-local PACE = 1.8
+-- future-proof running animation against balance tweaks
+local PACE = 1.8 * (UnitDefs[unitDefID].speed / 51)
 
 local function Walk()
 	Signal(SIG_WALK)
