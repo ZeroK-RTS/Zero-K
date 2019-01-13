@@ -38,11 +38,11 @@ local foot = {lfoot, rfoot}
 local smokePiece = {head, hips, chest}
 
 --constants
-local runspeed = 16  * (UnitDefs[unitDefID].speed / 115)  -- run animation rate, future-proofed
+local runspeed = 7.5 * (UnitDefs[unitDefID].speed / 115)  -- run animation rate, future-proofed
 local steptime = 40  -- how long legs stay extended during stride
 local hangtime = 20 -- how long it takes for "gravity" to accelerate stride descent
-local stride_top = 0.75  -- how high hips go during stride
-local stride_bottom = -3.25  -- how low hips go during stride
+local stride_top = 1.5  -- how high hips go during stride
+local stride_bottom = -1.0  -- how low hips go during stride
 
 -- variables
 local moving = false
@@ -74,6 +74,11 @@ local function Walk()
 
 	moving = true
 
+	for i = 1, 2 do
+		Turn(thigh[i], y_axis, 0, runspeed*0.15)
+		Turn(thigh[i], z_axis, 0, runspeed*0.15)
+	end
+
 	local side = 1
 	local sway = 1
 	-- randomly lead with either foot
@@ -88,29 +93,29 @@ local function Walk()
 
 		if not aiming then
 			Turn(head, y_axis, 0, 2.0)
-			Turn(lshoulder, x_axis, math.rad(-45)-math.rad(20)*sway, truespeed*0.2)
-			Turn(lforearm, x_axis, math.rad(-35)+math.rad(15)*sway, truespeed*0.2)
+			Turn(lshoulder, x_axis, math.rad(-15)-math.rad(45)*sway, truespeed*0.5)
+			Turn(lforearm, x_axis, math.rad(-45)+math.rad(45)*sway, truespeed*0.5)
+			Turn(rshoulder, x_axis, math.rad(0)+math.rad(45)*sway, truespeed*0.5)
+			Turn(rforearm, x_axis, math.rad(-80)-math.rad(40)*sway, truespeed*0.5)
 		end
-
-		Turn(rshoulder, x_axis, math.rad(0)+math.rad(30)*sway, truespeed*0.3)
-		Turn(rforearm, x_axis, math.rad(-55)-math.rad(15)*sway, truespeed*0.2)
 
 		Turn(thigh[side], x_axis, math.rad(-85), truespeed*1)
 		Turn(shin[side], x_axis, math.rad(75), truespeed*1)
-		Turn(foot[side], x_axis, math.rad(0), truespeed*0.25)
+		Turn(foot[side], x_axis, math.rad(0), truespeed*0.33)
 
 		Turn(thigh[3-side], x_axis, math.rad(68), truespeed*1)
 		Turn(shin[3-side], x_axis, math.rad(12), truespeed*1)
+		Turn(foot[3-side], x_axis, math.rad(-20), truespeed*0.33)
 
-		Turn(hips, z_axis, math.rad(6)*sway, truespeed*0.05)
-		Move(hips, y_axis, stride_top, truespeed*3)
-		WaitForMove(hips, y_axis)
-
-		Move(hips, y_axis, stride_bottom, truespeed*1.0)
+		Turn(hips, z_axis, math.rad(-6)*sway, truespeed*0.05)
+		Move(hips, y_axis, stride_bottom, truespeed*1)
 		Sleep(hangtime)
 
-		Move(hips, y_axis, stride_bottom, truespeed*3)
-		Turn(foot[side], x_axis, math.rad(-20), truespeed*0.25)
+		Move(hips, y_axis, stride_bottom, truespeed*4)
+		WaitForMove(hips, y_axis)
+
+		Move(hips, y_axis, stride_top, truespeed*4)
+		Turn(foot[side], x_axis, math.rad(20), truespeed*0.33)
 
 		WaitForTurn(thigh[side], x_axis)
 
@@ -127,16 +132,21 @@ local function Idle()
 
 	if moving or aiming then return end
 
+	Sleep(3000)
+
+	local rand = math.random()
 	local dir = 1
-	if math.random() > 0.5 then dir = -1 end
+	if rand > 0.5 then dir = -1 end
 	while true do
-		Sleep(2500 + 2500 * math.random())
+		Sleep(3000 * rand)
 
 		Turn(lshoulder, x_axis, math.rad(-10), 0.5)
 		Turn(lforearm, x_axis, math.rad(-30), 0.5)
 
 		Turn(head, y_axis, math.rad(30)*dir, 0.5)
 		dir = dir * -1
+
+		Sleep(3000)
 	end
 end
 
@@ -160,6 +170,9 @@ local function StopWalk()
 		Turn(thigh[i], x_axis, 0, 5)
 		Turn(shin[i], x_axis, 0, 5)
 		Turn(foot[i], x_axis, 0, 5)
+
+		Turn(thigh[i], y_axis, math.rad(12 - i*8), runspeed*0.1)
+		Turn(thigh[i], z_axis, math.rad(4*i - 6), runspeed*0.1)
 	end
 
 	StartThread(Idle)
@@ -181,6 +194,8 @@ local function RestoreAfterDelay()
 	Turn(lshoulder, x_axis, math.rad(-45), 5)
 	Turn(lshoulder, z_axis, 0, 3)
 	Turn(lforearm, z_axis, math.rad(-12), 5)
+	Turn(rshoulder, x_axis, math.rad(0), runspeed*0.3)
+	Turn(rforearm, x_axis, math.rad(-15), runspeed*0.3)
 	Spin(magazine, y_axis, 0)
 
 	StartThread(Idle)
@@ -205,6 +220,8 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(lforearm, z_axis, 0, 6)
 	Turn(lforearm, x_axis, 0, 6)
 	Turn(lshoulder, x_axis, -pitch - math.rad(80), 12)
+	Turn(rshoulder, x_axis, math.rad(0), math.rad(90))
+	Turn(rforearm, x_axis, math.rad(-45), math.rad(90))
 
 	WaitForTurn(chest, y_axis)
 	WaitForTurn(lshoulder, x_axis)
