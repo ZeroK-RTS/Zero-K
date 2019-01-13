@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[striderfunnelweb]],
   name                   = [[Funnelweb]],
-  description            = [[Drone/Shield Support Strider]],
+  description            = [[Shield Support Strider]],
   acceleration           = 0.0552,
   activateWhenBuilt      = true,
   brakeRate              = 0.1375,
@@ -9,6 +9,9 @@ unitDef = {
   buildPic               = [[striderfunnelweb.png]],
   builder                = true,
   
+  buildoptions        = {
+  },
+
   buildDistance          = 450,
   canGuard               = true,
   canMove                = true,
