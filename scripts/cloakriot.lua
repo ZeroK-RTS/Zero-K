@@ -45,7 +45,8 @@ local SIG_AIM = 4
 
 local RESTORE_DELAY = 3000
 
-local PACE = 1.4
+-- future-proof running animation against balance tweaks
+local PACE = 1.8 * (UnitDefs[unitDefID].speed / 51)
 
 local function Walk()
 	Signal(SIG_WALK)
@@ -75,7 +76,7 @@ local function Walk()
 			Sleep(500)
 		end
 	
-		Move(hips, y_axis, -0.169989, 3 * speedMult)
+		Move(hips, y_axis, 2.5, 4 * speedMult)
 		Move(lthigh, y_axis, 0.169989, 3 * speedMult)
 		Move(rthigh, y_axis, 0.319989, 1 * speedMult)
 		Turn(hips, x_axis, math.rad(9), math.rad(50) * speedMult)
@@ -92,7 +93,7 @@ local function Walk()
 		end
 		Sleep(49 / speedMult)
 	
-		Move(hips, y_axis, -0.35, 3 * speedMult)
+		Move(hips, y_axis, 2.5, 1 * speedMult)
 		Move(lthigh, y_axis, 0.35, 3 * speedMult)
 		Move(rthigh, y_axis, 0.25, 1 * speedMult)
 		Turn(hips, x_axis, math.rad(11), math.rad(50) * speedMult)
@@ -109,7 +110,7 @@ local function Walk()
 		end
 		Sleep(49 / speedMult)
 	
-		Move(hips, y_axis, -0.169989, 4 * speedMult)
+		Move(hips, y_axis, -0.5, 1 * speedMult)
 		Move(lthigh, y_axis, 0.369989, 0 * speedMult)
 		Move(rthigh, y_axis, 0.119989, 2 * speedMult)
 		Turn(hips, x_axis, math.rad(9), math.rad(62) * speedMult)
@@ -126,7 +127,7 @@ local function Walk()
 		end
 		Sleep(42 / speedMult)
 	
-		Move(hips, y_axis, 0, 3 * speedMult)
+		Move(hips, y_axis, -0.5, 2 * speedMult)
 		Move(lthigh, y_axis, 0.40, 0 * speedMult)
 		Move(rthigh, y_axis, 0, 2 * speedMult)
 		Turn(hips, x_axis, math.rad(6), math.rad(58) * speedMult)
@@ -199,7 +200,7 @@ local function Walk()
 		end
 		Sleep(95 / speedMult)
 	
-		Move(hips, y_axis, -0.169989, 3 * speedMult)
+		Move(hips, y_axis, 2.5, 4 * speedMult)
 		Move(lthigh, y_axis, 0.319989, 1 * speedMult)
 		Move(rthigh, y_axis, 0.169989, 3 * speedMult)
 		Turn(hips, x_axis, math.rad(9), math.rad(50) * speedMult)
@@ -216,7 +217,7 @@ local function Walk()
 		end
 		Sleep(49 / speedMult)
 	
-		Move(hips, y_axis, -0.35, 3 * speedMult)
+		Move(hips, y_axis, 2.5, 1 * speedMult)
 		Move(lthigh, y_axis, 0.25, 1 * speedMult)
 		Move(rthigh, y_axis, 0.35, 3 * speedMult)
 		Turn(hips, x_axis, math.rad(11), math.rad(50) * speedMult)
@@ -233,7 +234,7 @@ local function Walk()
 		end
 		Sleep(49 / speedMult)
 	
-		Move(hips, y_axis, -0.169989, 3 * speedMult)
+		Move(hips, y_axis, -0.5, 1 * speedMult)
 		Move(lthigh, y_axis, 0.119989, 2 * speedMult)
 		Move(rthigh, y_axis, 0.369989, 0 * speedMult)
 		Turn(hips, x_axis, math.rad(9), math.rad(56) * speedMult)
@@ -250,7 +251,7 @@ local function Walk()
 		end
 		Sleep(47 / speedMult)
 	
-		Move(hips, y_axis, 0, 3 * speedMult)
+		Move(hips, y_axis, -0.5, 2 * speedMult)
 		Move(lthigh, y_axis, 0, 2 * speedMult)
 		Move(rthigh, y_axis, 0.40, 0 * speedMult)
 		Turn(hips, x_axis, math.rad(6), math.rad(54) * speedMult)
@@ -318,7 +319,9 @@ end
 
 local function StopWalk()
 	Signal(SIG_WALK)
-	
+
+	Move(hips, x_axis, 0, 10.0)
+	Move(hips, y_axis, 0, 10.0)
 	Turn(rthigh, x_axis, 0, math.rad(400))
 	Turn(rshin, x_axis, 0, math.rad(400))
 	Turn(rfoot, x_axis, 0, math.rad(400))

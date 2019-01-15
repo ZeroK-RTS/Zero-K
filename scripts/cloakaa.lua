@@ -22,56 +22,131 @@ local rexhaust = piece 'rexhaust'
 local lmuzzle = piece 'lmuzzle' 
 local lexhaust = piece 'lexhaust' 
 
+local thigh = {lthigh, rthigh}
+local shin = {lshin, rshin}
+local foot = {lfoot, rfoot}
+
 local RESTORE_SPEED = math.rad(100)
 local COVER_UNFOLD_ANGLE = math.rad(100)
 local COVER_UNFOLD_SPEED = math.rad(400)
 
 local gun = false
+local moving = false
+local aiming = false
 
 -- Signal definitions
-local SIG_AIM = 2
 local SIG_WALK = 1
-local SIG_RESTORE = 4
+local SIG_AIM = 2
+local SIG_IDLE = 4
+
+-- future-proof running animation against balance tweaks
+local runspeed = 0.56 * (UnitDefs[unitDefID].speed / 87)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function GetSpeedMod()
+	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+end
+
+local function Idle()
+	Signal(SIG_IDLE)
+	SetSignalMask(SIG_IDLE)
+
+	if moving or aiming then return end
+
+	Sleep(3000)
+
+	local rand = math.random()
+	local dir = 1
+	if rand > 0.5 then dir = -1 end
+	while true do
+		Sleep(3000 * rand)
+
+		Turn(head, y_axis, math.rad(30)*dir, 0.5)
+		dir = dir * -1
+
+		Sleep(3000)
+	end
+end
 
 local function Walk()
+	Signal(SIG_IDLE)
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+	moving = true
+
+	local side = 1
+	local sway = 1
+	-- randomly lead with either foot
+	if math.random() > 0.5 then
+		side = 2
+		sway = -1
+	end
+
+	for i = 1, 2 do
+		Turn(thigh[i], y_axis, 0, math.rad(135))
+		Turn(thigh[i], z_axis, 0, math.rad(135))
+		Turn(foot[i], z_axis, 0, math.rad(135))
+	end
+
 	while true do
-		Turn(lshin, x_axis, math.rad(10), math.rad(630))
-		Turn(rshin, x_axis, math.rad(85), math.rad(540))
-		Turn(rthigh, x_axis, math.rad(-100), math.rad(270))
-		Turn(lthigh, x_axis, math.rad(30), math.rad(270))
-		WaitForTurn(lthigh, x_axis)
-		
-		Turn(rshin, x_axis, math.rad(10), math.rad(630))
-		Turn(lshin, x_axis, math.rad(85), math.rad(540))
-		Turn(lthigh, x_axis, math.rad(-100), math.rad(270))
-		Turn(rthigh, x_axis, math.rad(30), math.rad(270))
-		WaitForTurn(rthigh, x_axis)
+		local speedmod = GetSpeedMod()
+		local truespeed = runspeed * speedmod
+
+		if not aiming then
+			Turn(head, y_axis, 0, 2.0)
+			Turn(chest, x_axis, math.rad(10), truespeed*math.rad(40))
+			Turn(chest, y_axis, math.rad(-10)*sway, truespeed*math.rad(40))
+		end
+
+		Turn(hips, z_axis, math.rad(-5)*sway, truespeed*math.rad(45))
+
+		Turn(thigh[side], x_axis, math.rad(-50), truespeed*math.rad(450))
+		Turn(shin[side], x_axis, math.rad(65), truespeed*math.rad(640))
+		Turn(foot[side], x_axis, math.rad(0), truespeed*math.rad(30))
+
+		Turn(thigh[3-side], x_axis, math.rad(50), truespeed*math.rad(450))
+		Turn(shin[3-side], x_axis, math.rad(0), truespeed*math.rad(800))
+
+		Move(hips, y_axis, 0.5, truespeed*18)
+		WaitForMove(hips, y_axis)
+
+		Move(hips, y_axis, -2.5, truespeed*18)
+		Turn(shin[side], x_axis, math.rad(15), truespeed*math.rad(640))
+		Turn(foot[side], x_axis, math.rad(-15), truespeed*math.rad(30))
+		Turn(foot[3-side], x_axis, math.rad(15), truespeed*math.rad(30))
+
+		WaitForTurn(thigh[side], x_axis)
+
+		side = 3 - side
+		sway = sway * -1
 	end
 end
 
 local function StopWalk()
 	Signal(SIG_WALK)
-	Turn(lfoot, x_axis, 0, math.rad(395))
-	Turn(rfoot, x_axis, 0, math.rad(395))
-	Turn(rthigh, x_axis, 0, math.rad(235))
-	Turn(lthigh, x_axis, 0, math.rad(230))
-	Turn(lshin, x_axis, 0, math.rad(235))
-	Turn(rshin, x_axis, 0, math.rad(230))
-	
+	moving = false
+
+	Turn(chest, x_axis, 0, math.rad(120))
+	Turn(chest, y_axis, 0, math.rad(120))
+	Turn(hips, z_axis, 0, math.rad(80))
+	Move(hips, y_axis, 0.0, 10.0)
+
 	Turn(rthigh, y_axis, math.rad(-20), math.rad(135))
 	Turn(lthigh, y_axis, math.rad(20), math.rad(130))
-	
-	Turn(hips, x_axis, 0, math.rad(125))
+	Turn(rthigh, z_axis, math.rad(-3), math.rad(135))
+	Turn(lthigh, z_axis, math.rad(3), math.rad(130))
+	Turn(lfoot, z_axis, math.rad(-3), math.rad(130))
+	Turn(rfoot, z_axis, math.rad(3), math.rad(130))
 
-	Turn(rthigh, z_axis, math.rad(-(3)), math.rad(135))
-	Turn(lthigh, z_axis, math.rad(-(-3)), math.rad(130))
-	Turn(lfoot, z_axis, math.rad(-(3)), math.rad(130))
-	Turn(rfoot, z_axis, math.rad(-(-3)), math.rad(130))
+	for side = 1, 2 do
+		Turn(foot[side], x_axis, 0, math.rad(395))
+		Turn(thigh[side], x_axis, 0, math.rad(235))
+		Turn(shin[side], x_axis, 0, math.rad(235))
+	end
+
+	StartThread(Idle)
 end
 
 function script.StartMoving()
@@ -84,6 +159,12 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit, {chest})
+	Turn(rthigh, y_axis, math.rad(-20))
+	Turn(lthigh, y_axis, math.rad(20))
+	Turn(rthigh, z_axis, math.rad(-3))
+	Turn(lthigh, z_axis, math.rad(3))
+	Turn(lfoot, z_axis, math.rad(-3))
+	Turn(rfoot, z_axis, math.rad(3))
 end
 
 -----------------------------------------------------------------------
@@ -94,14 +175,15 @@ function script.QueryWeapon(num)
 end
 
 local function RestoreAfterDelay()
-	Signal(SIG_RESTORE)
-	SetSignalMask(SIG_RESTORE)
 	Sleep(2000)
 	Turn(chest, y_axis, 0, RESTORE_SPEED)
 	Turn(rtcover, x_axis, 0, RESTORE_SPEED)
 	Turn(rbcover, x_axis, 0, RESTORE_SPEED)
 	Turn(ltcover, x_axis, 0, RESTORE_SPEED)
 	Turn(lbcover, x_axis, 0, RESTORE_SPEED)
+	aiming = false
+
+	StartThread(Idle)
 end
 
 function script.AimFromWeapon(num)
@@ -110,8 +192,11 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
+	Signal(SIG_IDLE)
 	SetSignalMask(SIG_AIM)
-	Turn(chest, x_axis, 0) 
+	aiming = true
+	Turn(head, y_axis, 0, 4.0)
+	Turn(chest, x_axis, 0, math.rad(120))
 	Turn(chest, y_axis, heading, math.rad(450))
 	Turn(lshoulder, x_axis, -pitch, math.rad(500))
 	Turn(rshoulder, x_axis, -pitch, math.rad(500))
@@ -124,12 +209,12 @@ function script.AimWeapon(num, heading, pitch)
 	StartThread(RestoreAfterDelay)
 	return true
 end
-	
+
 function script.Shot(num)
 	if gun then
 		EmitSfx(lmuzzle,  1024)
 		EmitSfx(lexhaust,  1025)
-		Move(lmissile, z_axis, -1 )	
+		Move(lmissile, z_axis, -1 )
 		Move(lmissile, z_axis, 0, 500)
 	else
 		EmitSfx(rmuzzle,  1024)
@@ -139,7 +224,7 @@ function script.Shot(num)
 	end
 	gun = not gun
 end
-	
+
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
@@ -164,6 +249,6 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rshoulder, sfxShatter)
 		Explode(head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 	end
-	
+
 	return corpseType
 end

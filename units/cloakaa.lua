@@ -55,7 +55,7 @@ unitDef = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ComTrack]],
-  trackWidth             = 17,
+  trackWidth             = 16,
   turnRate               = 2200,
   upright                = true,
 
