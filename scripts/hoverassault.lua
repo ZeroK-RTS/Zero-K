@@ -241,10 +241,6 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 
-	while disarmed do
-		Sleep(34)
-	end
-
 	StartThread(Open)
 
 	-- start aiming gun even if Open animation hasn't completed
