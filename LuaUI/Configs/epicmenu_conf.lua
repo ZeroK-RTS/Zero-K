@@ -441,7 +441,8 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 		'Water rendering', {
 			{name = 'Basic',key='0', desc='A simple plane.', icon=imgPath..'epicmenu/water.png'},
 			{name = 'Reflective',key='1', desc='Reflects the world.', icon=imgPath..'epicmenu/water.png'},
-			{name = 'Dynamic',key='2', desc='Has waves and wakes when units move and projectiles explode.', icon=imgPath..'epicmenu/water.png'},
+			-- crashy, see https://github.com/ZeroK-RTS/Zero-K/issues/3396
+			--{name = 'Dynamic',key='2', desc='Has waves and wakes when units move and projectiles explode.', icon=imgPath..'epicmenu/water.png'},
 			{name = 'Reflective / Refractive',key='3', desc='Reflects the world and has distortions.', icon=imgPath..'epicmenu/water.png'},
 			{name = 'Bumpmapped',key='4', desc='Fast and good-looking.', icon=imgPath..'epicmenu/water.png'},
 		},'4',
