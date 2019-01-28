@@ -36,7 +36,7 @@ unitDef = {
   maxSlope            = 72,
   maxVelocity         = 4.8,
   maxWaterDepth       = 15,
-  minCloakDistance    = 220,
+  minCloakDistance    = 200,
   movementClass       = [[TKBOT2]],
   moveState           = 0,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -88,8 +88,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 9.5,
-        planes  = 9.5,
+        default = 9.8,
+        planes  = 9.8,
         subs    = 0.5,
       },
 
