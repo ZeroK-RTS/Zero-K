@@ -87,6 +87,7 @@ local GROUND = 103
 local UNIT = 117
 
 local MIN_FLY_TIME = 120
+local MAX_FLY_TIME = 150
 
 local throwUnits = IterableMap.New()
 local physicsRestore = IterableMap.New()
@@ -102,8 +103,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		return
 	end
 	
-	local _,_,_, x, y, z = Spring.GetUnitPosition(proOwnerID, true)
-	
+	-- Calculate target position.
 	local targetType, targetPos = Spring.GetProjectileTarget(proID)
 	local tx, ty, tz
 	if targetType == GROUND then
@@ -113,26 +113,29 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	end
 	ty = math.max(ty, 0)
 	
-	local dx, dy, dz = tx - x, ty - y, tz - z
-	local maxRange = GetEffectiveWeaponRange(data.unitDefID, -dy, data.weaponNum)
-	local fireDistance = math.sqrt(dx^2 + dz^2)
+	-- Calculate horizontal aiming parameters based on projectile owner position.
+	local _,_,_, ox, oy, oz = Spring.GetUnitPosition(proOwnerID, true)
+	local odx, ody, odz = tx - ox, ty - oy, tz - oz
+	local fireDistance = math.sqrt(odx^2 + odz^2)
 	
+	local maxRange = GetEffectiveWeaponRange(data.unitDefID, -ody, data.weaponNum)
 	if maxRange and fireDistance > maxRange*1.05 then
 		maxRange = maxRange*1.05
-		dx = dx*maxRange/fireDistance
-		dz = dz*maxRange/fireDistance
+		odx = odx*maxRange/fireDistance
+		odz = odz*maxRange/fireDistance
 	end
 	
-	local flyTime = math.max(MIN_FLY_TIME, math.sqrt(math.abs(dy))*10)
-	
-	local px, py, pz = dx/flyTime, flyTime*GRAVITY/2 + dy/flyTime, dz/flyTime
-	
-	local nearUnits = Spring.GetUnitsInSphere(x, y, z, data.def.radius)
+	local nearUnits = Spring.GetUnitsInCylinder(ox, oz, data.def.radius)
 	if nearUnits then
 		for i = 1, #nearUnits do
 			local nearID = nearUnits[i]
 			local physicsData = physicsRestore and physicsRestore.Get(nearID)
 			if ((not physicsData) or (not physicsData.drag) or physicsData.drag > -0.4) and ValidThrowTarget(proOwnerID, nearID) then
+				local _,_,_, _, ny, _ = Spring.GetUnitPosition(nearID, true)
+				local ndy = ty - ny
+				local flyTime = math.max(MIN_FLY_TIME, math.min(MAX_FLY_TIME, math.sqrt(math.abs(ndy))*10))
+				
+				local px, py, pz = odx/flyTime, flyTime*GRAVITY/2 + ndy/flyTime, odz/flyTime
 				local vx, vy, vz = Spring.GetUnitVelocity(nearID)
 				GG.AddGadgetImpulseRaw(nearID, px - vx, py - vy, pz - vz, true, true, nil, nil, true)
 				SetUnitDrag(nearID, 0)
@@ -307,7 +310,7 @@ local function DrawThrowerWires(unitID, data, index, spec, myAllyTeam)
 	local los = spGetUnitLosState(unitID, myAllyTeam, false)
 	if spec or (los and los.los) then
 		local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
-		local nearUnits = Spring.GetUnitsInSphere(x, y, z, data.def.radius)
+		local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
 		if nearUnits then
 			for i = 1, #nearUnits do
 				local nearID = nearUnits[i]
