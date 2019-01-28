@@ -127,7 +127,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	
 	local px, py, pz = dx/flyTime, flyTime*GRAVITY/2 + dy/flyTime, dz/flyTime
 	
-	local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
+	local nearUnits = Spring.GetUnitsInSphere(x, y, z, data.def.radius)
 	if nearUnits then
 		for i = 1, #nearUnits do
 			local nearID = nearUnits[i]
@@ -307,7 +307,7 @@ local function DrawThrowerWires(unitID, data, index, spec, myAllyTeam)
 	local los = spGetUnitLosState(unitID, myAllyTeam, false)
 	if spec or (los and los.los) then
 		local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
-		local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
+		local nearUnits = Spring.GetUnitsInSphere(x, y, z, data.def.radius)
 		if nearUnits then
 			for i = 1, #nearUnits do
 				local nearID = nearUnits[i]
