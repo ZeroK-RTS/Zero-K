@@ -32,7 +32,9 @@ local modOptions = Spring.GetModOptions()
 
 local getMovetype = Spring.Utilities.getMovetype
 
+-- Now to load utilities and/or configuration
 VFS.Include("LuaRules/Configs/CAI/accessory/targetReachableTester.lua")
+-- I'm scared... what exactly did including that file do and how do I use it?
 
 local spGetGroundHeight           = Spring.GetGroundHeight
 local spGetUnitPosition           = Spring.GetUnitPosition
