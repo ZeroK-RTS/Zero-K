@@ -261,5 +261,6 @@ local function Killed(recentDamage, maxHealth)
 end
 
 function script.Killed(recentDamage, maxHealth)
+	Signal(SIG_ACTIVATE) -- prevent pulsing while undead
 	return DelayTrueDeath(recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
 end
