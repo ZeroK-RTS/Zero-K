@@ -96,6 +96,9 @@ unitDef = {
       craterBoost             = 4,
       craterMult              = 3,
 
+      customParams = {
+        restrict_in_widgets = 1,
+      },
       damage                  = {
         default = 3002.1,
       },
@@ -133,6 +136,7 @@ unitDef = {
         setunitsonfire = "1",
         burntime = 240,
         burnchance = 1,
+        restrict_in_widgets = 1,
 
         area_damage = 1,
         area_damage_radius = 320,
@@ -175,6 +179,10 @@ unitDef = {
       craterBoost             = 0.5,
       craterMult              = 1,
 
+      customParams = {
+        restrict_in_widgets = 1,
+      },
+
       damage                  = {
         default = 801.1,
         planes  = 800,
@@ -214,6 +222,7 @@ unitDef = {
         gatherradius = [[384]],
         smoothradius = [[192]],
         smoothmult   = [[0.7]],
+        restrict_in_widgets = 1,
       },
       
       damage                  = {
@@ -248,6 +257,10 @@ unitDef = {
       avoidGround             = false,
       craterBoost             = 0.25,
       craterMult              = 0.5,
+
+      customParams = {
+        restrict_in_widgets = 1,
+      },
 
       damage                  = {
         default        = 12003,
@@ -287,6 +300,7 @@ unitDef = {
       customparams = {
         timeslow_damagefactor = 10,
         nofriendlyfire = "needs hax",
+        restrict_in_widgets = 1,
       },
       
       damage                  = {

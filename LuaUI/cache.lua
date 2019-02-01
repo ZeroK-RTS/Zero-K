@@ -25,14 +25,19 @@ local MarkerAddPoint = Spring.MarkerAddPoint
 --end
 
 local spGetProjectileDefID = Spring.GetProjectileDefID
-local sniperWeaponDefID = WeaponDefNames.cloaksnipe_shockrifle.id
-local function FilterOutSniperBullets(projectiles)
+local filteredWeaponDefID = {}
+for wdid, wd in pairs(WeaponDefs) do
+	if wd.customParams.restrict_in_widgets then
+		filteredWeaponDefID[wdid] = true
+	end
+end
+local function FilterOutRestrictedProjectiles(projectiles)
 	local i = 1
 	local n = #projectiles
 	while i <= n do
 		local p = projectiles[i]
 		local pID = spGetProjectileDefID(p)
-		if pID == sniperWeaponDefID then
+		if filteredWeaponDefID[pID] then
 			projectiles[i] = projectiles[n]
 			projectiles[n] = nil
 			n = n - 1
@@ -46,7 +51,7 @@ end
 local GetProjectilesInRectangle = Spring.GetProjectilesInRectangle
 function Spring.GetProjectilesInRectangle(x1,z1,x2,z2)
 	local projectiles = GetProjectilesInRectangle(x1,z1,x2,z2)
-	return FilterOutSniperBullets(projectiles)
+	return FilterOutRestrictedProjectiles(projectiles)
 end
 
 -- Cutscenes apply F5
