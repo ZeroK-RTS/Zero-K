@@ -5,7 +5,7 @@ unitDef = {
   acceleration           = 0.0552,
   activateWhenBuilt      = true,
   brakeRate              = 0.1375,
-  buildCostMetal         = 3000,
+  buildCostMetal         = 3500,
   buildPic               = [[striderfunnelweb.png]],
   builder                = true,
   
@@ -91,7 +91,7 @@ unitDef = {
       shieldBadColor          = [[1 0.1 0.1 1]],
       shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
-      shieldPower             = 24000,
+      shieldPower             = 28000,
       shieldPowerRegen        = 200,
       shieldRechargeDelay     = 15,
       shieldPowerRegenEnergy  = 48,
