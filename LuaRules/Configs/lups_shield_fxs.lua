@@ -63,6 +63,7 @@ for unitDefID = 1, #UnitDefs do
 				myShield.marginHQ = 2.8
 				myShield.uvMul = 1.0
 				--== /HQ  ==--
+				myShield.hitResposeMult = 0.0
 			else
 				myShield.shieldSize = "large"
 				--==  HQ  ==--
@@ -70,12 +71,12 @@ for unitDefID = 1, #UnitDefs do
 				myShield.marginHQ = 2.8
 				myShield.uvMul = 1.0
 				--== /HQ  ==--
+				myShield.hitResposeMult = 0.6
 			end
 			myShield.drawBack = 0.55
 			myShield.drawBackCol = 0.3
 			myShield.drawBackMargin = 4.5
 			myShield.margin = 4
-			myShield.hitResposeMult = 0.6
 		else
 			myShield.shieldSize = "small"
 			if radius > 100 then
@@ -115,7 +116,7 @@ for unitDefID = 1, #UnitDefs do
 		local shieldPower = tonumber(ud.customParams.shield_power)
 		if shieldPower > 10000 then
 			myShield.texture = "bitmaps/PD/shield3mist.png"  -- Placeholder until a better texture is thought of
-			myShield.colormap1 = {{0.5, 1.5, 0.5, 0.7}, {0.5, 0.5, 0.1, 0.3}}
+			myShield.colormap1 = {{0.5, 0.5, 1.0, 1}, {0.5, 0.1, 0.1, 0.3}}
 			myShield.colormap2 = {{0.2, 0.2, 0.2, 0.1}, {0.2, 0.2, 0.2, 0.05}}
 		end
 

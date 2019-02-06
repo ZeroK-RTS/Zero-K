@@ -585,7 +585,7 @@ ____FS_CODE_DEFS_____
 			standardVec.z -= timer * 3;
 			vec3 noiseVec = normal * 10;
 			noiseVec.z -= timer * 6;
-			noiseMult = 1 + snoise(standardVec) * (1 - noiseLevel / 2.0) + snoise(noiseVec) * noiseLevel / 2.0;
+			noiseMult = 1 + abs(snoise(standardVec)) * (1 - noiseLevel / 2.0) + abs(snoise(noiseVec) * noiseLevel / 2.0);
 		}
 		vec4 colorMultAdj = colorMult * (1.0 + length(offset2) * 50.0) * noiseMult;
 		//float colorMultAdj = colorMult;
