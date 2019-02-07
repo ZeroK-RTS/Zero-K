@@ -147,6 +147,7 @@ function ShieldSphereColorHQParticle:Draw()
 	gl.Uniform(shieldSizeDriftUniform, self.sizeDrift)
 	gl.Uniform(marginUniform, self.marginHQ)
 	gl.Uniform(uvMulUniform, self.uvMul)
+	gl.UniformInt(unitIdUniform, self.unit)
 
 	if hitTable then
 		local hitPointCount = math.min(#hitTable, MAX_POINTS)
@@ -251,6 +252,7 @@ ____FS_CODE_DEFS_____
 	uniform float sizeDrift;
 
 	uniform int shieldVariant;
+	uniform int unitId; // Used as a seed to make shield appearances unique
 
 	uniform int hitPointCount;
 	uniform float hitPoints[5 * MAX_POINTS];
@@ -582,10 +584,10 @@ ____FS_CODE_DEFS_____
 //			vec4 standardVec = vec4(normal * 4, timer * 4);
 //			vec4 noiseVec = vec4(normal * 10, timer * 8);
 			vec3 standardVec = normal * 4;
-			standardVec.z -= timer * 3;
+			standardVec.z -= timer * 3 + unitId*10;
 			vec3 noiseVec = normal * 10;
-			noiseVec.z -= timer * 6;
-			noiseMult = 1 + abs(snoise(standardVec)) * (1 - noiseLevel / 2.0) + abs(snoise(noiseVec) * noiseLevel / 2.0);
+			noiseVec.z -= timer * 6 + unitId*10;
+			noiseMult = 0.5 + (1 - abs(snoise(standardVec))) + (snoise(noiseVec)) * noiseLevel / 2.0;
 		}
 		vec4 colorMultAdj = colorMult * (1.0 + length(offset2) * 50.0) * noiseMult;
 		//float colorMultAdj = colorMult;
@@ -658,6 +660,7 @@ function ShieldSphereColorHQParticle:Initialize()
 	marginUniform = gl.GetUniformLocation(shieldShader, 'margin')
 	uvMulUniform = gl.GetUniformLocation(shieldShader, 'uvMul')
 	variantUniform = gl.GetUniformLocation(shieldShader, 'shieldVariant')
+	unitIdUniform = gl.GetUniformLocation(shieldShader, 'unitId')
 
 	hitPointCountUniform = gl.GetUniformLocation(shieldShader, 'hitPointCount')
 	hitPointsUniform = gl.GetUniformLocation(shieldShader, 'hitPoints')

@@ -63,7 +63,7 @@ for unitDefID = 1, #UnitDefs do
 				myShield.marginHQ = 2.8
 				myShield.uvMul = 1.0
 				--== /HQ  ==--
-				myShield.hitResposeMult = 0.0
+				myShield.hitResposeMult = 0.5
 			else
 				myShield.shieldSize = "large"
 				--==  HQ  ==--
@@ -117,7 +117,7 @@ for unitDefID = 1, #UnitDefs do
 		if shieldPower > 10000 then
 			myShield.texture = "bitmaps/PD/shield3mist.png"  -- Placeholder until a better texture is thought of
 			myShield.colormap1 = {{0.4, 0.4, 1.0, 0.8}, {0.5, 0.1, 0.1, 0.3}}
-			myShield.colormap2 = {{0.2, 0.2, 0.2, 0.1}, {0.2, 0.2, 0.2, 0.05}}
+			myShield.colormap2 = {{0.0, 0.2, 0.2, 0.1}, {0.0, 0.2, 0.0, 0.05}}
 		end
 
 		local isChicken = false
