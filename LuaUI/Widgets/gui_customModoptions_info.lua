@@ -20,6 +20,12 @@ local options = VFS.Include("ModOptions.lua")
 local displayExceptions = {
 	mutespec = true,
 	mutelobby = true,
+	minspeed = true,
+	maxspeed = true,
+}
+
+local forceHideModoptions = {
+	hidemodoptionswindow = true
 }
 
 -- gui elements
@@ -44,6 +50,7 @@ function widget:Initialize()
 	end
 	
 	displayWindow = false
+	forceHideWindow = false
 
 	local customizedModOptions = {}
 	for i=1, #options do
@@ -65,6 +72,9 @@ function widget:Initialize()
 				if not displayExceptions[keyName] then
 					displayWindow = true
 				end
+				if forceHideModoptions[keyName] then
+					forceHideWindow = true
+				end
 				local index = #customizedModOptions
 				customizedModOptions[index+1] = options[i].name
 				customizedModOptions[index+2] = {"value: "..value,{options[i].desc}}
@@ -72,7 +82,7 @@ function widget:Initialize()
 		end
 	end
 
-	if not displayWindow then
+	if forceHideWindow or (not displayWindow) then
 		widgetHandler:RemoveWidget()
 		return
 	end
