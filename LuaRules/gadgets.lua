@@ -1343,7 +1343,7 @@ function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum
 		local unitID = attackerID
 		local aquireRange = defPriority
 		for _, g in ipairs(self.AllowUnitTargetRangeList) do
-		-- Send priority to each successive gadget.
+			-- Send priority to each successive gadget.
 			local targetAllowed, newRange = g:AllowUnitTargetRange(unitID, aquireRange)
 
 			if (not targetAllowed) then
@@ -1353,7 +1353,6 @@ function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum
 
 			aquireRange = newRange
 		end
-	Spring.Utilities.UnitEcho(unitID, aquireRange)
 		return true, aquireRange
 	end
 	

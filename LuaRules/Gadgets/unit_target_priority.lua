@@ -280,18 +280,19 @@ end
 -- Priority callin
 local DEF_TARGET_TOO_FAR_PRIORITY = 100000 --usually numbers are around several millions, if target is out of range
 
-function gadget:AllowUnitTargetRange(unitID, defRange)
-	return true, 60000
-end
+--function gadget:AllowUnitTargetRange(unitID, defRange)
+--	return true, defRange
+--end
 
 function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
-
 	if not defPriority then
-		Spring.Echo("unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority", unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
+		-- This callin is effectively script.BlockShot but for CommandAI.
+		-- The engine will discard target priority information.
+		return true
 	end
 	--Spring.Echo("TARGET CHECK")
 	if defPriority > DEF_TARGET_TOO_FAR_PRIORITY then
-		return defPriority --hope engine is not that wrong about the best target outside of the range
+		return true, defPriority --hope engine is not that wrong about the best target outside of the range
 	end
 	
 	if (not targetID) or (not unitID) or (not attackerWeaponDefID) then
