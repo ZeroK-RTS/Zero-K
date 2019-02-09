@@ -110,30 +110,41 @@ function Bursts:EndDraw()
 end
 
 function Bursts:Draw()
-	if (lasttexture ~= self.texture) then
-		gl.Texture(self.texture)
-		lasttexture = self.texture
+  local inCooldown = false
+  if self.shieldRechargeDelay then
+    local hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
+    local currTime = Spring.GetGameFrame()
+    local cooldown = hitTime + self.shieldRechargeDelay * 30 - currTime
+    if cooldown > 0 then
+      inCooldown = true
+    end
+  end
+  if not inCooldown then
+    if (lasttexture ~= self.texture) then
+      gl.Texture(self.texture)
+      lasttexture = self.texture
+    end
+    gl.Blending(self.srcBlend,self.dstBlend)
+    gl.PushMatrix()
+    gl.Translate(self.pos[1],self.pos[2],self.pos[3])
+
+    local partList
+    for i=1,#self.lists do
+        partList = self.lists[i]
+        local rotv = partList.rotv
+        local size = partList.size
+
+        gl.Color(partList.color)
+
+        gl.PushMatrix()
+          gl.Rotate(partList.rotArc,rotv[1],rotv[2],rotv[3])
+          gl.Scale(size,size,size)
+          gl.CallList(partList.dlist)
+        gl.PopMatrix()
+    end
+
+    gl.PopMatrix()
 	end
-	gl.Blending(self.srcBlend,self.dstBlend)
-	gl.PushMatrix()
-	gl.Translate(self.pos[1],self.pos[2],self.pos[3])
-
-	local partList
-	for i=1,#self.lists do
-			partList = self.lists[i]
-			local rotv = partList.rotv
-			local size = partList.size
-
-			gl.Color(partList.color)
-
-			gl.PushMatrix()
-				gl.Rotate(partList.rotArc,rotv[1],rotv[2],rotv[3])
-				gl.Scale(size,size,size)
-				gl.CallList(partList.dlist)
-			gl.PopMatrix()
-	end
-
-	gl.PopMatrix()
 end
 
 -----------------------------------------------------------------------------------------------------------------

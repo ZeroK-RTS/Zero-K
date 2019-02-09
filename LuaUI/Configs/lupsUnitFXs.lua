@@ -109,6 +109,10 @@ effectUnitDefs = {
 	--{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4, onActive = true}},
 	--{class='Bursts', options=MergeTable(staticshieldBursts, {piece="aimpoint"})},
 	--{class='ShieldSphere', options=staticshieldBall},
+		{class='Bursts', options=MergeTable(staticshieldBursts, {piece="emitl", pos={0,8,0}, shieldRechargeDelay=15, colormap = { {0.3, 0.3, 1, 0.8} }})},
+		{class='Bursts', options=MergeTable(staticshieldBursts, {piece="emitr", pos={0,8,0}, shieldRechargeDelay=15, colormap = { {0.3, 0.3, 1, 0.8} }})},
+	{class='ShieldSphere', options={piece="emitl", life=math.huge, size=8, pos={0,8,0}, colormap1 = {{0.4, 0.1, 0.95, 1.0}}, rechargingColor = {0.95, 0.1, 0.4, 1.0}, shieldRechargeDelay=15, repeatEffect=true}},	
+	{class='ShieldSphere', options={piece="emitr", life=math.huge, size=8, pos={0,8,0}, colormap1 = {{0.4, 0.1, 0.95, 1.0}}, rechargingColor = {0.95, 0.1, 0.4, 1.0}, shieldRechargeDelay=15, repeatEffect=false}},	
 	},
 
 	--// ENERGY STORAGE //--------------------
