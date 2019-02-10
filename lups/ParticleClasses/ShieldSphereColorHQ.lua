@@ -399,6 +399,15 @@ ____FS_CODE_DEFS_____
 																			dot(p2,x2), dot(p3,x3) ) );
 			}
 
+	vec3 RectToPolar(vec3 rect) {
+		float len = length(rect);
+		return vec3(len, acos(rect.z/len), atan(rect.x, rect.y));
+	}
+
+	vec3 PolarToRect(vec3 p) {
+		return vec3(p.x*sin(p.y)*cos(p.z), p.x*sin(p.y)*sin(p.z), p.x*cos(p.y));
+	}
+
 	vec2 RadialCoords(vec3 a_coords)
 	{
 		vec3 a_coords_n = normalize(a_coords);
@@ -443,9 +452,18 @@ ____FS_CODE_DEFS_____
 
 		float noiseMult = 1;
 		if (shieldVariant == 1) {
-			vec3 standardVec = normal * 4;
+			vec3 adjustedOffset = vec3(0.0);
+			if (length(offset2) > 0) {
+				vec3 pOffset2 = RectToPolar(vec3(offset2, 0));
+				vec3 pNormal = RectToPolar(normal);
+				pOffset2.y += pNormal.y;
+				pOffset2.z += pNormal.z;
+				adjustedOffset = PolarToRect(pOffset2) * 10.0;
+			}
+			vec3 offsetNormal = normal + adjustedOffset;
+			vec3 standardVec = offsetNormal * 4;
 			standardVec.z -= timer * 3 + unitId*10;
-			vec3 noiseVec = normal * 10;
+			vec3 noiseVec = offsetNormal * 10;
 			noiseVec.z -= timer * 6 + unitId*10;
 			noiseMult = 0.5 + (1 - abs(snoise(standardVec))) + (snoise(noiseVec)) * noiseLevel / 2.0;
 		}
