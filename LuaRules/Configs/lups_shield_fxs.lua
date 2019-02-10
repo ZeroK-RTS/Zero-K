@@ -115,9 +115,9 @@ for unitDefID = 1, #UnitDefs do
 		-- Very powerful non-chicken shields get a different look
 		local shieldPower = tonumber(ud.customParams.shield_power)
 		if shieldPower > 10000 then
-			myShield.texture = "bitmaps/PD/shield3mist.png"  -- Placeholder until a better texture is thought of
-			myShield.colormap1 = {{0.4, 0.4, 1.0, 0.8}, {0.5, 0.1, 0.1, 0.3}}
-			myShield.colormap2 = {{0.0, 0.2, 0.2, 0.1}, {0.0, 0.2, 0.0, 0.05}}
+			myShield.texture = "bitmaps/PD/shieldblank.png"
+			myShield.colormap1 = {{0.4, 0.4, 1.3, 0.8}, {0.5, 0.1, 0.1, 0.3}}
+			myShield.colormap2 = {{0.0, 0.2, 0.2, 0.03}, {0.0, 0.2, 0.0, 0.02}}
 		end
 
 		local isChicken = false
