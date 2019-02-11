@@ -449,7 +449,8 @@ ____FS_CODE_DEFS_____
 			texel = texture2D(tex0, uvo);
 		else
 			texel = vec4(0.0);
-
+		
+		float alphaAdd = 0.0;
 		float noiseMult = 1;
 		if (shieldVariant == 1) {
 			vec3 adjustedOffset = vec3(0.0);
@@ -459,6 +460,7 @@ ____FS_CODE_DEFS_____
 				pOffset2.y += pNormal.y;
 				pOffset2.z += pNormal.z;
 				adjustedOffset = PolarToRect(pOffset2) * 10.0;
+				alphaAdd = smoothstep(0.0, 0.04, length(offset2));
 			}
 			vec3 offsetNormal = normal + adjustedOffset;
 			vec3 standardVec = offsetNormal * 4;
@@ -478,6 +480,7 @@ ____FS_CODE_DEFS_____
 		gl_FragColor = mix(color1TexM, color2M, opac);
 		//gl_FragColor = mix(color1Tex, color2M, opac);
 		//gl_FragColor = texel;
+		gl_FragColor.a += alphaAdd;
 	}
 ]]
 
