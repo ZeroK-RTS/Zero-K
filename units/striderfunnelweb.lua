@@ -12,7 +12,7 @@ unitDef = {
   buildoptions        = {
   },
 
-  buildDistance          = 450,
+  buildDistance          = 400,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
