@@ -34,6 +34,9 @@ local spGetActiveCmdDesc = Spring.GetActiveCmdDesc
 local hilite = false
 
 local function DrawWorldFunc()
+  if Spring.IsGUIHidden() then
+    return false
+  end
   if (not hilite) and (spGetMapDrawMode() ~= 'metal') and (not WG.showeco) then
     return
   end

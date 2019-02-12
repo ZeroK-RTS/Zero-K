@@ -54,6 +54,8 @@ local MISSION_PLAYER_ALLY_TEAM_ID = 0
 local SPARE_PLANETWARS_UNITS = false
 local SPARE_REGULAR_UNITS = false
 
+local DEBUG_MSG = false
+
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
@@ -74,6 +76,8 @@ local modOptions = Spring.GetModOptions() or {}
 local commends = tobool(modOptions.commends)
 local noElo = tobool(modOptions.noelo)
 local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid and true
+local planetIndex = Spring.GetModOptions().singleplayercampaignbattleid
+planetIndex = planetIndex and tonumber(planetIndex)
 
 local revealed = false
 local gameover = false
@@ -158,6 +162,9 @@ local function KillTeam(teamID)
 end
 
 local function GameOver(winningAllyTeamID)
+	if DEBUG_MSG then
+		Spring.Echo("GameOver", winningAllyTeamID)
+	end
 	if isMission then
 		if winningAllyTeamID == PLAYER_ALLY_TEAM_ID then
 			GG.MissionGameOver(true)
@@ -242,6 +249,9 @@ end
 
 -- if only one allyteam left, declare it the victor
 local function CheckForVictory()
+	if DEBUG_MSG then
+		Spring.Echo("CheckForVictory")
+	end
 	if Spring.IsCheatingEnabled() or gameOverSent then
 		return
 	end
@@ -270,6 +280,9 @@ local function CheckForVictory()
 end
 
 local function RevealAllianceUnits(allianceID)
+	if DEBUG_MSG then
+		Spring.Echo("RevealAllianceUnits", allianceID)
+	end
 	allianceToReveal = allianceID
 	local teamList = spGetTeamList(allianceID)
 	for i=1,#teamList do
@@ -289,6 +302,9 @@ end
 
 -- purge the alliance! for the horde!
 local function DestroyAlliance(allianceID, delayLossToNextGameFrame)
+	if DEBUG_MSG then
+		Spring.Echo("DestroyAlliance", allianceID, delayLossToNextGameFrame)
+	end
 	if delayLossToNextGameFrame then
 		alliancesToDestroy = alliancesToDestroy or {}
 		alliancesToDestroy[#alliancesToDestroy + 1] = allianceID
@@ -325,7 +341,7 @@ local function DestroyAlliance(allianceID, delayLossToNextGameFrame)
 			EchoUIMessage("Game Over: DEBUG")
 			EchoUIMessage("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
 			EchoUIMessage("Game Over: If this is true, then please resign.")
-			return	-- don't perform victory check
+			return -- don't perform victory check
 		else -- kaboom
 			if not (isMission or isScriptMission) then
 				local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allianceID)
@@ -370,6 +386,9 @@ end
 GG.DestroyAlliance = DestroyAlliance
 
 local function CauseVictory(allyTeamID)
+	if DEBUG_MSG then
+		Spring.Echo("CauseVictory", allyTeamID)
+	end
 	local allylist = spGetAllyTeamList()
 	local count = 0
 	for _,a in pairs(allylist) do
@@ -390,6 +409,9 @@ local function CanAddCommander()
 end
 
 local function AddAllianceUnit(unitID, unitDefID, teamID)
+	if DEBUG_MSG then
+		Spring.Echo("AddAllianceUnit", unitID, unitDefID, teamID)
+	end
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
 	aliveCount[teamID] = aliveCount[teamID] + 1
 	
@@ -410,6 +432,9 @@ local function AddAllianceUnit(unitID, unitDefID, teamID)
 end
 
 local function CheckMissionDefeatOnUnitLoss(unitID, allianceID)
+	if DEBUG_MSG then
+		Spring.Echo("CheckMissionDefeatOnUnitLoss", unitID, allianceID)
+	end
 	local defeatConfig = GG.GalaxyCampaignHandler.GetDefeatConfig(allianceID)
 	if defeatConfig.ignoreUnitLossDefeat then
 		return false
@@ -435,6 +460,9 @@ local function CheckMissionDefeatOnUnitLoss(unitID, allianceID)
 end
 
 local function RemoveAllianceUnit(unitID, unitDefID, teamID, delayLossToNextGameFrame)
+	if DEBUG_MSG then
+		Spring.Echo("RemoveAllianceUnit", unitID, unitDefID, teamID, delayLossToNextGameFrame)
+	end
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
 	aliveCount[teamID] = aliveCount[teamID] - 1
 	
@@ -502,7 +530,10 @@ local function CheckAllUnits()
 end
 
 -- check for active players
-local function ProcessLastAlly()	
+local function ProcessLastAlly()
+	if DEBUG_MSG then
+		Spring.Echo("ProcessLastAlly")
+	end
 	if Spring.IsCheatingEnabled() then
 		return
 	end
@@ -603,6 +634,9 @@ local function ProcessLastAlly()
 end
 
 local function CheckInactivityWin(cmd, line, words, player)
+	if DEBUG_MSG then
+		Spring.Echo("ProcessLastAlly", cmd, line, words, player)
+	end
 	if inactiveWinAllyTeam and not gameover then
 		if player then 
 			local name,_,spec,_,allyTeamID = Spring.GetPlayerInfo(player)
@@ -619,6 +653,9 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:TeamDied (teamID)
+	if DEBUG_MSG then
+		Spring.Echo("gadget:TeamDied", teamID)
+	end
 	if not gameover then
 		ProcessLastAlly()
 	end
@@ -728,12 +765,20 @@ function gadget:GameFrame(n)
 	-- end condition: only 1 ally with human players, no AIs in other ones
 	if (n % 45 == 0) then
 		if not gameover and not spGetGameRulesParam("loadedGame") then
-			ProcessLastAlly()
+			if DEBUG_MSG then
+				Spring.Echo("planetIndex", planetIndex, type(planetIndex))
+			end
+			if planetIndex ~= 18 then
+				ProcessLastAlly()
+			end
 		end
 	end
 end
 
 function gadget:GameOver()
+	if DEBUG_MSG then
+		Spring.Echo("gadget:GameOver")
+	end
 	gameover = true
 	if noElo then
 		Spring.SendCommands("wbynum 255 SPRINGIE:noElo")

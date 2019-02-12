@@ -53,9 +53,9 @@ unitDef = {
   sightDistance          = 325,
   trackOffset            = 0,
   trackStrength          = 8,
-  trackStretch           = 1,
+  trackStretch           = 0.8,
   trackType              = [[ComTrack]],
-  trackWidth             = 26,
+  trackWidth             = 24,
   turnRate               = 1400,
   upright                = true,
 

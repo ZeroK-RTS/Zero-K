@@ -36,7 +36,7 @@ unitDef = {
   maxSlope            = 72,
   maxVelocity         = 4.8,
   maxWaterDepth       = 15,
-  minCloakDistance    = 120,
+  minCloakDistance    = 200,
   movementClass       = [[TKBOT2]],
   moveState           = 0,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -88,8 +88,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 10.57,
-        planes  = 10.57,
+        default = 9.8,
+        planes  = 9.8,
         subs    = 0.5,
       },
 
@@ -102,7 +102,7 @@ unitDef = {
       laserFlareSize          = 3.22,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 155,
+      range                   = 150,
       reloadtime              = 0.25,
       rgbColor                = [[1 1 0]],
       soundStart              = [[weapon/laser/small_laser_fire]],

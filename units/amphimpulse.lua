@@ -5,7 +5,7 @@ unitDef = {
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
-  buildCostMetal         = 200,
+  buildCostMetal         = 180,
   buildPic               = [[amphimpulse.png]],
   canGuard               = true,
   canMove                = true,
@@ -80,7 +80,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        impulse = [[500]],
+        impulse = [[460]],
         impulsemaxdepth = [[20]],
         impulsedepthmult = [[0.5]],
         normaldamage = [[1]],
@@ -95,7 +95,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 15,
+        default = 24,
         subs    = 1,
       },
 
@@ -107,7 +107,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
       projectiles             = 2,
-      range                   = 280,
+      range                   = 275,
       reloadtime              = 20/30,
       rgbColor                = [[0.5 0.5 0.65]],
       scrollSpeed             = 10,

@@ -20,7 +20,7 @@ function widget:GetInfo()
 		date      = "Dec 06, 2007",
 		license   = "GNU GPL, v2 or later",
 		layer     = -10,
-		enabled   = false  --  loaded by default?
+		enabled   = true  --  loaded by default?
 	}
 end
 
@@ -52,8 +52,8 @@ options = {
 		name = 'Outline Thickness',
 		desc = 'How thick the outline appears around objects',
 		type = 'number',
-		min = 0.4, max = 1, step = 0.01,
-		value = 0.7,
+		min = 0.2, max = 1, step = 0.01,
+		value = 0.5,
 	OnChange = OnchangeFunc,
 	},
 	scaleWithHeight = {
@@ -73,7 +73,7 @@ options = {
 		name = 'Subtle Scale With Distance',
 		desc = 'Reduces the screen space width of outlines when zoomed out, in a subtle way.',
 		type = 'bool',
-		value = false,
+		value = true,
 		noHotkey = true,
 		OnChange = function (self)
 			functionScaleWithHeight = self.value

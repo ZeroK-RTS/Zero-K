@@ -14,10 +14,18 @@ local SIG_Walk = 2
 
 local isAiming = false
 
+-- future-proof running animation against balance tweaks
+local runspeed = 1.0 * (UnitDefs[unitDefID].speed / 48)
+
+local function GetSpeedMod()
+	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+end
+
 local function Walk()
 	for i = 1, 2 do
 		Turn (thigh[i], y_axis, 0, math.rad(135))
 		Turn (thigh[i], z_axis, 0, math.rad(135))
+		Turn (ankle[i], x_axis, 0, math.rad(135))
 		Turn (ankle[i], z_axis, 0, math.rad(135))
 	end
 
@@ -26,23 +34,32 @@ local function Walk()
 
 	local side = 1
 	while true do
-		Turn (shin[side], x_axis, math.rad(85), math.rad(210))
-		Turn (thigh[side], x_axis, math.rad(-100), math.rad(135))
-		Turn (thigh[3-side], x_axis, math.rad(30), math.rad(135))
+		local speedmod = GetSpeedMod()
+		local truespeed = runspeed * speedmod
+
+		Turn (shin[side], x_axis, math.rad(65), math.rad(230)*truespeed)
+		Turn (ankle[side], x_axis, math.rad(30), math.rad(230)*truespeed)
+		Turn (thigh[side], x_axis, math.rad(-45), math.rad(135)*truespeed)
+		Turn (thigh[3-side], x_axis, math.rad(45), math.rad(135)*truespeed)
 		if not isAiming then
-			Turn (torso, y_axis, math.rad(30 - 20*side), math.rad(45))
+			Turn (torso, x_axis, math.rad(20 - 5*side), math.rad(45)*truespeed)
+			Turn (torso, y_axis, math.rad(30 - 20*side), math.rad(45)*truespeed)
 		end
+		Move (waist, y_axis, 1.0, 12*truespeed)
 		WaitForMove (waist, y_axis)
-		Move (waist, y_axis, 3, 12)
-		WaitForMove (waist, y_axis)
-		Turn (shin[side], x_axis, math.rad(10), math.rad(315))
-		Move (waist, y_axis, 0, 12)
+		Turn (shin[side], x_axis, math.rad(0), math.rad(420)*truespeed)
+		Turn (ankle[side], x_axis, math.rad(0), math.rad(420)*truespeed)
+		Turn (ankle[3-side], x_axis, math.rad(-30), math.rad(90)*truespeed)
+		Move (waist, y_axis, -2.0, 8*truespeed)
+		WaitForTurn (thigh[side], x_axis)
 		side = 3 - side
 	end
 end
 
 local function StopWalk()
 	Signal(SIG_Walk)
+
+	Move (waist, y_axis, 0, 16)
 
 	for i = 1, 2 do
 		Turn (ankle[i], x_axis, 0, math.rad(400))
@@ -55,6 +72,7 @@ local function StopWalk()
 
 	if not isAiming then
 		Turn (torso, y_axis, 0, math.rad(45))
+		Turn (torso, x_axis, 0, math.rad(45))
 	end
 end
 

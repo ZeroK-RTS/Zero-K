@@ -19,8 +19,8 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	modelradius    = [[14]],
-	turnatfullspeed = [[1]],
+    modelradius    = [[14]],
+    turnatfullspeed = [[1]],
   },
 
 
@@ -39,7 +39,7 @@ unitDef = {
   movementClass       = [[BOAT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE HOVER]],
-  objectName          = [[SHIPTORPRAIDER]],
+  objectName          = [[shiptorpraider.dae]],
   script              = [[shiptorpraider.lua]],
   selfDestructAs      = [[SMALL_UNITEX]],
   sightDistance       = 450,
@@ -96,7 +96,7 @@ unitDef = {
 	  flightTime              = 0.9,
 	  leadlimit               = 0,
       model                   = [[wep_m_ajax.s3o]],
-      myGravity               = 10.1,
+      myGravity               = 5.1,
       numbounce               = 4,
       noSelfDamage            = true,
 
@@ -106,7 +106,7 @@ unitDef = {
       soundHitVolume          = 2.8,
       soundStart              = [[weapon/torp_land]],
       soundStartVolume        = 0.8,
-      startVelocity           = 20,
+      startVelocity           = 50,
       tolerance               = 100000,
       tracks                  = true,
       turnRate                = 200000,
@@ -128,7 +128,7 @@ unitDef = {
 
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[shiptorpraider_dead.s3o]],
+      object           = [[shiptorpraider_dead.dae]],
     },
 
 

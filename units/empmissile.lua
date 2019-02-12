@@ -63,6 +63,8 @@ unitDef = {
 	  customparams = {
 		burst = Shared.BURST_RELIABLE,
 
+		restrict_in_widgets = 1,
+
 		stats_hide_dps = 1, -- one use
 		stats_hide_reload = 1,
 		

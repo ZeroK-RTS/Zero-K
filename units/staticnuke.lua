@@ -65,6 +65,8 @@ unitDef = {
       craterMult              = 6,
 
 	  customParams        	  = {
+		restrict_in_widgets = 1,
+
 		light_color = [[2.92 2.64 1.76]],
 		light_radius = 3000,
 	  },

@@ -185,6 +185,7 @@ local callInLists = {
 	"AllowUnitTransport",
 	"AllowUnitCloak",
 	"AllowUnitDecloak",
+	"AllowUnitTargetRange",
 	"AllowFeatureBuildStep",
 	"AllowFeatureCreation",
 	"AllowResourceLevel",
@@ -1330,12 +1331,34 @@ function gadgetHandler:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, att
 	return true
 end
 
+-- AllowWeaponTarget is also called when auto-generating CAI attack commands.
+-- When targetID=-1 and weaponNum=-1 targetPriority determines the target search
+-- radius; targetPriority=nil accompanies any actual
+
 function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
 	local allowed = true
-	local priority = defPriority
+	local returnValue
+	
+	if targetID == -1 then
+		local unitID = attackerID
+		local aquireRange = defPriority
+		for _, g in ipairs(self.AllowUnitTargetRangeList) do
+			-- Send priority to each successive gadget.
+			local targetAllowed, newRange = g:AllowUnitTargetRange(unitID, aquireRange)
 
+			if (not targetAllowed) then
+				allowed = false
+				break
+			end
+
+			aquireRange = newRange
+		end
+		return true, aquireRange
+	end
+	
+	local priority = defPriority
 	for _, g in ipairs(self.AllowWeaponTargetList) do
-		-- Send priority to each sucessive gadget.
+		-- Send priority to each successive gadget.
 		local targetAllowed, targetPriority = g:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, priority)
 
 		if (not targetAllowed) then
@@ -1345,7 +1368,6 @@ function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum
 
 		priority = targetPriority
 	end
-
 	return allowed, priority
 end
 
