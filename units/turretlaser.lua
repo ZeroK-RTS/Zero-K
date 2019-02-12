@@ -78,7 +78,7 @@ unitDef = {
 		stats_hide_damage = 1, -- continuous laser
 		stats_hide_reload = 1,
 		
-		light_color = [[0.4 1.1 1.1]],
+		light_color = [[1.1 0.4 0.4]],
 		light_radius = 120,
 	  },
 
@@ -87,7 +87,7 @@ unitDef = {
         subs    = 0.5,
       },
 
-      explosionGenerator      = [[custom:FLASH1blue]],
+      explosionGenerator      = [[custom:FLASH1red]],
       fireStarter             = 30,
       impactOnly              = true,
       impulseBoost            = 0,
@@ -99,7 +99,7 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 460,
       reloadtime              = 0.1,
-      rgbColor                = [[0 1 1]],
+      rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/laser_burn8]],
       soundTrigger            = true,
       sweepfire               = false,
