@@ -101,15 +101,29 @@ end
 function ShieldSphereColorHQParticle:Draw()
 
 	gl.Culling(GL.FRONT)
-	if not self.texture then
-		gl.UniformInt(methodUniform, 0)
+	local noiseLevel = 0
+	if self.rechargeDelay > 0 then
+		gl.UniformInt(methodUniform, 2)
+		local hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
+		local currTime = Spring.GetGameFrame()
+		local cooldown = hitTime + self.rechargeDelay * 30 - currTime
+		if cooldown > 0 then
+			-- Should vary from 0.0 to 1.0
+			local rampDown = 1.0 - 30.0 / (cooldown + 30.0)
+			noiseLevel = rampDown
+		end
 	else
-		gl.UniformInt(methodUniform, 1)
-		if (lastTexture ~= self.texture) then
-			gl.Texture(0, self.texture)
-			lastTexture = self.texture
+		if not self.texture then
+			gl.UniformInt(methodUniform, 0)
+		else
+			gl.UniformInt(methodUniform, 1)
+			if (lastTexture ~= self.texture) then
+				gl.Texture(0, self.texture)
+				lastTexture = self.texture
+			end
 		end
 	end
+	gl.Uniform(shieldRechargingNoiseUniform, noiseLevel)
 
 	local col1, col2 = GetShieldColor(self.unit, self)
 
@@ -128,21 +142,6 @@ function ShieldSphereColorHQParticle:Draw()
 	local pos = self.pos
 	gl.Uniform(shieldPosUniform, pos[1], pos[2], pos[3], 0)
 
-		local noiseLevel = 0
-		local variantShield = 0
-		if self.rechargeDelay > 0 then
-			variantShield = 1
-			local hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
-			local currTime = Spring.GetGameFrame()
-			local cooldown = hitTime + self.rechargeDelay * 30 - currTime
-			if cooldown > 0 then
-				-- Should vary from 0.0 to 1.0
-				local rampDown = 1.0 - 30.0 / (cooldown + 30.0)
-				noiseLevel = rampDown
-			end
-		end
-		gl.Uniform(shieldRechargingNoiseUniform, noiseLevel)
-		gl.UniformInt(variantUniform, variantShield)
 	gl.Uniform(shieldSizeUniform, self.size)
 	gl.Uniform(shieldSizeDriftUniform, self.sizeDrift)
 	gl.Uniform(marginUniform, self.marginHQ)
@@ -443,16 +442,13 @@ ____FS_CODE_DEFS_____
 		vec2 uvo = uv + offset + offset2; //this is to trick GLSL compiler, otherwise shot-induced ripple is not drawn. Silly....
 
 		vec4 texel;
+		float alphaAdd = 0.0;
+		float noiseMult = 1;
 		if (method == 0)
 			texel = vec4(1.0 - hex(uvo * HEXSCALE, 0.2, 0.01));
 		else if (method == 1)
 			texel = texture2D(tex0, uvo);
-		else
-			texel = vec4(0.0);
-		
-		float alphaAdd = 0.0;
-		float noiseMult = 1;
-		if (shieldVariant == 1) {
+		else if (method == 2) {
 			vec3 adjustedOffset = vec3(0.0);
 			if (length(offset2) > 0) {
 				vec3 pOffset2 = RectToPolar(vec3(offset2, 0));
@@ -469,6 +465,9 @@ ____FS_CODE_DEFS_____
 			noiseVec.z -= timer * 6 + unitId*10;
 			noiseMult = 0.5 + (1 - abs(snoise(standardVec))) + (snoise(noiseVec)) * noiseLevel / 2.0;
 		}
+		else
+			texel = vec4(0.0);
+		
 		vec4 colorMultAdj = colorMult * (1.0 + length(offset2) * 50.0) * noiseMult;
 		//float colorMultAdj = colorMult;
 		//vec4 color1M = color1 * colorMultAdj;
@@ -540,7 +539,6 @@ function ShieldSphereColorHQParticle:Initialize()
 	shieldSizeDriftUniform = gl.GetUniformLocation(shieldShader, 'sizeDrift')
 	marginUniform = gl.GetUniformLocation(shieldShader, 'margin')
 	uvMulUniform = gl.GetUniformLocation(shieldShader, 'uvMul')
-	variantUniform = gl.GetUniformLocation(shieldShader, 'shieldVariant')
 	unitIdUniform = gl.GetUniformLocation(shieldShader, 'unitId')
 
 	hitPointCountUniform = gl.GetUniformLocation(shieldShader, 'hitPointCount')
