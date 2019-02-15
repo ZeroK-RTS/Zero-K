@@ -4,8 +4,12 @@ local wake = piece "wake"
 local base = piece "base"
 local firepoint = piece "firepoint"
 
-function script.QueryWeapon(num) return firepoint end
-function script.AimFromWeapon(num) return base end
+function script.QueryWeapon(num)
+	return firepoint
+end
+function script.AimFromWeapon(num)
+	return base
+end
 
 function script.AimWeapon(num, heading, pitch)
 	return num == 2
@@ -26,6 +30,7 @@ function script.setSFXoccupy(num)
 		submerged = true
 	end
 end
+
 
 function script.HitByWeapon (x, z, weaponDefID, damage)
 	if weaponDefID < 0 then return damage end
