@@ -100,7 +100,7 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType2',  'selectionClosesTab', 'altInsertBehind',
+	'background_opacity', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning', 
@@ -138,6 +138,13 @@ options = {
 		desc = "When enabled, issuing or cancelling a construction command will switch back to the Orders tab (except for build options in the factory queue tab).",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
+	},
+	selectionClosesTabOnSelect = {
+		name = 'Selection Closes Tab',
+		desc = "When enabled, selecting a construction command will switch back to the Orders tab (except for build options in the factory queue tab).",
+		type = 'bool',
+		value = false,
 		noHotkey = true,
 	},
 	altInsertBehind = {
@@ -1738,7 +1745,11 @@ local function InitializeControls()
 	buildTabHolder:SendToBack() -- behind background
 	
 	local function ReturnToOrders(cmdID)
-		if options.selectionClosesTab.value and cmdID then
+		if options.selectionClosesTabOnSelect.value then
+			if commandPanelMap.orders then
+				commandPanelMap.orders.tabButton.DoClick()
+			end
+		elseif options.selectionClosesTab.value and cmdID then
 			returnToOrdersCommand = cmdID
 		end
 	end
