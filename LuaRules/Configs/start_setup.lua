@@ -36,8 +36,8 @@ for i = 1, #ploppables do
 end
 
 -- starting resources
-START_METAL   = 400
-START_ENERGY  = 400
+START_METAL   = 200
+START_ENERGY  = 200
 
 START_STORAGE = 0
 
