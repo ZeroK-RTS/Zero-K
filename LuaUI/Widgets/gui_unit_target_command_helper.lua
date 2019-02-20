@@ -65,7 +65,6 @@ local handledCommand = {
 
 	[CMD_UNIT_SET_TARGET] = true,
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true,
-	[CMD_WAIT_AT_BEACON] = true,
 	
 	-- Features
 	[CMD.RECLAIM] = true,
