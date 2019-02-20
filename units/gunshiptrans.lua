@@ -28,6 +28,7 @@ unitDef = {
     airstrafecontrol = [[1]],
 	midposoffset   = [[0 0 0]],
 	modelradius    = [[15]],
+	transportcost  = 1000,
   },
 
   explodeAs           = [[GUNSHIPEX]],

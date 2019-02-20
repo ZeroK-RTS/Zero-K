@@ -143,7 +143,7 @@ local chassisDefs = {
 	},
 }
 
-local commanderCost = 1000
+local commanderCost = 1100
 
 local statOverrides = {
 	cloakcost       = 5, -- For personal cloak

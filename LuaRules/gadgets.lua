@@ -183,6 +183,8 @@ local callInLists = {
 	"AllowUnitTransfer",
 	"AllowUnitBuildStep",
 	"AllowUnitTransport",
+	"AllowUnitTransportLoad",
+	"AllowUnitTransportUnload",
 	"AllowUnitCloak",
 	"AllowUnitDecloak",
 	"AllowUnitTargetRange",
@@ -1197,20 +1199,54 @@ function gadgetHandler:AllowUnitBuildStep(builderID, builderTeam,
   return true
 end
 
-
 function gadgetHandler:AllowUnitTransport(
   transporterID, transporterUnitDefID, transporterTeam,
   transporteeID, transporteeUnitDefID, transporteeTeam
 )
   for _,g in ipairs(self.AllowUnitTransportList) do
-    if (not g:AllowUnitTransport(transporterID, transporterUnitDefID, transporterTeam,
-                                 transporteeID, transporteeUnitDefID, transporteeTeam)) then
+    if (not g:AllowUnitTransport(
+      transporterID, transporterUnitDefID, transporterTeam,
+      transporteeID, transporteeUnitDefID, transporteeTeam
+    )) then
       return false
     end
   end
   return true
 end
 
+function gadgetHandler:AllowUnitTransportLoad(
+  transporterID, transporterUnitDefID, transporterTeam,
+  transporteeID, transporteeUnitDefID, transporteeTeam,
+  loadPosX, loadPosY, loadPosZ
+)
+  for _,g in ipairs(self.AllowUnitTransportLoadList) do
+    if (not g:AllowUnitTransportLoad(
+      transporterID, transporterUnitDefID, transporterTeam,
+      transporteeID, transporteeUnitDefID, transporteeTeam,
+      loadPosX, loadPosY, loadPosZ
+    )) then
+      return false
+    end
+  end
+  return true
+end
+
+function gadgetHandler:AllowUnitTransportUnload(
+  transporterID, transporterUnitDefID, transporterTeam,
+  transporteeID, transporteeUnitDefID, transporteeTeam,
+  unloadPosX, unloadPosY, unloadPosZ
+)
+  for _,g in ipairs(self.AllowUnitTransportUnloadList) do
+    if (not g:AllowUnitTransportUnload(
+      transporterID, transporterUnitDefID, transporterTeam,
+      transporteeID, transporteeUnitDefID, transporteeTeam,
+      unloadPosX, unloadPosY, unloadPosZ
+    )) then
+      return false
+    end
+  end
+  return true
+end
 
 function gadgetHandler:AllowUnitCloak(unitID, enemyID)
   -- The case can be that unitID == enemyID. This is for engine stunned unitID, they are their own enemies.

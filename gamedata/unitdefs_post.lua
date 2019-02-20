@@ -63,8 +63,8 @@ for _, ud in pairs(UnitDefs) do
 --
 
 VFS.Include('gamedata/modularcomms/unitdefgen.lua')
-
 VFS.Include('gamedata/planetwars/pw_unitdefgen.lua')
+local Utilities = VFS.Include('gamedata/utilities.lua')
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -776,3 +776,15 @@ for name, ud in pairs (UnitDefs) do
 	end
 end
 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Remove engine transport limits
+--
+
+if Utilities.IsCurrentVersionNewerThan(104, 600) then
+	for name, ud in pairs (UnitDefs) do
+		ud.transportmass = nil
+	end
+end
