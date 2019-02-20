@@ -16,6 +16,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[130 40 130]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[130 40 130]],
+  selectionVolumeType    = [[box]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -23,6 +26,7 @@ unitDef = {
 	nobuildpower   = 1,
 	notreallyafactory = 1,
 	selection_rank  = [[1]],
+    selectionscalemult = 1,
   },
 
   explodeAs           = [[LARGE_BUILDINGEX]],

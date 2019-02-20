@@ -43,6 +43,7 @@ unitDef = {
 	modelradius    = [[43]],
 	nongroundfac = [[1]],
 	default_spacing = 8,
+    selectionscalemult = 1,
   },
 
   energyUse                     = 0,

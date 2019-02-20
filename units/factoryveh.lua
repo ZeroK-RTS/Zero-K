@@ -45,6 +45,7 @@ unitDef = {
 	midposoffset   = [[0 0 -10]],
 	modelradius    = [[100]],
 	unstick_help   = 1,
+    selectionscalemult = 1,
   },
 
   energyUse                     = 0,

@@ -41,6 +41,7 @@ unitDef = {
 	aimposoffset   = [[0 0 -32]],
     midposoffset    = [[0 0 -32]],
     solid_factory   = [[8]],
+    selectionscalemult = 1,
   },
 
   energyUse        = 0,

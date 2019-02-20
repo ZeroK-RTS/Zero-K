@@ -23,6 +23,7 @@ unitDef = {
 	midposoffset       = [[0 -10 0]],
 	modelradius        = [[15]],
 	removewait         = 1,
+    selectionscalemult = 1.4,
   },
 
   energyUse              = 0,

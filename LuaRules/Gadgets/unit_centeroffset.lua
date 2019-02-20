@@ -40,7 +40,6 @@ end
 
 local FULL_GROW = 0.4
 local UPDATE_FREQUENCY = 25
-local SET_SELECTION_VOLUME = false
 
 local growUnit = {}
 local offsets = {}
@@ -108,13 +107,6 @@ local function UpdateUnitGrow(unitID, growScale)
 			unit.offset[1], unit.offset[2] - growScale*unit.scaleOff, unit.offset[3], 
 			unit.volumeType, unit.testType, unit.primaryAxis
 		)
-		
-		if SET_SELECTION_VOLUME and Spring.SetUnitSelectionVolumeData then
-			Spring.SetUnitSelectionVolumeData(unitID,
-				unit.scale[1], unit.scale[2], unit.scale[3], 
-				unit.offset[1], unit.offset[2] - growScale*unit.scaleOff, unit.offset[3], 
-				unit.volumeType, unit.testType, unit.primaryAxis)
-		end
 	else
 		spSetUnitCollisionVolumeData(unitID,
 			unit.scale[1], unit.scale[2] - growScale*unit.scaleOff, unit.scale[3], 
@@ -197,6 +189,14 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		primaryAxis = primaryAxis,
 		prevGrowth = growScale,
 	}
+	
+	local luaSelectionScale = ud.customParams.lua_selection_scale
+	if Spring.SetUnitSelectionVolumeData and luaSelectionScale then
+		Spring.SetUnitSelectionVolumeData(unitID,
+			scaleX*luaSelectionScale, scaleY*luaSelectionScale, scaleZ*luaSelectionScale, 
+			0, 0, 0, 
+			volumeType, testType, primaryAxis)
+	end
 	
 	UpdateUnitGrow(unitID, growScale)
 end

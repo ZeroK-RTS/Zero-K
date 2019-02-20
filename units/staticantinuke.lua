@@ -16,12 +16,16 @@ unitDef = {
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[70 55 110]],
   collisionVolumeType           = [[box]],
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[70 55 110]],
+  selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
 	removewait     = 1,
     nuke_coverage  = 2500,
     modelradius      = [[50]],
+    selectionscalemult = 1,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

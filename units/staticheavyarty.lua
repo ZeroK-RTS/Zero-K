@@ -18,6 +18,7 @@ unitDef = {
   customParams                  = {
 
     modelradius    = [[35]],
+    selectionscalemult = 1,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
