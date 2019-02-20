@@ -68,6 +68,7 @@ local AREA_COMMAND = {
 	[CMD.RESURRECT] = true,
 	[CMD.LOAD_UNITS] = true,
 	[CMD.UNLOAD_UNITS] = true,
+	[CMD.UNLOAD_UNIT] = true,
 	[CMD.AREA_ATTACK] = true,
 	[CMD.RESTORE] = true,
 }

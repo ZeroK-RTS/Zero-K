@@ -163,9 +163,9 @@ end
 --- COMMAND HANDLING
 
 local function GiveUnloadOrder(transportID, x, y, z)
-	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, UNLOAD_RADIUS}, 0)
-	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, UNLOAD_RADIUS*2}, CMD.OPT_SHIFT)
-	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, UNLOAD_RADIUS*4}, CMD.OPT_SHIFT)
+	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x, y, z, UNLOAD_RADIUS}, 0)
+	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x, y, z, UNLOAD_RADIUS*2}, CMD.OPT_SHIFT)
+	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x, y, z, UNLOAD_RADIUS*4}, CMD.OPT_SHIFT)
 end
 
 function widget:CommandsChanged()
@@ -368,15 +368,12 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 			end
 		end
 	end
-	
 end
 
 function widget:GameFrame(frame)
 	
 	if frame%15 == 12 then
-		
 		for i = 1, ferryRoutes.count do
-		
 			route = ferryRoutes.route[i]
 		
 			local unitsInArea = Spring.GetUnitsInCylinder(route.start.x, route.start.z, COLLECTION_RADIUS, myTeam)
@@ -389,7 +386,7 @@ function widget:GameFrame(frame)
 						route.unitsQueuedToBeTransported[unitID] = nil
 					end
 				else
-          local cmd = Spring.GetCommandQueue(unitID, 1)        
+          local cmd = Spring.GetCommandQueue(unitID, 1)
 					if #cmd > 0 and cmd[1].id == CMD.WAIT then
 						unitsToTransport.count = unitsToTransport.count + 1
 						unitsToTransport.unit[unitsToTransport.count] = unitID
@@ -457,9 +454,7 @@ function widget:GameFrame(frame)
 end
 
 local function addUnit(unitID, unitDefID, unitTeam)
-
 	if unitTeam == myTeam and transportDefs[unitDefID] then
-		
 		local ud = UnitDefs[unitDefID]
 		
 		transportIndex.count = transportIndex.count + 1
@@ -477,9 +472,7 @@ local function addUnit(unitID, unitDefID, unitTeam)
 end
 
 local function removeUnit(unitID, unitDefID, unitTeam)
-
 	if unitTeam == myTeam and transportDefs[unitDefID] then
-		
 		local trans = transport[unitID]
 		
 		removeTransportFromRoute(unitID)

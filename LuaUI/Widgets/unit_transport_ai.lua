@@ -22,7 +22,7 @@ local CONST_HEIGHT_MULTIPLIER = 3 -- how many times to multiply height differenc
 local CONST_TRANSPORT_PICKUPTIME = 9 -- how long (in seconds) does transport land and takeoff with unit
 local CONST_PRIORITY_BENEFIT = 10000 -- how much more important are priority transfers
 local CONST_TRANSPORT_STOPDISTANCE = 350 -- how close by has transport be to stop the unit
-local CONST_UNLOAD_RADIUS = 140 -- how big is the radious for unload command for factory transports
+local CONST_UNLOAD_RADIUS = 100 -- how big is the radious for unload command for factory transports
 
 local idleTransports = {} -- list of idle transports key = id, value = {defid}
 local activeTransports = {} -- list of transports with AI enabled
@@ -426,9 +426,10 @@ local function PossiblyTransferAutoCallThroughMorph(unitID)
 end
 
 local function GiveUnloadOrder(transportID, x, y, z)
-	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT)
-	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, CONST_UNLOAD_RADIUS*2}, CMD.OPT_SHIFT)
-	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, CONST_UNLOAD_RADIUS*4}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x - 2, y, z - 2}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x + 2, y, z + 2, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x - 2, y, z + 2, CONST_UNLOAD_RADIUS*2}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x + 2, y, z - 2, CONST_UNLOAD_RADIUS*4}, CMD.OPT_SHIFT)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
@@ -701,8 +702,11 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 			if usefulCommand then
 				cnt = cnt +1
 				if cx then
-					spGiveOrderToUnit(transportID, CMD_RAW_MOVE, {cx, cy, cz}, CMD.OPT_SHIFT)
-					TableInsert(torev, {cx, cy, cz + 20})
+					if queue[k + 1] then
+						-- Do not give move order to the last waypoint.
+						spGiveOrderToUnit(transportID, CMD_RAW_MOVE, {cx, cy, cz}, CMD.OPT_SHIFT)
+						TableInsert(torev, {cx, cy, cz + 20})
+					end
 					lastX, lastY, lastZ = cx, cy, cz
 				end
 				if haltingCommand or (IsDisembark(v)) then
