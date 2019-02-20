@@ -178,6 +178,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Gesture Menu']             = imgPath..'epicmenu/stock_brightness.png',
 	['Settings/Interface/Economy Overlay']          = imgPath..'energy.png',
 	['Settings/Interface/Falling Units']            = imgPath..'advplayerslist/point2.png',
+	['Settings/Interface/Area Commands']            = imgPath..'commands/bold/areaattack.png',
 	
 	['Settings/HUD Panels/Minimap']                 = imgPath..'epicmenu/map.png',
 	['Settings/HUD Panels/Economy Panel']           = imgPath..'ibeam.png',

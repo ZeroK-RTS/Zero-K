@@ -1,9 +1,9 @@
 function widget:GetInfo()
 	return {
-		name      = "Attack Command Helper",
-		desc      = "Makes it easier to issue attack commands on moving units. Removes right click area attack.",
+		name      = "Unit Target Command Helper",
+		desc      = "Makes it easier to issue single unit commands on moving units.",
 		author    = "GoogleFrog",
-		date      = "24 January 2018",
+		date      = "20 February 2019",
 		license   = "GNU GPL, v2 or later",
 		layer     = -52,
 		enabled   = true,
@@ -14,15 +14,67 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local SIZE_FACTOR = ((select(1, Spring.GetWindowGeometry()) > 3000) and 2) or 1
+
+local function SetCircleDragThreshold(value)
+	value = value*SIZE_FACTOR
+	Spring.SetConfigInt("MouseDragCircleCommandThreshold", value)
+	WG.CircleDragThreshold = value
+end
+
+options_path = 'Settings/Interface/Area Commands'
+options_order = { 'circleDragThreshold', 'unitTargetHelper' }
+options = {
+	circleDragThreshold = {
+		name = "Area command drag threshold",
+		desc = "Distance that the mouse must move to issue an area command.",
+		type = 'number',
+		value = 25,
+		min = 2, max = 300, step = 1,
+		noHotkey = true,
+		OnChange = function (self)
+			SetCircleDragThreshold(self.value)
+		end
+	},
+	unitTargetHelper = {
+		name = "Use unit target helper",
+		desc = "When enabled, targets the unit under mouse press if nothing is under the mouse on release.",
+		type = "bool",
+		value = true,
+		noHotkey = true,
+	},
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local TRACE_UNIT = "unit"
-local CLICK_LEEWAY = 5
+local TRACE_FEATURE = "feature"
+local MAX_UNITS = Game.maxUnits
 
-local attackishCommandDefs = {
+local handledCommand = {
 	[CMD.ATTACK] = true,
+	[CMD.REPAIR] = true,
+	[CMD.LOAD_UNITS] = true,
+	[CMD.LOAD_ONTO] = true,
+	[CMD.UNLOAD_UNITS] = true,
+	[CMD.CAPTURE] = true,
+	[CMD.MANUALFIRE] = true,
+
 	[CMD_UNIT_SET_TARGET] = true,
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true,
+	[CMD_WAIT_AT_BEACON] = true,
+	
+	-- Features
+	[CMD.RECLAIM] = true,
+	[CMD.RESURRECT] = true,
+}
+
+local featureCommand = {
+	[CMD.RECLAIM] = true,
+	[CMD.RESURRECT] = true,
 }
 
 local CMD_OPT_ALT = CMD.OPT_ALT
@@ -31,8 +83,7 @@ local CMD_OPT_META = CMD.OPT_META
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 
-local clickX, clickY = false, false
-local clickUnitID = false
+local clickTargetID = false
 local clickCommandID = false
 local clickActiveCmdID = false
 local clickRight = false
@@ -41,9 +92,7 @@ local clickRight = false
 --------------------------------------------------------------------------------
 
 local function Reset()
-	clickX = false
-	clickY = false
-	clickUnitID = false
+	clickTargetID = false
 	clickCommandID = false
 	clickActiveCmdID = false
 	clickRight = false
@@ -111,60 +160,37 @@ local function MousePress(x, y, right)
 	end
 	
 	local cmdID = GetActionCommand(right)
-	if not (cmdID and attackishCommandDefs[cmdID]) then
+	if not (cmdID and handledCommand[cmdID]) then
 		return
 	end
 	
 	local traceType, targetID = Spring.TraceScreenRay(x, y)
-	if not (targetID and traceType == TRACE_UNIT) then
-		return
+	if not (traceType == TRACE_UNIT) then
+		if (featureCommand[cmdID] and traceType == TRACE_FEATURE) then
+			targetID = targetID + MAX_UNITS
+		else
+			return
+		end
 	end
 	
-	clickX = x
-	clickY = y
-	clickUnitID = targetID
+	clickTargetID = targetID
 	clickCommandID = cmdID
 	clickActiveCmdID = select(2, Spring.GetActiveCommand())
 	clickRight = right
 end
 
 local function MouseRelease(x, y)
+	if not clickTargetID then
+		return false
+	end
+	
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	
-	if clickRight then
-		if clickActiveCmdID then
-			Reset()
-			return
-		end
-		
-		if not shift then
-			Spring.SetActiveCommand(-1)
-		end
-	end
-	
-	if not (clickUnitID and clickCommandID) then
-		Reset()
-		return
-	end
-	
-	if not (clickX and clickY and clickUnitID) or (math.abs(clickX - x) > CLICK_LEEWAY) or (math.abs(clickY - y) > CLICK_LEEWAY) then
-		return
-	end
-	
-	if Spring.GetSelectedUnitsCount() == 0 then
-		Reset()
-		return
-	end
-	
-	local traceType, targetID = Spring.TraceScreenRay(x, y)
-	if (traceType == TRACE_UNIT) then
-		return
-	end
-	
-	GiveNotifyingOrder(clickCommandID, {clickUnitID}, GetCmdOpts(alt, ctrl, meta, shift, clickRight))
-	if (not shift) and (not clickRight) then
+	if (not shift) or clickRight then
 		Spring.SetActiveCommand(-1)
 	end
+	Spring.Echo("GiveNotifyingOrder", clickCommandID, clickTargetID)
+	GiveNotifyingOrder(clickCommandID, {clickTargetID}, GetCmdOpts(alt, ctrl, meta, shift, clickRight))
+	
 	Reset()
 	return true
 end
@@ -173,15 +199,10 @@ end
 --------------------------------------------------------------------------------
 
 function widget:CommandNotify(id, params, opts)
-	if not (attackishCommandDefs[id] and id == clickCommandID) then
-		return false
-	end
-	if #params < 3 or (#params >= 4 and #params < 6 and params[4] > 10) then
-		return false
-	end
-	
-	local x, y = Spring.WorldToScreenCoords(params[1], params[2], params[3])
-	if not (x and y) then
+	-- Right click commands only occur if they are area commands.
+	-- Left click commands that miss a unit may turn into ground commands.
+	if clickRight or (not clickTargetID) or (#params ~= 3 and #params ~= 4) then
+		Reset()
 		return false
 	end
 	
@@ -205,8 +226,9 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-	if Spring.Utilities.IsCurrentVersionNewerThan(104, 1000) then
+	if not Spring.Utilities.IsCurrentVersionNewerThan(104, 1000) then
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
+	SetCircleDragThreshold(options.circleDragThreshold.value)
 end
