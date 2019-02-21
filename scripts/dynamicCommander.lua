@@ -145,8 +145,8 @@ local function GetCegTable(wd)
 		return
 	end
 	local cegs = {
-		muzzle = cp.muzzleeffectshot and (SFX.GLOBAL + Spring.GetCEGID(cp.muzzleeffectshot)),
-		misc = cp.misceffectshot and (SFX.GLOBAL + Spring.GetCEGID(cp.misceffectshot)),
+		muzzle = cp.muzzleeffectshot and (SFX.GLOBAL + Spring.GetCEGID(cp.muzzleeffectshot:gsub("custom:",""))),
+		misc = cp.misceffectshot and (SFX.GLOBAL + Spring.GetCEGID(cp.misceffectshot:gsub("custom:",""))),
 	}
 	return cegs
 end
