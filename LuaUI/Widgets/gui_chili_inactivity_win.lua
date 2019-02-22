@@ -158,6 +158,10 @@ function widget:Update(dt)
 			screen0:RemoveChild(mainWindow)
 		end
 	end
+	
+	if windowVisible then
+		mainWindow:BringToFront()
+	end
 end
 
 --------------------------------------------------------------------------------
