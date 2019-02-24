@@ -90,7 +90,7 @@ float LinearizeDepth(vec2 uv){
 
     float n22 = viewProjectionInv[2][2];
 
-    return abs(((1 + n22) * (-1 + 2 * n22 + depthNDC)) / (2 * (n22 + depthNDC)));
+    return abs(((1.0 + depthNDC) * (1.0 + n22))/(2.0 * (depthNDC + n22)));
 }
 
 vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, out int compI)
@@ -140,7 +140,7 @@ void main()
     gl_FragData[0] = fragColor;
   }
 
-  else if (pass == HORIZ_BLUR_PASS)
+  else if (pass == HORIZ_BLUR_PASS) //Really Vert
   {
     vec2 stepVal = 1.0/resolution.xy;
     
@@ -153,7 +153,8 @@ void main()
     for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
     {
       compI = i;
-      vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x, 0.0), filterRadius, compI);
+      // vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x, 0.0), filterRadius, compI);
+      vec2 coords = GetFilterCoords(i, uv, vec2(0.0, stepVal.y), filterRadius, compI);
       if (compI < -KERNEL_RADIUS) continue;
 
       vec4 imageTexelRGB = texture2D(origTex, coords);
@@ -171,7 +172,7 @@ void main()
     gl_FragData[2] = valB;
 	}
 
-	else if (pass == VERT_BLUR_PASS)
+	else if (pass == VERT_BLUR_PASS) //Really Horiz
 	{
     vec2 stepVal = 1.0/resolution.xy;
   
@@ -183,7 +184,8 @@ void main()
     for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
     {
     	compI = i;
-      vec2 coords = GetFilterCoords(i, uv, vec2(0.0, stepVal.y), filterRadius, compI);
+      // vec2 coords = GetFilterCoords(i, uv, vec2(0.0, stepVal.y), filterRadius, compI);
+      vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x, 0.0), filterRadius, compI);
       if (compI < -KERNEL_RADIUS) continue;
       vec4 imageTexelR = texture2D(blurTex0, coords);  
       vec4 imageTexelG = texture2D(blurTex1, coords);  
@@ -215,7 +217,7 @@ void main()
 		fragColor = mix(texture2D(origTex, uv), texture2D(blurTex0, uv), 
       clamp((filterRadius - 1.2 / float(KERNEL_RADIUS)) * float(KERNEL_RADIUS) * 2.0, 0.0, 1.0));
     // if (filterRadius > 2.0 / float(KERNEL_RADIUS))
-    //   fragColor = texture2D(blurTex0, uv);
+      // fragColor = texture2D(blurTex0, uv);
     // else
     //   fragColor = texture2D(origTex, uv);
     gl_FragData[0] = fragColor;
