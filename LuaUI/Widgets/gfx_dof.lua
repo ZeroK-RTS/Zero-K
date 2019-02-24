@@ -66,14 +66,14 @@ local GL_COLOR_ATTACHMENT2_EXT = 0x8CE2
 
 local function CleanupTextures()
 	glDeleteTexture(baseBlurTex or "")
-	glDeleteTexture(horizBlurTexR or "")
-	glDeleteTexture(horizBlurTexG or "")
-	glDeleteTexture(horizBlurTexB or "")
+	glDeleteTexture(intermediateBlurTexR or "")
+	glDeleteTexture(intermediateBlurTexG or "")
+	glDeleteTexture(intermediateBlurTexB or "")
 	glDeleteTexture(finalBlurTex or "")
 	glDeleteTexture(screenTex or "")
 	glDeleteTexture(depthTex or "")
-	gl.DeleteFBO(horizBlurFBO)
-	baseBlurTex, horizBlurTexR, horizBlurTexG, horizBlurTexB, finalBlurTex, screenTex, depthTex = 
+	gl.DeleteFBO(intermediateBlurFBO)
+	baseBlurTex, intermediateBlurTexR, intermediateBlurTexG, intermediateBlurTexB, finalBlurTex, screenTex, depthTex = 
 		nil, nil, nil, nil, nil, nil, nil
 end
 -----------------------------------------------------------------
@@ -86,15 +86,15 @@ local dofShader = nil
 local screenTex = nil
 local depthTex = nil
 local baseBlurTex = nil
-local horizBlurTexR = nil
-local horizBlurTexG = nil
-local horizBlurTexB = nil
-local horizBlurFBO = nil
+local intermediateBlurTexR = nil
+local intermediateBlurTexG = nil
+local intermediateBlurTexB = nil
+local intermediateBlurFBO = nil
 local finalBlurTex = nil
 
 -- shader uniform handles
 local eyePosLoc = nil
-local viewProjectionInvLoc = nil
+local viewProjectionLoc = nil
 local resolutionLoc = nil
 -- local focusDepthLoc = nil
 -- local fstopFactorLoc = nil
@@ -105,8 +105,8 @@ local passLoc = nil
 local shaderPasses = 
 {
 	filterSize = 0,
-	horizBlur = 1,
-	vertBlur = 2,
+	vertBlur = 1,
+	horizBlur = 2,
 	composition = 3,
 }
 -- local blurChannels =
@@ -139,17 +139,17 @@ function widget:ViewResize(x, y)
 		wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 	
-	horizBlurTexR = glCreateTexture(vsx/2, vsy/2, {
+	intermediateBlurTexR = glCreateTexture(vsx/2, vsy/2, {
 		min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 	
-	horizBlurTexG = glCreateTexture(vsx/2, vsy/2, {
+	intermediateBlurTexG = glCreateTexture(vsx/2, vsy/2, {
 		 min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 	
-	horizBlurTexB = glCreateTexture(vsx/2, vsy/2, {
+	intermediateBlurTexB = glCreateTexture(vsx/2, vsy/2, {
 		 min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
@@ -159,17 +159,17 @@ function widget:ViewResize(x, y)
 		wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 	
-	horizBlurFBO = gl.CreateFBO({
-		color0 = horizBlurTexR,
-		color1 = horizBlurTexG,
-		color2 = horizBlurTexB,
+	intermediateBlurFBO = gl.CreateFBO({
+		color0 = intermediateBlurTexR,
+		color1 = intermediateBlurTexG,
+		color2 = intermediateBlurTexB,
      drawbuffers = { 
      	GL_COLOR_ATTACHMENT0_EXT, 
      	GL_COLOR_ATTACHMENT1_EXT, 
      	GL_COLOR_ATTACHMENT2_EXT}
 		})
 
-	if not horizBlurTexR or not horizBlurTexG or not horizBlurTexB or 
+	if not intermediateBlurTexR or not intermediateBlurTexG or not intermediateBlurTexB or 
 		not finalBlurTex or not baseBlurTex or not screenTex or not depthTex then
 		Spring.Echo("Depth of Field: Failed to create textures!")
 		widgetHandler:RemoveWidget()
@@ -194,8 +194,8 @@ function widget:Initialize()
 			"#define MAX_FILTER_SIZE 1.0\n",
 
 			"#define FILTER_SIZE_PASS " .. shaderPasses.filterSize .. "\n",
-			"#define HORIZ_BLUR_PASS " .. shaderPasses.horizBlur .. "\n",
 			"#define VERT_BLUR_PASS " .. shaderPasses.vertBlur .. "\n",
+			"#define HORIZ_BLUR_PASS " .. shaderPasses.horizBlur .. "\n",
 			"#define COMPOSITION_PASS " .. shaderPasses.composition .. "\n",
 
 			-- "#define BLUR_CHANNEL_RED " .. blurChannels.red .. "\n",
@@ -215,7 +215,7 @@ function widget:Initialize()
 	end
 	
 	eyePosLoc = gl.GetUniformLocation(dofShader, "eyePos")
-	viewProjectionInvLoc = gl.GetUniformLocation(dofShader, "viewProjectionInv")
+	viewProjectionLoc = gl.GetUniformLocation(dofShader, "viewProjection")
 	resolutionLoc = gl.GetUniformLocation(dofShader, "resolution")
 	-- focusDepthLoc = gl.GetUniformLocation(dofShader, "focusDepth")
 	-- fstopFactorLoc = gl.GetUniformLocation(dofShader, "fstopFactor")
@@ -242,7 +242,7 @@ local function FilterCalculation()
 	local effectiveHeight = cpy - math.max(0, gmin)
 	cpy = 3.5 * math.sqrt(effectiveHeight) * math.log(effectiveHeight)
 	glUniform(eyePosLoc, cpx, cpy, cpz)
-	-- glUniformMatrix(viewProjectionInvLoc, "projection")
+	-- glUniformMatrix(viewProjectionLoc, "projection")
 	glUniformInt(passLoc, shaderPasses.filterSize)
 	glTexture(0, screenTex)
 	glTexture(1, depthTex)
@@ -254,27 +254,27 @@ local function FilterCalculation()
 	glTexture(1, false)
 end
 
-local function HorizBlur()
+local function VertBlur()
 	glUniform(resolutionLoc, vsx/2, vsy/2)
-	glUniformInt(passLoc, shaderPasses.horizBlur)
+	glUniformInt(passLoc, shaderPasses.vertBlur)
 	glTexture(0, baseBlurTex)
   -- glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
 	glTexRect(0, 0, vsx, vsy, false, true)
 	glTexture(0, false)
 end
 
-local function VertBlur()
+local function HorizBlur()
 	glUniform(resolutionLoc, vsx/2, vsy/2)
-	glUniformInt(passLoc, shaderPasses.vertBlur)
-	glTexture(1, horizBlurTexR)
-	glTexture(2, horizBlurTexG)
-	glTexture(3, horizBlurTexB)
+	glUniformInt(passLoc, shaderPasses.horizBlur)
+	glTexture(1, intermediateBlurTexR)
+	glTexture(2, intermediateBlurTexG)
+	glTexture(3, intermediateBlurTexB)
   glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
 	glTexture(1, false)
 	glTexture(2, false)
 	glTexture(3, false)
-
 end
+
 local function Composition()
 	glUniformInt(passLoc, shaderPasses.composition)
 	glTexture(0, screenTex)
@@ -285,7 +285,7 @@ local function Composition()
 end
 
 function widget:DrawWorld()
-	gl.ActiveShader(dofShader, function() glUniformMatrix(viewProjectionInvLoc, "projection") end)
+	gl.ActiveShader(dofShader, function() glUniformMatrix(viewProjectionLoc, "projection") end)
 end
 
 function widget:DrawScreenEffects()
@@ -306,8 +306,8 @@ function widget:DrawScreenEffects()
 	glUseShader(dofShader)
 		
 		glRenderToTexture(baseBlurTex, FilterCalculation)
-		gl.ActiveFBO(horizBlurFBO, HorizBlur)
-		glRenderToTexture(finalBlurTex, VertBlur)
+		gl.ActiveFBO(intermediateBlurFBO, VertBlur)
+		glRenderToTexture(finalBlurTex, HorizBlur)
 		Composition()
 
 	glUseShader(0)

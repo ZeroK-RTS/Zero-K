@@ -5,7 +5,7 @@ uniform sampler2D blurTex1;
 uniform sampler2D blurTex2;
 
 uniform vec3 eyePos;
-uniform mat4 viewProjectionInv;
+uniform mat4 viewProjection;
 uniform vec2 resolution;
 
 // uniform float focusDepth;
@@ -88,34 +88,34 @@ float LinearizeDepth(vec2 uv){
     depthNDC = 2.0 * depthNDC - 1.0;
   #endif
 
-    float n22 = viewProjectionInv[2][2];
+    float n22 = viewProjection[2][2];
 
     return abs(((1.0 + depthNDC) * (1.0 + n22))/(2.0 * (depthNDC + n22)));
 }
 
-vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, out int compI)
+vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, inout int compI)
 {
   float filterDistance = float(i)*filterRadius;
   vec2 coords = uv + stepVal*filterDistance;
   float targetFilterRadius = texture2D(origTex, coords).a;
-  // if (targetFilterRadius < filterRadius)// < max(filterDistance, 1.2) / float(KERNEL_RADIUS))
-  if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
+  if (targetFilterRadius < max(filterDistance, 1.2) / float(KERNEL_RADIUS))
+  // if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
   {
-    // compI = -i;
-    // float correctionOffset = 0.0;
-    // correctionOffset = compI < 0 ? 0.5 : -0.5;
-    // filterDistance = (float(compI) + correctionOffset)*filterRadius;
-    // coords = uv + stepVal*filterDistance;
-    // targetFilterRadius = texture2D(origTex, coords).a;
-    // if (targetFilterRadius < filterRadius)//< max(filterDistance, 1.2)/ float(KERNEL_RADIUS))
-    // // if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
-    // { 
+    compI = -i;
+    float correctionOffset = 0.0;
+    correctionOffset = compI < 0 ? 0.5 : -0.5;
+    filterDistance = (float(compI) + correctionOffset)*filterRadius;
+    coords = uv + stepVal*filterDistance;
+    targetFilterRadius = texture2D(origTex, coords).a;
+    if (targetFilterRadius < max(filterDistance, 1.2)/ float(KERNEL_RADIUS))
+    // if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
+    { 
     filterDistance = (float(compI))*targetFilterRadius;
     coords = uv + stepVal*filterDistance;
       // filterDistance = filterDistance/filterRadius * targetFilterRadius;
       // compI = 0;
       // coords = uv;// + stepVal*filterDistance;
-    // }
+    }
   }
   return coords;
 }
@@ -140,7 +140,7 @@ void main()
     gl_FragData[0] = fragColor;
   }
 
-  else if (pass == HORIZ_BLUR_PASS) //Really Vert
+  else if (pass == VERT_BLUR_PASS)
   {
     vec2 stepVal = 1.0/resolution.xy;
     
@@ -153,7 +153,6 @@ void main()
     for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
     {
       compI = i;
-      // vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x, 0.0), filterRadius, compI);
       vec2 coords = GetFilterCoords(i, uv, vec2(0.0, stepVal.y), filterRadius, compI);
       if (compI < -KERNEL_RADIUS) continue;
 
@@ -172,7 +171,7 @@ void main()
     gl_FragData[2] = valB;
 	}
 
-	else if (pass == VERT_BLUR_PASS) //Really Horiz
+	else if (pass == HORIZ_BLUR_PASS)
 	{
     vec2 stepVal = 1.0/resolution.xy;
   
@@ -184,7 +183,6 @@ void main()
     for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
     {
     	compI = i;
-      // vec2 coords = GetFilterCoords(i, uv, vec2(0.0, stepVal.y), filterRadius, compI);
       vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x, 0.0), filterRadius, compI);
       if (compI < -KERNEL_RADIUS) continue;
       vec4 imageTexelR = texture2D(blurTex0, coords);  
