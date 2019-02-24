@@ -84,8 +84,9 @@ vec4 getFilters(int x)
 
 float LinearizeDepth(vec2 uv){   
   float depthNDC = texture2D(blurTex0, uv).r;
-  if (DEPTH_CLIP01 == 0)
+  #if DEPTH_CLIP01
     depthNDC = 2.0 * depthNDC - 1.0;
+  #endif
 
     float n22 = viewProjectionInv[2][2];
 
@@ -97,8 +98,8 @@ vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, out int c
   float filterDistance = float(i)*filterRadius;
   vec2 coords = uv + stepVal*filterDistance;
   float targetFilterRadius = texture2D(origTex, coords).a;
-  if (targetFilterRadius < filterRadius)// < max(filterDistance, 1.2) / float(KERNEL_RADIUS))
-  // if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
+  // if (targetFilterRadius < filterRadius)// < max(filterDistance, 1.2) / float(KERNEL_RADIUS))
+  if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
   {
     // compI = -i;
     // float correctionOffset = 0.0;
@@ -132,7 +133,7 @@ void main()
     float depth = LinearizeDepth(uv);
     float centerDepth = LinearizeDepth(vec2(0.5,0.5));
     float focusDepth = centerDepth;
-    float fstopFactor = max(0.2/(max(focusDepth, 0.04)) - 2, 0);
+    float fstopFactor = max(0.3/(max(focusDepth, 0.015)) - 2, 0);
 
   	fragColor = vec4(colors.rgb, clamp(abs(depth - focusDepth) * fstopFactor, 0, 0.5));
     // fragColor = vec4(depth, depth, depth, 2.0/float(KERNEL_RADIUS));
