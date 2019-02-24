@@ -57,6 +57,10 @@ local GL_DEPTH_COMPONENT16 = 0x81A5
 local GL_DEPTH_COMPONENT24 = 0x81A6
 local GL_DEPTH_COMPONENT32 = 0x81A7
 
+local GL_COLOR_ATTACHMENT0_EXT = 0x8CE0
+local GL_COLOR_ATTACHMENT1_EXT = 0x8CE1
+local GL_COLOR_ATTACHMENT2_EXT = 0x8CE2
+
 -----------------------------------------------------------------
 
 
@@ -68,6 +72,7 @@ local function CleanupTextures()
 	glDeleteTexture(finalBlurTex or "")
 	glDeleteTexture(screenTex or "")
 	glDeleteTexture(depthTex or "")
+	gl.DeleteFBO(horizBlurFBO)
 	baseBlurTex, horizBlurTexR, horizBlurTexG, horizBlurTexB, finalBlurTex, screenTex, depthTex = 
 		nil, nil, nil, nil, nil, nil, nil
 end
@@ -84,6 +89,7 @@ local baseBlurTex = nil
 local horizBlurTexR = nil
 local horizBlurTexG = nil
 local horizBlurTexB = nil
+local horizBlurFBO = nil
 local finalBlurTex = nil
 
 -- shader uniform handles
@@ -93,7 +99,7 @@ local resolutionLoc = nil
 -- local focusDepthLoc = nil
 -- local fstopFactorLoc = nil
 local passLoc = nil
-local channelLoc = nil
+-- local channelLoc = nil
 
 -- shader uniform enums
 local shaderPasses = 
@@ -103,12 +109,12 @@ local shaderPasses =
 	vertBlur = 2,
 	composition = 3,
 }
-local blurChannels =
-{
-	red = 0,
-	green = 1,
-	blue = 2,
-}
+-- local blurChannels =
+-- {
+-- 	red = 0,
+-- 	green = 1,
+-- 	blue = 2,
+-- }
 
 -----------------------------------------------------------------
 
@@ -134,17 +140,17 @@ function widget:ViewResize(x, y)
 	})
 	
 	horizBlurTexR = glCreateTexture(vsx/2, vsy/2, {
-		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
+		min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 	
 	horizBlurTexG = glCreateTexture(vsx/2, vsy/2, {
-		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
+		 min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 	
 	horizBlurTexB = glCreateTexture(vsx/2, vsy/2, {
-		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
+		 min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 	
@@ -153,6 +159,16 @@ function widget:ViewResize(x, y)
 		wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 	
+	horizBlurFBO = gl.CreateFBO({
+		color0 = horizBlurTexR,
+		color1 = horizBlurTexG,
+		color2 = horizBlurTexB,
+     drawbuffers = { 
+     	GL_COLOR_ATTACHMENT0_EXT, 
+     	GL_COLOR_ATTACHMENT1_EXT, 
+     	GL_COLOR_ATTACHMENT2_EXT}
+		})
+
 	if not horizBlurTexR or not horizBlurTexG or not horizBlurTexB or 
 		not finalBlurTex or not baseBlurTex or not screenTex or not depthTex then
 		Spring.Echo("Depth of Field: Failed to create textures!")
@@ -171,9 +187,10 @@ function widget:Initialize()
 	if not options.useDoF.value then
 		return
 	end
-	
+
 	dofShader = dofShader or glCreateShader({
 		defines = {"#version 120\n",
+			"#define DEPTH_CLIP01 " .. (Platform.glSupportClipSpaceControl and "1" or "0") .. "\n",
 			"#define MAX_FILTER_SIZE 1.0\n",
 
 			"#define FILTER_SIZE_PASS " .. shaderPasses.filterSize .. "\n",
@@ -181,9 +198,9 @@ function widget:Initialize()
 			"#define VERT_BLUR_PASS " .. shaderPasses.vertBlur .. "\n",
 			"#define COMPOSITION_PASS " .. shaderPasses.composition .. "\n",
 
-			"#define BLUR_CHANNEL_RED " .. blurChannels.red .. "\n",
-			"#define BLUR_CHANNEL_GREEN " .. blurChannels.green .. "\n",
-			"#define BLUR_CHANNEL_BLUE " .. blurChannels.blue .. "\n",
+			-- "#define BLUR_CHANNEL_RED " .. blurChannels.red .. "\n",
+			-- "#define BLUR_CHANNEL_GREEN " .. blurChannels.green .. "\n",
+			-- "#define BLUR_CHANNEL_BLUE " .. blurChannels.blue .. "\n",
 		},
 		fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\dof.fs", VFS.ZIP),
 		
@@ -203,7 +220,7 @@ function widget:Initialize()
 	-- focusDepthLoc = gl.GetUniformLocation(dofShader, "focusDepth")
 	-- fstopFactorLoc = gl.GetUniformLocation(dofShader, "fstopFactor")
 	passLoc = gl.GetUniformLocation(dofShader, "pass")
-	channelLoc = gl.GetUniformLocation(dofShader, "channel")
+	-- channelLoc = gl.GetUniformLocation(dofShader, "channel")
 	
 	widget:ViewResize()
 end
@@ -225,34 +242,25 @@ local function FilterCalculation()
 	local effectiveHeight = cpy - math.max(0, gmin)
 	cpy = 3.5 * math.sqrt(effectiveHeight) * math.log(effectiveHeight)
 	glUniform(eyePosLoc, cpx, cpy, cpz)
-	glUniformMatrix(viewProjectionInvLoc, "viewprojectioninverse")
+	-- glUniformMatrix(viewProjectionInvLoc, "projection")
 	glUniformInt(passLoc, shaderPasses.filterSize)
 	glTexture(0, screenTex)
 	glTexture(1, depthTex)
 
   glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
-	
+	-- glTexRect(0, 0, vsx, vsy, false, true)
+	-- 
 	glTexture(0, false)
 	glTexture(1, false)
 end
 
-local function HorizBlur(channel)
+local function HorizBlur()
 	glUniform(resolutionLoc, vsx/2, vsy/2)
-	glUniformInt(channelLoc, channel)
 	glUniformInt(passLoc, shaderPasses.horizBlur)
 	glTexture(0, baseBlurTex)
-  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
+  -- glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
+	glTexRect(0, 0, vsx, vsy, false, true)
 	glTexture(0, false)
-end
-
-local function HorizBlurR()
-	HorizBlur(blurChannels.red)
-end
-local function HorizBlurG()
-	HorizBlur(blurChannels.green)
-end
-local function HorizBlurB()
-	HorizBlur(blurChannels.blue)
 end
 
 local function VertBlur()
@@ -276,12 +284,9 @@ local function Composition()
 	glTexture(1, false)
 end
 
--- local function LinearizeDepth(depth)
--- 	Spring.Echo(depth)
---     local n = 0.1; --camera z near
---     local f = 100.0; --camera z far
---     return (2.0 * n) / (f + n - depth* (f - n));
--- end
+function widget:DrawWorld()
+	gl.ActiveShader(dofShader, function() glUniformMatrix(viewProjectionInvLoc, "projection") end)
+end
 
 function widget:DrawScreenEffects()
 	if not options.useDoF.value then
@@ -301,9 +306,7 @@ function widget:DrawScreenEffects()
 	glUseShader(dofShader)
 		
 		glRenderToTexture(baseBlurTex, FilterCalculation)
-		glRenderToTexture(horizBlurTexR, HorizBlurR)
-		glRenderToTexture(horizBlurTexG, HorizBlurG)
-		glRenderToTexture(horizBlurTexB, HorizBlurB)
+		gl.ActiveFBO(horizBlurFBO, HorizBlur)
 		glRenderToTexture(finalBlurTex, VertBlur)
 		Composition()
 

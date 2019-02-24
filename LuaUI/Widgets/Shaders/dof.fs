@@ -12,7 +12,7 @@ uniform vec2 resolution;
 // uniform float fstopFactor;
 
 uniform int pass;
-uniform int channel;
+// uniform int channel;
 
 // Circular DOF by Kleber Garcia "Kecho" - 2017
 // Publication & Filter generator: https://github.com/kecho/CircularDofFilterGenerator
@@ -27,9 +27,9 @@ THE SOFTWARE.
 **/
 const int KERNEL_RADIUS = 8;
 const int KERNEL_COUNT = 17;
-vec4 Kernel0BracketsRealXY_ImZW = vec4(-0.038708,0.943062,-0.025574,0.660892);
-vec2 Kernel0Weights_RealX_ImY = vec2(0.411259,-0.548794);
-vec4 Kernel0_RealX_ImY_RealZ_ImW[] = vec4[](
+const vec4 Kernel0BracketsRealXY_ImZW = vec4(-0.038708,0.943062,-0.025574,0.660892);
+const vec2 Kernel0Weights_RealX_ImY = vec2(0.411259,-0.548794);
+const vec4 Kernel0_RealX_ImY_RealZ_ImW[] = vec4[](
         vec4(/*XY: Non Bracketed*/0.014096,-0.022658,/*Bracketed WZ:*/0.055991,0.004413),
         vec4(/*XY: Non Bracketed*/-0.020612,-0.025574,/*Bracketed WZ:*/0.019188,0.000000),
         vec4(/*XY: Non Bracketed*/-0.038708,0.006957,/*Bracketed WZ:*/0.000000,0.049223),
@@ -48,9 +48,9 @@ vec4 Kernel0_RealX_ImY_RealZ_ImW[] = vec4[](
         vec4(/*XY: Non Bracketed*/-0.020612,-0.025574,/*Bracketed WZ:*/0.019188,0.000000),
         vec4(/*XY: Non Bracketed*/0.014096,-0.022658,/*Bracketed WZ:*/0.055991,0.004413)
 );
-vec4 Kernel1BracketsRealXY_ImZW = vec4(0.000115,0.559524,0.000000,0.178226);
-vec2 Kernel1Weights_RealX_ImY = vec2(0.513282,4.561110);
-vec4 Kernel1_RealX_ImY_RealZ_ImW[] = vec4[](
+const vec4 Kernel1BracketsRealXY_ImZW = vec4(0.000115,0.559524,0.000000,0.178226);
+const vec2 Kernel1Weights_RealX_ImY = vec2(0.513282,4.561110);
+const vec4 Kernel1_RealX_ImY_RealZ_ImW[] = vec4[](
         vec4(/*XY: Non Bracketed*/0.000115,0.009116,/*Bracketed WZ:*/0.000000,0.051147),
         vec4(/*XY: Non Bracketed*/0.005324,0.013416,/*Bracketed WZ:*/0.009311,0.075276),
         vec4(/*XY: Non Bracketed*/0.013753,0.016519,/*Bracketed WZ:*/0.024376,0.092685),
@@ -83,10 +83,39 @@ vec4 getFilters(int x)
 }
 
 float LinearizeDepth(vec2 uv){   
-    float n = 0.1; // camera z near
-    float f = 100.0; // camera z far
-    return (2.0 * n) / (f + n - texture2D(blurTex0, uv).r * (f - n));
+  float depthNDC = texture2D(blurTex0, uv).r;
+  if (DEPTH_CLIP01 == 1)
+    depthNDC = 2.0 * depthNDC - 1.0;
+
+    float n22 = viewProjectionInv[2][2];
+
+    return abs(((1 + n22) * (-1 + 2 * n22 + depthNDC)) / (2 * (n22 + depthNDC)));
+}
+
+vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, out int compI)
+{
+  float filterDistance = float(i)*filterRadius;
+  vec2 coords = uv + stepVal*filterDistance;
+  float targetFilterRadius = texture2D(origTex, coords).a;
+  if (targetFilterRadius < filterRadius)// < max(filterDistance, 1.2) / float(KERNEL_RADIUS))
+  // if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
+  {
+    // compI = -i;
+    // float correctionOffset = 0.0;
+    // correctionOffset = compI < 0 ? 0.5 : -0.5;
+    // filterDistance = (float(compI) + correctionOffset)*filterRadius;
+    // coords = uv + stepVal*filterDistance;
+    // targetFilterRadius = texture2D(origTex, coords).a;
+    // if (targetFilterRadius < filterRadius)//< max(filterDistance, 1.2)/ float(KERNEL_RADIUS))
+    // // if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
+    // { 
+      filterDistance = filterDistance/filterRadius * targetFilterRadius;
+      compI = 0;
+      coords = uv;// + stepVal*filterDistance;
+    // }
   }
+  return coords;
+}
 
 void main()
 {
@@ -101,42 +130,42 @@ void main()
     float depth = LinearizeDepth(uv);
     float centerDepth = LinearizeDepth(vec2(0.5,0.5));
     float focusDepth = centerDepth;
-    float fstopFactor = 0.4/(max(focusDepth, 0.04)) - 1.4;
+    float fstopFactor = max(0.4/(max(focusDepth, 0.04)) - 2, 0);
 
-  	fragColor = vec4(colors.rgb, abs(depth - focusDepth) * fstopFactor);
+  	fragColor = vec4(colors.rgb, clamp(abs(depth - focusDepth) * fstopFactor, 0, 0.5));
+    // fragColor = vec4(depth, depth, depth, 2.0/float(KERNEL_RADIUS));
+    gl_FragData[0] = fragColor;
   }
 
   else if (pass == HORIZ_BLUR_PASS)
   {
     vec2 stepVal = 1.0/resolution.xy;
     
-    vec4 val = vec4(0,0,0,0);
+    // vec4 val = vec4(0,0,0,0);
+    vec4 valR = vec4(0,0,0,0);
+    vec4 valG = vec4(0,0,0,0);
+    vec4 valB = vec4(0,0,0,0);
     float filterRadius = texture2D(origTex, uv).a;
     int compI = 0;
-    float correctionOffset = 0.0;
     for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
     {
       compI = i;
-      vec2 coords = uv + stepVal*vec2(float(i),0.0)*filterRadius;
-      float targetFilterRadius = texture2D(origTex, coords).a;
-      if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
-      {
-          compI = -i;
-          correctionOffset = compI < 0 ? 0.5 : -0.5;
-          coords = uv + stepVal*vec2(float(compI) + correctionOffset,0.0)*filterRadius;
-          if (texture2D(origTex, coords).a < 1.2 / float(KERNEL_RADIUS))
-            { compI = 0; coords = uv;}
-      }
+      vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x, 0.0), filterRadius, compI);
+      if (compI < -KERNEL_RADIUS) continue;
+
       vec4 imageTexelRGB = texture2D(origTex, coords);
       float imageTexel = 0.0;
-      if (channel == BLUR_CHANNEL_RED) { imageTexel = imageTexelRGB.r; }
-      if (channel == BLUR_CHANNEL_GREEN) { imageTexel = imageTexelRGB.g; }
-      if (channel == BLUR_CHANNEL_BLUE) { imageTexel = imageTexelRGB.b; }
-      vec4 c0_c1 = getFilters(i+KERNEL_RADIUS);
-      val.xy += imageTexel * c0_c1.xy;
-      val.zw += imageTexel * c0_c1.zw;
+      vec4 c0_c1 = getFilters(compI+KERNEL_RADIUS);
+      valR.xy += imageTexelRGB.r * c0_c1.xy;
+      valR.zw += imageTexelRGB.r * c0_c1.zw;
+      valG.xy += imageTexelRGB.g * c0_c1.xy;
+      valG.zw += imageTexelRGB.g * c0_c1.zw;
+      valB.xy += imageTexelRGB.b * c0_c1.xy;
+      valB.zw += imageTexelRGB.b * c0_c1.zw;
     }
-    fragColor = val; 
+    gl_FragData[0] = valR;
+    gl_FragData[1] = valG;
+    gl_FragData[2] = valB;
 	}
 
 	else if (pass == VERT_BLUR_PASS)
@@ -152,21 +181,13 @@ void main()
     for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
     {
     	compI = i;
-      vec2 coords = uv + stepVal*vec2(0.0,float(i))*filterRadius;
-      float targetFilterRadius = texture2D(origTex, coords).a;
-      if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
-      {
-          compI = -i;
-          correctionOffset = compI < 0 ? 0.5 : -0.5;
-          coords = uv + stepVal*vec2(float(compI) + correctionOffset,0.0)*filterRadius;
-          if (texture2D(origTex, coords).a < 1.2 / float(KERNEL_RADIUS))
-            { compI = 0; coords = uv;}
-      }
+      vec2 coords = GetFilterCoords(i, uv, vec2(0.0, stepVal.y), filterRadius, compI);
+      if (compI < -KERNEL_RADIUS) continue;
       vec4 imageTexelR = texture2D(blurTex0, coords);  
       vec4 imageTexelG = texture2D(blurTex1, coords);  
       vec4 imageTexelB = texture2D(blurTex2, coords);  
       
-      vec4 c0_c1 = getFilters(i+KERNEL_RADIUS);
+      vec4 c0_c1 = getFilters(compI+KERNEL_RADIUS);
       
       
       valR.xy += multComplex(imageTexelR.xy,c0_c1.xy);
@@ -183,6 +204,7 @@ void main()
     float greenChannel = dot(valG.xy,Kernel0Weights_RealX_ImY)+dot(valG.zw,Kernel1Weights_RealX_ImY);
     float blueChannel  = dot(valB.xy,Kernel0Weights_RealX_ImY)+dot(valB.zw,Kernel1Weights_RealX_ImY);
     fragColor = vec4(sqrt(redChannel),sqrt(greenChannel),sqrt(blueChannel),filterRadius);   
+    gl_FragData[0] = fragColor;
 	}
 
 	else if (pass == COMPOSITION_PASS)
@@ -194,7 +216,7 @@ void main()
     //   fragColor = texture2D(blurTex0, uv);
     // else
     //   fragColor = texture2D(origTex, uv);
+    gl_FragData[0] = fragColor;
 	}
 
-  gl_FragColor = fragColor;
 }
