@@ -98,24 +98,26 @@ vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, inout int
   float filterDistance = float(i)*filterRadius;
   vec2 coords = uv + stepVal*filterDistance;
   float targetFilterRadius = texture2D(origTex, coords).a;
-  if (targetFilterRadius < max(filterDistance, 1.2) / float(KERNEL_RADIUS))
+  // if (targetFilterRadius < max(filterDistance, 1.2) / float(KERNEL_RADIUS))
+  if (targetFilterRadius - filterRadius < -0.02 / float(KERNEL_RADIUS))
   // if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
   {
-    compI = -i;
-    float correctionOffset = 0.0;
-    correctionOffset = compI < 0 ? 0.5 : -0.5;
-    filterDistance = (float(compI) + correctionOffset)*filterRadius;
-    coords = uv + stepVal*filterDistance;
-    targetFilterRadius = texture2D(origTex, coords).a;
-    if (targetFilterRadius < max(filterDistance, 1.2)/ float(KERNEL_RADIUS))
-    // if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
-    { 
+  //   compI = -i;
+  //   float correctionOffset = 0.0;
+  //   correctionOffset = compI < 0 ? 0.5 : -0.5;
+  //   filterDistance = (float(compI) + correctionOffset)*filterRadius;
+  //   coords = uv + stepVal*filterDistance;
+  //   targetFilterRadius = texture2D(origTex, coords).a;
+  //   if (targetFilterRadius < max(filterDistance, 1.2)/ float(KERNEL_RADIUS))
+  // // if (targetFilterRadius - filterRadius < -0.02 / float(KERNEL_RADIUS))
+  //   // if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
+  //   { 
     filterDistance = (float(compI))*targetFilterRadius;
     coords = uv + stepVal*filterDistance;
       // filterDistance = filterDistance/filterRadius * targetFilterRadius;
       // compI = 0;
       // coords = uv;// + stepVal*filterDistance;
-    }
+    // }
   }
   return coords;
 }
@@ -213,7 +215,7 @@ void main()
 	{
     float filterRadius = texture2D(blurTex0, uv).a;
 		fragColor = mix(texture2D(origTex, uv), texture2D(blurTex0, uv), 
-      clamp((filterRadius - 1.2 / float(KERNEL_RADIUS)) * float(KERNEL_RADIUS) * 2.0, 0.0, 1.0));
+      clamp((filterRadius - 0.7 / float(KERNEL_RADIUS)) * float(KERNEL_RADIUS) * 2.0, 0.0, 1.0));
     // if (filterRadius > 2.0 / float(KERNEL_RADIUS))
       // fragColor = texture2D(blurTex0, uv);
     // else
