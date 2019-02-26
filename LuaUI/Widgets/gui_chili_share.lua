@@ -1,4 +1,3 @@
--- WARNING: This is a temporary file. Please modify as you see fit! --
 function widget:GetInfo()
 	return {
 		name	= "Chili Share menu v1.24",
