@@ -109,17 +109,21 @@ function Bursts:EndDraw()
 	gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 end
 
+function Bursts:CheckDrawSelf()
+	if not self.shieldRechargeDelay then
+		return true
+	end
+	local hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
+	local currTime = Spring.GetGameFrame()
+	local cooldown = hitTime + self.shieldRechargeDelay * 30 - currTime
+	if cooldown > 0 then
+		return false
+	end
+	return true
+end
+
 function Bursts:Draw()
-  local inCooldown = false
-  if self.shieldRechargeDelay then
-    local hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
-    local currTime = Spring.GetGameFrame()
-    local cooldown = hitTime + self.shieldRechargeDelay * 30 - currTime
-    if cooldown > 0 then
-      inCooldown = true
-    end
-  end
-  if not inCooldown then
+  if self:CheckDrawSelf() then
     if (lasttexture ~= self.texture) then
       gl.Texture(self.texture)
       lasttexture = self.texture
