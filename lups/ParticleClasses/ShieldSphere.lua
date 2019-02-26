@@ -74,7 +74,7 @@ function ShieldSphereParticle:Draw()
 	local color = self.color1
 	local color2 = self.color2
 	local size = self.size
-	local pos = self.pos
+	local alignment = self.pos[2]
 	if self.shieldRechargeDelay and self.rechargingColor1 and self.shieldRechargeDelay > 0 then
 		local hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
 		local currTime = Spring.GetGameFrame()
@@ -97,17 +97,18 @@ function ShieldSphereParticle:Draw()
 				end
 			else
 				self.shieldDisabled = true
-				size = self.shieldRechargeSize
 				color = self.rechargingColor1
+				size = self.shieldRechargeSize
 				if self.color2 then
 					color2 = self.rechargingColor2
 				end
 			end
+			alignment = alignment + size - self.size
 		end
 	end
 	glMultiTexCoord(1, color[1],color[2],color[3],color[4] or 1)
 	glMultiTexCoord(2, color2[1],color2[2],color2[3],color2[4] or 1)
-	glMultiTexCoord(3, pos[1],pos[2],pos[3], 0)
+	glMultiTexCoord(3, self.pos[1], alignment, self.pos[3], 0)
 	glMultiTexCoord(4, self.margin, size, 1, 1)
 	glCallList(sphereList)
 end
