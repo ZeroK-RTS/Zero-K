@@ -14,6 +14,11 @@
 ---------------------------------------------------------------------------------------------
 
 local floor = math.floor
+function MixColors(col1, col2, frac)
+	local oFrac = 1-frac
+	return {col1[1]*oFrac + col2[1]*frac, col1[2]*oFrac + col2[2]*frac, col1[3]*oFrac + col2[3]*frac, col1[4]*oFrac + col2[4]*frac}
+end
+
 function GetColor(colormap,life)
 	local ncolors = #colormap
 	if (life>=1)or(ncolors==1) then
