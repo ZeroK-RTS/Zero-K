@@ -130,7 +130,6 @@ void main()
 	if (pass == FILTER_SIZE_PASS)
 	{  
     vec4 colors = texture2D(origTex, uv);
-    colors = colors * colors;
 
     float depth = LinearizeDepth(uv);
     float centerDepth = LinearizeDepth(vec2(0.5,0.5));
@@ -207,7 +206,7 @@ void main()
     float redChannel   = dot(valR.xy,Kernel0Weights_RealX_ImY)+dot(valR.zw,Kernel1Weights_RealX_ImY);
     float greenChannel = dot(valG.xy,Kernel0Weights_RealX_ImY)+dot(valG.zw,Kernel1Weights_RealX_ImY);
     float blueChannel  = dot(valB.xy,Kernel0Weights_RealX_ImY)+dot(valB.zw,Kernel1Weights_RealX_ImY);
-    fragColor = vec4(sqrt(redChannel),sqrt(greenChannel),sqrt(blueChannel),filterRadius);   
+    fragColor = vec4(redChannel,greenChannel,blueChannel,filterRadius);   
     gl_FragData[0] = fragColor;
 	}
 
