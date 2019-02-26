@@ -212,7 +212,8 @@ end
 --------------------------------------------------------------------------------
 -- UnitDefs Dont Repeat Yourself
 --
-local BP2RES = 0.03
+local BP2RES = 0.00
+local BP2RES_FACTORY = 0.05
 local BP2TERRASPEED = 1000 --used to be 60 in most of the cases
 --local SEISMICSIG = 4 --used to be 4 in most of the cases
 for name, ud in pairs (UnitDefs) do
@@ -235,8 +236,13 @@ for name, ud in pairs (UnitDefs) do
 		local bp = ud.workertime
 
 		local mult = (ud.customparams.dynamic_comm and 0) or 1
-		if not ud.metalmake then ud.metalmake = bp * BP2RES * mult end
-		if not ud.energymake then ud.energymake = bp * BP2RES * mult end
+		if ud.customparams.factorytab then
+			if not ud.metalmake then ud.metalmake = bp * BP2RES_FACTORY * mult end
+			if not ud.energymake then ud.energymake = bp * BP2RES_FACTORY * mult end
+		else
+			if not ud.metalmake then ud.metalmake = bp * BP2RES * mult end
+			if not ud.energymake then ud.energymake = bp * BP2RES * mult end
+		end
 
 		if not ud.terraformspeed then
 			ud.terraformspeed = bp * BP2TERRASPEED

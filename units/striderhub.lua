@@ -43,6 +43,7 @@ unitDef = {
 	modelradius     = [[35]],
 	isfakefactory   = [[1]],
 	selection_rank  = [[2]],
+	factorytab       = 1,
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],

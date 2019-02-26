@@ -5,7 +5,7 @@ unitDef = {
   acceleration        = 0.1,
   airStrafe           = 0,
   brakeRate           = 0.08,
-  buildCostMetal      = 300,
+  buildCostMetal      = 260,
   buildDistance       = 160,
   builder             = true,
 

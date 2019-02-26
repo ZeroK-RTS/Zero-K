@@ -5,7 +5,7 @@ unitDef = {
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   brakeRate              = 0.6,
-  buildCostMetal         = 200,
+  buildCostMetal         = 170,
   buildDistance          = 220,
   builder                = true,
 

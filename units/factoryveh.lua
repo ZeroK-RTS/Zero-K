@@ -46,6 +46,7 @@ unitDef = {
 	modelradius    = [[100]],
 	unstick_help   = 1,
     selectionscalemult = 1,
+	factorytab       = 1,
   },
 
   energyUse                     = 0,

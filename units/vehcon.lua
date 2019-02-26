@@ -4,7 +4,7 @@ unitDef = {
   description            = [[Construction Rover, Builds at 5 m/s]],
   acceleration           = 0.066,
   brakeRate              = 1.5,
-  buildCostMetal         = 140,
+  buildCostMetal         = 120,
   buildDistance          = 180,
   builder                = true,
 
