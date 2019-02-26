@@ -84,6 +84,7 @@ unitDef = {
       },
       customParams            = {
         unlinked                = true,
+        shield_recharge_delay   = 15,
       },
 
       exteriorShield          = true,
@@ -93,7 +94,6 @@ unitDef = {
       shieldInterceptType     = 3,
       shieldPower             = 28000,
       shieldPowerRegen        = 200,
-      shieldRechargeDelay     = 15,
       shieldPowerRegenEnergy  = 48,
       shieldRadius            = 550,
       shieldRepulser          = false,

@@ -319,11 +319,9 @@ for _, weaponDef in pairs(WeaponDefs) do
 		
 		weaponDef.customparams.shield_rate = weaponDef.shieldpowerregen
 		weaponDef.customparams.shield_drain = weaponDef.shieldpowerregenenergy
-		weaponDef.customparams.shield_recharge_delay = weaponDef.shieldrechargedelay
 		
 		weaponDef.shieldpowerregen = 0
 		weaponDef.shieldpowerregenenergy = 0
-		weaponDef.shieldrechargedelay = 0
 	end
 end
 

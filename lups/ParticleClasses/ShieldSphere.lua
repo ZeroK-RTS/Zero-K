@@ -77,10 +77,10 @@ function ShieldSphereParticle:Draw()
 			local currTime = Spring.GetGameFrame()
 			local cooldown = hitTime + self.shieldRechargeDelay * 30 - currTime
 			if cooldown > 0 then
-        color = self.rechargingColor
-        if self.color2 then
-          color2 = self.rechargingColor2
-        end
+				color = self.rechargingColor
+				if self.color2 then
+					color2 = self.rechargingColor2
+				end
 			end
 		end
 	glMultiTexCoord(1, color[1],color[2],color[3],color[4] or 1)
