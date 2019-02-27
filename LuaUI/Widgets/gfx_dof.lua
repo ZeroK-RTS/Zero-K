@@ -13,10 +13,41 @@ end
 
 options_path = 'Settings/Graphics/Effects/Depth of Field'
 
-options_order = {'useDoF'}
+options_order = {'useDoF', 'autofocus', 'focusDepth', 'fStop'}
 
 options = {
-	useDoF = { type='bool', name='Apply Depth of Field Effect', value=false, noHotkey = true, advanced = false}
+	useDoF = 
+	{ 
+		type='bool', 
+		name='Apply Depth of Field Effect', 
+		value=false, 
+		noHotkey = true, 
+		advanced = false,
+	},
+	autofocus = 
+	{ 
+		type='bool',
+		name='Automatically Set Focus',
+		value=true,
+		noHotkey=true,
+		advanced=true,
+	},
+	focusDepth =
+	{
+		type='number',
+		name='Focus Depth (Manual Focus Only)',
+		min = 0.0, max = 10000.0, step = 0.1,
+		value = 0.3,
+		advanced = true,
+	},
+	fStop =
+	{
+		type='number',
+		name='F-Stop',
+		min = 2.4, max = 160.0, step = 0.1,
+		value = 16.0,
+		advanced = true,
+	},
 }
 
 local function onChangeFunc()
@@ -96,10 +127,10 @@ local finalBlurTex = nil
 local eyePosLoc = nil
 local viewProjectionLoc = nil
 local resolutionLoc = nil
--- local focusDepthLoc = nil
--- local fstopFactorLoc = nil
+local autofocusLoc = nil
+local focusDepthLoc = nil
+local fStopLoc = nil
 local passLoc = nil
--- local channelLoc = nil
 
 -- shader uniform enums
 local shaderPasses = 
@@ -217,8 +248,9 @@ function widget:Initialize()
 	eyePosLoc = gl.GetUniformLocation(dofShader, "eyePos")
 	viewProjectionLoc = gl.GetUniformLocation(dofShader, "viewProjection")
 	resolutionLoc = gl.GetUniformLocation(dofShader, "resolution")
-	-- focusDepthLoc = gl.GetUniformLocation(dofShader, "focusDepth")
-	-- fstopFactorLoc = gl.GetUniformLocation(dofShader, "fstopFactor")
+	autofocusLoc = gl.GetUniformLocation(dofShader, "autofocus")
+	focusDepthLoc = gl.GetUniformLocation(dofShader, "manualFocusDepth")
+	fStopLoc = gl.GetUniformLocation(dofShader, "fStop")
 	passLoc = gl.GetUniformLocation(dofShader, "pass")
 	-- channelLoc = gl.GetUniformLocation(dofShader, "channel")
 	
@@ -296,14 +328,12 @@ function widget:DrawScreenEffects()
 	gl.Blending(false)
 	glCopyToTexture(screenTex, 0, 0, 0, 0, vsx, vsy) -- the original screen image
 	glCopyToTexture(depthTex, 0, 0, 0, 0, vsx, vsy) -- the original screen image
-
-	-- glTexture(depthTex)
-	-- local depth = gl.ReadPixels(vsx/2, vsy/2, 1, 1, GL_DEPTH_COMPONENT24)
-	-- Spring.Echo(depth)
-	-- glUniform(focusDepthLoc, depth)
-	-- glUniform(fstopFactorLoc, math.min(math.max(0.4 / math.max(depth, 0.04) - 1.4, 0), 1))
 	
 	glUseShader(dofShader)
+
+		glUniformInt(autofocusLoc, options.autofocus.value and 1 or 0)
+		glUniform(focusDepthLoc, options.focusDepth.value / 10000)
+		glUniform(fStopLoc, options.fStop.value)
 		
 		glRenderToTexture(baseBlurTex, FilterCalculation)
 		gl.ActiveFBO(intermediateBlurFBO, VertBlur)

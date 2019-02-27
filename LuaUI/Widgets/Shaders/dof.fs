@@ -8,11 +8,11 @@ uniform vec3 eyePos;
 uniform mat4 viewProjection;
 uniform vec2 resolution;
 
-// uniform float focusDepth;
-// uniform float fstopFactor;
+uniform int autofocus;
+uniform float manualFocusDepth;
+uniform float fStop;
 
 uniform int pass;
-// uniform int channel;
 
 // Circular DOF by Kleber Garcia "Kecho" - 2017
 // Publication & Filter generator: https://github.com/kecho/CircularDofFilterGenerator
@@ -68,6 +68,17 @@ const vec4 Kernel1_RealX_ImY_RealZ_ImW[] = vec4[](
         vec4(/*XY: Non Bracketed*/0.013753,0.016519,/*Bracketed WZ:*/0.024376,0.092685),
         vec4(/*XY: Non Bracketed*/0.005324,0.013416,/*Bracketed WZ:*/0.009311,0.075276),
         vec4(/*XY: Non Bracketed*/0.000115,0.009116,/*Bracketed WZ:*/0.000000,0.051147)
+);
+
+const vec2 autofocusTestCoords[] = vec2[](
+        vec2(0.6, 0.6),
+        vec2(0.6, -0.6),
+        vec2(-0.6, -0.6),
+        vec2(-0.6, 0.6),
+        vec2(0.4, 0.4),
+        vec2(0.4, -0.4),
+        vec2(-0.4, -0.4),
+        vec2(-0.4, 0.4)
 );
 
 vec2 multComplex(vec2 p, vec2 q)
@@ -132,11 +143,38 @@ void main()
     vec4 colors = texture2D(origTex, uv);
 
     float depth = LinearizeDepth(uv);
-    float centerDepth = LinearizeDepth(vec2(0.5,0.5));
-    float focusDepth = centerDepth;
-    float fstopFactor = max(0.3/(max(focusDepth, 0.015)) - 2, 0);
+    float focusDepth = manualFocusDepth;
+    float aperture = 1.0/fStop;
+    if (autofocus == 1)
+    {
+      float centerDepth = LinearizeDepth(vec2(0.5,0.5));
+      focusDepth = centerDepth;
+      float testFocusDepth = focusDepth;
 
-  	fragColor = vec4(colors.rgb, clamp(abs(depth - focusDepth) * fstopFactor, 0, 0.5));
+      float minTestDepth = focusDepth;
+      float maxTestDepth = focusDepth;
+      float testDepth = 0.0;
+      int autofocusTestCoordCount = 4;
+      for (int i = 0; i < autofocusTestCoordCount; ++i)
+      {
+        testDepth = LinearizeDepth(autofocusTestCoords[i]);
+        minTestDepth = min(minTestDepth, testDepth);
+        maxTestDepth = max(maxTestDepth, testDepth);
+        testFocusDepth += testDepth / 2.0;
+      }
+      testFocusDepth /= (1.0 + float(autofocusTestCoordCount) / 2.0);
+
+      float focusSpread = maxTestDepth - minTestDepth;
+
+      //multiplying this with depth is cheating realism, but it looks nicer and it's easier
+      //than doing all the maths needed to pick the correct aperture factor for good autofocus.
+      float minFStop = 0.012;
+      aperture = max(1.0/max(3.3 * (testFocusDepth + focusSpread), minFStop) - 2.0, 0.0) * depth;
+      //(centerDepth + focusSpread);
+    }
+
+
+  	fragColor = vec4(colors.rgb, clamp((abs(depth - focusDepth) * aperture)/depth, 0.0, 0.65));
     // fragColor = vec4(depth, depth, depth, 2.0/float(KERNEL_RADIUS));
     gl_FragData[0] = fragColor;
   }
@@ -212,13 +250,14 @@ void main()
 
 	else if (pass == COMPOSITION_PASS)
 	{
-    float filterRadius = texture2D(blurTex0, uv).a;
-		fragColor = mix(texture2D(origTex, uv), texture2D(blurTex0, uv), 
-      clamp((filterRadius - 0.7 / float(KERNEL_RADIUS)) * float(KERNEL_RADIUS) * 2.0, 0.0, 1.0));
+    vec4 blurTexAtUV = texture2D(blurTex0, uv);
+    float filterRadius = blurTexAtUV.a;
+		fragColor = mix(texture2D(origTex, uv), blurTexAtUV, 
+      clamp((filterRadius - 0.5 / float(KERNEL_RADIUS)) * float(KERNEL_RADIUS) * 2.0, 0.0, 1.0));
     // if (filterRadius > 2.0 / float(KERNEL_RADIUS))
       // fragColor = texture2D(blurTex0, uv);
     // else
-    //   fragColor = texture2D(origTex, uv);
+      // fragColor = texture2D(origTex, uv);
     gl_FragData[0] = fragColor;
 	}
 
