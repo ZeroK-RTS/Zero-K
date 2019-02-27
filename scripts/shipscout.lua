@@ -46,8 +46,8 @@ local function shootyThingo()
 	Move(turret, y_axis, 20, 40)
 	Show(missile)
 end
-	
-	
+
+
 function script.Shot()
 	StartThread(shootyThingo)
 end
@@ -60,28 +60,15 @@ function script.StopMoving()
 	Signal(SIG_MOVE)
 end
 
-function script.AimWeapon1(heading, pitch)
-	return false
-end
-
-function script.AimFromWeapon1()
-	return missile
-end
-
-function script.QueryWeapon1()
-	return missile
-end
-
-function script.AimWeapon2(heading, pitch)
---	Turn(turret, x_axis, math.rad(-40), math.rad(50))
+function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-function script.AimFromWeapon2()
-	return firepoint
+function script.AimFromWeapon()
+	return missile
 end
 
-function script.QueryWeapon2()
+function script.QueryWeapon()
 	return firepoint
 end
 

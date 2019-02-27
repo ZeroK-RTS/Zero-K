@@ -106,7 +106,7 @@ function IterableMap.New()
 		return function ()
 			i = i + 1
 			if i <= indexMax then 
-	return keyByIndex[i], dataByKey[keyByIndex[i]]
+				return keyByIndex[i], dataByKey[keyByIndex[i]]
 			end
 		end
 	end
@@ -120,10 +120,10 @@ function IterableMap.New()
 		while i <= indexMax do
 			local key = keyByIndex[i]
 			if funcToApply(key, dataByKey[key], i, ...) then
-	-- Return true to remove element
-	api.Remove(key)
+				-- Return true to remove element
+				api.Remove(key)
 			else
-	i = i + 1
+				i = i + 1
 			end
 		end
 	end
@@ -133,10 +133,10 @@ function IterableMap.New()
 		while i <= indexMax do
 			local key = keyByIndex[i]
 			if funcToApply(key, dataByKey[key], i) then
-	-- Return true to remove element
-	api.Remove(key)
+				-- Return true to remove element
+				api.Remove(key)
 			else
-	i = i + 1
+				i = i + 1
 			end
 		end
 	end
