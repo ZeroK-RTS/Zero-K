@@ -93,7 +93,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:disruptor_missile_hit]],
       fixedLauncher           = true,
-      flightTime              = 1.2
+      flightTime              = 1.2,
       groundbounce            = 1,
       impactOnly              = true,
       impulseBoost            = 60,
