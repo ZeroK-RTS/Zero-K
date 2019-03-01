@@ -242,6 +242,9 @@ function script.Shot(num)
 end
 
 function script.BlockShot(num, targetID)
+	if num ~= 3 then
+		return false
+	end
 	if not targetID then
 		return false
 	end
