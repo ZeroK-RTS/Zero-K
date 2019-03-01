@@ -68,6 +68,7 @@ options = {
 
 function widget:Initialize()
 	if not lobbyOverlayActive then
+		Spring.SendCommands("grabinput")
 		Spring.SendCommands("grabinput " .. ((options.grabinput.value and "1") or "0"))
 	end
 end
@@ -82,6 +83,7 @@ function widget:Update(dt)
 		if grabTimer then
 			grabTimer = grabTimer + dt
 			if grabTimer > 1 then
+				Spring.SendCommands("grabinput")
 				Spring.SendCommands("grabinput 1")
 				grabTimer = false
 			end
