@@ -1,22 +1,7 @@
 include "constants.lua"
 include "pieceControl.lua"
 
-local aimLOS = piece('aimLOS');
-local body = piece('body');
-local body_001 = piece('body_001');
-local Circle = piece('Circle');
-local Cube = piece('Cube');
-local fins = piece('fins');
-local Plane = piece('Plane');
-local skid = piece('skid');
-local skid_001 = piece('skid_001');
-local torpedo = piece('torpedo');
-local turretBase = piece('turretBase');
-local turretMain = piece('turretMain');
-local turretRail = piece('turretRail');
-local turretSlidePanel = piece('turretSlidePanel');
-local wakeLeft = piece('wakeLeft');
-local wakeRight = piece('wakeRight');
+local base, base2, sleeve, body, turret, firepoint, wake1, wake2, platform = piece ('base', 'bas2', 'sleeve', 'body', 'turret', 'firepoint', 'wake1', 'wake2', 'platform')
 
 local SIG_Move = 1
 local SIG_Aim = 2
@@ -33,14 +18,14 @@ end
 local function RestoreAfterDelay()
 	SetSignalMask(SIG_Aim)
 	Sleep (5000)
-	Turn (turretMain, z_axis, 0, math.rad(30))
+	Turn (turret, y_axis, 0, math.rad(30))
 end
 
 local function MoveScript()
 	while true do
 		if moving and not Spring.GetUnitIsCloaked(unitID) and (sfxNum == 1 or sfxNum == 2) then
-			EmitSfx(wakeLeft, 3)
-			EmitSfx(wakeRight, 3)
+			EmitSfx(wake1, 3)
+			EmitSfx(wake2, 3)
 		end
 		Sleep(150)
 	end
@@ -57,7 +42,7 @@ end
 local function StunThread ()
 	disarmed = true
 	Signal (SIG_Aim)
-	StopTurn (turretMain, y_axis)
+	StopTurn (turret, y_axis)
 end
 
 local function UnstunThread ()
@@ -79,15 +64,15 @@ end
 
 function script.Create()
 	StartThread(MoveScript)
-	StartThread(SmokeUnit, {body_001, turretMain})
+	StartThread(SmokeUnit, {sleeve, turret})
 end
 
 function script.AimFromWeapon(id)
-	return turretMain
+	return turret
 end
 
 function script.QueryWeapon(id)
-	return torpedo
+	return firepoint
 end
 
 function script.AimWeapon(id, heading, pitch)
@@ -99,8 +84,8 @@ function script.AimWeapon(id, heading, pitch)
 	end
 
 	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
-	Turn (turretMain, z_axis, heading, math.rad(300 * slowMult))
-	WaitForTurn (turretMain, z_axis)
+	Turn (turret, y_axis, heading, math.rad(300 * slowMult))
+	WaitForTurn (turret, y_axis)
 
 	StartThread (RestoreAfterDelay)
 
@@ -114,7 +99,7 @@ function script.BlockShot(num, targetID)
 	return false
 end
 
-local explodables = {turretBase, turretMain, turretRail}
+local explodables = {base2, sleeve, turret}
 function script.Killed(severity, health)
 	severity = severity / health
 
@@ -122,17 +107,12 @@ function script.Killed(severity, health)
 		if (math.random() < severity) then
 			Explode (explodables[i], sfxFall + sfxFire + sfxSmoke)
 		end
-		Explode(skid, sfxShatter)
 	end
 
 	if severity <= 0.5 then
 		return 1
 	else
-		Explode(body, sfxShatter)
-		Explode(skid, sfxShatter)
-		Explode(fins, sfxShatter)
-		Explode(Plane, sfxShatter)
-		
+		-- no shatter because 3do models are gebork
 		return 2
 	end
 end
