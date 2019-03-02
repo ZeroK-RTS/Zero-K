@@ -155,8 +155,8 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	
 	-- All comms have 10 BP in their unitDef (even support)
 	local buildPower = (10 + (data.bonusBuildPower or 0)) * (data.buildPowerMult or 1)
-	data.metalIncome = (data.metalIncome or 0) + buildPower*0.03
-	data.energyIncome = (data.energyIncome or 0) + buildPower*0.03
+	data.metalIncome = (data.metalIncome or 0)
+	data.energyIncome = (data.energyIncome or 0)
 	Spring.SetUnitRulesParam(unitID, "buildpower_mult", buildPower/10, INLOS)
 	
 	if data.metalIncome and GG.Overdrive then
