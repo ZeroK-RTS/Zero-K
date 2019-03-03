@@ -13,7 +13,7 @@ end
 
 options_path = 'Settings/Graphics/Effects/Depth of Field'
 
-options_order = {'useDoF', 'autofocus', 'focusDepth', 'fStop'}
+options_order = {'useDoF', 'highQuality', 'autofocus', 'focusDepth', 'fStop'}
 
 options = {
 	useDoF = 
@@ -23,6 +23,15 @@ options = {
 		value=false, 
 		noHotkey = true, 
 		advanced = false,
+	},
+	highQuality =
+	{ 
+		type='bool',
+		name='High Quality',
+		value=false,
+		noHotkey=true,
+		advanced=true,
+		OnChange = function(self) InitTextures() end,
 	},
 	autofocus = 
 	{ 
@@ -36,15 +45,15 @@ options = {
 	{
 		type='number',
 		name='Focus Depth (Manual Focus Only)',
-		min = 0.0, max = 10000.0, step = 0.1,
-		value = 0.3,
+		min = 0.0, max = 2000.0, step = 0.1,
+		value = 300.0,
 		advanced = true,
 	},
 	fStop =
 	{
 		type='number',
 		name='F-Stop',
-		min = 2.4, max = 160.0, step = 0.1,
+		min = 1.0, max = 80.0, step = 0.1,
 		value = 16.0,
 		advanced = true,
 	},
@@ -106,6 +115,7 @@ local function CleanupTextures()
 	gl.DeleteFBO(intermediateBlurFBO)
 	baseBlurTex, intermediateBlurTexR, intermediateBlurTexG, intermediateBlurTexB, finalBlurTex, screenTex, depthTex = 
 		nil, nil, nil, nil, nil, nil, nil
+	intermediateBlurFBO = nil
 end
 -----------------------------------------------------------------
 -- Global Vars
@@ -130,6 +140,7 @@ local resolutionLoc = nil
 local autofocusLoc = nil
 local focusDepthLoc = nil
 local fStopLoc = nil
+local qualityLoc = nil
 local passLoc = nil
 
 -- shader uniform enums
@@ -140,17 +151,16 @@ local shaderPasses =
 	horizBlur = 2,
 	composition = 3,
 }
--- local blurChannels =
--- {
--- 	red = 0,
--- 	green = 1,
--- 	blue = 2,
--- }
 
 -----------------------------------------------------------------
 
-function widget:ViewResize(x, y)
+function InitTextures()
 	vsx, vsy = gl.GetViewSizes()
+	local blurTexSizeX, blurTexSizeY = vsx, vsy;
+	if not options.highQuality.value then
+		blurTexSizeX, blurTexSizeY = vsx/2, vsy/2;
+	end
+
 	CleanupTextures()
 	
 	screenTex = glCreateTexture(vsx, vsy, {
@@ -165,27 +175,27 @@ function widget:ViewResize(x, y)
 		mag_filter = GL.NEAREST,
 	})	
 
-	baseBlurTex = glCreateTexture(vsx/2, vsy/2, {
+	baseBlurTex = glCreateTexture(blurTexSizeX, blurTexSizeY, {
 		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 	
-	intermediateBlurTexR = glCreateTexture(vsx/2, vsy/2, {
+	intermediateBlurTexR = glCreateTexture(blurTexSizeX, blurTexSizeY, {
 		min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 	
-	intermediateBlurTexG = glCreateTexture(vsx/2, vsy/2, {
+	intermediateBlurTexG = glCreateTexture(blurTexSizeX, blurTexSizeY, {
 		 min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 	
-	intermediateBlurTexB = glCreateTexture(vsx/2, vsy/2, {
+	intermediateBlurTexB = glCreateTexture(blurTexSizeX, blurTexSizeY, {
 		 min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 	
-	finalBlurTex = glCreateTexture(vsx/2, vsy/2, {
+	finalBlurTex = glCreateTexture(blurTexSizeX, blurTexSizeY, {
 		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
@@ -208,6 +218,10 @@ function widget:ViewResize(x, y)
 	end
 end
 
+function widget:ViewResize(x, y)
+	InitTextures()
+end
+
 function widget:Initialize()
 	if (glCreateShader == nil) then
 		Spring.Echo("[Depth of Field::Initialize] removing widget, no shader support")
@@ -228,12 +242,8 @@ function widget:Initialize()
 			"#define VERT_BLUR_PASS " .. shaderPasses.vertBlur .. "\n",
 			"#define HORIZ_BLUR_PASS " .. shaderPasses.horizBlur .. "\n",
 			"#define COMPOSITION_PASS " .. shaderPasses.composition .. "\n",
-
-			-- "#define BLUR_CHANNEL_RED " .. blurChannels.red .. "\n",
-			-- "#define BLUR_CHANNEL_GREEN " .. blurChannels.green .. "\n",
-			-- "#define BLUR_CHANNEL_BLUE " .. blurChannels.blue .. "\n",
 		},
-		fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\dof.fs", VFS.ZIP),
+		fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\dof.fs", VFS.RAW_FIRST),
 		
 		uniformInt = {origTex = 0, blurTex0 = 1, blurTex1 = 2, blurTex2 = 3},
 	})
@@ -251,8 +261,8 @@ function widget:Initialize()
 	autofocusLoc = gl.GetUniformLocation(dofShader, "autofocus")
 	focusDepthLoc = gl.GetUniformLocation(dofShader, "manualFocusDepth")
 	fStopLoc = gl.GetUniformLocation(dofShader, "fStop")
+	qualityLoc = gl.GetUniformLocation(dofShader, "quality")
 	passLoc = gl.GetUniformLocation(dofShader, "pass")
-	-- channelLoc = gl.GetUniformLocation(dofShader, "channel")
 	
 	widget:ViewResize()
 end
@@ -334,6 +344,7 @@ function widget:DrawScreenEffects()
 		glUniformInt(autofocusLoc, options.autofocus.value and 1 or 0)
 		glUniform(focusDepthLoc, options.focusDepth.value / 10000)
 		glUniform(fStopLoc, options.fStop.value)
+		glUniformInt(qualityLoc, options.highQuality.value and 1 or 0)
 		
 		glRenderToTexture(baseBlurTex, FilterCalculation)
 		gl.ActiveFBO(intermediateBlurFBO, VertBlur)
