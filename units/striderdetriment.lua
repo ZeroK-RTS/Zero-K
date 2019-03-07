@@ -14,13 +14,13 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 10 0]],
-  collisionVolumeScales  = [[92 120 92]],
+  collisionVolumeOffsets = [[0 14 0]],
+  collisionVolumeScales  = [[92 158 92]],
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[40]],
+	modelradius    = [[95]],
 	extradrawrange = 925,
   },
 
@@ -30,7 +30,7 @@ unitDef = {
   iconType               = [[krogoth]],
   leaveTracks            = true,
   losEmitHeight          = 100,
-  maxDamage              = 85800,
+  maxDamage              = 86000,
   maxSlope               = 37,
   maxVelocity            = 1.2,
   maxWaterDepth          = 5000,
