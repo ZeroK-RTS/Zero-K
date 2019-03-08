@@ -26,13 +26,18 @@ function BobTidal()
 		Move(cradle, y_axis, math.random(-0.5,0.5) - 51, 0.05)
 		Move(cradle, z_axis, math.random(-2,2), 0.2)
 		Sleep(1000)
+		
+		if GG.Wind_SpinDisabled then
+			StopSpin(fan, z_axis)
+			return
+		end
 	end
 end
 
 function SpinWind() 
 	while true do 
 		if select(5, Spring.GetUnitHealth(unitID)) < 1 then
-			Spin(fan, z_axis, 0)
+			StopSpin(fan, z_axis)
 			Sleep(BUILD_PERIOD)
 		else
 			local st = baseWind + (Spring.GetGameRulesParam("WindStrength") or 0)*rangeWind
@@ -42,15 +47,15 @@ function SpinWind()
 			Turn(cradle, y_axis, direction - baseDirection + pi, turnSpeed)
 			Sleep(UPDATE_PERIOD + 200*math.random())
 		end
+		
+		if GG.Wind_SpinDisabled then
+			StopSpin(fan, z_axis)
+			return
+		end
 	end
 end
 
-function script.Create()
-	StartThread(SmokeUnit, smokePiece)
-		baseDirection = math.random(0,tau)
-	Turn(base, y_axis, baseDirection)
-	baseDirection = baseDirection + hpi * Spring.GetUnitBuildFacing(unitID)
-	
+function InitializeWind()
 	isWind, baseWind, rangeWind = GG.SetupWindmill(unitID)
 	if isWind then
 		StartThread(SpinWind)
@@ -74,6 +79,14 @@ function script.Create()
 		--]]
 		Spin(fan, z_axis, math.rad(30))
 	end
+end
+
+function script.Create()
+	StartThread(SmokeUnit, smokePiece)
+	baseDirection = math.random(0,tau)
+	Turn(base, y_axis, baseDirection)
+	baseDirection = baseDirection + hpi * Spring.GetUnitBuildFacing(unitID)
+	InitializeWind()
 end
 
 local function CreateTidalWreck()

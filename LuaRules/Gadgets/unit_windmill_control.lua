@@ -76,6 +76,31 @@ local function round(num, idp)
 	return sformat("%." .. (idp or 0) .. "f", num)
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Debug
+
+local function ToggleWindAnimation(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then 
+		return
+	end
+	GG.Wind_SpinDisabled = not GG.Wind_SpinDisabled
+	
+	if GG.Wind_SpinDisabled then
+		Spring.Echo("Wind animation disabled")
+	else
+		Spring.Echo("Wind animation enabled")
+		local allUnits = Spring.GetAllUnits()
+		for i = 1, #allUnits do
+			local env = Spring.UnitScript.GetScriptEnv(allUnits[i])
+			if env and env.InitializeWind then
+				Spring.UnitScript.CallAsUnit(allUnits[i], env.InitializeWind)
+			end
+		end
+	
+	end
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -222,6 +247,8 @@ function gadget:Initialize()
 		teamEnergy[teamList[i]] = 0
 		spSetTeamRulesParam(teamList[i], "WindIncome", 0, alliedTrueTable)
 	end
+	
+	gadgetHandler:AddChatAction("windanim", ToggleWindAnimation, "Toggles windmill animations.")
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, unitTeam)
