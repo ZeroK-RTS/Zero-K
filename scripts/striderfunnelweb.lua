@@ -83,8 +83,8 @@ function script.Create()
 	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 1) -- shields shouldn't disappear when turned off
 	Hide (gunL)
 	Hide (gunR)
-	Move (aimpoint, z_axis, -4)
-	Move (aimpoint, y_axis, 0)
+	Move (aimpoint, z_axis, 4)
+	Move (aimpoint, y_axis, 2)
 	Move (aimpoint, x_axis, 0)
 	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
@@ -112,7 +112,7 @@ function script.QueryNanoPiece()
 end
 
 function script.QueryWeapon(num)
-	return shield
+	return aimpoint
 end
 
 function script.Killed (recentDamage, maxHealth)
