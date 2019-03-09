@@ -602,9 +602,9 @@ function widget:Update()
 		for i, unitID in ipairs(units) do
 			local unitDefID = spGetUnitDefID(unitID)
 			local teamID = Spring.GetUnitTeam(unitID)
-		if unitDefID == mexDefID then
-			widget:UnitCreated(unitID, unitDefID, teamID)
-		end
+			if unitDefID == mexDefID then
+				widget:UnitCreated(unitID, unitDefID, teamID)
+			end
 		end
 	end
 	if metalSpotsNil and WG.metalSpots ~= nil then
@@ -641,6 +641,7 @@ local centerZ
 local extraction = 0
 
 local circleOnlyMexDrawList = 0
+local minimapDrawList = 0
 
 local function getSpotColor(id)
 	local teamID = spotData[id] and spotData[id].team or Spring.GetGaiaTeamID()
@@ -676,6 +677,36 @@ function calcMainMexDrawList()
 		glPopMatrix()
 	end
 
+	glLineWidth(1.0)
+	glColor(1,1,1,1)
+end
+
+function calcMinimapMexDrawList()
+	if not WG.metalSpots then
+		return
+	end
+	if not glDrawCircle then
+		glDrawCircle = gl.Utilities.DrawCircle -- FIXME make utilities available early enough to do this in init
+	end
+	
+	for i = 1, #WG.metalSpots do
+		local spot = WG.metalSpots[i]
+		local x,z = spot.x, spot.z
+		local y = spGetGroundHeight(x,z)
+
+		local r,g,b = getSpotColor(i)
+		local width = (spot.metal > 0 and spot.metal) or 0.1
+		width = width * metalmultInv
+
+		glColor(0,0,0,1)
+		glLineWidth(width*2.0)
+		glDrawCircle(x, z, MINIMAP_DRAW_SIZE)
+		glLineWidth(width*0.8)
+		glColor(r,g,b,1.0)
+
+		glDrawCircle(x, z, MINIMAP_DRAW_SIZE)
+	end
+	
 	glLineWidth(1.0)
 	glColor(1,1,1,1)
 end
@@ -750,16 +781,26 @@ function updateMexDrawList()
 	if circleOnlyMexDrawList then
 		gl.DeleteList(circleOnlyMexDrawList)
 	end
+	if minimapDrawList then
+		gl.DeleteList(minimapDrawList)
+	end
 
 	circleOnlyMexDrawList = glCreateList(calcMainMexDrawList)
+	minimapDrawList = glCreateList(calcMinimapMexDrawList)
 	if not circleOnlyMexDrawList then
 		Spring.Echo("Warning: Failed to update mex draw list.")
 	end
 end
 
 function widget:Shutdown()
-	gl.DeleteList(circleOnlyMexDrawList)
+	if circleOnlyMexDrawList then
+		gl.DeleteList(circleOnlyMexDrawList)
+	end
 	circleOnlyMexDrawList = nil
+	if minimapDrawList then
+		gl.DeleteList(minimapDrawList)
+	end
+	minimapDrawList = nil
 end
 
 local function DoLine(x1, y1, z1, x2, y2, z2)
@@ -863,34 +904,12 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 		return
 	end
 	if drawMexSpots or WG.showeco_always_mexes then
-		if not glDrawCircle then
-			glDrawCircle = gl.Utilities.DrawCircle -- FIXME make utilities available early enough to do this in init
-		end
-
-		local specatate = spGetSpectatingState()
-
 		glPushMatrix()
 		glTranslate(0,minimapY,0)
 		glScale(minimapX/mapX, -minimapY/mapZ, 1)
+		glLighting(false)
 
-		for i = 1, #WG.metalSpots do
-			local spot = WG.metalSpots[i]
-			local x,z = spot.x, spot.z
-			local y = spGetGroundHeight(x,z)
-
-			local r,g,b = getSpotColor(i)
-			local width = (spot.metal > 0 and spot.metal) or 0.1
-			width = width * metalmultInv
-
-			glLighting(false)
-			glColor(0,0,0,1)
-			glLineWidth(width*2.0)
-			glDrawCircle(x, z, MINIMAP_DRAW_SIZE)
-			glLineWidth(width*0.8)
-			glColor(r,g,b,1.0)
-
-			glDrawCircle(x, z, MINIMAP_DRAW_SIZE)
-		end
+		glCallList(minimapDrawList)
 
 		glLineWidth(1.0)
 		glColor(1,1,1,1)
