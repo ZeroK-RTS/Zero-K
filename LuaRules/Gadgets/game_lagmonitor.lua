@@ -48,6 +48,8 @@ local spGetUnitIsBuilding = Spring.GetUnitIsBuilding
 local spGetUnitHealth     = Spring.GetUnitHealth
 local spSetUnitHealth     = Spring.SetUnitHealth
 
+local useAfkDetection = (Spring.GetModOptions().enablelagmonitor ~= "0")
+
 include("LuaRules/Configs/constants.lua")
 
 -- in seconds. The delay considered is (ping + time spent afk)
@@ -139,8 +141,7 @@ local function GetPlayerActivity(playerID)
 	
 	local lastActionTime = spGetGameSeconds() - (mouseActivityTime[playerID] or 0)
 	
-	if lastActionTime >= TO_AFK_THRESHOLD
-	or lastActionTime >= FROM_AFK_THRESHOLD and playerIsAfk[playerID] then
+	if useAfkDetection and (lastActionTime >= TO_AFK_THRESHOLD or lastActionTime >= FROM_AFK_THRESHOLD and playerIsAfk[playerID]) then
 		playerIsAfk[playerID] = true
 		return false
 	end

@@ -203,6 +203,14 @@ local options = {
     def = true,
   },
   {
+    key = "enablelagmonitor",
+    name = "Enable Inactivity Sharing",
+    desc = "In a team game, automatically share units of inactive players.",
+    type = 'bool',
+    section= 'a_important',
+    def = true,
+  },
+  {
     key         = "allyreclaim",
     name        = "Reclaimable allies",
     desc        = "Allows reclaiming allied units and structures",
