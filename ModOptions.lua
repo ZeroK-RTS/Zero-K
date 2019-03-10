@@ -604,7 +604,7 @@ local options = {
     section= 'chicken',
     def    = 60,
     min    = 1,
-    max    = 200,
+    max    = 300,
     step   = 1,
   },
   {
