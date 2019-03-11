@@ -53,6 +53,11 @@ local function SetUnitWantedSpeed(unitID, unitDefID, wantedSpeed)
 		return
 	end
 	
+	if Spring.MoveCtrl.GetTag(unitID) then
+		units[unitID].lastWantedSpeed = wantedSpeed
+		return
+	end
+	
 	if units[unitID].lastWantedSpeed == wantedSpeed then
 		return
 	end
@@ -68,6 +73,10 @@ end
 
 local function MaintainWantedSpeed(unitID)
 	if not (units[unitID] and units[unitID].lastWantedSpeed) then
+		return
+	end
+	
+	if Spring.MoveCtrl.GetTag(unitID) then
 		return
 	end
 	
