@@ -86,6 +86,7 @@ local clickTargetID = false
 local clickCommandID = false
 local clickActiveCmdID = false
 local clickRight = false
+local totalDist = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -95,6 +96,7 @@ local function Reset()
 	clickCommandID = false
 	clickActiveCmdID = false
 	clickRight = false
+	totalDist = 0
 end
 
 local function GetActionCommand(right)
@@ -199,6 +201,15 @@ local function MouseRelease(x, y)
 	return true
 end
 
+local function MouseMove(dx, dy)
+	if clickTargetID then
+		totalDist = totalDist + math.sqrt(dx*dx + dy*dy)
+		if totalDist > (WG.CircleDragThreshold or 5) + 2 then
+			Reset()
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -214,15 +225,25 @@ function widget:CommandNotify(id, params, opts)
 end
 
 local mousePressed = false
+local lastX, lastY = 0, 0
 function widget:Update()
 	local x, y, left, middle, right, offscreen = Spring.GetMouseState()
 	if (left or right) and not mousePressed then
+		lastX, lastY = x, y
 		MousePress(x, y, right)
 		mousePressed = true
+		return
 	end
+	
 	if not (left or right) and mousePressed then
 		MouseRelease(x, y)
 		mousePressed = false
+		return
+	end
+	
+	if mousePressed then
+		MouseMove(x - lastX, y - lastY)
+		lastX, lastY = x, y
 	end
 end
 
