@@ -83,6 +83,13 @@ local function GetAttackTarget(unitID)
 			return targetID, not ud.isImmobile
 		end
 	end
+	
+	local targetType, isUser, targetID = Spring.GetUnitWeaponTarget(unitID, 3)
+	if targetType <= 1 and targetID and Spring.ValidUnitID(targetID) then
+		local unitDefID = Spring.GetUnitDefID(targetID)
+		local ud = UnitDefs[unitDefID]
+		return targetID, not ud.isImmobile
+	end
 end
 
 local function GetCollisionDistance(unitID, targetID)
