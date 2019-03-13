@@ -11,7 +11,6 @@ local sprGetModKeyState      = Spring.GetModKeyState
 local sprGiveOrderToUnit     = Spring.GiveOrderToUnit
 local sprSelectUnitArray     = Spring.SelectUnitArray
 local sprIsAboveMiniMap      = Spring.IsAboveMiniMap
-local sprMinimapMouseToWorld = Spring.MinimapMouseToWorld
 local sprTestBuildOrder      = Spring.TestBuildOrder
 local sprGetBuildFacing      = Spring.GetBuildFacing
 local sprGetMyTeamID         = Spring.GetMyTeamID
@@ -107,14 +106,7 @@ local function GetCommandColor(cmdID)
 end
 
 local function GetMouseWorldCoors(mx, my)
-	local cwc = nil
-
-	if (sprIsAboveMiniMap(mx, my)) then
-		cwc = sprMinimapMouseToWorld(mx, my)
-	else
-		_, cwc = sprTraceScreenRay(mx, my, true)
-	end
-
+	local _, cwc = Spring.TraceScreenRay(mx, my, true, sprIsAboveMiniMap(mx, my))
 	return cwc
 end
 
