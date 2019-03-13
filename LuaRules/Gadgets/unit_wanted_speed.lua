@@ -63,7 +63,7 @@ local function SetUnitWantedSpeed(unitID, unitDefID, wantedSpeed, forceUpdate)
 	end
 	units[unitID].lastWantedSpeed = wantedSpeed
 	
-	Spring.Utilities.UnitEcho(unitID, wantedSpeed or "f")
+	--Spring.Utilities.UnitEcho(unitID, wantedSpeed or "f")
 	if units[unitID].moveType == 1 then
 		Spring.MoveCtrl.SetGunshipMoveTypeData(unitID, "maxWantedSpeed", (wantedSpeed or 2000))
 	elseif units[unitID].moveType == 2 then
