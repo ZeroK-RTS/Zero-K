@@ -59,6 +59,7 @@ unitDef = {
   sightDistance       = 300,
   transportCapacity   = 1,
   transportMass       = 330,
+  transportSize       = 4,
   turninplace         = 0,
   turnRate            = 550,
   verticalSpeed       = 30,
