@@ -33,12 +33,12 @@ local units = {}
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local function SetUnitWantedSpeed(unitID, unitDefID, wantedSpeed)
+local function SetUnitWantedSpeed(unitID, unitDefID, wantedSpeed, forceUpdate)
 	if not unitDefID then
 		return
 	end
 	if not units[unitID] then
-		if not wantedSpeed then
+		if not (forceUpdate or wantedSpeed) then
 			return
 		end
 		local ud = UnitDefs[unitDefID]
@@ -58,17 +58,21 @@ local function SetUnitWantedSpeed(unitID, unitDefID, wantedSpeed)
 		return
 	end
 	
-	if units[unitID].lastWantedSpeed == wantedSpeed then
+	if (not forceUpdate) and (units[unitID].lastWantedSpeed == wantedSpeed) then
 		return
 	end
 	units[unitID].lastWantedSpeed = wantedSpeed
 	
-	--Spring.Utilities.UnitEcho(unitID, wantedSpeed)
+	Spring.Utilities.UnitEcho(unitID, wantedSpeed or "f")
 	if units[unitID].moveType == 1 then
 		Spring.MoveCtrl.SetGunshipMoveTypeData(unitID, "maxWantedSpeed", (wantedSpeed or 2000))
 	elseif units[unitID].moveType == 2 then
 		Spring.MoveCtrl.SetGroundMoveTypeData(unitID, "maxWantedSpeed", (wantedSpeed or 2000))
 	end
+end
+
+function GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
+	SetUnitWantedSpeed(unitID, unitDefID, units and units[unitID] and units[unitID].lastWantedSpeed, true)
 end
 
 local function MaintainWantedSpeed(unitID)
@@ -102,7 +106,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if not (wantedSpeed and teamID) then
 		return false
 	end
-
 	wantedSpeed = (wantedSpeed > 0) and wantedSpeed
 	SetUnitWantedSpeed(unitID, unitDefID, wantedSpeed)
 
