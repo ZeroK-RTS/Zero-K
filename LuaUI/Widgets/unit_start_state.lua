@@ -938,12 +938,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 		orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate0.value}, CMD.OPT_SHIFT}
 		orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, CMD.OPT_SHIFT}
+		orderArray[3] = {CMD_RETREAT, {options.commander_retreat.value}, CMD.OPT_SHIFT + (options.commander_retreat.value == 0 and CMD.OPT_RIGHT or 0)}
 		if WG.SetAutoCallTransportState and options.commander_auto_call_transport_2.value == 1 then
 			WG.SetAutoCallTransportState(unitID, unitDefID, true)
 		end
-		if WG['retreat'] then
-			WG['retreat'].addRetreatCommand(unitID, unitDefID, options.commander_retreat.value)
-		end
+
 		if options.commander_selection_rank and WG.SetSelectionRank then
 			WG.SetSelectionRank(unitID, options.commander_selection_rank.value)
 		end
