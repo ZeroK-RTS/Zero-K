@@ -1,26 +1,26 @@
 
 function widget:GetInfo()
-  return {
-    name      = "Ferry Points",
-    desc      = "Allow the creation of ferry routes for transports. Move transports and units to route entrance to assign them to the ferry route.",
-    author    = "Google Frog",
-    date      = "24 Nov 2010",
-    license   = "GNU GPL, v2 or later",
-	handler   = true,
-    layer     = 0,
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "Ferry Points",
+		desc      = "Allow the creation of ferry routes for transports. Move transports and units to route entrance to assign them to the ferry route.",
+		author    = "Google Frog",
+		date      = "24 Nov 2010",
+		license   = "GNU GPL, v2 or later",
+		handler   = true,
+		layer     = 0,
+		enabled   = true  --  loaded by default?
+	}
 end
 
 local spSetActiveCommand = Spring.SetActiveCommand
 
-local COLLECTION_RADIUS_DRAW = 120
-local COLLECTION_RADIUS = 150
-local NEAR_WAYPOINT_RANGE_SQ = 200^2
-local NEAR_START_RANGE_SQ = 300^2
-local UNLOAD_RADIUS = 160
+local COLLECTION_RADIUS_DRAW         = 120
+local COLLECTION_RADIUS              = 150
+local NEAR_WAYPOINT_RANGE_SQ         = 200^2
+local NEAR_START_RANGE_SQ            = 300^2
+local UNLOAD_RADIUS                  = 160
 local CANT_BE_TRANSPORTED_DECAY_TIME = 200
-local COMMAND_MOVE_RADIUS = 80
+local COMMAND_MOVE_RADIUS            = 80
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local CMD_FIGHT                = CMD.FIGHT
@@ -62,7 +62,6 @@ local function disSQ(x1,y1,x2,y2)
 end
 
 local function nearFerryPoint(x, z, r)
-	
 	local rsq = r^2
 	
 	for i = 1, ferryRoutes.count do
@@ -75,7 +74,6 @@ local function nearFerryPoint(x, z, r)
 end
 
 local function nearAnyPoint(x, z, r)
-	
 	local rsq = r^2
 	
 	for i = 1, ferryRoutes.count do
@@ -97,7 +95,6 @@ end
 
 -- removes transport from whichever route it is part of
 local function removeTransportFromRoute(unitID)
-
 	local trans = transport[unitID]
 
 	if not (trans and trans.route) then
@@ -121,7 +118,6 @@ end
 
 -- it is assumed that the transport is not part of a route
 local function addTransportToRoute(unitID, routeID)
-	
 	local trans = transport[unitID]
 	local route = ferryRoutes.route[routeID]
 	
@@ -135,7 +131,6 @@ local function addTransportToRoute(unitID, routeID)
 end
 
 local function removeRoute(routeID)
-
 	local route = ferryRoutes.route[routeID]
 	
 	for i = 1, route.transportCount do
@@ -185,7 +180,6 @@ function widget:CommandsChanged()
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
-	
 	if cmdID == CMD_SET_WANTED_MAX_SPEED then
 		return false
 	end
@@ -223,7 +217,6 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 			movingPointNeighbours = false
 			movingPoint = false
 		elseif not placedRoute then
-			
 			if cmdOptions.shift then
 				movingPoint = nearAnyPoint(cmdParams[1], cmdParams[3], COMMAND_MOVE_RADIUS)
 				if movingPoint then
@@ -296,7 +289,6 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		
 		return true
 	elseif (cmdID == CMD_RAW_MOVE or cmdID == CMD.MOVE or cmdID == CMD_FIGHT) and cmdParams then
-	
 		local routeID = nearFerryPoint(cmdParams[1], cmdParams[3], COLLECTION_RADIUS_DRAW)
 		if routeID then
 			local selected = Spring.GetSelectedUnits()
@@ -358,7 +350,6 @@ end
 --- UNIT HANDLING
 
 function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID) 
-
 	if Spring.ValidUnitID(unitID) then
 		local cmd = Spring.GetCommandQueue(unitID, 2)
 		if cmd and #cmd > 0 and cmd[1].id == CMD.WAIT then
@@ -371,7 +362,6 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 end
 
 function widget:GameFrame(frame)
-	
 	if frame%15 == 12 then
 		for i = 1, ferryRoutes.count do
 			route = ferryRoutes.route[i]
@@ -386,7 +376,7 @@ function widget:GameFrame(frame)
 						route.unitsQueuedToBeTransported[unitID] = nil
 					end
 				else
-          local cmd = Spring.GetCommandQueue(unitID, 1)
+					local cmd = Spring.GetCommandQueue(unitID, 1)
 					if #cmd > 0 and cmd[1].id == CMD.WAIT then
 						unitsToTransport.count = unitsToTransport.count + 1
 						unitsToTransport.unit[unitsToTransport.count] = unitID
@@ -450,7 +440,6 @@ function widget:GameFrame(frame)
 			end
 		end
 	end
-	
 end
 
 local function addUnit(unitID, unitDefID, unitTeam)
@@ -540,7 +529,6 @@ local function DrawMovingPoints(pos)
 end
 
 function widget:DrawWorld()
-
 	gl.DepthTest(false)
 	gl.LineWidth(2)
 	gl.Color(1, 0, 0, 0.9)
@@ -573,5 +561,3 @@ function widget:DrawWorld()
 
 	gl.Color(1, 1, 1, 1)
 end
-
-
