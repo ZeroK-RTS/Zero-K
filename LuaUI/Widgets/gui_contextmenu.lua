@@ -107,7 +107,7 @@ local colorPurple = {0.9, 0.2, 1, 1}
 local colorDisarm = {0.5, 0.5, 0.5, 1}
 local colorCapture = {0.6, 1, 0.6, 1}
 
-local valkMaxMass = UnitDefNames.gunshiptrans.transportMass
+local valkMaxCost = tonumber(UnitDefNames.gunshiptrans.customParams.transportcost)
 local valkMaxSize = UnitDefNames.gunshiptrans.transportSize * 2
 
 --------------------------------------------------------------------------------
@@ -1085,7 +1085,7 @@ local function printAbilities(ud, unitID)
 
 	if ud.transportCapacity and (ud.transportCapacity > 0) then
 		cells[#cells+1] = 'Transport: '
-		cells[#cells+1] = ((ud.transportMass < 365) and "Light" or "Heavy")
+		cells[#cells+1] = ((ud.customParams.islighttransport) and "Light" or "Heavy")
 	end
 
 	if ud.customParams.nuke_coverage then
@@ -1401,7 +1401,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	-- transportability by light or heavy airtrans
 	if not (ud.canFly or ud.cantBeTransported) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > valkMaxMass) or (ud.xsize > valkMaxSize) or (ud.zsize > valkMaxSize)) and "Heavy") or "Light"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = ((ud.customParams.requireheavytrans and "Heavy") or "Light"), textColor = color.stats_fg, }
 	end
 	
 	if ud.customParams.reload_move_penalty then

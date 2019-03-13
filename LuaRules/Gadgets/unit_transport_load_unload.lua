@@ -22,12 +22,11 @@ local airTransports = {
 	[UnitDefNames["gunshipheavytrans"].id] = true,
 }
 
-local transportCostLimit = {}
+local lightTransport = {}
 local allowTransportCache = {}
 for unitDefID, _ in pairs(airTransports) do
-	local costLimit = tonumber(UnitDefs[unitDefID].customParams.transportcost)
-	if costLimit then
-		transportCostLimit[unitDefID] = costLimit
+	if UnitDefs[unitDefID].customParams.islighttransport then
+		lightTransport[unitDefID] = true
 		allowTransportCache[unitDefID] = {}
 	end
 end
@@ -43,13 +42,13 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:AllowUnitTransport(transporterID, transporterUnitDefID, transporterTeam, transporteeID, transporteeUnitDefID, transporteeTeam)
-	if not transportCostLimit[transporterUnitDefID] then
+	if not lightTransport[transporterUnitDefID] then
 		return true
 	end
 	if allowTransportCache[transporterUnitDefID][transporteeUnitDefID] then
 		return (allowTransportCache[transporterUnitDefID][transporteeUnitDefID] == 1)
 	end
-	local allowed = (UnitDefs[transporteeUnitDefID].metalCost <= transportCostLimit[transporterUnitDefID])
+	local allowed = not UnitDefs[transporteeUnitDefID].customParams.requireheavytrans
 	allowTransportCache[transporterUnitDefID][transporteeUnitDefID] = ((allowed and 1) or 0)
 	return allowed
 end

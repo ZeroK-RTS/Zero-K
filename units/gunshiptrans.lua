@@ -25,10 +25,10 @@ unitDef = {
   cruiseAlt           = 140,
 
   customParams        = {
-    airstrafecontrol = [[1]],
-	midposoffset   = [[0 0 0]],
-	modelradius    = [[15]],
-	transportcost  = 1000,
+    airstrafecontrol  = [[1]],
+	midposoffset      = [[0 0 0]],
+	modelradius       = [[15]],
+	islighttransport  = 1,
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -59,7 +59,6 @@ unitDef = {
   sightDistance       = 300,
   transportCapacity   = 1,
   transportMass       = 330,
-  transportSize       = 4,
   turninplace         = 0,
   turnRate            = 550,
   verticalSpeed       = 30,
