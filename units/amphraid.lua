@@ -105,6 +105,7 @@ unitDef = {
       texture2                = [[lightsmoketrail]],
       tolerance               = 1000,
       tracks                  = true,
+      trajectoryHeight        = 0.8,
       turnRate                = 16000,
       turret                  = true,
       weaponAcceleration      = 90,
