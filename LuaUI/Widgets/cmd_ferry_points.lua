@@ -18,16 +18,17 @@ local COLLECTION_RADIUS_DRAW         = 120
 local COLLECTION_RADIUS              = 150
 local NEAR_WAYPOINT_RANGE_SQ         = 200^2
 local NEAR_START_RANGE_SQ            = 300^2
-local UNLOAD_RADIUS                  = 160
+local CONST_UNLOAD_RADIUS            = 100
 local CANT_BE_TRANSPORTED_DECAY_TIME = 200
 local COMMAND_MOVE_RADIUS            = 80
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local CMD_FIGHT                = CMD.FIGHT
-local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
+local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED or 70
 
-VFS.Include("LuaRules/Utilities/ClampPosition.lua")
-local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
+--VFS.Include("LuaRules/Utilities/ClampPosition.lua")
+--local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local ferryRoutes = {count = 0, route = {}}
 
@@ -158,9 +159,10 @@ end
 --- COMMAND HANDLING
 
 local function GiveUnloadOrder(transportID, x, y, z)
-	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x, y, z, UNLOAD_RADIUS}, 0)
-	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x, y, z, UNLOAD_RADIUS*2}, CMD.OPT_SHIFT)
-	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x, y, z, UNLOAD_RADIUS*4}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x - 2, y, z - 2}, CMD.OPT_RIGHT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x + 2, y, z + 2, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x - 2, y, z + 2, CONST_UNLOAD_RADIUS*2}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x + 2, y, z - 2, CONST_UNLOAD_RADIUS*4}, CMD.OPT_SHIFT)
 end
 
 function widget:CommandsChanged()
@@ -389,7 +391,6 @@ function widget:GameFrame(frame)
 				local carriedUnits = Spring.GetUnitIsTransporting(unitID)
 				
 				if #carriedUnits == trans.capacity then
-					
 					if trans.waypoint <= route.pointcount then
 						local x,_,z = Spring.GetUnitPosition(unitID)
 						if trans.waypoint == 0 or disSQ(x, z, route.points[trans.waypoint].x, route.points[trans.waypoint].z) < NEAR_WAYPOINT_RANGE_SQ then
@@ -397,23 +398,19 @@ function widget:GameFrame(frame)
 							if trans.waypoint > route.pointcount then
 								GiveUnloadOrder(unitID, route.finish.x, route.finish.y, route.finish.z)
 							else
-								GiveClampedOrderToUnit(unitID, CMD.MOVE, 
-									{route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, 0 )
+								spGiveOrderToUnit(unitID, CMD.MOVE, {route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, 0 )
 							end
 						end
 					end
-					
 				else
 					local x,_,z = Spring.GetUnitPosition(unitID)
 					if trans.waypoint > 0 then
 						if trans.waypoint > route.pointcount or disSQ(x, z, route.points[trans.waypoint].x, route.points[trans.waypoint].z) < NEAR_WAYPOINT_RANGE_SQ then
 							trans.waypoint = trans.waypoint - 1
 							if trans.waypoint == 0 then
-								GiveClampedOrderToUnit(unitID, CMD.MOVE, 
-									{route.start.x, route.start.y, route.start.z}, 0 )
+								spGiveOrderToUnit(unitID, CMD.MOVE, {route.start.x, route.start.y, route.start.z}, 0 )
 							else
-								GiveClampedOrderToUnit(unitID, CMD.MOVE, 
-									{route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, 0 )
+								spGiveOrderToUnit(unitID, CMD.MOVE, {route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, 0 )
 							end
 						end
 					elseif unitsToTransport.count ~= 0 and disSQ(x, z, route.start.x, route.start.z) < NEAR_START_RANGE_SQ then
@@ -432,10 +429,8 @@ function widget:GameFrame(frame)
 							end
 						end
 					elseif disSQ(x, z, route.start.x, route.start.z) > NEAR_WAYPOINT_RANGE_SQ then
-						GiveClampedOrderToUnit(unitID, CMD.MOVE, 
-							{route.start.x, route.start.y, route.start.z}, 0 )
+						spGiveOrderToUnit(unitID, CMD.MOVE, {route.start.x, route.start.y, route.start.z}, 0 )
 					end
-				
 				end
 			end
 		end
