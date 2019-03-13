@@ -569,7 +569,7 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_flylandstate_1_factory"
 	end
 
-	if ud.isFactory then
+	if ud.isFactory or ud.customParams.isfakefactory then
 		options[defName .. "_repeat"] = {
 			name = "  Repeat",
 			desc = "Repeat construction queue.",
