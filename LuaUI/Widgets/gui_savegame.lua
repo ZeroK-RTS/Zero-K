@@ -44,10 +44,17 @@ local mainWindow
 options_path = 'Settings/Misc/Autosave'
 options =
 {
+	enableautosave = {
+		name = 'Enable Autosave',
+		type = 'bool',
+		value = false,
+		simpleMode = true,
+		everyMode = true,
+	},
 	autosaveFrequency = {
 		name = 'Autosave Frequency (minutes)',
 		type = 'number',
-		min = 0, max = 20, step = 5,
+		min = 1, max = 60, step = 1,
 		value = 10,
 		simpleMode = true,
 		everyMode = true,
@@ -551,6 +558,9 @@ function widget:Shutdown()
 end
 
 function widget:GameFrame(n)
+	if not options.enableautosave.value then
+		return
+	end
 	if options.autosaveFrequency.value == 0 then
 		return
 	end
