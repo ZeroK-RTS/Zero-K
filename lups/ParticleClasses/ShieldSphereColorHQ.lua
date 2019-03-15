@@ -146,7 +146,7 @@ function ShieldSphereColorHQParticle:Draw()
 	gl.Uniform(shieldSizeDriftUniform, self.sizeDrift)
 	gl.Uniform(marginUniform, self.marginHQ)
 	gl.Uniform(uvMulUniform, self.uvMul)
-	gl.UniformInt(unitIdUniform, self.unit)
+	gl.UniformInt(unitIdUniform, 30276)--self.unit)
 
 	if hitTable then
 		local hitPointCount = math.min(#hitTable, MAX_POINTS)
@@ -277,6 +277,14 @@ ____FS_CODE_DEFS_____
 		return smoothstep(coreSize, width, val);
 	}
 
+	float hash( int n ) 
+	{
+		// integer hash copied and butchered from Hugo Elias
+		n = (n * 8192);
+		n = n * (n * n * 15731 + 789221) + 1376312589;
+		return float(n)/float(0x7fffffff);
+	}
+	
 	vec2 GetRippleLinearFallOffCoord(vec2 uv, vec2 point, float mag, float waveFreq, float waveSpeed, float waveDist, float time)
 	{
 		vec2 dir = uv - point;
@@ -460,9 +468,10 @@ ____FS_CODE_DEFS_____
 			}
 			vec3 offsetNormal = normal + adjustedOffset;
 			vec3 standardVec = offsetNormal * 4;
-			standardVec.z -= timer * 3 + unitId*10;
+			float seed = hash(unitId);
+			standardVec.z -= timer * 3 + seed;
 			vec3 noiseVec = offsetNormal * 10;
-			noiseVec.z -= timer * 6 + unitId*10;
+			noiseVec.z -= timer * 6 + seed;
 			noiseMult = 0.5 + (1 - abs(snoise(standardVec))) + (snoise(noiseVec)) * noiseLevel / 2.0;
 		}
 		else
