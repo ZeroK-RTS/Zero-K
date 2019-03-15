@@ -34,6 +34,7 @@ local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spUseUnitResource   = Spring.UseUnitResource
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
+local losTable = {inlos = true}
 
 local unitMap = {}
 local unitList = {}
@@ -91,6 +92,7 @@ function gadget:GameFrame(n)
 	end
 
 	local updatePriority = (n % TEAM_SLOWUPDATE_RATE == 0)
+	local setParam = ((n % 30) == 8)
 	
 	for i = 1, unitCount do
 		local data = unitList[i]
@@ -103,7 +105,11 @@ function gadget:GameFrame(n)
 		local currTime = Spring.GetGameFrame()
 		local inCooldown = false
 		if def.rechargeDelay then
-			inCooldown = (hitTime + def.rechargeDelay * 30 - currTime >= 0)
+			local remainingTime = hitTime + def.rechargeDelay * 30 - currTime
+			inCooldown = (remainingTime >= 0)
+			if (setParam or currTime - hitTime < 3) and remainingTime > -70 then
+				spSetUnitRulesParam(unitID, "shieldRegenTimer", remainingTime, losTable)
+			end
 		end
 		if enabled and charge < def.maxCharge and not inCooldown and spGetUnitRulesParam(unitID, "shieldChargeDisabled") ~= 1 then
 			-- Get changed charge rate based on slow

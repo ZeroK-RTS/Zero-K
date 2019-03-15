@@ -24,6 +24,7 @@ unitDef = {
 	shield_emit_height = 45,
 	unarmed       = true,
 	shield_power_gfx_override = 10000,
+	shield_recharge_delay   = 15,
   },
 
   explodeAs              = [[ESTOR_BUILDING]],
