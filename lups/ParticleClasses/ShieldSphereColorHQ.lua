@@ -261,13 +261,11 @@ ____FS_CODE_DEFS_____
 	uniform int method;
 
 	#define PI 3.141592653589793
-
 	#define HEXSCALE 90.0
-
 	#define SZDRIFTTOUV 7.0
-
 	#define nsin(x) (0.5 * sin(x) + 0.5)
-
+	#define HASHSCALE1 443.8975
+	
 	float hex(vec2 p, float width, float coreSize)
 	{
 		p.x *= 0.57735 * 2.0;
@@ -276,13 +274,11 @@ ____FS_CODE_DEFS_____
 		float val = abs(max(p.x*1.5 + p.y, p.y*2.0) - 1.0);
 		return smoothstep(coreSize, width, val);
 	}
-
-	float hash( int n ) 
-	{
-		// integer hash copied and butchered from Hugo Elias
-		n = (n * 8192);
-		n = n * (n * n * 15731 + 789221) + 1376312589;
-		return float(n)/float(0x7fffffff);
+	
+	float hash11(float p) {
+		vec3 p3  = fract(vec3(p) * HASHSCALE1);
+		p3 += dot(p3, p3.yzx + 19.19);
+		return fract((p3.x + p3.y) * p3.z);
 	}
 	
 	vec2 GetRippleLinearFallOffCoord(vec2 uv, vec2 point, float mag, float waveFreq, float waveSpeed, float waveDist, float time)
@@ -468,7 +464,7 @@ ____FS_CODE_DEFS_____
 			}
 			vec3 offsetNormal = normal + adjustedOffset;
 			vec3 standardVec = offsetNormal * 4;
-			float seed = hash(unitId);
+			float seed = hash11(float(unitId));
 			standardVec.z -= timer * 3 + seed;
 			vec3 noiseVec = offsetNormal * 10;
 			noiseVec.z -= timer * 6 + seed;
