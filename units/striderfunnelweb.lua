@@ -25,6 +25,7 @@ unitDef = {
 	unarmed       = true,
 	shield_power_gfx_override = 10000,
 	shield_recharge_delay   = 15,
+	selection_rank = 3,
   },
 
   explodeAs              = [[ESTOR_BUILDING]],

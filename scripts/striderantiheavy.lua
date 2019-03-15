@@ -32,7 +32,7 @@ local firepoints = {[0] = nanospray, [1] = laserblade}
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
-local PACE = 3
+local PACE = 3.2
 
 local THIGH_FRONT_ANGLE = -math.rad(50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
