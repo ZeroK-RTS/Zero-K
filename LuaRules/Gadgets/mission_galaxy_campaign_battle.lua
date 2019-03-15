@@ -700,6 +700,10 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		return 
 	end
 	
+	if unitData.shieldFactor and ud.customParams.shield_power then
+		Spring.SetUnitShieldState(unitID, -1, true, unitData.shieldFactor*tonumber(ud.customParams.shield_power))
+	end
+	
 	if unitData.commands then
 		local commands = unitData.commands
 		commandsToGive = commandsToGive or {}
