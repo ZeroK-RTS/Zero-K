@@ -146,7 +146,7 @@ function ShieldSphereColorHQParticle:Draw()
 	gl.Uniform(shieldSizeDriftUniform, self.sizeDrift)
 	gl.Uniform(marginUniform, self.marginHQ)
 	gl.Uniform(uvMulUniform, self.uvMul)
-	gl.UniformInt(unitIdUniform, 30276)--self.unit)
+	gl.UniformInt(unitIdUniform, self.unit)
 
 	if hitTable then
 		local hitPointCount = math.min(#hitTable, MAX_POINTS)
