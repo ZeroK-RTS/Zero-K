@@ -14,6 +14,11 @@
 ---------------------------------------------------------------------------------------------
 
 local floor = math.floor
+function MixColors(col1, col2, frac)
+	local oFrac = 1-frac
+	return {col1[1]*oFrac + col2[1]*frac, col1[2]*oFrac + col2[2]*frac, col1[3]*oFrac + col2[3]*frac, col1[4]*oFrac + col2[4]*frac}
+end
+
 function GetColor(colormap,life)
 	local ncolors = #colormap
 	if (life>=1)or(ncolors==1) then
@@ -40,7 +45,7 @@ local function MergeShieldColor(col, frac)
 	}
 end
 
-local hitOpacityMult = {1.2, 1.5, 1.5}
+local hitOpacityMult = {0.2, 0.5, 0.5}
 local HIT_DURATION = 2
 function GetShieldColor(unitID, self)
 	local _, charge = Spring.GetUnitShieldState(unitID)
@@ -52,9 +57,9 @@ function GetShieldColor(unitID, self)
 		local hitTime = Spring.GetUnitRulesParam(unitID, "shieldHitFrame")
 		local frame = Spring.GetGameFrame()
 		if hitTime and (hitTime + HIT_DURATION > frame) then
-			col1[4] = (col1[4] or 0.5)*(hitOpacityMult[frame - hitTime + 1] or 1)*(self.hitResposeMult or 1)
+			col1[4] = col1[4] + (col1[4] or 0.5)*(hitOpacityMult[frame - hitTime + 1] or 1)*(self.hitResposeMult or 1)
 			if col2 then
-				col2[4] = (col2[4] or 0.5)*(hitOpacityMult[frame - hitTime + 1] or 1)*(self.hitResposeMult or 1)
+				col2[4] = col2[4] + (col2[4] or 0.5)*(hitOpacityMult[frame - hitTime + 1] or 1)*(self.hitResposeMult or 1)
 			end
 		end
 	end

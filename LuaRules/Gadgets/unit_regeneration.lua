@@ -27,10 +27,10 @@ for id, def in pairs(UnitDefs) do
 end
 
 local currentFrame
-function gadget:GameFrame (frame)
+function gadget:GameFrame(frame)
 	currentFrame = frame
-	if ((frame % 15) == 7) then
-		local setParam = ((frame % 30) == 7)
+	if ((frame % 15) == 8) then
+		local setParam = ((frame % 30) == 8)
 		for i = 1, unitCount do
 			local unitID = unitList[i]
 			local data = units[unitID]
@@ -42,7 +42,7 @@ function gadget:GameFrame (frame)
 					spSetUnitHealth(unitID, health + amount)
 				end
 			end
-			if setParam then
+			if setParam and data.idleFrame - frame > -70 then
 				spSetUnitRulesParam(unitID, "idleRegenTimer", data.idleFrame - frame, losTable)
 			end
 		end

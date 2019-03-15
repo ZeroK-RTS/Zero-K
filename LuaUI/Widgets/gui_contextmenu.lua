@@ -437,8 +437,17 @@ local function weapons2Table(cells, ws, unitID)
 		cells[#cells+1] = regen .. " HP/s"
 		cells[#cells+1] = ' - Regen cost:'
 		cells[#cells+1] = drain .. " E/s"
+		local rechargeDelay = tonumber(wd.shieldrechargedelay or wd.customParams.shield_recharge_delay)
+		if rechargeDelay and rechargeDelay > 0 then
+			cells[#cells+1] = ' - Regen delay:'
+			cells[#cells+1] = rechargeDelay .. " s"
+		end
 		cells[#cells+1] = ' - Radius:'
 		cells[#cells+1] = wd.shieldRadius .. " elmo"
+		if wd.customParams.unlinked then
+			cells[#cells+1] = ' - Does not link with other shields'
+			cells[#cells+1] = ''
+		end
 	else
 		-- calculate damages
 

@@ -56,17 +56,27 @@ for unitDefID = 1, #UnitDefs do
 
 		local myShield = Spring.Utilities.CopyTable(ShieldSphereBase, true)
 		if radius > 250 then
-			myShield.shieldSize = "large"
+			if radius > 400 then
+				myShield.shieldSize = "huge"
+				--==  HQ  ==--
+				myShield.sizeDrift = 0.0;
+				myShield.marginHQ = 2.8
+				myShield.uvMul = 1.0
+				--== /HQ  ==--
+				myShield.hitResposeMult = 0.5
+			else
+				myShield.shieldSize = "large"
+				--==  HQ  ==--
+				myShield.sizeDrift = 0.008;
+				myShield.marginHQ = 2.8
+				myShield.uvMul = 1.0
+				--== /HQ  ==--
+				myShield.hitResposeMult = 0.6
+			end
 			myShield.drawBack = 0.55
 			myShield.drawBackCol = 0.3
 			myShield.drawBackMargin = 4.5
 			myShield.margin = 4
-			myShield.hitResposeMult = 0.6
-			--==  HQ  ==--
-			myShield.sizeDrift = 0.008;
-			myShield.marginHQ = 2.8
-			myShield.uvMul = 1.0
-			--== /HQ  ==--
 		else
 			myShield.shieldSize = "small"
 			if radius > 100 then
@@ -90,6 +100,7 @@ for unitDefID = 1, #UnitDefs do
 			myShield.margin = 1.8
 			myShield.hitResposeMult = 1
 		end
+		myShield.rechargeDelay = tonumber(ud.customParams.shield_recharge_delay) or 0
 
 		myShield.size = radius
 		myShield.radius = radius
@@ -99,6 +110,17 @@ for unitDefID = 1, #UnitDefs do
 		if strengthMult then
 			myShield.colormap1[1][4] = strengthMult*myShield.colormap1[1][4]
 			myShield.colormap1[2][4] = strengthMult*myShield.colormap1[2][4]
+		end
+		
+		-- Very powerful non-chicken shields get a different look
+		local shieldPower = tonumber(ud.customParams.shield_power)
+		local decayFactor = 0.1
+		if shieldPower > 10000 then
+			myShield.texture = "bitmaps/PD/shieldblank.png"
+			myShield.colormap1 = {{0.4, 0.4, 1.3, 0.8}, {0.5, 0.1, 0.1, 0.3}}
+			myShield.colormap2 = {{0.0, 0.2, 0.2, 0.03}, {0.0, 0.2, 0.0, 0.02}}
+			myShield.hitResposeMult = 0.15
+			decayFactor = 0.05
 		end
 
 		local isChicken = false
@@ -138,6 +160,8 @@ for unitDefID = 1, #UnitDefs do
 			fx = fxTable,
 			search = searchSizes[radius],
 			shieldCapacity = tonumber(ud.customParams.shield_power),
+			damageMultShieldCapacity = tonumber(ud.customParams.shield_power_gfx_override or ud.customParams.shield_power),
+			decayFactor = decayFactor,
 			shieldPos = myShield.pos,
 			shieldRadius = radius,
 		}

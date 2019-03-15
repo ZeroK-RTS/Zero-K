@@ -17,11 +17,13 @@ local bl = piece 'thigh_bacr' 	-- back left
 local ml = piece 'thigh_midr' 	-- middle left
 local fl = piece 'thigh_fror' 	-- front left
 
-local smokePiece = {gaster, notum}
+local smokePiece = {eye}
+local nanoPieces = {eye}
 
 local SIG_WALK = 1
+local SIG_BUILD = 2
 
-local PERIOD = 0.35
+local PERIOD = 0.275
 
 local sleepTime = PERIOD*1000
 
@@ -44,6 +46,19 @@ local legBackwardTheta = -math.rad(25)
 local legBackwardOffset = 0
 local legBackwardSpeed = legBackwardAngle/PERIOD
 
+
+function script.StartBuilding()
+	Signal(SIG_BUILD)
+	SetSignalMask(SIG_BUILD)
+	Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 1);
+end
+
+function script.StopBuilding()
+	Signal(SIG_BUILD)
+	Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 0);
+end
+
+
 local function Walk()
 	Signal (SIG_WALK)
 	SetSignalMask (SIG_WALK)
@@ -65,12 +80,14 @@ local function RestoreLegs()
 end
 
 function script.Create()
+	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 1) -- shields shouldn't disappear when turned off
 	Hide (gunL)
 	Hide (gunR)
-	Move (aimpoint, z_axis, -4)
-	Move (aimpoint, y_axis, 0)
-	Move (aimpoint, x_axis, -9)
+	Move (aimpoint, z_axis, 4)
+	Move (aimpoint, y_axis, 2)
+	Move (aimpoint, x_axis, 0)
 	StartThread(SmokeUnit, smokePiece)
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.Activate()
@@ -89,13 +106,13 @@ function script.StopMoving ()
 	StartThread (RestoreLegs)
 end
 
-function script.QueryWeapon (num)
-	return aimpoint
+function script.QueryNanoPiece()
+	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),gaster)
+	return gaster
 end
 
-function script.AimWeapon (num)
-	if num == 1 then return false -- fake targeter
-	else return true end
+function script.QueryWeapon(num)
+	return aimpoint
 end
 
 function script.Killed (recentDamage, maxHealth)

@@ -37,6 +37,7 @@ ShieldSphereParticle.Default = {
 	sizeGrowth = 0,
 
 	margin     = 1,
+	transitionTime = 10,
 
 	colormap1  = { {0, 0, 0, 0} },
 	colormap2  = { {0, 0, 0, 0} },
@@ -71,13 +72,44 @@ end
 
 function ShieldSphereParticle:Draw()
 	local color = self.color1
+	local color2 = self.color2
+	local size = self.size
+	local alignment = self.pos[2]
+	if self.shieldRechargeDelay and self.rechargingColor1 and self.shieldRechargeDelay > 0 then
+		local hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
+		local currTime = Spring.GetGameFrame()
+		local cooldown = hitTime + self.shieldRechargeDelay - currTime
+		if cooldown > 0 then
+			if (self.shieldRechargeDelay - cooldown < self.transitionTime) and not self.shieldDisabled then
+				local frac = (self.shieldRechargeDelay - cooldown)/self.transitionTime
+				color = MixColors(self.color1, self.rechargingColor1, frac)
+				size = self.shieldRechargeSize*frac + self.size*(1-frac)
+				if self.color2 then
+					color2 = MixColors(self.color2, self.rechargingColor2, frac)
+				end
+			elseif cooldown < self.transitionTime then
+				self.shieldDisabled = false
+				local frac = cooldown/self.transitionTime
+				color = MixColors(self.color1, self.rechargingColor1, frac)
+				size = self.shieldRechargeSize*frac + self.size*(1-frac)
+				if self.color2 then
+					color2 = MixColors(self.color2, self.rechargingColor2, frac)
+				end
+			else
+				self.shieldDisabled = true
+				color = self.rechargingColor1
+				size = self.shieldRechargeSize
+				if self.color2 then
+					color2 = self.rechargingColor2
+				end
+			end
+			alignment = alignment + size - self.size
+		end
+	end
 	glMultiTexCoord(1, color[1],color[2],color[3],color[4] or 1)
-	color = self.color2
-	glMultiTexCoord(2, color[1],color[2],color[3],color[4] or 1)
-	local pos = self.pos
-	glMultiTexCoord(3, pos[1],pos[2],pos[3], 0)
-	glMultiTexCoord(4, self.margin, self.size, 1, 1)
-
+	glMultiTexCoord(2, color2[1],color2[2],color2[3],color2[4] or 1)
+	glMultiTexCoord(3, self.pos[1], alignment, self.pos[3], 0)
+	glMultiTexCoord(4, self.margin, size, 1, 1)
 	glCallList(sphereList)
 end
 

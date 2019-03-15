@@ -106,9 +106,10 @@ effectUnitDefs = {
 	},
 	
 	striderfunnelweb = {
-	--{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4, onActive = true}},
-	{class='Bursts', options=MergeTable(staticshieldBursts, {piece="aimpoint"})},
-	{class='ShieldSphere', options=staticshieldBall},
+		{class='Bursts', options=MergeTable(staticshieldBursts, {piece="emitl", pos={0,9.8,0}, shieldRechargeDelay = tonumber(WeaponDefNames["striderfunnelweb_shield"].customParams.shield_recharge_delay), colormap = { {0.3, 0.3, 1, 0.8} }})},
+		{class='Bursts', options=MergeTable(staticshieldBursts, {piece="emitr", pos={0,9.8,0}, shieldRechargeDelay = tonumber(WeaponDefNames["striderfunnelweb_shield"].customParams.shield_recharge_delay), colormap = { {0.3, 0.3, 1, 0.8} }})},
+		{class='ShieldSphere', options={piece="emitl", life=math.huge, size=10, pos={0,9.8,0}, colormap1 = {{0.4, 0.1, 0.95, 1.0}}, rechargingColor1 = {0.95, 0.4, 0.4, 1.0}, rechargingColor2 = {0.95, 0.1, 0.4, 0.2}, shieldRechargeDelay = 30*tonumber(WeaponDefNames["striderfunnelweb_shield"].customParams.shield_recharge_delay), shieldRechargeSize = 7, repeatEffect=true}},	
+		{class='ShieldSphere', options={piece="emitr", life=math.huge, size=10, pos={0,9.8,0}, colormap1 = {{0.4, 0.1, 0.95, 1.0}}, rechargingColor1 = {0.95, 0.4, 0.4, 1.0}, rechargingColor2 = {0.95, 0.1, 0.4, 0.2}, shieldRechargeDelay = 30*tonumber(WeaponDefNames["striderfunnelweb_shield"].customParams.shield_recharge_delay), shieldRechargeSize = 7, repeatEffect=false}},	
 	},
 
 	--// ENERGY STORAGE //--------------------

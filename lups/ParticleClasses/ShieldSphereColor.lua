@@ -143,6 +143,7 @@ function ShieldSphereColorParticle:Initialize()
 	end
 
 	sphereList = {
+		huge = gl.CreateList(DrawSphere,0,0,0,1, 80, false),
 		large = gl.CreateList(DrawSphere,0,0,0,1, 60, false),
 		medium = gl.CreateList(DrawSphere,0,0,0,1, 50, false),
 		small = gl.CreateList(DrawSphere,0,0,0,1, 40, false),
