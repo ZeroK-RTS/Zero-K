@@ -26,50 +26,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 **/
-const int KERNEL_RADIUS = 8;
-const int KERNEL_COUNT = 17;
-const vec4 Kernel0BracketsRealXY_ImZW = vec4(-0.038708,0.943062,-0.025574,0.660892);
+//Main blur pass paramters
+const int KERNEL_RADIUS = 5;
+const int KERNEL_COUNT = 11;
+const vec4 Kernel0BracketsRealXY_ImZW = vec4(-0.056556,0.920040,-0.035849,0.611305);
 const vec2 Kernel0Weights_RealX_ImY = vec2(0.411259,-0.548794);
 const vec4 Kernel0_RealX_ImY_RealZ_ImW[] = vec4[](
-        vec4(/*XY: Non Bracketed*/0.014096,-0.022658,/*Bracketed WZ:*/0.055991,0.004413),
-        vec4(/*XY: Non Bracketed*/-0.020612,-0.025574,/*Bracketed WZ:*/0.019188,0.000000),
-        vec4(/*XY: Non Bracketed*/-0.038708,0.006957,/*Bracketed WZ:*/0.000000,0.049223),
-        vec4(/*XY: Non Bracketed*/-0.021449,0.040468,/*Bracketed WZ:*/0.018301,0.099929),
-        vec4(/*XY: Non Bracketed*/0.013015,0.050223,/*Bracketed WZ:*/0.054845,0.114689),
-        vec4(/*XY: Non Bracketed*/0.042178,0.038585,/*Bracketed WZ:*/0.085769,0.097080),
-        vec4(/*XY: Non Bracketed*/0.057972,0.019812,/*Bracketed WZ:*/0.102517,0.068674),
-        vec4(/*XY: Non Bracketed*/0.063647,0.005252,/*Bracketed WZ:*/0.108535,0.046643),
-        vec4(/*XY: Non Bracketed*/0.064754,0.000000,/*Bracketed WZ:*/0.109709,0.038697),
-        vec4(/*XY: Non Bracketed*/0.063647,0.005252,/*Bracketed WZ:*/0.108535,0.046643),
-        vec4(/*XY: Non Bracketed*/0.057972,0.019812,/*Bracketed WZ:*/0.102517,0.068674),
-        vec4(/*XY: Non Bracketed*/0.042178,0.038585,/*Bracketed WZ:*/0.085769,0.097080),
-        vec4(/*XY: Non Bracketed*/0.013015,0.050223,/*Bracketed WZ:*/0.054845,0.114689),
-        vec4(/*XY: Non Bracketed*/-0.021449,0.040468,/*Bracketed WZ:*/0.018301,0.099929),
-        vec4(/*XY: Non Bracketed*/-0.038708,0.006957,/*Bracketed WZ:*/0.000000,0.049223),
-        vec4(/*XY: Non Bracketed*/-0.020612,-0.025574,/*Bracketed WZ:*/0.019188,0.000000),
-        vec4(/*XY: Non Bracketed*/0.014096,-0.022658,/*Bracketed WZ:*/0.055991,0.004413)
+        vec4(/*XY: Non Bracketed*/0.022302,-0.035849,/*Bracketed WZ:*/0.085711,0.000000),
+        vec4(/*XY: Non Bracketed*/-0.056556,-0.013273,/*Bracketed WZ:*/0.000000,0.036931),
+        vec4(/*XY: Non Bracketed*/-0.023847,0.070538,/*Bracketed WZ:*/0.035552,0.174032),
+        vec4(/*XY: Non Bracketed*/0.059140,0.066382,/*Bracketed WZ:*/0.125751,0.167233),
+        vec4(/*XY: Non Bracketed*/0.096696,0.020687,/*Bracketed WZ:*/0.166571,0.092483),
+        vec4(/*XY: Non Bracketed*/0.102454,0.000000,/*Bracketed WZ:*/0.172829,0.058643),
+        vec4(/*XY: Non Bracketed*/0.096696,0.020687,/*Bracketed WZ:*/0.166571,0.092483),
+        vec4(/*XY: Non Bracketed*/0.059140,0.066382,/*Bracketed WZ:*/0.125751,0.167233),
+        vec4(/*XY: Non Bracketed*/-0.023847,0.070538,/*Bracketed WZ:*/0.035552,0.174032),
+        vec4(/*XY: Non Bracketed*/-0.056556,-0.013273,/*Bracketed WZ:*/0.000000,0.036931),
+        vec4(/*XY: Non Bracketed*/0.022302,-0.035849,/*Bracketed WZ:*/0.085711,0.000000)
 );
-const vec4 Kernel1BracketsRealXY_ImZW = vec4(0.000115,0.559524,0.000000,0.178226);
+const vec4 Kernel1BracketsRealXY_ImZW = vec4(0.000181,0.552380,0.000000,0.180493);
 const vec2 Kernel1Weights_RealX_ImY = vec2(0.513282,4.561110);
 const vec4 Kernel1_RealX_ImY_RealZ_ImW[] = vec4[](
-        vec4(/*XY: Non Bracketed*/0.000115,0.009116,/*Bracketed WZ:*/0.000000,0.051147),
-        vec4(/*XY: Non Bracketed*/0.005324,0.013416,/*Bracketed WZ:*/0.009311,0.075276),
-        vec4(/*XY: Non Bracketed*/0.013753,0.016519,/*Bracketed WZ:*/0.024376,0.092685),
-        vec4(/*XY: Non Bracketed*/0.024700,0.017215,/*Bracketed WZ:*/0.043940,0.096591),
-        vec4(/*XY: Non Bracketed*/0.036693,0.015064,/*Bracketed WZ:*/0.065375,0.084521),
-        vec4(/*XY: Non Bracketed*/0.047976,0.010684,/*Bracketed WZ:*/0.085539,0.059948),
-        vec4(/*XY: Non Bracketed*/0.057015,0.005570,/*Bracketed WZ:*/0.101695,0.031254),
-        vec4(/*XY: Non Bracketed*/0.062782,0.001529,/*Bracketed WZ:*/0.112002,0.008578),
-        vec4(/*XY: Non Bracketed*/0.064754,0.000000,/*Bracketed WZ:*/0.115526,0.000000),
-        vec4(/*XY: Non Bracketed*/0.062782,0.001529,/*Bracketed WZ:*/0.112002,0.008578),
-        vec4(/*XY: Non Bracketed*/0.057015,0.005570,/*Bracketed WZ:*/0.101695,0.031254),
-        vec4(/*XY: Non Bracketed*/0.047976,0.010684,/*Bracketed WZ:*/0.085539,0.059948),
-        vec4(/*XY: Non Bracketed*/0.036693,0.015064,/*Bracketed WZ:*/0.065375,0.084521),
-        vec4(/*XY: Non Bracketed*/0.024700,0.017215,/*Bracketed WZ:*/0.043940,0.096591),
-        vec4(/*XY: Non Bracketed*/0.013753,0.016519,/*Bracketed WZ:*/0.024376,0.092685),
-        vec4(/*XY: Non Bracketed*/0.005324,0.013416,/*Bracketed WZ:*/0.009311,0.075276),
-        vec4(/*XY: Non Bracketed*/0.000115,0.009116,/*Bracketed WZ:*/0.000000,0.051147)
+        vec4(/*XY: Non Bracketed*/0.000181,0.014423,/*Bracketed WZ:*/0.000000,0.079908),
+        vec4(/*XY: Non Bracketed*/0.015852,0.024540,/*Bracketed WZ:*/0.028370,0.135962),
+        vec4(/*XY: Non Bracketed*/0.042831,0.026910,/*Bracketed WZ:*/0.077211,0.149093),
+        vec4(/*XY: Non Bracketed*/0.072553,0.018473,/*Bracketed WZ:*/0.131019,0.102347),
+        vec4(/*XY: Non Bracketed*/0.094542,0.005900,/*Bracketed WZ:*/0.170826,0.032690),
+        vec4(/*XY: Non Bracketed*/0.102454,0.000000,/*Bracketed WZ:*/0.185149,0.000000),
+        vec4(/*XY: Non Bracketed*/0.094542,0.005900,/*Bracketed WZ:*/0.170826,0.032690),
+        vec4(/*XY: Non Bracketed*/0.072553,0.018473,/*Bracketed WZ:*/0.131019,0.102347),
+        vec4(/*XY: Non Bracketed*/0.042831,0.026910,/*Bracketed WZ:*/0.077211,0.149093),
+        vec4(/*XY: Non Bracketed*/0.015852,0.024540,/*Bracketed WZ:*/0.028370,0.135962),
+        vec4(/*XY: Non Bracketed*/0.000181,0.014423,/*Bracketed WZ:*/0.000000,0.079908)
 );
+
+const float baseStepValMag = 1.0/540.0;
 
 const vec2 autofocusTestCoords[] = vec2[](
         vec2(0.45, 0.45),
@@ -144,7 +135,7 @@ vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, inout int
   // // if (targetFilterRadius - filterRadius < -0.02 / float(KERNEL_RADIUS))
   //   // if (targetFilterRadius < 1.2 / float(KERNEL_RADIUS))
   //   { 
-    filterDistance = (float(i))*abs(targetFilterRadius);
+    filterDistance = (float(compI))*abs(targetFilterRadius);
     coords = uv + stepVal*filterDistance;
       // filterDistance = filterDistance/filterRadius * targetFilterRadius;
       // compI = 0;
@@ -158,6 +149,7 @@ void main()
 {
   vec4 fragColor = vec4(0,0,0,0);
 	vec2 uv = gl_TexCoord[0].st;
+  vec2 stepVal = vec2(baseStepValMag * (resolution.y/resolution.x), baseStepValMag);
 
 	if (pass == FILTER_SIZE_PASS)
 	{  
@@ -184,28 +176,29 @@ void main()
         testFocusDepth += testDepth / 2.0;
       }
       // testFocusDepth /= (1.0 + float(autofocusTestCoordCount) / 2.0);
-      testFocusDepth /= min(0.9 + ((testFocusDepth * 50.0) * 0.2), 1.2);
-      focusDepth /= min(0.9 + ((focusDepth * 50.0) * 0.2), 1.2);
+      testFocusDepth /= min(0.95 + ((testFocusDepth * 45.0) * 0.2), 1.08);
+      focusDepth /= min(0.95 + ((focusDepth * 45.0) * 0.2), 1.08);
 
       float focusSpread = maxTestDepth - minTestDepth;
+      focusSpread *= 1.25;
 
       float minFStop = 0.012;
       // testFocusDepth *= testFocusDepth;
-      float curveDepth = 17.4;
+      float curveDepth = 8.5;
       aperture = max(1.0/(max(
           (testFocusDepth + focusSpread) *
            exp(curveDepth * (testFocusDepth + focusSpread)), 
           minFStop)), 0.0) *
-      (testFocusDepth) * 2.0;
+      (testFocusDepth) * 1.55;
 
       // aperture = max(1.0/(max((testFocusDepth + focusSpread) * 3.3, minFStop)) - 2.0, 0.0) * depth; 
     }
 
-    float filterRadius = clamp(((depth - focusDepth) * aperture)/depth, -0.65, 0.65);
+    float filterRadius = clamp(((depth - focusDepth) * aperture)/depth, -1.0, 1.0);
 
   	fragColor = vec4(
       // mix(vec3(0,0,0), 
-        colors.rgb, 
+        sqrt(colors.rgb), 
         // clamp((abs(filterRadius) - (0.5 / float(KERNEL_RADIUS))) * 100.0, 0.0, 1.0)), 
       filterRadius * 0.5 + 0.5);
     // fragColor = vec4(depth, depth, depth, 2.0/float(KERNEL_RADIUS));
@@ -214,8 +207,6 @@ void main()
 
   else if (pass == VERT_BLUR_PASS)
   {
-    vec2 stepVal = 1.0/resolution.xy;
-    
     // vec4 val = vec4(0,0,0,0);
     vec4 valR = vec4(0,0,0,0);
     vec4 valG = vec4(0,0,0,0);
@@ -225,8 +216,8 @@ void main()
     for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
     {
       compI = i;
-      // vec2 coords = GetFilterCoords(i, uv, vec2(0.0, stepVal.y), filterRadius, compI);
-      vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x * cos(0.6), stepVal.y * sin(0.6)), filterRadius, compI);
+      vec2 coords = GetFilterCoords(i, uv, vec2(0.0, stepVal.y), filterRadius, compI);
+      // vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x * cos(0.6), stepVal.y * sin(0.6)), filterRadius, compI);
       if (compI < -KERNEL_RADIUS) continue;
 
       vec4 imageTexelRGB = texture2D(origTex, coords);
@@ -246,8 +237,6 @@ void main()
 
 	else if (pass == HORIZ_BLUR_PASS)
 	{
-    vec2 stepVal = 1.0/resolution.xy;
-  
     vec4 valR = vec4(0,0,0,0);
     vec4 valG = vec4(0,0,0,0);
     vec4 valB = vec4(0,0,0,0);
@@ -256,8 +245,8 @@ void main()
     for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
     {
     	compI = i;
-      // vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x, 0.0), filterRadius, compI);
-      vec2 coords = GetFilterCoords(i, uv, vec2(-stepVal.x * sin(0.6), stepVal.y * cos(0.6)), filterRadius, compI);
+      vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x, 0.0), filterRadius, compI);
+      // vec2 coords = GetFilterCoords(i, uv, vec2(-stepVal.x * sin(0.6), stepVal.y * cos(0.6)), filterRadius, compI);
       if (compI < -KERNEL_RADIUS) continue;
       vec4 imageTexelR = texture2D(blurTex0, coords);  
       vec4 imageTexelG = texture2D(blurTex1, coords);  
@@ -279,7 +268,7 @@ void main()
     float redChannel   = dot(valR.xy,Kernel0Weights_RealX_ImY)+dot(valR.zw,Kernel1Weights_RealX_ImY);
     float greenChannel = dot(valG.xy,Kernel0Weights_RealX_ImY)+dot(valG.zw,Kernel1Weights_RealX_ImY);
     float blueChannel  = dot(valB.xy,Kernel0Weights_RealX_ImY)+dot(valB.zw,Kernel1Weights_RealX_ImY);
-    fragColor = vec4(redChannel,greenChannel,blueChannel,filterRadius * 0.5 + 0.5);   
+    fragColor = vec4(redChannel*redChannel,greenChannel*greenChannel,blueChannel*blueChannel,filterRadius * 0.5 + 0.5);   
     gl_FragData[0] = fragColor;
 	}
 

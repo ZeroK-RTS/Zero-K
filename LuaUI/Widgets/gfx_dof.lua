@@ -165,7 +165,7 @@ function InitTextures()
 	
 	screenTex = glCreateTexture(vsx, vsy, {
 		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-		wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+		wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
 	})
 
 	depthTex = gl.CreateTexture(vsx,vsy, {
@@ -177,27 +177,27 @@ function InitTextures()
 
 	baseBlurTex = glCreateTexture(blurTexSizeX, blurTexSizeY, {
 		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-		wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+		wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
 	})
 	
 	intermediateBlurTexR = glCreateTexture(blurTexSizeX, blurTexSizeY, {
 		min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
 	})
 	
 	intermediateBlurTexG = glCreateTexture(blurTexSizeX, blurTexSizeY, {
 		 min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
 	})
 	
 	intermediateBlurTexB = glCreateTexture(blurTexSizeX, blurTexSizeY, {
 		 min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+		format = GL_RGBA16F_ARB, wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
 	})
 	
 	finalBlurTex = glCreateTexture(blurTexSizeX, blurTexSizeY, {
 		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-		wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+		wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
 	})
 	
 	intermediateBlurFBO = gl.CreateFBO({
@@ -243,7 +243,7 @@ function widget:Initialize()
 			"#define HORIZ_BLUR_PASS " .. shaderPasses.horizBlur .. "\n",
 			"#define COMPOSITION_PASS " .. shaderPasses.composition .. "\n",
 		},
-		fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\dof.fs", VFS.RAW_FIRST),
+		fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\dof.fs", VFS.ZIP),
 		
 		uniformInt = {origTex = 0, blurTex0 = 1, blurTex1 = 2, blurTex2 = 3},
 	})
