@@ -114,10 +114,13 @@ for unitDefID = 1, #UnitDefs do
 		
 		-- Very powerful non-chicken shields get a different look
 		local shieldPower = tonumber(ud.customParams.shield_power)
+		local decayFactor = 0.1
 		if shieldPower > 10000 then
 			myShield.texture = "bitmaps/PD/shieldblank.png"
 			myShield.colormap1 = {{0.4, 0.4, 1.3, 0.8}, {0.5, 0.1, 0.1, 0.3}}
 			myShield.colormap2 = {{0.0, 0.2, 0.2, 0.03}, {0.0, 0.2, 0.0, 0.02}}
+			myShield.hitResposeMult = 0.5
+			decayFactor = 0.05
 		end
 
 		local isChicken = false
@@ -156,7 +159,8 @@ for unitDefID = 1, #UnitDefs do
 		shieldUnitDefs[unitDefID] = {
 			fx = fxTable,
 			search = searchSizes[radius],
-			shieldCapacity = tonumber(ud.customParams.shield_power),
+			shieldCapacity = tonumber(ud.customParams.shield_power_gfx_override or ud.customParams.shield_power),
+			decayFactor = decayFactor,
 			shieldPos = myShield.pos,
 			shieldRadius = radius,
 		}
