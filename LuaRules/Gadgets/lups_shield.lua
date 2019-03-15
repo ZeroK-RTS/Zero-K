@@ -135,7 +135,7 @@ local function AddUnit(unitID, unitDefID)
 	local unitData = {
 		unitDefID   = unitDefID,
 		search      = def.search,
-		capacity    = def.shieldCapacity,
+		capacity    = def.damageMultShieldCapacity,
 		decayFactor = def.decayFactor,
 		radius      = def.shieldRadius,
 		fxTable     = fxTable,
