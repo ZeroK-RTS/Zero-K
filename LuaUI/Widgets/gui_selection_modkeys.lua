@@ -44,6 +44,8 @@ options = {
 	},
 }
 
+local screen0
+
 local clickX, clickY = false, false
 local clickUnitID = false
 local clickSelected = false
@@ -148,6 +150,10 @@ local function MousePress(x, y)
 		return
 	end
 	
+	if screen0 and screen0.currentTooltip then
+		return
+	end
+	
 	local _, activeCmdID = Spring.GetActiveCommand()
 	if activeCmdID then
 		return
@@ -178,6 +184,13 @@ end
 
 local function MouseRelease(x, y)
 	if not options.enable.value then
+		return
+	end
+	
+	-- The player may have clicked on a command button
+	local _, activeCmdID = Spring.GetActiveCommand()
+	if activeCmdID then
+		Reset()
 		return
 	end
 	
@@ -263,5 +276,6 @@ function widget:Update()
 end
 
 function widget:Initialize()
+	screen0 = WG.Chili and WG.Chili.Screen0
 	widget:PlayerChanged()
 end

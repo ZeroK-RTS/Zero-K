@@ -50,6 +50,8 @@ options = {
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+local screen0
+
 local TRACE_UNIT = "unit"
 local TRACE_FEATURE = "feature"
 local MAX_UNITS = Game.maxUnits
@@ -160,6 +162,10 @@ local function MousePress(x, y, right)
 		return
 	end
 	
+	if screen0 and screen0.currentTooltip then
+		return
+	end
+	
 	local cmdID = GetActionCommand(right)
 	if not (cmdID and handledCommand[cmdID]) then
 		return
@@ -255,5 +261,6 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
+	screen0 = WG.Chili and WG.Chili.Screen0
 	SetCircleDragThreshold(options.circleDragThreshold.value)
 end
