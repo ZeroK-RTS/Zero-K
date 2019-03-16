@@ -4212,7 +4212,7 @@ local function ReloadUnitIDs()
 end
 
 function gadget:Load(zip)
-	if not GG.SaveLoad then
+	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "CAI failed to access save/load API")
 		return
 	end
