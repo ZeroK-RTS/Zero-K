@@ -36,7 +36,7 @@ local function FindNormalmap(tex1, tex2)
 	local normaltex
 
 	--// check if there is a corresponding _normals.dds file
-	if (VFS.FileExists(tex1)) then
+	if tex1 and (VFS.FileExists(tex1)) then
 		local basefilename = tex1:gsub("%....","")
 		if (tonumber(basefilename:sub(-1,-1))) then
 			basefilename = basefilename:sub(1,-2)
@@ -81,13 +81,15 @@ for i=1,#UnitDefs do
 			local header = rawstr:sub(1,60)
 			local texPtrs = VFS.UnpackU32(header, 45, 2)
 			local tex1,tex2
-			if (texPtrs[2] > 0) then
-				tex2 = "unittextures/" .. rawstr:sub(texPtrs[2]+1, rawstr:len()-1)
-			else
-				texPtrs[2] = rawstr:len()
-			end
-			if (texPtrs[1] > 0) then
-				tex1 = "unittextures/" .. rawstr:sub(texPtrs[1]+1, texPtrs[2]-1)
+			if texPtrs then
+				if (texPtrs[2] > 0) then
+					tex2 = "unittextures/" .. rawstr:sub(texPtrs[2]+1, rawstr:len()-1)
+				else
+					texPtrs[2] = rawstr:len()
+				end
+				if (texPtrs[1] > 0) then
+					tex1 = "unittextures/" .. rawstr:sub(texPtrs[1]+1, texPtrs[2]-1)
+				end
 			end
 
 			-- output units without tex2
