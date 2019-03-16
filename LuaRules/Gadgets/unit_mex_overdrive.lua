@@ -10,15 +10,15 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:GetInfo()
-  return {
-    name      = "Mex Control with energy link",
-    desc      = "Controls mex overload and energy link grid",
-    author    = "Licho, Google Frog (pylon conversion), ashdnazg (quadField)",
-    date      = "16.5.2008 (OD date)",
-    license   = "GNU GPL, v2 or later",
-    layer     = -4,   -- OD grid circles must be drawn before lava drawing gadget some maps have (which has layer = -3)
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "Mex Control with energy link",
+		desc      = "Controls mex overload and energy link grid",
+		author    = "Licho, Google Frog (pylon conversion), ashdnazg (quadField)",
+		date      = "16.5.2008 (OD date)",
+		license   = "GNU GPL, v2 or later",
+		layer     = -4,   -- OD grid circles must be drawn before lava drawing gadget some maps have (which has layer = -3)
+		enabled   = true  --  loaded by default?
+	}
 end
 
 -------------------------------------------------------------------------------------
@@ -841,7 +841,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							gridEnergySpent[i] = maxGridCapacity[i]
 
 							summedMetalProduction = 0
-                            summedBaseMetal = 0
+							summedBaseMetal = 0
 							summedOverdrive = 0
 
 							maxedGrid[i] = true
@@ -868,7 +868,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 
 								maxedMetalProduction = maxedMetalProduction + thisMexM
 								maxedBaseMetal = maxedBaseMetal + orgMetal
-                                maxedOverdrive = maxedOverdrive + orgMetal * metalMult
+								maxedOverdrive = maxedOverdrive + orgMetal * metalMult
 
 								allyMetalSquared = allyMetalSquared - orgMetal * orgMetal
 								gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
@@ -891,7 +891,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 
 					summedMetalProduction = summedMetalProduction + thisMexM
 					summedBaseMetal = summedBaseMetal + orgMetal
-                    summedOverdrive = summedOverdrive + orgMetal * metalMult
+					summedOverdrive = summedOverdrive + orgMetal * metalMult
 
 					gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
 
@@ -929,16 +929,16 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 	return energyWasted,
 		summedMetalProduction + maxedMetalProduction,
 		summedBaseMetal + maxedBaseMetal,
-        summedOverdrive + maxedOverdrive,
+		summedOverdrive + maxedOverdrive,
 		gridEnergySpent,
 		gridMetalGain,
 		privateBaseMetal
 end
 
 local function teamEcho(team, st)
-    if team == 0 then
-        Spring.Echo(st)
-    end
+	if team == 0 then
+		Spring.Echo(st)
+	end
 end
 
 local lastTeamOverdriveNetLoss = {}
@@ -1236,7 +1236,7 @@ function gadget:GameFrame(n)
 					if te.energyProducerOrUser then
 						te.overdriveEnergyNet = te.overdriveEnergyNet + energyToRefund*te.freeStorage/totalFreeStorage
 					end
-                end
+		end
 				energyWasted = 0
 			else
 				for i = 1, allyTeamData.teams do
