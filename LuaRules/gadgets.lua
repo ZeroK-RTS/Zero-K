@@ -22,40 +22,6 @@
 local HANDLER_BASENAME = "gadgets.lua"
 local isMission = VFS.FileExists("mission.lua")	-- or Game.gameName:find("Scenario Editor")
 
-local DepthMod = 10
-local DepthValue = -1
-
-origPairs = pairs
-local whiteList = {['string'] = true, ['number'] = true, ['boolean'] = true, ['nil'] = true, ['thread'] = true}
-local function mynext(...)
-	local i,v = next(...)
-	local t = type(i)
-	if not whiteList[t] then
-		Spring.Log(HANDLER_BASENAME, "error", '*** A gadget is misusing pairs! Report this with full infolog.txt! ***')
-		Spring.Log(HANDLER_BASENAME, "error", t)
-		Spring.Log(HANDLER_BASENAME, "error", i)
-		Spring.Log(HANDLER_BASENAME, "error", v)
-		DepthValue = DepthValue + 1
-		if isMission then
-			Spring.Log(HANDLER_BASENAME, "error", "Error depth: " .. DepthValue%DepthMod + 1, DepthValue%DepthMod + 1)
-		else
-			error("Error depth: " .. DepthValue%DepthMod + 1, DepthValue%DepthMod + 1)	-- breaks mission_runner
-		end
-	end
-	return i,v
-end
-
-pairs = function(...) 
-	if SendToUnsynced then
-		local n,s,i = origPairs(...)
-		return mynext,s,i
-	else
-		local n,s,i = origPairs(...)
-		return next,s,i
-	end
-end
-
-
 local HANDLER_DIR = 'LuaGadgets/'
 local GADGETS_DIR = Script.GetName():gsub('US$', '') .. '/Gadgets/'
 local SCRIPT_DIR = Script.GetName() .. '/'
