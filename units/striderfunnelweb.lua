@@ -24,7 +24,6 @@ unitDef = {
 	shield_emit_height = 45,
 	unarmed       = true,
 	shield_power_gfx_override = 10000,
-	shield_recharge_delay   = 15,
 	selection_rank = 3,
   },
 
@@ -87,7 +86,7 @@ unitDef = {
       },
       customParams            = {
         unlinked                = true,
-        shield_recharge_delay   = 15,
+        shield_recharge_delay   = 10,
       },
 
       exteriorShield          = true,
