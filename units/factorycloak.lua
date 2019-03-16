@@ -36,6 +36,7 @@ unitDef = {
     solid_factory   = [[7]],
     selectionscalemult = 1,
 	factorytab       = 1,
+	shared_energy_gen = 1,
   },
 
   energyUse                     = 0,

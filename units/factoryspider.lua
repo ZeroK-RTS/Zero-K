@@ -45,6 +45,7 @@ unitDef = {
 	unstick_help   = 1,
     selectionscalemult = 1,
 	factorytab       = 1,
+	shared_energy_gen = 1,
   },
 
   energyUse                     = 0,

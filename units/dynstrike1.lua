@@ -33,6 +33,7 @@ unitDef = {
     aimposoffset   = [[0 15 0]],
 	modelradius    = [[25]],
 	dynamic_comm   = 1,
+	shared_energy_gen = 1,
   },
 
   energyStorage          = 500,

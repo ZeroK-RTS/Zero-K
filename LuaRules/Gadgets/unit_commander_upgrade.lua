@@ -162,7 +162,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	if data.metalIncome and GG.Overdrive then
 		Spring.SetUnitRulesParam(unitID, "comm_income_metal", data.metalIncome, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_income_energy", data.energyIncome, INLOS)
-		GG.Overdrive.AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
+		GG.Overdrive.AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome, true)
 	end
 	
 	if data.healthBonus then
@@ -226,7 +226,7 @@ local function ApplyModuleEffectsFromUnitRulesParams(unitID)
 	if GG.Overdrive then
 		local mInc = Spring.GetUnitRulesParam(unitID, "comm_income_metal")
 		local eInc = Spring.GetUnitRulesParam(unitID, "comm_income_energy")
-		GG.Overdrive.AddUnitResourceGeneration(unitID, mInc or 0, eInc or 0, true)
+		GG.Overdrive.AddUnitResourceGeneration(unitID, mInc or 0, eInc or 0, true, true)
 	end
 	
 	if Spring.GetUnitRulesParam(unitID, "carrier_count_drone") or Spring.GetUnitRulesParam(unitID, "carrier_count_droneheavyslow") then

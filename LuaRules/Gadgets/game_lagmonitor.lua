@@ -252,7 +252,6 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	allyTeamResourceShares[allyTeamID] = totalResourceShares
 	
 	if not recieveTeamID then
-
 		-- Nobody can recieve units so there is not much more to do
 		for i = 1, #giveAwayTeams do
 			local giveTeamID = giveAwayTeams[i]

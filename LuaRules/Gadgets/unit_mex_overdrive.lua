@@ -80,6 +80,7 @@ for i = 1, #UnitDefs do
 		generatorDefs[i] = {
 			metalIncome = metalIncome,
 			energyIncome = energyIncome,
+			sharedEnergyGenerator = udef.customParams.shared_energy_gen and true
 		}
 	end
 end
@@ -977,36 +978,25 @@ function gadget:GameFrame(n)
 			end
 
 			AddPylonsInQueueToGrid()
-
-			--// Calculate total energy and other metal income from structures and units
-			-- Does not include reclaim
-			local teamEnergy = {}
-
-			local allyTeamEnergyIncome = 0
-			local allyTeamExpense = 0
-			local allyTeamEnergySpare = 0
-			local allyTeamPositiveSpare = 0
-			local allyTeamNegativeSpare = 0
-			local allyTeamEnergyCurrent = 0
-			local allyTeamEnergyMax = 0
-			local allyTeamEnergyMaxCurMax = 0
-			local holdBackEnergyFromOverdrive = 0
-
-			local allyTeamMiscMetalIncome = 0
-		
-			if debugMode then
-				Spring.Echo("=============== Overdrive Debug " .. allyTeamID .. " ===============")
+			
+			--// Calculate personal and shared energy income, and shared constructor metal income.
+			-- Income is only from energy structures and constructors. Reclaim is always personal and unhandled by OD.
+			local resourceShares = allyTeamResourceShares[allyTeamID]
+			local splitByShare = true
+			if (not resourceShares) or resourceShares < 1 then
+				splitByShare = false
+				resourceShares = allyTeamData.teams
 			end
 			
-			local energyProducerOrUserCount = 0
-			local sumInc = 0
+			local allyTeamMiscMetalIncome = 0
+			local allyTeamSharedEnergyIncome= 0
+			local teamEnergy = {}
+			
 			for i = 1, allyTeamData.teams do
 				local teamID = allyTeamData.team[i]
-
 				-- Calculate total energy and misc. metal income from units and structures
 				local genList = generatorList[allyTeamID][teamID]
 				local gen = generator[allyTeamID][teamID]
-				local sumMetal = 0
 				local sumEnergy = 0
 				for i = 1, genList.count do
 					local unitID = genList.data[i]
@@ -1025,26 +1015,57 @@ function gadget:GameFrame(n)
 								metal  = data.metalIncome*incomeFactor
 								energy = data.energyIncome*incomeFactor
 
-								sumMetal = sumMetal + metal
-								sumEnergy = sumEnergy + energy
+								allyTeamMiscMetalIncome = allyTeamMiscMetalIncome + metal
+								if data.sharedEnergyGenerator then
+									allyTeamSharedEnergyIncome = allyTeamSharedEnergyIncome + energy
+								else
+									sumEnergy = sumEnergy + energy
+								end
 							end
 							spSetUnitRulesParam(unitID, "current_metalIncome", metal, inlosTrueTable)
 							spSetUnitRulesParam(unitID, "current_energyIncome", energy, inlosTrueTable)
 						end
 					end
 				end
+				
+				teamEnergy[teamID] = {inc = sumEnergy}
+			end
+			
+			if debugMode then
+				Spring.Echo("=============== Overdrive Debug " .. allyTeamID .. " ===============")
+				Spring.Echo("resourceShares", resourceShares, "teams", allyTeamData.teams, "metal", allyTeamMiscMetalIncome, "energy", allyTeamSharedEnergyIncome)
+			end
+			
+			--// Calculate total energy and other metal income from structures and units
+			-- Does not include reclaim
 
+			local allyTeamEnergyIncome = 0
+			local allyTeamExpense = 0
+			local allyTeamEnergySpare = 0
+			local allyTeamPositiveSpare = 0
+			local allyTeamNegativeSpare = 0
+			local allyTeamEnergyCurrent = 0
+			local allyTeamEnergyMax = 0
+			local allyTeamEnergyMaxCurMax = 0
+			local holdBackEnergyFromOverdrive = 0
+
+			local energyProducerOrUserCount = 0
+			local sumInc = 0
+			for i = 1, allyTeamData.teams do
+				local teamID = allyTeamData.team[i]
 				-- Collect energy information and contribute to ally team data.
-				teamEnergy[teamID] = {}
 				local te = teamEnergy[teamID]
+				
+				if splitByShare and (teamResourceShare[teamID] == 1) then
+					te.inc = te.inc + allyTeamSharedEnergyIncome/resourceShares
+				end
+
 				te.cur, te.max, te.pull, _, te.exp, _, te.sent, te.rec = spGetTeamResources(teamID, "energy")
 				te.exp = math.max(0, te.exp - (lastTeamOverdriveNetLoss[teamID] or 0))
 
 				te.max = math.max(MIN_STORAGE, te.max - HIDDEN_STORAGE) -- Caretakers spend in chunks of 0.33
-				te.inc = sumEnergy -- Income only from energy structures and constructors. Possibly add reclaim here
 
-				allyTeamMiscMetalIncome = allyTeamMiscMetalIncome + sumMetal
-				allyTeamEnergyIncome = allyTeamEnergyIncome + sumEnergy
+				allyTeamEnergyIncome = allyTeamEnergyIncome + te.inc
 				allyTeamEnergyCurrent = allyTeamEnergyCurrent + te.cur
 				allyTeamEnergyMax = allyTeamEnergyMax + te.max
 				allyTeamExpense = allyTeamExpense + te.exp
@@ -1059,7 +1080,7 @@ function gadget:GameFrame(n)
 				allyTeamNegativeSpare = allyTeamNegativeSpare + max(0, -te.spare)
 				
 				if debugMode then
-					Spring.Echo("--- Team Economy ---", teamID)
+					Spring.Echo("--- Team Economy ---", teamID, "has share", teamResourceShare[teamID])
 					Spring.Echo("inc", te.inc, "exp", te.exp, "spare", te.spare, "pull", te.pull)
 					Spring.Echo("last spend", lastTeamOverdriveNetLoss[teamID], "cur", te.cur, "max", te.max)
 				end
@@ -1343,7 +1364,7 @@ function gadget:GameFrame(n)
 			if enableEnergyPayback then
 				for i = 1, allyTeamData.teams do
 					local teamID = allyTeamData.team[i]
-					if teamResourceShare[teamID] then
+					if teamResourceShare[teamID] then -- Isn't this always 1 or 0?
 						local te = teamEnergy[teamID]
 						teamPaybackOD[teamID] = 0
 
@@ -1396,13 +1417,6 @@ function gadget:GameFrame(n)
 			end
 			
 			--// Share Overdrive Metal and Energy
-			local resourceShares = allyTeamResourceShares[allyTeamID]
-			local splitByShare = true
-			if (not resourceShares) or resourceShares < 1 then
-				splitByShare = false
-				resourceShares = allyTeamData.teams
-			end
-			
 			-- Make changes to team resources
 			local shareToSend = {}
 			local metalStorageToSet = {}
@@ -1629,18 +1643,21 @@ local function AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 		local defData = generatorDefs[unitDefID]
 		if spGetUnitRulesParam(unitID, "isWind") then
 			generator[allyTeamID][teamID][unitID] = {
-				isWind = defData.isWind
+				isWind = defData.isWind,
+				sharedEnergyGenerator = defData.sharedEnergyGenerator,
 			}
 		else
 			generator[allyTeamID][teamID][unitID] = {
 				metalIncome = spGetUnitRulesParam(unitID, "wanted_metalIncome") or defData.metalIncome,
 				energyIncome = spGetUnitRulesParam(unitID, "wanted_energyIncome") or defData.energyIncome,
+				sharedEnergyGenerator = defData.sharedEnergyGenerator,
 			}
 		end
 	else
 		generator[allyTeamID][teamID][unitID] = {
 			metalIncome = spGetUnitRulesParam(unitID, "wanted_metalIncome") or 0,
 			energyIncome = spGetUnitRulesParam(unitID, "wanted_energyIncome") or 0,
+			sharedEnergyGenerator = unitDefID and UnitDefs[unitDefID].customParams.shared_energy_gen and true,
 		}
 	end
 
@@ -1719,7 +1736,7 @@ end
 
 local externalFunctions = {}
 
-function externalFunctions.AddUnitResourceGeneration(unitID, metal, energy, override)
+function externalFunctions.AddUnitResourceGeneration(unitID, metal, energy, sharedEnergyGenerator, override)
 	if not unitID then
 		return
 	end
@@ -1741,6 +1758,7 @@ function externalFunctions.AddUnitResourceGeneration(unitID, metal, energy, over
 
 	genData.metalIncome = metalIncome
 	genData.energyIncome = energyIncome
+	genData.sharedEnergyGenerator = sharedEnergyGenerator
 
 	spSetUnitRulesParam(unitID, "wanted_metalIncome", metalIncome, inlosTrueTable)
 	spSetUnitRulesParam(unitID, "wanted_energyIncome", energyIncome, inlosTrueTable)
