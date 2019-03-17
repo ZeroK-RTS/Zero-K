@@ -800,7 +800,7 @@ end
 if Utilities.IsCurrentVersionNewerThan(104, 600) then
 	for name, ud in pairs (UnitDefs) do
 		ud.transportmass = nil
-		if ud.buildcostmetal and ud.buildcostmetal > TRANSPORT_LIGHT_COST_MAX then
+		if ud.buildcostmetal and tonumber(ud.buildcostmetal) > TRANSPORT_LIGHT_COST_MAX then
 			ud.customparams.requireheavytrans = 1
 		end
 	end
