@@ -144,7 +144,7 @@ local function GetUnitString(unitID, tabs, sendCommands)
 	end
 	
 	if sendCommands then
-		local commands = Spring.GetUnitCommands(unitID, -1)
+		local commands = Spring.GetCommandQueue(unitID, -1)
 		if commands and #commands > 0 then
 			local commandString = ProcessUnitCommands(inTabs, commands, unitID, not ud.isImmobile)
 			if commandString then
