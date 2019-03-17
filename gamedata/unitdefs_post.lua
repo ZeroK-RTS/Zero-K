@@ -805,3 +805,8 @@ if Utilities.IsCurrentVersionNewerThan(104, 600) then
 		end
 	end
 end
+
+local ai_start_units = VFS.Include("LuaRules/Configs/ai_commanders.lua")
+for i = 1, #ai_start_units do
+	UnitDefs[ai_start_units[i]].customparams.ai_start_unit = true
+end

@@ -1,16 +1,8 @@
-
-aiCommanders = {
-	[UnitDefNames["dyntrainer_recon_base"].id] = true,
-	[UnitDefNames["dyntrainer_support_base"].id] = true,
-	[UnitDefNames["dyntrainer_assault_base"].id] = true,
-	[UnitDefNames["dyntrainer_strike_base"].id] = true,
-}
-
-if Spring.GetModOptions().campaign_chassis == "1" then
-	--[[ Not sure about this, nabs like to feel special.
-	     We could always limit it to hard/brutal and it's
-	     not that amazing anyway ]]
-	aiCommanders[UnitDefNames["dyntrainer_knight_base"].id] = true
+aiCommanders = {}
+for unitDefID, unitDef in pairs(UnitDefs) do
+	if unitDef.customParams.ai_start_unit then
+		aiCommanders[unitDefID] = true
+	end
 end
 
 ploppables = {
