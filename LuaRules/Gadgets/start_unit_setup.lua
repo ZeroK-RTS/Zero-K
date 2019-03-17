@@ -307,7 +307,10 @@ local function GetStartPos(teamID, teamInfo, isAI)
 end
 
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartOfTheGame)
-	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
+	if not teamID then
+		return
+	end
+	local _,_,_,_,_,allyTeamID,teamInfo = Spring.GetTeamInfo(teamID)
 	if teamInfo and teamInfo.nocommander then
 		waitingForComm[teamID] = nil
 		return
@@ -392,6 +395,10 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 
 		Spring.SetTeamResource(teamID, "energy", teamInfo.start_energy or (START_ENERGY + energy))
 		Spring.SetTeamResource(teamID, "metal", teamInfo.start_metal or (START_METAL + metal))
+
+		if GG.Overdrive then
+			GG.Overdrive.AddInnateIncome(allyTeamID, INNATE_INC_METAL, INNATE_INC_ENERGY)
+		end
 
 		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") and 
 			((not campaignBattleID) or GG.GalaxyCampaignHandler.HasFactoryPlop(teamID)) then

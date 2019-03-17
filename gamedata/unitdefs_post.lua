@@ -220,8 +220,8 @@ end
 --------------------------------------------------------------------------------
 -- UnitDefs Dont Repeat Yourself
 --
-local BP2RES = 0.00
-local BP2RES_FACTORY = 0.05
+local BP2RES = 0
+local BP2RES_FACTORY = 0
 local BP2TERRASPEED = 1000 --used to be 60 in most of the cases
 --local SEISMICSIG = 4 --used to be 4 in most of the cases
 for name, ud in pairs (UnitDefs) do

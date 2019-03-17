@@ -165,6 +165,8 @@ do
 			nilGrid = {},
 			team = {},
 			teams = 0,
+			innateMetal = Spring.GetGameRulesParam("OD_allyteam_metal_innate_" .. allyTeamID) or 0,
+			innateEnergy = Spring.GetGameRulesParam("OD_allyteam_energy_innate_" .. allyTeamID) or 0,
 		}
 
 		local teamList = Spring.GetTeamList(allyTeamID)
@@ -273,6 +275,7 @@ local function SetTeamEconomyRulesParams(
 			allyTeamMiscMetalIncome, -- AllyTeam constructor income
 
 			allyTeamEnergyIncome, -- AllyTeam total energy generator income
+			allyTeamEnergyMisc, -- Team share innate and constructor energyIncome
 			overdriveEnergySpending, -- AllyTeam energy spent on overdrive
 			energyWasted, -- AllyTeam energy excess
 
@@ -281,6 +284,7 @@ local function SetTeamEconomyRulesParams(
 			miscShare, -- Team share of constructor metal income
 
 			energyIncome, -- Total energy generator income
+			energyMisc, -- Team share innate and constructor energyIncome
 			overdriveEnergyNet, -- Amount of energy spent or recieved due to overdrive and income
 			overdriveEnergyChange) -- real change in energy due to overdrive
 
@@ -293,6 +297,7 @@ local function SetTeamEconomyRulesParams(
 		spSetTeamRulesParam(teamID, "OD_team_metalMisc",       pd.allyTeamMiscMetalIncome, privateTable)
 
 		spSetTeamRulesParam(teamID, "OD_team_energyIncome",    pd.allyTeamEnergyIncome, privateTable)
+		spSetTeamRulesParam(teamID, "OD_team_energyMisc",      pd.allyTeamEnergyMisc, privateTable)
 		spSetTeamRulesParam(teamID, "OD_team_energyOverdrive", pd.overdriveEnergySpending, privateTable)
 		spSetTeamRulesParam(teamID, "OD_team_energyWaste",     pd.energyWasted, privateTable)
 
@@ -301,6 +306,7 @@ local function SetTeamEconomyRulesParams(
 		spSetTeamRulesParam(teamID, "OD_metalMisc",       pd.miscShare, privateTable)
 
 		spSetTeamRulesParam(teamID, "OD_energyIncome",    pd.energyIncome, privateTable)
+		spSetTeamRulesParam(teamID, "OD_energyMisc",      pd.energyMisc, privateTable)
 		spSetTeamRulesParam(teamID, "OD_energyOverdrive", pd.overdriveEnergyNet, privateTable)
 		spSetTeamRulesParam(teamID, "OD_energyChange",    pd.overdriveEnergyChange, privateTable)
 
@@ -319,6 +325,7 @@ local function SetTeamEconomyRulesParams(
 	pd.allyTeamMiscMetalIncome = allyTeamMiscMetalIncome
 
 	pd.allyTeamEnergyIncome = allyTeamEnergyIncome
+	pd.allyTeamEnergyMisc = allyTeamEnergyMisc
 	pd.overdriveEnergySpending = overdriveEnergySpending
 	pd.energyWasted = energyWasted
 
@@ -327,6 +334,7 @@ local function SetTeamEconomyRulesParams(
 	pd.miscShare = miscShare
 
 	pd.energyIncome = energyIncome
+	pd.energyMisc = energyMisc
 	pd.overdriveEnergyNet = overdriveEnergyNet
 	pd.overdriveEnergyChange = overdriveEnergyChange
 end
@@ -988,8 +996,8 @@ function gadget:GameFrame(n)
 				resourceShares = allyTeamData.teams
 			end
 			
-			local allyTeamMiscMetalIncome = 0
-			local allyTeamSharedEnergyIncome= 0
+			local allyTeamMiscMetalIncome = allyTeamData.innateMetal
+			local allyTeamSharedEnergyIncome = allyTeamData.innateEnergy
 			local teamEnergy = {}
 			
 			for i = 1, allyTeamData.teams do
@@ -1034,6 +1042,7 @@ function gadget:GameFrame(n)
 			if debugMode then
 				Spring.Echo("=============== Overdrive Debug " .. allyTeamID .. " ===============")
 				Spring.Echo("resourceShares", resourceShares, "teams", allyTeamData.teams, "metal", allyTeamMiscMetalIncome, "energy", allyTeamSharedEnergyIncome)
+				Spring.Echo("splitByShare", splitByShare, "innate metal", allyTeamData.innateMetal, "innate energy", allyTeamData.innateEnergy)
 			end
 			
 			--// Calculate total energy and other metal income from structures and units
@@ -1056,7 +1065,7 @@ function gadget:GameFrame(n)
 				-- Collect energy information and contribute to ally team data.
 				local te = teamEnergy[teamID]
 				
-				if splitByShare and (teamResourceShare[teamID] == 1) then
+				if (not splitByShare) or (teamResourceShare[teamID] == 1) then
 					te.inc = te.inc + allyTeamSharedEnergyIncome/resourceShares
 				end
 
@@ -1451,12 +1460,14 @@ function gadget:GameFrame(n)
 				local odShare = 0
 				local baseShare = 0
 				local miscShare = 0
+				local energyMisc = 0
 
 				local share = (splitByShare and teamResourceShare[teamID]) or 1
 				if share > 0 then
 					odShare = ((share * summedOverdriveMetalAfterPayback / resourceShares) + (teamPaybackOD[teamID] or 0)) or 0
 					baseShare = ((share * summedBaseMetalAfterPrivate / resourceShares) + (privateBaseMetal[teamID] or 0)) or 0
 					miscShare = share * allyTeamMiscMetalIncome / resourceShares
+					energyMisc = share * allyTeamSharedEnergyIncome / resourceShares
 				end
 
 				sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
@@ -1486,6 +1497,7 @@ function gadget:GameFrame(n)
 					allyTeamMiscMetalIncome, -- AllyTeam constructor income
 
 					allyTeamEnergyIncome, -- AllyTeam total energy income (everything)
+					allyTeamSharedEnergyIncome,
 					overdriveEnergySpending, -- AllyTeam energy spent on overdrive
 					energyWasted, -- AllyTeam energy excess
 
@@ -1494,6 +1506,7 @@ function gadget:GameFrame(n)
 					miscShare, -- Team share of constructor metal income
 
 					te.inc, -- Non-reclaim energy income for the team
+					energyMisc, -- Team share of innate and constructor income
 					te.overdriveEnergyNet, -- Amount of energy spent or recieved due to overdrive and income
 					te.overdriveEnergyNet + te.inc -- real change in energy due to overdrive
 				)
@@ -1762,6 +1775,16 @@ function externalFunctions.AddUnitResourceGeneration(unitID, metal, energy, shar
 
 	spSetUnitRulesParam(unitID, "wanted_metalIncome", metalIncome, inlosTrueTable)
 	spSetUnitRulesParam(unitID, "wanted_energyIncome", energyIncome, inlosTrueTable)
+end
+
+function externalFunctions.AddInnateIncome(allyTeamID, metal, energy)
+	if not (allyTeamID and allyTeamInfo[allyTeamID]) then
+		return
+	end
+	allyTeamInfo[allyTeamID].innateMetal = (allyTeamInfo[allyTeamID].innateMetal or 0) + metal
+	allyTeamInfo[allyTeamID].innateEnergy = (allyTeamInfo[allyTeamID].innateEnergy or 0) + energy
+	Spring.SetGameRulesParam("OD_allyteam_metal_innate_" .. allyTeamID, allyTeamInfo[allyTeamID].innateMetal)
+	Spring.SetGameRulesParam("OD_allyteam_energy_innate_" .. allyTeamID, allyTeamInfo[allyTeamID].innateEnergy)
 end
 
 function externalFunctions.RedirectTeamIncome(giveTeamID, recieveTeamID)
