@@ -17,6 +17,7 @@ local turretRail = piece('turretRail');
 local turretSlidePanel = piece('turretSlidePanel');
 local wakeLeft = piece('wakeLeft');
 local wakeRight = piece('wakeRight');
+local TorpMuzzle = piece('TorpMuzzle');
 
 local SIG_Move = 1
 local SIG_Aim = 2
@@ -87,7 +88,22 @@ function script.AimFromWeapon(id)
 end
 
 function script.QueryWeapon(id)
-	return torpedo
+	return turretMain;
+end
+
+local function FireAndReload(num)
+	Hide(torpedo)
+	Move(torpedo,y_axis,7);
+	Move(torpedo,z_axis,-2);
+	Sleep(30);
+	Show(torpedo);
+	Move(torpedo,y_axis,0,10);
+	Move(torpedo,z_axis,0,10);
+end
+
+function script.FireWeapon(id)
+	StartThread(FireAndReload);
+	return true
 end
 
 function script.AimWeapon(id, heading, pitch)
