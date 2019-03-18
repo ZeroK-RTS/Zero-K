@@ -261,16 +261,18 @@ local function DrainShieldAndCheckProjectilePenetrate(unitID, damage, realDamage
 		PossiblyUpdateLinks(unitID, allyTeamID)
 		local shieldData = allyTeamShields[allyTeamID].Get(unitID)
 		
-		totalCharge = 0
-		shieldCharges = {}
-		shieldData.neighbors.ApplyNoArg(SumCharge)
+		if shieldData then
+			totalCharge = 0
+			shieldCharges = {}
+			shieldData.neighbors.ApplyNoArg(SumCharge)
 
-		if damage < totalCharge then
-			Spring.SetUnitShieldState(unitID, -1, true, realDamage)
-			chargeProportion = 1 - damage/totalCharge
-			shieldData.neighbors.ApplyNoArg(SetCharge)
-			shieldCharges = nil
-			return false
+			if damage < totalCharge then
+				Spring.SetUnitShieldState(unitID, -1, true, realDamage)
+				chargeProportion = 1 - damage/totalCharge
+				shieldData.neighbors.ApplyNoArg(SetCharge)
+				shieldCharges = nil
+				return false
+			end
 		end
 		shieldCharges = nil
 	elseif PARTIAL_PENETRATE and proID then
