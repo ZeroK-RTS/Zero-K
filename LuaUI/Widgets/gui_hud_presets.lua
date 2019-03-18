@@ -895,6 +895,7 @@ local function SetupMinimapLeftPreset()
 		coreSelectorWidth, 
 		coreSelectorHeight
 	)
+	WG.SetWidgetOption(coreName, corePath, "leftsideofscreen", false)
 	
 	-- Commander Upgrade
 	local commUpgradeWidth = 200
@@ -999,6 +1000,7 @@ local function SetupMinimapRightPreset()
 		coreSelectorWidth, 
 		coreSelectorHeight
 	)
+	WG.SetWidgetOption(coreName, corePath, "leftsideofscreen", true)
 	
 	-- Commander Upgrade
 	local commUpgradeWidth = 200

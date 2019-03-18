@@ -121,7 +121,7 @@ for name in pairs(exceptionList) do
 	end
 end
 
-local function CheckHide()
+local function CheckHide(forceUpdate)
 	local spec = Spring.GetSpectatingState()
 	local showButtons, showBackground
 	if options.showCoreSelector.value == 'always' then
@@ -142,7 +142,7 @@ local function CheckHide()
 	if showBackground == showButtons then
 		mainBackground.SetVisible(showBackground)
 	end
-	mainBackground.UpdateSpecShowMode(showBackground ~= showButtons)
+	mainBackground.UpdateSpecShowMode(showBackground ~= showButtons, forceUpdate)
 end
 
 function widget:PlayerChanged()
@@ -166,6 +166,7 @@ local function ButtonHolderResize(self)
 		buttonCountLimit = buttonCountLimit + 1
 	end
 	
+	CheckHide(true)
 	buttonList.UpdateLayout()
 end
 
@@ -188,7 +189,7 @@ local defaultFacHotkeys = {
 }
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning'}
+options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
 options = { 
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -232,25 +233,25 @@ options = {
 		name = 'Track idle comms',
 		type = 'bool',
 		value = true,
-		noHotkey = true,	
+		noHotkey = true,
 	},
 	monitoridlenano = {
 		name = 'Track idle nanotowers',
 		type = 'bool',
 		value = true,
-		noHotkey = true,	
+		noHotkey = true,
 	},
 	monitorInbuiltCons = {
 		name = 'Track constructors being built',
 		type = 'bool',
 		value = false,
-		noHotkey = true,	
+		noHotkey = true,
 	},
 	leftMouseCenter = {
 		name = 'Swap Camera Center Button',
 		desc = 'When enabled left click a commander or factory to center the camera on it. When disabled right click centers.',
 		type = 'bool',
-		value = false,		
+		value = false,
 		noHotkey = true,
 	},
 	lblSelectionIdle = { type='label', name='Idle Units', path='Hotkeys/Selection', },
@@ -346,7 +347,16 @@ options = {
 		end,
 		hidden = true,
 		noHotkey = true,
-	}
+	},
+	leftsideofscreen = {  
+		name = 'Left side of screen',
+		type = 'number',
+		type = 'bool',
+		value = true,
+		hidden = true,
+		noHotkey = true,
+		OnChange = OptionsUpdateLayout,
+	},
 }
 
 
@@ -649,12 +659,11 @@ local function GetBackground(parent)
 		backgroundPanel:Invalidate()
 	end
 	
-	function externalFunctions.UpdateSpecShowMode(newSpecShowMode)
-		if newSpecShowMode == specShowMode then
+	function externalFunctions.UpdateSpecShowMode(newSpecShowMode, forceUpdate)
+		if (not forceUpdate) and (newSpecShowMode == specShowMode) then
 			return
 		end
 		specShowMode = newSpecShowMode
-		
 		if options.fancySkinning.value ~= "panel" then
 			externalFunctions.SetSkin(options.fancySkinning.value)
 		end
@@ -662,17 +671,18 @@ local function GetBackground(parent)
 		externalFunctions.UpdateSize()
 		if specShowMode then
 			externalFunctions.SetVisible(specShow)
-			if mainWindow.x < 100 then
+			if options.leftsideofscreen.value then
+				mainWindow.padding[1] = -1
 				mainWindow.padding[3] = 3
 			else
 				mainWindow.padding[1] = 3
+				mainWindow.padding[3] = -1
 			end
-			mainWindow:Invalidate()
 		else
 			mainWindow.padding[1] = -1
 			mainWindow.padding[3] = -1
-			mainWindow:Invalidate()
 		end
+		mainWindow:UpdateClientArea()
 	end
 	
 	function externalFunctions.UpdateSpecSpace(newSpecShow)
@@ -1384,9 +1394,9 @@ local function GetButtonListHandler(buttonBackground)
 			button.Destroy()
 		end
 		buttons = {}
-	    buttonMap = {}
-	    buttonList = {}
-	    buttonCount = 0
+		buttonMap = {}
+		buttonList = {}
+		buttonCount = 0
 		buttonBackground.UpdateSize(buttonCount)
 	end
 	
