@@ -284,7 +284,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			return true,false --hold this command
 		end
 		return true,true --remove this command
-	elseif cmdID == CMD_EXTENDED_UNLOAD then
+	elseif cmdID == CMD_EXTENDED_UNLOAD and cmdParams and cmdParams[3] then
 		if (transportPhase[unitID] and transportPhase[unitID]== "INTERNAL_UNLOAD_UNITS") then
 			return true,true --remove this command
 		end
