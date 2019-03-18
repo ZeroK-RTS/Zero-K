@@ -3362,7 +3362,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 						if not origHeight[i][j] then
 							origHeight[i][j] = spGetGroundHeight(i,j)
 						end
-						local newHeight = (groundHeight - origHeight[i][j]) * maxSmooth * (1 - disSQ/smoothradiusSQ)^2
+						local newHeight = (groundHeight - origHeight[i][j]) * maxSmooth * (1 - disSQ/smoothradiusSQ)^1.5
 						posCount = posCount + 1
 						posX[posCount] = i
 						posY[posCount] = newHeight
