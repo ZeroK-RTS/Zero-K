@@ -95,7 +95,7 @@ local function FireAndReload(num)
 	Hide(torpedo)
 	Move(torpedo,y_axis,7);
 	Move(torpedo,z_axis,-2);
-	Sleep(30);
+	Sleep(1000);
 	Show(torpedo);
 	Move(torpedo,y_axis,0,10);
 	Move(torpedo,z_axis,0,10);
