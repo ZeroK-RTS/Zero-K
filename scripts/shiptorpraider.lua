@@ -84,11 +84,11 @@ function script.Create()
 end
 
 function script.AimFromWeapon(id)
-	return turretMain
+	return turretRail
 end
 
 function script.QueryWeapon(id)
-	return turretMain;
+	return turretRail;
 end
 
 local function FireAndReload(num)
