@@ -581,7 +581,11 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ' - Damage:'
 			cells[#cells+1] = dam_str
 		end
-		if show_reload then
+		
+		if cp.post_capture_reload then
+			cells[#cells+1] = ' - Reloadtime:'
+			cells[#cells+1] = numformat (tonumber(cp.post_capture_reload)/30,2) .. 's'
+		elseif show_reload then
 			cells[#cells+1] = ' - Reloadtime:'
 			cells[#cells+1] = numformat (reloadtime,2) .. 's'
 		end

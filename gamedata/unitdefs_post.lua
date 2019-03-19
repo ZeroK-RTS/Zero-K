@@ -180,6 +180,9 @@ for name, ud in pairs(UnitDefs) do
 				if wd.customparams and wd.customparams.script_burst then
 					ud.customparams.script_burst = wd.customparams.script_burst
 				end
+				if wd.customparams and wd.customparams.post_capture_reload then
+					ud.customparams.post_capture_reload = wd.customparams.post_capture_reload
+				end
 			end
 		end
 	end
