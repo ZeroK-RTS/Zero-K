@@ -30,7 +30,7 @@ options = {
 		name='High Quality',
 		value=false,
 		noHotkey=true,
-		advanced=true,
+		advanced=false,
 		OnChange = function(self) InitTextures() end,
 	}, 
 	autofocus = 
