@@ -183,6 +183,8 @@ for name, ud in pairs(UnitDefs) do
 				if wd.customparams and wd.customparams.post_capture_reload then
 					ud.customparams.post_capture_reload = wd.customparams.post_capture_reload
 				end
+				wd.customparams = wd.customparams or {}
+				wd.customparams.is_unit_weapon = 1
 			end
 		end
 	end

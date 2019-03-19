@@ -434,9 +434,14 @@ function gadget:Initialize()
 		local unitDefID = spGetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)
 	end
-	-- Hopefully not all weapon callins will need to be watched
-	-- in some future version.
-	for weaponID,_ in pairs(WeaponDefs) do
-		Script.SetWatchWeapon(weaponID, true)
+
+	for weaponID,wd in pairs(WeaponDefs) do
+		if wd.customParams and wd.customParams.is_unit_weapon then
+			if Script.SetWatchAllowTarget then
+				Script.SetWatchAllowTarget(weaponID, true)
+			else
+				Script.SetWatchWeapon(weaponID, true)
+			end
+		end
 	end
 end

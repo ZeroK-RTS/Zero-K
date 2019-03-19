@@ -30,9 +30,13 @@ for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
 	
 	if wd.customParams and wd.customParams.massliftthrow then
-		Script.SetWatchWeapon(wd.id,true)
 		throwWeaponID[wd.id] = true
 		throwWeaponName[wd.name] = wd.id
+		if Script.SetWatchExplosion then
+			Script.SetWatchExplosion(wd.id, true)
+		else
+			Script.SetWatchWeapon(wd.id, true)
+		end
 	end
 end
 

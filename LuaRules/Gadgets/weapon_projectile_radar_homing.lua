@@ -37,7 +37,11 @@ end
 
 function gadget:Initialize()
 	for id, _ in pairs(projectileHomingDistance) do 
-		Script.SetWatchWeapon(id, true)
+		if Script.SetWatchProjectile then
+			Script.SetWatchProjectile(id, true)
+		else
+			Script.SetWatchWeapon(id, true)
+		end
 	end
 end
 

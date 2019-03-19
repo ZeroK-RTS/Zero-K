@@ -44,8 +44,12 @@ for wdid = 1, #WeaponDefs do
 		wantedWeaponList[#wantedWeaponList + 1] = wdid
 
 		if wdcp.nofriendlyfire == "needs hax" then
-			Script.SetWatchWeapon(wdid, true)
 			haxWeapons[wdid] = true
+			if Script.SetWatchProjectile then
+				Script.SetWatchProjectile(wdid, true)
+			else
+				Script.SetWatchWeapon(wdid, true)
+			end
 		end
 	end
 end

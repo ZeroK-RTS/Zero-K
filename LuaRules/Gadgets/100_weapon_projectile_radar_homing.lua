@@ -32,6 +32,11 @@ local projectileHomingDistance = {
 
 function gadget:Initialize()
 	for id, _ in pairs(projectileHomingDistance) do 
+		if Script.SetWatchProjectile then
+			Script.SetWatchProjectile(id, true)
+		else
+			Script.SetWatchWeapon(id, true)
+		end
 		Script.SetWatchWeapon(id, true)
 	end
 end

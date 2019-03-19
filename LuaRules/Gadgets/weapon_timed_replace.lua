@@ -29,7 +29,11 @@ local projectileAllyTeam = {}
 
 function gadget:Initialize()
 	weaponLoseTrackingFrames[WeaponDefNames["bomberdive_bombsabot"].id] = 14
-	Script.SetWatchWeapon(WeaponDefNames["bomberdive_bombsabot"].id, true)
+	if Script.SetWatchProjectile then
+		Script.SetWatchProjectile(WeaponDefNames["bomberdive_bombsabot"].id, true)
+	else
+		Script.SetWatchWeapon(WeaponDefNames["bomberdive_bombsabot"].id, true)
+	end
 end
 
 function gadget:GameFrame(n)

@@ -32,7 +32,11 @@ function gadget:Initialize()
 			if (UnitDefNames[spawn_def.name] and not spawn_def.feature) or (FeatureDefNames[spawn_def.name] and spawn_def.feature) then
 				spawn_defs_id[weaponID] = spawn_def
 				wantedList[#wantedList + 1] = weaponID
-				Script.SetWatchWeapon(weaponID, true)
+				if Script.SetWatchProjectile then
+					Script.SetWatchProjectile(weaponID, true)
+				else
+					Script.SetWatchWeapon(weaponID, true)
+				end
 			end
 		end
 	end

@@ -24,13 +24,17 @@ local wantedList = {}
 
 --// find nukes
 for i=1,#WeaponDefs do
-  local wd = WeaponDefs[i]
-  --note that area of effect is radius, not diameter here!
-  if (wd.damageAreaOfEffect >= 300 and wd.targetable) then
-    nux[wd.id] = true
-	wantedList[#wantedList + 1] = wd.id
-    Script.SetWatchWeapon(wd.id, true)
-  end
+	local wd = WeaponDefs[i]
+	--note that area of effect is radius, not diameter here!
+	if (wd.damageAreaOfEffect >= 800 and wd.targetable) then
+		nux[wd.id] = true
+		wantedList[#wantedList + 1] = wd.id
+		if Script.SetWatchExplosion then
+			Script.SetWatchExplosion(wd.id, true)
+		else
+			Script.SetWatchWeapon(wd.id, true)
+		end
+	end
 end
 
 function gadget:Explosion_GetWantedWeaponDef()
@@ -38,8 +42,8 @@ function gadget:Explosion_GetWantedWeaponDef()
 end
 
 function gadget:Explosion(weaponID, px, py, pz, ownerID)
-  if (nux[weaponID] and py-GetGroundHeight(px,pz)>100) then
-    return true
-  end
-  return false
+	if (nux[weaponID] and py-GetGroundHeight(px,pz)>100) then
+		return true
+	end
+	return false
 end
