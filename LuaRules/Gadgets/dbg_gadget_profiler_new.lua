@@ -308,15 +308,22 @@ end
 
 function SyncedCallinStarted(_,gname,cname)
 	timersSynced[#timersSynced+1] = spGetTimer() -- callins may call each other -> we need a FIFO queue 
-	local _,_,s,_ = spGetLuaMemUsage and spGetLuaMemUsage() 
-	memUsageSynced[#memUsageSynced+1] = s or 0
+	if spGetLuaMemUsage then
+		local _,_,s,_ = spGetLuaMemUsage() 
+		memUsageSynced[#memUsageSynced+1] = s
+	else
+		memUsageSynced[#memUsageSynced+1] = 0
+	end
 end
 
 function SyncedCallinFinished(_,gname,cname)
 	local dt = spDiffTimers(spGetTimer(),timersSynced[#timersSynced])
 	timersSynced[#timersSynced] = nil
-	local _,_,new_s,_ = spGetLuaMemUsage and spGetLuaMemUsage() 
-	local ds = (new_s or 0) - memUsageSynced[#memUsageSynced] 
+	local ds = 0
+	if spGetLuaMemUsage then
+		local _,_,new_s,_ = spGetLuaMemUsage() 
+		ds = new_s - memUsageSynced[#memUsageSynced]
+	end
 	memUsageSynced[#memUsageSynced] = nil
 
 	local gadgetCallinStats = callinStatsSYNCED[gname] or {}
@@ -326,8 +333,8 @@ function SyncedCallinFinished(_,gname,cname)
 
 	c[1] = c[1] + dt
 	c[2] = c[2] + dt
-	c[3] = c[3] + (ds or 0)
-	c[4] = c[4] + (ds or 0)
+	c[3] = c[3] + ds
+	c[4] = c[4] + ds
 end
 
 function Start (_,_,_,pID,_)
