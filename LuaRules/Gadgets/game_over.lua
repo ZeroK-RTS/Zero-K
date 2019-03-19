@@ -672,10 +672,7 @@ function gadget:PlayerChanged (playerID)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
-	if (teamID ~= gaiaTeamID)
-	  and(not doesNotCountList[unitDefID])
-	  and(not finishedUnits[unitID])
-	then
+	if (teamID ~= gaiaTeamID) and (not doesNotCountList[unitDefID]) and (not finishedUnits[unitID]) then
 		finishedUnits[unitID] = true
 		AddAllianceUnit(unitID, unitDefID, teamID)
 	end

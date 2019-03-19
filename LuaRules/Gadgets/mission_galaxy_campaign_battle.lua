@@ -68,6 +68,7 @@ local vitalUnits = {}
 local defeatConditionConfig
 local victoryAtLocation = {}
 local typeVictoryLocations = {}
+local finishedUnits = {} -- Units that have been non-nanoframes at some point.
 
 local midgamePlacement = {}
 
@@ -450,16 +451,13 @@ local function RemoveBonusObjectiveUnit(unitID, bonusObjectiveID)
 		return
 	end
 	if objectiveData.units[unitID] then
-		local inbuild
 		if objectiveData.countRemovedUnits or objectiveData.onlyCountRemovedUnits then
-			inbuild = (select(3, Spring.GetUnitIsStunned(unitID)) and 1) or 0
-			if inbuild == 0 then
+			if finishedUnits[unitID] then
 				objectiveData.removedUnits = (objectiveData.removedUnits or 0) + 1
 			end
 		end
 		if objectiveData.failOnUnitLoss then
-			inbuild = inbuild or ((select(3, Spring.GetUnitIsStunned(unitID)) and 1) or 0)
-			if inbuild == 0 then
+			if finishedUnits[unitID] then
 				CompleteBonusObjective(bonusObjectiveID, false)
 			end
 		end
@@ -1397,6 +1395,7 @@ function gadget:UnitFinished(unitID, unitDefID, teamID, builderID)
 		vitalUnits[unitID] = true
 	end
 	MaybeAddTypeVictoryLocation(unitID, unitDefID, teamID)
+	finishedUnits[unitID] = true
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
@@ -1418,6 +1417,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	CheckInitialUnitDestroyed(unitID)
 	if unitLineage[unitID] then
 		unitLineage[unitID] = nil
+	end
+	if finishedUnits[unitID] then
+		finishedUnits[unitID] = false
 	end
 end
 
