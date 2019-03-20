@@ -42,7 +42,6 @@ local spGetCommandQueue	= Spring.GetCommandQueue
 local spGetGameSeconds	= Spring.GetGameSeconds
 local spGetFeaturePosition = Spring.GetFeaturePosition
 local spGetPlayerInfo = Spring.GetPlayerInfo
-local spGetUnitStates = Spring.GetUnitStates
 local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
 local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitLastAttacker = Spring.GetUnitLastAttacker
@@ -747,8 +746,7 @@ function GateKeeperOrCommandFilter (cQueue,persistentData, unitInMotionSingleUni
 	if cQueue~=nil then --prevent ?. Forgot...
 		local isReloading = CheckIfUnitIsReloading(unitInMotionSingleUnit) --check if unit is reloading/shieldCritical
 		local unitID = unitInMotionSingleUnit["unitID"]
-		local state=spGetUnitStates(unitID)
-		local holdPosition= (state.movestate == 0)
+		local holdPosition= (Spring.Utilities.GetUnitMoveState(unitID) == 0)
 		local unitType = unitInMotionSingleUnit["unitType"]
 		local unitInView = unitInMotionSingleUnit["isVisible"]
 		local retreating = false

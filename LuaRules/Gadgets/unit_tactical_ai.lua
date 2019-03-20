@@ -32,7 +32,6 @@ local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
 local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spGetUnitLosState     = Spring.GetUnitLosState
-local spGetUnitStates       = Spring.GetUnitStates
 local spValidUnitID         = Spring.ValidUnitID
 local spGetUnitIsStunned    = Spring.GetUnitIsStunned
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
@@ -558,7 +557,7 @@ local function updateUnits(frame, start, increment)
 				break
 			end
 			local cQueue = spGetCommandQueue(unitID, 3)
-			local holdPos = (spGetUnitStates(unitID).movestate == 0)
+			local holdPos = (Spring.Utilities.GetUnitMoveState(unitID) == 0)
 			local enemy, move, haveFight, autoAttackEnemyID = getUnitOrderState(unitID, data, cQueue, holdPos) -- returns target enemy and movement state
 			--local ux,uy,uz = spGetUnitPosition(unitID)
 			--Spring.MarkerAddPoint(ux,uy,uz,"unit active")

@@ -19,7 +19,6 @@ if gadgetHandler:IsSyncedCode() then
 
 local spGetUnitPosition   = Spring.GetUnitPosition
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
-local spGetUnitStates     = Spring.GetUnitStates
 local spMoveCtrlGetTag    = Spring.MoveCtrl.GetTag
 local spGetCommandQueue   = Spring.GetCommandQueue
 
@@ -327,7 +326,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		unitData.cx, unitData.cz = cmdParams[1], cmdParams[3]
 		unitData.commandString = cmdParams[1] .. "_" .. cmdParams[3]
 		commandCount[unitData.commandString] = (commandCount[unitData.commandString] or 0) + 1
-		unitData.preventGoalClumping = (not goalDistOverride) and (distSq > COMMON_STOP_RADIUS_ACTIVE_DIST_SQ) and not (spGetUnitStates(unitID) or {})["repeat"]
+		unitData.preventGoalClumping = (not goalDistOverride) and (distSq > COMMON_STOP_RADIUS_ACTIVE_DIST_SQ) and not Spring.Utilities.GetUnitRepeat(unitID)
 	end
 	if unitData.preventGoalClumping and unitData.commandString and not commonStopRadius[unitData.commandString] then
 		commonStopRadius[unitData.commandString] = oldCommandStoppingRadius[unitData.commandString] or 0

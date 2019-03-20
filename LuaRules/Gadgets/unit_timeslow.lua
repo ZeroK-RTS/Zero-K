@@ -32,7 +32,6 @@ local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spGetUnitHealth       = Spring.GetUnitHealth
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spGetCommandQueue     = Spring.GetCommandQueue
-local spGetUnitStates       = Spring.GetUnitStates
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spSetUnitTarget       = Spring.SetUnitTarget
 local spGetUnitNearestEnemy	= Spring.GetUnitNearestEnemy
@@ -131,7 +130,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			-- set order by player
 			if #cmd > 1 and (cmd[1].id == CMD_ATTACK and #cmd[1].params == 1 and cmd[1].params[1] == unitID
 				and (cmd[2].id == CMD_ATTACK or (#cmd > 2 and cmd[2].id == CMD_SET_WANTED_MAX_SPEED and cmd[3].id == CMD_ATTACK))) then
-				local re = spGetUnitStates(attackerID)["repeat"]
+				local re = Spring.Utilities.GetUnitRepeat(attackerID)
 				if cmd[2].id == CMD_SET_WANTED_MAX_SPEED then
 					spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag,cmd[2].tag}, 0)
 				else

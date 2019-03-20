@@ -1048,8 +1048,7 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 		end
 		
 		-- Update repeat
-		local states = Spring.GetUnitStates(unitID)
-		UpdateRepeat(states and states["repeat"])
+		UpdateRepeat(Spring.Utilities.GetUnitRepeat(unitID))
 		
 		-- Update tooltip
 		local queue = Spring.GetFullBuildQueue(unitID) or {}

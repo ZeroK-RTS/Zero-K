@@ -126,8 +126,7 @@ function gadget:GameFrame(n)
 		local data = unitList[i]
 		local unitID = data.unitID
 		
-		local activeState = Spring.GetUnitStates(unitID)
-		activeState = activeState and activeState["active"]
+		local activeState = Spring.Utilities.GetUnitActiveState(unitID)
 		
 		local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
 		local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)

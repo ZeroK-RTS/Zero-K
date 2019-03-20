@@ -133,7 +133,7 @@ local function ReloadQueue(unitID, queue, cmdTag)
 		return
 	end
 
-	local re = Spring.GetUnitStates(unitID)["repeat"]
+	local re = Spring.Utilities.GetUnitRepeat(unitID)
 	local storeParams
 	--// remove finished command
 	local start = 1

@@ -20,7 +20,6 @@ end
 --------------------------------------------------------------------------------
 
 local spGetCommandQueue = Spring.GetCommandQueue
-local spGetUnitStates = Spring.GetUnitStates
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local myTeamID
@@ -87,7 +86,7 @@ local function CheckBombers() -- swap bombers whose commands have changed and up
 
 	for unitID, _ in pairs(reservedBombers) do
 		if isFighting(unitID) then
-			local oldFirestate = spGetUnitStates(unitID).firestate or 0
+			local oldFirestate = Spring.Utilities.GetUnitFireState(unitID) or 0
 			SetFireState(unitID, FIRESTATE_FIREATWILL)
 			fightingBombers[unitID] = oldFirestate
 			reservedBombers[unitID] = nil
@@ -126,7 +125,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 
 	if isFighting(unitID) then
-		local oldFirestate = spGetUnitStates(unitID).firestate or 0
+		local oldFirestate = Spring.Utilities.GetUnitFireState(unitID) or 0
 		SetFireState(unitID, FIRESTATE_FIREATWILL)
 		fightingBombers[unitID] = oldFirestate
 	else

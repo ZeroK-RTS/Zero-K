@@ -34,7 +34,6 @@ local spGetUnitAllyTeam   = Spring.GetUnitAllyTeam
 local spGetUnitTeam       = Spring.GetUnitTeam
 local spGetUnitPosition   = Spring.GetUnitPosition
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
-local spGetUnitStates     = Spring.GetUnitStates
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local spSetTeamRulesParam = Spring.SetTeamRulesParam
@@ -972,8 +971,8 @@ function gadget:GameFrame(n)
 						local stunned_or_inbuld = spGetUnitIsStunned(unitID) or
 							(spGetUnitRulesParam(unitID,"disarmed") == 1) or
 							(spGetUnitRulesParam(unitID,"morphDisable") == 1)
-						local states = spGetUnitStates(unitID)
-						local currentlyActive = (not stunned_or_inbuld) and ((states and states.active) or pylonData.neededLink)
+						local activeState = Spring.Utilities.GetUnitActiveState(unitID)
+						local currentlyActive = (not stunned_or_inbuld) and (activeState or pylonData.neededLink)
 						if (currentlyActive) and (not pylonData.active) then
 							ReactivatePylon(unitID)
 						elseif (not currentlyActive) and (pylonData.active) then
@@ -1015,7 +1014,6 @@ function gadget:GameFrame(n)
 							sumEnergy = sumEnergy + energy
 						else
 							local stunned_or_inbuld = spGetUnitIsStunned(unitID)
-							local states = spGetUnitStates(unitID)
 							local currentlyActive = not stunned_or_inbuld
 							local metal, energy = 0, 0
 							if currentlyActive then

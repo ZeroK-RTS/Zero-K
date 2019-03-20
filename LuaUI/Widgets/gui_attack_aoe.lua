@@ -60,7 +60,6 @@ local GetMouseState          = Spring.GetMouseState
 local GetSelectedUnitsSorted = Spring.GetSelectedUnitsSorted
 local GetUnitPosition        = Spring.GetUnitPosition
 local GetUnitRadius          = Spring.GetUnitRadius
-local GetUnitStates          = Spring.GetUnitStates
 local TraceScreenRay         = Spring.TraceScreenRay
 local CMD_ATTACK             = CMD.ATTACK
 local CMD_MANUALFIRE         = CMD.MANUALFIRE
@@ -756,13 +755,12 @@ function widget:DrawWorld()
 	if (weaponType == "noexplode") then
 		DrawNoExplode(info.aoe, fx, fy, fz, tx, ty, tz, info.range)
 	elseif (weaponType == "ballistic") then
-		local states = GetUnitStates(unitID)
-		local trajectory
-	if (states and states.trajectory) then
-		trajectory = 1
-	else
-		trajectory = -1
-	end
+		local trajectory = Spring.Utilities.GetUnitTrajectoryState(unitID)
+		if trajectory then
+			trajectory = 1
+		else
+			trajectory = -1
+		end
 		DrawAoE(tx, ty, tz, info.aoe, info.ee)
 		DrawBallisticScatter(info.scatter, info.v, info.mygravity, fx, fy, fz, tx, ty, tz, trajectory, info.range)
 	elseif (weaponType == "tracking") then

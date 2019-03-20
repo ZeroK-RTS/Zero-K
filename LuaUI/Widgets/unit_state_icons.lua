@@ -17,6 +17,8 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(103, 1120)
+
 local spGetUnitArmored       = Spring.GetUnitArmored
 local spGetUnitRulesParam    = Spring.GetUnitRulesParam
 local spGetUnitHealth        = Spring.GetUnitHealth
@@ -134,36 +136,35 @@ function SetUnitStateIcons(unitID)
 		return
 	end
 	
-	local states = spGetUnitStates(unitID)
-	
-	if not states then 
-		return 
-	end
-	
 	local ud = spGetUnitDefID(unitID)
-	if ud then
-		ud = UnitDefs[ud]
-	end
+	ud = ud and UnitDefs[ud]
 	
-	if ud and ud.customParams.completely_hidden then
+	if not ud then
 		return
 	end
 	
 	if options.showstateonshift.value then
-		if ud then
-			if ud.canAttack or ud.isFactory then
-				if not prevFirestate[unitID] or prevFirestate[unitID] ~= states.firestate then
-					prevFirestate[unitID] = states.firestate
-					local fireStateIcon = fireStateIcons[states.firestate]
-					WG.icons.SetUnitIcon( unitID, {name='firestate', texture=fireStateIcon} )
-				end
+		local firestate, movestate
+		if REVERSE_COMPAT then
+			local states = spGetUnitStates(unitID)
+			if states then
+				firestate, movestate = states.firestate, states.movestate
 			end
-			if (ud.canMove or ud.canPatrol) and ((not ud.isBuilding) or ud.isFactory) then
-				if not prevMovestate[unitID] or prevMovestate[unitID] ~= states.movestate then
-					prevMovestate[unitID] = states.movestate
-					local moveStateIcon = moveStateIcons[states.movestate]
-					WG.icons.SetUnitIcon( unitID, {name='movestate', texture=moveStateIcon} )
-				end
+		else
+			firestate, movestate = spGetUnitStates(unitID, false)
+		end
+		if ud.canAttack or ud.isFactory then
+			if not prevFirestate[unitID] or prevFirestate[unitID] ~= firestate then
+				prevFirestate[unitID] = firestate
+				local fireStateIcon = fireStateIcons[firestate]
+				--WG.icons.SetUnitIcon( unitID, {name='firestate', texture=fireStateIcon} )
+			end
+		end
+		if (ud.canMove or ud.canPatrol) and ((not ud.isBuilding) or ud.isFactory) then
+			if not prevMovestate[unitID] or prevMovestate[unitID] ~= movestate then
+				prevMovestate[unitID] = movestate
+				local moveStateIcon = moveStateIcons[movestate]
+				--WG.icons.SetUnitIcon( unitID, {name='movestate', texture=moveStateIcon} )
 			end
 		end
 	end
@@ -173,10 +174,10 @@ function SetUnitStateIcons(unitID)
 		armored = armored and amount and amount ~= 1
 		if not lastArmored[unitID] and armored then
 			lastArmored[unitID] = true
-			WG.icons.SetUnitIcon( unitID, {name='armored', texture=armoredTexture} )
+			--WG.icons.SetUnitIcon( unitID, {name='armored', texture=armoredTexture} )
 		elseif lastArmored[unitID] and not armored then
 			lastArmored[unitID] = nil
-			WG.icons.SetUnitIcon( unitID, {name='armored', texture=nil} )
+			--WG.icons.SetUnitIcon( unitID, {name='armored', texture=nil} )
 		end
 	end
 
@@ -192,11 +193,11 @@ function SetUnitStateIcons(unitID)
 		if not prevPriority[unitID] or prevPriority[unitID] ~= state then
 			if state == 1 then
 				prevPriority[unitID] = state
-				WG.icons.SetUnitIcon( unitID, {name='priority', texture=nil} )
+				--WG.icons.SetUnitIcon( unitID, {name='priority', texture=nil} )
 			else
 				prevPriority[unitID] = state
 				local priorityIcons = priorityIcons[state]
-				WG.icons.SetUnitIcon( unitID, {name='priority', texture=priorityIcons} )
+				--WG.icons.SetUnitIcon( unitID, {name='priority', texture=priorityIcons} )
 			end
 		end
 	end
@@ -207,15 +208,14 @@ function SetUnitStateIcons(unitID)
 		if not prevMiscPriority[unitID] or prevMiscPriority[unitID] ~= state then
 			if state == 1 then
 				prevMiscPriority[unitID] = state
-				WG.icons.SetUnitIcon( unitID, {name='miscpriority', texture=nil} )
+				--WG.icons.SetUnitIcon( unitID, {name='miscpriority', texture=nil} )
 			else
 				prevMiscPriority[unitID] = state
 				local miscPriorityIcons = miscPriorityIcons[state]
-				WG.icons.SetUnitIcon( unitID, {name='miscpriority', texture=miscPriorityIcons} )
+				--WG.icons.SetUnitIcon( unitID, {name='miscpriority', texture=miscPriorityIcons} )
 			end
 		end
 	end
-	
 end
 
 local function UpdateAllUnits()
@@ -232,7 +232,6 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	SetUnitStateIcons(unitID)
@@ -253,10 +252,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		return
 	end
 
-	if key == KEYSYMS.LSHIFT
-		or key == KEYSYMS.RSHIFT
-		then
-		
+	if key == KEYSYMS.LSHIFT or key == KEYSYMS.RSHIFT then
 		hide = false
 		
 		if options.showstateonshift.value then
@@ -277,11 +273,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 	end
 end
 function widget:KeyRelease(key, modifier )
-	
-	if key == KEYSYMS.LSHIFT
-		or key == KEYSYMS.RSHIFT
-		then
-		
+	if key == KEYSYMS.LSHIFT or key == KEYSYMS.RSHIFT then
 		hide = true
 		
 		WG.icons.SetDisplay('firestate', false)
@@ -322,7 +314,6 @@ function widget:Initialize()
 	WG.icons.SetDisplay('movestate', false)
 	
 	UpdateAllUnits()
-	
 end
 
 --------------------------------------------------------------------------------

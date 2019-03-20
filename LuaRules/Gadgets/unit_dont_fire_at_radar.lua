@@ -33,7 +33,6 @@ local spGetCommandQueue     = Spring.GetCommandQueue
 local spSetUnitTarget       = Spring.SetUnitTarget
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitPosition     = Spring.GetUnitPosition
-local spGetUnitStates       = Spring.GetUnitStates
 
 local CMD_ATTACK		= CMD.ATTACK
 local CMD_OPT_INTERNAL 	= CMD.OPT_INTERNAL
@@ -118,7 +117,7 @@ function GG.DontFireRadar_CheckAim(unitID)
 		local cQueue = spGetCommandQueue(unitID, 1)
 		local data = units[unitID]
 		if isTheRightSortOfCommand(cQueue, 1) and not canShootAtUnit(cQueue[1].params[1], spGetUnitAllyTeam(unitID)) then
-			local firestate = spGetUnitStates(unitID).firestate
+			local firestate = Spring.Utilities.GetUnitFireState(unitID)
 			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {0}, 0 )
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0 )
 			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {firestate}, 0 )

@@ -84,8 +84,7 @@ local function IsWaiting(unitID)
 end
 
 local function RemoveAttackCommandIfFirst(unitID)
-	local states = Spring.GetUnitStates(unitID) or EMPTY_TABLE
-	local rpt = states["repeat"]
+	local rpt = Spring.Utilities.GetUnitRepeat(unitID)
 	
 	local cmd = Spring.GetCommandQueue(unitID, 1)[1]
 	if (not cmd) or (cmd.id ~= CMD.ATTACK) then

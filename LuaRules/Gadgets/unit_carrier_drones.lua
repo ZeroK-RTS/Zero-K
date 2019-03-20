@@ -203,9 +203,9 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		Spring.MoveCtrl.Disable(droneID)
 		Spring.SetUnitCOBValue(droneID, 82, (rot - math.pi)*65536/2/math.pi)
 		
-		local states = Spring.GetUnitStates(unitID) or emptyTable
+		local movestate = Spring.Utilities.GetUnitMoveState(unitID)
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
-		GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.movestate }, 0)
+		GiveOrderToUnit(droneID, CMD.FIRE_STATE, { movestate }, 0)
 		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
 		local rx, rz = RandomPointInUnitCircle()
 		-- Drones intentionall use CMD.MOVE instead of CMD_RAW_MOVE as they do not require any of the features
@@ -572,8 +572,8 @@ local function UpdateCarrierTarget(carrierID, frame)
 		end
 	end
 	
-	local states = Spring.GetUnitStates(carrierID) or emptyTable
-	local holdfire = states.firestate == 0
+	local firestate = Spring.Utilities.GetUnitFireState(carrierID)
+	local holdfire = (firestate == 0)
 	local rx, rz
 	
 	for i = 1, #carrierList[carrierID].droneSets do
@@ -585,7 +585,6 @@ local function UpdateCarrierTarget(carrierID, frame)
 		for droneID in pairs(set.drones) do
 			tempCONTAINER = droneList[droneID]
 			droneList[droneID] = nil -- to keep AllowCommand from blocking the order
-			local droneStates = Spring.GetUnitStates(carrierID) or emptyTable
 			
 			if attackOrder or setTargetOrder then
 				-- drones fire at will if carrier has an attack/target order
@@ -593,7 +592,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { 2 }, 0) 
 			else
 				-- update firestate based on that of carrier
-				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.firestate }, 0) 
+				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { firestate }, 0) 
 			end
 			
 			if recallDrones then
@@ -615,7 +614,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 				local cQueue = GetCommandQueue(droneID, -1)
 				local engaged = false
 				for i=1, (cQueue and #cQueue or 0) do
-					if cQueue[i].id == CMD.FIGHT and droneStates.firestate > 0 then
+					if cQueue[i].id == CMD.FIGHT and firestate > 0 then
 						-- if currently fighting AND not on hold fire
 						engaged = true
 						break

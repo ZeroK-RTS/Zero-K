@@ -55,7 +55,7 @@ function widget:GameFrame(frame)
 					if data.height ~= c1height or math.abs(c1height - cmd[1].params[2]) > 32 then
 						data.height = Spring.GetGroundHeight(cmd[2].params[1],cmd[2].params[3])
 						Spring.GiveOrderToUnit(unitID, CMD_ATTACK, cmd[1].params, CMD.OPT_SHIFT)
-						if Spring.GetUnitStates(unitID)["repeat"] then
+						if Spring.Utilities.GetUnitRepeat(unitID) then
 							Spring.GiveOrderToUnit(unitID, CMD_ATTACK, {cmd[1].params[1], data.height, cmd[1].params[3]}, CMD.OPT_SHIFT)
 						end
 					end

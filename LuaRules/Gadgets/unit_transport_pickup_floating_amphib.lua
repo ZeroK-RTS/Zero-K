@@ -29,7 +29,6 @@ local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
-local spGetUnitStates = Spring.GetUnitStates
 local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
 local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
 local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
@@ -242,7 +241,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			if y >= -20 then --unit is above water
 				--"PHASE B"--
 				--Spring.Echo("B")
-				local isRepeat = spGetUnitStates(unitID)["repeat"]
+				local isRepeat = Spring.Utilities.GetUnitRepeat(unitID)
 				local options = isRepeat and CMD.OPT_INTERNAL or CMD.OPT_SHIFT 
 				transportPhase[unitID] = "INTERNAL_LOAD_UNITS " .. cargoID
 				giveLOAD_order[#giveLOAD_order+1] = {unitID,CMD.INSERT,{1,CMD.LOAD_UNITS,options,cargoID}, CMD.OPT_ALT}
@@ -274,7 +273,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 				transportPhase[unitID] = "ALREADY_CALL_UNIT_ONCE"
 			end
 			if haveFloater then
-				local isRepeat = spGetUnitStates(unitID)["repeat"]
+				local isRepeat = Spring.Utilities.GetUnitRepeat(unitID)
 				local options = isRepeat and CMD.OPT_INTERNAL or CMD.OPT_SHIFT 
 				transportPhase[unitID] = "INTERNAL_LOAD_UNITS " .. cmdParams[1]+cmdParams[3]
 				giveLOAD_order[#giveLOAD_order+1] = {unitID,CMD.INSERT,{1,CMD.LOAD_UNITS,options,unpack(cmdParams)}, CMD.OPT_ALT}

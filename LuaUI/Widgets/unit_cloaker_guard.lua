@@ -38,7 +38,6 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local spGetUnitPosition   = Spring.GetUnitPosition
 local spGetSelectedUnits  = Spring.GetSelectedUnits
-local spGetUnitStates     = Spring.GetUnitStates
 local spValidUnitID       = Spring.ValidUnitID
 local spGetUnitDefID      = Spring.GetUnitDefID
 local spGetCommandQueue   = Spring.GetCommandQueue
@@ -191,7 +190,7 @@ function widget:CommandNotify(id, params, options)
 				for _,sid in ipairs(units) do
 					local ud = UnitDefs[spGetUnitDefID(sid)]
 					if ud.canMove and not ud.isFactory then
-						local firestate = spGetUnitStates(sid).firestate
+						local firestate = Spring.Utilities.GetUnitFireState(sid)
 						local speed = ud.speed/30
 						if speed < v.maxVel then
 							v.maxVel = speed

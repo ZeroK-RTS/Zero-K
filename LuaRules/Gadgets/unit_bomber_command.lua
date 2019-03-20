@@ -183,7 +183,7 @@ local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 	-- workaround for STOP not clearing attack order due to auto-attack
 	-- we set it to hold fire temporarily, revert once commands have been reset
 	local queue = spGetCommandQueue(unitID, -1)
-	local firestate = Spring.GetUnitStates(unitID).firestate
+	local firestate = Spring.Utilities.GetUnitFireState(unitID)
 	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, 0)
 	spGiveOrderToUnit(unitID, CMD.STOP, emptyTable, 0)
 	if queue then
@@ -343,7 +343,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	if unitDefID and bomberDefs[unitDefID] then
 		-- Remove fight orders to implement a fight command version of CommandFire if Fight is the last command.
 		local queueLength = spGetCommandQueue(unitID, 0)
-		if queueLength <= 2 and (not Spring.GetUnitStates(unitID)["repeat"]) then
+		if queueLength <= 2 and (not Spring.Utilities.GetUnitRepeat(unitID)) then
 			spGiveOrderToUnit(unitID, CMD.REMOVE, {CMD.FIGHT}, CMD.OPT_ALT)
 		end
 	end
@@ -545,7 +545,7 @@ function gadget:GameFrame(n)
 					if spotCount>0 then
 						local padPiece = airpadsData[padID].emptySpot[spotCount]
 						table.remove(airpadsData[padID].emptySpot) --remove used spot
-						if Spring.GetUnitStates(bomberID)["repeat"] then 
+						if Spring.Utilities.GetUnitRepeat(bomberID) then 
 							cmdIgnoreSelf = true
 							-- InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
 							spGiveOrderToUnit(bomberID, CMD.INSERT, {-1, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, CMD.OPT_ALT) --Internal to avoid repeat

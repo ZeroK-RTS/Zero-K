@@ -34,7 +34,6 @@ local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitVelocity = Spring.GetUnitVelocity
-local spGetUnitStates = Spring.GetUnitStates
 local spGetCommandQueue = Spring.GetCommandQueue
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
@@ -505,8 +504,7 @@ local function AddImpulses()
 							spGiveOrderToUnit(unitID, CMD_STOP, {0}, 0)
 						end
 
-						local states = spGetUnitStates(unitID)
-						if states["repeat"] then
+						if Spring.Utilities.GetUnitRepeat(unitID) then
 							spGiveOrderToUnit(unitID, CMD_REPEAT, {0}, 0)
 						end
 					--end

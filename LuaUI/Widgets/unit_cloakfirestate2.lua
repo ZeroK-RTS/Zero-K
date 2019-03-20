@@ -39,7 +39,6 @@ options = {
 --------------------------------------------------------------------------------
 -- Speedups
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
-local GetUnitStates    = Spring.GetUnitStates
 local GetUnitDefID     = Spring.GetUnitDefID
 local GetUnitIsCloaked = Spring.GetUnitIsCloaked
 
@@ -70,9 +69,9 @@ function widget:UnitCloaked(unitID, unitDefID, teamID)
 	if (not enabled) or (teamID ~= myTeam) or exceptionArray[unitDefID] then 
 		return
 	end
-	local states = GetUnitStates(unitID)
-	cloakUnit[unitID] = states.firestate --store last state
-	if states.firestate ~= 0 then
+	local firestate = Spring.Utilities.GetUnitFireState(unitID)
+	cloakUnit[unitID] = firestate --store last state
+	if firestate ~= 0 then
 		STATIC_STATE_TABLE[1] = 0
 		GiveOrderToUnit(unitID, CMD.FIRE_STATE, STATIC_STATE_TABLE, 0)
 	end
@@ -82,8 +81,7 @@ function widget:UnitDecloaked(unitID, unitDefID, teamID)
 	if (not enabled) or (teamID ~= myTeam) or exceptionArray[unitDefID] or (not cloakUnit[unitID]) then 
 		return
 	end
-	local states = GetUnitStates(unitID)
-	if states.firestate == 0 then
+	if Spring.Utilities.GetUnitFireState(unitID) == 0 then
 		local targetState = cloakUnit[unitID]
 		STATIC_STATE_TABLE[1] = targetState
 		GiveOrderToUnit(unitID, CMD.FIRE_STATE, STATIC_STATE_TABLE, 0) --revert to last state
@@ -107,8 +105,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 		return
 	end
 	if unitTeam == myTeam then
-		local states = GetUnitStates(unitID)
-		cloakUnit[unitID] = states.firestate
+		cloakUnit[unitID] = Spring.Utilities.GetUnitFireState(unitID)
 	else
 		cloakUnit[unitID] = nil
 	end

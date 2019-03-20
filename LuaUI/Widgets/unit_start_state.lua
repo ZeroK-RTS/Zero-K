@@ -957,7 +957,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				if builderID then
 					local bdid = Spring.GetUnitDefID(builderID)
 					if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
-						local firestate = Spring.GetUnitStates(builderID).firestate
+						local firestate = Spring.Utilities.GetUnitFireState(builderID)
 						if firestate then
 							orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, CMD.OPT_SHIFT}
 							trueBuilder = true
@@ -982,7 +982,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				if builderID then
 					local bdid = Spring.GetUnitDefID(builderID)
 					if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
-						local movestate = Spring.GetUnitStates(builderID).movestate
+						local movestate = Spring.Utilities.GetUnitMoveState(builderID)
 						if movestate then
 							orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, CMD.OPT_SHIFT}
 							trueBuilder = true
