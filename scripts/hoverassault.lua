@@ -20,6 +20,7 @@ local rim2 = piece 'rim2'
 include "constants.lua"
 include "pieceControl.lua"
 include "rockPiece.lua"
+local dynamicRockData
 
 local shootCycle = 0
 local gunHeading = 0
@@ -109,8 +110,8 @@ end
 
 --[[
 function script.HitByWeapon(x, z, weaponID, damage)
-	StartThread(Rock, z_axis, false, x*ROCK_DAMGE_MULT*damage)
-	StartThread(Rock, x_axis, false, -z*ROCK_DAMGE_MULT*damage)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], false, x*ROCK_DAMGE_MULT*damage)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], false, -z*ROCK_DAMGE_MULT*damage)
 end
 ]]
 
@@ -142,7 +143,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (100)
 	end
@@ -266,8 +267,8 @@ end
 
 
 function script.FireWeapon(num)
-	StartThread(Rock, z_axis, gunHeading, ROCK_FIRE_FORCE)
-	StartThread(Rock, x_axis, gunHeading - hpi, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], gunHeading - hpi, ROCK_FIRE_FORCE)
 	EmitSfx(flareMap[shootCycle], 1025)
 	shootCycle = (shootCycle + 1) % 2
 end

@@ -33,6 +33,7 @@ local SIG_MOVE = 1
 
 --rockz
 include "rockPiece.lua"
+local dynamicRockData
 
 local ROCK_PIECE = base	-- should be negative to alternate rocking direction
 local ROCK_SPEED = 3		--number of quarter-cycles per second around z-axis
@@ -95,7 +96,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Spin( sonar , y_axis, math.rad(60) )
 	Spin( radarpole , y_axis, math.rad(-90) )
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 end
 
 -- SetMaxReloadTime(Func_Var_1)
@@ -225,7 +226,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num) 
-	StartThread(Rock, z_axis, gun_1_yaw, ROCK_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gun_1_yaw, ROCK_FORCE)
 	
 	gun_1 = 1 - gun_1
 	

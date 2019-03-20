@@ -39,6 +39,8 @@ local SIG_MOVE = 8
 
 --rockz
 include "rockPiece.lua"
+local dynamicRockData
+
 local ROCK_PIECE = hull -- should be negative to alternate rocking direction
 local ROCK_SPEED = 3 --number of quarter-cycles per second around z-axis
 local ROCK_DECAY = -1/2	--rocking around z-axis is reduced by this factor each time' 
@@ -68,7 +70,7 @@ local gun_1_yaw = 0
 local dead = false
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, smokePiece)
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 end
 
 local function RestoreAfterDelay()
@@ -114,7 +116,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot(num)
-	StartThread(Rock, z_axis, gun_1_yaw, ROCK_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gun_1_yaw, ROCK_FORCE)
 	gun1 = gun1 + 1
 	if gun1 == 4 then
 		 gun1 = 0 end

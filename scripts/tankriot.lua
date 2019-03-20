@@ -2,6 +2,7 @@ include "constants.lua"
 include "rockPiece.lua"
 include "trackControl.lua"
 include "pieceControl.lua"
+local dynamicRockData
 
 local base, turret, sleeve = piece ('base', 'turret', 'sleeve')
 
@@ -166,8 +167,8 @@ end
 function script.FireWeapon()
 	currentMissile = 3 - currentMissile
 	StartThread(ReloadThread, currentMissile)
-	StartThread(Rock, z_axis, gunHeading, ROCK_FIRE_FORCE)
-	StartThread(Rock, x_axis, gunHeading - hpi, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], gunHeading - hpi, ROCK_FIRE_FORCE)
 end
 
 function script.BlockShot(num, targetID)
@@ -175,7 +176,7 @@ function script.BlockShot(num, targetID)
 end
 
 function script.Create()
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 	InitiailizeTrackControl(trackData)
 
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do

@@ -1,5 +1,6 @@
 include "constants.lua"
 include "rockPiece.lua"
+local dynamicRockData
 include "trackControl.lua"
 include "pieceControl.lua"
 
@@ -133,7 +134,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 	InitiailizeTrackControl(trackData)
 	
 	Hide(flare)
@@ -172,8 +173,8 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon()
-	StartThread(Rock, 1, gunHeading, ROCK_FIRE_FORCE_TILT)
-	StartThread(Push, 2, gunHeading - hpi, ROCK_FIRE_FORCE_PUSH)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[1], gunHeading, ROCK_FIRE_FORCE_TILT)
+	StartThread(GG.ScriptRock.Push, dynamicRockData[2], gunHeading - hpi, ROCK_FIRE_FORCE_PUSH)
 	Move(barrel, z_axis, BARREL_DISTANCE)
 	Move(breech, z_axis, BREECH_DISTANCE)
 	Move(barrel, z_axis, 0, BARREL_SPEED)

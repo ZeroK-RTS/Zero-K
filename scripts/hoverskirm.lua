@@ -1,5 +1,6 @@
 include "constants.lua"
 include "rockPiece.lua"
+local dynamicRockData
 
 local base = piece 'base' 
 local front = piece 'front' 
@@ -108,7 +109,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 end
 
 local function RestoreAfterDelay()
@@ -142,8 +143,8 @@ function script.QueryWeapon(piecenum)
 end
 
 function script.FireWeapon()
-	StartThread(Rock, z_axis, gunHeading, ROCK_FIRE_FORCE)
-	StartThread(Rock, x_axis, gunHeading - hpi, ROCK_FIRE_FORCE*0.4)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], gunHeading - hpi, ROCK_FIRE_FORCE*0.4)
 end
 
 function script.BlockShot(num, targetID)

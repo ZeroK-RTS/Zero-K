@@ -40,6 +40,7 @@ local RECOIL_RESTORE_SPEED = 2.5
 
 --rockz
 include "rockPiece.lua"
+local dynamicRockData
 
 local ROCK_PIECE = ground		--piece to rock
 local ROCK_SPEED = 1		--number of rock angles per second around z-axis
@@ -75,7 +76,7 @@ function script.Create()
 	Turn(turret3, y_axis, math.rad(180))
 	Spin(radar, y_axis, math.rad(100))
 	StartThread(GG.Script.SmokeUnit, smokePiece)
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 end
 
 local function RestoreAfterDelay()
@@ -125,7 +126,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	StartThread(Rock, z_axis, gunHeading[num], ROCK_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading[num], ROCK_FORCE)
 end
 
 function script.Shot(num)

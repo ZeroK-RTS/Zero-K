@@ -1,5 +1,6 @@
 include "constants.lua"
 include "rockPiece.lua"
+local dynamicRockData
 include "trackControl.lua"
 include "pieceControl.lua"
 
@@ -104,7 +105,7 @@ function RestoreBarrel()
 end
 
 function script.Create()
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 	InitiailizeTrackControl(trackData)
 
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
@@ -160,8 +161,8 @@ function script.Shot(num)
 	if num ~= 1 then
 		return
 	end
-	StartThread(Rock, z_axis, gunHeading, ROCK_FIRE_FORCE)
-	StartThread(Rock, x_axis, gunHeading - hpi, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], gunHeading - hpi, ROCK_FIRE_FORCE)
 	
 	EmitSfx(firepoint1, LARGE_MUZZLE_FLASH_FX)
 	Move(barrel1, z_axis, -5)

@@ -15,6 +15,7 @@ local spike = piece 'spike'
 include "constants.lua"
 include "rockPiece.lua"
 include "JumpRetreat.lua"
+local dynamicRockData
 
 local smokePieces = {turret}
 
@@ -34,14 +35,14 @@ local SIG_STOP = 64
 
 local ROCK_FORCE = 0.22
 
--- Rock X
+-- GG.ScriptRock.Rock X
 local ROCK_X_SPEED = 10 -- Number of half-cycles per second around x-axis.
 local ROCK_X_DECAY = -1/2 -- Rocking around x-axis is reduced by this factor each time = piece 'to rock.
 local ROCK_X_PIECE = pre_turret -- should be negative to alternate rocking direction.
 local ROCK_X_MIN = 0.05 -- If around x-axis rock is not greater than this amount, rocking will stop after returning to center.
 local ROCK_X_MAX = 0.5
 
--- Rock Z
+-- GG.ScriptRock.Rock Z
 local ROCK_Z_SPEED = 10 -- Number of half-cycles per second around z-axis.
 local ROCK_Z_DECAY = -1/2 -- Rocking around z-axis is reduced by this factor each time = piece 'to rock.
 local ROCK_Z_PIECE = pre_turret -- should be between -1 and 0 to alternate rocking direction.
@@ -238,7 +239,7 @@ function script.Create()
 	Move(base, y_axis, 3)
 	Move(l_rocket, x_axis, 2)
 	Move(r_rocket, x_axis, -2)
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 	StartThread(GG.Script.SmokeUnit, smokePieces)
 end
 
@@ -272,8 +273,8 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	StartThread(Rock, z_axis, gunHeading, ROCK_FORCE)
-	StartThread(Rock, x_axis, gunHeading - hpi, ROCK_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], gunHeading - hpi, ROCK_FORCE)
 	Move(spike, z_axis, 30, 1800)
 	WaitForMove(spike, z_axis)
 	Move(spike, z_axis, 0, 40)

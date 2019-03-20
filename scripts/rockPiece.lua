@@ -37,9 +37,13 @@ More details:
 rock_z should be positive to rock away from the firing direction.
 ]]--
 
-local rockData = {}
+if GG.ScriptRock then
+	return
+end
+GG.ScriptRock = {}
 
-function InitializeRock(rockInitData)
+function GG.ScriptRock.InitializeRock(rockInitData)
+	local rockData = {}
 	for key, data in pairs(rockInitData) do
 		rockData[key] = {
 			piece = data.piece,
@@ -55,10 +59,10 @@ function InitializeRock(rockInitData)
 			extraEffect = data.extraEffect,
 		}
 	end
+	return rockData
 end
 
-function Oscillate(Func, key, heading, rockAmount)
-	local rock = rockData[key]
+function GG.ScriptRock.Oscillate(Func, rock, heading, rockAmount)
 	Signal(rock.signal)
 	SetSignalMask(rock.signal)
 	local magnitude = (heading and math.sin(heading)) or 1
@@ -99,10 +103,10 @@ function Oscillate(Func, key, heading, rockAmount)
 	rock.position = 0
 end
 
-function Rock(key, heading, rockAmount)
-	Oscillate(Turn, key, heading, rockAmount)
+function GG.ScriptRock.Rock(rockData, heading, rockAmount)
+	GG.ScriptRock.Oscillate(Turn, rockData, heading, rockAmount)
 end
 
-function Push(key, heading, rockAmount)
-	Oscillate(Move, key, heading, rockAmount)
+function GG.ScriptRock.Push(rockData, heading, rockAmount)
+	GG.ScriptRock.Oscillate(Move, rockData, heading, rockAmount)
 end

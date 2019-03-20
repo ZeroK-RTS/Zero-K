@@ -264,7 +264,7 @@ function script.Create()
 	end
 end
 
-local function Rock(anglex, anglez)	
+local function RockSelf(anglex, anglez)	
 	Turn(base, z_axis, -anglex, math.rad(50))
 	Turn(base, x_axis, anglez, math.rad(50))
 	WaitForTurn(base, z_axis)
@@ -274,7 +274,7 @@ local function Rock(anglex, anglez)
 end
 	
 function script.RockUnit(anglex, anglez)
-	StartThread(Rock, math.rad(anglex), math.rad(anglez))
+	StartThread(RockSelf, math.rad(anglex), math.rad(anglez))
 end
 
 local function RestoreAfterDelay1()
