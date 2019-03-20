@@ -268,11 +268,19 @@ local function GetGravityWeaponPriorityModifier(unitID, attackerWeaponDefID)
 end
 
 local function GetDisarmWeaponPriorityModifier(unitID, attackerWeaponDefID)
-	local stunned = GetUnitStunnedOrInBuild(unitID)
-	if stunned <= disarmWeaponTimeDefs[attackerWeaponDefID] then
-		return GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
+	local stunned, buildProgress = GetUnitStunnedOrInBuild(unitID)
+	local priority = (disarmPenaltyDefs[attackerWeaponDefID] or 10) + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
+	local fewAttackers = false
+	if buildProgress == 1 and (remStunAttackers[unitID] or 0) < STUN_ATTACKERS_IDLE_REQUIREMENT then
+		remStunAttackers[unitID] = (remStunAttackers[unitID] or 0) + 1
+		priority = priority - stunned*2 -- Counteract stunned penalty in normal priority
+		fewAttackers = true
 	end
-	return (disarmPenaltyDefs[attackerWeaponDefID] or 10) + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
+	if fewAttackers or stunned <= disarmWeaponTimeDefs[attackerWeaponDefID] then
+		return priority
+	end
+
+	return (disarmPenaltyDefs[attackerWeaponDefID] or 10) + priority
 end
 
 --------------------------------------------------------------------------------
