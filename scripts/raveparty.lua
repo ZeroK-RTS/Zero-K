@@ -83,8 +83,8 @@ end
 
 function script.HitByWeapon()
 	if Spring.GetUnitRulesParam(unitID,"disarmed") == 1 then
-		StopTurn (turret, y_axis)
-		StopTurn (spindle, x_axis)
+		GG.PieceControl.StopTurn (turret, y_axis)
+		GG.PieceControl.StopTurn (spindle, x_axis)
 	end
 end
 

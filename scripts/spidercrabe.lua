@@ -251,7 +251,7 @@ function script.Create()
 	Hide(flare6)
 	Hide(flare7)
 	
-	StartThread(StartStopMovingControl, script.StartMoving, script.StopMoving)
+	StartThread(GG.StartStopMovingControl, script.StartMoving, script.StopMoving)
 	
 	--StartThread(MotionControl)
 	StartThread(GG.Script.SmokeUnit, smokePiece)

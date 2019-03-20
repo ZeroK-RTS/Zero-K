@@ -64,11 +64,11 @@ local function StunThread ()
 	disarmed = true
 	Signal (SigAim)
 
-	-- StopMove (turret, y_axis) -- seems gebork
-	StopTurn (turret, y_axis)
-	StopTurn (launcher, x_axis)
-	StopTurn (door1, z_axis)
-	StopTurn (door2, z_axis)
+	-- GG.PieceControl.StopMove (turret, y_axis) -- seems gebork
+	GG.PieceControl.StopTurn (turret, y_axis)
+	GG.PieceControl.StopTurn (launcher, x_axis)
+	GG.PieceControl.StopTurn (door1, z_axis)
+	GG.PieceControl.StopTurn (door2, z_axis)
 end
 
 local function UnstunThread ()

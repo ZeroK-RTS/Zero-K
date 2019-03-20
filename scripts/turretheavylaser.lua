@@ -66,8 +66,8 @@ local function StunThread ()
 	SetSignalMask(SIG_AIM)
 	disarmed = true
 
-	StopTurn (basetop, y_axis)
-	StopTurn (housing, x_axis)
+	GG.PieceControl.StopTurn (basetop, y_axis)
+	GG.PieceControl.StopTurn (housing, x_axis)
 end
 
 local function UnstunThread()

@@ -50,8 +50,8 @@ local function StunThread ()
 	StopSpin (radar, y_axis)
 	for i = 1, 2 do
 		Signal (SIG_Aim[i])
-		StopTurn (turret[i], y_axis)
-		StopTurn (barrels[i], x_axis)
+		GG.PieceControl.StopTurn (turret[i], y_axis)
+		GG.PieceControl.StopTurn (barrels[i], x_axis)
 	end
 end
 

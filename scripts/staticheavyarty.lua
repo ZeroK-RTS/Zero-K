@@ -22,10 +22,10 @@ local smokePiece = {base, turret, ground}
 local function DisableCheck()
 	while true do
 		if select(1, spGetUnitIsStunned(unitID)) then
-			if StopTurn(sleeve, x_axis) then
+			if GG.PieceControl.StopTurn(sleeve, x_axis) then
 				Signal(SIG_AIM)
 			end
-			if StopTurn(turret, y_axis) then
+			if GG.PieceControl.StopTurn(turret, y_axis) then
 				Signal(SIG_AIM)
 			end
 		end

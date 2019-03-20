@@ -1,9 +1,12 @@
+if GG.StartStopMovingControl then
+	return
+end
 
-local spGetGroundHeight = Spring.GetGroundHeight
-local spGetUnitVelocity = Spring.GetUnitVelocity
-local spGetUnitPosition = Spring.GetUnitPosition
-
-function StartStopMovingControl(startFunc, stopFunc, thresholdSpeed, fallingCountsAsMoving)
+function GG.StartStopMovingControl(startFunc, stopFunc, thresholdSpeed, fallingCountsAsMoving)
+	local spGetGroundHeight = Spring.GetGroundHeight
+	local spGetUnitVelocity = Spring.GetUnitVelocity
+	local spGetUnitPosition = Spring.GetUnitPosition
+	
 	thresholdSpeed = thresholdSpeed or 0.05
 	local x,y,z, height, speed
 	local moving = false

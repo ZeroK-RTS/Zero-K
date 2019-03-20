@@ -3,7 +3,6 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- local CMD_REARM = 33410 --get from customcmds.h.lua
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetUnitMoveTypeData = Spring.GetUnitMoveTypeData
-local emptyTable = {}
 
 -- old crappy way
 --[[

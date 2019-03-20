@@ -204,8 +204,8 @@ local function StunThread()
 	disarmed = true
 	Signal(SIG_AIM)
 
-	StopTurn(gun, x_axis)
-	StopTurn(gun, y_axis)
+	GG.PieceControl.StopTurn(gun, x_axis)
+	GG.PieceControl.StopTurn(gun, y_axis)
 end
 
 local function UnstunThread()

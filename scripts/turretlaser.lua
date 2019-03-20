@@ -41,8 +41,8 @@ local function StunThread ()
 	SetSignalMask(SIG_AIM)
 	disarmed = true
 
-	StopTurn (turret, y_axis)
-	StopTurn (barrel, x_axis)
+	GG.PieceControl.StopTurn (turret, y_axis)
+	GG.PieceControl.StopTurn (barrel, x_axis)
 end
 
 local function UnstunThread ()
