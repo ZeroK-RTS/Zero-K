@@ -12,6 +12,9 @@ function GG.StartStopMovingControl(startFunc, stopFunc, thresholdSpeed, fallingC
 	local moving = false
 	while true do
 		x,y,z = spGetUnitPosition(unitID)
+		if not x then
+			return
+		end
 		height = spGetGroundHeight(x,z)
 		if y - height < 1 then
 			speed = select(4, spGetUnitVelocity(unitID))

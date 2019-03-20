@@ -111,7 +111,12 @@ function GG.Script.DelayTrueDeath(recentDamage, maxHealth, KillFunc, delayTime)
 
 	local ud = UnitDefs[unitDefID]
 	local x, y, z = Spring.GetUnitPosition(unitID)
-
+	
+	if not x then
+		Spring.Echo("NotX", x, unitID)
+		return
+	end
+	
 	-- hide unit
 	Spring.SetUnitNoSelect(unitID, true)
 	Spring.SetUnitNoDraw(unitID, true)

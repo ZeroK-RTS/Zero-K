@@ -230,6 +230,7 @@ function script.FireWeapon(num)
 end
 
 function script.Killed(recentDamage, maxHealth)
+	Signal(SIG_TAKEOFF)
 	local severity = recentDamage/maxHealth
 	if severity <= 0.25 then
 		Explode(fuselage, SFX.NONE)
