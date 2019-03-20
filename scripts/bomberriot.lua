@@ -25,13 +25,13 @@ local function Lights()
 end
 
 function script.StopMoving()
-	StartThread(GG.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 function script.Create()
 	SetInitialBomberSettings()
 	StartThread(GG.Script.SmokeUnit, smokePiece)
-	StartThread(GG.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	--StartThread(Lights)
 end
 

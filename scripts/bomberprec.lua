@@ -71,7 +71,7 @@ local function BehaviourChangeThread(behaviour)
 	local state = spGetUnitMoveTypeData(unitID).aircraftState
 	local flying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
 	if not flying then
-		StartThread(GG.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+		StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	end
 	
 	while not flying do
@@ -126,7 +126,7 @@ function script.StopMoving()
 	Move(wingr2, x_axis, 5, 30)
 	Move(wingl1, x_axis, -5, 30)
 	Move(wingl2, x_axis, -5, 30)
-	StartThread(GG.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 local function Lights()
@@ -143,7 +143,7 @@ end
 function script.Create()
 	SetInitialBomberSettings()
 	StartThread(GG.Script.SmokeUnit, smokePiece)
-	StartThread(GG.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	GG.FakeUpright.FakeUprightInit(xp, zp, drop) 
 	--StartThread(Lights)
 end
