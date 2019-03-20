@@ -105,17 +105,12 @@ function GG.Script.NonBlockingWaitTurn(piece, axis, angle, leeway)
 	end
 end
 
-function GG.Script.DelayTrueDeath(recentDamage, maxHealth, KillFunc, delayTime)
+function GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, KillFunc, delayTime)
 	
 	local wreckLevel = KillFunc(recentDamage, maxHealth)
 
 	local ud = UnitDefs[unitDefID]
 	local x, y, z = Spring.GetUnitPosition(unitID)
-	
-	if not x then
-		Spring.Echo("NotX", x, unitID)
-		return
-	end
 	
 	-- hide unit
 	Spring.SetUnitNoSelect(unitID, true)

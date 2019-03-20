@@ -124,6 +124,6 @@ local function Killed(recentDamage, maxHealth)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	return GG.Script.DelayTrueDeath(recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
+	return GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
 end
 

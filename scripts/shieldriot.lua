@@ -262,5 +262,5 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	Signal(SIG_ACTIVATE) -- prevent pulsing while undead
-	return GG.Script.DelayTrueDeath(recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
+	return GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
 end
