@@ -71,7 +71,7 @@ local function BehaviourChangeThread(behaviour)
 	local state = spGetUnitMoveTypeData(unitID).aircraftState
 	local flying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
 	if not flying then
-		StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+		StartThread(GG.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	end
 	
 	while not flying do
@@ -126,7 +126,7 @@ function script.StopMoving()
 	Move(wingr2, x_axis, 5, 30)
 	Move(wingl1, x_axis, -5, 30)
 	Move(wingl2, x_axis, -5, 30)
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 local function Lights()
@@ -143,8 +143,8 @@ end
 function script.Create()
 	SetInitialBomberSettings()
 	StartThread(GG.Script.SmokeUnit, smokePiece)
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-	FakeUprightInit(xp, zp, drop) 
+	StartThread(GG.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	GG.FakeUpright.FakeUprightInit(xp, zp, drop) 
 	--StartThread(Lights)
 end
 
@@ -185,7 +185,7 @@ function script.BlockShot(num, targetID)
 	--Spring.Echo(heading)
 	
 	if dz < 30 and dz > -30 and dx < 100 and dx > -100 and dy < 0 then
-		FakeUprightTurn(unitID, xp, zp, base, predrop) 
+		GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop) 
 		Move(drop, x_axis, dx)
 		Move(drop, z_axis, dz)
 		dy = math.max(dy, -30)

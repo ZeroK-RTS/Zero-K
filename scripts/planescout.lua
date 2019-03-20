@@ -28,12 +28,12 @@ function Cloak()
 end
 
 function script.StopMoving()
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 
 function script.Create()
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
