@@ -463,8 +463,9 @@ local function SendSetWantedMaxSpeed(alt, ctrl, meta, shift)
 	if ctrl then
 		local selUnits = spGetSelectedUnits()
 		for i = 1, #selUnits do
-			local uSpeed = UnitDefs[spGetUnitDefID(selUnits[i])].speed
-			if uSpeed > 0 and uSpeed < wantedSpeed then
+			local ud = UnitDefs[spGetUnitDefID(selUnits[i])]
+			local uSpeed = ud and ud.speed
+			if uSpeed and uSpeed > 0 and uSpeed < wantedSpeed then
 				wantedSpeed = uSpeed
 			end
 		end
