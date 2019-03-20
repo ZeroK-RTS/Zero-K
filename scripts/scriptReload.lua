@@ -1,4 +1,5 @@
-
+-- TODO: CACHE INCLUDE FILE
+-- May not be worth it due to all the local data.
 local ALLY_ACCESS = {allied = true}
 
 local extenalFunctions = {}

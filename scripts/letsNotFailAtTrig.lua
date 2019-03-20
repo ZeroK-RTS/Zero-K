@@ -1,3 +1,5 @@
+-- TODO: CACHE INCLUDE FILE
+-- Only Krow and Jugglenaut use this
 local hpi = math.pi*0.5
 
 local cos = math.cos

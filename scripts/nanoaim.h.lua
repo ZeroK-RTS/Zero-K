@@ -14,10 +14,13 @@
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local Utils_GetUnitNanoTarget = Spring.Utilities.GetUnitNanoTarget
+if GG.NanoAim then
+	return
+end
+GG.NanoAim = {}
 
-function UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
-	local type, target, isFeature = Utils_GetUnitNanoTarget(unitID)
+function GG.NanoAim.UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
+	local type, target, isFeature = Spring.Utilities.GetUnitNanoTarget(unitID)
 
 	if (target) then
 		local x,y,z
@@ -62,10 +65,10 @@ function UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
 end
 
 
-function UpdateNanoDirectionThread(nanopieces, updateInterval, turnSpeed,turnSpeedVert)
+function GG.NanoAim.UpdateNanoDirectionThread(nanopieces, updateInterval, turnSpeed,turnSpeedVert)
 	updateInterval = updateInterval or 1000
 	while true do
-		UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
+		GG.NanoAim.UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
 		Sleep(updateInterval)
 	end
 end

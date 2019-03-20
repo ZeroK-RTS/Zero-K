@@ -1,3 +1,5 @@
+-- TODO: CACHE INCLUDE FILE
+-- May not be worth it due to the rarity of comms, and the complexity of this file.
 local INLOS = {inlos = true}
 local spSetUnitShieldState = Spring.SetUnitShieldState
 
