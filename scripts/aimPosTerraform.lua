@@ -1,4 +1,8 @@
-local function SetupAimPosTerraform(unitID, unitDefID, defaultMid, defaultAim, minAimOffset, maxAimOffset, cliffPeek, searchRange)
+if GG.SetupAimPosTerraform then
+	return
+end
+
+function GG.SetupAimPosTerraform(unitID, unitDefID, defaultMid, defaultAim, minAimOffset, maxAimOffset, cliffPeek, searchRange)
 	local baseX,_,baseZ = Spring.GetUnitPosition(unitID)
 	baseHeight = Spring.GetGroundHeight(baseX, baseZ)
 	if baseHeight < 0 and UnitDefs[unitDefID].floatOnWater then
@@ -37,5 +41,3 @@ local function SetupAimPosTerraform(unitID, unitDefID, defaultMid, defaultAim, m
 	
 	StartThread(UpdateAimPos)
 end
-
-return SetupAimPosTerraform

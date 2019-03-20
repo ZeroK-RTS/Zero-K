@@ -1,6 +1,6 @@
 include "constants.lua"
 include "pieceControl.lua"
-
+include "aimPosTerraform.lua"
 ----------------------------------------------------------------------------------------------
 -- Model Pieces
 
@@ -8,7 +8,6 @@ local basebottom, basemid, basetop, holder, housing, spindle, aim = piece('baseb
 local flares = {piece('flare1', 'flare2', 'flare3')}
 
 local smokePiece = {basebottom, basemid, basetop}
-local SetupAimPosTerraform = Spring.Utilities.CacheInclude("scripts/aimPosTerraform.lua")
 
 ----------------------------------------------------------------------------------------------
 -- Local Constants
@@ -51,7 +50,7 @@ function script.Create()
 	local mid = {midTable.midx, midTable.midy, midTable.midz}
 	local aim = {midTable.midx, midTable.midy + 15, midTable.midz}
 
-	SetupAimPosTerraform(unitID, unitDefID, mid, aim, midTable.midy + 15, midTable.midy + 60, 15, 48)
+	GG.SetupAimPosTerraform(unitID, unitDefID, mid, aim, midTable.midy + 15, midTable.midy + 60, 15, 48)
 	
 	StartThread(GG.Script.SmokeUnit, smokePiece)
 end

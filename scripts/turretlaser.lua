@@ -7,8 +7,7 @@ local flare = piece 'flare'
 
 include "constants.lua"
 include "pieceControl.lua"
-
-local SetupAimPosTerraform = Spring.Utilities.CacheInclude("scripts/aimPosTerraform.lua")
+include "aimPosTerraform.lua"
 
 -- Signal definitions
 local SIG_AIM = 2
@@ -32,7 +31,7 @@ function script.Create()
 	local mid = {midTable.midx, midTable.midy, midTable.midz}
 	local aim = {midTable.midx, midTable.midy + 22, midTable.midz}
     
-	SetupAimPosTerraform(unitID, unitDefID, mid, aim, midTable.midy + 22, midTable.midy + 40, 15, 40)
+	GG.SetupAimPosTerraform(unitID, unitDefID, mid, aim, midTable.midy + 22, midTable.midy + 40, 15, 40)
 	
 	StartThread(GG.Script.SmokeUnit, {base})
 end

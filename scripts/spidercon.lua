@@ -60,7 +60,7 @@ local function Walk()
 	SetSignalMask(SIG_WALK)
 	while true do
 		
-		walk(leg1, leg2, leg3, leg4, leg5, leg6,
+		GG.SpiderWalk.walk(leg1, leg2, leg3, leg4, leg5, leg6,
 			legRaiseAngle, legRaiseSpeed, legLowerSpeed,
 			legForwardAngle, legForwardOffset, legForwardSpeed, legForwardTheta,
 			legMiddleAngle, legMiddleOffset, legMiddleSpeed, legMiddleTheta,
@@ -72,7 +72,7 @@ end
 local function RestoreLegs()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
-	restoreLegs(leg1, leg2, leg3, leg4, leg5, leg6,
+	GG.SpiderWalk.restoreLegs(leg1, leg2, leg3, leg4, leg5, leg6,
 		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)		
 end
 
