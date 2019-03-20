@@ -96,7 +96,7 @@ local function FireAndReload(num)
 
 	shotNum = (shotNum + 1)%3
 
-	scriptReload.GunStartReload(unitID, num)
+	scriptReload.GunStartReload(num)
 
 	Turn(lever, x_axis, 0, math.rad(50))
 	Turn(pod, x_axis, 0, math.rad(50))

@@ -348,7 +348,7 @@ end
 local SleepAndUpdateReload = scriptReload.SleepAndUpdateReload
 
 local function reload(num)
-	scriptReload.GunStartReload(unitID, num)
+	scriptReload.GunStartReload(num)
 	gun[num].loaded = false
 	gun[num].readyToAim = false
 
