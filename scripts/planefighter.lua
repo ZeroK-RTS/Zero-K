@@ -86,7 +86,7 @@ end
 function script.Create()
 	Move(rwing, x_axis, WING_DISTANCE)
 	Move(lwing, x_axis, -WING_DISTANCE)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.StartMoving()
@@ -116,11 +116,11 @@ end
 function script.FireWeapon(num)
 	if num == 1 then
 		shotCycle = 1 - shotCycle
-		EmitSfx(flare[shotCycle], UNIT_SFX3)
+		EmitSfx(flare[shotCycle], GG.Script.UNIT_SFX3)
 	elseif num == 2 then
-		EmitSfx(flare2, UNIT_SFX3)
+		EmitSfx(flare2, GG.Script.UNIT_SFX3)
 	elseif num == 3 then
-		EmitSfx(missile, UNIT_SFX2)
+		EmitSfx(missile, GG.Script.UNIT_SFX2)
 	end
 end
 
@@ -137,18 +137,18 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = (recentDamage/maxHealth)
 	if severity < 0.5 or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
-		Explode(base, sfxNone)
-		Explode(rwing, sfxNone)
-		Explode(lwing, sfxNone)
-		Explode(rjet, sfxSmoke + sfxFire + sfxExplode + sfxShatter + sfxExplodeOnHit)
-		Explode(ljet, sfxSmoke + sfxFire + sfxExplode + sfxShatter + sfxExplodeOnHit)
+		Explode(base, SFX.NONE)
+		Explode(rwing, SFX.NONE)
+		Explode(lwing, SFX.NONE)
+		Explode(rjet, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE + SFX.SHATTER + SFX.EXPLODE_ON_HIT)
+		Explode(ljet, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE + SFX.SHATTER + SFX.EXPLODE_ON_HIT)
 		return 1
 	else
-		Explode(base, sfxNone)
-		Explode(rwing, sfxNone)
-		Explode(lwing, sfxNone)
-		Explode(rjet, sfxSmoke + sfxFire + sfxExplode + sfxShatter + sfxExplodeOnHit)
-		Explode(ljet, sfxSmoke + sfxFire + sfxExplode + sfxShatter + sfxExplodeOnHit)
+		Explode(base, SFX.NONE)
+		Explode(rwing, SFX.NONE)
+		Explode(lwing, SFX.NONE)
+		Explode(rjet, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE + SFX.SHATTER + SFX.EXPLODE_ON_HIT)
+		Explode(ljet, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE + SFX.SHATTER + SFX.EXPLODE_ON_HIT)
 		return 2
 	end
 end

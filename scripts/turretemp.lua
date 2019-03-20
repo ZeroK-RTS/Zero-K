@@ -25,8 +25,8 @@ local readyToFire = false
 local RESTORE_DELAY = 3000
 local position = 0
 
-local tauOn12 = tau/12
-local tauOn6 = tau/6
+local tauOn12 = GG.Script.tau/12
+local tauOn6 = GG.Script.tau/6
 
 -- Signal definitions
 local SIG_RESTORE = 1
@@ -114,7 +114,7 @@ function script.Create()
 		Sleep(1000)
 	end
 	StartThread(RestoreAfterDelay)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -127,7 +127,7 @@ function script.AimWeapon(num, heading, pitch)
 		Sleep(250)
 	end
 
-	--Spring.Echo(heading*toDegrees)
+	--Spring.Echo(heading*GG.Script.toDegrees)
 	
 	position = math.floor((heading + tauOn12)/tauOn6)%6
 	--Spring.Echo(position)
@@ -157,38 +157,38 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
-		Explode(turret, sfxShatter)
-		Explode(door1, sfxSmoke)
-		Explode(door2, sfxSmoke)
-		Explode(door3, sfxSmoke)
-		Explode(door4, sfxSmoke)
-		Explode(door5, sfxSmoke)
-		Explode(door6, sfxSmoke)
+		Explode(turret, SFX.SHATTER)
+		Explode(door1, SFX.SMOKE)
+		Explode(door2, SFX.SMOKE)
+		Explode(door3, SFX.SMOKE)
+		Explode(door4, SFX.SMOKE)
+		Explode(door5, SFX.SMOKE)
+		Explode(door6, SFX.SMOKE)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(body, sfxShatter)
-		Explode(turret, sfxShatter)
-		Explode(door1, sfxFall)
-		Explode(door2, sfxFall)
-		Explode(barrel, sfxFall + sfxSmoke)
-		Explode(door4, sfxFall)
-		Explode(door6, sfxFall + sfxSmoke)
-		Explode(b1, sfxFall)
-		Explode(sleeve, sfxExplode + sfxSmoke)
+		Explode(body, SFX.SHATTER)
+		Explode(turret, SFX.SHATTER)
+		Explode(door1, SFX.FALL)
+		Explode(door2, SFX.FALL)
+		Explode(barrel, SFX.FALL + SFX.SMOKE)
+		Explode(door4, SFX.FALL)
+		Explode(door6, SFX.FALL + SFX.SMOKE)
+		Explode(b1, SFX.FALL)
+		Explode(sleeve, SFX.EXPLODE + SFX.SMOKE)
 		return 1
 	else
-		Explode(body, sfxShatter + sfxExplodeOnHit)
-		Explode(turret, sfxShatter)
-		Explode(door1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(door2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(door3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(door4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(door5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(door6, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(body, SFX.SHATTER + SFX.EXPLODE_ON_HIT)
+		Explode(turret, SFX.SHATTER)
+		Explode(door1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(door2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(door3, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(door4, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(door5, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(door6, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 
-		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(b1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(sleeve, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)		
+		Explode(barrel, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(b1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(sleeve, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)		
 		return 2
 	end
 end

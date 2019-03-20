@@ -19,7 +19,7 @@ local gun_1 = 0
 
 function script.Create()
 	restore_delay = 3000
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Turn(turret, x_axis, math.rad(-90), math.rad(10000))
 	Turn(doorl, z_axis, math.rad(-100), math.rad(240))
 	Turn(doorr, z_axis, math.rad(100), math.rad(240))
@@ -86,29 +86,29 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(base, sfxNone)
-		Explode(turret, sfxNone)
-		Explode(wake1, sfxNone)
-		Explode(wake2, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(wake1, SFX.NONE)
+		Explode(wake2, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(base, sfxNone)
-		Explode(turret, sfxShatter)
-		Explode(wake1, sfxFall + sfxExplode)
-		Explode(wake2, sfxFall + sfxExplode)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.SHATTER)
+		Explode(wake1, SFX.FALL + SFX.EXPLODE)
+		Explode(wake2, SFX.FALL + SFX.EXPLODE)
 		return 1
 	elseif severity <= .99 then
 		corpsetype = 3
-		Explode(base, sfxNone)
-		Explode(turret, sfxShatter)
-		Explode(wake1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(wake2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.SHATTER)
+		Explode(wake1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(wake2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	else
-		Explode(base, sfxNone)
-		Explode(turret, sfxShatter)
-		Explode(wake1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(wake2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.SHATTER)
+		Explode(wake1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(wake2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	end
 end

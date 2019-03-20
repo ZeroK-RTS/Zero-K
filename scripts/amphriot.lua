@@ -130,7 +130,7 @@ end
 
 function script.Create()
 	--StartThread(Walk)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(WeaponRangeUpdate)
 	local height = select(2, Spring.GetUnitPosition(unitID))
 	if height < -20 then
@@ -245,18 +245,18 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(base, sfxNone)
+		Explode(base, SFX.NONE)
 		return 1
 	elseif (severity <= .50) then
-		Explode(pelvis, sfxNone)
+		Explode(pelvis, SFX.NONE)
 		return 1
 	elseif (severity <= .99) then
-		Explode(pelvis, sfxShatter)
-		Explode(torso, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(pelvis, SFX.SHATTER)
+		Explode(torso, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	else
-		Explode(pelvis, sfxShatter)
-		Explode(torso, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(pelvis, SFX.SHATTER)
+		Explode(torso, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	end
 end

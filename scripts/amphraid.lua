@@ -143,7 +143,7 @@ local function WeaponRangeUpdate()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)	
+	StartThread(GG.Script.SmokeUnit, smokePiece)	
 	StartThread(WeaponRangeUpdate)
 end
 
@@ -212,40 +212,40 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(lfoot, sfxNone)
-		Explode(lshin, sfxNone)
-		Explode(lthigh, sfxNone)
-		Explode(rfoot, sfxNone)
-		Explode(rshin, sfxNone)
-		Explode(rthigh, sfxNone)
-		Explode(torso, sfxNone)
+		Explode(lfoot, SFX.NONE)
+		Explode(lshin, SFX.NONE)
+		Explode(lthigh, SFX.NONE)
+		Explode(rfoot, SFX.NONE)
+		Explode(rshin, SFX.NONE)
+		Explode(rthigh, SFX.NONE)
+		Explode(torso, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(lfoot, sfxFall)
-		Explode(lshin, sfxFall)
-		Explode(lthigh, sfxFall)
-		Explode(rfoot, sfxFall)
-		Explode(rshin, sfxFall)
-		Explode(rthigh, sfxFall)
-		Explode(torso, sfxShatter)
+		Explode(lfoot, SFX.FALL)
+		Explode(lshin, SFX.FALL)
+		Explode(lthigh, SFX.FALL)
+		Explode(rfoot, SFX.FALL)
+		Explode(rshin, SFX.FALL)
+		Explode(rthigh, SFX.FALL)
+		Explode(torso, SFX.SHATTER)
 		return 1
 	elseif severity <= .99 then
-		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(lshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(torso, sfxShatter)
+		Explode(lfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(lshin, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(lthigh, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rshin, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rthigh, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(torso, SFX.SHATTER)
 		return 2
 	else
-		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(lshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(torso, sfxShatter + sfxExplode)
+		Explode(lfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(lshin, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(lthigh, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rshin, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rthigh, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(torso, SFX.SHATTER + SFX.EXPLODE)
 		return 2
 	end
 end

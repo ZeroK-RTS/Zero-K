@@ -20,6 +20,7 @@ local smokePieces = {turret}
 
 local gunHeading = 0
 local walking = false
+local hpi = math.pi*0.5
 
 local PACE = 1.9
 
@@ -238,7 +239,7 @@ function script.Create()
 	Move(l_rocket, x_axis, 2)
 	Move(r_rocket, x_axis, -2)
 	InitializeRock(rockData)
-	StartThread(SmokeUnit, smokePieces)
+	StartThread(GG.Script.SmokeUnit, smokePieces)
 end
 
 function script.AimFromWeapon()
@@ -281,33 +282,33 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.25) then
-		Explode(base, sfxNone)
-		Explode(spike, sfxNone)
-		Explode(turret, sfxNone)
-		Explode(ram, sfxNone)
-		Explode(l_foot, sfxNone)
-		Explode(l_leg, sfxNone)
-		Explode(r_foot, sfxNone)
-		Explode(r_leg, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(spike, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(ram, SFX.NONE)
+		Explode(l_foot, SFX.NONE)
+		Explode(l_leg, SFX.NONE)
+		Explode(r_foot, SFX.NONE)
+		Explode(r_leg, SFX.NONE)
 		return 1
 	elseif (severity <= 0.5) then
-		Explode(base, sfxNone)
-		Explode(spike, sfxFall)
-		Explode(turret, sfxFall)
-		Explode(ram, sfxFall)
-		Explode(l_foot, sfxFall)
-		Explode(l_leg, sfxFall)
-		Explode(r_foot, sfxFall)
-		Explode(r_leg, sfxFall)
+		Explode(base, SFX.NONE)
+		Explode(spike, SFX.FALL)
+		Explode(turret, SFX.FALL)
+		Explode(ram, SFX.FALL)
+		Explode(l_foot, SFX.FALL)
+		Explode(l_leg, SFX.FALL)
+		Explode(r_foot, SFX.FALL)
+		Explode(r_leg, SFX.FALL)
 		return 1
 	end
-	Explode(base, sfxNone)
-		Explode(spike, sfxFall + sfxSmoke + sfxFire)
-		Explode(turret, sfxFall + sfxSmoke + sfxFire)
-		Explode(ram, sfxFall + sfxSmoke + sfxFire)
-		Explode(l_foot, sfxFall + sfxSmoke + sfxFire)
-		Explode(l_leg, sfxFall + sfxSmoke + sfxFire)
-		Explode(r_foot, sfxFall + sfxSmoke + sfxFire)
-		Explode(r_leg, sfxFall + sfxSmoke + sfxFire)
+	Explode(base, SFX.NONE)
+		Explode(spike, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(ram, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(l_foot, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(l_leg, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(r_foot, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(r_leg, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 	return 2
 end

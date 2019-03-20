@@ -7,7 +7,8 @@ local flare = piece 'flare'
 
 include "constants.lua"
 include "pieceControl.lua"
-include "aimPosTerraform.lua"
+
+local SetupAimPosTerraform = Spring.Utilities.CacheInclude("scripts/aimPosTerraform.lua")
 
 -- Signal definitions
 local SIG_AIM = 2
@@ -31,9 +32,9 @@ function script.Create()
 	local mid = {midTable.midx, midTable.midy, midTable.midz}
 	local aim = {midTable.midx, midTable.midy + 22, midTable.midz}
     
-	SetupAimPosTerraform(mid, aim, midTable.midy + 22, midTable.midy + 40, 15, 40)
+	SetupAimPosTerraform(unitID, unitDefID, mid, aim, midTable.midy + 22, midTable.midy + 40, 15, 40)
 	
-	StartThread(SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, {base})
 end
 
 local function StunThread ()
@@ -91,21 +92,21 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	Hide(flare)
 	if severity <= 0.25 then
-		Explode(base, sfxNone)
-		Explode(flare, sfxNone)
-		Explode(turret, sfxNone)
-		Explode(barrel, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(flare, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(barrel, SFX.NONE)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(base, sfxNone)
-		Explode(flare, sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(turret, sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(barrel, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(flare, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(turret, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(barrel, SFX.NONE)
 		return 1
 	end
-	Explode(base, sfxNone)
-	Explode(flare, sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(turret, sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(barrel, sfxShatter)
+	Explode(base, SFX.NONE)
+	Explode(flare, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(turret, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(barrel, SFX.SHATTER)
 	return 2
 end

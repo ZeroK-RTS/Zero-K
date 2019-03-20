@@ -291,7 +291,7 @@ function script.Create()
 	
 	Turn(rbleg, x_axis, math.rad(0))
 	Turn(rbfoot, x_axis, math.rad(0))
-	StartThread(SmokeUnit, {turret})
+	StartThread(GG.Script.SmokeUnit, {turret})
 end
 
 function script.QueryWeapon(num)
@@ -382,20 +382,20 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .50 then
-		Explode(turret, sfxNone)
-		Explode(body, sfxNone)
+		Explode(turret, SFX.NONE)
+		Explode(body, SFX.NONE)
 		return 1
 	elseif severity <= .99 then
-		Explode(body, sfxShatter)
-		Explode(turret, sfxShatter)
-		Explode(lbarrel1, sfxFall + sfxSmoke)
-		Explode(rbarrel2, sfxFall + sfxSmoke)
+		Explode(body, SFX.SHATTER)
+		Explode(turret, SFX.SHATTER)
+		Explode(lbarrel1, SFX.FALL + SFX.SMOKE)
+		Explode(rbarrel2, SFX.FALL + SFX.SMOKE)
 		return 2
 	else
-		Explode(body, sfxShatter)
-		Explode(turret, sfxShatter)
-		Explode(lbarrel1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rbarrel2, sfxFall + sfxSmoke + sfxFire + sfxExplode)	
+		Explode(body, SFX.SHATTER)
+		Explode(turret, SFX.SHATTER)
+		Explode(lbarrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rbarrel2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)	
 		return 2
 	end
 end

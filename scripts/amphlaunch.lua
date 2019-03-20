@@ -28,7 +28,7 @@ local unitDefID = Spring.GetUnitDefID(unitID)
 local smokePiece = {pelvis, turret}
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)	
+	StartThread(GG.Script.SmokeUnit, smokePiece)	
 	Hide(gunbase)
 	Hide(gun1)
 	Hide(gun2)
@@ -89,7 +89,7 @@ local function RestoreAfterDelay()
 end
 
 function script.FireWeapon(num)
-	EmitSfx(ground, UNIT_SFX1)
+	EmitSfx(ground, GG.Script.UNIT_SFX1)
 end
 
 
@@ -116,32 +116,32 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(lfoot, sfxNone)
-		Explode(lleg, sfxNone)
-		Explode(pelvis, sfxNone)
-		Explode(rfoot, sfxNone)
-		Explode(rleg, sfxNone)
+		Explode(lfoot, SFX.NONE)
+		Explode(lleg, SFX.NONE)
+		Explode(pelvis, SFX.NONE)
+		Explode(rfoot, SFX.NONE)
+		Explode(rleg, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(lfoot, sfxFall)
-		Explode(lleg, sfxFall)
-		Explode(rfoot, sfxFall)
-		Explode(rleg, sfxFall)
-		Explode(pelvis, sfxShatter)
+		Explode(lfoot, SFX.FALL)
+		Explode(lleg, SFX.FALL)
+		Explode(rfoot, SFX.FALL)
+		Explode(rleg, SFX.FALL)
+		Explode(pelvis, SFX.SHATTER)
 		return 1
 	elseif severity <= .99 then
-		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(lleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(pelvis, sfxShatter)
+		Explode(lfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(lleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(pelvis, SFX.SHATTER)
 		return 2
 	else
-		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(lleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(pelvis, sfxShatter + sfxExplode)
+		Explode(lfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(lleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(pelvis, SFX.SHATTER + SFX.EXPLODE)
 		return 2
 	end
 end

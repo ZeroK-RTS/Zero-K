@@ -62,7 +62,7 @@ local function Walk()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
@@ -144,28 +144,28 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then
-		Explode(torso, sfxFall)
-		Explode(leftLeg.thigh, sfxNone)
-		Explode(leftLeg.uppercalf, sfxNone)
-		Explode(leftLeg.lowercalf, sfxNone)
-		Explode(leftLeg.foot, sfxNone)
-		Explode(rightLeg.thigh, sfxNone)
-		Explode(rightLeg.uppercalf, sfxNone)
-		Explode(rightLeg.lowercalf, sfxNone)
-		Explode(rightLeg.foot, sfxNone)
-		Explode(base, sfxFall)
+		Explode(torso, SFX.FALL)
+		Explode(leftLeg.thigh, SFX.NONE)
+		Explode(leftLeg.uppercalf, SFX.NONE)
+		Explode(leftLeg.lowercalf, SFX.NONE)
+		Explode(leftLeg.foot, SFX.NONE)
+		Explode(rightLeg.thigh, SFX.NONE)
+		Explode(rightLeg.uppercalf, SFX.NONE)
+		Explode(rightLeg.lowercalf, SFX.NONE)
+		Explode(rightLeg.foot, SFX.NONE)
+		Explode(base, SFX.FALL)
 		return 1
 	else
-		Explode(torso, sfxShatter)
-		Explode(leftLeg.thigh, sfxFall)
-		Explode(leftLeg.uppercalf, sfxFall)
-		Explode(leftLeg.lowercalf, sfxFall)
-		Explode(leftLeg.foot, sfxFall)
-		Explode(rightLeg.thigh, sfxFall)
-		Explode(rightLeg.uppercalf, sfxFall)
-		Explode(rightLeg.lowercalf, sfxFall)
-		Explode(rightLeg.foot, sfxFall)
-		Explode(base, sfxShatter)
+		Explode(torso, SFX.SHATTER)
+		Explode(leftLeg.thigh, SFX.FALL)
+		Explode(leftLeg.uppercalf, SFX.FALL)
+		Explode(leftLeg.lowercalf, SFX.FALL)
+		Explode(leftLeg.foot, SFX.FALL)
+		Explode(rightLeg.thigh, SFX.FALL)
+		Explode(rightLeg.uppercalf, SFX.FALL)
+		Explode(rightLeg.lowercalf, SFX.FALL)
+		Explode(rightLeg.foot, SFX.FALL)
+		Explode(base, SFX.SHATTER)
 		return 2
 	end
 end

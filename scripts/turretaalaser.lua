@@ -95,7 +95,7 @@ function Unstunned (stun_type)
 end
 
 function script.Create()
-	StartThread (SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, smokePiece)
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (1000)
 	end
@@ -142,17 +142,17 @@ function script.Killed (recentDamage, maxHealth)
 
 	for i = 1, #explodables1 do
 		if (math.random() < severity) then
-			Explode (explodables1[i], sfxSmoke + sfxFire)
+			Explode (explodables1[i], SFX.SMOKE + SFX.FIRE)
 		end
 	end
 
 	if (severity <= .5) then
 		return 1
 	else
-		Explode (body, sfxShatter)
+		Explode (body, SFX.SHATTER)
 		for i = 1, #explodables2 do
 			if (math.random() < severity) then
-				Explode (explodables2[i], sfxSmoke + sfxFire)
+				Explode (explodables2[i], SFX.SMOKE + SFX.FIRE)
 			end
 		end
 		return 2

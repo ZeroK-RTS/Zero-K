@@ -29,7 +29,7 @@ local RECOIL_RESTORE_SPEED = 1
 local smokePiece = {base, turret}
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -69,32 +69,32 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(base, sfxNone)
-		Explode(turret, sfxNone)
-		Explode(barrel1, sfxNone)
-		Explode(barrel2, sfxNone)
-		Explode(barrel3, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(barrel1, SFX.NONE)
+		Explode(barrel2, SFX.NONE)
+		Explode(barrel3, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(base, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke)
-		Explode(barrel1, sfxNone)
-		Explode(barrel2, sfxNone)
-		Explode(barrel3, sfxNone)
+		Explode(base, SFX.SHATTER)
+		Explode(turret, SFX.FALL + SFX.SMOKE)
+		Explode(barrel1, SFX.NONE)
+		Explode(barrel2, SFX.NONE)
+		Explode(barrel3, SFX.NONE)
 		return 1
 	elseif severity <= .99 then
-		Explode(base, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(barrel1, sfxFall + sfxSmoke)
-		Explode(barrel2, sfxFall + sfxSmoke)
-		Explode(barrel3, sfxFall + sfxSmoke)
+		Explode(base, SFX.SHATTER)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(barrel1, SFX.FALL + SFX.SMOKE)
+		Explode(barrel2, SFX.FALL + SFX.SMOKE)
+		Explode(barrel3, SFX.FALL + SFX.SMOKE)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(barrel1, sfxFall + sfxSmoke + sfxFire)
-		Explode(barrel2, sfxFall + sfxSmoke + sfxFire)
-		Explode(barrel3, sfxFall + sfxSmoke + sfxFire)
+		Explode(base, SFX.SHATTER)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(barrel2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(barrel3, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	end
 end

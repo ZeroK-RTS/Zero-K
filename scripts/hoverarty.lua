@@ -80,7 +80,7 @@ function script.Create()
 	for i = 1, 4 do
 		Hide(wheels[i])
 	end
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(HoverFX)
 end
 
@@ -131,17 +131,17 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
 		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-		Explode(base, sfxNone)
-		Explode(turret, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
 		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-		Explode(base, sfxNone)
+		Explode(base, SFX.NONE)
 		Explode(turret, SFX.FALL)
 		return 1
 	elseif severity <= .99 then
 		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-		Explode(base, sfxNone)
+		Explode(base, SFX.NONE)
 		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(flpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(frpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
@@ -150,7 +150,7 @@ function script.Killed(recentDamage, maxHealth)
 		return 2
 	else
 		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-		Explode(base, sfxNone)
+		Explode(base, SFX.NONE)
 		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(flpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(frpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)

@@ -26,6 +26,7 @@ local gunHeading = 0
 local closed = true
 local stuns = {false, false, false}
 local disarmed = false
+local hpi = math.pi*0.5
 
 -- Tasks for open/close state
 local TASK_NEUTRAL = 0
@@ -138,7 +139,7 @@ end
 
 function script.Create()
 	Hide(ground1)
-	StartThread(SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 	InitializeRock(rockData)
@@ -274,21 +275,21 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
-		Explode(base, sfxNone)
-		Explode(door1, sfxNone)
-		Explode(door2, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(door1, SFX.NONE)
+		Explode(door2, SFX.NONE)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(base, sfxNone)
-		Explode(door1, sfxNone)
-		Explode(door2, sfxNone)
-		Explode(rim1, sfxShatter)
-		Explode(rim2, sfxShatter)
+		Explode(base, SFX.NONE)
+		Explode(door1, SFX.NONE)
+		Explode(door2, SFX.NONE)
+		Explode(rim1, SFX.SHATTER)
+		Explode(rim2, SFX.SHATTER)
 		return 1
 	end
-	Explode(door1, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(door2, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(rim1, sfxShatter)
-	Explode(rim2, sfxShatter)
+	Explode(door1, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(door2, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rim1, SFX.SHATTER)
+	Explode(rim2, SFX.SHATTER)
 	return 2
 end

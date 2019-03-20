@@ -153,7 +153,7 @@ local function FireDelayLoop()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(FireDelayLoop)
 	Move(shot1, y_axis, -80)
 end
@@ -225,22 +225,22 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
-		Explode(pelvis, sfxNone)
-		Explode(torso, sfxNone)
-		Explode(lbarrel, sfxNone)
-		Explode(rbarrel, sfxNone)
+		Explode(pelvis, SFX.NONE)
+		Explode(torso, SFX.NONE)
+		Explode(lbarrel, SFX.NONE)
+		Explode(rbarrel, SFX.NONE)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
-		Explode(pelvis, sfxNone)
-		Explode(torso, sfxShatter)
-		Explode(lbarrel, sfxShatter)
-		Explode(rbarrel, sfxShatter)
+		Explode(pelvis, SFX.NONE)
+		Explode(torso, SFX.SHATTER)
+		Explode(lbarrel, SFX.SHATTER)
+		Explode(rbarrel, SFX.SHATTER)
 		return 1 -- corpsetype
 	else
-		Explode(pelvis, sfxSmoke + sfxFire)
-		Explode(torso, sfxShatter)
-		Explode(lbarrel, sfxSmoke + sfxFire + sfxExplode)
-		Explode(rbarrel, sfxSmoke + sfxFire + sfxExplode)		
+		Explode(pelvis, SFX.SMOKE + SFX.FIRE)
+		Explode(torso, SFX.SHATTER)
+		Explode(lbarrel, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rbarrel, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)		
 		return 2 -- corpsetype
 	end
 end

@@ -84,7 +84,7 @@ function script.Create()
 	Turn(larm, z_axis, -0.1)
 	Turn(rarm, z_axis, 0.1)	
 	Turn(shoulderflare, x_axis, math.rad(-90))	
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 local function Step(frontLeg, backLeg)
@@ -262,18 +262,18 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .5) then
-		Explode(torso, sfxNone)
-		Explode(head, sfxNone)
-		Explode(pelvis, sfxNone)
-		Explode(rarmcannon, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(larmcannon, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(larm, sfxShatter)
+		Explode(torso, SFX.NONE)
+		Explode(head, SFX.NONE)
+		Explode(pelvis, SFX.NONE)
+		Explode(rarmcannon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(larmcannon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(larm, SFX.SHATTER)
 		
 		return 1 -- corpsetype
 	else
-		Explode(torso, sfxShatter)
-		Explode(head, sfxSmoke + sfxFire)
-		Explode(pelvis, sfxShatter)
+		Explode(torso, SFX.SHATTER)
+		Explode(head, SFX.SMOKE + SFX.FIRE)
+		Explode(pelvis, SFX.SHATTER)
 		return 2 -- corpsetype
 	end
 end

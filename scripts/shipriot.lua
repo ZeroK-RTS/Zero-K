@@ -52,7 +52,7 @@ local RESTORE_DELAY = 3000
 
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 
 	Turn(gunb, y_axis, math.rad(-180))
 end
@@ -125,37 +125,37 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.25) then
-		Explode(hull, sfxNone)
-		Explode(gunf, sfxNone)
-		Explode(base, sfxNone)
-		Explode(gunb, sfxNone)
-		Explode(barrelfr, sfxNone)
+		Explode(hull, SFX.NONE)
+		Explode(gunf, SFX.NONE)
+		Explode(base, SFX.NONE)
+		Explode(gunb, SFX.NONE)
+		Explode(barrelfr, SFX.NONE)
 		return 1
 	end
 	if severity <= 0.50 then
-		Explode(hull, sfxNone)
-		Explode(gunf, sfxFall)
-		Explode(base, sfxNone)
-		Explode(gunb, sfxFall)
-		Explode(barrelbr, sfxFall)
+		Explode(hull, SFX.NONE)
+		Explode(gunf, SFX.FALL)
+		Explode(base, SFX.NONE)
+		Explode(gunb, SFX.FALL)
+		Explode(barrelbr, SFX.FALL)
 		return 1
 	end
 	if severity <= 0.99 then
-		Explode(hull, sfxShatter)
-		Explode(gunf, sfxFall)
-		Explode(base, sfxNone)
-		Explode(gunb, sfxFall)
-		Explode(barrelbr, sfxFall)
-		Explode(barrelfr, sfxFall)
-		Explode(barrelfl, sfxFall)
+		Explode(hull, SFX.SHATTER)
+		Explode(gunf, SFX.FALL)
+		Explode(base, SFX.NONE)
+		Explode(gunb, SFX.FALL)
+		Explode(barrelbr, SFX.FALL)
+		Explode(barrelfr, SFX.FALL)
+		Explode(barrelfl, SFX.FALL)
 		return 2
 	end
-	Explode(hull, sfxShatter)
-	Explode(gunf, sfxFall)
-	Explode(base, sfxNone)
-	Explode(gunb, sfxFall)
-	Explode(barrelbr, sfxFall)
-	Explode(barrelfr, sfxFall)
-	Explode(barrelfl, sfxFall)
+	Explode(hull, SFX.SHATTER)
+	Explode(gunf, SFX.FALL)
+	Explode(base, SFX.NONE)
+	Explode(gunb, SFX.FALL)
+	Explode(barrelbr, SFX.FALL)
+	Explode(barrelfr, SFX.FALL)
+	Explode(barrelfl, SFX.FALL)
 	return 2
 end

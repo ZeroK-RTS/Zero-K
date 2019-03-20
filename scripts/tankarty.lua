@@ -15,6 +15,7 @@ local smoke = piece 'smoke'
 
 local gunHeading = 0
 local moving = false
+local hpi = math.pi*0.5
 
 local RESTORE_DELAY = 3000
 
@@ -139,7 +140,7 @@ function script.Create()
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (250)
 	end
-	StartThread (SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, smokePiece)
 end
 
 local function RestoreAfterDelay()
@@ -193,21 +194,21 @@ function script.Killed(recentDamage, maxHealth)
 		return 1
 	elseif (severity < 0.5) then
 		corpsetype = 1
-		Explode(barrel, sfxFall)
-		Explode(breech, sfxFall)
-		Explode(sleeve, sfxFall)
-		Explode(turret, sfxShatter)
+		Explode(barrel, SFX.FALL)
+		Explode(breech, SFX.FALL)
+		Explode(sleeve, SFX.FALL)
+		Explode(turret, SFX.SHATTER)
 		return 1
 	elseif(severity < 1) then
-		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(breech, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(sleeve, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(turret, sfxShatter)
+		Explode(barrel, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(breech, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(sleeve, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(turret, SFX.SHATTER)
 		return 2
 	end
-	Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(breech, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(sleeve, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(turret, sfxShatter + sfxExplodeOnHit)
+	Explode(barrel, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(breech, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(sleeve, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(turret, SFX.SHATTER + SFX.EXPLODE_ON_HIT)
 	return 2
 end

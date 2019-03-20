@@ -292,7 +292,7 @@ function script.Create()
 	Move(firept, y_axis, 9001)
 	Move(flare, y_axis, -110)
 	Turn(flare, x_axis, math.rad(-90))
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(SpawnProjectileThread)
 	
 	-- Helpful for devving
@@ -358,10 +358,10 @@ function script.Killed(recentDamage, maxHealth)
 	LoseControlOfMeteors();
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then
-		Explode(base, sfxNone)
+		Explode(base, SFX.NONE)
 		return 1
 	else
-		Explode(base, sfxShatter)
+		Explode(base, SFX.SHATTER)
 		return 2
 	end
 end

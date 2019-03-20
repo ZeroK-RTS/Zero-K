@@ -14,7 +14,7 @@ local nanoTurnSpeedHori = 0.5 * math.pi
 local nanoTurnSpeedVert = 0.3 * math.pi
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(UpdateNanoDirectionThread, nanoPieces, 500, nanoTurnSpeedHori, nanoTurnSpeedVert)
 	Spring.SetUnitNanoPieces(unitID, {emitnano})
 end

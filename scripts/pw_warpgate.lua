@@ -7,7 +7,7 @@ local gen2 = piece "gen2"
 local smokePiece = {gen1}
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Activate ()
@@ -25,14 +25,14 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then
-		Explode(base, sfxNone)
-		Explode(gen1, sfxNone)
-		Explode(gen2, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(gen1, SFX.NONE)
+		Explode(gen2, SFX.NONE)
 		return 1
 	else
-		Explode(base, sfxShatter)
-		Explode(gen1, sfxShatter)
-		Explode(gen2, sfxShatter)
+		Explode(base, SFX.SHATTER)
+		Explode(gen1, SFX.SHATTER)
+		Explode(gen2, SFX.SHATTER)
 		return 2
 	end
 end

@@ -88,16 +88,16 @@ function script.Killed(recentDamage, maxHealth)
 	if (severity <= 0.25) then
 		return 1
 	elseif (severity <= 0.50) then
-		Explode (door1, sfxFall)
+		Explode (door1, SFX.FALL)
 		return 1
 	elseif (severity <= 0.75) then
-		Explode (base, sfxShatter)
-		Explode (door1, sfxFall)
+		Explode (base, SFX.SHATTER)
+		Explode (door1, SFX.FALL)
 		return 2
 	else
-		Explode (base, sfxShatter)
-		Explode (door1, sfxFall + sfxSmoke + sfxFire)
-		Explode (door2, sfxFall + sfxSmoke + sfxFire)
+		Explode (base, SFX.SHATTER)
+		Explode (door1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode (door2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	end
 end

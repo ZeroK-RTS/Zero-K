@@ -22,6 +22,8 @@ local ROCK_PIECE = base -- should be negative to alternate rocking direction.
 local ROCK_MIN = 0.001 --If around axis rock is not greater than this amount, rocking will stop after returning to center.
 local ROCK_MAX = 1.5
 
+local hpi = math.pi*0.5
+
 local rockData = {
 	[x_axis] = {
 		piece = ROCK_PIECE,
@@ -183,31 +185,31 @@ function script.Create()
 	Move (missiles[1], z_axis, 0.5)
 	Move (missiles[2], z_axis, 0.5)
 	
-	StartThread (SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity < 0.5) then
-		if (math.random() < 2*severity) then Explode (missiles[1], sfxFall + sfxFire) end
-		if (math.random() < 2*severity) then Explode (missiles[2], sfxFall + sfxSmoke) end
+		if (math.random() < 2*severity) then Explode (missiles[1], SFX.FALL + SFX.FIRE) end
+		if (math.random() < 2*severity) then Explode (missiles[2], SFX.FALL + SFX.SMOKE) end
 		return 1
 	elseif (severity < 0.75) then
 		if (math.random() < severity) then 
-			Explode (turret, sfxFall) 
+			Explode (turret, SFX.FALL) 
 		end
-		Explode(sleeve, sfxFall)
-		Explode(trackData.tracks[1], sfxShatter)
-		Explode(missiles[1], sfxFall + sfxSmoke)
-		Explode(missiles[2], sfxFall + sfxSmoke + sfxFire)
+		Explode(sleeve, SFX.FALL)
+		Explode(trackData.tracks[1], SFX.SHATTER)
+		Explode(missiles[1], SFX.FALL + SFX.SMOKE)
+		Explode(missiles[2], SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke + sfxFire)
-		Explode(sleeve, sfxFall + sfxSmoke + sfxFire)
-		Explode(trackData.tracks[1], sfxShatter)
-		Explode(missiles[1], sfxFall + sfxSmoke)
-		Explode(missiles[2], sfxFall + sfxSmoke + sfxFire)
+		Explode(base, SFX.SHATTER)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(sleeve, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(trackData.tracks[1], SFX.SHATTER)
+		Explode(missiles[1], SFX.FALL + SFX.SMOKE)
+		Explode(missiles[2], SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	end
 end

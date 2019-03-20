@@ -75,7 +75,7 @@ end
 
 function script.Create()
 	StartThread(MoveScript)
-	StartThread(SmokeUnit, {hull, turret[1], turret[2]})
+	StartThread(GG.Script.SmokeUnit, {hull, turret[1], turret[2]})
 end
 
 function script.AimFromWeapon(id)
@@ -112,15 +112,15 @@ function script.Killed(severity, health)
 
 	for i = 1, #explodables do
 		if (math.random() < severity) then
-			Explode (explodables[i], sfxFall + sfxFire + sfxSmoke)
+			Explode (explodables[i], SFX.FALL + SFX.FIRE + SFX.SMOKE)
 		end
 	end
 
 	if severity <= 0.5 then
 		return 1
 	else
-		Explode(hull, sfxShatter)
-		Explode(base, sfxShatter)
+		Explode(hull, SFX.SHATTER)
+		Explode(base, SFX.SHATTER)
 		return 2
 	end
 end

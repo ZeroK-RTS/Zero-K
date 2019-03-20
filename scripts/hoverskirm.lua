@@ -16,6 +16,7 @@ end
 local ground1 = piece 'ground1'
 
 local random = math.random 
+local hpi = math.pi*0.5
 
 local shotNum = 1
 local flares = {
@@ -104,7 +105,7 @@ function script.Create()
 	Turn(exhaust, y_axis, math.rad(-180))
 	Turn(lbarrel, y_axis, ROCKET_SPREAD)
 	Turn(rbarrel, y_axis, -ROCKET_SPREAD)
-	StartThread(SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 	InitializeRock(rockData)
@@ -150,8 +151,8 @@ function script.BlockShot(num, targetID)
 end
 
 function script.Shot() 
-	EmitSfx(flares[shotNum], UNIT_SFX2)
-	EmitSfx(exhaust, UNIT_SFX3)
+	EmitSfx(flares[shotNum], GG.Script.UNIT_SFX2)
+	EmitSfx(exhaust, GG.Script.UNIT_SFX3)
 	shotNum = 3 - shotNum
 end
 
@@ -160,15 +161,15 @@ function script.Killed(recentDamage, maxHealth)
 	if severity <= 0.25 then
 		return 1
 	elseif severity <= 0.50 then
-		Explode(front, sfxNone)
-		Explode(turret, sfxShatter)
+		Explode(front, SFX.NONE)
+		Explode(turret, SFX.SHATTER)
 		return 1
 	elseif severity <= 0.99 then
-		Explode(front, sfxShatter)
-		Explode(turret, sfxShatter)
+		Explode(front, SFX.SHATTER)
+		Explode(turret, SFX.SHATTER)
 		return 2
 	end
-	Explode(front, sfxShatter)
-	Explode(turret, sfxShatter)
+	Explode(front, SFX.SHATTER)
+	Explode(turret, SFX.SHATTER)
 	return 2
 end

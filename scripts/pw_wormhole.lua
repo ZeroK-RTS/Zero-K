@@ -48,24 +48,24 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < .5 then
-		Explode(base, sfxNone)
-		Explode(wheel1, sfxNone)
-		Explode(wheel2, sfxNone)
-		Explode(slider1, sfxNone)
-		Explode(slider2, sfxNone)
-		--Explode(focal1, sfxFall)
-		--Explode(focal2, sfxFall)
-		--Explode(panel1, sfxFall)
-		--Explode(panel2, sfxFall)
+		Explode(base, SFX.NONE)
+		Explode(wheel1, SFX.NONE)
+		Explode(wheel2, SFX.NONE)
+		Explode(slider1, SFX.NONE)
+		Explode(slider2, SFX.NONE)
+		--Explode(focal1, SFX.FALL)
+		--Explode(focal2, SFX.FALL)
+		--Explode(panel1, SFX.FALL)
+		--Explode(panel2, SFX.FALL)
 		return 1
 	else
-		Explode(base, sfxShatter)
-		Explode(wheel1, sfxShatter)
-		Explode(wheel2, sfxShatter)
-		Explode(slider1, sfxFall + sfxSmoke + sfxFire)
-		Explode(slider2, sfxFall + sfxSmoke + sfxFire)
-		Explode(panel1, sfxFall + sfxSmoke + sfxFire)
-		Explode(panel2, sfxFall + sfxSmoke + sfxFire)
+		Explode(base, SFX.SHATTER)
+		Explode(wheel1, SFX.SHATTER)
+		Explode(wheel2, SFX.SHATTER)
+		Explode(slider1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(slider2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(panel1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(panel2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	end
 end

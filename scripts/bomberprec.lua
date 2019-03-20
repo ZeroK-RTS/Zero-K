@@ -142,7 +142,7 @@ end
 
 function script.Create()
 	SetInitialBomberSettings()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	FakeUprightInit(xp, zp, drop) 
 	--StartThread(Lights)
@@ -173,11 +173,11 @@ function script.BlockShot(num, targetID)
 	local x,y,z = spGetUnitPosition(unitID)
 	local _,_,_,_,_,_,tx,ty,tz = spGetUnitPosition(targetID, true, true)
 	local vx,vy,vz = spGetUnitVelocity(targetID)
-	local heading = spGetUnitHeading(unitID)*headingToRad
+	local heading = spGetUnitHeading(unitID)*GG.Script.headingToRad
 	vx, vy, vz = vx*predictMult, vy*predictMult, vz*predictMult
 	local dx, dy, dz = tx + vx - x, ty + vy - y, tz + vz - z
-	local cosHeading = cos(heading)
-	local sinHeading = sin(heading)
+	local cosHeading = math.cos(heading)
+	local sinHeading = math.sin(heading)
 	dx, dz = cosHeading*dx - sinHeading*dz, cosHeading*dz + sinHeading*dx
 	
 	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
@@ -232,28 +232,28 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= 0.25 then
-		Explode(fuselage, sfxNone)
-		Explode(engines, sfxNone)
-		Explode(wingl1, sfxNone)
-		Explode(wingr2, sfxNone)
+		Explode(fuselage, SFX.NONE)
+		Explode(engines, SFX.NONE)
+		Explode(wingl1, SFX.NONE)
+		Explode(wingr2, SFX.NONE)
 		return 1
 	elseif severity <= 0.50 or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
-		Explode(fuselage, sfxNone)
-		Explode(engines, sfxNone)
-		Explode(wingl2, sfxNone)
-		Explode(wingr1, sfxNone)
+		Explode(fuselage, SFX.NONE)
+		Explode(engines, SFX.NONE)
+		Explode(wingl2, SFX.NONE)
+		Explode(wingr1, SFX.NONE)
 		return 1
 	elseif severity <= 1 then
-		Explode(fuselage, sfxNone)
-		Explode(engines, sfxFall + sfxSmoke + sfxFire)
-		Explode(wingl1, sfxFall + sfxSmoke + sfxFire)
-		Explode(wingr2, sfxFall + sfxSmoke + sfxFire)
+		Explode(fuselage, SFX.NONE)
+		Explode(engines, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(wingl1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(wingr2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	else
-		Explode(fuselage, sfxNone)
-		Explode(engines, sfxFall + sfxSmoke + sfxFire)
-		Explode(wingl1, sfxFall + sfxSmoke + sfxFire)
-		Explode(wingl2, sfxFall + sfxSmoke + sfxFire)
+		Explode(fuselage, SFX.NONE)
+		Explode(engines, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(wingl1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(wingl2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	end
 end

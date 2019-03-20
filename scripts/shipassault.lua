@@ -44,7 +44,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	for i=1,#missiles do
 		Turn(missiles[i], x_axis, -math.rad(90))
 	end
@@ -113,32 +113,32 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
-		Explode(base, sfxNone)
-		Explode(turret, sfxNone)
-		Explode(sleeves, sfxNone)
-		Explode(barrel1, sfxFall)
-		Explode(barrel2, sfxFall)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(sleeves, SFX.NONE)
+		Explode(barrel1, SFX.FALL)
+		Explode(barrel2, SFX.FALL)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
-		Explode(base, sfxNone)
-		Explode(turret, sfxNone)
-		Explode(sleeves, sfxShatter)
-		Explode(barrel1, sfxSmoke)
-		Explode(barrel2, sfxSmoke)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(sleeves, SFX.SHATTER)
+		Explode(barrel1, SFX.SMOKE)
+		Explode(barrel2, SFX.SMOKE)
 		return 1 -- corpsetype
 	elseif (severity <= 1) then
-		Explode(base, sfxShatter)
-		Explode(turret, sfxShatter)
-		Explode(sleeves, sfxShatter)
-		Explode(barrel1, sfxSmoke + sfxFire)
-		Explode(barrel2, sfxSmoke + sfxFire)
+		Explode(base, SFX.SHATTER)
+		Explode(turret, SFX.SHATTER)
+		Explode(sleeves, SFX.SHATTER)
+		Explode(barrel1, SFX.SMOKE + SFX.FIRE)
+		Explode(barrel2, SFX.SMOKE + SFX.FIRE)
 		return 2 -- corpsetype
 	else
-		Explode(base, sfxShatter)
-		Explode(turret, sfxShatter)
-		Explode(sleeves, sfxShatter)
-		Explode(barrel1, sfxSmoke + sfxFire + sfxExplode)
-		Explode(barrel2, sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, SFX.SHATTER)
+		Explode(turret, SFX.SHATTER)
+		Explode(sleeves, SFX.SHATTER)
+		Explode(barrel1, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(barrel2, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2 -- corpsetype
 	end
 end

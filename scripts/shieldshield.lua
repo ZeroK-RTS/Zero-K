@@ -155,7 +155,7 @@ function script.Create()
 	Turn(rb_leaf, x_axis, -l_angle, 1)
 	Turn(rb_leaf, z_axis, l_angle, 1)
 
-	StartThread(SmokeUnit, {glow})
+	StartThread(GG.Script.SmokeUnit, {glow})
 	StartThread(Flutter)
 end
 

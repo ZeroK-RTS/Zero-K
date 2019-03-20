@@ -32,7 +32,7 @@ local function TiltWings()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(TiltWings)
 	Turn(Lwingengine, x_axis, math.rad(-90), math.rad(500))
 	Turn(Rwingengine, x_axis, math.rad(-90), math.rad(500))
@@ -80,20 +80,20 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(base, sfxNone)
-		Explode(body, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(body, SFX.NONE)
 		return 1
 	elseif severity <= .5 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
-		Explode(base, sfxNone)
-		Explode(body, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(body, SFX.NONE)
 		return 1
 	elseif severity <= .75 then
-		Explode(base, sfxShatter)
-		Explode(body, sfxShatter)
+		Explode(base, SFX.SHATTER)
+		Explode(body, SFX.SHATTER)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(body, sfxShatter)
+		Explode(base, SFX.SHATTER)
+		Explode(body, SFX.SHATTER)
 		return 2
 	end
 end

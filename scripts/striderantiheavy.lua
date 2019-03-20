@@ -188,7 +188,7 @@ function script.Create()
 	Hide(nanospray)
 	Hide(laserblade)
 	Move(jump, y_axis, -10, 100)
-	StartThread(SmokeUnit, {head})
+	StartThread(GG.Script.SmokeUnit, {head})
 end
 
 function script.StartMoving()

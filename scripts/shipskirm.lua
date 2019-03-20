@@ -67,7 +67,7 @@ local restore_delay = 3000
 local gun_1_yaw = 0
 local dead = false
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	InitializeRock(rockData)
 end
 
@@ -175,13 +175,13 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if  severity <= 0.50  then
-		Explode( turret, sfxShatter)
+		Explode( turret, SFX.SHATTER)
 		return 1
 	end
-	Explode( hull, sfxShatter)
-	Explode( neck, sfxShatter)
-	Explode( turret, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( arml, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( armr, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode( hull, SFX.SHATTER)
+	Explode( neck, SFX.SHATTER)
+	Explode( turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode( arml, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode( armr, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	return 2
 end

@@ -21,6 +21,8 @@ local ROCK_PIECE = base
 local ROCK_MIN = 0.001 --If around axis rock is not greater than this amount, rocking will stop after returning to center.
 local ROCK_MAX = 1.5
 
+local hpi = math.pi*0.5
+
 rockData = {
 	[x_axis] = {
 		piece = ROCK_PIECE,
@@ -108,7 +110,7 @@ function script.Create()
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (250)
 	end
-	StartThread (SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.StartMoving()
@@ -169,30 +171,30 @@ end
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity < 0.25) then
-		Explode(turret1, sfxSmoke)
+		Explode(turret1, SFX.SMOKE)
 		return 1
 	elseif (severity < 0.5) then
-		Explode(barrel1, sfxFall)
-		Explode(gun2, sfxShatter)
-		Explode(sleeve1, sfxFall)
-		Explode(turret1, sfxShatter)
-		Explode(turret2, sfxFall)
-		Explode(body, sfxSmoke)
+		Explode(barrel1, SFX.FALL)
+		Explode(gun2, SFX.SHATTER)
+		Explode(sleeve1, SFX.FALL)
+		Explode(turret1, SFX.SHATTER)
+		Explode(turret2, SFX.FALL)
+		Explode(body, SFX.SMOKE)
 		return 1
 	elseif (severity < 1) then
-		Explode(barrel1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(gun2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(sleeve1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(turret1, sfxShatter)
-		Explode(turret2, sfxShatter)
+		Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(gun2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(sleeve1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(turret1, SFX.SHATTER)
+		Explode(turret2, SFX.SHATTER)
 		return 2
 	end
 	
-	Explode(barrel1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(gun2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(sleeve1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(turret1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(turret2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(body, sfxShatter)
+	Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(gun2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(sleeve1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(turret1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(turret2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(body, SFX.SHATTER)
 	return 2
 end

@@ -97,7 +97,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Turn (chest, y_axis, math.rad(-20))
 	Turn (gun, x_axis, math.rad(20), math.rad(40))
 end
@@ -186,15 +186,15 @@ function script.Killed(recentDamage, maxHealth)
 
 	for i = 1, #explodables do
 		if math.random() < severity then
-			Explode (explodables[i], sfxFall + sfxSmoke + sfxFire)
+			Explode (explodables[i], SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		end
 	end
 
 	if (severity < 0.5) then
 		return 1
 	else
-		Explode (chest, sfxShatter)
-		Explode (gun, sfxShatter)
+		Explode (chest, SFX.SHATTER)
+		Explode (gun, SFX.SHATTER)
 		return 2
 	end
 end

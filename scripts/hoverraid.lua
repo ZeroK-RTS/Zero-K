@@ -47,7 +47,7 @@ local function MoveScript()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 end
@@ -84,17 +84,17 @@ function script.Killed(recentDamage, maxHealth)
 
 	for i = 1, #pieces do
 		if math.random() < severity then
-			Explode(pieces[i], sfxShatter)
+			Explode(pieces[i], SFX.SHATTER)
 		end
 		if math.random() < (severity*2) then
-			Explode(pieces[i], sfxFall + ((math.random() > severity) and (sfxSmoke + sfxFire) or 0))
+			Explode(pieces[i], SFX.FALL + ((math.random() > severity) and (SFX.SMOKE + SFX.FIRE) or 0))
 		end
 	end
 
 	if severity < 0.5 then
 		return 1
 	else
-		Explode(base, sfxShatter)
+		Explode(base, SFX.SHATTER)
 		return 2
 	end
 end

@@ -283,7 +283,7 @@ function script.Create()
 		Turn(rbflare1, y_axis, math.rad(45))
 		Turn(rbflare2, y_axis, math.rad(45))	 
 		
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 		StartThread(SomersaultLoop)
 end
 
@@ -347,24 +347,24 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then
-		Explode(torso, sfxNone)
-		Explode(luparm, sfxNone)
-		Explode(ruparm, sfxNone)
-		Explode(pelvis, sfxNone)
-		Explode(lthigh, sfxNone)
-		Explode(rthigh, sfxNone)
-		Explode(rleg, sfxNone)
-		Explode(lleg, sfxNone)
+		Explode(torso, SFX.NONE)
+		Explode(luparm, SFX.NONE)
+		Explode(ruparm, SFX.NONE)
+		Explode(pelvis, SFX.NONE)
+		Explode(lthigh, SFX.NONE)
+		Explode(rthigh, SFX.NONE)
+		Explode(rleg, SFX.NONE)
+		Explode(lleg, SFX.NONE)
 		return 1
 	else
-		Explode(torso, sfxShatter)
-		Explode(luparm, sfxSmoke + sfxFire + sfxExplode)
-		Explode(ruparm, sfxSmoke + sfxFire + sfxExplode)
-		Explode(pelvis, sfxShatter)
-		Explode(lthigh, sfxShatter)
-		Explode(rthigh, sfxShatter)
-		Explode(rleg, sfxShatter)
-		Explode(lleg, sfxShatter)
+		Explode(torso, SFX.SHATTER)
+		Explode(luparm, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(ruparm, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(pelvis, SFX.SHATTER)
+		Explode(lthigh, SFX.SHATTER)
+		Explode(rthigh, SFX.SHATTER)
+		Explode(rleg, SFX.SHATTER)
+		Explode(lleg, SFX.SHATTER)
 		return 2
 	end
 end

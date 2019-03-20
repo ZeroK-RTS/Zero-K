@@ -4,7 +4,7 @@ local base = piece "base"
 local smokePiece = { base }
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)

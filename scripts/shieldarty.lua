@@ -46,7 +46,7 @@ local SIG_Walk = 2
 local SIG_Aim = 4
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 local function Walk()
@@ -143,19 +143,19 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
-		Explode(body, sfxNone)
-		Explode(pelvis, sfxNone)
-		Explode(turret, sfxNone)
+		Explode(body, SFX.NONE)
+		Explode(pelvis, SFX.NONE)
+		Explode(turret, SFX.NONE)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
-		Explode(body, sfxNone)
-		Explode(pelvis, sfxNone)
-		Explode(turret, sfxShatter)
+		Explode(body, SFX.NONE)
+		Explode(pelvis, SFX.NONE)
+		Explode(turret, SFX.SHATTER)
 		return 1 -- corpsetype
 	else
-		Explode(body, sfxShatter)
-		Explode(pelvis, sfxSmoke + sfxFire)
-		Explode(turret, sfxSmoke + sfxFire + sfxExplode)
+		Explode(body, SFX.SHATTER)
+		Explode(pelvis, SFX.SMOKE + SFX.FIRE)
+		Explode(turret, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2 -- corpsetype
 	end
 end
