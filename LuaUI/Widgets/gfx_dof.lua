@@ -21,7 +21,7 @@ options = {
 		type='bool', 
 		name='Apply Depth of Field Effect', 
 		value=false, 
-		noHotkey = true, 
+		noHotkey = false, 
 		advanced = false,
 	},
 	highQuality =
@@ -29,7 +29,7 @@ options = {
 		type='bool',
 		name='High Quality',
 		value=false,
-		noHotkey=true,
+		noHotkey=false,
 		advanced=false,
 		OnChange = function(self) InitTextures() end,
 	}, 
