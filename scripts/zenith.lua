@@ -16,9 +16,9 @@ local HOVER_HEIGHT = 2600
 
 local AIM_RADIUS = 160
 
--- 5 minutes and 50 seconds to reach capacity.
-local SPAWN_PERIOD = 700 -- in milliseconds
-local METEOR_CAPACITY = 500 
+-- 6 minutes to reach capacity.
+local SPAWN_PERIOD = 1200 -- in milliseconds
+local METEOR_CAPACITY = 300
 
 local fireRange = WeaponDefNames["zenith_meteor"].range
 

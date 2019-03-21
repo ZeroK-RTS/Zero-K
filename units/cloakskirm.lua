@@ -18,7 +18,7 @@ unitDef = {
   customParams           = {
 	modelradius    = [[18]],
 	midposoffset   = [[0 6 0]],
-	reload_move_penalty = 0.75,
+	reload_move_penalty = 0.8,
   },
 
   explodeAs              = [[BIG_UNITEX]],
