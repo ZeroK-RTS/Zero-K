@@ -18,7 +18,7 @@ if (not gadgetHandler:IsSyncedCode()) then
    return false
 end
 
-local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(103, 1120)
+local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(104, 1120)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

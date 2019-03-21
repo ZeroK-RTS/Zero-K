@@ -1,4 +1,4 @@
-local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(103, 1120)
+local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(104, 1120)
 
 function Spring.Utilities.GetUnitRepeat(unitID)
 	if REVERSE_COMPAT then
