@@ -9,6 +9,7 @@ local effects = {
   ["london_flames"] = {
     rocks = {
       air                = true,
+      unit               = true,
       class              = [[CSimpleParticleSystem]],
       count              = 30,
       ground             = true,
@@ -56,6 +57,7 @@ local effects = {
   ["london"] = {
     dustring = {
       air                = true,
+      unit               = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
       ground             = true,
@@ -69,6 +71,7 @@ local effects = {
     },
     gflash = {
       air                = true,
+      unit               = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
       ground             = true,
@@ -81,6 +84,7 @@ local effects = {
     },
     glow = {
       air                = true,
+      unit               = true,
       class              = [[CExpGenSpawner]],
       count              = 10,
       ground             = true,
@@ -107,6 +111,7 @@ local effects = {
     },
     shroom = {
       air                = true,
+      unit               = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
       ground             = true,
@@ -151,6 +156,7 @@ local effects = {
     --},
     sphere = {
       air                = true,
+      unit               = true,
       class              = [[CSpherePartSpawner]],
       count              = 1,
       ground             = true,
@@ -168,6 +174,7 @@ local effects = {
   ["london_glow"] = {
     glow = {
       air                = true,
+      unit               = true,
       class              = [[CSimpleParticleSystem]],
       count              = 3,
       ground             = true,
@@ -236,6 +243,7 @@ local effects = {
 effects.london_flat = {
 	dustring = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 1,
 		ground             = true,
@@ -249,6 +257,7 @@ effects.london_flat = {
 	},
 	gflash = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 1,
 		ground             = true,
@@ -261,6 +270,7 @@ effects.london_flat = {
 	},
 	glow = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 10,
 		ground             = true,
@@ -274,6 +284,7 @@ effects.london_flat = {
 	},
 	sphere = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 1,
 		ground             = true,
@@ -288,6 +299,7 @@ effects.london_flat = {
 	-- BEGIN ZOE: Delay 100
 	cap = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 50,
 		ground             = true,
@@ -301,6 +313,7 @@ effects.london_flat = {
 	},
 	cap2 = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 50,
 		ground             = true,
@@ -314,6 +327,7 @@ effects.london_flat = {
 	},
 	cap3 = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 50,
 		ground             = true,
@@ -327,6 +341,7 @@ effects.london_flat = {
 	},
 	cap4 = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 50,
 		ground             = true,
@@ -340,6 +355,7 @@ effects.london_flat = {
 	},
 	ring = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 10,
 		ground             = true,
@@ -354,6 +370,7 @@ effects.london_flat = {
 	-- BEGIN SOLANG: Delay 100
 	zoe_solange_nw = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 150,
 		ground             = true,
@@ -369,6 +386,7 @@ effects.london_flat = {
 	-- BEGIN THEORA 1: Delay 500
 	zoe_theora_nw_1 = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 150,
 		ground             = true,
@@ -383,6 +401,7 @@ effects.london_flat = {
 	-- BEGIN THEORA 2: Delay 700
 	zoe_theora_nw_2 = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 150,
 		ground             = true,
@@ -398,6 +417,7 @@ effects.london_flat = {
 	-- BEGIN TRANSTHEORA: Delay 300
 	zoe_transtheora_nw = {
 		air                = true,
+		unit               = true,
 		class              = [[CExpGenSpawner]],
 		count              = 150,
 		ground             = true,
