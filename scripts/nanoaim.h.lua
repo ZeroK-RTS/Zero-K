@@ -20,6 +20,9 @@ end
 GG.NanoAim = {}
 
 function GG.NanoAim.UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
+	if not Spring.ValidUnitID(unitID) then
+		return
+	end
 	local type, target, isFeature = Spring.Utilities.GetUnitNanoTarget(unitID)
 
 	if (target) then
