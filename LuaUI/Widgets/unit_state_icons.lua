@@ -135,9 +135,8 @@ function SetUnitStateIcons(unitID)
 	if not (spIsUnitAllied(unitID)or(spGetSpectatingState())) then
 		return
 	end
-	
-	local ud = spGetUnitDefID(unitID)
-	ud = ud and UnitDefs[ud]
+	local unitDefID = spGetUnitDefID(unitID)
+	local ud = unitDefID and UnitDefs[unitDefID]
 	
 	if not ud then
 		return
@@ -157,14 +156,14 @@ function SetUnitStateIcons(unitID)
 			if not prevFirestate[unitID] or prevFirestate[unitID] ~= firestate then
 				prevFirestate[unitID] = firestate
 				local fireStateIcon = fireStateIcons[firestate]
-				--WG.icons.SetUnitIcon( unitID, {name='firestate', texture=fireStateIcon} )
+				WG.icons.SetUnitIcon( unitID, {name='firestate', texture=fireStateIcon} )
 			end
 		end
 		if (ud.canMove or ud.canPatrol) and ((not ud.isBuilding) or ud.isFactory) then
 			if not prevMovestate[unitID] or prevMovestate[unitID] ~= movestate then
 				prevMovestate[unitID] = movestate
 				local moveStateIcon = moveStateIcons[movestate]
-				--WG.icons.SetUnitIcon( unitID, {name='movestate', texture=moveStateIcon} )
+				WG.icons.SetUnitIcon( unitID, {name='movestate', texture=moveStateIcon} )
 			end
 		end
 	end
@@ -174,10 +173,10 @@ function SetUnitStateIcons(unitID)
 		armored = armored and amount and amount ~= 1
 		if not lastArmored[unitID] and armored then
 			lastArmored[unitID] = true
-			--WG.icons.SetUnitIcon( unitID, {name='armored', texture=armoredTexture} )
+			WG.icons.SetUnitIcon( unitID, {name='armored', texture=armoredTexture} )
 		elseif lastArmored[unitID] and not armored then
 			lastArmored[unitID] = nil
-			--WG.icons.SetUnitIcon( unitID, {name='armored', texture=nil} )
+			WG.icons.SetUnitIcon( unitID, {name='armored', texture=nil} )
 		end
 	end
 
@@ -193,11 +192,11 @@ function SetUnitStateIcons(unitID)
 		if not prevPriority[unitID] or prevPriority[unitID] ~= state then
 			if state == 1 then
 				prevPriority[unitID] = state
-				--WG.icons.SetUnitIcon( unitID, {name='priority', texture=nil} )
+				WG.icons.SetUnitIcon( unitID, {name='priority', texture=nil} )
 			else
 				prevPriority[unitID] = state
 				local priorityIcons = priorityIcons[state]
-				--WG.icons.SetUnitIcon( unitID, {name='priority', texture=priorityIcons} )
+				WG.icons.SetUnitIcon( unitID, {name='priority', texture=priorityIcons} )
 			end
 		end
 	end
@@ -208,11 +207,11 @@ function SetUnitStateIcons(unitID)
 		if not prevMiscPriority[unitID] or prevMiscPriority[unitID] ~= state then
 			if state == 1 then
 				prevMiscPriority[unitID] = state
-				--WG.icons.SetUnitIcon( unitID, {name='miscpriority', texture=nil} )
+				WG.icons.SetUnitIcon( unitID, {name='miscpriority', texture=nil} )
 			else
 				prevMiscPriority[unitID] = state
 				local miscPriorityIcons = miscPriorityIcons[state]
-				--WG.icons.SetUnitIcon( unitID, {name='miscpriority', texture=miscPriorityIcons} )
+				WG.icons.SetUnitIcon( unitID, {name='miscpriority', texture=miscPriorityIcons} )
 			end
 		end
 	end
