@@ -353,7 +353,7 @@ function gadget:GameFrame(f)
 		for i = 1, #giveLOAD_order do
 			local order = giveLOAD_order[i]
 			local transportID = order[1]
-			if if Spring.ValidUnitID(transportID) and transportPhase[transportID] == "INTERNAL_LOAD_UNITS " .. order[3][4] + (order[3][6] or 0) then
+			if Spring.ValidUnitID(transportID) and transportPhase[transportID] == "INTERNAL_LOAD_UNITS " .. order[3][4] + (order[3][6] or 0) then
 				spGiveOrderToUnit(unpack(order))
 				local transporteeList
 				if not order[3][5] then
