@@ -303,8 +303,8 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 					
 					GG.recursion_GiveOrderToUnit = true
 					if move then
-						spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+						spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 					else
 						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 					end
@@ -340,8 +340,8 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 			end
 			
 			if move then
-				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 			else
 				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 			end
@@ -361,7 +361,6 @@ end
 local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, cmdTag, n, haveFightAndHoldPos, doHug)
 
 	local data = unit[unitID]
-	
 	--local pointDis = spGetUnitSeparation (enemy,unitID,true)
 	
 	local vx,vy,vz = spGetUnitVelocity(enemy)
@@ -400,7 +399,6 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 		-- In this case the enemy is predicted to go past me
 		predictedDist = 0
 	end
-	
 	local skirmRange = (doHug and behaviour.hugRange) or ((GetEffectiveWeaponRange(data.udID, -dy, behaviour.weaponNum) or 0) - behaviour.skirmLeeway)
 	local reloadFrames
 	if behaviour.reloadSkirmLeeway then
@@ -448,13 +446,13 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		end
 		GG.recursion_GiveOrderToUnit = false
-		data.cx,data.cy,data.cz = cx,cy,cz
+		data.cx, data.cy, data.cz = cx, cy, cz
 		data.receivedOrder = true
 		return true
 	elseif cmdID and move and not behaviour.skirmKeepOrder then

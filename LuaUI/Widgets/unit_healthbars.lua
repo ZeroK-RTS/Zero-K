@@ -60,7 +60,7 @@ local walls = {dragonsteeth=true,dragonsteeth_core=true,fortification=true,forti
 local stockpileH = 24
 local stockpileW = 12
 
-local captureReloadTime = 360
+local captureReloadTime = tonumber(UnitDefNames["vehcapture"].customParams.post_capture_reload) -- Hackity hax
 local DISARM_DECAY_FRAMES = 1200
 
 local destructableFeature = {}
