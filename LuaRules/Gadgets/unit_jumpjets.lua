@@ -621,7 +621,7 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 			end
 		else
 			cmdID_1, _, cmdTag_1 = Spring.GetUnitCurrentCommand(unitID)
-			cmdID_2 = Spring.GetUnitCurrentCommand(unitID, 1)
+			cmdID_2 = Spring.GetUnitCurrentCommand(unitID, 2)
 		end
 		if cmdID_1 and cmdID_2 then
 			if cmdID_1 == CMD_MOVE and cmdID_2 == CMD_JUMP then

@@ -286,7 +286,7 @@ local function GiveRetreatOrders(unitID, hx,hz)
 		tag1, tag2 = cmds[1].tag, cmds[2] and cmds[2].tag
 	else
 		_, _, tag1 = Spring.GetUnitCurrentCommand(unitID)
-		_, _, tag2 = Spring.GetUnitCurrentCommand(unitID, 1)
+		_, _, tag2 = Spring.GetUnitCurrentCommand(unitID, 2)
 	end
 	
 	isRetreating[unitID] = true

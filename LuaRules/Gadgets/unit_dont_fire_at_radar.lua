@@ -105,7 +105,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 						cp_1, cp_2 = queue[2].params[1], queue[2].params[2]
 					end
 				else
-					cmdID, cmdOpts, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID, 1)
+					cmdID, cmdOpts, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID, 2)
 				end
 				if isTheRightSortOfCommand(cmdID, cmdOpts, cp_1, cp_2) then
 					spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
