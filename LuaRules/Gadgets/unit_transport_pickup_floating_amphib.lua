@@ -113,8 +113,8 @@ local function IsUnitAllied(unitID1,unitID2)
 end
 
 local function IsUnitIdle(unitID)
-	local cQueue = spGetCommandQueue(unitID, 1)
-	local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
+	local cmdID = Spring.Utilities.GetUnitFirstCommand(unitID)
+	local moving = cmdID and sinkCommand[cmdID]
 	return not moving
 end
 
@@ -328,9 +328,9 @@ function gadget:GameFrame(f)
 						haveFloater = true
 					end
 				end
-				local cmd=spGetCommandQueue(transportID,1)
-				if cmd and cmd[1] then					
-					if cmd[1]['id'] == CMD.LOAD_UNITS and haveFloater then
+				local cmdID = Spring.Utilities.GetUnitFirstCommand(transportID)
+				if cmdID then
+					if cmdID == CMD.LOAD_UNITS and haveFloater then
 						i = i + 1 --go to next entry
 					else
 						-- delete current entry, replace it with final entry, and loop again

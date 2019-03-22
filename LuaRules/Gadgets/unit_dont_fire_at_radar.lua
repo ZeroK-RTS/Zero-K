@@ -81,8 +81,8 @@ local function canShootAtUnit(targetID, allyTeam)
 	return false
 end
 
-local function isTheRightSortOfCommand(cQueue, index)
-	return #cQueue >= index and cQueue[index].options.internal and cQueue[index].id == CMD_ATTACK and #cQueue[index].params == 1
+local function isTheRightSortOfCommand(cmdID, cmdOpts, cp_1, cp_2)
+	return cmdID and Spring.Utilities.CheckBit(cmdOpts, CMD.OPT_INTERNAL) and cQueue[index].id == CMD_ATTACK and cp_1 and (not cp_2)
 end
 
 -------------------------------------------------------------------------------------
@@ -97,9 +97,18 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			if (not GG.recursion_GiveOrderToUnit) and wantGoodTarget[unitID] then
 				wantGoodTarget[unitID] = nil
 				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ATTACK, CMD_OPT_INTERNAL, targetID }, CMD.OPT_ALT )
-				local cQueue = spGetCommandQueue(unitID, 2)
-				if isTheRightSortOfCommand(cQueue, 2)  then
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[2].tag}, 0 )
+				local cmdID, cmdOpts, cmdTag, cp_1, cp_2
+				if Spring.Utilities.COMPAT_GET_ORDER then
+					local queue = Spring.GetCommandQueue(unitID, 2)
+					if queue and queue[2] then
+						cmdID, cmdOpts, cmdTag = queue[2].id, queue[2].options.coded, queue[2].tag
+						cp_1, cp_2 = queue[2].params[1], queue[2].params[2]
+					end
+				else
+					cmdID, cmdOpts, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID, 1)
+				end
+				if isTheRightSortOfCommand(cmdID, cmdOpts, cp_1, cp_2) then
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 				end
 			end
 			return true, defPriority
@@ -114,12 +123,22 @@ end
 
 function GG.DontFireRadar_CheckAim(unitID)
 	if units[unitID] then
-		local cQueue = spGetCommandQueue(unitID, 1)
+		local cmdID, cmdOpts, cmdTag, cp_1, cp_2
+		if Spring.Utilities.COMPAT_GET_ORDER then
+			local queue = Spring.GetCommandQueue(unitID, 1)
+			if queue and queue[1] then
+				cmdID, cmdOpts, cmdTag = queue[1].id, queue[1].options.coded, queue[1].tag
+				cp_1, cp_2 = queue[1].params[1], queue[1].params[2]
+			end
+		else
+			cmdID, cmdOpts, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID)
+		end
+		
 		local data = units[unitID]
-		if isTheRightSortOfCommand(cQueue, 1) and not canShootAtUnit(cQueue[1].params[1], spGetUnitAllyTeam(unitID)) then
+		if isTheRightSortOfCommand(cmdID, cmdOpts, cp_1, cp_2) and not canShootAtUnit(cp_1, spGetUnitAllyTeam(unitID)) then
 			local firestate = Spring.Utilities.GetUnitFireState(unitID)
 			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {0}, 0 )
-			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, 0 )
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {firestate}, 0 )
 			wantGoodTarget[unitID] = {command = true}
 			spSetUnitTarget(unitID,0)

@@ -220,8 +220,7 @@ local function BringingDownTheHeavens(unitID)
 	if (UnitDefs[unitDefID].canAttack) then
 		near_ally = GetUnitNearestAlly(unitID, 300)
 		if (near_ally) then
-			local cQueue = spGetCommandQueue(near_ally, 1)
-			if cQueue and (#cQueue > 0) and cQueue[1].id == CMD_GUARD then -- oh
+			if Spring.Utilities.GetUnitFirstCommand(near_ally) == CMD_GUARD then -- oh
 				near_ally = nil -- i dont want chain guards...
 			end
 		end
@@ -251,8 +250,8 @@ end
 
 local function CheckZombieOrders(unitID)	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
 	for unitID, _ in pairs(zombies) do
-		local cQueue = spGetCommandQueue(unitID, 1)
-		if not (cQueue) or not (#cQueue > 0) then -- oh
+		local queueSize = spGetCommandQueue(unitID, 0)
+		if not (queueSize) or not (queueSize > 0) then -- oh
 			BringingDownTheHeavens(unitID)
 		end
 	end

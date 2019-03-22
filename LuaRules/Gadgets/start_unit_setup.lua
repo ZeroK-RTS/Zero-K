@@ -60,9 +60,18 @@ local function CheckOrderRemoval() -- FIXME: maybe we can remove polling every f
 		return
 	end
 	for unitID, factoryDefID in pairs(ordersToRemove) do
-		local cQueue = Spring.GetCommandQueue(unitID, 1)
-		if cQueue and cQueue[1] and cQueue[1].id == -factoryDefID then
-			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, CMD.OPT_ALT)
+		local cmdID, cmdTag
+		if Spring.Utilities.COMPAT_GET_ORDER then
+			local queue = Spring.GetCommandQueue(unitID, 1)
+			if queue and queue[1] then
+				cmdID, cmdTag = queue[1].id, queue[1].tag
+			end
+		else
+			cmdID, _, cmdTag = Spring.GetUnitCurrentCommand(unitID)
+		end
+		
+		if cmdID == -factoryDefID then
+			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmdTag}, CMD.OPT_ALT)
 		end
 	end
 	ordersToRemove = nil

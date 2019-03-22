@@ -517,7 +517,17 @@ local function GetDistance(x1, x2, y1, y2)
 end
 
 local function UpdateCarrierTarget(carrierID, frame)
-	local cQueueC = GetCommandQueue(carrierID, 1)
+	local cmdID, cmdParam_1, cmdParam_2, cmdParam_3
+	if Spring.Utilities.COMPAT_GET_ORDER then
+		local queue = Spring.GetCommandQueue(carrierID, 1)
+		if queue and queue[1] then
+			local par = queue[1].params
+			cmdID, cmdParam_1, cmdParam_2, cmdParam_3 = queue[1].id, par[1], par[2], par[3]
+		end
+	else
+		cmdID, _, _, cmdParam_1, cmdParam_2, cmdParam_3 = Spring.GetUnitCurrentCommand(carrierID)
+	end
+	
 	local droneSendDistance = nil
 	local px, py, pz
 	local target
@@ -537,14 +547,13 @@ local function UpdateCarrierTarget(carrierID, frame)
 	end
 	
 	--Handles an attack order given to the carrier.
-	if not recallDrones and cQueueC and cQueueC[1] and cQueueC[1].id == CMD_ATTACK then
+	if not recallDrones and cmdID == CMD_ATTACK then
 		local ox, oy, oz = GetUnitPosition(carrierID)
-		local params = cQueueC[1].params
-		if #params == 1 then
-			target = {params[1]}
-			px, py, pz = GetUnitPosition(params[1])
+		if cmdParam_1 and not cmdParam_2 then
+			target = {cmdParam_1}
+			px, py, pz = GetUnitPosition(cmdParam_1)
 		else
-			px, py, pz = cQueueC[1].params[1], cQueueC[1].params[2], cQueueC[1].params[3]
+			px, py, pz = cmdParam_1, cmdParam_2, cmdParam_3
 		end
 		if px then
 			droneSendDistance = GetDistance(ox, px, oz, pz)

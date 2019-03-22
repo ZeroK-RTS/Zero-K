@@ -361,7 +361,6 @@ end
 -- Flying lups
 
 local Lups
-local SYNCED = SYNCED
 
 local particleIDs = {}
 

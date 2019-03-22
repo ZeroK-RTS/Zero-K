@@ -74,9 +74,18 @@ local function setFlyHigh(unitID)
 end
 
 local function GetAttackTarget(unitID)
-	local cQueue = Spring.GetCommandQueue(unitID,1)
-	if cQueue and #cQueue == 1 and cQueue[1].id == CMD_ATTACK and cQueue[1].params and cQueue[1].params[1] and (not cQueue[1].params[2]) then
-		local targetID = cQueue[1].params[1]
+	local cmdID, cmdParam_1, cmdParam_2
+	if Spring.Utilities.COMPAT_GET_ORDER then
+		local queue = Spring.GetCommandQueue(unitID, 1)
+		if queue and queue[1] then
+			cmdID, cmdParam_1, cmdParam_2 = queue[1].id, queue[1].params[1], queue[1].params[2]
+		end
+	else
+		cmdID, _, _, cmdParam_1, cmdParam_2 = Spring.GetUnitCurrentCommand(unitID)
+	end
+	
+	if cmdID and cmdID == CMD_ATTACK and cmdParam_1 and (not cmdParam_2) then
+		local targetID = cmdParam_1
 		if Spring.ValidUnitID(targetID) then
 			local unitDefID = Spring.GetUnitDefID(targetID)
 			local ud = UnitDefs[unitDefID]

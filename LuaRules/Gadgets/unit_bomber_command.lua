@@ -533,8 +533,7 @@ function gadget:GameFrame(n)
 		for bomberID, data in pairs(bomberToPad) do
 			local padID = data.padID
 			local unitDefID = data.unitDefID
-			local queue = spGetCommandQueue(bomberID, 1)
-			if (queue and queue[1] and queue[1].id == CMD_REARM) and 
+			if (Spring.Utilities.GetUnitFirstCommand(bomberID) == CMD_REARM) and 
 					((Spring.GetUnitSeparation(bomberID, padID, true) or 1000) < ((unitDefID and airDefs[unitDefID] and airDefs[unitDefID].padRadius) or DEFAULT_PAD_RADIUS)) then
 				if not airpadRefreshEmptyspot then
 					RefreshEmptyspot_minusBomberLanding() --initialize empty pad count once
@@ -571,8 +570,8 @@ function gadget:GameFrame(n)
 		
 		for unitID in pairs(bomberUnitIDs) do -- CommandFallback doesn't seem to activate for inbuilt commands!!! <-- What this really mean?
 			if spGetUnitRulesParam(unitID, "noammo") == 1 then
-				local queue = spGetCommandQueue(unitID, 1) or emptyTable
-				if #queue == 0 or combatCommands[queue[1].id] then --should never happen... (all should be catch by AllowCommand) 
+				local cmdID = Spring.Utilities.GetUnitFirstCommand(unitID)
+				if (not cmdID) or combatCommands[cmdID] then --should never happen... (all should be catch by AllowCommand) 
 					RequestRearm(unitID, nil, true)
 				end
 			end
@@ -598,8 +597,8 @@ function GG.LandComplete(bomberID)
 	
 	-- Check queue inheritence
 	local queueLength = spGetCommandQueue(bomberID, 0)
-	local queue = spGetCommandQueue(bomberID, 1)
-	if (queueLength == 0 or (queueLength == 1 and queue and queue[1] and (queue[1].id == CMD_REARM or queue[1].id == 0))) and 
+	local cmdID = Spring.Utilities.GetUnitFirstCommand(bomberID)
+	if (queueLength == 0 or (queueLength == 1 and (cmdID == CMD_REARM or cmdID == 0))) and 
 			(padID and airpadsData[padID] and not airpadsData[padID].mobile) then
 		local padQueueLength = spGetCommandQueue(padID, 0)
 		if padQueueLength > 0 then

@@ -570,7 +570,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	local range   = jumpDef.range
 
 	if (distSqr < (range*range)) then
-		local cmdTag = spGetCommandQueue(unitID,1)[1].tag
 		if (Spring.GetUnitRulesParam(unitID, "jumpReload") >= 1) and Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1 then
 			local coords = table.concat(cmdParams)
 			local currFrame = spGetGameFrame()
@@ -614,9 +613,19 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 	if jumpDefs[unitDefID] then
 		local queue = spGetCommandQueue(unitID, 2)
 		-- The first command in the queue is a move command added by the engine.
-		if queue and queue[1] and queue[2] then
-			if queue[2].id == CMD_JUMP and queue[1].id == CMD_MOVE then
-				Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {queue[1].tag}, 0)
+		local cmdID_1, cmdID_2, cmdTag_1
+		if Spring.Utilities.COMPAT_GET_ORDER then
+			local queue = Spring.GetCommandQueue(unitID, 2)
+			if queue and queue[1] and queue[2] then
+				cmdID_1, cmdID_2, cmdTag_1 = queue[1].id, queue[2].id, queue[1].tag
+			end
+		else
+			cmdID_1, _, cmdTag_1 = Spring.GetUnitCurrentCommand(unitID)
+			cmdID_2 = Spring.GetUnitCurrentCommand(unitID, 1)
+		end
+		if cmdID_1 and cmdID_2 then
+			if cmdID_1 == CMD_MOVE and cmdID_2 == CMD_JUMP then
+				Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag_1}, 0)
 			end
 		end
 	end

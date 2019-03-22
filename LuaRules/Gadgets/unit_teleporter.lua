@@ -410,11 +410,17 @@ function gadget:GameFrame(f)
 				
 				-- complete teleport
 				if teleFinished then
-					
 					local teleportiee = tele[tid].teleportiee
-					
-					local cQueue = Spring.GetCommandQueue(teleportiee, 1)
-					if cQueue and #cQueue > 0 and cQueue[1].id == CMD_WAIT_AT_BEACON and cQueue[1].params[1] == bid then
+					local cmdID, cmdTag, cmdParam_1
+					if Spring.Utilities.COMPAT_GET_ORDER then
+						local queue = Spring.GetCommandQueue(teleportiee, 1)
+						if queue and queue[1] then
+							cmdID, cmdTag, cmdParam_1 = queue[1].id, queue[1].tag, queue[1].params[1]
+						end
+					else
+						cmdID, _, cmdTag, cmdParam_1 = Spring.GetUnitCurrentCommand(teleportiee)
+					end
+					if cmdID and cmdID == CMD_WAIT_AT_BEACON and cmdParam_1 == bid then
 						local ud = Spring.GetUnitDefID(teleportiee)
 						ud = ud and UnitDefs[ud]
 						if ud then
@@ -454,7 +460,7 @@ function gadget:GameFrame(f)
 							
 							Spring.GiveOrderToUnit(teleportiee, CMD.WAIT, {}, 0)
 							Spring.GiveOrderToUnit(teleportiee, CMD.WAIT, {}, 0)
-							Spring.GiveOrderToUnit(teleportiee, CMD.REMOVE, {cQueue[1].tag}, 0)
+							Spring.GiveOrderToUnit(teleportiee, CMD.REMOVE, {cmdTag}, 0)
 						end
 					end
 					
@@ -476,8 +482,16 @@ function gadget:GameFrame(f)
 					for i = 1, #units do
 						local nid = units[i]
 						if allyTeam == Spring.GetUnitAllyTeam(nid) and beaconWaiter[nid] then
-							local cQueue = Spring.GetCommandQueue(nid, 1)
-							if #cQueue > 0 and cQueue[1].id == CMD_WAIT_AT_BEACON and cQueue[1].params[1] == bid then
+							local cmdID, cmdParam_1
+							if Spring.Utilities.COMPAT_GET_ORDER then
+								local queue = Spring.GetCommandQueue(nid, 1)
+								if queue and queue[1] then
+									cmdID, cmdParam_1 = queue[1].id, queue[1].params[1]
+								end
+							else
+								cmdID, _, _, cmdParam_1 = Spring.GetUnitCurrentCommand(nid)
+							end
+							if cmdID and cmdID == CMD_WAIT_AT_BEACON and cmdParam_1 == bid then
 								local priority = beaconWaiter[nid].frame
 								if ((not bestPriority) or priority < bestPriority) then
 									local ud = Spring.GetUnitDefID(nid)
