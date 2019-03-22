@@ -639,6 +639,8 @@ local function updateUnits(frame, start, increment)
 			else
 				cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
 				enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
+				--Spring.Echo("enemy, move, haveFight, autoAttackEnemyID", enemy, move, haveFight, autoAttackEnemyID)
+				--Spring.Echo("fightX, fightY, fightZ", fightX, fightY, fightZ)
 			end
 			
 			--local ux,uy,uz = spGetUnitPosition(unitID)
