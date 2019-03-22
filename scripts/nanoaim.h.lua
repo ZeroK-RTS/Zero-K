@@ -51,7 +51,7 @@ function GG.NanoAim.UpdateNanoDirection(unitID, nanopieces,turnSpeed,turnSpeedVe
 		turnSpeedVert = turnSpeedVert or turnSpeed
 
 		local turned = false
-		for i=1,#nanopieces do
+		for i = 1,#nanopieces do
 			local nano = nanopieces[i]
 			local cur_head,cur_pitch = Spring.UnitScript.GetPieceRotation(nano)
 			if (cur_head ~= heading)or(cur_pitch ~= pitch) then
