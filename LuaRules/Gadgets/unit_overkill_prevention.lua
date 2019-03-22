@@ -30,7 +30,7 @@ local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
-local spGetUnitCommands     = Spring.GetUnitCommands
+local spGetCommandQueue     = Spring.GetCommandQueue
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spGetUnitShieldState  = Spring.GetUnitShieldState
 
@@ -317,9 +317,9 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		-- Overkill prevention does not prevent firing at unidentified radar dots.
 		-- Although, it still remembers what has been fired at a radar dot.
 		if targetIdentified then
-			local queueSize = spGetUnitCommands(unitID, 0)
+			local queueSize = spGetCommandQueue(unitID, 0)
 			if queueSize == 1 then
-				local queue = spGetUnitCommands(unitID, 1)
+				local queue = spGetCommandQueue(unitID, 1)
 				local cmd = queue[1]
 				if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
 					--Spring.Echo("Removing auto-attack command")

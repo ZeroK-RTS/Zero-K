@@ -209,7 +209,7 @@ end
 
 local function StopRetreating(unitID)
 	SendToUnsynced("StopRetreat", unitID)
-	local cmds = Spring.GetUnitCommands(unitID, -1)
+	local cmds = Spring.GetCommandQueue(unitID, -1)
 	if retreaterHasRearm[unitID] then
 		for _,cmd in ipairs(cmds) do
 			if cmd.id == CMD_REARM then
@@ -280,7 +280,7 @@ local function GiveRetreatOrders(unitID, hx,hz)
 	spGiveOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD.WAIT, CMD.OPT_SHIFT}, CMD.OPT_ALT) --SHIFT W
 	GiveClampedOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD_RAW_MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, CMD.OPT_ALT) -- ALT makes the 0 positional
 	
-	local cmds = Spring.GetUnitCommands(unitID,2)
+	local cmds = Spring.GetCommandQueue(unitID,2)
 	local tag1, tag2 = cmds[1].tag, cmds[2] and cmds[2].tag
 	
 	isRetreating[unitID] = true

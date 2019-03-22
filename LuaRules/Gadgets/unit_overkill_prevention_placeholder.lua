@@ -27,7 +27,7 @@ local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spSetUnitTarget       = Spring.SetUnitTarget
-local spGetUnitCommands     = Spring.GetUnitCommands
+local spGetCommandQueue     = Spring.GetCommandQueue
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 
 local FEATURE = 102
@@ -154,9 +154,9 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 		projectiles.Add(-unitID, data)
 		return false
 	else
-		local queueSize = spGetUnitCommands(unitID, 0)
+		local queueSize = spGetCommandQueue(unitID, 0)
 		if queueSize == 1 then
-			local queue = spGetUnitCommands(unitID, 1)
+			local queue = spGetCommandQueue(unitID, 1)
 			local cmd = queue[1]
 			if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
 				--Spring.Echo("Removing auto-attack command")
