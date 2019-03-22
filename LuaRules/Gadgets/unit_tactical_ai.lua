@@ -62,6 +62,8 @@ local unitList = {count = 0, data = {}}
 local unitAIBehaviour = {}
 local externallyHandledUnit = {}
 
+local HEADING_TO_RAD = (math.pi*2/2^16)
+
 --------------------------------------------------------------------------------
 -- Commands
 
@@ -357,6 +359,15 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 	
 end
 
+local function HeadingAllowReloadSkirmBlock(unitID, blockThreshold, ex, ez)
+	local heading = Spring.GetUnitHeading(unitID)*HEADING_TO_RAD
+	local hx = math.sin(heading)
+	local hz = math.cos(heading)
+	local dist = math.sqrt(ex^2 + ez^2)
+	ex, ez = ex/dist, ez/dist
+	local dot = hx*ex + hz * ez
+	return dot < blockThreshold
+end
 
 local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, cmdTag, n, haveFightAndHoldPos, doHug)
 
@@ -429,10 +440,12 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 			-- Negative reloadFrames is how many frames the weapon has been loaded for.
 			-- If a unit has not fired then it has been loaded since frame zero.
 			if reloadFrames and (behaviour.skirmBlockedApproachFrames < -reloadFrames) then
-				if cmdID and move and not behaviour.skirmKeepOrder then
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+				if behaviour.skirmBlockApproachHeadingBlock and HeadingAllowReloadSkirmBlock(unitID, behaviour.skirmBlockApproachHeadingBlock, ex, ez) then
+					if cmdID and move and not behaviour.skirmKeepOrder then
+						spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+					end
+					return behaviour.skirmKeepOrder
 				end
-				return behaviour.skirmKeepOrder
 			end
 		end
 		
