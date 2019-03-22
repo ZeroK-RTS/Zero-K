@@ -19,7 +19,7 @@ if GG.NanoAim then
 end
 GG.NanoAim = {}
 
-function GG.NanoAim.UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
+function GG.NanoAim.UpdateNanoDirection(unitID, nanopieces,turnSpeed,turnSpeedVert)
 	if not Spring.ValidUnitID(unitID) then
 		return
 	end
@@ -68,10 +68,10 @@ function GG.NanoAim.UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
 end
 
 
-function GG.NanoAim.UpdateNanoDirectionThread(nanopieces, updateInterval, turnSpeed,turnSpeedVert)
+function GG.NanoAim.UpdateNanoDirectionThread(unitID, nanopieces, updateInterval, turnSpeed,turnSpeedVert)
 	updateInterval = updateInterval or 1000
-	while true do
-		GG.NanoAim.UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
+	while true and Spring.ValidUnitID(unitID) do
+		GG.NanoAim.UpdateNanoDirection(unitID, nanopieces,turnSpeed,turnSpeedVert)
 		Sleep(updateInterval)
 	end
 end
