@@ -353,7 +353,7 @@ function gadget:GameFrame(f)
 		for i = 1, #giveLOAD_order do
 			local order = giveLOAD_order[i]
 			local transportID = order[1]
-			if transportPhase[transportID] == "INTERNAL_LOAD_UNITS " .. order[3][4] + (order[3][6] or 0) then
+			if if Spring.ValidUnitID(transportID) and transportPhase[transportID] == "INTERNAL_LOAD_UNITS " .. order[3][4] + (order[3][6] or 0) then
 				spGiveOrderToUnit(unpack(order))
 				local transporteeList
 				if not order[3][5] then
@@ -361,12 +361,12 @@ function gadget:GameFrame(f)
 				else
 					transporteeList = spGetUnitsInCylinder(order[3][4],order[3][6],order[3][7])
 				end
-				transportPhase[transportID] = nil --clear a blocking tag
 				maintainFloatCount = maintainFloatCount + 1
 				maintainFloat[maintainFloatCount] = {transportID,transporteeList}
 				--Spring.Echo("C")
 				--"PHASE C"--
 			end
+			transportPhase[transportID] = nil --clear a blocking tag
 		end
 		giveLOAD_order = {}
 	end
