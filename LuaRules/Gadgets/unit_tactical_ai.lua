@@ -618,7 +618,9 @@ local function updateUnits(frame, start, increment)
 				if data.receivedOrder then
 					if Spring.Utilities.COMPAT_GET_ORDER then
 						local cQueue = spGetCommandQueue(unitID,1)
-						clearOrder(unitID, data, cQueue[1].id, cQueue[1].tag, cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3])
+						if cQueue and cQueue[1] then
+							clearOrder(unitID, data, cQueue[1].id, cQueue[1].tag, cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3])
+						end
 					else
 						cmdID, _, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
 						clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
