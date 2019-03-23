@@ -53,7 +53,7 @@ end
 
 function Spring.Utilities.GetUnitFirstCommand(unitID)
 	if REVERSE_COMPAT_ORDER then
-		local cQueue = Spring.GetUnitCommandQueue(unitID)
+		local cQueue = Spring.GetCommandQueue(unitID)
 		return cQueue and cQueue[1] and cQueue[1].id
 	end
 
