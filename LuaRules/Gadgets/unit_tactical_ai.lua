@@ -167,7 +167,7 @@ local function getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3,
 		return false -- no queue and on hold position.
 	end
 	
-	if (holdPos and cmdID == CMD_ATTACK and Spring.Utilities.CheckBit(cmdOpts, CMD.OPT_INTERNAL)) then
+	if (holdPos and cmdID == CMD_ATTACK and Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)) then
 		if spGetCommandQueue(unitID, 0) == 1 then
 			return false -- set to hold position and is auto-acquiring target
 		end
@@ -179,7 +179,7 @@ local function getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3,
 		local target, check = cp_1, cp_2
 		if (not check) and spValidUnitID(target) then -- if I target a unit
 			local cmdID_2 = Spring.GetUnitCurrentCommand(unitID, 2)
-			if not (cmdID == CMD_FIGHT or cmdID_2 == CMD_FIGHT or Spring.Utilities.CheckBit(cmdOpts, CMD.OPT_INTERNAL)) then -- only skirm single target when given the order manually
+			if not (cmdID == CMD_FIGHT or cmdID_2 == CMD_FIGHT or Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)) then -- only skirm single target when given the order manually
 				return target, false
 			else
 				return -1, false, true, target
@@ -194,7 +194,7 @@ local function getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3,
 			if cmdID_2 == CMD_FIGHT or (cmdID_2 == CMD_ATTACK and ((not holdPos) or cmdID_3 == CMD_FIGHT)) then -- if the next command is attack, patrol or fight
 				local target, check = cps_1, cps_2
 				if not check then -- if I target a unit
-					if not (cmdID_2 == CMD_FIGHT or cmdID_3 == CMD_FIGHT or Spring.Utilities.CheckBit(cmdOpts_2, CMD.OPT_INTERNAL)) then -- only skirm single target when given the order manually
+					if not (cmdID_2 == CMD_FIGHT or cmdID_3 == CMD_FIGHT or Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts_2, CMD.OPT_INTERNAL)) then -- only skirm single target when given the order manually
 						return target, true, nil, nil, cps_1, cps_2, cps_3
 					else
 						return -1, true, true, target, cps_1, cps_2, cps_3
@@ -573,7 +573,7 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fx
 					clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 				end
 			else
-				if not((not enemy) or (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(cmdOpts, CMD.OPT_INTERNAL)) or 
+				if not((not enemy) or (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)) or 
 						-- if I have been given attack order manually do not flee
 						not ((typeKnown and (behaviour.flees[enemyUnitDef] or (behaviour.fleeCombat and armedUnitDefIDs[enemyUnitDef]))) 
 						-- if I have los and the unit is a fleeable or a unit is unarmed and I flee combat - flee

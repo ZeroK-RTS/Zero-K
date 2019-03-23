@@ -61,7 +61,10 @@ function Spring.Utilities.GetUnitFirstCommand(unitID)
 	return cmdID
 end
 
-function Spring.Utilities.CheckBit(number, bit)
-	return number%(2*bit) >= bit
+function Spring.Utilities.CheckBit(name, number, bit)
+	if not number then
+		Spring.Echo("Name", name)
+	end
+	return number and (number%(2*bit) >= bit)
 end
 

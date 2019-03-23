@@ -134,10 +134,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			if Spring.Utilities.COMPAT_GET_ORDER then
 				local queue = Spring.GetCommandQueue(unitID, 3)
 				if queue and queue[1] then
-					cID_1, cOpt_1, cTag_1, cp_1, cp_2 = queue[1].id, queue[1].tag, queue[1].params[1], queue[1].params[2]
+					cID_1, cOpt_1, cTag_1, cp_1, cp_2 = queue[1].id, queue[1].options.coded, queue[1].tag, queue[1].params[1], queue[1].params[2]
 				end
 				if queue and queue[2] then
-					cID_2, cOpt_2, cTag_2, cps_1, cps_2 = queue[2].id, queue[2].tag, queue[2].params[1], queue[2].params[2]
+					cID_2, cOpt_2, cTag_2, cps_1, cps_2 = queue[2].id, queue[2].options.coded, queue[2].tag, queue[2].params[1], queue[2].params[2]
 				end
 				if queue and queue[3] then
 					cID_3 = queue[3].id
@@ -167,7 +167,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			end
 
 			-- if attack is a non-player command
-			if (not cID_1) or cID_1 ~= CMD_ATTACK or (cID_1 == CMD_ATTACK and Spring.Utilities.CheckBit(cOpt_1, CMD.OPT_INTERNAL)) then
+			if (not cID_1) or cID_1 ~= CMD_ATTACK or (cID_1 == CMD_ATTACK and Spring.Utilities.CheckBit(gadget:GetInfo().name, cOpt_1, CMD.OPT_INTERNAL)) then
 				local newTargetID = spGetUnitNearestEnemy(attackerID,UnitDefs[attackerDefID].range, true)
 				if newTargetID ~= unitID and spValidUnitID(attackerID) and spValidUnitID(newTargetID) then
 					
@@ -187,7 +187,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 							if not Spring.Utilities.COMPAT_GET_ORDER then
 								cID_2, cOpt_2, cTag_2, cps_1, cps_2 = Spring.GetUnitCurrentCommand(unitID, 2)
 							end
-							if cID_2 == CMD_FIGHT and Spring.Utilities.CheckBit(cOpt_2, CMD.OPT_INTERNAL) and (not cps_2) and cps_1 == unitID then
+							if cID_2 == CMD_FIGHT and Spring.Utilities.CheckBit(gadget:GetInfo().name, cOpt_2, CMD.OPT_INTERNAL) and (not cps_2) and cps_1 == unitID then
 								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cTag_2},0)
 							end
 						end

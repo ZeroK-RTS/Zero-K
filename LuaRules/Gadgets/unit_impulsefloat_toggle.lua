@@ -278,7 +278,7 @@ function gadget:GameFrame(f)
 					else
 						cmdID, cmdOpts = Spring.GetUnitCurrentCommand(unitID)
 					end
-					local moving = cmdID and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE) and not Spring.Utilities.CheckBit(cmdOpts, CMD.OPT_INTERNAL)
+					local moving = cmdID and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE) and not Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)
 					setSurfaceState(unitID, data.unitDefID, (not moving and aimWeapon[unitID]) or false)
 				elseif floatState[unitID] == FLOAT_NEVER then
 					setSurfaceState(unitID, data.unitDefID, false)
@@ -451,7 +451,7 @@ function gadget:Initialize()
 				cmdID, cmdOpts = Spring.GetUnitCurrentCommand(unitID)
 			end
 			
-			local moving = cmdID and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD) and not Spring.Utilities.CheckBit(cmdOpts, CMD.OPT_INTERNAL)
+			local moving = cmdID and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD) and not Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)
 			if not moving then
 				addFloat(unitID, unitDefID)
 			end
