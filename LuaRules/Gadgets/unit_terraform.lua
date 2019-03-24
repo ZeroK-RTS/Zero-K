@@ -2098,7 +2098,7 @@ function GG.Terraform_RaiseWater(raiseAmount)
 		if spValidUnitID(allUnits[i]) then
 			local x,y,z = spGetUnitPosition(allUnits[i])
 			spSetUnitPosition(x,y-raiseAmount,z)
-			local commands = spGetCommandQueue(allUnits[i])
+			local commands = spGetCommandQueue(allUnits[i], -1)
 			local commandsCount = #commands
 			for j = 1, commandsCount do
 			
