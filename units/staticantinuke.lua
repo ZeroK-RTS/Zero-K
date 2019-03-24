@@ -88,7 +88,7 @@ unitDef = {
       },
 
       --spawning the intercept explosion is handled by exp_nuke_effect_chooser.lua
-      --explosionGenerator      = [[custom:ANTINUKE]],
+      explosionGenerator      = [[custom:lrpc_expl]],
       fireStarter             = 100,
       flightTime              = 20,
       impulseBoost            = 0,
