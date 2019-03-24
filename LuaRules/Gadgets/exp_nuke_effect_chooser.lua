@@ -45,7 +45,7 @@ function gadget:Explosion(weaponID, px, py, pz, ownerID)
 	if (nux[weaponID] and py-GetGroundHeight(px,pz)>200) then
 		Spring.SpawnCEG(defaultInterceptExplosion, px, py, pz, 0, 0, 0, nux[weaponID])
 	else
-		Spring.SpawnCEG(defaultSuccessExplosion, px, py, pz, 0, 0, 0, nux[weaponID])
+		return false
 	end
 	return true -- always suppress engine/weapon default effects
 end
