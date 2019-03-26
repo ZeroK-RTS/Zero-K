@@ -76,7 +76,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.3,
-      explosionGenerator      = [[custom:LONDON_FLAT]],
+      explosionGenerator      = [[custom:LONDON_FLAT]],      -- note, spawning of the explosion is handled by exp_nuke_effect_chooser.lua 
       fireStarter             = 0,
       flightTime              = 180,
       impulseBoost            = 0.5,
