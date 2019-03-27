@@ -387,6 +387,17 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 		local px, py, pz, dx, dy, dz, vx, vy, vz, offx, offy, offz
 		-- local magnitude, newPadHeading
 		
+		if not droneList[unitID] then
+			--droneList[unitID] became NIL when drone or carrier is destroyed (in UnitDestroyed()). Is NIL at beginning of frame and this piece of code run at end of frame
+			if carrierList[carrierID] then
+				droneInfo.buildCount = droneInfo.buildCount - 1
+				carrierList[carrierID].occupiedPieces[padPieceID] = false
+				AddNextDroneFromQueue(carrierID) --add next drone in this vacant position
+				GG.StopMiscPriorityResourcing(carrierID, miscPriorityKey)
+			end
+			return --nothing else to do
+		end
+		
 		local miscPriorityKey = "drone_" .. unitID
 		local oldBuildRate = false
 		local buildProgress, health
@@ -407,7 +418,8 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 		end
 		
 		while true do
-			if (not droneList[unitID]) then --droneList[unitID] became NIL when drone or carrier is destroyed (in UnitDestroyed()). Is NIL at beginning of frame and this piece of code run at end of frame
+			if (not droneList[unitID]) then
+				--droneList[unitID] became NIL when drone or carrier is destroyed (in UnitDestroyed()). Is NIL at beginning of frame and this piece of code run at end of frame
 				if carrierList[carrierID] then
 					droneInfo.buildCount = droneInfo.buildCount - 1
 					carrierList[carrierID].occupiedPieces[padPieceID] = false
