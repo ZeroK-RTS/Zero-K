@@ -254,10 +254,12 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	if not mustJump then
 		-- check if there is no wall in between
 		local x,z = start[1],start[3]
-		for i=0, 1, step do
-			x = x + vector[1]*step
-			z = z + vector[3]*step
-			if ( (spGetGroundHeight(x,z) - 30) > (start[2] + vector[2]*i + (1-(2*i-1)^2)*height)) then
+		local wallStep = 0.015
+		--Spring.Echo("Gadget", x, start[2], z, "vec", vector[1], vector[2], vector[3], "step", wallStep)
+		for i = 0, 1, wallStep do
+			x = x + vector[1]*wallStep
+			z = z + vector[3]*wallStep
+			if ((spGetGroundHeight(x,z) - 30) > (start[2] + vector[2]*i + (1 - (2*i - 1)^2)*height)) then
 				return false, false -- FIXME: should try to use SetMoveGoal instead of jumping!
 			end
 		end
