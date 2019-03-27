@@ -747,7 +747,7 @@ local function CreateMainWindow()
 		tooltip = "Cancel module selection",
 		OnClick = {
 			function()
-				Spring.Echo("Upgrade UI Debug - Cancel Clicked")
+				--Spring.Echo("Upgrade UI Debug - Cancel Clicked")
 				HideMainWindow()
 			end
 		},
@@ -905,7 +905,7 @@ function SendUpgradeCommand(newModules)
 	end
 	
 	-- Remove main window
-	Spring.Echo("Upgrade UI Debug - Upgrade Command Sent")
+	--Spring.Echo("Upgrade UI Debug - Upgrade Command Sent")
 	HideMainWindow()
 end
 
@@ -1007,10 +1007,15 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	return true
 end
 
+local cachedSelectedUnits
+function widget:SelectionChanged(selectedUnits)
+	cachedSelectedUnits = selectedUnits
+end
+
 function widget:CommandsChanged()
-	local units = Spring.GetSelectedUnits()
+	local units = cachedSelectedUnits or Spring.GetSelectedUnits()
 	if mainWindowShown then
-		Spring.Echo("Upgrade UI Debug - Number of units selected", #units)
+		--Spring.Echo("Upgrade UI Debug - Number of units selected", #units)
 		local foundMatchingComm = false
 		for i = 1, #units do
 			local unitID = units[i]
@@ -1036,7 +1041,7 @@ function widget:CommandsChanged()
 			local customCommands = widgetHandler.customCommands
 			customCommands[#customCommands+1] = UPGRADE_CMD_DESC
 		else
-			Spring.Echo("Upgrade UI Debug - Commander Deselected")
+			----Spring.Echo("Upgrade UI Debug - Commander Deselected")
 			HideMainWindow() -- Hide window if no commander matching the window is selected
 		end
 	end
