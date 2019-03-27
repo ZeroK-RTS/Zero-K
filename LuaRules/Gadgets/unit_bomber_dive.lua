@@ -172,7 +172,14 @@ local function GetWantedBomberHeight(unitID, bomberID, config, underShield)
 			scaleZ = scaleZ*SQRT_TWO
 		end
 		local horSize = config.sizeSafetyFactor*(math.min(scaleX, scaleZ)/2 - math.sqrt(offsetX^2 + offsetZ^2))
-		local speed = UnitDefs[unitDefID].speed/30
+		local ud = UnitDefs[unitDefID]
+		local speed = ud.speed/30
+		if ud.customParams and ud.customParams.jump_speed then
+			local jumpSpeed = tonumber(ud.customParams.jump_speed)
+			if jumpSpeed and jumpSpeed/2 > speed then
+				speed = jumpSpeed/2
+			end
+		end
 		hitabilityDef[unitDefID] = horSize/speed
 		if speed > 3 then
 			hitabilityDef[unitDefID] = math.max(0, hitabilityDef[unitDefID] + 2 - speed*1.5)
