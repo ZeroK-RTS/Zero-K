@@ -888,7 +888,7 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 90, 
-		skirmLeeway = 20, 
+		skirmLeeway = 30, 
 	},
 	["shieldassault"] = {
 		skirms = riotRangeSkirmieeArray, 

@@ -82,6 +82,16 @@ for i = 1, #UnitDefs do
 	end
 end
 
+local UPGRADE_CMD_DESC = {
+	id      = CMD_UPGRADE_UNIT,
+	type    = CMDTYPE.ICON,
+	tooltip = 'Upgrade Commander',
+	cursor  = 'Repair',
+	action  = 'upgradecomm',
+	params  = {}, 
+	texture = 'LuaUI/Images/commands/Bold/upgrade.png',
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- New Module Selection Button Handling
@@ -1024,16 +1034,7 @@ function widget:CommandsChanged()
 		
 		if foundMatchingComm then
 			local customCommands = widgetHandler.customCommands
-
-			customCommands[#customCommands+1] = {			
-				id      = CMD_UPGRADE_UNIT,
-				type    = CMDTYPE.ICON,
-				tooltip = 'Upgrade Commander',
-				cursor  = 'Repair',
-				action  = 'upgradecomm',
-				params  = {}, 
-				texture = 'LuaUI/Images/commands/Bold/upgrade.png',
-			}
+			customCommands[#customCommands+1] = UPGRADE_CMD_DESC
 		else
 			Spring.Echo("Upgrade UI Debug - Commander Deselected")
 			HideMainWindow() -- Hide window if no commander matching the window is selected
@@ -1054,7 +1055,7 @@ function widget:CommandsChanged()
 		if foundRulesParams then
 			local customCommands = widgetHandler.customCommands
 
-			customCommands[#customCommands+1] = {			
+			customCommands[#customCommands+1] = {
 				id      = CMD_UPGRADE_UNIT,
 				type    = CMDTYPE.ICON,
 				tooltip = 'Upgrade Commander',
