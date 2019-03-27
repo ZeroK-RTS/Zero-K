@@ -889,6 +889,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 90, 
 		skirmLeeway = 30, 
+		skirmBlockedApproachFrames = 20,
 	},
 	["shieldassault"] = {
 		skirms = riotRangeSkirmieeArray, 
