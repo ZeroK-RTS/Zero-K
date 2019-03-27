@@ -160,6 +160,10 @@ local function DrawLoop(start, vector, color, progress, step, height)
 	glVertex(x, y, z)
 end
 
+local function DrawLineSeaLine(point, color)
+	glVertex(point[1], point[2], point[3])
+	glVertex(point[1], 0, point[3])
+end
 
 local function DrawArc(unitID, start, finish, color, jumpFrame, range, isEstimate, quality)
 	-- todo: display lists
@@ -208,6 +212,12 @@ local function DrawArc(unitID, start, finish, color, jumpFrame, range, isEstimat
 	glLineStipple('')
 	glBeginEnd(GL_LINE_STRIP, DrawLoop, start, vector, color, progress, step, height)
 	glLineStipple(false)
+	
+	if finish[2] < 0 then
+		glLineStipple(1, 255)
+		glBeginEnd(GL_LINE_STRIP, DrawLineSeaLine, finish, color)
+		glLineStipple(false)
+	end
 end
 
 
@@ -264,6 +274,7 @@ local function DrawMouseArc(unitID, shift, groundPos, quality)
 	if (not groundPos or not jumpDefs[unitDefID]) then
 		return
 	end
+	groundPos[2] = Spring.GetGroundHeight(groundPos[1], groundPos[3])
 	local queueCount = spGetCommandQueue(unitID, 0)
 	local passIf = (not queueCount or queueCount == 0 or not shift)
 
