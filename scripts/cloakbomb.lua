@@ -234,7 +234,7 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, smokePiece)
-	StartThread(GG.StartStopMovingControl, script.StartMoving, script.StopMoving, nil, true)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true)
 	if not Spring.GetUnitIsStunned(unitID) then
 		Burrow()
 	end
