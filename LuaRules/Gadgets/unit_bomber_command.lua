@@ -615,7 +615,7 @@ function GG.LandComplete(bomberID)
 	end
 	
 	-- Remove rearm if the queue was not inherited.
-	if queue and queue[1] and queue[1].id == CMD_REARM then
+	if cmdID == CMD_REARM then
 		rearmRemove[bomberID] = true --remove current RE-ARM command
 	end
 end
