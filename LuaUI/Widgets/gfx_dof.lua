@@ -6,7 +6,7 @@ function widget:GetInfo()
 		author    = "aeonios, Shadowfury333 (with some code from Kleber Garcia)",
 		date      = "Feb. 2019",
 		license   = "GPL, MIT",
-		layer     = -1,
+		layer     = -100000000000, --To run after gfx_deferred_rendering.lua
 		enabled   = true
 	}
 end
@@ -127,6 +127,8 @@ end
 -- Global Vars
 -----------------------------------------------------------------
 
+local maxBlurDistance = 10000 --Distance in Spring units above which autofocus blurring can't happen
+
 local vsx = nil	-- current viewport width
 local vsy = nil	-- current viewport height
 local dofShader = nil
@@ -146,6 +148,7 @@ local finalNearBlurTex = nil
 local eyePosLoc = nil
 local viewProjectionLoc = nil
 local resolutionLoc = nil
+local distanceLimitsLoc = nil
 local autofocusLoc = nil
 local focusDepthLoc = nil
 local fStopLoc = nil
@@ -285,6 +288,8 @@ function widget:Initialize()
 			"#define INITIAL_NEAR_BLUR_PASS " .. shaderPasses.initialNearBlur .. "\n",
 			"#define FINAL_NEAR_BLUR_PASS " .. shaderPasses.finalNearBlur .. "\n",
 			"#define COMPOSITION_PASS " .. shaderPasses.composition .. "\n",
+
+			"#define BLUR_START_DIST " .. maxBlurDistance .. "\n",
 		},
 		fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\dof.fs", VFS.ZIP),
 		
@@ -301,6 +306,7 @@ function widget:Initialize()
 	eyePosLoc = gl.GetUniformLocation(dofShader, "eyePos")
 	viewProjectionLoc = gl.GetUniformLocation(dofShader, "viewProjection")
 	resolutionLoc = gl.GetUniformLocation(dofShader, "resolution")
+	distanceLimitsLoc = gl.GetUniformLocation(dofShader, "distanceLimits")
 	autofocusLoc = gl.GetUniformLocation(dofShader, "autofocus")
 	focusDepthLoc = gl.GetUniformLocation(dofShader, "manualFocusDepth")
 	fStopLoc = gl.GetUniformLocation(dofShader, "fStop")
@@ -411,9 +417,10 @@ function widget:DrawScreenEffects()
 	glCopyToTexture(depthTex, 0, 0, 0, 0, vsx, vsy) -- the original screen image
 	
 	glUseShader(dofShader)
+		glUniform(distanceLimitsLoc, gl.GetViewRange())
 
 		glUniformInt(autofocusLoc, options.autofocus.value and 1 or 0)
-		glUniform(focusDepthLoc, options.focusDepth.value / 10000)
+		glUniform(focusDepthLoc, options.focusDepth.value / maxBlurDistance)
 		glUniform(fStopLoc, options.fStop.value)
 		glUniformInt(qualityLoc, options.highQuality.value and 1 or 0)
 		
