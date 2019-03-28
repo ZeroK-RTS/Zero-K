@@ -7,6 +7,7 @@ uniform sampler2D blurTex2;
 uniform vec3 eyePos;
 uniform mat4 viewProjection;
 uniform vec2 resolution;
+uniform vec2 distanceLimits;
 
 uniform int autofocus;
 uniform float manualFocusDepth;
@@ -114,17 +115,18 @@ float LinearizeDepth(vec2 uv){
 
     float n22 = viewProjection[2][2];
 
-    return abs(((1.0 + depthNDC) * (1.0 + n22))/(2.0 * (depthNDC + n22)));
+    return ((abs(((1.0 + depthNDC) * (1.0 + n22))/(2.0 * (depthNDC + n22)))
+      * (distanceLimits.y - distanceLimits.x)) + distanceLimits.x) / BLUR_START_DIST;
 }
 
 float GetFilterRadius(vec2 uv)
 {
-  return (2.0 * texture2D(origTex, uv).a) - 1.0;
+  return ((2.0 * texture2D(origTex, uv).a) - 1.0) * 2.0;
 }
 
 float GetEdgeNearFilterRadius(vec2 uv, vec2 stepVal)
 {
-  vec2 maxCoordsOffset = stepVal * KERNEL_RADIUS;
+  vec2 maxCoordsOffset = stepVal * 1.8 * KERNEL_RADIUS;
   float edgeRadius = min(GetFilterRadius(uv + maxCoordsOffset), GetFilterRadius(uv - maxCoordsOffset));
   float halfEdgeRadius = min(GetFilterRadius(uv + maxCoordsOffset / 2), 
                   GetFilterRadius(uv - maxCoordsOffset / 2));
@@ -160,6 +162,9 @@ void main()
   if (pass == FILTER_SIZE_PASS)
   {  
     vec4 colors = texture2D(origTex, uv);
+    float lum = dot(colors.rgb,vec3(0.2126,0.7152,0.0722))*0.5;
+    colors = colors *(1.0 + 0.2*lum*lum*lum);
+    colors *= colors;
 
     float depth = LinearizeDepth(uv);
     float focusDepth = manualFocusDepth;
@@ -174,38 +179,41 @@ void main()
       float minTestDepth = focusDepth;
       float maxTestDepth = focusDepth;
       float testDepth = 0.0;
+      float meanTestDepth = 0.0;
       int autofocusTestCoordCount = 8;
       for (int i = 0; i < autofocusTestCoordCount; ++i)
       {
         testDepth = LinearizeDepth(autofocusTestCoords[i]);
         minTestDepth = min(minTestDepth, testDepth);
         maxTestDepth = max(maxTestDepth, testDepth);
-        testFocusDepth += testDepth / 2.0;
+        meanTestDepth += testDepth;
+        // testFocusDepth += testDepth / 2.0;
       }
-      testFocusDepth /= (1.0 + float(autofocusTestCoordCount) / 2.0);
+      meanTestDepth /= float(autofocusTestCoordCount);
+      // testFocusDepth /= (1.0 + float(autofocusTestCoordCount) / 2.0);
 
       //pull focus back a bit to bias slightly towards air units and against distant terrain
-      testFocusDepth /= min(0.95 + ((testFocusDepth * 75.0) * 0.25), 1.2);
-      focusDepth /= min(0.95 + ((focusDepth * 75.0) * 0.25), 1.2);
+      testFocusDepth /= min(0.95 + ((testFocusDepth * 35.0) * 0.20), 1.15);
+      focusDepth /= clamp(0.95 + ((focusDepth * 35.0) * 0.20), 1.0, 1.15);
 
       float focusSpread = maxTestDepth - minTestDepth;
-      focusSpread *= 1.25;
+      focusSpread *= 1.35 * clamp(0.85 + ((testFocusDepth * 55.0) * 0.20), 1.0, 1.5);
 
-      float minFStop = 0.012;
+      float focalLength = clamp(testFocusDepth, 0.05, 1.0) * 1.0;
+      float minFStop = 1.0 * focalLength;
       // testFocusDepth *= testFocusDepth;
-      float curveDepth = 35.0;
+      float curveDepth = 21.5;
       aperture = max(1.0/(max(
-          (2.5 * testFocusDepth + focusSpread) *
+          (3.0 * testFocusDepth + focusSpread) *
            exp(curveDepth * (testFocusDepth + focusSpread)), 
-          minFStop)), 0.0) *
-      (testFocusDepth) * 4.0;
+          minFStop)), 0.0) * focalLength;
 
       // aperture = max(1.0/(max((testFocusDepth + focusSpread) * 3.3, minFStop)) - 2.0, 0.0) * depth; 
     }
 
-    float filterRadius = clamp(((depth - focusDepth) * aperture)/depth, -1.0, 1.0);
+    float filterRadius = clamp(((depth - focusDepth) * aperture)/depth, -1.8, 1.8);
 
-    fragColor = vec4(sqrt(colors.rgb), filterRadius * 0.5 + 0.5);
+    fragColor = vec4(colors.rgb, filterRadius * 0.25 + 0.5);
 
     //TODO: Convert to pre-processor definition
     gl_FragData[0] = fragColor;
@@ -277,7 +285,8 @@ void main()
     float redChannel   = dot(valR.xy,Kernel0Weights_RealX_ImY)+dot(valR.zw,Kernel1Weights_RealX_ImY);
     float greenChannel = dot(valG.xy,Kernel0Weights_RealX_ImY)+dot(valG.zw,Kernel1Weights_RealX_ImY);
     float blueChannel  = dot(valB.xy,Kernel0Weights_RealX_ImY)+dot(valB.zw,Kernel1Weights_RealX_ImY);
-    fragColor = vec4(redChannel*redChannel,greenChannel*greenChannel,blueChannel*blueChannel,filterRadius * 0.5 + 0.5);   
+    fragColor = vec4(sqrt(vec3(redChannel,greenChannel,blueChannel)),
+      filterRadius * 0.25 + 0.5);   
     gl_FragData[0] = fragColor;
   }
 
@@ -332,7 +341,7 @@ void main()
     float redChannel   = dot(valR.xy,KernelNearWeights_RealX_ImY);
     float greenChannel = dot(valG.xy,KernelNearWeights_RealX_ImY);
     float blueChannel  = dot(valB.xy,KernelNearWeights_RealX_ImY);
-    fragColor = vec4(redChannel*redChannel,greenChannel*greenChannel,blueChannel*blueChannel,
+    fragColor = vec4(sqrt(vec3(redChannel,greenChannel,blueChannel)),
     clamp(dot(valA.xy, KernelNearWeights_RealX_ImY), 0.0, 1.0));
     gl_FragData[0] = fragColor;
   }
@@ -341,7 +350,7 @@ void main()
   {
     vec4 blurTexAtUV = texture2D(blurTex0, uv);
     vec4 origTexAtUV = texture2D(origTex, uv);
-    float filterRadius = (2.0 * blurTexAtUV.a) - 1.0;
+    float filterRadius = ((2.0 * blurTexAtUV.a) - 1.0) * 2.0;
     float mixFactor = FocusThresholdMixFactor(abs(filterRadius));
     fragColor = mix(origTexAtUV, blurTexAtUV, mixFactor);
     if (quality >= 1)
