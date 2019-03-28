@@ -518,7 +518,7 @@ local function GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_
 			local queue = Spring.GetCommandQueue(unitID, 2)
 			if queue and queue[2] then
 				local par = queue[2].params
-				cmdID = queue[2].id, queue[2].tag
+				cmdID = queue[2].id
 				cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = par[1], par[2], par[3], par[4], par[5], par[6]
 			else
 				cmdID = false

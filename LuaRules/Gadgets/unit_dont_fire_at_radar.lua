@@ -82,7 +82,7 @@ local function canShootAtUnit(targetID, allyTeam)
 end
 
 local function isTheRightSortOfCommand(cmdID, cmdOpts, cp_1, cp_2)
-	return cmdID and Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL) and cQueue[index].id == CMD_ATTACK and cp_1 and (not cp_2)
+	return cmdID and Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL) and cmdID == CMD_ATTACK and cp_1 and (not cp_2)
 end
 
 -------------------------------------------------------------------------------------
