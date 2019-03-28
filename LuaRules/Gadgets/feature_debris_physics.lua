@@ -14,9 +14,11 @@ for i = 1, #FeatureDefs do
 	end
 end
 
+local spGetFeatureDefID = Spring.GetFeatureDefID
+local spSetFeatureMoveCtrl = Spring.SetFeatureMoveCtrl
 function gadget:FeatureCreated (featureID)
-	if validFeatureDefID[Spring.GetFeatureDefID(featureID)] then
-		Spring.SetFeatureMoveCtrl (featureID, false
+	if validFeatureDefID[spGetFeatureDefID(featureID)] then
+		spSetFeatureMoveCtrl (featureID, false
 			, 1, 1, 1
 			, 1, 1, 1
 			, 1, 1, 1

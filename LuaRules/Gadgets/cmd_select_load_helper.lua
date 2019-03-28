@@ -41,11 +41,15 @@ local loadSelectedCmd = {
 --------------------------------------------------------------------------------
 -- Callins
 
+local spFindUnitCmdDesc = Spring.FindUnitCmdDesc
+local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
+local CMD_LOAD_UNITS = CMD.LOAD_UNITS
+
 function gadget:UnitCreated(unitID, unitDefID, team)
-	local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD.LOAD_UNITS)
-    if cmdDescID then
-		Spring.InsertUnitCmdDesc(unitID, 502, loadSelectedCmd)
-    end
+	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_LOAD_UNITS)
+	if cmdDescID then
+		spInsertUnitCmdDesc(unitID, 502, loadSelectedCmd)
+	end
 end
 
 function gadget:Initialize()

@@ -99,6 +99,8 @@ local function ScrapUnit(unitID, unitDefID, team, progress, face)
 	end
 end
 
+local spawnProjPos = {1, 2, 3}
+local spawnProjTable = {ttl = 1, pos = spawnProjPos}
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 
 	local health, _,_,_,progress = spGetUnitHealth(unitID)
@@ -119,10 +121,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 			local wd = WeaponDefNames[explodeAs]
 			if wd then
 				local _,_,_,x,y,z = spGetUnitPosition(unitID, true)
-				local projId = Spring.SpawnProjectile(wd.id, {
-					pos = {x,y,z},
-					ttl = 1,
-				})
+				spawnProjPos[1] = x
+				spawnProjPos[2] = y
+				spawnProjPos[3] = z
+				local projId = Spring.SpawnProjectile(wd.id, spawnProjTable)
 				--Spring.SetProjectileCollision(projId) <- in case ttl = 1 does not work
 			end
 		end

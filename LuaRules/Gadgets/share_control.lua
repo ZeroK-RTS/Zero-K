@@ -10,8 +10,12 @@ function gadget:GetInfo() return {
 	enabled   = true,
 } end
 
+local spAreTeamsAllied = Spring.AreTeamsAllied
+local spIsCheatingEnabled = Spring.IsCheatingEnabled
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local gaiaTeamID = Spring.GetGaiaTeamID()
 function gadget:AllowResourceTransfer(oldTeam, newTeam, resource_type, amount)
-	if ((amount < 0) or (not Spring.AreTeamsAllied(oldTeam, newTeam))) then
+	if ((amount < 0) or (not spAreTeamsAllied(oldTeam, newTeam))) then
 		return false
 	end
 	return true
@@ -19,9 +23,9 @@ end
 
 function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 	if (capture
-	or Spring.AreTeamsAllied(oldTeam, newTeam)
-	or Spring.IsCheatingEnabled()
-	or ((Spring.GetUnitRulesParam(unitID, "can_share_to_gaia") == 1) and (newTeam == Spring.GetGaiaTeamID())) -- for Planet Wars
+	or spAreTeamsAllied(oldTeam, newTeam)
+	or spIsCheatingEnabled()
+	or ((newTeam == gaiaTeamID) and (spGetUnitRulesParam(unitID, "can_share_to_gaia") == 1)) -- for Planet Wars
 	) then
 		return true
 	end
