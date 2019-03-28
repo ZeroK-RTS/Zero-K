@@ -6,7 +6,7 @@ function widget:GetInfo()
 		author    = "aeonios, Shadowfury333 (with some code from Kleber Garcia)",
 		date      = "Feb. 2019",
 		license   = "GPL, MIT",
-		layer     = -100000000000,
+		layer     = -100000000000, --To run after gfx_deferred_rendering.lua
 		enabled   = true
 	}
 end
@@ -188,11 +188,11 @@ function InitTextures()
 
 	baseBlurTex = glCreateTexture(blurTexSizeX, blurTexSizeY, {
 		min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-		 wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
+		wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
 	})
 	if options.highQuality.value then
 		baseNearBlurTex = glCreateTexture(blurTexSizeX, blurTexSizeY, {
-			min_filter = GL.LINEAR, mag_filter = GL.LINEAR, 
+			min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 			wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
 		})
 	end
