@@ -120,3 +120,11 @@ local function GetPlayerInfo(playerID)
 	end
 end
 Spring.GetPlayerInfo = GetPlayerInfo
+
+if Script.IsEngineMinVersion(104, 0, 1166) then
+	local origGetTeamInfo = Spring.GetTeamInfo
+	Spring.GetTeamInfo = function (p1, p2)
+		local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTeamInfo(p1, p2)
+		return r1, r2, r3, r4, r5, r6, r8, r7
+	end
+end
