@@ -78,17 +78,18 @@ const vec4 KernelNear_RealX_ImY_RealZ_ImW[] = vec4[](
 );
 
 const float baseStepValMag = 1.0/540.0;
-const float inFocusThreshold = 0.5 / float(KERNEL_RADIUS);
+const float inFocusThreshold = 0.25 / float(KERNEL_RADIUS);
+const float colorPower = 1.6;
 
 const vec2 autofocusTestCoords[] = vec2[](
-        vec2(0.45, 0.45),
-        vec2(0.45, 0.55),
-        vec2(0.55, 0.55),
-        vec2(0.55, 0.45),
-        vec2(0.57, 0.43),
-        vec2(0.6, 0.57),
-        vec2(0.43, 0.4),
-        vec2(0.4, 0.57)
+        vec2(0.42, 0.42),
+        vec2(0.42, 0.58),
+        vec2(0.58, 0.58),
+        vec2(0.58, 0.42),
+        vec2(0.62, 0.38),
+        vec2(0.6, 0.55),
+        vec2(0.38, 0.4),
+        vec2(0.4, 0.62)
 );
 
 vec2 multComplex(vec2 p, vec2 q)
@@ -149,7 +150,7 @@ vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, out float
 
 float FocusThresholdMixFactor(float filterRadius)
 {
-  return clamp((filterRadius - inFocusThreshold) * float(KERNEL_RADIUS) * 2.0, 
+  return clamp((filterRadius - inFocusThreshold) * float(KERNEL_RADIUS) * 1.0, 
         0.0, 1.0);
 }
 
@@ -164,7 +165,7 @@ void main()
     vec4 colors = texture2D(origTex, uv);
     float lum = dot(colors.rgb,vec3(0.2126,0.7152,0.0722))*0.5;
     colors = colors *(1.0 + 0.2*lum*lum*lum);
-    colors *= colors;
+    colors = vec4(pow(colors.r, colorPower), pow(colors.g, colorPower), pow(colors.b, colorPower), colors.a);
 
     float depth = LinearizeDepth(uv);
     float focusDepth = manualFocusDepth;
@@ -179,30 +180,30 @@ void main()
       float minTestDepth = focusDepth;
       float maxTestDepth = focusDepth;
       float testDepth = 0.0;
-      float meanTestDepth = 0.0;
+      // float meanTestDepth = 0.0;
       int autofocusTestCoordCount = 8;
       for (int i = 0; i < autofocusTestCoordCount; ++i)
       {
         testDepth = LinearizeDepth(autofocusTestCoords[i]);
         minTestDepth = min(minTestDepth, testDepth);
         maxTestDepth = max(maxTestDepth, testDepth);
-        meanTestDepth += testDepth;
-        // testFocusDepth += testDepth / 2.0;
+        // meanTestDepth += testDepth;
+        testFocusDepth += testDepth / 2.0;
       }
-      meanTestDepth /= float(autofocusTestCoordCount);
-      // testFocusDepth /= (1.0 + float(autofocusTestCoordCount) / 2.0);
+      // meanTestDepth /= float(autofocusTestCoordCount);
+      testFocusDepth /= (1.0 + float(autofocusTestCoordCount) / 2.0);
 
       //pull focus back a bit to bias slightly towards air units and against distant terrain
-      testFocusDepth /= min(0.95 + ((testFocusDepth * 35.0) * 0.20), 1.15);
-      focusDepth /= clamp(0.95 + ((focusDepth * 35.0) * 0.20), 1.0, 1.15);
+      testFocusDepth /= min(0.95 + ((testFocusDepth * 45.0) * 0.20), 1.15);
+      focusDepth /= clamp(0.95 + ((focusDepth * 45.0) * 0.20), 1.0, 1.15);
 
       float focusSpread = maxTestDepth - minTestDepth;
-      focusSpread *= 1.35 * clamp(0.85 + ((testFocusDepth * 55.0) * 0.20), 1.0, 1.5);
+      focusSpread *= 1.75 * clamp(0.85 + ((testFocusDepth * 55.0) * 0.20), 1.0, 1.5);
 
-      float focalLength = clamp(testFocusDepth, 0.05, 1.0) * 1.0;
+      float focalLength = 0.065;
       float minFStop = 1.0 * focalLength;
       // testFocusDepth *= testFocusDepth;
-      float curveDepth = 21.5;
+      float curveDepth = 10.5;
       aperture = max(1.0/(max(
           (3.0 * testFocusDepth + focusSpread) *
            exp(curveDepth * (testFocusDepth + focusSpread)), 
@@ -285,7 +286,8 @@ void main()
     float redChannel   = dot(valR.xy,Kernel0Weights_RealX_ImY)+dot(valR.zw,Kernel1Weights_RealX_ImY);
     float greenChannel = dot(valG.xy,Kernel0Weights_RealX_ImY)+dot(valG.zw,Kernel1Weights_RealX_ImY);
     float blueChannel  = dot(valB.xy,Kernel0Weights_RealX_ImY)+dot(valB.zw,Kernel1Weights_RealX_ImY);
-    fragColor = vec4(sqrt(vec3(redChannel,greenChannel,blueChannel)),
+    // fragColor = vec4(redChannel*redChannel,greenChannel*greenChannel,blueChannel*blueChannel,
+    fragColor = vec4(vec3(pow(redChannel, 1.0/colorPower),pow(greenChannel, 1.0/colorPower),pow(blueChannel, 1.0/colorPower)),
       filterRadius * 0.25 + 0.5);   
     gl_FragData[0] = fragColor;
   }
@@ -341,7 +343,8 @@ void main()
     float redChannel   = dot(valR.xy,KernelNearWeights_RealX_ImY);
     float greenChannel = dot(valG.xy,KernelNearWeights_RealX_ImY);
     float blueChannel  = dot(valB.xy,KernelNearWeights_RealX_ImY);
-    fragColor = vec4(sqrt(vec3(redChannel,greenChannel,blueChannel)),
+    // fragColor = vec4(redChannel*redChannel,greenChannel*greenChannel,blueChannel*blueChannel,
+    fragColor = vec4(vec3(pow(redChannel, 1.0/colorPower),pow(greenChannel, 1.0/colorPower),pow(blueChannel, 1.0/colorPower)),
     clamp(dot(valA.xy, KernelNearWeights_RealX_ImY), 0.0, 1.0));
     gl_FragData[0] = fragColor;
   }
