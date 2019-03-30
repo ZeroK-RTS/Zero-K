@@ -44,7 +44,7 @@ local spMoveCtrlGetTag = Spring.MoveCtrl.GetTag
 local bomberWeaponNamesDefs, bomberWeaponDefs, bomberUnitDefs = include("LuaRules/Configs/bomber_dive_defs.lua")
 
 local UPDATE_FREQUENCY = 15
-local SQRT_TWO = 0.8 -- All hit tests have leeway so we don't need to be too fussy about the square root of two.
+local SQRT_TWO = math.sqrt(2)
 local bombers = {}
 local VOL_SPHERE = 3
 
