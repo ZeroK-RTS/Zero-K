@@ -150,7 +150,7 @@ vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, out float
 
 float FocusThresholdMixFactor(float filterRadius)
 {
-  return clamp((filterRadius - inFocusThreshold) * float(KERNEL_RADIUS) * 1.0, 
+  return clamp((filterRadius - inFocusThreshold) * float(KERNEL_RADIUS) * 2.0,
         0.0, 1.0);
 }
 
@@ -200,16 +200,18 @@ void main()
       float focusSpread = maxTestDepth - minTestDepth;
       focusSpread *= 1.75 * clamp(0.85 + ((testFocusDepth * 55.0) * 0.20), 1.0, 1.5);
 
-      float focalLength = 0.065;
+      float focalLength = 0.055;
       float minFStop = 1.0 * focalLength;
       // testFocusDepth *= testFocusDepth;
       float curveDepth = 10.5;
       aperture = max(1.0/(max(
-          (3.0 * testFocusDepth + focusSpread) *
-           exp(curveDepth * (testFocusDepth + focusSpread)), 
+          (3.3 * (testFocusDepth + focusSpread)) 
+          * exp(curveDepth * (testFocusDepth + focusSpread)),
           minFStop)), 0.0) * focalLength;
 
-      // aperture = max(1.0/(max((testFocusDepth + focusSpread) * 3.3, minFStop)) - 2.0, 0.0) * depth; 
+      // aperture = max(1.0/(max((testFocusDepth + focusSpread) * 3.3, minFStop)) - 2.0, 0.0) 
+      //         * focalLength; 
+      // depth; 
     }
 
     float filterRadius = clamp(((depth - focusDepth) * aperture)/depth, -1.8, 1.8);
