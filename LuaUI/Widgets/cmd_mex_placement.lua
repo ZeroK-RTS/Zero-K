@@ -363,9 +363,6 @@ function widget:CommandNotify(cmdID, params, options)
 				end
 			end
 			--prepare command list
-			if not (options.meta or shift) then
-				commandArrayToIssue[1] = {CMD.STOP, {} , {}}
-			end
 			for i, command in ipairs(orderedCommands) do
 				local x = command.x
 				local z = command.z
@@ -373,7 +370,7 @@ function widget:CommandNotify(cmdID, params, options)
 
 				-- check if some other widget wants to handle the command before sending it to units.
 				if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, options, true) then
-					commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
+					commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} }
 				end
 
 				if makeMexEnergy then
@@ -386,21 +383,15 @@ function widget:CommandNotify(cmdID, params, options)
 
 						-- check if some other widget wants to handle the command before sending it to units.
 						if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-buildDefID, {xx, yy, zz, 0}, options, true) then
-							commandArrayToIssue[#commandArrayToIssue+1] = {-buildDefID, {xx,yy,zz,0}, {"shift"}}
+							commandArrayToIssue[#commandArrayToIssue+1] = {-buildDefID, {xx,yy,zz,0} }
 						end
 					end
 				end
 			end
-			
-			if options.meta then
-				for i = #commandArrayToIssue, 1, -1 do
-					local command = commandArrayToIssue[i]
-					WG.CommandInsert(command[1], command[2], options)
-				end
-			else
-				if (#commandArrayToIssue > 0) then
-					Spring.GiveOrderArrayToUnitArray(unitArrayToReceive, commandArrayToIssue)
-				end
+
+			for i = 1, #commandArrayToIssue do
+				local command = commandArrayToIssue[i]
+				WG.CommandInsert(command[1], command[2], options, i - 1)
 			end
 		end
 
