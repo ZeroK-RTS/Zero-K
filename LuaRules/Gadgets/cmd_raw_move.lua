@@ -22,6 +22,9 @@ local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spMoveCtrlGetTag    = Spring.MoveCtrl.GetTag
 local spGetCommandQueue   = Spring.GetCommandQueue
 
+local mapSizeX = Game.mapSizeX
+local mapSizeZ = Game.mapSizeZ
+
 local CMD_STOP    = CMD.STOP
 local CMD_INSERT  = CMD.INSERT
 local CMD_REMOVE  = CMD.REMOVE
@@ -302,13 +305,25 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	if spMoveCtrlGetTag(unitID) then
 		return true, false
 	end
+
+	if #cmdParams < 3 then
+		return true, true
+	end
+
+	local mx, my, mz = cmdParams[1], cmdParams[2], cmdParams[3]
+	if mx < 0 or mx >= mapSizeX
+	or mz < 0 or mz >= mapSizeZ then
+		-- could do `and not GG.AllowOffMapOrders` for mission editor?
+		return true, true
+	end
+
 	local goalDistOverride = cmdParams[4]
 	local timerIncrement = cmdParams[5] or 1
 	if not rawMoveUnit[unitID] then
 		rawMoveUnit[unitID] = {}
 	end
 	local unitData = rawMoveUnit[unitID]
-	if not (unitData.cx == cmdParams[1] and unitData.cz == cmdParams[3]) then
+	if not (unitData.cx == mx and unitData.cz == mz) then
 		ResetUnitData(unitData)
 	end
 	if unitData.handlingWaitTime then
@@ -320,11 +335,11 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	end
 
 	local x, y, z = spGetUnitPosition(unitID)
-	local distSq = (x - (unitData.mx or cmdParams[1]))^2 + (z - (unitData.mz or cmdParams[3]))^2
+	local distSq = (x - (unitData.mx or mx))^2 + (z - (unitData.mz or mz))^2
 
 	if not unitData.cx then
-		unitData.cx, unitData.cz = cmdParams[1], cmdParams[3]
-		unitData.commandString = cmdParams[1] .. "_" .. cmdParams[3]
+		unitData.cx, unitData.cz = mx, mz
+		unitData.commandString = mx .. "_" .. mz
 		commandCount[unitData.commandString] = (commandCount[unitData.commandString] or 0) + 1
 		unitData.preventGoalClumping = (not goalDistOverride) and (distSq > COMMON_STOP_RADIUS_ACTIVE_DIST_SQ) and not Spring.Utilities.GetUnitRepeat(unitID)
 	end
@@ -358,7 +373,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		end
 		unitData.switchedFromRaw = true
 		unitData.commandHandled = true
-		Spring.SetUnitMoveGoal(unitID, cmdParams[1],cmdParams[2],cmdParams[3], goalDistOverride or goalDist[unitDefID] or 16, nil, false)
+		Spring.SetUnitMoveGoal(unitID, mx, my, mz, goalDistOverride or goalDist[unitDefID] or 16, nil, false)
 		return true, false
 	end
 
@@ -411,14 +426,13 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	unitData.nextTestTime = (unitData.nextTestTime or 0) - timerIncrement
 	if unitData.nextTestTime <= 0 then
 		local lazy = unitData.doingRawMove
-		local mx, my, mz = cmdParams[1], cmdParams[2], cmdParams[3]
 		local freePath
 		if (turnDiameterSq[unitDefID] or 0) > distSq then
 			freePath = false
 		else
 			local distance = math.sqrt(distSq)
 			local rx, rz
-			freePath, rx, rz = IsPathFree(unitDefID, x, z, cmdParams[1], cmdParams[3], distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE, goalDistOverride and (goalDistOverride - 20), BLOCK_RELAX_DISTANCE)
+			freePath, rx, rz = IsPathFree(unitDefID, x, z, mx, mz, distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE, goalDistOverride and (goalDistOverride - 20), BLOCK_RELAX_DISTANCE)
 			if rx then
 				mx, my, mz = rx, Spring.GetGroundHeight(rx, rz), rz
 			end
