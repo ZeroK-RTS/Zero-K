@@ -171,8 +171,8 @@ end
 
 local function removeUnseenTarget(data)
 	if data.targetID and not data.alwaysSeen and spValidUnitID(data.targetID) then
-		local los = spGetUnitLosState(data.targetID, data.allyTeam, false)
-		if not (los and (los.los or los.radar)) then
+		local los = spGetUnitLosState(data.targetID, data.allyTeam, true)
+		if not los or (los % 4 == 0) then
 			if data.unseenTargetTimer == UNSEEN_TIMEOUT then
 				return true
 			elseif not data.unseenTargetTimer then

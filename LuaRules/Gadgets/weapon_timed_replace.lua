@@ -42,8 +42,8 @@ function gadget:GameFrame(n)
 			local targetType, targetID = Spring.GetProjectileTarget(proID)
 			if targetType == UNIT then
 				local allyTeam = projectileAllyTeam[proID]
-				local los = Spring.GetUnitLosState(targetID,allyTeam,false)
-				if los and los.los then
+				local los = Spring.GetUnitLosState(targetID,allyTeam,true)
+				if los and (los % 2 == 1) then
 					-- If the unit is visible then target the ground beneath it.
 					local x,_,z = Spring.GetUnitPosition(targetID)
 					local y = Spring.GetGroundHeight(x,z)

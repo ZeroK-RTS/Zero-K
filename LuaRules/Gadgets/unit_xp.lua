@@ -30,8 +30,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		return
 	end
 
-	local canAttackerSeeTarget = spGetUnitLosState(unitID, allyTeamByTeam[attackerTeam])
-	if not canAttackerSeeTarget.los then
+	local canAttackerSeeTarget = spGetUnitLosState(unitID, allyTeamByTeam[attackerTeam], true)
+	if canAttackerSeeTarget % 2 == 0 then
 		return
 	end
 

@@ -38,17 +38,13 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return selfddefs
 end
 
-local toDestroy 
+local toDestroy = {}
+local toDestroyCount = 0
 
 local function QueueUnitDescruction(unitID, skipChecks)
-	if not skipChecks then skipChecks = false end --make sure it's not nil
-	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
-	if ((not stunned_or_inbuild) or skipChecks) then
-		if not toDestroy then
-			toDestroy = {count = 0, data = {}}
-		end
-		toDestroy.count = toDestroy.count + 1
-		toDestroy.data[toDestroy.count] = unitID
+	if skipChecks or not spGetUnitIsStunned(unitID) then
+		toDestroyCount = toDestroyCount + 1
+		toDestroy[toDestroyCount] = unitID
 	end
 end
 
@@ -60,11 +56,11 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 end
 
 function gadget:GameFrame(n)
-	if toDestroy then
-		for i = 1, toDestroy.count do
-			spDestroyUnit(toDestroy.data[i], true)
+	if toDestroyCount > 0 then
+		for i = 1, toDestroyCount do
+			spDestroyUnit(toDestroy[i], true)
 		end
-		toDestroy = nil
+		toDestroyCount = 0
 	end
 end
 

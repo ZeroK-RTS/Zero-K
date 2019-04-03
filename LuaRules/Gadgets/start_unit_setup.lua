@@ -711,7 +711,6 @@ else
 
 local teamID 			= Spring.GetLocalTeamID()
 local spGetUnitDefID 	= Spring.GetUnitDefID
-local spGetUnitLosState = Spring.GetUnitLosState
 local spValidUnitID 	= Spring.ValidUnitID
 local spAreTeamsAllied 	= Spring.AreTeamsAllied
 local spGetUnitTeam 	= Spring.GetUnitTeam

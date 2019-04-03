@@ -34,6 +34,8 @@ local spSetUnitTarget       = Spring.SetUnitTarget
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitPosition     = Spring.GetUnitPosition
 
+local floor = math.floor
+
 local CMD_ATTACK		= CMD.ATTACK
 local CMD_OPT_INTERNAL 	= CMD.OPT_INTERNAL
 local CMD_FIRE_STATE 	= CMD.FIRE_STATE
@@ -67,12 +69,15 @@ local wantGoodTarget = {}
 -------------------------------------------------------------------------------------
 
 local function canShootAtUnit(targetID, allyTeam)
-	local see = spGetUnitLosState(targetID,allyTeam,false)
 	local raw = spGetUnitLosState(targetID,allyTeam,true)
-	--GG.tableEcho(see)
-	if see and see.los then
+
+	if not raw then
+		return false
+	end
+	if raw % 2 == 1 then -- in LoS
 		return true
-	elseif raw and raw > 2 then
+	end
+	if floor(raw / 4) % 4 == 3 then -- typed
 		local unitDefID = spGetUnitDefID(targetID)
 		if unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isImmobile then
 			return true
