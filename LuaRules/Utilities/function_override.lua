@@ -70,41 +70,30 @@ if Spring.Utilities.IsCurrentVersionNewerThan(100, 0) then
 	Spring.MoveCtrl.SetRotationVelocity = newMcSetUnitRotationVelocity
 end
 
-local origGetGroundInfo = Spring.GetGroundInfo
-local function GetGroundInfo(x, z)
-	local r1, r2, r3, r4, r5, r6, r7, r8, r9 = origGetGroundInfo(x, z)
-	if type(r1) == "string" then
-		return r1, r2, r3, r4, r5, r6, r7, r8
-	else
+if Script.IsEngineMinVersion(104, 0, 50) then
+	local origGetGroundInfo = Spring.GetGroundInfo
+	Spring.GetGroundInfo = function (x, z)
+		local r1, r2, r3, r4, r5, r6, r7, r8, r9 = origGetGroundInfo(x, z)
 		return r2, r3, r4, r5, r6, r7, r8, r9, r1
 	end
-end
-Spring.GetGroundInfo = GetGroundInfo
 
-local origGetTerrainTypeData = Spring.GetTerrainTypeData
-local function GetTerrainTypeData(index)
-	local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTerrainTypeData(index)
-	if type(r1) == "string" then
-		return r1, r2, r3, r4, r5, r6, r7
-	else
+	local origGetTerrainTypeData = Spring.GetTerrainTypeData
+	Spring.GetTerrainTypeData = function (index)
+		local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTerrainTypeData(index)
 		return r2, r3, r4, r5, r6, r7, r8, r1
 	end
 end
-Spring.GetTerrainTypeData = GetTerrainTypeData
 
-local origGetPlayerInfo = Spring.GetPlayerInfo
-local function GetPlayerInfo(playerID)
-	if not playerID then
-		return
-	end
-	local r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11 = origGetPlayerInfo(playerID)
-	if type(r10) == "table" then
-		return r1, r2, r3, r4, r5, r6, r7, r8, r9, r10
-	else
+if Script.IsEngineMinVersion(104, 0, 536) then
+	local origGetPlayerInfo = Spring.GetPlayerInfo
+	Spring.GetPlayerInfo = function (playerID)
+		if not playerID then
+			return
+		end
+		local r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11 = origGetPlayerInfo(playerID)
 		return r1, r2, r3, r4, r5, r6, r7, r8, r9, r11, r10
 	end
 end
-Spring.GetPlayerInfo = GetPlayerInfo
 
 if Script.IsEngineMinVersion(104, 0, 1166) then
 	local origGetTeamInfo = Spring.GetTeamInfo
