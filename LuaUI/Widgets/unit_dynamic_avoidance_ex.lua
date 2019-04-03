@@ -67,9 +67,6 @@ local CMD_RECLAIM		= CMD.RECLAIM
 local CMD_RESURRECT		= CMD.RESURRECT
 local CMD_REPAIR		= CMD.REPAIR
 
-VFS.Include("LuaRules/Utilities/versionCompare.lua")
-local LOS_MULT = (Spring.Utilities.IsCurrentVersionNewerThan(100, 0) and 1) or 32
-
 --local spRequestPath = Spring.RequestPath
 local mathRandom = math.random
 --local spGetUnitSensorRadius  = Spring.GetUnitSensorRadius
@@ -908,7 +905,7 @@ function GetUnitLOSRadius(case,unitInMotionSingleUnit)
 	local unitDef= UnitDefs[unitDefID]
 	local losRadius =550 --arbitrary (scout LOS)
 	if unitDef~=nil then --if unitDef is not empty then use the following LOS
-		losRadius= unitDef.losRadius*LOS_MULT --in normal case use real LOS. Note: for some reason it was times 32
+		losRadius= unitDef.losRadius --in normal case use real LOS
 		losRadius= losRadius + extraLOSRadiusCONSTANT --add extra detection range for beyond LOS (radar)
 		if case=="attack" then --if avoidance is for attack enemy: use special LOS
 			

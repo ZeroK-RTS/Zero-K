@@ -56,8 +56,6 @@ local strFormat 				= string.format
 
 local echo = Spring.Echo
 
-local LOS_MULT = (Spring.Utilities.IsCurrentVersionNewerThan(100, 0) and 1) or 32
-
 local VFSMODE      = VFS.RAW_FIRST
 local ignoreweapon, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFSMODE)
 local confdata = VFS.Include(LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua", nil, VFSMODE)
@@ -1391,9 +1389,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	
 	if ud.losRadius > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*LOS_MULT) .. " elmo", textColor = color.stats_fg, }
-		-- 32 is to offset the engine multiplier, which is
-		-- (modInfo.losMul / (SQUARE_SIZE * (1 << modInfo.losMipLevel)))
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if (ud.sonarRadius > 0) then

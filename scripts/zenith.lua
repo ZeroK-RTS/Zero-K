@@ -2,8 +2,6 @@ include "constants.lua"
 
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
-local devCompatibility = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
-
 local base = piece "base"
 local flare = piece "flare"
 local firept = piece "firept"
@@ -76,14 +74,8 @@ local function TransformMeteor(weaponDefID, proID, x, y, z)
 	-- Get old projectile attributes
 	local px, py, pz = Spring.GetProjectilePosition(proID)
 	local vx, vy, vz = Spring.GetProjectileVelocity(proID)
-	
-	-- Destroy old projectile
-	if devCompatibility then
-		Spring.DeleteProjectile(proID)
-	else
-		Spring.SetProjectilePosition(proID,-100000,-100000,-100000)
-		Spring.SetProjectileCollision(proID)
-	end
+
+	Spring.DeleteProjectile(proID)
 	
 	-- Send new one in the right direction
 	local newProID = Spring.SpawnProjectile(weaponDefID, {

@@ -42,10 +42,7 @@ end
 
 function script.Create()
 	local ud = UnitDefs[unitDefID]
-	local midTable = ud
-	if Spring.Utilities.IsCurrentVersionNewerThan(100, 0) then
-		midTable = ud.model
-	end
+	local midTable = ud.model
 	
 	local mid = {midTable.midx, midTable.midy, midTable.midz}
 	local aim = {midTable.midx, midTable.midy + 15, midTable.midz}

@@ -6,13 +6,6 @@ VFS.Include("LuaRules/Utilities/versionCompare.lua")
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
-local origValidUnitID = Spring.ValidUnitID
-
-local function newValidUnitID(unitID)
-	return unitID and origValidUnitID(unitID)
-end
-
-Spring.ValidUnitID = newValidUnitID
 
 local function SetPlayerRulesParam(playerID, key, value)
 	return Spring.SetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key, value)
@@ -26,14 +19,6 @@ end
 if not Spring.GetPlayerRulesParam then
 	Spring.GetPlayerRulesParam = GetPlayerRulesParam
 end
-
------------------------------------------------------------------------------------
------------------------------------------------------------------------------------
-
-local function noFunc()
-end
-
-Spring.SetUnitNanoPieces = Spring.SetUnitNanoPieces or noFunc
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------

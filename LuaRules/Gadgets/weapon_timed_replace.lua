@@ -18,8 +18,6 @@ end
 -------------------------------------------------------------
 -------------------------------------------------------------
 
-local devCompatibility = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
-
 local FEATURE = 102
 local UNIT = 117
 
@@ -78,12 +76,7 @@ function gadget:GameFrame(n)
 			})
 			
 			-- Destroy old projectile
-			if devCompatibility then
-				Spring.DeleteProjectile(proID)
-			else
-				Spring.SetProjectilePosition(proID,-100000,-100000,-100000)
-				Spring.SetProjectileCollision(proID)
-			end
+			Spring.DeleteProjectile(proID)
 			--]]
 		end
 		
