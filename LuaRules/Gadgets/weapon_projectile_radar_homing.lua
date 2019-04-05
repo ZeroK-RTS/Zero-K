@@ -6,7 +6,7 @@ function gadget:GetInfo()
     date      = "9 January 2016",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = Spring.Utilities.IsCurrentVersionNewerThan(100, 0),
+    enabled   = true,
   }
 end
 

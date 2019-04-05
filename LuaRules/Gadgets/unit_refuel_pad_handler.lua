@@ -146,7 +146,7 @@ local function SitOnPad(unitID)
 		spSetUnitLeaveTracks(unitID, false)
 		unitMovectrled[unitID] = true
 	end
-	mcSetRotation(unitID,0,heading,0)
+	mcSetRotation(unitID,0,-heading,0)
 	
 	local padHeading = acos(dz)
 	if dx < 0 then
@@ -185,7 +185,7 @@ local function SitOnPad(unitID)
 					newPadHeading = 2*PI-newPadHeading
 				end
 				mcSetPosition(unitID, px, py, pz)
-				mcSetRotation(unitID,0,headingDiff+newPadHeading,0)
+				mcSetRotation(unitID,0,-(headingDiff+newPadHeading),0)
 			end
 			
 			landDuration = landDuration + 1
@@ -440,7 +440,7 @@ local function CircleToLand(unitID, goal)
 	if not unitMovectrled[unitID] then
 		mcEnable(unitID)
 		if rotateUnit[unitDefID] then
-			mcSetRotation(unitID,0,heading,roll+currentTime/50)
+			mcSetRotation(unitID,0,-heading,-(roll+currentTime/50))
 		end
 		spSetUnitLeaveTracks(unitID, false)
 		unitMovectrled[unitID] = true
@@ -463,7 +463,7 @@ local function CircleToLand(unitID, goal)
 			local direction = DistanceToDirection(currentDistance)
 			
 			if rotateUnit[unitDefID] then
-				mcSetRotation(unitID,0,direction,roll)
+				mcSetRotation(unitID,0,-direction,-roll)
 			end
 			mcSetPosition(unitID, px, py, pz)
 			mcSetVelocity(unitID, px - prevX, py - prevY, pz - prevZ)

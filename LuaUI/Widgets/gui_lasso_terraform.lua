@@ -1786,7 +1786,7 @@ function Terraform_SetPlacingRectangle(unitDefID)
 	end
 	
 	placingRectangle = {
-		floatOnWater = Spring.Utilities.BlueprintFloat(ud),
+		floatOnWater = ud.floatOnWater,
 		oddX = (footX%2)*8,
 		oddZ = (footZ%2)*8,
 		halfX = footX/2*16,

@@ -21,7 +21,6 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local LOS_MULT = (Spring.Utilities.IsCurrentVersionNewerThan(100, 0) and 1) or 32 -- multiplier from UnitDefs to reasonable units
 local UPDATE_FREQUENCY = 15
 
 local units = {count = 0, data = {}}
@@ -38,8 +37,8 @@ local function AddSphericalLOSCheck(unitID, unitDefID)
 		--GG.UnitEcho(unitID, "added")
 		units.data[units.count] = {
 			unitID = unitID,
-			los = ud.losRadius*LOS_MULT,
-			airLos = ud.airLosRadius*LOS_MULT,
+			los = ud.losRadius,
+			airLos = ud.airLosRadius,
 			removeAfter = frame + 40,
 		}
 		unitsByID[unitID] = units.count

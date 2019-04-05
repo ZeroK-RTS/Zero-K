@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		date = "2007-11-18",
 		license = "None",
 		layer = 50,
-		enabled = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
+		enabled = true
 	}
 end
 

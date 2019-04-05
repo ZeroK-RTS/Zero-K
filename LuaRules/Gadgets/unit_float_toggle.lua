@@ -105,7 +105,7 @@ local function addFloat(unitID, unitDefID, isFlying,transportCall)
 					paraData = {want = false, para = false},
 					transportCall = transportCall or 0,
 				}
-				Spring.MoveCtrl.SetRotation(unitID, 0, Spring.GetUnitHeading(unitID)*RAD_PER_ROT, 0)
+				Spring.MoveCtrl.SetRotation(unitID, 0, -Spring.GetUnitHeading(unitID)*RAD_PER_ROT, 0)
 				if isFlying then
 					Spring.MoveCtrl.Disable(unitID) --disable MoveCtrl temporary so that Newton can work
 				end
@@ -232,7 +232,7 @@ function gadget:GameFrame(f)
 					end
 				end
 				Spring.MoveCtrl.Enable(unitID)
-				Spring.MoveCtrl.SetRotation(unitID, 0, Spring.GetUnitHeading(unitID)*RAD_PER_ROT, 0)
+				Spring.MoveCtrl.SetRotation(unitID, 0, -Spring.GetUnitHeading(unitID)*RAD_PER_ROT, 0)
 			end
 			i = i + 1
 			

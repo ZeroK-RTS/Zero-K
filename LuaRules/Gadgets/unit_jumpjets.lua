@@ -292,8 +292,8 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	if (delay == 0) then
 		Spring.UnitScript.CallAsUnit(unitID,env.beginJump,turn,lineDist,flightDist,duration)
 		if rotateMidAir then
-			mcSetRotation(unitID, 0, (startHeading - 2^15)/rotUnit, 0) -- keep current heading
-			mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0)
+			mcSetRotation(unitID, 0, (2^15 - startHeading)/rotUnit, 0) -- keep current heading
+			mcSetRotationVelocity(unitID, 0, -turn/rotUnit*step, 0)
 		end
 		if PLAY_SOUND and (not cannotJumpMidair) then	-- don't make sound if we jump with legs instead of jets
 			GG.PlayFogHiddenSound("Jump", UnitDefs[unitDefID].mass/10, start[1], start[2], start[3])
@@ -318,8 +318,8 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			end
 
 			if rotateMidAir then
-				mcSetRotation(unitID, 0, (startHeading - 2^15)/rotUnit, 0) -- keep current heading
-				mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0)
+				mcSetRotation(unitID, 0, (2^15 - startHeading)/rotUnit, 0) -- keep current heading
+				mcSetRotationVelocity(unitID, 0, -turn/rotUnit*step, 0)
 			end
 		end
 	

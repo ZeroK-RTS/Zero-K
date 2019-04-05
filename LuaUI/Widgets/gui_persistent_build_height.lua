@@ -329,7 +329,7 @@ function widget:Update(dt)
 	
 	local mx,my = spGetMouseState()
 	-- Should not ignore water if the structure can float. See https://springrts.com/mantis/view.php?id=5390
-	local _, pos = spTraceScreenRay(mx, my, true, false, false, not Spring.Utilities.BlueprintFloat(ud))
+	local _, pos = spTraceScreenRay(mx, my, true, false, false, not ud.floatOnWater)
 	
 	if pos then
 		pointX = floor((pos[1] + 8 - oddX)/16)*16 + oddX

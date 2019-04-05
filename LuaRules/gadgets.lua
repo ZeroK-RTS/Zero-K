@@ -39,8 +39,6 @@ VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
 
-local reverseCompatAllowStartPosition = not Spring.Utilities.IsCurrentVersionNewerThan(103, 629)
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -1119,9 +1117,6 @@ function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam,
 end
 
 function gadgetHandler:AllowStartPosition(playerID, teamID, readyState, cx, cy, cz, rx, ry, rz)
-  if reverseCompatAllowStartPosition then
-    cx, cy, cz, playerID, readyState, rx, ry, rz = playerID, teamID, readyState, cx, cy, cz, rx, ry
-  end
   for _,g in ipairs(self.AllowStartPositionList) do
     if (not g:AllowStartPosition(playerID, teamID, readyState, cx, cy, cz, rx, ry, rz)) then
       return false

@@ -34,7 +34,6 @@ Spring.Utilities = {}
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 VFS.Include("LuaRules/Utilities/versionCompare.lua")
 VFS.Include("LuaRules/Utilities/unitStates.lua")
-local reverseCompat = not Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
 
 VFS.Include("LuaRules/Utilities/function_override.lua")
 
@@ -2129,9 +2128,6 @@ end
 
 function widgetHandler:UnitCommand(unitID, unitDefID, unitTeam,
                                    cmdId, cmdParams, cmdOpts, cmdTag) --cmdTag available in Spring 95
-  if reverseCompat then
-    cmdOpts, cmdParams = cmdParams, cmdOpts
-  end
   for _,w in ipairs(self.UnitCommandList) do
     w:UnitCommand(unitID, unitDefID, unitTeam,
                   cmdId, cmdParams, cmdOpts, cmdTag)
@@ -2141,9 +2137,6 @@ end
 
 
 function widgetHandler:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag) --cmdParams & cmdOptions available in Spring 95
-  if reverseCompat then
-    cmdOptions, cmdParams = cmdParams, cmdOptions
-  end
   for _,w in ipairs(self.UnitCmdDoneList) do
     w:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)
   end

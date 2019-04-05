@@ -298,7 +298,7 @@ local function HighlightPlacement(unitDefID)
 		return
 	end
 	local mx, my = spGetMouseState()
-	local _, coords = spTraceScreenRay(mx, my, true, true, false, not Spring.Utilities.BlueprintFloat(UnitDefs[unitDefID]))
+	local _, coords = spTraceScreenRay(mx, my, true, true, false, not UnitDefs[unitDefID].floatOnWater)
 	if coords then
 		local radius = pylonDefs[unitDefID]
 		if (radius ~= 0) then

@@ -18,12 +18,8 @@ function gadget:GetInfo()
     date      = "2008,2009,2010,2016",
     license   = "GNU GPL, v2 or later",
     layer     = 1,
-    enabled   = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)  --  loaded by default?
+    enabled   = true
   }
-end
-
-if not Spring.Utilities.IsCurrentVersionNewerThan(100, 0) then
-	return
 end
 
 --------------------------------------------------------------------------------
@@ -633,9 +629,6 @@ function gadget:Initialize()
 
   --// load the materials config files
   local MATERIALS_DIR = "ModelMaterials/"
-  if not Spring.Utilities.IsCurrentVersionNewerThan(103, 0) then
-    MATERIALS_DIR = "ModelMaterials_103/"
-  end
   local unitMaterialDefs, featureMaterialDefs = _LoadMaterialConfigFiles(MATERIALS_DIR)
   --// process the materials (compile shaders, load textures, ...)
   _ProcessMaterials(unitRendering,    unitMaterialDefs)

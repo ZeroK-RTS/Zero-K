@@ -199,7 +199,6 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		--SetUnitPosition(droneID, xS, zS, true)
 		Spring.MoveCtrl.Enable(droneID)
 		Spring.MoveCtrl.SetPosition(droneID, xS, yS, zS)
-		--Spring.MoveCtrl.SetRotation(droneID, 0, rot, 0)
 		Spring.MoveCtrl.Disable(droneID)
 		Spring.SetUnitCOBValue(droneID, 82, (rot - math.pi)*65536/2/math.pi)
 		
@@ -331,7 +330,6 @@ local exp = math.exp
 local min = math.min
 
 local mcSetVelocity         = Spring.MoveCtrl.SetVelocity
-local mcSetRotationVelocity = Spring.MoveCtrl.SetRotationVelocity
 local mcSetPosition         = Spring.MoveCtrl.SetPosition
 local mcSetRotation         = Spring.MoveCtrl.SetRotation
 local mcDisable             = Spring.MoveCtrl.Disable
@@ -445,7 +443,7 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 			end
 			mcSetVelocity(unitID, vx, vy, vz)
 			mcSetPosition(unitID, px + vx + offx, py + vy + offy, pz + vz + offz)
-			mcSetRotation(unitID, -pitch, yaw, -roll) --Spring conveniently rotate Y-axis first, X-axis 2nd, and Z-axis 3rd which allow Yaw, Pitch & Roll control.
+			mcSetRotation(unitID, pitch, -yaw, roll) --Spring conveniently rotate Y-axis first, X-axis 2nd, and Z-axis 3rd which allow Yaw, Pitch & Roll control.
 			
 			local buildRate = GetBuildRate(carrierID) 
 			if perSecondCost and oldBuildRate ~= buildRate then

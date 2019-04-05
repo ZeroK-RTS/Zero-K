@@ -53,22 +53,6 @@ end
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
-if Spring.Utilities.IsCurrentVersionNewerThan(100, 0) then
-	Spring.MoveCtrl = Spring.MoveCtrl or {}
-	local origMcSetUnitRotation = Spring.MoveCtrl.SetRotation
-	local origMcSetUnitRotationVelocity = Spring.MoveCtrl.SetRotationVelocity
-
-	local function newMcSetUnitRotation(unitID, x, y, z)
-		return origMcSetUnitRotation(unitID, -x, -y, -z)
-	end
-
-	local function newMcSetUnitRotationVelocity(unitID, x, y, z)
-		return origMcSetUnitRotationVelocity(unitID, -x, -y, -z)
-	end
-	
-	Spring.MoveCtrl.SetRotation = newMcSetUnitRotation
-	Spring.MoveCtrl.SetRotationVelocity = newMcSetUnitRotationVelocity
-end
 
 if Script.IsEngineMinVersion(104, 0, 50) then
 	local origGetGroundInfo = Spring.GetGroundInfo
