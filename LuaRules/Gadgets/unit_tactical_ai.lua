@@ -166,7 +166,6 @@ local function getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3,
 		end
 		return false -- no queue and on hold position.
 	end
-	
 	if (holdPos and cmdID == CMD_ATTACK and Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)) then
 		if spGetCommandQueue(unitID, 0) == 1 then
 			return false -- set to hold position and is auto-acquiring target
@@ -175,17 +174,19 @@ local function getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3,
 	
 	if cmdID == CMD_FIGHT then
 		return -1, false, true, nil, cp_1, cp_2, cp_3
-	elseif cmdID == CMD_ATTACK and ((not holdPos) or fightTwo) then -- if I attack 
-		local target, check = cp_1, cp_2
-		if (not check) and spValidUnitID(target) then -- if I target a unit
-			local cmdID_2 = Spring.GetUnitCurrentCommand(unitID, 2)
-			if not (cmdID == CMD_FIGHT or cmdID_2 == CMD_FIGHT or Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)) then -- only skirm single target when given the order manually
-				return target, false
-			else
-				return -1, false, true, target
+	elseif cmdID == CMD_ATTACK then -- if I attack
+		local cmdID_2 = Spring.GetUnitCurrentCommand(unitID, 2)
+		if ((not holdPos) or (cmdID_2 == CMD_FIGHT)) then
+			local target, check = cp_1, cp_2
+			if (not check) and spValidUnitID(target) then -- if I target a unit
+				if not (cmdID == CMD_FIGHT or cmdID_2 == CMD_FIGHT or Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)) then -- only skirm single target when given the order manually
+					return target, false
+				else
+					return -1, false, true, target
+				end
+			elseif (cmdID == CMD_FIGHT) then --  if I target the ground and have fight or patrol command
+				return -1, false, nil, nil, cp_1, cp_2, cp_3
 			end
-		elseif (cmdID == CMD_FIGHT) then --  if I target the ground and have fight or patrol command
-			return -1, false, nil, nil, cp_1, cp_2, cp_3
 		end
 	elseif (cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE) and (cp_1 == data.cx) and (cp_2 == data.cy) and (cp_3 == data.cz) then
 		local cmdID_2, cmdOpts_2, _, cps_1, cps_2, cps_3 = Spring.GetUnitCurrentCommand(unitID, 2)
