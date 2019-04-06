@@ -136,5 +136,18 @@ function gadget:GameFrame(n)
 	RevealedUnitTimeout(n)
 end
 
+-- TODO Replace SetWatchProjectile with a notifier in LUS.Shot or LUS.BlockShot. Perhaps this could be added to unit_script.lua.
+function gadget:Initialize()
+	for weaponID,wd in pairs(WeaponDefs) do
+		if wd.customParams and wd.customParams.is_unit_weapon then
+			if Script.SetWatchProjectile then
+				Script.SetWatchProjectile(weaponID, true)
+			else
+				Script.SetWatchWeapon(weaponID, true)
+			end
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
