@@ -69,7 +69,7 @@ local function IsDisabled()
 	return spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 end
 
-local function TransformMeteor(weaponDefID, proID, x, y, z)
+local function TransformMeteor(weaponDefID, proID, meteorTeamID, meteorOwnerID, x, y, z)
 	
 	-- Get old projectile attributes
 	local px, py, pz = Spring.GetProjectilePosition(proID)
@@ -85,7 +85,8 @@ local function TransformMeteor(weaponDefID, proID, x, y, z)
 		speed = {vx, vy, vz}, 
 		ttl = timeToLiveDefs[weaponDefID],
 		gravity = gravityDefs[weaponDefID],
-		team = gaiaTeam,
+		team = meteorTeamID,
+		owner = meteorOwnerID,
 	})
 	if x then
 		Spring.SetProjectileTarget(newProID, x, y, z)
@@ -98,7 +99,7 @@ local function DropSingleMeteor(index)
 	local proID = projectiles[index]
 	-- Check that the projectile ID is still valid
 	if Spring.GetProjectileDefID(proID) == floatWeaponDefID then
-		TransformMeteor(uncontrolWeaponDefID, proID)
+		TransformMeteor(uncontrolWeaponDefID, proID, gaiaTeam, nil)
 	end
 end
 
@@ -109,7 +110,7 @@ local function LoseControlOfMeteors()
 		-- Check that the projectile ID is still valid
 		if Spring.GetProjectileDefID(proID) == floatWeaponDefID then
 			tooltipProjectileCount = tooltipProjectileCount + 1
-			projectiles[i] = TransformMeteor(uncontrolWeaponDefID, proID)
+			projectiles[i] = TransformMeteor(uncontrolWeaponDefID, proID, gaiaTeam, nil)
 		end
 	end
 	Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
@@ -125,7 +126,7 @@ local function RegainControlOfMeteors()
 			if ttl > 0 then
 				tooltipProjectileCount = tooltipProjectileCount + 1
 				local hoverPos = Vector.PolarToCart(HOVER_RANGE*math.random()^2, 2*math.pi*math.random())
-				projectiles[i] = TransformMeteor(floatWeaponDefID, proID, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
+				projectiles[i] = TransformMeteor(floatWeaponDefID, proID, gaiaTeam, nil, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
 			end
 		end
 	end
@@ -207,6 +208,7 @@ local function LaunchAll(x, z)
 	end
 	
 	launchInProgress = true
+	local zenithTeamID = Spring.GetUnitTeam(unitID)
 	
 	-- Make the aiming projectiles. These projectiles have high turnRate
 	-- so are able to rotate the wobbly float projectiles in the right
@@ -233,7 +235,7 @@ local function LaunchAll(x, z)
 			
 			-- Projectile is valid, launch!
 			aimCount = aimCount + 1
-			aim[aimCount] = TransformMeteor(aimWeaponDefID, proID, x, y, z)
+			aim[aimCount] = TransformMeteor(aimWeaponDefID, proID, zenithTeamID, unitID, x, y, z)
 		end
 	end
 	
@@ -257,7 +259,7 @@ local function LaunchAll(x, z)
 			-- Projectile is valid, launch!
 			local aimOff = Vector.PolarToCart(AIM_RADIUS*math.random()^2, 2*math.pi*math.random())
 			
-			TransformMeteor(fireWeaponDefID, proID, x + aimOff[1], y, z + aimOff[2])
+			TransformMeteor(fireWeaponDefID, proID, zenithTeamID, unitID, x + aimOff[1], y, z + aimOff[2])
 		end
 	end
 	
