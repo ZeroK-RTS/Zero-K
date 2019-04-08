@@ -84,14 +84,13 @@ unitDef = {
 	  },
 
       damage                  = {
-        default = 7.2,
-        planes  = 72,
-        subs    = 4,
+        default = 7,
+        planes  = 70.1,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
-      flightTime              = 3,
+      flightTime              = 4,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
