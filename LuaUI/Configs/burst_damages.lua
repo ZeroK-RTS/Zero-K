@@ -17,8 +17,10 @@ local function processWeapon(weaponDef, targetCats)
 	end
 
 	local projectiles = tonumber(cp.statsprojectiles) or ((tonumber(cp.script_burst) or weaponDef.salvoSize) * weaponDef.projectiles)
+	local rawDamage = cp.stats_damage * projectiles
+	local roundedDamage = math.floor(rawDamage / 5 + 0.5) * 5 -- round numbers are easier to parse and multiply nicely.
 	local burstDef = {
-		damage = cp.stats_damage * projectiles,
+		damage = roundedDamage,
 		unreliable = (cp.burst == burstDefs.BURST_UNRELIABLE),
 		class = (weaponDef.paralyzer or cp.disarmdamagemult) and EMP_OR_DISARM or NORMAL,
 	}
