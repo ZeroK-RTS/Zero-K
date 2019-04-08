@@ -109,7 +109,7 @@ local weaponDefs = {
       lups_explodelife = 1.5,
 	},
     damage = {
-      default          = 8007.1,
+      default          = 8002.4,
     },
   },
 }

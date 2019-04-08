@@ -73,7 +73,7 @@ unitDef = {
 	  },
 
       damage                  = {
-        default = 30003.1,
+        default = 30002.4,
       },
 
       edgeEffectiveness       = 1,
