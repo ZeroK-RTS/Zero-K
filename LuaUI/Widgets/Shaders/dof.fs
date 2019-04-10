@@ -78,18 +78,18 @@ const vec4 KernelNear_RealX_ImY_RealZ_ImW[] = vec4[](
 );
 
 const float baseStepValMag = 1.0/540.0;
-const float inFocusThreshold = 0.25 / float(KERNEL_RADIUS);
+const float inFocusThreshold = 0.4 / float(KERNEL_RADIUS);
 const float colorPower = 1.6;
 
-const vec2 autofocusTestCoords[] = vec2[](
-        vec2(0.42, 0.42),
-        vec2(0.42, 0.58),
-        vec2(0.58, 0.58),
-        vec2(0.58, 0.42),
-        vec2(0.62, 0.38),
-        vec2(0.6, 0.55),
-        vec2(0.38, 0.4),
-        vec2(0.4, 0.62)
+const vec2 autofocusTestCoordOffsets[] = vec2[](
+  vec2(-0.71, -0.71),
+  vec2(-0.71, 0.71),
+  vec2(0.71, 0.71),
+  vec2(0.71, -0.71),
+  vec2(-1.0, 0.0),
+  vec2(0.0, 1.0),
+  vec2(0.0, -1.0),
+  vec2(1.0, 0.0)
 );
 
 vec2 multComplex(vec2 p, vec2 q)
@@ -118,6 +118,7 @@ float LinearizeDepth(vec2 uv){
 
     return ((abs(((1.0 + depthNDC) * (1.0 + n22))/(2.0 * (depthNDC + n22)))
       * (distanceLimits.y - distanceLimits.x)) + distanceLimits.x) / BLUR_START_DIST;
+    // return abs(viewProjection[3][2] / (viewProjection[2][2] + depthNDC)) / BLUR_START_DIST;
 }
 
 float GetFilterRadius(vec2 uv)
@@ -148,22 +149,30 @@ vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, out float
   return coords;
 }
 
+//Used to find the mix value to blend between the full-size screen texture and the
+//downscaled out-of-focus textures.
 float FocusThresholdMixFactor(float filterRadius)
 {
-  return clamp((filterRadius - inFocusThreshold) * float(KERNEL_RADIUS) * 2.0,
+  return clamp((filterRadius - inFocusThreshold) * float(KERNEL_RADIUS) * 3.0,
         0.0, 1.0);
+}
+
+float GetMaxInFocusAperture(float targetInFocusDepth, float focusDepth)
+{
+  return (targetInFocusDepth * inFocusThreshold) / abs(targetInFocusDepth - focusDepth);
 }
 
 void main()
 {
   vec4 fragColor = vec4(0,0,0,0);
   vec2 uv = gl_TexCoord[0].st;
-  vec2 stepVal = vec2(baseStepValMag * (resolution.y/resolution.x), baseStepValMag);
+  float aspectRatio = resolution.y / resolution.x;
+  vec2 stepVal = vec2(baseStepValMag * aspectRatio, baseStepValMag);
 
   if (pass == FILTER_SIZE_PASS)
   {  
     vec4 colors = texture2D(origTex, uv);
-    float lum = dot(colors.rgb,vec3(0.2126,0.7152,0.0722))*0.5;
+    float lum = dot(colors.rgb,vec3(0.2126,0.7152,0.0722))*0.6;
     colors = colors *(1.0 + 0.2*lum*lum*lum);
     colors = vec4(pow(colors.r, colorPower), pow(colors.g, colorPower), pow(colors.b, colorPower), colors.a);
 
@@ -173,45 +182,49 @@ void main()
 
     if (autofocus == 1)
     {
-      float centerDepth = LinearizeDepth(vec2(0.5,0.5));
+      vec2 centerUV = vec2(0.5,0.5);
+      float centerDepth = LinearizeDepth(centerUV);
       focusDepth = centerDepth;
       float testFocusDepth = focusDepth;
 
       float minTestDepth = focusDepth;
       float maxTestDepth = focusDepth;
       float testDepth = 0.0;
-      // float meanTestDepth = 0.0;
       int autofocusTestCoordCount = 8;
       for (int i = 0; i < autofocusTestCoordCount; ++i)
       {
-        testDepth = LinearizeDepth(autofocusTestCoords[i]);
-        minTestDepth = min(minTestDepth, testDepth);
-        maxTestDepth = max(maxTestDepth, testDepth);
-        // meanTestDepth += testDepth;
-        testFocusDepth += testDepth / 2.0;
+        testDepth = LinearizeDepth(centerUV + 
+          (vec2(autofocusTestCoordOffsets[i].x * aspectRatio, 
+            autofocusTestCoordOffsets[i].y) * 0.12));
+        minTestDepth = min(minTestDepth, (minTestDepth + 2 * testDepth) / 3);
+        maxTestDepth = max(maxTestDepth, (maxTestDepth + 2 * testDepth) / 3);
+        // testFocusDepth += testDepth / 2.0;
       }
-      // meanTestDepth /= float(autofocusTestCoordCount);
-      testFocusDepth /= (1.0 + float(autofocusTestCoordCount) / 2.0);
+      // testFocusDepth /= (1.0 + float(autofocusTestCoordCount) / 2.0);
+      // testFocusDepth = (3 * testFocusDepth * minTestDepth * maxTestDepth)/
+      // (minTestDepth * testFocusDepth + maxTestDepth * testFocusDepth + minTestDepth * maxTestDepth);
 
       //pull focus back a bit to bias slightly towards air units and against distant terrain
-      testFocusDepth /= min(0.95 + ((testFocusDepth * 45.0) * 0.20), 1.15);
-      focusDepth /= clamp(0.95 + ((focusDepth * 45.0) * 0.20), 1.0, 1.15);
+      float focusDepthAirFactor = clamp(0.95 + ((focusDepth * 45.0) * 0.20), 1.0, 1.15);
+      testFocusDepth /= focusDepthAirFactor;
+      focusDepth /= focusDepthAirFactor;
 
-      float focusSpread = maxTestDepth - minTestDepth;
-      focusSpread *= 1.75 * clamp(0.85 + ((testFocusDepth * 55.0) * 0.20), 1.0, 1.5);
+      minTestDepth /= focusDepthAirFactor;
+      maxTestDepth = (maxTestDepth + 2 * (maxTestDepth * focusDepthAirFactor)) / 3;
 
-      float focalLength = 0.055;
+      float focalLength = 0.5;
       float minFStop = 1.0 * focalLength;
-      // testFocusDepth *= testFocusDepth;
-      float curveDepth = 10.5;
-      aperture = max(1.0/(max(
-          (3.3 * (testFocusDepth + focusSpread)) 
-          * exp(curveDepth * (testFocusDepth + focusSpread)),
-          minFStop)), 0.0) * focalLength;
+      float curveDepth = 16.0;
+      float baseAperture = max(focalLength/(max(
+          (3.3 * (testFocusDepth )) 
+          * exp(curveDepth * (testFocusDepth)),
+          minFStop)), 0.0);
+      float maxDepthAperture = GetMaxInFocusAperture(maxTestDepth, focusDepth);
+      float minDepthAperture = GetMaxInFocusAperture(minTestDepth, focusDepth);
+      aperture = min(baseAperture, min(maxDepthAperture, minDepthAperture));
 
       // aperture = max(1.0/(max((testFocusDepth + focusSpread) * 3.3, minFStop)) - 2.0, 0.0) 
-      //         * focalLength; 
-      // depth; 
+      //         * depth;
     }
 
     float filterRadius = clamp(((depth - focusDepth) * aperture)/depth, -1.8, 1.8);
@@ -365,6 +378,16 @@ void main()
       fragColor.rgb = mix(fragColor.rgb, nearBlurTexAtUV.rgb, alpha);
       // fragColor = vec4(alpha);
     }
+
+    // if (abs(uv.x - 0.5) < 0.001 && abs(uv.y - 0.5) < 0.001)
+    //   fragColor = vec4(1);
+    // for(int i = 0; i < 8; ++i) 
+    // { 
+    //   if (abs(uv.x - (0.5 + autofocusTestCoordOffsets[i].x * aspectRatio * 0.12)) < 0.001 && 
+    //     abs(uv.y - (0.5 + autofocusTestCoordOffsets[i].y * 0.12)) < 0.001)
+    //   fragColor = vec4(1);
+    // }
+
     gl_FragData[0] = fragColor;
   }
 
