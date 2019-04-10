@@ -596,7 +596,7 @@ local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePositio
 end
 
 local function MoveCommandBlock(factoryUnitID, queueCmdID, moveBlock, insertBlock)
-	local commands = Spring.GetFactoryCommands(factoryUnitID)
+	local commands = Spring.GetFactoryCommands(factoryUnitID, -1)
 	if not commands then
 		return
 	end
@@ -651,7 +651,7 @@ local function MoveCommandBlock(factoryUnitID, queueCmdID, moveBlock, insertBloc
 end
 
 local function QueueClickFunc(mouse, right, alt, ctrl, meta, shift, queueCmdID, factoryUnitID, queueBlock)
-	local commands = Spring.GetFactoryCommands(factoryUnitID)
+	local commands = Spring.GetFactoryCommands(factoryUnitID, -1)
 	if not commands then
 		return true
 	end

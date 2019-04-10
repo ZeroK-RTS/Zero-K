@@ -439,7 +439,7 @@ local function BuildRowButtonFunc(num, cmdid, left, right,addInput,insertMode,cu
 	end
 	
 	-- skip over the commands with an id of 0, left behind by removal
-	local commands = Spring.GetFactoryCommands(targetFactory)
+	local commands = Spring.GetFactoryCommands(targetFactory, -1)
 	local i = 1
 	while i <= pos do
 		if not commands[i] then --end of queue reached
@@ -750,7 +750,7 @@ local function MakeClearButton(unitID, i)
 		backgroundColor = queueColor,
 		OnClick = {
 			function(_,_,_,button)
-				local buildQueue = Spring.GetFactoryCommands (unitID)               
+				local buildQueue = Spring.GetFactoryCommands (unitID, -1)
 				for _, buildCommand in ipairs( buildQueue) do
 					Spring.GiveOrderToUnit( unitID, CMD.REMOVE, { buildCommand.tag } , CMD.OPT_CTRL )
 				end

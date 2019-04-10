@@ -53,7 +53,7 @@ function DrawMouseArc(unitID, shift, groundPos)
 	if (not groundPos) then
 		return
 	end
-	local queue = spGetCommandQueue(unitID)
+	local queue = spGetCommandQueue(unitID, -1)
 	local deltaV = customWeaponVelocity
 	local customRange = customMaxRange
 	if (not queue or #queue == 0 or not shift) then

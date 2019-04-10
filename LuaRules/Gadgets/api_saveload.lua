@@ -944,7 +944,7 @@ local function SaveUnits()
 			
 			-- factory properties
 			if unitDef.isFactory then
-				local factoryCommands = Spring.GetFactoryCommands(unitID) or {}
+				local factoryCommands = Spring.GetFactoryCommands(unitID, -1) or {}
 				unitInfo.factoryData = { commands = factoryCommands }
 				local producedUnitID = spGetUnitIsBuilding(unitID)
 				if (producedUnitID) then
