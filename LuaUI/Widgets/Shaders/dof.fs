@@ -79,7 +79,7 @@ const vec4 KernelNear_RealX_ImY_RealZ_ImW[] = vec4[](
 
 const float baseStepValMag = 1.0/540.0;
 const float inFocusThreshold = 0.4 / float(KERNEL_RADIUS);
-const float colorPower = 1.6;
+const float colorPower = 1.8;
 
 const vec2 autofocusTestCoordOffsets[] = vec2[](
   vec2(-0.71, -0.71),
@@ -195,9 +195,9 @@ void main()
       {
         testDepth = LinearizeDepth(centerUV + 
           (vec2(autofocusTestCoordOffsets[i].x * aspectRatio, 
-            autofocusTestCoordOffsets[i].y) * 0.12));
-        minTestDepth = min(minTestDepth, (minTestDepth + 2 * testDepth) / 3);
-        maxTestDepth = max(maxTestDepth, (maxTestDepth + 2 * testDepth) / 3);
+            autofocusTestCoordOffsets[i].y) * clamp(focusDepth * 10.0, 0.1, 0.16)));
+        minTestDepth = min(minTestDepth, (2.0 * minTestDepth + testDepth) / 3.0);
+        maxTestDepth = max(maxTestDepth, (2.0 * maxTestDepth + testDepth) / 3.0);
         // testFocusDepth += testDepth / 2.0;
       }
       // testFocusDepth /= (1.0 + float(autofocusTestCoordCount) / 2.0);
@@ -205,16 +205,16 @@ void main()
       // (minTestDepth * testFocusDepth + maxTestDepth * testFocusDepth + minTestDepth * maxTestDepth);
 
       //pull focus back a bit to bias slightly towards air units and against distant terrain
-      float focusDepthAirFactor = clamp(0.95 + ((focusDepth * 45.0) * 0.20), 1.0, 1.15);
-      testFocusDepth /= focusDepthAirFactor;
-      focusDepth /= focusDepthAirFactor;
+      float focusDepthAirFactor = clamp(0.95 + ((focusDepth * 45.0) * 0.20), 0.95, 1.15);
+      testFocusDepth /= max(focusDepthAirFactor, 1.0);
+      focusDepth /= max(focusDepthAirFactor, 1.0);
 
       minTestDepth /= focusDepthAirFactor;
-      maxTestDepth = (maxTestDepth + 2 * (maxTestDepth * focusDepthAirFactor)) / 3;
+      maxTestDepth = (maxTestDepth + 2.0 * (maxTestDepth * focusDepthAirFactor)) / 3.0;
 
-      float focalLength = 0.5;
+      float focalLength = 0.2;
       float minFStop = 1.0 * focalLength;
-      float curveDepth = 16.0;
+      float curveDepth = 12.0;
       float baseAperture = max(focalLength/(max(
           (3.3 * (testFocusDepth )) 
           * exp(curveDepth * (testFocusDepth)),
