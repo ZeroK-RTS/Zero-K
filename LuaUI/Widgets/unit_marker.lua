@@ -128,7 +128,7 @@ function widget:UnitEnteredLos (unitID, teamID)
 			knownUnits[unitID] = unitDefID
 		end
 		if unitList[unitDefID].show_owner then
-			local _,playerID,_,isAI = Spring.GetTeamInfo(teamID)
+			local _,playerID,_,isAI = Spring.GetTeamInfo(teamID, false)
 			local owner_name
 			if isAI then
 				local _,botName,_,botType = Spring.GetAIInfo(teamID)

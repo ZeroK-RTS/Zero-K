@@ -12,7 +12,7 @@ end
 
 VFS.Include("LuaRules/Utilities/unitDefReplacements.lua")
 
-local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 local MAX_NAME_LENGTH = 20
 
 local doesNotCountUnits = {}

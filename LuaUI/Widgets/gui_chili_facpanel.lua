@@ -773,7 +773,7 @@ local function MakeClearButton(unitID, i)
 end
 
 function AddPlayerName(teamID)
-	local _, player,_,isAI = Spring.GetTeamInfo(teamID)
+	local _, player,_,isAI = Spring.GetTeamInfo(teamID, false)
 	local playerName
 	if isAI then
 		local _, aiName, _, shortName = Spring.GetAIInfo(teamID)

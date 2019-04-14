@@ -94,7 +94,7 @@ options = {
 
 local function SetTeamNamesAndColors()
 	for _,teamID in ipairs(Spring.GetTeamList()) do
-		local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
+		local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID, false)
 		if isAI then
 			local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
 			teamNames[teamID] = name
@@ -321,7 +321,7 @@ local function SetupControls()
 end
 
 local function SetEndgameCaption(winners)
-	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	if #winners > 1 then
 		if spec then
 			endgame_caption = "Game over!"

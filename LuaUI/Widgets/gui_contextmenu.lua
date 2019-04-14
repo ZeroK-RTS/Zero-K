@@ -1778,7 +1778,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 	if not ud then return end
 	local alliance 		= spGetUnitAllyTeam(unitID)
 	local team			= spGetUnitTeam(unitID)
-	local _, player 	= spGetTeamInfo(team)
+	local _, player 	= spGetTeamInfo(team, false)
 	local playerName 	= spGetPlayerInfo(player, false) or 'noname'
 	local teamColor 	= {spGetTeamColor(team)}
 		

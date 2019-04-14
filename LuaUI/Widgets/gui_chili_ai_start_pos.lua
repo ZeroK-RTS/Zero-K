@@ -181,7 +181,7 @@ function widget:Initialize()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local _,_,_,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
+		local _,_,_,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID, false)
 		if isAI then
 			local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
 			local playerName = Spring.GetPlayerInfo(hostingPlayerID, false)

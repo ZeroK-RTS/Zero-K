@@ -1076,7 +1076,7 @@ local function SetupAITeamColor() --Copied from gui_chili_chat2_1.lua
 	for i=1,#teamsSorted do
 		local teamID = teamsSorted[i]
 		if teamID ~= Spring.GetGaiaTeamID() then
-			local isAI = select(4,Spring.GetTeamInfo(teamID))
+			local isAI = select(4,Spring.GetTeamInfo(teamID, false))
 			if isAI then
 				local name = select(2,Spring.GetAIInfo(teamID))
 				--incolors[name] = color2incolor(Spring.GetTeamColor(teamID))

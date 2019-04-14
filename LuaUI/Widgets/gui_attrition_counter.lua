@@ -123,7 +123,7 @@ end
 local function cap (x) return math.max(math.min(x,1),0) end
 
 local function GetTeamName(teamID)
-	local _,leader,_,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
+	local _,leader,_,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID, false)
 	if teamID == gaiaTeamID then
 		return "gaia"
 	else
@@ -138,7 +138,7 @@ local function GetTeamName(teamID)
 end
 
 local function GetOpposingAllyTeams()
-	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local returnData = {}
 	local allyTeamList = Spring.GetAllyTeamList()
 	for i = 1, #allyTeamList do
@@ -289,7 +289,7 @@ function widget:Initialize()
 		end
 		
 		for i, t in pairs(_teams) do
-			local _,leader,_,isAI,_,allyTeamID,_ = Spring.GetTeamInfo(t);
+			local _,leader,_,isAI,_,allyTeamID = Spring.GetTeamInfo(t, false)
 			local elo = 0;
 			
 			allyTeams[allyTeamID].teamIDs[t] = true;

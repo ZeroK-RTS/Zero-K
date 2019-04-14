@@ -1308,7 +1308,7 @@ do
 	for _, teamID in ipairs(teams) do
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
 		if ((teamLuaAI == nil or teamLuaAI == "") and teamID ~= gaiaTeam) then
-			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID)
+			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID, false)
 			if (not ai) and (not humanAlly[ally]) then 
 				humanAlly[ally] = true
 				humanAllyCount = humanAllyCount + 1
@@ -1892,7 +1892,7 @@ function widgetHandler:GameStart()
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
 		if ((teamLuaAI == nil or teamLuaAI == "") and teamID ~= gaiaTeam) then
-			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID)
+			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID, false)
 			if (not ai) then 
 				for _, pid in ipairs(Spring.GetPlayerList(teamID)) do
 					local name, active, spec = Spring.GetPlayerInfo(pid, false)

@@ -108,7 +108,7 @@ local function SetupPlayers()
 	for i=1,#teamsSorted do
 		local teamID = teamsSorted[i]
 		if teamID ~= gaiaTeamID then
-			local _,_,_,isAI,_,allyTeamId = spGetTeamInfo(teamID)
+			local _,_,_,isAI,_,allyTeamId = spGetTeamInfo(teamID, false)
 			if isAI then
 				local skirmishAIID, name = spGetAIInfo(teamID)
 				--Note: to make AI appears like its doing an ally chat, do: Spring.Echo("<botname> Allies: bot_say_something")

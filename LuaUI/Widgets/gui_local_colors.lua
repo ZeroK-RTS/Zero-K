@@ -106,7 +106,7 @@ local function UpdateSimpleEnemyColor(self)
 			local allyTeamSeen = {}
 			local allyTeamCount = 0
 			for i = 1, #teamList do
-				local allyTeam = select(6, Spring.GetTeamInfo(teamList[i]))
+				local allyTeam = select(6, Spring.GetTeamInfo(teamList[i], false))
 				if not allyTeamSeen[allyTeam] then
 					allyTeamCount = allyTeamCount + 1
 					allyTeamSeen[allyTeam] = true
@@ -180,7 +180,7 @@ local function SetNewTeamColors()
 	
 	local a, e = 0, 0
 	for _, teamID in ipairs(Spring.GetTeamList()) do
-		local _,_,_,_,_,allyID = Spring.GetTeamInfo(teamID)
+		local _,_,_,_,_,allyID = Spring.GetTeamInfo(teamID, false)
 		if (allyID == myAlly) then
 			if is_speccing or options.matchColors.value or (myTeam ~= teamID) then
 				a = (a % #allyColors) + 1

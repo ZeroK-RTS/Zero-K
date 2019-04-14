@@ -799,7 +799,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 end
 
 local function GetPlayerCaption(teamID)
-	local _, player,_,isAI = Spring.GetTeamInfo(teamID)
+	local _, player,_,isAI = Spring.GetTeamInfo(teamID, false)
 	local playerName
 	if isAI then
 		local _, aiName, _, shortName = Spring.GetAIInfo(teamID)

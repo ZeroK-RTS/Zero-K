@@ -245,7 +245,7 @@ function widget:Initialize()
 
 	local shuffleMode = Spring.GetGameRulesParam("shuffleMode")
 	if (shuffleMode ~= "allshuffle") then -- only draw occupied boxes
-		local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+		local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 		local allyTeamList = Spring.GetAllyTeamList()
 		local actualAllyTeamList = {}
 		for i = 1, #allyTeamList do
@@ -345,7 +345,7 @@ function widget:DrawWorld()
 end
 
 local function GetTeamName(teamID)
-	local _, leaderID, _, isAiTeam = Spring.GetTeamInfo(teamID)
+	local _, leaderID, _, isAiTeam = Spring.GetTeamInfo(teamID, false)
 	if isAiTeam then
 		local aiName = select(2, Spring.GetAIInfo(teamID))
 		if aiName then

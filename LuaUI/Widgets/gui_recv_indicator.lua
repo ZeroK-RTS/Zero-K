@@ -311,7 +311,7 @@ function widget:Initialize()
 	for j= 1, #teamList do
 		local teamID = teamList[j]
 		notifyCapture[teamID] = true
-		local _,playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		local _,playerID, _, isAI = Spring.GetTeamInfo(teamID, false)
 		if isAI then
 			local _, aiName = Spring.GetAIInfo(teamID)
 			gameID_to_playerName[teamID+1] = aiName

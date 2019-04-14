@@ -832,7 +832,7 @@ end
 
 local function AmITeamLeader(teamID)
 	local myTeam = (teamID == Spring.GetMyTeamID())
-	local amLeader = myTeam and (Spring.GetMyPlayerID() == select (2, Spring.GetTeamInfo(teamID)))
+	local amLeader = myTeam and (Spring.GetMyPlayerID() == select (2, Spring.GetTeamInfo(teamID, false)))
 	return myTeam, amLeader
 end
 

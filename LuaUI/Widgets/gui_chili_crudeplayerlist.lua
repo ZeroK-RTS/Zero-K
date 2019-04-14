@@ -54,7 +54,7 @@ local white		= ''
 local function IsFFA()
 	local allyteams = Spring.GetAllyTeamList()
 	local gaiaT = Spring.GetGaiaTeamID()
-	local gaiaAT = select(6, Spring.GetTeamInfo(gaiaT))
+	local gaiaAT = select(6, Spring.GetTeamInfo(gaiaT, false))
 	local numAllyTeams = 0
 	for i=1,#allyteams do
 		if allyteams[i] ~= gaiaAT then
@@ -306,7 +306,7 @@ local function CfTooltip(allyTeam)
 	tooltip = tooltip .. 'Your team\'s votes: \n'
 	local teamList = Spring.GetTeamList(localAlliance)
 	for _,teamID in ipairs(teamList) do
-		local _,playerID = Spring.GetTeamInfo(teamID)
+		local _,playerID = Spring.GetTeamInfo(teamID, false)
 		local name = Spring.GetPlayerInfo(playerID, false) or '-'
 		local vote = Spring.GetTeamRulesParam(teamID, 'cf_vote_' ..allyTeam)==1 and green..'Y'..white or red..'N'..white
 		local teamColor = color2incolor(Spring.GetTeamColor(teamID))
@@ -753,7 +753,7 @@ SetupPlayerNames = function()
 		local teamID = teamsSorted[i]
 		if teamID ~= Spring.GetGaiaTeamID() then
 			teams[teamID] = teams[teamID] or {roster = {}}
-			local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
+			local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID, false)
 			if isAI then
 				local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
 				name = '<'.. name ..'> '.. shortName

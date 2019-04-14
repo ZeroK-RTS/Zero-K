@@ -674,7 +674,7 @@ function languageChanged()
 	local teams = Spring.GetTeamList()
 	for i = 1, #teams do
 		local teamID = teams[i]
-		local _,playerID,_,isAI = Spring.GetTeamInfo(teamID)
+		local _,playerID,_,isAI = Spring.GetTeamInfo(teamID, false)
 		if Spring.GetGaiaTeamID() == teamID then
 			teamPicker.items[i] = WG.Translate("interface", "neutral")
 		elseif isAI then

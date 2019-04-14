@@ -390,7 +390,7 @@ end
 
 function widget:PlayerChanged(playerID)
 	local playerName,active,isSpec,teamID = Spring.GetPlayerInfo(playerID, false)
-  local _,_,isDead = Spring.GetTeamInfo(teamID)
+  local _,_,isDead = Spring.GetTeamInfo(teamID, false)
 	if (isSpec) then
 		if not isDead then
 			AddEvent(playerName .. ' resigned', nil, colorOrange)

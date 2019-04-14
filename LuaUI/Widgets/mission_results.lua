@@ -25,7 +25,7 @@ local varsWritten = false
 
 function widget:GameOver(winners)
 	local result = "defeat"
-	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	if #winners > 1 then
 		for i = 1, #winners do
 			if (winners[i] == Spring.GetMyAllyTeamID()) then

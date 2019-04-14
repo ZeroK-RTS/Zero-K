@@ -363,12 +363,12 @@ local function UpdatePlayer(subject)
 	local mySpec, specFullView = Spring.GetSpectatingState()
 	local myteamID = Spring.GetMyTeamID()
 	local myallyteamID = Spring.GetMyAllyTeamID()
-	local amiteamleader = (select(2,Spring.GetTeamInfo(myteamID)) == myPlayerID)
+	local amiteamleader = (select(2,Spring.GetTeamInfo(myteamID, false)) == myPlayerID)
 	--Spring.Echo("I am spec " .. tostring(mySpec))
 	--Spring.Echo(subject.name)
 	local teamID = subject.team
 	local allyteamID = subject.allyteam
-	local teamLeader = subject.player and select(2, Spring.GetTeamInfo(teamID)) == subject.player
+	local teamLeader = subject.player and select(2, Spring.GetTeamInfo(teamID, false)) == subject.player
 	--Spring.Echo("leader: " .. tostring(teamLeader))
 	--Spring.Echo("ai: " .. tostring(subject.ai))
 	--Spring.Echo("allyteam: " .. allyteamID)
@@ -539,7 +539,7 @@ end
 	
 
 local function LeaveMySquad()
-	local leader = select(2,Spring.GetTeamInfo(Spring.GetMyTeamID()))
+	local leader = select(2,Spring.GetTeamInfo(Spring.GetMyTeamID(), false))
 	local name = select(1,Spring.GetPlayerInfo(leader, false))
 	Spring.SendCommands("say a: I left " .. name .. "'s squad.")
 	Spring.SendLuaRulesMsg("sharemode unmerge")
@@ -577,9 +577,9 @@ local function GiveUnit(target)
 	if num == 1 then
 		units = "unit"
 	end
-	local leader = select(2,Spring.GetTeamInfo(target))
+	local _, leader, _, isAI = Spring.GetTeamInfo(target, false)
 	local name = select(1,Spring.GetPlayerInfo(leader, false))
-	if select(4,Spring.GetTeamInfo(target)) then
+	if isAI then
 		name = select(2,Spring.GetAIInfo(target))
 	end
 	if #playerslist > 1 then
@@ -596,9 +596,9 @@ local function GiveResource(target,kind)
 	elseif ctrl then mod = defaultamount/5
 	elseif shift then mod = defaultamount*5
 	else mod = defaultamount end
-	local leader = select(2,Spring.GetTeamInfo(target))
+	local _, leader, _, isAI = Spring.GetTeamInfo(target, false)
 	local name = select(1,Spring.GetPlayerInfo(leader, false))
-	if select(4,Spring.GetTeamInfo(target)) then
+	if isAI then
 		name = select(2,Spring.GetAIInfo(target))
 	end
 	local playerslist = Spring.GetPlayerList(target,true)
@@ -1339,7 +1339,7 @@ local function UpdateAllyTeam(allyTeam)
 	local temp = {}
 	local nonSpecs = false
 	for _, teamID in ipairs(Spring.GetTeamList(allyTeam)) do
-		local _, leader, dead, ai = Spring.GetTeamInfo(teamID)
+		local _, leader, dead, ai = Spring.GetTeamInfo(teamID, false)
 		if (ai) then 
 			temp[#temp + 1] = {id = #temp + 1, team = teamID, ai = true, name = select(2, Spring.GetAIInfo(teamID)), allyteam = allyTeam, dead = dead}
 			nonSpecs = true

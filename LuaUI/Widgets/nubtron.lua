@@ -757,7 +757,7 @@ function widget:Initialize()
 	curStepNum = 1
 
 	myTeamID = Spring.GetLocalTeamID()
-	_, _, _, _, myFaction = Spring.GetTeamInfo(myTeamID)
+	_, _, _, _, myFaction = Spring.GetTeamInfo(myTeamID, false)
 
 	local allUnits = GetAllUnits()
 	for _, unitID in pairs(allUnits) do

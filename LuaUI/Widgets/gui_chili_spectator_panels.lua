@@ -905,7 +905,7 @@ local function GetWinString(name)
 end
 
 local function GetOpposingAllyTeams()
-	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local returnData = {}
 	local allyTeamList = Spring.GetAllyTeamList()
 	for i = 1, #allyTeamList do
@@ -917,7 +917,7 @@ local function GetOpposingAllyTeams()
 			local winString
 			local playerName
 			for j = 1, #teamList do
-				local _, playerID, _, isAI = Spring.GetTeamInfo (teamList[j])
+				local _, playerID, _, isAI = Spring.GetTeamInfo (teamList[j], false)
 				if not isAI then
 					playerName = Spring.GetPlayerInfo(playerID, false)
 					winString = GetWinString(playerName)
