@@ -81,7 +81,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 	local bounty_prefix = "$bounty"
 	
 	if command == '$bounty' then
-		local _,_, spec, teamID, allianceID = spGetPlayerInfo(playerID)
+		local _,_, spec, teamID, allianceID = spGetPlayerInfo(playerID, false)
 		if spec then
 			return
 		end

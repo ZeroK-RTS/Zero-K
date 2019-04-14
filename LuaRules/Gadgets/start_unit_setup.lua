@@ -104,7 +104,7 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 		if isAI then
 			str = str .. "Nightwatch" -- existing account just in case infra explodes otherwise
 		else
-			str = str .. (Spring.GetPlayerInfo(playerID) or "ChanServ") -- ditto, different acc to differentiate
+			str = str .. (Spring.GetPlayerInfo(playerID, false) or "ChanServ") -- ditto, different acc to differentiate
 		end
 		str = str .. ",END_PLOP"
 		Spring.SendCommands("wbynum 255 " .. str)
@@ -418,7 +418,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		if isAI then
 			name = select(2, Spring.GetAIInfo(teamID))
 		else
-			name = Spring.GetPlayerInfo(playerID)
+			name = Spring.GetPlayerInfo(playerID, false)
 		end
 		Spring.SetUnitRulesParam(unitID, "commander_owner", name, {inlos = true})
 		return true
@@ -427,7 +427,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 end
 
 local function StartUnitPicked(playerID, name)
-	local _,_,spec,teamID = spGetPlayerInfo(playerID)
+	local _,_,spec,teamID = spGetPlayerInfo(playerID, false)
 	if spec then 
 		return 
 	end
@@ -478,7 +478,7 @@ local function workAroundSpecsInTeamZero(playerlist, team)
 		local specs = 0
 		-- count specs
 		for i=1,#playerlist do
-			local _,_,spec = spGetPlayerInfo(playerlist[i])
+			local _,_,spec = spGetPlayerInfo(playerlist[i], false)
 			if spec then 
 				specs = specs + 1 
 			end
@@ -498,7 +498,7 @@ end
 local function IsTeamResigned(team)
 	local playersInTeam = spGetPlayerList(team)
 	for j=1,#playersInTeam do
-		local spec = select(3,spGetPlayerInfo(playersInTeam[j]))
+		local spec = select(3,spGetPlayerInfo(playersInTeam[j], false))
 		if not spec then
 			return false
 		end
@@ -550,7 +550,7 @@ function gadget:GameStart()
 				playerlist = workAroundSpecsInTeamZero(playerlist, team)
 				if playerlist and (#playerlist > 0) then
 					for i=1,#playerlist do
-						local _,_,spec = spGetPlayerInfo(playerlist[i])
+						local _,_,spec = spGetPlayerInfo(playerlist[i], false)
 						if (not spec) then
 							SpawnStartUnit(team, playerlist[i])
 						end
@@ -561,7 +561,7 @@ function gadget:GameStart()
 				end
 			else -- no COOP_MODE
 				if (playerID) then
-					local _,_,spec,teamID = spGetPlayerInfo(playerID)
+					local _,_,spec,teamID = spGetPlayerInfo(playerID, false)
 					if (teamID == team and not spec) then
 						isAI = false
 					else
@@ -725,7 +725,7 @@ function CommSelection(_,playerID, startUnit)
 	if (Script.LuaUI('CommSelection')) then --if there is widgets subscribing to "CommSelection" function then:
 		local isSpec = Spring.GetSpectatingState() --receiver player is spectator?
 		local myAllyID = Spring.GetMyAllyTeamID() --receiver player's alliance?
-		local _,_,_,_, eventAllyID,_,_,_,_ = Spring.GetPlayerInfo(playerID) --source alliance?
+		local _,_,_,_, eventAllyID = Spring.GetPlayerInfo(playerID, false) --source alliance?
 		if isSpec or myAllyID == eventAllyID then
 			Script.LuaUI.CommSelection(playerID, startUnit) --send to widgets as event
 		end

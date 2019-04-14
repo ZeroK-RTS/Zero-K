@@ -86,7 +86,7 @@ function gadget:GameFrame(n)
         local playerlist = Spring.GetPlayerList(t, true) -- active players
         if playerlist then
           for j=1,#playerlist do
-            local _,_,spec = Spring.GetPlayerInfo(playerlist[j])
+            local _,_,spec = Spring.GetPlayerInfo(playerlist[j], false)
             if not spec then
               activeTeams = activeTeams + 1
             end

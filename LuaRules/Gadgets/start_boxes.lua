@@ -189,7 +189,7 @@ local function GetPlayerInfo (teamID)
 		return select(2, Spring.GetAIInfo(teamID)), -1000, "", "", true
 	end
 
-	local name = Spring.GetPlayerInfo(playerID) or "?"
+	local name = Spring.GetPlayerInfo(playerID, false) or "?"
 	local customKeys = select(10, Spring.GetPlayerInfo(playerID)) or {}
 	local clanShort = customKeys.clan     or ""
 	local clanLong  = customKeys.clanfull or ""
@@ -422,7 +422,7 @@ function gadget:AllowStartPosition(playerID, teamID, readyState, x, y, z, rx, ry
 		return true -- custom AI, can't know which team it is on so allow it to place anywhere for now and filter invalid positions later
 	end
 
-	local teamID = select(4, Spring.GetPlayerInfo(playerID))
+	local teamID = select(4, Spring.GetPlayerInfo(playerID, false))
 
 	if (shuffleMode == "disable") then
 		-- note this is after the AI check; toasters still have to obey

@@ -126,7 +126,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (ChickenPlayers[GiveToTeam] ~= nil) then
 	  local leader = select(2, spGetTeamInfo(ChickenPlayers[GiveToTeam]))
 	  if (leader >= 0) then -- otherwise spec
-	    local active = select(2, spGetPlayerInfo(leader))
+	    local active = select(2, spGetPlayerInfo(leader, false))
 	    anyone_not_spec = true
 	    --Spring.Echo("chicken_control "..leader.." not spectator")
 	    if active then

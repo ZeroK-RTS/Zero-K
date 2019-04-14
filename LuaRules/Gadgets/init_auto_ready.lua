@@ -70,7 +70,7 @@ function gadget:GameSetup(label, ready, playerStates)
 	local totalAllies = {}
 		
 	for num, state in pairs(playerStates) do 
-		local name,active,spec,teamID,allyTeamID,ping = Spring.GetPlayerInfo(num)
+		local name,active,spec,teamID,allyTeamID,ping = Spring.GetPlayerInfo(num, false)
 		--Note: BUG, startPosSet returned by GetTeamStartPosition() always return true for Spring 96.0.1-442-g7191625 (game always start immediately)
 		-- therefore, a reasonable indicator for placing startPos could be x>0 because 0 is precisely an impossible position to be place by hand.
 		-- we might not need to check for -100 anymore IMHO.

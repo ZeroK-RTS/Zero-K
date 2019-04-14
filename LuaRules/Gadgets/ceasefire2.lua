@@ -212,7 +212,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 	if msg_table[1] ~= 'ceasefire' then
 		return
 	end
-	local _,_,isSpec,teamID, allianceID = spGetPlayerInfo(playerID)
+	local _,_,isSpec,teamID, allianceID = spGetPlayerInfo(playerID, false)
 	if isSpec then
 		return
 	end
@@ -356,7 +356,7 @@ function gadget:Initialize()
 		local _, leaderPlayerID = Spring.GetTeamInfo(teamID)
 		if leaderPlayerID and leaderPlayerID ~= -1 then
 			
-			teamNames[teamID] = Spring.GetPlayerInfo(leaderPlayerID) or '?? Rob P. ??'
+			teamNames[teamID] = Spring.GetPlayerInfo(leaderPlayerID, false) or '?? Rob P. ??'
 		end
 	end
 end

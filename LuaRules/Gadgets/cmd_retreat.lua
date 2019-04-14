@@ -477,7 +477,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 	end
 	
 	if not teamID then
-		_,_, spec, teamID, allianceID = Spring.GetPlayerInfo(playerID)
+		_,_, spec, teamID, allianceID = Spring.GetPlayerInfo(playerID, false)
 	end
 	
 	if spec then return end

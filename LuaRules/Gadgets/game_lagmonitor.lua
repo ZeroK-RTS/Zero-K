@@ -66,7 +66,7 @@ local function GetTeamName(teamID)
 end
 
 local function PlayerIDToTeamID(playerID)
-	local _, _, spectator, teamID = spGetPlayerInfo(playerID)
+	local _, _, spectator, teamID = spGetPlayerInfo(playerID, false)
 	if spectator then
 		return false
 	end
@@ -171,7 +171,7 @@ local function UpdateTeamActivity(teamID)
 	end
 	
 	if resourceShare > 0 and teamResourceShare[teamID] == 0 then
-		local playerName = Spring.GetPlayerInfo(leaderID)
+		local playerName = Spring.GetPlayerInfo(leaderID, false)
 		local unitsRecieved = false
 		
 		for unitID, playerList in pairs(playerLineageUnits) do --Return unit to the oldest inheritor (or to original owner if possible)
@@ -217,7 +217,7 @@ local function GetRawTeamShare(teamID)
 	local players = spGetPlayerList(teamID)
 	for i = 1, #players do
 		local playerID = players[i]
-		local _, active, spec = spGetPlayerInfo(playerID)
+		local _, active, spec = spGetPlayerInfo(playerID, false)
 		if active and not spec then
 			shares = shares + 1
 		end
@@ -352,7 +352,7 @@ function gadget:Initialize()
 		if isAI then
 			teamNames[teamID] = select(2, Spring.GetAIInfo(teamID))
 		else
-			teamNames[teamID] = Spring.GetPlayerInfo(playerID)
+			teamNames[teamID] = Spring.GetPlayerInfo(playerID, false)
 		end
 	end
 

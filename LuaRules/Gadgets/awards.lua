@@ -671,7 +671,7 @@ function gadget:Initialize()
 			local _, aiName, _, shortName = Spring.GetAIInfo(team)
 			name = aiName ..' ('.. shortName .. ')'
 		else
-			name = Spring.GetPlayerInfo(leaderPlayerID)
+			name = Spring.GetPlayerInfo(leaderPlayerID, false)
 		end
 		teamNames[team] = name
 	end

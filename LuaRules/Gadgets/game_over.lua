@@ -565,7 +565,7 @@ local function ProcessLastAlly()
 					local playerlist = spGetPlayerList(t) -- active players
 					if playerlist then
 						for j = 1, #playerlist do
-							local name,active,spec = spGetPlayerInfo(playerlist[j])
+							local name,active,spec = spGetPlayerInfo(playerlist[j], false)
 							if not spec then
 								if active then
 									hasActiveTeam = true
@@ -639,7 +639,7 @@ local function CheckInactivityWin(cmd, line, words, player)
 	end
 	if inactiveWinAllyTeam and not gameover then
 		if player then 
-			local name,_,spec,_,allyTeamID = Spring.GetPlayerInfo(player)
+			local name,_,spec,_,allyTeamID = Spring.GetPlayerInfo(player, false)
 			if allyTeamID == inactiveWinAllyTeam and not spec then
 				Spring.Echo((name or "") .. " has forced a win due to dropped opposition.")
 				CauseVictory(inactiveWinAllyTeam)

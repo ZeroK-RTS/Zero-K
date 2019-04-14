@@ -125,7 +125,7 @@ local function GeneratePlayerNameToTeamIDMap()
 	
 	local playerList = Spring.GetPlayerList()
 	for i = 1, #playerList do
-		local name, active, spectator, teamID = Spring.GetPlayerInfo(playerList[i])
+		local name, active, spectator, teamID = Spring.GetPlayerInfo(playerList[i], false)
 		if name and active and (not spectator) then
 			map[name] = teamID
 		end
