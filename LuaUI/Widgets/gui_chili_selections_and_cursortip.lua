@@ -1447,6 +1447,8 @@ local function GetSelectionStatsDisplay(parentControl)
 				global_totalBuildPower = total_totalbp
 			end
 		end
+
+		total_totalburst = math.floor(total_totalburst / 10) * 10 -- round numbers are easier to parse and compare
 		
 		UpdateDynamicGroupInfo()
 	end
