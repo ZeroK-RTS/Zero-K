@@ -661,13 +661,11 @@ function RefreshWatchdogList (unitID, commandTTL)
 					break --//exit the iteration, do not go to next iteration until this entry expire first... 
 				elseif commandTTL[unitID][i].countDown <=0 then --if commandTTL is found to reach ZERO then remove the command, assume a 'TIMEOUT', then remove *this* watchdog entry
 					local cQueue = spGetCommandQueue(unitID, 1) --// get unit's immediate command
-					local firstParam, secondParam = 0, 0
-					if cQueue[1]~=nil then
-						firstParam, secondParam = cQueue[1].params[1], cQueue[1].params[3] --if cQueue not empty then use it... x, z,
-					end
-					if (firstParam == commandTTL[unitID][i].widgetCommand[1]) and 
+					local cmdID, _, cmdTag, firstParam, _, secondParam = Spring.GetUnitCurrentCommand(unitID)
+					if cmdID and
+					( firstParam == commandTTL[unitID][i].widgetCommand[1]) and
 					(secondParam == commandTTL[unitID][i].widgetCommand[2]) then --//if current command is similar to the one once issued by widget then delete it
-						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+						spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, {} )
 					end
 					commandTTL[unitID][i] = nil --empty watchdog entry
 					commandTTL[unitID][1] = i-1 --refresh table lenght

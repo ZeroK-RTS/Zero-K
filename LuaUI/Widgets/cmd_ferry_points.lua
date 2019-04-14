@@ -353,10 +353,12 @@ end
 
 function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID) 
 	if Spring.ValidUnitID(unitID) then
-		local cmd = Spring.GetCommandQueue(unitID, 2)
-		if cmd and #cmd > 0 and cmd[1].id == CMD.WAIT then
+		local currentCmd = Spring.GetUnitCurrentCommand(unitID)
+		if currentCmd == CMD.WAIT then
 			Spring.GiveOrderToUnit(unitID, CMD.WAIT, EMPTY_TABLE, 0)
-			if #cmd == 1 then
+
+			-- unsure why this is done but probably to make sure UnitIdle works correctly or somesuch
+			if Spring.GetCommandQueue(unitID, 0) == 1 then
 				Spring.GiveOrderToUnit(unitID, CMD.STOP, EMPTY_TABLE, 0)
 			end
 		end
@@ -378,8 +380,7 @@ function widget:GameFrame(frame)
 						route.unitsQueuedToBeTransported[unitID] = nil
 					end
 				else
-					local cmd = Spring.GetCommandQueue(unitID, 1)
-					if #cmd > 0 and cmd[1].id == CMD.WAIT then
+					if Spring.GetUnitCurrentCommand(unitID) == CMD.WAIT then
 						unitsToTransport.count = unitsToTransport.count + 1
 						unitsToTransport.unit[unitsToTransport.count] = unitID
 					end
@@ -414,8 +415,7 @@ function widget:GameFrame(frame)
 							end
 						end
 					elseif unitsToTransport.count ~= 0 and disSQ(x, z, route.start.x, route.start.z) < NEAR_START_RANGE_SQ then
-						local cmd = Spring.GetCommandQueue(unitID, 1)
-						if #cmd == 0 or cmd[1].id ~= CMD.LOAD_UNITS then
+						if Spring.GetUnitCurrentCommand(unitID) ~= CMD.LOAD_UNITS then
 							local choice = math.floor(math.random(1,unitsToTransport.count))
 							local choiceUnitID = unitsToTransport.unit[choice]
 							local ud = UnitDefs[Spring.GetUnitDefID(choiceUnitID)]

@@ -79,6 +79,26 @@ if Script.IsEngineMinVersion(104, 0, 536) then
 	end
 end
 
+if not Script.IsEngineMinVersion(104, 0, 1143) then
+	local spGetCommandQueue = Spring.GetCommandQueue
+	local unpacc = unpack
+	Spring.GetUnitCurrentCommand = function (unitID, index)
+		index = index or 1
+
+		local queue = spGetCommandQueue(unitID, index)
+		if not queue then
+			return
+		end
+
+		local command = queue[index]
+		if not command then
+			return
+		end
+
+		return command.id, command.options.coded, command.tag, unpacc(command.params)
+	end
+end
+
 if Script.IsEngineMinVersion(104, 0, 1166) then
 	local origGetTeamInfo = Spring.GetTeamInfo
 	Spring.GetTeamInfo = function (p1, p2)

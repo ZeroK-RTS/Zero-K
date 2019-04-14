@@ -40,7 +40,6 @@ local spGetUnitsInRectangle = Spring.GetUnitsInRectangle
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
-local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitVelocity = Spring.GetUnitVelocity
 --local ech = Spring.Echo

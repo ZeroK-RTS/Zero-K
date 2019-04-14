@@ -355,8 +355,7 @@ function widget:Initialize()
 				allBuilders[uid] = {include=true} -- add it to the group of all workers
 				
 				if not nanoframe then -- and add any workers that aren't nanoframes to the active group
-					local cmd = GetFirstCommand(uid) -- find out if it already has any orders
-					if cmd and cmd.id then -- if so we mark it as drec
+					if spGetCommandQueue(uid, 0) ~= 0 then -- if so we mark it as drec
 						includedBuilders[uid] = {cmdtype=commandType.drec, unreachable={}}
 					else -- otherwise we mark it as idle
 						includedBuilders[uid] = {cmdtype=commandType.idle, unreachable={}}
@@ -880,8 +879,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	
 	-- add new workers to the active workers list if they're GBC-enabled.
 	if (allBuilders[unitID] and allBuilders[unitID].include) then
-		local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
-		if cmd and cmd.id then -- if so we mark it as drec
+		if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
 			includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
 		else -- otherwise we mark it as idle
 			includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
@@ -968,8 +966,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeam, unitTeam)
 	local ud = UnitDefs[unitDefID]
 	if ud.isMobileBuilder then -- if the new unit is a mobile builder
 		allBuilders[unitID] = {include=true}
-		local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
-		if cmd and cmd.id then -- if so we mark it as drec
+		if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
 			includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
 		else -- otherwise we mark it as idle
 			includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
@@ -1309,8 +1306,7 @@ function ApplyStateToggle()
 			if allBuilders[unitID].include then
 				local _,_,nanoframe = spGetUnitIsStunned(unitID)
 				if not includedBuilders[unitID] and not nanoframe then
-					local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
-					if cmd and cmd.id then -- if so we mark it as drec
+					if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
 						includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
 					else -- otherwise we mark it as idle
 						includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
@@ -1842,10 +1838,9 @@ function CheckIdlers()
 	for i=1, #idlers do
 		local unitID = idlers[i]
 		if includedBuilders[unitID] then -- we need to ensure that the unit hasn't died or left the group since it went idle, because this check is deferred
-			local cmd1 = GetFirstCommand(unitID) -- we need to check that the unit's command queue is empty, because other gadgets may invoke UnitIdle erroneously.
-			if ( cmd1 and cmd1.id) then 
+			-- we need to check that the unit's command queue is empty, because other gadgets may invoke UnitIdle erroneously.
 			-- if there's a command on the queue, do nothing and let it be removed from the idle list.
-			else -- otherwise if the unit is really idle
+			if spGetCommandQueue(unitID, 0) == 0 then
 				includedBuilders[unitID].cmdtype = commandType.idle -- then mark it as idle
 				if newBuilders[unitID] then -- for new units that have just been added and finished following their constructor separator orders.
 					newBuilders[unitID] = nil
@@ -2184,8 +2179,6 @@ HOW THIS WORKS:
 		removal tool.
 	Distance()
 		Simple 2D distance calculation.
-	GetFirstCommand()
-		Returns the first command in a unit's queue, if there is one, otherwise nil.
 	BuildHash()
 		Takes a command (formatted for buildQueue) as input, and returns a unique identifier
 		to use as a hash table key. Allows duplicate jobs to be easily identified, and to easily
@@ -2396,12 +2389,6 @@ function IsEmpty(table)
 		return false
 	end
 	return true
-end
-
---	Borrowed this from CarRepairer's Retreat.  Returns only first command in queue.
-function GetFirstCommand(unitID)
-	local queue = spGetCommandQueue(unitID, 1)
-	return queue[1]
 end
 
 --	Generate unique key value for each command using its parameters.

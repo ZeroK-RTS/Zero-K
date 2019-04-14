@@ -1510,8 +1510,8 @@ local function HasDoubleCommand(unitID, cmdID)
 		if cmdsLen == 0 then -- Occurs in the case of SELFD
 			return true
 		elseif cmdsLen == 1 then
-			local cmds = Spring.GetCommandQueue(unitID,1)
-			return cmds[1].id == CMD.WAIT
+			local cmdID = Spring.GetUnitCurrentCommand(unitID)
+			return cmdID == CMD.WAIT
 		end
 	end
 	return false
@@ -1666,9 +1666,9 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		if not bQueue[1] then  --- has no build queue
 			local _, _, _, _, buildProg = spGetUnitHealth(unitID)
 			if not ud.isFactory then
-				local cQueue = Spring.GetCommandQueue(unitID, 1)
+				local cQueue = Spring.GetCommandQueue(unitID, 0)
 				--Spring.Echo("Con "..unitID.." queue "..tostring(cQueue[1]))
-				if not cQueue[1] then
+				if cQueue == 0 then
 					--Spring.Echo("\tCon "..unitID.." must be idle")
 					widget:UnitIdle(unitID, unitDefID, myTeamID)
 				end

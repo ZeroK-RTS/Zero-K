@@ -107,20 +107,19 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local spGetCommandQueue = Spring.GetCommandQueue
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local function isWaiting(unitID)
-	local cmd = spGetCommandQueue(unitID, 1)
-	if not cmd or #cmd == 0 then
+	local cmdID, _, _, cmdParam1 = spGetUnitCurrentCommand(unitID)
+	if not cmdID then
 		everWait[unitID] = nil
 		return false
 	end
 
-	local firstCmd = cmd[1]
-	if firstCmd.id ~= CMD_WAIT then
+	if cmdID ~= CMD_WAIT then
 		return false
 	end
 
-	return firstCmd.params[1] or CMD_WAITCODE_NONE
+	return cmdParam1 or CMD_WAITCODE_NONE
 end
 
 function SetIcons()

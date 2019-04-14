@@ -272,7 +272,7 @@ local spGetUnitPosition     = Spring.GetUnitPosition
 local spGetSelectedUnits    = Spring.GetSelectedUnits
 local spValidUnitID         = Spring.ValidUnitID
 local spGetUnitDefID        = Spring.GetUnitDefID
-local spGetCommandQueue     = Spring.GetCommandQueue
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetTeamUnits        = Spring.GetTeamUnits
 local spGetUnitSeparation   = Spring.GetUnitSeparation
 
@@ -320,10 +320,10 @@ local function updateShields()
 			else
 				spGiveOrderToUnit(unit, CMD_WANTED_SPEED, {i.maxVel*30}, 0)
 			end
-			local cQueue = spGetCommandQueue(unit, 1) 
+			local cmdID = spGetUnitCurrentCommand(unit)
 
-			if (#cQueue ~= 0) and (i.folCount ~= 0) then
-				local wait = (cQueue[1].id == CMD_WAIT)
+			if cmdID and (i.folCount ~= 0) then
+				local wait = (cmdID == CMD_WAIT)
 				if wait then
 					wait = false
 					for cid, j in pairs(i.shieldiees) do

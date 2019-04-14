@@ -40,7 +40,7 @@ local spGetUnitPosition   = Spring.GetUnitPosition
 local spGetSelectedUnits  = Spring.GetSelectedUnits
 local spValidUnitID       = Spring.ValidUnitID
 local spGetUnitDefID      = Spring.GetUnitDefID
-local spGetCommandQueue   = Spring.GetCommandQueue
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetTeamUnits      = Spring.GetTeamUnits
 local spGetUnitSeparation = Spring.GetUnitSeparation
 
@@ -76,15 +76,14 @@ local function updateCloakers()
 	for unit, i in pairs(cloakers) do
 		i.ux,i.uy,i.uz = spGetUnitPosition(unit)
 		
-		local cQueue = spGetCommandQueue(unit,2)
-		if cQueue then
+		local cmdID_1 = spGetUnitCurrentCommand(unit)
+		if cmdID_1 then
 			if CMD_SET_WANTED_MAX_SPEED then
-				if #cQueue > 1 then
-					local id = cQueue[2].id
-					local params = cQueue[2].params
-					if id ~= CMD_SET_WANTED_MAX_SPEED then
+				local cmdID_2, _, _, cmdParam_2 = spGetUnitCurrentCommand(unit, 2)
+				if cmdID_2 then
+					if cmdID_2 ~= CMD_SET_WANTED_MAX_SPEED then
 						spGiveOrderToUnit(unit, CMD_REMOVE, TABLE_1, CMD_OPT_ALT )
-					elseif math.abs(params[1] - i.maxVel) > 0.1 then
+					elseif math.abs(cmdParam_2 - i.maxVel) > 0.1 then
 						spGiveOrderToUnit(unit, CMD_REMOVE, TABLE_1, CMD_OPT_ALT )
 						spGiveOrderToUnit(unit, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, i.maxVel }, CMD_OPT_ALT )
 					end
@@ -93,8 +92,8 @@ local function updateCloakers()
 				spGiveOrderToUnit(unit, CMD_WANTED_SPEED, {i.maxVel*30}, 0)
 			end
 			
-			if (#cQueue ~= 0) and (i.folCount ~= 0) then
-				local wait = (cQueue[1].id == CMD_WAIT)
+			if (i.folCount ~= 0) then
+				local wait = (cmdID_1 == CMD_WAIT)
 				if wait then
 					wait = false
 					for cid, j in pairs(i.cloakiees) do

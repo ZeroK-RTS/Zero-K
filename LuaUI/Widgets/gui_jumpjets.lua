@@ -269,8 +269,8 @@ function widget:CommandNotify(id, params, options)
 	for i=1,#units do
 		unitID = units[i]
 		local _, _, _, shift   = spGetModKeyState()
-		local queue = spGetCommandQueue(unitID, 1)
-		if queue and (#queue == 0 or not shift) then
+		local queue = spGetCommandQueue(unitID, 0)
+		if queue and (queue == 0 or not shift) then
 			local _,_,_,ux,uy,uz = spGetUnitPosition(unitID,true)
 			lastJump[unitID] = {
 				pos   = {ux,uy,uz},
@@ -282,8 +282,8 @@ end
 
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 	if jumpDefs[unitDefID] then
-		local cmd = spGetCommandQueue(unitID, 2)[2] 
-		if (cmd and cmd.id == CMD_JUMP) then
+		local cmdID = Spring.GetUnitCurrentCommand(unitID, 2)
+		if cmdID == CMD_JUMP then
 			local _,_,_,ux,uy,uz = spGetUnitPosition(unitID,true)
 			lastJump[unitID] = {
 				pos = {ux,uy,uz},

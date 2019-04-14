@@ -19,8 +19,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local spGetCommandQueue = Spring.GetCommandQueue
-local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
+local spGiveOrderToUnit       = Spring.GiveOrderToUnit
 
 local myTeamID
 
@@ -58,16 +58,6 @@ local function UpdatePlayerState()
 	end
 end
 
-local function GetFirstCommand(unitID)
-	local queue = spGetCommandQueue(unitID, 1)
-	return queue and queue[1]
-end
-
-local function isFighting(unitID)
-	local cmd = GetFirstCommand(unitID)
-	return (cmd and cmd.id == CMD_FIGHT)
-end
-
 local orderParamTable = {0}
 local function SetFireState(unitID, fireState)
 	orderParamTable[1] = fireState
@@ -77,7 +67,7 @@ end
 local function CheckBombers() -- swap bombers whose commands have changed and update their firestate
 
 	for unitID, oldFirestate in pairs(fightingBombers) do
-		if not isFighting(unitID) then
+		if spGetUnitCurrentCommand(unitID) ~= CMD_FIGHT then
 			SetFireState(unitID, oldFirestate)
 			fightingBombers[unitID] = nil
 			reservedBombers[unitID] = true
@@ -85,7 +75,7 @@ local function CheckBombers() -- swap bombers whose commands have changed and up
 	end
 
 	for unitID, _ in pairs(reservedBombers) do
-		if isFighting(unitID) then
+		if spGetUnitCurrentCommand(unitID) == CMD_FIGHT then
 			local oldFirestate = Spring.Utilities.GetUnitFireState(unitID) or 0
 			SetFireState(unitID, FIRESTATE_FIREATWILL)
 			fightingBombers[unitID] = oldFirestate
@@ -124,7 +114,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		return
 	end
 
-	if isFighting(unitID) then
+	if spGetUnitCurrentCommand(unitID) == CMD_FIGHT then
 		local oldFirestate = Spring.Utilities.GetUnitFireState(unitID) or 0
 		SetFireState(unitID, FIRESTATE_FIREATWILL)
 		fightingBombers[unitID] = oldFirestate
