@@ -582,8 +582,8 @@ end
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	
 	if beacon[unitID] then
-		local _,_,_,_,_,oldA = Spring.GetTeamInfo(oldTeamID)
-		local _,_,_,_,_,newA = Spring.GetTeamInfo(teamID)
+		local _,_,_,_,_,oldA = Spring.GetTeamInfo(oldTeamID, false)
+		local _,_,_,_,_,newA = Spring.GetTeamInfo(teamID, false)
 		if newA ~= oldA then
 			undeployTeleport(beacon[unitID].link)
 		end

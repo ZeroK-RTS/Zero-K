@@ -334,7 +334,7 @@ local function KillAllComputerUnits()
 		--for i=1,#teamUnits do
 		--	Spring.DestroyUnit(teamUnits[i])
 		--end
-		local allyTeam = select(6, Spring.GetTeamInfo(teamID))
+		local allyTeam = select(6, Spring.GetTeamInfo(teamID, false))
 		if GG.DestroyAlliance then
 			GG.DestroyAlliance(allyTeam)
 		end

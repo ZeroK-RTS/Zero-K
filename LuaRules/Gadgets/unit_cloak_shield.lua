@@ -281,8 +281,8 @@ end
 
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID)
-	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID)
+	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID, false)
+	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID, false)
 	
 	if (newAllyTeam ~= oldAllyTeam) then
 		if (cloakShieldUnits[unitID]) then

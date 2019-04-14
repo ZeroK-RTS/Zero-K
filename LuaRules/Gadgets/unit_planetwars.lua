@@ -388,7 +388,7 @@ end
 local function GetAllyTeamLeader(teamList)
 	local bestRank, bestRankTeams
 	for i = 1, #teamList do
-		local teamID, leader, _, isAiTeam = Spring.GetTeamInfo(teamList[i])
+		local teamID, leader, _, isAiTeam = Spring.GetTeamInfo(teamList[i], false)
 		if leader and not isAiTeam then
 			local customKeys = select(10, Spring.GetPlayerInfo(leader)) or {}
 			local rank = customKeys.pwrank
@@ -694,7 +694,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		CheckRemoveWormhole(unitID, unitDefID)
 	end
 	if hqs[unitID] then
-		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam))
+		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam, false))
 		hqsDestroyed[#hqsDestroyed+1] = allyTeam
 		
 		destroyedStructureCount = destroyedStructureCount + 1

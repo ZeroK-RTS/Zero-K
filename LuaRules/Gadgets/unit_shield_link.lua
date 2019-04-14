@@ -168,7 +168,7 @@ end
 
 function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	local ud = UnitDefs[unitDefID]
-	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam)
+	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam, false)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if allyTeamID and allyTeamShields[oldAllyTeam] and allyTeamShields[oldAllyTeam][unitID] then
 		local unitData

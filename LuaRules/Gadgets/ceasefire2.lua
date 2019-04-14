@@ -139,7 +139,7 @@ function checkAllianceSizes()
 		local teamList = spGetTeamList(alliance)
 		local livingTeam = false
 		for _,teamID in ipairs(teamList) do
-			local teamNum, leader, isDead = spGetTeamInfo(teamID)
+			local teamNum, leader, isDead = spGetTeamInfo(teamID, false)
 			if not isDead then livingTeam = true end
 		end
 		if not livingTeam then
@@ -242,7 +242,7 @@ function gadget:Initialize()
 	Spring.SetGameRulesParam('cf', 1)
 	
 	gaiaTeam = Spring.GetGaiaTeamID()
-	_,_,_,_,_, gaiaAlliance = spGetTeamInfo(gaiaTeam)
+	_,_,_,_,_, gaiaAlliance = spGetTeamInfo(gaiaTeam, false)
 	
 	local allianceList = spGetAllyTeamList()
 	local enAllianceList = spGetAllyTeamList()
@@ -353,7 +353,7 @@ function gadget:Initialize()
 	gadgetHandler:AddSyncAction('ceasefire', ceasefire)
 	local teamList = Spring.GetTeamList()
 	for _,teamID in ipairs(teamList) do
-		local _, leaderPlayerID = Spring.GetTeamInfo(teamID)
+		local _, leaderPlayerID = Spring.GetTeamInfo(teamID, false)
 		if leaderPlayerID and leaderPlayerID ~= -1 then
 			
 			teamNames[teamID] = Spring.GetPlayerInfo(leaderPlayerID, false) or '?? Rob P. ??'

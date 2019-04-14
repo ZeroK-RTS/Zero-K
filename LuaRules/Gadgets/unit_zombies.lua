@@ -57,7 +57,7 @@ local spGetUnitHealth             = Spring.GetUnitHealth
 local spSetUnitRulesParam         = Spring.SetUnitRulesParam
 
 local GaiaTeamID     = Spring.GetGaiaTeamID()
-local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID))
+local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
 
 local gameframe = 0
 local LOS_ACCESS = {inlos = true}

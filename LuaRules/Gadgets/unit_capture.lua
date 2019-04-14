@@ -200,7 +200,7 @@ local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID, old
 		local allyTeams = damageData.allyTeams
 		
 		-- add ally team stats
-		local _,_,_,_,_,attackerAllyTeam = spGetTeamInfo(oldTeamCaptureLinger)
+		local _,_,_,_,_,attackerAllyTeam = spGetTeamInfo(oldTeamCaptureLinger, false)
 		if not allyTeams[attackerAllyTeam] then
 			allyTeamByID.count = allyTeamByID.count + 1
 			allyTeamByID.data[allyTeamByID.count] = attackerAllyTeam
@@ -272,7 +272,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	local allyTeams = damageData.allyTeams
 	
 	-- add ally team stats
-	local _,_,_,_,_,attackerAllyTeam = spGetTeamInfo(attackerTeam)
+	local _,_,_,_,_,attackerAllyTeam = spGetTeamInfo(attackerTeam, false)
 	if not allyTeams[attackerAllyTeam] then
 		allyTeamByID.count = allyTeamByID.count + 1
 		allyTeamByID.data[allyTeamByID.count] = attackerAllyTeam

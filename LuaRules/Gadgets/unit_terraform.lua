@@ -462,7 +462,7 @@ local function setupTerraunit(unitID, team, x, y, z)
 	spSetUnitSensorRadius(unitID,"airLos",0) -- REMOVE IN 0.83
 	
 	local allyTeamList = spGetAllyTeamList()
-	local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team)
+	local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team, false)
 	for i=1, #allyTeamList do
 		local allyID = allyTeamList[i]
 		if allyID ~= unitAllyTeam then

@@ -225,7 +225,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	
 	local teamID = Spring.GetProjectileTeamID(proID)
 	if teamID then
-		local allyTeamID = select(6, Spring.GetTeamInfo(teamID))
+		local allyTeamID = select(6, Spring.GetTeamInfo(teamID, false))
 		data.allyTeamID = allyTeamID
 	end
 	

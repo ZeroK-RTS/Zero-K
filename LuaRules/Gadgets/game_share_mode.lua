@@ -83,12 +83,12 @@ local function GetTeamID(playerID)
 end
 
 local function GetTeamLeader(teamID)
-	return select(2, spGetTeamInfo(teamID))
+	return select(2, spGetTeamInfo(teamID, false))
 end
 
 local function IsTeamLeader(playerID)
 	local teamID = GetTeamID(playerID)
-	local teamleaderid = select(2, spGetTeamInfo(teamID))
+	local teamleaderid = select(2, spGetTeamInfo(teamID, false))
 	if playerID == teamleaderid then
 		return true
 	else
@@ -210,7 +210,7 @@ end
 local function MergeAllHumans(teamlist)
 	local mergeid = -1
 	for i = 1, #teamlist do
-		local _, teamLeader, _, AI = spGetTeamInfo(teamlist[i])
+		local _, teamLeader, _, AI = spGetTeamInfo(teamlist[i], false)
 		local human = not AI and teamLeader ~= -1
 		if human and mergeid ~= -1 then
 			spEcho("[Commshare] Merging team " .. teamlist[i])
@@ -239,7 +239,7 @@ end
 local function SendInvite(player, target) -- targetid is which player is the merger
 	if spGetGameFrame() > config.mintime then
 		local targetspec = select(3, spGetPlayerInfo(target, false))
-		local _,_,dead,ai,_ = spGetTeamInfo(GetTeamID(target))
+		local _,_,dead,ai = spGetTeamInfo(GetTeamID(target, false))
 		if player == target or GetTeamID(target) == GetTeamID(player) then
 			spEcho("[Commshare] " .. select(1,spGetPlayerInfo(player, false)) .. " tried to merge with theirself or a squad member!")
 			return

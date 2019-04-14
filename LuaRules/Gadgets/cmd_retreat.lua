@@ -467,11 +467,11 @@ function gadget:RecvLuaMsg(msg, playerID)
 	
 	if(t) then
 		t = tonumber(t);
-		local _,_,_,isAI = Spring.GetTeamInfo(t)
+		local _,_,_,isAI = Spring.GetTeamInfo(t, false)
 		if(isAI) then
 			local aiid, ainame, aihost = Spring.GetAIInfo(t);
 			if (aihost == playerID) then
-				teamID,_,_,_,_,allianceID = Spring.GetTeamInfo(t);
+				teamID,_,_,_,_,allianceID = Spring.GetTeamInfo(t, false);
 			end
 		end
 	end
@@ -599,7 +599,7 @@ local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
 local function WrapToLuaUI_Haven(_,teamID)
 	local spectating = Spring.GetSpectatingState()
 	if not spectating then
-		local allyTeamID = select(6, Spring.GetTeamInfo(teamID))
+		local allyTeamID = select(6, Spring.GetTeamInfo(teamID, false))
 		if (allyTeamID ~= spGetLocalAllyTeamID()) then 
 			return 
 		end

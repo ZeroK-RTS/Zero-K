@@ -74,7 +74,7 @@ local function PlayerIDToTeamID(playerID)
 end
 
 local function TeamIDToPlayerID(teamID)
-	return select(2, spGetTeamInfo(teamID))
+	return select(2, spGetTeamInfo(teamID, false))
 end
 
 --------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ local function UpdateTeamActivity(teamID)
 		end
 	end
 	
-	local _, leaderID, _, isAiTeam, _, allyTeamID = spGetTeamInfo(teamID)
+	local _, leaderID, _, isAiTeam, _, allyTeamID = spGetTeamInfo(teamID, false)
 	if isAiTeam then
 		-- Treat the AI as an active player.
 		resourceShare = resourceShare + 1
@@ -204,7 +204,7 @@ local function UpdateTeamActivity(teamID)
 end
 
 local function GetRawTeamShare(teamID)
-	local _, _, isDead, isAiTeam = spGetTeamInfo(teamID)
+	local _, _, isDead, isAiTeam = spGetTeamInfo(teamID, false)
 	if isDead then
 		return 0
 	end
@@ -255,7 +255,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 		-- Nobody can recieve units so there is not much more to do
 		for i = 1, #giveAwayTeams do
 			local giveTeamID = giveAwayTeams[i]
-			local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID))
+			local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID, false))
 			if giveResigned then
 				spEcho("game_message: " .. GetTeamName(giveTeamID) .. " resigned")
 			end
@@ -308,7 +308,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 		
 		local recieveName = GetTeamName(recieveTeamID)
 		local giveName = GetTeamName(giveTeamID)
-		local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID))
+		local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID, false))
 		
 		-- Send message
 		if giveResigned then
@@ -344,11 +344,10 @@ function gadget:Initialize()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local allyTeamID = select(6, spGetTeamInfo(teamID))
+		local _, playerID, _, isAI, _, allyTeamID = Spring.GetTeamInfo(teamID, false)
 		teamResourceShare[teamID] = 1
 		allyTeamResourceShares[allyTeamID] = (allyTeamResourceShares[allyTeamID] or 0) + 1
 
-		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
 		if isAI then
 			teamNames[teamID] = select(2, Spring.GetAIInfo(teamID))
 		else

@@ -60,7 +60,7 @@ local DEBUG_MSG = false
 -- vars
 --------------------------------------------------------------------------------
 local gaiaTeamID = Spring.GetGaiaTeamID()
-local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(gaiaTeamID))
+local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(gaiaTeamID, false))
 local chickenAllyTeamID
 
 local aliveCount = {}
@@ -135,7 +135,7 @@ for i = 1, #allyTeams do
 		local teamList = Spring.GetTeamList(allyTeamID)
 		vitalConstructorAllyTeam[allyTeamID] = true
 		for j = 1, #teamList do
-			local isAiTeam = select(4, Spring.GetTeamInfo(teamList[j]))
+			local isAiTeam = select(4, Spring.GetTeamInfo(teamList[j], false))
 			if not isAiTeam then
 				vitalConstructorAllyTeam[allyTeamID] = false
 				break
@@ -412,7 +412,7 @@ local function AddAllianceUnit(unitID, unitDefID, teamID)
 	if DEBUG_MSG then
 		Spring.Echo("AddAllianceUnit", unitID, unitDefID, teamID)
 	end
-	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
+	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID, false)
 	aliveCount[teamID] = aliveCount[teamID] + 1
 	
 	aliveValue[teamID] = aliveValue[teamID] + UnitDefs[unitDefID].metalCost
@@ -463,7 +463,7 @@ local function RemoveAllianceUnit(unitID, unitDefID, teamID, delayLossToNextGame
 	if DEBUG_MSG then
 		Spring.Echo("RemoveAllianceUnit", unitID, unitDefID, teamID, delayLossToNextGameFrame)
 	end
-	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
+	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID, false)
 	aliveCount[teamID] = aliveCount[teamID] - 1
 	
 	aliveValue[teamID] = aliveValue[teamID] - UnitDefs[unitDefID].metalCost
@@ -558,7 +558,7 @@ local function ProcessLastAlly()
 			if #(Spring.GetTeamUnits(t)) == 0 then numAlive = 0 end
 			if (numAlive > 0) or (GG.waitingForComm or {})[t] or (GetTeamIsChicken(t)) then	
 				-- count AI teams as active
-				local _,_,_,isAiTeam = spGetTeamInfo(t)
+				local _,_,_,isAiTeam = spGetTeamInfo(t, false)
 				if isAiTeam then
 					hasActiveTeam = true
 				else
@@ -680,7 +680,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if revealed then
-		local allyTeam = select(6, spGetTeamInfo(teamID))
+		local allyTeam = select(6, spGetTeamInfo(teamID, false))
 		if allyTeam == allianceToReveal then
 			Spring.SetUnitAlwaysVisible(unitID, true)
 		end
@@ -726,7 +726,7 @@ function gadget:Initialize()
 		aliveValue[teams[i]] = 0
 		if GetTeamIsChicken(teams[i]) then
 			Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Chicken team found")
-			chickenAllyTeamID = select(6, Spring.GetTeamInfo(teams[i]))
+			chickenAllyTeamID = select(6, Spring.GetTeamInfo(teams[i], false))
 			--break
 		end
 	end

@@ -35,7 +35,7 @@ function gadget:DrawProjectile(pID, pass)
 	end
 
 	local teamID = spGetProjectileTeamID(pID)
-	local allyTeamID = select(6, spGetTeamInfo(teamID))
+	local allyTeamID = select(6, spGetTeamInfo(teamID, false))
 	if allyTeamID == myAllyTeamID then
 		return false
 	end

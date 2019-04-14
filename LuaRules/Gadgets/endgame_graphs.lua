@@ -381,7 +381,7 @@ function gadget:Initialize()
 	allyTeamByTeam = {}
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		allyTeamByTeam[teamID] = select(6, Spring.GetTeamInfo(teamID))
+		allyTeamByTeam[teamID] = select(6, Spring.GetTeamInfo(teamID, false))
 
 		mIncome         [teamID] = 0
 		mIncomeBase     [teamID] = 0

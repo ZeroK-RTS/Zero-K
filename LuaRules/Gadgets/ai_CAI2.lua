@@ -105,11 +105,10 @@ function gadget:Initialize()
 	
 	--// Detect the AIs
 	for _,team in ipairs(spGetTeamList()) do
-		--local _,_,_,isAI,side = spGetTeamInfo(team)
+		--local _,_,_,isAI,side = spGetTeamInfo(team, false)
 		if aiConfigByName[spGetTeamLuaAI(team)] then
-			local _,_,_,_,_,_,CustomTeamOptions = spGetTeamInfo(team)
+			local _,_,_,_,_,allyTeam,CustomTeamOptions = spGetTeamInfo(team)
 			if (not CustomTeamOptions) or (not CustomTeamOptions["aioverride"]) then -- what is this for?
-				local _,_,_,_,_,allyTeam = spGetTeamInfo(team)
 				
 				if not pathfinder then
 					pathfinder = InitializePathfinder()

@@ -1853,8 +1853,8 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
-	local _,_,_,_,_,newAllyTeam = spGetTeamInfo(teamID)
-	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeamID)
+	local _,_,_,_,_,newAllyTeam = spGetTeamInfo(teamID, false)
+	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeamID, false)
 
 	if (newAllyTeam ~= oldAllyTeam) then
 		if (mexDefs[unitDefID]) then
@@ -1878,8 +1878,8 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	local _,_,_,_,_,newAllyTeam = spGetTeamInfo(teamID)
-	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeamID)
+	local _,_,_,_,_,newAllyTeam = spGetTeamInfo(teamID, false)
+	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeamID, false)
 
 	if (newAllyTeam ~= oldAllyTeam) then
 		if (mexDefs[unitDefID] and mexByID[unitID]) then

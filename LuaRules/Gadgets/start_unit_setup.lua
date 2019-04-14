@@ -32,7 +32,7 @@ local setAiStartPos = (modOptions.setaispawns == "1")
 local CAMPAIGN_SPAWN_DEBUG = (Spring.GetModOptions().campaign_spawn_debug == "1")
 
 local gaiateam = Spring.GetGaiaTeamID()
-local gaiaally = select(6, spGetTeamInfo(gaiateam))
+local gaiaally = select(6, spGetTeamInfo(gaiateam, false))
 
 local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 
@@ -99,8 +99,8 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 
 		-- FIXME: temporary hack because I'm in a hurry
 		-- proper way: get rid of all the useless shit in modstats, reenable and collect plop stats that way (see above)
-		local str = "SPRINGIE:facplop," .. UnitDefs[unitDefID].name .. "," .. teamID .. "," .. select(6, Spring.GetTeamInfo(teamID)) .. ","
-		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		local str = "SPRINGIE:facplop," .. UnitDefs[unitDefID].name .. "," .. teamID .. "," .. select(6, Spring.GetTeamInfo(teamID, false)) .. ","
+		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID, false)
 		if isAI then
 			str = str .. "Nightwatch" -- existing account just in case infra explodes otherwise
 		else
@@ -211,7 +211,7 @@ end
 
 local function GetStartUnit(teamID, playerID, isAI)
 
-	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
+	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID, true))
 	if teamInfo and teamInfo.staticcomm then
 		local commanderName = teamInfo.staticcomm
 		local commanderLevel = teamInfo.staticcomm_level or 1
@@ -235,7 +235,7 @@ local function GetStartUnit(teamID, playerID, isAI)
 	end
 
 	-- if a player-selected comm is available, use it
-	playerID = playerID or (teamID and select(2, spGetTeamInfo(teamID)) )
+	playerID = playerID or (teamID and select(2, spGetTeamInfo(teamID, false)) )
 	if (playerID and commChoice[playerID]) then
 		--Spring.Echo("Attempting to load alternate comm")
 		local playerCommProfiles = GG.ModularCommAPI.GetPlayerCommProfiles(playerID, true)
@@ -319,7 +319,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	if not teamID then
 		return
 	end
-	local _,_,_,_,_,allyTeamID,teamInfo = Spring.GetTeamInfo(teamID)
+	local _,_,_,_,_,allyTeamID,teamInfo = Spring.GetTeamInfo(teamID, true)
 	if teamInfo and teamInfo.nocommander then
 		waitingForComm[teamID] = nil
 		return
@@ -492,7 +492,7 @@ end
 
 --[[
    This function return true if everyone in the team resigned.
-   This function is alternative to "isDead" from: "_,_,isDead,isAI = spGetTeamInfo(team)"
+   This function is alternative to "isDead" from: "_,_,isDead,isAI = spGetTeamInfo(team, false)"
    because "isDead" failed to return true when human team resigned before GameStart() event.
 --]]
 local function IsTeamResigned(team)
@@ -534,7 +534,7 @@ function gadget:GameStart()
 		end
 
 		--check if player resigned before game started
-		local _,playerID,_,isAI = spGetTeamInfo(team)
+		local _,playerID,_,isAI = spGetTeamInfo(team, false)
 		local deadPlayer = (not isAI) and IsTeamResigned(team)
 
 		if team ~= gaiateam and not deadPlayer then
@@ -624,7 +624,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		
 		teamID = tonumber(teamID);
 		
-		local _,_,_,isAI = Spring.GetTeamInfo(teamID)
+		local _,_,_,isAI = Spring.GetTeamInfo(teamID, false)
 		if(isAI) then -- this is actually an AI 
 			local aiid, ainame, aihost = Spring.GetAIInfo(teamID)
 			if (aihost == playerID) then -- it's actually controlled by the local host
@@ -641,7 +641,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		if msg_table then
 			local teamID, x, z = tonumber(msg_table[2]), tonumber(msg_table[3]), tonumber(msg_table[4])
 			if teamID then
-				local _,_,_,isAI = Spring.GetTeamInfo(teamID)
+				local _,_,_,isAI = Spring.GetTeamInfo(teamID, false)
 				if isAI and x and z then
 					SetStartLocation(teamID, x, z)
 					Spring.MarkerAddPoint(x, 0, z, "AI " .. teamID .. " start")
@@ -655,7 +655,7 @@ function gadget:GameFrame(n)
 	CheckOrderRemoval()
 	if n == (COMM_SELECT_TIMEOUT) then
 		for team in pairs(waitingForComm) do
-			local _,playerID = spGetTeamInfo(team)
+			local _,playerID = spGetTeamInfo(team, false)
 			teamSides[team] = DEFAULT_UNIT_NAME
 			--playerSides[playerID] = "basiccomm"
 			scheduledSpawn[n] = scheduledSpawn[n] or {}

@@ -432,7 +432,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
-	local _,_,_,_,_,newAllyTeam = spGetTeamInfo(teamID)
+	local _,_,_,_,_,newAllyTeam = spGetTeamInfo(teamID, false)
 	remAllyTeam[unitID] = newAllyTeam
 end
 

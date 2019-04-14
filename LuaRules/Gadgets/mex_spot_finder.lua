@@ -463,7 +463,7 @@ function gadget:GameStart()
 	local encoded = false;
 	
 	for _, teamID in pairs(teamlist) do
-		local _,_,_,isAI = Spring.GetTeamInfo(teamID)
+		local _,_,_,isAI = Spring.GetTeamInfo(teamID, false)
 		if isAI then
 			local aiid, ainame, aihost = Spring.GetAIInfo(teamID);
 			if (aihost == localPlayer) then

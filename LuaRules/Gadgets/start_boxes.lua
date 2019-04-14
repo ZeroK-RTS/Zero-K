@@ -10,7 +10,7 @@ function gadget:GetInfo() return {
 	enabled  = true,
 } end
 
-local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 local shuffleMode = Spring.GetModOptions().shuffle or "auto"
 local startboxConfig
 
@@ -183,7 +183,7 @@ end
 
 -- name, elo, clanShort, clanLong, isAI
 local function GetPlayerInfo (teamID)
-	local _,playerID,_,isAI = Spring.GetTeamInfo(teamID)
+	local _,playerID,_,isAI = Spring.GetTeamInfo(teamID, false)
 
 	if isAI then
 		return select(2, Spring.GetAIInfo(teamID)), -1000, "", "", true
@@ -469,7 +469,7 @@ function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 	else
 		-- for checking enemy startpos
 		local enemyboxes = {}
-		local _,_,_,_,_,allyteamid,_,_ = Spring.GetTeamInfo(teamID)
+		local _,_,_,_,_,allyteamid = Spring.GetTeamInfo(teamID, false)
 		local allyteams = Spring.GetAllyTeamList()
 		
 		if shuffleMode == "allshuffle" then

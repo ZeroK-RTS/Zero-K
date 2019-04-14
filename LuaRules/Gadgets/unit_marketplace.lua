@@ -148,7 +148,7 @@ end
 
 function gadget:Initialize()
 	gaiaTeam = Spring.GetGaiaTeamID()
-	_,_,_,_,_, gaiaAlliance = spGetTeamInfo(gaiaTeam)
+	_,_,_,_,_, gaiaAlliance = spGetTeamInfo(gaiaTeam, false)
 	
 	if TESTMODE then
 		local allUnits = Spring.GetAllUnits()

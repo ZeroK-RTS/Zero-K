@@ -410,7 +410,7 @@ end
 function gadget:UnitFinished(unitID, unitDefID, team)
 	if airpadDefs[unitDefID] then
 		--Spring.Echo("Adding unit "..unitID.." to airpad list")
-		local allyTeam = select(6, Spring.GetTeamInfo(team))
+		local allyTeam = select(6, Spring.GetTeamInfo(team, false))
 		airpadsData[unitID] = Spring.Utilities.CopyTable(airpadDefs[unitDefID], true)
 		airpadsData[unitID].reservations = {count = 0, units = {}}
 		airpadsData[unitID].emptySpot = {}
@@ -476,7 +476,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, team)
 	if airpadsData[unitID] then
-		local allyTeam = select(6, Spring.GetTeamInfo(team))
+		local allyTeam = select(6, Spring.GetTeamInfo(team, false))
 		--Spring.Echo("Removing unit "..unitID.." from airpad list")
 		airpadsPerAllyteam[allyTeam][unitID] = nil
 		for bomberID in pairs(airpadsData[unitID].reservations.units) do

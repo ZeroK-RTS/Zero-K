@@ -79,7 +79,7 @@ local function ScrapUnit(unitID, unitDefID, team, progress, face)
 			if (progress == 0) then
 				progress = 0.001
 			end
-			local allyTeam = select(6, Spring.GetTeamInfo(team))
+			local allyTeam = select(6, Spring.GetTeamInfo(team, false))
 			local featureID = spCreateFeature(wreck, x, y, z, face, allyTeam)
 			if featureID then
 				Spring.TransferFeature(featureID, team)

@@ -87,7 +87,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			if metalSpotsByPos[x] and metalSpotsByPos[x][z] then
 				return true
 			else
-				local _,_,_,isAI = Spring.GetTeamInfo(teamID)
+				local _,_,_,isAI = Spring.GetTeamInfo(teamID, false)
 				if not isAI then 
 					return false;
 				else

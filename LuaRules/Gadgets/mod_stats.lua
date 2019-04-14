@@ -251,7 +251,7 @@ function gadget:GameOver()
 
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
 		if ((teamLuaAI == nil or teamLuaAI == "") and teamID ~= gaiaTeam) then
-			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID)
+			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID, false)
 			if (not ai) then 
 				humanAlly[ally] = 1
 				players = players + 1

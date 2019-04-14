@@ -75,7 +75,7 @@ function gadget:GameSetup(label, ready, playerStates)
 		-- therefore, a reasonable indicator for placing startPos could be x>0 because 0 is precisely an impossible position to be place by hand.
 		-- we might not need to check for -100 anymore IMHO.
 		local x,y,z,startPosSet = Spring.GetTeamStartPosition(teamID)
-		local _,_,_,isAI,_,_ = Spring.GetTeamInfo(teamID)
+		local _,_,_,isAI = Spring.GetTeamInfo(teamID, false)
 		startPosSet = x and x > 0 
 	
 		if not spec and not isAI then

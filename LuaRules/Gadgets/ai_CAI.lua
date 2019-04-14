@@ -2920,7 +2920,7 @@ function gadget:GameFrame(n)
 				if debugData.showFacJobList[team] then
 					echoFacJobList(team)
 				end
-				local isDead = select(3, spGetTeamInfo(team))
+				local isDead = select(3, spGetTeamInfo(team, false))
 				if isDead then
 					aiTeamData[team] = nil	-- team is dead, stop working
 				end
@@ -3535,8 +3535,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID) -- add unit
-	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID)
-	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID)
+	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID, false)
+	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID, false)
 	for team,_ in pairs(aiTeamData) do
 		if teamID == team then
 			ProcessUnitCreated(unitID, unitDefID, teamID, nil, newAllyTeam ~= oldAllyTeam)
@@ -3549,8 +3549,8 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID) -- add unit
 end
 
 function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID) -- remove unit
-	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(newTeamID)
-	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(teamID)
+	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(newTeamID, false)
+	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(teamID, false)
 	for team,_ in pairs(aiTeamData) do
 		if teamID == team then
 			ProcessUnitDestroyed(unitID, unitDefID, teamID, newAllyTeam ~= oldAllyTeam)
@@ -3726,7 +3726,7 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 		end
 	end
 	
-	local player = select(2, Spring.GetTeamInfo(team))
+	local player = select(2, Spring.GetTeamInfo(team, false))
 	local stratIndex = SelectRandomStrat(player, team)
 	--Spring.Echo(a.buildConfig)
 	--ModifyTable(a.buildConfig, buildTasksMods)
@@ -3776,7 +3776,7 @@ local function initialiseAllyTeam(allyTeam, aiOnTeam)
 	local at = allyTeamData[allyTeam]
 	
 	for _,t in pairs(spGetTeamList()) do
-		local _,_,_,_,_,myAllyTeam = spGetTeamInfo(t)
+		local _,_,_,_,_,myAllyTeam = spGetTeamInfo(t, false)
 		if myAllyTeam == allyTeam then
 			Spring.Echo("Team " .. t .. " on allyTeam " .. allyTeam)
 			at.teams[t] = true
@@ -4096,11 +4096,10 @@ function gadget:Initialize()
 	end
 	
 	for _,team in ipairs(spGetTeamList()) do
-		--local _,_,_,isAI,side = spGetTeamInfo(team)
+		--local _,_,_,isAI,side = spGetTeamInfo(team, false)
 		if aiConfigByName[spGetTeamLuaAI(team)] then
-			local _,_,_,_,_,_,CustomTeamOptions = spGetTeamInfo(team)
+			local _,_,_,_,_,allyTeam,CustomTeamOptions = spGetTeamInfo(team)
 			if (not CustomTeamOptions) or (not CustomTeamOptions["aioverride"]) then -- what is this for?
-				local _,_,_,_,_,allyTeam = spGetTeamInfo(team)
 				initialiseAiTeam(team, allyTeam, aiConfigByName[spGetTeamLuaAI(team)])
 				aiOnTeam[allyTeam] = true
 				usingAI = true
@@ -4305,7 +4304,7 @@ end
 function gadget:Initialize()
 	local usingAI = false
 	for _,team in ipairs(spGetTeamList()) do
-		--local _,_,_,isAI,side = spGetTeamInfo(team)
+		--local _,_,_,isAI,side = spGetTeamInfo(team, false)
 		if aiConfigByName[spGetTeamLuaAI(team)] then
 			local _,_,_,_,_,_,CustomTeamOptions = spGetTeamInfo(team)
 			if (not CustomTeamOptions) or (not CustomTeamOptions["aioverride"]) then -- what is this for?
