@@ -36,7 +36,7 @@ myTeamID=-1;
 --Initializer
 function widget:Initialize()
 	--disable widget if I am a spec
-	local _, _, spec = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+	local _, _, spec = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 	if spec then
 		widgetHandler:RemoveWidget()
 		return false

@@ -210,7 +210,6 @@ local spGetFeaturePosition	= Spring.GetFeaturePosition
 local spGetFeaturesInCylinder = Spring.GetFeaturesInCylinder
 local spGetAllFeatures		= Spring.GetAllFeatures
 local spGetLocalPlayerID	= Spring.GetLocalPlayerID
-local spGetPlayerInfo		= Spring.GetPlayerInfo
 local spGetSpectatingState	= Spring.GetSpectatingState
 local spGetModKeyState		= Spring.GetModKeyState
 local spGetKeyState			= Spring.GetKeyState

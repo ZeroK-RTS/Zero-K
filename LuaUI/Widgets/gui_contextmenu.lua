@@ -271,7 +271,7 @@ local players = Spring.GetPlayerList()
 for i = 1, #players do
 	local customkeys = select(10, Spring.GetPlayerInfo(players[i]))
 	if customkeys.lobbyid then
-		lobbyIDs[customkeys.lobbyid] = select(1, Spring.GetPlayerInfo(players[i]))
+		lobbyIDs[customkeys.lobbyid] = select(1, Spring.GetPlayerInfo(players[i], false))
 	end
 end
 
@@ -1779,7 +1779,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 	local alliance 		= spGetUnitAllyTeam(unitID)
 	local team			= spGetUnitTeam(unitID)
 	local _, player 	= spGetTeamInfo(team)
-	local playerName 	= spGetPlayerInfo(player) or 'noname'
+	local playerName 	= spGetPlayerInfo(player, false) or 'noname'
 	local teamColor 	= {spGetTeamColor(team)}
 		
 	local window_width = 200

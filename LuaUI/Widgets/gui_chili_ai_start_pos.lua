@@ -184,7 +184,7 @@ function widget:Initialize()
 		local _,_,_,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
 		if isAI then
 			local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
-			local playerName = Spring.GetPlayerInfo(hostingPlayerID)
+			local playerName = Spring.GetPlayerInfo(hostingPlayerID, false)
 			aiTeams[#aiTeams + 1] = {
 				teamID = teamID,
 				allyTeamID = allyTeamID,

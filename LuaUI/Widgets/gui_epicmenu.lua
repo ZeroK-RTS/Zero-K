@@ -551,7 +551,7 @@ local function IsSinglePlayer()
 	 for i = 1, #playerlist do
 		local playerID = playerlist[i]
 		if myPlayerID ~= playerID then
-			local _, active, spectator = Spring.GetPlayerInfo(playerID)
+			local _, active, spectator = Spring.GetPlayerInfo(playerID, false)
 			if active and not spectator then
 				return false
 			end
@@ -2735,7 +2735,7 @@ local function MakeQuitButtons()
 		OnChange = function()
 				-- Only allow restarting for local games or by the host of steam coop.
 				if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
-					local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+					local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false))
 					if myPing and myPing < 40 then
 						MakeExitConfirmWindow("Are you sure you want to restart?", function() 
 							Spring.SendLuaMenuMsg("restartGame")
@@ -2747,7 +2747,7 @@ local function MakeQuitButtons()
 		DisableFunc = function()
 			-- Only allow restarting for local games or by the host of steam coop.
 			if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
-				local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+				local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false))
 				return not (myPing and myPing < 40)
 			end
 			return true
@@ -2848,7 +2848,7 @@ function widget:Initialize()
 
 	if not confLoaded then
 		if not settings.lang or not flagByLang[settings.lang] then
-			local flag = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID())):lower()
+			local flag = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID(), false)):lower()
 			settings.lang = langByFlag[flag]
 		end
 
@@ -3194,7 +3194,7 @@ function widget:SetConfigData(data)
 	-- set language. Needs to be done ASAP, before other widgets are even loaded!
 	-- This is because option paths are done right on load and they can use translations.
 	if not settings.lang or not flagByLang[settings.lang] then
-		local flag = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID())):lower()
+		local flag = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID(), false)):lower()
 		settings.lang = langByFlag[flag]
 	end
 

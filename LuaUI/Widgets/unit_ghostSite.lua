@@ -190,7 +190,7 @@ end
 
 local function CheckSpecState()
 	local playerID = Spring.GetMyPlayerID()
-	local _, _, spec = Spring.GetPlayerInfo(playerID)
+	local _, _, spec = Spring.GetPlayerInfo(playerID, false)
 
 	if spec then
 		Spring.Echo("<Ghost Site> Spectator mode. Widget removed.")

@@ -99,7 +99,7 @@ local function SetTeamNamesAndColors()
 			local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
 			teamNames[teamID] = name
 		else
-			local name = Spring.GetPlayerInfo(leader)
+			local name = Spring.GetPlayerInfo(leader, false)
 			teamNames[teamID] = name
 		end
 	local r,g,b = Spring.GetTeamColor(teamID)

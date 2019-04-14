@@ -433,7 +433,7 @@ end
 -------------------------------------------------------------------
 --- SPECTATOR CHECK
 local function IsSpectatorAndExit()
-	local _, _, spec = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+	local _, _, spec = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 	if spec then 
 		Spring.Echo("Newton Firezone disabled for spectator.")
 		widgetHandler:RemoveWidget(widget)

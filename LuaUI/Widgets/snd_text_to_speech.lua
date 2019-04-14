@@ -25,8 +25,8 @@ local function SetupTTS(value)
 	if (value == 0) then
 		textToSpeechEnabled = false 
 		if not luaMenuActive then
-			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " DISABLE TTS")
-			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " TTS VOLUME 0")
+			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false) .. " DISABLE TTS")
+			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false) .. " TTS VOLUME 0")
 		end
 		WG.textToSpeechCtrl = {ttsEnable = false,}
 	else
@@ -34,8 +34,8 @@ local function SetupTTS(value)
 		if luaMenuActive then
 			Spring.SendLuaMenuMsg("textToSpeechVolume_" .. value)
 		else
-			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " ENABLE TTS")
-			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " TTS VOLUME " .. value)
+			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false) .. " ENABLE TTS")
+			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false) .. " TTS VOLUME " .. value)
 		end
 		WG.textToSpeechCtrl = {ttsEnable = true,}
 	end
@@ -74,7 +74,7 @@ function widget:Initialize()
 	WG.ttsNotify = ttsNotify
 	if luaMenuActive then
 		myPlayerID = Spring.GetMyPlayerID()
-		myPlayerName = Spring.GetPlayerInfo(myPlayerID)
+		myPlayerName = Spring.GetPlayerInfo(myPlayerID, false)
 	else
 		widgetHandler:RemoveCallIn("AddConsoleMessage")
 	end
@@ -82,7 +82,7 @@ end
 
 function widget:Shutdown()
 	if not luaMenuActive then
-		Spring.Echo (Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " DISABLE TTS")
+		Spring.Echo (Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false) .. " DISABLE TTS")
 	end
 	WG.textToSpeechCtrl = nil
 end
@@ -105,7 +105,7 @@ function widget:MapDrawCmd(playerId, cmdType, px, py, pz, caption)
 		return
 	end
 	if (cmdType == 'point') then
-		local playerName = Spring.GetPlayerInfo(playerId)
+		local playerName = Spring.GetPlayerInfo(playerId, false)
 		Spring.SendLuaMenuMsg("textToSpeechSay_" .. (playerName or "unknown") .. " " .. (caption or ""))
 	end
 end

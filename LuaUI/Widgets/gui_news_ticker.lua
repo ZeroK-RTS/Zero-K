@@ -375,7 +375,7 @@ function widget:TeamDied(teamID)
 	local player = Spring.GetPlayerList(teamID)[1]
 	-- chicken team has no players (normally)
 	if player then
-		local playerName = Spring.GetPlayerInfo(player)
+		local playerName = Spring.GetPlayerInfo(player, false)
 		AddEvent(playerName .. ' died', nil, colorOrange)
 	end
 end
@@ -383,13 +383,13 @@ end
 --[[
 function widget:TeamChanged(teamID)
 	--// ally changed
-	local playerName = Spring.GetPlayerInfo(Spring.GetPlayerList(teamID)[1])
+	local playerName = Spring.GetPlayerInfo(Spring.GetPlayerList(teamID)[1], false)
 	widget:AddWarning(playerName .. ' allied')
 end
 --]]
 
 function widget:PlayerChanged(playerID)
-	local playerName,active,isSpec,teamID = Spring.GetPlayerInfo(playerID)
+	local playerName,active,isSpec,teamID = Spring.GetPlayerInfo(playerID, false)
   local _,_,isDead = Spring.GetTeamInfo(teamID)
 	if (isSpec) then
 		if not isDead then
@@ -401,7 +401,7 @@ function widget:PlayerChanged(playerID)
 end
 
 function widget:PlayerRemoved(playerID, reason)
-	local playerName,active,isSpec = Spring.GetPlayerInfo(playerID)
+	local playerName,active,isSpec = Spring.GetPlayerInfo(playerID, false)
 	if spec then return end
 	if reason == 0 then
 		AddEvent(playerName .. ' timed out', nil, colorOrange)

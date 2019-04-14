@@ -120,7 +120,7 @@ local function UpdateLabels()
         end
         if sum > blocklimit and s ~= "erase" and not drawCmds[p].blocked then
           drawCmds[p].blocked = true
-          local name,_,_,teamid = Spring.GetPlayerInfo(p)
+          local name,_,_,teamid = Spring.GetPlayerInfo(p, false)
           Spring.Echo("Blocking map draw for " .. name .. "(" .. p .. ")")
         end
       end
@@ -215,7 +215,7 @@ local function CreateTrafficWindow()
 
     for i,p in ipairs(playerlist) do
 
-      local name,_,_,teamid = Spring.GetPlayerInfo(p)
+      local name,_,_,teamid = Spring.GetPlayerInfo(p, false)
 
       data.playerdata[p] = {}
       data.playerdata[p]["counters"] = {}
@@ -261,7 +261,7 @@ local function Output()
     -- update traffic window
     local playerlist = GetPlayerList()
     for i,p in ipairs(playerlist) do
-      local name,_,_,teamid = Spring.GetPlayerInfo(p)
+      local name,_,_,teamid = Spring.GetPlayerInfo(p, false)
       if name then
         for name, data in pairs(traffic) do
           local ret = Spring.GetPlayerTraffic(p, data.id)
@@ -289,7 +289,7 @@ end
 function ActionUnBlock(_,_,parms)
   local p = tonumber(parms[1])
   if not p then return end
-  local name = Spring.GetPlayerInfo(p)
+  local name = Spring.GetPlayerInfo(p, false)
   if name then
     drawCmds[p].blocked = false
     Spring.Echo("unblocking map draw for " .. name)
@@ -299,7 +299,7 @@ end
 function ActionBlock(_,_,parms)
   local p = tonumber(parms[1])
   if not p then return end
-  local name = Spring.GetPlayerInfo(p)
+  local name = Spring.GetPlayerInfo(p, false)
   if name then
     drawCmds[p].blocked = true
     Spring.Echo("blocking map draw for " .. name)
@@ -319,7 +319,7 @@ function ActionList()
   local playerlist = GetPlayerList()
   for i,p in ipairs(playerlist) do
     if drawCmds[p].blocked then
-      name = GetPlayerInfo(p)
+      name = GetPlayerInfo(p, false)
       if name then
         Spring.Echo(name .. " (" .. p .. ")")
       end

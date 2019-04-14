@@ -356,7 +356,7 @@ local function GetTeamName(teamID)
 	if not leaderID then
 		return
 	end
-	local playerName = Spring.GetPlayerInfo(leaderID)
+	local playerName = Spring.GetPlayerInfo(leaderID, false)
 	if not playerName then
 		return
 	end

@@ -40,7 +40,7 @@ local moveUnits = {}
 local myID = 0
 
 local function checkSpec()
-  local _, _, spec = GetPlayerInfo(myID)
+  local _, _, spec = GetPlayerInfo(myID, false)
   if spec then
     widgetHandler:RemoveWidget()
   end

@@ -227,7 +227,7 @@ function externalFunctions.PlayResponse(unitID, cmdID)
 end
 
 function widget:Initialize()
-	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID()) 
+	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 	myTeamID = team
 	WG.noises = externalFunctions
 end

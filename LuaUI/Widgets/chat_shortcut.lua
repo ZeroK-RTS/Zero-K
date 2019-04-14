@@ -58,7 +58,7 @@ function widget:Initialize()
 			local _, aiName = Spring.GetAIInfo(teamID)
 			gameID_to_playerName[teamID+1] = aiName
 		elseif not isAI then
-			local playerName = Spring.GetPlayerInfo(playerID)
+			local playerName = Spring.GetPlayerInfo(playerID, false)
 			gameID_to_playerName[teamID+1] = playerName or "Gaia"
 		end
 	end
@@ -116,7 +116,7 @@ function widget:MousePress(x, y, button)
 		end
 	end
 	if button == rightButton then
-		--local playerName,_,_,_,_,_,_,_,_,_ = spGetPlayerInfo(playerID)
+		--local playerName = spGetPlayerInfo(playerID, false)
 		local playerName = gameID_to_playerName[teamID+1]
 		local textToBePasted = pasteCommand .. playerName .. "," --//paste playerName
 		spSendCommands(textToBePasted)

@@ -402,7 +402,7 @@ function widget:DrawWorldPreUnit()
 				
 				-- use player colors
 				if  cmdType == 'map_mark'   or   cmdType == 'map_draw'  or  cmdType == 'map_erase'  then
-					local _,_,spec,teamID = spGetPlayerInfo(playerID)
+					local _,_,spec,teamID = spGetPlayerInfo(playerID, false)
 					local r,g,b = 1,1,1
 					if not spec then
 						r,g,b = spGetTeamColor(teamID)
@@ -463,7 +463,7 @@ function widget:DrawWorldPreUnit()
 				-- draw + erase:   nickname / draw icon
 				if  playerID  and  playerID ~= ownPlayerID  and  OPTIONS.showMapmarkSpecNames  and   (cmdType == 'map_draw'  or    cmdType == 'map_erase' and  clickOsClock >= mapEraseNicknameTime[playerID]) then
 					
-					local nickname,_,spec = spGetPlayerInfo(playerID)
+					local nickname,_,spec = spGetPlayerInfo(playerID, false)
 					if (spec) then
 						gl.Color(r,g,b, a * OPTIONS.nicknameOpacityMultiplier)
 							

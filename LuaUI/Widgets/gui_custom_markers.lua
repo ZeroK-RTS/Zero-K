@@ -163,7 +163,7 @@ local vsx, vsy, sMidX, sMidY
 --local functions
 ----------------------------------------------------------------
 local function GetPlayerColor(playerID)
-	local _, _, isSpec, teamID = GetPlayerInfo(playerID)
+	local _, _, isSpec, teamID = GetPlayerInfo(playerID, false)
 	if (isSpec) then return GetTeamColor(Spring.GetGaiaTeamID()) end
 	if (not teamID) then return nil end
 	return GetTeamColor(teamID)

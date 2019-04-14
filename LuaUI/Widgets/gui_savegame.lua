@@ -223,7 +223,7 @@ local function SaveGame(filename, description, requireOverwrite)
 			saveData.gameID = (Spring.GetGameRulesParam("save_gameID") or Game.gameID)
 			saveData.gameframe = Spring.GetGameFrame()
 			saveData.totalGameframe = Spring.GetGameFrame() + (Spring.GetGameRulesParam("totalSaveGameFrame") or 0)
-			saveData.playerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+			saveData.playerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 			table.save(saveData, path)
 			
 			-- TODO: back up existing save?

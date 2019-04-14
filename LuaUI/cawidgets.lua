@@ -1342,7 +1342,7 @@ do
 		for i = 1, #playerList do
 			local playerID = playerList[i]
 			if playerID then
-				local name, _, spectating = Spring.GetPlayerInfo(playerID)
+				local name, _, spectating = Spring.GetPlayerInfo(playerID, false)
 				if not spectating then
 					playerNameToID[name] = playerID
 				end
@@ -1398,7 +1398,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 			--TODO: improve chili_chat2 spam-filter/dedupe-detection too.
 		end
 		-- IGNORE FEATURE--
-        	if ignorelist.ignorees[select(1,Spring.GetPlayerInfo(playerID_msg))] then
+		if ignorelist.ignorees[select(1,Spring.GetPlayerInfo(playerID_msg, false))] then
 			return
         	end
 	end
@@ -1413,7 +1413,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 				if endChar then
 					local name = string.sub(newMsg.argument, 2, endChar-1)
 					if playerNameToID[name] then
-						local spectating = select(3, Spring.GetPlayerInfo(playerNameToID[name]))
+						local spectating = select(3, Spring.GetPlayerInfo(playerNameToID[name], false))
 						if spectating then
 							playerNameToID[name] = nil
 							return
@@ -1895,7 +1895,7 @@ function widgetHandler:GameStart()
 			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID)
 			if (not ai) then 
 				for _, pid in ipairs(Spring.GetPlayerList(teamID)) do
-					local name, active, spec = Spring.GetPlayerInfo(pid)
+					local name, active, spec = Spring.GetPlayerInfo(pid, false)
 					if active and not spec then plist = plist .. "," .. name end
 				end
 			end	
@@ -2000,8 +2000,8 @@ end
 
 
 function widgetHandler:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
-  local customkeys = select(10, Spring.GetPlayerInfo(playerID))
-  if ignorelist.ignorees[select(1,Spring.GetPlayerInfo(playerID))] or (customkeys and customkeys.muted) then
+  local playerName, _, _, _, _, _, _, _, _, customkeys = Spring.GetPlayerInfo(playerID)
+  if ignorelist.ignorees[playerName] or (customkeys and customkeys.muted) then
     return true
   end
   

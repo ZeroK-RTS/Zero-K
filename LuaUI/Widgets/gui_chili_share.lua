@@ -315,7 +315,7 @@ local function RenderName(subject)
 		end
 	end
 	if (subject.player) then
-		local ping = 1000 * select(6,Spring.GetPlayerInfo(subject.player) )
+		local ping = 1000 * select(6,Spring.GetPlayerInfo(subject.player, false) )
 		
 		local colorPing = '\255\180\180\180'
 		if (ping >= 500) then
@@ -487,11 +487,10 @@ local function UpdatePlayer(subject)
 end
 
 local function InvitePlayer(playerid)
-	local name = select(1,Spring.GetPlayerInfo(playerid))
-	local teamID = select(4,Spring.GetPlayerInfo(playerid))
-	local leaderID = select(2,Spring.GetTeamInfo(teamID))
+	local name, _, _, teamID = Spring.GetPlayerInfo(playerid, false)
+	local leaderID = select(2,Spring.GetTeamInfo(teamID, false))
 	Spring.SendLuaRulesMsg("sharemode invite " .. playerid)
-	if #Spring.GetPlayerList(select(4,Spring.GetPlayerInfo(playerid))) > 1 and playerid == leaderID then
+	if #Spring.GetPlayerList(teamID) > 1 and playerid == leaderID then
 		Spring.SendCommands("say a:I invited " .. name .. "'s squad to a merger.")
 	else
 		Spring.SendCommands("say a:I invited " .. name .. " to join my squad.")
@@ -512,8 +511,8 @@ local function MergeWithClanMembers()
 				local customKeys = select(10, Spring.GetPlayerInfo(players[j])) or {}
 				local clanShort = customKeys.clan     or ""
 				local clanLong  = customKeys.clanfull or ""
-				--Spring.Echo(select(1,Spring.GetPlayerInfo(players[j])) .. " : " .. clanLong)
-				if clanLong == myclanLong and players[j] ~= Spring.GetMyPlayerID() and select(4,Spring.GetPlayerInfo(players[j])) ~= Spring.GetMyTeamID() then
+				--Spring.Echo(select(1,Spring.GetPlayerInfo(players[j], false)) .. " : " .. clanLong)
+				if clanLong == myclanLong and players[j] ~= Spring.GetMyPlayerID() and select(4,Spring.GetPlayerInfo(players[j], false)) ~= Spring.GetMyTeamID() then
 					clanmembers[#clanmembers+1] = players[j]
 				end
 			end
@@ -541,13 +540,13 @@ end
 
 local function LeaveMySquad()
 	local leader = select(2,Spring.GetTeamInfo(Spring.GetMyTeamID()))
-	local name = select(1,Spring.GetPlayerInfo(leader))
+	local name = select(1,Spring.GetPlayerInfo(leader, false))
 	Spring.SendCommands("say a: I left " .. name .. "'s squad.")
 	Spring.SendLuaRulesMsg("sharemode unmerge")
 end
 
 local function InviteChange(playerid)
-	local name = select(1,Spring.GetPlayerInfo(playerid))
+	local name = select(1,Spring.GetPlayerInfo(playerid, false))
 	Spring.SendLuaRulesMsg("sharemode accept " .. playerid)
 	--Spring.SendCommands("say a:I have joined " .. name .. "'s squad.") -- Removed to reduce information overload.
 end
@@ -558,7 +557,7 @@ local function Hideme()
 end
 
 local function KickPlayer(playerid)
-	Spring.SendCommands("say a: I kicked " .. select(1,Spring.GetPlayerInfo(playerid)) .. " from my squad.")
+	Spring.SendCommands("say a: I kicked " .. select(1,Spring.GetPlayerInfo(playerid, false)) .. " from my squad.")
 	Spring.SendLuaRulesMsg("sharemode kick " .. playerid)
 end
 
@@ -579,7 +578,7 @@ local function GiveUnit(target)
 		units = "unit"
 	end
 	local leader = select(2,Spring.GetTeamInfo(target))
-	local name = select(1,Spring.GetPlayerInfo(leader))
+	local name = select(1,Spring.GetPlayerInfo(leader, false))
 	if select(4,Spring.GetTeamInfo(target)) then
 		name = select(2,Spring.GetAIInfo(target))
 	end
@@ -598,7 +597,7 @@ local function GiveResource(target,kind)
 	elseif shift then mod = defaultamount*5
 	else mod = defaultamount end
 	local leader = select(2,Spring.GetTeamInfo(target))
-	local name = select(1,Spring.GetPlayerInfo(leader))
+	local name = select(1,Spring.GetPlayerInfo(leader, false))
 	if select(4,Spring.GetTeamInfo(target)) then
 		name = select(2,Spring.GetAIInfo(target))
 	end
@@ -965,7 +964,7 @@ local function InitName(subject, playerPanel)
 	local country, icon, badges, clan, avatar, faction, admin
 	if (subject.player) then
 		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
-		country = select(8, Spring.GetPlayerInfo(subject.player))
+		country = select(8, Spring.GetPlayerInfo(subject.player, false))
 		icon = pdata.icon
 		badges = pdata.badges
 		clan = pdata.clan
@@ -1099,7 +1098,7 @@ local function InitName(subject, playerPanel)
 		end
 	end
 	--Spring.Echo("Playerpanel size: " .. playerPanel.width .. "x" .. playerPanel.height .. "\nTextbox size: " .. playerPanel.width*0.4 .. "x" .. playerPanel.height)
-	local isSpec = select(3,Spring.GetPlayerInfo(subject.id))
+	local isSpec = select(3,Spring.GetPlayerInfo(subject.id, false))
 	--if not isSpec then
 		RenderName(subject)
 	--end
@@ -1301,7 +1300,7 @@ local function UpdateInviteTable()
 					--Spring.Echo("showing")
 			end
 		else
-			--Spring.Echo("No accept for player " .. select(1, Spring.GetPlayerInfo(playerID)))
+			--Spring.Echo("No accept for player " .. select(1, Spring.GetPlayerInfo(playerID, false)))
 		end
 	end
 end
@@ -1346,7 +1345,7 @@ local function UpdateAllyTeam(allyTeam)
 			nonSpecs = true
 		else
 			for _, playerID in ipairs(Spring.GetPlayerList(teamID)) do
-				local name,active,spec = Spring.GetPlayerInfo(playerID)
+				local name,active,spec = Spring.GetPlayerInfo(playerID, false)
 				if playerID ~= Spring.GetMyPlayerID() and (teamID ~= 0 or teamZeroPlayers[playerID]) or not spec then
 					temp[#temp + 1] = {id = #temp + 1, team = teamID, player = playerID, name = name, allyteam = allyTeam, active = active, spec = spec, dead = dead}
 				end
@@ -1381,7 +1380,7 @@ local function UpdateSubjects()
 		end
 	end
 	for _, playerID in ipairs(Spring.GetPlayerList()) do 
-		local name,active,spec, teamID, allyTeam = Spring.GetPlayerInfo(playerID)
+		local name,active,spec, teamID, allyTeam = Spring.GetPlayerInfo(playerID, false)
 		if spec and active then
 			if (playerID == Spring.GetMyPlayerID()) then
 				mySubjectID = #subjects + 1
@@ -1493,7 +1492,7 @@ function widget:Initialize()
 	local spectating = Spring.GetSpectatingState()
 	
 	for _, playerID in ipairs(Spring.GetPlayerList()) do 
-		local name,active,spec, teamID, allyTeam = Spring.GetPlayerInfo(playerID)
+		local name,active,spec, teamID, allyTeam = Spring.GetPlayerInfo(playerID, false)
 		if teamID == 0 and not spec then
 			teamZeroPlayers[playerID] = true
 		end

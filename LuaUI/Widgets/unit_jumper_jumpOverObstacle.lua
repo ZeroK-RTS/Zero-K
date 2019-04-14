@@ -53,7 +53,7 @@ for i = 1, #exclusions do
 end
 
 function widget:Initialize()
-	local _, _, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+	local _, _, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 		if spec then
 		widgetHandler:RemoveWidget()
 		return false

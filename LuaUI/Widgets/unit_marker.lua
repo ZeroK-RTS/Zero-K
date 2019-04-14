@@ -134,7 +134,7 @@ function widget:UnitEnteredLos (unitID, teamID)
 				local _,botName,_,botType = Spring.GetAIInfo(teamID)
 				owner_name = (botType or "AI") .." - " .. (botName or "unnamed")
 			else
-				owner_name = Spring.GetPlayerInfo(playerID) or "nobody"
+				owner_name = Spring.GetPlayerInfo(playerID, false) or "nobody"
 			end
 
 			markerText = markerText .. " (" .. owner_name .. ")"

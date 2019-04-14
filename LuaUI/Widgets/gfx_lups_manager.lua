@@ -348,7 +348,7 @@ function widget:Update()
 		--// send errorlog if me (jK) is in the game
 		local allPlayers = Spring.GetPlayerList()
 		for i = 1, #allPlayers do
-			local playerName = Spring.GetPlayerInfo(allPlayers[i])
+			local playerName = Spring.GetPlayerInfo(allPlayers[i], false)
 			if (playerName == "[LCC]jK" or playerName == "GoogleFrog") then
 				local errorLog = Lups.GetErrorLog(1)
 				if (errorLog~="") then

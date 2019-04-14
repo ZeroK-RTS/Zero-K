@@ -380,7 +380,7 @@ function SetMaxPlayerNameWidth()
 	local nextWidth = 0
 	UseFont(font)
 	for _,wplayer in ipairs(t) do
-		name = Spring_GetPlayerInfo(wplayer)
+		name = Spring_GetPlayerInfo(wplayer, false)
 		nextWidth = GetTextWidth(name)+4
 		if nextWidth > maxWidth then
 			maxWidth = nextWidth
@@ -432,7 +432,7 @@ function GetAllPlayers()
 	end
 	specPlayers = Spring_GetTeamList()
 	for _,playerID in ipairs(specPlayers) do
-		local active,_,spec = Spring_GetPlayerInfo(playerID)
+		local active,_,spec = Spring_GetPlayerInfo(playerID, false)
 		if spec == true then
 			if active == true then
 				player[playerID] = CreatePlayer(playerID)
@@ -442,7 +442,7 @@ function GetAllPlayers()
 end
 
 function CreatePlayer(playerID)
-	local tname, _, tspec, tteam, tallyteam, tping, tcpu, tcountry, trank = Spring_GetPlayerInfo(playerID)
+	local tname, _, tspec, tteam, tallyteam, tping, tcpu, tcountry, trank = Spring_GetPlayerInfo(playerID, false)
 	local _,_,_,_,tside,tallyteam = Spring_GetTeamInfo(tteam)
 	local tred, tgreen, tblue = Spring_GetTeamColor(tteam)
 	tpingLvl = GetPingLvl(tping)
@@ -517,7 +517,7 @@ end
 function SortList()
 	local teamList
 	local myOldSpecStatus = mySpecStatus
-	_,_,mySpecStatus,_,_,_,_,_,_ = Spring_GetPlayerInfo(myPlayerID)
+	_,_,mySpecStatus = Spring_GetPlayerInfo(myPlayerID, false)
 	if mySpecStatus ~= myOldSpecStatus then
 		if mySpecStatus == true then
 			teamList = Spring_GetTeamList()
@@ -660,7 +660,7 @@ function SortSpecs(vOffset)
 	local playersList = Spring_GetPlayerList(_,true)
 	local noSpec = true
 	for _,playerID in ipairs(playersList) do
-		_,active,spec = Spring_GetPlayerInfo(playerID)
+		_,active,spec = Spring_GetPlayerInfo(playerID, false)
 		if spec == true then
 			if player[playerID].name ~= nil then
 				if noSpec == true then
@@ -1876,7 +1876,7 @@ end
 function CheckPlayersChange()
 	local sorting = false
 	for p = 0,31 do
-		local name,active,spec,teamID,allyTeamID,pingTime,cpuUsage, country, rank = Spring_GetPlayerInfo(p)
+		local name,active,spec,teamID,allyTeamID,pingTime,cpuUsage, country, rank = Spring_GetPlayerInfo(p, false)
 		if active == false then
 			if player[p].name ~= nil then                                             -- NON SPEC PLAYER LEAVING
 				if player[p].spec==false then

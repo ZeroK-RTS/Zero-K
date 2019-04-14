@@ -242,7 +242,7 @@ options = {
 function widget:Initialize()
 	skippingTimerG.echoTimestamp = spGetGameSeconds()
 	myPlayerID=Spring.GetMyPlayerID()
-	local _, _, spec = Spring.GetPlayerInfo(myPlayerID)
+	local _, _, spec = Spring.GetPlayerInfo(myPlayerID, false)
 	if spec then widgetHandler:RemoveWidget() return false end
 	myTeamID_gbl= spGetMyTeamID()
 	
@@ -622,7 +622,7 @@ function CountdownNetworkDelayWait(unitID)
 end
 
 function ReportedNetworkDelay(playerIDa, defaultDelay)
-	local _,_,_,_,_,totalDelay,_,_,_,_= Spring.GetPlayerInfo(playerIDa)
+	local _,_,_,_,_,totalDelay = Spring.GetPlayerInfo(playerIDa, false)
 	if totalDelay==nil or totalDelay<=defaultDelay then return defaultDelay --if ping is too low: set the minimum delay
 	else return totalDelay --take account for lag + wait a little bit for any command to properly update
 	end

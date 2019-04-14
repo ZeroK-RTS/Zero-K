@@ -779,7 +779,7 @@ function AddPlayerName(teamID)
 		local _, aiName, _, shortName = Spring.GetAIInfo(teamID)
 		playerName = aiName ..' ('.. shortName .. ')'
 	else
-		playerName = player and Spring.GetPlayerInfo(player) or 'noname'
+		playerName = player and Spring.GetPlayerInfo(player, false) or 'noname'
 	end
 	local teamColor		= {Spring.GetTeamColor(teamID)}
 	stack_main:AddChild( Label:New{ caption = playerName, font = {outline = true; color = teamColor; } } )

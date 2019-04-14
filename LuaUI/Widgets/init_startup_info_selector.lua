@@ -510,7 +510,7 @@ function widget:Update(dt)
 		startPosTimer = startPosTimer + dt
 		if Spring.GetGameFrame() <= 0 then
 			if startPosTimer > 0.1 then
-				local _, active, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+				local _, active, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 				if not spec then
 					local x, y, z = Spring.GetTeamStartPosition(teamID)
 					if not (x == 0 and y == 0 and z == 0) then

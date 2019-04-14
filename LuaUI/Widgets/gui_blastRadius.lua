@@ -333,7 +333,7 @@ end
 --[[
 function CheckSpecState()
 	local playerID = spGetMyPlayerID()
-	local _, _, spec, _, _, _, _, _ = spGetPlayerInfo(playerID)
+	local _, _, spec = spGetPlayerInfo(playerID, false)
 		
 	if ( spec == true ) then
 		spEcho("<Blast Radius> Spectator mode. Widget removed.")

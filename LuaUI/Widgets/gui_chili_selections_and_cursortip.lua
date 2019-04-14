@@ -805,7 +805,7 @@ local function GetPlayerCaption(teamID)
 		local _, aiName, _, shortName = Spring.GetAIInfo(teamID)
 		playerName = aiName -- .. ' (' .. shortName .. ')'
 	else
-		playerName = (player and Spring.GetPlayerInfo(player)) or (teamID ~= GAIA_TEAM and "noname")
+		playerName = (player and Spring.GetPlayerInfo(player, false)) or (teamID ~= GAIA_TEAM and "noname")
 		if not playerName then
 			return false
 		end

@@ -919,7 +919,7 @@ local function GetOpposingAllyTeams()
 			for j = 1, #teamList do
 				local _, playerID, _, isAI = Spring.GetTeamInfo (teamList[j])
 				if not isAI then
-					playerName = Spring.GetPlayerInfo(playerID)
+					playerName = Spring.GetPlayerInfo(playerID, false)
 					winString = GetWinString(playerName)
 					break
 				end

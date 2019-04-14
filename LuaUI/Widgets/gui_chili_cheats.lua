@@ -681,7 +681,7 @@ function languageChanged()
 			local _,botID,_,shortName = Spring.GetAIInfo(teamID)
 			teamPicker.items[i] = (shortName or "Bot") .." - " .. (botID or "")
 		else
-			teamPicker.items[i] = Spring.GetPlayerInfo(playerID) or "???"
+			teamPicker.items[i] = Spring.GetPlayerInfo(playerID, false) or "???"
 		end
 	end
 	teamPicker.tooltip = WG.Translate("interface", "cheatsheet_teampick_desc")

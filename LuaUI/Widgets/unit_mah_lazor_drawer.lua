@@ -27,7 +27,7 @@ local CMD_ATTACK = CMD.ATTACK
 --[[
 function ping()
 	local playerID = Spring.GetLocalPlayerID()
-	local ping = select(6, Spring.GetPlayerInfo(playerID))
+	local ping = select(6, Spring.GetPlayerInfo(playerID, false))
 	Spring.Echo(ping)
 	return ping
 end

@@ -131,7 +131,7 @@ local function GetTeamName(teamID)
 		if isAI then
 			_,name = Spring.GetAIInfo(teamID)
 		else
-			name,_,_,_,_,_,_,_,_,customKeys = GetPlayerInfo(leader)
+			name = GetPlayerInfo(leader, false)
 		end
 		return name;
 	end
