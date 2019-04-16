@@ -220,7 +220,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	local fakeUnitID
 	local unitDefID        = spGetUnitDefID(unitID)
 	local jumpDef          = jumpDefs[unitDefID]
-	local speed            = jumpDef.speed
+	local defSpeed         = jumpDef.speed
 	local delay            = jumpDef.delay
 	local height           = jumpDef.height
 	local cannotJumpMidair = jumpDef.cannotJumpMidair
@@ -247,7 +247,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	if lineDist == 0 then lineDist = 0.00001 end
 	local flightDist = GetDist3(start, vertex) + GetDist3(vertex, goal)
 	
-	local speed = speed * lineDist/flightDist
+	local speed = defSpeed * lineDist/flightDist
 	local step = speed/lineDist
 	local duration = math.ceil(1/step)+1
 

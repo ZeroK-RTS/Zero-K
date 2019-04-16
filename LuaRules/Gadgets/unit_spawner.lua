@@ -494,7 +494,7 @@ end
 
 local function ChooseChicken(units, useTech)
 	local s = spGetGameSeconds() + math.floor(gameFrameOffset/30)
-	local units = units or chickenTypes
+	units = units or chickenTypes
 	local choices,choisesN = {},0
 	local techMod = 0
 	if useTech then
