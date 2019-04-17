@@ -159,7 +159,7 @@ local function GetWantedBomberHeight(unitID, bomberID, config, underShield)
 		-- Collision volume is always full size for non-nanoframes.
 		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ, volType = Spring.GetUnitCollisionVolumeData(unitID)
 		if volType == VOL_SPHERE then
-			scaleY = scaleY*SQRT_TWO
+			scaleY = scaleY/SQRT_TWO
 		end
 		heightDef[unitDefID] = scaleY/2 + offsetY
 	end
@@ -168,8 +168,8 @@ local function GetWantedBomberHeight(unitID, bomberID, config, underShield)
 		-- Collision volume is always full size when buildProgress >- 0.9.
 		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ, volType = Spring.GetUnitCollisionVolumeData(unitID)
 		if volType == VOL_SPHERE then
-			scaleX = scaleX*SQRT_TWO
-			scaleZ = scaleZ*SQRT_TWO
+			scaleX = scaleX/SQRT_TWO
+			scaleZ = scaleZ/SQRT_TWO
 		end
 		local horSize = config.sizeSafetyFactor*(math.min(scaleX, scaleZ)/2 - math.sqrt(offsetX^2 + offsetZ^2))
 		local ud = UnitDefs[unitDefID]
