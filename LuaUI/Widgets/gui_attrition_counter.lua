@@ -450,8 +450,15 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	-- else it is most likely not the same unit but an old table entry and a re-used unitID. we just keep the entry
 	-- small margin of error remains
 	
-	-- prevents morph and factory-cancel from counting as kill
-	if GetUnitHealth(unitID) > 0 then return end
+	
+	
+	-- prevents factory-cancel from counting as kill
+	local buildProgress = select(5, GetUnitHealth(unitID))
+	if GetUnitHealth(unitID) > 0 && buildProgress < 1 then return end
+	
+	-- don't count morphed units
+	local wasMorphed = Spring.GetUnitRulesParam(unitID, wasMorphedTo);
+	if wasMorphed then return end
 
 	if teamID == gaiaTeam then return end
 	
@@ -476,7 +483,6 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	Echo("<Attrition Counter>: UnitDestroyed: While owned by controller: "..tostring(captureController));
 	if captureController and captureController ~= -1 then return end
 		
-	local buildProgress = select(5, GetUnitHealth(unitID))
 	local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
 	
 	-- if teamID and unitID and unitDefID and teamID ~= gaiaTeam then 	
