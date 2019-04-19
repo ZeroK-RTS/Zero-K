@@ -454,7 +454,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	
 	-- prevents factory-cancel from counting as kill
 	local buildProgress = select(5, GetUnitHealth(unitID))
-	if GetUnitHealth(unitID) > 0 && buildProgress < 1 then return end
+	if GetUnitHealth(unitID) > 0 and buildProgress < 1 then return end
 	
 	-- don't count morphed units
 	local wasMorphed = Spring.GetUnitRulesParam(unitID, wasMorphedTo);
