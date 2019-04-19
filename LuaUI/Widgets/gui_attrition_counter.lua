@@ -384,7 +384,6 @@ function widget:UnitTaken(unitID, unitDefID, unitTeamID, newTeamID) --//will be 
 			-- do nothing; shouldn't happen unless FFA, and this widget shuts down in FFA.
 		else
 			-- unit has now become mind-controlled for the first time; unitTeamID lost it
-			Echo("<AttritionCounter>: unitTaken: captured for the first time, file as casualty")
 			capturedUnits[unitID] = unitDefID; -- verify unitdef in case of ID recycling 
 			local buildProgress = select(5, GetUnitHealth(unitID))
 			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
