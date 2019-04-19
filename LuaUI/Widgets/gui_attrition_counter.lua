@@ -176,7 +176,7 @@ local function UpdateCounters()
 
 	local rate = allyTeams[myAllyTeam].rate
 	local caption	
-	if rate < 0 then caption 'N/A'; label_rate_player.font.color = grey	
+	if rate < 0 then caption = 'N/A'; label_rate_player.font.color = grey	
 	elseif rate > 9.99 then caption = 'PWN!'; label_rate_player.font.color = blue
 	else
 		caption = tostring(floor(rate*100))..'%'
@@ -353,20 +353,114 @@ end
 
 
 local deadUnits = {} -- in spec mode UnitDestroyed would sometimes be called twice for the same unit, so we need to prevent it from counting twice
+local capturedUnits = {} -- UnitTaken doesn't seem to have the luxury of reading capture_controller when unit is returned to owner
+
+function widget:UnitTaken(unitID, unitDefID, unitTeamID, newTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
+	local captureController = Spring.GetUnitRulesParam(unitID,"capture_controller");
+	if captureController == nil or captureController == -1 then 
+		-- unit is not presently mind controlled
+		if capturedUnits[unitID] and capturedUnits[unitID] == unitDefID then
+			--Echo("<AttritionCounter>: unitTaken: was formerly mind-controlled, refund score")
+			capturedUnits[unitID] = nil;
+			
+			local buildProgress = select(5, GetUnitHealth(unitID))
+			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
+			local team = teams[newTeamID]
+			team.lostUnits = team.lostUnits - 1
+			team.lostMetal = team.lostMetal - worth
+			
+			local allyTeam = allyTeams[team.friendlyAllyTeam]
+			allyTeam.lostUnits = allyTeam.lostUnits - 1
+			allyTeam.lostMetal = allyTeam.lostMetal - worth		
+			
+			doUpdate = true
+		end
+	else
+		-- this is most likely dead code because of the weird relationship between UnitGiven and UnitTaken
+		-- however there's no documentation i could find that explains it, so i feel unsafe otherwise.
+		if capturedUnits[unitID] and capturedUnits[unitID] == unitDefID then
+			Echo("<AttritionCounter>: unitTaken: captured by a new team while already captured, how peculiar")
+			-- unit has been captured before and is now captured by another owner. 
+			-- do nothing; shouldn't happen unless FFA, and this widget shuts down in FFA.
+		else
+			-- unit has now become mind-controlled for the first time; unitTeamID lost it
+			Echo("<AttritionCounter>: unitTaken: captured for the first time, file as casualty")
+			capturedUnits[unitID] = unitDefID; -- verify unitdef in case of ID recycling 
+			local buildProgress = select(5, GetUnitHealth(unitID))
+			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
+			local team = teams[unitTeamID]
+			team.lostUnits = team.lostUnits + 1
+			team.lostMetal = team.lostMetal + worth
+			
+			local allyTeam = allyTeams[team.friendlyAllyTeam]
+			allyTeam.lostUnits = allyTeam.lostUnits + 1
+			allyTeam.lostMetal = allyTeam.lostMetal + worth
+			doUpdate = true
+
+		end
+	end
+end
+
+function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
+	-- check if transfer is due to mind control 
+	local captureController = Spring.GetUnitRulesParam(unitID,"capture_controller");
+	if captureController == nil or captureController == -1 then 
+		-- unit is not presently mind controlled
+		if capturedUnits[unitID] and capturedUnits[unitID] == unitDefID then
+			-- unit was freed crom capture - refund score
+			capturedUnits[unitID] = nil;			
+			local buildProgress = select(5, GetUnitHealth(unitID))
+			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
+			local team = teams[unitTeamID]
+			team.lostUnits = team.lostUnits - 1
+			team.lostMetal = team.lostMetal - worth
+			
+			local allyTeam = allyTeams[team.friendlyAllyTeam]
+			allyTeam.lostUnits = allyTeam.lostUnits - 1
+			allyTeam.lostMetal = allyTeam.lostMetal - worth		
+			
+			doUpdate = true
+		end
+		-- unit is not presently or formerly mind controlled and is thus not a casualty.
+	else
+		if capturedUnits[unitID] and capturedUnits[unitID] == unitDefID then
+			Echo("<AttritionCounter>: unitGiven: captured by a new team while already captured, how peculiar")
+			-- unit has been captured before and is now captured by another owner. 
+			-- do nothing; shouldn't happen unless FFA, and this widget shuts down in FFA.
+		else
+			-- unit has now become mind-controlled for the first time; oldTeamID lost it
+			capturedUnits[unitID] = unitDefID; -- verify unitdef in case of ID recycling 
+			local buildProgress = select(5, GetUnitHealth(unitID))
+			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
+			local team = teams[oldTeamID]
+			team.lostUnits = team.lostUnits + 1
+			team.lostMetal = team.lostMetal + worth
+			
+			local allyTeam = allyTeams[team.friendlyAllyTeam]
+			allyTeam.lostUnits = allyTeam.lostUnits + 1
+			allyTeam.lostMetal = allyTeam.lostMetal + worth
+			doUpdate = true
+
+		end
+	end
+end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, attTeamID)	
 	
 	-- if its also the same kind of unit, its safe to assume that it is the very same unit
 	-- else it is most likely not the same unit but an old table entry and a re-used unitID. we just keep the entry
 	-- small margin of error remains
-	
-	if teamID == gaiaTeam or GetUnitHealth(unitID) > 0 then return end
+
+	if teamID == gaiaTeam then return end
 	
 	if deadUnits[unitID] and deadUnits[unitID] == unitDefID then
 		deadUnits[unitID] = nil
 		return 		
 	end
 	
+	capturedUnits[unitID] = nil;
+	
+		
 	deadUnits[unitID] = unitDefID
 
 		-- might just ignore gaia, it will set up a table for it and track its losses but nothing else will happen?
@@ -374,6 +468,11 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 
 	local ud = UnitDefs[unitDefID]
 	if ud.customParams.dontcount or ud.customParams.is_drone then return end
+	
+	-- ignore deaths of presently mind-controlled units 
+	local captureController = Spring.GetUnitRulesParam(unitID,"capture_controller");
+	Echo("<Attrition Counter>: UnitDestroyed: While owned by controller: "..tostring(captureController));
+	if captureController and captureController ~= -1 then return end
 		
 	local buildProgress = select(5, GetUnitHealth(unitID))
 	local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
