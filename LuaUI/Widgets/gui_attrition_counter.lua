@@ -457,7 +457,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	if GetUnitHealth(unitID) > 0 and buildProgress < 1 then return end
 	
 	-- don't count morphed units
-	local wasMorphed = Spring.GetUnitRulesParam(unitID, wasMorphedTo);
+	local wasMorphed = Spring.GetUnitRulesParam(unitID, "wasMorphedTo");
 	if wasMorphed then return end
 
 	if teamID == gaiaTeam then return end
