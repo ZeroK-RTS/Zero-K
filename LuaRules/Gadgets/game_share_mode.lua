@@ -239,7 +239,7 @@ end
 local function SendInvite(player, target) -- targetid is which player is the merger
 	if spGetGameFrame() > config.mintime then
 		local targetspec = select(3, spGetPlayerInfo(target, false))
-		local _,_,dead,ai = spGetTeamInfo(GetTeamID(target, false))
+		local _,_,dead,ai = spGetTeamInfo(GetTeamID(target), false)
 		if player == target or GetTeamID(target) == GetTeamID(player) then
 			spEcho("[Commshare] " .. select(1,spGetPlayerInfo(player, false)) .. " tried to merge with theirself or a squad member!")
 			return
