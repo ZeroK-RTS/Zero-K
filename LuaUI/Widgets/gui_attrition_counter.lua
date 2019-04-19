@@ -449,6 +449,9 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	-- if its also the same kind of unit, its safe to assume that it is the very same unit
 	-- else it is most likely not the same unit but an old table entry and a re-used unitID. we just keep the entry
 	-- small margin of error remains
+	
+	-- prevents morph and factory-cancel from counting as kill
+	if GetUnitHealth(unitID) > 0 then return end
 
 	if teamID == gaiaTeam then return end
 	
