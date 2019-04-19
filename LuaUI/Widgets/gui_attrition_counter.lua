@@ -376,8 +376,6 @@ function widget:UnitTaken(unitID, unitDefID, unitTeamID, newTeamID) --//will be 
 			doUpdate = true
 		end
 	else
-		-- this is most likely dead code because of the weird relationship between UnitGiven and UnitTaken
-		-- however there's no documentation i could find that explains it, so i feel unsafe otherwise.
 		if capturedUnits[unitID] and capturedUnits[unitID] == unitDefID then
 			Echo("<AttritionCounter>: unitTaken: captured by a new team while already captured, how peculiar")
 			-- unit has been captured before and is now captured by another owner. 
