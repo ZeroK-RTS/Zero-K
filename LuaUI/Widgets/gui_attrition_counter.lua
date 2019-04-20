@@ -355,14 +355,14 @@ end
 local deadUnits = {} -- in spec mode UnitDestroyed would sometimes be called twice for the same unit, so we need to prevent it from counting twice
 local capturedUnits = {} -- UnitTaken doesn't seem to have the luxury of reading capture_controller when unit is returned to owner
 
-function widget:UnitTaken(unitID, unitDefID, unitTeamID, newTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
+local function UnitTransfered(unitID, unitDefID, oldTeamID, newTeamID)
+	-- check if transfer is due to mind control 
 	local captureController = Spring.GetUnitRulesParam(unitID,"capture_controller");
 	if captureController == nil or captureController == -1 then 
 		-- unit is not presently mind controlled
 		if capturedUnits[unitID] and capturedUnits[unitID] == unitDefID then
-			--Echo("<AttritionCounter>: unitTaken: was formerly mind-controlled, refund score")
-			capturedUnits[unitID] = nil;
-			
+			-- unit was freed crom capture - refund score
+			capturedUnits[unitID] = nil;			
 			local buildProgress = select(5, GetUnitHealth(unitID))
 			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
 			local team = teams[newTeamID]
@@ -376,55 +376,8 @@ function widget:UnitTaken(unitID, unitDefID, unitTeamID, newTeamID) --//will be 
 			doUpdate = true
 		end
 	else
-		if capturedUnits[unitID] and capturedUnits[unitID] == unitDefID then
-			Echo("<AttritionCounter>: unitTaken: captured by a new team while already captured, how peculiar")
-			-- unit has been captured before and is now captured by another owner. 
-			-- do nothing; shouldn't happen unless FFA, and this widget shuts down in FFA.
-		else
-			-- unit has now become mind-controlled for the first time; unitTeamID lost it
-			capturedUnits[unitID] = unitDefID; -- verify unitdef in case of ID recycling 
-			local buildProgress = select(5, GetUnitHealth(unitID))
-			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
-			local team = teams[unitTeamID]
-			team.lostUnits = team.lostUnits + 1
-			team.lostMetal = team.lostMetal + worth
-			
-			local allyTeam = allyTeams[team.friendlyAllyTeam]
-			allyTeam.lostUnits = allyTeam.lostUnits + 1
-			allyTeam.lostMetal = allyTeam.lostMetal + worth
-			doUpdate = true
-
-		end
-	end
-end
-
-function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
-	-- check if transfer is due to mind control 
-	local captureController = Spring.GetUnitRulesParam(unitID,"capture_controller");
-	if captureController == nil or captureController == -1 then 
-		-- unit is not presently mind controlled
-		if capturedUnits[unitID] and capturedUnits[unitID] == unitDefID then
-			-- unit was freed crom capture - refund score
-			capturedUnits[unitID] = nil;			
-			local buildProgress = select(5, GetUnitHealth(unitID))
-			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
-			local team = teams[unitTeamID]
-			team.lostUnits = team.lostUnits - 1
-			team.lostMetal = team.lostMetal - worth
-			
-			local allyTeam = allyTeams[team.friendlyAllyTeam]
-			allyTeam.lostUnits = allyTeam.lostUnits - 1
-			allyTeam.lostMetal = allyTeam.lostMetal - worth		
-			
-			doUpdate = true
-		end
-		-- unit is not presently or formerly mind controlled and is thus not a casualty.
-	else
-		if capturedUnits[unitID] and capturedUnits[unitID] == unitDefID then
-			Echo("<AttritionCounter>: unitGiven: captured by a new team while already captured, how peculiar")
-			-- unit has been captured before and is now captured by another owner. 
-			-- do nothing; shouldn't happen unless FFA, and this widget shuts down in FFA.
-		else
+		-- transfers of presently captured units are ignored; they are already dead to us 
+		if not (capturedUnits[unitID] and capturedUnits[unitID] == unitDefID) then
 			-- unit has now become mind-controlled for the first time; oldTeamID lost it
 			capturedUnits[unitID] = unitDefID; -- verify unitdef in case of ID recycling 
 			local buildProgress = select(5, GetUnitHealth(unitID))
@@ -437,9 +390,16 @@ function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be 
 			allyTeam.lostUnits = allyTeam.lostUnits + 1
 			allyTeam.lostMetal = allyTeam.lostMetal + worth
 			doUpdate = true
-
 		end
 	end
+end
+
+function widget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
+	UnitTransfered(unitID, unitDefID, oldTeamID, newTeamID);
+end
+
+function widget:UnitGiven(unitID, unitDefID, newTeamID, oldTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
+	UnitTransfered(unitID, unitDefID, oldTeamID, newTeamID);
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, attTeamID)	
