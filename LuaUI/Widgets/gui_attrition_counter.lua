@@ -450,7 +450,8 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	
 	
 	
-	-- prevents factory-cancel from counting as kill
+	-- prevents factory-cancel from counting as kill.
+	-- TODO: only count mobile units because statics are never factory-made
 	local buildProgress = select(5, GetUnitHealth(unitID))
 	if GetUnitHealth(unitID) > 0 and buildProgress < 1 then return end
 	
@@ -478,7 +479,6 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	
 	-- ignore deaths of presently mind-controlled units 
 	local captureController = Spring.GetUnitRulesParam(unitID,"capture_controller");
-	Echo("<Attrition Counter>: UnitDestroyed: While owned by controller: "..tostring(captureController));
 	if captureController and captureController ~= -1 then return end
 		
 	local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
