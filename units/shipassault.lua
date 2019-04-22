@@ -97,9 +97,7 @@ unitDef = {
 		},
 
 		damage                  = {
-			default = 260,
-			planes  = 260,
-			subs    = 260,
+			default = 260.01,
 		},
 		
 		cegTag                  = [[sonictrail]],
@@ -141,8 +139,7 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 400,
-        subs    = 400,
+        default = 400.01,
       },
 
       edgeEffectiveness       = 0.5,
