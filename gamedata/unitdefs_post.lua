@@ -813,6 +813,20 @@ if Utilities.IsCurrentVersionNewerThan(104, 600) then
 			ud.customparams.requireheavytrans = 1
 		end
 	end
+else
+	--[[ old engines handle transporting rules entirely on their own,
+	     but mark units anyway so that other code doesn't need to
+	     replicate these checks ]]
+	local valkDef = UnitDefs.gunshiptrans
+	local valkMaxMass = valkDef.transportmass
+	local valkMaxSize = valkDef.transportsize
+	for name, ud in pairs (UnitDefs) do
+		if ud.mass > valkMaxMass
+		or ud.footprintx > valkMaxSize
+		or ud.footprintz > valkMaxSize then
+			ud.customparams.requireheavytrans = 1
+		end
+	end
 end
 
 local ai_start_units = VFS.Include("LuaRules/Configs/ai_commanders.lua")

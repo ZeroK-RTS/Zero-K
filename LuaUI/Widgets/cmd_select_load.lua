@@ -130,10 +130,6 @@ local function CopyMoveThenUnload(transportID, unitID)
 	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, queueToRemove, 0)
 end
 
-local valkMaxMass = UnitDefNames.gunshiptrans.transportMass
-local valkMaxSize = UnitDefNames.gunshiptrans.transportSize * 2
-local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(104, 600)
-
 local function DoSelectionLoad()
 	-- Find the units which can transport and the units which are transports
 	local selectedUnits = Spring.GetSelectedUnits()
@@ -158,20 +154,10 @@ local function DoSelectionLoad()
 						end
 					end
 				end
+			elseif ud.customParams.requireheavytrans then
+				heavy[#heavy + 1] = unitID
 			else
-				if REVERSE_COMPAT then
-					if (ud.mass > valkMaxMass) or (ud.xsize > valkMaxSize) or (ud.zsize > valkMaxSize) then
-						heavy[#heavy + 1] = unitID
-					else
-						light[#light + 1] = unitID
-					end
-				else
-					if ud.customParams.requireheavytrans then
-						heavy[#heavy + 1] = unitID
-					else
-						light[#light + 1] = unitID
-					end
-				end
+				light[#light + 1] = unitID
 			end
 		end
 	end
