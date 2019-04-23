@@ -629,11 +629,11 @@ function widget:Initialize()
   
   -- testing
   if TEST_MODE then
-    local str = '\255\255\255\0\In some remote\255\255\255\255 corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history" – yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
+    local str = '\255\255\255\0In some remote\255\255\255\255 corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history" – yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
     local str2 = 'Enemy nuclear silo spotted!'
     
-    local str3 = '\255\255\255\0\Colored\008 text'
-    local str4 = '\255\255\255\0\Colored text\008 2'
+    local str3 = '\255\255\255\0Colored\008 text'
+    local str4 = '\255\255\255\0Colored text\008 2'
     
     WG.ShowPersistentMessageBox(str, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
     --WG.ShowPersistentMessageBox(str4, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
