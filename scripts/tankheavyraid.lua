@@ -225,8 +225,6 @@ function script.Killed(severity, maxHealth)
 		Hide(tracks4)
 		return 2
 	end
-
-	return corpsetype
 end
 
 function script.Create()
