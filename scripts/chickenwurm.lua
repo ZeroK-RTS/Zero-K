@@ -19,7 +19,6 @@ local uwheight = -23
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
 local reloadTime = wd and WeaponDefs[wd].reload*30 or 30
-wd,unitDefID = nil
 
 --signals
 local SIG_Aim = 1
