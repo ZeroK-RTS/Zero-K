@@ -290,7 +290,6 @@ local function Burrow()
 		end
 		Sleep(500)
 	end
-	StartThread(BodyControl)
 end
 
 local function UnBurrow()

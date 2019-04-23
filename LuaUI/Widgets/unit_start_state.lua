@@ -883,7 +883,6 @@ local function GetFactoryDefState(unitDefName, stateName)
 	else
 		return state
 	end
-	return nil
 end
 
 local function GetStateValue(unitDefName, stateName)

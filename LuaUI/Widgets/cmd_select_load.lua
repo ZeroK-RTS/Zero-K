@@ -75,15 +75,13 @@ local function ProcessCommand(unitID, cmdID, params)
 		end
 	end
 	
+	local moveParams = {1, 2, 3}
 	if cmdID == CMD.RESURRECT or cmdID == CMD.RECLAIM then
-		local x, y, z = Spring.GetFeaturePosition((targetOverride or params[1] or 0) - MAX_UNITS)
-		return true, halting, {x, y, z}
+		moveParams[1], moveParams[2], moveParams[3] = Spring.GetFeaturePosition((targetOverride or params[1] or 0) - MAX_UNITS)
 	else
-		local x, y, z = Spring.GetUnitPosition(targetOverride or params[1])
-		return true, halting, {x, y, z}
+		moveParams[1], moveParams[2], moveParams[3] = Spring.GetUnitPosition(targetOverride or params[1])
 	end
-	
-	return true
+	return true, halting, moveParams
 end
 
 --------------------------------------------------------------------------------
