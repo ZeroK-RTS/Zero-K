@@ -265,8 +265,8 @@ local function makePylonListVolume(onlyActive, onlyDisabled)
 						end
 					end
 				end
+				break
 			end
-			break
 		end
 	end
 	-- Keep clean for everyone after us

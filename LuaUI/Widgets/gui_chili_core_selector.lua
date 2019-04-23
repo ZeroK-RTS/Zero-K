@@ -1054,10 +1054,8 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 		local queue = Spring.GetFullBuildQueue(unitID) or {}
 		local constructionCount = 0
 		for i = 1, #queue do
-			for udid, num in pairs(queue[i]) do
-				constructionCount = constructionCount + num
-				break
-			end
+			local udid, num = next(queue[i])
+			constructionCount = constructionCount + num
 		end
 		
 		UpdateTooltip(constructionCount)

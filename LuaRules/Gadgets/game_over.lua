@@ -216,17 +216,11 @@ local function CountAllianceValue(allianceID)
 end
 
 local function HasNoComms(allianceID)
-	for unitID in pairs(commsAlive[allianceID]) do
-		return false
-	end
-	return true
+	return not next(commsAlive[allianceID])
 end
 
 local function HasNoVitalUnits(allianceID)
-	for unitID in pairs(vitalAlive[allianceID]) do
-		return false
-	end
-	return true
+	return not next(vitalAlive[allianceID])
 end
 
 local function EchoUIMessage(message)

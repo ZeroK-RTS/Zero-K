@@ -847,7 +847,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		if options.separateConstructors.value then -- if constructor separator is enabled
 			local facDef = UnitDefs[spGetUnitDefID(builderID)]
 			local facScale -- how far our unit will be told to move
-			if IsEmpty(buildQueue) then -- if the queue is empty, we need to increase clearance to stop the fac from getting jammed with idle workers
+			if not next(buildQueue) then -- if the queue is empty, we need to increase clearance to stop the fac from getting jammed with idle workers
 				facScale = 350
 			elseif facDef.name == 'factoryship' then -- boatfac, needs a huge clearance
 				facScale = 250
@@ -2032,7 +2032,7 @@ function CleanOrders(cmd, isNew)
 						activeJobs[blockerID] = nil -- note this only stops a tiny space leak should a free starting fac be added to the queue
 						-- but it was cheap, so whatever.
 					end
-				elseif canBuildThisThere == blockageType.mobiles and includedBuilders[blockerID] and UnitDefs[blockerDefID].moveDef.id and (includedBuilders[blockerID].cmdtype == commandType.idle or includedBuilders[blockerID].cmdtype == commandType.buildQueue) and not IsEmpty(cmd.assignedUnits) then
+				elseif canBuildThisThere == blockageType.mobiles and includedBuilders[blockerID] and UnitDefs[blockerDefID].moveDef.id and (includedBuilders[blockerID].cmdtype == commandType.idle or includedBuilders[blockerID].cmdtype == commandType.buildQueue) and next(cmd.assignedUnits) then
 				-- if blocked by a mobile unit, and it's one of our constructors, and not a flying unit, and it's not under direct orders, and there's actually a worker assigned to the job...
 					local x,y,z = spGetUnitPosition(blockerID)
 					local dx, dz = GetNormalizedDirection(cx, cz, x, z) 
@@ -2381,14 +2381,6 @@ function GetNormalizedDirection(x1, z1, x2, z2)
 	x = x/d
 	z = z/d
 	return x, z
-end
-
--- determines if a table is empty, because lua does not provide a built in way to do that.
-function IsEmpty(table)
-	for _ in pairs(table) do
-		return false
-	end
-	return true
 end
 
 --	Generate unique key value for each command using its parameters.
