@@ -475,6 +475,29 @@ local function setupTerraunit(unitID, team, x, y, z)
 	})
 end
 
+local function GetTerraunitLeashedSpot(teamID, anchorX, anchorZ, biasX, biasZ)
+	local x, z
+
+	local vx = biasX - anchorX
+	local vz = biasZ - anchorZ
+
+	local leashLength = sqrt(vx*vx + vz*vz)
+	if leashLength > terraUnitLeash then
+		-- cruel leash!
+		local leashScale = terraUnitLeash / leashLength
+		x = anchorX + leashScale * vx
+		z = anchorZ + leashScale * vz
+	else
+		x = biasX
+		z = biasZ
+	end
+
+	x, z = getPointInsideMap(x, z)
+	local y = CallAsTeam(teamID, spGetGroundHeight, x, z)
+
+	return x, y, z
+end
+
 local function AddFallbackCommand(teamID, commandTag, terraunits, terraunitList, commandX, commandZ)
 	fallbackCommands[teamID] = fallbackCommands[teamID] or {}
 	
@@ -859,11 +882,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
 			local pos = segment[i].position
-			local vx, vz = unitsX - segment[i].position.x, unitsZ - segment[i].position.z
-			local scale = terraUnitLeash/sqrt(vx^2 + vz^2)
-			local terraunitX, terraunitZ = segment[i].position.x + scale*vx, segment[i].position.z + scale*vz
-
-			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
+			local terraunitX, teamY, terraunitZ = GetTerraunitLeashedSpot(team, pos.x, pos.z, unitsX, unitsZ)
 			
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			
@@ -875,8 +894,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				end
 				rampLevels.data[rampLevels.count].count = rampLevels.data[rampLevels.count].count + 1
 				rampLevels.data[rampLevels.count].data[rampLevels.data[rampLevels.count].count] = id
-			
-				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
+
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 				spSetUnitRulesParam(id, "terraformType", 4) --ramp
 			
@@ -887,7 +905,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				terraformOrder[terraformOrders].indexes = terraformOrder[terraformOrders].indexes + 1
 				
 				terraformUnit[id] = {
-					positionAnchor = segment[i].position, 
+					positionAnchor = pos,
 					position = {x = terraunitX, z = terraunitZ}, 
 					progress = 0, 
 					lastUpdate = 0, 
@@ -1324,18 +1342,13 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 			
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
 			local pos = segment[i].position
-			local vx, vz = unitsX - segment[i].position.x, unitsZ - segment[i].position.z
-			local scale = terraUnitLeash/sqrt(vx^2 + vz^2)
-			local terraunitX, terraunitZ = segment[i].position.x + scale*vx, segment[i].position.z + scale*vz
-			
-			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
+			local terraunitX, teamY, terraunitZ = GetTerraunitLeashedSpot(team, pos.x, pos.z, unitsX, unitsZ)
 			
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			if not id then
 				-- TODO: notify user? SendToUnsynced("terra_failed_unitlimit", team, terraunitX, terraunitZ) -> Script.LuaUI.something -> Spring.MarkerAddPoint
 			else
 				spSetUnitHealth(id, 0.01)
-				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 				spSetUnitRulesParam(id, "terraformType", terraform_type)
 			
@@ -1346,7 +1359,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 				terraformOrder[terraformOrders].indexes = terraformOrder[terraformOrders].indexes + 1
 
 				terraformUnit[id] = {
-					positionAnchor = segment[i].position, 
+					positionAnchor = pos,
 					position = {x = terraunitX, z = terraunitZ}, 
 					progress = 0, 
 					lastUpdate = 0, 
@@ -1848,11 +1861,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 			
 			--Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
 			local pos = segment[i].position
-			local vx, vz = unitsX - segment[i].position.x, unitsZ - segment[i].position.z
-			local scale = terraUnitLeash/sqrt(vx^2 + vz^2)
-			local terraunitX, terraunitZ = segment[i].position.x + scale*vx, segment[i].position.z + scale*vz
-			
-            local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
+			local terraunitX, teamY, terraunitZ = GetTerraunitLeashedSpot(team, pos.x, pos.z, unitsX, unitsZ)
 			
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			
@@ -1864,7 +1873,6 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 				aveX = aveX + segment[i].position.x
 				aveZ = aveZ + segment[i].position.z
 				
-				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 				spSetUnitRulesParam(id, "terraformType", terraform_type)
 			
@@ -1875,7 +1883,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 				terraformOrder[terraformOrders].indexes = terraformOrder[terraformOrders].indexes + 1
 
 				terraformUnit[id] = {
-					positionAnchor = segment[i].position, 
+					positionAnchor = pos,
 					position = {x = terraunitX, z = terraunitZ}, 
 					progress = 0, 
 					lastUpdate = 0, 
@@ -3119,14 +3127,9 @@ function gadget:GameFrame(n)
 								local cx, _, cz = spGetUnitPosition(constructorTable[currentCon])
 								local team = spGetUnitTeam(constructorTable[currentCon])
 								if cx and team then
+
 									local tpos = terraformUnit[cQueue[i].params[1] ].positionAnchor
-									local vx, vz = cx - tpos.x, cz - tpos.z
-									local scale = terraUnitLeash/sqrt(vx^2 + vz^2)
-									
-									local x,z = tpos.x + scale*vx, tpos.z + scale*vz
-									local y = CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
-									
-									x, z = getPointInsideMap(x,z)
+									local x, y, z = GetTerraunitLeashedSpot(team, tpos.x, tpos.z, cx, cz)
 									terraformUnit[cQueue[i].params[1] ].position = {x = x, z = z}
 									spSetUnitPosition(cQueue[i].params[1], x, y , z)
 									--Spring.MoveCtrl.Enable(cQueue[i].params[1])
