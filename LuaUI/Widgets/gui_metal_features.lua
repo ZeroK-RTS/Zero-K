@@ -73,11 +73,12 @@ options = {
 	},
 
 	minmetal = {
-		name = 'Metal Needed to Highlight',
+		name = 'Minimum Reclaim To Highlight',
+		desc = "Metal below this amount will not be highlighted",
 		type = "number", 
 		value = 1, 
 		min = 1,
-		max = 50,
+		max = 200,
 		step = 1,
 	},
 }
@@ -97,6 +98,13 @@ local function DrawWorldFunc()
     return false
   end
 
+  -- Minimum Metal Setting should not interfere with reclaim and area reclaim
+  if hilite then
+    minMetalShown = 1
+  else
+    minMetalShown = options.minmetal.value
+  end
+
   -- ways to bypass heavy resource load in economy overlay
   if (pregame and options.pregamehighlight.value) or hilite 
     or (options.showhighlight.value == 'always' and spGetMapDrawMode() ~= 'metal') 
@@ -114,7 +122,7 @@ local function DrawWorldFunc()
     local features = Spring.GetVisibleFeatures()
     for _, fID in pairs(features) do
       local metal = Spring.GetFeatureResources(fID)
-      if (metal and (metal > options.minmetal.value)) then
+      if (metal and (metal > minMetalShown)) then
         -- local aTeam = Spring.GetFeatureAllyTeam(fID)
         -- if (aTeam ~= myAllyTeam) then
           local x100  = 100  / (100  + metal)
