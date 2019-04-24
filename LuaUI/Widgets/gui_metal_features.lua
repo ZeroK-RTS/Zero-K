@@ -36,7 +36,7 @@ local spGetGameFrame = Spring.GetGameFrame
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Map/Reclaimables'
-options_order = { 'showhighlight','intensity','pregamehighlight','minmetal'}
+options_order = { 'showhighlight','pregamehighlight','intensity','minmetal'}
 options = {
 	showhighlight = {
 		name = 'Show Reclaim on Economy Overlay',
@@ -54,14 +54,11 @@ options = {
 	intensity = {
 		name = 'Highlighted Reclaim Brightness',
 		desc = "Increase or decrease visibility of effect",
-		type = 'radioButton',
-		value = '1',
-		items = {
-			{key ='1', name='High'},
-			{key ='2',  name='Medium'},
-			{key ='3',  name='Low'},
-		},
-		noHotkey = true,
+		type = "number", 
+		value = 100, 
+		min = 20,
+		max = 100,
+		step = 20,
 	},
 
 	pregamehighlight = {
@@ -115,7 +112,7 @@ local function DrawWorldFunc()
   
     local timer = widgetHandler:GetHourTimer()
     local intensity = options.intensity.value
-    local alpha = (0.25/intensity) + (0.5 / intensity * math.abs(1 - (timer * 2) % 2))
+    local alpha = (0.25*(intensity/100)) + (0.5 * (intensity/100) * math.abs(1 - (timer * 2) % 2))
   
     local myAllyTeam = Spring.GetMyAllyTeamID()
   
