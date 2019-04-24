@@ -54,8 +54,6 @@ local function DrawWorldFunc()
   for _, fID in pairs(features) do
     local metal = Spring.GetFeatureResources(fID)
     if (metal and (metal > 1)) then
-      -- local aTeam = Spring.GetFeatureAllyTeam(fID)
-      -- if (aTeam ~= myAllyTeam) then
         local x100  = 100  / (100  + metal)
         local x1000 = 1000 / (1000 + metal)
         local r = 1 - x1000
