@@ -381,7 +381,7 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 	
 	local function SitLoop()
 		local previousDir, currentDir
-		local pitch, yaw, roll, pitch, yaw, roll
+		local pitch, yaw, roll
 		local px, py, pz, dx, dy, dz, vx, vy, vz, offx, offy, offz
 		-- local magnitude, newPadHeading
 		

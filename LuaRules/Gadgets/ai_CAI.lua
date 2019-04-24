@@ -3259,7 +3259,6 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 				local x,y,z = spGetUnitPosition(unitID)
 				local mx,my,mz = getPositionTowardsMiddle(unitID, 500, 25)
 				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250, -25)
-				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250, -25)
 				if not built then
 					editDefenceHeatmap(unitTeam,unitID,buildDefs.factoryByDefId[unitDefID].defenceQuota,buildDefs.factoryByDefId[unitDefID].airDefenceQuota,buildDefs.factoryByDefId[unitDefID].defenceRange,1,1)
 				end

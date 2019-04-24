@@ -24,7 +24,6 @@ local DEBUG_MODE = false
 --local defenderTeam = nil
 local defenderFaction = Spring.GetModOptions().defendingfaction ~= "Mercenary"
 
-local spAreTeamsAllied = Spring.AreTeamsAllied
 local floor = math.floor
 
 include "LuaRules/Configs/customcmds.h.lua"

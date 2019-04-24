@@ -55,7 +55,6 @@ local spTestBuildOrder       = Spring.TestBuildOrder
 local spGetGameSeconds       = Spring.GetGameSeconds
 local spGetUnitHeading       = Spring.GetUnitHeading
 local spSetUnitNoDraw        = Spring.SetUnitNoDraw
-local spSetUnitNoDraw        = Spring.SetUnitNoDraw
 local spGetGameFrame         = Spring.GetGameFrame
 local spGetUnitDefID         = Spring.GetUnitDefID
 local spGetUnitTeam          = Spring.GetUnitTeam

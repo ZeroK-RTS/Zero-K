@@ -66,7 +66,6 @@ local spSetUnitLosMask      = Spring.SetUnitLosMask
 local spGetTeamInfo         = Spring.GetTeamInfo
 local spGetUnitHealth       = Spring.GetUnitHealth
 local spSetUnitHealth       = Spring.SetUnitHealth
-local spGetCommandQueue     = Spring.GetCommandQueue
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spAddHeightMap        = Spring.AddHeightMap

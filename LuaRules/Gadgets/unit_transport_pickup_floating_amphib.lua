@@ -25,7 +25,6 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spSetUnitMoveGoal = Spring.SetUnitMoveGoal
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetCommandQueue = Spring.GetCommandQueue
-local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam

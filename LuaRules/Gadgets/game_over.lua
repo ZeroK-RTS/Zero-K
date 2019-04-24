@@ -127,7 +127,6 @@ local aiTeamResign = not (isScriptMission or campaignBattleID or (Spring.GetModO
 
 local vitalConstructorAllyTeam = {}
 local vitalAlive = {}
-local allyTeams = spGetAllyTeamList()
 for i = 1, #allyTeams do
 	local allyTeamID = allyTeams[i]
 	vitalAlive[allyTeamID] = {}
