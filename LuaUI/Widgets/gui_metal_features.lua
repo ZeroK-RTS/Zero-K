@@ -36,7 +36,7 @@ local spGetGameFrame = Spring.GetGameFrame
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Map/Reclaimables'
-options_order = { 'showhighlight','intensity','pregamehighlight'}
+options_order = { 'showhighlight','intensity','pregamehighlight','minmetal'}
 options = {
 	showhighlight = {
 		name = 'Show Reclaim on Economy Overlay',
@@ -59,7 +59,7 @@ options = {
 		items = {
 			{key ='1', name='High'},
 			{key ='2',  name='Medium'},
-			{key ='4',  name='Low'},
+			{key ='3',  name='Low'},
 		},
 		noHotkey = true,
 	},
@@ -70,6 +70,15 @@ options = {
 		type = 'bool',
 		value = false,
 		noHotkey = true,
+	},
+
+	minmetal = {
+		name = 'Metal Needed to Highlight',
+		type = "number", 
+		value = 1, 
+		min = 1,
+		max = 50,
+		step = 1,
 	},
 }
 
@@ -105,7 +114,7 @@ local function DrawWorldFunc()
     local features = Spring.GetVisibleFeatures()
     for _, fID in pairs(features) do
       local metal = Spring.GetFeatureResources(fID)
-      if (metal and (metal > 1)) then
+      if (metal and (metal > options.minmetal.value)) then
         -- local aTeam = Spring.GetFeatureAllyTeam(fID)
         -- if (aTeam ~= myAllyTeam) then
           local x100  = 100  / (100  + metal)
