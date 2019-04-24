@@ -96,7 +96,6 @@ local function SecondsToClock(seconds)
 			return mins..":"..secs
 		end
 	end
-	return "unknown"
 end
 
 local function DisposeWindow()

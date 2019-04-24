@@ -28,7 +28,6 @@ end
 local FindUnitCmdDesc = Spring.FindUnitCmdDesc
 local GetUnitPosition = Spring.GetUnitPosition
 local GetGroundHeight = Spring.GetGroundHeight
-local GetUnitPosition = Spring.GetUnitPosition
 local disableWind
 --values: {unitID, reason,}
 local alwaysDisableTable = {}

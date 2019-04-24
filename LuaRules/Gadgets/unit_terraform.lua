@@ -66,7 +66,6 @@ local spSetUnitLosMask      = Spring.SetUnitLosMask
 local spGetTeamInfo         = Spring.GetTeamInfo
 local spGetUnitHealth       = Spring.GetUnitHealth
 local spSetUnitHealth       = Spring.SetUnitHealth
-local spGetCommandQueue     = Spring.GetCommandQueue
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spAddHeightMap        = Spring.AddHeightMap
@@ -452,7 +451,7 @@ end
 
 local function setupTerraunit(unitID, team, x, y, z)
 
-	local y = y or CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
+	y = y or CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
 
 	Spring.MoveCtrl.Enable(unitID)
 	Spring.MoveCtrl.SetPosition(unitID, x, y or 0, z)
@@ -3383,7 +3382,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 				end
 			end 
 			
-			local posY = makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
+			posY = makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
 			
 			if (not biggestChange) or (math.random() < biggestChange/2) then
 				spSetHeightMapFunc(

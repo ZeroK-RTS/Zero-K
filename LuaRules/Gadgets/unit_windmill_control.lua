@@ -155,8 +155,6 @@ local function SetupUnit(unitID)
 	local unitDefID = spGetUnitDefID(unitID)
 	local midy = (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].model.midy) or 18
 	
-	local unitDefID = spGetUnitDefID(unitID)
-	
 	local scriptIDs = {}
 
 	local x, y, z = spGetUnitPosition(unitID)

@@ -393,7 +393,6 @@ local function ShrinkRadius(cloaker)
     cloaker.radius = 0
     return 0
   end
-  local r = cloaker.radius
   r = (r * r) - cloaker.def.shrinkRate
   r = (r < 0) and 0 or math.sqrt(r)
   cloaker.radius = r
@@ -807,8 +806,6 @@ local GetSpectatingState  = Spring.GetSpectatingState
 local GetLocalAllyTeamID  = Spring.GetLocalAllyTeamID
 local IsUnitSelected      = Spring.IsUnitSelected
 local GetUnitAllyTeam     = Spring.GetUnitAllyTeam
-local GetLocalAllyTeamID  = Spring.GetLocalAllyTeamID
-local GetUnitViewPosition = Spring.GetUnitViewPosition
 local DrawGroundCircle    = gl.DrawGroundCircle
 
 function gadget:DrawWorld()

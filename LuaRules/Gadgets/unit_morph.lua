@@ -738,7 +738,7 @@ function gadget:GameFrame(n)
 end
 
 local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
-	local morphDef = nil
+	local morphDef, _
 	if cmdID == CMD_MORPH then
 		if type(GG.MorphInfo[unitDefID]) ~= "table" then
 			--Spring.Echo('Morph gadget: CommandFallback generic morph on non morphable unit')
@@ -749,10 +749,7 @@ local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
 			morphDef=(morphDefs[unitDefID] or {})[GG.MorphInfo[unitDefID][cmdParams[1]]]
 		else
 			--Spring.Echo('Morph gadget: CommandFallback generic morph, default target')
-			for _, md in pairs(morphDefs[unitDefID]) do
-				morphDef = md
-				break
-			end
+			_, morphDef = next(morphDefs[unitDefID])
 		end
 	else
 		--Spring.Echo('Morph gadget: CommandFallback specific morph')
@@ -831,18 +828,14 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			morphUnits[unitID] = nil
 		end
 	elseif (cmdID >= CMD_MORPH and cmdID <= CMD_MORPH+MAX_MORPH) then
-		local morphDef = nil
+		local morphDef, _
 		if cmdID == CMD_MORPH then
 			if type(GG.MorphInfo[unitDefID]) ~= "table" then
 				--Spring.Echo('Morph gadget: AllowCommand generic morph on non morphable unit')
 				return false
 			elseif #cmdParams == 0 then
 				--Spring.Echo('Morph gadget: AllowCommand generic morph, default target')
-				--return true
-				for _, md in pairs(morphDefs[unitDefID]) do
-					morphDef = md
-					break
-				end
+				_, morphDef = next(morphDefs[unitDefID])
 			elseif GG.MorphInfo[unitDefID][cmdParams[1]] then
 				--Spring.Echo('Morph gadget: AllowCommand generic morph, target valid')
 				--return true

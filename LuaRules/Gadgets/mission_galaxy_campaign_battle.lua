@@ -340,7 +340,7 @@ end
 
 local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 	local objectiveData = bonusObjectiveList[bonusObjectiveID]
-	gameSeconds = gameSeconds or math.floor(Spring.GetGameFrame()/30), victory
+	gameSeconds = gameSeconds or math.floor(Spring.GetGameFrame()/30)
 	
 	-- Cbeck whether the objective is open
 	if objectiveData.terminated then

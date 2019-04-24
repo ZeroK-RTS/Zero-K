@@ -151,12 +151,6 @@ function widget:CommandsChanged()
 	})
 end
 
-function widget:GameFrame(f)
-	if f % 30 == 0 then
-		--GetHavens()
-	end
-end
-	
 local function DrawWorldFunc()
 	local fade = abs((spGetGameFrame() % 40) - 20) / 20
 	--Draw ambulance on havens.

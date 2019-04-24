@@ -1579,7 +1579,7 @@ local function tooltipBreakdown(tooltip)
 		local ud = name and UnitDefNames[name]
 		return ud or false
 	elseif tooltip:find('Morph', 1, true) == 1 then
-		local unitHumanName = tooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \-]', '')
+		local unitHumanName = tooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \\-]', '')
 		local udef = GetUnitDefByHumanName(unitHumanName)
 		return udef or false
 			

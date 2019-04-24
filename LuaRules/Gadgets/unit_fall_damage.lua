@@ -303,7 +303,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		vx, vy, vz = tx*tf + nx*nf - vx, ty*tf + ny*nf - vy, tz*tf + nz*nf - vz
 		GG.AddGadgetImpulseRaw(unitID, vx, vy, vz, true, true)
 		
-		local env = Spring.UnitScript.GetScriptEnv(unitID)
 		if env and env.script.StopMoving then
 			env.script.StopMoving()
 		end

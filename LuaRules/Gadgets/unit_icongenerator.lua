@@ -773,9 +773,10 @@ local function PrepareForScaling(bottom,left,width,height,wantedX,wantedY,border
   local marginX,marginY  = wantX - width, wantY - height;
   local leftmargin,btmmargin  = marginX*0.5 - (marginX*0.5)%1, marginY*0.5 - (marginY*0.5)%1;
 
-  local bottom,left = bottom - btmmargin, left - leftmargin;
-  local height   = height + marginY;
-  local width    = width  + marginX;
+  bottom = bottom - btmmargin
+  left = left - leftmargin;
+  height = height + marginY;
+  width  = width  + marginX;
 
   if (scaleX>scaleY) then
     bottom,left  = bottom-border*scaleX,left-border*scaleX
@@ -1069,7 +1070,6 @@ local schemes,resolutions,ratios = {},{},{}
   local function UnitCreated(_,uid,defname)
     jobsInSynced = jobsInSynced - 1
 
-    local uid,defname = uid,defname;
     jobs[#jobs+1] = function() CreateIcon(UnitDefNames[defname].id,uid) end;
 
     gadget.DrawGenesis = ProcessJobs;

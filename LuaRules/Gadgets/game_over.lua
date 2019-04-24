@@ -127,7 +127,6 @@ local aiTeamResign = not (isScriptMission or campaignBattleID or (Spring.GetModO
 
 local vitalConstructorAllyTeam = {}
 local vitalAlive = {}
-local allyTeams = spGetAllyTeamList()
 for i = 1, #allyTeams do
 	local allyTeamID = allyTeams[i]
 	vitalAlive[allyTeamID] = {}
@@ -216,17 +215,11 @@ local function CountAllianceValue(allianceID)
 end
 
 local function HasNoComms(allianceID)
-	for unitID in pairs(commsAlive[allianceID]) do
-		return false
-	end
-	return true
+	return not next(commsAlive[allianceID])
 end
 
 local function HasNoVitalUnits(allianceID)
-	for unitID in pairs(vitalAlive[allianceID]) do
-		return false
-	end
-	return true
+	return not next(vitalAlive[allianceID])
 end
 
 local function EchoUIMessage(message)

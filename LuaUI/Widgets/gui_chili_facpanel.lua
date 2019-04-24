@@ -639,11 +639,8 @@ local function UpdateFacQ(i, facInfo)
 	--echo'updating facq'
 	
 	for j,v in ipairs(buildQueue) do
-		for id, num in pairs(v) do
-			unitDefIDb = id
-			count = num
-			break
-		end
+		local unitDefIDb, count = next(v)
+
 		local qButton = MakeButton(unitDefIDb, facInfo.unitID, j..'-'..unitDefIDb, i, j )
 		local qCount = qButton.childrenByName['count']
 		

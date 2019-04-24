@@ -452,8 +452,9 @@ function gadget:GameFrame(f)
 								Spring.MoveCtrl.Disable(teleportiee)
 							end
 							
-							local ux, uy, uz = Spring.GetUnitPosition(teleportiee)
-							Spring.SpawnCEG("teleport_in", ux, uy, uz, 0, 0, 0, size)
+							-- actual pos might not match nominal destination due to floating amphs
+							local ax, ay, az = Spring.GetUnitPosition(teleportiee)
+							Spring.SpawnCEG("teleport_in", ax, ay, az, 0, 0, 0, size)
 							
 							local mx, mz = tx + offset[tele[tid].offsetIndex].x*(size*4 + 120), tz + offset[tele[tid].offsetIndex].z*(size*4 + 120)
 							GiveClampedMoveGoalToUnit(teleportiee, mx, mz)

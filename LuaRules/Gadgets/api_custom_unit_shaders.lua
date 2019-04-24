@@ -235,9 +235,9 @@ end
 --------------------------------------------------------------------------------
 
 local function GetObjectMaterial(rendering, objectDefID)
-  local mat = rendering.bufMaterials[objectDefID]
-  if mat then
-    return mat
+  local bufMat = rendering.bufMaterials[objectDefID]
+  if bufMat then
+    return bufMat
   end
 
 

@@ -170,11 +170,4 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(nuke, SFX.NONE)
 		return 2
 	end
-	Explode(base, SFX.NONE)
-	Explode(tube, SFX.SHATTER + SFX.EXPLODE_ON_HIT)
-	Explode(doorl, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-	Explode(doorr, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-	Explode(tower, SFX.NONE)
-	Explode(nuke, SFX.NONE)
-	return 2
 end

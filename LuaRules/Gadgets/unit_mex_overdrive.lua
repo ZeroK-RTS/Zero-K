@@ -1196,7 +1196,6 @@ function gadget:GameFrame(n)
 			end
 
 			--// check if pylons disable due to low grid power (eg weapons)
-			local list = pylonList[allyTeamID]
 			for i = 1, list.count do
 				local unitID = list.data[i]
 				local pylonData = pylon[allyTeamID][unitID]
@@ -1312,7 +1311,6 @@ function gadget:GameFrame(n)
 			end
 
 			--// Update pylon tooltips
-			local list = pylonList[allyTeamID]
 			for i = 1, list.count do
 				local unitID = list.data[i]
 				local pylonData = pylon[allyTeamID][unitID]

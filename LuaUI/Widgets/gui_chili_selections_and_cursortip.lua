@@ -2180,7 +2180,7 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	
 	-- Mouseover morph tooltip (screen0.currentTooltip)
 	if chiliTooltip and string.find(chiliTooltip, "Morph") then
-		local unitHumanName = chiliTooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \-]', '')
+		local unitHumanName = chiliTooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \\-]', '')
 		local morphTime = chiliTooltip:gsub('.*time:(.*)metal.*', '%1'):gsub('[^%d]', '')
 		local morphCost = chiliTooltip:gsub('.*metal: (.*)energy.*', '%1'):gsub('[^%d]', '')
 		local unitDefID = GetUnitDefByHumanName(unitHumanName)

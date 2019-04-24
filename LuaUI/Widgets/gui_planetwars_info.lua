@@ -90,17 +90,17 @@ local function CreateStructureButton(holder, index)
 	local externalFunctions = {}
 	
 	function externalFunctions.Destroy()
-		structureName:SetCaption("\255\255\0\0\x " .. humanName)
+		structureName:SetCaption("\255\255\0\0x " .. humanName)
 	end
 	function externalFunctions.Evacuate()
-		structureName:SetCaption("\255\0\255\255\~ " .. humanName)
+		structureName:SetCaption("\255\0\255\255~ " .. humanName)
 	end
 	function externalFunctions.Teleporting()
 		flashState = not flashState
 		if flashState then
-			structureName:SetCaption("\255\0\205\255\- " .. humanName)
+			structureName:SetCaption("\255\0\205\255- " .. humanName)
 		else
-			structureName:SetCaption("\255\0\255\205\- " .. humanName)
+			structureName:SetCaption("\255\0\255\205- " .. humanName)
 		end
 	end
 	

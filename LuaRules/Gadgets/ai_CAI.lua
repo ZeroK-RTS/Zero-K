@@ -2838,18 +2838,8 @@ local function initialiseFaction(team)
 		return true
 	end
 	
-	local shortname = Game.modShortName
-	
-	-- FIXME: 	this is to allow CAI to work in missions
-	--		it has the side effect of assuming the mod is always ZK,
-	--		which is kind of hacky and should probably be changed
-	--		on the other hand the previous code wasn't flexible either!
-	if true then	--if shortname == "ZK" then
-		a.buildDefs = a.buildConfig.robots
-		return true
-	end
-	
-	return false
+	a.buildDefs = a.buildConfig.robots
+	return true
 end
 
 local function echoEnemyForceComposition(allyTeam)
@@ -3268,7 +3258,6 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 			elseif ud.isFactory and buildDefs.factoryByDefId[unitDefID] then -- factory
 				local x,y,z = spGetUnitPosition(unitID)
 				local mx,my,mz = getPositionTowardsMiddle(unitID, 500, 25)
-				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250, -25)
 				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250, -25)
 				if not built then
 					editDefenceHeatmap(unitTeam,unitID,buildDefs.factoryByDefId[unitDefID].defenceQuota,buildDefs.factoryByDefId[unitDefID].airDefenceQuota,buildDefs.factoryByDefId[unitDefID].defenceRange,1,1)
@@ -3891,8 +3880,8 @@ local function SetFactoryDefImportance(team, factoryDefID, importance)
 end
 
 local function RemoveUnit(unitID, unitDefID, unitTeam)
-	local unitDefID = unitDefID or spGetUnitDefID(unitID)
-	local unitTeam = unitTeam or spGetUnitTeam(unitID)
+	unitDefID = unitDefID or spGetUnitDefID(unitID)
+	unitTeam = unitTeam or spGetUnitTeam(unitID)
 	if not aiTeamData[unitTeam] then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "attempt to remove unit from a non-existent CAI team")
 	end
