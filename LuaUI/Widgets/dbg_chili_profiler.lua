@@ -116,7 +116,6 @@ local function ResetProfiler()
 	sample_tree = {}
 	samples = 0
 	label0:SetCaption("Samples: " .. samples)
-	profiling = false
 end
 
 --------------------------------------------------------------------------------
