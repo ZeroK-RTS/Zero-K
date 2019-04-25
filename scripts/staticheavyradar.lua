@@ -16,7 +16,7 @@ local SIG_CLOSE = 1
 local SIG_OPEN = 2
 
 function script.Create()
-	if not GG.Script.onWater() then 
+	if not GG.Script.onWater(unitID) then
 		--Hide(float1)
 		--Hide(float2)
 	end

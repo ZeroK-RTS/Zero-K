@@ -131,7 +131,7 @@ function script.Create()
 	--Hide(flare_l)
 	--Hide(flare_r)
 	
-	if GG.Script.onWater() then
+	if GG.Script.onWater(unitID) then
 		Hide(solid_ground)
 	else
 		Hide(plovak)

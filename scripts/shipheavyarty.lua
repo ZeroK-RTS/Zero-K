@@ -169,7 +169,7 @@ local function DeathAnim()
 	--Turn(ground, x_axis, math.rad(-10), speed)
 	EmitSfx(turret2, 1024)
 	
-	GG.Script.InitializeDeathAnimation()
+	GG.Script.InitializeDeathAnimation(unitID)
 	Sleep(120)
 	EmitSfx(turret1, 1024)
 	Explode(radar, SFX.SMOKE)

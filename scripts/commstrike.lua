@@ -600,7 +600,7 @@ function script.Killed(recentDamage, maxHealth)
 		--Explode(Head, SFX.FALL)
 		--Hide(Head)
 		
-		GG.Script.InitializeDeathAnimation()
+		GG.Script.InitializeDeathAnimation(unitID)
 		PlayAnimation('die')
 		
 		Explode(ArmLeft, SFX.NONE)
