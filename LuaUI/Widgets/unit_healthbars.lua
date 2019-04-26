@@ -45,8 +45,6 @@ local featureHpThreshold = 0.85
 
 local barScale = 1
 
-local infoDistance = 700000
-
 local drawStunnedOverlay = true
 local drawUnitsOnFire    = Spring.GetGameRulesParam("unitsOnFire")
 
@@ -114,7 +112,7 @@ local function OptionsChanged()
 end
 
 options_path = 'Settings/Interface/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'barScale', 'debugMode', 'minReloadTime', 'drawMaxHeight'}
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'barScale', 'debugMode', 'minReloadTime', 'drawMaxHeight', 'simpleHealthPercent'}
 options = {
 	showhealthbars = {
 		name = 'Show Healthbars',
@@ -143,7 +141,7 @@ options = {
 		type = 'number',
 		value = 1,
 		min = 0.5,
-		max = 3,
+		max = 6,
 		step = 0.25,
 		OnChange = OptionsChanged,
 	},
@@ -168,10 +166,18 @@ options = {
 	},	
 	drawMaxHeight = { -- Code for this is all from icon height widget
 		name = 'Health Bar Fade Height',
-		desc = 'If the camera is above this height, health bars will not be drawn.',
+		desc = 'If the camera is above this height, health bars will not be drawn. Setting this above 3000 may affect performance.',
 		type = 'number',
-		min = 0, max = 20000, step = 200,
+		min = 0, max = 9000, step = 200,
 		value = 3000,
+	},
+
+	simpleHealthPercent = { -- Code for this is all from icon height widget
+		name = 'Simple Health Bar Distance',
+		desc = 'Percentage of Health Bar Fade Height after which simple health bars are shown. Setting this above 50 may affect performance.',
+		type = 'number',
+		min = 10, max = 100, step = 5,
+		value = 25,
 	},
 }
 
@@ -620,8 +626,11 @@ do
 		end
 		local dx, dy, dz = ux-cx, uy-cy, uz-cz
 		local dist = dx*dx + dy*dy + dz*dz
-		if (dist > infoDistance) then
-			if (dist > 9000000) then
+		local maxDist = math.pow(options.drawMaxHeight.value, 2)
+		local simpleDist = maxDist * (options.simpleHealthPercent.value/100)
+
+		if (dist > simpleDist) then
+			if (dist > maxDist) then
 				if debugMode then
 					local x,y,z = Spring.GetUnitPosition(unitID)
 					Spring.MarkerAddPoint(x,y,z,"High Distance")
@@ -1159,6 +1168,8 @@ do
 			--// draw bars for features
 			local wx, wy, wz, dx, dy, dz, dist, featureID, valid
 			local featureInfo
+			local maxFeatureDist = math.pow(options.drawMaxHeight.value, 2) * (2/3)
+			local simpleFeatureDist = maxFeatureDist*(options.simpleHealthPercent.value/100)
 			for i=1,#visibleFeatures do
 				featureInfo = visibleFeatures[i]
 				featureID = featureInfo[4]
@@ -1167,8 +1178,8 @@ do
 					wx, wy, wz = featureInfo[1],featureInfo[2],featureInfo[3]
 					dx, dy, dz = wx-cx, wy-cy, wz-cz
 					dist = dx*dx + dy*dy + dz*dz
-					if (dist < 6000000) then
-						if (dist < infoDistance) then
+					if (dist < maxFeatureDist) then
+						if (dist < simpleFeatureDist) then
 							DrawFeatureInfos(featureInfo[4], featureInfo[5], true, wx,wy,wz)
 						else
 							DrawFeatureInfos(featureInfo[4], featureInfo[5], false, wx,wy,wz)
