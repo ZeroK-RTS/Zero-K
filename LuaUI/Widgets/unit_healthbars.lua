@@ -197,6 +197,25 @@ end
 
 local paralyzeOnMaxHealth = ((lowerkeys(VFS.Include"gamedata/modrules.lua") or {}).paralyze or {}).paralyzeonmaxhealth
 
+local function IsCameraBelowMaxHeight() 
+	
+	local cs = Spring.GetCameraState()
+	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
+	local tolerance = 25 --// as defined in iconheight
+
+	if cs.name == "ov" then
+		testHeight = options.drawMaxHeight.value * 2
+	elseif cs.name == "ta" then
+		testHeight = cs.height - gy
+	end
+
+	if testHeight >= options.drawMaxHeight.value - tolerance then
+		return false
+	end
+	return true
+end
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -249,7 +268,6 @@ local gameFrame = 0;
 local empDecline = 1/40;
 
 local cx, cy, cz = 0,0,0;  --// camera pos
-local tolerance = 25 --// via iconheight
 
 local paraUnits   = {};
 local disarmUnits = {};
@@ -1099,18 +1117,9 @@ do
 				return
 			end
 
-			-- Test for Camera Height before processing
-			local cs = Spring.GetCameraState() 
-			local gy = Spring.GetGroundHeight(cs.px, cs.pz)
-
-			if cs.name == "ov" then
-				testHeight = options.drawMaxHeight.value * 2
-			elseif cs.name == "ta" then
-				testHeight = cs.height - gy
-			end
-		
-			if testHeight >= options.drawMaxHeight.value - tolerance then
-				return
+			-- Test camera height before processing
+			if not IsCameraBelowMaxHeight() then
+				return false
 			end
 
 			-- Processing
@@ -1206,17 +1215,8 @@ do
 	function widget:Update(dt)
 
 		-- Test camera height before processing
-		local cs = Spring.GetCameraState()
-		local gy = Spring.GetGroundHeight(cs.px, cs.pz)
-
-		if cs.name == "ov" then
-			testHeight = options.drawMaxHeight.value * 2
-		elseif cs.name == "ta" then
-			testHeight = cs.height - gy
-		end
-	
-		if testHeight >= options.drawMaxHeight.value - tolerance then
-			return
+		if not IsCameraBelowMaxHeight() then
+			return false
 		end
 
 		-- Processing
