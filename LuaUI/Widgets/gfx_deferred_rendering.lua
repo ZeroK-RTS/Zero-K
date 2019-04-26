@@ -79,6 +79,8 @@ local spGetSmoothMeshHeight  = Spring.GetSmoothMeshHeight
 -- Config
 
 local GLSLRenderer = true
+local springMapState = nil
+local springUnitState = nil
 
 options_path = 'Settings/Graphics/HDR (experimental)'
 options_order = {'enableHDR', 'enableBloom', 'illumThreshold', 'maxBrightness'}
@@ -97,6 +99,9 @@ options = {
 local initialized = false
 
 local function OnchangeFunc()
+	springMapState = Spring.GetConfigInt("AllowDeferredMapRendering")
+	springUnitState = Spring.GetConfigInt("AllowDeferredModelRendering")
+
 	widget:Initialize()
 end
 for key,option in pairs(options) do
@@ -187,6 +192,10 @@ local collectionFunctionCount = 0
 --------------------------------------------------------------------------------
 
 function widget:ViewResize()
+	if (springMapState == 0 or springModelState == 0) then
+		return
+	end
+
 	vsx, vsy = gl.GetViewSizes()
 	ivsx = 1.0 / vsx --we can do /n here!
 	ivsy = 1.0 / vsy
@@ -257,9 +266,16 @@ local function DeferredLighting_RegisterFunction(func)
 end
 
 function widget:Initialize()
+	local mapState = Spring.GetConfigInt("AllowDeferredMapRendering")
+	local modelState = Spring.GetConfigInt("AllowDeferredModelRendering")
+
 	if not initialized then
 		initialized = true
 		OnchangeFunc()
+		return
+	end
+
+	if (mapState == 0 or modelState == 0) then
 		return
 	end
 
@@ -268,9 +284,6 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
-
-	Spring.SetConfigInt("AllowDeferredMapRendering", 1)
-	Spring.SetConfigInt("AllowDeferredModelRendering", 1)
 
 	if (Spring.GetConfigString("AllowDeferredMapRendering") == '0' or Spring.GetConfigString("AllowDeferredModelRendering") == '0') then
 		Spring.Echo('Deferred Rendering (gfx_deferred_rendering.lua) requires  AllowDeferredMapRendering and AllowDeferredModelRendering to be enabled in springsettings.cfg!')
@@ -597,6 +610,10 @@ local function Bloom()
 end
 
 function widget:DrawScreenEffects()
+	if (springMapState == 0 or springModelState == 0) then
+		return
+	end
+
 	if not (GLSLRenderer) then
 		Spring.Echo('Removing deferred rendering widget: failed to use GLSL shader')
 		widgetHandler:RemoveWidget()
