@@ -114,7 +114,7 @@ local function OptionsChanged()
 end
 
 options_path = 'Settings/Interface/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'barScale', 'debugMode', 'minReloadTime'}
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'barScale', 'debugMode', 'minReloadTime', 'drawMaxHeight'}
 options = {
 	showhealthbars = {
 		name = 'Show Healthbars',
@@ -165,6 +165,13 @@ options = {
 		noHotkey = true,
 		desc = 'Pings units with debug information',
 		OnChange = OptionsChanged,
+	},	
+	drawMaxHeight = { -- Code for this is all from icon height widget
+		name = 'Health Bar Fade Height',
+		desc = 'If the camera is above this height, health bars will not be drawn.',
+		type = 'number',
+		min = 0, max = 20000, step = 200,
+		value = 3000,
 	},
 }
 
@@ -242,6 +249,7 @@ local gameFrame = 0;
 local empDecline = 1/40;
 
 local cx, cy, cz = 0,0,0;  --// camera pos
+local tolerance = 25 --// via iconheight
 
 local paraUnits   = {};
 local disarmUnits = {};
@@ -1090,6 +1098,22 @@ do
 			if (#visibleUnits+#visibleFeatures==0) then
 				return
 			end
+
+			-- Test for Camera Height before processing
+			local cs = Spring.GetCameraState() 
+			local gy = Spring.GetGroundHeight(cs.px, cs.pz)
+
+			if cs.name == "ov" then
+				testHeight = options.drawMaxHeight.value * 2
+			elseif cs.name == "ta" then
+				testHeight = cs.height - gy
+			end
+		
+			if testHeight >= options.drawMaxHeight.value - tolerance then
+				return
+			end
+
+			-- Processing
 			if WG.Cutscene and WG.Cutscene.IsInCutscene() then
 				return
 			end
@@ -1180,6 +1204,22 @@ do
 	local sec2 = 0
 
 	function widget:Update(dt)
+
+		-- Test camera height before processing
+		local cs = Spring.GetCameraState()
+		local gy = Spring.GetGroundHeight(cs.px, cs.pz)
+
+		if cs.name == "ov" then
+			testHeight = options.drawMaxHeight.value * 2
+		elseif cs.name == "ta" then
+			testHeight = cs.height - gy
+		end
+	
+		if testHeight >= options.drawMaxHeight.value - tolerance then
+			return
+		end
+
+		-- Processing
 		sec=sec+dt
 		blink = (sec%1)<0.5
 
