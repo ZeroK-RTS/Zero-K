@@ -102,6 +102,14 @@ local function OnchangeFunc()
 	springMapState = Spring.GetConfigInt("AllowDeferredMapRendering")
 	springUnitState = Spring.GetConfigInt("AllowDeferredModelRendering")
 
+	if (springMapState == 0 or springModelState == 0) then
+	    widgetHandler:RemoveCallIn("DrawScreenEffects")
+	    widgetHandler:RemoveCallIn("ViewResize")
+	else
+	    widgetHandler:UpdateCallIn("DrawScreenEffects")
+	    widgetHandler:UpdateCallIn("ViewResize")
+	end
+
 	widget:Initialize()
 end
 for key,option in pairs(options) do
@@ -192,10 +200,6 @@ local collectionFunctionCount = 0
 --------------------------------------------------------------------------------
 
 function widget:ViewResize()
-	if (springMapState == 0 or springModelState == 0) then
-		return
-	end
-
 	vsx, vsy = gl.GetViewSizes()
 	ivsx = 1.0 / vsx --we can do /n here!
 	ivsy = 1.0 / vsy
@@ -285,7 +289,7 @@ function widget:Initialize()
 		return
 	end
 
-	if (Spring.GetConfigString("AllowDeferredMapRendering") == '0' or Spring.GetConfigString("AllowDeferredModelRendering") == '0') then
+	if (Spring.GetConfigInt("AllowDeferredMapRendering") == 0 or Spring.GetConfigInt("AllowDeferredModelRendering") == 0) then
 		Spring.Echo('Deferred Rendering (gfx_deferred_rendering.lua) requires  AllowDeferredMapRendering and AllowDeferredModelRendering to be enabled in springsettings.cfg!')
 		widgetHandler:RemoveWidget()
 		return
@@ -610,10 +614,6 @@ local function Bloom()
 end
 
 function widget:DrawScreenEffects()
-	if (springMapState == 0 or springModelState == 0) then
-		return
-	end
-
 	if not (GLSLRenderer) then
 		Spring.Echo('Removing deferred rendering widget: failed to use GLSL shader')
 		widgetHandler:RemoveWidget()
