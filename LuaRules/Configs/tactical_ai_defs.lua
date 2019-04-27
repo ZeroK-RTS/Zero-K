@@ -882,14 +882,14 @@ local behaviourConfig = {
 	
 	--assaults
 	["cloakassault"] = {
-		skirms = lowMedRangeSkirmieeArray, 
+		skirms = allGround, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 90, 
-		skirmLeeway = 30, 
-		skirmBlockedApproachFrames = 20,
+		skirmLeeway = 40,
+		skirmBlockedApproachFrames = 10,
 	},
 	["shieldassault"] = {
 		skirms = riotRangeSkirmieeArray, 
