@@ -208,7 +208,7 @@ local function IsCameraBelowMaxHeight()
 	local cs = Spring.GetCameraState()
 	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
 	local tolerance = 25 --// as defined in iconheight
-
+	local testHeight = cs.py - gy
 	if cs.name == "ov" then
 		testHeight = options.drawMaxHeight.value * 2
 	elseif cs.name == "ta" then
