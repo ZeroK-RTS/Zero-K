@@ -205,7 +205,6 @@ local paralyzeOnMaxHealth = ((lowerkeys(VFS.Include"gamedata/modrules.lua") or {
 local function IsCameraBelowMaxHeight()
 	local cs = Spring.GetCameraState()
 	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
-	local tolerance = 25 --// as defined in iconheight
 	local testHeight = cs.py - gy
 	if cs.name == "ov" then
 		testHeight = options.drawMaxHeight.value * 2
@@ -213,7 +212,7 @@ local function IsCameraBelowMaxHeight()
 		testHeight = cs.height - gy
 	end
 
-	if testHeight >= options.drawMaxHeight.value - tolerance then
+	if testHeight >= options.drawMaxHeight.value then
 		return false
 	end
 	return true
