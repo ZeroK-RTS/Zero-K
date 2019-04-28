@@ -65,7 +65,7 @@ local destructableFeature = {}
 local drawnFeature = {}
 for i = 1, #FeatureDefs do
 	destructableFeature[i] = FeatureDefs[i].destructable
-	drawnFeature[i] = (FeatureDefs[i].drawTypeString=="model") 
+	drawnFeature[i] = (FeatureDefs[i].drawTypeString=="model")
 end
 
 --------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ options = {
 		noHotkey = true,
 		desc = 'Pings units with debug information',
 		OnChange = OptionsChanged,
-	},	
+	},
 	drawMaxHeight = { -- Code for this is all from icon height widget
 		name = 'Health Bar Fade Height',
 		desc = 'If the camera is above this height, health bars will not be drawn. Setting this above 3000 may affect performance.',
@@ -171,7 +171,6 @@ options = {
 		min = 0, max = 9000, step = 200,
 		value = 3000,
 	},
-
 	simpleHealthPercent = { -- Code for this is all from icon height widget
 		name = 'Simple Health Bar Distance',
 		desc = 'Percentage of Health Bar Fade Height after which simple health bars are shown. Setting this above 50 may affect performance.',
@@ -203,22 +202,16 @@ end
 
 local paralyzeOnMaxHealth = ((lowerkeys(VFS.Include"gamedata/modrules.lua") or {}).paralyze or {}).paralyzeonmaxhealth
 
-local function IsCameraBelowMaxHeight() 
-	
+local spGetGroundHeight = Spring.GetGroundHeight
+local function IsCameraBelowMaxHeight()
 	local cs = Spring.GetCameraState()
-	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
-	local tolerance = 25 --// as defined in iconheight
-	local testHeight = cs.py - gy
-	if cs.name == "ov" then
-		testHeight = options.drawMaxHeight.value * 2
-	elseif cs.name == "ta" then
-		testHeight = cs.height - gy
-	end
-
-	if testHeight >= options.drawMaxHeight.value - tolerance then
+	if cs.name == "ta" then
+		return cs.height < options.drawMaxHeight.value
+	elseif cs.name == "ov" then
 		return false
+	else
+		return (cs.py - spGetGroundHeight(cs.px, cs.pz)) < options.drawMaxHeight.value
 	end
-	return true
 end
 
 
