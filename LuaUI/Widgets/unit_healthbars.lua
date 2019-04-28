@@ -211,7 +211,7 @@ local function IsCameraBelowMaxHeight()
 	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
 	local testHeight = cs.py - gy
 	if cs.name == "ta" then
-		testHeight = cs.height - gy
+		testHeight = cs.height
 	end
 
 	if testHeight >= options.drawMaxHeight.value then
