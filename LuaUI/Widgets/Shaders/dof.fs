@@ -79,7 +79,7 @@ const vec4 KernelNear_RealX_ImY_RealZ_ImW[] = vec4[](
 
 const float baseStepValMag = 1.0/540.0;
 const float inFocusThreshold = 0.4 / float(KERNEL_RADIUS);
-const float colorPower = 1.8;
+const float colorPower = 1.86;
 
 const vec2 autofocusTestCoordOffsets[] = vec2[](
   vec2(-0.71, -0.71),
@@ -128,7 +128,7 @@ float GetFilterRadius(vec2 uv)
 
 float GetEdgeNearFilterRadius(vec2 uv, vec2 stepVal)
 {
-  vec2 maxCoordsOffset = stepVal * 1.8 * KERNEL_RADIUS;
+  vec2 maxCoordsOffset = stepVal * 1.2 * KERNEL_RADIUS;
   float edgeRadius = min(GetFilterRadius(uv + maxCoordsOffset), GetFilterRadius(uv - maxCoordsOffset));
   float halfEdgeRadius = min(GetFilterRadius(uv + maxCoordsOffset / 2), 
                   GetFilterRadius(uv - maxCoordsOffset / 2));
@@ -153,13 +153,13 @@ vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, out float
 //downscaled out-of-focus textures.
 float FocusThresholdMixFactor(float filterRadius)
 {
-  return clamp((filterRadius - inFocusThreshold) * float(KERNEL_RADIUS) * 3.0,
+  return clamp((filterRadius - inFocusThreshold) * float(KERNEL_RADIUS) * 2.5,
         0.0, 1.0);
 }
 
 float GetMaxInFocusAperture(float targetInFocusDepth, float focusDepth)
 {
-  return (targetInFocusDepth * inFocusThreshold) / abs(targetInFocusDepth - focusDepth);
+  return (targetInFocusDepth * inFocusThreshold * 1.15) / abs(targetInFocusDepth - focusDepth);
 }
 
 void main()
@@ -195,7 +195,7 @@ void main()
       {
         testDepth = LinearizeDepth(centerUV + 
           (vec2(autofocusTestCoordOffsets[i].x * aspectRatio, 
-            autofocusTestCoordOffsets[i].y) * clamp(focusDepth * 10.0, 0.1, 0.16)));
+            autofocusTestCoordOffsets[i].y) * clamp(focusDepth * 4.4, 0.1, 0.25)));
         minTestDepth = min(minTestDepth, (2.0 * minTestDepth + testDepth) / 3.0);
         maxTestDepth = max(maxTestDepth, (2.0 * maxTestDepth + testDepth) / 3.0);
         // testFocusDepth += testDepth / 2.0;
@@ -205,29 +205,33 @@ void main()
       // (minTestDepth * testFocusDepth + maxTestDepth * testFocusDepth + minTestDepth * maxTestDepth);
 
       //pull focus back a bit to bias slightly towards air units and against distant terrain
-      float focusDepthAirFactor = clamp(0.95 + ((focusDepth * 45.0) * 0.20), 0.95, 1.15);
+      float focusDepthAirFactor = clamp(0.92 + (focusDepth * 12.0), 0.92, 1.2);
       testFocusDepth /= max(focusDepthAirFactor, 1.0);
       focusDepth /= max(focusDepthAirFactor, 1.0);
 
-      minTestDepth /= focusDepthAirFactor;
-      maxTestDepth = (maxTestDepth + 2.0 * (maxTestDepth * focusDepthAirFactor)) / 3.0;
+      minTestDepth = min(minTestDepth / focusDepthAirFactor, focusDepth);
+      maxTestDepth = 
+        max(focusDepthAirFactor > 1.0 ?
+          (maxTestDepth + 2.5 * maxTestDepth * focusDepthAirFactor) / 3.5 :
+          maxTestDepth * focusDepthAirFactor, focusDepth);
 
-      float focalLength = 0.2;
-      float minFStop = 1.0 * focalLength;
-      float curveDepth = 12.0;
+      float focalLength = 0.3;
+      float minFStop = 1.2 * focalLength;
+      float curveDepth = 10.0;
       float baseAperture = max(focalLength/(max(
-          (3.3 * (testFocusDepth )) 
+          (2.0 * (testFocusDepth )) 
           * exp(curveDepth * (testFocusDepth)),
           minFStop)), 0.0);
       float maxDepthAperture = GetMaxInFocusAperture(maxTestDepth, focusDepth);
       float minDepthAperture = GetMaxInFocusAperture(minTestDepth, focusDepth);
       aperture = min(baseAperture, min(maxDepthAperture, minDepthAperture));
+      // aperture = baseAperture;
 
       // aperture = max(1.0/(max((testFocusDepth + focusSpread) * 3.3, minFStop)) - 2.0, 0.0) 
       //         * depth;
     }
 
-    float filterRadius = clamp(((depth - focusDepth) * aperture)/depth, -1.8, 1.8);
+    float filterRadius = clamp(((depth - focusDepth) * aperture)/depth, -1.2, 1.2);
 
     fragColor = vec4(colors.rgb, filterRadius * 0.25 + 0.5);
 

@@ -139,7 +139,7 @@ function widget:DrawScreenEffects()
 	end
 
 	gl.Color(1,1,1,1)
-	gl.DepthMask(true)
+	-- gl.DepthMask(true)
 	gl.DepthTest(true)
 	gl.AlphaTest(GL.GREATER, 0.001)
 	
@@ -174,5 +174,5 @@ function widget:DrawScreenEffects()
 	
 	gl.AlphaTest(false)
 	gl.DepthTest(false)
-	gl.DepthMask(false)
+	-- gl.DepthMask(false)
 end
