@@ -632,8 +632,8 @@ local function UpdateCarrierTarget(carrierID, frame)
 				-- return to carrier unless in combat
 				local cQueue = GetCommandQueue(droneID, -1)
 				local engaged = false
-				for i=1, (cQueue and #cQueue or 0) do
-					if cQueue[i].id == CMD.FIGHT and firestate > 0 then
+				for j=1, (cQueue and #cQueue or 0) do
+					if cQueue[j].id == CMD.FIGHT and firestate > 0 then
 						-- if currently fighting AND not on hold fire
 						engaged = true
 						break
@@ -805,8 +805,8 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam)
 	end
 end
 
-function gadget:GameFrame(n)
-	if (((n+1) % 30) == 0) then
+function gadget:GameFrame(f)
+	if (((f+1) % 30) == 0) then
 		for carrierID, carrier in pairs(carrierList) do
 			if (not GetUnitIsStunned(carrierID)) then
 				for i = 1, #carrier.droneSets do
@@ -843,9 +843,9 @@ function gadget:GameFrame(n)
 			killList[unitID] = nil
 		end
 	end
-	if ((n % DEFAULT_UPDATE_ORDER_FREQUENCY) == 0) then
+	if ((f % DEFAULT_UPDATE_ORDER_FREQUENCY) == 0) then
 		for i, _ in pairs(carrierList) do
-			UpdateCarrierTarget(i, n)
+			UpdateCarrierTarget(i, f)
 		end
 	end
 	UpdateCoroutines() --maintain nanoframe position relative to carrier

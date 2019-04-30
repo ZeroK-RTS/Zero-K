@@ -216,8 +216,8 @@ local function InitializeVictoryConditions()
 		local defeatConfig = defeatConditionConfig[allyTeamID] or {}
 		if defeatConfig.vitalUnitTypes then
 			local unitDefMap = {}
-			for i = 1, #defeatConfig.vitalUnitTypes do
-				local ud = UnitDefNames[defeatConfig.vitalUnitTypes[i]]
+			for j = 1, #defeatConfig.vitalUnitTypes do
+				local ud = UnitDefNames[defeatConfig.vitalUnitTypes[j]]
 				if ud then
 					unitDefMap[ud.id] = true
 				end
@@ -1225,8 +1225,8 @@ local function InitializeMidgameUnits(gameFrame)
 		
 		local midgameUnits = CustomKeyToUsefulTable(customKeys and customKeys.midgameunits)
 		if midgameUnits then
-			for i = 1, #midgameUnits do
-				AddMidgameUnit(midgameUnits[i], teamID, gameFrame)
+			for j = 1, #midgameUnits do
+				AddMidgameUnit(midgameUnits[j], teamID, gameFrame)
 			end
 		end
 	end
@@ -1268,8 +1268,8 @@ local function DoInitialTerraform(noBuildings)
 			local initialUnits = GetExtraStartUnits(teamID, customKeys)
 			initialUnitDataTable[teamID] = initialUnitDataTable[teamID] or CustomKeyToUsefulTable(customKeys and customKeys.extrastartunits)
 			if initialUnits then
-				for i = 1, #initialUnits do
-					local unitTerra = AddUnitTerraform(initialUnits[i])
+				for j = 1, #initialUnits do
+					local unitTerra = AddUnitTerraform(initialUnits[j])
 					if unitTerra then
 						terraformList[#terraformList + 1] = unitTerra
 					end

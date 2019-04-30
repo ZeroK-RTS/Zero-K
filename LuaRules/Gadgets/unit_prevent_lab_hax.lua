@@ -77,8 +77,8 @@ local function CheckLabs(checkFeatures, onlyUnstick)
 			local clearUnits = data.unitExpulsionParameters
 			if clearUnits then
 				units = spGetUnitsInRectangle(clearUnits[1], clearUnits[2], clearUnits[3], clearUnits[4])
-				for i = 1, #units do
-					local unitID = units[i]
+				for j = 1, #units do
+					local unitID = units[j]
 					local unitDefID = spGetUnitDefID(unitID)
 					local ud = UnitDefs[unitDefID]
 					local movetype = Spring.Utilities.getMovetype(ud)
@@ -141,8 +141,8 @@ local function CheckLabs(checkFeatures, onlyUnstick)
 			if checkFeatures then
 				local clearFeatures = data.featureExpulsionParameters
 				features = spGetFeaturesInRectangle(clearFeatures[1], clearFeatures[2], clearFeatures[3], clearFeatures[4])
-				for i = 1, #features do
-					local featureID = features[i]
+				for j = 1, #features do
+					local featureID = features[j]
 					local fx, fy, fz = spGetFeaturePosition(featureID)
 					if fy and fy > clearFeatures[5] and fy < clearFeatures[6] then
 						local l = abs(fx - clearFeatures[1])

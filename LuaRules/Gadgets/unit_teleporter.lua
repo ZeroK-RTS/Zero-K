@@ -112,11 +112,9 @@ local function callScript(unitID, funcName, args)
 end
 
 local function changeSpeed(tid, bid, speed)
-	local func = Spring.UnitScript.GetScriptEnv(tid).activity_mode
-	Spring.UnitScript.CallAsUnit(tid,func,speed)
+	Spring.UnitScript.CallAsUnit(tid, Spring.UnitScript.GetScriptEnv(tid).activity_mode, speed)
 	if bid then
-		local func = Spring.UnitScript.GetScriptEnv(bid).activity_mode
-		Spring.UnitScript.CallAsUnit(bid,func,speed)
+		Spring.UnitScript.CallAsUnit(bid,Spring.UnitScript.GetScriptEnv(bid).activity_mode, speed)
 	end
 end
 
@@ -177,7 +175,7 @@ function tele_createBeacon(unitID, x, z, beaconID)
 		if not beaconID then
 			GG.PlayFogHiddenSound("sounds/misc/teleport2.wav", 10, x, Spring.GetGroundHeight(x,z) or 0, z)
 		end
-		local beaconID = beaconID or Spring.CreateUnit(beaconDef, x, y, z, 1, Spring.GetUnitTeam(unitID))
+		beaconID = beaconID or Spring.CreateUnit(beaconDef, x, y, z, 1, Spring.GetUnitTeam(unitID))
 		if beaconID then
 			Spring.SetUnitPosition(beaconID, x, y, z)
 			Spring.SetUnitNeutral(beaconID,true)
@@ -480,8 +478,8 @@ function gadget:GameFrame(f)
 					local bestPriority = false
 					local teleTarget = false
 					
-					for i = 1, #units do
-						local nid = units[i]
+					for j = 1, #units do
+						local nid = units[j]
 						if allyTeam == Spring.GetUnitAllyTeam(nid) and beaconWaiter[nid] then
 							local cmdID, cmdParam_1
 							if Spring.Utilities.COMPAT_GET_ORDER then

@@ -63,7 +63,7 @@ local allyTeamRole = {
 	[1] = "defender",
 }
 
-local hqDefID = {
+local hqDefIDs = {
 	[0] = UnitDefNames["pw_hq_attacker"].id,
 	[1] = UnitDefNames["pw_hq_defender"].id,
 }
@@ -717,7 +717,7 @@ function gadget:GamePreload()
 		local teamList = Spring.GetTeamList(i) or {0}
 		local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 		local teamID = GetAllyTeamLeader(teamList)
-		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]], hqDefID[i])
+		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]], hqDefIDs[i])
 	end
 	
 	Spring.SetGameRulesParam("pw_structureList_count", planetwarsStructureCount)

@@ -717,7 +717,6 @@ else
 -- UNSYNCED
 --------------------------------------------------------------------------------
 local spGetLocalTeamID = Spring.GetLocalTeamID
-local spAreTeamsAllied = Spring.AreTeamsAllied
 local spGetSpectatingState = Spring.GetSpectatingState
 local spValidUnitID = Spring.ValidUnitID
 local spGetSelectedUnits = Spring.GetSelectedUnits

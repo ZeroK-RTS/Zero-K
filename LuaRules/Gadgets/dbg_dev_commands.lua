@@ -363,10 +363,10 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-function GG.TableEcho(data, name, indent)
+function GG.TableEcho(data, tableName, indent)
 	indent = indent or ""
-	name = name or "TableEcho"
-	Spring.Echo(indent .. name .. " = {")
+	tableName = tableName or "TableEcho"
+	Spring.Echo(indent .. tableName .. " = {")
 	for name, v in pairs(data) do
 		local ty =  type(v)
 		if ty == "table" then

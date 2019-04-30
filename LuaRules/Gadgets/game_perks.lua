@@ -186,7 +186,7 @@ local function InitUnsafe()
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Unlock system error: ' .. err)
 		end
 
-		for index, name in pairs(unlockData) do
+		for unlockIndex, name in pairs(unlockData) do
 			local team = select(4, Spring.GetPlayerInfo(id, false))
 			local udid = UnitDefNames[name] and UnitDefNames[name].id
 			if udid then

@@ -332,8 +332,8 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		-- allied to latest chicken team? no com for you
 		local chickenTeamID = -1
 		for _,t in pairs(Spring.GetTeamList()) do
-			local luaAI = Spring.GetTeamLuaAI(t)
-			if luaAI and string.find(string.lower(luaAI), "chicken") then
+			local teamLuaAI = Spring.GetTeamLuaAI(t)
+			if teamLuaAI and string.find(string.lower(teamLuaAI), "chicken") then
 				chickenTeamID = t
 			end
 		end
@@ -521,7 +521,7 @@ function gadget:GameStart()
 	gamestart = true
 
 	-- spawn units
-	for i,team in ipairs(Spring.GetTeamList()) do
+	for teamNum,team in ipairs(Spring.GetTeamList()) do
 		
 		-- clear resources
 		-- actual resources are set depending on spawned unit and setup

@@ -267,11 +267,11 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 				if frame < gameFrame then
 					incData.frames:TrimFront() --frames should come in ascending order, so it's safe to trim front of array one by one
 				else
-					local disarmDamage = data.disarmDamage
-					local fullDamage = data.fullDamage
+					local dataDisarmDamage = data.disarmDamage
+					local dataFullDamage = data.fullDamage
 
-					local disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
-					adjHealth = adjHealth - fullDamage
+					local disarmExtra = math.floor(dataDisarmDamage/adjHealth*DECAY_FRAMES)
+					adjHealth = adjHealth - dataFullDamage
 
 					disarmFrame = disarmFrame + disarmExtra
 					if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then

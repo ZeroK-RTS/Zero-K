@@ -319,8 +319,8 @@ function gadget:GameFrame(f)
 				local transportID = maintainFloat[i][1]
 				local transporteeList = maintainFloat[i][2]
 				local haveFloater = false
-				for i = 1, #transporteeList do
-					local potentialCargo = transporteeList[i]
+				for j = 1, #transporteeList do
+					local potentialCargo = transporteeList[j]
 					if GG.HoldStillForTransport_HoldFloat and IsUnitAllied(potentialCargo,transportID) and GG.HoldStillForTransport_HoldFloat(potentialCargo) then
 						haveFloater = true
 					end

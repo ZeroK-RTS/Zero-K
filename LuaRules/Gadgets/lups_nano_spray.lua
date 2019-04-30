@@ -29,9 +29,9 @@ local function GetCmdTag(unitID)
 	end
 	if cmdTag == 0 then 
 		if Spring.Utilities.COMPAT_GET_ORDER then
-			local cmds = spGetCommandQueue(unitID,1)
-			if (cmds) then
-				local cmd = cmds[1]
+			local queue = spGetCommandQueue(unitID,1)
+			if (queue) then
+				local cmd = queue[1]
 				if cmd then
 					cmdTag = cmd.tag
 				end

@@ -378,7 +378,6 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 	local vx,vy,vz = spGetUnitVelocity(enemy)
 	local ex,ey,ez,_,aimY = spGetUnitPosition(enemy, false, true) -- enemy position
 	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-	local cx,cy,cz -- command position	
 
 	if not (ex and vx) then
 		return behaviour.skirmKeepOrder
@@ -494,7 +493,6 @@ local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move
 	local vx,vy,vz = spGetUnitVelocity(enemy)
 	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
 	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-	local cx,cy,cz -- command position		
 	local dx,dy,dz = ex + vx*behaviour.velocityPrediction, ey + vy*behaviour.velocityPrediction, ez + vz*behaviour.velocityPrediction
 	if behaviour.selfVelocityPrediction then
 		local uvx,uvy,uvz = spGetUnitVelocity(unitID)

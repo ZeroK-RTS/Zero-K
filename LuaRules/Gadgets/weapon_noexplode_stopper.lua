@@ -61,7 +61,7 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	elseif weaponDefID and shieldCarrierUnitID and shieldEmitterWeaponNum then
 		local wd = WeaponDefs[weaponDefID]
 		if wd and wd.noExplode then
-			local on, charge = Spring.GetUnitShieldState(shieldCarrierUnitID)	--FIXME figure out a way to get correct shield
+			local _, charge = Spring.GetUnitShieldState(shieldCarrierUnitID)	--FIXME figure out a way to get correct shield
 			if charge and shieldDamages[weaponDefID] < charge then
 				Spring.DeleteProjectile(proID)
 			else

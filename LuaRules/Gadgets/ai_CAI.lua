@@ -811,8 +811,6 @@ local function makeAirDefence(team,unitID, searchRange,maxDistance)
 		local ox = selfDefenceAirTask[minID].x
 		local oz = selfDefenceAirTask[minID].z
 		
-		local x,y,z = spGetUnitPosition(unitID)
-		
 		local vectorX = mapWidth*0.5 - ox
 		local vectorZ = mapHeight*0.5 - oz
 		local vectorMag = math.sqrt(disSQ(0,0,vectorX,vectorZ))
@@ -1501,7 +1499,6 @@ local function factoryJobHandler(team)
 				else
 					GiveClampedOrderToUnit(unitID, CMD_FIGHT, { data.wayX+math.random(-200,200), data.wayY, data.wayZ+math.random(-200,200)}, 0)
 				end
-				local facJob = a.facJob
 				local totalImportance = 0
 				for i = 1, 8 do
 					totalImportance = totalImportance + facJob[i].importance*defData[i].importanceMult
@@ -1726,12 +1723,12 @@ local function battleGroupHandler(team, frame, slowUpdate)
 					local changed = false
 					local x = data.aimX
 					local z = data.aimZ
-					for i = 1, at.enemyEconomy.count do
-						local dis = disSQ(x, z, at.enemyEconomy[i].x, at.enemyEconomy[i].z)
+					for j = 1, at.enemyEconomy.count do
+						local dis = disSQ(x, z, at.enemyEconomy[j].x, at.enemyEconomy[j].z)
 						if (not minTargetDistance) or minTargetDistance > dis and 
-								not (data.aX == at.enemyEconomy[i].aX and data.aZ == at.enemyEconomy[i].aZ) then
-							data.aX = at.enemyEconomy[i].aX
-							data.aZ = at.enemyEconomy[i].aZ
+								not (data.aX == at.enemyEconomy[j].aX and data.aZ == at.enemyEconomy[j].aZ) then
+							data.aX = at.enemyEconomy[j].aX
+							data.aZ = at.enemyEconomy[j].aZ
 							minTargetDistance = dis
 							changed = true
 						end
@@ -1747,7 +1744,6 @@ local function battleGroupHandler(team, frame, slowUpdate)
 						local moveGroupRange = groupRange*0.4
 						for unitID,_ in pairs(data.unit) do
 							if not data.aa[unitID] then
-								local x, y, z = spGetUnitPosition(unitID)
 								--GiveClampedOrderToUnit(unitID, CMD_FIGHT , {data.aimX ,data.aimY,data.aimZ,}, 0)
 								GiveClampedOrderToUnit(unitID, CMD_FIGHT , {data.aimX + math.random(-moveGroupRange,moveGroupRange),
 								data.aimY,data.aimZ + math.random(-moveGroupRange,moveGroupRange),}, 0)

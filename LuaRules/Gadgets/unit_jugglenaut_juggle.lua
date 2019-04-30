@@ -93,7 +93,7 @@ local function addFlying(unitID, frame, dx, dy, dz, height, parentDis)
 	local ux, uy, uz = Spring.GetUnitPosition(unitID)
 		
 	if unitDefID and ux and moveTypeByID[unitDefID] and  moveTypeByID[unitDefID] == 2 then
-		local frame = frame or Spring.GetGameFrame()
+		frame = frame or Spring.GetGameFrame()
 		
 		local dis = distance(ux,uy,uz,dx,dy,dz)
 		

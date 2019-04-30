@@ -140,7 +140,6 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 	local block = not overlappingAreas
 	
 	if not block then
-		local _,_,_,_,_,_, x, y, z = Spring.GetUnitPosition(targetID, true, true)
 		local gameFrame = Spring.GetGameFrame()
 		local data = {
 			x = x,

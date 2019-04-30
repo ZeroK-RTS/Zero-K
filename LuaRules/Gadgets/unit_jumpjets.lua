@@ -417,7 +417,6 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		local reloadAmount = reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
 		
 		while reloadAmount < 1 do
-			local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
 			if morphedTo then 
 				unitID = morphedTo 
 			end
@@ -612,7 +611,6 @@ end
 
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 	if jumpDefs[unitDefID] then
-		local queue = spGetCommandQueue(unitID, 2)
 		-- The first command in the queue is a move command added by the engine.
 		local cmdID_1, cmdID_2, cmdTag_1
 		if Spring.Utilities.COMPAT_GET_ORDER then

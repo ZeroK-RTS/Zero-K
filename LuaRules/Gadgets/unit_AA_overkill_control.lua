@@ -139,9 +139,9 @@ function gadget:Initialize()
     for i = 1,#WeaponDefs do
 	  local wd = WeaponDefs[i]
 	  if wd.name:find(unitname) then
-		for i = 1, #wd.damages do
-		  if damage < wd.damages[i] then
-		    damage = wd.damages[i]
+		for j = 1, #wd.damages do
+		  if damage < wd.damages[j] then
+		    damage = wd.damages[j]
 		  end
 		end
 	  end

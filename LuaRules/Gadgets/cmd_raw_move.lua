@@ -551,11 +551,11 @@ local function GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_
 	if cmdID == CMD_REPAIR then
 		-- (#cmd.params == 5 or #cmd.params == 1)
 		if (cp_1 and not cp_2) or (cp_5 and not cp_6) then
-			local unitID = cp_1
-			local unitDefID = Spring.GetUnitDefID(unitID)
+			local targetUnitID = cp_1
+			local unitDefID = Spring.GetUnitDefID(targetUnitID)
 			if unitDefID and not canMoveDefs[unitDefID] then
 				-- Don't try to chase moving units with raw move.
-				local x, y, z = Spring.GetUnitPosition(unitID)
+				local x, y, z = Spring.GetUnitPosition(targetUnitID)
 				if x then
 					return x, y, z
 				end

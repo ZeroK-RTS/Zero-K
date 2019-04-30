@@ -127,7 +127,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID)
 	-- only count finished buildings
-	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID)
+	local stunned_or_inbuild, _, inbuild = spGetUnitIsStunned(unitID)
 	if stunned_or_inbuild ~= nil and inbuild then
 		return
 	end
@@ -135,10 +135,9 @@ function gadget:UnitCreated(unitID, unitDefID)
 	local ud = UnitDefs[unitDefID]
 	
 	local shieldWeaponDefID
-	local shieldNum = -1
 	if ud.customParams.dynamic_comm then
 		if GG.Upgrades_UnitShieldDef then
-			shieldWeaponDefID, shieldNum = GG.Upgrades_UnitShieldDef(unitID)
+			shieldWeaponDefID = GG.Upgrades_UnitShieldDef(unitID)
 		end
 	else
 		shieldWeaponDefID = ud.shieldWeaponDef

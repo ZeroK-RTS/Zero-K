@@ -145,8 +145,7 @@ local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 		if otherUnitID ~= unitID and not alreadyGuarding[otherUnitID] then
 			local teamID = Spring.GetUnitTeam(otherUnitID)
 			if Spring.AreTeamsAllied( unitTeam, teamID ) then
-				local cmdParams = {otherUnitID}
-				if not GG.Teleport_AllowCommand(unitID, unitDefID, CMD.GUARD, cmdParams, cmdOptions2) then
+				if not GG.Teleport_AllowCommand(unitID, unitDefID, CMD.GUARD, {otherUnitID}, cmdOptions2) then
 					return
 				end
 			end
@@ -159,8 +158,7 @@ local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 		if otherUnitID ~= unitID and not alreadyGuarding[otherUnitID] then
 			local teamID = Spring.GetUnitTeam(otherUnitID)
 			if Spring.AreTeamsAllied( unitTeam, teamID ) then
-				local cmdParams = {otherUnitID}
-				Spring.GiveOrderToUnit(unitID, CMD.GUARD, cmdParams, cmdOptions2)
+				Spring.GiveOrderToUnit(unitID, CMD.GUARD, {otherUnitID}, cmdOptions2)
 			end
 		end
     end

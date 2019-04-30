@@ -31,7 +31,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	if not projectileDefs[weaponDefID] then
 		return
 	end
-	local px, py, pz = Spring.GetProjectilePosition(proID)
+	local _, py = Spring.GetProjectilePosition(proID)
 	if (py or 1) > 0 then
 		return
 	end

@@ -20,7 +20,7 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-include("LuaRules/Configs/customcmds.h.lua")
+VFS.Include("LuaRules/Configs/customcmds.h.lua", nil, VFS.GAME)
 
 local GRAVITY = Game.gravity
 local GRAVITY_BASELINE = 120

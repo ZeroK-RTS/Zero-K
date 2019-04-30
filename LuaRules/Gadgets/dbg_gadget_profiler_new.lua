@@ -516,7 +516,7 @@ local function DrawSortedList(list, name, x,y,j)
 	for i=1,#list do
 	if j>=maxLines then x = x - 375; j = 0; end
 		local v = list[i]
-		local name = v.plainname
+		local plainname = v.plainname
 		local gname = v.fullname
 		local tTime = v.tTime
 		local tLoad = v.tLoad

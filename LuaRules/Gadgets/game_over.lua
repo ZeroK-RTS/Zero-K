@@ -543,8 +543,8 @@ local function ProcessLastAlly()
 		if (not teamlist) then break end -- continue
 		local hasActiveTeam = false
 		local hasDroppedTeam = false
-		for i=1,#teamlist do
-			local t = teamlist[i]
+		for j=1,#teamlist do
+			local t = teamlist[j]
 			-- any team without units is dead to us; so only teams who are active AND have units matter
 			-- except chicken, who are alive even without units
 			local numAlive = aliveCount[t]
@@ -557,8 +557,8 @@ local function ProcessLastAlly()
 				else
 					local playerlist = spGetPlayerList(t) -- active players
 					if playerlist then
-						for j = 1, #playerlist do
-							local name,active,spec = spGetPlayerInfo(playerlist[j], false)
+						for k = 1, #playerlist do
+							local name,active,spec = spGetPlayerInfo(playerlist[k], false)
 							if not spec then
 								if active then
 									hasActiveTeam = true

@@ -183,8 +183,8 @@ else
 	-- the problem is with human controlled chickens, otherwise it counts them as robot-players and difficulty increases very much
 	-- probably, ideally this needs to be taught to differentiate between human chickens and human robots...
 	for _, teamID in pairs(teams) do
-		local luaAI = Spring.GetTeamLuaAI(teamID)
-		if luaAI and string.find(string.lower(luaAI), "chicken") then
+		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
+		if teamLuaAI and string.find(string.lower(teamLuaAI), "chicken") then
 			lastChickenTeam = teamID
 			--break
 		end
@@ -676,15 +676,15 @@ local function SpawnBurrow(number, loc, burrowLevel)
 					local vicinity = spGetUnitsInCylinder(x, z, maxBaseDistance)
 					local humanUnitsInVicinity = false
 					local humanUnitsInProximity = false
-					for i=1, #vicinity, 1 do
-						if (spGetUnitTeam(vicinity[i]) ~= chickenTeamID) then
+					for j=1, #vicinity, 1 do
+						if (spGetUnitTeam(vicinity[j]) ~= chickenTeamID) then
 							humanUnitsInVicinity = true
 							break
 						end
 					end
 				
-					for i=1, #proximity, 1 do
-						if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
+					for j=1, #proximity, 1 do
+						if (spGetUnitTeam(proximity[j]) ~= chickenTeamID) then
 							humanUnitsInProximity = true
 							break
 						end
@@ -1056,7 +1056,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 		local x, y, z = spGetUnitPosition(unitID)
 		data.targets[unitID] = unitTeam
 		--distance check for existing burrows goes here
-		for burrow, data in pairs(data.burrows) do
+		for burrow, burrowdata in pairs(data.burrows) do
 			UpdateBurrowTarget(burrow, unitID)
 		end
 	end
@@ -1176,10 +1176,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	data.chickenBirths[unitID] = nil
 	if data.targets[unitID] then
 		data.targets[unitID] = nil
-		for burrow, data in pairs(data.burrows) do
-			if data.targetID == unitID then		--retarget burrows if needed
-				data.targetID = burrow
-				data.targetDistance = 1000000
+		for burrow, burrowdata in pairs(data.burrows) do
+			if burrowdata.targetID == unitID then		--retarget burrows if needed
+				burrowdata.targetID = burrow
+				burrowdata.targetDistance = 1000000
 				UpdateBurrowTarget(burrow, nil)
 			end
 		end

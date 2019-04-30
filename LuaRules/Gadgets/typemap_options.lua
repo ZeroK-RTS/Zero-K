@@ -20,8 +20,6 @@ local oldTerrain = {}
 local IMPASSIBLE_TERRAIN = 137 -- Hope that this does not conflict with any maps
 local NANOFRAMES_BLOCK = false -- Allows for LOS hax.
 
-local externalFunctions = {}
-
 local function Round(x)
 	return math.floor((x + 4)/8)*8
 end

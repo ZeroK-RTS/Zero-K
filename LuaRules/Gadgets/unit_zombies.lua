@@ -248,7 +248,7 @@ local function BringingDownTheHeavens(unitID)
 	end
 end
 
-local function CheckZombieOrders(unitID)	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
+local function CheckZombieOrders()	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
 	for unitID, _ in pairs(zombies) do
 		local queueSize = spGetCommandQueue(unitID, 0)
 		if not (queueSize) or not (queueSize > 0) then -- oh

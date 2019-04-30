@@ -339,10 +339,10 @@ local function UpdateCloakees(data)
       local transported = Spring.GetUnitIsTransporting(cloakee)
       if transported ~= nil then
         for _,cloakeeLvl2 in ipairs(transported) do
-          local udid = GetUnitDefID(cloakeeLvl2)
-          if ((not uncloakableDefs[udid]) and
+          local udid2 = GetUnitDefID(cloakeeLvl2)
+          if ((not uncloakableDefs[udid2]) and
               (GetUnitAllyTeam(cloakeeLvl2) == allyTeam)) then
-            SetUnitCloakAndParam(cloakeeLvl2, 4, (not radiusException[udid]) and decloakDistance)
+            SetUnitCloakAndParam(cloakeeLvl2, 4, (not radiusException[udid2]) and decloakDistance)
             -- note: this gives perfect cloaking, but is the only level
             -- to work under paralysis
             cloakees[cloakeeLvl2] = true
