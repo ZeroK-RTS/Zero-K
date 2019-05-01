@@ -6,7 +6,7 @@ function widget:GetInfo()
 		author    = "aeonios, Shadowfury333 (with some code from Kleber Garcia)",
 		date      = "Feb. 2019",
 		license   = "GPL, MIT",
-		layer     = -100000000000, --To run after gfx_deferred_rendering.lua
+		layer     = -100000, --To run after gfx_deferred_rendering.lua
 		enabled   = true
 	}
 end
