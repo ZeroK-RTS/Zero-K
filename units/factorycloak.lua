@@ -2,6 +2,7 @@ unitDef = {
   unitname                      = [[factorycloak]],
   name                          = [[Cloakbot Factory]],
   description                   = [[Produces Cloaked, Mobile Robots, Builds at 10 m/s]],
+  activateWhenBuilt             = true,
   buildCostMetal                = Shared.FACTORY_COST,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
@@ -53,6 +54,8 @@ unitDef = {
   moveState        				= 1,
   noAutoFire                    = false,
   objectName                    = [[cremfactory.s3o]],
+  onoffable                     = true,
+  radarDistanceJam              = 650,
   script                        = [[factorycloak.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
