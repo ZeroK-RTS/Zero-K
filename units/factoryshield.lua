@@ -3,6 +3,7 @@ unitDef = {
   name                          = [[Shieldbot Factory]],
   description                   = [[Produces Tough, Shielded Robots, Builds at 10 m/s]],
   acceleration                  = 0,
+  activateWhenBuilt             = true,
   brakeRate                     = 0,
   buildCostMetal                = Shared.FACTORY_COST,
   builder                       = true,
@@ -38,6 +39,7 @@ unitDef = {
 	helptext_de    = [[Die Shieldbot Factory ist robust aber flexibel. Diese Einheiten werden gebaut, um all die Schmerzen auf sich zu nehmen und wieder zu verteilen, aber ohne Kompromisse bei der Mobilität. Schlauer Einsatz von Einheitenkombos wird gut belohnt. Wichtigste Einheiten: Bandit, Thug, Outlaw, Snitch, Dirtbag]],
     sortName       = [[1]],
     midposoffset   = [[0 0 -24]],
+    shield_emit_height = 9,
     solid_factory  = [[6]],
 	factorytab       = 1,
 	shared_energy_gen = 1,
@@ -58,6 +60,7 @@ unitDef = {
   moveState                     = 1,
   noAutoFire                    = false,
   objectName                    = [[factory.s3o]],
+  onoffable                     = false,
   script                        = "factoryshield.lua",
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
@@ -66,6 +69,37 @@ unitDef = {
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
   yardMap                       = [[oooooo occcco occcco occcco occcco occcco yyyyyy yyyyyy yyyyyy]],
+
+  weapons                       = {
+    {
+      def = [[SHIELD]],
+    },
+  },
+
+  weaponDefs                    = {
+    SHIELD = {
+      name = [[Energy Shield]],
+      damage = {
+        default = 10,
+      },
+
+      exteriorShield = true,
+      shieldAlpha = 0.2,
+      shieldBadColor = [[1 0.1 0.1 1]],
+      shieldGoodColor = [[0.1 0.1 1 1]],
+      shieldInterceptType = 3,
+      shieldPower = 900,
+      shieldPowerRegen = 9,
+      shieldPowerRegenEnergy = 0,
+      shieldRadius = 100,
+      shieldRepulser = false,
+      shieldStartingPower = 300,
+      smartShield = true,
+      visibleShield = false,
+      visibleShieldRepulse = false,
+      weaponType = [[Shield]],
+    },
+  },
 
   featureDefs                   = {
 
