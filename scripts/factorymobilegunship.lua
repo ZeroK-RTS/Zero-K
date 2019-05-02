@@ -16,6 +16,7 @@ local SIG_MOVE = 1
 local SIG_BUILD = 2
 
 function script.Create()
+	Spring.SetUnitNanoPieces(unitID, {pad})
 end
 
 function script.Activate()
@@ -49,11 +50,6 @@ end
 function script.StopBuilding()
 	Signal(SIG_BUILD)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),pad)
-	return pad
 end
 
 function script.Killed(recentDamage, maxHealth)
