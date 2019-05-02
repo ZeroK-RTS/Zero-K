@@ -227,6 +227,7 @@ local callInLists = {
   'Update',
   'TextCommand',
   'CommandNotify',
+  'UnitCommandNotify',
   'AddConsoleLine',
   'ReceiveUserInfo', 	-- widget:ReceiveUserInfo(info)
 						-- info is a table with keys name, avatar, icon, badges, admin, clan, faction, country
@@ -1285,6 +1286,15 @@ end
 function widgetHandler:CommandNotify(id, params, options)
   for _,w in ipairs(self.CommandNotifyList) do
     if (w:CommandNotify(id, params, options)) then
+      return true
+    end
+  end
+  return false
+end
+
+function widgetHandler:UnitCommandNotify(unitID, id, params, options)
+  for _,w in ipairs(self.UnitCommandNotifyList) do
+    if (w:UnitCommandNotify(unitID, id, params, options)) then
       return true
     end
   end

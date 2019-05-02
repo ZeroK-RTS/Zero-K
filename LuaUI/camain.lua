@@ -105,6 +105,10 @@ function CommandNotify(id, params, options)
   return widgetHandler:CommandNotify(id, params, options)
 end
 
+function UnitCommandNotify(unitID, id, params, options)
+  return widgetHandler:UnitCommandNotify(unitID, id, params, options)
+end
+
 function DrawScreen(vsx, vsy)
   return widgetHandler:DrawScreen()
 end
