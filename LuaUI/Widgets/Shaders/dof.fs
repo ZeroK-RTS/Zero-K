@@ -84,7 +84,7 @@ const vec4 KernelNear_RealX_ImY_RealZ_ImW[] = vec4[](
 const float baseStepValMag = 1.0/540.0;
 const float inFocusThreshold = 0.4 / float(KERNEL_RADIUS);
 const float colorPower = 1.9;
-const float maxFilterRadius = 1.3; //keep between 0 and 2. Any higher than 2 will require modifying the normalization maths 
+const float maxFilterRadius = 1.2; //keep between 0 and 2. Any higher than 2 will require modifying the normalization maths 
                                    //(currently does (radius/4)+0.5 to get [-2..2] to [0..1])
 
 const vec2 autofocusTestCoordOffsets[] = vec2[](
@@ -336,7 +336,7 @@ void main()
     for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
     {
       compI = i;
-      vec2 coords = GetFilterCoords(i, uv, vec2(0.71 * stepVal.x, 0.71 * stepVal.y), filterRadius, targetFilterRadius);
+      vec2 coords = GetFilterCoords(i, uv, vec2(0.0, stepVal.y), filterRadius, targetFilterRadius);
       if (compI < -KERNEL_RADIUS) continue;
 
       vec4 imageTexelRGB = texture2D(origTex, coords);
@@ -385,7 +385,7 @@ void main()
     for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
     {
       compI = i;
-      vec2 coords = GetFilterCoords(i, uv, vec2(-0.71 * stepVal.x, 0.71 * stepVal.y), filterRadius, targetFilterRadius);
+      vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x, 0.0), filterRadius, targetFilterRadius);
       if (compI < -KERNEL_RADIUS) continue;
 
       // vec4 imageTexelRG = texture2D(blurTex0, coords);  
@@ -416,10 +416,12 @@ void main()
 
       float alpha = FocusThresholdMixFactor(-targetFilterRadius, inFocusThreshold);
       alpha = min(alpha, clamp(abs(targetFilterRadius - baseFilterRadius) / 0.05, 0.0, 1.0));
-      imageTexelA.xy += alpha * c0_c1.xy;
-      imageTexelA.zw += alpha * c0_c1.zw;
       valA.xy += multComplex(imageTexelA.xy,c0_c1.xy);
       valA.zw += multComplex(imageTexelA.zw,c0_c1.zw);   
+      valA.xy += alpha * c0_c1.xy;
+      valA.zw += alpha * c0_c1.zw;
+      // valA.xy = max(valA.xy, alpha * c0_c1.xy);
+      // valA.zw = max(valA.zw, alpha * c0_c1.zw);
     }
     // float redChannel   = dot(valR.xy,KernelNearWeights_RealX_ImY);
     // float greenChannel = dot(valG.xy,KernelNearWeights_RealX_ImY);
@@ -468,7 +470,7 @@ void main()
     if (quality >= 1)
     {
       vec4 nearBlurTexAtUV = texture2D(blurTex1, uv);
-      float alpha = clamp(nearBlurTexAtUV.a * 3.5, 0.0, 1.0);
+      float alpha = clamp(nearBlurTexAtUV.a * 1.5, 0.0, 1.0);
       // alpha = clamp((0.5 - nearBlurTexAtUV.a), 0.0, 1.0) * 2.0;
       fragColor.rgb = mix(fragColor.rgb, nearBlurTexAtUV.rgb, alpha);
       // fragColor = vec4(alpha);
