@@ -1,15 +1,19 @@
 unitDef = {
-  unitname                      = [[factorygunship]],
-  name                          = [[Gunship Plant]],
+  unitname                      = [[factorymobilegunship]],
+  name                          = [[Mobile Gunship Plant]],
   description                   = [[Produces Gunships, Builds at 10 m/s]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
+  acceleration                  = 0.06,
+  activateWhenBuilt             = true,
+  airStrafe                     = 0,
+  bankingAllowed                = false,
+  brakeRate                     = 0.03,
   buildCostMetal                = Shared.FACTORY_COST,
+  buildDistance                 = 180,
   builder                       = true,
-  buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 10,
-  buildingGroundDecalSizeY      = 10,
-  buildingGroundDecalType       = [[factorygunship_aoplane.dds]],
+  --buildingGroundDecalDecaySpeed = 30,
+  --buildingGroundDecalSizeX      = 10,
+  --buildingGroundDecalSizeY      = 10,
+  --buildingGroundDecalType       = [[factorygunship_aoplane.dds]],
 
   buildoptions                  = {
     [[gunshipcon]],
@@ -26,9 +30,14 @@ unitDef = {
   },
 
   buildPic                      = [[factorygunship.png]],
+  buildRange3D                  = false,
+  canFly                        = true,
+  canGuard                      = true,
   canMove                       = true,
   canPatrol                     = true,
-  category                      = [[FLOAT UNARMED]],
+  canSubmerge                   = false,
+  category                      = [[GUNSHIP UNARMED]],
+  collide                       = true,
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[86 86 86]],
   collisionVolumeType           = [[ellipsoid]],
@@ -36,11 +45,12 @@ unitDef = {
   selectionVolumeScales         = [[104 60 96]],
   selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
+  cruiseAlt                     = 80,
 
   customParams                  = {
+    morphto = [[factorygunship]],
+    morphtime = 5,
     landflystate   = [[0]],
-    morphto = [[factorymobilegunship]],
-    morphtime = 30,
     sortName = [[3]],
 	modelradius    = [[43]],
 	nongroundfac = [[1]],
@@ -52,26 +62,28 @@ unitDef = {
 
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
+  floater                       = true,
   footprintX                    = 7,
   footprintZ                    = 7,
+  hoverAttack                   = true,
   iconType                      = [[facgunship]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   maxDamage                     = 4000,
-  maxSlope                      = 15,
-  maxVelocity                   = 0,
+  maxSlope                      = 36,
+  maxVelocity                   = 1.0,
   minCloakDistance              = 150,
-  moveState        				= 1,
+  moveState                     = 1,
   noAutoFire                    = false,
   objectName                    = [[CORPLAS.s3o]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
+  script                        = [[factorymobilegunship.lua]],
   showNanoSpray                 = false,
   sightDistance                 = 273,
-  turnRate                      = 0,
-  useBuildingGroundDecal        = true,
+  turnRate                      = 148,
+  useBuildingGroundDecal        = false,
   waterline						= 0,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[yyoooyy yoooooy ooooooo ooooooo ooooooo yoooooy yyoooyy]],
 
   featureDefs                   = {
 
@@ -95,4 +107,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ factorygunship = unitDef })
+return lowerkeys({ factorymobilegunship = unitDef })
