@@ -28,6 +28,7 @@ unitDef = {
 	[[gunshipaa]],
     [[gunshiptrans]],
     [[gunshipheavytrans]],
+    [[factorygunship]],
   },
 
   buildPic                      = [[factorygunship.png]],
@@ -50,7 +51,7 @@ unitDef = {
 
   customParams                  = {
     morphto = [[factorygunship]],
-    morphtime = 5,
+    morphtime = 0,
     landflystate   = [[0]],
     sortName = [[3]],
 	modelradius    = [[43]],
