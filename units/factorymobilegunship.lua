@@ -4,6 +4,7 @@ unitDef = {
   description                   = [[Produces Gunships, Builds at 10 m/s]],
   acceleration                  = 0.06,
   activateWhenBuilt             = true,
+  airHoverFactor                = 0.05,
   airStrafe                     = true,
   bankingAllowed                = false,
   brakeRate                     = 0.03,
