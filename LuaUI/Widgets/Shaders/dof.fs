@@ -135,9 +135,13 @@ float GetFilterRadius(vec2 uv)
 float GetEdgeNearFilterRadius(vec2 uv, vec2 stepVal)
 {
   vec2 maxCoordsOffset = stepVal * maxFilterRadius * KERNEL_RADIUS;
-  float edgeRadius = min(GetFilterRadius(uv + maxCoordsOffset), GetFilterRadius(uv - maxCoordsOffset));
-  float halfEdgeRadius = min(GetFilterRadius(uv + maxCoordsOffset / 2), 
-                  GetFilterRadius(uv - maxCoordsOffset / 2));
+  vec2 maxCoordsOffsetPerp = vec2(stepVal.y, -stepVal.x) * maxFilterRadius * KERNEL_RADIUS;
+  float edgeRadius = 
+  min(min(GetFilterRadius(uv + maxCoordsOffset), GetFilterRadius(uv - maxCoordsOffset)),
+  min(GetFilterRadius(uv + maxCoordsOffsetPerp), GetFilterRadius(uv - maxCoordsOffsetPerp)));
+  float halfEdgeRadius = 
+  min(min(GetFilterRadius(uv + maxCoordsOffset / 2), GetFilterRadius(uv - maxCoordsOffset / 2)),
+  min(GetFilterRadius(uv + maxCoordsOffsetPerp / 2), GetFilterRadius(uv - maxCoordsOffsetPerp / 2)));
   return min(edgeRadius, halfEdgeRadius);
 }
 
@@ -159,7 +163,7 @@ vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, out float
 //downscaled out-of-focus textures.
 float FocusThresholdMixFactor(float filterRadius, float threshold)
 {
-  return clamp((filterRadius - threshold) * float(KERNEL_RADIUS) * 2.5,
+  return clamp((filterRadius - threshold) * float(KERNEL_RADIUS) * 2.0,
         0.0, 1.0);
 }
 
@@ -324,13 +328,15 @@ void main()
     vec4 valG = vec4(0,0,0,0);
     vec4 valB = vec4(0,0,0,0);
     vec4 valA = vec4(0,0,0,0);
-    float filterRadius = min(GetFilterRadius(uv), GetEdgeNearFilterRadius(uv, stepVal));
+    float baseFilterRadius = GetFilterRadius(uv);
+    float filterRadius = min(baseFilterRadius, GetEdgeNearFilterRadius(uv, stepVal));
+    filterRadius = min(filterRadius, GetEdgeNearFilterRadius(uv, vec2(stepVal.y, 0.0)));
     float targetFilterRadius = 0.0;
     int compI = 0;
     for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
     {
       compI = i;
-      vec2 coords = GetFilterCoords(i, uv, vec2(0.0, stepVal.y), filterRadius, targetFilterRadius);
+      vec2 coords = GetFilterCoords(i, uv, vec2(0.71 * stepVal.x, 0.71 * stepVal.y), filterRadius, targetFilterRadius);
       if (compI < -KERNEL_RADIUS) continue;
 
       vec4 imageTexelRGB = texture2D(origTex, coords);
@@ -349,7 +355,9 @@ void main()
       valG.zw += imageTexelRGB.g * c0_c1.zw;
       valB.xy += imageTexelRGB.b * c0_c1.xy;
       valB.zw += imageTexelRGB.b * c0_c1.zw;
+
       float alpha = FocusThresholdMixFactor(-targetFilterRadius, inFocusThreshold);
+      alpha = min(alpha, clamp(abs(targetFilterRadius - baseFilterRadius) / 0.05, 0.0, 1.0));
       valA.xy += alpha * c0_c1.xy;
       valA.zw += alpha * c0_c1.zw;
     }
@@ -369,13 +377,15 @@ void main()
     vec4 valG = vec4(0,0,0,0);
     vec4 valB = vec4(0,0,0,0);
     vec4 valA = vec4(0,0,0,0);
+    float baseFilterRadius = GetFilterRadius(uv);
     float filterRadius = min(GetFilterRadius(uv), GetEdgeNearFilterRadius(uv, stepVal));
+    filterRadius = min(filterRadius, GetEdgeNearFilterRadius(uv, vec2(stepVal.x, 0.0)));
     float targetFilterRadius = 0.0;
     int compI = 0;
     for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
     {
       compI = i;
-      vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x, 0.0), filterRadius, targetFilterRadius);
+      vec2 coords = GetFilterCoords(i, uv, vec2(-0.71 * stepVal.x, 0.71 * stepVal.y), filterRadius, targetFilterRadius);
       if (compI < -KERNEL_RADIUS) continue;
 
       // vec4 imageTexelRG = texture2D(blurTex0, coords);  
@@ -404,6 +414,10 @@ void main()
       valB.xy += multComplex(imageTexelB.xy,c0_c1.xy);
       valB.zw += multComplex(imageTexelB.zw,c0_c1.zw);   
 
+      float alpha = FocusThresholdMixFactor(-targetFilterRadius, inFocusThreshold);
+      alpha = min(alpha, clamp(abs(targetFilterRadius - baseFilterRadius) / 0.05, 0.0, 1.0));
+      imageTexelA.xy += alpha * c0_c1.xy;
+      imageTexelA.zw += alpha * c0_c1.zw;
       valA.xy += multComplex(imageTexelA.xy,c0_c1.xy);
       valA.zw += multComplex(imageTexelA.zw,c0_c1.zw);   
     }
@@ -454,7 +468,8 @@ void main()
     if (quality >= 1)
     {
       vec4 nearBlurTexAtUV = texture2D(blurTex1, uv);
-      float alpha = clamp(nearBlurTexAtUV.a * 2.0, 0.0, 1.0);
+      float alpha = clamp(nearBlurTexAtUV.a * 3.5, 0.0, 1.0);
+      // alpha = clamp((0.5 - nearBlurTexAtUV.a), 0.0, 1.0) * 2.0;
       fragColor.rgb = mix(fragColor.rgb, nearBlurTexAtUV.rgb, alpha);
       // fragColor = vec4(alpha);
     }
