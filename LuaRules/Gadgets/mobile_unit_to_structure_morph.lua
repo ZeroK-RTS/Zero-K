@@ -27,7 +27,7 @@ if (gadgetHandler:IsSyncedCode()) then
 
 include("LuaRules/Configs/customcmds.h.lua")
 
-local LANDING_BOX_SZ = 6
+local LANDING_BOX_SZ = 8
 
 --let's start with Mobile Gunship Plant preMorphing and go from there.
 --for general use we would build tables from all unitdefs.

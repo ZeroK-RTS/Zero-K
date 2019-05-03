@@ -5,7 +5,7 @@ unitDef = {
   acceleration                  = 0.06,
   activateWhenBuilt             = true,
   airHoverFactor                = -1,
-  airStrafe                     = true,
+  airStrafe                     = 0,
   bankingAllowed                = false,
   brakeRate                     = 0.03,
   buildCostMetal                = Shared.FACTORY_COST,
@@ -50,6 +50,8 @@ unitDef = {
   cruiseAlt                     = 80,
 
   customParams                  = {
+    airstrafecontrol = [[0]],
+    midposoffset = [[0 4 0]],
     morphto = [[factorygunship]],
     morphtime = 0,
     landflystate   = [[1]],
