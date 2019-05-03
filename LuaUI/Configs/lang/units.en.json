@@ -687,7 +687,7 @@
 	"staticradar" : {
 		"name" : "Radar Tower",
 		"description" : "Early Warning System",
-		"helptext" : "The Radar tower provides early warning of enemy units and their movements over a moderate distance at virtually no cost. It has a very small but steady energy cost and will automatically shut down if you run out of energy. Radar coverage is blocked by terrain such as mountains."
+		"helptext" : "The Radar tower provides early warning of enemy units and their movements over a moderate distance at virtually no cost. It has a very small but steady energy cost and will automatically shut down if you run out of energy. Radar Towers can morph to Sparrows - light scout planes - to enhance their ability to gather intel. Radar coverage is blocked by terrain such as mountains."
 	},
 	"turretriot" : {
 		"name" : "Stardust",
@@ -1163,6 +1163,11 @@
 		"name" : "Owl",
 		"description" : "Area Jammer, Radar/Sonar Plane",
 		"helptext" : "The Owl provides an unparalleled means for deep scouting, and can locate underwater targets with its sonar. It is also equipped with an area jammer, which prevents radar from working in the area underneath."
+	},
+	"planelightscout" : {
+		"name" : "Sparrow",
+		"description" : "Light Scout Plane",
+		"helptext" : "The Sparrow is a light scout that can be built from a Radar Tower, making it the only plane that is availible without a Plane Factory. Such an accessible scouting option is invaluable to those without access to planes, but is generally outclassed by the faster Swift and larger Owl."
 	},
 	"amphfloater" : {
 		"name" : "Buoy",

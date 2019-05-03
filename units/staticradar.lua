@@ -19,9 +19,10 @@ unitDef = {
   corpse                        = [[DEAD]],
   
   customParams = {
+    morphto        = [[planelightscout]],
+    morphtime      = 20,
     modelradius    = [[16]],
-	removewait     = 1,
-	priority_misc  = 2, -- High
+    priority_misc  = 2, -- High
   },    
   
   energyUse                     = 0.8,
