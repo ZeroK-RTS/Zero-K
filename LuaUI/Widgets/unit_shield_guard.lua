@@ -388,30 +388,38 @@ end
 -- Add/remove shielded
 -- Override and add units guarding shields
 
+local function ProcessNotify(sid)
+	if follower[sid] then
+		local c = shields[follower[sid].fol]
+		c.shieldiees[sid] = nil
+		if c.maxVelID == sid then
+			c.maxVel = c.selfVel
+			c.maxVelID = -1
+			if CMD_SET_WANTED_MAX_SPEED then
+				spGiveOrderToUnit(follower[sid].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD.OPT_ALT)
+			else
+				spGiveOrderToUnit(follower[sid].fol, CMD_WANTED_SPEED, {c.selfVel*30}, 0)
+			end
+			for cid, j in pairs(c.shieldiees) do
+				if j.vel < c.maxVel then
+					c.maxVel = j.vel
+					c.maxVelID = cid
+				end
+			end
+		end
+		c.folCount = c.folCount-1
+		follower[sid] = nil
+	end
+end
+
+function widget:UnitCommandNotify(unitID, cmdID, params, options)
+	ProcessNotify(unitID)
+end
+
 function widget:CommandNotify(id, params, options)
 	local units = spGetSelectedUnits()
 	for _,sid in ipairs(units) do
-		if follower[sid] then
-			local c = shields[follower[sid].fol]
-			c.shieldiees[sid] = nil
-			if c.maxVelID == sid then
-				c.maxVel = c.selfVel
-				c.maxVelID = -1
-				if CMD_SET_WANTED_MAX_SPEED then
-					spGiveOrderToUnit(follower[sid].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD.OPT_ALT)
-				else
-					spGiveOrderToUnit(follower[sid].fol, CMD_WANTED_SPEED, {c.selfVel*30}, 0)
-				end
-				for cid, j in pairs(c.shieldiees) do
-					if j.vel < c.maxVel then
-						c.maxVel = j.vel
-						c.maxVelID = cid
-					end
-				end
-			end
-			c.folCount = c.folCount-1
-			follower[sid] = nil
-		end
+		ProcessNotify(sid)
 	end
 
 	if (id == CMD_GUARD) then

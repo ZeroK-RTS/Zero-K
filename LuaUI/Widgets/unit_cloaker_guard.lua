@@ -156,30 +156,38 @@ end
 -- Add/remove cloaked and hold fire units.
 -- Override and add units guarding cloakers
 
+local function ProcessNotify(sid)
+	if follower[sid] then
+		local c = cloakers[follower[sid].fol]
+		c.cloakiees[sid] = nil
+		if c.maxVelID == sid then
+			c.maxVel = c.selfVel
+			c.maxVelID = -1
+			if CMD_SET_WANTED_MAX_SPEED then
+				spGiveOrderToUnit(follower[sid].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD_OPT_ALT )
+			end
+			for cid, j in pairs(c.cloakiees) do
+				if j.vel < c.maxVel then
+					c.maxVel = j.vel
+					c.maxVelID = cid
+				end
+			end
+		end
+		spGiveOrderToUnit(sid, CMD_FIRE_STATE, { follower[sid].firestate }, 0)	
+		follower[sid] = nil
+		c.folCount = c.folCount-1
+	end
+end
+
+function widget:UnitCommandNotify(unitID, cmdID, params, options)
+	ProcessNotify(unitID)
+end
+
 function widget:CommandNotify(id, params, options)
 	local units = spGetSelectedUnits()
 
 	for _,sid in ipairs(units) do
-		if follower[sid] then
-			local c = cloakers[follower[sid].fol]
-			c.cloakiees[sid] = nil
-			if c.maxVelID == sid then
-				c.maxVel = c.selfVel
-				c.maxVelID = -1
-				if CMD_SET_WANTED_MAX_SPEED then
-					spGiveOrderToUnit(follower[sid].fol, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, c.selfVel }, CMD_OPT_ALT )
-				end
-				for cid, j in pairs(c.cloakiees) do
-					if j.vel < c.maxVel then
-						c.maxVel = j.vel
-						c.maxVelID = cid
-					end
-				end
-			end
-			spGiveOrderToUnit(sid, CMD_FIRE_STATE, { follower[sid].firestate }, 0)	
-			follower[sid] = nil
-			c.folCount = c.folCount-1
-		end
+		ProcessNotify(sid)
 	end
 
 	if (id == CMD_GUARD) then

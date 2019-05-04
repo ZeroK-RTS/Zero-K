@@ -21,6 +21,7 @@ unitDef = {
     [[bomberdisarm]],
     [[bomberheavy]],
     [[planescout]],
+    [[planelightscout]],
   },
 
   buildPic                      = [[factoryplane.png]],

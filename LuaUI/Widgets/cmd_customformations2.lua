@@ -446,14 +446,9 @@ local function GiveNonNotifyingOrder(cmdID, cmdParams, cmdOpts)
 end
 
 local function GiveNotifyingOrderToUnit(uID, cmdID, cmdParams, cmdOpts)
-	local widgets = widgetHandler.widgets
-	for i=1, #widgets do
-		local w = widgets[i]
-		if w.UnitCommandNotify and w:UnitCommandNotify(uID, cmdID, cmdParams, cmdOpts) then
-			return
-		end
+	if widgetHandler:UnitCommandNotify(uID, cmdID, cmdParams, cmdOpts) then
+		return
 	end
-	
 	spGiveOrderToUnit(uID, cmdID, cmdParams, cmdOpts.coded)
 end
 

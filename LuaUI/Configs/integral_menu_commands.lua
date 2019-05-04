@@ -85,6 +85,7 @@ local units = {
 		-- No Plane Artillery
 		planeheavyfighter = WEIRD_RAIDER,
 		planescout = UTILITY,
+		planelightscout = ARTILLERY,
 		bomberprec = ASSAULT,
 		bomberheavy = HEAVY_SOMETHING,
 		bomberdisarm = SPECIAL,

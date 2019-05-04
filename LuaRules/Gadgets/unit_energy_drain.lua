@@ -159,6 +159,10 @@ function gadget:GameFrame(n)
 				GG.StopMiscPriorityResourcing(unitID, 3)
 				data.oldUpkeep = 0
 			end
+			if data.oldEnabled then
+				ScriptUpdate(unitID, data.env, false)
+				data.oldEnabled = false
+			end
 		end
 	end
 end

@@ -769,7 +769,7 @@ local icontypes = {
   --plane icons
   scoutplane = {
     bitmap='icons/scoutplane.dds',
-    size=1.7,
+    size=1.6,
   },
   radarplane = {
     bitmap='icons/radarplane.dds',
