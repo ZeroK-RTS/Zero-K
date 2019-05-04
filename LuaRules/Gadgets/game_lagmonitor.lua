@@ -169,14 +169,15 @@ local function UpdateTeamActivity(teamID)
 	end
 	
 	local _, leaderID, _, isAiTeam, _, allyTeamID = spGetTeamInfo(teamID, false)
-	if isAiTeam then
+	if Spring.GetTeamRulesParam(teamID, "initialIsAiTeam") then
 		-- Treat luaAIs as active. Treat hosted AIs as active if their host is active.
 		if Spring.GetTeamLuaAI(teamID) then
 			resourceShare = resourceShare + 1
 		else
 			isHostedAi = true
 			local _, _, hostingPlayerID = Spring.GetAIInfo(teamID)
-			if GetPlayerActivity(hostingPlayerID, true) then
+			-- isAiTeam is false for teams that were AI teams, but had their hosting player drop.
+			if GetPlayerActivity(hostingPlayerID, true) and isAiTeam then
 				resourceShare = resourceShare + 1
 			end
 		end
@@ -238,7 +239,7 @@ local function GetRawTeamShare(teamID)
 	return shares
 end
 
-local function DoUnitGiveAway(recieveTeamID, giveAwayTeams, doPlayerLineage)
+local function DoUnitGiveAway(allyTeamID, recieveTeamID, giveAwayTeams, doPlayerLineage)
 	for i = 1, #giveAwayTeams do
 		local giveTeamID = giveAwayTeams[i]
 		local givePlayerID = doPlayerLineage and TeamIDToPlayerID(giveTeamID)
@@ -250,7 +251,6 @@ local function DoUnitGiveAway(recieveTeamID, giveAwayTeams, doPlayerLineage)
 		local units = spGetTeamUnits(giveTeamID) or {}
 		if #units > 0 then -- transfer units when number of units in AFK team is > 0
 			-- Transfer Units
-			GG.allowTransfer = true
 			for j = 1, #units do
 				local unitID = units[j]
 				if allyTeamID == spGetUnitAllyTeam(unitID) then
@@ -266,7 +266,6 @@ local function DoUnitGiveAway(recieveTeamID, giveAwayTeams, doPlayerLineage)
 					TransferUnit(unitID, recieveTeamID)
 				end
 			end
-			GG.allowTransfer = false
 		end
 		
 		local recieveName = GetTeamName(recieveTeamID)
@@ -294,7 +293,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local resourceShare, teamRank, isHostedAiTeam = UpdateTeamActivity(teamID)
+		local resourceShare, teamRank, aiRank = UpdateTeamActivity(teamID)
 		totalResourceShares = totalResourceShares + resourceShare
 		if resourceShare == 0 then
 			if teamResourceShare[teamID] ~= 0 then
@@ -316,7 +315,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	allyTeamResourceShares[allyTeamID] = totalResourceShares
 	
 	if recieveTeamID then
-		DoUnitGiveAway(recieveTeamID, giveAwayTeams, true)
+		DoUnitGiveAway(allyTeamID, recieveTeamID, giveAwayTeams, true)
 	else
 		-- Nobody can receive units so there is not much more to do
 		for i = 1, #giveAwayTeams do
@@ -342,7 +341,17 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	end
 	
 	if recieveAiTeamID then
-		DoUnitGiveAway(recieveAiTeamID, giveAwayAiTeams, false)
+		DoUnitGiveAway(allyTeamID, recieveAiTeamID, giveAwayAiTeams, false)
+	end
+end
+
+local function SetAiTeamRulesParams()
+	local teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		local _, leaderID, _, isAiTeam = spGetTeamInfo(teamList[i], false)
+		if isAiTeam then
+			Spring.SetTeamRulesParam(teamList[i], "initialIsAiTeam", 1)
+		end
 	end
 end
 
@@ -352,7 +361,10 @@ function gadget:GameFrame(n)
 		for i = 1, #allyTeamList do
 			UpdateAllyTeamActivity(allyTeamList[i])
 		end
-	end 
+	end
+	if n == 0 then
+		SetAiTeamRulesParams()
+	end
 end
 
 function gadget:GameOver()
