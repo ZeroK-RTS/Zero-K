@@ -310,26 +310,27 @@ local function UpdateAllyTeamActivity(allyTeamID)
 		local teamID = teamList[i]
 		local resourceShare, teamRank, isHostedAiTeam, isBackupAi = UpdateTeamActivity(teamID)
 		totalResourceShares = totalResourceShares + resourceShare
-		if resourceShare == 0 then
-			if teamResourceShare[teamID] ~= 0 then
-				-- The team is newly afk.
-				if isHostedAiTeam then
-					giveAwayAiTeams[#giveAwayAiTeams + 1] = teamID
-				else
-					giveAwayTeams[#giveAwayTeams + 1] = teamID
+		if not isBackupAi then
+			if resourceShare == 0 then
+				if teamResourceShare[teamID] ~= 0 then
+					-- The team is newly afk.
+					if isHostedAiTeam then
+						giveAwayAiTeams[#giveAwayAiTeams + 1] = teamID
+					else
+						giveAwayTeams[#giveAwayTeams + 1] = teamID
+					end
 				end
+			elseif isHostedAiTeam then
+				recieveAiTeamID = teamID
+			elseif teamRank and ((not recieveRank) or (teamRank > recieveRank)) then
+				recieveRank = teamRank
+				recieveTeamID = teamID
 			end
-		elseif isHostedAiTeam then
-			recieveAiTeamID = teamID
-		elseif teamRank and ((not recieveRank) or (teamRank > recieveRank)) then
-			recieveRank = teamRank
-			recieveTeamID = teamID
-		end
-		teamResourceShare[teamID] = resourceShare
-		
-		if isBackupAi then
+		else
 			backupAiTeam = teamID
 		end
+		
+		teamResourceShare[teamID] = resourceShare
 	end
 	
 	-- The backup AI team should be a LuaAI that exists only to take over from the circuitAIs.
@@ -376,22 +377,22 @@ local function InitializeAiTeamRulesParams()
 		if isAiTeam then
 			Spring.SetTeamRulesParam(teamList[i], "initialIsAiTeam", 1)
 		end
-		if customKeys.backupai or Spring.GetTeamLuaAI(teamID) then
+		if customKeys.backupai then
 			Spring.SetTeamRulesParam(teamID, "backupai", 1)
 		end
 	end
 end
 
 function gadget:GameFrame(n)
+	if n == 0 then
+		InitializeAiTeamRulesParams()
+	end
 	if n % TEAM_SLOWUPDATE_RATE == 0 then -- Just before overdrive
 		local allyTeamList = Spring.GetAllyTeamList()
 		--Spring.Echo("============================")
 		for i = 1, #allyTeamList do
 			UpdateAllyTeamActivity(allyTeamList[i])
 		end
-	end
-	if n == 0 then
-		InitializeAiTeamRulesParams()
 	end
 end
 

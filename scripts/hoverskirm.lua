@@ -148,7 +148,7 @@ function script.FireWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 620.1, 70, 0.3)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 660.1, 70, 0.3)
 end
 
 function script.Shot() 
