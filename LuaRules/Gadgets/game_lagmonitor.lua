@@ -132,11 +132,14 @@ end
 -- Activity updates
 
 local playerIsAfk = {}
-local function GetPlayerActivity(playerID)
+local function GetPlayerActivity(playerID, ignorePlayerAfk)
 	local name, active, spec, team, allyTeam, ping, _, _, _, customKeys = spGetPlayerInfo(playerID)
 	
 	if spec or not (active and ping <= 2000) then
 		return false
+	end
+	if ignorePlayerAfk then
+		return customKeys.elo and tonumber(customKeys.elo) or 0
 	end
 	
 	local lastActionTime = spGetGameSeconds() - (mouseActivityTime[playerID] or 0)
@@ -153,6 +156,7 @@ end
 local function UpdateTeamActivity(teamID)
 	local resourceShare = 0
 	local teamRank = false
+	local isHostedAi = false
 	local players = spGetPlayerList(teamID)
 	for i = 1, #players do
 		local activeRank = GetPlayerActivity(players[i])
@@ -166,8 +170,16 @@ local function UpdateTeamActivity(teamID)
 	
 	local _, leaderID, _, isAiTeam, _, allyTeamID = spGetTeamInfo(teamID, false)
 	if isAiTeam then
-		-- Treat the AI as an active player.
-		resourceShare = resourceShare + 1
+		-- Treat luaAIs as active. Treat hosted AIs as active if their host is active.
+		if Spring.GetTeamLuaAI(teamID) then
+			resourceShare = resourceShare + 1
+		else
+			isHostedAi = true
+			local _, _, hostingPlayerID = Spring.GetAIInfo(teamID)
+			if GetPlayerActivity(hostingPlayerID, true) then
+				resourceShare = resourceShare + 1
+			end
+		end
 	end
 	
 	if resourceShare > 0 and teamResourceShare[teamID] == 0 then
@@ -200,7 +212,7 @@ local function UpdateTeamActivity(teamID)
 	end
 	
 	-- Note that AIs do not have a rank so a team with just an AI will have teamRank = false
-	return resourceShare, teamRank
+	return resourceShare, teamRank, isHostedAi
 end
 
 local function GetRawTeamShare(teamID)
@@ -226,59 +238,10 @@ local function GetRawTeamShare(teamID)
 	return shares
 end
 
-local function UpdateAllyTeamActivity(allyTeamID)
-	local teamList = Spring.GetTeamList(allyTeamID)
-	
-	local totalResourceShares = 0
-	local giveAwayTeams = {}
-	local recieveRank = false
-	local recieveTeamID = false
-	
-	for i = 1, #teamList do
-		local teamID = teamList[i]
-		local resourceShare, teamRank = UpdateTeamActivity(teamID)
-		totalResourceShares = totalResourceShares + resourceShare
-		if resourceShare == 0 then
-			if teamResourceShare[teamID] ~= 0 then
-				-- The team is newly afk.
-				giveAwayTeams[#giveAwayTeams + 1] = teamID
-			end
-		elseif teamRank and ((not recieveRank) or (teamRank > recieveRank)) then
-			recieveRank = teamRank
-			recieveTeamID = teamID
-		end
-		teamResourceShare[teamID] = resourceShare
-	end
-	allyTeamResourceShares[allyTeamID] = totalResourceShares
-	
-	if not recieveTeamID then
-		-- Nobody can recieve units so there is not much more to do
-		for i = 1, #giveAwayTeams do
-			local giveTeamID = giveAwayTeams[i]
-			local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID, false))
-			if giveResigned then
-				spEcho("game_message: " .. GetTeamName(giveTeamID) .. " resigned")
-			end
-		end
-
-		-- a human can have bot teammates; they are not eligible to receive his units but would still drain his income if he goes AFK
-		-- in that case, the human gets to keep his income as well
-		if totalResourceShares > 0 and #giveAwayTeams > 0 then
-			totalResourceShares = 0
-			for i = 1, #teamList do
-				local teamID = teamList[i]
-				local rawShare = GetRawTeamShare(teamID)
-				totalResourceShares = totalResourceShares + rawShare
-				teamResourceShare[teamID] = rawShare
-			end
-			allyTeamResourceShares[allyTeamID] = totalResourceShares
-		end
-		return
-	end
-	
+local function DoUnitGiveAway(recieveTeamID, giveAwayTeams, doPlayerLineage)
 	for i = 1, #giveAwayTeams do
 		local giveTeamID = giveAwayTeams[i]
-		local givePlayerID = TeamIDToPlayerID(giveTeamID)
+		local givePlayerID = doPlayerLineage and TeamIDToPlayerID(giveTeamID)
 		
 		-- Energy share is not set because the storage needs to be full for full overdrive.
 		-- Also energy income is mostly private and a large energy influx to the rest of the 
@@ -316,6 +279,70 @@ local function UpdateAllyTeamActivity(allyTeamID)
 		elseif #units > 0 then
 			spEcho("game_message: Giving all units of ".. giveName .. " to " .. recieveName .. " due to lag/AFK")
 		end
+	end
+end
+
+local function UpdateAllyTeamActivity(allyTeamID)
+	local teamList = Spring.GetTeamList(allyTeamID)
+	
+	local totalResourceShares = 0
+	local giveAwayTeams = {}
+	local giveAwayAiTeams = {}
+	local recieveRank = false
+	local recieveTeamID = false
+	local recieveAiTeamID = false
+	
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		local resourceShare, teamRank, isHostedAiTeam = UpdateTeamActivity(teamID)
+		totalResourceShares = totalResourceShares + resourceShare
+		if resourceShare == 0 then
+			if teamResourceShare[teamID] ~= 0 then
+				-- The team is newly afk.
+				if isHostedAiTeam then
+					giveAwayAiTeams[#giveAwayAiTeams + 1] = teamID
+				else
+					giveAwayTeams[#giveAwayTeams + 1] = teamID
+				end
+			end
+		elseif isHostedAiTeam then
+			recieveAiTeamID = teamID
+		elseif teamRank and ((not recieveRank) or (teamRank > recieveRank)) then
+			recieveRank = teamRank
+			recieveTeamID = teamID
+		end
+		teamResourceShare[teamID] = resourceShare
+	end
+	allyTeamResourceShares[allyTeamID] = totalResourceShares
+	
+	if recieveTeamID then
+		DoUnitGiveAway(recieveTeamID, giveAwayTeams, true)
+	else
+		-- Nobody can receive units so there is not much more to do
+		for i = 1, #giveAwayTeams do
+			local giveTeamID = giveAwayTeams[i]
+			local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID, false))
+			if giveResigned then
+				spEcho("game_message: " .. GetTeamName(giveTeamID) .. " resigned")
+			end
+		end
+
+		-- a human can have bot teammates; they are not eligible to receive his units but would still drain his income if he goes AFK
+		-- in that case, the human gets to keep his income as well
+		if totalResourceShares > 0 and #giveAwayTeams > 0 then
+			totalResourceShares = 0
+			for i = 1, #teamList do
+				local teamID = teamList[i]
+				local rawShare = GetRawTeamShare(teamID)
+				totalResourceShares = totalResourceShares + rawShare
+				teamResourceShare[teamID] = rawShare
+			end
+			allyTeamResourceShares[allyTeamID] = totalResourceShares
+		end
+	end
+	
+	if recieveAiTeamID then
+		DoUnitGiveAway(recieveAiTeamID, giveAwayAiTeams, false)
 	end
 end
 
