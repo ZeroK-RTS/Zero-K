@@ -42,7 +42,7 @@ options = {
 		name = 'Show Reclaim on Economy Overlay',
 		desc = "When to highlight reclaimable features",
 		type = 'radioButton',
-		value = 'always',
+		value = 'constructors',
 		items = {
 			{key ='always', name='Always'},
 			{key ='constructors',  name='When Constructor Selected'},
@@ -65,7 +65,7 @@ options = {
 		name = "Show Reclaim Before Round Start",
 		desc = "Enabled: Show reclaimable metal features before game begins \n Disabled: No highlights before game begins",
 		type = 'bool',
-		value = false,
+		value = true,
 		noHotkey = true,
 	},
 

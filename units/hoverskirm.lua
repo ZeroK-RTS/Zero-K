@@ -87,7 +87,7 @@ unitDef = {
       },
 	  
       damage                  = {
-        default = 311,
+        default = 330,
       },
 
       fireStarter             = 70,
