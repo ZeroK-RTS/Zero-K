@@ -305,7 +305,6 @@ function widget:Initialize()
 	dofShader = dofShader or glCreateShader({
 		defines = {"#version 120\n",
 			"#define DEPTH_CLIP01 " .. (Platform.glSupportClipSpaceControl and "1" or "0") .. "\n",
-			"#define MAX_FILTER_SIZE 1.0\n",
 
 			"#define FILTER_SIZE_PASS " .. shaderPasses.filterSize .. "\n",
 			"#define INITIAL_BLUR_PASS " .. shaderPasses.initialBlur .. "\n",
@@ -315,6 +314,9 @@ function widget:Initialize()
 			"#define COMPOSITION_PASS " .. shaderPasses.composition .. "\n",
 
 			"#define BLUR_START_DIST " .. maxBlurDistance .. "\n",
+
+			"#define LOW_QUALITY 0 \n",
+			"#define HIGH_QUALITY 1 \n"
 		},
 		fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\dof.fs", VFS.ZIP),
 		
