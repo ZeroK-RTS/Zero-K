@@ -751,6 +751,19 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		}
 	end
 	
+	if unitData.movestate then
+		commandsToGive = commandsToGive or {}
+		if commandsToGive[#commandsToGive] and commandsToGive[#commandsToGive].unitID == unitID then
+			local cmd = commandsToGive[#commandsToGive].commands
+			cmd[#cmd + 1] = {cmdID = CMD.MOVE_STATE, params = {unitData.movestate}, options = {"shift"}}
+		else
+			commandsToGive[#commandsToGive + 1] = {
+				unitID = unitID,
+				commands = {cmdID = CMD.MOVE_STATE, params = {unitData.movestate}, options = {"shift"}}
+			}
+		end
+	end
+	
 	SetupInitialUnitParameters(unitID, unitData, x, z)
 	
 	if build then
