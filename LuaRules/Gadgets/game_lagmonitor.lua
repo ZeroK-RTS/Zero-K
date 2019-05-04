@@ -179,8 +179,8 @@ local function UpdateTeamActivity(teamID)
 	
 	local _, leaderID, _, isAiTeam, _, allyTeamID = spGetTeamInfo(teamID, false)
 	if Spring.GetTeamRulesParam(teamID, "initialIsAiTeam") then
-		-- Treat luaAIs as active. Treat hosted AIs as active if their host is active.
 		if Spring.GetTeamLuaAI(teamID) then
+			-- LuaAIs are always active, unless they exist for the purpose of backup.
 			if Spring.GetTeamRulesParam(teamID, "backupai") == 1 then
 				isBackupAi = true
 			else
@@ -190,6 +190,7 @@ local function UpdateTeamActivity(teamID)
 			isHostedAi = true
 			local _, _, hostingPlayerID = Spring.GetAIInfo(teamID)
 			-- isAiTeam is false for teams that were AI teams, but had their hosting player drop.
+			-- AI teams without any hosting player are effectively dead.
 			if GetPlayerActivity(hostingPlayerID, true) and isAiTeam then
 				resourceShare = resourceShare + 1
 			end
@@ -331,13 +332,21 @@ local function UpdateAllyTeamActivity(allyTeamID)
 		end
 	end
 	
+	-- The backup AI team should be a LuaAI that exists only to take over from the circuitAIs.
 	if backupAiTeam and not recieveAiTeamID then
-		-- Remove the backup status, since the hosted AIs are not going to recieve the units.
+		-- Remove backup status to give the team a resource share, and because circuitAIs cannot be reinitialised.
 		Spring.SetTeamRulesParam(backupAiTeam, "backupai", 0)
 		recieveAiTeamID = backupAiTeam
 		totalResourceShares = totalResourceShares + 1 -- The backup did not count for resource shares.
 		teamResourceShare[backupAiTeam] = 1
 	end
+	
+	--for i = 1, #teamList do
+	--	Spring.Echo("teamResourceShare[teamID]", teamList[i], teamResourceShare[teamList[i]])
+	--end
+	--if allyTeamID < 2 then
+	--	Spring.Echo("totalResourceShares", recieveTeamID, totalResourceShares, recieveAiTeamID, backupAiTeam)
+	--end
 	
 	if recieveAiTeamID then
 		DoUnitGiveAway(allyTeamID, recieveAiTeamID, giveAwayAiTeams, false)
@@ -354,20 +363,6 @@ local function UpdateAllyTeamActivity(allyTeamID)
 				spEcho("game_message: " .. GetTeamName(giveTeamID) .. " resigned")
 			end
 		end
-
-		-- a human can have bot teammates; they are not eligible to receive his units but would still drain his income if he goes AFK
-		-- in that case, the human gets to keep his income as well
-		-- TODO: Figure out whether this behaviour should be un-deleted.
-		--if totalResourceShares > 0 and #giveAwayTeams > 0 then
-		--	totalResourceShares = 0
-		--	for i = 1, #teamList do
-		--		local teamID = teamList[i]
-		--		local rawShare = GetRawTeamShare(teamID)
-		--		totalResourceShares = totalResourceShares + rawShare
-		--		teamResourceShare[teamID] = rawShare
-		--	end
-		--	allyTeamResourceShares[allyTeamID] = totalResourceShares
-		--end
 	end
 	
 	allyTeamResourceShares[allyTeamID] = totalResourceShares
@@ -390,6 +385,7 @@ end
 function gadget:GameFrame(n)
 	if n % TEAM_SLOWUPDATE_RATE == 0 then -- Just before overdrive
 		local allyTeamList = Spring.GetAllyTeamList()
+		--Spring.Echo("============================")
 		for i = 1, #allyTeamList do
 			UpdateAllyTeamActivity(allyTeamList[i])
 		end
