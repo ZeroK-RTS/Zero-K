@@ -55,6 +55,7 @@ include("LuaRules/Configs/constants.lua")
 -- in seconds. The delay considered is (ping + time spent afk)
 local TO_AFK_THRESHOLD = 30 -- going above this marks you AFK
 local FROM_AFK_THRESHOLD = 5 -- going below this marks you non-AFK
+local PING_TIMEOUT = 2000 -- ms
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -132,14 +133,21 @@ end
 -- Activity updates
 
 local playerIsAfk = {}
-local function GetPlayerActivity(playerID, ignorePlayerAfk)
-	local name, active, spec, team, allyTeam, ping, _, _, _, customKeys = spGetPlayerInfo(playerID)
-	
-	if spec or not (active and ping <= 2000) then
+local function GetPlayerActivity(playerID, onlyActive)
+	if not playerID then
 		return false
 	end
-	if ignorePlayerAfk then
-		return customKeys.elo and tonumber(customKeys.elo) or 0
+	local name, active, spec, team, allyTeam, ping, _, _, _, customKeys = spGetPlayerInfo(playerID)
+	
+	if onlyActive then
+		if (active and ping <= PING_TIMEOUT) then
+			return customKeys.elo and tonumber(customKeys.elo) or 0
+		end
+		return false
+	end
+	
+	if spec or not (active and ping <= PING_TIMEOUT) then
+		return false
 	end
 	
 	local lastActionTime = spGetGameSeconds() - (mouseActivityTime[playerID] or 0)
@@ -157,6 +165,7 @@ local function UpdateTeamActivity(teamID)
 	local resourceShare = 0
 	local teamRank = false
 	local isHostedAi = false
+	local isBackupAi = false
 	local players = spGetPlayerList(teamID)
 	for i = 1, #players do
 		local activeRank = GetPlayerActivity(players[i])
@@ -172,7 +181,11 @@ local function UpdateTeamActivity(teamID)
 	if Spring.GetTeamRulesParam(teamID, "initialIsAiTeam") then
 		-- Treat luaAIs as active. Treat hosted AIs as active if their host is active.
 		if Spring.GetTeamLuaAI(teamID) then
-			resourceShare = resourceShare + 1
+			if Spring.GetTeamRulesParam(teamID, "backupai") == 1 then
+				isBackupAi = true
+			else
+				resourceShare = resourceShare + 1
+			end
 		else
 			isHostedAi = true
 			local _, _, hostingPlayerID = Spring.GetAIInfo(teamID)
@@ -213,7 +226,7 @@ local function UpdateTeamActivity(teamID)
 	end
 	
 	-- Note that AIs do not have a rank so a team with just an AI will have teamRank = false
-	return resourceShare, teamRank, isHostedAi
+	return resourceShare, teamRank, isHostedAi, isBackupAi
 end
 
 local function GetRawTeamShare(teamID)
@@ -290,10 +303,11 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	local recieveRank = false
 	local recieveTeamID = false
 	local recieveAiTeamID = false
+	local backupAiTeam = false
 	
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local resourceShare, teamRank, aiRank = UpdateTeamActivity(teamID)
+		local resourceShare, teamRank, isHostedAiTeam, isBackupAi = UpdateTeamActivity(teamID)
 		totalResourceShares = totalResourceShares + resourceShare
 		if resourceShare == 0 then
 			if teamResourceShare[teamID] ~= 0 then
@@ -311,13 +325,28 @@ local function UpdateAllyTeamActivity(allyTeamID)
 			recieveTeamID = teamID
 		end
 		teamResourceShare[teamID] = resourceShare
+		
+		if isBackupAi then
+			backupAiTeam = teamID
+		end
 	end
-	allyTeamResourceShares[allyTeamID] = totalResourceShares
+	
+	if backupAiTeam and not recieveAiTeamID then
+		-- Remove the backup status, since the hosted AIs are not going to recieve the units.
+		Spring.SetTeamRulesParam(backupAiTeam, "backupai", 0)
+		recieveAiTeamID = backupAiTeam
+		totalResourceShares = totalResourceShares + 1 -- The backup did not count for resource shares.
+		teamResourceShare[backupAiTeam] = 1
+	end
+	
+	if recieveAiTeamID then
+		DoUnitGiveAway(allyTeamID, recieveAiTeamID, giveAwayAiTeams, false)
+	end
 	
 	if recieveTeamID then
 		DoUnitGiveAway(allyTeamID, recieveTeamID, giveAwayTeams, true)
 	else
-		-- Nobody can receive units so there is not much more to do
+		-- Nobody can receive units, send resigned messages anyway
 		for i = 1, #giveAwayTeams do
 			local giveTeamID = giveAwayTeams[i]
 			local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID, false))
@@ -328,29 +357,32 @@ local function UpdateAllyTeamActivity(allyTeamID)
 
 		-- a human can have bot teammates; they are not eligible to receive his units but would still drain his income if he goes AFK
 		-- in that case, the human gets to keep his income as well
-		if totalResourceShares > 0 and #giveAwayTeams > 0 then
-			totalResourceShares = 0
-			for i = 1, #teamList do
-				local teamID = teamList[i]
-				local rawShare = GetRawTeamShare(teamID)
-				totalResourceShares = totalResourceShares + rawShare
-				teamResourceShare[teamID] = rawShare
-			end
-			allyTeamResourceShares[allyTeamID] = totalResourceShares
-		end
+		-- TODO: Figure out whether this behaviour should be un-deleted.
+		--if totalResourceShares > 0 and #giveAwayTeams > 0 then
+		--	totalResourceShares = 0
+		--	for i = 1, #teamList do
+		--		local teamID = teamList[i]
+		--		local rawShare = GetRawTeamShare(teamID)
+		--		totalResourceShares = totalResourceShares + rawShare
+		--		teamResourceShare[teamID] = rawShare
+		--	end
+		--	allyTeamResourceShares[allyTeamID] = totalResourceShares
+		--end
 	end
 	
-	if recieveAiTeamID then
-		DoUnitGiveAway(allyTeamID, recieveAiTeamID, giveAwayAiTeams, false)
-	end
+	allyTeamResourceShares[allyTeamID] = totalResourceShares
 end
 
-local function SetAiTeamRulesParams()
+local function InitializeAiTeamRulesParams()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
-		local _, leaderID, _, isAiTeam = spGetTeamInfo(teamList[i], false)
+		local teamID = teamList[i]
+		local _, leaderID, _, isAiTeam, _, _, customKeys = spGetTeamInfo(teamID)
 		if isAiTeam then
 			Spring.SetTeamRulesParam(teamList[i], "initialIsAiTeam", 1)
+		end
+		if customKeys.backupai or Spring.GetTeamLuaAI(teamID) then
+			Spring.SetTeamRulesParam(teamID, "backupai", 1)
 		end
 	end
 end
@@ -363,7 +395,7 @@ function gadget:GameFrame(n)
 		end
 	end
 	if n == 0 then
-		SetAiTeamRulesParams()
+		InitializeAiTeamRulesParams()
 	end
 end
 
