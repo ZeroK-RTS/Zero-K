@@ -22,6 +22,7 @@ local AUTOSAVE_DIR = SAVE_DIR .. "/auto"
 local MAX_SAVES = 999
 
 local LOAD_GAME_STRING = "loadFilename "
+local SAVE_TYPE = (Spring.Utilities.IsCurrentVersionNewerThan(104, 1200) and "save ") or "luasave "
 
 --------------------------------------------------------------------------------
 -- Chili elements
@@ -137,6 +138,18 @@ local function SortSavesByFilename(a, b)
 	return false
 end
 
+local function GetSaveExtension(path)
+	if VFS.FileExists(path .. ".ssf") then
+		return ".ssf"
+	end
+	return VFS.FileExists(path .. ".slsf") and ".slsf"
+end
+
+local function GetSaveWithExtension(path)
+	local ext = GetSaveExtension(path)
+	return ext and path .. ext
+end
+
 -- Returns the data stored in a save file
 local function GetSave(path)
 	local ret = nil
@@ -149,8 +162,8 @@ local function GetSave(path)
 	if (not success) then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error getting save " .. path .. ": " .. err)
 	else
-		local engineSaveFilename = string.sub(path, 1, -5) .. ".slsf"
-		if not VFS.FileExists(engineSaveFilename) then
+		local engineSaveFilename = GetSaveWithExtension(string.sub(path, 1, -5))
+		if not engineSaveFilename then
 			--Spring.Log(widget:GetInfo().name, LOG.ERROR, "Save " .. engineSaveFilename .. " does not exist")
 			return nil
 		else
@@ -230,9 +243,9 @@ local function SaveGame(filename, description, requireOverwrite)
 			--end
 			
 			if requireOverwrite then
-				Spring.SendCommands("luasave " .. filename .. " -y")
+				Spring.SendCommands(SAVE_TYPE .. filename .. " -y")
 			else
-				Spring.SendCommands("luasave " .. filename)
+				Spring.SendCommands(SAVE_TYPE .. filename)
 			end
 			Spring.Log(widget:GetInfo().name, LOG.INFO, "Saved game to " .. path)
 			
@@ -250,6 +263,11 @@ local function LoadGameByFilename(filename)
 		if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
 			Spring.SendLuaMenuMsg(LOAD_GAME_STRING .. filename)
 		else
+			local ext = GetSaveExtension(SAVE_DIR .. '/' .. filename)
+			if not ext then
+				Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error loading game: cannot find save file.")
+				return
+			end
 			local success, err = pcall(
 				function()
 					-- This should perhaps be handled in chobby first?
@@ -264,7 +282,7 @@ local function LoadGameByFilename(filename)
 		MyPlayerName=__PLAYERNAME__;
 	}
 	]]
-					script = script:gsub("__FILE__", filename .. ".slsf")
+					script = script:gsub("__FILE__", filename .. ext)
 					script = script:gsub("__PLAYERNAME__", saveData.playerName)
 					Spring.Reload(script)
 				end
@@ -288,7 +306,10 @@ local function DeleteSave(filename)
 	local success, err = pcall(function()
 		local pathNoExtension = SAVE_DIR .. "/" .. filename
 		os.remove(pathNoExtension .. ".lua")
-		os.remove(pathNoExtension .. ".slsf")
+		local saveFilePath = GetSaveWithExtension(pathNoExtension)
+		if saveFilePath then
+			os.remove(saveFilePath)
+		end
 	end)
 	if (not success) then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error deleting save " .. filename .. ": " .. err)
