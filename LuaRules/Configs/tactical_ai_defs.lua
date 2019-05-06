@@ -352,6 +352,25 @@ local fleeables = NameToDefID({
 	"jumpsumo",
 })
 
+-- Not currently used as air scouts flee everything.
+--local antiAirFlee = NameToDefID({
+--	"cloakaa",
+--	"shieldaa",
+--	"jumpaa",
+--	"spideraa",
+--	"vehaa",
+--	"tankaa",
+--	"hoveraa",
+--	"amphaa",
+--	"gunshipaa",
+--	"shipaa",
+--	
+--	"turretmissile",
+--	"turretaalaser",
+--	"turretaaclose",
+--	"turretaaflak",
+--})
+
 -- Submarines to be fled by some things
 local subfleeables = NameToDefID({
 	"subraider",
@@ -398,6 +417,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 
 --*** flees(defaults to empty): the table of units that this unit will flee like the coward it is!!!
 -- fleeCombat (defaults to false): if true will flee everything without catergory UNARMED
+-- fleeEverything (defaults to false): if true will flee all enemies
 -- fleeLeeway (defaults to 100): adds to enemy range when fleeing
 -- fleeDistance (defaults to 100): unit will flee to enemy range + fleeDistance away from enemy
 -- fleeRadar (defaults to false): does the unit flee radar dots?
@@ -1340,6 +1360,26 @@ local behaviourConfig = {
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 40, 
+	},
+	
+	-- Flying scouts
+	["planelightscout"] = {
+		skirms = {}, 
+		swarms = {}, 
+		flees = {},
+		fleeEverything = true,
+		minFleeRange = 600, -- Avoid enemies standing in front of Pickets
+		fleeLeeway = 450,
+		fleeDistance = 550,
+	},
+	["planescout"] = {
+		skirms = {}, 
+		swarms = {}, 
+		flees = {},
+		fleeEverything = true,
+		minFleeRange = 600, -- Avoid enemies standing in front of Pickets
+		fleeLeeway = 700,
+		fleeDistance = 800,
 	},
 	
 	-- chickens
