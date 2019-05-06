@@ -58,6 +58,7 @@ local BUTTON_FOCUS_COLOR
 local BUTTON_BORDER_COLOR
 
 local NO_TEXT = ""
+local NO_TOOLTIP = "NONE"
 
 EPIC_NAME = "epic_chili_integral_menu_"
 EPIC_NAME_UNITS = "epic_chili_integral_menu_tab_units"
@@ -1347,6 +1348,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		classname = "button_tab",
 		caption = humanName,
 		padding = {0, 0, 0, 1},
+		tooltip = NO_TOOLTIP,
 		OnClick = {
 			function()
 				DoClick(true)
