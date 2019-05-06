@@ -5,7 +5,6 @@
 local materials = {
 	normalMappedS3o = {
 		-- Suggestions for fixing https://github.com/lhog/spring-ssao/issues/1
-		-- Apparently the following should be uncommented to make projectile lights work, but they seem to work regardless.
 		shaderDefinitions = {
 			"#define use_perspective_correct_shadows",
 			"#define use_normalmapping",
@@ -14,14 +13,15 @@ local materials = {
 			--"#define flashlights",
 			--"#define SPECULARMULT 8.0",
 		},
-		--deferredDefinitions = {
-		--	"#define use_normalmapping",
-		--	"#define deferred_mode 1",
-		--	--"#define flashlights",
-		--	--"#define use_vertex_ao",
-		--	--"#define SPECULARMULT 8.0",
-		--},
+		deferredDefinitions = {
+			"#define use_normalmapping",
+			"#define deferred_mode 1",
+			--"#define flashlights",
+			--"#define use_vertex_ao",
+			--"#define SPECULARMULT 8.0",
+		},
 		shader    = include("ModelMaterials/Shaders/default.lua"),
+		deferred  = include("ModelMaterials/Shaders/default.lua"),
 		usecamera = false,
 		culling   = GL.BACK,
 		predl  = nil,

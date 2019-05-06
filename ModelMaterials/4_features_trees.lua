@@ -81,7 +81,7 @@ local materials = {
 			]]
 		},
 		force     = false, --// always use the shader even when normalmapping is disabled
-		feature = true, --// This is used to define that this is a feature shader
+		feature   = true, --// This is used to define that this is a feature shader
 		usecamera = false,
 		culling   = GL.BACK,
 		texunits  = {
