@@ -39,7 +39,7 @@ unitDef = {
 
   customParams                  = {
     landflystate   = [[0]],
-    morphto = [[factorymobilegunship]],
+    morphto = [[mobilefactorygunship]],
     morphtime = 30,
     sortName = [[3]],
 	modelradius    = [[43]],

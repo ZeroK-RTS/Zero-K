@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[factorymobilegunship]],
+  unitname                      = [[mobilefactorygunship]],
   name                          = [[Mobile Gunship Plant]],
   description                   = [[Produces Gunships, Builds at 10 m/s]],
   acceleration                  = 0.06,
@@ -81,7 +81,7 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[CORPLAS.s3o]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
-  script                        = [[factorymobilegunship.lua]],
+  script                        = [[mobilefactorygunship.lua]],
   showNanoSpray                 = false,
   sightDistance                 = 273,
   turnRate                      = 148,
@@ -111,4 +111,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ factorymobilegunship = unitDef })
+return lowerkeys({ mobilefactorygunship = unitDef })

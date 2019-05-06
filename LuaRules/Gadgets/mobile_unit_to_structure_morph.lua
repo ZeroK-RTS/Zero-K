@@ -32,7 +32,7 @@ local LANDING_BOX_SZ = 8
 --let's start with Mobile Gunship Plant preMorphing and go from there.
 --for general use we would build tables from all unitdefs.
 local gunshipPlantID = UnitDefNames["factorygunship"].id
-local mobileGunshipPlantID = UnitDefNames["factorymobilegunship"].id
+local mobileGunshipPlantID = UnitDefNames["mobilefactorygunship"].id
 local mobileGunshipPlants = {}
 
 --keep track of units moving into morph position.
