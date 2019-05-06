@@ -1367,19 +1367,21 @@ local behaviourConfig = {
 		skirms = {}, 
 		swarms = {}, 
 		flees = {},
+		searchRange = 1000,
 		fleeEverything = true,
 		minFleeRange = 600, -- Avoid enemies standing in front of Pickets
-		fleeLeeway = 450,
-		fleeDistance = 550,
+		fleeLeeway = 650,
+		fleeDistance = 650,
 	},
 	["planescout"] = {
 		skirms = {}, 
 		swarms = {}, 
 		flees = {},
+		searchRange = 1200,
 		fleeEverything = true,
 		minFleeRange = 600, -- Avoid enemies standing in front of Pickets
-		fleeLeeway = 700,
-		fleeDistance = 800,
+		fleeLeeway = 850,
+		fleeDistance = 850,
 	},
 	
 	-- chickens
