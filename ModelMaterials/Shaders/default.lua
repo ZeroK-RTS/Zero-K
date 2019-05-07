@@ -202,16 +202,17 @@ fragment = [[
 	#endif
 
 	const float PI = acos(0.0) * 2.0;
+	#ifdef LUMAMULT
+		const mat3 RGB2YCBCR = mat3(
+			0.2126, -0.114572, 0.5,
+			0.7152, -0.385428, -0.454153,
+			0.0722, 0.5, -0.0458471);
 
-	const mat3 RGB2YCBCR = mat3(
-		0.2126, -0.114572, 0.5,
-		0.7152, -0.385428, -0.454153,
-		0.0722, 0.5, -0.0458471);
-
-	const mat3 YCBCR2RGB = mat3(
-		1.0, 1.0, 1.0,
-		0.0, -0.187324, 1.8556,
-		1.5748, -0.468124, -5.55112e-17);
+		const mat3 YCBCR2RGB = mat3(
+			1.0, 1.0, 1.0,
+			0.0, -0.187324, 1.8556,
+			1.5748, -0.468124, -5.55112e-17);
+	#endif
 
 	#define NORM2SNORM(value) (value * 2.0 - 1.0)
 	#define SNORM2NORM(value) (value * 0.5 + 0.5)
@@ -329,6 +330,7 @@ fragment = [[
 
 		vec3 specularColor;
 
+		// Blinn-Phong
 		vec3 H = normalize(L + V);
 		float HdotN = max(dot(H, N), 0.0);
 		specularColor = sunSpecular * pow(HdotN, SPECULARSUNEXP);
@@ -398,6 +400,7 @@ fragment = [[
 		textureS3o1 = 0,
 		textureS3o2 = 1,
 		shadowTex   = 2,
+		--specularTex = 3, -- specularTex contains lookup table sunSpecular = function(reflectionVector). It is buggy, incorrect and soon to be deprecated. This shader makes use of standard Blinn-Phong estimation for specular light instead
 		reflectTex  = 4,
 		normalMap   = 5,
 		--detailMap   = 6,

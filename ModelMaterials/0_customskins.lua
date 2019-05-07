@@ -31,7 +31,7 @@ local materials = {
          [0] = '%ALTSKIN',
          [1] = '%ALTSKIN2',
          [2] = '$shadow',
-         [3] = '$specular',
+         --[3] = '$specular',
          [4] = '$reflection',
          [5] = '%NORMALTEX',
        },
