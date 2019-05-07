@@ -141,24 +141,33 @@ fragment = [[
 	uniform vec3 sunSpecular;
 
 	uniform vec3 etcLoc;
-	
-	#ifndef SPECULARSUNEXP
-		#define SPECULARSUNEXP 16.0
-	#endif	
 
-	#ifndef SPECULARMULT
-		#define SPECULARMULT 2.0
+	#ifndef SPECULARSUNEXP
+		#define SPECULARSUNEXP 32.0
 	#endif
 
-	#ifndef SHADOW_SAMPLES
-		#define SHADOW_SAMPLES 6 // number of shadowmap samples per fragment
-		#define SHADOW_RANDOMNESS 0.3 // 0.0 - blocky look, 1.0 - random points look
-		#define SHADOW_SAMPLING_DISTANCE 5.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
-		#define SAMPLING_METHOD 2 // 1 - Hammersley Box, 2 - Spiral
+	#ifndef SPECULARMULT
+		#define SPECULARMULT 3.0
 	#endif
 
 	#ifdef use_shadows
 		uniform sampler2DShadow shadowTex;
+		
+		#if !defined(SHADOW_PROFILE_LOW) && !defined(SHADOW_PROFILE_HIGH)
+			#define SHADOW_PROFILE_LOW
+		#endif
+
+		#ifdef SHADOW_PROFILE_LOW
+			#define SHADOW_SAMPLES 1
+		#endif
+
+		#ifdef SHADOW_PROFILE_HIGH
+			#define SHADOW_SAMPLES 6 // number of shadowmap samples per fragment
+			#define SHADOW_RANDOMNESS 0.3 // 0.0 - blocky look, 1.0 - random points look
+			#define SHADOW_SAMPLING_DISTANCE 5.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
+			#define SAMPLING_METHOD 2 // 1 - Hammersley Box, 2 - Spiral
+		#endif
+
 	#endif
 	uniform float shadowDensity;
 
@@ -243,8 +252,6 @@ fragment = [[
 		bias = clamp(bias, 0.0, 5.0 * cb);
 
 		#if defined(SHADOW_SAMPLES) && (SHADOW_SAMPLES > 1)
-
-
 			float rndRotAngle = NORM2SNORM(hash12(gl_FragCoord.xy)) * PI / 2.0 * SHADOW_RANDOMNESS;
 
 			vec2 vSinCos = vec2(sin(rndRotAngle), cos(rndRotAngle));

@@ -17,14 +17,12 @@ local materials = {
 		shaderDefinitions = {
 			"#define use_normalmapping",
 			"#define deferred_mode 0",
-			"#define SPECULARMULT 3.0",
-			"#define SPECULARSUNEXP 32.0",
+			"#define SHADOW_PROFILE_HIGH",
 		},
 		deferredDefinitions = {
 			"#define use_normalmapping",
 			"#define deferred_mode 1",
-			"#define SPECULARMULT 3.0",
-			"#define SPECULARSUNEXP 32.0",
+			"#define SHADOW_PROFILE_HIGH",
 		},
 		shader    = default_lua,
 		deferred  = default_lua,

@@ -797,7 +797,7 @@ function gadget:Initialize()
   advShading = Spring.HaveAdvShading()
   normalmapping = tonumber(Spring.GetConfigInt("NormalMapping", 1) or 0) > 0
   treewind = tonumber(Spring.GetConfigInt("TreeWind",1) or 1) > 0
-  
+
   --// load the materials config files
   local unitMaterialDefs, featureMaterialDefs = _LoadMaterialConfigFiles(MATERIALS_DIR)
   --// process the materials (compile shaders, load textures, ...)

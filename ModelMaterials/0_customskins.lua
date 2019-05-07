@@ -2,16 +2,28 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function SunChanged(curShaderObj)
+	curShaderObj:SetUniformAlways("shadowDensity", gl.GetSun("shadowDensity" ,"unit"))
+
+	curShaderObj:SetUniformAlways("sunAmbient", gl.GetSun("ambient" ,"unit"))
+	curShaderObj:SetUniformAlways("sunDiffuse", gl.GetSun("diffuse" ,"unit"))
+	curShaderObj:SetUniformAlways("sunSpecular", gl.GetSun("specular" ,"unit"))
+end
+
+local default_lua = VFS.Include("ModelMaterials/Shaders/default.lua")
+
 local materials = {
    altSkinS3o = {
        shaderDefinitions = {
          "#define deferred_mode 0",
+		 "#define SHADOW_PROFILE_HIGH",
        },
        deferredDefinitions = {
          "#define deferred_mode 1",
+		 "#define SHADOW_PROFILE_HIGH",
        },
-       shader    = include("ModelMaterials/Shaders/default.lua"),
-       deferred  = include("ModelMaterials/Shaders/default.lua"),
+       shader    = default_lua,
+       deferred  = default_lua,
        force     = true,
        usecamera = false,
        culling   = GL.BACK,
@@ -23,6 +35,7 @@ local materials = {
          [4] = '$reflection',
          [5] = '%NORMALTEX',
        },
+	   SunChanged = SunChanged,
    },
 }
 
