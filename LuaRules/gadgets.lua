@@ -169,6 +169,8 @@ local callInLists = {
 	"DrawShield",
 	"DrawProjectile",
 	"RecvSkirmishAIMessage",
+	
+	"SunChanged",
 
 	-- COB CallIn  (FIXME?)
 	"CobCallback",
@@ -1090,6 +1092,12 @@ function gadgetHandler:RecvSkirmishAIMessage(aiTeam, dataStr)
   end
 end
 
+function gadgetHandler:SunChanged()
+  for _,g in ipairs(self.SunChangedList) do
+    g:SunChanged()
+  end
+  return
+end
 
 function gadgetHandler:CommandFallback(unitID, unitDefID, unitTeam,
                                        cmdID, cmdParams, cmdOptions, cmdTag)

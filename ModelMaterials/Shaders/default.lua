@@ -131,7 +131,6 @@ fragment = [[
 
 	uniform sampler2D textureS3o1;
 	uniform sampler2D textureS3o2;
-	uniform samplerCube specularTex;
 	uniform samplerCube reflectTex;
 
 	uniform vec3 sunPos; //light direction in fact
@@ -141,10 +140,11 @@ fragment = [[
 	uniform vec3 sunAmbient;
 	uniform vec3 sunSpecular;
 
-	uniform int lightingModel;
-	const float sunSpecularExp = 16.0;
-
 	uniform vec3 etcLoc;
+	
+	#ifndef SPECULARSUNEXP
+		#define SPECULARSUNEXP 16.0
+	#endif	
 
 	#ifndef SPECULARMULT
 		#define SPECULARMULT 2.0
@@ -322,19 +322,9 @@ fragment = [[
 
 		vec3 specularColor;
 
-		if (lightingModel == 1) { //blinn-phong
-			vec3 H = normalize(L + V);
-			float HdotN = max(dot(H, N), 0.0);
-			specularColor = sunSpecular * pow(HdotN, sunSpecularExp);
-		}
-		else if (lightingModel == 2) { //phong
-			vec3 Rl = -reflect(L, N);
-			float VdotRl = max(dot(Rl, V), 0.0);
-			specularColor = sunSpecular * min(1.0, (pow(VdotRl, sunSpecularExp) + pow(VdotRl, 3.0) * 0.15));
-		}
-		else {
-			specularColor = texture(specularTex, Rv).rgb;
-		}
+		vec3 H = normalize(L + V);
+		float HdotN = max(dot(H, N), 0.0);
+		specularColor = sunSpecular * pow(HdotN, SPECULARSUNEXP);
 
 		specularColor *= extraColor.g * SPECULARMULT;
 
@@ -401,12 +391,9 @@ fragment = [[
 		textureS3o1 = 0,
 		textureS3o2 = 1,
 		shadowTex   = 2,
-		specularTex = 3,
 		reflectTex  = 4,
 		normalMap   = 5,
 		--detailMap   = 6,
-
-		lightingModel = 1,
 	},
 	uniformFloat = {
 		-- sunPos = {gl.GetSun("pos")}, -- material has sunPosLoc
