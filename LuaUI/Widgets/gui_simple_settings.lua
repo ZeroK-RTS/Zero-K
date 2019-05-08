@@ -101,14 +101,14 @@ local optionGenerationTable = {
 		type = "label",
 		path = "Settings/Graphics",
 	},
-	{
-		optionName = "unitPlatter",
-		optionFunction = function(self) Spring.SendCommands{"luaui togglewidget Fancy Teamplatter"} end,
-		name = "Toggle Unit Platter",
-		desc = "Puts a team-coloured platter-halo below units.",
-		type = "button",
-		path = "Settings/Graphics",
-	},
+	--{
+	--	optionName = "unitPlatter",
+	--	optionFunction = function(self) Spring.SendCommands{"luaui togglewidget Fancy Teamplatter"} end,
+	--	name = "Toggle Unit Platter",
+	--	desc = "Puts a team-coloured platter-halo below units.",
+	--	type = "button",
+	--	path = "Settings/Graphics",
+	--},
 	{
 		optionName = "unitOutline",
 		optionFunction = function(self) Spring.SendCommands{"luaui togglewidget Outline"} end,
