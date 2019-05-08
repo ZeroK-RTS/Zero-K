@@ -54,10 +54,16 @@ local LuaShader = VFS.Include("LuaRules/Gadgets/Include/LuaShader.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local MATERIALS_DIR = "ModelMaterials/"
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local shadows = false
 local advShading = false
-local normalmapping = (tonumber(Spring.GetConfigInt("NormalMapping",1) or 1) == 1)
-local treewind = tonumber(Spring.GetConfigInt("TreeWind",1) or 1) == 1
+local normalmapping = false
+local treewind = false
+
 local sunChanged = false
 
 local idToDefID = {}
@@ -68,8 +74,6 @@ local unitRendering = {
   bufMaterials    = {},
   materialDefs    = {},
   loadedTextures  = {},
-
-  ObjectDefNames       = UnitDefNames,
 
   spGetAllObjects      = Spring.GetAllUnits,
   spGetObjectPieceList = Spring.GetUnitPieceList,
@@ -93,8 +97,6 @@ local featureRendering = {
   bufMaterials    = {},
   materialDefs    = {},
   loadedTextures  = {},
-
-  ObjectDefNames       = FeatureDefNames,
 
   spGetAllObjects      = Spring.GetAllFeatures,
   spGetObjectPieceList = Spring.GetFeaturePieceList,
@@ -440,7 +442,6 @@ function ToggleNormalmapping(_,newSetting,_, playerID)
   featureRendering.loadedTextures  = {}
 
   --// load the materials config files
-  local MATERIALS_DIR = "materials/"
   local unitMaterialDefs, featureMaterialDefs = _LoadMaterialConfigFiles(MATERIALS_DIR)
   _ProcessMaterials(unitRendering,    unitMaterialDefs)
   _ProcessMaterials(featureRendering, featureMaterialDefs)
@@ -499,7 +500,7 @@ local function GetShaderOverride(objectID, objectDefID)
   return false
 end
 
-function ObjectFinished(rendering, objectID, objectDefID)
+local function ObjectFinished(rendering, objectID, objectDefID)
   if not advShading then
     return
   end
@@ -537,7 +538,7 @@ function gadget:FeatureCreated(featureID)
 	ObjectFinished(featureRendering, featureID, idToDefID[-featureID])
 end
 
-function ObjectDestroyed(rendering, objectID, objectDefID)
+local function ObjectDestroyed(rendering, objectID, objectDefID)
   rendering.spDeactivateMaterial(objectID, 3)
 
   local mat = rendering.drawList[objectID]
@@ -722,7 +723,7 @@ end
 local function _ProcessMaterials(rendering, materialDefs)
   local engineShaderTypes = {"3do", "s3o", "obj", "ass"}
   for _, mat_src in pairs(rendering.materialDefs) do
-    -- mat_src = {shader = include(".../default.lua") or "s3o", ...}
+    --mat_src = {shader = include("ModelMaterials/Shaders/default.lua") or "s3o"}
     if mat_src.shader ~= nil and engineShaderTypes[mat_src.shader] == nil then
       mat_src.shaderSource = mat_src.shader
       mat_src.shader = nil
@@ -735,11 +736,11 @@ local function _ProcessMaterials(rendering, materialDefs)
 
   _CompileMaterialShaders(rendering)
 
-  for objectName, materialInfo in pairs(materialDefs) do
+  for objectDefID, materialInfo in pairs(materialDefs) do
     if (type(materialInfo) ~= "table") then
       materialInfo = {materialInfo}
     end
-    rendering.materialInfos[(rendering.ObjectDefNames[objectName] or {id=-1}).id] = materialInfo
+    rendering.materialInfos[objectDefID] = materialInfo
   end
 end
 
@@ -776,7 +777,6 @@ function ToggleTreeWind(_,newSetting,_, playerID)
   featureRendering.loadedTextures  = {}
 
   --// load the materials config files
-  local MATERIALS_DIR = "materials/"
   local unitMaterialDefs, featureMaterialDefs = _LoadMaterialConfigFiles(MATERIALS_DIR)
   _ProcessMaterials(featureRendering, featureMaterialDefs)
 
@@ -795,9 +795,10 @@ function gadget:Initialize()
   --// check user configs
   shadows = Spring.HaveShadows()
   advShading = Spring.HaveAdvShading()
+  normalmapping = tonumber(Spring.GetConfigInt("NormalMapping", 1) or 0) > 0
+  treewind = tonumber(Spring.GetConfigInt("TreeWind",1) or 1) > 0
 
   --// load the materials config files
-  local MATERIALS_DIR = "ModelMaterials/"
   local unitMaterialDefs, featureMaterialDefs = _LoadMaterialConfigFiles(MATERIALS_DIR)
   --// process the materials (compile shaders, load textures, ...)
   _ProcessMaterials(unitRendering,    unitMaterialDefs)

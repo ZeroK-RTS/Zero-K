@@ -131,7 +131,6 @@ fragment = [[
 
 	uniform sampler2D textureS3o1;
 	uniform sampler2D textureS3o2;
-	uniform samplerCube specularTex;
 	uniform samplerCube reflectTex;
 
 	uniform vec3 sunPos; //light direction in fact
@@ -141,24 +140,34 @@ fragment = [[
 	uniform vec3 sunAmbient;
 	uniform vec3 sunSpecular;
 
-	uniform int lightingModel;
-	const float sunSpecularExp = 16.0;
-
 	uniform vec3 etcLoc;
 
-	#ifndef SPECULARMULT
-		#define SPECULARMULT 2.0
+	#ifndef SPECULARSUNEXP
+		#define SPECULARSUNEXP 32.0
 	#endif
 
-	#ifndef SHADOW_SAMPLES
-		#define SHADOW_SAMPLES 6 // number of shadowmap samples per fragment
-		#define SHADOW_RANDOMNESS 0.3 // 0.0 - blocky look, 1.0 - random points look
-		#define SHADOW_SAMPLING_DISTANCE 5.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
-		#define SAMPLING_METHOD 2 // 1 - Hammersley Box, 2 - Spiral
+	#ifndef SPECULARMULT
+		#define SPECULARMULT 3.0
 	#endif
 
 	#ifdef use_shadows
 		uniform sampler2DShadow shadowTex;
+		
+		#if !defined(SHADOW_PROFILE_LOW) && !defined(SHADOW_PROFILE_HIGH)
+			#define SHADOW_PROFILE_LOW
+		#endif
+
+		#ifdef SHADOW_PROFILE_LOW
+			#define SHADOW_SAMPLES 1
+		#endif
+
+		#ifdef SHADOW_PROFILE_HIGH
+			#define SHADOW_SAMPLES 6 // number of shadowmap samples per fragment
+			#define SHADOW_RANDOMNESS 0.3 // 0.0 - blocky look, 1.0 - random points look
+			#define SHADOW_SAMPLING_DISTANCE 5.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
+			#define SAMPLING_METHOD 2 // 1 - Hammersley Box, 2 - Spiral
+		#endif
+
 	#endif
 	uniform float shadowDensity;
 
@@ -193,16 +202,17 @@ fragment = [[
 	#endif
 
 	const float PI = acos(0.0) * 2.0;
+	#ifdef LUMAMULT
+		const mat3 RGB2YCBCR = mat3(
+			0.2126, -0.114572, 0.5,
+			0.7152, -0.385428, -0.454153,
+			0.0722, 0.5, -0.0458471);
 
-	const mat3 RGB2YCBCR = mat3(
-		0.2126, -0.114572, 0.5,
-		0.7152, -0.385428, -0.454153,
-		0.0722, 0.5, -0.0458471);
-
-	const mat3 YCBCR2RGB = mat3(
-		1.0, 1.0, 1.0,
-		0.0, -0.187324, 1.8556,
-		1.5748, -0.468124, -5.55112e-17);
+		const mat3 YCBCR2RGB = mat3(
+			1.0, 1.0, 1.0,
+			0.0, -0.187324, 1.8556,
+			1.5748, -0.468124, -5.55112e-17);
+	#endif
 
 	#define NORM2SNORM(value) (value * 2.0 - 1.0)
 	#define SNORM2NORM(value) (value * 0.5 + 0.5)
@@ -243,8 +253,6 @@ fragment = [[
 		bias = clamp(bias, 0.0, 5.0 * cb);
 
 		#if defined(SHADOW_SAMPLES) && (SHADOW_SAMPLES > 1)
-
-
 			float rndRotAngle = NORM2SNORM(hash12(gl_FragCoord.xy)) * PI / 2.0 * SHADOW_RANDOMNESS;
 
 			vec2 vSinCos = vec2(sin(rndRotAngle), cos(rndRotAngle));
@@ -322,19 +330,10 @@ fragment = [[
 
 		vec3 specularColor;
 
-		if (lightingModel == 1) { //blinn-phong
-			vec3 H = normalize(L + V);
-			float HdotN = max(dot(H, N), 0.0);
-			specularColor = sunSpecular * pow(HdotN, sunSpecularExp);
-		}
-		else if (lightingModel == 2) { //phong
-			vec3 Rl = -reflect(L, N);
-			float VdotRl = max(dot(Rl, V), 0.0);
-			specularColor = sunSpecular * min(1.0, (pow(VdotRl, sunSpecularExp) + pow(VdotRl, 3.0) * 0.15));
-		}
-		else {
-			specularColor = texture(specularTex, Rv).rgb;
-		}
+		// Blinn-Phong
+		vec3 H = normalize(L + V);
+		float HdotN = max(dot(H, N), 0.0);
+		specularColor = sunSpecular * pow(HdotN, SPECULARSUNEXP);
 
 		specularColor *= extraColor.g * SPECULARMULT;
 
@@ -401,12 +400,10 @@ fragment = [[
 		textureS3o1 = 0,
 		textureS3o2 = 1,
 		shadowTex   = 2,
-		specularTex = 3,
+		--specularTex = 3, -- specularTex contains lookup table sunSpecular = function(reflectionVector). It is buggy, incorrect and soon to be deprecated. This shader makes use of standard Blinn-Phong estimation for specular light instead
 		reflectTex  = 4,
 		normalMap   = 5,
 		--detailMap   = 6,
-
-		lightingModel = 1,
 	},
 	uniformFloat = {
 		-- sunPos = {gl.GetSun("pos")}, -- material has sunPosLoc
