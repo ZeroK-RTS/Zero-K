@@ -27,7 +27,6 @@ starlight_satellite = {
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[starlight_satellite.dae]],
   script                 = [[starlight_satellite.lua]],
   selfDestructAs         = [[GUNSHIPEX]],
