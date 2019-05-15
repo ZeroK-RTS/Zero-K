@@ -16,7 +16,7 @@ function gadget:GetInfo()
 	return {
 		name     = "UnitMorph",
 		desc     = "Adds unit morphing",
-		author	 = "trepan (improved by jK, Licho, aegis, CarRepairer, Aquanim)",
+		author   = "trepan (improved by jK, Licho, aegis, CarRepairer, Aquanim)",
 		date     = "Jan, 2008",
 		license  = "GNU GPL, v2 or later",
 		layer    = -1, --must start after unit_priority.lua gadget to use GG.AddMiscPriority()
@@ -140,7 +140,7 @@ local morphToStart = {} -- morphs to start next frame
 GG.wasMorphedTo = {} -- when a unit finishes morphing, a mapping of old unitID to new unitID is recorded here prior to old unit destruction
 
 local morphCmdDesc = {
---	id	 = CMD_MORPH, -- added by the calling function because there is now more than one option
+	--id	 = CMD_MORPH, -- added by the calling function because there is now more than one option
 	type   = CMDTYPE.ICON,
 	name   = 'Morph',
 	cursor = 'Morph',	-- add with LuaUI?
@@ -164,9 +164,9 @@ local function GetMorphToolTip(unitID, unitDefID, teamID, morphDef)
 	local ud = UnitDefs[morphDef.into]
 	local tt = ''
 	if (morphDef.text ~= nil) then
-	tt = tt .. WhiteStr	.. morphDef.text .. '\n'
+		tt = tt .. WhiteStr	.. morphDef.text .. '\n'
 	else
-	tt = tt .. 'Morph into a ' .. ud.humanName .. '\n'
+		tt = tt .. 'Morph into a ' .. ud.humanName .. '\n'
 	end
 	tt = tt .. GreenStr	.. 'time: '	 .. morphDef.time	 .. '\n'
 	tt = tt .. CyanStr	 .. 'metal: '	.. morphDef.metal	.. '\n'
@@ -524,15 +524,15 @@ local function FinishMorph(unitID, morphData)
 	
 	--//transfer some state
 	Spring.GiveOrderArrayToUnitArray({ newUnit }, {
-	{CMD.FIRE_STATE,    { states.firestate             }, 0 },
-	{CMD.MOVE_STATE,    { states.movestate             }, 0 },
-	{CMD.REPEAT,        { states["repeat"] and 1 or 0  }, 0 },
-	{CMD_WANT_CLOAK,    { wantCloakState or 0          }, 0 },
-	{CMD.ONOFF,         { 1                            }, 0 },
-	{CMD.TRAJECTORY,    { states.trajectory and 1 or 0 }, 0 },
-	{CMD_PRIORITY,      { states.buildPrio             }, 0 },
-	{CMD_RETREAT,       { states.retreat               }, states.retreat == 0 and CMD.OPT_RIGHT or 0 },
-	{CMD_MISC_PRIORITY, { states.miscPrio              }, 0 },
+		{CMD.FIRE_STATE,    { states.firestate             }, 0 },
+		{CMD.MOVE_STATE,    { states.movestate             }, 0 },
+		{CMD.REPEAT,        { states["repeat"] and 1 or 0  }, 0 },
+		{CMD_WANT_CLOAK,    { wantCloakState or 0          }, 0 },
+		{CMD.ONOFF,         { 1                            }, 0 },
+		{CMD.TRAJECTORY,    { states.trajectory and 1 or 0 }, 0 },
+		{CMD_PRIORITY,      { states.buildPrio             }, 0 },
+		{CMD_RETREAT,       { states.retreat               }, states.retreat == 0 and CMD.OPT_RIGHT or 0 },
+		{CMD_MISC_PRIORITY, { states.miscPrio              }, 0 },
 	})
 	
 	--//reassign assist commands to new unit
@@ -1319,9 +1319,9 @@ function gadget:Save(zip)
 end
 
 --------------------------------------------------------------------------------
---	UNSYNCED
+--  UNSYNCED
 --------------------------------------------------------------------------------
 end
 --------------------------------------------------------------------------------
---	COMMON
+--  COMMON
 --------------------------------------------------------------------------------
