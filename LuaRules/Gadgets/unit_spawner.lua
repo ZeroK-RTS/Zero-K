@@ -205,6 +205,9 @@ else
 			humanTeams[teamID] = true
 		end
 	end
+	if chickenTeamID then
+		Spring.SetGameRulesParam("chickenTeamID", chickenTeamID)
+	end
 	luaAI = highestLevel
 end
 
