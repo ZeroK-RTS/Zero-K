@@ -14,17 +14,16 @@ function widget:GetInfo()
 	}
 end
 
-Spring.SendLuaMenuMsg(RESIGN_MESSAGE .. " " .. planetID .. " " .. GetTimeString())
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Globals
 
-local gameString = ""
 local DELIM = "_"
 
 local GAME_INIT = "ingameInfoInit" .. DELIM
 local GAME_START = "ingameInfoStart" .. DELIM
+
+local RELOAD_MODE = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -128,8 +127,9 @@ end
 --------------------------------------------------------------------------------
 -- Widget Interface
 
+local gameString
 function widget:GameFrame(n)
-	if n == 0 then
+	if n == 0 or RELOAD_MODE then
 		gameString = gameString or GetGameTypeCoded()
 		SendGameStart(gameString)
 	end
@@ -137,11 +137,12 @@ function widget:GameFrame(n)
 end
 
 function widget:Update(dt)
-	if Spring.GetGameFrame() > 0 then
+	if (not RELOAD_MODE) and Spring.GetGameFrame() > 0 then
 		widgetHandler:RemoveWidget()
 	end
 	gameString = gameString or GetGameTypeCoded()
 	SendPreGame(gameString)
+	widgetHandler:RemoveCallIn("Update")
 end
 
 function widget:Initialize() 
