@@ -22,7 +22,9 @@ local AUTOSAVE_DIR = SAVE_DIR .. "/auto"
 local MAX_SAVES = 999
 
 local LOAD_GAME_STRING = "loadFilename "
-local SAVE_TYPE = (Spring.Utilities.IsCurrentVersionNewerThan(104, 1200) and "save ") or "luasave "
+local SAVE_TYPE = "luasave " -- (Spring.Utilities.IsCurrentVersionNewerThan(104, 1200) and "save ") or "luasave "
+-- https://springrts.com/mantis/view.php?id=6219
+-- https://springrts.com/mantis/view.php?id=6222
 
 --------------------------------------------------------------------------------
 -- Chili elements
