@@ -720,7 +720,7 @@ end
       local cnt = #background
 
       local elements = {}
-      for i=1,cnt-1 do
+      for j=1,cnt-1 do
         for n=1,4 do
           elements[#elements+1] = {
             v = {}
@@ -739,8 +739,8 @@ end
 
   local function Background(unitdefid)
     local udef = UnitDefs[unitdefid];
-    for i=1,#backgrounds do
-      local bg = backgrounds[i]
+    for j=1,#backgrounds do
+      local bg = backgrounds[j]
       if (type(bg.check) == "table") then
         local fulfill = true
         for key,value in pairs(bg.check) do
@@ -862,9 +862,9 @@ end
 
   local function ProcessJobs()
     --//note: we have a LIFO stack
-    for i=#jobs,1,-1 do
-      if (jobs[i]() ~= false) then
-        jobs[i] = nil;
+    for j=#jobs,1,-1 do
+      if (jobs[j]() ~= false) then
+        jobs[j] = nil;
       else
         break;
       end;

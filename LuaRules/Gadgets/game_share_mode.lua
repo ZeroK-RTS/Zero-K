@@ -285,16 +285,16 @@ end
 function gadget:GameFrame(frame)
 	if frame%30 == 0 then
 		local invitecount
-		for player, invites in pairs(invites) do
+		for player, playerInvites in pairs(invites) do
 			invitecount = 0
-			for key,data in pairs(invites) do
+			for key,data in pairs(playerInvites) do
 				invitecount = invitecount+1
 				if data.timeleft > 0 then
 					data.timeleft = data.timeleft - 1
 				end
 				if data.timeleft == 0 then 
 					invitecount = invitecount-1
-					invites[key] = nil
+					playerInvites[key] = nil
 					spSetPlayerRulesParam(player, "commshare_invite_" .. invitecount .. "_id", nil)
 					spSetPlayerRulesParam(player, "commshare_invite_" .. invitecount .. "_timeleft", nil)
 				elseif data.timeleft > 0 then

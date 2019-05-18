@@ -288,12 +288,12 @@ function gadget:GameFrame(frame)
 		if ((unitID + frame) % 30 < 1) then --// only update once per second
 			local strength = (Spring.GetUnitCurrentBuildPower(unitID) or 0)*(Spring.GetUnitRulesParam(unitID, "totalEconomyChange") or 1)	-- * 16
 			if (strength > 0) then
-				local type, target, isFeature = Spring.Utilities.GetUnitNanoTarget(unitID)
+				local targetType, target, isFeature = Spring.Utilities.GetUnitNanoTarget(unitID)
 
 				if (target) then
 					local endpos
 					local radius = 30
-					if (type=="restore") then
+					if (targetType=="restore") then
 						endpos = target
 						radius = target[4]
 						target = -1
@@ -305,9 +305,9 @@ function gadget:GameFrame(frame)
 
 					local terraform = false
 					local inversed  = false
-					if (type=="restore") then
+					if (targetType=="restore") then
 						terraform = true
-					elseif (type=="reclaim") then
+					elseif (targetType=="reclaim") then
 						inversed  = true
 					end
 
@@ -345,7 +345,7 @@ function gadget:GameFrame(frame)
 							targetpos    = endpos,
 							count        = strength*30,
 							color        = teamColor,
-							type         = type,
+							type         = targetType,
 							targetradius = radius,
 							terraform    = terraform,
 							inversed     = inversed,

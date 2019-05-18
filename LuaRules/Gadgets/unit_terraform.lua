@@ -685,7 +685,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	local segment = {}
 	local n = 1
 	
-	local i = 0
+	do local i = 0
 	while i < segmentsAlong do
 		local j = 0
 		while j < segmentsAcross do
@@ -753,7 +753,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			j = j+1
 		end
 		i = i+1
-	end
+	end end
 	
 	--** Detect potentially overlapping buildings**
 	
@@ -1847,9 +1847,9 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 				end
 				
 				if edgeCount > 0 then
-					local height = abs(segment[i].point[j].diffHeight)
-					if height > 30 then
-						pyramidCostEstimate = pyramidCostEstimate + ((height - height%maxHeightDifference)*(floor(height/maxHeightDifference)-1)*0.5 + floor(height/maxHeightDifference)*(height%maxHeightDifference))*volumeCost
+					local diffHeight = abs(segment[i].point[j].diffHeight)
+					if diffHeight > 30 then
+						pyramidCostEstimate = pyramidCostEstimate + ((diffHeight - diffHeight%maxHeightDifference)*(floor(diffHeight/maxHeightDifference)-1)*0.5 + floor(diffHeight/maxHeightDifference)*(diffHeight%maxHeightDifference))*volumeCost
 					end
 				end
 			end
@@ -2024,7 +2024,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		end
 		
 		local terraform_type = cmdParams[1]
-		local teamID = cmdParams[2]
 		local commandX = cmdParams[3]
 		local commandZ = cmdParams[4]
 		local commandTag = cmdParams[5]
@@ -2728,7 +2727,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 		end
 	end
 	
-	local i = 1
+	do local i = 1
 	while i <= extraPoints do
 		local newHeight = extraPoint[i].supportH
 		-- diamond pyramids
@@ -2849,7 +2848,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 			break -- safty
 		end
 		i = i + 1
-	end
+	end end
 	
 	terraformOperations = terraformOperations + extraPoints
 	
@@ -3203,15 +3202,15 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	local ux,_,uz = spGetUnitPosition(unitID)
 	
 	local closestID
-	local closestDistance
+	local closestDistanceSq
 	for i = 1, command.terraunits do
 		local terraID = command.terraunitList[i]
 		if (Spring.ValidUnitID(terraID) and Spring.GetUnitDefID(terraID) == terraunitDefID) then
 			local tx,_,tz = spGetUnitPosition(terraID)
-			local distance = (tx-ux)*(tx-ux) + (tz-uz)*(tz-uz) 
-			if (not closestDistance) or (distance < closestDistance) then
+			local distanceSq = (tx-ux)*(tx-ux) + (tz-uz)*(tz-uz)
+			if (not closestDistanceSq) or (distanceSq < closestDistanceSq) then
 				closestID = terraID
-				closestDistance = distance
+				closestDistanceSq = distanceSq
 			end
 		end
 	end
@@ -3389,9 +3388,9 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 			
 			if (not biggestChange) or (math.random() < biggestChange/2) then
 				spSetHeightMapFunc(
-					function(x,z,h)
-						for i = 1, #x, 1 do
-							spAddHeightMap(x[i],z[i],h[i])
+					function(xt,zt,ht)
+						for i = 1, #xt, 1 do
+							spAddHeightMap(xt[i],zt[i],ht[i])
 						end
 					end,
 					posX,

@@ -347,21 +347,17 @@ local function conJobAllocator(team)
 	-- remove con from jobs with too much BP
 	for _,data in pairs(conJob) do
 		data.bpChange = data.importance*a.totalBP - data.assignedBP
-		local changed = true
-		while (changed and data.bpChange <= -4.8) do
-			changed = false
-			for unitID,_ in pairs(data.con) do
-				--if controlledUnit.conByID[unitID].bp <= -data.bpChange then
-					data.bpChange = data.bpChange + controlledUnit.conByID[unitID].bp
-					data.con[unitID] = nil
-					data.assignedBP = data.assignedBP - controlledUnit.conByID[unitID].bp
-					if Spring.ValidUnitID(unitID) and not Spring.GetUnitIsDead(unitID) then
-						unassignedCons.count = unassignedCons.count + 1
-						unassignedCons[unassignedCons.count] = unitID
-					end
-					changed = true
-					break
-				--end
+		while data.bpChange <= -4.8 do
+			local unitID = next(data.con)
+			if not unitID then
+				break
+			end
+			data.bpChange = data.bpChange + controlledUnit.conByID[unitID].bp
+			data.con[unitID] = nil
+			data.assignedBP = data.assignedBP - controlledUnit.conByID[unitID].bp
+			if Spring.ValidUnitID(unitID) and not Spring.GetUnitIsDead(unitID) then
+				unassignedCons.count = unassignedCons.count + 1
+				unassignedCons[unassignedCons.count] = unitID
 			end
 		end
 		

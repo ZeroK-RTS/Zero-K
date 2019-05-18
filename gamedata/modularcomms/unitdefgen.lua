@@ -48,7 +48,7 @@ local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) 
 local commData
 
 local function DecodeBase64CommData(toDecode, useLegacyTranslator)
-	local commData = {}
+	local commDataTable
 	local commDataFunc
 	local err, success
 	
@@ -62,18 +62,20 @@ local function DecodeBase64CommData(toDecode, useLegacyTranslator)
 	--Spring.Echo(toDecode)
 	commDataFunc, err = loadstring("return "..toDecode)
 	if commDataFunc then
-		success, commData = pcall(commDataFunc)
+		success, commDataTable = pcall(commDataFunc)
 		if not success then	-- execute Borat
-			err = commData
-			commData = {}
+			err = commDataTable
+			commDataTable = {}
 		elseif useLegacyTranslator then
-			commData = legacyTranslators.FixOverheadIcon(commData)
+			commDataTable = legacyTranslators.FixOverheadIcon(commDataTable)
 		end
+	else
+		commDataTable = {}
 	end
 	if err then 
 		Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", 'Modular Comms warning: ' .. err)
 	end
-	return commData
+	return commDataTable
 end
 
 do
@@ -152,7 +154,6 @@ commDefs = {}	--holds precedurally generated comm defs
 local function ProcessComm(name, config)
 	if config.chassis and UnitDefs[config.chassis] then
 		Spring.Log("gamedata/modularcomms/unitdefgen.lua", "debug", "\tModularComms: Processing comm: " .. name)
-		local name = name
 		commDefs[name] = CopyTable(UnitDefs[config.chassis], true)
 		commDefs[name].customparams = commDefs[name].customparams or {}
 		local cp = commDefs[name].customparams
@@ -346,7 +347,7 @@ for name, data in pairs(commDefs) do
 	-- calc lightning real damage based on para damage
 	-- TODO: use for slow-beams
 	if data.weapondefs then
-		for name, weaponData in pairs(data.weapondefs) do
+		for wName, weaponData in pairs(data.weapondefs) do
 			if (weaponData.customparams or {}).extra_damage_mult then
 				weaponData.customparams.extra_damage = weaponData.customparams.extra_damage_mult * weaponData.damage.default
 				weaponData.customparams.extra_damage_mult = nil
@@ -366,21 +367,21 @@ for name, data in pairs(commDefs) do
 				weaponNames[string.lower(weaponData.def)] = true
 			end
 		end
-		for name, weaponData in pairs(data.weapondefs) do
-			if weaponNames[name] and not (string.lower(weaponData.name):find('fake')) and not weaponData.commandfire then
+		for wName, weaponData in pairs(data.weapondefs) do
+			if weaponNames[wName] and not (string.lower(weaponData.name):find('fake')) and not weaponData.commandfire then
 				if (weaponData.range or 0) > maxRange then
-					maxRange = weaponData.range 
+					maxRange = weaponData.range
 				end
-				weaponRanges[name] = weaponData.range 
+				weaponRanges[wName] = weaponData.range
 			end
 		end
 		-- lame-ass hack, because the obvious methods don't work
-		for name, weaponData in pairs(data.weapondefs) do
+		for wName, weaponData in pairs(data.weapondefs) do
 			if string.lower(weaponData.name):find('fake') then
 				weaponData.range = maxRange
 			end
 		end
-		for name, range in pairs(weaponRanges) do -- only works for 2 weapons max
+		for wName, range in pairs(weaponRanges) do -- only works for 2 weapons max
 			if maxRange ~= range then
 				data.customparams.extradrawrange = range
 			end 
