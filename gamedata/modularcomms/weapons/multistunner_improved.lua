@@ -5,7 +5,7 @@ local weaponDef = {
 	avoidFeature            = false,
 	beamTTL                 = 12,
 	burst                   = 16,
-	burstRate               = 0.1875,
+	burstRate               = 0.166,
 	commandFire             = true,
 
 	customParams            = {

@@ -118,7 +118,7 @@ unitDef = {
         subs    = 0,
       },
 
-      duration                = 0.11,
+      duration                = 0.1,
       edgeEffectiveness       = 0.99,
       explosionGenerator      = [[custom:flash1green]],
       fireStarter             = 70,
@@ -131,7 +131,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 450,
-      reloadtime              = 0.11,
+      reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/laser_burn5]],
       soundTrigger            = true,

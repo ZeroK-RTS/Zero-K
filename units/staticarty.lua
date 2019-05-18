@@ -74,7 +74,7 @@ unitDef = {
       avoidFeature            = false,
       avoidGround             = false,
       burst                   = 3,
-      burstRate               = 0.16,
+      burstRate               = 0.133,
       craterBoost             = 1,
       craterMult              = 2,
 

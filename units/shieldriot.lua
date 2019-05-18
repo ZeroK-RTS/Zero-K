@@ -112,7 +112,7 @@ unitDef = {
       myGravity               = 10,
       noSelfDamage            = true,
       range                   = 300,
-      reloadtime              = 0.95,
+      reloadtime              = 0.933,
       soundHitVolume          = 1,
       turret                  = true,
       weaponType              = [[Cannon]],
@@ -138,7 +138,7 @@ unitDef = {
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 32,
-      reloadtime              = 0.95,
+      reloadtime              = 0.933,
       size                    = 1E-06,
       smokeTrail              = false,
 
@@ -176,7 +176,7 @@ unitDef = {
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 240,
-      reloadtime              = 0.95,
+      reloadtime              = 0.933,
       size                    = 1E-06,
       smokeTrail              = false,
 

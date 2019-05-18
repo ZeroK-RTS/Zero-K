@@ -77,7 +77,7 @@ unitDef = {
       name                    = [[Scatterblob]],
       areaOfEffect            = 96,
       burst                   = 11,
-      burstrate               = 0.01,
+      burstrate               = 0.033,
       craterBoost             = 0,
       craterMult              = 0,
             

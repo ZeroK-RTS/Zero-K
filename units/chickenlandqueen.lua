@@ -255,7 +255,7 @@ unitDef = {
       name                    = [[Napalm Goo]],
       areaOfEffect            = 256,
       burst                   = 8,
-      burstrate               = 0.01,
+      burstrate               = 0.033,
       cegTag                  = [[queen_trail_fire]],
       
       customParams            = {

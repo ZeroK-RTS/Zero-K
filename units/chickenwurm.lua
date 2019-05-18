@@ -86,7 +86,7 @@ unitDef = {
       name                    = [[Napalm Blob]],
       areaOfEffect            = 128,
       burst                   = 1,
-      burstrate               = 0.01,
+      burstrate               = 0.033,
       craterBoost             = 0,
       craterMult              = 0,
       

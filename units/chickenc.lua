@@ -76,7 +76,7 @@ unitDef = {
       name                    = [[Blob]],
       areaOfEffect            = 128,
       burst                   = 4,
-      burstrate               = 0.01,
+      burstrate               = 0.033,
       craterBoost             = 0,
       craterMult              = 0,
 

@@ -70,7 +70,7 @@ unitDef = {
       name                    = [[Bomblet]],
       areaOfEffect            = 16,
       burst                   = 5,
-      burstrate               = 0.01,
+      burstrate               = 0.033,
       craterBoost             = 0,
       craterMult              = 0,
 

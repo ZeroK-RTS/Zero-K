@@ -34,7 +34,7 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetGameFrame	 = Spring.GetGameFrame
 
 local waveWeaponDef = WeaponDefNames["shieldriot_blast"]
-local WAVE_RELOAD = math.ceil(waveWeaponDef.reload * Game.gameSpeed) -- 27
+local WAVE_RELOAD = math.floor(waveWeaponDef.reload * Game.gameSpeed)
 local WAVE_TIMEOUT = math.ceil(waveWeaponDef.damageAreaOfEffect / waveWeaponDef.explosionSpeed)* (1000 / Game.gameSpeed) + 200 -- empirically maximum delay of damage was (damageAreaOfEffect / explosionSpeed) - 4 frames
 
 --------------------------------------------------------------------------------

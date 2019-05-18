@@ -147,7 +147,7 @@ unitDef = {
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 1000,
-      reloadtime              = 1.25,
+      reloadtime              = 1.233,
       size                    = 1E-06,
       smokeTrail              = false,
 

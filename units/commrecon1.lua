@@ -123,7 +123,7 @@ unitDef = {
         default = 0,
       },
 
-      duration                = 0.11,
+      duration                = 0.1,
       explosionGenerator      = [[custom:flash1green]],
       impactOnly              = true,
       impulseBoost            = 0,
@@ -132,7 +132,7 @@ unitDef = {
       laserFlareSize          = 5.53,
       minIntensity            = 1,
       range                   = 400,
-      reloadtime              = 0.11,
+      reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       sweepfire               = false,
       texture1                = [[largelaser]],
