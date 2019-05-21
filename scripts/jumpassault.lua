@@ -47,7 +47,7 @@ local ROCK_Z_SPEED = 10 -- Number of half-cycles per second around z-axis.
 local ROCK_Z_DECAY = -1/2 -- Rocking around z-axis is reduced by this factor each time = piece 'to rock.
 local ROCK_Z_PIECE = pre_turret -- should be between -1 and 0 to alternate rocking direction.
 local ROCK_Z_MIN = 0.05 -- If around z-axis rock is not greater than this amount, rocking will stop after returning to center.
-local ROCK_X_MAX = 0.5
+local ROCK_Z_MAX = 0.5
 
 local rockData = {
 	[x_axis] = {
