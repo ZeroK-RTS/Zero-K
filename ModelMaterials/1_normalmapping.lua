@@ -2,26 +2,30 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function SunChanged(curShaderObj)
+	curShaderObj:SetUniformAlways("shadowDensity", gl.GetSun("shadowDensity" ,"unit"))
+
+	curShaderObj:SetUniformAlways("sunAmbient", gl.GetSun("ambient" ,"unit"))
+	curShaderObj:SetUniformAlways("sunDiffuse", gl.GetSun("diffuse" ,"unit"))
+	curShaderObj:SetUniformAlways("sunSpecular", gl.GetSun("specular" ,"unit"))
+end
+
+local default_lua = VFS.Include("ModelMaterials/Shaders/default.lua")
+
 local materials = {
 	normalMappedS3o = {
-		-- Suggestions for fixing https://github.com/lhog/spring-ssao/issues/1
 		shaderDefinitions = {
-			"#define use_perspective_correct_shadows",
 			"#define use_normalmapping",
 			"#define deferred_mode 0",
-			--"#define use_vertex_ao",
-			--"#define flashlights",
-			--"#define SPECULARMULT 8.0",
+			"#define SHADOW_PROFILE_HIGH",
 		},
 		deferredDefinitions = {
 			"#define use_normalmapping",
 			"#define deferred_mode 1",
-			--"#define flashlights",
-			--"#define use_vertex_ao",
-			--"#define SPECULARMULT 8.0",
+			"#define SHADOW_PROFILE_HIGH",
 		},
-		shader    = include("ModelMaterials/Shaders/default.lua"),
-		deferred  = include("ModelMaterials/Shaders/default.lua"),
+		shader    = default_lua,
+		deferred  = default_lua,
 		usecamera = false,
 		culling   = GL.BACK,
 		predl  = nil,
@@ -30,10 +34,11 @@ local materials = {
 			[0] = '%%UNITDEFID:0',
 			[1] = '%%UNITDEFID:1',
 			[2] = '$shadow',
-			[3] = '$specular',
+			--[3] = '$specular',
 			[4] = '$reflection',
 			[5] = '%NORMALTEX',
 		},
+		SunChanged = SunChanged,
 	},
 }
 
@@ -77,7 +82,6 @@ local function FindNormalmap(tex1, tex2)
 
 	return normaltex
 end
-
 
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
