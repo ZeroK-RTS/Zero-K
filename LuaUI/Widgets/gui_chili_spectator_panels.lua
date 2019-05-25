@@ -19,6 +19,7 @@ end
 include("colors.h.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
+-- local GetLeftRightAllyTeamIDs = VFS.Include("LuaUI/Headers/allyteam_selection_utilities.lua")
 local GetFlowStr = VFS.Include("LuaUI/Headers/ecopanels.lua")
 
 --------------------------------------------------------------------------------
@@ -906,18 +907,19 @@ local function GetWinString(name)
 end
 
 local function GetLeftRightAllyTeamIDs()
- 		if Spring.Utilities.Gametype.isFFA() or Spring.Utilities.Gametype.isSandbox() then
+    if Spring.Utilities.Gametype.isFFA() or Spring.Utilities.Gametype.isSandbox() then
         -- not 2 teams: unhandled by spec panels
         return {}
     end
 
-    local myAllyTeamID = 0
-    local enemyAllyTeamID = 1 
-    local myTeamID = Spring.GetTeamList(myAllyTeamID)[1]
+
+    local myAllyTeamID = 0--Spring.GetLocalAllyTeamID()
+    local enemyAllyTeamID = 1 -- FIXME assumes teams are 0 and 1
+    local myTeamID = Spring.GetTeamList(myAllyTeamID)[1]--Spring.GetLocalTeamID()
 
     local myBoxID = Spring.GetTeamRulesParam(myTeamID, "start_box_id")
     if not myBoxID then -- can start anywhere
-        return {0, 1} 
+        return {0, 1} -- players see themselves on the left, maybe should `return 0, 1` (see fixme above) so everybody sees everything the same?
     end
 
     local myBoxRepresentativeSpotX = Spring.GetGameRulesParam("startpos_x_" .. myBoxID .. "_1")
@@ -931,7 +933,7 @@ local function GetLeftRightAllyTeamIDs()
         comparisonX = Spring.GetGameRulesParam("startpos_x_" .. enemyBoxID .. "_1")
     end
 
-    if (not myBoxRepresentativeSpotX or not comparisonX) or myBoxRepresentativeSpotX < comparisonX then
+    if myBoxRepresentativeSpotX <= comparisonX then
         return {myAllyTeamID, enemyAllyTeamID}
     else
         return {enemyAllyTeamID, myAllyTeamID}
@@ -980,16 +982,11 @@ local function GetOpposingAllyTeams()
 		return
 	end
 	
-	-- if returnData[1].allyTeamID > returnData[2].allyTeamID then
-	-- 	returnData[1], returnData[2] = returnData[2], returnData[1]
-	-- end
-	
 	return returnData
 end
 
 
 function option_CheckEnable(self)
-
 	if not self.value then
 		if enabled then
 			RemovePlayerWindow()
@@ -1022,7 +1019,7 @@ function option_CheckEnable(self)
 	if options.enablePlayerPanel.value then
 		AddPlayerWindow()
 	end
-	
+
 	if options.enableEconomyPanels.value then
 		AddEconomyWindows()
 	end

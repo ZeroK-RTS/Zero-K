@@ -14,6 +14,8 @@ end
 include("colors.h.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
+-- local GetLeftRightAllyTeamIDs = VFS.Include("LuaUI/Headers/allyteam_selection_utilities.lua")
+
 options_path = 'Settings/HUD Panels/Attrition Counter'
 options_order = {'updateFrequency'}
 options = {
@@ -138,7 +140,7 @@ local function GetTeamName(teamID)
 end
 
 local function GetLeftRightAllyTeamIDs()
- 		if Spring.Utilities.Gametype.isFFA() or Spring.Utilities.Gametype.isSandbox() then
+    if Spring.Utilities.Gametype.isFFA() or Spring.Utilities.Gametype.isSandbox() then
         -- not 2 teams: unhandled by spec panels
         return {}
     end
@@ -174,7 +176,10 @@ end
 local function GetOpposingAllyTeams()
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local returnData = {}
-	local allyTeamList = GetLeftRightAllyTeamIDs() --Spring.GetAllyTeamList()
+	local allyTeamList = {}
+  if spectating then allyTeamList = GetLeftRightAllyTeamIDs() 
+  else allyTeamList = Spring.GetAllyTeamList()
+  end
 	for i = 1, #allyTeamList do
 		local allyTeamID = allyTeamList[i]
 
@@ -198,10 +203,6 @@ local function GetOpposingAllyTeams()
 	if #returnData ~= 2 then
 		return
 	end
-	
-	-- if returnData[1].allyTeamID > returnData[2].allyTeamID then
-	-- 	returnData[1], returnData[2] = returnData[2], returnData[1]
-	-- end
 	
 	return returnData
 end
