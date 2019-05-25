@@ -59,7 +59,7 @@ end
 
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if addedUnits[unitID] and (cmdID == CMD_FIGHT or cmdID == CMD_PATROL) then
-		return true, true
+		return true, false
 	end
 	return false
 end
