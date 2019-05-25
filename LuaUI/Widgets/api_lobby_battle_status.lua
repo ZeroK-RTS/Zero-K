@@ -39,16 +39,13 @@ local function AddTeamEntity(allyTeamID, onTeam, teamCount)
 	return teamCount + 1
 end
 
--- BOOL Is playing
--- NAT0 total PlayerCount
--- NAT0 Team 1 players
--- NAT0 Team 2 players
--- BOOL is FFA
--- BOOL is replay
--- BOOL is vs AI
--- BOOL is vs Chickens
--- BOOL is campaign
--- STRG is PLANET NAME
+local function DataTableToString(dataTable)
+	local retString = ""
+	for name, value in pairs(dataTable) do
+		retString = retString .. name .. DELIM .. value .. DELIM
+	end
+	return retString
+end
 
 local function GetGameTypeCoded()
 	-- Process the teams list.
@@ -87,28 +84,32 @@ local function GetGameTypeCoded()
 	-- Add info
 	local playersFirstTeam
 	local playerSecondTeam
+	local teamPlayerCount = 0
 	for _, n in pairs(playersOnTeam) do
 		if playersFirstTeam then
 			playerSecondTeam = n
 		else
 			playersFirstTeam = n
 		end
+		teamPlayerCount = teamPlayerCount + n
 	end
 	local playerList = Spring.GetPlayerList()
 	
-	local retString = ""
-	retString = retString .. (((not Spring.GetSpectatingState()) and "1") or "0") .. DELIM
-	retString = retString .. ((playerList and #playerList) or 1) .. DELIM
-	retString = retString .. (playersFirstTeam or 0) .. DELIM
-	retString = retString .. (playerSecondTeam or 0) .. DELIM
-	retString = retString .. ((playerTeamCount > 2 and "1") or "0") .. DELIM
-	retString = retString .. ((aiTeamCount > 0 and "1") or "0") .. DELIM
-	retString = retString .. ((Spring.IsReplay() and "1") or "0") .. DELIM
-	retString = retString .. ((chickenTeamID and "1") or "0") .. DELIM
-	retString = retString .. ((Spring.GetModOptions().singleplayercampaignbattleid and "1") or "0") .. DELIM
-	retString = retString .. ((WG.campaign_planetInformation and WG.campaign_planetInformation.name) or "") .. DELIM
+	local dataTable = {
+		isPlayer = (((not Spring.GetSpectatingState()) and "1") or "0"),
+		playerCount = ((playerList and #playerList) or 1),
+		teamOnePlayers = (playersFirstTeam or 0),
+		teamTwoPlayers = (playerSecondTeam or 0),
+		teamPlayers = (teamPlayerCount or 0),
+		isFFA = ((playerTeamCount > 2 and "1") or "0"),
+		isAI = ((aiTeamCount > 0 and "1") or "0"),
+		isReplay = ((Spring.IsReplay() and "1") or "0"),
+		isChicken = ((chickenTeamID and "1") or "0"),
+		isCampaign = ((Spring.GetModOptions().singleplayercampaignbattleid and "1") or "0"),
+		planetName = ((WG.campaign_planetInformation and WG.campaign_planetInformation.name) or ""),
+	}
 	
-	return retString
+	return DataTableToString(dataTable)
 end
 
 --------------------------------------------------------------------------------
@@ -129,7 +130,7 @@ end
 
 local gameString
 function widget:GameFrame(n)
-	if n == 0 or RELOAD_MODE then
+	if n == 1 or RELOAD_MODE then
 		gameString = gameString or GetGameTypeCoded()
 		SendGameStart(gameString)
 	end
