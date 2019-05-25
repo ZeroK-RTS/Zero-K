@@ -11,6 +11,7 @@ unitDef = {
   buildingGroundDecalType       = [[staticjammer_aoplane.dds]],
   buildPic                      = [[staticjammer.png]],
   category                      = [[SINK UNARMED]],
+  canMove                       = true,
   cloakCost                     = 1,
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[32 70 32]],

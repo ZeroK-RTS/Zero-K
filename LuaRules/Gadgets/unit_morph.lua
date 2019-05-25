@@ -250,12 +250,12 @@ end
 local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	-- do not allow morph for unfinsihed units
 	if not isFinished(unitID) then 
-		return true 
+		return false 
 	end
 	
 	-- do not allow morph for units being transported which are not combat morphs
 	if Spring.GetUnitTransporter(unitID) and not morphDef.combatMorph then
-		return true
+		return false
 	end
 	
 	Spring.SetUnitRulesParam(unitID, "morphing", 1)
@@ -293,6 +293,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	local newMorphRate = GetMorphRate(unitID)
 	GG.StartMiscPriorityResourcing(unitID, (newMorphRate*morphDef.metal/morphDef.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor), modified for slow
 	morphUnits[unitID].morphRate = newMorphRate
+	return true
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
@@ -725,10 +726,11 @@ end
 
 function gadget:GameFrame(n)
 	-- start pending morphs
-	for unitid, data in pairs(morphToStart) do
-		StartMorph(unitid, unpack(data))
+	for unitID, data in pairs(morphToStart) do
+		if StartMorph(unitID, unpack(data)) then
+			morphToStart[unitID] = nil
+		end
 	end
-	morphToStart = {}
 
 	for unitID, morphData in pairs(morphUnits) do
 		if (not UpdateMorph(unitID, morphData)) then
@@ -760,8 +762,7 @@ local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
 	end
 	if morphDef then
 		local morphData = morphUnits[unitID]
-		local health, maxHealth, paralyzeDamage, captureProgress, buildProgress = Spring.GetUnitHealth(unitID)
-		if (not morphData) and buildProgress == 1 then
+		if (not morphData) then
 			-- dont start directly to break recursion
 			--StartMorph(unitID, unitDefID, teamID, morphDef)
 			morphToStart[unitID] = {unitDefID, teamID, morphDef}
@@ -859,7 +860,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				return false
 			else
 				--// morph allowed
-				if morphDef.combatMorph then -- process now, no shift queue for combat morph to preserve command queue
+				if morphDef.combatMorph or not cmdOptions.shift then -- process now, no shift queue for combat morph to preserve command queue
 					processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
 					return false
 				else

@@ -12,6 +12,7 @@ unitDef = {
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[staticshield_aoplane.dds]],
   buildPic                      = [[staticshield.png]],
+  canMove                       = true,
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[30 39 30]],
