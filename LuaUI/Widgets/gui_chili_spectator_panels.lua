@@ -155,7 +155,8 @@ options = {
 		type  = "bool", 
 		value = false, 
 		OnChange = function(self)
-			WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", option_CheckEnable(self))
+			option_CheckEnable(self)
+			-- WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", option_CheckEnable(self))
 		end,
 		desc = "Enables the spectator resource bars when spectating a game with two teams."
 	},
@@ -904,10 +905,43 @@ local function GetWinString(name)
 	return ""
 end
 
+local function GetLeftRightAllyTeamIDs()
+ 		if Spring.Utilities.Gametype.isFFA() or Spring.Utilities.Gametype.isSandbox() then
+        -- not 2 teams: unhandled by spec panels
+        return {}
+    end
+
+    local myAllyTeamID = 0
+    local enemyAllyTeamID = 1 
+    local myTeamID = Spring.GetTeamList(myAllyTeamID)[1]
+
+    local myBoxID = Spring.GetTeamRulesParam(myTeamID, "start_box_id")
+    if not myBoxID then -- can start anywhere
+        return {0, 1} 
+    end
+
+    local myBoxRepresentativeSpotX = Spring.GetGameRulesParam("startpos_x_" .. myBoxID .. "_1")
+
+    local comparisonX
+    if Spring.GetGameRulesParam("shuffleMode") == "allshuffle" and Spring.GetGameRulesParam("startbox_max_n") > 1 then
+        -- there are multiple boxes the enemy can be in so just look where we are on the map
+        comparisonX = Game.mapSizeX / 2
+    else
+        local enemyBoxID = 1 - myBoxID
+        comparisonX = Spring.GetGameRulesParam("startpos_x_" .. enemyBoxID .. "_1")
+    end
+
+    if (not myBoxRepresentativeSpotX or not comparisonX) or myBoxRepresentativeSpotX < comparisonX then
+        return {myAllyTeamID, enemyAllyTeamID}
+    else
+        return {enemyAllyTeamID, myAllyTeamID}
+    end
+end
+
 local function GetOpposingAllyTeams()
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local returnData = {}
-	local allyTeamList = Spring.GetAllyTeamList()
+	local allyTeamList = GetLeftRightAllyTeamIDs()--Spring.GetAllyTeamList()
 	for i = 1, #allyTeamList do
 		local allyTeamID = allyTeamList[i]
 
@@ -946,9 +980,9 @@ local function GetOpposingAllyTeams()
 		return
 	end
 	
-	if returnData[1].allyTeamID > returnData[2].allyTeamID then
-		returnData[1], returnData[2] = returnData[2], returnData[1]
-	end
+	-- if returnData[1].allyTeamID > returnData[2].allyTeamID then
+	-- 	returnData[1], returnData[2] = returnData[2], returnData[1]
+	-- end
 	
 	return returnData
 end
@@ -983,6 +1017,7 @@ function option_CheckEnable(self)
 	if not allyTeamData then
 		return false
 	end
+
 	
 	if options.enablePlayerPanel.value then
 		AddPlayerWindow()
