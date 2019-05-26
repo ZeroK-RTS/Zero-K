@@ -431,6 +431,11 @@ ____FS_CODE_DEFS_____
 		offset += GetRippleCoord(uv, vec2(0.25 + 0.5 * float(!gl_FrontFacing), 0.5) * uvMulS, sizeDrift * SZDRIFTTOUV, 80.0, 15.0, timer);
 
 		vec2 offset2 = vec2(0.0);
+		
+		float hitRadiusMulti = 1;
+		if (method == 2) {
+			hitRadiusMulti = 0.7;
+		}
 
 		for (int hitPointIdx = 0; hitPointIdx < MAX_POINTS; ++hitPointIdx) {
 			if (hitPointIdx < hitPointCount) {
@@ -439,7 +444,7 @@ ____FS_CODE_DEFS_____
 				vec2 impactPointUV = RadialCoords(impactPointAdj) * uvMulS;
 				float mag = hitPoints[5 * hitPointIdx + 3];
 				float aoe = hitPoints[5 * hitPointIdx + 4];
-				offset2 += GetRippleLinearFallOffCoord(uv, impactPointUV, mag, 100.0, -120.0, aoe, timer);
+				offset2 += GetRippleLinearFallOffCoord(uv, impactPointUV, mag, 100.0 / hitRadiusMulti, -120.0, aoe * hitRadiusMulti, timer);
 			}
 		}
 
@@ -463,10 +468,10 @@ ____FS_CODE_DEFS_____
 				alphaAdd = smoothstep(0.0, 0.04, length(offset2));
 			}
 			vec3 offsetNormal = normal + adjustedOffset;
-			vec3 standardVec = offsetNormal * 4;
+			vec3 standardVec = offsetNormal * 2;
 			float seed = hash11(float(unitId));
 			standardVec.z -= timer * 3 + seed;
-			vec3 noiseVec = offsetNormal * 10;
+			vec3 noiseVec = offsetNormal * 5;
 			noiseVec.z -= timer * 6 + seed;
 			noiseMult = 0.5 + (1 - abs(snoise(standardVec))) + (snoise(noiseVec)) * noiseLevel / 2.0;
 		}
