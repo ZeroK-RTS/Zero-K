@@ -1853,9 +1853,16 @@ end
 --  Draw call-ins
 --
 
-function gadgetHandler:Update()
+function gadgetHandler:SunChanged()
+  for _,g in ipairs(self.SunChangedList) do
+    g:SunChanged()
+  end
+  return
+end
+
+function gadgetHandler:Update(deltaTime)
   for _,g in ipairs(self.UpdateList) do
-    g:Update()
+    g:Update(deltaTime)
   end
   return
 end
