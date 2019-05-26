@@ -67,7 +67,7 @@ gadgetHandler = {
   yViewSizeOld = 1,
 
   mouseOwner = nil,
-  
+
   actionHandler = actionHandler,	-- FIXME: not in base
 }
 
@@ -169,6 +169,8 @@ local callInLists = {
 	"DrawShield",
 	"DrawProjectile",
 	"RecvSkirmishAIMessage",
+
+	"SunChanged",
 
 	-- COB CallIn  (FIXME?)
 	"CobCallback",
@@ -1335,7 +1337,7 @@ end
 function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
 	local allowed = true
 	local returnValue
-	
+
 	if targetID == -1 then
 		local unitID = attackerID
 		local aquireRange = defPriority
@@ -1352,7 +1354,7 @@ function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum
 		end
 		return true, aquireRange
 	end
-	
+
 	local priority = defPriority
 	for _, g in ipairs(self.AllowWeaponTargetList) do
 		-- Send priority to each successive gadget.
@@ -1374,7 +1376,7 @@ function gadgetHandler:AllowWeaponInterceptTarget(interceptorUnitID, interceptor
 			return false
 		end
 	end
-	
+
 	return true
 end
 
@@ -1492,7 +1494,7 @@ end
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponDefID,
 								   projectileID, attackerID, attackerDefID, attackerTeam)
-	
+
 	if UnitPreDamaged_first then
 		for _,g in ipairs(self.UnitPreDamagedList) do
 			local weaponDefs = (g.UnitPreDamaged_GetWantedWeaponDef and g:UnitPreDamaged_GetWantedWeaponDef()) or allWeaponDefs
@@ -1510,7 +1512,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 		end
 		UnitPreDamaged_first = false
 	end
-	
+
 	local rDam = damage
 	local rImp = 1.0
 
@@ -1540,7 +1542,7 @@ end
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponDefID,
 								   projectileID, attackerID, attackerDefID, attackerTeam)
-  
+
   local rDam = damage
   local rImp = 1.0
 
@@ -1566,9 +1568,9 @@ local UnitDamaged_count = 0
 local UnitDamaged_gadgets = {}
 
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponID, projectileID, 
+                                   damage, paralyzer, weaponID, projectileID,
                                    attackerID, attackerDefID, attackerTeam)
-								   
+
 	if UnitDamaged_first then
 		for _,g in ipairs(self.UnitDamagedList) do
 			UnitDamaged_count = UnitDamaged_count + 1
@@ -1589,9 +1591,9 @@ end
 
 --[[ Old
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponID, projectileID, 
+                                   damage, paralyzer, weaponID, projectileID,
                                    attackerID, attackerDefID, attackerTeam)
-  
+
   for _,g in ipairs(self.UnitDamagedList) do
     g:UnitDamaged(unitID, unitDefID, unitTeam,
                   damage, paralyzer, weaponID,
@@ -1812,7 +1814,7 @@ function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID, proID)
 		end
 		Explosion_first = false
 	end
-	
+
 	local noGfx = false
 	local single = Explosion_GadgetSingle[weaponID]
 	local map = Explosion_GadgetMap[weaponID]
@@ -1845,9 +1847,16 @@ end
 --  Draw call-ins
 --
 
-function gadgetHandler:Update()
+function gadgetHandler:SunChanged()
+  for _,g in ipairs(self.SunChangedList) do
+    g:SunChanged()
+  end
+  return
+end
+
+function gadgetHandler:Update(deltaTime)
   for _,g in ipairs(self.UpdateList) do
-    g:Update()
+    g:Update(deltaTime)
   end
   return
 end
@@ -2213,7 +2222,7 @@ end
 
 function gadgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams) -- opts is a bitmask
   for _,g in ipairs(self.UnitCommandList) do
-    g:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams) 
+    g:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
   end
   return
 end
