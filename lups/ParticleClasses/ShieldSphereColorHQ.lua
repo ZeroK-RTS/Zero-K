@@ -54,6 +54,9 @@ ShieldSphereColorHQParticle.Default = {
 
 	size			= 10,
 	margin			= 1,
+	onHitTransitionTime = 10,
+	rechargeSpinupTime = 20,
+	startOfRechargeDelay = -999999,
 
 	colormap1	= { {0, 0, 0, 0} },
 	colormap2	= { {0, 0, 0, 0} },
@@ -101,6 +104,7 @@ end
 function ShieldSphereColorHQParticle:Draw()
 
 	gl.Culling(GL.FRONT)
+	-- Noise should only vary from 0.0 to 1.0
 	local noiseLevel = 0
 	if self.rechargeDelay > 0 then
 		gl.UniformInt(methodUniform, 2)
@@ -108,9 +112,18 @@ function ShieldSphereColorHQParticle:Draw()
 		local currTime = Spring.GetGameFrame()
 		local cooldown = hitTime + self.rechargeDelay * 30 - currTime
 		if cooldown > 0 then
-			-- Should vary from 0.0 to 1.0
-			local rampDown = 1.0 - 30.0 / (cooldown + 30.0)
-			noiseLevel = rampDown
+			local rampDown = 1.0
+			if cooldown < self.rechargeSpinupTime then
+				rampDown = cooldown / self.rechargeSpinupTime
+			end
+			local timeSinceRegenDisabled = currTime - self.startOfRechargeDelay
+			local rampUp = 1.0
+			if timeSinceRegenDisabled < self.onHitTransitionTime then
+				rampUp = timeSinceRegenDisabled / self.onHitTransitionTime
+			end
+			noiseLevel = rampDown * rampUp
+		else
+			self.startOfRechargeDelay = currTime
 		end
 	else
 		if not self.texture then
