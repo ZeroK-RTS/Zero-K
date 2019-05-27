@@ -142,10 +142,7 @@ end
 local function GetOpposingAllyTeams()
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local returnData = {}
-	local allyTeamList = {}
-  if spectating then allyTeamList = GetLeftRightAllyTeamIDs() 
-  else allyTeamList = Spring.GetAllyTeamList()
-  end
+	local allyTeamList = GetLeftRightAllyTeamIDs()
 	for i = 1, #allyTeamList do
 		local allyTeamID = allyTeamList[i]
 
@@ -273,6 +270,8 @@ function widget:Initialize()
 	
 	font = Chili.Font:New{} -- need this to call GetTextWidth without looking up an instance
 	
+	--[[ in the original design, "own" team was supposed to be on the left,
+	     but when speccing it's better to put the geographical left there ]]
 	if spectating then
 		myAllyTeam = GetLeftRightAllyTeamIDs()[1]
 	else

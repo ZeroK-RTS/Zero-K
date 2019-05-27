@@ -909,7 +909,7 @@ end
 local function GetOpposingAllyTeams()
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local returnData = {}
-	local allyTeamList = GetLeftRightAllyTeamIDs()--Spring.GetAllyTeamList()
+	local allyTeamList = GetLeftRightAllyTeamIDs()
 	for i = 1, #allyTeamList do
 		local allyTeamID = allyTeamList[i]
 
@@ -953,6 +953,7 @@ end
 
 
 function option_CheckEnable(self)
+
 	if not self.value then
 		if enabled then
 			RemovePlayerWindow()
@@ -980,12 +981,11 @@ function option_CheckEnable(self)
 	if not allyTeamData then
 		return false
 	end
-
 	
 	if options.enablePlayerPanel.value then
 		AddPlayerWindow()
 	end
-
+	
 	if options.enableEconomyPanels.value then
 		AddEconomyWindows()
 	end
