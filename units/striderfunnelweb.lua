@@ -17,6 +17,13 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND UNARMED]],
+  collisionVolumeOffsets        = [[0 10 -10]],
+  collisionVolumeScales         = [[60 50 80]],
+  collisionVolumeType           = [[elipsoid]],
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[80 80 80]],
+  selectionVolumeType           = [[Sphere]],
+
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -42,7 +49,7 @@ unitDef = {
   movementClass          = [[TKBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[funnelweb.s3o]],
+  objectName             = [[funnelweb.dae]],
   radarDistance          = 1400,
   radarEmitHeight        = 32,
   onoffable              = true,

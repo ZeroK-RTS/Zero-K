@@ -23,7 +23,9 @@ local nanoPieces = {eye}
 local SIG_WALK = 1
 local SIG_BUILD = 2
 
-local PERIOD = 0.275
+local modelScaling = 0.9
+local maxVelocity = 1.8
+local PERIOD = 0.495 * modelScaling / maxVelocity
 
 local sleepTime = PERIOD*1000
 
