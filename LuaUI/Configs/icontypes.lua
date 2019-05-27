@@ -540,6 +540,10 @@ local icontypes = {
     bitmap='icons/t3special.png',
     size=2.7,
   },
+  t3spiderbuilder = {
+    bitmap='icons/t3spiderbuilder.png',
+    size=2.7,
+  },
   t3arty = {
     bitmap='icons/t3arty.dds',
     size=2.7,
