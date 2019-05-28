@@ -662,7 +662,7 @@
     "staticantinuke": {
         "name": "Antinükleer",
         "description": "Stratejik Nükleer Engelleme Sistemi",
-        "helptext": "Antinukleer, kapsama alanı dahilindeki düşman nükleer ROKET'leri otomatik olarak durdurur."
+        "helptext": "Antinukleer, kapsama alanı dahilindeki düşman nükleer roket'leri otomatik olarak durdurur."
     },
     "staticheavyarty": {
         "name": "Büyük Bertha",
