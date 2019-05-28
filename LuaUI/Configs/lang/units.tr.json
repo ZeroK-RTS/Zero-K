@@ -112,7 +112,7 @@
     "turretmissile": {
         "name": "Kazık",
         "description": "Hafif Füze Kulesi",
-        "helptext": "Kazık hafif, çok amaçlı bir füze kulesidir. Üniteleri belli bir mesafeden koparmak, bir miktar hava önleyici koruma sağlamak ve düşman LLT'leri menzillerinin dışından fırlatmak için iyidir. Ancak, hapşırdığınızda kopar.\n"
+        "helptext": "Kazık hafif, çok amaçlı bir füze kulesidir. Üniteleri belli bir mesafeden koparmak, bir miktar hava önleyici koruma sağlamak ve düşman LLT'leri menzillerinin dışından fırlatmak için iyidir. Ancak, hapşırdığınızda kopar."
     },
     "chicken_roc": {
         "name": "Anka",
@@ -152,7 +152,7 @@
     "nebula": {
         "name": "Bulutsu",
         "description": "Atmosfersel Anagemi",
-        "helptext": "Bir tuğla kadar manevra kabiliyeti yüksek ve sadece mütevazi bir silahlı olan Bulutsu, kalkanından dolayı uzun vadeli saldırılara dayanma kabiliyetinden ve savaş uçağı tamamlayıcılığından daha az düşman olduğu için hala korkunç bir kuvvettir.\n"
+        "helptext": "Bir tuğla kadar manevra kabiliyeti yüksek ve sadece mütevazi bir silahlı olan Bulutsu, kalkanından dolayı uzun vadeli saldırılara dayanma kabiliyetinden ve savaş uçağı tamamlayıcılığından daha az düşman olduğu için hala korkunç bir kuvvettir."
     },
     "hoveraa": {
         "name": "Harmancı",
@@ -227,7 +227,7 @@
     "hoverskirm2": {
         "name": "Trisula",
         "description": "Hafif Taarruz/Savaş Hoveri",
-        "helptext": "Trisula, çok sayıda küçük hedefi silebilen ya da tek bir büyük olanı cüruflayabilen bir saçılma silahı ile donanmış oldukça hızlı, sağlam bir savaşçıdır.\n"
+        "helptext": "Trisula, çok sayıda küçük hedefi silebilen ya da tek bir büyük olanı cüruflayabilen bir saçılma silahı ile donanmış oldukça hızlı, sağlam bir savaşçıdır."
     },
     "vehriot": {
         "name": "Yırtıcı",
@@ -267,7 +267,7 @@
     "energysingu": {
         "name": "Boyutsal Reaktör",
         "description": "Büyük Güç Santrali (+225) - TEHLİKELİ",
-        "helptext": "Boyutsal Reaktör, kontrollü bir kara delik kullanarak, kulağa geldiği kadar güvenli olan büyük miktarda enerji üretir. Reaktör tahrip edildiğinde, kara delik şiddetli bir şekilde çarparak birimleri içeri sürükler. Bunun inşa edildiği kıtanın tamamı güvenli olmayan zemin olarak değerlendirilmelidir.\n"
+        "helptext": "Boyutsal Reaktör, kontrollü bir kara delik kullanarak, kulağa geldiği kadar güvenli olan büyük miktarda enerji üretir. Reaktör tahrip edildiğinde, kara delik şiddetli bir şekilde çarparak birimleri içeri sürükler. Bunun inşa edildiği kıtanın tamamı güvenli olmayan zemin olarak değerlendirilmelidir."
     },
     "bomberdisarm": {
         "name": "Şimşek kuşu",
@@ -657,7 +657,7 @@
     "tankriot": {
         "name": "Zalim",
         "description": "Ağır İsyan Destek Tankı",
-        "helptext": "Bir isyan platformu için oldukça hareketli olan Ogre, sınırlı bir menzile sahip olmalarına rağmen, hem hafif birimleri hem de uçakları harap eden ikiz yüksek hızlı parçalanma füzelerini bir araya getiriyor. Diğer isyan birimleri gibi, Ogre de çoğu silahlı avcıya karşı kendi ayak tutabilecek menzile ve hıza sahip değil. Füze araziyi düzlemekte oldukça etkilidir, bu nedenle Kaynakçıların ulaşamadığı duvarları yıkmada özellikle yararlıdır."
+        "helptext": "Bir isyan platformu için oldukça hareketli olan Zalim, sınırlı bir menzile sahip olmalarına rağmen, hem hafif birimleri hem de uçakları harap eden ikiz yüksek hızlı parçalanma füzelerini bir araya getiriyor. Diğer isyan birimleri gibi, Zalim de çoğu silahlı avcıya karşı kendi ayak tutabilecek menzile ve hıza sahip değil. Füze araziyi düzlemekte oldukça etkilidir, bu nedenle Kaynakçıların ulaşamadığı duvarları yıkmada özellikle yararlıdır."
     },
     "staticantinuke": {
         "name": "Antinükleer",
@@ -962,7 +962,7 @@
     "vehcapture": {
         "name": "Sahipçi",
         "description": "Elegeçirme Arabası",
-        "helptext": "Dominatrix, düşmanlarını eski müttefiklerine karşı çevirerek ele geçirir. Birden fazla Dominatrix, tek bir hedefi daha hızlı yakalayabilir, ancak yalnızca biri denetleyici olur. Birimin kontrolünü aldıktan sonra Dominatrix 12 saniye boyunca ateş edemez. Bir Dominatrix tahrip olursa, tüm birimler serbest kalır."
+        "helptext": "Sahipçi, düşmanlarını eski müttefiklerine karşı çevirerek ele geçirir. Birden fazla Sahipçi, tek bir hedefi daha hızlı yakalayabilir, ancak yalnızca biri denetleyici olur. Birimin kontrolünü aldıktan sonra Sahipçi 12 saniye boyunca ateş edemez. Bir Sahipçi tahrip olursa, tüm birimler serbest kalır."
     },
     "factorytank": {
         "name": "Tank Dökümhanesi",
@@ -987,7 +987,7 @@
     "factoryjump": {
         "name": "SıçramaJet Fabrikası",
         "description": "SıçramaJetli Robotlar Üretir, 10 m/s de inşa eder",
-        "helptext": "Ezoterik SıçramaJet Fabrikası, bir bıçakla savaşta mesafeyi hızla kapatmak ya da düşman hatlarında bir yolu kesmek için tepeleri ve nehirleri aşmak için benzersiz taktik seçenekler sunar. Anahtar birimler: Pyro, Moderatör, Kriko, YürüyenAteş, Jugglenaut"
+        "helptext": "Ezoterik SıçramaJet Fabrikası, bir bıçakla savaşta mesafeyi hızla kapatmak ya da düşman hatlarında bir yolu kesmek için tepeleri ve nehirleri aşmak için benzersiz taktik seçenekler sunar. Anahtar birimler: Ateş, Moderatör, Kriko, YürüyenAteş, Jugglenaut"
     },
     "jumpsumo": {
         "name": "Jugglenaut",
@@ -1042,7 +1042,7 @@
     "jumpraid": {
         "name": "Ateş",
         "description": "Akıncı/İsyan Sıçrayıcı",
-        "helptext": "Pyro, alev makinası ile ucuz ve hızlı bir yürüteç. Alev makinesi büyük ünitelere daha fazla hasar verir ve aynı anda birden fazla hedefi vurabilir. Öldürüldüğünde, Pyro etrafındaki birimleri ateşe verir. Ek olarak, Pyro aynı zamanda ssıçramajet'lerle birlikte gelir, engellerin üzerinden atlamalarını veya düşmanları düşürmelerini sağlar."
+        "helptext": "Ateş, alev makinası ile ucuz ve hızlı bir yürüteç. Alev makinesi büyük ünitelere daha fazla hasar verir ve aynı anda birden fazla hedefi vurabilir. Öldürüldüğünde, Ateş etrafındaki birimleri ateşe verir. Ek olarak, Ateş aynı zamanda ssıçramajet'lerle birlikte gelir, engellerin üzerinden atlamalarını veya düşmanları düşürmelerini sağlar."
     },
     "tankheavyarty": {
         "name": "Titreme",
@@ -1057,7 +1057,7 @@
     "cloakcon": {
         "name": "Efsuncu",
         "description": "Görünmez Mühendis Bot, 5 m/s de inşa eder",
-        "helptext": "Memur, kısa mesafeli bir bozucu ve gizli bir genişletme ve temel bakım için bir gizleme aygıtı içerir."
+        "helptext": "Efsuncu, kısa mesafeli bir bozucu ve gizli bir genişletme ve temel bakım için bir gizleme aygıtı içerir."
     },
     "turretsunlance": {
         "name": "Günmızrağı",
@@ -1127,12 +1127,12 @@
     "staticrearm": {
         "name": "HavaAlanı",
         "description": "Tamir eder ve Yeniden silahlandırıcı Uçak, 2.5 e/s de tamir eder",
-        "helptext": "AirAlanı bir seferde dört uçağa kadar tamir eder. Aynı zamanda bombardıman uçaklarını yeniden düzenler / geri alır."
+        "helptext": "HavaAlanı bir seferde dört uçağa kadar tamir eder. Aynı zamanda bombardıman uçaklarını yeniden düzenler / geri alır."
     },
     "dynrecon1": {
         "name": "Muhalefet Komutanı",
         "description": "Yüksek Hareketli Komutan",
-        "helptext": "Recon Komutanı hareketlilik ve suçluluk duygusu etrafında döner; Bu hafif zırhlı platform, birçok özel silah ve modülü monte edebiliyor ve daha önce atlama jetleriyle donatılmış olarak geliyor."
+        "helptext": "Muhalefet Komutanı hareketlilik ve suçluluk duygusu etrafında döner; Bu hafif zırhlı platform, birçok özel silah ve modülü monte edebiliyor ve daha önce atlama jetleriyle donatılmış olarak geliyor."
     },
     "gunshipemp": {
         "name": "Tatar",
@@ -1147,7 +1147,7 @@
     "striderarty": {
         "name": "Bozdoğan",
         "description": "Ağır Doygun Topçu Strider",
-        "helptext": "Merlin bir MLRS çırpıcıdır. Hedef bölgedeki hemen hemen her şeyin imha edilmesini garanti altına alan bir roket fırlatabilir, daha sonra dost kuvvetlerin arkasına hızla geri çekilebilir."
+        "helptext": "Bozdoğan bir MLRS çırpıcıdır. Hedef bölgedeki hemen hemen her şeyin imha edilmesini garanti altına alan bir roket fırlatabilir, daha sonra dost kuvvetlerin arkasına hızla geri çekilebilir."
     },
     "gunshipheavytrans": {
         "name": "Herkül",
