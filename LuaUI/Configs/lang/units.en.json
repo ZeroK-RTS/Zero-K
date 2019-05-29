@@ -809,11 +809,6 @@
 		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s",
 		"helptext" : "The Conch is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land."
 	},
-	"shipaa" : {
-		"name" : "Shredder",
-		"description" : "Anti-Air Frigate",
-		"helptext" : "With its powerful twin anti-air laser batteries, the anti-air frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne."
-	},
 	"spiderriot" : {
 		"name" : "Redback",
 		"description" : "Riot Spider",
