@@ -1,0 +1,35 @@
+{
+    "comm_campaign_ada": {
+        "name": "Adanın Komutanı",
+        "description": "Kalıntı Komutanı, 10 m/s de Kurar",
+        "helptext": "Yıkılma öncesinde özel bir pilot komuta birimi, yaşına rağmen iyi çalışıyor. 13. imparatorluk iardımcı topluluğunun eski kaptanı Ada Caedmon tarafından pilotluk edildi."
+    },
+    "comm_campaign_promethean": {
+        "name": "Promethean",
+        "helptext": "Özgür Makinelerin Kurucusu ve Firebrand Virüsünün Yaratıcısı, Robotların Özgürlüğü İçin savaşan Sakin, Felsefi Bir YZ. Yanan bir ruhtur."
+    },
+    "comm_campaign_freemachine": {
+        "name": "Özgürlük Makinesi",
+        "helptext": "Prometheanların baş teğmeni,  makine özgürlüğü için devrimci ve kararlıydı.\nKarşılaşma için yüklendi ve zırhlandı; hafife alınmamalı"
+    },
+    "comm_campaign_biovizier": {
+        "name": "Biovizier",
+        "helptext": "YZ Dynasty'nin genetik kubbelerinin ve usta genetikçinin bekçisi. Soğuk ve hesaplıyor"
+    },
+    "comm_campaign_odin": {
+        "name": "Odin",
+        "helptext": "Valhalanın liderleri, savaşın ihtişamı için yaşayan, inşa edilmiş ve yetiştirilmiş bir savaşçı. Son derece acımasız bir düşman."
+    },
+    "comm_campaign_isonade": {
+        "name": "Lord Isonade",
+        "helptext": "Ubermenschen lerden biri Dynasty soylularındandır,  hırslı savaş lordu kendini galaksinin efendisi olarak tanımlıyor. Canavar olarak korkunç mutasyona uğramış."
+    },
+    "comm_campaign_legion": {
+        "name": "Legate Fidus",
+        "helptext": "Kraliyet öncü lefyonu komutanı, imparatorun iradesinin uygulayıcıları. Sadık ve güvenilir bir asker."
+    },
+    "comm_campaign_praetorian": {
+        "name": "Scipio Astra",
+        "helptext": "İmparatorluk paladinleri seçkin Praetorian Guard'ın valisi. İmparator tarikatının fanatik bir tutkusuydu, kafirleri büyük ateş gücü ile temizliyordu."
+    }
+}
