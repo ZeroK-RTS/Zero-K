@@ -799,11 +799,6 @@
 		"description" : "EMP missile",
 		"helptext" : "The Shockley disables units in a small area for up to 45 seconds."
 	},
-	"subraider" : {
-		"name" : "Snake",
-		"description" : "Raider Submarine",
-		"helptext" : "Stealthy, fast, and fragile, this Submarine can quickly strike unprotected targets. Slow damage allows it to effectively kill lone units. Watch out for anything with anti-sub weaponry, especially Hunters."
-	},
 	"striderhub" : {
 		"name" : "Strider Hub",
 		"description" : "Constructs Striders, Builds at 10 m/s",
