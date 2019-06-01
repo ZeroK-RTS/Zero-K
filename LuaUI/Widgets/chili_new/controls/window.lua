@@ -1,4 +1,4 @@
---- Window module
+ndow module
 
 --- Window fields.
 -- Inherits from Control.
@@ -8,6 +8,7 @@ Window = Control:Inherit{
   classname = 'window',
   resizable = true,
   draggable = true,
+  bringToFrontOnClick = true,
 
   minWidth  = 50,
   minHeight = 50,
@@ -47,7 +48,9 @@ function Window:DrawControl()
 end
 
 function Window:MouseDown(...)
-  self:BringToFront()
+  if self.bringToFrontOnClick then
+    self:BringToFront()
+  end
   return inherited.MouseDown(self,...)
 end
 
