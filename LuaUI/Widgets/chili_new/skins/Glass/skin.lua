@@ -46,6 +46,20 @@ skin.button = {
   DrawControl = DrawButton,
 }
 
+skin.button_disabled = {
+  TileImageFG = ":cl:glassFG.png",
+  TileImageBK = ":cl:glassBK.png",
+  tiles       = {17,15,17,20},
+
+  textColor = {1,1,1,1},
+
+  padding = {12, 12, 12, 12},
+
+  color = {0.3,.3,.3,1},
+  backgroundColor = {0.1,0.1,0.1,0.8},
+
+  DrawControl = DrawButton,
+}
 
 skin.combobox = {
 	TileImageFG = ":cl:glassFG.png",
