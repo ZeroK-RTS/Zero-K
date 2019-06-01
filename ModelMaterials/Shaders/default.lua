@@ -143,11 +143,11 @@ fragment = [[
 	uniform vec3 etcLoc;
 
 	#ifndef SPECULARSUNEXP
-		#define SPECULARSUNEXP 16.0
+		#define SPECULARSUNEXP 18.0
 	#endif
 
 	#ifndef SPECULARMULT
-		#define SPECULARMULT 5.0
+		#define SPECULARMULT 4.0
 	#endif
 
 	#ifndef MAT_IDX
@@ -273,7 +273,7 @@ fragment = [[
 				// SpiralSNorm return low discrepancy sampling vec2
 				vec2 offset = (rotMat * SpiralSNorm( i, SHADOW_SAMPLES )) * filterSize;
 
-				vec4 shTexCoord = tex_coord1 + vec4(offset, -bias, 0.0);
+				vec4 shTexCoord = tex_coord1 + vec4(offset * tex_coord1.w, -bias, 0.0);
 				shadow += textureProj( shadowTex, shTexCoord );
 			}
 
