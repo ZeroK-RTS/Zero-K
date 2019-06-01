@@ -1,13 +1,5 @@
 --//=============================================================================
 
---- ImageListView module
-
---- ImageListView fields.
--- Inherits from LayoutPanel.
--- @see layoutpanel.LayoutPanel
--- @table ImageListView
--- @string[opt=""] dir initial directory
--- @tparam {func1,func2,...} OnDirChange table of function listeners for directory change (default {})
 ImageListView = LayoutPanel:Inherit{
   classname = "imagelistview",
 
@@ -28,8 +20,6 @@ ImageListView = LayoutPanel:Inherit{
   items = {},
 
   dir = '',
-
-  useRTT = false;
 
   OnDirChange = {},
 }
@@ -118,7 +108,6 @@ function ImageListView:_AddFile(name,imagefile)
     itemMargin = {0,0,0,0},
     rows = 2,
     columns = 1,
-    useRTT = false;
 
     children = {
       Image:New{
@@ -150,7 +139,6 @@ function ImageListView:ScanDir()
       imageFiles[#imageFiles+1]=f
     end
   end
-
 
   self._dirsNum = #dirs
   self._dirList = dirs
@@ -196,6 +184,7 @@ function ImageListView:SetDir(directory)
   self:DeselectAll()
   self.dir = directory
   self:ScanDir()
+
   self:CallListeners(self.OnDirChange, directory)
 
   if (self.parent) then
@@ -204,11 +193,6 @@ function ImageListView:SetDir(directory)
     self:UpdateLayout()
     self:Invalidate()
   end
-end
-
-
-function ImageListView:GoToParentDir()
-  self:SetDir(GetParentDir(self.dir))
 end
 
 

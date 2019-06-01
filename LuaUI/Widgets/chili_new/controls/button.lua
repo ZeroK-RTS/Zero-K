@@ -1,15 +1,8 @@
 --//=============================================================================
 
---- Button module
-
---- Button fields.
--- Inherits from Control.
--- @see control.Control
--- @table Button
--- @string[opt="button"] caption caption to be displayed
 Button = Control:Inherit{
   classname= "button",
-  caption  = 'button', 
+  caption  = 'button',
   defaultWidth  = 70,
   defaultHeight = 20,
 }
@@ -19,8 +12,6 @@ local inherited = this.inherited
 
 --//=============================================================================
 
---- Sets the caption of the button
--- @string caption new caption of the button
 function Button:SetCaption(caption)
   if (self.caption == caption) then return end
   self.caption = caption

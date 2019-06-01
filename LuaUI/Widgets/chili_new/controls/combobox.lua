@@ -21,6 +21,8 @@ ComboBox = Button:Inherit{
   OnClose = {},
   OnSelect = {},
   OnSelectName = {},
+  selectionOffsetX = 0,
+  selectionOffsetY = 0,
   maxDropDownHeight = 200,
   minDropDownHeight = 50,
   maxDropDownWidth = 500,
@@ -103,7 +105,7 @@ function ComboBox:MouseDown(x, y)
     local labels = {}
 
     local width = math.max(self.width, self.minDropDownWidth)
-    local height = 7
+    local height = 10
     for i = 1, #self.items do
       local item = self.items[i]
       if type(item) == "string" then
@@ -155,8 +157,8 @@ function ComboBox:MouseDown(x, y)
       width  = width,
       height = height,
       minHeight = self.minDropDownHeight,
-      x = math.max(sx, math.min(sx + self.width - width, (sx + x - width/2))),
-      y = y,
+      x = math.max(sx, math.min(sx + self.width - width, (sx + x - width/2))) + self.selectionOffsetX,
+      y = y + self.selectionOffsetY,
       children = {
         ComboBoxScrollPanel:New{
           width  = "100%",

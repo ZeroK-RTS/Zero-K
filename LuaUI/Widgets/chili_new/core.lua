@@ -4,7 +4,7 @@ local includes = {
   "headers/links.lua",
   "headers/backwardcompability.lua",
   "headers/unicode.lua",
-
+  
   "handlers/debughandler.lua",
   "handlers/taskhandler.lua",
   "handlers/skinhandler.lua",
@@ -40,13 +40,11 @@ local includes = {
   "controls/combobox.lua",
   "controls/tabbaritem.lua",
   "controls/tabbar.lua",
-  "controls/tabpanel.lua",
-  "controls/detachabletabpanel.lua",
 }
 
 local Chili = widget
 
-Chili.CHILI_DIRNAME = CHILI_DIRNAME or (LUA_DIRNAME .. "widgets/chili/")
+Chili.CHILI_DIRNAME = CHILI_DIRNAME or (LUAUI_DIRNAME .. "Widgets/chili/")
 Chili.SKIN_DIRNAME  =  SKIN_DIRNAME or (CHILI_DIRNAME .. "skins/")
 
 if (-1>0) then
