@@ -45,6 +45,19 @@ skin.button = {
   DrawControl = DrawButton,
 }
 
+skin.button_disabled = {
+  TileImageBK = ":cl:tech_button_bk.png",
+  TileImageFG = ":cl:tech_button_fg.png",
+  tiles = {22, 22, 22, 22}, --// tile widths: left,top,right,bottom
+  padding = {10, 10, 10, 10},
+
+  color = {0.3,.3,.3,1},
+  backgroundColor = {0.1,0.1,0.1,0.8},
+  borderColor = {1,1,1,0},
+
+  DrawControl = DrawButton,
+}
+
 skin.combobox = {
 	TileImageBK = ":cl:combobox_ctrl.png",
 	TileImageFG = ":cl:combobox_ctrl_fg.png",
@@ -90,27 +103,12 @@ skin.checkbox = {
 }
 
 skin.editbox = {
-  hintFont = table.merge({color = {1,1,1,0.7}}, skin.general.font),
-  
   backgroundColor = {0.1, 0.1, 0.1, 0.7},
   cursorColor     = {1.0, 0.7, 0.1, 0.8},
 
   TileImageBK = ":cl:panel2_bg.png",
   TileImageFG = ":cl:panel2_border.png",
   tiles       = {14,14,14,14},
-
-  DrawControl = DrawEditBox,
-}
-
-skin.textbox = {
-  hintFont = table.merge({color = {1,1,1,0.7}}, skin.general.font),
-
-  TileImageBK = ":cl:panel2_bg.png",
-  TileImageFG = ":cl:panel2_border.png",
-  tiles       = {14,14,14,14},
-
-  borderColor     = {0.0, 0.0, 0.0, 0.0},
-  focusColor      = {0.0, 0.0, 0.0, 0.0},
 
   DrawControl = DrawEditBox,
 }

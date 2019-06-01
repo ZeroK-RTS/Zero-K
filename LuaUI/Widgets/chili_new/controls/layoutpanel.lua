@@ -11,26 +11,6 @@
 --// This doesn't affect simple containers like grids & stackcontrols, which
 --// don't create any controls themselves (instead they just align their children).
 
---- LayoutPanel module
-
---- LayoutPanel fields.
--- Inherits from Control.
--- @see control.Control
--- @table LayoutPanel
--- @tparam {left,top,right,bottom} itemPadding table of item padding, (default {5,5,5,5})
--- @tparam {left,top,right,bottom} itemMargin table of item margin, (default {5,5,5,5})
--- @int[opt=1] minWidth minimum item width
--- @int[opt=0] maxWidth maximum item width
--- @int[opt=1] minHeight minimum item height
--- @int[opt=0] maxHeight maximum item height
--- @string[opt="horizontal] orientation orientation of the items
--- @bool[opt=false] resizeItems items are resized
--- @bool[opt=true] centerItems items are centered
--- @bool[opt=false] selectable items can be selected
--- @bool[multiSelect=true] multiSelect multiple items can be selected
--- @tparam {func1,func2,...} OnSelectItem function listeners to be called on item selection change (default {})
--- @tparam {func1,func2,...} OnDrawItem function listeners to be called when an item is drawn (default {})
--- @tparam (func1,func2,...} OnDblClickItem function listeners to be called on double click (default {})
 LayoutPanel = Control:Inherit{
   classname = "layoutpanel",
 
@@ -80,15 +60,13 @@ local inherited = this.inherited
 function LayoutPanel:New(obj)
   obj = inherited.New(self,obj)
   if (obj.selectable) then
-    obj:SelectItem(1)
+    obj.selectedItems = {[1]=true}
   end
   return obj
 end
 
 --//=============================================================================
 
---- Set the panel's orientation
--- @string orientation new orientation
 function LayoutPanel:SetOrientation(orientation)
   self.orientation = orientation
   inherited.UpdateClientArea(self)
@@ -270,6 +248,10 @@ function LayoutPanel:_AutoArrangeOrdinate(freeSpace)
   local lineSizes = {}
   for i=1,#_lines do
     local first_cell_in_line = _cells[ _lines[i] ]
+    if not first_cell_in_line then
+      Spring.Log(widget:GetInfo().name, LOG.WARNING, "(StackPanel) failed to find first_cell_in_line")
+      return
+    end
     if (self.orientation == "horizontal") then --FIXME
       lineSizes[i] = {i,first_cell_in_line[4]}
     else
@@ -433,6 +415,17 @@ end
 function LayoutPanel:_LayoutChildrenResizeItems()
   local cn = self.children
   local cn_count = #cn
+
+  local max_ix = math.floor(self.clientArea[3] / self.minItemWidth)
+  local max_iy = math.floor(self.clientArea[4] / self.minItemHeight)
+
+  if (max_ix * max_iy < cn_count)   or
+     (max_ix < (self.columns or 0)) or
+     (max_iy < (self.rows or 0))
+  then
+    --FIXME add autoEnlarge/autoAdjustSize?
+    --error"LayoutPanel: not enough space"
+  end
 
   --FIXME take minWidth/height maxWidth/Height into account! (and try to reach a 1:1 pixel ratio)
   if self.columns and self.rows then
@@ -748,7 +741,7 @@ function LayoutPanel:DrawChildren()
   if (not cn[1]) then return end
 
   gl.PushMatrix()
-  gl.Translate(self.clientArea[1], self.clientArea[2], 0)
+  gl.Translate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
   for i=1,#cn do
     self:DrawItemBkGnd(i)
   end
@@ -773,13 +766,13 @@ function LayoutPanel:DrawChildrenForList()
     gl.Color(0,1,0,0.5)
     gl.PolygonMode(GL.FRONT_AND_BACK,GL.LINE)
     gl.LineWidth(2)
-    gl.Rect(0, 0, self.width, self.height)
+    gl.Rect(self.x,self.y,self.x+self.width,self.y+self.height)
     gl.LineWidth(1)
     gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
   end
 
   gl.PushMatrix()
-  gl.Translate(self.clientArea[1], self.clientArea[2], 0)
+  gl.Translate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
   for i=1,#cn do
     self:DrawItemBkGnd(i)
   end
@@ -836,40 +829,38 @@ function LayoutPanel:MultiRectSelect(item1,item2,append)
   convexHull[3] = math.max(cell1[1]+cell1[3],cell2[1]+cell2[3]) - convexHull[1]
   convexHull[4] = math.max(cell1[2]+cell1[4],cell2[2]+cell2[4]) - convexHull[2]
 
-  local oldSelected = {} -- need to copy tables to not overwrite things
-  for k, v in pairs(self.selectedItems) do
-    oldSelected[k] = v
-  end  
-
-  self.selectedItems = append and self.selectedItems or {}
+  local newSelected = self.selectedItems
+  if (not append) then
+    newSelected = {}
+  end
 
   for i=1,#cells do
     local cell  = cells[i]
     local cellbox = ExpandRect(cell,itemPadding)
     if (AreRectsOverlapping(convexHull,cellbox)) then
-      self.selectedItems[i] = true
+      newSelected[i] = true
     end
   end
 
   if (not append) then
+    local oldSelected = self.selectedItems
+    self.selectedItems = newSelected
     for itemIdx,selected in pairs(oldSelected) do
-      if (selected)and(not self.selectedItems[itemIdx]) then
+      if (selected)and(not newSelected[itemIdx]) then
         self:CallListeners(self.OnSelectItem, itemIdx, false)
       end
     end
-  end
-  -- this needs to happen either way
-  for itemIdx,selected in pairs(self.selectedItems) do
-    if (selected)and(not oldSelected[itemIdx]) then
-      self:CallListeners(self.OnSelectItem, itemIdx, true)
+    for itemIdx,selected in pairs(newSelected) do
+      if (selected)and(not oldSelected[itemIdx]) then
+        self:CallListeners(self.OnSelectItem, itemIdx, true)
+      end
     end
   end
 
   self:Invalidate()
 end
 
---- Toggle item selection
--- @int itemIdx id of the item for which the selection will be toggled
+
 function LayoutPanel:ToggleItem(itemIdx)
   local newstate = not self.selectedItems[itemIdx]
   self.selectedItems[itemIdx] = newstate
@@ -878,9 +869,7 @@ function LayoutPanel:ToggleItem(itemIdx)
   self:Invalidate()
 end
 
---- Select the item
--- @int itemIdx id of the item to be selected
--- @bool append whether the old selection should be kept
+
 function LayoutPanel:SelectItem(itemIdx, append)
   if (self.selectedItems[itemIdx]) then
     return
@@ -902,8 +891,7 @@ function LayoutPanel:SelectItem(itemIdx, append)
   self:Invalidate()
 end
 
---- Deselect item
--- @int itemIdx id of the item to deselect
+
 function LayoutPanel:DeselectItem(itemIdx)
   if (not self.selectedItems[itemIdx]) then
     return
@@ -915,14 +903,14 @@ function LayoutPanel:DeselectItem(itemIdx)
   self:Invalidate()
 end
 
---- Select all items
+
 function LayoutPanel:SelectAll()
   for i=1,#self.children do
     self:SelectItem(i, append)
   end
 end
 
---- Deselect all items
+
 function LayoutPanel:DeselectAll()
   for idx in pairs(self.selectedItems) do
     self:DeselectItem(idx)
