@@ -3,23 +3,23 @@
 
 function widget:GetInfo()
 	return {
-		name	  = "Chili Framework",
-		desc	  = "Hot GUI Framework",
-		author	= "jK",
-		date	  = "WIP",
-		license   = "GPLv2",
-		version   = "2.1",
-		layer	 = 1000,
-		enabled   = true,  --  loaded by default?
-		handler   = true,
-		api	   = true,
+		name        = "Chili Framework",
+		desc        = "Hot GUI Framework",
+		author      = "jK",
+		date        = "WIP",
+		license     = "GPLv2",
+		version     = "2.1",
+		layer       = 1000,
+		enabled     = true,  --  loaded by default?
+		handler     = true,
+		api	        = true,
 		alwaysStart = true,
 	}
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local USE_OLD_CHILI = false
+local USE_OLD_CHILI = true
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -229,7 +229,7 @@ widget.TweakMouseWheel   = widget.MouseWheel
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-else -- Not Reverse Compatibility
+else -- Old Chili
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
