@@ -22,8 +22,9 @@ void main() {
 	float shapeDepth = texelFetch(shapeDepthTex, imageCoord, 0).r;
 	float mapDepth = texelFetch(mapDepthTex, imageCoord, 0).r;
 
-	bool cond = (shapeDepth == 1.0);
-	float depthToWrite = mix(dilatedDepth, 0.0, alwaysShowOutLine);
+	bool cond = ((alwaysShowOutLine == 1.0) && (shapeDepth == 1.0)) || (alwaysShowOutLine == 0.0) && true;
+
+	float depthToWrite = mix(dilatedDepth + eps, 0.0, alwaysShowOutLine);
 
 	gl_FragColor = mix(vec4(0.0), dilatedColor, float(cond));
 	gl_FragDepth = mix(1.0, depthToWrite, float(cond));
