@@ -43,12 +43,12 @@ local materials = {
 --------------------------------------------------------------------------------
 local unitMaterials = {}
 
-for i=1,#UnitDefs do
-  local udef = UnitDefs[i]
+for id = 1, #UnitDefs do
+  local udef = UnitDefs[id]
 
   if (udef.customParams.altskin and VFS.FileExists(udef.customParams.altskin)) then
-    local tex2 = "%%"..i..":1"
-    unitMaterials[i] = {"altSkinS3o", ALTSKIN = udef.customParams.altskin, ALTSKIN2 = udef.customParams.altskin2 or tex2}
+    local tex2 = "%%"..id..":1"
+    unitMaterials[id] = {"altSkinS3o", ALTSKIN = udef.customParams.altskin, ALTSKIN2 = udef.customParams.altskin2 or tex2}
   end --if
 end --for
 
