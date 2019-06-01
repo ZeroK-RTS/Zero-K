@@ -1,5 +1,20 @@
 --//=============================================================================
 
+--- ScrollPanel module
+
+--- ScrollPanel fields.
+-- Inherits from Control.
+-- @see control.Control
+-- @table ScrollPanel
+-- @int[opt=12] scrollBarSize size of the scrollbar
+-- @int[opt=0] scrollPosX position of the scrollbar
+-- @int[opt=0] scrollPosY position of the scrollbar
+-- @bool[opt=true] verticalScrollbar the vertical scroll bar is enabled
+-- @bool[opt=true] horizontalScrollbar the horizontal scroll bar is enabled
+-- @bool[opt=true] smoothScroll smooth scroll is enabled
+-- @bool[opt=false] verticalSmartScroll if control is scrolled to bottom, keep scroll when layout changes
+-- @number[opt=0.7] smoothScrollTime time of the smooth scroll, in seconds
+-- @bool[opt=false] ignoreMouseWheel mouse wheel scrolling is enabled
 ScrollPanel = Control:Inherit{
   classname     = "scrollpanel",
   padding       = {0,0,0,0},
@@ -9,9 +24,9 @@ ScrollPanel = Control:Inherit{
   scrollPosY    = 0,
   verticalScrollbar   = true,
   horizontalScrollbar = true,
-  verticalSmartScroll = false, --// if control is scrolled to bottom, keep scroll when layout changes
+  verticalSmartScroll = false, 
   smoothScroll     = true,
-  smoothScrollTime = 0.7, --// in seconds
+  smoothScrollTime = 0.7, 
   ignoreMouseWheel = false,
 }
 
@@ -26,8 +41,12 @@ end
 
 --//=============================================================================
 
-function ScrollPanel:SetScrollPos(x,y,inview, forceNotSmooth)
-  if (self.smoothScroll) and not forceNotSmooth then
+--- Sets the scroll position
+-- @int x x position
+-- @int y y position
+function ScrollPanel:SetScrollPos(x,y,inview,smoothscroll)
+  local dosmooth = self.smoothScroll and (smoothscroll or (smoothscroll == nil))
+  if dosmooth then
     self._oldScrollPosX = self.scrollPosX
     self._oldScrollPosY = self.scrollPosY
   end
@@ -51,7 +70,7 @@ function ScrollPanel:SetScrollPos(x,y,inview, forceNotSmooth)
     end
   end
 
-  if (self.smoothScroll) and not forceNotSmooth  then
+  if dosmooth then
     if (self._oldScrollPosX ~= self.scrollPosX)or(self._oldScrollPosY ~= self.scrollPosY) then
       self._smoothScrollEnd = Spring.GetTimer()
       self._newScrollPosX = self.scrollPosX
@@ -61,7 +80,7 @@ function ScrollPanel:SetScrollPos(x,y,inview, forceNotSmooth)
     end
   end
 
-  self:Invalidate()
+  self:InvalidateSelf()
 end
 
 
@@ -79,7 +98,7 @@ function ScrollPanel:Update(...)
 			for n=1,3 do trans = smoothstep(trans) end
 			self.scrollPosX = self._oldScrollPosX * (1 - trans) + self._newScrollPosX * trans
 			self.scrollPosY = self._oldScrollPosY * (1 - trans) + self._newScrollPosY * trans
-			self:Invalidate()
+			self:InvalidateSelf()
 		end
 	end
 
@@ -114,6 +133,8 @@ end
 --//=============================================================================
 
 function ScrollPanel:GetCurrentExtents()
+  local minLeft, minTop, maxRight, maxBottom = self:GetChildrenCurrentExtents()
+  
   local left = self.x
   local top  = self.y
   local right  = self.x + self.width
@@ -197,16 +218,16 @@ function ScrollPanel:UpdateLayout()
   end
 
   self.scrollPosX = clamp(0, self.contentArea[3] - self.clientArea[3], self.scrollPosX)
-  
+
   local oldClamp = self.clampY or 0
   self.clampY = self.contentArea[4] - self.clientArea[4]
 
-  if self.verticalSmartScroll and self.scrollPosY >= oldClamp then 
+  if self.verticalSmartScroll and self.scrollPosY >= oldClamp then
     self.scrollPosY = self.clampY
-  else 
+  else
     self.scrollPosY = clamp(0, self.clampY, self.scrollPosY)
   end
-  
+
   return true;
 end
 
@@ -216,6 +237,10 @@ end
 function ScrollPanel:IsRectInView(x,y,w,h)
 	if (not self.parent) then
 		return false
+	end
+
+	if self._inrtt then
+		return true
 	end
 
 	--//FIXME 1. don't create tables 2. merge somehow into Control:IsRectInView
@@ -243,27 +268,24 @@ end
 
 
 function ScrollPanel:_DrawInClientArea(fnc,...)
-  local clientX,clientY,clientWidth,clientHeight = unpack4(self.clientArea)
+	local clientX,clientY,clientWidth,clientHeight = unpack4(self.clientArea)
 
-  if WG.uiScale and WG.uiScale ~= 1 then
-    clientWidth, clientHeight = clientWidth*WG.uiScale, clientHeight*WG.uiScale
-  end
-  
-  if (self.safeOpengl) then
-    local sx,sy = self:UnscaledLocalToScreen(clientX,clientY)
-    sy = select(2,gl.GetViewSizes()) - (sy + clientHeight)
+	if WG.uiScale and WG.uiScale ~= 1 then
+		clientWidth, clientHeight = clientWidth*WG.uiScale, clientHeight*WG.uiScale
+	end
 
-    PushScissor(sx,sy,clientWidth,clientHeight)
-  end
+	gl.PushMatrix()
+	gl.Translate(clientX - self.scrollPosX, clientY - self.scrollPosY, 0)
 
-  gl.PushMatrix()
-  gl.Translate(math.floor(self.x + clientX - self.scrollPosX),math.floor(self.y + clientY - self.scrollPosY),0)
-  fnc(...)
-  gl.PopMatrix()
+	local sx,sy = self:UnscaledLocalToScreen(clientX,clientY)
+	sy = select(2,gl.GetViewSizes()) - (sy + clientHeight)
 
-  if (self.safeOpengl) then
-    PopScissor()
-  end
+	if PushLimitRenderRegion(self, sx, sy, clientWidth, clientHeight) then
+		fnc(...)
+		PopLimitRenderRegion(self, sx, sy, clientWidth, clientHeight)
+	end
+
+	gl.PopMatrix()
 end
 
 
@@ -298,18 +320,14 @@ function ScrollPanel:MouseDown(x, y, ...)
     self._vscrolling  = true
     local clientArea = self.clientArea
     local cy = y - clientArea[2]
-    self.scrollPosY = (cy/clientArea[4])*self.contentArea[4] - 0.5*clientArea[4]
-    self.scrollPosY = clamp(0, self.contentArea[4] - clientArea[4], self.scrollPosY)
-    self:Invalidate()
+    self:SetScrollPos(nil, (cy/clientArea[4])*self.contentArea[4], true, false)
     return self
   end
   if self:IsAboveHScrollbars(x,y) then
     self._hscrolling  = true
     local clientArea = self.clientArea
     local cx = x - clientArea[1]
-    self.scrollPosX = (cx/clientArea[3])*self.contentArea[3] - 0.5*clientArea[3]
-    self.scrollPosX = clamp(0, self.contentArea[3] - clientArea[3], self.scrollPosX)
-    self:Invalidate()
+    self:SetScrollPos((cx/clientArea[3])*self.contentArea[3], nil, true, false)
     return self
   end
 
@@ -321,17 +339,13 @@ function ScrollPanel:MouseMove(x, y, dx, dy, ...)
   if self._vscrolling then
     local clientArea = self.clientArea
     local cy = y - clientArea[2]
-    self.scrollPosY = (cy/clientArea[4])*self.contentArea[4] - 0.5*clientArea[4]
-    self.scrollPosY = clamp(0, self.contentArea[4] - clientArea[4], self.scrollPosY)
-    self:Invalidate()
+    self:SetScrollPos(nil, (cy/clientArea[4])*self.contentArea[4], true, false)
     return self
   end
   if self._hscrolling then
     local clientArea = self.clientArea
     local cx = x - clientArea[1]
-    self.scrollPosX = (cx/clientArea[3])*self.contentArea[3] - 0.5*clientArea[3]
-    self.scrollPosX = clamp(0, self.contentArea[3] - clientArea[3], self.scrollPosX)
-    self:Invalidate()
+    self:SetScrollPos((cx/clientArea[3])*self.contentArea[3], nil, true, false)
     return self
   end
 
@@ -340,7 +354,7 @@ function ScrollPanel:MouseMove(x, y, dx, dy, ...)
   self._vHovered = self:IsAboveVScrollbars(x,y)
   local new = (self._hHovered and 1 or 0) + (self._vHovered and 2 or 0)
   if (new ~= old) then
-    self:Invalidate()
+    self:InvalidateSelf()
   end
 
   return inherited.MouseMove(self, x, y, dx, dy, ...)
@@ -352,18 +366,14 @@ function ScrollPanel:MouseUp(x, y, ...)
     self._vscrolling = nil
     local clientArea = self.clientArea
     local cy = y - clientArea[2]
-    self.scrollPosY = (cy/clientArea[4])*self.contentArea[4] - 0.5*clientArea[4]
-    self.scrollPosY = clamp(0, self.contentArea[4] - clientArea[4], self.scrollPosY)
-    self:Invalidate()
+    self:SetScrollPos(nil, (cy/clientArea[4])*self.contentArea[4], true, false)
     return self
   end
   if self._hscrolling then
     self._hscrolling = nil
     local clientArea = self.clientArea
     local cx = x - clientArea[1]
-    self.scrollPosX = (cx/clientArea[3])*self.contentArea[3] - 0.5*clientArea[3]
-    self.scrollPosX = clamp(0, self.contentArea[3] - clientArea[3], self.scrollPosX)
-    self:Invalidate()
+    self:SetScrollPos((cx/clientArea[3])*self.contentArea[3], nil, true, false)
     return self
   end
 
@@ -373,9 +383,7 @@ end
 
 function ScrollPanel:MouseWheel(x, y, up, value, ...)
   if self._vscrollbar and not self.ignoreMouseWheel then
-    self.scrollPosY = self.scrollPosY - value*30
-    self.scrollPosY = clamp(0, self.contentArea[4] - self.clientArea[4], self.scrollPosY)
-    self:Invalidate()
+    self:SetScrollPos(nil, self.scrollPosY - value*30, false, false)
     return self
   end
 
@@ -387,5 +395,5 @@ function ScrollPanel:MouseOut(...)
 	inherited.MouseOut(self, ...)
 	self._hHovered = false
 	self._vHovered = false
-	self:Invalidate()
+	self:InvalidateSelf()
 end

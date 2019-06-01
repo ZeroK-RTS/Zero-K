@@ -85,7 +85,7 @@ for i,skinConfig in ipairs(SkinHandler.knownSkins) do
       dirs[#dirs+1] = dependSkin.info.dir
       table.merge(skinConfig, dependSkin)
     else
-      Spring.Echo("Chili: Skin " .. skinConfig.info.name .. " depends on an unknown skin named " .. dependSkinName .. ".")
+      Spring.Log("Chili", "error", "Skin " .. skinConfig.info.name .. " depends on an unknown skin named " .. dependSkinName .. ".")
     end
   end
 
@@ -107,8 +107,6 @@ SkinHandler.defaultSkin = GetSkin('default')
 
 --//=============================================================================
 --// API
-
-SkinHandler.GetSkin = GetSkin
 
 function SkinHandler.IsValidSkin(skinname)
   return (not not GetSkin(skinname))
@@ -150,7 +148,6 @@ function SkinHandler.LoadSkin(control, class)
 	local found = false
 	local inherited = class.inherited
 	local classname = control.classname
-	
 	repeat
 		--FIXME scan whole `depend` table
 

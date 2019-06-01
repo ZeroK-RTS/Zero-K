@@ -105,7 +105,7 @@ function ComboBox:MouseDown(x, y)
     local labels = {}
 
     local width = math.max(self.width, self.minDropDownWidth)
-    local height = 10
+    local height = 7
     for i = 1, #self.items do
       local item = self.items[i]
       if type(item) == "string" then
