@@ -1,4 +1,4 @@
-ndow module
+-- Window module
 
 --- Window fields.
 -- Inherits from Control.
