@@ -10,13 +10,8 @@ local function SunChanged(curShaderObj)
 	curShaderObj:SetUniformAlways("sunSpecular", gl.GetSun("specular" ,"unit"))
 end
 
-local default_lua = VFS.Include("ModelMaterials/Shaders/default.lua")
-
 local materials = {
 	feature_tree = {
-		shader    = default_lua,
-		deferred  = default_lua,
-
 		shaderDefinitions = {
 			"#define use_normalmapping",
 			"#define deferred_mode 0",
@@ -30,7 +25,7 @@ local materials = {
 			"#define SPECULARSUNEXP 16.0",
 			"#define SPECULARMULT 1.0",
 			"#define SHADOW_SOFTNESS SHADOW_HARD", -- cuz shadow for swaying trees is bugged anyway
-			"#define MAT_IDX 129",
+			"#define MAT_IDX 128",
 		},
 		shaderPlugins = {
 			VERTEX_GLOBAL_NAMESPACE = [[
@@ -42,7 +37,7 @@ local materials = {
 				}
 			]],
 			VERTEX_PRE_TRANSFORM = [[
-				// adapted from 0ad's model_common.vs
+				// adapted from 0ad"s model_common.vs
 
 				vec2 curWind = getWind(simFrame / 750);
 				vec2 nextWind = getWind(simFrame / 750 + 1);
@@ -62,7 +57,7 @@ local materials = {
 
 				vec4 cosVec;
 				float simTime = 0.02 * simFrame;
-				// these determine the speed of the wind's "cosine" waves.
+				// these determine the speed of the wind"s "cosine" waves.
 				cosVec.w = 0.0;
 				cosVec.x = simTime * modelPos[0] + vertex.x;
 				cosVec.y = simTime * modelPos[2] / 3.0 + modelPos.x;
@@ -90,12 +85,12 @@ local materials = {
 		usecamera = false,
 		culling   = GL.BACK,
 		texunits  = {
-			[0] = '%%FEATUREDEFID:0',
-			[1] = '%%FEATUREDEFID:1',
-			[2] = '$shadow',
-			--[3] = '$specular',
-			[4] = '$reflection',
-			[5] = '%NORMALTEX',
+			[0] = "%%FEATUREDEFID:0",
+			[1] = "%%FEATUREDEFID:1",
+			[2] = "$shadow",
+			--[3] = "$specular",
+			[4] = "$reflection",
+			[5] = "%NORMALTEX",
 		},
 		SunChanged = SunChanged,
 	},
@@ -122,8 +117,8 @@ for id, featureDef in pairs(FeatureDefs) do
 			((not stubData.prefix) or featureDef.name:find(stubData.str) == 1) then
 			--if featureDef.customParam.normaltex then
 			if featureDef.model.textures and featureDef.model.textures.tex1 then
-				-- Spring.Echo('Feature',featureDef.name,'seems like a nice tree, assigning the default normal texture to it.')
-				if featureDef.name:find('btree') == 1 then --beherith's old trees suffer if they get shitty normals
+				-- Spring.Echo("Feature",featureDef.name,"seems like a nice tree, assigning the default normal texture to it.")
+				if featureDef.name:find("btree") == 1 then --beherith"s old trees suffer if they get shitty normals
 					featureMaterials[id] = {"feature_tree", NORMALTEX = "unittextures/blank_normal.tga"}
 				else
 					featureMaterials[id] = {"feature_tree", NORMALTEX = "unittextures/default_tree_normal.tga"}

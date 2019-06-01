@@ -10,8 +10,6 @@ local function SunChanged(curShaderObj)
 	curShaderObj:SetUniformAlways("sunSpecular", gl.GetSun("specular" ,"unit"))
 end
 
-local default_lua = VFS.Include("ModelMaterials/Shaders/default.lua")
-
 local materials = {
 	normalMappedS3o = {
 		shaderDefinitions = {
@@ -25,19 +23,17 @@ local materials = {
 			"#define SHADOW_SOFTNESS SHADOW_SOFTER",
 			"#define MAT_IDX 2",
 		},
-		shader    = default_lua,
-		deferred  = default_lua,
 		usecamera = false,
 		culling   = GL.BACK,
 		predl  = nil,
 		postdl = nil,
 		texunits  = {
-			[0] = '%%UNITDEFID:0',
-			[1] = '%%UNITDEFID:1',
-			[2] = '$shadow',
-			--[3] = '$specular',
-			[4] = '$reflection',
-			[5] = '%NORMALTEX',
+			[0] = "%%UNITDEFID:0",
+			[1] = "%%UNITDEFID:1",
+			[2] = "$shadow",
+			--[3] = "$specular",
+			[4] = "$reflection",
+			[5] = "%NORMALTEX",
 		},
 		SunChanged = SunChanged,
 	},

@@ -143,11 +143,11 @@ fragment = [[
 	uniform vec3 etcLoc;
 
 	#ifndef SPECULARSUNEXP
-		#define SPECULARSUNEXP 32.0
+		#define SPECULARSUNEXP 16.0
 	#endif
 
 	#ifndef SPECULARMULT
-		#define SPECULARMULT 3.0
+		#define SPECULARMULT 5.0
 	#endif
 
 	#ifndef MAT_IDX
