@@ -47,7 +47,7 @@ function Screen:New(obj)
     obj.width = vsx
   end
   if ((obj.height or -1) <= 0) then
-    obj.height = vsy
+    obj.height = math.ceil(vsy)
   end
 
   obj = inherited.New(self,obj)
@@ -131,8 +131,8 @@ end
 --//=============================================================================
 
 function Screen:Resize(w,h)
-	self.width = w
-	self.height = h
+	self.width = math.ceil(w)
+	self.height = math.ceil(h)
 	self:CallChildren("RequestRealign")
 end
 
@@ -173,6 +173,13 @@ function Screen:IsAbove(x,y,...)
     -- See https://springrts.com/mantis/view.php?id=5671 for the good solution.
     return
   end
+  -- What is this for?
+  local activeControl = UnlinkSafe(self.activeControl)
+  if activeControl then
+    self.currentTooltip = activeControl.tooltip
+    return true
+  end
+
   y = select(2,Spring.GetViewSizes()) - y
   local hoveredControl = inherited.IsAbove(self,x,y,...)
 
@@ -301,6 +308,7 @@ function Screen:MouseWheel(x,y,...)
     local cx,cy = activeControl:ScreenToLocal(x,y)
     local obj = activeControl:MouseWheel(cx,cy,...)
     if not obj then
+      self.activeControl = nil
       return false
     elseif obj ~= activeControl then
       self.activeControl = MakeWeakLink(obj, self.activeControl)
