@@ -50,6 +50,7 @@ Control = Object:Inherit{
 
   fixedRatio      = false,
   tooltip         = nil, --// JUST TEXT
+  greedyHitText   = false, --// Enable to do hit test if the control has any mouse events.
 
   font = {
     font          = "FreeSansBold.otf",
@@ -1443,15 +1444,14 @@ function Control:HitTest(x,y)
     end
   end
 
-  if (self.noClickThrough and not IsTweakMode())
-	or (self.tooltip)
-	or (#self.OnMouseDown > 0)
-	or (#self.OnMouseUp > 0)
-	or (#self.OnClick > 0)
-	or (#self.OnDblClick > 0)
-	or (#self.OnMouseMove > 0)
-	or (#self.OnMouseWheel > 0)
-  then
+  if (self.noClickThrough and not IsTweakMode()) or (self.greedyHitText and (
+		(self.tooltip)
+		or (#self.OnMouseDown > 0)
+		or (#self.OnMouseUp > 0)
+		or (#self.OnClick > 0)
+		or (#self.OnDblClick > 0)
+		or (#self.OnMouseMove > 0)
+		or (#self.OnMouseWheel > 0))) then
     return self
   end
 

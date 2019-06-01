@@ -174,6 +174,7 @@ function Screen:IsAbove(x,y,...)
     return
   end
   -- What is this for?
+  
   local activeControl = UnlinkSafe(self.activeControl)
   if activeControl then
     self.currentTooltip = activeControl.tooltip
