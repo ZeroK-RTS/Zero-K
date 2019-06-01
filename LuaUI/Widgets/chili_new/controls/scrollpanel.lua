@@ -25,7 +25,7 @@ ScrollPanel = Control:Inherit{
   verticalScrollbar   = true,
   horizontalScrollbar = true,
   verticalSmartScroll = false, --// if control is scrolled to bottom, keep scroll when layout changes
-  smoothScroll     = true,
+  smoothScroll     = false,
   smoothScrollTime = 0.7, --// in seconds
   ignoreMouseWheel = false,
 }
