@@ -1,5 +1,15 @@
 --//=============================================================================
 
+--- TreeView module
+
+--- TreeView fields.
+-- Inherits from Control.
+-- @see control.Control
+-- @table TreeView
+-- @bool[opt=true] autosize whether size is automatically determined
+-- @int[opt=1] selected selected item
+-- @tparam {TreeNode1,TreeNode2,...} nodes nodes of the tree
+-- @tparam {func1,fun2,...} OnSelectNode function listeners for node selection (default {})
 TreeView = Control:Inherit{
   classname = "treeview",
 

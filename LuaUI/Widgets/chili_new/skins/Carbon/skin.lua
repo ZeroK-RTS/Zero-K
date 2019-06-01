@@ -63,21 +63,6 @@ skin.checkbox = {
   DrawControl = DrawCheckbox,
 }
 
-skin.editbox = {
-  backgroundColor = {0.1, 0.1, 0.1, 0},
-  cursorColor     = {1.0, 0.7, 0.1, 0.8},
-  
-  focusColor  = {1, 1, 1, 1},
-  borderColor = {1, 1, 1, 0.6},
-  padding = {6,2,2,3},
-
-  TileImageBK = ":cl:panel2_bg.png",
-  TileImageFG = ":cl:panel2.png",
-  tiles       = {8,8,8,8},
-
-  DrawControl = DrawEditBox,
-}
-
 skin.imagelistview = {
   imageFolder      = "folder.png",
   imageFolderUp    = "folder_up.png",
@@ -207,7 +192,6 @@ skin.scrollpanel = {
   HKnobTiles     = {8,8,8,8},
 
   KnobColorSelected = {0.0, 0.6, 1.0, 1.0},
-  padding = {2, 2, 2, 2},
 
   scrollbarSize = 12,
   DrawControl = DrawScrollPanel,

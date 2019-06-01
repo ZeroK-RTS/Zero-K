@@ -1,5 +1,18 @@
 --//=============================================================================
 
+--- Progressbar module
+
+--- Progressbar fields.
+-- Inherits from Control.
+-- @see control.Control
+-- @table Progressbar
+-- @int[opt=0] min minimum value of the Progressbar
+-- @int[opt=100] max maximum value of the Progressbar
+-- @int[opt=100] value value of the Progressbar
+-- @string[opt=""] caption text to be displayed
+-- @tparam {r,g,b,a} color specifies the color of the bar (default: {0,0,1,1})
+-- @tparam {r,g,b,a} backgroundColor specifies the background color (default: {1,1,1,1})
+-- @tparam {func1,fun2,...} OnChange function listeners for value change (default {})
 Progressbar = Control:Inherit{
   classname = "progressbar",
 
@@ -9,8 +22,6 @@ Progressbar = Control:Inherit{
   min       = 0,
   max       = 100,
   value     = 100,
-  orientation = "horizontal",
-  reverse   = false,
 
   caption   = "",
 
@@ -53,6 +64,8 @@ end
 
 --//=============================================================================
 
+--- Sets the new color
+-- @tparam {r,g,b,a} c color table 
 function Progressbar:SetColor(...)
   local color = _ParseColorArgs(...)
   table.merge(color,self.color)
@@ -62,14 +75,18 @@ function Progressbar:SetColor(...)
   end
 end
 
-
+--- Sets the minimum and maximum value of the progress bar
+-- @int[opt=0] min minimum value
+-- @int[opt=1] max maximum value (why is 1 the default?)
 function Progressbar:SetMinMax(min,max)
   self.min = tonumber(min) or 0
   self.max = tonumber(max) or 1
   self:SetValue(self.value)
 end
 
-
+--- Sets the value of the progress bar
+-- @int v value of the progress abr
+-- @bool[opt=false] setcaption whether the caption should be set as well
 function Progressbar:SetValue(v,setcaption)
   v = self:_Clamp(v)
   local oldvalue = self.value
@@ -85,7 +102,8 @@ function Progressbar:SetValue(v,setcaption)
   end
 end
 
-
+--- Sets the caption
+-- @string str caption to be set
 function Progressbar:SetCaption(str)
   if (self.caption ~= str) then
     self.caption = str
@@ -104,37 +122,13 @@ function Progressbar:DrawControl()
   local h = self.height
 
   gl.Color(self.backgroundColor)
-  if (self.orientation == "horizontal") then
-    if self.reverse then
-      gl.Rect(x,y,x+w*(1-percent),y+h)
-    else
-      gl.Rect(x+w*percent,y,x+w,y+h)
-    end
-  else
-    if self.reverse then
-       gl.Rect(x,y,x+w,y+h*percent)
-    else
-      gl.Rect(x,y+h*(1-percent),x+w,y+h)
-    end
-  end
+  gl.Rect(w*percent,y,w,h)
 
   gl.Color(self.color)
-  if (self.orientation == "horizontal") then
-    if self.reverse then
-      gl.Rect(x+w*(1-percent),y,x+w,y+h)
-    else
-      gl.Rect(x,y,x+w*percent,y+h)
-    end
-  else
-    if self.reverse then
-      gl.Rect(x,y+h*percent,x+w,y+h)
-    else
-      gl.Rect(x,y,x+w,y+h*(1-percent))
-    end
-  end
+  gl.Rect(0,y,w*percent,h)
 
   if (self.caption) then
-    (self.font):Print(self.caption, x+w*0.5, y+h*0.5, "center", "center")
+    (self.font):Print(self.caption, w*0.5, h*0.5, "center", "center")
   end
 end
 

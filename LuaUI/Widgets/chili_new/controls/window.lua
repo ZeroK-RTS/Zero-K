@@ -1,8 +1,13 @@
+--- Window module
+
+--- Window fields.
+-- Inherits from Control.
+-- @see control.Control
+-- @table Window
 Window = Control:Inherit{
   classname = 'window',
   resizable = true,
   draggable = true,
-  bringToFrontOnClick = true,
 
   minWidth  = 50,
   minHeight = 50,
@@ -42,9 +47,7 @@ function Window:DrawControl()
 end
 
 function Window:MouseDown(...)
-  if self.bringToFrontOnClick then
-    self:BringToFront()
-  end
+  self:BringToFront()
   return inherited.MouseDown(self,...)
 end
 
@@ -53,19 +56,17 @@ VFS.Include(CHILI_DIRNAME .. "headers/skinutils.lua", nil, VFS.RAW_FIRST)
 function Window:TweakDraw()
   gl.Color(0.6,1,0.6,0.65)
 
-  local x = self.x
-  local y = self.y
   local w = self.width
   local h = self.height
 
   if (self.resizable or self.tweakResizable) then
-    TextureHandler.LoadTexture(0,"LuaUI/Widgets/chili/skins/default/tweak_overlay_resizable.png",self)
+    TextureHandler.LoadTexture(0, "LuaUI/widgets/chili/skins/default/tweak_overlay_resizable.png",self)
   else
-    TextureHandler.LoadTexture(0,"LuaUI/Widgets/chili/skins/default/tweak_overlay.png",self)
+    TextureHandler.LoadTexture(0, "LuaUI/widgets/chili/skins/default/tweak_overlay.png",self)
   end
-    local texInfo = gl.TextureInfo("LuaUI/Widgets/chili/skins/default/tweak_overlay.png") or {xsize=1, ysize=1}
+    local texInfo = gl.TextureInfo("LuaUI/widgets/chili/skins/default/tweak_overlay.png") or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, 31,31,31,31, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, self.x,self.y,w,h, 31,31,31,31, tw,th, 0)
   gl.Texture(0,false)
 end

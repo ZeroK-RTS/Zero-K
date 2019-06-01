@@ -6,12 +6,16 @@ end
 
 --//=============================================================================
 
+--// some needed gl constants
+GL_DEPTH24_STENCIL8 = 0x88F0
+GL_KEEP      = 0x1E00
+GL_INCR_WRAP = 0x8507
+GL_DECR_WRAP = 0x8508
+
+--//=============================================================================
+
 function unpack4(t)
-  if t then
-    return t[1], t[2], t[3], t[4]
-  else
-    return 1, 2, 3, 4
-  end
+  return t[1], t[2], t[3], t[4]
 end
 
 function clamp(min,max,num)
@@ -117,43 +121,140 @@ local curScissor = {0,0,1e9,1e9}
 local stack = {curScissor}
 local stackN = 1
 
-function PushScissor(x,y,w,h)
-  local right = x+w
-  local bottom = y+h  
-  if (right  > curScissor[3]) then right  = curScissor[3] end
-  if (bottom > curScissor[4]) then bottom = curScissor[4] end
-  if (x < curScissor[1]) then x = curScissor[1] end
-  if (y < curScissor[2]) then y = curScissor[2] end
-	
-  curScissor = {x,y,right,bottom}
-  stackN = stackN + 1
-  stack[stackN] = curScissor
-  
-  local width = right  - x
-  local height = bottom - y
-  if (width < 0) or (height < 0) then
-    --// scissor is null space -> don't render at all
-    return false
-  end    
-  gl.Scissor(x,y,width,height)
-end
-
-
-function PopScissor()
-  stack[stackN] = nil
-  stackN = stackN - 1
-  curScissor = stack[stackN]
-  if (stackN == 1) then
-    gl.Scissor(false)
-  else
-    local x,y, right,bottom = unpack4(curScissor)
-	local w = right  - x
-	local h = bottom - y
-	if w >= 0 and h >= 0 then
-      gl.Scissor(x,y,w,h)
+local pool = {}
+local function GetVector4()
+	if not pool[1] then
+		return {0,0,0,0}
 	end
-  end
+	local t = pool[#pool]
+	pool[#pool] = nil
+	return t
 end
+local function FreeVector4(t)
+	pool[#pool + 1] = t
+end
+
+local function PushScissor(_,x,y,w,h)
+	local right  = x + w
+	local bottom = y + h
+	if (right  > curScissor[3]) then right  = curScissor[3] end
+	if (bottom > curScissor[4]) then bottom = curScissor[4] end
+	if (x < curScissor[1]) then x = curScissor[1] end
+	if (y < curScissor[2]) then y = curScissor[2] end
+
+	w = right  - x
+	h = bottom - y
+	if (w < 0) or (h < 0) then
+		--// scissor is null space -> don't render at all
+		return false
+	end
+
+	--curScissor = {x,y,right,bottom}
+	curScissor = GetVector4()
+	curScissor[1] = x; curScissor[2] = y; curScissor[3] = right; curScissor[4] = bottom;
+	stackN = stackN + 1
+	stack[stackN] = curScissor
+
+	gl.Scissor(x,y,w,h)
+	return true
+end
+
+
+local function PopScissor()
+	FreeVector4(curScissor)
+	stack[stackN] = nil
+	stackN = stackN - 1
+	curScissor = stack[stackN]
+	assert(stackN >= 1)
+	if (stackN == 1) then
+		gl.Scissor(false)
+	else
+		local x,y, right,bottom = unpack4(curScissor)
+		local w = right  - x
+		local h = bottom - y
+		gl.Scissor(x,y,w,h)
+	end
+end
+
+
+
+local function PushStencilMask(obj, x,y,w,h)
+	obj._stencilMask = (obj.parent._stencilMask or 0) + 1
+	if (obj._stencilMask > 255) then
+		obj._stencilMask = 0
+	end
+
+	gl.ColorMask(false)
+
+	gl.StencilFunc(GL.ALWAYS, 0, 0xFF)
+	gl.StencilOp(GL_KEEP, GL_INCR_WRAP, GL_INCR_WRAP)
+
+	if not obj.scrollPosY then
+		gl.Rect(0, 0, w, h)
+	else
+		local contentX,contentY,contentWidth,contentHeight = unpack4(obj.contentArea)
+		gl.Rect(0, 0, contentWidth,contentHeight)
+	end
+
+	gl.ColorMask(true)
+	gl.StencilFunc(GL.EQUAL, obj._stencilMask, 0xFF)
+	gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+	return true
+end
+
+local function PopStencilMask(obj, x,y,w,h)
+	gl.ColorMask(false)
+
+	gl.StencilFunc(GL.ALWAYS, 0, 0xFF)
+	gl.StencilOp(GL_KEEP, GL_DECR_WRAP, GL_DECR_WRAP)
+
+	if not obj.scrollPosY then
+		gl.Rect(0, 0, w, h)
+	else
+		local contentX,contentY,contentWidth,contentHeight = unpack4(obj.contentArea)
+		gl.Rect(0, 0, contentWidth,contentHeight)
+	end
+
+	gl.ColorMask(true)
+	gl.StencilFunc(GL.EQUAL, obj.parent._stencilMask or 0, 0xFF)
+	gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+	--gl.StencilTest(false)
+
+	obj._stencilMask = nil
+end
+
+
+local inRTT = false
+
+function EnterRTT()
+	inRTT = true
+end
+
+function LeaveRTT()
+	inRTT = false
+end
+
+function AreInRTT()
+	return inRTT
+end
+
+
+function PushLimitRenderRegion(...)
+	if inRTT then
+		return PushStencilMask(...)
+	else
+		return PushScissor(...)
+	end
+end
+
+function PopLimitRenderRegion(...)
+	if inRTT then
+		PopStencilMask(...)
+	else
+		PopScissor(...)
+	end
+end
+
 
 --//=============================================================================
 
@@ -304,6 +405,7 @@ function table:merge(table2)
       self[i] = v
     end
   end
+  return self
 end
 
 function table:iequal(table2)

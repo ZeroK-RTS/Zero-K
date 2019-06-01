@@ -1,5 +1,13 @@
 --//=============================================================================
 
+--- Colorbars module
+
+--- Colorbar fields.
+-- Inherits from Control.
+-- @see control.Control
+-- @table Colorbars
+-- @tparam {r,g,b,a} color color table, (default {1,1,1,1})
+-- @tparam {func1,func2,...} OnChange listener functions for color changes, (default {})
 Colorbars = Control:Inherit{
   classname = "colorbars",
   color     = {1,1,1,1},
@@ -15,6 +23,8 @@ local inherited = this.inherited
 
 --//=============================================================================
 
+--- Sets the new color
+-- @tparam {r,g,b,a} c color table 
 function Colorbars:SetColor(c)
   self:CallListeners(self.OnChange,c)
   self.value = c
@@ -34,9 +44,6 @@ local glColor    = gl.Color
 local glBeginEnd = gl.BeginEnd
 
 function Colorbars:DrawControl()
-  glPushMatrix()
-  glTranslate(self.x,self.y,0)
-
   local barswidth  = self.width - (self.height + 4)
 
   local color = self.color
@@ -64,8 +71,6 @@ function Colorbars:DrawControl()
   glRect(barswidth + 2,self.height,self.width - 2,0)
 
   gl.BeginEnd(GL.TRIANGLE_STRIP, theme.DrawBorder_, barswidth + 2,0,self.width - barswidth - 4,self.height, 1, self.borderColor, self.borderColor2)
-
-  glPopMatrix()
 end
 
 --//=============================================================================

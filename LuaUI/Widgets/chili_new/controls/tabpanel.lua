@@ -27,7 +27,7 @@ local inherited = this.inherited
 
 function TabPanel:New(obj)
 	obj = inherited.New(self,obj)
-
+	
 	obj:AddChild(
 		TabBar:New {
 			tabs = obj.tabs,
@@ -37,7 +37,7 @@ function TabPanel:New(obj)
 			height = obj.barHeight,
 		}
 	)
-
+  
 	obj.currentTab = Control:New {
 		x = 0,
 		y = obj.barHeight,
@@ -48,7 +48,7 @@ function TabPanel:New(obj)
 	obj:AddChild(obj.currentTab)
 	obj.tabIndexMapping = {}
 	for i=1, #obj.tabs do
-		local tabName = obj.tabs[i].name
+		local tabName = obj.tabs[i].name	
 		local tabFrame = Control:New {
 			padding = {0, 0, 0, 0},
 			x = 0,
@@ -72,13 +72,9 @@ end
 function TabPanel:AddTab(tab, neverSwitchTab)
     local tabbar = self.children[1]
 	local switchToTab = (#tabbar.children == 0) and not neverSwitchTab
-    tabbar:AddChild(TabBarItem:New {
-        name = tab.name,
-        tooltip = tab.tooltip,
-        caption = tab.caption or tab.name,
-        defaultWidth = tabbar.minItemWidth,
-        defaultHeight = tabbar.minItemHeight
-    }) --FIXME: implement an "Add Tab in TabBar too"
+    tabbar:AddChild(
+        TabBarItem:New{name = tab.name, caption = tab.caption or tab.name, defaultWidth = tabbar.minItemWidth, defaultHeight = tabbar.minItemHeight} --FIXME: implement an "Add Tab in TabBar too"
+    )
     local tabFrame = Control:New {
         padding = {0, 0, 0, 0},
         x = 0,

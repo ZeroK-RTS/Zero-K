@@ -27,7 +27,7 @@ setmetatable(DebugHandler.objectsOwnedByWidgets, {
     local st = {};
     setmetatable(st,{__mode="v"});
     if (not i) then
-      Spring.Echo("WAAA",debug.traceback())
+      Spring.Log("Chili", "error", "WAAA",debug.traceback())
     end
     t[i] = st;
     return st;
@@ -37,7 +37,6 @@ setmetatable(DebugHandler.objectsOwnedByWidgets, {
 --// holds all created chili objects (uses a weaktable to do so)
 --// hint: because it is a weaktable you still need to use pairs() to iterate it!
 DebugHandler.allObjects = {}
-DebugHandler.widgetCreationLoad = {}
 setmetatable(DebugHandler.allObjects, {
   __mode="v",
 })
@@ -74,7 +73,10 @@ local function ChiliErrorHandler(msg,...)
       end
       if (name == "self") then
         if (value._widget ~= widget) then --// ignore controls owned by Chili Framework!
-          control = value
+          --// ignore non-chili objects; TODO: implement a better way of checking whether something is a chili object
+          if value.name and value.Dispose then
+            control = value
+          end
         end
       end
 
@@ -84,24 +86,26 @@ local function ChiliErrorHandler(msg,...)
     _i = _i + 1
   until(control)
 
+
   if (control) then
     local w = control._widget
-    if (w) then
-      Spring.Echo(("Chili-Error in `%s`:%s : %s"):format(w.whInfo.name, control.name, msg))
-      Spring.Echo(DebugHandler.Stacktrace())
+    if isindexable(w) then
+      local wname = (w.whInfo and w.whInfo.name) or "unknown"
+      Spring.Log("Chili", "error", ("in `%s`:%s : %s"):format(wname, control.name, msg))
+      Spring.Log("Chili", "error", DebugHandler.Stacktrace())
 
       --// this also unloads all owned chili objects
-      Spring.Echo("Removed widget: " .. w.whInfo.name)
+      Spring.Log("Chili", "error", "Removed widget: " .. wname)
       widgetHandler:RemoveWidget(w)
     else
-      Spring.Echo(("Chili-Error in `%s` (couldn't detect the owner widget): %s"):format(control.name, msg))
-      Spring.Echo(DebugHandler.Stacktrace())
+      Spring.Log("Chili", "error", ("in `%s` (couldn't detect the owner widget): %s"):format(control.name, msg))
+      Spring.Log("Chili", "error", DebugHandler.Stacktrace())
       control:Dispose()
     end
   else
     --// error in Chili itself
-    Spring.Echo(("Chili-Error: %s"):format(msg))
-    Spring.Echo(DebugHandler.Stacktrace())
+    Spring.Log("Chili", "error", ("%s"):format(msg))
+    Spring.Log("Chili", "error", DebugHandler.Stacktrace())
 
     if (os.clock() - lastError < 5) then
       numChiliErrors = numChiliErrors + 1
@@ -112,7 +116,7 @@ local function ChiliErrorHandler(msg,...)
 
     --// unload Chili to avoid error spam
     if (numChiliErrors>=DebugHandler.maxChiliErrors) then
-      Spring.Echo("Removed widget: " .. widget.whInfo.name)
+      Spring.Log("Chili", "error", "Removed widget: " .. widget.whInfo.name)
       widgetHandler:RemoveWidget(widget)
     end
   end
@@ -162,7 +166,7 @@ function DebugHandler.Stacktrace()
     local i = 1 + math.ceil(DebugHandler.maxStackLength/2)+1
     local tail = (DebugHandler.maxStackLength - i)
     local j = #trace - tail
-    trace[i] = "..."
+    trace[i] = ("... (%i calls)"):format(#trace - (i + tail))
     for n=1,tail do
       trace[i+n] = trace[j+n]
     end
@@ -250,7 +254,7 @@ SafeCall = xpcall_va --// external code should access it via Chili.SafeCall()
 local orig_gl = gl
 local cdCreateList = gl.CreateList
 gl = {}
-setmetatable(gl,{__index=function(t,i) t[i] = orig_gl[i]; return t[i]; end}) --// use metatable to copy table entries on-demand
+setmetatable(gl,{__index=function(t,i) t[i] = orig_gl[i] or false; return t[i]; end}) --// use metatable to copy table entries on-demand
 gl.CreateList = function(...)
 	return cdCreateList(xpcall_va, ...)
 end
@@ -433,11 +437,6 @@ function DebugHandler:RegisterObject(obj)
     obj._widget = w
     local t = self.objectsOwnedByWidgets[w]
     t[#t+1] = obj
-    --local name = w:GetInfo().name
-    --if name ~= "Chili Pro Console" then
-    --  self.widgetCreationLoad[name] = (self.widgetCreationLoad[name] or 0) + 1
-    --  Spring.Echo("Obj created", name, obj.classname, self.widgetCreationLoad[name])
-    --end
   end
   local ta = self.allObjects
   ta[#ta+1] = obj

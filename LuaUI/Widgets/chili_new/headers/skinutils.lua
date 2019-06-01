@@ -35,6 +35,7 @@ function _DrawTiledTexture(x,y,w,h, skLeft,skTop,skRight,skBottom, texw,texh, te
     local txBottom = skBottom/texh
 
     --//scale down the texture if we don't have enough space
+
     local scaleY = h/(skTop+skBottom)
     local scaleX = w/(skLeft+skRight)
     local scale = (scaleX < scaleY) and scaleX or scaleY
@@ -195,8 +196,8 @@ local _DrawTiledBorder = _DrawTiledBorder
 
 
 local function _DrawDragGrip(obj)
-  local x = obj.x + 13
-  local y = obj.y + 8
+  local x = 13
+  local y = 8
   local w = obj.dragGripSize[1]
   local h = obj.dragGripSize[2]
 
@@ -223,8 +224,8 @@ end
 
 local function _DrawResizeGrip(obj)
   if (obj.resizable) then
-    local x = obj.x
-    local y = obj.y
+    local x = 0
+    local y = 0
 
     local resizeBox = GetRelativeObjBox(obj,obj.boxes.resize)
 
@@ -272,8 +273,6 @@ end
 --//
 
 function DrawWindow(obj)
-  local x = obj.x
-  local y = obj.y
   local w = obj.width
   local h = obj.height
 
@@ -289,11 +288,11 @@ function DrawWindow(obj)
     local texInfo = gl.TextureInfo(obj.TileImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    obj.font:Print(obj.caption, x+w*0.5, y+9, "center")
+    obj.font:Print(obj.caption, w*0.5, 9, "center")
   end
 end
 
@@ -301,21 +300,19 @@ end
 --//
 
 function DrawButton(obj)
-  local x = obj.x
-  local y = obj.y
+  if obj.debug then Spring.Echo("DrawButton", obj.name, obj.state.pressed) end
+
   local w = obj.width
   local h = obj.height
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
   local bgcolor = obj.backgroundColor
-  if not obj.supressButtonReaction then
-    if (obj.state.pressed) then
-      bgcolor = obj.pressBackgroundColor or mulColor(bgcolor, 0.4)
-    elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
-      bgcolor = obj.focusColor
-      --bgcolor = mixColors(bgcolor, obj.focusColor, 0.5)
-    end
+  if (obj.state.pressed) then
+    bgcolor = mulColor(bgcolor, 0.4)
+  elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
+    bgcolor = obj.focusColor
+    --bgcolor = mixColors(bgcolor, obj.focusColor, 0.5)
   end
   gl.Color(bgcolor)
 
@@ -323,16 +320,14 @@ function DrawButton(obj)
     local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
   local fgcolor = obj.borderColor
-  if not obj.supressButtonReaction then
-    if (obj.state.pressed) then
-      fgcolor = obj.pressForegroundColor or mulColor(fgcolor, 0.4)
-    elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
-      fgcolor = obj.focusColor
-    end
+  if (obj.state.pressed) then
+    fgcolor = mulColor(fgcolor, 0.4)
+  elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
+    fgcolor = obj.focusColor
   end
   gl.Color(fgcolor)
 
@@ -340,11 +335,11 @@ function DrawButton(obj)
     local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    obj.font:Print(obj.caption, x + w*0.5, y + math.floor(h*0.5 - obj.font.size*0.35), "center", "linecenter")
+    obj.font:Print(obj.caption, w*0.5, math.floor(h*0.5 - obj.font.size*0.35), "center", "linecenter")
   end
 end
 
@@ -360,16 +355,13 @@ function DrawComboBox(self)
 	TextureHandler.LoadTexture(0,self.TileImageArrow,self)
 		local texInfo = gl.TextureInfo(self.TileImageArrow) or {xsize=1, ysize=1}
 		local tw,th = texInfo.xsize, texInfo.ysize
-		_DrawTextureAspect(self.x + self.width - self.padding[3], self.y, self.padding[3], self.height, tw,th)
+		_DrawTextureAspect(self.width - self.padding[3], 0, self.padding[3], self.height, tw,th)
 	gl.Texture(0,false)
 end
-
 
 function DrawEditBox(obj)
 	local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
-	gl.Translate(obj.x, obj.y, 0) -- Remove with new chili, does translates for us.
-	
 	gl.Color(obj.backgroundColor)
 	TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
 	local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
@@ -388,7 +380,7 @@ function DrawEditBox(obj)
 	gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, 0, obj.width, obj.height,  skLeft,skTop,skRight,skBottom, tw,th)
 	gl.Texture(0,false)
 
-	local text = obj.text and tostring(obj.text)
+	local text = obj.text	
 	local font = obj.font
 	local displayHint = false
 	
@@ -444,7 +436,7 @@ function DrawEditBox(obj)
 				local scrollPosY = obj.parent.scrollPosY
 				local scrollHeight = obj.parent.clientArea[4]
 				
-				local h, d, numLines = obj.font:GetTextHeight(tostring(obj.text));
+				local h, d, numLines = obj.font:GetTextHeight(obj.text);
 				local minDrawY = scrollPosY - (h or 0)
 				local maxDrawY = scrollPosY + scrollHeight + (h or 0)
 				
@@ -469,29 +461,14 @@ function DrawEditBox(obj)
 			local cursorX = font:GetTextWidth(cursorTxt)
 
 			local dt = Spring.DiffTimers(Spring.GetTimer(), obj._interactedTime)
-			local alpha
-			if obj.cursorFramerate then
-				if math.floor(dt*obj.cursorFramerate)%2 == 0 then
-					alpha = 0.8
-				else
-					alpha = 0
-				end
-			else
-				local as = math.sin(dt * 8);
-				local ac = math.cos(dt * 8);
-				if (as < 0) then
-					as = 0
-				end
-				if (ac < 0) then
-					ac = 0
-				end
-				alpha = as + ac
-				if (alpha > 1) then 
-					alpha = 1
-				end
-				alpha = 0.8 * alpha
-			end
-			
+			local as = math.sin(dt * 8);
+			local ac = math.cos(dt * 8);
+			if (as < 0) then as = 0 end
+			if (ac < 0) then ac = 0 end
+			local alpha = as + ac
+			if (alpha > 1) then alpha = 1 end
+			alpha = 0.8 * alpha
+
 			local cc = obj.cursorColor
 			gl.Color(cc[1], cc[2], cc[3], cc[4] * alpha)
 			gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawCursor, cursorX + clientX - 1, clientY, 3, clientHeight)
@@ -544,16 +521,12 @@ function DrawEditBox(obj)
 			end
         end
 	end
-	
-	gl.Translate(-obj.x, -obj.y, 0) -- Remove with new chili, does translates for us.
 end
 
 --//=============================================================================
 --//
 
 function DrawPanel(obj)
-  local x = obj.x
-  local y = obj.y
   local w = obj.width
   local h = obj.height
 
@@ -564,7 +537,7 @@ function DrawPanel(obj)
     local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
   gl.Color(obj.borderColor)
@@ -572,7 +545,7 @@ function DrawPanel(obj)
     local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   gl.Texture(0,false)
 end
 
@@ -629,7 +602,7 @@ function DrawScrollPanelBorder(self)
       end
 
       gl.Color(self.borderColor)
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledBorder, self.x,self.y,width,height, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledBorder, 0,0,width,height, skLeft,skTop,skRight,skBottom, tw,th, 0)
       gl.Texture(0,false)
   end
 end
@@ -658,13 +631,13 @@ function DrawScrollPanel(obj)
       end
 
       gl.Color(obj.backgroundColor)
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, obj.x,obj.y,width,height, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,width,height, skLeft,skTop,skRight,skBottom, tw,th, 0)
       gl.Texture(0,false)
   end
 
   if obj._vscrollbar then
-    local x = obj.x + obj.width - obj.scrollbarSize
-    local y = obj.y
+    local x = obj.width - obj.scrollbarSize
+    local y = 0
     local w = obj.scrollbarSize
     local h = obj.height --FIXME what if hscrollbar is visible
     if (obj._hscrollbar) then
@@ -703,10 +676,10 @@ function DrawScrollPanel(obj)
   end
 
   if obj._hscrollbar then
-    gl.Color(1,1,1,1)  
+    gl.Color(1,1,1,1)
 
-    local x = obj.x
-    local y = obj.y + obj.height - obj.scrollbarSize
+    local x = 0
+    local y = obj.height - obj.scrollbarSize
     local w = obj.width
     local h = obj.scrollbarSize
     if (obj._vscrollbar) then
@@ -751,8 +724,8 @@ end
 function DrawCheckbox(obj)
   local boxSize = obj.boxsize
 
-  local x = obj.x + obj.width      - boxSize
-  local y = obj.y + obj.height*0.5 - boxSize*0.5
+  local x = obj.width      - boxSize
+  local y = obj.height*0.5 - boxSize*0.5
   local w = boxSize
   local h = boxSize
 
@@ -760,7 +733,7 @@ function DrawCheckbox(obj)
   local ty = obj.height * 0.5 --// verticale center
 
   if obj.boxalign == "left" then
-    x  = obj.x
+    x  = 0
     tx = boxSize + 2
   end
 
@@ -772,25 +745,22 @@ function DrawCheckbox(obj)
   else
     gl.Color(1,1,1,1)
   end
+  TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
 
-  local imageBK = obj.round and obj.TileImageBK_round or obj.TileImageBK
-  TextureHandler.LoadTexture(0, imageBK, obj)
-
-  local texInfo = gl.TextureInfo(imageBK) or {xsize=1, ysize=1}
+  local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
   local tw,th = texInfo.xsize, texInfo.ysize
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
   if (obj.state.checked) then
-    local imageFG = obj.round and obj.TileImageFG_round or obj.TileImageFG
-    TextureHandler.LoadTexture(0, imageFG, obj)
+    TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
       gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   end
   gl.Texture(0,false)
 
   gl.Color(1,1,1,1)
   if (obj.caption) then
-    obj.font:Print(obj.caption, obj.x + tx, obj.y + ty  - obj.font.size*0.35, nil, "linecenter")
+    obj.font:Print(obj.caption, tx, ty - obj.font.size*0.35, nil, "linecenter")
   end
 end
 
@@ -798,49 +768,33 @@ end
 --//
 
 function DrawProgressbar(obj)
-  local x = obj.x
-  local y = obj.y
   local w = obj.width
   local h = obj.height
-  
+
   local percent = (obj.value-obj.min)/(obj.max-obj.min)
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
   gl.Color(obj.backgroundColor)
-  if not obj.noSkin then
-    TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
+  TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
     local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    --gl.Texture(0,false)
-  end
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+  --gl.Texture(0,false)
 
   gl.Color(obj.color)
   TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
     local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    -- workaround for catalyst >12.6 drivers: do the "clipping" by multiplying width by percentage in glBeginEnd instead of using glClipPlane
-    -- fuck AMD
-    --gl.ClipPlane(1, -1,0,0, x+w*percent)
-	if obj.fillPadding then
-		x, y = x + obj.fillPadding[1], y + obj.fillPadding[2]
-		w, h = w - (obj.fillPadding[1] + obj.fillPadding[3]), h - (obj.fillPadding[2] + obj.fillPadding[4])
-	end
-	
-    if (obj.orientation == "horizontal") then
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w*percent,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    else
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y + (h - h*percent),w,h*percent, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    end
-
-    --gl.ClipPlane(1, false)
+    gl.ClipPlane(1, -1,0,0, w*percent)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.ClipPlane(1, false)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    (obj.font):Print(obj.caption, x+w*0.5, y+h*0.5 - obj.font.size*0.35 + (obj.fontOffset or 0), "center", "linecenter")
+    (obj.font):Print(obj.caption, w*0.5, h*0.5 - obj.font.size*0.35 , "center", "linecenter")
   end
 end
 
@@ -849,8 +803,6 @@ end
 
 function DrawTrackbar(self)
   local percent = self:_GetPercent()
-  local x = self.x
-  local y = self.y
   local w = self.width
   local h = self.height
 
@@ -858,15 +810,13 @@ function DrawTrackbar(self)
   local pdLeft,pdTop,pdRight,pdBottom = unpack4(self.hitpadding)
 
   gl.Color(1,1,1,1)
-  if not self.noDrawBar then
-    TextureHandler.LoadTexture(0,self.TileImage,self)
+
+  TextureHandler.LoadTexture(0,self.TileImage,self)
     local texInfo = gl.TextureInfo(self.TileImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-  end
-    
-  if not self.noDrawStep then
-    TextureHandler.LoadTexture(0,self.StepImage,self)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+
+  TextureHandler.LoadTexture(0,self.StepImage,self)
     local texInfo = gl.TextureInfo(self.StepImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
@@ -896,23 +846,21 @@ function DrawTrackbar(self)
       end
       stepWidth = newStepWidth
 
-      local my = y+h*0.5
-      local mx = x+pdLeft+stepWidth
-      while (mx<(x+pdLeft+barWidth)) do
+      local my = h*0.5
+      local mx = pdLeft+stepWidth
+      while (mx<(pdLeft+barWidth)) do
         gl.TexRect(math.ceil(mx-tw*0.5),math.ceil(my-th*0.5),math.ceil(mx+tw*0.5),math.ceil(my+th*0.5),false,true)
         mx = mx+stepWidth
       end
     end
-  end
 
   if (self.state.hovered) then
     gl.Color(self.focusColor)
   else
     gl.Color(1,1,1,1)
   end
-  
-  if not self.noDrawThumb then
-    TextureHandler.LoadTexture(0,self.ThumbImage,self)
+
+  TextureHandler.LoadTexture(0,self.ThumbImage,self)
     local texInfo = gl.TextureInfo(self.ThumbImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
@@ -921,13 +869,12 @@ function DrawTrackbar(self)
     th = h
 
     local barWidth = w - (pdLeft + pdRight)
-    local mx = x + pdLeft + barWidth * percent
-    local my = y + h * 0.5
+    local mx = pdLeft + barWidth * percent
+    local my = h * 0.5
     mx = math.floor(mx - tw * 0.5)
     my = math.floor(my - th * 0.5)
     gl.TexRect(mx, my, mx + tw, my + th, false, true)
-  end
-  
+
   gl.Texture(0,false)
 end
 
@@ -936,8 +883,8 @@ end
 
 function DrawTreeviewNode(self)
   if CompareLinks(self.treeview.selected,self) then
-    local x = self.x + self.clientArea[1]
-    local y = self.y
+    local x = self.clientArea[1]
+    local y = 0
     local w = self.children[1].width
     local h = self.clientArea[2] + self.children[1].height
 
@@ -948,7 +895,7 @@ function DrawTreeviewNode(self)
       local texInfo = gl.TextureInfo(self.treeview.ImageNodeSelected) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
 
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
     gl.Texture(0,false)
   end
 end
@@ -985,11 +932,11 @@ end
 
 
 function DrawTreeviewNodeTree(self)
-  local x1 = self.x + math.ceil(self.padding[1]*0.5)
-  local x2 = self.x + self.padding[1]
-  local y1 = self.y
-  local y2 = self.y + self.height
-  local y3 = self.y + self.padding[2] + math.ceil(self.children[1].height*0.5)
+  local x1 = math.ceil(self.padding[1]*0.5)
+  local x2 = self.padding[1]
+  local y1 = 0
+  local y2 = self.height
+  local y3 = self.padding[2] + math.ceil(self.children[1].height*0.5)
 
   if (self.parent)and(CompareLinks(self,self.parent.nodes[#self.parent.nodes])) then
     y2 = y3
@@ -1012,7 +959,7 @@ function DrawTreeviewNodeTree(self)
   local texInfo = gl.TextureInfo(image) or {xsize=1, ysize=1}
   local tw,th = texInfo.xsize, texInfo.ysize
 
-  _DrawTextureAspect(self.x,self.y,math.ceil(self.padding[1]),math.ceil(self.children[1].height) ,tw,th)
+  _DrawTextureAspect(0,0,math.ceil(self.padding[1]),math.ceil(self.children[1].height) ,tw,th)
   gl.Texture(0,false)
 end
 
@@ -1028,23 +975,30 @@ function DrawLine(self)
       TextureHandler.LoadTexture(0,self.TileImageV,self)
         local texInfo = gl.TextureInfo(self.TileImageV) or {xsize=1, ysize=1}
         local tw,th = texInfo.xsize, texInfo.ysize
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, self.x + self.width * 0.5 - 2, self.y, 4, self.height, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, self.width * 0.5 - 2, 0, 4, self.height, skLeft,skTop,skRight,skBottom, tw,th, 0)
     else
       local skLeft,skTop,skRight,skBottom = unpack4(self.tiles)
       TextureHandler.LoadTexture(0,self.TileImage,self)
         local texInfo = gl.TextureInfo(self.TileImage) or {xsize=1, ysize=1}
         local tw,th = texInfo.xsize, texInfo.ysize
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, self.x, self.y + self.height * 0.5 - 2, self.width, 4, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, self.height * 0.5 - 2, self.width, 4, skLeft,skTop,skRight,skBottom, tw,th, 0)
     end
 
   gl.Texture(0,false)
+
+  if (self.debug) then
+    gl.Color(0,1,0,0.5)
+    gl.PolygonMode(GL.FRONT_AND_BACK,GL.LINE)
+    gl.LineWidth(2)
+    gl.Rect(0,0,self.width,self.height)
+    gl.LineWidth(1)
+    gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
+  end
 end
 --//=============================================================================
 --//
 
 function DrawTabBarItem(obj)
-  local x = obj.x
-  local y = obj.y
   local w = obj.width
   local h = obj.height
 
@@ -1063,7 +1017,7 @@ function DrawTabBarItem(obj)
     local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
   if (obj.state.pressed) then
@@ -1078,17 +1032,17 @@ function DrawTabBarItem(obj)
     local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   gl.Texture(0,false)
 
   if (obj.caption) then
     local cx,cy,cw,ch = unpack4(obj.clientArea)
-    obj.font:DrawInBox(obj.caption, x + cx, y + cy, cw, ch, "center", "center")
+    obj.font:DrawInBox(obj.caption, cx, cy, cw, ch, "center", "center")
   end
 end
 
 --//=============================================================================
---// 
+--//
 
 function DrawDragGrip(obj)
   gl.BeginEnd(GL.TRIANGLES, _DrawDragGrip, obj)
@@ -1169,7 +1123,7 @@ function NCHitTestWithPadding(obj,mx,my)
   elseif (draggable) then
     return obj
   end
-
+  
   if obj.noClickThrough and not IsTweakMode() then
     return obj
   end

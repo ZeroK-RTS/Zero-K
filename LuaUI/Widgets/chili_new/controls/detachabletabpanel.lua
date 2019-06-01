@@ -27,7 +27,7 @@ local inherited = this.inherited
 
 function DetachableTabPanel:New(obj)
 	obj = inherited.New(self,obj)
-
+	
 	obj.tabBar = TabBar:New {
 		tabs = obj.tabs,
 		x = 0,
@@ -37,7 +37,7 @@ function DetachableTabPanel:New(obj)
 		minItemWidth = obj.minTabWidth,
 		padding = {0, 0, 0, 0},
 	}
-
+  
 	obj.currentTab = Control:New {
 		x = 0,
 		y = 0,
@@ -48,7 +48,7 @@ function DetachableTabPanel:New(obj)
 	obj:AddChild(obj.currentTab)
 	obj.tabIndexMapping = {}
 	for i=1, #obj.tabs do
-		local tabName = obj.tabs[i].name
+		local tabName = obj.tabs[i].name	
 		local tabFrame = Control:New {
 			padding = {0, 0, 0, 0},
 			x = 0,
@@ -72,14 +72,9 @@ end
 function DetachableTabPanel:AddTab(tab, neverSwitchTab)
     local tabbar = self.tabBar
 	local switchTab = (#tabbar.children == 0) or (not neverSwitchTab)
-    tabbar:AddChild(TabBarItem:New {
-        name = tab.name,
-        caption = tab.caption or tab.name,
-        tooltip = tab.tooltip,
-        font = tab.font,
-        defaultWidth = tabbar.minItemWidth,
-        defaultHeight = tabbar.minItemHeight
-    }) --FIXME: implement an "Add Tab in TabBar too"
+    tabbar:AddChild(
+        TabBarItem:New{name = tab.name, caption = tab.caption or tab.name, font = tab.font, defaultWidth = tabbar.minItemWidth, defaultHeight = tabbar.minItemHeight} --FIXME: implement an "Add Tab in TabBar too"
+    )
     local tabFrame = Control:New {
         padding = {0, 0, 0, 0},
         x = 0,
