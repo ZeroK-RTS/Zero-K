@@ -14,11 +14,11 @@ local materials = {
 	altSkinS3o = {
 		shaderDefinitions = {
 			"#define deferred_mode 0",
-			"#define SHADOW_SOFTNESS SHADOW_SOFTER",
+			"#define SHADOW_SOFTNESS SHADOW_SOFT",
 		},
 		deferredDefinitions = {
 			"#define deferred_mode 1",
-			"#define SHADOW_SOFTNESS SHADOW_SOFTER",
+			"#define SHADOW_SOFTNESS SHADOW_HARD",
 			"#define MAT_IDX 1",
 		},
 		force     = true,

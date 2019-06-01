@@ -20,7 +20,7 @@ local materials = {
 		deferredDefinitions = {
 			"#define use_normalmapping",
 			"#define deferred_mode 1",
-			"#define SHADOW_SOFTNESS SHADOW_SOFTER",
+			"#define SHADOW_SOFTNESS SHADOW_HARD",
 			"#define MAT_IDX 2",
 		},
 		usecamera = false,

@@ -11,7 +11,7 @@ local function SunChanged(curShaderObj)
 end
 
 local materials = {
-	unitsFallback = {
+	units3doFallback = {
 		shaderDefinitions = {
 			"#define deferred_mode 0",
 			"#define SHADOW_SOFTNESS SHADOW_SOFT",
@@ -19,14 +19,14 @@ local materials = {
 		deferredDefinitions = {
 			"#define deferred_mode 1",
 			"#define SHADOW_SOFTNESS SHADOW_HARD",
-			"#define MAT_IDX 127",
+			"#define MAT_IDX 126",
 		},
 		force     = true,
 		usecamera = false,
-		culling   = GL.BACK,
+		culling   = false,
 		texunits  = {
-			[0] = "%%UNITDEFID:0",
-			[1] = "%%UNITDEFID:1",
+			[0] = "$units1",
+			[1] = "$units2",
 			[2] = "$shadow",
 			--[3] = "$specular",
 			[4] = "$reflection",
@@ -42,8 +42,9 @@ local cusUnitMaterials = GG.CUS[1].bufMaterials
 local unitMaterials = {}
 
 for id = 1, #UnitDefs do
-	if not cusUnitMaterials[id] then
-		unitMaterials[id] = {"unitsFallback"}
+	local udef = UnitDefs[id]
+	if not cusUnitMaterials[id] and udef.modeltype == "3do" then
+		unitMaterials[id] = {"units3doFallback"}
 	end
 end
 
