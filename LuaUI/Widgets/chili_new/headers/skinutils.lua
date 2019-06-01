@@ -517,11 +517,13 @@ function DrawButton(obj)
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
   local bgcolor = obj.backgroundColor
-  if (obj.state.pressed) then
-    bgcolor = mulColor(bgcolor, 0.4)
-  elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
-    bgcolor = obj.focusColor
-    --bgcolor = mixColors(bgcolor, obj.focusColor, 0.5)
+  if not obj.supressButtonReaction then
+    if (obj.state.pressed) then
+      bgcolor = obj.pressBackgroundColor or mulColor(bgcolor, 0.4)
+    elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
+      bgcolor = obj.focusColor
+      --bgcolor = mixColors(bgcolor, obj.focusColor, 0.5)
+    end
   end
   gl.Color(bgcolor)
 
@@ -533,10 +535,12 @@ function DrawButton(obj)
   --gl.Texture(0,false)
 
   local fgcolor = obj.borderColor
-  if (obj.state.pressed) then
-    fgcolor = mulColor(fgcolor, 0.4)
-  elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
-    fgcolor = obj.focusColor
+  if not obj.supressButtonReaction then
+    if (obj.state.pressed) then
+      fgcolor = obj.pressForegroundColor or mulColor(fgcolor, 0.4)
+    elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
+      fgcolor = obj.focusColor
+    end
   end
   gl.Color(fgcolor)
 
@@ -989,15 +993,18 @@ function DrawCheckbox(obj)
   else
     gl.Color(1,1,1,1)
   end
-  TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
 
-  local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
+  local imageBK = obj.round and obj.TileImageBK_round or obj.TileImageBK
+  TextureHandler.LoadTexture(0, imageBK, obj)
+
+  local texInfo = gl.TextureInfo(imageBK) or {xsize=1, ysize=1}
   local tw,th = texInfo.xsize, texInfo.ysize
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
   if (obj.state.checked) then
-    TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
+    local imageFG = obj.round and obj.TileImageFG_round or obj.TileImageFG
+    TextureHandler.LoadTexture(0, imageFG, obj)
       gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   end
   gl.Texture(0,false)
@@ -1020,21 +1027,34 @@ function DrawProgressbar(obj)
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
   gl.Color(obj.backgroundColor)
-  TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
+  if not obj.noSkin then
+    TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
     local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-  --gl.Texture(0,false)
+    --gl.Texture(0,false)
+  end
 
   gl.Color(obj.color)
   TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
     local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.ClipPlane(1, -1,0,0, w*percent)
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    gl.ClipPlane(1, false)
+    -- workaround for catalyst >12.6 drivers: do the "clipping" by multiplying width by percentage in glBeginEnd instead of using glClipPlane
+    -- fuck AMD
+    --gl.ClipPlane(1, -1,0,0, x+w*percent)
+	if obj.fillPadding then
+		w, h = w - (obj.fillPadding[1] + obj.fillPadding[3]), h - (obj.fillPadding[2] + obj.fillPadding[4])
+	end
+	
+    if (obj.orientation == "horizontal") then
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w*percent,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    else
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, (h - h*percent),w,h*percent, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    end
+
+    --gl.ClipPlane(1, false)
   gl.Texture(0,false)
 
   if (obj.caption) then
@@ -1054,13 +1074,15 @@ function DrawTrackbar(self)
   local pdLeft,pdTop,pdRight,pdBottom = unpack4(self.hitpadding)
 
   gl.Color(1,1,1,1)
-
-  TextureHandler.LoadTexture(0,self.TileImage,self)
+  if not self.noDrawBar then
+    TextureHandler.LoadTexture(0,self.TileImage,self)
     local texInfo = gl.TextureInfo(self.TileImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-
-  TextureHandler.LoadTexture(0,self.StepImage,self)
+  end
+    
+  if not self.noDrawStep then
+    TextureHandler.LoadTexture(0,self.StepImage,self)
     local texInfo = gl.TextureInfo(self.StepImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
@@ -1097,14 +1119,16 @@ function DrawTrackbar(self)
         mx = mx+stepWidth
       end
     end
+  end
 
   if (self.state.hovered) then
     gl.Color(self.focusColor)
   else
     gl.Color(1,1,1,1)
   end
-
-  TextureHandler.LoadTexture(0,self.ThumbImage,self)
+  
+  if not self.noDrawThumb then
+    TextureHandler.LoadTexture(0,self.ThumbImage,self)
     local texInfo = gl.TextureInfo(self.ThumbImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
@@ -1118,7 +1142,8 @@ function DrawTrackbar(self)
     mx = math.floor(mx - tw * 0.5)
     my = math.floor(my - th * 0.5)
     gl.TexRect(mx, my, mx + tw, my + th, false, true)
-
+  end
+  
   gl.Texture(0,false)
 end
 
@@ -1368,7 +1393,7 @@ function NCHitTestWithPadding(obj,mx,my)
     return obj
   end
 
-  if obj.noClickThrough then
+  if obj.noClickThrough and not IsTweakMode() then
     return obj
   end
 end
@@ -1412,7 +1437,8 @@ function WindowNCMouseDownPostChildren(obj,x,y)
     obj:StartDragging()
     return obj
   end
-  if obj.noClickThrough then
+
+  if obj.noClickThrough and not IsTweakMode() then
     return obj
   end
 end

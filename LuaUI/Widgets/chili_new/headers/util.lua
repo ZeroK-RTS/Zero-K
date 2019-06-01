@@ -15,7 +15,11 @@ GL_DECR_WRAP = 0x8508
 --//=============================================================================
 
 function unpack4(t)
-  return t[1], t[2], t[3], t[4]
+  if t then
+    return t[1], t[2], t[3], t[4]
+  else
+    return 1, 2, 3, 4
+  end
 end
 
 function clamp(min,max,num)
@@ -149,11 +153,10 @@ local function PushScissor(_,x,y,w,h)
 		return false
 	end
 
-	--curScissor = {x,y,right,bottom}
-	curScissor = GetVector4()
-	curScissor[1] = x; curScissor[2] = y; curScissor[3] = right; curScissor[4] = bottom;
-	stackN = stackN + 1
-	stack[stackN] = curScissor
+  curScissor = GetVector4()
+  curScissor[1] = x; curScissor[2] = y; curScissor[3] = right; curScissor[4] = bottom;
+  stackN = stackN + 1
+  stack[stackN] = curScissor
 
 	gl.Scissor(x,y,w,h)
 	return true
@@ -169,11 +172,13 @@ local function PopScissor()
 	if (stackN == 1) then
 		gl.Scissor(false)
 	else
-		local x,y, right,bottom = unpack4(curScissor)
-		local w = right  - x
-		local h = bottom - y
-		gl.Scissor(x,y,w,h)
+    local x,y, right,bottom = unpack4(curScissor)
+	local w = right  - x
+	local h = bottom - y
+	if w >= 0 and h >= 0 then
+      gl.Scissor(x,y,w,h)
 	end
+  end
 end
 
 
