@@ -174,6 +174,12 @@ function Object:Dispose(_internal)
       end
     end
 
+    if self.state and self.state.focused then
+      local screenCtrl = self:FindParent("screen")
+      if screenCtrl then
+        screenCtrl:FocusControl(nil)
+      end
+    end
     self:CallListeners(self.OnDispose)
 
     self.disposed = true
@@ -481,6 +487,19 @@ function Object:SetVisibility(visible)
   end
   self.visible = visible
   self.hidden  = not visible
+
+  if not visible and self.state and self.state.focused then
+    local screenCtrl = self:FindParent("screen")
+    if screenCtrl then
+      screenCtrl:FocusControl(nil)
+    end
+  end
+
+  if visible then
+    self:CallListeners(self.OnShow, self)
+  else
+    self:CallListeners(self.OnHide, self)
+  end
 end
 
 --- Hides the objects

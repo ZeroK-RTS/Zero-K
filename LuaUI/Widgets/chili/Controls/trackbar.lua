@@ -161,8 +161,8 @@ function Trackbar:MouseMove(x,y,dx,dy,button)
     inherited.MouseMove(self,x,y,dx,dy,button)
     local percent = self:_GetPercent(x,y)
     self:SetValue(self.min + percent*(self.max-self.min))
-    return self
   end
+  return self
 end
 
 --//=============================================================================

@@ -13,6 +13,9 @@ Button = Control:Inherit{
   captionAlign  = nil,
   defaultWidth  = 70,
   defaultHeight = 20,
+
+  align = "center",
+  valign = "center",
 }
 
 local this = Button

@@ -70,6 +70,7 @@ LayoutPanel = Control:Inherit{
   _rows = nil,
   _columns = nil,
   _cells = nil,
+  __nofont = true,
 }
 
 local this = LayoutPanel
@@ -700,7 +701,7 @@ function LayoutPanel:_LayoutChildren()
     end
 
     --if (self.orientation == "horizontal") then
-      --FIXME use child:Resize or something like that 
+      --FIXME use child:Resize or something like that
       child:_UpdateConstraints(cposx,cposy)
     --else
     --  child:_UpdateConstraints(cposy,cposx)
@@ -854,7 +855,7 @@ function LayoutPanel:MultiRectSelect(item1,item2,append)
   local oldSelected = {} -- need to copy tables to not overwrite things
   for k, v in pairs(self.selectedItems) do
     oldSelected[k] = v
-  end  
+  end
 
   self.selectedItems = append and self.selectedItems or {}
 

@@ -431,8 +431,8 @@ function EditBox:UpdateLayout()
 	end
   --FIXME
   if (self.autosize) then
-    local w = font:GetTextWidth(self.text);
-    local h, d, numLines = font:GetTextHeight(self.text);
+    local w = font:GetTextWidth(self.text)
+    local h, d, numLines = font:GetTextHeight(self.text)
 
     if (self.autoObeyLineHeight) then
       h = math.ceil(numLines * (font:GetLineHeight() + self.lineSpacing))
@@ -481,6 +481,11 @@ function EditBox:Update(...)
 			self:Invalidate()
 		end
 	end
+end
+
+function EditBox:__GetStartX(text)
+    local texLen = self.font:GetTextWidth(text)
+    return math.max(self.padding[1], self.width - texLen - self.padding[3])
 end
 
 function EditBox:FocusUpdate(...)
@@ -547,6 +552,10 @@ function EditBox:_GetCursorByMousePos(x, y)
 			retVal.physicalCursor = retVal.physicalCursor + 1
 		end
 		local isStartLine = true
+
+        if self.align == "right" then
+            clientX = self:__GetStartX(selLine) - clientX
+        end
 		for i = retVal.offset, #selLine do
 			local tmpLen = self.font:GetTextWidth(selLine:sub(1 + retVal.offset, i))
 			if tmpLen > (x - clientX) then
@@ -567,6 +576,10 @@ function EditBox:_GetCursorByMousePos(x, y)
 				retVal.outOfBounds = true
 			end
 		end
+        if retVal.physicalCursor == 0 and self.align == "right" then
+            retVal.physicalCursor = 1
+            retVal.outOfBounds = true
+        end
 
 		-- calculate the logical line position
 		retVal.cursor = retVal.physicalCursor + physicalLine.logLineX - #physicalLine.colorPrefix

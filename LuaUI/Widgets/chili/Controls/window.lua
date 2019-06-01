@@ -1,4 +1,4 @@
--- Window module
+--- Window module
 
 --- Window fields.
 -- Inherits from Control.
@@ -63,11 +63,11 @@ function Window:TweakDraw()
   local h = self.height
 
   if (self.resizable or self.tweakResizable) then
-    TextureHandler.LoadTexture(0,LUA_DIRNAME .. "widgets/chili/skins/default/tweak_overlay_resizable.png",self)
+    TextureHandler.LoadTexture(0,(LUAUI_DIRNAME or LUA_DIRNAME) .. "widgets/chili/skins/default/tweak_overlay_resizable.png",self)
   else
-    TextureHandler.LoadTexture(0,LUA_DIRNAME .. "widgets/chili/skins/default/tweak_overlay.png",self)
+    TextureHandler.LoadTexture(0,(LUAUI_DIRNAME or LUA_DIRNAME) .. "widgets/chili/skins/default/tweak_overlay.png",self)
   end
-    local texInfo = gl.TextureInfo(LUA_DIRNAME .. "widgets/chili/skins/default/tweak_overlay.png") or {xsize=1, ysize=1}
+    local texInfo = gl.TextureInfo((LUAUI_DIRNAME or LUA_DIRNAME) .. "widgets/chili/skins/default/tweak_overlay.png") or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, self.x,self.y,w,h, 31,31,31,31, tw,th, 0)

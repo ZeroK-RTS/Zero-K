@@ -43,7 +43,7 @@ setmetatable(DebugHandler.allObjects, {
 
 
 --//=============================================================================
---// Chili ErrorHandler 
+--// Chili ErrorHandler
 --//
 --// Chili is a framework, so many widgets move parts of their code into its
 --// thread. If now a widget error happens, it could be shown as chili errors and
@@ -54,11 +54,12 @@ setmetatable(DebugHandler.allObjects, {
 
 DebugHandler.maxStackLength = 7
 DebugHandler.maxChiliErrors = 5
+DebugHandler.removeWidgets = false
 local numChiliErrors = 0
 local lastError = 0
 
 local function ChiliErrorHandler(msg,...)
-  local control 
+  local control
   local _i = 2 --// 1 is this function, so skip it
   repeat
     if (not debug.getinfo(_i)) then
@@ -94,13 +95,21 @@ local function ChiliErrorHandler(msg,...)
       Spring.Log("Chili", "error", ("in `%s`:%s : %s"):format(wname, control.name, msg))
       Spring.Log("Chili", "error", DebugHandler.Stacktrace())
 
-      --// this also unloads all owned chili objects
-      Spring.Log("Chili", "error", "Removed widget: " .. wname)
-      widgetHandler:RemoveWidget(w)
+      if DebugHandler.removeWidgets then
+          --// this also unloads all owned chili objects
+          Spring.Log("Chili", "error", "Removed widget: " .. wname)
+          widgetHandler:RemoveWidget(w)
+      else
+          Spring.Log("Chili", "error", "In widget: " .. wname)
+      end
     else
       Spring.Log("Chili", "error", ("in `%s` (couldn't detect the owner widget): %s"):format(control.name, msg))
       Spring.Log("Chili", "error", DebugHandler.Stacktrace())
-      control:Dispose()
+      if DebugHandler.removeWidgets then
+          control:Dispose()
+      else
+          Spring.Log("Chili", "error", "In control: " .. control.name)
+      end
     end
   else
     --// error in Chili itself

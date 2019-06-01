@@ -223,6 +223,9 @@ function Screen:FocusControl(control)
       if control then
           self.focusedControl = MakeWeakLink(control, self.focusedControl)
           self.focusedControl.state.focused = true
+          if self.focusedControl.hidden then
+            self.focusedControl:Show()
+          end
           self.focusedControl:FocusUpdate() --rename FocusGain()
       end
   end

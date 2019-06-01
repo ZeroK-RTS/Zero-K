@@ -454,6 +454,14 @@ local function _DrawSelection(x, y, w, h)
 	gl.Vertex(x + w, y + h)
 end
 
+local function _GetControlFont(obj)
+    if obj.state.enabled then
+        return obj.font
+    else
+        return obj.disabledFont
+    end
+end
+
 --//=============================================================================
 --//
 
@@ -477,7 +485,7 @@ function DrawWindow(obj)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    obj.font:Print(obj.caption, w*0.5, 9, "center")
+    _GetControlFont(obj):Print(obj.caption, w*0.5, 9, "center")
   end
 end
 
@@ -501,7 +509,7 @@ function DrawRepeatingTiledWindow(obj)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    obj.font:Print(obj.caption, w*0.5, 9, "center")
+     _GetControlFont(obj):Print(obj.caption, w*0.5, 9, "center")
   end
 end
 
@@ -523,6 +531,8 @@ function DrawButton(obj)
     elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
       bgcolor = obj.focusColor
       --bgcolor = mixColors(bgcolor, obj.focusColor, 0.5)
+    elseif obj.state.selected then
+      bgcolor = obj.selectedColor
     end
   end
   gl.Color(bgcolor)
@@ -535,7 +545,9 @@ function DrawButton(obj)
   --gl.Texture(0,false)
 
   local fgcolor = obj.borderColor
-  if not obj.supressButtonReaction then
+  if not obj.state.enabled then
+    fgcolor = mixColors(fgcolor, obj.disabledColor, 0.8)
+  elseif not obj.supressButtonReaction then
     if (obj.state.pressed) then
       fgcolor = obj.pressForegroundColor or mulColor(fgcolor, 0.4)
     elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
@@ -552,7 +564,8 @@ function DrawButton(obj)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    obj.font:Print(obj.caption, w*0.5 + (obj.captionHorAlign or 0), math.floor(h*0.5 - obj.font.size*0.35) + (obj.captionAlign or 0), "center", "linecenter")
+    local font = _GetControlFont(obj)
+    font:Print(obj.caption, w*0.5 + (obj.captionHorAlign or 0), math.floor(h*0.5 - font.size*0.35) + (obj.captionAlign or 0), "center", "linecenter")
   end
 end
 
@@ -597,7 +610,7 @@ function DrawEditBox(obj)
     if text and obj.textEditing then
         text = text .. obj.textEditing
     end
-	local font = obj.font
+	local font = _GetControlFont(obj)
 	local displayHint = false
 
 	if text == "" and not obj.state.focused then
@@ -662,7 +675,7 @@ function DrawEditBox(obj)
 				local scrollPosY = obj.parent.scrollPosY
 				local scrollHeight = obj.parent.clientArea[4]
 
-				local h, d, numLines = obj.font:GetTextHeight(tostring(obj.text));
+				local h, d, numLines = font:GetTextHeight(tostring(obj.text));
 				local minDrawY = scrollPosY - (h or 0)
 				local maxDrawY = scrollPosY + scrollHeight + (h or 0)
 
@@ -714,7 +727,14 @@ function DrawEditBox(obj)
 
 			local cc = obj.cursorColor
 			gl.Color(cc[1], cc[2], cc[3], cc[4] * alpha)
-			gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawCursor, cursorX + clientX - 1, clientY, 3, clientHeight)
+
+            if obj.align == "left" then
+			  gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawCursor, cursorX + clientX - 1, clientY, 3, clientHeight)
+            elseif obj.align == "right" then
+                local texLen = font:GetTextWidth(text)
+                cursorX = obj:__GetStartX(text) + cursorX - clientX
+                gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawCursor, cursorX, clientY, 3, clientHeight)
+             end
 		end
         if obj.selStart and obj.state.focused then
 			local cc = obj.selectionColor
@@ -752,7 +772,13 @@ function DrawEditBox(obj)
 				-- limit the selection to the editbox width
 				w = math.min(w, obj.width - leftX - 3)
 
-				gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawSelection, leftX + clientX - 1, y, w, height)
+                if obj.align == "left" then
+                    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawSelection, leftX + clientX - 1, y, w, height)
+                elseif obj.align == "right" then
+                    local texLen = font:GetTextWidth(text)
+                    leftX = obj:__GetStartX(text) + leftX - clientX
+                    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawSelection, leftX, y, w, height)
+                end
 			else
 				local topLine, bottomLine = obj.physicalLines[top], obj.physicalLines[bottom]
 				local leftTxt = topLine.text:sub(obj.offset, left - 1)
@@ -1011,7 +1037,8 @@ function DrawCheckbox(obj)
 
   gl.Color(1,1,1,1)
   if (obj.caption) then
-    obj.font:Print(obj.caption, tx, ty - obj.font.size*0.35, nil, "linecenter")
+    local font = _GetControlFont(obj)
+    font:Print(obj.caption, tx, ty - font.size*0.35, nil, obj.valign)
   end
 end
 
@@ -1061,7 +1088,8 @@ function DrawProgressbar(obj)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    (obj.font):Print(obj.caption, x+w*0.5, y+h*0.5 - obj.font.size*0.35 + (obj.fontOffset or 0), "center", "linecenter")
+    local font = _GetControlFont(obj)
+    font:Print(obj.caption, x+w*0.5, y+h*0.5 - font.size*0.35 + (obj.fontOffset or 0), "center", "linecenter")
   end
 end
 
@@ -1309,7 +1337,7 @@ function DrawTabBarItem(obj)
 
   if (obj.caption) then
     local cx,cy,cw,ch = unpack4(obj.clientArea)
-    obj.font:DrawInBox(obj.caption, cx, cy, cw, ch, "center", "center")
+    _GetControlFont(obj):DrawInBox(obj.caption, cx, cy, cw, ch, "center", "center")
   end
 end
 

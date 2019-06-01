@@ -12,6 +12,7 @@ TabPanel = LayoutPanel:Inherit{
   classname     = "tabpanel",
   orientation   = "vertical",
   resizeItems   = false,
+  scrollTabs    = false, -- NB: Requires the .tabbar to be explicitly resized due to autosize bug
   itemPadding   = {0, 0, 0, 0},
   itemMargin    = {0, 0, 0, 0},
   barHeight     = 40,
@@ -28,15 +29,32 @@ local inherited = this.inherited
 function TabPanel:New(obj)
 	obj = inherited.New(self,obj)
 
-	obj:AddChild(
-		TabBar:New {
-			tabs = obj.tabs,
+	obj.tabbar = TabBar:New {
+		tabs = obj.tabs,
+		x = 0,
+		y = 0,
+		right = 0,
+		height = obj.barHeight,
+	}
+	if obj.scrollTabs then
+		local tabScrollPanel = ScrollPanel:New {
 			x = 0,
-			y = 0,
 			right = 0,
+			y = 0,
 			height = obj.barHeight,
+			padding = {0,0,0,0},
+			borderColor = {0,0,0,0},
+			backgroundColor = {0,0,0,0},
+			verticalScrollbar = false,
+			scrollbarSize = 5,
+			children = {
+				obj.tabbar
+			}
 		}
-	)
+		obj:AddChild(tabScrollPanel)
+	else
+		obj:AddChild(obj.tabbar)
+	end
 
 	obj.currentTab = Control:New {
 		x = 0,
@@ -65,19 +83,18 @@ function TabPanel:New(obj)
 			tabFrame:SetVisibility(false)
 		end
 	end
-	obj.children[1].OnChange = { function(tabbar, tabname) obj:ChangeTab(tabname) end }
+	obj.tabbar.OnChange = { function(tabbar, tabname) obj:ChangeTab(tabname) end }
 	return obj
 end
 
 function TabPanel:AddTab(tab, neverSwitchTab)
-    local tabbar = self.children[1]
 	local switchToTab = (#tabbar.children == 0) and not neverSwitchTab
-    tabbar:AddChild(TabBarItem:New {
+    self.tabbar:AddChild(TabBarItem:New {
         name = tab.name,
         tooltip = tab.tooltip,
         caption = tab.caption or tab.name,
-        defaultWidth = tabbar.minItemWidth,
-        defaultHeight = tabbar.minItemHeight
+        defaultWidth = self.tabbar.minItemWidth,
+        defaultHeight = self.tabbar.minItemHeight
     }) --FIXME: implement an "Add Tab in TabBar too"
     local tabFrame = Control:New {
         padding = {0, 0, 0, 0},
@@ -99,8 +116,7 @@ function TabPanel:RemoveTab(name)
     if self.currentFrame == self.tabIndexMapping[name] then
 		self.currentFrame = nil
 	end
-    local tabbar = self.children[1]
-    tabbar:Remove(name)
+    self.tabbar:Remove(name)
     self.currentTab:RemoveChild(self.tabIndexMapping[name])
     self.tabIndexMapping[name] = nil
 end
