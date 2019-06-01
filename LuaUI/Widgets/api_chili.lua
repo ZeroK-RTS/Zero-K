@@ -135,15 +135,12 @@ function widget:TweakDrawScreen()
 	end
 end
 
-
-function widget:Update()
-	tk.Update()
-	tf.Update()
-end
-
-
 function widget:DrawGenesis()
+	gl.Color(1,1,1,1)
+	tf.Update()
 	th.Update()
+	tk.Update()
+	gl.Color(1,1,1,1)
 end
 
 
