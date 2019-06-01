@@ -24,9 +24,9 @@ ScrollPanel = Control:Inherit{
   scrollPosY    = 0,
   verticalScrollbar   = true,
   horizontalScrollbar = true,
-  verticalSmartScroll = false, 
+  verticalSmartScroll = false, --// if control is scrolled to bottom, keep scroll when layout changes
   smoothScroll     = true,
-  smoothScrollTime = 0.7, 
+  smoothScrollTime = 0.7, --// in seconds
   ignoreMouseWheel = false,
 }
 
@@ -44,8 +44,8 @@ end
 --- Sets the scroll position
 -- @int x x position
 -- @int y y position
-function ScrollPanel:SetScrollPos(x,y,inview,smoothscroll)
-  local dosmooth = self.smoothScroll and (smoothscroll or (smoothscroll == nil))
+function ScrollPanel:SetScrollPos(x,y,inview, forceNotSmooth)
+  local dosmooth = (self.smoothScroll) and not forceNotSmooth
   if dosmooth then
     self._oldScrollPosX = self.scrollPosX
     self._oldScrollPosY = self.scrollPosY
@@ -268,24 +268,24 @@ end
 
 
 function ScrollPanel:_DrawInClientArea(fnc,...)
-	local clientX,clientY,clientWidth,clientHeight = unpack4(self.clientArea)
+  local clientX,clientY,clientWidth,clientHeight = unpack4(self.clientArea)
 
-	if WG.uiScale and WG.uiScale ~= 1 then
-		clientWidth, clientHeight = clientWidth*WG.uiScale, clientHeight*WG.uiScale
-	end
+  if WG.uiScale and WG.uiScale ~= 1 then
+    clientWidth, clientHeight = clientWidth*WG.uiScale, clientHeight*WG.uiScale
+  end
 
-	gl.PushMatrix()
+  gl.PushMatrix()
 	gl.Translate(clientX - self.scrollPosX, clientY - self.scrollPosY, 0)
 
-	local sx,sy = self:UnscaledLocalToScreen(clientX,clientY)
-	sy = select(2,gl.GetViewSizes()) - (sy + clientHeight)
+    local sx,sy = self:UnscaledLocalToScreen(clientX,clientY)
+    sy = select(2,gl.GetViewSizes()) - (sy + clientHeight)
 
 	if PushLimitRenderRegion(self, sx, sy, clientWidth, clientHeight) then
 		fnc(...)
 		PopLimitRenderRegion(self, sx, sy, clientWidth, clientHeight)
 	end
 
-	gl.PopMatrix()
+  gl.PopMatrix()
 end
 
 
@@ -320,14 +320,14 @@ function ScrollPanel:MouseDown(x, y, ...)
     self._vscrolling  = true
     local clientArea = self.clientArea
     local cy = y - clientArea[2]
-    self:SetScrollPos(nil, (cy/clientArea[4])*self.contentArea[4], true, false)
+    self:SetScrollPos(nil, (cy/clientArea[4])*self.contentArea[4], true)
     return self
   end
   if self:IsAboveHScrollbars(x,y) then
     self._hscrolling  = true
     local clientArea = self.clientArea
     local cx = x - clientArea[1]
-    self:SetScrollPos((cx/clientArea[3])*self.contentArea[3], nil, true, false)
+    self:SetScrollPos((cx/clientArea[3])*self.contentArea[3], nil, true)
     return self
   end
 
@@ -339,13 +339,13 @@ function ScrollPanel:MouseMove(x, y, dx, dy, ...)
   if self._vscrolling then
     local clientArea = self.clientArea
     local cy = y - clientArea[2]
-    self:SetScrollPos(nil, (cy/clientArea[4])*self.contentArea[4], true, false)
+    self:SetScrollPos(nil, (cy/clientArea[4])*self.contentArea[4], true)
     return self
   end
   if self._hscrolling then
     local clientArea = self.clientArea
     local cx = x - clientArea[1]
-    self:SetScrollPos((cx/clientArea[3])*self.contentArea[3], nil, true, false)
+    self:SetScrollPos((cx/clientArea[3])*self.contentArea[3], nil, true)
     return self
   end
 
@@ -366,14 +366,14 @@ function ScrollPanel:MouseUp(x, y, ...)
     self._vscrolling = nil
     local clientArea = self.clientArea
     local cy = y - clientArea[2]
-    self:SetScrollPos(nil, (cy/clientArea[4])*self.contentArea[4], true, false)
+    self:SetScrollPos(nil, (cy/clientArea[4])*self.contentArea[4], true)
     return self
   end
   if self._hscrolling then
     self._hscrolling = nil
     local clientArea = self.clientArea
     local cx = x - clientArea[1]
-    self:SetScrollPos((cx/clientArea[3])*self.contentArea[3], nil, true, false)
+    self:SetScrollPos((cx/clientArea[3])*self.contentArea[3], nil, true)
     return self
   end
 
@@ -383,7 +383,7 @@ end
 
 function ScrollPanel:MouseWheel(x, y, up, value, ...)
   if self._vscrollbar and not self.ignoreMouseWheel then
-    self:SetScrollPos(nil, self.scrollPosY - value*30, false, false)
+    self:SetScrollPos(nil, self.scrollPosY - value*30, false)
     return self
   end
 

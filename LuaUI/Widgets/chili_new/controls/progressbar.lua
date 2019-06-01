@@ -22,6 +22,8 @@ Progressbar = Control:Inherit{
   min       = 0,
   max       = 100,
   value     = 100,
+  orientation = "horizontal",
+  reverse   = false,
 
   caption   = "",
 
@@ -116,16 +118,38 @@ end
 
 function Progressbar:DrawControl()
   local percent = (self.value-self.min)/(self.max-self.min)
-  local x = self.x
-  local y = self.y
   local w = self.width
   local h = self.height
 
   gl.Color(self.backgroundColor)
-  gl.Rect(w*percent,y,w,h)
+  if (self.orientation == "horizontal") then
+    if self.reverse then
+      gl.Rect(0,0,w*(1-percent),h)
+    else
+      gl.Rect(w*percent,0,w,h)
+    end
+  else
+    if self.reverse then
+       gl.Rect(0,0,w,h*percent)
+    else
+      gl.Rect(0,h*(1-percent),w,h)
+    end
+  end
 
   gl.Color(self.color)
-  gl.Rect(0,y,w*percent,h)
+  if (self.orientation == "horizontal") then
+    if self.reverse then
+      gl.Rect(w*(1-percent),0,w,h)
+    else
+      gl.Rect(0,0,w*percent,h)
+    end
+  else
+    if self.reverse then
+      gl.Rect(0,h*percent,w,h)
+    else
+      gl.Rect(0,0,w,h*(1-percent))
+    end
+  end
 
   if (self.caption) then
     (self.font):Print(self.caption, w*0.5, h*0.5, "center", "center")

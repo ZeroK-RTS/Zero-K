@@ -1019,6 +1019,8 @@ end
 --//
 
 function DrawProgressbar(obj)
+  local x = 0
+  local y = 0
   local w = obj.width
   local h = obj.height
 
@@ -1045,20 +1047,21 @@ function DrawProgressbar(obj)
     -- fuck AMD
     --gl.ClipPlane(1, -1,0,0, x+w*percent)
 	if obj.fillPadding then
+		x, y = x + obj.fillPadding[1], y + obj.fillPadding[2]
 		w, h = w - (obj.fillPadding[1] + obj.fillPadding[3]), h - (obj.fillPadding[2] + obj.fillPadding[4])
 	end
 	
     if (obj.orientation == "horizontal") then
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w*percent,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w*percent,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
     else
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, (h - h*percent),w,h*percent, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y + (h - h*percent),w,h*percent, skLeft,skTop,skRight,skBottom, tw,th, 0)
     end
 
     --gl.ClipPlane(1, false)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    (obj.font):Print(obj.caption, w*0.5, h*0.5 - obj.font.size*0.35 + (obj.fontOffset or 0), "center", "linecenter")
+    (obj.font):Print(obj.caption, x+w*0.5, y+h*0.5 - obj.font.size*0.35 + (obj.fontOffset or 0), "center", "linecenter")
   end
 end
 

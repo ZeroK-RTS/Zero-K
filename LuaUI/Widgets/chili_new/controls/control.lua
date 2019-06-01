@@ -73,6 +73,7 @@ Control = Object:Inherit{
   skin            = nil,
   skinName        = nil,
 
+  safeOpengl      = true, --// enables scissors
   drawcontrolv2 = nil, --// disable backward support with old DrawControl gl state (with 2.1 self.xy translation isn't needed anymore)
 
   useRTT = false and ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
@@ -89,6 +90,11 @@ local inherited = this.inherited
 function Control:New(obj)
   --// backward compability
   BackwardCompa(obj)
+  
+  --//minimum size from minimum size table when minWidth & minHeight is not set (backward compatibility)
+  local minimumSize = obj.minimumSize or {} 
+  obj.minWidth = obj.minWidth or minimumSize[1] 
+  obj.minHeight = obj.minHeight or minimumSize[2]
 
   if obj.DrawControl then
     obj._hasCustomDrawControl = true
@@ -149,14 +155,18 @@ end
 
 --- Removes the control.
 function Control:Dispose(...)
-  gl.DeleteList(self._all_dlist)
-  self._all_dlist = nil
-
-  gl.DeleteList(self._children_dlist)
-  self._children_dlist = nil
-
-  gl.DeleteList(self._own_dlist)
-  self._own_dlist = nil
+  if (self._all_dlist) then
+    gl.DeleteList(self._all_dlist)
+    self._all_dlist = nil
+  end
+  if (self._children_dlist) then
+    gl.DeleteList(self._children_dlist)
+    self._children_dlist = nil
+  end
+  if (self._own_dlist) then
+    gl.DeleteList(self._own_dlist)
+    self._own_dlist = nil
+  end
 
   gl.DeleteTexture(self._tex_all)
   self._tex_all = nil
@@ -194,8 +204,8 @@ end
 --- Adds a child object to the control
 -- @tparam object.Object obj child object
 -- @param dontUpdate if true won't trigger a RequestRealign()
-function Control:AddChild(obj, dontUpdate)
-  inherited.AddChild(self,obj)
+function Control:AddChild(obj, dontUpdate, index)
+  inherited.AddChild(self,obj, dontUpdate, index)
   if (not dontUpdate) then
     self:RequestRealign()
   end
@@ -357,7 +367,7 @@ end
 
 --//=============================================================================
 
-function Control:UpdateClientArea(dontRedraw)
+function Control:UpdateClientArea()
   local padding = self.padding
 
   self.clientWidth  = self.width  - padding[1] - padding[3]
@@ -533,7 +543,7 @@ function Control:SetPos(x, y, w, h, clientArea, dontUpdateRelative)
         self._relativeBounds.width = IsRelativeCoord(w) and w
         self._givenBounds.width = w
         changed = true
-	redraw  = true
+        redraw  = true
       end
     end
   end
@@ -552,7 +562,7 @@ function Control:SetPos(x, y, w, h, clientArea, dontUpdateRelative)
         self._relativeBounds.height = IsRelativeCoord(h) and h
         self._givenBounds.height = h
         changed = true
-	redraw  = true
+        redraw  = true
       end
     end
   end
@@ -1177,42 +1187,47 @@ end
 
 --//FIXME move resize and drag to Window class!!!!
 function Control:DrawBackground()
-	--// gets overriden by the skin/theme
+  --// gets overriden by the skin/theme
 end
 
 function Control:DrawDragGrip()
-	--// gets overriden by the skin/theme
+  --// gets overriden by the skin/theme
 end
 
 function Control:DrawResizeGrip()
-	--// gets overriden by the skin/theme
+  --// gets overriden by the skin/theme
 end
 
 function Control:DrawBorder()
-	--// gets overriden by the skin/theme ??????
+  --// gets overriden by the skin/theme ??????
 end
 
 
 function Control:DrawGrips() -- FIXME this thing is a hack, fix it - todo ideally make grips appear only when mouse hovering over it
-	local drawResizeGrip = self.resizable
-	local drawDragGrip   = self.draggable and self.dragUseGrip
-	--[[if IsTweakMode() then
-	drawResizeGrip = drawResizeGrip or self.tweakResizable
-	drawDragGrip   = (self.tweakDraggable and self.tweakDragUseGrip)
-	end--]]
+  local drawResizeGrip = self.resizable
+  local drawDragGrip   = self.draggable and self.dragUseGrip
+  --[[if IsTweakMode() then
+    drawResizeGrip = drawResizeGrip or self.tweakResizable
+    drawDragGrip   = (self.tweakDraggable and self.tweakDragUseGrip)
+  end--]]
 
-	if drawResizeGrip then
-		self:DrawResizeGrip()
-	end
-	if drawDragGrip then
-		self:DrawDragGrip()
-	end
+  if drawResizeGrip then
+    self:DrawResizeGrip()
+  end
+  if drawDragGrip then
+    self:DrawDragGrip()
+  end
 end
 
 
 function Control:DrawControl()
-	self:DrawBackground()
-	self:DrawBorder()
+  --//an option to make panel position snap to an integer
+  if self.snapToGrid then 
+    self.x = math.floor(self.x) + 0.5 
+    self.y = math.floor(self.y) + 0.5 
+  end 
+  self:DrawBackground()
+  self:DrawBorder()
 end
 
 
@@ -1343,23 +1358,23 @@ end
 
 
 function Control:TweakDraw()
-	if (next(self.children)) then
-		self:_DrawChildrenInClientArea('TweakDraw')
-	end
+  if (next(self.children)) then
+    self:_DrawChildrenInClientArea('TweakDraw')
+  end
 end
 
 
 function Control:DrawChildren()
-	if (next(self.children)) then
-		self:_DrawChildrenInClientArea('Draw')
-	end
+  if (next(self.children)) then
+    self:_DrawChildrenInClientArea('Draw')
+  end
 end
 
 
 function Control:DrawChildrenForList()
-	if (next(self.children)) then
-		self:_DrawChildrenInClientAreaWithoutViewCheck('DrawForList')
-	end
+  if (next(self.children)) then
+    self:_DrawChildrenInClientAreaWithoutViewCheck('DrawForList')
+  end
 end
 
 --//=============================================================================
@@ -1386,6 +1401,10 @@ function Control:HitTest(x,y)
           end
         end
       end
+      --//an option that allow you to mouse click on empty panel
+      if self.hitTestAllowEmpty then 
+        return self 
+      end
     end
   end
 
@@ -1396,8 +1415,8 @@ function Control:HitTest(x,y)
     end
   end
 
-  if
-	self.tooltip
+  if (self.noClickThrough and not IsTweakMode())
+	or (self.tooltip)
 	or (#self.OnMouseDown > 0)
 	or (#self.OnMouseUp > 0)
 	or (#self.OnClick > 0)
@@ -1435,6 +1454,10 @@ function Control:MouseDown(x, y, ...)
     if (result) then
       return result
     end
+  end
+
+  if self.noClickThrough and not IsTweakMode() then
+    return self
   end
 end
 
