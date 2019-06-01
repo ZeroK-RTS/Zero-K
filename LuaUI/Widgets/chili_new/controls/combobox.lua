@@ -27,6 +27,7 @@ ComboBox = Button:Inherit{
   minDropDownHeight = 50,
   maxDropDownWidth = 500,
   minDropDownWidth = 50,
+  topHeight = 7,
 }
 
 local ComboBoxWindow      = Window:Inherit{classname = "combobox_window", resizable = false, draggable = false, }
@@ -105,7 +106,7 @@ function ComboBox:MouseDown(x, y)
     local labels = {}
 
     local width = math.max(self.width, self.minDropDownWidth)
-    local height = 7
+    local height = self.topHeight
     for i = 1, #self.items do
       local item = self.items[i]
       if type(item) == "string" then
