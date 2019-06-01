@@ -22,12 +22,15 @@ local materials = {
 			"#define deferred_mode 0",
 			"#define SPECULARSUNEXP 16.0",
 			"#define SPECULARMULT 1.0",
+			"#define SHADOW_SOFTNESS SHADOW_HARD", -- cuz shadow for swaying trees is bugged anyway
 		},
 		deferredDefinitions = {
 			--"#define use_normalmapping", --very expensive for trees (too much overdraw)
 			"#define deferred_mode 1",
 			"#define SPECULARSUNEXP 16.0",
 			"#define SPECULARMULT 1.0",
+			"#define SHADOW_SOFTNESS SHADOW_HARD", -- cuz shadow for swaying trees is bugged anyway
+			"#define MAT_IDX 129",
 		},
 		shaderPlugins = {
 			VERTEX_GLOBAL_NAMESPACE = [[

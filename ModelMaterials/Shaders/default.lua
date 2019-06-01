@@ -150,23 +150,43 @@ fragment = [[
 		#define SPECULARMULT 3.0
 	#endif
 
+	#ifndef MAT_IDX
+		#define MAT_IDX 0
+	#endif
+
+	#define SHADOW_HARD 0
+	#define SHADOW_SOFT 1
+	#define SHADOW_SOFTER 2
+	#define SHADOW_SOFTEST 3
+
+	#ifndef SHADOW_SOFTNESS
+		#define SHADOW_SOFTNESS SHADOW_SOFT
+	#endif
+
+	#if (SHADOW_SOFTNESS == SHADOW_HARD)
+		#define SHADOW_SAMPLES 1
+	#endif
+
+	#if (SHADOW_SOFTNESS == SHADOW_SOFT)
+		#define SHADOW_SAMPLES 2 // number of shadowmap samples per fragment
+		#define SHADOW_RANDOMNESS 0.5 // 0.0 - blocky look, 1.0 - random points look
+		#define SHADOW_SAMPLING_DISTANCE 2.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
+	#endif
+
+	#if (SHADOW_SOFTNESS == SHADOW_SOFTER)
+		#define SHADOW_SAMPLES 6 // number of shadowmap samples per fragment
+		#define SHADOW_RANDOMNESS 0.4 // 0.0 - blocky look, 1.0 - random points look
+		#define SHADOW_SAMPLING_DISTANCE 2.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
+	#endif
+
+	#if (SHADOW_SOFTNESS == SHADOW_SOFTEST)
+		#define SHADOW_SAMPLES 8 // number of shadowmap samples per fragment
+		#define SHADOW_RANDOMNESS 0.4 // 0.0 - blocky look, 1.0 - random points look
+		#define SHADOW_SAMPLING_DISTANCE 2.5 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
+	#endif
+
 	#ifdef use_shadows
 		uniform sampler2DShadow shadowTex;
-		
-		#if !defined(SHADOW_PROFILE_LOW) && !defined(SHADOW_PROFILE_HIGH)
-			#define SHADOW_PROFILE_LOW
-		#endif
-
-		#ifdef SHADOW_PROFILE_LOW
-			#define SHADOW_SAMPLES 1
-		#endif
-
-		#ifdef SHADOW_PROFILE_HIGH
-			#define SHADOW_SAMPLES 6 // number of shadowmap samples per fragment
-			#define SHADOW_RANDOMNESS 0.4 // 0.0 - blocky look, 1.0 - random points look
-			#define SHADOW_SAMPLING_DISTANCE 2.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
-		#endif
-
 	#endif
 	uniform float shadowDensity;
 
@@ -366,7 +386,7 @@ fragment = [[
 			fragData[GBUFFER_DIFFTEX_IDX] = outColor;
 			fragData[GBUFFER_SPECTEX_IDX] = vec4(specularColor, extraColor.a);
 			fragData[GBUFFER_EMITTEX_IDX] = vec4(extraColor.rrr, 1.0);
-			fragData[GBUFFER_MISCTEX_IDX] = vec4(0.0);
+			fragData[GBUFFER_MISCTEX_IDX] = vec4(float(MAT_IDX) / 255.0, 0.0, 0.0, 0.0);
 		#endif
 
 		%%FRAGMENT_POST_SHADING%%

@@ -17,12 +17,13 @@ local materials = {
 		shaderDefinitions = {
 			"#define use_normalmapping",
 			"#define deferred_mode 0",
-			"#define SHADOW_PROFILE_HIGH",
+			"#define SHADOW_SOFTNESS SHADOW_SOFTER",
 		},
 		deferredDefinitions = {
 			"#define use_normalmapping",
 			"#define deferred_mode 1",
-			"#define SHADOW_PROFILE_HIGH",
+			"#define SHADOW_SOFTNESS SHADOW_SOFTER",
+			"#define MAT_IDX 2",
 		},
 		shader    = default_lua,
 		deferred  = default_lua,
