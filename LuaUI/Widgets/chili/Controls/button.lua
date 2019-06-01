@@ -1,4 +1,4 @@
---//=============================================================================
+--// ============================================================================= 
 
 --- Button module
 
@@ -6,57 +6,59 @@
 -- Inherits from Control.
 -- @see control.Control
 -- @table Button
--- @string[opt="button"] caption caption to be displayed
+-- @string[opt = "button"] caption caption to be displayed
 Button = Control:Inherit{
-  classname= "button",
-  caption  = 'button',
-  captionAlign  = nil,
-  defaultWidth  = 70,
-  defaultHeight = 20,
+	classname = "button",
+	caption  = 'button',
+	captionAlign  = nil,
+	defaultWidth  = 70,
+	defaultHeight = 20,
 
-  align = "center",
-  valign = "center",
+	align = "center",
+	valign = "center",
 }
 
 local this = Button
 local inherited = this.inherited
 
---//=============================================================================
+--// ============================================================================= 
 
 --- Sets the caption of the button
 -- @string caption new caption of the button
 function Button:SetCaption(caption)
-  if (self.caption == caption) then return end
-  self.caption = caption
-  self:Invalidate()
+	if (self.caption == caption) then
+		return
+	end
+	self.caption = caption
+	self:Invalidate()
 end
 
---//=============================================================================
+--// ============================================================================= 
 
 function Button:DrawControl()
-  --// gets overriden by the skin/theme
+	--// gets overriden by the skin/theme
 end
 
---//=============================================================================
+--// ============================================================================= 
 
-function Button:HitTest(x,y)
-  return self
+function Button:HitTest(x, y)
+	return self
 end
 
 function Button:MouseDown(...)
-  self.state.pressed = true
-  inherited.MouseDown(self, ...)
-  self:Invalidate()
-  return self
+	self.state.pressed = true
+	inherited.MouseDown(self, ...)
+	self:Invalidate()
+	return self
 end
 
 function Button:MouseUp(...)
-  if (self.state.pressed) then
-    self.state.pressed = false
-    inherited.MouseUp(self, ...)
-    self:Invalidate()
-    return self
-  end
+	if (self.state.pressed) then
+		self.state.pressed = false
+		inherited.MouseUp(self, ...)
+		self:Invalidate()
+		return self
+	end
 end
 
---//=============================================================================
+--// ============================================================================= 

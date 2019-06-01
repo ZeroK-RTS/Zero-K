@@ -8,18 +8,18 @@
 
 -- backup table works like a normal __index table
 local function MakeStrict(env, backup)
-  local mt = getmetatable(env)
-  if mt == nil then
-    mt = {}
-    setmetatable(env, mt)
-  end
-  
-  mt.__index = function (t, n)
-    if (backup[n]==nil) then
-      error("variable '"..n.."' is not declared (strict mode)", 2)
-    end
-    return backup[n]
-  end
+	local mt = getmetatable(env)
+	if mt == nil then
+		mt = {}
+		setmetatable(env, mt)
+	end
+	
+	mt.__index = function (t, n)
+		if (backup[n] == nil) then
+			error("variable '"..n.."' is not declared (strict mode)", 2)
+		end
+		return backup[n]
+	end
 end
 
 return MakeStrict
