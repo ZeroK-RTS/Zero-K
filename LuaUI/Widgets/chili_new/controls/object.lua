@@ -116,7 +116,7 @@ function Object:New(obj)
           ot = "table";
         end
         if (ot ~= "table")and(ot ~= "metatable") then
-          Spring.Log("Chili", "error", obj.name .. ": Wrong param type given to " .. i .. ": got " .. ot .. " expected table.")
+          Spring.Echo("Chili: " .. obj.name .. ": Wrong param type given to " .. i .. ": got " .. ot .. " expected table.")
           obj[i] = {}
         end
 
@@ -169,7 +169,7 @@ function Object:Dispose(_internal)
         local hlinks_cnt = table.size(self._hlinks)
         local i,v = next(self._hlinks)
         if hlinks_cnt > 1 or (v ~= self) then --// check if user called Dispose() directly
-          Spring.Log("Chili", "error", ("Tried to dispose \"%s\"! It's still referenced %i times!"):format(self.name, hlinks_cnt))
+          Spring.Echo(("Chili: tried to dispose \"%s\"! It's still referenced %i times!"):format(self.name, hlinks_cnt))
         end
       end
     end
@@ -265,11 +265,11 @@ end
 
 --- Adds the child object
 -- @tparam Object obj child object to be added
-function Object:AddChild(obj, dontUpdate)
+function Object:AddChild(obj, dontUpdate, index)
   local objDirect = UnlinkSafe(obj)
 
   if (self.children[objDirect]) then
-    Spring.Log("Chili", "error", ("Tried to add multiple times \"%s\" to \"%s\"!"):format(obj.name, self.name))
+    Spring.Echo(("Chili: tried to add multiple times \"%s\" to \"%s\"!"):format(obj.name, self.name))
     return
   end
 
@@ -289,11 +289,20 @@ function Object:AddChild(obj, dontUpdate)
   obj:SetParent(self)
 
   local children = self.children
-  local i = #children+1
-  children[i] = objDirect
-  children[hobj] = i
-  children[objDirect] = i
-  self:Invalidate()
+  if index and (index <= #children) then
+    for i,v in pairs(children) do -- remap hardlinks and objects
+      if type(v) == "number" and v >= index then
+        children[i] = v + 1
+      end
+    end
+    table.insert(children, index, objDirect)
+  else
+    local i = #children+1
+    children[i] = objDirect
+    children[hobj] = i
+    children[objDirect] = i
+  end
+    self:Invalidate()
 end
 
 
@@ -389,14 +398,14 @@ function Object:HideChild(obj)
 
   if (not self.children[objDirect]) then
     --if (self.debug) then
-      Spring.Log("Chili", "error", "Tried to hide a non-child (".. (obj.name or "") ..")")
+      Spring.Echo("Chili: tried to hide a non-child (".. (obj.name or "") ..")")
     --end
     return
   end
 
   if (self.children_hidden[objDirect]) then
     --if (self.debug) then
-      Spring.Log("Chili", "error", "Tried to hide the same child multiple times (".. (obj.name or "") ..")")
+      Spring.Echo("Chili: tried to hide the same child multiple times (".. (obj.name or "") ..")")
     --end
     return
   end
@@ -426,14 +435,14 @@ function Object:ShowChild(obj)
 
   if (not self.children_hidden[objDirect]) then
     --if (self.debug) then
-      Spring.Log("Chili", "error", "Tried to show a non-child (".. (obj.name or "") ..")")
+      Spring.Echo("Chili: tried to show a non-child (".. (obj.name or "") ..")")
     --end
     return
   end
 
   if (self.children[objDirect]) then
     --if (self.debug) then
-      Spring.Log("Chili", "error", "Tried to show the same child multiple times (".. (obj.name or "") ..")")
+      Spring.Echo("Chili: tried to show the same child multiple times (".. (obj.name or "") ..")")
     --end
     return
   end
@@ -826,7 +835,6 @@ function Object:LocalToScreen(x,y)
   if (not self.parent) then
     return x,y
   end
-  --Spring.Echo((not self.parent) and debug.traceback())
   return (self.parent):ClientToScreen(self:LocalToParent(x,y))
 end
 
