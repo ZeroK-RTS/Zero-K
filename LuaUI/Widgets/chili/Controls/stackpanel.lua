@@ -1,5 +1,11 @@
 --//=============================================================================
 
+--- StackPanel module
+
+--- StackPanel fields.
+-- Inherits from LayoutPanel.
+-- @see layoutpanel.LayoutPanel
+-- @table StackPanel
 StackPanel = LayoutPanel:Inherit{
   classname = "stackpanel",
   orientation = "vertical",

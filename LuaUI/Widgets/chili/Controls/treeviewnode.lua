@@ -4,14 +4,17 @@ TreeViewNode = Control:Inherit{
   classname = "treeviewnode",
 
   padding = {16,0,0,0},
+  labelFontsize = 14,
 
   autosize = true,
   caption   = "node",
   expanded  = true,
-
+  
+  clickTextToToggle = false,
   root      = false,
+  leaf      = true,
   nodes     = {},
-
+  
   treeview  = nil,
 
   _nodes_hidden = {},
@@ -35,6 +38,9 @@ function TreeViewNode:New(obj)
   assert(obj.treeview)
   obj.treeview = MakeWeakLink(obj.treeview)
   obj = inherited.New(self,obj)
+  self.labelFontsize = obj.labelFontsize
+  
+  self.clickTextToToggle = obj.clickTextToToggle
   return obj
 end
 
@@ -82,7 +88,9 @@ function TreeViewNode:ClearChildren()
 		self.children[1] = self.children[#self.children]
 		self.children[#self.children] = nil
 	end
-
+    
+	self.leaf = true
+	
 	local collapsed = not self.expanded
 	self:Expand()
 	inherited.ClearChildren(self)
@@ -98,14 +106,16 @@ TreeViewNode.Clear = TreeViewNode.ClearChildren
 --//=============================================================================
 
 function TreeViewNode:Add(item)
+  self.leaf = false
+  
   local newnode
   if (type(item) == "string") then
-    local lbl = TextBox:New{text = item; width = "100%"; padding = {2,3,2,2}; minHeight = self.minHeight;}
-    newnode = TreeViewNode:New{caption = item; treeview = self.treeview; minHeight = self.minHeight; expanded = self.expanded;}
+    local lbl = TextBox:New{text = item; width = "100%"; padding = {2,3,2,2}; minHeight = self.minHeight; fontsize = self.labelFontsize}
+    newnode = TreeViewNode:New{caption = item; treeview = self.treeview; minHeight = self.minHeight; expanded = self.expandedt; labelFontsize = self.labelFontsize}
     newnode:AddChild(lbl, false)
     self:AddChild(newnode)
   elseif (IsObject(item)) then
-    newnode = TreeViewNode:New{caption = ""; treeview = self.treeview; minHeight = self.minHeight; expanded = self.expanded;}
+    newnode = TreeViewNode:New{caption = ""; treeview = self.treeview; minHeight = self.minHeight; expanded = self.expandedt; labelFontsize = self.labelFontsize}
     newnode:AddChild(item, false)
     self:AddChild(newnode)
   end
@@ -129,7 +139,7 @@ function TreeViewNode:Toggle()
   if (self.root)or(not self.treeview) then
     return
   end
-
+  
   if (self.expanded) then
     self:Collapse()
   else
@@ -243,11 +253,11 @@ end
 --//=============================================================================
 
 function TreeViewNode:_InNodeButton(x,y)
-  if (self.root) then
+  if self.root or self.leaf then
     return false
   end
 
-  if (x>=self.padding[1]) then
+  if (x>=self.padding[1]) and not self.clickTextToToggle then
     return false
   end
 

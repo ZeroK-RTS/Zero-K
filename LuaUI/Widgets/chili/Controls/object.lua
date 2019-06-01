@@ -1,5 +1,25 @@
 --//=============================================================================
 
+--- Object module
+
+--- Object fields.
+-- @table Object
+-- @bool[opt=true] visible control is displayed
+-- @tparam {Object1,Object2,...} children table of visible children objects (default {})
+-- @tparam {Object1,Object2,...} children_hidden table of invisible children objects (default {})
+-- @tparam {"obj1Name"=Object1,"obj2Name"=Object2,...} childrenByName table mapping name->child
+-- @tparam {func1,func2,...} OnDispose  function listeners for object disposal, (default {})
+-- @tparam {func1,func2,...} OnClick  function listeners for mouse click, (default {})
+-- @tparam {func1,func2,...} OnDblClick  function listeners for mouse double click, (default {})
+-- @tparam {func1,func2,...} OnMouseDown  function listeners for mouse press, (default {})
+-- @tparam {func1,func2,...} OnMouseUp  function listeners for mouse release, (default {})
+-- @tparam {func1,func2,...} OnMouseMove  function listeners for mouse movement, (default {})
+-- @tparam {func1,func2,...} OnMouseWheel  function listeners for mouse scrolling, (default {})
+-- @tparam {func1,func2,...} OnMouseOver  function listeners for mouse over...?, (default {})
+-- @tparam {func1,func2,...} OnMouseOut  function listeners for mouse leaving the object, (default {})
+-- @tparam {func1,func2,...} OnKeyPress  function listeners for key press, (default {})
+-- @tparam {func1,func2,...} OnFocusUpdate  function listeners for focus change, (default {})
+-- @bool[opt=false] disableChildrenHitTest if set childrens are not clickable/draggable etc - their mouse events are not processed
 Object = {
   classname = 'object',
   --x         = 0,
@@ -29,6 +49,7 @@ Object = {
   OnMouseOut      = {},
   OnKeyPress      = {},
   OnTextInput     = {},
+  OnTextEditing   = {},
   OnFocusUpdate   = {},
   OnHide          = {},
   OnShow          = {},
@@ -55,7 +76,7 @@ local inherited = this.inherited
 --//=============================================================================
 --// used to generate unique objects names
 
-local cic = {} 
+local cic = {}
 local function GetUniqueId(classname)
   local ci = cic[classname] or 0
   cic[classname] = ci + 1
@@ -64,6 +85,8 @@ end
 
 --//=============================================================================
 
+--- Object constructor
+-- @tparam Object obj the object table
 function Object:New(obj)
   obj = obj or {}
 
@@ -132,12 +155,14 @@ function Object:New(obj)
 end
 
 
--- calling this releases unmanaged resources like display lists and disposes of the object
--- children are disposed too
--- todo: use scream, in case the user forgets
+--- Disposes of the object.
+-- Calling this releases unmanaged resources like display lists and disposes of the object.
+-- Children are disposed too.
+-- TODO: use scream, in case the user forgets.
 -- nil -> nil
 function Object:Dispose(_internal)
   if (not self.disposed) then
+
     --// check if the control is still referenced (if so it would indicate a bug in chili's gc)
     if _internal then
       if self._hlinks and next(self._hlinks) then
@@ -148,7 +173,7 @@ function Object:Dispose(_internal)
         end
       end
     end
- 
+
     self:CallListeners(self.OnDispose)
 
     self.disposed = true
@@ -201,11 +226,19 @@ function Object:Inherit(class)
 
   --setmetatable(class,{__index=self})
 
+  --// backward compability with old DrawControl gl state (change was done with v2.1)
+  local w = DebugHandler.GetWidgetOrigin()
+  if (w ~= widget)and(w ~= Chili) then
+	class._hasCustomDrawControl = true
+  end
+
   return class
 end
 
 --//=============================================================================
 
+--- Sets the parent object
+-- @tparam Object obj parent object
 function Object:SetParent(obj)
   obj = UnlinkSafe(obj)
   local typ = type(obj)
@@ -215,14 +248,14 @@ function Object:SetParent(obj)
     self:CallListeners(self.OnOrphan, self)
     return
   end
-  
+
   self:CallListeners(self.OnParent, self)
-  
+
   -- Children always appear to visible when they recieve new parents because they
   -- are added to the visible child list.
   self.visible = true
   self.hidden = false
-  
+
   self.parent = MakeWeakLink(obj, self.parent)
 
   self:Invalidate()
@@ -230,7 +263,8 @@ function Object:SetParent(obj)
   self:CallListeners(self.OnParentPost, self)
 end
 
-
+--- Adds the child object
+-- @tparam Object obj child object to be added
 function Object:AddChild(obj, dontUpdate, index)
   local objDirect = UnlinkSafe(obj)
 
@@ -272,6 +306,8 @@ function Object:AddChild(obj, dontUpdate, index)
 end
 
 
+--- Removes the child object
+-- @tparam Object child child object to be removed
 function Object:RemoveChild(child)
   if not isindexable(child) then
     return child
@@ -327,15 +363,15 @@ function Object:RemoveChild(child)
   return false
 end
 
-
+--- Removes all children
 function Object:ClearChildren()
   --// make it faster
   local old = self.preserveChildrenOrder
   self.preserveChildrenOrder = false
 
-  --// remove all children  
-    for i=1,#self.children_hidden do
-      self:ShowChild(self.children_hidden[i])
+  --// remove all children
+    for c in pairs(self.children_hidden) do
+      self:ShowChild(c)
     end
 
     for i=#self.children,1,-1 do
@@ -346,13 +382,16 @@ function Object:ClearChildren()
   self.preserveChildrenOrder = old
 end
 
-
+--- Specifies whether the object has any visible children
+-- @treturn bool
 function Object:IsEmpty()
   return (not self.children[1])
 end
 
 --//=============================================================================
 
+--- Hides a specific child
+-- @tparam Object obj child to be hidden
 function Object:HideChild(obj)
   --FIXME cause of performance reasons it would be usefull to use the direct object, but then we need to cache the link somewhere to avoid the auto calling of dispose
   local objDirect = UnlinkSafe(obj)
@@ -388,7 +427,8 @@ function Object:HideChild(obj)
   obj.parent = self
 end
 
-
+--- Makes a specific child visible
+-- @tparam Object obj child to be made visible
 function Object:ShowChild(obj)
   --FIXME cause of performance reasons it would be usefull to use the direct object, but then we need to cache the link somewhere to avoid the auto calling of dispose
   local objDirect = UnlinkSafe(obj)
@@ -428,7 +468,8 @@ function Object:ShowChild(obj)
   return true
 end
 
-
+--- Sets the visibility of the object
+-- @bool visible visibility status
 function Object:SetVisibility(visible)
   if self.visible == visible then
     return
@@ -442,7 +483,7 @@ function Object:SetVisibility(visible)
   self.hidden  = not visible
 end
 
-
+--- Hides the objects
 function Object:Hide()
   local wasHidden = self.hidden
   self:SetVisibility(false)
@@ -451,7 +492,7 @@ function Object:Hide()
   end
 end
 
-
+--- Makes the object visible
 function Object:Show()
   local wasVisible = not self.hidden
   self:SetVisibility(true)
@@ -460,7 +501,7 @@ function Object:Show()
   end
 end
 
-
+--- Toggles object visibility
 function Object:ToggleVisibility()
   self:SetVisibility(not self.visible)
 end
@@ -474,7 +515,7 @@ function Object:SetChildLayer(child,layer)
   if layer < 0 then
     layer = layer + #children + 1
   end
-  
+
   layer = math.min(layer, #children)
 
   --// it isn't at the same pos anymore, search it!
@@ -517,6 +558,9 @@ end
 
 --//=============================================================================
 
+--- Returns a child by name
+-- @string name child name
+-- @treturn Object child
 function Object:GetChildByName(name)
   local cn = self.children
   for i=1,#cn do
@@ -536,7 +580,9 @@ end
 Object.GetChild = Object.GetChildByName
 
 
---// Resursive search to find an object by its name
+--- Resursive search to find an object by its name
+-- @string name name of the object
+-- @treturn Object
 function Object:GetObjectByName(name)
   local r = self.childrenByName[name]
   if r then return r end
@@ -566,14 +612,14 @@ function Object:GetObjectByName(name)
 end
 
 
---// Climbs the family tree and returns the first parent that satisfies a 
+--// Climbs the family tree and returns the first parent that satisfies a
 --// predicate function or inherites the given class.
 --// Returns nil if not found.
 function Object:FindParent(predicate)
   if not self.parent then
     return -- not parent with such class name found, return nil
   elseif (type(predicate) == "string" and (self.parent):InheritsFrom(predicate)) or
-         (type(predicate) == "function" and predicate(self.parent)) then 
+         (type(predicate) == "function" and predicate(self.parent)) then
     return self.parent
   else
     return self.parent:FindParent(predicate)
@@ -773,7 +819,7 @@ function Object:LocalToClient(x,y)
   return x,y
 end
 
--- LocalToScreen does not do what it says it does because 
+-- LocalToScreen does not do what it says it does because
 -- self:LocalToParent(x,y) = 2*self.x, 2*self.y
 -- However, too much chili depends on the current LocalToScreen
 -- so this working version exists for widgets.
@@ -784,12 +830,14 @@ function Object:CorrectlyImplementedLocalToScreen(x,y)
   return (self.parent):ClientToScreen(x,y)
 end
 
+
 function Object:LocalToScreen(x,y)
   if (not self.parent) then
     return x,y
   end
   return (self.parent):ClientToScreen(self:LocalToParent(x,y))
 end
+
 
 function Object:UnscaledLocalToScreen(x,y)
   if (not self.parent) then
@@ -799,12 +847,14 @@ function Object:UnscaledLocalToScreen(x,y)
   return (self.parent):UnscaledClientToScreen(self:LocalToParent(x,y))
 end
 
+
 function Object:ClientToScreen(x,y)
   if (not self.parent) then
     return self:ClientToParent(x,y)
   end
   return (self.parent):ClientToScreen(self:ClientToParent(x,y))
 end
+
 
 function Object:UnscaledClientToScreen(x,y)
   if (not self.parent) then
@@ -859,7 +909,7 @@ end
 
 
 function Object:HitTest(x,y)
-  if not self.disableChildrenHitTest then 
+  if not self.disableChildrenHitTest then
     local children = self.children
     for i=1,#children do
       local c = children[i]
@@ -873,7 +923,7 @@ function Object:HitTest(x,y)
         end
       end
     end
-  end 
+  end
 
   return false
 end
@@ -970,6 +1020,15 @@ function Object:TextInput(...)
 end
 
 
+function Object:TextEditing(...)
+  if (self:CallListeners(self.OnTextEditing, ...)) then
+    return self
+  end
+
+  return false
+end
+
+
 function Object:FocusUpdate(...)
   if (self:CallListeners(self.OnFocusUpdate, ...)) then
     return self
@@ -979,4 +1038,3 @@ function Object:FocusUpdate(...)
 end
 
 --//=============================================================================
-

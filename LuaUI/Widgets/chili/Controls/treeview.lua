@@ -1,19 +1,31 @@
 --//=============================================================================
 
+--- TreeView module
+
+--- TreeView fields.
+-- Inherits from Control.
+-- @see control.Control
+-- @table TreeView
+-- @bool[opt=true] autosize whether size is automatically determined
+-- @int[opt=1] selected selected item
+-- @tparam {TreeNode1,TreeNode2,...} nodes nodes of the tree
+-- @tparam {func1,fun2,...} OnSelectNode function listeners for node selection (default {})
 TreeView = Control:Inherit{
   classname = "treeview",
 
   autosize = true,
 
   minItemHeight = 16,
-
+  labelFontsize = 14,
+  
   defaultWidth  = "100%",
   defaultHeight = "100%",
 
   selected = 1,
   root = nil,
   nodes = {},
-
+  
+  clickTextToToggle = false,
   defaultExpanded = false,
 
   OnSelectNode = {},
@@ -44,8 +56,8 @@ function TreeView:New(obj)
   end
 
   obj = inherited.New(self,obj)
-
-  obj.root = TreeViewNode:New{treeview = obj, root = true; minHeight = obj.minItemHeight; expanded = obj.defaultExpanded}
+  
+  obj.root = TreeViewNode:New{treeview = obj, root = true; minHeight = obj.minItemHeight; expanded = obj.defaultExpanded, clickTextToToggle = obj.clickTextToToggle, labelFontsize = obj.labelFontsize}
   if (nodes) then
     ParseInitTable(obj.root, nodes)
   end

@@ -18,12 +18,12 @@ theme.skin = {
   },
 
   imagelistview = {
-  --  imageFolder      = "luaui/images/folder.png",
-  --  imageFolderUp    = "luaui/images/folder_up.png",
+  --  imageFolder      = LUA_DIRNAME .. "images/folder.png",
+  --  imageFolderUp    = LUA_DIRNAME .. "images/folder_up.png",
   },
 
   icons = {
-  --  imageplaceholder = "luaui/images/placeholder.png",
+  --  imageplaceholder = LUA_DIRNAME .. "images/placeholder.png",
   },
 }
 

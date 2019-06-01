@@ -41,8 +41,11 @@ EditBox = Control:Inherit{
   editable = true,
   selectable = true,
   multiline = false,
+  agressiveMaxLines = false,
+  agressiveMaxLinesPreserve = false,
   subTooltips = false,
-  useIME = true, -- Currently broken, so every text box is set to use IME.
+  useIME = true, -- Disabling is broken, so every text box is set to use IME.
+  useSDLStartTextInput = true,
 
   passwordInput = false,
   lines = {},
@@ -309,6 +312,48 @@ end
 
 -- will automatically wrap into multiple lines if too long
 function EditBox:AddLine(text, tooltips, OnTextClick)
+	if self.agressiveMaxLines and #self.lines > self.agressiveMaxLines then
+		local preserve = {}
+		for i = math.max(1, #self.lines - self.agressiveMaxLinesPreserve), #self.lines do
+			preserve[#preserve + 1] = {self.lines[i].text, self.lines[i].tooltips, self.lines[i].OnTextClick}
+		end
+		self.lines = {}
+		self.physicalLines = {}
+		
+		self.forgetMouseMove = true
+		self.selStart = nil
+		self.selStartY = nil
+		self.selEnd = nil
+		self.selEndY = nil
+		
+		for i = 1, #preserve do
+			local line = {
+				text = preserve[i][1],
+				tooltips = preserve[i][2],
+				OnTextClick = preserve[i][3],
+				pls = {}, -- indexes of physical lines
+			}
+			table.insert(self.lines, line)
+			local lineID = #self.lines
+			self:_GeneratePhysicalLines(lineID)
+		end
+		
+		local line = {
+			text = text,
+			tooltips = tooltips,
+			OnTextClick = OnTextClick,
+			pls = {}, -- indexes of physical lines
+		}
+		table.insert(self.lines, line)
+		local lineID = #self.lines
+		self:_GeneratePhysicalLines(lineID)
+		
+		self._inRequestUpdate = true
+		self:RequestUpdate()
+		self:Invalidate()
+		return
+	end
+	
 	-- add logical line
 	local line = {
 		text = text,
@@ -439,7 +484,7 @@ function EditBox:Update(...)
 end
 
 function EditBox:FocusUpdate(...)
-	if Spring.SDLStartTextInput then
+	if Spring.SDLStartTextInput and self.useSDLStartTextInput then
 		if not self.state.focused then
 			self.textEditing = ""
 			Spring.SDLStopTextInput()
@@ -449,7 +494,7 @@ function EditBox:FocusUpdate(...)
 			Spring.SDLSetTextInputRect(x, y, 30, 1000)
 		end
 	end
-	-- self:InvalidateSelf()
+	self:InvalidateSelf()
 	return inherited.FocusUpdate(self, ...)
 end
 
@@ -561,6 +606,7 @@ end
 
 
 function EditBox:MouseDown(x, y, ...)
+	self.forgetMouseMove = nil
 	-- FIXME: didn't feel like reimplementing Screen:MouseDown to capture MouseClick correctly, so clicking on text items is triggered in MouseDown
 	-- handle clicking on text items
 	local retVal = self:_GetCursorByMousePos(x, y)
@@ -632,6 +678,10 @@ function EditBox:MouseMove(x, y, dx, dy, button)
 		return inherited.MouseMove(self, x, y, dx, dy, button)
 	end
 
+	if self.forgetMouseMove then
+		return self
+	end
+	
 	local _, _, _, shift = Spring.GetModKeyState()
 	local cp, cpy = self.cursor, self.cursorY
 	self:_SetCursorByMousePos(x, y)

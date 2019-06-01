@@ -26,7 +26,7 @@ end
 local _DrawTextureAspect = _DrawTextureAspect
 
 
-function _DrawTiledTexture(x,y,w,h, skLeft,skTop,skRight,skBottom, texw,texh, texIndex)
+function _DrawTiledTexture(x,y,w,h, skLeft,skTop,skRight,skBottom, texw,texh, texIndex, disableTiling)
     texIndex = texIndex or 0
 
     local txLeft   = skLeft/texw
@@ -35,10 +35,11 @@ function _DrawTiledTexture(x,y,w,h, skLeft,skTop,skRight,skBottom, texw,texh, te
     local txBottom = skBottom/texh
 
     --//scale down the texture if we don't have enough space
+
     local scaleY = h/(skTop+skBottom)
     local scaleX = w/(skLeft+skRight)
     local scale = (scaleX < scaleY) and scaleX or scaleY
-    if (scale<1) then
+    if disableTiling or (scale<1) then
       skTop = skTop * scale
       skBottom = skBottom * scale
       skLeft = skLeft * scale
@@ -88,7 +89,7 @@ function _DrawTiledTexture(x,y,w,h, skLeft,skTop,skRight,skBottom, texw,texh, te
     gl.MultiTexCoord(texIndex,0,1-txBottom)
     gl.Vertex(x,    y+h-skBottom)
 
-    --//bottom right
+    --//bottom left
     gl.MultiTexCoord(texIndex,0,1)
     gl.Vertex(x,      y+h)    --//degenerate
     gl.MultiTexCoord(texIndex,txLeft,1-txBottom)
@@ -110,6 +111,191 @@ function _DrawTiledTexture(x,y,w,h, skLeft,skTop,skRight,skBottom, texw,texh, te
 end
 local _DrawTiledTexture = _DrawTiledTexture
 
+
+function _DrawRepeatingTiledTexture(x,y,w,h, skLeft,skTop,skRight,skBottom, texw,texh, texIndex)
+    texIndex = texIndex or 0
+
+    local txLeft   = skLeft/texw
+    local txTop    = skTop/texh
+    local txRight  = skRight/texw
+    local txBottom = skBottom/texh
+
+    --//scale down the texture if we don't have enough space
+
+    local scaleY = h/(skTop+skBottom)
+    local scaleX = w/(skLeft+skRight)
+    local scale = (scaleX < scaleY) and scaleX or scaleY
+    if (scale<1) then
+      skTop = skTop * scale
+      skBottom = skBottom * scale
+      skLeft = skLeft * scale
+      skRight = skRight * scale
+    end
+
+	local horTileWidth = (texw - skLeft - skRight)
+	local widthRepeat = (w - skLeft - skRight)/horTileWidth
+	local horFrac = (1 - txLeft - txRight) *(widthRepeat%1)
+
+	local vertTileWidth = (texh - skTop - skBottom)
+	local heightRepeat = (h - skTop - skBottom)/vertTileWidth
+	local vertFrac = (1 - txTop - txBottom) *(heightRepeat%1)
+
+    --//topleft
+    gl.MultiTexCoord(texIndex,0,0)
+    gl.Vertex(x,      y)
+
+    gl.MultiTexCoord(texIndex,0,txTop)
+    gl.Vertex(x,      y+skTop)
+    gl.MultiTexCoord(texIndex,txLeft,0)
+    gl.Vertex(x+skLeft, y)
+    gl.MultiTexCoord(texIndex,txLeft,txTop)
+    gl.Vertex(x+skLeft, y+skTop)
+
+    --//topcenter
+	for i = 1, widthRepeat do
+		gl.MultiTexCoord(texIndex, 1-txRight, 0)
+		gl.Vertex(x + skLeft + i*horTileWidth, y)
+		gl.MultiTexCoord(texIndex, 1-txRight, txTop)
+		gl.Vertex(x + skLeft + i*horTileWidth, y+skTop)
+
+		-- Highly degenerate :(
+		gl.MultiTexCoord(texIndex, 1-txRight, txTop)
+		gl.Vertex(x + skLeft + i*horTileWidth, y+skTop)
+		gl.MultiTexCoord(texIndex, txLeft, 0)
+		gl.Vertex(x + skLeft + i*horTileWidth, y)
+		gl.MultiTexCoord(texIndex, txLeft, txTop)
+		gl.Vertex(x + skLeft + i*horTileWidth, y+skTop)
+	end
+
+    gl.MultiTexCoord(texIndex,txLeft + horFrac,0)
+    gl.Vertex(x+w-skRight, y)
+    gl.MultiTexCoord(texIndex,txLeft + horFrac,txTop)
+    gl.Vertex(x+w-skRight, y+skTop)
+
+	-- Highly degenerate :(
+    gl.MultiTexCoord(texIndex,txLeft + horFrac,txTop)
+    gl.Vertex(x+w-skRight, y+skTop)
+	gl.MultiTexCoord(texIndex,1 - txLeft,0)
+    gl.Vertex(x+w-skRight, y)
+    gl.MultiTexCoord(texIndex,1 - txLeft,txTop)
+    gl.Vertex(x+w-skRight, y+skTop)
+
+    --//topright
+    gl.MultiTexCoord(texIndex,1,0)
+    gl.Vertex(x+w,       y)
+    gl.MultiTexCoord(texIndex,1,txTop)
+    gl.Vertex(x+w,       y+skTop)
+
+    --//right center
+    gl.MultiTexCoord(texIndex,1,txTop)
+    gl.Vertex(x+w,       y+skTop)
+    gl.MultiTexCoord(texIndex,1 - txRight, txTop)
+    gl.Vertex(x+w - skRight,       y+skTop)    --//degenerate
+
+	for i = 1, heightRepeat do
+		gl.MultiTexCoord(texIndex,1,1-txBottom)
+		gl.Vertex(x + w, y + skTop + i*vertTileWidth)
+		gl.MultiTexCoord(texIndex,1-txRight,1-txBottom)
+		gl.Vertex(x + w - skRight, y + skTop + i*vertTileWidth)
+
+		-- Highly degenerate :(
+		gl.MultiTexCoord(texIndex,1-txRight,1-txBottom)
+		gl.Vertex(x + w - skRight, y + skTop + i*vertTileWidth)
+		gl.MultiTexCoord(texIndex,1,txTop)
+		gl.Vertex(x + w, y + skTop + i*vertTileWidth)
+		gl.MultiTexCoord(texIndex,1 - txRight,txTop)
+		gl.Vertex(x + w - skRight, y + skTop + i*vertTileWidth)
+	end
+
+    gl.MultiTexCoord(texIndex,1, txTop + vertFrac)
+    gl.Vertex(x+w, y + h - skBottom)
+    gl.MultiTexCoord(texIndex,1 - txRight, txTop + vertFrac)
+    gl.Vertex(x+w-skRight, y + h - skBottom)
+
+	-- Highly degenerate :(
+    gl.MultiTexCoord(texIndex,1 - txRight, txTop + vertFrac)
+    gl.Vertex(x+w-skRight, y + h - skBottom)
+    gl.MultiTexCoord(texIndex,1 - txRight, txTop)
+    gl.Vertex(x+w-skRight, y+skTop)
+
+    --//background
+    gl.MultiTexCoord(texIndex,txLeft, 1 - txBottom)
+    gl.Vertex(x+skLeft,    y + h - skBottom)
+    gl.MultiTexCoord(texIndex,txLeft,txTop)
+    gl.Vertex(x+skLeft,    y+skTop)
+
+    --//left center
+    gl.MultiTexCoord(texIndex,txLeft,txTop)
+    gl.Vertex(x+skLeft,    y+skTop)
+
+    gl.MultiTexCoord(texIndex,0,txTop)
+    gl.Vertex(x,       y+skTop)
+
+	for i = 1, heightRepeat do
+		gl.MultiTexCoord(texIndex, txLeft, 1 - txBottom)
+		gl.Vertex(x + skLeft, y + skTop + i*vertTileWidth)
+		gl.MultiTexCoord(texIndex, 0 , 1 - txBottom)
+		gl.Vertex(x, y + skTop + i*vertTileWidth)
+
+		-- Highly degenerate :(
+		gl.MultiTexCoord(texIndex, 0 , 1 - txBottom)
+		gl.Vertex(x, y + skTop + i*vertTileWidth)
+		gl.MultiTexCoord(texIndex,txLeft,txTop)
+		gl.Vertex(x + skLeft, y + skTop + i*vertTileWidth)
+		gl.MultiTexCoord(texIndex,0,txTop)
+		gl.Vertex(x, y + skTop + i*vertTileWidth)
+	end
+
+    gl.MultiTexCoord(texIndex, txLeft, txTop + vertFrac)
+    gl.Vertex(x+skLeft, y + h - skBottom)
+    gl.MultiTexCoord(texIndex, 0, txTop + vertFrac)
+    gl.Vertex(x, y + h - skBottom)
+
+    gl.MultiTexCoord(texIndex, 0, 1 - txBottom)
+    gl.Vertex(x, y + h - skBottom)
+
+    --//bottom left
+    gl.MultiTexCoord(texIndex,0,1)
+    gl.Vertex(x,      y+h)    --//degenerate
+    gl.MultiTexCoord(texIndex,txLeft,1-txBottom)
+    gl.Vertex(x+skLeft, y+h-skBottom)
+    gl.MultiTexCoord(texIndex,txLeft,1)
+    gl.Vertex(x+skLeft, y+h)
+
+    --//bottom center
+	for i = 1, widthRepeat do
+		gl.MultiTexCoord(texIndex, 1-txRight, 1 - txBottom)
+		gl.Vertex(x + skLeft + i*horTileWidth, y + h - skBottom)
+		gl.MultiTexCoord(texIndex, 1-txRight, 1)
+		gl.Vertex(x + skLeft + i*horTileWidth, y + h)
+
+		-- Highly degenerate :(
+		gl.MultiTexCoord(texIndex, 1-txRight, 1)
+		gl.Vertex(x + skLeft + i*horTileWidth, y + h)
+		gl.MultiTexCoord(texIndex, txLeft, 1 - txBottom)
+		gl.Vertex(x + skLeft + i*horTileWidth, y + h - skBottom)
+		gl.MultiTexCoord(texIndex, txLeft, 1)
+		gl.Vertex(x + skLeft + i*horTileWidth, y + h)
+	end
+
+    gl.MultiTexCoord(texIndex,txLeft + horFrac, 1 - txBottom)
+    gl.Vertex(x+w-skRight, y + h - skBottom)
+    gl.MultiTexCoord(texIndex,txLeft + horFrac, 1)
+    gl.Vertex(x+w-skRight, y + h)
+
+	-- Highly degenerate :(
+	gl.MultiTexCoord(texIndex,1 - txLeft, 1 - txBottom)
+    gl.Vertex(x+w-skRight, y + h - skBottom)
+    gl.MultiTexCoord(texIndex,1 - txLeft, 1)
+    gl.Vertex(x+w-skRight, y + h)
+
+    --//bottom right
+    gl.MultiTexCoord(texIndex,1,1-txBottom)
+    gl.Vertex(x+w, y+h-skBottom)
+    gl.MultiTexCoord(texIndex,1,1)
+    gl.Vertex(x+w, y+h)
+end
+local _DrawRepeatingTiledTexture = _DrawRepeatingTiledTexture
 
 function _DrawTiledBorder(x,y,w,h, skLeft,skTop,skRight,skBottom, texw,texh, texIndex)
   texIndex = texIndex or 0
@@ -195,8 +381,8 @@ local _DrawTiledBorder = _DrawTiledBorder
 
 
 local function _DrawDragGrip(obj)
-  local x = obj.x + 13
-  local y = obj.y + 8
+  local x = 13
+  local y = 8
   local w = obj.dragGripSize[1]
   local h = obj.dragGripSize[2]
 
@@ -223,8 +409,8 @@ end
 
 local function _DrawResizeGrip(obj)
   if (obj.resizable) then
-    local x = obj.x
-    local y = obj.y
+    local x = 0
+    local y = 0
 
     local resizeBox = GetRelativeObjBox(obj,obj.boxes.resize)
 
@@ -272,8 +458,6 @@ end
 --//
 
 function DrawWindow(obj)
-  local x = obj.x
-  local y = obj.y
   local w = obj.width
   local h = obj.height
 
@@ -289,11 +473,35 @@ function DrawWindow(obj)
     local texInfo = gl.TextureInfo(obj.TileImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    obj.font:Print(obj.caption, x+w*0.5, y+9, "center")
+    obj.font:Print(obj.caption, w*0.5, 9, "center")
+  end
+end
+
+function DrawRepeatingTiledWindow(obj)
+  local w = obj.width
+  local h = obj.height
+
+  local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
+
+  local c = obj.color
+  if (c) then
+    gl.Color(c)
+  else
+    gl.Color(1,1,1,1)
+  end
+  TextureHandler.LoadTexture(0,obj.TileImage,obj)
+    local texInfo = gl.TextureInfo(obj.TileImage) or {xsize=1, ysize=1}
+    local tw,th = texInfo.xsize, texInfo.ysize
+
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawRepeatingTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th)
+  gl.Texture(0,false)
+
+  if (obj.caption) then
+    obj.font:Print(obj.caption, w*0.5, 9, "center")
   end
 end
 
@@ -301,8 +509,8 @@ end
 --//
 
 function DrawButton(obj)
-  local x = obj.x
-  local y = obj.y
+  if obj.debug then Spring.Echo("DrawButton", obj.name, obj.state.pressed) end
+
   local w = obj.width
   local h = obj.height
 
@@ -323,7 +531,7 @@ function DrawButton(obj)
     local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0, obj.disableTiling)
   --gl.Texture(0,false)
 
   local fgcolor = obj.borderColor
@@ -340,11 +548,11 @@ function DrawButton(obj)
     local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0, obj.disableTiling)
   gl.Texture(0,false)
 
   if (obj.caption) then
-    obj.font:Print(obj.caption, x + w*0.5, y + math.floor(h*0.5 - obj.font.size*0.35), "center", "linecenter")
+    obj.font:Print(obj.caption, w*0.5 + (obj.captionHorAlign or 0), math.floor(h*0.5 - obj.font.size*0.35) + (obj.captionAlign or 0), "center", "linecenter")
   end
 end
 
@@ -360,16 +568,13 @@ function DrawComboBox(self)
 	TextureHandler.LoadTexture(0,self.TileImageArrow,self)
 		local texInfo = gl.TextureInfo(self.TileImageArrow) or {xsize=1, ysize=1}
 		local tw,th = texInfo.xsize, texInfo.ysize
-		_DrawTextureAspect(self.x + self.width - self.padding[3], self.y, self.padding[3], self.height, tw,th)
+		_DrawTextureAspect(self.width - self.padding[3], 0, self.padding[3], self.height, tw,th)
 	gl.Texture(0,false)
 end
-
 
 function DrawEditBox(obj)
 	local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
-	gl.Translate(obj.x, obj.y, 0) -- Remove with new chili, does translates for us.
-	
 	gl.Color(obj.backgroundColor)
 	TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
 	local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
@@ -389,38 +594,51 @@ function DrawEditBox(obj)
 	gl.Texture(0,false)
 
 	local text = obj.text and tostring(obj.text)
+    if text and obj.textEditing then
+        text = text .. obj.textEditing
+    end
 	local font = obj.font
 	local displayHint = false
-	
+
 	if text == "" and not obj.state.focused then
-		text = obj.hint		
+		text = obj.hint
 		displayHint = true
 		font = obj.hintFont
 	end
-	
+
 	if (text) then
-        if obj.passwordInput and not displayHint then 
+        if obj.passwordInput and not displayHint then
             text = string.rep("*", #text)
         end
 
-		if (obj.offset > obj.cursor) and not obj.multiline then
-			obj.offset = obj.cursor
+        local cursor = obj.cursor
+        if obj.textEditing then
+            cursor = cursor + #obj.textEditing
+        end
+		if (obj.offset > cursor) and not obj.multiline then
+			obj.offset = cursor
 		end
 
 		local clientX,clientY,clientWidth,clientHeight = unpack4(obj.clientArea)
 
-		--// make cursor pos always visible (when text is longer than editbox!)
 		if not obj.multiline then
+			--// make cursor pos always visible (when text is longer than editbox!)
 			repeat
-				local txt = text:sub(obj.offset, obj.cursor)
+				local txt = text:sub(obj.offset, cursor)
 				local wt = font:GetTextWidth(txt)
-				if (wt <= clientWidth) then
-					break
-				end
-				if (obj.offset >= obj.cursor) then
+				if wt <= clientWidth or obj.offset >= cursor then
 					break
 				end
 				obj.offset = obj.offset + 1
+			until (false)
+			--// but also automatically always show the maximum amount of text (scroll left on deletion)
+			repeat
+				local txt = text:sub(obj.offset-1)
+				local wt = font:GetTextWidth(txt)
+				if wt > clientWidth or obj.offset < 1 then
+					break
+				end
+				obj.offset = obj.offset - 1
 			until (false)
 		end
 
@@ -439,18 +657,20 @@ function DrawEditBox(obj)
 
 		gl.Color(1,1,1,1)
 		if obj.multiline then
-			
+
 			if obj.parent and obj.parent:InheritsFrom("scrollpanel") then
 				local scrollPosY = obj.parent.scrollPosY
 				local scrollHeight = obj.parent.clientArea[4]
-				
+
 				local h, d, numLines = obj.font:GetTextHeight(tostring(obj.text));
 				local minDrawY = scrollPosY - (h or 0)
 				local maxDrawY = scrollPosY + scrollHeight + (h or 0)
-				
+
 				for _, line in pairs(obj.physicalLines) do
-					local drawPos = clientY + line.y
-					if drawPos > minDrawY and drawPos < maxDrawY then
+					-- FIXME: figure out why clientY is always 0 (at least for all planetwars textboxes)
+					--local drawPos = clientY + line.y
+					local drawPos = obj.y + line.y
+					if (drawPos > minDrawY and drawPos < maxDrawY) or obj.useRTT then
 						font:Draw(line.text, clientX, clientY + line.y)
 					end
 				end
@@ -459,13 +679,13 @@ function DrawEditBox(obj)
 					font:Draw(line.text, clientX, clientY + line.y)
 				end
 			end
-		
+
 		else
 			font:DrawInBox(txt, clientX, clientY, clientWidth, clientHeight, obj.align, obj.valign)
 		end
 
 		if obj.state.focused and obj.editable then
-			local cursorTxt = text:sub(obj.offset, obj.cursor - 1)
+			local cursorTxt = text:sub(obj.offset, cursor - 1)
 			local cursorX = font:GetTextWidth(cursorTxt)
 
 			local dt = Spring.DiffTimers(Spring.GetTimer(), obj._interactedTime)
@@ -486,12 +706,12 @@ function DrawEditBox(obj)
 					ac = 0
 				end
 				alpha = as + ac
-				if (alpha > 1) then 
+				if (alpha > 1) then
 					alpha = 1
 				end
 				alpha = 0.8 * alpha
 			end
-			
+
 			local cc = obj.cursorColor
 			gl.Color(cc[1], cc[2], cc[3], cc[4] * alpha)
 			gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawCursor, cursorX + clientX - 1, clientY, 3, clientHeight)
@@ -502,10 +722,15 @@ function DrawEditBox(obj)
 
 			local top, bottom = obj.selStartPhysicalY, obj.selEndPhysicalY
 			local left, right = obj.selStartPhysical,  obj.selEndPhysical
-			if obj.multiline and top > bottom then
-                top, bottom = bottom, top
-				left, right = right, left
-            elseif top == bottom and left > right then
+
+            if obj.multiline then
+                if top > bottom then
+                    top, bottom = bottom, top
+                    left, right = right, left
+                elseif top == bottom and left > right then
+                    left, right = right, left
+                end
+            elseif left > right then
                 left, right = right, left
             end
 
@@ -544,16 +769,12 @@ function DrawEditBox(obj)
 			end
         end
 	end
-	
-	gl.Translate(-obj.x, -obj.y, 0) -- Remove with new chili, does translates for us.
 end
 
 --//=============================================================================
 --//
 
 function DrawPanel(obj)
-  local x = obj.x
-  local y = obj.y
   local w = obj.width
   local h = obj.height
 
@@ -564,7 +785,7 @@ function DrawPanel(obj)
     local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
   gl.Color(obj.borderColor)
@@ -572,7 +793,7 @@ function DrawPanel(obj)
     local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   gl.Texture(0,false)
 end
 
@@ -629,7 +850,7 @@ function DrawScrollPanelBorder(self)
       end
 
       gl.Color(self.borderColor)
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledBorder, self.x,self.y,width,height, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledBorder, 0,0,width,height, skLeft,skTop,skRight,skBottom, tw,th, 0)
       gl.Texture(0,false)
   end
 end
@@ -658,13 +879,13 @@ function DrawScrollPanel(obj)
       end
 
       gl.Color(obj.backgroundColor)
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, obj.x,obj.y,width,height, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,width,height, skLeft,skTop,skRight,skBottom, tw,th, 0)
       gl.Texture(0,false)
   end
 
   if obj._vscrollbar then
-    local x = obj.x + obj.width - obj.scrollbarSize
-    local y = obj.y
+    local x = obj.width - obj.scrollbarSize
+    local y = 0
     local w = obj.scrollbarSize
     local h = obj.height --FIXME what if hscrollbar is visible
     if (obj._hscrollbar) then
@@ -703,10 +924,10 @@ function DrawScrollPanel(obj)
   end
 
   if obj._hscrollbar then
-    gl.Color(1,1,1,1)  
+    gl.Color(1,1,1,1)
 
-    local x = obj.x
-    local y = obj.y + obj.height - obj.scrollbarSize
+    local x = 0
+    local y = obj.height - obj.scrollbarSize
     local w = obj.width
     local h = obj.scrollbarSize
     if (obj._vscrollbar) then
@@ -751,8 +972,8 @@ end
 function DrawCheckbox(obj)
   local boxSize = obj.boxsize
 
-  local x = obj.x + obj.width      - boxSize
-  local y = obj.y + obj.height*0.5 - boxSize*0.5
+  local x = obj.width      - boxSize
+  local y = obj.height*0.5 - boxSize*0.5
   local w = boxSize
   local h = boxSize
 
@@ -760,7 +981,7 @@ function DrawCheckbox(obj)
   local ty = obj.height * 0.5 --// verticale center
 
   if obj.boxalign == "left" then
-    x  = obj.x
+    x  = 0
     tx = boxSize + 2
   end
 
@@ -790,7 +1011,7 @@ function DrawCheckbox(obj)
 
   gl.Color(1,1,1,1)
   if (obj.caption) then
-    obj.font:Print(obj.caption, obj.x + tx, obj.y + ty  - obj.font.size*0.35, nil, "linecenter")
+    obj.font:Print(obj.caption, tx, ty - obj.font.size*0.35, nil, "linecenter")
   end
 end
 
@@ -798,11 +1019,11 @@ end
 --//
 
 function DrawProgressbar(obj)
-  local x = obj.x
-  local y = obj.y
+  local x = 0
+  local y = 0
   local w = obj.width
   local h = obj.height
-  
+
   local percent = (obj.value-obj.min)/(obj.max-obj.min)
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
@@ -813,7 +1034,7 @@ function DrawProgressbar(obj)
     local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
     --gl.Texture(0,false)
   end
 
@@ -849,8 +1070,6 @@ end
 
 function DrawTrackbar(self)
   local percent = self:_GetPercent()
-  local x = self.x
-  local y = self.y
   local w = self.width
   local h = self.height
 
@@ -862,7 +1081,7 @@ function DrawTrackbar(self)
     TextureHandler.LoadTexture(0,self.TileImage,self)
     local texInfo = gl.TextureInfo(self.TileImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   end
     
   if not self.noDrawStep then
@@ -896,9 +1115,9 @@ function DrawTrackbar(self)
       end
       stepWidth = newStepWidth
 
-      local my = y+h*0.5
-      local mx = x+pdLeft+stepWidth
-      while (mx<(x+pdLeft+barWidth)) do
+      local my = h*0.5
+      local mx = pdLeft+stepWidth
+      while (mx<(pdLeft+barWidth)) do
         gl.TexRect(math.ceil(mx-tw*0.5),math.ceil(my-th*0.5),math.ceil(mx+tw*0.5),math.ceil(my+th*0.5),false,true)
         mx = mx+stepWidth
       end
@@ -921,8 +1140,8 @@ function DrawTrackbar(self)
     th = h
 
     local barWidth = w - (pdLeft + pdRight)
-    local mx = x + pdLeft + barWidth * percent
-    local my = y + h * 0.5
+    local mx = pdLeft + barWidth * percent
+    local my = h * 0.5
     mx = math.floor(mx - tw * 0.5)
     my = math.floor(my - th * 0.5)
     gl.TexRect(mx, my, mx + tw, my + th, false, true)
@@ -936,8 +1155,8 @@ end
 
 function DrawTreeviewNode(self)
   if CompareLinks(self.treeview.selected,self) then
-    local x = self.x + self.clientArea[1]
-    local y = self.y
+    local x = self.clientArea[1]
+    local y = 0
     local w = self.children[1].width
     local h = self.clientArea[2] + self.children[1].height
 
@@ -948,7 +1167,7 @@ function DrawTreeviewNode(self)
       local texInfo = gl.TextureInfo(self.treeview.ImageNodeSelected) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
 
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
     gl.Texture(0,false)
   end
 end
@@ -985,11 +1204,11 @@ end
 
 
 function DrawTreeviewNodeTree(self)
-  local x1 = self.x + math.ceil(self.padding[1]*0.5)
-  local x2 = self.x + self.padding[1]
-  local y1 = self.y
-  local y2 = self.y + self.height
-  local y3 = self.y + self.padding[2] + math.ceil(self.children[1].height*0.5)
+  local x1 = math.ceil(self.padding[1]*0.5)
+  local x2 = self.padding[1]
+  local y1 = 0
+  local y2 = self.height
+  local y3 = self.padding[2] + math.ceil(self.children[1].height*0.5)
 
   if (self.parent)and(CompareLinks(self,self.parent.nodes[#self.parent.nodes])) then
     y2 = y3
@@ -1012,7 +1231,7 @@ function DrawTreeviewNodeTree(self)
   local texInfo = gl.TextureInfo(image) or {xsize=1, ysize=1}
   local tw,th = texInfo.xsize, texInfo.ysize
 
-  _DrawTextureAspect(self.x,self.y,math.ceil(self.padding[1]),math.ceil(self.children[1].height) ,tw,th)
+  _DrawTextureAspect(0,0,math.ceil(self.padding[1]),math.ceil(self.children[1].height) ,tw,th)
   gl.Texture(0,false)
 end
 
@@ -1028,23 +1247,30 @@ function DrawLine(self)
       TextureHandler.LoadTexture(0,self.TileImageV,self)
         local texInfo = gl.TextureInfo(self.TileImageV) or {xsize=1, ysize=1}
         local tw,th = texInfo.xsize, texInfo.ysize
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, self.x + self.width * 0.5 - 2, self.y, 4, self.height, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, self.width * 0.5 - 2, 0, 4, self.height, skLeft,skTop,skRight,skBottom, tw,th, 0)
     else
       local skLeft,skTop,skRight,skBottom = unpack4(self.tiles)
       TextureHandler.LoadTexture(0,self.TileImage,self)
         local texInfo = gl.TextureInfo(self.TileImage) or {xsize=1, ysize=1}
         local tw,th = texInfo.xsize, texInfo.ysize
-      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, self.x, self.y + self.height * 0.5 - 2, self.width, 4, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, self.height * 0.5 - 2, self.width, 4, skLeft,skTop,skRight,skBottom, tw,th, 0)
     end
 
   gl.Texture(0,false)
+
+  if (self.debug) then
+    gl.Color(0,1,0,0.5)
+    gl.PolygonMode(GL.FRONT_AND_BACK,GL.LINE)
+    gl.LineWidth(2)
+    gl.Rect(0,0,self.width,self.height)
+    gl.LineWidth(1)
+    gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
+  end
 end
 --//=============================================================================
 --//
 
 function DrawTabBarItem(obj)
-  local x = obj.x
-  local y = obj.y
   local w = obj.width
   local h = obj.height
 
@@ -1063,7 +1289,7 @@ function DrawTabBarItem(obj)
     local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
   if (obj.state.pressed) then
@@ -1078,17 +1304,17 @@ function DrawTabBarItem(obj)
     local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   gl.Texture(0,false)
 
   if (obj.caption) then
     local cx,cy,cw,ch = unpack4(obj.clientArea)
-    obj.font:DrawInBox(obj.caption, x + cx, y + cy, cw, ch, "center", "center")
+    obj.font:DrawInBox(obj.caption, cx, cy, cw, ch, "center", "center")
   end
 end
 
 --//=============================================================================
---// 
+--//
 
 function DrawDragGrip(obj)
   gl.BeginEnd(GL.TRIANGLES, _DrawDragGrip, obj)
