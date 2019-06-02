@@ -11,19 +11,17 @@ local function SunChanged(curShaderObj)
 end
 
 local materials = {
-	feature_fallback = {
+	feature_metal = {
 		shaderDefinitions = {
 			"#define deferred_mode 0",
-			"#define SPECULARSUNEXP 4.0",
-			"#define SPECULARMULT 1.0",
+			"#define SPECULARBIAS 0.25",
 			"#define SHADOW_SOFTNESS SHADOW_HARD",
 		},
 		deferredDefinitions = {
 			"#define deferred_mode 1",
-			"#define SPECULARSUNEXP 4.0",
-			"#define SPECULARMULT 1.0",
+			"#define SPECULARBIAS 0.25",
 			"#define SHADOW_SOFTNESS SHADOW_HARD",
-			"#define MAT_IDX 255",
+			"#define MAT_IDX 130",
 		},
 		force     = false, --// always use the shader even when normalmapping is disabled
 		feature   = true, --// This is used to define that this is a feature shader
@@ -49,8 +47,8 @@ local featureMaterials = {}
 
 for id = 1, #FeatureDefs do
 	local fdef = FeatureDefs[id]
-	if not cusFeatureMaterials[id] then
-		featureMaterials[id] = {"feature_fallback"}
+	if not cusFeatureMaterials[id] and fdef.metal > 1.0 then
+		featureMaterials[id] = {"feature_metal"}
 	end
 end
 

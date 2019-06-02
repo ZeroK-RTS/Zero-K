@@ -150,6 +150,10 @@ fragment = [[
 		#define SPECULARMULT 4.0
 	#endif
 
+	#ifndef SPECULARBIAS
+		#define SPECULARBIAS 0.0
+	#endif
+
 	#ifndef MAT_IDX
 		#define MAT_IDX 0
 	#endif
@@ -332,7 +336,7 @@ fragment = [[
 		float HdotN = max(dot(H, N), 0.0);
 		specularColor = sunSpecular * pow(HdotN, SPECULARSUNEXP);
 
-		specularColor *= extraColor.g * SPECULARMULT;
+		specularColor *= SPECULARBIAS + extraColor.g * SPECULARMULT;
 
 		vec3 reflection = texture(reflectTex,  Rv).rgb;
 
