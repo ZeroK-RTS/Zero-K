@@ -33,15 +33,19 @@ local AVG_FPS_ELASTICITY = 0.2
 local AVG_FPS_ELASTICITY_INV = 1.0 - AVG_FPS_ELASTICITY
 ]]--
 
-local DILATE_SINGLE_PASS = false --true is slower on my system
-local DILATE_HALF_KERNEL_SIZE = 3
-local DILATE_PASSES = 1
+local DILATE_HALF_KERNEL_SIZE_MAX = 1
+local DILATE_HALF_KERNEL_SIZE_MIN = 0 --should almost always be 0 for plausing visuals
 
-local OUTLINE_ZOOM_SCALE = true
-local OUTLINE_COLOR = {0.75, 0.75, 0.75, 1.0}
---local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
+local DILATE_SINGLE_PASS = DILATE_HALF_KERNEL_SIZE_MAX < 2 -- single pass should be faster for smaller kernels
+local DILATE_PASSES = 1 -- I think .... do not change it
+
+local OUTLINE_ZOOM_SCALE = true -- mix between DILATE_HALF_KERNEL_SIZE_MAX and DILATE_HALF_KERNEL_SIZE_MIN depending on zoom
 local OUTLINE_STRENGTH_BLENDED = 1.0
 local OUTLINE_STRENGTH_ALWAYS_ON = 0.6
+
+--local OUTLINE_COLOR = {0.9, 0.9, 0.9, 1.0}
+local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
+
 
 local USE_MATERIAL_INDICES = true -- for future material indices based outline evaluation
 
@@ -84,8 +88,20 @@ local pingPongIdx = 1
 -----------------------------------------------------------------
 -- Local Functions
 -----------------------------------------------------------------
+local function linestep(edge0, edge1, x)
+	local t = math.min(math.max((x - edge0) / (edge1 - edge0), 0.0), 1.0)
+	return t
+end
 
-local function GetZoomScale()
+local function mix(x, y, a)
+	return x * (1.0 - a) + y * a
+end
+
+local function round(x)
+	return math.floor(x + 0.5)
+end
+
+local function GetZoomScaleHalfKernel()
 	local cs = Spring.GetCameraState()
 	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
 	local cameraHeight
@@ -94,11 +110,10 @@ local function GetZoomScale()
 	else
 		cameraHeight = cs.py - gy
 	end
-	cameraHeight = math.max(1.0, cameraHeight)
-	local scaleFactor = 250.0 / cameraHeight
-	scaleFactor = math.min(math.max(0.5, scaleFactor), 1.0)
-	--Spring.Echo(cameraHeight, scaleFactor)
-	return scaleFactor
+	cameraHeight = math.max(0.0, cameraHeight)
+	local scaleFactor = 1.0 - linestep(300.0, 2000.0, cameraHeight)
+	--Spring.Echo(cameraHeight, scaleFactor, round( mix(DILATE_HALF_KERNEL_SIZE_MIN, DILATE_HALF_KERNEL_SIZE_MAX, scaleFactor) ))
+	return round( mix(DILATE_HALF_KERNEL_SIZE_MIN, DILATE_HALF_KERNEL_SIZE_MAX, scaleFactor) )
 end
 
 local show = true
@@ -134,9 +149,8 @@ local function PrepareOutline(cleanState)
 	for i = 1, DILATE_PASSES do
 		dilationShader:ActivateWith( function ()
 			if OUTLINE_ZOOM_SCALE then
-				strength = GetZoomScale()
+				dilationShader:SetUniformInt("dilateHalfKernelSize", GetZoomScaleHalfKernel())
 			end
-			dilationShader:SetUniformFloat("strength", strength)
 
 			if DILATE_SINGLE_PASS then
 				pingPongIdx = (pingPongIdx + 1) % 2
@@ -318,7 +332,6 @@ function widget:Initialize()
 
 	local dilationShaderFrag = VFS.LoadFile(shadersDir.."outlineDilate.frag.glsl")
 	dilationShaderFrag = dilationShaderFrag:gsub("###DILATE_SINGLE_PASS###", tostring((DILATE_SINGLE_PASS and 1) or 0))
-	dilationShaderFrag = dilationShaderFrag:gsub("###DILATE_HALF_KERNEL_SIZE###", tostring(DILATE_HALF_KERNEL_SIZE))
 
 	dilationShader = LuaShader({
 		vertex = identityShaderVert,
@@ -326,6 +339,7 @@ function widget:Initialize()
 		uniformInt = {
 			depthTex = 0,
 			colorTex = 1,
+			dilateHalfKernelSize = DILATE_HALF_KERNEL_SIZE,
 		},
 		uniformFloat = {
 			viewPortSize = {vsx, vsy},
