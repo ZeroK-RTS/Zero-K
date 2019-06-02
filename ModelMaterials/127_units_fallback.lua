@@ -14,7 +14,7 @@ local materials = {
 	unitsFallback = {
 		shaderDefinitions = {
 			"#define deferred_mode 0",
-			"#define SHADOW_SOFTNESS SHADOW_SOFT",
+			"#define SHADOW_SOFTNESS SHADOW_SOFTER",
 		},
 		deferredDefinitions = {
 			"#define deferred_mode 1",

@@ -164,7 +164,7 @@ fragment = [[
 	#define SHADOW_SOFTEST 3
 
 	#ifndef SHADOW_SOFTNESS
-		#define SHADOW_SOFTNESS SHADOW_SOFT
+		#define SHADOW_SOFTNESS SHADOW_HARD
 	#endif
 
 	#if (SHADOW_SOFTNESS == SHADOW_HARD)
@@ -172,21 +172,21 @@ fragment = [[
 	#endif
 
 	#if (SHADOW_SOFTNESS == SHADOW_SOFT)
-		#define SHADOW_SAMPLES 2 // number of shadowmap samples per fragment
-		#define SHADOW_RANDOMNESS 0.4 // 0.0 - blocky look, 1.0 - random points look
-		#define SHADOW_SAMPLING_DISTANCE 2.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
+		#define SHADOW_SAMPLES 3 // number of shadowmap samples per fragment
+		#define SHADOW_RANDOMNESS 1.0 // 0.0 - blocky look, 1.0 - random points look
+		#define SHADOW_SAMPLING_DISTANCE 1.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
 	#endif
 
 	#if (SHADOW_SOFTNESS == SHADOW_SOFTER)
-		#define SHADOW_SAMPLES 5 // number of shadowmap samples per fragment
+		#define SHADOW_SAMPLES 6 // number of shadowmap samples per fragment
 		#define SHADOW_RANDOMNESS 0.4 // 0.0 - blocky look, 1.0 - random points look
-		#define SHADOW_SAMPLING_DISTANCE 1.5 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
+		#define SHADOW_SAMPLING_DISTANCE 2.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
 	#endif
 
 	#if (SHADOW_SOFTNESS == SHADOW_SOFTEST)
 		#define SHADOW_SAMPLES 8 // number of shadowmap samples per fragment
 		#define SHADOW_RANDOMNESS 0.4 // 0.0 - blocky look, 1.0 - random points look
-		#define SHADOW_SAMPLING_DISTANCE 1.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
+		#define SHADOW_SAMPLING_DISTANCE 2.5 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
 	#endif
 
 	#ifdef use_shadows
@@ -255,44 +255,64 @@ fragment = [[
 		return fract((p3.x + p3.y) * p3.z);
 	}
 
-	float hash12S(vec2 p) {
-		const float HASHSCALE1 = 443.8975;
-		vec3 p3  = fract(vec3(p.xyx) * HASHSCALE1);
-		p3 += dot(p3, p3.yzx + 19.19);
-		return fract((p3.x + p3.y) * p3.z);
-	}
+	float Perlin2D(vec2 P) {
+		//  https://github.com/BrianSharpe/Wombat/blob/master/Perlin2D.glsl
 
-	float noise(vec2 x) {
-		vec2 i = floor(x);
-		vec2 f = fract(x);
+		// establish our grid cell and unit position
+		vec2 Pi = floor(P);
+		vec4 Pf_Pfmin1 = P.xyxy - vec4( Pi, Pi + 1.0 );
 
-		// Four corners in 2D of a tile
-		float a = hash12S(i);
-		float b = hash12S(i + vec2(1.0, 0.0));
-		float c = hash12S(i + vec2(0.0, 1.0));
-		float d = hash12S(i + vec2(1.0, 1.0));
+		// calculate the hash
+		vec4 Pt = vec4( Pi.xy, Pi.xy + 1.0 );
+		Pt = Pt - floor(Pt * ( 1.0 / 71.0 )) * 71.0;
+		Pt += vec2( 26.0, 161.0 ).xyxy;
+		Pt *= Pt;
+		Pt = Pt.xzxz * Pt.yyww;
+		vec4 hash_x = fract( Pt * ( 1.0 / 951.135664 ) );
+		vec4 hash_y = fract( Pt * ( 1.0 / 642.949883 ) );
 
-		// Simple 2D lerp using smoothstep envelope between the values.
-		// return vec3(mix(mix(a, b, smoothstep(0.0, 1.0, f.x)),
-		//			mix(c, d, smoothstep(0.0, 1.0, f.x)),
-		//			smoothstep(0.0, 1.0, f.y)));
+		// calculate the gradient results
+		vec4 grad_x = hash_x - 0.49999;
+		vec4 grad_y = hash_y - 0.49999;
+		vec4 grad_results = inversesqrt( grad_x * grad_x + grad_y * grad_y ) * ( grad_x * Pf_Pfmin1.xzxz + grad_y * Pf_Pfmin1.yyww );
 
-		// Same code, with the clamps in smoothstep and common subexpressions
-		// optimized away.
-		vec2 u = f * f * (3.0 - 2.0 * f);
-		return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+		// Classic Perlin Interpolation
+		grad_results *= 1.4142135623730950488016887242097;  // scale things to a strict -1.0->1.0 range  *= 1.0/sqrt(0.5)
+		vec2 blend = Pf_Pfmin1.xy * Pf_Pfmin1.xy * Pf_Pfmin1.xy * (Pf_Pfmin1.xy * (Pf_Pfmin1.xy * 6.0 - 15.0) + 10.0);
+		vec4 blend2 = vec4( blend, vec2( 1.0 - blend ) );
+		return dot( grad_results, blend2.zxzx * blend2.wwyy );
 	}
 
 #ifdef use_shadows
+	// Derivatives of light-space depth with respect to texture2D coordinates
+	vec2 DepthGradient(vec2 uv, float z) {
+		vec2 dZduv = vec2(0.0, 0.0);
+
+		vec3 dUVZdx = dFdx(vec3(uv,z));
+		vec3 dUVZdy = dFdy(vec3(uv,z));
+
+		dZduv.x = dUVZdy.y * dUVZdx.z;
+		dZduv.x -= dUVZdx.y * dUVZdy.z;
+
+		dZduv.y = dUVZdx.x * dUVZdy.z;
+		dZduv.y -= dUVZdy.x * dUVZdx.z;
+
+		float det = (dUVZdx.x * dUVZdy.y) - (dUVZdx.y * dUVZdy.x);
+		dZduv /= det;
+
+		return dZduv;
+	}
+
+	float BiasedZ(float z0, vec2 dZduv, vec2 offset) {
+		return z0 + dot(dZduv, offset);
+	}
+
 	float GetShadowPCFRandom(float NdotL) {
 		float shadow = 0.0;
 
-		const float cb = 0.00005;
-		float bias = cb * tan(acos(NdotL));
-		bias = clamp(bias, 0.0, 5.0 * cb);
-
+		vec3 shadowCoordN = tex_coord1.xyz / tex_coord1.w;
 		#if defined(SHADOW_SAMPLES) && (SHADOW_SAMPLES > 1)
-
+			vec2 dZduv = DepthGradient(shadowCoordN.xy, shadowCoordN.z);
 
 			float rndRotAngle = NORM2SNORM(hash12L(gl_FragCoord.xy)) * PI / 2.0 * SHADOW_RANDOMNESS;
 
@@ -305,16 +325,20 @@ fragment = [[
 				// SpiralSNorm return low discrepancy sampling vec2
 				vec2 offset = (rotMat * SpiralSNorm( i, SHADOW_SAMPLES )) * filterSize;
 
-				vec4 shTexCoord = tex_coord1 + vec4(offset * tex_coord1.w, -bias, 0.0);
-				shadow += textureProj( shadowTex, shTexCoord );
+				vec3 shadowSamplingCoord = vec3(shadowCoordN.xy, 0.0) + vec3(offset, BiasedZ(shadowCoordN.z, dZduv, offset));
+				shadow += texture( shadowTex, shadowSamplingCoord );
 			}
 
 			shadow /= float(SHADOW_SAMPLES);
 			shadow *= 1.0 - smoothstep(shadow, 1.0,  0.2);
 		#else
-			vec4 shTexCoord = tex_coord1;
-			shTexCoord.z -= bias;
-			shadow = textureProj( shadowTex, shTexCoord );
+			const float cb = 0.00005;
+			float bias = cb * tan(acos(NdotL));
+			bias = clamp(bias, 0.0, 5.0 * cb);
+
+			vec3 shadowSamplingCoord = shadowCoordN;
+			shadowSamplingCoord.z -= bias;
+			shadow = texture( shadowTex, shadowSamplingCoord );
 		#endif
 
 		return mix(1.0, shadow, shadowDensity);
@@ -355,7 +379,7 @@ fragment = [[
 		vec4 extraColor = texture(textureS3o2, tex_coord0.st);
 
 		#ifdef EXTRACOLOR_G_NOISE
-			extraColor.g = noise(tex_coord0.st * EXTRACOLOR_G_NOISE);
+			extraColor.g = smoothstep(-0.5, 0.5, (Perlin2D(EXTRACOLOR_G_NOISE * tex_coord0.st)));
 		#endif
 
 		vec3 V = normalize(viewDir);

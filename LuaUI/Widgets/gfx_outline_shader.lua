@@ -1,4 +1,4 @@
-local wiName = "Outline (Deferred)"
+local wiName = "Outline Shader"
 function widget:GetInfo()
 	return {
 		name      = wiName,
