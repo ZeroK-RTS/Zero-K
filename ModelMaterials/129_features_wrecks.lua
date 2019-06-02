@@ -14,16 +14,16 @@ local materials = {
 	feature_wrecks = {
 		shaderDefinitions = {
 			"#define deferred_mode 0",
-			"#define SPECULARSUNEXP 4.0",
-			"#define SPECULARMULT 2.0",
-			"#define SPECULARBIAS 0.1",
+			"#define SPECULARSUNEXP 24.0",
+			"#define SPECULARMULT 1.0",
+			"#define EXTRACOLOR_G_NOISE vec2(72.0)",
 			"#define SHADOW_SOFTNESS SHADOW_HARD",
 		},
 		deferredDefinitions = {
 			"#define deferred_mode 1",
-			"#define SPECULARSUNEXP 4.0",
-			"#define SPECULARMULT 2.0",
-			"#define SPECULARBIAS 0.1",
+			"#define SPECULARSUNEXP 24.0",
+			"#define SPECULARMULT 1.0",
+			"#define EXTRACOLOR_G_NOISE vec2(72.0)",
 			"#define SHADOW_SOFTNESS SHADOW_HARD",
 			"#define MAT_IDX 129",
 		},

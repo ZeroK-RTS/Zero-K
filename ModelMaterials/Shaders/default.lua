@@ -248,11 +248,39 @@ fragment = [[
 		return vec2 (r * cos(theta), r * sin(theta));
 	}
 
-	float hash12(vec2 p) {
+	float hash12L(vec2 p) {
 		const float HASHSCALE1 = 0.1031;
 		vec3 p3  = fract(vec3(p.xyx) * HASHSCALE1);
 		p3 += dot(p3, p3.yzx + 19.19);
 		return fract((p3.x + p3.y) * p3.z);
+	}
+
+	float hash12S(vec2 p) {
+		const float HASHSCALE1 = 443.8975;
+		vec3 p3  = fract(vec3(p.xyx) * HASHSCALE1);
+		p3 += dot(p3, p3.yzx + 19.19);
+		return fract((p3.x + p3.y) * p3.z);
+	}
+
+	float noise(vec2 x) {
+		vec2 i = floor(x);
+		vec2 f = fract(x);
+
+		// Four corners in 2D of a tile
+		float a = hash12S(i);
+		float b = hash12S(i + vec2(1.0, 0.0));
+		float c = hash12S(i + vec2(0.0, 1.0));
+		float d = hash12S(i + vec2(1.0, 1.0));
+
+		// Simple 2D lerp using smoothstep envelope between the values.
+		// return vec3(mix(mix(a, b, smoothstep(0.0, 1.0, f.x)),
+		//			mix(c, d, smoothstep(0.0, 1.0, f.x)),
+		//			smoothstep(0.0, 1.0, f.y)));
+
+		// Same code, with the clamps in smoothstep and common subexpressions
+		// optimized away.
+		vec2 u = f * f * (3.0 - 2.0 * f);
+		return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
 	}
 
 #ifdef use_shadows
@@ -266,7 +294,7 @@ fragment = [[
 		#if defined(SHADOW_SAMPLES) && (SHADOW_SAMPLES > 1)
 
 
-			float rndRotAngle = NORM2SNORM(hash12(gl_FragCoord.xy)) * PI / 2.0 * SHADOW_RANDOMNESS;
+			float rndRotAngle = NORM2SNORM(hash12L(gl_FragCoord.xy)) * PI / 2.0 * SHADOW_RANDOMNESS;
 
 			vec2 vSinCos = vec2(sin(rndRotAngle), cos(rndRotAngle));
 			mat2 rotMat = mat2(vSinCos.y, -vSinCos.x, vSinCos.x, vSinCos.y);
@@ -325,6 +353,10 @@ fragment = [[
 
 		vec4 outColor   = diffuseIn;
 		vec4 extraColor = texture(textureS3o2, tex_coord0.st);
+
+		#ifdef EXTRACOLOR_G_NOISE
+			extraColor.g = noise(tex_coord0.st * EXTRACOLOR_G_NOISE);
+		#endif
 
 		vec3 V = normalize(viewDir);
 		vec3 Rv = -reflect(V, N);
