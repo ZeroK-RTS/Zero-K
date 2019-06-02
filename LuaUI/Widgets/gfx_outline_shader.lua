@@ -192,7 +192,6 @@ local function DrawOutline(strength, loadTextures, alwaysVisible)
 	gl.AlphaTest(GL.GREATER, 0.0);
 	gl.DepthTest(GL.LEQUAL) --restore default mode
 	gl.DepthMask(true)
-	gl.Blending(true)
 
 	applicationShader:ActivateWith( function ()
 		applicationShader:SetUniformFloat("alwaysShowOutLine", (alwaysVisible and 1.0) or 0.0)
@@ -205,7 +204,6 @@ local function DrawOutline(strength, loadTextures, alwaysVisible)
 	gl.Texture(2, false)
 	gl.Texture(3, false)
 
-	gl.Blending(false)
 	gl.AlphaTest(GL.GREATER, 0.5);  --default mode
 	gl.AlphaTest(false)
 end
