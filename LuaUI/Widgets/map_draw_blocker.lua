@@ -40,6 +40,7 @@ local Chili
 local Button
 local Control
 local Label
+local Colorbars
 local Checkbox
 local Trackbar
 local Window
@@ -339,6 +340,7 @@ function widget:Initialize()
     Button = Chili.Button
     Control = Chili.Control
     Label = Chili.Label
+    Colorbars = Chili.Colorbars
     Checkbox = Chili.Checkbox
     Trackbar = Chili.Trackbar
     Window = Chili.Window
