@@ -119,20 +119,14 @@ local unitCancelTargetCmdDesc = {
 --------------------------------------------------------------------------------
 -- Target Handling
 
-local function unitInRange(unitID, unitDefID, targetID)
-	return true
-	--local dis = Spring.GetUnitSeparation(unitID, targetID) -- 2d range
-	--local _, _, _, ux, uy, uz = spGetUnitPosition(unitID, true)
-	--local _, _, _, tx, ty, tz = spGetUnitPosition(targetID, true)
-	--local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - ty) + 50
-	--return dis and range and dis < range
+local function unitInRange(unitID, targetID, range)
+	local dis = Spring.GetUnitSeparation(unitID, targetID) -- 2d range
+	return dis and range and dis < range
 end
 
-local function locationInRange(unitID, unitDefID, x, y, z)
-	return true
-	--local _, _, _, ux, uy, uz = spGetUnitPosition(unitID, true)
-	--local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - y) + 50
-	--return range and ((ux - x)^2 + (uz - z)^2) < range^2
+local function locationInRange(unitID, x, y, z, range)
+	local ux, uy, uz = spGetUnitPosition(unitID)
+	return range and ((ux - x)^2 + (uz - z)^2) < range^2
 end
 
 local function clearTarget(unitID)
@@ -150,7 +144,7 @@ end
 local function setTarget(data, sendToWidget)
 	if spValidUnitID(data.id) then
 		if not data.targetID then
-			if locationInRange(data.id, data.unitDefID, data.x, data.y, data.z) then
+			if locationInRange(data.id, data.x, data.y, data.z, data.range) then
 				spSetUnitTarget(data.id, data.x, data.y, data.z)
 				GG.UnitSetGroundTarget(data.id)
 			end
@@ -161,7 +155,7 @@ local function setTarget(data, sendToWidget)
 				spSetUnitRulesParam(data.id,"target_z",data.z)
 			end
 		elseif spValidUnitID(data.targetID) and (data.allyAllowed or IsValidTargetBasedOnAllyTeam(data.targetID, data.allyTeam)) then
-			if (not Spring.GetUnitIsCloaked(data.targetID)) and unitInRange(data.id, data.unitDefID, data.targetID) and (data.id ~= data.targetID) then
+			if (not Spring.GetUnitIsCloaked(data.targetID)) and unitInRange(data.id, data.targetID, data.range) and (data.id ~= data.targetID) then
 				spSetUnitTarget(data.id, data.targetID, false, true)
 			end
 			if sendToWidget then
@@ -264,7 +258,7 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 			targetID = data.targetID, 
 			x = data.x, y = data.y, z = data.z,
 			allyTeam = spGetUnitAllyTeam(unitID), 
-			unitDefID = unitDefID,
+			range = UnitDefs[unitDefID].maxWeaponRange,
 			alwaysSeen = data.alwaysSeen,
 		})
 	end
@@ -315,7 +309,7 @@ local function setTargetClosestFromList(unitID, unitDefID, team, choiceUnits)
 			id = unitID, 
 			targetID = bestUnit, 
 			allyTeam = spGetUnitAllyTeam(unitID), 
-			unitDefID = unitDefID,
+			range = UnitDefs[unitDefID].maxWeaponRange,
 			alwaysSeen = tud and tud.isImmobile,
 		})
 	end
@@ -372,7 +366,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end), 
 					z = cmdParams[3], 
 					allyTeam = spGetUnitAllyTeam(unitID), 
-					unitDefID = unitDefID,
+					range = UnitDefs[unitDefID].maxWeaponRange
 				})
 			
 			elseif #cmdParams == 4 then
@@ -399,7 +393,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					targetID = cmdParams[1], 
 					allyTeam = spGetUnitAllyTeam(unitID), 
 					allyAllowed = allyTargetUnits[unitDefID],
-					unitDefID = unitDefID,
+					range = UnitDefs[unitDefID].maxWeaponRange,
 					alwaysSeen = tud and tud.isImmobile,
 				})
 			end
@@ -449,7 +443,7 @@ function GG.SetUnitTarget(unitID, targetID)
 			targetID = targetID, 
 			allyTeam = spGetUnitAllyTeam(unitID), 
 			allyAllowed = allyTargetUnits[unitDefID],
-			unitDefID = unitDefID,
+			range = UnitDefs[unitDefID].maxWeaponRange,
 			alwaysSeen = tud.isImmobile,
 		})
 	end

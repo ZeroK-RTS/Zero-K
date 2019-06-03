@@ -24,6 +24,7 @@ local commandButtonOffset
 local Chili
 local Button
 local Label
+local Colorbars
 local Checkbox
 local Window
 local Panel
@@ -316,7 +317,6 @@ local function MakeDropdownButtonsFromWidget(parent, position, tooltip, width, t
 		selectionOffsetY = 7,
 		itemFontSize = 18,
 		itemHeight = 26,
-		topHeight = 10,
 		minDropDownWidth = width,
 		ignoreItemCaption = true,
 		classname = "button_tiny",
@@ -537,6 +537,7 @@ function widget:Initialize()
 	Chili = WG.Chili
 	Button = Chili.Button
 	Label = Chili.Label
+	Colorbars = Chili.Colorbars
 	Checkbox = Chili.Checkbox
 	Window = Chili.Window
 	Panel = Chili.Panel

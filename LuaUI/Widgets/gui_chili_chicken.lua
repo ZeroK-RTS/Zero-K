@@ -397,6 +397,7 @@ function widget:Initialize()
 	Chili = WG.Chili
 	Button = Chili.Button
 	Label = Chili.Label
+	Colorbars = Chili.Colorbars
 	Checkbox = Chili.Checkbox
 	Window = Chili.Window
 	Panel = Chili.Panel
