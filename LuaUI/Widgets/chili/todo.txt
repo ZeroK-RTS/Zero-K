@@ -4,8 +4,8 @@
 
 - self:Resize(), OnResize
 - RenderToTexture
-- masks for HitTest (depending on linked textures-> alpha channel)
-- more different window controls -> background textures
+- masks for HitTest (depending on linked textures- > alpha channel)
+- more different window controls - > background textures
 - use matrices for clientspace transformations
 - theme & layout handler
 

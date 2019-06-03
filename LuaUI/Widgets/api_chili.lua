@@ -3,23 +3,23 @@
 
 function widget:GetInfo()
 	return {
-		name	  = "Chili Framework",
-		desc	  = "Hot GUI Framework",
-		author	= "jK",
-		date	  = "WIP",
-		license   = "GPLv2",
-		version   = "2.1",
-		layer	 = 1000,
-		enabled   = true,  --  loaded by default?
-		handler   = true,
-		api	   = true,
+		name        = "Chili Framework",
+		desc        = "Hot GUI Framework",
+		author      = "jK",
+		date        = "WIP",
+		license     = "GPLv2",
+		version     = "2.1",
+		layer       = 1000,
+		enabled     = true,  --  loaded by default?
+		handler     = true,
+		api	        = true,
 		alwaysStart = true,
 	}
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local reverseCompatibility = false
+local USE_OLD_CHILI = true
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-if Spring.GetConfigInt("ZKuseNewChili") ~= 1 then
+if not USE_OLD_CHILI then
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -135,15 +135,12 @@ function widget:TweakDrawScreen()
 	end
 end
 
-
-function widget:Update()
-	tk.Update()
-	tf.Update()
-end
-
-
 function widget:DrawGenesis()
+	gl.Color(1,1,1,1)
+	tf.Update()
 	th.Update()
+	tk.Update()
+	gl.Color(1,1,1,1)
 end
 
 
@@ -232,7 +229,7 @@ widget.TweakMouseWheel   = widget.MouseWheel
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-else -- Not Reverse Compatibility
+else -- Old Chili
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -253,7 +250,7 @@ end
 assert(debug)
 local source = debug and debug.getinfo(1).source
 local DIR = GetDirectory(source) or ((LUA_DIRNAME or LUAUI_DIRNAME) .."Widgets/")
-CHILI_DIRNAME = DIR .. "chili_new/"
+CHILI_DIRNAME = DIR .. "chili_old/"
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

@@ -149,7 +149,7 @@ end
 
 function GG.UnitSetGroundTarget(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
-	if unitDefID and weaponCounts[unitDefID] then
+	if unitDefID and weaponCounts[unitDefID] and not weaponUnits.Get(unitID) then
 		AddUnit(unitID, unitDefID)
 	end
 end

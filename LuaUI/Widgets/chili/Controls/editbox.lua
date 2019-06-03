@@ -1,4 +1,4 @@
---//=============================================================================
+--// ============================================================================= 
 
 --- EditBox module
 
@@ -6,78 +6,81 @@
 -- Inherits from Control.
 -- @see control.Control
 -- @table EditBox
--- @tparam {r,g,b,a} cursorColor cursor color, (default {0,0,1,0.7})
--- @tparam {r,g,b,a} selectionColor selection color, (default {0,1,1,0.3})
--- @string[opt="left"] align alignment
--- @string[opt="linecenter"] valign vertical alignment
--- @string[opt=""] text text contained in the editbox
--- @string[opt=""] hint hint to be displayed when there is no text and the control isn't focused
--- @int[opt=1] cursor cursor position
+-- @tparam {r, g, b, a} cursorColor cursor color, (default {0, 0, 1, 0.7})
+-- @tparam {r, g, b, a} selectionColor selection color, (default {0, 1, 1, 0.3})
+-- @string[opt = "left"] align alignment
+-- @string[opt = "linecenter"] valign vertical alignment
+-- @string[opt = ""] text text contained in the editbox
+-- @string[opt = ""] hint hint to be displayed when there is no text and the control isn't focused
+-- @int[opt = 1] cursor cursor position
 -- @bool passwordInput specifies whether the text should be treated as a password
 EditBox = Control:Inherit{
-  classname = "editbox",
+	classname = "editbox",
 
-  defaultWidth = 70,
-  defaultHeight = 20,
+	defaultWidth = 70,
+	defaultHeight = 20,
 
-  padding = {3,3,3,3},
+	padding = {3, 3, 3, 3},
 
-  cursorColor = {0,0,1,0.7},
-  selectionColor = {0,1,1,0.3},
+	cursorColor = {0, 0, 1, 0.7},
+	selectionColor = {0, 1, 1, 0.3},
 
-  align    = "left",
-  valign   = "linecenter",
+	align    = "left",
+	valign   = "linecenter",
 
-  hintFont = table.merge({ color = {1,1,1,0.7} }, Control.font),
+	hintFont = table.merge({ color = {1, 1, 1, 0.7} }, Control.font),
 
-  text   = "", -- Do NOT use directly.
-  hint   = "",
-  cursor = 1,
-  offset = 1,
-  lineSpacing = 0,
-  selStart = nil,
-  selEnd = nil,
+	text   = "", -- Do NOT use directly.
+	hint   = "",
+	cursor = 1,
+	offset = 1,
+	lineSpacing = 0,
+	selStart = nil,
+	selEnd = nil,
 
-  editable = true,
-  selectable = true,
-  multiline = false,
-  subTooltips = false,
-  useIME = true, -- Currently broken, so every text box is set to use IME.
+	editable = true,
+	selectable = true,
+	multiline = false,
+	agressiveMaxLines = false,
+	agressiveMaxLinesPreserve = false,
+	subTooltips = false,
+	useIME = true, -- Disabling is broken, so every text box is set to use IME.
+	useSDLStartTextInput = true,
 
-  passwordInput = false,
-  lines = {},
-  physicalLines = {},
-  cursorX = 1,
-  cursorY = 1,
+	passwordInput = false,
+	lines = {},
+	physicalLines = {},
+	cursorX = 1,
+	cursorY = 1,
 
-  inedibleInput = {
-    [Spring.GetKeyCode("enter")] = true,
-    [Spring.GetKeyCode("numpad_enter")] = true,
-    [Spring.GetKeyCode("esc")] = true,
-    [Spring.GetKeyCode("f1")] = true,
-    [Spring.GetKeyCode("f2")] = true,
-    [Spring.GetKeyCode("f3")] = true,
-    [Spring.GetKeyCode("f4")] = true,
-    [Spring.GetKeyCode("f5")] = true,
-    [Spring.GetKeyCode("f6")] = true,
-    [Spring.GetKeyCode("f7")] = true,
-    [Spring.GetKeyCode("f8")] = true,
-    [Spring.GetKeyCode("f9")] = true,
-    [Spring.GetKeyCode("f10")] = true,
-    [Spring.GetKeyCode("f11")] = true,
-    [Spring.GetKeyCode("f12")] = true,
-  },
+	inedibleInput = {
+		[Spring.GetKeyCode("enter")] = true,
+		[Spring.GetKeyCode("numpad_enter")] = true,
+		[Spring.GetKeyCode("esc")] = true,
+		[Spring.GetKeyCode("f1")] = true,
+		[Spring.GetKeyCode("f2")] = true,
+		[Spring.GetKeyCode("f3")] = true,
+		[Spring.GetKeyCode("f4")] = true,
+		[Spring.GetKeyCode("f5")] = true,
+		[Spring.GetKeyCode("f6")] = true,
+		[Spring.GetKeyCode("f7")] = true,
+		[Spring.GetKeyCode("f8")] = true,
+		[Spring.GetKeyCode("f9")] = true,
+		[Spring.GetKeyCode("f10")] = true,
+		[Spring.GetKeyCode("f11")] = true,
+		[Spring.GetKeyCode("f12")] = true,
+	},
 }
 
 local this = EditBox
 local inherited = this.inherited
 
---//=============================================================================
+--// ============================================================================= 
 
 function EditBox:New(obj)
-	obj = inherited.New(self,obj)
+	obj = inherited.New(self, obj)
 	obj._interactedTime = Spring.GetTimer()
-	  --// create font
+		--// create font
 	obj.hintFont = Font:New(obj.hintFont)
 	obj.hintFont:SetParent(obj)
 	local text = obj.text
@@ -93,11 +96,11 @@ function EditBox:Dispose(...)
 	self.hintFont:SetParent()
 end
 
-function EditBox:HitTest(x,y)
+function EditBox:HitTest(x, y)
 	return self.selectable and self
 end
 
---//=============================================================================
+--// ============================================================================= 
 
 local function explode(div, str)
 	str = tostring(str)
@@ -126,7 +129,9 @@ local function explode(div, str)
 --- Sets the EditBox text
 -- @string newtext text to be set
 function EditBox:SetText(newtext)
-	if (self.text == newtext) then return end
+	if (self.text == newtext) then
+		return
+	end
 	self.text = newtext
 	self.cursor = 1
 	self.physicalCursor = 1
@@ -172,23 +177,23 @@ function EditBox:_SetSelection(selStart, selStartY, selEnd, selEndY)
 	self.selEnd    = selEnd          or self.selEnd
 	self.selEndY   = selEndY         or self.selEndY
 	if selStart or selStartY then
-        if not self.lines[self.selStartY] then
-            Spring.Log("chiliui", LOG.ERROR, "self.lines[self.selStartY] is nil for self.selStartY: " .. tostring(self.selStartY) .. " and #self.lines: " .. tostring(#self.lines))
-            Spring.Log("chiliui", LOG.ERROR, debug.traceback())
-        else
-    		local logicalLine = self.lines[self.selStartY]
-    		self.selStartPhysical, self.selStartPhysicalY = self:_LineLog2Phys(logicalLine, self.selStart)
-        end
+		if not self.lines[self.selStartY] then
+				Spring.Log("chiliui", LOG.ERROR, "self.lines[self.selStartY] is nil for self.selStartY: " .. tostring(self.selStartY) .. " and #self.lines: " .. tostring(#self.lines))
+				Spring.Log("chiliui", LOG.ERROR, debug.traceback())
+		else
+			local logicalLine = self.lines[self.selStartY]
+			self.selStartPhysical, self.selStartPhysicalY = self:_LineLog2Phys(logicalLine, self.selStart)
+		end
 	end
 
 	if selEnd or selEndY then
-        if not self.lines[self.selEndY] then
-            Spring.Log("chiliui", LOG.ERROR, "self.lines[self.selEndY] is nil for self.selEndY: " .. tostring(self.selEndY) .. " and #self.lines: " .. tostring(#self.lines))
-            Spring.Log("chiliui", LOG.ERROR, debug.traceback())
-        else
-    		local logicalLine = self.lines[self.selEndY]
-    		self.selEndPhysical, self.selEndPhysicalY  = self:_LineLog2Phys(logicalLine, self.selEnd)
-        end
+		if not self.lines[self.selEndY] then
+				Spring.Log("chiliui", LOG.ERROR, "self.lines[self.selEndY] is nil for self.selEndY: " .. tostring(self.selEndY) .. " and #self.lines: " .. tostring(#self.lines))
+				Spring.Log("chiliui", LOG.ERROR, debug.traceback())
+		else
+			local logicalLine = self.lines[self.selEndY]
+			self.selEndPhysical, self.selEndPhysicalY  = self:_LineLog2Phys(logicalLine, self.selEnd)
+		end
 	end
 end
 
@@ -219,7 +224,9 @@ function EditBox:_GeneratePhysicalLines(logicalLineID)
 	local startIndex = 1
 	while true do
 		local cp = string.find(text, "\255", startIndex)
-		if not cp then break end
+		if not cp then
+			break
+		end
 		table.insert(colors, cp)
 		startIndex = cp + 4
 	end
@@ -248,41 +255,41 @@ function EditBox:_GeneratePhysicalLines(logicalLineID)
 	-- split the text into physical lines
 	local logLineX = 0
 	for lineIndex, lineText in pairs(explode("\n", wrappedText)) do
-	  local th, td = font:GetTextHeight(lineText)
-	  local _txt = colorPrefix .. lineText
-	  local physicalLine = {
-		  text = _txt,
-		  th   = th,
-		  td   = td,
-		  lh   = fontLineHeight,
-		  tw   = font:GetTextWidth(lineText),
-		  y    = y,
-		  -- link to the logical line ID
-		  lineID = logicalLineID,
-		  colorPrefix = colorPrefix,
-		  logLineX = logLineX,
-		  extraSpace = false,
-	  }
-	  table.insert(self.physicalLines, physicalLine)
-	  logLineX = logLineX + #lineText - 1
-	  -- sometimes font:WrapText (see above) adds a " " at the end of the line, and sometimes it doesn't
-	  -- this handles the situations when it doesn't
-	  if _txt:sub(#_txt - 1, #_txt - 1) ~= " " then
-	  	-- a lack of " " at the end might be caused by two things
-	  	-- 1) the string is continuous and there shouldn't be a " " in the first place
-        -- 2) there are two words and there is a " "
+		local th, td = font:GetTextHeight(lineText)
+		local _txt = colorPrefix .. lineText
+		local physicalLine = {
+			text = _txt,
+			th   = th,
+			td   = td,
+			lh   = fontLineHeight,
+			tw   = font:GetTextWidth(lineText),
+			y    = y,
+			-- link to the logical line ID
+			lineID = logicalLineID,
+			colorPrefix = colorPrefix,
+			logLineX = logLineX,
+			extraSpace = false,
+		}
+		table.insert(self.physicalLines, physicalLine)
+		logLineX = logLineX + #lineText - 1
+		-- sometimes font:WrapText (see above) adds a " " at the end of the line, and sometimes it doesn't
+		-- this handles the situations when it doesn't
+		if _txt:sub(#_txt - 1, #_txt - 1) ~= " " then
+			-- a lack of " " at the end might be caused by two things
+			-- 1) the string is continuous and there shouldn't be a " " in the first place
+				-- 2) there are two words and there is a " "
 		if text:sub(logLineX + 1, logLineX + 1) == " " then
-	  		logLineX = logLineX + 1
-	  		physicalLine.extraSpace = true
-	    end
-	  end
-	  y = y + fontLineHeight
+				logLineX = logLineX + 1
+				physicalLine.extraSpace = true
+			end
+		end
+		y = y + fontLineHeight
 
-	  -- link to the physical line ID
-	  table.insert(line.pls, #self.physicalLines)
+		-- link to the physical line ID
+		table.insert(line.pls, #self.physicalLines)
 
-	  -- find color for next line
-	  if #colors > 0 then
+		-- find color for next line
+		if #colors > 0 then
 		totalLength = totalLength + #_txt
 		local colorIndex = 1
 		while colorIndex <= #colors do
@@ -296,10 +303,10 @@ function EditBox:_GeneratePhysicalLines(logicalLineID)
 		colorPrefix = ""
 		if colors[colorIndex] ~= nil then
 			local cp = colors[colorIndex]
-			colorPrefix = text:sub(cp, cp+3)
+			colorPrefix = text:sub(cp, cp + 3)
 		end
-	  end
-    end
+		end
+		end
 
 	if self.autoHeight then
 		local totalHeight = #self.physicalLines * fontLineHeight
@@ -309,6 +316,48 @@ end
 
 -- will automatically wrap into multiple lines if too long
 function EditBox:AddLine(text, tooltips, OnTextClick)
+	if self.agressiveMaxLines and #self.lines > self.agressiveMaxLines then
+		local preserve = {}
+		for i = math.max(1, #self.lines - self.agressiveMaxLinesPreserve), #self.lines do
+			preserve[#preserve + 1] = {self.lines[i].text, self.lines[i].tooltips, self.lines[i].OnTextClick}
+		end
+		self.lines = {}
+		self.physicalLines = {}
+		
+		self.forgetMouseMove = true
+		self.selStart = nil
+		self.selStartY = nil
+		self.selEnd = nil
+		self.selEndY = nil
+		
+		for i = 1, #preserve do
+			local line = {
+				text = preserve[i][1],
+				tooltips = preserve[i][2],
+				OnTextClick = preserve[i][3],
+				pls = {}, -- indexes of physical lines
+			}
+			table.insert(self.lines, line)
+			local lineID = #self.lines
+			self:_GeneratePhysicalLines(lineID)
+		end
+		
+		local line = {
+			text = text,
+			tooltips = tooltips,
+			OnTextClick = OnTextClick,
+			pls = {}, -- indexes of physical lines
+		}
+		table.insert(self.lines, line)
+		local lineID = #self.lines
+		self:_GeneratePhysicalLines(lineID)
+		
+		self._inRequestUpdate = true
+		self:RequestUpdate()
+		self:Invalidate()
+		return
+	end
+	
 	-- add logical line
 	local line = {
 		text = text,
@@ -321,14 +370,14 @@ function EditBox:AddLine(text, tooltips, OnTextClick)
 	self:_GeneratePhysicalLines(lineID)
 
 	--   if self.autoHeight then
---     local textHeight,textDescender,numLines = font:GetTextHeight(self._wrappedText)
+--     local textHeight, textDescender, numLines = font:GetTextHeight(self._wrappedText)
 --     textHeight = textHeight-textDescender
 --
 --     if (self.autoObeyLineHeight) then
---       if (numLines>1) then
+--       if (numLines > 1) then
 --         textHeight = numLines * font:GetLineHeight() + self.lineSpacing
 --       else
---         --// AscenderHeight = LineHeight w/o such deep chars as 'g','p',...
+--         --// AscenderHeight = LineHeight w/o such deep chars as 'g', 'p', ...
 --         textHeight = math.min( math.max(textHeight, font:GetAscenderHeight()), font:GetLineHeight() + self.lineSpacing)
 --       end
 --     end
@@ -384,44 +433,43 @@ function EditBox:UpdateLayout()
 		local totalHeight = #self.physicalLines * fontLineHeight
 		self:Resize(nil, totalHeight, true, true)
 	end
-  --FIXME
-  if (self.autosize) then
-    local w = font:GetTextWidth(self.text);
-    local h, d, numLines = font:GetTextHeight(self.text);
+	--FIXME
+	if (self.autosize) then
+		local w = font:GetTextWidth(self.text)
+		local h, d, numLines = font:GetTextHeight(self.text)
 
-    if (self.autoObeyLineHeight) then
-      h = math.ceil(numLines * (font:GetLineHeight() + self.lineSpacing))
-    else
-      h = math.ceil(h-d)
-    end
+		if (self.autoObeyLineHeight) then
+			h = math.ceil(numLines * (font:GetLineHeight() + self.lineSpacing))
+		else
+			h = math.ceil(h-d)
+		end
 
-    local x = self.x
-    local y = self.y
+		local x = self.x
+		local y = self.y
 
-    if self.valign == "center" then
-      y = math.round(y + (self.height - h) * 0.5)
-    elseif self.valign == "bottom" then
-      y = y + self.height - h
-    elseif self.valign == "top" then
-    else
-    end
+		if self.valign == "center" then
+			y = math.round(y + (self.height - h) * 0.5)
+		elseif self.valign == "bottom" then
+			y = y + self.height - h
+		--elseif self.valign == "top" then
+		end
 
-    if self.align == "left" then
-    elseif self.align == "right" then
-      x = x + self.width - w
-    elseif self.align == "center" then
-      x = math.round(x + (self.width - w) * 0.5)
-    end
+		--if self.align == "left" then
+		if self.align == "right" then
+			x = x + self.width - w
+		elseif self.align == "center" then
+			x = math.round(x + (self.width - w) * 0.5)
+		end
 
-    w = w + self.padding[1] + self.padding[3]
-    h = h + self.padding[2] + self.padding[4]
+		w = w + self.padding[1] + self.padding[3]
+		h = h + self.padding[2] + self.padding[4]
 
-    self:_UpdateConstraints(x,y,w,h)
-  end
+		self:_UpdateConstraints(x, y, w, h)
+	end
 
 end
 
---//=============================================================================
+--// ============================================================================= 
 
 function EditBox:Update(...)
 	--FIXME add special UpdateFocus event?
@@ -438,8 +486,13 @@ function EditBox:Update(...)
 	end
 end
 
+function EditBox:__GetStartX(text)
+	local texLen = self.font:GetTextWidth(text)
+	return math.max(self.padding[1], self.width - texLen - self.padding[3])
+end
+
 function EditBox:FocusUpdate(...)
-	if Spring.SDLStartTextInput then
+	if Spring.SDLStartTextInput and self.useSDLStartTextInput then
 		if not self.state.focused then
 			self.textEditing = ""
 			Spring.SDLStopTextInput()
@@ -449,7 +502,7 @@ function EditBox:FocusUpdate(...)
 			Spring.SDLSetTextInputRect(x, y, 30, 1000)
 		end
 	end
-	-- self:InvalidateSelf()
+	self:InvalidateSelf()
 	return inherited.FocusUpdate(self, ...)
 end
 
@@ -487,7 +540,9 @@ function EditBox:_GetCursorByMousePos(x, y)
 			end
 		end
 		local selLine = self.physicalLines[retVal.physicalCursorY]
-		if not selLine then return retVal end
+		if not selLine then
+			return retVal
+		end
 		selLine = selLine.text
 		if not self.multiline then
 			selLine = text
@@ -502,6 +557,11 @@ function EditBox:_GetCursorByMousePos(x, y)
 			retVal.physicalCursor = retVal.physicalCursor + 1
 		end
 		local isStartLine = true
+
+		if self.align == "right" then
+			clientX = self:__GetStartX(selLine) - clientX
+		end
+
 		for i = retVal.offset, #selLine do
 			local tmpLen = self.font:GetTextWidth(selLine:sub(1 + retVal.offset, i))
 			if tmpLen > (x - clientX) then
@@ -521,6 +581,10 @@ function EditBox:_GetCursorByMousePos(x, y)
 			if i == #selLine then
 				retVal.outOfBounds = true
 			end
+		end
+		if retVal.physicalCursor == 0 and self.align == "right" then
+			retVal.physicalCursor = 1
+			retVal.outOfBounds = true
 		end
 
 		-- calculate the logical line position
@@ -561,6 +625,7 @@ end
 
 
 function EditBox:MouseDown(x, y, ...)
+	self.forgetMouseMove = nil
 	-- FIXME: didn't feel like reimplementing Screen:MouseDown to capture MouseClick correctly, so clicking on text items is triggered in MouseDown
 	-- handle clicking on text items
 	local retVal = self:_GetCursorByMousePos(x, y)
@@ -632,6 +697,10 @@ function EditBox:MouseMove(x, y, dx, dy, button)
 		return inherited.MouseMove(self, x, y, dx, dy, button)
 	end
 
+	if self.forgetMouseMove then
+		return self
+	end
+	
 	local _, _, _, shift = Spring.GetModKeyState()
 	local cp, cpy = self.cursor, self.cursorY
 	self:_SetCursorByMousePos(x, y)
@@ -723,7 +792,7 @@ function EditBox:GetSelectionText()
 			local topText = self.lines[sy].text
 			local bottomText = self.lines[ey].text
 			table.insert(ls, RemoveColorFromText(topText:sub(s)))
-			for i = sy+1, ey-1 do
+			for i = sy + 1, ey-1 do
 				table.insert(ls, RemoveColorFromText(self.lines[i].text))
 			end
 			table.insert(ls, RemoveColorFromText(bottomText:sub(1, e - 1)))
@@ -735,7 +804,7 @@ end
 
 function EditBox:KeyPress(key, mods, isRepeat, label, unicode, ...)
 	local cp = self.cursor
-    local cpy = self.cursorY
+	local cpy = self.cursorY
 	local txt = self.text
 	local eatInput = true
 
@@ -758,7 +827,7 @@ function EditBox:KeyPress(key, mods, isRepeat, label, unicode, ...)
 				repeat
 					self.text = Utf8DeleteAt(self.text, self.cursor)
 					self:UpdateLine(1, self.text)
-				until self.cursor >= #self.text-1 or (self.text:sub(self.cursor, self.cursor) == " " and self.text:sub(self.cursor+1, self.cursor+1) ~= " ")
+				until self.cursor >= #self.text-1 or (self.text:sub(self.cursor, self.cursor) == " " and self.text:sub(self.cursor + 1, self.cursor + 1) ~= " ")
 			else
 				self.text = Utf8DeleteAt(txt, cp)
 				self:UpdateLine(1, self.text)
@@ -829,7 +898,6 @@ function EditBox:KeyPress(key, mods, isRepeat, label, unicode, ...)
 		end
 	end
 
-
 	self._interactedTime = Spring.GetTimer()
 	eatInput = inherited.KeyPress(self, key, mods, isRepeat, label, unicode, ...) or eatInput
 	self:UpdateLayout()
@@ -842,7 +910,7 @@ function EditBox:TextInput(utf8char, ...)
 	if not self.editable then
 		return false
 	end
-    self.textEditing = ""
+	self.textEditing = ""
 	local unicode = utf8char
 
 	if unicode then
@@ -866,12 +934,12 @@ function EditBox:TextInput(utf8char, ...)
 end
 
 function EditBox:TextEditing(utf8, start, length)
-    if not self.editable then
-        return false
-    end
+	if not self.editable then
+		return false
+	end
 
-    self.textEditing = utf8
-    return true
+	self.textEditing = utf8
+	return true
 end
 
---//=============================================================================
+--// ============================================================================= 

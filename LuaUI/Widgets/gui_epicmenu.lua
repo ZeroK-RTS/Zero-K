@@ -1888,6 +1888,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			--[[
 			tree_children[#tree_children+1] = ComboBox:New {
 				items = items;
+				topHeight = 10,
 			}
 			]]--
 		elseif option.type == 'radioButton' then

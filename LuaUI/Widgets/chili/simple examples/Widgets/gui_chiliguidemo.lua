@@ -2,15 +2,15 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-    name      = "chiliGUIDemo",
-    desc      = "GUI demo for robocracy",
-    author    = "quantum",
-    date      = "WIP",
-    license   = "WIP",
-    layer     = 1,
-    enabled   = false  --  loaded by default?
-  }
+	return {
+		name      = "chiliGUIDemo",
+		desc      = "GUI demo for robocracy",
+		author    = "quantum",
+		date      = "WIP",
+		license   = "WIP",
+		layer     = 1,
+		enabled   = false  --  loaded by default?
+	}
 end
 
 
@@ -39,7 +39,7 @@ function widget:Initialize()
 	--------------------------------------------------------------------------------
 	--------------------------------------------------------------------------------
 
-	local testText =
+	local testText = 
 	[[Bolivians are voting in a referendum on a new constitution that President Evo Morales says will empower the country's indigenous majority.
 
 The changes also include strengthening state control of Bolivia's natural resources, and no longer recognising Catholicism as the official religion.
@@ -70,12 +70,12 @@ President Morales has said the new constitution will pave the way for correcting
 		Chili.Label:New{
 			x      = 20,
 			y      = 50,
-			caption= 'FOOBAR',
+			caption = 'FOOBAR',
 		},
 		Chili.ScrollPanel:New{
-			backgroundColor = {0,0,0,0.5},
+			backgroundColor = {0, 0, 0, 0.5},
 			children = {
-				Chili.Button:New{caption="foo", width = 100, height = 100},
+				Chili.Button:New{caption = "foo", width = 100, height = 100},
 			}
 		},
 		Chili.Checkbox:New{
@@ -106,8 +106,8 @@ President Morales has said the new constitution will pave the way for correcting
 				width  = "100%";
 				weightedResize = true;
 				children = {
-					Chili.Button:New{caption="height: 70%", weight = 7; width = "90%"},
-					Chili.Button:New{caption="height: 30%", weight = 3},
+					Chili.Button:New{caption = "height: 70%", weight = 7; width = "90%"},
+					Chili.Button:New{caption = "height: 30%", weight = 3},
 				};
 			}
 		},
@@ -132,8 +132,8 @@ President Morales has said the new constitution will pave the way for correcting
 		width = 200,
 		height = 200,
 		--resizeItems = false,
-		x=0, right=0,
-		y=0, bottom=0,
+		x = 0, right = 0,
+		y = 0, bottom = 0,
 		margin = {10, 10, 10, 10},
 		parent = window01,
 		children = cs,
@@ -144,7 +144,7 @@ President Morales has said the new constitution will pave the way for correcting
 		width = 200,
 		height = 200,
 		children = {
-			Chili.Button:New{backgroundColor = {0,0.6,0,1}, textColor = {1,1,1,1}, caption = "Toggle", OnMouseUp = {ToggleOrientation}},
+			Chili.Button:New{backgroundColor = {0, 0.6, 0, 1}, textColor = {1, 1, 1, 1}, caption = "Toggle", OnMouseUp = {ToggleOrientation}},
 			Chili.Button:New{caption = "2"},
 			Chili.Button:New{caption = "3"},
 			Chili.Button:New{caption = "4", margin = {10, 10, 10, 10}},
@@ -172,28 +172,28 @@ President Morales has said the new constitution will pave the way for correcting
 		clientWidth = 200,
 		clientHeight = 200,
 		children = {
-			Chili.Button:New{right=0, bottom=0, caption = "2", OnClick={function()
+			Chili.Button:New{right = 0, bottom = 0, caption = "2", OnClick = {function()
 				--gridWindow1:GetObjectByName("tree_inspector")
 			end}},
-			Chili.TextBox:New{x=0, right=0, y=0, text = testText2},
-			Chili.EditBox:New{width = 200, y = 40, --[[autosize = true,]] text = testText3},
+			Chili.TextBox:New{x = 0, right = 0, y = 0, text = testText2},
+			Chili.EditBox:New{width = 200, y = 40, --[[autosize = true, ]] text = testText3},
 			Chili.Button:New{
 				caption = "Dispose Me",
 				name = "btn_dispose_me2",
-				x="5%", y=70,
+				x = "5%", y = 70,
 				width = "90%",
 				OnClick = {function(self) self:Dispose() end},
 			},
 			Chili.Button:New{
 				caption = "Dispose Me",
 				name = "btn_dispose_me3",
-				x="5%", y=90,
+				x = "5%", y = 90,
 				width = "90%",
 			},
 			Chili.Button:New{
 				caption = "Dispose Me",
 				name = "btn_dispose_me4",
-				x=0, y=120,
+				x = 0, y = 120,
 			},
 		},
 	}
@@ -211,30 +211,30 @@ President Morales has said the new constitution will pave the way for correcting
 	}
 
 	local control = Chili.ScrollPanel:New{
-		x=0, right=0,
-		y=0, bottom=0,
+		x = 0, right = 0,
+		y = 0, bottom = 0,
 		parent = windowImageList,
 		children = {
-			--Button:New{width = 410, height = 400, anchors = {top=true,left=true,bottom=true,right=true}},
+			--Button:New{width = 410, height = 400, anchors = {top = true, left = true, bottom = true, right = true}},
 			Chili.ImageListView:New{
 				name = "MyImageListView",
-				x=0, right=0,
-				y=0, bottom=0,
+				x = 0, right = 0,
+				y = 0, bottom = 0,
 				dir = "LuaUI/Images/",
 				OnSelectItem = {
-					function(obj,itemIdx,selected)
-						Spring.Echo("image selected ",itemIdx,selected)
+					function(obj, itemIdx, selected)
+						Spring.Echo("image selected ", itemIdx, selected)
 					end,
 				},
 				OnDblClickItem = {
-					function(obj,itemIdx)
-						Spring.Echo("image dblclicked ",itemIdx)
+					function(obj, itemIdx)
+						Spring.Echo("image dblclicked ", itemIdx)
 					end,
 				},
 				OnDirChange = {
-					function(obj,itemIdx)
+					function(obj, itemIdx)
 						if obj.parent and obj.parent:InheritsFrom("scrollpanel") then
-							obj.parent:SetScrollPos(0,0)
+							obj.parent:SetScrollPos(0, 0)
 						end
 					end,
 				}
@@ -258,11 +258,11 @@ President Morales has said the new constitution will pave the way for correcting
 		Chili.ScrollPanel:New{
 			width = 200,
 			height = 200,
-			x=0, right=0,
-			y=0, bottom=0,
+			x = 0, right = 0,
+			y = 0, bottom = 0,
 			horizontalScrollbar = false,
 			children = {
-					Chili.TextBox:New{width = 200, x=0, right=0, y=0, bottom=0, text = testText}
+					Chili.TextBox:New{width = 200, x = 0, right = 0, y = 0, bottom = 0, text = testText}
 				},
 			},
 		}
@@ -277,12 +277,12 @@ President Morales has said the new constitution will pave the way for correcting
 
 		children = {
 			Chili.ScrollPanel:New{
-				x=0, right=0,
-				y=0, bottom=0,
+				x = 0, right = 0,
+				y = 0, bottom = 0,
 				children = {
 					Chili.TreeView:New{
-						x=0, right=0,
-						y=0, bottom=0,
+						x = 0, right = 0,
+						y = 0, bottom = 0,
 						defaultExpanded = true,
 						nodes = {
 							"foo",
