@@ -35,6 +35,7 @@ local initialBuilder = 'armcom1'
 local Chili
 local Button
 local Label
+local Colorbars
 local Checkbox
 local Window
 local Panel
@@ -1085,6 +1086,7 @@ function widget:Initialize()
 	Chili = WG.Chili
 	Button = Chili.Button
 	Label = Chili.Label
+	Colorbars = Chili.Colorbars
 	Checkbox = Chili.Checkbox
 	Window = Chili.Window
 	Panel = Chili.Panel

@@ -461,7 +461,6 @@ local function MakeUnitPickerComboxes(parent, offset)
 		y = offset[1],
 		right = 5,
 		height = COMBOX_HEIGHT,
-		topHeight = 10,
 		items = {},
 		parent = parent,
 		selected = 1,
@@ -490,7 +489,6 @@ local function MakeTeamPickerCombox(parent, offset)
 		y = offset[1],
 		right = 5,
 		height = COMBOX_HEIGHT,
-		topHeight = 10,
 		items = {},
 		parent = parent,
 		OnSelect = {function(self, i)
