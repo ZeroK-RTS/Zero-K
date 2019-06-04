@@ -1,14 +1,19 @@
-if not gadgetHandler:IsSyncedCode() then return end
 
-function gadget:GetInfo() return {
-	name    = "Endgame Graphs",
-	desc    = "Gathers misc stats",
-	author  = "Sprung",
-	date    = "2016-02-14",
-	license = "PD",
-	layer   = 999999,
-	enabled = true,
-} end
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+
+function gadget:GetInfo()
+	return {
+		name    = "Endgame Graphs",
+		desc    = "Gathers misc stats",
+		author  = "Sprung",
+		date    = "2016-02-14",
+		license = "PD",
+		layer   = 999999,
+		enabled = true,
+	}
+end
 
 local unitCategoryDefs = VFS.Include("LuaRules/Configs/unit_category.lua")
 
