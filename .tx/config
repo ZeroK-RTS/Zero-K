@@ -1,3 +1,12 @@
+# This is the ZK config for the Transifex online translation platform 
+# The job of this file is to allow the Transifex CLI tool to fetch translation 
+# files from Transifex for you to commit to the repository with minimal effort.
+# Here's how to use it:
+# * Fetch one language: `tx pull -fl zh_CN`
+# * Fetch everything: `tx pull -af`
+# The -f key is needed because the client doesn't comprehend GIT, see https://github.com/transifex/transifex-client/issues/22
+# Here's more documentation on the `tx` client: https://docs.transifex.com/client/introduction
+# Here's the documentation on this file specifically: https://docs.transifex.com/client/client-configuration
 [main]
 host = https://www.transifex.com
 lang_map = zh_CN:zh,tr_TR:tr,sl_SL:sl,nl_NL:nl
