@@ -1,0 +1,52 @@
+[main]
+host = https://www.transifex.com
+lang_map = zh_CN:zh,tr_TR:tr,sl_SL:sl,nl_NL:nl
+
+[zero-k.units-en-json--master]
+file_filter = LuaUI/Configs/lang/units.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/units.en.json
+source_lang = en
+type = KEYVALUEJSON
+
+[zero-k.common-en-json--master]
+file_filter = LuaUI/Configs/lang/common.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/common.en.json
+source_lang = en
+type = KEYVALUEJSON
+
+[zero-k.healthbars-en-json--master]
+file_filter = LuaUI/Configs/lang/healthbars.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/healthbars.en.json
+source_lang = en
+type = KEYVALUEJSON
+
+[zero-k.interface-en-json--master]
+file_filter = LuaUI/Configs/lang/interface.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/interface.en.json
+source_lang = en
+type = KEYVALUEJSON
+
+[zero-k.pw-units-en-json--master]
+file_filter = LuaUI/Configs/lang/pw_units.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/pw_units.en.json
+source_lang = en
+type = KEYVALUEJSON
+
+[zero-k.pw-units-en-json--master]
+file_filter = LuaUI/Configs/lang/pw_units.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/pw_units.en.json
+source_lang = en
+type = KEYVALUEJSON
+
+[zero-k.campaign-units-en-json--master]
+file_filter = LuaUI/Configs/lang/campaign_units.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/campaign_units.en.json
+source_lang = en
+type = KEYVALUEJSON
