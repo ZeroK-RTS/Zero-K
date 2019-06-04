@@ -248,16 +248,15 @@ end
 --  c.f. Array{Insert,Remove}
 --
 
-local function r_ipairs(tbl)
-  local function r_iter(tbl, key)
-    if (key <= 1) then
-      return nil
-    end
-
-    -- next idx, next val
-    return (key - 1), tbl[key - 1]
+local function r_iter(tbl, key)
+  if (key <= 1) then
+    return nil
   end
+  -- next idx, next val
+  return (key - 1), tbl[key - 1]
+end
 
+local function r_ipairs(tbl)
   return r_iter, tbl, (1 + #tbl)
 end
 
