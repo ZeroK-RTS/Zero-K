@@ -27,6 +27,8 @@
 	"selected_units" : "W zaznaczeniu",
 	"unknown" : "nie wiadomo",
 	"buildpower" : "Moc",
+	"burst_damage" : "Obrażenia salwy",
+	"burst" : "Salwa",
 	"debris" : "szczątki",
 	"wreckage" : "wrak",
 	"no_helptext" : "Do tej jednostki nie ma samouczka.",
