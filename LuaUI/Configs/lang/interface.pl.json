@@ -1,6 +1,8 @@
 {
 	"idle_cons" : {
 		"one" : "%{count} wolny konstruktor",
+		"few" : "%{count} wolnych konstruktorów",	
+		"many" : "%{count} wolnych konstruktorów",
 		"other" : "%{count} wolnego konstruktora"
 	},
 	"quick_rallypoint_mode" : "Tryb szybkiej kolejki",
@@ -101,6 +103,8 @@
 	"cheatsheet_cat_rejects" : "Techniczne śmieci",
 	"x_units_in_queue" : {
 		"one" : "%{count} jednostka w kolejce",
+		"few" : "%{count} jednostki w kolejce",	
+		"many" : "%{count} jednostek w kolejce",
 		"other" : "%{count} jednostek w kolejce"
 	}
 }
