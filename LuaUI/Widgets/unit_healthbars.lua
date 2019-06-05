@@ -810,7 +810,7 @@ do
 		end
 
 		--// Planetwars teleport progress
-		if isPwStructure then
+		if ci.isPwStructure then
 			TeleportEnd = GetUnitRulesParam(unitID, "pw_teleport_frame")
 			if TeleportEnd then
 				local prog = 1 - (TeleportEnd - gameFrame)/TELEPORT_CHARGE_NEEDED
