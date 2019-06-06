@@ -26,20 +26,21 @@ local GL_DEPTH_COMPONENT32 = 0x81A7
 -- Configuration Constants
 -----------------------------------------------------------------
 
---[[
+
 local MIN_FPS = 20
 local MIN_FPS_DELTA = 10
 local AVG_FPS_ELASTICITY = 0.2
 local AVG_FPS_ELASTICITY_INV = 1.0 - AVG_FPS_ELASTICITY
-]]--
+
 
 local DILATE_SINGLE_PASS = false --true is slower on my system
 local DILATE_HALF_KERNEL_SIZE = 3
 local DILATE_PASSES = 1
 
 local OUTLINE_ZOOM_SCALE = true
+local OUTLINE_COLOR = {0.9, 0.9, 0.9, 1.0}
 --local OUTLINE_COLOR = {0.75, 0.75, 0.75, 1.0}
-local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
+--local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
 local OUTLINE_STRENGTH_BLENDED = 1.0
 local OUTLINE_STRENGTH_ALWAYS_ON = 0.6
 
@@ -191,6 +192,7 @@ local function DrawOutline(strength, loadTextures, alwaysVisible)
 	gl.AlphaTest(true)
 	gl.AlphaTest(GL.GREATER, 0.0);
 	gl.DepthTest(GL.LEQUAL) --restore default mode
+	gl.Blending(true)
 
 	applicationShader:ActivateWith( function ()
 		applicationShader:SetUniformFloat("alwaysShowOutLine", (alwaysVisible and 1.0) or 0.0)
@@ -203,6 +205,8 @@ local function DrawOutline(strength, loadTextures, alwaysVisible)
 	gl.Texture(2, false)
 	gl.Texture(3, false)
 
+	gl.DepthTest(not alwaysVisible)
+	gl.Blending(false)
 	gl.AlphaTest(GL.GREATER, 0.5);  --default mode
 	gl.AlphaTest(false)
 end
@@ -385,7 +389,7 @@ function widget:Shutdown()
 	applicationShader:Finalize()
 end
 
---[[
+
 local accuTime = 0
 local lastTime = 0
 local averageFPS = MIN_FPS + MIN_FPS_DELTA
@@ -402,7 +406,6 @@ function widget:Update(dt)
 		end
 	end
 end
-]]--
 
 
 -- For debug
