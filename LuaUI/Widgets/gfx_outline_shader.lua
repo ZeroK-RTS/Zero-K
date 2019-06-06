@@ -108,6 +108,8 @@ local function PrepareOutline(cleanState)
 		return
 	end
 
+	--gl.ResetState()
+
 	gl.DepthTest(true)
 	gl.DepthTest(GL.ALWAYS)
 
@@ -181,6 +183,8 @@ local function DrawOutline(strength, loadTextures, alwaysVisible)
 	if not show then
 		return
 	end
+
+	--gl.ResetState()
 
 	if loadTextures then
 		gl.Texture(0, dilationDepthTexes[pingPongIdx + 1])
@@ -408,15 +412,27 @@ function widget:Update(dt)
 end
 
 
--- For debug
+-- Debug #1, Uncomment the following
 --[[
 function widget:DrawScreenEffects()
 	gl.Blending(false)
 
-	gl.Texture(0, dilationDepthTexes[pingPongIdx + 1])
-	gl.Texture(0, dilationColorTexes[pingPongIdx + 1])
-	--gl.TexRect(0, 0, vsx, vsy, false, true)
+	gl.Texture(0, shapeColorTex)
+	gl.TexRect(0, 0, vsx, vsy, false, true)
 	gl.Texture(0, false)
+	gl.Blending(true)
+end
+]]--
+
+-- Debug #2, Comment the previous and uncomment the following
+--[[
+function widget:DrawScreenEffects()
+	gl.Blending(false)
+
+	gl.Texture(0, dilationColorTexes[pingPongIdx + 1])
+	gl.TexRect(0, 0, vsx, vsy, false, true)
+	gl.Texture(0, false)
+	gl.Blending(true)
 end
 ]]--
 
