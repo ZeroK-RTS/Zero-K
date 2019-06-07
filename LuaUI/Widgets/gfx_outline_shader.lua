@@ -29,7 +29,6 @@ local PI = math.pi
 
 local SUBTLE_MIN = 500
 local SUBTLE_MAX = 3000
-local STRENGTH_MULT = 0.5
 
 local DILATE_SINGLE_PASS = false --true is slower on my system
 local DILATE_HALF_KERNEL_SIZE = 3
@@ -83,7 +82,8 @@ local shadersEnabled = LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvSh
 -- Configuration
 -----------------------------------------------------------------
 
-local thickness = 1
+local DEFAULT_THICKNESS = 0.5
+local thickness = DEFAULT_THICKNESS
 local scaleWithHeight = true
 local functionScaleWithHeight = true
 
@@ -94,7 +94,7 @@ options = {
 		desc = 'How thick the outline appears around objects',
 		type = 'number',
 		min = 0.2, max = 1, step = 0.01,
-		value = 0.5,
+		value = DEFAULT_THICKNESS,
 		OnChange = function (self)
 			thickness = self.value
 		end,
@@ -132,8 +132,8 @@ options = {
 -----------------------------------------------------------------
 
 local function GetZoomScale()
-	if not scaleWithHeight then
-		return thickness
+	if not (scaleWithHeight or functionScaleWithHeight) then
+		return 1
 	end
 	local cs = Spring.GetCameraState()
 	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
@@ -192,7 +192,7 @@ local function PrepareOutline(cleanState)
 
 	for i = 1, DILATE_PASSES do
 		dilationShader:ActivateWith( function ()
-			strength = GetZoomScale() * STRENGTH_MULT
+			strength = thickness * GetZoomScale()
 			dilationShader:SetUniformFloat("strength", strength)
 
 			if DILATE_SINGLE_PASS then
