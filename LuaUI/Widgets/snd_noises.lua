@@ -13,19 +13,19 @@
 local versionNum = '1.11'
 
 function widget:GetInfo()
-  return {
-    name      = "Noises",
-    desc      = "v".. (versionNum) .." Selection, move and attack warning sounds.",
-    author    = "quantum",
-    date      = "Oct 24, 2007",
-    license   = "GNU GPL, v2 or later",
-    layer     = -10,
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "Noises",
+		desc      = "v".. (versionNum) .." Selection, move and attack warning sounds.",
+		author    = "quantum",
+		date      = "Oct 24, 2007",
+		license   = "GNU GPL, v2 or later",
+		layer     = -10,
+		enabled   = true  --  loaded by default?
+	}
 end
 ---- CHANGELOG -----
--- versus666, 		v1.1	(26oct2010)	:	Clean up code/corrected typo.
--- quantum,			v1.0				:	creation
+-- versus666,  v1.1 (26oct2010) : Clean up code/corrected typo.
+-- quantum,    v1.0             : creation
 
 --REMINDER to do:
 -- Disable robotic sounds heard when playing chicken faction.
@@ -35,12 +35,12 @@ end
 -- Replace your LuaUI/widgets.lua with our LuaUI/cawidgets.lua to benefit from
 -- it in other mods
 
-local GetSelectedUnits	= Spring.GetSelectedUnits
-local GetUnitDefID		= Spring.GetUnitDefID
-local osClock			= os.clock
-local spInView			= Spring.IsUnitInView
-local PlaySoundFile		= Spring.PlaySoundFile
-local spGetUnitHealth	= Spring.GetUnitHealth
+local GetSelectedUnits = Spring.GetSelectedUnits
+local GetUnitDefID     = Spring.GetUnitDefID
+local osClock          = os.clock
+local spInView         = Spring.IsUnitInView
+local PlaySoundFile    = Spring.PlaySoundFile
+local spGetUnitHealth  = Spring.GetUnitHealth
 
 local toleranceTime = Spring.GetConfigInt('DoubleClickTime', 300) * 0.001 -- no event to notify us if this changes but not really a big deal
 
@@ -198,6 +198,19 @@ function widget:CommandNotify(cmdID)
 		return
 	end
 	PlayResponse(unitID, cmdID)
+end
+
+local unitCommandHandled = false
+function widget:UnitCommandNotify(unitID, cmdID, cmdParams)
+	if unitCommandHandled then
+		return
+	end
+	PlayResponse(unitID, cmdID)
+	unitCommandHandled = true
+end
+
+function widget:Update()
+	unitCommandHandled = false
 end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
