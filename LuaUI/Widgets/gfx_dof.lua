@@ -13,7 +13,7 @@ end
 
 options_path = 'Settings/Graphics/Effects/Depth of Field'
 
-options_order = {'useDoF', 'highQuality', 'autofocus', 'focusDepth', 'fStop'}
+options_order = {'useDoF', 'highQuality', 'autofocus', 'mousefocus', 'focusDepth', 'fStop'}
 
 options = {
 	useDoF = 
@@ -39,23 +39,27 @@ options = {
 		name='Automatically Set Focus',
 		value=true,
 		noHotkey=true,
-		advanced=true,
+	},
+	mousefocus =
+	{
+		type='bool',
+		name='Focus on Mouse Position',
+		value=false,
+		noHotkey=true,
 	},
 	focusDepth =
 	{
 		type='number',
-		name='Focus Depth (Manual Focus Only)',
+		name='Focus Depth (Manual & Non-Mouse Focus)',
 		min = 0.0, max = 2000.0, step = 0.1,
 		value = 300.0,
-		advanced = true,
 	},
 	fStop =
 	{
 		type='number',
-		name='F-Stop',
+		name='F-Stop (Manual Focus Only)',
 		min = 1.0, max = 80.0, step = 0.1,
 		value = 16.0,
-		advanced = true,
 	},
 }
 
@@ -155,7 +159,9 @@ local viewProjectionLoc = nil
 local resolutionLoc = nil
 local distanceLimitsLoc = nil
 local autofocusLoc = nil
+local mousefocusLoc = nil
 local focusDepthLoc = nil
+local mouseDepthCoordLoc = nil
 local fStopLoc = nil
 local qualityLoc = nil
 local passLoc = nil
@@ -335,7 +341,9 @@ function widget:Initialize()
 	resolutionLoc = gl.GetUniformLocation(dofShader, "resolution")
 	distanceLimitsLoc = gl.GetUniformLocation(dofShader, "distanceLimits")
 	autofocusLoc = gl.GetUniformLocation(dofShader, "autofocus")
+	mousefocusLoc = gl.GetUniformLocation(dofShader, "mousefocus")
 	focusDepthLoc = gl.GetUniformLocation(dofShader, "manualFocusDepth")
+	mouseDepthCoordLoc = gl.GetUniformLocation(dofShader, "mouseDepthCoord")
 	fStopLoc = gl.GetUniformLocation(dofShader, "fStop")
 	qualityLoc = gl.GetUniformLocation(dofShader, "quality")
 	passLoc = gl.GetUniformLocation(dofShader, "pass")
@@ -446,11 +454,15 @@ function widget:DrawScreenEffects()
 	gl.Blending(false)
 	glCopyToTexture(screenTex, 0, 0, 0, 0, vsx, vsy) -- the original screen image
 	glCopyToTexture(depthTex, 0, 0, 0, 0, vsx, vsy) -- the original screen image
+
+	local mx, my = Spring.GetMouseState()
 	
 	glUseShader(dofShader)
 		glUniform(distanceLimitsLoc, gl.GetViewRange())
 
 		glUniformInt(autofocusLoc, options.autofocus.value and 1 or 0)
+		glUniformInt(mousefocusLoc, options.mousefocus.value and 1 or 0)
+		glUniform(mouseDepthCoordLoc, mx/vsx, my/vsy)
 		glUniform(focusDepthLoc, options.focusDepth.value / maxBlurDistance)
 		glUniform(fStopLoc, options.fStop.value)
 		glUniformInt(qualityLoc, options.highQuality.value and 1 or 0)
