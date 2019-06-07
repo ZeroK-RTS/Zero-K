@@ -163,7 +163,7 @@ local function GetZoomScale()
 end
 
 local function PrepareOutline(cleanState)
-	gl.ResetState()
+	--gl.ResetState()
 
 	gl.DepthTest(true)
 	gl.DepthTest(GL.ALWAYS)
@@ -233,7 +233,7 @@ local function PrepareOutline(cleanState)
 end
 
 local function DrawOutline(strength, loadTextures, alwaysVisible)
-	gl.ResetState()
+	--gl.ResetState()
 
 	if loadTextures then
 		gl.Texture(0, dilationDepthTexes[pingPongIdx + 1])
