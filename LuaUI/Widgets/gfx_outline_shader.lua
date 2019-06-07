@@ -7,7 +7,7 @@ function widget:GetInfo()
 		date      = "2019",
 		license   = "GNU GPL, v2 or later",
 		layer     = math.huge,
-		enabled   = false  --  loaded by default?
+		enabled   = true, --  loaded by default?
 	}
 end
 
@@ -78,6 +78,7 @@ local applicationShader
 
 local pingPongIdx = 1
 
+local shadersEnabled = LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
 -----------------------------------------------------------------
 -- Configuration
 -----------------------------------------------------------------
@@ -293,10 +294,13 @@ function widget:ViewResize()
 end
 
 function widget:Initialize()
-	local canContinue = LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
-	if not canContinue then
+	if not shadersEnabled then
 		Spring.Echo(string.format("Error in [%s] widget: %s", wiName, "Deferred shading is not enabled or advanced shading is not active"))
+		Spring.SendCommands("luaui enablewidget Outline No Shader")
+		widgetHandler:RemoveWidget()
+		return
 	end
+	Spring.SendCommands("luaui disablewidget Outline No Shader")
 
 	local configName = "AllowDrawModelPostDeferredEvents"
 	if Spring.GetConfigInt(configName, 0) == 0 then
@@ -412,6 +416,10 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
+	if not shadersEnabled then
+		return
+	end
+
 	if screenQuadList then
 		gl.DeleteList(screenQuadList)
 	end
@@ -419,8 +427,6 @@ function widget:Shutdown()
 	if screenWideList then
 		gl.DeleteList(screenWideList)
 	end
-
-
 
 	gl.DeleteTexture(shapeDepthTex)
 	gl.DeleteTexture(shapeColorTex)
@@ -469,6 +475,7 @@ end
 
 function widget:DrawWorld()
 	EnterLeaveScreenSpace(DrawOutline, OUTLINE_STRENGTH_ALWAYS_ON, true, true)
+	gl.ResetState()
 end
 
 function widget:DrawUnitsPostDeferred()
