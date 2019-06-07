@@ -40,7 +40,7 @@ local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
 local OUTLINE_STRENGTH_BLENDED = 1.0
 local OUTLINE_STRENGTH_ALWAYS_ON = 0.6
 
-local USE_MATERIAL_INDICES = true -- for future material indices based outline evaluation
+local USE_MATERIAL_INDICES = true
 
 
 -----------------------------------------------------------------
@@ -145,7 +145,7 @@ local function GetZoomScale()
 	end
 	cameraHeight = math.max(1.0, cameraHeight)
 	--Spring.Echo("cameraHeight", cameraHeight)
-	
+
 	if functionScaleWithHeight then
 		if cameraHeight < SUBTLE_MIN then
 			return 1
@@ -153,10 +153,10 @@ local function GetZoomScale()
 		if cameraHeight > SUBTLE_MAX then
 			return 0.5
 		end
-		
+
 		return (((math.cos(PI*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^2)/2 + 0.5
 	end
-	
+
 	local scaleFactor = 250.0 / cameraHeight
 	scaleFactor = math.min(math.max(0.5, scaleFactor), 1.0)
 	--Spring.Echo("cameraHeight", cameraHeight, "thicknessMult", thicknessMult)
@@ -164,8 +164,6 @@ local function GetZoomScale()
 end
 
 local function PrepareOutline(cleanState)
-	--gl.ResetState()
-
 	gl.DepthTest(true)
 	gl.DepthTest(GL.ALWAYS)
 
@@ -233,9 +231,7 @@ local function PrepareOutline(cleanState)
 	end
 end
 
-local function DrawOutline(strength, loadTextures, alwaysVisible)
-	--gl.ResetState()
-
+local function DrawOutline(strength, loadTextures, drawWorld)
 	if loadTextures then
 		gl.Texture(0, dilationDepthTexes[pingPongIdx + 1])
 		gl.Texture(1, dilationColorTexes[pingPongIdx + 1])
@@ -246,10 +242,10 @@ local function DrawOutline(strength, loadTextures, alwaysVisible)
 	gl.AlphaTest(true)
 	gl.AlphaTest(GL.GREATER, 0.0);
 	gl.DepthTest(GL.LEQUAL) --restore default mode
-	gl.Blending(true)
+	gl.Blending("alpha")
 
 	applicationShader:ActivateWith( function ()
-		applicationShader:SetUniformFloat("alwaysShowOutLine", (alwaysVisible and 1.0) or 0.0)
+		applicationShader:SetUniformFloat("alwaysShowOutLine", (drawWorld and 1.0) or 0.0)
 		applicationShader:SetUniformFloat("strength", strength)
 		gl.CallList(screenWideList)
 	end)
@@ -259,8 +255,10 @@ local function DrawOutline(strength, loadTextures, alwaysVisible)
 	gl.Texture(2, false)
 	gl.Texture(3, false)
 
-	gl.DepthTest(not alwaysVisible)
-	gl.Blending(false)
+	gl.DepthTest(not drawWorld)
+	if not drawWorld then
+		gl.Blending(false)
+	end
 	gl.AlphaTest(GL.GREATER, 0.5);  --default mode
 	gl.AlphaTest(false)
 end
@@ -448,34 +446,8 @@ function widget:Shutdown()
 	applicationShader:Finalize()
 end
 
--- Debug #1, Uncomment the following
---[[
-function widget:DrawScreenEffects()
-	gl.Blending(false)
-
-	gl.Texture(0, shapeColorTex)
-	gl.TexRect(0, 0, vsx, vsy, false, true)
-	gl.Texture(0, false)
-	gl.Blending(true)
-end
-]]--
-
--- Debug #2, Comment the previous and uncomment the following
---[[
-function widget:DrawScreenEffects()
-	gl.Blending(false)
-
-	gl.Texture(0, dilationColorTexes[pingPongIdx + 1])
-	gl.TexRect(0, 0, vsx, vsy, false, true)
-	gl.Texture(0, false)
-	gl.Blending(true)
-end
-]]--
-
-
 function widget:DrawWorld()
 	EnterLeaveScreenSpace(DrawOutline, OUTLINE_STRENGTH_ALWAYS_ON, true, true)
-	gl.ResetState()
 end
 
 function widget:DrawUnitsPostDeferred()
