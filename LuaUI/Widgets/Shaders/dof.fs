@@ -12,8 +12,10 @@ uniform vec3 eyePos;
 uniform mat4 viewProjection;
 uniform vec2 resolution;
 uniform vec2 distanceLimits;
+uniform vec2 mouseDepthCoord;
 
 uniform int autofocus;
+uniform int mousefocus;
 uniform float manualFocusDepth;
 uniform float fStop;
 uniform int quality;
@@ -90,13 +92,14 @@ const float focusMixDepthRange = (float(KERNEL_RADIUS) * 2.0);
 const float maxFilterRadius = 1.2; //keep between 0 and 2. Any higher than 2 will require modifying the normalization maths 
                                    //(currently does (radius/4)+0.5 to get [-2..2] to [0..1])
 
+//Approximately a circle, but bulging slightly up to help with focus making sense when looking down ramps
 const vec2 autofocusTestCoordOffsets[] = vec2[](
   vec2(-0.71, -0.71),
-  vec2(-0.71, 0.71),
-  vec2(0.71, 0.71),
+  vec2(-0.71, 0.76),
+  vec2(0.71, 0.76),
   vec2(0.71, -0.71),
   vec2(-1.0, 0.0),
-  vec2(0.0, 1.0),
+  vec2(0.0, 1.1),
   vec2(0.0, -1.0),
   vec2(1.0, 0.0)
 );
@@ -194,11 +197,17 @@ void main()
     float focusDepth = manualFocusDepth;
     float aperture = 1.0/fStop;
 
+    vec2 centerUV = vec2(0.5,0.5);
+    if (mousefocus == 1)
+    {
+      centerUV = mouseDepthCoord;
+      focusDepth = LinearizeDepth(mouseDepthCoord);
+    }
+
     if (autofocus == 1)
     {
       //The numbers in the autofocus computation that look like magic numbers are, 
       //found by experimentation to work well enough in practice, but not sacred.
-      vec2 centerUV = vec2(0.5,0.5);
       float centerDepth = LinearizeDepth(centerUV);
       focusDepth = centerDepth;
       float testFocusDepth = focusDepth;
@@ -213,8 +222,10 @@ void main()
         testDepth = LinearizeDepth(centerUV + 
           (vec2(autofocusTestCoordOffsets[i].x * aspectRatio, 
             autofocusTestCoordOffsets[i].y) * clamp(focusDepth * 4.4, 0.1, 0.225)));
-        minTestDepth = min(minTestDepth, (2.5 * minTestDepth + testDepth) / 3.5);
-        maxTestDepth = max(maxTestDepth, (2.5 * maxTestDepth + testDepth) / 3.5);
+        //We use averages here instead of just directly min/max testing testDepth in order to have smoother focus transitions
+        //across big changes to focus depth, such as the camera scrolling over a cliff or being zoomed in on a unit.
+        minTestDepth = min(minTestDepth, (3.0 * minTestDepth + 2.0 * testDepth) / 5.0);
+        maxTestDepth = max(maxTestDepth, (3.0 * maxTestDepth + 2.0 * testDepth) / 5.0);
       }
 
       //pull focus back a bit to bias slightly towards air units and against distant terrain
@@ -235,7 +246,7 @@ void main()
       float baseAperture = 
         focalLength/max(testFocusDepth * exp(curveDepth * testFocusDepth), minFStop);
 
-      float apertureBoundsFudgeFactor = 1.2; //Used to control bounds depths without having to change inFocusThreshold
+      float apertureBoundsFudgeFactor = 1.15; //Used to control bounds depths without having to change inFocusThreshold
       float maxDepthAperture = ApertureSizeToKeepFocusFor(maxTestDepth, focusDepth) * apertureBoundsFudgeFactor;
       float minDepthAperture = ApertureSizeToKeepFocusFor(minTestDepth, focusDepth) * apertureBoundsFudgeFactor;
 
