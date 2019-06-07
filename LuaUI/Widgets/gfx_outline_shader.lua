@@ -21,24 +21,21 @@ local GL_RGBA = 0x1908
 --GL_DEPTH_COMPONENT32F is the default for deferred depth textures, but Lua API only works correctly with GL_DEPTH_COMPONENT32
 local GL_DEPTH_COMPONENT32 = 0x81A7
 
+local PI = math.pi
 
 -----------------------------------------------------------------
 -- Configuration Constants
 -----------------------------------------------------------------
 
-
-local MIN_FPS = 20
-local MIN_FPS_DELTA = 10
-local AVG_FPS_ELASTICITY = 0.2
-local AVG_FPS_ELASTICITY_INV = 1.0 - AVG_FPS_ELASTICITY
-
+local SUBTLE_MIN = 500
+local SUBTLE_MAX = 3000
+local STRENGTH_MULT = 0.5
 
 local DILATE_SINGLE_PASS = false --true is slower on my system
 local DILATE_HALF_KERNEL_SIZE = 3
 local DILATE_PASSES = 1
 
-local OUTLINE_ZOOM_SCALE = true
-local OUTLINE_COLOR = {0.9, 0.9, 0.9, 1.0}
+local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
 --local OUTLINE_COLOR = {0.75, 0.75, 0.75, 1.0}
 --local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
 local OUTLINE_STRENGTH_BLENDED = 1.0
@@ -81,12 +78,62 @@ local applicationShader
 
 local pingPongIdx = 1
 
+-----------------------------------------------------------------
+-- Configuration
+-----------------------------------------------------------------
+
+local thickness = 1
+local scaleWithHeight = true
+local functionScaleWithHeight = true
+
+options_path = 'Settings/Graphics/Unit Visibility/Outline'
+options = {
+	thickness = {
+		name = 'Outline Thickness',
+		desc = 'How thick the outline appears around objects',
+		type = 'number',
+		min = 0.2, max = 1, step = 0.01,
+		value = 0.5,
+		OnChange = function (self)
+			thickness = self.value
+		end,
+	},
+	scaleWithHeight = {
+		name = 'Scale With Distance',
+		desc = 'Reduces the screen space width of outlines when zoomed out.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function (self)
+			scaleWithHeight = self.value
+			if not scaleWithHeight then
+				thicknessMult = 1
+			end
+		end,
+	},
+	functionScaleWithHeight = {
+		name = 'Subtle Scale With Distance',
+		desc = 'Reduces the screen space width of outlines when zoomed out, in a subtle way.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = function (self)
+			functionScaleWithHeight = self.value
+			if not functionScaleWithHeight then
+				thicknessMult = 1
+			end
+		end,
+	},
+}
 
 -----------------------------------------------------------------
 -- Local Functions
 -----------------------------------------------------------------
 
 local function GetZoomScale()
+	if not scaleWithHeight then
+		return thickness
+	end
 	local cs = Spring.GetCameraState()
 	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
 	local cameraHeight
@@ -96,19 +143,27 @@ local function GetZoomScale()
 		cameraHeight = cs.py - gy
 	end
 	cameraHeight = math.max(1.0, cameraHeight)
+	--Spring.Echo("cameraHeight", cameraHeight)
+	
+	if functionScaleWithHeight then
+		if cameraHeight < SUBTLE_MIN then
+			return 1
+		end
+		if cameraHeight > SUBTLE_MAX then
+			return 0.5
+		end
+		
+		return (((math.cos(PI*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^2)/2 + 0.5
+	end
+	
 	local scaleFactor = 250.0 / cameraHeight
 	scaleFactor = math.min(math.max(0.5, scaleFactor), 1.0)
-	--Spring.Echo(cameraHeight, scaleFactor)
+	--Spring.Echo("cameraHeight", cameraHeight, "thicknessMult", thicknessMult)
 	return scaleFactor
 end
 
-local show = true
 local function PrepareOutline(cleanState)
-	if not show then
-		return
-	end
-
-	--gl.ResetState()
+	gl.ResetState()
 
 	gl.DepthTest(true)
 	gl.DepthTest(GL.ALWAYS)
@@ -136,9 +191,7 @@ local function PrepareOutline(cleanState)
 
 	for i = 1, DILATE_PASSES do
 		dilationShader:ActivateWith( function ()
-			if OUTLINE_ZOOM_SCALE then
-				strength = GetZoomScale()
-			end
+			strength = GetZoomScale() * STRENGTH_MULT
 			dilationShader:SetUniformFloat("strength", strength)
 
 			if DILATE_SINGLE_PASS then
@@ -180,11 +233,7 @@ local function PrepareOutline(cleanState)
 end
 
 local function DrawOutline(strength, loadTextures, alwaysVisible)
-	if not show then
-		return
-	end
-
-	--gl.ResetState()
+	gl.ResetState()
 
 	if loadTextures then
 		gl.Texture(0, dilationDepthTexes[pingPongIdx + 1])
@@ -392,25 +441,6 @@ function widget:Shutdown()
 	dilationShader:Finalize()
 	applicationShader:Finalize()
 end
-
-
-local accuTime = 0
-local lastTime = 0
-local averageFPS = MIN_FPS + MIN_FPS_DELTA
-
-function widget:Update(dt)
-	accuTime = accuTime + dt
-	if accuTime >= lastTime + 1 then
-		lastTime = accuTime
-		averageFPS = AVG_FPS_ELASTICITY_INV * averageFPS + AVG_FPS_ELASTICITY * Spring.GetFPS()
-		if averageFPS < MIN_FPS then
-			show = false
-		elseif averageFPS > MIN_FPS + MIN_FPS_DELTA then
-			show = true
-		end
-	end
-end
-
 
 -- Debug #1, Uncomment the following
 --[[

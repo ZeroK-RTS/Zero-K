@@ -844,6 +844,7 @@ local function DrawFormationDots(vertFunction, zoomY, unitCount)
 	local lengthUnitNext = lengthPerUnit
 	local dotSize = sqrt(zoomY*0.1)*options.dotsize.value
 	if (#fNodes > 1) and (unitCount > 1) then
+		gl.ResetState()
 		SetColor(usingCmd, 1)
 		DrawFilledCircleOutFading(fNodes[1], dotSize, 8)
 		if (#fNodes > 2) then
