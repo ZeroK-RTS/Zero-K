@@ -21,7 +21,6 @@ options = {
 		type='bool', 
 		name='Apply Depth of Field Effect', 
 		value=false, 
-		noHotkey = false, 
 		advanced = false,
 	},
 	highQuality =
@@ -29,7 +28,6 @@ options = {
 		type='bool',
 		name='High Quality',
 		value=false,
-		noHotkey=false,
 		advanced=false,
 		OnChange = function(self) InitTextures() end,
 	}, 
@@ -38,14 +36,12 @@ options = {
 		type='bool',
 		name='Automatically Set Focus',
 		value=true,
-		noHotkey=true,
 	},
 	mousefocus =
 	{
 		type='bool',
 		name='Focus on Mouse Position',
 		value=false,
-		noHotkey=true,
 	},
 	focusDepth =
 	{
