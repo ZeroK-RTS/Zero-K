@@ -106,6 +106,10 @@ function Control:New(obj)
     end
   end
 
+  if WG.ChiliRedraw then
+    WG.ChiliRedraw.AddControl(obj, "New")
+  end
+
   return obj
 end
 
@@ -957,6 +961,9 @@ function Control:DrawForList()
   if (self._own_dlist) then
     gl.CallList(self._own_dlist);
   else
+    if WG.ChiliRedraw then
+      WG.ChiliRedraw.AddControl(self, "DrawForList")
+    end
     self:DrawControl();
   end
 
@@ -983,6 +990,9 @@ function Control:Draw()
   if (self._own_dlist) then
     gl.CallList(self._own_dlist);
   else
+    if WG.ChiliRedraw then
+      WG.ChiliRedraw.AddControl(self, "Draw")
+    end
     self:DrawControl();
   end
 
@@ -1016,6 +1026,9 @@ end
 
 function Control:DrawChildrenForList()
   if (next(self.children)) then
+    if WG.ChiliRedraw then
+      WG.ChiliRedraw.AddControl(self, "DrawChildrenForList")
+    end
     self:_DrawChildrenInClientArea('DrawForList')
   end
 end

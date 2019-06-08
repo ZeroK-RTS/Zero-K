@@ -20,7 +20,7 @@ end
 --------------------------------------------------------------------------------
 
 -- Use old chili if unable to use RTT
-local USE_OLD_CHILI = not ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil)
+local USE_OLD_CHILI = true -- not ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
