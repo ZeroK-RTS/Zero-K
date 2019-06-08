@@ -183,7 +183,7 @@ end
 
 
 local function PushStencilMask(obj, x, y, w, h)
-	obj._stencilMask = (obj.parent._stencilMask or 0) + 1
+	obj._stencilMask = ((obj.parent and obj.parent._stencilMask) or 0) + 1
 	if (obj._stencilMask > 255) then
 		obj._stencilMask = 0
 	end
@@ -220,7 +220,7 @@ local function PopStencilMask(obj, x, y, w, h)
 	end
 
 	gl.ColorMask(true)
-	gl.StencilFunc(GL.EQUAL, obj.parent._stencilMask or 0, 0xFF)
+	gl.StencilFunc(GL.EQUAL, ((obj.parent and obj.parent._stencilMask) or 0), 0xFF)
 	gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
 	--gl.StencilTest(false)
 
