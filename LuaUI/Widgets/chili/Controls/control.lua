@@ -391,9 +391,9 @@ end
 --// ============================================================================= 
 
 function Control:SetEnabled(enabled)
-		self.state.enabled = enabled
-		self:CallListeners(self.OnEnableChanged, not self.state.enabled)
-		self:Invalidate()
+	self.state.enabled = enabled
+	self:CallListeners(self.OnEnableChanged, not self.state.enabled)
+	self:Invalidate()
 end
 
 --// ============================================================================= 
@@ -1304,6 +1304,9 @@ function Control:DrawForList()
 	end
 
 	if (self._tex_all and not self._inrtt) then
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "DrawForList_tex_all")
+		end
 		gl.PushMatrix()
 		gl.Translate(self.x, self.y, 0)
 			gl.BlendFuncSeparate(GL.ONE, GL.SRC_ALPHA, GL.ZERO, GL.SRC_ALPHA)
@@ -1326,8 +1329,14 @@ function Control:DrawForList()
 	gl.Translate(self.x, self.y, 0)
 
 	if (self._own_dlist) then
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "DrawForList_own_dlist")
+		end
 		gl.CallList(self._own_dlist)
 	else
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "DrawForList")
+		end
 		if self._hasCustomDrawControl then
 			gl.Translate(-self.x, -self.y, 0)
 			self:DrawControl()
@@ -1379,6 +1388,9 @@ function Control:Draw()
 	end
 
 	if (self._tex_all) then
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "Draw_tex_all")
+		end
 		gl.PushMatrix()
 		gl.Translate(self.x, self.y, 0)
 			gl.BlendFunc(GL.ONE, GL.SRC_ALPHA)
@@ -1403,6 +1415,9 @@ function Control:Draw()
 	if (self._own_dlist) then
 		gl.CallList(self._own_dlist)
 	else
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "Draw")
+		end
 		if self._hasCustomDrawControl then
 			gl.Translate(-self.x, -self.y, 0)
 			self:DrawControl()
