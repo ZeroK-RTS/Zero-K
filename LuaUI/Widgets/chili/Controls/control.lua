@@ -984,6 +984,7 @@ function Control:_CheckIfRTTisAppreciated()
 			return (((self._redrawSelfCounter or 1) / (self._redrawCounter or 1)) < 0.03)
 		end
 	end
+	return true
 end
 
 
@@ -1461,6 +1462,9 @@ end
 
 function Control:DrawChildrenForList()
 	if (next(self.children)) then
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "DrawChildrenForList")
+		end
 		self:_DrawChildrenInClientAreaWithoutViewCheck('DrawForList')
 	end
 end
