@@ -77,7 +77,7 @@ local applicationShader
 
 local pingPongIdx = 1
 
-local shadersEnabled = LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
+local shadersEnabled = Spring.Utilities.IsCurrentVersionNewerThan(104, 1243) and LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
 -----------------------------------------------------------------
 -- Configuration
 -----------------------------------------------------------------
@@ -294,11 +294,11 @@ end
 function widget:Initialize()
 	if not shadersEnabled then
 		Spring.Echo(string.format("Error in [%s] widget: %s", wiName, "Deferred shading is not enabled or advanced shading is not active"))
-		Spring.SendCommands("luaui enablewidget Outline No Shader")
+		WG.HudEnableWidget("Outline No Shader")
 		widgetHandler:RemoveWidget()
 		return
 	end
-	Spring.SendCommands("luaui disablewidget Outline No Shader")
+	WG.HudDisableWidget("Outline No Shader")
 
 	local configName = "AllowDrawModelPostDeferredEvents"
 	if Spring.GetConfigInt(configName, 0) == 0 then

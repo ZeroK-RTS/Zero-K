@@ -1491,6 +1491,18 @@ options = {
 }
 
 ----------------------------------------------------
+-- Interface
+----------------------------------------------------
+
+function WG.HudEnableWidget(widgetName)
+	widgetHandler:EnableWidget(widgetName)
+end
+
+function WG.HudDisableWidget(widgetName)
+	widgetHandler:DisableWidget(widgetName)
+end
+
+----------------------------------------------------
 -- Callins
 ----------------------------------------------------
 local timeSinceUpdate = 0
