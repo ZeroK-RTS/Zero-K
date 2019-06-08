@@ -10,33 +10,30 @@ local function SunChanged(curShaderObj)
 	curShaderObj:SetUniformAlways("sunSpecular", gl.GetSun("specular" ,"unit"))
 end
 
-local default_lua = VFS.Include("ModelMaterials/Shaders/default.lua")
-
 local materials = {
 	normalMappedS3o = {
 		shaderDefinitions = {
 			"#define use_normalmapping",
 			"#define deferred_mode 0",
-			"#define SHADOW_PROFILE_HIGH",
+			"#define SHADOW_SOFTNESS SHADOW_SOFTER",
 		},
 		deferredDefinitions = {
 			"#define use_normalmapping",
 			"#define deferred_mode 1",
-			"#define SHADOW_PROFILE_HIGH",
+			"#define SHADOW_SOFTNESS SHADOW_HARD",
+			"#define MAT_IDX 2",
 		},
-		shader    = default_lua,
-		deferred  = default_lua,
 		usecamera = false,
 		culling   = GL.BACK,
 		predl  = nil,
 		postdl = nil,
 		texunits  = {
-			[0] = '%%UNITDEFID:0',
-			[1] = '%%UNITDEFID:1',
-			[2] = '$shadow',
-			--[3] = '$specular',
-			[4] = '$reflection',
-			[5] = '%NORMALTEX',
+			[0] = "%%UNITDEFID:0",
+			[1] = "%%UNITDEFID:1",
+			[2] = "$shadow",
+			--[3] = "$specular",
+			[4] = "$reflection",
+			[5] = "%NORMALTEX",
 		},
 		SunChanged = SunChanged,
 	},
@@ -83,11 +80,11 @@ local function FindNormalmap(tex1, tex2)
 	return normaltex
 end
 
-for i=1,#UnitDefs do
-	local udef = UnitDefs[i]
+for id = 1, #UnitDefs do
+	local udef = UnitDefs[id]
 
 	if (udef.customParams.normaltex and VFS.FileExists(udef.customParams.normaltex)) then
-		unitMaterials[i] = {"normalMappedS3o", NORMALTEX = udef.customParams.normaltex}
+		unitMaterials[id] = {"normalMappedS3o", NORMALTEX = udef.customParams.normaltex}
 	elseif (udef.modeltype == "s3o") then
 		local modelpath = udef.modelpath
 		if (modelpath) then
@@ -113,8 +110,8 @@ for i=1,#UnitDefs do
 			end
 
 			local normaltex = FindNormalmap(tex1,tex2)
-			if (normaltex and not unitMaterials[i]) then
-				unitMaterials[i] = {"normalMappedS3o", NORMALTEX = normaltex}
+			if (normaltex and not unitMaterials[id]) then
+				unitMaterials[id] = {"normalMappedS3o", NORMALTEX = normaltex}
 			end
 		end --if model
 
@@ -135,8 +132,8 @@ for i=1,#UnitDefs do
 					end
 
 					local normaltex = FindNormalmap(tex1,tex2)
-					if (normaltex and not unitMaterials[i]) then
-						unitMaterials[i] = {"normalMappedS3o", NORMALTEX = normaltex}
+					if (normaltex and not unitMaterials[id]) then
+						unitMaterials[id] = {"normalMappedS3o", NORMALTEX = normaltex}
 					end
 				end
 			end

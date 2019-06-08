@@ -14,13 +14,13 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Outline",
+		name      = "Outline No Shader",
 		desc      = "Displays a nice cartoon like outline around units.",
 		author    = "jK",
 		date      = "Dec 06, 2007",
 		license   = "GNU GPL, v2 or later",
 		layer     = -10,
-		enabled   = true  --  loaded by default?
+		enabled   = false  --  loaded by default?
 	}
 end
 
@@ -46,7 +46,7 @@ local function QualityChangeCheckFunc()
 	end
 end
 
-options_path = 'Settings/Graphics/Unit Visibility/Outline'
+options_path = 'Settings/Graphics/Unit Visibility/Outline (No Shader)'
 options = {
 	thickness = {
 		name = 'Outline Thickness',
