@@ -432,6 +432,7 @@ local pathMisc = 'Settings/Misc'
 			Spring.SetConfigInt("ZKuseOldChili", value); --store in Springsettings.txt because api_chili.lua must read it independent of gui_epicmenu.lua
 		end,
 	})
+	ShButton(pathMisc, 'Toggle Redraw Tracker', function() spSendCommands{"luaui togglewidget Chili Redraw Tracker"} end, '', true)
 	ShButton(pathMisc, 'Toggle Widget Profiler', function() spSendCommands{"luaui togglewidget WidgetProfiler"} end, '', true)
 	ShButton(pathMisc, 'Toggle New Widget Profiler', function() spSendCommands{"luaui togglewidget Widget Profiler New"} end, '', true)
 

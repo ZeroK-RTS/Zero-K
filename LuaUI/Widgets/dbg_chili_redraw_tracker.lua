@@ -51,6 +51,11 @@ local updateDefs = {
 		lineWidth = 6,
 		padding = -4,
 	},
+	DrawChildrenForList = {
+		color = {.96, .95, .05},
+		lineWidth = 3,
+		padding = -4,
+	},
 }
 
 local vsx, vsy, sMidX, sMidY = 0, 0, 0, 0
