@@ -168,6 +168,9 @@ function Control:New(obj)
 		end
 	end
 
+	if WG.ChiliRedraw then
+		WG.ChiliRedraw.AddControl(obj, "New")
+	end
 	return obj
 end
 

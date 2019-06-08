@@ -34,7 +34,7 @@ local updateDefs = {
 	DrawForList_tex_all = {
 		color = {.95, .96, .95},
 		lineWidth = 2,
-		padding = 1,
+		padding = 2,
 	},
 	DrawForList = {
 		color = {.96, .05, .95},
@@ -42,9 +42,14 @@ local updateDefs = {
 		padding = 0,
 	},
 	DrawForList_own_dlist = {
-		color = {.96, .95, .95},
-		lineWidth = 6,
+		color = {.05, .05, .05},
+		lineWidth = 20,
 		padding = 0,
+	},
+	New = {
+		color = {.06, .95, .05},
+		lineWidth = 6,
+		padding = -4,
 	},
 }
 
