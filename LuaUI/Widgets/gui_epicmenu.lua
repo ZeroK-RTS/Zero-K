@@ -2230,9 +2230,9 @@ local function GetMainPanel(parent, width, height)
 
 	local stackChildren = {}
 	local holderWidth = 6
-	local sliderWidth = 100
+	local sliderWidth = 96
 	if width < 372 then
-		sliderWidth = width - 272
+		sliderWidth = width - 276
 	end
 	
 	if height < 45 then
@@ -2256,7 +2256,7 @@ local function GetMainPanel(parent, width, height)
 		
 		stackChildren[#stackChildren + 1] = StackPanel:New{
 			orientation = 'horizontal',
-			width = 74,
+			width = 78,
 			height = '100%',
 			resizeItems = false,
 			autoArrangeV = false,
@@ -2268,7 +2268,7 @@ local function GetMainPanel(parent, width, height)
 				lbl_gtime,
 			},
 		}
-		holderWidth = holderWidth + 76
+		holderWidth = holderWidth + 80
 		
 		stackChildren[#stackChildren + 1] = Image:New{tooltip = 'Volume', file = LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width = 18, height = 18}
 		stackChildren[#stackChildren + 1] = Grid:New{
