@@ -65,7 +65,7 @@ local LuaShader = VFS.Include(LUASHADER_DIR .. "LuaShader.lua")
 
 local shadows = false
 local advShading = false
-local normalmapping = false
+local normalmapping = true
 local treewind = false
 
 local sunChanged = false
@@ -799,7 +799,8 @@ function gadget:Initialize()
 	--// check user configs
 	shadows = Spring.HaveShadows()
 	advShading = Spring.HaveAdvShading()
-	normalmapping = tonumber(Spring.GetConfigInt("NormalMapping", 1) or 0) > 0
+	--normalmapping = tonumber(Spring.GetConfigInt("NormalMapping", 1) or 0) > 0
+	normalmapping = true
 	treewind = tonumber(Spring.GetConfigInt("TreeWind", 1) or 1) > 0
 
 	--// GG assignment
@@ -813,7 +814,7 @@ function gadget:Initialize()
 
 	--// insert synced actions
 	gadgetHandler:AddSyncAction("unitshaders_reverse", UnitReverseBuilt)
-	gadgetHandler:AddChatAction("normalmapping", ToggleNormalmapping)
+	--gadgetHandler:AddChatAction("normalmapping", ToggleNormalmapping)
 	gadgetHandler:AddChatAction("treewind", ToggleTreeWind)
 
 	--// material initialization
