@@ -14,16 +14,10 @@ local materials = {
 	feature_metal = {
 		shaderDefinitions = {
 			"#define deferred_mode 0",
-			"#define EXTRACOLOR_G_NOISE vec2(20.0)",
-			"#define SPECULARSUNEXP 28.0",
-			"#define SPECULARMULT 0.5",
 			"#define SHADOW_SOFTNESS SHADOW_HARD",
 		},
 		deferredDefinitions = {
 			"#define deferred_mode 1",
-			"#define EXTRACOLOR_G_NOISE vec2(20.0)",
-			"#define SPECULARSUNEXP 28.0",
-			"#define SPECULARMULT 0.5",
 			"#define SHADOW_SOFTNESS SHADOW_HARD",
 			"#define MAT_IDX 130",
 		},
