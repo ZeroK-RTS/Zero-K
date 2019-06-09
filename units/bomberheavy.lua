@@ -29,7 +29,7 @@ unitDef = {
     requireammo      = [[1]],
     reammoseconds    = [[20]],
     refuelturnradius = [[150]],
-	reallyabomber    = [[1]],
+    reallyabomber    = [[1]],
   },
 
   explodeAs           = [[GUNSHIPEX]],

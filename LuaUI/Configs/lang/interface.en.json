@@ -1,6 +1,8 @@
 {
 	"idle_cons" : {
 		"one" : "You have %{count} idle constructor.",
+		"few" : "You have %{count} idle constructors",	
+		"many" : "You have %{count} idle constructors",
 		"other" : "You have %{count} idle constructors."
 	},
 	"quick_rallypoint_mode" : "Quick rallypoint mode",
@@ -101,6 +103,8 @@
 	"cheatsheet_cat_rejects" : "Technical junk",
 	"x_units_in_queue" : {
 		"one" : "%{count} unit in queue",
+		"few" : "%{count} units in queue",	
+		"many" : "%{count} units in queue",
 		"other" : "%{count} units in queue"
 	}
 }

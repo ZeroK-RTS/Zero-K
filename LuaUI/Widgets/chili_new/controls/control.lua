@@ -140,6 +140,10 @@ function Control:New(obj)
     end
   end
 
+  if WG.ChiliRedraw then
+    WG.ChiliRedraw.AddControl(obj, "New")
+  end
+
   return obj
 end
 
@@ -1199,6 +1203,7 @@ end
 
 
 function Control:DrawForList()
+<<<<<<< HEAD:LuaUI/Widgets/chili_new/controls/control.lua
 	self._redrawCounter = (self._redrawCounter or 0) + 1
 	if (not self._in_update and not self._usingRTT and self:_CheckIfRTTisAppreciated()) then self:InvalidateSelf() end
 
@@ -1220,6 +1225,16 @@ function Control:DrawForList()
 		gl.PopMatrix()
 		return
 	end
+=======
+  if (self._own_dlist) then
+    gl.CallList(self._own_dlist);
+  else
+    if WG.ChiliRedraw then
+      WG.ChiliRedraw.AddControl(self, "DrawForList")
+    end
+    self:DrawControl();
+  end
+>>>>>>> 512d49596f9296d3c29198ad53fb5acc0bd2cff8:LuaUI/Widgets/chili_old/Controls/control.lua
 
 	gl.PushMatrix()
 	gl.Translate(self.x, self.y, 0)
@@ -1290,8 +1305,19 @@ function Control:Draw()
 		return
 	end
 
+<<<<<<< HEAD:LuaUI/Widgets/chili_new/controls/control.lua
 	gl.PushMatrix()
 	gl.Translate(self.x, self.y, 0)
+=======
+  if (self._own_dlist) then
+    gl.CallList(self._own_dlist);
+  else
+    if WG.ChiliRedraw then
+      WG.ChiliRedraw.AddControl(self, "Draw")
+    end
+    self:DrawControl();
+  end
+>>>>>>> 512d49596f9296d3c29198ad53fb5acc0bd2cff8:LuaUI/Widgets/chili_old/Controls/control.lua
 
 	if (self._own_dlist) then
 		gl.CallList(self._own_dlist)
@@ -1335,9 +1361,18 @@ end
 
 
 function Control:DrawChildrenForList()
+<<<<<<< HEAD:LuaUI/Widgets/chili_new/controls/control.lua
 	if (next(self.children)) then
 		self:_DrawChildrenInClientAreaWithoutViewCheck('DrawForList')
 	end
+=======
+  if (next(self.children)) then
+    if WG.ChiliRedraw then
+      WG.ChiliRedraw.AddControl(self, "DrawChildrenForList")
+    end
+    self:_DrawChildrenInClientArea('DrawForList')
+  end
+>>>>>>> 512d49596f9296d3c29198ad53fb5acc0bd2cff8:LuaUI/Widgets/chili_old/Controls/control.lua
 end
 
 --//=============================================================================

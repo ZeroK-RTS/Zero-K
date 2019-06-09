@@ -6,6 +6,7 @@ for i=1, #WeaponDefs do
 		weaponArray[i] = {
 			captureDamage = WeaponDefs[i].damages[0],
 			scaleDamage = (WeaponDefs[i].customParams.capture_scaling == '1'), -- falloff, armor, etc
+			baseDamage = WeaponDefs[i].customParams.shield_damage,
 		}
 	end
 end

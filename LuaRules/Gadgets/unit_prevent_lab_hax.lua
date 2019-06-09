@@ -358,16 +358,16 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	--Spring.MarkerAddLine(x + xsize,0,z + zsize,x - xsize,0,z + zsize)
 	--Spring.MarkerAddLine(x - xsize,0,z + zsize,x - xsize,0,z - zsize)
 	
-	if (not x) or (not z) then
-		if Spring.IsCheatingEnabled() then
-			Spring.Echo("Prevent Lab Hax AllowCommand")
-			Spring.Echo("cmdID", cmdID)
-			Spring.Utilities.TableEcho(cmdParams, "cmdParams")
-			Spring.Utilities.TableEcho(cmdOptions, "cmdOptions")
-			Spring.Echo("x z xsize zsize", x, z, xsize, zsize)
-		end
-		return true
-	end
+	--if (not x) or (not z) then
+	--	if Spring.IsCheatingEnabled() then
+	--		Spring.Echo("Prevent Lab Hax AllowCommand")
+	--		Spring.Echo("cmdID", cmdID)
+	--		Spring.Utilities.TableEcho(cmdParams, "cmdParams")
+	--		Spring.Utilities.TableEcho(cmdOptions, "cmdOptions")
+	--		Spring.Echo("x z xsize zsize", x, z, xsize, zsize)
+	--	end
+	--	return true
+	--end
 	
 	local labData = labList.data
 	for i = 1, labList.count do

@@ -92,7 +92,6 @@ function script.FireWeapon(num)
 	EmitSfx(ground, GG.Script.UNIT_SFX1)
 end
 
-
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
@@ -111,6 +110,14 @@ end
 
 function script.QueryWeapon(num)
 	return pelvis
+end
+
+function script.BlockShot(num, targetID)
+	local reloadTime = Spring.GetUnitWeaponState(unitID, 1, "reloadTime")*30 -- Takes slow into account
+	local otherNum = 3 - num
+	local gameFrame = Spring.GetGameFrame()
+	Spring.SetUnitWeaponState(unitID, otherNum, "reloadFrame", gameFrame + reloadTime)
+	return false
 end
 
 function script.Killed(recentDamage, maxHealth)

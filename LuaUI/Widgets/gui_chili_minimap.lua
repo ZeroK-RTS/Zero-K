@@ -44,7 +44,6 @@ local map_panel
 local buttons_panel
 local Chili
 local glDrawMiniMap = gl.DrawMiniMap
-local glResetState = gl.ResetState
 local glResetMatrices = gl.ResetMatrices
 local echo = Spring.Echo
 

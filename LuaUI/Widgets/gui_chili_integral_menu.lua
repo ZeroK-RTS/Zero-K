@@ -884,7 +884,6 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		end
 		
 		textBoxes[textPosition]:SetCaption(text or NO_TEXT)
-		textBoxes[textPosition]:Invalidate()
 	end
 		
 	local externalFunctionsAndData = {
@@ -917,7 +916,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 				SetText(textConfig.topLeft.name, hotkeyText)
 			end
 		end
-			
+		
 		button:Invalidate()
 		image:Invalidate()
 	end
@@ -1367,7 +1366,6 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	
 	if hotkey and (not hideHotkey) and (not disabled) then
 		button:SetCaption(humanName .. " (\255\0\255\0" .. hotkey .. "\008)")
-		button:Invalidate()
 	end
 	
 	local externalFunctionsAndData = {
@@ -1397,7 +1395,6 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		else
 			button:SetCaption(humanName .. " (" .. hotkey .. ")")
 		end
-		button:Invalidate()
 	end
 	
 	function externalFunctionsAndData.SetHideHotkey(newHidden)
@@ -1407,7 +1404,6 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		hideHotkey = newHidden
 		if hideHotkey then
 			button:SetCaption(humanName)
-			button:Invalidate()
 		end
 	end
 	
@@ -1417,7 +1413,6 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 			externalFunctionsAndData.SetHotkeyActive(not isSelected)
 		end
 		button.backgroundColor[4] = isSelected and 0.8 or 0.4
-		button:Invalidate()
 	end
 	
 	function externalFunctionsAndData.SetFontSize(newSize)

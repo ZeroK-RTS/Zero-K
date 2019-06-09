@@ -1,6 +1,7 @@
 --//=============================================================================
 
 Control = Object:Inherit{
+<<<<<<< HEAD
   classname       = 'control',
   padding         = {5, 5, 5, 5},
   borderThickness = 1.5,
@@ -57,6 +58,73 @@ Control = Object:Inherit{
   skinName        = nil,
 
   OnResize        = {},
+=======
+	classname       = 'control',
+	padding         = {5, 5, 5, 5},
+	borderThickness = 1.5,
+	borderColor     = {1.0, 1.0, 1.0, 0.6},
+	borderColor2    = {0.0, 0.0, 0.0, 0.8},
+	backgroundColor = {0.8, 0.8, 1.0, 0.4},
+	focusColor      = {0.2, 0.2, 1.0, 0.6},
+	selectedColor   = {0.6, 0.6, 0.8, 0.8},
+	disabledColor   = {0.4, 0.4, 0.4, 0.6},
+
+	autosize        = false,
+	savespace       = true, --// iff autosize == true, it shrinks the control to the minimum needed space, if disabled autosize _normally_ only enlarges the control
+	resizeGripSize  = {11, 11},
+	dragGripSize    = {10, 10},
+
+	dragUseGrip      = false,
+	draggable        = false,
+	resizable        = false,
+	tweakDragUseGrip = false,
+	tweakDraggable   = false,
+	tweakResizable   = false,
+
+	minWidth        = 10,
+	minHeight       = 10,
+	maxWidth        = 1e9,
+	maxHeight       = 1e9,
+
+	fixedRatio      = false,
+	tooltip         = nil, --// JUST TEXT
+	greedyHitText   = false, --// Enable to do hit test if the control has any mouse events.
+
+	font = {
+		font          = "FreeSansBold.otf",
+		size          = 14,
+		shadow        = false,
+		outline       = false,
+		outlineWidth  = 3,
+		outlineWeight = 3,
+		color         = {1, 1, 1, 1},
+		outlineColor  = {0, 0, 0, 1},
+		autoOutlineColor = true,
+	},
+
+	state = {
+		focused  = false,
+		hovered  = false,
+		checked  = false,
+		selected = false, --FIXME implement
+		pressed  = false,
+		enabled  = true,
+	},
+
+	skin            = nil,
+	skinName        = nil,
+
+	drawcontrolv2 = nil, --// disable backward support with old DrawControl gl state (with 2.1 self.xy translation isn't needed anymore)
+
+	useRTT = ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
+	useDLists = false, --(gl.CreateList ~= nil), --FIXME broken in combination with RTT (wrong blending)
+
+	OnResize        = {},
+	OnEnableChanged = {},
+
+	-- __nofont should be manually set to true when using this class directly
+	__nofont = false,
+>>>>>>> 512d49596f9296d3c29198ad53fb5acc0bd2cff8
 }
 
 local this = Control
@@ -106,7 +174,14 @@ function Control:New(obj)
     end
   end
 
+<<<<<<< HEAD
   return obj
+=======
+	if WG.ChiliRedraw then
+		WG.ChiliRedraw.AddControl(obj, "New")
+	end
+	return obj
+>>>>>>> 512d49596f9296d3c29198ad53fb5acc0bd2cff8
 end
 
 
@@ -164,6 +239,7 @@ function Control:_GetMaxChildConstraints(child)
 end
 
 
+<<<<<<< HEAD
 function Control:DetectRelativeBounds()
   --// we need min 2 x-dim coords to define a rect!
   local numconstraints = 0
@@ -240,6 +316,12 @@ function Control:DetectRelativeBounds()
   self.height = ((not rb.height) and self.height) or 0
   --self.right  = (type(self.right)=='number')and(self.right>0)and(self.right) or 0
   --self.bottom = (type(self.bottom)=='number')and(self.bottom>0)and(self.bottom) or 0
+=======
+function Control:SetEnabled(enabled)
+	self.state.enabled = enabled
+	self:CallListeners(self.OnEnableChanged, not self.state.enabled)
+	self:Invalidate()
+>>>>>>> 512d49596f9296d3c29198ad53fb5acc0bd2cff8
 end
 
 
@@ -794,6 +876,7 @@ function Control:InstantUpdate()
 			self:_UpdateAllDList()
 		end
 	end
+	return true
 end
 
 --//=============================================================================
@@ -960,21 +1043,99 @@ function Control:DrawForList()
     self:DrawControl();
   end
 
+<<<<<<< HEAD
   if (self._children_dlist) then
     self:_DrawInClientArea(gl.CallList,self._children_dlist);
   else
     self:DrawChildrenForList();
   end
+=======
+	if (self._tex_all and not self._inrtt) then
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "DrawForList_tex_all")
+		end
+		gl.PushMatrix()
+		gl.Translate(self.x, self.y, 0)
+			gl.BlendFuncSeparate(GL.ONE, GL.SRC_ALPHA, GL.ZERO, GL.SRC_ALPHA)
+			gl.Color(1, 1, 1, 1)
+			gl.Texture(0, self._tex_all)
+			gl.TexRect(0, 0, self.width, self.height)
+			gl.Texture(0, false)
+			gl.BlendFuncSeparate(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ZERO, GL.ONE_MINUS_SRC_ALPHA)
+		gl.PopMatrix()
+		return
+	elseif (self._all_dlist) then
+		gl.PushMatrix()
+		gl.Translate(self.x, self.y, 0)
+			gl.CallList(self._all_dlist);
+		gl.PopMatrix()
+		return
+	end
+>>>>>>> 512d49596f9296d3c29198ad53fb5acc0bd2cff8
 
   if (self.DrawControlPostChildren) then
     self:DrawControlPostChildren();
   end
 
+<<<<<<< HEAD
   self:DrawGrips();
+=======
+	if (self._own_dlist) then
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "DrawForList_own_dlist")
+		end
+		gl.CallList(self._own_dlist)
+	else
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "DrawForList")
+		end
+		if self._hasCustomDrawControl then
+			gl.Translate(-self.x, -self.y, 0)
+			self:DrawControl()
+			gl.Translate(self.x, self.y, 0)
+		else
+			self:DrawControl()
+		end
+	end
+
+	local clientX, clientY, clientWidth, clientHeight = unpack4(self.clientArea)
+	if WG.uiScale and WG.uiScale ~= 1 then
+		clientWidth, clientHeight = clientWidth*WG.uiScale, clientHeight*WG.uiScale
+	end
+	
+	if (clientWidth > 0) and (clientHeight > 0) then
+		if (self._tex_children) then
+			gl.BlendFuncSeparate(GL.ONE, GL.SRC_ALPHA, GL.ZERO, GL.SRC_ALPHA)
+			gl.Color(1, 1, 1, 1)
+			gl.Texture(0, self._tex_children)
+			local contX, contY, contWidth, contHeight = unpack4(self.contentArea)
+
+			local s = self.scrollPosX / contWidth
+			local t = 1 - self.scrollPosY / contHeight
+			local u = s + clientWidth / contWidth
+			local v = t - clientHeight / contHeight
+			gl.TexRect(clientX, clientY, clientX + clientWidth, clientY + clientHeight, s, t, u, v)
+			gl.Texture(0, false)
+			gl.BlendFuncSeparate(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ZERO, GL.ONE_MINUS_SRC_ALPHA)
+		elseif (self._children_dlist) then
+			self:_DrawInClientArea(gl.CallList, self._children_dlist)
+		else
+			self:DrawChildrenForList()
+		end
+
+		if (self.DrawControlPostChildren) then
+			self:DrawControlPostChildren()
+		end
+	end
+
+	self:DrawGrips()
+	gl.PopMatrix()
+>>>>>>> 512d49596f9296d3c29198ad53fb5acc0bd2cff8
 end
 
 
 function Control:Draw()
+<<<<<<< HEAD
   if (self._all_dlist) then
     gl.CallList(self._all_dlist);
     return;
@@ -985,6 +1146,52 @@ function Control:Draw()
   else
     self:DrawControl();
   end
+=======
+	self._redrawCounter = (self._redrawCounter or 0) + 1
+	if (not self._in_update and not self._usingRTT and self:_CheckIfRTTisAppreciated()) then
+		self:InvalidateSelf()
+	end
+
+	if (self._tex_all) then
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "Draw_tex_all")
+		end
+		gl.PushMatrix()
+		gl.Translate(self.x, self.y, 0)
+			gl.BlendFunc(GL.ONE, GL.SRC_ALPHA)
+			gl.Color(1, 1, 1, 1)
+			gl.Texture(0, self._tex_all)
+			gl.TexRect(0, 0, self.width, self.height)
+			gl.Texture(0, false)
+			gl.Blending("reset")
+		gl.PopMatrix()
+		return
+	elseif (self._all_dlist) then
+		gl.PushMatrix()
+		gl.Translate(self.x, self.y, 0)
+			gl.CallList(self._all_dlist);
+		gl.PopMatrix()
+		return
+	end
+
+	gl.PushMatrix()
+	gl.Translate(self.x, self.y, 0)
+
+	if (self._own_dlist) then
+		gl.CallList(self._own_dlist)
+	else
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "Draw")
+		end
+		if self._hasCustomDrawControl then
+			gl.Translate(-self.x, -self.y, 0)
+			self:DrawControl()
+			gl.Translate(self.x, self.y, 0)
+		else
+			self:DrawControl()
+		end
+	end
+>>>>>>> 512d49596f9296d3c29198ad53fb5acc0bd2cff8
 
   if (self._children_dlist) then
     self:_DrawInClientArea(gl.CallList,self._children_dlist);
@@ -1015,6 +1222,7 @@ end
 
 
 function Control:DrawChildrenForList()
+<<<<<<< HEAD
   if (next(self.children)) then
     self:_DrawChildrenInClientArea('DrawForList')
   end
@@ -1063,6 +1271,66 @@ function Control:HitTest(x,y)
   end
   
   return false
+=======
+	if (next(self.children)) then
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "DrawChildrenForList")
+		end
+		self:_DrawChildrenInClientAreaWithoutViewCheck('DrawForList')
+	end
+end
+
+--// ============================================================================= 
+
+local function InLocalRect(cx, cy, w, h)
+	return (cx >= 0) and (cy >= 0) and (cx <= w) and (cy <= h)
+end
+
+
+function Control:HitTest(x, y)
+	if (not self.disableChildrenHitTest) then
+		if self:InClientArea(x, y) then
+			local cax, cay = self:LocalToClient(x, y)
+			local children = self.children
+			for i = 1, #children do
+				local c = children[i]
+				if (c) then
+					local cx, cy = c:ParentToLocal(cax, cay)
+					if InLocalRect(cx, cy, c.width, c.height) then
+						local obj = c:HitTest(cx, cy)
+						if (obj) then
+							return obj
+						end
+					end
+				end
+			end
+			--//an option that allow you to mouse click on empty panel
+			if self.hitTestAllowEmpty then
+				return self 
+			end
+		end
+	end
+
+	if (self.NCHitTest) then
+		local nchit = self:NCHitTest(x, y)
+		if (nchit) then
+			return nchit
+		end
+	end
+
+	if (self.noClickThrough and not IsTweakMode()) or (self.greedyHitText and (
+		(self.tooltip)
+		or (#self.OnMouseDown > 0)
+		or (#self.OnMouseUp > 0)
+		or (#self.OnClick > 0)
+		or (#self.OnDblClick > 0)
+		or (#self.OnMouseMove > 0)
+		or (#self.OnMouseWheel > 0))) then
+		return self
+	end
+
+	return false
+>>>>>>> 512d49596f9296d3c29198ad53fb5acc0bd2cff8
 end
 
 

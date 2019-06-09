@@ -596,7 +596,11 @@ do
 			local ud = UnitDefs[unitDefID]
 			customInfo[unitDefID] = {
 				height        = Spring.Utilities.GetUnitHeight(ud) + 14,
-				canJump       = (ud.customParams.canjump=="1")or(GetUnitRulesParam(unitID,"jumpReload")),
+				canJump       = (ud.customParams.canjump and true) or false,
+				canGoo        = (ud.customParams.grey_goo and true) or false,
+				canReammo     = (ud.customParams.requireammo and true) or false,
+				isPwStructure = (ud.customParams.planetwars_structure and true) or false,
+				canCapture    = (ud.customParams.post_capture_reload and true) or false,
 				maxShield     = ud.shieldPower - 10,
 				canStockpile  = ud.canStockpile,
 				gadgetStock   = ud.customParams.stockpiletime,
@@ -663,7 +667,7 @@ do
 		end
 
 		--// BARS //-----------------------------------------------------------------------------
-			--// Shield
+		--// Shield
 		if (ci.maxShield>0) then
 			local commShield = GetUnitRulesParam(unitID, "comm_shield_max")
 			if commShield then
@@ -769,10 +773,12 @@ do
 		end
 
 		--// CAPTURE RECHARGE
-		local captureReloadState = GetUnitRulesParam(unitID,"captureRechargeFrame")
-		if (captureReloadState and captureReloadState > 0) then
-			local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
-			AddBar(messages.capture_reload,capture,"reload",(fullText and floor(capture*100)..'%') or '')
+		if ci.canCapture then
+			local captureReloadState = GetUnitRulesParam(unitID,"captureRechargeFrame")
+			if (captureReloadState and captureReloadState > 0) then
+				local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
+				AddBar(messages.capture_reload,capture,"reload",(fullText and floor(capture*100)..'%') or '')
+			end
 		end
 
 		--// WATER TANK
@@ -804,11 +810,13 @@ do
 		end
 
 		--// Planetwars teleport progress
-		TeleportEnd = GetUnitRulesParam(unitID, "pw_teleport_frame")
-		if TeleportEnd then
-			local prog = 1 - (TeleportEnd - gameFrame)/TELEPORT_CHARGE_NEEDED
-			if prog < 1 then
-				AddBar(messages.teleport, prog, "tele_pw", (fullText and floor(prog*100)..'%') or '')
+		if ci.isPwStructure then
+			TeleportEnd = GetUnitRulesParam(unitID, "pw_teleport_frame")
+			if TeleportEnd then
+				local prog = 1 - (TeleportEnd - gameFrame)/TELEPORT_CHARGE_NEEDED
+				if prog < 1 then
+					AddBar(messages.teleport, prog, "tele_pw", (fullText and floor(prog*100)..'%') or '')
+				end
 			end
 		end
 
@@ -822,14 +830,16 @@ do
 		end
 
 		--// REAMMO
-		local reammoProgress = GetUnitRulesParam(unitID, "reammoProgress")
-		if reammoProgress then
-			AddBar(messages.reammo,reammoProgress,"reammo",(fullText and floor(reammoProgress*100)..'%') or '')
+		if ci.canReammo then
+			local reammoProgress = GetUnitRulesParam(unitID, "reammoProgress")
+			if reammoProgress then
+				AddBar(messages.reammo,reammoProgress,"reammo",(fullText and floor(reammoProgress*100)..'%') or '')
+			end
 		end
 
 		--// RELOAD
 		if (not ci.scriptReload) and (ci.dyanmicComm or (ci.reloadTime >= options.minReloadTime.value)) then
-			local primaryWeapon = GetUnitRulesParam(unitID, "primary_weapon_override") or ci.primaryWeapon
+			local primaryWeapon = (ci.dyanmicComm and GetUnitRulesParam(unitID, "primary_weapon_override")) or ci.primaryWeapon
 			_,reloaded,reloadFrame = GetUnitWeaponState(unitID,primaryWeapon)
 			if (reloaded==false) then
 				local reloadTime = Spring.GetUnitWeaponState(unitID, primaryWeapon, 'reloadTime')
@@ -837,7 +847,7 @@ do
 					ci.reloadTime = reloadTime
 					-- When weapon is disabled the reload time is constantly set to be almost complete.
 					-- It results in a bunch of units walking around with 99% reload bars.
-					if reloadFrame > gameFrame + 6 then -- UPDATE_PERIOD in unit_attributes.lua.
+					if (reloadFrame > gameFrame + 6) or (GetUnitRulesParam(unitID, "reloadPaused") ~= 1) then -- UPDATE_PERIOD in unit_attributes.lua.
 						reload = 1 - ((reloadFrame-gameFrame)/gameSpeed) / ci.reloadTime;
 						if (reload >= 0) then
 							AddBar(messages.reload,reload,"reload",(fullText and floor(reload*100)..'%') or '')
@@ -860,10 +870,10 @@ do
 		end
 
 		--// SHEATH
-		local sheathState = GetUnitRulesParam(unitID,"sheathState")
-		if sheathState and (sheathState < 1) then
-			AddBar("sheath",sheathState,"sheath",(fullText and floor(sheathState*100)..'%') or '')
-		end
+		--local sheathState = GetUnitRulesParam(unitID,"sheathState")
+		--if sheathState and (sheathState < 1) then
+		--	AddBar("sheath",sheathState,"sheath",(fullText and floor(sheathState*100)..'%') or '')
+		--end
 
 		--// SLOW
 		local slowState = GetUnitRulesParam(unitID,"slowState")
@@ -876,9 +886,11 @@ do
 		end
 
 		--// GOO
-		local gooState = GetUnitRulesParam(unitID,"gooState")
-		if (gooState and (gooState>0)) then
-			AddBar(messages.goo,gooState,"goo",(fullText and floor(gooState*100)..'%') or '')
+		if ci.canGoo then
+			local gooState = GetUnitRulesParam(unitID,"gooState")
+			if (gooState and (gooState>0)) then
+				AddBar(messages.goo,gooState,"goo",(fullText and floor(gooState*100)..'%') or '')
+			end
 		end
 
 		--// JUMPJET
@@ -894,7 +906,7 @@ do
 			Spring.MarkerAddPoint(x,y,z,"N" .. barsN)
 		end
 
-		if (barsN>0)or(numStockpiled) then
+		if (barsN > 0) or (numStockpiled) then
 			glPushMatrix()
 			glTranslate(ux, uy+ci.height, uz )
 			gl.Scale(barScale, barScale, barScale)
