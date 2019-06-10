@@ -4,9 +4,8 @@ vertex = [[
 	%%GLOBAL_NAMESPACE%%
 	#line 10005
 
-	/////////////////////////////////////////
-	///////////// Options in use
-	/////////////////////////////////////////
+	/***********************************************************************/
+	// Options in use
 	#define OPTION_SHADOWMAPPING 0
 	#define OPTION_NORMALMAPPING 1
 	#define OPTION_MOVING_THREADS 2
@@ -15,6 +14,8 @@ vertex = [[
 	#define OPTION_FOG 5
 	%%EXTRA_OPTIONS%%
 
+	/***********************************************************************/
+	// Definitions
 	#define BITMASK_FIELD(value, pos) ((uint(value) & (1u << uint(pos))) != 0u)
 
 	//For a moment let's pretend we have passed OpenGL 2.0 era
@@ -23,15 +24,13 @@ vertex = [[
 	#define viewMatrix camera						// viewMatrix is mat4 uniform supplied by engine
 	#define projectionMatrix gl_ProjectionMatrix	// just because I don't like gl_BlaBla
 
-	/////////////////////////////////////////
-	///////////// Matrix uniforms
-	/////////////////////////////////////////
+	/***********************************************************************/
+	// Matrix uniforms
 	uniform mat4 camera;
 	uniform mat4 shadowMatrix;
 
-	/////////////////////////////////////////
-	///////////// Uniforms
-	/////////////////////////////////////////
+	/***********************************************************************/
+	// Uniforms
 	uniform vec3 cameraPos; //world space camera position
 
 	uniform vec3 etcLoc;
@@ -41,9 +40,8 @@ vertex = [[
 
 	%%VERTEX_GLOBAL_NAMESPACE%%
 
-	/////////////////////////////////////////
-	///////////// Varyings
-	/////////////////////////////////////////
+	/***********************************************************************/
+	// Varyings
 	out Data {
 		// TBN matrix components
 		vec3 worldTangent;
@@ -67,6 +65,8 @@ vertex = [[
 		%%EXTRA_VARYINGS%%
 	};
 
+	/***********************************************************************/
+	// Vertex shader main()
 	void main(void)
 	{
 		vec4 modelVertexPos = gl_Vertex;
@@ -136,9 +136,8 @@ fragment = [[
 	//shader version is added via gadget
 	%%GLOBAL_NAMESPACE%%
 
-	/////////////////////////////////////////
-	///////////// Options in use
-	/////////////////////////////////////////
+	/***********************************************************************/
+	// Options in use
 	#define OPTION_SHADOWMAPPING 0
 	#define OPTION_NORMALMAPPING 1
 	#define OPTION_MOVING_THREADS 2
@@ -148,9 +147,8 @@ fragment = [[
 	#define OPTION_NORMALMAP_FLIP 6
 	%%EXTRA_OPTIONS%%
 
-	/////////////////////////////////////////
-	///////////// Definitions
-	/////////////////////////////////////////
+	/***********************************************************************/
+	// Definitions
 	#define BITMASK_FIELD(value, pos) ((uint(value) & (1u << uint(pos))) != 0u)
 
 	#define NORM2SNORM(value) (value * 2.0 - 1.0)
@@ -170,18 +168,16 @@ fragment = [[
 	#line 20169
 
 
-	/////////////////////////////////////////
-	///////////// Sampler uniforms
-	/////////////////////////////////////////
+	/***********************************************************************/
+	// Sampler uniforms
 	uniform sampler2D textureS3o1;
 	uniform sampler2D textureS3o2;
 	uniform sampler2D normalTex;
 	uniform samplerCube reflectTex;
 	uniform sampler2DShadow shadowTex;
 
-	/////////////////////////////////////////
-	///////////// Sun light uniforms
-	/////////////////////////////////////////
+	/***********************************************************************/
+	// Sunlight uniforms
 	uniform vec3 sunPos; //world space sun direction
 	uniform vec3 sunDiffuse;
 	uniform vec3 sunAmbient;
@@ -189,9 +185,8 @@ fragment = [[
 	uniform vec3 sunSpecularParams = vec3(18.0, 4.0, 0.0); // Exponent, multiplier, bias
 
 
-	/////////////////////////////////////////
-	///////////// Misc
-	/////////////////////////////////////////
+	/***********************************************************************/
+	// Misc. uniforms
 	uniform vec4 teamColor;
 	uniform float shadowDensity;
 	uniform int shadowsQuality;
@@ -202,15 +197,13 @@ fragment = [[
 	uniform int options;
 
 
-	/////////////////////////////////////////
-	///////////// Shadow Quality Params
-	/////////////////////////////////////////
+	/***********************************************************************/
+	// Shadow mapping quality params
 	struct ShadowQuality {
 		float samplingRandomness;	// 0.0 - blocky look, 1.0 - random points look
 		float samplingDistance;		// how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
 		int shadowSamples;			// number of shadowmap samples per fragment
 	};
-
 
 	#define SHADOW_QUALITY_PRESETS 4
 	const ShadowQuality shadowQualityPresets[SHADOW_QUALITY_PRESETS] = ShadowQuality[](
@@ -220,9 +213,8 @@ fragment = [[
 		ShadowQuality(0.4, 3.0, 8)	// softest
 	);
 
-	/////////////////////////////////////////
-	///////////// Varyings
-	/////////////////////////////////////////
+	/***********************************************************************/
+	// Varyings
 	in Data {
 		// TBN matrix components
 		vec3 worldTangent;
@@ -246,21 +238,8 @@ fragment = [[
 		%%EXTRA_VARYINGS%%
 	};
 
-	/////////////////////////////////////////
-	///////////// Outputs
-	/////////////////////////////////////////
-
-	#if (deferred_mode == 1)
-		out vec4 fragData[GBUFFER_COUNT];
-	#else
-		out vec4 fragData[1];
-	#endif
-
-
-	/////////////////////////////////////////
-	///////////// Shadow mapping
-	/////////////////////////////////////////
-
+	/***********************************************************************/
+	// Shadow mapping functions
 	const float PI = acos(0.0) * 2.0;
 
 	// http://blog.marmakoide.org/?p=1
@@ -342,6 +321,16 @@ fragment = [[
 		return shadow;
 	}
 
+	/***********************************************************************/
+	// Shader output definitions
+	#if (deferred_mode == 1)
+		out vec4 fragData[GBUFFER_COUNT];
+	#else
+		out vec4 fragData[1];
+	#endif
+
+	/***********************************************************************/
+	// Fragment shader main()
 	void main(void){
 		%%FRAGMENT_PRE_SHADING%%
 		#line 30261
