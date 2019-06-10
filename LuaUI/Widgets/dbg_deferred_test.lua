@@ -16,7 +16,7 @@ end
 function widget:DrawGenesis()
 end
 
-local texName = "$model_gbuffer_misctex"
+local texName = "$model_gbuffer_difftex"
 
 function widget:DrawScreenEffects()
 	gl.Blending(false)

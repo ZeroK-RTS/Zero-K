@@ -1,123 +1,160 @@
-return {
+local shader = {
 vertex = [[
 	//shader version is added via gadget
 	%%GLOBAL_NAMESPACE%%
+	#line 10005
 
-	//#define use_normalmapping
-	//#define flip_normalmap
-	//#define use_shadows
-	%%VERTEX_GLOBAL_NAMESPACE%%
-	#line 10010
+	/////////////////////////////////////////
+	///////////// Options in use
+	/////////////////////////////////////////
+	#define OPTION_SHADOWMAPPING 0
+	#define OPTION_NORMALMAPPING 1
+	#define OPTION_MOVING_THREADS 2
+	#define OPTION_VERTEX_AO 3
+	#define OPTION_FLASHLIGHTS 4
+	#define OPTION_FOG 5
+	%%EXTRA_OPTIONS%%
 
-	uniform mat4 camera;   //ViewMatrix (gl_ModelViewMatrix is ModelMatrix!)
-	uniform vec3 cameraPos;
+	#define BITMASK_FIELD(value, pos) ((uint(value) & (1u << uint(pos))) != 0u)
 
-	uniform vec3 sunDiffuse;
-	uniform vec3 sunAmbient;
+	//For a moment let's pretend we have passed OpenGL 2.0 era
+	#define modelMatrix gl_ModelViewMatrix			// don't trust the ModelView name, it's modelMatrix in fact
+	#define modelNormalMatrix gl_NormalMatrix		// gl_NormalMatrix is supposed to be normal model normal matrix. TODO: double check!!!
+	#define viewMatrix camera						// viewMatrix is mat4 uniform supplied by engine
+	#define projectionMatrix gl_ProjectionMatrix	// just because I don't like gl_BlaBla
+
+	/////////////////////////////////////////
+	///////////// Matrix uniforms
+	/////////////////////////////////////////
+	uniform mat4 camera;
+	uniform mat4 shadowMatrix;
+
+	/////////////////////////////////////////
+	///////////// Uniforms
+	/////////////////////////////////////////
+	uniform vec3 cameraPos; //world space camera position
+
 	uniform vec3 etcLoc;
 	uniform int simFrame;
 
-	#ifdef flashlights
-		out float selfIllumMod;
-	#endif
-	//uniform float frameLoc;
+	uniform int options;
 
-	//The api_custom_unit_shaders supplies this definition:
-	#ifdef use_shadows
-		uniform mat4 shadowMatrix;
-		uniform vec4 shadowParams;
-	#endif
+	%%VERTEX_GLOBAL_NAMESPACE%%
 
-	#ifdef use_vertex_ao
-		out float aoTerm;
-	#endif
+	/////////////////////////////////////////
+	///////////// Varyings
+	/////////////////////////////////////////
+	out Data {
+		// TBN matrix components
+		vec3 worldTangent;
+		vec3 worldBitangent;
+		vec3 worldNormal;
+		// main light vector(s)
+		vec3 worldCameraDir;
 
-	out vec3 viewDir;
+		// main textureCoord
+		vec2 modelUV;
 
-	#ifdef use_normalmapping
-		out mat3 tbnMatrix;
-	#else
-		out vec3 normalv;
-	#endif
+		// shadowPosition
+		vec4 shadowVertexPos;
 
-	out vec2 tex_coord0;
-	out vec4 tex_coord1;
-	out vec4 worldPos;
+		// auxilary varyings
+		float aoTerm;
+		float selfIllumMod;
+		float fogFactor;
+
+		// extra varyings
+		%%EXTRA_VARYINGS%%
+	};
 
 	void main(void)
 	{
-		vec4 vertex = gl_Vertex;
-		vec3 normal = gl_Normal;
+		vec4 modelVertexPos = gl_Vertex;
+		vec3 modelVertexNormal = gl_Normal;
 
 		%%VERTEX_PRE_TRANSFORM%%
 
-		#ifdef use_normalmapping
-			vec3 tangent   = gl_MultiTexCoord5.xyz;
-			vec3 bitangent = gl_MultiTexCoord6.xyz;
-			tbnMatrix = gl_NormalMatrix * mat3(tangent, bitangent, normal);
-		#else
-			normalv = gl_NormalMatrix * normal;
-		#endif
+		vec4 worldVertexPos = modelMatrix * modelVertexPos;
 
-		worldPos = gl_ModelViewMatrix * vertex;
-		gl_Position   = gl_ProjectionMatrix * (camera * worldPos);
-		viewDir     = cameraPos - worldPos.xyz;
+		/////////////////////////////////////////
+		///////////// Options in use
+		/////////////////////////////////////////
 
-		#ifdef use_shadows
-			tex_coord1 = shadowMatrix * worldPos;
-			#if 1
-				tex_coord1.xy = tex_coord1.xy + 0.5;
-			#else
-				tex_coord1.xy *= (inversesqrt(abs(tex_coord1.xy) + shadowParams.zz) + shadowParams.ww);
-				tex_coord1.xy += shadowParams.xy;
-			#endif
-		#endif
+		// V
+		worldCameraDir = normalize(cameraPos - worldVertexPos.xyz); //from fragment to camera, world space
 
-		#ifdef use_treadoffset
-			tex_coord0.st = gl_MultiTexCoord0.st;
+		if (BITMASK_FIELD(options, OPTION_SHADOWMAPPING)) {
+			shadowVertexPos = shadowMatrix * worldVertexPos;
+			shadowVertexPos.xy += vec2(0.5);  //no need for shadowParams anymore
+		}
+
+		if (BITMASK_FIELD(options, OPTION_NORMALMAPPING)) {
+			//no need to do Gram-Schmidt re-orthogonalization, because engine does it for us anyway
+			vec3 T = gl_MultiTexCoord5.xyz;
+			vec3 B = gl_MultiTexCoord6.xyz;
+
+			// tangent --> world space transformation (for vectors)
+			worldTangent = modelNormalMatrix * T;
+			worldBitangent = modelNormalMatrix * B;
+			worldNormal = modelNormalMatrix * modelVertexNormal;
+		} else {
+			worldNormal = modelNormalMatrix * modelVertexNormal;
+		}
+
+		modelUV = gl_MultiTexCoord0.xy;
+		if (BITMASK_FIELD(options, OPTION_MOVING_THREADS)) {
 			const vec4 treadBoundaries = vec4(0.6279296875, 0.74951171875, 0.5702890625, 0.6220703125);
-			if (all(bvec4(
-					tex_coord0.s >= treadBoundaries.x, tex_coord0.s <= treadBoundaries.y,
-					tex_coord0.t >= treadBoundaries.z, tex_coord0.t <= treadBoundaries.w))) {
-				tex_coord0.s = gl_MultiTexCoord0.s + etcLoc.z;
+
+			if ( all(bvec4(
+					greaterThanEqual(modelUV, treadBoundaries.xz),
+					lessThanEqual(modelUV, treadBoundaries.yw)))) {
+				modelUV.x += etcLoc.z;
 			}
-		#endif
+		}
 
-		#ifdef use_vertex_ao
+		if (BITMASK_FIELD(options, OPTION_VERTEX_AO)) {
 			aoTerm = max(0.4, fract(gl_MultiTexCoord0.s * 16384.0) * 1.3); // great
-		#endif
+		}
 
-		#ifndef use_treadoffset
-			tex_coord0.st = gl_MultiTexCoord0.st;
-		#endif
+		if (BITMASK_FIELD(options, OPTION_FLASHLIGHTS)) {
+			// modelMatrix[3][0] + modelMatrix[3][2] are Tx, Tz elements of translation of matrix
+			selfIllumMod = max(-0.2, sin(simFrame * 0.063 + (modelMatrix[3][0] + modelMatrix[3][2]) * 0.1)) + 0.2;
+		}
 
-		#ifdef flashlights
-			// gl_ModelViewMatrix[3][0] + gl_ModelViewMatrix[3][2] are Tx, Tz elements of translation of matrix
-			selfIllumMod = max(-0.2, sin(simFrame * 0.063 + (gl_ModelViewMatrix[3][0] + gl_ModelViewMatrix[3][2]) * 0.1)) + 0.2;
-		#endif
-
-		//float fogCoord = length(gl_Position.xyz); // maybe fog should be readded?
-		//fogFactor = (gl_Fog.end - fogCoord) * gl_Fog.scale; //gl_Fog.scale := 1.0 / (gl_Fog.end - gl_Fog.start)
-		//fogFactor = clamp(fogFactor, 0.0, 1.0);
+		gl_Position = projectionMatrix * viewMatrix * worldVertexPos;
 
 		%%VERTEX_POST_TRANSFORM%%
+
+		if (BITMASK_FIELD(options, OPTION_FOG)) {
+			float fogCoord = length(gl_Position.xyz); // maybe fog should be readded?
+			fogFactor = (gl_Fog.end - fogCoord) * gl_Fog.scale; //gl_Fog.scale := 1.0 / (gl_Fog.end - gl_Fog.start)
+			fogFactor = clamp(fogFactor, 0.0, 1.0);
+		}
 	}
 ]],
-
-
 fragment = [[
 	//shader version is added via gadget
 	%%GLOBAL_NAMESPACE%%
 
-	#if (GL_FRAGMENT_PRECISION_HIGH == 1)
-	// ancient GL3 ATI drivers confuse GLSL for GLSL-ES and require this
-	precision highp float;
-	#else
-	precision mediump float;
-	#endif
+	/////////////////////////////////////////
+	///////////// Options in use
+	/////////////////////////////////////////
+	#define OPTION_SHADOWMAPPING 0
+	#define OPTION_NORMALMAPPING 1
+	#define OPTION_MOVING_THREADS 2
+	#define OPTION_VERTEX_AO 3
+	#define OPTION_FLASHLIGHTS 4
+	#define OPTION_FOG 5
+	#define OPTION_NORMALMAP_FLIP 6
+	%%EXTRA_OPTIONS%%
 
-	%%FRAGMENT_GLOBAL_NAMESPACE%%
-	#line 20120
+	/////////////////////////////////////////
+	///////////// Definitions
+	/////////////////////////////////////////
+	#define BITMASK_FIELD(value, pos) ((uint(value) & (1u << uint(pos))) != 0u)
+
+	#define NORM2SNORM(value) (value * 2.0 - 1.0)
+	#define SNORM2NORM(value) (value * 0.5 + 0.5)
 
 	#if (deferred_mode == 1)
 		#define GBUFFER_NORMTEX_IDX 0
@@ -129,94 +166,89 @@ fragment = [[
 		#define GBUFFER_COUNT 5
 	#endif
 
+	%%FRAGMENT_GLOBAL_NAMESPACE%%
+	#line 20169
+
+
+	/////////////////////////////////////////
+	///////////// Sampler uniforms
+	/////////////////////////////////////////
 	uniform sampler2D textureS3o1;
 	uniform sampler2D textureS3o2;
+	uniform sampler2D normalTex;
 	uniform samplerCube reflectTex;
+	uniform sampler2DShadow shadowTex;
 
-	uniform vec3 sunPos; //light direction in fact
-	#define lightDir sunPos
-
+	/////////////////////////////////////////
+	///////////// Sun light uniforms
+	/////////////////////////////////////////
+	uniform vec3 sunPos; //world space sun direction
 	uniform vec3 sunDiffuse;
 	uniform vec3 sunAmbient;
 	uniform vec3 sunSpecular;
+	uniform vec3 sunSpecularParams = vec3(18.0, 4.0, 0.0); // Exponent, multiplier, bias
+
+
+	/////////////////////////////////////////
+	///////////// Misc
+	/////////////////////////////////////////
+	uniform vec4 teamColor;
+	uniform float shadowDensity;
+	uniform int shadowsQuality;
+	uniform int materialIndex;
 
 	uniform vec3 etcLoc;
+	uniform int simFrame;
+	uniform int options;
 
-	#ifndef SPECULARSUNEXP
-		#define SPECULARSUNEXP 18.0
-	#endif
 
-	#ifndef SPECULARMULT
-		#define SPECULARMULT 4.0
-	#endif
+	/////////////////////////////////////////
+	///////////// Shadow Quality Params
+	/////////////////////////////////////////
+	struct ShadowQuality {
+		float samplingRandomness;	// 0.0 - blocky look, 1.0 - random points look
+		float samplingDistance;		// how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
+		int shadowSamples;			// number of shadowmap samples per fragment
+	};
 
-	#ifndef SPECULARBIAS
-		#define SPECULARBIAS 0.0
-	#endif
 
-	#ifndef MAT_IDX
-		#define MAT_IDX 0
-	#endif
+	#define SHADOW_QUALITY_PRESETS 4
+	const ShadowQuality shadowQualityPresets[SHADOW_QUALITY_PRESETS] = ShadowQuality[](
+		ShadowQuality(0.0, 0.0, 1),	// hard
+		ShadowQuality(1.0, 1.0, 3),	// soft
+		ShadowQuality(0.4, 2.0, 6),	// softer
+		ShadowQuality(0.4, 3.0, 8)	// softest
+	);
 
-	#define SHADOW_HARD 0
-	#define SHADOW_SOFT 1
-	#define SHADOW_SOFTER 2
-	#define SHADOW_SOFTEST 3
+	/////////////////////////////////////////
+	///////////// Varyings
+	/////////////////////////////////////////
+	in Data {
+		// TBN matrix components
+		vec3 worldTangent;
+		vec3 worldBitangent;
+		vec3 worldNormal;
+		// main light vector(s)
+		vec3 worldCameraDir;
 
-	#ifndef SHADOW_SOFTNESS
-		#define SHADOW_SOFTNESS SHADOW_HARD
-	#endif
+		// main textureCoord
+		vec2 modelUV;
 
-	#if (SHADOW_SOFTNESS == SHADOW_HARD)
-		#define SHADOW_SAMPLES 1
-	#endif
+		// shadowPosition
+		vec4 shadowVertexPos;
 
-	#if (SHADOW_SOFTNESS == SHADOW_SOFT)
-		#define SHADOW_SAMPLES 3 // number of shadowmap samples per fragment
-		#define SHADOW_RANDOMNESS 1.0 // 0.0 - blocky look, 1.0 - random points look
-		#define SHADOW_SAMPLING_DISTANCE 1.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
-	#endif
+		// auxilary varyings
+		float aoTerm;
+		float selfIllumMod;
+		float fogFactor;
 
-	#if (SHADOW_SOFTNESS == SHADOW_SOFTER)
-		#define SHADOW_SAMPLES 6 // number of shadowmap samples per fragment
-		#define SHADOW_RANDOMNESS 0.4 // 0.0 - blocky look, 1.0 - random points look
-		#define SHADOW_SAMPLING_DISTANCE 2.0 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
-	#endif
+		// extra varyings
+		%%EXTRA_VARYINGS%%
+	};
 
-	#if (SHADOW_SOFTNESS == SHADOW_SOFTEST)
-		#define SHADOW_SAMPLES 8 // number of shadowmap samples per fragment
-		#define SHADOW_RANDOMNESS 0.4 // 0.0 - blocky look, 1.0 - random points look
-		#define SHADOW_SAMPLING_DISTANCE 2.5 // how far shadow samples go (in shadowmap texels) as if it was applied to 8192x8192 sized shadow map
-	#endif
-
-	#ifdef use_shadows
-		uniform sampler2DShadow shadowTex;
-	#endif
-	uniform float shadowDensity;
-
-	#ifdef use_vertex_ao
-		in float aoTerm;
-	#endif
-
-	uniform vec4 teamColor;
-	in vec3 viewDir;
-	//varying float fogFactor;
-
-	#ifdef flashlights
-		in float selfIllumMod;
-	#endif
-
-	#ifdef use_normalmapping
-		in mat3 tbnMatrix;
-		uniform sampler2D normalMap;
-		#define normalv tbnMatrix[2]
-	#else
-		in vec3 normalv;
-	#endif
-
-	in vec2 tex_coord0;
-	in vec4 tex_coord1;
-	in vec4 worldPos;
+	/////////////////////////////////////////
+	///////////// Outputs
+	/////////////////////////////////////////
 
 	#if (deferred_mode == 1)
 		out vec4 fragData[GBUFFER_COUNT];
@@ -224,21 +256,12 @@ fragment = [[
 		out vec4 fragData[1];
 	#endif
 
-	const float PI = 3.1415926535897932384626433832795;
-	#ifdef LUMAMULT
-		const mat3 RGB2YCBCR = mat3(
-			0.2126, -0.114572, 0.5,
-			0.7152, -0.385428, -0.454153,
-			0.0722, 0.5, -0.0458471);
 
-		const mat3 YCBCR2RGB = mat3(
-			1.0, 1.0, 1.0,
-			0.0, -0.187324, 1.8556,
-			1.5748, -0.468124, -5.55112e-17);
-	#endif
+	/////////////////////////////////////////
+	///////////// Shadow mapping
+	/////////////////////////////////////////
 
-	#define NORM2SNORM(value) (value * 2.0 - 1.0)
-	#define SNORM2NORM(value) (value * 0.5 + 0.5)
+	const float PI = acos(0.0) * 2.0;
 
 	// http://blog.marmakoide.org/?p=1
 	const float goldenAngle = PI * (3.0 - sqrt(5.0));
@@ -255,7 +278,6 @@ fragment = [[
 		return fract((p3.x + p3.y) * p3.z);
 	}
 
-#ifdef use_shadows
 	// Derivatives of light-space depth with respect to texture2D coordinates
 	vec2 DepthGradient(vec2 uv, float z) {
 		vec2 dZduv = vec2(0.0, 0.0);
@@ -263,10 +285,10 @@ fragment = [[
 		vec3 dUVZdx = dFdx(vec3(uv,z));
 		vec3 dUVZdy = dFdy(vec3(uv,z));
 
-		dZduv.x = dUVZdy.y * dUVZdx.z;
+		dZduv.x  = dUVZdy.y * dUVZdx.z;
 		dZduv.x -= dUVZdx.y * dUVZdy.z;
 
-		dZduv.y = dUVZdx.x * dUVZdy.z;
+		dZduv.y  = dUVZdx.x * dUVZdy.z;
 		dZduv.y -= dUVZdy.x * dUVZdx.z;
 
 		float det = (dUVZdx.x * dUVZdy.y) - (dUVZdx.y * dUVZdy.x);
@@ -282,164 +304,189 @@ fragment = [[
 	float GetShadowPCFRandom(float NdotL) {
 		float shadow = 0.0;
 
-		vec3 shadowCoordN = tex_coord1.xyz / tex_coord1.w;
-		#if defined(SHADOW_SAMPLES) && (SHADOW_SAMPLES > 1)
-			vec2 dZduv = DepthGradient(shadowCoordN.xy, shadowCoordN.z);
+		vec3 shadowCoord = shadowVertexPos.xyz / shadowVertexPos.w;
+		int presetIndex = clamp(shadowsQuality, 0, SHADOW_QUALITY_PRESETS);
 
-			float rndRotAngle = NORM2SNORM(hash12L(gl_FragCoord.xy)) * PI / 2.0 * SHADOW_RANDOMNESS;
+		float samplingRandomness = shadowQualityPresets[presetIndex].samplingRandomness;
+		float samplingDistance = shadowQualityPresets[presetIndex].samplingDistance;
+		int shadowSamples = shadowQualityPresets[presetIndex].shadowSamples;
+
+		if (shadowSamples > 1) {
+			vec2 dZduv = DepthGradient(shadowCoord.xy, shadowCoord.z);
+
+			float rndRotAngle = NORM2SNORM(hash12L(gl_FragCoord.xy)) * PI / 2.0 * samplingRandomness;
 
 			vec2 vSinCos = vec2(sin(rndRotAngle), cos(rndRotAngle));
 			mat2 rotMat = mat2(vSinCos.y, -vSinCos.x, vSinCos.x, vSinCos.y);
 
-			vec2 filterSize = vec2(SHADOW_SAMPLING_DISTANCE / 8192.0);
+			vec2 filterSize = vec2(samplingDistance / 8192.0);
 
-			for (int i = 0; i < SHADOW_SAMPLES; ++i) {
+			for (int i = 0; i < shadowSamples; ++i) {
 				// SpiralSNorm return low discrepancy sampling vec2
-				vec2 offset = (rotMat * SpiralSNorm( i, SHADOW_SAMPLES )) * filterSize;
+				vec2 offset = (rotMat * SpiralSNorm( i, shadowSamples )) * filterSize;
 
-				vec3 shadowSamplingCoord = vec3(shadowCoordN.xy, 0.0) + vec3(offset, BiasedZ(shadowCoordN.z, dZduv, offset));
+				vec3 shadowSamplingCoord = vec3(shadowCoord.xy, 0.0) + vec3(offset, BiasedZ(shadowCoord.z, dZduv, offset));
 				shadow += texture( shadowTex, shadowSamplingCoord );
 			}
-
-			shadow /= float(SHADOW_SAMPLES);
-			shadow *= 1.0 - smoothstep(shadow, 1.0,  0.2);
-		#else
+			shadow /= float(shadowSamples);
+			//shadow *= 1.0 - smoothstep(shadow, 1.0,  0.2);
+		} else { //shadowSamples == 0
 			const float cb = 0.00005;
 			float bias = cb * tan(acos(NdotL));
 			bias = clamp(bias, 0.0, 5.0 * cb);
 
-			vec3 shadowSamplingCoord = shadowCoordN;
+			vec3 shadowSamplingCoord = shadowCoord;
 			shadowSamplingCoord.z -= bias;
 			shadow = texture( shadowTex, shadowSamplingCoord );
-		#endif
-
-		return mix(1.0, shadow, shadowDensity);
+		}
+		return shadow;
 	}
-#endif
 
 	void main(void){
 		%%FRAGMENT_PRE_SHADING%%
-		#line 30322
+		#line 30261
 
-		#ifdef use_normalmapping
-			vec2 tc = tex_coord0.st;
-			#ifdef flip_normalmap
-				tc.t = 1.0 - tc.t;
+		vec4 tex1 = texture(textureS3o1, modelUV);
+		vec4 tex2 = texture(textureS3o2, modelUV);
+
+		// N - worldFragNormal
+		vec3 N;
+		if (BITMASK_FIELD(options, OPTION_NORMALMAPPING)) {
+			vec2 nmUV = modelUV;
+			if (BITMASK_FIELD(options, OPTION_NORMALMAP_FLIP)) {
+				nmUV.y = 1.0 - nmUV.y;
+			}
+			vec3 tbnNormal = normalize(NORM2SNORM(texture(normalTex, nmUV).xyz));
+			#if 1 //TODO, check if required
+				N = mat3(normalize(worldTangent), normalize(worldBitangent), normalize(worldNormal)) * tbnNormal;
+			#else
+				N = mat3(worldTangent, worldBitangent, worldNormal) * tbnNormal;
 			#endif
-			vec4 normaltex = texture(normalMap, tc);
-			vec3 nvTS = normalize(NORM2SNORM(normaltex.xyz));
-			vec3 N = tbnMatrix * nvTS;
-		#else
-			vec3 N = normalize(normalv);
-		#endif
+		} else {
+			N = normalize(worldNormal);
+		}
 
-		vec3 L = normalize(lightDir); //just in case
+		// L - worldLightDir
+		/// Sun light is considered infinitely far, so it stays same no matter worldVertexPos.xyz
+		vec3 L = normalize(sunPos); //from fragment to light, world space
 
-		float NdotLu = dot(N, L);
-		float NdotL = max(NdotLu, 0.0);
-		vec3 light = NdotL * sunDiffuse + sunAmbient;
+		// V - worldCameraDir
+		vec3 V = normalize(worldCameraDir);
 
-		vec4 diffuseIn  = texture(textureS3o1, tex_coord0.st);
+		// H - worldHalfVec
+		vec3 H = normalize(L + V); //half vector
 
-		#ifdef LUMAMULT
-			vec3 yCbCr = RGB2YCBCR * diffuseIn.rgb;
-			yCbCr.x *= LUMAMULT;
-			diffuseIn.rgb = YCBCR2RGB * yCbCr;
-		#endif
-
-		vec4 outColor   = diffuseIn;
-		vec4 extraColor = texture(textureS3o2, tex_coord0.st);
-
-		vec3 V = normalize(viewDir);
+		// R - reflection of worldCameraDir against worldFragNormal
 		vec3 Rv = -reflect(V, N);
 
-		vec3 specularColor;
+		// N.L
+		float NdotLu = dot(N, L);
+		float NdotL = max(NdotLu, 0.0);
 
-		// Blinn-Phong
-		vec3 H = normalize(L + V);
-		float HdotN = max(dot(H, N), 0.0);
-		specularColor = sunSpecular * pow(HdotN, SPECULARSUNEXP);
+		// N.H
+		float HdotN = max(dot(N, H), 0.0);
 
-		specularColor *= SPECULARBIAS + extraColor.g * SPECULARMULT;
-
-		vec3 reflection = texture(reflectTex,  Rv).rgb;
-
-		float nShadowMix = smoothstep(0.0, 0.35, NdotLu);
-		float nShadow = mix(1.0, nShadowMix, shadowDensity);
-
-		#ifdef use_shadows
-			float gShadow = GetShadowPCFRandom(NdotL);
-		#else
-			float gShadow = 1.0;
-		#endif
-
+		// shadows
+		float nShadow = smoothstep(0.0, 0.35, NdotLu); //normal based shadowing, always on
+		float gShadow = 1.0; // shadow mapping
+		if (BITMASK_FIELD(options, OPTION_SHADOWMAPPING)) {
+			gShadow = GetShadowPCFRandom(NdotL);
+		}
 		float shadow = min(nShadow, gShadow);
+		float shadowMult = mix(1.0, shadow, shadowDensity);
 
-		light     = mix(sunAmbient, light, shadow);
-		specularColor *= shadow;
+		// ambient occlusion
+		float ao = 1.0;
+		if (BITMASK_FIELD(options, OPTION_VERTEX_AO)) {
+			ao = aoTerm;
+		}
 
-		reflection = mix(light, reflection, extraColor.g); // reflection
+		// light
+		vec3 lightAmbient = ao * sunAmbient;
+		vec3 lightDiffuse = NdotL * sunDiffuse;
+		vec3 lightAD = lightAmbient + lightDiffuse;
 
-		#ifdef flashlights
-			extraColor.r = extraColor.r * selfIllumMod;
-		#endif
+		// sunSpecularParams = (exponent, multiplier, bias)
+		vec3 lightSpecular = sunSpecular * pow(HdotN, sunSpecularParams.x);
+		lightSpecular *= sunSpecularParams.z + tex2.g * sunSpecularParams.y;
 
-		reflection += (extraColor.rrr); // self-illum
+		// apply shadows
+		lightAD = mix(lightAmbient, lightAD, shadowMult);
+		lightSpecular *= shadowMult;
 
-		outColor.rgb = mix(outColor.rgb, teamColor.rgb, outColor.a);
+		// environment reflection
+		vec3 lightADR = texture(reflectTex,  Rv).rgb;
+		lightADR = mix(lightAD, lightADR, tex2.g);
 
-		//#if (deferred_mode == 0)
-			// diffuse + specularColor + envcube lighting
-			// (reflection contains the NdotL term!)
-			outColor.rgb = outColor.rgb * reflection + specularColor;
-		//#endif
+		// emissive color
+		vec3 emissiveMult = tex2.rrr;
+		if (BITMASK_FIELD(options, OPTION_FLASHLIGHTS)) {
+			emissiveMult *= selfIllumMod;
+		}
 
-		outColor.a   = extraColor.a;
-		//outColor.rgb = outColor.rgb + outColor.rgb * (normaltex.a - 0.5) * etcLoc.g; // no more wreck color blending
-
-		#ifdef use_vertex_ao
-			outColor.rgb = outColor.rgb * aoTerm;
-		#endif
-
-		// debug hook
-		#if 0
-			//outColor.rgb = vec3(normalv);
-			outColor.rgb = vec3(N);
-		#endif
+		// final color
+		vec3 finalColor;
+		finalColor = mix(tex1.rgb, teamColor.rgb, tex1.a); //mix diffuse texture with team color
+		finalColor = finalColor.rgb * (lightADR + emissiveMult) + lightSpecular;
 
 		#if (deferred_mode == 0)
-			fragData[0] = outColor;
+			fragData[0] = vec4(finalColor, tex2.a);
 		#else
 			fragData[GBUFFER_NORMTEX_IDX] = vec4(SNORM2NORM(N), 1.0);
-			fragData[GBUFFER_DIFFTEX_IDX] = outColor;
-			fragData[GBUFFER_SPECTEX_IDX] = vec4(specularColor, extraColor.a);
-			fragData[GBUFFER_EMITTEX_IDX] = vec4(extraColor.rrr, 1.0);
-			fragData[GBUFFER_MISCTEX_IDX] = vec4(float(MAT_IDX) / 255.0, 0.0, 0.0, 0.0);
+			fragData[GBUFFER_DIFFTEX_IDX] = vec4(finalColor, tex2.a);
+			fragData[GBUFFER_SPECTEX_IDX] = vec4(lightSpecular, tex2.a);
+			fragData[GBUFFER_EMITTEX_IDX] = vec4(tex2.rrr, 1.0);
+			fragData[GBUFFER_MISCTEX_IDX] = vec4(float(materialIndex) / 255.0, 0.0, 0.0, 0.0);
 		#endif
 
 		%%FRAGMENT_POST_SHADING%%
 	}
 ]],
-
 	uniformInt = {
 		textureS3o1 = 0,
 		textureS3o2 = 1,
 		shadowTex   = 2,
-		--specularTex = 3, -- specularTex contains lookup table sunSpecular = function(reflectionVector). It is buggy, incorrect and soon to be deprecated. This shader makes use of standard Blinn-Phong estimation for specular light instead
 		reflectTex  = 4,
-		normalMap   = 5,
-		--detailMap   = 6,
+		normalTex   = 5,
 	},
 	uniformFloat = {
-		-- sunPos = {gl.GetSun("pos")}, -- material has sunPosLoc
 		sunAmbient = {gl.GetSun("ambient" ,"unit")},
 		sunDiffuse = {gl.GetSun("diffuse" ,"unit")},
 		sunSpecular = {gl.GetSun("specular" ,"unit")},
-		--sunSpecularExp = gl.GetSun("specularExponent"), -- this might return crazy values like 100.0, which are unapplicable for Phong/Blinn-Phong
 		shadowDensity = gl.GetSun("shadowDensity" ,"unit"),
-		-- shadowParams  = {gl.GetShadowMapParams()}, -- material has shadowParamsLoc
 	},
 	uniformMatrix = {
-		-- shadowMatrix = {gl.GetMatrixData("shadow")}, -- material has shadow{Matrix}Loc
 	},
 }
+
+-- Lua limitations only allow to send 24 bits. Should be enough for now.
+local function EncodeBitmaskField(bitmask, option, position)
+	return math.bit_or(bitmask, ((option and 1) or 0) * math.floor(2 ^ position))
+end
+
+local function GetShaderOptions(optionsTable)
+	local knownOptions = {
+		OPTION_SHADOWMAPPING = 0,
+		OPTION_NORMALMAPPING = 1,
+		OPTION_MOVING_THREADS = 2,
+		OPTION_VERTEX_AO = 3,
+		OPTION_FLASHLIGHTS = 4,
+		OPTION_FOG = 5,
+		OPTION_NORMALMAP_FLIP = 6,
+	}
+
+	local intOption = 0
+	for opt, val in pairs(optionsTable) do
+		local optPosition = knownOptions[opt]
+		if optPosition then
+			intOption = EncodeBitmaskField(intOption, val, optPosition)
+		else
+			Spring.Echo("BLA")
+		end
+	end
+end
+
+local shaderPlugins = {
+}
+
+return shader, shaderPlugins, GetShaderOptions

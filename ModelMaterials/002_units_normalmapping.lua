@@ -23,6 +23,13 @@ local materials = {
 			"#define SHADOW_SOFTNESS SHADOW_HARD",
 			"#define MAT_IDX 2",
 		},
+		shaderOptions = {
+			
+		},
+		deferredOptions = {
+
+		},
+		materialIndex = 2,
 		usecamera = false,
 		culling   = GL.BACK,
 		predl  = nil,

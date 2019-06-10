@@ -59,22 +59,22 @@ local materials = {
 				float simTime = 0.02 * simFrame;
 				// these determine the speed of the wind"s "cosine" waves.
 				cosVec.w = 0.0;
-				cosVec.x = simTime * modelPos[0] + vertex.x;
+				cosVec.x = simTime * modelPos[0] + modelVertexPos.x;
 				cosVec.y = simTime * modelPos[2] / 3.0 + modelPos.x;
-				cosVec.z = simTime * 1.0 + vertex.z;
+				cosVec.z = simTime * 1.0 + modelVertexPos.z;
 
 				// calculate "cosines" in parallel, using a smoothed triangle wave
 				vec4 tri = abs(fract(cosVec + 0.5) * 2.0 - 1.0);
 				cosVec = tri * tri *(3.0 - 2.0 * tri);
 
-				float limit = clamp((vertex.x * vertex.z * vertex.y) / 3000.0, 0.0, 0.2);
+				float limit = clamp((modelVertexPos.x * modelVertexPos.z * modelVertexPos.y) / 3000.0, 0.0, 0.2);
 
 				float diff = cosVec.x * limit;
-				float diff2 = cosVec.y * clamp(vertex.y / 30.0, 0.05, 0.2);
+				float diff2 = cosVec.y * clamp(modelVertexPos.y / 30.0, 0.05, 0.2);
 
-				vertex.xyz += cosVec.z * limit * clamp(abswind, 1.2, 1.7);
+				modelVertexPos.xyz += cosVec.z * limit * clamp(abswind, 1.2, 1.7);
 
-				vertex.xz += diff + diff2 * wind;
+				modelVertexPos.xz += diff + diff2 * wind;
 			]],
 			FRAGMENT_POST_SHADING = [[
 				//gl_FragColor.r=1.0;
