@@ -14,7 +14,7 @@
 	"clear_factory_queue" : "Wyczyść kolejkę",
 	"space_click_show_stats" : "Spacja+klik: Pokaż statystyki jednostki",
 	"hold_space_for_help" : "Przytrzymaj spację: instrukcja",
-	"fac_modifier_keys_instruction" : "Shift: razy 5\nCtrl: razy 20\nAlt: wstaw na początek\nPrawy-klik: usuń z kolejki\n",
+	"fac_modifier_keys_instruction" : "Shift: x5\nCtrl: x20\nAlt: wstaw na początek\nPPM: usuń z kolejki\n",
 	"evac_ready" : "Ewakuacja gotowa",
 	"evac_charging" : "Ewakuacja przygotowywana",
 	"evac_no_wormhole" : "Brak tunelu czasoprzestrzennego",

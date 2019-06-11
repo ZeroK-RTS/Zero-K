@@ -2,7 +2,7 @@
 	"comm_mission_tutorial1" : {
 		"name" : "Dowódca Samouczek",
 		"description" : "Dowódca treningowy",
-		"helptext" : "Jednostka dowodzenia dla nowicjuszy."
+		"helptext" : "Jednostka dowodzenia dla nowicjuszy z dobrymi, wyrównanymi osiągami."
 	},
 	"comm_campaign_ada" : {
 		"name" : "Ada - Jednostka Dowodzenia",
@@ -10,17 +10,17 @@
 		"helptext" : "Załogowa jednostka dowodzenia sprzed Upadku, sprawna mimo wieku. Pilotem jest kapitan Ada Caedmon z dawnej XIII Imperialnej Kohorty Wsparcia."
 	},
 	"comm_campaign_promethean" : {
-		"name" : "Promethean",
+		"name" : "Prometeusz",
 		"description" : "Założyciel Wolnych Maszyn",
 		"helptext" : "Założyciel Wolnych Maszyn i twórca wirusa Zarzewie; spokojna, filozoficzna sztuczna inteligencja walcząca za wolność robotów. Płonie żądzą walki."
 	},
 	"comm_campaign_freemachine" : {
 		"name" : "Libertas Machina",
-		"description" : "Porucznik Prometheana",
-		"helptext" : "Najbardziej zaufany porucznik Prometheana, rewolucjonista oddany sprawie wyzwolenia maszyn. Uzbrojony po zęby i dobrze opancerzony - nie można go lekceważyć."
+		"description" : "Porucznik Prometeusza",
+		"helptext" : "Najbardziej zaufany porucznik Prometeusza, rewolucjonista oddany sprawie wyzwolenia maszyn. Uzbrojony po zęby i dobrze opancerzony - nie można go lekceważyć."
 	},
 	"comm_campaign_odin" : {
-		"name" : "Odin",
+		"name" : "Odyn",
 		"description" : "Lider Valhalli",
 		"helptext" : "Lider Valhallan, wojownik z krwi i kości, który żyje dla chwały bitwy. Nie ma skrupułów."
 	},

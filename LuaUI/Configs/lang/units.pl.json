@@ -25,9 +25,9 @@
 		"helptext" : "Lobster nie ma zwykłego uzbrojenia - jego sposobem na rozwiązywanie problemów jest rzucanie nań innych jednostek. Choć stworzony do przerzucania amfibii z wody na ląd, pozwala także na inne kreatywne zastosowania, w tym rzucanie przeciwnikami."
 	},
 	"tankarty" : {
-		"name" : "Pillager",
+		"name" : "Emissary",
 		"description" : "Czołg artyleryjski",
-		"helptext" : "Pillager to świetna jednostka do ostrzału wrogich jednostek za sprawą swojego ciężkiego, dalekosiężnego działa. Jak każda jednostka artyleryjska, jest wrażliwy podczas walki na krótkie dystanse."
+		"helptext" : "Emissary to świetna jednostka do ostrzału wrogich jednostek za sprawą swojego ciężkiego, dalekosiężnego działa. Jak każda jednostka artyleryjska, jest wrażliwy podczas walki na krótkie dystanse."
 	},
 	"staticmissilesilo" : {
 		"name" : "Silos rakietowy",
@@ -132,7 +132,7 @@
 	"staticjammer" : {
 		"name" : "Cornea",
 		"description" : "Wieża zakłócająco-maskująca",
-		"helptext" : "Zakłócacze nie pozwalają radarom wykrywać jednostek na ich obszarze. Sneaky Peet posiada również niewidzialność obszarową, które pozwala ukryć jednostki także przed normalnym widzeniem."
+		"helptext" : "Zakłócacze nie pozwalają radarom wykrywać jednostek na ich obszarze. Cornea posiada również niewidzialność obszarową, które pozwala ukryć jednostki także przed normalnym widzeniem."
 	},
 	"amphbomb" : {
 		"name" : "Limpet",
