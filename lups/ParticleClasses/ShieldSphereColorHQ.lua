@@ -54,6 +54,9 @@ ShieldSphereColorHQParticle.Default = {
 
 	size			= 10,
 	margin			= 1,
+	onHitTransitionTime = 10,
+	rechargeSpinupTime = 20,
+	startOfRechargeDelay = -999999,
 
 	colormap1	= { {0, 0, 0, 0} },
 	colormap2	= { {0, 0, 0, 0} },
@@ -101,6 +104,7 @@ end
 function ShieldSphereColorHQParticle:Draw()
 
 	gl.Culling(GL.FRONT)
+	-- Noise should only vary from 0.0 to 1.0
 	local noiseLevel = 0
 	if self.rechargeDelay > 0 then
 		gl.UniformInt(methodUniform, 2)
@@ -108,9 +112,18 @@ function ShieldSphereColorHQParticle:Draw()
 		local currTime = Spring.GetGameFrame()
 		local cooldown = hitTime + self.rechargeDelay * 30 - currTime
 		if cooldown > 0 then
-			-- Should vary from 0.0 to 1.0
-			local rampDown = 1.0 - 30.0 / (cooldown + 30.0)
-			noiseLevel = rampDown
+			local rampDown = 1.0
+			if cooldown < self.rechargeSpinupTime then
+				rampDown = cooldown / self.rechargeSpinupTime
+			end
+			local timeSinceRegenDisabled = currTime - self.startOfRechargeDelay
+			local rampUp = 1.0
+			if timeSinceRegenDisabled < self.onHitTransitionTime then
+				rampUp = timeSinceRegenDisabled / self.onHitTransitionTime
+			end
+			noiseLevel = rampDown * rampUp
+		else
+			self.startOfRechargeDelay = currTime
 		end
 	else
 		if not self.texture then
@@ -431,6 +444,11 @@ ____FS_CODE_DEFS_____
 		offset += GetRippleCoord(uv, vec2(0.25 + 0.5 * float(!gl_FrontFacing), 0.5) * uvMulS, sizeDrift * SZDRIFTTOUV, 80.0, 15.0, timer);
 
 		vec2 offset2 = vec2(0.0);
+		
+		float hitRadiusMulti = 1;
+		if (method == 2) {
+			hitRadiusMulti = 0.7;
+		}
 
 		for (int hitPointIdx = 0; hitPointIdx < MAX_POINTS; ++hitPointIdx) {
 			if (hitPointIdx < hitPointCount) {
@@ -439,7 +457,7 @@ ____FS_CODE_DEFS_____
 				vec2 impactPointUV = RadialCoords(impactPointAdj) * uvMulS;
 				float mag = hitPoints[5 * hitPointIdx + 3];
 				float aoe = hitPoints[5 * hitPointIdx + 4];
-				offset2 += GetRippleLinearFallOffCoord(uv, impactPointUV, mag, 100.0, -120.0, aoe, timer);
+				offset2 += GetRippleLinearFallOffCoord(uv, impactPointUV, mag, 100.0 / hitRadiusMulti, -120.0, aoe * hitRadiusMulti, timer);
 			}
 		}
 
@@ -463,10 +481,10 @@ ____FS_CODE_DEFS_____
 				alphaAdd = smoothstep(0.0, 0.04, length(offset2));
 			}
 			vec3 offsetNormal = normal + adjustedOffset;
-			vec3 standardVec = offsetNormal * 4;
+			vec3 standardVec = offsetNormal * 2;
 			float seed = hash11(float(unitId));
 			standardVec.z -= timer * 3 + seed;
-			vec3 noiseVec = offsetNormal * 10;
+			vec3 noiseVec = offsetNormal * 5;
 			noiseVec.z -= timer * 6 + seed;
 			noiseMult = 0.5 + (1 - abs(snoise(standardVec))) + (snoise(noiseVec)) * noiseLevel / 2.0;
 		}
