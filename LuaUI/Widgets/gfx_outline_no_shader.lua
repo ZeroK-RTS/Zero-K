@@ -501,6 +501,7 @@ function widget:DrawWorldPreUnit()
 		gl.DepthMask(true)
 		DrawVisibleUnitsLines(false, true)
 		gl.DepthMask(false)
+		glTexture(0)
 	end
 end
 
