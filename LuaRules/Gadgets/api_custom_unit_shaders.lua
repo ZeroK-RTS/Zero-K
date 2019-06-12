@@ -56,7 +56,6 @@ local LUASHADER_DIR = "LuaRules/Gadgets/Include/"
 -----------------------------------------------------------------
 
 VFS.Include("luarules/utilities/unitrendering.lua", nil, VFS.MOD .. VFS.BASE)
-local defaultShader = VFS.Include(MATERIALS_DIR .. "Shaders/default.lua")
 local LuaShader = VFS.Include(LUASHADER_DIR .. "LuaShader.lua")
 
 -----------------------------------------------------------------
@@ -193,6 +192,32 @@ local function _CompileShader(shader, definitions, plugins, addName)
 	return luaShader
 end
 
+local function _FillUniformLocs(luaShader)
+	local engineUniforms = {
+		"viewMatrix",
+		"viewMatrixInv",
+		"projectionMatrix",
+		"projectionMatrixInv",
+		"viewProjectionMatrix",
+		"viewProjectionMatrixInv",
+		"shadowMatrix",
+		"shadowParams",
+		"cameraPos",
+		"cameraDir",
+		"sunDir",
+		"rndVec",
+		"simFrame",
+		"drawFrame", --visFrame
+	}
+
+	local uniformLocTbl = {}
+	for _, uniformName in ipairs(engineUniforms) do
+		local uniformNameLoc = string.lower(uniformName).."loc"
+		uniformLocTbl[uniformNameLoc] = luaShader:GetUniformLocation(uniformName)
+	end
+	return uniformLocTbl
+end
+
 local function _CompileMaterialShaders(rendering)
 	for matName, mat_src in pairs(rendering.materialDefs) do
 		if mat_src.shaderSource then
@@ -215,15 +240,7 @@ local function _CompileMaterialShaders(rendering)
 				mat_src.standardShader = luaShader:GetHandle()
 				luaShader:SetUnknownUniformIgnore(true)
 				luaShader:ActivateWith( function()
-					mat_src.standardUniforms = {
-						cameraloc       = luaShader:GetUniformLocation("camera"),
-						camerainvloc    = luaShader:GetUniformLocation("cameraInv"),
-						cameraposloc    = luaShader:GetUniformLocation("cameraPos"),
-						shadowmatrixloc = luaShader:GetUniformLocation("shadowMatrix"),
-						shadowparamsloc = luaShader:GetUniformLocation("shadowParams"),
-						sunposloc       = luaShader:GetUniformLocation("sunPos"),
-						simframeloc     = luaShader:GetUniformLocation("simFrame"),
-					}
+					mat_src.standardUniforms = _FillUniformLocs(luaShader)
 				end)
 				luaShader:SetActiveStateIgnore(true)
 			end
@@ -249,15 +266,7 @@ local function _CompileMaterialShaders(rendering)
 				mat_src.deferredShader = luaShader:GetHandle()
 				luaShader:SetUnknownUniformIgnore(true)
 				luaShader:ActivateWith( function()
-					mat_src.deferredUniforms = {
-						cameraloc       = luaShader:GetUniformLocation("camera"),
-						camerainvloc    = luaShader:GetUniformLocation("cameraInv"),
-						cameraposloc    = luaShader:GetUniformLocation("cameraPos"),
-						shadowmatrixloc = luaShader:GetUniformLocation("shadowMatrix"),
-						shadowparamsloc = luaShader:GetUniformLocation("shadowParams"),
-						sunposloc       = luaShader:GetUniformLocation("sunPos"),
-						simframeloc     = luaShader:GetUniformLocation("simFrame"),
-					}
+					mat_src.deferredUniforms = _FillUniformLocs(luaShader)
 				end)
 				luaShader:SetActiveStateIgnore(true)
 			end
@@ -389,6 +398,7 @@ local function _LoadMaterialConfigFiles(path)
 			end
 		end
 	end
+
 	return unitMaterialDefs, featureMaterialDefs
 end
 
@@ -397,17 +407,11 @@ local function _ProcessMaterials(rendering, materialDefs)
 
 	for _, mat_src in pairs(rendering.materialDefs) do
 
-		if mat_src.shader == nil then
-			mat_src.shader = defaultShader
-		end
 		if mat_src.shader ~= nil and engineShaderTypes[mat_src.shader] == nil then
 			mat_src.shaderSource = mat_src.shader
 			mat_src.shader = nil
 		end
 
-		if mat_src.deferred == nil then
-			mat_src.deferred = defaultShader
-		end
 		if mat_src.deferred ~= nil and engineShaderTypes[mat_src.deferred] == nil then
 			mat_src.deferredSource = mat_src.deferred
 			mat_src.deferred = nil
