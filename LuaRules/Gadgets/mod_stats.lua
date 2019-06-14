@@ -10,7 +10,7 @@ function gadget:GetInfo()
     date      = "29.3.2009",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -22,7 +22,7 @@ if VFS.FileExists("mission.lua") then
   return
 end
 
-  
+
 if (not gadgetHandler:IsSyncedCode()) then
   return false  --  silent removal
 end
@@ -226,7 +226,7 @@ end
 function gadget:GameOver()
 	if GG.Chicken then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Chicken game; unit stats disabled")
-		return	-- don't report stats in chicken
+		return -- don't report stats in chicken
 	end
 	Spring.Echo("Submitting stats")
 	for atk, victims in pairs(damages) do

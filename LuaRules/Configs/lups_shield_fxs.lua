@@ -120,7 +120,10 @@ for unitDefID = 1, #UnitDefs do
 			myShield.colormap1 = {{0.4, 0.4, 1.3, 0.8}, {0.5, 0.1, 0.1, 0.3}}
 			myShield.colormap2 = {{0.0, 0.2, 0.2, 0.03}, {0.0, 0.2, 0.0, 0.02}}
 			myShield.hitResposeMult = 0.15
-			decayFactor = 0.05
+			myShield.faintShield = true
+			decayFactor = 0.1
+		else
+			myShield.faintShield = false
 		end
 
 		local isChicken = false

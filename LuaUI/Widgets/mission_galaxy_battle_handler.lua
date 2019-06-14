@@ -246,6 +246,7 @@ end
 
 local function InitializeBriefingWindow()
 	local planetInformation = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().planetmissioninformationtext) or {}
+	WG.campaign_planetInformation = planetInformation
 	
 	local BRIEF_WIDTH = 720
 	local BRIEF_HEIGHT = 680

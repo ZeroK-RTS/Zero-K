@@ -57,7 +57,11 @@ local enableMexPayback = isReturnOfInvestment
 
 include("LuaRules/Configs/constants.lua")
 
-local QUADFIELD_SQUARE_SIZE = 300 -- set to be twice the largest pylon range (so a pylon can be in 4 quads at most)
+--[[ Set to be twice the largest link range except Pylon, so a regular linking building can be in 4 quads at most.
+     Pylons can belong to more quads but they are comparatively rare and would inflate this value too much.
+     A potential optimisation here would be to measure if limiting this value to Solar radius would help even further
+     since Solar/Wind/Mex make up the majority of linkables. ]]
+local QUADFIELD_SQUARE_SIZE = 300
 
 for i = 1, #UnitDefs do
 	local udef = UnitDefs[i]
@@ -106,7 +110,7 @@ end
 
 local MIN_STORAGE = 0.5
 local PAYBACK_FACTOR = 0.5
-local MEX_REFUND_SHARE = 0.5 -- refund starts at 50%
+local MEX_REFUND_SHARE = 0.5 -- refund starts at 50% of base income and linearly goes to 0% over time
 
 local paybackDefs = { -- cost is how much to pay back
 	[UnitDefNames["energywind"].id] = {cost = UnitDefNames["energywind"].metalCost*PAYBACK_FACTOR},
@@ -1063,9 +1067,8 @@ function gadget:GameFrame(n)
 				-- Collect energy information and contribute to ally team data.
 				local te = teamEnergy[teamID]
 				
-				if (not splitByShare) or (teamResourceShare[teamID] == 1) then
-					te.inc = te.inc + allyTeamSharedEnergyIncome/resourceShares
-				end
+				local share = (splitByShare and teamResourceShare[teamID]) or 1
+				te.inc = te.inc + share*allyTeamSharedEnergyIncome/resourceShares
 
 				te.cur, te.max, te.pull, _, te.exp, _, te.sent, te.rec = spGetTeamResources(teamID, "energy")
 				te.exp = math.max(0, te.exp - (lastTeamOverdriveNetLoss[teamID] or 0))
@@ -1196,7 +1199,6 @@ function gadget:GameFrame(n)
 			end
 
 			--// check if pylons disable due to low grid power (eg weapons)
-			local list = pylonList[allyTeamID]
 			for i = 1, list.count do
 				local unitID = list.data[i]
 				local pylonData = pylon[allyTeamID][unitID]
@@ -1312,7 +1314,6 @@ function gadget:GameFrame(n)
 			end
 
 			--// Update pylon tooltips
-			local list = pylonList[allyTeamID]
 			for i = 1, list.count do
 				local unitID = list.data[i]
 				local pylonData = pylon[allyTeamID][unitID]
@@ -1372,6 +1373,7 @@ function gadget:GameFrame(n)
 				for i = 1, allyTeamData.teams do
 					local teamID = allyTeamData.team[i]
 					if teamResourceShare[teamID] then -- Isn't this always 1 or 0?
+					-- well it can technically be 2+ when comsharing (but shouldn't act as a multiplier because the debt should transfer)
 						local te = teamEnergy[teamID]
 						teamPaybackOD[teamID] = 0
 

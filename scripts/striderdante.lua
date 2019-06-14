@@ -450,7 +450,7 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(lleg, y_axis, math.rad(28), math.rad(50))
 		Turn(lfoot, x_axis, math.rad(23), math.rad(50))
 		
-		GG.Script.InitializeDeathAnimation()
+		GG.Script.InitializeDeathAnimation(unitID)
 		Sleep(800)
 		--EmitSfx(torso, 1027) --impact
 		--StartThread(burn)

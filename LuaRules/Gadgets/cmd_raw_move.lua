@@ -311,10 +311,9 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	end
 
 	local mx, my, mz = cmdParams[1], cmdParams[2], cmdParams[3]
-	if mx < 0 or mx >= mapSizeX
-	or mz < 0 or mz >= mapSizeZ then
-		-- could do `and not GG.AllowOffMapOrders` for mission editor?
-		return true, true
+	if mx < 0 or mx >= mapSizeX or mz < 0 or mz >= mapSizeZ then
+		mx = math.max(0, math.min(mx, mapSizeX))
+		mz = math.max(0, math.min(mz, mapSizeZ))
 	end
 
 	local goalDistOverride = cmdParams[4]

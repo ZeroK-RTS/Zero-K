@@ -46,10 +46,6 @@ local glScale          = gl.Scale
 local glText           = gl.Text
 local glTranslate      = gl.Translate
 
-local readyCount = 0 
-local waitingCount = 0 
-local missingCount = 0
-
 local forceSent = false
 
 local fixedStartPos = (Spring.GetModOptions().fixedstartpos == "1")
@@ -180,4 +176,4 @@ function gadget:Update()
 	if (Spring.GetGameFrame() > 1) then 
 		gadgetHandler:RemoveGadget()
 	end 
-end 
+end

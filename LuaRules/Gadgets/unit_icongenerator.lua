@@ -720,7 +720,7 @@ end
       local cnt = #background
 
       local elements = {}
-      for i=1,cnt-1 do
+      for j=1,cnt-1 do
         for n=1,4 do
           elements[#elements+1] = {
             v = {}
@@ -739,8 +739,8 @@ end
 
   local function Background(unitdefid)
     local udef = UnitDefs[unitdefid];
-    for i=1,#backgrounds do
-      local bg = backgrounds[i]
+    for j=1,#backgrounds do
+      local bg = backgrounds[j]
       if (type(bg.check) == "table") then
         local fulfill = true
         for key,value in pairs(bg.check) do
@@ -773,9 +773,10 @@ local function PrepareForScaling(bottom,left,width,height,wantedX,wantedY,border
   local marginX,marginY  = wantX - width, wantY - height;
   local leftmargin,btmmargin  = marginX*0.5 - (marginX*0.5)%1, marginY*0.5 - (marginY*0.5)%1;
 
-  local bottom,left = bottom - btmmargin, left - leftmargin;
-  local height   = height + marginY;
-  local width    = width  + marginX;
+  bottom = bottom - btmmargin
+  left = left - leftmargin;
+  height = height + marginY;
+  width  = width  + marginX;
 
   if (scaleX>scaleY) then
     bottom,left  = bottom-border*scaleX,left-border*scaleX
@@ -861,9 +862,9 @@ end
 
   local function ProcessJobs()
     --//note: we have a LIFO stack
-    for i=#jobs,1,-1 do
-      if (jobs[i]() ~= false) then
-        jobs[i] = nil;
+    for j=#jobs,1,-1 do
+      if (jobs[j]() ~= false) then
+        jobs[j] = nil;
       else
         break;
       end;
@@ -1069,7 +1070,6 @@ local schemes,resolutions,ratios = {},{},{}
   local function UnitCreated(_,uid,defname)
     jobsInSynced = jobsInSynced - 1
 
-    local uid,defname = uid,defname;
     jobs[#jobs+1] = function() CreateIcon(UnitDefNames[defname].id,uid) end;
 
     gadget.DrawGenesis = ProcessJobs;

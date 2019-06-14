@@ -394,7 +394,7 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(rarmgun, y_axis, 30, 20)	
 		Turn(larmgun, y_axis, 30, 20)
 		
-		GG.Script.InitializeDeathAnimation()
+		GG.Script.InitializeDeathAnimation(unitID)
 		Sleep(800)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then

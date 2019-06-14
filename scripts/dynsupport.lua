@@ -557,7 +557,7 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(lupleg, y_axis, math.rad(34), math.rad(250))	
 		Turn(lupleg, z_axis, math.rad(-(-9)), math.rad(250))	
 		
-		GG.Script.InitializeDeathAnimation()
+		GG.Script.InitializeDeathAnimation(unitID)
 		Sleep(200) --give time to fall
 		Turn(luparm, y_axis, math.rad(18), math.rad(350))	
 		Turn(luparm, z_axis, math.rad(-(-45)), math.rad(350))

@@ -95,6 +95,8 @@ local CURSOR_ERASE_NAME = "map_erase"
 local CURSOR_POINT_NAME = "map_point"
 local CURSOR_DRAW_NAME = "map_draw"
 
+local NO_TOOLTIP = "NONE"
+
 local iconTypesPath = LUAUI_DIRNAME .. "Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
@@ -2162,6 +2164,10 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	
 	-- Mouseover build option tooltip (screen0.currentTooltip)
 	local chiliTooltip = screen0.currentTooltip
+	if chiliTooltip == NO_TOOLTIP then
+		return false
+	end
+	
 	if chiliTooltip and string.find(chiliTooltip, "BuildUnit") then
 		local name = string.sub(chiliTooltip, 10)
 		local ud = name and UnitDefNames[name]
@@ -2180,7 +2186,7 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	
 	-- Mouseover morph tooltip (screen0.currentTooltip)
 	if chiliTooltip and string.find(chiliTooltip, "Morph") then
-		local unitHumanName = chiliTooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \-]', '')
+		local unitHumanName = chiliTooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \\-]', '')
 		local morphTime = chiliTooltip:gsub('.*time:(.*)metal.*', '%1'):gsub('[^%d]', '')
 		local morphCost = chiliTooltip:gsub('.*metal: (.*)energy.*', '%1'):gsub('[^%d]', '')
 		local unitDefID = GetUnitDefByHumanName(unitHumanName)

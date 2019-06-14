@@ -618,29 +618,29 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 end
 
 function gadget:GameOver()
-		gameOver = true
+	gameOver = true
 
-		local units = spGetAllUnits()
-		for i=1,#units do
-			local unitID = units[i]
-			local teamID = spGetUnitTeam(unitID)
-			local unitDefID = spGetUnitDefID(unitID)
-			gadget:UnitDestroyed(unitID, unitDefID, teamID)
+	local units = spGetAllUnits()
+	for i=1,#units do
+		local unitID = units[i]
+		local teamID = spGetUnitTeam(unitID)
+		local unitDefID = spGetUnitDefID(unitID)
+		gadget:UnitDestroyed(unitID, unitDefID, teamID)
+	end
+
+	-- read externally tracked values
+	local teams = Spring.GetTeamList()
+	for i = 1, #teams do
+		local team = teams[i]
+		if team ~= gaiaTeamID then
+			AddAwardPoints('reclaim', team, Spring.GetTeamRulesParam(team, "stats_history_metal_reclaim_current") or 0)
+			AddAwardPoints('pwn', team, Spring.Utilities.GetHiddenTeamRulesParam(team, "stats_history_damage_dealt_current") or 0)
 		end
+	end
 
-		-- read externally tracked values
-		local teams = Spring.GetTeamList()
-		for i = 1, #teams do
-			local team = teams[i]
-			if team ~= gaiaTeamID then
-				AddAwardPoints('reclaim', team, Spring.GetTeamRulesParam(team, "stats_history_metal_reclaim_current") or 0)
-				AddAwardPoints('pwn', team, Spring.Utilities.GetHiddenTeamRulesParam(team, "stats_history_damage_dealt_current") or 0)
-			end
-		end
+	ProcessAwardData()
 
-		ProcessAwardData()
-
-		_G.awardList = awardList
+	_G.awardList = awardList
 end
 
 -------------------------------------------------------------------------------------

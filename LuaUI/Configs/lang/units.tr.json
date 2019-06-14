@@ -1,0 +1,1172 @@
+{
+    "starlight_satellite": {
+        "name": "Parıltı",
+        "description": "Yıldızışığı ışın uydusu",
+        "helptext": "Bu Yıldızışığı tarafından hedefleme için kullanılan bir uydu."
+    },
+    "gunshipcon": {
+        "name": "Yabanarısı",
+        "description": "Ağır Kopter Mühendis, 7.5 M/s de kurar ",
+        "helptext": "Yüksek inşa gücü ile uçmanın kolaylığını birleştiren ağır bir yapıcı."
+    },
+    "gunshipskirm": {
+        "name": "Harpy",
+        "description": "Çok rollü Destek Kopteri",
+        "helptext": "Harpy hafif bir savaş kopteridir. Füzeleri etrafındaki en zarar verici şey olmasa da, oldukça doğrular ve bozma savaş başlıkları hedeflerini yavaşlatıyor."
+    },
+    "factorycloak": {
+        "name": "Görünmez bot Fabrikası",
+        "description": "Görünmez, Mobil Robotlar Üretir, 10 m/s de İnşa Eder",
+        "helptext": "Vahşi kuvvete karşı suçluluk duygusunu vurgulayan Görünmez bot Fabrikası, düşmanın zayıf noktalarına saldıran gizli, mobilite ve EMD silahlarını iyi kullanan. Anahtar birimler: Glaive, Ronin, Reaver, Knight, Hammer"
+    },
+    "ampharty": {
+        "name": "Kraken",
+        "description": "Amfibi Avcı / Topçu Botu",
+        "helptext": "Kraken, ikiz ateşli toplarla donanmış, kısa menzilli bir topçu botudur. Sualtı mücadelesinde yavaş düşmanları öldürmek için hızlı bir şekilde güdümsüz atışlar yapabilir."
+    },
+    "tankarty": {
+        "name": "Temsilci",
+        "description": "Genel Amaçlı Topçu",
+        "helptext": "Temsilci nin ağır, uzun menzilli silahı, onu düşman cep veya yapılarının soğuk kabartması için tercih edilen ünite yapar. Her zaman olduğu gibi, ona yaklaşan her şeye karşı dikkatli olmalısınız."
+    },
+    "staticmissilesilo": {
+        "name": "Füze Silosu",
+        "description": "Tactiksel Füzeler Hazırlar, 10 m/s de inşa eder",
+        "helptext": "Füze Silosu, her biri benzersiz bir savaş başlığına sahip dört farklı seyir füzesi inşa eder ve tutar. Saldırgan ve savunucu amaçlar için mükemmel yeteneği sunuyor."
+    },
+    "spiderscout": {
+        "name": "Pire",
+        "description": "Ultra hafif Gözcü Böcek (Kazar)",
+        "helptext": "Pire, gelişmiş sensör grubunun görüldüğünden daha fazla görmesine izin verdiği erişilemez yerlerde saklanabilir. Küçük gruplarda, erken dönemlerde etkili bir şekilde basmak için kullanılabilir ve uzun kayalıkları olan haritalarda beklenmedik açılardan saldırabilir. Çok az hasar verir ve herhangi bir muhalefet türüne ölür."
+    },
+    "energyfusion": {
+        "name": "Füzyon Reaktörü",
+        "description": "Orta Enerji Santrali(+35)",
+        "helptext": "Füzyon reaktörleri makul bir fiyata iyi miktarda sabit enerji çıkışı sağlar. Onlar çekici hedefler ve çok iyi zırhlı değiller, bu yüzden iyi korunmalarını sağla. Öldürüldüğünde, füzyon reaktörleri yakındaki birimlere ağır hasar verir."
+    },
+    "chickenlandqueen": {
+        "name": "Tavuk Kraliçe",
+        "description": "Cehenneme saldır!",
+        "helptext": "Tek kelime: TOPUKLA! Tavuk Kraliçesi, Thunderbird kolonisinin özüdür ve ağırlaştığında durması neredeyse imkansızdır. Ateşli toplar tükürebilir, uçakları öldürmek için sporları spreyleyebilir ve kara birimlerini ondan uzaklaştırabilir. Hepsinden öte, çeneleri en büyük saldırı mekanizmasını saniyeler içinde parçalayabilir. Sadece en kararlı, odaklanmış saldırı bu canavarı durdurabilir."
+    },
+    "tankassault": {
+        "name": "YarıBoğa",
+        "description": "Taarruz Tankı",
+        "helptext": "Ağır hizmet savaş tankı. YarıBoğa perdeli savaşlarda emici hasarı üstündür, ancak düşük ateş oranı, sürülerle uğraşmakta çok iyi olmadığı ve ağır zırhının yönetilebilirlik fiyatından kaynaklandığı anlamına gelir."
+    },
+    "chicken_listener": {
+        "name": "Dinleyici",
+        "description": "Oyma Mobil Sismik Dedektör",
+        "helptext": "Dinleyici, Kazıcı nın gelişmiş bir şeklidir. Tüm dövüş kabiliyetini yitirmesine rağmen, düşman kara kuvvetlerinin yerini belirleyebilmesine izin veren benzersiz bir işitme duyusu kazanmıştır."
+    },
+    "cloakbomb": {
+        "name": "Imp",
+        "description": "Tüm Arazi EMP Bombası (Kazar)",
+        "helptext": "Imp, hatalı silahlardan, özellikle saldırganlardan ve birçok savaşçıdan kurtulmak için hızına ve küçük boyutuna güveniyor. Zaten menzilde girmeden öldüremediği ağır birimleri veya hafif akıncı paketlerini felç edebilir. Reavers veya Glaives daha sonra çaresiz düşmanları riske atmadan ortadan kaldırabilir. Erken bir patlamayı başlatmak için savunma veya tek ucuz birimlerle karşı durun. Aksi halde rölantide iken bu ünite görünmez olur."
+    },
+    "shieldriot": {
+        "name": "Haydut",
+        "description": "İsyancı bot",
+        "helptext": "Haydut, etrafındaki geniş bir dairede, düşman birimlerine zarar veren ve yavaşlatan elektromanyetik bir bozulma atımı yayar. Dost birimler etkilenmez."
+    },
+    "chickenc": {
+        "name": "Basilisk",
+        "description": "Tüm Arazi İsyancı",
+        "helptext": "Basilisk, asidik tükürükleriyle düşmanı şaşırtmak için bir örümcek gibi duvara tırmanıyor. Yalnızca uyanık bir saat, üslerin beklenmedik yönlerden kalkmasını sağlamak için bu yaratıkların tepelerin üzerinden gezinmesini önler. Silah savaşları, Basilisk saldırılarına en iyi çözümdür."
+    },
+    "hoverraid": {
+        "name": "Hançer",
+        "description": "Hızlı Saldırı Hoveri",
+        "helptext": "Hançer hover izcidir. Akıllı, ucuz harcanabilir bir yöntem sunar ve ayrıca ekonomik fırsat hedeflerine de varabilir. Hafif Gaus silahı aynı zamanda sualtı hedeflerini vurabilir."
+    },
+    "chicken_digger": {
+        "name": "Kazıcı",
+        "description": "Kazıcı Gözcü/Akıncı",
+        "helptext": "Kazıcı'nın güçlü pençeleri, en sert kayaların arasından atlayabilir. Böylece, tespit edilemez bir şekilde yeraltında seyahat edebilir ve kargaşaya neden olabileceği herhangi bir yerde görünebilir. Kazıcılar, ana savunma hattınızı atlayabildiğinden değerli eşyalarınızı doğrudan koruyun."
+    },
+    "chicken_leaper": {
+        "name": "Sıçrayıcı",
+        "description": "Atlamayan Akıncı",
+        "helptext": "Sıçrayıcı, tavukların hızlı saldırı birimidir, düşmanlara akar ve engelleri aşar."
+    },
+    "chickenr": {
+        "name": "Lobber",
+        "description": "Topçu",
+        "helptext": "Bir organik topçu şekli olan Lobber, uzun mesafelerde yüksek yörüngede zehir toplarını fırlatır. Statik savunmaya aşırı derecede güvenenler için bir problem olduğunu kanıtlıyor, ancak doğrudan saldırıya uğradığında pratik olarak çaresiz."
+    },
+    "turrettorp": {
+        "name": "Afacan",
+        "description": "Torpido Atıcı",
+        "helptext": "Bu Torpido Atıcısı, hem yüzeye hem de suya daldırılmış gemilere karşı savunma sağlar."
+    },
+    "tankheavyassault": {
+        "name": "TepeGöz",
+        "description": "Çok Ağır Tank Avcı",
+        "helptext": "Tepegöz sahadaki en ağır tanktır. Ana silahı, daha küçük tankları unutulmayacak şekilde parçalamak için tasarlanmış ağır bir top, taretin üzerine monte edildiğinde ise daha hızlı düşmeleri engellemekten kaçınmak için kısa mesafeli bir yavaş tüfek. Bununla birlikte, bir su kabı gibi dönüyor, kısa menzili gelişmiş avcı avcıları veya hava saldırıları için kolay bir av yapıyor ve yavaş atış hızı onu toplu akıncı saldırılarına karşı savunmasız bırakıyor. Ağır ana savaş topu duvarları sallayabilir, bu yüzden biraz daha sertleştirilmiş alanlara karşı saldırılara öncülük edebilir."
+    },
+    "damagesink": {
+        "name": "Hasar Batma olayı",
+        "description": "Ateş etmen önemli değil.",
+        "helptext": "\"Ben batıyorum, öyleyse öyleyim.\""
+    },
+    "turretmissile": {
+        "name": "Kazık",
+        "description": "Hafif Füze Kulesi",
+        "helptext": "Kazık hafif, çok amaçlı bir füze kulesidir. Üniteleri belli bir mesafeden koparmak, bir miktar hava önleyici koruma sağlamak ve düşman LLT'leri menzillerinin dışından fırlatmak için iyidir. Ancak, hapşırdığınızda kopar."
+    },
+    "chicken_roc": {
+        "name": "Anka",
+        "description": "Ağır Saldırı Uçucusu",
+        "helptext": "Büyük, öfkeli ve hem hava hem de toprak düşmanlarıyla mücadele edebilen Anka, zorlu bir uçan tavuktur."
+    },
+    "turretaaheavy": {
+        "name": "Artemis",
+        "description": "Çok Uzun Menzilli - Anti Hava Füze Kulesi",
+        "helptext": "Artemis, düşman uçaklarına net bir mesaj gönderen son derece uzun menzilli ilk saldırı önleyici bir silahtır - buraya gidemez, evlat. Her atış 20 saniye boyunca stoklanmalıdır, ancak zamana değer, çünkü hızlı bir füze salvo hemen hemen her hava saldırısını silecek."
+    },
+    "chicken_drone": {
+        "name": "İHA",
+        "description": "Tavuk yapılarına Evrim geçirir",
+        "helptext": "Hayattaki tek amacı, Tavuk Kovanının yapılarından birine dönüşmek olan, taarruz etmeyen bir organizma."
+    },
+    "staticjammer": {
+        "name": "Kornea",
+        "description": "Alan Saklayıcı / Bozucu",
+        "helptext": "Bunun gibi bozucular, düşman radar dalgalarına müdahale ederek ünitelerinizin radar getirilerini gizler. Kornea ayrıca yakındaki birimleri düşman görüş alanından gizlemek için bir görünmezlik kalkanı ile donatılmıştır."
+    },
+    "amphbomb": {
+        "name": "Minare",
+        "description": "Amfibi Yavaş Bomba",
+        "helptext": "Minare, çevikliği ve küçüklüğü sayesinde çoğu yavaş mermiyi atlatıp, patlatmak, yavaşlatmak ve onlara zarar vermek için düşman birimlerine yaklaşmalarına izin veriyor."
+    },
+    "factoryveh": {
+        "name": "Araba Fabrikası",
+        "description": "Hafif Tekerlekli Araçlar Üretir, 10 m/s de inşa eder ",
+        "helptext": "Geleneksel bir favori olan Araba Fabrikası, hızlı ve agresif birimleriyle ideal bir yatırım. Hızı olmayan birimler, çok fazla ateş gücü ile onu telafi ediyor. Anahtar Birimler: Dart, Acısöz, Tahripçi, Yırtıcı, Kesici"
+    },
+    "turretgauss": {
+        "name": "Gaus",
+        "description": "Gaus Tareti, kapalıyken 20 can/s yeniler",
+        "helptext": "Gaus, orta menzilli bir gaus topuyla birlikte kompakt ve esnek bir tarettir. Patlatıldığında, gelen hasarın dörtte birini ve ayrıca az miktarda sağlık rejenerasyonunu alır. Aynı zamanda sualtı hedeflerine de saldırabilir."
+    },
+    "nebula": {
+        "name": "Bulutsu",
+        "description": "Atmosfersel Anagemi",
+        "helptext": "Bir tuğla kadar manevra kabiliyeti yüksek ve sadece mütevazi bir silahlı olan Bulutsu, kalkanından dolayı uzun vadeli saldırılara dayanma kabiliyetinden ve savaş uçağı tamamlayıcılığından daha az düşman olduğu için hala korkunç bir kuvvettir."
+    },
+    "hoveraa": {
+        "name": "Harmancı",
+        "description": "Anti Hava Hoveri",
+        "helptext": "Harmancı ağır hasar veren büyük, kısa ve orta menzilli YHM'yi piyasaya sürdü"
+    },
+    "cloakarty": {
+        "name": "Sapan",
+        "description": "Hafif Topçu Bot",
+        "helptext": "Sapan, engeller üzerinden dolaylı yangına izin veren ve ağır lazer kulelerine kadar statik savunmaları engelleyen uzun menzilli bir plazma topuna sahiptir. Her ne kadar mobil birimlere karşı etkili olsa da, akıncıların ve diğer hızlı birimlerin kapanma mesafelerinin önüne geçmek için korunmalıdır."
+    },
+    "chickend": {
+        "name": "Tavuk Tüpü",
+        "description": "Savunma ve enerji kaynağı",
+        "helptext": "Tüp, tavukların tek savunma yapısıdır, hem ölümcül sporları havaya uçurur hem de yer hedeflerine vurur."
+    },
+    "rocksink": {
+        "name": "Sallanan Hasar Batma olayı",
+        "description": "Ona ateş ederken coşar.",
+        "helptext": "Ben harikayım ve beni kırma\nBen kaaaaaya'yım ve beni sarsacak bir şey yok"
+    },
+    "fakeunit_aatarget": {
+        "name": "Sahte AH hedefi",
+        "description": "Zımlamajet betiği tarafından kullanılır.",
+        "helptext": "Teknik amaçlar için sahte birim."
+    },
+    "mahlazer": {
+        "name": "Yıldızışığı",
+        "description": "Gezegensel Enerji Kesici",
+        "helptext": "Bu büyük ölçekli araç, terraform projeleri için araziyi şekillendirmek için kullanılır. Ayrıca sinir bozucu düşman birimleri ve üsleri gibi engellerin temizliği için de faydalıdır."
+    },
+    "spidercrabe": {
+        "name": "Yengeç",
+        "description": "Ağır İsyan / Çatışma Böceği - Sabitken Zırhlı Forma Geçer",
+        "helptext": "Yengeç'in büyük topları, büyük miktarda ucuz ünite kümesini yok eder ve aynı zamanda temel savunmaları yenebilir. Yürümeyi bıraktığında, yengeç üçte bir gelen hasarı azaltarak zırhlı formda kıvrılıyor. Yengeç in temel zayıflığı, hız eksikliğidir."
+    },
+    "subscout": {
+        "name": "Mızrak",
+        "description": "İzci / İntihar Mini Denialtı",
+        "helptext": "Mızrak temelde keşif işlevselliğine sahip büyük bir akıllı torpidocu. Düşman hareketlerini gözlemlemek için derinlerde saklı kalabilir, ardından istenmeyen gemileri batırmak için patlayıcı yükünü patlatabilir."
+    },
+    "staticstorage": {
+        "name": "Depo",
+        "description": "Metal ve Enerji Depolar (500)",
+        "helptext": "Depolar, engin bir enkaz alanını geri kazanmak gibi, büyük bir metal akışı beklediğinde depo görevi görür. Bununla birlikte, daha uzun metal gücü gelirlerinin artması, daha fazla inşa gücü edinerek daha iyi ele alınmaktadır."
+    },
+    "shieldscout": {
+        "name": "Çamurkutusu",
+        "description": "Çamurlu bir Kutu",
+        "helptext": "Çamur kutu, düşman hareketini engellemek ve genellikle engel olmak için var. Bu göreve o kadar sadıklar ki, can sıkıcı alanlar oluşturmak için ölümden sonra kir yüklerini serbest bırakıyorlar. Kaderlerini beklerken Çamur kutu'lar kafa atma ve izcilikten zevk alıyor."
+    },
+    "amphaa": {
+        "name": "Fener",
+        "description": "Amfibi Anti-Hava Bot",
+        "helptext": "Fener, fabrikanın nemsizliğine karşı koyacak şekilde tasarlanmış amfibi hava önleyici bottur - Kuzgun. İkisi birlikte yüzer ve tek bir Kuzgun öldürür."
+    },
+    "tankaa": {
+        "name": "Ettin",
+        "description": "Flak Anti Hava Tank",
+        "helptext": "Ettin'in flak topu, düşman silahlılarını hızlıca temizlemeyi sağlar ve ayrıca uçaklara karşı da oldukça etkilidir."
+    },
+    "asteroid": {
+        "name": "Astroid",
+        "description": "Uzay Taşı",
+        "helptext": "Asteroitler Meteor Denetleyici tarafından gezegene düşmek üzere manipüle edilebilir; öncelikli olarak düştükleri birimleri ezmek için bir silah görevi görürler, ancak kaynaklar için yeniden talep edilebilirler."
+    },
+    "planeheavyfighter": {
+        "name": "Raptor",
+        "description": "Hava Hakimiyet Savaşçısı",
+        "helptext": "Raptor, uçan başka bir şeyi geri getirme konusunda uzmanlaşmıştır. Kara saldırı kabiliyeti olmamasına rağmen, sınırlı AH ateşini almak için yeterince sağlamdır."
+    },
+    "hoverskirm2": {
+        "name": "Trisula",
+        "description": "Hafif Taarruz/Savaş Hoveri",
+        "helptext": "Trisula, çok sayıda küçük hedefi silebilen ya da tek bir büyük olanı cüruflayabilen bir saçılma silahı ile donanmış oldukça hızlı, sağlam bir savaşçıdır."
+    },
+    "vehriot": {
+        "name": "Yırtıcı",
+        "description": "İsyancı Araba",
+        "helptext": "Yırtıcı'nın isyan topu, akıncı sürülerini yok etmede ve düşman ilerlemelerini durdurmada etkilidir. Mermi yay yapmaz, bu nedenle Yırtıcılar topaklaşmadan kaçınmalı ve mümkün olan her yerde bir çizgi oluşumunda düzenlenmelidir. Hız ve menzil eksiklikleri nedeniyle, çoğu avcı ustası onlara karşı etkilidir. Yırtıcı'nın topu, müttefik araçların sert arazide geçişini sağlamak için araziyi düzleştirir."
+    },
+    "staticshield": {
+        "name": "Siper",
+        "description": "Alan Kalkanı",
+        "helptext": "Siper, gelen mermileri durduran baloncuk kalkanı ile mütevazı bir alanı koruyor (ancak AE etkileri yok). Kalkan önemli bir enerji bakımına sahip ve çok güçlü silahları engellemiyor."
+    },
+    "turretaaclose": {
+        "name": "Testere",
+        "description": "Patlayıcı Anti Hava Tareti",
+        "helptext": "Testere'nin ikiz füzeleri, menziline giren herhangi bir uçağı acımasızca cezalandırıyor, ancak hafif hedeflere karşı ideallerinden daha az hale getirmek için yeniden yükleme önemli miktarda zaman ayırıyor."
+    },
+    "chicken_rafflesia": {
+        "name": "Rafflesia",
+        "description": "Tavuk Kalkan (Statik)",
+        "helptext": "Rafflesia, kalkanlarını kullanarak yakındaki tavuk birimlerini ve yapıları korur."
+    },
+    "empiricaldpser": {
+        "name": "Ampirik SBH şeyi",
+        "description": "Bilim için ona ateş et.",
+        "helptext": "!!BİLİM!!"
+    },
+    "hoverassault": {
+        "name": "Teber",
+        "description": "Abluka Yarıcı Hover",
+        "helptext": "Teber, ateş etmediğinde zırhlı gövdesine düğmelerini sokar ve 4x hasar direnci sunar. Yavaş, kısa menzilli silahı, oldukça hareketli hedeflere karşı kullanım için uygun değildir."
+    },
+    "shieldcon": {
+        "name": "Mahkum",
+        "description": "Kalkanlı İnşa Botu, 5 m/s de inşa eder",
+        "helptext": "Mahkum, standart bir yapı botudur ve burkulmuştur: kendini savunmak ve müttefik kalkanları desteklemek için hafif bir kalkanlıdır."
+    },
+    "energysingu": {
+        "name": "Boyutsal Reaktör",
+        "description": "Büyük Güç Santrali (+225) - TEHLİKELİ",
+        "helptext": "Boyutsal Reaktör, kontrollü bir kara delik kullanarak, kulağa geldiği kadar güvenli olan büyük miktarda enerji üretir. Reaktör tahrip edildiğinde, kara delik şiddetli bir şekilde çarparak birimleri içeri sürükler. Bunun inşa edildiği kıtanın tamamı güvenli olmayan zemin olarak değerlendirilmelidir."
+    },
+    "bomberdisarm": {
+        "name": "Şimşek kuşu",
+        "description": "Bozucu Şimşek Bombardımanı",
+        "helptext": "Hızlı bombardıman uçağı, altındaki geniş bir bölgedeki birimleri etkisiz hale getiren bir şimşek jeneratörü ile silahlandırıldı."
+    },
+    "chicken_spidermonkey": {
+        "name": "Böcekmaymun",
+        "description": "Tüm Arazi Destek",
+        "helptext": "Böcekmaymun çok sıradışı bir destek tavuğu. Adından da anlaşılacağı gibi, duvarlara tırmanabilir, ancak aynı zamanda düşmanları yavaşlatan ve çekebilir ipek bir çizgiyi de döndürebilir."
+    },
+    "shieldskirm": {
+        "name": "Serseri",
+        "description": "Çatışmacı Bot (Dolaylı Atış)",
+        "helptext": "Serseri'nin ark roketleri düşük ateş oranına sahip, ancak çok fazla hasar veriyor, bu da düşman birimlerine veya savunma alanlarına girip çıkmada veya güçlü bir ilk salvoda kaçmayı çok iyi yapıyor. Onlara hızlı birimlerle saldırarak veya toplandıklarında bombaları sürerek onları karşı koy."
+    },
+    "dronelight": {
+        "name": "Ateşböceği",
+        "description": "Saldırı İHAsı",
+        "helptext": "Ateşböceği, zayıf bir yüksek hassasiyetli nabız lazeri ile bir saldırı uçağıdır. Ana birimlerini hafif düşman birimlerden koruyabilirler. Bununla birlikte gizliliğini paylaşmazlar, bu nedenle gizlenmiş bir komutanın varlığına ihanet edebilirler."
+    },
+    "chickenblobber": {
+        "name": "Blobber",
+        "description": "Ağır Topçu",
+        "helptext": "Lobber’in büyük kardeşi Blobber, geniş bir dağınık asit yağmuru yağar. En zorlu kalkan ağını bile çok çabuk zayıflayatabilir, ancak doğrudan saldırıya meyilli kalır."
+    },
+    "energyheavygeo": {
+        "name": "Gelişmiş Jeotermal",
+        "description": "Büyük Güç Santrali (+100) - TEHLİKELİ",
+        "helptext": "Gelişmiş Jeotermal Santrali büyük miktarda enerji üretir. Bununla birlikte, onu yok etmek yıkıcı bir patlamaya neden olacağı için korunmayı gerektirir."
+    },
+    "staticcon": {
+        "name": "Bakımcı",
+        "description": "Statik Mühendis, 10 m/s de inşa eder",
+        "helptext": "En uygun maliyetli yapı gücü kaynağı olan Bakımcı, fabrikaların üretimini artırmak veya yakındaki savunmaları otomatik olarak onarmak için idealdir. Ancak herhangi bir inşaat projesine başlayamaz."
+    },
+    "terraunit": {
+        "name": "Terraform",
+        "description": "Harcandı: 0",
+        "helptext": "Bu birim, terraform olan bir alanı temsil eder."
+    },
+    "chickenf": {
+        "name": "Kilit",
+        "description": "Uçan Diken Tükürücü",
+        "helptext": "Uçan bir tavuk! Kilit, düşman uçaklarını sivri uçlarla yere indiren öldürücü bir yırtıcı hayvan, aynı zamanda onları mutlu bir şekilde yer hedeflerinde kullanacak. Bununla birlikte, herhangi bir hava ünitesi gibi mağlup edilebilir"
+    },
+    "energypylon": {
+        "name": "Enerji Direği",
+        "description": "AşırıYükleme menzilini genişletir",
+        "helptext": "Enerji İletimi Direkleri, enerji şebekelerinin genişletilmesine ve daha fazla Çıkarıcı veya enerji kaynağı bağlanmasına yardımcı olur. Bu da Aspiratörlerin aşırı yüklenmesine ve daha fazla metal üretilmesine yardımcı olur. Direkler ayrıca, enerji şebekesine dayanan savunmalara güç sağlamak için hızlı bir yol sağlayabilir. Kısa mesafelerde veya düşük enerjili durumlarda, ızgaraları bağlamak için güneş enerji gibi enerji üreticilerinin kullanılması daha uygun maliyetli bir alternatif olabilir."
+    },
+    "bomberprec": {
+        "name": "Kuzgun",
+        "description": "Hassas Bombacı",
+        "helptext": "Kuzgun tek bir yüksek hasar bırakır, düşük AE li bomba atıyor. Maliyet maliyeti, hiçbir şey o antinukleer veya Boğayı çıkarmakla tam olarak eşleşmiyor, ancak daha küçük cep telefonlarına karşı kullanmak için başka bir yer aramalısınız."
+    },
+    "chicken_shield": {
+        "name": "Blooper",
+        "description": "Kalkan/Anti Hava",
+        "helptext": "Bitişik tavukları korur."
+    },
+    "chicken_dodo": {
+        "name": "Dodo",
+        "description": "Tavuk Bomba",
+        "helptext": "Dodo'nun vücudunda uçucu bir organik patlayıcı karışımı var. En ufak bir provokasyonda, şaşırtıcı bir şekilde patlar, bu da şokunun yakındaki birimleri havaya fırlatmasıyla sonuçlanır. Uçan uzuvlarına ve sivri uçlara zarar verebileceğinden sakının."
+    },
+    "bomberheavy": {
+        "name": "Atılgan",
+        "description": "Boyutsal Bombardımancı",
+        "helptext": "Atılgan, uçan birimleri gönderebilecek tek bir güçlü bombayı attı. Orta derecede AH'ye nüfuz edip onarıma kaçmak için yeterince sağlamdır, ancak dikkatsizce kullanılmamalıdır - bunun için çok pahalıdır."
+    },
+    "tacnuke": {
+        "name": "Eos",
+        "description": "Taktiksel Nükleer",
+        "helptext": "Uzun menzilli hassas bir saldırı silahı. Eos'un patlama yarıçapı küçük, ancak ölümcül."
+    },
+    "chickenwurm": {
+        "name": "Solucan",
+        "description": "Ateşli Kazıcı (Taarruz/İsyan)",
+        "helptext": "Solucan, zeminin yüzeyinin altına “girer” ve kendisini, geniş bir arazide yüzeye yerleşir ve bir ateş topunu fırlattığında ortaya çıkar. Uçurumlara tırmanabilir ve savunma taretlerini şaşırtabilir, ancak saldırılar için zayıftır."
+    },
+    "dronefighter": {
+        "name": "Spicula",
+        "description": "Savaşçı İHA",
+        "helptext": "Spicula, partikül hüzmesi hem kara hem de hava hedeflerine karşı etkili olan hızlı bir çok amaçlı avcı uçağıdır."
+    },
+    "bomberassault": {
+        "name": "Elips",
+        "description": "Taarruz Bombardımancı (Anti Statik)",
+        "helptext": "Elips'in heybetli gövdesi, ağır bir tahribat yükünü vermek için sürekli yanarken sert bir ceza alabilir, ancak güdümsüz bombanın, mobil hedefleri vurmakla ilgili sorunları var ve büyük boyutu, kolay bir hedef haline getiriyor."
+    },
+    "cloakassault": {
+        "name": "Şovalye",
+        "description": "Şimşek Taarruz Botu",
+        "helptext": "Yavaşça ve istikrarlı bir şekilde, Şövalyeler grupları, düşman tahkimatlarına doğru yol alırken, şiddetli düşmanlara zarar veren ve sersemleten kısa menzilli yıldırım toplarını yokedene kadar ağır ateşi kaldırabilir. Felç geçirmediğinizden emin olarak uçurtma yapabilen herhangi bir şeyle mücadele edin (bu durumda ölü kadar iyi olursunuz.)"
+    },
+    "energysolar": {
+        "name": "Solar Santral",
+        "description": "Küçük Santral (+2)",
+        "helptext": "Güneş Santralleri enerji yapılarının maliyet açısından en az verimli olduğu, ancak aynı zamanda en güvenilir ve sağlam. Saldırıya uğradığında, santraller 8 saniye boyunca zırhlı bir şekilde kıvrılır ve bu da gelen hasarı çeyreğe kadar azaltır ve akıncılara karşı mükemmel koruma sağlar."
+    },
+    "gunshipheavyskirm": {
+        "name": "Nimbus",
+        "description": "Ateş Desteği Kopter",
+        "helptext": "Nimbus, çoğu kara hedeflerinin erişemeyeceği bir ateş destek silahıdır. Sınırlı hava karşıtı yangında hayatta kalmak için yeterince zordur ve ikiz EMG'leri, koyacak kadar salak ünitelerden çiğnenir."
+    },
+    "factoryshield": {
+        "name": "Kalkanbot Fabrikası",
+        "description": "Sert Robotlar Üretir, 10 m/s de inşa eder",
+        "helptext": "Kalkan Bot Fabrikası zor ama esnektir. Birimleri, hareketten ödün vermeksizin, ağrıyı gidermek ve geri almak için inşa edilmiştir. Akıllı ünite taraklarının akıllıca kullanılması iyi ödüllendirilir. Anahtar birimler: Haydut, Eşkıya, Yasadışı, Serseri, Şantajcı"
+    },
+    "chickena": {
+        "name": "Cockatrice",
+        "description": "Taarruz/Anti Zırhlı",
+        "helptext": "Cockatrice bir canavar. Düşman ateşine son derece geçirimsiz göründüğü için, raslantı hedefine doğru yürür ve inanılmaz güçlü çeneleri ile onu parçalar. Neyse ki, hızlı ya da özellikle akıllı değildir ve avcılarla ya da kırıcılarla kolayca tahrip edilebilir."
+    },
+    "hoverskirm": {
+        "name": "Cerrah",
+        "description": "Çatışmacı/Anti Ağır Hover",
+        "helptext": "Vur kaç saldırıları için Neşter kullanın. Uzun bir yeniden doldurma süresi vardır ve çok fazla isabet noktası yoktur ve daima düşmanla birlikte olmalıdır. Kavisli bir mermi, engelleri ve arkadaş canlısı birimleri atmasına izin veriyor."
+    },
+    "jumpbomb": {
+        "name": "Skuttle",
+        "description": "Görümez Zıplayan Anti Ağır Bomba",
+        "helptext": "Bu yavaş hareket eden, pahalı gizlenmiş birim, düşman birimlere sıçrayabilir ve ağır bir tankı bile doğrudan cehenneme fırlatabilir. Ucuz eleme üniteleri sürülerine sahip. Kullanırken çok küçük patlama yarıçapına dikkat edin."
+    },
+    "jumpskirm": {
+        "name": "Moderator",
+        "description": "Bozucu Çatışma Yürüyücü",
+        "helptext": "Moderatör'ün bozucu ışını, düşman hasarını ve ayrıca atış hızını %%50'ye kadar düşürerek neredeyse tüm hedeflere karşı etkili kılar."
+    },
+    "chicken": {
+        "name": "Tavuk",
+        "description": "Sürü",
+        "helptext": "Şimşek kuş'un kürsüsü agresif bir zırıltı tipi bir birimdir. Bireysel güçlülükten yoksun olan şey, sayıları, küçük tavuk sürüleriyle ezici düşmanları telafi ediyor. Durdurmak için iyi bir isyan birimi önerilir."
+    },
+    "chicken_sporeshooter": {
+        "name": "Spor Atıcı",
+        "description": "Arazi Arası Sporlar (Anti-Hava / Çatışma)",
+        "helptext": "Spor atıcı, uçakları düşürmek ve uzaktaki kara hedeflerine vurmak için sporları atıyor. Sürpriz saldırılar için duvarlara tırmanabilir."
+    },
+    "turretaafar": {
+        "name": "Z.Testere",
+        "description": "Uzun Menzil AntiHava Füze Batarya",
+        "helptext": "Z.Testere, çok büyük bir hava tahriki olan tarettir ve çok büyük hasar verir, bombardıman uçaklarını çok hızlı bir şekilde dışarı çıkarabilir. Buna karşın çok fazla hasar alamaz ve doğrudan saldırıya uğradığında kötü bir şekle girer."
+    },
+    "staticnuke": {
+        "name": "Üçlü",
+        "description": "Stratejik Nükleer Atıcı, 18 m/s emer 3 dakikada stoklar",
+        "helptext": "Üçlü, tüm üsleri yok edebilecek yıkıcı nükleer füzeler fırlatır. Ancak, önceden istenen hedef alandan kaldırılması gereken anti-nükleer sistemler tarafından kolayca yenilebilir."
+    },
+    "hovershotgun": {
+        "name": "Cezalandırıcı",
+        "description": "Saçmalı Hover",
+        "helptext": "Cezalandırıcı, büyük hedeflere veya sıkı düşman kümelerine karşı iyi olan bir mermi saçmalı av tüfeğine sahiptir."
+    },
+    "spiderantiheavy": {
+        "name": "Karadul",
+        "description": "Görünmez Gözcü/Anti Ağır",
+        "helptext": "Karadul iki şekilde faydalıdır. Öncelikle mükemmel bir keşif ve tespit edilmesi çok zor. Düşman hattına derinlemesine nüfuz edebilir. Ayrıca, herhangi bir hedefi donduracak, ağır düşmanlara ve düşman altyapısına karşı iyi olacak şekilde felç edici bir silaha sahiptir."
+    },
+    "energywind": {
+        "name": "Rüzgargülü Generatör",
+        "description": "Küçük Santral",
+        "helptext": "Rüzgar jeneratörleri, rakım ve rüzgar hızına bağlı olarak değişken miktarda enerji üretir. Çok kırılgandırlar ve toplandıklarında zincirleme patlarlar, bu yüzden yerleşimini dikkatlice düşünün. Suya girdiklerinde, iyi ve sabit bir çıkışa sahip biraz daha sağlam gelgit jeneratörleri olurlar."
+    },
+    "amphassault": {
+        "name": "Bozayı",
+        "description": "Ağır Amfibi Taarruz Yürüyücü",
+        "helptext": "Bozayı klasik bir saldırı birimi - nispeten yavaş, sakar ve durdurulamaz. Silahı, sürüler ve hızlı uçaklara karşı etkisiz olan, ancak çok fazla olmayan yüksek menzilli ve hasarlı, güçlü bir lazer ışınıdır. Silahı su altında ateşlenemezken, bozayı ateş etmek için yüzeye zıplayabilir."
+    },
+    "shieldaa": {
+        "name": "Vandal",
+        "description": "Anti Hava Bot",
+        "helptext": "Vandal ucuz, dayanıklı ve güvenilir özel bir anti-hava botu. kara kuvvetlerine karşı etkisizdir."
+    },
+    "hoverriot": {
+        "name": "Topuz",
+        "description": "İsyancı Hover",
+        "helptext": "Topuz, mobil bir lazer kulesidir. Yüksek ateş gücü, hafif düşman birimlerini öldürmek için kullanışlıdır. Mükemmel derecede hassas silah ve hızlı birimlere karşı iyidir. Bununla birlikte, ince zırhı, özellikle avukatlar tarafından doğrudan hedef alındığında korunmasız kalmaktadır."
+    },
+    "veharty": {
+        "name": "Porsuk",
+        "description": "Topçu Mayın Arabası",
+        "helptext": "Porsuk, oldukça etkili, ancak belli bir mesafeden sınırlı bir ömre sahip mayınları bırakır (oldukça tehlikeli). Porsuk çoğu savunmayı dışa vurur, ancak hafif zırhlıdır ve kolayca kaçamaz, bu nedenle muhtemelen kendi mayınlarınızın yardımı ile dost birimlerle gösterilmeye devam eder."
+    },
+    "striderantiheavy": {
+        "name": "Ultimatum",
+        "description": "Görünme Anti Ağır/ Anti Strider Yürüyücü",
+        "helptext": "Ultimatum yalnızca bir silahı toplar: ağır bir tankı bir patlamada buharlaştırabilen bir parçalayıcı tabancası. En iyi, düşman ağır taşıtlarına gizlice yaklaşmak ve birkaç atışla ciddi hasar veya imha vermek için kullanılır. Buna karşı savunma, ağırlığınızı daha hafif ünitelerle tarayarak elde edilir."
+    },
+    "staticmex": {
+        "name": "Metal Çıkarıcı",
+        "description": "Metal Üretir",
+        "helptext": "Metal çıkarıcı, metal almanın birincil yoludur. Aşırı enerjiniz varsa, metal çıkarıcılar otomatik olarak daha fazla metal elde etmek için kullanır."
+    },
+    "vehsupport": {
+        "name": "Eskrimci",
+        "description": "Konuşlanabilen Füze Arabası (saldırı için durmalı)",
+        "helptext": "Rakibin birimlerini taciz etmek için Eskrimciyi maksimum seviyede tutun. Eskrimcilerin füzeleri takip ediyor, bu yüzden hızlı hareket eden akıncıları ve sürünen bombaları öldürmek için ideal. Havayı vurabiliyor, ancak savaşçılara karşı gerçekten yararlı. Engellerin üzerinden ateş edemez ve düşmanların, özellikle de saldırı birimlerinin menzilini kapatmasına izin verilirse, zayıf kalır. Avcıların aksine, Eskrimci hareket ederken ateş edemez."
+    },
+    "grebe": {
+        "name": "Dalgıç",
+        "description": "Amfibi İsyan Botu",
+        "helptext": "Dalgıç, el bombasıyla donanmış temel bir akıncı - iyi bir kısa menzilli anti-ağır silah. Amfibi olmasına rağmen, su altında iken ateş edemez."
+    },
+    "hoverarty": {
+        "name": "Neşter",
+        "description": "Anti Ağır Topçu Hover",
+        "helptext": "Neşter'in 'Ölümün Mavi Lazeri' olarak adlandırılan silahı, çoğu birimi tek bir atışla şişirme gücüne ve doğruluğuna sahip. Yüksek zırhlı birimlere karşı kullanın, ancak ön sıraların arkasında tutun; hafif zırhı vardır ve tehlikeden kaçamazlar."
+    },
+    "shieldbomb": {
+        "name": "Fitne",
+        "description": "Sürünen Bomba (Kazcı)",
+        "helptext": "Bu hızlı hareket eden intihar birimi, özellikle saldırı tankları olmak üzere, toplu birimlere karşı çok iyidir. Ünite durduktan sonra otomatik olarak devreye giren ve etkin bir şekilde bir madene dönüşen bir gizleme cihazına sahiptir. Zincirleme patlar, bu yüzden sabit durmamalıdır. Savunuculara ve füze kamyonlarına karşı sayaç veya erken bir patlamayı başlatmak için ucuz tek birimler."
+    },
+    "cloakjammer": {
+        "name": "İris",
+        "description": "Alan Gizleyici/Bozucu Yürüyücü",
+        "helptext": "Iris, birimlerinizin radar getirilerini gizlemek için bir sıkışma cihazına sahip. Ayrıca yakınlardaki birimleri düşman görüş alanından gizlemek için küçük bir gizlenme kalkanı vardır."
+    },
+    "spidercon": {
+        "name": "Dokumacı",
+        "description": "Mühendis Böcek, 7.5 m/s de inşa eder",
+        "helptext": "Dokumacı, herhangi bir engeli aşabilecek ve yüksek zeminde savunmalar kurabilecek bir inşaatçıdır. Aynı zamanda kısa menzilli bir radar ile donatılmıştır."
+    },
+    "hoverdepthcharge": {
+        "name": "Kılıç",
+        "description": "Anti Deniz Hoveri",
+        "helptext": "Biraz intihara meyilli olan Kılıç, ağır bir derinlik yükü başlatıcısı ile donanmış ve karaya düşürme konusunda hiçbir vasıfları yok."
+    },
+    "gunshipkrow": {
+        "name": "Krow",
+        "description": "Uçan Kale",
+        "helptext": "Krow pahalı ve düşünceli olabilir, ama inanılmaz zırhı, en iyi anti-hava savunmasına karşı koymasını ve üç lazer topuyla düşmanları meşgul etmesini sağlar. Hepsinden iyisi, altındaki herhangi bir şeyi tahrip eden geniş çapta bomba bırakabilir."
+    },
+    "neebcomm": {
+        "name": "Neeb İletişim",
+        "description": "Çirkin Hindi",
+        "helptext": "Bu şişman tavuk, hatalarınız için bir ödül olarak size sunulur. Bir dahaki sefere davran!"
+    },
+    "factoryplane": {
+        "name": "Uçak Santrali",
+        "description": "Uçaklar Üretir, 10 m/s de inşa eder",
+        "helptext": "Uçak Fabrikası ihtiyaçlarınızı karşılamak için çeşitli sabit kanatlı uçaklar sunar. Hafif saldırganlar veya özel yakalayıcılar olarak ikiye katlayabilen çok amaçlı avcılar arasında ve belirli hedefleri çekmek için hassas bombardıman uçakları veya sürüleri yok etmek için doyma benzerleri arasından seçim yapın. Tesis aynı zamanda bir arka tampon ile birlikte gelir."
+    },
+    "gunshipbomb": {
+        "name": "Blastwing",
+        "description": "Uçan Bomba (Kazar)",
+        "helptext": "Blastwing, LLT'ler, rüzgar çiftlikleri ve nanotonları çıkarmak için uygun, ancak daha uygun bir yumruk kütlesi sunmasına rağmen, sadece küçük bir hasar verir. Bombanın yörüngesinde öldükten sonra devam edecek olan yönelimli şarapnel olduğu için, hareket hızına ve yönüne dikkat edin. Bu sayede, Blastwing menzildeyken ölse bile, bir metal parçayla bir düşmanı püskürtebilirsiniz. Zincileme patlama olacağı için çok fazla sıkmayın. İnince görünmez."
+    },
+    "napalmmissile": {
+        "name": "Cehennem",
+        "description": "Ateşli Saldırı",
+        "helptext": "Cehennem büyük bir AE ateş silahıdır. Doğrudan zararı mütevazıdır, ancak oluşturduğu ateş bulutu çok uzun süre devam eder."
+    },
+    "factoryamph": {
+        "name": "Amfibot Fabrikası",
+        "description": "Amfibi Botlar Üretir, 10m/s de inşa eder",
+        "helptext": "Amfibi Operasyonlar Tesisi karada ve denizde savaşa alternatif bir yaklaşım sunarak yavaş ama sağlam amfibi botlar inşa eder. Bu fabrikadaki birimler tipik olarak su altındayken yenilenirler."
+    },
+    "factoryship": {
+        "name": "Tersane",
+        "description": "Deniz Üniteleri Üretir, 10 m/s de inşa eder",
+        "helptext": "Tersane, hem gemilerin hem de denizaltıların inşa edildiği yerdir. Hover ve amfibi botlar gibi diğer su kaynaklı birimler ayrı fabrikalara sahiptir."
+    },
+    "vehassault": {
+        "name": "Tahripçi",
+        "description": "Taarruz Arabası",
+        "helptext": "Pahalı ve güçlü olan Tahripçi, çoğu muhalefete karşı kendini tutabilir. Manevra kabiliyeti korkunç olsa da, gücü düz bir çizgide kayda değer bir hızda ilerler. Bu nedenle, akıncıları kullanarak çarpışma yapmak neredeyse imkansız. Savaşta, en yüksek hızı korumak için ileriye doğru seyahat etmeye devam etmeli ve aniden dönmemeye çalışmalısınız. Hedefinizi menzilinizin kenarında daire içine almak iyi bir taktiktir. Kavisli bir mermi enkazı, diğer tankları vb. Atmasına izin veriyor. Sürülerdeyken sürünen bombalara karşı hassas."
+    },
+    "raveparty": {
+        "name": "Disko Topu Partisi",
+        "description": "Ölümcül Kuşak Projectörü",
+        "helptext": "Disko Topu Partisi, düşmanınıza her seferinde farklı bir sürpriz için altı farklı parti atışı yapar. Bütün aile için eğlenceli!"
+    },
+    "turretlaser": {
+        "name": "Nilüfer",
+        "description": "Hafif Lazer Kulesi",
+        "helptext": "Nilüfer temel bir tarettir. Çok yönlü, sağlam bir anti-toprak silah, bir veya iki akıncıyı ele geçirmenin yanı sıra izcilere karşı da iyidir. Desteklenmediği sürece, savaşçılara, topçulara veya saldırı birimlerine nispeten kolayca düşer."
+    },
+    "cloakskirm": {
+        "name": "Ronin",
+        "description": "Çatışmacı Bot (Dolaylı Ateş)",
+        "helptext": "Ronin'in düşük hasarı, düşük hızlı güdümsüz roketler menzillerine göre yapıldı. Bir çizgi oluşumunda en etkilidir, maksimum menzile ateş eder ve düşmanı öldürür. Menzili kapatabilecek ve füzelerini atlatabilecek hızlı birimlerle onlara saldırarak onlara karşı koy."
+    },
+    "tankcon": {
+        "name": "Kaynakçı",
+        "description": "Silahlı Mühendis Tankı, 7.5 m/s de inşa eder",
+        "helptext": "Küçük bir savunma kulesi ile donanmış olan Kaynakçı, hafif düşman saldırılarına karşı kendini savunabilir."
+    },
+    "shieldarty": {
+        "name": "Şantajcı",
+        "description": "Bozucu Topçu",
+        "helptext": "Şantajcı, saldırıya başlamadan önce önemli düşman savunmalarını veya birimlerini etkisiz hale getirebilecek uzun menzilli füzeler fırlatır. Hedefi etkisiz hale getirmek için sadece bir Şantajcıya ihtiyaç vardır, bu yüzden her Şantajcı için farklı bir hedef seçin. Düşman kalkanlarının enerjisini tüketmek ve büyük birimleri zararsız hale getirmek için mükemmeldir."
+    },
+    "roost": {
+        "name": "Konak",
+        "description": "Tavuklar Çıkarır",
+        "helptext": "Bunun gibi Horozlar Şimşek kuşunun kuluçka alanıdır."
+    },
+    "dynsupport1": {
+        "name": "Mühendis Komutan",
+        "description": "Ekon/Destek Komutanı",
+        "helptext": "Ezoterik Mühendis şasisi daha geleneksel olmayan bir silah seti kullanıyor. Zırh veya hızdan yoksun olmasına rağmen, bu şasi, kendine özgü inşa gücü bonusu nedeniyle hala tercih edilmektedir."
+    },
+    "cloakraid": {
+        "name": "Glaive",
+        "description": "Hafif Akıncı Bot",
+        "helptext": "Hafif ve ucuz olan Glaive, düşman avcı ustaları, topçu ve ekonomi konusunda kısa çalışmalar yapar, ancak güçlü olmayan yerlerde isyan birimleri ve savunmalarından kaçınılmalı ve üstün olmalıdır. Hasarlı Glaive, çatışma dışı olduğunda yenilenir."
+    },
+    "gunshipaa": {
+        "name": "DişliMızrak",
+        "description": "Anti Hava Kopter",
+        "helptext": "Trident, düşman uçaklarını füzelerle öldüren yavaş bir savaş gemisidir. Diğer silahlardan daha yavaştır, bu yüzden Trident'i kara birimleriyle öldürmek uçaklardan daha kolaydır."
+    },
+    "hoverminer": {
+        "name": "Sönümleyici",
+        "description": "Mayıncı Hover",
+        "helptext": "Sönümleyici, mayınları kendinden kısa bir mesafeye yerleştirir."
+    },
+    "gunshiptrans": {
+        "name": "Charon",
+        "description": "Taşıyıcı",
+        "helptext": "Charon, temel hava taşımacılığıdır. Birimleri öne doğru feribotla çekmek veya düşman hatlarının arkasına bir damla atmak için idealdir, ancak herhangi bir AH örtüsüne sahip alanlarda karada kullanılmamalıdır."
+    },
+    "striderdetriment": {
+        "name": "Detriment",
+        "description": "Eşsiz Taarruz Strideri",
+        "helptext": "Zararcı alandaki en ağır tek şeydir. Kendisini hava saldırılarına karşı savunabilir veya roketlerini uzaktaki hedefleri vurmak için kullanabilir, ancak asıl et diğer ağır birimleri hızlı ve verimli bir şekilde öldürmek için bir amaç için tasarlanan devasa gaus silahlarında yatıyor. Unutma - bilge komutan Detriment’i ışık birimi sürülerine ve hava saldırılarına karşı yeterli eskortlarla gönderir."
+    },
+    "energygeo": {
+        "name": "Jeotermal Jeneratör",
+        "description": "Orta Santral (+25)",
+        "helptext": "Jeotermal santralleri yalnızca haritada bulunan jeojik alanlar üzerine kurulabilen yüksek verimli enerji kaynaklarıdır. Yok edildiklerinde şiddetli bir şekilde patlarlar, bu nedenle doğrudan bitişik herhangi bir şey koymaktan kaçının."
+    },
+    "jumpcon": {
+        "name": "Memur",
+        "description": "SıçrayanJet Mühendis 5 m/s de inşa eder",
+        "helptext": "Hızlı ve kısa mesafelerde veya yüksekliklerde atlayabilen Memur, hızlı genişleme için ideal bir kurucudur. Hafif bir ışıltıyla donanmış, aynı zamanda savaş desteği sağlayabilir."
+    },
+    "chicken_blimpy": {
+        "name": "Blimpy",
+        "description": "Dodo Bombacı",
+        "helptext": "Blimpy şüphesiz ordulara ve üslere bir Dodo düşürüyor."
+    },
+    "droneheavyslow": {
+        "name": "Engerek",
+        "description": "Gelişmiş Savaş İHAsı",
+        "helptext": "Engerek, Ateşböceğine benzer gelişmiş bir savaş uçağıdır, ancak her vuruşta hedefini daha da yavaşlatan, bir Yıkıcı Darbe Kirişi ile donatılmıştır."
+    },
+    "athena": {
+        "name": "Athena",
+        "description": "Hava ÖzelHrkt Mühendis, 15 m/s de inşa eder",
+        "helptext": "Athena, gizli grev kabiliyetinin zirvesidir. Bir gizleme tertibatı ve bir radar sıkıştırıcısı ile donatılmış olarak, düşman hatlarından kayarak akıncı ekiplerini bir araya getirerek muhalefetin lojistik sistemine zarar verebilir. Athena ayrıca savaş alanındaki enkazları dirilterek ordunuza ekleyebilir."
+    },
+    "staticsonar": {
+        "name": "Sonar İstasyon",
+        "description": "Su Ünitelerini bulur",
+        "helptext": "Doktrin Sonar İstasyonu, su altı hedeflerini belirlemenin birkaç yolundan birini sunar."
+    },
+    "spideremp": {
+        "name": "Zehir",
+        "description": "Şimşek İsyan Böceği",
+        "helptext": "Zehir, düşmanları felç etmek için tasarlanan ve diğer birimlerin onları kolayca yok edebilecekleri bir arazi birimidir. Bir isyan birimi için özellikle hızlı hareket eder ve felce ek olarak az miktarda zarar verir. Düşmanları hassas kırıcı ile yakın mesafeden uzak tutmak için Keşiş ile iyi çalışır."
+    },
+    "jumpassault": {
+        "name": "Kriko",
+        "description": "Yakın Muharebe Sıçrayıcı",
+        "helptext": "Kriko, sıçramajet'lere sahip bir yakın dövüş saldırıcısı. Birkaç Kriko çoğu tahkimat hattını kolayca hizalayabilir. Küçük serisi ve çok düşük hızı, avcılara karşı çok savunmasız kalıyor."
+    },
+    "vehscout": {
+        "name": "Dart",
+        "description": "İsyan/Gözcü Araba",
+        "helptext": "Ucuz ve hızlı, rakibiniz kapalı tutulursa Dart oyunun ilk dakikalarında ölümcül olur. Durdurmak için füze kuleleri, LLT'ler veya herhangi bir hızlı ünite kullanın."
+    },
+    "factoryhover": {
+        "name": "Hover Platformu",
+        "description": "Hoverlar Üretir, 10 m/s de inşa eder",
+        "helptext": "Hover Platformu hızlı ve ölümcül, denizi ve ovaları geçip düşmanı ön plana çıkaracak. Anahtar birimler: Hançer, Teber, Neşter, Topuz, Mızrak"
+    },
+    "gunshipassault": {
+        "name": "Revenant",
+        "description": "Ağır İsyan/Taarruz Kopter",
+        "helptext": "Revenant bir güdümsüz roket fırlatır. Yüksek HP'ye ve çok büyük bir hasar çıktısına sahip, ancak özellikle hareketli hedeflere karşı pahalı ve yanlış. Baz yapıları, yavaş hareket eden veya sabit birimler kümeleri üstlenmek için en iyisidir. Revenant, alınan hasarı en aza indirmek için voleybollar arasında ayrılmalıdır."
+    },
+    "tankriot": {
+        "name": "Zalim",
+        "description": "Ağır İsyan Destek Tankı",
+        "helptext": "Bir isyan platformu için oldukça hareketli olan Zalim, sınırlı bir menzile sahip olmalarına rağmen, hem hafif birimleri hem de uçakları harap eden ikiz yüksek hızlı parçalanma füzelerini bir araya getiriyor. Diğer isyan birimleri gibi, Zalim de çoğu silahlı avcıya karşı kendi ayak tutabilecek menzile ve hıza sahip değil. Füze araziyi düzlemekte oldukça etkilidir, bu nedenle Kaynakçıların ulaşamadığı duvarları yıkmada özellikle yararlıdır."
+    },
+    "staticantinuke": {
+        "name": "Antinükleer",
+        "description": "Stratejik Nükleer Engelleme Sistemi",
+        "helptext": "Antinukleer, kapsama alanı dahilindeki düşman nükleer roket'leri otomatik olarak durdurur."
+    },
+    "staticheavyarty": {
+        "name": "Büyük Bertha",
+        "description": "Stratejik Plazma Topu",
+        "helptext": "Bertha, harita boyunca yüksek enerjili plazmidleri ateşleyen devasa bir top. Uygun şekilde kullanıldığında, düşman operasyonlarını üssünüzün güvenliğinden etkili bir şekilde bastırabilir. Bununla birlikte, yalnızca sizin için savaşlar kazanmasını beklemeyin."
+    },
+    "cloaksnipe": {
+        "name": "Hayalet",
+        "description": "Görünmez Çatışma/Anti Ağır Topçu Bot",
+        "helptext": "Hayalet'in enerji tüfeği, tek bir hedefe ağır hasar verir. Gizlendiğinde ateş edebilir; ancak görünür mermisi pozisyonuna ihanet ediyor. Özellikle hareket ederken, gizlenmesi için biraz enerji gerektirir. Bir hayalet bulmanın en iyi yolu, bölgeyi birçok ucuz ünite ile süpürmektir."
+    },
+    "staticarty": {
+        "name": "ÜçBaşlı",
+        "description": "Plazma topçu Bataryası - 50 enerjilik gelirin alanı içinde çalışır",
+        "helptext": "Ücbaşlı, uzun menzilli topçu/karşı-topçu yeteneği sunar ve alanın inkar edilmesi için mükemmeldir. Bir savunma kulesi olarak tasarlanmadı ve doğrudan saldırıya uğrarsa yere iner."
+    },
+    "wolverine_mine": {
+        "name": "Tırnak",
+        "description": "Porsuk Mayın",
+        "helptext": "Bu mayın patlamıyor - bunun yerine, geçen düşmanlara bomba atma telaşı salıyor. Bir dakika sonra devre dışı kalır."
+    },
+    "staticradar": {
+        "name": "Radar Kulesi",
+        "description": "Erken Uyarı Sistemi",
+        "helptext": "Radar kulesi, düşman birimlerinin ve bunların hareketlerinin neredeyse hiçbir ücret ödemeden ılımlı bir mesafeden erken uyarılmasını sağlar. Çok küçük ama sabit bir enerji maliyeti var ve enerji tükenirse otomatik olarak kapanacaktır. Radarın kapsama alanı dağlar gibi araziler tarafından engellenir."
+    },
+    "turretriot": {
+        "name": "Yıldıztozu",
+        "description": "Anti Sürü Tareti",
+        "helptext": "Yıldıztozu güçlü bir otomatik top kullanır. Kısa bir menzile sahip olmasına rağmen, avcılara LLT'den daha savunmasız olmasına rağmen, yüksek ateş ve AE çakma birimlerinin sürülerini hızla çiğnemelerine izin veriyor."
+    },
+    "spideranarchid": {
+        "name": "Anarchid",
+        "description": "İsyan EMD Böceği",
+        "helptext": "Anarchid bir Yıldızışığı gibidir, fakat bir Örümcek"
+    },
+    "vehraid": {
+        "name": "Scorcher",
+        "description": "İsyancı Araba",
+        "helptext": "Hasar alma ve çözme kabiliyetine sahip olan Scorcher, sadece üretilebilirlik ve maliyet bedelini ödediği halde, yağmalamaktan daha fazlası için çok kullanışlı olan çok yönlü bir birimdir. Mücadelede kendi gücünü tutabilse de, sürgü ve isyan karşıtı birimler veya savunmalarla eşleşmiyor. Scorcher'ın ısı yayını daha fazla hasar verir."
+    },
+    "striderfunnelweb": {
+        "name": "Funnelweb",
+        "description": "İHA/Kalkan Destek Strideri",
+        "helptext": "Yavaş arazide yer alan Funnelweb, bir alan kalkanı ve güçlü bir İHA tamamlayıcısı sunar."
+    },
+    "cloakriot": {
+        "name": "İşgalci",
+        "description": "İsyancı bot",
+        "helptext": "İşgalcinin yıkıcı ağır Enerji Makineli Tüfeği özellikle akıncıların çoğu düşman birimlerine karşı etkilidir. Statik savunmaya karşı düşük performans gösterir, bu yüzden bir saldırı birimi olarak kullanmayın. Kendi menzili dışında kalarak, yavaş olduklarından karşı durun. İşgalciler, savaşta olmadığında hasarı hızla yeniler."
+    },
+    "chickenspire": {
+        "name": "Tavuk Helezon",
+        "description": "Statik Topçu",
+        "helptext": "Uzun menzil statik topçu"
+    },
+    "turretemp": {
+        "name": "Faraday",
+        "description": "EMD Tareti",
+        "helptext": "Faraday güçlü bir EMD kulesidir. Hasar ve etki alanı yüksektir. Diğer kulelerin etkisini büyük ölçüde arttırır, fakat neredeyse hiç işe yaramaz. Kapalıyken hasar alındığında çeyreğe düşürür . Sıçrama hasarına dikkat edin, düşmana çok yakınsa kendi birimlerinizi felç edebilir."
+    },
+    "factoryspider": {
+        "name": "Böcek Fabrikası",
+        "description": "Böcekler Üretir, 10 m/s de inşa eder",
+        "helptext": "Engebeli araziler için optimize edilmiş BöcekFabrikası, öncelikli olarak kaba kuvvet yerine menzil ve manevra kabiliyetine güveniyor. Anahtar üniteler: Pire, Münzevi, Hermit, Yengeç"
+    },
+    "chicken_dragon": {
+        "name": "Beyaz Ejder",
+        "description": "Baş Taarruz Tavuk",
+        "helptext": "Tavuk kovanının kıdemli gardiyanları olan Beyaz Ejderhalar, yalnızca kraliçenin kendisinin ikinci canavarlarıdır. Güçlü bir duruş, ölümcül çeneler, aşındırıcı tüyler ve çok sayıda sporla, gerçekten korkulması gereken bir tehdittir."
+    },
+    "chickens": {
+        "name": "Dikenci",
+        "description": "Çatışmacı",
+        "helptext": "Dikencinin ustura gibi keskin mermileri en kalın zırhı bile delebilir. Sağlığı çok olmamakla birlikte, hem hava hem de yer birimleri için güçlü bir tehdit olmaya devam ediyor. Güvenilir bir şekilde menziline gelen birşey ile karşılaştır."
+    },
+    "striderdante": {
+        "name": "Dante",
+        "description": "Taarruz/İsyan Strideri",
+        "helptext": "Dante, hedefine yaklaşma ve eritme konusunda uzmanlaşmış, ağır bir savaş birimidir. Alev makinesi ve ikiz ısıtıcılar olağanüstü değildir, ancak kışkırtıcı roketleri geniş bir araziyi tahrip eden yirmi bir salvoda ateşlenebilir."
+    },
+    "dynassault1": {
+        "name": "Gardiyan Komutan",
+        "description": "Ağır Muharebe Komutanı",
+        "helptext": "Gardiyan Şasesi, zırh ve ateş gücünü, hız ve destek ekipmanı pahasına vurgular."
+    },
+    "chickenbroodqueen": {
+        "name": "Tavuk Damızlık Kraliçesi",
+        "description": "Yuvaya Bakar",
+        "helptext": "Yumurtlayan yavru kraliçesi, diğer kraliçe ile olan mücadelede oldukça korkutucu değildir, ancak uzun vadede daha da büyük bir tehdit oluşturabilir. Şimşek kuşunun bütün farklı tavuk ırklarını üretir."
+    },
+    "cloakaa": {
+        "name": "Cin",
+        "description": "Görünmez Anti Hava Bot",
+        "helptext": "Fiyatı hızlı ve oldukça sağlam olan Cin, bütçeye uygun mobil hava önleyici bir üründür. Beklenmedik anti-hava koruması sağlamasına veya savunmasız olduğu kara kuvvetlerinden kaçmasına izin vererek gizleyebilir."
+    },
+    "vehheavyarty": {
+        "name": "Kazıkçı",
+        "description": "Hassas Topçu Araba",
+        "helptext": "Kazıkçı dikey olarak yüksek bir hasara, uzun mesafeden yüksek hassasiyetli kinetik füze ateş eder. Yüksek yayı, herhangi bir engelin üzerinden ateş açılmasını sağlar, ancak uçuş süresini o kadar yüksek yapar ki, hareket eden hedeflere karşı yararsızdır. Belirli binaları yoketmek için Kazıkçı'yı kullanın."
+    },
+    "zenith": {
+        "name": "Zirve",
+        "description": "Meteor Kontrolcüsü",
+        "helptext": "Zirve göktaşlarını gökten toplar (500'e kadar), bir şeyleri parçalamak ya da küçük bir geri kazanılabilir metal kaynağı sağlamak için her yere gönderebilir."
+    },
+    "vehaa": {
+        "name": "Çarpıcı",
+        "description": "Hızlı Anti Hava Arabası",
+        "helptext": "Çarpıcı düşman bombardıman saldırılarına hızlı bir çözümdür ve aynı zamanda kopterlere karşı iyi çalışır."
+    },
+    "spiderskirm": {
+        "name": "Keşiş",
+        "description": "Çatışmacı Böcek (Dolaylı Ateş)",
+        "helptext": "Tüm arazi füze fırlatma birimi. Bu örümcek ayakları ile duvarlara tırmanın ve düşmanınızı şaşırtın. Güdümsüz roketler hızla göz kamaştıran bir hedefi vuramaz, ancak oldukça uzun bir menzile sahiptir."
+    },
+    "thicket": {
+        "name": "Çalı",
+        "description": "Barikat",
+        "helptext": "Çalılar Şimşekkuşunun çevre savunmasıdır."
+    },
+    "fakeunit_los": {
+        "name": "Görüş Sağlayan",
+        "description": "Her şeyi bilir ve her şeyi görür",
+        "helptext": "Kilrogg gurur duyardı!"
+    },
+    "tele_beacon": {
+        "name": "Lamba",
+        "description": "Işınlanma Köprüsü Giriş Sinyali, ışınlanma için sağ tıklayın.",
+        "helptext": "Bu Djinn'in giriş feneri. Birimleri üst Djinn'e ışınlamak için sağ tıklayın."
+    },
+    "dynstrike1": {
+        "name": "Baskın Komutanı",
+        "description": "Mobil Taarruz Komutan",
+        "helptext": "Baskın Komutanı, çoğu modülü uygun hız, zırh ve rejenerasyonla monte edebilen iyi dengelenmiş bir komut platformudur."
+    },
+    "empmissile": {
+        "name": "Şokçu",
+        "description": "EMD Füzesi",
+        "helptext": "Şokçu, küçük bir alandaki birimleri 45 saniyeye kadar devre dışı bırakır."
+    },
+    "subraider": {
+        "name": "Denizkurdu",
+        "description": "Saldırı Denizaltısı (Gizli İsyancı)",
+        "helptext": "Gizli, hızlı ve kırılgan, bu Denizaltı, korunmasız hedeflere hızla çarpabilir. Yavaş hasar, yalnız birimleri etkili bir şekilde öldürmesini sağlar. Anti-DA silahlara, özellikle de Torpido Botlara ve Yokedicilere dikkat edin."
+    },
+    "striderhub": {
+        "name": "Strider Merkezi",
+        "description": "Striderlar Üretir, 10 m/s de inşa eder",
+        "helptext": "Strider Merkezi, savaş alanında huşu ve korku uyandıran \"koskocaman makina\" olan striders'ı dağıtır. Normal bir fabrikadan farklı olarak, merkez projeyi bitirmek için değil, sadece bir projeyi başlatmak için gereklidir."
+    },
+    "amphcon": {
+        "name": "Conch",
+        "description": "Amfibi Mühendis Bot, 7.5 m/s de inşa eder",
+        "helptext": "Conch, karada olduğu gibi derin denizde de inşa edebilen ya da geri kazanabilen sağlam bir kurucudur."
+    },
+    "shipaa": {
+        "name": "Esinti",
+        "description": "Anti Hava Firkateyn",
+        "helptext": "Güçlü ikiz hava önleyici lazer pilleriyle, bu Anti-Hava Firkayen filonuzu hava saldırılarından korur. Her zaman olduğu gibi, havadaki olmayan hedeflere karşı yararsızdır."
+    },
+    "spiderriot": {
+        "name": "KızılKıç",
+        "description": "İsyancı Böcek",
+        "helptext": "Hızlı birimleri halletmekte başarılı olan hızlı bir ışın örümceği."
+    },
+    "spiderassault": {
+        "name": "Münzevi",
+        "description": "Tüm Arazi Taarruz Botu",
+        "helptext": "Münzevi inanılmaz bir dayak alabilir ve zayıf, daha fazla zarar veren Keşişler için bir kalkan olarak kullanışlıdır."
+    },
+    "turretantiheavy": {
+        "name": "Venüs",
+        "description": "Takyon Projektör - 50 enerjilik alana bağlanarak çalışır",
+        "helptext": "Venüs ün ağır zırhlı kabuğunun içinde yıkıcı Takyon Hızlandırıcı yatıyor. Bu korkunç silah, bir güç kaynağına bağlı kalmanız koşuluyla, uç noktalarda kesin nokta hasar verme yeteneğine sahiptir. Venüs ün kesinlikle bir destek silahı olduğunu unutmayın; korumasız bırakırsanız akıncılar anında halleder. Uzun menzilli topçuların veya bombardıman uçağının saldırılarına uğradığında, ana silah gelen hasarı azaltmak için geri çekilebilir."
+    },
+    "jumparty": {
+        "name": "Yürüyenateş",
+        "description": "Canlı Yürüyen Topçu",
+        "helptext": "Ateşyürüyücü orta menzilli harçları, kısa bir süre için o arazinin kullanımını iptal ederek küçük bir alanı kurban eder. kendisi biraz beceriksiz ve manevra yavaş."
+    },
+    "spideraa": {
+        "name": "Tarantula",
+        "description": "Anti Hava Böcek",
+        "helptext": "Orta menzilli füzeleri ile diğer örümcekleri havaya karşı destekleyen tüm arazi tipi AH birimi."
+    },
+    "chicken_pigeon": {
+        "name": "Güvercin",
+        "description": "Uçan Spor İzci",
+        "helptext": "Spor ile uçan küçük tavuk izci."
+    },
+    "cloakheavyraid": {
+        "name": "Tırpan",
+        "description": "Görünmez İsyancı Bot",
+        "helptext": "Tırpan, sağlam bir dövüşte özellikle zor değildir, ancak gizleme cihazı düşmanın ekonomisinde bıçaklamak için düşman savunmalarını atmasını sağlar. Zarar görmüş tırpanlar, savaş dışı kaldıklarında hızlı bir şekilde yenilenebilirler."
+    },
+    "jumpblackhole": {
+        "name": "Alantutan",
+        "description": "Kara Delip Atıcı",
+        "helptext": "Yer Tutucu bir destek birimidir. Mermileri, yakındaki birimleri içine çeken, kümeleyen ve onları bitirmek için yerinde tutan bir vakum yaratır."
+    },
+    "vehcon": {
+        "name": "Mason",
+        "description": "Mühendis Araba, 5 m/s de inşa eder",
+        "helptext": "Çok hareketli ve dayak atma yeteneğine sahip olan Mason, hızla geniş bir alana yayılabilir."
+    },
+    "amphtele": {
+        "name": "Djinn",
+        "description": "Amfibi Işınlanma Köprüsü",
+        "helptext": "Djinn, geniş kara tabanlı orduları su kütleleri arasında gezdirmek konusunda çok başarılı. Dağıtıldığında, üniteleri önceden yerleştirilmiş statik işaretinin etrafından mevcut konumuna ışınlar. Işınlanma tek yönlüdür, bu nedenle varış yerinin güvenli olduğundan emin olun."
+    },
+    "shipcon": {
+        "name": "Denizci",
+        "description": "İnşa Gemisi, 7.5 m/s de inşa eder",
+        "helptext": "Pahalı olmasına rağmen, İnşaat Gemisi sert zırh ve iyi hız ile birlikte son derece yüksek nano gücüne sahiptir."
+    },
+    "shipscout": {
+        "name": "Kesici",
+        "description": "Gözcü Gemisi (Bozucu Gözcü)",
+        "helptext": "Ucuz, hızlı ve kırılgan, bu Gözcü gemi daha pahalı gemiler için iyi bir keşifçi ve gözcüdür. Sayılarda silahsızlanma füzeleri daha büyük hedeflere karşı etkilidir."
+    },
+    "shiptorpraider": {
+        "name": "Avcı",
+        "description": "Torpido botu (Akıncı)",
+        "helptext": "Torpido botu, mobil bir akıncı ve denizaltı karşıtı bir birimdir. Sualtı birimleri ve büyük gemilere karşı etkilidir."
+    },
+    "shipskirm": {
+        "name": "Karayel",
+        "description": "Roket Botu (Çatışmacı)",
+        "helptext": "Bu Roket Botu, deniz ve kıyı hedeflerini bombalamak için yararlı olan dört orta menzilli roket salvoyu ateşliyor. Sualtılara yaklaşmayın yeterince hızlı olan her şeye dikkat edin."
+    },
+    "subtacmissile": {
+        "name": "Scylla",
+        "description": "Sualtı Taktik Nükleer Füze, 20 m/s emer, 30 saniyede stoklar",
+        "helptext": "Sualtı Taktik Nükleer Füze taktik füzeler şeklinde bir soğukluk hassas grev silah sağlar. Doğrudan saldırılara karşı savunması yoktur ve düşmanla temastan kaçınması gerekir."
+    },
+    "shipriot": {
+        "name": "Korsan",
+        "description": "Korvet (Akıncı/İsyancı)",
+        "helptext": "Bu korvet, yaklaşan her şeye karşı etkili olan iki av tüfeğiyle donatılmıştır. Sualtı hedeflerine karşı etkili silahları yok."
+    },
+    "shipassault": {
+        "name": "Siren",
+        "description": "Yokedici (İsyan/Taaruz)",
+        "helptext": "Bu Yokedici, güçlü bir etki alanı sonik topunu, orta menzilli bir dikey fırlatma füzesini ve güçlü zırhı birleştiren genel amaçlı bir savaş gemisidir. Sonik tabancasını suyun altında ve üstünde daha küçük rakiplere ve statik hedeflere karşı füzesini kullanın."
+    },
+    "shiparty": {
+        "name": "Elçi",
+        "description": "Kruvazör (Topçu)",
+        "helptext": "Bu kruvazör, sabit yer ve kıyı hedeflerini bombalamak için yararlı olan güçlü, uzun menzilli bir top barındırıyor. Uçaklara, denizaltılara ve akıncı gemilerine dikkat edin."
+    },
+    "shiptransport": {
+        "name": "Sörfçü",
+        "description": "Taşıyıcı Platform",
+        "helptext": "Sörf tahtası deniz taşımacılığı ve ateş platformu olarak hizmet eder - yani Sörf Tahtası üzerindeki herhangi bir ünite ateşleyebilir."
+    },
+    "shipheavyarty": {
+        "name": "Pomplalı",
+        "description": "Savaşgemisi (Ağır Topçu)",
+        "helptext": "Bunlardan birinden gelen tek bir salvo, neredeyse tüm yüzey hedeflerini teslim etmeye zorlayacak. Namlu flaşının psikolojik etkileri ve suya geri dönen gemi, doğrudan bir vuruşun etkilerinden hiçbir şey söylemeyecek kadar etkileyicidir. Dikkatli olun - savaş gemileri kendi başlarına kullanılırsa havadan ve denizaltı karşıtı korumadan yoksun olacaklar."
+    },
+    "factorygunship": {
+        "name": "Kopter Santrali",
+        "description": "Kopterler Üretir, 10 m/s de inşa eder",
+        "helptext": "Kopter Tesisi yakın hava desteği için tasarlanmıştır. Kara birimlerini çekmek için çeşitli nakliye araçları ve çeşitli saldırı veya savunma rollerini yerine getirebilecek olan savaş silahlarıyla mücadele içerir."
+    },
+    "turretheavy": {
+        "name": "Desolator",
+        "description": "Orta Menzil Savunma Kalesi - 50 enerjilik alana içinde çalışır",
+        "helptext": "Ağır bir plazma topu ve bir Isı Işını ile donatılan Desolator, düşman saldırılarına karşı odaklanan bir savunma noktası oluşturur. Uzun menzilli topçu saldırılarına veya hava saldırılarına maruz kalmak için verilen hasarı azaltmak için sığınak olur ancak silahlarını ateşleyemez."
+    },
+    "turretimpulse": {
+        "name": "Newton",
+        "description": "Çekim Tareti - Amaca göre iter",
+        "helptext": "Newton, deneysel graviton projektörü ile donanmıştır. Bu silah neredeyse doğrudan zarar vermez, ancak birimleri Newton'a doğru ya da uzağa itebilir. Kendi ünitelerinde de kullanabilirsin, ama dost ateşinden sakın."
+    },
+    "assaultcruiser": {
+        "name": "Buharlaştırıcı",
+        "description": "Ağır Kruvazör (Taarruz)",
+        "helptext": "Buharcı kruvazörü mükemmel zırhı ve ölümcül ateş gücüne sahiptir. Gaus topları, tereyağı gibi yüzey hedeflerini dilimlemeye devam ederken, füzeleri su yüzeyinin altındaki ve üstündeki düşmanlara karşı destek veriyor. Kısa menzili ve hava önleyici ateş gücünün eksikliği onu soğuk hava ünitelerine ve uçaklara karşı savunmasız bırakır."
+    },
+    "shieldfelon": {
+        "name": "Zalim",
+        "description": "Kalkanlı İsyan/Çatışmacı Bot",
+        "helptext": "Suçlu, kalkandan enerji çekerek doğru patlamalarla boşaltır. Yangın oranını arttırmak için onu diğer kalkanlara bağlayın."
+    },
+    "seismic": {
+        "name": "Sarsıntı",
+        "description": "Sismik Füze",
+        "helptext": "Sarsıntı, geniş bir araziyi düzleştiren ve birimlere en az zarar veren güçlü bir sismik şok dalgası yaratır."
+    },
+    "striderscorpion": {
+        "name": "Akrep",
+        "description": "Görünmez Sızma Strideri",
+        "helptext": "Akrep, yıldırım iğnesiyle düşmanları felç eder ve daha sonra onları parçacık demeti pençeleri ile çiğniyor. Sert kabarması, düşman ateşinin çoğunu ortadan kaldırır ve Akrep'i şeffaf hale getirebilir."
+    },
+    "vehcapture": {
+        "name": "Sahipçi",
+        "description": "Elegeçirme Arabası",
+        "helptext": "Sahipçi, düşmanlarını eski müttefiklerine karşı çevirerek ele geçirir. Birden fazla Sahipçi, tek bir hedefi daha hızlı yakalayabilir, ancak yalnızca biri denetleyici olur. Birimin kontrolünü aldıktan sonra Sahipçi 12 saniye boyunca ateş edemez. Bir Sahipçi tahrip olursa, tüm birimler serbest kalır."
+    },
+    "factorytank": {
+        "name": "Tank Dökümhanesi",
+        "description": "Ağır Paletli Araçlar Üretir, 10 m/s de inşa eder",
+        "helptext": "Tank Dökümhanesi kaba kuvvet yöntemlerinde son noktadır - hiçbirşey işini sürekli topçu barajı gibi yapmaz ve ardından sahadaki en büyük tanklarla belirleyici bir baskı yapar. Anahtar birimler: Emisser, Boğa, Cin, Cyclops"
+    },
+    "striderbantha": {
+        "name": "Paladin",
+        "description": "Menzilli Destek Strideri",
+        "helptext": "Paladin, özellikle kırılmaz bir savunma hattına daha sert bir çözümdür, takyon projektörü ve duraksama nişanları için EMD füzeleri, genel amaçlı savaş için yıldırım eli topları ve çok sayıda zırh bulunur. Ancak dikkatli olun, çünkü havaya karşı savunmasızdır ve kendi başına etkin bir şekilde kullanılamaz."
+    },
+    "shipcarrier": {
+        "name": "Resif",
+        "description": "Uçak Gemisi (Bombardıman), 5 m/s de bozucu roket stoklar",
+        "helptext": "Açık denizlerdeki en çok yönlü gemi olan taşıyıcı, çeşitli işlevlere hizmet eder. Menzili düşman gemilerini devre dışı bırakmak için el ateşi silahsızlandırmalı bir füze fırlatıcı ile donatılmıştır ve dost canlısı uçaklar için mobil bir onarım üssü görevi görür. Belki de en önemlisi, taşıyıcı hedefleri yakalamak için kendi yüzey saldırı uçağı tamamlayıcısını sağlar."
+    },
+    "turretaaflak": {
+        "name": "Batöz",
+        "description": "Anti Hava Flak Top",
+        "helptext": "Harmancı iyi AE ve yüksek hasar verimine sahip bir flak topudur ve düşman silahlarını kurdelelere hızlıca kesmesini sağlar."
+    },
+    "factoryjump": {
+        "name": "SıçramaJet Fabrikası",
+        "description": "SıçramaJetli Robotlar Üretir, 10 m/s de inşa eder",
+        "helptext": "Ezoterik SıçramaJet Fabrikası, bir bıçakla savaşta mesafeyi hızla kapatmak ya da düşman hatlarında bir yolu kesmek için tepeleri ve nehirleri aşmak için benzersiz taktik seçenekler sunar. Anahtar birimler: Ateş, Moderatör, Kriko, YürüyenAteş, Jugglenaut"
+    },
+    "jumpsumo": {
+        "name": "Jugglenaut",
+        "description": "Ağır İsyan Sıçrayıcı - İhtiyaca Göre",
+        "helptext": "Jugglenaut'un etkileyici zırhı onu neredeyse durdurulamaz bir ölüm küresi yapıyor. Onların oluşumunu bozması için düşman birimlerine saldırır ve Çekim ışınları ile kurtulanları etrafa fırlatabilir. Tabanı binalara zarar vermesinin tek yoludur."
+    },
+    "jumpscout": {
+        "name": "Yavru",
+        "description": "Yürüyen Füze",
+        "helptext": "Bu hızlı hareket eden intihar birimi, hafif zırhlı hedeflere saldırmak ve vurmak için iyidir. Enkazların yanında dururken, otomatik olarak kendini, gri goo stilini çoğaltmak için onlardan metal çeker."
+    },
+    "turretaalaser": {
+        "name": "Ustura",
+        "description": "Sertleştirilmiş Anti Hava Lazer",
+        "helptext": "Ustura, havaya dayanıklı bir tarettir. Yüksek vuruş noktaları ve kapalıyken 4x zırh bonusu düşmanın saldırmasını çok zorlaştırıyor."
+    },
+    "hovercon": {
+        "name": "Tüy",
+        "description": "Mühendis Hover, 5 m/s de inşa eder",
+        "helptext": "Tüy, hem karada hem de denizde pürüzsüz bir genişleme sağlar."
+    },
+    "jumpaa": {
+        "name": "Kurbağa",
+        "description": "Ağır Anti Hava Sıçrayıcı",
+        "helptext": "Kurbağa, düşman uçaklarını hızlı bir şekilde öldürmek için ikiz anti-hava lazerleri ve bir otomatik top taşıyor. Ayrıca hızlı bir şekilde yüksek toprağa erişmek veya kaçmak için atlayabilir."
+    },
+    "tankheavyraid": {
+        "name": "Baskıncı",
+        "description": "Şimşek Taarruz/Akıncı Tank",
+        "helptext": "Baskıncı  yüksek teknolojili bir akıncı silahı olan yıldırım silahı, çoğunlukla felç edici hasarı verir. Bu şekilde, Baskıncı taretleri devre dışı bırakabilir, savunma hattını kullanarak vals yapabilir ve rakibin üssünün ekonomik kalbi seviyesini yükseltebilir. Öldürüldüğünde, çevredeki akıncıları sersemletebilecek bir EMD patlaması meydana getiriyor."
+    },
+    "staticheavyradar": {
+        "name": "Gelişmiş Radar",
+        "description": "Uzun Menzil Radar",
+        "helptext": "Gelişmiş Radar Kulesi, temel versiyona göre çok daha geniş bir görüşe sahiptir"
+    },
+    "amphimpulse": {
+        "name": "Okçu",
+        "description": "Amfibi Akıncı/İsyan Bot",
+        "helptext": "Okçu, düşmanları vurmak için güçlü bir su kesme jeti kullanıyor. Su topu ateş gücünü kaybeder ve su deposu boşaldıkça menzilini arttırırken, su kütlesinde durmak suretiyle tekrar doldurulabilir. Okçular, deniz birlikleriyle savaşmak için yüzeye yüzebilirler."
+    },
+    "fakeunit": {
+        "name": "Sahte radar sinyali",
+        "description": "Çırpma cihazları tarafından düzenlendi.",
+        "helptext": "Teknik amaçlar için sahte birim."
+    },
+    "shieldshield": {
+        "name": "Aspis",
+        "description": "Yürüyen Kalkan Alanı",
+        "helptext": "Aspis, düşman mermilerini yok ederek çevresindeki birimleri alan siperiyle koruyor ve şarjı paylaşmak için otomatik olarak diğer siper donanımlı birimlere bağlanacak. Alan kalkanı üniteleri durdurmayacak ve sadece çevresindeki mermileri yakalayacaktır, böylece düşmanlar kalkanın altına girebilir ve içindeki birimlerde ateş edebilir. Alanın yeniden doldurulması ve korunması, enerji tasarrufu sağlar."
+    },
+    "jumpraid": {
+        "name": "Ateş",
+        "description": "Akıncı/İsyan Sıçrayıcı",
+        "helptext": "Ateş, alev makinası ile ucuz ve hızlı bir yürüteç. Alev makinesi büyük ünitelere daha fazla hasar verir ve aynı anda birden fazla hedefi vurabilir. Öldürüldüğünde, Ateş etrafındaki birimleri ateşe verir. Ek olarak, Ateş aynı zamanda ssıçramajet'lerle birlikte gelir, engellerin üzerinden atlamalarını veya düşmanları düşürmelerini sağlar."
+    },
+    "tankheavyarty": {
+        "name": "Titreme",
+        "description": "Ağır Başlı Topçu Tank",
+        "helptext": "Titremenin arkasındaki ilke basittir: yeterli çekim alanını doldurun ve en az bir kere bir şeye çarpacaksınız. Yavaş, beceriksiz, hassas ve son derece korkutucu olan Titreme, doygunluk çekimlerinin zarar verme ihtimalinin yüksek olduğu yüksek yoğunluklu hedef alanlara karşı en iyi şekilde çalışır. Kalkanları saniyeler içinde ufalar ve kabukları yumuşak bir zemindedir."
+    },
+    "tankraid": {
+        "name": "Kodachi",
+        "description": "Akıncı Tank",
+        "helptext": "Küçük Kodachi eşsiz bir akıncı. Küçük ama çevik şasesi, silahını, napalm bombasını ateşlemek için yeterince yakınlaştıracak kadar zırh ve hıza sahip. Kodachi içeri girmeli, vurulmalı ve ciddi hasar almadan önce geri çekilmelidir. Hasarlı Kodachiler savaş dışı kalıyor."
+    },
+    "cloakcon": {
+        "name": "Efsuncu",
+        "description": "Görünmez Mühendis Bot, 5 m/s de inşa eder",
+        "helptext": "Efsuncu, kısa mesafeli bir bozucu ve gizli bir genişletme ve temel bakım için bir gizleme aygıtı içerir."
+    },
+    "turretsunlance": {
+        "name": "Günmızrağı",
+        "description": "Anti Tank Taret - 25 enerji gerekir",
+        "helptext": "Günmızrağının ağır kırıcı huzmesi, en ağır saldırı birimini bile engeller ve zırhlı saldırıyı izlerinde ölüp durur."
+    },
+    "shieldassault": {
+        "name": "Eşkiya",
+        "description": "Kalkanlı Taarruz Botu",
+        "helptext": "Zayıf kendi başına, Eşkiya Haydutlar Outlaws ve Serseriler için mükemmel bir ekran yapar. Bağlama kalkanı, Eşkiyaya sayılarda güç verir, ancak AE silahları tarafından yenilebilir veya ateşe odaklanabilir."
+    },
+    "amphriot": {
+        "name": "Tarak",
+        "description": "Amfibi İsyan Bot (Anti Sualtı)",
+        "helptext": "Tipik bir isyan birimi olan Tarak, su altında kullanım için darbeli patlayıcılarla ve karadayken dörtlü bir av tüfeğiyle donanmıştır."
+    },
+    "planecon": {
+        "name": "Vinç",
+        "description": "Mühendis Uçak, 4 m/s de inşa eder",
+        "helptext": "Vinç herhangi bir arazide hızla uçuyor, ancak herhangi bir AH için kırılgan. Diğer inşaatçılar ile karşılaştırıldığında nispeten zayıf bir nano güce sahip olmasına rağmen, ulaşılması zor birçok yerde inşa edebilir ve bir hava oyuncuları bölgesini doğrusal olmayan bir şekilde genişletebilir. Hareket kabiliyetinden dolayı, enkazları ve diğer tekrarlayan görevleri geri almak için idealdir."
+    },
+    "gunshipraid": {
+        "name": "Çekirge",
+        "description": "Akıncı Kopter",
+        "helptext": "Çekirge hafif bir savaş gemisidir. Yüksek hızı ve nezih hasarı, düşman ekonomisini veya saldırılar gibi hatalı birimleri hızlı bir şekilde çıkarmak için mükemmeldir. Ancak, zemine yakın uçuyor ve kısa bir menzile sahip, yani diğer akıncıları bile eşit bir temele sokabiliyorlar. Her akıncı gibi, Çekirge isyanlardan ve statik savunmadan kaçınmalıdır."
+    },
+    "shieldraid": {
+        "name": "Haydut",
+        "description": "Orta-Hafif Akıncı Bot",
+        "helptext": "Haydut öfkeleniyor ve Glaive'den biraz daha sert, ama hala yerleşik kuvvetlere karşı savunduğun bir şey değil. İsyan birimleri ve LLT'ler ile karşı."
+    },
+    "amphraid": {
+        "name": "Ördek",
+        "description": "Amfibi Akıncı Bot (Anti Sualtı)",
+        "helptext": "Ördek temel sualtı akıncısıdır. Kısa menzilli torpidolarla donanmış, (görece) yüksek hızını, ciddi muhalefetten ölmekle birlikte geri çekilemeyen deniz hedeflerini taciz etmek için kullanıyor. Karada, torpidoları kısa mesafeli, terletici bir ağır silah gibi kısa bir mesafeye atabilir."
+    },
+    "planefighter": {
+        "name": "Çevik",
+        "description": "Çok amaçlı Savaşçı",
+        "helptext": "Çevik hem karaya hem de havaya isabet edebilir. Güdümlü füzeleri ve lazerleri ile hava birimlerine karşı etkilidir, ancak düşman AH ve hava üstünlüğü savaşçıları onu çabucak öldürür. Rakamlarla, kara birimlerini taciz edebilir ve baskın yapmaya elverişlidir. Belki de en önemlisi, Çevik'e müthiş bir hız artışı sağlamak için kullanılabilecek ve inanılmaz savaş ve kaçış manevraları yapmalarına olanak tanıyan yanıcı jetler ile donatılmışlardır."
+    },
+    "dronecarry": {
+        "name": "Martı",
+        "description": "Kariyer İHA",
+        "helptext": "Martı, enerji makinalısı ile donanmış küçük, agresif bir İHAdır."
+    },
+    "turretheavylaser": {
+        "name": "İğneci",
+        "description": "Yüksek Enerji Lazer Kulesi",
+        "helptext": "İğne orta derecede bir lazer tarettir. Üç döner lazer silahı neredeyse tüm küçük üniteleri öldürebilir, ancak düşük ateş hızı, yardım edilmediğinde sürülere karşı savunmasız hale getirir."
+    },
+    "hoversonic": {
+        "name": "Sabahyıldızı",
+        "description": "Anti Sualtı Hover",
+        "helptext": "Sabahyıldızı, hedefin suyun altında mı yoksa üstünde mı olduğunu önemsemediği sonik bir darbe topuyla silahlandırılmış olarak geliyor."
+    },
+    "chicken_tiamat": {
+        "name": "Tiamat",
+        "description": "Ağır Taarruz/İsyan",
+        "helptext": "Nihai saldırı tavuğu olan Tiamat, ateşi soluyan, çeneli, korkutucu, merhametsiz sporsever bir canavardır. Hatta kendisini ve çevresindeki tavukları hasardan korumak için bir mukoza kalkanı bile vardır."
+    },
+    "bomberstrike": {
+        "name": "Kerkenez",
+        "description": "Taktiksel Saldırı Bombacı",
+        "helptext": "Kerkenez, denizaltılara da vurabilecek kısa mesafeli yüzey saldırı füzeleri başlattı. Tekli mobil hedefleri seçmek için en iyi bombardıman uçağı."
+    },
+    "staticrearm": {
+        "name": "HavaAlanı",
+        "description": "Tamir eder ve Yeniden silahlandırıcı Uçak, 2.5 e/s de tamir eder",
+        "helptext": "HavaAlanı bir seferde dört uçağa kadar tamir eder. Aynı zamanda bombardıman uçaklarını yeniden düzenler / geri alır."
+    },
+    "dynrecon1": {
+        "name": "Muhalefet Komutanı",
+        "description": "Yüksek Hareketli Komutan",
+        "helptext": "Muhalefet Komutanı hareketlilik ve suçluluk duygusu etrafında döner; Bu hafif zırhlı platform, birçok özel silah ve modülü monte edebiliyor ve daha önce atlama jetleriyle donatılmış olarak geliyor."
+    },
+    "gunshipemp": {
+        "name": "Tatar",
+        "description": "Anti Ağır EMD İHA",
+        "helptext": "Tatar, düşman birimlerini felç etmek için kullanılabilir. Mükemmel bir savunma birimi haline gelir ve periler veya diğer birimlerle birleştiğinde düşmanı durdurabilir ve onu öldürmek için size zaman verebilir. Saldırganca yoğun biçimde güçlendirilmiş alanları bile felç edebilir, ancak savunuculara nispeten kolay bir şekilde ölür."
+    },
+    "bomberriot": {
+        "name": "ZümrüdüAnka",
+        "description": "Doygun Ateş Bombacı",
+        "helptext": "Zümrüdüankanın ateş bombaları, büyük birimler ve hafif yapılar kümesini azaltıyor."
+    },
+    "striderarty": {
+        "name": "Bozdoğan",
+        "description": "Ağır Doygun Topçu Strider",
+        "helptext": "Bozdoğan bir MLRS çırpıcıdır. Hedef bölgedeki hemen hemen her şeyin imha edilmesini garanti altına alan bir roket fırlatabilir, daha sonra dost kuvvetlerin arkasına hızla geri çekilebilir."
+    },
+    "gunshipheavytrans": {
+        "name": "Herkül",
+        "description": "Silahlı Ağır Hava Nakliyeci",
+        "helptext": "Herkül, oyunda herhangi bir kara birimini taşıyabilir. İkiz lazer tabancaları ve otomatik kargo atma sistemi, sıcak LZ'lere düşmek için idealdir."
+    },
+    "planescout": {
+        "name": "Baykuş",
+        "description": "Alan Bozucu, Radar/Sonar Uçak",
+        "helptext": "Baykuş, derin izcilik için benzersiz bir araç sunar ve sonarı ile sualtı hedeflerini belirleyebilir. Ayrıca, radarın altındaki alanda çalışmasını önleyen bir alan sıkıştırıcısı ile donatılmıştır."
+    },
+    "amphfloater": {
+        "name": "Şamandıra",
+        "description": "Ağır Amfibi Çartışma Botu",
+        "helptext": "Şamandıra, deniz yüzeyine yüzerek su altındayken ateş edememe konusunda çalışmaktadır. Burada yavaşça hasar ile düzgün bir şekilde düzenlenmiş bir top ateşleyebilir. Yüzerken hareket edemez."
+    },
+    "dynknight1": {
+        "name": "Komutan",
+        "description": "Mobil Taarruz Komutan",
+        "helptext": "Şovalye Komutan şasi, çoğu modülü uygun hız, zırh ve rejenerasyonla monte edebilen dengeli bir komut platformudur."
+    }
+}

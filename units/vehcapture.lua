@@ -75,7 +75,7 @@ unitDef = {
       craterMult              = 0,
 
       customparams = {
-        capture_scaling = 0,
+        capture_scaling = 1,
         is_capture = 1,
         post_capture_reload = 360,
 
@@ -87,7 +87,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 2.6,
+        default = 11.1,
       },
 
       explosionGenerator      = [[custom:NONE]],

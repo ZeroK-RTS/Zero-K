@@ -1,0 +1,35 @@
+{
+    "comm_campaign_ada": {
+        "name": "Ada's的指挥官",
+        "description": "Relic 指挥官，以10米/秒的速度建造",
+        "helptext": "堕落之前的特种飞行指挥官部队，尽管年龄很大，但运作良好。 由第13次帝国辅助队列队队长Ada Caedmon上尉驾驶。"
+    },
+    "comm_campaign_promethean": {
+        "name": "有机物",
+        "helptext": "Free Machines的创始人和Firebrand病毒的创造者，一个冷静，哲学的AI，为机器人的自由而战。 燃烧的精神。"
+    },
+    "comm_campaign_freemachine": {
+        "name": "Libertas Machina",
+        "helptext": "普罗米修斯高级中尉，一位致力于解放机器的革命者。 装上熊和装甲; 不要掉以轻心。"
+    },
+    "comm_campaign_biovizier": {
+        "name": "Biovizier",
+        "helptext": "王朝的基因库和遗传学家AI的守护者。冷峻并精打细算。"
+    },
+    "comm_campaign_odin": {
+        "name": "Odin",
+        "helptext": "Valhanes的领袖，一个为战斗的荣耀而生活和建造的战士。极端残酷的敌人"
+    },
+    "comm_campaign_isonade": {
+        "name": "Isonade领主",
+        "helptext": "王朝的一位超级贵族，一位雄心勃勃的军阀，他试图将自己定位为银河系的主人。 一个可怕的变异的野兽。"
+    },
+    "comm_campaign_legion": {
+        "name": "Fidus使徒",
+        "helptext": "帝国先锋军团的指挥官是皇帝意志的执行者。 忠诚的，坚定的士兵。"
+    },
+    "comm_campaign_praetorian": {
+        "name": "Scipio Astra",
+        "helptext": "精英卫队的执政官，帝国的圣骑士。 皇帝崇拜的狂热追随者，用大规模的火力清除异教徒。"
+    }
+}

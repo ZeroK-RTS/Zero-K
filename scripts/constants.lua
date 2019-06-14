@@ -82,7 +82,7 @@ function GG.Script.SmokeUnit(smokePiece, multiplier)
 	end
 end
 
-function GG.Script.onWater()
+function GG.Script.onWater(unitID)
 	local spGetUnitPosition = Spring.GetUnitPosition
 	local spGetGroundHeight = Spring.GetGroundHeight
 	local x,_,z = spGetUnitPosition(unitID)
@@ -143,7 +143,7 @@ function GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, Ki
 	return 10 -- don't spawn second wreck
 end
 
-function GG.Script.InitializeDeathAnimation()
+function GG.Script.InitializeDeathAnimation(unitID)
 	local paralyzeDamage = select(3, Spring.GetUnitHealth(unitID))
 	Spring.SetUnitRulesParam(unitID, "real_para", paralyzeDamage or 0)
 end

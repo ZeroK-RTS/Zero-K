@@ -68,7 +68,7 @@ local function GetVotes(line)
 		local index_votesHave = line:find("%d[%d/]", index_init)
 		local index_votesHaveEnd = line:find("/", index_votesHave) - 1
 		local index_votesNeeded = index_votesHaveEnd + 2
-		local index_votesNeededEnd = ( line:find("[,]", index_votesNeeded) or line:find("\]", index_votesNeeded) ) - 1
+		local index_votesNeededEnd = ( line:find("[,]", index_votesNeeded) or line:find("]", index_votesNeeded) ) - 1
 
 		local numVotes = tonumber(line:sub(index_votesHave, index_votesHaveEnd))
 		local maxVotes = tonumber(line:sub(index_votesNeeded, index_votesNeededEnd))
@@ -182,7 +182,6 @@ function widget:Initialize()
 	Chili = WG.Chili
 	Button = Chili.Button
 	Label = Chili.Label
-	Colorbars = Chili.Colorbars
 	Window = Chili.Window
 	Panel = Chili.Panel
 	Image = Chili.Image

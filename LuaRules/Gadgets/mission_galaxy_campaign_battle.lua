@@ -340,7 +340,7 @@ end
 
 local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 	local objectiveData = bonusObjectiveList[bonusObjectiveID]
-	gameSeconds = gameSeconds or math.floor(Spring.GetGameFrame()/30), victory
+	gameSeconds = gameSeconds or math.floor(Spring.GetGameFrame()/30)
 	
 	-- Cbeck whether the objective is open
 	if objectiveData.terminated then
@@ -749,6 +749,19 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 			unitID = unitID,
 			commands = patrolCommands,
 		}
+	end
+	
+	if unitData.movestate then
+		commandsToGive = commandsToGive or {}
+		if commandsToGive[#commandsToGive] and commandsToGive[#commandsToGive].unitID == unitID then
+			local cmd = commandsToGive[#commandsToGive].commands
+			cmd[#cmd + 1] = {cmdID = CMD.MOVE_STATE, params = {unitData.movestate}, options = {"shift"}}
+		else
+			commandsToGive[#commandsToGive + 1] = {
+				unitID = unitID,
+				commands = {cmdID = CMD.MOVE_STATE, params = {unitData.movestate}, options = {"shift"}}
+			}
+		end
 	end
 	
 	SetupInitialUnitParameters(unitID, unitData, x, z)
@@ -1180,6 +1193,7 @@ local function CheckDisableControlAiMessage()
 		local dis_msg = "DISABLE_CONTROL:"
 		for i = 1, #data do
 			dis_msg = dis_msg .. data[i] .. "+"
+			Spring.SetUnitRulesParam(unitID, "disableAiControl", 1, publicTrueTable)
 		end
 		SendToUnsynced("SendAIEvent", teamID, dis_msg)
 	end

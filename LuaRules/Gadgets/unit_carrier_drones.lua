@@ -202,9 +202,9 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		Spring.MoveCtrl.Disable(droneID)
 		Spring.SetUnitCOBValue(droneID, 82, (rot - math.pi)*65536/2/math.pi)
 		
-		local movestate = Spring.Utilities.GetUnitMoveState(unitID)
+		local firestate = Spring.Utilities.GetUnitFireState(unitID)
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
-		GiveOrderToUnit(droneID, CMD.FIRE_STATE, { movestate }, 0)
+		GiveOrderToUnit(droneID, CMD.FIRE_STATE, { firestate }, 0)
 		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
 		local rx, rz = RandomPointInUnitCircle()
 		-- Drones intentionall use CMD.MOVE instead of CMD_RAW_MOVE as they do not require any of the features
@@ -381,7 +381,7 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 	
 	local function SitLoop()
 		local previousDir, currentDir
-		local pitch, yaw, roll, pitch, yaw, roll
+		local pitch, yaw, roll
 		local px, py, pz, dx, dy, dz, vx, vy, vz, offx, offy, offz
 		-- local magnitude, newPadHeading
 		

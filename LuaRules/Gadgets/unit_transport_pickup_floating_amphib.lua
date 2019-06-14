@@ -25,7 +25,6 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spSetUnitMoveGoal = Spring.SetUnitMoveGoal
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetCommandQueue = Spring.GetCommandQueue
-local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
@@ -248,7 +247,6 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 				-- return true,true --remove this command
 				return true,false --hold this command (removed in next frame after giveLOAD_order have inserted command (this avoid unit trigger UnitIdle)
 			end
-			return true,false --hold this command
 		else
 			local units = spGetUnitsInCylinder(cmdParams[1],cmdParams[3],cmdParams[4])
 			if #units == 0 then
@@ -280,9 +278,8 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 				-- return true,true --remove this command
 				return true,false --hold this command (removed in next frame after giveLOAD_order have inserted command (this avoid unit trigger UnitIdle)
 			end
-			return true,false --hold this command
 		end
-		return true,true --remove this command
+		return true,false --remove this command
 	elseif cmdID == CMD_EXTENDED_UNLOAD and cmdParams and cmdParams[3] then
 		if (transportPhase[unitID] and transportPhase[unitID]== "INTERNAL_UNLOAD_UNITS") then
 			return true,true --remove this command

@@ -482,24 +482,22 @@ function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 			for _,value in pairs(allyteams) do
 				if value ~= allyteamid then
 					local enemyteams = Spring.GetTeamList(value)
-					for _,value1 in pairs(enemyteams) do
+					local _,value1 = next(enemyteams)
+					if value1 then
 						local enemybox = Spring.GetTeamRulesParam(value1, "start_box_id")
 						if (enemybox) then
 							enemyboxes[enemybox] = true
 						end
-						break
 					end
 				end
 			end
 		end
 		
-		local valid = "0"
 		for bid,_ in pairs(enemyboxes) do
 			if CheckStartbox(bid, x, z) then
-				valid = "1"
-				break
+				return "1"
 			end
 		end
-		return valid
+		return "0"
 	end
 end

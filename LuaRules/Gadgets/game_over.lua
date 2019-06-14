@@ -80,7 +80,7 @@ local planetIndex = Spring.GetModOptions().singleplayercampaignbattleid
 planetIndex = planetIndex and tonumber(planetIndex)
 
 local revealed = false
-local gameover = false
+local gameIsOver = false
 local gameOverSent = false
 
 local inactiveWinAllyTeam = false
@@ -127,7 +127,6 @@ local aiTeamResign = not (isScriptMission or campaignBattleID or (Spring.GetModO
 
 local vitalConstructorAllyTeam = {}
 local vitalAlive = {}
-local allyTeams = spGetAllyTeamList()
 for i = 1, #allyTeams do
 	local allyTeamID = allyTeams[i]
 	vitalAlive[allyTeamID] = {}
@@ -161,7 +160,7 @@ local function KillTeam(teamID)
 	end
 end
 
-local function GameOver(winningAllyTeamID)
+local function SetGameOver(winningAllyTeamID)
 	if DEBUG_MSG then
 		Spring.Echo("GameOver", winningAllyTeamID)
 	end
@@ -216,17 +215,11 @@ local function CountAllianceValue(allianceID)
 end
 
 local function HasNoComms(allianceID)
-	for unitID in pairs(commsAlive[allianceID]) do
-		return false
-	end
-	return true
+	return not next(commsAlive[allianceID])
 end
 
 local function HasNoVitalUnits(allianceID)
-	for unitID in pairs(vitalAlive[allianceID]) do
-		return false
-	end
-	return true
+	return not next(vitalAlive[allianceID])
 end
 
 local function EchoUIMessage(message)
@@ -243,7 +236,7 @@ local function Draw() -- declares a draw
 		return
 	end
 	EchoUIMessage("The game ended in a draw!")
-	GameOver(gaiaAllyTeamID) -- exit uses {} so use Gaia for draw to differentiate
+	SetGameOver(gaiaAllyTeamID) -- exit uses {} so use Gaia for draw to differentiate
 	gameOverSent = true
 end
 
@@ -273,7 +266,7 @@ local function CheckForVictory()
 				local name = Spring.GetGameRulesParam("allyteam_long_name_" .. lastAllyTeam)
 				EchoUIMessage(name .. " wins!")
 			end
-			GameOver(lastAllyTeam)
+			SetGameOver(lastAllyTeam)
 			gameOverSent = true
 		end
 	end
@@ -637,7 +630,7 @@ local function CheckInactivityWin(cmd, line, words, player)
 	if DEBUG_MSG then
 		Spring.Echo("ProcessLastAlly", cmd, line, words, player)
 	end
-	if inactiveWinAllyTeam and not gameover then
+	if inactiveWinAllyTeam and not gameIsOver then
 		if player then 
 			local name,_,spec,_,allyTeamID = Spring.GetPlayerInfo(player, false)
 			if allyTeamID == inactiveWinAllyTeam and not spec then
@@ -656,7 +649,7 @@ function gadget:TeamDied (teamID)
 	if DEBUG_MSG then
 		Spring.Echo("gadget:TeamDied", teamID)
 	end
-	if not gameover then
+	if not gameIsOver then
 		ProcessLastAlly()
 	end
 end
@@ -664,7 +657,7 @@ end
 -- supposed to solve game over not being called when resigning during pause
 -- not actually called yet (PlayerChanged is unsynced at present)
 function gadget:PlayerChanged (playerID)
-	if gameover then
+	if gameIsOver then
 		return
 	end
 
@@ -761,7 +754,7 @@ function gadget:GameFrame(n)
 	-- check for last ally:
 	-- end condition: only 1 ally with human players, no AIs in other ones
 	if (n % 45 == 0) then
-		if not gameover and not spGetGameRulesParam("loadedGame") then
+		if not gameIsOver and not spGetGameRulesParam("loadedGame") then
 			if DEBUG_MSG then
 				Spring.Echo("planetIndex", planetIndex, type(planetIndex))
 			end
@@ -776,7 +769,7 @@ function gadget:GameOver()
 	if DEBUG_MSG then
 		Spring.Echo("gadget:GameOver")
 	end
-	gameover = true
+	gameIsOver = true
 	if noElo then
 		Spring.SendCommands("wbynum 255 SPRINGIE:noElo")
 	end

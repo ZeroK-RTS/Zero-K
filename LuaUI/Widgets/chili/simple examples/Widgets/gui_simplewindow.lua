@@ -1,15 +1,15 @@
 
 
 function widget:GetInfo()
-  return {
-		name		= "chilli example",
-		desc		= "example chilli code",
-		author		= "smoth",
-		date		= "8/26/10",
+	return {
+		name		 = "chilli example",
+		desc		 = "example chilli code",
+		author		 = "smoth",
+		date		 = "8/26/10",
 		license   = "none",
 		layer		 = 0,
 		enabled   = false  --  loaded by default?
-  }
+	}
 end
 
 
@@ -26,7 +26,7 @@ local bluelabel
 local scrolllabel
 
 function widget:Shutdown()
-	for i=1,#windows do
+	for i = 1, #windows do
 		(windows[i]):Dispose()
 	end
 end
@@ -48,10 +48,10 @@ function widget:Initialize()
 		x = 5,
 		y = 10,
 		width = '50%',
-		align="left",
-		valign="ascender",
-		--itemPadding  = {5,5,5,5},
-		--itemMargin  = {1,1,1,1},
+		align = "left",
+		valign = "ascender",
+		--itemPadding  = {5, 5, 5, 5},
+		--itemMargin  = {1, 1, 1, 1},
 		text = tx,
 		fontOutline = true,
 	}
@@ -65,8 +65,8 @@ function widget:Initialize()
 		caption = "I AM A RED LABEL!",
 		fontsize = 13,
 		autosize = false,
-		textColor = {1,0.1,0.1,0.9},
-		anchors = {left=true,bottom=true,right=true},
+		textColor = {1, 0.1, 0.1, 0.9},
+		anchors = {left = true, bottom = true, right = true},
 	}	
 		
 	scrollabel2 = Chili.Label:New{
@@ -78,15 +78,15 @@ function widget:Initialize()
 		caption = "I AM A GREEN LABEL!",
 		fontsize = 13,
 		autosize = false,
-		textColor = {0.1,1,0.1,0.9},
-		anchors = {left=true,bottom=true,right=true},
+		textColor = {0.1, 1, 0.1, 0.9},
+		anchors = {left = true, bottom = true, right = true},
 	}		
 	
 	scrollpanel1 = ScrollPanel:New{
-  		x = 0,
+			x = 0,
 		y = 50,
 		bottom = 0,
-		right=6,
+		right = 6,
 		horizontalScrollbar = false,
 		verticalSmartScroll = true,
 		disableChildrenHitTest = true,
@@ -104,9 +104,9 @@ function widget:Initialize()
 		width = 15,
 		height = 15,
 		caption = "O",
-		anchors = {top=true,right=true},
-		textColor = {1,1,1,0.9},
-		backgroundColor = {0.1,1,0.1,0.9},
+		anchors = {top = true, right = true},
+		textColor = {1, 1, 1, 0.9},
+		backgroundColor = {0.1, 1, 0.1, 0.9},
 		-- OnClick = {function() window1:Dispose() end},
 		}
 
@@ -119,8 +119,8 @@ function widget:Initialize()
 		caption = "I AM A RED LABEL!",
 		fontsize = 13,
 		autosize = false,
-		textColor = {1,0.1,0.1,0.9},
-		anchors = {left=true,bottom=true,right=true},
+		textColor = {1, 0.1, 0.1, 0.9},
+		anchors = {left = true, bottom = true, right = true},
 	}	
 	
 	window0 = Chili.Window:New{
@@ -132,7 +132,7 @@ function widget:Initialize()
 		dragUseGrip = true,
 		clientWidth = 400,
 		clientHeight = 150,
-		backgroundColor = {0.8,0.8,0.8,0.9},
+		backgroundColor = {0.8, 0.8, 0.8, 0.9},
 		
 		children = { -- to nest this way, table has to come BEFORE the parent or it won't show
 						scrollpanel1,
@@ -140,10 +140,10 @@ function widget:Initialize()
 						redlabel,
 		},
 	}
-	windows[#windows+1] = window0
+	windows[#windows + 1] = window0
 	
 	bluelabel = Chili.Label:New{
-		parent = window0,--can nest this way as well, has to come AFTER parent or it won't see the parent
+		parent = window0, --can nest this way as well, has to come AFTER parent or it won't see the parent
 		x = 160,
 		y = 8,
 		width = 150,
@@ -152,8 +152,8 @@ function widget:Initialize()
 		caption = "I AM A BLUE LABEL!",
 		fontsize = 13,
 		autosize = false,
-		textColor = {0.1,0.1,1,0.9},
-		anchors = {left=true,bottom=true,right=true},
+		textColor = {0.1, 0.1, 1, 0.9},
+		anchors = {left = true, bottom = true, right = true},
 	}	
 
 end

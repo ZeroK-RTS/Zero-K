@@ -102,7 +102,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 
 	local wantedSpeed = cmdParams[1]
-	local teamID = Spring.GetUnitTeam(unitID)
 	if not (wantedSpeed and teamID) then
 		return false
 	end

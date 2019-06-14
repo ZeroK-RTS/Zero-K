@@ -18,6 +18,7 @@ local INACTIVE_MESSAGE = "LobbyOverlayActive0"
 
 local lobbyOverlayActive = false
 local grabTimer = false
+local grabPaused = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -27,6 +28,7 @@ options_path = 'Settings/Interface/Mouse Cursor'
 options_order = {
 	'grabinput',
 	'lobbyDisables',
+	'pauseDisables',
 }
 
 -- Radio buttons are intentionally absent from these options to allow hotkeys to
@@ -60,6 +62,21 @@ options = {
 		end,
 		noHotkey = true,
 	},
+	pauseDisables = {
+		name = "Pausing disables lock",
+		tooltip = "Disables input grabbing when the game is paused.",
+		type = "bool",
+		value = true,
+		noHotkey = false,
+		OnChange = function (self)
+			if self.value and (options.grabinput.value and "1") then		
+				widgetHandler:UpdateCallIn("GamePaused")
+			else
+				widgetHandler:RemoveCallIn("GamePaused")
+			end
+		end,
+		noHotkey = true,
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -75,7 +92,8 @@ end
 
 function widget:Update(dt)
 	-- Input grabbing is disabled on Alt+Tab and there is no event for this. Therefore it needs to be periodically reenabled if the cursor has left Spring.
-	if options.grabinput.value and (not lobbyOverlayActive) then
+	-- Bypass this when game is paused and intentionally unlocked.
+	if options.grabinput.value and (not lobbyOverlayActive) and (not options.pauseDisables.value and grabPaused) then
 		local _, _, _, _, _, outsideSpring = Spring.GetMouseState()
 		if outsideSpring and not grabTimer then
 			grabTimer = 0
@@ -94,6 +112,18 @@ end
 function widget:Shutdown()
 	-- For Chobby.
 	Spring.SendCommands("grabinput 0")
+end
+
+function widget:GamePaused(playerID, paused)
+	if (options.grabinput.value) then
+		if paused then
+			grabPaused = true
+			Spring.SendCommands("grabinput 0")
+		else
+			grabPaused = false
+			Spring.SendCommands("grabinput 1")
+		end
+	end
 end
 
 function widget:RecvLuaMsg(msg)

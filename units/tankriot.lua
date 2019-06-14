@@ -4,7 +4,7 @@ unitDef = {
   description         = [[Heavy Riot Support Tank]],
   acceleration        = 0.02181,
   brakeRate           = 0.04282,
-  buildCostMetal      = 520,
+  buildCostMetal      = 500,
   builder             = false,
   buildPic            = [[tankriot.png]],
   canGuard            = true,
@@ -80,7 +80,7 @@ unitDef = {
 	  },
 	  
       damage                  = {
-        default = 440.5,
+        default = 420.1,
         subs    = 22,
       },
 
@@ -93,7 +93,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[corbanishrk.s3o]],
       noSelfDamage            = true,
-      range                   = 340,
+      range                   = 320,
       reloadtime              = 2.15,
       smokeTrail              = false,
       soundHit                = [[weapon/bomb_hit]],

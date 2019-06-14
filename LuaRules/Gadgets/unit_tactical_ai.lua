@@ -574,9 +574,10 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fx
 					clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 				end
 			else
-				if not((not enemy) or (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)) or 
+				if (enemy and behaviour.fleeEverything) or not((not enemy) 
+						or (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL))
 						-- if I have been given attack order manually do not flee
-						not ((typeKnown and (behaviour.flees[enemyUnitDef] or (behaviour.fleeCombat and armedUnitDefIDs[enemyUnitDef]))) 
+						or not ((typeKnown and (behaviour.flees[enemyUnitDef] or (behaviour.fleeCombat and armedUnitDefIDs[enemyUnitDef]))) 
 						-- if I have los and the unit is a fleeable or a unit is unarmed and I flee combat - flee
 						or (not typeKnown and behaviour.fleeRadar))) then 
 						-- if I do not have los and flee radar dot, flee

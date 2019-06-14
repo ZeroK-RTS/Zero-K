@@ -3,13 +3,13 @@
 
 function gadget:GetInfo()
 	return {
-		name		= "Chicken Spawner",
-		desc		= "Spawns burrows and chickens",
-		author		= "quantum, improved by KingRaptor",
-		date		= "April 29, 2008", --last update: Mei 7, 2014
-		license		= "GNU GPL, v2 or later",
-		layer		= 1000001,	-- must do the GameOver() thing only after gadget:awards.lua has finishes detect queen destroyed else queenKill award won't appear.
-		enabled		= true --	loaded by default?
+		name     = "Chicken Spawner",
+		desc     = "Spawns burrows and chickens",
+		author   = "quantum, improved by KingRaptor",
+		date     = "April 29, 2008", --last update: Mei 7, 2014
+		license  = "GNU GPL, v2 or later",
+		layer    = 1000001,	-- must do the GameOver() thing only after gadget:awards.lua has finishes detect queen destroyed else queenKill award won't appear.
+		enabled  = true --	loaded by default?
 	}
 end
 
@@ -204,6 +204,9 @@ else
 	--then -- well as far as I understood this means to check whether team is chicken enemy then do next
 			humanTeams[teamID] = true
 		end
+	end
+	if chickenTeamID then
+		Spring.SetGameRulesParam("chickenTeamID", chickenTeamID)
 	end
 	luaAI = highestLevel
 end
@@ -494,7 +497,7 @@ end
 
 local function ChooseChicken(units, useTech)
 	local s = spGetGameSeconds() + math.floor(gameFrameOffset/30)
-	local units = units or chickenTypes
+	units = units or chickenTypes
 	local choices,choisesN = {},0
 	local techMod = 0
 	if useTech then

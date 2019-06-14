@@ -12,6 +12,7 @@ unitDef = {
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[staticshield_aoplane.dds]],
   buildPic                      = [[staticshield.png]],
+  canMove                       = true,
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[30 39 30]],
@@ -41,13 +42,15 @@ unitDef = {
   yardMap                       = [[oooo]],
 
   customParams        = {
-	removewait     = 1,
+    removewait     = 1,
 
     morphto = [[shieldshield]],
     morphtime = [[30]],
-	
-	priority_misc = 1, -- Medium
-	unarmed       = true,
+
+    priority_misc = 1, -- Medium
+    unarmed       = true,
+    addfight       = 1,
+    addpatrol      = 1,
   },  
   
   weapons                       = {
