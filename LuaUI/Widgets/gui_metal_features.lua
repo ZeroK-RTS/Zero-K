@@ -104,7 +104,7 @@ local function DrawWorldFunc()
 
   -- ways to bypass heavy resource load in economy overlay
   if (pregame and options.pregamehighlight.value) or hilite 
-    or (options.showhighlight.value == 'always' and spGetMapDrawMode() ~= 'metal') 
+    or (options.showhighlight.value == 'always' and (spGetMapDrawMode() == 'metal' or WG.showeco)) 
     or (conSelected and options.showhighlight.value == "constructors") then 
 
     gl.PolygonOffset(-2, -2)
