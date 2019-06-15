@@ -62,14 +62,24 @@ local LuaShader = VFS.Include(LUASHADER_DIR .. "LuaShader.lua")
 -- Global Variables
 -----------------------------------------------------------------
 
+local advShading = false
+
+local sunChanged = false
+local optionsChanged = true --just in case
+
 local shadows = false
 local advShading = false
 local normalmapping = true
 local treewind = false
 
-local sunChanged = false
 
 local idToDefID = {}
+
+---
+-- rendering.materialDefs[matName] = mat_src
+-- rendering.bufMaterials[objectDefID] = rendering.spGetMaterial() / luaMat
+-- rendering.materialInfos[objectDefID] = {matName, name = param, name1 = param1}
+---
 
 local unitRendering = {
 	drawList        = {},
@@ -279,6 +289,21 @@ local function CompileMaterialShaders()
 		_CompileMaterialShaders(rendering)
 	end
 end
+
+local function _ProcessOptions(optName, optValue, playerID)
+	if (playerID ~= Spring.GetMyPlayerID()) then
+		return
+	end
+	for _, rendering in ipairs(allRendering) do
+		for matName, matTable in pairs(rendering.materialDefs) do
+			if matTable.ProcessOptions then
+				optionsChanged = optionsChanged or matTable.ProcessOptions(matTable.shaderOptions, optName, optValue)
+				optionsChanged = optionsChanged or matTable.ProcessOptions(matTable.deferredOptions, optName, optValue)
+			end
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -790,13 +815,6 @@ end
 -----------------------------------------------------------------
 
 function gadget:Initialize()
-	--// check user configs
-	shadows = Spring.HaveShadows()
-	advShading = Spring.HaveAdvShading()
-	--normalmapping = tonumber(Spring.GetConfigInt("NormalMapping", 1) or 0) > 0
-	normalmapping = true
-	treewind = tonumber(Spring.GetConfigInt("TreeWind", 1) or 1) > 0
-
 	--// GG assignment
 	GG.CUS = allRendering
 
@@ -814,6 +832,39 @@ function gadget:Initialize()
 	end
 	for _, fid in ipairs(Spring.GetAllFeatures()) do
 		gadget:FeatureCreated(fid, Spring.GetFeatureDefID(fid), Spring.GetFeatureTeam(fid))
+	end
+
+	local shadows = Spring.HaveShadows()
+	local normalmapping = tonumber(Spring.GetConfigInt("NormalMapping", 1) or 0) > 0
+	local treewind = tonumber(Spring.GetConfigInt("TreeWind", 1) or 1) > 0
+
+	local commonOptions = {
+		shadowmapping 	= shadows,
+		normalmapping 	= normalmapping,
+		treewind		= treewind,
+	}
+
+	local seenOptions = {}
+	for _, rendering in ipairs(allRendering) do
+		for matName, matTable in pairs(rendering.materialDefs) do
+			local optTableStd = Spring.Utilities.MergeWithDefault(matTable.shaderOptions, commonOptions)
+			local optTableDef = Spring.Utilities.MergeWithDefault(matTable.deferredOptions, commonOptions)
+
+			for opt, _ in pairs(optTableStd) do
+				if not seenOptions[opt] then
+					seenOptions[opt] = true
+					gadgetHandler:AddChatAction(opt, _ProcessOptions)
+				end
+			end
+
+			for opt, _ in pairs(optTableDef) do
+				if not seenOptions[opt] then
+					seenOptions[opt] = true
+					gadgetHandler:AddChatAction(opt, _ProcessOptions)
+				end
+			end
+
+		end
 	end
 
 	--// insert synced actions

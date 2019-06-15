@@ -476,6 +476,7 @@ local defaultMaterialTemplate = {
 		flashlights		= false,
 		unitsfog		= false,
 		normalmap_flip	= false,
+		treewind		= false,
 
 		shadowsQuality	= 2,
 		materialIndex	= 0,
@@ -490,6 +491,7 @@ local defaultMaterialTemplate = {
 		flashlights		= false,
 		unitsfog		= false,
 		normalmap_flip	= false,
+		treewind		= false,
 
 		shadowsQuality	= 0,
 		materialIndex	= 0,
@@ -522,6 +524,7 @@ local knownBitOptions = {
 	["flashlights"] = 4,
 	["unitsfog"] = 5,
 	["normalmap_flip"] = 6,
+	["treewind"] = 6,
 }
 
 local knownIntOptions = {
@@ -555,7 +558,7 @@ local function ProcessOptions(optTable, optName, optValue)
 		--TODO
 		handled = true
 	end
-	return handled, optTable
+	return handled
 end
 
 local function ApplyOptions(luaShader, optionsTbl)
