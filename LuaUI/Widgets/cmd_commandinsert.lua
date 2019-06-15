@@ -137,6 +137,7 @@ local function ProcessCommand(id, params, options, sequence_order)
 	-- Redefine the way in which modifiers apply to Area- Repair and Rez
 	local ctrl = options.ctrl
 	local meta = options.meta
+
 	if ctrl and not meta and id == CMD.REPAIR then
 		-- Engine CTRL means "keep repairing even when being reclaimed" (now inaccessible)
 		-- Engine META means "only repair live units, don't assist construction" (now CTRL)
@@ -147,6 +148,11 @@ local function ProcessCommand(id, params, options, sequence_order)
 		-- Engine CTRL means "keep rezzing even when being reclaimed" (now inaccessible)
 		-- Engine META means "only rez fresh wrecks, don't refill partially-reclaimed" (now default, CTRL disables)
 		Spring.GiveOrder(id, params, options.coded - (ctrl and CMD.OPT_CTRL or 0) + (ctrl and 0 or CMD.OPT_META))
+		return true
+	end
+	if id == CMD_FIRE_ONCE and not meta then
+		-- META means "fire once" (not the engine meaning; overridden by ZK)
+		Spring.GiveOrder(CMD.ATTACK, params, options.coded + CMD.OPT_META)
 		return true
 	end
 
@@ -161,6 +167,8 @@ local function ProcessCommand(id, params, options, sequence_order)
 			else
 				coded = coded
 			end
+		elseif id == CMD_FIRE_ONCE then
+			id = CMD.ATTACK
 		else
 			coded = coded - CMD.OPT_META
 		end

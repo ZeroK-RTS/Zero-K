@@ -119,6 +119,14 @@ local sp_GetUnitWeaponState = Spring.GetUnitWeaponState
 local sp_SetUnitWeaponState = Spring.SetUnitWeaponState
 local sp_SetUnitShieldState = Spring.SetUnitShieldState
 
+local spGetUnitWeaponTarget = Spring.GetUnitWeaponTarget
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spSetUnitTarget = Spring.SetUnitTarget
+local CMD_ATTACK = CMD.ATTACK
+local CMD_REMOVE = CMD.REMOVE
+local CMD_OPT_META = CMD.OPT_META
+
 -- Keep local reference to engine's CallAsUnit/WaitForMove/WaitForTurn,
 -- as we overwrite them with (safer) framework version later on.
 local sp_CallAsUnit  = Spring.UnitScript.CallAsUnit
@@ -637,6 +645,44 @@ local function Wrap_AimWeapon(unitID, callins)
 	end
 end
 
+local TARGET_UNIT = 1
+local TARGET_POS = 2
+local function Wrap_EndBurst(unitID, callins)
+	local EndBurst = callins.EndBurst
+
+	local function EndBurstThread(weaponNum)
+		if EndBurst then
+			EndBurst(weaponNum)
+		end
+
+		local targetType, isUserTarget, targetID = spGetUnitWeaponTarget(unitID, weaponNum)
+		if not isUserTarget then
+			return
+		end
+
+		local cmdID, cmdOpt, cmdTag, cmdParam1, cmdParam2, cmdParam3 = spGetUnitCurrentCommand(unitID)
+		if cmdID ~= CMD_ATTACK or floor(cmdOpt / CMD_OPT_META) % 2 == 0 then
+			-- FIXME: jinking/kiting units might get a move command inserted in front (tested with gator)
+			return
+		end
+
+		if  (targetType ~= TARGET_UNIT or cmdParam2 or cmdParam1 ~= targetID)
+		and (targetType ~= TARGET_POS  or cmdParam4 or cmdParam1 ~= targetID[1] or cmdParam2 ~= targetID[2] or cmdParam3 ~= targetID[3]) then
+			return
+		end
+
+		--[[ Unit keeps shooting otherwise; doesn't seem to affect Set Target negatively though.
+		     Has to be before REMOVE because else if there's 2 commands in a row, the unit already
+		     starts doing the second command by the time the target it set to nil ]]
+		spSetUnitTarget(unitID, nil)
+		spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0) -- fixme: some way to make the command "finish" instead of remove (for repeat state)
+	end
+
+	callins.EndBurst = function(weaponNum)
+		return StartThread(EndBurstThread, weaponNum)
+	end
+end
+
 
 local function Wrap_AimShield(unitID, callins)
 	local AimShield = callins["AimShield"]
@@ -801,6 +847,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	Wrap_AimWeapon(unitID, callins)
 	Wrap_AimShield(unitID, callins)
 	Wrap_Killed(unitID, callins)
+	Wrap_EndBurst(unitID, callins)
 
 	-- Wrap everything so activeUnit get's set properly.
 	for k,v in pairs(callins) do

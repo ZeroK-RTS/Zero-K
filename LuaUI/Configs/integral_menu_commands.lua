@@ -345,6 +345,7 @@ local tooltips = {
 
 local overrides = {
 	[CMD.ATTACK] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Force Fire: Shoot at a particular target or position."},
+	[CMD_FIRE_ONCE] = { texture = imageDir .. 'Bold/fire_once.png', tooltip = "Fire Once: Shoot at a particular target or position, once."},
 	[CMD.STOP] = { texture = imageDir .. 'Bold/cancel.png'},
 	[CMD.FIGHT] = { texture = imageDir .. 'Bold/fight.png', tooltip = "Attack Move: Move to a position engaging targets on the way."},
 	[CMD.GUARD] = { texture = imageDir .. 'Bold/guard.png'},
