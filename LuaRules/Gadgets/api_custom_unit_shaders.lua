@@ -373,8 +373,8 @@ local function _LoadMaterialConfigFiles(path)
 
 	for i = 1, #files do
 		local mats, unitMats = VFS.Include(files[i])
+
 		for k, v in pairs(mats) do
-		-- Spring.Echo(files[i],'is a feature?',v.feature)
 			local rendering
 			if v.feature then
 				rendering = featureRendering
@@ -385,6 +385,7 @@ local function _LoadMaterialConfigFiles(path)
 				rendering.materialDefs[k] = v
 			end
 		end
+
 		for k, v in pairs(unitMats) do
 			--// we check if the material is defined as a unit or as feature material (one namespace for both!!)
 			local materialDefs
@@ -686,23 +687,13 @@ function gadget:DrawGenesis()
 			local DrawGenesisFunc = mat.DrawGenesis
 
 			if SunChangedFunc or DrawGenesisFunc then
-				if mat.standardShaderObj then
-					mat.standardShaderObj:ActivateWith( function ()
+				for _, shaderObject in pairs({mat.standardShaderObj, mat.deferredShaderObj}) do
+					shaderObject:ActivateWith( function ()
 						if SunChangedFunc then
-							SunChangedFunc(mat.standardShaderObj)
+							SunChangedFunc(shaderObject)
 						end
 						if DrawGenesisFunc then
-							DrawGenesisFunc(mat.standardShaderObj)
-						end
-					end)
-				end
-				if mat.deferredShaderObj then
-					mat.deferredShaderObj:ActivateWith( function ()
-						if SunChangedFunc then
-							SunChangedFunc(mat.deferredShaderObj)
-						end
-						if DrawGenesisFunc then
-							DrawGenesisFunc(mat.deferredShaderObj)
+							DrawGenesisFunc(shaderObject)
 						end
 					end)
 				end
@@ -816,11 +807,6 @@ function gadget:Initialize()
 	_ProcessMaterials(unitRendering,    unitMaterialDefs)
 	_ProcessMaterials(featureRendering, featureMaterialDefs)
 
-	--// insert synced actions
-	gadgetHandler:AddSyncAction("unitshaders_reverse", UnitReverseBuilt)
-	--gadgetHandler:AddChatAction("normalmapping", ToggleNormalmapping)
-	gadgetHandler:AddChatAction("treewind", ToggleTreeWind)
-
 	--// material initialization
 	for _, uid in ipairs(Spring.GetAllUnits()) do
 		if not select(3, Spring.GetUnitIsStunned(uid)) then --// inbuild?
@@ -830,6 +816,18 @@ function gadget:Initialize()
 	for _, fid in ipairs(Spring.GetAllFeatures()) do
 		gadget:FeatureCreated(fid, Spring.GetFeatureDefID(fid), Spring.GetFeatureTeam(fid))
 	end
+
+	--// insert synced actions
+	--gadgetHandler:AddSyncAction("unitshaders_reverse", UnitReverseBuilt)
+
+	--gadgetHandler:AddChatAction("normalmapping", ToggleNormalmapping)
+	--gadgetHandler:AddChatAction("treewind", ToggleTreeWind)
+
+	for _, rendering in ipairs(allRendering) do
+		_CompileMaterialShaders(rendering)
+	end
+
+
 end
 
 --// Workaround: unsynced LuaRules doesn't receive Shutdown events
