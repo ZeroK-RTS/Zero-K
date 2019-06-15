@@ -36,7 +36,7 @@ vertex = [[
 	uniform vec3 etcLoc;
 	uniform int simFrame;
 
-	uniform int options;
+	uniform int bitOptions;
 
 	%%VERTEX_GLOBAL_NAMESPACE%%
 
@@ -81,12 +81,12 @@ vertex = [[
 		// V
 		worldCameraDir = normalize(cameraPos - worldVertexPos.xyz); //from fragment to camera, world space
 
-		if (BITMASK_FIELD(options, OPTION_SHADOWMAPPING)) {
+		if (BITMASK_FIELD(bitOptions, OPTION_SHADOWMAPPING)) {
 			shadowVertexPos = shadowMatrix * worldVertexPos;
 			shadowVertexPos.xy += vec2(0.5);  //no need for shadowParams anymore
 		}
 
-		if (BITMASK_FIELD(options, OPTION_NORMALMAPPING)) {
+		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING)) {
 			//no need to do Gram-Schmidt re-orthogonalization, because engine does it for us anyway
 			vec3 T = gl_MultiTexCoord5.xyz;
 			vec3 B = gl_MultiTexCoord6.xyz;
@@ -100,7 +100,7 @@ vertex = [[
 		}
 
 		modelUV = gl_MultiTexCoord0.xy;
-		if (BITMASK_FIELD(options, OPTION_MOVING_THREADS)) {
+		if (BITMASK_FIELD(bitOptions, OPTION_MOVING_THREADS)) {
 			const vec4 treadBoundaries = vec4(0.6279296875, 0.74951171875, 0.5702890625, 0.6220703125);
 
 			if ( all(bvec4(
@@ -110,11 +110,11 @@ vertex = [[
 			}
 		}
 
-		if (BITMASK_FIELD(options, OPTION_VERTEX_AO)) {
+		if (BITMASK_FIELD(bitOptions, OPTION_VERTEX_AO)) {
 			aoTerm = max(0.4, fract(gl_MultiTexCoord0.s * 16384.0) * 1.3); // great
 		}
 
-		if (BITMASK_FIELD(options, OPTION_FLASHLIGHTS)) {
+		if (BITMASK_FIELD(bitOptions, OPTION_FLASHLIGHTS)) {
 			// modelMatrix[3][0] + modelMatrix[3][2] are Tx, Tz elements of translation of matrix
 			selfIllumMod = max(-0.2, sin(simFrame * 0.063 + (modelMatrix[3][0] + modelMatrix[3][2]) * 0.1)) + 0.2;
 		}
@@ -123,7 +123,7 @@ vertex = [[
 
 		%%VERTEX_POST_TRANSFORM%%
 
-		if (BITMASK_FIELD(options, OPTION_UNITSFOG)) {
+		if (BITMASK_FIELD(bitOptions, OPTION_UNITSFOG)) {
 			float fogCoord = length(gl_Position.xyz);
 			//fogFactor = (gl_Fog.end - fogCoord) * gl_Fog.scale; //linear
 			//fogFactor = exp(-gl_Fog.density * fogCoord); //exp
@@ -198,7 +198,7 @@ fragment = [[
 	uniform uint drawFrame; //TODO dblcheck if it works
 
 	uniform vec3 etcLoc;
-	uniform int options;
+	uniform int bitOptions;
 
 
 	/***********************************************************************/
@@ -344,9 +344,9 @@ fragment = [[
 
 		// N - worldFragNormal
 		vec3 N;
-		if (BITMASK_FIELD(options, OPTION_NORMALMAPPING)) {
+		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING)) {
 			vec2 nmUV = modelUV;
-			if (BITMASK_FIELD(options, OPTION_NORMALMAP_FLIP)) {
+			if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAP_FLIP)) {
 				nmUV.y = 1.0 - nmUV.y;
 			}
 			vec3 tbnNormal = normalize(NORM2SNORM(texture(normalTex, nmUV).xyz));
@@ -382,7 +382,7 @@ fragment = [[
 		// shadows
 		float nShadow = smoothstep(0.0, 0.35, NdotLu); //normal based shadowing, always on
 		float gShadow = 1.0; // shadow mapping
-		if (BITMASK_FIELD(options, OPTION_SHADOWMAPPING)) {
+		if (BITMASK_FIELD(bitOptions, OPTION_SHADOWMAPPING)) {
 			gShadow = GetShadowPCFRandom(NdotL);
 		}
 		float shadow = min(nShadow, gShadow);
@@ -390,21 +390,20 @@ fragment = [[
 
 		// ambient occlusion
 		float ao = 1.0;
-		if (BITMASK_FIELD(options, OPTION_VERTEX_AO)) {
+		if (BITMASK_FIELD(bitOptions, OPTION_VERTEX_AO)) {
 			ao = aoTerm;
 		}
 
 		// light
 		vec3 lightAmbient = ao * sunAmbient;
 		vec3 lightDiffuse = NdotL * sunDiffuse;
-		vec3 lightAD = lightAmbient + lightDiffuse;
 
 		// sunSpecularParams = (exponent, multiplier, bias)
 		vec3 lightSpecular = sunSpecular * pow(HdotN, sunSpecularParams.x);
 		lightSpecular *= sunSpecularParams.z + texColor2.g * sunSpecularParams.y;
 
 		// apply shadows
-		lightAD = mix(lightAmbient, lightAD, shadowMult);
+		vec3 lightAD = lightAmbient + lightDiffuse * shadowMult;
 		lightSpecular *= shadowMult;
 
 		// environment reflection
@@ -413,7 +412,7 @@ fragment = [[
 
 		// emissive color
 		vec3 emissiveMult = texColor2.rrr;
-		if (BITMASK_FIELD(options, OPTION_FLASHLIGHTS)) {
+		if (BITMASK_FIELD(bitOptions, OPTION_FLASHLIGHTS)) {
 			emissiveMult *= selfIllumMod;
 		}
 
@@ -422,7 +421,7 @@ fragment = [[
 		finalColor = mix(texColor1.rgb, teamColor.rgb, texColor1.a); //mix diffuse texture with team color
 		finalColor = finalColor.rgb * (lightADR + emissiveMult) + lightSpecular;
 
-		if (BITMASK_FIELD(options, OPTION_UNITSFOG)) {
+		if (BITMASK_FIELD(bitOptions, OPTION_UNITSFOG)) {
 			finalColor = mix(gl_Fog.color.rgb, finalColor, fogFactor);
 		}
 
@@ -562,16 +561,20 @@ local function ProcessOptions(optTable, optName, optValue)
 end
 
 local function ApplyOptions(luaShader, optionsTbl)
+	--Spring.Echo("ApplyOptions", luaShader, optionsTbl)
+	--Spring.Utilities.TableEcho(optionsTbl, "optionsTbl")
 	local intOption = 0
-	for name, value in pairs(optionsTbl) do
+	for optName, optValue in pairs(optionsTbl) do
 		if knownBitOptions[optName] then --boolean
-			intOption = EncodeBitmaskField(intOption, value, knownBitOptions[optName]) --encode options into Int.
+			intOption = EncodeBitmaskField(intOption, optValue, knownBitOptions[optName]) --encode options into Int.
 		elseif knownIntOptions[optName] then --integer
 			--TODO
 		elseif knownFloatOptions[optName] then --float
 			--TODO
 		end
 	end
+	Spring.Echo("intOption", intOption)
+	luaShader:SetUniformInt("bitOptions", intOption)
 end
 
 defaultMaterialTemplate.ProcessOptions = ProcessOptions

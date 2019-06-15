@@ -28,10 +28,11 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
 if (gadgetHandler:IsSyncedCode()) then
 	return
 end
+
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -62,15 +63,12 @@ local LuaShader = VFS.Include(LUASHADER_DIR .. "LuaShader.lua")
 -- Global Variables
 -----------------------------------------------------------------
 
-local advShading = false
+--these two have no callin to detect change of state
+local advShading
+local shadows
 
 local sunChanged = false
 local optionsChanged = true --just in case
-
-local shadows = false
-local normalmapping = true
-local treewind = false
-
 
 local idToDefID = {}
 
@@ -168,7 +166,8 @@ local function _CompileShader(shader, definitions, plugins, addName)
 	--// append definitions at top of the shader code
 	--// (this way we can modularize a shader and enable/disable features in it)
 	definitions = definitions or {}
-	hasVersion = false
+
+	local hasVersion = false
 	for _, def in pairs(definitions) do
 		hasVersion = hasVersion or string.sub(def,1,string.len("#version")) == "#version"
 	end
@@ -278,21 +277,19 @@ local function _CompileMaterialShaders(rendering)
 	end
 end
 
-local function CompileMaterialShaders()
-	for _, rendering in ipairs(allRendering) do
-		_CompileMaterialShaders(rendering)
-	end
-end
-
 local function _ProcessOptions(optName, optValue, playerID)
+	Spring.Echo(optName, optValue, playerID)
 	if (playerID ~= Spring.GetMyPlayerID()) then
 		return
 	end
 	for _, rendering in ipairs(allRendering) do
 		for matName, matTable in pairs(rendering.materialDefs) do
 			if matTable.ProcessOptions then
-				optionsChanged = optionsChanged or matTable.ProcessOptions(matTable.shaderOptions, optName, optValue)
-				optionsChanged = optionsChanged or matTable.ProcessOptions(matTable.deferredOptions, optName, optValue)
+				local optionsChanged1 = matTable.ProcessOptions(matTable.shaderOptions, optName, optValue)
+				local optionsChanged2 = matTable.ProcessOptions(matTable.deferredOptions, optName, optValue)
+				--Spring.Utilities.TableEcho(matTable.shaderOptions, "matTable.shaderOptions")
+				--Spring.Utilities.TableEcho(matTable.deferredOptions, "matTable.deferredOptions")
+				optionsChanged = optionsChanged or optionsChanged1 or optionsChanged2
 			end
 		end
 	end
@@ -368,18 +365,16 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function ResetUnit(unitID)
+local function _ResetUnit(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	gadget:RenderUnitDestroyed(unitID, unitDefID)
-	Spring.UnitRendering.DeactivateMaterial(unitID, 3)
 	if not select(3, Spring.GetUnitIsStunned(unitID)) then --// inbuild?
 		gadget:UnitFinished(unitID,unitDefID)
 	end
 end
 
-local function ResetFeature(featureID)
+local function _ResetFeature(featureID)
 	gadget:FeatureDestroyed(featureID)
-	Spring.FeatureRendering.DeactivateMaterial(featureID, 3)
 	gadget:FeatureCreated(featureID)
 end
 
@@ -448,44 +443,33 @@ local function _ProcessMaterials(rendering, materialDefs)
 end
 
 
-local function ToggleShadows()
-
-	shadows = Spring.HaveShadows()
-
-	--unitRendering.bufMaterials = {}
+local function BindMaterials()
 	local units = Spring.GetAllUnits()
 	for _, unitID in pairs(units) do
-		ResetUnit(unitID)
+		_ResetUnit(unitID)
 	end
 
-	--featureRendering.bufMaterials = {}
 	local features = Spring.GetAllFeatures()
 	for _, featureID in pairs(features) do
-		ResetFeature(featureID)
+		_ResetFeature(featureID)
 	end
 
 end
 
-
 local function ToggleAdvShading()
-	advShading = Spring.HaveAdvShading()
-
 	if (not advShading) then
 		--// unload all materials
 		unitRendering.drawList = {}
 		local units = Spring.GetAllUnits()
 		for _,unitID in pairs(units) do
-			ResetUnit(unitID)
+			_ResetUnit(unitID)
 		end
 
 		featureRendering.drawList = {}
 		local features = Spring.GetAllFeatures()
 		for _, featureID in pairs(features) do
-			ResetFeature(featureID)
+			_ResetFeature(featureID)
 		end
-	elseif (normalmapping) then
-		--// reinitializes all shaders
-		--ToggleShadows()
 	end
 end
 
@@ -505,21 +489,23 @@ local function ObjectFinished(rendering, objectID, objectDefID)
 	local objectMat = rendering.materialInfos[objectDefID]
 	if objectMat then
 		local mat = rendering.materialDefs[objectMat[1]]
-		if (normalmapping or mat.force) then
-			rendering.spActivateMaterial(objectID, 3)
-			rendering.spSetMaterial(objectID, 3, "opaque", GetObjectMaterial(rendering, objectDefID))
-			for pieceID in ipairs(rendering.spGetObjectPieceList(objectID) or {}) do
-				rendering.spSetPieceList(objectID, 3, pieceID)
-			end
-			local DrawObject = mat[rendering.DrawObject]
-			local ObjectCreated = mat[rendering.ObjectCreated]
-			if DrawObject then
-				rendering.spSetObjectLuaDraw(objectID, true)
-				rendering.drawList[objectID] = mat
-			end
-			if ObjectCreated then
-				ObjectCreated(objectID, mat, 3)
-			end
+
+		rendering.spActivateMaterial(objectID, 3)
+		rendering.spSetMaterial(objectID, 3, "opaque", GetObjectMaterial(rendering, objectDefID))
+		for pieceID in ipairs(rendering.spGetObjectPieceList(objectID) or {}) do
+			rendering.spSetPieceList(objectID, 3, pieceID)
+		end
+
+		local DrawObject = mat[rendering.DrawObject]
+		local ObjectCreated = mat[rendering.ObjectCreated]
+
+		if DrawObject then
+			rendering.spSetObjectLuaDraw(objectID, true)
+			rendering.drawList[objectID] = mat
+		end
+
+		if ObjectCreated then
+			ObjectCreated(objectID, mat, 3)
 		end
 	end
 end
@@ -574,15 +560,26 @@ function gadget:DrawGenesis()
 		for _, mat in pairs(rendering.materialDefs) do
 			local SunChangedFunc = (sunChanged and mat.SunChanged) or nil
 			local DrawGenesisFunc = mat.DrawGenesis
+			local ApplyOptionsFunc = mat.ApplyOptions
 
-			if SunChangedFunc or DrawGenesisFunc then
-				for _, shaderObject in pairs({mat.standardShaderObj, mat.deferredShaderObj}) do
+			if SunChangedFunc or DrawGenesisFunc or (optionsChanged and ApplyOptionsFunc) then
+				for key, shaderObject in pairs({mat.standardShaderObj, mat.deferredShaderObj}) do
 					shaderObject:ActivateWith( function ()
+
 						if SunChangedFunc then
 							SunChangedFunc(shaderObject)
 						end
+
 						if DrawGenesisFunc then
 							DrawGenesisFunc(shaderObject)
+						end
+
+						if ApplyOptionsFunc then
+							local optionsTables = {mat.shaderOptions, mat.deferredOptions}
+							if optionsTables[key] then
+								--Spring.Utilities.TableEcho(optionsTables[key], tostring(key))
+								ApplyOptionsFunc(shaderObject, optionsTables[key])
+							end
 						end
 					end)
 				end
@@ -594,7 +591,9 @@ function gadget:DrawGenesis()
 		sunChanged = false
 	end
 
-	sunChanged = false
+	if optionsChanged then
+		optionsChanged = false
+	end
 end
 
 -----------------------------------------------------------------
@@ -603,18 +602,27 @@ end
 local n = -1
 local init = true
 function gadget:Update()
-	if init then
-		ToggleShadows()
+	if init then --because BindMaterials() doesn't work in Initialize(). WTF...
+		BindMaterials()
 		init = true
 	end
 	if (n < Spring.GetDrawFrame()) then
 		n = Spring.GetDrawFrame() + Spring.GetFPS()
 
-		if (advShading ~= Spring.HaveAdvShading()) then
+		local advShadingNow = Spring.HaveAdvShading()
+		local shadowsNow = Spring.HaveShadows()
+
+		if (advShading ~= advShadingNow) then
+			advShading = advShadingNow
 			ToggleAdvShading()
-		elseif advShading and normalmapping and shadows ~= Spring.HaveShadows() then
-			--ToggleShadows()
 		end
+
+		if (shadows ~= shadowsNow) then
+			shadows = shadowsNow
+			Spring.Echo("shadows ~= shadowsNow")
+			_ProcessOptions("shadowmapping", shadows, Spring.GetMyPlayerID())
+		end
+
 	end
 end
 
@@ -694,16 +702,9 @@ function gadget:Initialize()
 	_ProcessMaterials(unitRendering,    unitMaterialDefs)
 	_ProcessMaterials(featureRendering, featureMaterialDefs)
 
-	--// material initialization
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		ResetUnit(unitID)
-	end
-	for _, featureID in ipairs(Spring.GetAllFeatures()) do
-		ResetFeature(featureID)
-	end
-	
+	advShading = Spring.HaveAdvShading()
 
-	local shadows = Spring.HaveShadows()
+	shadows = Spring.HaveShadows()
 	local normalmapping = tonumber(Spring.GetConfigInt("NormalMapping", 1) or 0) > 0
 	local treewind = tonumber(Spring.GetConfigInt("TreeWind", 1) or 1) > 0
 
@@ -716,17 +717,25 @@ function gadget:Initialize()
 	local seenOptions = {}
 	for _, rendering in ipairs(allRendering) do
 		for matName, matTable in pairs(rendering.materialDefs) do
-			local optTableStd = Spring.Utilities.MergeWithDefault(matTable.shaderOptions, commonOptions)
-			local optTableDef = Spring.Utilities.MergeWithDefault(matTable.deferredOptions, commonOptions)
+			for optName, optValue in pairs(commonOptions) do
 
-			for opt, _ in pairs(optTableStd) do
+				if matTable.shaderOptions[optName] and not optValue then -- shader options set to true, but user setting is false
+					matTable.shaderOptions[optName] = optValue
+				end
+
+				if matTable.deferredOptions[optName] and not optValue then -- shader options set to true, but user setting is false
+					matTable.deferredOptions[optName] = optValue
+				end
+			end
+
+			for opt, _ in pairs(matTable.shaderOptions) do
 				if not seenOptions[opt] then
 					seenOptions[opt] = true
 					gadgetHandler:AddChatAction(opt, _ProcessOptions)
 				end
 			end
 
-			for opt, _ in pairs(optTableDef) do
+			for opt, _ in pairs(matTable.deferredOptions) do
 				if not seenOptions[opt] then
 					seenOptions[opt] = true
 					gadgetHandler:AddChatAction(opt, _ProcessOptions)
