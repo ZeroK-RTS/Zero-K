@@ -125,7 +125,9 @@ vertex = [[
 
 		if (BITMASK_FIELD(bitOptions, OPTION_UNITSFOG)) {
 			float fogCoord = length(gl_Position.xyz);
-			//fogFactor = (gl_Fog.end - fogCoord) * gl_Fog.scale; //linear
+			fogFactor = (gl_Fog.end - fogCoord) * gl_Fog.scale; //linear
+
+			// these two don't work correctly as they should
 			//fogFactor = exp(-gl_Fog.density * fogCoord); //exp
 			//fogFactor = exp(-pow((gl_Fog.density * fogCoord), 2.0)); //exp2
 
@@ -183,7 +185,7 @@ fragment = [[
 	uniform vec3 sunDiffuse;
 	uniform vec3 sunAmbient;
 	uniform vec3 sunSpecular;
-	uniform vec3 sunSpecularParams = vec3(18.0, 4.0, 0.0); // Exponent, multiplier, bias
+	uniform vec3 sunSpecularParams; // Exponent, multiplier, bias
 
 
 	/***********************************************************************/
@@ -288,7 +290,7 @@ fragment = [[
 		float shadow = 0.0;
 
 		vec3 shadowCoord = shadowVertexPos.xyz / shadowVertexPos.w;
-		int presetIndex = clamp(shadowsQuality, 0, SHADOW_QUALITY_PRESETS);
+		int presetIndex = clamp(shadowsQuality, 0, SHADOW_QUALITY_PRESETS - 1);
 
 		float samplingRandomness = shadowQualityPresets[presetIndex].samplingRandomness;
 		float samplingDistance = shadowQualityPresets[presetIndex].samplingDistance;
@@ -312,7 +314,6 @@ fragment = [[
 				shadow += texture( shadowTex, shadowSamplingCoord );
 			}
 			shadow /= float(shadowSamples);
-			//shadow *= 1.0 - smoothstep(shadow, 1.0,  0.2);
 		} else { //shadowSamples == 0
 			const float cb = 0.00005;
 			float bias = cb * tan(acos(NdotL));
@@ -541,39 +542,56 @@ local function EncodeBitmaskField(bitmask, option, position)
 	return math.bit_or(bitmask, ((option and 1) or 0) * math.floor(2 ^ position))
 end
 
-local function ProcessOptions(optTable, optName, optValue)
+local function ProcessOptions(optTable, optName, optValues)
 	local handled = false
 	if knownBitOptions[optName] then --boolean
+		local optValue = tonumber(unpack(optValues or {}) or nil)
+		--Spring.Echo(optName, "optValue", optValue)
 		if optValue then
-			optTable[optName] = optValue
+			optTable[optName] = (optValue > 0) and true or false
 		else
 			optTable[optName] = not optTable[optName] -- apparently `not nil` == true
 		end
 		handled = true
 	elseif knownIntOptions[optName] then --integer
 		--TODO
-		handled = true
+		--handled = true
 	elseif knownFloatOptions[optName] then --float
 		--TODO
-		handled = true
+		--handled = true
 	end
 	return handled
 end
 
 local function ApplyOptions(luaShader, optionsTbl)
-	--Spring.Echo("ApplyOptions", luaShader, optionsTbl)
-	--Spring.Utilities.TableEcho(optionsTbl, "optionsTbl")
 	local intOption = 0
+
+	--Spring.Utilities.TableEcho(optionsTbl, "optionsTbl")
+
 	for optName, optValue in pairs(optionsTbl) do
 		if knownBitOptions[optName] then --boolean
+
 			intOption = EncodeBitmaskField(intOption, optValue, knownBitOptions[optName]) --encode options into Int.
+
 		elseif knownIntOptions[optName] then --integer
-			--TODO
+
+			if type(optValue) == "number" then
+				luaShader:SetUniformInt(optName, optValue)
+			elseif type(optValue) == "table" and knownIntOptions[optName] == #optValue then
+				luaShader:SetUniformInt(optName, unpack(optValue))
+			end
+
 		elseif knownFloatOptions[optName] then --float
-			--TODO
+
+			if type(optValue) == "number" then
+				luaShader:SetUniformFloat(optName, optValue)
+			elseif type(optValue) == "table" and knownFloatOptions[optName] == #optValue then
+				luaShader:SetUniformFloat(optName, unpack(optValue))
+			end
+
 		end
 	end
-	Spring.Echo("intOption", intOption)
+
 	luaShader:SetUniformInt("bitOptions", intOption)
 end
 

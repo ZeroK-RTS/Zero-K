@@ -277,16 +277,21 @@ local function _CompileMaterialShaders(rendering)
 	end
 end
 
-local function _ProcessOptions(optName, optValue, playerID)
-	Spring.Echo(optName, optValue, playerID)
+local function _ProcessOptions(optName, _, optValues, playerID)
+	if type(optValues) ~= "table" then
+		optValues = {optValues}
+	end
+
+	Spring.Utilities.TableEcho({optName, optValues, playerID}, "_ProcessOptions")
+
 	if (playerID ~= Spring.GetMyPlayerID()) then
 		return
 	end
 	for _, rendering in ipairs(allRendering) do
 		for matName, matTable in pairs(rendering.materialDefs) do
 			if matTable.ProcessOptions then
-				local optionsChanged1 = matTable.ProcessOptions(matTable.shaderOptions, optName, optValue)
-				local optionsChanged2 = matTable.ProcessOptions(matTable.deferredOptions, optName, optValue)
+				local optionsChanged1 = matTable.ProcessOptions(matTable.shaderOptions, optName, optValues)
+				local optionsChanged2 = matTable.ProcessOptions(matTable.deferredOptions, optName, optValues)
 				--Spring.Utilities.TableEcho(matTable.shaderOptions, "matTable.shaderOptions")
 				--Spring.Utilities.TableEcho(matTable.deferredOptions, "matTable.deferredOptions")
 				optionsChanged = optionsChanged or optionsChanged1 or optionsChanged2
@@ -568,6 +573,7 @@ function gadget:DrawGenesis()
 
 						if SunChangedFunc then
 							SunChangedFunc(shaderObject)
+							sunChanged = false
 						end
 
 						if DrawGenesisFunc then
@@ -577,22 +583,14 @@ function gadget:DrawGenesis()
 						if ApplyOptionsFunc then
 							local optionsTables = {mat.shaderOptions, mat.deferredOptions}
 							if optionsTables[key] then
-								--Spring.Utilities.TableEcho(optionsTables[key], tostring(key))
 								ApplyOptionsFunc(shaderObject, optionsTables[key])
 							end
+							optionsChanged = false
 						end
 					end)
 				end
 			end
 		end
-	end
-
-	if sunChanged then
-		sunChanged = false
-	end
-
-	if optionsChanged then
-		optionsChanged = false
 	end
 end
 
@@ -619,8 +617,7 @@ function gadget:Update()
 
 		if (shadows ~= shadowsNow) then
 			shadows = shadowsNow
-			Spring.Echo("shadows ~= shadowsNow")
-			_ProcessOptions("shadowmapping", shadows, Spring.GetMyPlayerID())
+			_ProcessOptions("shadowmapping", nil, shadows, Spring.GetMyPlayerID())
 		end
 
 	end
