@@ -251,6 +251,7 @@ local function DrawOutline(strength, loadTextures, drawWorld)
 	gl.Blending("alpha")
 
 	applicationShader:ActivateWith( function ()
+		--applicationShader:SetUniformFloat("alwaysShowOutLine", (drawWorld and 1.0) or 0.0)
 		applicationShader:SetUniformFloat("alwaysShowOutLine", 0.0)
 		applicationShader:SetUniformFloat("strength", strength)
 		gl.CallList(screenWideList)
