@@ -39,14 +39,17 @@ options_path = 'Settings/Interface/Map/Reclaimables'
 options_order = { 'showhighlight', 'pregamehighlight', 'minmetal'}
 options = {
 	showhighlight = {
-		name = 'Show Reclaim on Economy Overlay',
+		name = 'Show Reclaim',
 		desc = "When to highlight reclaimable features",
 		type = 'radioButton',
 		value = 'constructors',
 		items = {
 			{key ='always', name='Always'},
-			{key ='constructors', name='When Constructor Selected'},
-			{key ='reclaiming', name='When Reclaiming'},
+			{key ='withecon', name='With the Economy Overlay'},
+			{key ='constructors',  name='With Constructors Selected'},
+			{key ='conorecon',  name='With Constructors or Overlay'},
+			{key ='conandecon',  name='With Constructors and Overlay'},
+			{key ='reclaiming',  name='When Reclaiming'},
 		},
 		noHotkey = true,
 	},
@@ -100,10 +103,14 @@ function widget:Update()
 
 	local pregame = (spGetGameFrame() < 1)
 
+-- ways to bypass heavy resource load in economy overlay
 	local enableCondNew =
-		(pregame and options.pregamehighlight.value) or hilite
-		or (options.showhighlight.value == 'always' and spGetMapDrawMode() ~= 'metal')
-		or (conSelected and options.showhighlight.value == "constructors")
+(pregame and options.pregamehighlight.value) or hilite 
+or (options.showhighlight.value == 'always')
+or (options.showhighlight.value == 'withecon' and WG.showeco)
+or (options.showhighlight.value == "constructors" and conSelected)
+or (options.showhighlight.value == 'conorecon' and (conSelected or WG.showeco))
+or (options.showhighlight.value == 'conandecon' and (conSelected and WG.showeco))
 
 	if enableCondNew and minMetalShownOld ~= minMetalShownNew then
 		minMetalShownOld = minMetalShownNew
