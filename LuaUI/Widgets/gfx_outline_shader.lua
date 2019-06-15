@@ -125,6 +125,12 @@ options = {
 			end
 		end,
 	},
+	drawUnderCeg = {
+		name = 'Draw through effects',
+		desc = 'Reduces the screen space width of outlines when zoomed out.',
+		type = 'bool',
+		value = false,
+	},
 }
 
 -----------------------------------------------------------------
@@ -245,7 +251,7 @@ local function DrawOutline(strength, loadTextures, drawWorld)
 	gl.Blending("alpha")
 
 	applicationShader:ActivateWith( function ()
-		applicationShader:SetUniformFloat("alwaysShowOutLine", (drawWorld and 1.0) or 0.0)
+		applicationShader:SetUniformFloat("alwaysShowOutLine", 0.0)
 		applicationShader:SetUniformFloat("strength", strength)
 		gl.CallList(screenWideList)
 	end)
@@ -447,7 +453,9 @@ function widget:Shutdown()
 end
 
 function widget:DrawWorld()
-	EnterLeaveScreenSpace(DrawOutline, OUTLINE_STRENGTH_ALWAYS_ON, true, true)
+	if options.drawUnderCeg.value then
+		EnterLeaveScreenSpace(DrawOutline, OUTLINE_STRENGTH_ALWAYS_ON, true, true)
+	end
 end
 
 function widget:DrawUnitsPostDeferred()
