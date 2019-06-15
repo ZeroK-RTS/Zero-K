@@ -373,8 +373,8 @@ local function _LoadMaterialConfigFiles(path)
 
 	for i = 1, #files do
 		local mats, unitMats = VFS.Include(files[i])
-
 		for k, v in pairs(mats) do
+		-- Spring.Echo(files[i],'is a feature?',v.feature)
 			local rendering
 			if v.feature then
 				rendering = featureRendering
@@ -385,7 +385,6 @@ local function _LoadMaterialConfigFiles(path)
 				rendering.materialDefs[k] = v
 			end
 		end
-
 		for k, v in pairs(unitMats) do
 			--// we check if the material is defined as a unit or as feature material (one namespace for both!!)
 			local materialDefs
@@ -819,15 +818,8 @@ function gadget:Initialize()
 
 	--// insert synced actions
 	--gadgetHandler:AddSyncAction("unitshaders_reverse", UnitReverseBuilt)
-
 	--gadgetHandler:AddChatAction("normalmapping", ToggleNormalmapping)
 	--gadgetHandler:AddChatAction("treewind", ToggleTreeWind)
-
-	for _, rendering in ipairs(allRendering) do
-		_CompileMaterialShaders(rendering)
-	end
-
-
 end
 
 --// Workaround: unsynced LuaRules doesn't receive Shutdown events
