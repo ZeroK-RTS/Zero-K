@@ -72,10 +72,12 @@ local optionsChanged = true --just in case
 
 local idToDefID = {}
 
----
--- rendering.materialDefs[matName] = mat_src
--- rendering.bufMaterials[objectDefID] = rendering.spGetMaterial() / luaMat
+--- Main data structures:
+-- rendering.drawList[objectDefID] = mat_src
 -- rendering.materialInfos[objectDefID] = {matName, name = param, name1 = param1}
+-- rendering.bufMaterials[objectDefID] = rendering.spGetMaterial() / luaMat
+-- rendering.materialDefs[matName] = mat_src
+-- rendering.loadedTextures[texname] = true
 ---
 
 local unitRendering = {
@@ -303,6 +305,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local validTexturePrefixes = {
+	["%"] = true,
+	["#"] = true,
+	["!"] = true,
+	["$"] = true
+}
 local function GetObjectMaterial(rendering, objectDefID)
 	local mat = rendering.bufMaterials[objectDefID]
 	if mat then
@@ -332,21 +340,16 @@ local function GetObjectMaterial(rendering, objectDefID)
 	end
 
 	--// materials don't load those textures themselves
-	if (texUnits[1]) then
-		local texdl = gl.CreateList(function()
-			for _,tex in pairs(texUnits) do
-				local prefix = tex.tex:sub(1,1)
-				if    (prefix~="%")
-				   and(prefix~="#")
-				   and(prefix~="!")
-				   and(prefix~="$") then
-					gl.Texture(tex.tex)
-					rendering.loadedTextures[#rendering.loadedTextures+1] = tex.tex
-				end
+	local texdl = gl.CreateList(function() --this stupidity is required, because GetObjectMaterial() is called outside of GL enabled callins
+		for _,tex in pairs(texUnits) do
+			local prefix = tex.tex:sub(1, 1)
+			if validTexturePrefixes[prefix] then
+				gl.Texture(tex.tex)
+				rendering.loadedTextures[tex.tex] = true
 			end
-		end)
-		gl.DeleteList(texdl)
-	end
+		end
+	end)
+	gl.DeleteList(texdl)
 
 	local luaMat = rendering.spGetMaterial("opaque", {
 		standardshader = mat.standardShader,
@@ -374,7 +377,7 @@ local function _ResetUnit(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	gadget:RenderUnitDestroyed(unitID, unitDefID)
 	if not select(3, Spring.GetUnitIsStunned(unitID)) then --// inbuild?
-		gadget:UnitFinished(unitID,unitDefID)
+		gadget:UnitFinished(unitID, unitDefID)
 	end
 end
 
@@ -517,8 +520,8 @@ end
 
 
 local function _CleanupTextures(rendering)
-	for i = 1, #rendering.loadedTextures do
-		gl.DeleteTexture(rendering.loadedTextures[i])
+	for tex, _ in pairs(rendering.loadedTextures) do
+		gl.DeleteTexture(tex)
 	end
 	for _, oid in ipairs(rendering.spGetAllObjects()) do
 		rendering.spSetLODCount(oid, 0)
@@ -526,16 +529,15 @@ local function _CleanupTextures(rendering)
 end
 
 local function ObjectDestroyed(rendering, objectID, objectDefID)
-	rendering.spDeactivateMaterial(objectID, 3)
-
 	local mat = rendering.drawList[objectID]
 	if mat then
 		local _ObjectDestroyed = mat[rendering.ObjectDestroyed]
 		if _ObjectDestroyed then
-			_ObjectDestroyed(objectID, 3)
+			_ObjectDestroyed(objectID)
 		end
 		rendering.drawList[objectID] = nil
 	end
+	rendering.spDeactivateMaterial(objectID, 3)
 end
 
 local function DrawObject(rendering, objectID, objectDefID, drawMode)
@@ -637,13 +639,13 @@ function gadget:FeatureCreated(featureID)
 end
 
 function gadget:RenderUnitDestroyed(unitID, unitDefID)
-	idToDefID[unitID] = nil  --not really required
 	ObjectDestroyed(unitRendering, unitID, unitDefID)
+	idToDefID[unitID] = nil  --not really required
 end
 
 function gadget:FeatureDestroyed(featureID)
+	ObjectDestroyed(featureRendering, featureID, idToDefID[-featureID])
 	idToDefID[-featureID] = nil --not really required
-	ObjectDestroyed(featureRendering, featureID, Spring.GetFeatureDefID(featureID))
 end
 
 -----------------------------------------------------------------
@@ -680,10 +682,7 @@ gadget.UnitDecloaked = gadget.UnitFinished
 
 -- NOTE: No feature equivalent (features can't change team)
 function gadget:UnitGiven(unitID, ...)
-	if not select(3, Spring.GetUnitIsStunned(unitID)) then
-		gadget:RenderUnitDestroyed(unitID, ...)
-		gadget:UnitFinished(unitID, ...)
-	end
+	_ResetUnit(unitID)
 end
 
 -----------------------------------------------------------------

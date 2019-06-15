@@ -560,6 +560,7 @@ local function ProcessOptions(optTable, optName, optValues)
 		--TODO
 		--handled = true
 	end
+	Spring.Echo("ProcessOptions")
 	return handled
 end
 
@@ -592,6 +593,7 @@ local function ApplyOptions(luaShader, optionsTbl)
 		end
 	end
 
+	Spring.Echo("ApplyOptions")
 	luaShader:SetUniformInt("bitOptions", intOption)
 end
 
