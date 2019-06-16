@@ -126,6 +126,7 @@ local spSetUnitTarget = Spring.SetUnitTarget
 local CMD_ATTACK = CMD.ATTACK
 local CMD_REMOVE = CMD.REMOVE
 local CMD_OPT_META = CMD.OPT_META
+local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 
 -- Keep local reference to engine's CallAsUnit/WaitForMove/WaitForTurn,
 -- as we overwrite them with (safer) framework version later on.
@@ -661,7 +662,7 @@ local function Wrap_EndBurst(unitID, callins)
 		end
 
 		local cmdID, cmdOpt, cmdTag, cmdParam1, cmdParam2, cmdParam3 = spGetUnitCurrentCommand(unitID)
-		if cmdID ~= CMD_ATTACK or floor(cmdOpt / CMD_OPT_META) % 2 == 0 then
+		if cmdID ~= CMD_ATTACK or not Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_META) then
 			-- FIXME: jinking/kiting units might get a move command inserted in front (tested with gator)
 			return
 		end
@@ -671,11 +672,17 @@ local function Wrap_EndBurst(unitID, callins)
 			return
 		end
 
-		--[[ Unit keeps shooting otherwise; doesn't seem to affect Set Target negatively though.
-		     Has to be before REMOVE because else if there's 2 commands in a row, the unit already
-		     starts doing the second command by the time the target it set to nil ]]
-		spSetUnitTarget(unitID, nil)
-		spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0) -- fixme: some way to make the command "finish" instead of remove (for repeat state)
+		if Spring.Utilities.GetUnitRepeat(unitID) then
+			spSetUnitTarget(unitID, nil)
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0)
+			spGiveOrderToUnit(unitID, CMD_ATTACK, {cmdParam1, cmdParam2, cmdParam3}, Spring.Utilities.AndBit(cmdOpt, CMD_OPT_SHIFT))
+		else
+			--[[ Unit keeps shooting otherwise; doesn't seem to affect Set Target negatively though.
+			     Has to be before REMOVE because else if there's 2 commands in a row, the unit already
+			     starts doing the second command by the time the target it set to nil ]]
+			spSetUnitTarget(unitID, nil)
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0)
+		end
 	end
 
 	callins.EndBurst = function(weaponNum)
