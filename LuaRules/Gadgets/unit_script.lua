@@ -665,7 +665,7 @@ local function Wrap_EndBurst(unitID, callins)
 		local cmdID, cmdOpt, cmdTag, cmdParam1, cmdParam2, cmdParam3, cmdParam4 = spGetUnitCurrentCommand(unitID)
 		-- Some methods of issuing attack commands with Ctrl held do not have Ctrl show up in the opts. 
 		-- In these cases widgets add Meta to opts.
-		local singleTarget = (cmdID == CMD.ATTACK and (Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_CTRL) or Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_META) or cmdParam4 == 0))
+		local singleTarget = (cmdID == CMD.ATTACK and (cmdParam4 or 0) == 0 and (Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_CTRL) or Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_META)))
 		if not singleTarget then
 			-- FIXME: jinking/kiting units might get a move command inserted in front (tested with gator)
 			return
