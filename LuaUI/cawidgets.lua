@@ -202,6 +202,7 @@ local flexCallIns = {
   'DrawGenesis',
   'DrawWorld',
   'DrawWorldPreUnit',
+  'DrawWorldPreParticles',
   'DrawWorldShadow',
   'DrawWorldReflection',
   'DrawWorldRefraction',
@@ -228,6 +229,7 @@ local reverseCallIns = {
   'DrawGenesis',
   'DrawWorld',
   'DrawWorldPreUnit',
+  'DrawWorldPreParticles',
   'DrawWorldShadow',
   'DrawWorldReflection',
   'DrawWorldRefraction',
@@ -1619,6 +1621,15 @@ function widgetHandler:DrawWorldPreUnit()
   for _,w in r_ipairs(self.DrawWorldPreUnitList) do
     gl.Fog(true)
     w:DrawWorldPreUnit()
+  end
+  gl.Fog(false)
+end
+
+
+function widgetHandler:DrawWorldPreParticles()
+  for _,w in r_ipairs(self.DrawWorldPreParticlesList) do
+    gl.Fog(true)
+    w:DrawWorldPreParticles()
   end
   gl.Fog(false)
 end
