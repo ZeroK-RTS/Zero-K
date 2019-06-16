@@ -1,12 +1,14 @@
 if not Script.GetSynced() then return end
 
-function gadget:GetInfo() return {
-	name    = "Fire Once command",
-	author  = "Sprung",
-	license = "PD",
-	layer   = 0,
-	enabled = true,
-} end
+function gadget:GetInfo()
+	return {
+		name    = "Fire Once command",
+		author  = "Sprung",
+		license = "PD",
+		layer   = 0,
+		enabled = false,
+	}
+end
 
 VFS.Include ("LuaRules/Configs/customcmds.h.lua", nil, VFS.GAME)
 

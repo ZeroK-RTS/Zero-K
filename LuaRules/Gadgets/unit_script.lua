@@ -126,6 +126,7 @@ local spSetUnitTarget = Spring.SetUnitTarget
 local CMD_ATTACK = CMD.ATTACK
 local CMD_REMOVE = CMD.REMOVE
 local CMD_OPT_META = CMD.OPT_META
+local CMD_OPT_CTRL = CMD.OPT_CTRL
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 
 -- Keep local reference to engine's CallAsUnit/WaitForMove/WaitForTurn,
@@ -661,14 +662,17 @@ local function Wrap_EndBurst(unitID, callins)
 			return
 		end
 
-		local cmdID, cmdOpt, cmdTag, cmdParam1, cmdParam2, cmdParam3 = spGetUnitCurrentCommand(unitID)
-		if cmdID ~= CMD_ATTACK or not Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_META) then
+		local cmdID, cmdOpt, cmdTag, cmdParam1, cmdParam2, cmdParam3, cmdParam4 = spGetUnitCurrentCommand(unitID)
+		-- Some methods of issuing attack commands with Ctrl held do not have Ctrl show up in the opts. 
+		-- In these cases widgets add Meta to opts.
+		local singleTarget = (cmdID == CMD.ATTACK and (Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_CTRL) or Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_META) or cmdParam4 == 0))
+		if not singleTarget then
 			-- FIXME: jinking/kiting units might get a move command inserted in front (tested with gator)
 			return
 		end
 
 		if  (targetType ~= TARGET_UNIT or cmdParam2 or cmdParam1 ~= targetID)
-		and (targetType ~= TARGET_POS  or cmdParam4 or cmdParam1 ~= targetID[1] or cmdParam2 ~= targetID[2] or cmdParam3 ~= targetID[3]) then
+		and (targetType ~= TARGET_POS  or ((cmdParam4 or 0) ~= 0) or cmdParam1 ~= targetID[1] or cmdParam2 ~= targetID[2] or cmdParam3 ~= targetID[3]) then
 			return
 		end
 
