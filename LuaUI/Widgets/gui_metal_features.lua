@@ -113,7 +113,7 @@ local function DrawWorldFunc()
     or (options.showhighlight.value == 'conorecon' and (conSelected or WG.showeco))
     or (options.showhighlight.value == 'conandecon' and (conSelected and WG.showeco)) then 
 
-    gl.PolygonOffset(-2, -2)
+    --gl.PolygonOffset(-2, -2)
     gl.Blending(GL.SRC_ALPHA, GL.ONE)
   
     local timer = widgetHandler:GetHourTimer()

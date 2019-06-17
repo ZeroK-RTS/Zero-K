@@ -12,6 +12,9 @@ vertex = [[
 	#define OPTION_VERTEX_AO 3
 	#define OPTION_FLASHLIGHTS 4
 	#define OPTION_UNITSFOG 5
+	#define OPTION_NORMALMAP_FLIP 6
+	#define OPTION_METAL_HIGHLIGHT 7
+	#define OPTION_TREEWIND 8
 	%%EXTRA_OPTIONS%%
 
 	/***********************************************************************/
@@ -33,9 +36,11 @@ vertex = [[
 	uniform vec3 cameraPos; // world space camera position
 	uniform vec3 cameraDir; // forward vector of camera
 
-	uniform vec3 etcLoc;
+	uniform vec3 rndVec; //engine supplied
 	uniform int simFrame;
+	uniform int drawFrame; //TODO dblcheck if it works
 
+	uniform vec4 floatOptions;
 	uniform int bitOptions;
 
 	%%VERTEX_GLOBAL_NAMESPACE%%
@@ -57,6 +62,7 @@ vertex = [[
 		vec4 shadowVertexPos;
 
 		// auxilary varyings
+		vec4 addColor;
 		float aoTerm;
 		float selfIllumMod;
 		float fogFactor;
@@ -106,7 +112,7 @@ vertex = [[
 			if ( all(bvec4(
 					greaterThanEqual(modelUV, treadBoundaries.xz),
 					lessThanEqual(modelUV, treadBoundaries.yw)))) {
-				modelUV.x += etcLoc.z;
+				modelUV.x += floatOptions.x;
 			}
 		}
 
@@ -116,7 +122,26 @@ vertex = [[
 
 		if (BITMASK_FIELD(bitOptions, OPTION_FLASHLIGHTS)) {
 			// modelMatrix[3][0] + modelMatrix[3][2] are Tx, Tz elements of translation of matrix
-			selfIllumMod = max(-0.2, sin(simFrame * 0.063 + (modelMatrix[3][0] + modelMatrix[3][2]) * 0.1)) + 0.2;
+			selfIllumMod = max(-0.2, sin(simFrame * 0.067 + (modelMatrix[3][0] + modelMatrix[3][2]) * 0.1)) + 0.2;
+		}
+
+		if (BITMASK_FIELD(bitOptions, OPTION_METAL_HIGHLIGHT)) {
+			//	local alpha = (0.25*(intensity/100)) + (0.5 * (intensity/100) * math.abs(1 - (timer * 2) % 2))
+
+			//	local x100  = 100  / (100  + metal)
+			//	local x1000 = 1000 / (1000 + metal)
+			//	local r = 1 - x1000
+			//	local g = x1000 - x100
+			//	local b = x100
+
+			//#define wreckMetal floatOptions.w
+			float wreckMetal = 20.0;
+
+			float alpha = 0.25 + 0.75 * mod(simFrame * 0.022, 1.0);
+			vec2 x100_1000 = vec2(100.0 / (100.0 + wreckMetal), 1000.0 / (1000.0 + wreckMetal));
+			addColor = vec4(1.0 - x100_1000.y, x100_1000.y - x100_1000.x, x100_1000.x, alpha);
+
+			//#undef wreckMetal
 		}
 
 		gl_Position = projectionMatrix * viewMatrix * worldVertexPos;
@@ -127,7 +152,7 @@ vertex = [[
 			float fogCoord = length(gl_Position.xyz);
 			fogFactor = (gl_Fog.end - fogCoord) * gl_Fog.scale; //linear
 
-			// these two don't work correctly as they should
+			// these two don't work correctly as they should. Probably gl_Fog.density is not set correctly
 			//fogFactor = exp(-gl_Fog.density * fogCoord); //exp
 			//fogFactor = exp(-pow((gl_Fog.density * fogCoord), 2.0)); //exp2
 
@@ -148,6 +173,8 @@ fragment = [[
 	#define OPTION_FLASHLIGHTS 4
 	#define OPTION_UNITSFOG 5
 	#define OPTION_NORMALMAP_FLIP 6
+	#define OPTION_METAL_HIGHLIGHT 7
+	#define OPTION_TREEWIND 8
 	%%EXTRA_OPTIONS%%
 
 	/***********************************************************************/
@@ -197,9 +224,9 @@ fragment = [[
 
 	uniform vec3 rndVec; //engine supplied
 	uniform int simFrame;
-	uniform uint drawFrame; //TODO dblcheck if it works
+	uniform int drawFrame; //TODO dblcheck if it works
 
-	uniform vec3 etcLoc;
+	uniform vec4 floatOptions;
 	uniform int bitOptions;
 
 
@@ -226,6 +253,7 @@ fragment = [[
 		vec3 worldTangent;
 		vec3 worldBitangent;
 		vec3 worldNormal;
+
 		// main light vector(s)
 		vec3 worldCameraDir;
 
@@ -236,6 +264,7 @@ fragment = [[
 		vec4 shadowVertexPos;
 
 		// auxilary varyings
+		vec4 addColor;
 		float aoTerm;
 		float selfIllumMod;
 		float fogFactor;
@@ -375,10 +404,10 @@ fragment = [[
 
 		// N.L
 		float NdotLu = dot(N, L);
-		float NdotL = max(NdotLu, 0.0);
+		float NdotL = max(NdotLu, 1e-3);
 
 		// N.H
-		float HdotN = max(dot(N, H), 0.0);
+		float HdotN = max(dot(N, H), 1e-3);
 
 		// shadows
 		float nShadow = smoothstep(0.0, 0.35, NdotLu); //normal based shadowing, always on
@@ -425,6 +454,14 @@ fragment = [[
 		if (BITMASK_FIELD(bitOptions, OPTION_UNITSFOG)) {
 			finalColor = mix(gl_Fog.color.rgb, finalColor, fogFactor);
 		}
+
+		if (BITMASK_FIELD(bitOptions, OPTION_METAL_HIGHLIGHT)) {
+			finalColor = mix(finalColor, addColor.aaa, addColor.rgb);
+		}
+
+		#if 0
+			finalColor = addColor;
+		#endif
 
 		#if (DEFERRED_MODE == 0)
 			fragData[0] = vec4(finalColor, texColor2.a);
@@ -515,6 +552,19 @@ local defaultMaterialTemplate = {
 local shaderPlugins = {
 }
 
+
+--[[
+	#define OPTION_SHADOWMAPPING 0
+	#define OPTION_NORMALMAPPING 1
+	#define OPTION_MOVING_THREADS 2
+	#define OPTION_VERTEX_AO 3
+	#define OPTION_FLASHLIGHTS 4
+	#define OPTION_UNITSFOG 5
+	#define OPTION_NORMALMAP_FLIP 6
+	#define OPTION_METAL_HIGHLIGHT 7
+	#define OPTION_TREEWIND 8
+]]--
+
 -- bit = (index - 1)
 local knownBitOptions = {
 	["shadowmapping"] = 0,
@@ -524,7 +574,8 @@ local knownBitOptions = {
 	["flashlights"] = 4,
 	["unitsfog"] = 5,
 	["normalmap_flip"] = 6,
-	["treewind"] = 6,
+	["metal_highlight"] = 7,
+	["treewind"] = 8,
 }
 
 local knownIntOptions = {
@@ -536,6 +587,7 @@ local knownFloatOptions = {
 	["sunSpecularParams"] = 3,
 }
 
+local allOptions = nil
 
 -- Lua limitations only allow to send 24 bits. Should be enough for now.
 local function EncodeBitmaskField(bitmask, option, position)
@@ -597,7 +649,26 @@ local function ApplyOptions(luaShader, optionsTbl)
 	luaShader:SetUniformInt("bitOptions", intOption)
 end
 
+local function GetAllOptions()
+	if not allOptions then
+		allOptions = {}
+		for k, _ in pairs(knownBitOptions) do
+			allOptions[k] = true
+		end
+
+		for k, _ in pairs(knownIntOptions) do
+			allOptions[k] = true
+		end
+
+		for k, _ in pairs(knownFloatOptions) do
+			allOptions[k] = true
+		end
+	end
+	return allOptions
+end
+
 defaultMaterialTemplate.ProcessOptions = ProcessOptions
 defaultMaterialTemplate.ApplyOptions = ApplyOptions
+defaultMaterialTemplate.GetAllOptions = GetAllOptions
 
 return defaultMaterialTemplate

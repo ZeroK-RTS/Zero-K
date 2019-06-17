@@ -575,7 +575,6 @@ function gadget:DrawGenesis()
 
 						if SunChangedFunc then
 							SunChangedFunc(shaderObject)
-							sunChanged = false
 						end
 
 						if DrawGenesisFunc then
@@ -587,12 +586,20 @@ function gadget:DrawGenesis()
 							if optionsTables[key] then
 								ApplyOptionsFunc(shaderObject, optionsTables[key])
 							end
-							optionsChanged = false
 						end
+
 					end)
 				end
 			end
 		end
+	end
+
+	if sunChanged then
+		sunChanged = false
+	end
+
+	if optionsChanged then
+		optionsChanged = false
 	end
 end
 
@@ -724,14 +731,8 @@ function gadget:Initialize()
 				end
 			end
 
-			for opt, _ in pairs(matTable.shaderOptions) do
-				if not seenOptions[opt] then
-					seenOptions[opt] = true
-					gadgetHandler:AddChatAction(opt, _ProcessOptions)
-				end
-			end
-
-			for opt, _ in pairs(matTable.deferredOptions) do
+			local allOptions = matTable.GetAllOptions()
+			for opt, _ in pairs(allOptions) do
 				if not seenOptions[opt] then
 					seenOptions[opt] = true
 					gadgetHandler:AddChatAction(opt, _ProcessOptions)
