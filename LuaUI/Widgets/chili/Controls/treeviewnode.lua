@@ -8,7 +8,7 @@ TreeViewNode = Control:Inherit{
 
 	autosize = true,
 	caption   = "node",
-	expanded  = true,
+	expanded  = false,
 	
 	clickTextToToggle = false,
 	root      = false,
