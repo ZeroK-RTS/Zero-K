@@ -1421,6 +1421,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 			externalFunctionsAndData.SetHotkeyActive(not isSelected)
 		end
 		button.backgroundColor[4] = isSelected and 0.8 or 0.4
+		button:Invalidate()
 	end
 	
 	function externalFunctionsAndData.SetFontSize(newSize)
