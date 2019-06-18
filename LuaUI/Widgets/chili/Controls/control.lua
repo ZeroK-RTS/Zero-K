@@ -1313,6 +1313,9 @@ end
 
 
 function Control:DrawForList()
+	--if not self:IsVisibleDescendantByName("screen0") then
+	--	return
+	--end
 	self._redrawCounter = (self._redrawCounter or 0) + 1
 	if (not self._in_update and not self._usingRTT and self:_CheckIfRTTisAppreciated()) then
 		self:InvalidateSelf()

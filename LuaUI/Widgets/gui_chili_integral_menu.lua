@@ -885,13 +885,19 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			return
 		end
 		
-		if text == textBoxes[textPosition].caption then
+		local newVisible = ((text and true) or false)
+		
+		if (not newVisible) and (not textBoxes[textPosition].visible) then
 			return
 		end
+		textBoxes[textPosition]:SetVisibility(newVisible)
 		
-		textBoxes[textPosition]:SetCaption(text or NO_TEXT)
+		if (not newVisible) or (text == textBoxes[textPosition].caption) then
+			return
+		end
+		textBoxes[textPosition]:SetCaption(text)
 	end
-		
+	
 	local externalFunctionsAndData = {
 		button = button,
 		DoClick = DoClick,

@@ -477,7 +477,7 @@ end
 --- Sets the visibility of the object
 -- @bool visible visibility status
 function Object:SetVisibility(visible)
-	if self.visible == visible then
+	if self.visible == ((visible and true) or false) then
 		return
 	end
 	if (visible) then
@@ -660,6 +660,18 @@ function Object:IsDescendantOf(object, _already_unlinked)
 	return false
 end
 
+function Object:IsVisibleDescendantByName(name)
+	if not self.visible then
+		return false
+	end
+	if self.name == name then
+		return true
+	end
+	if (self.parent) then
+		return (self.parent):IsVisibleDescendantByName(name)
+	end
+	return false
+end
 
 function Object:IsAncestorOf(object, _level, _already_unlinked)
 	_level = _level or 1
