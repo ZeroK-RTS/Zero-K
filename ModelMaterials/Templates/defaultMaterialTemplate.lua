@@ -21,6 +21,9 @@ vertex = [[
 	// Definitions
 	#define BITMASK_FIELD(value, pos) ((uint(value) & (1u << uint(pos))) != 0u)
 
+	#define NORM2SNORM(value) (value * 2.0 - 1.0)
+	#define SNORM2NORM(value) (value * 0.5 + 0.5)
+
 	//For a moment let's pretend we have passed OpenGL 2.0 gl_XYZ era
 	#define modelMatrix gl_ModelViewMatrix			// don't trust the ModelView name, it's modelMatrix in fact
 	#define modelNormalMatrix gl_NormalMatrix		// gl_NormalMatrix seems to represent world space model matrix
@@ -137,7 +140,7 @@ vertex = [[
 			//#define wreckMetal floatOptions.w
 			float wreckMetal = 20.0;
 
-			float alpha = 0.25 + 0.75 * mod(simFrame * 0.022, 1.0);
+			float alpha = 0.35 + 0.65 * SNORM2NORM( sin(simFrame * 0.2) );
 			vec2 x100_1000 = vec2(100.0 / (100.0 + wreckMetal), 1000.0 / (1000.0 + wreckMetal));
 			addColor = vec4(1.0 - x100_1000.y, x100_1000.y - x100_1000.x, x100_1000.x, alpha);
 
@@ -456,7 +459,8 @@ fragment = [[
 		}
 
 		if (BITMASK_FIELD(bitOptions, OPTION_METAL_HIGHLIGHT)) {
-			finalColor = mix(finalColor, addColor.aaa, addColor.rgb);
+			//finalColor = mix(finalColor, addColor.aaa, addColor.rgb);
+			finalColor += addColor.a * addColor.rgb;
 		}
 
 		#if 0
