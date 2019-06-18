@@ -35,7 +35,7 @@ Image = Button:Inherit{
 
 	OnClick  = {},
 
-	__nofont = true,
+	noFont = true,
 }
 
 

@@ -28,6 +28,7 @@ ComboBox = Button:Inherit{
 	maxDropDownWidth = 500,
 	minDropDownWidth = 50,
 	topHeight = 7,
+	noFont = false,
 }
 
 local ComboBoxWindow      = Window:Inherit{classname = "combobox_window", resizable = false, draggable = false, }

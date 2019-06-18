@@ -70,6 +70,8 @@ EditBox = Control:Inherit{
 		[Spring.GetKeyCode("f11")] = true,
 		[Spring.GetKeyCode("f12")] = true,
 	},
+
+	noFont = false,
 }
 
 local this = EditBox

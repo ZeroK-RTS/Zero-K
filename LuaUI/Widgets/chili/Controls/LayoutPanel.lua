@@ -70,7 +70,7 @@ LayoutPanel = Control:Inherit{
 	_rows = nil,
 	_columns = nil,
 	_cells = nil,
-	__nofont = true,
+	noFont = true,
 }
 
 local this = LayoutPanel

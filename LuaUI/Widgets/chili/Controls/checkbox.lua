@@ -21,6 +21,7 @@ Checkbox = Control:Inherit{
 	valign    = "linecenter",
 	boxalign  = "right",
 	boxsize   = 10,
+	noFont = false,
 
 	textColor = {0, 0, 0, 1},
 

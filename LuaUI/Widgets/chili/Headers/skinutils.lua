@@ -455,11 +455,11 @@ local function _DrawSelection(x, y, w, h)
 end
 
 local function _GetControlFont(obj)
-		if obj.state.enabled then
-				return obj.font
-		else
-				return obj.disabledFont
-		end
+	if obj.state.enabled or not obj.disabledFont then
+		return obj.font
+	else
+		return obj.disabledFont
+	end
 end
 
 --// ============================================================================= 
@@ -483,7 +483,7 @@ function DrawWindow(obj)
 		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, 0, w, h, skLeft, skTop, skRight, skBottom, tw, th)
 	gl.Texture(0, false)
 
-	if (obj.caption) then
+	if (obj.caption) and not obj.noFont then
 		_GetControlFont(obj):Print(obj.caption, w*0.5, 9, "center")
 	end
 end
@@ -507,7 +507,7 @@ function DrawRepeatingTiledWindow(obj)
 		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawRepeatingTiledTexture, 0, 0, w, h, skLeft, skTop, skRight, skBottom, tw, th)
 	gl.Texture(0, false)
 
-	if (obj.caption) then
+	if (obj.caption) and not obj.noFont then
  		_GetControlFont(obj):Print(obj.caption, w*0.5, 9, "center")
 	end
 end
@@ -563,7 +563,7 @@ function DrawButton(obj)
 		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, 0, w, h, skLeft, skTop, skRight, skBottom, tw, th, 0, obj.disableTiling)
 	gl.Texture(0, false)
 
-	if (obj.caption) then
+	if (obj.caption) and not obj.noFont then
 		local font = _GetControlFont(obj)
 		font:Print(obj.caption, w*0.5 + (obj.captionHorAlign or 0), math.floor(h*0.5 - font.size*0.35) + (obj.captionAlign or 0), "center", "linecenter")
 	end
@@ -1036,7 +1036,7 @@ function DrawCheckbox(obj)
 	gl.Texture(0, false)
 
 	gl.Color(1, 1, 1, 1)
-	if (obj.caption) then
+	if (obj.caption) and not obj.noFont then
 		local font = _GetControlFont(obj)
 		font:Print(obj.caption, tx, ty - font.size*0.35, nil, obj.valign)
 	end
@@ -1087,7 +1087,7 @@ function DrawProgressbar(obj)
 		--gl.ClipPlane(1, false)
 	gl.Texture(0, false)
 
-	if (obj.caption) then
+	if (obj.caption) and not obj.noFont then
 		local font = _GetControlFont(obj)
 		font:Print(obj.caption, x + w*0.5, y + h*0.5 - font.size*0.35 + (obj.fontOffset or 0), "center", "linecenter")
 	end
@@ -1335,7 +1335,7 @@ function DrawTabBarItem(obj)
 		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, 0, w, h, skLeft, skTop, skRight, skBottom, tw, th, 0)
 	gl.Texture(0, false)
 
-	if (obj.caption) then
+	if (obj.caption) and not obj.noFont then
 		local cx, cy, cw, ch = unpack4(obj.clientArea)
 		_GetControlFont(obj):DrawInBox(obj.caption, cx, cy, cw, ch, "center", "center")
 	end

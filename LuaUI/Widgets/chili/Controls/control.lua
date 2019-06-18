@@ -84,8 +84,7 @@ Control = Object:Inherit{
 	OnResize        = {},
 	OnEnableChanged = {},
 
-	-- __nofont should be manually set to true when using this class directly
-	__nofont = false,
+	noFont = true,
 }
 Control.disabledFont = table.merge({ color = {0.8, 0.8, 0.8, 0.8} }, Control.font)
 
@@ -145,17 +144,29 @@ function Control:New(obj)
 
 	-- We don't create fonts for controls that don't need them
 	-- This should drastically use memory usage for some cases
-	if not obj.__nofont then
-		--// create font
-		obj.font = Font:New(obj.font)
-		obj.font:SetParent(obj)
-
-		--// create disabled font
-		obj.disabledFont = Font:New(obj.disabledFont)
-		obj.disabledFont:SetParent(obj)
-	else
+	if obj.noFont then
 		obj.font = nil
 		obj.disabledFont = nil
+	else
+		if obj.objectOverrideFont then
+			obj.font = obj.objectOverrideFont
+		else
+			--// create font
+			obj.font = Font:New(obj.font)
+			obj.font:SetParent(obj)
+		end
+		
+		if obj.hasDisabledFont then
+			if obj.objectOverrideDisabledFont then
+				obj.disabledFont = obj.objectOverrideDisabledFont
+			else
+				--// create disabled font
+				obj.disabledFont = Font:New(obj.disabledFont)
+				obj.disabledFont:SetParent(obj)
+			end
+		else
+			obj.disabledFont = nil
+		end
 	end
 
 	obj:DetectRelativeBounds()
@@ -207,12 +218,12 @@ function Control:Dispose(...)
 
 	inherited.Dispose(self, ...)
 
-	if not self.__nofont then
-		if self.font.SetParent then
+	if (not self.noFont) then
+		if (not self.objectOverrideFont) and self.font and self.font.SetParent then
 			self.font:SetParent()
+		end
+		if (not self.objectOverrideDisabledFont) and self.disabledFont and self.disabledFont.SetParent then
 			self.disabledFont:SetParent()
-		else
-			Spring.Echo("nil self.font:SetParent", self.name)
 		end
 	end
 end

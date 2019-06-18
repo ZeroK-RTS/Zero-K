@@ -87,6 +87,8 @@ end
 configurationName = "Configs/integral_menu_config.lua"
 local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands -- In Initialize = include("Configs/integral_menu_config.lua")
 
+local fontObjects = {} -- Filled in init
+
 local statePanel = {}
 local tabPanel
 local selectionIndex = 0
@@ -745,7 +747,7 @@ end
 --------------------------------------------------------------------------------
 -- Button Panel
 
-local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
+local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 	local cmdID
 	local usingGrid
 	local factoryUnitID
@@ -772,11 +774,13 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	end
 	
 	local button = Button:New {
+		name = name,
 		x = xStr,
 		y = yStr,
 		width = width,
 		height = height,
-		caption = buttonLayout.caption or "",
+		caption = buttonLayout.caption or false,
+		noFont = not buttonLayout.caption,
 		padding = {0, 0, 0, 0},
 		parent = parent,
 		OnClick = {DoClick},
@@ -828,6 +832,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	local function SetImage(texture1, texture2)
 		if not image then
 			image = Image:New {
+				name = name .. "_image",
 				x = buttonLayout.image.x,
 				y = buttonLayout.image.y,
 				right = buttonLayout.image.right,
@@ -864,13 +869,15 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			end
 			local config = textConfig[textPosition]
 			textBoxes[textPosition] = Label:New {
+				name = name .. "_text_" .. config.name,
 				x = config.x,
 				y = config.y,
 				right = config.right,
 				bottom = config.bottom,
 				height = config.height,
 				align = config.align,
-				fontsize = config.fontsize,
+				--fontsize = config.fontsize,
+				objectOverrideFont = fontObjects[config.fontsize],
 				caption = text,
 				parent = button,
 			}
@@ -937,7 +944,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			bottom = "5%",
 			value = proportion,
 			max = 1,
-			color   		= {0.7, 0.7, 0.4, 0.6},
+			color           = {0.7, 0.7, 0.4, 0.6},
 			backgroundColor = {1, 1, 1, 0.01},
 			parent = image,
 			skin = nil,
@@ -1144,7 +1151,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	return externalFunctionsAndData
 end
 
-local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayout, generalIsStructure, onClick, buttonLayoutOverride)
+local function GetButtonPanel(parent, name, rows, columns, vertical, generalButtonLayout, generalIsStructure, onClick, buttonLayoutOverride)
 	local buttons = {}
 	local buttonList = {}
 	
@@ -1194,7 +1201,7 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 			isStructure = buttonLayoutOverride[x][y].isStructure
 		end
 		
-		newButton = GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
+		newButton = GetButton(parent, name .. "_".. x .. "_" .. y, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 		
 		buttonList[#buttonList + 1] = newButton
 		if gridMap and gridEnabled then
@@ -1256,7 +1263,7 @@ local function GetQueuePanel(parent, columns)
 		}
 	}
 	
-	local buttons = GetButtonPanel(parent, 1, columns, false, buttonLayoutConfig.queue, false, nil, buttonLayoutOverride)
+	local buttons = GetButtonPanel(parent, "queuePanel", 1, columns, false, buttonLayoutConfig.queue, false, nil, buttonLayoutOverride)
 
 	function externalFunctions.ClearOldButtons(selectionIndex)
 		buttons.ClearOldButtons(selectionIndex)
@@ -1674,6 +1681,24 @@ end
 --------------------------------------------------------------------------------
 -- Initialization
 
+local function InitializeFonts()
+	local sizes = {12, 14, 16}
+
+	for i = 1, #sizes do
+		fontObjects[sizes[i]] = Chili.Font:New {
+			font          = "FreeSansBold.otf",
+			size          = sizes[i],
+			shadow        = true,
+			outline       = false,
+			outlineWidth  = 3,
+			outlineWeight = 3,
+			color         = {1, 1, 1, 1},
+			outlineColor  = {0, 0, 0, 1},
+			autoOutlineColor = true,
+		}
+	end
+end
+
 local gridKeyMap, gridMap, gridCustomOverrides -- Configuration requires this
 
 local function InitializeControls()
@@ -1775,7 +1800,7 @@ local function InitializeControls()
 		local OnTabSelect
 		
 		data.holder = commandHolder
-		data.buttons = GetButtonPanel(commandHolder, 3, 6,  false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
+		data.buttons = GetButtonPanel(commandHolder, data.name, 3, 6,  false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
 		
 		if data.factoryQueue then
 			local queueHolder = Control:New{
@@ -1810,7 +1835,7 @@ local function InitializeControls()
 	}
 	statePanel.holder:SetVisibility(false)
 	
-	statePanel.buttons = GetButtonPanel(statePanel.holder, 5, 3, true, buttonLayoutConfig.command)
+	statePanel.buttons = GetButtonPanel(statePanel.holder, "statePanel", 5, 3, true, buttonLayoutConfig.command)
 	
 	SetIntegralVisibility(false)
 end
@@ -2071,6 +2096,7 @@ function widget:Initialize()
 	Control = Chili.Control
 	screen0 = Chili.Screen0
 	
+	InitializeFonts()
 	InitializeControls()
 	
 	WG.IntegralMenu = externalFunctions

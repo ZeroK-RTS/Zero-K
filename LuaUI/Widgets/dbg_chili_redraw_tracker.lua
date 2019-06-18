@@ -56,6 +56,11 @@ local updateDefs = {
 		lineWidth = 3,
 		padding = -4,
 	},
+	DrawForList_notVisible = {
+		color = {.96, .25, .05},
+		lineWidth = 12,
+		padding = -4,
+	},
 }
 
 local vsx, vsy, sMidX, sMidY = 0, 0, 0, 0

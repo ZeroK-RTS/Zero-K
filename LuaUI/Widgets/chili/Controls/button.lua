@@ -16,6 +16,7 @@ Button = Control:Inherit{
 
 	align = "center",
 	valign = "center",
+	noFont = false,
 }
 
 local this = Button
