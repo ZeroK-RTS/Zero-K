@@ -771,13 +771,14 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				width = "85%",
 				height = "85%",
 				max = 1,
-				caption = "",
+				caption = false,
+				noFont = true,
 				skin = nil,
 				skinName = 'default',
 				color = {0.7, 0.7, 0.4, 0.6},
 				backgroundColor = {1, 1, 1, 0.01},
-				parent = image,	
-			}	
+				parent = image,
+			}
 		end
 		buildProgress:SetValue(newProgress)
 	end
@@ -813,7 +814,8 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				width   = "100%",
 				height  = "15%",
 				max     = 1,
-				caption = "",
+				caption = false,
+				noFont = true,
 				color   = {0,0.8,0,1},
 				parent  = image,
 			}
