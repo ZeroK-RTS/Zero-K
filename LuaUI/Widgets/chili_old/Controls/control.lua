@@ -57,6 +57,8 @@ Control = Object:Inherit{
   skinName        = nil,
 
   OnResize        = {},
+
+  noFont = true,
 }
 
 local this = Control
@@ -92,9 +94,19 @@ function Control:New(obj)
     obj.height = obj.clientHeight + p[2] + p[4]
   end
 
-  --// create font
-  obj.font = Font:New(obj.font)
-  obj.font:SetParent(obj)
+  -- We don't create fonts for controls that don't need them
+  -- This should drastically use memory usage for some cases
+  if obj.noFont then
+    obj.font = nil
+  else
+    if obj.objectOverrideFont then
+      obj.font = obj.objectOverrideFont
+    else
+      --// create font
+      obj.font = Font:New(obj.font)
+      obj.font:SetParent(obj)
+    end
+  end
 
   obj:DetectRelativeBounds()
   obj:AlignControl()
@@ -129,7 +141,9 @@ function Control:Dispose(...)
   end
 
   inherited.Dispose(self,...)
-  self.font:SetParent()
+  if (not self.noFont) and (not self.objectOverrideFont) and self.font and self.font.SetParent then
+    self.font:SetParent()
+  end
 end
 
 --//=============================================================================

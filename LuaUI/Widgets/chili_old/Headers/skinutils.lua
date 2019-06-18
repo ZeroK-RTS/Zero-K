@@ -292,7 +292,7 @@ function DrawWindow(obj)
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th)
   gl.Texture(0,false)
 
-  if (obj.caption) then
+  if (obj.caption) and not obj.noFont then
     obj.font:Print(obj.caption, x+w*0.5, y+9, "center")
   end
 end
@@ -343,7 +343,7 @@ function DrawButton(obj)
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   gl.Texture(0,false)
 
-  if (obj.caption) then
+  if (obj.caption) and not obj.noFont then
     obj.font:Print(obj.caption, x + w*0.5, y + math.floor(h*0.5 - obj.font.size*0.35), "center", "linecenter")
   end
 end
@@ -789,7 +789,7 @@ function DrawCheckbox(obj)
   gl.Texture(0,false)
 
   gl.Color(1,1,1,1)
-  if (obj.caption) then
+  if (obj.caption) and not obj.noFont then
     obj.font:Print(obj.caption, obj.x + tx, obj.y + ty  - obj.font.size*0.35, nil, "linecenter")
   end
 end
@@ -839,7 +839,7 @@ function DrawProgressbar(obj)
     --gl.ClipPlane(1, false)
   gl.Texture(0,false)
 
-  if (obj.caption) then
+  if (obj.caption) and not obj.noFont then
     (obj.font):Print(obj.caption, x+w*0.5, y+h*0.5 - obj.font.size*0.35 + (obj.fontOffset or 0), "center", "linecenter")
   end
 end
@@ -1081,7 +1081,7 @@ function DrawTabBarItem(obj)
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   gl.Texture(0,false)
 
-  if (obj.caption) then
+  if (obj.caption) and not obj.noFont then
     local cx,cy,cw,ch = unpack4(obj.clientArea)
     obj.font:DrawInBox(obj.caption, x + cx, y + cy, cw, ch, "center", "center")
   end

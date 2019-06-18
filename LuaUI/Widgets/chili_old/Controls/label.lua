@@ -14,6 +14,7 @@ Label = Control:Inherit{
   align    = "left",
   valign   = "linecenter", --// usefull too "ascender"
   caption  = "no text",
+  noFont = false,
 }
 
 local this = Label

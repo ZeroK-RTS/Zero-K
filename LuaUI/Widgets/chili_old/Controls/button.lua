@@ -5,6 +5,7 @@ Button = Control:Inherit{
   caption  = 'button',
   defaultWidth  = 70,
   defaultHeight = 20,
+  noFont = false,
 }
 
 local this = Button

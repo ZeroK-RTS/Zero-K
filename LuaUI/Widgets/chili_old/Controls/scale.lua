@@ -5,6 +5,7 @@ Scale = Control:Inherit{
   max = 50,
   step = 10,
   logBase = 1.5,
+  noFont = false,
   
   defaultWidth     = 90,
   defaultHeight    = 12,

@@ -7,6 +7,7 @@ Checkbox = Control:Inherit{
   textalign = "left",
   boxalign  = "right",
   boxsize   = 10,
+  noFont = false,
 
   textColor = {0,0,0,1},
 
