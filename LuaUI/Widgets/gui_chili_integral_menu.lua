@@ -757,6 +757,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	local isSelected = false
 	local isQueueButton = buttonLayout.queueButton
 	local hotkeyText
+	local keyToShowWhenVisible
 	
 	local function DoClick(_, _, _, mouse)
 		if buttonLayout.ClickFunction and buttonLayout.ClickFunction() then
@@ -783,6 +784,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		noFont = not buttonLayout.caption,
 		padding = {0, 0, 0, 0},
 		parent = parent,
+		preserveChildrenOrder = true,
 		OnClick = {DoClick},
 	}
 	
@@ -959,8 +961,16 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			skinName = 'default',
 		}
 	end
-		
-	function externalFunctionsAndData.RemoveGridHotkey()
+	
+	local function IsVisible()
+		return button.parent and button.parent.visible
+	end
+	
+	function externalFunctionsAndData.RemoveGridHotkey(onlyWhenVisible)
+		if onlyWhenVisible and not IsVisible() then
+			keyToShowWhenVisible = -1
+			return
+		end
 		if not usingGrid then
 			return
 		end
@@ -974,20 +984,43 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		end
 	end
 	
-	function externalFunctionsAndData.UpdateGridHotkey(myGridMap, myOverride)
+	local function SetGridKey(key)
+		usingGrid = true
+		hotkeyText = '\255\0\255\0' .. key
+		SetText(textConfig.topLeft.name, hotkeyText)
+	end
+	
+	function externalFunctionsAndData.UpdateGridHotkey(myGridMap, myOverride, onlyWhenVisible)
 		local key
 		if myOverride then
 			key = myOverride[y] and myOverride[y][x]
 		else
 			key = myGridMap[y] and myGridMap[y][x]
 		end
+
+		if onlyWhenVisible and not IsVisible() then
+			keyToShowWhenVisible = key or -1
+			return
+		end
+
 		if not key then
 			externalFunctionsAndData.RemoveGridHotkey()
 			return
 		end
-		usingGrid = true
-		hotkeyText = '\255\0\255\0' .. key
-		SetText(textConfig.topLeft.name, hotkeyText)
+		SetGridKey(key)
+	end
+	
+	function externalFunctionsAndData.OnVisibleGridKeyUpdate()
+		if not keyToShowWhenVisible then
+			return
+		end
+		if keyToShowWhenVisible == -1 then
+			externalFunctionsAndData.RemoveGridHotkey()
+			keyToShowWhenVisible = false
+			return
+		end
+		SetGridKey(keyToShowWhenVisible)
+		keyToShowWhenVisible = false
 	end
 	
 	function externalFunctionsAndData.ClearGridHotkey()
@@ -1168,6 +1201,7 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 	
 	local gridMap, override
 	local gridEnabled = true
+	local gridUpdatedSinceVisible = false
 	
 	local externalFunctions = {}
 	
@@ -1186,6 +1220,7 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 				if not selectionIndex then
 					return false
 				end
+				buttons[x][y].OnVisibleGridKeyUpdate()
 				parent:AddChild(buttons[x][y].button)
 			end
 			if selectionIndex then
@@ -1233,20 +1268,36 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 		end
 	end
 	
-	function externalFunctions.ApplyGridHotkeys(newGridMap, newOverride)
+	function externalFunctions.ApplyGridHotkeys(newGridMap, newOverride, updateNonVisible)
 		gridMap = newGridMap or gridMap
 		override = newOverride or override
 		gridEnabled = true
 		for i = 1, #buttonList do
-			buttonList[i].UpdateGridHotkey(gridMap, override and override.gridMap)
+			buttonList[i].UpdateGridHotkey(gridMap, override and override.gridMap, not updateNonVisible)
+		end
+		if (not parent.visible) and (not updateNonVisible) then
+			gridUpdatedSinceVisible = true
 		end
 	end
 	
 	function externalFunctions.RemoveGridHotkeys()
 		gridEnabled = false
 		for i = 1, #buttonList do
-			buttonList[i].RemoveGridHotkey()
+			buttonList[i].RemoveGridHotkey(true)
 		end
+		if not parent.visible then
+			gridUpdatedSinceVisible = true
+		end
+	end
+	
+	function externalFunctions.OnSelect()
+		if not gridUpdatedSinceVisible then
+			return
+		end
+		for i = 1, #buttonList do
+			buttonList[i].OnVisibleGridKeyUpdate()
+		end
+		gridUpdatedSinceVisible = false
 	end
 	
 	return externalFunctions
@@ -1806,10 +1857,10 @@ local function InitializeControls()
 			data.onClick = ReturnToOrders
 		end
 		
-		local OnTabSelect
 		
 		data.holder = commandHolder
 		data.buttons = GetButtonPanel(commandHolder, data.name, 3, 6,  false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
+		local OnTabSelect = data.buttons.OnSelect
 		
 		if data.factoryQueue then
 			local queueHolder = Control:New{
@@ -1824,7 +1875,10 @@ local function InitializeControls()
 			
 			-- If many things need doing they must be put in a function
 			-- but this works for now.
-			OnTabSelect = data.queue.UpdateBuildProgress
+			OnTabSelect = function ()
+				data.queue.UpdateBuildProgress()
+				data.buttons.OnSelect()
+			end
 		end
 		
 		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect)
@@ -1858,10 +1912,9 @@ local function UpdateGrid(name)
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
-			data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
+			data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {}, true)
 		end
 	end
-
 end
 
 function options.keyboardType2.OnChange(self)
@@ -1884,7 +1937,7 @@ function options.unitsHotkeys2.OnChange(self)
 			if not options.unitsHotkeys2.value then
 				data.buttons.RemoveGridHotkeys()
 			else
-				data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
+				data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {}, true)
 			end
 		end
 	end
