@@ -71,7 +71,7 @@ unitDef = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 85,
-  turnRate               = 240,
+  turnRate               = 960,
   workerTime             = 40,
 
   weapons                = {
