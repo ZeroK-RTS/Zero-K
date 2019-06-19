@@ -178,6 +178,7 @@ function Control:New(obj)
 			obj:AddChild(cn[i], true)
 		end
 	end
+	obj:Realign()
 
 	if WG.ChiliRedraw then
 		WG.ChiliRedraw.AddControl(obj, "New")
