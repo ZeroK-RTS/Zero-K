@@ -150,12 +150,6 @@ local function ProcessCommand(id, params, options, sequence_order)
 		Spring.GiveOrder(id, params, options.coded - (ctrl and CMD.OPT_CTRL or 0) + (ctrl and 0 or CMD.OPT_META))
 		return true
 	end
-	local singleAttack = (ctrl and id == CMD.ATTACK and (params[4] or 0) == 0)
-	if not meta and singleAttack then
-		-- META means "fire once" (not the engine meaning; overridden by ZK)
-		Spring.GiveOrder(CMD.ATTACK, params, options.coded + CMD.OPT_META)
-		return true
-	end
 	if id == CMD_FIRE_ONCE and not meta then
 		-- META means "fire once" (not the engine meaning; overridden by ZK)
 		Spring.GiveOrder(CMD.ATTACK, params, options.coded + CMD.OPT_META)
@@ -173,8 +167,6 @@ local function ProcessCommand(id, params, options, sequence_order)
 			else
 				coded = coded
 			end
-		elseif singleAttack then
-			coded = coded -- Retain meta
 		else
 			coded = coded - CMD.OPT_META
 		end
