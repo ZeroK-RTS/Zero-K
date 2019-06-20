@@ -417,6 +417,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		local reloadAmount = reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
 		
 		while reloadAmount < 1 do
+			morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
 			if morphedTo then 
 				unitID = morphedTo 
 			end
