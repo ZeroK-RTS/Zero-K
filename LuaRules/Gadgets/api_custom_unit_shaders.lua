@@ -293,7 +293,8 @@ local function _ProcessOptions(optName, _, optValues, playerID)
 	for _, rendering in ipairs(allRendering) do
 		for matName, matTable in pairs(rendering.materialDefs) do
 			if matTable.ProcessOptions then
-				optionsChanged = optionsChanged or matTable.ProcessOptions(matTable, optName, optValues)
+				local optCh = matTable.ProcessOptions(matTable, optName, optValues)
+				optionsChanged = optionsChanged or optCh
 			end
 		end
 	end
@@ -463,18 +464,10 @@ end
 
 local function ToggleAdvShading()
 	if (not advShading) then
-		--// unload all materials
 		unitRendering.drawList = {}
-		local units = Spring.GetAllUnits()
-		for _,unitID in pairs(units) do
-			_ResetUnit(unitID)
-		end
-
 		featureRendering.drawList = {}
-		local features = Spring.GetAllFeatures()
-		for _, featureID in pairs(features) do
-			_ResetFeature(featureID)
-		end
+
+		BindMaterials()
 	end
 end
 
@@ -495,22 +488,24 @@ local function ObjectFinished(rendering, objectID, objectDefID)
 	if objectMat then
 		local mat = rendering.materialDefs[objectMat[1]]
 
-		rendering.spActivateMaterial(objectID, 3)
-		rendering.spSetMaterial(objectID, 3, "opaque", GetObjectMaterial(rendering, objectDefID))
-		for pieceID in ipairs(rendering.spGetObjectPieceList(objectID) or {}) do
-			rendering.spSetPieceList(objectID, 3, pieceID)
-		end
+		if mat.standardShader then
+			rendering.spActivateMaterial(objectID, 3)
+			rendering.spSetMaterial(objectID, 3, "opaque", GetObjectMaterial(rendering, objectDefID))
+			for pieceID in ipairs(rendering.spGetObjectPieceList(objectID) or {}) do
+				rendering.spSetPieceList(objectID, 3, pieceID)
+			end
 
-		local DrawObject = mat[rendering.DrawObject]
-		local ObjectCreated = mat[rendering.ObjectCreated]
+			local DrawObject = mat[rendering.DrawObject]
+			local ObjectCreated = mat[rendering.ObjectCreated]
 
-		if DrawObject then
-			rendering.spSetObjectLuaDraw(objectID, true)
-			rendering.drawList[objectID] = mat
-		end
+			if DrawObject then
+				rendering.spSetObjectLuaDraw(objectID, true)
+				rendering.drawList[objectID] = mat
+			end
 
-		if ObjectCreated then
-			ObjectCreated(objectID, mat, 3)
+			if ObjectCreated then
+				ObjectCreated(objectID, mat, 3)
+			end
 		end
 	end
 end
