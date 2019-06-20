@@ -180,6 +180,7 @@ function widget:DrawWorldPreUnit()
          end
       end
    end
+   glPolygonOffset(false)
 end
              
 
