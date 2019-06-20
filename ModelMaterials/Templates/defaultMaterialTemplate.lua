@@ -278,10 +278,12 @@ fragment = [[
 
 	/***********************************************************************/
 	// Shadow mapping functions
-	const float PI = acos(0.0) * 2.0;
+	//const float PI = acos(0.0) * 2.0;
+	const float PI = 3.1415926535897932384626433832795;
 
 	// http://blog.marmakoide.org/?p=1
-	const float goldenAngle = PI * (3.0 - sqrt(5.0));
+	//const float goldenAngle = PI * (3.0 - sqrt(5.0));
+	const float goldenAngle = 2.3999632297286533222315555066336;
 	vec2 SpiralSNorm(int i, int N) {
 		float theta = float(i) * goldenAngle;
 		float r = sqrt(float(i)) / sqrt(float(N));
