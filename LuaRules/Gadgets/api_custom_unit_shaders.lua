@@ -706,6 +706,7 @@ function gadget:Initialize()
 		shadowmapping 	= shadows,
 		normalmapping 	= normalmapping,
 		treewind		= treewind,
+		metal_highlight	= false,
 	}
 
 	local seenOptions = {}

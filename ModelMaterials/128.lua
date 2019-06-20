@@ -9,9 +9,12 @@ local materials = {
 			[4] = "$reflection",
 		},
 		feature = true,
+		shaderOptions = {
+			metal_highlight	= true,
+		},
 		deferredOptions = {
 			materialIndex	= 128,
-		}
+		},
 	})
 }
 

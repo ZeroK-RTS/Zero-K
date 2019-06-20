@@ -519,6 +519,7 @@ local defaultMaterialTemplate = {
 		flashlights		= false,
 		unitsfog		= false,
 		normalmap_flip	= false,
+		metal_highlight	= false,
 		treewind		= false,
 
 		shadowsQuality	= 2,
@@ -534,6 +535,7 @@ local defaultMaterialTemplate = {
 		flashlights		= false,
 		unitsfog		= false,
 		normalmap_flip	= false,
+		metal_highlight	= false,
 		treewind		= false,
 
 		shadowsQuality	= 0,
@@ -611,7 +613,7 @@ local function ProcessOptions(materialDef, optName, optValues)
 
 	for id, optTable in ipairs({materialDef.shaderOptions, materialDef.deferredOptions}) do
 		if knownBitOptions[optName] then --boolean
-			local optValue = tonumber(unpack(optValues or {}) or nil)
+			local optValue = unpack(optValues or {})
 			local optOriginalValue = materialDef.originalOptions[id][optName]
 
 			--Spring.Echo(optName, "optValue", optValue, "optOriginalValue", optOriginalValue)
