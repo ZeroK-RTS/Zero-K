@@ -188,13 +188,13 @@ local function _CompileShader(shader, definitions, plugins, addName)
 	end
 
 	local luaShader = LuaShader(shader, "Custom Unit Shaders. " .. addName)
-	luaShader:Initialize()
+	local compilationResult = luaShader:Initialize()
 
 	shader.vertex   = shader.vertexOrig
 	shader.fragment = shader.fragmentOrig
 	shader.geometry = shader.geometryOrig
 
-	return luaShader
+	return (compilationResult and luaShader) or nil
 end
 
 local function _FillUniformLocs(luaShader)
@@ -280,23 +280,20 @@ local function _CompileMaterialShaders(rendering)
 end
 
 local function _ProcessOptions(optName, _, optValues, playerID)
+	if (playerID ~= Spring.GetMyPlayerID()) then
+		return
+	end
+
 	if type(optValues) ~= "table" then
 		optValues = {optValues}
 	end
 
 	Spring.Utilities.TableEcho({optName, optValues, playerID}, "_ProcessOptions")
 
-	if (playerID ~= Spring.GetMyPlayerID()) then
-		return
-	end
 	for _, rendering in ipairs(allRendering) do
 		for matName, matTable in pairs(rendering.materialDefs) do
 			if matTable.ProcessOptions then
-				local optionsChanged1 = matTable.ProcessOptions(matTable.shaderOptions, optName, optValues)
-				local optionsChanged2 = matTable.ProcessOptions(matTable.deferredOptions, optName, optValues)
-				--Spring.Utilities.TableEcho(matTable.shaderOptions, "matTable.shaderOptions")
-				--Spring.Utilities.TableEcho(matTable.deferredOptions, "matTable.deferredOptions")
-				optionsChanged = optionsChanged or optionsChanged1 or optionsChanged2
+				optionsChanged = matTable.ProcessOptions(matTable, optName, optValues)
 			end
 		end
 	end
@@ -334,14 +331,14 @@ local function GetObjectMaterial(rendering, objectDefID)
 	for texid, tex in pairs(mat.texunits or {}) do
 		local tex_ = tex
 		for varname, value in pairs(matInfo) do
-			tex_ = tex_:gsub("%%"..tostring(varname),value)
+			tex_ = tex_:gsub("%%"..tostring(varname), value)
 		end
-		texUnits[texid] = {tex=tex_, enable=false}
+		texUnits[texid] = {tex = tex_, enable = false}
 	end
 
 	--// materials don't load those textures themselves
 	local texdl = gl.CreateList(function() --this stupidity is required, because GetObjectMaterial() is called outside of GL enabled callins
-		for _,tex in pairs(texUnits) do
+		for _, tex in pairs(texUnits) do
 			local prefix = tex.tex:sub(1, 1)
 			if validTexturePrefixes[prefix] then
 				gl.Texture(tex.tex)
@@ -571,24 +568,23 @@ function gadget:DrawGenesis()
 
 			if SunChangedFunc or DrawGenesisFunc or (optionsChanged and ApplyOptionsFunc) then
 				for key, shaderObject in pairs({mat.standardShaderObj, mat.deferredShaderObj}) do
-					shaderObject:ActivateWith( function ()
+					if shaderObject then
+						shaderObject:ActivateWith( function ()
 
-						if SunChangedFunc then
-							SunChangedFunc(shaderObject)
-						end
-
-						if DrawGenesisFunc then
-							DrawGenesisFunc(shaderObject)
-						end
-
-						if ApplyOptionsFunc then
-							local optionsTables = {mat.shaderOptions, mat.deferredOptions}
-							if optionsTables[key] then
-								ApplyOptionsFunc(shaderObject, optionsTables[key])
+							if ApplyOptionsFunc then
+								ApplyOptionsFunc(shaderObject, mat, (key == 2))
 							end
-						end
 
-					end)
+							if SunChangedFunc then
+								SunChangedFunc(shaderObject)
+							end
+
+							if DrawGenesisFunc then
+								DrawGenesisFunc(shaderObject)
+							end
+
+						end)
+					end
 				end
 			end
 		end
@@ -708,8 +704,8 @@ function gadget:Initialize()
 	advShading = Spring.HaveAdvShading()
 
 	shadows = Spring.HaveShadows()
-	local normalmapping = tonumber(Spring.GetConfigInt("NormalMapping", 1) or 0) > 0
-	local treewind = tonumber(Spring.GetConfigInt("TreeWind", 1) or 1) > 0
+	local normalmapping = Spring.GetConfigInt("NormalMapping", 1) > 0
+	local treewind = Spring.GetConfigInt("TreeWind", 1) > 0
 
 	local commonOptions = {
 		shadowmapping 	= shadows,
@@ -744,8 +740,6 @@ function gadget:Initialize()
 
 	--// insert synced actions
 	--gadgetHandler:AddSyncAction("unitshaders_reverse", UnitReverseBuilt)
-	--gadgetHandler:AddChatAction("normalmapping", ToggleNormalmapping)
-	--gadgetHandler:AddChatAction("treewind", ToggleTreeWind)
 end
 
 --// Workaround: unsynced LuaRules doesn't receive Shutdown events

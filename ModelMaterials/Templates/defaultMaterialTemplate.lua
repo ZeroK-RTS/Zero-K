@@ -600,29 +600,46 @@ local function EncodeBitmaskField(bitmask, option, position)
 	return math.bit_or(bitmask, ((option and 1) or 0) * math.floor(2 ^ position))
 end
 
-local function ProcessOptions(optTable, optName, optValues)
+local function ProcessOptions(materialDef, optName, optValues)
 	local handled = false
-	if knownBitOptions[optName] then --boolean
-		local optValue = tonumber(unpack(optValues or {}) or nil)
-		--Spring.Echo(optName, "optValue", optValue)
-		if optValue then
-			optTable[optName] = (optValue > 0) and true or false
-		else
-			optTable[optName] = not optTable[optName] -- apparently `not nil` == true
-		end
-		handled = true
-	elseif knownIntOptions[optName] then --integer
-		--TODO
-		--handled = true
-	elseif knownFloatOptions[optName] then --float
-		--TODO
-		--handled = true
+
+	if not materialDef.originalOptions then
+		materialDef.originalOptions = {}
+		materialDef.originalOptions[1] = Spring.Utilities.CopyTable(materialDef.shaderOptions)
+		materialDef.originalOptions[2] = Spring.Utilities.CopyTable(materialDef.deferredOptions)
 	end
+
+	for id, optTable in ipairs({materialDef.shaderOptions, materialDef.deferredOptions}) do
+		if knownBitOptions[optName] then --boolean
+			local optValue = tonumber(unpack(optValues or {}) or nil)
+			local optOriginalValue = materialDef.originalOptions[id][optName]
+
+			--Spring.Echo(optName, "optValue", optValue, "optOriginalValue", optOriginalValue)
+			if optOriginalValue then
+				if optValue ~= nil then
+					optTable[optName] = (optValue > 0) and true or false
+				else
+					optTable[optName] = not optTable[optName] -- apparently `not nil` == true
+				end
+				handled = true
+			end
+		elseif knownIntOptions[optName] then --integer
+			--TODO
+			--handled = true
+		elseif knownFloatOptions[optName] then --float
+			--TODO
+			--handled = true
+		end
+	end
+
 	Spring.Echo("ProcessOptions")
 	return handled
 end
 
-local function ApplyOptions(luaShader, optionsTbl)
+local function ApplyOptions(luaShader, materialDef, isDeferred)
+
+	local optionsTbl = (isDeferred and materialDef.deferredOptions) or materialDef.shaderOptions
+
 	local intOption = 0
 
 	--Spring.Utilities.TableEcho(optionsTbl, "optionsTbl")
