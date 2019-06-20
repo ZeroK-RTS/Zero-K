@@ -224,7 +224,7 @@ fragment = [[
 		out vec4 fragData[1];
 	#endif
 
-	const float PI = acos(0.0) * 2.0;
+	const float PI = 3.1415926535897932384626433832795;
 	#ifdef LUMAMULT
 		const mat3 RGB2YCBCR = mat3(
 			0.2126, -0.114572, 0.5,
@@ -319,7 +319,7 @@ fragment = [[
 
 	void main(void){
 		%%FRAGMENT_PRE_SHADING%%
-		#line 20212
+		#line 30322
 
 		#ifdef use_normalmapping
 			vec2 tc = tex_coord0.st;
