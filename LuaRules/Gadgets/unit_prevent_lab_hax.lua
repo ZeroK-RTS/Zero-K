@@ -360,7 +360,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	
 	if (not x) or (not z) then
 		Spring.Echo("LUA_ERRRUN", "Prevent Lab Hax AllowCommand")
-		Spring.Echo("cmdID", cmdID)
+		Spring.Echo("cmdID", cmdID, "ud.name", ud and ud.name)
 		Spring.Utilities.TableEcho(cmdParams, "cmdParams")
 		Spring.Utilities.TableEcho(cmdOptions, "cmdOptions")
 		Spring.Echo("x z xsize zsize", x, z, xsize, zsize)
