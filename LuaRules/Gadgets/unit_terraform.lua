@@ -229,6 +229,9 @@ local REPAIR_ORDER_PARAMS = {0, CMD_REPAIR, CMD_OPT_RIGHT, 0} -- static because 
 local workaround_recursion_in_cmd_fallback = {}
 local workaround_recursion_in_cmd_fallback_needed = false
 
+local debugMode = false
+local debugModeUnitID
+
 --------------------------------------------------------------------------------
 -- Custom Commands
 --------------------------------------------------------------------------------
@@ -338,6 +341,21 @@ end
 --------------------------------------------------------------------------------
 -- New Functions
 --------------------------------------------------------------------------------
+
+local unitAlreadyEchoed = {}
+local function EchoUnit(unitID)
+	if debugMode and not unitAlreadyEchoed[unitID] and ((not debugModeUnitID) or debugModeUnitID[unitID]) then
+		Spring.Utilities.UnitEcho(unitID, unitID)
+		unitAlreadyEchoed[unitID] = true
+	end
+end
+
+local function EchoDebug(unitID, ...)
+	if debugMode and ((not debugModeUnitID) or debugModeUnitID[unitID]) then
+		Spring.Echo(unitID, ...)
+	end
+end
+
 
 local function IsBadNumber(value, thingToSay)
 	local isBad = (string.find(tostring(value), "n") and true) or false
@@ -2391,6 +2409,7 @@ local function updateTerraformCost(id)
 		volume = volume + abs(point.diffHeight) 
 	end
 	
+	EchoDebug(id, "updateTerraformCost")
 	spSetUnitHealth(id, {
 		health = 0,
 		build  = 0
@@ -2407,6 +2426,8 @@ local function updateTerraformCost(id)
 	terra.progress = 0
 	terra.cost = volume*volumeCost
 	terra.totalCost = terra.cost + terra.baseCost
+	
+	EchoDebug(id, "Update Cost", terra.cost, terra.totalCost)
 	
 	return true
 end
@@ -2524,6 +2545,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	end
 	
 	if terra.baseCostSpent then
+		EchoDebug(id, "baseCostSpent", terra.baseCostSpent, terra.baseCost)
 		if costDiff < terra.baseCost-terra.baseCostSpent then
 			terra.baseCostSpent = terra.baseCostSpent + costDiff
 			
@@ -2899,6 +2921,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 
 	local newBuild = terra.progress
 	
+	EchoDebug(id, "SetHealth", newBuild*terraUnitHP, newBuild)
 	spSetUnitHealth(id, {
 		health = newBuild*terraUnitHP,
 		build  = newBuild
@@ -3004,6 +3027,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	--		end
 	--	end
 	--end
+	EchoDebug(id, "terra.points", terra.points, "newProgress", newProgress)
 	
 	if terra.progress > 1 then
 		deregisterTerraformUnit(id,arrayIndex,2)
@@ -3018,21 +3042,24 @@ local function DoTerraformUpdate(n, forceCompletion)
 	local i = 1
 	while i <= terraformUnitCount do
 		local id = terraformUnitTable[i]
+		EchoDebug(id, "Check", Spring.GetUnitHealth(id))
 		if (spValidUnitID(id)) then
 			local force = (forceCompletion and not terraformUnit[id].disableForceCompletion)
 			
 			local health = spGetUnitHealth(id)
 			local diffProgress = health/terraUnitHP - terraformUnit[id].progress
+			EchoDebug(id, "Valid", diffProgress, terraformUnit[id].progress, health)
 			
 			if diffProgress == 0 then
 				if (not forceCompletion) and (n % decayCheckFrequency == 0 and terraformUnit[id].decayTime < n) then
+					EchoUnit(id)
+					EchoDebug(id, "Decay", id)
 					deregisterTerraformUnit(id,i,3)
 					spDestroyUnit(id, false, true)
 				else
 					i = i + 1
 				end
 			else
-			
 				if not terraformUnit[id].fullyInitialised then
 					finishInitialisingTerraformUnit(id,i)
 				end
@@ -3042,7 +3069,10 @@ local function DoTerraformUpdate(n, forceCompletion)
 					if force then
 						costDiff = costDiff + 100000 -- enough?
 					end
+					EchoUnit(id)
+					EchoDebug(id, "============== " .. id .. " ==============")
 					terraformUnit[id].totalSpent = terraformUnit[id].totalSpent + costDiff
+					EchoDebug(id, "Spent", terraformUnit[id].totalSpent, costDiff)
 					SetTooltip(id, terraformUnit[id].totalSpent, terraformUnit[id].pyramidCostEstimate + terraformUnit[id].totalCost)
 					
 					if GG.Awards and GG.Awards.AddAwardPoints then
@@ -3050,6 +3080,7 @@ local function DoTerraformUpdate(n, forceCompletion)
 					end
 					
 					local updateVar = updateTerraform(health,id,i,costDiff) 
+					EchoDebug(id, "updateVar", updateVar)
 					while updateVar == -1 do
 						if updateTerraformCost(id) then
 							updateTerraformEdgePoints(id)
@@ -3057,6 +3088,7 @@ local function DoTerraformUpdate(n, forceCompletion)
 						else
 							updateVar = 0
 						end
+						EchoDebug(id, "updateVar while", updateVar)
 					end
 					
 					if updateVar == 1 then
@@ -3229,8 +3261,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	return false
 end
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
-                            weaponID, attackerID, attackerDefID, attackerTeam)
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if unitDefID == terraunitDefID then
 		return 0 -- terraunit starts on 0 HP. If a unit is damaged and has 0 HP it dies
 	end
@@ -3416,10 +3447,8 @@ end
 --------------------------------------------------------------------------------
 
 local function deregisterStructure(unitID)
-
-	if structure[unitID].checkAtDeath then			
+	if structure[unitID].checkAtDeath then
 		for i = 1, terraformOrders do
-				
 			if (structure[unitID].minx < terraformOrder[i].border.right and 
 				structure[unitID].maxx > terraformOrder[i].border.left and
 				structure[unitID].minz < terraformOrder[i].border.bottom and
@@ -3768,6 +3797,28 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		end
 	end
 end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Debug
+
+local function toggleDebug(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then 
+		return
+	end
+	local unitID = tonumber(words[1])
+	Spring.Echo("Debug terraform")
+	if not unitID then
+		debugMode = not debugMode
+		Spring.Echo((debugMode and "Enabled") or "Disabled")
+		debugModeUnitID = nil
+		return
+	end
+	
+	debugMode = true
+	Spring.Echo("unitID", unitID)
+	debugModeUnitID = debugModeUnitID or {}
+	debugModeUnitID[unitID] = true
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -3825,6 +3876,8 @@ function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_RESTORE)
 	
 	GG.Terraform = TerraformFunctions
+	
+	gadgetHandler:AddChatAction("debugterra", toggleDebug, "Debugs terraform.")
 	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
