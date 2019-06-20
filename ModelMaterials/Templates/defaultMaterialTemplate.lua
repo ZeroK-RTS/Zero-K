@@ -617,10 +617,15 @@ local function ProcessOptions(materialDef, optName, optValues)
 			--Spring.Echo(optName, "optValue", optValue, "optOriginalValue", optOriginalValue)
 			if optOriginalValue then
 				if optValue ~= nil then
-					optTable[optName] = (optValue > 0) and true or false
+					if type(optValue) == "boolean" then
+						optTable[optName] = optValue
+					elseif type(optValue) == "number" then
+						optTable[optName] = (optValue > 0) and true or false
+					end
 				else
 					optTable[optName] = not optTable[optName] -- apparently `not nil` == true
 				end
+				--Spring.Echo("optTable[optName]", optTable[optName])
 				handled = true
 			end
 		elseif knownIntOptions[optName] then --integer
@@ -632,6 +637,7 @@ local function ProcessOptions(materialDef, optName, optValues)
 		end
 	end
 
+	--Spring.Echo("ProcessOptions", optName, unpack(optValues))
 	Spring.Echo("ProcessOptions")
 	return handled
 end

@@ -288,12 +288,12 @@ local function _ProcessOptions(optName, _, optValues, playerID)
 		optValues = {optValues}
 	end
 
-	Spring.Utilities.TableEcho({optName, optValues, playerID}, "_ProcessOptions")
+	--Spring.Utilities.TableEcho({optName, optValues, playerID}, "_ProcessOptions")
 
 	for _, rendering in ipairs(allRendering) do
 		for matName, matTable in pairs(rendering.materialDefs) do
 			if matTable.ProcessOptions then
-				optionsChanged = matTable.ProcessOptions(matTable, optName, optValues)
+				optionsChanged = optionsChanged or matTable.ProcessOptions(matTable, optName, optValues)
 			end
 		end
 	end
@@ -716,16 +716,6 @@ function gadget:Initialize()
 	local seenOptions = {}
 	for _, rendering in ipairs(allRendering) do
 		for matName, matTable in pairs(rendering.materialDefs) do
-			for optName, optValue in pairs(commonOptions) do
-
-				if matTable.shaderOptions[optName] and not optValue then -- shader options set to true, but user setting is false
-					matTable.shaderOptions[optName] = optValue
-				end
-
-				if matTable.deferredOptions[optName] and not optValue then -- shader options set to true, but user setting is false
-					matTable.deferredOptions[optName] = optValue
-				end
-			end
 
 			local allOptions = matTable.GetAllOptions()
 			for opt, _ in pairs(allOptions) do
@@ -733,6 +723,10 @@ function gadget:Initialize()
 					seenOptions[opt] = true
 					gadgetHandler:AddChatAction(opt, _ProcessOptions)
 				end
+			end
+
+			for optName, optValue in pairs(commonOptions) do
+				_ProcessOptions(optName, nil, optValue, Spring.GetMyPlayerID())
 			end
 
 		end
