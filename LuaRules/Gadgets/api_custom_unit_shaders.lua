@@ -73,10 +73,10 @@ local optionsChanged = true --just in case
 local idToDefID = {}
 
 --- Main data structures:
--- rendering.drawList[objectDefID] = mat_src
+-- rendering.drawList[objectDefID] = matSrc
 -- rendering.materialInfos[objectDefID] = {matName, name = param, name1 = param1}
 -- rendering.bufMaterials[objectDefID] = rendering.spGetMaterial() / luaMat
--- rendering.materialDefs[matName] = mat_src
+-- rendering.materialDefs[matName] = matSrc
 -- rendering.loadedTextures[texname] = true
 ---
 
@@ -224,56 +224,64 @@ local function _FillUniformLocs(luaShader)
 end
 
 local function _CompileMaterialShaders(rendering)
-	for matName, mat_src in pairs(rendering.materialDefs) do
-		if mat_src.shaderSource then
+	for matName, matSrc in pairs(rendering.materialDefs) do
+		if matSrc.shaderSource then
 			local luaShader = _CompileShader(
-				mat_src.shaderSource,
-				mat_src.shaderDefinitions,
-				mat_src.shaderPlugins,
+				matSrc.shaderSource,
+				matSrc.shaderDefinitions,
+				matSrc.shaderPlugins,
 				string.format("MatName: \"%s\"(%s)", matName, "Standard")
 			)
 
 			if luaShader then
-				if mat_src.standardShader then
-					if mat_src.standardShaderObj then
-						mat_src.standardShaderObj:Finalize()
+				if matSrc.standardShader then
+					if matSrc.standardShaderObj then
+						matSrc.standardShaderObj:Finalize()
 					else
-						gl.DeleteShader(mat_src.standardShader)
+						gl.DeleteShader(matSrc.standardShader)
 					end
 				end
-				mat_src.standardShaderObj = luaShader
-				mat_src.standardShader = luaShader:GetHandle()
+				matSrc.standardShaderObj = luaShader
+				matSrc.standardShader = luaShader:GetHandle()
 				luaShader:SetUnknownUniformIgnore(true)
 				luaShader:ActivateWith( function()
-					mat_src.standardUniforms = _FillUniformLocs(luaShader)
+					matSrc.standardUniforms = _FillUniformLocs(luaShader)
 				end)
 				luaShader:SetActiveStateIgnore(true)
+
+				if matSrc.Initialize then
+					matSrc.Initialize()
+				end
 			end
 		end
 
-		if (mat_src.deferredSource) then
+		if (matSrc.deferredSource) then
 			local luaShader = _CompileShader(
-				mat_src.deferredSource,
-				mat_src.deferredDefinitions,
-				mat_src.deferredPlugins,
+				matSrc.deferredSource,
+				matSrc.deferredDefinitions,
+				matSrc.deferredPlugins,
 				string.format("MatName: \"%s\"(%s)", matName, "Deferred")
 			)
 
 			if luaShader then
-				if mat_src.deferredShader then
-					if mat_src.deferredShaderObj then
-						mat_src.deferredShaderObj:Finalize()
+				if matSrc.deferredShader then
+					if matSrc.deferredShaderObj then
+						matSrc.deferredShaderObj:Finalize()
 					else
-						gl.DeleteShader(mat_src.deferredShader)
+						gl.DeleteShader(matSrc.deferredShader)
 					end
 				end
-				mat_src.deferredShaderObj = luaShader
-				mat_src.deferredShader = luaShader:GetHandle()
+				matSrc.deferredShaderObj = luaShader
+				matSrc.deferredShader = luaShader:GetHandle()
 				luaShader:SetUnknownUniformIgnore(true)
 				luaShader:ActivateWith( function()
-					mat_src.deferredUniforms = _FillUniformLocs(luaShader)
+					matSrc.deferredUniforms = _FillUniformLocs(luaShader)
 				end)
 				luaShader:SetActiveStateIgnore(true)
+
+				if matSrc.Initialize then
+					matSrc.Initialize()
+				end
 			end
 		end
 	end
@@ -422,25 +430,25 @@ local function _LoadMaterialConfigFiles(path)
 	return unitMaterialDefs, featureMaterialDefs
 end
 
-local function _ProcessMaterials(rendering, materialDefs)
+local function _ProcessMaterials(rendering, materialDefsSrc)
 	local engineShaderTypes = {"3do", "s3o", "obj", "ass"}
 
-	for _, mat_src in pairs(rendering.materialDefs) do
+	for _, matSrc in pairs(rendering.materialDefs) do
 
-		if mat_src.shader ~= nil and engineShaderTypes[mat_src.shader] == nil then
-			mat_src.shaderSource = mat_src.shader
-			mat_src.shader = nil
+		if matSrc.shader ~= nil and engineShaderTypes[matSrc.shader] == nil then
+			matSrc.shaderSource = matSrc.shader
+			matSrc.shader = nil
 		end
 
-		if mat_src.deferred ~= nil and engineShaderTypes[mat_src.deferred] == nil then
-			mat_src.deferredSource = mat_src.deferred
-			mat_src.deferred = nil
+		if matSrc.deferred ~= nil and engineShaderTypes[matSrc.deferred] == nil then
+			matSrc.deferredSource = matSrc.deferred
+			matSrc.deferred = nil
 		end
 	end
 
 	_CompileMaterialShaders(rendering)
 
-	for objectDefID, materialInfo in pairs(materialDefs) do
+	for objectDefID, materialInfo in pairs(materialDefsSrc) do --note not rendering.materialDefs
 		if (type(materialInfo) ~= "table") then
 			materialInfo = {materialInfo}
 		end
@@ -511,10 +519,17 @@ local function ObjectFinished(rendering, objectID, objectDefID)
 end
 
 
-local function _CleanupTextures(rendering)
+local function _CleanupEverything(rendering)
+	for _, mat in pairs(rendering.materialDefs) do
+		if mat.Finalize then
+			mat.Finalize()
+		end
+	end
+
 	for tex, _ in pairs(rendering.loadedTextures) do
 		gl.DeleteTexture(tex)
 	end
+
 	for _, oid in ipairs(rendering.spGetAllObjects()) do
 		rendering.spSetLODCount(oid, 0)
 	end
@@ -538,9 +553,9 @@ local function DrawObject(rendering, objectID, objectDefID, drawMode)
 		return
 	end
 
-	local luaShaderObj = (drawMode == 5) and mat.deferredShaderObj or mat.standardShaderObj
 	local _DrawObject = mat[rendering.DrawObject]
 	if _DrawObject then
+		local luaShaderObj = ((drawMode == 1) and mat.standardShaderObj) or ((drawMode == 5) and mat.deferredShaderObj)
 		return _DrawObject(objectID, objectDefID, mat, drawMode, luaShaderObj)
 	end
 end
@@ -566,16 +581,16 @@ function gadget:DrawGenesis()
 					if shaderObject then
 						shaderObject:ActivateWith( function ()
 
-							if ApplyOptionsFunc then
+							if optionsChanged and ApplyOptionsFunc then
 								ApplyOptionsFunc(shaderObject, mat, (key == 2))
 							end
 
 							if SunChangedFunc then
-								SunChangedFunc(shaderObject)
+								SunChangedFunc(shaderObject, mat)
 							end
 
 							if DrawGenesisFunc then
-								DrawGenesisFunc(shaderObject)
+								DrawGenesisFunc(shaderObject, mat)
 							end
 
 						end)
@@ -737,7 +752,7 @@ cusShutdown = Script.CreateScream()
 cusShutdown.func = function()
 	 --// unload textures, so the user can do a `/luarules reload` to reload the normalmaps
 	for _, rendering in ipairs(allRendering) do
-		_CleanupTextures(rendering)
+		_CleanupEverything(rendering)
 	end
 
 	--// GG de-assignment

@@ -128,7 +128,8 @@ vertex = [[
 			selfIllumMod = max(-0.2, sin(simFrame * 0.067 + (modelMatrix[3][0] + modelMatrix[3][2]) * 0.1)) + 0.2;
 		}
 
-		if (BITMASK_FIELD(bitOptions, OPTION_METAL_HIGHLIGHT)) {
+		#define wreckMetal floatOptions.w
+		if (BITMASK_FIELD(bitOptions, OPTION_METAL_HIGHLIGHT) && wreckMetal > 0.0) {
 			//	local alpha = (0.25*(intensity/100)) + (0.5 * (intensity/100) * math.abs(1 - (timer * 2) % 2))
 
 			//	local x100  = 100  / (100  + metal)
@@ -137,15 +138,11 @@ vertex = [[
 			//	local g = x1000 - x100
 			//	local b = x100
 
-			//#define wreckMetal floatOptions.w
-			float wreckMetal = 20.0;
-
 			float alpha = 0.35 + 0.65 * SNORM2NORM( sin(simFrame * 0.2) );
 			vec2 x100_1000 = vec2(100.0 / (100.0 + wreckMetal), 1000.0 / (1000.0 + wreckMetal));
 			addColor = vec4(1.0 - x100_1000.y, x100_1000.y - x100_1000.x, x100_1000.x, alpha);
-
-			//#undef wreckMetal
 		}
+		#undef wreckMetal
 
 		gl_Position = projectionMatrix * viewMatrix * worldVertexPos;
 
@@ -460,10 +457,12 @@ fragment = [[
 			finalColor = mix(gl_Fog.color.rgb, finalColor, fogFactor);
 		}
 
-		if (BITMASK_FIELD(bitOptions, OPTION_METAL_HIGHLIGHT)) {
+		#define wreckMetal floatOptions.w
+		if (BITMASK_FIELD(bitOptions, OPTION_METAL_HIGHLIGHT) && wreckMetal > 0.0) {
 			//finalColor = mix(finalColor, addColor.aaa, addColor.rgb);
 			finalColor += addColor.a * addColor.rgb;
 		}
+		#undef wreckMetal
 
 		#if 0
 			finalColor = addColor;
@@ -698,8 +697,19 @@ local function GetAllOptions()
 	return allOptions
 end
 
+local function SunChanged(luaShader)
+	luaShader:SetUniformAlways("shadowDensity", gl.GetSun("shadowDensity" ,"unit"))
+
+	luaShader:SetUniformAlways("sunAmbient", gl.GetSun("ambient" ,"unit"))
+	luaShader:SetUniformAlways("sunDiffuse", gl.GetSun("diffuse" ,"unit"))
+	luaShader:SetUniformAlways("sunSpecular", gl.GetSun("specular" ,"unit"))
+end
+
 defaultMaterialTemplate.ProcessOptions = ProcessOptions
 defaultMaterialTemplate.ApplyOptions = ApplyOptions
 defaultMaterialTemplate.GetAllOptions = GetAllOptions
+
+defaultMaterialTemplate.SunChangedOrig = SunChanged
+defaultMaterialTemplate.SunChanged = SunChanged
 
 return defaultMaterialTemplate

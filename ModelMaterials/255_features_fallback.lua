@@ -13,7 +13,7 @@ local materials = {
 			metal_highlight	= true,
 		},
 		deferredOptions = {
-			materialIndex	= 128,
+			materialIndex	= 255,
 		},
 	})
 }
