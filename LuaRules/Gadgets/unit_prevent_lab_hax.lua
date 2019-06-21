@@ -344,6 +344,11 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		face = cmdParams[4]
 	end
 	
+	if (not x) or (not z) then
+		-- Sometimes factory construction orders reach here 
+		return true
+	end
+	
 	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
 	local ud = UnitDefs[buildDefID]
 	local xsize = (ud.xsize)*4 - 8
@@ -358,14 +363,14 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	--Spring.MarkerAddLine(x + xsize,0,z + zsize,x - xsize,0,z + zsize)
 	--Spring.MarkerAddLine(x - xsize,0,z + zsize,x - xsize,0,z - zsize)
 	
-	if (not x) or (not z) then
-		Spring.Echo("LUA_ERRRUN", "Prevent Lab Hax AllowCommand")
-		Spring.Echo("cmdID", cmdID, "ud.name", ud and ud.name)
-		Spring.Utilities.TableEcho(cmdParams, "cmdParams")
-		Spring.Utilities.TableEcho(cmdOptions, "cmdOptions")
-		Spring.Echo("x z xsize zsize", x, z, xsize, zsize)
-		return true
-	end
+	--if (not x) or (not z) then
+	--	Spring.Echo("LUA_ERRRUN", "Prevent Lab Hax AllowCommand")
+	--	Spring.Echo("cmdID", cmdID, "ud.name", ud and ud.name)
+	--	Spring.Utilities.TableEcho(cmdParams, "cmdParams")
+	--	Spring.Utilities.TableEcho(cmdOptions, "cmdOptions")
+	--	Spring.Echo("x z xsize zsize", x, z, xsize, zsize)
+	--	return true
+	--end
 	
 	local labData = labList.data
 	for i = 1, labList.count do

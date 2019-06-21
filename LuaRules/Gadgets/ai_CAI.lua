@@ -1293,7 +1293,7 @@ local function conJobHandler(team)
 	-- reclaim
 	for unitID,_ in pairs(conJob.reclaim.con) do
 		local cQueue = spGetCommandQueue(unitID, 1)
-		if (cQueue and #cQueue == 0) or controlledUnit.conByID[unitID].idle then
+		if (cQueue and #cQueue == 0) or (unitID and controlledUnit.conByID[unitID] and controlledUnit.conByID[unitID].idle) then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].makingDefence = false
 			controlledUnit.conByID[unitID].oldJob = conJob.reclaim.index
@@ -1304,7 +1304,7 @@ local function conJobHandler(team)
 	-- defence
 	for unitID,_ in pairs(conJob.defence.con) do
 		local cQueue = spGetCommandQueue(unitID, 1)
-		if (cQueue and #cQueue) == 0 or controlledUnit.conByID[unitID].idle then
+		if (cQueue and #cQueue) == 0 or (unitID and controlledUnit.conByID[unitID] and controlledUnit.conByID[unitID].idle) then
 			local x,y,z = spGetUnitPosition(unitID)
 			controlledUnit.conByID[unitID].oldJob = conJob.defence.index
 			controlledUnit.conByID[unitID].idle = false
@@ -1349,7 +1349,7 @@ local function conJobHandler(team)
 	-- mex
 	for unitID,_ in pairs(conJob.mex.con) do
 		local cQueue = spGetCommandQueue(unitID, 1)
-		if (cQueue and #cQueue == 0) or controlledUnit.conByID[unitID].idle then
+		if (cQueue and #cQueue == 0) or (unitID and controlledUnit.conByID[unitID] and controlledUnit.conByID[unitID].idle) then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].oldJob = conJob.mex.index
 			if math.random() < conJob.mex.defenceChance and makeWantedDefence(team,unitID,500,500,1000) then
@@ -1375,8 +1375,8 @@ local function conJobHandler(team)
 	-- factory assist/construction
 	for unitID,data in pairs(conJob.factory.con) do
 		local cQueue = spGetCommandQueue(unitID, 1)
-			
-		if (cQueue and #cQueue == 0) or controlledUnit.conByID[unitID].idle then
+		
+		if (cQueue and #cQueue == 0) or (unitID and controlledUnit.conByID[unitID] and controlledUnit.conByID[unitID].idle) then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].makingDefence = false
 			controlledUnit.conByID[unitID].oldJob = conJob.factory.index
@@ -1389,7 +1389,7 @@ local function conJobHandler(team)
 	-- energy
 	for unitID,_ in pairs(conJob.energy.con) do
 		local cQueue = spGetCommandQueue(unitID, 1)
-		if (cQueue and #cQueue == 0) or controlledUnit.conByID[unitID].idle then
+		if (cQueue and #cQueue == 0) or (unitID and controlledUnit.conByID[unitID] and controlledUnit.conByID[unitID].idle) then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].makingDefence = false
 			controlledUnit.conByID[unitID].oldJob = conJob.energy.index
