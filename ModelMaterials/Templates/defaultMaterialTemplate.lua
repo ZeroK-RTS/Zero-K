@@ -1,8 +1,7 @@
 local shaderTemplate = {
 vertex = [[
 	//shader version is added via gadget
-	%%GLOBAL_NAMESPACE%%
-	#line 10005
+	#line 10004
 
 	/***********************************************************************/
 	// Options in use
@@ -15,7 +14,6 @@ vertex = [[
 	#define OPTION_NORMALMAP_FLIP 6
 	#define OPTION_METAL_HIGHLIGHT 7
 	#define OPTION_TREEWIND 8
-	%%EXTRA_OPTIONS%%
 
 	/***********************************************************************/
 	// Definitions
@@ -39,14 +37,13 @@ vertex = [[
 	uniform vec3 cameraPos; // world space camera position
 	uniform vec3 cameraDir; // forward vector of camera
 
-	uniform vec3 rndVec; //engine supplied
+	uniform vec3 rndVec;
 	uniform int simFrame;
-	uniform int drawFrame; //TODO dblcheck if it works
+	uniform int drawFrame;
 
 	uniform vec4 floatOptions;
 	uniform int bitOptions;
 
-	%%VERTEX_GLOBAL_NAMESPACE%%
 
 	/***********************************************************************/
 	// Varyings
@@ -69,10 +66,52 @@ vertex = [[
 		float aoTerm;
 		float selfIllumMod;
 		float fogFactor;
-
-		// extra varyings
-		%%EXTRA_VARYINGS%%
 	};
+
+	/***********************************************************************/
+	// Auxilary functions
+	vec2 GetWind(int period) {
+		vec2 wind;
+		wind.x = sin(period * 5.0);
+		wind.y = cos(period * 5.0);
+		return wind * 10.0f;
+	}
+
+	void DoWindVertexMove(inout vec4 mVP) {
+		vec2 curWind = GetWind(simFrame / 750);
+		vec2 nextWind = GetWind(simFrame / 750 + 1);
+		float tweenFactor = smoothstep(0.0f, 1.0f, max(simFrame % 750 - 600, 0) / 150.0f);
+		vec2 wind = mix(curWind, nextWind, tweenFactor);
+
+		// fractional part of model position, clamped to >.4
+		vec4 modelPos = gl_ModelViewMatrix[3];
+		modelPos = fract(modelPos);
+		modelPos = clamp(modelPos, 0.4, 1.0);
+
+		// crude measure of wind intensity
+		float abswind = abs(wind.x) + abs(wind.y);
+
+		vec4 cosVec;
+		float simTime = 0.02 * simFrame;
+		// these determine the speed of the wind"s "cosine" waves.
+		cosVec.w = 0.0;
+		cosVec.x = simTime * modelPos[0] + mVP.x;
+		cosVec.y = simTime * modelPos[2] / 3.0 + modelPos.x;
+		cosVec.z = simTime * 1.0 + mVP.z;
+
+		// calculate "cosines" in parallel, using a smoothed triangle wave
+		vec4 tri = abs(fract(cosVec + 0.5) * 2.0 - 1.0);
+		cosVec = tri * tri *(3.0 - 2.0 * tri);
+
+		float limit = clamp((mVP.x * mVP.z * mVP.y) / 3000.0, 0.0, 0.2);
+
+		float diff = cosVec.x * limit;
+		float diff2 = cosVec.y * clamp(mVP.y / 30.0, 0.05, 0.2);
+
+		mVP.xyz += cosVec.z * limit * clamp(abswind, 1.2, 1.7);
+
+		mVP.xz += diff + diff2 * wind;
+	}
 
 	/***********************************************************************/
 	// Vertex shader main()
@@ -81,7 +120,9 @@ vertex = [[
 		vec4 modelVertexPos = gl_Vertex;
 		vec3 modelVertexNormal = gl_Normal;
 
-		%%VERTEX_PRE_TRANSFORM%%
+		if (BITMASK_FIELD(bitOptions, OPTION_TREEWIND)) {
+			DoWindVertexMove(modelVertexPos);
+		}
 
 		vec4 worldVertexPos = modelMatrix * modelVertexPos;
 
@@ -146,8 +187,6 @@ vertex = [[
 
 		gl_Position = projectionMatrix * viewMatrix * worldVertexPos;
 
-		%%VERTEX_POST_TRANSFORM%%
-
 		if (BITMASK_FIELD(bitOptions, OPTION_UNITSFOG)) {
 			float fogCoord = length(gl_Position.xyz);
 			fogFactor = (gl_Fog.end - fogCoord) * gl_Fog.scale; //linear
@@ -162,7 +201,6 @@ vertex = [[
 ]],
 fragment = [[
 	//shader version is added via gadget
-	%%GLOBAL_NAMESPACE%%
 
 	/***********************************************************************/
 	// Options in use
@@ -175,7 +213,6 @@ fragment = [[
 	#define OPTION_NORMALMAP_FLIP 6
 	#define OPTION_METAL_HIGHLIGHT 7
 	#define OPTION_TREEWIND 8
-	%%EXTRA_OPTIONS%%
 
 	/***********************************************************************/
 	// Definitions
@@ -194,7 +231,6 @@ fragment = [[
 		#define GBUFFER_COUNT 5
 	#endif
 
-	%%FRAGMENT_GLOBAL_NAMESPACE%%
 	#line 20169
 
 
@@ -222,9 +258,9 @@ fragment = [[
 	uniform int shadowsQuality;
 	uniform int materialIndex;
 
-	uniform vec3 rndVec; //engine supplied
+	uniform vec3 rndVec;
 	uniform int simFrame;
-	uniform int drawFrame; //TODO dblcheck if it works
+	uniform int drawFrame;
 
 	uniform vec4 floatOptions;
 	uniform int bitOptions;
@@ -268,9 +304,6 @@ fragment = [[
 		float aoTerm;
 		float selfIllumMod;
 		float fogFactor;
-
-		// extra varyings
-		%%EXTRA_VARYINGS%%
 	};
 
 	/***********************************************************************/
@@ -368,7 +401,6 @@ fragment = [[
 	/***********************************************************************/
 	// Fragment shader main()
 	void main(void){
-		%%FRAGMENT_PRE_SHADING%%
 		#line 30342
 
 		vec4 texColor1 = texture(texture1, modelUV);
@@ -477,8 +509,6 @@ fragment = [[
 			fragData[GBUFFER_EMITTEX_IDX] = vec4(texColor2.rrr, 1.0);
 			fragData[GBUFFER_MISCTEX_IDX] = vec4(float(materialIndex) / 255.0, 0.0, 0.0, 0.0);
 		#endif
-
-		%%FRAGMENT_POST_SHADING%%
 	}
 ]],
 	uniformInt = {
@@ -544,7 +574,10 @@ local defaultMaterialTemplate = {
 
 	feature = false,
 
-	texUnits = {},
+	texUnits = {
+		[2] = "$shadow",
+		[4] = "$reflection",
+	},
 
 	predl = nil, -- `predl` is replaced with `prelist` later in api_cus
 	postdl = nil, -- `postdl` is replaced with `postlist` later in api_cus
@@ -639,7 +672,7 @@ local function ProcessOptions(materialDef, optName, optValues)
 	end
 
 	--Spring.Echo("ProcessOptions", optName, unpack(optValues))
-	Spring.Echo("ProcessOptions")
+	--Spring.Echo("ProcessOptions")
 	return handled
 end
 
@@ -675,7 +708,7 @@ local function ApplyOptions(luaShader, materialDef, isDeferred)
 		end
 	end
 
-	Spring.Echo("ApplyOptions")
+	--Spring.Echo("ApplyOptions")
 	luaShader:SetUniformInt("bitOptions", intOption)
 end
 

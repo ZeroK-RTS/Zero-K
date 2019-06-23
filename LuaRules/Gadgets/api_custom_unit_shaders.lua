@@ -51,6 +51,7 @@ end
 
 local MATERIALS_DIR = "ModelMaterials/"
 local LUASHADER_DIR = "LuaRules/Gadgets/Include/"
+local DEFAULT_VERSION = "#version 150 compatibility"
 
 -----------------------------------------------------------------
 -- Includes and classes loading
@@ -137,64 +138,21 @@ local allRendering = {
 -- Local Functions
 -----------------------------------------------------------------
 
-local _plugins = nil
-local function InsertPlugin(str)
-	return (_plugins and _plugins[str]) or ""
-end
-
-local function _CompileShader(shader, definitions, plugins, addName)
-	shader.vertexOrig   = shader.vertex
-	shader.fragmentOrig = shader.fragment
-	shader.geometryOrig = shader.geometry
-
-	--// insert small pieces of code named `plugins`
-	--// this way we can use a basic shader and add some simple vertex animations etc.
-	do
-		if (plugins) then
-			_plugins = plugins
-		end
-
-		if (shader.vertex) then
-			shader.vertex   = shader.vertex:gsub("%%%%([%a_]+)%%%%", InsertPlugin)
-		end
-		if (shader.fragment) then
-			shader.fragment = shader.fragment:gsub("%%%%([%a_]+)%%%%", InsertPlugin)
-		end
-		if (shader.geometry) then
-			shader.geometry = shader.geometry:gsub("%%%%([%a_]+)%%%%", InsertPlugin)
-		end
-
-		_plugins = nil
-	end
-
-	--// append definitions at top of the shader code
-	--// (this way we can modularize a shader and enable/disable features in it)
+local function _CompileShader(shader, definitions, addName)
 	definitions = definitions or {}
 
 	local hasVersion = false
-	for _, def in pairs(definitions) do
-		hasVersion = hasVersion or string.sub(def,1,string.len("#version")) == "#version"
-	end
-	if not hasVersion then
-		table.insert(definitions, 1, "#version 150 compatibility")
-	end
-	definitions = table.concat(definitions, "\n") .. "\n"
-	if (shader.vertex) then
-		shader.vertex = definitions .. shader.vertex
-	end
-	if (shader.fragment) then
-		shader.fragment = definitions .. shader.fragment
-	end
-	if (shader.geometry) then
-		shader.geometry = definitions .. shader.geometry
+	if definitions[1] then -- #version must be 1st statement
+		hasVersion = string.find(definitions[1], "#version") == 1
 	end
 
+	if not hasVersion then
+		table.insert(definitions, 1, DEFAULT_VERSION)
+	end
+
+	shader.definitions = table.concat(definitions, "\n") .. "\n"
 	local luaShader = LuaShader(shader, "Custom Unit Shaders. " .. addName)
 	local compilationResult = luaShader:Initialize()
-
-	shader.vertex   = shader.vertexOrig
-	shader.fragment = shader.fragmentOrig
-	shader.geometry = shader.geometryOrig
 
 	return (compilationResult and luaShader) or nil
 end
@@ -231,7 +189,6 @@ local function _CompileMaterialShaders(rendering)
 			local luaShader = _CompileShader(
 				matSrc.shaderSource,
 				matSrc.shaderDefinitions,
-				matSrc.shaderPlugins,
 				string.format("MatName: \"%s\"(%s)", matName, "Standard")
 			)
 
@@ -261,7 +218,6 @@ local function _CompileMaterialShaders(rendering)
 			local luaShader = _CompileShader(
 				matSrc.deferredSource,
 				matSrc.deferredDefinitions,
-				matSrc.deferredPlugins,
 				string.format("MatName: \"%s\"(%s)", matName, "Deferred")
 			)
 
@@ -339,7 +295,7 @@ local function GetObjectMaterial(rendering, objectDefID)
 	--// find unitdef tex keyword and replace it
 	--// (a shader can be just for multiple unitdefs, so we support this keywords)
 	local texUnits = {}
-	for texid, tex in pairs(mat.texunits or {}) do
+	for texid, tex in pairs(mat.texUnits or {}) do
 		local tex_ = tex
 		for varname, value in pairs(matInfo) do
 			tex_ = tex_:gsub("%%"..tostring(varname), value)
@@ -398,12 +354,15 @@ local function _LoadMaterialConfigFiles(path)
 	local unitMaterialDefs = {}
 	local featureMaterialDefs = {}
 
+	GG.CUS.unitMaterialDefs = unitMaterialDefs
+	GG.CUS.featureMaterialDefs = featureMaterialDefs
+
 	local files = VFS.DirList(path)
 	table.sort(files)
 
 	for i = 1, #files do
-		local mats, unitMats = VFS.Include(files[i])
-		for k, v in pairs(mats) do
+		local matNames, matObjects = VFS.Include(files[i])
+		for k, v in pairs(matNames) do
 		-- Spring.Echo(files[i],'is a feature?',v.feature)
 			local rendering
 			if v.feature then
@@ -415,7 +374,7 @@ local function _LoadMaterialConfigFiles(path)
 				rendering.materialDefs[k] = v
 			end
 		end
-		for k, v in pairs(unitMats) do
+		for k, v in pairs(matObjects) do
 			--// we check if the material is defined as a unit or as feature material (one namespace for both!!)
 			local materialDefs
 			if featureRendering.materialDefs[v[1]] then
@@ -709,7 +668,7 @@ end
 
 function gadget:Initialize()
 	--// GG assignment
-	GG.CUS = allRendering
+	GG.CUS = {}
 
 	--// load the materials config files
 	local unitMaterialDefs, featureMaterialDefs = _LoadMaterialConfigFiles(MATERIALS_DIR)
