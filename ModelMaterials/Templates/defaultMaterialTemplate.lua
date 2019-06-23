@@ -481,9 +481,8 @@ fragment = [[
 		}
 
 		// final color
-		vec3 finalColor;
-		finalColor = mix(texColor1.rgb, teamColor.rgb, texColor1.a); //mix diffuse texture with team color
-		finalColor = finalColor.rgb * (lightADR + emissiveMult) + lightSpecular;
+		vec3 modelDiffuseColor = mix(texColor1.rgb, teamColor.rgb, texColor1.a); //mix diffuse texture with team color
+		vec3 finalColor = modelDiffuseColor.rgb * (lightADR + emissiveMult) + lightSpecular;
 
 		if (BITMASK_FIELD(bitOptions, OPTION_UNITSFOG)) {
 			finalColor = mix(gl_Fog.color.rgb, finalColor, fogFactor);
@@ -504,7 +503,7 @@ fragment = [[
 			fragData[0] = vec4(finalColor, texColor2.a);
 		#else
 			fragData[GBUFFER_NORMTEX_IDX] = vec4(SNORM2NORM(N), 1.0);
-			fragData[GBUFFER_DIFFTEX_IDX] = vec4(finalColor, texColor2.a); //TODO, fix finalColor
+			fragData[GBUFFER_DIFFTEX_IDX] = vec4(modelDiffuseColor, texColor2.a);
 			fragData[GBUFFER_SPECTEX_IDX] = vec4(lightSpecular, texColor2.a);
 			fragData[GBUFFER_EMITTEX_IDX] = vec4(texColor2.rrr, 1.0);
 			fragData[GBUFFER_MISCTEX_IDX] = vec4(float(materialIndex) / 255.0, 0.0, 0.0, 0.0);
