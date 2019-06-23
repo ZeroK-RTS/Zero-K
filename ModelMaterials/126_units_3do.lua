@@ -1,34 +1,33 @@
 local matTemplate = VFS.Include("ModelMaterials/Templates/defaultMaterialTemplate.lua")
 
 local materials = {
-	featuresFallback = Spring.Utilities.MergeWithDefault(matTemplate, {
+	units3do = Spring.Utilities.MergeWithDefault(matTemplate, {
 		texUnits  = {
-			[0] = "%%FEATUREDEFID:0",
-			[1] = "%%FEATUREDEFID:1",
+			[0] = "$units1",
+			[1] = "$units2",
 		},
-		feature = true,
 		deferredOptions = {
-			materialIndex = 255,
+			materialIndex = 126,
 		},
 	})
 }
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local cusFeaturesMaterials = GG.CUS.featureMaterialDefs
-local featureMaterials = {}
+local cusUnitMaterials = GG.CUS.unitMaterialDefs
+local unitMaterials = {}
 
-for id = 1, #FeatureDefs do
-	if not cusFeaturesMaterials[id] then
-		Spring.Log(gadget:GetInfo().name, LOG.WARNING, string.format("Assigning featuresFallback material to feature %s. This should never happen.", FeatureDefs[id].name))
-		featureMaterials[id] = {"featuresFallback"}
+for id = 1, #UnitDefs do
+	local udef = UnitDefs[id]
+	if not cusUnitMaterials[id] and udef.modeltype == "3do" then
+		unitMaterials[id] = {"units3do"}
 	end
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-return materials, featureMaterials
+return materials, unitMaterials
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
