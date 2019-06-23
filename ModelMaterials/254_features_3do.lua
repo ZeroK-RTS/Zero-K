@@ -8,7 +8,7 @@ local materials = {
 		},
 		feature = true,
 		deferredOptions = {
-			materialIndex = 134,
+			materialIndex = 254,
 		},
 	})
 }
