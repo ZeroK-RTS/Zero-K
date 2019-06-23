@@ -36,7 +36,7 @@ local spGetGameFrame = Spring.GetGameFrame
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Map/Reclaimables'
-options_order = { 'showhighlight','pregamehighlight','intensity','minmetal'}
+options_order = { 'showhighlight', 'pregamehighlight', 'minmetal'}
 options = {
 	showhighlight = {
 		name = 'Show Reclaim',
@@ -75,8 +75,8 @@ options = {
 	minmetal = {
 		name = 'Minimum Reclaim To Highlight',
 		desc = "Metal below this amount will not be highlighted",
-		type = "number", 
-		value = 1, 
+		type = "number",
+		value = 1,
 		min = 1,
 		max = 200,
 		step = 1,
@@ -86,88 +86,59 @@ options = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local enableCondOld = false
+local minMetalShownOld = -1
+local highlight = false
 local conSelected = false
-local hilite = false
-local pregame = true
+local currCmd = spGetActiveCommand() --remember current command
+function widget:Update()
+	if Spring.IsGUIHidden() then
+		return false
+	end
 
-local function DrawWorldFunc()
+	local activeCurrentCmd = spGetActiveCommand()
+	if currCmd ~= activeCurrentCmd then
+		currCmd = activeCurrentCmd --update active command
+		local activeCmdDesc = spGetActiveCmdDesc(currCmd)
+		highlight = (activeCmdDesc and (activeCmdDesc.name == "Reclaim" or activeCmdDesc.name == "Resurrect"))
+	end
 
-  pregame = (spGetGameFrame() < 1)
+	-- Minimum Metal Setting should not interfere with reclaim and area reclaim
+	local minMetalShownNew
+	if highlight then
+		minMetalShownNew = 1
+	else
+		minMetalShownNew = options.minmetal.value
+	end
 
-  if Spring.IsGUIHidden() then
-    return false
-  end
+	local pregame = (spGetGameFrame() < 1)
 
-  -- Minimum Metal Setting should not interfere with reclaim and area reclaim
-  if hilite then
-    minMetalShown = 1
-  else
-    minMetalShown = options.minmetal.value
-  end
+	local enableCondNew =
+		(pregame and options.pregamehighlight.value) or hilite
+		or (options.showhighlight.value == 'always' and spGetMapDrawMode() ~= 'metal')
+		or (conSelected and options.showhighlight.value == "constructors")
 
-  -- ways to bypass heavy resource load in economy overlay
-  if (pregame and options.pregamehighlight.value) or hilite 
-    or (options.showhighlight.value == 'always')
-    or (options.showhighlight.value == 'withecon' and WG.showeco)
-    or (options.showhighlight.value == "constructors" and conSelected)
-    or (options.showhighlight.value == 'conorecon' and (conSelected or WG.showeco))
-    or (options.showhighlight.value == 'conandecon' and (conSelected and WG.showeco)) then 
+	if enableCondNew and minMetalShownOld ~= minMetalShownNew then
+		minMetalShownOld = minMetalShownNew
+		if Script.LuaRules.SetWreckMetalThreshold then
+			Script.LuaRules.SetWreckMetalThreshold(minMetalShownNew)
+		end
+	end
 
-    --gl.PolygonOffset(-2, -2)
-    gl.Blending(GL.SRC_ALPHA, GL.ONE)
-  
-    local timer = widgetHandler:GetHourTimer()
-    local intensity = options.intensity.value
-    local alpha = (0.25*(intensity/100)) + (0.5 * (intensity/100) * math.abs(1 - (timer * 2) % 2))
-  
-    local myAllyTeam = Spring.GetMyAllyTeamID()
-  
-    local features = Spring.GetVisibleFeatures()
-    for _, fID in pairs(features) do
-      local metal = Spring.GetFeatureResources(fID)
-      if (metal and (metal > minMetalShown)) then
-        -- local aTeam = Spring.GetFeatureAllyTeam(fID)
-        -- if (aTeam ~= myAllyTeam) then
-          local x100  = 100  / (100  + metal)
-          local x1000 = 1000 / (1000 + metal)
-          local r = 1 - x1000
-          local g = x1000 - x100
-          local b = x100
-          
-          gl.Color(r, g, b, alpha)
-          
-          gl.Feature(fID, true)
-        -- end
-      end
-    end
-    gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
-    gl.PolygonOffset(false)
-    gl.DepthTest(false)
-  	
-  end
+	if enableCondNew ~= enableCondOld then
+		enableCondOld = enableCondNew
+		Spring.SendCommands("luarules metal_highlight " .. tostring((enableCondNew and 1) or 0))
+	end
 end
 
-function widget:DrawWorld()
-  DrawWorldFunc()
-end
-function widget:DrawWorldRefraction()
-  DrawWorldFunc()
+function widget:Shutdown()
+	Spring.SendCommands("luarules metal_highlight 0")
 end
 
 function widget:SelectionChanged(units)
 	if (WG.selectionEntirelyCons) then
 		conSelected = true
-	else	
-		conSelected = false  
+	else
+		conSelected = false
 	end
-end
-
-local currCmd =  spGetActiveCommand() --remember current command
-function widget:Update()
-	if currCmd == spGetActiveCommand() then --if detect no change in command selection: --skip whole thing
-		return
-	end --else (command selection has change): perform check/automated-map-view-change
-	currCmd = spGetActiveCommand() --update active command
-	local activeCmd = spGetActiveCmdDesc(currCmd)
-	hilite = (activeCmd and (activeCmd.name == "Reclaim" or activeCmd.name == "Resurrect"))
 end

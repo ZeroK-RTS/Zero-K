@@ -56,7 +56,7 @@ local LUASHADER_DIR = "LuaRules/Gadgets/Include/"
 -- Includes and classes loading
 -----------------------------------------------------------------
 
-VFS.Include("luarules/utilities/unitrendering.lua", nil, VFS.MOD .. VFS.BASE)
+VFS.Include("LuaRules/Utilities/UnitRendering.lua", nil, VFS.MOD .. VFS.BASE)
 local LuaShader = VFS.Include(LUASHADER_DIR .. "LuaShader.lua")
 
 -----------------------------------------------------------------
@@ -718,10 +718,10 @@ function gadget:Initialize()
 	local treewind = Spring.GetConfigInt("TreeWind", 1) > 0
 
 	local commonOptions = {
-		shadowmapping 	= shadows,
-		normalmapping 	= normalmapping,
-		treewind		= treewind,
-		metal_highlight	= false,
+		shadowmapping		= shadows,
+		normalmapping		= normalmapping,
+		treewind			= treewind,
+		metal_highlight		= false,
 	}
 
 	local seenOptions = {}
@@ -750,7 +750,6 @@ end
 --// Workaround: unsynced LuaRules doesn't receive Shutdown events
 cusShutdown = Script.CreateScream()
 cusShutdown.func = function()
-	 --// unload textures, so the user can do a `/luarules reload` to reload the normalmaps
 	for _, rendering in ipairs(allRendering) do
 		_CleanupEverything(rendering)
 	end

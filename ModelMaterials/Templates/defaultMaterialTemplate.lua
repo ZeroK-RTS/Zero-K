@@ -615,13 +615,13 @@ local function ProcessOptions(materialDef, optName, optValues)
 			local optValue = unpack(optValues or {})
 			local optOriginalValue = materialDef.originalOptions[id][optName]
 
-			--Spring.Echo(optName, "optValue", optValue, "optOriginalValue", optOriginalValue)
+			--Spring.Echo(optName, type(optValue), "optValue", optValue, "optOriginalValue", optOriginalValue)
 			if optOriginalValue then
 				if optValue ~= nil then
 					if type(optValue) == "boolean" then
 						optTable[optName] = optValue
-					elseif type(optValue) == "number" then
-						optTable[optName] = (optValue > 0) and true or false
+					elseif type(tonumber(optValue)) == "number" then
+						optTable[optName] = ((tonumber(optValue) > 0) and true) or false
 					end
 				else
 					optTable[optName] = not optTable[optName] -- apparently `not nil` == true
