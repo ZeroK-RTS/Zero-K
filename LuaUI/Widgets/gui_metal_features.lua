@@ -39,29 +39,16 @@ options_path = 'Settings/Interface/Map/Reclaimables'
 options_order = { 'showhighlight', 'pregamehighlight', 'minmetal'}
 options = {
 	showhighlight = {
-		name = 'Show Reclaim',
+		name = 'Show Reclaim on Economy Overlay',
 		desc = "When to highlight reclaimable features",
 		type = 'radioButton',
 		value = 'constructors',
 		items = {
 			{key ='always', name='Always'},
-			{key ='withecon', name='With the Economy Overlay'},
-			{key ='constructors',  name='With Constructors Selected'},
-			{key ='conorecon',  name='With Constructors or Overlay'},
-			{key ='conandecon',  name='With Constructors and Overlay'},
-			{key ='reclaiming',  name='When Reclaiming'},
+			{key ='constructors', name='When Constructor Selected'},
+			{key ='reclaiming', name='When Reclaiming'},
 		},
 		noHotkey = true,
-	},
-
-	intensity = {
-		name = 'Highlighted Reclaim Brightness',
-		desc = "Increase or decrease visibility of effect",
-		type = "number", 
-		value = 100, 
-		min = 20,
-		max = 100,
-		step = 20,
 	},
 
 	pregamehighlight = {
@@ -129,6 +116,10 @@ function widget:Update()
 		enableCondOld = enableCondNew
 		Spring.SendCommands("luarules metal_highlight " .. tostring((enableCondNew and 1) or 0))
 	end
+end
+
+function widget:Initialize()
+	Spring.SendCommands("luarules metal_highlight 0")
 end
 
 function widget:Shutdown()

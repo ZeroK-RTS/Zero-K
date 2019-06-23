@@ -70,6 +70,8 @@ local shadows
 local sunChanged = false
 local optionsChanged = true --just in case
 
+local registeredOptions = {}
+
 local idToDefID = {}
 
 --- Main data structures:
@@ -533,6 +535,10 @@ local function _CleanupEverything(rendering)
 	for _, oid in ipairs(rendering.spGetAllObjects()) do
 		rendering.spSetLODCount(oid, 0)
 	end
+
+	for optName, _ in pairs(registeredOptions) do
+		gadgetHandler:RemoveChatAction(optName)
+	end
 end
 
 local function ObjectDestroyed(rendering, objectID, objectDefID)
@@ -721,17 +727,16 @@ function gadget:Initialize()
 		shadowmapping		= shadows,
 		normalmapping		= normalmapping,
 		treewind			= treewind,
-		metal_highlight		= false,
+		--metal_highlight		= false,
 	}
 
-	local seenOptions = {}
 	for _, rendering in ipairs(allRendering) do
 		for matName, matTable in pairs(rendering.materialDefs) do
 
 			local allOptions = matTable.GetAllOptions()
 			for opt, _ in pairs(allOptions) do
-				if not seenOptions[opt] then
-					seenOptions[opt] = true
+				if not registeredOptions[opt] then
+					registeredOptions[opt] = true
 					gadgetHandler:AddChatAction(opt, _ProcessOptions)
 				end
 			end
@@ -742,9 +747,6 @@ function gadget:Initialize()
 
 		end
 	end
-
-	--// insert synced actions
-	--gadgetHandler:AddSyncAction("unitshaders_reverse", UnitReverseBuilt)
 end
 
 --// Workaround: unsynced LuaRules doesn't receive Shutdown events
