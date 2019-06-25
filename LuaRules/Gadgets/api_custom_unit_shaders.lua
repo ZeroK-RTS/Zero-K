@@ -76,7 +76,7 @@ local registeredOptions = {}
 local idToDefID = {}
 
 --- Main data structures:
--- rendering.drawList[objectDefID] = matSrc
+-- rendering.drawList[objectID] = matSrc
 -- rendering.materialInfos[objectDefID] = {matName, name = param, name1 = param1}
 -- rendering.bufMaterials[objectDefID] = rendering.spGetMaterial() / luaMat
 -- rendering.materialDefs[matName] = matSrc
@@ -209,7 +209,7 @@ local function _CompileMaterialShaders(rendering)
 				luaShader:SetActiveStateIgnore(true)
 
 				if matSrc.Initialize then
-					matSrc.Initialize()
+					matSrc.Initialize(matName, matSrc)
 				end
 			end
 		end
@@ -238,7 +238,7 @@ local function _CompileMaterialShaders(rendering)
 				luaShader:SetActiveStateIgnore(true)
 
 				if matSrc.Initialize then
-					matSrc.Initialize()
+					matSrc.Initialize(matName, matSrc)
 				end
 			end
 		end
@@ -481,9 +481,16 @@ end
 
 
 local function _CleanupEverything(rendering)
+	for objectID, mat in pairs(rendering.drawList) do
+		local DrawObject = mat[rendering.DrawObject]
+		if DrawObject then
+			rendering.spSetObjectLuaDraw(objectID, false)
+		end
+	end
+
 	for _, mat in pairs(rendering.materialDefs) do
 		if mat.Finalize then
-			mat.Finalize()
+			mat.Finalize(matName, matSrc)
 		end
 	end
 
@@ -577,16 +584,9 @@ end
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 
-local n = -1
-local init = true
-function gadget:Update()
-	if init then --because BindMaterials() doesn't work in Initialize(). WTF...
-		BindMaterials()
-		init = true
-	end
-	if (n < Spring.GetDrawFrame()) then
-		n = Spring.GetDrawFrame() + Spring.GetFPS()
-
+local CHECK_FREQ = 30
+function gadget:GameFrame(gf)
+	if gf % CHECK_FREQ == 0 then
 		local advShadingNow = Spring.HaveAdvShading()
 		local shadowsNow = Spring.HaveShadows()
 
@@ -599,7 +599,6 @@ function gadget:Update()
 			shadows = shadowsNow
 			_ProcessOptions("shadowmapping", nil, shadows, Spring.GetMyPlayerID())
 		end
-
 	end
 end
 
@@ -645,6 +644,7 @@ end
 function gadget:DrawUnit(unitID, drawMode)
 	return DrawObject(unitRendering, unitID, idToDefID[unitID], drawMode)
 end
+
 
 function gadget:DrawFeature(featureID, drawMode)
 	return DrawObject(featureRendering, featureID, idToDefID[-featureID], drawMode)
@@ -706,6 +706,8 @@ function gadget:Initialize()
 
 		end
 	end
+
+	BindMaterials()
 end
 
 --// Workaround: unsynced LuaRules doesn't receive Shutdown events

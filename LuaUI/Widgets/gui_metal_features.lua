@@ -83,7 +83,8 @@ local conSelected = false
 local currCmd = spGetActiveCommand() --remember current command
 function widget:Update()
 	if Spring.IsGUIHidden() then
-		return false
+		Spring.SendCommands("luarules metal_highlight 0")
+		return
 	end
 
 	local activeCurrentCmd = spGetActiveCommand()
@@ -105,12 +106,12 @@ function widget:Update()
 
 -- ways to bypass heavy resource load in economy overlay
 	local enableCondNew =
-(pregame and options.pregamehighlight.value) or hilite 
-or (options.showhighlight.value == 'always')
-or (options.showhighlight.value == 'withecon' and WG.showeco)
-or (options.showhighlight.value == "constructors" and conSelected)
-or (options.showhighlight.value == 'conorecon' and (conSelected or WG.showeco))
-or (options.showhighlight.value == 'conandecon' and (conSelected and WG.showeco))
+		(pregame and options.pregamehighlight.value) or highlight
+		or (options.showhighlight.value == 'always')
+		or (options.showhighlight.value == 'withecon' and WG.showeco)
+		or (options.showhighlight.value == "constructors" and conSelected)
+		or (options.showhighlight.value == 'conorecon' and (conSelected or WG.showeco))
+		or (options.showhighlight.value == 'conandecon' and (conSelected and WG.showeco))
 
 	if enableCondNew and minMetalShownOld ~= minMetalShownNew then
 		minMetalShownOld = minMetalShownNew

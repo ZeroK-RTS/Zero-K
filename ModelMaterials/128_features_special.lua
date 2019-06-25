@@ -6,15 +6,18 @@ local function SetWreckMetalThreshold(mwt)
 end
 
 local registered = false
-local function Initialize()
+local function Initialize(matName, matSrc)
 	if not registered then
 		gadgetHandler:RegisterGlobal("SetWreckMetalThreshold", SetWreckMetalThreshold)
 		registered = true
 	end
+	if matSrc.ProcessOptions then
+		matSrc.ProcessOptions(matSrc, "metal_highlight", {false})
+	end
 end
 
 local unregistered = false
-local function Finalize()
+local function Finalize(matName, matSrc)
 	if not unregistered then
 		gadgetHandler:DeregisterGlobal("SetWreckMetalThreshold")
 		unregistered = true
@@ -79,10 +82,6 @@ local featureTreeTemplate = Spring.Utilities.MergeWithDefault(matTemplate, {
 	deferredOptions = {
 		treewind = true,
 	},
-	Initialize	= Initialize,
-	Finalize	= Finalize,
-	DrawGenesis	= DrawGenesis,
-	DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
 })
 
 local materials = {
