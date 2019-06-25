@@ -314,11 +314,6 @@ local function DoDrawOutline(isScreenSpace)
 	gl.Texture(0, false)
 	gl.Texture(1, false)
 	gl.Texture(3, false)
-
---	gl.Texture(0, blurTexes[2])
---	gl.CallList(screenWideList)
---	gl.Texture(0, false)
-	
 end
 
 local function EnterLeaveScreenSpace(functionName, ...)
@@ -339,25 +334,6 @@ local function EnterLeaveScreenSpace(functionName, ...)
 	gl.PopMatrix()
 end
 
---[[
 function widget:DrawWorld()
 	EnterLeaveScreenSpace(DoDrawOutline, false)
-end]]--
-
-function widget:DrawWorld()
-	gl.MatrixMode(GL.MODELVIEW)
-	gl.PushMatrix()
-	gl.LoadIdentity()
-
-		gl.MatrixMode(GL.PROJECTION)
-		gl.PushMatrix()
-		gl.LoadIdentity();
-
-			DoDrawOutline(false)
-
-		gl.MatrixMode(GL.PROJECTION)
-		gl.PopMatrix()
-
-	gl.MatrixMode(GL.MODELVIEW)
-	gl.PopMatrix()
 end
