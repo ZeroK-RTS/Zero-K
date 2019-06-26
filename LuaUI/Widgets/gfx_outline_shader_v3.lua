@@ -1,4 +1,4 @@
-local wiName = "Outline Shader v2"
+local wiName = "Outline Shader v3"
 function widget:GetInfo()
 	return {
 		name      = wiName,
@@ -23,10 +23,10 @@ local GL_COLOR_ATTACHMENT0_EXT = 0x8CE0
 
 local BLUR_HALF_KERNEL_SIZE = 3 -- (BLUR_HALF_KERNEL_SIZE + BLUR_HALF_KERNEL_SIZE + 1) samples are used to perform the blur.
 local BLUR_PASSES = 1 -- number of blur passes
-local BLUR_SIGMA = 1
+local BLUR_SIGMA = 0.5
 
 local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
-local OUTLINE_STRENGTH = 1.4 -- make it much smaller for softer edges
+local OUTLINE_STRENGTH = 2.0 -- make it much smaller for softer edges
 
 local USE_MATERIAL_INDICES = true
 
@@ -59,7 +59,6 @@ local blurFBOs = {}
 
 local shapeShader
 local gaussianBlurShader
-local applicationShader
 
 
 -----------------------------------------------------------------
@@ -162,17 +161,16 @@ function widget:Initialize()
 
 	local identityShaderVert = VFS.LoadFile(shadersDir.."identity.vert.glsl")
 
-	local shapeShaderFrag = VFS.LoadFile(shadersDir.."outlineShape2.frag.glsl")
+	local shapeShaderFrag = VFS.LoadFile(shadersDir.."outlineShape3.frag.glsl")
 
 	shapeShaderFrag = shapeShaderFrag:gsub("###USE_MATERIAL_INDICES###", tostring((USE_MATERIAL_INDICES and 1) or 0))
 	shapeShaderFrag = shapeShaderFrag:gsub("###DEPTH_CLIP01###", (Platform.glSupportClipSpaceControl and "1" or "0"))
+
 
 	shapeShader = LuaShader({
 		vertex = identityShaderVert,
 		fragment = shapeShaderFrag,
 		uniformInt = {
-			-- be consistent with gfx_deferred_rendering.lua
-			--	glTexture(1, "$model_gbuffer_zvaltex")
 			modelDepthTex = 1,
 			modelMiscTex = 2,
 			mapDepthTex = 3,
@@ -206,21 +204,6 @@ function widget:Initialize()
 		gaussianBlurShader:SetUniformFloatArrayAlways("offsets", gaussOffsets)
 	end)
 
-	local applicationFrag = VFS.LoadFile(shadersDir.."outlineApplication2.frag.glsl")
-
-	applicationShader = LuaShader({
-		vertex = identityShaderVert,
-		fragment = applicationFrag,
-		uniformInt = {
-			tex = 0,
-			modelDepthTex = 1,
-			mapDepthTex = 3,
-		},
-		uniformFloat = {
-			viewPortSize = {vsx, vsy},
-		},
-	}, wiName..": Outline Application")
-	applicationShader:Initialize()
 end
 
 function widget:Shutdown()
@@ -247,7 +230,6 @@ function widget:Shutdown()
 
 	shapeShader:Finalize()
 	gaussianBlurShader:Finalize()
-	applicationShader:Finalize()
 end
 
 local function DoDrawOutline(isScreenSpace)
@@ -303,22 +285,17 @@ local function DoDrawOutline(isScreenSpace)
 
 		end)
 	end
-	
+
 	gl.Blending(true)
 	gl.BlendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA) --alpha NO pre-multiply
 
-	--gl.Texture(1, "$model_gbuffer_zvaltex") -- already bound
-
-	applicationShader:ActivateWith( function ()
-		gl.CallList(screenWideList)
-	end)
-
-	gl.Texture(0, false)
 	gl.Texture(1, false)
 	gl.Texture(3, false)
-	
-	gl.Texture(0, blurTexes[2])
+
+	--gl.Texture(0, shapeTex)
+
 	gl.CallList(screenWideList)
+
 	gl.Texture(0, false)
 end
 
