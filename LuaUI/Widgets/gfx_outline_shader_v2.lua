@@ -21,19 +21,14 @@ local GL_COLOR_ATTACHMENT0_EXT = 0x8CE0
 -- Configuration Constants
 -----------------------------------------------------------------
 
---local MIN_FPS = 20
---local MIN_FPS_DELTA = 10
---local AVG_FPS_ELASTICITY = 0.2
---local AVG_FPS_ELASTICITY_INV = 1.0 - AVG_FPS_ELASTICITY
-
-local BLUR_HALF_KERNEL_SIZE = 5 -- (BLUR_HALF_KERNEL_SIZE + BLUR_HALF_KERNEL_SIZE + 1) samples are used to perform the blur.
-local BLUR_PASSES = 1 -- number of blur passes
-local BLUR_SIGMA = 1 -- Gaussian sigma of a single blur pass, other factors like BLUR_HALF_KERNEL_SIZE, BLUR_PASSES and DOWNSAMPLE affect the end result gaussian shape too
+local BLUR_HALF_KERNEL_SIZE = 3 -- (BLUR_HALF_KERNEL_SIZE + BLUR_HALF_KERNEL_SIZE + 1) samples are used to perform the blur.
+local BLUR_PASSES = 2 -- number of blur passes
+local BLUR_SIGMA = 1
 
 local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
-local OUTLINE_STRENGTH = 20.5 -- make it much smaller for softer edges
+local OUTLINE_STRENGTH = 2.5 -- make it much smaller for softer edges
 
-local USE_MATERIAL_INDICES = true -- for future material indices based SSAO evaluation
+local USE_MATERIAL_INDICES = true
 
 
 -----------------------------------------------------------------
@@ -218,30 +213,13 @@ function widget:Initialize()
 		uniformInt = {
 			tex = 0,
 			modelDepthTex = 1,
+			mapDepthTex = 3,
 		},
 		uniformFloat = {
 			viewPortSize = {vsx, vsy},
 		},
 	}, wiName..": Outline Application")
 	applicationShader:Initialize()
-
-	WG['outline'] = {}
-	WG['outline'].getSize = function()
-		return BLUR_SIGMA
-	end
-	WG['outline'].setSize = function(value)
-		BLUR_SIGMA = value
-		widget:Shutdown()
-		widget:Initialize()
-	end
-	WG['outline'].getStrength = function()
-		return OUTLINE_STRENGTH
-	end
-	WG['outline'].setStrength = function(value)
-		OUTLINE_STRENGTH = value
-		widget:Shutdown()
-		widget:Initialize()
-	end
 end
 
 function widget:Shutdown()
@@ -271,18 +249,19 @@ function widget:Shutdown()
 	applicationShader:Finalize()
 end
 
-local show = true
-local function PrepareOutline()
-	if not show then
-		return
-	end
+local function DoDrawOutline(isScreenSpace)
 	gl.DepthTest(false)
 	gl.DepthMask(false)
 	gl.Blending(false)
 
 	if firstTime then
 		screenQuadList = gl.CreateList(gl.TexRect, -1, -1, 1, 1)
-		screenWideList = gl.CreateList(gl.TexRect, -1, -1, 1, 1, false, true)
+		if isScreenSpace then
+			--screenWideList = gl.CreateList(gl.TexRect, 0, vsy, vsx, 0)
+			screenWideList = gl.CreateList(gl.TexRect, 0, vsy, vsx, 0)
+		else
+			screenWideList = gl.CreateList(gl.TexRect, -1, -1, 1, 1, false, true)
+		end
 		firstTime = false
 	end
 
@@ -300,7 +279,6 @@ local function PrepareOutline()
 			if USE_MATERIAL_INDICES then
 				gl.Texture(2, false)
 			end
-			gl.Texture(3, false)
 		end)
 	end)
 
@@ -323,44 +301,20 @@ local function PrepareOutline()
 
 		end)
 	end
-
-	gl.Texture(0, false)
-	gl.Texture(1, false)
-end
-
-local function DrawOutline(strength)
+	
 	gl.Blending(true)
 	gl.BlendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA) --alpha NO pre-multiply
 
-	gl.Texture(0, blurTexes[2])
-	gl.Texture(1, "$model_gbuffer_zvaltex")
+	--gl.Texture(1, "$model_gbuffer_zvaltex") -- already bound
 
 	applicationShader:ActivateWith( function ()
-		applicationShader:SetUniformFloat("strength", strength or 1.0)
 		gl.CallList(screenWideList)
 	end)
 
 	gl.Texture(0, false)
 	gl.Texture(1, false)
+	gl.Texture(3, false)
 end
-
-
---local accuTime = 0
---local lastTime = 0
---local averageFPS = MIN_FPS + MIN_FPS_DELTA
---
---function widget:Update(dt)
---	accuTime = accuTime + dt
---	if accuTime >= lastTime + 1 then
---		lastTime = accuTime
---		averageFPS = AVG_FPS_ELASTICITY_INV * averageFPS + AVG_FPS_ELASTICITY * Spring.GetFPS()
---		if averageFPS < MIN_FPS then
---			show = false
---		elseif averageFPS > MIN_FPS + MIN_FPS_DELTA then
---			show = true
---		end
---	end
---end
 
 local function EnterLeaveScreenSpace(functionName, ...)
 	gl.MatrixMode(GL.MODELVIEW)
@@ -380,16 +334,6 @@ local function EnterLeaveScreenSpace(functionName, ...)
 	gl.PopMatrix()
 end
 
-function widget:DrawUnitsPostDeferred() --to be done
-	--Spring.Echo("DrawUnitsPostDeferred")
-end
-
-function widget:DrawWorldPreUnit()
-	EnterLeaveScreenSpace( function()
-		PrepareOutline()
-		DrawOutline(100.0)
-	end)
-end
-
 function widget:DrawWorld()
+	EnterLeaveScreenSpace(DoDrawOutline, false)
 end
