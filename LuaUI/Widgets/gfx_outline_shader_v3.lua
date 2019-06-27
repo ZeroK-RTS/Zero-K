@@ -16,20 +16,55 @@ end
 -----------------------------------------------------------------
 
 local GL_COLOR_ATTACHMENT0_EXT = 0x8CE0
+local PI = math.pi
 
 -----------------------------------------------------------------
 -- Configuration Constants
 -----------------------------------------------------------------
 
+local SUBTLE_MIN = 50
+local SUBTLE_MAX = 3000
+
 local BLUR_HALF_KERNEL_SIZE = 3 -- (BLUR_HALF_KERNEL_SIZE + BLUR_HALF_KERNEL_SIZE + 1) samples are used to perform the blur.
 local BLUR_PASSES = 1 -- number of blur passes
-local BLUR_SIGMA = 0.5
+
+local BLUR_SIGMA_ZOOMIN = 0.6
+local BLUR_SIGMA_ZOOMOUT = 0.3
 
 local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
-local OUTLINE_STRENGTH = 2.0 -- make it much smaller for softer edges
+local OUTLINE_STRENGTH = 2.5 -- make it much smaller for softer edges
 
 local USE_MATERIAL_INDICES = true
 
+-----------------------------------------------------------------
+-- Options
+-----------------------------------------------------------------
+
+local functionScaleWithHeight = true
+
+options_path = 'Settings/Graphics/Unit Visibility/Outline v3'
+options = {
+	thickness = {
+		name = 'Outline Thickness',
+		desc = 'How thick the outline appears around objects (the thicker - the more expensive)',
+		type = 'number',
+		min = 1, max = 3, step = 1,
+		value = 1,
+		OnChange = function (self)
+			BLUR_PASSES = self.value
+		end,
+	},
+	functionScaleWithHeight = {
+		name = 'Scale With Distance',
+		desc = 'Reduces the screen space width of outlines when zoomed out',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = function (self)
+			functionScaleWithHeight = self.value
+		end,
+	},
+}
 
 -----------------------------------------------------------------
 -- File path Constants
@@ -66,41 +101,72 @@ local gaussianBlurShader
 -----------------------------------------------------------------
 
 local function G(x, sigma)
-	return ( 1 / ( math.sqrt(2 * math.pi) * sigma ) ) * math.exp( -(x * x) / (2 * sigma * sigma) )
+	return ( 1 / ( math.sqrt(2 * PI) * sigma ) ) * math.exp( -(x * x) / (2 * sigma * sigma) )
 end
 
-local function GetGaussDiscreteWeightsOffsets(sigma, kernelHalfSize, valMult)
-	local weights = {}
-	local offsets = {}
-
-	weights[1] = G(0, sigma)
-	local sum = weights[1]
+local dWeights = {}
+local dOffsets = {}
+local sum = 0
+local function FillGaussDiscreteWeightsOffsets(sigma, kernelHalfSize, valMult)
+	dWeights[1] = G(0, sigma)
+	sum = dWeights[1]
 
 	for i = 1, kernelHalfSize - 1 do
-		weights[i + 1] = G(i, sigma)
-		sum = sum + 2.0 * weights[i + 1]
+		dWeights[i + 1] = G(i, sigma)
+		sum = sum + 2.0 * dWeights[i + 1]
 	end
 
 	for i = 0, kernelHalfSize - 1 do --normalize so the weights sum up to valMult
-		weights[i + 1] = weights[i + 1] / sum * valMult
-		offsets[i + 1] = i
+		dWeights[i + 1] = dWeights[i + 1] / sum * valMult
+		dOffsets[i + 1] = i
 	end
-	return weights, offsets
 end
 
 --see http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
-local function GetGaussLinearWeightsOffsets(sigma, kernelHalfSize, valMult)
-	local dWeights, dOffsets = GetGaussDiscreteWeightsOffsets(sigma, kernelHalfSize, 1.0)
+local fWeights = {}
+local fOffsets = {}
+local function FillGaussLinearWeightsOffsets(sigma, kernelHalfSize, valMult)
+	FillGaussDiscreteWeightsOffsets(sigma, kernelHalfSize, 1.0)
 
-	local weights = {dWeights[1]}
-	local offsets = {dOffsets[1]}
+	fWeights = {dWeights[1]}
+	fOffsets = {dOffsets[1]}
 
 	for i = 1, (kernelHalfSize - 1) / 2 do
 		local newWeight = dWeights[2 * i] + dWeights[2 * i + 1]
-		weights[i + 1] = newWeight * valMult
-		offsets[i + 1] = (dOffsets[2 * i] * dWeights[2 * i] + dOffsets[2 * i + 1] * dWeights[2 * i + 1]) / newWeight
+		fWeights[i + 1] = newWeight * valMult
+		fOffsets[i + 1] = (dOffsets[2 * i] * dWeights[2 * i] + dOffsets[2 * i + 1] * dWeights[2 * i + 1]) / newWeight
 	end
-	return weights, offsets
+end
+
+local function GetZoomScale()
+	if not functionScaleWithHeight then
+		return 1
+	end
+	local cs = Spring.GetCameraState()
+	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
+	local cameraHeight
+	if cs.name == "ta" then
+		cameraHeight = cs.height - gy
+	else
+		cameraHeight = cs.py - gy
+	end
+	cameraHeight = math.max(1.0, cameraHeight)
+	--Spring.Echo("cameraHeight", cameraHeight)
+
+	if functionScaleWithHeight then
+		if cameraHeight < SUBTLE_MIN then
+			return 1
+		end
+		if cameraHeight > SUBTLE_MAX then
+			return 0.0
+		end
+
+		return (((math.cos(PI * (cameraHeight - SUBTLE_MIN) / (SUBTLE_MAX - SUBTLE_MIN)) + 1) / 2)^2) / 2
+	end
+end
+
+local function mix(a, b, t)
+	return a * (1 - t) + b * t
 end
 
 -----------------------------------------------------------------
@@ -196,14 +262,6 @@ function widget:Initialize()
 		},
 	}, wiName..": Gaussian Blur")
 	gaussianBlurShader:Initialize()
-
-	local gaussWeights, gaussOffsets = GetGaussLinearWeightsOffsets(BLUR_SIGMA, BLUR_HALF_KERNEL_SIZE, OUTLINE_STRENGTH)
-
-	gaussianBlurShader:ActivateWith( function()
-		gaussianBlurShader:SetUniformFloatArrayAlways("weights", gaussWeights)
-		gaussianBlurShader:SetUniformFloatArrayAlways("offsets", gaussOffsets)
-	end)
-
 end
 
 function widget:Shutdown()
@@ -268,9 +326,16 @@ local function DoDrawOutline(isScreenSpace)
 
 	gl.Texture(0, shapeTex)
 
+	gaussianBlurShader:ActivateWith( function ()
+		local blurSigma = mix(BLUR_SIGMA_ZOOMIN, BLUR_SIGMA_ZOOMOUT, 1.0 - GetZoomScale())
+
+		FillGaussLinearWeightsOffsets(blurSigma, BLUR_HALF_KERNEL_SIZE, OUTLINE_STRENGTH)
+		gaussianBlurShader:SetUniformFloatArrayAlways("weights", fWeights)
+		gaussianBlurShader:SetUniformFloatArrayAlways("offsets", fOffsets)
+	end)
+
 	for i = 1, BLUR_PASSES do
 		gaussianBlurShader:ActivateWith( function ()
-
 			gaussianBlurShader:SetUniform("dir", 1.0, 0.0) --horizontal blur
 			gl.ActiveFBO(blurFBOs[1], function()
 				gl.CallList(screenQuadList) -- gl.TexRect(-1, -1, 1, 1)
