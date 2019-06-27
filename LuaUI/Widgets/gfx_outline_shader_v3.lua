@@ -101,7 +101,8 @@ local gaussianBlurShader
 -----------------------------------------------------------------
 
 local function G(x, sigma)
-	return ( 1 / ( math.sqrt(2 * PI) * sigma ) ) * math.exp( -(x * x) / (2 * sigma * sigma) )
+	--return ( 1 / ( math.sqrt(2 * PI) * sigma ) ) * math.exp( -(x * x) / (2 * sigma * sigma) )
+	return 0.3989422804 * math.exp(-0.5 * x * x / (sigma * sigma)) / sigma;
 end
 
 local dWeights = {}
@@ -188,7 +189,7 @@ function widget:Initialize()
 	vsx, vsy, vpx, vpy = Spring.GetViewGeometry()
 
 	local commonTexOpts = {
-		target = GL_TEXTURE_2D,
+		target = GL.TEXTURE_2D,
 		border = false,
 		min_filter = GL.NEAREST,
 		mag_filter = GL.LINEAR,
