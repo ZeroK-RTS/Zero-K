@@ -55,14 +55,14 @@ local gameFrame = 0
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function setFlyLow(unitID, height)
+local function setFlyLow(unitID, height, targetID)
 	local wantedHeight = bombers[unitID].config.diveHeight + height
 	if wantedHeight > bombers[unitID].config.orgHeight then
 		wantedHeight = bombers[unitID].config.orgHeight
 	end
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
 	if env then
-		Spring.UnitScript.CallAsUnit(unitID, env.BomberDive_FlyLow, wantedHeight)
+		Spring.UnitScript.CallAsUnit(unitID, env.BomberDive_FlyLow, wantedHeight, targetID)
 	end
 end
 
@@ -222,7 +222,7 @@ local function GetWantedBomberHeight(unitID, bomberID, config, underShield)
 	return diveHeight
 end
 
-local function temporaryDive(unitID, duration, height, distance)
+local function temporaryDive(unitID, duration, height, distance, targetID)
 	local config = bombers[unitID].config
 	
 	-- No distance given for shield collision, dive as soon as possible.
@@ -234,7 +234,7 @@ local function temporaryDive(unitID, duration, height, distance)
 		end
 	end
 	
-	setFlyLow(unitID, height)
+	setFlyLow(unitID, height, targetID)
 	bombers[unitID].resetTime = UPDATE_FREQUENCY * math.ceil((Spring.GetGameFrame() + duration)/UPDATE_FREQUENCY)
 end
 
@@ -256,7 +256,7 @@ function Bomber_Dive_fake_fired(unitID)
 				if targetID and mobile then
 					local height = GetWantedBomberHeight(targetID, unitID, bombers[unitID].config)
 					local distance = GetCollisionDistance(unitID, targetID)
-					temporaryDive(unitID, 8, height, distance)
+					temporaryDive(unitID, 8, height, distance, targetID)
 				end
 			end
 		end
@@ -280,7 +280,7 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 						if targetID then
 							local height = GetWantedBomberHeight(targetID, proOwnerID, bombers[proOwnerID].config, true)
 							local distance = GetCollisionDistance(proOwnerID, targetID)
-							temporaryDive(proOwnerID, 45, height, distance)
+							temporaryDive(proOwnerID, 45, height, distance, targetID)
 						else
 							temporaryDive(proOwnerID, 45, 40)
 						end

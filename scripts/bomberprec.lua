@@ -62,7 +62,35 @@ local fullHeight = UnitDefNames["bomberprec"].wantedHeight/1.5
 
 local minSpeedMult = 0.75
 
-local function BehaviourChangeThread(behaviour)
+local PREDICT_FRAMES = 10
+local function TargetHeightUpdateThread(targetID, behaviour)
+	-- Inherits signals from BehaviourChangeThread
+	local flatDiveHeight = behaviour.wantedHeight
+	
+	while Spring.ValidUnitID(targetID) do
+		local tx,_,tz = spGetUnitPosition(targetID)
+		local tHeight = max(Spring.GetGroundHeight(tx, tz), 0)
+		
+		local ux,_,uz = spGetUnitPosition(unitID)
+		local vx,vy,vz = spGetUnitVelocity(unitID)
+		vx, vz = vx*PREDICT_FRAMES, vz*PREDICT_FRAMES
+		local predictX, predictZ = ux + vx, uz + vz
+		if math.abs(ux - tx) < vx then
+			local predictX = tx
+		end
+		if math.abs(uz - tz) < vz then
+			predictZ = tz
+		end
+		local uHeight = max(spGetGroundHeight(predictX, predictZ), 0)
+		
+		behaviour.wantedHeight = flatDiveHeight + max((tHeight - uHeight)*0.4, 0)
+		Spring.MoveCtrl.SetAirMoveTypeData(unitID, behaviour)
+		
+		Sleep(200)
+	end
+end
+
+local function BehaviourChangeThread(behaviour, targetID)
 	Signal(SIG_CHANGE_FLY_HEIGHT)
 	SetSignalMask(SIG_CHANGE_FLY_HEIGHT)
 	
@@ -81,6 +109,9 @@ local function BehaviourChangeThread(behaviour)
 	end
 	
 	Spring.MoveCtrl.SetAirMoveTypeData(unitID, behaviour)
+	if targetID then
+		TargetHeightUpdateThread(targetID, behaviour)
+	end
 	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	--GG.UpdateUnitAttributes(unitID)
 	--GG.UpdateUnitAttributes(unitID)
@@ -92,7 +123,7 @@ local function SpeedControl()
 	while true do
 		local x,y,z = spGetUnitPosition(unitID)
 		local terrain = max(spGetGroundHeight(x,z), 0) -- not amphibious, treat water as ground
-		local speedMult = minSpeedMult + (1-minSpeedMult)*max(0, min(1, (y - terrain-50)/(fullHeight-60)))
+		local speedMult = minSpeedMult + (1-minSpeedMult)*max(0, min(1, (y - terrain - 50)/(fullHeight - 60)))
 		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", speedMult)
 		GG.UpdateUnitAttributes(unitID)
 		GG.UpdateUnitAttributes(unitID)
@@ -104,11 +135,11 @@ function BomberDive_FlyHigh()
 	StartThread(BehaviourChangeThread, highBehaviour)
 end
 
-function BomberDive_FlyLow(height)
+function BomberDive_FlyLow(height, targetID)
 	height = math.min(height, highBehaviour.wantedHeight)
 	StartThread(SpeedControl)
 	lowBehaviour.wantedHeight = height
-	StartThread(BehaviourChangeThread, lowBehaviour)
+	StartThread(BehaviourChangeThread, lowBehaviour, targetID)
 end
 
 function script.StartMoving()
