@@ -14,6 +14,7 @@ vertex = [[
 	#define OPTION_NORMALMAP_FLIP 6
 	#define OPTION_METAL_HIGHLIGHT 7
 	#define OPTION_TREEWIND 8
+	#define OPTION_POM 9
 
 	/***********************************************************************/
 	// Definitions
@@ -146,6 +147,8 @@ vertex = [[
 			worldBitangent = modelNormalMatrix * B;
 			worldNormal = modelNormalMatrix * modelVertexNormal;
 		} else {
+			worldTangent = modelNormalMatrix * vec3(1.0, 0.0, 0.0);
+			worldBitangent = modelNormalMatrix * vec3(0.0, 1.0, 0.0);
 			worldNormal = modelNormalMatrix * modelVertexNormal;
 		}
 
@@ -213,6 +216,7 @@ fragment = [[
 	#define OPTION_NORMALMAP_FLIP 6
 	#define OPTION_METAL_HIGHLIGHT 7
 	#define OPTION_TREEWIND 8
+	#define OPTION_POM 9
 
 	/***********************************************************************/
 	// Definitions
@@ -255,6 +259,9 @@ fragment = [[
 	// Misc. uniforms
 	uniform vec4 teamColor;
 	uniform float shadowDensity;
+
+	uniform vec4 pomParams;
+
 	uniform int shadowsQuality;
 	uniform int materialIndex;
 
@@ -390,6 +397,74 @@ fragment = [[
 		return shadow;
 	}
 
+
+	#define POM_SCALE pomParams.x
+	#define POM_MINLAYERS pomParams.y
+	#define POM_MAXLAYERS pomParams.z
+	#define POM_LODBIAS pomParams.w
+	#define GET_DISPLACEMENT_VALUE(coord) (1.0 - texture(normalTex, coord, POM_LODBIAS).w)
+
+	vec2 ParallaxOcclusionMapping(vec2 uv, vec3 viewDir, float camDistNorm) {
+
+		float oneDotVDZ = abs(dot(vec3(0.0, 0.0, 1.0), viewDir));
+		float numLayers = POM_MAXLAYERS * (1.0 - oneDotVDZ) * camDistNorm;
+		numLayers = ceil(numLayers);
+
+		numLayers = clamp(numLayers, POM_MINLAYERS, POM_MAXLAYERS);
+
+		// calculate the size of each layer
+		float layerDepth = 1.0 / numLayers;
+
+		// depth of current layer
+		float currentLayerDepth = 0.0;
+
+		vec2 Pn = viewDir.xy;
+		vec2 Pp = Pn / viewDir.z;
+
+		float Pmix = smoothstep(0.0, 0.4, oneDotVDZ);
+		//float Pmix = step(0.5, oneDotVDZ);
+
+
+		vec2 P = mix(Pn, Pp, Pmix) * POM_SCALE;
+
+		vec2 deltaTexCoords = P / numLayers;
+
+		// get initial values
+		vec2  currentTexCoords     = uv;
+		float currentDepthMapValue = GET_DISPLACEMENT_VALUE(currentTexCoords);
+
+		int currentStep = int(numLayers);
+		while(currentStep > 0) {
+			// shift texture coordinates along direction of P
+			currentTexCoords -= deltaTexCoords;
+
+			// get depthmap value at current texture coordinates
+			currentDepthMapValue = GET_DISPLACEMENT_VALUE(currentTexCoords);
+
+			// get depth of next layer
+			currentLayerDepth += layerDepth;
+			if (currentLayerDepth >= currentDepthMapValue)
+				break;
+
+			currentStep--;
+		}
+
+
+		// get texture coordinates before collision (reverse operations)
+		vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+
+		// get depth after and before collision for linear interpolation
+		float afterDepth  = currentDepthMapValue - currentLayerDepth;
+		float beforeDepth = GET_DISPLACEMENT_VALUE(prevTexCoords) - currentLayerDepth + layerDepth;
+
+		// interpolation of texture coordinates
+		float weight = afterDepth / (afterDepth - beforeDepth);
+		vec2 finalTexCoords = mix(currentTexCoords, prevTexCoords, weight);
+
+		return finalTexCoords;
+	}
+
 	/***********************************************************************/
 	// Shader output definitions
 	#if (DEFERRED_MODE == 1)
@@ -403,25 +478,46 @@ fragment = [[
 	void main(void){
 		#line 30342
 
-		vec4 texColor1 = texture(texture1, modelUV);
-		vec4 texColor2 = texture(texture2, modelUV);
+		vec2 myUV = modelUV;
+
+		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAP_FLIP)) {
+			myUV.y = 1.0 - myUV.y;
+		}
+
+		mat3 worldTBN;
+		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING) || BITMASK_FIELD(bitOptions, OPTION_POM)) {
+			worldTBN = mat3(normalize(worldTangent), normalize(worldBitangent), normalize(worldNormal));
+		}
+
+		if (BITMASK_FIELD(bitOptions, OPTION_POM)) {
+			mat3 invWorldTBN = transpose(worldTBN);
+			vec3 tbnV = invWorldTBN * normalize(worldCameraDir);
+
+			float depthPomScale = 1.0 - smoothstep(15.0, 250.0, 1.0 / gl_FragCoord.w);
+			myUV = ParallaxOcclusionMapping(myUV, tbnV, depthPomScale);
+
+			bvec4 badTexCoords = bvec4(myUV.x > 1.0, myUV.y > 1.0, myUV.x < 0.0, myUV.y < 0.0);
+			if (any(badTexCoords)) {
+				discard;
+			}
+		}
 
 		// N - worldFragNormal
 		vec3 N;
+
 		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING)) {
-			vec2 nmUV = modelUV;
-			if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAP_FLIP)) {
-				nmUV.y = 1.0 - nmUV.y;
-			}
-			vec3 tbnNormal = normalize(NORM2SNORM(texture(normalTex, nmUV).xyz));
-			#if 1 //TODO, check if required
-				N = mat3(normalize(worldTangent), normalize(worldBitangent), normalize(worldNormal)) * tbnNormal;
-			#else
-				N = mat3(worldTangent, worldBitangent, worldNormal) * tbnNormal;
-			#endif
+			vec3 tbnNormal = normalize(NORM2SNORM(texture(normalTex, myUV).xyz));
+			N = worldTBN * tbnNormal;
 		} else {
 			N = normalize(worldNormal);
 		}
+
+		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAP_FLIP)) {
+			myUV.y = 1.0 - myUV.y;
+		}
+
+		vec4 texColor1 = texture(texture1, myUV);
+		vec4 texColor2 = texture(texture2, myUV);
 
 		// L - worldLightDir
 		/// Sun light is considered infinitely far, so it stays same no matter worldVertexPos.xyz
@@ -496,7 +592,7 @@ fragment = [[
 		#undef wreckMetal
 
 		#if 0
-			finalColor = addColor;
+			finalColor = vec3(1.0 - smoothstep(15.0, 400.0, 1.0 / gl_FragCoord.w));
 		#endif
 
 		#if (DEFERRED_MODE == 0)
@@ -543,31 +639,36 @@ local defaultMaterialTemplate = {
 		shadowmapping 	= true,
 		normalmapping 	= false,
 		threads 		= false,
-		vertex_ao		= false,
-		flashlights		= false,
-		unitsfog		= false,
-		normalmap_flip	= false,
-		metal_highlight	= false,
-		treewind		= false,
+		vertex_ao 		= false,
+		flashlights 	= false,
+		unitsfog 		= false,
+		normalmap_flip 	= false,
+		metal_highlight = false,
+		treewind 		= false,
+		pom 			= true,
 
 		shadowsQuality	= 2,
 		materialIndex	= 0,
+
 		sunSpecularParams = {18.0, 4.0, 0.0}, -- Exponent, multiplier, bias
+		pomParams = {0.002, 1.0, 24.0, -2.0}, -- scale, minLayers, maxLayers, lodBias
 	},
 
 	deferredOptions = {
 		shadowmapping 	= true,
 		normalmapping 	= false,
 		threads 		= false,
-		vertex_ao		= false,
-		flashlights		= false,
-		unitsfog		= false,
-		normalmap_flip	= false,
-		metal_highlight	= false,
-		treewind		= false,
+		vertex_ao 		= false,
+		flashlights 	= false,
+		unitsfog 		= false,
+		normalmap_flip 	= false,
+		metal_highlight = false,
+		treewind 		= false,
+		pom 			= false,
 
 		shadowsQuality	= 0,
 		materialIndex	= 0,
+
 		sunSpecularParams = {18.0, 4.0, 0.0}, -- Exponent, multiplier, bias
 	},
 
@@ -602,6 +703,7 @@ local shaderPlugins = {
 	#define OPTION_NORMALMAP_FLIP 6
 	#define OPTION_METAL_HIGHLIGHT 7
 	#define OPTION_TREEWIND 8
+	#define OPTION_POM 9
 ]]--
 
 -- bit = (index - 1)
@@ -615,6 +717,7 @@ local knownBitOptions = {
 	["normalmap_flip"] = 6,
 	["metal_highlight"] = 7,
 	["treewind"] = 8,
+	["pom"] = 9,
 }
 
 local knownIntOptions = {
@@ -623,6 +726,7 @@ local knownIntOptions = {
 
 }
 local knownFloatOptions = {
+	["pomParams"] = 4,
 	["sunSpecularParams"] = 3,
 }
 
