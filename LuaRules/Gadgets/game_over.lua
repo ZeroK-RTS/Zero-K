@@ -90,6 +90,10 @@ local function GetUnitDefIdByName(defName)
   return (UnitDefNames[defName] or nilUnitDef).id
 end
 
+local alwaysHiddenDefs = {
+	[GetUnitDefIdByName("terraunit")] = true,
+}
+
 local doesNotCountList 
 if campaignBattleID then
 	doesNotCountList = {
@@ -283,11 +287,14 @@ local function RevealAllianceUnits(allianceID)
 		local teamUnits = spGetTeamUnits(t) 
 		for j=1,#teamUnits do
 			local unitID = teamUnits[j]
-			-- purge extra-map units
-			if not UnitWithinBounds(unitID) then
-				Spring.DestroyUnit(unitID)
-			else
-				Spring.SetUnitAlwaysVisible(unitID, true)
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			if unitDefID and (not alwaysHiddenDefs[unitDefID]) then
+				-- purge extra-map units
+				if not UnitWithinBounds(unitID) then
+					Spring.DestroyUnit(unitID)
+				else
+					Spring.SetUnitAlwaysVisible(unitID, true)
+				end
 			end
 		end
 	end
@@ -674,7 +681,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if revealed then
 		local allyTeam = select(6, spGetTeamInfo(teamID, false))
-		if allyTeam == allianceToReveal then
+		if (allyTeam == allianceToReveal) and (not alwaysHiddenDefs[unitDefID]) then
 			Spring.SetUnitAlwaysVisible(unitID, true)
 		end
 	end
