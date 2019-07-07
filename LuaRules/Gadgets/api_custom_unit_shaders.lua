@@ -14,8 +14,8 @@ function gadget:GetInfo()
 	return {
 		name      = "CustomUnitShaders",
 		desc      = "allows to override the engine unit and feature shaders",
-		author    = "jK, gajop",
-		date      = "2008,2009,2010,2016",
+		author    = "jK, gajop, ivand",
+		date      = "2008,2009,2010,2016, 2019",
 		license   = "GNU GPL, v2 or later",
 		layer     = 1,
 		enabled   = true  --  loaded by default?
@@ -549,7 +549,7 @@ function gadget:DrawGenesis()
 			local ApplyOptionsFunc = mat.ApplyOptions
 
 			if SunChangedFunc or DrawGenesisFunc or (optionsChanged and ApplyOptionsFunc) then
-				for key, shaderObject in pairs({mat.standardShaderObj, mat.deferredShaderObj}) do
+				for key, shaderObject in ipairs({mat.standardShaderObj, mat.deferredShaderObj}) do
 					if shaderObject then
 						shaderObject:ActivateWith( function ()
 
@@ -584,9 +584,24 @@ end
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 
+-- To be called once per CHECK_FREQ
+local function GameFrameSlow(gf)
+	for _, rendering in ipairs(allRendering) do
+		for _, mat in pairs(rendering.materialDefs) do
+			local gameFrameSlowFunc = mat.GameFrameSlow
+			if gameFrameSlowFunc then
+				for key, shaderObject in ipairs({mat.standardShaderObj, mat.deferredShaderObj}) do
+					gameFrameSlowFunc(gf, mat, (key == 2))
+				end
+			end
+		end
+	end
+end
+
 local CHECK_FREQ = 30
 function gadget:GameFrame(gf)
-	if gf % CHECK_FREQ == 0 then
+	local gfMod = gf % CHECK_FREQ
+	if gfMod == 0 then
 		local advShadingNow = Spring.HaveAdvShading()
 		local shadowsNow = Spring.HaveShadows()
 
@@ -599,6 +614,8 @@ function gadget:GameFrame(gf)
 			shadows = shadowsNow
 			_ProcessOptions("shadowmapping", nil, shadows, Spring.GetMyPlayerID())
 		end
+	elseif gfMod == 15 then	--TODO change 15 to something less busy
+		GameFrameSlow(gf)
 	end
 end
 

@@ -44,6 +44,42 @@ local function DrawFeature(objectID, objectDefID, mat, drawMode, luaShaderObj)
 	end
 end
 
+-- args=<objID, matName, lodMatNum, uniformName, uniformType, uniformData>
+local frSetMaterialUniform = {
+	[false] = Spring.FeatureRendering.SetForwardMaterialUniform,
+	[true]  = Spring.FeatureRendering.SetDeferredMaterialUniform,
+}
+
+-- args=<objID, matName, lodMatNum, uniformName>
+local frClearMaterialUniform = {
+	[false] = Spring.FeatureRendering.ClearForwardMaterialUniform,
+	[true]  = Spring.FeatureRendering.ClearDeferredMaterialUniform,
+}
+
+local GL_FLOAT_VEC4 = 0x8B52
+local GL_FLOAT = 0x1406
+local function GameFrameSlow(gf, mat, isDeferred)
+	--Spring.Echo("GameFrameSlow", gf, matName, isDeferred)
+	local highlightActive
+	if isDeferred then
+		highlightActive = mat.deferredOptions.metal_highlight
+	else
+		highlightActive = mat.shaderOptions.metal_highlight
+	end
+
+	if highlightActive then
+		local fs = Spring.GetAllFeatures()
+		--local fs = Spring.GetVisibleFeatures(-1, 30, false)
+		for _, fID in ipairs(fs) do
+			local metalHere = Spring.GetFeatureResources(fID)
+			metalHere = ((metalHere >= metalWreckTreshold) and metalHere) or 0.0
+			--Spring.Echo("GameFrameSlow", fID, metalHere)
+			frSetMaterialUniform[isDeferred](fID, "opaque", 3, "floatOptions[1]", GL_FLOAT, {metalHere})
+			--frSetMaterialUniform[isDeferred](fID, "opaque", 3, "floatOptions", GL_FLOAT_VEC4, {0.0, 0.0, 0.0, metalHere})
+		end
+	end
+end
+
 local gfUpd = -math.huge
 local UPDATE_DELAY = 15  --two times per second
 local function DrawGenesis(luaShader, mat)
@@ -95,13 +131,14 @@ local materials = {
 		},
 		deferredOptions = {
 			normalmapping = true,
-			metal_highlight	= true,
+			--metal_highlight	= true,
 			materialIndex = 128,
 		},
 		Initialize	= Initialize,
 		Finalize	= Finalize,
-		DrawGenesis	= DrawGenesis,
-		DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
+		--DrawGenesis	= DrawGenesis,
+		GameFrameSlow = GameFrameSlow,
+		--DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
 	}),
 
 	featuresTreeMetalNoNormal = Spring.Utilities.MergeWithDefault(featureTreeTemplate, {
@@ -109,13 +146,14 @@ local materials = {
 			metal_highlight	= true,
 		},
 		deferredOptions = {
-			metal_highlight	= true,
+			--metal_highlight	= true,
 			materialIndex = 129,
 		},
 		Initialize	= Initialize,
 		Finalize	= Finalize,
-		DrawGenesis	= DrawGenesis,
-		DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
+		--DrawGenesis	= DrawGenesis,
+		GameFrameSlow = GameFrameSlow,
+		--DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
 	}),
 
 	featuresTreeNoMetalFakeNormal = Spring.Utilities.MergeWithDefault(featureTreeTemplate, {
@@ -147,13 +185,14 @@ local materials = {
 			metal_highlight	= true,
 		},
 		deferredOptions = {
-			metal_highlight	= true,
+			--metal_highlight	= true,
 			materialIndex = 132,
 		},
 		Initialize	= Initialize,
 		Finalize	= Finalize,
-		DrawGenesis	= DrawGenesis,
-		DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
+		--DrawGenesis	= DrawGenesis,
+		GameFrameSlow = GameFrameSlow,
+		--DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
 	}),
 
 }

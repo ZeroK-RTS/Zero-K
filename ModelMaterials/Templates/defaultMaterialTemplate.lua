@@ -42,7 +42,8 @@ vertex = [[
 	uniform int simFrame;
 	uniform int drawFrame;
 
-	uniform vec4 floatOptions;
+	uniform float floatOptions[2];
+	//uniform vec4 floatOptions;
 	uniform int bitOptions;
 
 
@@ -159,7 +160,8 @@ vertex = [[
 			if ( all(bvec4(
 					greaterThanEqual(modelUV, treadBoundaries.xz),
 					lessThanEqual(modelUV, treadBoundaries.yw)))) {
-				modelUV.x += floatOptions.x;
+				modelUV.x += floatOptions[0];
+				//modelUV.x += floatOptions.x;
 			}
 		}
 
@@ -172,7 +174,8 @@ vertex = [[
 			selfIllumMod = max(-0.2, sin(simFrame * 0.067 + (modelMatrix[3][0] + modelMatrix[3][2]) * 0.1)) + 0.2;
 		}
 
-		#define wreckMetal floatOptions.w
+		#define wreckMetal floatOptions[1]
+		//#define wreckMetal floatOptions.w
 		if (BITMASK_FIELD(bitOptions, OPTION_METAL_HIGHLIGHT) && wreckMetal > 0.0) {
 			//	local alpha = (0.25*(intensity/100)) + (0.5 * (intensity/100) * math.abs(1 - (timer * 2) % 2))
 
@@ -269,7 +272,8 @@ fragment = [[
 	uniform int simFrame;
 	uniform int drawFrame;
 
-	uniform vec4 floatOptions;
+	uniform float floatOptions[2];
+	//uniform vec4 floatOptions;
 	uniform int bitOptions;
 
 
@@ -584,7 +588,8 @@ fragment = [[
 			finalColor = mix(gl_Fog.color.rgb, finalColor, fogFactor);
 		}
 
-		#define wreckMetal floatOptions.w
+		#define wreckMetal floatOptions[1]
+		//#define wreckMetal floatOptions.w
 		if (BITMASK_FIELD(bitOptions, OPTION_METAL_HIGHLIGHT) && wreckMetal > 0.0) {
 			//finalColor = mix(finalColor, addColor.aaa, addColor.rgb);
 			finalColor += addColor.a * addColor.rgb;
