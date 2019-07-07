@@ -100,8 +100,8 @@ local materials = {
 		},
 		Initialize	= Initialize,
 		Finalize	= Finalize,
-		--DrawGenesis	= DrawGenesis,
-		--DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
+		DrawGenesis	= DrawGenesis,
+		DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
 	}),
 
 	featuresTreeMetalNoNormal = Spring.Utilities.MergeWithDefault(featureTreeTemplate, {
@@ -114,8 +114,8 @@ local materials = {
 		},
 		Initialize	= Initialize,
 		Finalize	= Finalize,
-		--DrawGenesis	= DrawGenesis,
-		--DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
+		DrawGenesis	= DrawGenesis,
+		DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
 	}),
 
 	featuresTreeNoMetalFakeNormal = Spring.Utilities.MergeWithDefault(featureTreeTemplate, {
@@ -152,8 +152,8 @@ local materials = {
 		},
 		Initialize	= Initialize,
 		Finalize	= Finalize,
-		--DrawGenesis	= DrawGenesis,
-		--DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
+		DrawGenesis	= DrawGenesis,
+		DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
 	}),
 
 }
