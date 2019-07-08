@@ -34,12 +34,12 @@ local function FindNormalmap(tex1, tex2)
 
 	--// check if there is a corresponding _normals.dds file
 	if tex1 and (VFS.FileExists(tex1)) then
-		local basefilename = tex1:gsub("%....","")
-		if (tonumber(basefilename:sub(-1,-1))) then
-			basefilename = basefilename:sub(1,-2)
+		local basefilename = tex1:gsub("%....", "")
+		if (tonumber(basefilename:sub(-1, -1))) then
+			basefilename = basefilename:sub(1, -2)
 		end
-		if (basefilename:sub(-1,-1) == "_") then
-			basefilename = basefilename:sub(1,-2)
+		if (basefilename:sub(-1, -1) == "_") then
+			basefilename = basefilename:sub(1, -2)
 		end
 		normaltex = basefilename .. "_normals.dds"
 		if (not VFS.FileExists(normaltex)) then
@@ -48,12 +48,12 @@ local function FindNormalmap(tex1, tex2)
 	end --if FileExists
 
 	if (not normaltex) and tex2 and (VFS.FileExists(tex2)) then
-		local basefilename = tex2:gsub("%....","")
-		if (tonumber(basefilename:sub(-1,-1))) then
-			basefilename = basefilename:sub(1,-2)
+		local basefilename = tex2:gsub("%....", "")
+		if (tonumber(basefilename:sub(-1, -1))) then
+			basefilename = basefilename:sub(1, -2)
 		end
 		if (basefilename:sub(-1,-1) == "_") then
-			basefilename = basefilename:sub(1,-2)
+			basefilename = basefilename:sub(1, -2)
 		end
 		normaltex = basefilename .. "_normals.dds"
 		if (not VFS.FileExists(normaltex)) then
@@ -87,7 +87,7 @@ local function GetS3ONormalTex(udef, tex1, tex2)
 
 		-- output units without tex2
 		if not tex2 then
-			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "CustomUnitShaders: " .. udef.name .. " no tex2")
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "CustomUnitShaders: " .. udef.name .. "has no tex2")
 		end
 
 		normaltex = FindNormalmap(tex1, tex2)
@@ -111,7 +111,7 @@ local function GetAssimpNormalTex(udef, tex1, tex2)
 
 				-- output units without tex2
 				if not tex2 then
-					Spring.Log(gadget:GetInfo().name, LOG.WARNING, "CustomUnitShaders: " .. udef.name .. " no tex2")
+					Spring.Log(gadget:GetInfo().name, LOG.WARNING, "CustomUnitShaders: " .. udef.name .. "has no tex2")
 				end
 
 				normaltex = FindNormalmap(tex1, tex2)
@@ -128,11 +128,9 @@ local function GetNormalTex(udef)
 		normalTex = udef.customParams.normaltex
 	elseif ((not normalTex) and udef.modeltype == "s3o") then --s3o
 		normalTex = GetS3ONormalTex(udef, tex1, tex2)
-
-	elseif ((not normalTex) and udef.modeltype ~= "3do") then --assimp, 3do crap is handled later as it requires special culling
+	elseif ((not normalTex) and udef.modeltype ~= "3do") then --assimp, 3do crap is handled later as it requires special culling and textures
 		normalTex = GetAssimpNormalTex(udef, tex1, tex2)
 	end
-	--if normalTex then Spring.Echo(udef.name, normalTex) end
 	return normalTex
 end
 
