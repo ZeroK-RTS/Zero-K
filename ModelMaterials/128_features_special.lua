@@ -25,25 +25,6 @@ local function Finalize(matName, matSrc)
 end
 
 
-local updateTime = true
-local metalInfo = {}
-local function DrawFeature(objectID, objectDefID, mat, drawMode, luaShaderObj)
-	if drawMode ~= 5 and drawMode ~= 1 then
-		return
-	end
-
-	if updateTime or not metalInfo[objectID] then
-		metalInfo[objectID] = Spring.GetFeatureResources(objectID)
-	end
-
-	if luaShaderObj then
-		local metalHere = metalInfo[objectID]
-		metalHere = ((metalHere >= metalWreckTreshold) and metalHere) or 0.0
-
-		luaShaderObj:SetUniformFloat("floatOptions", 0.0, 0.0, 0.0, metalHere)
-	end
-end
-
 -- args=<objID, matName, lodMatNum, uniformName, uniformType, uniformData>
 local frSetMaterialUniform = {
 	[false] = Spring.FeatureRendering.SetForwardMaterialUniform,
@@ -56,10 +37,11 @@ local frClearMaterialUniform = {
 	[true]  = Spring.FeatureRendering.ClearDeferredMaterialUniform,
 }
 
-local GL_FLOAT_VEC4 = 0x8B52
 local GL_FLOAT = 0x1406
+local mhArray = {[1] = 0.0}
+local metalInfo = {}
+local abs = math.abs
 local function GameFrameSlow(gf, mat, isDeferred)
-	--Spring.Echo("GameFrameSlow", gf, matName, isDeferred)
 	local highlightActive
 	if isDeferred then
 		highlightActive = mat.deferredOptions.metal_highlight
@@ -72,33 +54,14 @@ local function GameFrameSlow(gf, mat, isDeferred)
 		--local fs = Spring.GetVisibleFeatures(-1, 30, false)
 		for _, fID in ipairs(fs) do
 			local metalHere = Spring.GetFeatureResources(fID)
-			metalHere = ((metalHere >= metalWreckTreshold) and metalHere) or 0.0
-			--Spring.Echo("GameFrameSlow", fID, metalHere)
-			frSetMaterialUniform[isDeferred](fID, "opaque", 3, "floatOptions[1]", GL_FLOAT, {metalHere})
-			--frSetMaterialUniform[isDeferred](fID, "opaque", 3, "floatOptions", GL_FLOAT_VEC4, {0.0, 0.0, 0.0, metalHere})
-		end
-	end
-end
 
-local gfUpd = -math.huge
-local UPDATE_DELAY = 15  --two times per second
-local function DrawGenesis(luaShader, mat)
-	local highlightActive = mat.shaderOptions.metal_highlight or mat.deferredOptions.metal_highlight
+			--only update when metalHere has changed or object has never been seen before
+			if not metalInfo[fID] or abs(metalInfo[fID] - metalHere) > 1.0 then
+				metalInfo[fID] = metalHere
+				mhArray[1] = ((metalHere >= metalWreckTreshold) and metalHere) or 0.0
+				frSetMaterialUniform[isDeferred](fID, "opaque", 3, "floatOptions[1]", GL_FLOAT, mhArray)
+			end
 
-	if highlightActive then
-		local gf = Spring.GetGameFrame()
-		updateTime = false
-		if gf >= gfUpd then
-			gfUpd = gfUpd + UPDATE_DELAY
-			updateTime = true
-		end
-
-		if mat.DrawFeature then
-			mat.DrawFeature = DrawFeature  --restore callin
-		end
-	else
-		if not mat.DrawFeature then
-			mat.DrawFeature = nil --remove callin
 		end
 	end
 end
@@ -136,9 +99,7 @@ local materials = {
 		},
 		Initialize	= Initialize,
 		Finalize	= Finalize,
-		--DrawGenesis	= DrawGenesis,
 		GameFrameSlow = GameFrameSlow,
-		--DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
 	}),
 
 	featuresTreeMetalNoNormal = Spring.Utilities.MergeWithDefault(featureTreeTemplate, {
@@ -151,9 +112,7 @@ local materials = {
 		},
 		Initialize	= Initialize,
 		Finalize	= Finalize,
-		--DrawGenesis	= DrawGenesis,
 		GameFrameSlow = GameFrameSlow,
-		--DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
 	}),
 
 	featuresTreeNoMetalFakeNormal = Spring.Utilities.MergeWithDefault(featureTreeTemplate, {
@@ -190,9 +149,7 @@ local materials = {
 		},
 		Initialize	= Initialize,
 		Finalize	= Finalize,
-		--DrawGenesis	= DrawGenesis,
 		GameFrameSlow = GameFrameSlow,
-		--DrawFeature	= DrawFeature, --mandatory, so api_cus can register "DrawFeature" callin for an objectID
 	}),
 
 }

@@ -142,8 +142,8 @@ local cusUnitMaterials = GG.CUS.unitMaterialDefs
 local unitMaterials = {}
 
 for id = 1, #UnitDefs do
-	if not cusUnitMaterials[id] then
-		local udef = UnitDefs[id]
+	local udef = UnitDefs[id]
+	if not cusUnitMaterials[id] and udef.modeltype ~= "3do" then
 		local tex1 = "%%"..id..":0"
 		local tex2 = "%%"..id..":1"
 

@@ -9,6 +9,7 @@ local materials = {
 		deferredOptions = {
 			materialIndex = 126,
 		},
+		culling = false,
 	})
 }
 

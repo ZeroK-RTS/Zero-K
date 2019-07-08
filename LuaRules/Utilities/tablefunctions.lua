@@ -14,37 +14,37 @@ function Spring.Utilities.CopyTable(tableToCopy, deep)
 end
 
 function Spring.Utilities.MergeTable(primary, secondary, deep)
-    local new = Spring.Utilities.CopyTable(primary, deep)
-    for i, v in pairs(secondary) do
-	    -- key not used in primary, assign it the value at same key in secondary
-	    if not new[i] then
-		    if (deep and type(v) == "table") then
+	local new = Spring.Utilities.CopyTable(primary, deep)
+	for i, v in pairs(secondary) do
+		-- key not used in primary, assign it the value at same key in secondary
+		if not new[i] then
+			if (deep and type(v) == "table") then
 			    new[i] = Spring.Utilities.CopyTable(v, true)
-		    else
-			    new[i] = v
-		    end
-	    -- values at key in both primary and secondary are tables, merge those
-	    elseif type(new[i]) == "table" and type(v) == "table"  then
-		    new[i] = Spring.Utilities.MergeTable(new[i], v, deep)
-	    end
-    end
-    return new
+			else
+				new[i] = v
+			end
+		-- values at key in both primary and secondary are tables, merge those
+		elseif type(new[i]) == "table" and type(v) == "table"  then
+			new[i] = Spring.Utilities.MergeTable(new[i], v, deep)
+		end
+	end
+	return new
 end
 
 function Spring.Utilities.MergeWithDefault(default, override)
-    local new = Spring.Utilities.CopyTable(default, true)
-    for key, v in pairs(override) do
-	    -- key not used in default, assign it the value at same key in override
-	    if not new[key] and type(v) == "table" then
-        new[key] = Spring.Utilities.CopyTable(v, true)
-	    -- values at key in both default and override are tables, merge those
-	    elseif type(new[key]) == "table" and type(v) == "table"  then
-		    new[key] = Spring.Utilities.MergeWithDefault(new[key], v)
-      else
-        new[key] = v
-	    end
-    end
-    return new
+	local new = Spring.Utilities.CopyTable(default, true)
+	for key, v in pairs(override) do
+		-- key not used in default, assign it the value at same key in override
+		if not new[key] and type(v) == "table" then
+			new[key] = Spring.Utilities.CopyTable(v, true)
+		-- values at key in both default and override are tables, merge those
+		elseif type(new[key]) == "table" and type(v) == "table"  then
+			new[key] = Spring.Utilities.MergeWithDefault(new[key], v)
+		else
+			new[key] = v
+		end
+	end
+	return new
 end
 
 function Spring.Utilities.TableToString(data, key)
