@@ -236,6 +236,7 @@ end
 local cusFeaturesMaterials = GG.CUS.featureMaterialDefs
 local featureMaterials = {}
 
+--metallic features & trees
 for id = 1, #FeatureDefs do
 	local fdef = FeatureDefs[id]
 	if not cusFeaturesMaterials[id] and fdef.modeltype ~= "3do" then

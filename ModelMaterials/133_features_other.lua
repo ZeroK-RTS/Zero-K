@@ -20,8 +20,8 @@ local featureMaterials = {}
 
 for id = 1, #FeatureDefs do
 	local fdef = FeatureDefs[id]
-	if not cusFeaturesMaterials[id] and fdef.modeltype == "3do" then
-		featureMaterials[id] = {"features3do"}
+	if not cusFeaturesMaterials[id] and fdef.modeltype ~= "3do" then
+		featureMaterials[id] = {"featuresOther"}
 	end
 end
 
