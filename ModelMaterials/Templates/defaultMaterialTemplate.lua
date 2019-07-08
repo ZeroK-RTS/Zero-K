@@ -153,6 +153,13 @@ vertex = [[
 		}
 
 		modelUV = gl_MultiTexCoord0.xy;
+
+		if (BITMASK_FIELD(bitOptions, OPTION_VERTEX_AO)) {
+			aoTerm = clamp(1.0 * fract(modelUV.x * 16384.0), 0.1, 1.0);
+		} else {
+			aoTerm = 1.0;
+		}
+
 		if (BITMASK_FIELD(bitOptions, OPTION_MOVING_THREADS)) {
 			const vec4 treadBoundaries = vec4(0.6279296875, 0.74951171875, 0.5702890625, 0.6220703125);
 
@@ -161,10 +168,6 @@ vertex = [[
 					lessThanEqual(modelUV, treadBoundaries.yw)))) {
 				modelUV.x += floatOptions[0];
 			}
-		}
-
-		if (BITMASK_FIELD(bitOptions, OPTION_VERTEX_AO)) {
-			aoTerm = max(0.4, fract(gl_MultiTexCoord0.s * 16384.0) * 1.3); // great
 		}
 
 		if (BITMASK_FIELD(bitOptions, OPTION_FLASHLIGHTS)) {
@@ -548,14 +551,8 @@ fragment = [[
 		float shadow = min(nShadow, gShadow);
 		float shadowMult = mix(1.0, shadow, shadowDensity);
 
-		// ambient occlusion
-		float ao = 1.0;
-		if (BITMASK_FIELD(bitOptions, OPTION_VERTEX_AO)) {
-			ao = aoTerm;
-		}
-
 		// light
-		vec3 lightAmbient = ao * sunAmbient;
+		vec3 lightAmbient = aoTerm * sunAmbient;
 		vec3 lightDiffuse = NdotL * sunDiffuse;
 
 		// sunSpecularParams = (exponent, multiplier, bias)
