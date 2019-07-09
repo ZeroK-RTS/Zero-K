@@ -82,14 +82,19 @@ local Grid = 16 -- grid size, do not change without other changes.
 -- Epic Menu
 ---------------------------------
 options_path = 'Settings/Interface/Building Placement'
-options_order = {'holdMouseForStructureTerraform', 'staticMouseTime'}
+options_order = {'structure_holdMouse', 'structure_altSelect', 'structure_altmmb', 'staticMouseTime'}
 options = {
-	holdMouseForStructureTerraform = {
-		name = "Hold Mouse To Terraform Structures",
+	structure_holdMouse = {
+		name = "Terraform by holding mouse click",
 		type = "bool",
-		value = true,
+		value = false,
 		desc = "When enabled, holding down the left mouse button while placing a structure will enter height selection mode.",
-		noHotkey = true,
+	},
+	structure_altSelect = {
+		name = "Terraform by selecting with Alt",
+		type = "bool",
+		value = false,
+		desc = "When enabled, holding Alt while selecting a build option (either on the command card or with a hotkey) will cause height selection mode when the structure is placed.",
 	},
 	staticMouseTime = {
 		name = "Structure Terraform Press Time",
@@ -1331,7 +1336,7 @@ function widget:Update(dt)
 		else
 			pos = select(2, spTraceScreenRay(mx, my, true, false, false, true))
 		end
-		if pos and legalPos(pos) and options.holdMouseForStructureTerraform.value then
+		if pos and legalPos(pos) and options.structure_holdMouse.value then
 			if buildingPress then
 				if math.abs(pos[1] - buildingPress.pos[1]) >= 4 or math.abs(pos[3] - buildingPress.pos[3]) >= 4 then
 					local a,c,m,s = spGetModKeyState()
@@ -1762,8 +1767,7 @@ end
 -- Rectangle placement interaction
 --------------------------------------------------------------------------------
 
-function Terraform_SetPlacingRectangle(unitDefID)
-	
+local function Terraform_SetPlacingRectangle(unitDefID)
 	-- Do no terraform with pregame placement.
 	if Spring.GetGameFrame() < 1 then
 		return false
@@ -1813,8 +1817,14 @@ function Terraform_SetPlacingRectangle(unitDefID)
 	return true
 end
 
+local function Terraform_SetPlacingRectangleCheck()
+	return options.structure_altSelect.value
+end
+
 function widget:Initialize()
-	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle --set WG content at initialize rather than during file read to avoid conflict with local copy (for dev/experimentation)
+	--set WG content at initialize rather than during file read to avoid conflict with local copy (for dev/experimentation)
+	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle
+	WG.Terraform_SetPlacingRectangleCheck = Terraform_SetPlacingRectangleCheck
 end
 
 --------------------------------------------------------------------------------

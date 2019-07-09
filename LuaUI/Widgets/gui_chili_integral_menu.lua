@@ -736,7 +736,7 @@ local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, fakeFactory, 
 		if not instantCommands[cmdID] then
 			UpdateButtonSelection(cmdID)
 		end
-		if alt and isStructure and WG.Terraform_SetPlacingRectangle then
+		if alt and isStructure and WG.Terraform_SetPlacingRectangleCheck and WG.Terraform_SetPlacingRectangleCheck() then
 			WG.Terraform_SetPlacingRectangle(-cmdID)
 		end
 	end
