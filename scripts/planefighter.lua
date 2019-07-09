@@ -16,10 +16,10 @@ local flare = {
 local SPEEDUP_FACTOR = tonumber (UnitDef.customParams.boost_speed_mult)
 local BOOSTUP_FACTOR = tonumber (UnitDef.customParams.boost_accel_mult)
 local SPEEDUP_DURATION = tonumber (UnitDef.customParams.boost_duration)
-		
+
 ----------------------------------------------------------
 
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local CMD_ONECLICK_WEAPON = Spring.Utilities.CMD.ONECLICK_WEAPON
 
 local function RetreatThread()
 	Sleep(800)

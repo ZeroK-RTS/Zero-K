@@ -77,7 +77,7 @@ local rockData = {
 }
 
 ----------------------------------------------------------
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local CMD_UNIT_CANCEL_TARGET = Spring.Utilities.CMD.UNIT_CANCEL_TARGET
 local firestate = 0
 local firstTime = true
 

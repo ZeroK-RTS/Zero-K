@@ -1,7 +1,5 @@
 -- TODO: CACHE INCLUDE FILE
 -- scripts common to bombers
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
--- local CMD_REARM = 33410 --get from customcmds.h.lua
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetUnitMoveTypeData = Spring.GetUnitMoveTypeData
 
