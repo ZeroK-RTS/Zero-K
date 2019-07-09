@@ -151,7 +151,7 @@ local function setTarget(data, sendToWidget)
 	if spValidUnitID(data.id) then
 		if not data.targetID then
 			if locationInRange(data.id, data.unitDefID, data.x, data.y, data.z) then
-				spSetUnitTarget(data.id, data.x, data.y, data.z)
+				spSetUnitTarget(data.id, data.x, data.y, data.z, false, true)
 				GG.UnitSetGroundTarget(data.id)
 			end
 			if sendToWidget then
@@ -286,9 +286,8 @@ local function disSQ(x1,y1,x2,y2)
 end
 
 local function setTargetClosestFromList(unitID, unitDefID, team, choiceUnits)
-
 	local ux, uy, uz = Spring.GetUnitPosition(unitID)
-				
+	
 	local bestDis = false
 	local bestUnit = false
 
@@ -459,9 +458,9 @@ end
 -- Target update
 
 function gadget:GameFrame(n)
-	if n%16 == 15 then -- timing synced with slow update to reduce attack jittering
-		-- 15 causes attack command to override target command
-		-- 0 causes target command to take precedence
+	if n%5 == 4 then
+		-- Slow update every 15 frames
+		-- Ideally units would run this code the frame after their slow update
 
 		local toRemove = {count = 0, data = {}}
 		for i = 1, unit.count do
