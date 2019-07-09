@@ -1546,7 +1546,7 @@ end
 -- Initialization
 
 local function InitializeUnits()
-	if Spring.GetGameFrame() > 1 and myTeamID then
+	if myTeamID then
 		local buttonList = Spring.GetTeamUnits(myTeamID)
 		for _,unitID in pairs(buttonList) do
 			local unitDefID = spGetUnitDefID(unitID)
