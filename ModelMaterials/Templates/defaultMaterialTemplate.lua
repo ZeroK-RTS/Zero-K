@@ -377,7 +377,7 @@ fragment = [[
 		int shadowSamples = shadowQualityPresets[presetIndex].shadowSamples;
 
 		if (shadowSamples > 1) {
-			//vec2 dZduv = DepthGradient(shadowCoord.xyz);
+			vec2 dZduv = DepthGradient(shadowCoord.xyz);
 
 			float rndRotAngle = NORM2SNORM(hash12L(gl_FragCoord.xy)) * PI / 2.0 * samplingRandomness;
 
@@ -390,8 +390,7 @@ fragment = [[
 				// SpiralSNorm return low discrepancy sampling vec2
 				vec2 offset = (rotMat * SpiralSNorm( i, shadowSamples )) * filterSize;
 
-				//vec3 shadowSamplingCoord = vec3(shadowCoord.xy, 0.0) + vec3(offset, BiasedZ(shadowCoord.z, dZduv, offset));
-				vec3 shadowSamplingCoord = shadowCoord.xyz + vec3(offset, 0.0);
+				vec3 shadowSamplingCoord = vec3(shadowCoord.xy, 0.0) + vec3(offset, BiasedZ(shadowCoord.z, dZduv, offset));
 				shadow += texture( shadowTex, shadowSamplingCoord );
 			}
 			shadow /= float(shadowSamples);
