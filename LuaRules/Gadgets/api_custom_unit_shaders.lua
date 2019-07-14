@@ -160,24 +160,24 @@ local function _CompileShader(shader, definitions, addName)
 	return (compilationResult and luaShader) or nil
 end
 
-local function _FillUniformLocs(luaShader)
-	local engineUniforms = {
-		"viewMatrix",
-		"viewMatrixInv",
-		"projectionMatrix",
-		"projectionMatrixInv",
-		"viewProjectionMatrix",
-		"viewProjectionMatrixInv",
-		"shadowMatrix",
-		"shadowParams",
-		"cameraPos",
-		"cameraDir",
-		"sunDir",
-		"rndVec",
-		"simFrame",
-		"drawFrame", --visFrame
-	}
 
+local engineUniforms = {
+	"viewMatrix",
+	"viewMatrixInv",
+	"projectionMatrix",
+	"projectionMatrixInv",
+	"viewProjectionMatrix",
+	"viewProjectionMatrixInv",
+	"shadowMatrix",
+	"shadowParams",
+	"cameraPos",
+	"cameraDir",
+	"sunDir",
+	"rndVec",
+	"simFrame",
+	"drawFrame", --visFrame
+}
+local function _FillUniformLocs(luaShader)
 	local uniformLocTbl = {}
 	for _, uniformName in ipairs(engineUniforms) do
 		local uniformNameLoc = string.lower(uniformName).."loc"
@@ -486,7 +486,7 @@ local function _LoadMaterialConfigFiles(path)
 end
 
 local function _ProcessMaterials(rendering, materialDefsSrc)
-	local engineShaderTypes = {"3do", "s3o", "obj", "ass"}
+	local engineShaderTypes = {"3do", "s3o", "ass"}
 
 	for _, matSrc in pairs(rendering.materialDefs) do
 
@@ -593,6 +593,11 @@ local function _CleanupEverything(rendering)
 	for _, mat in pairs(rendering.materialDefs) do
 		if mat.Finalize then
 			mat.Finalize(matName, matSrc)
+		end
+		for _, shaderObject in ipairs({mat.standardShaderObj, mat.deferredShaderObj, mat.shadowShaderObj}) do
+			if shaderObject then
+				shaderObject:Finalize()
+			end
 		end
 	end
 
