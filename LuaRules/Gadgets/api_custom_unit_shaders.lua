@@ -84,13 +84,13 @@ local idToDefID = {}
 -- rendering.loadedTextures[texname] = true
 ---
 
-local unitRendering 	= {
-	drawList			= {},
-	materialInfos		= {},
-	bufMaterials		= {},
-	bufShadowMaterials	= {},
-	materialDefs		= {},
-	loadedTextures		= {},
+local unitRendering = {
+	drawList            = {},
+	materialInfos       = {},
+	bufMaterials        = {},
+	bufShadowMaterials  = {},
+	materialDefs        = {},
+	loadedTextures      = {},
 
 	spGetAllObjects      = Spring.GetAllUnits,
 	spGetObjectPieceList = Spring.GetUnitPieceList,
@@ -109,12 +109,12 @@ local unitRendering 	= {
 }
 
 local featureRendering = {
-	drawList			= {},
-	materialInfos		= {},
-	bufMaterials		= {},
-	bufShadowMaterials	= {},
-	materialDefs		= {},
-	loadedTextures		= {},
+	drawList            = {},
+	materialInfos       = {},
+	bufMaterials        = {},
+	bufShadowMaterials  = {},
+	materialDefs        = {},
+	loadedTextures      = {},
 
 	spGetAllObjects      = Spring.GetAllFeatures,
 	spGetObjectPieceList = Spring.GetFeaturePieceList,
