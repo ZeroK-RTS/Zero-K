@@ -81,6 +81,9 @@ local featureTreeTemplate = Spring.Utilities.MergeWithDefault(matTemplate, {
 	deferredOptions = {
 		treewind = true,
 	},
+	shadowOptions = {
+		treewind = true,
+	},
 })
 
 local materials = {
@@ -176,7 +179,7 @@ local featureNameTrees = {
 	{str = "birch", prefix = true, fakeNormal = true},
 	{str = "maple", prefix = true, fakeNormal = true},
 	{str = "oak", prefix = true, fakeNormal = true},
-	{str = "fern", prefix = true, fakeNormal = true},
+	{str = "fern", prefix = true, fakeNormal = true}, --doesn't look good on DownPour_v1, but let it be for now
 	{str = "grass", prefix = true, fakeNormal = true},
 	{str = "weed", prefix = true, fakeNormal = true},
 	{str = "plant", prefix = true, fakeNormal = true},

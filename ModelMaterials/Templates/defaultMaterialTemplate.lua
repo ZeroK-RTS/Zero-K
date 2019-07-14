@@ -121,44 +121,7 @@ vertex = [[
 		vec4 modelVertexPos = gl_Vertex;
 		vec3 modelVertexNormal = gl_Normal;
 
-		if (BITMASK_FIELD(bitOptions, OPTION_TREEWIND)) {
-			DoWindVertexMove(modelVertexPos);
-		}
-
-		vec4 worldVertexPos = modelMatrix * modelVertexPos;
-
-		/***********************************************************************/
-		// Main vectors for lighting
-		// V
-		worldCameraDir = normalize(cameraPos - worldVertexPos.xyz); //from fragment to camera, world space
-
-		if (BITMASK_FIELD(bitOptions, OPTION_SHADOWMAPPING)) {
-			shadowVertexPos = shadowMatrix * worldVertexPos;
-			shadowVertexPos.xy += vec2(0.5);  //no need for shadowParams anymore
-		}
-
-		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING)) {
-			//no need to do Gram-Schmidt re-orthogonalization, because engine does it for us anyway
-			vec3 T = gl_MultiTexCoord5.xyz;
-			vec3 B = gl_MultiTexCoord6.xyz;
-
-			// tangent --> world space transformation (for vectors)
-			worldTangent = modelNormalMatrix * T;
-			worldBitangent = modelNormalMatrix * B;
-			worldNormal = modelNormalMatrix * modelVertexNormal;
-		} else {
-			worldTangent = modelNormalMatrix * vec3(1.0, 0.0, 0.0);
-			worldBitangent = modelNormalMatrix * vec3(0.0, 1.0, 0.0);
-			worldNormal = modelNormalMatrix * modelVertexNormal;
-		}
-
 		modelUV = gl_MultiTexCoord0.xy;
-
-		if (BITMASK_FIELD(bitOptions, OPTION_VERTEX_AO)) {
-			aoTerm = clamp(1.0 * fract(modelUV.x * 16384.0), 0.1, 1.0);
-		} else {
-			aoTerm = 1.0;
-		}
 
 		if (BITMASK_FIELD(bitOptions, OPTION_MOVING_THREADS)) {
 			const vec4 treadBoundaries = vec4(0.6279296875, 0.74951171875, 0.5702890625, 0.6220703125);
@@ -170,39 +133,82 @@ vertex = [[
 			}
 		}
 
-		if (BITMASK_FIELD(bitOptions, OPTION_FLASHLIGHTS)) {
-			// modelMatrix[3][0] + modelMatrix[3][2] are Tx, Tz elements of translation of matrix
-			selfIllumMod = max(-0.2, sin(simFrame * 0.067 + (modelMatrix[3][0] + modelMatrix[3][2]) * 0.1)) + 0.2;
+		if (BITMASK_FIELD(bitOptions, OPTION_TREEWIND)) {
+			DoWindVertexMove(modelVertexPos);
 		}
 
-		#define wreckMetal floatOptions[1]
-		if (BITMASK_FIELD(bitOptions, OPTION_METAL_HIGHLIGHT) && wreckMetal > 0.0) {
-			//	local alpha = (0.25*(intensity/100)) + (0.5 * (intensity/100) * math.abs(1 - (timer * 2) % 2))
+		#if (RENDERING_MODE != 2) //non-shadow pass
+			vec4 worldVertexPos = modelMatrix * modelVertexPos;
+			/***********************************************************************/
+			// Main vectors for lighting
+			// V
+			worldCameraDir = normalize(cameraPos - worldVertexPos.xyz); //from fragment to camera, world space
 
-			//	local x100  = 100  / (100  + metal)
-			//	local x1000 = 1000 / (1000 + metal)
-			//	local r = 1 - x1000
-			//	local g = x1000 - x100
-			//	local b = x100
+			if (BITMASK_FIELD(bitOptions, OPTION_SHADOWMAPPING)) {
+				shadowVertexPos = shadowMatrix * worldVertexPos;
+				shadowVertexPos.xy += vec2(0.5);  //no need for shadowParams anymore
+			}
 
-			float alpha = 0.35 + 0.65 * SNORM2NORM( sin(simFrame * 0.2) );
-			vec2 x100_1000 = vec2(100.0 / (100.0 + wreckMetal), 1000.0 / (1000.0 + wreckMetal));
-			addColor = vec4(1.0 - x100_1000.y, x100_1000.y - x100_1000.x, x100_1000.x, alpha);
-		}
-		#undef wreckMetal
+			if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING)) {
+				//no need to do Gram-Schmidt re-orthogonalization, because engine does it for us anyway
+				vec3 T = gl_MultiTexCoord5.xyz;
+				vec3 B = gl_MultiTexCoord6.xyz;
 
-		gl_Position = projectionMatrix * viewMatrix * worldVertexPos;
+				// tangent --> world space transformation (for vectors)
+				worldTangent = modelNormalMatrix * T;
+				worldBitangent = modelNormalMatrix * B;
+				worldNormal = modelNormalMatrix * modelVertexNormal;
+			} else {
+				worldTangent = modelNormalMatrix * vec3(1.0, 0.0, 0.0);
+				worldBitangent = modelNormalMatrix * vec3(0.0, 1.0, 0.0);
+				worldNormal = modelNormalMatrix * modelVertexNormal;
+			}
 
-		if (BITMASK_FIELD(bitOptions, OPTION_UNITSFOG)) {
-			float fogCoord = length(gl_Position.xyz);
-			fogFactor = (gl_Fog.end - fogCoord) * gl_Fog.scale; //linear
+			if (BITMASK_FIELD(bitOptions, OPTION_VERTEX_AO)) {
+				aoTerm = clamp(1.0 * fract(modelUV.x * 16384.0), 0.1, 1.0);
+			} else {
+				aoTerm = 1.0;
+			}
 
-			// these two don't work correctly as they should. Probably gl_Fog.density is not set correctly
-			//fogFactor = exp(-gl_Fog.density * fogCoord); //exp
-			//fogFactor = exp(-pow((gl_Fog.density * fogCoord), 2.0)); //exp2
+			if (BITMASK_FIELD(bitOptions, OPTION_FLASHLIGHTS)) {
+				// modelMatrix[3][0] + modelMatrix[3][2] are Tx, Tz elements of translation of matrix
+				selfIllumMod = max(-0.2, sin(simFrame * 0.067 + (modelMatrix[3][0] + modelMatrix[3][2]) * 0.1)) + 0.2;
+			}
 
-			fogFactor = clamp(fogFactor, 0.0, 1.0);
-		}
+			#define wreckMetal floatOptions[1]
+			if (BITMASK_FIELD(bitOptions, OPTION_METAL_HIGHLIGHT) && wreckMetal > 0.0) {
+				//	local alpha = (0.25*(intensity/100)) + (0.5 * (intensity/100) * math.abs(1 - (timer * 2) % 2))
+
+				//	local x100  = 100  / (100  + metal)
+				//	local x1000 = 1000 / (1000 + metal)
+				//	local r = 1 - x1000
+				//	local g = x1000 - x100
+				//	local b = x100
+
+				float alpha = 0.35 + 0.65 * SNORM2NORM( sin(simFrame * 0.2) );
+				vec2 x100_1000 = vec2(100.0 / (100.0 + wreckMetal), 1000.0 / (1000.0 + wreckMetal));
+				addColor = vec4(1.0 - x100_1000.y, x100_1000.y - x100_1000.x, x100_1000.x, alpha);
+			}
+			#undef wreckMetal
+
+			gl_Position = projectionMatrix * viewMatrix * worldVertexPos;
+
+			if (BITMASK_FIELD(bitOptions, OPTION_UNITSFOG)) {
+				float fogCoord = length(gl_Position.xyz);
+				fogFactor = (gl_Fog.end - fogCoord) * gl_Fog.scale; //linear
+
+				// these two don't work correctly as they should. Probably gl_Fog.density is not set correctly
+				//fogFactor = exp(-gl_Fog.density * fogCoord); //exp
+				//fogFactor = exp(-pow((gl_Fog.density * fogCoord), 2.0)); //exp2
+
+				fogFactor = clamp(fogFactor, 0.0, 1.0);
+			}
+		#else //shadow pass
+			vec4 lightVertexPos = gl_ModelViewMatrix * modelVertexPos;
+			lightVertexPos.xy += vec2(0.5);
+			lightVertexPos.z += 0.0001;
+			gl_Position = gl_ProjectionMatrix * lightVertexPos;
+		#endif
 	}
 ]],
 fragment = [[
@@ -228,7 +234,7 @@ fragment = [[
 	#define NORM2SNORM(value) (value * 2.0 - 1.0)
 	#define SNORM2NORM(value) (value * 0.5 + 0.5)
 
-	#if (DEFERRED_MODE == 1)
+	#if (RENDERING_MODE == 1)
 		#define GBUFFER_NORMTEX_IDX 0
 		#define GBUFFER_DIFFTEX_IDX 1
 		#define GBUFFER_SPECTEX_IDX 2
@@ -388,7 +394,7 @@ fragment = [[
 				shadow += texture( shadowTex, shadowSamplingCoord );
 			}
 			shadow /= float(shadowSamples);
-		} else { //shadowSamples == 0
+		} else { //shadowSamples == 1
 			const float cb = 0.00005;
 			float bias = cb * tan(acos(NdotL));
 			bias = clamp(bias, 0.0, 5.0 * cb);
@@ -470,13 +476,15 @@ fragment = [[
 
 	/***********************************************************************/
 	// Shader output definitions
-	#if (DEFERRED_MODE == 1)
+	#if (RENDERING_MODE == 1)
 		out vec4 fragData[GBUFFER_COUNT];
 	#else
 		out vec4 fragData[1];
 	#endif
 
 	/***********************************************************************/
+
+#if (RENDERING_MODE != 2) //non-shadow pass
 	// Fragment shader main()
 	void main(void){
 		#line 30342
@@ -589,10 +597,10 @@ fragment = [[
 		#undef wreckMetal
 
 		#if 0
-			finalColor = vec3(1.0 - smoothstep(15.0, 400.0, 1.0 / gl_FragCoord.w));
+			finalColor = vec3(modelUV.x < 0.5);
 		#endif
 
-		#if (DEFERRED_MODE == 0)
+		#if (RENDERING_MODE == 0)
 			fragData[0] = vec4(finalColor, texColor2.a);
 		#else
 			fragData[GBUFFER_NORMTEX_IDX] = vec4(SNORM2NORM(N), 1.0);
@@ -602,6 +610,20 @@ fragment = [[
 			fragData[GBUFFER_MISCTEX_IDX] = vec4(float(materialIndex) / 255.0, 0.0, 0.0, 0.0);
 		#endif
 	}
+#else //shadow pass
+	#if (SUPPORT_DEPTH_LAYOUT == 1)
+		#extension GL_ARB_conservative_depth : enable
+		#extension GL_EXT_conservative_depth : enable
+		// preserve early-z performance if possible
+		layout(depth_unchanged) out float gl_FragDepth;
+	#endif
+
+	void main(void){
+		vec4 texColor2 = texture(texture2, modelUV);
+		if (texColor2.a < 0.5)
+			discard;
+	}
+#endif
 ]],
 	uniformInt = {
 		texture1 	= 0,
@@ -622,14 +644,19 @@ local defaultMaterialTemplate = {
 	--standardUniforms --locs, set by api_cus
 	--deferredUniforms --locs, set by api_cus
 
-	shader = shaderTemplate, -- `shader` is replaced with standardShader later in api_cus
+	shader   = shaderTemplate, -- `shader` is replaced with standardShader later in api_cus
 	deferred = shaderTemplate, -- `deferred` is replaced with deferredShader later in api_cus
+	shadow   = shaderTemplate, -- `shadow` is replaced with deferredShader later in api_cus
 
 	shaderDefinitions = {
-		"#define DEFERRED_MODE 0",
+		"#define RENDERING_MODE 0",
 	},
 	deferredDefinitions = {
-		"#define DEFERRED_MODE 1",
+		"#define RENDERING_MODE 1",
+	},
+	shadowDefinitions = {
+		"#define RENDERING_MODE 2",
+		"#define SUPPORT_DEPTH_LAYOUT ".. tostring((Platform.glSupportFragDepthLayout and 1) or 0),
 	},
 
 	shaderOptions = {
@@ -642,7 +669,7 @@ local defaultMaterialTemplate = {
 		normalmap_flip 	= false,
 		metal_highlight = false,
 		treewind 		= false,
-		pom 			= true,
+		pom 			= false,
 
 		shadowsQuality	= 2,
 		materialIndex	= 0,
@@ -669,6 +696,10 @@ local defaultMaterialTemplate = {
 		sunSpecularParams = {18.0, 4.0, 0.0}, -- Exponent, multiplier, bias
 	},
 
+	shadowOptions = {
+		treewind 		= false,
+	},
+
 	feature = false,
 
 	texUnits = {
@@ -683,6 +714,7 @@ local defaultMaterialTemplate = {
 	order = nil, -- currently unused (not sent to engine)
 
 	culling = GL.BACK, -- usually GL.BACK is default, except for 3do
+	shadowCulling = GL.BACK,
 	usecamera = false, -- usecamera ? {gl_ModelViewMatrix, gl_NormalMatrix} = {modelViewMatrix, modelViewNormalMatrix} : {modelMatrix, modelNormalMatrix}
 }
 
@@ -741,9 +773,10 @@ local function ProcessOptions(materialDef, optName, optValues)
 		materialDef.originalOptions = {}
 		materialDef.originalOptions[1] = Spring.Utilities.CopyTable(materialDef.shaderOptions)
 		materialDef.originalOptions[2] = Spring.Utilities.CopyTable(materialDef.deferredOptions)
+		materialDef.originalOptions[3] = Spring.Utilities.CopyTable(materialDef.shadowOptions)
 	end
 
-	for id, optTable in ipairs({materialDef.shaderOptions, materialDef.deferredOptions}) do
+	for id, optTable in ipairs({materialDef.shaderOptions, materialDef.deferredOptions, materialDef.shadowOptions}) do
 		if knownBitOptions[optName] then --boolean
 			local optValue = unpack(optValues or {})
 			local optOriginalValue = materialDef.originalOptions[id][optName]
@@ -776,9 +809,16 @@ local function ProcessOptions(materialDef, optName, optValues)
 	return handled
 end
 
-local function ApplyOptions(luaShader, materialDef, isDeferred)
+local function ApplyOptions(luaShader, materialDef, key)
 
-	local optionsTbl = (isDeferred and materialDef.deferredOptions) or materialDef.shaderOptions
+	local optionsTbl
+	if key == 1 then
+		optionsTbl = materialDef.shaderOptions
+	elseif key == 2 then
+		optionsTbl = materialDef.deferredOptions
+	elseif key == 3 then
+		optionsTbl = materialDef.shadowOptions
+	end
 
 	local intOption = 0
 

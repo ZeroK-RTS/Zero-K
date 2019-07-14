@@ -78,17 +78,19 @@ local idToDefID = {}
 --- Main data structures:
 -- rendering.drawList[objectID] = matSrc
 -- rendering.materialInfos[objectDefID] = {matName, name = param, name1 = param1}
--- rendering.bufMaterials[objectDefID] = rendering.spGetMaterial() / luaMat
+-- rendering.bufMaterials[objectDefID] = rendering.spGetMaterial("opaque") / luaMat
+-- rendering.bufShadowMaterials[objectDefID] = rendering.spGetMaterial("shadow") / luaMat
 -- rendering.materialDefs[matName] = matSrc
 -- rendering.loadedTextures[texname] = true
 ---
 
-local unitRendering = {
-	drawList        = {},
-	materialInfos   = {},
-	bufMaterials    = {},
-	materialDefs    = {},
-	loadedTextures  = {},
+local unitRendering 	= {
+	drawList			= {},
+	materialInfos		= {},
+	bufMaterials		= {},
+	bufShadowMaterials	= {},
+	materialDefs		= {},
+	loadedTextures		= {},
 
 	spGetAllObjects      = Spring.GetAllUnits,
 	spGetObjectPieceList = Spring.GetUnitPieceList,
@@ -101,17 +103,18 @@ local unitRendering = {
 	spSetLODCount        = Spring.UnitRendering.SetLODCount,
 	spSetPieceList       = Spring.UnitRendering.SetPieceList,
 
-	DrawObject           = "DrawUnit",
+	DrawObject           = "DrawUnit", --avoid, will kill CPU-side of performance!
 	ObjectCreated        = "UnitCreated",
 	ObjectDestroyed      = "UnitDestroyed",
 }
 
 local featureRendering = {
-	drawList        = {},
-	materialInfos   = {},
-	bufMaterials    = {},
-	materialDefs    = {},
-	loadedTextures  = {},
+	drawList			= {},
+	materialInfos		= {},
+	bufMaterials		= {},
+	bufShadowMaterials	= {},
+	materialDefs		= {},
+	loadedTextures		= {},
 
 	spGetAllObjects      = Spring.GetAllFeatures,
 	spGetObjectPieceList = Spring.GetFeaturePieceList,
@@ -124,7 +127,7 @@ local featureRendering = {
 	spSetLODCount        = Spring.FeatureRendering.SetLODCount,
 	spSetPieceList       = Spring.FeatureRendering.SetPieceList,
 
-	DrawObject           = "DrawFeature",
+	DrawObject           = "DrawFeature", --avoid, will kill CPU-side of performance!
 	ObjectCreated        = "FeatureCreated",
 	ObjectDestroyed      = "FeatureDestroyed",
 }
@@ -242,6 +245,36 @@ local function _CompileMaterialShaders(rendering)
 				end
 			end
 		end
+
+		if (matSrc.shadowSource) then
+			local luaShader = _CompileShader(
+				matSrc.shadowSource,
+				matSrc.shadowDefinitions,
+				string.format("MatName: \"%s\"(%s)", matName, "Shadow")
+			)
+
+			if luaShader then
+				if matSrc.shadowShader then
+					if matSrc.shadowShaderObj then
+						matSrc.shadowShaderObj:Finalize()
+					else
+						gl.DeleteShader(matSrc.shadowShader)
+					end
+				end
+				matSrc.shadowShaderObj = luaShader
+				matSrc.shadowShader = luaShader:GetHandle()
+				luaShader:SetUnknownUniformIgnore(true)
+				luaShader:ActivateWith( function()
+					matSrc.shadowUniforms = _FillUniformLocs(luaShader)
+				end)
+				luaShader:SetActiveStateIgnore(true)
+
+				if matSrc.Initialize then
+					matSrc.Initialize(matName, matSrc)
+				end
+			end
+		end
+
 	end
 end
 
@@ -304,16 +337,20 @@ local function GetObjectMaterial(rendering, objectDefID)
 	end
 
 	--// materials don't load those textures themselves
+
 	local texdl = gl.CreateList(function() --this stupidity is required, because GetObjectMaterial() is called outside of GL enabled callins
 		for _, tex in pairs(texUnits) do
-			local prefix = tex.tex:sub(1, 1)
-			if validTexturePrefixes[prefix] then
-				gl.Texture(tex.tex)
-				rendering.loadedTextures[tex.tex] = true
+			if not rendering.loadedTextures[tex.tex] then
+				local prefix = tex.tex:sub(1, 1)
+				if validTexturePrefixes[prefix] then
+					gl.Texture(tex.tex)
+					rendering.loadedTextures[tex.tex] = true
+				end
 			end
 		end
 	end)
 	gl.DeleteList(texdl)
+
 
 	local luaMat = rendering.spGetMaterial("opaque", {
 		standardshader = mat.standardShader,
@@ -330,8 +367,65 @@ local function GetObjectMaterial(rendering, objectDefID)
 	})
 
 	rendering.bufMaterials[objectDefID] = luaMat
-
 	return luaMat
+end
+
+local function GetObjectShadowMaterial(rendering, objectDefID)
+	local mat = rendering.bufShadowMaterials[objectDefID]
+	if mat then
+		return mat
+	end
+
+
+	local matInfo = rendering.materialInfos[objectDefID]
+	local mat = rendering.materialDefs[matInfo[1]]
+
+	if type(objectDefID) == "number" then
+		-- Non-number objectDefIDs are default material overrides. They will have
+		-- their textures defined in the unit materials files.
+		matInfo.UNITDEFID = objectDefID
+		matInfo.FEATUREDEFID = -objectDefID
+	end
+
+	--// find unitdef tex keyword and replace it
+	--// (a shader can be just for multiple unitdefs, so we support this keywords)
+	local texUnits = {}
+	for texid, tex in pairs(mat.texUnits or {}) do
+		local tex_ = tex
+		for varname, value in pairs(matInfo) do
+			tex_ = tex_:gsub("%%"..tostring(varname), value)
+		end
+		texUnits[texid] = {tex = tex_, enable = false}
+	end
+
+	--// materials don't load those textures themselves
+
+	local texdl = gl.CreateList(function() --this stupidity is required, because GetObjectMaterial() is called outside of GL enabled callins
+		for _, tex in pairs(texUnits) do
+			if not rendering.loadedTextures[tex.tex] then
+				local prefix = tex.tex:sub(1, 1)
+				if validTexturePrefixes[prefix] then
+					gl.Texture(tex.tex)
+					rendering.loadedTextures[tex.tex] = true
+				end
+			end
+		end
+	end)
+	gl.DeleteList(texdl)
+
+	--No deferred statements are required
+	local luaShadowMat = rendering.spGetMaterial("shadow", {
+		standardshader = mat.shadowShader,
+
+		standarduniforms = mat.shadowUniforms,
+
+		usecamera   = true,
+		culling     = mat.shadowCulling,
+		texunits    = texUnits,
+	})
+
+	rendering.bufShadowMaterials[objectDefID] = luaShadowMat
+	return luaShadowMat
 end
 
 --------------------------------------------------------------------------------
@@ -405,6 +499,11 @@ local function _ProcessMaterials(rendering, materialDefsSrc)
 			matSrc.deferredSource = matSrc.deferred
 			matSrc.deferred = nil
 		end
+
+		if matSrc.shadow ~= nil and engineShaderTypes[matSrc.shadow] == nil then
+			matSrc.shadowSource = matSrc.shadow
+			matSrc.shadow = nil
+		end
 	end
 
 	_CompileMaterialShaders(rendering)
@@ -459,7 +558,10 @@ local function ObjectFinished(rendering, objectID, objectDefID)
 
 		if mat.standardShader then
 			rendering.spActivateMaterial(objectID, 3)
+
 			rendering.spSetMaterial(objectID, 3, "opaque", GetObjectMaterial(rendering, objectDefID))
+			rendering.spSetMaterial(objectID, 3, "shadow", GetObjectShadowMaterial(rendering, objectDefID))
+
 			for pieceID in ipairs(rendering.spGetObjectPieceList(objectID) or {}) do
 				rendering.spSetPieceList(objectID, 3, pieceID)
 			end
@@ -549,12 +651,12 @@ function gadget:DrawGenesis()
 			local ApplyOptionsFunc = mat.ApplyOptions
 
 			if SunChangedFunc or DrawGenesisFunc or (optionsChanged and ApplyOptionsFunc) then
-				for key, shaderObject in ipairs({mat.standardShaderObj, mat.deferredShaderObj}) do
+				for key, shaderObject in ipairs({mat.standardShaderObj, mat.deferredShaderObj, mat.shadowShaderObj}) do
 					if shaderObject then
 						shaderObject:ActivateWith( function ()
 
 							if optionsChanged and ApplyOptionsFunc then
-								ApplyOptionsFunc(shaderObject, mat, (key == 2))
+								ApplyOptionsFunc(shaderObject, mat, key)
 							end
 
 							if SunChangedFunc then
