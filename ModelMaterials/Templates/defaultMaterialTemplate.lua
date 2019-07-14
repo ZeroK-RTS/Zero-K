@@ -206,7 +206,7 @@ vertex = [[
 		#else //shadow pass
 			vec4 lightVertexPos = gl_ModelViewMatrix * modelVertexPos;
 			lightVertexPos.xy += vec2(0.5);
-			lightVertexPos.z += 0.0001;
+			//lightVertexPos.z += 0.00005;
 			gl_Position = gl_ProjectionMatrix * lightVertexPos;
 		#endif
 	}
@@ -357,9 +357,8 @@ fragment = [[
 		dZduv.y -= dUVZdy.x * dUVZdx.z;
 
 		float det = (dUVZdx.x * dUVZdy.y) - (dUVZdx.y * dUVZdy.x);
-		dZduv /= det;
 
-		return dZduv;
+		return dZduv / det;
 	}
 
 	float BiasedZ(float z0, vec2 dZduv, vec2 offset) {
@@ -369,7 +368,7 @@ fragment = [[
 	float GetShadowPCFRandom(float NdotL) {
 		float shadow = 0.0;
 
-		vec3 shadowCoord = shadowVertexPos.xyz / shadowVertexPos.w;
+		vec3 shadowCoord = shadowVertexPos.xyz; // shadowVertexPos.w is always 1.0
 		int presetIndex = clamp(shadowsQuality, 0, SHADOW_QUALITY_PRESETS - 1);
 
 		float samplingRandomness = shadowQualityPresets[presetIndex].samplingRandomness;
@@ -377,7 +376,7 @@ fragment = [[
 		int shadowSamples = shadowQualityPresets[presetIndex].shadowSamples;
 
 		if (shadowSamples > 1) {
-			vec2 dZduv = DepthGradient(shadowCoord.xyz);
+			//vec2 dZduv = DepthGradient(shadowCoord.xyz);
 
 			float rndRotAngle = NORM2SNORM(hash12L(gl_FragCoord.xy)) * PI / 2.0 * samplingRandomness;
 
@@ -390,17 +389,20 @@ fragment = [[
 				// SpiralSNorm return low discrepancy sampling vec2
 				vec2 offset = (rotMat * SpiralSNorm( i, shadowSamples )) * filterSize;
 
-				vec3 shadowSamplingCoord = vec3(shadowCoord.xy, 0.0) + vec3(offset, BiasedZ(shadowCoord.z, dZduv, offset));
+				//vec3 shadowSamplingCoord = vec3(shadowCoord.xy, 0.0) + vec3(offset, BiasedZ(shadowCoord.z, dZduv, offset));
+				vec3 shadowSamplingCoord = vec3(shadowCoord.xy, 0.0) + vec3(offset, shadowCoord.z);
 				shadow += texture( shadowTex, shadowSamplingCoord );
 			}
 			shadow /= float(shadowSamples);
 		} else { //shadowSamples == 1
+			/*
 			const float cb = 0.00005;
 			float bias = cb * tan(acos(NdotL));
 			bias = clamp(bias, 0.0, 5.0 * cb);
+			*/
 
 			vec3 shadowSamplingCoord = shadowCoord;
-			shadowSamplingCoord.z -= bias;
+			//shadowSamplingCoord.z -= bias;
 			shadow = texture( shadowTex, shadowSamplingCoord );
 		}
 		return shadow;
@@ -716,7 +718,7 @@ local defaultMaterialTemplate = {
 	order = nil, -- currently unused (not sent to engine)
 
 	culling = GL.BACK, -- usually GL.BACK is default, except for 3do
-	shadowCulling = GL.BACK,
+	shadowCulling = GL.FRONT,
 	usecamera = false, -- usecamera ? {gl_ModelViewMatrix, gl_NormalMatrix} = {modelViewMatrix, modelViewNormalMatrix} : {modelMatrix, modelNormalMatrix}
 }
 
