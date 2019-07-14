@@ -498,7 +498,7 @@ fragment = [[
 
 		mat3 worldTBN;
 		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING) || BITMASK_FIELD(bitOptions, OPTION_POM)) {
-			worldTBN = mat3(normalize(worldTangent), normalize(worldBitangent), normalize(worldNormal));
+			worldTBN = mat3(worldTangent, worldBitangent, worldNormal);
 		}
 
 		if (BITMASK_FIELD(bitOptions, OPTION_POM)) {
@@ -518,11 +518,13 @@ fragment = [[
 		vec3 N;
 
 		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING)) {
-			vec3 tbnNormal = normalize(NORM2SNORM(texture(normalTex, myUV).xyz));
+			vec3 tbnNormal = NORM2SNORM(texture(normalTex, myUV).xyz);
 			N = worldTBN * tbnNormal;
 		} else {
-			N = normalize(worldNormal);
+			N = worldNormal;
 		}
+
+		N = normalize(N);
 
 		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAP_FLIP)) {
 			myUV.y = 1.0 - myUV.y;
@@ -598,7 +600,7 @@ fragment = [[
 		#undef wreckMetal
 
 		#if 0
-			finalColor = vec3(modelUV.x < 0.5);
+			finalColor = vec3(SNORM2NORM(N));
 		#endif
 
 		#if (RENDERING_MODE == 0)
