@@ -493,6 +493,23 @@ local function weapons2Table(cells, ws, unitID)
 		else
 			dam = val
 		end
+		
+		-- shield damage multiplier
+		local shieldDam = dam
+		if wd.customParams and wd.customParams.shield_damage_total then
+			-- Use the "real" damage value if possible
+			shieldDam = wd.customParams.shield_damage_total
+		else
+			-- Fallback on trying to calculate damage here
+			shieldDam = dam + damc + damd / 3 + dams / 3 + damc + damw / 3
+			local lowerName = name:lower()
+			if lowerName:find("flamethrower") or lowerName:find("flame thrower") then
+				shieldDam = shieldDam * 3
+			elseif lowerName:find("gauss") then
+				shieldDam = shieldDam * 1.5
+			end
+		end
+		local shieldDamPc = (100 * shieldDam) / (dam + damd + dams + damc + damw)
 
 		-- get reloadtime and calculate dps
 		local reloadtime = tonumber(cp.script_reload) or wd.reload
@@ -591,14 +608,11 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ' - DPS:'
 			cells[#cells+1] = dps_str
 		end
-		
-		local lowerName = name:lower()
-		if lowerName:find("flamethrower") or lowerName:find("flame thrower") then
-			cells[#cells+1] = ' - Shield damage:'
-			cells[#cells+1] = "300%"
-		elseif lowerName:find("gauss") then
-			cells[#cells+1] = ' - Shield damage:'
-			cells[#cells+1] = "150%"
+		if shieldDamPc ~= 100 then
+			if not cp.damage_vs_shield then -- Badger shield damage is handled above
+				cells[#cells+1] = ' - Shield damage:'
+				cells[#cells+1] = numformat(shieldDamPc, 2) .. "%"
+			end
 		end
 
 		if (wd.interceptedByShieldType == 0) then
