@@ -149,6 +149,7 @@ for name, wd in pairs(DEFS.weaponDefs) do
 		end
 	end
 	wd.customparams.shield_damage = wd.damage.shield/((wd.customparams.effective_beam_time or wd.beamtime or 1/30) * 30)
+	wd.customparams.stats_shield_damage = wd.damage.shield
 	if wd.beamtime and wd.beamtime >= 0.1 then
 		-- Settings damage default to 0 removes cratering and impulse so is not universally applied.
 		-- It fixes long beams vs shield cases.
