@@ -567,6 +567,7 @@ local function weapons2Table(cells, ws, unitID)
 
 		if mult > 1 then
 			dam_str = dam_str .. " x " .. mult
+			shield_dam_str = shield_dam_str .. " x " .. mult
 		end
 		
 		local show_damage = not cp.stats_hide_damage
@@ -601,12 +602,12 @@ local function weapons2Table(cells, ws, unitID)
 			if cp.damage_vs_shield then
 				cells[#cells+1] = ' - Shield damage:'
 				cells[#cells+1] = numformat(cp.stats_shield_damage)
-			elseif cp.stats_shield_damage ~= dam then
+			elseif tonumber(cp.stats_shield_damage) ~= dam then
 				cells[#cells+1] = ' - Shield damage:'
-				if damageTypes > 1 then
-					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage), 2) .. " (" .. shield_dam_str .. ")"
+				if damageTypes > 1 or mult > 1 then
+					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage * mult), 2) .. " (" .. shield_dam_str .. ")"
 				else
-					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage), 2)
+					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage * mult), 2)
 				end
 			end
 		end
