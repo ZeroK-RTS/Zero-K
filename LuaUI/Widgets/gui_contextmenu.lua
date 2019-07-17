@@ -493,23 +493,6 @@ local function weapons2Table(cells, ws, unitID)
 		else
 			dam = val
 		end
-		
-		-- shield damage multiplier
-		local shieldDam = dam
-		if wd.customParams and wd.customParams.shield_damage_total then
-			-- Use the "real" damage value if possible
-			shieldDam = wd.customParams.shield_damage_total
-		else
-			-- Fallback on trying to calculate damage here
-			shieldDam = dam + damc + damd / 3 + dams / 3 + damc + damw / 3
-			local lowerName = name:lower()
-			if lowerName:find("flamethrower") or lowerName:find("flame thrower") then
-				shieldDam = shieldDam * 3
-			elseif lowerName:find("gauss") then
-				shieldDam = shieldDam * 1.5
-			end
-		end
-		local shieldDamPc = (100 * shieldDam) / (dam + damd + dams + damc + damw)
 
 		-- get reloadtime and calculate dps
 		local reloadtime = tonumber(cp.script_reload) or wd.reload
@@ -522,9 +505,10 @@ local function weapons2Table(cells, ws, unitID)
 
 		local mult = tonumber(cp.statsprojectiles) or ((tonumber(cp.script_burst) or wd.salvoSize) * wd.projectiles)
 
-		local dps_str, dam_str = '', ''
+		local dps_str, dam_str, shield_dam_str = '', '', ''
 		if dps > 0 then
 			dam_str = dam_str .. numformat(dam,2)
+			shield_dam_str = shield_dam_str .. numformat(dam,2)
 			if wd.customParams.stats_damage_per_second then
 				dps_str = dps_str .. numformat(tonumber(cp.stats_damage_per_second),2)
 			else
@@ -535,16 +519,20 @@ local function weapons2Table(cells, ws, unitID)
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
+				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorCyan) .. numformat(damw,2) .. " (P)\008"
+			shield_dam_str = shield_dam_str .. color2incolor(colorCyan) .. numformat(math.floor(damw / 3),2) .. " (P)\008"
 			dps_str = dps_str .. color2incolor(colorCyan) .. numformat(dpsw*mult,2) .. " (P)\008"
 		end
 		if dpss > 0 then
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
+				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorPurple) .. numformat(dams,2) .. " (S)\008"
+			shield_dam_str = shield_dam_str .. color2incolor(colorPurple) .. numformat(math.floor(dams / 3),2) .. " (S)\008"
 			dps_str = dps_str .. color2incolor(colorPurple) .. numformat(dpss*mult,2) .. " (S)\008"
 		end
 
@@ -552,8 +540,10 @@ local function weapons2Table(cells, ws, unitID)
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
+				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorDisarm) .. numformat(damd,2) .. " (D)\008"
+			shield_dam_str = shield_dam_str .. color2incolor(colorDisarm) .. numformat(math.floor(damd / 3),2) .. " (D)\008"
 			dps_str = dps_str .. color2incolor(colorDisarm) .. numformat(dpsd*mult,2) .. " (D)\008"
 		end
 
@@ -561,8 +551,10 @@ local function weapons2Table(cells, ws, unitID)
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
+				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorCapture) .. numformat(damc,2) .. " (C)\008"
+			shield_dam_str = shield_dam_str .. color2incolor(colorCapture) .. numformat(damc,2) .. " (C)\008"
 			dps_str = dps_str .. color2incolor(colorCapture) .. numformat(dpsc*mult,2) .. " (C)\008"
 		end
 
@@ -587,7 +579,7 @@ local function weapons2Table(cells, ws, unitID)
 			show_dps = false
 		end
 		
-		if cp.damage_vs_shield then -- Badger
+		if name:lower():find("mine") then -- Badger
 			dam_str = tostring(cp.damage_vs_shield) .. " (" .. dam .. " + " .. (tonumber(cp.damage_vs_shield)-dam) .. " mine)"
 			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield)/reloadtime))
 		end
@@ -595,6 +587,33 @@ local function weapons2Table(cells, ws, unitID)
 		if show_damage then
 			cells[#cells+1] = ' - Damage:'
 			cells[#cells+1] = dam_str
+		end
+
+		-- shield damage
+		if wd.customParams and wd.customParams.stats_shield_damage then
+			local nonShieldDam = dam + damd + dams + damc + damw
+			local shieldDamPc = (100 * wd.customParams.stats_shield_damage) / nonShieldDam
+
+			local damageTypes = 0
+			local damageVals = {dam, damd, dams, damc, damw}
+			for i, d in ipairs(damageVals) do
+				if d > 0 then
+					damageTypes = damageTypes + 1
+				end
+			end
+
+			if name:lower():find("mine") then -- Badger again
+				cells[#cells+1] = ' - Shield damage:'
+				cells[#cells+1] = numformat(wd.customParams.stats_shield_damage)
+			else
+				if damageTypes > 1 then
+					cells[#cells+1] = ' - Shield damage:'
+					cells[#cells+1] = numformat(math.floor(wd.customParams.stats_shield_damage), 2) .. " (" .. shield_dam_str .. ")"
+				else
+					cells[#cells+1] = ' - Shield damage:'
+					cells[#cells+1] = numformat(shieldDamPc, 2) .. "%"
+				end
+			end
 		end
 		
 		if cp.post_capture_reload then
@@ -607,12 +626,6 @@ local function weapons2Table(cells, ws, unitID)
 		if show_dps then
 			cells[#cells+1] = ' - DPS:'
 			cells[#cells+1] = dps_str
-		end
-		if shieldDamPc ~= 100 then
-			if not cp.damage_vs_shield then -- Badger shield damage is handled above
-				cells[#cells+1] = ' - Shield damage:'
-				cells[#cells+1] = numformat(shieldDamPc, 2) .. "%"
-			end
 		end
 
 		if (wd.interceptedByShieldType == 0) then
