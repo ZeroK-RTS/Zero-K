@@ -506,14 +506,16 @@ local function weapons2Table(cells, ws, unitID)
 		local mult = tonumber(cp.statsprojectiles) or ((tonumber(cp.script_burst) or wd.salvoSize) * wd.projectiles)
 
 		local dps_str, dam_str, shield_dam_str = '', '', ''
+		local damageTypes = 0
 		if dps > 0 then
 			dam_str = dam_str .. numformat(dam,2)
 			shield_dam_str = shield_dam_str .. numformat(dam,2)
-			if wd.customParams.stats_damage_per_second then
+			if cp.stats_damage_per_second then
 				dps_str = dps_str .. numformat(tonumber(cp.stats_damage_per_second),2)
 			else
 				dps_str = dps_str .. numformat(dps*mult,2)
 			end
+			damageTypes = damageTypes + 1
 		end
 		if dpsw > 0 then
 			if dps_str ~= '' then
@@ -524,6 +526,7 @@ local function weapons2Table(cells, ws, unitID)
 			dam_str = dam_str .. color2incolor(colorCyan) .. numformat(damw,2) .. " (P)\008"
 			shield_dam_str = shield_dam_str .. color2incolor(colorCyan) .. numformat(math.floor(damw / 3),2) .. " (P)\008"
 			dps_str = dps_str .. color2incolor(colorCyan) .. numformat(dpsw*mult,2) .. " (P)\008"
+			damageTypes = damageTypes + 1
 		end
 		if dpss > 0 then
 			if dps_str ~= '' then
@@ -534,9 +537,11 @@ local function weapons2Table(cells, ws, unitID)
 			dam_str = dam_str .. color2incolor(colorPurple) .. numformat(dams,2) .. " (S)\008"
 			shield_dam_str = shield_dam_str .. color2incolor(colorPurple) .. numformat(math.floor(dams / 3),2) .. " (S)\008"
 			dps_str = dps_str .. color2incolor(colorPurple) .. numformat(dpss*mult,2) .. " (S)\008"
+			damageTypes = damageTypes + 1
 		end
 
 		if dpsd > 0 then
+			hasStatusEffect = true
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
@@ -545,6 +550,7 @@ local function weapons2Table(cells, ws, unitID)
 			dam_str = dam_str .. color2incolor(colorDisarm) .. numformat(damd,2) .. " (D)\008"
 			shield_dam_str = shield_dam_str .. color2incolor(colorDisarm) .. numformat(math.floor(damd / 3),2) .. " (D)\008"
 			dps_str = dps_str .. color2incolor(colorDisarm) .. numformat(dpsd*mult,2) .. " (D)\008"
+			damageTypes = damageTypes + 1
 		end
 
 		if dpsc > 0 then
@@ -556,6 +562,7 @@ local function weapons2Table(cells, ws, unitID)
 			dam_str = dam_str .. color2incolor(colorCapture) .. numformat(damc,2) .. " (C)\008"
 			shield_dam_str = shield_dam_str .. color2incolor(colorCapture) .. numformat(damc,2) .. " (C)\008"
 			dps_str = dps_str .. color2incolor(colorCapture) .. numformat(dpsc*mult,2) .. " (C)\008"
+			damageTypes = damageTypes + 1
 		end
 
 		if mult > 1 then
@@ -579,7 +586,7 @@ local function weapons2Table(cells, ws, unitID)
 			show_dps = false
 		end
 		
-		if name:lower():find("mine") then -- Badger
+		if cp.damage_vs_shield and cp.spawns_name then -- Badger
 			dam_str = tostring(cp.damage_vs_shield) .. " (" .. dam .. " + " .. (tonumber(cp.damage_vs_shield)-dam) .. " mine)"
 			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield)/reloadtime))
 		end
@@ -590,28 +597,16 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		-- shield damage
-		if wd.customParams and wd.customParams.stats_shield_damage then
-			local nonShieldDam = dam + damd + dams + damc + damw
-			local shieldDamPc = (100 * wd.customParams.stats_shield_damage) / nonShieldDam
-
-			local damageTypes = 0
-			local damageVals = {dam, damd, dams, damc, damw}
-			for i, d in ipairs(damageVals) do
-				if d > 0 then
-					damageTypes = damageTypes + 1
-				end
-			end
-
-			if name:lower():find("mine") then -- Badger again
+		if (wd.interceptedByShieldType ~= 0) and show_damage then
+			if cp.damage_vs_shield then
 				cells[#cells+1] = ' - Shield damage:'
-				cells[#cells+1] = numformat(wd.customParams.stats_shield_damage)
-			else
+				cells[#cells+1] = numformat(cp.stats_shield_damage)
+			elseif cp.stats_shield_damage ~= dam then
+				cells[#cells+1] = ' - Shield damage:'
 				if damageTypes > 1 then
-					cells[#cells+1] = ' - Shield damage:'
-					cells[#cells+1] = numformat(math.floor(wd.customParams.stats_shield_damage), 2) .. " (" .. shield_dam_str .. ")"
+					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage), 2) .. " (" .. shield_dam_str .. ")"
 				else
-					cells[#cells+1] = ' - Shield damage:'
-					cells[#cells+1] = numformat(shieldDamPc, 2) .. "%"
+					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage), 2)
 				end
 			end
 		end
