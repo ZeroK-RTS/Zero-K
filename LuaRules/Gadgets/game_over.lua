@@ -47,10 +47,6 @@ local spKillTeam          = Spring.KillTeam
 local spGameOver          = Spring.GameOver
 local spEcho              = Spring.Echo
 
-local COMM_VALUE = UnitDefNames.armcom1.metalCost or 1200
-local ECON_SUPREMACY_MULT = 25
-local MISSION_PLAYER_ALLY_TEAM_ID = 0
-
 local SPARE_PLANETWARS_UNITS = false
 local SPARE_REGULAR_UNITS = false
 
@@ -121,13 +117,19 @@ else
 	end
 end
 
+local COMM_VALUE = UnitDefNames.armcom1.metalCost or 1200
+local ECON_SUPREMACY_MULT = 25
+local MISSION_PLAYER_ALLY_TEAM_ID = 0
+
+local disableEconSupremacy = (isScriptMission or campaignBattleID or (Spring.GetModOptions().disable_overwhelming_advantage == 1))
+
 local commsAlive = {}
 local allyTeams = spGetAllyTeamList()
 for i = 1, #allyTeams do
 	commsAlive[allyTeams[i]] = {}
 end
 
-local aiTeamResign = not (isScriptMission or campaignBattleID or (Spring.GetModOptions().disableAiTeamResign == 1))
+local aiTeamResign = not (isScriptMission or campaignBattleID or (Spring.GetModOptions().disable_ai_team_resign == 1))
 
 local vitalConstructorAllyTeam = {}
 local vitalAlive = {}
@@ -501,6 +503,9 @@ local function RemoveAllianceUnit(unitID, unitDefID, teamID, delayLossToNextGame
 end
 
 local function CompareArmyValues(ally1, ally2)
+	if disableEconSupremacy then
+		return nil
+	end
 	local value1, value2 = CountAllianceValue(ally1), CountAllianceValue(ally2)
 	if value1 > ECON_SUPREMACY_MULT*value2 then
 		return ally1
@@ -598,7 +603,7 @@ local function ProcessLastAlly()
 			return
 		end
 		-- run value comparison
-		local supreme = (not campaignBattleID) and CompareArmyValues(activeAllies[1], activeAllies[2])
+		local supreme = CompareArmyValues(activeAllies[1], activeAllies[2])
 		if supreme then
 			EchoUIMessage("AllyTeam " .. supreme .. " has an overwhelming numerical advantage!")
 			for i=1, #allylist do

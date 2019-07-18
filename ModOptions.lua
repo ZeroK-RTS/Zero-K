@@ -262,6 +262,22 @@ local options = {
     def=false,
   },
   {
+    key='disable_ai_team_resign',
+    name='Disable AI Resignation',
+    desc='Prevents AIs from resigning when they run out of constructors and factories.',
+    type='bool',
+    section= 'a_important',
+    def=false,
+  },
+  {
+    key='disable_overwhelming_advantage',
+    name='Disable Overwhelming Advantage',
+    desc='Disable team reveal when the opposing team has 25x more assets.',
+    type='bool',
+    section= 'a_important',
+    def=false,
+  },
+  {
     key='campaign_chassis',
     name='Allow campaign commander chassis',
     desc='Allows you to choose the campaign commander chassis.',
