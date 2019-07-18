@@ -541,7 +541,6 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if dpsd > 0 then
-			hasStatusEffect = true
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
