@@ -575,7 +575,10 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	local pathXrayShader = 'Settings/Graphics/Unit Visibility/XRay Shader'
 		ShButton(pathXrayShader, 'Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
 	local pathUnitOutline = 'Settings/Graphics/Unit Visibility/Outline'
-		ShButton(pathUnitOutline, 'Toggle Unit Outline', function() spSendCommands{"luaui togglewidget Outline Shader"} end, "Highlights edges of units")
+		ShButton(pathUnitOutline, 'Toggle Unit Outline', function()
+				spSendCommands{"luaui disablewidget Outline No Shader"}
+				spSendCommands{"luaui togglewidget Outline Shader"}
+			end, "Highlights edges of units")
 
 
 local pathAudio = 'Settings/Audio'

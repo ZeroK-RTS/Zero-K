@@ -1502,6 +1502,16 @@ function WG.HudDisableWidget(widgetName)
 	widgetHandler:DisableWidget(widgetName)
 end
 
+function WG.IsWidgetEnabled(widgetName)
+	local widgets = widgetHandler.widgets
+	for i = 1, #widgets do
+		local w = widgets[i]
+		if w:GetInfo().name == widgetName then
+			return true
+		end
+	end
+end
+
 ----------------------------------------------------
 -- Callins
 ----------------------------------------------------

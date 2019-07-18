@@ -111,7 +111,10 @@ local optionGenerationTable = {
 	--},
 	{
 		optionName = "unitOutline",
-		optionFunction = function(self) Spring.SendCommands{"luaui togglewidget Outline Shader"} end,
+		optionFunction = function(self)
+			Spring.SendCommands{"luaui disablewidget Outline No Shader"}
+			Spring.SendCommands{"luaui togglewidget Outline Shader"}
+		end,
 		name = "Toggle Unit Outline",
 		desc = "Draws a black outline around units.",
 		type = "button",
