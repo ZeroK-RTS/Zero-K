@@ -287,10 +287,10 @@ end
 ---------------------------------------------------------------------
 -- Walking
 
-local PACE = 2.18
+local BASE_PACE = 2.18
 local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
-local PACE = PACE * VELOCITY/BASE_VELOCITY
+local PACE = BASE_PACE * VELOCITY/BASE_VELOCITY
 
 local SLEEP_TIME = 935*10/30 -- Empirically determined
 
