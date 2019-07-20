@@ -1214,12 +1214,12 @@ function widget:Update(dt)
 	
 	if setHeight then
 		local mx,my = spGetMouseState()
-			
+		
 		if terraform_type == 1 then
 			local a,c,m,s = spGetModKeyState()
 			if c then
 				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
-				if legalPos(pos) then	
+				if legalPos(pos) then
 					terraformHeight = spGetGroundHeight(pos[1],pos[3])
 					storedHeight = terraformHeight
 					mouseX = mx
