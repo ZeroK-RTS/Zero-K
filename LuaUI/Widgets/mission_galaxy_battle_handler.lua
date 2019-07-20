@@ -446,6 +446,15 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 		offset = offset + (#label.physicalLines)*14 + 2
 	end
 	
+	local function SetTentativeSuccess(index)
+		-- This is success that the UI draws, but it may still be overridden with failure by luaRules.
+		if objectives[index].terminated then
+			return
+		end
+		objectives[index].image.file = SUCCESS_ICON
+		objectives[index].image:Invalidate()
+	end
+	
 	local function UpdateSuccess(index)
 		if objectives[index].terminated then
 			return
@@ -481,6 +490,12 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 	
 	function externalFunctions.Update()
 		UpdateObjectiveSuccess()
+	end
+	
+	function externalFunctions.SetTentativeSuccess()
+		for i = 1, #objectives do
+			SetTentativeSuccess(i)
+		end
 	end
 	
 	function externalFunctions.UpdateTooltip(text)
@@ -731,6 +746,10 @@ local function MissionGameOver(newMissionWon)
 	missionWon = newMissionWon
 	missionEndFrame = Spring.GetGameFrame() + VICTORY_SUSTAIN_FRAMES
 	missionEndTime = osClock()
+	
+	if missionWon and mainObjectiveBlock then
+		mainObjectiveBlock.SetTentativeSuccess()
+	end
 	
 	if WG.Music then
 		WG.Music.PlayGameOverMusic(missionWon)

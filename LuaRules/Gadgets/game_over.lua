@@ -442,7 +442,7 @@ local function CheckMissionDefeatOnUnitLoss(unitID, allianceID)
 		return false
 	end
 	if defeatConfig.defeatIfUnitDestroyed and defeatConfig.defeatIfUnitDestroyed[unitID] then
-		if (not gameOverSent) and type(defeatConfig.defeatIfUnitDestroyed[unitID]) == "number" then
+		if type(defeatConfig.defeatIfUnitDestroyed[unitID]) == "number" then
 			local objParameter = "objectiveSuccess_" .. defeatConfig.defeatIfUnitDestroyed[unitID]
 			local value = (allianceID == MISSION_PLAYER_ALLY_TEAM_ID and 0) or 1
 			Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + value)
