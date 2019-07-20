@@ -14,13 +14,13 @@
 
 function widget:GetInfo()
   return {
-    name      = "MetalFeatures 2",
+    name      = "MetalFeatures (new)",
     desc      = "Highlights features with reclaimable metal. Slow due to DrawFeature() overhead",
     author    = "ivand",
     date      = "2019",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false,  --  loaded by default?
+    enabled   = true,  --  loaded by default?
   }
 end
 
