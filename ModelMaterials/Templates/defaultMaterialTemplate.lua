@@ -609,7 +609,7 @@ fragment = [[
 		#define wreckMetal floatOptions[1]
 		if (BITMASK_FIELD(bitOptions, OPTION_METAL_HIGHLIGHT) && wreckMetal > 0.0) {
 			//finalColor = mix(finalColor, addColor.aaa, addColor.rgb);
-			finalColor += addColor.a * addColor.rgb;
+			finalColor += addColor.a * addColor.rgb - lightSpecular;
 		}
 		#undef wreckMetal
 
