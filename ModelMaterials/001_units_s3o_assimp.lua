@@ -8,6 +8,7 @@ local materials = {
 			[5] = "%NORMALTEX",
 		},
 		shaderOptions = {
+			flashlights   = true,
 			normalmapping = true,
 		},
 		deferredOptions = {

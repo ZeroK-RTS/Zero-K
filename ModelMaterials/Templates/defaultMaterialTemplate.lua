@@ -188,7 +188,7 @@ vertex = [[
 				//	GoogleFrog	Today at 1:04 PM
 				//	for the colour scheme we could just rescale it so that the smallest wreck has the colour that an 88 metal wreck has now
 				//	and make all wrecks below that have the same colour
-				float wm = max(wreckMetal, 88.0);
+				float wm = max(78.0 + wreckMetal, 88.0);
 
 				float alpha = 0.35 + 0.65 * SNORM2NORM( sin(simFrame * 0.2) );
 				vec2 x100_1000 = vec2(100.0 / (100.0 + wm), 1000.0 / (1000.0 + wm));
