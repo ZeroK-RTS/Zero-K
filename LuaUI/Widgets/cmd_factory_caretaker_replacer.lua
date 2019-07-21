@@ -54,7 +54,15 @@ local glLineStipple         = gl.LineStipple
 
 local FACTORY_RANGE_SQ = 450^2
 
-local drawRadius = {
+local outCircle = {
+	range = math.sqrt(FACTORY_RANGE_SQ),
+	color = {0.8, 0.8, 0.8, 0.4},
+	width = 2.5,
+	miniWidth = 1.5,
+	circleDivs = 128
+}
+
+local inCircle = {
 	range = math.sqrt(FACTORY_RANGE_SQ),
 	color = {0.1, 1, 0.3, 0.6},
 	width = 2.5,
@@ -125,6 +133,11 @@ local function GetMousePos()
 end
 
 local function CheckFactoryTransformRange(unitDefID)
+	local alt, ctrl = Spring.GetModKeyState()
+	if alt and ctrl then
+		return
+	end
+	
 	local mx, mz = GetMousePos()
 	if not mx then
 		return
@@ -152,6 +165,11 @@ local function CheckFactoryTransformRange(unitDefID)
 end
 
 local function CheckNanoTransformRange()
+	local alt, ctrl = Spring.GetModKeyState()
+	if alt and ctrl then
+		return
+	end
+	
 	local mx, mz = GetMousePos()
 	if not mx then
 		return
@@ -178,8 +196,11 @@ function widget:Update()
 			return
 		end
 		
-		if currentFactoryDefID and unitDefID == nanoUnitDefID and CheckNanoTransformRange() then
-			return
+		if currentFactoryDefID and unitDefID == nanoUnitDefID then
+			if CheckNanoTransformRange() then
+				return
+			end
+			Spring.SetActiveCommand(factoryBuildAction[currentFactoryDefID])
 		end
 	end
 	
@@ -256,12 +277,20 @@ local function DrawFactoryLine(x, y, z)
 		return
 	end
 	
-	local mx = math.floor((mx + 8 - oddX[-cmdID])/16)*16 + oddX[-cmdID]
-	local mz = math.floor((mz + 8 - oddZ[-cmdID])/16)*16 + oddZ[-cmdID]
+	local facing = Spring.GetBuildFacing()
+	local offFacing = (facing == 1 or facing == 3)
+	if offFacing then
+		mx = math.floor((mx + 8 - oddZ[-cmdID])/16)*16 + oddZ[-cmdID]
+		mz = math.floor((mz + 8 - oddX[-cmdID])/16)*16 + oddX[-cmdID]
+	else
+		mx = math.floor((mx + 8 - oddX[-cmdID])/16)*16 + oddX[-cmdID]
+		mz = math.floor((mz + 8 - oddZ[-cmdID])/16)*16 + oddZ[-cmdID]
+	end
+
 	local my = spGetGroundHeight(mx, mz)
 
-	glLineWidth(drawRadius.width)
-	glColor(drawRadius.color[1], drawRadius.color[2], drawRadius.color[3], drawRadius.color[4])
+	glLineWidth(inCircle.width)
+	glColor(inCircle.color[1], inCircle.color[2], inCircle.color[3], inCircle.color[4])
 	gl.BeginEnd(GL.LINE_STRIP, DoLine, x, y, z, mx, my, mz)
 
 	glLineStipple(false)
@@ -269,24 +298,35 @@ local function DrawFactoryLine(x, y, z)
 	glColor(1, 1, 1, 1)
 end
 
+local function GetDrawDef(mx, mz, data)
+	if DistSq(mx, mz, data.x, data.z) < FACTORY_RANGE_SQ then
+		return inCircle
+	end
+	return outCircle
+end
+
 function widget:DrawInMiniMap(minimapX, minimapY)
 	if not currentFactoryDefID then
+		return
+	end
+	local mx, mz = GetMousePos()
+	if not mx then
 		return
 	end
 	
 	local drawn = false
 	for unitID, data in factories.Iterator() do
 		if data.unitDefID == currentFactoryDefID then
-			if not drawn then
-				glTranslate(0,minimapY,0)
-				glScale(minimapX/mapX, -minimapY/mapZ, 1)
-				
-				glLineWidth(drawRadius.miniWidth)
-				glColor(drawRadius.color[1], drawRadius.color[2], drawRadius.color[3], drawRadius.color[4])
-				drawn = true
-			end
+			drawn = true
+			local drawDef = GetDrawDef(mx, mz, data)
 			
-			glDrawCircle(data.x, data.z, drawRadius.range)
+			glTranslate(0,minimapY,0)
+			glScale(minimapX/mapX, -minimapY/mapZ, 1)
+			
+			glLineWidth(drawDef.miniWidth)
+			glColor(drawDef.color[1], drawDef.color[2], drawDef.color[3], drawDef.color[4])
+			
+			glDrawCircle(data.x, data.z, drawDef.range)
 		end
 	end
 	
@@ -302,17 +342,22 @@ function widget:DrawWorld()
 	if not currentFactoryDefID then
 		return
 	end
+	local mx, mz = GetMousePos()
+	if not mx then
+		return
+	end
 	
 	local drawn = false
 	for unitID, data in factories.Iterator() do
 		if data.unitDefID == currentFactoryDefID then
-			if not drawn then
-				glLineWidth(drawRadius.width)
-				glColor(drawRadius.color[1], drawRadius.color[2], drawRadius.color[3], drawRadius.color[4])
-				drawn = true
-			end
+			drawn = true
+			local drawDef = GetDrawDef(mx, mz, data)
 			
-			glDrawGroundCircle(data.x, data.y, data.z, drawRadius.range, drawRadius.circleDivs)
+			gl.DepthTest(false)
+			glLineWidth(drawDef.width)
+			glColor(drawDef.color[1], drawDef.color[2], drawDef.color[3], drawDef.color[4])
+			
+			glDrawGroundCircle(data.x, data.y, data.z, drawDef.range, drawDef.circleDivs)
 		end
 	end
 	
