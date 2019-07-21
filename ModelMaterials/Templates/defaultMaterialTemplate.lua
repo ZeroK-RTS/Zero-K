@@ -229,6 +229,15 @@ vertex = [[
 fragment = [[
 	//shader version is added via gadget
 
+	#if (RENDERING_MODE == 2) //shadows pass. AMD requests that extensions are declared right on top of the shader
+		#if (SUPPORT_DEPTH_LAYOUT == 1)
+			#extension GL_ARB_conservative_depth : enable
+			#extension GL_EXT_conservative_depth : enable
+			// preserve early-z performance if possible
+			layout(depth_unchanged) out float gl_FragDepth;
+		#endif
+	#endif
+
 	/***********************************************************************/
 	// Options in use
 	#define OPTION_SHADOWMAPPING 0
@@ -633,13 +642,6 @@ fragment = [[
 		#endif
 	}
 #else //shadow pass
-	#if (SUPPORT_DEPTH_LAYOUT == 1)
-		#extension GL_ARB_conservative_depth : enable
-		#extension GL_EXT_conservative_depth : enable
-		// preserve early-z performance if possible
-		layout(depth_unchanged) out float gl_FragDepth;
-	#endif
-
 	void main(void){
 		vec4 texColor2 = texture(texture2, modelUV);
 		if (texColor2.a < 0.5)
