@@ -641,30 +641,22 @@ end
 local function Wrap_EndBurst(unitID, unitDefID, callins)
 	local EndBurst = callins.EndBurst
 
-	local function EndBurstThread(weaponNum)
-		if EndBurst then
-			EndBurst(weaponNum)
-		end
-		scriptCallins:ScriptEndBurst(unitID, unitDefID, weaponNum)
-	end
-
 	callins.EndBurst = function(weaponNum)
-		return StartThread(EndBurstThread, weaponNum)
+		scriptCallins:ScriptEndBurst(unitID, unitDefID, weaponNum)
+		if EndBurst then
+			return StartThread(EndBurst, weaponNum)
+		end
 	end
 end
 
 local function Wrap_FireWeapon(unitID, unitDefID, callins)
 	local FireWeapon = callins.FireWeapon
-	
-	local function FireWeaponThread(weaponNum)
-		if FireWeapon then
-			FireWeapon(weaponNum)
-		end
-		scriptCallins:ScriptFireWeapon(unitID, unitDefID, weaponNum)
-	end
-	
+
 	callins.FireWeapon = function(weaponNum)
-		return StartThread(FireWeaponThread, weaponNum)
+		scriptCallins:ScriptFireWeapon(unitID, unitDefID, weaponNum)
+		if FireWeapon then
+			return StartThread(FireWeapon, weaponNum)
+		end
 	end
 end
 
