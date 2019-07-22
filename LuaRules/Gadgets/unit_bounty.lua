@@ -81,7 +81,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 	local bounty_prefix = "$bounty"
 	
 	if command == '$bounty' then
-		local _,_, spec, teamID, allianceID = spGetPlayerInfo(playerID)
+		local _,_, spec, teamID, allianceID = spGetPlayerInfo(playerID, false)
 		if spec then
 			return
 		end
@@ -116,7 +116,7 @@ end
 
 function gadget:Initialize()
 	gaiaTeam = Spring.GetGaiaTeamID()
-	_,_,_,_,_, gaiaAlliance = spGetTeamInfo(gaiaTeam)
+	_,_,_,_,_, gaiaAlliance = spGetTeamInfo(gaiaTeam, false)
 	
 	if TESTMODE then
 		local allUnits = Spring.GetAllUnits()

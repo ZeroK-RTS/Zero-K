@@ -60,7 +60,7 @@ local function AnimControl()
 	SetSignalMask(SIG_ANIM)
 	
 	local lastHeading, currHeading, diffHeading, pivotAngle
-	lastHeading = GetUnitValue(COB.HEADING)*headingToRad
+	lastHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
 	while true do
 		tracks = tracks + 1
 		if tracks == 2 then 
@@ -88,18 +88,18 @@ local function AnimControl()
 		Spin(bigwheel, x_axis, WHEEL_SPIN_SPEED_L, WHEEL_SPIN_ACCEL_L)
 		
 		--pivot
-		currHeading = GetUnitValue(COB.HEADING)*headingToRad
+		currHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
 		diffHeading = (currHeading - lastHeading)
 		if (diffHeading > 0 and diffHeading < MIN_DIFF) or (diffHeading < 0 and diffHeading > -MIN_DIFF) then 
 			diffHeading = MIN_DIFF -- to prevent segfaulting perfect alignment
 		end	
 		
 		-- Fix wrap location
-		if diffHeading > pi then
-			diffHeading = diffHeading - 2*pi
+		if diffHeading > math.pi then
+			diffHeading = diffHeading - 2*math.pi
 		end
-		if diffHeading < -pi then
-			diffHeading = diffHeading + 2*pi
+		if diffHeading < -math.pi then
+			diffHeading = diffHeading + 2*math.pi
 		end
 		
 		-- Bound maximun pivot
@@ -157,7 +157,7 @@ function script.AimFromWeapon(num) return flare end
 function script.QueryWeapon(num) return flare end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Turn(rear, y_axis, 0.01, PIVOT_SPEED)
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (1000)
@@ -235,20 +235,20 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(front, sfxNone)
-		Explode(rear, sfxNone)
+		Explode(front, SFX.NONE)
+		Explode(rear, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(front, sfxNone)
-		Explode(rear, sfxNone)
+		Explode(front, SFX.NONE)
+		Explode(rear, SFX.NONE)
 		return 1
 	elseif severity <= .99 then
-		Explode(front, sfxShatter)
-		Explode(rear, sfxSmoke + sfxFire)
+		Explode(front, SFX.SHATTER)
+		Explode(rear, SFX.SMOKE + SFX.FIRE)
 		return 2
 	else
-		Explode(front, sfxShatter)
-		Explode(rear, sfxSmoke + sfxFire + sfxExplode)
+		Explode(front, SFX.SHATTER)
+		Explode(rear, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	end
 end

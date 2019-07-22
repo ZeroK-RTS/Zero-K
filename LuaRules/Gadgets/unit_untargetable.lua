@@ -23,7 +23,7 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)
 
 	local numParams = #cmdParams
-	if cmdID == CMD.INSERT then
+	if cmdID == CMD_INSERT then
 		numParams = numParams - 3
 		cmdParams[1] = cmdParams[4]
 	end

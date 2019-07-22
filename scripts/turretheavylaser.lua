@@ -1,7 +1,6 @@
 include "constants.lua"
 include "pieceControl.lua"
 include "aimPosTerraform.lua"
-
 ----------------------------------------------------------------------------------------------
 -- Model Pieces
 
@@ -13,10 +12,10 @@ local smokePiece = {basebottom, basemid, basetop}
 ----------------------------------------------------------------------------------------------
 -- Local Constants
 
-local BASETOP_TURN_SPEED = rad(200)
-local BASEMID_TURN_SPEED = rad(230)
-local HOUSING_TURN_SPEED = rad(200)
-local SPINDLE_TURN_SPEED = rad(120 / 0.8)
+local BASETOP_TURN_SPEED = math.rad(200)
+local BASEMID_TURN_SPEED = math.rad(230)
+local HOUSING_TURN_SPEED = math.rad(200)
+local SPINDLE_TURN_SPEED = math.rad(120 / 0.8)
 
 local firing = false
 local index = 2
@@ -43,17 +42,14 @@ end
 
 function script.Create()
 	local ud = UnitDefs[unitDefID]
-	local midTable = ud
-	if Spring.Utilities.IsCurrentVersionNewerThan(100, 0) then
-		midTable = ud.model
-	end
+	local midTable = ud.model
 	
 	local mid = {midTable.midx, midTable.midy, midTable.midz}
 	local aim = {midTable.midx, midTable.midy + 15, midTable.midz}
 
-	SetupAimPosTerraform(mid, aim, midTable.midy + 15, midTable.midy + 60, 15, 48)
+	GG.SetupAimPosTerraform(unitID, unitDefID, mid, aim, midTable.midy + 15, midTable.midy + 60, 15, 48)
 	
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 ----------------------------------------------------------------------------------------------
@@ -67,8 +63,8 @@ local function StunThread ()
 	SetSignalMask(SIG_AIM)
 	disarmed = true
 
-	StopTurn (basetop, y_axis)
-	StopTurn (housing, x_axis)
+	GG.PieceControl.StopTurn (basetop, y_axis)
+	GG.PieceControl.StopTurn (housing, x_axis)
 end
 
 local function UnstunThread()
@@ -111,10 +107,10 @@ function script.FireWeapon(num)
 		index = #flares
 	end
 	firing = true
-	EmitSfx(flares[index], UNIT_SFX2)
+	EmitSfx(flares[index], GG.Script.UNIT_SFX2)
 	Sleep(800)
-	local rz = select(3, GetPieceRotation(spindle))
-	Turn(spindle, z_axis, rz + rad(120),SPINDLE_TURN_SPEED)
+	local rz = select(3, Spring.UnitScript.GetPieceRotation(spindle))
+	Turn(spindle, z_axis, rz + math.rad(120),SPINDLE_TURN_SPEED)
 	firing = false
 end
 
@@ -130,28 +126,28 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .50 then
-		Explode(basebottom, sfxNone)
-		Explode(housing, sfxNone)
-		Explode(holder, sfxNone)
-		Explode(spindle, sfxNone)
-		Explode(basetop, sfxNone)
-		Explode(basemid, sfxNone)
+		Explode(basebottom, SFX.NONE)
+		Explode(housing, SFX.NONE)
+		Explode(holder, SFX.NONE)
+		Explode(spindle, SFX.NONE)
+		Explode(basetop, SFX.NONE)
+		Explode(basemid, SFX.NONE)
 		return 1
 	elseif severity <= .99 then
-		Explode(basebottom, sfxNone)
-		Explode(housing, sfxFall+ sfxSmoke+ sfxFire + sfxExplode)
-		Explode(holder, sfxFall+ sfxSmoke+ sfxFire + sfxExplode)
-		Explode(spindle, sfxFall+ sfxSmoke+ sfxFire + sfxExplode)
-		Explode(basetop, sfxFall+ sfxSmoke+ sfxFire + sfxExplode)
-		Explode(basemid, sfxShatter)
+		Explode(basebottom, SFX.NONE)
+		Explode(housing, SFX.FALL+ SFX.SMOKE+ SFX.FIRE + SFX.EXPLODE)
+		Explode(holder, SFX.FALL+ SFX.SMOKE+ SFX.FIRE + SFX.EXPLODE)
+		Explode(spindle, SFX.FALL+ SFX.SMOKE+ SFX.FIRE + SFX.EXPLODE)
+		Explode(basetop, SFX.FALL+ SFX.SMOKE+ SFX.FIRE + SFX.EXPLODE)
+		Explode(basemid, SFX.SHATTER)
 		return 2
 	else
-		Explode(basebottom, sfxNone)
-		Explode(housing, sfxShatter)
-		Explode(holder, sfxFall+ sfxSmoke+ sfxFire + sfxExplode)
-		Explode(spindle, sfxFall+ sfxSmoke+ sfxFire + sfxExplode)
-		Explode(basetop, sfxShatter)
-		Explode(basemid, sfxShatter)
+		Explode(basebottom, SFX.NONE)
+		Explode(housing, SFX.SHATTER)
+		Explode(holder, SFX.FALL+ SFX.SMOKE+ SFX.FIRE + SFX.EXPLODE)
+		Explode(spindle, SFX.FALL+ SFX.SMOKE+ SFX.FIRE + SFX.EXPLODE)
+		Explode(basetop, SFX.SHATTER)
+		Explode(basemid, SFX.SHATTER)
 		return 2
 	end
 end

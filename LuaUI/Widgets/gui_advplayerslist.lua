@@ -380,7 +380,7 @@ function SetMaxPlayerNameWidth()
 	local nextWidth = 0
 	UseFont(font)
 	for _,wplayer in ipairs(t) do
-		name = Spring_GetPlayerInfo(wplayer)
+		name = Spring_GetPlayerInfo(wplayer, false)
 		nextWidth = GetTextWidth(name)+4
 		if nextWidth > maxWidth then
 			maxWidth = nextWidth
@@ -432,7 +432,7 @@ function GetAllPlayers()
 	end
 	specPlayers = Spring_GetTeamList()
 	for _,playerID in ipairs(specPlayers) do
-		local active,_,spec = Spring_GetPlayerInfo(playerID)
+		local active,_,spec = Spring_GetPlayerInfo(playerID, false)
 		if spec == true then
 			if active == true then
 				player[playerID] = CreatePlayer(playerID)
@@ -442,8 +442,8 @@ function GetAllPlayers()
 end
 
 function CreatePlayer(playerID)
-	local tname, _, tspec, tteam, tallyteam, tping, tcpu, tcountry, trank = Spring_GetPlayerInfo(playerID)
-	local _,_,_,_,tside,tallyteam = Spring_GetTeamInfo(tteam)
+	local tname, _, tspec, tteam, tallyteam, tping, tcpu, tcountry, trank = Spring_GetPlayerInfo(playerID, false)
+	local _,_,_,_,tside,tallyteam = Spring_GetTeamInfo(tteam, false)
 	local tred, tgreen, tblue = Spring_GetTeamColor(tteam)
 	tpingLvl = GetPingLvl(tping)
 	tcpuLvl  = GetCpuLvl(tcpu)
@@ -469,7 +469,7 @@ function CreatePlayer(playerID)
 end
 
 function CreatePlayerFromTeam(teamID)
-	local _,_,_,isAI,tside,tallyteam = Spring_GetTeamInfo(teamID)
+	local _,_,_,isAI,tside,tallyteam = Spring_GetTeamInfo(teamID, false)
 	local tred, tgreen, tblue = Spring_GetTeamColor(teamID)
 	local ttotake, tdead
 	if isAI == true then
@@ -517,12 +517,12 @@ end
 function SortList()
 	local teamList
 	local myOldSpecStatus = mySpecStatus
-	_,_,mySpecStatus,_,_,_,_,_,_ = Spring_GetPlayerInfo(myPlayerID)
+	_,_,mySpecStatus = Spring_GetPlayerInfo(myPlayerID, false)
 	if mySpecStatus ~= myOldSpecStatus then
 		if mySpecStatus == true then
 			teamList = Spring_GetTeamList()
 			for _,team in ipairs(teamList) do               --
-				_,_,isDead = Spring_GetTeamInfo(team)
+				_,_,isDead = Spring_GetTeamInfo(team, false)
 				if isDead == false then
 					Spec(team)
 					break
@@ -615,7 +615,7 @@ end
 function SortPlayers(teamID,allyTeamID,vOffset)
 	local playersList       = Spring_GetPlayerList(teamID,true)
 	local noPlayer          = true
-	local _, _, _, isAi = Spring_GetTeamInfo(teamID)
+	local _, _, _, isAi = Spring_GetTeamInfo(teamID, false)
 	if myTeamID == teamID then
 		if player[myPlayerID].name ~= nil then
 			if mySpecStatus == false then
@@ -660,7 +660,7 @@ function SortSpecs(vOffset)
 	local playersList = Spring_GetPlayerList(_,true)
 	local noSpec = true
 	for _,playerID in ipairs(playersList) do
-		_,active,spec = Spring_GetPlayerInfo(playerID)
+		_,active,spec = Spring_GetPlayerInfo(playerID, false)
 		if spec == true then
 			if player[playerID].name ~= nil then
 				if noSpec == true then
@@ -1318,7 +1318,7 @@ function SetSidePics()
 
 	teamList = Spring_GetTeamList()
 	for _, team in ipairs(teamList) do
-		_,_,_,_,teamside = Spring_GetTeamInfo(team)
+		_,_,_,_,teamside = Spring_GetTeamInfo(team, false)
 		if VFS.FileExists(LUAUI_DIRNAME.."Images/Advplayerslist/"..teamside..".png") then
 			sidePics[team] = ":n:LuaUI/Images/Advplayerslist/"..teamside..".png"
 			if VFS.FileExists(LUAUI_DIRNAME.."Images/Advplayerslist/"..teamside.."WO.png") then
@@ -1876,7 +1876,7 @@ end
 function CheckPlayersChange()
 	local sorting = false
 	for p = 0,31 do
-		local name,active,spec,teamID,allyTeamID,pingTime,cpuUsage, country, rank = Spring_GetPlayerInfo(p)
+		local name,active,spec,teamID,allyTeamID,pingTime,cpuUsage, country, rank = Spring_GetPlayerInfo(p, false)
 		if active == false then
 			if player[p].name ~= nil then                                             -- NON SPEC PLAYER LEAVING
 				if player[p].spec==false then

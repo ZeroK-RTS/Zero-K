@@ -35,7 +35,6 @@ local CMD_ONOFF         = CMD.ONOFF;
 local CMD_REPEAT        = CMD.REPEAT;
 local CMD_MOVE_STATE    = CMD.MOVE_STATE;
 local CMD_FIRE_STATE    = CMD.FIRE_STATE;
-local CMD_ONOFF         = CMD.ONOFF
 
 local gaiaID = Spring.GetGaiaTeamID();
 

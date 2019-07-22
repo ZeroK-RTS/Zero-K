@@ -77,10 +77,10 @@ function Shoot()
 	SetSignalMask(SIG_SHOOT)
 	while(on) do
 		if shooting ~= 0 then
-			EmitSfx(SatelliteMuzzle, FIRE_W2)
+			EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W2)
 			shooting = shooting - 1
 		else
-			EmitSfx(SatelliteMuzzle, FIRE_W4)
+			EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W4)
 		end
 		Sleep(30)
 	end

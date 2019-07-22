@@ -24,7 +24,6 @@ local DEBUG_MODE = false
 --local defenderTeam = nil
 local defenderFaction = Spring.GetModOptions().defendingfaction ~= "Mercenary"
 
-local spAreTeamsAllied = Spring.AreTeamsAllied
 local floor = math.floor
 
 include "LuaRules/Configs/customcmds.h.lua"
@@ -64,7 +63,7 @@ local allyTeamRole = {
 	[1] = "defender",
 }
 
-local hqDefID = {
+local hqDefIDs = {
 	[0] = UnitDefNames["pw_hq_attacker"].id,
 	[1] = UnitDefNames["pw_hq_defender"].id,
 }
@@ -125,7 +124,7 @@ local function GeneratePlayerNameToTeamIDMap()
 	
 	local playerList = Spring.GetPlayerList()
 	for i = 1, #playerList do
-		local name, active, spectator, teamID = Spring.GetPlayerInfo(playerList[i])
+		local name, active, spectator, teamID = Spring.GetPlayerInfo(playerList[i], false)
 		if name and active and (not spectator) then
 			map[name] = teamID
 		end
@@ -388,7 +387,7 @@ end
 local function GetAllyTeamLeader(teamList)
 	local bestRank, bestRankTeams
 	for i = 1, #teamList do
-		local teamID, leader, _, isAiTeam = Spring.GetTeamInfo(teamList[i])
+		local teamID, leader, _, isAiTeam = Spring.GetTeamInfo(teamList[i], false)
 		if leader and not isAiTeam then
 			local customKeys = select(10, Spring.GetPlayerInfo(leader)) or {}
 			local rank = customKeys.pwrank
@@ -694,7 +693,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		CheckRemoveWormhole(unitID, unitDefID)
 	end
 	if hqs[unitID] then
-		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam))
+		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam, false))
 		hqsDestroyed[#hqsDestroyed+1] = allyTeam
 		
 		destroyedStructureCount = destroyedStructureCount + 1
@@ -718,7 +717,7 @@ function gadget:GamePreload()
 		local teamList = Spring.GetTeamList(i) or {0}
 		local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 		local teamID = GetAllyTeamLeader(teamList)
-		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]], hqDefID[i])
+		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]], hqDefIDs[i])
 	end
 	
 	Spring.SetGameRulesParam("pw_structureList_count", planetwarsStructureCount)

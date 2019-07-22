@@ -22,7 +22,7 @@ local CONST_HEIGHT_MULTIPLIER = 3 -- how many times to multiply height differenc
 local CONST_TRANSPORT_PICKUPTIME = 9 -- how long (in seconds) does transport land and takeoff with unit
 local CONST_PRIORITY_BENEFIT = 10000 -- how much more important are priority transfers
 local CONST_TRANSPORT_STOPDISTANCE = 350 -- how close by has transport be to stop the unit
-local CONST_UNLOAD_RADIUS = 140 -- how big is the radious for unload command for factory transports
+local CONST_UNLOAD_RADIUS = 100 -- how big is the radious for unload command for factory transports
 
 local idleTransports = {} -- list of idle transports key = id, value = {defid}
 local activeTransports = {} -- list of transports with AI enabled
@@ -260,25 +260,14 @@ function IsDisembark(cmd)
 	return false
 end
 
+local CMD_OPT_ALT = CMD.OPT_ALT
 function IsWaitCommand(unitID)
-	local queue = spGetCommandQueue(unitID, 1);
-	local alt
-	if queue and queue[1] then
-		alt = ExtractModifiedOptions(queue[1].options)
-	end
-	if (queue and queue[1] and queue[1].id == CMD.WAIT and not (queue[1].options.alt or alt)) then
-		return true
-	end
-	return false
+	local cmdID, cmdOpts = Spring.GetUnitCurrentCommand(unitID)
+	return cmdID == CMD.WAIT and (cmdOpts % (2*CMD_OPT_ALT) < CMD_OPT_ALT)
 end
 
 function IsIdle(unitID)
-	local queue = spGetCommandQueue(unitID, 1)
-	if (queue == nil or #queue==0) then
-		return true
-	else
-		return false
-	end
+	return spGetCommandQueue(unitID, 0) == 0
 end
 
 function GetToPickTransport(unitID)
@@ -426,9 +415,10 @@ local function PossiblyTransferAutoCallThroughMorph(unitID)
 end
 
 local function GiveUnloadOrder(transportID, x, y, z)
-	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT)
-	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, CONST_UNLOAD_RADIUS*2}, CMD.OPT_SHIFT)
-	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, CONST_UNLOAD_RADIUS*4}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x - 2, y, z - 2}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x + 2, y, z + 2, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x - 2, y, z + 2, CONST_UNLOAD_RADIUS*2}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x + 2, y, z - 2, CONST_UNLOAD_RADIUS*4}, CMD.OPT_SHIFT)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
@@ -643,7 +633,7 @@ function StopCloseUnits() -- stops dune units which are close to transport
 end
 
 function widget:Initialize()
-	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID())
+	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID(), false)
 	 if spec then
 		widgetHandler:RemoveWidget(widget)
 		return false
@@ -701,8 +691,11 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 			if usefulCommand then
 				cnt = cnt +1
 				if cx then
-					spGiveOrderToUnit(transportID, CMD_RAW_MOVE, {cx, cy, cz}, CMD.OPT_SHIFT)
-					TableInsert(torev, {cx, cy, cz + 20})
+					if queue[k + 1] then
+						-- Do not give move order to the last waypoint.
+						spGiveOrderToUnit(transportID, CMD_RAW_MOVE, {cx, cy, cz}, CMD.OPT_SHIFT)
+						TableInsert(torev, {cx, cy, cz + 20})
+					end
 					lastX, lastY, lastZ = cx, cy, cz
 				end
 				if haltingCommand or (IsDisembark(v)) then
@@ -768,8 +761,8 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 		spGiveOrderToUnit(unitID, x[1], x[2], x[3])
 	end
 	storedQueue[unitID] = nil
-	local queue = spGetCommandQueue(unitID, 1)
-	if (queue and queue[1] and queue[1].id == CMD.WAIT) then
+	local cmdID = Spring.GetUnitCurrentCommand(unitID)
+	if cmdID == CMD.WAIT then
 		-- workaround: clears wait order if STOP fails to do so
 		spGiveOrderToUnit(unitID, CMD.WAIT, EMPTY_TABLE, 0)
 	end 
@@ -880,8 +873,8 @@ function AssignTransports(transportID, unitID, guardID, guardOnly)
 		if guardID then
 			for id, def in pairs(allMyTransports) do
 				if CanTransport(id, unitID) and IsTransportable(unitDefID, unitID) then
-					local queue = spGetCommandQueue(id, 1)
-					if queue and queue[1] and queue[1].id == CMD.GUARD and queue[1].params[1] == guardID then
+					local cmdID, _, _, cmdParam = Spring.GetUnitCurrentCommand(id)
+					if cmdID == CMD.GUARD and cmdParam == guardID then
 						local benefit = GetTransportBenefit(unitID, pathLength, id, def, unitspeed, unitmass, priorityState)
 						if benefit then
 							toGuard[id] = guardID

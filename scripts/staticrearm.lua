@@ -19,7 +19,7 @@ local function SpinRadar()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(SpinRadar)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
@@ -35,38 +35,38 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(base, sfxNone)
-		Explode(land1, sfxNone)
-		Explode(land2, sfxNone)
-		Explode(land3, sfxNone)
-		Explode(land4, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(land1, SFX.NONE)
+		Explode(land2, SFX.NONE)
+		Explode(land3, SFX.NONE)
+		Explode(land4, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(base, sfxNone)
-		Explode(body, sfxShatter)
-		Explode(land1, sfxNone)
-		Explode(land2, sfxNone)
-		Explode(land3, sfxNone)
-		Explode(land4, sfxNone)
-		Explode(radar, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, SFX.NONE)
+		Explode(body, SFX.SHATTER)
+		Explode(land1, SFX.NONE)
+		Explode(land2, SFX.NONE)
+		Explode(land3, SFX.NONE)
+		Explode(land4, SFX.NONE)
+		Explode(radar, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 1
 	elseif severity <= .99 then
-		Explode(base, sfxNone)
-		Explode(body, sfxShatter)
-		Explode(land1, sfxNone)
-		Explode(land2, sfxNone)
-		Explode(land3, sfxNone)
-		Explode(land4, sfxNone)
-		Explode(radar, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, SFX.NONE)
+		Explode(body, SFX.SHATTER)
+		Explode(land1, SFX.NONE)
+		Explode(land2, SFX.NONE)
+		Explode(land3, SFX.NONE)
+		Explode(land4, SFX.NONE)
+		Explode(radar, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	else
-		Explode(base, sfxNone)
-		Explode(body, sfxShatter)
-		Explode(land1, sfxNone)
-		Explode(land2, sfxNone)
-		Explode(land3, sfxNone)
-		Explode(land4, sfxNone)
-		Explode(radar, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, SFX.NONE)
+		Explode(body, SFX.SHATTER)
+		Explode(land1, SFX.NONE)
+		Explode(land2, SFX.NONE)
+		Explode(land3, SFX.NONE)
+		Explode(land4, SFX.NONE)
+		Explode(radar, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	end
 end

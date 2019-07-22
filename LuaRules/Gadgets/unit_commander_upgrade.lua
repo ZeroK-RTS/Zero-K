@@ -98,15 +98,15 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, dama
 		local wd = WeaponDefNames[weaponName]
 		if wd and wd.customParams and wd.customParams.manualfire then
 			weapon2 = weapon1
-			weapon1 = "commweapon_peashooter"
+			weapon1 = "commweapon_beamlaser"
 		end
 	end
 	
-	weapon1 = weapon1 or "commweapon_peashooter"
+	weapon1 = weapon1 or "commweapon_beamlaser"
 	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
 	
 	if chassis and chassisDefs[chassis] and chassisDefs[chassis].secondPeashooter and (not weapon2) and Spring.GetUnitRulesParam(unitID, "comm_level") > 2 then 
-		weapon2 = "commweapon_peashooter"
+		weapon2 = "commweapon_beamlaser"
 	end
 	
 	rangeMult = rangeMult or Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1
@@ -155,14 +155,14 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	
 	-- All comms have 10 BP in their unitDef (even support)
 	local buildPower = (10 + (data.bonusBuildPower or 0)) * (data.buildPowerMult or 1)
-	data.metalIncome = (data.metalIncome or 0) + buildPower*0.03
-	data.energyIncome = (data.energyIncome or 0) + buildPower*0.03
+	data.metalIncome = (data.metalIncome or 0)
+	data.energyIncome = (data.energyIncome or 0)
 	Spring.SetUnitRulesParam(unitID, "buildpower_mult", buildPower/10, INLOS)
 	
 	if data.metalIncome and GG.Overdrive then
 		Spring.SetUnitRulesParam(unitID, "comm_income_metal", data.metalIncome, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_income_energy", data.energyIncome, INLOS)
-		GG.Overdrive.AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
+		GG.Overdrive.AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome, true)
 	end
 	
 	if data.healthBonus then
@@ -226,7 +226,7 @@ local function ApplyModuleEffectsFromUnitRulesParams(unitID)
 	if GG.Overdrive then
 		local mInc = Spring.GetUnitRulesParam(unitID, "comm_income_metal")
 		local eInc = Spring.GetUnitRulesParam(unitID, "comm_income_energy")
-		GG.Overdrive.AddUnitResourceGeneration(unitID, mInc or 0, eInc or 0, true)
+		GG.Overdrive.AddUnitResourceGeneration(unitID, mInc or 0, eInc or 0, true, true)
 	end
 	
 	if Spring.GetUnitRulesParam(unitID, "carrier_count_drone") or Spring.GetUnitRulesParam(unitID, "carrier_count_droneheavyslow") then

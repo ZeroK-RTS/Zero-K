@@ -51,12 +51,6 @@ unitDef = {
   waterline              = 2,
 
   weapons                = {
-  
-    {
-      def                = [[FAKEWEAPON]],
-      mainDir            = [[0 0 1]],
-      maxAngleDif        = 60,
-    },
 
     {
       def                = [[MISSILE]],
@@ -67,41 +61,6 @@ unitDef = {
   },
 
   weaponDefs             = {
-
-    FAKEWEAPON = {
-      name                    = [[Fake Missile]],
-      areaOfEffect            = 8,
-      craterBoost             = 0,
-      craterMult              = 0,
-      cylinderTargeting       = 1,
-
-      damage                  = {
-        default = 0,
-      },
-
-      explosionGenerator      = [[custom:FLASH2]],
-      fireStarter             = 70,
-      fixedlauncher           = true,
-      flightTime              = 4,
-      heightmod               = 0.5,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 2,
-      model                   = [[wep_m_fury.s3o]],
-      range                   = 330,
-      reloadtime              = 2,
-      smokeTrail              = true,
-      startVelocity           = 300,
-      tolerance               = 10000,
-      tracks                  = true,
-      trajectoryHeight        = 1.2,
-      turnRate                = 60000,
-      turret                  = true,
-      weaponAcceleration      = 350,
-      weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 750,
-    },
 
     MISSILE   = {
       name                    = [[Light Disarm Missile]],

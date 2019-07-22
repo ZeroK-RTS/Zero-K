@@ -47,7 +47,7 @@ function script.Activate()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	if not Spring.GetUnitIsStunned(unitID) then
 		StartThread(Open)
 	end
@@ -60,14 +60,14 @@ function script.Killed(recentDamage, maxHealth)
 
 	for i = 1, #explodables do
 		if (math.random() < severity*1.5) then
-			Explode (explodables[i], sfxFall + sfxSmoke)
+			Explode (explodables[i], SFX.FALL + SFX.SMOKE)
 		end
 	end
 	if severity < 0.5 then
 		return 1
 	else
-		Explode (door_r, sfxFall + sfxSmoke)
-		Explode (bottom, sfxShatter)
+		Explode (door_r, SFX.FALL + SFX.SMOKE)
+		Explode (bottom, SFX.SHATTER)
 		return 2
 	end
 end

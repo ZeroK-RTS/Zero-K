@@ -203,6 +203,14 @@ local options = {
     def = true,
   },
   {
+    key = "enablelagmonitor",
+    name = "Enable Inactivity Sharing",
+    desc = "In a team game, automatically share units of inactive players.",
+    type = 'bool',
+    section= 'a_important',
+    def = true,
+  },
+  {
     key         = "allyreclaim",
     name        = "Reclaimable allies",
     desc        = "Allows reclaiming allied units and structures",
@@ -596,7 +604,7 @@ local options = {
     section= 'chicken',
     def    = 60,
     min    = 1,
-    max    = 200,
+    max    = 300,
     step   = 1,
   },
   {
@@ -607,7 +615,7 @@ local options = {
     section= 'chicken',
     def    = 1,
     min    = 0.1,
-    max    = 10,
+    max    = 30,
     step   = 0.05,
   },
   {

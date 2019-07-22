@@ -19,8 +19,8 @@ local spGetFactoryCommands = Spring.GetFactoryCommands
 local spGetCommandQueue    = Spring.GetCommandQueue
 
 local function GetCmdTag(unitID) 
-    local cmdTag = 0
-    local cmds = spGetFactoryCommands(unitID,1)
+	local cmdTag = 0
+	local cmds = spGetFactoryCommands(unitID,1)
 	if (cmds) then
 		local cmd = cmds[1]
 		if cmd then
@@ -28,13 +28,20 @@ local function GetCmdTag(unitID)
 		end
 	end
 	if cmdTag == 0 then 
-		local cmds = spGetCommandQueue(unitID,1)
-		if (cmds) then
-			local cmd = cmds[1]
-			if cmd then
-				cmdTag = cmd.tag
+		if Spring.Utilities.COMPAT_GET_ORDER then
+			local queue = spGetCommandQueue(unitID,1)
+			if (queue) then
+				local cmd = queue[1]
+				if cmd then
+					cmdTag = cmd.tag
+				end
 			end
-        end
+		else
+			cmdID, _, firstCmdTag = Spring.GetUnitCurrentCommand(unitID)
+			if cmdID then
+				cmdTag = firstCmdTag
+			end
+		end
 	end 
 	return cmdTag
 end 
@@ -281,12 +288,12 @@ function gadget:GameFrame(frame)
 		if ((unitID + frame) % 30 < 1) then --// only update once per second
 			local strength = (Spring.GetUnitCurrentBuildPower(unitID) or 0)*(Spring.GetUnitRulesParam(unitID, "totalEconomyChange") or 1)	-- * 16
 			if (strength > 0) then
-				local type, target, isFeature = Spring.Utilities.GetUnitNanoTarget(unitID)
+				local targetType, target, isFeature = Spring.Utilities.GetUnitNanoTarget(unitID)
 
 				if (target) then
 					local endpos
 					local radius = 30
-					if (type=="restore") then
+					if (targetType=="restore") then
 						endpos = target
 						radius = target[4]
 						target = -1
@@ -298,9 +305,9 @@ function gadget:GameFrame(frame)
 
 					local terraform = false
 					local inversed  = false
-					if (type=="restore") then
+					if (targetType=="restore") then
 						terraform = true
-					elseif (type=="reclaim") then
+					elseif (targetType=="reclaim") then
 						inversed  = true
 					end
 
@@ -338,7 +345,7 @@ function gadget:GameFrame(frame)
 							targetpos    = endpos,
 							count        = strength*30,
 							color        = teamColor,
-							type         = type,
+							type         = targetType,
 							targetradius = radius,
 							terraform    = terraform,
 							inversed     = inversed,

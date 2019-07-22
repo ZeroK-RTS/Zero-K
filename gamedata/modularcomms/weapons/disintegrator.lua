@@ -16,7 +16,7 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default    = 1400,
+		default    = 2000,
 	},
 
 	explosionGenerator      = [[custom:DGUNTRACE]],

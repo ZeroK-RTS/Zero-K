@@ -5,7 +5,7 @@ unitDef = {
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   brakeRate              = 0.6,
-  buildCostMetal         = 200,
+  buildCostMetal         = 170,
   buildDistance          = 220,
   builder                = true,
 
@@ -24,12 +24,13 @@ unitDef = {
 
   customParams           = {
 	modelradius    = [[15]],
+	selection_scale = 1.2,
   },
 
   energyUse              = 0,
   explodeAs              = [[BIG_UNITEX]],
-  footprintX             = 3,
-  footprintZ             = 3,
+  footprintX             = 2,
+  footprintZ             = 2,
   iconType               = [[builder]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -39,7 +40,7 @@ unitDef = {
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
-  movementClass          = [[TKBOT3]],
+  movementClass          = [[TKBOT2]],
   objectName             = [[weaver.s3o]],
   radarDistance          = 1200,
   radarEmitHeight        = 12,

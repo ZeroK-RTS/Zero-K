@@ -75,22 +75,20 @@ local function ProcessCommand(unitID, cmdID, params)
 		end
 	end
 	
+	local moveParams = {1, 2, 3}
 	if cmdID == CMD.RESURRECT or cmdID == CMD.RECLAIM then
-		local x, y, z = Spring.GetFeaturePosition((targetOverride or params[1] or 0) - MAX_UNITS)
-		return true, halting, {x, y, z}
+		moveParams[1], moveParams[2], moveParams[3] = Spring.GetFeaturePosition((targetOverride or params[1] or 0) - MAX_UNITS)
 	else
-		local x, y, z = Spring.GetUnitPosition(targetOverride or params[1])
-		return true, halting, {x, y, z}
+		moveParams[1], moveParams[2], moveParams[3] = Spring.GetUnitPosition(targetOverride or params[1])
 	end
-	
-	return true
+	return true, halting, moveParams
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 local function CopyMoveThenUnload(transportID, unitID)
-	local cmdQueue = Spring.GetCommandQueue(unitID)
+	local cmdQueue = Spring.GetCommandQueue(unitID, -1)
 	if not cmdQueue then
 		return
 	end
@@ -134,6 +132,7 @@ end
 
 local valkMaxMass = UnitDefNames.gunshiptrans.transportMass
 local valkMaxSize = UnitDefNames.gunshiptrans.transportSize * 2
+local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(104, 600)
 
 local function DoSelectionLoad()
 	-- Find the units which can transport and the units which are transports
@@ -152,18 +151,26 @@ local function DoSelectionLoad()
 				if ud.isTransport then
 					local transportUnits = Spring.GetUnitIsTransporting(unitID)
 					if transportUnits and #transportUnits == 0 then
-						if ud.transportMass > valkMaxMass then
-							heavyTrans[#heavyTrans + 1] = unitID
-						else
+						if ud.customParams.islighttransport then
 							lightTrans[#lightTrans + 1] = unitID
+						else
+							heavyTrans[#heavyTrans + 1] = unitID
 						end
 					end
 				end
 			else
-				if (ud.mass > valkMaxMass) or (ud.xsize > valkMaxSize) or (ud.zsize > valkMaxSize) then
-					heavy[#heavy + 1] = unitID
+				if REVERSE_COMPAT then
+					if (ud.mass > valkMaxMass) or (ud.xsize > valkMaxSize) or (ud.zsize > valkMaxSize) then
+						heavy[#heavy + 1] = unitID
+					else
+						light[#light + 1] = unitID
+					end
 				else
-					light[#light + 1] = unitID
+					if ud.customParams.requireheavytrans then
+						heavy[#heavy + 1] = unitID
+					else
+						light[#light + 1] = unitID
+					end
 				end
 			end
 		end

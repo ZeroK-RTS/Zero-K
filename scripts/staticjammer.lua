@@ -4,7 +4,7 @@ local base, cylinder, turret, jammersturret, jam1, jam2, deploy = piece ('base',
 local smokePiece = {base}
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Activate()
@@ -31,23 +31,23 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(base, sfxNone)
-		Explode(turret, sfxNone)
-		Explode(cylinder, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(cylinder, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(base, sfxNone)
-		Explode(turret, sfxShatter)
-		Explode(cylinder, sfxShatter)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.SHATTER)
+		Explode(cylinder, SFX.SHATTER)
 		return 1
 	elseif severity <= .99 then
-		Explode(base, sfxShatter)
+		Explode(base, SFX.SHATTER)
 		Explode(turret, SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(cylinder, SFX.FALL + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		return 2
 	end
-	Explode(base, sfxShatter)
-	Explode(turret, sfxSmoke + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(base, SFX.SHATTER)
+	Explode(turret, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	Explode(cylinder, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 	return 2
 end

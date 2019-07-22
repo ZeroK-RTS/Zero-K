@@ -53,12 +53,12 @@ function widget:Initialize()
 	local teamList = Spring.GetTeamList() --//check teamIDlist for AI, retrieve all names
 	for j= 1, #teamList do
 		local teamID = teamList[j]
-		local _,playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		local _,playerID, _, isAI = Spring.GetTeamInfo(teamID, false)
 		if isAI then
 			local _, aiName = Spring.GetAIInfo(teamID)
 			gameID_to_playerName[teamID+1] = aiName
 		elseif not isAI then
-			local playerName = Spring.GetPlayerInfo(playerID)
+			local playerName = Spring.GetPlayerInfo(playerID, false)
 			gameID_to_playerName[teamID+1] = playerName or "Gaia"
 		end
 	end
@@ -116,7 +116,7 @@ function widget:MousePress(x, y, button)
 		end
 	end
 	if button == rightButton then
-		--local playerName,_,_,_,_,_,_,_,_,_ = spGetPlayerInfo(playerID)
+		--local playerName = spGetPlayerInfo(playerID, false)
 		local playerName = gameID_to_playerName[teamID+1]
 		local textToBePasted = pasteCommand .. playerName .. "," --//paste playerName
 		spSendCommands(textToBePasted)
@@ -124,7 +124,7 @@ function widget:MousePress(x, y, button)
 		drawText={true, playerName, {scrnX,y,scrnY}}
 	end
 	if button == middleButton then
-		local _,playerID,_,_,_,_,_,_ = spGetTeamInfo(teamID) --//definition of playerID in this context refer to: http://springrts.com/wiki/Lua_SyncedRead#Player.2CTeam.2CAlly_Lists.2FInfo
+		local _,playerID = spGetTeamInfo(teamID, false) --//definition of playerID in this context refer to: http://springrts.com/wiki/Lua_SyncedRead#Player.2CTeam.2CAlly_Lists.2FInfo
 		if playerID>=0 then --//if playerID==-1 then skip
 			local textToBePasted = whisper .. playerID .. " ," --//paste whisper
 			spSendCommands(textToBePasted)

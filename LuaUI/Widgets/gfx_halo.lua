@@ -294,8 +294,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-Spring.GetTeamColor = Spring.GetTeamColor or function(teamID) local _,_,_,_,_,_,r,g,b = Spring.GetTeamInfo(teamID); return r,g,b end
-
 local teamColors = {}
 local function SetTeamColor(teamID)
   local teamColor = teamColors[teamID]

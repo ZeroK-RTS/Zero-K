@@ -16,7 +16,7 @@ function gadget:GetInfo()
 	return {
 		name     = "UnitMorph",
 		desc     = "Adds unit morphing",
-		author	 = "trepan (improved by jK, Licho, aegis, CarRepairer, Aquanim)",
+		author   = "trepan (improved by jK, Licho, aegis, CarRepairer, Aquanim)",
 		date     = "Jan, 2008",
 		license  = "GNU GPL, v2 or later",
 		layer    = -1, --must start after unit_priority.lua gadget to use GG.AddMiscPriority()
@@ -140,7 +140,7 @@ local morphToStart = {} -- morphs to start next frame
 GG.wasMorphedTo = {} -- when a unit finishes morphing, a mapping of old unitID to new unitID is recorded here prior to old unit destruction
 
 local morphCmdDesc = {
---	id	 = CMD_MORPH, -- added by the calling function because there is now more than one option
+	--id	 = CMD_MORPH, -- added by the calling function because there is now more than one option
 	type   = CMDTYPE.ICON,
 	name   = 'Morph',
 	cursor = 'Morph',	-- add with LuaUI?
@@ -164,9 +164,9 @@ local function GetMorphToolTip(unitID, unitDefID, teamID, morphDef)
 	local ud = UnitDefs[morphDef.into]
 	local tt = ''
 	if (morphDef.text ~= nil) then
-	tt = tt .. WhiteStr	.. morphDef.text .. '\n'
+		tt = tt .. WhiteStr	.. morphDef.text .. '\n'
 	else
-	tt = tt .. 'Morph into a ' .. ud.humanName .. '\n'
+		tt = tt .. 'Morph into a ' .. ud.humanName .. '\n'
 	end
 	tt = tt .. GreenStr	.. 'time: '	 .. morphDef.time	 .. '\n'
 	tt = tt .. CyanStr	 .. 'metal: '	.. morphDef.metal	.. '\n'
@@ -250,12 +250,12 @@ end
 local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	-- do not allow morph for unfinsihed units
 	if not isFinished(unitID) then 
-		return true 
+		return false 
 	end
 	
 	-- do not allow morph for units being transported which are not combat morphs
 	if Spring.GetUnitTransporter(unitID) and not morphDef.combatMorph then
-		return true
+		return false
 	end
 	
 	Spring.SetUnitRulesParam(unitID, "morphing", 1)
@@ -293,6 +293,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	local newMorphRate = GetMorphRate(unitID)
 	GG.StartMiscPriorityResourcing(unitID, (newMorphRate*morphDef.metal/morphDef.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor), modified for slow
 	morphUnits[unitID].morphRate = newMorphRate
+	return true
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
@@ -436,7 +437,7 @@ local function FinishMorph(unitID, morphData)
 	--//copy command queue
 	local cmds = Spring.GetCommandQueue(unitID, -1)
 
-	local states = Spring.GetUnitStates(unitID)
+	local states = Spring.GetUnitStates(unitID) -- This can be left in table-state mode until REVERSE_COMPAT is not an issue.
 	states.retreat = Spring.GetUnitRulesParam(unitID, "retreatState") or 0
 	states.buildPrio = Spring.GetUnitRulesParam(unitID, "buildpriority") or 1
 	states.miscPrio = Spring.GetUnitRulesParam(unitID, "miscpriority") or 1
@@ -524,15 +525,15 @@ local function FinishMorph(unitID, morphData)
 	
 	--//transfer some state
 	Spring.GiveOrderArrayToUnitArray({ newUnit }, {
-	{CMD.FIRE_STATE,    { states.firestate             }, 0 },
-	{CMD.MOVE_STATE,    { states.movestate             }, 0 },
-	{CMD.REPEAT,        { states["repeat"] and 1 or 0  }, 0 },
-	{CMD_WANT_CLOAK,    { wantCloakState or 0          }, 0 },
-	{CMD.ONOFF,         { 1                            }, 0 },
-	{CMD.TRAJECTORY,    { states.trajectory and 1 or 0 }, 0 },
-	{CMD_PRIORITY,      { states.buildPrio             }, 0 },
-	{CMD_RETREAT,       { states.retreat               }, states.retreat == 0 and CMD.OPT_RIGHT or 0 },
-	{CMD_MISC_PRIORITY, { states.miscPrio              }, 0 },
+		{CMD.FIRE_STATE,    { states.firestate             }, 0 },
+		{CMD.MOVE_STATE,    { states.movestate             }, 0 },
+		{CMD.REPEAT,        { states["repeat"] and 1 or 0  }, 0 },
+		{CMD_WANT_CLOAK,    { wantCloakState or 0          }, 0 },
+		{CMD.ONOFF,         { 1                            }, 0 },
+		{CMD.TRAJECTORY,    { states.trajectory and 1 or 0 }, 0 },
+		{CMD_PRIORITY,      { states.buildPrio             }, 0 },
+		{CMD_RETREAT,       { states.retreat               }, states.retreat == 0 and CMD.OPT_RIGHT or 0 },
+		{CMD_MISC_PRIORITY, { states.miscPrio              }, 0 },
 	})
 	
 	--//reassign assist commands to new unit
@@ -725,10 +726,11 @@ end
 
 function gadget:GameFrame(n)
 	-- start pending morphs
-	for unitid, data in pairs(morphToStart) do
-		StartMorph(unitid, unpack(data))
+	for unitID, data in pairs(morphToStart) do
+		if StartMorph(unitID, unpack(data)) then
+			morphToStart[unitID] = nil
+		end
 	end
-	morphToStart = {}
 
 	for unitID, morphData in pairs(morphUnits) do
 		if (not UpdateMorph(unitID, morphData)) then
@@ -738,7 +740,7 @@ function gadget:GameFrame(n)
 end
 
 local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
-	local morphDef = nil
+	local morphDef, _
 	if cmdID == CMD_MORPH then
 		if type(GG.MorphInfo[unitDefID]) ~= "table" then
 			--Spring.Echo('Morph gadget: CommandFallback generic morph on non morphable unit')
@@ -749,10 +751,7 @@ local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
 			morphDef=(morphDefs[unitDefID] or {})[GG.MorphInfo[unitDefID][cmdParams[1]]]
 		else
 			--Spring.Echo('Morph gadget: CommandFallback generic morph, default target')
-			for _, md in pairs(morphDefs[unitDefID]) do
-				morphDef = md
-				break
-			end
+			_, morphDef = next(morphDefs[unitDefID])
 		end
 	else
 		--Spring.Echo('Morph gadget: CommandFallback specific morph')
@@ -763,8 +762,7 @@ local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
 	end
 	if morphDef then
 		local morphData = morphUnits[unitID]
-		local health, maxHealth, paralyzeDamage, captureProgress, buildProgress = Spring.GetUnitHealth(unitID)
-		if (not morphData) and buildProgress == 1 then
+		if (not morphData) then
 			-- dont start directly to break recursion
 			--StartMorph(unitID, unitDefID, teamID, morphDef)
 			morphToStart[unitID] = {unitDefID, teamID, morphDef}
@@ -831,18 +829,14 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			morphUnits[unitID] = nil
 		end
 	elseif (cmdID >= CMD_MORPH and cmdID <= CMD_MORPH+MAX_MORPH) then
-		local morphDef = nil
+		local morphDef, _
 		if cmdID == CMD_MORPH then
 			if type(GG.MorphInfo[unitDefID]) ~= "table" then
 				--Spring.Echo('Morph gadget: AllowCommand generic morph on non morphable unit')
 				return false
 			elseif #cmdParams == 0 then
 				--Spring.Echo('Morph gadget: AllowCommand generic morph, default target')
-				--return true
-				for _, md in pairs(morphDefs[unitDefID]) do
-					morphDef = md
-					break
-				end
+				_, morphDef = next(morphDefs[unitDefID])
 			elseif GG.MorphInfo[unitDefID][cmdParams[1]] then
 				--Spring.Echo('Morph gadget: AllowCommand generic morph, target valid')
 				--return true
@@ -866,7 +860,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				return false
 			else
 				--// morph allowed
-				if morphDef.combatMorph then -- process now, no shift queue for combat morph to preserve command queue
+				if morphDef.combatMorph or not cmdOptions.shift then -- process now, no shift queue for combat morph to preserve command queue
 					processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
 					return false
 				else
@@ -892,7 +886,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 end
 
 function gadget:Load(zip)
-	if not GG.SaveLoad then
+	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
 		return
 	end
@@ -1326,9 +1320,9 @@ function gadget:Save(zip)
 end
 
 --------------------------------------------------------------------------------
---	UNSYNCED
+--  UNSYNCED
 --------------------------------------------------------------------------------
 end
 --------------------------------------------------------------------------------
---	COMMON
+--  COMMON
 --------------------------------------------------------------------------------

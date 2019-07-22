@@ -30,9 +30,13 @@ for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
 	
 	if wd.customParams and wd.customParams.massliftthrow then
-		Script.SetWatchWeapon(wd.id,true)
 		throwWeaponID[wd.id] = true
 		throwWeaponName[wd.name] = wd.id
+		if Script.SetWatchExplosion then
+			Script.SetWatchExplosion(wd.id, true)
+		else
+			Script.SetWatchWeapon(wd.id, true)
+		end
 	end
 end
 
@@ -89,7 +93,7 @@ local function addFlying(unitID, frame, dx, dy, dz, height, parentDis)
 	local ux, uy, uz = Spring.GetUnitPosition(unitID)
 		
 	if unitDefID and ux and moveTypeByID[unitDefID] and  moveTypeByID[unitDefID] == 2 then
-		local frame = frame or Spring.GetGameFrame()
+		frame = frame or Spring.GetGameFrame()
 		
 		local dis = distance(ux,uy,uz,dx,dy,dz)
 		
@@ -120,15 +124,15 @@ function gadget:Explosion(weaponID, px, py, pz, ownerID)
 	if throwWeaponID[weaponID] and ownerID then
 		local frame = Spring.GetGameFrame()
 		local sx,sy,sz = Spring.GetUnitPosition(ownerID)
-		py = Spring.GetGroundHeight(px,pz) + 20
+		local gy = Spring.GetGroundHeight(px,pz) + 20
 		Spring.SpawnCEG("riotballgrav", sx, sy, sz, 0, 1, 0, COLLLECT_RADIUS)
 		local units = Spring.GetUnitsInSphere(sx, sy, sz, COLLLECT_RADIUS)
-		local parentDis = distance(sx, sy, sz, px,py,pz)
+		local parentDis = distance(sx, sy, sz, px,gy,pz)
 		for i = 1, #units do
 			local unitID = units[i]
 			if unitID ~= ownerID then
 				local ux, uy, uz = Spring.GetUnitPosition(unitID)
-				local tx, ty, tz = px + (ux-sx)*0.4, py + (uy-sy)*0.4, pz + (uz-sz)*0.4
+				local tx, ty, tz = px + (ux-sx)*0.4, gy + (uy-sy)*0.4, pz + (uz-sz)*0.4
 				local mag = distance(sx, sy, sz, tx, ty, tz)
 				tx, ty, tz = (tx-sx)*parentDis/mag + sx, (ty-sy)*parentDis/mag + sy, (tz-sz)*parentDis/mag + sz
 				addFlying(unitID, frame, tx, ty, tz, sy + RISE_HEIGHT, parentDis)

@@ -133,12 +133,13 @@ local function AddUnit(unitID, unitDefID)
 	end
 
 	local unitData = {
-		unitDefID  = unitDefID,
-		search     = def.search,
-		capacity   = def.shieldCapacity,
-		radius     = def.shieldRadius,
-		fxTable    = fxTable,
-		allyTeamID = Spring.GetUnitAllyTeam(unitID)
+		unitDefID   = unitDefID,
+		search      = def.search,
+		capacity    = def.damageMultShieldCapacity,
+		decayFactor = def.decayFactor,
+		radius      = def.shieldRadius,
+		fxTable     = fxTable,
+		allyTeamID  = Spring.GetUnitAllyTeam(unitID)
 	}
 
 	if highEnoughQuality then
@@ -247,7 +248,6 @@ local function DoAddShieldHitData(unitData, hitFrame, dmg, theta, phi)
 	unitData.needsUpdate = true
 end
 
-local DECAY_FACTOR = 0.1
 local MIN_DAMAGE = 1
 
 local function GetShieldHitPositions(unitID)
@@ -263,7 +263,7 @@ local function ProcessHitTable(unitData, gameFrame)
 	for i = #hitData, 1, -1 do
 		local hitInfo = hitData[i]
 		if hitInfo then
-			local mult = math.exp(-DECAY_FACTOR*(gameFrame - hitInfo.hitFrame))
+			local mult = math.exp(-unitData.decayFactor*(gameFrame - hitInfo.hitFrame))
 			--Spring.Echo(gameFrame, hitInfo.dmg, mult, hitInfo.dmg * mult)
 			hitInfo.dmg = hitInfo.dmg * mult
 			hitInfo.hitFrame = gameFrame

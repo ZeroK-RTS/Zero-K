@@ -62,7 +62,35 @@ local fullHeight = UnitDefNames["bomberprec"].wantedHeight/1.5
 
 local minSpeedMult = 0.75
 
-local function BehaviourChangeThread(behaviour)
+local PREDICT_FRAMES = 10
+local function TargetHeightUpdateThread(targetID, behaviour)
+	-- Inherits signals from BehaviourChangeThread
+	local flatDiveHeight = behaviour.wantedHeight
+	
+	while Spring.ValidUnitID(targetID) do
+		local tx,_,tz = spGetUnitPosition(targetID)
+		local tHeight = max(Spring.GetGroundHeight(tx, tz), 0)
+		
+		local ux,_,uz = spGetUnitPosition(unitID)
+		local vx,vy,vz = spGetUnitVelocity(unitID)
+		vx, vz = vx*PREDICT_FRAMES, vz*PREDICT_FRAMES
+		local predictX, predictZ = ux + vx, uz + vz
+		if math.abs(ux - tx) < vx then
+			local predictX = tx
+		end
+		if math.abs(uz - tz) < vz then
+			predictZ = tz
+		end
+		local uHeight = max(spGetGroundHeight(predictX, predictZ), 0)
+		
+		behaviour.wantedHeight = flatDiveHeight + max((tHeight - uHeight)*0.4, 0)
+		Spring.MoveCtrl.SetAirMoveTypeData(unitID, behaviour)
+		
+		Sleep(200)
+	end
+end
+
+local function BehaviourChangeThread(behaviour, targetID)
 	Signal(SIG_CHANGE_FLY_HEIGHT)
 	SetSignalMask(SIG_CHANGE_FLY_HEIGHT)
 	
@@ -71,7 +99,7 @@ local function BehaviourChangeThread(behaviour)
 	local state = spGetUnitMoveTypeData(unitID).aircraftState
 	local flying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
 	if not flying then
-		StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+		StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	end
 	
 	while not flying do
@@ -81,6 +109,9 @@ local function BehaviourChangeThread(behaviour)
 	end
 	
 	Spring.MoveCtrl.SetAirMoveTypeData(unitID, behaviour)
+	if targetID then
+		TargetHeightUpdateThread(targetID, behaviour)
+	end
 	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	--GG.UpdateUnitAttributes(unitID)
 	--GG.UpdateUnitAttributes(unitID)
@@ -92,7 +123,7 @@ local function SpeedControl()
 	while true do
 		local x,y,z = spGetUnitPosition(unitID)
 		local terrain = max(spGetGroundHeight(x,z), 0) -- not amphibious, treat water as ground
-		local speedMult = minSpeedMult + (1-minSpeedMult)*max(0, min(1, (y - terrain-50)/(fullHeight-60)))
+		local speedMult = minSpeedMult + (1-minSpeedMult)*max(0, min(1, (y - terrain - 50)/(fullHeight - 60)))
 		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", speedMult)
 		GG.UpdateUnitAttributes(unitID)
 		GG.UpdateUnitAttributes(unitID)
@@ -104,11 +135,11 @@ function BomberDive_FlyHigh()
 	StartThread(BehaviourChangeThread, highBehaviour)
 end
 
-function BomberDive_FlyLow(height)
+function BomberDive_FlyLow(height, targetID)
 	height = math.min(height, highBehaviour.wantedHeight)
 	StartThread(SpeedControl)
 	lowBehaviour.wantedHeight = height
-	StartThread(BehaviourChangeThread, lowBehaviour)
+	StartThread(BehaviourChangeThread, lowBehaviour, targetID)
 end
 
 function script.StartMoving()
@@ -126,7 +157,7 @@ function script.StopMoving()
 	Move(wingr2, x_axis, 5, 30)
 	Move(wingl1, x_axis, -5, 30)
 	Move(wingl2, x_axis, -5, 30)
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 local function Lights()
@@ -142,9 +173,9 @@ end
 
 function script.Create()
 	SetInitialBomberSettings()
-	StartThread(SmokeUnit, smokePiece)
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-	FakeUprightInit(xp, zp, drop) 
+	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	GG.FakeUpright.FakeUprightInit(xp, zp, drop) 
 	--StartThread(Lights)
 end
 
@@ -173,11 +204,11 @@ function script.BlockShot(num, targetID)
 	local x,y,z = spGetUnitPosition(unitID)
 	local _,_,_,_,_,_,tx,ty,tz = spGetUnitPosition(targetID, true, true)
 	local vx,vy,vz = spGetUnitVelocity(targetID)
-	local heading = spGetUnitHeading(unitID)*headingToRad
+	local heading = spGetUnitHeading(unitID)*GG.Script.headingToRad
 	vx, vy, vz = vx*predictMult, vy*predictMult, vz*predictMult
 	local dx, dy, dz = tx + vx - x, ty + vy - y, tz + vz - z
-	local cosHeading = cos(heading)
-	local sinHeading = sin(heading)
+	local cosHeading = math.cos(heading)
+	local sinHeading = math.sin(heading)
 	dx, dz = cosHeading*dx - sinHeading*dz, cosHeading*dz + sinHeading*dx
 	
 	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
@@ -185,7 +216,7 @@ function script.BlockShot(num, targetID)
 	--Spring.Echo(heading)
 	
 	if dz < 30 and dz > -30 and dx < 100 and dx > -100 and dy < 0 then
-		FakeUprightTurn(unitID, xp, zp, base, predrop) 
+		GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop) 
 		Move(drop, x_axis, dx)
 		Move(drop, z_axis, dz)
 		dy = math.max(dy, -30)
@@ -230,30 +261,31 @@ function script.FireWeapon(num)
 end
 
 function script.Killed(recentDamage, maxHealth)
+	Signal(SIG_TAKEOFF)
 	local severity = recentDamage/maxHealth
 	if severity <= 0.25 then
-		Explode(fuselage, sfxNone)
-		Explode(engines, sfxNone)
-		Explode(wingl1, sfxNone)
-		Explode(wingr2, sfxNone)
+		Explode(fuselage, SFX.NONE)
+		Explode(engines, SFX.NONE)
+		Explode(wingl1, SFX.NONE)
+		Explode(wingr2, SFX.NONE)
 		return 1
 	elseif severity <= 0.50 or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
-		Explode(fuselage, sfxNone)
-		Explode(engines, sfxNone)
-		Explode(wingl2, sfxNone)
-		Explode(wingr1, sfxNone)
+		Explode(fuselage, SFX.NONE)
+		Explode(engines, SFX.NONE)
+		Explode(wingl2, SFX.NONE)
+		Explode(wingr1, SFX.NONE)
 		return 1
 	elseif severity <= 1 then
-		Explode(fuselage, sfxNone)
-		Explode(engines, sfxFall + sfxSmoke + sfxFire)
-		Explode(wingl1, sfxFall + sfxSmoke + sfxFire)
-		Explode(wingr2, sfxFall + sfxSmoke + sfxFire)
+		Explode(fuselage, SFX.NONE)
+		Explode(engines, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(wingl1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(wingr2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	else
-		Explode(fuselage, sfxNone)
-		Explode(engines, sfxFall + sfxSmoke + sfxFire)
-		Explode(wingl1, sfxFall + sfxSmoke + sfxFire)
-		Explode(wingl2, sfxFall + sfxSmoke + sfxFire)
+		Explode(fuselage, SFX.NONE)
+		Explode(engines, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(wingl1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(wingl2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	end
 end

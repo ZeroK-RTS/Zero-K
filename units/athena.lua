@@ -55,6 +55,8 @@ unitDef = {
   customParams        = {
     airstrafecontrol = [[1]],
     modelradius    = [[15]],
+    isfakefactory = 1,
+    notreallyafactory = 1,
   },
 
   energyUse           = 0,

@@ -25,6 +25,7 @@ unitDef = {
     midposoffset   = [[0 -10 0]],
     modelradius    = [[42]],
 	removewait     = 1,
+    selectionscalemult = 1.15,
     
     morphto = [[energyheavygeo]],
     morphtime = [[90]],

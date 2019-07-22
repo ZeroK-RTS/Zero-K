@@ -551,7 +551,7 @@ local function IsSinglePlayer()
 	 for i = 1, #playerlist do
 		local playerID = playerlist[i]
 		if myPlayerID ~= playerID then
-			local _, active, spectator = Spring.GetPlayerInfo(playerID)
+			local _, active, spectator = Spring.GetPlayerInfo(playerID, false)
 			if active and not spectator then
 				return false
 			end
@@ -1888,6 +1888,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			--[[
 			tree_children[#tree_children+1] = ComboBox:New {
 				items = items;
+				topHeight = 10,
 			}
 			]]--
 		elseif option.type == 'radioButton' then
@@ -2229,9 +2230,9 @@ local function GetMainPanel(parent, width, height)
 
 	local stackChildren = {}
 	local holderWidth = 6
-	local sliderWidth = 100
+	local sliderWidth = 96
 	if width < 372 then
-		sliderWidth = width - 272
+		sliderWidth = width - 276
 	end
 	
 	if height < 45 then
@@ -2255,7 +2256,7 @@ local function GetMainPanel(parent, width, height)
 		
 		stackChildren[#stackChildren + 1] = StackPanel:New{
 			orientation = 'horizontal',
-			width = 74,
+			width = 78,
 			height = '100%',
 			resizeItems = false,
 			autoArrangeV = false,
@@ -2267,7 +2268,7 @@ local function GetMainPanel(parent, width, height)
 				lbl_gtime,
 			},
 		}
-		holderWidth = holderWidth + 76
+		holderWidth = holderWidth + 80
 		
 		stackChildren[#stackChildren + 1] = Image:New{tooltip = 'Volume', file = LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width = 18, height = 18}
 		stackChildren[#stackChildren + 1] = Grid:New{
@@ -2735,7 +2736,7 @@ local function MakeQuitButtons()
 		OnChange = function()
 				-- Only allow restarting for local games or by the host of steam coop.
 				if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
-					local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+					local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false))
 					if myPing and myPing < 40 then
 						MakeExitConfirmWindow("Are you sure you want to restart?", function() 
 							Spring.SendLuaMenuMsg("restartGame")
@@ -2747,7 +2748,7 @@ local function MakeQuitButtons()
 		DisableFunc = function()
 			-- Only allow restarting for local games or by the host of steam coop.
 			if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
-				local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+				local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false))
 				return not (myPing and myPing < 40)
 			end
 			return true
@@ -2848,7 +2849,7 @@ function widget:Initialize()
 
 	if not confLoaded then
 		if not settings.lang or not flagByLang[settings.lang] then
-			local flag = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID())):lower()
+			local flag = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID(), false)):lower()
 			settings.lang = langByFlag[flag]
 		end
 
@@ -3194,7 +3195,7 @@ function widget:SetConfigData(data)
 	-- set language. Needs to be done ASAP, before other widgets are even loaded!
 	-- This is because option paths are done right on load and they can use translations.
 	if not settings.lang or not flagByLang[settings.lang] then
-		local flag = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID())):lower()
+		local flag = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID(), false)):lower()
 		settings.lang = langByFlag[flag]
 	end
 

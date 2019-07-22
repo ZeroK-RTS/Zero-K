@@ -32,7 +32,7 @@ local firepoints = {[0] = nanospray, [1] = laserblade}
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
-local PACE = 3
+local PACE = 3.2
 
 local THIGH_FRONT_ANGLE = -math.rad(50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
@@ -188,7 +188,7 @@ function script.Create()
 	Hide(nanospray)
 	Hide(laserblade)
 	Move(jump, y_axis, -10, 100)
-	StartThread(SmokeUnit, {head})
+	StartThread(GG.Script.SmokeUnit, {head})
 end
 
 function script.StartMoving()

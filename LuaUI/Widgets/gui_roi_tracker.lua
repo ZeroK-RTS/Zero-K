@@ -134,7 +134,7 @@ function CreateWindow()
 	for i = 1, #allied_teams do
 		local tID = allied_teams[i]
 		local r, g, b = Spring.GetTeamColor(tID)
-		local name = Spring.GetPlayerInfo (select (2, Spring.GetTeamInfo(tID)))
+		local name = Spring.GetPlayerInfo (select (2, Spring.GetTeamInfo(tID, false)), false)
 		name_labels[i] = Chili.Label:New{
 			x = 5,
 			y = 16*i - 10,

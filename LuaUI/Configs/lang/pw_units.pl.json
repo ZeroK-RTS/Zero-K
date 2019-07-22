@@ -108,5 +108,10 @@
 		"name" : "Placówka badawcza",
 		"description" : "Odblokowuje technologię",
 		"helptext" : "Ten budynek odblokowuje konkretną technologię dla swojej frakcji."
+	},
+	"pw_techlab" : {
+		"name" : "Stacja badawcza",
+		"description" : "Zawiera zaawansowane, starodawne technologie" ,
+		"helptext" : "Ten budynek zawiera zaawansowane technologie."
 	}
 }

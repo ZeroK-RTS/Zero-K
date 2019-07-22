@@ -294,7 +294,7 @@ end
 
 function script.Create()
 
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	
 	Spin(tank, z_axis, 70)
 	
@@ -351,17 +351,17 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.5) then
-		Explode(base, sfxNone)
-		Explode(l_foot, sfxNone)
-		Explode(l_leg, sfxNone)
-		Explode(r_foot, sfxNone)
-		Explode(r_leg, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(l_foot, SFX.NONE)
+		Explode(l_leg, SFX.NONE)
+		Explode(r_foot, SFX.NONE)
+		Explode(r_leg, SFX.NONE)
 		return 1
 	end
-	Explode(base, sfxShatter)
-	Explode(l_foot, sfxShatter)
-	Explode(l_leg, sfxShatter)
-	Explode(r_foot, sfxShatter)
-	Explode(r_leg, sfxShatter)
+	Explode(base, SFX.SHATTER)
+	Explode(l_foot, SFX.SHATTER)
+	Explode(l_leg, SFX.SHATTER)
+	Explode(r_foot, SFX.SHATTER)
+	Explode(r_leg, SFX.SHATTER)
 	return 2
 end

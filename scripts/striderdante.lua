@@ -287,7 +287,7 @@ function script.Create()
 	Hide(jet1)
 	Hide(jet2)
 	
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 local function Stopping()
@@ -450,21 +450,21 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(lleg, y_axis, math.rad(28), math.rad(50))
 		Turn(lfoot, x_axis, math.rad(23), math.rad(50))
 		
-		InitializeDeathAnimation()
+		GG.Script.InitializeDeathAnimation(unitID)
 		Sleep(800)
 		--EmitSfx(torso, 1027) --impact
 		--StartThread(burn)
 		--Sleep((1000 * rand (2, 5)))
 
-		Explode(pelvis, sfxNone)
-		Explode(luparm, sfxNone)
-		Explode(lleg, sfxNone)
-		Explode(lupleg, sfxNone)
-		Explode(rarm, sfxFall)
-		Explode(rleg, sfxNone)
-		Explode(ruparm, sfxNone)
-		Explode(rupleg, sfxNone)
-		Explode(torso, sfxNone)
+		Explode(pelvis, SFX.NONE)
+		Explode(luparm, SFX.NONE)
+		Explode(lleg, SFX.NONE)
+		Explode(lupleg, SFX.NONE)
+		Explode(rarm, SFX.FALL)
+		Explode(rleg, SFX.NONE)
+		Explode(ruparm, SFX.NONE)
+		Explode(rupleg, SFX.NONE)
+		Explode(torso, SFX.NONE)
 		return 1
 	else
 		Explode(pelvis, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)

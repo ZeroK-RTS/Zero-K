@@ -218,7 +218,7 @@ local function PingHeading()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	--StartThread(PingHeading)
 end
 
@@ -227,10 +227,10 @@ function script.Killed(recentDamage, maxHealth)
 	if (severity <= 0.25) then
 		return 1 -- corpsetype
 	elseif (severity <= 0.5) then
-		Explode(fan, sfxFall)	
+		Explode(fan, SFX.FALL)	
 		return 1 -- corpsetype
 	else
-		Explode(fan, sfxFall)	
+		Explode(fan, SFX.FALL)	
 		return 2 -- corpsetype
 	end
 end

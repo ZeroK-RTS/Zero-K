@@ -18,6 +18,8 @@ if (not gadgetHandler:IsSyncedCode()) then
    return false
 end
 
+local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(104, 1120)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -221,9 +223,16 @@ function gadget:GameFrame(f)
 				local x,y,z = spGetUnitPosition(unitIndex[i])
 				local newId = spCreateUnit(unit.defs.spawns,x+random(-50,50),y,z+random(-50,50),random(0,3),spGetUnitTeam(unitIndex[i]))
 				if newId then
-					local states = spGetUnitStates(unitIndex[i])
-					spGiveOrderToUnit(newId, CMD_FIRE_STATE, {states.firestate}, 0)
-					spGiveOrderToUnit(newId, CMD_MOVE_STATE, {states.movestate}, 0)
+					local firestate, movestate
+					if REVERSE_COMPAT then
+						local states = spGetUnitStates(unitIndex[i])
+						firestate, movestate = states.firestate, states.movestate
+					else
+						firestate, movestate = spGetUnitStates(unitIndex[i], false)
+					end
+					
+					spGiveOrderToUnit(newId, CMD_FIRE_STATE, {firestate}, 0)
+					spGiveOrderToUnit(newId, CMD_MOVE_STATE, {movestate}, 0)
 					spGiveOrderToUnit(newId, CMD_GUARD     , {unitIndex[i]}    , 0)
 
 					spSpawnCEG( CEG_SPAWN,

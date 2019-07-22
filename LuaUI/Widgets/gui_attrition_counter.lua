@@ -14,6 +14,8 @@ end
 include("colors.h.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
+local GetLeftRightAllyTeamIDs = VFS.Include("LuaUI/Headers/allyteam_selection_utilities.lua")
+
 options_path = 'Settings/HUD Panels/Attrition Counter'
 options_order = {'updateFrequency'}
 options = {
@@ -123,7 +125,7 @@ end
 local function cap (x) return math.max(math.min(x,1),0) end
 
 local function GetTeamName(teamID)
-	local _,leader,_,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
+	local _,leader,_,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID, false)
 	if teamID == gaiaTeamID then
 		return "gaia"
 	else
@@ -131,16 +133,16 @@ local function GetTeamName(teamID)
 		if isAI then
 			_,name = Spring.GetAIInfo(teamID)
 		else
-			name,_,_,_,_,_,_,_,_,customKeys = GetPlayerInfo(leader)
+			name = GetPlayerInfo(leader, false)
 		end
 		return name;
 	end
 end
 
 local function GetOpposingAllyTeams()
-	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local returnData = {}
-	local allyTeamList = Spring.GetAllyTeamList()
+	local allyTeamList = GetLeftRightAllyTeamIDs()
 	for i = 1, #allyTeamList do
 		local allyTeamID = allyTeamList[i]
 
@@ -165,10 +167,6 @@ local function GetOpposingAllyTeams()
 		return
 	end
 	
-	if returnData[1].allyTeamID > returnData[2].allyTeamID then
-		returnData[1], returnData[2] = returnData[2], returnData[1]
-	end
-	
 	return returnData
 end
 
@@ -176,7 +174,7 @@ local function UpdateCounters()
 
 	local rate = allyTeams[myAllyTeam].rate
 	local caption	
-	if rate < 0 then caption 'N/A'; label_rate_player.font.color = grey	
+	if rate < 0 then caption = 'N/A'; label_rate_player.font.color = grey	
 	elseif rate > 9.99 then caption = 'PWN!'; label_rate_player.font.color = blue
 	else
 		caption = tostring(floor(rate*100))..'%'
@@ -272,7 +270,13 @@ function widget:Initialize()
 	
 	font = Chili.Font:New{} -- need this to call GetTextWidth without looking up an instance
 	
-	myAllyTeam = Spring.GetMyAllyTeamID()
+	--[[ in the original design, "own" team was supposed to be on the left,
+	     but when speccing it's better to put the geographical left there ]]
+	if spectating then
+		myAllyTeam = GetLeftRightAllyTeamIDs()[1]
+	else
+		myAllyTeam = Spring.GetMyAllyTeamID()
+	end
 	myTeam = Spring.GetMyTeamID()
 	gaiaTeam = Spring.GetGaiaTeamID()
 
@@ -289,7 +293,7 @@ function widget:Initialize()
 		end
 		
 		for i, t in pairs(_teams) do
-			local _,leader,_,isAI,_,allyTeamID,_ = Spring.GetTeamInfo(t);
+			local _,leader,_,isAI,_,allyTeamID = Spring.GetTeamInfo(t, false)
 			local elo = 0;
 			
 			allyTeams[allyTeamID].teamIDs[t] = true;
@@ -353,6 +357,54 @@ end
 
 
 local deadUnits = {} -- in spec mode UnitDestroyed would sometimes be called twice for the same unit, so we need to prevent it from counting twice
+local capturedUnits = {} -- UnitTaken doesn't seem to have the luxury of reading capture_controller when unit is returned to owner
+
+local function UnitTransfered(unitID, unitDefID, oldTeamID, newTeamID)
+	-- check if transfer is due to mind control 
+	local captureController = Spring.GetUnitRulesParam(unitID,"capture_controller");
+	if captureController == nil or captureController == -1 then 
+		-- unit is not presently mind controlled
+		if capturedUnits[unitID] and capturedUnits[unitID] == unitDefID then
+			-- unit was freed crom capture - refund score
+			capturedUnits[unitID] = nil;			
+			local buildProgress = select(5, GetUnitHealth(unitID))
+			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
+			local team = teams[newTeamID]
+			team.lostUnits = team.lostUnits - 1
+			team.lostMetal = team.lostMetal - worth
+			
+			local allyTeam = allyTeams[team.friendlyAllyTeam]
+			allyTeam.lostUnits = allyTeam.lostUnits - 1
+			allyTeam.lostMetal = allyTeam.lostMetal - worth		
+			
+			doUpdate = true
+		end
+	else
+		-- transfers of presently captured units are ignored; they are already dead to us 
+		if not (capturedUnits[unitID] and capturedUnits[unitID] == unitDefID) then
+			-- unit has now become mind-controlled for the first time; oldTeamID lost it
+			capturedUnits[unitID] = unitDefID; -- verify unitdef in case of ID recycling 
+			local buildProgress = select(5, GetUnitHealth(unitID))
+			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
+			local team = teams[oldTeamID]
+			team.lostUnits = team.lostUnits + 1
+			team.lostMetal = team.lostMetal + worth
+			
+			local allyTeam = allyTeams[team.friendlyAllyTeam]
+			allyTeam.lostUnits = allyTeam.lostUnits + 1
+			allyTeam.lostMetal = allyTeam.lostMetal + worth
+			doUpdate = true
+		end
+	end
+end
+
+function widget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
+	UnitTransfered(unitID, unitDefID, oldTeamID, newTeamID);
+end
+
+function widget:UnitGiven(unitID, unitDefID, newTeamID, oldTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
+	UnitTransfered(unitID, unitDefID, oldTeamID, newTeamID);
+end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, attTeamID)	
 	
@@ -360,13 +412,27 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	-- else it is most likely not the same unit but an old table entry and a re-used unitID. we just keep the entry
 	-- small margin of error remains
 	
-	if teamID == gaiaTeam or GetUnitHealth(unitID) > 0 then return end
+	
+	
+	-- prevents factory-cancel from counting as kill.
+	-- TODO: only count mobile units because statics are never factory-made
+	local buildProgress = select(5, GetUnitHealth(unitID))
+	if GetUnitHealth(unitID) > 0 and buildProgress < 1 then return end
+	
+	-- don't count morphed units
+	local wasMorphed = Spring.GetUnitRulesParam(unitID, "wasMorphedTo");
+	if wasMorphed then return end
+
+	if teamID == gaiaTeam then return end
 	
 	if deadUnits[unitID] and deadUnits[unitID] == unitDefID then
 		deadUnits[unitID] = nil
 		return 		
 	end
 	
+	capturedUnits[unitID] = nil;
+	
+		
 	deadUnits[unitID] = unitDefID
 
 		-- might just ignore gaia, it will set up a table for it and track its losses but nothing else will happen?
@@ -374,8 +440,11 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 
 	local ud = UnitDefs[unitDefID]
 	if ud.customParams.dontcount or ud.customParams.is_drone then return end
+	
+	-- ignore deaths of presently mind-controlled units 
+	local captureController = Spring.GetUnitRulesParam(unitID,"capture_controller");
+	if captureController and captureController ~= -1 then return end
 		
-	local buildProgress = select(5, GetUnitHealth(unitID))
 	local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
 	
 	-- if teamID and unitID and unitDefID and teamID ~= gaiaTeam then 	

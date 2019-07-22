@@ -45,7 +45,14 @@ local unitWeaponList = {}
 for i = 1, #UnitDefs do
 	local weaponList = UnitDefs[i].weapons
 	if #weaponList > 0 then
-		unitWeapon[i] = weaponList[1].weaponDef
+		local maxRange
+		for j = 1, #weaponList do
+			local wd = WeaponDefs[weaponList[j].weaponDef]
+			if wd and ((not maxRange) or wd.range > maxRange) then
+				maxRange = wd.range
+				unitWeapon[i] = weaponList[j].weaponDef
+			end
+		end
 	end
 end
 
@@ -83,17 +90,19 @@ local function CalculateModdedMaxRange(heightDiff, weapon)
 	local heightModded = (heightDiff)*weapon.customHeightMod
 	--equivalent to: GetRange2D():
 	if weapon.modType == 0 then --Ballistic
-		local myGravity = (weapon.myGravity > 0 and weapon.myGravity*888.888888) or (Game.gravity) or 0
-		local deltaV = weapon.projectilespeed*30
-		local maxFlatRange = CalculateBallisticConstant(deltaV,myGravity,0)
-		local scaleDown = weapon.customMaxRange/maxFlatRange --Example: UpdateRange() in Spring\rts\Sim\Weapons\Cannon.cpp
-		local heightBoostFactor = weapon.customHeightBoost
-		if heightBoostFactor < 0 and scaleDown > 0 then
-			heightBoostFactor = (2 - scaleDown) / math.sqrt(scaleDown) --such that: heightBoostFactor == 1 when scaleDown == 1
+		if not weapon.gameMyGravity then
+			weapon.gameMyGravity = (weapon.myGravity > 0 and weapon.myGravity*888.888888) or (Game.gravity) or 0
+			weapon.deltaV = weapon.projectilespeed*30
+			local maxFlatRange = CalculateBallisticConstant(weapon.deltaV,weapon.gameMyGravity,0)
+			weapon.scaleDown = weapon.customMaxRange/maxFlatRange --Example: UpdateRange() in Spring\rts\Sim\Weapons\Cannon.cpp
+			weapon.heightBoostFactor = weapon.customHeightBoost
+			if weapon.heightBoostFactor < 0 and weapon.scaleDown > 0 then
+				weapon.heightBoostFactor = (2 - weapon.scaleDown) / math.sqrt(weapon.scaleDown) --such that: heightBoostFactor == 1 when scaleDown == 1
+			end
 		end
-		heightModded = heightModded*heightBoostFactor
-		local moddedRange = CalculateBallisticConstant(deltaV,myGravity,heightModded)
-		effectiveRange = moddedRange*scaleDown --Example: GetRange2D() in Spring\rts\Sim\Weapons\Cannon.cpp
+		heightModded = heightModded*weapon.heightBoostFactor
+		local moddedRange = CalculateBallisticConstant(weapon.deltaV,weapon.gameMyGravity,heightModded)
+		effectiveRange = moddedRange*weapon.scaleDown --Example: GetRange2D() in Spring\rts\Sim\Weapons\Cannon.cpp
 	elseif weapon.modType == 1 then 
 		--SPHERE
 		effectiveRange = math.sqrt(weapon.customMaxRange^2 - heightModded^2) --Pythagoras theorem. Example: GetRange2D() in Spring\rts\Sim\Weapons\Weapon.cpp
@@ -144,6 +153,41 @@ function Spring.Utilities.GetEffectiveWeaponRange(unitDefID, heightDiff, weaponN
 	if weaponDefID then
 		heightDiff = heightDiff or 0
 		effectiveMaxRange = CalculateModdedMaxRange(heightDiff, weaponAttributes[weaponDefID])
+	end
+	return effectiveMaxRange
+end
+
+--This function a cheap upper bound on Spring.Utilities.GetEffectiveWeaponRange
+--Note: heightDiff is (unitY - targetY)
+--Note2: weaponNumOverride is defaulted to 1 if not specified
+function Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, heightDiff, weaponNumOverride)
+	if not unitDefID or not UnitDefs[unitDefID] then
+		return 0
+	end
+	local weaponNumber = weaponNumOverride and math.modf(weaponNumOverride)
+	local weaponDefID
+	if weaponNumber then
+		if not unitWeaponList[unitDefID] then
+			unitWeaponList[unitDefID] = UnitDefs[unitDefID].weapons
+			if #(unitWeaponList[unitDefID] or {}) < 1 then
+				unitWeaponList[unitDefID] = 0
+			end
+		end
+		if unitWeaponList[unitDefID] ~= 0 then
+			weaponDefID = (unitWeaponList[unitDefID][weaponNumber] or {}).weaponDef
+		end
+	else
+		weaponDefID = unitWeapon[unitDefID]
+	end
+	local effectiveMaxRange = 0
+	if weaponDefID then
+		local weapon = weaponAttributes[weaponDefID]
+		heightDiff = heightDiff or 0
+		if weapon.modType == 0 or heightDiff > 0 then -- Ballistic range gain
+			effectiveMaxRange = CalculateModdedMaxRange(heightDiff, weapon)
+		else
+			effectiveMaxRange = weapon.customMaxRange
+		end
 	end
 	return effectiveMaxRange
 end

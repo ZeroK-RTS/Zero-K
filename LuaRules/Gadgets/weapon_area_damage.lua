@@ -24,7 +24,7 @@ if gadgetHandler:IsSyncedCode() then
 --------------------------------------------------------------------------------
 
 local frameNum
-local DAMAGE_PERIOD, weaponInfo = include("LuaRules/Configs/area_damage_defs.lua")
+local DAMAGE_PERIOD, weaponInfo = VFS.Include("LuaRules/Configs/area_damage_defs.lua", nil, VFS.GAME)
 
 local explosionList = {}
 local explosionCount = 0
@@ -113,12 +113,16 @@ end
 
 function gadget:Initialize()
 	for w,_ in pairs(weaponInfo) do
-		Script.SetWatchWeapon(w, true)
+		if Script.SetWatchExplosion then
+			Script.SetWatchExplosion(w, true)
+		else
+			Script.SetWatchWeapon(w, true)
+		end
 	end
 end
 
 function gadget:Load(zip)
-	if not GG.SaveLoad then
+	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
 		return
 	end

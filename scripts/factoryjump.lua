@@ -56,7 +56,7 @@ function script.Create()
 	Move(side1, z_axis, 20)
 	Move(side2, z_axis, 10)
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.QueryNanoPiece()
@@ -91,26 +91,26 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 
 	if (severity <= .25) then
-		Explode(base, sfxNone)
-		Explode(center1, sfxNone)
-		Explode(center2, sfxNone)
-		Explode(head1, sfxNone)
-		Explode(head2, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(center1, SFX.NONE)
+		Explode(center2, SFX.NONE)
+		Explode(head1, SFX.NONE)
+		Explode(head2, SFX.NONE)
 		return 1 -- corpsetype
 
 	elseif (severity <= .5) then
-		Explode(base, sfxNone)
-		Explode(center1, sfxNone)
-		Explode(center2, sfxNone)
-		Explode(head1, sfxShatter)
-		Explode(head2, sfxShatter)
+		Explode(base, SFX.NONE)
+		Explode(center1, SFX.NONE)
+		Explode(center2, SFX.NONE)
+		Explode(head1, SFX.SHATTER)
+		Explode(head2, SFX.SHATTER)
 		return 1 -- corpsetype
 	else
-		Explode(base, sfxShatter)
-		Explode(center1, sfxShatter)
-		Explode(center2, sfxShatter)
-		Explode(head1, sfxSmoke + sfxFire + sfxExplode)
-		Explode(head2, sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, SFX.SHATTER)
+		Explode(center1, SFX.SHATTER)
+		Explode(center2, SFX.SHATTER)
+		Explode(head1, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(head2, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2 -- corpsetype
 	end
 end

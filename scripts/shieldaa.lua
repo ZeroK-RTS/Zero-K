@@ -73,7 +73,7 @@ function script.Create()
 	Turn(ex_2, x_axis, math.rad(170))
 	Turn(ex_3, x_axis, math.rad(170))
 	Turn(axle, x_axis, math.rad(-30))
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 local function Walk()
@@ -209,19 +209,19 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
-		Explode(base, sfxNone)
-		Explode(head, sfxNone)
-		Explode(pod, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(head, SFX.NONE)
+		Explode(pod, SFX.NONE)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
-		Explode(base, sfxNone)
-		Explode(head, sfxNone)
-		Explode(pod, sfxShatter)
+		Explode(base, SFX.NONE)
+		Explode(head, SFX.NONE)
+		Explode(pod, SFX.SHATTER)
 		return 1 -- corpsetype
 	else
-		Explode(base, sfxShatter)
-		Explode(head, sfxSmoke + sfxFire)
-		Explode(pod, sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, SFX.SHATTER)
+		Explode(head, SFX.SMOKE + SFX.FIRE)
+		Explode(pod, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2 -- corpsetype
 	end
 end

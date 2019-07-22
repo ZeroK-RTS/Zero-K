@@ -16,12 +16,16 @@ unitDef = {
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[70 55 110]],
   collisionVolumeType           = [[box]],
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[70 55 110]],
+  selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
 	removewait     = 1,
     nuke_coverage  = 2500,
     modelradius      = [[50]],
+    selectionscalemult = 1,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
@@ -72,6 +76,8 @@ unitDef = {
       craterMult              = 2,
 	  
 	  customParams            = {
+        restrict_in_widgets = 1,
+
         reaim_time = 15,
         nuke_coverage = 2500,
 	  },
@@ -81,7 +87,8 @@ unitDef = {
         subs    = 75,
       },
 
-      explosionGenerator      = [[custom:ANTINUKE]],
+      --spawning the intercept explosion is handled by exp_nuke_effect_chooser.lua
+      explosionGenerator      = [[custom:lrpc_expl]],
       fireStarter             = 100,
       flightTime              = 20,
       impulseBoost            = 0,

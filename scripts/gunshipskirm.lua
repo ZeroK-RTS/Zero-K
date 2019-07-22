@@ -16,17 +16,17 @@ include "constants.lua"
 local gun_1 = false
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Activate()
-	Turn(lWing,z_axis, rad(-25),0.7)
-	Turn(rWing,z_axis, rad(25),0.7)
+	Turn(lWing,z_axis, math.rad(-25),0.7)
+	Turn(rWing,z_axis, math.rad(25),0.7)
 end
 
 function script.Deactivate()
-	Turn(lWing,z_axis, rad(0),1)
-	Turn(rWing,z_axis, rad(0),1)
+	Turn(lWing,z_axis, math.rad(0),1)
+	Turn(rWing,z_axis, math.rad(0),1)
 end
 
 function script.QueryWeapon(num)
@@ -56,24 +56,24 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= 0.25 then	
-		Explode(base, sfxNone)
-		Explode(lWing, sfxNone)
-		Explode(rWing, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(lWing, SFX.NONE)
+		Explode(rWing, SFX.NONE)
 		return 1
 	elseif severity <= 0.5 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
 		Explode(base, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(lWing, sfxFall)
+		Explode(lWing, SFX.FALL)
 		Explode(rWing, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		return 1
 	elseif severity <= 0.75 then
 		Explode(base, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(lWing, sfxFall)
+		Explode(lWing, SFX.FALL)
 		Explode(rWing, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(lWing, sfxShatter)
-		Explode(rWing, sfxShatter)
+		Explode(base, SFX.SHATTER)
+		Explode(lWing, SFX.SHATTER)
+		Explode(rWing, SFX.SHATTER)
 		return 2
 	end
 end

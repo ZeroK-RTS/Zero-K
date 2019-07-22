@@ -251,10 +251,10 @@ function script.Create()
 	Hide(flare6)
 	Hide(flare7)
 	
-	StartThread(StartStopMovingControl, script.StartMoving, script.StopMoving)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.02)
 	
 	--StartThread(MotionControl)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	--StartThread(BlinkingLight)
 	if Spring.GetUnitIsStunned(unitID) then
 		StartThread(CurlDelay)
@@ -264,7 +264,7 @@ function script.Create()
 	end
 end
 
-local function Rock(anglex, anglez)	
+local function RockSelf(anglex, anglez)	
 	Turn(base, z_axis, -anglex, math.rad(50))
 	Turn(base, x_axis, anglez, math.rad(50))
 	WaitForTurn(base, z_axis)
@@ -274,7 +274,7 @@ local function Rock(anglex, anglez)
 end
 	
 function script.RockUnit(anglex, anglez)
-	StartThread(Rock, math.rad(anglex), math.rad(anglez))
+	StartThread(RockSelf, math.rad(anglex), math.rad(anglez))
 end
 
 local function RestoreAfterDelay1()
@@ -345,29 +345,29 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(base, sfxNone)
+		Explode(base, SFX.NONE)
 		return 1
 	elseif (severity <= .50) then
-		Explode(base, sfxNone)
-		Explode(leg1, sfxNone)
-		Explode(leg2, sfxNone)
-		Explode(leg3, sfxNone)
-		Explode(leg4, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(leg1, SFX.NONE)
+		Explode(leg2, SFX.NONE)
+		Explode(leg3, SFX.NONE)
+		Explode(leg4, SFX.NONE)
 		return 1
 	elseif (severity <= .99) then
-		Explode(leg1, sfxFall + sfxSmoke + sfxFire)
-		Explode(leg2, sfxFall + sfxSmoke + sfxFire)
-		Explode(leg3, sfxFall + sfxSmoke + sfxFire)
-		Explode(leg4, sfxFall + sfxSmoke + sfxFire)
-		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(leg2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(leg3, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(leg4, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	else
-		Explode(leg1, sfxFall + sfxSmoke + sfxFire)
-		Explode(leg2, sfxFall + sfxSmoke + sfxFire)
-		Explode(leg3, sfxFall + sfxSmoke + sfxFire)
-		Explode(leg4, sfxFall + sfxSmoke + sfxFire)
-		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(canon, sfxFall + sfxSmoke + sfxFire)
+		Explode(leg1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(leg2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(leg3, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(leg4, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(canon, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	end
 end

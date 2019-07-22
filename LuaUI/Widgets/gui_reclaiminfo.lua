@@ -93,7 +93,8 @@ function widget:DrawScreen()
 	--bit more precise showing when mouse is moved by 4 pixels (start)
 	if (b1 and (rangestart ~= nil) and (cmd == CMD.RECLAIM) and (start == false)) or ((nonground == "Reclaim") and (rangestart ~= nil) and (start == false) and (b2)) then
 		xend, yend = x,y
-		if (((xend>xstart+4)or(xend<xstart-4))or((yend>ystart+4)or(yend<ystart-4))) then
+		local distSq = (xstart - xend)^2 + (ystart - yend)^2
+		if distSq > (WG.CircleDragThreshold or 4)^2 then
 			start = true
 		end
 	end
@@ -125,51 +126,51 @@ function widget:DrawScreen()
 		local dist = math.sqrt((rdx * rdx) + (rdy * rdy))
 		--because there is only GetFeaturesInRectangle. Features outside of the circle are needed to be ignored
 		local units = Spring.GetFeaturesInRectangle(rangestart[1]-dist,rangestart[3]-dist,rangestart[1]+dist,rangestart[3]+dist)
-		for i = 1,#units do
+		for i = 1, #units do
 			local unit = units[i]
-				local ux, _, uy = Spring.GetFeaturePosition(unit)
-				local udx, udy = (ux - rangestart[1]), (uy - rangestart[3])
-				udist = math.sqrt((udx * udx) + (udy * udy))
-				if (udist < dist) then
-					local fm,_,fe	= Spring.GetFeatureResources(unit) 
-					metal = metal + fm
-					energy = energy + fe
-				end
+			local ux, _, uy = Spring.GetFeaturePosition(unit)
+			local udx, udy = (ux - rangestart[1]), (uy - rangestart[3])
+			udist = math.sqrt((udx * udx) + (udy * udy))
+			if (udist < dist) then
+				local fm,_,fe	= Spring.GetFeatureResources(unit) 
+				metal = metal + fm
+				energy = energy + fe
 			end
-			metal = math.floor(metal)
-			energy = math.floor(energy)
-			local textwidth = 12*gl.GetTextWidth("	M:"..metal.."\255\255\255\128".." E:"..energy)
-			if(textwidth+x>vsx) then
+		end
+		metal = math.floor(metal)
+		energy = math.floor(energy)
+		local textwidth = 12*gl.GetTextWidth("	M:"..metal.."\255\255\255\128".." E:"..energy)
+		if(textwidth+x>vsx) then
+			x = x - textwidth - 10
+		end
+		if(12+y>vsy) then
+			y = y - form
+		end
+		gl.Text("	M:"..metal.."\255\255\255\128".." E:"..energy,x,y,form)
+	end
+	--Unit resource info when mouse on one
+	if (nonground == "Reclaim") and (rangestart ~= nil) and ((energy == 0) or (metal == 0)) and (b1 == false) then
+		local isunit, unitID = Spring.TraceScreenRay(x, y) --if on unit pos!
+		if (isunit == "unit") and (Spring.GetUnitHealth(unitID)) then --Getunithealth just to make sure that it is in los
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			local _,_,_,_,buildprogress = Spring.GetUnitHealth(unitID)
+			metal = math.floor(Spring.Utilities.GetUnitCost(unitID, unitDefID)*buildprogress)
+			local textwidth = 12*gl.GetTextWidth("	M:"..metal.."\255\255\255\128")
+			if (textwidth+x>vsx) then
 				x = x - textwidth - 10
 			end
 			if(12+y>vsy) then
 				y = y - form
 			end
-			gl.Text("	M:"..metal.."\255\255\255\128".." E:"..energy,x,y,form)
-		end
-		--Unit resource info when mouse on one
-		if (nonground == "Reclaim") and (rangestart ~= nil) and ((energy == 0) or (metal == 0)) and (b1 == false) then
-			local isunit, unitID = Spring.TraceScreenRay(x, y) --if on unit pos!
-			if (isunit == "unit") and (Spring.GetUnitHealth(unitID)) then --Getunithealth just to make sure that it is in los
-				local unitDefID = Spring.GetUnitDefID(unitID)
-				local _,_,_,_,buildprogress = Spring.GetUnitHealth(unitID)
-				metal = math.floor(Spring.Utilities.GetUnitCost(unitID, unitDefID)*buildprogress)
-				local textwidth = 12*gl.GetTextWidth("	M:"..metal.."\255\255\255\128")
-				if (textwidth+x>vsx) then
-					x = x - textwidth - 10
-				end
-				if(12+y>vsy) then
-					y = y - form
-				end
-				local color = "\255\255\255\255"
-				if not UnitDefs[Spring.GetUnitDefID(unitID)].reclaimable then
-					color = "\255\220\10\10"
-				end
-				gl.Text(color.."	M:"..metal*0.5,x,y,form) -- multiply metal by unit reclaim mult in gamerules
+			local color = "\255\255\255\255"
+			if not UnitDefs[Spring.GetUnitDefID(unitID)].reclaimable then
+				color = "\255\220\10\10"
 			end
+			gl.Text(color.."	M:"..metal*0.5,x,y,form) -- multiply metal by unit reclaim mult in gamerules
 		end
-		--
-		metal = 0
-		energy = 0
+	end
+	--
+	metal = 0
+	energy = 0
 end
 

@@ -36,28 +36,26 @@ function IterableMap.New()
 	
 	function api.Remove(key)
 		if (not key) or (not indexByKey[key]) then
-			return
+			return false
 		end
 		local myIndex = indexByKey[key]
 		local endKey = keyByIndex[indexMax]
-		
 		keyByIndex[myIndex] = endKey
 		indexByKey[endKey] = myIndex
 		keyByIndex[indexMax] = nil
 		indexByKey[key] = nil
 		dataByKey[key] = nil
 		indexMax = indexMax - 1
+		return true
 	end
 	
 	function api.ReplaceKey(oldKey, newKey)
 		if (not oldKey) or (not indexByKey[oldKey]) or indexByKey[newKey] then
 			return false
 		end
-		
 		keyByIndex[indexByKey[oldKey]] = newKey
 		indexByKey[newKey] = indexByKey[oldKey]
 		dataByKey[newKey] = dataByKey[oldKey]
-		
 		indexByKey[oldKey] = nil
 		dataByKey[oldKey] = nil
 		return true
@@ -67,7 +65,6 @@ function IterableMap.New()
 	function api.Get(key)
 		return dataByKey[key]
 	end
-		
 	function api.Set(key, data)
 		if not indexByKey[key] then
 			api.Add(key, data)
@@ -143,7 +140,6 @@ function IterableMap.New()
 			end
 		end
 	end
-	
 	
 	-- This 'method' of iteration is for barbarians. Seems to have performance
 	-- similar to Apply.

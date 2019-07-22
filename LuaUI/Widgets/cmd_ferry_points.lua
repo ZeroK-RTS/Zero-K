@@ -1,33 +1,34 @@
 
 function widget:GetInfo()
-  return {
-    name      = "Ferry Points",
-    desc      = "Allow the creation of ferry routes for transports. Move transports and units to route entrance to assign them to the ferry route.",
-    author    = "Google Frog",
-    date      = "24 Nov 2010",
-    license   = "GNU GPL, v2 or later",
-	handler   = true,
-    layer     = 0,
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "Ferry Points",
+		desc      = "Allow the creation of ferry routes for transports. Move transports and units to route entrance to assign them to the ferry route.",
+		author    = "Google Frog",
+		date      = "24 Nov 2010",
+		license   = "GNU GPL, v2 or later",
+		handler   = true,
+		layer     = 0,
+		enabled   = true  --  loaded by default?
+	}
 end
 
 local spSetActiveCommand = Spring.SetActiveCommand
 
-local COLLECTION_RADIUS_DRAW = 120
-local COLLECTION_RADIUS = 150
-local NEAR_WAYPOINT_RANGE_SQ = 200^2
-local NEAR_START_RANGE_SQ = 300^2
-local UNLOAD_RADIUS = 160
+local COLLECTION_RADIUS_DRAW         = 120
+local COLLECTION_RADIUS              = 150
+local NEAR_WAYPOINT_RANGE_SQ         = 200^2
+local NEAR_START_RANGE_SQ            = 300^2
+local CONST_UNLOAD_RADIUS            = 100
 local CANT_BE_TRANSPORTED_DECAY_TIME = 200
-local COMMAND_MOVE_RADIUS = 80
+local COMMAND_MOVE_RADIUS            = 80
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local CMD_FIGHT                = CMD.FIGHT
-local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
+local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED or 70
 
-VFS.Include("LuaRules/Utilities/ClampPosition.lua")
-local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
+--VFS.Include("LuaRules/Utilities/ClampPosition.lua")
+--local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local ferryRoutes = {count = 0, route = {}}
 
@@ -62,7 +63,6 @@ local function disSQ(x1,y1,x2,y2)
 end
 
 local function nearFerryPoint(x, z, r)
-	
 	local rsq = r^2
 	
 	for i = 1, ferryRoutes.count do
@@ -75,7 +75,6 @@ local function nearFerryPoint(x, z, r)
 end
 
 local function nearAnyPoint(x, z, r)
-	
 	local rsq = r^2
 	
 	for i = 1, ferryRoutes.count do
@@ -97,7 +96,6 @@ end
 
 -- removes transport from whichever route it is part of
 local function removeTransportFromRoute(unitID)
-
 	local trans = transport[unitID]
 
 	if not (trans and trans.route) then
@@ -121,7 +119,6 @@ end
 
 -- it is assumed that the transport is not part of a route
 local function addTransportToRoute(unitID, routeID)
-	
 	local trans = transport[unitID]
 	local route = ferryRoutes.route[routeID]
 	
@@ -135,7 +132,6 @@ local function addTransportToRoute(unitID, routeID)
 end
 
 local function removeRoute(routeID)
-
 	local route = ferryRoutes.route[routeID]
 	
 	for i = 1, route.transportCount do
@@ -163,9 +159,10 @@ end
 --- COMMAND HANDLING
 
 local function GiveUnloadOrder(transportID, x, y, z)
-	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, UNLOAD_RADIUS}, 0)
-	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, UNLOAD_RADIUS*2}, CMD.OPT_SHIFT)
-	Spring.GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x, y, z, UNLOAD_RADIUS*4}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x - 2, y, z - 2}, CMD.OPT_RIGHT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x + 2, y, z + 2, CONST_UNLOAD_RADIUS}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x - 2, y, z + 2, CONST_UNLOAD_RADIUS*2}, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(transportID, CMD.UNLOAD_UNIT, {x + 2, y, z - 2, CONST_UNLOAD_RADIUS*4}, CMD.OPT_SHIFT)
 end
 
 function widget:CommandsChanged()
@@ -185,7 +182,6 @@ function widget:CommandsChanged()
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
-	
 	if cmdID == CMD_SET_WANTED_MAX_SPEED then
 		return false
 	end
@@ -223,7 +219,6 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 			movingPointNeighbours = false
 			movingPoint = false
 		elseif not placedRoute then
-			
 			if cmdOptions.shift then
 				movingPoint = nearAnyPoint(cmdParams[1], cmdParams[3], COMMAND_MOVE_RADIUS)
 				if movingPoint then
@@ -296,7 +291,6 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		
 		return true
 	elseif (cmdID == CMD_RAW_MOVE or cmdID == CMD.MOVE or cmdID == CMD_FIGHT) and cmdParams then
-	
 		local routeID = nearFerryPoint(cmdParams[1], cmdParams[3], COLLECTION_RADIUS_DRAW)
 		if routeID then
 			local selected = Spring.GetSelectedUnits()
@@ -358,25 +352,22 @@ end
 --- UNIT HANDLING
 
 function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID) 
-
 	if Spring.ValidUnitID(unitID) then
-		local cmd = Spring.GetCommandQueue(unitID, 2)
-		if cmd and #cmd > 0 and cmd[1].id == CMD.WAIT then
+		local currentCmd = Spring.GetUnitCurrentCommand(unitID)
+		if currentCmd == CMD.WAIT then
 			Spring.GiveOrderToUnit(unitID, CMD.WAIT, EMPTY_TABLE, 0)
-			if #cmd == 1 then
+
+			-- unsure why this is done but probably to make sure UnitIdle works correctly or somesuch
+			if Spring.GetCommandQueue(unitID, 0) == 1 then
 				Spring.GiveOrderToUnit(unitID, CMD.STOP, EMPTY_TABLE, 0)
 			end
 		end
 	end
-	
 end
 
 function widget:GameFrame(frame)
-	
 	if frame%15 == 12 then
-		
 		for i = 1, ferryRoutes.count do
-		
 			route = ferryRoutes.route[i]
 		
 			local unitsInArea = Spring.GetUnitsInCylinder(route.start.x, route.start.z, COLLECTION_RADIUS, myTeam)
@@ -389,8 +380,7 @@ function widget:GameFrame(frame)
 						route.unitsQueuedToBeTransported[unitID] = nil
 					end
 				else
-          local cmd = Spring.GetCommandQueue(unitID, 1)        
-					if #cmd > 0 and cmd[1].id == CMD.WAIT then
+					if Spring.GetUnitCurrentCommand(unitID) == CMD.WAIT then
 						unitsToTransport.count = unitsToTransport.count + 1
 						unitsToTransport.unit[unitsToTransport.count] = unitID
 					end
@@ -402,7 +392,6 @@ function widget:GameFrame(frame)
 				local carriedUnits = Spring.GetUnitIsTransporting(unitID)
 				
 				if #carriedUnits == trans.capacity then
-					
 					if trans.waypoint <= route.pointcount then
 						local x,_,z = Spring.GetUnitPosition(unitID)
 						if trans.waypoint == 0 or disSQ(x, z, route.points[trans.waypoint].x, route.points[trans.waypoint].z) < NEAR_WAYPOINT_RANGE_SQ then
@@ -410,28 +399,23 @@ function widget:GameFrame(frame)
 							if trans.waypoint > route.pointcount then
 								GiveUnloadOrder(unitID, route.finish.x, route.finish.y, route.finish.z)
 							else
-								GiveClampedOrderToUnit(unitID, CMD.MOVE, 
-									{route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, 0 )
+								spGiveOrderToUnit(unitID, CMD.MOVE, {route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, 0 )
 							end
 						end
 					end
-					
 				else
 					local x,_,z = Spring.GetUnitPosition(unitID)
 					if trans.waypoint > 0 then
 						if trans.waypoint > route.pointcount or disSQ(x, z, route.points[trans.waypoint].x, route.points[trans.waypoint].z) < NEAR_WAYPOINT_RANGE_SQ then
 							trans.waypoint = trans.waypoint - 1
 							if trans.waypoint == 0 then
-								GiveClampedOrderToUnit(unitID, CMD.MOVE, 
-									{route.start.x, route.start.y, route.start.z}, 0 )
+								spGiveOrderToUnit(unitID, CMD.MOVE, {route.start.x, route.start.y, route.start.z}, 0 )
 							else
-								GiveClampedOrderToUnit(unitID, CMD.MOVE, 
-									{route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, 0 )
+								spGiveOrderToUnit(unitID, CMD.MOVE, {route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, 0 )
 							end
 						end
 					elseif unitsToTransport.count ~= 0 and disSQ(x, z, route.start.x, route.start.z) < NEAR_START_RANGE_SQ then
-						local cmd = Spring.GetCommandQueue(unitID, 1)
-						if #cmd == 0 or cmd[1].id ~= CMD.LOAD_UNITS then
+						if Spring.GetUnitCurrentCommand(unitID) ~= CMD.LOAD_UNITS then
 							local choice = math.floor(math.random(1,unitsToTransport.count))
 							local choiceUnitID = unitsToTransport.unit[choice]
 							local ud = UnitDefs[Spring.GetUnitDefID(choiceUnitID)]
@@ -445,21 +429,16 @@ function widget:GameFrame(frame)
 							end
 						end
 					elseif disSQ(x, z, route.start.x, route.start.z) > NEAR_WAYPOINT_RANGE_SQ then
-						GiveClampedOrderToUnit(unitID, CMD.MOVE, 
-							{route.start.x, route.start.y, route.start.z}, 0 )
+						spGiveOrderToUnit(unitID, CMD.MOVE, {route.start.x, route.start.y, route.start.z}, 0 )
 					end
-				
 				end
 			end
 		end
 	end
-	
 end
 
 local function addUnit(unitID, unitDefID, unitTeam)
-
 	if unitTeam == myTeam and transportDefs[unitDefID] then
-		
 		local ud = UnitDefs[unitDefID]
 		
 		transportIndex.count = transportIndex.count + 1
@@ -477,9 +456,7 @@ local function addUnit(unitID, unitDefID, unitTeam)
 end
 
 local function removeUnit(unitID, unitDefID, unitTeam)
-
 	if unitTeam == myTeam and transportDefs[unitDefID] then
-		
 		local trans = transport[unitID]
 		
 		removeTransportFromRoute(unitID)
@@ -547,7 +524,6 @@ local function DrawMovingPoints(pos)
 end
 
 function widget:DrawWorld()
-
 	gl.DepthTest(false)
 	gl.LineWidth(2)
 	gl.Color(1, 0, 0, 0.9)
@@ -580,5 +556,3 @@ function widget:DrawWorld()
 
 	gl.Color(1, 1, 1, 1)
 end
-
-

@@ -8,6 +8,13 @@ Spring.Echo("Loading UnitDefs_posts")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Constants?
+--
+
+local TRANSPORT_LIGHT_COST_MAX = 1000
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Utility
 --
 
@@ -63,8 +70,8 @@ for _, ud in pairs(UnitDefs) do
 --
 
 VFS.Include('gamedata/modularcomms/unitdefgen.lua')
-
 VFS.Include('gamedata/planetwars/pw_unitdefgen.lua')
+local Utilities = VFS.Include('gamedata/utilities.lua')
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -173,6 +180,11 @@ for name, ud in pairs(UnitDefs) do
 				if wd.customparams and wd.customparams.script_burst then
 					ud.customparams.script_burst = wd.customparams.script_burst
 				end
+				if wd.customparams and wd.customparams.post_capture_reload then
+					ud.customparams.post_capture_reload = wd.customparams.post_capture_reload
+				end
+				wd.customparams = wd.customparams or {}
+				wd.customparams.is_unit_weapon = 1
 			end
 		end
 	end
@@ -193,6 +205,7 @@ for name, ud in pairs(UnitDefs) do
 					hasShield = true
 					ud.customparams.shield_radius = wd.shieldradius
 					ud.customparams.shield_power = wd.shieldpower
+					ud.customparams.shield_recharge_delay = (wd.customparams or {}).shield_recharge_delay or wd.shieldrechargedelay
 					ud.customparams.shield_rate = (wd.customparams or {}).shield_rate or wd.shieldpowerregen
 					break
 				end
@@ -212,7 +225,8 @@ end
 --------------------------------------------------------------------------------
 -- UnitDefs Dont Repeat Yourself
 --
-local BP2RES = 0.03
+local BP2RES = 0
+local BP2RES_FACTORY = 0
 local BP2TERRASPEED = 1000 --used to be 60 in most of the cases
 --local SEISMICSIG = 4 --used to be 4 in most of the cases
 for name, ud in pairs (UnitDefs) do
@@ -235,8 +249,13 @@ for name, ud in pairs (UnitDefs) do
 		local bp = ud.workertime
 
 		local mult = (ud.customparams.dynamic_comm and 0) or 1
-		if not ud.metalmake then ud.metalmake = bp * BP2RES * mult end
-		if not ud.energymake then ud.energymake = bp * BP2RES * mult end
+		if ud.customparams.factorytab then
+			if not ud.metalmake then ud.metalmake = bp * BP2RES_FACTORY * mult end
+			if not ud.energymake then ud.energymake = bp * BP2RES_FACTORY * mult end
+		else
+			if not ud.metalmake then ud.metalmake = bp * BP2RES * mult end
+			if not ud.energymake then ud.energymake = bp * BP2RES * mult end
+		end
 
 		if not ud.terraformspeed then
 			ud.terraformspeed = bp * BP2TERRASPEED
@@ -596,52 +615,62 @@ local VISUALIZE_SELECTION_VOLUME = false
 local CYL_SCALE = 1.1
 local CYL_LENGTH = 0.8
 local CYL_ADD = 5
-local SEL_SCALE = 1.35
+local SEL_SCALE = 1.5
+local STATIC_SEL_SCALE = 1.35
 
 for name, ud in pairs(UnitDefs) do
+	local scale = STATIC_SEL_SCALE
+	if ud.acceleration and ud.acceleration > 0 and ud.canmove then
+		scale = SEL_SCALE
+	end
+	if ud.customparams.selectionscalemult then
+		scale = ud.customparams.selectionscalemult
+	end
+	
 	if ud.collisionvolumescales or ud.selectionvolumescales then
 		-- Do not override default colvol because it is hard to measure.
-		if ud.acceleration and ud.acceleration > 0 and ud.canmove then
-			if ud.selectionvolumescales then
-				local dim = GetDimensions(ud.selectionvolumescales)
-				ud.selectionvolumescales  = math.ceil(dim[1]*SEL_SCALE) .. " " .. math.ceil(dim[2]*SEL_SCALE) .. " " .. math.ceil(dim[3]*SEL_SCALE)
-			else
-				local size = math.max(ud.footprintx or 0, ud.footprintz or 0)*15
-				if size > 0 then
-					local dimensions, largest = GetDimensions(ud.collisionvolumescales)
-					local x, y, z = size, size, size
-					if size > largest then
-						ud.selectionvolumeoffsets = "0 0 0"
-						ud.selectionvolumetype    = "ellipsoid"
-					elseif string.lower(ud.collisionvolumetype) == "cylx" then
-						ud.selectionvolumeoffsets = ud.collisionvolumeoffsets or "0 0 0"
-						x = dimensions[1]*CYL_LENGTH
-						y = math.max(dimensions[2], math.min(size, CYL_ADD + dimensions[2]*CYL_SCALE))
-						z = math.max(dimensions[3], math.min(size, CYL_ADD + dimensions[3]*CYL_SCALE))
-						ud.selectionvolumetype    = ud.collisionvolumetype
-					elseif string.lower(ud.collisionvolumetype) == "cyly" then
-						ud.selectionvolumeoffsets = ud.collisionvolumeoffsets or "0 0 0"
-						x = math.max(dimensions[1], math.min(size, CYL_ADD + dimensions[1]*CYL_SCALE))
-						y = dimensions[2]*CYL_LENGTH
-						z = math.max(dimensions[3], math.min(size, CYL_ADD + dimensions[3]*CYL_SCALE))
-						ud.selectionvolumetype    = ud.collisionvolumetype
-					elseif string.lower(ud.collisionvolumetype) == "cylz" then
-						ud.selectionvolumeoffsets = ud.collisionvolumeoffsets or "0 0 0"
-						x = math.max(dimensions[1], math.min(size, CYL_ADD + dimensions[1]*CYL_SCALE))
-						y = math.max(dimensions[2], math.min(size, CYL_ADD + dimensions[2]*CYL_SCALE))
-						z = dimensions[3]*CYL_LENGTH
-						ud.selectionvolumetype    = ud.collisionvolumetype
-					elseif string.lower(ud.collisionvolumetype) == "box" then
-						ud.selectionvolumeoffsets = "0 0 0"
-						x = dimensions[1]
-						y = dimensions[2]
-						z = dimensions[3]
-						ud.selectionvolumetype    = ud.collisionvolumetype
-					end
-					ud.selectionvolumescales  = math.ceil(x*SEL_SCALE) .. " " .. math.ceil(y*SEL_SCALE) .. " " .. math.ceil(z*SEL_SCALE)
+		
+		if ud.selectionvolumescales then
+			local dim = GetDimensions(ud.selectionvolumescales)
+			ud.selectionvolumescales  = math.ceil(dim[1]*scale) .. " " .. math.ceil(dim[2]*scale) .. " " .. math.ceil(dim[3]*scale)
+		else
+			local size = math.max(ud.footprintx or 0, ud.footprintz or 0)*15
+			if size > 0 then
+				local dimensions, largest = GetDimensions(ud.collisionvolumescales)
+				local x, y, z = size, size, size
+				if size > largest then
+					ud.selectionvolumeoffsets = ud.selectionvolumeoffsets or "0 0 0"
+					ud.selectionvolumetype    = ud.selectionvolumetype or "ellipsoid"
+				elseif string.lower(ud.collisionvolumetype) == "cylx" then
+					ud.selectionvolumeoffsets = ud.selectionvolumeoffsets or ud.collisionvolumeoffsets or "0 0 0"
+					x = dimensions[1]*CYL_LENGTH
+					y = math.max(dimensions[2], math.min(size, CYL_ADD + dimensions[2]*CYL_SCALE))
+					z = math.max(dimensions[3], math.min(size, CYL_ADD + dimensions[3]*CYL_SCALE))
+					ud.selectionvolumetype    = ud.selectionvolumetype or ud.collisionvolumetype
+				elseif string.lower(ud.collisionvolumetype) == "cyly" then
+					ud.selectionvolumeoffsets = ud.selectionvolumeoffsets or ud.collisionvolumeoffsets or "0 0 0"
+					x = math.max(dimensions[1], math.min(size, CYL_ADD + dimensions[1]*CYL_SCALE))
+					y = dimensions[2]*CYL_LENGTH
+					z = math.max(dimensions[3], math.min(size, CYL_ADD + dimensions[3]*CYL_SCALE))
+					ud.selectionvolumetype    = ud.selectionvolumetype or ud.collisionvolumetype
+				elseif string.lower(ud.collisionvolumetype) == "cylz" then
+					ud.selectionvolumeoffsets = ud.selectionvolumeoffsets or ud.collisionvolumeoffsets or "0 0 0"
+					x = math.max(dimensions[1], math.min(size, CYL_ADD + dimensions[1]*CYL_SCALE))
+					y = math.max(dimensions[2], math.min(size, CYL_ADD + dimensions[2]*CYL_SCALE))
+					z = dimensions[3]*CYL_LENGTH
+					ud.selectionvolumetype    = ud.selectionvolumetype or ud.collisionvolumetype
+				elseif string.lower(ud.collisionvolumetype) == "box" then
+					ud.selectionvolumeoffsets = ud.selectionvolumeoffsets or "0 0 0"
+					x = dimensions[1]
+					y = dimensions[2]
+					z = dimensions[3]
+					ud.selectionvolumetype    = ud.selectionvolumetype or ud.collisionvolumetype
 				end
+				ud.selectionvolumescales  = math.ceil(x*scale) .. " " .. math.ceil(y*scale) .. " " .. math.ceil(z*scale)
 			end
 		end
+	else
+		ud.customparams.lua_selection_scale = scale -- Scale default colVol units in lua, where we can read their model radius.
 	end
 	
 	if VISUALIZE_SELECTION_VOLUME then
@@ -651,6 +680,8 @@ for name, ud in pairs(UnitDefs) do
 			ud.collisionvolumetype    = ud.selectionvolumetype
 		end
 	end
+	
+	--Spring.Echo("VISUALIZE_SELECTION_VOLUME", ud.name, ud.collisionvolumescales, ud.selectionvolumescales)
 end
 
 
@@ -764,3 +795,23 @@ for name, ud in pairs (UnitDefs) do
 	end
 end
 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Remove engine transport limits
+--
+
+if Utilities.IsCurrentVersionNewerThan(104, 600) then
+	for name, ud in pairs (UnitDefs) do
+		ud.transportmass = nil
+		if ud.buildcostmetal and tonumber(ud.buildcostmetal) > TRANSPORT_LIGHT_COST_MAX then
+			ud.customparams.requireheavytrans = 1
+		end
+	end
+end
+
+local ai_start_units = VFS.Include("LuaRules/Configs/ai_commanders.lua")
+for i = 1, #ai_start_units do
+	UnitDefs[ai_start_units[i]].customparams.ai_start_unit = true
+end

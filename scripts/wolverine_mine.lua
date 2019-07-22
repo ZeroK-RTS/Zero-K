@@ -34,7 +34,7 @@ local currentBomblet = 1
 local function Remove ()
 	for i = 3, 3 do
 		for j = 1, 4 do
-			Explode(petals[i][j], sfxShatter)
+			Explode(petals[i][j], SFX.SHATTER)
 		end
 	end
 
@@ -64,11 +64,11 @@ function script.Create()
 		Hide (fakepetals[i])
 	end
 
-	Turn (base, y_axis, math.random()*pi);
+	Turn (base, y_axis, math.random()*math.pi);
 	Spin (stalk[4], y_axis, math.rad(30))
 
 	for i = 1, #bomblets do
-		Turn (bomblets[i].hinge, y_axis, i * 2 * pi / #bomblets)
+		Turn (bomblets[i].hinge, y_axis, i * 2 * math.pi / #bomblets)
 		Turn (bomblets[i].bomb, x_axis, math.rad(-75))
 		Move (bomblets[i].bomb, z_axis, 3.8)
 		Move (bomblets[i].bomb, z_axis, 0, 2)
@@ -76,7 +76,7 @@ function script.Create()
 
 	for i = 1, #petals do
 		Move (petals[i][1], y_axis, 100)
-		Turn (petals[i][1], y_axis, i * 2 * pi / #petals)
+		Turn (petals[i][1], y_axis, i * 2 * math.pi / #petals)
 		Turn (petals[i][2], x_axis, math.rad(-70), math.rad(49))
 		Turn (petals[i][3], x_axis, math.rad(-20), math.rad(14))
 		Turn (petals[i][4], x_axis, math.rad(-30), math.rad(21))

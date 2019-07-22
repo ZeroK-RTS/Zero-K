@@ -32,6 +32,7 @@ unitDef = {
 	modelradius    = [[25]],
     aimposoffset   = [[0 15 0]],
 	dynamic_comm   = 1,
+	shared_energy_gen = 1,
   },
 
   energyStorage       = 500,
@@ -44,7 +45,7 @@ unitDef = {
   idleTime            = 0,
   leaveTracks         = true,
   losEmitHeight       = 40,
-  maxDamage           = 2800,
+  maxDamage           = 3800,
   maxSlope            = 36,
   maxVelocity         = 1.2,
   maxWaterDepth       = 5000,

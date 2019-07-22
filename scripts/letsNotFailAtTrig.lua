@@ -1,5 +1,5 @@
-local tau = math.pi*2
-local pi = math.pi
+-- TODO: CACHE INCLUDE FILE
+-- Only Krow and Jugglenaut use this
 local hpi = math.pi*0.5
 
 local cos = math.cos
@@ -59,7 +59,7 @@ function getTheActuallyCorrectHeadingAndPitch(heading, pitch, normal, radial, ri
 	end
 	
 	--Spring.Echo(normal)
-	--Spring.Echo((phi+hpi)*180/pi)
+	--Spring.Echo((phi+hpi)*180/math.pi)
 	
 	return theta, phi
 end

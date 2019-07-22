@@ -4,7 +4,7 @@ unitDef = {
   description         = [[Jumpjet Constructor, Builds at 4 m/s]],
   acceleration        = 0.26,
   brakeRate           = 0.78,
-  buildCostMetal      = 130,
+  buildCostMetal      = 120,
   buildDistance       = 128,
   builder             = true,
 
@@ -115,7 +115,7 @@ unitDef = {
       laserFlareSize          = 4,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 320,
+      range                   = 240,
       reloadtime              = 2,
       rgbColor                = [[0.3 0 0.4]],
       soundStart              = [[weapon/laser/pulse_laser2]],

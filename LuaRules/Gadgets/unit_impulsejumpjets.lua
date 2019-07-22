@@ -65,7 +65,6 @@ local spTestBuildOrder     = Spring.TestBuildOrder
 local spGetGameSeconds     = Spring.GetGameSeconds
 local spGetUnitHeading     = Spring.GetUnitHeading
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
-local spSetUnitNoDraw      = Spring.SetUnitNoDraw
 local spGetGameFrame       = Spring.GetGameFrame
 local spGetUnitDefID       = Spring.GetUnitDefID
 local spGetUnitTeam        = Spring.GetUnitTeam
@@ -133,7 +132,7 @@ local function ReloadQueue(unitID, queue, cmdTag)
 		return
 	end
 
-	local re = Spring.GetUnitStates(unitID)["repeat"]
+	local re = Spring.Utilities.GetUnitRepeat(unitID)
 	local storeParams
 	--// remove finished command
 	local start = 1
@@ -254,10 +253,9 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	local verticalLaunchVel, gravity, xVelocity, zVelocity = FindLaunchSpeedAndAcceleration(duration, vector,apexHeight,lineDist)
 
 	-- check if there is no wall in between
-	local x,z
 	for i=10, duration-10 do
-		x = start[1] + xVelocity*i
-		z = start[3] + zVelocity*i
+		local x = start[1] + xVelocity*i
+		local z = start[3] + zVelocity*i
 		if ( (spGetGroundHeight(x,z) - 30) > (start[2] + verticalLaunchVel*i - gravity*i*i/2)) then
 			return false, false -- FIXME: should try to use SetMoveGoal instead of jumping!
 		end

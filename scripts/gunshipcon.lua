@@ -144,7 +144,7 @@ local function StopLanded()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 0)
 	-- Permanent changes
@@ -194,24 +194,24 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
-		Explode(ForejetLeft, sfxFall)
-		Explode(ForejetRight, sfxFall)
-		Explode(HindJetLeft, sfxFall)
-		Explode(HindJetRight, sfxFall)
+		Explode(ForejetLeft, SFX.FALL)
+		Explode(ForejetRight, SFX.FALL)
+		Explode(HindJetLeft, SFX.FALL)
+		Explode(HindJetRight, SFX.FALL)
 		return 1
 	elseif severity <= 0.50 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
-		Explode(Spine1, sfxShatter)
-		Explode(ForejetLeft, sfxFall)
-		Explode(ForejetRight, sfxFall)
-		Explode(HindJetLeft, sfxFall)
-		Explode(HindJetRight, sfxFall)
+		Explode(Spine1, SFX.SHATTER)
+		Explode(ForejetLeft, SFX.FALL)
+		Explode(ForejetRight, SFX.FALL)
+		Explode(HindJetLeft, SFX.FALL)
+		Explode(HindJetRight, SFX.FALL)
 		return 1
 	else
-		Explode(Spine1, sfxShatter)
-		Explode(ForejetLeft, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(ForejetRight, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(HindJetLeft, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(HindJetRight, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(Spine1, SFX.SHATTER)
+		Explode(ForejetLeft, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(ForejetRight, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(HindJetLeft, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(HindJetRight, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		return 2
 	end
 end

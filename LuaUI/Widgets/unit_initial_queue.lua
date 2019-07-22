@@ -450,7 +450,7 @@ function widget:RecvLuaMsg(msg, playerID)
 		local msgArray = explode('|',msg)
 		local typeArg, unitDefID = tonumber(msgArray[1]), tonumber(msgArray[2])
 		if typeArg == 5 then -- Cancel queue
-			local teamID = select(4,Spring.GetPlayerInfo(playerID))
+			local teamID = select(4,Spring.GetPlayerInfo(playerID, false))
 			othersBuildQueue[teamID] = {}
 			return
 		end
@@ -461,7 +461,7 @@ function widget:RecvLuaMsg(msg, playerID)
 		if not (x and y and z and face) then
 			return --invalid coordinate and facing
 		end
-		local teamID = select(4,Spring.GetPlayerInfo(playerID))
+		local teamID = select(4,Spring.GetPlayerInfo(playerID, false))
 		othersBuildQueue[teamID] = othersBuildQueue[teamID] or {}
 		local playerXBuildQueue = othersBuildQueue[teamID]
 		if typeArg == 1 then

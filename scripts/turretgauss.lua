@@ -153,7 +153,7 @@ function script.Create()
 	is_open = true;
 		
 	--StartThread(AimBlink);
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(RestoreAfterDelay);
 
 	Hide(legs);
@@ -235,12 +235,12 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 
 	if(pillarHeight > 0) then
-		Explode(legs, sfxShatter)
+		Explode(legs, SFX.SHATTER)
 	end
 
 	if(numPillars > 0) then
 		for i = 1, numPillars do
-			Explode(pillars[i],sfxShatter);
+			Explode(pillars[i],SFX.SHATTER);
 		end
 	end
 

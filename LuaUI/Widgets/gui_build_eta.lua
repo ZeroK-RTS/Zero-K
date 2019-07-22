@@ -191,7 +191,7 @@ function widget:GameFrame(n)
 		end
 	end
 
-	for unitID,bi in pairs(etaTable) do
+	for unitID, bi in pairs(etaTable) do
 		local buildProgress = select(5, Spring.GetUnitHealth(unitID)) or 0
 		if buildProgress == 1 then
 			etaTable[unitID] = nil
@@ -342,10 +342,8 @@ local function DrawEtaText(unitID, timeLeft,yoffset, negative)
 end
 
 function widget:DrawWorld()
-	if Spring.IsGUIHidden() or 
-		not displayETA or
-		(options.showonlyonshift.value and not select(4,Spring.GetModKeyState())) then 
-		return 
+	if Spring.IsGUIHidden() or not displayETA or (options.showonlyonshift.value and not select(4,Spring.GetModKeyState())) then 
+		return
 	end
 	gl.DepthTest(true)
 

@@ -46,7 +46,7 @@ options = {
 -- Speedups
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetTeamUnits = Spring.GetTeamUnits
-local spGetCommandQueue = Spring.GetCommandQueue
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetKeyState = Spring.GetKeyState
 local spGetSelectedUnits = Spring.GetSelectedUnits
@@ -108,15 +108,10 @@ function widget:GameFrame(f)
 			local ux, uz = entry.x, entry.z
 			local units = spGetTeamUnits(team)
 			for _, unit_id in ipairs(units) do
-				local cQueue = spGetCommandQueue(unit_id, 1)
-				if cQueue and cQueue[1] then
-					local command = cQueue[1]
-					if command.id < 0 then 
-						local cx = command.params[1]
-						local cz = command.params[3]
-						if (abs(cx-ux) < 16) and (abs(cz-uz) < 16) then
-							spGiveOrderToUnit(unit_id, CMD_REMOVE, {command.tag}, 0 )
-						end
+				local cmdID, cmdOpt, cmdTag, cx, cy, cz = spGetUnitCurrentCommand(unit_id)
+				if cmdID and cmdID < 0 then
+					if (abs(cx-ux) < 16) and (abs(cz-uz) < 16) then
+						spGiveOrderToUnit(unit_id, CMD_REMOVE, {cmdTag}, 0 )
 					end
 				end
 			end

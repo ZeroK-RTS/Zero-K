@@ -40,6 +40,7 @@ local RECOIL_RESTORE_SPEED = 2.5
 
 --rockz
 include "rockPiece.lua"
+local dynamicRockData
 
 local ROCK_PIECE = ground		--piece to rock
 local ROCK_SPEED = 1		--number of rock angles per second around z-axis
@@ -74,8 +75,8 @@ function script.Create()
 	Turn(turret2, y_axis, math.rad(180))
 	Turn(turret3, y_axis, math.rad(180))
 	Spin(radar, y_axis, math.rad(100))
-	StartThread(SmokeUnit, smokePiece)
-	InitializeRock(rockData)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 end
 
 local function RestoreAfterDelay()
@@ -125,7 +126,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	StartThread(Rock, z_axis, gunHeading[num], ROCK_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading[num], ROCK_FORCE)
 end
 
 function script.Shot(num)
@@ -149,14 +150,14 @@ end
 local function ExplodeTurret(num)
 	for i=1,3 do
 		if math.random() > 0.5 then
-			Explode(barrels[num][i], sfxFall + sfxSmoke + sfxExplode)
-			Hide(barrels[num][i], sfxFall + sfxSmoke + sfxExplode)
+			Explode(barrels[num][i], SFX.FALL + SFX.SMOKE + SFX.EXPLODE)
+			Hide(barrels[num][i], SFX.FALL + SFX.SMOKE + SFX.EXPLODE)
 		else
-			Explode(barrels[num][i], sfxShatter)
+			Explode(barrels[num][i], SFX.SHATTER)
 		end
 	end
 	Sleep(250)
-	Explode(turrets[num], sfxShatter)
+	Explode(turrets[num], SFX.SHATTER)
 	--Hide(turrets[num])
 end
 
@@ -168,10 +169,10 @@ local function DeathAnim()
 	--Turn(ground, x_axis, math.rad(-10), speed)
 	EmitSfx(turret2, 1024)
 	
-	InitializeDeathAnimation()
+	GG.Script.InitializeDeathAnimation(unitID)
 	Sleep(120)
 	EmitSfx(turret1, 1024)
-	Explode(radar, sfxSmoke)
+	Explode(radar, SFX.SMOKE)
 	EmitSfx(radar, 1024)
 	Hide(radar)
 	Sleep(120)
@@ -196,23 +197,23 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.25 then
 		DeathAnim()
-		Explode(hull, sfxNone)
+		Explode(hull, SFX.NONE)
 		return 1
 	elseif severity < 0.5 then
 		DeathAnim()
-		Explode(hull, sfxNone)
+		Explode(hull, SFX.NONE)
 		return 1	
 	else
 		for i=1,3 do
 			for v=1,3 do
-				Explode(barrels[i][v], sfxFall + sfxSmoke + sfxExplode)
+				Explode(barrels[i][v], SFX.FALL + SFX.SMOKE + SFX.EXPLODE)
 			end
 		end
-		Explode(hull, sfxShatter)
-		Explode(ground, sfxShatter)
-		Explode(turret1, sfxShatter)
-		Explode(turret2, sfxShatter)
-		Explode(turret3, sfxShatter)
+		Explode(hull, SFX.SHATTER)
+		Explode(ground, SFX.SHATTER)
+		Explode(turret1, SFX.SHATTER)
+		Explode(turret2, SFX.SHATTER)
+		Explode(turret3, SFX.SHATTER)
 		return 2
 	end
 end

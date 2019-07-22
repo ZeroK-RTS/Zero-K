@@ -80,7 +80,7 @@ local commTips = {
 	["LuaUI/Images/startup_info_selector/chassis_commrecon.png"] = "Select Recon Chassis\nA nimble chassis that uses speed and jumpjets to explore the map and avoid opposition. Otherwise has poor survivability.",
 	["LuaUI/Images/startup_info_selector/chassis_commstrike.png"] = "Select Strike Chassis\nAn all-round chassis with decent speed and health. Can dual wield.",
 	["LuaUI/Images/startup_info_selector/chassis_commsupport.png"] = "Select Engineer Chassis\nA chassis focused on economy that uses its high build range and base build power to increase production. It has relatively poor speed and health.",
-	["LuaUI/Images/startup_info_selector/chassis_cremcom.png"] = "Select Campaign Chassis\nCan mount anything and wears a funky mouthgag.",
+	["LuaUI/Images/startup_info_selector/chassis_cremcom.png"] = "Select Campaign Chassis\nCan mount any module.",
 }
 
 --local wantLabelUpdate = false
@@ -510,7 +510,7 @@ function widget:Update(dt)
 		startPosTimer = startPosTimer + dt
 		if Spring.GetGameFrame() <= 0 then
 			if startPosTimer > 0.1 then
-				local _, active, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+				local _, active, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 				if not spec then
 					local x, y, z = Spring.GetTeamStartPosition(teamID)
 					if not (x == 0 and y == 0 and z == 0) then

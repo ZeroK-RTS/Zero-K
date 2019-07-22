@@ -143,6 +143,25 @@ staticshieldBall = {
 	quality = 3, -- High
 }
 
+staticshieldBurstsBig = {
+	layer      = -35,
+	life       = math.huge,
+	piece      = "glow",
+	rotSpeed   = 0.7,
+	rotSpread  = 0,
+	arc        = 50,
+	arcSpread  = 0,
+	size       = 22,
+	sizeSpread = 10,
+	texture    = "bitmaps/GPL/Lups/shieldbursts5.png",
+	--colormap   = { {1, 0.6, 1, 0.8} },
+	colormap   = { {1, 0.3, 1, 0.8} },
+	directional= true,
+	repeatEffect = true,
+	noIconDraw = true,
+	count      = 8,
+	quality = 3, -- High
+}
 ----------------------------------------------------------------------------
 -- COLORSPHERES ------------------------------------------------------------
 ----------------------------------------------------------------------------

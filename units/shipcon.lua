@@ -3,9 +3,9 @@ unitDef = {
   name                   = [[Mariner]],
   description            = [[Construction Ship, Builds at 7.5 m/s]],
   acceleration           = 0.051375,
-  activateWhenBuilt   = true,
+  activateWhenBuilt      = true,
   brakeRate              = 0.061,
-  buildCostMetal         = 220,
+  buildCostMetal         = 200,
   buildDistance          = 330,
   builder                = true,
 
@@ -26,6 +26,7 @@ unitDef = {
   customParams           = {
 	modelradius    = [[40]],
 	turnatfullspeed = [[1]],
+	selection_scale = 1.2,
   },
 
   energyUse              = 0,

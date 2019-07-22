@@ -1,39 +1,57 @@
 unitDef = {
   unitname               = [[striderfunnelweb]],
   name                   = [[Funnelweb]],
-  description            = [[Drone/Shield Support Strider]],
+  description            = [[Shield Support Strider]],
   acceleration           = 0.0552,
   activateWhenBuilt      = true,
   brakeRate              = 0.1375,
-  buildCostMetal         = 4500,
+  buildCostMetal         = 3000,
   buildPic               = [[striderfunnelweb.png]],
+  builder                = true,
+  
+  buildoptions        = {
+  },
+
+  buildDistance          = 400,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND]],
+  category               = [[LAND UNARMED]],
+  collisionVolumeOffsets        = [[0 10 -10]],
+  collisionVolumeScales         = [[60 50 80]],
+  collisionVolumeType           = [[elipsoid]],
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[80 80 80]],
+  selectionVolumeType           = [[Sphere]],
+
   corpse                 = [[DEAD]],
 
   customParams           = {
 	priority_misc  = 1, -- Medium
 	shield_emit_height = 45,
+	unarmed       = true,
+	shield_power_gfx_override = 10000,
+	selection_rank = 3,
   },
 
   explodeAs              = [[ESTOR_BUILDING]],
   footprintX             = 4,
   footprintZ             = 4,
-  iconType               = [[t3special]],
+  iconType               = [[t3spiderbuilder]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 11000,
+  maxDamage              = 6500,
   maxSlope               = 36,
-  maxVelocity            = 1.5,
+  maxVelocity            = 1.8,
   maxWaterDepth          = 22,
   minCloakDistance       = 150,
   movementClass          = [[TKBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[funnelweb.s3o]],
+  objectName             = [[funnelweb.dae]],
+  radarDistance          = 1400,
+  radarEmitHeight        = 32,
   onoffable              = true,
   selfDestructAs         = [[ESTOR_BUILDING]],
 
@@ -46,22 +64,17 @@ unitDef = {
 
   },
   script                 = [[striderfunnelweb.lua]],
+  showNanoSpray          = false,
   sightDistance          = 650,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 85,
-  turnRate               = 240,
-  workerTime             = 0,
+  turnRate               = 520,
+  workerTime             = 40,
 
   weapons                = {
-
-    {
-      def                = "BOGUS_FAKE_TARGETER",
-      badTargetCategory  = "FIXEDWING",
-      onlyTargetCategory = "FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER",
-    },
 
     {
       def                = [[SHIELD]],
@@ -72,34 +85,15 @@ unitDef = {
 
   weaponDefs             = {
 
-    BOGUS_FAKE_TARGETER = {
-      name                    = [[Bogus Fake Targeter]],
-      avoidGround             = false, -- avoid nothing, else attempts to move out to clear line of fine
-      avoidFriendly           = false,
-      avoidFeature            = false,
-      avoidNeutral            = false,
-
-      damage                  = {
-        default = 11.34,
-        planes  = 11.34,
-        subs    = 0.567,
-      },
-
-      explosionGenerator      = [[custom:FLASHPLOSION]],
-      noSelfDamage            = true,
-      range                   = 800,
-      reloadtime              = 1,
-      tolerance               = 5000,
-      turret                  = true,
-      weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 500,
-    },
-	
     SHIELD = {
       name                    = [[Energy Shield]],
 
       damage                  = {
         default = 10,
+      },
+      customParams            = {
+        unlinked                = true,
+        shield_recharge_delay   = 10,
       },
 
       exteriorShield          = true,
@@ -107,10 +101,10 @@ unitDef = {
       shieldBadColor          = [[1 0.1 0.1 1]],
       shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
-      shieldPower             = 3600,
-      shieldPowerRegen        = 50,
-      shieldPowerRegenEnergy  = 12,
-      shieldRadius            = 350,
+      shieldPower             = 23000,
+      shieldPowerRegen        = 300,
+      shieldPowerRegenEnergy  = 48,
+      shieldRadius            = 550,
       shieldRepulser          = false,
       smartShield             = true,
       visibleShield           = false,

@@ -18,10 +18,22 @@ local rim1 = piece 'rim1'
 local rim2 = piece 'rim2' 
 
 include "constants.lua"
+include "pieceControl.lua"
 include "rockPiece.lua"
+local dynamicRockData
 
 local shootCycle = 0
 local gunHeading = 0
+local closed = true
+local stuns = {false, false, false}
+local disarmed = false
+local hpi = math.pi*0.5
+
+-- Tasks for open/close state
+local TASK_NEUTRAL = 0
+local TASK_CLOSING = 1
+local TASK_OPENING = 2
+local currentTask = TASK_NEUTRAL
 
 local flareMap = {
 	[0] = flare1,
@@ -30,7 +42,6 @@ local flareMap = {
 
 -- Signal definitions
 local SIG_AIM = 2
-local SIG_RESTORE = 4
 local SIG_ROCK_X = 8
 local SIG_ROCK_Z = 16
 
@@ -66,7 +77,7 @@ local rockData = {
 }
 
 ----------------------------------------------------------
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local CMD_UNIT_CANCEL_TARGET = Spring.Utilities.CMD.UNIT_CANCEL_TARGET
 local firestate = 0
 local firstTime = true
 
@@ -99,8 +110,8 @@ end
 
 --[[
 function script.HitByWeapon(x, z, weaponID, damage)
-	StartThread(Rock, z_axis, false, x*ROCK_DAMGE_MULT*damage)
-	StartThread(Rock, x_axis, false, -z*ROCK_DAMGE_MULT*damage)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], false, x*ROCK_DAMGE_MULT*damage)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], false, -z*ROCK_DAMGE_MULT*damage)
 end
 ]]
 
@@ -129,21 +140,21 @@ end
 
 function script.Create()
 	Hide(ground1)
-	StartThread(SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (100)
 	end
 	Spring.SetUnitArmored(unitID,true)
 end
 
-local function RestoreAfterDelay()
+local function Close()
+	currentTask = TASK_CLOSING
+	if disarmed then return end
+	closed = true
 
-	Signal(SIG_RESTORE)
-	SetSignalMask(SIG_RESTORE)
-	Sleep(RESTORE_DELAY)
 	Move(turretbase, y_axis, 0, 20)
 	Turn(turretbase, x_axis, 0, math.rad(150.000000))
 	Turn(turret, x_axis, 0, math.rad(150.000000))
@@ -153,22 +164,26 @@ local function RestoreAfterDelay()
 	Turn(rim2, z_axis, math.rad(-(0)), math.rad(150.000000))
 	Turn(gun, y_axis, 0, math.rad(300.000000))
 	Turn(gun, x_axis, 0, math.rad(60.000000))
+
 	WaitForMove(turretbase, y_axis)
-	Spring.SetUnitArmored(unitID,true)
+	WaitForTurn(turretbase, x_axis)
+	if disarmed then return end
+
+	currentTask = TASK_NEUTRAL
+	Spring.SetUnitArmored(unitID, true)
 end
 
-function script.AimFromWeapon(num) 
-	return turret
+local function RestoreAfterDelay()
+	Sleep(RESTORE_DELAY)
+	Close()
 end
 
-function script.AimWeapon(num, heading, pitch)
-
+local function Open()
 	StartThread(RestoreAfterDelay)
-	Signal(SIG_AIM)
-	SetSignalMask(SIG_AIM)
-	
-	Spring.SetUnitArmored(unitID,false)
-	
+	if not closed then return end
+	currentTask = TASK_OPENING
+	Spring.SetUnitArmored(unitID, false)
+
 	Move(turretbase, y_axis, 3, 30)
 	Turn(turretbase, x_axis, math.rad(30), math.rad(150.000000))
 	Turn(turret, x_axis, math.rad(-30), math.rad(150.000000))
@@ -176,11 +191,73 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(door2, z_axis, math.rad(-80), math.rad(150.000000))
 	Turn(rim1, z_axis, math.rad(-30), math.rad(150.000000))
 	Turn(rim2, z_axis, math.rad(30), math.rad(150.000000))
-	Turn(gun, y_axis, heading, math.rad(300.000000))
-	Turn(gun, x_axis, -pitch, math.rad(60.000000))
-	WaitForTurn(turret, y_axis)
-	WaitForTurn(turret, x_axis)
+
+	WaitForMove(turretbase, y_axis)
+	WaitForTurn(turretbase, x_axis)
+	if disarmed then return end
+
+	currentTask = TASK_NEUTRAL
+	closed = false
+end
+
+local function StunThread()
+	disarmed = true
+	Signal(SIG_AIM)
+
+	GG.PieceControl.StopTurn(gun, x_axis)
+	GG.PieceControl.StopTurn(gun, y_axis)
+end
+
+local function UnstunThread()
+	SetSignalMask(SIG_AIM)
+	disarmed = false
+
+	if currentTask == TASK_CLOSING then
+		Close()
+	elseif currentTask == TASK_OPENING then
+		Open()
+	else
+		RestoreAfterDelay()
+	end
+end
+
+function Stunned(stun_type)
+	stuns[stun_type] = true
+	StartThread(StunThread)
+end
+
+function Unstunned(stun_type)
+	stuns[stun_type] = false
+	if not stuns[1] and not stuns[2] and not stuns[3] then
+		StartThread(UnstunThread)
+	end
+end
+
+function script.AimFromWeapon(num) 
+	return turret
+end
+
+function script.AimWeapon(num, heading, pitch)
+	if disarmed and closed then return false end
+
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
+
+	StartThread(Open)
+
+	-- start aiming gun even if Open animation hasn't completed
+	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
+	Turn(gun, y_axis, heading, math.rad(300.000000)*slowMult)
+	Turn(gun, x_axis, -pitch, math.rad(60.000000)*slowMult)
+
+	while closed do
+		Sleep(34)
+	end
+
+	WaitForTurn(gun, y_axis)
+	WaitForTurn(gun, x_axis)
 	gunHeading = heading
+
 	return true
 end
 
@@ -190,8 +267,8 @@ end
 
 
 function script.FireWeapon(num)
-	StartThread(Rock, z_axis, gunHeading, ROCK_FIRE_FORCE)
-	StartThread(Rock, x_axis, gunHeading - hpi, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], gunHeading - hpi, ROCK_FIRE_FORCE)
 	EmitSfx(flareMap[shootCycle], 1025)
 	shootCycle = (shootCycle + 1) % 2
 end
@@ -199,21 +276,21 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
-		Explode(base, sfxNone)
-		Explode(door1, sfxNone)
-		Explode(door2, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(door1, SFX.NONE)
+		Explode(door2, SFX.NONE)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(base, sfxNone)
-		Explode(door1, sfxNone)
-		Explode(door2, sfxNone)
-		Explode(rim1, sfxShatter)
-		Explode(rim2, sfxShatter)
+		Explode(base, SFX.NONE)
+		Explode(door1, SFX.NONE)
+		Explode(door2, SFX.NONE)
+		Explode(rim1, SFX.SHATTER)
+		Explode(rim2, SFX.SHATTER)
 		return 1
 	end
-	Explode(door1, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(door2, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(rim1, sfxShatter)
-	Explode(rim2, sfxShatter)
+	Explode(door1, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(door2, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rim1, SFX.SHATTER)
+	Explode(rim2, SFX.SHATTER)
 	return 2
 end

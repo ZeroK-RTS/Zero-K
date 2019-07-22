@@ -40,8 +40,8 @@ local shellSpeed = 0.7
 
 local position = 0
 
-local tauOn16 = tau/16
-local tauOn8 = tau/8
+local tauOn16 = GG.Script.tau/16
+local tauOn8 = GG.Script.tau/8
 
 local function Open()
 	Signal(close) --kill the closing animation if it is in process
@@ -182,7 +182,7 @@ end
 
 function script.Create()
 	on = true
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	SetupQueryWeaponFixHax(cannonAim, flare1)
 end
 

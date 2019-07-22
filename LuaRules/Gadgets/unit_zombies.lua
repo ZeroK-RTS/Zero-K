@@ -32,7 +32,9 @@ local modOptions = Spring.GetModOptions()
 
 local getMovetype = Spring.Utilities.getMovetype
 
+-- Now to load utilities and/or configuration
 VFS.Include("LuaRules/Configs/CAI/accessory/targetReachableTester.lua")
+-- I'm scared... what exactly did including that file do and how do I use it?
 
 local spGetGroundHeight           = Spring.GetGroundHeight
 local spGetUnitPosition           = Spring.GetUnitPosition
@@ -55,7 +57,7 @@ local spGetUnitHealth             = Spring.GetUnitHealth
 local spSetUnitRulesParam         = Spring.SetUnitRulesParam
 
 local GaiaTeamID     = Spring.GetGaiaTeamID()
-local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID))
+local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
 
 local gameframe = 0
 local LOS_ACCESS = {inlos = true}
@@ -218,8 +220,7 @@ local function BringingDownTheHeavens(unitID)
 	if (UnitDefs[unitDefID].canAttack) then
 		near_ally = GetUnitNearestAlly(unitID, 300)
 		if (near_ally) then
-			local cQueue = spGetCommandQueue(near_ally, 1)
-			if cQueue and (#cQueue > 0) and cQueue[1].id == CMD_GUARD then -- oh
+			if Spring.Utilities.GetUnitFirstCommand(near_ally) == CMD_GUARD then -- oh
 				near_ally = nil -- i dont want chain guards...
 			end
 		end
@@ -247,10 +248,10 @@ local function BringingDownTheHeavens(unitID)
 	end
 end
 
-local function CheckZombieOrders(unitID)	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
+local function CheckZombieOrders()	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
 	for unitID, _ in pairs(zombies) do
-		local cQueue = spGetCommandQueue(unitID, 1)
-		if not (cQueue) or not (#cQueue > 0) then -- oh
+		local queueSize = spGetCommandQueue(unitID, 0)
+		if not (queueSize) or not (queueSize > 0) then -- oh
 			BringingDownTheHeavens(unitID)
 		end
 	end

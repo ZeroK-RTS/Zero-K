@@ -55,7 +55,7 @@ function script.Create()
 	Turn(turretPieces[4].turret, y_axis, math.rad(180))
 	Turn(turretPieces[5].turret, y_axis, math.rad(180))
 	Spin(radardish, y_axis, math.rad(100))
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 local function RestoreAfterDelay()
@@ -139,17 +139,17 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.25 then
 		DeathAnim()
-		Explode(lowerhull, sfxNone)
-		Explode(upperhull, sfxNone)
+		Explode(lowerhull, SFX.NONE)
+		Explode(upperhull, SFX.NONE)
 		return 1
 	elseif severity < 0.5 then
 		DeathAnim()
-		Explode(lowerhull, sfxNone)
-		Explode(upperhull, sfxNone)
+		Explode(lowerhull, SFX.NONE)
+		Explode(upperhull, SFX.NONE)
 		return 1	
 	else
-		Explode(lowerhull, sfxShatter)
-		Explode(upperhull, sfxShatter)
+		Explode(lowerhull, SFX.SHATTER)
+		Explode(upperhull, SFX.SHATTER)
 		return 2
 	end
 end

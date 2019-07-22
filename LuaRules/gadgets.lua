@@ -22,40 +22,6 @@
 local HANDLER_BASENAME = "gadgets.lua"
 local isMission = VFS.FileExists("mission.lua")	-- or Game.gameName:find("Scenario Editor")
 
-local DepthMod = 10
-local DepthValue = -1
-
-origPairs = pairs
-local whiteList = {['string'] = true, ['number'] = true, ['boolean'] = true, ['nil'] = true, ['thread'] = true}
-local function mynext(...)
-	local i,v = next(...)
-	local t = type(i)
-	if not whiteList[t] then
-		Spring.Log(HANDLER_BASENAME, "error", '*** A gadget is misusing pairs! Report this with full infolog.txt! ***')
-		Spring.Log(HANDLER_BASENAME, "error", t)
-		Spring.Log(HANDLER_BASENAME, "error", i)
-		Spring.Log(HANDLER_BASENAME, "error", v)
-		DepthValue = DepthValue + 1
-		if isMission then
-			Spring.Log(HANDLER_BASENAME, "error", "Error depth: " .. DepthValue%DepthMod + 1, DepthValue%DepthMod + 1)
-		else
-			error("Error depth: " .. DepthValue%DepthMod + 1, DepthValue%DepthMod + 1)	-- breaks mission_runner
-		end
-	end
-	return i,v
-end
-
-pairs = function(...) 
-	if SendToUnsynced then
-		local n,s,i = origPairs(...)
-		return mynext,s,i
-	else
-		local n,s,i = origPairs(...)
-		return next,s,i
-	end
-end
-
-
 local HANDLER_DIR = 'LuaGadgets/'
 local GADGETS_DIR = Script.GetName():gsub('US$', '') .. '/Gadgets/'
 local SCRIPT_DIR = Script.GetName() .. '/'
@@ -72,8 +38,6 @@ VFS.Include(HANDLER_DIR .. 'callins.lua',   nil, VFSMODE)
 VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
-
-local reverseCompatAllowStartPosition = not Spring.Utilities.IsCurrentVersionNewerThan(103, 629)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -103,7 +67,7 @@ gadgetHandler = {
   yViewSizeOld = 1,
 
   mouseOwner = nil,
-  
+
   actionHandler = actionHandler,	-- FIXME: not in base
 }
 
@@ -183,8 +147,11 @@ local callInLists = {
 	"AllowUnitTransfer",
 	"AllowUnitBuildStep",
 	"AllowUnitTransport",
+	"AllowUnitTransportLoad",
+	"AllowUnitTransportUnload",
 	"AllowUnitCloak",
 	"AllowUnitDecloak",
+	"AllowUnitTargetRange",
 	"AllowFeatureBuildStep",
 	"AllowFeatureCreation",
 	"AllowResourceLevel",
@@ -202,6 +169,8 @@ local callInLists = {
 	"DrawShield",
 	"DrawProjectile",
 	"RecvSkirmishAIMessage",
+
+	"SunChanged",
 
 	-- COB CallIn  (FIXME?)
 	"CobCallback",
@@ -264,6 +233,31 @@ end
 local isSyncedCode = (SendToUnsynced ~= nil)
 local function IsSyncedCode()
   return isSyncedCode
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+--  array-table reverse iterator
+--
+--  all callin handlers use this so that gadgets can
+--  RemoveGadget() themselves (during iteration over
+--  a callin list) without causing a miscount
+--
+--  c.f. Array{Insert,Remove}
+--
+
+local function r_iter(tbl, key)
+  if (key <= 1) then
+    return nil
+  end
+  -- next idx, next val
+  return (key - 1), tbl[key - 1]
+end
+
+local function r_ipairs(tbl)
+  return r_iter, tbl, (1 + #tbl)
 end
 
 
@@ -540,7 +534,11 @@ local function ArrayInsert(t, f, g)
       if (v == g) then
         return -- already in the table
       end
-      if (layer >= v.ghInfo.layer) then
+    
+      -- insert-sort the gadget based on its layer
+      -- note: reversed value ordering, highest to lowest
+      -- iteration over the callin lists is also reversed
+      if (layer < v.ghInfo.layer) then
         index = i + 1
       end
     end
@@ -907,14 +905,14 @@ end
 --
 
 function gadgetHandler:GamePreload()
-  for _,g in ipairs(self.GamePreloadList) do
+  for _,g in r_ipairs(self.GamePreloadList) do
     g:GamePreload()
   end
   return
 end
 
 function gadgetHandler:GameStart()
-  for _,g in ipairs(self.GameStartList) do
+  for _,g in r_ipairs(self.GameStartList) do
     g:GameStart()
   end
   return
@@ -922,7 +920,7 @@ end
 
 function gadgetHandler:Shutdown()
   Spring.Echo("Start gadgetHandler:Shutdown")
-  for _,g in ipairs(self.ShutdownList) do
+  for _,g in r_ipairs(self.ShutdownList) do
     local name = g.ghInfo.name or "UNKNOWN NAME"
 	Spring.Echo("Shutdown - " .. name)
 	g:Shutdown()
@@ -932,7 +930,7 @@ function gadgetHandler:Shutdown()
 end
 
 function gadgetHandler:GameFrame(frameNum)
-  for _,g in ipairs(self.GameFrameList) do
+  for _,g in r_ipairs(self.GameFrameList) do
     g:GameFrame(frameNum)
   end
   return
@@ -943,7 +941,7 @@ function gadgetHandler:RecvFromSynced(...)
   if (actionHandler.RecvFromSynced(...)) then
     return
   end
-  for _,g in ipairs(self.RecvFromSyncedList) do
+  for _,g in r_ipairs(self.RecvFromSyncedList) do
     if (g:RecvFromSynced(...)) then
       return
     end
@@ -978,7 +976,7 @@ end
 --    return true
 --  end
 --
---  for _,g in ipairs(self.GotChatMsgList) do
+--  for _,g in r_ipairs(self.GotChatMsgList) do
 --    if (g:GotChatMsg(msg, player)) then
 --      return true
 --    end
@@ -989,7 +987,7 @@ end
 
 
 function gadgetHandler:RecvLuaMsg(msg, player)
-  for _,g in ipairs(self.RecvLuaMsgList) do
+  for _,g in r_ipairs(self.RecvLuaMsgList) do
     if (g:RecvLuaMsg(msg, player)) then
       return true
     end
@@ -1017,7 +1015,7 @@ end
 
 
 function gadgetHandler:ViewResize(vsx, vsy)
-  for _,g in ipairs(self.ViewResizeList) do
+  for _,g in r_ipairs(self.ViewResizeList) do
     g:ViewResize(vsx, vsy)
   end
   return
@@ -1030,14 +1028,14 @@ end
 --
 
 function gadgetHandler:GameOver(winners)
-  for _,g in ipairs(self.GameOverList) do
+  for _,g in r_ipairs(self.GameOverList) do
     g:GameOver(winners)
   end
   return
 end
 
 function gadgetHandler:GameID(gameID)
-  for _,g in ipairs(self.GameIDList) do
+  for _,g in r_ipairs(self.GameIDList) do
     g:GameID(gameID)
   end
   return
@@ -1045,28 +1043,28 @@ end
 
 
 function gadgetHandler:TeamDied(teamID)
-  for _,g in ipairs(self.TeamDiedList) do
+  for _,g in r_ipairs(self.TeamDiedList) do
     g:TeamDied(teamID)
   end
   return
 end
 
 function gadgetHandler:PlayerAdded(playerID)
-  for _,g in ipairs(self.PlayerAddedList) do
+  for _,g in r_ipairs(self.PlayerAddedList) do
     g:PlayerAdded(playerID)
   end
   return
 end
 
 function gadgetHandler:PlayerChanged(playerID)
-  for _,g in ipairs(self.PlayerChangedList) do
+  for _,g in r_ipairs(self.PlayerChangedList) do
     g:PlayerChanged(playerID)
   end
   return
 end
 
 function gadgetHandler:PlayerRemoved(playerID, reason)
-  for _,g in ipairs(self.PlayerRemovedList) do
+  for _,g in r_ipairs(self.PlayerRemovedList) do
     g:PlayerRemoved(playerID, reason)
   end
   return
@@ -1079,7 +1077,7 @@ end
 --
 
 function gadgetHandler:DrawUnit(unitID, drawMode)
-  for _,g in ipairs(self.DrawUnitList) do
+  for _,g in r_ipairs(self.DrawUnitList) do
     if (g:DrawUnit(unitID, drawMode)) then
       return true
     end
@@ -1088,7 +1086,7 @@ function gadgetHandler:DrawUnit(unitID, drawMode)
 end
 
 function gadgetHandler:DrawFeature(featureID, drawMode)
-  for _,g in ipairs(self.DrawFeatureList) do
+  for _,g in r_ipairs(self.DrawFeatureList) do
     if (g:DrawFeature(featureID, drawMode)) then
       return true
     end
@@ -1097,7 +1095,7 @@ function gadgetHandler:DrawFeature(featureID, drawMode)
 end
 
 function gadgetHandler:DrawShield(unitID, weaponID, drawMode)
-  for _,g in ipairs(self.DrawShieldList) do
+  for _,g in r_ipairs(self.DrawShieldList) do
     if (g:DrawShield(unitID, weaponID, drawMode)) then
       return true
     end
@@ -1106,7 +1104,7 @@ function gadgetHandler:DrawShield(unitID, weaponID, drawMode)
 end
 
 function gadgetHandler:DrawProjectile(projectileID, drawMode)
-  for _,g in ipairs(self.DrawProjectileList) do
+  for _,g in r_ipairs(self.DrawProjectileList) do
     if (g:DrawProjectile(projectileID, drawMode)) then
       return true
     end
@@ -1115,7 +1113,7 @@ function gadgetHandler:DrawProjectile(projectileID, drawMode)
 end
 
 function gadgetHandler:RecvSkirmishAIMessage(aiTeam, dataStr)
-  for _,g in ipairs(self.RecvSkirmishAIMessageList) do
+  for _,g in r_ipairs(self.RecvSkirmishAIMessageList) do
     local dataRet = g:RecvSkirmishAIMessage(aiTeam, dataStr)
     if (dataRet) then
       return dataRet
@@ -1123,10 +1121,16 @@ function gadgetHandler:RecvSkirmishAIMessage(aiTeam, dataStr)
   end
 end
 
+function gadgetHandler:SunChanged()
+  for _,g in r_ipairs(self.SunChangedList) do
+    g:SunChanged()
+  end
+  return
+end
 
 function gadgetHandler:CommandFallback(unitID, unitDefID, unitTeam,
                                        cmdID, cmdParams, cmdOptions, cmdTag)
-  for _,g in ipairs(self.CommandFallbackList) do
+  for _,g in r_ipairs(self.CommandFallbackList) do
     local used, remove = g:CommandFallback(unitID, unitDefID, unitTeam,
                                            cmdID, cmdParams, cmdOptions, cmdTag)
     if (used) then
@@ -1139,7 +1143,7 @@ end
 
 function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam,
                                     cmdID, cmdParams, cmdOptions, cmdTag, synced)
-  for _,g in ipairs(self.AllowCommandList) do
+  for _,g in r_ipairs(self.AllowCommandList) do
 
 	if (not g:AllowCommand(unitID, unitDefID, unitTeam,
                            cmdID, cmdParams, cmdOptions, cmdTag, synced)) then
@@ -1150,10 +1154,7 @@ function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam,
 end
 
 function gadgetHandler:AllowStartPosition(playerID, teamID, readyState, cx, cy, cz, rx, ry, rz)
-  if reverseCompatAllowStartPosition then
-    cx, cy, cz, playerID, readyState, rx, ry, rz = playerID, teamID, readyState, cx, cy, cz, rx, ry
-  end
-  for _,g in ipairs(self.AllowStartPositionList) do
+  for _,g in r_ipairs(self.AllowStartPositionList) do
     if (not g:AllowStartPosition(playerID, teamID, readyState, cx, cy, cz, rx, ry, rz)) then
       return false
     end
@@ -1163,7 +1164,7 @@ end
 
 function gadgetHandler:AllowUnitCreation(unitDefID, builderID,
                                          builderTeam, x, y, z, facing)
-  for _,g in ipairs(self.AllowUnitCreationList) do
+  for _,g in r_ipairs(self.AllowUnitCreationList) do
     if (not g:AllowUnitCreation(unitDefID, builderID,
                                 builderTeam, x, y, z, facing)) then
       return false
@@ -1175,7 +1176,7 @@ end
 
 function gadgetHandler:AllowUnitTransfer(unitID, unitDefID,
                                          oldTeam, newTeam, capture)
-  for _,g in ipairs(self.AllowUnitTransferList) do
+  for _,g in r_ipairs(self.AllowUnitTransferList) do
     if (not g:AllowUnitTransfer(unitID, unitDefID,
                                 oldTeam, newTeam, capture)) then
       return false
@@ -1187,7 +1188,7 @@ end
 
 function gadgetHandler:AllowUnitBuildStep(builderID, builderTeam,
                                           unitID, unitDefID, part)
-  for _,g in ipairs(self.AllowUnitBuildStepList) do
+  for _,g in r_ipairs(self.AllowUnitBuildStepList) do
     if (not g:AllowUnitBuildStep(builderID, builderTeam,
                                  unitID, unitDefID, part)) then
       return false
@@ -1196,24 +1197,58 @@ function gadgetHandler:AllowUnitBuildStep(builderID, builderTeam,
   return true
 end
 
-
 function gadgetHandler:AllowUnitTransport(
   transporterID, transporterUnitDefID, transporterTeam,
   transporteeID, transporteeUnitDefID, transporteeTeam
 )
-  for _,g in ipairs(self.AllowUnitTransportList) do
-    if (not g:AllowUnitTransport(transporterID, transporterUnitDefID, transporterTeam,
-                                 transporteeID, transporteeUnitDefID, transporteeTeam)) then
+  for _,g in r_ipairs(self.AllowUnitTransportList) do
+    if (not g:AllowUnitTransport(
+      transporterID, transporterUnitDefID, transporterTeam,
+      transporteeID, transporteeUnitDefID, transporteeTeam
+    )) then
       return false
     end
   end
   return true
 end
 
+function gadgetHandler:AllowUnitTransportLoad(
+  transporterID, transporterUnitDefID, transporterTeam,
+  transporteeID, transporteeUnitDefID, transporteeTeam,
+  loadPosX, loadPosY, loadPosZ
+)
+  for _,g in r_ipairs(self.AllowUnitTransportLoadList) do
+    if (not g:AllowUnitTransportLoad(
+      transporterID, transporterUnitDefID, transporterTeam,
+      transporteeID, transporteeUnitDefID, transporteeTeam,
+      loadPosX, loadPosY, loadPosZ
+    )) then
+      return false
+    end
+  end
+  return true
+end
+
+function gadgetHandler:AllowUnitTransportUnload(
+  transporterID, transporterUnitDefID, transporterTeam,
+  transporteeID, transporteeUnitDefID, transporteeTeam,
+  unloadPosX, unloadPosY, unloadPosZ
+)
+  for _,g in r_ipairs(self.AllowUnitTransportUnloadList) do
+    if (not g:AllowUnitTransportUnload(
+      transporterID, transporterUnitDefID, transporterTeam,
+      transporteeID, transporteeUnitDefID, transporteeTeam,
+      unloadPosX, unloadPosY, unloadPosZ
+    )) then
+      return false
+    end
+  end
+  return true
+end
 
 function gadgetHandler:AllowUnitCloak(unitID, enemyID)
   -- The case can be that unitID == enemyID. This is for engine stunned unitID, they are their own enemies.
-  for _,g in ipairs(self.AllowUnitCloakList) do
+  for _,g in r_ipairs(self.AllowUnitCloakList) do
     if (not g:AllowUnitCloak(unitID, enemyID)) then
       return false
     end
@@ -1224,7 +1259,7 @@ end
 
 
 function gadgetHandler:AllowUnitDecloak(unitID, objectID, weaponID)
-  for _,g in ipairs(self.AllowUnitDecloakList) do
+  for _,g in r_ipairs(self.AllowUnitDecloakList) do
     if (not g:AllowUnitDecloak(unitID, objectID, weaponID)) then
       return false
     end
@@ -1236,7 +1271,7 @@ end
 
 function gadgetHandler:AllowFeatureBuildStep(builderID, builderTeam,
                                              featureID, featureDefID, part)
-  for _,g in ipairs(self.AllowFeatureBuildStepList) do
+  for _,g in r_ipairs(self.AllowFeatureBuildStepList) do
     if (not g:AllowFeatureBuildStep(builderID, builderTeam,
                                     featureID, featureDefID, part)) then
       return false
@@ -1247,7 +1282,7 @@ end
 
 
 function gadgetHandler:AllowFeatureCreation(featureDefID, teamID, x, y, z)
-  for _,g in ipairs(self.AllowFeatureCreationList) do
+  for _,g in r_ipairs(self.AllowFeatureCreationList) do
     if (not g:AllowFeatureCreation(featureDefID, teamID, x, y, z)) then
       return false
     end
@@ -1257,7 +1292,7 @@ end
 
 
 function gadgetHandler:AllowResourceLevel(teamID, res, level)
-  for _,g in ipairs(self.AllowResourceLevelList) do
+  for _,g in r_ipairs(self.AllowResourceLevelList) do
     if (not g:AllowResourceLevel(teamID, res, level)) then
       return false
     end
@@ -1267,7 +1302,7 @@ end
 
 
 function gadgetHandler:AllowResourceTransfer(oldTeamID, newTeamID, res, amount)
-  for _,g in ipairs(self.AllowResourceTransferList) do
+  for _,g in r_ipairs(self.AllowResourceTransferList) do
     if (not g:AllowResourceTransfer(oldTeamID, newTeamID, res, amount)) then
       return false
     end
@@ -1278,7 +1313,7 @@ end
 
 function gadgetHandler:AllowDirectUnitControl(unitID, unitDefID, unitTeam,
                                               playerID)
-  for _,g in ipairs(self.AllowDirectUnitControlList) do
+  for _,g in r_ipairs(self.AllowDirectUnitControlList) do
     if (not g:AllowDirectUnitControl(unitID, unitDefID, unitTeam,
                                      playerID)) then
       return false
@@ -1288,7 +1323,7 @@ function gadgetHandler:AllowDirectUnitControl(unitID, unitDefID, unitTeam,
 end
 
 function gadgetHandler:AllowBuilderHoldFire(unitID, unitDefID, action)
-	for _,g in ipairs(self.AllowBuilderHoldFireList) do
+	for _,g in r_ipairs(self.AllowBuilderHoldFireList) do
 		if (not g:AllowBuilderHoldFire(unitID, unitDefID, action)) then
 			return false
 		end
@@ -1299,7 +1334,7 @@ end
 
 function gadgetHandler:MoveCtrlNotify(unitID, unitDefID, unitTeam, data)
   local state = false
-  for _,g in ipairs(self.MoveCtrlNotifyList) do
+  for _,g in r_ipairs(self.MoveCtrlNotifyList) do
     if (g:MoveCtrlNotify(unitID, unitDefID, unitTeam, data)) then
       state = true
     end
@@ -1310,7 +1345,7 @@ end
 
 function gadgetHandler:TerraformComplete(unitID, unitDefID, unitTeam,
                                        buildUnitID, buildUnitDefID, buildUnitTeam)
-  for _,g in ipairs(self.TerraformCompleteList) do
+  for _,g in r_ipairs(self.TerraformCompleteList) do
     local stop = g:TerraformComplete(unitID, unitDefID, unitTeam,
                                        buildUnitID, buildUnitDefID, buildUnitTeam)
     if (stop) then
@@ -1322,7 +1357,7 @@ end
 
 
 function gadgetHandler:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, attackerWeaponDefID)
-	for _, g in ipairs(self.AllowWeaponTargetCheckList) do
+	for _, g in r_ipairs(self.AllowWeaponTargetCheckList) do
 		if (not g:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, attackerWeaponDefID)) then
 			return false
 		end
@@ -1330,12 +1365,34 @@ function gadgetHandler:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, att
 	return true
 end
 
+-- AllowWeaponTarget is also called when auto-generating CAI attack commands.
+-- When targetID=-1 and weaponNum=-1 targetPriority determines the target search
+-- radius; targetPriority=nil accompanies any actual
+
 function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
 	local allowed = true
-	local priority = defPriority
+	local returnValue
 
-	for _, g in ipairs(self.AllowWeaponTargetList) do
-		-- Send priority to each sucessive gadget.
+	if targetID == -1 then
+		local unitID = attackerID
+		local aquireRange = defPriority
+		for _, g in r_ipairs(self.AllowUnitTargetRangeList) do
+			-- Send priority to each successive gadget.
+			local targetAllowed, newRange = g:AllowUnitTargetRange(unitID, aquireRange)
+
+			if (not targetAllowed) then
+				allowed = false
+				break
+			end
+
+			aquireRange = newRange
+		end
+		return true, aquireRange
+	end
+
+	local priority = defPriority
+	for _, g in r_ipairs(self.AllowWeaponTargetList) do
+		-- Send priority to each successive gadget.
 		local targetAllowed, targetPriority = g:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, priority)
 
 		if (not targetAllowed) then
@@ -1345,17 +1402,16 @@ function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum
 
 		priority = targetPriority
 	end
-
 	return allowed, priority
 end
 
 function gadgetHandler:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponNum, targetProjectileID)
-	for _, g in ipairs(self.AllowWeaponInterceptTargetList) do
+	for _, g in r_ipairs(self.AllowWeaponInterceptTargetList) do
 		if (not g:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponNum, targetProjectileID)) then
 			return false
 		end
 	end
-	
+
 	return true
 end
 
@@ -1370,7 +1426,7 @@ function gadgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
   finishedDuringCreated = false
   inCreated = true
-  for _,g in ipairs(self.UnitCreatedList) do
+  for _,g in r_ipairs(self.UnitCreatedList) do
     g:UnitCreated(unitID, unitDefID, unitTeam, builderID)
   end
   inCreated = false
@@ -1387,21 +1443,21 @@ function gadgetHandler:UnitFinished(unitID, unitDefID, unitTeam)
     return
   end
 
-  for _,g in ipairs(self.UnitFinishedList) do
+  for _,g in r_ipairs(self.UnitFinishedList) do
     g:UnitFinished(unitID, unitDefID, unitTeam)
   end
   return
 end
 
 function gadgetHandler:UnitReverseBuilt(unitID, unitDefID, unitTeam)
-  for _,g in ipairs(self.UnitReverseBuiltList) do
+  for _,g in r_ipairs(self.UnitReverseBuiltList) do
     g:UnitReverseBuilt(unitID, unitDefID, unitTeam)
   end
   return
 end
 
 function gadgetHandler:UnitStunned(unitID, unitDefID, unitTeam, stunned)
-  for _,g in ipairs(self.UnitStunnedList) do
+  for _,g in r_ipairs(self.UnitStunnedList) do
     g:UnitStunned(unitID, unitDefID, unitTeam, stunned)
   end
   return
@@ -1409,7 +1465,7 @@ end
 
 function gadgetHandler:UnitFromFactory(unitID, unitDefID, unitTeam,
                                        factID, factDefID, userOrders)
-  for _,g in ipairs(self.UnitFromFactoryList) do
+  for _,g in r_ipairs(self.UnitFromFactoryList) do
     g:UnitFromFactory(unitID, unitDefID, unitTeam,
                       factID, factDefID, userOrders)
   end
@@ -1420,7 +1476,7 @@ end
 function gadgetHandler:UnitDestroyed(unitID,     unitDefID,     unitTeam,
                                      attackerID, attackerDefID, attackerTeam, pre)
   if pre == false then return end
-  for _,g in ipairs(self.UnitDestroyedList) do
+  for _,g in r_ipairs(self.UnitDestroyedList) do
     g:UnitDestroyed(unitID,     unitDefID,     unitTeam,
                     attackerID, attackerDefID, attackerTeam)
   end
@@ -1429,7 +1485,7 @@ end
 
 
 function gadgetHandler:RenderUnitDestroyed(unitID, unitDefID, unitTeam)
-  for _,g in ipairs(self.RenderUnitDestroyedList) do
+  for _,g in r_ipairs(self.RenderUnitDestroyedList) do
     g:RenderUnitDestroyed(unitID, unitDefID, unitTeam)
   end
   return
@@ -1438,7 +1494,7 @@ end
 
 function gadgetHandler:UnitExperience(unitID, unitDefID, unitTeam,
                                       experience, oldExperience)
-  for _,g in ipairs(self.UnitExperienceList) do
+  for _,g in r_ipairs(self.UnitExperienceList) do
     g:UnitExperience(unitID, unitDefID, unitTeam, experience, oldExperience)
   end
   return
@@ -1446,7 +1502,7 @@ end
 
 
 function gadgetHandler:UnitIdle(unitID, unitDefID, unitTeam)
-  for _,g in ipairs(self.UnitIdleList) do
+  for _,g in r_ipairs(self.UnitIdleList) do
     g:UnitIdle(unitID, unitDefID, unitTeam)
   end
   return
@@ -1454,7 +1510,7 @@ end
 
 
 function gadgetHandler:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)
-  for _,g in ipairs(self.UnitCmdDoneList) do
+  for _,g in r_ipairs(self.UnitCmdDoneList) do
     g:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)
   end
   return
@@ -1473,9 +1529,9 @@ end
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponDefID,
 								   projectileID, attackerID, attackerDefID, attackerTeam)
-	
+
 	if UnitPreDamaged_first then
-		for _,g in ipairs(self.UnitPreDamagedList) do
+		for _,g in r_ipairs(self.UnitPreDamagedList) do
 			local weaponDefs = (g.UnitPreDamaged_GetWantedWeaponDef and g:UnitPreDamaged_GetWantedWeaponDef()) or allWeaponDefs
 			for _,wdid in ipairs(weaponDefs) do
 				if UnitPreDamaged_GadgetMap[wdid] then
@@ -1491,7 +1547,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 		end
 		UnitPreDamaged_first = false
 	end
-	
+
 	local rDam = damage
 	local rImp = 1.0
 
@@ -1521,11 +1577,11 @@ end
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponDefID,
 								   projectileID, attackerID, attackerDefID, attackerTeam)
-  
+
   local rDam = damage
   local rImp = 1.0
 
-  for _,g in ipairs(self.UnitPreDamagedList) do
+  for _,g in r_ipairs(self.UnitPreDamagedList) do
     dam, imp = g:UnitPreDamaged(unitID, unitDefID, unitTeam,
                   rDam, paralyzer, weaponDefID,
                   attackerID, attackerDefID, attackerTeam,
@@ -1547,11 +1603,11 @@ local UnitDamaged_count = 0
 local UnitDamaged_gadgets = {}
 
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponID, projectileID, 
+                                   damage, paralyzer, weaponID, projectileID,
                                    attackerID, attackerDefID, attackerTeam)
-								   
+
 	if UnitDamaged_first then
-		for _,g in ipairs(self.UnitDamagedList) do
+		for _,g in r_ipairs(self.UnitDamagedList) do
 			UnitDamaged_count = UnitDamaged_count + 1
 			UnitDamaged_gadgets[UnitDamaged_count] = g
 		end
@@ -1570,10 +1626,10 @@ end
 
 --[[ Old
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponID, projectileID, 
+                                   damage, paralyzer, weaponID, projectileID,
                                    attackerID, attackerDefID, attackerTeam)
-  
-  for _,g in ipairs(self.UnitDamagedList) do
+
+  for _,g in r_ipairs(self.UnitDamagedList) do
     g:UnitDamaged(unitID, unitDefID, unitTeam,
                   damage, paralyzer, weaponID,
                   attackerID, attackerDefID, attackerTeam)
@@ -1584,7 +1640,7 @@ end
 
 
 function gadgetHandler:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
-  for _,g in ipairs(self.UnitTakenList) do
+  for _,g in r_ipairs(self.UnitTakenList) do
     g:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
   end
   return
@@ -1592,7 +1648,7 @@ end
 
 
 function gadgetHandler:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
-  for _,g in ipairs(self.UnitGivenList) do
+  for _,g in r_ipairs(self.UnitGivenList) do
     g:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
   end
   return
@@ -1600,7 +1656,7 @@ end
 
 
 function gadgetHandler:UnitEnteredRadar(unitID, unitTeam, allyTeam, unitDefID)
-  for _,g in ipairs(self.UnitEnteredRadarList) do
+  for _,g in r_ipairs(self.UnitEnteredRadarList) do
     g:UnitEnteredRadar(unitID, unitTeam, allyTeam, unitDefID)
   end
   return
@@ -1608,7 +1664,7 @@ end
 
 
 function gadgetHandler:UnitEnteredLos(unitID, unitTeam, allyTeam, unitDefID)
-  for _,g in ipairs(self.UnitEnteredLosList) do
+  for _,g in r_ipairs(self.UnitEnteredLosList) do
     g:UnitEnteredLos(unitID, unitTeam, allyTeam, unitDefID)
   end
   return
@@ -1616,7 +1672,7 @@ end
 
 
 function gadgetHandler:UnitLeftRadar(unitID, unitTeam, allyTeam, unitDefID)
-  for _,g in ipairs(self.UnitLeftRadarList) do
+  for _,g in r_ipairs(self.UnitLeftRadarList) do
     g:UnitLeftRadar(unitID, unitTeam, allyTeam, unitDefID)
   end
   return
@@ -1624,7 +1680,7 @@ end
 
 
 function gadgetHandler:UnitLeftLos(unitID, unitTeam, allyTeam, unitDefID)
-  for _,g in ipairs(self.UnitLeftLosList) do
+  for _,g in r_ipairs(self.UnitLeftLosList) do
     g:UnitLeftLos(unitID, unitTeam, allyTeam, unitDefID)
   end
   return
@@ -1633,7 +1689,7 @@ end
 
 function gadgetHandler:UnitSeismicPing(x, y, z, strength,
                                        allyTeam, unitID, unitDefID)
-  for _,g in ipairs(self.UnitSeismicPingList) do
+  for _,g in r_ipairs(self.UnitSeismicPingList) do
     g:UnitSeismicPing(x, y, z, strength,
                       allyTeam, unitID, unitDefID)
   end
@@ -1643,7 +1699,7 @@ end
 
 function gadgetHandler:UnitLoaded(unitID, unitDefID, unitTeam,
                                   transportID, transportTeam)
-  for _,g in ipairs(self.UnitLoadedList) do
+  for _,g in r_ipairs(self.UnitLoadedList) do
     g:UnitLoaded(unitID, unitDefID, unitTeam,
                  transportID, transportTeam)
   end
@@ -1653,7 +1709,7 @@ end
 
 function gadgetHandler:UnitUnloaded(unitID, unitDefID, unitTeam,
                                     transportID, transportTeam)
-  for _,g in ipairs(self.UnitUnloadedList) do
+  for _,g in r_ipairs(self.UnitUnloadedList) do
     g:UnitUnloaded(unitID, unitDefID, unitTeam,
                    transportID, transportTeam)
   end
@@ -1662,7 +1718,7 @@ end
 
 
 function gadgetHandler:UnitCloaked(unitID, unitDefID, unitTeam)
-  for _,g in ipairs(self.UnitCloakedList) do
+  for _,g in r_ipairs(self.UnitCloakedList) do
     g:UnitCloaked(unitID, unitDefID, unitTeam)
   end
   return
@@ -1670,7 +1726,7 @@ end
 
 
 function gadgetHandler:UnitDecloaked(unitID, unitDefID, unitTeam)
-  for _,g in ipairs(self.UnitDecloakedList) do
+  for _,g in r_ipairs(self.UnitDecloakedList) do
     g:UnitDecloaked(unitID, unitDefID, unitTeam)
   end
   return
@@ -1678,13 +1734,13 @@ end
 
 
 function gadgetHandler:UnitUnitCollision(colliderID, collideeID)
-	for _,g in ipairs(self.UnitUnitCollisionList) do
+	for _,g in r_ipairs(self.UnitUnitCollisionList) do
 		g:UnitUnitCollision(colliderID, collideeID)
 	end
 end
 
 function gadgetHandler:UnitFeatureCollision(colliderID, collideeID)
-	for _,g in ipairs(self.UnitFeatureCollisionList) do
+	for _,g in r_ipairs(self.UnitFeatureCollisionList) do
 		g:UnitFeatureCollision(colliderID, collideeID)
 	end
 end
@@ -1692,7 +1748,7 @@ end
 
 function gadgetHandler:StockpileChanged(unitID, unitDefID, unitTeam,
                                         weaponNum, oldCount, newCount)
-  for _,g in ipairs(self.StockpileChangedList) do
+  for _,g in r_ipairs(self.StockpileChangedList) do
     g:StockpileChanged(unitID, unitDefID, unitTeam,
                        weaponNum, oldCount, newCount)
   end
@@ -1706,7 +1762,7 @@ end
 --
 
 function gadgetHandler:FeatureCreated(featureID, allyTeam)
-  for _,g in ipairs(self.FeatureCreatedList) do
+  for _,g in r_ipairs(self.FeatureCreatedList) do
     g:FeatureCreated(featureID, allyTeam)
   end
   return
@@ -1714,7 +1770,7 @@ end
 
 
 function gadgetHandler:FeatureDestroyed(featureID, allyTeam)
-  for _,g in ipairs(self.FeatureDestroyedList) do
+  for _,g in r_ipairs(self.FeatureDestroyedList) do
     g:FeatureDestroyed(featureID, allyTeam)
   end
   return
@@ -1727,7 +1783,7 @@ end
 --
 
 function gadgetHandler:ProjectileCreated(proID, proOwnerID, proWeaponDefID)
-  for _,g in ipairs(self.ProjectileCreatedList) do
+  for _,g in r_ipairs(self.ProjectileCreatedList) do
     g:ProjectileCreated(proID, proOwnerID, proWeaponDefID)
   end
   return
@@ -1735,7 +1791,7 @@ end
 
 
 function gadgetHandler:ProjectileDestroyed(proID)
-  for _,g in ipairs(self.ProjectileDestroyedList) do
+  for _,g in r_ipairs(self.ProjectileDestroyedList) do
     g:ProjectileDestroyed(proID)
   end
   return
@@ -1749,7 +1805,7 @@ end
 
 function gadgetHandler:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile, beamEmitterWeaponNum, beamEmitterUnitID, startX, startY, startZ, hitX, hitY, hitZ)
 
-  for _,g in ipairs(self.ShieldPreDamagedList) do
+  for _,g in r_ipairs(self.ShieldPreDamagedList) do
     -- first gadget to handle this consumes the event
     if (g:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile, beamEmitterWeaponNum, beamEmitterUnitID, startX, startY, startZ, hitX, hitY, hitZ)) then
       return true
@@ -1772,7 +1828,7 @@ local Explosion_first = true
 
 function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID, proID)
 	if Explosion_first then
-		for _,g in ipairs(self.ExplosionList) do
+		for _,g in r_ipairs(self.ExplosionList) do
 			local weaponDefs = (g.Explosion_GetWantedWeaponDef and g:Explosion_GetWantedWeaponDef()) or allWeaponDefs
 			for _,wdid in ipairs(weaponDefs) do
 				if Explosion_GadgetSingle[wdid] or Explosion_GadgetMap[wdid] then
@@ -1793,7 +1849,7 @@ function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID, proID)
 		end
 		Explosion_first = false
 	end
-	
+
 	local noGfx = false
 	local single = Explosion_GadgetSingle[weaponID]
 	local map = Explosion_GadgetMap[weaponID]
@@ -1814,7 +1870,7 @@ end
 --[[ Base
 function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID)
   local noGfx = false
-  for _,g in ipairs(self.ExplosionList) do
+  for _,g in r_ipairs(self.ExplosionList) do
 	noGfx = noGfx or g:Explosion(weaponID, px, py, pz, ownerID)
   end
   return noGfx
@@ -1826,16 +1882,23 @@ end
 --  Draw call-ins
 --
 
-function gadgetHandler:Update()
-  for _,g in ipairs(self.UpdateList) do
-    g:Update()
+function gadgetHandler:SunChanged()
+  for _,g in r_ipairs(self.SunChangedList) do
+    g:SunChanged()
+  end
+  return
+end
+
+function gadgetHandler:Update(deltaTime)
+  for _,g in r_ipairs(self.UpdateList) do
+    g:Update(deltaTime)
   end
   return
 end
 
 
 function gadgetHandler:DefaultCommand(type, id, engineCmd)
-  for _,g in ipairs(self.DefaultCommandList) do
+  for _,g in r_ipairs(self.DefaultCommandList) do
     local defCmd = g:DefaultCommand(type, id, engineCmd)
     if defCmd then
       return defCmd
@@ -1846,7 +1909,7 @@ end
 
 
 function gadgetHandler:DrawGenesis()
-  for _,g in ipairs(self.DrawGenesisList) do
+  for _,g in r_ipairs(self.DrawGenesisList) do
     g:DrawGenesis()
   end
   return
@@ -1854,7 +1917,7 @@ end
 
 
 function gadgetHandler:DrawWorld()
-  for _,g in ipairs(self.DrawWorldList) do
+  for _,g in r_ipairs(self.DrawWorldList) do
     g:DrawWorld()
   end
   return
@@ -1862,7 +1925,7 @@ end
 
 
 function gadgetHandler:DrawWorldPreUnit()
-  for _,g in ipairs(self.DrawWorldPreUnitList) do
+  for _,g in r_ipairs(self.DrawWorldPreUnitList) do
     g:DrawWorldPreUnit()
   end
   return
@@ -1870,7 +1933,7 @@ end
 
 
 function gadgetHandler:DrawWorldShadow()
-  for _,g in ipairs(self.DrawWorldShadowList) do
+  for _,g in r_ipairs(self.DrawWorldShadowList) do
     g:DrawWorldShadow()
   end
   return
@@ -1878,7 +1941,7 @@ end
 
 
 function gadgetHandler:DrawWorldReflection()
-  for _,g in ipairs(self.DrawWorldReflectionList) do
+  for _,g in r_ipairs(self.DrawWorldReflectionList) do
     g:DrawWorldReflection()
   end
   return
@@ -1886,7 +1949,7 @@ end
 
 
 function gadgetHandler:DrawWorldRefraction()
-  for _,g in ipairs(self.DrawWorldRefractionList) do
+  for _,g in r_ipairs(self.DrawWorldRefractionList) do
     g:DrawWorldRefraction()
   end
   return
@@ -1894,14 +1957,14 @@ end
 
 
 function gadgetHandler:DrawScreenEffects(vsx, vsy)
-  for _,g in ipairs(self.DrawScreenEffectsList) do
+  for _,g in r_ipairs(self.DrawScreenEffectsList) do
     g:DrawScreenEffects(vsx, vsy)
   end
   return
 end
 
 function gadgetHandler:DrawScreenPost(vsx, vsy)
-  for _,g in ipairs(self.DrawScreenPostList) do
+  for _,g in r_ipairs(self.DrawScreenPostList) do
     g:DrawScreenPost(vsx, vsy)
   end
   return
@@ -1909,7 +1972,7 @@ end
 
 
 function gadgetHandler:DrawScreen(vsx, vsy)
-  for _,g in ipairs(self.DrawScreenList) do
+  for _,g in r_ipairs(self.DrawScreenList) do
     g:DrawScreen(vsx, vsy)
   end
   return
@@ -1917,7 +1980,7 @@ end
 
 
 function gadgetHandler:DrawInMiniMap(mmsx, mmsy)
-  for _,g in ipairs(self.DrawInMiniMapList) do
+  for _,g in r_ipairs(self.DrawInMiniMapList) do
     g:DrawInMiniMap(mmsx, mmsy)
   end
   return
@@ -1928,7 +1991,7 @@ end
 --------------------------------------------------------------------------------
 
 function gadgetHandler:KeyPress(key, mods, isRepeat, label, unicode)
-  for _,g in ipairs(self.KeyPressList) do
+  for _,g in r_ipairs(self.KeyPressList) do
     if (g:KeyPress(key, mods, isRepeat, label, unicode)) then
       return true
     end
@@ -1938,7 +2001,7 @@ end
 
 
 function gadgetHandler:KeyRelease(key, mods, label, unicode)
-  for _,g in ipairs(self.KeyReleaseList) do
+  for _,g in r_ipairs(self.KeyReleaseList) do
     if (g:KeyRelease(key, mods, label, unicode)) then
       return true
     end
@@ -1953,7 +2016,7 @@ function gadgetHandler:MousePress(x, y, button)
     mo:MousePress(x, y, button)
     return true  --  already have an active press
   end
-  for _,g in ipairs(self.MousePressList) do
+  for _,g in r_ipairs(self.MousePressList) do
     if (g:MousePress(x, y, button)) then
       self.mouseOwner = g
       return true
@@ -1985,7 +2048,7 @@ end
 
 
 function gadgetHandler:MouseWheel(up, value)
-  for _,g in ipairs(self.MouseWheelList) do
+  for _,g in r_ipairs(self.MouseWheelList) do
     if (g:MouseWheel(up, value)) then
       return true
     end
@@ -1995,7 +2058,7 @@ end
 
 
 function gadgetHandler:IsAbove(x, y)
-  for _,g in ipairs(self.IsAboveList) do
+  for _,g in r_ipairs(self.IsAboveList) do
     if (g:IsAbove(x, y)) then
       return true
     end
@@ -2005,7 +2068,7 @@ end
 
 
 function gadgetHandler:GetTooltip(x, y)
-  for _,g in ipairs(self.GetTooltipList) do
+  for _,g in r_ipairs(self.GetTooltipList) do
     if (g:IsAbove(x, y)) then
       local tip = g:GetTooltip(x, y)
       if (string.len(tip) > 0) then
@@ -2018,7 +2081,7 @@ end
 
 
 function gadgetHandler:UnsyncedHeightMapUpdate(x1, z1, x2, z2)
-  for _,g in ipairs(self.UnsyncedHeightMapUpdateList) do
+  for _,g in r_ipairs(self.UnsyncedHeightMapUpdateList) do
     g:UnsyncedHeightMapUpdate(x1, z1, x2, z2)
   end
   return
@@ -2027,7 +2090,7 @@ end
 --------------------------------------------------------------------------------
 
 function gadgetHandler:Save(zip)
-  for _,g in ipairs(self.SaveList) do
+  for _,g in r_ipairs(self.SaveList) do
     g:Save(zip)
   end
   return
@@ -2035,7 +2098,7 @@ end
 
 
 function gadgetHandler:Load(zip)
-  for _,g in ipairs(self.LoadList) do
+  for _,g in r_ipairs(self.LoadList) do
     g:Load(zip)
   end
   return
@@ -2059,7 +2122,7 @@ local AllowCommand_WantedUnitDefID = {}
 
 function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced) 	-- ours
 --function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)	-- base
-  for _,g in ipairs(self.AllowCommandList) do
+  for _,g in r_ipairs(self.AllowCommandList) do
 	if not AllowCommand_WantedCommand[g] then
 		AllowCommand_WantedCommand[g] = (g.AllowCommand_GetWantedCommand and g:AllowCommand_GetWantedCommand()) or true
 	end
@@ -2092,7 +2155,7 @@ function gadgetHandler:RecvFromSynced(cmd,...)
   if (actionHandler.RecvFromSynced(cmd, ...)) then
     return
   end
-  for _,g in ipairs(self.RecvFromSyncedList) do
+  for _,g in r_ipairs(self.RecvFromSyncedList) do
     if (g:RecvFromSynced(cmd, ...)) then
       return
     end
@@ -2106,7 +2169,7 @@ function gadgetHandler:RecvFromSynced(...)
   if (actionHandler.RecvFromSynced(...)) then
     return
   end
-  for _,g in ipairs(self.RecvFromSyncedList) do
+  for _,g in r_ipairs(self.RecvFromSyncedList) do
     if (g:RecvFromSynced(...)) then
       return
     end
@@ -2143,7 +2206,7 @@ function gadgetHandler:GotChatMsg(msg, player)
     return true
   end
 
-  for _,g in ipairs(self.GotChatMsgList) do
+  for _,g in r_ipairs(self.GotChatMsgList) do
     if (g:GotChatMsg(msg, player)) then
       return true
     end
@@ -2158,7 +2221,7 @@ function gadgetHandler:ViewResize(viewGeometry)
   local vsx = viewGeometry.viewSizeX
   local vsy = viewGeometry.viewSizeY
 
-  for _,g in ipairs(self.ViewResizeList) do
+  for _,g in r_ipairs(self.ViewResizeList) do
     g:ViewResize(vsx, vsy, viewGeometry)
   end
   return
@@ -2167,7 +2230,7 @@ end
 -- base
 --[[
 function gadgetHandler:ViewResize(vsx, vsy)
-  for _,g in ipairs(self.ViewResizeList) do
+  for _,g in r_ipairs(self.ViewResizeList) do
     g:ViewResize(vsx, vsy)
   end
   return
@@ -2193,14 +2256,14 @@ end
 --
 
 function gadgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams) -- opts is a bitmask
-  for _,g in ipairs(self.UnitCommandList) do
-    g:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams) 
+  for _,g in r_ipairs(self.UnitCommandList) do
+    g:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
   end
   return
 end
 
 function gadgetHandler:UnitEnteredWater(unitID, unitDefID, unitTeam)
-  for _,g in ipairs(self.UnitEnteredWaterList) do
+  for _,g in r_ipairs(self.UnitEnteredWaterList) do
     g:UnitEnteredWater(unitID, unitDefID, unitTeam)
   end
   return
@@ -2208,7 +2271,7 @@ end
 
 
 function gadgetHandler:UnitEnteredAir(unitID, unitDefID, unitTeam)
-  for _,g in ipairs(self.UnitEnteredAirList) do
+  for _,g in r_ipairs(self.UnitEnteredAirList) do
     g:UnitEnteredAir(unitID, unitDefID, unitTeam)
   end
   return
@@ -2216,7 +2279,7 @@ end
 
 
 function gadgetHandler:UnitLeftWater(unitID, unitDefID, unitTeam)
-  for _,g in ipairs(self.UnitLeftWaterList) do
+  for _,g in r_ipairs(self.UnitLeftWaterList) do
     g:UnitLeftWater(unitID, unitDefID, unitTeam)
   end
   return
@@ -2224,14 +2287,14 @@ end
 
 
 function gadgetHandler:UnitLeftAir(unitID, unitDefID, unitTeam)
-  for _,g in ipairs(self.UnitLeftAirList) do
+  for _,g in r_ipairs(self.UnitLeftAirList) do
     g:UnitLeftAir(unitID, unitDefID, unitTeam)
   end
   return
 end
 
 function gadgetHandler:GameSetup(state, ready, playerStates)
-  for _,g in ipairs(self.GameSetupList) do
+  for _,g in r_ipairs(self.GameSetupList) do
     local success, newReady = g:GameSetup(state, ready, playerStates)
     if (success) then
       return true, newReady

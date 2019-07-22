@@ -1,5 +1,6 @@
 include "constants.lua"
 include "rockPiece.lua"
+local dynamicRockData
 include "trackControl.lua"
 include "pieceControl.lua"
 
@@ -15,6 +16,7 @@ local smoke = piece 'smoke'
 
 local gunHeading = 0
 local moving = false
+local hpi = math.pi*0.5
 
 local RESTORE_DELAY = 3000
 
@@ -132,14 +134,14 @@ function script.StopMoving()
 end
 
 function script.Create()
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 	InitiailizeTrackControl(trackData)
 	
 	Hide(flare)
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (250)
 	end
-	StartThread (SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, smokePiece)
 end
 
 local function RestoreAfterDelay()
@@ -171,8 +173,8 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon()
-	StartThread(Rock, 1, gunHeading, ROCK_FIRE_FORCE_TILT)
-	StartThread(Push, 2, gunHeading - hpi, ROCK_FIRE_FORCE_PUSH)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[1], gunHeading, ROCK_FIRE_FORCE_TILT)
+	StartThread(GG.ScriptRock.Push, dynamicRockData[2], gunHeading - hpi, ROCK_FIRE_FORCE_PUSH)
 	Move(barrel, z_axis, BARREL_DISTANCE)
 	Move(breech, z_axis, BREECH_DISTANCE)
 	Move(barrel, z_axis, 0, BARREL_SPEED)
@@ -193,21 +195,21 @@ function script.Killed(recentDamage, maxHealth)
 		return 1
 	elseif (severity < 0.5) then
 		corpsetype = 1
-		Explode(barrel, sfxFall)
-		Explode(breech, sfxFall)
-		Explode(sleeve, sfxFall)
-		Explode(turret, sfxShatter)
+		Explode(barrel, SFX.FALL)
+		Explode(breech, SFX.FALL)
+		Explode(sleeve, SFX.FALL)
+		Explode(turret, SFX.SHATTER)
 		return 1
 	elseif(severity < 1) then
-		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(breech, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(sleeve, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(turret, sfxShatter)
+		Explode(barrel, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(breech, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(sleeve, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(turret, SFX.SHATTER)
 		return 2
 	end
-	Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(breech, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(sleeve, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(turret, sfxShatter + sfxExplodeOnHit)
+	Explode(barrel, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(breech, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(sleeve, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(turret, SFX.SHATTER + SFX.EXPLODE_ON_HIT)
 	return 2
 end

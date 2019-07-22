@@ -6,13 +6,6 @@ VFS.Include("LuaRules/Utilities/versionCompare.lua")
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
-local origValidUnitID = Spring.ValidUnitID
-
-local function newValidUnitID(unitID)
-	return unitID and origValidUnitID(unitID)
-end
-
-Spring.ValidUnitID = newValidUnitID
 
 local function SetPlayerRulesParam(playerID, key, value)
 	return Spring.SetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key, value)
@@ -60,52 +53,56 @@ end
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
-if Spring.Utilities.IsCurrentVersionNewerThan(100, 0) then
-	Spring.MoveCtrl = Spring.MoveCtrl or {}
-	local origMcSetUnitRotation = Spring.MoveCtrl.SetRotation
-	local origMcSetUnitRotationVelocity = Spring.MoveCtrl.SetRotationVelocity
 
-	local function newMcSetUnitRotation(unitID, x, y, z)
-		return origMcSetUnitRotation(unitID, -x, -y, -z)
-	end
-
-	local function newMcSetUnitRotationVelocity(unitID, x, y, z)
-		return origMcSetUnitRotationVelocity(unitID, -x, -y, -z)
-	end
-	
-	Spring.MoveCtrl.SetRotation = newMcSetUnitRotation
-	Spring.MoveCtrl.SetRotationVelocity = newMcSetUnitRotationVelocity
-end
-
-local origGetGroundInfo = Spring.GetGroundInfo
-local function GetGroundInfo(x, z)
-	local r1, r2, r3, r4, r5, r6, r7, r8, r9 = origGetGroundInfo(x, z)
-	if type(r1) == "string" then
-		return r1, r2, r3, r4, r5, r6, r7, r8
-	else
+if Script.IsEngineMinVersion(104, 0, 50) then
+	local origGetGroundInfo = Spring.GetGroundInfo
+	Spring.GetGroundInfo = function (x, z)
+		local r1, r2, r3, r4, r5, r6, r7, r8, r9 = origGetGroundInfo(x, z)
 		return r2, r3, r4, r5, r6, r7, r8, r9, r1
 	end
-end
-Spring.GetGroundInfo = GetGroundInfo
 
-local origGetTerrainTypeData = Spring.GetTerrainTypeData
-local function GetTerrainTypeData(index)
-	local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTerrainTypeData(index)
-	if type(r1) == "string" then
-		return r1, r2, r3, r4, r5, r6, r7
-	else
+	local origGetTerrainTypeData = Spring.GetTerrainTypeData
+	Spring.GetTerrainTypeData = function (index)
+		local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTerrainTypeData(index)
 		return r2, r3, r4, r5, r6, r7, r8, r1
 	end
 end
-Spring.GetTerrainTypeData = GetTerrainTypeData
 
-local origGetPlayerInfo = Spring.GetPlayerInfo
-local function GetPlayerInfo(playerID)
-	local r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11 = origGetPlayerInfo(playerID)
-	if type(r10) == "table" then
-		return r1, r2, r3, r4, r5, r6, r7, r8, r9, r10
-	else
+if Script.IsEngineMinVersion(104, 0, 536) then
+	local origGetPlayerInfo = Spring.GetPlayerInfo
+	Spring.GetPlayerInfo = function (playerID)
+		if not playerID then
+			return
+		end
+		local r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11 = origGetPlayerInfo(playerID)
 		return r1, r2, r3, r4, r5, r6, r7, r8, r9, r11, r10
 	end
 end
-Spring.GetPlayerInfo = GetPlayerInfo
+
+if not Script.IsEngineMinVersion(104, 0, 1143) then
+	local spGetCommandQueue = Spring.GetCommandQueue
+	local unpacc = unpack
+	Spring.GetUnitCurrentCommand = function (unitID, index)
+		index = index or 1
+
+		local queue = spGetCommandQueue(unitID, index)
+		if not queue then
+			return
+		end
+
+		local command = queue[index]
+		if not command then
+			return
+		end
+
+		return command.id, command.options.coded, command.tag, unpacc(command.params)
+	end
+end
+
+if Script.IsEngineMinVersion(104, 0, 1166) then
+	local origGetTeamInfo = Spring.GetTeamInfo
+	Spring.GetTeamInfo = function (p1, p2)
+		local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTeamInfo(p1, p2)
+		return r1, r2, r3, r4, r5, r6, r8, r7
+	end
+end

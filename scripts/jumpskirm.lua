@@ -174,7 +174,7 @@ function script.Create()
 	Hide(flare)
 	Hide(support)
 	Hide(barrel)
-	StartThread(SmokeUnit, {torso})
+	StartThread(GG.Script.SmokeUnit, {torso})
 end
 
 function script.StartMoving()
@@ -244,31 +244,31 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= 0.25 then
-		Explode(foot1, sfxNone)
-		Explode(foot2, sfxNone)
-		Explode(leg1, sfxNone)
-		Explode(leg2, sfxNone)
-		Explode(thigh1, sfxNone)
-		Explode(thigh2, sfxNone)
-		Explode(torso, sfxNone)
+		Explode(foot1, SFX.NONE)
+		Explode(foot2, SFX.NONE)
+		Explode(leg1, SFX.NONE)
+		Explode(leg2, SFX.NONE)
+		Explode(thigh1, SFX.NONE)
+		Explode(thigh2, SFX.NONE)
+		Explode(torso, SFX.NONE)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(foot1, sfxNone)
-		Explode(foot2, sfxNone)
-		Explode(leg1, sfxNone)
-		Explode(leg2, sfxNone)
-		Explode(thigh1, sfxNone)
-		Explode(thigh2, sfxNone)
-		Explode(torso, sfxShatter)
+		Explode(foot1, SFX.NONE)
+		Explode(foot2, SFX.NONE)
+		Explode(leg1, SFX.NONE)
+		Explode(leg2, SFX.NONE)
+		Explode(thigh1, SFX.NONE)
+		Explode(thigh2, SFX.NONE)
+		Explode(torso, SFX.SHATTER)
 		return 1
 	end
 
-	Explode(foot1, sfxSmoke + sfxFire)
-	Explode(foot2, sfxSmoke + sfxFire)
-	Explode(leg1, sfxSmoke + sfxFire)
-	Explode(leg2, sfxSmoke + sfxFire)
-	Explode(thigh1, sfxSmoke + sfxFire)
-	Explode(thigh2, sfxSmoke + sfxFire)
-	Explode(torso, sfxShatter)
+	Explode(foot1, SFX.SMOKE + SFX.FIRE)
+	Explode(foot2, SFX.SMOKE + SFX.FIRE)
+	Explode(leg1, SFX.SMOKE + SFX.FIRE)
+	Explode(leg2, SFX.SMOKE + SFX.FIRE)
+	Explode(thigh1, SFX.SMOKE + SFX.FIRE)
+	Explode(thigh2, SFX.SMOKE + SFX.FIRE)
+	Explode(torso, SFX.SHATTER)
 	return 2
 end

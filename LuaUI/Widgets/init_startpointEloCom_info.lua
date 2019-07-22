@@ -56,7 +56,7 @@ function widget:Initialize()
 		local playerList = Spring.GetPlayerList(teamID)--get player(s) in a team
 		for j=1, #playerList do
 			local playerID = playerList[j]
-			local _,_,spec,_,_,_,_,_,_,customKey = Spring.GetPlayerInfo(playerID) --get customPlayerKey
+			local _,_,spec,_,_,_,_,_,_,customKey = Spring.GetPlayerInfo(playerID) --get customPlayerKey -- oh really? no fucking shit sherlock
 			local icon = 'LuaUI/Images/LobbyRanks/' .. (customKey and customKey.icon or "0_0") .. '.png'
 			local validEntry = not (x==y and x==z) and (not spec)
 			playerInfo[#playerInfo +1] = {icon=icon, xyz={x,y,z},playerID=playerID,teamID=teamID, validEntry=validEntry,
@@ -79,7 +79,7 @@ function widget:Update(dt)
 			local teamID = playerInfo[i].teamID
 			local playerID = playerInfo[i].playerID
 			local comDefName = playerInfo[i].comDefName
-			local _,active,spec = Spring.GetPlayerInfo(playerID)
+			local _,active,spec = Spring.GetPlayerInfo(playerID, false)
 			local x,y,z = Spring.GetTeamStartPosition(teamID) --update player's start position (if available).
 			x,y,z = x or 0 ,y or 0, z or 0 --safety for spectating using restricted LOS
 			local validEntry = not (x==y and x==z) and active and (not spec) -- invalidate symmetrical coordinate (since they are not humanly possible, probably indicate issues), and invalidate "nil" rank, and invalidate disconnected players, and invalid spec
@@ -139,7 +139,7 @@ function widget:DrawScreenEffects()
 	end
 
 	gl.Color(1,1,1,1)
-	gl.DepthMask(true)
+	-- gl.DepthMask(true)
 	gl.DepthTest(true)
 	gl.AlphaTest(GL.GREATER, 0.001)
 	
@@ -174,5 +174,5 @@ function widget:DrawScreenEffects()
 	
 	gl.AlphaTest(false)
 	gl.DepthTest(false)
-	gl.DepthMask(false)
+	-- gl.DepthMask(false)
 end

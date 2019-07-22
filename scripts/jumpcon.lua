@@ -563,12 +563,12 @@ end
 
 function beginJump()
 	script.StopMoving()
-	EmitSfx(jump, UNIT_SFX2)
+	EmitSfx(jump, GG.Script.UNIT_SFX2)
 end
 
 function jumping()
 	GG.PokeDecloakUnit(unitID, 50)
-	EmitSfx(thrust, UNIT_SFX1)
+	EmitSfx(thrust, GG.Script.UNIT_SFX1)
 end
 
 function halfJump()
@@ -576,7 +576,7 @@ end
 
 function endJump()
 	script.StopMoving()
-	EmitSfx(jump, UNIT_SFX2)
+	EmitSfx(jump, GG.Script.UNIT_SFX2)
 end
 
 --------------------------
@@ -587,7 +587,7 @@ function script.Create()
 	Hide(jump)
 	Hide(flare)
 	Turn(thrust, x_axis, math.rad(70), math.rad(2000))
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, {nanoPiece})
 end
 
@@ -596,49 +596,49 @@ function script.Killed(recentDamage, maxHealth)
 	Hide(flare)
 	if severity <= 0.25 then
 	
-		Explode(head, sfxNone)
-		Explode(pelvis, sfxNone)
-		Explode(lhand, sfxNone)
-		Explode(lcalf, sfxNone)
-		Explode(larm, sfxNone)
-		Explode(lthigh, sfxNone)
-		Explode(rhand, sfxNone)
-		Explode(rcalf, sfxNone)
-		Explode(rarm, sfxNone)
-		Explode(rthigh, sfxNone)
-		Explode(thrust, sfxNone)
-		Explode(torso, sfxNone)
+		Explode(head, SFX.NONE)
+		Explode(pelvis, SFX.NONE)
+		Explode(lhand, SFX.NONE)
+		Explode(lcalf, SFX.NONE)
+		Explode(larm, SFX.NONE)
+		Explode(lthigh, SFX.NONE)
+		Explode(rhand, SFX.NONE)
+		Explode(rcalf, SFX.NONE)
+		Explode(rarm, SFX.NONE)
+		Explode(rthigh, SFX.NONE)
+		Explode(thrust, SFX.NONE)
+		Explode(torso, SFX.NONE)
 		return 1
 	end
 	if severity <= 0.5 then
 	
-		Explode(head, sfxFall)
-		Explode(pelvis, sfxFall)
-		Explode(lhand, sfxFall)
-		Explode(lcalf, sfxFall)
-		Explode(larm, sfxFall)
-		Explode(lthigh, sfxFall)
-		Explode(rhand, sfxFall)
-		Explode(rcalf, sfxFall)
-		Explode(rarm, sfxFall)
-		Explode(rthigh, sfxFall)
-		Explode(thrust, sfxFall)
-		Explode(torso, sfxShatter)
+		Explode(head, SFX.FALL)
+		Explode(pelvis, SFX.FALL)
+		Explode(lhand, SFX.FALL)
+		Explode(lcalf, SFX.FALL)
+		Explode(larm, SFX.FALL)
+		Explode(lthigh, SFX.FALL)
+		Explode(rhand, SFX.FALL)
+		Explode(rcalf, SFX.FALL)
+		Explode(rarm, SFX.FALL)
+		Explode(rthigh, SFX.FALL)
+		Explode(thrust, SFX.FALL)
+		Explode(torso, SFX.SHATTER)
 		return 1
 	end
 	
-	Explode(head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(pelvis, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(lhand, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(lcalf, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(larm, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(rhand, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(rcalf, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(rarm, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(thrust, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(torso, sfxShatter)
+	Explode(head, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(pelvis, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lhand, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lcalf, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(larm, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lthigh, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rhand, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rcalf, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rarm, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rthigh, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(thrust, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(torso, SFX.SHATTER)
 	return 2
 
 end

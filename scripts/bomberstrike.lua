@@ -25,7 +25,7 @@ local bFirepoint2 = false
 
 function script.Create()
 	Turn(turret, y_axis, math.pi)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Move(wingl, x_axis, -5, 7)
 	Move(wingr, x_axis, 5, 7)
 	Hide(turretbase)
@@ -119,26 +119,26 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .5 then
-	Explode(fuselage, sfxNone)
-	Explode(head, sfxNone)
-	Explode(wingl, sfxNone)
-	Explode(wingr, sfxNone)
-	Explode(enginel, sfxNone)
-	Explode(enginer, sfxNone)
-	Explode(turret, sfxNone)
-	Explode(sleevel, sfxNone)
-	Explode(sleever, sfxNone)
+	Explode(fuselage, SFX.NONE)
+	Explode(head, SFX.NONE)
+	Explode(wingl, SFX.NONE)
+	Explode(wingr, SFX.NONE)
+	Explode(enginel, SFX.NONE)
+	Explode(enginer, SFX.NONE)
+	Explode(turret, SFX.NONE)
+	Explode(sleevel, SFX.NONE)
+	Explode(sleever, SFX.NONE)
 	return 1
 	else	
-	Explode(fuselage, sfxFall + sfxSmoke)
-	Explode(head, sfxFall + sfxSmoke + sfxFire)
-	Explode(wingl, sfxFall + sfxSmoke)
-	Explode(wingr, sfxFall + sfxSmoke)
-	Explode(enginel, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-	Explode(enginer, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-	Explode(turret, sfxFall + sfxSmoke + sfxFire)
-	Explode(sleevel, sfxFall + sfxSmoke)
-	Explode(sleever, sfxFall + sfxSmoke)
+	Explode(fuselage, SFX.FALL + SFX.SMOKE)
+	Explode(head, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+	Explode(wingl, SFX.FALL + SFX.SMOKE)
+	Explode(wingr, SFX.FALL + SFX.SMOKE)
+	Explode(enginel, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+	Explode(enginer, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+	Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+	Explode(sleevel, SFX.FALL + SFX.SMOKE)
+	Explode(sleever, SFX.FALL + SFX.SMOKE)
 	return 2
 	end
 end

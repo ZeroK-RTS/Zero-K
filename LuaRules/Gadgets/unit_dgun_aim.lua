@@ -19,15 +19,13 @@ if (not gadgetHandler:IsSyncedCode()) then
   return false  --  silent removal
 end
 
-local cmd = CMD.MANUALFIRE
+local CMD_MANUALFIRE = CMD.MANUALFIRE
+local descIconUnitOrMap = { type = CMDTYPE.ICON_UNIT_OR_MAP }
 
 local spFindUnitCmdDesc = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc = Spring.EditUnitCmdDesc
 
 function gadget:UnitCreated(unitID, unitDefID, team)
-	local cmd = spFindUnitCmdDesc(unitID, cmd)
-	local desc = {
-		type = CMDTYPE.ICON_UNIT_OR_MAP,
-	}
-	if cmd then spEditUnitCmdDesc(unitID, cmd, desc) end
+	local cmd = spFindUnitCmdDesc(unitID, CMD_MANUALFIRE)
+	if cmd then spEditUnitCmdDesc(unitID, cmd, descIconUnitOrMap) end
 end

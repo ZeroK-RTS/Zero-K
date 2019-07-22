@@ -106,9 +106,10 @@ effectUnitDefs = {
 	},
 	
 	striderfunnelweb = {
-	--{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4, onActive = true}},
-	{class='Bursts', options=MergeTable(staticshieldBursts, {piece="aimpoint"})},
-	{class='ShieldSphere', options=staticshieldBall},
+		{class='Bursts', options=MergeTable(staticshieldBurstsBig, {piece="emitl", pos={2,14.3,0}, shieldRechargeDelay = tonumber(WeaponDefNames["striderfunnelweb_shield"].customParams.shield_recharge_delay), colormap = { {0.3, 0.3, 1, 0.8} }})},
+		{class='Bursts', options=MergeTable(staticshieldBurstsBig, {piece="emitr", pos={-2,14.3,0}, shieldRechargeDelay = tonumber(WeaponDefNames["striderfunnelweb_shield"].customParams.shield_recharge_delay), colormap = { {0.3, 0.3, 1, 0.8} }})},
+		{class='ShieldSphere', options={piece="emitl", life=math.huge, size=14.5, pos={2,14.3,0}, colormap1 = {{0.1, 0.85, 0.95, 0.9}}, colormap2 = {{0.5, 0.3, 0.95, 0.2}}, rechargingColor1 = {0.95, 0.4, 0.4, 1.0}, rechargingColor2 = {0.95, 0.1, 0.4, 0.2}, shieldRechargeDelay = 30*tonumber(WeaponDefNames["striderfunnelweb_shield"].customParams.shield_recharge_delay), shieldRechargeSize = 7, repeatEffect=true}},	
+		{class='ShieldSphere', options={piece="emitr", life=math.huge, size=14.5, pos={-2,14.3,0}, colormap1 = {{0.1, 0.85, 0.95, 0.9}}, colormap2 = {{0.5, 0.3, 0.95, 0.2}}, rechargingColor1 = {0.95, 0.4, 0.4, 1.0}, rechargingColor2 = {0.95, 0.1, 0.4, 0.2}, shieldRechargeDelay = 30*tonumber(WeaponDefNames["striderfunnelweb_shield"].customParams.shield_recharge_delay), shieldRechargeSize = 7, repeatEffect=false}},	
 	},
 
 	--// ENERGY STORAGE //--------------------
@@ -348,6 +349,14 @@ effectUnitDefs = {
 		{class='Ribbon', options={width=1, size=8, piece="wingtipr"}},
 	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },		
+	},
+	planelightscout = {
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=1.8, length=15, piece="exhaustl", onActive=true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=1.8, length=15, piece="exhaustr", onActive=true}},
+		{class='Ribbon', options={width=1, size=6, piece="wingtipl"}},
+		{class='Ribbon', options={width=1, size=6, piece="wingtipr"}},
+	--{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
+	--{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },		
 	},
 	gunshipassault = {
 		{class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Lengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},

@@ -569,7 +569,7 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_flylandstate_1_factory"
 	end
 
-	if ud.isFactory then
+	if ud.isFactory or ud.customParams.isfakefactory then
 		options[defName .. "_repeat"] = {
 			name = "  Repeat",
 			desc = "Repeat construction queue.",
@@ -832,7 +832,7 @@ end
 
 local function AmITeamLeader(teamID)
 	local myTeam = (teamID == Spring.GetMyTeamID())
-	local amLeader = myTeam and (Spring.GetMyPlayerID() == select (2, Spring.GetTeamInfo(teamID)))
+	local amLeader = myTeam and (Spring.GetMyPlayerID() == select (2, Spring.GetTeamInfo(teamID, false)))
 	return myTeam, amLeader
 end
 
@@ -883,7 +883,6 @@ local function GetFactoryDefState(unitDefName, stateName)
 	else
 		return state
 	end
-	return nil
 end
 
 local function GetStateValue(unitDefName, stateName)
@@ -938,12 +937,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 		orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate0.value}, CMD.OPT_SHIFT}
 		orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, CMD.OPT_SHIFT}
+		orderArray[3] = {CMD_RETREAT, {options.commander_retreat.value}, CMD.OPT_SHIFT + (options.commander_retreat.value == 0 and CMD.OPT_RIGHT or 0)}
 		if WG.SetAutoCallTransportState and options.commander_auto_call_transport_2.value == 1 then
 			WG.SetAutoCallTransportState(unitID, unitDefID, true)
 		end
-		if WG['retreat'] then
-			WG['retreat'].addRetreatCommand(unitID, unitDefID, options.commander_retreat.value)
-		end
+
 		if options.commander_selection_rank and WG.SetSelectionRank then
 			WG.SetSelectionRank(unitID, options.commander_selection_rank.value)
 		end
@@ -958,7 +956,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				if builderID then
 					local bdid = Spring.GetUnitDefID(builderID)
 					if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
-						local firestate = Spring.GetUnitStates(builderID).firestate
+						local firestate = Spring.Utilities.GetUnitFireState(builderID)
 						if firestate then
 							orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, CMD.OPT_SHIFT}
 							trueBuilder = true
@@ -983,7 +981,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				if builderID then
 					local bdid = Spring.GetUnitDefID(builderID)
 					if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
-						local movestate = Spring.GetUnitStates(builderID).movestate
+						local movestate = Spring.Utilities.GetUnitMoveState(builderID)
 						if movestate then
 							orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, CMD.OPT_SHIFT}
 							trueBuilder = true

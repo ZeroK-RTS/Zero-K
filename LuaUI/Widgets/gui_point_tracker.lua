@@ -75,7 +75,7 @@ local vsx, vsy, sMidX, sMidY
 --local functions
 ----------------------------------------------------------------
 local function GetPlayerColor(playerID)
-	local _, _, isSpec, teamID = GetPlayerInfo(playerID)
+	local _, _, isSpec, teamID = GetPlayerInfo(playerID, false)
 	if (isSpec) then return GetTeamColor(Spring.GetGaiaTeamID()) end
 	if (not teamID) then return nil end
 	return GetTeamColor(teamID)
@@ -229,7 +229,7 @@ function widget:MapDrawCmd(playerID, cmdType, px, py, pz, label)
 		StartTime()
 	end
 	local spectator, fullView = GetSpectatingState()
-	local _, _, _, playerTeam = GetPlayerInfo(playerID)
+	local _, _, _, playerTeam = GetPlayerInfo(playerID, false)
 	if (label == "Start " .. playerTeam
 			or cmdType ~= "point" 
 			or not (ArePlayersAllied(myPlayerID, playerID) or (spectator and fullView))) then 

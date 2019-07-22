@@ -7,7 +7,7 @@ local spin = math.rad(60)
 local spinAccel = math.rad(6)
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Activate()
@@ -25,14 +25,14 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then
-		Explode(base, sfxNone)
-		Explode(cylinder, sfxNone)
-		Explode(radars, sfxShatter)
+		Explode(base, SFX.NONE)
+		Explode(cylinder, SFX.NONE)
+		Explode(radars, SFX.SHATTER)
 		return 1
 	else
-		Explode(base, sfxShatter)
-		Explode(cylinder, sfxShatter)
-		Explode(radars, sfxShatter)
+		Explode(base, SFX.SHATTER)
+		Explode(cylinder, SFX.SHATTER)
+		Explode(radars, SFX.SHATTER)
 		return 2
 	end
 end

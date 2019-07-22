@@ -21,10 +21,20 @@ local spSetGroundMoveTypeData  = Spring.MoveCtrl.SetGroundMoveTypeData
 local getMovetype              = Spring.Utilities.getMovetype
 local spMoveCtrlGetTag         = Spring.MoveCtrl.GetTag
 
+local turnAccels = {}
+for unitDefID, unitDef in pairs(UnitDefs) do
+	if getMovetype(unitDef) == 2 then -- Ground/Sea
+		turnAccels[unitDefID] = unitDef.turnRate * 1.2
+	end
+end
+
 function gadget:UnitCreated(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	local ud = UnitDefs[unitDefID]
-	if getMovetype(ud) == 2 and spMoveCtrlGetTag(unitID) == nil  then -- Ground/Sea
-		spSetGroundMoveTypeData(unitID, "turnAccel", ud.turnRate*1.2)
+	local turnAccel = turnAccels[unitDefID]
+	if turnAccel and not spMoveCtrlGetTag(unitID) then
+		-- FIXME: it should be possible to optimize this and get rid of the GetTag check.
+		-- Doing the check before calling UnitCreated in Initialize() takes care of that venue (eg /luarules reload mid-jump)
+		-- and moving the gadget to some high layer should take care of units that are perma-movectrl'd (eg mahlazer satellite or something)
+		spSetGroundMoveTypeData(unitID, "turnAccel", turnAccel)
 	end
 end
 

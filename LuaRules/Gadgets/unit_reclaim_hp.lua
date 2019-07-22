@@ -26,6 +26,9 @@ local spGetUnitHealth = Spring.GetUnitHealth
 local spValidUnitID   = Spring.ValidUnitID
 local spGetUnitDefID  = Spring.GetUnitDefID
 
+local CMD_INSERT  = CMD.INSERT
+local CMD_RECLAIM = CMD.RECLAIM
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- This is the allowUnitBuildStep method. It is a seamless solution but turns 
@@ -54,7 +57,10 @@ end
 --------------------------------------------------------------------------------
 -- This is the alternate way of doing things. It iterates over all units which 
 -- have been the target of a reclaim command and gives them back the health that
--- they lost in being reclaimed.
+-- they lost in being reclaimed. It iterates over all units that have ever been
+-- targeted by reclaim every frame so would be pretty horrible in the worst case
+-- but fortunately unit-targeted reclaim is very rare and usually results in the
+-- target unit being removed.
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -91,7 +97,7 @@ function gadget:GameFrame(n)
 end
 
 function gadget:AllowCommand_GetWantedCommand()	
-	return {[CMD.RECLAIM] = true}
+	return {[CMD_RECLAIM] = true, [CMD_INSERT] = true}
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
@@ -99,8 +105,14 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
-	
-	if (cmdID == CMD.RECLAIM) and #cmdParams == 1 then
+	local numParams = #cmdParams
+	if cmdID == CMD_INSERT then
+		cmdID = cmdParams[2]
+		cmdParams[1] = cmdParams[4]
+		numParams = numParams - 3
+	end
+
+	if (cmdID == CMD_RECLAIM) and numParams == 1 then
 		if not reclaimedUnit[cmdParams[1] ] then
 			if spValidUnitID(cmdParams[1]) then
 				local ud = spGetUnitDefID(cmdParams[1])

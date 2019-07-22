@@ -17,9 +17,14 @@ function gadget:GetInfo()
   }
 end
 
+local spFindUnitCmdDesc = Spring.FindUnitCmdDesc
+local spEditUnitCmdDesc = Spring.EditUnitCmdDesc
+local CMD_AUTOREPAIRLEVEL = CMD.AUTOREPAIRLEVEL
+local hideTable = {hidden = true}
+
 function gadget:UnitCreated(unitID, unitDefID, team)
-	local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD.AUTOREPAIRLEVEL)
+	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_AUTOREPAIRLEVEL)
 	if cmdDescID then
-		Spring.EditUnitCmdDesc(unitID, cmdDescID, {hidden=true,})
+		spEditUnitCmdDesc(unitID, cmdDescID, hideTable)
 	end
 end

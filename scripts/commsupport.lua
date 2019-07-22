@@ -325,7 +325,7 @@ function script.Create()
 
 	StartThread(MotionControl)
 	StartThread(RestoreAfterDelay)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
@@ -517,18 +517,18 @@ function script.Killed(recentDamage, maxHealth)
 ]]--
 		return 1
 	else
-		Explode(gun, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(head, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(pelvis, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(lloarm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(luparm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(lloleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(lupleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(rloarm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(rloleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(ruparm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(rupleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(torso, sfxShatter + sfxExplode)
+		Explode(gun, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(head, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(pelvis, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(lloarm, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(luparm, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(lloleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(lupleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(rloarm, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(rloleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(ruparm, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(rupleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(torso, SFX.SHATTER + SFX.EXPLODE)
 		return 2
 	end
 end

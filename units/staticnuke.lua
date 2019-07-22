@@ -65,6 +65,8 @@ unitDef = {
       craterMult              = 6,
 
 	  customParams        	  = {
+		restrict_in_widgets = 1,
+
 		light_color = [[2.92 2.64 1.76]],
 		light_radius = 3000,
 	  },
@@ -74,7 +76,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.3,
-      explosionGenerator      = [[custom:LONDON_FLAT]],
+      explosionGenerator      = [[custom:LONDON_FLAT]],      -- note, spawning of the explosion is handled by exp_nuke_effect_chooser.lua 
       fireStarter             = 0,
       flightTime              = 180,
       impulseBoost            = 0.5,

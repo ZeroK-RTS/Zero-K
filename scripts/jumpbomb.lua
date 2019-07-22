@@ -101,20 +101,20 @@ function Detonate() -- Giving an order causes recursion.
 end
 
 function script.Create ()
-	StartThread (SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)
 
-	Explode (Tail, sfxSmoke + sfxFire)
-	Explode (Left_Back_Leg, sfxSmoke + sfxFire)
-	Explode (Left_Back_Foot, sfxSmoke + sfxFire)
-	Explode (Right_Back_Leg, sfxSmoke + sfxFire)
-	Explode (Right_Back_Foot, sfxSmoke + sfxFire)
-	Explode (Left_Front_Leg, sfxSmoke + sfxFire)
-	Explode (Left_Front_Foot, sfxSmoke + sfxFire)
-	Explode (Right_Front_Foot, sfxSmoke + sfxFire)
-	Explode (Right_Front_Leg, sfxSmoke + sfxFire)
+	Explode (Tail, SFX.SMOKE + SFX.FIRE)
+	Explode (Left_Back_Leg, SFX.SMOKE + SFX.FIRE)
+	Explode (Left_Back_Foot, SFX.SMOKE + SFX.FIRE)
+	Explode (Right_Back_Leg, SFX.SMOKE + SFX.FIRE)
+	Explode (Right_Back_Foot, SFX.SMOKE + SFX.FIRE)
+	Explode (Left_Front_Leg, SFX.SMOKE + SFX.FIRE)
+	Explode (Left_Front_Foot, SFX.SMOKE + SFX.FIRE)
+	Explode (Right_Front_Foot, SFX.SMOKE + SFX.FIRE)
+	Explode (Right_Front_Leg, SFX.SMOKE + SFX.FIRE)
 
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.5) then

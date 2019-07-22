@@ -1,11 +1,8 @@
--- $Id$
-local versionNumber = "1.03"
-local devCompat = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
 
 function widget:GetInfo()
 	return {
 		name      = "Ghost Site",
-		desc      = "[v" .. string.format("%s", versionNumber) .. "] Displays ghosted buildings in progress and features",
+		desc      = "[v1.03] Displays ghosted buildings in progress and features",
 		author    = "very_bad_soldier",
 		date      = "April 7, 2009",
 		license   = "GNU GPL v2",
@@ -109,19 +106,16 @@ local function DrawGhostSites()
 			gl.Translate(x, y, z) 
 			gl.Rotate(ghost[PARAM_FACING], 0, 1, 0)
 			
-			if devCompat then
-				if shaderObj then
-					gl.UseShader(shaderObj.shader)
-					gl.Uniform(shaderObj.teamColorID, ghostTeamColor[1], ghostTeamColor[2], ghostTeamColor[3], 0.25)
-					gl.Uniform(shaderObj.tint, 0.1, 1, 0.2)
-				end
-				
-				gl.UnitShapeTextures(ghost[PARAM_DEFID], true)
-				gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], true)
-				gl.UnitShapeTextures(ghost[PARAM_DEFID], false)
-			else
-				gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID])
+			if shaderObj then
+				gl.UseShader(shaderObj.shader)
+				gl.Uniform(shaderObj.teamColorID, ghostTeamColor[1], ghostTeamColor[2], ghostTeamColor[3], 0.25)
+				gl.Uniform(shaderObj.tint, 0.1, 1, 0.2)
 			end
+
+			gl.UnitShapeTextures(ghost[PARAM_DEFID], true)
+			gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], true)
+			gl.UnitShapeTextures(ghost[PARAM_DEFID], false)
+
 			if shaderObj then
 				gl.UseShader(0)
 			end
@@ -196,7 +190,7 @@ end
 
 local function CheckSpecState()
 	local playerID = Spring.GetMyPlayerID()
-	local _, _, spec = Spring.GetPlayerInfo(playerID)
+	local _, _, spec = Spring.GetPlayerInfo(playerID, false)
 
 	if spec then
 		Spring.Echo("<Ghost Site> Spectator mode. Widget removed.")
@@ -254,7 +248,7 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 end
 
 function widget:Initialize()
-	if gl.CreateShader and devCompat then
+	if gl.CreateShader then
 		InitShader()
 	end
 end

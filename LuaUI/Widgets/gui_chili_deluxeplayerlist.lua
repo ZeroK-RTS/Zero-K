@@ -257,7 +257,7 @@ end
 local function IsFFA()
 	local allyteams = Spring.GetAllyTeamList()
 	local gaiaT = Spring.GetGaiaTeamID()
-	local gaiaAT = select(6, Spring.GetTeamInfo(gaiaT))
+	local gaiaAT = select(6, Spring.GetTeamInfo(gaiaT, false))
 	local numAllyTeams = 0
 	for i=1,#allyteams do
 		if allyteams[i] ~= gaiaAT then
@@ -284,7 +284,7 @@ local myName
 local amSpec
 
 myID = Spring.GetMyPlayerID()
-myName,_,amSpec = Spring.GetPlayerInfo(myID)
+myName,_,amSpec = Spring.GetPlayerInfo(myID, false)
 localTeam = Spring.GetMyTeamID()
 localAlliance = Spring.GetMyAllyTeamID()
 
@@ -593,8 +593,8 @@ local function CfTooltip(allyTeam)
 	tooltip = tooltip .. 'Your team\'s votes: \n'
 	local teamList = Spring.GetTeamList(localAlliance)
 	for _,teamID in ipairs(teamList) do
-		local _,playerID = Spring.GetTeamInfo(teamID)
-		local name = Spring.GetPlayerInfo(playerID) or '-'
+		local _,playerID = Spring.GetTeamInfo(teamID, false)
+		local name = Spring.GetPlayerInfo(playerID, false) or '-'
 		local vote = Spring.GetTeamRulesParam(teamID, 'cf_vote_' ..allyTeam)==1 and green..'Y'..white or red..'N'..white
 		local teamColor = color2incolor(Spring.GetTeamColor(teamID))
 		tooltip = tooltip .. teamColor .. ' <' .. name .. '> ' .. white.. vote ..'\n'
@@ -624,7 +624,7 @@ local function MakeSpecTooltip()
 	local playerlist = Spring.GetPlayerList()
 	for i=1, #playerlist do
 		local playerID = playerlist[i]
-		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank,customKeys = Spring.GetPlayerInfo(playerID)
+		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID, false)
 		local pingCol, cpuCol, pingText, cpuText = FormatPingCpu(pingTime,cpuUsage)
 		local cpuColChar = GetColorChar(cpuCol)
 		local pingColChar = GetColorChar(pingCol)
@@ -779,7 +779,7 @@ local function UpdatePlayerInfo()
 			teamID = entities[i].teamID
 		else
 			local playerID = entities[i].playerID
-			local name,active,spectator,localteamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID)
+			local name,active,spectator,localteamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID, false)
 			teamID = localteamID
 			local teamcolor = teamID and {Spring.GetTeamColor(teamID)} or {1,1,1,1}
 			
@@ -836,7 +836,7 @@ local function UpdatePlayerInfo()
 	if #specTeam.roster ~= 0 then
 		for i = 1,#specTeam.roster do
 			local playerID = specTeam.roster[i].playerID
-			local name,active,spectator,localteamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID)
+			local name,active,spectator,localteamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID, false)
 			specTeam.roster[i].pingTime = pingTime
 			specTeam.roster[i].cpuUsage = cpuUsage
 			if list_size == 4 then
@@ -860,8 +860,8 @@ local function UpdatePlayerInfo()
 					if teamID then
 						local s = GetPlayerTeamStats(teamID)
 						AccumulatePlayerTeamStats(r,s)
-						local _,leader = Spring.GetTeamInfo(teamID)
-						local name = Spring.GetPlayerInfo(leader)
+						local _,leader = Spring.GetTeamInfo(teamID, false)
+						local name = Spring.GetPlayerInfo(leader, false)
 						if v.winsLabel and name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then
 							v.winsLabel:SetCaption(FormatWins(name)) 
 						end
@@ -1080,8 +1080,8 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 				AddCfCheckbox(allyTeamID)
 				if allyTeamsDead[allyTeamID] then MakeNewLabel(allyTeamEntities[allyTeamID],"statusLabel",{x=x_status,width=16,caption = "X",textColor = {1,0,0,1},}) end
 
-				local _,leader = Spring.GetTeamInfo(allyTeams[allyTeamID][1])
-				local leaderName = Spring.GetPlayerInfo(leader);
+				local _,leader = Spring.GetTeamInfo(allyTeams[allyTeamID][1], false)
+				local leaderName = Spring.GetPlayerInfo(leader, false)
 
 				if showWins and leaderName ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[leaderName] ~= nil then 
 					MakeNewLabel(allyTeamEntities[allyTeamID],"winsLabel",{x=0,width=wins_width,caption = FormatWins(leaderName),textColor = allyTeamColor, align = "right"})
@@ -1139,7 +1139,7 @@ SetupPlayerNames = function()
 		local teamID = teamsSorted[i]
 		if teamID ~= Spring.GetGaiaTeamID() then
 			teams[teamID] = teams[teamID] or {roster = {}}
-			local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
+			local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID, false)
 			if isAI then
 				local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
 				if (IsMission == false) then
@@ -1533,7 +1533,7 @@ function PlayersChanged()
 	if amSpec then
 		SetupPlayerNames()
 	else
-		local _,_,amNowSpec = Spring.GetPlayerInfo(myID)
+		local _,_,amNowSpec = Spring.GetPlayerInfo(myID, false)
 		if amNowSpec then
 			amSpec = amNowSpec
 			SetupPanels()

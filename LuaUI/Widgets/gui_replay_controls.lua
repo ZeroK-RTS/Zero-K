@@ -106,7 +106,6 @@ function widget:Initialize()
 	Chili = WG.Chili
 	Button = Chili.Button
 	Label = Chili.Label
-	Colorbars = Chili.Colorbars
 	Window = Chili.Window
 	StackPanel = Chili.StackPanel
 	Image = Chili.Image

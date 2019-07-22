@@ -52,7 +52,7 @@ local function GetCmdTag(unitID)
 				end
 		end
 	if cmdTag == 0 then 
-		local cmds = Spring.GetUnitCommands(unitID,1)
+		local cmds = Spring.GetCommandQueue(unitID,1)
 		if (cmds) then
 			local cmd = cmds[1]
 			if cmd then

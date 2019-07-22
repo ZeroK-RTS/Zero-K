@@ -66,7 +66,7 @@ function widget:CommandNotify(id, params, options) --ref: gui_tacticalCalculator
 	
 	if (id == CMD.ATTACK or id == CMD_UNIT_SET_TARGET or id == CMD_UNIT_SET_TARGET_CIRCLE) then
 		local cx, cy, cz, cr = params[1], params[2], params[3], params[4]
-		if (cr == nil) then --not area command
+		if (cr or 0) == 0 then --not area command
 			return false 
 		end
 		if (cx == nil or cy == nil or cz == nil) then --outside of map

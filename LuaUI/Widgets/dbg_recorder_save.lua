@@ -110,7 +110,7 @@ function SaveUnits()
         end
         
         if UnitDefs[uDID].isFactory then
-            local orderQueue = Spring.GetFactoryCommands(uID)
+            local orderQueue = Spring.GetFactoryCommands(uID, -1)
             for _,order in ipairs(orderQueue) do
                 order.uID = uID
 				order.key = key

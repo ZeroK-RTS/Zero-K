@@ -44,6 +44,8 @@ options = {
 	},
 }
 
+local screen0
+
 local clickX, clickY = false, false
 local clickUnitID = false
 local clickSelected = false
@@ -148,12 +150,16 @@ local function MousePress(x, y)
 		return
 	end
 	
+	if screen0 and screen0.currentTooltip then
+		return
+	end
+	
 	local _, activeCmdID = Spring.GetActiveCommand()
 	if activeCmdID then
 		return
 	end
 	
-	local targetID = WG.PreSelection_GetUnitUnderCursor(true)
+	local targetID = WG.PreSelection_GetUnitUnderCursor(true, true)
 	if not targetID then
 		return
 	end
@@ -181,12 +187,32 @@ local function MouseRelease(x, y)
 		return
 	end
 	
+	-- The player may have clicked on a command button
+	local _, activeCmdID = Spring.GetActiveCommand()
+	if activeCmdID then
+		Reset()
+		return
+	end
+	
+	local targetID
+	if (clickX and clickY and clickUnitID) then
+		targetID = WG.PreSelection_GetUnitUnderCursor(true, true)
+		if targetID == clickUnitID then
+			local newSel = HandleUnitSelection(Spring.GetSelectedUnits(), targetID, true)
+			if newSel then
+				spSelectUnitArray(newSel)
+			end
+			Reset()
+			return
+		end
+	end
+	
 	if not (clickX and clickY and clickUnitID) or (math.abs(clickX - x) > CLICK_LEEWAY) or (math.abs(clickY - y) > CLICK_LEEWAY) then
 		Reset()
 		return
 	end
 	
-	local targetID = WG.PreSelection_GetUnitUnderCursor(true)
+	targetID = targetID or WG.PreSelection_GetUnitUnderCursor(true, true)
 	local needSelection = false
 	if (not targetID) then
 		needSelection = true
@@ -209,13 +235,22 @@ function widget:SelectionChanged(selectedUnits)
 		return
 	end
 	local x, y = Spring.GetMouseState()
+	local targetID
+	if (clickX and clickY and clickUnitID) then
+		targetID = WG.PreSelection_GetUnitUnderCursor(true, true)
+		if targetID == clickUnitID then
+			local newSel = HandleUnitSelection(Spring.GetSelectedUnits(), targetID, true)
+			Reset()
+			return newSel
+		end
+	end
 	
 	if not (clickX and clickY and clickUnitID) or (math.abs(clickX - x) > CLICK_LEEWAY) or (math.abs(clickY - y) > CLICK_LEEWAY) then
 		Reset()
 		return
 	end
 	
-	local targetID = WG.PreSelection_GetUnitUnderCursor(true)
+	targetID = targetID or WG.PreSelection_GetUnitUnderCursor(true, true)
 	local needSelection = true
 	if (not targetID) then
 		needSelection = true
@@ -241,5 +276,6 @@ function widget:Update()
 end
 
 function widget:Initialize()
+	screen0 = WG.Chili and WG.Chili.Screen0
 	widget:PlayerChanged()
 end

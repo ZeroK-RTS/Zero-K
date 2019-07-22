@@ -83,7 +83,7 @@ function script.Create()
 	Turn (pipesl, z_axis, math.rad(40))
 	Turn (pipesr, z_axis, math.rad(-40))
 
-	StartThread (SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
 end
 

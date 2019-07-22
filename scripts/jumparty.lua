@@ -182,7 +182,7 @@ end
 function script.Create()
 	bMoving = false
 	bAiming = false
-	StartThread(SmokeUnit, {torso})
+	StartThread(GG.Script.SmokeUnit, {torso})
 end
 
 function script.StartMoving()
@@ -267,17 +267,17 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .50 then
-		Explode(base, sfxNone)
-		Explode(pelvis, sfxNone)
-		Explode(torso, sfxNone)
-		Explode(lgun, sfxFall)
-		Explode(rgun, sfxFall)
-		Explode(rupleg, sfxNone)
-		Explode(rloleg, sfxNone)
-		Explode(rfoot, sfxNone)
-		Explode(lupleg, sfxNone)
-		Explode(lloleg, sfxNone)
-		Explode(lfoot, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(pelvis, SFX.NONE)
+		Explode(torso, SFX.NONE)
+		Explode(lgun, SFX.FALL)
+		Explode(rgun, SFX.FALL)
+		Explode(rupleg, SFX.NONE)
+		Explode(rloleg, SFX.NONE)
+		Explode(rfoot, SFX.NONE)
+		Explode(lupleg, SFX.NONE)
+		Explode(lloleg, SFX.NONE)
+		Explode(lfoot, SFX.NONE)
 		return 1
 	end
 	Explode(base, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)

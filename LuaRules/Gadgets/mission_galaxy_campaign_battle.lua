@@ -68,6 +68,7 @@ local vitalUnits = {}
 local defeatConditionConfig
 local victoryAtLocation = {}
 local typeVictoryLocations = {}
+local finishedUnits = {} -- Units that have been non-nanoframes at some point.
 
 local midgamePlacement = {}
 
@@ -215,8 +216,8 @@ local function InitializeVictoryConditions()
 		local defeatConfig = defeatConditionConfig[allyTeamID] or {}
 		if defeatConfig.vitalUnitTypes then
 			local unitDefMap = {}
-			for i = 1, #defeatConfig.vitalUnitTypes do
-				local ud = UnitDefNames[defeatConfig.vitalUnitTypes[i]]
+			for j = 1, #defeatConfig.vitalUnitTypes do
+				local ud = UnitDefNames[defeatConfig.vitalUnitTypes[j]]
 				if ud then
 					unitDefMap[ud.id] = true
 				end
@@ -339,7 +340,7 @@ end
 
 local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 	local objectiveData = bonusObjectiveList[bonusObjectiveID]
-	gameSeconds = gameSeconds or math.floor(Spring.GetGameFrame()/30), victory
+	gameSeconds = gameSeconds or math.floor(Spring.GetGameFrame()/30)
 	
 	-- Cbeck whether the objective is open
 	if objectiveData.terminated then
@@ -450,16 +451,13 @@ local function RemoveBonusObjectiveUnit(unitID, bonusObjectiveID)
 		return
 	end
 	if objectiveData.units[unitID] then
-		local inbuild
 		if objectiveData.countRemovedUnits or objectiveData.onlyCountRemovedUnits then
-			inbuild = (select(3, Spring.GetUnitIsStunned(unitID)) and 1) or 0
-			if inbuild == 0 then
+			if finishedUnits[unitID] then
 				objectiveData.removedUnits = (objectiveData.removedUnits or 0) + 1
 			end
 		end
 		if objectiveData.failOnUnitLoss then
-			inbuild = inbuild or ((select(3, Spring.GetUnitIsStunned(unitID)) and 1) or 0)
-			if inbuild == 0 then
+			if finishedUnits[unitID] then
 				CompleteBonusObjective(bonusObjectiveID, false)
 			end
 		end
@@ -700,6 +698,10 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		return 
 	end
 	
+	if unitData.shieldFactor and ud.customParams.shield_power then
+		Spring.SetUnitShieldState(unitID, -1, true, unitData.shieldFactor*tonumber(ud.customParams.shield_power))
+	end
+	
 	if unitData.commands then
 		local commands = unitData.commands
 		commandsToGive = commandsToGive or {}
@@ -747,6 +749,19 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 			unitID = unitID,
 			commands = patrolCommands,
 		}
+	end
+	
+	if unitData.movestate then
+		commandsToGive = commandsToGive or {}
+		if commandsToGive[#commandsToGive] and commandsToGive[#commandsToGive].unitID == unitID then
+			local cmd = commandsToGive[#commandsToGive].commands
+			cmd[#cmd + 1] = {cmdID = CMD.MOVE_STATE, params = {unitData.movestate}, options = {"shift"}}
+		else
+			commandsToGive[#commandsToGive + 1] = {
+				unitID = unitID,
+				commands = {cmdID = CMD.MOVE_STATE, params = {unitData.movestate}, options = {"shift"}}
+			}
+		end
 	end
 	
 	SetupInitialUnitParameters(unitID, unitData, x, z)
@@ -1142,7 +1157,7 @@ local function InitializeUnlocks()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local customKeys = select(7, Spring.GetTeamInfo(teamID))
+		local customKeys = select(7, Spring.GetTeamInfo(teamID, true))
 		SetTeamAbilities(teamID, customKeys)
 		SetTeamUnlocks(teamID, customKeys)
 		InitializeCommanderParameters(teamID, customKeys)
@@ -1153,7 +1168,7 @@ local function InitializeTypeVictoryLocation()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local _,_,_,_,_,allyTeamID, customKeys = Spring.GetTeamInfo(teamID)
+		local _,_,_,_,_,allyTeamID, customKeys = Spring.GetTeamInfo(teamID, true)
 		InitializeTeamTypeVictoryLocations(teamID, customKeys)
 	end
 end
@@ -1178,6 +1193,7 @@ local function CheckDisableControlAiMessage()
 		local dis_msg = "DISABLE_CONTROL:"
 		for i = 1, #data do
 			dis_msg = dis_msg .. data[i] .. "+"
+			Spring.SetUnitRulesParam(unitID, "disableAiControl", 1, publicTrueTable)
 		end
 		SendToUnsynced("SendAIEvent", teamID, dis_msg)
 	end
@@ -1205,12 +1221,12 @@ local function InitializeMidgameUnits(gameFrame)
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local _,_,_,_,_,allyTeamID, customKeys = Spring.GetTeamInfo(teamID)
+		local _,_,_,_,_,allyTeamID, customKeys = Spring.GetTeamInfo(teamID, true)
 		
 		local midgameUnits = CustomKeyToUsefulTable(customKeys and customKeys.midgameunits)
 		if midgameUnits then
-			for i = 1, #midgameUnits do
-				AddMidgameUnit(midgameUnits[i], teamID, gameFrame)
+			for j = 1, #midgameUnits do
+				AddMidgameUnit(midgameUnits[j], teamID, gameFrame)
 			end
 		end
 	end
@@ -1220,7 +1236,7 @@ local function DoInitialUnitPlacement()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local _,_,_,_,_,allyTeamID, customKeys = Spring.GetTeamInfo(teamID)
+		local _,_,_,_,_,allyTeamID, customKeys = Spring.GetTeamInfo(teamID, true)
 		PlaceTeamUnits(teamID, customKeys, allyTeamID == PLAYER_ALLY_TEAM_ID)
 	end
 	
@@ -1248,12 +1264,12 @@ local function DoInitialTerraform(noBuildings)
 		local teamList = Spring.GetTeamList()
 		for i = 1, #teamList do
 			local teamID = teamList[i]
-			local customKeys = select(7, Spring.GetTeamInfo(teamID))
+			local customKeys = select(7, Spring.GetTeamInfo(teamID, true))
 			local initialUnits = GetExtraStartUnits(teamID, customKeys)
 			initialUnitDataTable[teamID] = initialUnitDataTable[teamID] or CustomKeyToUsefulTable(customKeys and customKeys.extrastartunits)
 			if initialUnits then
-				for i = 1, #initialUnits do
-					local unitTerra = AddUnitTerraform(initialUnits[i])
+				for j = 1, #initialUnits do
+					local unitTerra = AddUnitTerraform(initialUnits[j])
 					if unitTerra then
 						terraformList[#terraformList + 1] = unitTerra
 					end
@@ -1330,7 +1346,7 @@ function GalaxyCampaignHandler.GetDefeatConfig(allyTeamID)
 end
 
 function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
-	local customKeys = select(7, Spring.GetTeamInfo(teamID))
+	local customKeys = select(7, Spring.GetTeamInfo(teamID, true))
 	local retinueData = CustomKeyToUsefulTable(customKeys and customKeys.retinuestartunits)
 	if retinueData then
 		local range = 70 + #retinueData*20
@@ -1342,7 +1358,7 @@ function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
 end
 
 function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
-	local customKeys = select(7, Spring.GetTeamInfo(teamID))
+	local customKeys = select(7, Spring.GetTeamInfo(teamID, true))
 	local retinueData = CustomKeyToUsefulTable(customKeys and customKeys.retinuestartunits)
 	if retinueData then
 		local range = 70 + #retinueData*20
@@ -1393,6 +1409,7 @@ function gadget:UnitFinished(unitID, unitDefID, teamID, builderID)
 		vitalUnits[unitID] = true
 	end
 	MaybeAddTypeVictoryLocation(unitID, unitDefID, teamID)
+	finishedUnits[unitID] = true
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
@@ -1414,6 +1431,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	CheckInitialUnitDestroyed(unitID)
 	if unitLineage[unitID] then
 		unitLineage[unitID] = nil
+	end
+	if finishedUnits[unitID] then
+		finishedUnits[unitID] = false
 	end
 end
 
@@ -1506,7 +1526,7 @@ end
 -- Load
 
 function gadget:Load(zip)
-	if not GG.SaveLoad then
+	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission failed to access save/load API")
 		return
 	end

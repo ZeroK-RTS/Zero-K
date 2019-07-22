@@ -46,10 +46,6 @@ local glScale          = gl.Scale
 local glText           = gl.Text
 local glTranslate      = gl.Translate
 
-local readyCount = 0 
-local waitingCount = 0 
-local missingCount = 0
-
 local forceSent = false
 
 local fixedStartPos = (Spring.GetModOptions().fixedstartpos == "1")
@@ -70,12 +66,12 @@ function gadget:GameSetup(label, ready, playerStates)
 	local totalAllies = {}
 		
 	for num, state in pairs(playerStates) do 
-		local name,active,spec,teamID,allyTeamID,ping = Spring.GetPlayerInfo(num)
+		local name,active,spec,teamID,allyTeamID,ping = Spring.GetPlayerInfo(num, false)
 		--Note: BUG, startPosSet returned by GetTeamStartPosition() always return true for Spring 96.0.1-442-g7191625 (game always start immediately)
 		-- therefore, a reasonable indicator for placing startPos could be x>0 because 0 is precisely an impossible position to be place by hand.
 		-- we might not need to check for -100 anymore IMHO.
 		local x,y,z,startPosSet = Spring.GetTeamStartPosition(teamID)
-		local _,_,_,isAI,_,_ = Spring.GetTeamInfo(teamID)
+		local _,_,_,isAI = Spring.GetTeamInfo(teamID, false)
 		startPosSet = x and x > 0 
 	
 		if not spec and not isAI then
@@ -180,4 +176,4 @@ function gadget:Update()
 	if (Spring.GetGameFrame() > 1) then 
 		gadgetHandler:RemoveGadget()
 	end 
-end 
+end

@@ -671,38 +671,38 @@ function script.Create()
 	
 	dyncomm.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then
 		-- Pointless because deathclone contains head.
-		--Explode(Head, sfxFall)
+		--Explode(Head, SFX.FALL)
 		--Hide(Head)
 		
-		InitializeDeathAnimation()
+		GG.Script.InitializeDeathAnimation(unitID)
 		PlayAnimation('die')
 		
-		Explode(ArmLeft, sfxNone)
-		Explode(ArmRight, sfxNone)
-		Explode(CalfLeft, sfxNone)
-		Explode(CalfRight, sfxNone)
+		Explode(ArmLeft, SFX.NONE)
+		Explode(ArmRight, SFX.NONE)
+		Explode(CalfLeft, SFX.NONE)
+		Explode(CalfRight, SFX.NONE)
 		
 		dyncomm.SpawnModuleWrecks(1)
 		dyncomm.SpawnWreck(1)
 	else
-		Explode(Head, sfxFall + sfxFire)
-		Explode(Stomach, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(ArmLeft, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(ArmRight, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(HandRight, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(getGun(), sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(CalfLeft, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(CalfRight, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(HipLeft, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(HipRight, sfxFall + sfxFire + sfxSmoke + sfxExplode)
-		Explode(Breast, sfxShatter + sfxExplode)
+		Explode(Head, SFX.FALL + SFX.FIRE)
+		Explode(Stomach, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(ArmLeft, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(ArmRight, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(HandRight, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(getGun(), SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(CalfLeft, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(CalfRight, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(HipLeft, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(HipRight, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE)
+		Explode(Breast, SFX.SHATTER + SFX.EXPLODE)
 		dyncomm.SpawnModuleWrecks(2)
 		dyncomm.SpawnWreck(2)
 	end

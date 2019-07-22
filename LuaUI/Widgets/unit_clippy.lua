@@ -1,6 +1,6 @@
 local playerID = Spring.GetMyPlayerID()
 local customkeys = playerID and select(10, Spring.GetPlayerInfo(playerID))
-local rank = (customkeys and tonumber(customkeys.level) or 0) or select(9, Spring.GetPlayerInfo(playerID))
+local rank = (customkeys and tonumber(customkeys.level) or 0) or select(9, Spring.GetPlayerInfo(playerID, false))
 
 function widget:GetInfo()
 	return {

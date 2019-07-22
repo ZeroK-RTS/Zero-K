@@ -171,7 +171,7 @@ end
 
 function script.Create()
 	Turn(fire, x_axis, math.rad(-45.000000))
-	StartThread(SmokeUnit, {pelvis})
+	StartThread(GG.Script.SmokeUnit, {pelvis})
 end
 
 function script.StartMoving()
@@ -220,10 +220,10 @@ end
 
 local function ShotScript()
 	Sleep(1)
-	Explode(lcalf, sfxFall)
-	Explode(rcalf, sfxFall)
-	Explode(lfoot, sfxFall)
-	Explode(rfoot, sfxFall)
+	Explode(lcalf, SFX.FALL)
+	Explode(rcalf, SFX.FALL)
+	Explode(lfoot, SFX.FALL)
+	Explode(rfoot, SFX.FALL)
 	GG.PuppyHandler_Shot(unitID)
 end
 
@@ -238,30 +238,30 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= 0.25 then
-		Explode(lfoot, sfxFall)
-		Explode(rfoot, sfxFall)
+		Explode(lfoot, SFX.FALL)
+		Explode(rfoot, SFX.FALL)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(lcalf, sfxFall)
-		Explode(rcalf, sfxFall)
-		Explode(lfoot, sfxFall)
-		Explode(rfoot, sfxFall)
+		Explode(lcalf, SFX.FALL)
+		Explode(rcalf, SFX.FALL)
+		Explode(lfoot, SFX.FALL)
+		Explode(rfoot, SFX.FALL)
 		return 1
 	elseif severity <= 0.99 then
-		Explode(pelvis, sfxFall + sfxExplode)
-		Explode(lthigh, sfxFall)
-		Explode(rthigh, sfxFall)
-		Explode(lcalf, sfxFall)
-		Explode(rcalf, sfxFall)
-		Explode(lfoot, sfxFall)
-		Explode(rfoot, sfxFall)
+		Explode(pelvis, SFX.FALL + SFX.EXPLODE)
+		Explode(lthigh, SFX.FALL)
+		Explode(rthigh, SFX.FALL)
+		Explode(lcalf, SFX.FALL)
+		Explode(rcalf, SFX.FALL)
+		Explode(lfoot, SFX.FALL)
+		Explode(rfoot, SFX.FALL)
 		return 2
 	end
-	Explode(pelvis, sfxFall + sfxExplode)
-	Explode(lthigh, sfxFall + sfxFire)
-	Explode(rthigh, sfxFall + sfxFire)
-	Explode(lcalf, sfxFall)
-	Explode(rcalf, sfxFall)
-	Explode(lfoot, sfxFall)
-	Explode(rfoot, sfxFall)
+	Explode(pelvis, SFX.FALL + SFX.EXPLODE)
+	Explode(lthigh, SFX.FALL + SFX.FIRE)
+	Explode(rthigh, SFX.FALL + SFX.FIRE)
+	Explode(lcalf, SFX.FALL)
+	Explode(rcalf, SFX.FALL)
+	Explode(lfoot, SFX.FALL)
+	Explode(rfoot, SFX.FALL)
 end

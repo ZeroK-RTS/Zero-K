@@ -77,7 +77,7 @@ function script.Create()
 	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 1)
 	for i = 1, #fakes do Hide (fakes[i]) end
 	Move (base, y_axis, -90000)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Turn(base, y_axis, math.rad(45))
 end
 
@@ -139,25 +139,25 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .50 then
-		Explode(dish1, sfxSmoke + sfxFire + sfxExplode)
-		Explode(dish2, sfxNone)
-		Explode(dish3, sfxNone)
-		Explode(dish4, sfxNone)
-		Explode(base, sfxNone)
+		Explode(dish1, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(dish2, SFX.NONE)
+		Explode(dish3, SFX.NONE)
+		Explode(dish4, SFX.NONE)
+		Explode(base, SFX.NONE)
 		return 1
 	elseif severity <= .99 then
-		Explode(dish1, sfxSmoke + sfxFire + sfxExplode)
-		Explode(dish2, sfxFall)
-		Explode(dish3, sfxFall)
-		Explode(dish4, sfxFall)
-		Explode(base, sfxNone)
+		Explode(dish1, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(dish2, SFX.FALL)
+		Explode(dish3, SFX.FALL)
+		Explode(dish4, SFX.FALL)
+		Explode(base, SFX.NONE)
 		return 2
 	else
-		Explode(dish1, sfxSmoke + sfxFire + sfxExplode)
-		Explode(dish2, sfxSmoke + sfxFire + sfxExplode)
-		Explode(dish3, sfxSmoke + sfxFire + sfxExplode)
-		Explode(dish4, sfxSmoke + sfxFire + sfxExplode)
-		Explode(base, sfxShatter + sfxExplode)
+		Explode(dish1, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(dish2, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(dish3, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(dish4, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(base, SFX.SHATTER + SFX.EXPLODE)
 		return 2
 	end
 end

@@ -53,7 +53,7 @@ end
 
 function script.Create()
 	StartThread(EngineLoop)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	--Turn(piece "turret3", z_axis, math.rad(-90))
 	--Turn(piece "turret4", z_axis, math.rad(90))
 	for i=1,2 do
@@ -100,7 +100,7 @@ end
 function script.Shot(num)
 	local index = weapons[num].gunIndex % #weapons[num].flares + 1
 	weapons[num].gunIndex = index
-	EmitSfx(weapons[num].flares[index], UNIT_SFX1)
+	EmitSfx(weapons[num].flares[index], GG.Script.UNIT_SFX1)
 end
 
 function script.BlockShot(num)
@@ -111,35 +111,35 @@ function script.Killed(recentDamage, maxHealth)
 	-- TBD
 	local severity = (recentDamage/maxHealth) * 100
 	if severity < 50 then
-		EmitSfx(pads[math.random(#pads)], UNIT_SFX2)
+		EmitSfx(pads[math.random(#pads)], GG.Script.UNIT_SFX2)
 		Sleep(300)
 		
 		local fallOff = math.random(#docked)
-		EmitSfx(docked[fallOff], UNIT_SFX2)
-		Explode(docked[fallOff], sfxFall + sfxSmoke + sfxFire)
+		EmitSfx(docked[fallOff], GG.Script.UNIT_SFX2)
+		Explode(docked[fallOff], SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		table.remove(docked, fallOff)
 		Sleep(300)
-		EmitSfx(engines[4], UNIT_SFX2)
-		Explode(engines[4], sfxShatter)
+		EmitSfx(engines[4], GG.Script.UNIT_SFX2)
+		Explode(engines[4], SFX.SHATTER)
 		Sleep(300)
-		Explode(weapons[1].aimFrom, UNIT_SFX2)
+		Explode(weapons[1].aimFrom, GG.Script.UNIT_SFX2)
 		
 		fallOff = math.random(#docked)
-		EmitSfx(docked[fallOff], UNIT_SFX2)
-		Explode(docked[fallOff], sfxFall + sfxSmoke + sfxFire)
+		EmitSfx(docked[fallOff], GG.Script.UNIT_SFX2)
+		Explode(docked[fallOff], SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		table.remove(docked, fallOff)
 		Sleep(600)
-		EmitSfx(facframe, UNIT_SFX3)
+		EmitSfx(facframe, GG.Script.UNIT_SFX3)
 		Sleep(100)
 		return 1
 	else
-		EmitSfx(hull, UNIT_SFX3)
-		Explode(hull, sfxShatter)
+		EmitSfx(hull, GG.Script.UNIT_SFX3)
+		Explode(hull, SFX.SHATTER)
 		for i=1,4 do
-			Explode(engines[i], sfxFall + sfxSmoke + sfxFire)
+			Explode(engines[i], SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		end
 		for i=1,6 do
-			Explode(docked[i], sfxFall + sfxSmoke + sfxFire)
+			Explode(docked[i], SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		end
 		return 2
 	end

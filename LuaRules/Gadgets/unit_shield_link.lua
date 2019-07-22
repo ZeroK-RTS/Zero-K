@@ -117,34 +117,36 @@ function gadget:UnitCreated(unitID, unitDefID)
 	
 	if shieldWeaponDefID then
 		local shieldWep = WeaponDefs[shieldWeaponDefID]
-		--local x,y,z = spGetUnitPosition(unitID)
-		local allyTeamID = spGetUnitAllyTeam(unitID)
-		if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID][unitID]) then -- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
-			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or {}
-			allyTeamShieldList[allyTeamID] = allyTeamShieldList[allyTeamID] or {count = 0}
-			
-			local shieldRegen = shieldWep.shieldPowerRegen
-			if shieldRegen == 0 and shieldWep.customParams and shieldWep.customParams.shield_rate then
-				shieldRegen = tonumber(shieldWep.customParams.shield_rate)
+		if not shieldWep.customParams.unlinked then 
+			--local x,y,z = spGetUnitPosition(unitID)
+			local allyTeamID = spGetUnitAllyTeam(unitID)
+			if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID][unitID]) then -- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
+				allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or {}
+				allyTeamShieldList[allyTeamID] = allyTeamShieldList[allyTeamID] or {count = 0}
+				
+				local shieldRegen = shieldWep.shieldPowerRegen
+				if shieldRegen == 0 and shieldWep.customParams and shieldWep.customParams.shield_rate then
+					shieldRegen = tonumber(shieldWep.customParams.shield_rate)
+				end
+				
+				local shieldUnit = {
+					shieldMaxCharge  = shieldWep.shieldPower,
+					shieldNum    = shieldNum,
+					shieldRadius = shieldWep.shieldRadius,
+					shieldRegen  = shieldRegen,
+					shieldRank   = ((shieldWep.shieldRadius > 400) and 3) or ((shieldWep.shieldRadius > 200) and 2) or 1,
+					unitDefID    = unitDefID,
+					neighbors    = {},
+					neighborList = {count = 0},
+					allyTeamID   = allyTeamID,
+					enabled      = false,
+					oldEnabled   = false,
+					oldFastEnabled = false,
+				}
+				AddDataThingToIterable(unitID, shieldUnit, allyTeamShields[allyTeamID], allyTeamShieldList[allyTeamID])
 			end
-			
-			local shieldUnit = {
-				shieldMaxCharge  = shieldWep.shieldPower,
-				shieldNum    = shieldNum,
-				shieldRadius = shieldWep.shieldRadius,
-				shieldRegen  = shieldRegen,
-				shieldRank   = ((shieldWep.shieldRadius > 200) and 2) or 1,
-				unitDefID    = unitDefID,
-				neighbors    = {},
-				neighborList = {count = 0},
-				allyTeamID   = allyTeamID,
-				enabled      = false,
-				oldEnabled   = false,
-				oldFastEnabled = false,
-			}
-			AddDataThingToIterable(unitID, shieldUnit, allyTeamShields[allyTeamID], allyTeamShieldList[allyTeamID])
+			QueueLinkUpdate(allyTeamID,unitID)
 		end
-		QueueLinkUpdate(allyTeamID,unitID)
 	end
 end
 
@@ -166,7 +168,7 @@ end
 
 function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	local ud = UnitDefs[unitDefID]
-	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam)
+	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam, false)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if allyTeamID and allyTeamShields[oldAllyTeam] and allyTeamShields[oldAllyTeam][unitID] then
 		local unitData

@@ -36,8 +36,8 @@ end
 
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	if gunships[unitDefID] then
-		local queue = Spring.GetCommandQueue(unitID, 1)
-		if queue and queue[1] and (queue[1].id == CMD_RAW_MOVE or queue[1].id == CMD_FIGHT) then
+		local cmdID = Spring.Utilities.GetUnitFirstCommand(unitID)
+		if cmdID and (cmdID == CMD_RAW_MOVE or cmdID == CMD_FIGHT) then
 			return
 		end
 		

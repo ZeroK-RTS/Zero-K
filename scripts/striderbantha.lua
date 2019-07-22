@@ -105,7 +105,7 @@ function script.Create()
 	Turn(rarm, z_axis, 0.1)	
 	Turn(lmissileflare, z_axis, math.rad(-90))
 	Turn(rmissileflare, z_axis, math.rad(-90))	
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 local function IdleAnim()
@@ -381,31 +381,31 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
-		Explode(body, sfxNone)
-		Explode(head, sfxNone)
-		Explode(pelvis, sfxNone)
-		Explode(lleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rarmgun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(larmgun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(larm, sfxShatter)
-		Explode(lmissiles, sfxShatter)
-		Explode(rmissiles, sfxShatter)
+		Explode(body, SFX.NONE)
+		Explode(head, SFX.NONE)
+		Explode(pelvis, SFX.NONE)
+		Explode(lleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rarmgun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(larmgun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(larm, SFX.SHATTER)
+		Explode(lmissiles, SFX.SHATTER)
+		Explode(rmissiles, SFX.SHATTER)
 		Turn(torso, y_axis, 0, 50)
 		Turn(rarmgun, y_axis, 30, 20)	
 		Turn(larmgun, y_axis, 30, 20)
 		
-		InitializeDeathAnimation()
+		GG.Script.InitializeDeathAnimation(unitID)
 		Sleep(800)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
-		Explode(body, sfxNone)
-		Explode(head, sfxNone)
-		Explode(pelvis, sfxShatter)
+		Explode(body, SFX.NONE)
+		Explode(head, SFX.NONE)
+		Explode(pelvis, SFX.SHATTER)
 		return 1 -- corpsetype
 	else
-		Explode(body, sfxShatter)
-		Explode(head, sfxSmoke + sfxFire)
-		Explode(pelvis, sfxSmoke + sfxFire + sfxExplode)
+		Explode(body, SFX.SHATTER)
+		Explode(head, SFX.SMOKE + SFX.FIRE)
+		Explode(pelvis, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2 -- corpsetype
 	end
 end

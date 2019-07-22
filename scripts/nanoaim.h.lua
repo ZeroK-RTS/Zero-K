@@ -14,10 +14,16 @@
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local Utils_GetUnitNanoTarget = Spring.Utilities.GetUnitNanoTarget
+if GG.NanoAim then
+	return
+end
+GG.NanoAim = {}
 
-function UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
-	local type, target, isFeature = Utils_GetUnitNanoTarget(unitID)
+function GG.NanoAim.UpdateNanoDirection(unitID, nanopieces,turnSpeed,turnSpeedVert)
+	if not Spring.ValidUnitID(unitID) then
+		return
+	end
+	local type, target, isFeature = Spring.Utilities.GetUnitNanoTarget(unitID)
 
 	if (target) then
 		local x,y,z
@@ -45,7 +51,7 @@ function UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
 		turnSpeedVert = turnSpeedVert or turnSpeed
 
 		local turned = false
-		for i=1,#nanopieces do
+		for i = 1,#nanopieces do
 			local nano = nanopieces[i]
 			local cur_head,cur_pitch = Spring.UnitScript.GetPieceRotation(nano)
 			if (cur_head ~= heading)or(cur_pitch ~= pitch) then
@@ -62,10 +68,10 @@ function UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
 end
 
 
-function UpdateNanoDirectionThread(nanopieces, updateInterval, turnSpeed,turnSpeedVert)
+function GG.NanoAim.UpdateNanoDirectionThread(unitID, nanopieces, updateInterval, turnSpeed,turnSpeedVert)
 	updateInterval = updateInterval or 1000
-	while true do
-		UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
+	while true and Spring.ValidUnitID(unitID) do
+		GG.NanoAim.UpdateNanoDirection(unitID, nanopieces,turnSpeed,turnSpeedVert)
 		Sleep(updateInterval)
 	end
 end

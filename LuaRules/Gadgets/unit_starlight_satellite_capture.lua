@@ -17,11 +17,14 @@ function gadget:GetInfo()
 	}
 end
 
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spTransferUnit = Spring.TransferUnit
+
 local transfers = {}
 local alreadyAdded
 
 function gadget:UnitGiven(unitID, unitDefID, newTeam)
-	local satID = Spring.GetUnitRulesParam(unitID,'has_satellite');
+	local satID = spGetUnitRulesParam(unitID, 'has_satellite')
 	if not satID then
 		return
 	end
@@ -42,7 +45,7 @@ end
 
 function gadget:GameFrame(f)
 	for satID, team in pairs(transfers) do
-		Spring.TransferUnit(satID, team, false)
+		spTransferUnit(satID, team, false)
 		transfers[satID] = nil
 	end
 

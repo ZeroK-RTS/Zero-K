@@ -203,3 +203,10 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+function widget:Initialize()
+	if Spring.Utilities.IsCurrentVersionNewerThan(104, 1000) then
+		widgetHandler:RemoveWidget(widget)
+		return
+	end
+end

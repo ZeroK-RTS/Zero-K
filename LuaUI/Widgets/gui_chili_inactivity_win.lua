@@ -97,7 +97,6 @@ local function SetupWindow()
 		tooltip = "Stop waiting for dropped players and declare yourself the winner.";
 		OnClick = {
 			function() 
-				Spring.SendCommands("pause 0")
 				Spring.SendCommands("luarules inactivitywin")
 			end
 		}
@@ -150,7 +149,6 @@ function widget:Update(dt)
 	if desiredActive ~= windowVisible then
 		if desiredActive then
 			windowVisible = true
-			Spring.SendCommands("pause 1")
 			if not mainWindow then
 				mainWindow = SetupWindow()
 			end
@@ -158,10 +156,9 @@ function widget:Update(dt)
 		else
 			windowVisible = false
 			screen0:RemoveChild(mainWindow)
-			Spring.SendCommands("pause 0")
 		end
 	end
-
+	
 	if windowVisible then
 		mainWindow:BringToFront()
 	end

@@ -34,7 +34,7 @@ local CMD_STOP          = CMD.STOP
 local spGetGameFrame    = Spring.GetGameFrame
 local spGetMyTeamID     = Spring.GetMyTeamID
 local spGetTeamUnits    = Spring.GetTeamUnits
-local spGetCommandQueue = Spring.GetCommandQueue
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetUnitDefID    = Spring.GetUnitDefID
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
@@ -67,8 +67,8 @@ end
 local function SetupUnit(unitID)
 	-- set immobile builders (nanotowers?) to the ROAM movestate,
 	-- and give them a PATROL order (does not matter where, afaict)
-	local cQueue = spGetCommandQueue(unitID, 1)
-	if (not cQueue) or ((#cQueue > 0) and cQueue[1].id ~= CMD_PATROL) then
+	local cmdID = spGetUnitCurrentCommand(unitID)
+	if cmdID and cmdID ~= CMD_PATROL then
 		return
 	end
 	

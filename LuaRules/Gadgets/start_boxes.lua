@@ -10,7 +10,7 @@ function gadget:GetInfo() return {
 	enabled  = true,
 } end
 
-local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 local shuffleMode = Spring.GetModOptions().shuffle or "auto"
 local startboxConfig
 
@@ -183,13 +183,13 @@ end
 
 -- name, elo, clanShort, clanLong, isAI
 local function GetPlayerInfo (teamID)
-	local _,playerID,_,isAI = Spring.GetTeamInfo(teamID)
+	local _,playerID,_,isAI = Spring.GetTeamInfo(teamID, false)
 
 	if isAI then
 		return select(2, Spring.GetAIInfo(teamID)), -1000, "", "", true
 	end
 
-	local name = Spring.GetPlayerInfo(playerID) or "?"
+	local name = Spring.GetPlayerInfo(playerID, false) or "?"
 	local customKeys = select(10, Spring.GetPlayerInfo(playerID)) or {}
 	local clanShort = customKeys.clan     or ""
 	local clanLong  = customKeys.clanfull or ""
@@ -422,7 +422,7 @@ function gadget:AllowStartPosition(playerID, teamID, readyState, x, y, z, rx, ry
 		return true -- custom AI, can't know which team it is on so allow it to place anywhere for now and filter invalid positions later
 	end
 
-	local teamID = select(4, Spring.GetPlayerInfo(playerID))
+	local teamID = select(4, Spring.GetPlayerInfo(playerID, false))
 
 	if (shuffleMode == "disable") then
 		-- note this is after the AI check; toasters still have to obey
@@ -469,7 +469,7 @@ function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 	else
 		-- for checking enemy startpos
 		local enemyboxes = {}
-		local _,_,_,_,_,allyteamid,_,_ = Spring.GetTeamInfo(teamID)
+		local _,_,_,_,_,allyteamid = Spring.GetTeamInfo(teamID, false)
 		local allyteams = Spring.GetAllyTeamList()
 		
 		if shuffleMode == "allshuffle" then
@@ -482,24 +482,22 @@ function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 			for _,value in pairs(allyteams) do
 				if value ~= allyteamid then
 					local enemyteams = Spring.GetTeamList(value)
-					for _,value1 in pairs(enemyteams) do
+					local _,value1 = next(enemyteams)
+					if value1 then
 						local enemybox = Spring.GetTeamRulesParam(value1, "start_box_id")
 						if (enemybox) then
 							enemyboxes[enemybox] = true
 						end
-						break
 					end
 				end
 			end
 		end
 		
-		local valid = "0"
 		for bid,_ in pairs(enemyboxes) do
 			if CheckStartbox(bid, x, z) then
-				valid = "1"
-				break
+				return "1"
 			end
 		end
-		return valid
+		return "0"
 	end
 end

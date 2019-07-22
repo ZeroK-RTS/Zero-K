@@ -42,7 +42,6 @@ local spGetCommandQueue	= Spring.GetCommandQueue
 local spGetGameSeconds	= Spring.GetGameSeconds
 local spGetFeaturePosition = Spring.GetFeaturePosition
 local spGetPlayerInfo = Spring.GetPlayerInfo
-local spGetUnitStates = Spring.GetUnitStates
 local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
 local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitLastAttacker = Spring.GetUnitLastAttacker
@@ -67,9 +66,6 @@ local CMD_OPT_SHIFT		= CMD.OPT_SHIFT
 local CMD_RECLAIM		= CMD.RECLAIM
 local CMD_RESURRECT		= CMD.RESURRECT
 local CMD_REPAIR		= CMD.REPAIR
-
-VFS.Include("LuaRules/Utilities/versionCompare.lua")
-local LOS_MULT = (Spring.Utilities.IsCurrentVersionNewerThan(100, 0) and 1) or 32
 
 --local spRequestPath = Spring.RequestPath
 local mathRandom = math.random
@@ -246,7 +242,7 @@ options = {
 function widget:Initialize()
 	skippingTimerG.echoTimestamp = spGetGameSeconds()
 	myPlayerID=Spring.GetMyPlayerID()
-	local _, _, spec = Spring.GetPlayerInfo(myPlayerID)
+	local _, _, spec = Spring.GetPlayerInfo(myPlayerID, false)
 	if spec then widgetHandler:RemoveWidget() return false end
 	myTeamID_gbl= spGetMyTeamID()
 	
@@ -626,7 +622,7 @@ function CountdownNetworkDelayWait(unitID)
 end
 
 function ReportedNetworkDelay(playerIDa, defaultDelay)
-	local _,_,_,_,_,totalDelay,_,_,_,_= Spring.GetPlayerInfo(playerIDa)
+	local _,_,_,_,_,totalDelay = Spring.GetPlayerInfo(playerIDa, false)
 	if totalDelay==nil or totalDelay<=defaultDelay then return defaultDelay --if ping is too low: set the minimum delay
 	else return totalDelay --take account for lag + wait a little bit for any command to properly update
 	end
@@ -656,29 +652,6 @@ function RefreshWatchdogList (unitID, commandTTL)
 		commandTTL[unitID] = {1,} --Note: first entry is table lenght
 	else --//if commandTTL is not empty then perform check and update its content appropriately. Its not empty when widget has issued a new command
 
-		--//Method1: the following function do work offline but not online because widget's command appears delayed (latency) and this cause missmatch with what commandTTL expect to see: it doesn't see the command thus it assume the command already been deleted.
-		--[[
-		local cQueue = spGetCommandQueue(unitID, 1)
-		for i=#commandTTL[unitID], 1, -1 do
-			local firstParam, secondParam = 0, 0
-			if cQueue[1]~=nil then
-				firstParam, secondParam = cQueue[1].params[1], cQueue[1].params[3]
-			end
-			if (firstParam == commandTTL[unitID][i].widgetCommand[1]) and (secondParam == commandTTL[unitID][i].widgetCommand[2]) then --//if current command is similar to the one once issued by widget then countdown its TTL
-				if commandTTL[unitID][i].countDown >0 then 
-					commandTTL[unitID][i].countDown = commandTTL[unitID][i].countDown - 1 --count-down until zero and stop
-				elseif commandTTL[unitID][i].countDown ==0 then --if commandTTL is found to reach ZERO then remove the command, assume a 'TIMEOUT', then remove *this* watchdog entry
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-					commandTTL[unitID][i] = nil
-				end
-				break --//exit the iteration, save the rest of the commandTTL for checking on next update/next cQueue. Since later commandTTL is for cQueue[2](next qeueu) then it is more appropriate to compare it later (currently we only check cQueue[1] for timeout/expiration).
-			else --//if current command is a NEW command (not similar to the one catalogued in commandTTL as widget-issued), then delete this watchdog entry. LUA Operator "#" will automatically register the 'nil' as 'end of table' for future updates
-				commandTTL[unitID][i] = nil
-				--commandTTL[unitID][i].miss = commandTTL[unitID][i].miss +1 --//when unit's command doesn't match the one on watchdog-list then mark the entry as "miss"+1 .  
-			end
-		end
-		--]]
-		
 		--//Method2: work by checking for cQueue after the command has expired. No latency could be as long as command's expiration time so it solve Method1's issue.
 		local returnToReclaimOffset = 1 --
 		for i=commandTTL[unitID][1], 2, -1 do --iterate downward over commandTTL, empty last entry when possible. Note: first table entry is the table's lenght, so we iterate down to only index 2
@@ -688,13 +661,11 @@ function RefreshWatchdogList (unitID, commandTTL)
 					break --//exit the iteration, do not go to next iteration until this entry expire first... 
 				elseif commandTTL[unitID][i].countDown <=0 then --if commandTTL is found to reach ZERO then remove the command, assume a 'TIMEOUT', then remove *this* watchdog entry
 					local cQueue = spGetCommandQueue(unitID, 1) --// get unit's immediate command
-					local firstParam, secondParam = 0, 0
-					if cQueue[1]~=nil then
-						firstParam, secondParam = cQueue[1].params[1], cQueue[1].params[3] --if cQueue not empty then use it... x, z,
-					end
-					if (firstParam == commandTTL[unitID][i].widgetCommand[1]) and 
+					local cmdID, _, cmdTag, firstParam, _, secondParam = Spring.GetUnitCurrentCommand(unitID)
+					if cmdID and
+					( firstParam == commandTTL[unitID][i].widgetCommand[1]) and
 					(secondParam == commandTTL[unitID][i].widgetCommand[2]) then --//if current command is similar to the one once issued by widget then delete it
-						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+						spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, {} )
 					end
 					commandTTL[unitID][i] = nil --empty watchdog entry
 					commandTTL[unitID][1] = i-1 --refresh table lenght
@@ -747,8 +718,7 @@ function GateKeeperOrCommandFilter (cQueue,persistentData, unitInMotionSingleUni
 	if cQueue~=nil then --prevent ?. Forgot...
 		local isReloading = CheckIfUnitIsReloading(unitInMotionSingleUnit) --check if unit is reloading/shieldCritical
 		local unitID = unitInMotionSingleUnit["unitID"]
-		local state=spGetUnitStates(unitID)
-		local holdPosition= (state.movestate == 0)
+		local holdPosition= (Spring.Utilities.GetUnitMoveState(unitID) == 0)
 		local unitType = unitInMotionSingleUnit["unitType"]
 		local unitInView = unitInMotionSingleUnit["isVisible"]
 		local retreating = false
@@ -910,7 +880,7 @@ function GetUnitLOSRadius(case,unitInMotionSingleUnit)
 	local unitDef= UnitDefs[unitDefID]
 	local losRadius =550 --arbitrary (scout LOS)
 	if unitDef~=nil then --if unitDef is not empty then use the following LOS
-		losRadius= unitDef.losRadius*LOS_MULT --in normal case use real LOS. Note: for some reason it was times 32
+		losRadius= unitDef.losRadius --in normal case use real LOS
 		losRadius= losRadius + extraLOSRadiusCONSTANT --add extra detection range for beyond LOS (radar)
 		if case=="attack" then --if avoidance is for attack enemy: use special LOS
 			
@@ -918,27 +888,7 @@ function GetUnitLOSRadius(case,unitInMotionSingleUnit)
 			if unitFastestReloadableWeapon ~= -1 then
 				local weaponRange = fastestWeapon["range"] --retrieve weapon range
 				losRadius = math.max(weaponRange*0.75, losRadius) --select avoidance's detection-range to 75% of weapon range or maintain to losRadius, select which is the biggest (Note: big LOSradius mean big detection but also big "distanceCONSTANTunit_G" if "useLOS_distanceCONSTANTunit_G==true", thus bigger avoidance circle)
-			end	
-			
-			--[[
-			local unitShieldRange,fastWeaponRange =-1, -1 --assume unit has no shield and no weapon
-			local fastestReloadTime = 999 --temporary variables
-			for _, weapons in ipairs(unitDef["weapons"]) do --reference: gui_contextmenu.lua by CarRepairer
-				local weaponsID = weapons["weaponDef"]
-				local weaponsDef = WeaponDefs[weaponsID]
-				if weaponsDef["name"] and not (weaponsDef["name"]:find('fake') or weaponsDef["name"]:find('noweapon')) then --reference: gui_contextmenu.lua by CarRepairer
-					if weaponsDef["isShield"] then 
-						unitShieldRange = weaponsDef["shieldRadius"] --remember the shield radius of this unit
-					else --if not shield then this is conventional weapon
-						local reloadTime = weaponsDef["reload"]
-						if reloadTime < fastestReloadTime then --find the weapon with the smallest reload time
-							fastestReloadTime = reloadTime
-							fastWeaponRange = weaponsDef["range"] --remember the range of the fastest weapon. 
-						end
-					end
-				end
 			end
-			--]]
 		end
 		if unitDef.isBuilder then 
 			losRadius = losRadius + extraLOSRadiusCONSTANT --add additional/more detection range for constructors for quicker reaction vs enemy radar dot
@@ -1211,56 +1161,7 @@ function InsertCommandQueue(unitID,cQueue,cQueueGKPed,newCommand,persistentData)
 	local now = persistentData["now"]
 	local commandTTL = persistentData["commandTTL"]
 	local commandIndexTable = persistentData["commandIndexTable"]
-	-------
-	--Method 1: doesn't work online
-	--if not newCommand then spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) end --delete old command
-	-- spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
-	----
-	--Method 2: doesn't work online
-	-- if not newCommand then spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]}, {"ctrl","shift"} ) end --delete old command
-	-- spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
-	----
-	--Method 3.5: cause big movement noise
-	-- newX = Round(newX)
-	-- newY = Round(newY)
-	-- newZ = Round(newZ)
-	----
-	--Method 3: work online, but under rare circumstances doesn't work
-	-- spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
-	-- spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {newX, newY, newZ}, {} )
-	-- local arrayIndex=1
-	-- if not newCommand then arrayIndex=2 end --skip old widget command
-	-- if #cQueue>=2 then --try to identify unique signature of area reclaim/repair
-		-- if (cQueue[1].id==40 or cQueue[1].id==90 or cQueue[1].id==125) then
-			-- if cQueue[2].id==90 or cQueue[2].id==125 then 
-				-- if (not Spring.ValidFeatureID(cQueue[2].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[2].params[1]))) and not Spring.ValidUnitID(cQueue[2].params[1]) then --if it is an area command
-					-- spGiveOrderToUnit(unitID, CMD_RAW_MOVE, cQueue[2].params, {} ) --divert unit to the center of reclaim/repair command
-					-- arrayIndex=arrayIndex+1 --skip the target:wreck/units. Allow command reset
-				-- end
-			-- elseif cQueue[2].id==40 then
-				-- if (not Spring.ValidFeatureID(cQueue[2].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[2].params[1]))) and not Spring.ValidUnitID(cQueue[2].params[1]) then --if it is an area command
-					-- arrayIndex=arrayIndex+1 --skip the target:units. Allow continuous command reset
-				-- end
-			-- end
-		-- end
-	-- end
-	-- for b = arrayIndex, #cQueue,1 do --re-do user's optional command
-		-- local options={"shift",nil,nil,nil}
-		-- local optionsIndex=2
-		-- if cQueue[b].options["alt"] then 
-			-- options[optionsIndex]="alt"
-		-- end
-		-- if cQueue[b].options["ctrl"] then 
-			-- optionsIndex=optionsIndex+1
-			-- options[optionsIndex]="ctrl"
-		-- end
-		-- if cQueue[b].options["right"] then 
-			-- optionsIndex=optionsIndex+1
-			-- options[optionsIndex]="right"
-		-- end
-		-- spGiveOrderToUnit(unitID, cQueue[b].id, cQueue[b].params, options) --replace the rest of the command
-	-- end
-	--Method 4: with network delay detection won't do any problem
+
 	local orderArray={nil,nil,nil,nil,nil,nil}
 	local queueIndex=1
 	local avoidanceCommand = true
@@ -1467,29 +1368,6 @@ function ExtractTarget (queueIndex, cQueue,unitInMotionSingleUnit) --//used by I
 		end
 		--]]
 
-		--Method 2: set target to center of area command (also check for area command in next queue), else set target to wreckage or to no target. *This method assume retreat to base is a norm*
-		--[[
-		if (cQueue[queueIndex].params[4] ~= nil) then --area reclaim should has no "nil" on params 1,2,3, & 4  while single reclaim has unit/featureID in params 1 only
-			wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
-			areaMode = true
-			foundMatch = true
-		elseif (cQueue[queueIndex+1].params[4] ~= nil and (cQueue[queueIndex+1].id==CMD_RECLAIM or cQueue[queueIndex+1].id==CMD_RESURRECT)) then --if next queue is an area-reclaim
-			wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex+1].params[1], cQueue[queueIndex+1].params[2],cQueue[queueIndex+1].params[3]
-			areaMode = true
-			foundMatch = true
-		end
-		if not areaMode then
-			local posX, posY, posZ = GetUnitOrFeaturePosition(cQueue[queueIndex].params[1])
-			if posX then
-				foundMatch = true
-				wreckPosX, wreckPosY, wreckPosZ = posX, posY, posZ
-			end
-		end
-		if not foundMatch then --if no area-command, no wreckage, no trees, no rock, and no unitID then return error
-			if (turnOnEcho == 2)then Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target") end
-		end
-		--]]
-		
 		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck/center-of-area-command as target
 		--graphCONSTANTtrigger[1] = 2 --use bigger angle scale for initial avoidance: after that is a MOVE command to the center or area-command which uses standard angle scale (take ~4 cycle to do 180 flip, but more chaotic) 
 		--graphCONSTANTtrigger[2] = 2
@@ -2196,30 +2074,7 @@ function NearestSafeCoordinate (unitID, safeHavenCoordinates, nearestSafeHavenDi
 				break
 			end
 		end
-		
-		--local pathOpen = spRequestPath(movementType, x,y,z, safeHavenCoordinates[j][1], safeHavenCoordinates[j][2], safeHavenCoordinates[j][3])
-		-- if pathOpen == nil then
-			-- pathOpen = spRequestPath(movementType, x,y,z, safeHavenCoordinates[j][1]-80, safeHavenCoordinates[j][2], safeHavenCoordinates[j][3])
-			-- validX = safeHavenCoordinates[j][1]-80
-			-- validZ = safeHavenCoordinates[j][3]
-			-- if not pathOpen then
-				-- pathOpen = spRequestPath(movementType, x,y,z, safeHavenCoordinates[j][1], safeHavenCoordinates[j][2], safeHavenCoordinates[j][3]-80)
-				-- validX = safeHavenCoordinates[j][1]
-				-- validZ = safeHavenCoordinates[j][3]-80
-				-- if not pathOpen then
-					-- pathOpen = spRequestPath(movementType, x,y,z, safeHavenCoordinates[j][1], safeHavenCoordinates[j][2], safeHavenCoordinates[j][3]+80)
-					-- validX = safeHavenCoordinates[j][1]
-					-- validZ = safeHavenCoordinates[j][3]+80
-					-- if not pathOpen then
-						-- pathOpen = spRequestPath(movementType, x,y,z, safeHavenCoordinates[j][1]+80, safeHavenCoordinates[j][2], safeHavenCoordinates[j][3])
-						-- validX = safeHavenCoordinates[j][1]+80
-						-- validZ = safeHavenCoordinates[j][3]
-					-- end
-				-- end
-			-- end
-		--end
-		--Spring.MarkerAddPoint(validX, safeHavenCoordinates[j][2] , validZ, "here")
-			
+
 		if distance > 300 and distance < nearestSafeHavenDistance and pathOpen then
 			nearestSafeHavenDistance = distance
 			nearestSafeHaven.params[1] = validX

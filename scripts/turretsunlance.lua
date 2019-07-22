@@ -36,30 +36,30 @@ function script.Shot(num)
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(base, sfxNone)
-		Explode(turret, sfxNone)
-		Explode(breech, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(breech, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(base, sfxNone)
-		Explode(turret, sfxNone)
-		Explode(breech, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(breech, SFX.NONE)
 		return 1
 	elseif severity <= .99 then
-		Explode(base, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke + sfxFire)
-		Explode(breech, sfxFall + sfxSmoke + sfxFire)
+		Explode(base, SFX.SHATTER)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(breech, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(breech, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, SFX.SHATTER)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(breech, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	end
 end

@@ -17,9 +17,10 @@ end
 --------------------------------------------------------------------------------
 
 local RETAKING_DEGRADE_TIMER = 15
-local GENERAL_DEGRADE_TIMER = 5
-local DEGRADE_FACTOR = 0.04
-local CAPTURE_LINGER = 0.95
+local GENERAL_DEGRADE_TIMER  = 5
+local DEGRADE_FACTOR         = 0.04
+local CAPTURE_LINGER         = 0.95
+local FIREWALL_HEALTH        = 500
 
 local DAMAGE_MULT = 3 -- n times faster when target is at 0% health
 
@@ -189,9 +190,10 @@ local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID, old
 		damageByID.count = damageByID.count + 1
 		damageByID.data[damageByID.count] = unitID
 		
+		local maxHealth = (select(2, Spring.GetUnitHealth(unitID)) or 0) + FIREWALL_HEALTH
 		local damageData = {
 			index = damageByID.count,
-			captureHealth = Spring.Utilities.GetUnitCost(unitID, unitDefID),
+			captureHealth = maxHealth,
 			largestDamage = 0,
 			allyTeamByID = {count = 0, data = {}},
 			allyTeams = {},
@@ -200,7 +202,7 @@ local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID, old
 		local allyTeams = damageData.allyTeams
 		
 		-- add ally team stats
-		local _,_,_,_,_,attackerAllyTeam = spGetTeamInfo(oldTeamCaptureLinger)
+		local _,_,_,_,_,attackerAllyTeam = spGetTeamInfo(oldTeamCaptureLinger, false)
 		if not allyTeams[attackerAllyTeam] then
 			allyTeamByID.count = allyTeamByID.count + 1
 			allyTeamByID.data[allyTeamByID.count] = attackerAllyTeam
@@ -254,13 +256,15 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 	
 	-- add stats that the unit requires for this gadget
+	local health, maxHealth = spGetUnitHealth(unitID)
+	maxHealth = maxHealth + FIREWALL_HEALTH
 	if not unitDamage[unitID] then
 		damageByID.count = damageByID.count + 1
 		damageByID.data[damageByID.count] = unitID
 		
 		unitDamage[unitID] = {
 			index = damageByID.count,
-			captureHealth = Spring.Utilities.GetUnitCost(unitID, unitDefID),
+			captureHealth = maxHealth,
 			largestDamage = 0,
 			allyTeamByID = {count = 0, data = {}},
 			allyTeams = {},
@@ -272,7 +276,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	local allyTeams = damageData.allyTeams
 	
 	-- add ally team stats
-	local _,_,_,_,_,attackerAllyTeam = spGetTeamInfo(attackerTeam)
+	local _,_,_,_,_,attackerAllyTeam = spGetTeamInfo(attackerTeam, false)
 	if not allyTeams[attackerAllyTeam] then
 		allyTeamByID.count = allyTeamByID.count + 1
 		allyTeamByID.data[allyTeamByID.count] = attackerAllyTeam
@@ -284,16 +288,14 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 	
 	-- check damage (armourmod, range falloff) if enabled
-	local newCaptureDamage = captureWeaponDefs[weaponID].captureDamage
-	if captureWeaponDefs[weaponID].scaleDamage then 
-		newCaptureDamage = newCaptureDamage * (damage/WeaponDefs[weaponID].customParams.shield_damage) 
-	end --scale damage based on real damage (i.e. take into account armortypes etc.)
-	-- scale damage based on target health
-	local health, maxHealth = spGetUnitHealth(unitID)
-	if health <= 0 then 
-		health = 0.01 
+	local def = captureWeaponDefs[weaponID]
+	local newCaptureDamage = def.captureDamage
+	if def.scaleDamage then 
+		newCaptureDamage = newCaptureDamage * (damage/def.baseDamage) 
 	end
-	newCaptureDamage = newCaptureDamage * (DAMAGE_MULT - (DAMAGE_MULT - 1)*(health/maxHealth))
+	-- scale damage based on real damage (i.e. take into account armortypes etc.)
+	health = health + FIREWALL_HEALTH
+	newCaptureDamage = newCaptureDamage * (maxHealth/health)
 	
 	local allyTeamData = allyTeams[attackerAllyTeam]
 	
@@ -543,7 +545,7 @@ function gadget:Initialize()
 end
 
 function gadget:Load(zip)
-	if not GG.SaveLoad then
+	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Capture failed to access save/load API")
 		return
 	end

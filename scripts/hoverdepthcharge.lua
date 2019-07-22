@@ -87,7 +87,7 @@ function script.Create()
 	Turn(rim1, y_axis, math.rad(-35))
 	Turn(rim2, y_axis, math.rad(35))
 	
-	StartThread(SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 end
@@ -124,7 +124,7 @@ local depthchargeWeaponDef = WeaponDefNames["hoverdepthcharge_depthcharge"]
 local RELOAD = math.ceil(depthchargeWeaponDef.reload * Game.gameSpeed)
 
 function ShootDepthcharge()
-	EmitSfx(pads, FIRE_W3)
+	EmitSfx(pads, GG.Script.FIRE_W3)
 	StartThread(ShotThread)
 end
 
@@ -139,7 +139,7 @@ local function FakeWeaponShoot()
 			local reloadFrame = gameFrame + RELOAD / reloadMult
 			spSetUnitWeaponState(unitID, 1, {reloadFrame = reloadFrame})
 			
-			EmitSfx(pads, FIRE_W3)
+			EmitSfx(pads, GG.Script.FIRE_W3)
 			StartThread(ShotThread)
 			Move(gun, y_axis, -2)
 			Move(gun, y_axis, 2, 2)
@@ -162,24 +162,24 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
-		Explode(base, sfxNone)
-		Explode(door1, sfxNone)
-		Explode(door2, sfxNone)
-		Explode(back, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(door1, SFX.NONE)
+		Explode(door2, SFX.NONE)
+		Explode(back, SFX.NONE)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(base, sfxNone)
-		Explode(door1, sfxNone)
-		Explode(door2, sfxNone)
-		Explode(back, sfxNone)
-		Explode(rim1, sfxShatter)
-		Explode(rim2, sfxShatter)
+		Explode(base, SFX.NONE)
+		Explode(door1, SFX.NONE)
+		Explode(door2, SFX.NONE)
+		Explode(back, SFX.NONE)
+		Explode(rim1, SFX.SHATTER)
+		Explode(rim2, SFX.SHATTER)
 		return 1
 	end
-	Explode(door1, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(door2, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(back, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(rim1, sfxShatter)
-	Explode(rim2, sfxShatter)
+	Explode(door1, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(door2, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(back, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rim1, SFX.SHATTER)
+	Explode(rim2, SFX.SHATTER)
 	return 2
 end

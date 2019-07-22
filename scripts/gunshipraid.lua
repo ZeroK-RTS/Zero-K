@@ -34,7 +34,7 @@ local function RestoreAfterDelay ()
 end
 
 function script.Create()
-	StartThread (SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, smokePiece)
 	StartThread (TiltWings)
 	Hide (lfx)
 	Hide (rfx)
@@ -66,14 +66,14 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if (severity <= .50 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing")) then
-		Explode (body, sfxShatter)
-		Explode (rjet, sfxFall)
+		Explode (body, SFX.SHATTER)
+		Explode (rjet, SFX.FALL)
 		return 1
 	else
-		Explode (gun, sfxFall + sfxSmoke + sfxFire)
-		Explode (ljet, sfxFall + sfxSmoke + sfxFire)
-		Explode (rjet, sfxFall + sfxSmoke + sfxFire)
-		Explode (body, sfxShatter)
+		Explode (gun, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode (ljet, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode (rjet, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode (body, SFX.SHATTER)
 		return 2
 	end
 end

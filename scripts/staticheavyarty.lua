@@ -22,10 +22,10 @@ local smokePiece = {base, turret, ground}
 local function DisableCheck()
 	while true do
 		if select(1, spGetUnitIsStunned(unitID)) then
-			if StopTurn(sleeve, x_axis) then
+			if GG.PieceControl.StopTurn(sleeve, x_axis) then
 				Signal(SIG_AIM)
 			end
-			if StopTurn(turret, y_axis) then
+			if GG.PieceControl.StopTurn(turret, y_axis) then
 				Signal(SIG_AIM)
 			end
 		end
@@ -37,7 +37,7 @@ function script.Create()
 	Hide(flare)
 	Hide(muzzle)
 	Hide(barrel_back)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(DisableCheck)
 	SetupQueryWeaponFixHax(query, flare)
 end
@@ -45,8 +45,8 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	Turn(turret, y_axis, heading, rad(5))
-	Turn(sleeve, x_axis, -pitch, rad(2.5))
+	Turn(turret, y_axis, heading, math.rad(5))
+	Turn(sleeve, x_axis, -pitch, math.rad(2.5))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(sleeve, x_axis)
 	StartThread(AimingDone)
@@ -54,10 +54,10 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	EmitSfx(ground, UNIT_SFX1)
+	EmitSfx(ground, GG.Script.UNIT_SFX1)
 	Move(barrel, z_axis, -24, 500)
-	EmitSfx(barrel_back, UNIT_SFX2)
-	EmitSfx(muzzle, UNIT_SFX3)
+	EmitSfx(barrel_back, GG.Script.UNIT_SFX2)
+	EmitSfx(muzzle, GG.Script.UNIT_SFX3)
 	WaitForMove(barrel, z_axis)
 	Move(barrel, z_axis, 0, 6)
 end
@@ -75,13 +75,13 @@ function script.Killed(recentDamage, maxHealth)
 	if severity <= 0.25 then
 		return 1
 	elseif severity <= 0.50 then
-		Explode(sleeve, sfxShatter)
-		Explode(turret, sfxShatter)
+		Explode(sleeve, SFX.SHATTER)
+		Explode(turret, SFX.SHATTER)
 		return 1
 	else
-		Explode(base, sfxShatter + sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(sleeve, sfxShatter + sfxExplodeOnHit)
-		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(base, SFX.SHATTER + SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(sleeve, SFX.SHATTER + SFX.EXPLODE_ON_HIT)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		return 2
 	end
 end

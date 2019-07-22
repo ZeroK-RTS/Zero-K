@@ -327,7 +327,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	--StartThread(Walk)
 	activity_mode(1)
 end
@@ -336,34 +336,34 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 		if severity <= .50 then
-		Explode(lfoot, sfxNone)
-		Explode(lshin, sfxNone)
-		Explode(lthigh, sfxNone)
-		Explode(rfoot, sfxNone)
-		Explode(rshin, sfxNone)
-		Explode(rthigh, sfxNone)
-		Explode(body, sfxNone)
-		Explode(sphere, sfxFall)
+		Explode(lfoot, SFX.NONE)
+		Explode(lshin, SFX.NONE)
+		Explode(lthigh, SFX.NONE)
+		Explode(rfoot, SFX.NONE)
+		Explode(rshin, SFX.NONE)
+		Explode(rthigh, SFX.NONE)
+		Explode(body, SFX.NONE)
+		Explode(sphere, SFX.FALL)
 		return 1
 	elseif severity <= .99 then
-		Explode(lfoot, sfxFall)
-		Explode(lshin, sfxFall)
-		Explode(lthigh, sfxFall)
-		Explode(rfoot, sfxFall)
-		Explode(rshin, sfxFall)
-		Explode(rthigh, sfxFall)
-		Explode(body, sfxShatter)
-		Explode(sphere, sfxFall)
+		Explode(lfoot, SFX.FALL)
+		Explode(lshin, SFX.FALL)
+		Explode(lthigh, SFX.FALL)
+		Explode(rfoot, SFX.FALL)
+		Explode(rshin, SFX.FALL)
+		Explode(rthigh, SFX.FALL)
+		Explode(body, SFX.SHATTER)
+		Explode(sphere, SFX.FALL)
 		return 2
 	else
-		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(lshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(body, sfxShatter + sfxExplode)
-		Explode(sphere, sfxFall)
+		Explode(lfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(lshin, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(lthigh, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rshin, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rthigh, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(body, SFX.SHATTER + SFX.EXPLODE)
+		Explode(sphere, SFX.FALL)
 		return 2
 	end
 end

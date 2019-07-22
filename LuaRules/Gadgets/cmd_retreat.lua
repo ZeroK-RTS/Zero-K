@@ -209,7 +209,7 @@ end
 
 local function StopRetreating(unitID)
 	SendToUnsynced("StopRetreat", unitID)
-	local cmds = Spring.GetUnitCommands(unitID, -1)
+	local cmds = Spring.GetCommandQueue(unitID, -1)
 	if retreaterHasRearm[unitID] then
 		for _,cmd in ipairs(cmds) do
 			if cmd.id == CMD_REARM then
@@ -239,8 +239,8 @@ end
 
 
 local function IsUnitIdle(unitID)
-	local cQueue = spGetCommandQueue(unitID, 1)
-	local moving = cQueue and #cQueue > 0
+	local queueSize = spGetCommandQueue(unitID, 0)
+	local moving = queueSize and queueSize > 0
 	return not moving
 end
 
@@ -280,8 +280,14 @@ local function GiveRetreatOrders(unitID, hx,hz)
 	spGiveOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD.WAIT, CMD.OPT_SHIFT}, CMD.OPT_ALT) --SHIFT W
 	GiveClampedOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD_RAW_MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, CMD.OPT_ALT) -- ALT makes the 0 positional
 	
-	local cmds = Spring.GetUnitCommands(unitID,2)
-	local tag1, tag2 = cmds[1].tag, cmds[2] and cmds[2].tag
+	local tag1, tag2
+	if Spring.Utilities.COMPAT_GET_ORDER then
+		local cmds = Spring.GetCommandQueue(unitID, 2)
+		tag1, tag2 = cmds[1].tag, cmds[2] and cmds[2].tag
+	else
+		_, _, tag1 = Spring.GetUnitCurrentCommand(unitID)
+		_, _, tag2 = Spring.GetUnitCurrentCommand(unitID, 2)
+	end
 	
 	isRetreating[unitID] = true
 	retreaterTagsMove[unitID] = tag1
@@ -461,17 +467,17 @@ function gadget:RecvLuaMsg(msg, playerID)
 	
 	if(t) then
 		t = tonumber(t);
-		local _,_,_,isAI = Spring.GetTeamInfo(t)
+		local _,_,_,isAI = Spring.GetTeamInfo(t, false)
 		if(isAI) then
 			local aiid, ainame, aihost = Spring.GetAIInfo(t);
 			if (aihost == playerID) then
-				teamID,_,_,_,_,allianceID = Spring.GetTeamInfo(t);
+				teamID,_,_,_,_,allianceID = Spring.GetTeamInfo(t, false);
 			end
 		end
 	end
 	
 	if not teamID then
-		_,_, spec, teamID, allianceID = Spring.GetPlayerInfo(playerID)
+		_,_, spec, teamID, allianceID = Spring.GetPlayerInfo(playerID, false)
 	end
 	
 	if spec then return end
@@ -551,7 +557,7 @@ function gadget:Initialize()
 end
 
 function gadget:Load(zip)
-	if not GG.SaveLoad then
+	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
 		return
 	end
@@ -593,7 +599,7 @@ local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
 local function WrapToLuaUI_Haven(_,teamID)
 	local spectating = Spring.GetSpectatingState()
 	if not spectating then
-		local allyTeamID = select(6, Spring.GetTeamInfo(teamID))
+		local allyTeamID = select(6, Spring.GetTeamInfo(teamID, false))
 		if (allyTeamID ~= spGetLocalAllyTeamID()) then 
 			return 
 		end

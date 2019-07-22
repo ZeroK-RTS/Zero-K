@@ -41,7 +41,7 @@ local function Bobbing ()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(Bobbing)
 end
 
@@ -50,7 +50,7 @@ function script.Killed(recentDamage, maxHealth)
 
 	for i = 1, #explodables1 do
 		if (math.random() < severity) then
-			Explode (explodables1[i], sfxSmoke + sfxFire)
+			Explode (explodables1[i], SFX.SMOKE + SFX.FIRE)
 		end
 	end
 
@@ -60,7 +60,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(body, SFX.SHATTER)
 		for i = 1, #explodables2 do
 			if (math.random() < severity) then
-				Explode (explodables2[i], sfxSmoke + sfxFire)
+				Explode (explodables2[i], SFX.SMOKE + SFX.FIRE)
 			end
 		end
 		return 2

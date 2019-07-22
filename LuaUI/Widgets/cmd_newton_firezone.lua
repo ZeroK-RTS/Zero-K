@@ -40,7 +40,6 @@ local spGetUnitsInRectangle = Spring.GetUnitsInRectangle
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
-local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitVelocity = Spring.GetUnitVelocity
 --local ech = Spring.Echo
@@ -433,7 +432,7 @@ end
 -------------------------------------------------------------------
 --- SPECTATOR CHECK
 local function IsSpectatorAndExit()
-	local _, _, spec = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+	local _, _, spec = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 	if spec then 
 		Spring.Echo("Newton Firezone disabled for spectator.")
 		widgetHandler:RemoveWidget(widget)

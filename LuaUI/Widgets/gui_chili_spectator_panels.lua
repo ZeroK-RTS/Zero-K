@@ -19,6 +19,7 @@ end
 include("colors.h.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
+local GetLeftRightAllyTeamIDs = VFS.Include("LuaUI/Headers/allyteam_selection_utilities.lua")
 local GetFlowStr = VFS.Include("LuaUI/Headers/ecopanels.lua")
 
 --------------------------------------------------------------------------------
@@ -155,7 +156,8 @@ options = {
 		type  = "bool", 
 		value = false, 
 		OnChange = function(self)
-			WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", option_CheckEnable(self))
+			option_CheckEnable(self)
+			-- WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", option_CheckEnable(self))
 		end,
 		desc = "Enables the spectator resource bars when spectating a game with two teams."
 	},
@@ -905,9 +907,9 @@ local function GetWinString(name)
 end
 
 local function GetOpposingAllyTeams()
-	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local returnData = {}
-	local allyTeamList = Spring.GetAllyTeamList()
+	local allyTeamList = GetLeftRightAllyTeamIDs()
 	for i = 1, #allyTeamList do
 		local allyTeamID = allyTeamList[i]
 
@@ -917,9 +919,9 @@ local function GetOpposingAllyTeams()
 			local winString
 			local playerName
 			for j = 1, #teamList do
-				local _, playerID, _, isAI = Spring.GetTeamInfo (teamList[j])
+				local _, playerID, _, isAI = Spring.GetTeamInfo (teamList[j], false)
 				if not isAI then
-					playerName = Spring.GetPlayerInfo(playerID)
+					playerName = Spring.GetPlayerInfo(playerID, false)
 					winString = GetWinString(playerName)
 					break
 				end
@@ -944,10 +946,6 @@ local function GetOpposingAllyTeams()
 
 	if #returnData ~= 2 then
 		return
-	end
-	
-	if returnData[1].allyTeamID > returnData[2].allyTeamID then
-		returnData[1], returnData[2] = returnData[2], returnData[1]
 	end
 	
 	return returnData

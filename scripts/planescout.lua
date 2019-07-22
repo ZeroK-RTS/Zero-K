@@ -28,23 +28,23 @@ function Cloak()
 end
 
 function script.StopMoving()
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 
 function script.Create()
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
-		Explode(nozzle, sfxFall)
+		Explode(nozzle, SFX.FALL)
 		return 1
 	else
-		Explode(base, sfxShatter)
-		Explode(nozzle, sfxFall + sfxSmoke)
+		Explode(base, SFX.SHATTER)
+		Explode(nozzle, SFX.FALL + SFX.SMOKE)
 		return 2
 	end
 end

@@ -45,7 +45,8 @@ local SIG_AIM = 4
 
 local RESTORE_DELAY = 3000
 
-local PACE = 1.4
+-- future-proof running animation against balance tweaks
+local PACE = 1.8 * (UnitDefs[unitDefID].speed / 51)
 
 local function Walk()
 	Signal(SIG_WALK)
@@ -75,7 +76,7 @@ local function Walk()
 			Sleep(500)
 		end
 	
-		Move(hips, y_axis, -0.169989, 3 * speedMult)
+		Move(hips, y_axis, 2.5, 4 * speedMult)
 		Move(lthigh, y_axis, 0.169989, 3 * speedMult)
 		Move(rthigh, y_axis, 0.319989, 1 * speedMult)
 		Turn(hips, x_axis, math.rad(9), math.rad(50) * speedMult)
@@ -92,7 +93,7 @@ local function Walk()
 		end
 		Sleep(49 / speedMult)
 	
-		Move(hips, y_axis, -0.35, 3 * speedMult)
+		Move(hips, y_axis, 2.5, 1 * speedMult)
 		Move(lthigh, y_axis, 0.35, 3 * speedMult)
 		Move(rthigh, y_axis, 0.25, 1 * speedMult)
 		Turn(hips, x_axis, math.rad(11), math.rad(50) * speedMult)
@@ -109,7 +110,7 @@ local function Walk()
 		end
 		Sleep(49 / speedMult)
 	
-		Move(hips, y_axis, -0.169989, 4 * speedMult)
+		Move(hips, y_axis, -0.5, 1 * speedMult)
 		Move(lthigh, y_axis, 0.369989, 0 * speedMult)
 		Move(rthigh, y_axis, 0.119989, 2 * speedMult)
 		Turn(hips, x_axis, math.rad(9), math.rad(62) * speedMult)
@@ -126,7 +127,7 @@ local function Walk()
 		end
 		Sleep(42 / speedMult)
 	
-		Move(hips, y_axis, 0, 3 * speedMult)
+		Move(hips, y_axis, -0.5, 2 * speedMult)
 		Move(lthigh, y_axis, 0.40, 0 * speedMult)
 		Move(rthigh, y_axis, 0, 2 * speedMult)
 		Turn(hips, x_axis, math.rad(6), math.rad(58) * speedMult)
@@ -199,7 +200,7 @@ local function Walk()
 		end
 		Sleep(95 / speedMult)
 	
-		Move(hips, y_axis, -0.169989, 3 * speedMult)
+		Move(hips, y_axis, 2.5, 4 * speedMult)
 		Move(lthigh, y_axis, 0.319989, 1 * speedMult)
 		Move(rthigh, y_axis, 0.169989, 3 * speedMult)
 		Turn(hips, x_axis, math.rad(9), math.rad(50) * speedMult)
@@ -216,7 +217,7 @@ local function Walk()
 		end
 		Sleep(49 / speedMult)
 	
-		Move(hips, y_axis, -0.35, 3 * speedMult)
+		Move(hips, y_axis, 2.5, 1 * speedMult)
 		Move(lthigh, y_axis, 0.25, 1 * speedMult)
 		Move(rthigh, y_axis, 0.35, 3 * speedMult)
 		Turn(hips, x_axis, math.rad(11), math.rad(50) * speedMult)
@@ -233,7 +234,7 @@ local function Walk()
 		end
 		Sleep(49 / speedMult)
 	
-		Move(hips, y_axis, -0.169989, 3 * speedMult)
+		Move(hips, y_axis, -0.5, 1 * speedMult)
 		Move(lthigh, y_axis, 0.119989, 2 * speedMult)
 		Move(rthigh, y_axis, 0.369989, 0 * speedMult)
 		Turn(hips, x_axis, math.rad(9), math.rad(56) * speedMult)
@@ -250,7 +251,7 @@ local function Walk()
 		end
 		Sleep(47 / speedMult)
 	
-		Move(hips, y_axis, 0, 3 * speedMult)
+		Move(hips, y_axis, -0.5, 2 * speedMult)
 		Move(lthigh, y_axis, 0, 2 * speedMult)
 		Move(rthigh, y_axis, 0.40, 0 * speedMult)
 		Turn(hips, x_axis, math.rad(6), math.rad(54) * speedMult)
@@ -318,7 +319,9 @@ end
 
 local function StopWalk()
 	Signal(SIG_WALK)
-	
+
+	Move(hips, x_axis, 0, 10.0)
+	Move(hips, y_axis, 0, 10.0)
 	Turn(rthigh, x_axis, 0, math.rad(400))
 	Turn(rshin, x_axis, 0, math.rad(400))
 	Turn(rfoot, x_axis, 0, math.rad(400))
@@ -340,7 +343,7 @@ function script.Create()
 	Hide(rflare)
 	Hide(lflare)
 	
-	StartThread(SmokeUnit, {chest})
+	StartThread(GG.Script.SmokeUnit, {chest})
 end
 
 function script.StartMoving()
@@ -416,49 +419,49 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.25) then
 
-		Explode(lgun, sfxNone)
-		Explode(lfoot, sfxNone)
-		Explode(lshin, sfxNone)
-		Explode(lshoulder, sfxNone)
-		Explode(lthigh, sfxNone)
-		Explode(lforearm, sfxNone)
-		Explode(rgun, sfxNone)
-		Explode(rfoot, sfxNone)
-		Explode(rshin, sfxNone)
-		Explode(rshoulder, sfxNone)
-		Explode(rthigh, sfxNone)
-		Explode(rforearm, sfxNone)
-		Explode(chest, sfxNone)
+		Explode(lgun, SFX.NONE)
+		Explode(lfoot, SFX.NONE)
+		Explode(lshin, SFX.NONE)
+		Explode(lshoulder, SFX.NONE)
+		Explode(lthigh, SFX.NONE)
+		Explode(lforearm, SFX.NONE)
+		Explode(rgun, SFX.NONE)
+		Explode(rfoot, SFX.NONE)
+		Explode(rshin, SFX.NONE)
+		Explode(rshoulder, SFX.NONE)
+		Explode(rthigh, SFX.NONE)
+		Explode(rforearm, SFX.NONE)
+		Explode(chest, SFX.NONE)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(lgun, sfxFall)
-		Explode(lfoot, sfxFall)
-		Explode(lshin, sfxFall)
-		Explode(lshoulder, sfxFall)
-		Explode(lthigh, sfxFall)
-		Explode(lforearm, sfxFall)
-		Explode(rgun, sfxFall)
-		Explode(rfoot, sfxFall)
-		Explode(rshin, sfxFall)
-		Explode(rshoulder, sfxFall)
-		Explode(rthigh, sfxFall)
-		Explode(rforearm, sfxFall)
-		Explode(chest, sfxShatter)
+		Explode(lgun, SFX.FALL)
+		Explode(lfoot, SFX.FALL)
+		Explode(lshin, SFX.FALL)
+		Explode(lshoulder, SFX.FALL)
+		Explode(lthigh, SFX.FALL)
+		Explode(lforearm, SFX.FALL)
+		Explode(rgun, SFX.FALL)
+		Explode(rfoot, SFX.FALL)
+		Explode(rshin, SFX.FALL)
+		Explode(rshoulder, SFX.FALL)
+		Explode(rthigh, SFX.FALL)
+		Explode(rforearm, SFX.FALL)
+		Explode(chest, SFX.SHATTER)
 		return 1
 	end
 
-	Explode(lgun, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(lshin, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(lshoulder, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(lforearm, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(rgun, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(rshin, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(rshoulder, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(rforearm, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(chest, sfxShatter + sfxExplodeOnHit)
+	Explode(lgun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lshin, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lshoulder, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lthigh, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lforearm, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rgun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rshin, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rshoulder, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rthigh, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rforearm, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(chest, SFX.SHATTER + SFX.EXPLODE_ON_HIT)
 	return 2
 end

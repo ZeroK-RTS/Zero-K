@@ -17,8 +17,9 @@ function gadget:GetInfo()
 	}
 end
 
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,attackerID,_,_, projectileID)
-    if attackerID and Spring.GetUnitRulesParam(attackerID,'cannot_damage_unit') == unitID then
+    if attackerID and spGetUnitRulesParam(attackerID,'cannot_damage_unit') == unitID then
         return 0;
     end
     return damage

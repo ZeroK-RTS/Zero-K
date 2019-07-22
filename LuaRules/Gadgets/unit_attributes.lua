@@ -108,7 +108,7 @@ end
 
 local origUnitBuildSpeed = {}
 
-local function updateBuildSpeed(unitID, ud, speedFactor)	
+local function UpdateBuildSpeed(unitID, ud, speedFactor)	
 
     if ud.buildSpeed == 0 then
         return
@@ -139,7 +139,7 @@ end
 --------------------------------------------------------------------------------
 -- Economy Handling
 
-local function updateEconomy(unitID, ud, factor)
+local function UpdateEconomy(unitID, ud, factor)
 	spSetUnitRulesParam(unitID,"resourceGenerationFactor", factor, INLOS_ACCESS)
 end
 
@@ -150,7 +150,7 @@ end
 local origUnitReload = {}
 local unitReloadPaused = {}
 
-local function updatePausedReload(unitID, unitDefID, gameFrame)
+local function UpdatePausedReload(unitID, unitDefID, gameFrame)
 	local state = origUnitReload[unitDefID]
 	
 	for i = 1, state.weaponCount do
@@ -169,7 +169,7 @@ local function updatePausedReload(unitID, unitDefID, gameFrame)
 	end
 end
 
-local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
+local function UpdateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 	local unitDefID = ud.id
 	
 	if not origUnitReload[unitDefID] then
@@ -205,6 +205,7 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 			if not unitReloadPaused[unitID] then
 				local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
 				unitReloadPaused[unitID] = unitDefID
+				spSetUnitRulesParam(unitID, "reloadPaused", 1, INLOS_ACCESS)
 				if reloadState < gameFrame then -- unit is already reloaded, so set unit to almost reloaded
 					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = gameFrame+UPDATE_PERIOD+1})
 				else
@@ -216,7 +217,7 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 		else
 			if unitReloadPaused[unitID] then
 				unitReloadPaused[unitID] = nil
-				spSetUnitRulesParam(unitID, "reloadPaused", -1, INLOS_ACCESS)
+				spSetUnitRulesParam(unitID, "reloadPaused", 0, INLOS_ACCESS)
 			end
 			local newReload = w.reload/speedFactor
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
@@ -236,7 +237,7 @@ end
 
 local origUnitSpeed = {}
 
-local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, maxAccelerationFactor)	
+local function UpdateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, maxAccelerationFactor)	
 	local unitDefID = ud.id
 	if not origUnitSpeed[unitDefID] then
 	
@@ -308,6 +309,7 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 				decRate         = state.origMaxDec      *maxAccelerationFactor
 			}
 			spSetGunshipMoveTypeData (unitID, attribute)
+			GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
 		elseif state.movetype == 2 then
 			if workingGroundMoveType then
 				local accRate = state.origMaxAcc*maxAccelerationFactor 
@@ -325,6 +327,7 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 					turnAccel       = state.origTurnRate    *turnAccelFactor*1.2,
 				}
 				spSetGroundMoveTypeData (unitID, attribute)
+				GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
 			else
 				--Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)
 				--Spring.Echo(Spring.GetUnitCOBValue(unitID, COB_MAX_SPEED))
@@ -436,24 +439,24 @@ function UpdateUnitAttributes(unitID, frame)
 		
 		unitSlowed[unitID] = moveMult < 1
 		if reloadMult ~= currentReload[unitID] then
-			updateReloadSpeed(unitID, ud, reloadMult, frame)
+			UpdateReloadSpeed(unitID, ud, reloadMult, frame)
 			currentReload[unitID] = reloadMult
 		end
 		
 		if currentMovement[unitID] ~= moveMult or currentTurn[unitID] ~= turnMult or currentAcc[unitID] ~= maxAccMult then
-			updateMovementSpeed(unitID, ud, moveMult, turnMult, maxAccMult*moveMult)
+			UpdateMovementSpeed(unitID, ud, moveMult, turnMult, maxAccMult*moveMult)
 			currentMovement[unitID] = moveMult
 			currentTurn[unitID] = turnMult
 			currentAcc[unitID] = maxAccMult
 		end
 		
 		if buildMult ~= currentBuildpower[unitID] then
-			updateBuildSpeed(unitID, ud, buildMult)
+			UpdateBuildSpeed(unitID, ud, buildMult)
 			currentBuildpower[unitID] = buildMult
 		end
 		
 		if econMult ~= currentEcon[unitID] then
-			updateEconomy(unitID, ud, econMult)
+			UpdateEconomy(unitID, ud, econMult)
 			currentEcon[unitID] = econMult
 		end
 		if econMult ~= 1 or moveMult ~= 1 or reloadMult ~= 1 or turnMult ~= 1 or maxAccMult ~= 1 then
@@ -510,7 +513,7 @@ end
 function gadget:GameFrame(f)
 	if f % UPDATE_PERIOD == 1 then
 		for unitID, unitDefID in pairs(unitReloadPaused) do
-			updatePausedReload(unitID, unitDefID, f)
+			UpdatePausedReload(unitID, unitDefID, f)
 		end
 	end
 end

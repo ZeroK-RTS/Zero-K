@@ -1,24 +1,36 @@
-local FUDGE_FACTOR = 1.5
+if GG.TakeOffFuncs then
+	return
+end
+GG.TakeOffFuncs = {}
 
-local spGetUnitMoveTypeData = Spring.GetUnitMoveTypeData
-local spSetAirMoveTypeData = Spring.MoveCtrl.SetAirMoveTypeData
-local spMoveCtrlGetTag = Spring.MoveCtrl.GetTag
+function GG.TakeOffFuncs.NotTakingOff()
+	local state = Spring.GetUnitMoveTypeData(unitID)
+	return state and (state.aircraftState ~= "takeoff")
+end
 
-function TakeOffThread(height, signal)
+function GG.TakeOffFuncs.TakeOffThread(height, signal)
+	local FUDGE_FACTOR = 1.5
+	
 	Signal(signal)
 	SetSignalMask(signal)
-	while spGetUnitMoveTypeData(unitID).aircraftState ~= "takeoff" do
+	while GG.TakeOffFuncs.NotTakingOff() do
 		Sleep(1000)
 	end
 	for i = 1, 5 do
 		Sleep(100)
-		if spMoveCtrlGetTag(unitID) == nil then
-			spSetAirMoveTypeData(unitID, "wantedHeight", 10)
+		if not Spring.ValidUnitID(unitID) then
+			return
+		end
+		if not Spring.MoveCtrl.GetTag(unitID) then
+			Spring.MoveCtrl.SetAirMoveTypeData(unitID, "wantedHeight", 10)
 			Sleep(33)
 		end
-		while spMoveCtrlGetTag(unitID) do
+		while Spring.MoveCtrl.GetTag(unitID) do
 			Sleep(500)
 		end
-		spSetAirMoveTypeData(unitID, "wantedHeight", height*FUDGE_FACTOR)
+		if not Spring.ValidUnitID(unitID) then
+			return
+		end
+		Spring.MoveCtrl.SetAirMoveTypeData(unitID, "wantedHeight", height*FUDGE_FACTOR)
 	end
 end

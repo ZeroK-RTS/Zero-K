@@ -53,7 +53,7 @@ local spGetSelectedUnits  	= Spring.GetSelectedUnits
 local SendLuaUIMsg       	= Spring.SendLuaUIMsg
 
 local function IsSpec()
-	local _, _, spec, _, _, _, _, _ = spGetPlayerInfo(spGetMyPlayerID())
+	local _, _, spec = spGetPlayerInfo(spGetMyPlayerID(), false)
 	return spec
 	--[[
 	if spec then
@@ -126,7 +126,7 @@ end
 
 function widget:RecvLuaMsg(msg, playerID)
 	if (msg:sub(1,1)=="@") then
-		local _, _, spec = spGetPlayerInfo(playerID)
+		local _, _, spec = spGetPlayerInfo(playerID, false)
 		if spec or (playerID==Spring.GetMyPlayerID()) then return true; end
 		if msg == '@' then
 			allySelData[playerID] = ''

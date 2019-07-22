@@ -133,7 +133,7 @@ local function SitOnPad(unitID)
 	end
 	heading = heading*HEADING_TO_RAD
 	
-	local px, py, pz, dx, dy, dz = Spring.GetUnitPiecePosDir(landData.padID, landData.padPieceID)
+	local ppx, ppy, ppz, pdx, pdy, pdz = Spring.GetUnitPiecePosDir(landData.padID, landData.padPieceID)
 	
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	local ud = UnitDefs[unitDefID]
@@ -146,23 +146,23 @@ local function SitOnPad(unitID)
 		spSetUnitLeaveTracks(unitID, false)
 		unitMovectrled[unitID] = true
 	end
-	mcSetRotation(unitID,0,heading,0)
+	mcSetRotation(unitID,0,-heading,0)
 	
-	local padHeading = acos(dz)
-	if dx < 0 then
+	local padHeading = acos(pdz)
+	if pdx < 0 then
 		padHeading = 2*PI-padHeading
 	end
 	
-	-- Spring.Echo(dx)
-	-- Spring.Echo(dy)
-	-- Spring.Echo(dz)
+	-- Spring.Echo(pdx)
+	-- Spring.Echo(pdy)
+	-- Spring.Echo(pdz)
 	-- Spring.Echo(padHeading*180/PI)
 	
 	local headingDiff = heading - padHeading
 	
 	spSetUnitVelocity(unitID, 0, 0, 0)
 	mcSetVelocity(unitID, 0, 0, 0)
-	mcSetPosition(unitID, px, py, pz)
+	mcSetPosition(unitID, ppx, ppy, ppz)
 	
 	-- deactivate unit to cause the lups jets away
 	Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 0)
@@ -185,7 +185,7 @@ local function SitOnPad(unitID)
 					newPadHeading = 2*PI-newPadHeading
 				end
 				mcSetPosition(unitID, px, py, pz)
-				mcSetRotation(unitID,0,headingDiff+newPadHeading,0)
+				mcSetRotation(unitID,0,-(headingDiff+newPadHeading),0)
 			end
 			
 			landDuration = landDuration + 1
@@ -440,7 +440,7 @@ local function CircleToLand(unitID, goal)
 	if not unitMovectrled[unitID] then
 		mcEnable(unitID)
 		if rotateUnit[unitDefID] then
-			mcSetRotation(unitID,0,heading,roll+currentTime/50)
+			mcSetRotation(unitID,0,-heading,-(roll+currentTime/50))
 		end
 		spSetUnitLeaveTracks(unitID, false)
 		unitMovectrled[unitID] = true
@@ -463,7 +463,7 @@ local function CircleToLand(unitID, goal)
 			local direction = DistanceToDirection(currentDistance)
 			
 			if rotateUnit[unitDefID] then
-				mcSetRotation(unitID,0,direction,roll)
+				mcSetRotation(unitID,0,-direction,-roll)
 			end
 			mcSetPosition(unitID, px, py, pz)
 			mcSetVelocity(unitID, px - prevX, py - prevY, pz - prevZ)

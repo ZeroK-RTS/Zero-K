@@ -12,6 +12,7 @@ unitDef = {
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[staticradar_aoplane.dds]],
   buildPic                      = [[staticradar.png]],
+  canMove                       = true,
   category                      = [[FLOAT UNARMED]],
   collisionVolumeOffsets        = [[0 -32 0]],
   collisionVolumeScales         = [[32 90 32]],
@@ -19,10 +20,13 @@ unitDef = {
   corpse                        = [[DEAD]],
   
   customParams = {
+    morphto        = [[planelightscout]],
+    morphtime      = 20,
     modelradius    = [[16]],
-	removewait     = 1,
-	priority_misc  = 2, -- High
-  },    
+    priority_misc  = 2, -- High
+    addfight       = 1,
+    addpatrol      = 1,
+  },
   
   energyUse                     = 0.8,
   explodeAs                     = [[SMALL_BUILDINGEX]],

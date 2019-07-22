@@ -66,7 +66,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return
 	end
 
-	local commands = Spring.GetFactoryCommands(unitID)
+	local commands = Spring.GetFactoryCommands(unitID, -1)
 	if not commands then
 		return
 	end

@@ -214,7 +214,7 @@ function script.Create()
 	--Move(LeftTurretSeat,y_axis,-1.1)
 	--Move(LeftTurretSeat,z_axis,17)
 	--SetDGunCMD()
-	StartThread(SmokeUnit, {RearTurret, RightTurret, LeftTurret})
+	StartThread(GG.Script.SmokeUnit, {RearTurret, RightTurret, LeftTurret})
 	StartThread(EmitDust)
 	StartThread(DeathAnim)
 end
@@ -262,7 +262,7 @@ local function ClusterBombThread()
 	while index <= SPECIAL_FIRE_COUNT do
 		local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID,"disarmed") == 1)
 		if not stunned_or_inbuild then
-			EmitSfx(subemit[0], FIRE_W3)
+			EmitSfx(subemit[0], GG.Script.FIRE_W3)
 			index = index + 1
 		end
 		local slowState = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
@@ -326,16 +326,16 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .5 or IsCrashing() then
-		Explode(Base, sfxNone)
-		Explode(RightTurret, sfxNone)
-		Explode(LeftTurret, sfxNone)
-		Explode(RearTurret, sfxNone)
+		Explode(Base, SFX.NONE)
+		Explode(RightTurret, SFX.NONE)
+		Explode(LeftTurret, SFX.NONE)
+		Explode(RearTurret, SFX.NONE)
 		return 1
 	else
-		Explode(Base, sfxShatter)
-		Explode(RightTurret, sfxExplode)
-		Explode(LeftTurret, sfxExplode)
-		Explode(RearTurret, sfxExplode)
+		Explode(Base, SFX.SHATTER)
+		Explode(RightTurret, SFX.EXPLODE)
+		Explode(LeftTurret, SFX.EXPLODE)
+		Explode(RearTurret, SFX.EXPLODE)
 		return 2
 	end
 end

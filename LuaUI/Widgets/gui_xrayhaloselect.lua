@@ -78,8 +78,6 @@ local DrawUnitCommands    = Spring.DrawUnitCommands
 local GetFeatureRadius   = Spring.GetFeatureRadius
 local GetFeaturePosition = Spring.GetFeaturePosition
 
-local GetPlayerInfo      = Spring.GetPlayerInfo
-
 local acos   = math.acos
 local PI_DEG = 180 / math.pi
 

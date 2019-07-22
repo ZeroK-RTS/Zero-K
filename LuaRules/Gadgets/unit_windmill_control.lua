@@ -22,8 +22,6 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local devCompatibility = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
-
 include("LuaRules/Configs/constants.lua")
 
 local windDefs = {
@@ -74,6 +72,31 @@ local rand    = math.random
 
 local function round(num, idp)
 	return sformat("%." .. (idp or 0) .. "f", num)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Debug
+
+local function ToggleWindAnimation(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then 
+		--return
+	end
+	GG.Wind_SpinDisabled = not GG.Wind_SpinDisabled
+	
+	if GG.Wind_SpinDisabled then
+		Spring.Echo("Wind animation disabled")
+	else
+		Spring.Echo("Wind animation enabled")
+		local allUnits = Spring.GetAllUnits()
+		for i = 1, #allUnits do
+			local env = Spring.UnitScript.GetScriptEnv(allUnits[i])
+			if env and env.InitializeWind then
+				Spring.UnitScript.CallAsUnit(allUnits[i], env.InitializeWind)
+			end
+		end
+	
+	end
 end
 
 -------------------------------------------------------------------------------------
@@ -130,14 +153,7 @@ local function SetupUnit(unitID)
 	end
 	
 	local unitDefID = spGetUnitDefID(unitID)
-	local midy
-	if devCompatibility then
-		midy = (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].model.midy) or 18
-	else
-		midy = (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].midy) or 18
-	end
-	
-	local unitDefID = spGetUnitDefID(unitID)
+	local midy = (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].model.midy) or 18
 	
 	local scriptIDs = {}
 
@@ -222,6 +238,8 @@ function gadget:Initialize()
 		teamEnergy[teamList[i]] = 0
 		spSetTeamRulesParam(teamList[i], "WindIncome", 0, alliedTrueTable)
 	end
+	
+	gadgetHandler:AddChatAction("windanim", ToggleWindAnimation, "Toggles windmill animations.")
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, unitTeam)

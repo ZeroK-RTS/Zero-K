@@ -4,7 +4,7 @@ unitDef = {
   description                   = [[Meteor Controller]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  buildCostMetal                = 30000,
+  buildCostMetal                = 32000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
@@ -125,9 +125,9 @@ unitDef = {
       },
 	  
       damage                  = {
-        default = 1000,
-        planes  = 1000,
-        subs    = 50,
+        default = 2000,
+        planes  = 2000,
+        subs    = 100,
       },
 
       edgeEffectiveness       = 0.8,
@@ -176,9 +176,9 @@ unitDef = {
 	  },
 
       damage                  = {
-        default = 1000,
-        planes  = 1000,
-        subs    = 50,
+        default = 2000,
+        planes  = 2000,
+        subs    = 100,
       },
 
       edgeEffectiveness       = 0.8,
@@ -229,9 +229,9 @@ unitDef = {
 	  },
 
       damage                  = {
-        default = 1000,
-        planes  = 1000,
-        subs    = 50,
+        default = 2000,
+        planes  = 2000,
+        subs    = 100,
       },
 
       edgeEffectiveness       = 0.8,

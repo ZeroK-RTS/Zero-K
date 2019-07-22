@@ -894,6 +894,14 @@ local sounds = {
 			[1] = "bomber_select",
 		},
 	},
+	planelightscout = {
+		ok = {
+			[1] = "fighter_move",
+		},
+		select = {
+			[1] = "fighter_select",
+		},
+	},
 	
 	-- Gunship
 	planecon = {

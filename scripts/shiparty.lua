@@ -33,6 +33,7 @@ local SIG_MOVE = 1
 
 --rockz
 include "rockPiece.lua"
+local dynamicRockData
 
 local ROCK_PIECE = base	-- should be negative to alternate rocking direction
 local ROCK_SPEED = 3		--number of quarter-cycles per second around z-axis
@@ -92,10 +93,10 @@ function script.Create()
 	Hide( depthcharge3)
 	Hide( depthcharge4)
 	Hide( depthcharge5)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Spin( sonar , y_axis, math.rad(60) )
 	Spin( radarpole , y_axis, math.rad(-90) )
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 end
 
 -- SetMaxReloadTime(Func_Var_1)
@@ -225,7 +226,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num) 
-	StartThread(Rock, z_axis, gun_1_yaw, ROCK_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gun_1_yaw, ROCK_FORCE)
 	
 	gun_1 = 1 - gun_1
 	
@@ -267,37 +268,37 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	Explode( body, sfxShatter)
+	Explode( body, SFX.SHATTER)
 	if  severity <= 0.25  then 
 		return 1
 	elseif  severity <= 0.50  then 
-		Explode( sleeve1, sfxFall)
-		Explode( sleeve2, sfxFall)
-		Explode( barrel1, sfxFall)
-		Explode( barrel2, sfxFall)
-		Explode( depthcharge1, sfxFall)
-		Explode( depthcharge2, sfxFall)
-		Explode( depthcharge3, sfxFall)
-		Explode( depthcharge4, sfxFall)
-		Explode( depthcharge5, sfxFall)
-		Explode( radarpole, sfxFall)
-		Explode( radardish, sfxFall)
-		Explode( propeller, sfxFall)
+		Explode( sleeve1, SFX.FALL)
+		Explode( sleeve2, SFX.FALL)
+		Explode( barrel1, SFX.FALL)
+		Explode( barrel2, SFX.FALL)
+		Explode( depthcharge1, SFX.FALL)
+		Explode( depthcharge2, SFX.FALL)
+		Explode( depthcharge3, SFX.FALL)
+		Explode( depthcharge4, SFX.FALL)
+		Explode( depthcharge5, SFX.FALL)
+		Explode( radarpole, SFX.FALL)
+		Explode( radardish, SFX.FALL)
+		Explode( propeller, SFX.FALL)
 		return 1
 	else 
-		Explode( turret, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
-		Explode( sleeve1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
-		Explode( sleeve2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
-		Explode( barrel1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
-		Explode( barrel2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
-		Explode( depthcharge1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
-		Explode( depthcharge2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
-		Explode( depthcharge3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
-		Explode( depthcharge4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
-		Explode( depthcharge5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
-		Explode( radarpole, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
-		Explode( radardish, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
-		Explode( propeller, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxShatter)
+		Explode( turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
+		Explode( sleeve1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
+		Explode( sleeve2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
+		Explode( barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
+		Explode( barrel2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
+		Explode( depthcharge1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
+		Explode( depthcharge2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
+		Explode( depthcharge3, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
+		Explode( depthcharge4, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
+		Explode( depthcharge5, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
+		Explode( radarpole, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
+		Explode( radardish, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
+		Explode( propeller, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
 		return 2
 	end
 end

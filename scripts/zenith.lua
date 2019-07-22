@@ -2,8 +2,6 @@ include "constants.lua"
 
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
-local devCompatibility = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
-
 local base = piece "base"
 local flare = piece "flare"
 local firept = piece "firept"
@@ -16,9 +14,9 @@ local HOVER_HEIGHT = 2600
 
 local AIM_RADIUS = 160
 
--- 5 minutes and 50 seconds to reach capacity.
-local SPAWN_PERIOD = 700 -- in milliseconds
-local METEOR_CAPACITY = 500 
+-- 6 minutes to reach capacity.
+local SPAWN_PERIOD = 1200 -- in milliseconds
+local METEOR_CAPACITY = 300
 
 local fireRange = WeaponDefNames["zenith_meteor"].range
 
@@ -71,19 +69,13 @@ local function IsDisabled()
 	return spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 end
 
-local function TransformMeteor(weaponDefID, proID, x, y, z)
+local function TransformMeteor(weaponDefID, proID, meteorTeamID, meteorOwnerID, x, y, z)
 	
 	-- Get old projectile attributes
 	local px, py, pz = Spring.GetProjectilePosition(proID)
 	local vx, vy, vz = Spring.GetProjectileVelocity(proID)
-	
-	-- Destroy old projectile
-	if devCompatibility then
-		Spring.DeleteProjectile(proID)
-	else
-		Spring.SetProjectilePosition(proID,-100000,-100000,-100000)
-		Spring.SetProjectileCollision(proID)
-	end
+
+	Spring.DeleteProjectile(proID)
 	
 	-- Send new one in the right direction
 	local newProID = Spring.SpawnProjectile(weaponDefID, {
@@ -93,7 +85,8 @@ local function TransformMeteor(weaponDefID, proID, x, y, z)
 		speed = {vx, vy, vz}, 
 		ttl = timeToLiveDefs[weaponDefID],
 		gravity = gravityDefs[weaponDefID],
-		team = gaiaTeam,
+		team = meteorTeamID,
+		owner = meteorOwnerID,
 	})
 	if x then
 		Spring.SetProjectileTarget(newProID, x, y, z)
@@ -106,7 +99,7 @@ local function DropSingleMeteor(index)
 	local proID = projectiles[index]
 	-- Check that the projectile ID is still valid
 	if Spring.GetProjectileDefID(proID) == floatWeaponDefID then
-		TransformMeteor(uncontrolWeaponDefID, proID)
+		TransformMeteor(uncontrolWeaponDefID, proID, gaiaTeam, nil)
 	end
 end
 
@@ -117,7 +110,7 @@ local function LoseControlOfMeteors()
 		-- Check that the projectile ID is still valid
 		if Spring.GetProjectileDefID(proID) == floatWeaponDefID then
 			tooltipProjectileCount = tooltipProjectileCount + 1
-			projectiles[i] = TransformMeteor(uncontrolWeaponDefID, proID)
+			projectiles[i] = TransformMeteor(uncontrolWeaponDefID, proID, gaiaTeam, nil)
 		end
 	end
 	Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
@@ -133,7 +126,7 @@ local function RegainControlOfMeteors()
 			if ttl > 0 then
 				tooltipProjectileCount = tooltipProjectileCount + 1
 				local hoverPos = Vector.PolarToCart(HOVER_RANGE*math.random()^2, 2*math.pi*math.random())
-				projectiles[i] = TransformMeteor(floatWeaponDefID, proID, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
+				projectiles[i] = TransformMeteor(floatWeaponDefID, proID, gaiaTeam, nil, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
 			end
 		end
 	end
@@ -215,6 +208,7 @@ local function LaunchAll(x, z)
 	end
 	
 	launchInProgress = true
+	local zenithTeamID = Spring.GetUnitTeam(unitID)
 	
 	-- Make the aiming projectiles. These projectiles have high turnRate
 	-- so are able to rotate the wobbly float projectiles in the right
@@ -241,7 +235,7 @@ local function LaunchAll(x, z)
 			
 			-- Projectile is valid, launch!
 			aimCount = aimCount + 1
-			aim[aimCount] = TransformMeteor(aimWeaponDefID, proID, x, y, z)
+			aim[aimCount] = TransformMeteor(aimWeaponDefID, proID, zenithTeamID, unitID, x, y, z)
 		end
 	end
 	
@@ -265,7 +259,7 @@ local function LaunchAll(x, z)
 			-- Projectile is valid, launch!
 			local aimOff = Vector.PolarToCart(AIM_RADIUS*math.random()^2, 2*math.pi*math.random())
 			
-			TransformMeteor(fireWeaponDefID, proID, x + aimOff[1], y, z + aimOff[2])
+			TransformMeteor(fireWeaponDefID, proID, zenithTeamID, unitID, x + aimOff[1], y, z + aimOff[2])
 		end
 	end
 	
@@ -292,7 +286,7 @@ function script.Create()
 	Move(firept, y_axis, 9001)
 	Move(flare, y_axis, -110)
 	Turn(flare, x_axis, math.rad(-90))
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(SpawnProjectileThread)
 	
 	-- Helpful for devving
@@ -358,10 +352,10 @@ function script.Killed(recentDamage, maxHealth)
 	LoseControlOfMeteors();
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then
-		Explode(base, sfxNone)
+		Explode(base, SFX.NONE)
 		return 1
 	else
-		Explode(base, sfxShatter)
+		Explode(base, SFX.SHATTER)
 		return 2
 	end
 end

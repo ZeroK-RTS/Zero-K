@@ -376,6 +376,7 @@ function UpdateCustomParamResourceData()
 	cp.team_metalMisc       = spGetTeamRulesParam(teamID, "OD_team_metalMisc") or 0
 	
 	cp.team_energyIncome    = spGetTeamRulesParam(teamID, "OD_team_energyIncome") or 0
+	cp.team_energyMisc      = spGetTeamRulesParam(teamID, "OD_team_energyMisc") or 0
 	cp.team_energyOverdrive = spGetTeamRulesParam(teamID, "OD_team_energyOverdrive") or 0
 	cp.team_energyWaste     = spGetTeamRulesParam(teamID, "OD_team_energyWaste") or 0
 	
@@ -406,6 +407,7 @@ function UpdateCustomParamResourceData()
 	end
 	
 	cp.energyIncome    = spGetTeamRulesParam(teamID, "OD_energyIncome") or 0
+	cp.energyMisc      = spGetTeamRulesParam(teamID, "OD_energyMisc") or 0
 	cp.energyOverdrive = spGetTeamRulesParam(teamID, "OD_energyOverdrive") or 0
 	cp.energyChange    = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
 	
@@ -777,14 +779,16 @@ function widget:GameFrame(n)
 	local team_metalConstruction = Format(-teamMSpent)
 	local team_metalWaste = Format(teamMetalWaste)
 	
-	local energyGenerators = Format(cp.energyIncome)
+	local energyGenerators = Format(cp.energyIncome - cp.energyMisc)
 	local energyReclaim = Format(eReclaim)
+	local energyMisc = Format(cp.energyMisc)
 	local energyOverdrive = Format(cp.energyOverdrive)
 	local energyOther = Format(-eExpe + mExpe - math.min(0, cp.energyOverdrive))
 	
 	local team_energyIncome = Format(teamEnergyIncome)
-	local team_energyGenerators = Format(cp.team_energyIncome)
+	local team_energyGenerators = Format(cp.team_energyIncome - cp.team_energyMisc)
 	local team_energyReclaim = Format(teamEnergyReclaim)
+	local team_energyMisc = Format(cp.team_energyMisc)
 	local team_energyPull = Format(-totalPull)
 	local team_energyOverdrive = Format(-cp.team_energyOverdrive)
 	local team_energyWaste = Format(-cp.team_energyWaste)
@@ -826,6 +830,7 @@ function widget:GameFrame(n)
 	image_energy.tooltip = strings["local_energy_economy"] ..
 	"\n  " .. strings["resbar_generators"] .. ": " .. energyGenerators ..
 	"\n  " .. strings["resbar_reclaim"] .. ": " .. energyReclaim ..
+	"\n  " .. strings["resbar_cons"] .. ": " .. energyMisc ..
 	"\n  " .. strings["resbar_sharing_and_overdrive"] .. ": " .. energyOverdrive .. 
 	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstruction .. 
 	"\n  " .. strings["resbar_other"] .. ": " .. energyOther ..
@@ -836,6 +841,7 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_inc"] .. ": " .. team_energyIncome .. "      " .. strings["resbar_pull"] .. ": " .. team_energyPull ..
 	"\n  " .. strings["resbar_generators"] .. ": " .. team_energyGenerators ..
 	"\n  " .. strings["resbar_reclaim"] .. ": " .. team_energyReclaim ..
+	"\n  " .. strings["resbar_cons"] .. ": " .. team_energyMisc ..
 	"\n  " .. strings["resbar_overdrive"] .. ": " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " " .. strings["metal"] ..
 	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
 	"\n  " .. strings["resbar_other"] .. ": " .. team_energyOther ..

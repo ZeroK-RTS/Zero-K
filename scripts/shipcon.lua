@@ -20,7 +20,7 @@ local SIG_Build = 1
 local SIG_Move = 2
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
@@ -83,14 +83,14 @@ function script.Killed(recentDamage, maxHealth)
 
 	for i = 1, #explodables do
 		if (math.random() < severity) then
-			Explode (explodables[i], sfxFall + sfxFire + sfxSmoke)
+			Explode (explodables[i], SFX.FALL + SFX.FIRE + SFX.SMOKE)
 		end
 	end
 
 	if severity < 0.5 then
 		return 1
 	else
-		Explode(body, sfxShatter)
+		Explode(body, SFX.SHATTER)
 		return 2
 	end
 end

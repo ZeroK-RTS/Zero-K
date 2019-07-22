@@ -117,8 +117,12 @@ local function ProcessCommand(id, params, options, sequence_order)
 	local setPositionOverride = false
 
 	-- Structure block checking
+	-- Note that Area Mex will queue a bunch of mexes at the same time
+	-- which looks a lot like a block, but it can be told apart because
+	-- unlike blocks queued by hand (i.e. through the default engine UI)
+	-- automex supplies non-zero sequence order
 	local shift = options.shift
-	if shift and id < 0 then
+	if shift and id < 0 and sequence_order == 0 then
 		-- If the command is possibly part of a block of structures
 		if structureSquenceCount then
 			structureSquenceCount = structureSquenceCount + 1
@@ -127,12 +131,13 @@ local function ProcessCommand(id, params, options, sequence_order)
 			setPositionOverride = true
 			structureSquenceCount = 0
 		end
-		sequence_order = structureSquenceCount + sequence_order
+		sequence_order = structureSquenceCount
 	end
 	
 	-- Redefine the way in which modifiers apply to Area- Repair and Rez
 	local ctrl = options.ctrl
 	local meta = options.meta
+
 	if ctrl and not meta and id == CMD.REPAIR then
 		-- Engine CTRL means "keep repairing even when being reclaimed" (now inaccessible)
 		-- Engine META means "only repair live units, don't assist construction" (now CTRL)
@@ -143,6 +148,11 @@ local function ProcessCommand(id, params, options, sequence_order)
 		-- Engine CTRL means "keep rezzing even when being reclaimed" (now inaccessible)
 		-- Engine META means "only rez fresh wrecks, don't refill partially-reclaimed" (now default, CTRL disables)
 		Spring.GiveOrder(id, params, options.coded - (ctrl and CMD.OPT_CTRL or 0) + (ctrl and 0 or CMD.OPT_META))
+		return true
+	end
+	if id == CMD_FIRE_ONCE and not meta then
+		-- META means "fire once" (not the engine meaning; overridden by ZK)
+		Spring.GiveOrder(CMD.ATTACK, params, options.coded + CMD.OPT_META)
 		return true
 	end
 
@@ -237,15 +247,25 @@ end
 
 function WG.CommandInsert(id, params, options, seq)
 	options.coded = (options.coded or EncodeOptions(options))
-	if not options.shift and not options.meta then
-		Spring.GiveOrder (CMD.STOP, EMPTY_TABLE, 0)
-		options.shift = true
-		options.coded = options.coded + CMD.OPT_SHIFT
-	end
-
 	seq = seq or 0
+
 	if ProcessCommand(id, params, options, seq) then
 		return
+	end
+
+	if not options.shift then
+		if seq == 0 then
+			-- ProcessCommand ensures that META is also false at this point
+			Spring.GiveOrder (id, params, options.coded)
+			return
+		end
+
+		-- Technically a SHIFT is not needed, but if you try to copy a queue with a shiftless
+		-- order in it verbatim (i.e. without appending missing SHIFT manually) it will erase
+		-- anything before it; as far as I can tell some other gadgets/widgets behave that way.
+		-- At some point it would be good to fix them (TODO) but until then here's a workaround.
+		options.shift = true
+		options.coded = options.coded + CMD_OPT_SHIFT
 	end
 
 	local units = Spring.GetSelectedUnits()

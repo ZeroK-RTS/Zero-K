@@ -687,7 +687,7 @@
 	"staticradar" : {
 		"name" : "Radar Tower",
 		"description" : "Early Warning System",
-		"helptext" : "The Radar tower provides early warning of enemy units and their movements over a moderate distance at virtually no cost. It has a very small but steady energy cost and will automatically shut down if you run out of energy. Radar coverage is blocked by terrain such as mountains."
+		"helptext" : "The Radar tower provides early warning of enemy units and their movements over a moderate distance at virtually no cost. It has a very small but steady energy cost and will automatically shut down if you run out of energy. Radar Towers can morph to Sparrows - light scout planes - to enhance their ability to gather intel. Radar coverage is blocked by terrain such as mountains."
 	},
 	"turretriot" : {
 		"name" : "Stardust",
@@ -706,8 +706,8 @@
 	},
 	"striderfunnelweb" : {
 		"name" : "Funnelweb",
-		"description" : "Drone/Shield Support Strider",
-		"helptext" : "The slow all-terrain Funnelweb features an area shield and a powerful drone complement."
+		"description" : "Shield Support Strider",
+		"helptext" : "The slow all-terrain Funnelweb features an extremely powerful wide-area shield and high nano power for post-battle utility. It is otherwise unarmed."
 	},
 	"cloakriot" : {
 		"name" : "Reaver",
@@ -799,11 +799,6 @@
 		"description" : "EMP missile",
 		"helptext" : "The Shockley disables units in a small area for up to 45 seconds."
 	},
-	"subraider" : {
-		"name" : "Snake",
-		"description" : "Raider Submarine",
-		"helptext" : "Stealthy, fast, and fragile, this Submarine can quickly strike unprotected targets. Slow damage allows it to effectively kill lone units. Watch out for anything with anti-sub weaponry, especially Hunters."
-	},
 	"striderhub" : {
 		"name" : "Strider Hub",
 		"description" : "Constructs Striders, Builds at 10 m/s",
@@ -813,11 +808,6 @@
 		"name" : "Conch",
 		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s",
 		"helptext" : "The Conch is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land."
-	},
-	"shipaa" : {
-		"name" : "Shredder",
-		"description" : "Anti-Air Frigate",
-		"helptext" : "With its powerful twin anti-air laser batteries, the anti-air frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne."
 	},
 	"spiderriot" : {
 		"name" : "Redback",
@@ -1163,6 +1153,11 @@
 		"name" : "Owl",
 		"description" : "Area Jammer, Radar/Sonar Plane",
 		"helptext" : "The Owl provides an unparalleled means for deep scouting, and can locate underwater targets with its sonar. It is also equipped with an area jammer, which prevents radar from working in the area underneath."
+	},
+	"planelightscout" : {
+		"name" : "Sparrow",
+		"description" : "Light Scout Plane",
+		"helptext" : "The Sparrow is a light scout that can be built from a Radar Tower, making it the only plane that is availible without a Plane Factory. Such an accessible scouting option is invaluable to those without access to planes, but is generally outclassed by the faster Swift and larger Owl."
 	},
 	"amphfloater" : {
 		"name" : "Buoy",

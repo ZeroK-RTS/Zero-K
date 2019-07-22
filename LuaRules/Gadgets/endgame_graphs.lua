@@ -1,14 +1,19 @@
-if not gadgetHandler:IsSyncedCode() then return end
 
-function gadget:GetInfo() return {
-	name    = "Endgame Graphs",
-	desc    = "Gathers misc stats",
-	author  = "Sprung",
-	date    = "2016-02-14",
-	license = "PD",
-	layer   = 999999,
-	enabled = true,
-} end
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+
+function gadget:GetInfo()
+	return {
+		name    = "Endgame Graphs",
+		desc    = "Gathers misc stats",
+		author  = "Sprung",
+		date    = "2016-02-14",
+		license = "PD",
+		layer   = 999999,
+		enabled = true,
+	}
+end
 
 local unitCategoryDefs = VFS.Include("LuaRules/Configs/unit_category.lua")
 
@@ -381,7 +386,7 @@ function gadget:Initialize()
 	allyTeamByTeam = {}
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		allyTeamByTeam[teamID] = select(6, Spring.GetTeamInfo(teamID))
+		allyTeamByTeam[teamID] = select(6, Spring.GetTeamInfo(teamID, false))
 
 		mIncome         [teamID] = 0
 		mIncomeBase     [teamID] = 0

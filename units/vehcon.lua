@@ -4,7 +4,7 @@ unitDef = {
   description            = [[Construction Rover, Builds at 5 m/s]],
   acceleration           = 0.066,
   brakeRate              = 1.5,
-  buildCostMetal         = 140,
+  buildCostMetal         = 120,
   buildDistance          = 180,
   builder                = true,
 
@@ -23,12 +23,13 @@ unitDef = {
 
   customParams           = {
 	modelradius    = [[20]],
+	selection_scale = 1.2,
   },
 
   energyUse              = 0,
   explodeAs              = [[BIG_UNITEX]],
-  footprintX             = 3,
-  footprintZ             = 3,
+  footprintX             = 2,
+  footprintZ             = 2,
   iconType               = [[builder]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -38,7 +39,7 @@ unitDef = {
   maxVelocity            = 2.4,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
-  movementClass          = [[TANK3]],
+  movementClass          = [[TANK2]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[corcv.s3o]],

@@ -26,7 +26,7 @@ function gadget:GameFrame(n)
 	if n == 0 then
 		for i = 1, #playerlist do
 			local playerID = playerlist[i]
-			local name, active, spectator, teamID, allyTeamID = Spring.GetPlayerInfo(playerID)
+			local name, active, spectator, teamID, allyTeamID = Spring.GetPlayerInfo(playerID, false)
 			
 			-- Widgets have trouble telling between spectators and the resigned non-spectator who was playing with teamID 0.
 			if not spectator then

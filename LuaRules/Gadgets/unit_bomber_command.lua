@@ -183,7 +183,7 @@ local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 	-- workaround for STOP not clearing attack order due to auto-attack
 	-- we set it to hold fire temporarily, revert once commands have been reset
 	local queue = spGetCommandQueue(unitID, -1)
-	local firestate = Spring.GetUnitStates(unitID).firestate
+	local firestate = Spring.Utilities.GetUnitFireState(unitID)
 	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, 0)
 	spGiveOrderToUnit(unitID, CMD.STOP, emptyTable, 0)
 	if queue then
@@ -343,7 +343,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	if unitDefID and bomberDefs[unitDefID] then
 		-- Remove fight orders to implement a fight command version of CommandFire if Fight is the last command.
 		local queueLength = spGetCommandQueue(unitID, 0)
-		if queueLength <= 2 and (not Spring.GetUnitStates(unitID)["repeat"]) then
+		if queueLength <= 2 and (not Spring.Utilities.GetUnitRepeat(unitID)) then
 			spGiveOrderToUnit(unitID, CMD.REMOVE, {CMD.FIGHT}, CMD.OPT_ALT)
 		end
 	end
@@ -410,7 +410,7 @@ end
 function gadget:UnitFinished(unitID, unitDefID, team)
 	if airpadDefs[unitDefID] then
 		--Spring.Echo("Adding unit "..unitID.." to airpad list")
-		local allyTeam = select(6, Spring.GetTeamInfo(team))
+		local allyTeam = select(6, Spring.GetTeamInfo(team, false))
 		airpadsData[unitID] = Spring.Utilities.CopyTable(airpadDefs[unitDefID], true)
 		airpadsData[unitID].reservations = {count = 0, units = {}}
 		airpadsData[unitID].emptySpot = {}
@@ -476,7 +476,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, team)
 	if airpadsData[unitID] then
-		local allyTeam = select(6, Spring.GetTeamInfo(team))
+		local allyTeam = select(6, Spring.GetTeamInfo(team, false))
 		--Spring.Echo("Removing unit "..unitID.." from airpad list")
 		airpadsPerAllyteam[allyTeam][unitID] = nil
 		for bomberID in pairs(airpadsData[unitID].reservations.units) do
@@ -533,8 +533,7 @@ function gadget:GameFrame(n)
 		for bomberID, data in pairs(bomberToPad) do
 			local padID = data.padID
 			local unitDefID = data.unitDefID
-			local queue = spGetCommandQueue(bomberID, 1)
-			if (queue and queue[1] and queue[1].id == CMD_REARM) and 
+			if (Spring.Utilities.GetUnitFirstCommand(bomberID) == CMD_REARM) and 
 					((Spring.GetUnitSeparation(bomberID, padID, true) or 1000) < ((unitDefID and airDefs[unitDefID] and airDefs[unitDefID].padRadius) or DEFAULT_PAD_RADIUS)) then
 				if not airpadRefreshEmptyspot then
 					RefreshEmptyspot_minusBomberLanding() --initialize empty pad count once
@@ -545,7 +544,7 @@ function gadget:GameFrame(n)
 					if spotCount>0 then
 						local padPiece = airpadsData[padID].emptySpot[spotCount]
 						table.remove(airpadsData[padID].emptySpot) --remove used spot
-						if Spring.GetUnitStates(bomberID)["repeat"] then 
+						if Spring.Utilities.GetUnitRepeat(bomberID) then 
 							cmdIgnoreSelf = true
 							-- InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
 							spGiveOrderToUnit(bomberID, CMD.INSERT, {-1, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, CMD.OPT_ALT) --Internal to avoid repeat
@@ -571,8 +570,8 @@ function gadget:GameFrame(n)
 		
 		for unitID in pairs(bomberUnitIDs) do -- CommandFallback doesn't seem to activate for inbuilt commands!!! <-- What this really mean?
 			if spGetUnitRulesParam(unitID, "noammo") == 1 then
-				local queue = spGetCommandQueue(unitID, 1) or emptyTable
-				if #queue == 0 or combatCommands[queue[1].id] then --should never happen... (all should be catch by AllowCommand) 
+				local cmdID = Spring.Utilities.GetUnitFirstCommand(unitID)
+				if (not cmdID) or combatCommands[cmdID] then --should never happen... (all should be catch by AllowCommand) 
 					RequestRearm(unitID, nil, true)
 				end
 			end
@@ -598,8 +597,8 @@ function GG.LandComplete(bomberID)
 	
 	-- Check queue inheritence
 	local queueLength = spGetCommandQueue(bomberID, 0)
-	local queue = spGetCommandQueue(bomberID, 1)
-	if (queueLength == 0 or (queueLength == 1 and queue and queue[1] and (queue[1].id == CMD_REARM or queue[1].id == 0))) and 
+	local cmdID = Spring.Utilities.GetUnitFirstCommand(bomberID)
+	if (queueLength == 0 or (queueLength == 1 and (cmdID == CMD_REARM or cmdID == 0))) and 
 			(padID and airpadsData[padID] and not airpadsData[padID].mobile) then
 		local padQueueLength = spGetCommandQueue(padID, 0)
 		if padQueueLength > 0 then
@@ -616,7 +615,7 @@ function GG.LandComplete(bomberID)
 	end
 	
 	-- Remove rearm if the queue was not inherited.
-	if queue and queue[1] and queue[1].id == CMD_REARM then
+	if cmdID == CMD_REARM then
 		rearmRemove[bomberID] = true --remove current RE-ARM command
 	end
 end
@@ -718,7 +717,6 @@ else
 -- UNSYNCED
 --------------------------------------------------------------------------------
 local spGetLocalTeamID = Spring.GetLocalTeamID
-local spAreTeamsAllied = Spring.AreTeamsAllied
 local spGetSpectatingState = Spring.GetSpectatingState
 local spValidUnitID = Spring.ValidUnitID
 local spGetSelectedUnits = Spring.GetSelectedUnits

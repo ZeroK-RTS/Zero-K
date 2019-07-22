@@ -34,7 +34,7 @@ local function Close()
 end
 
 function script.Create()
-	StartThread (SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
 end
 
@@ -60,14 +60,14 @@ function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 
 	for i = 1, #explodables do
-		if (severity > math.random()) then Explode(explodables[i], sfxSmoke + sfxFire) end
+		if (severity > math.random()) then Explode(explodables[i], SFX.SMOKE + SFX.FIRE) end
 	end
 
 	if (severity <= .5) then
 		return 1
 	else
-		Explode (base1, sfxShatter)
-		Explode (base2, sfxShatter)
+		Explode (base1, SFX.SHATTER)
+		Explode (base2, SFX.SHATTER)
 		return 2
 	end
 end

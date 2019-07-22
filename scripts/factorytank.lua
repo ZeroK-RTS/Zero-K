@@ -138,7 +138,7 @@ local function Close()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, {pipe, lidh2, piece "smoke_1"})
+	StartThread(GG.Script.SmokeUnit, {pipe, lidh2, piece "smoke_1"})
 	Spring.SetUnitNanoPieces(unitID, {emit})
 	StartThread(Open)
 end
@@ -172,14 +172,14 @@ function script.Killed(recentDamage, maxHealth)
 	local explodables = {barrel, turret, pipe, spinners[1], spinners[4], piece "lid_1"}
 	for i = 1, #explodables do
 		if math.random() < severity then
-			Explode (explodables[i], sfxFall + (brutal and (sfxSmoke + sfxFire) or 0))
+			Explode (explodables[i], SFX.FALL + (brutal and (SFX.SMOKE + SFX.FIRE) or 0))
 		end
 	end
 
 	if not brutal then
 		return 1
 	else
-		Explode (base, sfxShatter)
+		Explode (base, SFX.SHATTER)
 		return 2
 	end
 end

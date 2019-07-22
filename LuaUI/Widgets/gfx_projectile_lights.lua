@@ -520,5 +520,9 @@ function widget:Initialize()
 	if WG.DeferredLighting_RegisterFunction then
 		WG.DeferredLighting_RegisterFunction(GetProjectileLights)
 		projectileLightTypes = GetLightsFromUnitDefs()
+	else
+		Spring.Echo('Projectile Lights (gfx_projectile_lights.lua) - Deferred rendering widget not found.')
+		widgetHandler:RemoveWidget()
+		return
 	end
 end

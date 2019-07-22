@@ -90,7 +90,6 @@ return {
     sseacloud = {
       class              = [[CExpGenSpawner]],
       count              = 1,
-      underwater         = true,
       water              = true,
       underwater         = true,
       properties = {
@@ -103,7 +102,6 @@ return {
     swaterdroplets = {
       class              = [[CExpGenSpawner]],
       count              = 1,
-      underwater         = true,
       water              = true,
       underwater         = true,
       properties = {

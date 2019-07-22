@@ -37,7 +37,6 @@ local glClear				= gl.Clear
 local glColorMask			= gl.ColorMask
 local glBlending			= gl.Blending
 local glLoadIdentity		= glLoadIdentity
-local glResetState			= gl.ResetState
 local glMatrixMode			= gl.MatrixMode
 local glPushMatrix			= gl.PushMatrix
 local glPopMatrix			= gl.PopMatrix

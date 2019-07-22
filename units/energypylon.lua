@@ -23,6 +23,7 @@ unitDef = {
     modelradius    = [[24]],
 	removewait     = 1,
 	default_spacing = 41, -- Diagonal connection.
+    selectionscalemult = 1.15,
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],

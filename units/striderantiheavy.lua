@@ -34,7 +34,7 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 2000,
   maxSlope               = 36,
-  maxVelocity            = 1.45,
+  maxVelocity            = 1.55,
   maxWaterDepth          = 5000,
   minCloakDistance       = 100,
   movementClass          = [[AKBOT2]],
@@ -86,7 +86,7 @@ unitDef = {
       craterMult              = 6,
 
       damage                  = {
-        default = 1200,
+        default = 2000,
       },
 
       explosionGenerator      = [[custom:DGUNTRACE]],

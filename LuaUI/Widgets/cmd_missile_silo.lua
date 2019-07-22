@@ -78,32 +78,30 @@ local function GetMissiles(siloID, justOne)
 	return missiles, count
 end
 
-local function IsWaiting(unitID)
-	local cmd = Spring.GetFactoryCommands(unitID, 1)[1]
-	return cmd and cmd.id == CMD.WAIT
-end
-
+local orderParamsTable = {1, 2, 3}
 local function RemoveAttackCommandIfFirst(unitID)
-	local states = Spring.GetUnitStates(unitID) or EMPTY_TABLE
-	local rpt = states["repeat"]
+	local rpt = Spring.Utilities.GetUnitRepeat(unitID)
 	
-	local cmd = Spring.GetUnitCommands(unitID, 1)[1]
-	if (not cmd) or (cmd.id ~= CMD.ATTACK) then
+	local cmdID, _, cmdTag, cmdX, cmdY, cmdZ = Spring.GetUnitCurrentCommand(unitID)
+	if cmdID ~= CMD.ATTACK then
 		return
 	end
 	
-	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmdTag}, 0)
 	if rpt then
-		Spring.GiveOrderToUnit(unitID, CMD.ATTACK, cmd.params, CMD.OPT_SHIFT)
+		orderParamsTable[1] = cmdX
+		orderParamsTable[2] = cmdY
+		orderParamsTable[3] = cmdZ
+		Spring.GiveOrderToUnit(unitID, CMD.ATTACK, orderParamsTable, CMD.OPT_SHIFT)
 	end
 end
 
-local function FireOneMissileAtSiloTarget(siloID, cmdParams)
+local function FireOneMissileAtSiloTarget(siloID, cmdX, cmdY, cmdZ)
 	if not siloID then
 		return
 	end
 	
-	if IsWaiting(siloID) then
+	if Spring.GetUnitCurrentCommand(siloID) == CMD.WAIT then
 		return
 	end
 	
@@ -112,7 +110,10 @@ local function FireOneMissileAtSiloTarget(siloID, cmdParams)
 		return
 	end
 	
-	Spring.GiveOrderToUnit(missile, CMD.ATTACK, cmdParams, 0)
+	orderParamsTable[1] = cmdX
+	orderParamsTable[2] = cmdY
+	orderParamsTable[3] = cmdZ
+	Spring.GiveOrderToUnit(missile, CMD.ATTACK, orderParamsTable, 0)
 	--silos[siloID] = FIRE_INTERVAL
 	
 	RemoveAttackCommandIfFirst(siloID)
@@ -123,12 +124,12 @@ local function FireMissileCheck(siloID)
 		return
 	end
 	
-	local cmd = Spring.GetUnitCommands(siloID, 1)[1]
-	if (not cmd) or (cmd.id ~= CMD.ATTACK) then
+	local cmdID, _, _, cmdX, cmdY, cmdZ = Spring.GetUnitCurrentCommand(siloID)
+	if cmdID ~= CMD.ATTACK then
 		return
 	end
-	
-	FireOneMissileAtSiloTarget(siloID, cmd.params)
+
+	FireOneMissileAtSiloTarget(siloID, cmdX, cmdY, cmdZ)
 end
 
 --------------------------------------------------------------------------------

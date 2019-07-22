@@ -164,34 +164,34 @@ function script.Create()
 	Hide(tracks3)
 	Hide(tracks4)
 	Move(bay, x_axis, -BAY_DISTANCE)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then 
-		Explode(base, sfxNone)
-		Explode(bay, sfxNone)
-		Explode(gantry, sfxNone)
-		Explode(clamp1, sfxNone)
-		Explode(clamp2, sfxNone)
-		Explode(missile, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(bay, SFX.NONE)
+		Explode(gantry, SFX.NONE)
+		Explode(clamp1, SFX.NONE)
+		Explode(clamp2, SFX.NONE)
+		Explode(missile, SFX.NONE)
 		return 1
 	elseif severity <= .50 then 
-		Explode(base, sfxNone)
-		Explode(bay, sfxNone)
-		Explode(gantry, sfxFall)
-		Explode(clamp1, sfxFall)
-		Explode(clamp2, sfxFall)
-		Explode(missile, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(bay, SFX.NONE)
+		Explode(gantry, SFX.FALL)
+		Explode(clamp1, SFX.FALL)
+		Explode(clamp2, SFX.FALL)
+		Explode(missile, SFX.NONE)
 		return 1
 	else 
-		Explode(base, sfxShatter)
-		Explode(bay, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(gantry, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(clamp1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(clamp2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(missile, sfxNone)
+		Explode(base, SFX.SHATTER)
+		Explode(bay, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(gantry, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(clamp1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(clamp2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(missile, SFX.NONE)
 		return 2
 	end
 end
