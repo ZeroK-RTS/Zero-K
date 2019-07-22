@@ -1,56 +1,27 @@
--- $Id$
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local function SunChanged(curShaderObj)
-	curShaderObj:SetUniformAlways("shadowDensity", gl.GetSun("shadowDensity" ,"unit"))
-
-	curShaderObj:SetUniformAlways("sunAmbient", gl.GetSun("ambient" ,"unit"))
-	curShaderObj:SetUniformAlways("sunDiffuse", gl.GetSun("diffuse" ,"unit"))
-	curShaderObj:SetUniformAlways("sunSpecular", gl.GetSun("specular" ,"unit"))
-end
+local matTemplate = VFS.Include("ModelMaterials/Templates/defaultMaterialTemplate.lua")
 
 local materials = {
-	feature_fallback = {
-		shaderDefinitions = {
-			"#define deferred_mode 0",
-			"#define SPECULARSUNEXP 4.0",
-			"#define SPECULARMULT 1.0",
-			"#define SHADOW_SOFTNESS SHADOW_HARD",
-		},
-		deferredDefinitions = {
-			"#define deferred_mode 1",
-			"#define SPECULARSUNEXP 4.0",
-			"#define SPECULARMULT 1.0",
-			"#define SHADOW_SOFTNESS SHADOW_HARD",
-			"#define MAT_IDX 255",
-		},
-		force     = false, --// always use the shader even when normalmapping is disabled
-		feature   = true, --// This is used to define that this is a feature shader
-		usecamera = false,
-		culling   = GL.BACK,
-		texunits  = {
+	featuresFallback = Spring.Utilities.MergeWithDefault(matTemplate, {
+		texUnits  = {
 			[0] = "%%FEATUREDEFID:0",
 			[1] = "%%FEATUREDEFID:1",
-			[2] = "$shadow",
-			--[3] = "$specular",
-			[4] = "$reflection",
 		},
-		SunChanged = SunChanged,
-	},
+		feature = true,
+		deferredOptions = {
+			materialIndex = 255,
+		},
+	})
 }
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local cusFeatureMaterials = GG.CUS[2].bufMaterials
-
+local cusFeaturesMaterials = GG.CUS.featureMaterialDefs
 local featureMaterials = {}
 
 for id = 1, #FeatureDefs do
-	local fdef = FeatureDefs[id]
-	if not cusFeatureMaterials[id] then
-		featureMaterials[id] = {"feature_fallback"}
+	if not cusFeaturesMaterials[id] then
+		Spring.Log(gadget:GetInfo().name, LOG.WARNING, string.format("Assigning featuresFallback material to feature %s. This should never happen.", FeatureDefs[id].name))
+		featureMaterials[id] = {"featuresFallback"}
 	end
 end
 

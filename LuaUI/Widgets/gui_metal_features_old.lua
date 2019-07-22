@@ -14,13 +14,13 @@
 
 function widget:GetInfo()
   return {
-    name      = "MetalFeatures",
+    name      = "MetalFeatures (old)",
     desc      = "Highlights features with reclaimable metal",
     author    = "trepan",
     date      = "Aug 05, 2007", --Apr 23, 2019
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true,  --  loaded by default?
+    enabled   = false,  --  loaded by default?
   }
 end
 
