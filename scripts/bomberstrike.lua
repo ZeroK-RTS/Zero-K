@@ -107,8 +107,8 @@ end
 
 function script.FireWeapon(num)
 	if num == 1 then
-	Sleep(66)
-	Reload()
+		Sleep(66)
+		Reload()
 	end
 end
 

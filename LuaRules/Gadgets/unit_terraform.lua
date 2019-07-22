@@ -3341,7 +3341,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		
 		local smoothradius = SeismicWeapon[weaponID].smoothradius
 		local gatherradius = SeismicWeapon[weaponID].gatherradius
-		local detachmentradius = SeismicWeapon[weaponID].detachmentradius	
+		local detachmentradius = SeismicWeapon[weaponID].detachmentradius
 		local maxSmooth = SeismicWeapon[weaponID].smooth
 		if y > height + HEIGHT_FUDGE_FACTOR then
 			local factor = 1 - ((y - height - HEIGHT_FUDGE_FACTOR)/smoothradius*HEIGHT_RAD_MULT)^2

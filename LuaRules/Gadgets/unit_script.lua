@@ -31,7 +31,8 @@ function gadget:GetInfo()
 		date      = "2 September 2009",
 		license   = "GPL v2",
 		layer     = 0,
-		enabled   = true --  loaded by default?
+		enabled   = true, --  loaded by default?
+		script    = true,
 	}
 end
 
@@ -694,6 +695,17 @@ local function Wrap_EndBurst(unitID, callins)
 	end
 end
 
+local function Wrap_FireWeapon(unitID, unitDefID, callins)
+	local FireWeapon = callins.FireWeapon
+	
+	local function FireWeaponThread(weaponNum)
+		scriptCallins:ScriptFireWeapon(unitID, unitDefID, weaponNum)
+	end
+	
+	callins.FireWeapon = function(weaponNum)
+		return StartThread(FireWeaponThread, weaponNum)
+	end
+end
 
 local function Wrap_AimShield(unitID, callins)
 	local AimShield = callins["AimShield"]
@@ -859,6 +871,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	Wrap_AimShield(unitID, callins)
 	Wrap_Killed(unitID, callins)
 	Wrap_EndBurst(unitID, callins)
+	Wrap_FireWeapon(unitID, unitDefID, callins)
 
 	-- Wrap everything so activeUnit get's set properly.
 	for k,v in pairs(callins) do
