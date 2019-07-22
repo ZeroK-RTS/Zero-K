@@ -992,7 +992,7 @@ local function MorphQueen()
 	end
 
 	if not data.queenID then
-		Spring.Echo("LUA_ERRRUN chicken queen was not recreated correctly")
+		Spring.Echo("LUA_ERRRUN chicken queen was not recreated correctly, chicken team unit count / total unit count / maxunits ", Spring.GetTeamUnitCount(queenOwner), #Spring.GetAllUnits(), Spring.GetModOptions().maxunits or 10000)
 		return
 	end
 
