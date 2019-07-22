@@ -13,6 +13,13 @@ uniform float strength = 1.0;
 //layout(pixel_center_integer) in vec4 gl_FragCoord;
 //layout(origin_upper_left) in vec4 gl_FragCoord;
 
+#define STRICT_GL ###STRICT_GL###
+#if (STRICT_GL == 1)
+	#define TEXEL_FETCH_OFFSET(t, c, l, o) texelFetch(t, c + o, l)
+#else
+	#define TEXEL_FETCH_OFFSET texelFetchOffset
+#endif
+
 
 #if (DILATE_SINGLE_PASS == 1)
 	void main(void)
@@ -38,8 +45,8 @@ uniform float strength = 1.0;
 				);
 
 				if (okCoords)*/ {
-					minDepth = min(minDepth, texelFetchOffset( depthTex, thisCoord, 0, offset).r);
-					vec4 thisColor = texelFetchOffset( colorTex, thisCoord, 0, offset);
+					minDepth = min(minDepth, TEXEL_FETCH_OFFSET( depthTex, thisCoord, 0, offset).r);
+					vec4 thisColor = TEXEL_FETCH_OFFSET( colorTex, thisCoord, 0, offset);
 					thisColor.a *= smoothstep(bnd.y, bnd.x, sqrt(float(x * x + y * y)));
 					maxColor = max(maxColor, thisColor);
 				}
@@ -72,8 +79,8 @@ uniform float strength = 1.0;
 			);
 
 			if (okCoords)*/ {
-				minDepth = min(minDepth, texelFetchOffset( depthTex, thisCoord, 0, offset).r);
-				vec4 thisColor = texelFetchOffset( colorTex, thisCoord, 0, offset);
+				minDepth = min(minDepth, TEXEL_FETCH_OFFSET( depthTex, thisCoord, 0, offset).r);
+				vec4 thisColor = TEXEL_FETCH_OFFSET( colorTex, thisCoord, 0, offset);
 				thisColor.a *= smoothstep(bnd.y, bnd.x, abs(i));
 				maxColor = max(maxColor, thisColor);
 			}

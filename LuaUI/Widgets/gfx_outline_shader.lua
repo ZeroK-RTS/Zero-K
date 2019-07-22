@@ -384,6 +384,7 @@ function widget:Initialize()
 	local dilationShaderFrag = VFS.LoadFile(shadersDir.."outlineDilate.frag.glsl")
 	dilationShaderFrag = dilationShaderFrag:gsub("###DILATE_SINGLE_PASS###", tostring((DILATE_SINGLE_PASS and 1) or 0))
 	dilationShaderFrag = dilationShaderFrag:gsub("###DILATE_HALF_KERNEL_SIZE###", tostring(DILATE_HALF_KERNEL_SIZE))
+	dilationShaderFrag = dilationShaderFrag:gsub("###STRICT_GL###", tostring((Platform.gpuVendor == "Nvidia" and 0) or 1))
 
 	dilationShader = LuaShader({
 		vertex = identityShaderVert,
