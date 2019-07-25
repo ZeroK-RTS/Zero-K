@@ -568,8 +568,8 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	ShLabel(pathUnitVisiblity, 'Unit Visibility Widgets')
 	ShButton(pathUnitVisiblity,'Toggle Unit Halos', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
 	
-	local pathSpotter = 'Settings/Graphics/Unit Visibility/Spotter'
-		ShButton(pathSpotter, 'Toggle Unit Spotter', function() spSendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
+	--local pathSpotter = 'Settings/Graphics/Unit Visibility/Spotter'
+	--	ShButton(pathSpotter, 'Toggle Unit Spotter', function() spSendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
 	--local pathPlatter = 'Settings/Graphics/Unit Visibility/Platter'
 	--	ShButton(pathPlatter, 'Toggle Unit Platter', function() spSendCommands{"luaui togglewidget Fancy Teamplatter"} end, "Puts a team-coloured platter-halo below units.")
 	local pathXrayShader = 'Settings/Graphics/Unit Visibility/XRay Shader'
