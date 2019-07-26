@@ -18,9 +18,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[13]],
-	aimposoffset   = [[0 -5 0]],
-	midposoffset   = [[0 -5 0]],
+    modelradius    = [[13]],
+    aimposoffset   = [[0 -5 0]],
+    midposoffset   = [[0 -5 0]],
     turnatfullspeed = [[1]],
   },
 
@@ -81,7 +81,7 @@ unitDef = {
       cegTag                  = [[torptrailpurple]],
 
       customparams = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 2,
       },

@@ -8,8 +8,13 @@ include "constants.lua"
 
 local SIG_AIM = 1
 
-function script.QueryWeapon() return missile end
-function script.AimFromWeapon() return aimpoint end
+function script.QueryWeapon()
+	return missile
+end
+
+function script.AimFromWeapon()
+	return aimpoint
+end
 
 local respawning_rocket = false
 

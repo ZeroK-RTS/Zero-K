@@ -111,9 +111,9 @@ unitDef = {
       craterBoost             = 4,
       craterMult              = 3.5,
 
-			customParams = {
-				burst = Shared.BURST_RELIABLE,
-			},
+      customParams = {
+        burst = Shared.BURST_RELIABLE,
+      },
 
       damage                  = {
         default = 3502.4,
