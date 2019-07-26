@@ -100,7 +100,7 @@ UpdateDrawList = function()
 			alpha = 0.7
 			fadealpha = 0.4
 		end
-		
+
 		--Spring.Echo("Team", team, "R G B", r, g, b, "Alphas", alpha, fadealpha)
 		circlePoly[team] = glCreateList(function()
 			-- inner:
@@ -229,6 +229,7 @@ function widget:DrawWorldPreUnit()
 			end
 		end
 	end
+	glPolygonOffset(false)
 	glColor(1,1,1,1)
 end
 
