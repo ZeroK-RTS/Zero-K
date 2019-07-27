@@ -36,12 +36,12 @@ function GetColor(colormap,life)
 				 col1[3]*ia + col2[3]*aa, col1[4]*ia + col2[4]*aa
 end
 
-local function MergeShieldColor(col, frac)
+local function MergeShieldColor(col, frac, charge)
 	return {
 		frac*col[1][1] + (1 - frac)*col[2][1],
 		frac*col[1][2] + (1 - frac)*col[2][2],
 		frac*col[1][3] + (1 - frac)*col[2][3],
-		frac*col[1][4] + (1 - frac)*col[2][4],
+		(frac*col[1][4] + (1 - frac)*col[2][4]) * (0.2 + charge / (charge + 200)),
 	}
 end
 
@@ -50,8 +50,8 @@ local HIT_DURATION = 2
 function GetShieldColor(unitID, self)
 	local _, charge = Spring.GetUnitShieldState(unitID)
 	local frac = math.max(0, math.min(1, charge/(self.shieldCapacity or 10000)))
-	local col1 = MergeShieldColor(self.colormap1, frac)
-	local col2 = self.colormap2 and MergeShieldColor(self.colormap2, frac)
+	local col1 = MergeShieldColor(self.colormap1, frac, charge)
+	local col2 = self.colormap2 and MergeShieldColor(self.colormap2, frac, charge)
 	
 	if self.hitResposeMult ~= 0 then
 		local hitTime = Spring.GetUnitRulesParam(unitID, "shieldHitFrame")
