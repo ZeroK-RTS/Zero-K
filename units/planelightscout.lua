@@ -3,7 +3,7 @@ unitDef = {
   name                = [[Sparrow]],
   description         = [[Light Scout Plane]],
   brakerate           = 0.4,
-  buildCostMetal      = 135,
+  buildCostMetal      = 235,
   builder             = false,
   buildPic            = [[planelightscout.png]],
   canFly              = true,
@@ -21,7 +21,7 @@ unitDef = {
 
   customParams        = {
     modelradius    = [[8]],
-    refuelturnradius = [[160]],
+    refuelturnradius = [[130]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -33,9 +33,9 @@ unitDef = {
   idleTime            = 1800,
   maxAcc              = 0.5,
   maxDamage           = 350,
-  maxAileron          = 0.018,
-  maxElevator         = 0.02,
-  maxRudder           = 0.008,
+  maxAileron          = 0.016,
+  maxElevator         = 0.022,
+  maxRudder           = 0.012,
   maxVelocity         = 7,
   minCloakDistance    = 75,
   noAutoFire          = false,
@@ -44,7 +44,7 @@ unitDef = {
   script              = [[planelightscout.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 950,
-  turnRadius          = 70,
+  turnRadius          = 50,
   workerTime          = 0,
 
   featureDefs         = {

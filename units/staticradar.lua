@@ -21,7 +21,7 @@ unitDef = {
   
   customParams = {
     morphto        = [[planelightscout]],
-    morphtime      = 20,
+    morphtime      = 24,
     modelradius    = [[16]],
     priority_misc  = 2, -- High
     addfight       = 1,
