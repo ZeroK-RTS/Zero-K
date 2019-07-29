@@ -444,8 +444,13 @@ local function WaypointHandler(x,y,button)
     Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt) 
   elseif type=='unit' then
     Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.GUARD,{param},opt)     
+  elseif type~='feature' then
+    return -- sky, ignore
   else --feature
     type,param = Spring.TraceScreenRay(x,y,true)
+    if not param then
+      return -- there's sky behind the feature, ignore
+    end
     Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt)
   end
 
