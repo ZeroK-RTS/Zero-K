@@ -190,7 +190,7 @@ unitDef = {
       reloadtime              = 8,
       size                    = 1E-06,
       smokeTrail              = false,
-      targetborder            = 1,
+      targetborder            = 0.9,
       
       textures                = {
         [[null]],
