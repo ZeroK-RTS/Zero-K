@@ -38,6 +38,7 @@ unitDef = {
   maxDamage                     = 4000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[fus.s3o]],

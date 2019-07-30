@@ -1068,18 +1068,16 @@ local function printAbilities(ud, unitID)
 	end
 
 	if cp.windgen then
-		local ground_extreme = Spring.GetGameRulesParam("WindGroundExtreme") or 1
 		local wind_slope = Spring.GetGameRulesParam("WindSlope") or 0
 		local max_wind = Spring.GetGameRulesParam("WindMax") or 2.5
-		local bonus_per_elmo = max_wind * wind_slope / ground_extreme
-		local bonus_100 = numformat(100*bonus_per_elmo)
+		local bonus_100 = numformat(100*wind_slope*max_wind)
 
 		cells[#cells+1] = 'Generates energy from wind'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Variable income'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Max wind:' 
-		cells[#cells+1] = max_wind
+		cells[#cells+1] = max_wind .. " E"
 		cells[#cells+1] = ' - Altitude bonus:'
 		cells[#cells+1] = bonus_100 .. " E / 100 height"
 		cells[#cells+1] = ''

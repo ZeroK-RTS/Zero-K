@@ -194,8 +194,8 @@ local tidalStrength
 local windMin
 local windMax
 local windGroundMin
-local windGroundExtreme
 local windGroundSlope
+local windMinBound
 
 local GAIA_TEAM = Spring.GetGaiaTeamID()
 
@@ -740,7 +740,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 					income = tidalStrength
 					healthOverride = 400
 				else
-					local minWindIncome = windMin + (windMax - windMin)*math.max(0, math.min(1, windGroundSlope*(y - windGroundMin)/windGroundExtreme))
+					local minWindIncome = windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin)))
 					extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax)
 					income = (minWindIncome+windMax)/2
 				end
@@ -2446,8 +2446,8 @@ local function InitializeWindParameters()
 	windMin = spGetGameRulesParam("WindMin")
 	windMax = spGetGameRulesParam("WindMax")
 	windGroundMin = spGetGameRulesParam("WindGroundMin")
-	windGroundExtreme = spGetGameRulesParam("WindGroundExtreme")
 	windGroundSlope = spGetGameRulesParam("WindSlope")
+	windMinBound = spGetGameRulesParam("WindMinBound")
 	tidalStrength = Spring.GetGameRulesParam("tidalStrength")
 	tidalHeight = Spring.GetGameRulesParam("tidalHeight")
 end
