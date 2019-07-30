@@ -35,6 +35,8 @@ unitDef = {
   corpse           = [[DEAD]],
 
   customParams     = {
+    amph_regen = 40,
+    amph_submerged_at = 32,
 	modelradius    = [[100]],
     aimposoffset   = [[0 0 -26]],
     midposoffset   = [[0 0 -10]],
