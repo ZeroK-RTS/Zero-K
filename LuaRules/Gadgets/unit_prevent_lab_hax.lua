@@ -331,7 +331,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	local buildDefID, x, z, face
 	if cmdID == CMD.INSERT then
 		if not cmdParams[2] then
-			return false
+			return true
 		end
 		if cmdParams[2] >= 0 then
 			return true
@@ -355,7 +355,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
 	local ud = UnitDefs[buildDefID]
 	if not ud then
-		return false
+		return true
 	end
 
 	local xsize = (ud.xsize)*4 - 8
