@@ -84,8 +84,9 @@ local function TargetHeightUpdateThread(targetID, behaviour)
 		local uHeight = max(spGetGroundHeight(predictX, predictZ), 0)
 		
 		behaviour.wantedHeight = flatDiveHeight + max((tHeight - uHeight)*0.4, 0)
-		Spring.MoveCtrl.SetAirMoveTypeData(unitID, behaviour)
-		
+		if not Spring.MoveCtrl.GetTag(unitID) then
+			Spring.MoveCtrl.SetAirMoveTypeData(unitID, behaviour)
+		end
 		Sleep(200)
 	end
 end
