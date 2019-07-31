@@ -177,6 +177,7 @@ local engineUniforms = {
 	"simFrame",
 	"drawFrame", --visFrame
 }
+
 local function _FillUniformLocs(luaShader)
 	local uniformLocTbl = {}
 	for _, uniformName in ipairs(engineUniforms) do
@@ -721,7 +722,7 @@ function gadget:GameFrame(gf)
 			shadows = shadowsNow
 			_ProcessOptions("shadowmapping", nil, shadows, Spring.GetMyPlayerID())
 		end
-	elseif gfMod == 15 then	--TODO change 15 to something less busy
+	elseif gfMod == 15 then --TODO change 15 to something less busy
 		GameFrameSlow(gf)
 	end
 end
@@ -807,10 +808,10 @@ function gadget:Initialize()
 	local treewind = Spring.GetConfigInt("TreeWind", 1) > 0
 
 	local commonOptions = {
-		shadowmapping		= shadows,
-		normalmapping		= normalmapping,
-		treewind			= treewind,
-		--metal_highlight		= false,
+		shadowmapping     = shadows,
+		normalmapping     = normalmapping,
+		treewind          = treewind,
+		--metal_highlight   = false,
 	}
 
 	for _, rendering in ipairs(allRendering) do
