@@ -85,11 +85,11 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams            = {
-		lups_noshockwave = [[1]],
-		thower_weapon    = 1,
-	  },
-	  
+      customParams            = {
+        lups_noshockwave = [[1]],
+        thower_weapon    = 1,
+      },
+      
       damage                  = {
         default = 0,
       },
@@ -124,11 +124,12 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams            = {
-		lups_noshockwave = [[1]],
-		thower_weapon    = 1,
-	  },
-	  
+      customParams            = {
+        lups_noshockwave = [[1]],
+        thower_weapon    = 1,
+        bogus = 1,
+      },
+      
       damage                  = {
         default = 0,
       },

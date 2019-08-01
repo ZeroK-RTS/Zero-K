@@ -128,6 +128,10 @@ unitDef = {
       burstrate               = 1,
       collideFriendly         = false,
 
+      customParams            = {
+        bogus = 1,
+      },
+
       damage                  = {
         default = 0,
       },

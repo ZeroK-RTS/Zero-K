@@ -38,7 +38,7 @@ local noDecloaUnits = {
 
 for i = 1, #WeaponDefs do
 	local wd = WeaponDefs[i]
-	if wd.name:find("bogus") or wd.name:find("fake") then
+	if wd.customParams and wd.customParams.bogus then
 		fakeWeapons[i] = true
 	end
 end

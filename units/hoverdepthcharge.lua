@@ -86,9 +86,9 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 2,
 
-			customParams = {
-				burst = Shared.BURST_UNRELIABLE,
-			},
+      customParams = {
+        burst = Shared.BURST_UNRELIABLE,
+      },
 
       damage                  = {
         default = 900.5,
@@ -174,6 +174,10 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
+
+      customParams            = {
+        bogus = 1,
+      },
 
       damage                  = {
         default = 1E-06,

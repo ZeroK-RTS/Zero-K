@@ -141,6 +141,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams            = {
+        bogus = 1,
+      },
+
       damage                  = {
         default = 300,
         subs    = 15,

@@ -23,7 +23,26 @@ local CMD_OPT_META = CMD.OPT_META
 local CMD_OPT_CTRL = CMD.OPT_CTRL
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 
+local fakeWeaponByNum = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.weapons then
+		for j = 1, #ud.weapons do
+			local weaponDefID = ud.weapons[j].weaponDef
+			local wd = WeaponDefs[weaponDefID]
+			if wd.customParams and wd.customParams.bogus then
+				fakeWeaponByNum[i] = fakeWeaponByNum[i] or {}
+				fakeWeaponByNum[i][j] = true
+			end
+		end
+	end
+end
+
+
 function gadget:ScriptEndBurst(unitID, unitDefID, weaponNum)
+	if (fakeWeaponByNum[unitDefID] and fakeWeaponByNum[unitDefID][weaponNum]) then
+		return
+	end
 	local targetType, isUserTarget, targetID = spGetUnitWeaponTarget(unitID, weaponNum)
 	if not isUserTarget then
 		return

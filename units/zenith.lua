@@ -21,7 +21,7 @@ unitDef = {
     keeptooltip = [[any string I want]],
     --neededlink  = 150,
     --pylonrange  = 150,
-	modelradius    = [[45]],
+    modelradius    = [[45]],
   },  
   
   energyUse                     = 0,
@@ -58,7 +58,7 @@ unitDef = {
 
     {
       def                = [[GRAVITY_NEG]],
-	  onlyTargetCategory = [[NONE]],
+      onlyTargetCategory = [[NONE]],
     },
 
   },
@@ -70,14 +70,14 @@ unitDef = {
       name                    = [[Attractive Gravity (fake)]],
       alwaysVisible           = 1,
       avoidFriendly           = false,
-	  canAttackGround		  = false,
+      canAttackGround         = false,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-		light_radius = 0,
-	  },
+      customParams            = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 0.001,
@@ -99,7 +99,7 @@ unitDef = {
       rgbColor2               = [[1 0.5 1]],
       size                    = 32,
       soundStart              = [[weapon/gravity_fire]],
-	  soundStartVolume        = 0.15,
+      soundStartVolume        = 0.15,
       thickness               = 32,
       tolerance               = 5000,
       turret                  = true,
@@ -108,7 +108,7 @@ unitDef = {
     },
     METEOR      = {
       name                    = [[Meteor]],
-	  accuracy                = 700,
+      accuracy                = 700,
       alwaysVisible           = 1,
       areaOfEffect            = 240,
       avoidFriendly           = false,
@@ -119,11 +119,11 @@ unitDef = {
       craterBoost             = 3,
       craterMult              = 6, 
 
-	  customParams        	  = {
-		light_color = [[2.4 1.5 0.6]],
-		light_radius = 600,
+      customParams              = {
+        light_color = [[2.4 1.5 0.6]],
+        light_radius = 600,
       },
-	  
+      
       damage                  = {
         default = 2000,
         planes  = 2000,
@@ -151,16 +151,16 @@ unitDef = {
       },
 
       turret                  = true,
-	  turnrate                = 2000,
+      turnrate                = 2000,
       weaponAcceleration      = 2000,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 1600,
       wobble                  = 5500,
     },
-	
-	METEOR_AIM      = {
+    
+    METEOR_AIM      = {
       name                    = [[Meteor]],
-	  accuracy                = 700,
+      accuracy                = 700,
       alwaysVisible           = 1,
       areaOfEffect            = 240,
       avoidFriendly           = false,
@@ -171,9 +171,9 @@ unitDef = {
       craterBoost             = 3,
       craterMult              = 6,
 
-	  customParams        	  = {
-		light_radius = 0,
-	  },
+      customParams              = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 2000,
@@ -201,7 +201,7 @@ unitDef = {
         [[null]],
       },
 
-	  tracks                  = true,
+      tracks                  = true,
       turret                  = true,
       turnRate                = 25000,
       weaponAcceleration      = 600,
@@ -209,10 +209,10 @@ unitDef = {
       weaponVelocity          = 1200,
       wobble                  = 0,
     },
-	
-	METEOR_FLOAT      = {
+    
+    METEOR_FLOAT      = {
       name                    = [[Meteor]],
-	  accuracy                = 700,
+      accuracy                = 700,
       alwaysVisible           = 1,
       areaOfEffect            = 240,
       avoidFriendly           = false,
@@ -223,10 +223,10 @@ unitDef = {
       craterBoost             = 3,
       craterMult              = 6,
 
-	  customParams        	  = {
-		light_radius = 0,
-		do_not_save = 1, -- Controlled meteors are regenerated on load.
-	  },
+      customParams              = {
+        light_radius = 0,
+        do_not_save = 1, -- Controlled meteors are regenerated on load.
+      },
 
       damage                  = {
         default = 2000,
@@ -254,7 +254,7 @@ unitDef = {
         [[null]],
       },
 
-	  tracks                  = true,
+      tracks                  = true,
       trajectoryHeight        = 0,
       turret                  = true,
       turnRate                = 6000,
@@ -263,10 +263,10 @@ unitDef = {
       weaponVelocity          = 200,
       wobble                  = 30000,
     },
-	
-	METEOR_UNCONTROLLED      = {
+    
+    METEOR_UNCONTROLLED      = {
       name                    = [[Meteor]],
-	  accuracy                = 700,
+      accuracy                = 700,
       alwaysVisible           = 1,
       areaOfEffect            = 240,
       avoidFriendly           = false,
@@ -277,10 +277,10 @@ unitDef = {
       craterBoost             = 3,
       craterMult              = 6,
 
-	  customParams        	  = {
-		light_color = [[2.4 1.5 0.6]],
-		light_radius = 600,
-		do_not_save = 1, -- Controlled meteors are regenerated on load.
+      customParams              = {
+        light_color = [[2.4 1.5 0.6]],
+        light_radius = 600,
+        do_not_save = 1, -- Controlled meteors are regenerated on load.
       },
 
       damage                  = {

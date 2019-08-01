@@ -123,6 +123,7 @@ unitDef = {
 
       customparams = {
         timeslow_damagefactor = 1.7,
+        bogus = 1,
       },
   
       damage                  = {
