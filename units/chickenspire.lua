@@ -27,7 +27,7 @@ unitDef = {
   floater                       = true,
   footprintX                    = 4,
   footprintZ                    = 4,
-  highTrajectory				= 1, 
+  highTrajectory                = 1, 
   iconType                      = [[staticarty]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -64,7 +64,7 @@ unitDef = {
 
     {
       def                = [[SLAMSPORE]],
-	  badTargetCategory	 = [[MOBILE]],
+      badTargetCategory  = [[MOBILE]],
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
     },
 
@@ -80,8 +80,8 @@ unitDef = {
       burstrate               = 0.01,
       craterBoost             = 0,
       craterMult              = 0,
-			
-			customParams            = {
+            
+            customParams            = {
         light_radius = 0,
       },
 
@@ -107,7 +107,7 @@ unitDef = {
       sprayAngle              = 512,
       tolerance               = 5000,
       turret                  = true,
-      waterweapon             = true,	  
+      waterweapon             = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 550,
     },  
@@ -119,8 +119,8 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-			
-			customParams            = {
+            
+            customParams            = {
         light_radius = 0,
       },
 

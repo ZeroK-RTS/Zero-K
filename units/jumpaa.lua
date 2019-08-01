@@ -19,7 +19,7 @@ unitDef = {
     jump_speed         = 6,
     jump_reload        = 10,
     jump_from_midair   = 0,
-	modelradius    = [[15]],
+    modelradius    = [[15]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -38,7 +38,7 @@ unitDef = {
   moveState           = 0,
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName          = [[hunchback.s3o]],
-  script			  = [[jumpaa.lua]],
+  script              = [[jumpaa.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 660,
   trackOffset         = 0,
@@ -78,13 +78,13 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-		
-		light_camera_height = 1600,
-		light_color = [[0.9 0.86 0.45]],
-		light_radius = 140,
-	  },
+      customParams              = {
+        isaa = [[1]],
+        
+        light_camera_height = 1600,
+        light_color = [[0.9 0.86 0.45]],
+        light_radius = 140,
+      },
 
       damage                  = {
         default = 0.78,
@@ -125,11 +125,11 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-		light_color = [[0.2 1.2 1.2]],
-		light_radius = 120,
-	  },
+      customParams              = {
+        isaa = [[1]],
+        light_color = [[0.2 1.2 1.2]],
+        light_radius = 120,
+      },
 
       damage                  = {
         default = 1.636,

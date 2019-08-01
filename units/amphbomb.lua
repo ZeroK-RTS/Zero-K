@@ -90,20 +90,20 @@ local weaponDefs = {
     areaOfEffect       = 500,
     craterBoost        = 1,
     craterMult         = 3.5,
-	customparams = {
+    customparams = {
         lups_explodespeed = 1.04,
         lups_explodelife = 0.88,
-	    timeslow_damagefactor = 10,
-		timeslow_overslow_frames = 5*30, --5 seconds before slow decays
+        timeslow_damagefactor = 10,
+        timeslow_overslow_frames = 5*30, --5 seconds before slow decays
         nofriendlyfire = 1,
-		light_color = [[1.88 0.63 2.5]],
-		light_radius = 320,
-	 },
-	 
-	damage = {
+        light_color = [[1.88 0.63 2.5]],
+        light_radius = 320,
+     },
+     
+    damage = {
       default          = 150.1,
     },
-	 
+     
     edgeEffectiveness  = 0.4,
     explosionGenerator = "custom:riotballplus2_purple_limpet",
     explosionSpeed     = 10,
@@ -111,7 +111,7 @@ local weaponDefs = {
     impulseFactor      = 0.3,
     name               = "Slowing Explosion",
     soundHit           = "weapon/aoe_aura",
-	soundHitVolume     = 1.2,
+    soundHitVolume     = 1.2,
   },
 }
 unitDef.weaponDefs = weaponDefs

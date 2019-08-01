@@ -79,10 +79,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-		light_radius = 0,
+      customParams              = {
+        light_radius = 0,
         combatrange = 5,
-	  },
+      },
 
       damage                  = {
         default = 36,

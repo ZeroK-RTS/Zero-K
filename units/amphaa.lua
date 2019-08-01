@@ -80,7 +80,7 @@ unitDef = {
       cylinderTargeting       = 1,
 
       customParams            = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
         isaa = [[1]],
         script_reload = [[12]],

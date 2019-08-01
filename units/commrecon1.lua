@@ -29,11 +29,11 @@ unitDef = {
     jump_speed         = 6,
     jump_reload        = 20,
     jump_from_midair   = 1,
-	level = [[1]],
-	statsname = [[dynrecon1]],
-	soundok = [[heavy_bot_move]],
-	soundselect = [[bot_select]],
-	soundbuild = [[builder_start]],
+    level = [[1]],
+    statsname = [[dynrecon1]],
+    soundok = [[heavy_bot_move]],
+    soundselect = [[bot_select]],
+    soundbuild = [[builder_start]],
     commtype = [[3]],
     aimposoffset   = [[0 10 0]],
   },
@@ -65,10 +65,10 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-	  [[custom:NONE]],
-	  [[custom:NONE]],
+      [[custom:NONE]],
+      [[custom:NONE]],
       [[custom:RAIDMUZZLE]],
-	  [[custom:NONE]],
+      [[custom:NONE]],
       [[custom:VINDIBACK]],
       [[custom:FLASH64]],
     },
@@ -90,11 +90,11 @@ unitDef = {
 
   weapons             = {
   
-	[1] = {
+    [1] = {
       def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
-	},
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
   
     [5] = {
       def                = [[SLOWBEAM]],

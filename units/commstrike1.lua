@@ -23,13 +23,13 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	level = [[1]],
-	statsname = [[dynstrike1]],
-	soundok = [[heavy_bot_move]],
-	soundselect = [[bot_select]],
-	soundbuild = [[builder_start]],
-	commtype = [[1]],
-	--decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
+    level = [[1]],
+    statsname = [[dynstrike1]],
+    soundok = [[heavy_bot_move]],
+    soundselect = [[bot_select]],
+    soundbuild = [[builder_start]],
+    commtype = [[1]],
+    --decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
     aimposoffset   = [[0 15 0]],
   },
 
@@ -57,8 +57,8 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-    	[[custom:BEAMWEAPON_MUZZLE_BLUE]],
-		[[custom:NONE]],
+        [[custom:BEAMWEAPON_MUZZLE_BLUE]],
+        [[custom:NONE]],
     },
 
   },

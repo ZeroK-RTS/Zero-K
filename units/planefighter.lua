@@ -24,16 +24,16 @@ unitDef = {
 
   customParams           = {
 
-	specialreloadtime = [[850]],
-	boost_speed_mult = 5,
-	boost_accel_mult = 6,
-	boost_duration = 30, -- frames
+    specialreloadtime = [[850]],
+    boost_speed_mult = 5,
+    boost_accel_mult = 6,
+    boost_duration = 30, -- frames
 
-	fighter_pullup_dist = 400,
+    fighter_pullup_dist = 400,
 
-	midposoffset   = [[0 3 0]],
-	modelradius    = [[5]],
-	refuelturnradius = [[80]],
+    midposoffset   = [[0 3 0]],
+    modelradius    = [[5]],
+    refuelturnradius = [[80]],
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -104,9 +104,9 @@ unitDef = {
       craterMult              = 0,
 
       customparams = {
-		light_camera_height = 1500,
+        light_camera_height = 1500,
         light_ground_height = 120,
-		light_radius = 100,
+        light_radius = 100,
       },
 
       damage                  = {
@@ -148,12 +148,12 @@ unitDef = {
       craterMult              = 2,
       cylinderTargeting       = 6,
 
-	  customParams        	  = {
-		burst = Shared.BURST_RELIABLE,
+      customParams              = {
+        burst = Shared.BURST_RELIABLE,
 
-		isaa = [[1]],
-		light_color = [[0.5 0.6 0.6]],
-	  },
+        isaa = [[1]],
+        light_color = [[0.5 0.6 0.6]],
+      },
 
       damage                  = {
         default = 13.5,

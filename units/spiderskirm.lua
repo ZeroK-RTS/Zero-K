@@ -13,7 +13,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	midposoffset   = [[0 -5 0]],
+    midposoffset   = [[0 -5 0]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -63,9 +63,9 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-		light_camera_height = 2500,
-		light_color = [[0.90 0.65 0.30]],
-		light_radius = 250,
+        light_camera_height = 2500,
+        light_color = [[0.90 0.65 0.30]],
+        light_radius = 250,
       },
 
       damage                  = {

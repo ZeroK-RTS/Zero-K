@@ -58,18 +58,18 @@ starlight_satellite = {
       def                = [[LAZER]],
       onlyTargetCategory = [[NONE]],
     },
-	
-	{
+    
+    {
       def                = [[RELAYLAZER]],
       onlyTargetCategory = [[NONE]],
     },
-	
-	{
+    
+    {
       def                = [[CUTTER]],
       onlyTargetCategory = [[NONE]],
     },
-	
-	{
+    
+    {
       def                = [[RELAYCUTTER]],
       onlyTargetCategory = [[NONE]],
     },
@@ -89,9 +89,9 @@ starlight_satellite = {
       beamTime                = 1/30,
       coreThickness           = 0.5,
 
-	  customParams        	  = {
-		light_radius = 0,
-	  },
+      customParams              = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = -0.00001,
@@ -120,7 +120,7 @@ starlight_satellite = {
       weaponType              = [[BeamLaser]],
     },
   
-	LAZER    = {
+    LAZER    = {
       name                    = [[Craterpuncher]],
       alwaysVisible           = 0,
       areaOfEffect            = 140,
@@ -132,13 +132,13 @@ starlight_satellite = {
       craterBoost             = 4,
       craterMult              = 8,
 
-	  customParams        	  = {
-		stats_damage = 3000,
+      customParams              = {
+        stats_damage = 3000,
 
-		light_color = [[5 0.3 6]],
-		light_radius = 2000,
-		light_beam_start = 0.8,
-	  },
+        light_color = [[5 0.3 6]],
+        light_radius = 2000,
+        light_beam_start = 0.8,
+      },
 
       damage                  = {
         default = 180,
@@ -154,7 +154,7 @@ starlight_satellite = {
       range                   = 9000,
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
-	  scrollSpeed             = 8,
+      scrollSpeed             = 8,
       soundStartVolume        = 1,
       soundTrigger            = true,
       texture1                = [[largelaser]],
@@ -163,13 +163,13 @@ starlight_satellite = {
       texture4                = [[smallflare]],
       thickness               = 100,
       tolerance               = 65536,
-	  tileLength              = 10000,
+      tileLength              = 10000,
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[BeamLaser]],
     },
-	
-	RELAYLAZER    = {
+    
+    RELAYLAZER    = {
       name                    = [[Relay Craterpuncher (fake)]],
       alwaysVisible           = 18,
       areaOfEffect            = 56,
@@ -182,9 +182,9 @@ starlight_satellite = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-		light_radius = 0,
-	  },
+      customParams              = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 180,
@@ -200,7 +200,7 @@ starlight_satellite = {
       range                   = 9000,
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
-	  scrollSpeed             = 8,
+      scrollSpeed             = 8,
       soundTrigger            = true,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
@@ -208,13 +208,13 @@ starlight_satellite = {
       texture4                = [[smallflare]],
       thickness               = 100,
       tolerance               = 65536,
-	  tileLength              = 10000,
+      tileLength              = 10000,
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[BeamLaser]],
     },
-	
-	CUTTER    = {
+    
+    CUTTER    = {
       name                    = [[Groovecutter]],
       alwaysVisible           = 0,
       areaOfEffect            = 140,
@@ -226,12 +226,12 @@ starlight_satellite = {
       craterBoost             = 4,
       craterMult              = 8,
 
-	  customParams        	  = {
-		light_color = [[3 0.2 4]],
-		light_radius = 1200,
-		light_beam_start = 0.8,
-	  },
-	  
+      customParams              = {
+        light_color = [[3 0.2 4]],
+        light_radius = 1200,
+        light_beam_start = 0.8,
+      },
+      
       damage                  = {
         default = 180,
       },
@@ -246,7 +246,7 @@ starlight_satellite = {
       range                   = 9000,
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
-	  scrollSpeed             = 8,
+      scrollSpeed             = 8,
       soundStartVolume        = 1,
       soundTrigger            = true,
       texture1                = [[largelaser]],
@@ -255,13 +255,13 @@ starlight_satellite = {
       texture4                = [[smallflare]],
       thickness               = 50,
       tolerance               = 65536,
-	  tileLength              = 10000,
+      tileLength              = 10000,
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[BeamLaser]],
     },
-	
-	RELAYCUTTER    = {
+    
+    RELAYCUTTER    = {
       name                    = [[Relay Cutter (fake)]],
       alwaysVisible           = 18,
       areaOfEffect            = 56,
@@ -274,9 +274,9 @@ starlight_satellite = {
       craterBoost             = 2,
       craterMult              = 4,
 
-	  customParams        	  = {
-		light_radius = 0,
-	  },
+      customParams              = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 180,
@@ -292,7 +292,7 @@ starlight_satellite = {
       range                   = 9000,
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
-	  scrollSpeed             = 8,
+      scrollSpeed             = 8,
       soundTrigger            = true,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
@@ -300,7 +300,7 @@ starlight_satellite = {
       texture4                = [[smallflare]],
       thickness               = 50,
       tolerance               = 65536,
-	  tileLength              = 10000,
+      tileLength              = 10000,
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[BeamLaser]],
@@ -314,9 +314,9 @@ starlight_satellite = {
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[satellite_d.dae]],
-	customParams = {
-		unit = "mahlazer",
-	},
+    customParams = {
+        unit = "mahlazer",
+    },
     },
 
     HEAP  = {
@@ -324,9 +324,9 @@ starlight_satellite = {
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[debris2x2c.s3o]],
-	customParams = {
-		unit = "mahlazer",
-	},
+    customParams = {
+        unit = "mahlazer",
+    },
     },
 
   },

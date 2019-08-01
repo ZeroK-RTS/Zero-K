@@ -82,8 +82,8 @@ unitDef = {
       burstrate               = 0.01,
       craterBoost             = 0,
       craterMult              = 0,
-			
-			customParams            = {
+            
+            customParams            = {
         light_radius = 0,
       },
 

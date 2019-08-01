@@ -12,7 +12,7 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 15 0]],
   collisionVolumeScales         = [[20 60 20]],
-  collisionVolumeType	        = [[CylY]],
+  collisionVolumeType            = [[CylY]],
 
   customParams                  = {
     mobilebuilding = [[1]],
@@ -59,28 +59,28 @@ unitDef = {
       name                    = [[Napalm Missile]],
       cegTag                  = [[napalmtrail]],
       areaOfEffect            = 512,
-	  craterAreaOfEffect      = 64,
+      craterAreaOfEffect      = 64,
       avoidFriendly           = false,
       collideFriendly         = false,
       craterBoost             = 4,
       craterMult              = 3.5,
 
-      customParams        	  = {
+      customParams            = {
         setunitsonfire = "1",
         burntime = 90,
 
         restrict_in_widgets = 1,
 
-		stats_hide_dps = 1, -- one use
-		stats_hide_reload = 1,
+        stats_hide_dps = 1, -- one use
+        stats_hide_reload = 1,
 
-		area_damage = 1,
-		area_damage_radius = 256,
-		area_damage_dps = 20,
-		area_damage_duration = 45,
-		
-		light_color = [[1.35 0.5 0.36]],
-		light_radius = 550,
+        area_damage = 1,
+        area_damage_radius = 256,
+        area_damage_dps = 20,
+        area_damage_duration = 45,
+        
+        light_color = [[1.35 0.5 0.36]],
+        light_radius = 550,
       },
 
       damage                  = {

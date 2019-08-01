@@ -76,10 +76,10 @@ unitDef = {
         disarmDamageMult = 5.0,
         disarmDamageOnly = 0,
         disarmTimer      = 3, -- seconds
-		
-		light_color = [[1 1 1]],
+        
+        light_color = [[1 1 1]],
       },
-	  
+      
       damage                  = {
         default = 35,
         subs    = 5,

@@ -24,11 +24,11 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	level = [[1]],
-	statsname = [[dynassault1]],
-	soundok = [[heavy_bot_move]],
-	soundselect = [[bot_select]],
-	soundbuild = [[builder_start]],
+    level = [[1]],
+    statsname = [[dynassault1]],
+    soundok = [[heavy_bot_move]],
+    soundselect = [[bot_select]],
+    soundbuild = [[builder_start]],
     commtype = [[2]],
     aimposoffset   = [[0 5 0]],
   },

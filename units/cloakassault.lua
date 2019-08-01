@@ -19,7 +19,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[12]],
+    modelradius    = [[12]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -38,7 +38,7 @@ unitDef = {
   movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherezeus.s3o]],
-  script		         = [[cloakassault.lua]],
+  script                 = [[cloakassault.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -79,10 +79,10 @@ unitDef = {
 
       customParams            = {
         extra_damage = 600,
-		
-		light_camera_height = 1600,
-		light_color = [[0.85 0.85 1.2]],
-		light_radius = 200,
+        
+        light_camera_height = 1600,
+        light_color = [[0.85 0.85 1.2]],
+        light_radius = 200,
       },
 
       cylinderTargeting      = 0,

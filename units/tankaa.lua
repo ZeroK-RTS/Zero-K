@@ -17,7 +17,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[19]],
+    modelradius    = [[19]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -82,11 +82,11 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
+      customParams              = {
         reaim_time = 4, -- COB
-		isaa = [[1]],
-		light_radius = 0,
-	  },
+        isaa = [[1]],
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 9,

@@ -61,7 +61,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:flashmuzzle1]],
-	  [[custom:NONE]],
+      [[custom:NONE]],
     },
 
   },
@@ -81,11 +81,11 @@ unitDef = {
 
   weapons             = {
 
-	[1] = {
+    [1] = {
       def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
-	}, 
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+    }, 
   
     [5] = {
       def                = [[GAUSS]],
@@ -136,7 +136,7 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
     },
-	
+    
     GAUSS = {
       name                    = [[Gauss Rifle]],
       alphaDecay              = 0.12,

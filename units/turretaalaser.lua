@@ -12,7 +12,7 @@ unitDef = {
   category                      = [[FLOAT UNARMED STUPIDTARGET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[50 36 50]],
-  collisionVolumeType	        = [[CylY]],
+  collisionVolumeType            = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -71,12 +71,12 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-		
-		light_camera_height = 2600,
-		light_radius = 220,
-	  },
+      customParams              = {
+        isaa = [[1]],
+        
+        light_camera_height = 2600,
+        light_radius = 220,
+      },
 
       damage                  = {
         default = 1.49,
@@ -120,7 +120,7 @@ unitDef = {
       object           = [[aapopup_dead.s3o]],
     },
 
-	HEAP  = {
+    HEAP  = {
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

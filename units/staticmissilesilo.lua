@@ -24,7 +24,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-	nongroundfac = [[1]],
+    nongroundfac = [[1]],
   },
 
   energyUse                     = 0,

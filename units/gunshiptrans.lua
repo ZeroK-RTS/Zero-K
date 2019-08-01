@@ -26,9 +26,9 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol  = [[1]],
-	midposoffset      = [[0 0 0]],
-	modelradius       = [[15]],
-	islighttransport  = 1,
+    midposoffset      = [[0 0 0]],
+    modelradius       = [[15]],
+    islighttransport  = 1,
   },
 
   explodeAs           = [[GUNSHIPEX]],

@@ -17,7 +17,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[9]],
+    modelradius    = [[9]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -81,12 +81,12 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		burst = Shared.BURST_RELIABLE,
+      customParams              = {
+        burst = Shared.BURST_RELIABLE,
 
-		isaa = [[1]],
-		light_color = [[0.5 0.6 0.6]],
-	  },
+        isaa = [[1]],
+        light_color = [[0.5 0.6 0.6]],
+      },
 
       damage                  = {
         default = 29.01,

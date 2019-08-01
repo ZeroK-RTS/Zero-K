@@ -66,8 +66,8 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-		light_color = [[0.9 0.22 0.22]],
-		light_radius = 80,
+        light_color = [[0.9 0.22 0.22]],
+        light_radius = 80,
       },
 
       damage                  = {
@@ -92,7 +92,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[BeamLaser]],
     },
-	
+    
   },
 
   featureDefs            = {

@@ -31,7 +31,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[tarantula.s3o]],
-  script				 = [[spideraa.lua]],
+  script                 = [[spideraa.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 660,
   trackOffset            = 0,
@@ -62,12 +62,12 @@ unitDef = {
       craterMult              = 2,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		burst = Shared.BURST_RELIABLE,
+      customParams              = {
+        burst = Shared.BURST_RELIABLE,
 
-		isaa = [[1]],
-		light_color = [[0.58 0.7 0.7]],
-	  },
+        isaa = [[1]],
+        light_color = [[0.58 0.7 0.7]],
+      },
 
       damage                  = {
         default = 20,

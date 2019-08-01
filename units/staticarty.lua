@@ -45,7 +45,7 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-	  [[custom:LARGE_MUZZLE_FLASH_FX]],
+      [[custom:LARGE_MUZZLE_FLASH_FX]],
     },
 
   },
@@ -59,7 +59,7 @@ unitDef = {
 
     {
       def                = [[PLASMA]],
-	  badTargetCategory  = [[GUNSHIP]],
+      badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
@@ -72,14 +72,14 @@ unitDef = {
       name                    = [[Long-Range Plasma Battery]],
       areaOfEffect            = 192,
       avoidFeature            = false,
-	  avoidGround             = false,
-	  burst					  = 3,
-	  burstRate				  = 0.16,
+      avoidGround             = false,
+      burst                   = 3,
+      burstRate               = 0.16,
       craterBoost             = 1,
       craterMult              = 2,
 
       customParams            = {
-		light_color = [[1.4 0.8 0.3]],
+        light_color = [[1.4 0.8 0.3]],
       },
 
       damage                  = {
@@ -94,7 +94,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-	  mygravity				  = 0.1,
+      mygravity               = 0.1,
       range                   = 1850,
       reloadtime              = 10,
       soundHit                = [[explosion/ex_large4]],

@@ -22,10 +22,10 @@ unitDef = {
     keeptooltip    = [[any string I want]],
     neededlink     = 50,
     pylonrange     = 50,
-	extradrawrange = 430,
-	aimposoffset   = [[0 30 0]],
-	midposoffset   = [[0 0 0]],
-	modelradius    = [[20]],
+    extradrawrange = 430,
+    aimposoffset   = [[0 30 0]],
+    midposoffset   = [[0 0 0]],
+    modelradius    = [[20]],
   },
 
   damageModifier                = 0.25,
@@ -65,7 +65,7 @@ unitDef = {
 
     {
       def                = [[PLASMA]],
-	  badTargetCategory  = [[FIXEDWING GUNSHIP]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
@@ -89,15 +89,15 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-		light_camera_height = 2000,
-		light_color = [[0.9 0.4 0.12]],
-		light_radius = 180,
-		light_fade_time = 35,
-		light_fade_offset = 10,
-		light_beam_mult_frames = 9,
-		light_beam_mult = 8,
-	  },
+      customParams              = {
+        light_camera_height = 2000,
+        light_color = [[0.9 0.4 0.12]],
+        light_radius = 180,
+        light_fade_time = 35,
+        light_fade_offset = 10,
+        light_beam_mult_frames = 9,
+        light_beam_mult = 8,
+      },
 
       damage                  = {
         default = 51.1,
@@ -118,7 +118,7 @@ unitDef = {
       interceptedByShieldType = 1,
       lodDistance             = 10000,
       proximityPriority       = 6,
-	  projectiles			  = 2,
+      projectiles             = 2,
       range                   = 430,
       reloadtime              = 0.1,
       rgbColor                = [[1 0.1 0]],
@@ -141,8 +141,8 @@ unitDef = {
       craterMult              = 1.2,
 
       customParams            = {
-		light_color = [[2.2 1.6 0.9]],
-		light_radius = 550,
+        light_color = [[2.2 1.6 0.9]],
+        light_radius = 550,
       },
 
       damage                  = {
@@ -161,7 +161,7 @@ unitDef = {
       range                   = 650,
       reloadtime              = 3,
       soundHit                = [[weapon/cannon/cannon_hit4]],
-	  --soundHitVolume          = 70,
+      --soundHitVolume          = 70,
       soundStart              = [[weapon/cannon/heavy_cannon2]],
       sprayangle              = 768,
       turret                  = true,

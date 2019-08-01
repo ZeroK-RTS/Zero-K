@@ -27,11 +27,11 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	priority_misc  = 1, -- Medium
-	shield_emit_height = 45,
-	unarmed       = true,
-	shield_power_gfx_override = 10000,
-	selection_rank = 3,
+    priority_misc  = 1, -- Medium
+    shield_emit_height = 45,
+    unarmed       = true,
+    shield_power_gfx_override = 10000,
+    selection_rank = 3,
   },
 
   explodeAs              = [[ESTOR_BUILDING]],
@@ -111,7 +111,7 @@ unitDef = {
       visibleShieldRepulse    = false,
       weaponType              = [[Shield]],
     },
-	
+    
   },
 
 

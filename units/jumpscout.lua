@@ -88,9 +88,9 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 2,
 
-			customParams = {
-				burst = Shared.BURST_RELIABLE,
-			},
+            customParams = {
+                burst = Shared.BURST_RELIABLE,
+            },
 
       damage                  = {
         default = 410.1,
@@ -132,8 +132,8 @@ unitDef = {
       footprintZ       = 3,
       object           = [[debris2x2a.s3o]],
     },
-	
-	HEAP      = {
+    
+    HEAP      = {
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

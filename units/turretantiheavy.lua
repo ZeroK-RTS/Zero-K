@@ -74,10 +74,10 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
-		light_color = [[1.6 1.05 2.25]],
-		light_radius = 320,
+        light_color = [[1.6 1.05 2.25]],
+        light_radius = 320,
       },
 
       damage                  = {
@@ -87,14 +87,14 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:ataalaser]],
-	  fireTolerance           = 8192, -- 45 degrees
+      fireTolerance           = 8192, -- 45 degrees
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       largeBeamLaser          = true,
       laserFlareSize          = 16.94,
-	  leadLimit               = 18,
+      leadLimit               = 18,
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 1200,

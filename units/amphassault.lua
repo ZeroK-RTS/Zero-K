@@ -12,8 +12,8 @@ unitDef = {
   canPatrol           = true,
   category            = [[LAND SINK]],
   collisionVolumeOffsets  = [[0 0 0]],
-  --collisionVolumeScales   = [[70 70 70]],
-  --collisionVolumeType	  = [[ellipsoid]],
+  --collisionVolumeScales = [[70 70 70]],
+  --collisionVolumeType   = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -68,7 +68,7 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-	{
+    {
       def                = [[FAKE_LASER]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
@@ -88,10 +88,10 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-		burst = Shared.BURST_UNRELIABLE,
+        burst = Shared.BURST_UNRELIABLE,
 
-		light_color = [[0.5 0.5 1.5]],
-		light_radius = 180,
+        light_color = [[0.5 0.5 1.5]],
+        light_radius = 180,
       },
 
       damage                  = {
@@ -101,7 +101,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:flash1bluedark]],
-	  fireTolerance           = 8192, -- 45 degrees
+      fireTolerance           = 8192, -- 45 degrees
       fireStarter             = 90,
       impactOnly              = true,
       impulseBoost            = 0,
@@ -109,7 +109,7 @@ unitDef = {
       interceptedByShieldType = 1,
       largeBeamLaser          = true,
       laserFlareSize          = 10.4,
-	  leadLimit               = 18,
+      leadLimit               = 18,
       minIntensity            = 1,
       noSelfDamage            = true,
       projectiles             = 2,

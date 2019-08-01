@@ -22,7 +22,7 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[1]],
-	modelradius    = [[10]],
+    modelradius    = [[10]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -70,11 +70,11 @@ unitDef = {
       craterMult              = 0.246,
 
       customparams = {
-		burst = Shared.BURST_UNRELIABLE,
+        burst = Shared.BURST_UNRELIABLE,
 
-		light_camera_height = 2500,
-		light_color = [[0.55 0.27 0.05]],
-		light_radius = 360,
+        light_camera_height = 2500,
+        light_color = [[0.55 0.27 0.05]],
+        light_radius = 360,
       },
 
       damage                  = {
@@ -115,8 +115,8 @@ unitDef = {
 
     DEAD  = {
       blocking         = true,
-	  collisionVolumeScales  = [[65 20 65]],
-	  collisionVolumeType    = [[CylY]],
+      collisionVolumeScales  = [[65 20 65]],
+      collisionVolumeType    = [[CylY]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,

@@ -25,7 +25,7 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[1]],
-	modelradius    = [[9]],
+    modelradius    = [[9]],
   },
 
   explodeAs           = [[TINY_BUILDINGEX]],
@@ -113,7 +113,7 @@ unitDef = {
     },
 
   },
-	
+    
   featureDefs                   = {
 
     DEAD = {

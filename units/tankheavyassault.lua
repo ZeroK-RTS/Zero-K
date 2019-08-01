@@ -56,7 +56,7 @@ unitDef = {
 
     {
       def                = [[COR_GOL]],
-	  badTargetCategory  = [[FIXEDWING GUNSHIP]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
     {
@@ -76,15 +76,15 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-		burst = Shared.BURST_RELIABLE,
-	    gatherradius = [[105]],
-	    smoothradius = [[70]],
-	    smoothmult   = [[0.4]],
-		force_ignore_ground = [[1]],
-		
-		light_color = [[3 2.33 1.5]],
-		light_radius = 150,
-	  },
+        burst = Shared.BURST_RELIABLE,
+        gatherradius = [[105]],
+        smoothradius = [[70]],
+        smoothmult   = [[0.4]],
+        force_ignore_ground = [[1]],
+        
+        light_color = [[3 2.33 1.5]],
+        light_radius = 150,
+      },
       
       damage                  = {
         default = 1000,
@@ -104,8 +104,8 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 270,
     },
-	
-	SLOWBEAM = {
+    
+    SLOWBEAM = {
       name                    = [[Slowing Beam]],
       areaOfEffect            = 8,
       beamDecay               = 0.9,
@@ -119,10 +119,10 @@ unitDef = {
         timeslow_damagefactor = 1,
         timeslow_onlyslow = 1,
         timeslow_smartretarget = 0.33,
-		
-		light_camera_height = 1800,
-		light_color = [[0.6 0.22 0.8]],
-		light_radius = 200,
+        
+        light_camera_height = 1800,
+        light_color = [[0.6 0.22 0.8]],
+        light_radius = 200,
       },
 
       damage                  = {
@@ -167,12 +167,12 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-		flamethrower = [[1]],
-	    setunitsonfire = "1",
-		burntime = [[360]],
-	  },
-	  
+      customParams              = {
+        flamethrower = [[1]],
+        setunitsonfire = "1",
+        burntime = [[360]],
+      },
+      
       damage                  = {
         default = 5,
         subs    = 0.05,
@@ -193,9 +193,9 @@ unitDef = {
       rgbColor                = [[1 1 1]],
       soundStart              = [[weapon/flamethrower]],
       soundTrigger            = true,
-      texture1				  = [[fireball]],
-      texture2				  = [[fireball]],
-      thickness	              = 12,
+      texture1                = [[fireball]],
+      texture2                = [[fireball]],
+      thickness               = 12,
       tolerance               = 5000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
@@ -216,7 +216,7 @@ unitDef = {
       object           = [[golly_d.s3o]],
     },
 
-	
+    
     HEAP       = {
       blocking         = false,
       footprintX       = 4,

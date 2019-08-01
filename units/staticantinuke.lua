@@ -22,7 +22,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-	removewait     = 1,
+    removewait     = 1,
     nuke_coverage  = 2500,
     modelradius      = [[50]],
     selectionscalemult = 1,
@@ -42,7 +42,7 @@ unitDef = {
   minCloakDistance              = 150,
   objectName                    = [[antinuke.s3o]],
   radarDistance                 = 2500,
-  radarEmitHeight			    = 24,
+  radarEmitHeight               = 24,
   script                        = [[staticantinuke.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   sightDistance                 = 660,
@@ -74,14 +74,14 @@ unitDef = {
       coverage                = 100000,
       craterBoost             = 1,
       craterMult              = 2,
-	  
-	  customParams            = {
+      
+      customParams            = {
         restrict_in_widgets = 1,
 
         reaim_time = 15,
         nuke_coverage = 2500,
-	  },
-	  
+      },
+      
       damage                  = {
         default = 1500,
         subs    = 75,

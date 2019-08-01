@@ -17,9 +17,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	aimposoffset   = [[0 8 0]],
-	midposoffset   = [[0 3 0]],
-	modelradius    = [[21]],
+    aimposoffset   = [[0 8 0]],
+    midposoffset   = [[0 3 0]],
+    modelradius    = [[21]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -80,7 +80,7 @@ unitDef = {
 
       customParams        = {
         reaim_time = 8, -- COB
-		light_camera_height = 1500,
+        light_camera_height = 1500,
       },
 
       damage                  = {

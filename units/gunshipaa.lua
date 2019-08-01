@@ -23,9 +23,9 @@ unitDef = {
   cruiseAlt              = 110,
 
   customParams           = {
-	modelradius    = [[18]],
-	midposoffset   = [[0 15 0]],
-	selection_velocity_heading = 1,
+    modelradius    = [[18]],
+    midposoffset   = [[0 15 0]],
+    selection_velocity_heading = 1,
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -71,25 +71,25 @@ unitDef = {
     AA_MISSILE = {
       name                    = [[Homing Missiles]],
       areaOfEffect            = 48,
-	  avoidFeature            = false,
+      avoidFeature            = false,
       canattackground         = false,
       cegTag                  = [[missiletrailblue]],
-	  collideFriendly         = false,
+      collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		burst = Shared.BURST_RELIABLE,
+      customParams              = {
+        burst = Shared.BURST_RELIABLE,
 
-		isaa = [[1]],
-		script_reload = [[10]],
-		script_burst = [[3]],
-		
-		light_camera_height = 2500,
-		light_radius = 200,
-		light_color = [[0.5 0.6 0.6]],
-	  },
+        isaa = [[1]],
+        script_reload = [[10]],
+        script_burst = [[3]],
+        
+        light_camera_height = 2500,
+        light_radius = 200,
+        light_color = [[0.5 0.6 0.6]],
+      },
 
       damage                  = {
         default = 20.01,
@@ -113,7 +113,7 @@ unitDef = {
       soundStart              = [[weapon/missile/missile_fire7]],
       startVelocity           = 650,
       texture2                = [[AAsmoketrail]],
-	  texture3                = [[null]],
+      texture3                = [[null]],
       tolerance               = 32767,
       tracks                  = true,
       turnRate                = 90000,

@@ -20,10 +20,10 @@ unitDef = {
   cruiseAlt           = 250,
 
   customParams        = {
-	modelradius    = [[20]],
-	specialreloadtime = [[600]],
-	refuelturnradius = [[120]],
-	priority_misc = 2, -- High
+    modelradius       = [[20]],
+    specialreloadtime = [[600]],
+    refuelturnradius  = [[120]],
+    priority_misc     = 2, -- High
   },
 
   energyUse           = 1.5,

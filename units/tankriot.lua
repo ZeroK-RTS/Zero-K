@@ -63,22 +63,22 @@ unitDef = {
     TAWF_BANISHER = {
       name                    = [[Heavy Missile]],
       areaOfEffect            = 160,
-	  cegTag                  = [[BANISHERTRAIL]],
+      cegTag                  = [[BANISHERTRAIL]],
       craterBoost             = 1,
       craterMult              = 2,
 
-	  customParams            = {
-		burst = Shared.BURST_RELIABLE,
+      customParams            = {
+        burst = Shared.BURST_RELIABLE,
 
-	    gatherradius = [[120]],
-	    smoothradius = [[80]],
-	    smoothmult   = [[0.25]],
-		force_ignore_ground = [[1]],
-		
-		light_color = [[1.4 1 0.7]],
-		light_radius = 320,
-	  },
-	  
+        gatherradius = [[120]],
+        smoothradius = [[80]],
+        smoothmult   = [[0.25]],
+        force_ignore_ground = [[1]],
+        
+        light_color = [[1.4 1 0.7]],
+        light_radius = 320,
+      },
+      
       damage                  = {
         default = 420.1,
         subs    = 22,

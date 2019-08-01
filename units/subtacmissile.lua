@@ -18,10 +18,10 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[15]],
-	stockpiletime  = [[30]],
-	stockpilecost  = [[600]],
-	priority_misc  = 1, -- Medium
+    modelradius    = [[15]],
+    stockpiletime  = [[30]],
+    stockpilecost  = [[600]],
+    priority_misc  = 1, -- Medium
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -155,9 +155,9 @@ unitDef = {
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[subtacmissile_dead.s3o]],
-	  collisionVolumeOffsets = [[0 -5 0]],
-	  collisionVolumeScales  = [[30 25 110]],
-	  collisionVolumeType    = [[box]],
+      collisionVolumeOffsets = [[0 -5 0]],
+      collisionVolumeScales  = [[30 25 110]],
+      collisionVolumeType    = [[box]],
     },
 
     HEAP  = {

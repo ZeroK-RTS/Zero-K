@@ -80,17 +80,17 @@ unitDef = {
         gatherradius = [[128]],
         smoothradius = [[96]],
         smoothmult   = [[0.4]],
-		
-		light_color = [[2.4 1.5 0.6]],
+        
+        light_color = [[2.4 1.5 0.6]],
       },
-	  
+      
       damage                  = {
         default = 2002.4,
         subs    = 100,
       },
 
       explosionGenerator      = [[custom:lrpc_expl]],
-	  fireTolerance           = 1820, -- 10 degrees
+      fireTolerance           = 1820, -- 10 degrees
       impulseBoost            = 0.5,
       impulseFactor           = 0.2,
       interceptedByShieldType = 1,

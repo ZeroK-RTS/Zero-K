@@ -19,8 +19,8 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	modelradius    = [[14]],
-	turnatfullspeed = [[1]],
+    modelradius    = [[14]],
+    turnatfullspeed = [[1]],
   },
 
 
@@ -68,16 +68,15 @@ unitDef = {
       avoidFriendly           = false,
       bouncerebound           = 0.5,
       bounceslip              = 0.5,
-	  burnblow                = 1,
-
-      canAttackGround		  = false,	-- workaround for range hax
+      burnblow                = 1,
+      canAttackGround          = false, -- workaround for range hax
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
-			customParams = {
-				burst = Shared.BURST_RELIABLE,
-			},
+            customParams = {
+                burst = Shared.BURST_RELIABLE,
+            },
 
       damage                  = {
 
@@ -93,8 +92,8 @@ unitDef = {
       impulseBoost            = 1,
       impulseFactor           = 0.9,
       interceptedByShieldType = 1,
-	  flightTime              = 0.9,
-	  leadlimit               = 0,
+      flightTime              = 0.9,
+      leadlimit               = 0,
       model                   = [[wep_m_ajax.s3o]],
       myGravity               = 10.1,
       numbounce               = 4,

@@ -67,10 +67,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargeting       = 0,
-	  
+      
       customParams            = {
-		light_color = [[0.75 0.75 0.56]],
-		light_radius = 220,
+        light_color = [[0.75 0.75 0.56]],
+        light_radius = 220,
       },
 
       damage                  = {

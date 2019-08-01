@@ -75,13 +75,13 @@ unitDef = {
       craterMult              = 2,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		burst = Shared.BURST_RELIABLE,
+      customParams              = {
+        burst = Shared.BURST_RELIABLE,
 
-		isaa = [[1]],
-		light_color = [[0.5 0.6 0.6]],
-		light_radius = 380,
-	  },
+        isaa = [[1]],
+        light_color = [[0.5 0.6 0.6]],
+        light_radius = 380,
+      },
 
       damage                  = {
         default = 7.2,

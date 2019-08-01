@@ -41,7 +41,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[penetrator_lordmuffe.s3o]],
-  script	          = [[hoverarty.lua]],
+  script              = [[hoverarty.lua]],
   selfDestructAs      = [[MEDIUM_BUILDINGEX]],
   
   sfxtypes            = {
@@ -80,10 +80,10 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
-		light_color = [[1.25 0.8 1.75]],
-		light_radius = 320,
+        light_color = [[1.25 0.8 1.75]],
+        light_radius = 320,
       },
       damage                  = {
         default = 3000.1,
@@ -92,14 +92,14 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:ataalaser]],
-	  fireTolerance           = 8192, -- 45 degrees
+      fireTolerance           = 8192, -- 45 degrees
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       largeBeamLaser          = true,
       laserFlareSize          = 10,
-	  leadLimit               = 18,
+      leadLimit               = 18,
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 1020,
@@ -125,8 +125,8 @@ unitDef = {
 
     DEAD  = {
       blocking         = true,
-	  collisionVolumeScales  = [[40 40 60]],
-	  collisionVolumeType    = [[CylZ]],
+      collisionVolumeScales  = [[40 40 60]],
+      collisionVolumeType    = [[CylZ]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,

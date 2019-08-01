@@ -22,7 +22,7 @@ unitDef = {
   cruiseAlt           = 150,
 
   customParams        = {
-	statsname = "chickenlandqueen",
+    statsname = "chickenlandqueen",
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -36,7 +36,7 @@ unitDef = {
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
   maxDamage           = 150000,
-  maxSlope			  = 36,
+  maxSlope            = 36,
   maxVelocity         = 3,
   minCloakDistance    = 250,
   noAutoFire          = false,
@@ -123,8 +123,8 @@ unitDef = {
       craterMult              = 2,
       
       customparams            = {
-      	spawns_name = "chickenc",
-      	spawns_expire = 0,
+          spawns_name = "chickenc",
+          spawns_expire = 0,
       },
 
       damage                  = {
@@ -165,8 +165,8 @@ unitDef = {
       craterMult              = 0,
       
       customparams            = {
-      	spawns_name = "chicken_dodo",
-      	spawns_expire = 30,
+          spawns_name = "chicken_dodo",
+          spawns_expire = 30,
       },
 
       damage                  = {
@@ -204,11 +204,11 @@ unitDef = {
       cegTag                  = [[queen_trail]],
       craterBoost             = 0,
       craterMult              = 0,
-			
-			customParams            = {
+            
+            customParams            = {
         light_radius = 0,
       },
-			
+            
       damage                  = {
         default = 1500,
         planes  = 1500,
@@ -302,8 +302,8 @@ unitDef = {
       craterMult              = 2,
       
       customparams            = {
-      	spawns_name = "chicken_tiamat",
-      	spawns_expire = 0,
+          spawns_name = "chicken_tiamat",
+          spawns_expire = 0,
       },
 
       damage                  = {

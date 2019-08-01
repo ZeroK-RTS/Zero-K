@@ -72,7 +72,7 @@ unitDef = {
       beamTime                = 1/30,
       burst                   = 80,
       burstRate               = 0.3,
-	  cameraShake             = 150,
+      cameraShake             = 150,
       canattackground         = false,
       collideFriendly         = false,
       coreThickness           = 0.6,
@@ -84,9 +84,9 @@ unitDef = {
         disarmDamageMult = 1,
         disarmDamageOnly = 1,
         disarmTimer      = 16, -- seconds
-	  
-		light_radius = 350,
-		light_color = [[2 2 2]],
+      
+        light_radius = 350,
+        light_color = [[2 2 2]],
       },
  
       damage                  = {

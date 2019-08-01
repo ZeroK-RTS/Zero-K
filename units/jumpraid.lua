@@ -23,7 +23,7 @@ unitDef = {
     jump_reload        = 10,
     jump_from_midair   = 1,
     fireproof      = [[1]],
-	stats_show_death_explosion = 1,
+    stats_show_death_explosion = 1,
   },
 
   explodeAs             = [[PYRO_DEATH]],
@@ -131,40 +131,40 @@ unitDef = {
       soundStart              = [[weapon/flamethrower]],
       soundTrigger            = true,
       texture1                = [[flame]],
-      thickness	              = 0,
+      thickness               = 0,
       tolerance               = 5000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 800,
     },
 
-	PYRO_DEATH = {
-		name                    = [[Napalm Blast]],
-		areaofeffect            = 256,
-		craterboost             = 1,
-		cratermult              = 3.5,
+    PYRO_DEATH = {
+        name                    = [[Napalm Blast]],
+        areaofeffect            = 256,
+        craterboost             = 1,
+        cratermult              = 3.5,
 
-		customparams        	  = {
-			setunitsonfire = "1",
-			burnchance     = "1",
-			burntime       = 60,
+        customparams              = {
+            setunitsonfire = "1",
+            burnchance     = "1",
+            burntime       = 60,
 
-			area_damage = 1,
-			area_damage_radius = 128,
-			area_damage_dps = 20,
-			area_damage_duration = 13.3,
-		},
+            area_damage = 1,
+            area_damage_radius = 128,
+            area_damage_dps = 20,
+            area_damage_duration = 13.3,
+        },
 
-		damage                  = {
-			default = 50,
-		},
+        damage                  = {
+            default = 50,
+        },
 
-		edgeeffectiveness       = 0.5,
-		explosionGenerator      = [[custom:napalm_pyro]],
-		impulseboost            = 0,
-		impulsefactor           = 0,
-		soundhit                = [[explosion/ex_med3]],
-	},
+        edgeeffectiveness       = 0.5,
+        explosionGenerator      = [[custom:napalm_pyro]],
+        impulseboost            = 0,
+        impulsefactor           = 0,
+        soundhit                = [[explosion/ex_med3]],
+    },
   },
 
   featureDefs           = {
@@ -177,7 +177,7 @@ unitDef = {
       object           = [[m-5_dead.s3o]],
     },
 
-	
+    
     HEAP  = {
       blocking         = false,
       footprintX       = 2,

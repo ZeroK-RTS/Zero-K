@@ -20,7 +20,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[21]],
+    modelradius    = [[21]],
   },
 
   energyUse              = 0,
@@ -97,13 +97,13 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 250,
       reloadtime              = 1.5,
-	  size					  = 6,
+      size                    = 6,
       soundHit                = [[explosion/ex_med6]],
       soundStart              = [[weapon/laser/heavy_laser4]],
       soundTrigger            = true,
       tolerance               = 10000,
       turret                  = true,
-	  waterWeapon             = true,
+      waterWeapon             = true,
       weaponType              = [[DGun]],
       weaponVelocity          = 300,
     },

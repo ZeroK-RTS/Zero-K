@@ -20,8 +20,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[13]],
-	chase_everything = [[1]], -- Does not get stupidtarget added to noChaseCats
+    modelradius    = [[13]],
+    chase_everything = [[1]], -- Does not get stupidtarget added to noChaseCats
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -84,8 +84,8 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-		light_camera_height = 2000,
-		light_radius = 200,
+        light_camera_height = 2000,
+        light_radius = 200,
       },
 
       damage                  = {

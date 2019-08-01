@@ -2,7 +2,7 @@ unitDef = {
   unitname            = [[bomberassault]],
   name                = [[Eclipse]],
   description         = [[Assault Bomber (Anti-Static)]],
-  --autoheal			  = 25,
+  --autoheal            = 25,
   brakerate           = 0.4,
   buildCostMetal      = 1000,
   builder             = false,
@@ -44,8 +44,8 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[zeppelin.dae]],
-  --refuelTime		  = 16,
-  script			  = [[bomberassault.lua]],
+  --refuelTime        = 16,
+  script              = [[bomberassault.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
   turnRadius          = 90,
@@ -55,7 +55,7 @@ unitDef = {
 
     {
       def                = [[ZEPPELIN_BOMB]],
-	  badTargetCategory	 = [[GUNSHIP FIXEDWING]],
+      badTargetCategory  = [[GUNSHIP FIXEDWING]],
       onlyTargetCategory = [[SWIM LAND SINK SUB TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
@@ -72,7 +72,7 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 10,
       craterMult              = 1,
-	  
+      
       damage                  = {
         default = 2500,
         planes  = 2500,
@@ -80,7 +80,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.7,
-	  explosionGenerator      = [[custom:slam]],
+      explosionGenerator      = [[custom:slam]],
       impulseBoost            = 0,
       impulseFactor           = 0.1,
       interceptedByShieldType = 1,

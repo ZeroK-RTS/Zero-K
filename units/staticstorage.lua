@@ -35,8 +35,8 @@ unitDef = {
 
   customParams                  = {
     modelradius    = [[30]],
-	removewait     = 1,
-	default_spacing = 0,
+    removewait     = 1,
+    default_spacing = 0,
     selectionscalemult = 1.15,
   },
 

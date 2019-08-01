@@ -25,11 +25,11 @@ unitDef = {
   customParams           = {
     midposoffset   = [[0 3 0]],
     aimposoffset   = [[0 3 0]],
-	modelradius    = [[10]],
-	refuelturnradius = [[120]],
+    modelradius    = [[10]],
+    refuelturnradius = [[120]],
 
-	combat_slowdown = 0.5,
-	selection_scale = 1.4,
+    combat_slowdown = 0.5,
+    selection_scale = 1.4,
   },
 
   explodeAs              = [[GUNSHIPEX]],

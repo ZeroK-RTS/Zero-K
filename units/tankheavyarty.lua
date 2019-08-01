@@ -17,7 +17,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[17]],
+    modelradius    = [[17]],
   },
 
   explodeAs              = [[BIG_UNIT]],
@@ -76,30 +76,30 @@ unitDef = {
       name                    = [[Rapid-Fire Plasma Artillery]],
       accuracy                = 1400,
       areaOfEffect            = 160,
-	  avoidFeature            = false,
-	  avoidGround             = false,
-	  craterAreaOfEffect      = 5,
+      avoidFeature            = false,
+      avoidGround             = false,
+      craterAreaOfEffect      = 5,
       craterBoost             = 0,
       craterMult              = 0,
-	  
-	  customParams            = {
+      
+      customParams            = {
         reaim_time = 15, -- Some sort of bug prevents firing.
-		
-	    gatherradius     = [[240]],
-	    smoothradius     = [[120]],
-		smoothmult       = [[0.5]],
-		lups_noshockwave = [[1]],
-		
+        
+        gatherradius     = [[240]],
+        smoothradius     = [[120]],
+        smoothmult       = [[0.5]],
+        lups_noshockwave = [[1]],
+        
         light_ground_height = 200,
-	  },
-	  
+      },
+      
       damage                  = {
         default = 145,
         planes  = 145,
         subs    = 7,
       },
-	  
-	  edgeEffectiveness       = 0.5,
+      
+      edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:tremor]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

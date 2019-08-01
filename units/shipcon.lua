@@ -24,9 +24,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[40]],
-	turnatfullspeed = [[1]],
-	selection_scale = 1.2,
+    modelradius    = [[40]],
+    turnatfullspeed = [[1]],
+    selection_scale = 1.2,
   },
 
   energyUse              = 0,

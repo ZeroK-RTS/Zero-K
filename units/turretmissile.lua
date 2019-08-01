@@ -70,22 +70,22 @@ unitDef = {
     ARMRL_MISSILE = {
       name                    = [[Homing Missiles]],
       areaOfEffect            = 8,
-	  avoidFeature            = true,
+      avoidFeature            = true,
       cegTag                  = [[missiletrailyellow]],
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargeting       = 5,
 
-	  customParams        	  = {
-		burst = Shared.BURST_RELIABLE,
+      customParams            = {
+        burst = Shared.BURST_RELIABLE,
 
-		isaa = [[1]],
-		script_reload = [[12.5]],
-		script_burst = [[3]],
-		
-		light_camera_height = 2000,
-		light_radius = 200,
-	  },
+        isaa = [[1]],
+        script_reload = [[12.5]],
+        script_burst = [[3]],
+        
+        light_camera_height = 2000,
+        light_radius = 200,
+      },
 
       damage                  = {
         default = 104,

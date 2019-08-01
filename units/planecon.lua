@@ -32,8 +32,8 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[0]],
-	modelradius    = [[10]],
-	midposoffset   = [[0 4 0]],
+    modelradius    = [[10]],
+    midposoffset   = [[0 4 0]],
   },
 
   energyUse           = 0,

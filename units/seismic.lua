@@ -12,7 +12,7 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 15 0]],
   collisionVolumeScales         = [[20 50 20]],
-  collisionVolumeType	        = [[CylY]],
+  collisionVolumeType           = [[CylY]],
 
   customParams                  = {
     mobilebuilding = [[1]],
@@ -72,13 +72,13 @@ unitDef = {
 
         restrict_in_widgets = 1,
 
-		stats_hide_dps = 1, -- one use
-		stats_hide_reload = 1,
-		
-		light_color = [[1.2 1.6 0.55]],
-		light_radius = 550,
+        stats_hide_dps = 1, -- one use
+        stats_hide_reload = 1,
+        
+        light_color = [[1.2 1.6 0.55]],
+        light_radius = 550,
       },
-	  
+      
       damage                  = {
         default = 20,
         subs    = 1,

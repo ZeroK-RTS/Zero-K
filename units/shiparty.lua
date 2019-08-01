@@ -62,13 +62,13 @@ unitDef = {
       name                    = [[Plasma Cannon]],
       areaOfEffect            = 96,
       avoidFeature            = false,
-	  avoidGround             = false,
+      avoidGround             = false,
       craterBoost             = 1,
       craterMult              = 2,
 
-			customParams = {
-				burst = Shared.BURST_RELIABLE,
-			},
+            customParams = {
+                burst = Shared.BURST_RELIABLE,
+            },
 
       damage                  = {
         default = 601.1,
@@ -80,7 +80,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-	  myGravity               = 0.1,
+      myGravity               = 0.1,
       projectiles             = 1,
       range                   = 1200,
       reloadtime              = 5,

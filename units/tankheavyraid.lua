@@ -17,7 +17,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[10]],
+    modelradius    = [[10]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

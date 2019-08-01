@@ -24,7 +24,7 @@ unitDef = {
 
   customParams        = {
     modelradius    = [[25]],
-	selection_scale = 1.2,
+    selection_scale = 1.2,
   },
 
   energyUse           = 0,

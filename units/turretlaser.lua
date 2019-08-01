@@ -74,13 +74,13 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customparams = {
-		stats_hide_damage = 1, -- continuous laser
-		stats_hide_reload = 1,
-		
-		light_color = [[0.4 1.1 1.1]],
-		light_radius = 120,
-	  },
+      customparams = {
+        stats_hide_damage = 1, -- continuous laser
+        stats_hide_reload = 1,
+        
+        light_color = [[0.4 1.1 1.1]],
+        light_radius = 120,
+      },
 
       damage                  = {
         default = 7.15,

@@ -37,7 +37,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[corcan.s3o]],
-  script	          = [[jumpassault.lua]],
+  script              = [[jumpassault.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -81,11 +81,11 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-		light_camera_height = 1000,
-		light_color = [[1 1 0.7]],
-		light_radius = 150,
-		light_beam_start = 0.25,
-		
+        light_camera_height = 1000,
+        light_color = [[1 1 0.7]],
+        light_radius = 150,
+        light_beam_start = 0.25,
+        
         combatrange = 60,
       },
 

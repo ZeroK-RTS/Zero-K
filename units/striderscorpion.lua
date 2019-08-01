@@ -28,7 +28,7 @@ unitDef = {
   iconType               = [[t3spidergeneric]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  initCloaked			 = true,
+  initCloaked            = true,
   leaveTracks            = true,
   maxDamage              = 12000,
   maxSlope               = 72,
@@ -39,7 +39,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[scorpion.s3o]],
-  script				 = [[striderscorpion.lua]],
+  script                 = [[striderscorpion.lua]],
   selfDestructAs         = [[CRAWL_BLASTSML]],
 
   sfxtypes               = {
@@ -48,7 +48,7 @@ unitDef = {
       [[custom:zeusmuzzle]],
       [[custom:zeusgroundflash]],
       [[custom:YELLOW_LIGHTNING_MUZZLE]],
-      [[custom:YELLOW_LIGHTNING_GROUNDFLASH]],	  
+      [[custom:YELLOW_LIGHTNING_GROUNDFLASH]],
     },
 
   },
@@ -56,7 +56,7 @@ unitDef = {
   trackOffset            = 0,
   trackStrength          = 10,
   trackStretch           = 1,
-  trackType				 = [[crossFoot]],
+  trackType              = [[crossFoot]],
   trackWidth             = 76,
   turnRate               = 400,
   workerTime             = 0,
@@ -78,24 +78,24 @@ unitDef = {
     {
       def                = [[MULTILIGHTNING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },	
-	
+    },
+    
     {
       def                = [[PARTICLEBEAM]],
-	  mainDir            = [[-0.2 0 1]],
+      mainDir            = [[-0.2 0 1]],
       maxAngleDif        = 240,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-	
+    
     {
       def                = [[PARTICLEBEAM]],
-	  mainDir            = [[0.2 0 1]],
+      mainDir            = [[0.2 0 1]],
       maxAngleDif        = 240,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-	
+    
   },
 
 
@@ -154,10 +154,10 @@ unitDef = {
 
       customParams            = {
         extra_damage = 1080,
-		
-		light_camera_height = 1600,
-		light_color = [[0.85 0.85 1.2]],
-		light_radius = 200,
+        
+        light_camera_height = 1600,
+        light_color = [[0.85 0.85 1.2]],
+        light_radius = 200,
         gui_draw_range = 450,
       },
 
@@ -188,21 +188,21 @@ unitDef = {
       weaponType              = [[LightningCannon]],
       weaponVelocity          = 400,
     },
-	
+    
     MULTILIGHTNING = {
       name                    = [[Multi-Stunner]],
       areaOfEffect            = 160,
       avoidFeature            = false,
-	  burst					  = 20,
-	  burstRate				  = 0.1,
-	  commandFire			  = true,
+      burst                   = 20,
+      burstRate               = 0.1,
+      commandFire             = true,
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargeting      = 0,
 
       customParams            = {
-		light_color = [[0.7 0.7 0.2]],
-		light_radius = 320,
+        light_color = [[0.7 0.7 0.2]],
+        light_radius = 320,
         gui_draw_range = 450,
       },
 
@@ -227,13 +227,13 @@ unitDef = {
       rgbColor                = [[1 1 0.25]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = false,
-	  sprayAngle			  = 2048,
+      sprayAngle              = 2048,
       texture1                = [[lightning]],
       thickness               = 10,
       turret                  = true,
       weaponType              = [[LightningCannon]],
       weaponVelocity          = 450,
-    },	
+    },
 
     PARTICLEBEAM = {
       name                    = [[Auto Particle Beam]],
@@ -243,12 +243,12 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
-	  
+      
       customParams            = {
-		light_color = [[0.9 0.22 0.22]],
-		light_radius = 80,
+        light_color = [[0.9 0.22 0.22]],
+        light_radius = 80,
       },
-	  
+      
       damage                  = {
         default = 70.01,
         subs    = 3,

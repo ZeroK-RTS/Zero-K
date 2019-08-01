@@ -60,10 +60,10 @@ unitDef = {
   weapons             = {
     {
       def                = [[WEB]],
-			badTargetCategory	 = [[UNARMED]],
+      badTargetCategory  = [[UNARMED]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-			mainDir            = [[0 0 1]],
-      maxAngleDif        = 180,	  
+      mainDir            = [[0 0 1]],
+      maxAngleDif        = 180,
     },
   },
 
@@ -78,7 +78,7 @@ unitDef = {
         timeslow_damagefactor = 1,
         timeslow_onlyslow = 1,
         timeslow_smartretarget = 0.33,
-				light_radius = 0,
+                light_radius = 0,
       },
       
       craterBoost             = 0,

@@ -20,10 +20,10 @@ unitDef = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
-	level		   = [[1]],
+    level             = [[1]],
   },
 
-  energyMake		  = 2,
+  energyMake          = 2,
   energyStorage       = 500,
   explodeAs           = [[SMALL_UNITEX]],
   footprintX          = 4,
@@ -45,7 +45,7 @@ unitDef = {
   objectName          = [[chickenbroodqueen.s3o]],
   power               = 2500,
   reclaimable         = false,
-  script			  = [[chickenbroodqueen.cob]],
+  script              = [[chickenbroodqueen.cob]],
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

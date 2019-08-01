@@ -21,8 +21,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[15]],
-	dontfireatradarcommand = '0',
+    modelradius    = [[15]],
+    dontfireatradarcommand = '0',
   },
 
   decloakOnFire          = false,
@@ -83,12 +83,12 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-		burst = Shared.BURST_RELIABLE,
-		light_radius = 0,
-		restrict_in_widgets = 1,
-	  },
-	  
+      customParams              = {
+        burst = Shared.BURST_RELIABLE,
+        light_radius = 0,
+        restrict_in_widgets = 1,
+      },
+      
       damage                  = {
         default = 1500.1,
         planes  = 1500.1,

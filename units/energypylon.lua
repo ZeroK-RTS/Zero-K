@@ -21,8 +21,8 @@ unitDef = {
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -6 0]],
     modelradius    = [[24]],
-	removewait     = 1,
-	default_spacing = 41, -- Diagonal connection.
+    removewait     = 1,
+    default_spacing = 41, -- Diagonal connection.
     selectionscalemult = 1.15,
   },
 

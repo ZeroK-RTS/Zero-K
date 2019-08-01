@@ -38,8 +38,8 @@ unitDef = {
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
-	is_drone = 1,
-	modelradius    = [[13]],
+    is_drone = 1,
+    modelradius    = [[13]],
   },
   
   
@@ -78,10 +78,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
   
-      customParams			= {
-		light_camera_height = 2000,
-		light_color = [[0.95 0.91 0.48]],
-		light_radius = 150,
+      customParams            = {
+        light_camera_height = 2000,
+        light_color = [[0.95 0.91 0.48]],
+        light_radius = 150,
       },
 
       damage                  = {

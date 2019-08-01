@@ -19,10 +19,10 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-	modelradius    = [[80]],
-	aimposoffset   = [[0 35 0]],
-	midposoffset   = [[0 0 0]],
-	select_no_rotate   = [[1]], -- tells selection widgets to treat the unit as if it has no rotation.
+    modelradius    = [[80]],
+    aimposoffset   = [[0 35 0]],
+    midposoffset   = [[0 0 0]],
+    select_no_rotate   = [[1]], -- tells selection widgets to treat the unit as if it has no rotation.
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
@@ -66,18 +66,18 @@ unitDef = {
       def                = [[LAZER]],
       onlyTargetCategory = [[NONE]],
     },
-	
-	{
+    
+    {
       def                = [[RELAYLAZER]],
       onlyTargetCategory = [[NONE]],
     },
-	
-	{
+    
+    {
       def                = [[CUTTER]],
       onlyTargetCategory = [[NONE]],
     },
-	
-	{
+    
+    {
       def                = [[RELAYCUTTER]],
       onlyTargetCategory = [[NONE]],
     },
@@ -97,9 +97,9 @@ unitDef = {
       beamTime                = 1/30,
       coreThickness           = 0.5,
 
-	  customParams        	  = {
-		light_radius = 0,
-	  },
+      customParams              = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = -0.00001,
@@ -128,7 +128,7 @@ unitDef = {
       weaponType              = [[BeamLaser]],
     },
   
-	LAZER    = {
+    LAZER    = {
       name                    = [[Craterpuncher]],
       alwaysVisible           = 0,
       areaOfEffect            = 140,
@@ -140,13 +140,13 @@ unitDef = {
       craterBoost             = 4,
       craterMult              = 8,
 
-	  customParams        	  = {
-		stats_damage = 5400,
+      customParams              = {
+        stats_damage = 5400,
 
-		light_color = [[5 0.3 6]],
-		light_radius = 2000,
-		light_beam_start = 0.8,
-	  },
+        light_color = [[5 0.3 6]],
+        light_radius = 2000,
+        light_beam_start = 0.8,
+      },
 
       damage                  = {
         default = 180,
@@ -162,7 +162,7 @@ unitDef = {
       range                   = 9000,
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
-	  scrollSpeed             = 8,
+      scrollSpeed             = 8,
       soundStartVolume        = 1,
       soundTrigger            = true,
       texture1                = [[largelaser]],
@@ -171,13 +171,13 @@ unitDef = {
       --texture4                = [[smallflare]],
       thickness               = 100,
       tolerance               = 65536,
-	  tileLength              = 10000,
+      tileLength              = 10000,
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[BeamLaser]],
     },
-	
-	RELAYLAZER    = {
+    
+    RELAYLAZER    = {
       name                    = [[Relay Craterpuncher (fake)]],
       alwaysVisible           = 18,
       areaOfEffect            = 56,
@@ -190,9 +190,9 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-		light_radius = 0,
-	  },
+      customParams              = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 180,
@@ -208,7 +208,7 @@ unitDef = {
       range                   = 9000,
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
-	  scrollSpeed             = 8,
+      scrollSpeed             = 8,
       soundTrigger            = true,
       texture1                = [[largelaser]],
       --texture2                = [[flare]],
@@ -216,13 +216,13 @@ unitDef = {
       --texture4                = [[smallflare]],
       thickness               = 100,
       tolerance               = 65536,
-	  tileLength              = 10000,
+      tileLength              = 10000,
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[BeamLaser]],
     },
-	
-	CUTTER    = {
+    
+    CUTTER    = {
       name                    = [[Groovecutter]],
       alwaysVisible           = 0,
       areaOfEffect            = 140,
@@ -234,15 +234,15 @@ unitDef = {
       craterBoost             = 4,
       craterMult              = 8,
 
-	  customParams        	  = {
-		light_color = [[3 0.2 4]],
-		light_radius = 1200,
-		light_beam_start = 0.8,
-		stats_damage_per_second = 5400,
-		stats_hide_reload = 1,
-		stats_hide_damage = 1,
-	  },
-	  
+      customParams              = {
+        light_color = [[3 0.2 4]],
+        light_radius = 1200,
+        light_beam_start = 0.8,
+        stats_damage_per_second = 5400,
+        stats_hide_reload = 1,
+        stats_hide_damage = 1,
+      },
+      
       damage                  = {
         default = 180,
       },
@@ -257,7 +257,7 @@ unitDef = {
       range                   = 9000,
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
-	  scrollSpeed             = 8,
+      scrollSpeed             = 8,
       soundStartVolume        = 1,
       soundTrigger            = true,
       texture1                = [[largelaser]],
@@ -266,13 +266,13 @@ unitDef = {
       --texture4                = [[smallflare]],
       thickness               = 50,
       tolerance               = 65536,
-	  tileLength              = 10000,
+      tileLength              = 10000,
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[BeamLaser]],
     },
-	
-	RELAYCUTTER    = {
+    
+    RELAYCUTTER    = {
       name                    = [[Relay Cutter (fake)]],
       alwaysVisible           = 18,
       areaOfEffect            = 56,
@@ -285,9 +285,9 @@ unitDef = {
       craterBoost             = 2,
       craterMult              = 4,
 
-	  customParams        	  = {
-		light_radius = 0,
-	  },
+      customParams              = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 180,
@@ -303,7 +303,7 @@ unitDef = {
       range                   = 9000,
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
-	  scrollSpeed             = 8,
+      scrollSpeed             = 8,
       soundTrigger            = true,
       texture1                = [[largelaser]],
       --texture2                = [[flare]],
@@ -311,7 +311,7 @@ unitDef = {
       --texture4                = [[smallflare]],
       thickness               = 50,
       tolerance               = 65536,
-	  tileLength              = 10000,
+      tileLength              = 10000,
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[BeamLaser]],

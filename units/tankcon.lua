@@ -22,10 +22,10 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	aimposoffset   = [[0 0 0]],
-	midposoffset   = [[0 -10 0]],
-	modelradius    = [[30]],
-	selection_scale = 1.2,
+    aimposoffset   = [[0 0 0]],
+    midposoffset   = [[0 -10 0]],
+    modelradius    = [[30]],
+    selection_scale = 1.2,
   },
 
   energyUse              = 0,
@@ -89,8 +89,8 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-		light_camera_height = 1200,
-		light_radius = 120,
+        light_camera_height = 1200,
+        light_radius = 120,
       },
 
       damage                  = {

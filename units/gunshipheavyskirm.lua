@@ -22,7 +22,7 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[0]],
-	modelradius    = [[10]],
+    modelradius    = [[10]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -73,7 +73,7 @@ unitDef = {
       name                    = [[Heavy Pulse MG]],
       areaOfEffect            = 40,
       avoidFeature            = false,
-	  burnBlow                = true,
+      burnBlow                = true,
       burst                   = 4,
       burstrate               = 0.1,
       collideFriendly         = false,
@@ -86,7 +86,7 @@ unitDef = {
         light_color = [[0.9 0.84 0.45]],
         light_ground_height = 120,
       },
-	  
+      
       damage                  = {
         default = 19.3,
         subs    = 1.0,
@@ -98,7 +98,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.2,
       interceptedByShieldType = 1,
-	  myGravity               = 0.15,
+      myGravity               = 0.15,
       noSelfDamage            = true,
       range                   = 600,
       reloadtime              = 0.45,

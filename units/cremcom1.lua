@@ -24,13 +24,13 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	level = [[1]],
-	statsname = [[dynknight1]],
-	soundok = [[heavy_bot_move]],
-	soundselect = [[bot_select]],
-	soundbuild = [[builder_start]],
-	--lups_unit_fxs = { "commandShieldBlue" },
-	commtype = [[6]],
+    level = [[1]],
+    statsname = [[dynknight1]],
+    soundok = [[heavy_bot_move]],
+    soundselect = [[bot_select]],
+    soundbuild = [[builder_start]],
+    --lups_unit_fxs = { "commandShieldBlue" },
+    commtype = [[6]],
   },
 
   energyMake             = 6,
@@ -51,7 +51,7 @@ unitDef = {
   metalMake              = 4,
   metalStorage           = 500,
   minCloakDistance       = 75,
-  modelCenterOffset		 = [[0 1 0]],
+  modelCenterOffset      = [[0 1 0]],
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[cremcom.s3o]],
@@ -61,8 +61,8 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-    	[[custom:BEAMWEAPON_MUZZLE_BLUE]],
-		[[custom:NONE]],
+        [[custom:BEAMWEAPON_MUZZLE_BLUE]],
+        [[custom:NONE]],
     },
 
   },

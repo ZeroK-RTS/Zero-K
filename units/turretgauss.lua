@@ -41,7 +41,7 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[gauss.dae]],
-  script                 		= [[turretgauss.lua]],
+  script                        = [[turretgauss.lua]],
   selfDestructAs                = [[SMALL_BUILDINGEX]],
  
   sfxtypes               = {
@@ -71,7 +71,7 @@ unitDef = {
       name                    = [[Light Gauss Cannon]],
       alphaDecay              = 0.12,
       areaOfEffect            = 16,
-	  avoidfeature            = false,
+      avoidfeature            = false,
       bouncerebound           = 0.15,
       bounceslip              = 1,
       cegTag                  = [[gauss_tag_l]],
@@ -79,7 +79,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
         single_hit = true,
       },
@@ -110,7 +110,7 @@ unitDef = {
       soundStartVolume        = 2.5,
       stages                  = 32,
       turret                  = true,
-      waterweapon			  = true,
+      waterweapon              = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1200,
     },

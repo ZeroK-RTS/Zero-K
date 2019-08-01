@@ -16,7 +16,7 @@ unitDef = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
-	statsname = "chicken_drone",
+    statsname = "chicken_drone",
   },
 
   energyMake          = 0,

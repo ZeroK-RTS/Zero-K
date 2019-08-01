@@ -27,7 +27,7 @@ unitDef = {
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -4 0]],
     modelradius    = [[24]],
-	default_spacing = 1,
+    default_spacing = 1,
   },
 
   explodeAs                     = [[NANOBOOM2]],
@@ -72,23 +72,23 @@ unitDef = {
 
   },
 
-	weaponDefs = {
-		NANOBOOM2 = {
-			name = "Nano Explosion",
-			areaofeffect = 128,
-			craterboost = 1,
-			cratermult = 3.5,
-			edgeeffectiveness = 0.75,
-			explosiongenerator = [[custom:FLASH1]],
-			impulseboost = 0,
-			impulsefactor = 0.4,
-			soundhit = [[explosion/ex_small1]],
+    weaponDefs = {
+        NANOBOOM2 = {
+            name = "Nano Explosion",
+            areaofeffect = 128,
+            craterboost = 1,
+            cratermult = 3.5,
+            edgeeffectiveness = 0.75,
+            explosiongenerator = [[custom:FLASH1]],
+            impulseboost = 0,
+            impulsefactor = 0.4,
+            soundhit = [[explosion/ex_small1]],
 
-			damage = {
-				default = 500,
-			},
-		},
-	},
+            damage = {
+                default = 500,
+            },
+        },
+    },
 }
 
 return lowerkeys({ staticcon = unitDef })

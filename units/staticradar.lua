@@ -46,7 +46,7 @@ unitDef = {
   script                        = [[staticradar.lua]],
   onoffable                     = true,
   radarDistance                 = 2100,
-  radarEmitHeight			    = 32,
+  radarEmitHeight               = 32,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 800,
   turnRate                      = 0,
@@ -124,8 +124,8 @@ unitDef = {
       },
 
       customParams           = {
-	lups_noshockwave = "1",
-	nofriendlyfire = "1",
+    lups_noshockwave = "1",
+    nofriendlyfire = "1",
       },
 
       edgeeffectiveness       = 1,

@@ -20,7 +20,7 @@ unitDef = {
 
   customParams        = {
     modelradius    = [[25]],
-	turnatfullspeed = [[1]],
+    turnatfullspeed = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -62,7 +62,7 @@ unitDef = {
 
     {
       def                = [[MISSILE]],
-	  badTargetCategory  = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
 
@@ -77,15 +77,15 @@ unitDef = {
       cegTag                  = [[missiletrailyellow]],
       craterBoost             = 1,
       craterMult              = 1.4,
-	  
+      
       customParams        = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
-		light_camera_height = 3000,
-		light_color = [[1 0.58 0.17]],
-		light_radius = 200,
+        light_camera_height = 3000,
+        light_color = [[1 0.58 0.17]],
+        light_radius = 200,
       },
-	  
+      
       damage                  = {
         default = 330,
       },
@@ -96,7 +96,7 @@ unitDef = {
       impulseBoost            = 0.75,
       impulseFactor           = 0.3,
       interceptedByShieldType = 2,
-	  leadlimit               = 0,
+      leadlimit               = 0,
       model                   = [[wep_m_dragonsfang.s3o]],
       projectiles             = 2,
       range                   = 440,
@@ -116,7 +116,7 @@ unitDef = {
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 180,
     },
-	
+    
   },
 
 
