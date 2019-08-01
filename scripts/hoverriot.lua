@@ -63,7 +63,7 @@ function script.Create()
 	Hide(ground1)
 	Move(ground1, x_axis, 24.2)
 	Move(ground1, y_axis, -8)
-	StartThread(SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 end
@@ -89,12 +89,12 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
-		Explode(base, sfxNone)
+		Explode(base, SFX.NONE)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(base, sfxNone)
+		Explode(base, SFX.NONE)
 		return 1
 	end
-	Explode(base, sfxShatter)
+	Explode(base, SFX.SHATTER)
 	return 2
 end

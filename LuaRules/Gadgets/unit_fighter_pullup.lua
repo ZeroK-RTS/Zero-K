@@ -10,9 +10,21 @@ function gadget:GetInfo() return {
 	enabled = true
 } end
 
-function gadget:UnitCreated(unitID, unitDefID)
-	local dist = UnitDefs[unitDefID].customParams.fighter_pullup_dist
+local pullupDist = {}
+for unitDefID, unitDef in pairs(UnitDefs) do
+	local dist = unitDef.customParams.fighter_pullup_dist
 	if dist then
-		Spring.MoveCtrl.SetAirMoveTypeData(unitID,{attackSafetyDistance=dist})
+		pullupDist[unitDefID] = dist
+	end
+end
+
+local spMcSetAirMoveTypeData = Spring.MoveCtrl.SetAirMoveTypeData
+local moveTypeDataTable = {attackSafetyDistance = 123}
+
+function gadget:UnitCreated(unitID, unitDefID)
+	local dist = pullupDist[unitDefID]
+	if dist then
+		moveTypeDataTable.attackSafetyDistance = dist
+		spMcSetAirMoveTypeData(unitID, moveTypeDataTable)
 	end
 end

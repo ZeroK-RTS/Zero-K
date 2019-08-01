@@ -26,19 +26,24 @@ local projectileDefs = {
 -------------------------------------------------------------
 -------------------------------------------------------------
 
+local spSetProjectileGravity = Spring.SetProjectileGravity
 function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	if not projectileDefs[weaponDefID] then
 		return
 	end
-	local px, py, pz = Spring.GetProjectilePosition(proID)
+	local _, py = Spring.GetProjectilePosition(proID)
 	if (py or 1) > 0 then
 		return
 	end
-	Spring.SetProjectileGravity(proID, -1)
+	spSetProjectileGravity(proID, -1)
 end
 
 function gadget:Initialize()
 	for id,_ in pairs(projectileDefs) do
-		Script.SetWatchWeapon(id, true)
+		if Script.SetWatchProjectile then
+			Script.SetWatchProjectile(id, true)
+		else
+			Script.SetWatchWeapon(id, true)
+		end
 	end
 end

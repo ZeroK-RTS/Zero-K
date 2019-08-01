@@ -18,6 +18,7 @@ local INACTIVE_MESSAGE = "LobbyOverlayActive0"
 
 local lobbyOverlayActive = false
 local grabTimer = false
+local grabPaused = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -27,6 +28,7 @@ options_path = 'Settings/Interface/Mouse Cursor'
 options_order = {
 	'grabinput',
 	'lobbyDisables',
+	'pauseDisables2',
 }
 
 -- Radio buttons are intentionally absent from these options to allow hotkeys to
@@ -60,6 +62,21 @@ options = {
 		end,
 		noHotkey = true,
 	},
+	pauseDisables2 = {
+		name = "Pausing disables lock",
+		tooltip = "Disables input grabbing when the game is paused.",
+		type = "bool",
+		value = false,
+		noHotkey = false,
+		OnChange = function (self)
+			if self.value then
+				widgetHandler:UpdateCallIn("GamePaused")
+			else
+				widgetHandler:RemoveCallIn("GamePaused")
+			end
+		end,
+		noHotkey = true,
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -75,6 +92,7 @@ end
 
 function widget:Update(dt)
 	-- Input grabbing is disabled on Alt+Tab and there is no event for this. Therefore it needs to be periodically reenabled if the cursor has left Spring.
+	-- Bypass this when game is paused and intentionally unlocked.
 	if options.grabinput.value and (not lobbyOverlayActive) then
 		local _, _, _, _, _, outsideSpring = Spring.GetMouseState()
 		if outsideSpring and not grabTimer then
@@ -82,7 +100,7 @@ function widget:Update(dt)
 		end
 		if grabTimer then
 			grabTimer = grabTimer + dt
-			if grabTimer > 1 then
+			if grabTimer > 1 and not grabPaused then
 				Spring.SendCommands("grabinput")
 				Spring.SendCommands("grabinput 1")
 				grabTimer = false
@@ -94,6 +112,18 @@ end
 function widget:Shutdown()
 	-- For Chobby.
 	Spring.SendCommands("grabinput 0")
+end
+
+function widget:GamePaused(playerID, paused)
+	if (options.pauseDisables2.value and options.grabinput.value) then
+		if paused then
+			grabPaused = true
+			Spring.SendCommands("grabinput 0")
+		else
+			grabPaused = false
+			Spring.SendCommands("grabinput 1")
+		end
+	end
 end
 
 function widget:RecvLuaMsg(msg)

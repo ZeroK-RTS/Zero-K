@@ -196,6 +196,11 @@ function gadget:Initialize()
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 	end
+	if Script.SetWatchProjectile then
+		for id, _ in pairs(throwWeaponDef) do
+			Script.SetWatchProjectile(id, true)
+		end
+	end
 end
 
 local function ReinstatePhysics(unitID, data)
@@ -240,7 +245,6 @@ local spGetUnitLosState   = Spring.GetUnitLosState
 local spValidUnitID       = Spring.ValidUnitID
 local spGetMyAllyTeamID   = Spring.GetMyAllyTeamID
 local spGetUnitVectors    = Spring.GetUnitVectors
-local spGetUnitDefID      = Spring.GetUnitDefID
 local spGetLocalTeamID    = Spring.GetLocalTeamID
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
@@ -358,7 +362,6 @@ end
 -- Flying lups
 
 local Lups
-local SYNCED = SYNCED
 
 local particleIDs = {}
 

@@ -29,5 +29,5 @@ end
 
 function script.Killed()
 	EmitSfx(body, 1025)
-	Explode(body, sfxShatter)
+	Explode(body, SFX.SHATTER)
 end

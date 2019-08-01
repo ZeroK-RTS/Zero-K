@@ -9,7 +9,7 @@ function widget:GetInfo()
 	author    = "beherith, aeonios",
 	date      = "2015 Sept.",
 	license   = "GPL V2",
-	layer     = -1000000000,
+	layer     = -99999,
 	enabled   = true
   }
 end
@@ -94,13 +94,8 @@ options = {
 	maxBrightness  = {type = 'number', name = 'Maximum Highlight Brightness', value = 0.35, min = 0.05, max = 1, step = 0.05,},
 }
 
-local initialized = false
-
-local function OnchangeFunc()
-	widget:Initialize()
-end
 for key,option in pairs(options) do
-	option.OnChange = OnchangeFunc
+	option.OnChange = InitialiseShaders
 end
 
 --------------------------------------------------------------------------------
@@ -256,27 +251,8 @@ local function DeferredLighting_RegisterFunction(func)
 	collectionFunctions[collectionFunctionCount] = func
 end
 
-function widget:Initialize()
-	if not initialized then
-		initialized = true
-		OnchangeFunc()
-		return
-	end
+function InitialiseShaders()
 
-	if (glCreateShader == nil) then
-		Spring.Echo('Deferred Rendering requires shader support!')
-		widgetHandler:RemoveWidget()
-		return
-	end
-
-	Spring.SetConfigInt("AllowDeferredMapRendering", 1)
-	Spring.SetConfigInt("AllowDeferredModelRendering", 1)
-
-	if (Spring.GetConfigString("AllowDeferredMapRendering") == '0' or Spring.GetConfigString("AllowDeferredModelRendering") == '0') then
-		Spring.Echo('Deferred Rendering (gfx_deferred_rendering.lua) requires  AllowDeferredMapRendering and AllowDeferredModelRendering to be enabled in springsettings.cfg!')
-		widgetHandler:RemoveWidget()
-		return
-	end
 	if ((not forceNonGLSL) and Spring.GetMiniMapDualScreen() ~= 'left') then --FIXME dualscreen
 		if (not glCreateShader) then
 			spEcho("gfx_deferred_rendering.lua: Shaders not found, removing self.")
@@ -433,6 +409,22 @@ function widget:Initialize()
 	end
 
 	widget:ViewResize()
+end
+
+function widget:Initialize()
+	if (glCreateShader == nil) then
+		Spring.Echo('Deferred Rendering requires shader support!')
+		widgetHandler:RemoveWidget()
+		return
+	end
+
+	if (Spring.GetConfigInt("AllowDeferredMapRendering") ~= 1 or Spring.GetConfigInt("AllowDeferredModelRendering") ~= 1) then
+		Spring.Echo('Deferred Rendering (gfx_deferred_rendering.lua) requires  AllowDeferredMapRendering and AllowDeferredModelRendering to be enabled in springsettings.cfg!')
+		widgetHandler:RemoveWidget()
+		return
+	end
+	
+	InitialiseShaders()
 end
 
 function widget:Shutdown()

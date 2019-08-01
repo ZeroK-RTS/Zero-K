@@ -1,0 +1,61 @@
+# This is the ZK config for the Transifex online translation platform 
+# The job of this file is to allow the Transifex CLI tool to fetch translation 
+# files from Transifex for you to commit to the repository with minimal effort.
+# Here's how to use it:
+# * Fetch one language: `tx pull -fl zh_CN`
+# * Fetch everything: `tx pull -af`
+# The -f key is needed because the client doesn't comprehend GIT, see https://github.com/transifex/transifex-client/issues/22
+# Here's more documentation on the `tx` client: https://docs.transifex.com/client/introduction
+# Here's the documentation on this file specifically: https://docs.transifex.com/client/client-configuration
+[main]
+host = https://www.transifex.com
+lang_map = zh_CN:zh,tr_TR:tr,sl_SL:sl,nl_NL:nl
+
+[zero-k.units-en-json--master]
+file_filter = LuaUI/Configs/lang/units.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/units.en.json
+source_lang = en
+type = KEYVALUEJSON
+
+[zero-k.common-en-json--master]
+file_filter = LuaUI/Configs/lang/common.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/common.en.json
+source_lang = en
+type = KEYVALUEJSON
+
+[zero-k.healthbars-en-json--master]
+file_filter = LuaUI/Configs/lang/healthbars.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/healthbars.en.json
+source_lang = en
+type = KEYVALUEJSON
+
+[zero-k.interface-en-json--master]
+file_filter = LuaUI/Configs/lang/interface.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/interface.en.json
+source_lang = en
+type = KEYVALUEJSON
+
+[zero-k.pw-units-en-json--master]
+file_filter = LuaUI/Configs/lang/pw_units.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/pw_units.en.json
+source_lang = en
+type = KEYVALUEJSON
+
+[zero-k.pw-units-en-json--master]
+file_filter = LuaUI/Configs/lang/pw_units.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/pw_units.en.json
+source_lang = en
+type = KEYVALUEJSON
+
+[zero-k.campaign-units-en-json--master]
+file_filter = LuaUI/Configs/lang/campaign_units.<lang>.json
+minimum_perc = 0
+source_file = LuaUI/Configs/lang/campaign_units.en.json
+source_lang = en
+type = KEYVALUEJSON

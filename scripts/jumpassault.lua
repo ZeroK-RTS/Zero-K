@@ -15,11 +15,13 @@ local spike = piece 'spike'
 include "constants.lua"
 include "rockPiece.lua"
 include "JumpRetreat.lua"
+local dynamicRockData
 
 local smokePieces = {turret}
 
 local gunHeading = 0
 local walking = false
+local hpi = math.pi*0.5
 
 local PACE = 1.9
 
@@ -33,19 +35,19 @@ local SIG_STOP = 64
 
 local ROCK_FORCE = 0.22
 
--- Rock X
+-- GG.ScriptRock.Rock X
 local ROCK_X_SPEED = 10 -- Number of half-cycles per second around x-axis.
 local ROCK_X_DECAY = -1/2 -- Rocking around x-axis is reduced by this factor each time = piece 'to rock.
 local ROCK_X_PIECE = pre_turret -- should be negative to alternate rocking direction.
 local ROCK_X_MIN = 0.05 -- If around x-axis rock is not greater than this amount, rocking will stop after returning to center.
 local ROCK_X_MAX = 0.5
 
--- Rock Z
+-- GG.ScriptRock.Rock Z
 local ROCK_Z_SPEED = 10 -- Number of half-cycles per second around z-axis.
 local ROCK_Z_DECAY = -1/2 -- Rocking around z-axis is reduced by this factor each time = piece 'to rock.
 local ROCK_Z_PIECE = pre_turret -- should be between -1 and 0 to alternate rocking direction.
 local ROCK_Z_MIN = 0.05 -- If around z-axis rock is not greater than this amount, rocking will stop after returning to center.
-local ROCK_X_MAX = 0.5
+local ROCK_Z_MAX = 0.5
 
 local rockData = {
 	[x_axis] = {
@@ -237,8 +239,8 @@ function script.Create()
 	Move(base, y_axis, 3)
 	Move(l_rocket, x_axis, 2)
 	Move(r_rocket, x_axis, -2)
-	InitializeRock(rockData)
-	StartThread(SmokeUnit, smokePieces)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
+	StartThread(GG.Script.SmokeUnit, smokePieces)
 end
 
 function script.AimFromWeapon()
@@ -271,8 +273,8 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	StartThread(Rock, z_axis, gunHeading, ROCK_FORCE)
-	StartThread(Rock, x_axis, gunHeading - hpi, ROCK_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], gunHeading - hpi, ROCK_FORCE)
 	Move(spike, z_axis, 30, 1800)
 	WaitForMove(spike, z_axis)
 	Move(spike, z_axis, 0, 40)
@@ -281,33 +283,33 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.25) then
-		Explode(base, sfxNone)
-		Explode(spike, sfxNone)
-		Explode(turret, sfxNone)
-		Explode(ram, sfxNone)
-		Explode(l_foot, sfxNone)
-		Explode(l_leg, sfxNone)
-		Explode(r_foot, sfxNone)
-		Explode(r_leg, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(spike, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(ram, SFX.NONE)
+		Explode(l_foot, SFX.NONE)
+		Explode(l_leg, SFX.NONE)
+		Explode(r_foot, SFX.NONE)
+		Explode(r_leg, SFX.NONE)
 		return 1
 	elseif (severity <= 0.5) then
-		Explode(base, sfxNone)
-		Explode(spike, sfxFall)
-		Explode(turret, sfxFall)
-		Explode(ram, sfxFall)
-		Explode(l_foot, sfxFall)
-		Explode(l_leg, sfxFall)
-		Explode(r_foot, sfxFall)
-		Explode(r_leg, sfxFall)
+		Explode(base, SFX.NONE)
+		Explode(spike, SFX.FALL)
+		Explode(turret, SFX.FALL)
+		Explode(ram, SFX.FALL)
+		Explode(l_foot, SFX.FALL)
+		Explode(l_leg, SFX.FALL)
+		Explode(r_foot, SFX.FALL)
+		Explode(r_leg, SFX.FALL)
 		return 1
 	end
-	Explode(base, sfxNone)
-		Explode(spike, sfxFall + sfxSmoke + sfxFire)
-		Explode(turret, sfxFall + sfxSmoke + sfxFire)
-		Explode(ram, sfxFall + sfxSmoke + sfxFire)
-		Explode(l_foot, sfxFall + sfxSmoke + sfxFire)
-		Explode(l_leg, sfxFall + sfxSmoke + sfxFire)
-		Explode(r_foot, sfxFall + sfxSmoke + sfxFire)
-		Explode(r_leg, sfxFall + sfxSmoke + sfxFire)
+	Explode(base, SFX.NONE)
+		Explode(spike, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(ram, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(l_foot, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(l_leg, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(r_foot, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(r_leg, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 	return 2
 end

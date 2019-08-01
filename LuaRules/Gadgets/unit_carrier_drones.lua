@@ -199,13 +199,12 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		--SetUnitPosition(droneID, xS, zS, true)
 		Spring.MoveCtrl.Enable(droneID)
 		Spring.MoveCtrl.SetPosition(droneID, xS, yS, zS)
-		--Spring.MoveCtrl.SetRotation(droneID, 0, rot, 0)
 		Spring.MoveCtrl.Disable(droneID)
 		Spring.SetUnitCOBValue(droneID, 82, (rot - math.pi)*65536/2/math.pi)
 		
-		local states = Spring.GetUnitStates(unitID) or emptyTable
+		local firestate = Spring.Utilities.GetUnitFireState(unitID)
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
-		GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.movestate }, 0)
+		GiveOrderToUnit(droneID, CMD.FIRE_STATE, { firestate }, 0)
 		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
 		local rx, rz = RandomPointInUnitCircle()
 		-- Drones intentionall use CMD.MOVE instead of CMD_RAW_MOVE as they do not require any of the features
@@ -331,7 +330,6 @@ local exp = math.exp
 local min = math.min
 
 local mcSetVelocity         = Spring.MoveCtrl.SetVelocity
-local mcSetRotationVelocity = Spring.MoveCtrl.SetRotationVelocity
 local mcSetPosition         = Spring.MoveCtrl.SetPosition
 local mcSetRotation         = Spring.MoveCtrl.SetRotation
 local mcDisable             = Spring.MoveCtrl.Disable
@@ -383,9 +381,20 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 	
 	local function SitLoop()
 		local previousDir, currentDir
-		local pitch, yaw, roll, pitch, yaw, roll
+		local pitch, yaw, roll
 		local px, py, pz, dx, dy, dz, vx, vy, vz, offx, offy, offz
 		-- local magnitude, newPadHeading
+		
+		if not droneList[unitID] then
+			--droneList[unitID] became NIL when drone or carrier is destroyed (in UnitDestroyed()). Is NIL at beginning of frame and this piece of code run at end of frame
+			if carrierList[carrierID] then
+				droneInfo.buildCount = droneInfo.buildCount - 1
+				carrierList[carrierID].occupiedPieces[padPieceID] = false
+				AddNextDroneFromQueue(carrierID) --add next drone in this vacant position
+				GG.StopMiscPriorityResourcing(carrierID, miscPriorityKey)
+			end
+			return --nothing else to do
+		end
 		
 		local miscPriorityKey = "drone_" .. unitID
 		local oldBuildRate = false
@@ -407,7 +416,8 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 		end
 		
 		while true do
-			if (not droneList[unitID]) then --droneList[unitID] became NIL when drone or carrier is destroyed (in UnitDestroyed()). Is NIL at beginning of frame and this piece of code run at end of frame
+			if (not droneList[unitID]) then
+				--droneList[unitID] became NIL when drone or carrier is destroyed (in UnitDestroyed()). Is NIL at beginning of frame and this piece of code run at end of frame
 				if carrierList[carrierID] then
 					droneInfo.buildCount = droneInfo.buildCount - 1
 					carrierList[carrierID].occupiedPieces[padPieceID] = false
@@ -433,7 +443,7 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 			end
 			mcSetVelocity(unitID, vx, vy, vz)
 			mcSetPosition(unitID, px + vx + offx, py + vy + offy, pz + vz + offz)
-			mcSetRotation(unitID, -pitch, yaw, -roll) --Spring conveniently rotate Y-axis first, X-axis 2nd, and Z-axis 3rd which allow Yaw, Pitch & Roll control.
+			mcSetRotation(unitID, pitch, -yaw, roll) --Spring conveniently rotate Y-axis first, X-axis 2nd, and Z-axis 3rd which allow Yaw, Pitch & Roll control.
 			
 			local buildRate = GetBuildRate(carrierID) 
 			if perSecondCost and oldBuildRate ~= buildRate then
@@ -517,7 +527,17 @@ local function GetDistance(x1, x2, y1, y2)
 end
 
 local function UpdateCarrierTarget(carrierID, frame)
-	local cQueueC = GetCommandQueue(carrierID, 1)
+	local cmdID, cmdParam_1, cmdParam_2, cmdParam_3
+	if Spring.Utilities.COMPAT_GET_ORDER then
+		local queue = Spring.GetCommandQueue(carrierID, 1)
+		if queue and queue[1] then
+			local par = queue[1].params
+			cmdID, cmdParam_1, cmdParam_2, cmdParam_3 = queue[1].id, par[1], par[2], par[3]
+		end
+	else
+		cmdID, _, _, cmdParam_1, cmdParam_2, cmdParam_3 = Spring.GetUnitCurrentCommand(carrierID)
+	end
+	
 	local droneSendDistance = nil
 	local px, py, pz
 	local target
@@ -537,14 +557,13 @@ local function UpdateCarrierTarget(carrierID, frame)
 	end
 	
 	--Handles an attack order given to the carrier.
-	if not recallDrones and cQueueC and cQueueC[1] and cQueueC[1].id == CMD_ATTACK then
+	if not recallDrones and cmdID == CMD_ATTACK then
 		local ox, oy, oz = GetUnitPosition(carrierID)
-		local params = cQueueC[1].params
-		if #params == 1 then
-			target = {params[1]}
-			px, py, pz = GetUnitPosition(params[1])
+		if cmdParam_1 and not cmdParam_2 then
+			target = {cmdParam_1}
+			px, py, pz = GetUnitPosition(cmdParam_1)
 		else
-			px, py, pz = cQueueC[1].params[1], cQueueC[1].params[2], cQueueC[1].params[3]
+			px, py, pz = cmdParam_1, cmdParam_2, cmdParam_3
 		end
 		if px then
 			droneSendDistance = GetDistance(ox, px, oz, pz)
@@ -572,8 +591,8 @@ local function UpdateCarrierTarget(carrierID, frame)
 		end
 	end
 	
-	local states = Spring.GetUnitStates(carrierID) or emptyTable
-	local holdfire = states.firestate == 0
+	local firestate = Spring.Utilities.GetUnitFireState(carrierID)
+	local holdfire = (firestate == 0)
 	local rx, rz
 	
 	for i = 1, #carrierList[carrierID].droneSets do
@@ -585,7 +604,6 @@ local function UpdateCarrierTarget(carrierID, frame)
 		for droneID in pairs(set.drones) do
 			tempCONTAINER = droneList[droneID]
 			droneList[droneID] = nil -- to keep AllowCommand from blocking the order
-			local droneStates = Spring.GetUnitStates(carrierID) or emptyTable
 			
 			if attackOrder or setTargetOrder then
 				-- drones fire at will if carrier has an attack/target order
@@ -593,7 +611,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { 2 }, 0) 
 			else
 				-- update firestate based on that of carrier
-				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.firestate }, 0) 
+				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { firestate }, 0) 
 			end
 			
 			if recallDrones then
@@ -614,8 +632,8 @@ local function UpdateCarrierTarget(carrierID, frame)
 				-- return to carrier unless in combat
 				local cQueue = GetCommandQueue(droneID, -1)
 				local engaged = false
-				for i=1, (cQueue and #cQueue or 0) do
-					if cQueue[i].id == CMD.FIGHT and droneStates.firestate > 0 then
+				for j=1, (cQueue and #cQueue or 0) do
+					if cQueue[j].id == CMD.FIGHT and firestate > 0 then
 						-- if currently fighting AND not on hold fire
 						engaged = true
 						break
@@ -787,8 +805,8 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam)
 	end
 end
 
-function gadget:GameFrame(n)
-	if (((n+1) % 30) == 0) then
+function gadget:GameFrame(f)
+	if (((f+1) % 30) == 0) then
 		for carrierID, carrier in pairs(carrierList) do
 			if (not GetUnitIsStunned(carrierID)) then
 				for i = 1, #carrier.droneSets do
@@ -825,9 +843,9 @@ function gadget:GameFrame(n)
 			killList[unitID] = nil
 		end
 	end
-	if ((n % DEFAULT_UPDATE_ORDER_FREQUENCY) == 0) then
+	if ((f % DEFAULT_UPDATE_ORDER_FREQUENCY) == 0) then
 		for i, _ in pairs(carrierList) do
-			UpdateCarrierTarget(i, n)
+			UpdateCarrierTarget(i, f)
 		end
 	end
 	UpdateCoroutines() --maintain nanoframe position relative to carrier

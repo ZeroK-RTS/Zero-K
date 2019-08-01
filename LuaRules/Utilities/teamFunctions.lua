@@ -1,7 +1,7 @@
 local teamCount
 local is1v1, isTeams, isBigTeams, isSmallTeams, isChickens, isCoop, isFFA, isSandbox, isPlanetWars = false, false, false, false, false, false, false, false, false
 do
-	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local allyTeamList = Spring.GetAllyTeamList()
 	local actualAllyTeamList = {}
 	local entirelyHumanAllyTeams = {}
@@ -11,7 +11,7 @@ do
 		if ((#teamList > 0) and (allyTeamList[i] ~= gaiaAllyTeamID)) then
 			local isTeamValid = true
 			for j = 1, #teamList do
-				if select (4, Spring.GetTeamInfo(teamList[j])) then
+				if select (4, Spring.GetTeamInfo(teamList[j], false)) then
 					allyteamEntirelyHuman = false
 				end
 				local luaAI = Spring.GetTeamLuaAI(teamList[j])

@@ -54,6 +54,6 @@ function script.HitByWeapon(x, z, weaponDefID, damage)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode(base, sfxNone)
+	Explode(base, SFX.NONE)
 	return 1
 end

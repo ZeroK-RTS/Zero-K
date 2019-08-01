@@ -324,7 +324,7 @@ local function getEngineArrays(statistic, labelCaption)
 	local teamScores = {}
 	local graphMax = 0
 	local gaia = usingAllyteams
-		and select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+		and select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 		or Spring.GetGaiaTeamID()
 
 	for i = 1, #teams do
@@ -332,7 +332,7 @@ local function getEngineArrays(statistic, labelCaption)
 		if Spring.GetTeamStatsHistory(teamID, 0, graphLength) then
 
 			local effectiveTeam = usingAllyteams
-				and select(6, Spring.GetTeamInfo(teamID))
+				and select(6, Spring.GetTeamInfo(teamID, false))
 				or teamID
 
 			teamScores[effectiveTeam] = teamScores[effectiveTeam] or {}
@@ -539,12 +539,12 @@ function widget:Initialize()
 	local teams = Spring.GetTeamList()
 	for i = 1, #teams do
 		local teamID = teams[i]
-		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID, false)
 		local name
 		if isAI then
 			name = select(2, Spring.GetAIInfo(teamID))
 		else
-			name = Spring.GetPlayerInfo(playerID)
+			name = Spring.GetPlayerInfo(playerID, false)
 		end
 		teamNames[teamID] = name
 	end
@@ -560,7 +560,7 @@ function widget:GameFrame(n)
 		local teams	= Spring.GetTeamList()
 		for i = 1, #teams do
 			local teamID = teams[i]
-			playerNames[teamID] = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(teamID)))
+			playerNames[teamID] = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(teamID, false)), false)
 		end
 		widgetHandler:RemoveCallIn("GameFrame")
 	end

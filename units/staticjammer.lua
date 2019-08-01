@@ -11,6 +11,7 @@ unitDef = {
   buildingGroundDecalType       = [[staticjammer_aoplane.dds]],
   buildPic                      = [[staticjammer.png]],
   category                      = [[SINK UNARMED]],
+  canMove                       = true,
   cloakCost                     = 1,
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[32 70 32]],
@@ -18,7 +19,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-	removewait     = 1,
+    removewait     = 1,
 
     morphto = [[cloakjammer]],
     morphtime = 30,
@@ -27,8 +28,10 @@ unitDef = {
     area_cloak_upkeep = 12,
     area_cloak_radius = 550,
     area_cloak_decloak_distance = 75,
-	
-	priority_misc = 2, -- High
+
+    priority_misc = 2, -- High
+    addfight       = 1,
+    addpatrol      = 1,
   },
 
   energyUse                     = 1.5,

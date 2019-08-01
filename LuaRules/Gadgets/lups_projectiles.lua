@@ -58,13 +58,11 @@ end
 
 function gadget:Initialize()
 	for weaponID in pairs(weapons) do
-		Script.SetWatchWeapon(weaponID, true)
-	end
-end
-
-function gadget:Shutdown()
-for weaponID in pairs(weapons) do
-		Script.SetWatchWeapon(weaponID, false)
+		if Script.SetWatchProjectile then
+			Script.SetWatchProjectile(weaponID, true)
+		else
+			Script.SetWatchWeapon(weaponID, true)
+		end
 	end
 end
 

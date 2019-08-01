@@ -222,8 +222,8 @@ local function BuildMorphDef(udSrc, morphData)
 		}
 		newData.facing = morphData.facing
 
-			MAX_MORPH = MAX_MORPH + 1 -- CMD_MORPH is the "generic" morph command. "Specific" morph command start at CMD_MORPH+1
-		newData.cmd	 = CMD_MORPH		+ MAX_MORPH
+		MAX_MORPH = MAX_MORPH + 1 -- CMD_MORPH is the "generic" morph command. "Specific" morph command start at CMD_MORPH+1
+		newData.cmd = CMD_MORPH + MAX_MORPH
 		newData.stopCmd = CMD_MORPH_STOP + MAX_MORPH
 
 		if (type(GG.MorphInfo)~="table") then

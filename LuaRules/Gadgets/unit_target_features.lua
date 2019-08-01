@@ -66,11 +66,20 @@ local function WantAttackGround(unitID)
 		return true
 	end
 	
-	local cQueue = spGetCommandQueue(unitID, 1)
-	if not (cQueue and #cQueue > 0) then
+	local cmdID, cp_3
+	if Spring.Utilities.COMPAT_GET_ORDER then
+		local queue = Spring.GetCommandQueue(unitID, 1)
+		if queue and queue[1] then
+			cmdID, cp_3 = queue[1].id, queue[1].params[3]
+		end
+	else
+		cmdID, _, _, _, _, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+	end
+		
+	if not cmdID then
 		return false, true
 	end
-	return (cQueue[1].id == CMD.ATTACK) and (#cQueue[1].params > 2)
+	return (cmdID == CMD.ATTACK) and cp_3
 end
 
 local function UpdateTargets(unitID, unitData)
@@ -140,7 +149,7 @@ end
 
 function GG.UnitSetGroundTarget(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
-	if unitDefID and weaponCounts[unitDefID] then
+	if unitDefID and weaponCounts[unitDefID] and not weaponUnits.Get(unitID) then
 		AddUnit(unitID, unitDefID)
 	end
 end

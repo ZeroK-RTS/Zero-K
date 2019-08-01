@@ -30,7 +30,7 @@ end
 function script.Create()
 	Turn(thrust1, x_axis, -math.rad(90), 1)
 	Turn(thrust2, x_axis, -math.rad(90), 1)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.StartMoving()
@@ -101,7 +101,7 @@ local function RestoreAfterDelay()
 end
 
 function script.BlockShot(num)
-	if GetUnitValue(CRASHING) == 1 then
+	if GetUnitValue(GG.Script.CRASHING) == 1 then
 		return true
 	else
 		if Spring.GetUnitRulesParam(unitID, "selfMoveSpeedChange") ~= FIRE_SLOWDOWN then
@@ -123,29 +123,29 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.25 then
-		Explode(base, sfxNone)
-		Explode(wingL, sfxNone)
-		Explode(wingR, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(wingL, SFX.NONE)
+		Explode(wingR, SFX.NONE)
 		return 1
 	elseif severity < 0.5 or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
-		Explode(base, sfxNone)
-		Explode(engineL, sfxSmoke)
-		Explode(engineR, sfxSmoke)
-		Explode(wingL, sfxNone)
-		Explode(wingR, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(engineL, SFX.SMOKE)
+		Explode(engineR, SFX.SMOKE)
+		Explode(wingL, SFX.NONE)
+		Explode(wingR, SFX.NONE)
 		return 1
 	elseif severity < 0.75 then
-		Explode(engineL, sfxSmoke + sfxFire + sfxExplode)
-		Explode(engineR, sfxSmoke + sfxFire + sfxExplode)
-		Explode(wingL, sfxFall + sfxSmoke)
-		Explode(wingR, sfxFall + sfxSmoke)
+		Explode(engineL, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(engineR, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(wingL, SFX.FALL + SFX.SMOKE)
+		Explode(wingR, SFX.FALL + SFX.SMOKE)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(engineL, sfxSmoke + sfxFire + sfxExplode)
-		Explode(engineR, sfxSmoke + sfxFire + sfxExplode)
-		Explode(wingL, sfxSmoke + sfxExplode)
-		Explode(wingR, sfxSmoke + sfxExplode)
+		Explode(base, SFX.SHATTER)
+		Explode(engineL, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(engineR, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(wingL, SFX.SMOKE + SFX.EXPLODE)
+		Explode(wingR, SFX.SMOKE + SFX.EXPLODE)
 		return 2
 	end
 end

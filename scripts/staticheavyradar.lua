@@ -16,11 +16,11 @@ local SIG_CLOSE = 1
 local SIG_OPEN = 2
 
 function script.Create()
-	if not onWater() then 
+	if not GG.Script.onWater(unitID) then
 		--Hide(float1)
 		--Hide(float2)
 	end
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 local function Activate()
@@ -31,11 +31,11 @@ local function Activate()
 	Sleep(1000)
 	Move(dish, y_axis, 30, 7)
 	WaitForMove(dish, y_axis)
-	Turn(ant, z_axis, rad(-100), rad(60))
-	Turn(arm, z_axis, rad(30), rad(40))
-	Spin(spinner, y_axis, rad(20), rad(20))
+	Turn(ant, z_axis, math.rad(-100), math.rad(60))
+	Turn(arm, z_axis, math.rad(30), math.rad(40))
+	Spin(spinner, y_axis, math.rad(20), math.rad(20))
 	WaitForTurn(ant, z_axis)
-	Spin(dish, y_axis, rad(20), rad(20))
+	Spin(dish, y_axis, math.rad(20), math.rad(20))
 end
 
 local function Deactivate()
@@ -44,16 +44,16 @@ local function Deactivate()
 	SetSignalMask(SIG_CLOSE)
 
 	if spGetUnitIsStunned(unitID) then
-		Spring.UnitScript.StopSpin(dish, y_axis, rad(10))
-		Spring.UnitScript.StopSpin(spinner, y_axis, rad(10))
+		Spring.UnitScript.StopSpin(dish, y_axis, math.rad(10))
+		Spring.UnitScript.StopSpin(spinner, y_axis, math.rad(10))
 	else
-		Spin(dish, y_axis, rad(0), rad(20))
-		Turn(ant, z_axis, rad(0), rad(60))
-		Turn(arm, z_axis, rad(0), rad(40))
+		Spin(dish, y_axis, math.rad(0), math.rad(20))
+		Turn(ant, z_axis, math.rad(0), math.rad(60))
+		Turn(arm, z_axis, math.rad(0), math.rad(40))
 		WaitForTurn(ant, z_axis)
 		Move(dish, y_axis, 0, 7)
 		WaitForMove(dish, y_axis)
-		Spin(spinner, y_axis, rad(0), rad(3))
+		Spin(spinner, y_axis, math.rad(0), math.rad(3))
 	end
 end
 
@@ -68,25 +68,25 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
-		Explode(arm, sfxFire)
-		Explode(ant, sfxFire)
-		Explode(base, sfxFire)
-		Explode(dish, sfxExplode)
-		Explode(spinner, sfxExplode)
+		Explode(arm, SFX.FIRE)
+		Explode(ant, SFX.FIRE)
+		Explode(base, SFX.FIRE)
+		Explode(dish, SFX.EXPLODE)
+		Explode(spinner, SFX.EXPLODE)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(arm, sfxFall)
-		Explode(ant, sfxFall)
-		Explode(base, sfxShatter)
-		Explode(dish, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(spinner, sfxShatter)
+		Explode(arm, SFX.FALL)
+		Explode(ant, SFX.FALL)
+		Explode(base, SFX.SHATTER)
+		Explode(dish, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(spinner, SFX.SHATTER)
 		return 1
 	else
-		Explode(arm, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(ant, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(base, sfxShatter)
-		Explode(dish, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(spinner, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(arm, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(ant, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(base, SFX.SHATTER)
+		Explode(dish, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(spinner, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		return 2
 	end
 end

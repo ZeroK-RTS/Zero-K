@@ -141,7 +141,7 @@ end
 
 function script.Create()
 	--Move(emit, y_axis, 20)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function AutoAttack_Thread()
@@ -157,8 +157,8 @@ function AutoAttack_Thread()
 			spSetUnitWeaponState(unitID, 3, {reloadFrame = reloadFrame})
 			GG.PokeDecloakUnit(unitID,100)
 			
-			EmitSfx(emit, UNIT_SFX1)
-			EmitSfx(emit, DETO_W2)
+			EmitSfx(emit, GG.Script.UNIT_SFX1)
+			EmitSfx(emit, GG.Script.DETO_W2)
 			FireAnim()
 		end
 	end
@@ -195,8 +195,8 @@ end
 
 function script.FireWeapon(num)
 	if num == 3 then
-		EmitSfx(emit, UNIT_SFX1)
-		EmitSfx(emit, DETO_W2)
+		EmitSfx(emit, GG.Script.UNIT_SFX1)
+		EmitSfx(emit, GG.Script.DETO_W2)
 		FireAnim()
 	end
 end
@@ -216,51 +216,51 @@ end
 local function Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(base, sfxNone)
-		Explode(torso, sfxNone)
-		Explode(Rleg, sfxNone)
-		Explode(Lleg, sfxNone)
-		Explode(lowerRleg, sfxNone)
-		Explode(lowerLleg, sfxNone)
-		Explode(Rfoot, sfxNone)
-		Explode(Lfoot, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(torso, SFX.NONE)
+		Explode(Rleg, SFX.NONE)
+		Explode(Lleg, SFX.NONE)
+		Explode(lowerRleg, SFX.NONE)
+		Explode(lowerLleg, SFX.NONE)
+		Explode(Rfoot, SFX.NONE)
+		Explode(Lfoot, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(base, sfxNone)
-		Explode(torso, sfxNone)
-		Explode(Rleg, sfxNone)
-		Explode(Lleg, sfxNone)
-		Explode(lowerRleg, sfxNone)
-		Explode(lowerLleg, sfxNone)
-		Explode(Rfoot, sfxNone)
-		Explode(Lfoot, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(torso, SFX.NONE)
+		Explode(Rleg, SFX.NONE)
+		Explode(Lleg, SFX.NONE)
+		Explode(lowerRleg, SFX.NONE)
+		Explode(lowerLleg, SFX.NONE)
+		Explode(Rfoot, SFX.NONE)
+		Explode(Lfoot, SFX.NONE)
 		return 1
 	elseif severity <= .99 then
 		Explode(base, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(torso, sfxNone)
+		Explode(torso, SFX.NONE)
 
 		Explode(Rleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(Lleg, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(lowerRleg, sfxNone)
-		Explode(lowerLleg, sfxNone)
+		Explode(lowerRleg, SFX.NONE)
+		Explode(lowerLleg, SFX.NONE)
 		Explode(Rfoot, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(Lfoot, sfxNone)
+		Explode(Lfoot, SFX.NONE)
 		return 2
 	else
 		Explode(base, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(torso, sfxNone)
+		Explode(torso, SFX.NONE)
 	
 		Explode(Rleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(Lleg, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(lowerRleg, sfxNone)
-		Explode(lowerLleg, sfxNone)
+		Explode(lowerRleg, SFX.NONE)
+		Explode(lowerLleg, SFX.NONE)
 		Explode(Rfoot, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(Lfoot, sfxNone)
+		Explode(Lfoot, SFX.NONE)
 		return 2
 	end
 end
 
 function script.Killed(recentDamage, maxHealth)
 	Signal(SIG_ACTIVATE) -- prevent pulsing while undead
-	return DelayTrueDeath(recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
+	return GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
 end

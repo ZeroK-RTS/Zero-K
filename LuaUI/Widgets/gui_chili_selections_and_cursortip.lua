@@ -95,6 +95,8 @@ local CURSOR_ERASE_NAME = "map_erase"
 local CURSOR_POINT_NAME = "map_point"
 local CURSOR_DRAW_NAME = "map_draw"
 
+local NO_TOOLTIP = "NONE"
+
 local iconTypesPath = LUAUI_DIRNAME .. "Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
@@ -192,8 +194,8 @@ local tidalStrength
 local windMin
 local windMax
 local windGroundMin
-local windGroundExtreme
 local windGroundSlope
+local windMinBound
 
 local GAIA_TEAM = Spring.GetGaiaTeamID()
 
@@ -738,7 +740,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 					income = tidalStrength
 					healthOverride = 400
 				else
-					local minWindIncome = windMin + (windMax - windMin)*math.max(0, math.min(1, windGroundSlope*(y - windGroundMin)/windGroundExtreme))
+					local minWindIncome = windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin)))
 					extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax)
 					income = (minWindIncome+windMax)/2
 				end
@@ -799,13 +801,13 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 end
 
 local function GetPlayerCaption(teamID)
-	local _, player,_,isAI = Spring.GetTeamInfo(teamID)
+	local _, player,_,isAI = Spring.GetTeamInfo(teamID, false)
 	local playerName
 	if isAI then
 		local _, aiName, _, shortName = Spring.GetAIInfo(teamID)
 		playerName = aiName -- .. ' (' .. shortName .. ')'
 	else
-		playerName = (player and Spring.GetPlayerInfo(player)) or (teamID ~= GAIA_TEAM and "noname")
+		playerName = (player and Spring.GetPlayerInfo(player, false)) or (teamID ~= GAIA_TEAM and "noname")
 		if not playerName then
 			return false
 		end
@@ -1134,7 +1136,8 @@ local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum,
 			bottom = 5,
 			minWidth = 4,
 			max = 1,
-			caption = '',
+			caption = false,
+			noFont = true,
 			color = reloadBarColor,
 			skinName = 'default',
 			orientation = "vertical",
@@ -1182,7 +1185,8 @@ local function GetUnitGroupIconButton(parentControl)
 		right = 0,
 		height = 0,
 		max = 1,
-		caption = '',
+		caption = false,
+		noFont = true,
 		color = fullHealthBarColor,
 		parent = holder
 	}
@@ -1447,6 +1451,8 @@ local function GetSelectionStatsDisplay(parentControl)
 				global_totalBuildPower = total_totalbp
 			end
 		end
+
+		total_totalburst = math.floor(total_totalburst / 10) * 10 -- round numbers are easier to parse and compare
 		
 		UpdateDynamicGroupInfo()
 	end
@@ -2160,6 +2166,10 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	
 	-- Mouseover build option tooltip (screen0.currentTooltip)
 	local chiliTooltip = screen0.currentTooltip
+	if chiliTooltip == NO_TOOLTIP then
+		return false
+	end
+	
 	if chiliTooltip and string.find(chiliTooltip, "BuildUnit") then
 		local name = string.sub(chiliTooltip, 10)
 		local ud = name and UnitDefNames[name]
@@ -2178,7 +2188,7 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	
 	-- Mouseover morph tooltip (screen0.currentTooltip)
 	if chiliTooltip and string.find(chiliTooltip, "Morph") then
-		local unitHumanName = chiliTooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \-]', '')
+		local unitHumanName = chiliTooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \\-]', '')
 		local morphTime = chiliTooltip:gsub('.*time:(.*)metal.*', '%1'):gsub('[^%d]', '')
 		local morphCost = chiliTooltip:gsub('.*metal: (.*)energy.*', '%1'):gsub('[^%d]', '')
 		local unitDefID = GetUnitDefByHumanName(unitHumanName)
@@ -2436,8 +2446,8 @@ local function InitializeWindParameters()
 	windMin = spGetGameRulesParam("WindMin")
 	windMax = spGetGameRulesParam("WindMax")
 	windGroundMin = spGetGameRulesParam("WindGroundMin")
-	windGroundExtreme = spGetGameRulesParam("WindGroundExtreme")
 	windGroundSlope = spGetGameRulesParam("WindSlope")
+	windMinBound = spGetGameRulesParam("WindMinBound")
 	tidalStrength = Spring.GetGameRulesParam("tidalStrength")
 	tidalHeight = Spring.GetGameRulesParam("tidalHeight")
 end

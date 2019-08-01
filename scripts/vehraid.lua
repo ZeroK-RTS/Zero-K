@@ -172,35 +172,35 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function FireWeapon(num)
-	EmitSfx(firepoint, UNIT_SFX1)
+	EmitSfx(firepoint, GG.Script.UNIT_SFX1)
 end
 
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity >= 0 and severity < 0.25 then
-		Explode(barrel, sfxNone)
-		Explode(sleeve, sfxNone)
-		Explode(body, sfxNone)
-		Explode(turret, sfxNone)
+		Explode(barrel, SFX.NONE)
+		Explode(sleeve, SFX.NONE)
+		Explode(body, SFX.NONE)
+		Explode(turret, SFX.NONE)
 		return 1
 	elseif severity < 0.50 then
-		Explode(barrel, sfxFall)
-		Explode(sleeve, sfxFall)
-		Explode(body, sfxNone)
-		Explode(turret, sfxShatter)
+		Explode(barrel, SFX.FALL)
+		Explode(sleeve, SFX.FALL)
+		Explode(body, SFX.NONE)
+		Explode(turret, SFX.SHATTER)
 		return 1
 	elseif severity < 1 then
-		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(sleeve, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(body, sfxNone)
-		Explode(turret, sfxShatter)
+		Explode(barrel, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(sleeve, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(body, SFX.NONE)
+		Explode(turret, SFX.SHATTER)
 		return 2
 	else
-		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(sleeve, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(body, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(barrel, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(sleeve, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(body, SFX.SHATTER)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		return 2
 	end
 end
@@ -209,5 +209,5 @@ function script.Create()
 	moving = false
 	StartThread(Suspension)
 	
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end

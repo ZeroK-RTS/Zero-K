@@ -56,7 +56,7 @@ end
 
 function script.StopMoving()
 	StartThread(Stopping)
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 function script.MoveRate(rate)
@@ -73,8 +73,8 @@ end
 
 function script.Create()
 	SetInitialBomberSettings()
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Hide(rearthrust)
 	Hide(wingthrust1)
 	Hide(wingthrust2)
@@ -105,21 +105,21 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(base, sfxNone)
-		Explode(wing1, sfxNone)
-		Explode(wing2, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(wing1, SFX.NONE)
+		Explode(wing2, SFX.NONE)
 		return 1
 	elseif severity <= .50 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
-		Explode(wing1, sfxFall + sfxSmoke + sfxFire)
-		Explode(wing2, sfxFall + sfxSmoke + sfxFire)
+		Explode(wing1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(wing2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 1
 	elseif severity <= .75 then
-		Explode(wing1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(wing2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(wing1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(wing2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	else
-		Explode(wing1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(wing2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(wing1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(wing2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	end
 end

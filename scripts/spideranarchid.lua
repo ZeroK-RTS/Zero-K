@@ -57,7 +57,7 @@ local function Walk()
 	SetSignalMask(SIG_WALK)
 	while true do
 		
-		walk(br, mr, fr, bl, ml, fl,
+		GG.SpiderWalk.walk(br, mr, fr, bl, ml, fl,
 			legRaiseAngle, legRaiseSpeed, legLowerSpeed,
 			legForwardAngle, legForwardOffset, legForwardSpeed, legForwardTheta,
 			legMiddleAngle, legMiddleOffset, legMiddleSpeed, legMiddleTheta,
@@ -69,12 +69,12 @@ end
 local function RestoreLegs()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
-	restoreLegs(br, mr, fr, bl, ml, fl,
+	GG.SpiderWalk.restoreLegs(br, mr, fr, bl, ml, fl,
 		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)				
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.StartMoving()
@@ -115,48 +115,48 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(gun, sfxNone)
-		Explode(body, sfxNone)
-		Explode(br, sfxNone)
-		Explode(mr, sfxNone)
-		Explode(fr, sfxNone)
-		Explode(bl, sfxNone)
-		Explode(ml, sfxNone)
-		Explode(fl, sfxNone)
-		Explode(turret, sfxNone)
+		Explode(gun, SFX.NONE)
+		Explode(body, SFX.NONE)
+		Explode(br, SFX.NONE)
+		Explode(mr, SFX.NONE)
+		Explode(fr, SFX.NONE)
+		Explode(bl, SFX.NONE)
+		Explode(ml, SFX.NONE)
+		Explode(fl, SFX.NONE)
+		Explode(turret, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(gun, sfxFall)
-		Explode(body, sfxNone)
-		Explode(br, sfxFall)
-		Explode(mr, sfxFall)
-		Explode(fr, sfxFall)
-		Explode(bl, sfxFall)
-		Explode(ml, sfxFall)
-		Explode(fl, sfxFall)
-		Explode(turret, sfxShatter)
+		Explode(gun, SFX.FALL)
+		Explode(body, SFX.NONE)
+		Explode(br, SFX.FALL)
+		Explode(mr, SFX.FALL)
+		Explode(fr, SFX.FALL)
+		Explode(bl, SFX.FALL)
+		Explode(ml, SFX.FALL)
+		Explode(fl, SFX.FALL)
+		Explode(turret, SFX.SHATTER)
 		return 1
 	elseif severity <= .99 then
-		Explode(gun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(body, sfxNone)
-		Explode(br, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(mr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(fr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(bl, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(ml, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(fl, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(turret, sfxShatter)
+		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(body, SFX.NONE)
+		Explode(br, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(mr, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(fr, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(bl, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(ml, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(fl, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(turret, SFX.SHATTER)
 		return 2
 	else
-		Explode(gun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(body, sfxNone)
-		Explode(br, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(mr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(fr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(bl, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(ml, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(fl, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(turret, sfxShatter + sfxExplode)
+		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(body, SFX.NONE)
+		Explode(br, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(mr, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(fr, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(bl, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(ml, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(fl, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(turret, SFX.SHATTER + SFX.EXPLODE)
 		return 2
 	end
 end

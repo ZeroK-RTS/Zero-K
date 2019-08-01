@@ -280,10 +280,10 @@ function TargetingLaser()
 				
 				--// Shooting
 				if shooting ~= 0 then
-					EmitSfx(EmitterMuzzle, FIRE_W3)
+					EmitSfx(EmitterMuzzle, GG.Script.FIRE_W3)
 					shooting = shooting - 1
 				else
-					EmitSfx(EmitterMuzzle, FIRE_W5)
+					EmitSfx(EmitterMuzzle, GG.Script.FIRE_W5)
 				end
 			end
 		end
@@ -295,7 +295,7 @@ end
 function script.Create()
 	Spring.SetUnitWeaponState(unitID, 2, "range", 9300)
 	Spring.SetUnitWeaponState(unitID, 4, "range", 9300)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 
 	--Move(ShortSpikes,z_axis, -5)
 	--Move(LongSpikes,z_axis, -10)

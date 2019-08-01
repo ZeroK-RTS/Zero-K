@@ -19,8 +19,6 @@ end
 -------------------------------------------------------------
 local useRapidReaim = true
 
-local START_TIME = 20*60*30
-local FLIP_PERIOD =60*30
 
 -------------------------------------------------------------
 -------------------------------------------------------------
@@ -92,6 +90,9 @@ function gadget:Initialize()
 	gadgetHandler:AddChatAction("debugreaim", ToggleReaimTime, "Debugs reaim time.")
 end
 
+--local START_TIME = 20*60*30
+--local FLIP_PERIOD =60*30
+--
 --function gadget:GameFrame(n)
 --	-- Performance test by switching during games.
 --	if n < START_TIME then

@@ -1,5 +1,8 @@
+if GG.TransportAllowed then
+	return
+end
 
-function TransportAllowed(passengerID)
+function GG.TransportAllowed(passengerID)
 	if Spring.GetUnitAllyTeam(unitID) == Spring.GetUnitAllyTeam(passengerID) then
 		return true
 	end

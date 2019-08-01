@@ -275,8 +275,8 @@ local function LoadOrdersForUnit(oldID, data)
 		
 		-- workaround for stupid bug where the coordinates are all mixed up
 		local params = {}
-		for i=1,#command.params do
-			params[i] = command.params[i]
+		for j=1,#command.params do
+			params[j] = command.params[j]
 		end
 		
 		Spring.GiveOrderToUnit(data.newID, command.id, params, command.options.coded)
@@ -927,12 +927,12 @@ local function SaveUnits()
 			local weapons = unitDef.weapons
 			unitInfo.weapons = {}
 			unitInfo.shield = {}
-			for i=1,#weapons do
-				unitInfo.weapons[i] = {}
-				unitInfo.weapons[i].reloadState = spGetUnitWeaponState(unitID, i, 'reloadState')
-				local enabled, power = Spring.GetUnitShieldState(unitID, i)
+			for j=1,#weapons do
+				unitInfo.weapons[j] = {}
+				unitInfo.weapons[j].reloadState = spGetUnitWeaponState(unitID, j, 'reloadState')
+				local enabled, power = Spring.GetUnitShieldState(unitID, j)
 				if power then
-					unitInfo.shield[i] = {enabled = Spring.Utilities.tobool(enabled), power = power}
+					unitInfo.shield[j] = {enabled = Spring.Utilities.tobool(enabled), power = power}
 				end
 			end
 			unitInfo.stockpile = {}
@@ -944,7 +944,7 @@ local function SaveUnits()
 			
 			-- factory properties
 			if unitDef.isFactory then
-				local factoryCommands = Spring.GetFactoryCommands(unitID) or {}
+				local factoryCommands = Spring.GetFactoryCommands(unitID, -1) or {}
 				unitInfo.factoryData = { commands = factoryCommands }
 				local producedUnitID = spGetUnitIsBuilding(unitID)
 				if (producedUnitID) then
@@ -969,7 +969,7 @@ local function SaveUnits()
 			
 			local commandsTemp = spGetCommandQueue(unitID, -1)
 			local commands = {}
-			for i,v in ipairs(commandsTemp) do
+			for j,v in ipairs(commandsTemp) do
 				if (type(v) == "table" and v.params) then v.params.n = nil end
 				
 				-- don't save commands from retreat, we'll regenerate those at load)
@@ -986,8 +986,8 @@ local function SaveUnits()
 			unitInfo.states.custom = {}
 			local custom = unitInfo.states.custom
 			local cmdDescs = Spring.GetUnitCmdDescs(unitID)
-			for i=1,#cmdDescs do
-				local cmdDesc = cmdDescs[i]
+			for j=1,#cmdDescs do
+				local cmdDesc = cmdDescs[j]
 				if cmdDesc["type"] == CMDTYPE.ICON_MODE and not (CMD[cmdDesc.id] or nonSavedCommands[cmdDesc.id]) then
 					custom[cmdDesc.id] = cmdDesc.params and tonumber(cmdDesc.params[1])
 				end

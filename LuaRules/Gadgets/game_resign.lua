@@ -23,7 +23,7 @@ function gadget:RecvLuaMsg (msg, playerID)
 		return
 	end
 
-	local _, _, spec, teamID = spGetPlayerInfo(playerID)
+	local _, _, spec, teamID = spGetPlayerInfo(playerID, false)
 	if spec or #spGetPlayerList(teamID) > 1 then -- don't kill the entire squad until the last member resigns
 		return
 	end
@@ -53,7 +53,7 @@ function gadget:GotChatMsg (msg, senderID)
 		local people = spGetPlayerList()
 		for i = 1, #people do
 			local personID = people[i]
-			local nick, _, _, teamID = spGetPlayerInfo(personID)
+			local nick, _, _, teamID = spGetPlayerInfo(personID, false)
 			if (target == nick) then
 				spKillTeam (teamID)
 				spSetTeamRulesParam (teamID, "WasKilled", 1)

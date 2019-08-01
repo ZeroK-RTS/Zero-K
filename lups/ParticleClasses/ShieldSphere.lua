@@ -38,6 +38,7 @@ ShieldSphereParticle.Default = {
 
 	margin     = 1,
 	transitionTime = 10,
+	startOfRechargeDelay = -999999,
 
 	colormap1  = { {0, 0, 0, 0} },
 	colormap2  = { {0, 0, 0, 0} },
@@ -80,8 +81,9 @@ function ShieldSphereParticle:Draw()
 		local currTime = Spring.GetGameFrame()
 		local cooldown = hitTime + self.shieldRechargeDelay - currTime
 		if cooldown > 0 then
-			if (self.shieldRechargeDelay - cooldown < self.transitionTime) and not self.shieldDisabled then
-				local frac = (self.shieldRechargeDelay - cooldown)/self.transitionTime
+			local timeSinceRegenDisabled = currTime - self.startOfRechargeDelay
+			if (timeSinceRegenDisabled < self.transitionTime) and not self.shieldDisabled then
+				local frac = timeSinceRegenDisabled/self.transitionTime
 				color = MixColors(self.color1, self.rechargingColor1, frac)
 				size = self.shieldRechargeSize*frac + self.size*(1-frac)
 				if self.color2 then
@@ -104,6 +106,8 @@ function ShieldSphereParticle:Draw()
 				end
 			end
 			alignment = alignment + size - self.size
+		else
+			self.startOfRechargeDelay = currTime
 		end
 	end
 	glMultiTexCoord(1, color[1],color[2],color[3],color[4] or 1)

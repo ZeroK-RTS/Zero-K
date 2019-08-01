@@ -1,0 +1,38 @@
+Nimbus Sans L Regular, Nimbus Mono L Regular, Nimbus Mono L Oblique
+all come from a more recent version of the cyrillic URW fonts.
+
+The hints on Nimbus Sans Regular have been modified in the
+following ways:
+
+25 June 2002
+
+ - Added ghost hint to the top of 4 to keep it from being
+   taller than the other digits.
+ - Reduced the width of the left stem hint for H to 83
+   (probably no real differences)
+ - Changed the StemSnapV values from [78 85 94] to [78 83 92]
+   (and fixed up StdVW accordingly)
+   This corresponds to the values in the font (which are 83/93
+   for lower case and upper case stems) better and makes
+   the width-88 stems on M and N snap to to upper case 
+   widths not lower-case widths.
+
+29 June 2002
+
+ - Removed odd vertical stem hints (width of horizontal
+   stems) from f, F, t, E, yen sign, fi ligature, 
+   fl ligature, AE ligature, R, Lstroke, OE ligature,
+   lstroke, E" variants, t, variants, Eth, Dstoke, etc.
+ - Fixed hints on 1 to be two ghost hints instead of one
+   hint the height of the font
+ - fix bottom stem of u to have integer coordinates
+ - fixed hints on |
+ - fixed hints on inverted exclamation mark
+
+The hints on Nimbus Mono L Oblique have been modified in the
+following ways:
+
+ - Removed vertical stem hints from horizontal serifs on
+   roman characters.
+  
+Owen Taylor

@@ -461,6 +461,7 @@ local function MakeUnitPickerComboxes(parent, offset)
 		y = offset[1],
 		right = 5,
 		height = COMBOX_HEIGHT,
+		topHeight = 10,
 		items = {},
 		parent = parent,
 		selected = 1,
@@ -489,6 +490,7 @@ local function MakeTeamPickerCombox(parent, offset)
 		y = offset[1],
 		right = 5,
 		height = COMBOX_HEIGHT,
+		topHeight = 10,
 		items = {},
 		parent = parent,
 		OnSelect = {function(self, i)
@@ -674,14 +676,14 @@ function languageChanged()
 	local teams = Spring.GetTeamList()
 	for i = 1, #teams do
 		local teamID = teams[i]
-		local _,playerID,_,isAI = Spring.GetTeamInfo(teamID)
+		local _,playerID,_,isAI = Spring.GetTeamInfo(teamID, false)
 		if Spring.GetGaiaTeamID() == teamID then
 			teamPicker.items[i] = WG.Translate("interface", "neutral")
 		elseif isAI then
 			local _,botID,_,shortName = Spring.GetAIInfo(teamID)
 			teamPicker.items[i] = (shortName or "Bot") .." - " .. (botID or "")
 		else
-			teamPicker.items[i] = Spring.GetPlayerInfo(playerID) or "???"
+			teamPicker.items[i] = Spring.GetPlayerInfo(playerID, false) or "???"
 		end
 	end
 	teamPicker.tooltip = WG.Translate("interface", "cheatsheet_teampick_desc")

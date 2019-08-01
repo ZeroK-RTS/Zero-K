@@ -158,7 +158,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, {chest})
+	StartThread(GG.Script.SmokeUnit, {chest})
 	Turn(rthigh, y_axis, math.rad(-20))
 	Turn(lthigh, y_axis, math.rad(20))
 	Turn(rthigh, z_axis, math.rad(-3))
@@ -230,24 +230,24 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	local corpseType = 1
 	if severity <= .25 then
-		Explode(hips, sfxNone)
-		Explode(chest, sfxNone)
-		Explode(lshoulder, sfxNone)
-		Explode(rshoulder, sfxNone)
-		Explode(head, sfxFall + sfxFire)
+		Explode(hips, SFX.NONE)
+		Explode(chest, SFX.NONE)
+		Explode(lshoulder, SFX.NONE)
+		Explode(rshoulder, SFX.NONE)
+		Explode(head, SFX.FALL + SFX.FIRE)
 	elseif severity <= .50 then
-		Explode(hips, sfxNone)
-		Explode(chest, sfxNone)
-		Explode(lshoulder, sfxFall + sfxFire)
-		Explode(rshoulder, sfxFall + sfxFire)
-		Explode(head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(hips, SFX.NONE)
+		Explode(chest, SFX.NONE)
+		Explode(lshoulder, SFX.FALL + SFX.FIRE)
+		Explode(rshoulder, SFX.FALL + SFX.FIRE)
+		Explode(head, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	else
 		corpseType = 2
-		Explode(hips, sfxShatter)
-		Explode(chest, sfxShatter)
-		Explode(lshoulder, sfxShatter)
-		Explode(rshoulder, sfxShatter)
-		Explode(head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(hips, SFX.SHATTER)
+		Explode(chest, SFX.SHATTER)
+		Explode(lshoulder, SFX.SHATTER)
+		Explode(rshoulder, SFX.SHATTER)
+		Explode(head, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	end
 
 	return corpseType

@@ -68,7 +68,7 @@ local function ScannerLoop()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	--StartThread(ScannerLoop)
 	local cmd = Spring.FindUnitCmdDesc(unitID, CMD.ATTACK)
 	if cmd then 
@@ -90,21 +90,21 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(ground, sfxNone)
-		Explode(head, sfxFall + sfxExplode)
+		Explode(ground, SFX.NONE)
+		Explode(head, SFX.FALL + SFX.EXPLODE)
 		return 1
 	elseif severity <= .50 then
-		Explode(ground, sfxNone)
-		Explode(head, sfxFall + sfxExplode)
+		Explode(ground, SFX.NONE)
+		Explode(head, SFX.FALL + SFX.EXPLODE)
 		return 1
 	elseif severity <= .99 then
 		corpsetype = 2
-		Explode(ground, sfxNone)
-		Explode(head, sfxFall + sfxExplode)
+		Explode(ground, SFX.NONE)
+		Explode(head, SFX.FALL + SFX.EXPLODE)
 		return 2
 	else
-		Explode(ground, sfxNone)
-		Explode(head, sfxFall + sfxExplode)
+		Explode(ground, SFX.NONE)
+		Explode(head, SFX.FALL + SFX.EXPLODE)
 		return 2
 	end
 end

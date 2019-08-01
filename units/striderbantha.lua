@@ -139,8 +139,8 @@ unitDef = {
       accuracy                = 512,
       avoidFeature            = false,
       avoidFriendly           = false,
-      burst                   = 10,
-      burstrate               = 0.2,
+      burst                   = 12,
+      burstrate               = 0.167,
       cegTag                  = [[emptrail]],
       commandFire             = true,
       craterBoost             = 0,
@@ -153,7 +153,7 @@ unitDef = {
       },
 
       damage                  = {
-        default        = 1500,
+        default        = 1250,
       },
 
       dance                   = 20,

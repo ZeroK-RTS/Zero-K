@@ -1,7 +1,7 @@
 local widgetName = "Automatic Tip Dispenser"
 
 local playerID = Spring.GetMyPlayerID()
-local rank = playerID and select(9, Spring.GetPlayerInfo(playerID))
+local rank = playerID and select(9, Spring.GetPlayerInfo(playerID, false))
 
 function widget:GetInfo()
 	return {

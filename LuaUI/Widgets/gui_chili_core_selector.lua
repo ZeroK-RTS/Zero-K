@@ -121,7 +121,7 @@ for name in pairs(exceptionList) do
 	end
 end
 
-local function CheckHide()
+local function CheckHide(forceUpdate)
 	local spec = Spring.GetSpectatingState()
 	local showButtons, showBackground
 	if options.showCoreSelector.value == 'always' then
@@ -142,7 +142,7 @@ local function CheckHide()
 	if showBackground == showButtons then
 		mainBackground.SetVisible(showBackground)
 	end
-	mainBackground.UpdateSpecShowMode(showBackground ~= showButtons)
+	mainBackground.UpdateSpecShowMode(showBackground ~= showButtons, forceUpdate)
 end
 
 function widget:PlayerChanged()
@@ -166,6 +166,7 @@ local function ButtonHolderResize(self)
 		buttonCountLimit = buttonCountLimit + 1
 	end
 	
+	CheckHide(true)
 	buttonList.UpdateLayout()
 end
 
@@ -188,7 +189,7 @@ local defaultFacHotkeys = {
 }
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning'}
+options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
 options = { 
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -232,25 +233,25 @@ options = {
 		name = 'Track idle comms',
 		type = 'bool',
 		value = true,
-		noHotkey = true,	
+		noHotkey = true,
 	},
 	monitoridlenano = {
 		name = 'Track idle nanotowers',
 		type = 'bool',
 		value = true,
-		noHotkey = true,	
+		noHotkey = true,
 	},
 	monitorInbuiltCons = {
 		name = 'Track constructors being built',
 		type = 'bool',
 		value = false,
-		noHotkey = true,	
+		noHotkey = true,
 	},
 	leftMouseCenter = {
 		name = 'Swap Camera Center Button',
 		desc = 'When enabled left click a commander or factory to center the camera on it. When disabled right click centers.',
 		type = 'bool',
-		value = false,		
+		value = false,
 		noHotkey = true,
 	},
 	lblSelectionIdle = { type='label', name='Idle Units', path='Hotkeys/Selection', },
@@ -346,7 +347,16 @@ options = {
 		end,
 		hidden = true,
 		noHotkey = true,
-	}
+	},
+	leftsideofscreen = {  
+		name = 'Left side of screen',
+		type = 'number',
+		type = 'bool',
+		value = true,
+		hidden = true,
+		noHotkey = true,
+		OnChange = OptionsUpdateLayout,
+	},
 }
 
 
@@ -649,12 +659,11 @@ local function GetBackground(parent)
 		backgroundPanel:Invalidate()
 	end
 	
-	function externalFunctions.UpdateSpecShowMode(newSpecShowMode)
-		if newSpecShowMode == specShowMode then
+	function externalFunctions.UpdateSpecShowMode(newSpecShowMode, forceUpdate)
+		if (not forceUpdate) and (newSpecShowMode == specShowMode) then
 			return
 		end
 		specShowMode = newSpecShowMode
-		
 		if options.fancySkinning.value ~= "panel" then
 			externalFunctions.SetSkin(options.fancySkinning.value)
 		end
@@ -662,17 +671,18 @@ local function GetBackground(parent)
 		externalFunctions.UpdateSize()
 		if specShowMode then
 			externalFunctions.SetVisible(specShow)
-			if mainWindow.x < 100 then
+			if options.leftsideofscreen.value then
+				mainWindow.padding[1] = -1
 				mainWindow.padding[3] = 3
 			else
 				mainWindow.padding[1] = 3
+				mainWindow.padding[3] = -1
 			end
-			mainWindow:Invalidate()
 		else
 			mainWindow.padding[1] = -1
 			mainWindow.padding[3] = -1
-			mainWindow:Invalidate()
 		end
+		mainWindow:UpdateClientArea()
 	end
 	
 	function externalFunctions.UpdateSpecSpace(newSpecShow)
@@ -761,13 +771,14 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				width = "85%",
 				height = "85%",
 				max = 1,
-				caption = "",
+				caption = false,
+				noFont = true,
 				skin = nil,
 				skinName = 'default',
 				color = {0.7, 0.7, 0.4, 0.6},
 				backgroundColor = {1, 1, 1, 0.01},
-				parent = image,	
-			}	
+				parent = image,
+			}
 		end
 		buildProgress:SetValue(newProgress)
 	end
@@ -803,7 +814,8 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				width   = "100%",
 				height  = "15%",
 				max     = 1,
-				caption = "",
+				caption = false,
+				noFont = true,
 				color   = {0,0.8,0,1},
 				parent  = image,
 			}
@@ -1038,17 +1050,14 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 		end
 		
 		-- Update repeat
-		local states = Spring.GetUnitStates(unitID)
-		UpdateRepeat(states and states["repeat"])
+		UpdateRepeat(Spring.Utilities.GetUnitRepeat(unitID))
 		
 		-- Update tooltip
 		local queue = Spring.GetFullBuildQueue(unitID) or {}
 		local constructionCount = 0
 		for i = 1, #queue do
-			for udid, num in pairs(queue[i]) do
-				constructionCount = constructionCount + num
-				break
-			end
+			local udid, num = next(queue[i])
+			constructionCount = constructionCount + num
 		end
 		
 		UpdateTooltip(constructionCount)
@@ -1384,9 +1393,9 @@ local function GetButtonListHandler(buttonBackground)
 			button.Destroy()
 		end
 		buttons = {}
-	    buttonMap = {}
-	    buttonList = {}
-	    buttonCount = 0
+		buttonMap = {}
+		buttonList = {}
+		buttonCount = 0
 		buttonBackground.UpdateSize(buttonCount)
 	end
 	
@@ -1501,8 +1510,8 @@ local function HasDoubleCommand(unitID, cmdID)
 		if cmdsLen == 0 then -- Occurs in the case of SELFD
 			return true
 		elseif cmdsLen == 1 then
-			local cmds = Spring.GetCommandQueue(unitID,1)
-			return cmds[1].id == CMD.WAIT
+			local cmdID = Spring.GetUnitCurrentCommand(unitID)
+			return cmdID == CMD.WAIT
 		end
 	end
 	return false
@@ -1537,7 +1546,7 @@ end
 -- Initialization
 
 local function InitializeUnits()
-	if Spring.GetGameFrame() > 1 and myTeamID then
+	if myTeamID then
 		local buttonList = Spring.GetTeamUnits(myTeamID)
 		for _,unitID in pairs(buttonList) do
 			local unitDefID = spGetUnitDefID(unitID)
@@ -1657,9 +1666,9 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		if not bQueue[1] then  --- has no build queue
 			local _, _, _, _, buildProg = spGetUnitHealth(unitID)
 			if not ud.isFactory then
-				local cQueue = Spring.GetCommandQueue(unitID, 1)
+				local cQueue = Spring.GetCommandQueue(unitID, 0)
 				--Spring.Echo("Con "..unitID.." queue "..tostring(cQueue[1]))
-				if not cQueue[1] then
+				if cQueue == 0 then
 					--Spring.Echo("\tCon "..unitID.." must be idle")
 					widget:UnitIdle(unitID, unitDefID, myTeamID)
 				end

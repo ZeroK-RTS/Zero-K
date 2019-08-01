@@ -31,7 +31,8 @@ function gadget:GetInfo()
 		date      = "2 September 2009",
 		license   = "GPL v2",
 		layer     = 0,
-		enabled   = true --  loaded by default?
+		enabled   = true, --  loaded by default?
+		script    = true,
 	}
 end
 
@@ -108,6 +109,8 @@ local co_create = coroutine.create
 local co_resume = coroutine.resume
 local co_yield = coroutine.yield
 local co_running = coroutine.running
+
+local debugMode = false
 
 local bit_and = math.bit_and
 local floor = math.floor
@@ -253,6 +256,10 @@ end
 local function WakeUp(thread, ...)
 	thread.container = nil
 	local co = thread.thread
+	if debugMode and not co then
+		Spring.Echo("Error in WakeUp", thread.unitID)
+		Spring.Utilities.UnitEcho(thread.unitID, UnitDefs[Spring.GetUnitDefID(thread.unitID)].name)
+	end
 	local good, err = co_resume(co, ...)
 	if (not good) then
 		Spring.Log(section, LOG.ERROR, err)
@@ -396,6 +403,10 @@ end
 
 function Spring.UnitScript.StartThread(fun, ...)
 	local activeUnit = GetActiveUnit()
+	if debugMode and not fun then
+		Spring.Echo("Error in StartThread", activeUnit.unitID)
+		Spring.Utilities.UnitEcho(activeUnit.unitID, UnitDefs[Spring.GetUnitDefID(activeUnit.unitID)].name)
+	end
 	local co = co_create(fun)
 	-- signal_mask is inherited from current thread, if any
 	local thd = co_running() and activeUnit.threads[co_running()]
@@ -546,9 +557,18 @@ local function LoadScript(scriptName, filename)
 	return chunk
 end
 
+local function ToggleScriptDebug(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then 
+		return
+	end
+	
+	debugMode = not debugMode
+	Spring.Echo("Script debug mode", debugMode)
+end
 
 function gadget:Initialize()
 	Spring.Log(section, LOG.INFO, string.format("Loading gadget: %-18s  <%s>", ghInfo.name, ghInfo.basename))
+	gadgetHandler:AddChatAction("scriptdebug", ToggleScriptDebug, "Toggles script debug output.")
 
 	-- This initialization code has following properties:
 	--  * all used scripts are loaded => early syntax error detection
@@ -618,6 +638,27 @@ local function Wrap_AimWeapon(unitID, callins)
 	end
 end
 
+local function Wrap_EndBurst(unitID, unitDefID, callins)
+	local EndBurst = callins.EndBurst
+
+	callins.EndBurst = function(weaponNum)
+		scriptCallins:ScriptEndBurst(unitID, unitDefID, weaponNum)
+		if EndBurst then
+			return StartThread(EndBurst, weaponNum)
+		end
+	end
+end
+
+local function Wrap_FireWeapon(unitID, unitDefID, callins)
+	local FireWeapon = callins.FireWeapon
+
+	callins.FireWeapon = function(weaponNum)
+		scriptCallins:ScriptFireWeapon(unitID, unitDefID, weaponNum)
+		if FireWeapon then
+			return StartThread(FireWeapon, weaponNum)
+		end
+	end
+end
 
 local function Wrap_AimShield(unitID, callins)
 	local AimShield = callins["AimShield"]
@@ -782,6 +823,8 @@ function gadget:UnitCreated(unitID, unitDefID)
 	Wrap_AimWeapon(unitID, callins)
 	Wrap_AimShield(unitID, callins)
 	Wrap_Killed(unitID, callins)
+	Wrap_EndBurst(unitID, unitDefID, callins)
+	Wrap_FireWeapon(unitID, unitDefID, callins)
 
 	-- Wrap everything so activeUnit get's set properly.
 	for k,v in pairs(callins) do

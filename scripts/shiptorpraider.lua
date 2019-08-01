@@ -58,7 +58,7 @@ end
 local function StunThread ()
 	disarmed = true
 	Signal (SIG_Aim)
-	StopTurn (turretMain, y_axis)
+	GG.PieceControl.StopTurn (turretMain, y_axis)
 end
 
 local function UnstunThread ()
@@ -80,7 +80,7 @@ end
 
 function script.Create()
 	StartThread(MoveScript)
-	StartThread(SmokeUnit, {body_001, turretMain})
+	StartThread(GG.Script.SmokeUnit,  {body_001, turretMain})
 end
 
 function script.AimFromWeapon(id)
@@ -136,7 +136,7 @@ function script.Killed(severity, health)
 
 	for i = 1, #explodables do
 		if (math.random() < severity) then
-			Explode (explodables[i], sfxFall + sfxFire + sfxSmoke)
+			Explode (explodables[i], SFX.FALL + SFX.FIRE + SFX.SMOKE)
 		end
 		Explode(skid, sfxShatter)
 	end

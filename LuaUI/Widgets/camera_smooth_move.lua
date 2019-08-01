@@ -78,11 +78,7 @@ function widget:Update(dt)
 		local flip = -cs.flipped
 		-- simple, forward and right are locked
 		cs.px = cs.px + (speed * flip * (x - mx))
-		if (false) then
-			cs.py = cs.py + (speed * flip * (my - y))
-		else
-			cs.pz = cs.pz + (speed * flip * (my - y))
-		end
+		cs.pz = cs.pz + (speed * flip * (my - y))
 	else
 		-- forward, up, right, top, bottom, left, right
 		local camVecs = spGetCameraVectors()

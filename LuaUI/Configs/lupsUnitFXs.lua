@@ -350,6 +350,14 @@ effectUnitDefs = {
 	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },		
 	},
+	planelightscout = {
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=1.8, length=15, piece="exhaustl", onActive=true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=1.8, length=15, piece="exhaustr", onActive=true}},
+		{class='Ribbon', options={width=1, size=6, piece="wingtipl"}},
+		{class='Ribbon', options={width=1, size=6, piece="wingtipr"}},
+	--{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
+	--{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },		
+	},
 	gunshipassault = {
 		{class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Lengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
 		{class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Rengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},

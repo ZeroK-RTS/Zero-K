@@ -260,8 +260,6 @@ local hotkeysMiscPath = 'Hotkeys/Misc'
 	ShButton(hotkeysMiscPath, 'Pause/Unpause', 'pause', nil, nil, imgPath .. 'epicmenu/media_playback_pause.png')
 		ShButton(hotkeysMiscPath, 'Increase Speed', 'speedup')
 		ShButton(hotkeysMiscPath, 'Decrease Speed', 'slowdown')
-		ShButton(hotkeysMiscPath, 'Fast Camera Movement', 'movefast', "Increased camera speed while this key is held.", nil, nil, nil, true)
-		ShButton(hotkeysMiscPath, 'Slow Camera Movement', 'moveslow', "Decreased camera speed while this key is held.", nil, nil, nil, true)
 		
 	--ShLabel(hotkeysMiscPath, '')
 	ShButton(hotkeysMiscPath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
@@ -325,6 +323,8 @@ local camerHotkeys = 'Hotkeys/Camera'
 	ShButton(camerHotkeys, 'Move Left', 'moveleft')
 	ShButton(camerHotkeys, 'Move Right', 'moveright')
 	ShLabel(camerHotkeys, '')
+	ShButton(camerHotkeys, 'Fast Camera Movement', 'movefast', "Increased camera speed while this key is held.", nil, nil, nil, true)
+	ShButton(camerHotkeys, 'Slow Camera Movement', 'moveslow', "Decreased camera speed while this key is held.", nil, nil, nil, true)
 	ShButton(camerHotkeys, 'Overview Mode', 'toggleoverview')
 	ShButton(camerHotkeys, 'Track unit', 'track')
 	ShButton(camerHotkeys, 'Flip the Camera', 'viewtaflip')
@@ -432,6 +432,7 @@ local pathMisc = 'Settings/Misc'
 			Spring.SetConfigInt("ZKuseOldChili", value); --store in Springsettings.txt because api_chili.lua must read it independent of gui_epicmenu.lua
 		end,
 	})
+	ShButton(pathMisc, 'Toggle Redraw Tracker', function() spSendCommands{"luaui togglewidget Chili Redraw Tracker"} end, '', true)
 	ShButton(pathMisc, 'Toggle Widget Profiler', function() spSendCommands{"luaui togglewidget WidgetProfiler"} end, '', true)
 	ShButton(pathMisc, 'Toggle New Widget Profiler', function() spSendCommands{"luaui togglewidget Widget Profiler New"} end, '', true)
 
@@ -567,14 +568,17 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	ShLabel(pathUnitVisiblity, 'Unit Visibility Widgets')
 	ShButton(pathUnitVisiblity,'Toggle Unit Halos', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
 	
-	local pathSpotter = 'Settings/Graphics/Unit Visibility/Spotter'
-		ShButton(pathSpotter, 'Toggle Unit Spotter', function() spSendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
-	local pathPlatter = 'Settings/Graphics/Unit Visibility/Platter'
-		ShButton(pathPlatter, 'Toggle Unit Platter', function() spSendCommands{"luaui togglewidget Fancy Teamplatter"} end, "Puts a team-coloured platter-halo below units.")
+	--local pathSpotter = 'Settings/Graphics/Unit Visibility/Spotter'
+	--	ShButton(pathSpotter, 'Toggle Unit Spotter', function() spSendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
+	--local pathPlatter = 'Settings/Graphics/Unit Visibility/Platter'
+	--	ShButton(pathPlatter, 'Toggle Unit Platter', function() spSendCommands{"luaui togglewidget Fancy Teamplatter"} end, "Puts a team-coloured platter-halo below units.")
 	local pathXrayShader = 'Settings/Graphics/Unit Visibility/XRay Shader'
 		ShButton(pathXrayShader, 'Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
 	local pathUnitOutline = 'Settings/Graphics/Unit Visibility/Outline'
-		ShButton(pathUnitOutline, 'Toggle Unit Outline', function() spSendCommands{"luaui togglewidget Outline"} end, "Highlights edges of units")
+		ShButton(pathUnitOutline, 'Toggle Unit Outline', function()
+				spSendCommands{"luaui disablewidget Outline No Shader"}
+				spSendCommands{"luaui togglewidget Outline Shader"}
+			end, "Highlights edges of units")
 
 
 local pathAudio = 'Settings/Audio'

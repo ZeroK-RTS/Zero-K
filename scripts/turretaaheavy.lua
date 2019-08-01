@@ -27,7 +27,7 @@ end
 
 function script.Create()
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(IdleAnim)
 end
 
@@ -64,14 +64,14 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .5) then
-		Explode(base, sfxNone)
-		Explode(turret, sfxNone)
-		Explode(barrel, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(barrel, SFX.NONE)
 		return 1 -- corpsetype
 	else		
-		Explode(base, sfxShatter)
-		Explode(turret, sfxSmoke + sfxFire)
-		Explode(barrel, sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, SFX.SHATTER)
+		Explode(turret, SFX.SMOKE + SFX.FIRE)
+		Explode(barrel, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2 -- corpsetype
 	end
 end

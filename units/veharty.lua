@@ -81,12 +81,12 @@ unitDef = {
         reaim_time = 8, -- COB
         damage_vs_shield = [[220]],
         damage_vs_feature = [[220]],
-		spawns_name = "wolverine_mine",
-		spawns_expire = 60,
-		
-		light_radius = 0,
+        spawns_name = "wolverine_mine",
+        spawns_expire = 60,
+        
+        light_radius = 0,
       },
-	  
+      
       damage                  = {
         default = 20,
         planes  = 20,

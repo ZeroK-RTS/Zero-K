@@ -20,12 +20,14 @@ local rim2 = piece 'rim2'
 include "constants.lua"
 include "pieceControl.lua"
 include "rockPiece.lua"
+local dynamicRockData
 
 local shootCycle = 0
 local gunHeading = 0
 local closed = true
 local stuns = {false, false, false}
 local disarmed = false
+local hpi = math.pi*0.5
 
 -- Tasks for open/close state
 local TASK_NEUTRAL = 0
@@ -75,7 +77,7 @@ local rockData = {
 }
 
 ----------------------------------------------------------
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local CMD_UNIT_CANCEL_TARGET = Spring.Utilities.CMD.UNIT_CANCEL_TARGET
 local firestate = 0
 local firstTime = true
 
@@ -108,8 +110,8 @@ end
 
 --[[
 function script.HitByWeapon(x, z, weaponID, damage)
-	StartThread(Rock, z_axis, false, x*ROCK_DAMGE_MULT*damage)
-	StartThread(Rock, x_axis, false, -z*ROCK_DAMGE_MULT*damage)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], false, x*ROCK_DAMGE_MULT*damage)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], false, -z*ROCK_DAMGE_MULT*damage)
 end
 ]]
 
@@ -138,10 +140,10 @@ end
 
 function script.Create()
 	Hide(ground1)
-	StartThread(SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (100)
 	end
@@ -202,8 +204,8 @@ local function StunThread()
 	disarmed = true
 	Signal(SIG_AIM)
 
-	StopTurn(gun, x_axis)
-	StopTurn(gun, y_axis)
+	GG.PieceControl.StopTurn(gun, x_axis)
+	GG.PieceControl.StopTurn(gun, y_axis)
 end
 
 local function UnstunThread()
@@ -265,8 +267,8 @@ end
 
 
 function script.FireWeapon(num)
-	StartThread(Rock, z_axis, gunHeading, ROCK_FIRE_FORCE)
-	StartThread(Rock, x_axis, gunHeading - hpi, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], gunHeading - hpi, ROCK_FIRE_FORCE)
 	EmitSfx(flareMap[shootCycle], 1025)
 	shootCycle = (shootCycle + 1) % 2
 end
@@ -274,21 +276,21 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
-		Explode(base, sfxNone)
-		Explode(door1, sfxNone)
-		Explode(door2, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(door1, SFX.NONE)
+		Explode(door2, SFX.NONE)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(base, sfxNone)
-		Explode(door1, sfxNone)
-		Explode(door2, sfxNone)
-		Explode(rim1, sfxShatter)
-		Explode(rim2, sfxShatter)
+		Explode(base, SFX.NONE)
+		Explode(door1, SFX.NONE)
+		Explode(door2, SFX.NONE)
+		Explode(rim1, SFX.SHATTER)
+		Explode(rim2, SFX.SHATTER)
 		return 1
 	end
-	Explode(door1, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(door2, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(rim1, sfxShatter)
-	Explode(rim2, sfxShatter)
+	Explode(door1, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(door2, SFX.SMOKE + SFX.FALL + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rim1, SFX.SHATTER)
+	Explode(rim2, SFX.SHATTER)
 	return 2
 end

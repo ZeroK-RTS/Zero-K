@@ -90,8 +90,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 20,
-        planes  = 20,
+        default = 30,
+        planes  = 30,
         subs    = 0.1,
       },
 
@@ -100,12 +100,12 @@ unitDef = {
         lups_explodespeed = 1,
         lups_explodelife = 0.6,
         nofriendlyfire = 1,
-        timeslow_damagefactor = 3.75,
+        timeslow_damagefactor = 3,
       },
 
       edgeeffectiveness       = 1,
       explosionGenerator      = [[custom:NONE]],
-      explosionSpeed          = 11,
+      explosionSpeed          = 12,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,

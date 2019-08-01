@@ -181,8 +181,7 @@ return {
       class              = [[CExpGenSpawner]],
       count              = 1,
       water              = true,
-	  underwater		 = true,
-	  underwater		 = true,
+      underwater         = true,
       properties = {
         delay              = 25,
         dir                = [[dir]],
@@ -207,8 +206,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       water              = true,
-	  underwater		 = true,
-	  underwater		 = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.99,
         alwaysvisible      = true,

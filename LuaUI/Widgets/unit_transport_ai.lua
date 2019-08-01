@@ -260,25 +260,14 @@ function IsDisembark(cmd)
 	return false
 end
 
+local CMD_OPT_ALT = CMD.OPT_ALT
 function IsWaitCommand(unitID)
-	local queue = spGetCommandQueue(unitID, 1);
-	local alt
-	if queue and queue[1] then
-		alt = ExtractModifiedOptions(queue[1].options)
-	end
-	if (queue and queue[1] and queue[1].id == CMD.WAIT and not (queue[1].options.alt or alt)) then
-		return true
-	end
-	return false
+	local cmdID, cmdOpts = Spring.GetUnitCurrentCommand(unitID)
+	return cmdID == CMD.WAIT and (cmdOpts % (2*CMD_OPT_ALT) < CMD_OPT_ALT)
 end
 
 function IsIdle(unitID)
-	local queue = spGetCommandQueue(unitID, 1)
-	if (queue == nil or #queue==0) then
-		return true
-	else
-		return false
-	end
+	return spGetCommandQueue(unitID, 0) == 0
 end
 
 function GetToPickTransport(unitID)
@@ -644,7 +633,7 @@ function StopCloseUnits() -- stops dune units which are close to transport
 end
 
 function widget:Initialize()
-	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID())
+	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID(), false)
 	 if spec then
 		widgetHandler:RemoveWidget(widget)
 		return false
@@ -772,8 +761,8 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 		spGiveOrderToUnit(unitID, x[1], x[2], x[3])
 	end
 	storedQueue[unitID] = nil
-	local queue = spGetCommandQueue(unitID, 1)
-	if (queue and queue[1] and queue[1].id == CMD.WAIT) then
+	local cmdID = Spring.GetUnitCurrentCommand(unitID)
+	if cmdID == CMD.WAIT then
 		-- workaround: clears wait order if STOP fails to do so
 		spGiveOrderToUnit(unitID, CMD.WAIT, EMPTY_TABLE, 0)
 	end 
@@ -884,8 +873,8 @@ function AssignTransports(transportID, unitID, guardID, guardOnly)
 		if guardID then
 			for id, def in pairs(allMyTransports) do
 				if CanTransport(id, unitID) and IsTransportable(unitDefID, unitID) then
-					local queue = spGetCommandQueue(id, 1)
-					if queue and queue[1] and queue[1].id == CMD.GUARD and queue[1].params[1] == guardID then
+					local cmdID, _, _, cmdParam = Spring.GetUnitCurrentCommand(id)
+					if cmdID == CMD.GUARD and cmdParam == guardID then
 						local benefit = GetTransportBenefit(unitID, pathLength, id, def, unitspeed, unitmass, priorityState)
 						if benefit then
 							toGuard[id] = guardID

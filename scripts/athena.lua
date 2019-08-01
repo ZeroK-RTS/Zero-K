@@ -30,7 +30,7 @@ local function BuildDecloakThread()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
@@ -93,17 +93,17 @@ function script.Killed(recentDamage, maxHealth)
 	if severity <= 0.25 then
 		return 1
 	elseif severity <= 0.5 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
-		Explode(enginel, sfxFall + sfxFire)
-		Explode(enginer, sfxFall + sfxFire)
+		Explode(enginel, SFX.FALL + SFX.FIRE)
+		Explode(enginer, SFX.FALL + SFX.FIRE)
 		return 1
 	else
-		Explode(fuselage, sfxFall)
-		Explode(head, sfxFall)
-		Explode(wingl, sfxFall)
-		Explode(wingr, sfxFall)
-		Explode(enginel, sfxFall + sfxSmoke + sfxFire)
-		Explode(enginer, sfxFall + sfxSmoke + sfxFire)
-		Explode(lathe, sfxFall + sfxSmoke + sfxFire)
+		Explode(fuselage, SFX.FALL)
+		Explode(head, SFX.FALL)
+		Explode(wingl, SFX.FALL)
+		Explode(wingr, SFX.FALL)
+		Explode(enginel, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(enginer, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(lathe, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	end
 end

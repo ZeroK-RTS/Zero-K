@@ -56,8 +56,6 @@ local strFormat 				= string.format
 
 local echo = Spring.Echo
 
-local LOS_MULT = (Spring.Utilities.IsCurrentVersionNewerThan(100, 0) and 1) or 32
-
 local VFSMODE      = VFS.RAW_FIRST
 local ignoreweapon, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFSMODE)
 local confdata = VFS.Include(LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua", nil, VFSMODE)
@@ -273,7 +271,7 @@ local players = Spring.GetPlayerList()
 for i = 1, #players do
 	local customkeys = select(10, Spring.GetPlayerInfo(players[i]))
 	if customkeys.lobbyid then
-		lobbyIDs[customkeys.lobbyid] = select(1, Spring.GetPlayerInfo(players[i]))
+		lobbyIDs[customkeys.lobbyid] = select(1, Spring.GetPlayerInfo(players[i], false))
 	end
 end
 
@@ -507,52 +505,68 @@ local function weapons2Table(cells, ws, unitID)
 
 		local mult = tonumber(cp.statsprojectiles) or ((tonumber(cp.script_burst) or wd.salvoSize) * wd.projectiles)
 
-		local dps_str, dam_str = '', ''
+		local dps_str, dam_str, shield_dam_str = '', '', ''
+		local damageTypes = 0
 		if dps > 0 then
 			dam_str = dam_str .. numformat(dam,2)
-			if wd.customParams.stats_damage_per_second then
+			shield_dam_str = shield_dam_str .. numformat(dam,2)
+			if cp.stats_damage_per_second then
 				dps_str = dps_str .. numformat(tonumber(cp.stats_damage_per_second),2)
 			else
 				dps_str = dps_str .. numformat(dps*mult,2)
 			end
+			damageTypes = damageTypes + 1
 		end
 		if dpsw > 0 then
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
+				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorCyan) .. numformat(damw,2) .. " (P)\008"
+			shield_dam_str = shield_dam_str .. color2incolor(colorCyan) .. numformat(math.floor(damw / 3),2) .. " (P)\008"
 			dps_str = dps_str .. color2incolor(colorCyan) .. numformat(dpsw*mult,2) .. " (P)\008"
+			damageTypes = damageTypes + 1
 		end
 		if dpss > 0 then
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
+				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorPurple) .. numformat(dams,2) .. " (S)\008"
+			shield_dam_str = shield_dam_str .. color2incolor(colorPurple) .. numformat(math.floor(dams / 3),2) .. " (S)\008"
 			dps_str = dps_str .. color2incolor(colorPurple) .. numformat(dpss*mult,2) .. " (S)\008"
+			damageTypes = damageTypes + 1
 		end
 
 		if dpsd > 0 then
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
+				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorDisarm) .. numformat(damd,2) .. " (D)\008"
+			shield_dam_str = shield_dam_str .. color2incolor(colorDisarm) .. numformat(math.floor(damd / 3),2) .. " (D)\008"
 			dps_str = dps_str .. color2incolor(colorDisarm) .. numformat(dpsd*mult,2) .. " (D)\008"
+			damageTypes = damageTypes + 1
 		end
 
 		if dpsc > 0 then
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
+				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorCapture) .. numformat(damc,2) .. " (C)\008"
+			shield_dam_str = shield_dam_str .. color2incolor(colorCapture) .. numformat(damc,2) .. " (C)\008"
 			dps_str = dps_str .. color2incolor(colorCapture) .. numformat(dpsc*mult,2) .. " (C)\008"
+			damageTypes = damageTypes + 1
 		end
 
 		if mult > 1 then
 			dam_str = dam_str .. " x " .. mult
+			shield_dam_str = shield_dam_str .. " x " .. mult
 		end
 		
 		local show_damage = not cp.stats_hide_damage
@@ -572,7 +586,7 @@ local function weapons2Table(cells, ws, unitID)
 			show_dps = false
 		end
 		
-		if cp.damage_vs_shield then -- Badger
+		if cp.damage_vs_shield and cp.spawns_name then -- Badger
 			dam_str = tostring(cp.damage_vs_shield) .. " (" .. dam .. " + " .. (tonumber(cp.damage_vs_shield)-dam) .. " mine)"
 			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield)/reloadtime))
 		end
@@ -581,22 +595,32 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ' - Damage:'
 			cells[#cells+1] = dam_str
 		end
-		if show_reload then
+
+		-- shield damage
+		if (wd.interceptedByShieldType ~= 0) and show_damage then
+			if cp.damage_vs_shield then
+				cells[#cells+1] = ' - Shield damage:'
+				cells[#cells+1] = numformat(cp.stats_shield_damage)
+			elseif tonumber(cp.stats_shield_damage) ~= dam then
+				cells[#cells+1] = ' - Shield damage:'
+				if damageTypes > 1 or mult > 1 then
+					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage * mult), 2) .. " (" .. shield_dam_str .. ")"
+				else
+					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage * mult), 2)
+				end
+			end
+		end
+		
+		if cp.post_capture_reload then
+			cells[#cells+1] = ' - Reloadtime:'
+			cells[#cells+1] = numformat (tonumber(cp.post_capture_reload)/30,2) .. 's'
+		elseif show_reload then
 			cells[#cells+1] = ' - Reloadtime:'
 			cells[#cells+1] = numformat (reloadtime,2) .. 's'
 		end
 		if show_dps then
 			cells[#cells+1] = ' - DPS:'
 			cells[#cells+1] = dps_str
-		end
-		
-		local lowerName = name:lower()
-		if lowerName:find("flamethrower") or lowerName:find("flame thrower") then
-			cells[#cells+1] = ' - Shield damage:'
-			cells[#cells+1] = "300%"
-		elseif lowerName:find("gauss") then
-			cells[#cells+1] = ' - Shield damage:'
-			cells[#cells+1] = "150%"
 		end
 
 		if (wd.interceptedByShieldType == 0) then
@@ -1044,18 +1068,16 @@ local function printAbilities(ud, unitID)
 	end
 
 	if cp.windgen then
-		local ground_extreme = Spring.GetGameRulesParam("WindGroundExtreme") or 1
 		local wind_slope = Spring.GetGameRulesParam("WindSlope") or 0
 		local max_wind = Spring.GetGameRulesParam("WindMax") or 2.5
-		local bonus_per_elmo = max_wind * wind_slope / ground_extreme
-		local bonus_100 = numformat(100*bonus_per_elmo)
+		local bonus_100 = numformat(100*wind_slope*max_wind)
 
 		cells[#cells+1] = 'Generates energy from wind'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Variable income'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Max wind:' 
-		cells[#cells+1] = max_wind
+		cells[#cells+1] = max_wind .. " E"
 		cells[#cells+1] = ' - Altitude bonus:'
 		cells[#cells+1] = bonus_100 .. " E / 100 height"
 		cells[#cells+1] = ''
@@ -1387,9 +1409,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	
 	if ud.losRadius > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*LOS_MULT) .. " elmo", textColor = color.stats_fg, }
-		-- 32 is to offset the engine multiplier, which is
-		-- (modInfo.losMul / (SQUARE_SIZE * (1 << modInfo.losMipLevel)))
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if (ud.sonarRadius > 0) then
@@ -1579,7 +1599,7 @@ local function tooltipBreakdown(tooltip)
 		local ud = name and UnitDefNames[name]
 		return ud or false
 	elseif tooltip:find('Morph', 1, true) == 1 then
-		local unitHumanName = tooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \-]', '')
+		local unitHumanName = tooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \\-]', '')
 		local udef = GetUnitDefByHumanName(unitHumanName)
 		return udef or false
 			
@@ -1778,8 +1798,8 @@ local function MakeUnitContextMenu(unitID,x,y)
 	if not ud then return end
 	local alliance 		= spGetUnitAllyTeam(unitID)
 	local team			= spGetUnitTeam(unitID)
-	local _, player 	= spGetTeamInfo(team)
-	local playerName 	= spGetPlayerInfo(player) or 'noname'
+	local _, player 	= spGetTeamInfo(team, false)
+	local playerName 	= spGetPlayerInfo(player, false) or 'noname'
 	local teamColor 	= {spGetTeamColor(team)}
 		
 	local window_width = 200

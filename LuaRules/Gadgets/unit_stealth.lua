@@ -32,12 +32,15 @@ function gadget:GetInfo()
   }
 end
 
+local spSetUnitStealth = Spring.SetUnitStealth
+local spSetUnitSonarStealth = Spring.SetUnitSonarStealth
+
 function gadget:UnitCloaked(unitID)
-	Spring.SetUnitStealth(unitID, true)
-	Spring.SetUnitSonarStealth(unitID, true)
+	spSetUnitStealth(unitID, true)
+	spSetUnitSonarStealth(unitID, true)
 end
 
 function gadget:UnitDecloaked(unitID)
-	Spring.SetUnitStealth(unitID, false)
-	Spring.SetUnitSonarStealth(unitID, false)
+	spSetUnitStealth(unitID, false)
+	spSetUnitSonarStealth(unitID, false)
 end

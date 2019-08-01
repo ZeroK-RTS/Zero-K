@@ -36,7 +36,7 @@ end
 
 function script.FireWeapon(num)
 	shotCycle = 1 - shotCycle
-	EmitSfx(flare[shotCycle], UNIT_SFX3)
+	EmitSfx(flare[shotCycle], GG.Script.UNIT_SFX3)
 end
 
 function script.BlockShot(num)

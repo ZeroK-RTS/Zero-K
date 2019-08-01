@@ -33,12 +33,12 @@ local function openDoors()
 	Signal(SIG_OPENDOORS)
 	SetSignalMask(SIG_OPENDOORS)
 	
-	Turn(lUpperCl1,z_axis, rad(-140),6)
-	Turn(rUpperCl1,z_axis, rad(140), 6)
+	Turn(lUpperCl1,z_axis, math.rad(-140),6)
+	Turn(rUpperCl1,z_axis, math.rad(140), 6)
 	Sleep(100)
 									 
-	Turn(lUpperCl2,z_axis, rad(-140),6)	
-	Turn(rUpperCl2,z_axis, rad(140), 6)
+	Turn(lUpperCl2,z_axis, math.rad(-140),6)	
+	Turn(rUpperCl2,z_axis, math.rad(140), 6)
 	WaitForTurn(lUpperCl1, z_axis) 
 	WaitForTurn(rUpperCl1, z_axis) 
 	WaitForTurn(lUpperCl2, z_axis)
@@ -50,12 +50,12 @@ end
 function closeDoors()
 	Signal(SIG_CLOSEDOORS)
 	SetSignalMask(SIG_CLOSEDOORS)
-	Turn(lUpperCl1,z_axis, rad(0),4)
-	Turn(rUpperCl1,z_axis, rad(0),4)
+	Turn(lUpperCl1,z_axis, math.rad(0),4)
+	Turn(rUpperCl1,z_axis, math.rad(0),4)
 	Sleep(100)
 
-	Turn(lUpperCl2,z_axis, rad(0),4)	
-	Turn(rUpperCl2,z_axis, rad(0),4)
+	Turn(lUpperCl2,z_axis, math.rad(0),4)	
+	Turn(rUpperCl2,z_axis, math.rad(0),4)
 
 	WaitForTurn(lUpperCl1, z_axis)
 	WaitForTurn(rUpperCl1, z_axis)	
@@ -215,7 +215,7 @@ function script.BeginTransport(passengerID)
 	end
 	Move(link, y_axis, -Spring.GetUnitHeight(passengerID), nil, true)
 	
-	if not TransportAllowed(passengerID) then
+	if not GG.TransportAllowed(passengerID) then
 		Sleep(10)
 		unitLoaded = passengerID
 		ForceDropUnit()
@@ -235,7 +235,7 @@ end
 
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(PickupAndDropFixer)
 end
 
@@ -268,19 +268,19 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
-		Explode(base, sfxNone)
+		Explode(base, SFX.NONE)
 		return 1
 	elseif severity <= 0.50 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
-		Explode(base, sfxShatter)
+		Explode(base, SFX.SHATTER)
 		return 1
 	elseif severity <= 0.75 then
-		Explode(base, sfxShatter)
+		Explode(base, SFX.SHATTER)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(lLowerCl1, sfxFall + sfxSmoke + sfxFire)
-		Explode(rLowerCl1, sfxFall + sfxSmoke + sfxFire)
-		Explode(lUpperCl2, sfxFall + sfxSmoke + sfxFire)
-		Explode(rUpperCl2, sfxFall + sfxSmoke + sfxFire)
+		Explode(base, SFX.SHATTER)
+		Explode(lLowerCl1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(rLowerCl1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(lUpperCl2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(rUpperCl2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 	end
 end

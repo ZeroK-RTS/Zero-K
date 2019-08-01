@@ -29,14 +29,8 @@ local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
 
 local min = math.min
 
-local devCompatibility = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-if not Spring.SetUnitMidAndAimPos then
-	return
-end
 
 local FULL_GROW = 0.4
 local UPDATE_FREQUENCY = 25
@@ -122,10 +116,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	local ud = UnitDefs[unitDefID]
 	
-	local midTable = ud
-	if devCompatibility then
-		midTable = ud.model
-	end
+	local midTable = ud.model
 	
 	local mid, aim
 	

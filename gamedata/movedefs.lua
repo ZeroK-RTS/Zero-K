@@ -203,7 +203,7 @@ local moveDefs = {
 		--slopemod = 60,
 		crushstrength = 150,
 	},
-	
+
 	BOAT3 = {
 		footprintx = 3,
 		footprintz = 3,

@@ -210,7 +210,6 @@ local spGetFeaturePosition	= Spring.GetFeaturePosition
 local spGetFeaturesInCylinder = Spring.GetFeaturesInCylinder
 local spGetAllFeatures		= Spring.GetAllFeatures
 local spGetLocalPlayerID	= Spring.GetLocalPlayerID
-local spGetPlayerInfo		= Spring.GetPlayerInfo
 local spGetSpectatingState	= Spring.GetSpectatingState
 local spGetModKeyState		= Spring.GetModKeyState
 local spGetKeyState			= Spring.GetKeyState
@@ -356,8 +355,7 @@ function widget:Initialize()
 				allBuilders[uid] = {include=true} -- add it to the group of all workers
 				
 				if not nanoframe then -- and add any workers that aren't nanoframes to the active group
-					local cmd = GetFirstCommand(uid) -- find out if it already has any orders
-					if cmd and cmd.id then -- if so we mark it as drec
+					if spGetCommandQueue(uid, 0) ~= 0 then -- if so we mark it as drec
 						includedBuilders[uid] = {cmdtype=commandType.drec, unreachable={}}
 					else -- otherwise we mark it as idle
 						includedBuilders[uid] = {cmdtype=commandType.idle, unreachable={}}
@@ -849,7 +847,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		if options.separateConstructors.value then -- if constructor separator is enabled
 			local facDef = UnitDefs[spGetUnitDefID(builderID)]
 			local facScale -- how far our unit will be told to move
-			if IsEmpty(buildQueue) then -- if the queue is empty, we need to increase clearance to stop the fac from getting jammed with idle workers
+			if not next(buildQueue) then -- if the queue is empty, we need to increase clearance to stop the fac from getting jammed with idle workers
 				facScale = 350
 			elseif facDef.name == 'factoryship' then -- boatfac, needs a huge clearance
 				facScale = 250
@@ -881,8 +879,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	
 	-- add new workers to the active workers list if they're GBC-enabled.
 	if (allBuilders[unitID] and allBuilders[unitID].include) then
-		local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
-		if cmd and cmd.id then -- if so we mark it as drec
+		if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
 			includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
 		else -- otherwise we mark it as idle
 			includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
@@ -969,8 +966,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeam, unitTeam)
 	local ud = UnitDefs[unitDefID]
 	if ud.isMobileBuilder then -- if the new unit is a mobile builder
 		allBuilders[unitID] = {include=true}
-		local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
-		if cmd and cmd.id then -- if so we mark it as drec
+		if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
 			includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
 		else -- otherwise we mark it as idle
 			includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
@@ -1310,8 +1306,7 @@ function ApplyStateToggle()
 			if allBuilders[unitID].include then
 				local _,_,nanoframe = spGetUnitIsStunned(unitID)
 				if not includedBuilders[unitID] and not nanoframe then
-					local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
-					if cmd and cmd.id then -- if so we mark it as drec
+					if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
 						includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
 					else -- otherwise we mark it as idle
 						includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
@@ -1843,10 +1838,9 @@ function CheckIdlers()
 	for i=1, #idlers do
 		local unitID = idlers[i]
 		if includedBuilders[unitID] then -- we need to ensure that the unit hasn't died or left the group since it went idle, because this check is deferred
-			local cmd1 = GetFirstCommand(unitID) -- we need to check that the unit's command queue is empty, because other gadgets may invoke UnitIdle erroneously.
-			if ( cmd1 and cmd1.id) then 
+			-- we need to check that the unit's command queue is empty, because other gadgets may invoke UnitIdle erroneously.
 			-- if there's a command on the queue, do nothing and let it be removed from the idle list.
-			else -- otherwise if the unit is really idle
+			if spGetCommandQueue(unitID, 0) == 0 then
 				includedBuilders[unitID].cmdtype = commandType.idle -- then mark it as idle
 				if newBuilders[unitID] then -- for new units that have just been added and finished following their constructor separator orders.
 					newBuilders[unitID] = nil
@@ -2038,7 +2032,7 @@ function CleanOrders(cmd, isNew)
 						activeJobs[blockerID] = nil -- note this only stops a tiny space leak should a free starting fac be added to the queue
 						-- but it was cheap, so whatever.
 					end
-				elseif canBuildThisThere == blockageType.mobiles and includedBuilders[blockerID] and UnitDefs[blockerDefID].moveDef.id and (includedBuilders[blockerID].cmdtype == commandType.idle or includedBuilders[blockerID].cmdtype == commandType.buildQueue) and not IsEmpty(cmd.assignedUnits) then
+				elseif canBuildThisThere == blockageType.mobiles and includedBuilders[blockerID] and UnitDefs[blockerDefID].moveDef.id and (includedBuilders[blockerID].cmdtype == commandType.idle or includedBuilders[blockerID].cmdtype == commandType.buildQueue) and next(cmd.assignedUnits) then
 				-- if blocked by a mobile unit, and it's one of our constructors, and not a flying unit, and it's not under direct orders, and there's actually a worker assigned to the job...
 					local x,y,z = spGetUnitPosition(blockerID)
 					local dx, dz = GetNormalizedDirection(cx, cz, x, z) 
@@ -2185,8 +2179,6 @@ HOW THIS WORKS:
 		removal tool.
 	Distance()
 		Simple 2D distance calculation.
-	GetFirstCommand()
-		Returns the first command in a unit's queue, if there is one, otherwise nil.
 	BuildHash()
 		Takes a command (formatted for buildQueue) as input, and returns a unique identifier
 		to use as a hash table key. Allows duplicate jobs to be easily identified, and to easily
@@ -2389,20 +2381,6 @@ function GetNormalizedDirection(x1, z1, x2, z2)
 	x = x/d
 	z = z/d
 	return x, z
-end
-
--- determines if a table is empty, because lua does not provide a built in way to do that.
-function IsEmpty(table)
-	for _ in pairs(table) do
-		return false
-	end
-	return true
-end
-
---	Borrowed this from CarRepairer's Retreat.  Returns only first command in queue.
-function GetFirstCommand(unitID)
-	local queue = spGetCommandQueue(unitID, 1)
-	return queue[1]
 end
 
 --	Generate unique key value for each command using its parameters.

@@ -80,7 +80,7 @@ end
 --]]
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	--StartThread(SpinScienceThread)
 end
 
@@ -108,7 +108,7 @@ local function somersaultThread(jumpDuration)
 	jumpTuckInLegs(leftLeg)
 	jumpTuckInLegs(rightLeg)
 	
-	local speed = 4*pi/(9/16*jumpDuration/1000)
+	local speed = 4*math.pi/(9/16*jumpDuration/1000)
 	local accel = speed*(16/6)/(jumpDuration/1000)/30
 	
 	Spin(pelvis, x_axis, speed, accel)
@@ -145,7 +145,7 @@ function beginJump(turn,lineDist,flightDist,duration)
 	doingSomersault = math.random() < 0.15
 	
 	if doingSomersault then
-		StartThread(somersaultThread, duration*frameToMs)
+		StartThread(somersaultThread, duration*GG.Script.frameToMs)
 	end
 end
 
@@ -242,7 +242,7 @@ function Detonate() -- Giving an order causes recursion.
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode(box, sfxShatter + sfxSmoke)
+	Explode(box, SFX.SHATTER + SFX.SMOKE)
 	
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.5) then

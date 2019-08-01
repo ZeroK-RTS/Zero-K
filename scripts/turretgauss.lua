@@ -90,7 +90,7 @@ local function Close()
 	Move(barrel1,y_axis,1,2);
 	Move(barrel2,y_axis,1,2);
 	Move(barrel3,y_axis,1,2); 
-		
+	
 	Turn(wheel, x_axis, math.rad(-15),math.rad(90));
 	Turn(cannon, x_axis, math.rad(65),math.rad(90));
 	
@@ -128,10 +128,10 @@ function RestoreAfterDelay()
 	Sleep(restore_delay);
 	
 	repeat
-			local inactive = spGetUnitIsStunned(unitID)
-			if inactive then
-					Sleep(restore_delay)
-			end
+		local inactive = spGetUnitIsStunned(unitID)
+		if inactive then
+			Sleep(restore_delay)
+		end
 	until not inactive
 	
 	StartThread(Close);
@@ -151,10 +151,15 @@ end
 
 function script.Create()
 	is_open = true;
-		
+	
 	--StartThread(AimBlink);
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(RestoreAfterDelay);
+
+	Move(muzzleProxy, y_axis, 5)
+	Move(muzzleProxy, z_axis, 0.5)
+
+	Move(aimProxy, z_axis, -6)
 
 	Hide(legs);
 	for i = 1,6 do
@@ -181,7 +186,7 @@ end
 
 
 function script.QueryWeapon(n)
-	return (is_open and muzzle) or muzzleProxy
+	return muzzleProxy
 end
 
 function script.AimFromWeapon(n) 
@@ -235,12 +240,12 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 
 	if(pillarHeight > 0) then
-		Explode(legs, sfxShatter)
+		Explode(legs, SFX.SHATTER)
 	end
 
 	if(numPillars > 0) then
 		for i = 1, numPillars do
-			Explode(pillars[i],sfxShatter);
+			Explode(pillars[i],SFX.SHATTER);
 		end
 	end
 

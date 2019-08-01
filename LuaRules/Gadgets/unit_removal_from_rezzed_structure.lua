@@ -29,7 +29,7 @@ local spGetGroundHeight = Spring.GetGroundHeight
 local spGetGroundNormal = Spring.GetGroundNormal
 local spSetUnitPosition = Spring.SetUnitPosition
 local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
-local spGetUnitCommands = Spring.GetUnitCommands
+local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitHeight = Spring.GetUnitHeight
 local gameSquareSize = Game.squareSize
 
@@ -221,9 +221,8 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
     local uDef = UnitDefs[unitDefID]
-    if builderID then 
-        local command = spGetUnitCommands(builderID, 1)[1]
-        if command and command.id == CMD_RESURRECT and uDef.isImmobile and
+    if builderID then
+        if Spring.Utilities.GetUnitFirstCommand(builderID) == CMD_RESURRECT and uDef.isImmobile and
         uDef.name ~= "terraunit" then
             local ux1, uy1, uz1 = spGetUnitPosition(unitID)
             --local dimensions = spGetUnitDefDimensions(unitDefID)

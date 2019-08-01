@@ -36,9 +36,13 @@ function gadget:Initialize()
 				wantedWeaponList[#wantedWeaponList + 1] = wdid
 			end
 			if wd.customParams.single_hit_multi then
-				Script.SetWatchWeapon(wd.id, true)
 				singleHitMultiWeapon[wd.id] = true;
 				wantedWeaponList[#wantedWeaponList + 1] = wdid
+				if Script.SetWatchProjectile then
+					Script.SetWatchProjectile(wd.id, true)
+				else
+					Script.SetWatchWeapon(wd.id, true)
+				end
 			end
 		end
 	end
@@ -47,13 +51,13 @@ end
 
 function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 	if singleHitMultiWeapon[weaponID] then
-		singleHitProjectile[proID] = {};
+		singleHitProjectile[proID] = {}
 	end
 end	
 
 function gadget:ProjectileDestroyed(proID)
-	if singleHitMultiWeapon[proID] then -- apparently setwatchweapon is not per-gadget. sad but true.
-		singleHitProjectile[proID] = nil;
+	if singleHitMultiWeapon[proID] then
+		singleHitProjectile[proID] = nil
 	end
 end
 

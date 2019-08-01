@@ -19,7 +19,3 @@ function Spring.Utilities.getMovetypeByID(unitDefID)
 	end
 	return false
 end
-
-function Spring.Utilities.BlueprintFloat(ud)
-	return Spring.Utilities.IsCurrentVersionNewerThan(103, 289) and ud.floatOnWater 
-end

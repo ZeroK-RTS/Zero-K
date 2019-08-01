@@ -30,7 +30,7 @@ local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
-local spGetUnitCommands     = Spring.GetUnitCommands
+local spGetCommandQueue     = Spring.GetCommandQueue
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spGetUnitShieldState  = Spring.GetUnitShieldState
 
@@ -267,11 +267,11 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 				if frame < gameFrame then
 					incData.frames:TrimFront() --frames should come in ascending order, so it's safe to trim front of array one by one
 				else
-					local disarmDamage = data.disarmDamage
-					local fullDamage = data.fullDamage
+					local dataDisarmDamage = data.disarmDamage
+					local dataFullDamage = data.fullDamage
 
-					local disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
-					adjHealth = adjHealth - fullDamage
+					local disarmExtra = math.floor(dataDisarmDamage/adjHealth*DECAY_FRAMES)
+					adjHealth = adjHealth - dataFullDamage
 
 					disarmFrame = disarmFrame + disarmExtra
 					if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then
@@ -317,16 +317,23 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		-- Overkill prevention does not prevent firing at unidentified radar dots.
 		-- Although, it still remembers what has been fired at a radar dot.
 		if targetIdentified then
-			local queueSize = spGetUnitCommands(unitID, 0)
+			local queueSize = spGetCommandQueue(unitID, 0)
 			if queueSize == 1 then
-				local queue = spGetUnitCommands(unitID, 1)
-				local cmd = queue[1]
-				if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
+				local cmdID, cmdOpts, cmdTag, cp_1, cp_2
+				if Spring.Utilities.COMPAT_GET_ORDER then
+					local queue = Spring.GetCommandQueue(unitID, 1)
+					if queue and queue[1] then
+						cmdID, cmdOpts, cmdTag  = queue[1].id, queue[1].options.coded, queue[1].tag
+						cp_1, cp_2 = queue[1].params[1], queue[1].params[2]
+					end
+				else
+					cmdID, cmdOpts, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID)
+				end
+				if cmdID == CMD.ATTACK and Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL) and cp_1 and (not cp_2) and cp_1 == targetID then
 					--Spring.Echo("Removing auto-attack command")
 					GG.recursion_GiveOrderToUnit = true
-					spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, 0 )
+					spGiveOrderToUnit(unitID, CMD.REMOVE, {cmdTag}, 0 )
 					GG.recursion_GiveOrderToUnit = false
-					--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0 )
 				end
 			else
 				spSetUnitTarget(unitID, 0)

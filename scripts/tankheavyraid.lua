@@ -189,9 +189,9 @@ end
 function script.Shot(num)		
 	--[[
 	Turn(firepoint, y_axis, math.rad(25))
-	EmitSfx(firepoint, FIRE_W2)
+	EmitSfx(firepoint, GG.Script.FIRE_W2)
 	Turn(firepoint, y_axis, - math.rad(25))
-	EmitSfx(firepoint, FIRE_W2)
+	EmitSfx(firepoint, GG.Script.FIRE_W2)
 	Turn(firepoint, y_axis, 0)
 	--]]
 	StartThread(Recoil)
@@ -202,31 +202,29 @@ function script.Killed(severity, maxHealth)
 	if severity <= 0.25 then
 	
 		corpsetype = 1
-		Explode(main, sfxNone)
-		Explode(turret, sfxNone)
+		Explode(main, SFX.NONE)
+		Explode(turret, SFX.NONE)
 		return 1
 	end
 	if severity <= 0.50 then
 	
 		corpsetype = 1
-		Explode(main, sfxNone)
-		Explode(turret,sfxNone)
-		Explode(barrel1, sfxFall + sfxSmoke + sfxFire)
+		Explode(main, SFX.NONE)
+		Explode(turret,SFX.NONE)
+		Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 1
 	else
 	
 		corpsetype = 2
-		Explode(main, sfxNone)
-		Explode(turret, sfxNone)
-		Explode(barrel2, sfxFall + sfxSmoke + sfxFire)
-		Explode(tracks1, sfxShatter + sfxSmoke + sfxFire)
+		Explode(main, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(barrel2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(tracks1, SFX.SHATTER + SFX.SMOKE + SFX.FIRE)
 		Hide(tracks2)
 		Hide(tracks3)
 		Hide(tracks4)
 		return 2
 	end
-
-	return corpsetype
 end
 
 function script.Create()
@@ -243,5 +241,5 @@ function script.Create()
 	end
 	
 	StartThread(AnimationControl)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end

@@ -375,7 +375,7 @@ end
 
 local function GetPlayerName(playerID)
 	if not playerID then return "" end
-	local name = GetPlayerInfo(playerID)
+	local name = GetPlayerInfo(playerID, false)
 	return name or ""
 end
 
@@ -419,7 +419,7 @@ end
 --drawing
 ------------------------------------------------
 local function GetPlayerColor(playerID)
-	local _, _, _, teamID = GetPlayerInfo(playerID)
+	local _, _, _, teamID = GetPlayerInfo(playerID, false)
 	if (not teamID) then return nil end
 	return GetTeamColor(teamID)
 end

@@ -39,6 +39,8 @@ local SIG_MOVE = 8
 
 --rockz
 include "rockPiece.lua"
+local dynamicRockData
+
 local ROCK_PIECE = hull -- should be negative to alternate rocking direction
 local ROCK_SPEED = 3 --number of quarter-cycles per second around z-axis
 local ROCK_DECAY = -1/2	--rocking around z-axis is reduced by this factor each time' 
@@ -67,8 +69,8 @@ local restore_delay = 3000
 local gun_1_yaw = 0
 local dead = false
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
-	InitializeRock(rockData)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 end
 
 local function RestoreAfterDelay()
@@ -114,7 +116,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot(num)
-	StartThread(Rock, z_axis, gun_1_yaw, ROCK_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gun_1_yaw, ROCK_FORCE)
 	gun1 = gun1 + 1
 	if gun1 == 4 then
 		 gun1 = 0 end
@@ -175,13 +177,13 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if  severity <= 0.50  then
-		Explode( turret, sfxShatter)
+		Explode( turret, SFX.SHATTER)
 		return 1
 	end
-	Explode( hull, sfxShatter)
-	Explode( neck, sfxShatter)
-	Explode( turret, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( arml, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( armr, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode( hull, SFX.SHATTER)
+	Explode( neck, SFX.SHATTER)
+	Explode( turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode( arml, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode( armr, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	return 2
 end

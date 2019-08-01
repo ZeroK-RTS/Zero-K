@@ -62,7 +62,7 @@ function Detonate() -- Giving an order causes recursion.
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	if not Spring.GetUnitIsStunned(unitID) then
 		Spring.SetUnitCloak(unitID, 2)
 		Spring.SetUnitStealth(unitID, true)

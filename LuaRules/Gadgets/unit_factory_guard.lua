@@ -128,11 +128,6 @@ local function GuardFactory(unitID, unitDefID, factID, factDefID)
 		dist = sideDis
 	end
 
-	local facing = spGetUnitBuildFacing(factID)
-	if (not facing) then
-		return
-	end
-
 	-- facing values { S = 0, E = 1, N = 2, W = 3 }  
 	local dx, dz -- down vector
 	local rx, rz -- right vector

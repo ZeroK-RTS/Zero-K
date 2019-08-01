@@ -5,10 +5,7 @@ local baseDirection
 
 local smokePiece = {base}
 
-local tau = math.pi*2
-local pi = math.pi
 local hpi = math.pi*0.5
-local pi34 = math.pi*1.5
 
 local UPDATE_PERIOD = 1000
 local BUILD_PERIOD = 500
@@ -34,17 +31,20 @@ function BobTidal()
 	end
 end
 
+local oldWindStrength, oldWindHeading
 function SpinWind() 
 	while true do 
 		if select(5, Spring.GetUnitHealth(unitID)) < 1 then
+			oldWindStrength = nil
 			StopSpin(fan, z_axis)
 			Sleep(BUILD_PERIOD)
 		else
-			local st = baseWind + (Spring.GetGameRulesParam("WindStrength") or 0)*rangeWind
-			local direction = Spring.GetGameRulesParam("WindHeading")
-			
-			Spin(fan, z_axis, -st*(0.94 + 0.08*math.random()))
-			Turn(cradle, y_axis, direction - baseDirection + pi, turnSpeed)
+			if GG.WindStrength and ((oldWindStrength ~= GG.WindStrength) or (oldWindHeading ~= GG.WindHeading)) then 
+				oldWindStrength, oldWindHeading = GG.WindStrength, GG.WindHeading
+				local st = baseWind + (GG.WindStrength or 0)*rangeWind
+				Spin(fan, z_axis, -st*(0.94 + 0.08*math.random()))
+				Turn(cradle, y_axis, GG.WindHeading - baseDirection + math.pi, turnSpeed)
+			end
 			Sleep(UPDATE_PERIOD + 200*math.random())
 		end
 		
@@ -82,8 +82,8 @@ function InitializeWind()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
-	baseDirection = math.random(0,tau)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
+	baseDirection = math.random(0,GG.Script.tau)
 	Turn(base, y_axis, baseDirection)
 	baseDirection = baseDirection + hpi * Spring.GetUnitBuildFacing(unitID)
 	InitializeWind()
@@ -93,7 +93,7 @@ local function CreateTidalWreck()
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	local heading = Spring.GetUnitHeading(unitID)
 	local team = Spring.GetUnitTeam(unitID)
-	local featureID = Spring.CreateFeature("energywind_deadwater", x, y, z, heading + baseDirection*65536/tau, team)
+	local featureID = Spring.CreateFeature("energywind_deadwater", x, y, z, heading + baseDirection*65536/GG.Script.tau, team)
 	Spring.SetFeatureResurrect(featureID, "energywind")
 end
 
@@ -101,35 +101,35 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if isWind then
 		if severity <= 0.25 then
-			Explode(base, sfxShatter)
-			Explode(fan, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-			Explode(base, sfxShatter)
+			Explode(base, SFX.SHATTER)
+			Explode(fan, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+			Explode(base, SFX.SHATTER)
 			return 1
 		elseif severity <= 0.5 then
-			Explode(base, sfxShatter)
-			Explode(fan, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-			Explode(cradle, sfxShatter)
+			Explode(base, SFX.SHATTER)
+			Explode(fan, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+			Explode(cradle, SFX.SHATTER)
 			return 1
 		else
-			Explode(base, sfxShatter)
-			Explode(fan, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-			Explode(cradle, sfxSmoke)
+			Explode(base, SFX.SHATTER)
+			Explode(fan, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+			Explode(cradle, SFX.SMOKE)
 			return 2
 		end
 	else
 		if severity <= 0.25 then
-			--Explode(fan, sfxSmoke)
-			--Explode(cradle, sfxFire)
+			--Explode(fan, SFX.SMOKE)
+			--Explode(cradle, SFX.FIRE)
 			CreateTidalWreck()
 			return 3
 		elseif severity <= 0.5 then
-			--Explode(fan, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-			--Explode(cradle, sfxSmoke)
+			--Explode(fan, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+			--Explode(cradle, SFX.SMOKE)
 			CreateTidalWreck()
 			return 3
 		else
-			Explode(fan, sfxShatter)
-			Explode(cradle, sfxShatter)
+			Explode(fan, SFX.SHATTER)
+			Explode(cradle, SFX.SHATTER)
 			return 2
 		end
 	end

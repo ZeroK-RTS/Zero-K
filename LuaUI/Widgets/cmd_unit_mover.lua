@@ -40,7 +40,7 @@ local moveUnits = {}
 local myID = 0
 
 local function checkSpec()
-  local _, _, spec = GetPlayerInfo(myID)
+  local _, _, spec = GetPlayerInfo(myID, false)
   if spec then
     widgetHandler:RemoveWidget()
   end
@@ -60,8 +60,8 @@ function widget:Update(deltaTime)
 
  if (countDown > DELAY) then
    for unitID,_ in pairs(moveUnits) do
-     local cQueue = GetCommandQueue(unitID, 1)
-     if (table.getn(cQueue) == 0) then
+     local cQueue = GetCommandQueue(unitID, 0)
+     if (cQueue == 0) then
        local x, y, z = GetUnitPosition(unitID)
        if (math.random(1,2) == 1) then
          x = x + math.random(50,100)

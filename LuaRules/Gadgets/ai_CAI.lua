@@ -347,21 +347,17 @@ local function conJobAllocator(team)
 	-- remove con from jobs with too much BP
 	for _,data in pairs(conJob) do
 		data.bpChange = data.importance*a.totalBP - data.assignedBP
-		local changed = true
-		while (changed and data.bpChange <= -4.8) do
-			changed = false
-			for unitID,_ in pairs(data.con) do
-				--if controlledUnit.conByID[unitID].bp <= -data.bpChange then
-					data.bpChange = data.bpChange + controlledUnit.conByID[unitID].bp
-					data.con[unitID] = nil
-					data.assignedBP = data.assignedBP - controlledUnit.conByID[unitID].bp
-					if Spring.ValidUnitID(unitID) and not Spring.GetUnitIsDead(unitID) then
-						unassignedCons.count = unassignedCons.count + 1
-						unassignedCons[unassignedCons.count] = unitID
-					end
-					changed = true
-					break
-				--end
+		while data.bpChange <= -4.8 do
+			local unitID = next(data.con)
+			if not unitID then
+				break
+			end
+			data.bpChange = data.bpChange + controlledUnit.conByID[unitID].bp
+			data.con[unitID] = nil
+			data.assignedBP = data.assignedBP - controlledUnit.conByID[unitID].bp
+			if Spring.ValidUnitID(unitID) and not Spring.GetUnitIsDead(unitID) then
+				unassignedCons.count = unassignedCons.count + 1
+				unassignedCons[unassignedCons.count] = unitID
 			end
 		end
 		
@@ -814,8 +810,6 @@ local function makeAirDefence(team,unitID, searchRange,maxDistance)
 		
 		local ox = selfDefenceAirTask[minID].x
 		local oz = selfDefenceAirTask[minID].z
-		
-		local x,y,z = spGetUnitPosition(unitID)
 		
 		local vectorX = mapWidth*0.5 - ox
 		local vectorZ = mapHeight*0.5 - oz
@@ -1299,7 +1293,7 @@ local function conJobHandler(team)
 	-- reclaim
 	for unitID,_ in pairs(conJob.reclaim.con) do
 		local cQueue = spGetCommandQueue(unitID, 1)
-		if (cQueue and #cQueue == 0) or controlledUnit.conByID[unitID].idle then
+		if (cQueue and #cQueue == 0) or (unitID and controlledUnit.conByID[unitID] and controlledUnit.conByID[unitID].idle) then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].makingDefence = false
 			controlledUnit.conByID[unitID].oldJob = conJob.reclaim.index
@@ -1310,7 +1304,7 @@ local function conJobHandler(team)
 	-- defence
 	for unitID,_ in pairs(conJob.defence.con) do
 		local cQueue = spGetCommandQueue(unitID, 1)
-		if (cQueue and #cQueue) == 0 or controlledUnit.conByID[unitID].idle then
+		if (cQueue and #cQueue) == 0 or (unitID and controlledUnit.conByID[unitID] and controlledUnit.conByID[unitID].idle) then
 			local x,y,z = spGetUnitPosition(unitID)
 			controlledUnit.conByID[unitID].oldJob = conJob.defence.index
 			controlledUnit.conByID[unitID].idle = false
@@ -1355,7 +1349,7 @@ local function conJobHandler(team)
 	-- mex
 	for unitID,_ in pairs(conJob.mex.con) do
 		local cQueue = spGetCommandQueue(unitID, 1)
-		if (cQueue and #cQueue == 0) or controlledUnit.conByID[unitID].idle then
+		if (cQueue and #cQueue == 0) or (unitID and controlledUnit.conByID[unitID] and controlledUnit.conByID[unitID].idle) then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].oldJob = conJob.mex.index
 			if math.random() < conJob.mex.defenceChance and makeWantedDefence(team,unitID,500,500,1000) then
@@ -1381,8 +1375,8 @@ local function conJobHandler(team)
 	-- factory assist/construction
 	for unitID,data in pairs(conJob.factory.con) do
 		local cQueue = spGetCommandQueue(unitID, 1)
-			
-		if (cQueue and #cQueue == 0) or controlledUnit.conByID[unitID].idle then
+		
+		if (cQueue and #cQueue == 0) or (unitID and controlledUnit.conByID[unitID] and controlledUnit.conByID[unitID].idle) then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].makingDefence = false
 			controlledUnit.conByID[unitID].oldJob = conJob.factory.index
@@ -1395,7 +1389,7 @@ local function conJobHandler(team)
 	-- energy
 	for unitID,_ in pairs(conJob.energy.con) do
 		local cQueue = spGetCommandQueue(unitID, 1)
-		if (cQueue and #cQueue == 0) or controlledUnit.conByID[unitID].idle then
+		if (cQueue and #cQueue == 0) or (unitID and controlledUnit.conByID[unitID] and controlledUnit.conByID[unitID].idle) then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].makingDefence = false
 			controlledUnit.conByID[unitID].oldJob = conJob.energy.index
@@ -1505,7 +1499,6 @@ local function factoryJobHandler(team)
 				else
 					GiveClampedOrderToUnit(unitID, CMD_FIGHT, { data.wayX+math.random(-200,200), data.wayY, data.wayZ+math.random(-200,200)}, 0)
 				end
-				local facJob = a.facJob
 				local totalImportance = 0
 				for i = 1, 8 do
 					totalImportance = totalImportance + facJob[i].importance*defData[i].importanceMult
@@ -1730,12 +1723,12 @@ local function battleGroupHandler(team, frame, slowUpdate)
 					local changed = false
 					local x = data.aimX
 					local z = data.aimZ
-					for i = 1, at.enemyEconomy.count do
-						local dis = disSQ(x, z, at.enemyEconomy[i].x, at.enemyEconomy[i].z)
+					for j = 1, at.enemyEconomy.count do
+						local dis = disSQ(x, z, at.enemyEconomy[j].x, at.enemyEconomy[j].z)
 						if (not minTargetDistance) or minTargetDistance > dis and 
-								not (data.aX == at.enemyEconomy[i].aX and data.aZ == at.enemyEconomy[i].aZ) then
-							data.aX = at.enemyEconomy[i].aX
-							data.aZ = at.enemyEconomy[i].aZ
+								not (data.aX == at.enemyEconomy[j].aX and data.aZ == at.enemyEconomy[j].aZ) then
+							data.aX = at.enemyEconomy[j].aX
+							data.aZ = at.enemyEconomy[j].aZ
 							minTargetDistance = dis
 							changed = true
 						end
@@ -1751,7 +1744,6 @@ local function battleGroupHandler(team, frame, slowUpdate)
 						local moveGroupRange = groupRange*0.4
 						for unitID,_ in pairs(data.unit) do
 							if not data.aa[unitID] then
-								local x, y, z = spGetUnitPosition(unitID)
 								--GiveClampedOrderToUnit(unitID, CMD_FIGHT , {data.aimX ,data.aimY,data.aimZ,}, 0)
 								GiveClampedOrderToUnit(unitID, CMD_FIGHT , {data.aimX + math.random(-moveGroupRange,moveGroupRange),
 								data.aimY,data.aimZ + math.random(-moveGroupRange,moveGroupRange),}, 0)
@@ -2838,18 +2830,8 @@ local function initialiseFaction(team)
 		return true
 	end
 	
-	local shortname = Game.modShortName
-	
-	-- FIXME: 	this is to allow CAI to work in missions
-	--		it has the side effect of assuming the mod is always ZK,
-	--		which is kind of hacky and should probably be changed
-	--		on the other hand the previous code wasn't flexible either!
-	if true then	--if shortname == "ZK" then
-		a.buildDefs = a.buildConfig.robots
-		return true
-	end
-	
-	return false
+	a.buildDefs = a.buildConfig.robots
+	return true
 end
 
 local function echoEnemyForceComposition(allyTeam)
@@ -2920,7 +2902,7 @@ function gadget:GameFrame(n)
 				if debugData.showFacJobList[team] then
 					echoFacJobList(team)
 				end
-				local isDead = select(3, spGetTeamInfo(team))
+				local isDead = select(3, spGetTeamInfo(team, false))
 				if isDead then
 					aiTeamData[team] = nil	-- team is dead, stop working
 				end
@@ -3269,7 +3251,6 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 				local x,y,z = spGetUnitPosition(unitID)
 				local mx,my,mz = getPositionTowardsMiddle(unitID, 500, 25)
 				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250, -25)
-				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250, -25)
 				if not built then
 					editDefenceHeatmap(unitTeam,unitID,buildDefs.factoryByDefId[unitDefID].defenceQuota,buildDefs.factoryByDefId[unitDefID].airDefenceQuota,buildDefs.factoryByDefId[unitDefID].defenceRange,1,1)
 				end
@@ -3535,8 +3516,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID) -- add unit
-	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID)
-	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID)
+	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID, false)
+	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID, false)
 	for team,_ in pairs(aiTeamData) do
 		if teamID == team then
 			ProcessUnitCreated(unitID, unitDefID, teamID, nil, newAllyTeam ~= oldAllyTeam)
@@ -3549,8 +3530,8 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID) -- add unit
 end
 
 function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID) -- remove unit
-	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(newTeamID)
-	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(teamID)
+	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(newTeamID, false)
+	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(teamID, false)
 	for team,_ in pairs(aiTeamData) do
 		if teamID == team then
 			ProcessUnitDestroyed(unitID, unitDefID, teamID, newAllyTeam ~= oldAllyTeam)
@@ -3726,7 +3707,7 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 		end
 	end
 	
-	local player = select(2, Spring.GetTeamInfo(team))
+	local player = select(2, Spring.GetTeamInfo(team, false))
 	local stratIndex = SelectRandomStrat(player, team)
 	--Spring.Echo(a.buildConfig)
 	--ModifyTable(a.buildConfig, buildTasksMods)
@@ -3776,7 +3757,7 @@ local function initialiseAllyTeam(allyTeam, aiOnTeam)
 	local at = allyTeamData[allyTeam]
 	
 	for _,t in pairs(spGetTeamList()) do
-		local _,_,_,_,_,myAllyTeam = spGetTeamInfo(t)
+		local _,_,_,_,_,myAllyTeam = spGetTeamInfo(t, false)
 		if myAllyTeam == allyTeam then
 			Spring.Echo("Team " .. t .. " on allyTeam " .. allyTeam)
 			at.teams[t] = true
@@ -3891,8 +3872,8 @@ local function SetFactoryDefImportance(team, factoryDefID, importance)
 end
 
 local function RemoveUnit(unitID, unitDefID, unitTeam)
-	local unitDefID = unitDefID or spGetUnitDefID(unitID)
-	local unitTeam = unitTeam or spGetUnitTeam(unitID)
+	unitDefID = unitDefID or spGetUnitDefID(unitID)
+	unitTeam = unitTeam or spGetUnitTeam(unitID)
 	if not aiTeamData[unitTeam] then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "attempt to remove unit from a non-existent CAI team")
 	end
@@ -4096,11 +4077,10 @@ function gadget:Initialize()
 	end
 	
 	for _,team in ipairs(spGetTeamList()) do
-		--local _,_,_,isAI,side = spGetTeamInfo(team)
+		--local _,_,_,isAI,side = spGetTeamInfo(team, false)
 		if aiConfigByName[spGetTeamLuaAI(team)] then
-			local _,_,_,_,_,_,CustomTeamOptions = spGetTeamInfo(team)
+			local _,_,_,_,_,allyTeam,CustomTeamOptions = spGetTeamInfo(team)
 			if (not CustomTeamOptions) or (not CustomTeamOptions["aioverride"]) then -- what is this for?
-				local _,_,_,_,_,allyTeam = spGetTeamInfo(team)
 				initialiseAiTeam(team, allyTeam, aiConfigByName[spGetTeamLuaAI(team)])
 				aiOnTeam[allyTeam] = true
 				usingAI = true
@@ -4305,7 +4285,7 @@ end
 function gadget:Initialize()
 	local usingAI = false
 	for _,team in ipairs(spGetTeamList()) do
-		--local _,_,_,isAI,side = spGetTeamInfo(team)
+		--local _,_,_,isAI,side = spGetTeamInfo(team, false)
 		if aiConfigByName[spGetTeamLuaAI(team)] then
 			local _,_,_,_,_,_,CustomTeamOptions = spGetTeamInfo(team)
 			if (not CustomTeamOptions) or (not CustomTeamOptions["aioverride"]) then -- what is this for?

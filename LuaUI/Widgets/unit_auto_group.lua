@@ -216,7 +216,7 @@ function widget:PlayerChanged(playerID)
 end
 
 function widget:Initialize() 
-	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 	if spec then
 		widgetHandler:RemoveWidget()
 		return false
@@ -454,12 +454,12 @@ local function UnstickUpdate(unitID, unitData)
 	if not Spring.ValidUnitID(unitID) then
 		return true
 	end
-	local commands = Spring.GetCommandQueue(unitID, 1)
-	if #commands == 0 then
+	local cmdID = Spring.GetUnitCurrentCommand(unitID)
+	if not cmdID then
 		widget:UnitIdle(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 		return true
 	end
-	if commands[1].id == CMD.FIGHT then
+	if cmdID == CMD.FIGHT then
 		local x, y, z = Spring.GetUnitPosition(unitID)
 		if not unitData.x then
 			unitData.x, unitData.y, unitData.z = x, y, z

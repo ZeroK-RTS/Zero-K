@@ -53,7 +53,7 @@ local function GetSpeedMod()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Turn(lshoulder, z_axis, math.rad(0))
 	Turn(lshoulder, x_axis, -math.rad(10))
 	Turn(lforearm, x_axis, -math.rad(80))
@@ -234,19 +234,19 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
-		Explode(hips, sfxNone)
-		Explode(head, sfxNone)
-		Explode(chest, sfxNone)
+		Explode(hips, SFX.NONE)
+		Explode(head, SFX.NONE)
+		Explode(chest, SFX.NONE)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
-		Explode(hips, sfxNone)
-		Explode(head, sfxNone)
-		Explode(chest, sfxShatter)
+		Explode(hips, SFX.NONE)
+		Explode(head, SFX.NONE)
+		Explode(chest, SFX.SHATTER)
 		return 1 -- corpsetype
 	else
-		Explode(hips, sfxShatter)
-		Explode(head, sfxSmoke + sfxFire)
-		Explode(chest, sfxSmoke + sfxFire + sfxExplode)
+		Explode(hips, SFX.SHATTER)
+		Explode(head, SFX.SMOKE + SFX.FIRE)
+		Explode(chest, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2 -- corpsetype
 	end
 end

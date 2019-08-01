@@ -92,7 +92,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 	local buy = command == '$buy'
 	
 	if buy or sell then
-		local _,_,spec,teamID, allianceID = spGetPlayerInfo(playerID)
+		local _,_,spec,teamID, allianceID = spGetPlayerInfo(playerID, false)
 		if spec then
 			return
 		end
@@ -148,7 +148,7 @@ end
 
 function gadget:Initialize()
 	gaiaTeam = Spring.GetGaiaTeamID()
-	_,_,_,_,_, gaiaAlliance = spGetTeamInfo(gaiaTeam)
+	_,_,_,_,_, gaiaAlliance = spGetTeamInfo(gaiaTeam, false)
 	
 	if TESTMODE then
 		local allUnits = Spring.GetAllUnits()

@@ -8,7 +8,7 @@ function widget:GetInfo()
     author    = "KingRaptor (L.J. Lim)",
     date      = "Dec 2011",
     license   = "GNU GPL, v2 or later",
-    layer     = -1,	-- make sure it draws before point tracker 
+    layer     = -1, -- make sure it draws before point tracker 
     enabled   = true  --  loaded by default?
   }
 end
@@ -314,15 +314,15 @@ function widget:Initialize()
 		return
 	end
 
-	Chili		= WG.Chili
-	Window		= Chili.Window
-	Panel		= Chili.Panel
-	StackPanel	= Chili.StackPanel
-	ScrollPanel	= Chili.ScrollPanel
-	Button		= Chili.Button
-	Label		= Chili.Label
-	Image		= Chili.Image
-	screen0		= Chili.Screen0
+	Chili       = WG.Chili
+	Window      = Chili.Window
+	Panel       = Chili.Panel
+	StackPanel  = Chili.StackPanel
+	ScrollPanel = Chili.ScrollPanel
+	Button      = Chili.Button
+	Label       = Chili.Label
+	Image       = Chili.Image
+	screen0     = Chili.Screen0
 	
 	local vsx, vsy = Spring.GetWindowGeometry()
 	local width, height = 480, 240

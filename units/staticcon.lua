@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[staticcon]],
   name                          = [[Caretaker]],
-  description                   = [[Static Constructor, Builds at 10 m/s]],
+  description                   = [[Construction Assistant, Builds at 10 m/s]],
   acceleration                  = 0,
   brakeRate                     = 1.5,
   buildCostMetal                = 180,

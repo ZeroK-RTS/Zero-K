@@ -32,7 +32,7 @@ local setAiStartPos = (modOptions.setaispawns == "1")
 local CAMPAIGN_SPAWN_DEBUG = (Spring.GetModOptions().campaign_spawn_debug == "1")
 
 local gaiateam = Spring.GetGaiaTeamID()
-local gaiaally = select(6, spGetTeamInfo(gaiateam))
+local gaiaally = select(6, spGetTeamInfo(gaiateam, false))
 
 local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 
@@ -60,9 +60,18 @@ local function CheckOrderRemoval() -- FIXME: maybe we can remove polling every f
 		return
 	end
 	for unitID, factoryDefID in pairs(ordersToRemove) do
-		local cQueue = Spring.GetCommandQueue(unitID, 1)
-		if cQueue and cQueue[1] and cQueue[1].id == -factoryDefID then
-			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, CMD.OPT_ALT)
+		local cmdID, cmdTag
+		if Spring.Utilities.COMPAT_GET_ORDER then
+			local queue = Spring.GetCommandQueue(unitID, 1)
+			if queue and queue[1] then
+				cmdID, cmdTag = queue[1].id, queue[1].tag
+			end
+		else
+			cmdID, _, cmdTag = Spring.GetUnitCurrentCommand(unitID)
+		end
+		
+		if cmdID == -factoryDefID then
+			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmdTag}, CMD.OPT_ALT)
 		end
 	end
 	ordersToRemove = nil
@@ -90,12 +99,12 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 
 		-- FIXME: temporary hack because I'm in a hurry
 		-- proper way: get rid of all the useless shit in modstats, reenable and collect plop stats that way (see above)
-		local str = "SPRINGIE:facplop," .. UnitDefs[unitDefID].name .. "," .. teamID .. "," .. select(6, Spring.GetTeamInfo(teamID)) .. ","
-		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		local str = "SPRINGIE:facplop," .. UnitDefs[unitDefID].name .. "," .. teamID .. "," .. select(6, Spring.GetTeamInfo(teamID, false)) .. ","
+		local _, playerID, _, isAI = Spring.GetTeamInfo(teamID, false)
 		if isAI then
 			str = str .. "Nightwatch" -- existing account just in case infra explodes otherwise
 		else
-			str = str .. (Spring.GetPlayerInfo(playerID) or "ChanServ") -- ditto, different acc to differentiate
+			str = str .. (Spring.GetPlayerInfo(playerID, false) or "ChanServ") -- ditto, different acc to differentiate
 		end
 		str = str .. ",END_PLOP"
 		Spring.SendCommands("wbynum 255 " .. str)
@@ -202,7 +211,7 @@ end
 
 local function GetStartUnit(teamID, playerID, isAI)
 
-	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
+	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID, true))
 	if teamInfo and teamInfo.staticcomm then
 		local commanderName = teamInfo.staticcomm
 		local commanderLevel = teamInfo.staticcomm_level or 1
@@ -226,7 +235,7 @@ local function GetStartUnit(teamID, playerID, isAI)
 	end
 
 	-- if a player-selected comm is available, use it
-	playerID = playerID or (teamID and select(2, spGetTeamInfo(teamID)) )
+	playerID = playerID or (teamID and select(2, spGetTeamInfo(teamID, false)) )
 	if (playerID and commChoice[playerID]) then
 		--Spring.Echo("Attempting to load alternate comm")
 		local playerCommProfiles = GG.ModularCommAPI.GetPlayerCommProfiles(playerID, true)
@@ -310,7 +319,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	if not teamID then
 		return
 	end
-	local _,_,_,_,_,allyTeamID,teamInfo = Spring.GetTeamInfo(teamID)
+	local _,_,_,_,_,allyTeamID,teamInfo = Spring.GetTeamInfo(teamID, true)
 	if teamInfo and teamInfo.nocommander then
 		waitingForComm[teamID] = nil
 		return
@@ -323,8 +332,8 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		-- allied to latest chicken team? no com for you
 		local chickenTeamID = -1
 		for _,t in pairs(Spring.GetTeamList()) do
-			local luaAI = Spring.GetTeamLuaAI(t)
-			if luaAI and string.find(string.lower(luaAI), "chicken") then
+			local teamLuaAI = Spring.GetTeamLuaAI(t)
+			if teamLuaAI and string.find(string.lower(teamLuaAI), "chicken") then
 				chickenTeamID = t
 			end
 		end
@@ -409,7 +418,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		if isAI then
 			name = select(2, Spring.GetAIInfo(teamID))
 		else
-			name = Spring.GetPlayerInfo(playerID)
+			name = Spring.GetPlayerInfo(playerID, false)
 		end
 		Spring.SetUnitRulesParam(unitID, "commander_owner", name, {inlos = true})
 		return true
@@ -418,7 +427,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 end
 
 local function StartUnitPicked(playerID, name)
-	local _,_,spec,teamID = spGetPlayerInfo(playerID)
+	local _,_,spec,teamID = spGetPlayerInfo(playerID, false)
 	if spec then 
 		return 
 	end
@@ -469,7 +478,7 @@ local function workAroundSpecsInTeamZero(playerlist, team)
 		local specs = 0
 		-- count specs
 		for i=1,#playerlist do
-			local _,_,spec = spGetPlayerInfo(playerlist[i])
+			local _,_,spec = spGetPlayerInfo(playerlist[i], false)
 			if spec then 
 				specs = specs + 1 
 			end
@@ -483,13 +492,13 @@ end
 
 --[[
    This function return true if everyone in the team resigned.
-   This function is alternative to "isDead" from: "_,_,isDead,isAI = spGetTeamInfo(team)"
+   This function is alternative to "isDead" from: "_,_,isDead,isAI = spGetTeamInfo(team, false)"
    because "isDead" failed to return true when human team resigned before GameStart() event.
 --]]
 local function IsTeamResigned(team)
 	local playersInTeam = spGetPlayerList(team)
 	for j=1,#playersInTeam do
-		local spec = select(3,spGetPlayerInfo(playersInTeam[j]))
+		local spec = select(3,spGetPlayerInfo(playersInTeam[j], false))
 		if not spec then
 			return false
 		end
@@ -512,7 +521,7 @@ function gadget:GameStart()
 	gamestart = true
 
 	-- spawn units
-	for i,team in ipairs(Spring.GetTeamList()) do
+	for teamNum,team in ipairs(Spring.GetTeamList()) do
 		
 		-- clear resources
 		-- actual resources are set depending on spawned unit and setup
@@ -525,7 +534,7 @@ function gadget:GameStart()
 		end
 
 		--check if player resigned before game started
-		local _,playerID,_,isAI = spGetTeamInfo(team)
+		local _,playerID,_,isAI = spGetTeamInfo(team, false)
 		local deadPlayer = (not isAI) and IsTeamResigned(team)
 
 		if team ~= gaiateam and not deadPlayer then
@@ -541,7 +550,7 @@ function gadget:GameStart()
 				playerlist = workAroundSpecsInTeamZero(playerlist, team)
 				if playerlist and (#playerlist > 0) then
 					for i=1,#playerlist do
-						local _,_,spec = spGetPlayerInfo(playerlist[i])
+						local _,_,spec = spGetPlayerInfo(playerlist[i], false)
 						if (not spec) then
 							SpawnStartUnit(team, playerlist[i])
 						end
@@ -552,7 +561,7 @@ function gadget:GameStart()
 				end
 			else -- no COOP_MODE
 				if (playerID) then
-					local _,_,spec,teamID = spGetPlayerInfo(playerID)
+					local _,_,spec,teamID = spGetPlayerInfo(playerID, false)
 					if (teamID == team and not spec) then
 						isAI = false
 					else
@@ -615,7 +624,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		
 		teamID = tonumber(teamID);
 		
-		local _,_,_,isAI = Spring.GetTeamInfo(teamID)
+		local _,_,_,isAI = Spring.GetTeamInfo(teamID, false)
 		if(isAI) then -- this is actually an AI 
 			local aiid, ainame, aihost = Spring.GetAIInfo(teamID)
 			if (aihost == playerID) then -- it's actually controlled by the local host
@@ -632,7 +641,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		if msg_table then
 			local teamID, x, z = tonumber(msg_table[2]), tonumber(msg_table[3]), tonumber(msg_table[4])
 			if teamID then
-				local _,_,_,isAI = Spring.GetTeamInfo(teamID)
+				local _,_,_,isAI = Spring.GetTeamInfo(teamID, false)
 				if isAI and x and z then
 					SetStartLocation(teamID, x, z)
 					Spring.MarkerAddPoint(x, 0, z, "AI " .. teamID .. " start")
@@ -646,7 +655,7 @@ function gadget:GameFrame(n)
 	CheckOrderRemoval()
 	if n == (COMM_SELECT_TIMEOUT) then
 		for team in pairs(waitingForComm) do
-			local _,playerID = spGetTeamInfo(team)
+			local _,playerID = spGetTeamInfo(team, false)
 			teamSides[team] = DEFAULT_UNIT_NAME
 			--playerSides[playerID] = "basiccomm"
 			scheduledSpawn[n] = scheduledSpawn[n] or {}
@@ -702,7 +711,6 @@ else
 
 local teamID 			= Spring.GetLocalTeamID()
 local spGetUnitDefID 	= Spring.GetUnitDefID
-local spGetUnitLosState = Spring.GetUnitLosState
 local spValidUnitID 	= Spring.ValidUnitID
 local spAreTeamsAllied 	= Spring.AreTeamsAllied
 local spGetUnitTeam 	= Spring.GetUnitTeam
@@ -717,7 +725,7 @@ function CommSelection(_,playerID, startUnit)
 	if (Script.LuaUI('CommSelection')) then --if there is widgets subscribing to "CommSelection" function then:
 		local isSpec = Spring.GetSpectatingState() --receiver player is spectator?
 		local myAllyID = Spring.GetMyAllyTeamID() --receiver player's alliance?
-		local _,_,_,_, eventAllyID,_,_,_,_ = Spring.GetPlayerInfo(playerID) --source alliance?
+		local _,_,_,_, eventAllyID = Spring.GetPlayerInfo(playerID, false) --source alliance?
 		if isSpec or myAllyID == eventAllyID then
 			Script.LuaUI.CommSelection(playerID, startUnit) --send to widgets as event
 		end

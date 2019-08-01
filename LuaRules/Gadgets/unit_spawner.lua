@@ -3,13 +3,13 @@
 
 function gadget:GetInfo()
 	return {
-		name		= "Chicken Spawner",
-		desc		= "Spawns burrows and chickens",
-		author		= "quantum, improved by KingRaptor",
-		date		= "April 29, 2008", --last update: Mei 7, 2014
-		license		= "GNU GPL, v2 or later",
-		layer		= 1000001,	-- must do the GameOver() thing only after gadget:awards.lua has finishes detect queen destroyed else queenKill award won't appear.
-		enabled		= true --	loaded by default?
+		name     = "Chicken Spawner",
+		desc     = "Spawns burrows and chickens",
+		author   = "quantum, improved by KingRaptor",
+		date     = "April 29, 2008", --last update: Mei 7, 2014
+		license  = "GNU GPL, v2 or later",
+		layer    = 1000001,	-- must do the GameOver() thing only after gadget:awards.lua has finishes detect queen destroyed else queenKill award won't appear.
+		enabled  = true --	loaded by default?
 	}
 end
 
@@ -183,8 +183,8 @@ else
 	-- the problem is with human controlled chickens, otherwise it counts them as robot-players and difficulty increases very much
 	-- probably, ideally this needs to be taught to differentiate between human chickens and human robots...
 	for _, teamID in pairs(teams) do
-		local luaAI = Spring.GetTeamLuaAI(teamID)
-		if luaAI and string.find(string.lower(luaAI), "chicken") then
+		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
+		if teamLuaAI and string.find(string.lower(teamLuaAI), "chicken") then
 			lastChickenTeam = teamID
 			--break
 		end
@@ -204,6 +204,9 @@ else
 	--then -- well as far as I understood this means to check whether team is chicken enemy then do next
 			humanTeams[teamID] = true
 		end
+	end
+	if chickenTeamID then
+		Spring.SetGameRulesParam("chickenTeamID", chickenTeamID)
 	end
 	luaAI = highestLevel
 end
@@ -334,7 +337,7 @@ local function KillAllComputerUnits()
 		--for i=1,#teamUnits do
 		--	Spring.DestroyUnit(teamUnits[i])
 		--end
-		local allyTeam = select(6, Spring.GetTeamInfo(teamID))
+		local allyTeam = select(6, Spring.GetTeamInfo(teamID, false))
 		if GG.DestroyAlliance then
 			GG.DestroyAlliance(allyTeam)
 		end
@@ -494,7 +497,7 @@ end
 
 local function ChooseChicken(units, useTech)
 	local s = spGetGameSeconds() + math.floor(gameFrameOffset/30)
-	local units = units or chickenTypes
+	units = units or chickenTypes
 	local choices,choisesN = {},0
 	local techMod = 0
 	if useTech then
@@ -673,15 +676,15 @@ local function SpawnBurrow(number, loc, burrowLevel)
 					local vicinity = spGetUnitsInCylinder(x, z, maxBaseDistance)
 					local humanUnitsInVicinity = false
 					local humanUnitsInProximity = false
-					for i=1, #vicinity, 1 do
-						if (spGetUnitTeam(vicinity[i]) ~= chickenTeamID) then
+					for j=1, #vicinity, 1 do
+						if (spGetUnitTeam(vicinity[j]) ~= chickenTeamID) then
 							humanUnitsInVicinity = true
 							break
 						end
 					end
 				
-					for i=1, #proximity, 1 do
-						if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
+					for j=1, #proximity, 1 do
+						if (spGetUnitTeam(proximity[j]) ~= chickenTeamID) then
 							humanUnitsInProximity = true
 							break
 						end
@@ -989,7 +992,7 @@ local function MorphQueen()
 	end
 
 	if not data.queenID then
-		Spring.Echo("LUA_ERRRUN chicken queen was not recreated correctly")
+		Spring.Echo("LUA_ERRRUN chicken queen was not recreated correctly, chicken team unit count / total unit count / maxunits ", Spring.GetTeamUnitCount(queenOwner), #Spring.GetAllUnits(), Spring.GetModOptions().maxunits or 10000)
 		return
 	end
 
@@ -1053,7 +1056,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 		local x, y, z = spGetUnitPosition(unitID)
 		data.targets[unitID] = unitTeam
 		--distance check for existing burrows goes here
-		for burrow, data in pairs(data.burrows) do
+		for burrow, burrowdata in pairs(data.burrows) do
 			UpdateBurrowTarget(burrow, unitID)
 		end
 	end
@@ -1145,8 +1148,7 @@ function gadget:GameFrame(n)
 			local chickens = spGetTeamUnits(chickenTeamID) 
 			for i=1,#chickens do
 				local unitID = chickens[i]
-				local cmdQueue = spGetCommandQueue(unitID, 1)
-				if (not (cmdQueue and cmdQueue[1])) then
+				if (not Spring.Utilities.GetUnitFirstCommand(unitID)) then
 					--AttackNearestEnemy(unitID)
 					if (difficulty > 1) and (unitID == data.queenID) then
 						spGiveOrderToUnit(unitID, CMD_RAW_MOVE, data.targetCache, CMD.OPT_SHIFT)
@@ -1174,10 +1176,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	data.chickenBirths[unitID] = nil
 	if data.targets[unitID] then
 		data.targets[unitID] = nil
-		for burrow, data in pairs(data.burrows) do
-			if data.targetID == unitID then		--retarget burrows if needed
-				data.targetID = burrow
-				data.targetDistance = 1000000
+		for burrow, burrowdata in pairs(data.burrows) do
+			if burrowdata.targetID == unitID then		--retarget burrows if needed
+				burrowdata.targetID = burrow
+				burrowdata.targetDistance = 1000000
 				UpdateBurrowTarget(burrow, nil)
 			end
 		end

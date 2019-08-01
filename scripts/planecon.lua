@@ -61,7 +61,7 @@ function script.Create()
 
 	Move(engShield1, y_axis, 0, 0.5) 
 	Move(engShield2, y_axis, 0, 0.5) 
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	StartThread(TiltBody)
 end
@@ -92,14 +92,14 @@ function script.StartBuilding()
 	Signal(SIG_TILT)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	
-	Turn(base,x_axis, rad(30),0.5)
+	Turn(base,x_axis, math.rad(30),0.5)
 	
-	Turn(centreClaw,x_axis, rad(-35),1)
-	Turn(centreClawBit,x_axis, rad(-135),2.5)
-	Turn(leftClaw,y_axis, rad(40),1)
-	Turn(leftClawBit,y_axis, rad(135),2.5)
-	Turn(rightClaw,y_axis, rad(-40),1)
-	Turn(rightClawBit,y_axis, rad(-135),2.5)
+	Turn(centreClaw,x_axis, math.rad(-35),1)
+	Turn(centreClawBit,x_axis, math.rad(-135),2.5)
+	Turn(leftClaw,y_axis, math.rad(40),1)
+	Turn(leftClawBit,y_axis, math.rad(135),2.5)
+	Turn(rightClaw,y_axis, math.rad(-40),1)
+	Turn(rightClawBit,y_axis, math.rad(-135),2.5)
 	
 	--[[
 	WaitForTurn(centreClaw, x_axis)
@@ -115,13 +115,13 @@ function script.StopBuilding()
 	StartThread(TiltBody)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 	
-	Turn(base,x_axis, rad(0),0.5)
-	Turn(centreClaw,x_axis, rad(0),0.5)
-	Turn(centreClawBit,x_axis, rad(0),2)
-	Turn(leftClaw,y_axis, rad(0),0.5)
-	Turn(leftClawBit,y_axis, rad(0),2)
-	Turn(rightClaw,y_axis, rad(0),0.5)
-	Turn(rightClawBit,y_axis, rad(0),2)
+	Turn(base,x_axis, math.rad(0),0.5)
+	Turn(centreClaw,x_axis, math.rad(0),0.5)
+	Turn(centreClawBit,x_axis, math.rad(0),2)
+	Turn(leftClaw,y_axis, math.rad(0),0.5)
+	Turn(leftClawBit,y_axis, math.rad(0),2)
+	Turn(rightClaw,y_axis, math.rad(0),0.5)
+	Turn(rightClawBit,y_axis, math.rad(0),2)
 	
 	--[[
 	WaitForTurn(centreClaw, x_axis)
@@ -141,18 +141,18 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
-		Explode(engine2, sfxFall)
-		Explode(engine1, sfxFall)
+		Explode(engine2, SFX.FALL)
+		Explode(engine1, SFX.FALL)
 		return 1
 	elseif severity <= 0.50 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
-		Explode(base, sfxShatter)
-		Explode(engine2, sfxFall)
-		Explode(engine1, sfxFall)
+		Explode(base, SFX.SHATTER)
+		Explode(engine2, SFX.FALL)
+		Explode(engine1, SFX.FALL)
 		return 1
 	else
-		Explode(base, sfxShatter)
-		Explode(engine2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(engine1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(base, SFX.SHATTER)
+		Explode(engine2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(engine1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		return 2
 	end
 end

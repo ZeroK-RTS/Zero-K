@@ -110,6 +110,14 @@ local function AddSedateProfiler()
 	debug.sethook(trace, "l", 16000000)
 end
 
+local function ResetProfiler()
+	if profiling then return end
+	tree0.root:ClearChildren()
+	sample_tree = {}
+	samples = 0
+	label0:SetCaption("Samples: " .. samples)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -152,19 +160,25 @@ function widget:Initialize()
 				},
 			},
 			Chili.Button:New{
-				x=0, right="66%",
+				x=0, right="75%",
 				y=-20, bottom=0,
 				caption="start",
 				OnClick = {AddProfiler},
 			},
 			Chili.Button:New{
-				x="34%", right="34%",
+				x="25%", right="50%",
 				y=-20, bottom=0,
 				caption="sedate",
 				OnClick = {AddSedateProfiler},
 			},
 			Chili.Button:New{
-				x="66%", right=0,
+				x="50%", right="25%",
+				y=-20, bottom=0,
+				caption="reset",
+				OnClick = {ResetProfiler},
+			},
+			Chili.Button:New{
+				x="75%", right=0,
 				y=-20, bottom=0,
 				caption = "stop",
 				OnClick = {function() debug.sethook( nil ); profiling = false; rendertree() end},

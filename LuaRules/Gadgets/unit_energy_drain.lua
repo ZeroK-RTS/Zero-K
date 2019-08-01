@@ -126,8 +126,7 @@ function gadget:GameFrame(n)
 		local data = unitList[i]
 		local unitID = data.unitID
 		
-		local activeState = Spring.GetUnitStates(unitID)
-		activeState = activeState and activeState["active"]
+		local activeState = Spring.Utilities.GetUnitActiveState(unitID)
 		
 		local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
 		local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
@@ -159,6 +158,10 @@ function gadget:GameFrame(n)
 			if data.oldUpkeep ~= 0 then
 				GG.StopMiscPriorityResourcing(unitID, 3)
 				data.oldUpkeep = 0
+			end
+			if data.oldEnabled then
+				ScriptUpdate(unitID, data.env, false)
+				data.oldEnabled = false
 			end
 		end
 	end

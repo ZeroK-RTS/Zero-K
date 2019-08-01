@@ -37,6 +37,7 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[corflak.s3o]],
+  script                        = [[turretaaflak.lua]],
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
   
   sfxtypes               = {
@@ -77,7 +78,6 @@ unitDef = {
       cylinderTargeting       = 1,
 
 	  customParams        	  = {
-        reaim_time = 8, -- COB
 		isaa = [[1]],
 		light_radius = 0,
 	  },

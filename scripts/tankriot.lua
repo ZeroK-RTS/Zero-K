@@ -2,6 +2,7 @@ include "constants.lua"
 include "rockPiece.lua"
 include "trackControl.lua"
 include "pieceControl.lua"
+local dynamicRockData
 
 local base, turret, sleeve = piece ('base', 'turret', 'sleeve')
 
@@ -21,6 +22,8 @@ local ROCK_DECAY = -0.25 --Rocking around axis is reduced by this factor each ti
 local ROCK_PIECE = base -- should be negative to alternate rocking direction.
 local ROCK_MIN = 0.001 --If around axis rock is not greater than this amount, rocking will stop after returning to center.
 local ROCK_MAX = 1.5
+
+local hpi = math.pi*0.5
 
 local rockData = {
 	[x_axis] = {
@@ -90,8 +93,8 @@ end
 function StunThread()
 	disarmed = true
 	Signal (SIG_AIM)
-	StopTurn(turret, y_axis)
-	StopTurn(sleeve, x_axis)
+	GG.PieceControl.StopTurn(turret, y_axis)
+	GG.PieceControl.StopTurn(sleeve, x_axis)
 end
 
 function UnstunThread()
@@ -164,8 +167,8 @@ end
 function script.FireWeapon()
 	currentMissile = 3 - currentMissile
 	StartThread(ReloadThread, currentMissile)
-	StartThread(Rock, z_axis, gunHeading, ROCK_FIRE_FORCE)
-	StartThread(Rock, x_axis, gunHeading - hpi, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FIRE_FORCE)
+	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], gunHeading - hpi, ROCK_FIRE_FORCE)
 end
 
 function script.BlockShot(num, targetID)
@@ -173,7 +176,7 @@ function script.BlockShot(num, targetID)
 end
 
 function script.Create()
-	InitializeRock(rockData)
+	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 	InitiailizeTrackControl(trackData)
 
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
@@ -183,31 +186,31 @@ function script.Create()
 	Move (missiles[1], z_axis, 0.5)
 	Move (missiles[2], z_axis, 0.5)
 	
-	StartThread (SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity < 0.5) then
-		if (math.random() < 2*severity) then Explode (missiles[1], sfxFall + sfxFire) end
-		if (math.random() < 2*severity) then Explode (missiles[2], sfxFall + sfxSmoke) end
+		if (math.random() < 2*severity) then Explode (missiles[1], SFX.FALL + SFX.FIRE) end
+		if (math.random() < 2*severity) then Explode (missiles[2], SFX.FALL + SFX.SMOKE) end
 		return 1
 	elseif (severity < 0.75) then
 		if (math.random() < severity) then 
-			Explode (turret, sfxFall) 
+			Explode (turret, SFX.FALL) 
 		end
-		Explode(sleeve, sfxFall)
-		Explode(trackData.tracks[1], sfxShatter)
-		Explode(missiles[1], sfxFall + sfxSmoke)
-		Explode(missiles[2], sfxFall + sfxSmoke + sfxFire)
+		Explode(sleeve, SFX.FALL)
+		Explode(trackData.tracks[1], SFX.SHATTER)
+		Explode(missiles[1], SFX.FALL + SFX.SMOKE)
+		Explode(missiles[2], SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke + sfxFire)
-		Explode(sleeve, sfxFall + sfxSmoke + sfxFire)
-		Explode(trackData.tracks[1], sfxShatter)
-		Explode(missiles[1], sfxFall + sfxSmoke)
-		Explode(missiles[2], sfxFall + sfxSmoke + sfxFire)
+		Explode(base, SFX.SHATTER)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(sleeve, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(trackData.tracks[1], SFX.SHATTER)
+		Explode(missiles[1], SFX.FALL + SFX.SMOKE)
+		Explode(missiles[2], SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	end
 end

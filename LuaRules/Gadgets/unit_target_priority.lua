@@ -31,6 +31,7 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
 local spGetGameFrame = Spring.GetGameFrame
 
+local floor = math.floor
 
 local targetTable, disarmWeaponTimeDefs, disarmPenaltyDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, radarDotPenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME = include("LuaRules/Configs/target_priority_defs.lua")
 
@@ -93,15 +94,13 @@ local function GetUnitVisibility(unitID, allyTeam)
 		if not remVisible[allyTeam] then
 			remVisible[allyTeam] = {}
 		end
-		local visibilityTable = spGetUnitLosState(unitID,allyTeam,false)
-		if visibilityTable then
-			if visibilityTable.los then
-				remVisible[allyTeam][unitID] = 2 -- In LoS
-			elseif visibilityTable.typed then
-				remVisible[allyTeam][unitID] = 1 -- Known type
-			else
-				remVisible[allyTeam][unitID] = 0
-			end
+		local visibilityBits = spGetUnitLosState(unitID,allyTeam,true)
+		if not visibilityBits then
+			remVisible[allyTeam][unitID] = 0
+		elseif visibilityBits % 2 == 1 then
+			remVisible[allyTeam][unitID] = 2 -- In LoS
+		elseif floor(visibilityBits / 4) % 4 == 3 then
+			remVisible[allyTeam][unitID] = 1 -- Known type
 		else
 			remVisible[allyTeam][unitID] = 0
 		end
@@ -268,11 +267,19 @@ local function GetGravityWeaponPriorityModifier(unitID, attackerWeaponDefID)
 end
 
 local function GetDisarmWeaponPriorityModifier(unitID, attackerWeaponDefID)
-	local stunned = GetUnitStunnedOrInBuild(unitID)
-	if stunned <= disarmWeaponTimeDefs[attackerWeaponDefID] then
-		return GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
+	local stunned, buildProgress = GetUnitStunnedOrInBuild(unitID)
+	local priority = (disarmPenaltyDefs[attackerWeaponDefID] or 10) + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
+	local fewAttackers = false
+	if buildProgress == 1 and (remStunAttackers[unitID] or 0) < STUN_ATTACKERS_IDLE_REQUIREMENT then
+		remStunAttackers[unitID] = (remStunAttackers[unitID] or 0) + 1
+		priority = priority - stunned*2 -- Counteract stunned penalty in normal priority
+		fewAttackers = true
 	end
-	return (disarmPenaltyDefs[attackerWeaponDefID] or 10) + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
+	if fewAttackers or stunned <= disarmWeaponTimeDefs[attackerWeaponDefID] then
+		return priority
+	end
+
+	return (disarmPenaltyDefs[attackerWeaponDefID] or 10) + priority
 end
 
 --------------------------------------------------------------------------------
@@ -425,7 +432,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
-	local _,_,_,_,_,newAllyTeam = spGetTeamInfo(teamID)
+	local _,_,_,_,_,newAllyTeam = spGetTeamInfo(teamID, false)
 	remAllyTeam[unitID] = newAllyTeam
 end
 
@@ -434,9 +441,14 @@ function gadget:Initialize()
 		local unitDefID = spGetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)
 	end
-	-- Hopefully not all weapon callins will need to be watched
-	-- in some future version.
-	for weaponID,_ in pairs(WeaponDefs) do
-		Script.SetWatchWeapon(weaponID, true)
+
+	for weaponID,wd in pairs(WeaponDefs) do
+		if wd.customParams and wd.customParams.is_unit_weapon then
+			if Script.SetWatchAllowTarget then
+				Script.SetWatchAllowTarget(weaponID, true)
+			else
+				Script.SetWatchWeapon(weaponID, true)
+			end
+		end
 	end
 end

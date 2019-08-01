@@ -290,7 +290,6 @@ local function Burrow()
 		end
 		Sleep(500)
 	end
-	StartThread(BodyControl)
 end
 
 local function UnBurrow()
@@ -331,8 +330,8 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, {body})
-	StartThread(StartStopMovingControl, script.StartMoving, script.StopMoving, nil, true)
+	StartThread(GG.Script.SmokeUnit, {body})
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true)
 	if not Spring.GetUnitIsStunned(unitID) then
 		Burrow()
 	end
@@ -374,43 +373,43 @@ function script.Killed(recentDamage, maxHealth)
 
 	local rand = math.random(1, 10)
 	if rand == 1 then
-		Explode( body, sfxShatter)
-		Explode( head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode( body, SFX.SHATTER)
+		Explode( head, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	elseif rand == 2 then
-		Explode( body, sfxShatter)
-		Explode( turret, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode( body, SFX.SHATTER)
+		Explode( turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	elseif rand == 3 then
-		Explode( body, sfxShatter)
+		Explode( body, SFX.SHATTER)
 	elseif rand == 4 then
-		Explode( head, sfxShatter)
-		Explode( turret, sfxShatter)
-		Explode( body, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode( head, SFX.SHATTER)
+		Explode( turret, SFX.SHATTER)
+		Explode( body, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	elseif rand == 5 then
-		Explode( lfleg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( rfleg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( lrleg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( rrleg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode( lfleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode( rfleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode( lrleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode( rrleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	elseif rand == 6 then
-		Explode( body, sfxShatter)
-		Explode( head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( lfleg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode( body, SFX.SHATTER)
+		Explode( head, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode( lfleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	elseif rand == 7 then
-		Explode( body, sfxShatter)
-		Explode( head, sfxShatter)
-		Explode( turret, sfxShatter)
+		Explode( body, SFX.SHATTER)
+		Explode( head, SFX.SHATTER)
+		Explode( turret, SFX.SHATTER)
 	elseif rand == 8 then
-		Explode( body, sfxShatter)
-		Explode( head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode( body, SFX.SHATTER)
+		Explode( head, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	elseif rand == 9 then
-		Explode( body, sfxShatter)
+		Explode( body, SFX.SHATTER)
 	elseif rand == 10 then
-		Explode( body, sfxShatter)
-		Explode( turret, sfxShatter)
-		Explode( head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( lfleg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( rfleg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( lrleg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( rrleg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode( body, SFX.SHATTER)
+		Explode( turret, SFX.SHATTER)
+		Explode( head, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode( lfleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode( rfleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode( lrleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode( rrleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	end
 	
 	return corpseType

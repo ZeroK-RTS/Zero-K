@@ -78,13 +78,13 @@ function endTeleOutLoop()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	--StartThread(Walk)
 	activity_mode(1)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode(holder, sfxSmoke + sfxFire + sfxExplode)
-	Explode(sphere, sfxFall)
+	Explode(holder, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+	Explode(sphere, SFX.FALL)
 	return 0
 end

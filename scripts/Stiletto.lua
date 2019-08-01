@@ -11,7 +11,6 @@ local smokePiece = {base, jet1, jet2}
 local SIG_Aim = 1
 
 --cob values
-local CRASHING = 97
 
 function script.Create()	
 	Turn(Lwing, z_axis, math.rad(90))
@@ -62,38 +61,38 @@ function script.AimFromWeapon1() return base end
 
 function script.AimWeapon1(heading, pitch)
 	
-	if (GetUnitValue(CRASHING) == 1) then return false end
+	if (GetUnitValue(GG.Script.CRASHING) == 1) then return false end
 	return true
 end
 
 function script.BlockShot1()
-	return (GetUnitValue(CRASHING) == 1)
+	return (GetUnitValue(GG.Script.CRASHING) == 1)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = (recentDamage/maxHealth) * 100
 	if severity < 50 then
-		Explode(base, sfxNone)
-		Explode(jet1, sfxSmoke)
-		Explode(jet2, sfxSmoke)
-		Explode(Lwing, sfxNone)
-		Explode(Rwing, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(jet1, SFX.SMOKE)
+		Explode(jet2, SFX.SMOKE)
+		Explode(Lwing, SFX.NONE)
+		Explode(Rwing, SFX.NONE)
 		return 1
 	elseif severity < 100 then
-		Explode(base, sfxShatter)
-		Explode(jet1, sfxSmoke + sfxFire + sfxExplode)
-		Explode(jet2, sfxSmoke + sfxFire + sfxExplode)
-		Explode(Lwing, sfxFall + sfxSmoke)
-		Explode(Rwing, sfxFall + sfxSmoke)
+		Explode(base, SFX.SHATTER)
+		Explode(jet1, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(jet2, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(Lwing, SFX.FALL + SFX.SMOKE)
+		Explode(Rwing, SFX.FALL + SFX.SMOKE)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(jet1, sfxSmoke + sfxFire + sfxExplode)
-		Explode(jet2, sfxSmoke + sfxFire + sfxExplode)
-		Explode(Lwing, sfxSmoke + sfxExplode)
-		Explode(Rwing, sfxSmoke + sfxExplode)
-		Explode(LwingTip, sfxSmoke + sfxExplode)
-		Explode(RwingTip, sfxSmoke + sfxExplode)
+		Explode(base, SFX.SHATTER)
+		Explode(jet1, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(jet2, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(Lwing, SFX.SMOKE + SFX.EXPLODE)
+		Explode(Rwing, SFX.SMOKE + SFX.EXPLODE)
+		Explode(LwingTip, SFX.SMOKE + SFX.EXPLODE)
+		Explode(RwingTip, SFX.SMOKE + SFX.EXPLODE)
 		return 2
 	end
 end

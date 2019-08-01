@@ -895,6 +895,7 @@ local function SetupMinimapLeftPreset()
 		coreSelectorWidth, 
 		coreSelectorHeight
 	)
+	WG.SetWidgetOption(coreName, corePath, "leftsideofscreen", false)
 	
 	-- Commander Upgrade
 	local commUpgradeWidth = 200
@@ -999,6 +1000,7 @@ local function SetupMinimapRightPreset()
 		coreSelectorWidth, 
 		coreSelectorHeight
 	)
+	WG.SetWidgetOption(coreName, corePath, "leftsideofscreen", true)
 	
 	-- Commander Upgrade
 	local commUpgradeWidth = 200
@@ -1487,6 +1489,28 @@ options = {
 		OnChange = UpdateInterfacePreset
 	},
 }
+
+----------------------------------------------------
+-- Interface
+----------------------------------------------------
+
+function WG.HudEnableWidget(widgetName)
+	widgetHandler:EnableWidget(widgetName)
+end
+
+function WG.HudDisableWidget(widgetName)
+	widgetHandler:DisableWidget(widgetName)
+end
+
+function WG.IsWidgetEnabled(widgetName)
+	local widgets = widgetHandler.widgets
+	for i = 1, #widgets do
+		local w = widgets[i]
+		if w:GetInfo().name == widgetName then
+			return true
+		end
+	end
+end
 
 ----------------------------------------------------
 -- Callins

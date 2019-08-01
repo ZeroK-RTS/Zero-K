@@ -181,11 +181,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:Initialize()
-	
-	for i = 1, #waterCannonIterable do
-		Script.SetWatchWeapon(waterCannonIterable[i],true)
-	end
-
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local team = Spring.GetUnitTeam(unitID)

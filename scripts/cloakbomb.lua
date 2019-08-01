@@ -37,7 +37,7 @@ local function Burrow()
 	
 	Signal(SIG_Walk)
 	burrowed = true
-	EmitSfx(digger, UNIT_SFX1)
+	EmitSfx(digger, GG.Script.UNIT_SFX1)
 	
 	--burrow
 	Move(base, y_axis, -1.500000, 1.500000)
@@ -210,7 +210,7 @@ local function UnBurrow()
 	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	--Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
 	--GG.UpdateUnitAttributes(unitID)
-	EmitSfx(digger, UNIT_SFX1)
+	EmitSfx(digger, GG.Script.UNIT_SFX1)
 	
 	StartThread(Walk)
 end
@@ -233,28 +233,28 @@ function Detonate() -- Giving an order causes recursion.
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
-	StartThread(StartStopMovingControl, script.StartMoving, script.StopMoving, nil, true)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true)
 	if not Spring.GetUnitIsStunned(unitID) then
 		Burrow()
 	end
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode(base, sfxNone)
-	Explode(head, sfxFall, sfxFire, sfxSmoke)
-	Explode(lleg1, sfxFall, sfxFire, sfxSmoke)
-	Explode(lleg2, sfxFall, sfxFire, sfxSmoke)
-	Explode(lleg3, sfxFall, sfxFire, sfxSmoke)
-	Explode(lupleg1, sfxFall, sfxFire, sfxSmoke)
-	Explode(lupleg2, sfxFall, sfxFire, sfxSmoke)
-	Explode(lupleg3, sfxFall, sfxFire, sfxSmoke)
-	Explode(rleg1, sfxFall, sfxFire, sfxSmoke)
-	Explode(rleg2, sfxFall, sfxFire, sfxSmoke)
-	Explode(rleg3, sfxFall, sfxFire, sfxSmoke)
-	Explode(rupleg1, sfxFall, sfxFire, sfxSmoke)
-	Explode(rupleg2, sfxFall, sfxFire, sfxSmoke)
-	Explode(rupleg3, sfxFall, sfxFire, sfxSmoke)
+	Explode(base, SFX.NONE)
+	Explode(head, SFX.FALL, SFX.FIRE, SFX.SMOKE)
+	Explode(lleg1, SFX.FALL, SFX.FIRE, SFX.SMOKE)
+	Explode(lleg2, SFX.FALL, SFX.FIRE, SFX.SMOKE)
+	Explode(lleg3, SFX.FALL, SFX.FIRE, SFX.SMOKE)
+	Explode(lupleg1, SFX.FALL, SFX.FIRE, SFX.SMOKE)
+	Explode(lupleg2, SFX.FALL, SFX.FIRE, SFX.SMOKE)
+	Explode(lupleg3, SFX.FALL, SFX.FIRE, SFX.SMOKE)
+	Explode(rleg1, SFX.FALL, SFX.FIRE, SFX.SMOKE)
+	Explode(rleg2, SFX.FALL, SFX.FIRE, SFX.SMOKE)
+	Explode(rleg3, SFX.FALL, SFX.FIRE, SFX.SMOKE)
+	Explode(rupleg1, SFX.FALL, SFX.FIRE, SFX.SMOKE)
+	Explode(rupleg2, SFX.FALL, SFX.FIRE, SFX.SMOKE)
+	Explode(rupleg3, SFX.FALL, SFX.FIRE, SFX.SMOKE)
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.5) then
 		return 1 -- corpsetype

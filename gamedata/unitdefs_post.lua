@@ -173,12 +173,21 @@ end
 for name, ud in pairs(UnitDefs) do
 	if not ud.customparams.dynamic_comm then
 		if ud.weapondefs then
+			local cobWeapon = (ud.script and ud.script:find("%.cob"))
 			for _, wd in pairs(ud.weapondefs) do
 				if wd.customparams and wd.customparams.script_reload then
 					ud.customparams.script_reload = wd.customparams.script_reload
 				end
 				if wd.customparams and wd.customparams.script_burst then
 					ud.customparams.script_burst = wd.customparams.script_burst
+				end
+				if wd.customparams and wd.customparams.post_capture_reload then
+					ud.customparams.post_capture_reload = wd.customparams.post_capture_reload
+				end
+				wd.customparams = wd.customparams or {}
+				wd.customparams.is_unit_weapon = 1
+				if cobWeapon then
+					wd.customparams.cob_weapon = 1
 				end
 			end
 		end

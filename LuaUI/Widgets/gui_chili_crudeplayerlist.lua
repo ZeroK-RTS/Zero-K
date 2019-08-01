@@ -54,7 +54,7 @@ local white		= ''
 local function IsFFA()
 	local allyteams = Spring.GetAllyTeamList()
 	local gaiaT = Spring.GetGaiaTeamID()
-	local gaiaAT = select(6, Spring.GetTeamInfo(gaiaT))
+	local gaiaAT = select(6, Spring.GetTeamInfo(gaiaT, false))
 	local numAllyTeams = 0
 	for i=1,#allyteams do
 		if allyteams[i] ~= gaiaAT then
@@ -306,8 +306,8 @@ local function CfTooltip(allyTeam)
 	tooltip = tooltip .. 'Your team\'s votes: \n'
 	local teamList = Spring.GetTeamList(localAlliance)
 	for _,teamID in ipairs(teamList) do
-		local _,playerID = Spring.GetTeamInfo(teamID)
-		local name = Spring.GetPlayerInfo(playerID) or '-'
+		local _,playerID = Spring.GetTeamInfo(teamID, false)
+		local name = Spring.GetPlayerInfo(playerID, false) or '-'
 		local vote = Spring.GetTeamRulesParam(teamID, 'cf_vote_' ..allyTeam)==1 and green..'Y'..white or red..'N'..white
 		local teamColor = color2incolor(Spring.GetTeamColor(teamID))
 		tooltip = tooltip .. teamColor .. ' <' .. name .. '> ' .. white.. vote ..'\n'
@@ -334,7 +334,7 @@ local function MakeSpecTooltip()
 	
 	local specsSorted = {}
 	for i = 1, #players do
-		local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage = Spring.GetPlayerInfo(players[i])
+		local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage = Spring.GetPlayerInfo(players[i], false)
 		if spectator and active then
 			specsSorted[#specsSorted + 1] = {name = name, ping = pingTime, cpu = math.min(cpuUsage,1)}
 			--specsSorted[#specsSorted + 1] = {name = name, ping = pingTime, cpu = cpuUsage}
@@ -360,7 +360,7 @@ local function UpdatePlayerInfo()
 	for i = 1, #entities do
 		if not entities[i].isAI then
 			local playerID = entities[i].playerID
-			local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage = Spring.GetPlayerInfo(playerID)
+			local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage = Spring.GetPlayerInfo(playerID, false)
 			--Spring.Echo("Player Update", playerID, name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, #(Spring.GetPlayerList(teamID, true)))
 			
 			local name_out = name or ''
@@ -744,7 +744,7 @@ SetupPlayerNames = function()
 	local allyTeamsSorted = Spring.GetAllyTeamList()
 	
 	local myID = Spring.GetMyPlayerID()
-	local myName = Spring.GetPlayerInfo(myID)
+	local myName = Spring.GetPlayerInfo(myID, false)
 	localTeam = Spring.GetMyTeamID()
 	localAlliance = Spring.GetMyAllyTeamID()
 	
@@ -753,7 +753,7 @@ SetupPlayerNames = function()
 		local teamID = teamsSorted[i]
 		if teamID ~= Spring.GetGaiaTeamID() then
 			teams[teamID] = teams[teamID] or {roster = {}}
-			local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
+			local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID, false)
 			if isAI then
 				local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
 				name = '<'.. name ..'> '.. shortName
@@ -771,7 +771,7 @@ SetupPlayerNames = function()
 	-- go through all players, register as entities, assign to teams
 	for i = 1, #playerlist do
 		local playerID = playerlist[i]
-		local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country = Spring.GetPlayerInfo(playerID)
+		local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country = Spring.GetPlayerInfo(playerID, false)
 		local isSpec = (teamID == 0 and spectator and Spring.GetPlayerRulesParam(playerID, "initiallyPlayingPlayer") ~= 1)
 		local entityID = #entities + 1
 		entities[entityID] = {name = name, isSpec = isSpec, playerID = playerID, teamID = teamID}--(not spectator) and teamID or nil}

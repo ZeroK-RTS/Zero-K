@@ -21,6 +21,7 @@ unitDef = {
 
   energyMake                    = 2,
   explodeAs                     = [[NOWEAPON]],
+  floater                       = true,
   footprintX                    = 3,
   footprintZ                    = 3,
   iconType                      = [[defense]],

@@ -96,7 +96,7 @@ function StockpileChanged(newStock)
 end
 
 function script.Create()
-	StartThread(SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, {base})
 	Hide(tube)
 	Hide(tower)
 	Hide(nuke)
@@ -146,35 +146,28 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
-		Explode(base, sfxNone)
-		Explode(tube, sfxNone)
-		Explode(doorl, sfxNone)
-		Explode(doorr, sfxNone)
-		Explode(tower, sfxNone)
-		Explode(nuke, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(tube, SFX.NONE)
+		Explode(doorl, SFX.NONE)
+		Explode(doorr, SFX.NONE)
+		Explode(tower, SFX.NONE)
+		Explode(nuke, SFX.NONE)
 		return 1
 	elseif (severity <= .5) then
-		Explode(base, sfxNone)
-		Explode(tube, sfxShatter)
-		Explode(doorl, sfxFall)
-		Explode(doorr, sfxFall)
-		Explode(tower, sfxNone)
-		Explode(nuke, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(tube, SFX.SHATTER)
+		Explode(doorl, SFX.FALL)
+		Explode(doorr, SFX.FALL)
+		Explode(tower, SFX.NONE)
+		Explode(nuke, SFX.NONE)
 		return 1
 	else
-		Explode(base, sfxNone)
-		Explode(tube, sfxShatter)
-		Explode(doorl, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(doorr, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(tower, sfxNone)
-		Explode(nuke, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(tube, SFX.SHATTER)
+		Explode(doorl, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(doorr, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(tower, SFX.NONE)
+		Explode(nuke, SFX.NONE)
 		return 2
 	end
-	Explode(base, sfxNone)
-	Explode(tube, sfxShatter + sfxExplodeOnHit)
-	Explode(doorl, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(doorr, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(tower, sfxNone)
-	Explode(nuke, sfxNone)
-	return 2
 end

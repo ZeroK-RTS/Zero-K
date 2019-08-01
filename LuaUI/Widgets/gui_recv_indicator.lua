@@ -288,7 +288,7 @@ end
 
 function widget:Initialize()
 	local myPlayerID=Spring.GetMyPlayerID()
-	local _, _, spec = Spring.GetPlayerInfo(myPlayerID)
+	local _, _, spec = Spring.GetPlayerInfo(myPlayerID, false)
 	if spec or Spring.GetModOptions().campaign_disable_share_marker then
 		widgetHandler:RemoveWidget()
 		return false
@@ -311,12 +311,12 @@ function widget:Initialize()
 	for j= 1, #teamList do
 		local teamID = teamList[j]
 		notifyCapture[teamID] = true
-		local _,playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		local _,playerID, _, isAI = Spring.GetTeamInfo(teamID, false)
 		if isAI then
 			local _, aiName = Spring.GetAIInfo(teamID)
 			gameID_to_playerName[teamID+1] = aiName
 		elseif not isAI then
-			local playerName = Spring.GetPlayerInfo(playerID)
+			local playerName = Spring.GetPlayerInfo(playerID, false)
 			gameID_to_playerName[teamID+1] = playerName or "Gaia"
 		end
 	end

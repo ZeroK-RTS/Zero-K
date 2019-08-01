@@ -102,14 +102,7 @@ local sound_queue_rem = LUAUI_DIRNAME .. 'Sounds/buildbar_rem.wav'
 
 local image_repeat    = LUAUI_DIRNAME .. 'Images/repeat.png'
 
-local teamColors = {}
-local GetTeamColor = Spring.GetTeamColor or function (teamID)
-  local color = teamColors[teamID]
-  if (color) then return unpack(color) end
-  local _,_,_,_,_,_,r,g,b = Spring.GetTeamInfo(teamID)
-  teamColors[teamID] = {r,g,b}
-  return r,g,b
-end
+local GetTeamColor = Spring.GetTeamColor
 
 -------------------------------------------------------------------------------
 -- SCREENSIZE FUNCTIONS
@@ -451,8 +444,13 @@ local function WaypointHandler(x,y,button)
     Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt) 
   elseif type=='unit' then
     Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.GUARD,{param},opt)     
+  elseif type~='feature' then
+    return -- sky, ignore
   else --feature
     type,param = Spring.TraceScreenRay(x,y,true)
+    if not param then
+      return -- there's sky behind the feature, ignore
+    end
     Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt)
   end
 

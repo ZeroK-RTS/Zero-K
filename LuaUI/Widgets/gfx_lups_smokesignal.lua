@@ -92,7 +92,7 @@ function widget:MapDrawCmd(playerID, cmdType, px, py, pz, caption)
 	smokeFX.force[2] = wy * 0.09 + 3
 	smokeFX.force[3] = wz * 0.09
 
-	local _,_, spec, teamID = Spring.GetPlayerInfo(playerID)
+	local _,_, spec, teamID = Spring.GetPlayerInfo(playerID, false)
 	if spec then
 		teamID = Spring.GetGaiaTeamID()
 	end

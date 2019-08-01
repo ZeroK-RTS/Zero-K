@@ -1064,13 +1064,13 @@ end
 
 local function setupPlayers(playerID)
 	if playerID then
-		local name, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerID)
+		local name, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerID, false)
 		--lobby: grey chat, spec: white chat, player: color chat
 		incolors[name] = (spec and incolors['#s']) or color2incolor(Spring.GetTeamColor(teamId))
 	else
 		local playerroster = Spring.GetPlayerList()
 		for i, id in ipairs(playerroster) do
-			local name,active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id)
+			local name,active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id, false)
 			--lobby: grey chat, spec: white chat, player: color chat
 			incolors[name] = (spec and incolors['#s']) or color2incolor(Spring.GetTeamColor(teamId))
 		end
@@ -1084,7 +1084,7 @@ local function SetupAITeamColor() --Copied from gui_chili_chat2_1.lua
 	for i=1,#teamsSorted do
 		local teamID = teamsSorted[i]
 		if teamID ~= Spring.GetGaiaTeamID() then
-			local isAI = select(4,Spring.GetTeamInfo(teamID))
+			local isAI = select(4,Spring.GetTeamInfo(teamID, false))
 			if isAI then
 				local name = select(2,Spring.GetAIInfo(teamID))
 				incolors[name] = color2incolor(Spring.GetTeamColor(teamID))
@@ -1094,7 +1094,7 @@ local function SetupAITeamColor() --Copied from gui_chili_chat2_1.lua
 end
 
 local function setupMyself()
-	myName, _, _, _, myAllyTeamId = Spring.GetPlayerInfo(Spring.GetMyPlayerID()) -- or do it in the loop?
+	myName, _, _, _, myAllyTeamId = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false) -- or do it in the loop?
 	highlightPattern = caseInsensitivePattern(myName)
 end
 
@@ -1356,7 +1356,7 @@ function widget:MapDrawCmd(playerId, cmdType, px, py, pz, caption)
 end
 
 function widget:AddMapPoint(playerId, px, py, pz, caption)
-	local playerName, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerId)
+	local playerName, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerId, false)
 
 	widget:AddConsoleMessage({
 		msgtype = ((caption:len() > 0) and 'label' or 'point'),

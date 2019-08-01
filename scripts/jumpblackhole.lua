@@ -41,7 +41,7 @@ local SIG_Walk = 2
 local SIG_Aim = 4
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Turn(flare, x_axis, 1.6, 5)
 	Turn(lshoulder, x_axis, -0.9, 5)
 	Turn(lforearm, z_axis, -0.2, 5)
@@ -182,35 +182,35 @@ function beginJump()
 end
 
 function jumping()
-	EmitSfx(lfoot, UNIT_SFX4)
-	EmitSfx(rfoot, UNIT_SFX4)
-	EmitSfx(lfoot, UNIT_SFX1)
-	EmitSfx(rfoot, UNIT_SFX2)
-	EmitSfx(lshoulder, UNIT_SFX3)
-	EmitSfx(rshoulder, UNIT_SFX3)
+	EmitSfx(lfoot, GG.Script.UNIT_SFX4)
+	EmitSfx(rfoot, GG.Script.UNIT_SFX4)
+	EmitSfx(lfoot, GG.Script.UNIT_SFX1)
+	EmitSfx(rfoot, GG.Script.UNIT_SFX2)
+	EmitSfx(lshoulder, GG.Script.UNIT_SFX3)
+	EmitSfx(rshoulder, GG.Script.UNIT_SFX3)
 end
 
 function halfJump()
 end
 
 function endJump() 
-	EmitSfx(lfoot, UNIT_SFX4)
-	EmitSfx(rfoot, UNIT_SFX4)
+	EmitSfx(lfoot, GG.Script.UNIT_SFX4)
+	EmitSfx(rfoot, GG.Script.UNIT_SFX4)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
-		Explode(hips, sfxNone)
-		Explode(chest, sfxNone)
+		Explode(hips, SFX.NONE)
+		Explode(chest, SFX.NONE)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
-		Explode(hips, sfxNone)
-		Explode(chest, sfxShatter)
+		Explode(hips, SFX.NONE)
+		Explode(chest, SFX.SHATTER)
 		return 1 -- corpsetype
 	else
-		Explode(hips, sfxShatter)
-		Explode(chest, sfxSmoke + sfxFire + sfxExplode)
+		Explode(hips, SFX.SHATTER)
+		Explode(chest, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2 -- corpsetype
 	end
 end

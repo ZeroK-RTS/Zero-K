@@ -91,27 +91,27 @@ function script.Deactivate()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, {head, hips, chest})
+	StartThread(GG.Script.SmokeUnit, {head, hips, chest})
 	Turn(hips, x_axis, math.rad(45))
 end
 	
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.25) then
-		Explode(hips, sfxNone)
-		Explode(chest, sfxNone)
-		Explode(head, sfxFall + sfxFire)
+		Explode(hips, SFX.NONE)
+		Explode(chest, SFX.NONE)
+		Explode(head, SFX.FALL + SFX.FIRE)
 		return 1
 	elseif (severity <= 0.5) then
-		Explode(hips, sfxShatter)
-		Explode(chest, sfxShatter)
-		Explode(head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(hips, SFX.SHATTER)
+		Explode(chest, SFX.SHATTER)
+		Explode(head, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		return 1
 	end
 
-	Explode(hips, sfxShatter)
-	Explode(chest, sfxShatter)
-	Explode(head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(hips, SFX.SHATTER)
+	Explode(chest, SFX.SHATTER)
+	Explode(head, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	
 	return 2
 end

@@ -1,34 +1,31 @@
-local IsInTurn = Spring.UnitScript.IsInTurn
-local IsInMove = Spring.UnitScript.IsInMove 
-local GetPieceRotation = Spring.UnitScript.GetPieceRotation
-local GetPieceTranslation = Spring.UnitScript.GetPieceTranslation 
-local SpringGetUnitRulesParam = Spring.GetUnitRulesParam
-local SpringGetUnitIsStunned = Spring.GetUnitIsStunned
+if GG.PieceControl then
+	return
+end
+GG.PieceControl = {}
 
--- for some reason a 4th argument is required
-local ROTATION_STOP = math.rad(3)
-local TRANSLATION_STOP = 1
+GG.PieceControl.ROTATION_STOP = math.rad(3)
+GG.PieceControl.TRANSLATION_STOP = 1
 
-function StopTurn(piece, axis)
-	if IsInTurn(piece, axis) then
-		local rot = select(axis, GetPieceRotation(piece))
-		Turn(piece, axis, rot, ROTATION_STOP)
+function GG.PieceControl.StopTurn(piece, axis)
+	if Spring.UnitScript.IsInTurn(piece, axis) then
+		local rot = select(axis, Spring.UnitScript.GetPieceRotation(piece))
+		Turn(piece, axis, rot, GG.PieceControl.ROTATION_STOP)
 		return true
 	end
 	return false
 end
 
-function StopMove(piece, axis)
-	if IsInMove(piece, axis) then
-		local trans = select(axis, GetPieceRotation(piece))
-		Move(piece, axis, trans, TRANSLATION_STOP)
+function GG.PieceControl.StopMove(piece, axis)
+	if Spring.UnitScript.IsInMove (piece, axis) then
+		local trans = select(axis, Spring.UnitScript.GetPieceRotation(piece))
+		Move(piece, axis, trans, GG.PieceControl.TRANSLATION_STOP)
 		return true
 	end
 	return false
 end
 
-function IsDisarmed ()
-	if ((SpringGetUnitRulesParam (unitID, "disarmed") == 1) or SpringGetUnitIsStunned (unitID)) then
+function GG.PieceControl.IsDisarmed ()
+	if ((Spring.SpringGetUnitRulesParam (unitID, "disarmed") == 1) or Spring.SpringGetUnitIsStunned (unitID)) then
 		return true
 	else
 		return false

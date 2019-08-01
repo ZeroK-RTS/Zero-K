@@ -6,9 +6,9 @@ unitDef = {
   buildCostMetal                = 400,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 5,
-  buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[turretgauss_aoplane.dds]],
+  buildingGroundDecalSizeX      = 4,
+  buildingGroundDecalSizeY      = 4,
+  buildingGroundDecalType       = [[gauss_aoplate.dds]],
   buildPic                      = [[turretgauss.png]],
   canMove                       = false,
   category                      = [[SINK TURRET]],
@@ -53,10 +53,6 @@ unitDef = {
   sightDistance                 = 660,
   useBuildingGroundDecal        = true,
   yardmap                       = [[ooooooooo]],
-  buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 4,
-  buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[gauss_aoplate.dds]],
 
   weapons                       = {
 

@@ -19,9 +19,11 @@ if gadgetHandler:IsSyncedCode() then
 
 local spGetUnitPosition   = Spring.GetUnitPosition
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
-local spGetUnitStates     = Spring.GetUnitStates
 local spMoveCtrlGetTag    = Spring.MoveCtrl.GetTag
 local spGetCommandQueue   = Spring.GetCommandQueue
+
+local mapSizeX = Game.mapSizeX
+local mapSizeZ = Game.mapSizeZ
 
 local CMD_STOP    = CMD.STOP
 local CMD_INSERT  = CMD.INSERT
@@ -303,13 +305,24 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	if spMoveCtrlGetTag(unitID) then
 		return true, false
 	end
+
+	if #cmdParams < 3 then
+		return true, true
+	end
+
+	local mx, my, mz = cmdParams[1], cmdParams[2], cmdParams[3]
+	if mx < 0 or mx >= mapSizeX or mz < 0 or mz >= mapSizeZ then
+		mx = math.max(0, math.min(mx, mapSizeX))
+		mz = math.max(0, math.min(mz, mapSizeZ))
+	end
+
 	local goalDistOverride = cmdParams[4]
 	local timerIncrement = cmdParams[5] or 1
 	if not rawMoveUnit[unitID] then
 		rawMoveUnit[unitID] = {}
 	end
 	local unitData = rawMoveUnit[unitID]
-	if not (unitData.cx == cmdParams[1] and unitData.cz == cmdParams[3]) then
+	if not (unitData.cx == mx and unitData.cz == mz) then
 		ResetUnitData(unitData)
 	end
 	if unitData.handlingWaitTime then
@@ -321,13 +334,13 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	end
 
 	local x, y, z = spGetUnitPosition(unitID)
-	local distSq = (x - (unitData.mx or cmdParams[1]))^2 + (z - (unitData.mz or cmdParams[3]))^2
+	local distSq = (x - (unitData.mx or mx))^2 + (z - (unitData.mz or mz))^2
 
 	if not unitData.cx then
-		unitData.cx, unitData.cz = cmdParams[1], cmdParams[3]
-		unitData.commandString = cmdParams[1] .. "_" .. cmdParams[3]
+		unitData.cx, unitData.cz = mx, mz
+		unitData.commandString = mx .. "_" .. mz
 		commandCount[unitData.commandString] = (commandCount[unitData.commandString] or 0) + 1
-		unitData.preventGoalClumping = (not goalDistOverride) and (distSq > COMMON_STOP_RADIUS_ACTIVE_DIST_SQ) and not (spGetUnitStates(unitID) or {})["repeat"]
+		unitData.preventGoalClumping = (not goalDistOverride) and (distSq > COMMON_STOP_RADIUS_ACTIVE_DIST_SQ) and not Spring.Utilities.GetUnitRepeat(unitID)
 	end
 	if unitData.preventGoalClumping and unitData.commandString and not commonStopRadius[unitData.commandString] then
 		commonStopRadius[unitData.commandString] = oldCommandStoppingRadius[unitData.commandString] or 0
@@ -359,7 +372,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		end
 		unitData.switchedFromRaw = true
 		unitData.commandHandled = true
-		Spring.SetUnitMoveGoal(unitID, cmdParams[1],cmdParams[2],cmdParams[3], goalDistOverride or goalDist[unitDefID] or 16, nil, false)
+		Spring.SetUnitMoveGoal(unitID, mx, my, mz, goalDistOverride or goalDist[unitDefID] or 16, nil, false)
 		return true, false
 	end
 
@@ -412,14 +425,13 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	unitData.nextTestTime = (unitData.nextTestTime or 0) - timerIncrement
 	if unitData.nextTestTime <= 0 then
 		local lazy = unitData.doingRawMove
-		local mx, my, mz = cmdParams[1], cmdParams[2], cmdParams[3]
 		local freePath
 		if (turnDiameterSq[unitDefID] or 0) > distSq then
 			freePath = false
 		else
 			local distance = math.sqrt(distSq)
 			local rx, rz
-			freePath, rx, rz = IsPathFree(unitDefID, x, z, cmdParams[1], cmdParams[3], distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE, goalDistOverride and (goalDistOverride - 20), BLOCK_RELAX_DISTANCE)
+			freePath, rx, rz = IsPathFree(unitDefID, x, z, mx, mz, distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE, goalDistOverride and (goalDistOverride - 20), BLOCK_RELAX_DISTANCE)
 			if rx then
 				mx, my, mz = rx, Spring.GetGroundHeight(rx, rz), rz
 			end
@@ -463,8 +475,7 @@ end
 
 local function CheckUnitQueues()
 	for unitID,_ in pairs(unitQueuesToCheck) do
-		local queue = spGetCommandQueue(unitID, 1)
-		if (not queue) or (not queue[1]) or (queue[1].id ~= CMD_RAW_MOVE) then
+		if Spring.Utilities.GetUnitFirstCommand(unitID) ~= CMD_RAW_MOVE then
 			StopRawMoveUnit(unitID)
 		end
 		unitQueuesToCheck[unitID] = nil
@@ -514,25 +525,37 @@ end
 ----------------------------------------------------------------------------------------------
 -- Constructor Handling
 
-local function GetConstructorCommandPos(cmd, secondCmd)
-	if cmd and (cmd.id == CMD_RAW_BUILD) then
-		cmd = secondCmd
+local function GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6, unitID)
+	if cmdID == CMD_RAW_BUILD then
+		if Spring.Utilities.COMPAT_GET_ORDER then
+			local queue = Spring.GetCommandQueue(unitID, 2)
+			if queue and queue[2] then
+				local par = queue[2].params
+				cmdID = queue[2].id
+				cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = par[1], par[2], par[3], par[4], par[5], par[6]
+			else
+				cmdID = false
+			end
+		else
+			cmdID, _, _, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID, 2)
+		end
 	end
-	if not cmd then
+	if not cmdID then
 		return false
 	end
 
-	if cmd.id < 0 then
-		return cmd.params[1], cmd.params[2], cmd.params[3]
+	if cmdID < 0 then
+		return cp_1, cp_2, cp_3
 	end
 
-	if cmd.id == CMD_REPAIR then
-		if cmd.params and (#cmd.params == 5 or #cmd.params == 1) then
-			local unitID = cmd.params[1]
-			local unitDefID = Spring.GetUnitDefID(unitID)
+	if cmdID == CMD_REPAIR then
+		-- (#cmd.params == 5 or #cmd.params == 1)
+		if (cp_1 and not cp_2) or (cp_5 and not cp_6) then
+			local targetUnitID = cp_1
+			local unitDefID = Spring.GetUnitDefID(targetUnitID)
 			if unitDefID and not canMoveDefs[unitDefID] then
 				-- Don't try to chase moving units with raw move.
-				local x, y, z = Spring.GetUnitPosition(unitID)
+				local x, y, z = Spring.GetUnitPosition(targetUnitID)
 				if x then
 					return x, y, z
 				end
@@ -540,9 +563,10 @@ local function GetConstructorCommandPos(cmd, secondCmd)
 		end
 	end
 
-	if cmd.id == CMD_RECLAIM then
-		if cmd.params and (#cmd.params == 5 or #cmd.params == 1) then
-			local x, y, z = Spring.GetFeaturePosition(cmd.params[1] - MAX_UNITS)
+	if cmdID == CMD_RECLAIM then
+		-- (#cmd.params == 5 or #cmd.params == 1)
+		if (cp_1 and not cp_2) or (cp_5 and not cp_6) then
+			local x, y, z = Spring.GetFeaturePosition(cp_1 - MAX_UNITS)
 			if x then
 				return x, y, z
 			end
@@ -555,18 +579,28 @@ local function CheckConstructorBuild(unitID)
 	if not buildDist then
 		return
 	end
+	
+	local cmdID, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6
+	if Spring.Utilities.COMPAT_GET_ORDER then
+		local queue = Spring.GetCommandQueue(unitID, 1)
+		if queue and queue[1] then
+			local par = queue[1].params
+			cmdID, cmdTag = queue[1].id, queue[1].tag
+			cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = par[1], par[2], par[3], par[4], par[5], par[6]
+		end
+	else
+		cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID)
+	end
+	
 	local queue = spGetCommandQueue(unitID, 2)
 	if not queue then
 		return
 	end
-	local cmd = queue[1]
-	local secondCmd = queue[2]
+	local cx, cy, cz = GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6, unitID)
 
-	local cx, cy, cz = GetConstructorCommandPos(cmd, secondCmd)
-
-	if cmd and cmd.id == CMD_RAW_BUILD then
-		if (not cx) or math.abs(cx - cmd.params[1]) > 3 or math.abs(cz - cmd.params[3]) > 3 then
-			Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmd.tag}, 0)
+	if cmdID == CMD_RAW_BUILD and cp_3 then
+		if (not cx) or math.abs(cx - cp_1) > 3 or math.abs(cz - cp_3) > 3 then
+			Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0)
 			StopRawMoveUnit(unitID, true)
 		end
 		return
@@ -672,15 +706,24 @@ end
 -- Move replacement
 
 local function ReplaceMoveCommand(unitID)
-	local queue = spGetCommandQueue(unitID, 1)
-	local cmd = queue and queue[1]
-	if cmd and cmd.id == CMD_MOVE and cmd.params[3] then
+	local cmdID, cmdTag, cmdParam_1, cmdParam_2, cmdParam_3
+	if Spring.Utilities.COMPAT_GET_ORDER then
+		local queue = Spring.GetCommandQueue(unitID, 1)
+		if queue and queue[1] then
+			cmdID, cmdTag = queue[1].id, queue[1].tag
+			cmdParam_1, cmdParam_2, cmdParam_3 = queue[1].params[1], queue[1].params[2], queue[1].params[3]
+		end
+	else
+		cmdID, _, cmdTag, cmdParam_1, cmdParam_2, cmdParam_3 = Spring.GetUnitCurrentCommand(unitID)
+	end
+
+	if cmdID == CMD_MOVE and cmdParam_3 then
 		if fromFactory[unitID] then
 			fromFactory[unitID] = nil
 		else
-			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_RAW_MOVE, 0, cmd.params[1], cmd.params[2], cmd.params[3]}, CMD.OPT_ALT)
+			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_RAW_MOVE, 0, cmdParam_1, cmdParam_2, cmdParam_3}, CMD.OPT_ALT)
 		end
-		Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmd.tag}, 0)
+		Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0)
 	end
 end
 

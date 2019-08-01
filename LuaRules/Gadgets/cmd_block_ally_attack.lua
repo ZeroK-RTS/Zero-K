@@ -15,7 +15,7 @@ include("LuaRules/Configs/customcmds.h.lua")
 local allyTeamByTeam = {}
 local teamList = Spring.GetTeamList()
 for i = 1, #teamList do
-	local allyTeamID = select(6, Spring.GetTeamInfo(teamList[i]))
+	local allyTeamID = select(6, Spring.GetTeamInfo(teamList[i], false))
 	allyTeamByTeam[teamList[i]] = allyTeamID
 end
 

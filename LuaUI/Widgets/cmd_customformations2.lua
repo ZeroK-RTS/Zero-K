@@ -446,14 +446,9 @@ local function GiveNonNotifyingOrder(cmdID, cmdParams, cmdOpts)
 end
 
 local function GiveNotifyingOrderToUnit(uID, cmdID, cmdParams, cmdOpts)
-	local widgets = widgetHandler.widgets
-	for i=1, #widgets do
-		local w = widgets[i]
-		if w.UnitCommandNotify and w:UnitCommandNotify(uID, cmdID, cmdParams, cmdOpts) then
-			return
-		end
+	if widgetHandler:UnitCommandNotify(uID, cmdID, cmdParams, cmdOpts) then
+		return
 	end
-	
 	spGiveOrderToUnit(uID, cmdID, cmdParams, cmdOpts.coded)
 end
 
@@ -463,8 +458,9 @@ local function SendSetWantedMaxSpeed(alt, ctrl, meta, shift)
 	if ctrl then
 		local selUnits = spGetSelectedUnits()
 		for i = 1, #selUnits do
-			local uSpeed = UnitDefs[spGetUnitDefID(selUnits[i])].speed
-			if uSpeed > 0 and uSpeed < wantedSpeed then
+			local ud = UnitDefs[spGetUnitDefID(selUnits[i])]
+			local uSpeed = ud and ud.speed
+			if uSpeed and uSpeed > 0 and uSpeed < wantedSpeed then
 				wantedSpeed = uSpeed
 			end
 		end

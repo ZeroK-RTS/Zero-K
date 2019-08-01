@@ -361,7 +361,7 @@ function script.Create()
 	Turn(rf_ball, y_axis, math.rad(-45))
 	Turn(lb_ball, y_axis, math.rad(-45))
 	Turn(rb_ball, y_axis, math.rad(45))
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 local function Stopping()

@@ -55,7 +55,7 @@ end
 
 function script.Create()
 	Turn(firepoint, x_axis, math.rad(-90))
-	StartThread(SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 end
@@ -90,20 +90,20 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 
 	if severity <= 0.25 then
-		Explode(body, sfxNone)
+		Explode(body, SFX.NONE)
 		return 1
 	end
 	if severity <= 0.50 then
-		Explode(body, sfxNone)
-		Explode(turret, sfxShatter)
+		Explode(body, SFX.NONE)
+		Explode(turret, SFX.SHATTER)
 		return 1
 	end
 	if severity <= 0.99 then
-		Explode(body, sfxNone)
-		Explode(turret, sfxShatter)
+		Explode(body, SFX.NONE)
+		Explode(turret, SFX.SHATTER)
 		return 2
 	end
-	Explode(body, sfxNone)
-	Explode(turret, sfxShatter)
+	Explode(body, SFX.NONE)
+	Explode(turret, SFX.SHATTER)
 	return 2
 end

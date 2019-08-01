@@ -14,8 +14,6 @@ for i=1,6 do
 	}
 end
 
-local tau = math.pi*2
-local pi = math.pi
 local hpi = math.pi*0.5
 
 local headingSpeed = math.rad(4)
@@ -68,7 +66,7 @@ local weaponNum = 1
 local randomize = false
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Turn(spindle, x_axis, spindleOffset + spindlePitch)
 	for i=1,6 do
 		Turn(guns[i].flare, x_axis, (math.rad(-60)* i+1))
@@ -85,8 +83,8 @@ end
 
 function script.HitByWeapon()
 	if Spring.GetUnitRulesParam(unitID,"disarmed") == 1 then
-		StopTurn (turret, y_axis)
-		StopTurn (spindle, x_axis)
+		GG.PieceControl.StopTurn (turret, y_axis)
+		GG.PieceControl.StopTurn (spindle, x_axis)
 	end
 end
 
@@ -115,14 +113,14 @@ function script.AimWeapon(num, heading, pitch)
 
 	local curHead = select (2, Spring.UnitScript.GetPieceRotation(turret))
 	local headDiff = heading-curHead
-	if math.abs(headDiff) > pi then
-		headDiff = headDiff - math.abs(headDiff)/headDiff*2*pi
+	if math.abs(headDiff) > math.pi then
+		headDiff = headDiff - math.abs(headDiff)/headDiff*2*math.pi
 	end
 	--Spring.Echo(headDiff*180/math.pi)
 
 	if math.abs(headDiff) > hpi then
-		heading = (heading+pi)%tau
-		pitch = -pitch+pi
+		heading = (heading+math.pi)%GG.Script.tau
+		pitch = -pitch+math.pi
 	end
 	spindlePitch = -pitch
 
@@ -173,24 +171,24 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(base, sfxNone)
-		Explode(spindle, sfxNone)
-		Explode(turret, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(spindle, SFX.NONE)
+		Explode(turret, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(base, sfxNone)
-		Explode(spindle, sfxNone)
-		Explode(turret, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(spindle, SFX.NONE)
+		Explode(turret, SFX.NONE)
 		return 1
 	elseif severity <= .99 then
-		Explode(base, sfxShatter)
-		Explode(spindle, sfxShatter)
-		Explode(turret, sfxShatter)
+		Explode(base, SFX.SHATTER)
+		Explode(spindle, SFX.SHATTER)
+		Explode(turret, SFX.SHATTER)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(spindle, sfxShatter)
-		Explode(turret, sfxShatter)
+		Explode(base, SFX.SHATTER)
+		Explode(spindle, SFX.SHATTER)
+		Explode(turret, SFX.SHATTER)
 		return 2
 	end
 end

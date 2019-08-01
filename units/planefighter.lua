@@ -77,11 +77,10 @@ unitDef = {
 
     {
       def                = [[SWIFT_GUN]],
-      badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 60,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  badTargetCategory  = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
+      badTargetCategory  = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
     },
 
 

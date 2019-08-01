@@ -110,11 +110,11 @@ function Detonate() -- Giving an order causes recursion.
 end
 
 local function Killed(recentDamage, maxHealth)
-	Explode(body, sfxSmoke + sfxShatter)
-	Explode(wheell1, sfxSmoke + sfxFire)
-	Explode(wheell2, sfxSmoke + sfxFire)
-	Explode(wheelr1, sfxSmoke + sfxFire)
-	Explode(wheelr2, sfxSmoke + sfxFire)
+	Explode(body, SFX.SMOKE + SFX.SHATTER)
+	Explode(wheell1, SFX.SMOKE + SFX.FIRE)
+	Explode(wheell2, SFX.SMOKE + SFX.FIRE)
+	Explode(wheelr1, SFX.SMOKE + SFX.FIRE)
+	Explode(wheelr2, SFX.SMOKE + SFX.FIRE)
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.5) then
 		return 1 -- corpsetype
@@ -124,6 +124,6 @@ local function Killed(recentDamage, maxHealth)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	return DelayTrueDeath(recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
+	return GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
 end
 

@@ -1,7 +1,7 @@
 --Chat preprocessor. Provide preprocessed chat message for Chili Chat widget
 --last update: 20 May 2014
 
-local myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID()) or "nonanme"
+local myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false) or "nonanme"
 local transmitMagic = "> ["..myName.."]!transmit" -- Lobby is sending to LuaUI
 local voiceMagic = "> ["..myName.."]!transmit voice" -- Lobby is sending a voice command to LuaUI
 local transmitLobbyMagic = "!transmitlobby" -- LuaUI is sending to lobby
@@ -84,7 +84,7 @@ function MessageProcessor:AddPlayer(playerID)
 end
 
 function MessageProcessor:UpdatePlayer(playerID)
-	local name, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerID)
+	local name, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerID, false)
 	players[name].id = playerID
 	players[name].spec = spec
 	players[name].allyTeamId = allyTeamId
@@ -108,7 +108,7 @@ local function SetupPlayers()
 	for i=1,#teamsSorted do
 		local teamID = teamsSorted[i]
 		if teamID ~= gaiaTeamID then
-			local _,_,_,isAI,_,allyTeamId = spGetTeamInfo(teamID)
+			local _,_,_,isAI,_,allyTeamId = spGetTeamInfo(teamID, false)
 			if isAI then
 				local skirmishAIID, name = spGetAIInfo(teamID)
 				--Note: to make AI appears like its doing an ally chat, do: Spring.Echo("<botname> Allies: bot_say_something")

@@ -131,20 +131,20 @@ function script.Create()
 	--Hide(flare_l)
 	--Hide(flare_r)
 	
-	if onWater() then
+	if GG.Script.onWater(unitID) then
 		Hide(solid_ground)
 	else
 		Hide(plovak)
 	end
 	
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	
 	--Spin(rotating_bas, y_axis, 0.5)
 	
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end	
 	StartThread(IdleAnim)
 
-	--Turn(rotating_bas, y_axis, rad(-90), 0.5)
+	--Turn(rotating_bas, y_axis, math.rad(-90), 0.5)
 end
 
 function DoAmmoRotate()
@@ -414,34 +414,34 @@ function script.Killed(recentDamage, maxHealth)
 	if severity <= 0.25 then
 		return 1
 	elseif severity <= 0.50 then
-		Explode(trubky, sfxFall)
-		Explode(raketa027, sfxFall)
-		Explode(raketa004, sfxFall)
-		Explode(raketa011_l, sfxFall)
-		Explode(raketa008_l, sfxFall)
-		Explode(raketa009, sfxFall)
-		Explode(cervena, sfxFall)
-		Explode(modra, sfxFall)
-		Explode(zelena, sfxFall)
-		Explode(spodni_zebra, sfxFall)
-		Explode(vrchni_zebra, sfxFall)
-		Explode(mc_rocket_ho, sfxFall)
-		Explode(rotating_bas, sfxShatter)
+		Explode(trubky, SFX.FALL)
+		Explode(raketa027, SFX.FALL)
+		Explode(raketa004, SFX.FALL)
+		Explode(raketa011_l, SFX.FALL)
+		Explode(raketa008_l, SFX.FALL)
+		Explode(raketa009, SFX.FALL)
+		Explode(cervena, SFX.FALL)
+		Explode(modra, SFX.FALL)
+		Explode(zelena, SFX.FALL)
+		Explode(spodni_zebra, SFX.FALL)
+		Explode(vrchni_zebra, SFX.FALL)
+		Explode(mc_rocket_ho, SFX.FALL)
+		Explode(rotating_bas, SFX.SHATTER)
 		return 1
 	else
-		Explode(trubky, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(raketa027, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(raketa004, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(raketa011_l, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(raketa008_l, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(raketa009, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(cervena, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(modra, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(zelena, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(spodni_zebra, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(vrchni_zebra, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(mc_rocket_ho, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(rotating_bas, sfxShatter)
+		Explode(trubky, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(raketa027, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(raketa004, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(raketa011_l, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(raketa008_l, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(raketa009, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(cervena, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(modra, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(zelena, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(spodni_zebra, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(vrchni_zebra, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(mc_rocket_ho, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(rotating_bas, SFX.SHATTER)
 		return 2
 	end
 end

@@ -8,6 +8,7 @@ unitDef = {
   buildCostMetal         = 320,
   buildPic               = [[amphlaunch.png]],
   canGuard               = true,
+  canManualFire          = true,
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND SINK]],
@@ -55,12 +56,17 @@ unitDef = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 28,
-  turnRate               = 1000,
+  turnRate               = 1800,
   upright                = true,
 
   weapons                = {
     {
       def                = [[TELEPORT_GUN]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+    {
+      def                = [[BOGUS_TELEPORTER_GUN]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -76,6 +82,45 @@ unitDef = {
       avoidFriendly           = false,
       avoidGround             = false,
       burnblow                = true,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+	  customParams            = {
+		lups_noshockwave = [[1]],
+		thower_weapon    = 1,
+	  },
+	  
+      damage                  = {
+        default = 0,
+      },
+
+      explosionSpeed          = 50,
+      intensity               = 0.9,
+      interceptedByShieldType = 1,
+      leadLimit               = 0,
+      myGravity               = 0.05,
+      projectiles             = 1,
+      range                   = 680,
+      reloadtime              = 8.5,
+      rgbColor                = [[0.05 0.45 0.95]],
+      size                    = 0.005,
+      soundStart              = [[Launcher]],
+      soundStartVolume        = 6000,
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 350,
+      waterweapon             = true,
+    },
+
+    BOGUS_TELEPORTER_GUN = {
+      name                    = [[Bogus Unit Launcher]],
+      accuracy                = 0,
+      areaOfEffect            = 224, -- UI
+      avoidFeature            = false,
+      avoidFriendly           = false,
+      avoidGround             = false,
+      burnblow                = true,
+      commandfire             = true,
       craterBoost             = 0,
       craterMult              = 0,
 

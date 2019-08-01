@@ -39,7 +39,7 @@ local gun_1 = 0
 local DRAIN = tonumber (WeaponDefs[UnitDef.weapons[1].weaponDef].customParams.shield_drain)
 local SHIELD_RADIUS = 100
 local SPEED = UnitDef.speed / 30
-local AIM_DELAY = 0 -- Was 300
+local AIM_DELAY = 300
 local RESTORE_DELAY = 4000
 
 --signals
@@ -153,7 +153,7 @@ local function FireDelayLoop()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(FireDelayLoop)
 	Move(shot1, y_axis, -80)
 end
@@ -190,7 +190,7 @@ function script.AimWeapon(num, heading, pitch)
 	-- it very rarely shoots at radar dots.
 	--GG.DontFireRadar_CheckAim(unitID)
 	
-	if (AIM_DELAY > 0) and (not bAiming) then
+	if not bAiming then
 		aimTime = AIM_DELAY
 	end
 	
@@ -225,22 +225,22 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
-		Explode(pelvis, sfxNone)
-		Explode(torso, sfxNone)
-		Explode(lbarrel, sfxNone)
-		Explode(rbarrel, sfxNone)
+		Explode(pelvis, SFX.NONE)
+		Explode(torso, SFX.NONE)
+		Explode(lbarrel, SFX.NONE)
+		Explode(rbarrel, SFX.NONE)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
-		Explode(pelvis, sfxNone)
-		Explode(torso, sfxShatter)
-		Explode(lbarrel, sfxShatter)
-		Explode(rbarrel, sfxShatter)
+		Explode(pelvis, SFX.NONE)
+		Explode(torso, SFX.SHATTER)
+		Explode(lbarrel, SFX.SHATTER)
+		Explode(rbarrel, SFX.SHATTER)
 		return 1 -- corpsetype
 	else
-		Explode(pelvis, sfxSmoke + sfxFire)
-		Explode(torso, sfxShatter)
-		Explode(lbarrel, sfxSmoke + sfxFire + sfxExplode)
-		Explode(rbarrel, sfxSmoke + sfxFire + sfxExplode)		
+		Explode(pelvis, SFX.SMOKE + SFX.FIRE)
+		Explode(torso, SFX.SHATTER)
+		Explode(lbarrel, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rbarrel, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)		
 		return 2 -- corpsetype
 	end
 end

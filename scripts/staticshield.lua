@@ -81,7 +81,7 @@ function script.Create()
 	Turn(rb_leaf, x_axis, -l_angle, l_speed)
 	Turn(rb_leaf, z_axis, l_angle, l_speed)
 	
-	StartThread(SmokeUnit, {glow})
+	StartThread(GG.Script.SmokeUnit, {glow})
 	StartThread(initialize)
 end
 

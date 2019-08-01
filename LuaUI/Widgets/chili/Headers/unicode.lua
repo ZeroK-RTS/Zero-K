@@ -1,13 +1,13 @@
---//=============================================================================
+--// ============================================================================= 
 --//
 
 -- shift left
-local function lsh(value,shift)
-    return (value*(2^shift)) % 2^24
+local function lsh(value, shift)
+		return (value*(2^shift)) % 2^24
 end
 -- shift right
-local function rsh(value,shift)
-    return math.floor(value/2^shift) % 2^24
+local function rsh(value, shift)
+		return math.floor(value/2^shift) % 2^24
 end
 
 
@@ -16,24 +16,24 @@ function UnicodeToUtf8(ch)
 		return nil
 	end
 
-	if     (ch < lsh(1,7)) then
+	if     (ch < lsh(1, 7)) then
 		return string.char(ch)
-	elseif (ch < lsh(1,11)) then
+	elseif (ch < lsh(1, 11)) then
 		return string.char(
-			math.bit_or(0xC0, rsh(ch,6)),
+			math.bit_or(0xC0, rsh(ch, 6)),
 			math.bit_or(0x80, math.bit_and(ch, 0x3F))
 		)
-	elseif (ch < lsh(1,16)) then
+	elseif (ch < lsh(1, 16)) then
 		return string.char(
-			math.bit_or(0xE0, rsh(ch,12)),
-			math.bit_or(0x80, math.bit_and(rsh(ch,6), 0x3F)),
+			math.bit_or(0xE0, rsh(ch, 12)),
+			math.bit_or(0x80, math.bit_and(rsh(ch, 6), 0x3F)),
 			math.bit_or(0x80, math.bit_and(       ch, 0x3F))
 		)
-	elseif (ch < lsh(1,21)) then
+	elseif (ch < lsh(1, 21)) then
 		return string.char(
-			math.bit_or(0xF0, rsh(ch,18)),
-			math.bit_or(0x80, math.bit_and(rsh(ch,12), 0x3F)),
-			math.bit_or(0x80, math.bit_and( rsh(ch,6), 0x3F)),
+			math.bit_or(0xF0, rsh(ch, 18)),
+			math.bit_or(0x80, math.bit_and(rsh(ch, 12), 0x3F)),
+			math.bit_or(0x80, math.bit_and( rsh(ch, 6), 0x3F)),
 			math.bit_or(0x80, math.bit_and(        ch, 0x3F))
 		)
 	end
@@ -44,7 +44,7 @@ end
 
 local function count_leading_ones(num)
 	return
-	   ((math.bit_and(num, 0xF0) == 0xF0) and 4)
+	 	((math.bit_and(num, 0xF0) == 0xF0) and 4)
 	or ((math.bit_and(num, 0xE0) == 0xE0) and 3)
 	or ((math.bit_and(num, 0xC0) == 0xC0) and 2)
 	or ((math.bit_and(num, 0x80) == 0x80) and 1)
@@ -76,13 +76,21 @@ local function Utf8GetCharByteLength(text, pos)
 
 	--// how many bytes are requested for our multi-byte utf8 sequence
 	local clo = count_leading_ones(string.byte(text, pos, pos)) --FIXME
-	if (clo>4) or (clo==0) then clo = 1 end --// ignore >=5 byte ones cause of RFC 3629
+	if (clo > 4) or (clo == 0) then --// ignore >= 5 byte ones cause of RFC 3629
+		clo = 1
+	end
 
 	--// how many healthy utf8 bytes are following
 	local numValidUtf8Bytes = 1; --// first char is always valid
-	if (math.bit_and(string.byte(text, pos + 1, pos + 1) or 0, UTF8_CONT_MASK) == UTF8_CONT_OKAY) then numValidUtf8Bytes = numValidUtf8Bytes + 1 end
-	if (math.bit_and(string.byte(text, pos + 2, pos + 2) or 0, UTF8_CONT_MASK) == UTF8_CONT_OKAY) then numValidUtf8Bytes = numValidUtf8Bytes + 1 end
-	if (math.bit_and(string.byte(text, pos + 3, pos + 3) or 0, UTF8_CONT_MASK) == UTF8_CONT_OKAY) then numValidUtf8Bytes = numValidUtf8Bytes + 1 end
+	if (math.bit_and(string.byte(text, pos + 1, pos + 1) or 0, UTF8_CONT_MASK) == UTF8_CONT_OKAY) then
+		numValidUtf8Bytes = numValidUtf8Bytes + 1
+	end
+	if (math.bit_and(string.byte(text, pos + 2, pos + 2) or 0, UTF8_CONT_MASK) == UTF8_CONT_OKAY) then
+		numValidUtf8Bytes = numValidUtf8Bytes + 1
+	end
+	if (math.bit_and(string.byte(text, pos + 3, pos + 3) or 0, UTF8_CONT_MASK) == UTF8_CONT_OKAY) then
+		numValidUtf8Bytes = numValidUtf8Bytes + 1
+	end
 
 	--// check if enough trailing utf8 bytes are healthy
 	--// else ignore utf8 and parse it as 8bit Latin-1 char (extended ASCII)
@@ -109,7 +117,9 @@ function Utf8NextChar(s, pos)
 end
 
 function Utf8BackspaceAt(s, pos)
-	if pos <= 1 then return s, pos end
+	if pos <= 1 then
+		return s, pos
+	end
 	local p = Utf8PrevChar(s, pos)
 	return Utf8DeleteAt(s, p), p
 end

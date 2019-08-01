@@ -45,8 +45,6 @@ local featureHpThreshold = 0.85
 
 local barScale = 1
 
-local infoDistance = 700000
-
 local drawStunnedOverlay = true
 local drawUnitsOnFire    = Spring.GetGameRulesParam("unitsOnFire")
 
@@ -60,14 +58,14 @@ local walls = {dragonsteeth=true,dragonsteeth_core=true,fortification=true,forti
 local stockpileH = 24
 local stockpileW = 12
 
-local captureReloadTime = 360
+local captureReloadTime = tonumber(UnitDefNames["vehcapture"].customParams.post_capture_reload) -- Hackity hax
 local DISARM_DECAY_FRAMES = 1200
 
 local destructableFeature = {}
 local drawnFeature = {}
 for i = 1, #FeatureDefs do
 	destructableFeature[i] = FeatureDefs[i].destructable
-	drawnFeature[i] = (FeatureDefs[i].drawTypeString=="model") 
+	drawnFeature[i] = (FeatureDefs[i].drawTypeString=="model")
 end
 
 --------------------------------------------------------------------------------
@@ -114,7 +112,7 @@ local function OptionsChanged()
 end
 
 options_path = 'Settings/Interface/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'barScale', 'debugMode', 'minReloadTime'}
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'barScale', 'debugMode', 'minReloadTime', 'drawMaxHeight', 'simpleHealthPercent'}
 options = {
 	showhealthbars = {
 		name = 'Show Healthbars',
@@ -143,7 +141,7 @@ options = {
 		type = 'number',
 		value = 1,
 		min = 0.5,
-		max = 3,
+		max = 6,
 		step = 0.25,
 		OnChange = OptionsChanged,
 	},
@@ -165,6 +163,20 @@ options = {
 		noHotkey = true,
 		desc = 'Pings units with debug information',
 		OnChange = OptionsChanged,
+	},
+	drawMaxHeight = { -- Code for this is all from icon height widget
+		name = 'Health Bar Fade Height',
+		desc = 'If the camera is above this height, health bars will not be drawn. Setting this above 3000 may affect performance.',
+		type = 'number',
+		min = 0, max = 9000, step = 200,
+		value = 3000,
+	},
+	simpleHealthPercent = { -- Code for this is all from icon height widget
+		name = 'Simple Health Bar Distance',
+		desc = 'Percentage of Health Bar Fade Height after which simple health bars are shown. Setting this above 50 may affect performance.',
+		type = 'number',
+		min = 10, max = 100, step = 5,
+		value = 25,
 	},
 }
 
@@ -189,6 +201,19 @@ local function lowerkeys(t)
 end
 
 local paralyzeOnMaxHealth = ((lowerkeys(VFS.Include"gamedata/modrules.lua") or {}).paralyze or {}).paralyzeonmaxhealth
+
+local spGetGroundHeight = Spring.GetGroundHeight
+local function IsCameraBelowMaxHeight()
+	local cs = Spring.GetCameraState()
+	if cs.name == "ta" then
+		return cs.height < options.drawMaxHeight.value
+	elseif cs.name == "ov" then
+		return false
+	else
+		return (cs.py - spGetGroundHeight(cs.px, cs.pz)) < options.drawMaxHeight.value
+	end
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -571,7 +596,11 @@ do
 			local ud = UnitDefs[unitDefID]
 			customInfo[unitDefID] = {
 				height        = Spring.Utilities.GetUnitHeight(ud) + 14,
-				canJump       = (ud.customParams.canjump=="1")or(GetUnitRulesParam(unitID,"jumpReload")),
+				canJump       = (ud.customParams.canjump and true) or false,
+				canGoo        = (ud.customParams.grey_goo and true) or false,
+				canReammo     = (ud.customParams.requireammo and true) or false,
+				isPwStructure = (ud.customParams.planetwars_structure and true) or false,
+				canCapture    = (ud.customParams.post_capture_reload and true) or false,
 				maxShield     = ud.shieldPower - 10,
 				canStockpile  = ud.canStockpile,
 				gadgetStock   = ud.customParams.stockpiletime,
@@ -594,8 +623,11 @@ do
 		end
 		local dx, dy, dz = ux-cx, uy-cy, uz-cz
 		local dist = dx*dx + dy*dy + dz*dz
-		if (dist > infoDistance) then
-			if (dist > 9000000) then
+		local maxDist = math.pow(options.drawMaxHeight.value, 2)
+		local simpleDist = maxDist * (options.simpleHealthPercent.value/100)
+
+		if (dist > simpleDist) then
+			if (dist > maxDist) then
 				if debugMode then
 					local x,y,z = Spring.GetUnitPosition(unitID)
 					Spring.MarkerAddPoint(x,y,z,"High Distance")
@@ -635,7 +667,7 @@ do
 		end
 
 		--// BARS //-----------------------------------------------------------------------------
-			--// Shield
+		--// Shield
 		if (ci.maxShield>0) then
 			local commShield = GetUnitRulesParam(unitID, "comm_shield_max")
 			if commShield then
@@ -741,10 +773,12 @@ do
 		end
 
 		--// CAPTURE RECHARGE
-		local captureReloadState = GetUnitRulesParam(unitID,"captureRechargeFrame")
-		if (captureReloadState and captureReloadState > 0) then
-			local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
-			AddBar(messages.capture_reload,capture,"reload",(fullText and floor(capture*100)..'%') or '')
+		if ci.canCapture then
+			local captureReloadState = GetUnitRulesParam(unitID,"captureRechargeFrame")
+			if (captureReloadState and captureReloadState > 0) then
+				local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
+				AddBar(messages.capture_reload,capture,"reload",(fullText and floor(capture*100)..'%') or '')
+			end
 		end
 
 		--// WATER TANK
@@ -776,11 +810,13 @@ do
 		end
 
 		--// Planetwars teleport progress
-		TeleportEnd = GetUnitRulesParam(unitID, "pw_teleport_frame")
-		if TeleportEnd then
-			local prog = 1 - (TeleportEnd - gameFrame)/TELEPORT_CHARGE_NEEDED
-			if prog < 1 then
-				AddBar(messages.teleport, prog, "tele_pw", (fullText and floor(prog*100)..'%') or '')
+		if ci.isPwStructure then
+			TeleportEnd = GetUnitRulesParam(unitID, "pw_teleport_frame")
+			if TeleportEnd then
+				local prog = 1 - (TeleportEnd - gameFrame)/TELEPORT_CHARGE_NEEDED
+				if prog < 1 then
+					AddBar(messages.teleport, prog, "tele_pw", (fullText and floor(prog*100)..'%') or '')
+				end
 			end
 		end
 
@@ -794,14 +830,16 @@ do
 		end
 
 		--// REAMMO
-		local reammoProgress = GetUnitRulesParam(unitID, "reammoProgress")
-		if reammoProgress then
-			AddBar(messages.reammo,reammoProgress,"reammo",(fullText and floor(reammoProgress*100)..'%') or '')
+		if ci.canReammo then
+			local reammoProgress = GetUnitRulesParam(unitID, "reammoProgress")
+			if reammoProgress then
+				AddBar(messages.reammo,reammoProgress,"reammo",(fullText and floor(reammoProgress*100)..'%') or '')
+			end
 		end
 
 		--// RELOAD
 		if (not ci.scriptReload) and (ci.dyanmicComm or (ci.reloadTime >= options.minReloadTime.value)) then
-			local primaryWeapon = GetUnitRulesParam(unitID, "primary_weapon_override") or ci.primaryWeapon
+			local primaryWeapon = (ci.dyanmicComm and GetUnitRulesParam(unitID, "primary_weapon_override")) or ci.primaryWeapon
 			_,reloaded,reloadFrame = GetUnitWeaponState(unitID,primaryWeapon)
 			if (reloaded==false) then
 				local reloadTime = Spring.GetUnitWeaponState(unitID, primaryWeapon, 'reloadTime')
@@ -809,7 +847,7 @@ do
 					ci.reloadTime = reloadTime
 					-- When weapon is disabled the reload time is constantly set to be almost complete.
 					-- It results in a bunch of units walking around with 99% reload bars.
-					if reloadFrame > gameFrame + 6 then -- UPDATE_PERIOD in unit_attributes.lua.
+					if (reloadFrame > gameFrame + 6) or (GetUnitRulesParam(unitID, "reloadPaused") ~= 1) then -- UPDATE_PERIOD in unit_attributes.lua.
 						reload = 1 - ((reloadFrame-gameFrame)/gameSpeed) / ci.reloadTime;
 						if (reload >= 0) then
 							AddBar(messages.reload,reload,"reload",(fullText and floor(reload*100)..'%') or '')
@@ -832,10 +870,10 @@ do
 		end
 
 		--// SHEATH
-		local sheathState = GetUnitRulesParam(unitID,"sheathState")
-		if sheathState and (sheathState < 1) then
-			AddBar("sheath",sheathState,"sheath",(fullText and floor(sheathState*100)..'%') or '')
-		end
+		--local sheathState = GetUnitRulesParam(unitID,"sheathState")
+		--if sheathState and (sheathState < 1) then
+		--	AddBar("sheath",sheathState,"sheath",(fullText and floor(sheathState*100)..'%') or '')
+		--end
 
 		--// SLOW
 		local slowState = GetUnitRulesParam(unitID,"slowState")
@@ -848,9 +886,11 @@ do
 		end
 
 		--// GOO
-		local gooState = GetUnitRulesParam(unitID,"gooState")
-		if (gooState and (gooState>0)) then
-			AddBar(messages.goo,gooState,"goo",(fullText and floor(gooState*100)..'%') or '')
+		if ci.canGoo then
+			local gooState = GetUnitRulesParam(unitID,"gooState")
+			if (gooState and (gooState>0)) then
+				AddBar(messages.goo,gooState,"goo",(fullText and floor(gooState*100)..'%') or '')
+			end
 		end
 
 		--// JUMPJET
@@ -866,7 +906,7 @@ do
 			Spring.MarkerAddPoint(x,y,z,"N" .. barsN)
 		end
 
-		if (barsN>0)or(numStockpiled) then
+		if (barsN > 0) or (numStockpiled) then
 			glPushMatrix()
 			glTranslate(ux, uy+ci.height, uz )
 			gl.Scale(barScale, barScale, barScale)
@@ -1090,6 +1130,13 @@ do
 			if (#visibleUnits+#visibleFeatures==0) then
 				return
 			end
+
+			-- Test camera height before processing
+			if not IsCameraBelowMaxHeight() then
+				return false
+			end
+
+			-- Processing
 			if WG.Cutscene and WG.Cutscene.IsInCutscene() then
 				return
 			end
@@ -1126,6 +1173,8 @@ do
 			--// draw bars for features
 			local wx, wy, wz, dx, dy, dz, dist, featureID, valid
 			local featureInfo
+			local maxFeatureDist = math.pow(options.drawMaxHeight.value, 2) * (2/3)
+			local simpleFeatureDist = maxFeatureDist*(options.simpleHealthPercent.value/100)
 			for i=1,#visibleFeatures do
 				featureInfo = visibleFeatures[i]
 				featureID = featureInfo[4]
@@ -1134,8 +1183,8 @@ do
 					wx, wy, wz = featureInfo[1],featureInfo[2],featureInfo[3]
 					dx, dy, dz = wx-cx, wy-cy, wz-cz
 					dist = dx*dx + dy*dy + dz*dz
-					if (dist < 6000000) then
-						if (dist < infoDistance) then
+					if (dist < maxFeatureDist) then
+						if (dist < simpleFeatureDist) then
 							DrawFeatureInfos(featureInfo[4], featureInfo[5], true, wx,wy,wz)
 						else
 							DrawFeatureInfos(featureInfo[4], featureInfo[5], false, wx,wy,wz)
@@ -1180,6 +1229,13 @@ do
 	local sec2 = 0
 
 	function widget:Update(dt)
+
+		-- Test camera height before processing
+		if not IsCameraBelowMaxHeight() then
+			return false
+		end
+
+		-- Processing
 		sec=sec+dt
 		blink = (sec%1)<0.5
 

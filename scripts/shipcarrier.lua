@@ -69,7 +69,7 @@ function script.Create()
 	Hide(WakeForeRight)
 	Hide(WakeAftLeft)
 	Hide(WakeAftRight)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	
 	for bay,_ in pairs(droneBays) do
 		Move(bay, x_axis, 16)
@@ -78,7 +78,7 @@ function script.Create()
 	while select(5, Spring.GetUnitHealth(unitID)) < 1 do
 		Sleep(1000)
 	end
-	Spin(Radar, y_axis, rad(60))
+	Spin(Radar, y_axis, math.rad(60))
 end
 
 local function StartMoving()
@@ -187,7 +187,7 @@ function script.Killed(recentDamage, maxHealth)
 		EmitSfx(DroneFore, 1024)
 		Turn(BayForeHatch, z_axis, math.rad(-100),math.rad(200));
 
-		InitializeDeathAnimation()
+		GG.Script.InitializeDeathAnimation(unitID)
 		Sleep(120)
 		
 		EmitSfx(DroneAft, 1024)

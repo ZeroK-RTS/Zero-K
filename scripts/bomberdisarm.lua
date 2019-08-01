@@ -19,13 +19,13 @@ function script.Create()
 	Hide(preDrop)
 	Hide(drop)
 	
-	FakeUprightInit(xp, zp, drop)
+	GG.FakeUpright.FakeUprightInit(xp, zp, drop)
 	Turn(Lwing, z_axis, math.rad(90))
 	Turn(Rwing, z_axis, math.rad(-90))	
 	Turn(LwingTip, z_axis, math.rad(-165))
 	Turn(RwingTip, z_axis, math.rad(165))
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 function script.Activate()
@@ -41,7 +41,7 @@ function script.Deactivate()
 	Turn(Rwing, z_axis, math.rad(-10), 2)
 	Turn(LwingTip, z_axis, math.rad(-30), 2) -- -30
 	Turn(RwingTip, z_axis, math.rad(30), 2) --30
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 
@@ -88,7 +88,7 @@ function script.FireWeapon(checkHeight)
 			Turn(preDrop, x_axis, angle_x)
 			Turn(preDrop, z_axis, -angle_z)
 			
-			EmitSfx(drop, FIRE_W2)
+			EmitSfx(drop, GG.Script.FIRE_W2)
 			if sound_index == 0 then
 				local px, py, pz = Spring.GetUnitPosition(unitID)
 				Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz)
@@ -120,40 +120,40 @@ function script.AimFromWeapon()
 end
 
 function script.AimWeapon(heading, pitch)
-	if (GetUnitValue(CRASHING) == 1) then 
+	if (GetUnitValue(GG.Script.CRASHING) == 1) then 
 		return false 
 	end
 	return true
 end
 
 function script.BlockShot()
-	return (GetUnitValue(CRASHING) == 1)
+	return (GetUnitValue(GG.Script.CRASHING) == 1)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
-		Explode(base, sfxNone)
-		Explode(jet1, sfxSmoke)
-		Explode(jet2, sfxSmoke)
-		Explode(Lwing, sfxNone)
-		Explode(Rwing, sfxNone)
+		Explode(base, SFX.NONE)
+		Explode(jet1, SFX.SMOKE)
+		Explode(jet2, SFX.SMOKE)
+		Explode(Lwing, SFX.NONE)
+		Explode(Rwing, SFX.NONE)
 		return 1
 	elseif severity < 0.75 then
-		Explode(base, sfxShatter)
-		Explode(jet1, sfxSmoke + sfxFire + sfxExplode)
-		Explode(jet2, sfxSmoke + sfxFire + sfxExplode)
-		Explode(Lwing, sfxFall + sfxSmoke)
-		Explode(Rwing, sfxFall + sfxSmoke)
+		Explode(base, SFX.SHATTER)
+		Explode(jet1, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(jet2, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(Lwing, SFX.FALL + SFX.SMOKE)
+		Explode(Rwing, SFX.FALL + SFX.SMOKE)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(jet1, sfxSmoke + sfxFire + sfxExplode)
-		Explode(jet2, sfxSmoke + sfxFire + sfxExplode)
-		Explode(Lwing, sfxSmoke + sfxExplode)
-		Explode(Rwing, sfxSmoke + sfxExplode)
-		Explode(LwingTip, sfxSmoke + sfxExplode)
-		Explode(RwingTip, sfxSmoke + sfxExplode)
+		Explode(base, SFX.SHATTER)
+		Explode(jet1, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(jet2, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(Lwing, SFX.SMOKE + SFX.EXPLODE)
+		Explode(Rwing, SFX.SMOKE + SFX.EXPLODE)
+		Explode(LwingTip, SFX.SMOKE + SFX.EXPLODE)
+		Explode(RwingTip, SFX.SMOKE + SFX.EXPLODE)
 		return 2
 	end
 end

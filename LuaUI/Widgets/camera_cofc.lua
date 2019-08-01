@@ -1667,7 +1667,7 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 		lastMouseX = nil
 	end
 	local teamID = Spring.GetLocalTeamID()
-	local _, playerID = Spring.GetTeamInfo(teamID)
+	local _, playerID = Spring.GetTeamInfo(teamID, false)
 	local pp = WG.alliedCursorsPos[ playerID ]
 	if pp then
 		local groundY = max(0,spGetGroundHeight(pp[1],pp[2]))

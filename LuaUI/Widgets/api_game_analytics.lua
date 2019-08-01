@@ -219,7 +219,7 @@ function widget:GameOver(winners)
 		return -- exited
 	end
 
-	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local localAllyTeamID = Spring.GetLocalAllyTeamID()
 	for i = 1, #winners do
 		local allyTeamID = winners[i]

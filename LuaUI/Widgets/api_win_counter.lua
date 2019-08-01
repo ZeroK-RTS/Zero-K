@@ -31,7 +31,7 @@ local loadedFromConfig = false
 local function Set(player, winCount, forAllyTeam, wonLastGame)
 	local name = ""
 	if type(player) == "number" then
-		name = Spring.GetPlayerInfo(player)
+		name = Spring.GetPlayerInfo(player, false)
 	elseif type(player) == "string" then
 		name = player
 	end
@@ -43,7 +43,7 @@ local function Set(player, winCount, forAllyTeam, wonLastGame)
 			for j=1, #playerTeams do
 				local players = Spring.GetPlayerList(playerTeams[j])
 				for k=1, #players do
-					local playerName = Spring.GetPlayerInfo(players[k])
+					local playerName = Spring.GetPlayerInfo(players[k], false)
 					if playerName ~= nil and currentWinTable[playerName] ~= nil then
 						currentWinTable[playerName].wonLastGame = false
 					end
@@ -58,7 +58,7 @@ local function Set(player, winCount, forAllyTeam, wonLastGame)
 			for i=1, #alliedTeams do
 				local players = Spring.GetPlayerList(alliedTeams[i])
 				for j=1, #players do
-					local playerName = Spring.GetPlayerInfo(players[j])
+					local playerName = Spring.GetPlayerInfo(players[j], false)
 					if currentWinTable[playerName] ~= nil then
 						currentWinTable[playerName].wins = winCount
 						if wonLastGame ~= nil then
@@ -95,7 +95,7 @@ local function IncrementAllyTeamWins(allyTeamNumber) --We need to figure out pla
 	if playerTeams ~= nil and #playerTeams >= 1 then
 		players = Spring.GetPlayerList(playerTeams[1])
 		for i=1, #players do
-			local name,_,isSpec = Spring.GetPlayerInfo(players[i])
+			local name,_,isSpec = Spring.GetPlayerInfo(players[i], false)
 			if not isSpec then
 				playerName = name
 				break
@@ -128,7 +128,7 @@ local function Reset()
 			local players = Spring.GetPlayerList(playerTeams[j])
 			-- Spring.Echo("#players on team "..playerTeams[j]..": "..#players)
 			for k=1, #players do
-				local name,_,isSpec = Spring.GetPlayerInfo(players[k])
+				local name,_,isSpec = Spring.GetPlayerInfo(players[k], false)
 				if playerTeams[j] ~= 0 or (playerTeams[j] == 0 and not isSpec) then --Logic taken from Deluxe Player List, though adapted to one line
 					-- Spring.Echo("Resetting: "..name)
 					playerCount = playerCount + 1
@@ -165,7 +165,7 @@ function widget:GameOver(winningAllyTeams)
 	-- Reset who won last game
 	local players = Spring.GetPlayerList()
 	for i=1, #players do
-		playerName = Spring.GetPlayerInfo(players[i])
+		local playerName = Spring.GetPlayerInfo(players[i], false)
 		if currentWinTable[playerName] ~= nil then 
 			currentWinTable[playerName].wonLastGame = false 
 		end
@@ -177,7 +177,7 @@ function widget:GameOver(winningAllyTeams)
 		for i=1, #winningPlayerTeams do
 			local players = Spring.GetPlayerList(winningPlayerTeams[i])
 			for j=1, #players do
-				local playerName = Spring.GetPlayerInfo(players[j])
+				local playerName = Spring.GetPlayerInfo(players[j], false)
 				if currentWinTable[playerName] ~= nil then
 					currentWinTable[playerName].wins = (currentWinTable[playerName].wins or 0) + 1
 					currentWinTable[playerName].wonLastGame = true

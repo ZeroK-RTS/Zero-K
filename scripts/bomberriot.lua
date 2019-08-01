@@ -25,13 +25,13 @@ local function Lights()
 end
 
 function script.StopMoving()
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 function script.Create()
 	SetInitialBomberSettings()
-	StartThread(SmokeUnit, smokePiece)
-	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	--StartThread(Lights)
 end
 
@@ -56,20 +56,20 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(body, sfxNone)
-		Explode(jet, sfxNone)
+		Explode(body, SFX.NONE)
+		Explode(jet, SFX.NONE)
 		return 1
 	elseif severity <= .50 or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
-		Explode(body, sfxNone)
-		Explode(jet, sfxShatter)
+		Explode(body, SFX.NONE)
+		Explode(jet, SFX.SHATTER)
 		return 1
 	elseif severity <= .75 then
-		Explode(body, sfxShatter)
-		Explode(jet, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(body, SFX.SHATTER)
+		Explode(jet, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	else
-		Explode(body, sfxShatter)
-		Explode(jet, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(body, SFX.SHATTER)
+		Explode(jet, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	end
 end

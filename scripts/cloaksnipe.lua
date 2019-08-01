@@ -179,7 +179,7 @@ function script.ChangeHeading(delta)
 		return
 	end
 	if maintainHeading then
-		torsoHeading = torsoHeading + delta * headingToRad
+		torsoHeading = torsoHeading + delta * GG.Script.headingToRad
 		Turn(torsoTrue, y_axis, -torsoHeading, AIM_SPEED)
 	end
 end
@@ -201,7 +201,7 @@ end
 
 function script.Create()
 	--Turn(forearmr, x_axis, math.rad(-45), math.rad(280))
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	UnpackGunInstant()
 	StartThread(IdleAnim)
 	--StartThread(TorsoHeadingThread)
@@ -355,18 +355,18 @@ function script.Killed(recentDamage, maxHealth)
 		WaitForMove(hips, y_axis)		
 		Sleep(2000)]]
 
-		Explode(shoulderl, sfxNone)
-		Explode(shoulderr, sfxNone)
-		Explode(hips, sfxNone)
-		Explode(torsoTrue, sfxNone)
-		Explode(camera, sfxNone)
+		Explode(shoulderl, SFX.NONE)
+		Explode(shoulderr, SFX.NONE)
+		Explode(hips, SFX.NONE)
+		Explode(torsoTrue, SFX.NONE)
+		Explode(camera, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(shoulderl, sfxShatter)
-		Explode(shoulderr, sfxShatter)
+		Explode(shoulderl, SFX.SHATTER)
+		Explode(shoulderr, SFX.SHATTER)
 		Explode(camera, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 --		Sleep(200)
-		Explode(torsoTrue, sfxShatter)
+		Explode(torsoTrue, SFX.SHATTER)
 
 --		Turn(base, x_axis, math.rad(-90), math.rad(50))
 --		Turn(hips, x_axis, math.rad(90), math.rad(50))
@@ -376,32 +376,32 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(hips, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 1
 	elseif severity <= .99 then
-		Explode(hips, sfxShatter)
-		Explode(torsoTrue, sfxShatter)
-		Explode(shoulderl, sfxShatter)
-		Explode(forearml, sfxShatter)
-		Explode(shoulderr, sfxShatter)
-		Explode(forearmr, sfxShatter)
-		Explode(thighr, sfxShatter)
-		Explode(thighl, sfxShatter)
-		Explode(shinl, sfxShatter)
-		Explode(shinr, sfxShatter)
+		Explode(hips, SFX.SHATTER)
+		Explode(torsoTrue, SFX.SHATTER)
+		Explode(shoulderl, SFX.SHATTER)
+		Explode(forearml, SFX.SHATTER)
+		Explode(shoulderr, SFX.SHATTER)
+		Explode(forearmr, SFX.SHATTER)
+		Explode(thighr, SFX.SHATTER)
+		Explode(thighl, SFX.SHATTER)
+		Explode(shinl, SFX.SHATTER)
+		Explode(shinr, SFX.SHATTER)
 		Explode(camera, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		Explode(backpack, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		Explode(receiver, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	else
-		Explode(hips, sfxShatter)
-		Explode(torsoTrue, sfxShatter)
-		Explode(shoulderl, sfxShatter)
-		Explode(forearml, sfxShatter)
-		Explode(shoulderr, sfxShatter)
-		Explode(forearmr, sfxShatter)
-		Explode(thighr, sfxShatter)
-		Explode(thighl, sfxShatter)
-		Explode(shinl, sfxShatter)
-		Explode(shinr, sfxShatter)
-		Explode(camera, SFX.FALL + SFX.SMOKE + SFX.FIRE + sfxExplode)
+		Explode(hips, SFX.SHATTER)
+		Explode(torsoTrue, SFX.SHATTER)
+		Explode(shoulderl, SFX.SHATTER)
+		Explode(forearml, SFX.SHATTER)
+		Explode(shoulderr, SFX.SHATTER)
+		Explode(forearmr, SFX.SHATTER)
+		Explode(thighr, SFX.SHATTER)
+		Explode(thighl, SFX.SHATTER)
+		Explode(shinl, SFX.SHATTER)
+		Explode(shinr, SFX.SHATTER)
+		Explode(camera, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		Explode(backpack, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		Explode(receiver, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2

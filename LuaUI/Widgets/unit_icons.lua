@@ -172,7 +172,7 @@ function WG.icons.SetPulse( iconName, pulse )
 end
 
 
-function WG.icons.SetUnitIcon( unitID, data )
+function WG.icons.SetUnitIcon(unitID, data)
 	local iconName = data.name
 	local texture = data.texture
 	local color = data.color
@@ -211,8 +211,6 @@ function WG.icons.SetUnitIcon( unitID, data )
 		textureData[texture][iconName] = {}
 	end
 	textureData[texture][iconName][unitID] = 0
-	
-		
 
 	if color then
 		if not textureColors[unitID] then
@@ -237,7 +235,6 @@ function WG.icons.SetUnitIcon( unitID, data )
 	end
 
 	OrderIconsOnUnit(unitID)
-	
 end
 
 -------------------------------------------------------------------------------------

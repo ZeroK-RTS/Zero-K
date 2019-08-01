@@ -156,7 +156,7 @@ function script.Create()
 --	Turn(rhand, x_axis, math.rad(41))
 --	Turn(lnanohand, x_axis, math.rad(36))
 	
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
@@ -299,28 +299,28 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then
-		Explode(torso, sfxNone)
-		Explode(larm, sfxNone)
-		Explode(rarm, sfxNone)
-		Explode(pelvis, sfxNone)
-		Explode(lupleg, sfxNone)
-		Explode(rupleg, sfxNone)
-		Explode(lnanoflare, sfxNone)
-		Explode(rhand, sfxNone)
-		Explode(lleg, sfxNone)
-		Explode(rleg, sfxNone)
+		Explode(torso, SFX.NONE)
+		Explode(larm, SFX.NONE)
+		Explode(rarm, SFX.NONE)
+		Explode(pelvis, SFX.NONE)
+		Explode(lupleg, SFX.NONE)
+		Explode(rupleg, SFX.NONE)
+		Explode(lnanoflare, SFX.NONE)
+		Explode(rhand, SFX.NONE)
+		Explode(lleg, SFX.NONE)
+		Explode(rleg, SFX.NONE)
 		return 1
 	else
-		Explode(torso, sfxShatter)
-		Explode(larm, sfxSmoke + sfxFire + sfxExplode)
-		Explode(rarm, sfxSmoke + sfxFire + sfxExplode)
-		Explode(pelvis, sfxShatter)
-		Explode(lupleg, sfxShatter)
-		Explode(rupleg, sfxShatter)
-		Explode(lnanoflare, sfxSmoke + sfxFire + sfxExplode)
-		Explode(rhand, sfxSmoke + sfxFire + sfxExplode)
-		Explode(lleg, sfxShatter)
-		Explode(rleg, sfxShatter)
+		Explode(torso, SFX.SHATTER)
+		Explode(larm, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rarm, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(pelvis, SFX.SHATTER)
+		Explode(lupleg, SFX.SHATTER)
+		Explode(rupleg, SFX.SHATTER)
+		Explode(lnanoflare, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(rhand, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(lleg, SFX.SHATTER)
+		Explode(rleg, SFX.SHATTER)
 		return 2
 	end
 end

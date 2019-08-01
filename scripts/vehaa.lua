@@ -80,19 +80,19 @@ local function AnimControl()
 	SetSignalMask(SIG_ANIM)
 	
 	local lastHeading, currHeading, diffHeading, turnAngle
-	lastHeading = GetUnitValue(COB.HEADING)*headingToRad
+	lastHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
 	while true do 
 	
 		--pivot
-		currHeading = GetUnitValue(COB.HEADING)*headingToRad
+		currHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
 		diffHeading = (currHeading - lastHeading)
 		
 		-- Fix wrap location
-		if diffHeading > pi then
-			diffHeading = diffHeading - 2*pi
+		if diffHeading > math.pi then
+			diffHeading = diffHeading - 2*math.pi
 		end
-		if diffHeading < -pi then
-			diffHeading = diffHeading + 2*pi
+		if diffHeading < -math.pi then
+			diffHeading = diffHeading + 2*math.pi
 		end
 		
 		-- Bound maximun pivot
@@ -180,7 +180,7 @@ function script.Create()
 	runSpin = false
 	StartThread(Suspension)
 	StartThread(AnimControl)
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 -- Weapons
@@ -208,30 +208,30 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	
 	if severity <= 0.25 then
-		Explode(rwheel2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(turret, sfxNone)
-		Explode(body, sfxNone)
+		Explode(rwheel2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(turret, SFX.NONE)
+		Explode(body, SFX.NONE)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(lwheel1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(lwheel2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(turret, sfxShatter)
-		Explode(body, sfxNone)
+		Explode(lwheel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(lwheel2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(turret, SFX.SHATTER)
+		Explode(body, SFX.NONE)
 		return 1
 	elseif severity <= 0.99 then
-		Explode(rwheel1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(lwheel2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(lwheel1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(turret, sfxShatter)
-		Explode(body, sfxNone)
+		Explode(rwheel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(lwheel2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(lwheel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(turret, SFX.SHATTER)
+		Explode(body, SFX.NONE)
 		return 2
 	end
 
-	Explode(rwheel1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(rwheel2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(lwheel1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(lwheel2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(body, sfxShatter)
+	Explode(rwheel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rwheel2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lwheel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lwheel2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(body, SFX.SHATTER)
 	return 2
 end

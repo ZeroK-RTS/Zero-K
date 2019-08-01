@@ -102,6 +102,7 @@ local ALLY_ACCESS = {allied = true}
 
 local debugTeam = false
 local debugOnUnits = false
+local debugBuildUnit
 
 --------------------------------------------------------------------------------
 --  COMMON
@@ -285,6 +286,9 @@ local function AllowMiscPriorityBuildStep(unitID, teamID, onlyEnergy, resTable)
 end
 
 function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
+	if debugBuildUnit and debugBuildUnit[unitID] then
+		Spring.Echo("AUBS", builderID, teamID, unitID, unitDefID, step, Spring.GetUnitHealth(unitID))
+	end
 	if (step<=0) then
 		--// Reclaiming and null buildpower (waited cons) aren't prioritized
 		return true
@@ -672,6 +676,23 @@ local function toggleDebug(cmd, line, words, player)
 	end
 end
 
+local function toggleDebugBuild(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then 
+		return
+	end
+	local unitID = tonumber(words[1])
+	Spring.Echo("Debug build")
+	if not unitID then
+		Spring.Echo("Disabled")
+		debugBuildUnit = nil
+		return
+	end
+	
+	Spring.Echo("unitID", unitID)
+	debugBuildUnit = debugBuildUnit or {}
+	debugBuildUnit[unitID] = true
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Unit Handling
@@ -695,11 +716,12 @@ function gadget:Initialize()
 
 	--toggleDebug(nil, nil, {"0"}, nil)
 	gadgetHandler:AddChatAction("debugpri", toggleDebug, "Debugs priority.")
+	gadgetHandler:AddChatAction("debugbuild", toggleDebugBuild, "Debugs build step.")
 end
 
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("mreserve:",1,true) then
-		local _,_,spec,teamID = spGetPlayerInfo(playerID)
+		local _,_,spec,teamID = spGetPlayerInfo(playerID, false)
 		local amount = tonumber(msg:sub(10))
 		if spec or (not teamID) or (not amount) then
 			return
@@ -707,7 +729,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		SetMetalReserved(teamID, amount)
 	end	
 	if msg:find("ereserve:",1,true) then
-		local _,_,spec,teamID = spGetPlayerInfo(playerID)
+		local _,_,spec,teamID = spGetPlayerInfo(playerID, false)
 		local amount = tonumber(msg:sub(10))
 		if spec or (not teamID) or (not amount) then
 			return

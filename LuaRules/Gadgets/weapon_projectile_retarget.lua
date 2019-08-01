@@ -37,7 +37,11 @@ local projectileSpeed = {
 
 function gadget:Initialize()
 	for id, _ in pairs(projectileSpeed) do 
-		Script.SetWatchWeapon(id, true)
+		if Script.SetWatchProjectile then
+			Script.SetWatchProjectile(id, true)
+		else
+			Script.SetWatchWeapon(id, true)
+		end
 	end
 end
 local function Dist3Dsqr(x,y,z)

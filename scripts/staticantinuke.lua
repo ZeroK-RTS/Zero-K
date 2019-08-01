@@ -43,7 +43,7 @@ local function Close()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 local function RestoreAfterDelay()
@@ -72,28 +72,28 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(base, sfxNone)
-		Explode(door1, sfxNone)
-		Explode(door2, sfxNone)
-		Explode(brace, sfxSmoke)
+		Explode(base, SFX.NONE)
+		Explode(door1, SFX.NONE)
+		Explode(door2, SFX.NONE)
+		Explode(brace, SFX.SMOKE)
 		return 1
 	elseif severity <= .50 then
-		Explode(base, sfxNone)
-		Explode(door1, sfxShatter)
-		Explode(door2, sfxShatter)
-		Explode(brace, sfxSmoke)
+		Explode(base, SFX.NONE)
+		Explode(door1, SFX.SHATTER)
+		Explode(door2, SFX.SHATTER)
+		Explode(brace, SFX.SMOKE)
 		return 1
 	elseif severity <= .99 then
-		Explode(base, sfxShatter)
-		Explode(door1, sfxSmoke + sfxFire)
-		Explode(door2, sfxSmoke + sfxFire)
-		Explode(brace, sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, SFX.SHATTER)
+		Explode(door1, SFX.SMOKE + SFX.FIRE)
+		Explode(door2, SFX.SMOKE + SFX.FIRE)
+		Explode(brace, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(door1, sfxSmoke + sfxFire + sfxExplode)
-		Explode(door2, sfxSmoke + sfxFire + sfxExplode)
-		Explode(brace, sfxSmoke + sfxFire + sfxExplode)
+		Explode(base, SFX.SHATTER)
+		Explode(door1, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(door2, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(brace, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	end
 end

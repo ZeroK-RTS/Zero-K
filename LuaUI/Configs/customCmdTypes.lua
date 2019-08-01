@@ -67,10 +67,11 @@ local custom_cmd_actions = {
 	areaguard = {cmdType = 1, name = "Area Guard"},
 	dropflag = {cmdType = 3, name = "Drop Flag"},
 	upgradecomm = {cmdType = 3, name = "Upgrade Commander"},
-	upgradecommstop  = {cmdType = 3, name = "Stop Upgrade Commander"},
-	stopproduction  = {cmdType = 3, name = "Stop Factory Production"},
-	globalbuildcancel  = {cmdType = 1, name = "Cancel Global Build Tasks"},
-	evacuate  = {cmdType = 3, name = "Evacuate"},
+	upgradecommstop = {cmdType = 3, name = "Stop Upgrade Commander"},
+	stopproduction = {cmdType = 3, name = "Stop Factory Production"},
+	globalbuildcancel = {cmdType = 1, name = "Cancel Global Build Tasks"},
+	evacuate = {cmdType = 3, name = "Evacuate"},
+	morph = {cmdType = 3, name = "Morph (and stop morph)"},
 
 	-- terraform
 	rampground = {cmdType = 1, name = "Terraform Ramp"},

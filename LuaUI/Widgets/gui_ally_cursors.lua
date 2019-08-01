@@ -117,7 +117,7 @@ function widget:RecvLuaMsg(msg, playerID)
 
         acp[(numMousePos+1)*2+1] = clock()
         acp[(numMousePos+1)*2+2] = (msg:sub(2,2)=="1")
-        _,_,_,acp[(numMousePos+1)*2+3] = GetPlayerInfo(playerID)
+        _,_,_,acp[(numMousePos+1)*2+3] = GetPlayerInfo(playerID, false)
       end
     end
     return true

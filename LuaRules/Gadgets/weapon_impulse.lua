@@ -20,7 +20,7 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-include("LuaRules/Configs/customcmds.h.lua")
+VFS.Include("LuaRules/Configs/customcmds.h.lua", nil, VFS.GAME)
 
 local GRAVITY = Game.gravity
 local GRAVITY_BASELINE = 120
@@ -34,7 +34,6 @@ local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitVelocity = Spring.GetUnitVelocity
-local spGetUnitStates = Spring.GetUnitStates
 local spGetCommandQueue = Spring.GetCommandQueue
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
@@ -500,13 +499,11 @@ local function AddImpulses()
 					spSetUnitVelocity(unitID, vx + data.x, vy + data.y, vz + data.z)
 
 					--if data.allied then
-						local cQueue = spGetCommandQueue(unitID,1)
-						if #cQueue >= 1 and cQueue[1].id == CMD_GUARD then
+						if Spring.Utilities.GetUnitFirstCommand(unitID) == CMD_GUARD then
 							spGiveOrderToUnit(unitID, CMD_STOP, {0}, 0)
 						end
 
-						local states = spGetUnitStates(unitID)
-						if states["repeat"] then
+						if Spring.Utilities.GetUnitRepeat(unitID) then
 							spGiveOrderToUnit(unitID, CMD_REPEAT, {0}, 0)
 						end
 					--end

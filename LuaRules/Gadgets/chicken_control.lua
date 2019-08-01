@@ -87,10 +87,10 @@ function gadget:Initialize()
     --Spring.Echo("chicken_control gadget quit. did not find chicken")
     gadgetHandler:RemoveGadget()
   end
-  ChickenAllyTeam = select(6,spGetTeamInfo(ChickenTeam))
+  ChickenAllyTeam = select(6,spGetTeamInfo(ChickenTeam, false))
   local j = 0
   for i=1,#teams do
-    local allyTeam = select(6,spGetTeamInfo(teams[i]))
+    local allyTeam = select(6,spGetTeamInfo(teams[i], false))
     if (spGetTeamLuaAI(teams[i]) == "") and (allyTeam == ChickenAllyTeam) then
       j=j+1
       ChickenPlayers[j] = teams[i]
@@ -124,9 +124,9 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
     if (not NotGivingToPlayersUnits[unitDefID]) then
       while (condition) do
 	if (ChickenPlayers[GiveToTeam] ~= nil) then
-	  local leader = select(2, spGetTeamInfo(ChickenPlayers[GiveToTeam]))
+	  local leader = select(2, spGetTeamInfo(ChickenPlayers[GiveToTeam], false))
 	  if (leader >= 0) then -- otherwise spec
-	    local active = select(2, spGetPlayerInfo(leader))
+	    local active = select(2, spGetPlayerInfo(leader, false))
 	    anyone_not_spec = true
 	    --Spring.Echo("chicken_control "..leader.." not spectator")
 	    if active then
