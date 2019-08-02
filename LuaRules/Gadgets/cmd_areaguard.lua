@@ -34,27 +34,24 @@ local spGetUnitTeam     = Spring.GetUnitTeam
 --------------------------------------------------------------------------------
 -- Global Variables
 
-local PREDICTION = 30
-local RAW_MOVE_MODE = false
-
 local areaGuardCmd = {
-    id      = CMD_AREA_GUARD,
-    name    = "Guard2",
-    action  = "areaguard",
+	id      = CMD_AREA_GUARD,
+	name    = "Guard2",
+	action  = "areaguard",
 	cursor  = 'Guard',
-    type    = CMDTYPE.ICON_UNIT_OR_AREA,
+	type    = CMDTYPE.ICON_UNIT_OR_AREA,
 	tooltip = "Guard the unit or units",
-	--hidden	= true,
+	--hidden  = true,
 }
 
 local orbitDrawCmd = {
-    id      = CMD_ORBIT_DRAW,
-    name    = "OrbitDraw",
-    action  = "orbitdraw",
+	id      = CMD_ORBIT_DRAW,
+	name    = "OrbitDraw",
+	action  = "orbitdraw",
 	cursor  = 'Guard',
-    type    = CMDTYPE.ICON_UNIT,
+	type    = CMDTYPE.ICON_UNIT,
 	tooltip = "Circle around the unit in a protective manner",
-	hidden	= true,
+	hidden  = true,
 }
 
 -- ud.canGuard is true for units for which it should not be true. This table
@@ -81,9 +78,13 @@ local frame = 0
 
 -- 2*pi comes from the circumference of the circle.
 -- 15 comes from the gap between move goals being recieved.
+local RAW_MOVE_MODE = false
+
 local CIRC_MULT = 15 * 2*math.pi
 
-local UPDATE_GAP_LEEWAY = 30
+local UPDATE_MULT = 2
+local PREDICTION = 30
+local UPDATE_GAP_LEEWAY = 30*UPDATE_MULT
 
 local RADIUS_BAND_SIZE = 100
 
@@ -166,7 +167,6 @@ local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 end
 
 local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
-	
 	-- targetID is the unitID of the unit to guard.
 	-- radius is the radius to keep from the unit.
 	-- facing is an optional parameter which restricts to 120 degrees in that direction(set to 0 to disable).
@@ -255,7 +255,7 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 		
 		local x,_,z = Spring.GetUnitPosition(unitID)
 		local myAngle = Angle(x - ux, z - uz)
-		local circuitTime = circumference/mySpeed
+		local circuitTime = circumference/(mySpeed*UPDATE_MULT)
 		
 		-- Factor of 3 acts as leeway because if a unit gets stuck nothing is 
 		-- going to move it.
@@ -284,7 +284,7 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 		if adjustedSpeed < 0.01 then
 			newcircuitTime[targetID][radGroup] = false
 		elseif newcircuitTime[targetID][radGroup] ~= false then
-			local circuitTime = circumference/adjustedSpeed
+			local circuitTime = circumference/(adjustedSpeed*UPDATE_MULT)
 			newcircuitTime[targetID][radGroup] = math.max(circuitTime, newcircuitTime[targetID][radGroup] or 0)
 		end
 		
@@ -378,7 +378,7 @@ end
 
 function gadget:GameFrame(f)
 	frame = f
-	if f%15 == 0 then
+	if f%(15*UPDATE_MULT) == 0 then
 		oldGuards = newGuards
 		newGuards = {}
 		

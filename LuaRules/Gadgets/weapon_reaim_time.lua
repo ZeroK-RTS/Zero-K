@@ -18,7 +18,7 @@ end
 -------------------------------------------------------------
 -------------------------------------------------------------
 local useRapidReaim = true
-
+local minReaimTime = 1
 
 -------------------------------------------------------------
 -------------------------------------------------------------
@@ -43,7 +43,7 @@ local function UpdateRapidReaim(unitID, unitDefID)
 		return
 	end
 	for weaponNum, reaimTime in pairs(unitDefsToModify[unitDefID]) do
-		Spring.SetUnitWeaponState(unitID, weaponNum, {reaimTime = (useRapidReaim and reaimTime) or 15})
+		Spring.SetUnitWeaponState(unitID, weaponNum, {reaimTime = math.max(minReaimTime, (useRapidReaim and reaimTime) or 15)})
 	end
 end
 
