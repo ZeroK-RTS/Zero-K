@@ -68,7 +68,7 @@ unitDef = {
       avoidGround             = false,
       burst                   = 20,
       burstrate               = 0.1,
-      cegTag                  = [[RAVENTRAIL]],
+      cegTag                  = [[RAVENTRAIL_Light]],
       craterBoost             = 1,
       craterMult              = 2,
       
