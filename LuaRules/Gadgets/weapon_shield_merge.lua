@@ -39,8 +39,10 @@ local allyTeamShields = {}
 local gameFrame = 0
 
 local shieldDamages = {}
+local defaultShielDamages = {}
 for i = 1, #WeaponDefs do
 	shieldDamages[i] = tonumber(WeaponDefs[i].customParams.shield_damage)
+	defaultShielDamages[i] = WeaponDefs[i].damages[SHIELD_ARMOR]
 end
 
 --------------------------------------------------------------------------------
@@ -212,14 +214,9 @@ local beamMultiHitException = {
 	[UnitDefNames["amphassault"].id] = true,
 	[UnitDefNames["striderdetriment"].id] = true,
 }
-local repeatedHits = {}
 local penetrationPower = {}
 
 function gadget:GameFrame(n)
-	repeatedHits = {} -- Feel sorry for GC
-	if not MERGE_ENABLED then
-		return
-	end
 	gameFrame = n
 	if n%13 == 7 then
 		for allyTeamID, unitList in pairs(allyTeamShields) do
@@ -299,15 +296,7 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	
 	if proID == -1 then
 		local unitDefID = Spring.GetUnitDefID(beamCarrierID)
-		-- Beam weapons hit shields four times per frame.
-		-- No idea why.
-		if not beamMultiHitException[unitDefID] then
-			hackyProID = beamCarrierID + beamEmitter/64
-			repeatedHits[shieldCarrierUnitID] = repeatedHits[shieldCarrierUnitID] or {}
-			if repeatedHits[shieldCarrierUnitID][hackyProID] ~= nil then
-				return repeatedHits[shieldCarrierUnitID][hackyProID]
-			end
-		end
+		hackyProID = beamCarrierID + beamEmitter/64
 		-- Beam weapon
 		local ud = beamCarrierID and UnitDefs[unitDefID]
 		if not ud then
@@ -326,11 +315,7 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	local wd = WeaponDefs[weaponDefID]
 	local damage = shieldDamages[weaponDefID]
 	
-	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, wd.damages[SHIELD_ARMOR], hackyProID or proID)
-	
-	if hackyProID then
-		repeatedHits[shieldCarrierUnitID][hackyProID] = projectilePasses
-	end
+	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, defaultShielDamages[weaponDefID], hackyProID or proID)
 	return projectilePasses
 end
 
@@ -354,6 +339,7 @@ function gadget:Initialize()
 	if MERGE_ENABLED then
 		RegenerateData()
 	else
+		gadgetHandler:RemoveCallIn("GameFrame")
 		gadgetHandler:RemoveCallIn("UnitCreated")
 		gadgetHandler:RemoveCallIn("UnitFinished")
 		gadgetHandler:RemoveCallIn("UnitDestroyed")
