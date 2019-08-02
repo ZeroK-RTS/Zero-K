@@ -112,6 +112,34 @@ options = {
 			end
 		end,
 	},
+	toggleplayerlist = {
+		name = 'Toggle Player List',
+		type = 'button',
+		action = 'toggleplayerlist',
+		noAutoControlFunc = true,
+		OnChange = function(self)
+			if (WG.ToggleCrudePlayerlist) then
+				WG.ToggleCrudePlayerlist()
+			end
+			if (WG.ToggleDeluxePlayerlist) then
+				WG.ToggleDeluxePlayerlist()
+			end
+			if (WG.TogglePlayerlistMinimal) then
+				WG.TogglePlayerlistMinimal()
+			end
+		end,
+	},
+	toggleplayerlistwindow = {
+		name = 'Toggle Playerlist Window',
+		type = 'button',
+		action = 'toggleplayerlistwindow',
+		noAutoControlFunc = true,
+		OnChange = function(self)
+			if (WG.TogglePlayerlistWindow) then
+				WG.TogglePlayerlistWindow()
+			end
+		end,
+	},
 	fancySkinning = {
 		name = 'Fancy Skinning',
 		type = 'radioButton',
@@ -513,6 +541,23 @@ local function InitializeControls()
 		'LuaUI/images/commands/Bold/ferry.png',
 		{action = 'setferry', command = CMD_SET_FERRY}
 	)
+	offset = offset + 1
+
+	-- Playerlist commands
+	offset = offset + 0.5
+
+	MakeCommandButton(contentHolder, offset,
+		'LuaUI/images/playerlist/playerlist.png', 
+		{option = 'toggleplayerlist'}
+	)
+	
+	offset = offset + 1
+	
+	MakeCommandButton(contentHolder, offset,
+		'LuaUI/images/playerlist/playerwindow.png', 
+		{option = 'toggleplayerlistwindow'}
+	)
+	
 	offset = offset + 1
 	
 	commandButtonOffset = offset + 0.5
