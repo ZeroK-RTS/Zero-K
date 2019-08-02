@@ -1,12 +1,12 @@
 function gadget:GetInfo()
 	return {
-		name 	= "Shield Link",
-		desc	= "Nearby shields on the same ally team share charge to and from each other. Working Version",
-		author	= "lurker",
-		date	= "2009",
-		license	= "Public domain",
-		layer	= 0,
-		enabled	= true	--	loaded by default?
+		name    = "Shield Link",
+		desc    = "Nearby shields on the same ally team share charge to and from each other. Working Version",
+		author  = "lurker",
+		date    = "2009",
+		license = "Public domain",
+		layer   = 0,
+		enabled = true -- loaded by default?
 	}
 end
 local version = 1.232
@@ -22,15 +22,15 @@ local version = 1.232
 
 if gadgetHandler:IsSyncedCode() then
 
-local spGetUnitPosition		= Spring.GetUnitPosition
-local spGetUnitDefID		= Spring.GetUnitDefID
-local spGetUnitTeam			= Spring.GetUnitTeam
-local spGetTeamInfo			= Spring.GetTeamInfo
-local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
-local spGetUnitIsStunned	= Spring.GetUnitIsStunned
-local spGetUnitIsActive		= Spring.GetUnitIsActive
-local spGetUnitShieldState	= Spring.GetUnitShieldState
-local spSetUnitShieldState	= Spring.SetUnitShieldState
+local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetUnitDefID        = Spring.GetUnitDefID
+local spGetUnitTeam         = Spring.GetUnitTeam
+local spGetTeamInfo         = Spring.GetTeamInfo
+local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
+local spGetUnitIsStunned    = Spring.GetUnitIsStunned
+local spGetUnitIsActive     = Spring.GetUnitIsActive
+local spGetUnitShieldState  = Spring.GetUnitShieldState
+local spSetUnitShieldState  = Spring.SetUnitShieldState
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
 
@@ -183,7 +183,7 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 		end
 		allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or {}
 		allyTeamShieldList[allyTeamID] = allyTeamShieldList[allyTeamID] or {count = 0}
-			
+		
 		--Note: wont be problem when NIL when nanoframe is captured because is always filled with new value when unit finish
 		AddDataThingToIterable(unitID, unitData, allyTeamShields[allyTeamID], allyTeamShieldList[allyTeamID])
 		QueueLinkUpdate(allyTeamID,unitID)
@@ -525,10 +525,9 @@ end
 function gadget:DrawWorldRefraction()
 	DrawWorldFunc()
 end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-

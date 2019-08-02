@@ -7,12 +7,12 @@ end
 --------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
-		name = "Shield Merge",
-		desc = "Implements shields as if they had a large shared battery between adjacent shields.",
-		author = "GoogleFrog",
-		date = "30 July 2016",
+		name    = "Shield Merge",
+		desc    = "Implements shields as if they had a large shared battery between adjacent shields.",
+		author  = "GoogleFrog",
+		date    = "30 July 2016",
 		license = "None",
-		layer = 100,
+		layer   = 100,
 		enabled = true
 	}
 end
@@ -22,12 +22,12 @@ local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local spGetUnitPosition		= Spring.GetUnitPosition
-local spGetUnitDefID		= Spring.GetUnitDefID
-local spGetUnitTeam			= Spring.GetUnitTeam
-local spGetTeamInfo			= Spring.GetTeamInfo
-local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
-local spGetUnitIsStunned	= Spring.GetUnitIsStunned
+local spGetUnitPosition  = Spring.GetUnitPosition
+local spGetUnitDefID     = Spring.GetUnitDefID
+local spGetUnitTeam      = Spring.GetUnitTeam
+local spGetTeamInfo      = Spring.GetTeamInfo
+local spGetUnitAllyTeam  = Spring.GetUnitAllyTeam
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
 local modOptions = Spring.GetModOptions()
 local MERGE_ENABLED = (modOptions.shield_merge == "share")
@@ -295,7 +295,7 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	
 	if (not Spring.ValidUnitID(shieldCarrierUnitID)) or Spring.GetUnitIsDead(shieldCarrierUnitID) then
 		return false
-	end	
+	end
 	
 	if proID == -1 then
 		local unitDefID = Spring.GetUnitDefID(beamCarrierID)
