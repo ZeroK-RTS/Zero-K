@@ -23,7 +23,7 @@ end
 local wantedList = {}
 
 --// find nukes
-for i=1,#WeaponDefs do
+for i = 1, #WeaponDefs do
 	local wd = WeaponDefs[i]
 	--note that area of effect is radius, not diameter here!
 	if (wd.damageAreaOfEffect >= 800 and wd.targetable) then

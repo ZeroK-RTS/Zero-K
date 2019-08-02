@@ -312,7 +312,6 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 		return true
 	end
 
-	local wd = WeaponDefs[weaponDefID]
 	local damage = shieldDamages[weaponDefID]
 	
 	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, defaultShielDamages[weaponDefID], hackyProID or proID)

@@ -283,10 +283,10 @@ local function BuilderDestroyed(unitID)
 end
 
 function gadget:GameFrame(frame)
-	for i=1,#builders do
+	for i = 1, #builders do
 		local unitID = builders[i]
 		if ((unitID + frame) % 30 < 1) then --// only update once per second
-			local strength = (Spring.GetUnitCurrentBuildPower(unitID) or 0)*(Spring.GetUnitRulesParam(unitID, "totalEconomyChange") or 1)	-- * 16
+			local strength = (Spring.GetUnitCurrentBuildPower(unitID) or 0)*(Spring.GetUnitRulesParam(unitID, "totalEconomyChange") or 1) -- * 16
 			if (strength > 0) then
 				local targetType, target, isFeature = Spring.Utilities.GetUnitNanoTarget(unitID)
 
@@ -326,7 +326,7 @@ function gadget:GameFrame(frame)
 					local teamColor = {Spring.GetTeamColor(teamID)}
 					local nanoPieces = Spring.GetUnitNanoPieces(unitID) or {}
 
-					for j=1,#nanoPieces do
+					for j = 1,#nanoPieces do
 						local nanoPieceID = nanoPieces[j]
 						--local nanoPieceIDAlt = Spring.GetUnitScriptPiece(unitID, nanoPieceID)
 						--if (unitID+frame)%60 == 0 then
