@@ -181,14 +181,14 @@ vertex = [[
 
 				//	local x100  = 100  / (100  + metal)
 				//	local x1000 = 1000 / (1000 + metal)
-				//	local v = 1 / (1 + 40 / metal)
+				//	local v = 0.2 + 0.8 / (1 + 40 / metal)
 				//	local r = v * (1 - x1000)
 				//	local g = v * (x1000 - x100)
 				//	local b = v * (x100)
 				float boundedMetal = max(wreckMetal, 20.0);
 
 				float alpha = 0.35 + 0.65 * SNORM2NORM( sin(simFrame * 0.2) );
-				vec3 x100_1000 = vec3(100.0 / (100.0 + boundedMetal), 1000.0 / (1000.0 + boundedMetal), 1 / (1 + 40 / boundedMetal));
+				vec3 x100_1000 = vec3(100.0 / (100.0 + boundedMetal), 1000.0 / (1000.0 + boundedMetal), 0.2 + 0.8 / (1 + 40 / boundedMetal));
 				addColor = vec4((1.0 - x100_1000.y) * x100_1000.z, (x100_1000.y - x100_1000.x) * x100_1000.z, x100_1000.x * x100_1000.z, alpha);
 			}
 			#undef wreckMetal
