@@ -468,7 +468,6 @@ end
 
 
 local function setupTerraunit(unitID, team, x, y, z)
-
 	y = y or CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
 
 	Spring.MoveCtrl.Enable(unitID)
@@ -3292,6 +3291,7 @@ for i=1,#WeaponDefs do
 			smooth = wd.customParams.smoothmult or DEFAULT_SMOOTH,
 			smoothradius = wd.customParams.smoothradius or wd.craterAreaOfEffect*0.5,
 			gatherradius = wd.customParams.gatherradius or wd.craterAreaOfEffect*0.75,
+			quickgather = wd.customParams.quickgather,
 			detachmentradius = wd.customParams.detachmentradius
 		}
 	end
@@ -3334,6 +3334,28 @@ function gadget:Explosion_GetWantedWeaponDef()
 	return wantedList
 end
 
+local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ)
+	for i = sx - smoothradius, sx + smoothradius,8 do
+		for j = sz - smoothradius, sz + smoothradius,8 do
+			if not (structureAreaMap[i] and structureAreaMap[i][j]) then
+				local disSQ = (i - x)^2 + (j - z)^2
+				if disSQ <= smoothradiusSQ then
+					local newHeight = (groundHeight - spGetGroundHeight(i,j)) * maxSmooth * (1 - disSQ/smoothradiusSQ)^1.5
+					spAddHeightMap(i, j, newHeight)
+				end
+			end
+		end
+	end
+end
+
+local function SmoothFromList(xt,zt,ht)
+	for i = 1, #xt, 1 do
+		spAddHeightMap(xt[i],zt[i],ht[i])
+	end
+end
+
+local APPLY_SMALL_CHANGES = true
+
 function gadget:Explosion(weaponID, x, y, z, owner)
 	
 	if SeismicWeapon[weaponID] then
@@ -3366,67 +3388,61 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		local groundPoints = 0
 		local groundHeight = 0
 		
-		local origHeight = {} -- just to not read the heightmap twice
-		
-		for i = sx-gatherradius, sx+gatherradius,8 do
-			origHeight[i] = {}
-			for j = sz-gatherradius, sz+gatherradius,8 do
+		local increment = (SeismicWeapon[weaponID].quickgather and 16) or 8
+		for i = sx - gatherradius, sx + gatherradius, increment do
+			for j = sz - gatherradius, sz + gatherradius, increment do
 				local disSQ = (i - x)^2 + (j - z)^2
 				if disSQ <= gatherradiusSQ then
-					origHeight[i][j] = spGetGroundHeight(i,j)
 					groundPoints = groundPoints + 1
-					groundHeight = groundHeight + origHeight[i][j]
+					groundHeight = groundHeight + spGetGroundHeight(i,j)
 				end
 			end
 		end
 		
-		local biggestChange = 0
 		if groundPoints > 0 then
 			groundHeight = groundHeight/groundPoints
 			
-			local posX, posY, posZ = {}, {}, {}
-			local posCount = 0
-			
-			for i = sx-smoothradius, sx+smoothradius,8 do
-				for j = sz-smoothradius, sz+smoothradius,8 do
-					local disSQ = (i - x)^2 + (j - z)^2
-					if disSQ <= smoothradiusSQ then
-						if not origHeight[i] then
-							origHeight[i] = {}
-						end
-						if not origHeight[i][j] then
-							origHeight[i][j] = spGetGroundHeight(i,j)
-						end
-						local newHeight = (groundHeight - origHeight[i][j]) * maxSmooth * (1 - disSQ/smoothradiusSQ)^1.5
-						posCount = posCount + 1
-						posX[posCount] = i
-						posY[posCount] = newHeight
-						posZ[posCount] = j
-						local absChange = math.abs(newHeight)
-						if biggestChange and absChange > biggestChange then
-							if absChange > 0.5 then
-								biggestChange = false
-							else
-								biggestChange = absChange
+			if APPLY_SMALL_CHANGES then
+				spSetHeightMapFunc(DoSmoothDirectly, x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ)
+			else
+				local posX, posY, posZ = {}, {}, {}
+				local posCount = 0
+				local biggestChange = 0
+				
+				for i = sx - smoothradius, sx + smoothradius,8 do
+					for j = sz - smoothradius, sz + smoothradius,8 do
+						if not (structureAreaMap[i] and structureAreaMap[i][j]) then
+							local disSQ = (i - x)^2 + (j - z)^2
+							if disSQ <= smoothradiusSQ then
+								if not origHeight[i] then
+									origHeight[i] = {}
+								end
+								if not origHeight[i][j] then
+									origHeight[i][j] = spGetGroundHeight(i,j)
+								end
+								local newHeight = (groundHeight - origHeight[i][j]) * maxSmooth * (1 - disSQ/smoothradiusSQ)^1.5
+								posCount = posCount + 1
+								posX[posCount] = i
+								posY[posCount] = newHeight
+								posZ[posCount] = j
+								local absChange = math.abs(newHeight)
+								if biggestChange and absChange > biggestChange then
+									if absChange > 0.5 then
+										biggestChange = false
+									else
+										biggestChange = absChange
+									end
+								end
 							end
 						end
 					end
+				end 
+				
+				--posY = makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
+				
+				if (not biggestChange) or (math.random() < biggestChange/2) then
+					spSetHeightMapFunc(SmoothFromList, posX, posZ, posY)
 				end
-			end 
-			
-			posY = makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
-			
-			if (not biggestChange) or (math.random() < biggestChange/2) then
-				spSetHeightMapFunc(
-					function(xt,zt,ht)
-						for i = 1, #xt, 1 do
-							spAddHeightMap(xt[i],zt[i],ht[i])
-						end
-					end,
-					posX,
-					posZ,
-					posY
-				)
 			end
 		end
 		

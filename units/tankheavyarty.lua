@@ -88,6 +88,7 @@ unitDef = {
         gatherradius     = [[240]],
         smoothradius     = [[120]],
         smoothmult       = [[0.5]],
+        quickgather      = [[1]],
         lups_noshockwave = [[1]],
         
         light_ground_height = 200,

@@ -84,8 +84,6 @@ else
 local glTexture = gl.Texture
 local glCreateTexture = gl.CreateTexture
 local glDeleteTexture = gl.DeleteTexture
-local CallAsTeam = CallAsTeam
-
 
 local TEXTURE_COUNT = 3
 local texturePool = {
