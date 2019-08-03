@@ -3518,6 +3518,39 @@ local function deregisterStructure(unitID)
 	
 end
 
+local dirtbagPosX = 
+	          { -8, 0, 8,
+	        -16,-8, 0, 8, 16,
+	    -24,-16,-8, 0, 8, 16, 24,
+	-32,-24,-16,-8, 0, 8, 16, 24, 32,
+	-32,-24,-16,-8, 0, 8, 16, 24, 32,
+	-32,-24,-16,-8, 0, 8, 16, 24, 32,
+	    -24,-16,-8, 0, 8, 16, 24,
+	        -16,-8, 0, 8, 16,
+	            -8, 0, 8}
+
+local dirtbagPosZ = 
+	           {-32,-32,-32,
+	        -24,-24,-24,-24,-24,
+	    -16,-16,-16,-16,-16,-16,-16,
+	 -8, -8, -8, -8, -8, -8, -8, -8, -8,
+	  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	  8,  8,  8,  8,  8,  8,  8,  8,  8,
+	      16, 16, 16, 16, 16, 16, 16,
+	          24, 24, 24, 24, 24,
+	              32, 32, 32}
+
+local dirtbagPosY = 
+	            {2 , 3 , 2 ,
+	         2 , 3 , 7 , 3 , 2 ,
+	     2 , 5 , 20, 21, 20, 4 , 2 ,
+	 2 , 3 , 20, 25, 26, 25, 20, 3 , 2 ,
+	 3 , 7 , 21, 26, 28, 26, 21, 7 , 3 ,
+	 2 , 3 , 20, 25, 26, 25, 20, 3 , 2 ,
+	     2 , 4 , 20, 21, 20, 5 , 2 , 
+	          2, 3 , 7 , 3 , 2 , 
+	             2 , 3 , 2 }
+
 function gadget:UnitDestroyed(unitID, unitDefID)
 
 	if (unitDefID == shieldscoutDefID) then
@@ -3527,62 +3560,15 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 			ux = floor((ux+8)/16)*16
 			uz = floor((uz+8)/16)*16
 			
-			local posCount = 57
-			
-			local posX = 
-							{ux-8,ux,ux+8,
-						ux-16,ux-8,ux,ux+8,ux+16,
-				  ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,
-			ux-32,ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,ux+32,
-			ux-32,ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,ux+32,
-			ux-32,ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,ux+32,
-				  ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,
-						ux-16,ux-8,ux,ux+8,ux+16,
-							  ux-8,ux,ux+8}
-							  
-			local posZ = 
-							{uz-32,uz-32,uz-32,
-						uz-24,uz-24,uz-24,uz-24,uz-24,
-				  uz-16,uz-16,uz-16,uz-16,uz-16,uz-16,uz-16,
-			uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,
-			uz   ,uz   ,uz   ,uz   ,uz   ,uz   ,uz   ,uz   ,uz   ,
-			uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,
-				  uz+16,uz+16,uz+16,uz+16,uz+16,uz+16,uz+16,
-						uz+24,uz+24,uz+24,uz+24,uz+24,
-							  uz+32,uz+32,uz+32}
-			
-			--        {0 ,0 ,0 ,
-			--	  1 ,3 ,5 ,3 ,1 ,
-			--   1 ,7 ,14,17,14,7 ,1 ,
-			--0 ,3 ,14,26,31,26,14,3 ,0 ,
-			--0 ,5 ,17,31,36,31,17,5 ,0 ,
-			--0 ,3 ,14,26,31,26,14,3 ,0 ,
-			--   1 ,7 ,14,17,14,7 ,1 ,
-			--      1 ,3 ,5 ,3 ,1 ,
-			--		 0 ,0 ,0 }
-			
-			local posY = 
-				    {2 ,3 ,2 ,
-			      2 ,3 ,7 ,3 ,2 ,
-			   2 ,5 ,20,21,20,4 ,2 ,
-			2 ,3 ,20,25,26,25,20,3 ,2 ,
-			3 ,7 ,21,26,28,26,21,7 ,3 ,
-			2 ,3 ,20,25,26,25,20,3 ,2 ,
-			   2 ,4 ,20,21,20,5 ,2 ,
-			       2,3 ,7 ,3 ,2 ,
-				     2 ,3 ,2 }
-			
-			posY = makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
-			
 			spSetHeightMapFunc(
-				function(x,z,h)
-					for i = 1, #x, 1 do
-						spAddHeightMap(x[i],z[i],h[i])
+				function()
+					for i = 1, #dirtbagPosX, 1 do
+						local x, z = dirtbagPosX[i] + ux, dirtbagPosZ[i] + uz
+						if not (structureAreaMap[x] and structureAreaMap[x][z]) then
+							spAddHeightMap(x, z, dirtbagPosY[i])
+						end
 					end
-				end,
-				posX,
-				posZ,
-				posY
+				end
 			) 
 			
 			local units = Spring.GetUnitsInCylinder(ux,uz,40)
