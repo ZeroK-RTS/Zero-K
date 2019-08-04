@@ -293,7 +293,7 @@ fragment = [[
 	uniform float shadowDensity;
 
 	uniform vec4 pomParams;
-	uniform float autoNormalAmmount;
+	uniform vec2 autoNormalParams;
 
 	uniform int shadowsQuality;
 	uniform int materialIndex;
@@ -345,6 +345,10 @@ fragment = [[
 		float selfIllumMod;
 		float fogFactor;
 	};
+
+	/***********************************************************************/
+	// Constants
+	const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
 
 	/***********************************************************************/
 	// Shadow mapping functions
@@ -436,7 +440,8 @@ fragment = [[
 	}
 
 
-	#define GetDiffuseVal(tex, uv) length(texture(tex, uv).xyz)
+	#define GetDiffuseVal(tex, uv) length(texture(tex, uv).rgb)
+	//#define GetDiffuseVal(tex, uv) dot(LUMA, texture(tex, uv).rgb)
 	vec2 GetDiffuseGrad(vec2 uv, vec2 delta) {
 		vec3 d = vec3(delta, 0.0);
 		return vec2(
@@ -448,7 +453,7 @@ fragment = [[
 	vec3 GetNormalFromDiffuse(vec2 uv) {
 		vec2 texDim = vec2(textureSize(texture1, 0));
 		return normalize(
-			vec3(GetDiffuseGrad(uv, 0.5 / texDim), 1.0 / autoNormalAmmount)
+			vec3(GetDiffuseGrad(uv, autoNormalParams.x / texDim), 1.0 / autoNormalParams.y)
 		);
 	}
 
@@ -532,7 +537,7 @@ fragment = [[
 #if (RENDERING_MODE != 2) //non-shadow pass
 	// Fragment shader main()
 	void main(void){
-		#line 30534
+		#line 30540
 
 		vec2 myUV = modelUV;
 
@@ -721,7 +726,7 @@ local defaultMaterialTemplate = {
 		shadowsQuality	= 2,
 		materialIndex	= 0,
 
-		autoNormalAmmount = 0.00125,
+		autoNormalParams = {1.5, 0.00125}, -- Sampling distance, autonormal value
 		sunSpecularParams = {18.0, 4.0, 0.0}, -- Exponent, multiplier, bias
 		pomParams = {0.002, 1.0, 24.0, -2.0}, -- scale, minLayers, maxLayers, lodBias
 	},
@@ -805,7 +810,7 @@ local knownIntOptions = {
 
 }
 local knownFloatOptions = {
-	["autoNormalAmmount"] = 1,
+	["autoNormalParams"] = 2,
 	["pomParams"] = 4,
 	["sunSpecularParams"] = 3,
 }

@@ -108,7 +108,7 @@ local materials = {
 	featuresTreeMetalNoNormal = Spring.Utilities.MergeWithDefault(featureTreeTemplate, {
 		shaderOptions = {
 			autonormal = true,
-			autoNormalAmmount = 0.01,
+			autoNormalParams = {0.5, 0.01},
 			metal_highlight	= true,
 		},
 		deferredOptions = {
@@ -136,7 +136,7 @@ local materials = {
 	featuresTreeNoMetalNoNormal = Spring.Utilities.MergeWithDefault(featureTreeTemplate, {
 		shaderOptions = {
 			autonormal = true,
-			autoNormalAmmount = 0.01,
+			autoNormalParams = {0.5, 0.01},
 		},
 		deferredOptions = {
 			materialIndex = 131,
@@ -151,7 +151,7 @@ local materials = {
 		feature = true,
 		shaderOptions = {
 			autonormal = true,
-			autoNormalAmmount = 0.01,
+			autoNormalParams = {1.0, 0.005},
 			metal_highlight	= true,
 		},
 		deferredOptions = {
