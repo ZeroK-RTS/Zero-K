@@ -726,7 +726,7 @@ local defaultMaterialTemplate = {
 		shadowsQuality	= 2,
 		materialIndex	= 0,
 
-		autoNormalParams = {1.5, 0.00125}, -- Sampling distance, autonormal value
+		autoNormalParams = {1.0, 0.00125}, -- Sampling distance, autonormal value
 		sunSpecularParams = {18.0, 4.0, 0.0}, -- Exponent, multiplier, bias
 		pomParams = {0.002, 1.0, 24.0, -2.0}, -- scale, minLayers, maxLayers, lodBias
 	},
