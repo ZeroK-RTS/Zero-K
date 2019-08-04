@@ -15,6 +15,7 @@ vertex = [[
 	#define OPTION_METAL_HIGHLIGHT 7
 	#define OPTION_TREEWIND 8
 	#define OPTION_POM 9
+	#define OPTION_AUTONORMAL 10
 
 	/***********************************************************************/
 	// Definitions
@@ -149,7 +150,7 @@ vertex = [[
 				shadowVertexPos.xy += vec2(0.5);  //no need for shadowParams anymore
 			}
 
-			if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING)) {
+			if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING) || BITMASK_FIELD(bitOptions, OPTION_AUTONORMAL)) {
 				//no need to do Gram-Schmidt re-orthogonalization, because engine does it for us anyway
 				vec3 T = gl_MultiTexCoord5.xyz;
 				vec3 B = gl_MultiTexCoord6.xyz;
@@ -247,6 +248,7 @@ fragment = [[
 	#define OPTION_METAL_HIGHLIGHT 7
 	#define OPTION_TREEWIND 8
 	#define OPTION_POM 9
+	#define OPTION_AUTONORMAL 10
 
 	/***********************************************************************/
 	// Definitions
@@ -265,7 +267,7 @@ fragment = [[
 		#define GBUFFER_COUNT 5
 	#endif
 
-	#line 20169
+	#line 20270
 
 
 	/***********************************************************************/
@@ -291,6 +293,7 @@ fragment = [[
 	uniform float shadowDensity;
 
 	uniform vec4 pomParams;
+	uniform float autoNormalAmmount;
 
 	uniform int shadowsQuality;
 	uniform int materialIndex;
@@ -433,6 +436,22 @@ fragment = [[
 	}
 
 
+	#define GetDiffuseVal(tex, uv) length(texture(tex, uv).xyz)
+	vec2 GetDiffuseGrad(vec2 uv, vec2 delta) {
+		vec3 d = vec3(delta, 0.0);
+		return vec2(
+			GetDiffuseVal(texture1, uv + d.xz) - GetDiffuseVal(texture1, uv - d.xz),
+			GetDiffuseVal(texture1, uv + d.zy) - GetDiffuseVal(texture1, uv - d.zy)
+		) / delta;
+	}
+
+	vec3 GetNormalFromDiffuse(vec2 uv) {
+		vec2 texDim = vec2(textureSize(texture1, 0));
+		return normalize(
+			vec3(GetDiffuseGrad(uv, 0.5 / texDim), 1.0 / autoNormalAmmount)
+		);
+	}
+
 	#define POM_SCALE pomParams.x
 	#define POM_MINLAYERS pomParams.y
 	#define POM_MAXLAYERS pomParams.z
@@ -513,7 +532,7 @@ fragment = [[
 #if (RENDERING_MODE != 2) //non-shadow pass
 	// Fragment shader main()
 	void main(void){
-		#line 30342
+		#line 30534
 
 		vec2 myUV = modelUV;
 
@@ -522,7 +541,10 @@ fragment = [[
 		}
 
 		mat3 worldTBN;
-		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING) || BITMASK_FIELD(bitOptions, OPTION_POM)) {
+		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING) ||
+			BITMASK_FIELD(bitOptions, OPTION_POM) ||
+			BITMASK_FIELD(bitOptions, OPTION_AUTONORMAL))
+		{
 			worldTBN = mat3(worldTangent, worldBitangent, worldNormal);
 		}
 
@@ -544,6 +566,9 @@ fragment = [[
 
 		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAPPING)) {
 			vec3 tbnNormal = NORM2SNORM(texture(normalTex, myUV).xyz);
+			N = worldTBN * tbnNormal;
+		} else if (BITMASK_FIELD(bitOptions, OPTION_AUTONORMAL)) {
+			vec3 tbnNormal = GetNormalFromDiffuse(myUV);
 			N = worldTBN * tbnNormal;
 		} else {
 			N = worldNormal;
@@ -625,7 +650,7 @@ fragment = [[
 		#undef wreckMetal
 
 		#if 0
-			finalColor = vec3(shadow);
+			finalColor = vec3( GetNormalFromDiffuse(myUV));
 		#endif
 
 		#if (RENDERING_MODE == 0)
@@ -691,10 +716,12 @@ local defaultMaterialTemplate = {
 		metal_highlight = false,
 		treewind 		= false,
 		pom 			= false,
+		autonormal 		= false,
 
 		shadowsQuality	= 2,
 		materialIndex	= 0,
 
+		autoNormalAmmount = 0.00125,
 		sunSpecularParams = {18.0, 4.0, 0.0}, -- Exponent, multiplier, bias
 		pomParams = {0.002, 1.0, 24.0, -2.0}, -- scale, minLayers, maxLayers, lodBias
 	},
@@ -710,6 +737,7 @@ local defaultMaterialTemplate = {
 		metal_highlight = false,
 		treewind 		= false,
 		pom 			= false,
+		autonormal 		= false,
 
 		shadowsQuality	= 0,
 		materialIndex	= 0,
@@ -768,6 +796,7 @@ local knownBitOptions = {
 	["metal_highlight"] = 7,
 	["treewind"] = 8,
 	["pom"] = 9,
+	["autonormal"] = 10,
 }
 
 local knownIntOptions = {
@@ -776,6 +805,7 @@ local knownIntOptions = {
 
 }
 local knownFloatOptions = {
+	["autoNormalAmmount"] = 1,
 	["pomParams"] = 4,
 	["sunSpecularParams"] = 3,
 }
@@ -852,15 +882,14 @@ local function ApplyOptions(luaShader, materialDef, key)
 
 		elseif knownIntOptions[optName] then --integer
 
-			if type(optValue) == "number" then
+			if type(optValue) == "number" and knownFloatOptions[optName] == 1 then
 				luaShader:SetUniformInt(optName, optValue)
 			elseif type(optValue) == "table" and knownIntOptions[optName] == #optValue then
 				luaShader:SetUniformInt(optName, unpack(optValue))
 			end
 
 		elseif knownFloatOptions[optName] then --float
-
-			if type(optValue) == "number" then
+			if type(optValue) == "number" and knownFloatOptions[optName] == 1 then
 				luaShader:SetUniformFloat(optName, optValue)
 			elseif type(optValue) == "table" and knownFloatOptions[optName] == #optValue then
 				luaShader:SetUniformFloat(optName, unpack(optValue))

@@ -6,6 +6,9 @@ local materials = {
 			[0] = "$units1",
 			[1] = "$units2",
 		},
+		shaderOptions = {
+			autonormal = true,
+		},
 		deferredOptions = {
 			materialIndex = 126,
 		},
