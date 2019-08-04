@@ -440,14 +440,15 @@ fragment = [[
 	}
 
 
-	#define GetDiffuseVal(tex, uv) length(texture(tex, uv).rgb)
+	#define GetDiffuseVal(tex, uv) length(texture(tex, fract(uv)).rgb)
 	//#define GetDiffuseVal(tex, uv) dot(LUMA, texture(tex, uv).rgb)
 	vec2 GetDiffuseGrad(vec2 uv, vec2 delta) {
 		vec3 d = vec3(delta, 0.0);
-		return vec2(
+		vec2 grad = vec2(
 			GetDiffuseVal(texture1, uv + d.xz) - GetDiffuseVal(texture1, uv - d.xz),
 			GetDiffuseVal(texture1, uv + d.zy) - GetDiffuseVal(texture1, uv - d.zy)
-		) / delta;
+		);
+		return grad * step(3.0/255.0, grad) / delta; //ignore small encoding error (1.0/255.0 per channel, so 3.0) gradients
 	}
 
 	vec3 GetNormalFromDiffuse(vec2 uv) {
@@ -726,7 +727,7 @@ local defaultMaterialTemplate = {
 		shadowsQuality	= 2,
 		materialIndex	= 0,
 
-		autoNormalParams = {1.0, 0.00125}, -- Sampling distance, autonormal value
+		autoNormalParams = {1.0, 0.00200}, -- Sampling distance, autonormal value
 		sunSpecularParams = {18.0, 4.0, 0.0}, -- Exponent, multiplier, bias
 		pomParams = {0.002, 1.0, 24.0, -2.0}, -- scale, minLayers, maxLayers, lodBias
 	},
