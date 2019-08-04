@@ -86,6 +86,24 @@ local featureTreeTemplate = Spring.Utilities.MergeWithDefault(matTemplate, {
 	},
 })
 
+local featuresMetalTemplate = Spring.Utilities.MergeWithDefault(matTemplate, {
+	texUnits  = {
+		[0] = "%%FEATUREDEFID:0",
+		[1] = "%%FEATUREDEFID:1",
+	},
+	feature = true,
+	shaderOptions = {
+		autonormal = true,
+		metal_highlight	= true,
+	},
+	deferredOptions = {
+		--metal_highlight	= true,
+	},
+	Initialize	= Initialize,
+	Finalize	= Finalize,
+	GameFrameSlow = GameFrameSlow,
+})
+
 local materials = {
 	featuresTreeMetalFakeNormal = Spring.Utilities.MergeWithDefault(featureTreeTemplate, {
 		texUnits  = {
@@ -143,24 +161,22 @@ local materials = {
 		},
 	}),
 
-	featuresMetal = Spring.Utilities.MergeWithDefault(matTemplate, {
-		texUnits  = {
-			[0] = "%%FEATUREDEFID:0",
-			[1] = "%%FEATUREDEFID:1",
-		},
-		feature = true,
+	featuresMetalWreck = Spring.Utilities.MergeWithDefault(featuresMetalTemplate, {
 		shaderOptions = {
-			autonormal = true,
 			autoNormalParams = {1.0, 0.005},
-			metal_highlight	= true,
 		},
 		deferredOptions = {
-			--metal_highlight	= true,
 			materialIndex = 132,
 		},
-		Initialize	= Initialize,
-		Finalize	= Finalize,
-		GameFrameSlow = GameFrameSlow,
+	}),
+
+	featuresMetalNoWreck = Spring.Utilities.MergeWithDefault(featuresMetalTemplate, {
+		shaderOptions = {
+			autoNormalParams = {0.75, 0.03},
+		},
+		deferredOptions = {
+			materialIndex = 133,
+		},
 	}),
 
 }
@@ -269,7 +285,12 @@ for id = 1, #FeatureDefs do
 				end
 			end
 		elseif metallic then
-			featureMaterials[id] = {"featuresMetal"}
+			local fromUnit = fdef.customParams and (fdef.customParams.fromunit ~= nil)
+			if fromUnit then
+				featureMaterials[id] = {"featuresMetalWreck"}
+			else
+				featureMaterials[id] = {"featuresMetalNoWreck"}
+			end
 		end
 	end
 end

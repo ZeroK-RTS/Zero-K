@@ -448,7 +448,7 @@ fragment = [[
 			GetDiffuseVal(texture1, uv + d.xz) - GetDiffuseVal(texture1, uv - d.xz),
 			GetDiffuseVal(texture1, uv + d.zy) - GetDiffuseVal(texture1, uv - d.zy)
 		);
-		return grad * step(3.0/255.0, grad) / delta; //ignore small encoding error (1.0/255.0 per channel, so 3.0) gradients
+		return grad / delta;
 	}
 
 	vec3 GetNormalFromDiffuse(vec2 uv) {
