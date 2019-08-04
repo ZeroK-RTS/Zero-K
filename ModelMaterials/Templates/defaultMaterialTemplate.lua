@@ -887,7 +887,7 @@ local function ApplyOptions(luaShader, materialDef, key)
 
 		elseif knownIntOptions[optName] then --integer
 
-			if type(optValue) == "number" and knownFloatOptions[optName] == 1 then
+			if type(optValue) == "number" and knownIntOptions[optName] == 1 then
 				luaShader:SetUniformInt(optName, optValue)
 			elseif type(optValue) == "table" and knownIntOptions[optName] == #optValue then
 				luaShader:SetUniformInt(optName, unpack(optValue))
