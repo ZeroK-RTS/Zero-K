@@ -343,7 +343,7 @@ local function GetObjectMaterial(rendering, objectDefID)
 		for _, tex in pairs(texUnits) do
 			if not rendering.loadedTextures[tex.tex] then
 				local prefix = tex.tex:sub(1, 1)
-				if validTexturePrefixes[prefix] then
+				if not validTexturePrefixes[prefix] then
 					gl.Texture(tex.tex)
 					rendering.loadedTextures[tex.tex] = true
 				end
