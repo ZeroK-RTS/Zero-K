@@ -21,6 +21,9 @@ local materials = {
 			[0] = "%TEX1",
 			[1] = "%TEX2",
 		},
+		shaderOptions = {
+			autonormal = true,
+		},
 		deferredOptions = {
 			materialIndex = 2,
 		},
