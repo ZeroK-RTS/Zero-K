@@ -53,7 +53,8 @@ function GetShieldColor(unitID, self)
 	local col1 = MergeShieldColor(self.colormap1, frac)
 	local col2 = self.colormap2 and MergeShieldColor(self.colormap2, frac)
 	
-	local changeAlphaMult = 0.1 + 0.9*charge/(charge + 100)
+	local boundCharge = math.max(20, charge)
+	local changeAlphaMult = 0.1 + 0.9*boundCharge/(boundCharge + 100)
 	col1[4] = col1[4]*changeAlphaMult
 	if col2 then
 		col2[4] = col2[4]*changeAlphaMult
