@@ -264,8 +264,8 @@ function TargetingLaser()
 				local _, SatelliteMuzzleY = Spring.GetUnitPiecePosition(unitID, SatelliteMuzzle)
 				newHeight = max(SatelliteMuzzleY-flashY, 1)
 				if newHeight ~= oldHeight then
+					Spring.SetUnitWeaponState(unitID, 2, "range", newHeight)
 					Spring.SetUnitWeaponState(unitID, 3, "range", newHeight)
-					Spring.SetUnitWeaponState(unitID, 5, "range", newHeight)
 					oldHeight = newHeight
 				end
 				
@@ -280,10 +280,10 @@ function TargetingLaser()
 				
 				--// Shooting
 				if shooting ~= 0 then
-					EmitSfx(EmitterMuzzle, GG.Script.FIRE_W3)
+					EmitSfx(EmitterMuzzle, GG.Script.FIRE_W2)
 					shooting = shooting - 1
 				else
-					EmitSfx(EmitterMuzzle, GG.Script.FIRE_W5)
+					EmitSfx(EmitterMuzzle, GG.Script.FIRE_W3)
 				end
 			end
 		end

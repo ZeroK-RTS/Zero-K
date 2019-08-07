@@ -3292,7 +3292,8 @@ for i=1,#WeaponDefs do
 			smoothradius = wd.customParams.smoothradius or wd.craterAreaOfEffect*0.5,
 			gatherradius = wd.customParams.gatherradius or wd.craterAreaOfEffect*0.75,
 			quickgather = wd.customParams.quickgather,
-			detachmentradius = wd.customParams.detachmentradius
+			detachmentradius = wd.customParams.detachmentradius,
+			smoothheightoffset = wd.customParams.smoothheightoffset,
 		}
 	end
 end
@@ -3365,6 +3366,8 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		local gatherradius = SeismicWeapon[weaponID].gatherradius
 		local detachmentradius = SeismicWeapon[weaponID].detachmentradius
 		local maxSmooth = SeismicWeapon[weaponID].smooth
+		local smoothheightoffset = SeismicWeapon[weaponID].smoothheightoffset
+		
 		if y > height + HEIGHT_FUDGE_FACTOR then
 			local factor = 1 - ((y - height - HEIGHT_FUDGE_FACTOR)/smoothradius*HEIGHT_RAD_MULT)^2
 			if factor > 0 then
@@ -3400,7 +3403,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		end
 		
 		if groundPoints > 0 then
-			groundHeight = groundHeight/groundPoints
+			groundHeight = groundHeight/groundPoints - (smoothheightoffset or 0)
 			
 			if APPLY_SMALL_CHANGES then
 				spSetHeightMapFunc(DoSmoothDirectly, x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ)

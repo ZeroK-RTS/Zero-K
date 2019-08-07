@@ -597,7 +597,7 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		-- shield damage
-		if (wd.interceptedByShieldType ~= 0) and show_damage then
+		if (wd.interceptedByShieldType ~= 0) and show_damage and not cp.stats_hide_shield_damage then
 			if cp.damage_vs_shield then
 				cells[#cells+1] = ' - Shield damage:'
 				cells[#cells+1] = numformat(cp.stats_shield_damage)

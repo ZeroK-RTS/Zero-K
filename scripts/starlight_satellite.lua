@@ -73,15 +73,31 @@ function Undock()
 	end
 end
 
+local function EmitShot()
+	if not parentUnitID then
+		return
+	end
+	
+	if GG.Starlight_DamageFrame[parentUnitID] then
+		local frame = Spring.GetGameFrame()
+		if frame <= GG.Starlight_DamageFrame[parentUnitID] + 1 then
+			return
+		end
+		GG.Starlight_DamageFrame[parentUnitID] = nil
+	end
+	
+	if shooting ~= 0 then
+		EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W1)
+		shooting = shooting - 1
+	else
+		EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W2)
+	end
+end
+
 function Shoot()
 	SetSignalMask(SIG_SHOOT)
 	while(on) do
-		if shooting ~= 0 then
-			EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W2)
-			shooting = shooting - 1
-		else
-			EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W4)
-		end
+		EmitShot()
 		Sleep(30)
 	end
 end
