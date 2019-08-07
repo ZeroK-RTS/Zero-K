@@ -120,7 +120,6 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon() 
-	gun_1 = not gun_1
 	if gun_1 then
 		EmitSfx(firept1, GG.Script.UNIT_SFX1)
 		EmitSfx(firept1, GG.Script.UNIT_SFX2)
@@ -129,7 +128,7 @@ function script.FireWeapon()
 
 		Move(r_barrel, z_axis, 0, 2.5)
 		Move(r_gun, z_axis, 0, 1.25)
-		else
+	else
 		EmitSfx(firept2, GG.Script.UNIT_SFX1)
 		EmitSfx(firept2, GG.Script.UNIT_SFX2)
 		Move(l_barrel, z_axis, -4, 0)
@@ -152,6 +151,10 @@ function script.QueryWeapon(num)
 		-- Shield
 		return shield
 	end
+end
+
+function script.EndBurst()
+	gun_1 = not gun_1
 end
 
 function script.BlockShot(num, targetID)
