@@ -45,7 +45,7 @@ local function RestoreAfterDelay()
 end
 
 function script.QueryWeapon(num)
-	return flares[current_flare]
+	return flares[3 - current_flare]
 end
 
 function script.AimFromWeapon(num)
@@ -70,6 +70,8 @@ function script.FireWeapon(num)
 	EmitSfx(flares[current_flare], 1024)
 	current_flare = 3 - current_flare
 end
+
+-- EndBurst doesn't seem to fix friendlyfire on units with high-RoF
 
 -- Misc
 
