@@ -251,9 +251,9 @@ end
 
 function script.QueryWeapon(num)
 	if gun_1 == 1 then
-		return fire1
-	else
 		return fire2
+	else
+		return fire1
 	end
 end
 
