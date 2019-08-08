@@ -78,12 +78,16 @@ local reloadTime = wd and WeaponDefs[wd].reload*30 or 30
 wd = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
 local reloadTimeShort = wd and WeaponDefs[wd].reload*30 or 30
 
+
+local firetracker = 0 --from 0 to 2 inclusive for gauss burst
+local gausslefttrue = false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function script.Create()
 	Turn(larm, z_axis, -0.1)
-	Turn(rarm, z_axis, 0.1)	
-	Turn(shoulderflare, x_axis, math.rad(-90))	
+	Turn(rarm, z_axis, 0.1)
+	Turn(shoulderflare, x_axis, math.rad(-90))
 	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
@@ -137,7 +141,7 @@ end
 local function Walk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
-	
+
 	while (true) do
 		Step(leftLeg, rightLeg)
 		Step(rightLeg, leftLeg)
@@ -147,7 +151,7 @@ end
 local function StopWalk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
-	
+
 	Move(torso, y_axis, 0, 100)
 	for i,p in pairs(leftLeg) do
 		Turn(leftLeg[i], x_axis, 0, LEG_STRAIGHT_SPEEDS[i])
@@ -198,9 +202,9 @@ function script.AimWeapon(num, heading, pitch)
 	isFiring = true
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	
+
 	StartThread(RestoreAfterDelay)
-	
+
 	if num == 1 then
 		Turn(torso, y_axis, heading, math.rad(180))
 		Turn(larm, x_axis, -pitch, math.rad(120))
@@ -221,23 +225,49 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(torso, y_axis, heading, math.rad(180))
 		WaitForTurn(torso, y_axis)
 	end
-	
+
 	if num ~= 2 then
 		lastTorsoHeading = heading
 	end
-	
+
 	return true
 end
 
+
+function script.FireWeapon(num)
+	if num == 1 then--gauss battery
+		firetracker = 0
+	end
+	if num == 2 then--AA
+	end
+	if num == 3 then--greenrocket
+	end
+	if num == 4 then--greenLAZER
+	end
+end
 function script.Shot(num)
 	if num == 1 then
-		Move(barrels[gunIndex[1]], z_axis, -20)
-		Move(barrels[gunIndex[1]], z_axis, 0, 20)
-	end 
-	flareIndex[num] = gunIndex[num] -- store current gunIndex in flareIndex 
-	gunIndex[num] = gunIndex[num] + 1
-	if gunIndex[num] > #gunFlares[num] then 
-		gunIndex[num] = 1
+		if gausslefttrue == false then
+			gunIndex[1] = firetracker + 1
+		else
+			gunIndex[1] = firetracker + 4
+		end
+		Move(barrels[gunIndex[1] ], z_axis, -20)
+		Move(barrels[gunIndex[1] ], z_axis, 0, 20)
+		firetracker = (firetracker +1) % 3
+	end
+	if num == 2 then
+		gunIndex[num] = (gunIndex[num] % #gunFlares[num]) + 1
+	end
+	flareIndex[num] = gunIndex[num] -- store current gunIndex in flareIndex
+
+end
+
+function script.EndBurst(num)
+	if num == 1 then
+		gunIndex[num] = (gunIndex[num] % #gunFlares[num]) +1
+		flareIndex[num] = gunIndex[num]
+		gausslefttrue = not gausslefttrue
 	end
 end
 
@@ -268,7 +298,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rarmcannon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		Explode(larmcannon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		Explode(larm, SFX.SHATTER)
-		
+
 		return 1 -- corpsetype
 	else
 		Explode(torso, SFX.SHATTER)
