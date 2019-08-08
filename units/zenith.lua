@@ -4,7 +4,7 @@ unitDef = {
   description                   = [[Meteor Controller]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  buildCostMetal                = 32000,
+  buildCostMetal                = 38000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
@@ -123,11 +123,11 @@ unitDef = {
         light_color = [[2.4 1.5 0.6]],
         light_radius = 600,
       },
-      
+
       damage                  = {
-        default = 2000,
-        planes  = 2000,
-        subs    = 100,
+        default = 1700,
+        planes  = 1700,
+        subs    = 85,
       },
 
       edgeEffectiveness       = 0.8,
@@ -139,7 +139,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[asteroid.s3o]],
       range                   = 9000,
-      reloadtime              = 0.7,
+      reloadtime              = 1.2,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
@@ -176,9 +176,9 @@ unitDef = {
       },
 
       damage                  = {
-        default = 2000,
-        planes  = 2000,
-        subs    = 100,
+        default = 1700,
+        planes  = 1700,
+        subs    = 85,
       },
 
       edgeEffectiveness       = 0.8,
@@ -190,7 +190,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[asteroid.s3o]],
       range                   = 9000,
-      reloadtime              = 0.7,
+      reloadtime              = 1.2,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
@@ -229,9 +229,9 @@ unitDef = {
       },
 
       damage                  = {
-        default = 2000,
-        planes  = 2000,
-        subs    = 100,
+        default = 1700,
+        planes  = 1700,
+        subs    = 85,
       },
 
       edgeEffectiveness       = 0.8,
@@ -243,7 +243,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[asteroid.s3o]],
       range                   = 9000,
-      reloadtime              = 0.7,
+      reloadtime              = 1.2,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
@@ -284,9 +284,9 @@ unitDef = {
       },
 
       damage                  = {
-        default = 1000,
-        planes  = 1000,
-        subs    = 50,
+        default = 1700,
+        planes  = 1700,
+        subs    = 85,
       },
 
       edgeEffectiveness       = 0.8,
@@ -298,7 +298,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[asteroid.s3o]],
       range                   = 9000,
-      reloadtime              = 0.7,
+      reloadtime              = 1.2,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
