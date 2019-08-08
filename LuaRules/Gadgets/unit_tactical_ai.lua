@@ -276,7 +276,6 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 					local cx,cy,cz -- command position
 					
 					if behaviour.circleStrafe then
-						
 						-- jink around the enemy
 						local up = 0
 						local ep = 1
@@ -297,10 +296,10 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 							cz = uz-data.rot*(ux-ex)*behaviour.strafeOrderLength/pointDis
 							data.rot = data.rot*-1
 						else
-							data.jinkDir = data.jinkDir*-1					-- jink away
-							cx = ux-(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+							data.jinkDir = data.jinkDir*-1 -- jink away
+							cx = ux-(-(ux-ex)*behaviour.jinkAwayParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
 							cy = uy
-							cz = uz-(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+							cz = uz-(-(uz-ez)*behaviour.jinkAwayParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
 						end
 					end
 					
@@ -759,6 +758,7 @@ local function GetBehaviourTable(behaviourData, ud)
 	behaviourData.skirmLeeway             = (behaviourData.skirmLeeway or 0)
 	behaviourData.jinkTangentLength       = (behaviourData.jinkTangentLength or behaviourDefaults.defaultJinkTangentLength)
 	behaviourData.jinkParallelLength      = (behaviourData.jinkParallelLength or behaviourDefaults.defaultJinkParallelLength)
+	behaviourData.jinkAwayParallelLength  = (behaviourData.jinkAwayParallelLength or behaviourData.defaultJinkAwayParallelLength)
 	behaviourData.localJinkOrder          = (behaviourData.alwaysJinkFight or behaviourDefaults.defaultLocalJinkOrder)
 	behaviourData.stoppingDistance        = (behaviourData.stoppingDistance or 0)
 	behaviourData.strafeOrderLength       = (behaviourData.strafeOrderLength or behaviourDefaults.defaultStrafeOrderLength)
