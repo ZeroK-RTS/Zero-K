@@ -187,6 +187,7 @@ local ignoredCommand = {
 	[CMD_ABANDON_PW] = true,
 	[CMD_RECALL_DRONES] = true,
 	[CMD_UNIT_KILL_SUBORDINATES] = true,
+	[CMD_DISABLE_ATTACK] = true,
 	[CMD_PUSH_PULL] = true,
 	[CMD_UNIT_AI] = true,
 	[CMD_WANT_CLOAK] = true,
