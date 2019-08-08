@@ -80,6 +80,7 @@ local cmds = {
 	TOGGLE_DRONES = 35301,
 	ANTINUKEZONE = 35130, -- ceasefire
 	UNIT_KILL_SUBORDINATES = 35821, -- unit_capture
+	DISABLE_ATTACK = 35822, -- unit_launcher
 	PUSH_PULL = 35666, -- weapon_impulse
 	UNIT_AI = 36214,
 	WANT_CLOAK = 37382,
