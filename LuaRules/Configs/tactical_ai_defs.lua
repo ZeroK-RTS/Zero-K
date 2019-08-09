@@ -84,7 +84,7 @@ local lowRangeSwarmieeArray = NameToDefID({
 	"tankheavyassault",
 	
 	"spidercrabe",
-	--"hoverarty", -- Always hits small units. Swarm may make it hit more.
+	"hoverarty",
 	
 	"chickenr",
 	"chickenblobber",
@@ -407,7 +407,6 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- minSwarmLeeway (defaults to Weapon range): (Weapon range - minSwarmLeeway) = Range that the unit will attempt to move further away from the target while swarming
 -- jinkTangentLength (default in config): component of jink vector tangent to direction to enemy
 -- jinkParallelLength (default in config): component of jink vector parallel to direction to enemy
--- jinkAwayParallelLength (defaults in config): component of jink vector parallel to direction to enemy when jinking away due to being too close
 -- circleStrafe (defaults to false): when set to true the unit will run all around the target unit, false will cause the unit to jink back and forth
 -- minCircleStrafeDistance (default in config): (weapon range - minCircleStrafeDistance) = distance at which the circle strafer will attempt to move away from target
 -- strafeOrderLength (default in config): length of move order while strafing
@@ -438,10 +437,9 @@ local behaviourDefaults = {
 	defaultState = 1,
 	defaultJinkTangentLength = 80,
 	defaultJinkParallelLength = 200,
-	defaultJinkAwayParallelLength = 170,
 	defaultStrafeOrderLength = 100,
 	defaultMinCircleStrafeDistance = 40,
-	defaultLocalJinkOrder = true,
+    defaultLocalJinkOrder = true,
 	defaultSkirmOrderDis = 120,
 	defaultVelocityPrediction = 30,
 	defaultHugRange = 50,
@@ -608,12 +606,11 @@ local behaviourConfig = {
 		fightOnlyUnits = shortRangeExplodables, 
 		localJinkOrder = false,
 		jinkTangentLength = 50,
-		jinkAwayParallelLength = 120,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
 		strafeOrderLength = 100,
 		minCircleStrafeDistance = 260,
-		maxSwarmLeeway = 50,
-		minSwarmLeeway = 120,
+		maxSwarmLeeway = 0,
+		minSwarmLeeway = 100,
 		swarmLeeway = 300,
 		skirmLeeway = 10,
 		stoppingDistance = 8,
@@ -624,7 +621,6 @@ local behaviourConfig = {
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		fightOnlyUnits = shortRangeExplodables,
-		jinkAwayParallelLength = 100,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE, 
 		strafeOrderLength = 180,
 		maxSwarmLeeway = 40, 
@@ -651,8 +647,7 @@ local behaviourConfig = {
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		fightOnlyUnits = shortRangeExplodables,
-		circleStrafe = ENABLE_OLD_JINK_STRAFE,
-		jinkAwayParallelLength = 150,
+		circleStrafe = ENABLE_OLD_JINK_STRAFE, 
 		maxSwarmLeeway = 100, 
 		minSwarmLeeway = 200, 
 		swarmLeeway = 30, 
