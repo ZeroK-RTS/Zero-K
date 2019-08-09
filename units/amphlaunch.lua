@@ -18,10 +18,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen         = 10,
-    amph_submerged_at  = 40,
-    thrower_gather     = 112,
-    attack_toggle      = [[1]],
+    amph_regen        = 10,
+    amph_submerged_at = 40,
+    thrower_gather    = 112,
   },
 
   explodeAs              = [[BIG_UNITEX]],

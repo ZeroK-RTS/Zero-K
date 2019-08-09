@@ -785,18 +785,6 @@ local function addUnit(defName, path)
 			options_order[#options_order+1] = defName .. "_activateWhenBuilt"
 		end
 	end
-	
-	if ud.customParams.attack_toggle then
-		options[defName .. "_disableattack"] = {
-			name = "  Disable Attack Commands",
-			desc = "Check the box to make the unit not respond to attack commands.",
-			type = 'bool',
-			value = false,
-			path = path,
-		}
-		options_order[#options_order+1] = defName .. "_disableattack"
-	
-	end
 end
 
 local function AddFactoryOfUnits(defName)
@@ -1101,11 +1089,6 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			WG.SetSelectionRank(unitID, value)
 		end
 		
-		value = GetStateValue(name, "disableattack")
-		if value then -- false is the default
-			orderArray[#orderArray + 1] = {CMD_DISABLE_ATTACK, {1}, CMD.OPT_SHIFT}
-		end
-		
 		QueueState(name, "tactical_ai_2", CMD_UNIT_AI, orderArray)
 		
 		value = GetStateValue(name, "tactical_ai_transport")
@@ -1164,7 +1147,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		return
 	end
 	
-	local oldID = Spring.GetUnitRulesParam(unitID, "saveload_oldID")
+	local oldID = Spring.GetUnitRulesParam(unitID, "saveload_oldID")	
 	if oldID then
 		return
 	end

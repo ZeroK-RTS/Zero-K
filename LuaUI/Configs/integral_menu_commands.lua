@@ -333,7 +333,6 @@ local tooltips = {
 	AP_FLY_STATE = "Idle State (_STATE_)\n  Set whether aircraft lands when idle.",
 	UNIT_BOMBER_DIVE_STATE = "Dive State (_STATE_)\n  Set when Ravens dive.",
 	UNIT_KILL_SUBORDINATES = "Kill Captured (_STATE_)\n  Set whether to kill captured units.",
-	DISABLE_ATTACK = "Allow attack commands (_STATE_)\n  Set whether the unit responds to attack commands.",
 	PUSH_PULL = "Impulse Mode (_STATE_)\n  Set whether gravity guns push or pull.",
 	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire at radar dots.",
 	PREVENT_OVERKILL = "Overkill Prevention (_STATE_)\n  Prevents units from shooting at already doomed enemies.",
@@ -491,10 +490,6 @@ local overrides = {
 	[CMD_UNIT_KILL_SUBORDINATES] = {
 		texture = {imageDir .. 'states/capturekill_off.png', imageDir .. 'states/capturekill_on.png'},
 		stateTooltip = {tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", "Keep"), tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", "Kill")}
-	},
-	[CMD_DISABLE_ATTACK] = {
-		texture = {imageDir .. 'states/disableattack_off.png', imageDir .. 'states/disableattack_on.png'},
-		stateTooltip = {tooltips.DISABLE_ATTACK:gsub("_STATE_", "Allowed"), tooltips.DISABLE_ATTACK:gsub("_STATE_", "Blocked")}
 	},
 	[CMD_PUSH_PULL] = {
 		texture = {imageDir .. 'states/pull_alt.png', imageDir .. 'states/push_alt.png'},

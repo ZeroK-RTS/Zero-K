@@ -410,16 +410,12 @@ local function KillToggleCommand(unitID, cmdParams, cmdOptions)
 	end
 end
 
-function gadget:AllowCommand_GetWantedCommand()
+function gadget:AllowCommand_GetWantedCommand()	
 	return {[CMD_UNIT_KILL_SUBORDINATES] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()
-	local wanted = {}
-	for unitID, _ in pairs(captureUnitDefs) do
-		wanted[unitID] = true
-	end
-	return wanted
+function gadget:AllowCommand_GetWantedUnitDefID()	
+	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
