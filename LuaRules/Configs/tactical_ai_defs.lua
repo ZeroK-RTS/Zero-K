@@ -183,7 +183,7 @@ local medRangeSkirmieeArray = NameToDefID({
 	"vehriot",
 	
 	"hoverriot",
-    "shieldfelon",
+	"shieldfelon",
 
 	"tankassault",
 	"tankheavyassault",
@@ -348,7 +348,7 @@ local fleeables = NameToDefID({
 	"vehcapture",
 
 	"hoverriot", -- mumbo
-    "shieldfelon",
+	"shieldfelon",
 	"jumpsumo",
 })
 
@@ -535,9 +535,6 @@ local behaviourConfig = {
 		flees = fleeables,
 		fightOnlyUnits = veryShortRangeExplodables,
 		fightOnlyOverride = {
-			skirms = veryShortRangeSkirmieeArray, 
-			swarms = lowRangeSwarmieeArray, 
-			flees = fleeables,
 			skirmLeeway = 40,
 			skirmOrderDis = 30,
 			stoppingDistance = 30,
@@ -785,7 +782,12 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0, 
 		skirmLeeway = -30, 
-		stoppingDistance = 5
+		stoppingDistance = 5,
+		fightOnlyOverride = {
+			skirmLeeway = 10,
+			stoppingDistance = 10,
+			stoppingDistance = 10,
+		},
 	},
 	
     ["shieldfelon"] = {
@@ -809,6 +811,9 @@ local behaviourConfig = {
 		stoppingDistance = 5,
 		skirmBlockedApproachFrames = 40,
 		skirmBlockApproachHeadingBlock = 0,
+		fightOnlyOverride = {
+			skirmLeeway = 10,
+		},
 	},
 	["tankriot"] = {
 		skirms = medRangeSkirmieeArray, 
@@ -819,7 +824,10 @@ local behaviourConfig = {
 		skirmOrderDis = 220,
 		skirmLeeway = -30, 
 		reloadSkirmLeeway = 2,
-		stoppingDistance = 10
+		stoppingDistance = 10,
+		fightOnlyOverride = {
+			skirmLeeway = 10,
+		},
 	},
 	["amphriot"] = {
 		waterline = -5,
@@ -893,7 +901,10 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0, 
 		skirmLeeway = -30, 
-		stoppingDistance = 5
+		stoppingDistance = 5,
+		fightOnlyOverride = {
+			skirmLeeway = 10,
+		},
 	},
 	["hoverdepthcharge"] = {
 		skirms = {}, 
