@@ -293,8 +293,6 @@ function TargetingLaser()
 end
 
 function script.Create()
-	Spring.SetUnitWeaponState(unitID, 2, "range", 9300)
-	Spring.SetUnitWeaponState(unitID, 4, "range", 9300)
 	StartThread(GG.Script.SmokeUnit, smokePiece)
 
 	--Move(ShortSpikes,z_axis, -5)
