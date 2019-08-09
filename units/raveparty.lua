@@ -98,7 +98,6 @@ unitDef = {
 
       customParams = {
         restrict_in_widgets = 1,
-        script_reload = [[6]],
       },
       damage                  = {
         default = 3002.1,
@@ -138,7 +137,6 @@ unitDef = {
         burntime = 240,
         burnchance = 1,
         restrict_in_widgets = 1,
-        script_reload = [[6]],
 
         area_damage = 1,
         area_damage_radius = 320,
@@ -183,7 +181,6 @@ unitDef = {
 
       customParams = {
         restrict_in_widgets = 1,
-        script_reload = [[6]],
       },
 
       damage                  = {
@@ -226,7 +223,6 @@ unitDef = {
         smoothradius = [[192]],
         smoothmult   = [[0.7]],
         restrict_in_widgets = 1,
-        script_reload = [[6]],
       },
       
       damage                  = {
@@ -264,7 +260,6 @@ unitDef = {
 
       customParams = {
         restrict_in_widgets = 1,
-        script_reload = [[6]],
       },
 
       damage                  = {
@@ -306,7 +301,6 @@ unitDef = {
         timeslow_damagefactor = 10,
         nofriendlyfire = "needs hax",
         restrict_in_widgets = 1,
-        script_reload = [[6]],
       },
       
       damage                  = {
