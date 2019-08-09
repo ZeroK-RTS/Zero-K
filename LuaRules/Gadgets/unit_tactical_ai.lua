@@ -546,6 +546,7 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fx
 	-- Apologies for this function.
 	local usefulEnemy = false
 	if not (typeKnown and (not haveFight) and behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef]) then
+		
 		if behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef] and behaviour.fightOnlyOverride then
 			behaviour = behaviour.fightOnlyOverride
 		end
@@ -748,6 +749,7 @@ local function GetBehaviourTable(behaviourData, ud)
 		weaponRange = ud.maxWeaponRange
 	end
 	
+	
 	behaviourData.weaponNum               = (behaviourData.weaponNum or 1)
 	behaviourData.maxSwarmRange           = weaponRange - (behaviourData.maxSwarmLeeway or 0)
 	behaviourData.minSwarmRange           = weaponRange - (behaviourData.minSwarmLeeway or weaponRange/2)
@@ -772,11 +774,6 @@ local function GetBehaviourTable(behaviourData, ud)
 	behaviourData.minFleeRange            = behaviourData.minFleeRange - behaviourData.fleeLeeway
 	
 	if behaviourData.fightOnlyOverride then
-		for k, v in pairs(behaviourData) do
-			if not (k == "fightOnlyOverride" or behaviourData.fightOnlyOverride[k]) then
-				behaviourData.fightOnlyOverride[k] = v
-			end
-		end
 		behaviourData.fightOnlyOverride = GetBehaviourTable(behaviourData.fightOnlyOverride, ud)
 	end
 	
