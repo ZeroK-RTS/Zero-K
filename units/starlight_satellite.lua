@@ -90,7 +90,7 @@ starlight_satellite = {
         default = 800,
       },
 
-      explosionGenerator      = [[custom:craterpuncher]],
+      explosionGenerator      = [[custom:FLASHLAZER]],
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
