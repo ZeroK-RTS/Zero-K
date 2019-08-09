@@ -173,8 +173,10 @@ unitDef = {
       areaOfEffect            = 0,
       avoidFeature            = false,
       avoidFriendly           = false,
+      avoidGround             = false,
       collideFeature          = false,
       collideFriendly         = false,
+      collideGround           = false,
       craterBoost             = 0,
       craterMult              = 0,
 

@@ -66,6 +66,13 @@ local function setFlyLow(unitID, height, targetID)
 	end
 end
 
+local function BomberHighPitchUpdate(unitID, targetID, attackGroundHeight)
+	local env = Spring.UnitScript.GetScriptEnv(unitID)
+	if env then
+		Spring.UnitScript.CallAsUnit(unitID, env.BomberDive_HighPitchUpdate, targetID, attackGroundHeight)
+	end
+end
+
 local function setFlyHigh(unitID)
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
 	if env then
@@ -74,14 +81,14 @@ local function setFlyHigh(unitID)
 end
 
 local function GetAttackTarget(unitID)
-	local cmdID, cmdParam_1, cmdParam_2
+	local cmdID, cmdParam_1, cmdParam_2, cmdParam_3
 	if Spring.Utilities.COMPAT_GET_ORDER then
 		local queue = Spring.GetCommandQueue(unitID, 1)
 		if queue and queue[1] then
-			cmdID, cmdParam_1, cmdParam_2 = queue[1].id, queue[1].params[1], queue[1].params[2]
+			cmdID, cmdParam_1, cmdParam_2, cmdParam_3 = queue[1].id, queue[1].params[1], queue[1].params[2], queue[1].params[3]
 		end
 	else
-		cmdID, _, _, cmdParam_1, cmdParam_2 = Spring.GetUnitCurrentCommand(unitID)
+		cmdID, _, _, cmdParam_1, cmdParam_2, cmdParam_3 = Spring.GetUnitCurrentCommand(unitID)
 	end
 	
 	if cmdID and cmdID == CMD_ATTACK and cmdParam_1 and (not cmdParam_2) then
@@ -91,6 +98,10 @@ local function GetAttackTarget(unitID)
 			local ud = UnitDefs[unitDefID]
 			return targetID, not ud.isImmobile
 		end
+	end
+	
+	if cmdID == CMD_ATTACK and cmdParam_3 then
+		return nil, nil, cmdParam_2
 	end
 	
 	local targetType, isUser, targetID = Spring.GetUnitWeaponTarget(unitID, 3)
@@ -249,10 +260,13 @@ GG.Bomber_Dive_fired = Bomber_Dive_fired
 function Bomber_Dive_fake_fired(unitID)
 	if unitID and Spring.ValidUnitID(unitID) then
 		local data = bombers[unitID]
-		if data and (data.diveState == 2 or data.diveState == 1) and ((not data.underShield) or data.underShield < gameFrame) then
-			data.underShield = false
-			if ((not Spring.GetUnitRulesParam(unitID, "noammo")) or Spring.GetUnitRulesParam(unitID, "noammo") ~= 1) then
-				local targetID, mobile = GetAttackTarget(unitID)
+		if ((not Spring.GetUnitRulesParam(unitID, "noammo")) or Spring.GetUnitRulesParam(unitID, "noammo") ~= 1) then
+			local targetID, mobile, attackGroundHeight = GetAttackTarget(unitID)
+			if targetID or attackGroundHeight then
+				BomberHighPitchUpdate(unitID, targetID, attackGroundHeight)
+			end
+			if data and (data.diveState == 2 or data.diveState == 1) and ((not data.underShield) or data.underShield < gameFrame) then
+				data.underShield = false
 				if targetID and mobile then
 					local height = GetWantedBomberHeight(targetID, unitID, bombers[unitID].config)
 					local distance = GetCollisionDistance(unitID, targetID)
