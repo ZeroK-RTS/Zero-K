@@ -1,11 +1,10 @@
 local name = "commweapon_heavy_disruptor"
 local weaponDef = {
 	name                    = [[Heavy Disruptor Pulse Beam]],
-	areaOfEffect            = 32,
 	beamdecay               = 0.9,
 	beamTime                = 1/30,
-	beamttl                 = 30,
-	coreThickness           = 0.25,
+	beamttl                 = 75,
+	coreThickness           = 0.5,
 	craterBoost             = 0,
 	craterMult              = 0,
 
@@ -14,21 +13,20 @@ local weaponDef = {
 		timeslow_damagefactor = [[2]],
 
 		light_color = [[1.88 0.63 2.5]],
-		light_radius = 320,
+		light_radius = 120,
 	},
 
 	damage                  = {
-		default = 500,
+		default = 600,
+		subs    = 40,
 	},
 
 	explosionGenerator      = [[custom:flash2purple_large]],
-	fireStarter             = 30,
+	fireStarter             = 100,
 	impactOnly              = true,
-	impulseBoost            = 0,
-	impulseFactor           = 0.4,
+	impulseFactor           = 0,
 	interceptedByShieldType = 1,
-	largeBeamLaser          = true,
-	laserFlareSize          = 4.33,
+	laserFlareSize          = 10,
 	minIntensity            = 1,
 	noSelfDamage            = true,
 	range                   = 390,
@@ -36,16 +34,10 @@ local weaponDef = {
 	rgbColor                = [[0.3 0 0.4]],
 	soundStart              = [[weapon/laser/heavy_laser5]],
 	soundStartVolume        = 7,
-	soundTrigger            = true,
-	texture1                = [[largelaser]],
-	texture2                = [[flare]],
-	texture3                = [[flare]],
-	texture4                = [[smallflare]],
-	thickness               = 24,
-	tolerance               = 18000,
+	thickness               = 8,
+	tolerance               = 8192,
 	turret                  = true,
 	weaponType              = [[BeamLaser]],
-	weaponVelocity          = 500,
 }
 
 return name, weaponDef
