@@ -294,6 +294,8 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, smokePiece)
+	-- Give the targeter +500 extra range to allow the build UI to show what a Starlight can hit
+	Spring.SetUnitWeaponState(unitID, 1, "range", 10500)
 
 	--Move(ShortSpikes,z_axis, -5)
 	--Move(LongSpikes,z_axis, -10)

@@ -283,7 +283,6 @@ function script.Create()
 	
 	currentlyStunned = IsDisabled()
 	
-	Move(firept, y_axis, 9001)
 	Move(flare, y_axis, -110)
 	Turn(flare, x_axis, math.rad(-90))
 	StartThread(GG.Script.SmokeUnit, smokePiece)
