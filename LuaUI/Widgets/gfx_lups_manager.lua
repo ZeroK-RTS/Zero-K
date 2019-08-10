@@ -311,7 +311,10 @@ local function CheckForExistingUnits()
 	for i=1,#allUnits do
 		local unitID    = allUnits[i]
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		UnitFinished(nil,unitID,unitDefID)
+		local _,_,inBuild = Spring.GetUnitIsStunned(unitID)
+		if not inBuild then
+			UnitFinished(nil,unitID,unitDefID)
+		end
 	end
 
 	widgetHandler:RemoveWidgetCallIn("Update",widget)

@@ -17,20 +17,20 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function gadget:GetInfo()
-  return {
-    name      = "AutoReadyStartpos",
-    desc      = "Automatically readies all people after they all pick start positons, replaces default wait screen",
-    author    = "Licho",
-    date      = "15.4.2012",
-    license   = "Nobody can do anything except me, Microsoft and Apple! Thieves hands off",
-    layer     = 0,
-    enabled   = not (singleplayer and VFS.FileExists("mission.lua"))  --  loaded by default?
-  }
+	return {
+		name      = "AutoReadyStartpos",
+		desc      = "Automatically readies all people after they all pick start positons, replaces default wait screen",
+		author    = "Licho",
+		date      = "15.4.2012",
+		license   = "Nobody can do anything except me, Microsoft and Apple! Thieves hands off",
+		layer     = 0,
+		enabled   = not (singleplayer and VFS.FileExists("mission.lua"))  --  loaded by default?
+	}
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local MAX_TIME_DIFF = 150	-- wait this long for disconnected players
+local MAX_TIME_DIFF = 150 -- wait this long for disconnected players
 
 local allReady = false 
 local startTimer = nil
@@ -107,7 +107,7 @@ function gadget:GameSetup(label, ready, playerStates)
 	
 	if ( ( (timeDiff > MAX_TIME_DIFF) and enoughAlliesActive ) or missingCount == 0) and readyCount > 0 and waitingCount ==0 then
 		if (readyTimer == nil) then 
-			readyTimer = Spring.GetTimer()	
+			readyTimer = Spring.GetTimer()
 		end 
 	end 
 	
@@ -116,7 +116,7 @@ function gadget:GameSetup(label, ready, playerStates)
 			Spring.SendCommands("wbynum 255 SPRINGIE:FORCE")
 			forceSent = true
 		end 
-		return true, true	
+		return true, true
 	end 
 	
 	return true, false
@@ -165,11 +165,11 @@ function gadget:DrawScreen()
 	end
 	local vsx, vsy = gl.GetViewSizes()
 
-    glPushMatrix()
-    glTranslate((vsx * 0.5), (vsy * 0.5)+150, 0)
-    glScale(1.5, 1.5, 1)
-    glText(GetStartText(), 0, 0, 14, "oc")
-    glPopMatrix()
+	glPushMatrix()
+	glTranslate((vsx * 0.5), (vsy * 0.5) + 150, 0)
+	glScale(1.5, 1.5, 1)
+	glText(GetStartText(), 0, 0, 14, "oc")
+	glPopMatrix()
 end 
 
 function gadget:Update() 

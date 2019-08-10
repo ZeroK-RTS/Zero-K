@@ -1,13 +1,13 @@
 function gadget:GetInfo()
-  return {
-    name      = "StartSetup",
-    desc      = "Implements initial setup: start units, resources, and plop for construction",
-    author    = "Licho, CarRepairer, Google Frog, SirMaverick",
-    date      = "2008-2010",
-    license   = "GNU GPL, v2 or later",
-    layer     = -1, -- Before terraforming gadget (for facplop terraforming)
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "StartSetup",
+		desc      = "Implements initial setup: start units, resources, and plop for construction",
+		author    = "Licho, CarRepairer, Google Frog, SirMaverick",
+		date      = "2008-2010",
+		license   = "GNU GPL, v2 or later",
+		layer     = -1, -- Before terraforming gadget (for facplop terraforming)
+		enabled   = true  --  loaded by default?
+	}
 end
 
 -- partially based on Spring's unit spawn gadget
@@ -16,10 +16,10 @@ include("LuaRules/Configs/constants.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local spGetTeamInfo 		= Spring.GetTeamInfo
-local spGetPlayerInfo 		= Spring.GetPlayerInfo
-local spGetSpectatingState 	= Spring.GetSpectatingState
-local spGetPlayerList		= Spring.GetPlayerList
+local spGetTeamInfo         = Spring.GetTeamInfo
+local spGetPlayerInfo       = Spring.GetPlayerInfo
+local spGetSpectatingState  = Spring.GetSpectatingState
+local spGetPlayerList       = Spring.GetPlayerList
 
 local modOptions = Spring.GetModOptions()
 
@@ -735,8 +735,8 @@ end
 local MakeRealTable = Spring.Utilities.MakeRealTable
 
 function gadget:Save(zip)
-	if VFS.FileExists("mission.lua") then	-- nothing to do
-		return		
+	if VFS.FileExists("mission.lua") then -- nothing to do
+		return
 	end
 	if not GG.SaveLoad then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Start Unit Setup failed to access save/load API")
