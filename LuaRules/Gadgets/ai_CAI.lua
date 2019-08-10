@@ -31,7 +31,7 @@ local spGetTeamRulesParam	= Spring.GetTeamRulesParam
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 local spGetCommandQueue 	= Spring.GetCommandQueue
 local spGetUnitHealth		= Spring.GetUnitHealth
-local spTestBuildOrder		= Spring.TestBuildOrder		
+local spTestBuildOrder		= Spring.TestBuildOrder
 local spGetUnitBuildFacing	= Spring.GetUnitBuildFacing
 local spGetUnitRadius		= Spring.GetUnitRadius
 local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
@@ -352,9 +352,11 @@ local function conJobAllocator(team)
 			if not unitID then
 				break
 			end
-			data.bpChange = data.bpChange + controlledUnit.conByID[unitID].bp
+			if controlledUnit.conByID[unitID] then
+				data.bpChange = data.bpChange + controlledUnit.conByID[unitID].bp
+				data.assignedBP = data.assignedBP - controlledUnit.conByID[unitID].bp
+			end
 			data.con[unitID] = nil
-			data.assignedBP = data.assignedBP - controlledUnit.conByID[unitID].bp
 			if Spring.ValidUnitID(unitID) and not Spring.GetUnitIsDead(unitID) then
 				unassignedCons.count = unassignedCons.count + 1
 				unassignedCons[unassignedCons.count] = unitID
