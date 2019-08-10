@@ -60,18 +60,9 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-function script.FireWeapon(num)
-	--Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, {})
+function script.BlockShot(num, targetID)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 700, 12)
 end
-
---[[
-function script.BlockShot(num)
-	--Spring.Echo("Checking shot")
-	firestate = Spring.GetUnitStates(unitID).firestate
-	--Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, {})
-	return false
-end
-]]--
 
 function script.Shot(num) 
 	gun_1 = not gun_1
