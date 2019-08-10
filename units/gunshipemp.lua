@@ -36,7 +36,7 @@ unitDef = {
   iconType            = [[gunshipscout]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maxDamage           = 350,
+  maxDamage           = 420,
   maxVelocity         = 7.5,
   minCloakDistance    = 75,
   noChaseCategory     = [[TERRAFORM SUB UNARMED]],
@@ -76,14 +76,14 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-        combatrange = 80,
+        combatrange = 70,
         light_camera_height = 1000,
         light_color = [[1 1 0.4]],
         light_radius = 150,
       },
 
       damage                  = {
-        default        = 600,
+        default        = 700,
       },
 
       duration                = 0.01,
@@ -97,7 +97,7 @@ unitDef = {
       noSelfDamage            = true,
       paralyzer               = true,
       paralyzeTime            = 2, -- was 2.5 but can only be int
-      range                   = 180,
+      range                   = 160,
       reloadtime              = 1.2,
       rgbColor                = [[1 1 0.25]],
       sprayAngle              = 4500,
