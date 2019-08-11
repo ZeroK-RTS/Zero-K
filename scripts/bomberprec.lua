@@ -93,7 +93,9 @@ local function SetMoveTypeDataWithOverrides(behaviour)
 		currentBehaviour.maxPitch = pitchOverride
 	end
 	
-	spSetAirMoveTypeData(unitID, currentBehaviour)
+	if not Spring.MoveCtrl.GetTag(unitID) then
+		spSetAirMoveTypeData(unitID, currentBehaviour)
+	end
 	currentBehaviour.maxPitch = origPitch
 end
 
