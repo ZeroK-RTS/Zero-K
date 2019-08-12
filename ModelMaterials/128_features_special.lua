@@ -49,7 +49,7 @@ local function GameFrameSlow(gf, mat, isDeferred)
 		highlightActive = mat.shaderOptions.metal_highlight
 	end
 
-	if highlightActive and (isDeferred ~= nil) then
+	if highlightActive then
 		local fs = Spring.GetAllFeatures()
 		--local fs = Spring.GetVisibleFeatures(-1, 30, false)
 		for _, fID in ipairs(fs) do
