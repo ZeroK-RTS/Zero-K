@@ -79,6 +79,9 @@ unitDef = {
       footprintX       = 7,
       footprintZ       = 6,
       object           = [[corplas_dead.s3o]],
+      collisionVolumeOffsets        = [[0 -20 0]],
+      collisionVolumeScales         = [[86 86 86]],
+      collisionVolumeType           = [[ellipsoid]],
     },
 
 

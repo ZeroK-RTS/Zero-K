@@ -82,6 +82,9 @@ unitDef = {
       footprintX       = 5,
       footprintZ       = 6,
       object           = [[factoryjump_dead.s3o]],
+      collisionVolumeOffsets        = [[0 0 -18]],
+      collisionVolumeScales         = [[104 70 40]],
+      collisionVolumeType           = [[box]],
     },
 
 

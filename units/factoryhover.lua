@@ -74,11 +74,15 @@ unitDef = {
   featureDefs      = {
 
     DEAD  = {
-      blocking         = false,
+      blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 8,
       footprintZ       = 7,
       object           = [[ARMFHP_DEAD.s3o]],
+      collisionVolumeOffsets  = [[0 -2 -50]],
+      collisionVolumeScales   = [[124 32 124]],
+      collisionVolumeType     = [[cylY]],
+
     },
 
 
