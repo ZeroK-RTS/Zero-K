@@ -262,7 +262,7 @@ local raiseCmdDesc = {
   name    = 'Raise',
   cursor  = 'Raise', 
   action  = 'raiseground',
-  tooltip = 'Raises/Lower terrain -  - Click and drag a line or closed shape.',
+  tooltip = 'Raises/Lower terrain - Click and drag a line or closed shape.',
 }
 
 local smoothCmdDesc = {
