@@ -80,6 +80,9 @@ unitDef = {
       footprintX       = 5,
       footprintZ       = 6,
       object           = [[factory3_dead.s3o]],
+      collisionVolumeOffsets        = [[0 0 -16]],
+      collisionVolumeScales         = [[104 50 36]],
+      collisionVolumeType           = [[box]],
     },
 
     HEAP  = {
