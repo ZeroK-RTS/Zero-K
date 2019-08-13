@@ -532,12 +532,10 @@ local function BindMaterials()
 end
 
 local function ToggleAdvShading()
-	if (not advShading) then
-		unitRendering.drawList = {}
-		featureRendering.drawList = {}
+	unitRendering.drawList = {}
+	featureRendering.drawList = {}
 
-		BindMaterials()
-	end
+	BindMaterials()
 end
 
 local function GetShaderOverride(objectID, objectDefID)
@@ -595,7 +593,7 @@ local function _CleanupEverything(rendering)
 		if mat.Finalize then
 			mat.Finalize(matName, matSrc)
 		end
-		for _, shaderObject in ipairs({mat.standardShaderObj, mat.deferredShaderObj, mat.shadowShaderObj}) do
+		for _, shaderObject in pairs({mat.standardShaderObj, mat.deferredShaderObj, mat.shadowShaderObj}) do
 			if shaderObject then
 				shaderObject:Finalize()
 			end
@@ -657,7 +655,7 @@ function gadget:DrawGenesis()
 			local ApplyOptionsFunc = mat.ApplyOptions
 
 			if SunChangedFunc or DrawGenesisFunc or (optionsChanged and ApplyOptionsFunc) then
-				for key, shaderObject in ipairs({mat.standardShaderObj, mat.deferredShaderObj, mat.shadowShaderObj}) do
+				for key, shaderObject in pairs({mat.standardShaderObj, mat.deferredShaderObj, mat.shadowShaderObj}) do
 					if shaderObject then
 						shaderObject:ActivateWith( function ()
 
@@ -698,8 +696,11 @@ local function GameFrameSlow(gf)
 		for _, mat in pairs(rendering.materialDefs) do
 			local gameFrameSlowFunc = mat.GameFrameSlow
 			if gameFrameSlowFunc then
-				for key, shaderObject in ipairs({mat.standardShaderObj, mat.deferredShaderObj}) do
-					gameFrameSlowFunc(gf, mat, (key == 2))
+				if mat.standardShaderObj then
+					gameFrameSlowFunc(gf, mat, false)
+				end
+				if mat.deferredShaderObj then
+					gameFrameSlowFunc(gf, mat, true)
 				end
 			end
 		end
