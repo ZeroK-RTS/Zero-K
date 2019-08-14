@@ -70,7 +70,7 @@ function WG.game_SetLosFogBrightnessMinimum(newMin)
 	fogBrightnessMax = 1
 end
 
-function WG.game_SetLosFogBrightnessMinimum(newMax)
+function WG.game_SetLosFogBrightnessMaximum(newMax)
 	if (not newMax) or (type(newMax) ~= "number") or (newMax < 0) or (newMax > 1) then
 		return
 	end
