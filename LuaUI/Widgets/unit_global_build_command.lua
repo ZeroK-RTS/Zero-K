@@ -19,20 +19,20 @@
 
 local version = "v1.1"
 function widget:GetInfo()
-  return {
-	name      = "Global Build Command",
-	desc      = version.. "\nGlobal Build Command gives you a global, persistent build queue for all workers that automatically assigns workers to the nearest jobs.\n \nInstructions: Enable this " ..
+	return {
+		name      = "Global Build Command",
+		desc      = version.. "\nGlobal Build Command gives you a global, persistent build queue for all workers that automatically assigns workers to the nearest jobs.\n \nInstructions: Enable this " ..
 "then give any worker build-related commands. Placing buildings on top of existing jobs while holding \255\200\200\200Shift\255\255\255\255 cancels them, and without shift replaces them. \n" ..
 "You can also exclude workers from GBC's control by using the state toggle button in the unit's orders menu. " ..
 "Units also get a job area removal command, the default hotkey is \255\255\90\90alt-s\255\255\255\255.\n \n" .. "It can also handle repair/reclaim/res, and automatically converts area res to reclaim for targets that cannot be resurrected.\n \n" ..
 "Configuration is in \nGame->Worker AI",
-	author    = "aeonios",
-	date      = "July 20, 2009, 8 March 2014",
-	license   = "GNU GPL, v2 or later",
-	layer     = 10,
-	handler   = true,
-	enabled   = false  --  loaded by default?
-  }
+		author    = "aeonios",
+		date      = "July 20, 2009, 8 March 2014",
+		license   = "GNU GPL, v2 or later",
+		layer     = 10,
+		handler   = true,
+		enabled   = false  --  loaded by default?
+	}
 end
 
 --  Global Build Command creates and manages a global, persistent build queue for all
@@ -111,10 +111,10 @@ options_order = {
 
 options = {
 	updateRate = {
-	name = 'Worker Update Rate (higher numbers are faster but more CPU intensive):',
-	type = 'number',
-	min = 1, max = 4, step = 1,
-	value = 1,
+		name = 'Worker Update Rate (higher numbers are faster but more CPU intensive):',
+		type = 'number',
+		min = 1, max = 4, step = 1,
+		value = 1,
 	},
 
 	separateConstructors = {
@@ -2364,8 +2364,8 @@ end
 
 --	Borrowed distance calculation from Google Frog's Area Mex
 function Distance(x1,z1,x2,z2)
-  local dis = sqrt((x1-x2)*(x1-x2)+(z1-z2)*(z1-z2))
-  return dis
+	local dis = sqrt((x1-x2)*(x1-x2)+(z1-z2)*(z1-z2))
+	return dis
 end
 
 -- Produces a normalized direction from two points.
