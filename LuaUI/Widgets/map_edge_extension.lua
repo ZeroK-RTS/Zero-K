@@ -44,6 +44,12 @@ local drawingEnabled = true
 
 local SPACE_CLICK_OUTSIDE = false
 
+local forceTextureToGrid = false
+function WG.game_SetCustomExtensionGridTexture(newGridTex, newForceTextureToGrid)
+	gridTex = newGridTex
+	forceTextureToGrid = newForceTextureToGrid
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -331,7 +337,7 @@ end
 local function DrawOMap(useMirrorShader)
 	gl.Blending(GL.SRC_ALPHA,GL.ONE_MINUS_SRC_ALPHA)
 	gl.DepthTest(GL.LEQUAL)
-        if options.mapBorderStyle.value == "texture" then 
+		if options.mapBorderStyle.value == "texture" and not forceTextureToGrid then 
 			gl.Texture(realTex)
 		else 
 			gl.Texture(gridTex) 
@@ -348,7 +354,7 @@ local function DrawOMap(useMirrorShader)
 	gl.DepthTest(false)
 	gl.Color(1,1,1,1)
 	gl.PopAttrib()
-	----	
+	----
 end
 
 local function Initialize()
@@ -364,7 +370,7 @@ local function Initialize()
 	local enableMapBorder = false
 	if island and not options.drawForIslands.value then
 		enableMapBorder = false
-	elseif options and (options.mapBorderStyle.value == 'cutaway' or options.mapBorderStyle.value == 'texture') then
+	elseif options and (options.mapBorderStyle.value == 'cutaway' or (options.mapBorderStyle.value == 'texture' and (not forceTextureToGrid))) then
 		enableMapBorder = true
 	end
 	
@@ -434,15 +440,15 @@ local function DrawWorldFunc() --is overwritten when not using the shader
         gl.UseShader(mirrorShader)
         gl.PushMatrix()
         gl.DepthMask(true)
-        if options.mapBorderStyle.value == "texture" then 
-        		gl.Texture(realTex)
-        		glUniform(ubrightness, options.textureBrightness.value)
-        		glUniform(ugrid, 0)
-				else 
-						gl.Texture(gridTex) 
-        		glUniform(ubrightness, 1.0)
-        		glUniform(ugrid, 1)
-				end
+        if options.mapBorderStyle.value == "texture" and not forceTextureToGrid then 
+			gl.Texture(realTex)
+			glUniform(ubrightness, options.textureBrightness.value)
+			glUniform(ugrid, 0)
+		else 
+			gl.Texture(gridTex) 
+			glUniform(ubrightness, 1.0)
+			glUniform(ugrid, 1)
+		end
         if wiremap then
             gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
         end
