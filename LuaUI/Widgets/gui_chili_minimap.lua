@@ -60,6 +60,24 @@ local usingNewEngine = (#{Spring.GetLosViewColors()} == 5) -- newer engine has r
 
 WG.MinimapDraggingCamera = false --Boolean, false if selection through minimap is possible
 
+local fogBrightnessMin = 0
+local fogBrightnessMax = 1
+function WG.game_SetLosFogBrightnessMinimum(newMin)
+	if (not newMin) or (type(newMin) ~= "number") or (newMin < 0) or (newMin > 1) then
+		return
+	end
+	fogBrightnessMin = newMin
+	fogBrightnessMax = 1
+end
+
+function WG.game_SetLosFogBrightnessMinimum(newMax)
+	if (not newMax) or (type(newMax) ~= "number") or (newMax < 0) or (newMax > 1) then
+		return
+	end
+	fogBrightnessMin = 0
+	fogBrightnessMax = newMax
+end
+
 local function toggleTeamColors()
 	if WG.LocalColor and WG.LocalColor.localTeamColorToggle then
 		WG.LocalColor.localTeamColorToggle()
@@ -133,7 +151,10 @@ options_order = {
 	'radar_radar_color', 
 	'radar_radar2_color',
 	'radar_jammer_color', 
-
+	
+	-- Debug
+	'echoLos',
+	
 	-- Radar view presets
 	'radar_view_presets_label1',
 	'radar_preset_only_los', 
@@ -286,6 +307,21 @@ options = {
 		path = radar_path_edit,
 	},
 	
+	echoLos = {
+		name = 'Print LOS config to console',
+		type = 'button',
+		OnChange = function()
+			local always, los, radar, jam, inRadar = Spring.GetLosViewColors()
+			Spring.Echo("always", always[1], always[2], always[3])
+			Spring.Echo("los", los[1], los[2], los[3])
+			Spring.Echo("radar", radar[1], radar[2], radar[3])
+			Spring.Echo("jam", jam[1], jam[2], jam[3])
+			Spring.Echo("inRadar", inRadar[1], inRadar[2], inRadar[3])
+		end,
+		advanced = true,
+		path = radar_path,
+	},
+	
 --------------------------------------------------------------------------
 -- Radar view presets 'Settings/Interface/Map/Radar'
 --------------------------------------------------------------------------
@@ -365,7 +401,6 @@ options = {
 		end,
 		path = radar_path,
 	},
-	
 	
 --------------------------------------------------------------------------
 -- Minimap path area 'Settings/HUD Panels/Minimap'
@@ -560,7 +595,8 @@ function updateRadarColors()
 
 	-- local fog = options.radar_fog_color.value
 	-- local los = options.radar_los_color.value
-	local fog_value = options.radar_fog_brightness1.value * losViewOffBrightness
+	local fogBrightness = (fogBrightnessMax - fogBrightnessMin) * options.radar_fog_brightness1.value + fogBrightnessMin
+	local fog_value = fogBrightness * losViewOffBrightness
 	local los_value = (losViewOffBrightness - fog_value)
 	local fog = {fog_value, fog_value, fog_value, 1}
 	local los = {los_value, los_value, los_value, 1}
