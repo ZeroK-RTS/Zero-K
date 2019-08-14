@@ -2016,12 +2016,12 @@ end
 
 
 -- Coord in % (resize) geometry will not be done
--- mise à jour ciblée des joueurs (maintenir les "point" - nettoyer les objets qui ne sont plus ciblés par le gamePlayersInfo/spectatorsInfo) le mieux est de modifier le minimum à partir de l'équipe/joueur modifié
--- mise en mémoire si collé à droit/en haut
+-- mise Ã  jour ciblÃ©e des joueurs (maintenir les "point" - nettoyer les objets qui ne sont plus ciblÃ©s par le gamePlayersInfo/spectatorsInfo) le mieux est de modifier le minimum Ã  partir de l'Ã©quipe/joueur modifiÃ©
+-- mise en mÃ©moire si collÃ© Ã  droit/en haut
 -- ajouter les stalls
--- ajouter les décryptages de messages "widget:AddConsoleLine(line,priority)" appelé à chaque fois qu'il doit ajouter une ligne
--- !!! reload (mieux faire le système de mise en place des modules)
--- !!! s'il n'y a que des specs/ replay pour le système de spec.
+-- ajouter les dÃ©cryptages de messages "widget:AddConsoleLine(line,priority)" appelÃ© Ã  chaque fois qu'il doit ajouter une ligne
+-- !!! reload (mieux faire le systÃ¨me de mise en place des modules)
+-- !!! s'il n'y a que des specs/ replay pour le systÃ¨me de spec.
 -- Random --> first unit determine the side
 -- isabove pour take et point
 

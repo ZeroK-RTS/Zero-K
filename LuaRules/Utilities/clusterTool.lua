@@ -533,8 +533,8 @@ function Spring.Utilities.DBSCAN_cluster(receivedUnitList,neighborhoodRadius,min
 	return cluster, unitIDNoise
 end
 --brief:   a clustering algorithm
---algorithm source: Ordering Points To Identify the Clustering Structure (OPTICS) by Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel and Jörg Sander
---algorithm source: density-based spatial clustering of applications with noise (DBSCAN) by Martin Ester, Hans-Peter Kriegel, Jörg Sander and Xiaowei Xu
+--algorithm source: Ordering Points To Identify the Clustering Structure (OPTICS) by Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel and JÃ¶rg Sander
+--algorithm source: density-based spatial clustering of applications with noise (DBSCAN) by Martin Ester, Hans-Peter Kriegel, JÃ¶rg Sander and Xiaowei Xu
 --Reference:
 --http://en.wikipedia.org/wiki/OPTICS_algorithm ;pseudocode
 --http://en.wikipedia.org/wiki/DBSCAN ;pseudocode

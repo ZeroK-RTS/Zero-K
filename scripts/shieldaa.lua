@@ -160,7 +160,7 @@ function script.AimFromWeapon1() return pod end
 function script.AimWeapon1(heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
-	pitch = math.max(pitch, math.rad(20))	-- results in a minimum pod angle of 20° above horizontal
+	pitch = math.max(pitch, math.rad(20))	-- results in a minimum pod angle of 20Â° above horizontal
 	Turn(head, y_axis, heading, 6)
 	Turn(pod, x_axis, -pitch, 6)
 	Move(podpist, y_axis, pitch*2.5, 3)
