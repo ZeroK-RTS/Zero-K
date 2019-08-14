@@ -1,4 +1,7 @@
-# Declare files that will always have CRLF line endings on checkout.
-*.lua text eol=crlf
-*.txt text eol=crlf
-*.tdf text eol=crlf
+*.lua  text
+*.txt  text
+*.tdf  text
+*.h    text
+*.glsl text
+*.fs   text
+*.json text
