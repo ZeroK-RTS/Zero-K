@@ -20,18 +20,18 @@
 local version = "v1.1"
 function widget:GetInfo()
   return {
-    name      = "Global Build Command",
-    desc      = version.. "\nGlobal Build Command gives you a global, persistent build queue for all workers that automatically assigns workers to the nearest jobs.\n \nInstructions: Enable this " ..
+	name      = "Global Build Command",
+	desc      = version.. "\nGlobal Build Command gives you a global, persistent build queue for all workers that automatically assigns workers to the nearest jobs.\n \nInstructions: Enable this " ..
 "then give any worker build-related commands. Placing buildings on top of existing jobs while holding \255\200\200\200Shift\255\255\255\255 cancels them, and without shift replaces them. \n" ..
 "You can also exclude workers from GBC's control by using the state toggle button in the unit's orders menu. " ..
 "Units also get a job area removal command, the default hotkey is \255\255\90\90alt-s\255\255\255\255.\n \n" .. "It can also handle repair/reclaim/res, and automatically converts area res to reclaim for targets that cannot be resurrected.\n \n" ..
 "Configuration is in \nGame->Worker AI",
-    author    = "aeonios",
-    date      = "July 20, 2009, 8 March 2014",
-    license   = "GNU GPL, v2 or later",
-    layer     = 10,
-    handler   = true,
-    enabled   = false  --  loaded by default?
+	author    = "aeonios",
+	date      = "July 20, 2009, 8 March 2014",
+	license   = "GNU GPL, v2 or later",
+	layer     = 10,
+	handler   = true,
+	enabled   = false  --  loaded by default?
   }
 end
 
@@ -111,12 +111,12 @@ options_order = {
 
 options = {
 	updateRate = {
-    name = 'Worker Update Rate (higher numbers are faster but more CPU intensive):',
-    type = 'number',
-    min = 1, max = 4, step = 1,
-    value = 1,
+	name = 'Worker Update Rate (higher numbers are faster but more CPU intensive):',
+	type = 'number',
+	min = 1, max = 4, step = 1,
+	value = 1,
 	},
-	
+
 	separateConstructors = {
 		name = 'Separate Constructors',
 		type = 'bool',
@@ -603,7 +603,7 @@ end
 --  Text stuff mostly borrowed from gunblob's Group Label and trepan/JK's BuildETA.
 --  Ghost stuff borrowed from very_bad_soldier's Ghost Radar.
 function widget:DrawWorld()
-    if spIsGUIHidden() then
+	if spIsGUIHidden() then
 		return
 	end
 	local alt, ctrl, meta, shift = spGetModKeyState()
@@ -1204,7 +1204,7 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 				if ( options.shift ) then -- if the command was given with shift
 					return true	-- we return true to take ownership of the command from Spring.
 				else -- for direct orders
-                    if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
+					if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
 						buildQueue[busyUnits[unitID]].assignedUnits[unitID] = nil -- remove it from the list of workers assigned to its previous job
 					end
 					busyUnits[unitID] = hash -- add the worker to our busy list
@@ -1473,14 +1473,14 @@ end
 
 -- This function returns the cheapest job for a given worker, given the cost model implemented in CostOfJob().
 function FindCheapestJob(unitID)
-    local cachedJob = nil -- the cheapest job that we've seen
-    local cachedCost = 0 -- the cost of the currently cached cheapest job
-    local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
-    
-    -- if the worker has already been assigned to a job, we cache it first to increase job 'stickiness'
-    -- This looks redundant but it is not, because cleanorders may remove a worker from busyUnits without necessarily returning false,
-    -- ie if it's standing on top of the job that it's been assigned to and has to be cleared off.
-    if busyUnits[unitID] and CleanOrders(buildQueue[busyUnits[unitID]], false) and busyUnits[unitID] then
+	local cachedJob = nil -- the cheapest job that we've seen
+	local cachedCost = 0 -- the cost of the currently cached cheapest job
+	local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
+
+	-- if the worker has already been assigned to a job, we cache it first to increase job 'stickiness'
+	-- This looks redundant but it is not, because cleanorders may remove a worker from busyUnits without necessarily returning false,
+	-- ie if it's standing on top of the job that it's been assigned to and has to be cleared off.
+	if busyUnits[unitID] and CleanOrders(buildQueue[busyUnits[unitID]], false) and busyUnits[unitID] then
 		local key = busyUnits[unitID]
 		local jx, jy, jz
 		cachedJob = buildQueue[key]
@@ -1550,20 +1550,20 @@ function FindCheapestJob(unitID)
 			end
 		end
 	end
-    return cachedJob -- after iterating over the entire queue, the resulting cached job will be the cheapest, return it.
+	return cachedJob -- after iterating over the entire queue, the resulting cached job will be the cheapest, return it.
 end
-                    
+
 -- This function implements the 'intelligent' cost model for assigning jobs.
 function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	local job = buildQueue[hash]
-    local distance = Distance(ux, uz, jx, jz) -- the distance between our worker and job
-    
-    local costMod = 1 -- our cost modifier, the number of other units assigned to the same job + 1.
-    
-    -- note we only count workers that are roughly closer/equal distance to the job,
-    -- so that can achieve both "find the job closest to worker x" and "find the worker closest to their job"
-    -- at the same time. You probably should not change this, since it accounts for a lot of edge cases
-    -- but does not directly determine the behavior.
+	local distance = Distance(ux, uz, jx, jz) -- the distance between our worker and job
+
+	local costMod = 1 -- our cost modifier, the number of other units assigned to the same job + 1.
+
+	-- note we only count workers that are roughly closer/equal distance to the job,
+	-- so that can achieve both "find the job closest to worker x" and "find the worker closest to their job"
+	-- at the same time. You probably should not change this, since it accounts for a lot of edge cases
+	-- but does not directly determine the behavior.
 	for unit,_ in pairs(job.assignedUnits) do -- for all units that have been recorded as assigned to this job
 		if ( unitID ~= unit) and spValidUnitID(unit) then -- excluding our current worker.
 			local ix, _, iz = spGetUnitPosition(unit)
@@ -1665,14 +1665,14 @@ end
 -- This function implements the 'flat' cost model for assigning jobs.
 function FlatCost(unitID, hash, ux, uz, jx, jz)
 	local job = buildQueue[hash]
-    local distance = Distance(ux, uz, jx, jz) -- the distance between our worker and job
-    
-    local costMod = 1 -- our cost modifier, the number of other units assigned to the same job + 1.
-    
-    -- note we only count workers that are roughly closer/equal distance to the job,
-    -- so that can achieve both "find the job closest to worker x" and "find the worker closest to their job"
-    -- at the same time. You probably should not change this, since it accounts for a lot of edge cases
-    -- but does not directly determine the behavior.
+	local distance = Distance(ux, uz, jx, jz) -- the distance between our worker and job
+
+	local costMod = 1 -- our cost modifier, the number of other units assigned to the same job + 1.
+
+	-- note we only count workers that are roughly closer/equal distance to the job,
+	-- so that can achieve both "find the job closest to worker x" and "find the worker closest to their job"
+	-- at the same time. You probably should not change this, since it accounts for a lot of edge cases
+	-- but does not directly determine the behavior.
 	for unit,_ in pairs(job.assignedUnits) do -- for all units that have been recorded as assigned to this job
 		if ( unitID ~= unit) and spValidUnitID(unit) then -- excluding our current worker.
 			local ix, _, iz = spGetUnitPosition(unit)
@@ -2210,30 +2210,30 @@ function IsTargetReachable(unitID, tx,ty,tz)
 	local ox, oy, oz = spGetUnitPosition(unitID)	-- unit location
 	local unitDefID = spGetUnitDefID(unitID)
 	local buildDist = UnitDefs[unitDefID].buildDistance -- build range
-    local moveID = UnitDefs[unitDefID].moveDef.id -- unit pathing type
-    if moveID then -- air units have no moveID, and we don't need to calculate pathing for them.
-	    local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, 10)
-	    if path then
-		    local waypoints = path:GetPathWayPoints()
-		    local finalCoord = waypoints[#waypoints]
-		    if finalCoord then -- unknown why sometimes NIL
-			    local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
-			    local dist = sqrt(dx*dx + dz*dz)
-			    if dist < buildDist + 40 then -- is within radius?
-				    return true -- within reach
-			    else
-				    return false -- not within reach
-			    end
-            else
-                return true -- if finalCoord is nil for some reason, return true
-		    end
-	    else
-		    return true -- if path is nil for some reason, return true
-		    -- note: it usually returns nil for very short distances, which is why returning true is a much better default here
-	    end
-    else
-	    return true --for air units; always reachable
-    end
+	local moveID = UnitDefs[unitDefID].moveDef.id -- unit pathing type
+	if moveID then -- air units have no moveID, and we don't need to calculate pathing for them.
+		local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, 10)
+		if path then
+			local waypoints = path:GetPathWayPoints()
+			local finalCoord = waypoints[#waypoints]
+			if finalCoord then -- unknown why sometimes NIL
+				local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
+				local dist = sqrt(dx*dx + dz*dz)
+				if dist < buildDist + 40 then -- is within radius?
+					return true -- within reach
+				else
+					return false -- not within reach
+				end
+			else
+				return true -- if finalCoord is nil for some reason, return true
+			end
+		else
+			return true -- if path is nil for some reason, return true
+			-- note: it usually returns nil for very short distances, which is why returning true is a much better default here
+		end
+	else
+		return true --for air units; always reachable
+	end
 end
 
 -- This function caches pathing when a new worker enters the group.
