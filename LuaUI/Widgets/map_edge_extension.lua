@@ -1,17 +1,17 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:GetInfo()
-  return {
-    name      = "Map Edge Extension",
-    version   = "v0.5",
-    desc      = "Draws a mirrored map next to the edges of the real map",
-    author    = "Pako",
-    date      = "2010.10.27 - 2011.10.29", --YYYY.MM.DD, created - updated
-    license   = "GPL",
-    layer     = 3,
-    enabled   = true,
-    --detailsDefault = 3
-  }
+	return {
+		name      = "Map Edge Extension",
+		version   = "v0.5",
+		desc      = "Draws a mirrored map next to the edges of the real map",
+		author    = "Pako",
+		date      = "2010.10.27 - 2011.10.29", --YYYY.MM.DD, created - updated
+		license   = "GPL",
+		layer     = 3,
+		enabled   = true,
+		--detailsDefault = 3
+	}
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ options_path = 'Settings/Graphics/Map Exterior'
 options_order = {'mapBorderStyle', 'drawForIslands', 'gridSize',  'fogEffect', 'curvature', 'textureBrightness', 'useShader'}
 options = {
 	--when using shader the map is stored once in a DL and drawn 8 times with vertex mirroring and bending
-    --when not, the map is drawn mirrored 8 times into a display list
+	--when not, the map is drawn mirrored 8 times into a display list
 	mapBorderStyle = {
 		type='radioButton', 
 		name='Exterior Effect',
@@ -147,26 +147,26 @@ options = {
 
 local shaderTable
 local function SetupShaderTable()
-  shaderTable = {
-	  uniform = {
-		mirrorX = 0,
-		mirrorZ = 0,
-		lengthX = 0,
-		lengthZ = 0,
-		tex0 = 0,
-		up = 0,
-		left = 0,
-		grid = 0,
-		brightness = 1.0,
-	  },
-	  vertex = (options.curvature.value and "#define curvature \n" or '')
-		.. (options.fogEffect.value and "#define edgeFog \n" or '')
-		.. [[
+	shaderTable = {
+		uniform = {
+			mirrorX = 0,
+			mirrorZ = 0,
+			lengthX = 0,
+			lengthZ = 0,
+			tex0 = 0,
+			up = 0,
+			left = 0,
+			grid = 0,
+			brightness = 1.0,
+		},
+		vertex = (options.curvature.value and "#define curvature \n" or '')
+			.. (options.fogEffect.value and "#define edgeFog \n" or '')
+			.. [[
 		// Application to vertex shader
 		uniform float mirrorX;
 		uniform float mirrorZ;
 		uniform float lengthX;
-	  uniform float lengthZ;
+		uniform float lengthZ;
 		uniform float left;
 		uniform float up;
 		uniform float brightness;
@@ -176,40 +176,40 @@ local function SetupShaderTable()
   
 		void main()
 		{
-		gl_TexCoord[0]= gl_TextureMatrix[0]*gl_MultiTexCoord0;
-		vec4 mirrorVertex = gl_Vertex;
-		mirrorVertex.x = abs(mirrorX-mirrorVertex.x);
-		mirrorVertex.z = abs(mirrorZ-mirrorVertex.z);
-		
-		float alpha = 1.0;
-		#ifdef curvature
-		  if(mirrorX != 0.0)mirrorVertex.y -= pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0);
-		  if(mirrorZ != 0.0)mirrorVertex.y -= pow(abs(mirrorVertex.z-up*mirrorZ)/150.0, 2.0);
-		  alpha = 0.0;
-			if(mirrorX != 0.0) alpha -= pow(abs(mirrorVertex.x-left*mirrorX)/lengthX, 2.0);
-			if(mirrorZ != 0.0) alpha -= pow(abs(mirrorVertex.z-up*mirrorZ)/lengthZ, 2.0);
-			alpha = 1.0 + (6.0 * (alpha + 0.18));
-		#endif
-  
-		float ff = 20000.0;
-		if((mirrorZ != 0.0 && mirrorX != 0.0))
-		  ff=ff/(pow(abs(mirrorVertex.z-up*mirrorZ)/150.0, 2.0)+pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0)+2.0);
-		else if(mirrorX != 0.0)
-		  ff=ff/(pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0)+2.0);
-		else if(mirrorZ != 0.0)
-		  ff=ff/(pow(abs(mirrorVertex.z-up*mirrorZ)/150.0, 2.0)+2.0);
-  
-		gl_Position  = gl_ModelViewProjectionMatrix*mirrorVertex;
-		//gl_Position.z+ff;
-		
-		#ifdef edgeFog
-		  gl_FogFragCoord = length((gl_ModelViewMatrix * mirrorVertex).xyz)+ff; //see how Spring shaders do the fog and copy from there to fix this
-		#endif
-		
-		gl_FrontColor = vec4(brightness * gl_Color.rgb, alpha);
+			gl_TexCoord[0]= gl_TextureMatrix[0]*gl_MultiTexCoord0;
+			vec4 mirrorVertex = gl_Vertex;
+			mirrorVertex.x = abs(mirrorX-mirrorVertex.x);
+			mirrorVertex.z = abs(mirrorZ-mirrorVertex.z);
+			
+			float alpha = 1.0;
+			#ifdef curvature
+				if(mirrorX != 0.0)mirrorVertex.y -= pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0);
+				if(mirrorZ != 0.0)mirrorVertex.y -= pow(abs(mirrorVertex.z-up*mirrorZ)/150.0, 2.0);
+				alpha = 0.0;
+				if(mirrorX != 0.0) alpha -= pow(abs(mirrorVertex.x-left*mirrorX)/lengthX, 2.0);
+				if(mirrorZ != 0.0) alpha -= pow(abs(mirrorVertex.z-up*mirrorZ)/lengthZ, 2.0);
+				alpha = 1.0 + (6.0 * (alpha + 0.18));
+			#endif
+			
+			float ff = 20000.0;
+			if((mirrorZ != 0.0 && mirrorX != 0.0))
+				ff=ff/(pow(abs(mirrorVertex.z-up*mirrorZ)/150.0, 2.0)+pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0)+2.0);
+			else if(mirrorX != 0.0)
+				ff=ff/(pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0)+2.0);
+			else if(mirrorZ != 0.0)
+				ff=ff/(pow(abs(mirrorVertex.z-up*mirrorZ)/150.0, 2.0)+2.0);
+	 
+			gl_Position  = gl_ModelViewProjectionMatrix*mirrorVertex;
+			//gl_Position.z+ff;
+			
+			#ifdef edgeFog
+				gl_FogFragCoord = length((gl_ModelViewMatrix * mirrorVertex).xyz)+ff; //see how Spring shaders do the fog and copy from there to fix this
+			#endif
+			
+			gl_FrontColor = vec4(brightness * gl_Color.rgb, alpha);
 
-		color = gl_FrontColor;
-		vertex = mirrorVertex;
+			color = gl_FrontColor;
+			vertex = mirrorVertex;
 		}
 	  ]],
 	 --  fragment = [[
@@ -234,7 +234,7 @@ local function SetupShaderTable()
 		-- 	gl_FragColor = vec4(mix(gl_Fog.color, color.rgb, clamp((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0.0, 1.0)), clamp(alpha, 0.0, 1.0)) * texture2D(tex0, gl_TexCoord[0].xy);
 		-- }
 	 --  ]],
-  }
+	}
 end
 
 
@@ -304,11 +304,11 @@ local function DrawMapVertices(useMirrorShader)
 			for z=sten[ind+1], sten[ind+2], (1+(-ind*2))*Scale do
 				zv = abs(dz+z)+sz
 				TexCoord(xm0/mapSizeX, z/mapSizeZ)
-       -- Normal(GetGroundNormal(xm0,z))
-        h = sggh(xm0,z)
+				-- Normal(GetGroundNormal(xm0,z))
+				h = sggh(xm0,z)
 				Vertex(xv0,h,zv)
 				TexCoord(xm1/mapSizeX, z/mapSizeZ)
-        --Normal(GetGroundNormal(xm1,z))
+				--Normal(GetGroundNormal(xm1,z))
 				h = sggh(xm1,z)
 				Vertex(xv1,h,zv)
 			end
@@ -431,16 +431,16 @@ function widget:Shutdown()
 end
 
 local function DrawWorldFunc() --is overwritten when not using the shader
-    if dList and ((not island) or options.drawForIslands.value) then
-        local glTranslate = gl.Translate
-        local glUniform = gl.Uniform
-        local GamemapSizeZ, GamemapSizeX = Game.mapSizeZ,Game.mapSizeX
-        
-        gl.FogCoord(1)
-        gl.UseShader(mirrorShader)
-        gl.PushMatrix()
-        gl.DepthMask(true)
-        if options.mapBorderStyle.value == "texture" and not forceTextureToGrid then 
+	if dList and ((not island) or options.drawForIslands.value) then
+		local glTranslate = gl.Translate
+		local glUniform = gl.Uniform
+		local GamemapSizeZ, GamemapSizeX = Game.mapSizeZ,Game.mapSizeX
+
+		gl.FogCoord(1)
+		gl.UseShader(mirrorShader)
+		gl.PushMatrix()
+		gl.DepthMask(true)
+		if options.mapBorderStyle.value == "texture" and not forceTextureToGrid then 
 			gl.Texture(realTex)
 			glUniform(ubrightness, options.textureBrightness.value)
 			glUniform(ugrid, 0)
@@ -449,53 +449,53 @@ local function DrawWorldFunc() --is overwritten when not using the shader
 			glUniform(ubrightness, 1.0)
 			glUniform(ugrid, 1)
 		end
-        if wiremap then
-            gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
-        end
-        glUniform(umirrorX, GamemapSizeX)
-        glUniform(umirrorZ, GamemapSizeZ)
-        glUniform(ulengthX, GamemapSizeX)
-        glUniform(ulengthZ, GamemapSizeZ)
-        glUniform(uleft, 1)
-        glUniform(uup, 1)
-        glTranslate(-GamemapSizeX,0,-GamemapSizeZ)
-        gl.CallList(dList)
-        glUniform(uleft , 0)
-        glTranslate(GamemapSizeX*2,0,0)
-        gl.CallList(dList)
-        gl.Uniform(uup, 0)
-        glTranslate(0,0,GamemapSizeZ*2)
-        gl.CallList(dList)
-        glUniform(uleft, 1)
-        glTranslate(-GamemapSizeX*2,0,0)
-        gl.CallList(dList)
-        
-        glUniform(umirrorX, 0)
-        glTranslate(GamemapSizeX,0,0)
-        gl.CallList(dList)
-        glUniform(uleft, 0)
-        glUniform(uup, 1)
-        glTranslate(0,0,-GamemapSizeZ*2)
-        gl.CallList(dList)
-        
-        glUniform(uup, 0)
-        glUniform(umirrorZ, 0)
-        glUniform(umirrorX, GamemapSizeX)
-        glTranslate(GamemapSizeX,0,GamemapSizeZ)
-        gl.CallList(dList)
-        glUniform(uleft, 1)
-        glTranslate(-GamemapSizeX*2,0,0)
-        gl.CallList(dList)
-        if wiremap then
-            gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-        end
-        gl.DepthMask(false)
-        gl.Texture(false)
-        gl.PopMatrix()
-        gl.UseShader(0)
-        
-        gl.FogCoord(0)
-    end
+		if wiremap then
+			gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
+		end
+		glUniform(umirrorX, GamemapSizeX)
+		glUniform(umirrorZ, GamemapSizeZ)
+		glUniform(ulengthX, GamemapSizeX)
+		glUniform(ulengthZ, GamemapSizeZ)
+		glUniform(uleft, 1)
+		glUniform(uup, 1)
+		glTranslate(-GamemapSizeX,0,-GamemapSizeZ)
+		gl.CallList(dList)
+		glUniform(uleft , 0)
+		glTranslate(GamemapSizeX*2,0,0)
+		gl.CallList(dList)
+		gl.Uniform(uup, 0)
+		glTranslate(0,0,GamemapSizeZ*2)
+		gl.CallList(dList)
+		glUniform(uleft, 1)
+		glTranslate(-GamemapSizeX*2,0,0)
+		gl.CallList(dList)
+
+		glUniform(umirrorX, 0)
+		glTranslate(GamemapSizeX,0,0)
+		gl.CallList(dList)
+		glUniform(uleft, 0)
+		glUniform(uup, 1)
+		glTranslate(0,0,-GamemapSizeZ*2)
+		gl.CallList(dList)
+
+		glUniform(uup, 0)
+		glUniform(umirrorZ, 0)
+		glUniform(umirrorX, GamemapSizeX)
+		glTranslate(GamemapSizeX,0,GamemapSizeZ)
+		gl.CallList(dList)
+		glUniform(uleft, 1)
+		glTranslate(-GamemapSizeX*2,0,0)
+		gl.CallList(dList)
+		if wiremap then
+			gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+		end
+		gl.DepthMask(false)
+		gl.Texture(false)
+		gl.PopMatrix()
+		gl.UseShader(0)
+
+		gl.FogCoord(0)
+	end
 end
 
 function widget:DrawWorldPreUnit()
