@@ -12,9 +12,9 @@ function widget:GetInfo()
 end
 --[[
 Changelog:
-	v0.8 KingRaptor: 
+	v0.8 KingRaptor:
 		- use GameFrame() % 30 instead of Update()
-	v0.7 CarRepairer: 
+	v0.7 CarRepairer:
 		- Fixed so units don't autorepair if they are busy with something else.
 		- Added leash so that builders return to where they were sitting when they began autorepairing if they stray too far.
 		- Other small code fixes.
@@ -39,7 +39,7 @@ local spGetSelectedUnits = Spring.GetSelectedUnits
 
 local function isIdleRepairer(unitID)
 	local udef = spGetUnitDefID(unitID)
-	local ud = UnitDefs[udef] 
+	local ud = UnitDefs[udef]
 	if not ud.canRepair then
 		return false
 	end
@@ -180,7 +180,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 		return
 	end
 	local hp, maxhp = spGetUnitHealth(unitID)
-	if(hp and maxhp and hp < maxhp) then 
+	if(hp and maxhp and hp < maxhp) then
 		unitsToRepair[unitID] = true
 	end
 end

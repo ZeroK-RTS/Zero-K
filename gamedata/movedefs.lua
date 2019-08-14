@@ -15,7 +15,7 @@ local common_depthmodparams = {
 
 local moveDefs = {
 
-	SKBOT2 = { -- Small 
+	SKBOT2 = { -- Small
 		footprintx = 2,
 		footprintz = 2,
 		maxwaterdepth = 16,

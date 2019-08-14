@@ -21,11 +21,11 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local commandHistory			= {}	
+local commandHistory			= {}
 local commandHistoryCoords		= {}	-- this table is used to count cmd´s with same coordinates
 local commandCoordsRendered		= {}	-- this table is used to skip cmd´s that have the same coordinates
 local mapDrawNicknameTime		= {}	-- this table is used to filter out previous map drawing nicknames if user has drawn something new
-local mapEraseNicknameTime		= {}	-- 
+local mapEraseNicknameTime		= {}	--
 local ownPlayerID				= Spring.GetMyPlayerID()
 
 local commandCount = 0
@@ -46,16 +46,16 @@ options_order = { 'lblformations', 'indicate_cf_v2', 'onClick'}
 options = {
 	lblformations = { name = 'Formations', type = 'label'},
 	indicate_cf_v2 = {
-		name = "Indicate for custom formations", 
+		name = "Indicate for custom formations",
 		desc = "Draw the command indication for commands given with custom formations.",
-		type = 'bool', 
+		type = 'bool',
 		noHotkey = true,
 		value = true
 	},
 	onClick = {
-		name = "Indicate for clicks", 
+		name = "Indicate for clicks",
 		desc = "Draw the command indication for every click.",
-		type = 'bool', 
+		type = 'bool',
 		noHotkey = true,
 		value = false
 	}

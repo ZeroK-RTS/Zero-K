@@ -86,9 +86,9 @@
 --    ud.canCrash = ud.canLoopbackAttack or nil
 --    ud.canLoopbackAttack = nil
 --  end
---  --isCommander = 
+--  --isCommander =
 --  ud.isMetalExtractor = ud.extractsMetal and ud.extractsMetal > 0 or nil
---  
+--
 --  if ud.weapons and #ud.weapons > 0 then
 --    ud.wDefs = {}
 --    for i, wt in ipairs(ud.weapons) do
@@ -155,7 +155,7 @@
 --	local EchoAccessEvery = 1
 --
 --	Spring.Echo("ProfileUnitDefsTable enabled, disable this for production!")
---	
+--
 --	local function AddAccessEcho(defTable, name)
 --		local accesCounts = {}
 --		local accessingWidgets = {} --["name"] = total access
@@ -166,8 +166,8 @@
 --			local metaIndexproxy = {__index =
 --				function(self, key)
 --					accesCounts[key] = accesCounts[key] and accesCounts[key] + 1 or 1
---					if(accesCounts[key]%EchoAccessEvery==0)then 
---						Spring.Echo("UnitDef Access",key,accesCounts[key]) 
+--					if(accesCounts[key]%EchoAccessEvery==0)then
+--						Spring.Echo("UnitDef Access",key,accesCounts[key])
 --					end
 --					--// get caller's enviroment
 --					local _level = 2
@@ -176,27 +176,27 @@
 --						success, Widg = pcall(getfenv, i+1) --// +1 cause of pcall!
 --						if success then
 --							if Widg.GetInfo then success = Widg.GetInfo().name;
---								break 
+--								break
 --							end
 --						end
 --					end
---				   
+--
 --					if success then
 --						accessingWidgets[success] = accessingWidgets[success] and accessingWidgets[success]+1 or 1
 --						if(accessingWidgets[success]%EchoAccessEvery==0)then
 --							Spring.Echo(name .. " Access by widget",success,accessingWidgets[success],key,accesCounts[key], id)
 --						end
 --					end
---				   
+--
 --					return llllUnitDefs[key]
 --				end
 --			}
 --			defTable[id] = setmetatable({}, metaIndexproxy)
 --		end
--- 
+--
 --		defTable.Profiling = {accesCounts,accessingWidgets}
 --	end
---	
+--
 --	AddAccessEcho(UnitDefs, "UnitDefs")
 --	AddAccessEcho(UnitDefNames, "UnitDefNames")
 --	AddAccessEcho(WeaponDefs, "WeaponDefs")

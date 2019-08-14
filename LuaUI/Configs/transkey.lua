@@ -56,7 +56,7 @@ local transkey = {
 		world_64                = '0x0e0',
 	
 	--other
-		leftparen               = ')', 
+		leftparen               = ')',
 		world_89				= '0x0f9',
 		dollar					= '$',
 		asterisk                = '*',

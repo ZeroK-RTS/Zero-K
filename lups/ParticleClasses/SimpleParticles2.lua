@@ -89,7 +89,7 @@ local IsPosInLos    = Spring.IsPosInLos
 local IsPosInAirLos = Spring.IsPosInAirLos
 local IsPosInRadar  = Spring.IsPosInRadar
 
-local glTexture     = gl.Texture 
+local glTexture     = gl.Texture
 local glBlending    = gl.Blending
 local glUniform     = gl.Uniform
 local glUniformInt  = gl.UniformInt
@@ -244,7 +244,7 @@ function SimpleParticles2:Initialize()
 				 //if (attributesExp.x<0.0) attrib.x = 1.0 - attrib.x; // speed (no need for backward movement)
 					 if (attributesExp.y<0.0) attrib.y = 1.0 - attrib.y; // size
 					 if (attributesExp.z<0.0) attrib.z = 1.0 - attrib.z; // rot
-					 attrib.yz   = attributesStart.yz + attrib.yz * attributesEnd.yz; 
+					 attrib.yz   = attributesStart.yz + attrib.yz * attributesEnd.yz;
 
 					 // calc vertex position
 					 vec3 forceV = (1.0 - pow(1.0 - life, abs(forceExp))) * forceDir; //FIXME combine with other attribs!

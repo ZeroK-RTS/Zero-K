@@ -168,7 +168,7 @@ function UnitJitter.Initialize()
 	void main()
 	{
 						gl_Position = ftransform();
-						texCoord.s = dot( gl_Vertex, ObjectPlaneS ) + timer; 
+						texCoord.s = dot( gl_Vertex, ObjectPlaneS ) + timer;
 						texCoord.t = dot( gl_Vertex, ObjectPlaneT ) + timer;
 						texCoord.z = gl_MultiTexCoord2.x; //life
 						texCoord.z *= abs( dot(normalize(gl_NormalMatrix * gl_Normal), normalize(vec3(gl_ModelViewMatrix * gl_Vertex))) );

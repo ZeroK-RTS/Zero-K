@@ -4,7 +4,7 @@
 -- torpedo_trail_big
 -- hydromissile
 
-return {  
+return {
   ["torpedo_hit"] = {
     usedefaultexplosions = false,
     droplets = {
@@ -203,7 +203,7 @@ return {
         ttl                = 10,
       },
     },
-  }, 
+  },
 
   ["torpedo_hit_large"] = {
     usedefaultexplosions = false,
@@ -275,7 +275,7 @@ return {
         ttl                = 10,
       },
     },
-  },  
+  },
   
   ["torpedohithuge"] = {
     usedefaultexplosions = false,
@@ -418,7 +418,7 @@ return {
         ttl                = 10,
       },
     },
-  }, 
+  },
   
   ["torpedo_hit_main"] = {
     mainhit = {
@@ -506,7 +506,7 @@ return {
         ttl                = 24,
       },
     },
-  },  
+  },
   
    ["torpedo_hit_main_huge"] = {
     mainhit = {
@@ -528,7 +528,7 @@ return {
         ttl                = 24,
       },
     },
-  },  
+  },
   
   ["torpedo_trail"] = {
     alwaysvisible      = false,

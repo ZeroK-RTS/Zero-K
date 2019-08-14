@@ -36,7 +36,7 @@ local interceptorRanges = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD.ATTACK] = true, [CMD.INSERT] = true}
 end
 
@@ -102,7 +102,7 @@ function gadget:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponN
 	ux, uz, tx, tz, px, pz = ux - px, uz - pz, tx - px, tz - pz, 0, 0
 	
 	-- Get direction from projectile to target
-	local tDir 
+	local tDir
 	if tx == 0 then
 		if tz == 0 then
 			return InCircle(ux, uy, radiusSq)

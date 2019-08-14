@@ -232,7 +232,7 @@ function gadget:DrawGenesis()
 		for cx = cx1, cx2 do
 			if chunkMap[cx] and chunkMap[cx][cz] and not (chunkUpdateMap[cx] and chunkUpdateMap[cx][cz]) then --only process chunk that has been added by ChangeTextureBlock()
 				chunkUpdateMap[cx] = chunkUpdateMap[cx] or {}
-                chunkUpdateMap[cx][cz] = true 
+                chunkUpdateMap[cx][cz] = true
 				chunkUpdateList.count = chunkUpdateList.count + 1
 				chunkUpdateList.data[chunkUpdateList.count] = {x = cx, z = cz}
 				--Spring.MarkerAddPoint(x,0,z,"point triggered")
@@ -252,7 +252,7 @@ function gadget:DrawGenesis()
 		--gl.DepthMask(false)
 		--gl.DepthTest(false)
 		--gl.Color(1,1,1,1)
-		--gl.AlphaTest(false)	
+		--gl.AlphaTest(false)
 		
 		gl.ResetState()
 		gl.ResetMatrices()
@@ -279,13 +279,13 @@ function gadget:DrawGenesis()
 				if not mapTex[sx][sz] then
 					mapTex[sx][sz] = {
 						cur = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
-							wrap_s = GL.CLAMP_TO_EDGE, 
+							wrap_s = GL.CLAMP_TO_EDGE,
 							wrap_t = GL.CLAMP_TO_EDGE,
 							fbo = true,
 							min_filter = GL.LINEAR_MIPMAP_NEAREST,
 						}),
 						orig = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
-							wrap_s = GL.CLAMP_TO_EDGE, 
+							wrap_s = GL.CLAMP_TO_EDGE,
 							wrap_t = GL.CLAMP_TO_EDGE,
 							fbo = true,
 						}),
@@ -316,12 +316,12 @@ function gadget:DrawGenesis()
 							count = 0,
 							data = {}
 						}
-					end	
+					end
 					
 					local toTex = toTexture[tex]
 					toTex.count = toTex.count + 1
 					toTex.data[toTex.count] = {x = x, z = z, sx = sx, sz = sz}
-				else 
+				else
 					-- Restore Texture
 					if blockStateMap[x] then
 						blockStateMap[x][z] = nil

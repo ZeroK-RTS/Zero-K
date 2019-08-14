@@ -130,7 +130,7 @@ function Ribbon:Draw()
 		elseif self.projectile then
 			x,y,z = spGetProjectilePosition(self.projectile)
 		end
-		if x and y and z then 
+		if x and y and z then
 			glUniform( oldPosUniform[quads0+1] , x,y,z )
 		end
 	else
@@ -254,7 +254,7 @@ function Ribbon:Update(n)
 			end
 		end
 	else
-		local lastIndex = self.posIdx 
+		local lastIndex = self.posIdx
 		self.posIdx = (self.posIdx % self.size)+1
 		self.oldPos[self.posIdx] = self.oldPos[lastIndex]
 		
@@ -314,7 +314,7 @@ function Ribbon:CreateParticle()
 	self.quads0 = self.size-1
 	self.blendfactor = 1
 
-	local x,y,z 
+	local x,y,z
 	if self.unit then
 		x,y,z = spGetUnitPiecePosDir(self.unit,self.piecenum)
 	elseif self.projectile then

@@ -44,7 +44,7 @@ setmetatable(DebugHandler.allObjects, {
 
 
 --//=============================================================================
---// Chili ErrorHandler 
+--// Chili ErrorHandler
 --//
 --// Chili is a framework, so many widgets move parts of their code into its
 --// thread. If now a widget error happens, it could be shown as chili errors and
@@ -59,7 +59,7 @@ local numChiliErrors = 0
 local lastError = 0
 
 local function ChiliErrorHandler(msg,...)
-  local control 
+  local control
   local _i = 2 --// 1 is this function, so skip it
   repeat
     if (not debug.getinfo(_i)) then

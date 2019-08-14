@@ -120,7 +120,7 @@ function mahlazer_Show()
 		Show(OuterLimbs[i]);
 	end
 	Show(Satellite);
-end 
+end
 
 -- prepare the laser beam, i'm gonna use it tonite
 function mahlazer_EngageTheLaserBeam() -- it's gonna END YOUR LIFE

@@ -148,7 +148,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	SetupUnit(unitID)
 end
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions) 
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if not IsImmobileBuilder(UnitDefs[unitDefID]) then
 		return
 	end

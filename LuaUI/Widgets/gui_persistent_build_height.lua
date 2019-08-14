@@ -35,7 +35,7 @@ local glColor       	= gl.Color
 local glBeginEnd    	= gl.BeginEnd
 
 local floor = math.floor
-local ceil = math.ceil 
+local ceil = math.ceil
 
 local toggleHeight   = KEYSYMS.B
 local heightIncrease = KEYSYMS.C
@@ -166,7 +166,7 @@ end
 local function SendCommand()
 	local constructor = spGetSelectedUnits()
 
-	if #constructor == 0 then 
+	if #constructor == 0 then
 		return
 	end
 	
@@ -183,9 +183,9 @@ local function SendCommand()
 					pointY = 2
 				else
 					pointY = height + buildingPlacementHeight
-				end	
+				end
 			else
-				pointY = height + buildingPlacementHeight	
+				pointY = height + buildingPlacementHeight
 			end
 		end
 	end
@@ -201,7 +201,7 @@ local function SendCommand()
 	params[4] = pointZ
 	params[5] = commandTag
 	params[6] = 1            -- Loop parameter
-	params[7] = pointY       -- Height parameter of terraform 
+	params[7] = pointY       -- Height parameter of terraform
 	params[8] = 5            -- Five points in the terraform
 	params[9] = #constructor -- Number of constructors with the command
 	params[10] = 0            -- Ordinary volume selection
@@ -346,10 +346,10 @@ function widget:Update(dt)
 				pointY = 2
 			else
 				pointY = height + buildingPlacementHeight
-			end	
+			end
 		else
 			floating = false
-			pointY = height + buildingPlacementHeight	
+			pointY = height + buildingPlacementHeight
 		end
 		
 		for i = -1, 1, 2 do
@@ -357,7 +357,7 @@ function widget:Update(dt)
 				corner[i][j] = spGetGroundHeight(pointX + sizeX*i, pointZ + sizeZ*j)
 			end
 		end
-	else 
+	else
 		pointX = false
 	end
 end
@@ -464,12 +464,12 @@ function widget:DrawWorld()
 end
 
 function widget:Shutdown()
-	if (volumeDraw) then 
+	if (volumeDraw) then
 		gl.DeleteList(volumeDraw); volumeDraw=nil
 		gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
 	end
-	if (groundGridDraw) then 
-		gl.DeleteList(groundGridDraw); groundGridDraw=nil 
+	if (groundGridDraw) then
+		gl.DeleteList(groundGridDraw); groundGridDraw=nil
 	end
 end
 

@@ -232,11 +232,11 @@ local function GetBuildQueue(unitID)
 end
 
 
-local function RemoveChildren(container) 
-	for i = 1, #container.children do 
+local function RemoveChildren(container)
+	for i = 1, #container.children do
 		container:RemoveChild(container.children[1])
 	end
-end 
+end
 
 
 local function UpdateFac(i, facInfo)
@@ -256,7 +256,7 @@ local function UpdateFac(i, facInfo)
 		
 	elseif (unfinished_facs[facInfo.unitID]) then
 		_, _, _, _, progress = GetUnitHealth(facInfo.unitID)
-		if (progress>=1) then 
+		if (progress>=1) then
 			progress = -1
 			unfinished_facs[facInfo.unitID] = nil
 		end
@@ -297,7 +297,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 	local facButton = Button:New{
 		width = options.buttonsize.value*1.2,
 		height = options.buttonsize.value*1.0,
-		tooltip = 			WG.Translate("interface", "lmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "select") .. '\n' 					
+		tooltip = 			WG.Translate("interface", "lmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "select") .. '\n'
 			.. WhiteStr .. 	WG.Translate("interface", "mmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "go_to") .. '\n'
 			.. WhiteStr .. 	WG.Translate("interface", "rmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "quick_rallypoint_mode")
 			,
@@ -445,7 +445,7 @@ local function BuildRowButtonFunc(num, cmdid, left, right,addInput,insertMode,cu
 		if not commands[i] then --end of queue reached
 			break
 		end
-		if commands[i].id == 0 then 
+		if commands[i].id == 0 then
 			pos = pos + 1
 		end
 		i = i + 1
@@ -470,7 +470,7 @@ local function BuildRowButtonFunc(num, cmdid, left, right,addInput,insertMode,cu
 			alreadyRemovedTag[commands[i+pos].tag] = true
 			j = j + 1
 			i = i - 1
-		end 
+		end
 	end
 end
 
@@ -528,7 +528,7 @@ local function MakeButton(unitDefID, facID, buttonId, facIndex, bqPos)
 				if not bqPos then return end
 				
 				if mouse == 1 then
-					buildRow_dragDrop[1] = bqPos; 
+					buildRow_dragDrop[1] = bqPos;
 					--buildRow_dragDrop[2] = -buildRowButtons[i].cmdid
 					buildRow_dragDrop[2] = cmdid
 					buildRow_dragDrop[3] = count-1;
@@ -724,9 +724,9 @@ local function WaypointHandler(x,y,button)
 
   local type,param = Spring.TraceScreenRay(x,y)
   if type=='ground' then
-    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt) 
+    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt)
   elseif type=='unit' then
-    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.GUARD,{param},opt)     
+    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.GUARD,{param},opt)
   else --feature
     type,param = Spring.TraceScreenRay(x,y,true)
     Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt)
@@ -810,14 +810,14 @@ RecreateFacbar = function()
 			_, _, _, _, progress = GetUnitHealth(unitBuildID)
 		elseif (unfinished_facs[facInfo.unitID]) then
 			_, _, _, _, progress = GetUnitHealth(facInfo.unitID)
-			if (progress>=1) then 
+			if (progress>=1) then
 				progress = -1
 				unfinished_facs[facInfo.unitID] = nil
 			end
 		end
 		--]]
 		if showAllPlayers and facInfo.teamID ~= curTeam then
-			curTeam = facInfo.teamID 
+			curTeam = facInfo.teamID
 			AddPlayerName(curTeam)
 		end
 		local facButton,boStack, qStack, qStore = AddFacButton(facInfo.unitID, unitDefID, stack_main, i)
@@ -902,7 +902,7 @@ function widget:DrawWorld()
 	-- Draw factories command lines
 	if waypointMode>1 then
 		local unitID
-		if waypointMode>1 then 
+		if waypointMode>1 then
 			unitID = facs[waypointFac].unitID
 		end
 		DrawUnitCommands(unitID)
@@ -1019,12 +1019,12 @@ function widget:SelectionChanged(selectedUnits)
 	
 	pressedFac = -1
 
-	local showBuildPanel = options.showBuildPanel.value == 'always' or 
+	local showBuildPanel = options.showBuildPanel.value == 'always' or
 	(options.showBuildPanel.value == 'playerOnly' and not Spring.GetSpectatingState())
 	
-	if (#selectedUnits == 1) then 
-		for cnt, f in ipairs(facs) do 
-			if f.unitID == selectedUnits[1] then 
+	if (#selectedUnits == 1) then
+		for cnt, f in ipairs(facs) do
+			if f.unitID == selectedUnits[1] then
 				pressedFac = cnt
 				if showBuildPanel then
 				--local qStack = facs[pressedFac].qStack
@@ -1045,7 +1045,7 @@ end
 
 function widget:MouseRelease(x, y, button)
 	if (waypointMode>0)and(not inTweak) and (waypointMode>0)and(waypointFac>0) then
-		WaypointHandler(x,y,button)	
+		WaypointHandler(x,y,button)
 	end
 	return -1
 end
@@ -1101,7 +1101,7 @@ function widget:Initialize()
 	
 	stack_build = Panel:New{
 		y=0,
-		x=options.buttonsize.value*1.2 + 0, 
+		x=options.buttonsize.value*1.2 + 0,
 		right=0,
 		--bottom=0,
 		height='100%';

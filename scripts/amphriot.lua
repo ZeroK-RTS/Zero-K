@@ -20,7 +20,7 @@ local smokePiece = {pelvis, torso}
 local restore_delay = 3000
 local base_speed = 100
 
-local SIG_WALK = 1	
+local SIG_WALK = 1
 local SIG_AIM1 = 2
 local SIG_AIM2 = 4
 local SIG_RESTORE = 8
@@ -47,13 +47,13 @@ local function Walk()
 		Turn(lffoot, x_axis, math.rad(0), math.rad(150)*speedmult)
 		
 		Turn(rfleg, x_axis, math.rad(-40), math.rad(80)*speedmult)
-		Turn(rffoot, x_axis, math.rad(60), math.rad(120)*speedmult)	
+		Turn(rffoot, x_axis, math.rad(60), math.rad(120)*speedmult)
 		
 		Turn(rbleg, x_axis, math.rad(20), math.rad(100)*speedmult)
 		Turn(rbfoot, x_axis, math.rad(30), math.rad(50)*speedmult)
 		
 		Turn(lbleg, x_axis, math.rad(-40), math.rad(80)*speedmult)
-		Turn(lbfoot, x_axis, math.rad(60), math.rad(120)*speedmult)	
+		Turn(lbfoot, x_axis, math.rad(60), math.rad(120)*speedmult)
 
 		Sleep(400/speedmult)
 		
@@ -78,7 +78,7 @@ local function Walk()
 		Turn(rbfoot, x_axis, math.rad(60), math.rad(120)*speedmult)
 		
 		Turn(lbleg, x_axis, math.rad(20), math.rad(100)*speedmult)
-		Turn(lbfoot, x_axis, math.rad(30), math.rad(50)*speedmult)		
+		Turn(lbfoot, x_axis, math.rad(30), math.rad(50)*speedmult)
 	
 		Sleep(400/speedmult)
 		
@@ -105,7 +105,7 @@ local function ResetLegs()
 	Turn(lbleg, x_axis, 0, math.rad(80))
 	Turn(lbfoot, x_axis, 0, math.rad(80))
 	Turn(rbleg, x_axis, 0, math.rad(80))
-	Turn(rbfoot, x_axis, 0, math.rad(80))	
+	Turn(rbfoot, x_axis, 0, math.rad(80))
 end
 
 local longRange = false
@@ -160,7 +160,7 @@ local function RestoreAfterDelay()
 	Turn(lturret1, x_axis, 0, math.rad(50))
 	Turn(rturret1, x_axis, 0, math.rad(50))
 	Turn(lturret2, x_axis, 0, math.rad(50))
-	Turn(rturret2, x_axis, 0, math.rad(50))	
+	Turn(rturret2, x_axis, 0, math.rad(50))
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -168,7 +168,7 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_AIM1)
 		SetSignalMask(SIG_AIM1)
 		
-		Turn(torso, y_axis, heading, math.rad(360))	
+		Turn(torso, y_axis, heading, math.rad(360))
 		Turn(mainturret, x_axis, -pitch, math.rad(180))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(mainturret, x_axis)
@@ -176,13 +176,13 @@ function script.AimWeapon(num, heading, pitch)
 		return true
 	elseif num == 2 then
 	
-		Signal(SIG_AIM2)	
+		Signal(SIG_AIM2)
 		SetSignalMask(SIG_AIM2)
 		
-		if pitch < -math.rad(10) then 
+		if pitch < -math.rad(10) then
 			pitch = -math.rad(10)
-		elseif pitch > math.rad(10) then 
-			pitch = math.rad(10) 
+		elseif pitch > math.rad(10) then
+			pitch = math.rad(10)
 		end
 		
 		Turn(torso, y_axis, heading, math.rad(360))
@@ -192,7 +192,7 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(rturret2, x_axis, -pitch, math.rad(180))
 		WaitForTurn(lturret1, x_axis)
 		WaitForTurn(torso, y_axis)
-		StartThread(RestoreAfterDelay)	
+		StartThread(RestoreAfterDelay)
 		
 		StartThread(RestoreAfterDelay)
 		return true
@@ -216,8 +216,8 @@ end
 function script.Shot(num)
 	if num == 2 then
 		gun_1 = gun_1 + 1
-		if gun_1 > 4 then 
-			gun_1 = 1 
+		if gun_1 > 4 then
+			gun_1 = 1
 		end
 	end
 end
@@ -235,9 +235,9 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	if num == 2 then 
-		return flares[gun_1] 
-	else 
+	if num == 2 then
+		return flares[gun_1]
+	else
 		return flaremain
 	end
 end

@@ -2,10 +2,10 @@
 
 include "constants.lua"
 
--- WARNING: change your constant for the -brackets to 65536 before compilingnot 
-local base, body, turret, sleeve, barrel, firepoint, tracks1, tracks2, tracks3, tracks4, 
-wheels1, wheels2, wheels3, wheels4, wheels5, wheels6, wheels7, wheels8 = 
-piece('base', 'body', 'turret', 'sleeve', 'barrel', 'firepoint', 'tracks1', 'tracks2', 
+-- WARNING: change your constant for the -brackets to 65536 before compilingnot
+local base, body, turret, sleeve, barrel, firepoint, tracks1, tracks2, tracks3, tracks4,
+wheels1, wheels2, wheels3, wheels4, wheels5, wheels6, wheels7, wheels8 =
+piece('base', 'body', 'turret', 'sleeve', 'barrel', 'firepoint', 'tracks1', 'tracks2',
 'tracks3', 'tracks4', 'wheels1', 'wheels2', 'wheels3', 'wheels4', 'wheels5', 'wheels6', 'wheels7', 'wheels8')
 
 local moving, once, animCount = false,true,0

@@ -95,8 +95,8 @@ end
 
 local function SpringSpeedToDamage(colliderMass,collideeeMass,relativeSpeed) --Inelastic collision. Reference: Spring/rts/Sim/MoveTypes/GroundMoveType.cpp#875
 	local COLLISION_DAMAGE_MULT = 0.02 --Reference: Spring/rts/Sim/MoveTypes/GroundMoveType.cpp#66
-	local MAX_UNIT_SPEED = 1000 --Reference: Spring/rts/Sim/Misc/GlobalConstants.h 
-	local impactSpeed = relativeSpeed * 0.5; 
+	local MAX_UNIT_SPEED = 1000 --Reference: Spring/rts/Sim/Misc/GlobalConstants.h
+	local impactSpeed = relativeSpeed * 0.5;
 	local colliderelMass = (colliderMass / (colliderMass + collideeeMass));
 	local colliderelImpactSpeed = impactSpeed * (1 - colliderelMass);
 	local collideeRelImpactSpeed = impactSpeed * (colliderelMass);

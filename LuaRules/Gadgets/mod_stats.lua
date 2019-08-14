@@ -27,7 +27,7 @@ if (not gadgetHandler:IsSyncedCode()) then
   return false  --  silent removal
 end
 
-local damages = {}     -- damages[attacker][victim] = { damage, emp} 
+local damages = {}     -- damages[attacker][victim] = { damage, emp}
 local unitCounts = {}  -- unitCounts[defID] = { created, destroyed}
 local lastPara = {}
 
@@ -91,7 +91,7 @@ end
 GG.mod_stats_AddFactoryPlop = AddFactoryPlop
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                             weaponID, attackerID, attackerDefID, attackerTeam)
 
 	if unitTeam == gaiaTeamID then
@@ -102,9 +102,9 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		attackerDefID = weaponIDToUnitDefID[weaponID]
 		--Spring.Echo(UnitDefs[attackerDefID].humanName)
 	end
-	if (attackerDefID == nil or  unitDefID == nil or damage == nil) or (not attackerTeam) or (attackerTeam == unitTeam) or (damage < 0)  or spAreTeamsAllied(attackerTeam, unitTeam) then 
-		if (paralyzer) then 
-			local hp, maxHp, paraDam = spGetUnitHealth(unitID)	
+	if (attackerDefID == nil or  unitDefID == nil or damage == nil) or (not attackerTeam) or (attackerTeam == unitTeam) or (damage < 0)  or spAreTeamsAllied(attackerTeam, unitTeam) then
+		if (paralyzer) then
+			local hp, maxHp, paraDam = spGetUnitHealth(unitID)
 			local paraHp = maxHp - paraDam
 			if paraHp < 0 then paraHp = 0 end
 			lastPara[unitID] = paraHp
@@ -120,7 +120,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 	if drones[UnitDefs[attackerDefID].name] then
 		local name = drones[UnitDefs[attackerDefID].name]
 		attackerDefID = (UnitDefNames[name] and UnitDefNames[name].id) or attackerDefID
-	end	
+	end
 	local attackerAlias = UnitDefs[attackerDefID].customParams.statsname
 	if attackerAlias and UnitDefNames[attackerAlias] then
 		attackerDefID = UnitDefNames[attackerAlias].id
@@ -131,16 +131,16 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 	end
 	
 	
-	local hp, maxHp, paraDam, capture, build = spGetUnitHealth(unitID)		
+	local hp, maxHp, paraDam, capture, build = spGetUnitHealth(unitID)
 	
-	if build >= 1 then 
+	if build >= 1 then
 
 		local tab = damages[attackerDefID]
-		if (tab == nil) then 
+		if (tab == nil) then
 			tab = {}
 			damages[attackerDefID] = tab
 		end
-		local dam = tab[unitDefID] 
+		local dam = tab[unitDefID]
 		if (dam == nil) then
 			dam = {0,0}
 			tab[unitDefID] = dam
@@ -148,21 +148,21 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 
 		local h
 		if (paralyzer)  then h = lastPara[unitID] or maxHp
-		else h = hp + damage end 
+		else h = hp + damage end
 	
 		if h < 0 then h = 0 end
 		if h > maxHp then h = maxHp end
 		if (damage > h) then damage = h end
 
 		if (paralyzer) then
-			dam[2] = dam[2] + damage 
-		else 
-			dam[1] = dam[1] + damage  
+			dam[2] = dam[2] + damage
+		else
+			dam[1] = dam[1] + damage
 		end
 	end
 
 	local paraHp = maxHp - paraDam
-	if paraHp < 0 then paraHp = 0 end	
+	if paraHp < 0 then paraHp = 0 end
 	lastPara[unitID] = paraHp
 end
 
@@ -173,9 +173,9 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local unitAlias = UnitDefs[unitDefID].customParams.statsname
 	if unitAlias and UnitDefNames[unitAlias] then
 		unitDefID = UnitDefNames[unitAlias].id
-	end	
+	end
 	
-	if (builderID == nil) then 
+	if (builderID == nil) then
 		local tab = unitCounts[unitDefID]
 		if (tab == nil) then
 			tab = {0,0}
@@ -192,7 +192,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	local unitAlias = UnitDefs[unitDefID].customParams.statsname
 	if unitAlias and UnitDefNames[unitAlias] then
 		unitDefID = UnitDefNames[unitAlias].id
-	end	
+	end
 	
 	local tab = unitCounts[unitDefID]
 	if (tab == nil) then
@@ -204,7 +204,7 @@ end
 
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	lastPara[unitID] = nil	
+	lastPara[unitID] = nil
 
 	local unitAlias = UnitDefs[unitDefID].customParams.statsname
 	if unitAlias and UnitDefNames[unitAlias] then
@@ -219,9 +219,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	tab[2] = tab[2] + 1
 end
 
-function SendData(statsData) 
+function SendData(statsData)
 	Spring.SendCommands("wbynum 255 SPRINGIE:stats,".. statsData)
-end 
+end
 
 function gadget:GameOver()
 	if GG.Chicken then
@@ -252,10 +252,10 @@ function gadget:GameOver()
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
 		if ((teamLuaAI == nil or teamLuaAI == "") and teamID ~= gaiaTeam) then
 			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID, false)
-			if (not ai) then 
+			if (not ai) then
 				humanAlly[ally] = 1
 				players = players + 1
-			end	
+			end
 		end
 	end
 	local allycount = 0

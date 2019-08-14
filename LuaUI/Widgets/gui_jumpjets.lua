@@ -121,7 +121,7 @@ local function GetJumpViabilityLevel(unitDefID, bx, by, bz, finish, height)
 		end
 		
 		-- Ground is fine, must contain a blocking structure or
-		-- be out of LOS. Spring.TestMoveOrder returns false in 
+		-- be out of LOS. Spring.TestMoveOrder returns false in
 		-- widgets for all out of LOS locations.
 		
 		if spIsPosInLos(x, y, z) then
@@ -136,7 +136,7 @@ local function ListToSet(t)
 	local new = {}
 	for i=1,#t do
 		new[ t[i] ] = true
-	end 
+	end
 	return new
 end
 

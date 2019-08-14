@@ -28,7 +28,7 @@ local unitDefID = Spring.GetUnitDefID(unitID)
 local smokePiece = {pelvis, turret}
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)	
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Hide(gunbase)
 	Hide(gun1)
 	Hide(gun2)

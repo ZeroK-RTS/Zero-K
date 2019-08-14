@@ -42,10 +42,10 @@ local cyan = '\255\1\255\255'
 local white = '\255\255\255\255'
 local yellow = '\255\255\255\1'
 
-local selectionTooltip = "\n" .. green .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") .. "\n" .. 
+local selectionTooltip = "\n" .. green .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") .. "\n" ..
 	green .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect") .. "\n" ..
-	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type") .. "\n" .. 
-	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type") .. "\n" .. 
+	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type") .. "\n" ..
+	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type") .. "\n" ..
 	green .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to")
 
 --------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
 local UNIT_BURST_DAMAGES = VFS.Include(LUAUI_DIRNAME .. "Configs/burst_damages.lua" , nil, VFS.RAW_FIRST)
 
-local terraformGeneralTip = 
+local terraformGeneralTip =
 	green.. 'Click&Drag'..white..': Free draw terraform. \n'..
 	green.. 'Alt+Click&Drag'..white..': Box terraform. \n'..
 	green.. 'Alt+Ctrl+Click&Drag'..white..': Hollow box terraform. \n'..
@@ -110,7 +110,7 @@ local terraformGeneralTip =
 	'\n'
 
 local terraCmdTip = {
-	[CMD_RAMP] = 
+	[CMD_RAMP] =
 		yellow..'[Ramp between two points]\n'..
 		'1: ' .. green.. 'Click&Drag'..white..' from start to end. \n' ..
 		'2: ' .. green.. 'Click' ..white..' again to set width. \n'..
@@ -154,7 +154,7 @@ local terraCmdTip = {
 		green.. 'Space'..white..': Limit to only raise/lower',
 }
 
-local DRAWING_TOOLTIP = 
+local DRAWING_TOOLTIP =
 	green.. 'Left click'..white..': Draw on map. \n' ..
 	green.. 'Right click'..white..': Erase. \n' ..
 	green.. 'Middle click'..white..': Place marker. \n' ..
@@ -347,8 +347,8 @@ options = {
 			end
 		end,
 	},
-	groupbehaviour = {name='Unit Grouping Behaviour', type='radioButton', 
-		value='overflow', 
+	groupbehaviour = {name='Unit Grouping Behaviour', type='radioButton',
+		value='overflow',
 		items = {
 			{key = 'overflow',	name = 'On window overflow'},
 			{key = 'multitype',	name = 'With multiple unit types'},
@@ -444,17 +444,17 @@ end
 local function Format(amount, displaySign)
 	local formatted
 	if type(amount) == "number" then
-		if (amount ==0) then formatted = "0" else 
-			if (amount < 20 and (amount * 10)%10 ~=0) then 
+		if (amount ==0) then formatted = "0" else
+			if (amount < 20 and (amount * 10)%10 ~=0) then
 				if displaySign then formatted = strFormat("%+.1f", amount)
-				else formatted = strFormat("%.1f", amount) end 
-			else 
-				if displaySign then 
+				else formatted = strFormat("%.1f", amount) end
+			else
+				if displaySign then
 					formatted = strFormat("%+d", amount)
 				else
 					formatted = strFormat("%d", amount)
-				end 
-			end 
+				end
+			end
 		end
 	else
 		formatted = amount .. ""
@@ -479,13 +479,13 @@ local function SecondsToMinutesSeconds(seconds)
 	end
 end
 
-local function UnitDefTableSort(a,b) 
-	return a and UnitDefs[a] and b and UnitDefs[b] and UnitDefs[a].name < UnitDefs[b].name 
+local function UnitDefTableSort(a,b)
+	return a and UnitDefs[a] and b and UnitDefs[b] and UnitDefs[a].name < UnitDefs[b].name
 end
 
 local function IsGroupingRequired(selectedUnits, selectionSortOrder, selectionSpace)
 	if options.groupbehaviour.value == 'overflow' then
-		return #selectedUnits > selectionSpace 
+		return #selectedUnits > selectionSpace
 	elseif options.groupbehaviour.value == 'multitype' then
 		return not (#selectedUnits <= selectionSpace and #selectionSortOrder <= 1)
 	else
@@ -496,7 +496,7 @@ end
 local function GetHealthColor(fraction, returnString)
 	local midpt = (fraction > 0.5)
 	local r, g
-	if midpt then 
+	if midpt then
 		r = (1 - fraction)*2
 		g = 1
 	else
@@ -534,8 +534,8 @@ local function GetUnitIcon(unitDefID)
 		return iconTypeCache[unitDefID]
 	end
 	local ud = UnitDefs[unitDefID]
-	if not ud then 
-		return 
+	if not ud then
+		return
 	end
 	iconTypeCache[unitDefID] = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/' .. ud.iconType .. iconFormat
 	return iconTypeCache[unitDefID]
@@ -551,8 +551,8 @@ local function GetUnitBorder(unitDefID)
 		return unitBorderCache[unitDefID]
 	end
 	local ud = UnitDefs[unitDefID]
-	if not ud then 
-		return 
+	if not ud then
+		return
 	end
 	unitBorderCache[unitDefID] = WG.GetBuildIconFrame and WG.GetBuildIconFrame(ud)
 	return unitBorderCache[unitDefID]
@@ -572,7 +572,7 @@ end
 local function GetWeaponReloadStatus(unitID, weapNum, reloadTime)
 	local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, weapNum) --select weapon no.X
 	if weaponReloadFrame then
-		local currentFrame, _ = Spring.GetGameFrame() 
+		local currentFrame, _ = Spring.GetGameFrame()
 		local remainingTime = (weaponReloadFrame - currentFrame)/30
 		local reloadFraction = 1 - remainingTime/reloadTime
 		return reloadFraction, remainingTime
@@ -752,7 +752,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 	local metalOD = Spring.GetTeamRulesParam(teamID, "OD_team_metalOverdrive") or 0
 	local energyOD = Spring.GetTeamRulesParam(teamID, "OD_team_energyOverdrive") or 0
 	
-	if metalOD and metalOD > 0 and energyOD and energyOD > 0 then 
+	if metalOD and metalOD > 0 and energyOD and energyOD > 0 then
 		-- Best case payback assumes that extra energy will make
 		-- metal at the current energy:metal ratio. Note that if
 		-- grids are linked better then better payback may be
@@ -785,16 +785,16 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		local mexIncome = metalOD/singleMexMult
 		local worstCasePayback = cost/(mexIncome*math.sqrt(energyOD+income)/4 - metalOD)
 		
-		--extraText = extraText 
-		--.. "\n overdriveMult: " .. overdriveMult 
-		--.. "\n energyPerMex: " .. energyPerMex 
-		--.. "\n mexCount: " .. mexCount 
-		--.. "\n incomePerMex: " .. incomePerMex 
-		--.. "\n overdrivePerMex: " .. overdrivePerMex 
+		--extraText = extraText
+		--.. "\n overdriveMult: " .. overdriveMult
+		--.. "\n energyPerMex: " .. energyPerMex
+		--.. "\n mexCount: " .. mexCount
+		--.. "\n incomePerMex: " .. incomePerMex
+		--.. "\n overdrivePerMex: " .. overdrivePerMex
 		--.. "\n extraMetalPerMex: " .. extraMetalPerMex
 		--.. "\n extraMetal: " .. extraMetalza
-		--.. "\n unitformCasePayback: " .. unitformCasePayback 
-		--.. "\n worstCasePayback: " .. worstCasePayback 
+		--.. "\n unitformCasePayback: " .. unitformCasePayback
+		--.. "\n worstCasePayback: " .. worstCasePayback
 		return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " .. SecondsToMinutesSeconds(worstCasePayback), healthOverride
 	end
 	return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " ..  WG.Translate("interface", "unknown"), healthOverride
@@ -868,7 +868,7 @@ end
 local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 	unitID = unitID or (unitList and unitList[1])
 	
-	if not unitID then 
+	if not unitID then
 		return
 	end
 	local alt, ctrl, meta, shift = spGetModKeyState()
@@ -904,7 +904,7 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 		if shift then
 			spSelectUnitArray(unitList) -- select all
 		else
-			spSelectUnitArray({unitID})  -- only 1	
+			spSelectUnitArray({unitID})  -- only 1
 		end
 	else --button2 (middle)
 		local x,y,z = Spring.GetUnitPosition(unitID)
@@ -1070,9 +1070,9 @@ local function GetMorphInfo(parentControl, yPos)
 	local morphLabel = Chili.Label:New{
 		x = 4,
 		y = 0,
-		height = ICON_SIZE, 
+		height = ICON_SIZE,
 		width = 50,
-		valign = 'center', 
+		valign = 'center',
 		caption = cyan .. 'Morph:',
 		fontSize = BAR_FONT,
 		parent = holder,
@@ -1347,7 +1347,7 @@ local function GetSelectionStatsDisplay(parentControl)
 		parent = holder,
 	}
 	
-	local total_count = 0 
+	local total_count = 0
 	local total_finishedcost = 0
 	local total_totalbp = 0
 	local total_maxhp = 0
@@ -1381,7 +1381,7 @@ local function GetSelectionStatsDisplay(parentControl)
 				end
 				
 				stunned_or_inbuild = spGetUnitIsStunned(unitID)
-				if not stunned_or_inbuild then 
+				if not stunned_or_inbuild then
 					if mm then
 						total_metalincome = total_metalincome + mm
 						total_metaldrain = total_metaldrain + mu
@@ -1857,7 +1857,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local morphShown = false
 		local visible = IsUnitInLos(unitID)
 		
-		if prevUnitID == unitID and prevUnitDefID == unitDefID and prevFeatureID == featureID and prevFeatureDefID == featureDefID and 
+		if prevUnitID == unitID and prevUnitDefID == unitDefID and prevFeatureID == featureID and prevFeatureDefID == featureDefID and
 				prevVisible == visible and prevMorphTime == morphTime and prevMorphCost == morphCost and prevMousePlace == ((mousePlaceX and true) or false) then
 			
 			if not requiredOnly then
@@ -2037,7 +2037,7 @@ local function GetTooltipWindow()
 		y = 4,
 		width = RIGHT_WIDTH - 10,
 		height = 5,
-		valign = "ascender", 
+		valign = "ascender",
 		autoHeight = true,
 		font = {size = TOOLTIP_FONT},
 		parent = window,
@@ -2291,11 +2291,11 @@ local function GetSelectionWindow()
 
 	local holderWindow = Chili.Window:New{
 		name      = 'selections',
-		x         = x, 
+		x         = x,
 		bottom    = 0,
 		width     = 450,
 		height    = height,
-        minWidth  = 450, 
+        minWidth  = 450,
 		minHeight = 120,
 		bringToFrontOnClick = false,
 		dockable  = true,
@@ -2321,13 +2321,13 @@ local function GetSelectionWindow()
 		OnMouseDown = {
 			function(self)
 				local _,_, meta,_ = spGetModKeyState()
-				if not meta then 
-					return false 
+				if not meta then
+					return false
 				end
 				WG.crude.OpenPath('Settings/HUD Panels/Selected Units Window')
-				WG.crude.ShowMenu() 
+				WG.crude.ShowMenu()
 				return true --skip button function, else clicking on build pic will also select the unit.
-			end 
+			end
 		},
 		noClickThrough = false,
 		parent = holderWindow

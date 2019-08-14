@@ -22,7 +22,7 @@ unitDef = {
     --neededlink  = 150,
     --pylonrange  = 150,
     modelradius    = [[45]],
-  },  
+  },
   
   energyUse                     = 0,
   explodeAs                     = [[ATOMIC_BLAST]],
@@ -118,7 +118,7 @@ unitDef = {
       cegTag                  = [[METEOR_TAG]],
       collideFriendly         = true,
       craterBoost             = 3,
-      craterMult              = 6, 
+      craterMult              = 6,
 
       customParams              = {
         light_color = [[2.4 1.5 0.6]],

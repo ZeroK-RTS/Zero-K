@@ -10,7 +10,7 @@ local claw2 = piece 'claw2'
 local wakes =
 	{ piece 'wake1'
 	, piece 'wake2'
-} 
+}
 local beam = piece 'beam'
 
 local smokePiece = {body, claw1, turret}

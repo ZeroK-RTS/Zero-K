@@ -27,7 +27,7 @@ function script.Create()
     Spin(wheel1, x_axis, spin)
     Spin(wheel2, x_axis, spin)
     --StartThread(SliderAnim, slider1)
-    --StartThread(SliderAnim, slider2)  
+    --StartThread(SliderAnim, slider2)
     Spin(focal1, y_axis, spin)
     Spin(focal2, y_axis, -spin)
 end

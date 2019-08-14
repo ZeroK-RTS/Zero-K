@@ -134,8 +134,8 @@ return {
         sizegrowth         = 175,
         ttl                = 18,
       },
-    },	
-  },  
+    },
+  },
   
   ["riotballplus"] = {
     usedefaultexplosions = false,
@@ -271,7 +271,7 @@ return {
         sizegrowth         = 260,
         ttl                = 60,
       },
-    }, 
-  },  
+    },
+  },
 }
 

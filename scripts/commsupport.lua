@@ -3,32 +3,32 @@ include "constants.lua"
 local spSetUnitShieldState = Spring.SetUnitShieldState
 
 -- pieces
-local base = piece 'base' 
-local pelvis = piece 'pelvis' 
-local turret = piece 'turret' 
-local torso = piece 'torso' 
-local head = piece 'head' 
-local armhold = piece 'armhold' 
-local ruparm = piece 'ruparm' 
-local rarm = piece 'rarm' 
-local rloarm = piece 'rloarm' 
-local luparm = piece 'luparm' 
-local larm = piece 'larm' 
-local lloarm = piece 'lloarm' 
-local rupleg = piece 'rupleg' 
-local lupleg = piece 'lupleg' 
-local lloleg = piece 'lloleg' 
-local rloleg = piece 'rloleg' 
-local rfoot = piece 'rfoot' 
-local lfoot = piece 'lfoot' 
-local gun = piece 'gun' 
-local flare = piece 'flare' 
-local rhand = piece 'rhand' 
-local lhand = piece 'lhand' 
-local gunpod = piece 'gunpod' 
-local ac1 = piece 'ac1' 
-local ac2 = piece 'ac2' 
-local nanospray = piece 'nanospray' 
+local base = piece 'base'
+local pelvis = piece 'pelvis'
+local turret = piece 'turret'
+local torso = piece 'torso'
+local head = piece 'head'
+local armhold = piece 'armhold'
+local ruparm = piece 'ruparm'
+local rarm = piece 'rarm'
+local rloarm = piece 'rloarm'
+local luparm = piece 'luparm'
+local larm = piece 'larm'
+local lloarm = piece 'lloarm'
+local rupleg = piece 'rupleg'
+local lupleg = piece 'lupleg'
+local lloleg = piece 'lloleg'
+local rloleg = piece 'rloleg'
+local rfoot = piece 'rfoot'
+local lfoot = piece 'lfoot'
+local gun = piece 'gun'
+local flare = piece 'flare'
+local rhand = piece 'rhand'
+local lhand = piece 'lhand'
+local gunpod = piece 'gunpod'
+local ac1 = piece 'ac1'
+local ac2 = piece 'ac2'
+local nanospray = piece 'nanospray'
 
 local smokePiece = {torso}
 local nanoPieces = {nanospray}
@@ -97,35 +97,35 @@ local function RestoreAfterDelay()
 		else
 			Turn(turret, x_axis, 0, math.rad(150))
 			Turn(turret, y_axis, 0, math.rad(150))
-			--torso	
+			--torso
 			Turn(torso, x_axis, 0, math.rad(250))
 			Turn(torso, y_axis, 0, math.rad(250))
-			Turn(torso, z_axis, 0, math.rad(250))	
-			--head	
+			Turn(torso, z_axis, 0, math.rad(250))
+			--head
 			Turn(head, x_axis, 0, math.rad(250))
 			Turn(head, y_axis, 0, math.rad(250))
 			Turn(head, z_axis, 0, math.rad(250))
 			
 			-- at ease pose
 			Turn(armhold, x_axis, math.rad(-45), math.rad(250)) --upspring at -45
-			Turn(ruparm, x_axis, 0, math.rad(250)) 
-			Turn(ruparm, y_axis, 0, math.rad(250)) 
-			Turn(ruparm, z_axis, 0, math.rad(250)) 
+			Turn(ruparm, x_axis, 0, math.rad(250))
+			Turn(ruparm, y_axis, 0, math.rad(250))
+			Turn(ruparm, z_axis, 0, math.rad(250))
 			Turn(rarm, x_axis, math.rad(2), math.rad(250))	 --up 2
-			Turn(rarm, y_axis, 0, math.rad(250)) 
+			Turn(rarm, y_axis, 0, math.rad(250))
 			Turn(rarm, z_axis, math.rad(12), math.rad(250))	--up -12
 			Turn(rloarm, x_axis, math.rad(47), math.rad(250)) --up 47
 			Turn(rloarm, y_axis, math.rad(76), math.rad(250)) --up 76
 			Turn(rloarm, z_axis, math.rad(47), math.rad(250)) --up -47
 			--left
 			Turn(luparm, x_axis, math.rad(12), math.rad(250))	 --up -9
-			Turn(luparm, y_axis, 0, math.rad(250)) 
-			Turn(luparm, z_axis, 0, math.rad(250)) 
+			Turn(luparm, y_axis, 0, math.rad(250))
+			Turn(luparm, z_axis, 0, math.rad(250))
 			Turn(larm, x_axis, math.rad(-35), math.rad(250))	 --up 5
 			Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up -3
 			Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up 22
 			Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up 82
-			Turn(lloarm, y_axis, 0, math.rad(250)) 
+			Turn(lloarm, y_axis, 0, math.rad(250))
 			Turn(lloarm, z_axis, math.rad(-94), math.rad(250)) --upspring 94
 			
 			Turn(gun, x_axis, 0, math.rad(250))
@@ -300,23 +300,23 @@ end
 function script.Create()
 	--alert to dirt
 	Turn(armhold, x_axis, math.rad(-45), math.rad(250)) --upspring
-	Turn(ruparm, x_axis, 0, math.rad(250)) 
-	Turn(ruparm, y_axis, 0, math.rad(250)) 
-	Turn(ruparm, z_axis, 0, math.rad(250)) 
+	Turn(ruparm, x_axis, 0, math.rad(250))
+	Turn(ruparm, y_axis, 0, math.rad(250))
+	Turn(ruparm, z_axis, 0, math.rad(250))
 	Turn(rarm, x_axis, math.rad(2), math.rad(250))	 --
-	Turn(rarm, y_axis, 0, math.rad(250)) 
+	Turn(rarm, y_axis, 0, math.rad(250))
 	Turn(rarm, z_axis, math.rad(-(-12)), math.rad(250))	--up
-	Turn(rloarm, x_axis, math.rad(47), math.rad(250)) --up 
-	Turn(rloarm, y_axis, math.rad(76), math.rad(250)) --up 
-	Turn(rloarm, z_axis, math.rad(-(-47)), math.rad(250)) --up 
+	Turn(rloarm, x_axis, math.rad(47), math.rad(250)) --up
+	Turn(rloarm, y_axis, math.rad(76), math.rad(250)) --up
+	Turn(rloarm, z_axis, math.rad(-(-47)), math.rad(250)) --up
 	Turn(luparm, x_axis, math.rad(12), math.rad(250))	 --up
-	Turn(luparm, y_axis, 0, math.rad(250)) 
-	Turn(luparm, z_axis, 0, math.rad(250)) 
-	Turn(larm, x_axis, math.rad(-35), math.rad(250))	 --up 
-	Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up 
-	Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up 
-	Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up 
-	Turn(lloarm, y_axis, 0, math.rad(250)) 
+	Turn(luparm, y_axis, 0, math.rad(250))
+	Turn(luparm, z_axis, 0, math.rad(250))
+	Turn(larm, x_axis, math.rad(-35), math.rad(250))	 --up
+	Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up
+	Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up
+	Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up
+	Turn(lloarm, y_axis, 0, math.rad(250))
 	Turn(lloarm, z_axis, math.rad(-(94)), math.rad(250)) --upspring
 
 	Hide(flare)
@@ -356,15 +356,15 @@ local function AimRifle(heading, pitch, isDgun)
 		return false
 	end
 	]]--
-	--torso	
+	--torso
 	Turn(torso, x_axis, math.rad(5), math.rad(250))
 	Turn(torso, y_axis, 0, math.rad(250))
-	Turn(torso, z_axis, 0, math.rad(250))	
-	--head	
+	Turn(torso, z_axis, 0, math.rad(250))
+	--head
 	Turn(head, x_axis, 0, math.rad(250))
 	Turn(head, y_axis, 0, math.rad(250))
-	Turn(head, z_axis, 0, math.rad(250))	
-	--rarm	
+	Turn(head, z_axis, 0, math.rad(250))
+	--rarm
 	Turn(ruparm, x_axis, math.rad(-55), math.rad(250))
 	Turn(ruparm, y_axis, 0, math.rad(250))
 	Turn(ruparm, z_axis, 0, math.rad(250))
@@ -378,7 +378,7 @@ local function AimRifle(heading, pitch, isDgun)
 	Turn(rloarm, z_axis, math.rad(11), math.rad(250))
 	
 	Turn(gun, x_axis, math.rad(17.0), math.rad(250))
-	Turn(gun, y_axis, math.rad(-19.8), math.rad(250)) ---20 is dead straight 
+	Turn(gun, y_axis, math.rad(-19.8), math.rad(250)) ---20 is dead straight
 	Turn(gun, z_axis, math.rad(2.0), math.rad(250))
 	--larm
 	Turn(luparm, x_axis, math.rad(-70), math.rad(250))
@@ -397,7 +397,7 @@ local function AimRifle(heading, pitch, isDgun)
 	Turn(turret, y_axis, heading, math.rad(350))
 	Turn(armhold, x_axis, -pitch, math.rad(250))
 	WaitForTurn(turret, y_axis)
-	WaitForTurn(armhold, x_axis) --need to make sure not 
+	WaitForTurn(armhold, x_axis) --need to make sure not
 	WaitForTurn(lloarm, x_axis) --stil setting up
 	StartThread(RestoreAfterDelay)
 	if isDgun then dgunning = false end
@@ -461,7 +461,7 @@ function script.Shot(num)
 	end
 	if flamers[num] then
 		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
-	end	
+	end
 end
 
 function script.QueryNanoPiece()
@@ -477,7 +477,7 @@ function script.StopBuilding()
 	end
 end
 
-function script.StartBuilding(heading, pitch) 
+function script.StartBuilding(heading, pitch)
 	restoreHeading, restorePitch = heading, pitch
 	BuildPose(heading, pitch)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
@@ -490,12 +490,12 @@ function script.Killed(recentDamage, maxHealth)
 	if severity <= .5 then
 	
 		Turn(base, x_axis, math.rad(79), math.rad(80))
-		Turn(rloleg, x_axis, math.rad(25), math.rad(250))	
-		Turn(lupleg, x_axis, math.rad(7), math.rad(250))	
-		Turn(lupleg, y_axis, math.rad(34), math.rad(250))	
-		Turn(lupleg, z_axis, math.rad(-(-9)), math.rad(250))	
+		Turn(rloleg, x_axis, math.rad(25), math.rad(250))
+		Turn(lupleg, x_axis, math.rad(7), math.rad(250))
+		Turn(lupleg, y_axis, math.rad(34), math.rad(250))
+		Turn(lupleg, z_axis, math.rad(-(-9)), math.rad(250))
 		Sleep(200) --give time to fall
-		Turn(luparm, y_axis, math.rad(18), math.rad(350))	
+		Turn(luparm, y_axis, math.rad(18), math.rad(350))
 		Turn(luparm, z_axis, math.rad(-(-45)), math.rad(350))
 		Sleep(650)
 		--EmitSfx(turret, 1026) --impact

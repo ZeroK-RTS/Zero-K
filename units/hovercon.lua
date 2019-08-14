@@ -19,7 +19,7 @@ unitDef = {
   category            = [[UNARMED HOVER]],
   collisionVolumeOffsets = [[0 2 0]],
   collisionVolumeScales  = [[35 20 40]],
-  collisionVolumeType    = [[box]],  
+  collisionVolumeType    = [[box]],
   corpse              = [[DEAD]],
 
   customParams        = {

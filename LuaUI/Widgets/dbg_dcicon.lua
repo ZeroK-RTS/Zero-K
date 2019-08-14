@@ -103,7 +103,7 @@ function widget:DrawScreen()
     dc_timer = 5
   end
     
-  if (dc_timer>0) then 
+  if (dc_timer>0) then
     DrawIcon()
   end
 end
@@ -117,7 +117,7 @@ function widget:GetTooltip()
 end
 
 function widget:IsAbove(x,y)
-  if (dc_timer>0) then 
+  if (dc_timer>0) then
     return (x >= dc_rec[1]) and (x <= dc_rec[3])and
            (y >= dc_rec[2]) and (y <= dc_rec[4])
   end

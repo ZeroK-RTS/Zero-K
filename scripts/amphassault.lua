@@ -325,7 +325,7 @@ local function RestoreAfterDelay()
 	Sleep(6000)
 	Turn(turret, y_axis, 0, math.rad(90))
 	Turn(lbarrel1, x_axis, 0, math.rad(45))
-	Turn(rbarrel1, x_axis, 0, math.rad(45))	
+	Turn(rbarrel1, x_axis, 0, math.rad(45))
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -395,7 +395,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(body, SFX.SHATTER)
 		Explode(turret, SFX.SHATTER)
 		Explode(lbarrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
-		Explode(rbarrel2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)	
+		Explode(rbarrel2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	end
 end

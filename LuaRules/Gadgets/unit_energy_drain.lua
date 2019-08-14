@@ -88,19 +88,19 @@ end
 
 local function ScriptUpdate(unitID, env, val)
 	if val then
-		if env then 
+		if env then
 			if env.script.Activate then
 				Spring.UnitScript.CallAsUnit(unitID, env.script.Activate)
 			end
-		else 
+		else
 			Spring.CallCOBScript(unitID, "Activate", 0)
 		end
 	else
-		if env then 
+		if env then
 			if env.script.Deactivate then
 				Spring.UnitScript.CallAsUnit(unitID, env.script.Deactivate)
 			end
-		else 
+		else
 			Spring.CallCOBScript(unitID, "Deactivate", 0)
 		end
 	end
@@ -128,7 +128,7 @@ function gadget:GameFrame(n)
 		
 		local activeState = Spring.Utilities.GetUnitActiveState(unitID)
 		
-		local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
+		local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID)
 		local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
 		local morphing = (spGetUnitRulesParam(unitID, "morphDisable") == 1)
 		
@@ -194,7 +194,7 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 		local data = {
 			unitID = unitID,
 			index = unitCount,
-			unitDefID = unitDefID, 
+			unitDefID = unitDefID,
 			teamID = teamID,
 			env = env,
 			resTable = {

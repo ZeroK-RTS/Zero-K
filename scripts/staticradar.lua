@@ -1,8 +1,8 @@
 include "constants.lua"
 
-local base = piece 'base' 
-local ground = piece 'ground' 
-local head = piece 'head' 
+local base = piece 'base'
+local ground = piece 'ground'
+local head = piece 'head'
 
 local smokePiece = {head}
 
@@ -71,8 +71,8 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, smokePiece)
 	--StartThread(ScannerLoop)
 	local cmd = Spring.FindUnitCmdDesc(unitID, CMD.ATTACK)
-	if cmd then 
-		Spring.RemoveUnitCmdDesc(unitID, cmd) 
+	if cmd then
+		Spring.RemoveUnitCmdDesc(unitID, cmd)
 	end
 end
 

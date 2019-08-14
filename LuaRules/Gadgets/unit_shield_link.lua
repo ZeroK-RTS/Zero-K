@@ -117,7 +117,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	
 	if shieldWeaponDefID then
 		local shieldWep = WeaponDefs[shieldWeaponDefID]
-		if not shieldWep.customParams.unlinked then 
+		if not shieldWep.customParams.unlinked then
 			--local x,y,z = spGetUnitPosition(unitID)
 			local allyTeamID = spGetUnitAllyTeam(unitID)
 			if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID][unitID]) then -- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
@@ -212,7 +212,7 @@ local function IsEnabled(unitID)
 	if not enabled then
 		return false
 	end
-	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
+	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID)
 	if stunned_or_inbuild then
 		return false
 	end
@@ -225,7 +225,7 @@ local function ShieldsAreTouching(shield1, shield2)
 	local zDiff = shield1.z - shield2.z
 	local yDiff = shield1.y - shield2.y
 	local sumRadius = shield1.shieldRadius + shield2.shieldRadius
-	return xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius 
+	return xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius
 end
 
 local function AdjustLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
@@ -238,7 +238,7 @@ local function AdjustLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
 				otherID = shieldList[i]
 				if unitID ~= otherID then
 					otherData = shieldUnits[otherID]
-					if not (otherData.neighbors[unitID] or unitData.neighbors[otherID]) and 
+					if not (otherData.neighbors[unitID] or unitData.neighbors[otherID]) and
 							otherData.enabled and ShieldsAreTouching(unitData, otherData) then
 						if unitData.shieldRank == otherData.shieldRank then
 							AddThingToIterable(otherID, unitData.neighbors, unitData.neighborList)
@@ -293,7 +293,7 @@ end
 local function DoChargeTransfer(lowID, lowData, lowCharge, highID, highData, highCharge)
 	--charge flow is: based on the absolute difference in charge content,
 	--charge flow must:
-	--1)not be more than receiver's capacity, 
+	--1)not be more than receiver's capacity,
 	--2)not be more than donator's available charge,
 	--3)leave spaces for receiver to regen,
 	--charge flow is capable: to reverse flow (IS DISABLED!) when receiver have regen and is full,
@@ -369,8 +369,8 @@ function gadget:GameFrame(n)
 						allyTeamID = unitData.allyTeamID
 						unitFlow = 0
 						-- The +1 is here intentionally to give units a chance to not link (because
-						-- otherID will be nil). This penalises the flow rate of units with few 
-						-- neighbors. 
+						-- otherID will be nil). This penalises the flow rate of units with few
+						-- neighbors.
 						randomNumberRange = unitData.neighborList.count + 1
 						randomUnitIndex = math.random(1, randomNumberRange)
 						otherID = unitData.neighborList[randomUnitIndex]
@@ -406,7 +406,7 @@ function gadget:GameFrame(n)
 					else
 						attempt = false
 					end
-				end 
+				end
 				if chargeFlow < CHARGE_DRAW_THRESHOLD and drawChange then
 					spSetUnitRulesParam(unitID,"shield_link_unit",-1,unitRulesParamsSetting)
 				end
@@ -488,7 +488,7 @@ local function DrawFunc()
 		if connectedToUnitID and connectedToUnitID >= 0 and (spValidUnitID(unitID) and spValidUnitID(connectedToUnitID)) then
 			local los1 = spGetUnitLosState(unitID, myTeam, false)
 			local los2 = spGetUnitLosState(connectedToUnitID, myTeam, false)
-			if (fullview or (los1 and los1.los) or (los2 and los2.los)) and 
+			if (fullview or (los1 and los1.los) or (los2 and los2.los)) and
 					(spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) then
 				
 				x1, y1, z1 = spGetUnitViewPosition(unitID, true)

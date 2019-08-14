@@ -234,7 +234,7 @@ local function GetTeamNames (allyTeamID)
 	local humans = 0
 	for i = 1, #teamList do
 		local name, elo, clanShort, clanLong, isAI = GetPlayerInfo(teamList[i])
-		if not isAI then 
+		if not isAI then
 			if clanFirst then
 				clanShortName = clanShort
 				clanLongName  = clanLong

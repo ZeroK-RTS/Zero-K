@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 --- ScrollPanel module
 
@@ -33,13 +33,13 @@ ScrollPanel = Control:Inherit{
 local this = ScrollPanel
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 local function smoothstep(x)
 	return x*x*(3 - 2*x)
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Sets the scroll position
 -- @int x x position
@@ -105,7 +105,7 @@ function ScrollPanel:Update(...)
 	inherited.Update(self, ...)
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function ScrollPanel:LocalToClient(x, y)
 	local ca = self.clientArea
@@ -130,7 +130,7 @@ function ScrollPanel:ClientToParent(x, y)
 	return x + self.x + ca[1] - self.scrollPosX, y + self.y + ca[2] - self.scrollPosY
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function ScrollPanel:GetCurrentExtents()
 	local minLeft, minTop, maxRight, maxBottom = self:GetChildrenCurrentExtents()
@@ -157,7 +157,7 @@ function ScrollPanel:GetCurrentExtents()
 	return minLeft, minTop, maxRight, maxBottom
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function ScrollPanel:_DetermineContentArea()
 	local minLeft, minTop, maxRight, maxBottom = self:GetChildrenCurrentExtents()
@@ -212,7 +212,7 @@ function ScrollPanel:_DetermineContentArea()
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 
 function ScrollPanel:UpdateLayout()
@@ -239,7 +239,7 @@ function ScrollPanel:UpdateLayout()
 	return true;
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 
 function ScrollPanel:IsRectInView(x, y, w, h)
@@ -268,7 +268,7 @@ function ScrollPanel:IsRectInView(x, y, w, h)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 function ScrollPanel:DrawControl()
 	--// gets overriden by the skin/theme
@@ -297,7 +297,7 @@ function ScrollPanel:_DrawInClientArea(fnc, ...)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 function ScrollPanel:IsAboveHScrollbars(x, y)
 	if (not self._hscrollbar) then

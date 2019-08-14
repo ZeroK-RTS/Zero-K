@@ -3,34 +3,34 @@ include "constants.lua"
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local base = piece 'base' 
+local base = piece 'base'
 local hips = piece 'hips'
 local torsoPivot = piece 'torsopivot'
 local torsoTrue = piece 'torso'
-local camera = piece 'camera' 
-local shoulderl = piece 'shoulderl' 
-local shoulderr = piece 'shoulderr' 
-local arml = piece 'arml' 
-local armr = piece 'armr' 
-local forearml = piece 'forearml' 
-local forearmr = piece 'forearmr' 
-local handl = piece 'handl' 
-local handr = piece 'handr' 
-local receiver = piece 'receiver' 
-local barrel = piece 'barrel' 
-local flare = piece 'flare' 
-local gunemit = piece 'gunemit' 
-local scope = piece 'scope' 
-local stock = piece 'stock' 
-local thighl = piece 'thighl' 
-local thighr = piece 'thighr' 
-local shinl = piece 'shinl' 
-local shinr = piece 'shinr' 
-local anklel = piece 'anklel' 
-local ankler = piece 'ankler' 
-local footl = piece 'footl' 
-local footr = piece 'footr' 
-local backpack = piece 'backpack' 
+local camera = piece 'camera'
+local shoulderl = piece 'shoulderl'
+local shoulderr = piece 'shoulderr'
+local arml = piece 'arml'
+local armr = piece 'armr'
+local forearml = piece 'forearml'
+local forearmr = piece 'forearmr'
+local handl = piece 'handl'
+local handr = piece 'handr'
+local receiver = piece 'receiver'
+local barrel = piece 'barrel'
+local flare = piece 'flare'
+local gunemit = piece 'gunemit'
+local scope = piece 'scope'
+local stock = piece 'stock'
+local thighl = piece 'thighl'
+local thighr = piece 'thighr'
+local shinl = piece 'shinl'
+local shinr = piece 'shinr'
+local anklel = piece 'anklel'
+local ankler = piece 'ankler'
+local footl = piece 'footl'
+local footr = piece 'footr'
+local backpack = piece 'backpack'
 
 local shoulder = {shoulderl, shoulderr}
 local thigh = {thighl, thighr}
@@ -216,7 +216,7 @@ function script.QueryWeapon(num)
 end
 -----------------------------------------------------------------------
 --gun functions
------------------------------------------------------------------------	
+-----------------------------------------------------------------------
 
 local function PackGun()
 	Signal(SIG_IDLE)
@@ -335,7 +335,7 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
 		--[[
-		Turn(shinr, x_axis, 0)	
+		Turn(shinr, x_axis, 0)
 		Turn(thighr, x_axis, 0)
 		Turn(thighl, x_axis, 0)
 		Turn(shinl, x_axis, 0)
@@ -348,11 +348,11 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(hips, x_axis, math.rad(-90), math.rad(50))
 		Turn(thighr, x_axis, math.rad(-45), math.rad(50))
 		Turn(thighl, x_axis, math.rad(-45), math.rad(50))
-		Turn(shinr, x_axis, math.rad(135), math.rad(50))	
+		Turn(shinr, x_axis, math.rad(135), math.rad(50))
 		Turn(shinl, x_axis, math.rad(135), math.rad(50))
-		Move(hips, y_axis, -3, 2000) 
+		Move(hips, y_axis, -3, 2000)
 
-		WaitForMove(hips, y_axis)		
+		WaitForMove(hips, y_axis)
 		Sleep(2000)]]
 
 		Explode(shoulderl, SFX.NONE)

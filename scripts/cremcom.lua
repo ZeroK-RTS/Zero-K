@@ -6,18 +6,18 @@ local spSetUnitShieldState = Spring.SetUnitShieldState
 -- pieces
 --------------------------------------------------------------------------------
 local base = piece 'base'
-local torso = piece 'torso' 
-local uparmR = piece 'upperarmr' 
-local uparmL = piece 'upperarml' 
-local flareR = piece 'flarer' 
-local snout = piece 'snout' 
-local pelvis = piece 'pelvis' 
-local flareL = piece 'flarel' 
-local thighL = piece 'thighl' 
-local thighR = piece 'thighr' 
-local forearmL = piece 'forearml' 
-local forearmR = piece 'forearmr' 
-local shinR = piece 'shinr' 
+local torso = piece 'torso'
+local uparmR = piece 'upperarmr'
+local uparmL = piece 'upperarml'
+local flareR = piece 'flarer'
+local snout = piece 'snout'
+local pelvis = piece 'pelvis'
+local flareL = piece 'flarel'
+local thighL = piece 'thighl'
+local thighR = piece 'thighr'
+local forearmL = piece 'forearml'
+local forearmR = piece 'forearmr'
+local shinR = piece 'shinr'
 local shinL = piece 'shinl'
 local shieldEmit = piece 'shieldemit'
 
@@ -154,9 +154,9 @@ local function Walk()
 			Turn(uparmL, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
 			Turn(uparmR, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 			Turn(forearmL, x_axis, FOREARM_FRONT_ANGLE, FOREARM_FRONT_SPEED)
-			Turn(forearmR, x_axis, FOREARM_BACK_ANGLE, FOREARM_BACK_SPEED)			
+			Turn(forearmR, x_axis, FOREARM_BACK_ANGLE, FOREARM_BACK_SPEED)
 		end
-		WaitForTurn(thighR, x_axis)		
+		WaitForTurn(thighR, x_axis)
 		Sleep(0)
 	end
 end
@@ -183,17 +183,17 @@ function script.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
-function script.StartMoving() 
+function script.StartMoving()
 	isMoving = true
 	StartThread(Walk)
 end
 
-function script.StopMoving() 
+function script.StopMoving()
 	isMoving = false
 	StartThread(RestorePose)
 end
 
-function beginJump() 
+function beginJump()
 	script.StopMoving()
 	GG.PokeDecloakUnit(unitID, 50)
 	inJumpMode = true
@@ -209,7 +209,7 @@ end
 function halfJump()
 end
 
-function endJump() 
+function endJump()
 	script.StopMoving()
 	inJumpMode = false
 	EmitSfx(base, 1029)
@@ -220,8 +220,8 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	if num == 3 then 
-		return flareR 
+	if num == 3 then
+		return flareR
 	elseif num == 2 or num == 4 then
 		return shieldEmit
 	end
@@ -291,7 +291,7 @@ function script.Shot(num)
 	end
 	if flamers[num] then
 		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
-	end	
+	end
 end
 
 function script.FireWeapon(num)

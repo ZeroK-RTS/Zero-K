@@ -358,7 +358,7 @@ local function GetButtonYPos(index)
 	return (index - 1)*SAVEGAME_BUTTON_HEIGHT + 4
 end
 
-local function UpdateSaveButtonPositions(container) 
+local function UpdateSaveButtonPositions(container)
 	for i = 1, #container.children do
 		local child = container.children[i]
 		child:SetPos(child.x, GetButtonYPos(#container.children - i + 1))	-- assume reverse order, to match the ordering of the original save buttons
@@ -400,7 +400,7 @@ local function AddSaveEntryButton(parent, saveFile, position, saveMode)
 	--	width = "100%",
 	--	orientation = "vertical",
 	--	resizeItems = false,
-	--	autoArrangeV = false,	
+	--	autoArrangeV = false,
 	--}
 	local titleLabel = Label:New {
 		parent = button,
@@ -428,7 +428,7 @@ local function AddSaveEntryButton(parent, saveFile, position, saveMode)
 		caption = WG.Translate("interface", "delete") or "Delete",
 		--backgroundColor = {0.4,0.4,0.4,1},
 		OnClick = { function(self)
-				WG.crude.MakeExitConfirmWindow("Are you sure you want to delete this save?", function() 
+				WG.crude.MakeExitConfirmWindow("Are you sure you want to delete this save?", function()
 					DeleteSave(saveFile.filename)
 					holder:Dispose()
 					UpdateSaveButtonPositions(parent)

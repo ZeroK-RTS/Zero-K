@@ -20,7 +20,7 @@ unitDef = {
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[45 50 45]],
-  collisionVolumeType    = [[CylY]],  
+  collisionVolumeType    = [[CylY]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -85,7 +85,7 @@ unitDef = {
       def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    }, 
+    },
   
     [5] = {
       def                = [[GAUSS]],

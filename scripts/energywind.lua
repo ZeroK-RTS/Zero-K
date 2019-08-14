@@ -32,14 +32,14 @@ function BobTidal()
 end
 
 local oldWindStrength, oldWindHeading
-function SpinWind() 
-	while true do 
+function SpinWind()
+	while true do
 		if select(5, Spring.GetUnitHealth(unitID)) < 1 then
 			oldWindStrength = nil
 			StopSpin(fan, z_axis)
 			Sleep(BUILD_PERIOD)
 		else
-			if GG.WindStrength and ((oldWindStrength ~= GG.WindStrength) or (oldWindHeading ~= GG.WindHeading)) then 
+			if GG.WindStrength and ((oldWindStrength ~= GG.WindStrength) or (oldWindHeading ~= GG.WindHeading)) then
 				oldWindStrength, oldWindHeading = GG.WindStrength, GG.WindHeading
 				local st = baseWind + (GG.WindStrength or 0)*rangeWind
 				Spin(fan, z_axis, -st*(0.94 + 0.08*math.random()))

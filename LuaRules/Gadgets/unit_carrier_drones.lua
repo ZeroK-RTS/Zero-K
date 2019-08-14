@@ -19,7 +19,7 @@ function gadget:GetInfo()
 end
 --Version 1.003
 --Changelog:
---24/6/2014 added carrier building drone on emit point. 
+--24/6/2014 added carrier building drone on emit point.
 
 --around 1/1/2017: added hold fire functionality, recall drones button, circular drone leash, drones pay attention to set target
 --------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ local function Drones_InitializeDynamicCarrier(unitID)
 	carrierList[unitID] = InitCarrier(unitID, carrierData, Spring.GetUnitTeam(unitID), maxDronesOverride)
 end
 
--- communicates to unitscript, copied from unit_float_toggle; should be extracted to utility 
+-- communicates to unitscript, copied from unit_float_toggle; should be extracted to utility
 -- preferably that before i PR this
 local function callScript(unitID, funcName, args)
 	local func = Spring.UnitScript.GetScriptEnv(unitID)[funcName]
@@ -233,7 +233,7 @@ function AddUnitToEmptyPad(carrierID, droneType)
 				SitOnPad(unitIDAdded, carrierID, pieceNum, offsets)
 				carrierData.occupiedPieces[pieceNum] = true
 				if carrierData.droneSets[droneType].config.colvolTweaked then --can be used to move collision volume away from carrier to avoid collision
-					Spring.SetUnitMidAndAimPos(unitIDAdded, offsets.colvolMidX, offsets.colvolMidY, offsets.colvolMidZ, offsets.aimX, offsets.aimY, offsets.aimZ, true) 
+					Spring.SetUnitMidAndAimPos(unitIDAdded, offsets.colvolMidX, offsets.colvolMidY, offsets.colvolMidZ, offsets.aimX, offsets.aimY, offsets.aimZ, true)
 					--offset whole colvol & aim point (red dot) above the carrier (use /debugcolvol to check)
 				end
 				return true
@@ -267,12 +267,12 @@ local function StartScript(fn)
 	coroutines[coroutineCount] = co
 end
 
-function UpdateCoroutines() 
+function UpdateCoroutines()
 	coroutineCount = #coroutines
 	local i = 1
 	while (i <= coroutineCount) do
-		local co = coroutines[i] 
-		if (coroutine.status(co) ~= "dead") then 
+		local co = coroutines[i]
+		if (coroutine.status(co) ~= "dead") then
 			assert(coroutine.resume(co))
 			i = i + 1
 		else
@@ -280,7 +280,7 @@ function UpdateCoroutines()
 			coroutines[coroutineCount] = nil
 			coroutineCount = coroutineCount - 1
 		end
-	end 
+	end
 end
 
 local function GetPitchYawRoll(front, top) --This allow compatibility with Spring 91
@@ -296,13 +296,13 @@ local function GetPitchYawRoll(front, top) --This allow compatibility with Sprin
 	
 	--2) Processing TOP's vector to get Roll
 	x, y, z = top[1], top[2], top[3]
-	--rotate coordinate around Y-axis until Yaw value is 0 (a reset) 
+	--rotate coordinate around Y-axis until Yaw value is 0 (a reset)
 	local newX = x* math.cos (-yaw) + z*  math.sin (-yaw)
 	local newY = y
 	local newZ = z* math.cos (-yaw) - x* math.sin (-yaw)
 	x, y, z = newX, newY, newZ
-	--rotate coordinate around X-axis until Pitch value is 0 (a reset) 
-	newX = x 
+	--rotate coordinate around X-axis until Pitch value is 0 (a reset)
+	newX = x
 	newY = y* math.cos (-pitch) + z* math.sin (-pitch)
 	newZ = z* math.cos (-pitch) - y* math.sin (-pitch)
 	x, y, z = newX, newY, newZ
@@ -445,7 +445,7 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 			mcSetPosition(unitID, px + vx + offx, py + vy + offy, pz + vz + offz)
 			mcSetRotation(unitID, pitch, -yaw, roll) --Spring conveniently rotate Y-axis first, X-axis 2nd, and Z-axis 3rd which allow Yaw, Pitch & Roll control.
 			
-			local buildRate = GetBuildRate(carrierID) 
+			local buildRate = GetBuildRate(carrierID)
 			if perSecondCost and oldBuildRate ~= buildRate then
 				oldBuildRate = buildRate
 				GG.StartMiscPriorityResourcing(carrierID, perSecondCost*buildRate, false, miscPriorityKey)
@@ -457,8 +457,8 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 			if (buildRate > 0) and ((not perSecondCost) or (GG.AllowMiscPriorityBuildStep(carrierID, Spring.GetUnitTeam(carrierID), false, resTable) and Spring.UseUnitResource(carrierID, resTable))) then
 				health, _, _, _, buildProgress = Spring.GetUnitHealth(unitID)
 				buildProgress = buildProgress + (build_step*buildRate) --progress
-				Spring.SetUnitHealth(unitID, {health = health + (build_step_health*buildRate), build = buildProgress}) 
-				if buildProgress >= 1 then 
+				Spring.SetUnitHealth(unitID, {health = health + (build_step_health*buildRate), build = buildProgress})
+				if buildProgress >= 1 then
 					callScript(carrierID, "Carrier_droneCompleted", padPieceID)
 					break
 				end
@@ -475,7 +475,7 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 		Spring.SetUnitVelocity(unitID, 0, 0, 0)
 		Spring.SetUnitBlocking(unitID, false, true, true, true, false, true, false)
 		mcDisable(unitID)
-		GG.UpdateUnitAttributes(unitID) --update pending attribute changes in unit_attributes.lua if available 
+		GG.UpdateUnitAttributes(unitID) --update pending attribute changes in unit_attributes.lua if available
 		
 		if droneInfo.config.colvolTweaked then
 			Spring.SetUnitMidAndAimPos(unitID, 0, 0, 0, 0, 0, 0, true)
@@ -608,10 +608,10 @@ local function UpdateCarrierTarget(carrierID, frame)
 			if attackOrder or setTargetOrder then
 				-- drones fire at will if carrier has an attack/target order
 				-- a drone bomber probably should not do this
-				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { 2 }, 0) 
+				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { 2 }, 0)
 			else
 				-- update firestate based on that of carrier
-				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { firestate }, 0) 
+				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { firestate }, 0)
 			end
 			
 			if recallDrones then
@@ -791,7 +791,7 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam)
 		for i = 1, #carrierList[unitID].droneSets do
 			local set = carrierList[unitID].droneSets[i]
 			for droneID, _ in pairs(set.drones) do
-				-- Only transfer drones which are allied with the carrier. This is to 
+				-- Only transfer drones which are allied with the carrier. This is to
 				-- make carriers and capture interact in a robust, simple way. A captured
 				-- drone will take up a slot on the carrier and attack the carriers allies.
 				-- A captured carrier will need to have its drones killed or captured to

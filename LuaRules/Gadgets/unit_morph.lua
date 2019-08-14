@@ -152,7 +152,7 @@ local stopUpgradeCmdDesc = {
 	type    = CMDTYPE.ICON,
 	name    = "",
 	action  = 'upgradecommstop',
-	cursor  = 'Morph', 
+	cursor  = 'Morph',
 	tooltip	= 'Stop commander upgrade.',
 }
 
@@ -249,8 +249,8 @@ end
 
 local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	-- do not allow morph for unfinsihed units
-	if not isFinished(unitID) then 
-		return false 
+	if not isFinished(unitID) then
+		return false
 	end
 	
 	-- do not allow morph for units being transported which are not combat morphs
@@ -299,7 +299,7 @@ end
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
 	local morphData = morphUnits[unitID]
 	if not morphData then
-		return 
+		return
 	end
 	GG.StopMiscPriorityResourcing(unitID, 2)
 	morphData.teamID = newTeamID
@@ -431,9 +431,9 @@ local function FinishMorph(unitID, morphData)
 	end
 
 	--// copy lineage
-	--local lineage = Spring.GetUnitLineage(unitID) 
+	--local lineage = Spring.GetUnitLineage(unitID)
 	--// copy facplop
-	local facplop = Spring.GetUnitRulesParam(unitID, "facplop")	
+	local facplop = Spring.GetUnitRulesParam(unitID, "facplop")
 	--//copy command queue
 	local cmds = Spring.GetCommandQueue(unitID, -1)
 
@@ -448,7 +448,7 @@ local function FinishMorph(unitID, morphData)
 	local shieldNum = Spring.GetUnitRulesParam(unitID, "comm_shield_num") or -1
 	local oldShieldState, oldShieldCharge = Spring.GetUnitShieldState(unitID, shieldNum)
 	--//copy experience
-	local newXp = Spring.GetUnitExperience(unitID) 
+	local newXp = Spring.GetUnitExperience(unitID)
 	local oldBuildTime = Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	--//copy unit speed
 	local velX,velY,velZ = Spring.GetUnitVelocity(unitID) --remember speed
@@ -497,14 +497,14 @@ local function FinishMorph(unitID, morphData)
 	--// transfer facplop
 	if facplop and (facplop == 1) then
 		Spring.SetUnitRulesParam(newUnit, "facplop", 1, {inlos = true})
-	end	
+	end
 	
 	--// transfer health
 	-- old health is declared far above
 	local _,newMaxHealth		 = Spring.GetUnitHealth(newUnit)
 	local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
-	if newHealth <= 1 then 
-		newHealth = 1 
+	if newHealth <= 1 then
+		newHealth = 1
 	end
 	
 	local newPara = 0
@@ -576,7 +576,7 @@ local function UpdateMorph(unitID, morphData)
 		end
 		transportUnitDefID = Spring.GetUnitDefID(transportID)
 		if not UnitDefs[transportUnitDefID].isFirePlatform then
-			return true 
+			return true
 		end
 	end
 	
@@ -624,7 +624,7 @@ end
 function gadget:Initialize()
 	--// get the morphDefs
 	morphDefs, MAX_MORPH = include("LuaRules/Configs/morph_defs.lua")
-	if (not morphDefs) then 
+	if (not morphDefs) then
 		gadgetHandler:RemoveGadget()
 		return
 	end
@@ -796,11 +796,11 @@ local function processUpgrade(unitID, unitDefID, teamID, cmdID, cmdParams)
 	morphToStart[unitID] = {targetUnitDefID, teamID, morphDef}
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return true -- morph command is dynamic so incoperating it is difficult
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	boolDef = {}
 	for udid,_ in pairs(morphDefs) do
 		boolDef[udid] = true
@@ -1001,12 +1001,12 @@ local function SelectSwap(cmd, oldID, newID)
 	if (Script.LuaUI('MorphFinished')) then
 		if useLuaUI then
 			local readTeam, spec, specFullView = nil,GetSpectatingState()
-			if specFullView then 
+			if specFullView then
 				readTeam = Script.ALL_ACCESS_TEAM
-			else 
+			else
 				readTeam = GetLocalTeamID()
 			end
-			CallAsTeam({['read'] = readTeam }, 
+			CallAsTeam({['read'] = readTeam },
 				function()
 					if (IsUnitVisible(oldID)) then
 						Script.LuaUI.MorphFinished(oldID,newID)
@@ -1022,12 +1022,12 @@ local function StartMorph(cmd, unitID, unitDefID, morphID)
 	if (Script.LuaUI('MorphStart')) then
 		if useLuaUI then
 			local readTeam, spec, specFullView = nil, GetSpectatingState()
-			if specFullView then 
+			if specFullView then
 				readTeam = Script.ALL_ACCESS_TEAM
-			else 
-				readTeam = GetLocalTeamID() 
+			else
+				readTeam = GetLocalTeamID()
 			end
-			CallAsTeam({['read'] = readTeam }, 
+			CallAsTeam({['read'] = readTeam },
 				function()
 					if (unitID)and(IsUnitVisible(unitID)) then
 						Script.LuaUI.MorphStart(unitID, (SYNCED.morphDefs[unitDefID] or {})[morphID] or SYNCED.extraUnitMorphDefs[unitID])
@@ -1043,12 +1043,12 @@ local function StopMorph(cmd, unitID)
 	if (Script.LuaUI('MorphStop')) then
 		if useLuaUI then
 			local readTeam, spec, specFullView = nil, GetSpectatingState()
-			if specFullView then 
+			if specFullView then
 				readTeam = Script.ALL_ACCESS_TEAM
-			else 
-				readTeam = GetLocalTeamID() 
+			else
+				readTeam = GetLocalTeamID()
 			end
-			CallAsTeam({['read'] = readTeam }, 
+			CallAsTeam({['read'] = readTeam },
 				function()
 					if (unitID)and(IsUnitVisible(unitID)) then
 						Script.LuaUI.MorphStop(unitID)
@@ -1090,12 +1090,12 @@ function gadget:Update()
 			if useLuaUI then
 				local morphTable = {}
 				local readTeam, spec, specFullView = nil,GetSpectatingState()
-				if specFullView then 
+				if specFullView then
 					readTeam = Script.ALL_ACCESS_TEAM
-				else 
-					readTeam = GetLocalTeamID() 
+				else
+					readTeam = GetLocalTeamID()
 				end
-				CallAsTeam({ ['read'] = readTeam }, 
+				CallAsTeam({ ['read'] = readTeam },
 					function()
 						for unitID, morphData in spairs(morphUnitsSynced) do
 							if (unitID and morphData)and(IsUnitVisible(unitID)) then
@@ -1133,7 +1133,7 @@ local alreadyInit = {}
 local function InitializeUnitShape(unitDefID,unitTeam)
 	local iTeam = alreadyInit[unitTeam]
 	if  iTeam and iTeam[unitDefID] then
-		return 
+		return
 	end
 
 	glPushMatrix()
@@ -1141,8 +1141,8 @@ local function InitializeUnitShape(unitDefID,unitTeam)
 	glUnitShape(unitDefID, unitTeam)
 	gl.ColorMask(true)
 	glPopMatrix()
-	if (alreadyInit[unitTeam] == nil) then 
-		alreadyInit[unitTeam] = {} 
+	if (alreadyInit[unitTeam] == nil) then
+		alreadyInit[unitTeam] = {}
 	end
 	alreadyInit[unitTeam][unitDefID] = true
 end
@@ -1235,12 +1235,12 @@ local function DrawWorldFunc()
 		readTeam = GetLocalTeamID()
 	end
 
-	CallAsTeam({['read'] = readTeam}, 
+	CallAsTeam({['read'] = readTeam},
 		function()
 			for unitID, morphData in spairs(morphUnits) do
 				if (unitID and morphData)and(IsUnitVisible(unitID)) then
 					if morphData.combatMorph then
-						DrawCombatMorphUnit(unitID, morphData,readTeam) 
+						DrawCombatMorphUnit(unitID, morphData,readTeam)
 					else
 						DrawMorphUnit(unitID, morphData,readTeam)
 					end

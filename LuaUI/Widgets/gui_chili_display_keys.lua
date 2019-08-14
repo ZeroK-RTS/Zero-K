@@ -90,9 +90,9 @@ local function InitializeDisplayLabelControl(name)
  		align  = "center",
 		autosize = false,
 		font   = {
-			size = 36, 
-			outline = true, 
-			outlineWidth = 2, 
+			size = 36,
+			outline = true,
+			outlineWidth = 2,
 			outlineWeight = 2,
 		},
 	}
@@ -189,9 +189,9 @@ local function InitializeMouseButtonControl(name)
  		align  = "center",
 		autosize = false,
 		font   = {
-			size = 36, 
-			outline = true, 
-			outlineWidth = 2, 
+			size = 36,
+			outline = true,
+			outlineWidth = 2,
 			outlineWeight = 2,
 		},
 	}
@@ -205,9 +205,9 @@ local function InitializeMouseButtonControl(name)
  		align  = "center",
 		autosize = false,
 		font   = {
-			size = 36, 
-			outline = true, 
-			outlineWidth = 2, 
+			size = 36,
+			outline = true,
+			outlineWidth = 2,
 			outlineWeight = 2,
 		},
 	}

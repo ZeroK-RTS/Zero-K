@@ -33,7 +33,7 @@ end
 -- one man ally?
 rogueAlly = {}
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD.SELFD] = true}
 end
 

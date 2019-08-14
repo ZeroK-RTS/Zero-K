@@ -85,7 +85,7 @@ end
 -- Debug
 
 local function ToggleWindAnimation(cmd, line, words, player)
-	if not Spring.IsCheatingEnabled() then 
+	if not Spring.IsCheatingEnabled() then
 		--return
 	end
 	GG.Wind_SpinDisabled = not GG.Wind_SpinDisabled
@@ -241,7 +241,7 @@ function gadget:Initialize()
 	Spring.SetGameRulesParam("WindSlope", energyPropPerAlt)
 	Spring.SetGameRulesParam("WindMinBound", MIN_BOUND)
 
-	--this is a function defined between 0 and 1, so we can adjust the gadget 
+	--this is a function defined between 0 and 1, so we can adjust the gadget
 	-- effect between 0% (flat maps) and 100% (mountained maps)
 	--slope = minWindMult * 1/(1+math.exp(4 - groundExtreme/105))
 
@@ -256,7 +256,7 @@ function gadget:Initialize()
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, unitTeam)
-	if (windDefs[unitDefID]) then 
+	if (windDefs[unitDefID]) then
 		local data = windmills.Get(unitID)
 		if data then
 			data.teamID = unitTeam
@@ -266,7 +266,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, unitTeam)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if (windDefs[unitDefID]) then 
+	if (windDefs[unitDefID]) then
 		windmills.Remove(unitID)
 	end
 end

@@ -4,7 +4,7 @@ local commsCampaign = {
     chassis = "cremcom3",
     name = "Tutorial Commander",
     modules = { "commweapon_beamlaser", "module_autorepair", "module_autorepair"},
-  },  
+  },
 
   comm_campaign_ada = {
     chassis = "cremcom2",
@@ -53,7 +53,7 @@ local commsCampaign = {
 
     --modules = { "commweapon_shotgun", "module_heavy_armor", "weaponmod_autoflechette", "module_adv_targeting", "module_autorepair"},
     --decorations = { "skin_battle_tiger" },
-  },  
+  },
     
   comm_campaign_praetorian = {
     chassis = "benzcom2",
@@ -62,7 +62,7 @@ local commsCampaign = {
   },
 }
   
-local comms = {    
+local comms = {
   -- Not Hax
   comm_riot_cai = {
     chassis = "corcom1",
@@ -94,43 +94,43 @@ local comms = {
     chassis = "armcom1",
     name = "Peashooter Commander",
     modules = { "commweapon_peashooter"},
-  }, 
+  },
   comm_strike_hmg = {
     chassis = "armcom1",
     name = "Heavy Machine Gun Commander",
     modules = { "commweapon_heavymachinegun"},
-  }, 
+  },
   comm_strike_lpb = {
     chassis = "armcom1",
     name = "Light Particle Beam Commander",
     modules = { "commweapon_lparticlebeam"},
-  }, 
+  },
   comm_battle_pea = {
     chassis = "corcom1",
     name = "Peashooter Commander",
     modules = { "commweapon_peashooter"},
-  }, 
+  },
   comm_support_pea = {
     chassis = "commsupport1",
     name = "Peashooter Commander",
     modules = { "commweapon_peashooter"},
-  }, 
+  },
   comm_recon_pea = {
     chassis = "commrecon1",
     name = "Peashooter Commander",
     modules = { "commweapon_peashooter"},
   },
   
-  comm_guardian = { 
-    chassis = "armcom2", 
+  comm_guardian = {
+    chassis = "armcom2",
     name = "Star Guardian",
     modules = { "commweapon_beamlaser", "module_ablative_armor", "module_high_power_servos", "weaponmod_high_frequency_beam"},
   },
-  comm_thunder = { 
-    chassis = "armcom2", 
+  comm_thunder = {
+    chassis = "armcom2",
     name = "Thunder Wizard",
     modules = { "commweapon_lightninggun", "module_ablative_armor", "module_high_power_servos", "weaponmod_stun_booster", "module_energy_cell"},
-  },  
+  },
   comm_riot = {
     chassis = "corcom2",
     name = "Crowd Controller",
@@ -140,7 +140,7 @@ local comms = {
     chassis = "corcom2",
     name = "The Fury",
     modules = { "commweapon_flamethrower", "module_dmg_booster", "module_ablative_armor", "module_ablative_armor", "module_high_power_servos"},
-  },  
+  },
   comm_recon = {
     chassis = "commrecon2",
     name = "Ghost Recon",
@@ -150,7 +150,7 @@ local comms = {
     chassis = "commrecon2",
     name = "Space Marine",
     modules = { "commweapon_heavymachinegun", "module_heavy_armor", "module_high_power_servos", "module_dmg_booster", "module_adv_targeting"},
-  },  
+  },
   comm_marksman = {
     chassis = "commsupport2",
     name = "The Marksman",
@@ -170,7 +170,7 @@ local comms = {
     chassis = "benzcom2",
     name = "Hammer Slammer",
     modules = { "commweapon_assaultcannon", "module_dmg_booster", "conversion_partillery"},
-  },  
+  },
 }
 
 for name, data in pairs(commsCampaign) do
@@ -218,8 +218,8 @@ end
 --------------------------------------------------------------------------------------
 -- Must match dynamic_comm_defs.lua around line 800 (top of the chassis defs)
 --------------------------------------------------------------------------------------
-MakeCommanderChassisClones("dynrecon", 
-	{{0}, {1}, {1}, {1}, {1}}, 
+MakeCommanderChassisClones("dynrecon",
+	{{0}, {1}, {1}, {1}, {1}},
 	{"module_personal_shield"}
 )
 
@@ -228,18 +228,18 @@ MakeCommanderChassisClones("dynsupport",
 	{"module_personal_shield", "module_areashield", "module_resurrect"}
 )
 
-MakeCommanderChassisClones("dynassault", 
+MakeCommanderChassisClones("dynassault",
 	{{0, 0}, {1, 0}, {1, 1}, {1, 1}, {1, 1}},
 	{"module_personal_shield", "module_areashield"}
 )
 
-MakeCommanderChassisClones("dynstrike", 
+MakeCommanderChassisClones("dynstrike",
 	{{0, 0}, {1, 0}, {1, 1}, {1, 1}, {1, 1}},
 	{"module_personal_shield", "module_areashield"}
 )
 
 -- All modules may be available at any level, depending on campaign layout.
-MakeCommanderChassisClones("dynknight", 
+MakeCommanderChassisClones("dynknight",
 	{{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}},
 	{"module_personal_shield", "module_areashield", "module_resurrect", "module_jumpjet"}
 )

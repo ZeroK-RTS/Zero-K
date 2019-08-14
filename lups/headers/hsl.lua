@@ -31,7 +31,7 @@ function mt:setRGB(r,g,b)
 	if (d==0) then
 		 self.H,self.S=0,0
 	else
-		if (self.L<0.5) then 
+		if (self.L<0.5) then
 			self.S = dm/(dp)
 		else
 			self.S = dm/(2 - dp)

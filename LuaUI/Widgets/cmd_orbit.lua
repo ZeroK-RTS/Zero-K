@@ -27,7 +27,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local function GiveFacingOrder(targetID, cx, cz, radius, options)
 	local mx, my = Spring.GetMouseState()
-	local _, pos = spTraceScreenRay(mx, my, true) 
+	local _, pos = spTraceScreenRay(mx, my, true)
 	if not pos then
 		return
 	end
@@ -65,9 +65,9 @@ function widget:CommandNotify(cmdID, params, options)
 	if (cmdID == CMD_AREA_GUARD) and (#params == 4) then
 		local cx, cy, cz = params[1], params[2], params[3]
 		local pressX, pressY = spWorldToScreenCoords(cx, cy, cz)
-		local cType, targetID = spTraceScreenRay(pressX, pressY) 
+		local cType, targetID = spTraceScreenRay(pressX, pressY)
 		
-		if (cType == "unit") then 
+		if (cType == "unit") then
 			if options.alt and GiveFacingOrder(targetID, cx, cz, params[4], options) then
 				return true
 			end
@@ -76,7 +76,7 @@ function widget:CommandNotify(cmdID, params, options)
 			spGiveOrderToUnitArray(selUnits, CMD_ORBIT, {targetID, params[4], -1}, options)
 			options.shift = true
 			spGiveOrderToUnitArray(selUnits, CMD_ORBIT_DRAW, {targetID}, options)
-			return true 
+			return true
 		end
 	end
 end

@@ -49,7 +49,7 @@ function gadget:ScriptEndBurst(unitID, unitDefID, weaponNum)
 	end
 
 	local cmdID, cmdOpt, cmdTag, cmdParam1, cmdParam2, cmdParam3, cmdParam4 = spGetUnitCurrentCommand(unitID)
-	-- Some methods of issuing attack commands with Ctrl held do not have Ctrl show up in the opts. 
+	-- Some methods of issuing attack commands with Ctrl held do not have Ctrl show up in the opts.
 	-- In these cases widgets add Meta to opts.
 	local singleTarget = (cmdID == CMD_ATTACK and (cmdParam4 or 0) == 0 and (Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_CTRL) or Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_META)))
 	if not singleTarget then

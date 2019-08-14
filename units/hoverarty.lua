@@ -14,7 +14,7 @@ unitDef = {
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 -2 0]],
   collisionVolumeScales  = [[48 58 48]],
-  collisionVolumeType    = [[cylY]], 
+  collisionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
 
   customParams        = {

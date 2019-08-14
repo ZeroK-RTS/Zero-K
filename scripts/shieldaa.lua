@@ -1,4 +1,4 @@
--- This is very much wip. There are lots of parts broken, so be warned. 
+-- This is very much wip. There are lots of parts broken, so be warned.
 --by Chris Mackey
 
 include "constants.lua"
@@ -80,7 +80,7 @@ local function Walk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 	
-	while (true) do -- needs major fixing. 
+	while (true) do -- needs major fixing.
 		Move(base, y_axis, 3.6, 12)
 		
 		Turn(l_thigh, x_axis, 0.6, 4)

@@ -257,12 +257,12 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 		local myAngle = Angle(x - ux, z - uz)
 		local circuitTime = circumference/(mySpeed*UPDATE_MULT)
 		
-		-- Factor of 3 acts as leeway because if a unit gets stuck nothing is 
+		-- Factor of 3 acts as leeway because if a unit gets stuck nothing is
 		-- going to move it.
 		angle = myAngle + 3*circleDirection[targetID]*CIRC_MULT/circuitTime
 		perpSize = circleDirection[targetID]*50
 		
-	else 
+	else
 		-- Fixed spacing and matched speed along circle mode
 		-- Group with units of nearby radius
 		local radGroup = math.ceil(radius/RADIUS_BAND_SIZE)
@@ -349,11 +349,11 @@ function gadget:UnitDestroyed(unitID, unitDefID, team)
 	end
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_AREA_GUARD] = true, [CMD_ORBIT] = true, [CMD_ORBIT_DRAW] = true}
 end
 	
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
@@ -371,7 +371,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 	if cmdID == CMD_ORBIT then
 		-- return true from DoCircleGuard to remove the command.
 		-- return false from DoCircleGuard to keep the command in the queue.
-		return true, DoCircleGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions)	
+		return true, DoCircleGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions)
 	end
 	return false -- command not used
 end

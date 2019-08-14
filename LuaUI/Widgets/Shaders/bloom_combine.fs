@@ -41,7 +41,7 @@ void main(void) {
 	// tone mapping and color correction
 	hdr.rgb = toneMapReinhard(hdr.rgb);
 	
-	//Experimental exponential exposure tone mapping. It produces much smoother lighting 
+	//Experimental exponential exposure tone mapping. It produces much smoother lighting
 	// but causes HSV shifting in the resulting color which is difficult to correct and impossible to correct completely.
 	//hdr.rgb = toneMapEXP(hdr.rgb);
 	//hdr.rgb = levelsControl(hdr.rgb, 0.15, 0.85);

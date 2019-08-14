@@ -2,13 +2,13 @@
 
 include "constants.lua"
 
-local base, rockbase, body, turret, firepoint, 
-	rwheel1, rwheel2, 
-	lwheel1, lwheel2, 
-	gs1r, gs2r, gs1l, gs2l = 
-piece('base', 'rockbase', 'body', 'turret', 'firepoint', 
-	'rwheel1', 'rwheel2', 
-	'lwheel1', 'lwheel2', 
+local base, rockbase, body, turret, firepoint,
+	rwheel1, rwheel2,
+	lwheel1, lwheel2,
+	gs1r, gs2r, gs1l, gs2l =
+piece('base', 'rockbase', 'body', 'turret', 'firepoint',
+	'rwheel1', 'rwheel2',
+	'lwheel1', 'lwheel2',
 	'gs1r', 'gs2r', 'gs1l', 'gs2l')
 
 local SIG_AIM = 1
@@ -75,13 +75,13 @@ function StartMoving()
 end
 
 
-local function AnimControl() 
+local function AnimControl()
 	Signal(SIG_ANIM)
 	SetSignalMask(SIG_ANIM)
 	
 	local lastHeading, currHeading, diffHeading, turnAngle
 	lastHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
-	while true do 
+	while true do
 	
 		--pivot
 		currHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
@@ -113,7 +113,7 @@ function Suspension()
 	local ya, yv, yp = 0, 0, 0
 	local speed = 0
 	
-	while true do 
+	while true do
 		speed = select(4,spGetUnitVelocity(unitID))
 		wheelTurnSpeed = speed*WHEEL_TURN_MULT
 	
@@ -143,7 +143,7 @@ function Suspension()
 				s1l = GetWheelHeight(gs1l)
 				s2l = GetWheelHeight(gs2l)
 				
-				--xtilta = (s3r + s3l - s1l - s1r)/6000	
+				--xtilta = (s3r + s3l - s1l - s1r)/6000
 				--xtiltv = xtiltv*0.99 + xtilta
 				--xtilt = xtilt*0.98 + xtiltv
 
@@ -172,7 +172,7 @@ function Suspension()
 			end
 		end
 		Sleep(ANIM_PERIOD)
-	end 
+	end
 end
 
 function script.Create()

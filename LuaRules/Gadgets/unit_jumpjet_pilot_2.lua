@@ -31,18 +31,18 @@ local noRecursion = false
 
 gridSize = tonumber(UnitDefNames["chicken_leaper"].customParams.jump_range)
 
-function Dist(x,y,z, x2, y2, z2) 
+function Dist(x,y,z, x2, y2, z2)
 	local xd = x2-x
 	local yd = y2-y
 	local zd = z2-z
 	return math.sqrt(xd*xd + yd*yd + zd*zd)
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return true
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return {[leaperDefID] = true}
 end
 

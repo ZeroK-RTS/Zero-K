@@ -1,19 +1,19 @@
 include 'constants.lua'
 
-local base = piece 'base' 
-local pelvis = piece 'pelvis' 
-local torso = piece 'torso' 
-local emit = piece 'emit' 
-local fire = piece 'fire' 
-local Lleg = piece 'lleg' 
-local Rleg = piece 'rleg' 
-local lowerLleg = piece 'lowerlleg' 
-local lowerRleg = piece 'lowerrleg' 
-local Lfoot = piece 'lfoot' 
+local base = piece 'base'
+local pelvis = piece 'pelvis'
+local torso = piece 'torso'
+local emit = piece 'emit'
+local fire = piece 'fire'
+local Lleg = piece 'lleg'
+local Rleg = piece 'rleg'
+local lowerLleg = piece 'lowerlleg'
+local lowerRleg = piece 'lowerrleg'
+local Lfoot = piece 'lfoot'
 local Rfoot = piece 'rfoot'
 
-local l_gun = piece 'l_gun' 
-local r_gun = piece 'r_gun' 
+local l_gun = piece 'l_gun'
+local r_gun = piece 'r_gun'
 
 local smokePiece = {torso}
 
@@ -167,12 +167,12 @@ end
 function FireAnim()
 	
 	local mspeed = 4
-	Move (l_gun, x_axis, 2, mspeed*3)	
+	Move (l_gun, x_axis, 2, mspeed*3)
 	Move (r_gun, x_axis, -2, mspeed*3)
 	WaitForMove(l_gun, x_axis)
 	WaitForMove(r_gun, x_axis)
 	Sleep(1)
-	Move (l_gun, x_axis, 0, mspeed)	
+	Move (l_gun, x_axis, 0, mspeed)
 	Move (r_gun, x_axis, 0, mspeed)
 	Sleep(1)
 end

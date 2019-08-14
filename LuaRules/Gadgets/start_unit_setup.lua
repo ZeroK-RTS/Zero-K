@@ -125,14 +125,14 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
 		end
 	end
 
-	function GG.SetStartLocation() 
+	function GG.SetStartLocation()
 	end
 
 	function gadget:GameFrame(n)
 		CheckOrderRemoval()
 	end
 	
-	function GG.GiveFacplop(unitID) -- deprecated, use rulesparam directly 
+	function GG.GiveFacplop(unitID) -- deprecated, use rulesparam directly
 		Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
 	end
 
@@ -226,11 +226,11 @@ local function GetStartUnit(teamID, playerID, isAI)
 		return UnitDefNames[Spring.GetTeamRulesParam(teamID, "start_unit") or "dyntrainer_assault_base"].id
 	end
 
-	if (teamID and teamSides[teamID]) then 
+	if (teamID and teamSides[teamID]) then
 		startUnit = DEFAULT_UNIT
 	end
 
-	if (playerID and playerSides[playerID]) then 
+	if (playerID and playerSides[playerID]) then
 		startUnit = DEFAULT_UNIT
 	end
 
@@ -390,7 +390,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 			commSpawnedTeam[teamID] = true
 			if playerID then
 				Spring.SetGameRulesParam("commSpawnedPlayer"..playerID, 1, {allied = true})
-				commSpawnedPlayer[playerID] = true 
+				commSpawnedPlayer[playerID] = true
 			end
 			waitingForComm[teamID] = nil
 		end
@@ -409,7 +409,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 			GG.Overdrive.AddInnateIncome(allyTeamID, INNATE_INC_METAL, INNATE_INC_ENERGY)
 		end
 
-		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") and 
+		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") and
 			((not campaignBattleID) or GG.GalaxyCampaignHandler.HasFactoryPlop(teamID)) then
 			Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
 		end
@@ -428,8 +428,8 @@ end
 
 local function StartUnitPicked(playerID, name)
 	local _,_,spec,teamID = spGetPlayerInfo(playerID, false)
-	if spec then 
-		return 
+	if spec then
+		return
 	end
 	teamSides[teamID] = name
 	local startUnit = GetStartUnit(teamID, playerID)
@@ -479,8 +479,8 @@ local function workAroundSpecsInTeamZero(playerlist, team)
 		-- count specs
 		for i=1,#playerlist do
 			local _,_,spec = spGetPlayerInfo(playerlist[i], false)
-			if spec then 
-				specs = specs + 1 
+			if spec then
+				specs = specs + 1
 			end
 			end
 		if players == specs then
@@ -593,7 +593,7 @@ end
 function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
 	-- perhaps this should be a global relay mode somewhere instead
 	local command = "ai_commander:";
-	if dataStr:find(command,1,true) then	
+	if dataStr:find(command,1,true) then
 		local name = dataStr:sub(command:len()+1);
 		CallAsTeam(aiTeam, function()
 			Spring.SendLuaRulesMsg(command..aiTeam..":"..name);
@@ -625,7 +625,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		teamID = tonumber(teamID);
 		
 		local _,_,_,isAI = Spring.GetTeamInfo(teamID, false)
-		if(isAI) then -- this is actually an AI 
+		if(isAI) then -- this is actually an AI
 			local aiid, ainame, aihost = Spring.GetAIInfo(teamID)
 			if (aihost == playerID) then -- it's actually controlled by the local host
 				local unitDef = UnitDefNames[name];

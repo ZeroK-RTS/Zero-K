@@ -101,7 +101,7 @@ function CalculateBallisticConstant(deltaV,myGravity,heightDiff,start, finish)
 		maxRange=xDist1 --maximum range
 		t=t1 --flight time
 	else
-		maxRange=xDist2 
+		maxRange=xDist2
 		t=t2
 	end
 	--
@@ -135,30 +135,30 @@ function DrawArc(unitID, start, finish, range, dist, deltaV, myGravity)
 	--calculate correct trajectory
 	local correctAngle= cachedResult[1] or 0
 	local yVelocity = cachedResult[2] or 0
-	local horizontalSpeed = cachedResult[3] or 0	
+	local horizontalSpeed = cachedResult[3] or 0
 	if calculateNow then --let GameFrame() control when to calculate this rather than letting it to DrawWorld()
 		local goodValue = {deviation= 999}
 		local searchPattern = {startAngle = -1.571, endAngle = 0.707, stepAngle = 0.005}
-		if highTrajectory == 1 then 
+		if highTrajectory == 1 then
 			searchPattern= {startAngle = 0.707, endAngle = 1.57, stepAngle = 0.005}
 		end
 		for i= searchPattern.startAngle ,searchPattern.endAngle, searchPattern.stepAngle do
 			local angle  = i
 			local xVel = math.cos(angle)*deltaV
 			local yVel = math.sin(angle)*deltaV
-			local yDist = start[2] - spGetGroundHeight(finish[1],finish[3]) 
+			local yDist = start[2] - spGetGroundHeight(finish[1],finish[3])
 			local a = myGravity
 			local t1 = nil
 			local t2 = nil
 			-- yDist = yVel*t - a*t*t/2
-			-- 0 = -yDist + (yVel)*t - (a/2)*t*t 
+			-- 0 = -yDist + (yVel)*t - (a/2)*t*t
 			local discriminant =(yVel^2 - 4*(-a/2)*(yDist))^0.5
 			local denominator = 2*(-a/2)
 			t1 = (-yVel + discriminant)/denominator
 			t2 = (-yVel - discriminant)/denominator
 			local xDist1 = xVel*t1
 			local xDist2 = xVel*t2
-			if math.abs(xDist1 - dist) <= goodValue.deviation and t1>=0 then 
+			if math.abs(xDist1 - dist) <= goodValue.deviation and t1>=0 then
 				goodValue[2] = angle
 				goodValue[3] = xVel
 				goodValue[4] = yVel
@@ -169,8 +169,8 @@ function DrawArc(unitID, start, finish, range, dist, deltaV, myGravity)
 				--Formula to find root is: t = (-b +- (b*b - 4*(a)*(c))^0.5)/(2*a) ..... a & b & c is: 0= c + b*t - a*t*t
 				--but when it have only 1 solution (which only happen at the top-most of the arch/trajectory, the discriminant become 0, simplifying the equation to: t = -b /(2*a)
 				local flightTimeApex = -yVel/(2*(-a/2)) --time to apex^
-				apexHeight = yVel*flightTimeApex - a*flightTimeApex*flightTimeApex/2 --from: yDist = yVel*t - a*t*t/2 
-			elseif math.abs(xDist2 - dist) <= goodValue.deviation and t2>=0 then 
+				apexHeight = yVel*flightTimeApex - a*flightTimeApex*flightTimeApex/2 --from: yDist = yVel*t - a*t*t/2
+			elseif math.abs(xDist2 - dist) <= goodValue.deviation and t2>=0 then
 				goodValue[2] = angle
 				goodValue[3] = xVel
 				goodValue[4] = yVel
@@ -179,7 +179,7 @@ function DrawArc(unitID, start, finish, range, dist, deltaV, myGravity)
 				currRange = xDist2
 				
 				local flightTimeApex = -yVel/(2*(-a/2)) --time to apex^
-				apexHeight = yVel*flightTimeApex - a*flightTimeApex*flightTimeApex/2 --from: yDist = yVel*t - a*t*t/2 
+				apexHeight = yVel*flightTimeApex - a*flightTimeApex*flightTimeApex/2 --from: yDist = yVel*t - a*t*t/2
 			end
 		end
 		correctAngle = goodValue[2] or 1.57
@@ -223,7 +223,7 @@ end
 
 local modType = 0
 function CalculateModdedMaxRange(start,finish,deltaV,myGravity,customRange)
-	local heightDiff = start[2] - finish[2] 
+	local heightDiff = start[2] - finish[2]
 	local heightModded = (heightDiff)*customHeightMod
 	if modType == 0 then --Ballistic
 		-- Spring.Echo(scaleDown)
@@ -248,7 +248,7 @@ function CalculateModdedMaxRange(start,finish,deltaV,myGravity,customRange)
 			return 0
 		end
 	end
-	return 0 
+	return 0
 end
 
 local lineProgress = 0
@@ -263,7 +263,7 @@ function DrawLoop(start, vector, color,dist, flightTime, yVelocity, horizontalSp
 	for i=0, currentProjectilePosition,simStep do
 
 		local x = start[1] + xVelocity*i
-		local y = start[2] + (yVelocity)*i - (myGravity/2)*i*i 
+		local y = start[2] + (yVelocity)*i - (myGravity/2)*i*i
 		local z = start[3] + zVelocity*i
 
 		glVertex(x, y, z)
@@ -300,7 +300,7 @@ function widget:DrawScreen()
 		gl.Text("\".\"&\"/\": show different CylinderTargeting", mx+40, my+k, 10,"")
 		k = k - 10
 		gl.Text("\"\\\": show different TargetingMod", mx+40, my+k, 10,"")
-		k = k - 10		
+		k = k - 10
 		gl.Text("customMaxRange: " .. string.format("%.3f", customMaxRange), mx+40, my+k, 10,"")
 		k = k - 10
 		gl.Text("customHeightMod: " .. string.format("%.3f", customHeightMod), mx+40, my+k, 10,"")
@@ -379,7 +379,7 @@ local targetingMod = string.byte( "\\" )
 local hideBallisticPlot = string.byte( "n" )
 
 function widget:KeyPress(key, mods, isRepeat)
-	if ( key == incGravity ) then 
+	if ( key == incGravity ) then
 		customMyGravity = customMyGravity + ((isRepeat and 1) or 0.1)
 		return true
 	elseif ( key == decGravity ) then
@@ -395,13 +395,13 @@ function widget:KeyPress(key, mods, isRepeat)
 		highTrajectory = highTrajectory + 1
 		highTrajectory = highTrajectory%2
 		return true
-	elseif ( key == incMaxRange ) then 
+	elseif ( key == incMaxRange ) then
 		customMaxRange = customMaxRange + ((isRepeat and 10) or 1)
 		return true
 	elseif ( key == decMaxRange ) then
 		customMaxRange = customMaxRange - ((isRepeat and 10) or 1)
 		return true
-	elseif ( key == incHeightMod ) then 
+	elseif ( key == incHeightMod ) then
 		customHeightMod = customHeightMod + ((isRepeat and 0.1) or 0.01)
 		return true
 	elseif ( key == decHeightMod ) then
@@ -419,7 +419,7 @@ function widget:KeyPress(key, mods, isRepeat)
 			customCylinderTargeting = 0
 		end
 		return true
-	elseif ( key == incCylinder ) then 
+	elseif ( key == incCylinder ) then
 		customCylinderTargeting = customCylinderTargeting + ((isRepeat and 0.1) or 0.01)
 		if customCylinderTargeting >= 0.01 then
 			modType = 3  --pure cylinder (no heightMod)

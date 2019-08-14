@@ -63,7 +63,7 @@ local function AddUnit(unitID, unitDefID, intMap, nukeMap)
 			return
 		end
 		
-		local def = intDefs[unitDefID] 
+		local def = intDefs[unitDefID]
 		local _,_,inBuild = Spring.GetUnitIsStunned(unitID)
 		
 		intMap[unitID] = {
@@ -101,7 +101,7 @@ local function RemoveUnit(unitID)
     allyInt[unitID] = nil
 	allyNuke[unitID] = nil
 	specUnit[unitID] = nil
-end  
+end
 
 local function ReaddUnits()
 	enemyInt = {}
@@ -223,7 +223,7 @@ local function SortUnitsIntoAllyEnemy(teamID, matchAllyTeam)
 			enemyInt[unitID] = nil
 			enemyNuke[unitID] = nil
 			AddUnit(unitID, unitDefID, allyInt, allyNuke)
-		else 
+		else
 			allyInt[unitID] = nil
 			allyNuke[unitID] = nil
 			AddUnit(unitID, unitDefID, enemyInt, enemyNuke)
@@ -286,7 +286,7 @@ local function DrawAntinukeOnMouse(cmdID)
 	-- Code for doing drawing based on placement position
 	
 	--local def = intDefs[-cmdID]
-	--	
+	--
 	--local mx, my = spGetMouseState()
 	--local _, mouse = spTraceScreenRay(mx, my, true, true)
 	--
@@ -300,7 +300,7 @@ local function DrawAntinukeOnMouse(cmdID)
 	--		x = math.floor((mouse[1] + 8 - def.oddZ)/16)*16 + def.oddZ
 	--		z = math.floor((mouse[3] + 8 - def.oddX)/16)*16 + def.oddX
 	--	end
-	--	
+	--
 	--	if drawAnti and drawAnti ~= true then
 	--		drawAnti.x = x
 	--		drawAnti.y = spGetGroundHeight(x, z)
@@ -308,9 +308,9 @@ local function DrawAntinukeOnMouse(cmdID)
 	--		drawAnti.range = def.range
 	--	else
 	--		drawAnti = {
-	--			x = x, 
-	--			y = spGetGroundHeight(x, z), 
-	--			z = z, 
+	--			x = x,
+	--			y = spGetGroundHeight(x, z),
+	--			z = z,
 	--			range = def.range
 	--		}
 	--	end
@@ -357,7 +357,7 @@ function widget:Update()
 	end
 
 	if not (nukeSelected and not drawAnti and DrawNukeOnMouse(cmdID)) then
-		drawNuke = false 
+		drawNuke = false
 	end
 end
 
@@ -376,7 +376,7 @@ local function GetNukeIntercepted(ux, uz, px, pz, tx, tz, radiusSq)
 	ux, uz, tx, tz, px, pz = ux - px, uz - pz, tx - px, tz - pz, 0, 0
 	
 	-- Get direction from projectile to target
-	local tDir 
+	local tDir
 	if tx == 0 then
 		if tz == 0 then
 			return InCircle(ux, uy, radiusSq)
@@ -477,7 +477,7 @@ local function DrawEnemyInterceptors(inMinimap)
 					intercepted = math.max(intercepted, 1)
 					glColor(0.9, 0.5, 0, 1)
 				else
-					intercepted = 2	
+					intercepted = 2
 					glColor(1, 0, 0, 1)
 				end
 			else

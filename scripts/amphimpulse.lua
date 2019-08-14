@@ -63,7 +63,7 @@ local impulseDepthMult = -tonumber(wd.customParams.impulsedepthmult)
 
 local SOUND_PERIOD = 2
 local soundIndex = SOUND_PERIOD
-local TANK_MAX 
+local TANK_MAX
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -292,7 +292,7 @@ local function Walk()
 		Turn(pelvis, z_axis, BODY_TILT_ANGLE, BODY_TILT_SPEED*speed)
 		Turn(lthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED*speed)
 		Turn(lcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED*speed)
-		Turn(lfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED*speed)		
+		Turn(lfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED*speed)
 		Turn(rthigh, x_axis, 0, THIGH_FRONT_SPEED*speed)
 		Turn(rcalf, x_axis, 0, CALF_RETRACT_SPEED*speed)
 		Turn(rfoot, x_axis, 0, FOOT_FRONT_SPEED*speed)
@@ -304,7 +304,7 @@ local function Walk()
 		Turn(pelvis, z_axis, 0, BODY_TILT_SPEED*speed)
 		--Turn(lcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED*speed)
-		Turn(rfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED*speed)	
+		Turn(rfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED*speed)
 		WaitForMove(pelvis, y_axis)
 		Sleep(0)
 		
@@ -313,10 +313,10 @@ local function Walk()
 		Turn(pelvis, z_axis, -BODY_TILT_ANGLE, BODY_TILT_SPEED*speed)
 		Turn(lthigh, x_axis, 0, THIGH_FRONT_SPEED*speed)
 		Turn(lcalf, x_axis, 0, CALF_RETRACT_SPEED*speed)
-		Turn(lfoot, x_axis, 0, FOOT_FRONT_SPEED*speed)		
+		Turn(lfoot, x_axis, 0, FOOT_FRONT_SPEED*speed)
 		Turn(rthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED*speed)
 		Turn(rcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED*speed)
-		Turn(rfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED*speed)		
+		Turn(rfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED*speed)
 		WaitForTurn(rthigh, x_axis)
 		Sleep(0)
 		
@@ -324,7 +324,7 @@ local function Walk()
 		Move(pelvis, y_axis, 0, BODY_RISE_SPEED*speed)
 		Turn(pelvis, z_axis, 0, BODY_TILT_SPEED*speed)
 		Turn(lthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED*speed)
-		Turn(lfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED*speed)			
+		Turn(lfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED*speed)
 		--Turn(rcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
 		WaitForMove(pelvis, y_axis)
 		Sleep(0)
@@ -359,7 +359,7 @@ function script.Create()
 	TANK_MAX = UnitDefs[Spring.GetUnitDefID(unitID)].customParams.maxwatertank
 	--StartThread(Walk)
 
-	StartThread(GG.Script.SmokeUnit, smokePiece)	
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 local function RestoreAfterDelay()

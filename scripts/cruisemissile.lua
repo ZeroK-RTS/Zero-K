@@ -1,6 +1,6 @@
 include "constants.lua"
 
-local base = piece 'base' 
+local base = piece 'base'
 local launched = false
 
 function script.AimWeapon1(heading, pitch) return true end
@@ -14,15 +14,15 @@ local function RemoveMissile()
 	Spring.SetUnitNoMinimap(unitID, true)
 	Spring.SetUnitHealth(unitID, {paralyze=99999999})
 	Spring.SetUnitCloak(unitID, 4)
-	Spring.SetUnitStealth(unitID, true)	
+	Spring.SetUnitStealth(unitID, true)
 	Spring.SetUnitBlocking(unitID,false,false,false)
 	launched = true
 	Sleep(2000)
 
 	-- keep alive for stats
 	Spring.SetUnitPosition(unitID,-9001, -9001)
-	-- Note that missiles intentionally remove their command 2s after firing 
-	-- instead of immediately. This is to give some command feedback (that the 
+	-- Note that missiles intentionally remove their command 2s after firing
+	-- instead of immediately. This is to give some command feedback (that the
 	-- command actually was placed) and to show allies where the launch occurred.
 	Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
 	
@@ -34,12 +34,12 @@ function script.Shot()
 	StartThread(RemoveMissile)
 end
 
-function script.AimFromWeapon() 
-	return base 
+function script.AimFromWeapon()
+	return base
 end
 
 function script.QueryWeapon()
-	return base 
+	return base
 end
 
 function script.Create()

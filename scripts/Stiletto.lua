@@ -12,9 +12,9 @@ local SIG_Aim = 1
 
 --cob values
 
-function script.Create()	
+function script.Create()
 	Turn(Lwing, z_axis, math.rad(90))
-	Turn(Rwing, z_axis, math.rad(-90))	
+	Turn(Rwing, z_axis, math.rad(-90))
 	Turn(LwingTip, z_axis, math.rad(-165))
 	Turn(RwingTip, z_axis, math.rad(165))
 	

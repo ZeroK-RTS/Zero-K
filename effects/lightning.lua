@@ -485,7 +485,7 @@ return {
         pos                = [[0, 0, 0]],
 		dir				   = [[dir]],
       },
-    },	
+    },
   },
   
   ["lightningplosion_smallbolts_purple"] = {
@@ -516,6 +516,6 @@ return {
         texture            = [[lightb_purple]],
       },
     },
-  },  
+  },
 }
 

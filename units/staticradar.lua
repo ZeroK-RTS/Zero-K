@@ -140,7 +140,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 230,
-    },    
+    },
 
   },
 

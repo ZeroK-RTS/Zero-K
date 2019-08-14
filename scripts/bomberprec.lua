@@ -1,19 +1,19 @@
 local base = piece 'base'
-local fuselage = piece 'fuselage' 
-local wingl1 = piece 'wingl1' 
-local wingr1 = piece 'wingr1' 
-local wingl2 = piece 'wingl2' 
-local wingr2 = piece 'wingr2' 
-local engines = piece 'engines' 
-local fins = piece 'fins' 
-local rflap = piece 'rflap' 
-local lflap = piece 'lflap' 
-local predrop = piece 'predrop' 
-local drop = piece 'drop' 
-local thrustl = piece 'thrustl' 
-local thrustr = piece 'thrustr' 
-local wingtipl = piece 'wingtipl' 
-local wingtipr = piece 'wingtipr' 
+local fuselage = piece 'fuselage'
+local wingl1 = piece 'wingl1'
+local wingr1 = piece 'wingr1'
+local wingl2 = piece 'wingl2'
+local wingr2 = piece 'wingr2'
+local engines = piece 'engines'
+local fins = piece 'fins'
+local rflap = piece 'rflap'
+local lflap = piece 'lflap'
+local predrop = piece 'predrop'
+local drop = piece 'drop'
+local thrustl = piece 'thrustl'
+local thrustr = piece 'thrustr'
+local wingtipl = piece 'wingtipl'
+local wingtipr = piece 'wingtipr'
 local xp,zp = piece("x","z")
 
 local spGetUnitPosition     = Spring.GetUnitPosition
@@ -264,7 +264,7 @@ function script.Create()
 	SetInitialBomberSettings()
 	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-	GG.FakeUpright.FakeUprightInit(xp, zp, drop) 
+	GG.FakeUpright.FakeUprightInit(xp, zp, drop)
 	--StartThread(Lights)
 end
 
@@ -305,7 +305,7 @@ function script.BlockShot(num, targetID)
 	--Spring.Echo(heading)
 	
 	if dz < 30 and dz > -30 and dx < 100 and dx > -100 and dy < 0 then
-		GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop) 
+		GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop)
 		Move(drop, x_axis, dx)
 		Move(drop, z_axis, dz)
 		dy = math.max(dy, -30)

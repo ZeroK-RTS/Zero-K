@@ -45,7 +45,7 @@ local function armmove(piece1, piece2, piece3)
 		Turn(piece3, z_axis, anglec, speedb)
 
 		WaitForTurn(piece1, z_axis)
-		WaitForTurn(piece2, z_axis)	
+		WaitForTurn(piece2, z_axis)
 		WaitForTurn(piece3, z_axis)
 
 		Turn(piece1, z_axis, 0, speedb)

@@ -6,7 +6,7 @@
 --					remove the -y to not overwrite
 --				/savegame to save to Spring/Saves/QuickSave.ssf
 --				open an .ssf with spring.exe to load
---				/reloadgame reloads the save you loaded 
+--				/reloadgame reloads the save you loaded
 --					(gadget purges existing units and feautres)
 --	NOTES
 --	- heightmap saving is implemented by engine
@@ -111,7 +111,7 @@ local function ReadFile(zip, name, file)
 			end
 		end
 	end
-	if err then 
+	if err then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, 'Save/Load error: ' .. err)
 		return nil
 	end
@@ -999,7 +999,7 @@ local function SaveUnits()
 			unitInfo.rulesParams = {}
 			local params = Spring.GetUnitRulesParams(unitID)
 			for name,value in pairs(params) do
-				unitInfo.rulesParams[name] = value 
+				unitInfo.rulesParams[name] = value
 			end
 			
 			-- control group
@@ -1069,7 +1069,7 @@ local function GetProjectileSaveInfo(projectileID)
 	if wd and wd.type == "StarburstLauncher" and wd.customParams then
 		local cp = wd.customParams
 		-- Some crazyness with how these values are interpreted:
-		-- flightTime (ttl) is multiplied by 32 when weaponDefs are loaded. 
+		-- flightTime (ttl) is multiplied by 32 when weaponDefs are loaded.
 		-- weaponTimer (upTime) is multiplied by 30 when the weapon is loaded.
 		projectileInfo.upTime = math.max(0, cp.weapontimer*30 - math.max(0, cp.flighttime*32 - timeToLive))
 	end
@@ -1101,7 +1101,7 @@ local function SaveGeneralInfo()
 	data.gameRulesParams = {}
 	local gameRulesParams = spGetGameRulesParams()
 	for name,value in pairs(gameRulesParams) do
-		data.gameRulesParams[name] = value 
+		data.gameRulesParams[name] = value
 	end
 	
 	-- team stuff - rulesparams, resources
@@ -1117,7 +1117,7 @@ local function SaveGeneralInfo()
 		local rulesParams = spGetTeamRulesParams(teamID) or {}
 		data.teams[teamID].rulesParams = {}
 		for name,value in pairs(rulesParams) do
-			data.teams[teamID].rulesParams[name] = value 
+			data.teams[teamID].rulesParams[name] = value
 		end
 	end
 	

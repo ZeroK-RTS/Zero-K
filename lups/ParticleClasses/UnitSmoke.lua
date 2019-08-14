@@ -142,7 +142,7 @@ function UnitSmoke.Initialize()
 				 updir = traildirs[int(gl_MultiTexCoord0.w)];
 				 gl_Position.xyz += updir;
 
-				 //gl_TexCoord[0].pq = updir.xy*vec2(0.1) + vec2(heading, -time*3.0); 
+				 //gl_TexCoord[0].pq = updir.xy*vec2(0.1) + vec2(heading, -time*3.0);
 
 				 gl_Position = gl_TextureMatrix[0] * gl_Position;
 
@@ -157,7 +157,7 @@ function UnitSmoke.Initialize()
 				 //gl_FrontColor = vec4(1.0,1.0,1.0,1.0);
 				 gl_TexCoord[0].st = gl_MultiTexCoord0.pt;
 				 //gl_TexCoord[0].st = gl_Position.xy;
-				 gl_TexCoord[0].pq = gl_TexCoord[0].st + vec2(heading, time*3.0); 
+				 gl_TexCoord[0].pq = gl_TexCoord[0].st + vec2(heading, time*3.0);
 			}
 		]],
 		fragment = [[

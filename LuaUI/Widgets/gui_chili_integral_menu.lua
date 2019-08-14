@@ -101,11 +101,11 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 -- Widget Options
 
 options_path = 'Settings/HUD Panels/Command Panel'
-options_order = { 
+options_order = {
 	'background_opacity', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
-	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning', 
+	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
 }
 
 local commandPanelPath = 'Hotkeys/Command Panel'
@@ -122,7 +122,7 @@ options = {
 		end,
 	},
 	keyboardType2 = {
-		type='radioButton', 
+		type='radioButton',
 		name='Grid Keyboard Layout',
 		items = {
 			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
@@ -229,9 +229,9 @@ options = {
 		value = 0,
 		advanced = true,
 		min = 0, max = 500, step=1,
-		OnChange = function() 
+		OnChange = function()
 			ClearData(true)
-		end,	
+		end,
 	},
 	tabFontSize = {
 		name = "Tab Font Size",
@@ -244,7 +244,7 @@ options = {
 		value = 0,
 		advanced = true,
 		min = 0, max = 500, step=1,
-		OnChange = function() 
+		OnChange = function()
 			ClearData(true)
 		end,
 	},
@@ -321,7 +321,7 @@ local function TabClickFunction(mouse)
 		return false
 	end
 	local _,_, meta,_ = Spring.GetModKeyState()
-	if not meta then 
+	if not meta then
 		return false
 	end
 	WG.crude.OpenPath(options_path) --// click+ space on integral-menu tab will open a integral options.
@@ -642,7 +642,7 @@ local function MoveCommandBlock(factoryUnitID, queueCmdID, moveBlock, insertBloc
 	end
 	
 	if not insertPos then
-		insertPos = #commands 
+		insertPos = #commands
 	end
 	
 	if not (movePos and insertPos) then
@@ -799,7 +799,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 
 		-- MouseRelease event, for drag_drop feature --note: x & y is coordinate with respect to obj
 		button.OnMouseUp = button.OnMouseUp or {}
-		button.OnMouseUp[#button.OnMouseUp + 1] = function(obj, clickX, clickY, mouse) 
+		button.OnMouseUp[#button.OnMouseUp + 1] = function(obj, clickX, clickY, mouse)
 			WG.DrawMouseBuild.ClearMouseIcon()
 			if not factoryUnitID then
 				return
@@ -1032,7 +1032,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		factoryUnitID = newFactoryUnitID
 		fakeFactory = newFakeFactory
 		if buttonLayout.dotDotOnOverflow then
-			currentOverflow = overflow 
+			currentOverflow = overflow
 			if overflow then
 				button.tooltip = ""
 				for _,textBox in pairs(textBoxes) do
@@ -1337,7 +1337,7 @@ local function GetQueuePanel(parent, columns)
 			return
 		end
 		local unitBuildID = Spring.GetUnitIsBuilding(factoryUnitID)
-		if not unitBuildID then 
+		if not unitBuildID then
 			button.SetProgressBar(0)
 			return
 		end
@@ -1355,7 +1355,7 @@ local function GetQueuePanel(parent, columns)
 		
 		alreadyRemovedTag = {}
 		
-		factoryUnitID = newFactoryUnitID 
+		factoryUnitID = newFactoryUnitID
 		factoryUnitDefID = newFactoryUnitDefID
 	
 		local buildQueue = Spring.GetRealBuildQueue(factoryUnitID)
@@ -1589,7 +1589,7 @@ end
 --------------------------------------------------------------------------------
 -- Command Handling
 
-local function GetSelectionValues()	
+local function GetSelectionValues()
 	local selection = Spring.GetSelectedUnits()
 	for i = 1, #selection do
 		local unitID = selection[i]
@@ -1771,7 +1771,7 @@ local function InitializeControls()
 	
 	local mainWindow = Window:New{
 		name      = 'integralwindow',
-		x         = 0, 
+		x         = 0,
 		bottom    = 0,
 		width     = width,
 		height    = height,

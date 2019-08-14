@@ -28,7 +28,7 @@ end
 -- Count all units and calculate their barycenter
 local function SetStartPos()
 	if Spring.GetTeamUnitCount(Spring.GetMyTeamID()) and Spring.GetTeamUnitCount(Spring.GetMyTeamID())>0 then
-		x= 0	
+		x= 0
 		for k,unitID in pairs(Spring.GetTeamUnits(Spring.GetMyTeamID())) do
 			local ux=0
 			local uz=0

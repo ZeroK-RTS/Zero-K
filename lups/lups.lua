@@ -494,7 +494,7 @@ local function IsUnitPositionKnown(unitID)
 	if LocalAllyTeamID < 0 then
 		return true
 	end
-	local targetVisiblityState = Spring.GetUnitLosState(unitID, LocalAllyTeamID, true) 
+	local targetVisiblityState = Spring.GetUnitLosState(unitID, LocalAllyTeamID, true)
 	if not targetVisiblityState then
 		return false
 	end
@@ -537,7 +537,7 @@ local function Draw(extension,layer)
 				FxLayer[partClass]=nil
 			else
 				for unitID,UnitEffects in pairs(Units) do
-					if (not UnitEffects[1]) then 
+					if (not UnitEffects[1]) then
 						Units[unitID]=nil
 					else
 

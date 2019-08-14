@@ -26,7 +26,7 @@ end
 function widget:DrawScreen()
 	for i = #drawFuncs, 1, -1 do
 		drawFuncs[i]()
-		drawFuncs[i] = nil 
+		drawFuncs[i] = nil
 	end
 end
 

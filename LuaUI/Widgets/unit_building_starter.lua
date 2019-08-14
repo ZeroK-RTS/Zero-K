@@ -123,7 +123,7 @@ function widget:GameFrame(f)
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	if (unitTeam ~= team) then 
+	if (unitTeam ~= team) then
 		return
 	end
 	local ux, uy, uz  = spGetUnitPosition(unitID)

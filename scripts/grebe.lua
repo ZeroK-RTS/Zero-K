@@ -61,7 +61,7 @@ local function Walk()
 		Turn(lshin, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(rshin, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
-		WaitForTurn(rthigh, x_axis)		
+		WaitForTurn(rthigh, x_axis)
 		Sleep(0)
 	end
 end
@@ -89,7 +89,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)	
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
 local function RestoreAfterDelay()
@@ -115,7 +115,7 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask(SIG_AIM1)
 		Turn(body, y_axis, heading, math.rad(360))
 		Turn(pelvis, x_axis, -pitch, math.rad(180))
-		Turn(countertilt, x_axis, pitch, math.rad(180))	
+		Turn(countertilt, x_axis, pitch, math.rad(180))
 		WaitForTurn(body, y_axis)
 		WaitForTurn(pelvis, x_axis)
 		StartThread(RestoreAfterDelay)

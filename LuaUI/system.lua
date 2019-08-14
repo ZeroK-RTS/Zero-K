@@ -59,7 +59,7 @@ if (System == nil) then
     -- luasocket
     socket          = socket,
 
-    --  
+    --
     --  Standard functions and variables
     --
     assert         = assert,

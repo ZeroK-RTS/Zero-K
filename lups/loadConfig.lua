@@ -28,7 +28,7 @@ function LoadConfig(configFile)
 		if success then
 			local res = {}
 			for i,v in pairs(env) do
-				if (type(v)~="function") then 
+				if (type(v)~="function") then
 					res[i:lower()] = v
 				end
 			end

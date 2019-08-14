@@ -44,7 +44,7 @@ function WG.Overlay_TogglePathMap()
 		Spring.SendCommands('showpathtraversability')
 		pathMapEnabled = true
 	end
-end	
+end
 
 function WG.Overlay_ToggleLOS()
 	if heightMapEnabled or pathMapEnabled then

@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 --- Multiprogressbar module
 
@@ -27,7 +27,7 @@ Multiprogressbar = Control:Inherit{
 	scaleFunction = nil, --- function that can be used to rescale graph - takes 0-1 and must return 0-1
 
 	-- list of bar components to display
-	bars = {  
+	bars = {
 	{
 		color1 = {1, 0, 1, 1},
 		color2 = {0.7, 0, 0.7, 1},
@@ -44,7 +44,7 @@ Multiprogressbar = Control:Inherit{
 local this = Multiprogressbar
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 local glVertex = gl.Vertex
 local glColor = gl.Color
@@ -81,8 +81,8 @@ function Multiprogressbar:DrawControl()
 	local efp
 	local fillPadding = self.fillPadding
 
-	local x, y, w, h = fillPadding[1], fillPadding[2], 
-	                   self.width - fillPadding[1] - fillPadding[3], 
+	local x, y, w, h = fillPadding[1], fillPadding[2],
+	                   self.width - fillPadding[1] - fillPadding[3],
 	                   self.height  - fillPadding[2] - fillPadding[4]
 
 	if (self.scaleFunction ~= nil) then  -- if using non linear scale fix the bar
@@ -164,11 +164,11 @@ function Multiprogressbar:DrawControl()
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Multiprogressbar:HitTest()
 	return self
 end
 
 
---// ============================================================================= 
+--// =============================================================================

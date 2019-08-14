@@ -68,10 +68,10 @@ function GG.ScriptRock.Oscillate(Func, rock, heading, rockAmount)
 	local magnitude = (heading and math.sin(heading)) or 1
 	--Spring.Echo(magnitude)
 	rock.position = rock.position + (rockAmount * magnitude)
-	if rock.position > rock.maxPos then 
+	if rock.position > rock.maxPos then
 		rock.position = rock.maxPos
-	elseif -rock.position < -rock.maxPos then 
-		rock.position = -rock.maxPos 
+	elseif -rock.position < -rock.maxPos then
+		rock.position = -rock.maxPos
 	end
 	
 	while (rock.position > rock.minPos) or (rock.position < -rock.minPos) do

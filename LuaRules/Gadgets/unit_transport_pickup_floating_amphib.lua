@@ -45,7 +45,7 @@ local extendedloadCmdDesc = {
   type    =	CMDTYPE.ICON_UNIT_OR_AREA , --have unitID or mapPos + radius
   name    = 'extendloadunit',
   --hidden  = true,
-  cursor  = 'Loadunits', 
+  cursor  = 'Loadunits',
   action  = 'extendloadunit',
   tooltip = 'Load unit into transport, call amphibious to surface if possible.',
 }
@@ -55,7 +55,7 @@ local extendedunloadCmdDesc = {
   type    =	CMDTYPE.ICON_MAP , --have mapPos
   name    = 'extendunloadunit',
   --hidden  = true,
-  cursor  = 'Unloadunits', 
+  cursor  = 'Unloadunits',
   action  = 'extendunloadunit',
   tooltip = 'Unload unit from transport, drop amphibious to water if possible.',
 }
@@ -69,7 +69,7 @@ local sinkCommand = {
 	[CMD_WAIT_AT_BEACON] = true,
 }
 
-local dropableUnits = { 
+local dropableUnits = {
 	--all floatable unit will be dropped when regular unload fail (such as when unloading at sea), but some can't float but is amphibious,
 	--this list additional units that should be dropped.
 	[UnitDefNames["amphcon"].id] = true, --clam
@@ -137,14 +137,14 @@ end
 
 function gadget:Initialize()
   gadgetHandler:RegisterCMDID(CMD_EXTENDED_LOAD);
-  gadgetHandler:RegisterCMDID(CMD_EXTENDED_UNLOAD);  
+  gadgetHandler:RegisterCMDID(CMD_EXTENDED_UNLOAD);
 end
 
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD.UNLOAD_UNITS] = true, [CMD.LOAD_UNITS] = true,}
 end
 
@@ -185,7 +185,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			or spGetGroundHeight(cmdParams[1],cmdParams[3]-halfRadius) < 0
 			then
 				haveWater = true
-			end 
+			end
 			if haveWater then
 				local cmds
 				local index = 0
@@ -241,7 +241,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 				--"PHASE B"--
 				--Spring.Echo("B")
 				local isRepeat = Spring.Utilities.GetUnitRepeat(unitID)
-				local options = isRepeat and CMD.OPT_INTERNAL or CMD.OPT_SHIFT 
+				local options = isRepeat and CMD.OPT_INTERNAL or CMD.OPT_SHIFT
 				transportPhase[unitID] = "INTERNAL_LOAD_UNITS " .. cargoID
 				giveLOAD_order[#giveLOAD_order+1] = {unitID,CMD.INSERT,{1,CMD.LOAD_UNITS,options,cargoID}, CMD.OPT_ALT}
 				-- return true,true --remove this command
@@ -272,7 +272,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			end
 			if haveFloater then
 				local isRepeat = Spring.Utilities.GetUnitRepeat(unitID)
-				local options = isRepeat and CMD.OPT_INTERNAL or CMD.OPT_SHIFT 
+				local options = isRepeat and CMD.OPT_INTERNAL or CMD.OPT_SHIFT
 				transportPhase[unitID] = "INTERNAL_LOAD_UNITS " .. cmdParams[1]+cmdParams[3]
 				giveLOAD_order[#giveLOAD_order+1] = {unitID,CMD.INSERT,{1,CMD.LOAD_UNITS,options,unpack(cmdParams)}, CMD.OPT_ALT}
 				-- return true,true --remove this command
@@ -305,7 +305,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 				--"PHASE E"--
 				return true,false --hold this command (removed in next frame after giveLOAD_order have inserted command (this avoid unit trigger UnitIdle)
 			end
-		end 
+		end
 		return true,true --remove this command
 	end
 	return false --ignore
@@ -354,7 +354,7 @@ function gadget:GameFrame(f)
 				spGiveOrderToUnit(unpack(order))
 				local transporteeList
 				if not order[3][5] then
-					transporteeList = {order[3][4]} 
+					transporteeList = {order[3][4]}
 				else
 					transporteeList = spGetUnitsInCylinder(order[3][4],order[3][6],order[3][7])
 				end

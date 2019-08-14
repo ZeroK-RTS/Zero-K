@@ -249,7 +249,7 @@ local function StringToCameraState(str)
     
 	if not (cameraID and mode and name and stateFormat) then
         --echo ('ISSUE', cameraID , mode , name , stateFormat)
-		return nil 
+		return nil
 	end
 	
 	local result = {
@@ -296,8 +296,8 @@ local function FileToData(filename)
     local prevkey = 0
     while true do
 		line = file:read()
-		if not line then 
-			break 
+		if not line then
+			break
 		end
         --echo ('<camrec> opening line ', line)
         local data = StringToCameraState( line )

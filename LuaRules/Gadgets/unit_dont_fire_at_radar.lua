@@ -158,7 +158,7 @@ function GG.DontFireRadar_CheckBlock(unitID, targetID)
 			return false
 		else
 			spSetUnitTarget(unitID,0)
-			return true 
+			return true
 		end
 	end
 	return false
@@ -188,11 +188,11 @@ local function DontFireAtRadarToggleCommand(unitID, cmdParams, cmdOptions)
 	
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_DONT_FIRE_AT_RADAR] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
@@ -200,7 +200,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if (cmdID ~= CMD_DONT_FIRE_AT_RADAR) then
 		return true  -- command was not used
 	end
-	DontFireAtRadarToggleCommand(unitID, cmdParams, cmdOptions)  
+	DontFireAtRadarToggleCommand(unitID, cmdParams, cmdOptions)
 	return false  -- command was used
 end
 

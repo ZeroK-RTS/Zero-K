@@ -99,7 +99,7 @@ function script.AimWeapon(num, heading, pitch)
 	end
 
 	sleeper[num] = true
-	while weaponNum ~= num do 
+	while weaponNum ~= num do
 		Sleep(10)
 	end
 	sleeper[num] = false

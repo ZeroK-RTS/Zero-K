@@ -76,7 +76,7 @@ local spIsSphereInView      = Spring.IsSphereInView
 local spGetUnitRadius       = Spring.GetUnitRadius
 local spGetProjectilePosition = Spring.GetProjectilePosition
 
-local glTexture     = gl.Texture 
+local glTexture     = gl.Texture
 local glBlending    = gl.Blending
 local glUniform     = gl.Uniform
 local glUniformInt  = gl.UniformInt
@@ -104,7 +104,7 @@ function OverdriveParticles:CreateParticleAttributes(partpos,n)
 	local part = {size=self.size+size,life=life,i=n}
 	pos   = { ProcessParamCode(partpos, part) }
 
-	return life, size, 
+	return life, size,
 				 pos[1],pos[2],pos[3];
 end
 

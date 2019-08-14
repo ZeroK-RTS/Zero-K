@@ -227,7 +227,7 @@ local function GetWantedBomberHeight(unitID, bomberID, config, underShield)
 		end
 	end
 	
-	if mag > 120 and ground > by then 
+	if mag > 120 and ground > by then
 		diveHeight = diveHeight + ground - by
 	end
 	return diveHeight
@@ -313,7 +313,7 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 		if bomberWeaponDefs[wdid] then
 			wantedWeaponList[#wantedWeaponList + 1] = wdid
 		end
-	end 
+	end
 	return wantedWeaponList
 end
 
@@ -362,7 +362,7 @@ local function ToggleDiveCommand(unitID, cmdParams, cmdOptions)
 	
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_UNIT_BOMBER_DIVE_STATE] = true}
 end
 
@@ -374,7 +374,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if (cmdID ~= CMD_UNIT_BOMBER_DIVE_STATE) then
 		return true  -- command was not used
 	end
-	ToggleDiveCommand(unitID, cmdParams, cmdOptions)  
+	ToggleDiveCommand(unitID, cmdParams, cmdOptions)
 	return false  -- command was used
 end
 

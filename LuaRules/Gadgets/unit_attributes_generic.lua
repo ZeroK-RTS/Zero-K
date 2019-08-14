@@ -13,7 +13,7 @@ function gadget:GetInfo()
 		date      = "2018-11-30", -- v1 2009-11-27
 		license   = "GNU GPL, v2 or later",
 		layer     = -1,
-		enabled   = false, 
+		enabled   = false,
 	}
 end
 
@@ -71,19 +71,19 @@ local function UpdateSensorAndJamm(unitID, unitDefID, speedFactor)
 	end
 	local orig = origUnitSight[unitDefID]
 	
-	if orig.radar then 
+	if orig.radar then
 		Spring.SetUnitSensorRadius(unitID, "radar", orig.radar*speedFactor)
 	end
-	if orig.sonar then 
+	if orig.sonar then
 		Spring.SetUnitSensorRadius(unitID, "sonar", orig.sonar*speedFactor)
 	end
-	if orig.jammer then 
+	if orig.jammer then
 		Spring.SetUnitSensorRadius(unitID, "radarJammer", orig.jammer*speedFactor)
 	end
-	if orig.los then 
+	if orig.los then
 		Spring.SetUnitSensorRadius(unitID, "los", orig.los*speedFactor)
 	end
-	if orig.airLos then 
+	if orig.airLos then
 		Spring.SetUnitSensorRadius(unitID, "airLos", orig.airLos*speedFactor)
 	end
 end
@@ -109,7 +109,7 @@ local function UpdateBuildSpeed(unitID, ud, speedFactor)
 	end
 	local state = origUnitBuildSpeed[unitDefID]
 	
-	spSetUnitBuildSpeed(unitID, 
+	spSetUnitBuildSpeed(unitID,
 		state.buildSpeed * speedFactor, -- build
 		state.maxRepairSpeed * speedFactor, -- repair
 		state.reclaimSpeed * speedFactor, -- reclaim
@@ -287,12 +287,12 @@ local function UpdateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 			}
 			spSetGunshipMoveTypeData (unitID, attribute)
 		elseif state.movetype == 2 then
-			local accRate = state.origMaxAcc*maxAccelerationFactor 
+			local accRate = state.origMaxAcc*maxAccelerationFactor
 			if isSlowed and accRate > speedFactor then
 				-- Clamp acceleration to mitigate prevent brief speedup when executing new order
 				-- 1 is here as an arbitary factor, there is no nice conversion which means that 1 is a good value.
-				accRate = speedFactor 
-			end 
+				accRate = speedFactor
+			end
 			local attribute =  {
 				maxSpeed        = state.origSpeed       *speedFactor,
 				maxReverseSpeed = (isSlowed and 0) or state.origReverseSpeed, --disallow reverse while slowed
@@ -336,7 +336,7 @@ local function UpdateUnitAttributes(unitID, attList)
 	end
 	
 	local unitDefID = spGetUnitDefID(unitID)
-	if not unitDefID then 
+	if not unitDefID then
 		return true
 	end
 	

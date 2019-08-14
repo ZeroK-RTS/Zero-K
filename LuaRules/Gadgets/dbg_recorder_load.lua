@@ -5,8 +5,8 @@ function gadget:GetInfo()
     author    = "Bluestone",
     date      = "June 2014",
     license   = "GNU GPL, v3 or later",
-    layer     = 1,  
-    enabled   = false  
+    layer     = 1,
+    enabled   = false
   }
 end
 
@@ -15,7 +15,7 @@ if gadgetHandler:IsSyncedCode() then
 ----------------SYNCED---------------
 
 UNIT_FILENAME = "REC_unit.lua"
-ORDER_Q_FILENAME = "REC_order_q.lua" 
+ORDER_Q_FILENAME = "REC_order_q.lua"
 FACTORY_Q_FILENAME = "REC_factory_q.lua"
 ORDER_FILENAME = "REC_order.lua"
 
@@ -31,7 +31,7 @@ local t2ID = 1
 
 local startFrame
 local playOrders = false
-local orderCount 
+local orderCount
 local playStartFrame
 local nOrders = #order_table
 
@@ -61,10 +61,10 @@ function LoadUnits()
     if not Spring.IsCheatingEnabled() then
 		return
 	end
-	if playOrders then 
+	if playOrders then
         Spring.Echo("ERROR: Already in progress")
-        return 
-    end 
+        return
+    end
     if t1ID==t2ID or t2ID==nil then
         Spring.Echo("ERROR: Need at least two ally teams")
         return
@@ -92,7 +92,7 @@ function LoadUnitsNow()
         local uDID = UnitDefNames[u.name].id
         local unitID = Spring.CreateUnit(uDID,u.x,u.y,u.z,u.f,tID,false,false)
         if not unitID then
-            Spring.Echo("ERROR: Failed to create unit or unitID, likely reached unit limit (" .. unitID .. ")") 
+            Spring.Echo("ERROR: Failed to create unit or unitID, likely reached unit limit (" .. unitID .. ")")
         end
 		local key = uDID .. math.floor(u.x) .. math.floor(u.y) .. math.floor(u.z)
 		keyToUnitID[key] = unitID
@@ -118,7 +118,7 @@ end
 
 function GiveInitialOrders()
    for _,o in ipairs(order_q_table) do
-        o.options.shift = true 
+        o.options.shift = true
         o.params = {o.params[1],o.params[2],o.params[3],o.params[4],o.params[5],o.params[6]} --otherwise the params table is loaded in the wrong order (i bet it's luas crappy type conversion)
 		if not o.params[2] then
 			o.params[1] = keyToUnitID[o.params[1]] or 0
@@ -130,8 +130,8 @@ function GiveInitialOrders()
     end
     
     for _,o in ipairs(factory_q_table) do
-        o.options.shift = true 
-        o.params = {o.params[1],o.params[2],o.params[3],o.params[4],o.params[5],o.params[6]} 
+        o.options.shift = true
+        o.params = {o.params[1],o.params[2],o.params[3],o.params[4],o.params[5],o.params[6]}
 		if not o.params[2] then
 			o.params[1] = keyToUnitID[o.params[1]] or 0
 		end
@@ -153,7 +153,7 @@ end
 
 function gadget:GameFrame(n)
     if n-30==startFrame then
-        LoadUnitsNow()    
+        LoadUnitsNow()
     end
 
     if n-30*PFSwait==startFrame then
@@ -164,12 +164,12 @@ function gadget:GameFrame(n)
         playOrders = true
         playStartFrame = Spring.GetGameFrame()
         orderCount = 1
-    end 
+    end
 
     if playOrders then
         while order_table[orderCount].f<=n-playStartFrame do
             local o = order_table[orderCount]
-            o.params = {o.params[1],o.params[2],o.params[3],o.params[4],o.params[5],o.params[6]} 
+            o.params = {o.params[1],o.params[2],o.params[3],o.params[4],o.params[5],o.params[6]}
 			if not o.params[2] then
 				o.params[1] = keyToUnitID[o.params[1]] or 0
 			end
@@ -195,11 +195,11 @@ function CleanUnits()
 	end
     local units = Spring.GetAllUnits()
     for _,unitID in ipairs(units) do
-        Spring.DestroyUnit(unitID, false, true) 
+        Spring.DestroyUnit(unitID, false, true)
     end
     local features = Spring.GetAllFeatures()
     for _,featureID in ipairs(features) do
-        Spring.DestroyFeature(featureID, false, true) 
+        Spring.DestroyFeature(featureID, false, true)
     end
     playOrders = false
     Spring.Echo(white .. "Cleaned map")
@@ -225,7 +225,7 @@ function gadget:Initialize()
     gadgetHandler:AddSyncAction("Interrupt", Interrupt)
 end
 function SaveUnits()
-    Script.LuaUI.SaveUnits() 
+    Script.LuaUI.SaveUnits()
 end
 
 local profile = false
@@ -251,7 +251,7 @@ function gadget:DrawScreen()
 end
 
 function Finished()
-    local version = Spring.Utilities.GetEngineVersion() 
+    local version = Spring.Utilities.GetEngineVersion()
     local buildFlags = Game.buildFlags or ""
     local gameName = Game.gameName
     local gameVersion = Game.gameVersion

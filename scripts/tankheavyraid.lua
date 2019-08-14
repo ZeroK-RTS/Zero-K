@@ -186,7 +186,7 @@ local function Recoil()
 	Move(barrel2, z_axis, 0, 10)
 end
 
-function script.Shot(num)		
+function script.Shot(num)
 	--[[
 	Turn(firepoint, y_axis, math.rad(25))
 	EmitSfx(firepoint, GG.Script.FIRE_W2)

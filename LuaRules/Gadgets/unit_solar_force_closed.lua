@@ -30,11 +30,11 @@ end
 
 local CMD_ONOFF = CMD.ONOFF
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_ONOFF] = true}
 end
 	
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return forceClosableUnitDefs
 end
 

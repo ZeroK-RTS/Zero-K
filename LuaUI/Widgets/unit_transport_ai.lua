@@ -766,7 +766,7 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 	if cmdID == CMD.WAIT then
 		-- workaround: clears wait order if STOP fails to do so
 		spGiveOrderToUnit(unitID, CMD.WAIT, EMPTY_TABLE, 0)
-	end 
+	end
 end
 
 function CanTransport(transportID, unitID)

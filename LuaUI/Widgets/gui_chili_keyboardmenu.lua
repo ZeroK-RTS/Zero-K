@@ -12,7 +12,7 @@ function widget:GetInfo()
     enabled   = false,
     handler = true,
   }
-end 
+end
 
 
 -------------------------------------------------
@@ -46,7 +46,7 @@ local Control
 
 -- Chili instances
 local screen0
-local window_main		
+local window_main
 local tab_commands, tab_sels, tab_toggles
 local key_buttons = {}
 local key_button_images, tab_buttons
@@ -74,8 +74,8 @@ local builder_types_i = {}
 local builder_ids_i = {}
 local curbuilder = 1
 local last_cmdid
-local build_menu = nil 
-local build_menu_selected = nil 
+local build_menu = nil
+local build_menu_selected = nil
 local menu_level = 0
 local customKeyBind = false
 local build_mode = false
@@ -199,7 +199,7 @@ options = {
 		type = 'bool',
 		advanced = true,
 		value = true,
-	},		
+	},
 }
 
 
@@ -208,7 +208,7 @@ local function CapCase(str)
 	str = str:gsub( '_', ' ' )
 	str = str:sub(1,1):upper() .. str:sub(2)
 	
-	str = str:gsub( ' (.)', 
+	str = str:gsub( ' (.)',
 		function(x) return (' ' .. x):upper(); end
 		)
 	return str
@@ -218,7 +218,7 @@ local function AddHotkeyOptions()
 	local options_order_tmp_cmd = {}
 	local options_order_tmp_cmd_instant = {}
 	local options_order_tmp_states = {}
-	for cmdname, cmdData in pairs(custom_cmd_actions) do 
+	for cmdname, cmdData in pairs(custom_cmd_actions) do
 		local number = cmdData.cmdType
 		
 		local cmdnamel = cmdname:lower()
@@ -332,7 +332,7 @@ local function explode(div,str)
 end
 
 local function CopyTable(outtable,intable)
-  for i,v in pairs(intable) do 
+  for i,v in pairs(intable) do
     if (type(v)=='table') then
       if (type(outtable[i])~='table') then outtable[i] = {} end
       CopyTable(outtable[i],v)
@@ -376,8 +376,8 @@ end
 
 local function AngleToKey(angle)
 	angle=angle+0
-	if angle < 0 then 
-		angle = angle + 360 
+	if angle < 0 then
+		angle = angle + 360
 	end
 	local conv = {
 		[0] 	= 'E',
@@ -429,7 +429,7 @@ local function AddBuildButton(color)
 	)
 	key_buttons['D']:AddChild(
 		Image:New {
-			file = builder_ids_i[curbuilder] and "#".. builder_ids_i[curbuilder], 
+			file = builder_ids_i[curbuilder] and "#".. builder_ids_i[curbuilder],
 			file2 = 'LuaUI/Images/nested_buildmenu/frame_Fac.png',
 			width = '100%',
 			height = '80%',
@@ -493,7 +493,7 @@ local function AddBuildStructureButtonBasic(unitName, hotkey_key, index )
 	if index then
 		--local angle = KeyToAngle(index)
 		AddHotkeyLabel( index, index )
-	end 
+	end
 	button1:AddChild( Image:New {
 		file = "#"..ud.id,
 		file2 = WG.GetBuildIconFrame(ud),
@@ -506,7 +506,7 @@ local function AddBuildStructureButtonBasic(unitName, hotkey_key, index )
 	
 	
 	button1.OnClick = { function (self, x, y, mouse)
-		local left, right = mouse == 1, mouse == 3   
+		local left, right = mouse == 1, mouse == 3
 		CommandFunction( -(ud.id), left, right );
 	end }
 end
@@ -521,23 +521,23 @@ local function AddBuildStructureButton(item, index)
 	
 	local ud = UnitDefNames[item.unit]
 	--[[
-    if not ud then 
+    if not ud then
 		grid_menu:AddChild(Label:New{caption=''})
 		return
 	end
 	--]]
-    local func = function (self, x, y, mouse) 
-		--if menu_level ~= 0 then 
+    local func = function (self, x, y, mouse)
+		--if menu_level ~= 0 then
 		if menu_level ~= 0 or not item.items then  --account for first level items without subitems
 			local cmdid = build_menu_selected.cmd
 
-			if (cmdid == nil) then 
+			if (cmdid == nil) then
 				local ud = UnitDefNames[item.unit]
 				if (ud ~= nil) then
 					cmdid = Spring.GetCmdDescIndex(-ud.id)
 				end
 				
-			end 
+			end
 
 			if (cmdid) then
 				local alt, ctrl, meta, shift = Spring.GetModKeyState()
@@ -546,13 +546,13 @@ local function AddBuildStructureButton(item, index)
 
 				if (build_menu ~= build_menu_selected) then -- store last item and menu_level to render its back path
 					menu_level = menu_level + 1  -- save menu_level
-				end 
+				end
 				Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)
 				last_cmdid = cmdid
 			end
 			--BuildMode(false)
-		end 
-		if (item.items ~= nil) then -- item has subitems 
+		end
+		if (item.items ~= nil) then -- item has subitems
 			menu_level = menu_level + 1  -- save menu_level
 			build_menu = item
 			build_menu_selected = item
@@ -578,7 +578,7 @@ local function AddBuildStructureButton(item, index)
 	if index then
 		--local angle = KeyToAngle(index)
 		AddHotkeyLabel( index, index )
-	end 
+	end
 	button1:AddChild( Image:New {
 		file = "#"..ud.id,
 		file2 = WG.GetBuildIconFrame(ud),
@@ -626,7 +626,7 @@ UpdateBuildMenu = function()
 			end
 		end
 		
-	end 
+	end
 end
 
 -- setup menu depending on selected unit(s)
@@ -640,7 +640,7 @@ local function SetupBuilderMenuData()
 		buildername = initialBuilder
 	end
 	
-	if buildername then 
+	if buildername then
 		menu_level = 0
 		build_menu = build_menu_use[buildername]
 		build_menu_selected = build_menu
@@ -663,9 +663,9 @@ StoreBuilders = function(units)
 	builder_types_i = {}
 	builder_ids_i = {}
 	curbuilder = 1
-	for _, unitID in ipairs(units) do 
+	for _, unitID in ipairs(units) do
 		local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-		if ud and ud.isBuilder and build_menu_use[ud.name] then 
+		if ud and ud.isBuilder and build_menu_use[ud.name] then
 			if not builder_types[ud.name] then
 				builder_types[ud.name] = true
 				builder_types_i[#builder_types_i + 1] = ud.name
@@ -687,7 +687,7 @@ local function AddCustomCommands(selectedUnits)
 	for _, unitID in ipairs(selectedUnits) do
 		local ud
 		if CanInitialQueue() then
-			ud = UnitDefNames[initialBuilder]	
+			ud = UnitDefNames[initialBuilder]
 		else
 			ud = UnitDefs[Spring.GetUnitDefID(unitID)]
 		end
@@ -699,10 +699,10 @@ local function AddCustomCommands(selectedUnits)
 				tooltip = 'Build a structure.',
 				cursor  = 'Repair',
 				action  = 'radialbuildmenu',
-				params  = { }, 
+				params  = { },
 				--texture = 'LuaUI/Images/commands/Bold/retreat.png',
 		
-				pos = {CMD.MOVE_STATE,CMD.FIRE_STATE, }, 
+				pos = {CMD.MOVE_STATE,CMD.FIRE_STATE, },
 			})
 			table.insert(widgetHandler.customCommands, {
 				id      = CMD_BUILDPREV,
@@ -711,8 +711,8 @@ local function AddCustomCommands(selectedUnits)
 				tooltip = 'Build the previous structure.',
 				cursor  = 'Repair',
 				action  = 'buildprev',
-				params  = { }, 
-				pos = {CMD.MOVE_STATE,CMD.FIRE_STATE, }, 
+				params  = { },
+				pos = {CMD.MOVE_STATE,CMD.FIRE_STATE, },
 			})
 		end
 	end
@@ -741,7 +741,7 @@ local function SetupTabs()
 		tab_buttons[tab] = Button:New{
 			parent = window_main,
 			--name = '',
-			caption = caption, 
+			caption = caption,
 			--tooltip = '',
 			backgroundColor = white_table,
 			
@@ -817,8 +817,8 @@ SetupKeybuttons = function()
 			
 			key_buttons[key] = Button:New{
 				parent = window_main,
-				caption = '-', 
-				backgroundColor = color, 
+				caption = '-',
+				backgroundColor = color,
 				x = x, y = y,
 				width = width,
 				height = height,
@@ -833,9 +833,9 @@ end
 
 
 --sorts commands into categories
-local function ProcessCommand(cmd) 
+local function ProcessCommand(cmd)
 	if not cmd.hidden and cmd.id ~= CMD.PAGES then
-		if (cmd.type == CMDTYPE.ICON_MODE and cmd.params ~= nil and #cmd.params > 1) then 
+		if (cmd.type == CMDTYPE.ICON_MODE and cmd.params ~= nil and #cmd.params > 1) then
 			curCommands[#curCommands+1] = cmd
 		elseif special_commands[cmd.id] then --curently terraform
 			curCommands[#curCommands+1] = cmd
@@ -846,7 +846,7 @@ local function ProcessCommand(cmd)
 			curCommands[#curCommands+1] = cmd
 		end
 	end
-end 
+end
 
 local function UpdateButton( hotkey_key, hotkey, name, fcn, tooltip, texture, color )
 
@@ -900,8 +900,8 @@ local function SetupCommands( modifier )
 	curCommands = {}
 	commandButtons = {}
 	-- [=[
-	for i = 1, #commands do ProcessCommand(commands[i]) end 
-	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
+	for i = 1, #commands do ProcessCommand(commands[i]) end
+	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end
 	--]=]
 	
 	
@@ -942,7 +942,7 @@ local function SetupCommands( modifier )
 						
 						local buildCommand = actionCmd:find('buildunit_')
 						
-						if not custom_cmd_actions[ actionCmd ] and actionCmd ~= 'radialbuildmenu' and not buildCommand then 
+						if not custom_cmd_actions[ actionCmd ] and actionCmd ~= 'radialbuildmenu' and not buildCommand then
 						
 							local actionOption = WG.crude.GetActionOption(actionCmd)
 							local actionName = actionOption and actionOption.name
@@ -972,7 +972,7 @@ local function SetupCommands( modifier )
 				
 			end
 			
-		end --for letterInd=1,26 
+		end --for letterInd=1,26
 	end --if options.showGlobalCommands.value
 	--]=]
 	
@@ -1005,7 +1005,7 @@ local function SetupCommands( modifier )
 				local override = overrides[cmd.id]  -- command overrides
 				local texture = override and override.texture or cmd.texture
 				local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1)	--is command a state toggle command?
-				if isState and override then 
+				if isState and override then
 					texture = override.texture[cmd.params[1]+1]
 				end
 				local _,cmdid,_,cmdname = Spring.GetActiveCommand()
@@ -1096,7 +1096,7 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 	
 	-- setup chili controls
-	window_main = Window:New{  
+	window_main = Window:New{
 		parent = screen0,
 		dockable = true,
 		name = "keyboardmenu",
@@ -1114,13 +1114,13 @@ function widget:Initialize()
 	}
 	local configButton = Button:New{
 		parent = window_main,
-		caption = '', 
+		caption = '',
 		tooltip = 'Configure Hotkeys',
 		backgroundColor = white_table,
 		OnClick = { function()
 			WG.crude.OpenPath('Settings/HUD Panels/KB Menu')
 			WG.crude.ShowMenu() --make epic Chili menu appear.
-		end }, 
+		end },
 		bottom = tabHeight .. '%',
 		x = 0,
 		width = (tabHeight/2) .. '%',
@@ -1158,7 +1158,7 @@ function widget:Initialize()
 	end
 	
 	
-end 
+end
 
 function widget:Shutdown()
 	if not customKeyBind then
@@ -1177,7 +1177,7 @@ function widget:KeyPress(key, modifier)
 	if build_mode then
 		if not build_menu or key == KEYSYMS.ESCAPE then  -- cancel menu
 			BuildMode(false)
-			return true 
+			return true
 		end
 		
 		if modifier.shift then
@@ -1185,7 +1185,7 @@ function widget:KeyPress(key, modifier)
 		end
 		
 		local angle = keys[key]
-		if angle == nil then return end 
+		if angle == nil then return end
 		--local index = AngleToIndex(angle)
 		local index = AngleToKey(angle)
 		--local pressbutton = grid_menu:GetChildByName(index+0)
@@ -1216,13 +1216,13 @@ function widget:KeyRelease(key)
 	if
 		key == KEYSYMS.LCTRL or key == KEYSYMS.RCTRL
 		or key == KEYSYMS.LALT or key == KEYSYMS.LALT
-		or key == KEYSYMS.LMETA or key == KEYSYMS.RMETA or key == KEYSYMS.SPACE 
+		or key == KEYSYMS.LMETA or key == KEYSYMS.RMETA or key == KEYSYMS.SPACE
 		then
 		local alt, ctrl, meta, shift = Spring.GetModKeyState()
 		SetCurTab( ctrl and 'ctrl'
 			or alt and 'alt'
 			or meta and 'meta'
-			or 'none' 
+			or 'none'
 			)
 	end
 end
@@ -1254,16 +1254,16 @@ end
 -- this is needed to highlight active command
 function widget:DrawScreen()
 	local _,cmdid,_,cmdname = Spring.GetActiveCommand()
-	if cmdid ~= lastCmd then 
+	if cmdid ~= lastCmd then
 		if cmdid and commandButtons[cmdid]  then
 			local button = commandButtons[cmdid]
 			lastColor = button.backgroundColor
 			SetButtonColor(button, magenta_table)
-		end 
-		if lastCmd ~= nil and commandButtons[lastCmd] then 
+		end
+		if lastCmd ~= nil and commandButtons[lastCmd] then
 			local button = commandButtons[lastCmd]
 			SetButtonColor(button, lastColor)
-		end 
+		end
 		lastCmd = cmdid
 	end
 end

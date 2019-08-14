@@ -164,7 +164,7 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 		end
 	end
 	if unitDefID and buildTimes[unitDefID] then
-		return buildTimes[unitDefID] 
+		return buildTimes[unitDefID]
 	end
 	return 50
 end

@@ -14,7 +14,7 @@ unitDef = {
   category              = [[SUB FIREPROOF]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[18 12 38]],
-  collisionVolumeType    = [[cylZ]],  
+  collisionVolumeType    = [[cylZ]],
 
   customParams          = {
     fireproof = [[1]],
@@ -22,7 +22,7 @@ unitDef = {
   },
 
   explodeAs             = [[SUBSCOUT_DEATH]],
-  fireState              = 0,  
+  fireState              = 0,
   footprintX            = 2,
   footprintZ            = 2,
   iconType              = [[submarine]],

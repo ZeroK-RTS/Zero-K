@@ -67,7 +67,7 @@ function gadget:GetInfo() return {
 	end
 
  -- UNSYNCED
---[[	
+--[[
 	local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
 	local spGetSpectatingState = Spring.GetSpectatingState
 	local spIsPosInLos         = Spring.IsPosInLos

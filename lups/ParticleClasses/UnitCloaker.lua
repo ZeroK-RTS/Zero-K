@@ -167,7 +167,7 @@ function UnitCloaker.Initialize()
 			void main(void)
 			{
 				texCoord.st  = gl_MultiTexCoord0.st;
-				texCoord.p   = dot( gl_Vertex, ObjectPlaneS ); 
+				texCoord.p   = dot( gl_Vertex, ObjectPlaneS );
 				texCoord.q   = dot( gl_Vertex, ObjectPlaneT );// + life*0.25;
 				normal       = gl_NormalMatrix * gl_Normal;
 				viewdir      = (gl_ModelViewMatrix * gl_Vertex).xyz - cameraPos;

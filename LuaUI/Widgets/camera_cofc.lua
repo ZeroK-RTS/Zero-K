@@ -39,8 +39,8 @@ local scrollPath = 'Settings/Camera/Camera Controls/Scroll Behaviour'
 local miscPath = 'Settings/Camera/Camera Controls/Misc'
 local cameraFollowPath = 'Settings/Camera/Camera Following'
 local minimap_path = 'Settings/HUD Panels/Minimap'
-options_order = { 
-	'helpwindow', 
+options_order = {
+	'helpwindow',
 	
 	'topBottomEdge',
 
@@ -51,39 +51,39 @@ options_order = {
 	'smoothness',
 	
 	'lblZoom',
-	-- 'zoomintocursor', 
-	-- 'zoomoutfromcursor', 
-	'zoominfactor', 
+	-- 'zoomintocursor',
+	-- 'zoomoutfromcursor',
+	'zoominfactor',
 	'zoomin',
 	'zoomoutfactor',
 	'zoomout',
 	'drifttocenter',
-	'invertzoom', 
-	'invertalt', 
+	'invertzoom',
+	'invertalt',
 	'tiltedzoom',
 	'tiltzoomfactor',
-	'zoomouttocenter', 
+	'zoomouttocenter',
 
 	'lblRotate',
 	'rotatefactor',
 	'rotsmoothness',
-	'targetmouse', 
-	-- 'rotateonedge', 
+	'targetmouse',
+	-- 'rotateonedge',
 	'inverttilt',
 	'tiltfactor',
 	'groundrot',
 	
 	'lblScroll',
-	'speedFactor', 
-	'speedFactor_k', 
-	-- 'edgemove', 
-	'invertscroll', 
+	'speedFactor',
+	'speedFactor_k',
+	-- 'edgemove',
+	'invertscroll',
 	'smoothscroll',
-	'smoothmeshscroll', 
+	'smoothmeshscroll',
 	
 	'lblMisc',
 	'fov',
-	'overviewmode', 
+	'overviewmode',
 	'overviewset',
 	'rotatebackfromov',
 	--'restrictangle',
@@ -269,7 +269,7 @@ options = {
 		desc = 'Center the map as you zoom out.',
 		type = 'bool',
 		value = true,
-		OnChange = function(self) 
+		OnChange = function(self)
 			local cs = Spring.GetCameraState()
 			if cs.rx then
 				cs = ApplyCenterBounds(cs)
@@ -312,7 +312,7 @@ options = {
 		min = 0.5, max = 10, step = 0.5,
 		value = 2,
 		path = rotatePath,
-	},	
+	},
 	rotsmoothness = {
 		name = 'Rotation Smoothness',
 		desc = "Controls how smoothly the camera rotates.",
@@ -358,7 +358,7 @@ options = {
 		min = 2, max = 40, step = 2,
 		value = 10,
 		path = rotatePath,
-	},	
+	},
 	groundrot = {
 		name = "Rotate When Camera Hits Ground",
 		desc = "If world-rotation motion causes the camera to hit the ground, camera-rotation motion takes over. Doesn't apply in Free Mode.",
@@ -479,7 +479,7 @@ options = {
 		value = false,
 		hotkey = {key='l', mod='alt+'},
 		path = cameraFollowPath,
-		OnChange = function(self) Spring.Echo("COFC: follow cursor " .. (self.value and "active" or "inactive")) end,		
+		OnChange = function(self) Spring.Echo("COFC: follow cursor " .. (self.value and "active" or "inactive")) end,
 	},
 	followautozoom = {
 		name = "Auto zoom",
@@ -497,7 +497,7 @@ options = {
 		value = 1,
 		OnChange = function(self) Spring.Echo("COFC: " ..self.mid*2 - self.value .. " second") end,
 		path = cameraFollowPath,
-	},	
+	},
 	followoutscrollspeed = {
 		name = "Off Screen Tracking Speed",
 		desc = "Tracking speed while cursor is off-screen. \n\nRecommend: Highest (prevent missed action)",
@@ -525,7 +525,7 @@ options = {
 		value = 2000,
 		OnChange = function(self) Spring.Echo("COFC: " .. self.value .. " elmo") end,
 		path = cameraFollowPath,
-	},	
+	},
 	followzoominspeed = {
 		name = "Zoom-in Speed",
 		desc = "Zoom-in speed when cursor is on-screen. Default: 50%",
@@ -553,7 +553,7 @@ options = {
 		type = 'button',
         hotkey = {key='t', mod='alt+'},
 		path = cameraFollowPath,
-		OnChange = function(self) 
+		OnChange = function(self)
 			if thirdperson_trackunit then --turn off 3rd person tracking if it is.
 				Spring.SendCommands('trackoff')
 				Spring.SendCommands('viewfree')
@@ -641,7 +641,7 @@ local black = { 0, 0, 0 }
 local white = { 1, 1, 1 }
 
 
-local spGetCameraState		= Spring.GetCameraState 
+local spGetCameraState		= Spring.GetCameraState
 local spGetCameraVectors	= Spring.GetCameraVectors
 local spGetGroundHeight		= Spring.GetGroundHeight
 local spGetSmoothMeshHeight	= Spring.GetSmoothMeshHeight
@@ -699,16 +699,16 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 	cy = vsy * 0.5
 	centerDriftFactor = 20/1080 * vsy
 	horizAspectCorrectionFactor, vertAspectCorrectionFactor = 1, 1
-	if vsx > vsy then 
+	if vsx > vsy then
 		horizAspectCorrectionFactor = vsx/vsy
-	else 
-		vertAspectCorrectionFactor = vsy/vsx 
+	else
+		vertAspectCorrectionFactor = vsy/vsx
 	end
 	SetFOV(Spring.GetCameraFOV())
 end
 
 local PI 			= 3.1415
---local TWOPI			= PI*2	
+--local TWOPI			= PI*2
 local HALFPI		= PI/2
 --local HALFPIPLUS	= HALFPI+0.01
 local HALFPIMINUS	= HALFPI-0.01
@@ -821,7 +821,7 @@ local function DetermineInitCameraState()
 	local csOlddx, csOlddy, csOlddz = Spring.GetCameraDirection()
 	local csOldrx = PI/2 - math.acos(csOlddy)
 	local csOldry = math.atan2(csOlddx, -csOlddz) - PI
-	spSendCommands("viewfree") 
+	spSendCommands("viewfree")
 	local cs = spGetCameraState()
 	-- if csOldpx == 0.0 * csOldpz == 0.0 then
 	-- 	cs.px = MWIDTH/2
@@ -840,16 +840,16 @@ end
 local function GetPyramidBoundedCoords(x,z) --This is meant for minX,minZ,maxX,maxZ bounds, to get bounds without necessarily changing camera state
 	if x < minX then x = minX; end
 	if x > maxX then x = maxX; end
-	if z < minZ then z = minZ; end 
-	if z > maxZ then z = maxZ; end 
+	if z < minZ then z = minZ; end
+	if z > maxZ then z = maxZ; end
 	return x,z
 end
 
 local function GetMapBoundedCoords(x,z) --This should not use minX,minZ,maxX,maxZ bounds, as this is used specifically to keep things on the map
 	if x < 0 then x = 0; end
 	if x > MWIDTH then x=MWIDTH; end
-	if z < 0 then z = 0; end 
-	if z > MHEIGHT then z = MHEIGHT; end 
+	if z < 0 then z = 0; end
+	if z > MHEIGHT then z = MHEIGHT; end
 	return x,z
 end
 
@@ -923,11 +923,11 @@ local function OverrideTraceScreenRay(x,y,cs,planeToHit,sphereToHit,returnRayDis
 		viewSizeX, viewSizeY = widgetHandler:GetViewSizes()
 	end
 	--//Speedup//--
-	if scrnRay_cache.previous.fov==cs.fov 
-	and scrnRay_cache.previous.inclination == cs.rx 
-	and scrnRay_cache.previous.azimuth == cs.ry 
-	and scrnRay_cache.previous.x ==x 
-	and scrnRay_cache.previous.y == y 
+	if scrnRay_cache.previous.fov==cs.fov
+	and scrnRay_cache.previous.inclination == cs.rx
+	and scrnRay_cache.previous.azimuth == cs.ry
+	and scrnRay_cache.previous.x ==x
+	and scrnRay_cache.previous.y == y
 	and scrnRay_cache.previous.plane == planeToHit
 	and scrnRay_cache.previous.sphere == sphereToHit
 	then --if camera Sphere coordinate & mouse position not change then use cached value
@@ -937,11 +937,11 @@ local function OverrideTraceScreenRay(x,y,cs,planeToHit,sphereToHit,returnRayDis
 		scrnRay_cache.result[4],
 		scrnRay_cache.result[5],
 		scrnRay_cache.result[6],
-		scrnRay_cache.result[7] 
+		scrnRay_cache.result[7]
 	end
 	local camPos = {px=cs.px,py=cs.py,pz=cs.pz}
 	local camRot = {rx=cs.rx,ry=cs.ry,rz=cs.rz}
-	local gx,gy,gz,rx,ry,rz,rayDist,cancelCache = TraceCursorToGround(viewSizeX,viewSizeY,{x=x,y=y} ,cs.fov, camPos, camRot,planeToHit,sphereToHit,returnRayDistance) 
+	local gx,gy,gz,rx,ry,rz,rayDist,cancelCache = TraceCursorToGround(viewSizeX,viewSizeY,{x=x,y=y} ,cs.fov, camPos, camRot,planeToHit,sphereToHit,returnRayDistance)
 	--//caching for efficiency
 	if not cancelCache then
 		scrnRay_cache.result[1] = gx
@@ -988,7 +988,7 @@ local function MoveRotatedCam(cs, mxm, mym)
 	local ddz = (mxm * drz) + (mym * dfz)
 	
 	local gx1, gz1 = cs.px + vecDist*cs.dx,			cs.pz + vecDist*cs.dz --note me: what does cs.dx mean?
-	local gx2, gz2 = cs.px + vecDist*cs.dx + ddx,	cs.pz + vecDist*cs.dz + ddz 
+	local gx2, gz2 = cs.px + vecDist*cs.dx + ddx,	cs.pz + vecDist*cs.dz + ddz
 	
 	local extra = 500
 	
@@ -1029,7 +1029,7 @@ local function VirtTraceRay(x,y, cs)
 		local gx, gy, gz = gpos[1], gpos[2], gpos[3]
 		
 		if gx < 0 or gx > MWIDTH or gz < 0 or gz > MHEIGHT then --out of map
-			return false, gx, gy, gz	
+			return false, gx, gy, gz
 		else
 			return true, gx, gy, gz
 		end
@@ -1038,7 +1038,7 @@ local function VirtTraceRay(x,y, cs)
 	if not cs or not cs.dy or cs.dy == 0 then
 		return false, false
 	end
-	--[[ 
+	--[[
 	local vecDist = (- cs.py) / cs.dy
 	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz  --note me: what does cs.dx mean?
 	--]]
@@ -1099,7 +1099,7 @@ local function ComputeLockSpotParams(cs, gx, gy, gz, onmap) --Only compute from 
 	end
 end
 
-local function SetLockSpot2(cs, x, y, useSmoothMeshSetting) --set an anchor on the ground for camera rotation 
+local function SetLockSpot2(cs, x, y, useSmoothMeshSetting) --set an anchor on the ground for camera rotation
 	if ls_have then --if lockspot is locked
 		return
 	end
@@ -1122,7 +1122,7 @@ local function UpdateCam(cs)
 	local cstemp = spGetCameraState()
 	CopyState(cstemp, cs)
 	if not (cstemp.rx and cstemp.ry and ls_dist) then
-		--return cstemp 
+		--return cstemp
 		return false
 	end
 	
@@ -1166,18 +1166,18 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 	local targetRx = sqrt(skyProportion) * (minZoomTiltAngle - HALFPI) - minZoomTiltAngle
 
 	-- Ensure angle correction only happens by parts if the angle doesn't match the target, unless it is within a threshold
-	-- If it isn't, make sure the correction only happens in the direction of the curve. 
+	-- If it isn't, make sure the correction only happens in the direction of the curve.
 	-- Zooming in shouldn't make the camera face the ground more, and zooming out shouldn't focus more on the horizon
 	if zoomin ~= nil and rayDist then
 		if onTiltZoomTrack or math.abs(targetRx - cs.rx) < angleCorrectionMaximum then
 			-- Spring.Echo("Within Bounds")
 			onTiltZoomTrack = true
 			return targetRx
-		elseif targetRx > cs.rx and zoomin then 
+		elseif targetRx > cs.rx and zoomin then
 			-- Spring.Echo("Pulling on track for Zoomin")
 			-- onTiltZoomTrack = true
 			return cs.rx + angleCorrectionMaximum
-		elseif targetRx < cs.rx and not zoomin then 
+		elseif targetRx < cs.rx and not zoomin then
 			-- Spring.Echo("Pulling on track for Zoomout")
 			-- onTiltZoomTrack = true
 			if skyProportion < 1.0 and rayDist < (maxDistY - topDownBufferZone) then return cs.rx - angleCorrectionMaximum
@@ -1217,7 +1217,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY, gx, gy, gz, storeTa
 
 	--We need to get WorldToScreenCoords for computation to avoid the camera popping around, but WorldToScreenCoords drifts north on its own
 	--so while WorldToScreenCoords is necessary, it should only happen when the mouse moves or zoom state changes
-	local mouseMoved = true 
+	local mouseMoved = true
 	if lockPoint and lastMouseX and lastMouseY then
 		mouseMoved = mouseX ~= lastMouseX and mouseY ~= lastMouseY
 	end
@@ -1288,7 +1288,7 @@ local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 			return
 		end
 		if dist then -- if a distance is specified, loosen bounds at first. They will be checked at the end
-			ls_dist = dist 
+			ls_dist = dist
 			ls_x, ls_y, ls_z = gx, gy, gz
 		else -- otherwise, enforce bounds here to avoid the camera jumping around when moved with MMB or minimap over hilly terrain
 			ls_x = min(max(gx, minX), maxX) --update lockpot to target destination
@@ -1302,10 +1302,10 @@ local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 		local cstemp = UpdateCam(cs)
 		if options.tiltedzoom.value then
 			if cstemp then
-				if dist then 
+				if dist then
 					lockPoint = {}
 					_, x, y, z = VirtTraceRay(cx, cy, cs)
-					cs = ZoomTiltCorrection(cstemp, cs.py > cstemp.py, cx, cy, ls_x, ls_y, ls_z, true, true) 
+					cs = ZoomTiltCorrection(cstemp, cs.py > cstemp.py, cx, cy, ls_x, ls_y, ls_z, true, true)
 					lockPoint.worldEnd = {x = ls_x, y = ls_y, z = ls_z}
 					lockPoint.worldBegin = {x = x, y = y, z = z}
 				else
@@ -1361,7 +1361,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		if gx then
 			gx,gz = DriftToCenter(cs, gx, gy, gz, mx, my)
 			if not options.freemode.value then
-				gx,gz = GetMapBoundedCoords(gx,gz)  
+				gx,gz = GetMapBoundedCoords(gx,gz)
 			end
 		end
 
@@ -1431,7 +1431,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		
 		if gx and not options.freemode.value then
 			--out of map. Bound zooming to within map
-			gx,gz = GetMapBoundedCoords(gx,gz)   
+			gx,gz = GetMapBoundedCoords(gx,gz)
 			-- if not zoomin then gx, gz = GetPyramidBoundedCoords(gx, gz) end
 		end
 
@@ -1442,8 +1442,8 @@ local function Zoom(zoomin, shift, forceCenter)
 			return
 		end
 
-		-- if not options.freemode.value and ls_dist >= maxDistY then 
-			-- return 
+		-- if not options.freemode.value and ls_dist >= maxDistY then
+			-- return
 		-- end
 	    
 		local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (shift and 3 or 1)
@@ -1495,9 +1495,9 @@ local function Altitude(up, s)
 	local new_py = py + dy
 	if not options.freemode.value then
         if new_py < spGetGroundHeight(cs.px, cs.pz)+5  then
-            new_py = spGetGroundHeight(cs.px, cs.pz)+5  
+            new_py = spGetGroundHeight(cs.px, cs.pz)+5
         elseif new_py > maxDistY then
-            new_py = maxDistY 
+            new_py = maxDistY
         end
 	end
     cs.py = new_py
@@ -1580,10 +1580,10 @@ OverviewAction = function()
 		mx, my = spGetMouseState()
 		local onmap, gx, gy, gz = VirtTraceRay(mx,my,cs) --create a lockstop point.
 		if gx then --Note:  Now VirtTraceRay can extrapolate coordinate in null space (no need to check for onmap)
-			local cs = GetTargetCameraState()			
+			local cs = GetTargetCameraState()
 			cs.rx = last_rx
 			if ov_cs and last_ry and options.rotatebackfromov.value then cs.ry = last_ry end
-			ls_dist = last_ls_dist 
+			ls_dist = last_ls_dist
 			ls_x = gx
 			ls_z = gz
 			ls_y = gy
@@ -1609,11 +1609,11 @@ OverviewAction = function()
 				selUnits = spGetSelectedUnits()
 			end
 			thirdperson_trackunit = false
-			if selUnits and selUnits[1] then 
+			if selUnits and selUnits[1] then
 				spSendCommands('viewfps')
 				spSendCommands('track') -- re-issue 3rd person for selected unit
 				thirdperson_trackunit = selUnits[1]
-				local cs = GetTargetCameraState()	
+				local cs = GetTargetCameraState()
 				cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1]) --move camera to unit position so no "out of LOD" case
 				cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
 				-- spSetCameraState(cs,0)
@@ -1637,11 +1637,11 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 			return
 		end
 		local cs = GetTargetCameraState()
-		ls_have = false --unlock lockspot 
+		ls_have = false --unlock lockspot
         SetLockSpot2(cs) --set lockspot
         if not ls_have then
             return
-        end 
+        end
 		local sp = (zoomin and -1*options.followzoominspeed.value or options.followzoomoutspeed.value)
 		local deltaDist = max(abs(ls_dist - abs(options.followzoommaxdist.value+options.followzoommindist.value)/2),10) --distance to midpoint
 		local ls_dist_new = ls_dist + deltaDist*sp --zoom step: distance-to-midpoint multiplied by a zooming-multiplier
@@ -1653,8 +1653,8 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 		ls_z = z
 		ls_have = true --lock lockspot
 
-		if options.tiltedzoom.value and cs.name == "free" then 
-			--fixme: proper handling of a case where cam is not "free cam". 
+		if options.tiltedzoom.value and cs.name == "free" then
+			--fixme: proper handling of a case where cam is not "free cam".
 			--How to replicate: join a running game with autozoom & autotilt on, but DO NOT OPEN THE SPRING WINDOW,
 			--allow for some catchup then open the Spring window to look at the game, the camera definitely already crashed.
 			cs = ZoomTiltCorrection(cs, zoomin, nil)
@@ -1678,13 +1678,13 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 			local onscreenspeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
 			lclZoom(true, onscreenspeed,pp[1], groundY, pp[2]) --zoom in & track
 			offscreenTracking = nil
-		elseif (scrn_x<scrnsize_X*5/6 and scrn_x>scrnsize_X*1/6) and (scrn_y<scrnsize_Y*5/6 and scrn_y>scrnsize_Y*1/6) then --if cursor between center & edge: do nothing 
+		elseif (scrn_x<scrnsize_X*5/6 and scrn_x>scrnsize_X*1/6) and (scrn_y<scrnsize_Y*5/6 and scrn_y>scrnsize_Y*1/6) then --if cursor between center & edge: do nothing
 			-- Spring.Echo("MID")
 			if not offscreenTracking then
 				local onscreenspeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
 				SetCameraTarget(pp[1], groundY, pp[2], onscreenspeed) --track
 			else --continue off-screen tracking, but at fastest speed (bring cursor to center ASAP)
-				local maxspeed = math.min(options.followoutscrollspeed.mid*2 - options.followoutscrollspeed.value,options.followinscrollspeed.mid*2 - options.followinscrollspeed.value) --the fastest speed available 
+				local maxspeed = math.min(options.followoutscrollspeed.mid*2 - options.followoutscrollspeed.value,options.followinscrollspeed.mid*2 - options.followinscrollspeed.value) --the fastest speed available
 				SetCameraTarget(pp[1], groundY, pp[2], maxspeed) --track
 			end
 		elseif (scrn_x<scrnsize_X*6/6 and scrn_x>scrnsize_X*0/6) and (scrn_y<scrnsize_Y*6/6 and scrn_y>scrnsize_Y*0/6) then --if cursor near edge: do
@@ -1693,7 +1693,7 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 				local onscreenspeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
 				lclZoom(false, onscreenspeed,pp[1], groundY, pp[2]) --zoom out & track
 			else --continue off-screen tracking, but at fastest speed (bring cursor to center ASAP)
-				local maxspeed = math.min(options.followoutscrollspeed.mid*2 - options.followoutscrollspeed.value,options.followinscrollspeed.mid*2 - options.followinscrollspeed.value) --the fastest speed available 
+				local maxspeed = math.min(options.followoutscrollspeed.mid*2 - options.followoutscrollspeed.value,options.followinscrollspeed.mid*2 - options.followinscrollspeed.value) --the fastest speed available
 				lclZoom(false, maxspeed,pp[1], groundY, pp[2]) --zoom out & track
 			end
 		else --outside screen
@@ -1721,7 +1721,7 @@ local function RotateCamera(x, y, dx, dy, smooth, lock, tilt)
 		if cs.rx < -HALFPIMINUS then
 			cs.rx = -HALFPIMINUS
 		elseif cs.rx > max_rx then
-			cs.rx = max_rx 
+			cs.rx = max_rx
 		end
 		
         -- [[
@@ -1775,7 +1775,7 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 	local teamID = (not isSpec and Spring.GetMyTeamID()) --get teamID ONLY IF not spec
 	local foundUnit, foundUnitStructure
 	local forwardOffset,backwardOffset,leftOffset,rightOffset
-	if move.right then --content of move table is set in KeyPress(). Is global. Is used to start scrolling & rotation (initiated in Update()) 
+	if move.right then --content of move table is set in KeyPress(). Is global. Is used to start scrolling & rotation (initiated in Update())
 		rightOffset =true
 	elseif move.up then
 		forwardOffset = true
@@ -1785,7 +1785,7 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 		backwardOffset = true
 	end
 	local front, top, right = Spring.GetUnitVectors(thirdperson_trackunit) --get vector of current tracked unit
-	local x,y,z = spGetUnitPosition(thirdperson_trackunit) 
+	local x,y,z = spGetUnitPosition(thirdperson_trackunit)
 	y = y+25
 	for i=1, 3 do --create a (detection) sphere of increasing size to ~1600-elmo range in scroll direction
 		local sphereCenterOffset = detectionSphereRadiusAndPosition[i][2]
@@ -1842,7 +1842,7 @@ end
 
 local function Tilt(s, dir)
 	if not tilting then
-		ls_have = false	
+		ls_have = false
 	end
 	tilting = true
 	lastMouseX = nil
@@ -1885,8 +1885,8 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	local drx = cr[1] / len
 	local drz = cr[3] / len
 
-	-- The following code should be here and not in SetLockSpot2, 
-	-- but MouseMove springscroll (MMB scrolling, not smoothscroll) 
+	-- The following code should be here and not in SetLockSpot2,
+	-- but MouseMove springscroll (MMB scrolling, not smoothscroll)
 	-- starts translating on all axes, rather than just x and z
 
 	-- corrected, ls_x, ls_y, ls_z = CorrectTraceTargetToSmoothMesh(cs, ls_x, ls_y, ls_z)
@@ -1937,8 +1937,8 @@ function widget:Update(dt)
 	local cs = spGetCameraState() --GetTargetCameraState()
 	--//MISC
 	fpsmode = cs.name == "fps"
-	if init or ((cs.name ~= "free") and (cs.name ~= "ov") and not fpsmode) then 
-		-- spSendCommands("viewfree") 
+	if init or ((cs.name ~= "free") and (cs.name ~= "ov") and not fpsmode) then
+		-- spSendCommands("viewfree")
 		cs = DetermineInitCameraState()
 
 		init = false
@@ -1951,7 +1951,7 @@ function widget:Update(dt)
 
 		OverrideSetCameraStateInterpolate(cs,0)
 
-		if not initialBoundsSet then 
+		if not initialBoundsSet then
 			local oldzoomouttocenterValue = options.zoomouttocenter.value
 			options.zoomouttocenter.value = false
 			SetCameraTarget(MWIDTH/2, 10, MHEIGHT/2, 0)
@@ -1963,24 +1963,24 @@ function widget:Update(dt)
 
 	--//HANDLE TIMER FOR VARIOUS SECTION
 	--timer to block tracking when using mouse
-	if follow_timer > 0  then 
+	if follow_timer > 0  then
 		follow_timer = follow_timer - dt
 	end
 	--timer to block unit tracking
-	trackcycle = trackcycle + framePassed 
-	if trackcycle >=6 then 
+	trackcycle = trackcycle + framePassed
+	if trackcycle >=6 then
 		trackcycle = 0 --reset value to Zero (0) every 6th frame. Extra note: dt*trackcycle would be the estimated number of second elapsed since last reset.
 	end
 	--timer to block cursor tracking
-	camcycle = camcycle + framePassed 
+	camcycle = camcycle + framePassed
 	if camcycle >=12 then
-		camcycle = 0 --reset value to Zero (0) every 12th frame. NOTE: a reset value a multiple of trackcycle's reset is needed to prevent conflict 
+		camcycle = 0 --reset value to Zero (0) every 12th frame. NOTE: a reset value a multiple of trackcycle's reset is needed to prevent conflict
 	end
 	--timer to block periodic warning
 	cycle = cycle + framePassed
 	if cycle >=32*15 then
 		cycle = 0 --reset value to Zero (0) every 32*15th frame.
-	end	
+	end
 
 	--//HANDLE TRACK UNIT
 	--trackcycle = trackcycle%(6) + 1 --automatically reset "trackcycle" value to Zero (0) every 6th iteration.
@@ -1991,12 +1991,12 @@ function widget:Update(dt)
 	not thirdperson_trackunit and
 	not (rot.right or rot.left or rot.up or rot.down) and --cam rotation conflict with tracking, causing zoom-out bug. Rotation while tracking is handled in RotateCamera() but with less smoothing.
 	(not rotate)) --update trackmode during non-rotating state (doing both will cause a zoomed-out bug)
-	then 
+	then
 		local selUnits = spGetSelectedUnits()
 		if selUnits and selUnits[1] then
 			local vx,vy,vz = Spring.GetUnitVelocity(selUnits[1])
 			local x,y,z = spGetUnitPosition( selUnits[1] )
-			--MAINTENANCE NOTE: the following smooth value is obtained from trial-n-error. There's no formula to calculate and it could change depending on engine (currently Spring 91). 
+			--MAINTENANCE NOTE: the following smooth value is obtained from trial-n-error. There's no formula to calculate and it could change depending on engine (currently Spring 91).
 			--The following instruction explain how to get this smooth value:
 			--1) reset Spring.SetCameraTarget to: (x+vx,y+vy,z+vz, 0.0333)
 			--2) increase value A until camera motion is not jittery, then stop: (x+vx,y+vy,z+vz, 0.0333*A)
@@ -2016,8 +2016,8 @@ function widget:Update(dt)
 	(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
 	not thirdperson_trackunit and
 	options.follow.value)  --if follow selected player's cursor:
-	then 
-		if WG.alliedCursorsPos then 
+	then
+		if WG.alliedCursorsPos then
 			AutoZoomInOutToCursor()
 		end
 	end
@@ -2031,7 +2031,7 @@ function widget:Update(dt)
 	local fpsCompensationFactor = (60 * dt) --Normalize to 60fps
     
 	--//HANDLE ROTATE CAMERA
-	if 	(not thirdperson_trackunit and  --block 3rd Person 
+	if 	(not thirdperson_trackunit and  --block 3rd Person
 	(rot.right or rot.left or rot.up or rot.down))
 	then
 		
@@ -2063,7 +2063,7 @@ function widget:Update(dt)
 	end
 	
 	--//HANDLE MOVE CAMERA
-	if (not thirdperson_trackunit and  --block 3rd Person 
+	if (not thirdperson_trackunit and  --block 3rd Person
 	(smoothscroll or
 	move.right or move.left or move.up or move.down or
 	move2.right or move2.left or move2.up or move2.down or
@@ -2087,7 +2087,7 @@ function widget:Update(dt)
 		
 		local heightFactor = (cs.py/1000)
 		if smoothscroll then
-			--local speed = dt * options.speedFactor.value * heightFactor 
+			--local speed = dt * options.speedFactor.value * heightFactor
 			local speed = math.max( dt * options.speedFactor.value * heightFactor, 0.005 )
 			mxm = speed * (x - cx)
 			mym = speed * (y - cy)
@@ -2098,7 +2098,7 @@ function widget:Update(dt)
 			mxm = speed * (x - mx) * dir
 			mym = speed * (y - my) * dir
 			
-			spWarpMouse(cx, cy)		
+			spWarpMouse(cx, cy)
 		else --edge screen scroll
 			--local speed = options.speedFactor_k.value * (s and 3 or 1) * heightFactor
 			local speed = math.max( options.speedFactor_k.value * (s and 3 or 1) * heightFactor * fpsCompensationFactor, 1 )
@@ -2116,9 +2116,9 @@ function widget:Update(dt)
 			end
 			smoothlevel = options.smoothness.value
 			
-			if spDiffTimers(spGetTimer(),last_move)>1 then --if edge scroll is 'first time': unlock lockspot once 
+			if spDiffTimers(spGetTimer(),last_move)>1 then --if edge scroll is 'first time': unlock lockspot once
 				ls_have = false
-			end			
+			end
 			last_move = spGetTimer()
 		end
 		
@@ -2133,17 +2133,17 @@ function widget:Update(dt)
 		if options.leftRightEdge.value == 'pan' then
 			move2.right = false --reset mouse move state
 			move2.left = false
-			if mx > vsx-2 then 
+			if mx > vsx-2 then
 				move2.right = true
 			elseif mx < 2 then
 				move2.left = true
 			end
 			
 		elseif options.leftRightEdge.value == 'rotate' or options.leftRightEdge.value == 'orbit' then
-			rot.right = false 
+			rot.right = false
 			rot.left = false
-			if mx > vsx-2 then 
-				rot.right = true 
+			if mx > vsx-2 then
+				rot.right = true
 			elseif mx < 2 then
 				rot.left = true
 			end
@@ -2170,7 +2170,7 @@ function widget:Update(dt)
 	end
 	
 	--//HANDLE MOUSE/KEYBOARD'S 3RD-PERSON (TRACK UNIT) RETARGET
-	if 	(thirdperson_trackunit and 
+	if 	(thirdperson_trackunit and
 	not overview_mode and --block 3rd person scroll when in overview mode
 	(move.right or move.left or move.up or move.down or
 	move2.right or move2.left or move2.up or move2.down or
@@ -2203,7 +2203,7 @@ function widget:Update(dt)
 		end
 	end
 	
-	if missedMouseRelease and camcycle==0 then 
+	if missedMouseRelease and camcycle==0 then
 		--Workaround/Fix for middle-mouse button release event not detected:
 		--We request MouseRelease event for middle-mouse release in MousePress by returning "true",
 		--but when 2 key is pressed at same time, the MouseRelease is called for the first key which is released (not necessarily middle-mouse button).
@@ -2257,8 +2257,8 @@ end
 
 function widget:MousePress(x, y, button) --called once when pressed, not repeated
 	ls_have = false
-	if (button == 2 and options.middleMouseButton.value == 'off') then 
-		return true 
+	if (button == 2 and options.middleMouseButton.value == 'off') then
+		return true
 	end
 	--overview_mode = false
     --if fpsmode then return end
@@ -2318,7 +2318,7 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	if ctrl or options.middleMouseButton.value == 'orbit' then
 		rotate_transit = nil
 		onTiltZoomTrack = false
-		if options.targetmouse.value then --if rotate world at mouse cursor: 
+		if options.targetmouse.value then --if rotate world at mouse cursor:
 			
 			local onmap, gx, gy, gz = VirtTraceRay(x,y, cs)
 			if gx and (options.freemode.value or onmap) then  --Note: we don't block offmap position since VirtTraceRay() now work for offmap position.
@@ -2327,7 +2327,7 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 				--//update "ls_dist" with value from mid-screen's LockSpot because rotation is centered on mid-screen and not at cursor (cursor's "ls_dist" has bigger value than midscreen "ls_dist")//--
 				local _,cgx,cgy,cgz = VirtTraceRay(cx,cy,cs) --get ground position traced from mid of screen
 				local dx,dy,dz = cgx-cs.px, cgy-cs.py, cgz-cs.pz
-				ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground 
+				ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground
 				
 				SetCameraTarget(gx,gy,gz,1) --transit to cursor position
 				rotate_transit = spGetTimer() --trigger smooth in-transit effect in widget:MouseMove()
@@ -2375,12 +2375,12 @@ function widget:MouseWheel(wheelUp, value)
 	if ctrl then
 		return Tilt(shift, wheelUp and 1 or -1)
 	elseif alt then
-		if overview_mode then --cancel overview_mode if Overview_mode + descending 
+		if overview_mode then --cancel overview_mode if Overview_mode + descending
 			local zoomin = not wheelUp
 			if options.invertalt.value then
 				zoomin = not zoomin
 			end
-			if zoomin then 
+			if zoomin then
 				overview_mode = false
 			else return; end-- skip wheel if Overview_mode + ascending
 		end
@@ -2512,7 +2512,7 @@ function widget:DrawScreen()
 		DrawPoint(x, y, { 0, 1, 0 },  5)
 	end
 	
-	local filefound	
+	local filefound
 	if smoothscroll then --or (rotate and ls_have) then
 		filefound = glTexture(LUAUI_DIRNAME .. 'Images/ccc/arrows.png')
 		hideCursor = true
@@ -2552,7 +2552,7 @@ function widget:DrawScreen()
 		glTexture(false)
 
 		glColor(1,1,1,1)
-		glAlphaTest(false)		
+		glAlphaTest(false)
 	end
 end
 
@@ -2581,7 +2581,7 @@ function widget:Initialize()
 	WG.COFC_SetCameraTargetBox = SetCameraTargetBox
 
 	--for external use, so that minimap can scale when zoomed out
-	WG.COFC_SkyBufferProportion = 0 
+	WG.COFC_SkyBufferProportion = 0
 	
 	if WG.SetWidgetOption then
 		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC") --tell epicmenu.lua that we select COFC as our default camera (since we enabled it!)
@@ -2616,7 +2616,7 @@ function widget:TextCommand(command)
 		return true
 	end
 	return false
-end   
+end
 
 function widget:UnitDestroyed(unitID) --transfer 3rd person trackmode to other unit or exit to freeStyle view
 	if thirdperson_trackunit and thirdperson_trackunit == unitID then --return user to normal view if tracked unit is destroyed
@@ -2662,7 +2662,7 @@ end
 --Remake Spring's group recall to trigger ZK's custom Spring.SetCameraTarget (which work for freestyle camera mode).
 --------------------------------------------------------------------------------
 local spGetUnitGroup = Spring.GetUnitGroup
-local spGetGroupList  = Spring.GetGroupList 
+local spGetGroupList  = Spring.GetGroupList
 
 
 --include("keysym.h.lua")
@@ -2691,8 +2691,8 @@ end
 function GroupRecallFix(key, modifier, isRepeat)
 	if ( not modifier.ctrl and not modifier.alt and not modifier.meta) then --check key for group. Reference: unit_auto_group.lua by Licho
 		local group
-		if (key ~= nil and groupNumber[key]) then 
-			group = groupNumber[key]	
+		if (key ~= nil and groupNumber[key]) then
+			group = groupNumber[key]
 		end
 		if (group ~= nil) then
 			local selectedUnit = spGetSelectedUnits()
@@ -2718,7 +2718,7 @@ function GroupRecallFix(key, modifier, isRepeat)
 			previousKey = key
 			previousTime = spGetTimer()
 			
-			if options.enableCycleView.value then 
+			if options.enableCycleView.value then
 				if (currentIterations[group]) then
 					currentIteration = currentIterations[group]
 				else

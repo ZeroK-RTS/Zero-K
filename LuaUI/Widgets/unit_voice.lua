@@ -26,7 +26,7 @@ local factories = {}
 
 local function EnableVoiceCommandOptions(unitDef)
   for _, buildOptionID in ipairs(unitDef.buildOptions) do
-    local buildOptionDef = UnitDefs[buildOptionID]      
+    local buildOptionDef = UnitDefs[buildOptionID]
     Spring.Echo("!transmitlobby @voice@buildUnit@add;"..buildOptionDef.name..";"..buildOptionDef.humanName) -- zklobby listens to this
   end
   Spring.Echo("!transmitlobby @voice@buildUnit@reload")
@@ -35,7 +35,7 @@ end
 
 local function DisableVoiceCommandOptions(unitDef)
   for _, buildOptionID in ipairs(unitDef.buildOptions) do
-    local buildOptionDef = UnitDefs[buildOptionID]      
+    local buildOptionDef = UnitDefs[buildOptionID]
     Spring.Echo("!transmitlobby @voice@buildUnit@remove;"..buildOptionDef.name) -- zklobby listens to this
   end
   Spring.Echo("!transmitlobby @voice@buildUnit@reload")
@@ -72,11 +72,11 @@ end
 
 -- todo: take into account factories given to me
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-  local myTeamID = Spring.GetMyTeamID()  
+  local myTeamID = Spring.GetMyTeamID()
   if unitTeam ~= myTeamID then
     return
   end
-  local unitDef = UnitDefs[unitDefID]  
+  local unitDef = UnitDefs[unitDefID]
   if unitDef and unitDef.isFactory then
     factories[unitID] = true
     if Spring.GetTeamUnitDefCount(myTeamID, unitDefID) < 2 then -- if this is the first factory of this type

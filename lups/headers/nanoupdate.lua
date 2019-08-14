@@ -40,7 +40,7 @@ local function GetUnitIsMobile(self, unitID)
 	return true
 end
 
-local function GetCmdTag(unitID) 
+local function GetCmdTag(unitID)
 	local cmdTag = 0
 	local cmds = Spring.GetFactoryCommands(unitID,1)
 	if (cmds) then
@@ -49,7 +49,7 @@ local function GetCmdTag(unitID)
 				 cmdTag = cmd.tag
 			end
 		end
-	if cmdTag == 0 then 
+	if cmdTag == 0 then
 		local cmds = Spring.GetCommandQueue(unitID,1)
 		if (cmds) then
 			local cmd = cmds[1]
@@ -59,7 +59,7 @@ local function GetCmdTag(unitID)
 		end
 	end
 	return cmdTag
-end 
+end
 
 
 function UpdateNanoParticles(self)

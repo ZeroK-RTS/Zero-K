@@ -8,7 +8,7 @@ function widget:GetInfo()
     author    = "KingRaptor",
     date      = "May 04, 2008",
     license   = "GNU GPL, v2 or later",
-    layer     = -9, 
+    layer     = -9,
     enabled   = true  --  loaded by default?
   }
 end
@@ -203,7 +203,7 @@ function widget:Initialize()
 		color = {0, 0, 0, 0},
 		width = 300;
 		height = 120;
-		right = 2; 
+		right = 2;
 		y = "45%";
 		dockable = true;
 		dockableSavePositionOnly = true,
@@ -211,7 +211,7 @@ function widget:Initialize()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		minWidth = MIN_WIDTH, 
+		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
 		padding = {0, 0, 0, 0},
 		--itemMargin  = {0, 0, 0, 0},
@@ -274,7 +274,7 @@ function widget:Initialize()
 			height = "100%",
 			classname = "overlay_button",
 			caption = (i==1) and 'Yes' or 'No',
-			OnClick = {	function () 
+			OnClick = {	function ()
 					--if voteAntiSpam then return end
 					--voteAntiSpam = true
 					local notSpam = CheckForVoteSpam (os.clock())
@@ -300,7 +300,7 @@ function widget:Initialize()
 		margin = {0, 0, 0, 0},
 		caption="";
 		tooltip = "Hide this vote";
-		OnClick = {function() 
+		OnClick = {function()
 				screen0:RemoveChild(window)
 				hidePoll = true
 			end}

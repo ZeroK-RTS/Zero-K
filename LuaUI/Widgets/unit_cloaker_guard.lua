@@ -59,7 +59,7 @@ local cloakRangeSafety = 80 -- how close to the edge cloakers should wait at
 local cloakReactivateRange = 120 -- how far from the edge cloakers should reactivate at
 local cloakieeStopDis = 90 -- how far from the cloaker the cloakiees should stop
 
-local cloakerArray = { 
+local cloakerArray = {
 	"staticjammer",
 	"cloakjammer",
 	"armadvcom",
@@ -145,11 +145,11 @@ end
 -- update following and cloaker
 
 function widget:GameFrame(n)
-	if (n%15<1) then 
+	if (n%15<1) then
 		updateCloakers()
 		updateFollowers()
 	end
-end 
+end
 
 
 ----------------------------
@@ -173,7 +173,7 @@ local function ProcessNotify(sid)
 				end
 			end
 		end
-		spGiveOrderToUnit(sid, CMD_FIRE_STATE, { follower[sid].firestate }, 0)	
+		spGiveOrderToUnit(sid, CMD_FIRE_STATE, { follower[sid].firestate }, 0)
 		follower[sid] = nil
 		c.folCount = c.folCount-1
 	end
@@ -204,8 +204,8 @@ function widget:CommandNotify(id, params, options)
 							v.maxVelID = sid
 						end
 						follower[sid] = {
-							fol = cid, 
-							firestate = firestate, 
+							fol = cid,
+							firestate = firestate,
 							vel = speed,
 							range = v.range
 						}
@@ -213,7 +213,7 @@ function widget:CommandNotify(id, params, options)
 						v.folCount = v.folCount+1
 						spGiveOrderToUnit(sid, CMD_FIRE_STATE, TABLE_0, 0)
 					else
-						spGiveOrderToUnit(sid, id, params, options)	
+						spGiveOrderToUnit(sid, id, params, options)
 					end
 				end
 				
@@ -238,12 +238,12 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 				local ux,uy,uz = spGetUnitPosition(unitID)
 				local speed = ud.speed/30
 				cloakers[unitID] = {
-					id = unitID, ux = ux, uy = uy, uz = uz, 
-					range = ud.jammerRadius-cloakRangeSafety, 
-					reactiveRange = ud.jammerRadius-cloakReactivateRange, 
+					id = unitID, ux = ux, uy = uy, uz = uz,
+					range = ud.jammerRadius-cloakRangeSafety,
+					reactiveRange = ud.jammerRadius-cloakReactivateRange,
 					cloakiees = {},
 					folCount = 0,
-					selfVel = speed, 
+					selfVel = speed,
 					maxVel = speed,
 					maxVelID = -1
 				}
@@ -261,7 +261,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 
 	if cloakers[unitID] then -- remove cloaker
 		for fid, j in pairs(cloakers[unitID].cloakiees) do
-			spGiveOrderToUnit(fid, CMD_FIRE_STATE, { follower[fid].firestate }, 0)	
+			spGiveOrderToUnit(fid, CMD_FIRE_STATE, { follower[fid].firestate }, 0)
 			follower[fid] = nil
 		end
 		cloakers[unitID] = nil
@@ -304,13 +304,13 @@ end
 -----------------------
 --Add cloaker names to array
 
-function widget:Initialize() 
+function widget:Initialize()
 	if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 		Spring.Echo("<Cloaker Guard>: disabled for spectators")
 		widgetHandler:RemoveWidget()
 	end
 	local units = spGetTeamUnits(team)
-	for i, id in ipairs(units) do 
+	for i, id in ipairs(units) do
 		widget:UnitCreated(id, spGetUnitDefID(id),team)
 	end
 end

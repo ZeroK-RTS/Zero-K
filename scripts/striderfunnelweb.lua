@@ -4,7 +4,7 @@ include "spider_walking.lua"
 local ALLY_ACCESS = {allied = true}
 
 local notum = piece 'notum'
-local gaster = piece 'gaster' 
+local gaster = piece 'gaster'
 local gunL, gunR, flareL, flareR, aimpoint = piece('gunl', 'gunr', 'flarel', 'flarer', 'aimpoint')
 local shieldArm, shield, eye, eyeflare = piece('shield_arm', 'shield', 'eye', 'eyeflare')
 local emitl, emitr = piece('emitl', 'emitr')
@@ -78,7 +78,7 @@ local function RestoreLegs()
 	Signal (SIG_WALK)
 	SetSignalMask (SIG_WALK)
 	GG.SpiderWalk.restoreLegs (br, mr, fr, bl, ml, fl,
-		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)				
+		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)
 end
 
 function script.Create()

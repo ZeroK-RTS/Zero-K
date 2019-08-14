@@ -4,14 +4,14 @@ local dynamicRockData
 include "trackControl.lua"
 include "pieceControl.lua"
 
-local main = piece 'main' 
-local turret = piece 'turret' 
-local outer = piece 'outer' 
-local inner = piece 'inner' 
-local sleeve = piece 'sleeve' 
-local barrel = piece 'barrel' 
-local flare = piece 'flare' 
-local breech = piece 'breech' 
+local main = piece 'main'
+local turret = piece 'turret'
+local outer = piece 'outer'
+local inner = piece 'inner'
+local sleeve = piece 'sleeve'
+local barrel = piece 'barrel'
+local flare = piece 'flare'
+local breech = piece 'breech'
 local smoke = piece 'smoke'
 
 local gunHeading = 0

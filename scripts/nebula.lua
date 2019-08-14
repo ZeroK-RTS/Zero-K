@@ -61,12 +61,12 @@ function script.Create()
 	end
 end
 
-function script.QueryWeapon(num) 
+function script.QueryWeapon(num)
 	local index = weapons[num].gunIndex
 	return weapons[num].flares[index]
 end
 
-function script.AimFromWeapon(num) 
+function script.AimFromWeapon(num)
 	return weapons[num].aimFrom
 end
 
@@ -78,10 +78,10 @@ function script.AimWeapon(num, heading, pitch)
 		if (heading/math.pi < 1.5 and heading/math.pi > 0.5) then
 			if num == 4 then
 			heading = -2*math.pi/2 + heading
-			pitch = -pitch + math.pi 
+			pitch = -pitch + math.pi
 			elseif num == 3 then
 			heading = -2*math.pi/2 + heading
-			pitch = -pitch + math.pi 
+			pitch = -pitch + math.pi
 			end
 		end
 		Turn(weapons[num].pitch, x_axis, -pitch, math.rad(240))

@@ -96,7 +96,7 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(turretPieces[num].turret, y_axis, heading, TURRET_YAW_SPEED)
 	Turn(turretPieces[num].pivot, x_axis, -pitch, TURRET_PITCH_SPEED)
 	WaitForTurn(turretPieces[num].turret, y_axis)
-	WaitForTurn(turretPieces[num].pivot, x_axis)	
+	WaitForTurn(turretPieces[num].pivot, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
 end
@@ -108,7 +108,7 @@ function script.Shot(num)
 	local gun_num = gunStates[num]
 	local barrel = turretPieces[num].barrel[gun_num]
 	local flare = turretPieces[num].flare[gun_num]
-	local toEmit = (num <= 5) and 1024 or 1025 
+	local toEmit = (num <= 5) and 1024 or 1025
 	EmitSfx(flare, toEmit)
 	if (num <= 5) then
 		Move(barrel, z_axis, RECOIL_DISTANCE)
@@ -146,7 +146,7 @@ function script.Killed(recentDamage, maxHealth)
 		DeathAnim()
 		Explode(lowerhull, SFX.NONE)
 		Explode(upperhull, SFX.NONE)
-		return 1	
+		return 1
 	else
 		Explode(lowerhull, SFX.SHATTER)
 		Explode(upperhull, SFX.SHATTER)

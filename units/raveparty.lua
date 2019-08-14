@@ -73,15 +73,15 @@ unitDef = {
     {
       def                = [[GREEN_STAMPER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
-    },    
+    },
     {
       def                = [[BLUE_SHOCKER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
-    },    
+    },
     {
       def                = [[VIOLET_SLUGGER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
-    },        
+    },
   },
 
 
@@ -210,7 +210,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1100,
-    },    
+    },
 
     GREEN_STAMPER = {
       name                    = [[Green Stamper]],
@@ -251,7 +251,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1100,
-    },    
+    },
 
     BLUE_SHOCKER = {
       name                    = [[Blue Shocker]],
@@ -333,7 +333,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1100,
-    },    
+    },
     
   },
 

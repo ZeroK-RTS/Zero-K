@@ -1,7 +1,7 @@
 include "constants.lua"
 include "utility.lua"
 
-local beacon, holder, sphere = piece('beacon', 'holder', 'sphere') 
+local beacon, holder, sphere = piece('beacon', 'holder', 'sphere')
 
 local SIG_CEG_EFFECTS = 1
 

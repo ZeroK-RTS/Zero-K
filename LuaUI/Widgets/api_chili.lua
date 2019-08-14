@@ -70,9 +70,9 @@ local tf
 --------------------------------------------------------------------------------
 -- Chili's location
 
-local function GetDirectory(filepath) 
-	return filepath and filepath:gsub("(.*/)(.*)", "%1") 
-end 
+local function GetDirectory(filepath)
+	return filepath and filepath:gsub("(.*/)(.*)", "%1")
+end
 
 local source = debug and debug.getinfo(1).source
 local DIR = GetDirectory(source) or (LUAUI_DIRNAME.."Widgets/")
@@ -218,9 +218,9 @@ function widget:TextInput(utf8, ...)
 end
 
 
-function widget:ViewResize(vsx, vsy) 
+function widget:ViewResize(vsx, vsy)
 	screen0:Resize(vsx/(WG.uiScale or 1), vsy/(WG.uiScale or 1))
-end 
+end
 
 widget.TweakIsAbove	  = widget.IsAbove
 widget.TweakMousePress   = widget.MousePress

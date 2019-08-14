@@ -1,5 +1,5 @@
---[[ 
- Handles all the information about force composition and 
+--[[
+ Handles all the information about force composition and
  position for both an allyTeam and enemies of that allyTeam.
 --]]
 local AssetTracker = VFS.Include("LuaRules/Gadgets/CAI/AssetTracker.lua")

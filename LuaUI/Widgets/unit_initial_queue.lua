@@ -309,7 +309,7 @@ function widget:DrawScreen()
 	gl.PushMatrix()
 	gl.Translate(scrW*0.4, scrH*0.35, 0)
 	local num = #buildQueue
-	if num > 0 then	
+	if num > 0 then
 		--gl.Text(string.format(queueTimeFormat, mCost, buildTime), 0, 0, fontSize, 'cdo')
 		local str = "Queue: " .. num .. "/" .. MAX_QUEUE
 		if num >= MAX_QUEUE then
@@ -323,7 +323,7 @@ end
 local function DrawWorldFunc()
 	--don't draw anything once the game has started; after that engine can draw queues itself
 	if gameStarted then
-		return 
+		return
 	end
 
 	-- local clash = false
@@ -454,7 +454,7 @@ function widget:RecvLuaMsg(msg, playerID)
 			othersBuildQueue[teamID] = {}
 			return
 		end
-		if not UnitDefs[unitDefID] or typeArg > 5 or typeArg < 1 then 
+		if not UnitDefs[unitDefID] or typeArg > 5 or typeArg < 1 then
 			return --invalid unitDefID and message type
 		end
 		local x,y,z,face = tonumber(msgArray[3]),tonumber(msgArray[4]),tonumber(msgArray[5]),tonumber(msgArray[6])
@@ -542,7 +542,7 @@ end
 ------------------------------------------------------------
 -- Mouse
 ------------------------------------------------------------
---[[ 
+--[[
 --Task handled by CommandNotify()
 function widget:MousePress(mx, my, mButton)
 	if selDefID then
@@ -624,7 +624,7 @@ function widget:CommandsChanged()
 				tooltip = "Build: " .. UnitDefNames[unitName].humanName .. " - " .. UnitDefNames[unitName].tooltip,
 				cursor  = unitName,
 				action  = "buildunit_" .. unitName,
-				params  = {}, 
+				params  = {},
 				texture = "", --"#"..id,
 				name = unitName,
 			})
@@ -635,14 +635,14 @@ function widget:CommandsChanged()
 		type    = CMDTYPE.ICON,
 		tooltip = "Stop",
 		action  = "stop",
-		params  = {}, 
+		params  = {},
 	})
 end
 
 local function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
 	local bestSpot
 	local bestDist = math.huge
-	local bestIndex 
+	local bestIndex
 	for i = 1, #WG.metalSpots do
 		local spot = WG.metalSpots[i]
 		local dx, dz = x - spot.x, z - spot.z
@@ -670,7 +670,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if areSpec then
 		return false
 	end
-	if cmdID == CMD_STOP then 
+	if cmdID == CMD_STOP then
 		-- This only handles pressing the stop button in integral menu.
 		CancelQueue()
 		return true

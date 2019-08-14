@@ -125,7 +125,7 @@ local altforms = {
 	properties = {particlelife = 5, particlesize = 12},
       },
     },
-  },  
+  },
 }
 
 for cegName, info in pairs(altforms) do

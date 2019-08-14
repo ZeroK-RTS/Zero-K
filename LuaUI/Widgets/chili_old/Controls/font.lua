@@ -32,7 +32,7 @@ end
 
 function Font:Dispose(...)
   if (not self.disposed) then
-    FontHandler.UnloadFont(self._font)  
+    FontHandler.UnloadFont(self._font)
   end
   inherited.Dispose(self,...)
 end
@@ -118,11 +118,11 @@ do
       if (recreateFont) then
         self:_LoadFont()
         if (p) then
-          p:RequestRealign() 
+          p:RequestRealign()
         end
       else
         if (p)and NotEqual(oldValue, self[param]) then
-          p:Invalidate() 
+          p:Invalidate()
         end
       end
     end

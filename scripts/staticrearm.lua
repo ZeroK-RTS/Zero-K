@@ -1,12 +1,12 @@
 include "constants.lua"
 
-local base = piece 'base' 
-local body = piece 'body' 
-local land1 = piece 'land1' 
-local land2 = piece 'land2' 
-local land3 = piece 'land3' 
-local land4 = piece 'land4' 
-local radar = piece 'radar' 
+local base = piece 'base'
+local body = piece 'body'
+local land1 = piece 'land1'
+local land2 = piece 'land2'
+local land3 = piece 'land3'
+local land4 = piece 'land4'
+local radar = piece 'radar'
 
 local nanoPieces = {radar}
 local smokePiece = {base,land1,land2,land3,land4}

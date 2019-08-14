@@ -77,7 +77,7 @@ end
 local type  = type
 local pairs = pairs
 function CopyTable(outtable,intable)
-	for i,v in pairs(intable) do 
+	for i,v in pairs(intable) do
 		if (type(v)=='table') then
 			if (type(outtable[i])~='table') then outtable[i] = {} end
 			CopyTable(outtable[i],v)

@@ -118,7 +118,7 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	end
 end
 
-function RemoveWeapons(unitDef) 
+function RemoveWeapons(unitDef)
 end
 
 function ReplaceWeapon(unitDef, oldWeapon, newWeapon)

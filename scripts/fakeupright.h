@@ -6,7 +6,7 @@
 /*
 Model Requirements:
 1. You need two pieces to made upright, one a child of the other.
-2. The model for the unit must have three pieces all in the same spot, tied directly to something that doesn't turn relative to the base 
+2. The model for the unit must have three pieces all in the same spot, tied directly to something that doesn't turn relative to the base
 and not used in other animation.
 There should be a "ref", "x", and "z" piece.
 You can use the base for the ref piece if it is not being used in animation and is not the piece to be made upright.
@@ -18,9 +18,9 @@ Script Requirements:
 //fakeupright
 #define FAKE_UPRIGHT_TARGET_PARENT	0
 #define FAKE_UPRIGHT_TARGET_CHILD	0	//piece to make upright
-#define FAKE_UPRIGHT_REFERENCE		0	
-#define FAKE_UPRIGHT_X				0	
-#define FAKE_UPRIGHT_Z				0	
+#define FAKE_UPRIGHT_REFERENCE		0
+#define FAKE_UPRIGHT_X				0
+#define FAKE_UPRIGHT_Z				0
 
 #include "fakeupright.h"
 

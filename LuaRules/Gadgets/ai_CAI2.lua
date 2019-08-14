@@ -131,7 +131,7 @@ function gadget:Initialize()
 	else
 		Spring.SetGameRulesParam("CAI2_disabled", 1)
 		gadgetHandler:RemoveGadget()
-		return 
+		return
 	end
 	
 	local allUnits = Spring.GetAllUnits()

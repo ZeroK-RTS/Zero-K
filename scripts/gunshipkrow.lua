@@ -184,8 +184,8 @@ local function updateAllVectors()
 	gunpoints[1].right,gunpoints[2].right = gunpoints[2].right,gunpoints[1].right
 end
 
-function script.Create()	
-	--Turn(Base,y_axis, math.pi)	
+function script.Create()
+	--Turn(Base,y_axis, math.pi)
 	--Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"turnRate",0)
 	
 	--set starting positions for turrets
@@ -222,13 +222,13 @@ end
 --[[
 function TiltBody(heading)
 	Signal(signals.tilt)
-	SetSignalMask(signals.tilt)	
+	SetSignalMask(signals.tilt)
 		if(attacking) then
 			--calculate tilt amount for z angle and x angle
 			local amountz = -math.sin(heading)
 			local amountx = math.cos(heading)
 					
-			--Turn(Base,x_axis, amountx * tiltAngle,1)							
+			--Turn(Base,x_axis, amountx * tiltAngle,1)
 			--Turn(Base,z_axis, amountz * tiltAngle,1)
 			WaitForTurn (Base, x_axis)
 			WaitForTurn (Base, z_axis)
@@ -247,11 +247,11 @@ local function RestoreAfterDelay()
 	--Signal(tiltSignal)
 end
 
-function script.QueryWeapon(num) 	
-	return gunpoints[num].fire	
+function script.QueryWeapon(num)
+	return gunpoints[num].fire
 end
 
-function script.AimFromWeapon(num)	
+function script.AimFromWeapon(num)
 	return gunpoints[num].aim
 end
 
@@ -298,15 +298,15 @@ function script.AimWeapon(num, heading, pitch)
 	end
 	Signal(signals[num])
 	SetSignalMask(signals[num])
-	attacking = true	
+	attacking = true
 
-	--StartThread(TiltBody, heading)	
+	--StartThread(TiltBody, heading)
 	
 	local theta, phi = getTheActuallyCorrectHeadingAndPitch(heading, pitch, gunpoints[num].normal, gunpoints[num].radial, gunpoints[num].right)
 	
 	Turn(gunpoints[num].rot, y_axis, theta, turretSpeed)
-	Turn(gunpoints[num].pitch, x_axis, phi,turretSpeed)	
-	WaitForTurn (gunpoints[num].pitch, x_axis) 
+	Turn(gunpoints[num].pitch, x_axis, phi,turretSpeed)
+	WaitForTurn (gunpoints[num].pitch, x_axis)
 	WaitForTurn (gunpoints[num].rot, y_axis)
 	
 	StartThread(RestoreAfterDelay)

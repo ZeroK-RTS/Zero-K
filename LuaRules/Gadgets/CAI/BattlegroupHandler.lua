@@ -70,7 +70,7 @@ function scoutHandler.CreateScoutHandler(allyTeamID)
 				end
 			end
 		end
-	end	
+	end
 	
 	local function GetScoutedProportion()
 		return 1 - unscoutedUnweightedCount/TOTAL_HEAT_POINTS

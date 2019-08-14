@@ -242,7 +242,7 @@ local averageTime = 5
 local loadAverages = {}
 
 local function CalcLoad(old_load, new_load, t)
-  return old_load*math.exp(-tick/t) + new_load*(1 - math.exp(-tick/t)) 
+  return old_load*math.exp(-tick/t) + new_load*(1 - math.exp(-tick/t))
   --return (old_load-new_load)*math.exp(-tick/t) + new_load
 end
 
@@ -287,7 +287,7 @@ end
         targetCallinCumul = {nil}
         targetCountdown = 0
       else
-        local words = explode(" ",command)	  
+        local words = explode(" ",command)
         local countdown = tonumber(words[#words])
         if countdown and #words>=2 then
           local wname = table.concat(words,' ',1,#words-1)
@@ -346,7 +346,7 @@ end
         local tLoad = loadAverages[wname]
         allOverTime = allOverTime + tLoad
         if (maximum<tLoad) then maximum=tLoad end
-        if tLoad > 0.5 or not (options.hideLowValues.value) then 
+        if tLoad > 0.5 or not (options.hideLowValues.value) then
                 sortedList[n] = {wname..'('..cmaxname..')',tLoad}
                 n = n + 1
         end
@@ -373,7 +373,7 @@ end
 
     gl.Color(1,1,1,1)
     gl.BeginText()
-    if targetWname=='' then	
+    if targetWname=='' then
       for i=1,#sortedList do
         local v = sortedList[i]
         local wname = v[1]
@@ -393,11 +393,11 @@ end
       index2 = index2 + 3
       for cname, value in pairs(targetCallinCumul) do
         gl.Text(cname, x+200, y+1-(fSpacing)*(1+index2), fSize)
-        gl.Text(('%.4fs'):format(value), x+100, y+1-(fSpacing)*(1+index2), fSize)          
+        gl.Text(('%.4fs'):format(value), x+100, y+1-(fSpacing)*(1+index2), fSize)
         index2 = index2 + 1
       end
-    end	
-    local i = #sortedList + 1    
+    end
+    local i = #sortedList + 1
     gl.Text("\255\255\064\064total time", x+150, y-1-(fSpacing)*i, fSize)
     gl.Text("\255\255\064\064"..('%.3fs'):format(allOverTimeSec), x+105, y-1-(fSpacing)*i, fSize)
     i = i+1

@@ -6,13 +6,13 @@ if GG.FakeUpright then
 end
 GG.FakeUpright = {}
 
-function GG.FakeUpright.FakeUprightInit(xp, zp, drop) 
+function GG.FakeUpright.FakeUprightInit(xp, zp, drop)
 	Move (xp,z_axis,5000)
 	Move (zp,x_axis,5000)
 	Turn(drop, x_axis, math.rad(90))
 end
 
-function GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, preDrop) 
+function GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, preDrop)
 	
 	local xx, xy, xz = Spring.GetUnitPiecePosDir(unitID,xp)
 	local zx, zy, zz = Spring.GetUnitPiecePosDir(unitID,zp)
