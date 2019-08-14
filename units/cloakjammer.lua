@@ -22,6 +22,7 @@ unitDef = {
     area_cloak_decloak_distance = 75,
     
     priority_misc = 2, -- High
+    cus_noflashlight = 1,
   },
 
   energyUse              = 1.5,

@@ -22,6 +22,7 @@ unitDef = {
 
   customParams           = {
     modelradius    = [[14]],
+    cus_noflashlight = 1,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
