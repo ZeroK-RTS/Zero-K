@@ -544,7 +544,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return false
 	end
 
-	if not Spring.ValidUnitID(unitID) then
+	if (not Spring.ValidUnitID(unitID)) or (not cmdParams[3]) then
 		return true, true
 	end
 
