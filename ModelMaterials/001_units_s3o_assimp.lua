@@ -1,39 +1,54 @@
 local matTemplate = VFS.Include("ModelMaterials/Templates/defaultMaterialTemplate.lua")
 
+local unitsNewNormalMap = Spring.Utilities.MergeWithDefault(matTemplate, {
+	texUnits  = {
+		[0] = "%TEX1",
+		[1] = "%TEX2",
+		[5] = "%NORMALTEX",
+	},
+	shaderOptions = {
+		normalmapping = true,
+	},
+	deferredOptions = {
+		normalmapping = true,
+		materialIndex = 1,
+	},
+})
+local unitsNewNormalMapFL = Spring.Utilities.MergeWithDefault(unitsNewNormalMap, {
+	shaderOptions = {
+		flashlights = true,
+	},
+})
+local unitsNewNoNormalMap = Spring.Utilities.MergeWithDefault(matTemplate, {
+	texUnits  = {
+		[0] = "%TEX1",
+		[1] = "%TEX2",
+	},
+	shaderOptions = {
+		autonormal  = true,
+	},
+	deferredOptions = {
+		materialIndex = 2,
+	},
+})
+local unitsNewNoNormalMapFL = Spring.Utilities.MergeWithDefault(unitsNewNoNormalMap, {
+	shaderOptions = {
+		flashlights = false, --TODO change to true and sort out which units misbehave manually
+	},
+})
+
 local materials = {
-	unitsNewNormalMap = Spring.Utilities.MergeWithDefault(matTemplate, {
-		texUnits  = {
-			[0] = "%TEX1",
-			[1] = "%TEX2",
-			[5] = "%NORMALTEX",
-		},
-		shaderOptions = {
-			flashlights   = true,
-			normalmapping = true,
-		},
-		deferredOptions = {
-			normalmapping = true,
-			materialIndex = 1,
-		},
-	}),
-	unitsNewNoNormalMap = Spring.Utilities.MergeWithDefault(matTemplate, {
-		texUnits  = {
-			[0] = "%TEX1",
-			[1] = "%TEX2",
-		},
-		shaderOptions = {
-			autonormal = true,
-		},
-		deferredOptions = {
-			materialIndex = 2,
-		},
-	}),
+	unitsNewNormalMap = unitsNewNormalMap,
+	unitsNewNormalMapFL = unitsNewNormalMapFL,
+	unitsNewNoNormalMap = unitsNewNoNormalMap,
+	unitsNewNoNormalMapFL = unitsNewNoNormalMapFL,
 }
 
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function FindNormalmap(tex1, tex2)
+local function FindNormalMap(tex1, tex2)
 	local normaltex
 
 	--// check if there is a corresponding _normals.dds file
@@ -94,7 +109,7 @@ local function GetS3ONormalTex(udef, tex1, tex2)
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "CustomUnitShaders: " .. udef.name .. "has no tex2")
 		end
 
-		normaltex = FindNormalmap(tex1, tex2)
+		normaltex = FindNormalMap(tex1, tex2)
 	end
 
 	return normaltex
@@ -118,7 +133,7 @@ local function GetAssimpNormalTex(udef, tex1, tex2)
 					Spring.Log(gadget:GetInfo().name, LOG.WARNING, "CustomUnitShaders: " .. udef.name .. "has no tex2")
 				end
 
-				normaltex = FindNormalmap(tex1, tex2)
+				normaltex = FindNormalMap(tex1, tex2)
 			end
 		end
 	end
@@ -138,6 +153,26 @@ local function GetNormalTex(udef)
 	return normalTex
 end
 
+local function GetUnitMaterial(tex1, tex2, normalTex, flashlights)
+	local unitMaterial
+
+	if normalTex then
+		if flashlights then
+			unitMaterial = {"unitsNewNormalMapFL", TEX1 = tex1, TEX2 = tex2, NORMALTEX = normalTex}
+		else
+			unitMaterial = {"unitsNewNormalMap", TEX1 = tex1, TEX2 = tex2, NORMALTEX = normalTex}
+		end
+	else
+		if flashlights then
+			unitMaterial = {"unitsNewNoNormalMapFL", TEX1 = tex1, TEX2 = tex2}
+		else
+			unitMaterial = {"unitsNewNoNormalMap", TEX1 = tex1, TEX2 = tex2}
+		end
+	end
+
+	return unitMaterial
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local cusUnitMaterials = GG.CUS.unitMaterialDefs
@@ -149,6 +184,11 @@ for id = 1, #UnitDefs do
 		local tex1 = "%%"..id..":0"
 		local tex2 = "%%"..id..":1"
 
+		local flashlights = true
+		if (udef.customParams.cus_noflashlight and udef.customParams.cus_noflashlight == "1") then
+			flashlights = false
+		end
+
 		if (udef.customParams.altskin and VFS.FileExists(udef.customParams.altskin)) then
 			tex1 = udef.customParams.altskin
 		end
@@ -159,12 +199,8 @@ for id = 1, #UnitDefs do
 
 		local normalTex = GetNormalTex(udef)
 
-		if normalTex then
-			unitMaterials[id] = {"unitsNewNormalMap", TEX1 = tex1, TEX2 = tex2, NORMALTEX = normalTex}
-		else
-			unitMaterials[id] = {"unitsNewNoNormalMap", TEX1 = tex1, TEX2 = tex2}
-		end
 
+		unitMaterials[id] = GetUnitMaterial(tex1, tex2, normalTex, flashlights)
 	end
 end
 
@@ -173,6 +209,11 @@ local skinDefs = include("LuaRules/Configs/dynamic_comm_skins.lua")
 for name, data in pairs(skinDefs) do
 	local udefParent = UnitDefNames["dyn" .. data.chassis .. "0"]
 
+	local flashlights = true
+	if (udefParent.customParams.cus_noflashlight) then
+		flashlights = false
+	end
+
 	local tex1 = data.altskin
 	local tex2 = data.altskin2
 	if not tex2 then
@@ -180,11 +221,7 @@ for name, data in pairs(skinDefs) do
 	end
 
 	local normalTex = GetNormalTex(udefParent)
-	if normalTex then
-		unitMaterials[name] = {"unitsNewNormalMap", TEX1 = tex1, TEX2 = tex2, NORMALTEX = normalTex}
-	else
-		unitMaterials[name] = {"unitsNewNoNormalMap", TEX1 = tex1, TEX2 = tex2}
-	end
+	unitMaterials[name] = GetUnitMaterial(tex1, tex2, normalTex, flashlights)
 end
 
 --------------------------------------------------------------------------------

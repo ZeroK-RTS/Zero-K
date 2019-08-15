@@ -20,6 +20,7 @@ unitDef = {
 
   customParams          = {
     dontfireatradarcommand = '1',
+    cus_noflashlight = 1,
   },
 
   explodeAs             = [[BIG_UNITEX]],

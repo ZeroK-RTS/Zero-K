@@ -18,6 +18,7 @@ unitDef = {
 
   customParams        = {
     shield_emit_height = 17,
+    cus_noflashlight = 1,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -109,7 +110,7 @@ unitDef = {
         light_color = [[0.80 0.54 0.23]],
         light_radius = 200,
       },
-      
+
       damage                  = {
         default = 170,
         planes  = 170,
