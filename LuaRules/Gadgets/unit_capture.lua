@@ -473,6 +473,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeamID)
 	if controllers[unitID] then
+		-- This was a mastermind, transfer captured units
 		local unitByID = controllers[unitID].unitByID
 		local i = 1
 		while i <= unitByID.count do
@@ -487,6 +488,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeamID)
 	end
 	
 	if capturedUnits[unitID] then
+		-- This was a captured unit, update our references
 		if capturedUnits[unitID].controllerID then
 			local oldController = capturedUnits[unitID].controllerID
 			removeThingFromIterable(unitID, controllers[oldController].units, controllers[oldController].unitByID)
@@ -494,8 +496,19 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeamID)
 		capturedUnits[unitID] = nil
 	end
 	
+
 	if unitDamage[unitID] then
-		removeThingFromDoubleTable(unitID, unitDamage, damageByID)
+		-- This was a partially captured unit
+		local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+		if morphedTo then
+			-- Psuedo-destruction from a morph, transfer capture progress
+			unitDamage[morphedTo] = unitDamage[unitID]
+			damageByID.data[unitDamage[unitID].index] = morphedTo
+			unitDamage[unitID] = nil
+		else
+			-- True destruction, discard the capture progress we were tracking
+			removeThingFromDoubleTable(unitID, unitDamage, damageByID)
+		end
 	end
 end
 

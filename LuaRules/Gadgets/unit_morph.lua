@@ -507,13 +507,12 @@ local function FinishMorph(unitID, morphData)
 		newHealth = 1
 	end
 	
-	local newPara = 0
-	newPara = paralyzeDamage*newMaxHealth/oldMaxHealth
+	local newPara = paralyzeDamage*newMaxHealth/oldMaxHealth
 	local slowDamage = Spring.GetUnitRulesParam(unitID,"slowState")
 	if slowDamage then
 		GG.addSlowDamage(newUnit, slowDamage*newMaxHealth)
 	end
-	Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})
+	Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara, capture = captureProgress })
 	
 	--//transfer experience
 	newXp = newXp * (oldBuildTime / Spring.Utilities.GetUnitCost(unitID, morphData.def.into))
