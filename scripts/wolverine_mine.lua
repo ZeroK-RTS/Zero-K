@@ -54,7 +54,8 @@ local function Remove ()
 	Spring.MoveCtrl.Enable(unitID, true)
 	Spring.MoveCtrl.SetNoBlocking(unitID, true)
 	Spring.MoveCtrl.SetPosition(unitID, x, Spring.GetGroundHeight(x, z) - 1000, z)
-
+	Spring.SetUnitRulesParam(unitID,'untargetable',1)
+	Spring.SetUnitNeutral(unitID,true)
 	Sleep(5000)
 	Spring.DestroyUnit(unitID, false, true)
 end
