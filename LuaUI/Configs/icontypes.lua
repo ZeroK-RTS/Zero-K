@@ -184,7 +184,7 @@ local icontypes = {
     bitmap='icons/kbotscout.dds',
     size=1.8,
   },
-  --puppy
+  --bunny
   kbotbomb = {
     bitmap='icons/kbotbomb.dds',
     size=1.8,

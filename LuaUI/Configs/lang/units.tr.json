@@ -995,7 +995,7 @@
         "helptext": "Jugglenaut'un etkileyici zırhı onu neredeyse durdurulamaz bir ölüm küresi yapıyor. Onların oluşumunu bozması için düşman birimlerine saldırır ve Çekim ışınları ile kurtulanları etrafa fırlatabilir. Tabanı binalara zarar vermesinin tek yoludur."
     },
     "jumpscout": {
-        "name": "Yavru",
+        "name": "Tavşan",
         "description": "Yürüyen Füze",
         "helptext": "Bu hızlı hareket eden intihar birimi, hafif zırhlı hedeflere saldırmak ve vurmak için iyidir. Enkazların yanında dururken, otomatik olarak kendini, gri goo stilini çoğaltmak için onlardan metal çeker."
     },

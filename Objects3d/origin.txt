@@ -41,7 +41,7 @@ Beherith's bots - Public Domain (http://springrts.com/phpbb/viewtopic.php?f=9&t=
  * Dirtbag
  * Freaker
  * Felon
- * Puppy
+ * Bunny
 
 maackey (Chris Mackey) - CC-BY
  * Shieldbots:

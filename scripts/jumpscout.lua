@@ -224,7 +224,7 @@ local function ShotScript()
 	Explode(rcalf, SFX.FALL)
 	Explode(lfoot, SFX.FALL)
 	Explode(rfoot, SFX.FALL)
-	GG.PuppyHandler_Shot(unitID)
+	GG.BunnyHandler_Shot(unitID)
 end
 
 function script.Shot()
@@ -232,7 +232,7 @@ function script.Shot()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.PuppyHandler_IsHidden(unitID) or GG.OverkillPrevention_CheckBlock(unitID, targetID, 407, 15, 0.25)
+	return GG.BunnyHandler_IsHidden(unitID) or GG.OverkillPrevention_CheckBlock(unitID, targetID, 407, 15, 0.25)
 end
 
 function script.Killed(recentDamage, maxHealth)

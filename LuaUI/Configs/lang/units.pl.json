@@ -990,7 +990,7 @@
 		"helptext" : "Jugglenaut posiada imponującą wytrzymałość i podwójne promienie grawitacyjne, które mogą przyciągać lub odpychać inne jednostki. Może również skakać, co w połączeniu z jego dużą masą pozwala mu zgniatać wrogie jednostki, skacząc na nie."
 	},
 	"jumpscout" : {
-		"name" : "Puppy",
+		"name" : "królik",
 		"description" : "Jednorazowa rakieta",
 		"helptext" : "Szybka jednostka samobójcza dobra do wyborowego niszczenia odsłoniętych celów. Stojąc obok złomu, pobiera z niego metal i replikuje się."
 	},

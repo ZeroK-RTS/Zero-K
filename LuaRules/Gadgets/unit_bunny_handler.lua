@@ -4,8 +4,8 @@
 
 function gadget:GetInfo()
 	return {
-		name      = "Puppy Handler",
-		desc      = "Handlers the puppy weapon",
+		name      = "Bunny Handler",
+		desc      = "Handlers the bunny weapon",
 		author    = "quantum",
 		date      = "Dec 2010",
 		license   = "GNU GPL, v2 or later",
@@ -52,21 +52,21 @@ local CMD_WAIT = CMD.WAIT
 
 local wantedList = {}
 
-local puppyDefID
-local puppyWeaponID
-local puppyLosRadius
+local bunnyDefID
+local bunnyWeaponID
+local bunnyLosRadius
 
 local cannotBeDamage = {}
-local stuckPuppyWorkaround = {}
+local stuckBunnyWorkaround = {}
 
-local puppyGoodPosition = {}
+local bunnyGoodPosition = {}
 
-local hiddenPuppy = {}
+local hiddenBunny = {}
 
-local function HidePuppy(unitID)
+local function HideBunny(unitID)
 	--Spring.Echo("Hide " .. unitID)
-	hiddenPuppy[unitID] = true
-	-- send the puppy to the stratosphere, cloak it
+	hiddenBunny[unitID] = true
+	-- send the bunny to the stratosphere, cloak it
 	spMoveCtrlEnable(unitID)
 	local x, _, z = spGetUnitPosition(unitID)
 	local y = spGetGroundHeight(x,z)
@@ -82,37 +82,37 @@ local function HidePuppy(unitID)
 
 	local frame = spGetGameFrame() + 450
 	cannotBeDamage[unitID] = cannotBeDamage[unitID] or frame
-	stuckPuppyWorkaround[frame] = stuckPuppyWorkaround[frame] or {count = 0, data = {}}
-	stuckPuppyWorkaround[frame].count = stuckPuppyWorkaround[frame].count + 1
-	stuckPuppyWorkaround[frame].data[stuckPuppyWorkaround[frame].count] = unitID
+	stuckBunnyWorkaround[frame] = stuckBunnyWorkaround[frame] or {count = 0, data = {}}
+	stuckBunnyWorkaround[frame].count = stuckBunnyWorkaround[frame].count + 1
+	stuckBunnyWorkaround[frame].data[stuckBunnyWorkaround[frame].count] = unitID
 end
 
 
-local function RestorePuppy(unitID, x, y, z)
+local function RestoreBunny(unitID, x, y, z)
 	--Spring.SetUnitCloak(unitID, false)
-	--Spring.Echo("RestorePuppy " .. unitID)
-	if not hiddenPuppy[unitID] then
+	--Spring.Echo("RestoreBunny " .. unitID)
+	if not hiddenBunny[unitID] then
 		local frame = spGetGameFrame() + 1
-		stuckPuppyWorkaround[frame] = stuckPuppyWorkaround[frame] or {count = 0, data = {}}
-		stuckPuppyWorkaround[frame].count = stuckPuppyWorkaround[frame].count + 1
-		stuckPuppyWorkaround[frame].data[stuckPuppyWorkaround[frame].count] = unitID
+		stuckBunnyWorkaround[frame] = stuckBunnyWorkaround[frame] or {count = 0, data = {}}
+		stuckBunnyWorkaround[frame].count = stuckBunnyWorkaround[frame].count + 1
+		stuckBunnyWorkaround[frame].data[stuckBunnyWorkaround[frame].count] = unitID
 		cannotBeDamage[unitID] = cannotBeDamage[unitID] or frame
-		puppyGoodPosition[unitID] = puppyGoodPosition[unitID] or {x = x, y = y, z = z}
+		bunnyGoodPosition[unitID] = bunnyGoodPosition[unitID] or {x = x, y = y, z = z}
 		return
 	end
-	--Spring.Echo("RestorePuppy DONE")
-	hiddenPuppy[unitID] = nil
+	--Spring.Echo("RestoreBunny DONE")
+	hiddenBunny[unitID] = nil
 	spSetUnitPosition(unitID, x, z) -- fixes rectangle selection
 	spMoveCtrlSetPosition(unitID, x, y, z)
 	spSetUnitBlocking(unitID, false, false)	-- allows it to clip into wrecks (workaround for puppies staying in heaven)
 	spMoveCtrlDisable(unitID)
 	spSetUnitBlocking(unitID, true, true)	-- restores normal state once they land
-	-- Spring.SetUnitSensorRadius(unitID, "los", puppyLosRadius)
+	-- Spring.SetUnitSensorRadius(unitID, "los", bunnyLosRadius)
 	-- Spring.SetUnitStealth(unitID, false)
 	spSetUnitNoDraw(unitID, false)
 	spSetUnitCollisionVolumeData(unitID, 20, 20, 20, 0, 0, 0, 0, 1, 0)
 	cannotBeDamage[unitID] = false
-	spAddUnitDamage(unitID, 15, 0, -1, WeaponDefNames["jumpscout_missile"].id) -- prevent puppy fountain
+	spAddUnitDamage(unitID, 15, 0, -1, WeaponDefNames["jumpscout_missile"].id) -- prevent bunny fountain
 	-- Spring.SetUnitNoSelect(unitID, false)
 	spSetUnitNoMinimap(unitID, false)
 	spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
@@ -121,25 +121,25 @@ local function RestorePuppy(unitID, x, y, z)
 	-- spGiveOrderToUnit(unitID, CMD.STOP, {}, 0)
 end
 
-function GG.PuppyHandler_IsHidden(unitID)
+function GG.BunnyHandler_IsHidden(unitID)
 	return (unitID and cannotBeDamage[unitID] and true) or false
 end
 
-function GG.PuppyHandler_Shot(unitID)
-	-- the puppy fired its weapon, hide it
-	HidePuppy(unitID)
+function GG.BunnyHandler_Shot(unitID)
+	-- the bunny fired its weapon, hide it
+	HideBunny(unitID)
 end
 
 function gadget:Initialize()
-	local puppyDef =  UnitDefNames.jumpscout
-	puppyDefID = puppyDef.id
-	puppyWeaponID = puppyDef.weapons[1].weaponDef
-	puppyLosRadius = puppyDef.losRadius
-	wantedList = {puppyWeaponID}
+	local bunnyDef =  UnitDefNames.jumpscout
+	bunnyDefID = bunnyDef.id
+	bunnyWeaponID = bunnyDef.weapons[1].weaponDef
+	bunnyLosRadius = bunnyDef.losRadius
+	wantedList = {bunnyWeaponID}
 	if Script.SetWatchExplosion then
-		Script.SetWatchExplosion(puppyWeaponID, true)
+		Script.SetWatchExplosion(bunnyWeaponID, true)
 	else
-		Script.SetWatchWeapon(puppyWeaponID, true)
+		Script.SetWatchWeapon(bunnyWeaponID, true)
 	end
 end
 
@@ -148,35 +148,35 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	local attackerTeam, attackerDefID, defenderTeam, defenderDefID
 	if spValidUnitID(proOwnerID) then
 		attackerDefID = spGetUnitDefID(proOwnerID)
-		if attackerDefID ~= puppyDefID then return false end	-- nothing to do with us, exit
+		if attackerDefID ~= bunnyDefID then return false end	-- nothing to do with us, exit
 		attackerTeam = spGetUnitTeam(proOwnerID)
 	end
 	if spValidUnitID(shieldCarrierUnitID) then
 		defenderTeam = spGetUnitTeam(shieldCarrierUnitID)
 		defenderDefID = spGetUnitDefID(shieldCarrierUnitID)
 	end
-	-- we don't actually have the weaponID, but can assume it is puppyWeaponID
-	gadget:UnitPreDamaged(shieldCarrierID, defenderDefID, defenderTeam, 0, false, puppyWeaponID, proOwnerID, attackerDefID, attackerTeam, proID)
+	-- we don't actually have the weaponID, but can assume it is bunnyWeaponID
+	gadget:UnitPreDamaged(shieldCarrierID, defenderDefID, defenderTeam, 0, false, bunnyWeaponID, proOwnerID, attackerDefID, attackerTeam, proID)
 	return false
 end
 
 function gadget:UnitPreDamaged_GetWantedWeaponDef()
-	return {puppyWeaponID}
+	return {bunnyWeaponID}
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam,projectileID)
-	if weaponDefID == puppyWeaponID and attackerID and spValidUnitID(attackerID) then
+	if weaponDefID == bunnyWeaponID and attackerID and spValidUnitID(attackerID) then
 		if attackerTeam and unitTeam then
 			-- attacker and attacked units are known (both units are alive)
 			if spAreTeamsAllied(unitTeam, attackerTeam) then
 				-- attacked unit is an ally
-				if unitDefID == puppyDefID then
-					-- attacked unit is an allied puppy, cancel damage
+				if unitDefID == bunnyDefID then
+					-- attacked unit is an allied bunny, cancel damage
 					--Spring.Echo("UnitPreDamaged " .. attackerID)
 					return 0
 				end
 			else
-				-- attacked unit is an enemy, self-destruct the puppy
+				-- attacked unit is an enemy, self-destruct the bunny
 				spDestroyUnit(attackerID, false, true)
 				return damage
 			end
@@ -195,21 +195,21 @@ function gadget:UnitCreated(unitID)
 end
 
 function gadget:GameFrame(frame)
-	if stuckPuppyWorkaround[frame] then
-		for i = 1, stuckPuppyWorkaround[frame].count do
-			local unitID = stuckPuppyWorkaround[frame].data[i]
+	if stuckBunnyWorkaround[frame] then
+		for i = 1, stuckBunnyWorkaround[frame].count do
+			local unitID = stuckBunnyWorkaround[frame].data[i]
 			if cannotBeDamage[unitID] and cannotBeDamage[unitID] == frame and spValidUnitID(unitID) then
 				local x, z
-				if puppyGoodPosition[unitID] then
-					x,z = puppyGoodPosition[unitID].x, puppyGoodPosition[unitID].z
+				if bunnyGoodPosition[unitID] then
+					x,z = bunnyGoodPosition[unitID].x, bunnyGoodPosition[unitID].z
 				else
 					x,_,z = spGetUnitPosition(unitID)
 				end
 				local y = spGetGroundHeight(x,z)
-				RestorePuppy(unitID, x, y, z)
+				RestoreBunny(unitID, x, y, z)
 			end
 		end
-		stuckPuppyWorkaround[frame] = nil
+		stuckBunnyWorkaround[frame] = nil
 	end
 end
 
@@ -218,9 +218,9 @@ function gadget:Explosion_GetWantedWeaponDef()
 end
 
 function gadget:Explosion(weaponID, px, py, pz, ownerID)
-	if weaponID == puppyWeaponID and ownerID and spValidUnitID(ownerID) then
-		-- the puppy landed
-		RestorePuppy(ownerID, px, py, pz)
+	if weaponID == bunnyWeaponID and ownerID and spValidUnitID(ownerID) then
+		-- the bunny landed
+		RestoreBunny(ownerID, px, py, pz)
 	end
 	return false
 end
