@@ -43,7 +43,7 @@ local TARGET_GROUND = 1
 local TARGET_UNIT= 2
 
 local selectedUnitCount = 0
-local selectedUnits 
+local selectedUnits
 
 local drawUnit = {count = 0, data = {}}
 local drawUnitID = {}
@@ -62,7 +62,7 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 local setTargetUnitDefIDs = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ((not (ud.canFly and (ud.isBomber or ud.isBomberAirUnit))) and 
+	if ((not (ud.canFly and (ud.isBomber or ud.isBomberAirUnit))) and
 			ud.canAttack and ud.canMove and ud.maxWeaponRange and ud.maxWeaponRange > 0) or ud.isFactory then
 		setTargetUnitDefIDs[i] = true
 	end
@@ -77,12 +77,12 @@ end
 
 
 options_path = 'Settings/Interface/Command Visibility'
-options_order = { 
+options_order = {
 'showallcommandselection','lbl_filters','includeallies', 'includealliesunits', 'includeneutral'
 }
 options = {
 	showallcommandselection = {
-		type='radioButton', 
+		type='radioButton',
 		name='Commands are drawn for',
 		items = {
 			{name = 'All units',key='showallcommand', desc="Command always drawn on all units.", hotkey=nil},
@@ -242,7 +242,7 @@ local function drawUnitCommands(unitID)
 	if tx then
 		local _,_,_,x,y,z = spGetUnitPosition(unitID,true)
 		glBeginEnd(GL.LINES,
-			function() 
+			function()
 				glVertex(x,y,z);
 				glVertex(tx,ty,tz);
 			end)
@@ -314,7 +314,7 @@ function widget:SelectionChanged(newSelection)
 	end
 end
 
-function widget:PlayerChanged(playerID) 
+function widget:PlayerChanged(playerID)
 	if myPlayerID == playerID then
 		spectating = Spring.GetSpectatingState()
 		myAllyTeamID = Spring.GetLocalAllyTeamID()
@@ -344,6 +344,6 @@ end
 function widget:GameFrame(n)
 	if (n > 0) then
 		PoolUnit()
-		widgetHandler:RemoveCallIn("GameFrame") 
+		widgetHandler:RemoveCallIn("GameFrame")
 	end
 end

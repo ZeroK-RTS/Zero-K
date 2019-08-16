@@ -8,7 +8,7 @@ function widget:GetInfo()
     author    = "quantum",
     date      = "Nov 2010",
     license   = "GNU GPL, v2 or later",
-    layer     = 2, 
+    layer     = 2,
     enabled   = true,  --  loaded by default?
   }
 end
@@ -120,8 +120,8 @@ local function ShowMessageBox(text, width, height, fontsize, pause)
     Spring.SendCommands("pause 1")
   end
   local window
-  window = Chili.Window:New{  
-    x = x,  
+  window = Chili.Window:New{
+    x = x,
     y = y,
 	--autosize	 = true,	-- donut work
     clientWidth  = width,
@@ -130,14 +130,14 @@ local function ShowMessageBox(text, width, height, fontsize, pause)
     draggable = true,
     parent = Chili.Screen0,
     children = {
-      Chili.Button:New{ 
-        caption = 'Close', 
-        OnClick = { function(self) 
+      Chili.Button:New{
+        caption = 'Close',
+        OnClick = { function(self)
           window:Dispose()
           if pause then
             Spring.SendCommands("pause 0")
           end
-        end },           
+        end },
         x=0,
         height=30,
         right=10,
@@ -197,7 +197,7 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 	--if msgBoxPersistent then
 	--	msgBoxPersistent:ClearChildren()
 	--	msgBoxPersistent:Dispose()
-	--end	
+	--end
 	
 	-- we have an existing box, modify that one instead of making a new one
 	if msgBoxPersistent then
@@ -241,7 +241,7 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 				size   = fontsize or 12;
 				shadow = true;
 			},
-		}	
+		}
 		scrollPersistent:AddChild(textPersistent)
 		
 		if (not nextButton) and GetHaveNextButton() then
@@ -261,7 +261,7 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 		width = width,
 		height = height + PERSISTENT_SUBBAR_HEIGHT,
 		y = y,
-		right = 0; 
+		right = 0;
 		dockable = true;
 		draggable = false,
 		resizable = false,
@@ -337,7 +337,7 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 				_ShowPersistentMessageBox(data.text, data.width, data.height, data.fontsize, data.image)
 			end
 		}
-	}	
+	}
 		
 	countLabelPersistent = Chili.Label:New{
 		parent = stackPersistent,
@@ -393,7 +393,7 @@ local function ShowConvoBoxNoChili(data)
   convoString = ProcessColorCodes(data.text)
   convoSize = data.fontsize
   if data.image then
-    convoImage = data.image  
+    convoImage = data.image
   end
   if data.sound then
     Spring.PlaySoundFile(data.sound, 1, 'ui')
@@ -410,8 +410,8 @@ local function ShowConvoBoxChili(data)
   local x = math.floor((vsx - width)/2)
   local y = vsy * 0.2	-- fits under chatbox
 
-  msgBoxConvo = Chili.Window:New{  
-    x = x,  
+  msgBoxConvo = Chili.Window:New{
+    x = x,
     y = y,
     width  = width,
     height = height,
@@ -448,7 +448,7 @@ local function ShowConvoBoxChili(data)
       keepAspect = true,
       file = data.image;
       parent = msgBoxConvo;
-    }      
+    }
   end
   
   if data.sound then
@@ -552,7 +552,7 @@ function widget:Update(dt)
 			msgBoxPersistent:Invalidate()
 			flasthTime = nil
 		end
-	end	
+	end
 	timer = 0
 end
 
@@ -673,9 +673,9 @@ function widget:Update(dt)
 	timer = timer + dt
 	if timer >= 5 then
 		if bool then
-			WG.ShowPersistentMessageBox("Now you see me...", 320, 100, 12, "LuaUI/Images/advisor2.jpg")  
+			WG.ShowPersistentMessageBox("Now you see me...", 320, 100, 12, "LuaUI/Images/advisor2.jpg")
 		else
-			WG.ShowPersistentMessageBox("Now you don't!", 320, 100, 14, nil)  
+			WG.ShowPersistentMessageBox("Now you don't!", 320, 100, 14, nil)
 		end
 		timer = 0
 		bool = not bool

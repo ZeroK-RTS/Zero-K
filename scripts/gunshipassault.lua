@@ -1,13 +1,13 @@
-local base = piece 'base' 
-local body = piece 'body' 
-local firep1 = piece 'firep1' 
-local firep2 = piece 'firep2' 
-local wings = piece 'wings' 
-local fan = piece 'fan' 
-local Rwingengine = piece 'Rwingengine' 
-local Lwingengine = piece 'Lwingengine' 
-local Rengine = piece 'Rengine' 
-local Lengine = piece 'Lengine' 
+local base = piece 'base'
+local body = piece 'body'
+local firep1 = piece 'firep1'
+local firep2 = piece 'firep2'
+local wings = piece 'wings'
+local fan = piece 'fan'
+local Rwingengine = piece 'Rwingengine'
+local Lwingengine = piece 'Lwingengine'
+local Rengine = piece 'Rengine'
+local Lengine = piece 'Lengine'
 
 local smokePiece = {base}
 
@@ -64,7 +64,7 @@ function script.BlockShot(num, targetID)
 	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 700, 12)
 end
 
-function script.Shot(num) 
+function script.Shot(num)
 	gun_1 = not gun_1
 end
 

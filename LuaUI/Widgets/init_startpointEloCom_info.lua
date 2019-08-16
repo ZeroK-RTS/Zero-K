@@ -131,7 +131,7 @@ end
 
 function widget:DrawScreenEffects()
 
-	if Spring.IsGUIHidden() then 
+	if Spring.IsGUIHidden() then
 		return
 	end
 	if (#playerInfo <= 0) then

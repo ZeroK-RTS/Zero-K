@@ -1,14 +1,14 @@
 include 'constants.lua'
 
-local base = piece 'base' 
-local body = piece 'body' 
-local head = piece 'head' 
-local tail = piece 'tail' 
-local lwing = piece 'lwing' 
-local rwing = piece 'rwing' 
-local rsack = piece 'rsack' 
-local lsack = piece 'lsack' 
-local dodobomb = piece 'dodobomb' 
+local base = piece 'base'
+local body = piece 'body'
+local head = piece 'head'
+local tail = piece 'tail'
+local lwing = piece 'lwing'
+local rwing = piece 'rwing'
+local rsack = piece 'rsack'
+local lsack = piece 'lsack'
+local dodobomb = piece 'dodobomb'
 
 -- Signal definitions
 --local SIG_AIM = 2

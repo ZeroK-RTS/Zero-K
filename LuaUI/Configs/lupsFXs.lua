@@ -134,10 +134,10 @@ staticshieldBursts = {
 	quality = 3, -- High
 }
 staticshieldBall = {
-	piece = "glow", 
-	life = math.huge, 
-	size = 11, 
-	colormap1 = {{0.95, 0.1, 0.95, 0.9}}, 
+	piece = "glow",
+	life = math.huge,
+	size = 11,
+	colormap1 = {{0.95, 0.1, 0.95, 0.9}},
 	repeatEffect = true,
 	noIconDraw = true,
 	quality = 3, -- High
@@ -236,7 +236,7 @@ valkShieldSphere = {
 commandShieldSphere = {
 	life			= math.huge,
 	heightFactor	= 0.75,
-	radiusFactor	= 1.75, 
+	radiusFactor	= 1.75,
 	repeatEffect	= true,
 }
 

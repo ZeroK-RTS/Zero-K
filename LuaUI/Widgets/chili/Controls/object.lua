@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 --- Object module
 
@@ -73,7 +73,7 @@ end
 local this = Object
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 --// used to generate unique objects names
 
 local cic = {}
@@ -83,7 +83,7 @@ local function GetUniqueId(classname)
 	return ci
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Object constructor
 -- @tparam Object obj the object table
@@ -241,7 +241,7 @@ function Object:Inherit(class)
 	return class
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Sets the parent object
 -- @tparam Object obj parent object
@@ -394,7 +394,7 @@ function Object:IsEmpty()
 	return (not self.children[1])
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Hides a specific child
 -- @tparam Object obj child to be hidden
@@ -525,7 +525,7 @@ function Object:ToggleVisibility()
 	self:SetVisibility(not self.visible)
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Object:SetChildLayer(child, layer)
 	child = UnlinkSafe(child)
@@ -563,7 +563,7 @@ function Object:BringToFront()
 	self:SetLayer(1)
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Object:InheritsFrom(classname)
 	if (self.classname == classname) then
@@ -575,7 +575,7 @@ function Object:InheritsFrom(classname)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Returns a child by name
 -- @string name child name
@@ -700,7 +700,7 @@ function Object:IsAncestorOf(object, _level, _already_unlinked)
 	return false
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Object:CallListeners(listeners, ...)
 	for i = 1, #listeners do
@@ -808,7 +808,7 @@ function Object:CallChildrenHTWeak(eventname, x, y, ...)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Object:RequestUpdate()
 	--// we have something todo in Update
@@ -831,7 +831,7 @@ function Object:TweakDraw()
 	self:CallChildrenInverse('TweakDraw')
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Object:LocalToParent(x, y)
 	return x + self.x, y + self.y
@@ -931,13 +931,13 @@ function Object:IsVisibleOnScreen()
 	return (self.parent):IsVisibleOnScreen()
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Object:_GetMaxChildConstraints(child)
 	return 0, 0, self.width, self.height
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 
 function Object:HitTest(x, y)
@@ -1069,4 +1069,4 @@ function Object:FocusUpdate(...)
 	return false
 end
 
---// ============================================================================= 
+--// =============================================================================

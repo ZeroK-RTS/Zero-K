@@ -147,7 +147,7 @@ local commanderCost = 1100
 
 local statOverrides = {
 	cloakcost       = 5, -- For personal cloak
-	cloakcostmoving = 10, 
+	cloakcostmoving = 10,
 	onoffable       = true, -- For jammer and cloaker toggling
 	canmanualfire   = true, -- For manualfire weapons.
 	buildcostmetal  = commanderCost,

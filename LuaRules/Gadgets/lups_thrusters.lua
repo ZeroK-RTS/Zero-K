@@ -25,7 +25,7 @@ local UPDATE_PERIOD = 3
 --------------------------------------------------------------------------------
 
 local Lups
-local LupsAddParticles 
+local LupsAddParticles
 local SYNCED = SYNCED
 
 local units = {}
@@ -130,7 +130,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
   if unitDefs[unitDefID] then
     AddUnit(unitID, unitDefID)
-    unitSpeeds[unitID] = GetUnitSpeed(unitID) 
+    unitSpeeds[unitID] = GetUnitSpeed(unitID)
   end
 end
 

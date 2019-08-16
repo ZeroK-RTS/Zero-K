@@ -38,6 +38,6 @@ function widget:CommandNotify(id, params, options)
 			end
 			return true
 		end
-	end	
+	end
 
 end

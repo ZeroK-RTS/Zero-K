@@ -47,7 +47,7 @@ local icontypes = {
   commander5 = {
     bitmap='icons/armcommander.dds',
     size=2.8,
-  },    
+  },
 
   corcommander = {
     bitmap='icons/corcommander.dds',
@@ -505,22 +505,22 @@ local icontypes = {
   },
   jumpjetriot = {
     bitmap='icons/jumpjetriot.dds',
-    size=1.8,  
+    size=1.8,
   },
   kbotwideriot = {
     bitmap='icons/kbotwideriot.png',
-    size=2,  
+    size=2,
   },
   
   
   -- fatbots (jumpers that don't jump)
   fatbotarty = {
     bitmap='icons/fatbotarty.png',
-    size=2.1,  
+    size=2.1,
   },
   fatbotsupport = {
     bitmap='icons/fatbotsupport.png',
-    size=1.8,  
+    size=1.8,
   },
   
   --striders (aka tier 3)
@@ -535,7 +535,7 @@ local icontypes = {
   t3genericbig = {
     bitmap='icons/t3generic.dds',
     size=3,
-  },  
+  },
   t3special = {
     bitmap='icons/t3special.png',
     size=2.7,
@@ -722,11 +722,11 @@ local icontypes = {
   advradar = {
     bitmap='icons/radar.dds',
     size=2.8,
-  },  
+  },
    sonar = {
     bitmap='icons/sonar.dds',
     size=2,
-  }, 
+  },
   
   --now only covers snipers
   sniper = {
@@ -737,7 +737,7 @@ local icontypes = {
   stealth = {
     bitmap='icons/sniper.dds',
     size=1.6,
-  },  
+  },
   
   --clogger icon
   clogger = {
@@ -898,7 +898,7 @@ local icontypes = {
   airtransportbig = {
     bitmap='icons/airtransport.dds',
     size=3,
-  },  
+  },
   airbomb = {
     bitmap='icons/airbomb.dds',
 	distance=0.5,
@@ -984,7 +984,7 @@ local icontypes = {
   shiptransport = {
     bitmap='icons/shiptransport.dds',
     size=2.5,
-  },   
+  },
   shipheavyarty = {
     bitmap='icons/shipheavyarty.dds',
     size=4,
@@ -996,7 +996,7 @@ local icontypes = {
   shipcarrier = {
     bitmap='icons/shipcarrier.dds',
     size=4,
-  },  
+  },
 
   --icon for energy buildings of various tiers, including pylon
   energy_med = {
@@ -1208,17 +1208,17 @@ local icontypes = {
     size=1.8,
   },
   --chicken mini queen
-  chickenminiq = { 
-    bitmap='icons/chickenq.dds', 
-    size=3.5, 
+  chickenminiq = {
+    bitmap='icons/chickenq.dds',
+    size=3.5,
   },
   --chicken queen
-  chickenq = { 
-    bitmap='icons/chickenq.dds', 
-    size=5.0, 
+  chickenq = {
+    bitmap='icons/chickenq.dds',
+    size=5.0,
   },
   
-  --planetwars 
+  --planetwars
   pw_assault = {
     bitmap='icons/pw_assault.png',
 	distance = 1.3,

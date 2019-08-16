@@ -47,7 +47,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 		projectiles[proID] = true;
 		SendToUnsynced("lupsProjectiles_AddProjectile", proID, proOwnerID, weaponID)
 	end
-end	
+end
 
 function gadget:ProjectileDestroyed(proID)
 	if projectiles[proID] then
@@ -74,7 +74,7 @@ else
 --------------------------------------------------------------------------------
 
 local Lups
-local LupsAddParticles 
+local LupsAddParticles
 local SYNCED = SYNCED
 
 local projectiles = {}

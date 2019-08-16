@@ -125,7 +125,7 @@ local function DropBasiliskLoop()
 			for i=1,malus do
 				EmitSfx(body,2048+5)
 				Sleep(1000)
-			end		
+			end
 		end
 		Sleep(8000)
 	end

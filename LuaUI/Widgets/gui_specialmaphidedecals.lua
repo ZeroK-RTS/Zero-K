@@ -9,7 +9,7 @@ function widget:GetInfo()
     date      = "2009-06-29",
     license   = "GNU GPL, v2 or later",
     layer     = 1,
-    enabled   = false  
+    enabled   = false
   }
 end
 
@@ -28,5 +28,5 @@ function widget:Update()
 	elseif lastStateNormal and spGetMapDrawMode() ~= 'normal' and spGetMapDrawMode() ~= 'los' then
 		lastStateNormal = false
 		spSendCommands{"grounddecals 0"}
-	end	
+	end
 end

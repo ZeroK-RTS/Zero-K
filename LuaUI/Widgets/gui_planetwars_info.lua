@@ -8,7 +8,7 @@ function widget:GetInfo()
     author    = "KingRaptor (L.J. Lim)",
     date      = "Nov 2010",
     license   = "GNU GPL, v2 or later",
-    layer     = 1, 
+    layer     = 1,
     enabled   = true  --  loaded by default?
   }
 end
@@ -162,7 +162,7 @@ local function CreateTeleportWindow()
 		classname = ((holderHeight > 130) and "main_window_small") or "main_window_small_flat",
 		name   = 'pw_teleport_meter_1',
 		y = 48,
-		right = 2, 
+		right = 2,
 		width = 240,
 		height = holderHeight,
 		dockable = true,
@@ -501,7 +501,7 @@ local function CreateGoalWindow()
 		classname = "main_window_small",
 		name   = 'pw_instructions_1',
 		x = 2,
-		y = 178, 
+		y = 178,
 		width = WINDOW_WIDTH,
 		height = WINDOW_HEIGHT,
 		dockable = true,

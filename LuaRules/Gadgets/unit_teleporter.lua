@@ -159,7 +159,7 @@ function tele_undeployTeleport(unitID)
 	if tele[unitID].deployed then
 		interruptTeleport(unitID)
 	end
-	tele[unitID].deployed = false	
+	tele[unitID].deployed = false
 	changeSpeed(unitID, tele[unitID].link, 1)
 	Spring.SetUnitRulesParam(unitID, "deploy", 0)
 end
@@ -189,7 +189,7 @@ function tele_createBeacon(unitID, x, z, beaconID)
 end
 
 local function undeployTeleport(unitID)
-	if tele[unitID].deployed then 
+	if tele[unitID].deployed then
 		local func = Spring.UnitScript.GetScriptEnv(unitID).UndeployTeleport
 		Spring.UnitScript.CallAsUnit(unitID,func)
 		tele_undeployTeleport(unitID)
@@ -261,7 +261,7 @@ end
 -- Create the beacon
 
 
-function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting 
+function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
                                 cmdID, cmdParams, cmdOptions) -- called until
 	if cmdID == CMD_PLACE_BEACON and tele[unitID] then
 		local f = Spring.GetGameFrame()
@@ -369,7 +369,7 @@ function gadget:GameFrame(f)
 	
 	-- progress teleport
 	for i = 1, teleID.count do
-		local tid = teleID.data[i]	
+		local tid = teleID.data[i]
 		local bid = tele[tid].link
 		if tele[tid].teleFrame then
 			-- Cannont teleport if Teleporter or Beacon are disarmed, stunned or nanoframes and cannot teleport a nanoframe.
@@ -426,7 +426,7 @@ function gadget:GameFrame(f)
 							local _,_,_,ux, uy, uz = Spring.GetUnitPosition(teleportiee, true)
 							local _,_,_,tx, _, tz = Spring.GetUnitPosition(tid, true)
 							local dx, dz = tx + offset[tele[tid].offsetIndex].x*(size*4+40), tz + offset[tele[tid].offsetIndex].z*(size*4+40)
-							local dy 
+							local dy
 							
 							if ud.floatOnWater or ud.canFly then
 								dy = uy - math.max(0, Spring.GetGroundHeight(ux,uz)) +  math.max(0, Spring.GetGroundHeight(dx,dz))
@@ -672,7 +672,7 @@ function gadget:Load(zip)
 		-- load teleportiee with new ID and teleport destination
 		local teleportieeOld = Spring.GetUnitRulesParam(unitID, "teleportiee")
 		if teleportieeOld and teleportieeOld > 0 then
-			local teleportiee = GG.SaveLoad.GetNewUnitID(teleportieeOld)			
+			local teleportiee = GG.SaveLoad.GetNewUnitID(teleportieeOld)
 			if teleportiee and tele[unitID] then
 				local udID = Spring.GetUnitDefID(teleportiee)
 				local ud = UnitDefs[udID]
@@ -807,7 +807,7 @@ local function DrawWire(spec)
 					gl.PopAttrib()
 				end
 			end
-		end	
+		end
 	end
 end
 

@@ -107,10 +107,10 @@ function constructionAndEconomyHandler(a, at, frame)
 		facJob[7].importance = 0.6
 	end
 	
-	if at.relativeEnemyForceComposition.unit.air > 1 then 
+	if at.relativeEnemyForceComposition.unit.air > 1 then
 		facJob[8].importance = 1.4
-	else 
-		facJob[8].importance = 0.4	
+	else
+		facJob[8].importance = 0.4
 	end
 	
 	conJob.factory.airFactor = 0.3
@@ -195,7 +195,7 @@ function constructionAndEconomyHandler(a, at, frame)
 		
 	if controlledUnit.factory.count == 0 or (not controlledUnit.factoryByID[controlledUnit.factory[1]].finished) then
 		conJob.factory.importance = 20
-	end 
+	end
 	
 	if averagedEcon.eCur < 30 and averagedEcon.energyToMetalRatio < 1.25 then
 		conJob.defence.interruptable = true

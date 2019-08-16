@@ -34,8 +34,8 @@ options_order = {
 options = {
 	label = { type = 'label', name = 'Decloak Ranges' },
 	drawranges = {
-		name = 'Draw decloak ranges', 
-		type = 'bool', 
+		name = 'Draw decloak ranges',
+		type = 'bool',
 		value = true,
 		OnChange = function (self)
 			if self.value then

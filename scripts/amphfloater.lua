@@ -147,7 +147,7 @@ local function Walk()
 		Turn(lshin, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(rshin, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
-		WaitForTurn(rthigh, x_axis)		
+		WaitForTurn(rthigh, x_axis)
 		Sleep(0)
 	end
 end
@@ -208,7 +208,7 @@ end
 
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)	
+	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(WeaponRangeUpdate)
 end
 

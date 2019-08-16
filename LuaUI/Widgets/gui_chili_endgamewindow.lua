@@ -79,7 +79,7 @@ local teamColors = {}
 
 options_path = 'Settings/HUD Panels/Stats Graph'
 options_order = {'togglestatsgraph'}
-options = { 
+options = {
 	togglestatsgraph = { type = 'button',
 		name = 'Toggle stats graph',
 		desc = 'Shows and hides the statistics graph.',
@@ -223,12 +223,12 @@ end
 --setup
 
 local function SetupControls()
-	window_endgame = Window:New{  
+	window_endgame = Window:New{
 		parent = screen0,
 		classname = "main_window",
 		name = "GameOver",
 		caption = "",
-		textColor = {0.5,0.5,0.5,1}, 
+		textColor = {0.5,0.5,0.5,1},
 		fontSize = 50,
 		x = '20%',
 		y = '20%',

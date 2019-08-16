@@ -3,7 +3,7 @@
 --------------------------------------------------------------------------------
 --
 --  file:    gfx_halo.lua
---  brief:   
+--  brief:
 --  author:  jK
 --
 --  Copyright (C) 2008.
@@ -320,7 +320,7 @@ local function DrawVisibleUnitsLimited()
     for unitDefID,unitIDs in pairs(teamUnits) do
       local UnitDef = UnitDefs[unitDefID]
 
-      if (limitToCommanders and UnitDef.customParams.commtype)or 
+      if (limitToCommanders and UnitDef.customParams.commtype)or
          (limitToWorkers and UnitDef.isBuilder)
       then
         for _,unitID in ipairs(unitIDs) do

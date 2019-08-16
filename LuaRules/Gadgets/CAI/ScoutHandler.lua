@@ -30,7 +30,7 @@ function scoutHandler.CreateScoutHandler(scoutHeatmap)
 				end
 			end
 		end
-	end	
+	end
 	
 	local newScoutHandler = {
 		AddUnit = scoutList.AddUnit,

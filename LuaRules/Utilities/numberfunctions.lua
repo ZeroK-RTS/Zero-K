@@ -25,13 +25,13 @@ function ToSI(num, displaySign)
     if (absNum < 0.001) then
       return displaySign and strFormat("%+.1fu", 1000000 * num) or strFormat("%.1fu", 1000000 * num)
     elseif (absNum < 1) then
-      return displaySign and strFormat("%+.1f", num) or strFormat("%.1f", num) 
+      return displaySign and strFormat("%+.1f", num) or strFormat("%.1f", num)
     elseif (absNum < 1000) then
-	  return displaySign and strFormat("%+.0f", num) or strFormat("%.0f", num) 
+	  return displaySign and strFormat("%+.0f", num) or strFormat("%.0f", num)
     elseif (absNum < 1000000) then
-      return displaySign and strFormat("%+.1fk", 0.001 * num) or strFormat("%.1fk", 0.001 * num) 
+      return displaySign and strFormat("%+.1fk", 0.001 * num) or strFormat("%.1fk", 0.001 * num)
     else
-      return displaySign and strFormat("%+.1fM", 0.000001 * num) or strFormat("%.1fM", 0.000001 * num) 
+      return displaySign and strFormat("%+.1fM", 0.000001 * num) or strFormat("%.1fM", 0.000001 * num)
     end
   end
 end

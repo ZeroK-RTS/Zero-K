@@ -6,7 +6,7 @@
 --					remove the -y to not overwrite
 --				/savegame to save to Spring/Saves/QuickSave.ssf
 --				open an .ssf with spring.exe to load
---				/reloadgame reloads the save you loaded 
+--				/reloadgame reloads the save you loaded
 --					(widget purges existing units and feautres)
 --	NOTES
 --	- heightmap saving is implemented by engine
@@ -65,7 +65,7 @@ local function ReadFile(zip, name, file)
 			end
 		end
 	end
-	if err then 
+	if err then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, 'Save/Load error: ' .. err)
 		return nil
 	end
@@ -178,7 +178,7 @@ local function LoadUnits()
 		if oldID and savedata.unit[oldID] then
 			savedata.unit[oldID].newID = newID
 		end
-	end	
+	end
 end
 
 -----------------------------------------------------------------------------------

@@ -85,7 +85,7 @@ local function updateZone(x,z,state)
 			zoneID.count = zoneID.count + 1
 			zoneID.data[zoneID.count] = {x = x, z = z}
 			zones[x] = zones[x] or {}
-			zones[x][z] = zoneID.count 
+			zones[x][z] = zoneID.count
 		end
 	else
 		if (zones[x] and zones[x][z]) then
@@ -97,7 +97,7 @@ local function updateZone(x,z,state)
 			zoneID.data[zoneID.count] = nil
 			zoneID.count = zoneID.count - 1
 		end
-	end	
+	end
 end
 
 -- fills in the lasso
@@ -111,16 +111,16 @@ local function calculateAreaPoints()
 	-- deduce area to flood
 	for i = 1, points do
 		if point[i].x < border.left then
-			border.left = point[i].x 
+			border.left = point[i].x
 		end
 		if point[i].x > border.right then
-			border.right = point[i].x 
+			border.right = point[i].x
 		end
 		if point[i].z < border.top then
 			border.top = point[i].z
 		end
 		if point[i].z > border.bottom then
-			border.bottom = point[i].z 
+			border.bottom = point[i].z
 		end
 	end
 	
@@ -279,7 +279,7 @@ function widget:MousePress(mx, my, button)
 	
 	if WG.rzones.rZonePlaceMode and (button == 1 or button == 3) and not drawingLasso then
 		local _, pos = spTraceScreenRay(mx, my, true)
-		if legalPos(pos) then	
+		if legalPos(pos) then
 			points = 1
 			point[points] = {x = floor(pos[1]/size)*size, z = floor(pos[3]/size)*size}
 			
@@ -330,7 +330,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 						local m = diffZ/diffX
 						local sign = diffX/a_diffX
 						local a_diffX = floor(a_diffX/size)*size
-						for j = 0, a_diffX, size do	
+						for j = 0, a_diffX, size do
 							points = points + 1
 							point[points] = {x = reffPoint.x + j*sign, z = floor((reffPoint.z + j*m*sign)/size)*size}
 							--point[points] = {x = reffPoint.x + j*sign, z = reffPoint.z}
@@ -339,14 +339,14 @@ function widget:MouseMove(mx, my, dx, dy, button)
 						local m = diffX/diffZ
 						local sign = diffZ/a_diffZ
 						local a_diffZ = floor(a_diffZ/size)*size
-						for j = 0, a_diffZ, size do	
+						for j = 0, a_diffZ, size do
 							points = points + 1
 							point[points] = {x = floor((reffPoint.x + j*m*sign)/size)*size, z = reffPoint.z + j*sign}
 							--point[points] = {x = reffPoint.x, z = reffPoint.z + j*sign}
 						end
 					end
 				
-				end 
+				end
 			end
 		end
 		return true

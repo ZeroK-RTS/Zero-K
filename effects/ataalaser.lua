@@ -4,7 +4,7 @@ return {
     groundsmoke = {
       class              = [[CSimpleParticleSystem]],
       count              = 2,
-      ground             = 0,	
+      ground             = 0,
 						unit = 1,
 
       properties = {
@@ -32,7 +32,7 @@ return {
 	flash = {
       class              = [[CSimpleParticleSystem]],
       count              = 2,
-      ground             = 1,	
+      ground             = 1,
       air = 1,
 
       properties = {
@@ -59,7 +59,7 @@ return {
 	flash2 = {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
-      ground             = 1,	
+      ground             = 1,
 						air = 1,
 
       properties = {
@@ -140,10 +140,10 @@ return {
         colormap           = [[0.6 0.25 1 0.2  0.4 0.2 1 0.2    0 0 0 0]],
         size               = 80,
         sizegrowth         = [[-1.25]],
-        texture            = [[groundflash]],	
+        texture            = [[groundflash]],
         ttl                = 60,
       },
-    },	
+    },
 	
 	yudell3 = {
       air                = false,
@@ -156,10 +156,10 @@ return {
         colormap           = [[1 1 0 0.2  1 .45 0 0.2     0 0 0 0]],
         size               = 20,
         sizegrowth         = [[-1.25]],
-        texture            = [[groundflash]],	
+        texture            = [[groundflash]],
         ttl                = 60,
       },
-    },	
+    },
 				
   },
 

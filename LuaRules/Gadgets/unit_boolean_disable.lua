@@ -193,7 +193,7 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	return wantedWeaponList
 end
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                             weaponDefID, attackerID, attackerDefID, attackerTeam)
 	
 	if disarmWeapons[weaponDefID] then

@@ -26,7 +26,7 @@ upgrades = {
 	commweapon_assaultcannon = {
 		name = "Assault Cannon",
 		description = "Conventional plasma cannon with decent range",
-	},	
+	},
 	commweapon_beamlaser = {
 		name = "Beam Laser",
 		description = "An effective short-range cutting tool",
@@ -65,7 +65,7 @@ upgrades = {
 	},
 	commweapon_missilelauncher = {
 		name = "Missile Launcher",
-		description = "Fires light seeker missiles with good range",	
+		description = "Fires light seeker missiles with good range",
 	},
 	commweapon_partillery = {
 		name = "Plasma Artillery",
@@ -90,7 +90,7 @@ upgrades = {
 	commweapon_sonicgun = {
 		name = "Sonic Blaster",
 		description = "Short-range weapon that works when dry or wet",
-	},	
+	},
 	commweapon_torpedo = {
 		name = "Torpedo",
 		description = "Fires a torpedo effective against waterborne targets",
@@ -136,14 +136,14 @@ upgrades = {
 		description = "Slow Beam: +33% reload time, +250 real damage",
 		func = function(unitDef)
 				ReplaceWeapon(unitDef, "commweapon_slowbeam", "commweapon_disruptor")
-			end,	
+			end,
 	},
 	conversion_shockrifle = {
 		name = "Shock Rifle",
 		description = "Light Particle Beam: Convert to a long-range sniper rifle",
 		func = function(unitDef)
 				ReplaceWeapon(unitDef, "commweapon_lparticlebeam", "commweapon_shockrifle")
-			end,	
+			end,
 	},
 	conversion_partillery = {
 		name = "Plasma Artillery",
@@ -151,14 +151,14 @@ upgrades = {
 		func = function(unitDef)
 				ReplaceWeapon(unitDef, "commweapon_assaultcannon", "commweapon_partillery")
 				--unitDef.hightrajectory = 1
-			end,	
-	},		
+			end,
+	},
 	conversion_hparticlebeam = {
 		name = "Heavy Particle Beam",
 		description = "Light Particle Beam: Convert to an extended range rifle weapon",
 		func = function(unitDef)
 				ReplaceWeapon(unitDef, "commweapon_lparticlebeam", "commweapon_hparticlebeam")
-			end,	
+			end,
 	},
 	
 	-- weapon mods
@@ -179,8 +179,8 @@ upgrades = {
 						ReplaceWeapon(unitDef, "commweapon_missilelauncher", "commweapon_aamissile")
 					end
 				end
-			end	
-	},	
+			end
+	},
 	weaponmod_autoflechette = {
 		name = "Autoflechette",
 		description = "Shotgun: -25% projectiles, -40% reload time",
@@ -194,7 +194,7 @@ upgrades = {
 						--break
 					end
 				end
-			end,	
+			end,
 	},
 	weaponmod_disruptor_ammo = {
 		name = "Disruptor Ammo",
@@ -227,7 +227,7 @@ upgrades = {
 						end
 					end
 				end
-			end,	
+			end,
 	},
 	weaponmod_high_frequency_beam = {
 		name = "High Frequency Beam",
@@ -249,7 +249,7 @@ upgrades = {
 						end
 					end
 				end
-			end,		
+			end,
 	},
 	weaponmod_railaccel = {
 		name = "Rail Accelerator",
@@ -265,8 +265,8 @@ upgrades = {
 						end
 					end
 				end
-			end,		
-	},	
+			end,
+	},
 	weaponmod_high_caliber_barrel = {
 		name = "High Caliber Barrel",
 		description = "Shotgun/Riot Cannon/Assault Cannon/Plasma Artillery: +150% damage, +100% reload time",
@@ -293,11 +293,11 @@ upgrades = {
 							ReplaceWeapon(unitDef, "commweapon_partillery", "commweapon_hpartillery")
 							ReplaceWeapon(unitDef, "commweapon_partillery", "commweapon_hpartillery")
 							ReplaceWeapon(unitDef, "commweapon_partillery_napalm", "commweapon_hpartillery_napalm")
-							ReplaceWeapon(unitDef, "commweapon_partillery_napalm", "commweapon_hpartillery_napalm")						
+							ReplaceWeapon(unitDef, "commweapon_partillery_napalm", "commweapon_hpartillery_napalm")
 						end
 					end
 				end
-			end,		
+			end,
 	},
 	weaponmod_standoff_rocket = {
 		name = "Standoff Rocket",
@@ -311,25 +311,25 @@ upgrades = {
 						v.reloadtime = v.reloadtime * 1.5
 						for armorname, dmg in pairs(v.damage) do
 							v.damage[armorname] = dmg * 1.25
-						end						
+						end
 						v.model = [[wep_m_dragonsfang.s3o]]
 						v.soundhitvolume = 8
 						v.soundstart = [[weapon/missile/missile2_fire_bass]]
-						v.soundstartvolume = 7					
+						v.soundstartvolume = 7
 						--break
 					elseif id == "commweapon_missilelauncher" then
 						v.range = v.range * 1.5
 						v.reloadtime = v.reloadtime * 1.5
 						for armorname, dmg in pairs(v.damage) do
 							v.damage[armorname] = dmg * 1.25
-						end						
+						end
 						v.model = [[wep_m_phoenix.s3o]]
 						v.soundhitvolume = 5
 						v.soundstart = [[weapon/missile/missile_fire7]]
-						v.soundstartvolume = 3							
+						v.soundstartvolume = 3
 					end
 				end
-			end,	
+			end,
 	},
 	weaponmod_stun_booster = {
 		name = "Flux Amplifier",
@@ -342,7 +342,7 @@ upgrades = {
 						v.paralyzetime = v.paralyzetime + 2
 					end
 				end
-			end,	
+			end,
 	},
 	weaponmod_napalm_warhead = {
 		name = "Napalm Warhead",
@@ -386,7 +386,7 @@ upgrades = {
 						v.customparams.setunitsonfire = "1"
 					end
 				end
-			end,		
+			end,
 	},
 	weaponmod_flame_enhancer = {
 		name = "Long-Burn Napalm",
@@ -418,8 +418,8 @@ upgrades = {
 						v.range = v.range * 1.3
 					end
 				end
-			end,	
-	},	
+			end,
+	},
 	
 	-- modules
 	module_ablative_armor = {
@@ -437,7 +437,7 @@ upgrades = {
 				for i,v in pairs(weapons) do
 					v.customparams.rangemod = v.customparams.rangemod + 0.1
 				end
-			end,	
+			end,
 	},
 	module_adv_nano = {
 		name = "CarRepairer's Nanolathe",
@@ -469,7 +469,7 @@ upgrades = {
 				unitDef.customparams.drones = unitDef.customparams.drones or {}
 				unitDef.customparams.drones[#unitDef.customparams.drones+1] = "module_battle_drone"
 			end,
-	},	
+	},
 	module_dmg_booster = {
 		name = "Damage Booster",
 		description = "Increases damage of all weapons by 10%",
@@ -484,7 +484,7 @@ upgrades = {
 						v.customparams.damagemod = (v.customparams.damagemod or 0) + 0.1
 					end
 				end
-			end,	
+			end,
 	},
 	module_burst_loader = {
 		name = "Burst Loader",
@@ -499,9 +499,9 @@ upgrades = {
 					local baseReload = v.reloadtime / (1 + 0.7*previousCount)
 					if id == "commweapon_beamlaser" or id == "commweapon_disruptor" or id == "commweapon_slowbeam" then
 						-- v.beamtime = v.beamtime + 10 -- beamlaser has 0.1, it's in seconds
-						v.corethickness = v.corethickness + v.corethickness/(previousCount + 1)	
+						v.corethickness = v.corethickness + v.corethickness/(previousCount + 1)
 						for armorname, dmg in pairs(v.damage) do
-							v.damage[armorname] = dmg + dmg/(previousCount + 1)	
+							v.damage[armorname] = dmg + dmg/(previousCount + 1)
 						end
 					elseif id == "commweapon_shotgun" then
 						v.burst = (v.burst or 1) + 3
@@ -515,7 +515,7 @@ upgrades = {
 					end
 					v.customparams.burstloaders = previousCount + 1
 				end
-			end,	
+			end,
 	},
 	module_energy_cell = {
 		name = "Energy Cell",
@@ -529,10 +529,10 @@ upgrades = {
 		description = "Basic radar system with 1800 range",
 		func = function(unitDef)
 				unitDef.radardistance = (unitDef.radardistance or 0)
-				if unitDef.radardistance < 1800 then 
+				if unitDef.radardistance < 1800 then
 					unitDef.radardistance = 1800
 				end
-				if (not unitDef.radaremitheight) or unitDef.radaremitheight < 100 then 
+				if (not unitDef.radaremitheight) or unitDef.radaremitheight < 100 then
 					unitDef.radaremitheight = 24
 				end
 			end,
@@ -555,16 +555,16 @@ upgrades = {
 	module_personal_cloak = {
 		name = "Personal Cloak",
 		description = "Cloaks the commander",
-		func = function(unitDef) 
+		func = function(unitDef)
 				unitDef.cancloak = true
 				unitDef.cloakcost = unitDef.cloakcost or 5
 				unitDef.mincloakdistance = math.max(150, unitDef.mincloakdistance or 0)
-				if unitDef.cloakcost > 5 then 
-					unitDef.cloakcost = 5 
+				if unitDef.cloakcost > 5 then
+					unitDef.cloakcost = 5
 				end
 				unitDef.cloakcostmoving = unitDef.cloakcostmoving or 10
-				if unitDef.cloakcostmoving > 10 then 
-					unitDef.cloakcostmoving = 10 
+				if unitDef.cloakcostmoving > 10 then
+					unitDef.cloakcostmoving = 10
 				end
 			end,
 	},
@@ -617,7 +617,7 @@ upgrades = {
 				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
 				table.insert(unitDef.customparams.lups_unit_fxs, "commAreaShield")
 			end,
-	},	
+	},
 	module_cloak_field = {
 		name = "Cloaking Field",
 		description = "Cloaks all friendly units within 350 m",
@@ -646,7 +646,7 @@ upgrades = {
 		description = "Increases jump range and height",
 		func = function(unitDef)
 				unitDef.customparams.jumpclass = "commrecon2"
-			end,	
+			end,
 	},
 	
 	module_radarnet = {
@@ -676,7 +676,7 @@ upgrades = {
 					v.customparams.damagemod = v.customparams.damagemod + 0.4
 				end
 			end,
-	},	
+	},
 	-- modules that use a weapon slot
 	module_guardian_armor = {
 		name = "Guardian Defense System",
@@ -695,7 +695,7 @@ upgrades = {
 				attributeMods.speed = attributeMods.speed + 0.5
 		end,
 		useWeaponSlot = true,
-	},	
+	},
 	
 	module_longshot = {
 		name = "Longshot Fire Control",
@@ -705,9 +705,9 @@ upgrades = {
 				for i,v in pairs(weapons) do
 					v.customparams.rangemod = v.customparams.rangemod + 0.4
 				end
-			end,	
+			end,
 		useWeaponSlot = true,
-	},		
+	},
 		
 	module_super_nano = {
 		name = "Engineer's Revenge",
@@ -717,7 +717,7 @@ upgrades = {
 				if unitDef.builddistance then unitDef.builddistance = unitDef.builddistance + 200 end
 		end,
 		useWeaponSlot = true,
-	},	
+	},
 	
 	-- deprecated
 	module_improved_optics = {
@@ -742,7 +742,7 @@ upgrades = {
 		func = function(unitDef)
 				unitDef.energymake = (unitDef.energymake or 0) + 2
 				unitDef.metalmake = (unitDef.metalmake or 0) + 2
-			end,	
+			end,
 	},
 	
 	conversion_lazor = {
@@ -750,7 +750,7 @@ upgrades = {
 		description = "LOLOLOL",
 		func = function(unitDef)
 				ReplaceWeapon(unitDef, "commweapon_beamlaser", "commweapon_hparticlebeam")
-			end,	
+			end,
 	}
 }
 
@@ -840,7 +840,7 @@ decorations = {
 	shield_red = {
 		func = function(unitDef)
 				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
-				table.insert(unitDef.customparams.lups_unit_fxs, "commandShieldRed")		
+				table.insert(unitDef.customparams.lups_unit_fxs, "commandShieldRed")
 			end,
 	},
 	shield_green = {
@@ -858,13 +858,13 @@ decorations = {
 	shield_orange = {
 		func = function(unitDef)
 				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
-				table.insert(unitDef.customparams.lups_unit_fxs, "commandShieldOrange")	
+				table.insert(unitDef.customparams.lups_unit_fxs, "commandShieldOrange")
 			end,
 	},
 	shield_violet = {
 		func = function(unitDef)
 				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
-				table.insert(unitDef.customparams.lups_unit_fxs, "commandShieldViolet")	
+				table.insert(unitDef.customparams.lups_unit_fxs, "commandShieldViolet")
 			end,
 	},
 	
@@ -874,7 +874,7 @@ decorations = {
 					unitDef.customparams.decorationicons = unitDef.customparams.decorationicons or {}
 					unitDef.customparams.decorationicons.shoulders = config.decorations.icon_shoulders.image
 				end
-			end,	
+			end,
 	},
 	
 	icon_chest = {
@@ -883,7 +883,7 @@ decorations = {
 					unitDef.customparams.decorationicons = unitDef.customparams.decorationicons or {}
 					unitDef.customparams.decorationicons.chest = config.decorations.icon_chest.image
 				end
-			end,		
+			end,
 	},
 	
 	icon_back = {
@@ -892,7 +892,7 @@ decorations = {
 					unitDef.customparams.decorationicons = unitDef.customparams.decorationicons or {}
 					unitDef.customparams.decorationicons.back = config.decorations.icon_back.image
 				end
-			end,		
+			end,
 	},
 	
 	icon_overhead = {

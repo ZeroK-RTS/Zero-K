@@ -3,33 +3,33 @@ include "constants.lua"
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local base = piece 'base' 
-local pelvis = piece 'pelvis' 
-local torso = piece 'torso' 
-local rgun = piece 'rgun' 
-local lgun = piece 'lgun' 
-local rbarrel = piece 'rbarrel' 
-local lbarrel = piece 'lbarrel' 
-local fp1 = piece 'fp1' 
-local fp2 = piece 'fp2' 
-local rflap1 = piece 'rflap1' 
-local rflap2 = piece 'rflap2' 
-local rflap3 = piece 'rflap3' 
-local rflap4 = piece 'rflap4' 
-local lflap1 = piece 'lflap1' 
-local lflap2 = piece 'lflap2' 
-local lflap3 = piece 'lflap3' 
-local lflap4 = piece 'lflap4' 
-local rupleg = piece 'rupleg' 
-local rloleg = piece 'rloleg' 
-local rfoot = piece 'rfoot' 
-local lupleg = piece 'lupleg' 
-local lloleg = piece 'lloleg' 
-local lfoot = piece 'lfoot' 
-local rftoe = piece 'rftoe' 
-local rrtoe = piece 'rrtoe' 
-local lftoe = piece 'lftoe' 
-local lrtoe = piece 'lrtoe' 
+local base = piece 'base'
+local pelvis = piece 'pelvis'
+local torso = piece 'torso'
+local rgun = piece 'rgun'
+local lgun = piece 'lgun'
+local rbarrel = piece 'rbarrel'
+local lbarrel = piece 'lbarrel'
+local fp1 = piece 'fp1'
+local fp2 = piece 'fp2'
+local rflap1 = piece 'rflap1'
+local rflap2 = piece 'rflap2'
+local rflap3 = piece 'rflap3'
+local rflap4 = piece 'rflap4'
+local lflap1 = piece 'lflap1'
+local lflap2 = piece 'lflap2'
+local lflap3 = piece 'lflap3'
+local lflap4 = piece 'lflap4'
+local rupleg = piece 'rupleg'
+local rloleg = piece 'rloleg'
+local rfoot = piece 'rfoot'
+local lupleg = piece 'lupleg'
+local lloleg = piece 'lloleg'
+local lfoot = piece 'lfoot'
+local rftoe = piece 'rftoe'
+local rrtoe = piece 'rrtoe'
+local lftoe = piece 'lftoe'
+local lrtoe = piece 'lrtoe'
 
 local flares = {[0] = fp2, [1] = fp1}
 local barrels = {[0] = lbarrel, [1] = rbarrel}
@@ -238,7 +238,7 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(torso, y_axis, heading, math.rad(65)*aimMult)
 	WaitForTurn(torso, y_axis)
 	WaitForTurn(lgun, x_axis)
-	StartThread(RestoreAfterDelay)	
+	StartThread(RestoreAfterDelay)
 	return true
 end
 

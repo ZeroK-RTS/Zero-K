@@ -18,7 +18,7 @@ options = {
 		name = 'MMB scrolls instead of dragging',
 		desc = "When enabled hold middle mouse button to scroll the map in a direction.\n" ..
 		       "When disabled click and drag the map with middle mouse button.",
-		type = 'bool', 
+		type = 'bool',
 		noHotkey = true,
 		value = false,
 		OnChange = function(self)

@@ -66,8 +66,8 @@ function Jet:EndDrawDistortion()
 end
 
 function Jet:DrawDistortion()
-	glTexture(1,self.texture1) 
-	glTexture(2,self.texture2) 
+	glTexture(1,self.texture1)
+	glTexture(2,self.texture2)
 
 	glCallList(self.dList)
 end
@@ -165,7 +165,7 @@ local glBeginEnd      = gl.BeginEnd
 local GL_QUADS        = GL.QUADS
 
 local function BeginEndDrawList(self)
-	local ev    = self.emitVector 
+	local ev    = self.emitVector
 	glMultiTexCoord(0,self.width/self.length,self.distortion,0.2*self.animSpeed)
 	glMultiTexCoord(1,ev[1],ev[2],ev[3],1)
 

@@ -12,7 +12,7 @@ end
 
 -------------------------------------------------------------
 -------------------------------------------------------------
-if not (gadgetHandler:IsSyncedCode()) then 
+if not (gadgetHandler:IsSyncedCode()) then
 	return false
 end
 -------------------------------------------------------------
@@ -36,7 +36,7 @@ local projectileSpeed = {
 -- speed = 0.00701024*distance + 5.27606
 
 function gadget:Initialize()
-	for id, _ in pairs(projectileSpeed) do 
+	for id, _ in pairs(projectileSpeed) do
 		if Script.SetWatchProjectile then
 			Script.SetWatchProjectile(id, true)
 		else

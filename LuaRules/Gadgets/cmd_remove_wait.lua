@@ -37,7 +37,7 @@ function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_WAIT] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return waitRemoveDefs
 end
 

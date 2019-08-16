@@ -26,7 +26,7 @@ local spGetProjectileVelocity = Spring.GetProjectileVelocity
 local spGetProjectileTarget = Spring.GetProjectileTarget
 local spSetProjectileCollision = Spring.SetProjectileCollision
 local spSetProjectileVelocity = Spring.SetProjectileVelocity
-local spSetProjectileGravity  = Spring.SetProjectileGravity 
+local spSetProjectileGravity  = Spring.SetProjectileGravity
 local spSpawnProjectile = Spring.SpawnProjectile
 local spSetProjectileTarget = Spring.SetProjectileTarget
 local spSetPieceProjectileParams = Spring.SetPieceProjectileParams
@@ -67,7 +67,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 			weaponID = weaponID,
 			torpName = underwaterWeapon[weaponID].torpName,
 		}
-	end	
+	end
 end
 
 function gadget:ProjectileDestroyed(proID, proOwnerID, weaponID)

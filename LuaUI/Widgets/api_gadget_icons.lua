@@ -137,7 +137,7 @@ function SetIcons()
 		local unitDefID = unitDefIDMap[unitID]
 		-- calculate which units can have these states and check them first
 		
-		local lowpower = lowPowerUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "lowpower") 
+		local lowpower = lowPowerUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "lowpower")
 		if lowpower then
 			local _,_,inbuild = Spring.GetUnitIsStunned(unitID)
 			if inbuild then
@@ -153,7 +153,7 @@ function SetIcons()
 			end
 		end
 		
-		local facplop = facPlopUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "facplop") 
+		local facplop = facPlopUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "facplop")
 		if facplop or lastFacPlop[unitID] == 1 then
 			if not facplop then
 				facplop = 0
@@ -169,7 +169,7 @@ function SetIcons()
 			end
 		end
 		
-		local rearm = rearmUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "noammo") 
+		local rearm = rearmUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "noammo")
 		if rearm then
 			if (not lastRearm[unitID]) or lastRearm[unitID] ~= rearm then
 				lastRearm[unitID] = rearm
@@ -183,7 +183,7 @@ function SetIcons()
 			end
 		end
 		
-		local retreat = retreatUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "retreat") 
+		local retreat = retreatUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "retreat")
 		if retreat then
 			if (not lastRetreat[unitID]) or lastRetreat[unitID] ~= retreat then
 				lastRetreat[unitID] = retreat

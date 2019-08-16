@@ -144,8 +144,8 @@ local oldMouseX,oldMouseY
 --------------------------------------------------------------------------------
 
 -- local player info
-local myAllyTeamID                           
-local myTeamID			
+local myAllyTeamID
+local myTeamID
 local myPlayerID
 local mySpecStatus = false
 
@@ -313,7 +313,7 @@ end
 		width     = 18,
 		position  = 10,
 		posX      = 0,
-		pic       = diplomacyPic,		
+		pic       = diplomacyPic,
 	}
 	
 	modules = {
@@ -414,7 +414,7 @@ function InitializePlayers()
 	myTeamID = Spring_GetLocalTeamID()
 	myAllyTeamID = Spring_GetLocalAllyTeamID()
 	for i = 0, 64 do
-		player[i] = {} 
+		player[i] = {}
 	end
 	GetAllPlayers()
 end
@@ -572,7 +572,7 @@ function SortAllyTeams(vOffset)
 			vOffset = vOffset + labelOffset
 			table.insert(drawListOffset, vOffset)
 			table.insert(drawList, -2)
-			vOffset = SortTeams(allyTeamID, vOffset)			
+			vOffset = SortTeams(allyTeamID, vOffset)
 			break
 		end
 	end
@@ -600,14 +600,14 @@ function SortTeams(allyTeamID, vOffset)
 	if myAllyTeamID == allyTeamID then
 		table.insert(drawListOffset, vOffset)
 		table.insert(drawList, -1)
-		vOffset = SortPlayers(myTeamID,allyTeamID,vOffset)	
+		vOffset = SortPlayers(myTeamID,allyTeamID,vOffset)
 	end
 	for _,teamID in ipairs(teamsList) do
 		if teamID ~= myTeamID then
 			table.insert(drawListOffset, vOffset)
 			table.insert(drawList, -1)
 			vOffset = SortPlayers(teamID,allyTeamID,vOffset)
-		end  
+		end
 	end
 	return vOffset
 end
@@ -738,7 +738,7 @@ function CheckTime()
 				end
 			end
 		end
-	end 
+	end
 end
 
 function DrawBackground()
@@ -749,7 +749,7 @@ function DrawBackground()
 	gl_Rect(widgetPosX,widgetPosY + widgetHeight  - 2, widgetPosX + widgetWidth, widgetPosY + widgetHeight  - 1)
 	gl_Rect(widgetPosX , widgetPosY, widgetPosX + 1, widgetPosY + widgetHeight  - 1)
 	gl_Rect(widgetPosX + widgetWidth - 1, widgetPosY, widgetPosX + widgetWidth, widgetPosY + widgetHeight  - 1)
-	gl_Color(1,1,1,1)  
+	gl_Color(1,1,1,1)
 end
 
 function DrawList()
@@ -845,7 +845,7 @@ function DrawPlayer(playerID, leader, vOffset)
 					DrawSpecButton(team,posY)                           -- spec button
 				end
 			end
-			gl_Color(red,green,blue,1)	
+			gl_Color(red,green,blue,1)
 			if m_ID.active == true then
 				--if playerID < 32 then
 					DrawRank(rank, posY, dark)
@@ -854,14 +854,14 @@ function DrawPlayer(playerID, leader, vOffset)
 			end
 		end
 		gl_Color(red,green,blue,1)
-		if m_side.active == true then                        
-			DrawSidePic(team, posY, leader, dark)   
+		if m_side.active == true then
+			DrawSidePic(team, posY, leader, dark)
 		end
 	else
-		gl_Color(1,1,1,1)	
+		gl_Color(1,1,1,1)
 		if m_name.active == true then
 			DrawName(name, posY, false)
-		end		
+		end
 	end
 	if m_cpuping.active == true then
 		if cpuLvl ~= nil then                              -- draws CPU usage and ping icons (except AI and ghost teams)
@@ -903,7 +903,7 @@ function DrawPlayerTip(playerID, leader, vOffset, mouseX, mouseY)
 	local pingLvl  = player[playerID].pingLvl
 	local cpuLvl   = player[playerID].cpuLvl
 	local ping     = player[playerID].ping
-	local cpu      = player[playerID].cpu    
+	local cpu      = player[playerID].cpu
 	local spec     = player[playerID].spec
 	local totake   = player[playerID].totake
 	local needm    = player[playerID].needm
@@ -934,7 +934,7 @@ function DrawPlayerTip(playerID, leader, vOffset, mouseX, mouseY)
 					if tipY == true then SpecTip(mouseX) end
 				end
 			end
-			gl_Color(red,green,blue,1)	
+			gl_Color(red,green,blue,1)
 			if m_rank.active == true then
 			--	if playerID < 32 then
 					DrawRank(rank, posY, dark)
@@ -947,22 +947,22 @@ function DrawPlayerTip(playerID, leader, vOffset, mouseX, mouseY)
 			end
 		end
 		gl_Color(red,green,blue,1)
-		if m_rank.active == true then                        
-			DrawRank(rank, posY, leader, dark)   
+		if m_rank.active == true then
+			DrawRank(rank, posY, leader, dark)
 		end
 		gl_Color(red,green,blue,1)
-		if m_side.active == true then                        
-			DrawSidePic(team, posY, leader, dark)   
+		if m_side.active == true then
+			DrawSidePic(team, posY, leader, dark)
 		end
-		gl_Color(red,green,blue,1)	
+		gl_Color(red,green,blue,1)
 		if m_name.active == true then
 			DrawName(name, posY, dark)
 		end
 	else
-		gl_Color(1,1,1,1)	
+		gl_Color(1,1,1,1)
 		if m_name.active == true then
 			DrawName(name, posY, false)
-		end		
+		end
 	end
 
 	if m_cpuping.active == true then
@@ -1005,7 +1005,7 @@ function DrawTakeSignal(posY)
 			gl_TexRect(widgetPosX - 11, posY, widgetPosX - 1, posY + 16)
 			gl_Color(1,1,1)
 			gl_Texture(takePic)
-			gl_TexRect(widgetPosX - 57, posY - 1, widgetPosX - 12, posY + 17)			
+			gl_TexRect(widgetPosX - 57, posY - 1, widgetPosX - 12, posY + 17)
 		else
 			local leftPosX = widgetPosX + widgetWidth
 			gl_Color(1,0.95,0)
@@ -1013,9 +1013,9 @@ function DrawTakeSignal(posY)
 			gl_TexRect(leftPosX + 11, posY, leftPosX + 1, posY + 16)
 			gl_Color(1,1,1)
 			gl_Texture(takePic)
-			gl_TexRect(leftPosX + 12, posY - 1, leftPosX + 57, posY + 17)	
+			gl_TexRect(leftPosX + 12, posY - 1, leftPosX + 57, posY + 17)
 		end
-	end	
+	end
 end
 
 function DrawShareButtons(posY, needm, neede)
@@ -1030,7 +1030,7 @@ function DrawShareButtons(posY, needm, neede)
 		gl_TexRect(m_share.posX + widgetPosX  + 33, posY, m_share.posX + widgetPosX  + 49, posY + 16)
 	end
 	if neede == true then
-		gl_TexRect(m_share.posX + widgetPosX  + 17, posY, m_share.posX + widgetPosX  + 33, posY + 16)	
+		gl_TexRect(m_share.posX + widgetPosX  + 17, posY, m_share.posX + widgetPosX  + 33, posY + 16)
 	end
 	gl_Texture(false)
 end
@@ -1038,7 +1038,7 @@ end
 function DrawSpecButton(team, posY)
 	gl_Texture(specPic)
 	gl_TexRect(m_spec.posX + widgetPosX  + 1, posY, m_spec.posX + widgetPosX  + 17, posY + 16)
-	if specTarget == team then 
+	if specTarget == team then
 		gl_Texture(selectPic)
 		gl_TexRect(m_spec.posX + widgetPosX  + 1, posY, m_spec.posX + widgetPosX  + 17, posY + 16)
 	end
@@ -1047,7 +1047,7 @@ end
 
 function DrawChatButton(posY)
 	gl_Texture(chatPic)
-	gl_TexRect(m_chat.posX + widgetPosX  + 1, posY, m_chat.posX + widgetPosX  + 17, posY + 16)	
+	gl_TexRect(m_chat.posX + widgetPosX  + 1, posY, m_chat.posX + widgetPosX  + 17, posY + 16)
 end
 
 function DrawSidePic(team, posY, leader, dark)
@@ -1067,7 +1067,7 @@ function DrawSidePic(team, posY, leader, dark)
 		gl_TexRect(m_side.posX + widgetPosX +1, posY,m_side.posX + widgetPosX +17, posY + 16)
 		gl_Texture(false)
 	end
-	gl_Texture(false)	
+	gl_Texture(false)
 end
 
 function DrawRank(rank, posY, dark)
@@ -1133,7 +1133,7 @@ function DrawPingCpu(pingLvl, cpuLvl, posY)
 	gl_TexRect(m_cpuping.posX + widgetPosX  + 13, posY + 1, m_cpuping.posX + widgetPosX  + 23, posY + 17)
 	gl_Color(pingCpuColors[cpuLvl].r,pingCpuColors[cpuLvl].g,pingCpuColors[cpuLvl].b)
 	gl_Texture(cpuPic)
-	gl_TexRect(m_cpuping.posX + widgetPosX  + 1, posY - 1, m_cpuping.posX + widgetPosX  + 11, posY + 15)	
+	gl_TexRect(m_cpuping.posX + widgetPosX  + 1, posY - 1, m_cpuping.posX + widgetPosX  + 11, posY + 15)
 end
 
 function DrawPoint(posY,pointtime)
@@ -1151,7 +1151,7 @@ function DrawPoint(posY,pointtime)
 		gl_TexRect(leftPosX + 11, posY, leftPosX + 1, posY + 16)
 		gl_Color(1,1,1,pointtime/20)
 		gl_Texture(pointPic)
-		gl_TexRect(leftPosX + 28, posY, leftPosX + 12, posY + 16)	
+		gl_TexRect(leftPosX + 28, posY, leftPosX + 12, posY + 16)
 	end
 	gl_Color(1,1,1,1)
 end
@@ -1165,7 +1165,7 @@ function TakeTip(mouseX)
 		local leftPosX = widgetPosX + widgetWidth
 		if mouseX >= leftPosX + 1 and mouseX <= leftPosX + 57 then
 			tipText = "Click to take abandoned units"
-		end		
+		end
 	end
 end
 
@@ -1192,13 +1192,13 @@ end
 function SpecTip(mouseX)
 	if mouseX >= m_spec.posX + widgetPosX  + 1 and mouseX <= m_spec.posX + widgetPosX  + 17 then
 		tipText = "Click to observe the Player"
-	end	
+	end
 end
 
 function PingCpuTip(mouseX, pingLvl, cpuLvl)
 	if mouseX >= m_cpuping.posX + widgetPosX  + 13 and mouseX <=  m_cpuping.posX + widgetPosX  + 23 then
 		tipText = "Ping: "..pingLvl.." ms"
-	elseif mouseX >= m_cpuping.posX + widgetPosX  + 1 and mouseX <=  m_cpuping.posX + widgetPosX  + 11 then		
+	elseif mouseX >= m_cpuping.posX + widgetPosX  + 1 and mouseX <=  m_cpuping.posX + widgetPosX  + 11 then
 		tipText = "Cpu Usage: "..cpuLvl.."%"
 	end
 end
@@ -1212,7 +1212,7 @@ function PointTip(mouseX)
 		local leftPosX = widgetPosX + widgetWidth
 		if mouseX >= leftPosX + 1 and mouseX <= leftPosX + 28 then
 			tipText = "Click to reach the last point set by the player"
-		end		
+		end
 	end
 end
 
@@ -1262,7 +1262,7 @@ function DrawShareSlider()
 			gl_Texture(amountPic)
 			gl_TexRect(m_share.posX + widgetPosX  + 82,posY-1+amount, m_share.posX + widgetPosX  + 34,posY+17+amount)
 			gl_Texture(false)
-			TextDrawCentered(amountEM.."", m_share.posX + widgetPosX  + 55,posY+3+amount)				
+			TextDrawCentered(amountEM.."", m_share.posX + widgetPosX  + 55,posY+3+amount)
 		end
 	elseif playerMetal ~= nil then
 		posY = widgetPosY + widgetHeight - playerMetal.posY
@@ -1358,7 +1358,7 @@ function SetPingCpuColors()
 	}
 end
 
-function GetDark(red,green,blue)                  	
+function GetDark(red,green,blue)
 
 	-- Determines if the player color is dark. (to determine if white outline is needed)
 
@@ -1452,7 +1452,7 @@ function widget:MousePress(x,y,button)
 										end
 									end
 									release = nil
-								else	
+								else
 									firstclick = now + 0.3
 								end
 								return true
@@ -1590,31 +1590,31 @@ function widget:TweakDrawScreen()
 	local bottom = widgetPosY + widgetHeight - 28
 	if bottom < 0 then bottom = 0 end
 	if left + 181 > vsx then left = vsx - 181 end
-	gl_Texture(sidePic)	
+	gl_Texture(sidePic)
 	gl_TexRect(left + 1, bottom + 11, left + 17, bottom + 27)
 	if m_side.active ~= true then
-		gl_Texture(crossPic)	
-		gl_TexRect(left + 1, bottom + 11, left + 17, bottom + 27)		
+		gl_Texture(crossPic)
+		gl_TexRect(left + 1, bottom + 11, left + 17, bottom + 27)
 	end
-	gl_Texture(IDPic)	
+	gl_Texture(IDPic)
 	gl_TexRect(left + 19, bottom + 11, left + 35, bottom + 27)
 	if m_ID.active ~= true then
-		gl_Texture(crossPic)	
-		gl_TexRect(left + 19, bottom + 11, left + 35, bottom + 27)	
-	end	
-	gl_Texture(namePic)	
+		gl_Texture(crossPic)
+		gl_TexRect(left + 19, bottom + 11, left + 35, bottom + 27)
+	end
+	gl_Texture(namePic)
 	gl_TexRect(left + 37, bottom + 11, left + 53, bottom + 27)
 	if m_name.active ~= true then
 		gl_Texture(crossPic)
 		gl_TexRect(left + 37, bottom + 11, left + 53, bottom + 27)
 	end
-	gl_Texture(cpuPingPic)	
+	gl_Texture(cpuPingPic)
 	gl_TexRect(left + 55, bottom + 11, left + 71, bottom + 27)
 	if m_cpuping.active ~= true then
 		gl_Texture(crossPic)
 		gl_TexRect(left + 55, bottom + 11, left + 71, bottom + 27)
 	end
-	gl_Texture(sharePic)	
+	gl_Texture(sharePic)
 	gl_TexRect(left + 73, bottom + 11, left + 89, bottom + 27)
 	if m_share.active ~= true then
 		gl_Texture(crossPic)
@@ -1633,13 +1633,13 @@ function widget:TweakDrawScreen()
 		gl_TexRect(left + 109, bottom + 11, left + 125, bottom + 27)
 	end
 	gl_Texture(takebPic)
-	gl_TexRect(left + 127, bottom + 11, left + 143, bottom + 27)	
+	gl_TexRect(left + 127, bottom + 11, left + 143, bottom + 27)
 	if m_take ~= true then
 		gl_Texture(crossPic)
 		gl_TexRect(left + 127, bottom + 11, left + 143, bottom + 27)
 	end
 	gl_Texture(seespecPic)
-	gl_TexRect(left + 145, bottom + 11, left + 161, bottom + 27)	
+	gl_TexRect(left + 145, bottom + 11, left + 161, bottom + 27)
 	if m_seespec ~= true then
 		gl_Texture(crossPic)
 		gl_TexRect(left + 145, bottom + 11, left + 161, bottom + 27)
@@ -1655,7 +1655,7 @@ function widget:TweakDrawScreen()
 	if expandDown == true then
 		gl_TexRect(widgetPosX, widgetPosY - 12, widgetRight, widgetPosY - 4)
 	else
-		gl_TexRect(widgetPosX, widgetTop + 12, widgetRight, widgetTop + 4)	
+		gl_TexRect(widgetPosX, widgetTop + 12, widgetRight, widgetTop + 4)
 	end
 		gl_Texture(arrowPic)
 	if expandLeft == true then
@@ -1832,7 +1832,7 @@ function widget:SetConfigData(data)      -- load
 		local oldvsy = data.vsy
 		if oldvsx == nil then
 			oldvsx = vsx
-			oldvsy = vsy		
+			oldvsy = vsy
 		end
 		local dx     = vsx - oldvsx
 		local dy     = vsy - oldvsy
@@ -1902,7 +1902,7 @@ function CheckPlayersChange()
 			end
 			if teamID ~= player[p].team then                                               -- PLAYER CHANGING TEAM
 				if table.maxn(Spring_GetPlayerList(player[p].team,true)) == 0 then           -- check if there is no more player in the team + update
-					player[player[p].team + 32] = CreatePlayerFromTeam(player[p].team)         
+					player[player[p].team + 32] = CreatePlayerFromTeam(player[p].team)
 				end
 				player[p].team = teamID
 				player[p].red, player[p].green, player[p].blue = Spring_GetTeamColor(teamID)
@@ -1985,7 +1985,7 @@ function widget:Update(frame)
 	local gs = Spring_GetGameSeconds()
 	if gs < 1 then
 		if gs > 0 then
-			Init() 
+			Init()
 		end
 	end
 end
@@ -2016,12 +2016,12 @@ end
 
 
 -- Coord in % (resize) geometry will not be done
--- mise à jour ciblée des joueurs (maintenir les "point" - nettoyer les objets qui ne sont plus ciblés par le gamePlayersInfo/spectatorsInfo) le mieux est de modifier le minimum à partir de l'équipe/joueur modifié
--- mise en mémoire si collé à droit/en haut
+-- mise Ã  jour ciblÃ©e des joueurs (maintenir les "point" - nettoyer les objets qui ne sont plus ciblÃ©s par le gamePlayersInfo/spectatorsInfo) le mieux est de modifier le minimum Ã  partir de l'Ã©quipe/joueur modifiÃ©
+-- mise en mÃ©moire si collÃ© Ã  droit/en haut
 -- ajouter les stalls
--- ajouter les décryptages de messages "widget:AddConsoleLine(line,priority)" appelé à chaque fois qu'il doit ajouter une ligne
--- !!! reload (mieux faire le système de mise en place des modules)
--- !!! s'il n'y a que des specs/ replay pour le système de spec.
+-- ajouter les dÃ©cryptages de messages "widget:AddConsoleLine(line,priority)" appelÃ© Ã  chaque fois qu'il doit ajouter une ligne
+-- !!! reload (mieux faire le systÃ¨me de mise en place des modules)
+-- !!! s'il n'y a que des specs/ replay pour le systÃ¨me de spec.
 -- Random --> first unit determine the side
 -- isabove pour take et point
 

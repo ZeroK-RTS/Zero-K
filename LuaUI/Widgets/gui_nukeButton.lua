@@ -158,7 +158,7 @@ function widget:Update()
 	local time = floor(timef)
 
 	-- update timers once every <updateInt> seconds
-	if (time % updateInt == 0 and time ~= lastTime) then	
+	if (time % updateInt == 0 and time ~= lastTime) then
 		lastTime = time
 		--do update stuff:
 		
@@ -182,7 +182,7 @@ function widget:Update()
 				if ( numStockPQue > 0 ) then
 					highProgress = max( highProgress, buildPercent )
 				end
-			end			
+			end
 			
 			if ( numStockpiled > highestLoadCount ) then
 				intConfig["nextNuke"] = unitID
@@ -197,7 +197,7 @@ function widget:Update()
 end
 
 function updateProgressLayer()
-	--progress layer	
+	--progress layer
 	--fuck, replace half of the "buttonCurrentWidth" by "buttonCurrentHeight"
 	intConfig["buttonCoords"]["progress"] = {}
 	table.insert( intConfig["buttonCoords"]["progress"], { 0, 0 } )
@@ -222,10 +222,10 @@ function updateProgressLayer()
 	local y=0
 	if ( localHP < 0.125 ) then
 		y = intConfig["buttonCurrentWidth"]
-		x = intConfig["buttonCurrentWidth"] * localHP / 0.125 
+		x = intConfig["buttonCurrentWidth"] * localHP / 0.125
 	elseif ( localHP < 0.375 ) then
 		y = intConfig["buttonCurrentWidth"] - 2 * intConfig["buttonCurrentWidth"] * ( localHP - 0.125 ) / 0.25
-		x = intConfig["buttonCurrentWidth"] 
+		x = intConfig["buttonCurrentWidth"]
 	elseif ( localHP < 0.625 ) then
 		y = -intConfig["buttonCurrentWidth"]
 		x = intConfig["buttonCurrentWidth"] - 2 * intConfig["buttonCurrentWidth"] * ( localHP - 0.375 ) / 0.25
@@ -234,7 +234,7 @@ function updateProgressLayer()
 		x = -intConfig["buttonCurrentWidth"]
 	elseif ( localHP < 1.0 ) then
 		y = intConfig["buttonCurrentWidth"]
-		x = -intConfig["buttonCurrentWidth"] + intConfig["buttonCurrentWidth"] * ( localHP - 0.875 ) / 0.125 
+		x = -intConfig["buttonCurrentWidth"] + intConfig["buttonCurrentWidth"] * ( localHP - 0.875 ) / 0.125
 	end
 	table.insert( intConfig["buttonCoords"]["progress"], { x,y } )
 end
@@ -277,7 +277,7 @@ function widget:DrawScreen()
 	intConfig["mouseOver"] = false
 	
 	if ( isMouseOver( mx, my ) ) then
-		intConfig["mouseOver"] = true	
+		intConfig["mouseOver"] = true
 	end
 	
 	if ( highProgress > -1 or readyNukeCount > 0 ) then
@@ -290,7 +290,7 @@ end
   
 function widget:MousePress(x, y, button)
 	if ( isMouseOver( x, y ) and readyNukeCount > 0 and button == 1 ) then
-		local timeNow = spGetGameSeconds() 
+		local timeNow = spGetGameSeconds()
 		spSelectUnitArray( { intConfig["nextNuke"] } , false )
 		
 		local _,speedfac, _ = spGetGameSpeed()
@@ -382,7 +382,7 @@ function ResizeButtonsToScreen()
 	intConfig["buttonCoords"][1]["y"] = intConfig["screeny"] * config["buttonYPer"] + intConfig["buttonCurrentHeight"]
 
 	intConfig["buttonCoords"][2]["x"] = intConfig["screenx"] * config["buttonXPer"] + intConfig["buttonCurrentWidth"]
-	intConfig["buttonCoords"][2]["y"] = intConfig["screeny"] * config["buttonYPer"] - intConfig["buttonCurrentHeight"] 
+	intConfig["buttonCoords"][2]["y"] = intConfig["screeny"] * config["buttonYPer"] - intConfig["buttonCurrentHeight"]
 
 	intConfig["fontSize"] = baseFontSize * ( intConfig["screeny"] / intConfig["defaultScreenResY"] )
 	printDebug("Resizing: " .. intConfig["buttonCoords"][1]["x"] )
@@ -465,7 +465,7 @@ function DrawButtonProgress( xcenter, ycenter )
 end
 
 --Commons
-function ResetGl() 
+function ResetGl()
 	glColor( { 1.0, 1.0, 1.0, 1.0 } )
 	glLineWidth( 1.0 )
 	glDepthTest(false)
@@ -482,7 +482,7 @@ function CheckSpecState()
 		return false
 	end
 	
-	return true	
+	return true
 end
 
 function printDebug( value )
@@ -492,8 +492,8 @@ function printDebug( value )
 				else spEcho("false") end
 		elseif ( type(value ) == "table" ) then
 			spEcho("Dumping table:")
-			for key,val in pairs(value) do 
-				spEcho(key,val) 
+			for key,val in pairs(value) do
+				spEcho(key,val)
 			end
 		else
 			spEcho( value )
@@ -508,7 +508,7 @@ function widget:GetConfigData()
 	return config
 end
 
-function widget:SetConfigData(data) 
+function widget:SetConfigData(data)
 	if (data ~= nil) then
 		config = data
 		ResizeButtonsToScreen()
@@ -561,7 +561,7 @@ end
 function widget:TweakDrawScreen()
 	drawButton()
 	
-	glColor(0.0,0.0,1.0,0.5)                                   
+	glColor(0.0,0.0,1.0,0.5)
 	glRect( intConfig["buttonCoords"][1]["x"], intConfig["buttonCoords"][2]["y"], intConfig["buttonCoords"][2]["x"], intConfig["buttonCoords"][1]["y"])
 	glColor(1,1,1,1)
 	local centerx = xmin - intConfig["buttonCurrentWidth"] - 16

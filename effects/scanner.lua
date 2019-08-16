@@ -45,7 +45,7 @@ return {
     --    expansionspeed     = 10,
     --    ttl                = 60,
     --  },
-    --},    
-  },  
+    --},
+  },
 }
 

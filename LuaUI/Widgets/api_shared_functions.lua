@@ -27,7 +27,7 @@ VFS.Include("LuaRules/Utilities/unitDefReplacements.lua")
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 VFS.Include("LuaRules/Utilities/rulesParam.lua")
 
-local function GetBuildIconFrame(udef) 
+local function GetBuildIconFrame(udef)
 	local cp = udef.customParams
 	if udef.isMobileBuilder then
 		return consTex
@@ -47,7 +47,7 @@ local function GetBuildIconFrame(udef)
 	else
 		return diffTex
 	end
-end 
+end
 
 --------------------------------------------------------------------------------
 -- table writing funcs
@@ -278,8 +278,8 @@ function widget:Initialize()
 end
 
 local builderDefs = {}
-for udid, ud in ipairs(UnitDefs) do 
-	for i, option in ipairs(ud.buildOptions) do 
+for udid, ud in ipairs(UnitDefs) do
+	for i, option in ipairs(ud.buildOptions) do
 		if UnitDefNames.staticmex.id == option then
 			builderDefs[udid] = true
 		end

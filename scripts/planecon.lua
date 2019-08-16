@@ -1,12 +1,12 @@
 include "constants.lua"
 include "gunshipConstructionTurnHax.lua"
 
-local base = piece 'base' 
-local body = piece 'body' 
-local engine1 = piece 'engine1' 
-local engine2 = piece 'engine2' 
-local nozzle = piece 'nozzle' 
-local nano = piece 'nano' 
+local base = piece 'base'
+local body = piece 'body'
+local engine1 = piece 'engine1'
+local engine2 = piece 'engine2'
+local nozzle = piece 'nozzle'
+local nano = piece 'nano'
 
 --New bits
 local centreClaw 		= piece 'CentreClaw'
@@ -37,13 +37,13 @@ local function TiltBody()
 				speed = 6
 			end
 			Turn(base, x_axis, math.rad(2) * speed, math.rad(45))
-			Move(engShield1, y_axis, 0.25*speed, 2) 
-			Move(engShield2, y_axis, -0.25*speed, 2) 
+			Move(engShield1, y_axis, 0.25*speed, 2)
+			Move(engShield2, y_axis, -0.25*speed, 2)
 			Sleep(100)
 		else
 			Turn(base, x_axis, math.rad(0), math.rad(45))
-			Move(engShield1, y_axis, 0, 2) 
-			Move(engShield2, y_axis, 0, 2) 
+			Move(engShield1, y_axis, 0, 2)
+			Move(engShield2, y_axis, 0, 2)
 			Sleep(100)
 		end
 	end
@@ -59,8 +59,8 @@ function script.Create()
 	
 	Move(body, z_axis, -8)
 
-	Move(engShield1, y_axis, 0, 0.5) 
-	Move(engShield2, y_axis, 0, 0.5) 
+	Move(engShield1, y_axis, 0, 0.5)
+	Move(engShield2, y_axis, 0, 0.5)
 	StartThread(GG.Script.SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	StartThread(TiltBody)

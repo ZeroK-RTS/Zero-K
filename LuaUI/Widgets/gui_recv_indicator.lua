@@ -4,7 +4,7 @@ function widget:GetInfo()
     name      = "Receive Units Indicator",
     desc      = versionName .. " Notify users of received units from unit transfer",
     author    = "msafwan",
-    date      = "Jan 30, 2012", --minor clean up: June 25, 2013 
+    date      = "Jan 30, 2012", --minor clean up: June 25, 2013
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = true  --  loaded by default?
@@ -20,7 +20,7 @@ local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
 local spAreTeamsAllied = Spring.AreTeamsAllied
 local spValidUnitID = Spring.ValidUnitID
 local spIsAABBInView = Spring.IsAABBInView
-local spGetGameFrame  = Spring.GetGameFrame 
+local spGetGameFrame  = Spring.GetGameFrame
 
 --Copied From gui_point_tracker.lua----------------------------------------------
 local glLineWidth = gl.LineWidth
@@ -51,7 +51,7 @@ local knownCirclePositionEMPTY_gbl = true --//variable: a flag
 local receivedUnitListEMPTY_gbl = true --//variable: a flag
 
 local minimumNeighbor_gbl = 3 --//constant: minimum neighboring (units) before considered a cluster
-local neighborhoodRadius_gbl = 600 --//constant: neighborhood radius. Distance from each unit where neighborhoodList are generated. 
+local neighborhoodRadius_gbl = 600 --//constant: neighborhood radius. Distance from each unit where neighborhoodList are generated.
 local radiusThreshold_gbl = 300 --//constant: density threshold where border is detected. Huge value means 2 cluster are combined, small value mean all unit disassociated
 local waitConstant_gbl = 1 --//constant: default interval (in second) for 'widget:Update()' to be executed
 local waitDuration_gbl = waitConstant_gbl --//variable: determine how frequently 'widget:Update()' is executed
@@ -79,7 +79,7 @@ local maxLabelLength = 16
 
 ---------------------------------------------------------------------------------
 --Add Marker---------------------------------------------------------------------
--- 1 function. 
+-- 1 function.
 local function AddMarker (cluster, unitIDNoise, receivedUnitList)
 	local givenByTeamID = givenByTeamID_gbl
 	local gameID_to_playerName = gameID_to_playerName_gbl
@@ -144,7 +144,7 @@ local function AddMarker (cluster, unitIDNoise, receivedUnitList)
 				if j>= 6 and currentIndex > 1 then --//IF current index is greater than 5, and there already discernable cluster, then no need to hi-light individual units.
 					notIgnore=false
 				end
-				if addMarker then 
+				if addMarker then
 					spMarkerAddPoint(x,y,z, label)
 					knownMarkerPosition[(#knownMarkerPosition or 0)+1] = {x, y, z,  birth = now, age = 0}
 				end --// add marker
@@ -454,7 +454,7 @@ function widget:DrawScreen() --Reference: gui_point_tracker.lua (Evil4Zerggin)
 				glColor(1,1,1,1)
 				glLineWidth(1)
 				glPopMatrix()
-			end			
+			end
 		end
 	end
 end
@@ -464,7 +464,7 @@ function widget:DrawWorld() --Reference: minimap_events.lua (Dave Rodgers), gfx_
 		for i,_ in pairs(knownCirclePosition_gbl) do --// draw circle on the ground
 			local x,y,z,r = knownCirclePosition_gbl[i][1], knownCirclePosition_gbl[i][2], knownCirclePosition_gbl[i][3], knownCirclePosition_gbl[i][5]
 			local inView = spIsAABBInView(x-r,y-r,z-r, x+r,y+r,z+r )
-			if inView and (on) then 
+			if inView and (on) then
 				glPushMatrix()
 				glLineWidth(2)
 				glColor(myColor_gbl[1],myColor_gbl[2],myColor_gbl[3], 0.3)

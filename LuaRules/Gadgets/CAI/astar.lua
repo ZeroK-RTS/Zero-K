@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------
 --[[
-author: quantum 
+author: quantum
 GPL v2 or later
 
  http://www.policyalmanac.org/games/aStarTutorial.htm
@@ -90,7 +90,7 @@ function aStar.NewPriorityQueue()
     heap[currentPosition] = currentKey
     while true do
       local parentPosition = math.floor(currentPosition/2)
-      if parentPosition == 1 then 
+      if parentPosition == 1 then
         break
       end
       local parentKey = heap[parentPosition]
@@ -180,13 +180,13 @@ end
 function aStar.GetNeighbors(id, goal) -- override this if the nodes are not arranged in a grid
   local x, y = aStar.ToCoords(id)
   local nodes = {
-    aStar.ToID{x-1, y}, 
-    aStar.ToID{x, y-1},  
-    aStar.ToID{x+1, y}, 
-    aStar.ToID{x, y+1}, 
-    aStar.ToID{x-1, y-1},  
-    aStar.ToID{x-1, y+1}, 
-    aStar.ToID{x+1, y+1}, 
+    aStar.ToID{x-1, y},
+    aStar.ToID{x, y-1},
+    aStar.ToID{x+1, y},
+    aStar.ToID{x, y+1},
+    aStar.ToID{x-1, y-1},
+    aStar.ToID{x-1, y+1},
+    aStar.ToID{x+1, y+1},
     aStar.ToID{x+1, y-1}
   }
   local passable = {}
@@ -214,7 +214,7 @@ end
 function aStar.GetPath(startID, goalID, cyclesBeforeYield)
   local parents = {}
   local gScores = {} -- distance from start along optimal path
-  local closedSet = {} --  nodes already evaluated 
+  local closedSet = {} --  nodes already evaluated
   local openHeap = aStar.NewPriorityQueue() -- binary heap of nodes by f score
 
   gScores[startID] = 0

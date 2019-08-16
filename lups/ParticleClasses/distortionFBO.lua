@@ -5,7 +5,7 @@
 --//FIXME: GL_TEXTURE_RECTANGLE support (LuaFBO doesn't support it yet?)
 
 local PostDistortion = {}
-local pd = PostDistortion 
+local pd = PostDistortion
 PostDistortion.__index = PostDistortion
 
 -----------------------------------------------------------------------------------------------------------------
@@ -151,7 +151,7 @@ function PostDistortion:EndDraw()
 	glCallList(enterIdentity);
 	if (pd.texRectangle) then glUniform(screenSizeLoc,vsx,vsy) end
 	glTexture(0,jitterTex);
-	glTexture(1,screenCopyTex); 
+	glTexture(1,screenCopyTex);
 	glCallList(postDrawAndLeaveIdentity);
 end
 
@@ -305,7 +305,7 @@ function PostDistortion.Finalize()
 		gl.DeleteShader(jitterShader or 0)
 	end
 
-	gl.DeleteList(enterIdentity or 0) 
+	gl.DeleteList(enterIdentity or 0)
 	gl.DeleteList(postDrawAndLeaveIdentity or 0)
 end
 

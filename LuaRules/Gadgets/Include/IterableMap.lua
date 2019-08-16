@@ -105,7 +105,7 @@ function IterableMap.New()
 		local i = 0
 		return function ()
 			i = i + 1
-			if i <= indexMax then 
+			if i <= indexMax then
 				return keyByIndex[i], dataByKey[keyByIndex[i]]
 			end
 		end

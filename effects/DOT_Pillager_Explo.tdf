@@ -32,7 +32,7 @@
 		particleSize		= 0.5;
 		particleSizeSpread	= 8;
 
-		directional		= 0; 
+		directional		= 0;
 		useAirLos		= 1;
 		}
 	air=0;
@@ -71,7 +71,7 @@
 		particleSize		= 0.5;
 		particleSizeSpread	= 1;
 
-		directional		= 0; 
+		directional		= 0;
 		useAirLos		= 1;
 		}
 	air=0;
@@ -109,7 +109,7 @@
 		particleSize		= 0.5;
 		particleSizeSpread	= 1;
 
-		directional		= 0; 
+		directional		= 0;
 		useAirLos		= 1;
 		}
 	air=1;
@@ -148,7 +148,7 @@
 		particleSize		= 1;
 		particleSizeSpread	= 3;
 
-		directional		= 1; 
+		directional		= 1;
 		useAirLos		= 1;
 		}
 	air=1;
@@ -206,7 +206,7 @@
 		particleSize		= 1;
 		particleSizeSpread	= 3;
 
-		directional		= 0; 
+		directional		= 0;
 		useAirLos		= 1;
 		}
 	air=0;
@@ -245,7 +245,7 @@
 		particleSize		= 3;
 		particleSizeSpread	= 12;
 
-		directional		= 1; 
+		directional		= 1;
 		useAirLos		= 1;
 		}
 	air=0;
@@ -285,7 +285,7 @@
 		particleSize		= 0.02;
 		particleSizeSpread	= 0;
 
-		directional		= 1; 
+		directional		= 1;
 		useAirLos		= 1;
 		}
 	air=0;

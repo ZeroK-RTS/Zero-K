@@ -62,7 +62,7 @@ end
 local function ScrapUnit(unitID, unitDefID, team, progress, face)
 	if (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].wreckName and FeatureDefNames[UnitDefs[unitDefID].wreckName]) then
 		local wreck = FeatureDefNames[UnitDefs[unitDefID].wreckName].id
-		if (wreck and FeatureDefs[wreck]) then		 
+		if (wreck and FeatureDefs[wreck]) then
 			local nextWreck = FeatureDefs[wreck].deathFeatureID
 			if nextWreck and FeatureDefs[nextWreck] then
 				wreck = FeatureDefs[wreck].deathFeatureID

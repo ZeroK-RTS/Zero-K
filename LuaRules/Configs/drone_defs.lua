@@ -9,12 +9,12 @@ local carrierDefNames = {
 	shipcarrier = {
 		spawnPieces = {"DroneAft", "DroneFore", "DroneLower","DroneUpper"},
 		{
-			drone = UnitDefNames.dronecarry.id, 
-			reloadTime = 5, 
-			maxDrones = 8, 
-			spawnSize = 1, 
-			range = 1000, 
-			buildTime = 25, 
+			drone = UnitDefNames.dronecarry.id,
+			reloadTime = 5,
+			maxDrones = 8,
+			spawnSize = 1,
+			range = 1000,
+			buildTime = 25,
 			maxBuild = 4,
 			offsets = {0, 0, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 		},
@@ -24,12 +24,12 @@ local carrierDefNames = {
 	nebula = {
 		spawnPieces = {"pad1", "pad2", "pad3", "pad4"},
 		{
-			drone = UnitDefNames.dronefighter.id, 
-			reloadTime = 15, 
-			maxDrones = 8, 
-			spawnSize = 2, 
+			drone = UnitDefNames.dronefighter.id,
+			reloadTime = 15,
+			maxDrones = 8,
+			spawnSize = 2,
 			range = 1000,
-			buildTime = 3, 
+			buildTime = 3,
 			maxBuild = 1,
 			offsets = {0, 8, 15, colvolMidX = 0, colvolMidY = 30, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0} --shift colvol to avoid collision.
 		},
@@ -37,12 +37,12 @@ local carrierDefNames = {
 	pw_garrison = {
 		spawnPieces = {"drone"},
 		{
-			drone = UnitDefNames.dronelight.id, 
-			reloadTime = 10, 
-			maxDrones = 8, 
-			spawnSize = 1, 
-			range = 800, 
-			buildTime = 5, 
+			drone = UnitDefNames.dronelight.id,
+			reloadTime = 10,
+			maxDrones = 8,
+			spawnSize = 1,
+			range = 800,
+			buildTime = 5,
 			maxBuild = 1,
 			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 		},
@@ -50,12 +50,12 @@ local carrierDefNames = {
 	pw_grid = {
 		spawnPieces = {"drone"},
 		{
-			drone = UnitDefNames.droneheavyslow.id, 
-			reloadTime = 10, 
-			maxDrones = 6, 
-			spawnSize = 1, 
-			range = 800, 
-			buildTime = 5, 
+			drone = UnitDefNames.droneheavyslow.id,
+			reloadTime = 10,
+			maxDrones = 6,
+			spawnSize = 1,
+			range = 800,
+			buildTime = 5,
 			maxBuild = 1,
 			offsets = {0, 5, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 		},
@@ -63,12 +63,12 @@ local carrierDefNames = {
 	pw_hq_attacker = {
 		spawnPieces = {"drone"},
 		{
-			drone = UnitDefNames.dronelight.id, 
-			reloadTime = 10, 
-			maxDrones = 6, 
-			spawnSize = 1, 
-			range = 500, 
-			buildTime = 5, 
+			drone = UnitDefNames.dronelight.id,
+			reloadTime = 10,
+			maxDrones = 6,
+			spawnSize = 1,
+			range = 500,
+			buildTime = 5,
 			maxBuild = 1,
 			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 		},
@@ -76,12 +76,12 @@ local carrierDefNames = {
 	pw_hq_defender = {
 		spawnPieces = {"drone"},
 		{
-			drone = UnitDefNames.dronelight.id, 
-			reloadTime = 10, 
-			maxDrones = 6, 
-			spawnSize = 1, 
-			range = 500, 
-			buildTime = 5, 
+			drone = UnitDefNames.dronelight.id,
+			reloadTime = 10,
+			maxDrones = 6,
+			spawnSize = 1,
+			range = 500,
+			buildTime = 5,
 			maxBuild = 1,
 			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 		},
@@ -90,21 +90,21 @@ local carrierDefNames = {
 
 local presets = {
 	module_companion_drone = {
-		drone = UnitDefNames.dronelight.id, 
-		reloadTime = 15, 
+		drone = UnitDefNames.dronelight.id,
+		reloadTime = 15,
 		maxDrones = 2,
-		spawnSize = 1, 
-		range = 600, 
-		buildTime = 6, 
+		spawnSize = 1,
+		range = 600,
+		buildTime = 6,
 		maxBuild = 1,
 		offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 	},
 	module_battle_drone = {
-		drone = UnitDefNames.droneheavyslow.id, 
+		drone = UnitDefNames.droneheavyslow.id,
 		reloadTime = 25,
-		maxDrones = 1, 
-		spawnSize = 1, 
-		range = 600, 
+		maxDrones = 1,
+		spawnSize = 1,
+		range = 600,
 		buildTime = 9,
 		maxBuild = 1,
 		offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
@@ -113,21 +113,21 @@ local presets = {
 
 local unitRulesCarrierDefs = {
 	drone = {
-		drone = UnitDefNames.dronelight.id, 
-		reloadTime = 15, 
+		drone = UnitDefNames.dronelight.id,
+		reloadTime = 15,
 		maxDrones = 2,
-		spawnSize = 1, 
-		range = 450, 
-		buildTime = 10, 
+		spawnSize = 1,
+		range = 450,
+		buildTime = 10,
 		maxBuild = 1,
 		offsets = {0, 50, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 	},
 	droneheavyslow = {
-		drone = UnitDefNames.droneheavyslow.id, 
+		drone = UnitDefNames.droneheavyslow.id,
 		reloadTime = 25,
-		maxDrones = 1, 
-		spawnSize = 1, 
-		range = 600, 
+		maxDrones = 1,
+		spawnSize = 1,
+		range = 600,
 		buildTime = 15,
 		maxBuild = 1,
 		offsets = {0, 50, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
@@ -153,8 +153,8 @@ for id, ud in pairs(UnitDefs) do
 end
 
 for name, data in pairs(carrierDefNames) do
-	if UnitDefNames[name] then 
-		carrierDefs[UnitDefNames[name].id] = data	
+	if UnitDefNames[name] then
+		carrierDefs[UnitDefNames[name].id] = data
 	end
 end
 

@@ -1,8 +1,8 @@
-local base = piece 'base' 
-local body = piece 'body' 
-local jet = piece 'jet' 
-local wingtipl = piece 'wingtipl' 
-local wingtipr = piece 'wingtipr' 
+local base = piece 'base'
+local body = piece 'body'
+local jet = piece 'jet'
+local wingtipl = piece 'wingtipl'
+local wingtipr = piece 'wingtipr'
 
 local smokePiece = {body, jet}
 

@@ -36,12 +36,12 @@ local FLASH_PERIOD = 0.4
 
 local flashStateDefs = {
 	{
-		color = {1,0.2,0,1}, 
-		outlinecolor = {0.3,0.1,0,1}, 
+		color = {1,0.2,0,1},
+		outlinecolor = {0.3,0.1,0,1},
 	},
 	{
-		color = {0.9,0.6,0.1,1}, 
-		outlinecolor = {0.25,0.15,0,1}, 
+		color = {0.9,0.6,0.1,1},
+		outlinecolor = {0.25,0.15,0,1},
 	},
 }
 
@@ -101,12 +101,12 @@ local function CreateWindow()
  		align  = "center",
 		autosize = false,
 		font   = {
-			size = 32, 
-			outline = true, 
-			outlineWidth = 6, 
+			size = 32,
+			outline = true,
+			outlineWidth = 6,
 			outlineWeight = 6,
-			color = flashStateDefs[1].color, 
-			outlinecolor = flashStateDefs[1].outlinecolor, 
+			color = flashStateDefs[1].color,
+			outlinecolor = flashStateDefs[1].outlinecolor,
 		},
 	}
 	

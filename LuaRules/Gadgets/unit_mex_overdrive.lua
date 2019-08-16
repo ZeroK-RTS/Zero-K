@@ -1127,7 +1127,7 @@ function gadget:GameFrame(n)
 					te.extraFreeStorage = math.max(0, averageSpare - te.inc)
 					
 					-- This prevents full overdrive until everyone has full energy storage.
-					allyTeamEnergyMaxCurMax = allyTeamEnergyMaxCurMax + math.max(te.max + te.extraFreeStorage, te.cur) 
+					allyTeamEnergyMaxCurMax = allyTeamEnergyMaxCurMax + math.max(te.max + te.extraFreeStorage, te.cur)
 					
 					-- Save from energy from being sent to overdrive if we are stalling and have below average energy income.
 					local holdBack = math.max(0, te.extraFreeStorage - te.cur)
@@ -1721,7 +1721,7 @@ local function OverdriveDebugToggle()
 end
 
 local function OverdriveDebugEconomyToggle(cmd, line, words, player)
-	if not Spring.IsCheatingEnabled() then 
+	if not Spring.IsCheatingEnabled() then
 		return
 	end
 	local allyTeamID = tonumber(words[1])

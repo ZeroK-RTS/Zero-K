@@ -38,7 +38,7 @@ BA Remake by Mr. Bob - CC-BY-NC?
 Beherith's bots - Public Domain (http://springrts.com/phpbb/viewtopic.php?f=9&t=23244)
  * All amphs
  * Con Artist
- * Dirtbag  
+ * Dirtbag
  * Freaker
  * Felon
  * Puppy
@@ -76,7 +76,7 @@ Mr. D - ?
 Saktoth (Oscar Evans) - *default license
  * Spherebots (texture by Lynx/Wolf in Exile -license unknown)
  * Banshee
- * Hacksaw 
+ * Hacksaw
  * Missile Silo
  
 MidKnight - Artistic License 2.0

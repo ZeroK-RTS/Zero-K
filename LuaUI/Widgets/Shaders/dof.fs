@@ -89,7 +89,7 @@ const float colorPower = 1.9;
 
 const float inFocusThreshold = 0.4 / float(KERNEL_RADIUS);
 const float focusMixDepthRange = (float(KERNEL_RADIUS) * 2.0);
-const float maxFilterRadius = 1.2; //keep between 0 and 2. Any higher than 2 will require modifying the normalization maths 
+const float maxFilterRadius = 1.2; //keep between 0 and 2. Any higher than 2 will require modifying the normalization maths
                                    //(currently does (radius/4)+0.5 to get [-2..2] to [0..1])
 
 //Approximately a circle, but bulging slightly up to help with focus making sense when looking down ramps
@@ -120,7 +120,7 @@ vec2 get1CompFilters(int x)
   return KernelNear_RealX_ImY_RealZ_ImW[x].xy;
 }
 
-float LinearizeDepth(vec2 uv){   
+float LinearizeDepth(vec2 uv){
   float depthNDC = texture2D(blurTex0, uv).r;
   #if DEPTH_CLIP01
     depthNDC = 2.0 * depthNDC - 1.0;
@@ -142,10 +142,10 @@ float GetEdgeNearFilterRadius(vec2 uv, vec2 stepVal)
 {
   vec2 maxCoordsOffset = stepVal * maxFilterRadius * KERNEL_RADIUS;
   vec2 maxCoordsOffsetPerp = vec2(stepVal.y, -stepVal.x) * maxFilterRadius * KERNEL_RADIUS;
-  float edgeRadius = 
+  float edgeRadius =
   min(min(GetFilterRadius(uv + maxCoordsOffset), GetFilterRadius(uv - maxCoordsOffset)),
   min(GetFilterRadius(uv + maxCoordsOffsetPerp), GetFilterRadius(uv - maxCoordsOffsetPerp)));
-  float halfEdgeRadius = 
+  float halfEdgeRadius =
   min(min(GetFilterRadius(uv + maxCoordsOffset / 2.0), GetFilterRadius(uv - maxCoordsOffset / 2.0)),
   min(GetFilterRadius(uv + maxCoordsOffsetPerp / 2.0), GetFilterRadius(uv - maxCoordsOffsetPerp / 2.0)));
   return min(edgeRadius, halfEdgeRadius);
@@ -157,11 +157,11 @@ vec2 GetFilterCoords(int i, vec2 uv, vec2 stepVal, float filterRadius, out float
   vec2 coords = uv + stepVal*filterDistance;
   targetFilterRadius = GetFilterRadius(coords);
 
-  //Taking the filter radius for the first candidate sampled pixel if it's less than the base filter radius 
-  //makes sure that we both don't blur in-focus objects into out-of-focus regions behind them, and 
-  //also blur in the out-of-focus objects nearer to the camera than the in-focus region. 
+  //Taking the filter radius for the first candidate sampled pixel if it's less than the base filter radius
+  //makes sure that we both don't blur in-focus objects into out-of-focus regions behind them, and
+  //also blur in the out-of-focus objects nearer to the camera than the in-focus region.
   //This works because it's basically checking if the first candidate sampled pixel's blur radius is large
-  //enough to hit the pixel we are gathering into now, that means its circle of confusion is big enough to reach 
+  //enough to hit the pixel we are gathering into now, that means its circle of confusion is big enough to reach
   //that starting pixel.
   if (targetFilterRadius - filterRadius < -0.02 / float(KERNEL_RADIUS))
   {
@@ -191,7 +191,7 @@ void main()
   vec2 stepVal = vec2(baseStepValMag * aspectRatio, baseStepValMag);
 
   if (pass == FILTER_SIZE_PASS)
-  {  
+  {
 
     float depth = LinearizeDepth(uv);
     float focusDepth = manualFocusDepth;
@@ -206,7 +206,7 @@ void main()
 
     if (autofocus == 1)
     {
-      //The numbers in the autofocus computation that look like magic numbers are, 
+      //The numbers in the autofocus computation that look like magic numbers are,
       //found by experimentation to work well enough in practice, but not sacred.
       float centerDepth = LinearizeDepth(centerUV);
       focusDepth = centerDepth;
@@ -219,8 +219,8 @@ void main()
       int autofocusTestCoordCount = 8;
       for (int i = 0; i < autofocusTestCoordCount; ++i)
       {
-        testDepth = LinearizeDepth(centerUV + 
-          (vec2(autofocusTestCoordOffsets[i].x * aspectRatio, 
+        testDepth = LinearizeDepth(centerUV +
+          (vec2(autofocusTestCoordOffsets[i].x * aspectRatio,
             autofocusTestCoordOffsets[i].y) * clamp(focusDepth * 4.4, 0.1, 0.225)));
         //We use averages here instead of just directly min/max testing testDepth in order to have smoother focus transitions
         //across big changes to focus depth, such as the camera scrolling over a cliff or being zoomed in on a unit.
@@ -235,7 +235,7 @@ void main()
 
       //The min depth bound is scaled more strongly to reduce air unit blurring when zoomed moderately out
       minTestDepth = min(minTestDepth / focusDepthAirFactor, focusDepth);
-      maxTestDepth = 
+      maxTestDepth =
         max(focusDepthAirFactor > 1.0 ?
           (maxTestDepth + 2.5 * maxTestDepth * focusDepthAirFactor) / 3.5 :
           maxTestDepth * focusDepthAirFactor, focusDepth);
@@ -243,7 +243,7 @@ void main()
       float focalLength = 0.05;
       float minFStop = 1.0 * focalLength;
       float curveDepth = 6.0;
-      float baseAperture = 
+      float baseAperture =
         focalLength/max(testFocusDepth * exp(curveDepth * testFocusDepth), minFStop);
 
       float apertureBoundsFudgeFactor = 1.15; //Used to control bounds depths without having to change inFocusThreshold
@@ -314,9 +314,9 @@ void main()
       compI = i;
       vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x, 0.0), filterRadius, targetFilterRadius);
       if (compI < -KERNEL_RADIUS) continue;
-      vec4 imageTexelR = texture2D(blurTex0, coords);  
-      vec4 imageTexelG = texture2D(blurTex1, coords);  
-      vec4 imageTexelB = texture2D(blurTex2, coords);  
+      vec4 imageTexelR = texture2D(blurTex0, coords);
+      vec4 imageTexelG = texture2D(blurTex1, coords);
+      vec4 imageTexelB = texture2D(blurTex2, coords);
       
       vec4 c0_c1 = get2CompFilters(compI+KERNEL_RADIUS);
       
@@ -328,7 +328,7 @@ void main()
       valG.zw += multComplex(imageTexelG.zw,c0_c1.zw);
       
       valB.xy += multComplex(imageTexelB.xy,c0_c1.xy);
-      valB.zw += multComplex(imageTexelB.zw,c0_c1.zw);       
+      valB.zw += multComplex(imageTexelB.zw,c0_c1.zw);
     }
     
     float redChannel   = dot(valR.xy,Kernel0Weights_RealX_ImY)+dot(valR.zw,Kernel1Weights_RealX_ImY);
@@ -406,14 +406,14 @@ void main()
       vec2 coords = GetFilterCoords(i, uv, vec2(stepVal.x, 0.0), filterRadius, targetFilterRadius);
       if (compI < -KERNEL_RADIUS) continue;
 
-      //imageTexelBA/imageTexelA has the alpha from the initial pass, but we need to also get it for the 
-      //final pass separately since alpha represents the edge of different filter radii, and 
+      //imageTexelBA/imageTexelA has the alpha from the initial pass, but we need to also get it for the
+      //final pass separately since alpha represents the edge of different filter radii, and
       //that's not something a single pass of a 2-pass blur will fully pick up.
       float finalPassAlpha = FocusThresholdMixFactor(-targetFilterRadius, inFocusThreshold);
       finalPassAlpha = min(finalPassAlpha, clamp(abs(targetFilterRadius - baseFilterRadius) / 0.05, 0.0, 1.0));
 
-      // vec4 imageTexelRG = texture2D(blurTex0, coords);  
-      // vec4 imageTexelBA = texture2D(blurTex1, coords); 
+      // vec4 imageTexelRG = texture2D(blurTex0, coords);
+      // vec4 imageTexelBA = texture2D(blurTex1, coords);
 
       // vec2 c0 = get1CompFilters(compI+KERNEL_RADIUS);
 
@@ -423,10 +423,10 @@ void main()
       // valA.xy += multComplex(imageTexelBA.zw,c0);
       // valA.xy += finalPassAlpha * c0;
 
-      vec4 imageTexelR = texture2D(blurTex0, coords);  
-      vec4 imageTexelG = texture2D(blurTex1, coords);  
-      vec4 imageTexelB = texture2D(blurTex2, coords);  
-      vec4 imageTexelA = texture2D(blurTex3, coords);  
+      vec4 imageTexelR = texture2D(blurTex0, coords);
+      vec4 imageTexelG = texture2D(blurTex1, coords);
+      vec4 imageTexelB = texture2D(blurTex2, coords);
+      vec4 imageTexelA = texture2D(blurTex3, coords);
 
       vec4 c0_c1 = get2CompFilters(compI+KERNEL_RADIUS);
 
@@ -437,10 +437,10 @@ void main()
       valG.zw += multComplex(imageTexelG.zw,c0_c1.zw);
       
       valB.xy += multComplex(imageTexelB.xy,c0_c1.xy);
-      valB.zw += multComplex(imageTexelB.zw,c0_c1.zw);   
+      valB.zw += multComplex(imageTexelB.zw,c0_c1.zw);
 
       valA.xy += multComplex(imageTexelA.xy,c0_c1.xy);
-      valA.zw += multComplex(imageTexelA.zw,c0_c1.zw);   
+      valA.zw += multComplex(imageTexelA.zw,c0_c1.zw);
       valA.xy += finalPassAlpha * c0_c1.xy;
       valA.zw += finalPassAlpha * c0_c1.zw;
     }
@@ -477,7 +477,7 @@ void main()
     //     + texture2D(origTex, GetFilterCoords(-KERNEL_RADIUS, uv, vec2(stepVal.x, 0.0), filterRadius, targetFilterRadius))
     //     + texture2D(origTex, GetFilterCoords(KERNEL_RADIUS, uv, vec2(0.0, stepVal.y), filterRadius, targetFilterRadius))
     //     + texture2D(origTex, GetFilterCoords(-KERNEL_RADIUS, uv, vec2(0.0, stepVal.y), filterRadius, targetFilterRadius))
-    //     + texture2D(origTex, GetFilterCoords(KERNEL_RADIUS / 2, uv, vec2(stepVal.x, 0.0), filterRadius, targetFilterRadius)) 
+    //     + texture2D(origTex, GetFilterCoords(KERNEL_RADIUS / 2, uv, vec2(stepVal.x, 0.0), filterRadius, targetFilterRadius))
     //     + texture2D(origTex, GetFilterCoords(-KERNEL_RADIUS / 2, uv, vec2(stepVal.x, 0.0), filterRadius, targetFilterRadius))
     //     + texture2D(origTex, GetFilterCoords(KERNEL_RADIUS / 2, uv, vec2(0.0, stepVal.y), filterRadius, targetFilterRadius))
     //     + texture2D(origTex, GetFilterCoords(-KERNEL_RADIUS / 2, uv, vec2(0.0, stepVal.y), filterRadius, targetFilterRadius));

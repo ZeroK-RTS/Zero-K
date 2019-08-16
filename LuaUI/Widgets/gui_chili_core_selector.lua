@@ -69,13 +69,13 @@ local mainWindow, buttonHolder, mainBackground
 local echo = Spring.Echo
 
 -- list and interface vars
-local buttonList 
+local buttonList
 
--- Fixes change team flicker. Buttons are not visible in the frame after they 
--- are created. Images are visible immediately. The solution is to hide the 
+-- Fixes change team flicker. Buttons are not visible in the frame after they
+-- are created. Images are visible immediately. The solution is to hide the
 -- images of the old button list when creating a new one. The old button list
 -- is destroyed fully one frame later.
-local oldButtonList 
+local oldButtonList
 
 local factoryList = {}
 local commanderList = {}
@@ -101,7 +101,7 @@ local BUILD_ICON_ACTIVE = LUAUI_DIRNAME .. 'Images/idlecon.png' --LUAUI_DIRNAME 
 local BUILD_ICON_DISABLED = LUAUI_DIRNAME .. 'Images/idlecon_bw.png'
 
 local UPDATE_FREQUENCY = 0.25
-local COMM_WARNING_TIME	= 2 
+local COMM_WARNING_TIME	= 2
 
 local CONSTRUCTOR_ORDER = 1
 local COMMANDER_ORDER = 2
@@ -190,7 +190,7 @@ local defaultFacHotkeys = {
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
 options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
-options = { 
+options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
 		type = 'radioButton',
@@ -314,7 +314,7 @@ options = {
 		min = 0, max = 100, step = 0.25,
 		OnChange = OptionsUpdateLayout,
 	},
-	minButtonSpaces = {  
+	minButtonSpaces = {
 		name = 'Minimum Button Space',
 		type = 'number',
 		value = 0,
@@ -348,7 +348,7 @@ options = {
 		hidden = true,
 		noHotkey = true,
 	},
-	leftsideofscreen = {  
+	leftsideofscreen = {
 		name = 'Left side of screen',
 		type = 'number',
 		type = 'bool',
@@ -370,8 +370,8 @@ local standardFactoryTooltip =  "\n\255\0\255\0" .. WG.Translate("interface", "l
 local commIndex = 1
 local function SelectComm()
 	local commCount = #commanderList
-	if commCount <= 0 then 
-		return 
+	if commCount <= 0 then
+		return
 	end
 	
 	-- This check deals with the case of spectators selecting
@@ -410,7 +410,7 @@ local function SelectPrecBomber()
 	--	If not, then we'll increment the number of ready bombers selected
 	--	If so, then we'll either:
 	--		Select one ready bomber if none are selected
-	--		Select only the already selected ready bombers if at least one is selected	
+	--		Select only the already selected ready bombers if at least one is selected
 	
 	local toBeSelected = {}
 	
@@ -528,7 +528,7 @@ end
 local function GetHealthColor(fraction, wantString)
 	local midpt = (fraction > 0.5)
 	local r, g
-	if midpt then 
+	if midpt then
 		r = ((1 - fraction)/0.5)
 		g = 1
 	else
@@ -721,7 +721,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 		caption = '',
 		padding = {1,1,1,1},
 		backgroundColor = backgroundColor,
-		OnClick = {	
+		OnClick = {
 			function (self, x, y, mouse)
 				local _, _, meta, shift = Spring.GetModKeyState()
 				if meta then
@@ -792,7 +792,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				height = "40%",
 				file = IMAGE_REPEAT,
 				keepAspect = true,
-				parent = image,	
+				parent = image,
 			}
 		end
 		repeatImage.file = (newRepeat and IMAGE_REPEAT) or nil
@@ -921,7 +921,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 	function externalFunctions.MoveUp(compCategory, compIndex)
 		if compCategory < category or (compCategory == category and compIndex < index) then
 			externalFunctions.SetPosition(position + 1)
-			return true 
+			return true
 		else
 			return false -- Button did not move
 		end
@@ -974,11 +974,11 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 	
 	local button = GetNewButton(
 		parent,
-		OnClick, 
+		OnClick,
 		FACTORY_ORDER,
 		categoryOrder,
-		BUTTON_COLOR_FACTORY, 
-		'#' .. unitDefID, 
+		BUTTON_COLOR_FACTORY,
+		'#' .. unitDefID,
 		FACTORY_FRAME
 	)
 	
@@ -1125,10 +1125,10 @@ local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 	
 	local button = GetNewButton(
 		parent,
-		OnClick, 
+		OnClick,
 		COMMANDER_ORDER,
 		categoryOrder,
-		BUTTON_COLOR, 
+		BUTTON_COLOR,
 		'#' .. unitDefID
 	)
 	
@@ -1229,10 +1229,10 @@ local function GetConstructorButton(parent)
 	
 	local button = GetNewButton(
 		parent,
-		OnClick, 
+		OnClick,
 		CONSTRUCTOR_ORDER,
 		0,
-		BUTTON_COLOR, 
+		BUTTON_COLOR,
 		BUILD_ICON_ACTIVE
 	)
 	
@@ -1573,7 +1573,7 @@ local function InitializeControls()
 		padding = {-1, 0, -1, -1},
 		itemMargin = {0, 0, 0, 0},
 		name = "selector_window",
-		x = 0, 
+		x = 0,
 		y = windowY,
 		width  = integralWidth,
 		height = BUTTON_HEIGHT,
@@ -1647,8 +1647,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	elseif ud.customParams.level then
 		AddComm(unitID, unitDefID)
 	elseif options.monitorInbuiltCons.value and (
-			(ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not ud.isFactory) and 
-			(options.monitoridlecomms.value or not ud.customParams.dynamic_comm) and 
+			(ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not ud.isFactory) and
+			(options.monitoridlecomms.value or not ud.customParams.dynamic_comm) and
 			(options.monitoridlenano.value or ud.canMove)
 		) then
 		idleCons[unitID] = true
@@ -1683,7 +1683,7 @@ end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	widget:UnitCreated(unitID, unitDefID, unitTeam)
-	widget:UnitFinished(unitID, unitDefID, unitTeam)  
+	widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
@@ -1693,10 +1693,10 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if idleCons[unitID] then
 		idleCons[unitID] = nil
 		wantUpdateCons = true
-	end	
+	end
 	if readyUntaskedBombers[unitID] then
 		readyUntaskedBombers[unitID] = nil
-	end	
+	end
 	
 	local ud = UnitDefs[unitDefID]
 	if ud.isFactory and (not exceptionArray[unitDefID]) then

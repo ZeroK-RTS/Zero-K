@@ -796,7 +796,7 @@ local cegs = {
         pos                = [[0, 0, 0]],
       },
     },
-  },  
+  },
   
   ["beamweapon_muzzle_red"] = {
     usedefaultexplosions = false,
@@ -1205,7 +1205,7 @@ local colors = {
 	properties = {colormap = "1 0.7 0.3 0.01   0.01 0.01 0.005 0.01"},
       },
     },
-  },  
+  },
 }
 
 for color, info in pairs(colors) do

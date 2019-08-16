@@ -309,7 +309,7 @@ local GL_QUADS        = GL.QUADS
 
 local function BeginEndDrawList(self)
 	local color = self.color
-	local ev    = self.emitVector 
+	local ev    = self.emitVector
 	glMultiTexCoord(0,self.jitterWidthScale,self.jitterLengthScale,self.width/self.length,self.distortion)
 	glMultiTexCoord(1,ev[1],ev[2],ev[3],1)
 	glMultiTexCoord(2,color[1],color[2],color[3],self.animSpeed)
@@ -367,7 +367,7 @@ function AirJet:Visible()
 					return false
 				end
 			end
-			posX,posY,posZ = posX+ux,posY+uy,posZ+uz  
+			posX,posY,posZ = posX+ux,posY+uy,posZ+uz
 		end
 	end
 	if (losState==nil) then

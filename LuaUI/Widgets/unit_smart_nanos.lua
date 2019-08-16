@@ -76,7 +76,7 @@ local nanoTurrets = {}
 local allyUnits = {}
 local orderQueue = {}
 
-if (Game.modShortName == "BA") then local BA = true end 
+if (Game.modShortName == "BA") then local BA = true end
 
 local myTeamID
 
@@ -98,9 +98,9 @@ function widget:Initialize()
     if (unitTeam == myTeamID) or AreTeamsAllied(unitTeam, myTeamID) then
       local unitDefID = GetUnitDefID(unitID)
       local _, _, _, _, buildProgress = GetUnitHealth(unitID)
-      if (buildProgress < 1) then 
+      if (buildProgress < 1) then
         widget:UnitCreated(unitID, unitDefID, unitTeam)
-      else 
+      else
         widget:UnitFinished(unitID, unitDefID, unitTeam)
       end
     end
@@ -111,14 +111,14 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
   if (unitTeam ~= myTeamID) then return end
-  buildUnits[unitID] = true 
+  buildUnits[unitID] = true
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 
   if UnitDefs[unitDefID].customParams.commtype then myTeamID = GetMyTeamID() end
   
-  if (unitTeam == myTeamID) then 
+  if (unitTeam == myTeamID) then
   
     buildUnits[unitID] = nil
         
@@ -130,7 +130,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
       nanoTurrets[unitID] = {}
       nanoTurrets[unitID].unitDefID = unitDefID
       nanoTurrets[unitID].buildDistance = UnitDefs[nanoTurrets[unitID].unitDefID].buildDistance
-      nanoTurrets[unitID].buildDistanceSqr = (UnitDefs[nanoTurrets[unitID].unitDefID].buildDistance * 
+      nanoTurrets[unitID].buildDistanceSqr = (UnitDefs[nanoTurrets[unitID].unitDefID].buildDistance *
                                               UnitDefs[nanoTurrets[unitID].unitDefID].buildDistance)
       nanoTurrets[unitID].damaged = false
       local posX,_,posZ = GetUnitPosition(unitID)
@@ -149,12 +149,12 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
   elseif AreTeamsAllied(unitTeam, myTeamID) then
     allyUnits[unitID] = {}
     allyUnits[unitID].unitDefID = unitDefID
-    allyUnits[unitID].damaged = false    
+    allyUnits[unitID].damaged = false
   end
 end
 
 function widget:CommandNotify(id, params, options)
---[[  
+--[[
   local CMD_UPGRADEMEX = math.huge
   
   if BA and (id == 31244) then
@@ -194,7 +194,7 @@ function widget:CommandNotify(id, params, options)
   
   if (id == CMD.REPAIR) then
     targetUnit = params[1]
-    if (not teamUnits[targetUnit]) and (not allyUnits[targetUnit]) and (not nanoTurrets[targetUnit]) 
+    if (not teamUnits[targetUnit]) and (not allyUnits[targetUnit]) and (not nanoTurrets[targetUnit])
         and (not buildUnits[targetUnit]) and (GetUnitTeam(targetUnit) == myTeamID) then
       widget:UnitFinished(targetUnit, GetUnitDefID(targetUnit), myTeamID)
     end
@@ -304,7 +304,7 @@ function widget:Update(deltaTime)
           end
         else
           allyUnits[unitID] = nil
-        end 
+        end
       end
       pointer = 1
     else
@@ -360,13 +360,13 @@ function widget:Update(deltaTime)
                 local uX, _, uZ = GetUnitPosition(prevUnit)
                 if (getDistance(unitDefs.posX, unitDefs.posZ, uX, uZ) > unitDefs.buildDistanceSqr) then
                   commandMe = true
-                end 
+                end
   	          end
   	        end
 	        
 	          if ((unitDefs.timeCounter + UPDATE_TICK) < GetGameSeconds()) then
 	            commandMe = true
-	          end       
+	          end
 	        end
         end
                     
@@ -376,7 +376,7 @@ function widget:Update(deltaTime)
           local ordered = false
                   
           local nearUnits = GetUnitsInCylinder(unitDefs.posX,unitDefs.posZ,unitDefs.buildDistance)
-          local nearFeatures = Spring.GetFeaturesInRectangle(unitDefs.posX - (unitDefs.buildDistance+75), unitDefs.posZ - (unitDefs.buildDistance+75), 
+          local nearFeatures = Spring.GetFeaturesInRectangle(unitDefs.posX - (unitDefs.buildDistance+75), unitDefs.posZ - (unitDefs.buildDistance+75),
                                                            unitDefs.posX + (unitDefs.buildDistance+75), unitDefs.posZ + (unitDefs.buildDistance+75))
                                                            
           if (nearUnits ~= nil) and (nearFeatures ~= nil) then
@@ -437,7 +437,7 @@ function widget:Update(deltaTime)
                 local fX, _, fZ = GetFeaturePosition(featureID)
                 local fd = GetFeatureDefID(featureID)
                 local radiusSqr = (FeatureDefs[fd].radius * FeatureDefs[fd].radius)
-                if (getDistance(unitDefs.posX, unitDefs.posZ, fX, fZ) < (unitDefs.buildDistanceSqr + radiusSqr)) then 
+                if (getDistance(unitDefs.posX, unitDefs.posZ, fX, fZ) < (unitDefs.buildDistanceSqr + radiusSqr)) then
                   if (FeatureDefs[fd].reclaimable) and (not noReclaimList[FeatureDefs[fd].tooltip]) then
                     local fm,_,fe  = GetFeatureResources(featureID)
                     if (fm > 0) and (fe > 0) then
@@ -484,7 +484,7 @@ function widget:Update(deltaTime)
             end
           end
           
-          if (nanoTurrets[unitID].auto) and (not ordered) and (cQueueCount > 0) and 
+          if (nanoTurrets[unitID].auto) and (not ordered) and (cQueueCount > 0) and
              ((cmdID == CMD.REPAIR) or (cmdID == CMD.RECLAIM)) then
             orderQueue[unitID] = {0, cmdID, cmdParam}
           elseif ordered then

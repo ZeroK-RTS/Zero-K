@@ -79,7 +79,7 @@ end
 function widget:UnitCommand(unitID)
 	--echo("<auto_reclaim_heal_assist>: unit "..unitID.." got a command") --¤debug
 	for reclaimerID in pairs(idleReclaimers) do
-		if (reclaimerID==unitID) then 
+		if (reclaimerID==unitID) then
 			idleReclaimers[reclaimerID]=nil
 			--echo("<auto_reclaim_heal_assist>: unregistering unit "..reclaimerID.." as idle")
 		end

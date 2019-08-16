@@ -43,7 +43,7 @@ options = {
 		type = 'number',
 		value = 2,
 		min = 1, max = 2, step=1,
-		-- For some reason drawing lines fails for numbers higher than 2. 
+		-- For some reason drawing lines fails for numbers higher than 2.
 	},
 	
 	dotsize = {
@@ -339,7 +339,7 @@ local function HasWaterWeapon(UnitDefID)
 		local weapondefid = UnitDefs[UnitDefID]["weapons"][j]["weaponDef"]
 		local iswaterweapon = WeaponDefs[weapondefid]["waterWeapon"]
 		if iswaterweapon then haswaterweapon=true end
-	end	
+	end
 	return haswaterweapon
 end
 
@@ -355,7 +355,7 @@ local function GetInterpNodes(mUnits)
 	end
 	--result of this and code below is that the height of the aimpoint for a unit [i] will be:
 	--(a) on GetGroundHeight(units aimed position), if the unit has a waterweapon
-	--(b) on whichever is highest out of water surface (=0) and GetGroundHeight(units aimed position), if the unit does not have water weapon. 
+	--(b) on whichever is highest out of water surface (=0) and GetGroundHeight(units aimed position), if the unit does not have water weapon.
 	--in BA this must match the behaviour of prevent_range_hax or commands will get modified.
 	
 	local interpNodes = {}
@@ -371,11 +371,11 @@ local function GetInterpNodes(mUnits)
 	local eZ = ePos[3]
 	local eDist = fDists[2]
 	
-	local sY 
-	if haswaterweapon[1] then 
-		sY = spGetGroundHeight(sX, sZ) 
-	else 
-		sY = math.max(0,spGetGroundHeight(sX,sZ)) 
+	local sY
+	if haswaterweapon[1] then
+		sY = spGetGroundHeight(sX, sZ)
+	else
+		sY = math.max(0,spGetGroundHeight(sX,sZ))
 	end
 	interpNodes[1] = {sX, sY, sZ}
 	
@@ -398,11 +398,11 @@ local function GetInterpNodes(mUnits)
 		local nFrac = (reqDist - sDist) / (eDist - sDist)
 		local nX = sX * (1 - nFrac) + eX * nFrac
 		local nZ = sZ * (1 - nFrac) + eZ * nFrac
-		local nY 
-		if haswaterweapon[number+1] then 
-			nY = spGetGroundHeight(nX, nZ) 
-		else 
-			nY = math.max(0,spGetGroundHeight(nX, nZ)) 
+		local nY
+		if haswaterweapon[number+1] then
+			nY = spGetGroundHeight(nX, nZ)
+		else
+			nY = math.max(0,spGetGroundHeight(nX, nZ))
 		end
 		interpNodes[n + 1] = {nX, nY, nZ}
 	end
@@ -410,7 +410,7 @@ local function GetInterpNodes(mUnits)
 	ePos = fNodes[#fNodes]
 	eX = ePos[1]
 	eZ = ePos[3]
-	local eY 
+	local eY
 	if haswaterweapon[number] then  eY=spGetGroundHeight(eX, eZ) else eY=math.max(0,spGetGroundHeight(eX, eZ)) end
 	interpNodes[number] = {eX, eY, eZ}
 	
@@ -490,7 +490,7 @@ function widget:MousePress(mx, my, mButton)
 	end
 	if (mButton == 1 or mButton == 3) and fNodes and #fNodes > 0 then
 		-- already issuing command
-		return true 
+		return true
 	end
 	
 	lineLength = 0
@@ -498,15 +498,15 @@ function widget:MousePress(mx, my, mButton)
 	-- Get command that would've been issued
 	local _, activeCmdID = spGetActiveCommand()
 	if activeCmdID then
-		if mButton ~= 1 then 
-			return false 
+		if mButton ~= 1 then
+			return false
 		end
 		
 		usingCmd = activeCmdID
 		usingRMB = false
 	else
-		if mButton ~= 3 then 
-			return false 
+		if mButton ~= 3 then
+			return false
 		end
 		
 		local _, defaultCmdID = spGetDefaultCommand()
@@ -908,7 +908,7 @@ function widget:DrawWorld()
 	if not pathCandidate and (#fNodes > 1 or #dimmNodes > 1) and options.drawmode_v2.value ~= "lines" then
 		local camX, camY, camZ = spGetCameraPosition()
 		local at, p = CulledTraceScreenRay(Xs,Ys,true,false,false)
-		if at == "ground" then 
+		if at == "ground" then
 			local dx, dy, dz = camX-p[1], camY-p[2], camZ-p[3]
 			--zoomY = ((dx*dx + dy*dy + dz*dz)*0.01)^0.25	--tests show that sqrt(sqrt(x)) is faster than x^0.25
 			zoomY = sqrt(dx*dx + dy*dy + dz*dz)
@@ -916,8 +916,8 @@ function widget:DrawWorld()
 			--zoomY = sqrt((camY - max(spGetGroundHeight(camX, camZ), 0))*0.1)
 			zoomY = camY - max(spGetGroundHeight(camX, camZ), 0)
 		end
-		if zoomY < 6 then 
-			zoomY = 6 
+		if zoomY < 6 then
+			zoomY = 6
 		end
 		if lineLength > 0 then  --don't try and draw if the command was cancelled by having two mouse buttons pressed at once
 			local unitCount = spGetSelectedUnitsCount()
@@ -937,7 +937,7 @@ function widget:DrawInMiniMap()
 end
 
 function InitFilledCircle(cmdID)
-	filledCircleOutFading[cmdID] = gl.CreateList(gl.BeginEnd, GL.TRIANGLE_FAN, filledCircleVerts, cmdID, 8) 
+	filledCircleOutFading[cmdID] = gl.CreateList(gl.BeginEnd, GL.TRIANGLE_FAN, filledCircleVerts, cmdID, 8)
 end
 
 function widget:Initialize()
@@ -1178,7 +1178,7 @@ function GetOrdersHungarian(nodes, units, unitCount, shifted)
 	for i = 1, unitCount do
 		
 		local uID = units[i]
-		local ux, uz 
+		local ux, uz
 		
 		if shifted then
 			ux, _, uz = GetUnitFinalPosition(uID)

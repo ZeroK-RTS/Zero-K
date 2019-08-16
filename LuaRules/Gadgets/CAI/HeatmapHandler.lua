@@ -269,8 +269,8 @@ function HeatmapHandler.CreateHeatmap(minSquareSize, teamID, allowNegativeValues
 	end
 	
 	local function UpdateUnitPositions(removeUnseen)
-		CallAsTeam(teamID, 
-			function () 
+		CallAsTeam(teamID,
+			function ()
 				local i = 1
 				while i <= unitCount do
 					local data = unitList[i]
@@ -285,8 +285,8 @@ function HeatmapHandler.CreateHeatmap(minSquareSize, teamID, allowNegativeValues
 						i = i + 1
 					end
 				end
-			end 
-		) 
+			end
+		)
 	end
 	
 	-- Get particular vaules
@@ -299,7 +299,7 @@ function HeatmapHandler.CreateHeatmap(minSquareSize, teamID, allowNegativeValues
 		local j = 0
 		return function ()
 			j = j + 1
-			if j > HEAT_SIZE_Z then 
+			if j > HEAT_SIZE_Z then
 				i = i + 1
 				j = 1
 				if i > HEAT_SIZE_X then

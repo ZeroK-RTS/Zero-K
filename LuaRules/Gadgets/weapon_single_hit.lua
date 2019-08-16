@@ -53,7 +53,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 	if singleHitMultiWeapon[weaponID] then
 		singleHitProjectile[proID] = {}
 	end
-end	
+end
 
 function gadget:ProjectileDestroyed(proID)
 	if singleHitMultiWeapon[proID] then
@@ -80,7 +80,7 @@ function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,attacke
 					singleHitUnitId[attackerID][unitID] = frame
 				end
 			end
-			return damage 
+			return damage
 		end
 	end
 	
@@ -93,7 +93,7 @@ function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,attacke
 		else
 			singleHitProjectile[projectileID][unitID] = true
 		end
-		return damage 
+		return damage
 	end
 	return damage;
 end

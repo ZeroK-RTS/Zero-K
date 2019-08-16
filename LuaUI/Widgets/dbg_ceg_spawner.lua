@@ -61,10 +61,10 @@ local vsx, vsy = widgetHandler:GetViewSizes()
 local cx,cy = vsx * 0.5,vsy * 0.5
 
 function OnChangeFunc(self)
-	if not Spring.IsCheatingEnabled() then 
+	if not Spring.IsCheatingEnabled() then
 		echo "Cannot do this unless Cheating is enabled."
-		return 
-	end		
+		return
+	end
 	cx,cy = vsx * 0.5,vsy * 0.5
 	local ttype,pos = Spring.TraceScreenRay(cx, cy, true)
 	if ttype == 'ground' then
@@ -79,7 +79,7 @@ function OnChangeFunc(self)
 			.. '|' .. options.radius.value
 			
 			
-		) 
+		)
 	else
 		echo "Cannot do this with a unit in the center of the screen."
 	end
@@ -96,7 +96,7 @@ local function AddCEGButton(cegname)
 	}
 	
 	if ALPHA then
-		options[cegname].path = options_path..'/' .. cegname:sub(1,1):upper()	
+		options[cegname].path = options_path..'/' .. cegname:sub(1,1):upper()
 		--echo ( options[cegname].path )
 	end
 end
@@ -111,7 +111,7 @@ local function SetupOptions()
 	end
 	table.sort(explosions2)
 	for i,v in ipairs(explosions2) do
-		AddCEGButton(v)	
+		AddCEGButton(v)
 	end
 end
 

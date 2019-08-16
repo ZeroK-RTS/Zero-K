@@ -84,7 +84,7 @@ local function DropBasiliskLoop()
 			for i=1,malus do
 				EmitSfx(tail, 2048+7)
 				Sleep(1000)
-			end		
+			end
 		end
 		Sleep(8000)
 	end
@@ -118,7 +118,7 @@ local function Walk()
 		Turn(body, z_axis, math.rad(-(5)), math.rad(20))
 		Turn(leftThigh, z_axis, math.rad(-(-5)), math.rad(20) * PACE)
 		Turn(rightThigh, z_axis, math.rad(-(-5)), math.rad(20) * PACE)
-		Move(body, y_axis, 10, 20)			
+		Move(body, y_axis, 10, 20)
 		Turn(tail, y_axis, math.rad(20), math.rad(40))
 		Turn(head, x_axis, math.rad(-10), math.rad(20))
 		Turn(tail, y_axis, math.rad(20), math.rad(20))

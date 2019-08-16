@@ -416,7 +416,7 @@ for sourceName, copyTable in pairs(copy) do
 			end
 			--for statName, value in pairs(statsByLevel.customparams[stats.level]) do
 			--	UnitDefs[cloneName].customparams[statName] = value
-			--end		
+			--end
 			
 			-- copy from specific table
 			for statName, value in pairs(stats.mainstats or {}) do

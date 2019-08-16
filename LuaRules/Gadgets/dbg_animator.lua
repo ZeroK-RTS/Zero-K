@@ -40,7 +40,7 @@ local function WriteCurrent( unitID )
 	local env = true -- Spring.UnitScript.GetScriptEnv(unitID)
 	if not env then return end
 		
-	local allpieces = Spring.GetUnitPieceMap(unitID)	
+	local allpieces = Spring.GetUnitPieceMap(unitID)
 	local s = "function POSENAME (mspeed, tspeed)\n"
 	
 	local allpieces2 = {}
@@ -87,7 +87,7 @@ end
 local function Reset(unitID)
 	local env = true -- Spring.UnitScript.GetScriptEnv(unitID)
 	if env and Spring.UnitScript.GetPieceRotation then
-		local allpieces = Spring.GetUnitPieceMap(unitID)	
+		local allpieces = Spring.GetUnitPieceMap(unitID)
 		
 		for pname,pid in pairs(allpieces) do
 			for axisnum = 1,3 do
@@ -102,7 +102,7 @@ local function CallUnitScript(unitID, funcName, ...)
 	if Spring.UnitScript.GetScriptEnv(unitID) and Spring.UnitScript.GetScriptEnv(unitID).script[funcName] then
 		Spring.UnitScript.CallAsUnit(unitID, Spring.UnitScript.GetScriptEnv(unitID).script[funcName], ...)
 	end
-end  
+end
   
 function gadget:RecvLuaMsg(msg, playerID)
   
@@ -126,7 +126,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 	
 	if cmd == 'sel' and param1 then
 		local unitID = param1+0 --convert to int!
-		euID = unitID 
+		euID = unitID
 		--Spring.Echo ("now editing: " .. euID)
 		
 	elseif cmd == 'getpieceinfo' and param1 and param2 then

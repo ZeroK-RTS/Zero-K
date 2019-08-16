@@ -13,7 +13,7 @@ unitDef = {
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[50 50 50]],
-  collisionVolumeType    = [[ellipsoid]],  
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {

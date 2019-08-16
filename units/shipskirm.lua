@@ -60,7 +60,7 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[ROCKET]], 
+      def                = [[ROCKET]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },

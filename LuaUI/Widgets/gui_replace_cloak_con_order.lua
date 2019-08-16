@@ -15,14 +15,14 @@ end
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 options_path = 'Settings/Unit Behaviour/Replace Cloak Con Orders'
-options = { 
+options = {
 	reclaim = {name='Replace Reclaim', type='bool', value=true},
 	resurrect = {name='Replace Resurrect', type='bool', value=true},
 	repair = {name='Replace Repair', type='bool', value=true},
 }
 
 function widget:CommandNotify(id, params, cmdOptions)
-	if cmdOptions.right and #params < 4 and ((id == CMD.REPAIR and options.repair.value) or 
+	if cmdOptions.right and #params < 4 and ((id == CMD.REPAIR and options.repair.value) or
 	(id == CMD.RECLAIM and options.reclaim.value) or (id == CMD.RESURRECT and options.resurrect.value)) then
 		local selUnits = Spring.GetSelectedUnits()
 		local replace = false

@@ -55,7 +55,7 @@ return {
 				colormap           = [[0 0 1 0.5		1 0 1 0.5		0 0 0 0.01]],
 				pos					= [[0, 0,0]],
 			},
-		},		
+		},
 		smallflash = {
 			air                = false,
 			class              = [[CSimpleGroundFlash]],

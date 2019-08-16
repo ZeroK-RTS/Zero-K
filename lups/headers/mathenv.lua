@@ -14,7 +14,7 @@
 ---------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------
 
-local MathG = {math = math, rand = math.random, random = math.random, sin = math.sin, cos = math.cos, pi = math.pi, 
+local MathG = {math = math, rand = math.random, random = math.random, sin = math.sin, cos = math.cos, pi = math.pi,
 							 deg = math.deg, loadstring = loadstring, assert = assert, echo = Spring.Echo};
 
 --local cachedParsedFunctions = {}

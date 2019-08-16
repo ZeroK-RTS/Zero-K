@@ -77,22 +77,22 @@ function aStar.GetNeighbors(id, goal)
   local x, y = aStar.ToCoords(id)
   local nodes = {
     -- half jump (8 directions)
-    aStar.ToID{x-1, y}, 
-    aStar.ToID{x, y-1},  
-    aStar.ToID{x+1, y}, 
-    aStar.ToID{x, y+1}, 
-    aStar.ToID{x-1, y-1},  
-    aStar.ToID{x-1, y+1}, 
-    aStar.ToID{x+1, y+1}, 
+    aStar.ToID{x-1, y},
+    aStar.ToID{x, y-1},
+    aStar.ToID{x+1, y},
+    aStar.ToID{x, y+1},
+    aStar.ToID{x-1, y-1},
+    aStar.ToID{x-1, y+1},
+    aStar.ToID{x+1, y+1},
     aStar.ToID{x+1, y-1},
     -- full jump (8 directions)
     aStar.ToID{x-2, y},
-    aStar.ToID{x, y-2},  
-    aStar.ToID{x+2, y}, 
-    aStar.ToID{x, y+2}, 
-    aStar.ToID{x-2, y-2},  
-    aStar.ToID{x-2, y+2}, 
-    aStar.ToID{x+2, y+2}, 
+    aStar.ToID{x, y-2},
+    aStar.ToID{x+2, y},
+    aStar.ToID{x, y+2},
+    aStar.ToID{x-2, y-2},
+    aStar.ToID{x-2, y+2},
+    aStar.ToID{x+2, y+2},
     aStar.ToID{x+2, y-2},
   }
   local passable = {}
@@ -123,11 +123,11 @@ function aStar.GetDistance(a, b) -- distance between two directly connected node
   return 1 -- jumps always take the same time (iirc)
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return true
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return {[leaperDefID] = true}
 end
 

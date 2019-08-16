@@ -8,10 +8,10 @@
 //Directions:
 //1. Include this file by putting the line
 //
-//	#include "waterdepthspeed.h" 
+//	#include "waterdepthspeed.h"
 //
 //at the top.
-//2a. For boats: in Create() put the following line: 
+//2a. For boats: in Create() put the following line:
 //
 //	start-script WaterDepthSpeedBoat();
 //
@@ -35,7 +35,7 @@ WaterDepthSpeedBoat() {
 	base_speed = GET MAX_SPEED;
 	
 	while (1) {
-		speed_penalty = ((GET LUA_WATERDEPTHSPEED_HEIGHT_BOAT) - GET GROUND_WATER_HEIGHT(GET UNIT_XZ)) 
+		speed_penalty = ((GET LUA_WATERDEPTHSPEED_HEIGHT_BOAT) - GET GROUND_WATER_HEIGHT(GET UNIT_XZ))
 			/ GET LUA_WATERDEPTHSPEED_DIST;
 		if (speed_penalty < 0) speed_penalty = 0;
 		else if (speed_penalty > GET LUA_WATERDEPTHSPEED_MAX) speed_penalty = GET LUA_WATERDEPTHSPEED_MAX;
@@ -52,7 +52,7 @@ WaterDepthSpeedShip() {
 	base_speed = GET MAX_SPEED;
 	
 	while (1) {
-		speed_penalty = (GET GROUND_WATER_HEIGHT(GET UNIT_XZ) - GET LUA_WATERDEPTHSPEED_HEIGHT_SHIP) 
+		speed_penalty = (GET GROUND_WATER_HEIGHT(GET UNIT_XZ) - GET LUA_WATERDEPTHSPEED_HEIGHT_SHIP)
 			/ GET LUA_WATERDEPTHSPEED_DIST;
 		if (speed_penalty < 0) speed_penalty = 0;
 		else if (speed_penalty > GET LUA_WATERDEPTHSPEED_MAX) speed_penalty = GET LUA_WATERDEPTHSPEED_MAX;

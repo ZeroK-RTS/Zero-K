@@ -98,7 +98,7 @@ unitDef = {
       maxAngleDif        = 240,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
-    },    
+    },
 
     {
       def                = [[MISSILE]],
@@ -203,7 +203,7 @@ unitDef = {
 
       edgeEffectiveness       = 0.5,
       fireStarter             = 100,
-      fixedLauncher              = true,      
+      fixedLauncher              = true,
       flightTime              = 4,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -220,7 +220,7 @@ unitDef = {
       tracks                  = true,
       trajectoryHeight        = 0.5,
       turnrate                = 30000,
-      turret                  = true,      
+      turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 300,
       weaponType              = [[MissileLauncher]],

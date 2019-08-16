@@ -9,19 +9,19 @@ local menu_athena = {
 			angle= -45,
 			unit = "spiderscout",
 		  },
-		  { 
+		  {
 			angle = -135,
 			unit = "shieldraid",
 		  },
-		  { 
+		  {
 			angle = -180,
 			unit = "cloakheavyraid",
 		  },
-		  { 
+		  {
 			angle = 0,
 			unit = "cloakaa",
 		  },
-		  { 
+		  {
 			angle = 45,
 			unit = "cloakassault",
 		  },
@@ -32,26 +32,26 @@ local menu_athena = {
 		unit = "spiderskirm",
 		label = "Walkers",
 		items = {
-		  { 
+		  {
 			angle = -90,
 			unit = "cloaksnipe",
 		  },
-		  { 
+		  {
 			angle = 135,
 			unit = "cloakjammer",
 		  },
-		  { 
+		  {
 			angle = -135,
 			unit = "shieldshield",
-		  },	
+		  },
 		  {
 			angle = -45,
 			unit = "spiderantiheavy"
 		  },
-		  { 
+		  {
 			angle = 90,
 			unit = "amphtele",
-		  },		  
+		  },
 		  {
 			angle = 45,
 			unit = "jumpskirm"
@@ -70,11 +70,11 @@ local menu_athena = {
 		  {
 			angle = 135,
 			unit = "staticjammer"
-		  },		  
+		  },
 		  {
 			angle = 180,
 			unit = "staticcon"
-		  },		  
+		  },
 		}
 	  },
 	  {
@@ -89,13 +89,13 @@ local menu_athena = {
 		  {
 			angle = 135,
 			unit = "striderantiheavy"
-		  },		  
+		  },
 		  {
 			angle = -90,
 			unit = "hoverassault"
-		  },		  
+		  },
 		}
-	  },	  
+	  },
   }
 }
 

@@ -9,7 +9,7 @@ local unitClasses = {
 	Con	= { 'cloakcon' },
 }
 
-local steps = {	
+local steps = {
 	selectCon = {
 		image		= unitClasses.Con[1] ..'.png',
 		passIfAny	= { 'ConSelected' },
@@ -81,7 +81,7 @@ local unitClassNames = {
 local mClasses = { Con=1, Raider=1, }
 
 -- generic sub states
-local steps = {	
+local steps = {
 	intro = {
 		--message		= 'Hello! I am Nubtron, the friendly robot. I will teach you how to play Complete Annihilation. <(Click here to continue)>',
 		passIfAny	= { 'clickedNubtron', },
@@ -175,7 +175,7 @@ local tasks = {
 		states		= { 'hideMetalMap', },
 	},
 	buildMex = {
-		--desc		= 'Building a Metal Extractor (mex)',		
+		--desc		= 'Building a Metal Extractor (mex)',
 		--tip			= 'Metal extractors output metal which is the heart of your economy.',
 		states		= { 'selectComm', 'showMetalMap', 'finishMex', 'selectBuildMex', 'startMex', 'buildMex', 'hideMetalMap' },
 		passIfAll	= { 'haveMex',},

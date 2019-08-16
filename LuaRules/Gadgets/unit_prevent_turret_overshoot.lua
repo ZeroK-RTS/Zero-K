@@ -45,11 +45,11 @@ local blockedCmds = {
 }
 
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return blockedCmds
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return allowedRangeSq
 end
 

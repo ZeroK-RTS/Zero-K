@@ -79,8 +79,8 @@ options = {
 		name = "Reset Wins",
 		desc = "Reset the win counts of all players",
 		type = 'button',
-		OnChange = function() 
-		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end 
+		OnChange = function()
+		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end
 		end,
 	},
 	inc_wins_1 = {
@@ -88,9 +88,9 @@ options = {
 		desc = "",
 		type = 'button',
 		OnChange = function()
-		if WG.WinCounter_Increment ~= nil then 
+		if WG.WinCounter_Increment ~= nil then
 			local allyTeams = Spring.GetAllyTeamList()
-			WG.WinCounter_Increment(allyTeams[1]) 
+			WG.WinCounter_Increment(allyTeams[1])
 		end
 		end,
 		advanced = true
@@ -100,9 +100,9 @@ options = {
 		desc = "",
 		type = 'button',
 		OnChange = function()
-		if WG.WinCounter_Increment ~= nil then 
+		if WG.WinCounter_Increment ~= nil then
 			local allyTeams = Spring.GetAllyTeamList()
-			WG.WinCounter_Increment(allyTeams[2]) 
+			WG.WinCounter_Increment(allyTeams[2])
 		end
 		end,
 		advanced = true
@@ -154,7 +154,7 @@ options = {
 		name = "Scroll with mousewheel",
 		type = 'bool',
 		value = false,
-		OnChange = function(self) 
+		OnChange = function(self)
 				scroll_cpl.ignoreMouseWheel = not self.value;
 			end,
 	},
@@ -332,7 +332,7 @@ local function CalculateWidths()
 	x_status		= cf and x_cf + 20 or x_cf
 	x_name			= x_status + 12
 	x_teamsize		= x_icon_clan
-	x_teamsize_dude	= x_icon_rank 
+	x_teamsize_dude	= x_icon_rank
 	x_share			= x_name + name_width
 	x_m_mobiles		= not amSpec and x_share + 12 or x_share
 	x_m_mobiles_width = options.stats_width.value * options.text_height.value / 2 + 10
@@ -393,7 +393,7 @@ local function ShareUnits(playername, team)
 	local selcnt = Spring.GetSelectedUnitsCount()
 	if selcnt > 0 then
 		Spring.SendCommands("say a: I gave "..selcnt.." units to "..playername..".")
-		Spring.ShareResources(team, "units")     
+		Spring.ShareResources(team, "units")
 	else
 		echo 'Player List: No units selected to share.'
 	end
@@ -497,7 +497,7 @@ local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 	if UnitDefs[unitDefID] and stats then -- shouldn't need to guard against nil here, but I've had it happen
 		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
 		local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-		local isbuilt = not select(3, spGetUnitIsStunned(unitID))	
+		local isbuilt = not select(3, spGetUnitIsStunned(unitID))
 		if metal and metal < 1000000 then -- tforms show up as 1million cost, so ignore them
 			if remove then
 				metal = -metal
@@ -536,7 +536,7 @@ local function GetPlayerTeamStats(teamID)
 	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = Spring.GetTeamResources(teamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = Spring.GetTeamResources(teamID, "metal")
 
-	if eInco then	
+	if eInco then
 		local energyIncome = spGetTeamRulesParam(teamID, "OD_energyIncome") or 0
 		local energyChange = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
 		eInco = eInco + energyIncome - math.max(0, energyChange)
@@ -819,8 +819,8 @@ local function UpdatePlayerInfo()
 
 			if entities[i].nameLabel then entities[i].nameLabel:SetCaption(displayname) end
 			if entities[i].statusLabel then entities[i].statusLabel:SetCaption(tstatus) ; entities[i].statusLabel.font:SetColor(tstatuscolor) end
-			if entities[i].winsLabel and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then 
-				entities[i].winsLabel:SetCaption(FormatWins(name)) 
+			if entities[i].winsLabel and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then
+				entities[i].winsLabel:SetCaption(FormatWins(name))
 			end
 
 			UpdatePingCpu(entities[i],pingTime,cpuUsage,pstatus)
@@ -863,7 +863,7 @@ local function UpdatePlayerInfo()
 						local _,leader = Spring.GetTeamInfo(teamID, false)
 						local name = Spring.GetPlayerInfo(leader, false)
 						if v.winsLabel and name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then
-							v.winsLabel:SetCaption(FormatWins(name)) 
+							v.winsLabel:SetCaption(FormatWins(name))
 						end
 					end
 				end
@@ -924,20 +924,20 @@ local function AddEntity(entity, teamID, allyTeamID)
 
 		-- clan/faction emblems, level, country, elo
 		local icon = nil
-		local icRank = nil 
+		local icRank = nil
 		local elo = nil
 		local eloCol = nil
 		local icCountry = entity.country and entity.country ~= '' and entity.country ~= '??' and "LuaUI/Images/flags/" .. (entity.country) .. ".png" or nil
 		if options.show_ccr.value then
-			if entity.clan and entity.clan ~= "" then 
+			if entity.clan and entity.clan ~= "" then
 				icon = "LuaUI/Configs/Clans/" .. entity.clan ..".png"
 			elseif entity.faction and entity.faction ~= "" then
 				icon = "LuaUI/Configs/Factions/" .. entity.faction ..".png"
 			end
 			icRank = "LuaUI/Images/LobbyRanks/" .. (entity.rank or "0_0") .. ".png"
-			if icCountry then MakeNewIcon(entity,"countryIcon",{x=x_icon_country,file=icCountry,}) end 
+			if icCountry then MakeNewIcon(entity,"countryIcon",{x=x_icon_country,file=icCountry,}) end
 			if icRank then MakeNewIcon(entity,"rankIcon",{x=x_icon_rank,file=icRank,}) end
-			if icon then MakeNewIcon(entity,"clanIcon",{x=x_icon_clan,file=icon,y=((fontsize+1)*row)+5,width=fontsize-1,height=fontsize-1}) end 
+			if icon then MakeNewIcon(entity,"clanIcon",{x=x_icon_clan,file=icon,y=((fontsize+1)*row)+5,width=fontsize-1,height=fontsize-1}) end
 		end
 
 		-- status (player status and team status)
@@ -997,7 +997,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 			end
 		end
 
-		if showWins and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[entity.name] ~= nil then 
+		if showWins and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[entity.name] ~= nil then
 			MakeNewLabel(entity,"winsLabel",{x=0,width=wins_width,caption = FormatWins(entity.name),textColor = teamcolor, align = "right"})
 		end
 
@@ -1043,7 +1043,7 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 	for i=1,#allyTeamsSorted do
 		local allyTeamID = allyTeamsSorted[i]
 		if allyTeams[allyTeamID] then
-			allyTeamsNumActivePlayers[allyTeamID] = 0			
+			allyTeamsNumActivePlayers[allyTeamID] = 0
 			for j=1,#allyTeams[allyTeamID] do
 				local teamID = allyTeams[allyTeamID][j]
 				if teamID then
@@ -1083,7 +1083,7 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 				local _,leader = Spring.GetTeamInfo(allyTeams[allyTeamID][1], false)
 				local leaderName = Spring.GetPlayerInfo(leader, false)
 
-				if showWins and leaderName ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[leaderName] ~= nil then 
+				if showWins and leaderName ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[leaderName] ~= nil then
 					MakeNewLabel(allyTeamEntities[allyTeamID],"winsLabel",{x=0,width=wins_width,caption = FormatWins(leaderName),textColor = allyTeamColor, align = "right"})
 				end
 				row = row + 1
@@ -1256,7 +1256,7 @@ SetupPlayerNames = function()
 	for i=1,#allyTeamsSorted do  -- for every ally team
 		local allyTeamID = allyTeamsSorted[i]
 		if allyTeams[allyTeamID] then
-			table.sort(allyTeams[allyTeamID], 
+			table.sort(allyTeams[allyTeamID],
 				function(a,b)
 					if not teams[a] or not teams[b] then
 						Spring.Echo('<ChiliDeluxePlayerlist> Critical Error #1!')
@@ -1457,7 +1457,7 @@ SetupScrollPanel = function ()
 			local alt,ctrl, meta,shift = Spring.GetModKeyState()
 			local _,_,lmb,mmb,rmb = Spring.GetMouseState()
 			if (shift or ctrl or alt) or (mmb or rmb) or ((not self.tooltip or self.tooltip=="") and not (meta and lmb)) then --hover over window will intercept mouse, pressing right-mouse or middle-mouse or shift or ctrl or alt will stop intercept
-				return false 
+				return false
 			end
 			return self --mouse over panel
 		end,
@@ -1478,8 +1478,8 @@ SetupScrollPanel = function ()
 	
 	function scroll_cpl:IsAboveVScrollbars(x, y)  -- this override default Scrollpanel's HitTest. It aim to: reduce chance of click stealing. It exclude any modifier key (shift,alt,ctrl, except spacebar which is used for Space+click shortcut), and only allow left-click to reposition the vertical scrollbar
 		local alt,ctrl, meta,shift = Spring.GetModKeyState()
-		if (x< self.width - self.scrollbarSize) or (shift or ctrl or alt) or (not select(3,Spring.GetMouseState())) then 
-			return false 
+		if (x< self.width - self.scrollbarSize) or (shift or ctrl or alt) or (not select(3,Spring.GetMouseState())) then
+			return false
 		end
 		return self
 	end
@@ -1507,7 +1507,7 @@ SetupPanels = function ()
 	end
 	lastSizeX = width
 	
-	window_cpl = Window:New{  
+	window_cpl = Window:New{
 		dockable = true,
 		name = "Player List",
 		color = {0,0,0,0},

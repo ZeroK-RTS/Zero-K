@@ -23,7 +23,7 @@ local myPlayerID, myPlayerName
 local function SetupTTS(value)
 	value = math.floor(value * Spring.GetConfigInt("snd_volmaster", 50) / 100)
 	if (value == 0) then
-		textToSpeechEnabled = false 
+		textToSpeechEnabled = false
 		if not luaMenuActive then
 			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false) .. " DISABLE TTS")
 			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false) .. " TTS VOLUME 0")
@@ -48,7 +48,7 @@ options = {
 		name = "Text-to-speech volume",
 		desc = "TTS reads the ally chat.",
 		type = 'number',
-		min = 0, max = 100, 
+		min = 0, max = 100,
 		value = 0, step = 1,
 		noHotkey = true,
 		OnChange = function(self)

@@ -58,7 +58,7 @@ RockX(heading, rock_x)
 	call-script Abs(ROCKX_H_ANGLE);
 	while ( CALC_H_RESULT > ROCK_X_MIN )
 	{
-	    turn ROCK_PIECE to x-axis ROCKX_H_ANGLE speed CALC_H_RESULT * ROCK_X_SPEED;		
+	    turn ROCK_PIECE to x-axis ROCKX_H_ANGLE speed CALC_H_RESULT * ROCK_X_SPEED;
 		wait-for-turn ROCK_PIECE around x-axis;
 		ROCKX_H_ANGLE = ROCKX_H_ANGLE * ROCK_X_DECAY;
 		call-script Abs(ROCKX_H_ANGLE);

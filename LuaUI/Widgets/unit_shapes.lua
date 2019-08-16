@@ -109,7 +109,7 @@ local forceUpdate = false
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 options_path = 'Settings/Interface/Selection/Selection Shapes'
-options_order = {'allyselectionlevel', 'showallyplayercolours', 'showhover', 'showinselectionbox', 'animatehover', 'animateselectionbox'} 
+options_order = {'allyselectionlevel', 'showallyplayercolours', 'showhover', 'showinselectionbox', 'animatehover', 'animateselectionbox'}
 options = {
 	allyselectionlevel = {
 		name = 'Show Ally Selections',
@@ -120,34 +120,34 @@ options = {
 			{name = 'Disabled',key='disabled', desc="Do not show any allied selection."},
 		},
 		value = 'commshare',
-		OnChange = function(self) 
+		OnChange = function(self)
 			forceUpdate = true
 			visibleAllySelUnits = {}
 		end,
 	},
 	showallyplayercolours = {
 		name = 'Use Player Colors when Spectating',
-		desc = 'Highlight allies\' selected units with their color.', 
+		desc = 'Highlight allies\' selected units with their color.',
 		type = 'bool',
 		value = false,
-		OnChange = function(self) 
+		OnChange = function(self)
 			forceUpdate = true
 		end,
 		noHotkey = true,
 	},
 	showhover = {
 		name = 'Highlight Hovered Unit',
-		desc = 'Highlight the unit under your cursor.', 
+		desc = 'Highlight the unit under your cursor.',
 		type = 'bool',
 		value = true,
-		OnChange = function(self) 
+		OnChange = function(self)
 			hoveredUnit = {}
 		end,
 		noHotkey = true,
 	},
 	showinselectionbox = {
 		name = 'Highlight Units in Selection Box',
-		desc = 'Highlight the units in the selection box.', 
+		desc = 'Highlight the units in the selection box.',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -270,7 +270,7 @@ local function GetVisibleUnits()
 				visibleSelected[#visibleSelected+1] = {unitID = unitID}
 			end
 			
-			if ShowAllySelection(unitID, myTeamID) then 
+			if ShowAllySelection(unitID, myTeamID) then
 				local teamIDIndex = Spring.GetUnitTeam(unitID)
 				if teamIDIndex then --Possible nil check failure if unit is destroyed while selected
 					teamIDIndex = teamIDIndex+1
@@ -519,8 +519,8 @@ function widget:Initialize()
 		end
 
 		unitConf[udid] = {
-			shape = shape, 
-			xscale = xscale, 
+			shape = shape,
+			xscale = xscale,
 			zscale = zscale,
 			noRotate = (unitDef.customParams.select_no_rotate and true) or false
 		}
@@ -576,7 +576,7 @@ local function UpdateUnitListScale(unitList)
 			unitList[i].scale = startScale
 		elseif not unitList[i].scale then --implicitly allows explicit scale to be set on unitList entry creation
 			unitList[i].scale = 1.0
-		end	
+		end
 	end
 end
 
@@ -595,12 +595,12 @@ local function UpdateUnitListRotation(unitList)
 				local speed = vx*vx + vz*vz
 				if speed > 0.25 then
 					local velHeading = Spring.GetHeadingFromVector(vx, vz)*HEADING_TO_RAD
-					degrot[unitID] = 180 + velHeading * rad_con	
+					degrot[unitID] = 180 + velHeading * rad_con
 				end
 			end
 		else
 			local heading = (not (spGetUnitIsDead(unitID)) and spGetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE
-			degrot[unitID] = 180 + heading * rad_con	
+			degrot[unitID] = 180 + heading * rad_con
 		end
 	end
 end
@@ -750,7 +750,7 @@ local function DrawCircles(underWorld)
 			SetupUnitShapes()
 
 			DrawUnitShapes(visibleSelected, rgba, underWorld)
-			if not Spring.IsGUIHidden() then 
+			if not Spring.IsGUIHidden() then
 				local spec, _, fullselect = Spring.GetSpectatingState()
 				if spec and options.showallyplayercolours.value then
 					if fullselect then hoverColor = teal end

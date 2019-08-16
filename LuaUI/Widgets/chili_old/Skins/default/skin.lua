@@ -375,7 +375,7 @@ end
 
 function DrawItemBkGnd(obj,x,y,w,h,state)
   if (state=="selected") then
-    gl.Color(0.15,0.15,0.9,1)   
+    gl.Color(0.15,0.15,0.9,1)
   else
     gl.Color({0.8, 0.8, 1, 0.45})
   end

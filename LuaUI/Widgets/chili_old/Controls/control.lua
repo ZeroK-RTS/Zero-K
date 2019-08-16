@@ -71,8 +71,8 @@ function Control:New(obj)
   BackwardCompa(obj)
   
   --//minimum size from minimum size table when minWidth & minHeight is not set (backward compatibility)
-  local minimumSize = obj.minimumSize or {} 
-  obj.minWidth = obj.minWidth or minimumSize[1] 
+  local minimumSize = obj.minimumSize or {}
+  obj.minWidth = obj.minWidth or minimumSize[1]
   obj.minHeight = obj.minHeight or minimumSize[2]
 
   --// load the skin for this control
@@ -731,7 +731,7 @@ end
 function Control:StartResizing(x,y)
   --//FIXME the x,y aren't needed check how drag is handled!
   self.resizing = {
-    mouse = {x, y}, 
+    mouse = {x, y},
     size  = {self.width, self.height},
     pos   = {self.x, self.y},
   }
@@ -768,13 +768,13 @@ end
 
 function Control:ParentToClient(x,y)
   local ca = self.clientArea
-  return x - self.x - ca[1], y - self.y - ca[2] 
+  return x - self.x - ca[1], y - self.y - ca[2]
 end
 
 
 function Control:ClientToParent(x,y)
   local ca = self.clientArea
-  return x + self.x + ca[1], y + self.y + ca[2] 
+  return x + self.x + ca[1], y + self.y + ca[2]
 end
 
 
@@ -902,7 +902,7 @@ end
 
 
 function Control:IsRectInView(x,y,w,h)
-	if not self.parent or not UnlinkSafe(self.parent) then 
+	if not self.parent or not UnlinkSafe(self.parent) then
 		return false
 	end
 
@@ -962,10 +962,10 @@ end
 
 function Control:DrawControl()
   --//an option to make panel position snap to an integer
-  if self.snapToGrid then 
-    self.x = math.floor(self.x) + 0.5 
-    self.y = math.floor(self.y) + 0.5 
-  end 
+  if self.snapToGrid then
+    self.x = math.floor(self.x) + 0.5
+    self.y = math.floor(self.y) + 0.5
+  end
   self:DrawBackground()
   self:DrawBorder()
 end
@@ -1072,8 +1072,8 @@ function Control:HitTest(x,y)
         end
       end
       --//an option that allow you to mouse click on empty panel
-      if self.hitTestAllowEmpty then 
-        return self 
+      if self.hitTestAllowEmpty then
+        return self
       end
     end
   end
@@ -1135,7 +1135,7 @@ function Control:MouseMove(x, y, dx, dy, ...)
     local deltaMousePosY = y - oldState.mouse[2]
 
     local w = math.max(
-      self.minWidth, 
+      self.minWidth,
       oldState.size[1] + deltaMousePosX
     )
     local h = math.max(

@@ -58,11 +58,11 @@ local spIsUnitSelected		= Spring.IsUnitSelected
 --halo
 local GL_ZERO      = GL.ZERO
 local GL_KEEP      = 0x1E00
-local GL_REPLACE   = 0x1E01  
-local GL_INCR      = 0x1E02  
+local GL_REPLACE   = 0x1E01
+local GL_INCR      = 0x1E02
 local GL_DECR      = 0x1E03
-local GL_INCR_WRAP = 0x8507 
-local GL_DECR_WRAP = 0x8508 
+local GL_INCR_WRAP = 0x8507
+local GL_DECR_WRAP = 0x8508
 local GL_STENCIL_BITS = 0x0D57
 
 
@@ -107,7 +107,7 @@ options = {
 		type = 'bool',
 		desc = 'Highlight the units your allies currently have selected.',
 		value = false,
-		OnChange = function(self) 
+		OnChange = function(self)
 			visibleAllySelUnits = {}
 			showAlly = self.value
 		end,
@@ -238,7 +238,7 @@ end
 
 function widget:Initialize()
 
-    showAlly = options.showally.value 
+    showAlly = options.showally.value
     shader = glCreateShader({
     
 	uniform = {
@@ -265,7 +265,7 @@ function widget:Initialize()
 		
 		gl_Position = gl_ProjectionMatrix * P;
 	    }
-	]],  
+	]],
 	
 	fragment = [[
 	    varying vec3 normal;
@@ -412,7 +412,7 @@ local function DrawWorldFunc()
     glBlending(GL_SRC_ALPHA, GL_ONE)
     glPolygonOffset(-2, -2)
     
-    if (type == 'unit') and ValidUnitID(data) and not spIsUnitSelected(data) and (data ~= GetPlayerControlledUnit(myPlayerID)) then 
+    if (type == 'unit') and ValidUnitID(data) and not spIsUnitSelected(data) and (data ~= GetPlayerControlledUnit(myPlayerID)) then
         SetTeamColor(GetUnitTeam(data))
         glUnit(data, true)
     elseif (type == 'feature') and ValidFeatureID(data) then
@@ -499,7 +499,7 @@ local function DrawWorldFunc()
         for i=1,nc do
               glUnit(visCloakUnit[i],true,-1)
         end
-    end 
+    end
 
     if (nac>0) then
         gl.ColorMask(false)
@@ -511,7 +511,7 @@ local function DrawWorldFunc()
         end
         
         gl.ColorMask(true)
-		if (type == 'unit') and ValidUnitID(data) then 
+		if (type == 'unit') and ValidUnitID(data) then
 			glColor(Spring.GetTeamColor(GetUnitTeam(data)))
 		else
 			glColor(allySelectColor)
@@ -536,7 +536,7 @@ local function DrawWorldFunc()
         for i=1,nac do
             glUnit(visAllyCloakUnit[i],true,-1)
         end
-    end 
+    end
 
     if (nbc>0) then
         gl.ColorMask(false)
@@ -567,7 +567,7 @@ local function DrawWorldFunc()
         for i=1,nbc do
             glUnit(visBoxedCloakUnit[i],true,-1)
         end
-    end 
+    end
 
 	-- highlight hovered unit
 
@@ -580,7 +580,7 @@ local function DrawWorldFunc()
 			gl.PointSize(4)
 		
 			gl.ColorMask(false)
-			gl.StencilFunc(GL.ALWAYS, 1, 1); 
+			gl.StencilFunc(GL.ALWAYS, 1, 1);
 			gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
 			gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
 			gl.Unit(data,true,-1)
@@ -596,7 +596,7 @@ local function DrawWorldFunc()
 			gl.Unit(data,true,-1)
 			
 			gl.ColorMask(false)
-			gl.StencilFunc(GL.ALWAYS, 0, 1); 
+			gl.StencilFunc(GL.ALWAYS, 0, 1);
 			gl.StencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE)
 			gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
 			gl.Unit(data,true,-1)

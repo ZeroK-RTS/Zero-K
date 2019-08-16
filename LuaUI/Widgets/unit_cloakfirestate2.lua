@@ -66,7 +66,7 @@ end
 local cloakUnit = {} --stores the desired fire state when decloaked of each unitID
 
 function widget:UnitCloaked(unitID, unitDefID, teamID)
-	if (not enabled) or (teamID ~= myTeam) or exceptionArray[unitDefID] then 
+	if (not enabled) or (teamID ~= myTeam) or exceptionArray[unitDefID] then
 		return
 	end
 	local firestate = Spring.Utilities.GetUnitFireState(unitID)
@@ -78,7 +78,7 @@ function widget:UnitCloaked(unitID, unitDefID, teamID)
 end
 
 function widget:UnitDecloaked(unitID, unitDefID, teamID)
-	if (not enabled) or (teamID ~= myTeam) or exceptionArray[unitDefID] or (not cloakUnit[unitID]) then 
+	if (not enabled) or (teamID ~= myTeam) or exceptionArray[unitDefID] or (not cloakUnit[unitID]) then
 		return
 	end
 	if Spring.Utilities.GetUnitFireState(unitID) == 0 then

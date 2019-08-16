@@ -29,7 +29,7 @@ function combatHandler.CreateCombatHandler(allyTeamID)
 				end
 			end
 		end
-	end	
+	end
 	
 	local newScoutHandler = {
 		UpdateHeatmap = UpdateHeatmap,

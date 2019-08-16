@@ -4,11 +4,11 @@ include "spider_walking.lua"
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local body = piece 'body' 
-local turret = piece 'turret' 
-local gun = piece 'gun' 
-local flare = piece 'flare' 
-local aim = piece 'aim' 
+local body = piece 'body'
+local turret = piece 'turret'
+local gun = piece 'gun'
+local flare = piece 'flare'
+local aim = piece 'aim'
 local br = piece 'leg1'	-- back right
 local mr = piece 'leg2' 	-- middle right
 local fr = piece 'leg3' 	-- front right
@@ -70,7 +70,7 @@ local function RestoreLegs()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	GG.SpiderWalk.restoreLegs(br, mr, fr, bl, ml, fl,
-		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)				
+		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)
 end
 
 function script.Create()

@@ -1,4 +1,4 @@
--- 
+--
 
 return {
 	en = {
@@ -58,7 +58,7 @@ return {
 	--I let this part between quote because I never used a ' in it.
 	fr = {
 		tasks = {
-			descs = { 
+			descs = {
 				intro = 'Introduction',
 				restoreInterface = 'Restaurez votre interface',
 				buildMex = 'Construire un extracteur de métal',
@@ -92,8 +92,8 @@ return {
 			selectComm = [[Sélectionnez votre commandeur en cliquant sur lui ou en pressant <ctrl+c>.]],
 			showMetalMap = [[Vous pouvez voir la présence de métal sur le sol en pressant <F4>.]],
 			hideMetalMap = [[Rappuyez sur <F4> pour cacher l'affichage du metal sur le sol et ainsi revenir à la vue normale.]],
-			selectBotLab = [[Selectionnez votre Usine de Robots en cliquant sur elle. (Le cercle bleu vous aidera à la trouver).]], 
-			selectCon = [[Selectionnez un constructeur en cliquant sur lui. (Le cercle bleu vous aidera à le trouver).]], 
+			selectBotLab = [[Selectionnez votre Usine de Robots en cliquant sur elle. (Le cercle bleu vous aidera à la trouver).]],
+			selectCon = [[Selectionnez un constructeur en cliquant sur lui. (Le cercle bleu vous aidera à le trouver).]],
 			guardFac = [[Ordonnez à votre constructeur de garder votre Usine de Robots en cliquant avec le bouton droit dessus. Le constructeur assistera la production de celle-ci jusqu'à ce que vous lui donniez un autre ordre ou que celle-ci finisse sa file de production.]],
 			tutorialEnd = [[C'est la fin de ce tutoriel, je n'ai plus rien à vous apprendre. Vous pouvez éteindre Nubtron et reprendre une activité guerrière normale. Merci et au revoir! (Cliquez pour redémarrer le tutoriel)]],
 			

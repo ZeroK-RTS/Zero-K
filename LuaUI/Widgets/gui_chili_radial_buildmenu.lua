@@ -12,7 +12,7 @@ function widget:GetInfo()
     enabled   = false,
     handler = true,
   }
-end 
+end
 
 include("keysym.h.lua")
 
@@ -53,8 +53,8 @@ local keys_display = keyconfig.qwerty_d.keys_display
 ------------------------------------------------
 
 local selected_item = nil
-local menu = nil 
-local menu_selected = nil 
+local menu = nil
+local menu_selected = nil
 local level = 0
 local customKeyBind = false
 local menu_use = include("Configs/marking_menu_menus.lua")
@@ -71,8 +71,8 @@ local last_cmdid
 
 local function AngleToIndex(angle)
 	angle=angle+0
-	if angle < 0 then 
-		angle = angle + 360 
+	if angle < 0 then
+		angle = angle + 360
 	end
 	local conv = {
 		[0] 	= 2,
@@ -106,7 +106,7 @@ local Make_KB_Menu = function() end
 local advance_builder = false
 local function NextBuilder()
 	if advance_builder then
-		curbuilder = curbuilder % #builder_types_i + 1	
+		curbuilder = curbuilder % #builder_types_i + 1
 	end
 end
 
@@ -114,10 +114,10 @@ local function HotKeyMode(enable)
 	if enable then
 		window_menu.color = build_color
 		window_menu:Invalidate()
-		hotkey_mode = true 
+		hotkey_mode = true
 		for i,v in ipairs(hotkey_labels) do
 			v:SetCaption(green .. v.name)
-		end		
+		end
 	else
 		window_menu.color = menu_visible and orig_color or hide_color
 		window_menu:Invalidate()
@@ -132,9 +132,9 @@ end
 local function AddBuildButton()
 	local button1 = Button:New{
 		name = 5,
-		--caption = 'Buil'.. green ..'d', 
-		caption = '', 
-		tooltip = 'Click or press ' .. green .. 'D' .. white .. ' to activate build menu hotkeys.\n' 
+		--caption = 'Buil'.. green ..'d',
+		caption = '',
+		tooltip = 'Click or press ' .. green .. 'D' .. white .. ' to activate build menu hotkeys.\n'
 			.. 'Press ' .. green .. 'Space+D' .. white .. ' to build the last thing you built.' ,
 		OnMouseUp = { Make_KB_Menu, },
 		children = {
@@ -164,19 +164,19 @@ local function AddButton(item, index)
 	end
 	
 	local ud = UnitDefNames[item.unit]
-    if not ud then 
+    if not ud then
 		grid_menu:AddChild(Label:New{caption=''})
 		return
 	end
     local func = function()
-		if level ~= 0 then 
+		if level ~= 0 then
 			local cmdid = menu_selected.cmd
-			if (cmdid == nil) then 
+			if (cmdid == nil) then
 				local ud = UnitDefNames[item.unit]
 				if (ud ~= nil) then
 					cmdid = Spring.GetCmdDescIndex(-ud.id)
 				end
-			end 
+			end
 
 			if (cmdid) then
 				local alt, ctrl, meta, shift = Spring.GetModKeyState()
@@ -184,13 +184,13 @@ local function AddButton(item, index)
 
 				if (menu ~= menu_selected) then -- store last item and level to render its back path
 					level = level + 1  -- save level
-				end 
+				end
 				Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)
 				last_cmdid = cmdid
 			end
 			HotKeyMode(false)
-		end 
-		if (item.items ~= nil)  then -- item has subitems 
+		end
+		if (item.items ~= nil)  then -- item has subitems
 			level = level + 1  -- save level
 			menu = item
 			menu_selected = item
@@ -202,10 +202,10 @@ local function AddButton(item, index)
 	local tooltip1 = (level ~= 0) and ('Build: ' ..ud.humanName .. ' - ' .. ud.tooltip) or ('Category: ' .. item.label)
 	local button1 = Button:New{
 		name = index ,
-		caption = '', 
+		caption = '',
 		tooltip = tooltip1,
-		OnMouseDown = { function() HotKeyMode(false); end }, 
-		OnMouseUp = { func }, 
+		OnMouseDown = { function() HotKeyMode(false); end },
+		OnMouseUp = { func },
 		children = {
 		},
 	}
@@ -215,13 +215,13 @@ local function AddButton(item, index)
 	local label_hotkey
 	if index then
 		local angle = IndexToAngle(index)
-		if angle < 0 then angle = angle + 360 end 
+		if angle < 0 then angle = angle + 360 end
 		local idx = angle / 45
 		local hotkey = keys_display[1 + idx%8]
 		local label_hotkey = Label:New{ name = hotkey, caption = (hotkey_mode and green..hotkey or ''), fontSize = 11, y = 0, right=0, fontShadow = true, }
 		hotkey_labels[#hotkey_labels +1] = label_hotkey
 		button1:AddChild( label_hotkey )
-	end 
+	end
 	button1:AddChild( Image:New {
 		file = "#"..ud.id,
 		file2 = WG.GetBuildIconFrame(ud),
@@ -248,10 +248,10 @@ UpdateMenu = function()
 			temptree[index] = menu
 		end
 		
-		for _,i in ipairs(menu.items) do 
+		for _,i in ipairs(menu.items) do
 			local index = AngleToIndex(i.angle)
 			temptree[index] = i
-		end 
+		end
 		for i=1,9 do
 			if i == 5 then
 				AddBuildButton()
@@ -259,7 +259,7 @@ UpdateMenu = function()
 				AddButton(temptree[i], i)
 			end
 		end
-	end 
+	end
 end
 
 local function MakeMenu()
@@ -272,7 +272,7 @@ local function MakeMenu()
 	local buildername = builder_types_i[curbuilder]
 	
 	-- setup menu depending on selected unit
-	if buildername then 
+	if buildername then
 		level = 0
 		menu = menu_use[buildername]
 		menu_selected = menu
@@ -312,9 +312,9 @@ local function StoreBuilders(units)
 	builder_types_i = {}
 	builder_ids_i = {}
 	curbuilder = 1
-	for _, unitID in ipairs(units) do 
+	for _, unitID in ipairs(units) do
 		local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-		if ud.isBuilder and menu_use[ud.name] then 
+		if ud.isBuilder and menu_use[ud.name] then
 			if not builder_types[ud.name] then
 				builder_types[ud.name] = true
 				builder_types_i[#builder_types_i + 1] = ud.name
@@ -336,10 +336,10 @@ function widget:KeyPress(k, modifier)
 	if hotkey_mode then
 		if not menu or k == KEYSYMS.ESCAPE then  -- cancel menu
 			HotKeyMode(false)
-			return true 
-		end 
+			return true
+		end
 		local angle = keys[k]
-		if angle == nil then return end 
+		if angle == nil then return end
 		local index = AngleToIndex(angle)
 		local pressbutton = grid_menu:GetChildByName(index+0)
 		if pressbutton then
@@ -403,7 +403,7 @@ function widget:Initialize()
 		--autosize = true,
 		preserveChildrenOrder=true,
 	}
-	window_menu = Window:New{  
+	window_menu = Window:New{
 		dockable = true,
 		name = "chiliradialmenu",
 		color = hide_color,
@@ -425,7 +425,7 @@ function widget:Initialize()
 	--OptionsChanged()
 	local sel = Spring.GetSelectedUnits()
 	widget:SelectionChanged(sel)
-end 
+end
 
 function widget:Shutdown()
   if not customKeyBind then

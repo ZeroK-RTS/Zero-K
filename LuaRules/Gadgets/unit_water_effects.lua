@@ -139,7 +139,7 @@ function gadget:GameFrame(n)
 						local hp, maxHp = Spring.GetUnitHealth(unitID)
 						local regenMult = (Spring.GetUnitRulesParam(unitID,"totalBuildPowerChange") or 1)
 						local newHp = hp + math.min(-height,effect.submergedAt) * effect.healthRegen * regenMult * SECOND_MULT/effect.submergedAt
-						Spring.SetUnitHealth(unitID, newHp) 
+						Spring.SetUnitHealth(unitID, newHp)
 					end
 				end
 				i = i + 1
@@ -155,7 +155,7 @@ function gadget:GameFrame(n)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	if unitDefData[unitDefID] then	
+	if unitDefData[unitDefID] then
 		local tankMax = unitDefData[unitDefID].tankMax
 		unitByID.count = unitByID.count + 1
 		unitByID.data[unitByID.count] = unitID

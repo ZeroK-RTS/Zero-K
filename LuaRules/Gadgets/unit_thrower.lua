@@ -58,7 +58,7 @@ local function ValidThrowTarget(unitID, targetID)
 	if speed > 6 then
 		-- Dart speed is 5.1.
 		-- Normal launch speed is 9.9
-		return false 
+		return false
 	end
 	local unitDefID = spGetUnitDefID(targetID)
 	return canBeThrown[unitDefID]
@@ -161,7 +161,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 				SetUnitDrag(nearID, 0)
 				GG.SetCollisionDamageMult(nearID, 0)
 				Spring.SetUnitLeaveTracks(nearID, false)
-				physicsRestore.Add(nearID, 
+				physicsRestore.Add(nearID,
 					{
 						drag = -1.5,
 						collisionResistence = -5*flyTime/MIN_FLY_TIME,
@@ -182,7 +182,7 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 		if throwWeaponDef[wdid] then
 			wantedWeaponList[#wantedWeaponList + 1] = wdid
 		end
-	end 
+	end
 	return wantedWeaponList
 end
 
@@ -244,7 +244,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if throwDefs[unitDefID] then
-		throwUnits.Add(unitID, 
+		throwUnits.Add(unitID,
 			{
 				def = throwDefs[unitDefID],
 				unitDefID = unitDefID,
@@ -329,7 +329,7 @@ local function UnitIsActive(unitID)
 		return false
 	end
 	
-	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
+	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID)
 	local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
 	return not (stunned_or_inbuild or disarmed)
 end
@@ -401,7 +401,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID)
 	if throwDefs[unitDefID] then
-		throwers.Add(unitID, 
+		throwers.Add(unitID,
 			{
 				def = throwDefs[unitDefID],
 			}
@@ -439,7 +439,7 @@ local particleIDs = {}
 
 local flyFX = {
 	{
-		class = 'StaticParticles', 
+		class = 'StaticParticles',
 		options = {
 			life        = 250,
 			sizeMod     = 4,
@@ -450,7 +450,7 @@ local flyFX = {
 			noIconDraw = true,
 		}
 	}
-} 
+}
 
 local function removeFlying(_, unitID)
 	if not particleIDs[unitID] then

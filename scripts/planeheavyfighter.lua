@@ -52,19 +52,19 @@ function script.StopMoving()
 end
 
 function script.QueryWeapon(num)
-	if gun then 
+	if gun then
 		return missR
-	else 
-		return missL 
+	else
+		return missL
 	end
 end
 
-function script.AimFromWeapon(num) 
-	return base 
+function script.AimFromWeapon(num)
+	return base
 end
 
 function script.AimWeapon(num, heading, pitch)
-	return not (GetUnitValue(COB.CRASHING) == 1) 
+	return not (GetUnitValue(COB.CRASHING) == 1)
 end
 
 function script.Shot(num)

@@ -21,10 +21,10 @@ end
 
 local selfddefs = {}
 for i=1,#UnitDefs do
-	if UnitDefs[i].customParams and UnitDefs[i].customParams.instantselfd then 
+	if UnitDefs[i].customParams and UnitDefs[i].customParams.instantselfd then
 		selfddefs[i] = true
 	end
-end 
+end
 
 local CMD_SELFD = CMD.SELFD
 local spGetUnitIsStunned = Spring.GetUnitIsStunned

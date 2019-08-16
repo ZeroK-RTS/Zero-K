@@ -13,7 +13,7 @@ unitDef = {
   category               = [[LAND SINK]],
   selectionVolumeOffsets = [[0 0 0]],
   selectionVolumeScales  = [[30 30 30]],
-  selectionVolumeType    = [[ellipsoid]], 
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {

@@ -4,14 +4,14 @@
 function widget:GetInfo()
   return {
     name      = "GC at >300MB",
-    desc      = "Workaround for abnormal memory usage while rejoining game in Spring 97." 
+    desc      = "Workaround for abnormal memory usage while rejoining game in Spring 97."
 				.."Usual ingame usage never exceed 100MB.",
     author    = "xponen",
     version   = "1",
     date      = "4 June 2014",
     license   = "none",
     layer     = math.huge,
-	alwaysStart = true,	
+	alwaysStart = true,
     enabled   = true  --  loaded by default?
   }
 end
@@ -20,7 +20,7 @@ end
 --------------------------------------------------------------------------------
 function widget:Initialize()
 	if (Spring.Utilities.GetEngineVersion():find('91.0') == 1) or true then
-		Spring.Echo("Removed 'GC at >100MB': disabled.") 
+		Spring.Echo("Removed 'GC at >100MB': disabled.")
 		widgetHandler:RemoveWidget()
 	end
 end

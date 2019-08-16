@@ -95,7 +95,7 @@ function teamUnitTracker.CreateTeamUnitTracker(teamID, allyTeamID)
 	
 	local newAssetTracker = {
 		AddUnit = AddUnit,
-		GetUnitList = GetUnitList, 
+		GetUnitList = GetUnitList,
 		GetCombatUnitList = GetCombatUnitList,
 	}
 	

@@ -28,13 +28,13 @@ local lx, ly
 
 function widget:MousePress()
 	second = spGetGameSeconds()
-end 
+end
 
 function widget:KeyPress()
 	second = spGetGameSeconds()
-end 
+end
 
-function widget:GameFrame(f) 
+function widget:GameFrame(f)
 	if f%51 == 0 then
 		local mx, my = Spring.GetMouseState()
 		if mx ~= lx or my ~= ly then
@@ -47,7 +47,7 @@ function widget:GameFrame(f)
 			Spring.SendLuaRulesMsg('AFK'..second)
 			secondSent = second
 		end
-	end 
+	end
 end
 
 

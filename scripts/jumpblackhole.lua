@@ -177,7 +177,7 @@ end
 function preJump(turn, distance)
 end
 
-function beginJump() 
+function beginJump()
 	StartThread(StopWalk)
 end
 
@@ -193,7 +193,7 @@ end
 function halfJump()
 end
 
-function endJump() 
+function endJump()
 	EmitSfx(lfoot, GG.Script.UNIT_SFX4)
 	EmitSfx(rfoot, GG.Script.UNIT_SFX4)
 end

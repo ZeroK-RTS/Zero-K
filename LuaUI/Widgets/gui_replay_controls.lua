@@ -1,12 +1,12 @@
 function widget:GetInfo()
   return {
     name      = "Replay control buttons",
-    desc      = "Graphical buttons for controlling replay speed, " .. 
+    desc      = "Graphical buttons for controlling replay speed, " ..
     "pausing and skipping pregame chatter",
     author    = "knorke",
     date      = "August 2012", --updated on 20 May 2015
     license   = "stackable",
-    layer     = 1, 
+    layer     = 1,
     enabled   = true  --  loaded by my horse?
   }
 end
@@ -39,7 +39,7 @@ local progress_target
 local label_hoverTime
 
 ---------------------------------
--- Globals 
+-- Globals
 ---------------------------------
 local speeds = {0.5, 1, 2, 3, 4, 5,10}
 local isPaused = false
@@ -70,7 +70,7 @@ options = {
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-		OnChange = function(self) 
+		OnChange = function(self)
 			if (not Spring.IsReplay()) then
 				return
 			end
@@ -144,7 +144,7 @@ function CreateTheUI()
 		name   = 'replaycontroller3';
 		width = 310;
 		height = 86;
-		right = 10; 
+		right = 10;
 		y = windowY;
 		classname = "main_window_small_flat",
 		dockable = false;
@@ -153,12 +153,12 @@ function CreateTheUI()
 		tweakDraggable = true,
 		tweakResizable = false,
 		--informational tag:
-		currSpeed = currSpeed, 
+		currSpeed = currSpeed,
 		lastClick = Spring.GetTimer(),
 		--end info tag
 		--itemMargin  = {0, 0, 0, 0},
 		--caption = "replay control"
-		OnMouseDown = {function(self, x, y, mouse) 
+		OnMouseDown = {function(self, x, y, mouse)
 				--clickable bar, reference: "Chili Economy Panel Default"'s Reserve bar
 				if not showProgress then
 					return
@@ -177,9 +177,9 @@ function CreateTheUI()
 						setReplaySpeed (speeds[2],2)
 					end
 				end
-				return 
+				return
 			end},
-		OnMouseMove = {function(self, x, y, mouse) 
+		OnMouseMove = {function(self, x, y, mouse)
 				--clickable bar, reference: "Chili Economy Panel Default"'s Reserve bar
 				if not showProgress then
 					return
@@ -196,7 +196,7 @@ function CreateTheUI()
 						label_hoverTime:SetCaption(" ")
 					end
 				end
-				return 
+				return
 			end},
 	}
 	
@@ -219,7 +219,7 @@ function CreateTheUI()
 					setReplaySpeed (speeds[i], i)
 				end
 			}
-		}	
+		}
 		if not BUTTON_COLOR then
 			BUTTON_COLOR = button.backgroundColor
 		end
@@ -237,7 +237,7 @@ function CreateTheUI()
 		button_setspeed[i] = button
 	end
 	
-	if (frame == 0) then 
+	if (frame == 0) then
 		button_skipPreGame = Button:New {
 			width = 180,
 			height = 20,
@@ -253,7 +253,7 @@ function CreateTheUI()
 				skipPreGameChatter ()
 				end}
 		}
-	else 
+	else
 		--in case reloading luaui mid demo
 		widgetHandler:RemoveCallIn("AddConsoleMessage")
 	end
@@ -293,7 +293,7 @@ function CreateTheUI()
 			y =  5,
 			x		= 5,
 			right = 5,
-			height	= 20, 
+			height	= 20,
 			max     = 1;
 			color   = {0.75,0.75,0.75,0.5} ;
 			backgroundColor = {0,0,0,0} ,
@@ -306,7 +306,7 @@ function CreateTheUI()
 			y =  5,
 			x		= 5,
 			right = 5,
-			height	= 20, 
+			height	= 20,
 			max     = replayLen;
 			caption = showProgress and (frame/replayLen*100 .. "%") or " ",
 			color   = showProgress and {0.9,0.15,0.2,0.75} or  {1,1,1,0.0} ; --red, --{0.2,0.9,0.3,1}; --green
@@ -355,7 +355,7 @@ function setReplaySpeed (speed, i)
 	--doesNotExist[3] = 5
 	--and there will be no error message. However, the game will stutter for a second
 	
-	local s = Spring.GetGameSpeed()	
+	local s = Spring.GetGameSpeed()
 	--Spring.Echo ("setting speed to: " .. speed .. " current is " .. s)
 	if (speed > s) then	--speedup
 		Spring.SendCommands ("setminspeed " .. speed)
@@ -378,8 +378,8 @@ function setReplaySpeed (speed, i)
 			Spring.SendCommands ("setmaxspeed " .. 10.0)
 			-- Spring.SendCommands ("slowdown")
 			-- i=i+1
-		-- end	
-	end	
+		-- end
+	end
 	--Spring.SendCommands ("setmaxpeed " .. speed)
 	window.currSpeed = i
 end
@@ -393,7 +393,7 @@ function widget:Update(dt)
 	-- 		wantedSpeed = nil
 	-- 	end
 	-- end
-	if skipped and demoStarted then --do not do "skip 1" at or before demoStart because,it Hung Spring/broke the command respectively. 
+	if skipped and demoStarted then --do not do "skip 1" at or before demoStart because,it Hung Spring/broke the command respectively.
 		if lastSkippedTime > 1.5 then
 			Spring.SendCommands("skip 1")
 			lastSkippedTime = 0
@@ -449,7 +449,7 @@ end
 
 function skipPreGameChatter ()
 	Spring.Echo("Skipping pregame chatter")
-	if (demoStarted) then 
+	if (demoStarted) then
 		Spring.SendCommands("skip 1")
 	end
 	skipped = true

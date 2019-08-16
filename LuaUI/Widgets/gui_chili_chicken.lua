@@ -8,7 +8,7 @@ function widget:GetInfo()
 		author    = "quantum, KingRaptor",
 		date      = "May 04, 2008",
 		license   = "GNU GPL, v2 or later",
-		layer     = -9, 
+		layer     = -9,
 		enabled   = true  --  loaded by default?
 	}
 end
@@ -157,7 +157,7 @@ end
 local function GetColor(percent)
 	local midpt = (percent > 50)
 	local r, g
-	if midpt then 
+	if midpt then
 		r = 255
 		g = math.floor(255*(100-percent)/50)
 	else
@@ -336,10 +336,10 @@ function ChickenEvent(chickenEventArgs)
 		end
 		waveMessage    = {}
 		waveCount      = waveCount + 1
-		waveMessage[1] = "Wave "..waveCount 
+		waveMessage[1] = "Wave "..waveCount
 		if (chicken1Name and chicken2Name and chicken1Name == chicken2Name) then
 			if (chicken2Number and chicken2Number) then
-				waveMessage[2] = 
+				waveMessage[2] =
 					MakeLine(chicken1Name, (chicken2Number+chicken1Number)*gameInfo[roostName .. 'Count'])
 			else
 				waveMessage[2] =
@@ -353,7 +353,7 @@ function ChickenEvent(chickenEventArgs)
 		waveTime = Spring.GetTimer()
 		
 	-- table.foreachi(waveMessage, print)
-	-- local t = Spring.GetGameSeconds() 
+	-- local t = Spring.GetGameSeconds()
 	-- print(string.format("time %d:%d", t/60, t%60))
 	-- print""
 	elseif (chickenEventArgs.type == "burrowSpawn") then
@@ -420,7 +420,7 @@ function widget:Initialize()
 		color = {0, 0, 0, 0},
 		width = 270;
 		height = 189;
-		right = 0; 
+		right = 0;
 		y = 100,
 		dockable = true;
 		draggable = false,
@@ -495,7 +495,7 @@ function widget:Initialize()
 		height = labelHeight,
 		width = "100%";
 		font = {font = panelFont, size = fontSize, shadow = true, outline = true,},
-	}	
+	}
 	label_tech = Label:New{
 		parent = labelStack,
 		autosize=false;

@@ -27,7 +27,7 @@ local function CapCase(str)
 	str = str:gsub( '_', ' ' )
 	str = str:sub(1,1):upper() .. str:sub(2)
 	
-	str = str:gsub( ' (.)', 
+	str = str:gsub( ' (.)',
 		function(x) return (' ' .. x):upper(); end
 		)
 	return str
@@ -40,7 +40,7 @@ local function AddHotkeyOptions()
 	local options_order_tmp_cmd = {}
 	local options_order_tmp_cmd_instant = {}
 	local options_order_tmp_states = {}
-	for cmdname, cmdData in pairs(custom_cmd_actions) do 
+	for cmdname, cmdData in pairs(custom_cmd_actions) do
 		local number = cmdData.cmdType
 		
 		local cmdnamel = cmdname:lower()
@@ -95,10 +95,10 @@ AddHotkeyOptions()
 -- Command List Processing
 
 local function CopyTable(outtable,intable)
-	for i,v in pairs(intable) do 
+	for i,v in pairs(intable) do
 		if (type(v)=='table') then
-			if (type(outtable[i])~='table') then 
-				outtable[i] = {} 
+			if (type(outtable[i])~='table') then
+				outtable[i] = {}
 			end
 			CopyTable(outtable[i],v)
 		else
@@ -117,7 +117,7 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 	
 	local cnt = 0
 	
-	local AddCommand = function(command) 
+	local AddCommand = function(command)
 		local cc = {}
 		CopyTable(cc,command )
 		cnt = cnt + 1
@@ -138,7 +138,7 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 		cc.params    = nil
 		
 		customCmds[#customCmds+1] = cc
-	end 
+	end
 	
 	
 	--// preprocess the Custom Commands
@@ -150,7 +150,7 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 		return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {} --prevent CommandChanged() from being called twice when deselecting all units  (copied from ca_layout.lua)
 	end
 	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
-end 
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -167,7 +167,7 @@ end
 --			Spring.Echo("action", commands[i].action)
 --		end
 --	end
---	
+--
 --	for i = 1, #customCommands do
 --		if customCommands[i].action and not seenAction[customCommands[i].action] then
 --			seenAction[customCommands[i].action] = true

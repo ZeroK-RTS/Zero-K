@@ -14,7 +14,7 @@ function widget:GetInfo()
 end
 
 --[[
-Changelog: 
+Changelog:
 1.2   CarRepairer: Added an actual HelloMyNameIs nametag that is pinned to the Commander's chest!!!
 
 1.7   CarRepairer: Using Fonthandler, nametag text now works properly. Added speedups.
@@ -62,7 +62,7 @@ local GetVisibleUnits     = Spring.GetVisibleUnits
 local GetUnitDefID        = Spring.GetUnitDefID
 local GetAllUnits         = Spring.GetAllUnits
 local GetUnitHeading      = Spring.GetUnitHeading
-local IsUnitIcon 		  = Spring.IsUnitIcon 
+local IsUnitIcon 		  = Spring.IsUnitIcon
 
 local iconsize   = 10
 local iconhsize  = iconsize * 0.5
@@ -113,9 +113,9 @@ local function GetCommAttributes(unitID, unitDefID)
   local height = Spring.Utilities.GetUnitHeight(UnitDefs[unitDefID]) + heightOffset
   local pm = spGetUnitPieceMap(unitID)
   local pmt = pm["torso"]
-  if (pmt == nil) then 
+  if (pmt == nil) then
     pmt = pm["chest"]
-  end    
+  end
   return {name, {r, g, b, a}, height, pmt }
 end
 
@@ -179,7 +179,7 @@ local function DrawWorldFunc()
 		if (showStickyTags) then
 			--draw HelloMyName icon is on chest
 			for unitID, attributes in pairs(comms) do
-				if (attributes[4]) and (not IsUnitIcon(unitID)) then 
+				if (attributes[4]) and (not IsUnitIcon(unitID)) then
 					glPushMatrix()
 					glUnitMultMatrix(unitID)
 					glUnitPieceMultMatrix(unitID, attributes[4])

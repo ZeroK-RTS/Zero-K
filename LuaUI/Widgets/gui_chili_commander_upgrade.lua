@@ -88,7 +88,7 @@ local UPGRADE_CMD_DESC = {
 	tooltip = 'Upgrade Commander',
 	cursor  = 'Repair',
 	action  = 'upgradecomm',
-	params  = {}, 
+	params  = {},
 	texture = 'LuaUI/Images/commands/Bold/upgrade.png',
 }
 
@@ -105,10 +105,10 @@ local function AddNewSelectonButton(buttonIndex, moduleDefID)
 		width = BUTTON_SIZE,
 		minHeight = BUTTON_SIZE,
 		padding = {0, 0, 0, 0},
-		OnClick = { 
-			function(self) 
+		OnClick = {
+			function(self)
 				SelectNewModule(self.moduleDefID)
-			end 
+			end
 		},
 		backgroundColor = {0.5,0.5,0.5,0.1},
 		color = {1,1,1,0.1},
@@ -175,11 +175,11 @@ local function CreateModuleSelectionWindow()
 	}
 	
 	local fakeSelectionWindow = Panel:New{
-		x = 0,  
+		x = 0,
 		width = 20,
-		y = 0, 
+		y = 0,
 		height = 20,
-		padding = {0, 0, 0, 0},	
+		padding = {0, 0, 0, 0},
 		backgroundColor = {1, 1, 1, 0.8},
 		children = {selectionButtonPanel}
 	}
@@ -190,13 +190,13 @@ local function CreateModuleSelectionWindow()
 	local selectionWindowMain = Window:New{
 		name = "ModuleSelectionWindow",
 		fontsize = 20,
-		x = 200,  
+		x = 200,
 		y = minimapHeight,
 		clientWidth = 500,
 		clientHeight = 500,
 		minWidth = 0,
 		minHeight = 0,
-		padding = {0, 0, 0, 0},	
+		padding = {0, 0, 0, 0},
 		resizable = false,
 		draggable = false,
 		dockable = true,
@@ -338,7 +338,7 @@ local function GetNewReplacementSet(level, chassis, slotAllows, ignoreSlot)
 	local haveEmpty = false
 	for i = 1, #moduleDefs do
 		local data = moduleDefs[i]
-		if slotAllows[data.slotType] and (data.requireLevel or 0) <= level and 
+		if slotAllows[data.slotType] and (data.requireLevel or 0) <= level and
 				((not data.requireChassis) or data.requireChassis[chassis]) and not data.unequipable then
 			local accepted = true
 			
@@ -347,9 +347,9 @@ local function GetNewReplacementSet(level, chassis, slotAllows, ignoreSlot)
 				local foundRequirement = false
 				for j = 1, #data.requireOneOf do
 					local req = data.requireOneOf[j]
-					if (alreadyOwnedModulesByDefID[req] or 
-						(currentModulesByDefID[req] and 
-							(currentModulesBySlot[ignoreSlot] ~= req or 
+					if (alreadyOwnedModulesByDefID[req] or
+						(currentModulesByDefID[req] and
+							(currentModulesBySlot[ignoreSlot] ~= req or
 							currentModulesByDefID[req] > 1))) then
 						
 						foundRequirement = true
@@ -365,9 +365,9 @@ local function GetNewReplacementSet(level, chassis, slotAllows, ignoreSlot)
 			if accepted and data.prohibitingModules then
 				for j = 1, #data.prohibitingModules do
 					local prohibit = data.prohibitingModules[j]
-					if (alreadyOwnedModulesByDefID[prohibit] or 
-						(currentModulesByDefID[prohibit] and 
-							(currentModulesBySlot[ignoreSlot] ~= prohibit or 
+					if (alreadyOwnedModulesByDefID[prohibit] or
+						(currentModulesByDefID[prohibit] and
+							(currentModulesBySlot[ignoreSlot] ~= prohibit or
 							currentModulesByDefID[prohibit] > 1))) then
 						
 						accepted = false
@@ -385,7 +385,7 @@ local function GetNewReplacementSet(level, chassis, slotAllows, ignoreSlot)
 
 			-- Check against module limit, not counting ignored slot
 			if accepted and limit and (currentModulesByDefID[i] or alreadyOwnedModulesByDefID[i]) then
-				local count = (currentModulesByDefID[i] or 0) + (alreadyOwnedModulesByDefID[i] or 0) 
+				local count = (currentModulesByDefID[i] or 0) + (alreadyOwnedModulesByDefID[i] or 0)
 				if currentModulesBySlot[ignoreSlot] == i then
 					count = count - 1
 				end
@@ -474,7 +474,7 @@ local function AddCurrentModuleButton(slotIndex, moduleDefID)
 		right = 0,
 		minHeight = BUTTON_SIZE,
 		height = BUTTON_SIZE,
-		padding = {0, 0, 0, 0},	
+		padding = {0, 0, 0, 0},
 		backgroundColor = {0.5,0.5,0.5,0.5},
 		OnClick = {
 			function(self)
@@ -609,8 +609,8 @@ local function CreateMainWindow()
 		classname = "main_window_small_tall",
 		name = "CommanderUpgradeWindow",
 		fontsize = 20,
-		x = 0,  
-		y = minimapHeight, 
+		x = 0,
+		y = minimapHeight,
 		width = 201,
 		height = 332,
 		minWidth = 201,
@@ -640,12 +640,12 @@ local function CreateMainWindow()
 		parent = mainWindow,
 	}
 	
-	currentModuleList = StackPanel:New{  
-		x = 3,  
+	currentModuleList = StackPanel:New{
+		x = 3,
 		right = 2,
-		y = 36, 
+		y = 36,
 		bottom = 0,
-		padding = {0, 0, 0, 0},	
+		padding = {0, 0, 0, 0},
 		itemPadding = {2,2,2,2},
 		itemMargin  = {0,0,0,0},
 		backgroundColor = {1, 1, 1, 0.8},
@@ -661,7 +661,7 @@ local function CreateMainWindow()
 		bottom  = 75,
 		file ='LuaUI/images/clock.png',
 		height = 24,
-		width = 24, 
+		width = 24,
 		keepAspect = true,
 		parent = mainWindow,
 	}
@@ -683,7 +683,7 @@ local function CreateMainWindow()
 		bottom  = 75,
 		file ='LuaUI/images/costIcon.png',
 		height = 24,
-		width = 24, 
+		width = 24,
 		keepAspect = true,
 		parent = mainWindow,
 	}
@@ -706,7 +706,7 @@ local function CreateMainWindow()
 		bottom = 5,
 		width = 55,
 		height = 55,
-		padding = {0, 0, 0, 0},	
+		padding = {0, 0, 0, 0},
 		backgroundColor = {0.5,0.5,0.5,0.5},
 		tooltip = "Start upgrade",
 		OnClick = {
@@ -725,7 +725,7 @@ local function CreateMainWindow()
 		bottom = 5,
 		width = 55,
 		height = 55,
-		padding = {0, 0, 0, 0},	
+		padding = {0, 0, 0, 0},
 		backgroundColor = {0.5,0.5,0.5,0.5},
 		tooltip = "View current modules",
 		OnClick = {
@@ -742,7 +742,7 @@ local function CreateMainWindow()
 		bottom = 5,
 		width = 55,
 		height = 55,
-		padding = {0, 0, 0, 0},	
+		padding = {0, 0, 0, 0},
 		backgroundColor = {0.5,0.5,0.5,0.5},
 		tooltip = "Cancel module selection",
 		OnClick = {
@@ -1066,7 +1066,7 @@ function widget:CommandsChanged()
 				tooltip = 'Upgrade Commander',
 				cursor  = 'Repair',
 				action  = 'upgradecomm',
-				params  = {}, 
+				params  = {},
 				texture = 'LuaUI/Images/commands/Bold/upgrade.png',
 			}
 		end

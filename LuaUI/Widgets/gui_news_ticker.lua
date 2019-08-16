@@ -316,7 +316,7 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 			airSpotted = true
 		elseif unitDef.name == "staticnuke" and not nukeSpotted then
 			AddEvent("Enemy nuke silo spotted", nil, colorRed, "enemyNukeSpotted", pos)
-			nukeSpotted = true			
+			nukeSpotted = true
 		end
 	end
 end
@@ -461,7 +461,7 @@ function widget:Initialize()
 				WG.crude.OpenPath(options_path)
 				WG.crude.ShowMenu() --make epic Chili menu appear.
 				return true
-				end }, 
+				end },
 	}
 	
 	SetTickerVisiblity = function(bool)

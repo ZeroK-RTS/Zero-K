@@ -39,7 +39,7 @@ function Spring.Utilities.GiveClampedOrderToUnit(unitID, cmdID, params, options,
 	if cmdID == CMD_INSERT then
 		local x, z = Spring.Utilities.ClampPosition(params[4], params[6])
 		spGiveOrderToUnit(unitID, cmdID, {params[1], params[2], params[3], x, params[5], z}, options)
-		return x, params[5], z 
+		return x, params[5], z
 	end
 	local x, z = Spring.Utilities.ClampPosition(params[1], params[3])
 	spGiveOrderToUnit(unitID, cmdID, {x, params[2], z}, options)

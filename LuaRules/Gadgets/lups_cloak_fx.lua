@@ -241,7 +241,7 @@ local function ReinitializeUnitFX()
   for _,unitFxIDs in pairs(particleIDs) do
     for i=1,#unitFxIDs do
       Lups.RemoveParticles(unitFxIDs[i])
-    end    
+    end
   end
   particleIDs = {}
 
@@ -263,7 +263,7 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:Update()
-  if (Spring.GetGameFrame()<1) then 
+  if (Spring.GetGameFrame()<1) then
     return
   end
 
@@ -288,7 +288,7 @@ function gadget:Shutdown()
     for _,unitFxIDs in pairs(particleIDs) do
       for i=1,#unitFxIDs do
 		Lups.RemoveParticles(unitFxIDs[i])
-      end    
+      end
     end
     particleIDs = {}
   end

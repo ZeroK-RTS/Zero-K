@@ -166,7 +166,7 @@ function widget:GameStart()
   gamestart = true
 end
 
-local function CreateLists() 
+local function CreateLists()
   circleList = glCreateList(function()
     glBeginEnd(GL_TRIANGLE_FAN, function()
       for i = 0, circleDivs - 1 do
@@ -196,17 +196,17 @@ local function CreateLists()
   --end)
   --rectList = glCreateList(function()
   --  glBeginEnd(GL_QUADS, function()
-  --    --glTexCoord(0, 0); 
+  --    --glTexCoord(0, 0);
   --    glVertex(-1, -1, 0)
-  --    --glTexCoord(1, 0); 
+  --    --glTexCoord(1, 0);
   --    glVertex( 1, -1, 0)
-  --    --glTexCoord(1, 1); 
+  --    --glTexCoord(1, 1);
   --    glVertex( 1,  1, 0)
-  --    --glTexCoord(0, 1); 
+  --    --glTexCoord(0, 1);
   --    glVertex(-1,  1, 0)
   --  end)
   --end)
-end 
+end
 
 function widget:Initialize()
 
@@ -254,7 +254,7 @@ function widget:Update(dt)
       if (v > limit) then
         d.v = v
       else
-        if (p > limit) then 
+        if (p > limit) then
           d.v = 0
         else
           damageMap[unitID] = nil
@@ -264,7 +264,7 @@ function widget:Update(dt)
       if (p > 1) then
         d.p = p
       else
-        if (v > 1) then 
+        if (v > 1) then
           d.p = 0
         else
           damageMap[unitID] = nil
@@ -349,10 +349,10 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
   -- scale the damage value
   if (paralyzer) then
     damage = (paraHealthScale * damage) +
-             (paraFracScale   * (damage / ud.health)) 
+             (paraFracScale   * (damage / ud.health))
   else
     damage = (healthScale * damage) +
-             (fracScale   * (damage / ud.health)) 
+             (fracScale   * (damage / ud.health))
   end
 
 

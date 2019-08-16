@@ -109,7 +109,7 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	return wantedWeaponList
 end
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                             weaponID, attackerID, attackerDefID, attackerTeam, projectileID)
 	if weaponID and noFFWeaponDefs[weaponID] then
 		attackerTeam = attackerTeam or haxProjectiles[projectileID]

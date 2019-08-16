@@ -9,7 +9,7 @@ Label = Control:Inherit{
   padding = {0,0,0,0},
 
   autosize = true,
-  autoObeyLineHeight = true, --// (needs autosize) if true, autosize will obey the lineHeight (-> texts with the same line count will have the same height) 
+  autoObeyLineHeight = true, --// (needs autosize) if true, autosize will obey the lineHeight (-> texts with the same line count will have the same height)
 
   align    = "left",
   valign   = "linecenter", --// usefull too "ascender"

@@ -1,8 +1,8 @@
-local base = piece 'base' 
-local body = piece 'body' 
-local barrel = piece 'barrel' 
-local turret = piece 'turret' 
-local flare = piece 'flare' 
+local base = piece 'base'
+local body = piece 'body'
+local barrel = piece 'barrel'
+local turret = piece 'turret'
+local flare = piece 'flare'
 --linear constant 163840
 
 include "constants.lua"
@@ -14,8 +14,8 @@ local SIG_AIM = 2
 
 local function RestoreAfterDelay()
 	Sleep(5000)
-	Turn(barrel, x_axis, 0, math.rad(10)) 
-	Turn(turret, y_axis, 0, math.rad(10)) 
+	Turn(barrel, x_axis, 0, math.rad(10))
+	Turn(turret, y_axis, 0, math.rad(10))
 end
 
 local stuns = {false, false, false}

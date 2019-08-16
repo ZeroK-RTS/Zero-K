@@ -29,7 +29,7 @@ end
 local start = false  --reclaim area cylinder drawing has been started
 local metal = 0  --metal count from features in cylinder
 local energy = 0  --energy count from features in cylinder
-local nonground = "" --if reclaim order done with right click on a feature or unit 
+local nonground = "" --if reclaim order done with right click on a feature or unit
 local rangestart = {}  --counting start center
 local rangestartinminimap = false --both start and end need to be equaly checked
 local rangeend = {}  --counting radius end point
@@ -89,7 +89,7 @@ function widget:DrawScreen()
 	else
 		b1was = false
 		rangestart = {0, _,0}
-	end 
+	end
 	--bit more precise showing when mouse is moved by 4 pixels (start)
 	if (b1 and (rangestart ~= nil) and (cmd == CMD.RECLAIM) and (start == false)) or ((nonground == "Reclaim") and (rangestart ~= nil) and (start == false) and (b2)) then
 		xend, yend = x,y
@@ -132,7 +132,7 @@ function widget:DrawScreen()
 			local udx, udy = (ux - rangestart[1]), (uy - rangestart[3])
 			udist = math.sqrt((udx * udx) + (udy * udy))
 			if (udist < dist) then
-				local fm,_,fe	= Spring.GetFeatureResources(unit) 
+				local fm,_,fe	= Spring.GetFeatureResources(unit)
 				metal = metal + fm
 				energy = energy + fe
 			end

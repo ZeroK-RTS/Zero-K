@@ -12,7 +12,7 @@ end
 
 -------------------------------------------------------------
 -------------------------------------------------------------
-if not (gadgetHandler:IsSyncedCode()) then 
+if not (gadgetHandler:IsSyncedCode()) then
 	return false
 end
 -------------------------------------------------------------
@@ -58,7 +58,7 @@ end
 -- Debug
 
 local function ToggleReaimTime(cmd, line, words, player)
-	if not Spring.IsCheatingEnabled() then 
+	if not Spring.IsCheatingEnabled() then
 		return
 	end
 	

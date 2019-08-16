@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 --- DetachableTabPanel module (based on TabPanel)
 
@@ -23,7 +23,7 @@ DetachableTabPanel = LayoutPanel:Inherit{
 local this = DetachableTabPanel
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 function DetachableTabPanel:New(obj)
 	obj = inherited.New(self, obj)
@@ -112,7 +112,7 @@ function DetachableTabPanel:GetTab(tabname)
 	return self.tabIndexMapping[tabname]
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function DetachableTabPanel:ChangeTab(tabname)
 	self:CallListeners(self.OnTabClick, tabname)
@@ -130,4 +130,4 @@ function DetachableTabPanel:ChangeTab(tabname)
 	self:CallListeners(self.OnTabChange, tabname)
 end
 
---// ============================================================================= 
+--// =============================================================================

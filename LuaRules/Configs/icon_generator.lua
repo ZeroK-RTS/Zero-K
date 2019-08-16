@@ -200,7 +200,7 @@ unitConfigs = {
     unfold = true,
     attack = true,
     wait   = 120,
-   },  
+   },
   [UnitDefNames.turretgauss.id] = {
     unfold = true,
     attack = true,
@@ -255,7 +255,7 @@ unitConfigs = {
 
   [UnitDefNames.chicken_dodo.id] = {
     border = defaults.border,
-  }, 
+  },
 
   [UnitDefNames.chickenbroodqueen.id] = {
     rot    = 29,
@@ -278,17 +278,17 @@ unitConfigs = {
   [UnitDefNames.nebula.id] = {
     rot    = 28,
     angle  = 10,
-  },  
+  },
   [UnitDefNames.turretaaheavy.id] = {
     rot    = 30,
     angle  = 30,
   },
   [UnitDefNames.spiderassault.id] = {
     unfold = true,
-  },  
+  },
   [UnitDefNames.amphlaunch.id] = {
     unfold = true,
-  },  
+  },
   [UnitDefNames.spidercon.id] = {
     scale    = 3,
     attempts = 10,
@@ -303,7 +303,7 @@ unitConfigs = {
   },
   [UnitDefNames.zenith.id] = {
     wait   = 50,
-  },  
+  },
   [UnitDefNames.fakeunit.id] = {
     empty  = true,
   },

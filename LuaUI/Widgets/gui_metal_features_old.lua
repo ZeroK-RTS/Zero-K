@@ -57,8 +57,8 @@ options = {
 	intensity = {
 		name = 'Highlighted Reclaim Brightness',
 		desc = "Increase or decrease visibility of effect",
-		type = "number", 
-		value = 100, 
+		type = "number",
+		value = 100,
 		min = 20,
 		max = 100,
 		step = 20,
@@ -75,8 +75,8 @@ options = {
 	minmetal = {
 		name = 'Minimum Reclaim To Highlight',
 		desc = "Metal below this amount will not be highlighted",
-		type = "number", 
-		value = 1, 
+		type = "number",
+		value = 1,
 		min = 1,
 		max = 200,
 		step = 1,
@@ -106,12 +106,12 @@ local function DrawWorldFunc()
   end
 
   -- ways to bypass heavy resource load in economy overlay
-  if (pregame and options.pregamehighlight.value) or hilite 
+  if (pregame and options.pregamehighlight.value) or hilite
     or (options.showhighlight.value == 'always')
     or (options.showhighlight.value == 'withecon' and WG.showeco)
     or (options.showhighlight.value == "constructors" and conSelected)
     or (options.showhighlight.value == 'conorecon' and (conSelected or WG.showeco))
-    or (options.showhighlight.value == 'conandecon' and (conSelected and WG.showeco)) then 
+    or (options.showhighlight.value == 'conandecon' and (conSelected and WG.showeco)) then
 
     gl.PolygonOffset(-2, -2)
     gl.Blending(GL.SRC_ALPHA, GL.ONE)
@@ -157,8 +157,8 @@ end
 function widget:SelectionChanged(units)
 	if (WG.selectionEntirelyCons) then
 		conSelected = true
-	else	
-		conSelected = false  
+	else
+		conSelected = false
 	end
 end
 

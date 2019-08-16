@@ -33,7 +33,7 @@ local function MakeWords(line)
   local words = {}
   for w in line:gmatch("[^%s]+") do
     table.insert(words, w)
-  end   
+  end
   return words
 end
 

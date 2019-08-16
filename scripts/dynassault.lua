@@ -11,23 +11,23 @@ local pieceMap = Spring.GetUnitPieceMap(unitID)
 local HAS_GATTLING = pieceMap.rgattlingflare and true or false
 local HAS_BONUS_CANNON = pieceMap.bonuscannonflare and true or false
 
-local torso = piece 'torso' 
+local torso = piece 'torso'
 
-local rcannon_flare= HAS_GATTLING and piece('rgattlingflare') or piece('rcannon_flare') 
+local rcannon_flare= HAS_GATTLING and piece('rgattlingflare') or piece('rcannon_flare')
 local barrels = HAS_GATTLING and piece 'barrels' or nil
 local lcannon_flare = HAS_BONUS_CANNON and piece('bonuscannonflare') or piece('lnanoflare')
-local lnanoflare = piece 'lnanoflare' 
-local lnanohand = piece 'lnanohand' 
-local larm = piece 'larm' 
-local rarm = piece 'rarm' 
-local pelvis = piece 'pelvis' 
-local rupleg = piece 'rupleg' 
-local lupleg = piece 'lupleg' 
-local rhand = piece 'rhand' 
-local lleg = piece 'lleg' 
-local lfoot = piece 'lfoot' 
-local rleg = piece 'rleg' 
-local rfoot = piece 'rfoot' 
+local lnanoflare = piece 'lnanoflare'
+local lnanohand = piece 'lnanohand'
+local larm = piece 'larm'
+local rarm = piece 'rarm'
+local pelvis = piece 'pelvis'
+local rupleg = piece 'rupleg'
+local lupleg = piece 'lupleg'
+local rhand = piece 'rhand'
+local lleg = piece 'lleg'
+local lfoot = piece 'lfoot'
+local rleg = piece 'rleg'
+local rfoot = piece 'rfoot'
 
 local smokePiece = {torso}
 local nanoPieces = {lnanoflare}
@@ -147,8 +147,8 @@ local function Walk()
 		walkCycle = 3 - walkCycle
 		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*dyncomm.GetPace()
 		
-		local left = walkAngle[walkCycle] 
-		local right = walkAngle[3 - walkCycle] 
+		local left = walkAngle[walkCycle]
+		local right = walkAngle[3 - walkCycle]
 		-----------------------------------------------------------------------------------
 		
 		Turn(lupleg, x_axis,  left[1].hip[1],  left[1].hip[2] * speedMult)
@@ -217,12 +217,12 @@ function script.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
-function script.StartMoving() 
+function script.StartMoving()
 	isMoving = true
 	StartThread(Walk)
 end
 
-function script.StopMoving() 
+function script.StopMoving()
 	isMoving = false
 	StartThread(RestoreLegs)
 end
@@ -318,9 +318,9 @@ end
 
 function script.AimFromWeapon(num)
 	if dyncomm.IsManualFire(num) then
-		if dyncomm.GetWeapon(num) == 1 then 
+		if dyncomm.GetWeapon(num) == 1 then
 			return rcannon_flare
-		elseif dyncomm.GetWeapon(num) == 2 then 
+		elseif dyncomm.GetWeapon(num) == 2 then
 			return lcannon_flare
 		end
 	end
@@ -328,9 +328,9 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	if dyncomm.GetWeapon(num) == 1 then 
+	if dyncomm.GetWeapon(num) == 1 then
 		return rcannon_flare
-	elseif dyncomm.GetWeapon(num) == 2 then 
+	elseif dyncomm.GetWeapon(num) == 2 then
 		return lcannon_flare
 	end
 	return pelvis

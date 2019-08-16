@@ -2,7 +2,7 @@
 remaining issues:
 - some things that should keep or remove target don't: building things, cloaking?, ... setting target when attacking would fix part of this
 - doesn't work with queues, needs synched
-- empty area commands trigger can trigger set/remove, but shouldnt. (because this runs in CommandNotify(), where these arent filtered out yet) 
+- empty area commands trigger can trigger set/remove, but shouldnt. (because this runs in CommandNotify(), where these arent filtered out yet)
 --]]
 
 function widget:GetInfo()

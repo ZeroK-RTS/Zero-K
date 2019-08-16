@@ -79,7 +79,7 @@ function widget:Update(s)
 	end
 end
 
-function CreateWindow()	
+function CreateWindow()
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 
 	fake_window = Chili.Window:New {

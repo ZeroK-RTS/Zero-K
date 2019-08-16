@@ -46,10 +46,10 @@ unitCategories.basicEnergyBuildings = {
 }
 
 unitCategories.advancedEnergyBuildings = {
-	energyheavygeo  = true, 
-	energyfusion = true, 
-	energysingu  = true, 
-	energygeo    = true, 
+	energyheavygeo  = true,
+	energyfusion = true,
+	energysingu  = true,
+	energygeo    = true,
 }
 
 unitCategories.energyBuildings = Spring.Utilities.MergeTable(unitCategories.basicEnergyBuildings, unitCategories.advancedEnergyBuildings)
@@ -61,7 +61,7 @@ unitCategories.lightGroundTurrets = {
 	turretmissile      = true,
 	turrettorp = true,
 	turretimpulse    = true,
-}              
+}
 
 unitCategories.heavyGroundTurrets = {
 	turretantiheavy  = true,
@@ -208,7 +208,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 end
 
-function widget:Initialize() 
+function widget:Initialize()
 	WG.Analytics = Analytics
 	Analytics.SendOnetimeEvent("begin_load")
 end

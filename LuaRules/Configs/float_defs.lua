@@ -14,7 +14,7 @@
 -- stopSpeedLeeway:     Below this speed the unit can snap to surface
 -- stopPositionLeeway:  Below this distance from the surface the unit can stnap to surface.
 
--- PHYSIC UPDATE (4 April 2013): 
+-- PHYSIC UPDATE (4 April 2013):
 -- as in ZK version >= r9871 (>1.1.3.6) all "Drag" related constant now mean "dragCoefficient" from Physic's drag equation ( this equation here: http://en.wikipedia.org/wiki/Drag_equation ),
 -- from this physic equation, the negative acceleration (the resistance) is defined by :  resistiveAccel = 0.5*(currentVelocity*currentVelocity*dragCoefficient)
 -- this mean faster unit has more drag, and bigger "Drag" cause more drag, while smaller "Drag" lead to less drag, while 0 "Drag" lead to 0 drag (and 0 drag will lead to infinite speed).
@@ -37,7 +37,7 @@ local floatDefs = {
 		waterHitDrag = 0.5,
 		floatPoint = -20,
 		depthRequirement = -30,
-		stopSpeedLeeway = 0.05, 
+		stopSpeedLeeway = 0.05,
 		stopPositionLeeway = 0.1,
 	},
 
@@ -55,9 +55,9 @@ local floatDefs = {
 		floatPoint = -12,
 		depthRequirement = -30,
 		sinkTankRequirement = false,
-		stopSpeedLeeway = 0.05, 
+		stopSpeedLeeway = 0.05,
 		stopPositionLeeway = 0.1,
-	},	
+	},
 		
 	-- This unit expels water with an air tank to float. It results in high rise
 	-- acceleration with low drag. To sink the tank must be filled with water

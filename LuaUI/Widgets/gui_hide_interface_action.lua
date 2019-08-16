@@ -1,4 +1,4 @@
-function widget:GetInfo() 
+function widget:GetInfo()
 	return {
 		name        = "Hide Interface and Mouse Cursor",
 		desc        = "Implements a hide interface action as well as mouse cursor sets.",
@@ -8,7 +8,7 @@ function widget:GetInfo()
 		layer       = -100000,
 		enabled     = true,
 		alwaysStart = true,
-	} 
+	}
 end
 
 include("keysym.h.lua")

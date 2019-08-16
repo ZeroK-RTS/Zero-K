@@ -368,7 +368,7 @@ local function DrawVisibleUnits(overrideEngineDraw, perUnitStencil)
 	end
 
 	local visibleUnits = GetVisibleUnits(ALL_UNITS,nil,false)
-	for i = 1, #visibleUnits do  
+	for i = 1, #visibleUnits do
 		if checknow then
 			local unitProgress = select(5, GetUnitHealth(visibleUnits[i]))
 			if unitProgress == nil or unitProgress >= 1 then
@@ -393,7 +393,7 @@ local function DrawVisibleUnits(overrideEngineDraw, perUnitStencil)
 			glUnit(visibleUnits[i],overrideEngineDraw)
 			if perUnitStencil then
 				gl.DepthMask(false)
-				gl.StencilFunc(GL.ALWAYS, 0, 0xFF); 
+				gl.StencilFunc(GL.ALWAYS, 0, 0xFF);
 				gl.StencilOp(GL.REPLACE, GL.REPLACE, GL.REPLACE)
 				gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
 				gl.Unit(visibleUnits[i],true)
@@ -413,7 +413,7 @@ local MyDrawVisibleUnits = function()
 end
 
 --This is expected to be a shader-less fallback for low-end machines, though it also works for refraction pass
-local function DrawVisibleUnitsLines(underwater, frontLines) 
+local function DrawVisibleUnitsLines(underwater, frontLines)
 	gl.DepthTest(GL.LESS)
 	if underwater then
 		gl.LineWidth(3.0 * thickness * thicknessMult)
@@ -507,7 +507,7 @@ end
 
 function widget:DrawWorldRefraction()
 	DrawVisibleUnitsLines(true)
-end 
+end
 
 function widget:UnitCreated(unitID)
 	unbuiltUnits[unitID] = true

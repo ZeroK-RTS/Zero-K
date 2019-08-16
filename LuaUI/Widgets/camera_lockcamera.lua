@@ -141,7 +141,7 @@ local GL_LINE_STRIP = GL.LINE_STRIP
 
 local vfsPackU8 = VFS.PackU8
 local vfsPackF32 = VFS.PackF32
-local vfsUnpackU8 = VFS.UnpackU8 
+local vfsUnpackU8 = VFS.UnpackU8
 local vfsUnpackF32 = VFS.UnpackF32
 
 ------------------------------------------------
@@ -346,8 +346,8 @@ local function PacketToCameraState(p)
 	local mode = CustomUnpackU8(p, offset + 1)
 	local name = CAMERA_NAMES[cameraID]
 	local stateFormat = CAMERA_STATE_FORMATS[name]
-	if not (cameraID and mode and name and stateFormat) then 
-		return nil 
+	if not (cameraID and mode and name and stateFormat) then
+		return nil
 	end
 	
 	local result = {
@@ -391,7 +391,7 @@ local function GetComponent(tx, ty)
 	if tx < 0 or tx > 8 or ty < 0 then return nil end
 	if ty < 1 then
 		return "title"
-	elseif not show then 
+	elseif not show then
 		return nil
 	elseif ty < 2 then
 		if tx < 4 then
@@ -676,7 +676,7 @@ function widget:RecvLuaMsg(msg, playerID)
 	
 	lastBroadcasts[playerID] = {totalTime, cameraState}
 	
-	if (playerID == lockPlayerID) then 
+	if (playerID == lockPlayerID) then
 		 SetCameraState(cameraState, transitionTime)
 	end
 	
@@ -745,8 +745,8 @@ function widget:Update(dt)
 	end
 	
 	if (isSpectator and not broadcastSpecsAsSpec)
-			or (not isSpectator and not broadcastAlliesAsPlayer and not broadcastSpecsAsPlayer) then 
-		return 
+			or (not isSpectator and not broadcastAlliesAsPlayer and not broadcastSpecsAsPlayer) then
+		return
 	end
 	totalTime = totalTime + dt
 	timeSinceBroadcast = timeSinceBroadcast + dt

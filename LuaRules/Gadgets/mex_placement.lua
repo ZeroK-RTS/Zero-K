@@ -3,7 +3,7 @@ function gadget:GetInfo()
   return {
     name      = "Mex Placement",
     desc      = "Controls mex placement and income",
-    author    = "Google Frog", -- 
+    author    = "Google Frog", --
     date      = "21 April 2012",
     license   = "GNU GPL, v2 or later",
     layer     = -10,
@@ -24,7 +24,7 @@ local cmdMex = {
 	name    = 'Mex',
 	cursor  = 'Mex',
 	action  = 'areamex',
-	params  = {}, 
+	params  = {},
 }
 
 ----------------------------------------------------------------------------------------------
@@ -37,8 +37,8 @@ if gadgetHandler:IsSyncedCode() then
 local mexDefID = UnitDefNames["staticmex"].id
 
 local canMex = {}
-for udid, ud in ipairs(UnitDefs) do 
-	for i, option in ipairs(ud.buildOptions) do 
+for udid, ud in ipairs(UnitDefs) do
+	for i, option in ipairs(ud.buildOptions) do
 		if mexDefID == option then
 			canMex[udid] = true
 			--Spring.Echo(ud.name)
@@ -65,7 +65,7 @@ local MEX_DISTANCE = 50
 
 local sameOrder = {}
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[-mexDefID] = true, [CMD.INSERT] = true}
 end
 
@@ -88,7 +88,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				return true
 			else
 				local _,_,_,isAI = Spring.GetTeamInfo(teamID, false)
-				if not isAI then 
+				if not isAI then
 					return false;
 				else
 					local nearestspot, dist, spotindex = GetClosestMetalSpot(x, z)
@@ -174,7 +174,7 @@ end
 function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
 	local bestSpot
 	local bestDist = math.huge
-	local bestIndex 
+	local bestIndex
 	for i = 1, #metalSpots do
 		local spot = metalSpots[i]
 		local dx, dz = x - spot.x, z - spot.z
@@ -201,7 +201,7 @@ else --UNSYNCED--
 ----------------------------------------------------------------------------------------------
 
 function gadget:Initialize()
-	--Note: IMO we must *allow* LUAUI to draw this command. We already used to seeing skirm command, and it is informative to players. 
+	--Note: IMO we must *allow* LUAUI to draw this command. We already used to seeing skirm command, and it is informative to players.
 	--Also, its informative to widget coder and allow player to decide when to manually micro units (like seeing unit stuck on cliff with jink command)
 	--gadgetHandler:RegisterCMDID(CMD_RAW_MOVE)
 	--Spring.SetCustomCommandDrawData(CMD_RAW_MOVE, "RawMove", {0.5, 1.0, 0.5, 0.7}) -- "" mean there's no MOVE cursor if the command is drawn.

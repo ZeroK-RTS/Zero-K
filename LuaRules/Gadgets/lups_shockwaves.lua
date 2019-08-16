@@ -48,7 +48,7 @@ for i = 1, #WeaponDefs do
 			end
 		elseif normalShockwave then
 			hasShockwave[wd.id] = {
-				life = 23*life, 
+				life = 23*life,
 				speed = speed,
 				growth = (wd.damageAreaOfEffect*1.1)/20*speed
 			}

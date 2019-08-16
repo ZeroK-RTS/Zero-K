@@ -3,21 +3,21 @@ include "bombers.lua"
 include "fixedwingTakeOff.lua"
 
 
-local flare1 = piece 'flare1' 
-local flare2 = piece 'flare2' 
-local base = piece 'base' 
-local wing1 = piece 'wing1' 
-local wing2 = piece 'wing2' 
-local rearthrust = piece 'rearthrust' 
-local wingthrust1 = piece 'wingthrust1' 
-local wingthrust2 = piece 'wingthrust2' 
-local thrust1 = piece 'thrust1' 
-local thrust2 = piece 'thrust2' 
-local drop = piece 'drop' 
-local emit1 = piece 'emit1' 
-local emit2 = piece 'emit2' 
-local emit3 = piece 'emit3' 
-local emit4 = piece 'emit4' 
+local flare1 = piece 'flare1'
+local flare2 = piece 'flare2'
+local base = piece 'base'
+local wing1 = piece 'wing1'
+local wing2 = piece 'wing2'
+local rearthrust = piece 'rearthrust'
+local wingthrust1 = piece 'wingthrust1'
+local wingthrust2 = piece 'wingthrust2'
+local thrust1 = piece 'thrust1'
+local thrust2 = piece 'thrust2'
+local drop = piece 'drop'
+local emit1 = piece 'emit1'
+local emit2 = piece 'emit2'
+local emit3 = piece 'emit3'
+local emit4 = piece 'emit4'
 
 local smokePiece = {base}
 

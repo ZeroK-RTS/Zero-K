@@ -106,19 +106,19 @@ end
 
 options_path = 'Settings/Unit Behaviour/Default States'
 options_order = {
-	'inheritcontrol', 'presetlabel', 
-	'resetMoveStates', 'holdPosition', 
-	'skirmHoldPosition', 'artyHoldPosition', 'aaHoldPosition', 
+	'inheritcontrol', 'presetlabel',
+	'resetMoveStates', 'holdPosition',
+	'skirmHoldPosition', 'artyHoldPosition', 'aaHoldPosition',
 	'enableTacticalAI', 'disableTacticalAI',
-	'enableAutoAssist', 'disableAutoAssist', 
+	'enableAutoAssist', 'disableAutoAssist',
 	'enableAutoCallTransport', 'disableAutoCallTransport',
 	'setRanksToDefault', 'setRanksToThree',
-	'categorieslabel', 
-	'commander_label', 
-	'commander_firestate0', 
-	'commander_movestate1', 
-	'commander_constructor_buildpriority', 
-	'commander_misc_priority', 
+	'categorieslabel',
+	'commander_label',
+	'commander_firestate0',
+	'commander_movestate1',
+	'commander_constructor_buildpriority',
+	'commander_misc_priority',
 	'commander_retreat',
 	'commander_auto_call_transport_2',
 	'commander_selection_rank',
@@ -126,9 +126,9 @@ options_order = {
 
 options = {
 	inheritcontrol = {
-		name = "Inherit Factory Control Group", 
-		type = 'bool', 
-		value = false, 
+		name = "Inherit Factory Control Group",
+		type = 'bool',
+		value = false,
 		path = "Settings/Interface/Control Groups",
 	},
 

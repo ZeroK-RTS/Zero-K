@@ -9,7 +9,7 @@ function gadget:GetInfo()
       date      = "15 Dec 2010",
       license   = "GNU GPL, v2 or later",
       layer     = 0,
-      enabled   = true  
+      enabled   = true
    }
 end
 
@@ -68,11 +68,11 @@ local function ToggleCommand(unitID, cmdParams, unitDefID)
 	
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_AIR_STRAFE] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
@@ -82,7 +82,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return true  -- command was not used
 	end
 	if spMoveCtrlGetTag(unitID) == nil then
-		ToggleCommand(unitID, cmdParams, unitDefID)  
+		ToggleCommand(unitID, cmdParams, unitDefID)
 	end
 	return false  -- command was used
 end
@@ -102,7 +102,7 @@ function gadget:Initialize()
 	end
 end
 
-function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
+function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
     local ud = UnitDefs[unitDefID]
     if ud and strafeUnitDefs[unitDefID] then
         unitState[unitID] = {active = ud.airStrafe}
@@ -113,6 +113,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
     end
 end
 
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam) 
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
     unitState[unitID] = nil
 end

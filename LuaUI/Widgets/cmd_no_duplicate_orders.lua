@@ -36,15 +36,15 @@ local GetUnitHealth    = Spring.GetUnitHealth
 local buildList = {}
 
 function widget:Initialize()
-  if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then 
-	widgetHandler:RemoveWidget() 
+  if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
+	widgetHandler:RemoveWidget()
   end
   local myTeam = Spring.GetMyTeamID()
   local units = Spring.GetTeamUnits(myTeam)
   for i=1,#units do
     local unitID = units[i]
     local buildProgress = select(5, GetUnitHealth(unitID))
-    if (buildProgress < 1) then widget:UnitCreated(unitID) end    
+    if (buildProgress < 1) then widget:UnitCreated(unitID) end
   end
 end
 
@@ -128,7 +128,7 @@ function widget:CommandNotify(id, params, options)
         return true
       else -- if
         return false
-      end  
+      end
     end
   end
 end

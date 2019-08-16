@@ -5,22 +5,22 @@ local spSetUnitShieldState = Spring.SetUnitShieldState
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local torso = piece 'torso' 
-local lfirept = piece 'lfirept' 
-local rbigflash = piece 'rbigflash' 
-local nanospray = piece 'nanospray' 
-local nanolathe = piece 'nanolathe' 
-local luparm = piece 'luparm' 
-local ruparm = piece 'ruparm' 
-local pelvis = piece 'pelvis' 
-local rthigh = piece 'rthigh' 
-local lthigh = piece 'lthigh' 
-local biggun = piece 'biggun' 
-local lleg = piece 'lleg' 
-local l_foot = piece 'l_foot' 
-local rleg = piece 'rleg' 
-local r_foot = piece 'r_foot' 
-local head = piece 'head' 
+local torso = piece 'torso'
+local lfirept = piece 'lfirept'
+local rbigflash = piece 'rbigflash'
+local nanospray = piece 'nanospray'
+local nanolathe = piece 'nanolathe'
+local luparm = piece 'luparm'
+local ruparm = piece 'ruparm'
+local pelvis = piece 'pelvis'
+local rthigh = piece 'rthigh'
+local lthigh = piece 'lthigh'
+local biggun = piece 'biggun'
+local lleg = piece 'lleg'
+local l_foot = piece 'l_foot'
+local rleg = piece 'rleg'
+local r_foot = piece 'r_foot'
+local head = piece 'head'
 
 local smokePiece = {torso}
 local nanoPieces = {nanospray}
@@ -121,7 +121,7 @@ local function Walk()
 			Turn(luparm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
 			Turn(ruparm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 		end
-		WaitForTurn(rthigh, x_axis)		
+		WaitForTurn(rthigh, x_axis)
 		Sleep(0)
 	end
 end
@@ -152,12 +152,12 @@ function script.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
-function script.StartMoving() 
+function script.StartMoving()
 	isMoving = true
 	StartThread(Walk)
 end
 
-function script.StopMoving() 
+function script.StopMoving()
 	isMoving = false
 	StartThread(RestoreLegs)
 end
@@ -176,7 +176,7 @@ function script.QueryWeapon(num)
 	end
 end
 
-function script.FireWeapon(num) 
+function script.FireWeapon(num)
 	if num == 5 then
 		EmitSfx(lfirept, 1024)
 	elseif num == 3 then
@@ -184,7 +184,7 @@ function script.FireWeapon(num)
 	end
 end
 
-function script.Shot(num) 
+function script.Shot(num)
 	if num == 5 then
 		EmitSfx(lfirept, 1025)
 	elseif num == 3 then
@@ -192,7 +192,7 @@ function script.Shot(num)
 	end
 	if flamers[num] then
 		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
-	end	
+	end
 end
 
 local function RestoreLaser()
@@ -202,8 +202,8 @@ local function RestoreLaser()
 	isLasering = false
 	Turn(luparm, x_axis, 0, ARM_SPEED_PITCH)
 	Turn(biggun, x_axis, math.rad(41), ARM_SPEED_PITCH)
-	if not isDgunning then 
-		Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW) 
+	if not isDgunning then
+		Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW)
 	end
 end
 
@@ -214,8 +214,8 @@ local function RestoreDgun()
 	isDgunning = false
 	Turn(ruparm, x_axis, restorePitch, ARM_SPEED_PITCH)
 	Turn(nanolathe, x_axis, math.rad(36), ARM_SPEED_PITCH)
-	if not isLasering then 
-		Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW) 
+	if not isLasering then
+		Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW)
 	end
 end
 
@@ -224,7 +224,7 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_LASER)
 		SetSignalMask(SIG_LASER)
 		isLasering = true
-		if not isDgunning then 
+		if not isDgunning then
 			Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
 		end
 		Turn(luparm, x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH)
@@ -260,7 +260,7 @@ function script.StopBuilding()
 	StartThread(RestoreLaser)
 end
 
-function script.StartBuilding(heading, pitch) 
+function script.StartBuilding(heading, pitch)
 	Turn(ruparm, x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH)
 	if not (isDgunning) then Turn(torso, y_axis, heading, TORSO_SPEED_YAW) end
 	restoreHeading, restorePitch = heading, pitch

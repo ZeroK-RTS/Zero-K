@@ -28,7 +28,7 @@ local Sounds = {
 			MapEntryValExtract(items, "dopplerscale", dopplerScale);
 			MapEntryValExtract(items, "rolloff", rolloff);
 		},
-		--]]	  
+		--]]
 		BladeSwing = {
 			file = "sounds/weapon/blade/blade_swing.wav",
 			pitchmod = 0.1,
@@ -133,16 +133,16 @@ local function AutoAdd(subDir, generalOpts)
 			end
 			--Spring.Echo(path,key,ext, pathPart)
 			Sounds.SoundItems[pathPart] = {
-				file = tostring('sounds/'..path), 
-				rolloff = opts.rollOff, 
-				dopplerscale = opts.dopplerscale, 
-				maxdist = opts.maxdist, 
-				maxconcurrent = opts.maxconcurrent, 
-				priority = opts.priority, 
+				file = tostring('sounds/'..path),
+				rolloff = opts.rollOff,
+				dopplerscale = opts.dopplerscale,
+				maxdist = opts.maxdist,
+				maxconcurrent = opts.maxconcurrent,
+				priority = opts.priority,
 				in3d = opts.in3d,
-				gain = opts.gain, 
-				gainmod = opts.gainmod, 
-				pitch = opts.pitch, 
+				gain = opts.gain,
+				gainmod = opts.gainmod,
+				pitch = opts.pitch,
 				pitchmod = opts.pitchmod
 			}
 			--Spring.Echo(Sounds.SoundItems[key].file)

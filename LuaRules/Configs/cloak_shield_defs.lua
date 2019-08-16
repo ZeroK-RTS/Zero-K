@@ -33,7 +33,7 @@ for name, ud in pairs (UnitDefNames) do
 		cloakShieldDefs[name].selfCloak = (cp.area_cloak_self ~= "0")
 		
 		local exception = {}
-		if cloakShieldDefs[name].decloakDistance then	
+		if cloakShieldDefs[name].decloakDistance then
 			for _, eud in pairs (UnitDefs) do
 				if eud.decloakDistance < cloakShieldDefs[name].decloakDistance then
 					exception[eud.id] = true
