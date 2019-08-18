@@ -247,6 +247,11 @@ local function LaunchAll(x, z)
 	tooltipProjectileCount = 0
 	Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
 	
+	-- Raw projectile manipulation doesn't create an event (needed for stuff like Fire Once)
+	if aimCount > 0 then
+		script.EndBurst(1)
+	end
+
 	-- Sleep to give time for the aim projectiles to turn
 	Sleep(1500)
 	
