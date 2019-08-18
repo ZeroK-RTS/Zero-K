@@ -713,6 +713,7 @@ local function serial(cmd,line,words,player)
 	
 	creationIndex = tonumber(words[1]) or 1
 	creationUnitList = unitList
+	gadgetHandler:UpdateGadgetCallIn('GameFrame', gadget)
 end
 
 local function EchoCrush()
@@ -796,13 +797,10 @@ local function EmpiricalDps(cmd,line,words,player)
 end
 
 function gadget:GameFrame(n)
-	if (not creationIndex) then
-		return
-	end
-	
 	if n%120 == 0 then
 		if not creationUnitList[creationIndex] then
 			creationIndex, creationUnitList = nil, nil
+			gadgetHandler:RemoveGadgetCallIn('GameFrame', gadget)
 			return
 		end
 		local INCREMENT = 128
@@ -846,6 +844,8 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"serial",serial,"Gives all units in succession.")
 	gadgetHandler.actionHandler.AddChatAction(self,"restart",restart,"Gives some commanders and clears everything else.")
 	gadgetHandler.actionHandler.AddChatAction(self,"nocost",nocost,"Makes everything gadget-implemented free.")
+
+	gadgetHandler:RemoveGadgetCallIn('GameFrame', gadget)
 end
 
 -------------------------------------------------------------------------------------

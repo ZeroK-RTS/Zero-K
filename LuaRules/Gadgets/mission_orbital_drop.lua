@@ -135,6 +135,7 @@ function GG.DropUnit(unitDefName, x, y, z, facing, teamID, useSetUnitVelocity, t
 		Spring.MoveCtrl.SetGravity(unitID,0)
 	end
 	units[unitID] = {2,absBrakeHeight+gy,heading,useSetUnitVelocity,speedProfile} --store speed profile index, store braking height , store heading , store speed profile
+	gadgetHandler:UpdateCallIn("GameFrame")
 
 	Spring.SetUnitRulesParam(unitID, "orbitalDrop", 1, LOS_ACCESS)
 
@@ -153,6 +154,11 @@ end
 
 
 function gadget:GameFrame(frame)
+  if not next(units) then
+    gadgetHandler:RemoveCallIn("GameFrame")
+    return
+  end
+
   for unitID, controlValue in pairs(units) do
     if Spring.ValidUnitID(unitID) then
       local x, y, z = Spring.GetUnitPosition(unitID)
@@ -250,6 +256,16 @@ function gadget:Load(zip)
 	end
 	units = loadedUnits
 	_G.units = units
+
+	if next(units) then
+		gadgetHandler:UpdateCallIn("GameFrame")
+	else
+		gadgetHandler:RemoveCallIn("GameFrame")
+	end
+end
+
+function gadget:Initialize()
+	gadgetHandler:RemoveCallIn("GameFrame")
 end
 
 --------------------------------------------------------------------------------
