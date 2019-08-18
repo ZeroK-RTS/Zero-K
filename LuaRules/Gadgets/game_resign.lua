@@ -15,6 +15,15 @@ local spKillTeam = Spring.KillTeam
 local spSetTeamRulesParam = Spring.SetTeamRulesParam
 local spGetPlayerList = Spring.GetPlayerList
 
+local function ResignTeam(teamID)
+	spKillTeam(teamID)
+	spSetTeamRulesParam(teamID, "WasKilled", 1)
+end
+
+function gadget:Initialize()
+	GG.ResignTeam = ResignTeam
+end
+
 function gadget:RecvLuaMsg (msg, playerID)
 	if msg ~= "forceresign"
 	or Spring.GetGameFrame() <= 0 -- causes dedi server to think the game is over (apparently)
@@ -28,8 +37,7 @@ function gadget:RecvLuaMsg (msg, playerID)
 		return
 	end
 
-	spKillTeam(teamID)
-	spSetTeamRulesParam(teamID, "WasKilled", 1)
+	ResignTeam(teamID)
 end
 
 function gadget:GotChatMsg (msg, senderID)
@@ -55,8 +63,7 @@ function gadget:GotChatMsg (msg, senderID)
 			local personID = people[i]
 			local nick, _, _, teamID = spGetPlayerInfo(personID, false)
 			if (target == nick) then
-				spKillTeam (teamID)
-				spSetTeamRulesParam (teamID, "WasKilled", 1)
+				ResignTeam (teamID)
 				return
 			end
 		end
