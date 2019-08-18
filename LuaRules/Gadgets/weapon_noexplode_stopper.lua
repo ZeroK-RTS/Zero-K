@@ -19,13 +19,11 @@ end
 
 local passedProjectile = {}
 local shieldDamages = {}
+local noExplode = {}
 for i = 1, #WeaponDefs do
 	shieldDamages[i] = tonumber(WeaponDefs[i].customParams.shield_damage)
-end
-
-function gadget:ProjectileDestroyed(proID)
-	if passedProjectile[proID] then
-		passedProjectile[proID] = false
+	if WeaponDefs[i].noExplode then
+		noExplode[i] = true
 	end
 end
 
@@ -58,18 +56,32 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	--elseif select(2, Spring.GetProjectilePosition(proID)) < 0 then
 	--	passedProjectile[proID] = true
 	--	return true
-	elseif weaponDefID and shieldCarrierUnitID and shieldEmitterWeaponNum then
-		local wd = WeaponDefs[weaponDefID]
-		if wd and wd.noExplode then
-			local _, charge = Spring.GetUnitShieldState(shieldCarrierUnitID)	--FIXME figure out a way to get correct shield
-			if charge and shieldDamages[weaponDefID] < charge then
-				Spring.DeleteProjectile(proID)
-			else
-				passedProjectile[proID] = true
-			end
+	elseif weaponDefID and shieldCarrierUnitID and shieldEmitterWeaponNum and noExplode[weaponDefID] then
+		local _, charge = Spring.GetUnitShieldState(shieldCarrierUnitID) --FIXME figure out a way to get correct shield
+		if charge and shieldDamages[weaponDefID] < charge then
+			Spring.DeleteProjectile(proID)
+		else
+			passedProjectile[proID] = true
 		end
 	end
 
 	return false
 	
+end
+
+function gadget:ProjectileDestroyed(proID)
+	if passedProjectile[proID] then
+		passedProjectile[proID] = false
+	end
+end
+
+
+function gadget:Initialize()
+	for id, _ in pairs(noExplode) do
+		if Script.SetWatchProjectile then
+			Script.SetWatchProjectile(id, true)
+		else
+			Script.SetWatchWeapon(id, true)
+		end
+	end
 end
