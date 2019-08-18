@@ -125,6 +125,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
+      collisionVolumeOffsets = [[0 0 -5]],
+      collisionVolumeScales  = [[55 15 70]],
+      collisionVolumeType    = [[box]],
       object           = [[firestorm_dead.s3o]],
     },
 
