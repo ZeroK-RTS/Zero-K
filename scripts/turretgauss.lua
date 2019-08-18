@@ -156,11 +156,6 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, smokePiece)
 	StartThread(RestoreAfterDelay);
 
-	Move(muzzleProxy, y_axis, 5)
-	Move(muzzleProxy, z_axis, 0.5)
-
-	Move(aimProxy, z_axis, -6)
-
 	Hide(legs);
 	for i = 1,6 do
 		Hide(pillars[i]);
@@ -198,6 +193,9 @@ function script.AimWeapon(num, heading, pitch)
 	SetSignalMask(aim)
 	
 	Turn(belt, z_axis, heading, math.rad(200));
+
+	-- instantly turn the actual sim gun towards target, then wait for the visual pieces to animate
+	Turn(aimProxy, x_axis, -pitch); 
 	
 	if (not is_open) then
 		StartThread(Open);
@@ -223,7 +221,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(n)
-	EmitSfx(muzzle, 1024)
+	EmitSfx(muzzleProxy, 1024)
 	Move(barrel1,y_axis,1,5);
 	Move(barrel2,y_axis,1,7);
 	Move(barrel3,y_axis,1,9);
