@@ -113,6 +113,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
+      collisionVolumeOffsets = [[0 -5 0]],
+      collisionVolumeScales  = [[42 42 42]],
+      collisionVolumeType    = [[ellipsoid]], 
       object           = [[corraid_dead.s3o]],
     },
 

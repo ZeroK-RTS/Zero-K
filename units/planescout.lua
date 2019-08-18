@@ -60,6 +60,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
+      collisionVolumeOffsets = [[0 0 0]],
+      collisionVolumeScales  = [[35 12 60]],
+      collisionVolumeType    = [[box]],
       object           = [[armpnix_dead.s3o]],
     },
 
