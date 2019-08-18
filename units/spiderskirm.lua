@@ -109,6 +109,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
+      collisionVolumeOffsets = [[0 0 0]],
+      collisionVolumeScales  = [[50 30 50]],
+      collisionVolumeType    = [[ellipsoid]], 
       object           = [[recluse_wreck.s3o]],
     },
 
