@@ -14,7 +14,7 @@ local GADGETS_DIR = SCRIPT_DIR .. 'Gadgets/'
 
 local gh = gadgetHandler.gadgetHandler
 
---// export GADGET_DIR, so gadgets can easily load e.g. config.lua 
+--// export GADGET_DIR, so gadgets can easily load e.g. config.lua
 --// from the same dir where the main.lua is placed
 local oldNewGadget = gh.NewGadget
 local curdir = ""

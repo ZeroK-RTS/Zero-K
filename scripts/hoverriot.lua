@@ -1,7 +1,7 @@
-local base = piece 'base' 
-local flare = piece 'flare' 
-local ground1 = piece 'ground1' 
-local barrel = piece 'barrel' 
+local base = piece 'base'
+local flare = piece 'flare'
+local ground1 = piece 'ground1'
+local barrel = piece 'barrel'
 
 local wakes = {}
 for i = 1, 8 do

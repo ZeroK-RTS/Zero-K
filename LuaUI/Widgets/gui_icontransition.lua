@@ -99,7 +99,7 @@ renderAtPos = {
 
 options_path = 'Settings/Graphics/Unit Visibility/Icon Transition'
 
-options_order = { 
+options_order = {
 	'lblIconTransition',
 	'icontransitiontop',
 	'icontransitionbottom',
@@ -186,7 +186,7 @@ function GotHotkeypress()
 			target_mode = "Off"
 		elseif current_mode == "Off" then
 			target_mode = "On"
-		elseif showing_icons then 
+		elseif showing_icons then
 			target_mode = "Off"
 		else
 			target_mode = "On"

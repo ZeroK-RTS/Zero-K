@@ -52,7 +52,7 @@ function gadget:UnitDamaged_GetWantedWeaponDef()
 	return wantedWeaponList
 end
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                             weaponDefID, attackerID, attackerDefID, attackerTeam)
 	if paralyzer then -- the weapon deals paralysis damage
 		local health, maxHealth = spGetUnitHealth(unitID)

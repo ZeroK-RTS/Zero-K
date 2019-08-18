@@ -179,8 +179,8 @@ local function MakeTip(unitID, tip)
 
 	local img = nil
 	if not options.cartoonBubbles.value then
-		--str = str:gsub("\n"," ")	
-		img = Panel:New { 
+		--str = str:gsub("\n"," ")
+		img = Panel:New {
 			width = textWidth + 4,
 			height = textHeight + 4 + fontSize,
 			x = x - (textWidth + 8)/2;

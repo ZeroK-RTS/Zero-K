@@ -142,7 +142,7 @@ end
 
 local function AddTipOnce(str, level, weight, sound, prereq)
 	if alreadyDisplayedTips[str] then return end
-	AddTip(str, level, weight, sound, prereq) 
+	AddTip(str, level, weight, sound, prereq)
 end
 
 local function CountMy(unitKind)
@@ -247,7 +247,7 @@ local function GetTipsList()
 
 		-- Once the player has started getting stuff done
 	else
-	]]--	
+	]]--
 		--[[if CountMy(factory)>=1 then
 			AddTipOnce("Build some units with that factory. You'll want to start with a couple of constructors for expansion and a few raiders for early combat.", 1, 10)
 		end --]]
@@ -288,7 +288,7 @@ local function GetTipsList()
 		local elevel, estore = spGetTeamResources(myTeam, "energy")
 		if elevel < 80 and mlevel > elevel then
 			AddTip("Your energy reserves are running dangerously low. You should build more energy structures.", 3, 10)
-		end		
+		end
 		
 		--always tips
 		AddTipOnce("Left click to select a unit.\nKeep button down to drag a selection box.",1)
@@ -354,7 +354,7 @@ local function GenerateTextBox(str)
 			size   = 12;
 			shadow = true;
 		},
-	}	
+	}
 end
 
 local timer = 0
@@ -404,7 +404,7 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 			airSpotted = true
 		elseif unitDef.name == "staticnuke" and not nukeSpotted then
 			SetTip(stringNukeSpotted)
-			nukeSpotted = true			
+			nukeSpotted = true
 		end
 	end
 end
@@ -430,7 +430,7 @@ function widget:Initialize()
 		name   = 'tipwindow';
 		width = 320,
 		height = 100,
-		right = 0; 
+		right = 0;
 		bottom = 350;
 		dockable = true;
 		draggable = false,
@@ -476,7 +476,7 @@ function widget:Initialize()
 		keepAspect = false,
 		file = "LuaUI/Images/closex_16.png";
 		parent = close;
-	}	
+	}
 		
 	--sound code
 	--[[

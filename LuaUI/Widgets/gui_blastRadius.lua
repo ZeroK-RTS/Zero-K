@@ -93,10 +93,10 @@ function widget:Update()
 	local time = floor(timef)
 	
 	-- update timers once every <updateInt> seconds
-	--if (time % updateInt == 0 and time ~= lastTimeUpdate) then	
+	--if (time % updateInt == 0 and time ~= lastTimeUpdate) then
 	--	lastTimeUpdate = time
 	--	--do update stuff:
-	--	
+	--
 	--	if ( CheckSpecState() == false ) then
 	--		return false
 	--	end
@@ -123,8 +123,8 @@ function ChangeBlastColor()
 	local time = spGetGameSeconds()
 	local timediff = ( time - lastColorChangeTime )
 		
-	local addValueSelf = timediff/ selfdCycleTime 	
-	local addValueExp = timediff/ expCycleTime 	
+	local addValueSelf = timediff/ selfdCycleTime
+	local addValueExp = timediff/ expCycleTime
 
 	if ( blastColor[2] >= 1.0 ) then
 		selfdCycleDir = false
@@ -237,7 +237,7 @@ function DrawBuildMenuBlastRange()
 	glTranslate(-blastRadius / 2, 0, blastRadius / 2 )
 	glBillboard()
 	glText( defaultDamage, 0.0, 0.0, sqrt(blastRadius), "cn")
-	glPopMatrix()  
+	glPopMatrix()
 	
 	--tidy up
 	glLineWidth(1)
@@ -283,7 +283,7 @@ function DrawUnitBlastRadius( unitID )
 		end
 
 		glText( text, 0.0, 0.0, sqrt(blastRadius) , "cn")
-		glPopMatrix()  
+		glPopMatrix()
 
 		if ( deathblastRadius ~= blastRadius ) then
 			glColor( expBlastColor[1], expBlastColor[2], expBlastColor[3], expBlastAlphaValue)
@@ -294,7 +294,7 @@ function DrawUnitBlastRadius( unitID )
 			glBillboard()
 			glText( deathblastDamage , 0.0, 0.0, sqrt(deathblastRadius), "cn")
 			--glText("EXPLODE" , 0.0, 0.0, sqrt(deathblastRadius), "cn")
-			glPopMatrix()  
+			glPopMatrix()
 		end
 	end
 end
@@ -319,7 +319,7 @@ function DrawBlastRadiusSelectedUnits()
 end
 
 --Commons
-function ResetGl() 
+function ResetGl()
 	glColor( { 1.0, 1.0, 1.0, 1.0 } )
 	glLineWidth( 1.0 )
 	glDepthTest(false)
@@ -338,7 +338,7 @@ function CheckSpecState()
 		return false
 	end
 	
-	return true	
+	return true
 end
 --]]
 
@@ -349,8 +349,8 @@ function printDebug( value )
 				else spEcho("false") end
 		elseif ( type(value ) == "table" ) then
 			spEcho("Dumping table:")
-			for key,val in pairs(value) do 
-				spEcho(key,val) 
+			for key,val in pairs(value) do
+				spEcho(key,val)
 			end
 		else
 			spEcho( value )

@@ -91,7 +91,7 @@ local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spIsSphereInView      = Spring.IsSphereInView
 local spGetUnitRadius       = Spring.GetUnitRadius
 
-local glTexture     = gl.Texture 
+local glTexture     = gl.Texture
 local glBlending    = gl.Blending
 local glMultiTexCoord = gl.MultiTexCoord
 local glCreateList  = gl.CreateList

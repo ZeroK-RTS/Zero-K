@@ -73,7 +73,7 @@ local function RestoreLegs()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	GG.SpiderWalk.restoreLegs(leg1, leg2, leg3, leg4, leg5, leg6,
-		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)		
+		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)
 end
 
 function script.Create()
@@ -89,7 +89,7 @@ function script.StopMoving()
 	StartThread(RestoreLegs)
 end
 
-function script.StartBuilding(heading, pitch) 
+function script.StartBuilding(heading, pitch)
 	if GetUnitValue(COB.INBUILDSTANCE) == 0 then
 		Signal(SIG_STOPBUILD)
 		SetUnitValue(COB.INBUILDSTANCE, 1)

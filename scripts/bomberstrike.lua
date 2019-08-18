@@ -1,22 +1,22 @@
 include "constants.lua"
 include "bombers.lua"
 
-local fuselage = piece 'fuselage' 
-local wingl = piece 'wingl' 
-local wingr = piece 'wingr' 
-local enginel = piece 'enginel' 
-local enginer = piece 'enginer' 
-local head = piece 'head' 
-local turretbase = piece 'turretbase' 
-local turret = piece 'turret' 
-local sleevel = piece 'sleevel' 
-local sleever = piece 'sleever' 
-local barrell = piece 'barrell' 
-local barrelr = piece 'barrelr' 
-local flarel = piece 'flarel' 
-local flarer = piece 'flarer' 
-local bombl = piece 'bombl' 
-local bombr = piece 'bombr' 
+local fuselage = piece 'fuselage'
+local wingl = piece 'wingl'
+local wingr = piece 'wingr'
+local enginel = piece 'enginel'
+local enginer = piece 'enginer'
+local head = piece 'head'
+local turretbase = piece 'turretbase'
+local turret = piece 'turret'
+local sleevel = piece 'sleevel'
+local sleever = piece 'sleever'
+local barrell = piece 'barrell'
+local barrelr = piece 'barrelr'
+local flarel = piece 'flarel'
+local flarer = piece 'flarer'
+local bombl = piece 'bombl'
+local bombr = piece 'bombr'
 
 local bFirepoint1 = false
 local bFirepoint2 = false
@@ -129,7 +129,7 @@ function script.Killed(recentDamage, maxHealth)
 	Explode(sleevel, SFX.NONE)
 	Explode(sleever, SFX.NONE)
 	return 1
-	else	
+	else
 	Explode(fuselage, SFX.FALL + SFX.SMOKE)
 	Explode(head, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 	Explode(wingl, SFX.FALL + SFX.SMOKE)

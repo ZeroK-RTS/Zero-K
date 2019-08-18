@@ -110,11 +110,11 @@ function gadget:GameFrame(f)
 	end
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD.MOVE] = true, [CMD.FIGHT] = true, [CMD.WAIT] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
@@ -190,11 +190,11 @@ local function DrawPathLink(start, finish, relation, color)
 		local sColor = ((SYNCED.heatmap[sx] and SYNCED.heatmap[sx][sz] and SYNCED.heatmap[sx][sz].value) or 0)*0.01
 		local fColor = ((SYNCED.heatmap[fx] and SYNCED.heatmap[fx][fz] and SYNCED.heatmap[fx][fz].value) or 0)*0.01
 		DrawLine(
-			start.px, start.py, start.pz, {sColor, sColor, sColor, 1}, 
+			start.px, start.py, start.pz, {sColor, sColor, sColor, 1},
 			finish.px, finish.py, finish.pz, {fColor, fColor, fColor, 1}
 		)
 	end
-end	
+end
 
 local function DrawGraph(array, color)
 	for i = 1, PATH_X do
@@ -211,23 +211,23 @@ end
 
 local function DrawPathMaps()
 	--gl.LineWidth(10)
-	--if SYNCED and SYNCED.shipPathMap then	
+	--if SYNCED and SYNCED.shipPathMap then
 	--	gl.BeginEnd(GL.LINES, DrawGraph, SYNCED.shipPathMap, {0,1,1,0.5})
 	--end
 	--gl.LineWidth(7)
-	--if SYNCED and SYNCED.hoverPathMap then	
+	--if SYNCED and SYNCED.hoverPathMap then
 	--	gl.BeginEnd(GL.LINES, DrawGraph, SYNCED.hoverPathMap, {1,0,1,0.5})
 	--end
 	--gl.LineWidth(5)
-	--if SYNCED and SYNCED.amphPathMap then	
+	--if SYNCED and SYNCED.amphPathMap then
 	--	gl.BeginEnd(GL.LINES, DrawGraph, SYNCED.amphPathMap, {0.8,0.8,0,0.5})
 	--end
 	--gl.LineWidth(3)
-	--if SYNCED and SYNCED.botPathMap then	
+	--if SYNCED and SYNCED.botPathMap then
 	--	gl.BeginEnd(GL.LINES, DrawGraph, SYNCED.botPathMap, {0,1,0.1,1})
 	--end
 	gl.LineWidth(2)
-	if SYNCED and SYNCED.pathMap and SYNCED.heatmap then	
+	if SYNCED and SYNCED.pathMap and SYNCED.heatmap then
 		gl.BeginEnd(GL.LINES, DrawGraph, SYNCED.pathMap)
 	end
 end

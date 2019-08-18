@@ -193,7 +193,7 @@ local terraformOrders 		= 0
 local constructor			= {}
 local constructorTable		= {}
 local constructors			= 0
-local currentCon 			= 0 
+local currentCon 			= 0
 
 local checkInterval 		= 0
 
@@ -242,7 +242,7 @@ local rampCmdDesc = {
   id      = CMD_RAMP,
   type    = CMDTYPE.ICON_MAP,
   name    = 'Ramp',
-  cursor  = 'Ramp', 
+  cursor  = 'Ramp',
   action  = 'rampground',
   tooltip = 'Build a Ramp - Click and drag between two positions.',
 }
@@ -251,7 +251,7 @@ local levelCmdDesc = {
   id      = CMD_LEVEL,
   type    = CMDTYPE.ICON_AREA,
   name    = 'Level',
-  cursor  = 'Level', 
+  cursor  = 'Level',
   action  = 'levelground',
   tooltip = 'Level the terrain - Click and drag a line or closed shape.',
 }
@@ -260,16 +260,16 @@ local raiseCmdDesc = {
   id      = CMD_RAISE,
   type    = CMDTYPE.ICON_AREA,
   name    = 'Raise',
-  cursor  = 'Raise', 
+  cursor  = 'Raise',
   action  = 'raiseground',
-  tooltip = 'Raises/Lower terrain -  - Click and drag a line or closed shape.',
+  tooltip = 'Raises/Lower terrain - Click and drag a line or closed shape.',
 }
 
 local smoothCmdDesc = {
   id      = CMD_SMOOTH,
   type    = CMDTYPE.ICON_AREA,
   name    = 'Smooth',
-  cursor  = 'Smooth', 
+  cursor  = 'Smooth',
   action  = 'smoothground',
   tooltip = 'Smooth the terrain - Click and drag a line or closed shape.',
 }
@@ -278,7 +278,7 @@ local restoreCmdDesc = {
   id      = CMD_RESTORE,
   type    = CMDTYPE.ICON_AREA,
   name    = 'Restore2',
-  cursor  = 'Restore2', 
+  cursor  = 'Restore2',
   action  = 'restoreground',
   tooltip = 'Restore the terrain to its original shape - Click and drag a line or closed shape.',
 }
@@ -287,7 +287,7 @@ local bumpyCmdDesc = {
   id      = CMD_BUMPY,
   type    = CMDTYPE.ICON_AREA,
   name    = 'Bumpify',
-  cursor  = 'Repair', 
+  cursor  = 'Repair',
   action  = 'bumpifyground',
   tooltip = 'Makes the ground bumpy',
 }
@@ -367,10 +367,32 @@ end
 
 local function SetTooltip(unitID, spent, estimatedCost)
 	Spring.SetUnitRulesParam(unitID, "terraform_spent", spent, {allied = true})
-	if IsBadNumber(estimatedCost, "SetTooltip") then 
+	if IsBadNumber(estimatedCost, "SetTooltip") then
 		estimatedCost = 100 -- the estimate is for widgets only so better to have wrong data than to crash
 	end
 	Spring.SetUnitRulesParam(unitID, "terraform_estimate", estimatedCost, {allied = true})
+end
+
+local function IsPositionTerraformable(x, z)
+	if structureAreaMap[x] and structureAreaMap[x][z] then
+		return false
+	end
+	if GG.map_AllowPositionTerraform then
+		return GG.map_AllowPositionTerraform(x, z)
+	end
+	return true
+end
+
+local function SetupPointStructure(point, structArea, segArea)
+	local currHeight = point.orHeight
+	local x, z = point.x, point.z
+	if (structArea[x] and structArea[x][z]) or (GG.map_AllowPositionTerraform and not GG.map_AllowPositionTerraform(x, z)) then
+		point.diffHeight = 0.0001
+		point.structure = true
+	else
+		point.diffHeight = point.aimHeight - currHeight
+		segArea[x][z] = {orHeight = point.orHeight, diffHeight = point.diffHeight, building = false}
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -521,8 +543,8 @@ local function AddFallbackCommand(teamID, commandTag, terraunits, terraunitList,
 	fallbackCommands[teamID][commandTag] = {
 		terraunits = terraunits,
 		terraunitList = terraunitList,
-		commandX = commandX, 
-		commandZ = commandZ, 
+		commandX = commandX,
+		commandZ = commandZ,
 	}
 end
 
@@ -546,7 +568,7 @@ local function GetUnitAveragePosition(unit, units)
 		end
 	end
 		
-	if units == 0 then 
+	if units == 0 then
 		return
 	end
 	
@@ -658,9 +680,9 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			leftpoint = {x = toppoint.x+add.x, z = toppoint.z+add.z}
 			
 			border = {left = leftRot.x-x1+x2, right = rightRot.x, top = rightRot.z-z1+z2, bottom = leftRot.z}
-		else 
+		else
 			-- top left
-			topleftGrad = -1/m 
+			topleftGrad = -1/m
 			botleftGrad = m
 			
 			botpoint = rightRot
@@ -714,9 +736,9 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			segment[n].point = {}
 			segment[n].area = {}
 			segment[n].border = {
-				left = floor((leftpoint.x+add.x*i+addPerp.x*j)/8)*8 - offset, 
-				right = ceil((rightpoint.x+add.x*i+addPerp.x*j)/8)*8 + offset, 
-				top = floor((toppoint.z+add.z*i+addPerp.z*j)/8)*8 - offset, 
+				left = floor((leftpoint.x+add.x*i+addPerp.x*j)/8)*8 - offset,
+				right = ceil((rightpoint.x+add.x*i+addPerp.x*j)/8)*8 + offset,
+				top = floor((toppoint.z+add.z*i+addPerp.z*j)/8)*8 - offset,
 				bottom = ceil((botpoint.z+add.z*i+addPerp.z*j)/8)*8 + offset
 			}
 			-- end of segment
@@ -761,7 +783,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				if botline == botline1 and botline2.x < lx then
 					botline = botline2
 				end
-			end  
+			end
 			
 			if pc ~= 1 then
 				segment[n].points = pc - 1
@@ -779,14 +801,14 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	
 	for i = 1, structureCount do
 		local s = structure[structureTable[i] ]
-		if (border.left < s.maxx and 
+		if (border.left < s.maxx and
 			border.right > s.minx and
 			border.top < s.maxz and
 			border.bottom > s.minz) then
 			
 			localStructureCount = localStructureCount + 1
 			localStructure[localStructureCount] = i
-		end	
+		end
 	end
     
 	--** Creates terraform building and assigns each one segment data **
@@ -811,7 +833,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		
 		for j = 1, localStructureCount do
 			local s = structure[structureTable[localStructure[j]]]
-			if (segment[i].border.left < s.maxx and 
+			if (segment[i].border.left < s.maxx and
 				segment[i].border.right > s.minx and
 				segment[i].border.top < s.maxz and
 				segment[i].border.bottom > s.minz) then
@@ -828,9 +850,9 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 					for lz = s.minz,s.maxz, 8 do
 						segment[i].structureArea[lx][lz] = true
 					end
-				end 
+				end
 				
-			end	
+			end
 		end
 	
 		-- calculate cost
@@ -842,16 +864,8 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			if not segment[i].area[segment[i].point[j].x] then
 				segment[i].area[segment[i].point[j].x] = {}
 			end
-			local currHeight = segment[i].point[j].orHeight
 			segment[i].point[j].aimHeight = segment[i].point[j].y
-			if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
-				segment[i].point[j].diffHeight = 0.0001
-				segment[i].point[j].structure = true
-				--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
-			else
-				segment[i].point[j].diffHeight = segment[i].point[j].aimHeight-currHeight
-				segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
-			end
+			SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
 			totalCost = totalCost + abs(segment[i].point[j].diffHeight)
 			areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 		end
@@ -923,24 +937,24 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				
 				terraformUnit[id] = {
 					positionAnchor = pos,
-					position = {x = terraunitX, z = terraunitZ}, 
-					progress = 0, 
-					lastUpdate = 0, 
+					position = {x = terraunitX, z = terraunitZ},
+					progress = 0,
+					lastUpdate = 0,
 					totalSpent = 0,
 					baseCostSpent = 0,
-					cost = totalCost, 
+					cost = totalCost,
 					baseCost = baseCost,
 					totalCost = totalCost,
 					pyramidCostEstimate = pyramidCostEstimate,
-					point = segment[i].point, 
-					points = segment[i].points, 
-					area = segment[i].area, 
-					border = segment[i].border, 
-					smooth = false, 
-					intercepts = 0, 
-					intercept = {}, 
+					point = segment[i].point,
+					points = segment[i].points,
+					area = segment[i].area,
+					border = segment[i].border,
+					smooth = false,
+					intercepts = 0,
+					intercept = {},
 					interceptMap = {},
-					decayTime = frame + terraformDecayFrames, 
+					decayTime = frame + terraformDecayFrames,
 					allyTeam = unitAllyTeam,
 					team = team,
 					order = terraformOrders,
@@ -1026,7 +1040,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 			if a_diffX > a_diffZ then
 				local m = diffZ/diffX
 				local sign = diffX/a_diffX
-				for j = 0, a_diffX, 16 do	
+				for j = 0, a_diffX, 16 do
 					points = points + 1
 					point[points] = {x = mPoint[i-1].x + j*sign, z = floor((mPoint[i-1].z + j*m*sign)/16)*16}
 					updateBorderWithPoint(border, point[points].x, point[points].z)
@@ -1034,7 +1048,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 			else
 				local m = diffX/diffZ
 				local sign = diffZ/a_diffZ
-				for j = 0, a_diffZ, 16 do	
+				for j = 0, a_diffZ, 16 do
 					points = points + 1
 					point[points] = {x = floor((mPoint[i-1].x + j*m*sign)/16)*16, z = mPoint[i-1].z + j*sign}
 					updateBorderWithPoint(border, point[points].x, point[points].z)
@@ -1051,7 +1065,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 	
 	if points > maxWallPoints then
 		-- cancel command if the wall is too big, anti-slowdown
-		return false 
+		return false
 	end
 
 	
@@ -1085,7 +1099,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 			for j = count*wallSegmentLength+1, (count+1)*wallSegmentLength do
 			
 				if j > points then
-					continue = false				
+					continue = false
 					break
 				else
 					
@@ -1096,7 +1110,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 					for lx = -16,16,8 do
 						for lz = -16,16,8 do
 							-- lx/lz steps through the points around the mousePoint
-							if not area[point[j].x+lx][point[j].z+lz] then 
+							if not area[point[j].x+lx][point[j].z+lz] then
 								-- check if the point will be terraformed be a previous block
 								segment[n].point[pc] = {x = point[j].x+lx, z = point[j].z+lz}
 								area[point[j].x+lx][point[j].z+lz] = true
@@ -1106,13 +1120,13 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 									segment[n].border.left = segment[n].point[pc].x-16
 								end
 								if segment[n].point[pc].x+16 > segment[n].border.right then
-									segment[n].border.right = segment[n].point[pc].x+16 
+									segment[n].border.right = segment[n].point[pc].x+16
 								end
 								if segment[n].point[pc].z-16 < segment[n].border.top then
 									segment[n].border.top = segment[n].point[pc].z-16
 								end
 								if segment[n].point[pc].z+16 > segment[n].border.bottom then
-									segment[n].border.bottom = segment[n].point[pc].z+16 
+									segment[n].border.bottom = segment[n].point[pc].z+16
 								end--]]
 								local currHeight = spGetGroundHeight(segment[n].point[pc].x, segment[n].point[pc].z)
 								segment[n].point[pc].orHeight = currHeight
@@ -1149,14 +1163,14 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 	
 	for i = 1, structureCount do
 		local s = structure[structureTable[i]]
-		if (border.left < s.maxx and 
+		if (border.left < s.maxx and
 			border.right > s.minx and
 			border.top < s.maxz and
 			border.bottom > s.minz) then
-				
+			
 			localStructureCount = localStructureCount + 1
 			localStructure[localStructureCount] = i
-		end	
+		end
 	end
 	
 
@@ -1182,7 +1196,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 		
 		for j = 1, localStructureCount do
 			local s = structure[structureTable[localStructure[j]]]
-			if (segment[i].border.left < s.maxx and 
+			if (segment[i].border.left < s.maxx and
 				segment[i].border.right > s.minx and
 				segment[i].border.top < s.maxz and
 				segment[i].border.bottom > s.minz) then
@@ -1199,9 +1213,9 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 					for lz = s.minz,s.maxz, 8 do
 						segment[i].structureArea[lx][lz] = true
 					end
-				end 
+				end
 				
-			end	
+			end
 		end
 		
 		-- calculate cost
@@ -1214,44 +1228,30 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
-				currHeight = segment[i].point[j].orHeight
 				segment[i].point[j].aimHeight = terraformHeight
-				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
-					segment[i].point[j].diffHeight = 0.0001
-					segment[i].point[j].structure = true
-					--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
-				else
-					segment[i].point[j].diffHeight = segment[i].point[j].aimHeight-currHeight
-					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
-				end
+				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
+				
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
 				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
 			end
-		elseif terraform_type == 2 then 
+		elseif terraform_type == 2 then
 			for j = 1, segment[i].points do
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
-				currHeight = segment[i].point[j].orHeight
-				segment[i].point[j].aimHeight = terraformHeight+currHeight
-				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
-					segment[i].point[j].diffHeight = 0.0001
-					segment[i].point[j].structure = true
-					--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
-				else
-					segment[i].point[j].diffHeight = terraformHeight
-					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
-				end
+				segment[i].point[j].aimHeight = terraformHeight + segment[i].point[j].orHeight
+				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
+				
 				totalCost = totalCost + abs(terraformHeight)
 				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
 			end
-		elseif terraform_type == 3 then 
+		elseif terraform_type == 3 then
 			for j = 1, segment[i].points do
 				local totalHeight = 0
 				for lx = -16, 16,8 do
@@ -1262,37 +1262,23 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
-				currHeight = segment[i].point[j].orHeight
 				segment[i].point[j].aimHeight = totalHeight/25
-				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
-					segment[i].point[j].diffHeight = 0.0001
-					segment[i].point[j].structure = true
-					--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
-				else
-					segment[i].point[j].diffHeight = segment[i].point[j].aimHeight-currHeight
-					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
-				end
+				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
+				
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
 				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
 			end
-		elseif terraform_type == 5 then 
+		elseif terraform_type == 5 then
 			for j = 1, segment[i].points do
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
-				currHeight = segment[i].point[j].orHeight
 				segment[i].point[j].aimHeight = spGetGroundOrigHeight(segment[i].point[j].x, segment[i].point[j].z)
-				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
-					segment[i].point[j].diffHeight = 0.0001
-					segment[i].point[j].structure = true
-					--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
-				else
-					segment[i].point[j].diffHeight = segment[i].point[j].aimHeight-currHeight
-					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
-				end
+				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
+				
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
 				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
@@ -1301,16 +1287,9 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
-				currHeight = segment[i].point[j].orHeight
 				segment[i].point[j].aimHeight = currHeight + bumpyFunc(segment[i].point[j].x,segment[i].point[j].z,volumeSelection)
-				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
-					segment[i].point[j].diffHeight = 0.0001
-					segment[i].point[j].structure = true
-					--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
-				else
-					segment[i].point[j].diffHeight = segment[i].point[j].aimHeight-currHeight
-					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
-				end
+				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
+				
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
 				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
@@ -1377,24 +1356,24 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 
 				terraformUnit[id] = {
 					positionAnchor = pos,
-					position = {x = terraunitX, z = terraunitZ}, 
-					progress = 0, 
-					lastUpdate = 0, 
+					position = {x = terraunitX, z = terraunitZ},
+					progress = 0,
+					lastUpdate = 0,
 					totalSpent = 0,
 					baseCostSpent = 0,
-					cost = totalCost, 
+					cost = totalCost,
 					baseCost = baseCost,
 					totalCost = totalCost,
 					pyramidCostEstimate = pyramidCostEstimate,
-					point = segment[i].point, 
-					points = segment[i].points, 
-					area = segment[i].area, 
-					border = segment[i].border, 
-					smooth = false, 
-					intercepts = 0, 
-					intercept = {}, 
+					point = segment[i].point,
+					points = segment[i].points,
+					area = segment[i].area,
+					border = segment[i].border,
+					smooth = false,
+					intercepts = 0,
+					intercept = {},
 					interceptMap = {},
-					decayTime = frame + terraformDecayFrames, 
+					decayTime = frame + terraformDecayFrames,
 					allyTeam = unitAllyTeam,
 					team = team,
 					order = terraformOrders,
@@ -1431,7 +1410,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 	--** Convert Mouse Points to a Closed Loop on a Grid **
 	
 	-- close the mouse points loop
-	mPoints = mPoints + 1 
+	mPoints = mPoints + 1
 	mPoint[mPoints] = mPoint[1]
 	
 	-- points interpolated from mouse points
@@ -1454,7 +1433,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 		local a_diffX = abs(diffX)
 		local a_diffZ = abs(diffZ)
 			
-		-- do not add another points of the same coordinates	
+		-- do not add another points of the same coordinates
 		if a_diffX <= 16 and a_diffZ <= 16 then
 			points = points + 1
 			point[points] = {x = mPoint[i].x, z = mPoint[i].z}
@@ -1464,7 +1443,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 			if a_diffX > a_diffZ then
 				local m = diffZ/diffX
 				local sign = diffX/a_diffX
-				for j = 0, a_diffX, 16 do	
+				for j = 0, a_diffX, 16 do
 					points = points + 1
 					point[points] = {x = mPoint[i].x - j*sign, z = floor((mPoint[i].z - j*m*sign)/16)*16}
 					updateBorderWithPoint(border, point[points].x, point[points].z)
@@ -1472,7 +1451,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 			else
 				local m = diffX/diffZ
 				local sign = diffZ/a_diffZ
-				for j = 0, a_diffZ, 16 do	
+				for j = 0, a_diffZ, 16 do
 					points = points + 1
 					point[points] = {x = floor((mPoint[i].x - j*m*sign)/16)*16, z = mPoint[i].z - j*sign}
 					updateBorderWithPoint(border, point[points].x, point[points].z)
@@ -1484,7 +1463,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 	
 	if border.right-border.left > maxAreaSize or border.bottom-border.top > maxAreaSize then
 		-- cancel command if the area is too big, anti-slowdown
-		return false 
+		return false
 	end
 	
 	--** Compute which points are on the inside of the Loop **
@@ -1661,7 +1640,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 			-- if there are no points in the segment the segment is discarded
 			if m ~= 1 then
 				segment[n].points = m - 1
-				segment[n].position = {x = totalX/(m-1), z = totalZ/(m-1)}				
+				segment[n].position = {x = totalX/(m-1), z = totalZ/(m-1)}
 				n = n + 1
 			end
 		end
@@ -1675,14 +1654,14 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 	
 	for i = 1, structureCount do
 		local s = structure[structureTable[i]]
-		if (border.left < s.maxx and 
+		if (border.left < s.maxx and
 			border.right > s.minx and
 			border.top < s.maxz and
 			border.bottom > s.minz) then
 				
 			localStructureCount = localStructureCount + 1
 			localStructure[localStructureCount] = i
-		end	
+		end
 	end
 	
 	--** Creates terraform building and assigns each one segment data **
@@ -1709,7 +1688,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 		
 		for j = 1, localStructureCount do
 			local s = structure[structureTable[localStructure[j]]]
-			if (segment[i].border.left < s.maxx and 
+			if (segment[i].border.left < s.maxx and
 				segment[i].border.right > s.minx and
 				segment[i].border.top < s.maxz and
 				segment[i].border.bottom > s.minz) then
@@ -1726,9 +1705,9 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 					for lz = s.minz,s.maxz, 8 do
 						segment[i].structureArea[lx][lz] = true
 					end
-				end 
+				end
 				
-			end	
+			end
 		end
 		
 		--calculate cost of terraform
@@ -1741,38 +1720,24 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
-				local currHeight = segment[i].point[j].orHeight
 				segment[i].point[j].aimHeight = terraformHeight
-				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
-					segment[i].point[j].diffHeight = 0.0001
-					segment[i].point[j].structure = true
-					--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
-				else
-					segment[i].point[j].diffHeight = segment[i].point[j].aimHeight-currHeight
-					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
-				end
+				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
+				
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
 				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
-		elseif terraform_type == 2 then 
+		elseif terraform_type == 2 then
 			for j = 1, segment[i].points do
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
-				local currHeight = segment[i].point[j].orHeight
-				segment[i].point[j].aimHeight = terraformHeight+currHeight
-				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
-					segment[i].point[j].diffHeight = 0.0001
-					segment[i].point[j].structure = true
-					--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
-				else
-					segment[i].point[j].diffHeight = terraformHeight
-					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
-				end
+				segment[i].point[j].aimHeight = terraformHeight + segment[i].point[j].orHeight
+				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
+				
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
 				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
-		elseif terraform_type == 3 then 
+		elseif terraform_type == 3 then
 			for j = 1, segment[i].points do
 				local totalHeight = 0
 				for lx = -16, 16,8 do
@@ -1783,34 +1748,20 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
-				local currHeight = segment[i].point[j].orHeight
 				segment[i].point[j].aimHeight = totalHeight/25
-				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
-					segment[i].point[j].diffHeight = 0.0001
-					segment[i].point[j].structure = true
-					--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
-				else
-					segment[i].point[j].diffHeight = segment[i].point[j].aimHeight-currHeight
-					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
-				end
+				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
+				
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
 				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
-		elseif terraform_type == 5 then 
+		elseif terraform_type == 5 then
 			for j = 1, segment[i].points do
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
-				local currHeight = segment[i].point[j].orHeight
 				segment[i].point[j].aimHeight = spGetGroundOrigHeight(segment[i].point[j].x, segment[i].point[j].z)
-				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
-					segment[i].point[j].diffHeight = 0.0001
-					segment[i].point[j].structure = true
-					--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
-				else
-					segment[i].point[j].diffHeight = segment[i].point[j].aimHeight-currHeight
-					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
-				end
+				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
+				
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
 				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
@@ -1819,16 +1770,9 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
-				local currHeight = segment[i].point[j].orHeight
 				segment[i].point[j].aimHeight = currHeight + bumpyFunc(segment[i].point[j].x,segment[i].point[j].z,volumeSelection)
-				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
-					segment[i].point[j].diffHeight = 0.0001
-					segment[i].point[j].structure = true
-					--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
-				else
-					segment[i].point[j].diffHeight = segment[i].point[j].aimHeight-currHeight
-					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
-				end
+				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
+				
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
 				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
@@ -1901,24 +1845,24 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 
 				terraformUnit[id] = {
 					positionAnchor = pos,
-					position = {x = terraunitX, z = terraunitZ}, 
-					progress = 0, 
-					lastUpdate = 0, 
+					position = {x = terraunitX, z = terraunitZ},
+					progress = 0,
+					lastUpdate = 0,
 					totalSpent = 0,
 					baseCostSpent = 0,
-					cost = totalCost, 
+					cost = totalCost,
 					baseCost = baseCost,
 					totalCost = totalCost,
 					pyramidCostEstimate = pyramidCostEstimate,
-					point = segment[i].point, 
+					point = segment[i].point,
 					points = segment[i].points,
-					area = segment[i].area, 
-					border = segment[i].border, 
-					smooth = false, 
-					intercepts = 0, 
-					intercept = {}, 
+					area = segment[i].area,
+					border = segment[i].border,
+					smooth = false,
+					intercepts = 0,
+					intercept = {},
 					interceptMap = {},
-					decayTime = frame + terraformDecayFrames, 
+					decayTime = frame + terraformDecayFrames,
 					allyTeam = unitAllyTeam,
 					team = team,
 					order = terraformOrders,
@@ -2051,7 +1995,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		local volumeSelection = cmdParams[10]
 		
 		--level or raise or smooth or restore or bumpify
-		if terraform_type == 1 or terraform_type == 2 or terraform_type == 3 or terraform_type == 5 then --or terraform_type == 6 then 
+		if terraform_type == 1 or terraform_type == 2 or terraform_type == 3 or terraform_type == 5 then --or terraform_type == 6 then
 			local point = {}
 			local unit = {}
 			local i = 11
@@ -2106,7 +2050,7 @@ function GG.Terraform_RaiseWater(raiseAmount)
 	end
 	
 	for i = 1, terraformUnitCount do
-		local id = terraformUnitTable[i] 
+		local id = terraformUnitTable[i]
 		for j = 1, terraformUnit[id].points do
 			local point = terraformUnit[id].point[j]
 			point.orHeight = point.orHeight - raiseAmount
@@ -2166,7 +2110,7 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 	--end
 	----Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Spent " .. terraformUnit[id].totalSpent)
 	--
-	-- remove from intercepts tables 
+	-- remove from intercepts tables
 	--for j = 1, terraformUnit[id].intercepts do -- CRASH ON THIS LINE -- not for a while though
 	--	local oid = terraformUnit[id].intercept[j].id
 	--	local oindex = terraformUnit[id].intercept[j].index
@@ -2220,7 +2164,7 @@ local function updateTerraformEdgePoints(id)
 			local x = point.x
 			local z = point.z
 
-			local area = terraformUnit[id].area		
+			local area = terraformUnit[id].area
 			local edges = 0
 			local edge = {}
 			
@@ -2302,7 +2246,7 @@ local function updateTerraformEdgePoints(id)
 end
 
 local function CheckThickness(x, z, area)
-	-- This function returns whether the terraform point has sufficient nearby points 
+	-- This function returns whether the terraform point has sufficient nearby points
 	-- for the terraform to not be considered too thin.
 
 	if x%16 == 8 then
@@ -2378,11 +2322,11 @@ local function updateTerraformCost(id)
 					if terra.area[x] and terra.area[x][z] then
 						terra.area[x][z] = nil
 					end
-					point.structure = 1		
+					point.structure = 1
 					areaRemoved = true
 					checkAreaRemoved = true
 				end
-			end		
+			end
 		end
 	end
 	
@@ -2403,9 +2347,9 @@ local function updateTerraformCost(id)
 		elseif point.structure then
 			point.diffHeight = 0
 		else
-			point.diffHeight = point.aimHeight - height 
+			point.diffHeight = point.aimHeight - height
 		end
-		volume = volume + abs(point.diffHeight) 
+		volume = volume + abs(point.diffHeight)
 	end
 	
 	EchoDebug(id, "updateTerraformCost")
@@ -2439,20 +2383,20 @@ local function checkTerraformIntercepts(id)
 		--Spring.MarkerAddLine(terraformOrder[i].border.left,0,terraformOrder[i].border.bottom,terraformOrder[i].border.right,0,terraformOrder[i].border.bottom)
 		--Spring.MarkerAddLine(terraformOrder[i].border.left,0,terraformOrder[i].border.top,terraformOrder[i].border.left,0,terraformOrder[i].border.bottom)
 		--Spring.MarkerAddLine(terraformOrder[i].border.right,0,terraformOrder[i].border.top,terraformOrder[i].border.right,0,terraformOrder[i].border.bottom)
-		if (terraformOrder[i].border.left <= terraformOrder[terraformUnit[id].order].border.right and 
+		if (terraformOrder[i].border.left <= terraformOrder[terraformUnit[id].order].border.right and
 			terraformOrder[i].border.right >= terraformOrder[terraformUnit[id].order].border.left and
 			terraformOrder[i].border.top <= terraformOrder[terraformUnit[id].order].border.bottom and
 			terraformOrder[i].border.bottom >= terraformOrder[terraformUnit[id].order].border.top) then
 			
 			for j = 1, terraformOrder[i].indexes do
-				local oid = terraformUnitTable[terraformOrder[i].index[j]] 
+				local oid = terraformUnitTable[terraformOrder[i].index[j]]
 				if oid ~= id and not terraformUnit[id].interceptMap[oid] and terraformUnit[oid].fullyInitialised then
-					if (terraformUnit[id].border.left <= terraformUnit[oid].border.right and 
+					if (terraformUnit[id].border.left <= terraformUnit[oid].border.right and
 						terraformUnit[id].border.right >= terraformUnit[oid].border.left and
 						terraformUnit[id].border.top <= terraformUnit[oid].border.bottom and
 						terraformUnit[id].border.bottom >= terraformUnit[oid].border.top) then
 						
-						terraformUnit[oid].intercepts = terraformUnit[oid].intercepts + 1				
+						terraformUnit[oid].intercepts = terraformUnit[oid].intercepts + 1
 						terraformUnit[id].intercepts = terraformUnit[id].intercepts + 1
 					
 						terraformUnit[oid].intercept[terraformUnit[oid].intercepts] = {index = terraformUnit[id].intercepts, id = id}
@@ -2574,7 +2518,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 			for i = 1, terra.points do
 				local x = terra.point[i].x
 				local z = terra.point[i].z
-				if terra.area[x+8] and terra.area[x+8][z+8] then 
+				if terra.area[x+8] and terra.area[x+8][z+8] then
 					if drawPosMap[x] and drawPosMap[x][z] then
 						drawPositions.data[drawPosMap[x][z] ].r = 0.5
 						drawPositions.data[drawPosMap[x][z] ].g = 0
@@ -2648,7 +2592,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 				local overlapCost = 0
 				if extraPointArea[x] and extraPointArea[x][z] then
 					overlap = extraPointArea[x][z]
-					edgeHeight = extraPoint[overlap].orHeight + extraPoint[overlap].heightDiff 
+					edgeHeight = extraPoint[overlap].orHeight + extraPoint[overlap].heightDiff
 					overlapCost = extraPoint[overlap].cost
 				end
 
@@ -2669,12 +2613,12 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 					end
 
 					extraPoint[index] = {
-						x = x, z = z, 
-						orHeight = groundHeight, 
-						heightDiff = newHeight - maxHeightDifference - groundHeight, 
-						cost = (newHeight - maxHeightDifference - groundHeight), 
-						supportX = terra.point[i].x, 
-						supportZ = terra.point[i].z, 
+						x = x, z = z,
+						orHeight = groundHeight,
+						heightDiff = newHeight - maxHeightDifference - groundHeight,
+						cost = (newHeight - maxHeightDifference - groundHeight),
+						supportX = terra.point[i].x,
+						supportZ = terra.point[i].z,
 						supportH = newHeight,
 						supportID = i,
 						check = terra.point[i].edge[j].check,
@@ -2682,7 +2626,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 					}
 					--updateTerraformBorder(id,x,z) --Removed Intercept Check
 					
-					if structureAreaMap[x] and structureAreaMap[x][z] then
+					if not IsPositionTerraformable(x, z) then
 						if terra.area[terra.point[i].x] and terra.area[terra.point[i].x][terra.point[i].z] then
 							terra.area[terra.point[i].x][terra.point[i].z] = false
 						end
@@ -2690,7 +2634,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 						terra.point[i].structure = 1
 						return -1
 					end
-						
+					
 					addedCost = addedCost + extraPoint[index].cost - overlapCost
 					
 					if not extraPointArea[x] then
@@ -2714,13 +2658,13 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 					end
 					
 					extraPoint[index] = {
-						x = x, 
-						z = z, 
-						orHeight = groundHeight, 
-						heightDiff = newHeight + maxHeightDifference - groundHeight, 
-						cost = -(newHeight + maxHeightDifference - groundHeight), 
-						supportX = terra.point[i].x, 
-						supportZ = terra.point[i].z, 
+						x = x,
+						z = z,
+						orHeight = groundHeight,
+						heightDiff = newHeight + maxHeightDifference - groundHeight,
+						cost = -(newHeight + maxHeightDifference - groundHeight),
+						supportX = terra.point[i].x,
+						supportZ = terra.point[i].z,
 						supportH = newHeight,
 						supportID = i,
 						check = terra.point[i].edge[j].check,
@@ -2728,7 +2672,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 					}
 					--updateTerraformBorder(id,x,z) --Removed Intercept Check
 					
-					if structureAreaMap[x] and structureAreaMap[x][z] then
+					if not IsPositionTerraformable(x, z) then
 						if terra.area[terra.point[i].x] and terra.area[terra.point[i].x][terra.point[i].z] then
 							terra.area[terra.point[i].x][terra.point[i].z] = false
 						end
@@ -2754,7 +2698,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 		-- diamond pyramids
 		--local maxHeightDifferenceLocal = (abs(extraPoint[i].x-extraPoint[i].supportX) + abs(extraPoint[i].z-extraPoint[i].supportZ))*maxHeightDifference/8+maxHeightDifference
 		-- circular pyramids
-		local maxHeightDifferenceLocal = sqrt((extraPoint[i].x-extraPoint[i].supportX)^2 + (extraPoint[i].z-extraPoint[i].supportZ)^2)*maxHeightDifference/8+maxHeightDifference 
+		local maxHeightDifferenceLocal = sqrt((extraPoint[i].x-extraPoint[i].supportX)^2 + (extraPoint[i].z-extraPoint[i].supportZ)^2)*maxHeightDifference/8+maxHeightDifference
 		for j = 1, extraPoint[i].check.count do
 			local x = extraPoint[i].check.pos[j].x + extraPoint[i].x
 			local z = extraPoint[i].check.pos[j].z + extraPoint[i].z
@@ -2767,7 +2711,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 				local overlapCost = 0
 				if extraPointArea[x] and extraPointArea[x][z] then
 					overlap = extraPointArea[x][z]
-					edgeHeight = extraPoint[overlap].orHeight + extraPoint[overlap].heightDiff 
+					edgeHeight = extraPoint[overlap].orHeight + extraPoint[overlap].heightDiff
 					overlapCost = extraPoint[overlap].cost
 				end
 
@@ -2786,13 +2730,13 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 						extraPoints = extraPoints + 1
 					end
 					extraPoint[index] = {
-						x = x, 
-						z = z, 
-						orHeight = groundHeight, 
-						heightDiff = newHeight - maxHeightDifferenceLocal - groundHeight, 
-						cost = (newHeight - maxHeightDifferenceLocal - groundHeight), 
-						supportX = extraPoint[i].supportX, 
-						supportZ = extraPoint[i].supportZ, 
+						x = x,
+						z = z,
+						orHeight = groundHeight,
+						heightDiff = newHeight - maxHeightDifferenceLocal - groundHeight,
+						cost = (newHeight - maxHeightDifferenceLocal - groundHeight),
+						supportX = extraPoint[i].supportX,
+						supportZ = extraPoint[i].supportZ,
 						supportH = extraPoint[i].supportH,
 						supportID = extraPoint[i].supportID,
 						check =  extraPoint[i].check,
@@ -2800,7 +2744,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 					}
 					--updateTerraformBorder(id,x,z) --Removed Intercept Check
 					
-					if structureAreaMap[x] and structureAreaMap[x][z] then
+					if not IsPositionTerraformable(x, z) then
 						if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
 							terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = false
 						end
@@ -2830,13 +2774,13 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 						extraPoints = extraPoints + 1
 					end
 					extraPoint[index] = {
-						x = x, 
-						z = z, 
-						orHeight = groundHeight, 
+						x = x,
+						z = z,
+						orHeight = groundHeight,
 						heightDiff = newHeight + maxHeightDifferenceLocal - groundHeight,
-						cost = -(newHeight + maxHeightDifferenceLocal - groundHeight), 
-						supportX = extraPoint[i].supportX, 
-						supportZ = extraPoint[i].supportZ, 
+						cost = -(newHeight + maxHeightDifferenceLocal - groundHeight),
+						supportX = extraPoint[i].supportX,
+						supportZ = extraPoint[i].supportZ,
 						supportH = extraPoint[i].supportH,
 						supportID = extraPoint[i].supportID,
 						check =  extraPoint[i].check,
@@ -2844,7 +2788,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 					}
 					--updateTerraformBorder(id,x,z) --Removed Intercept Check
 					
-					if structureAreaMap[x] and structureAreaMap[x][z] then
+					if not IsPositionTerraformable(x, z) then
 						if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
 							terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = false -- false for edge-derived problems
 						end
@@ -2946,7 +2890,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 			local height = terra.point[i].orHeight+terra.point[i].diffHeight*progress
 			spSetHeightMap(terra.point[i].x,terra.point[i].z, height)
 			terra.point[i].prevHeight = height
-		end 
+		end
 		for i = 1, extraPoints do
 			spSetHeightMap(extraPoint[i].x,extraPoint[i].z,extraPoint[i].orHeight + extraPoint[i].heightDiff*edgeTerraMult)
 		end
@@ -3078,12 +3022,12 @@ local function DoTerraformUpdate(n, forceCompletion)
 						GG.Awards.AddAwardPoints('terra', terraformUnit[id].team, costDiff)
 					end
 					
-					local updateVar = updateTerraform(health,id,i,costDiff) 
+					local updateVar = updateTerraform(health,id,i,costDiff)
 					EchoDebug(id, "updateVar", updateVar)
 					while updateVar == -1 do
 						if updateTerraformCost(id) then
 							updateTerraformEdgePoints(id)
-							updateVar = updateTerraform(health,id,i,costDiff) 
+							updateVar = updateTerraform(health,id,i,costDiff)
 						else
 							updateVar = 0
 						end
@@ -3168,12 +3112,12 @@ function gadget:GameFrame(n)
 								end
 							end
 							
-						elseif #cQueue[i].params == 4 then -- there is a command with 5 params that I do not want 
+						elseif #cQueue[i].params == 4 then -- there is a command with 5 params that I do not want
 							-- area command
 							local radSQ = cQueue[i].params[4]^2
 							local cX, _, cZ = cQueue[i].params[1],cQueue[i].params[2],cQueue[i].params[3]
 							if constructor[constructorTable[currentCon]] and constructor[constructorTable[currentCon]].allyTeam then
-								local allyTeam = constructor[constructorTable[currentCon]].allyTeam 
+								local allyTeam = constructor[constructorTable[currentCon]].allyTeam
 								for j = 1, terraformUnitCount do
 									local terra = terraformUnit[terraformUnitTable[j]]
 									if terra.allyTeam == allyTeam then
@@ -3208,7 +3152,7 @@ function gadget:GameFrame(n)
 			end
 			i = i + 1
 		end
-	end	
+	end
 end
 
 function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
@@ -3305,12 +3249,12 @@ local function makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posC
 			posY[i] = 0
 			--found.count = found.count + 1
 			--found.data[found.count] = {x = posX[i], z = posZ[i]}
-		end	
+		end
 	end
 	
 	
 	--[[
-	if found.count == 0 then	
+	if found.count == 0 then
 		return posY
 	end
 	
@@ -3439,7 +3383,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 							end
 						end
 					end
-				end 
+				end
 				
 				--posY = makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
 				
@@ -3468,14 +3412,14 @@ end
 local function deregisterStructure(unitID)
 	if structure[unitID].checkAtDeath then
 		for i = 1, terraformOrders do
-			if (structure[unitID].minx < terraformOrder[i].border.right and 
+			if (structure[unitID].minx < terraformOrder[i].border.right and
 				structure[unitID].maxx > terraformOrder[i].border.left and
 				structure[unitID].minz < terraformOrder[i].border.bottom and
 				structure[unitID].maxz> terraformOrder[i].border.top) then
 				
 				for j = 1, terraformOrder[i].indexes do
-					local oid = terraformUnitTable[terraformOrder[i].index[j]] 
-					if (structure[unitID].minx < terraformUnit[oid].border.right and 
+					local oid = terraformUnitTable[terraformOrder[i].index[j]]
+					if (structure[unitID].minx < terraformUnit[oid].border.right and
 						structure[unitID].maxx > terraformUnit[oid].border.left and
 						structure[unitID].minz < terraformUnit[oid].border.bottom and
 						structure[unitID].maxz > terraformUnit[oid].border.top) then
@@ -3529,7 +3473,7 @@ local function deregisterStructure(unitID)
 	end
 		
 	if structure[unitID].index ~= structureCount then
-		structureTable[structure[unitID].index] = structureTable[structureCount] 
+		structureTable[structure[unitID].index] = structureTable[structureCount]
 		structure[structureTable[structureCount]].index = structure[unitID].index
 	end
 	structureCount = structureCount - 1
@@ -3537,7 +3481,7 @@ local function deregisterStructure(unitID)
 	
 end
 
-local dirtbagPosX = 
+local dirtbagPosX =
 	          { -8, 0, 8,
 	        -16,-8, 0, 8, 16,
 	    -24,-16,-8, 0, 8, 16, 24,
@@ -3548,7 +3492,7 @@ local dirtbagPosX =
 	        -16,-8, 0, 8, 16,
 	            -8, 0, 8}
 
-local dirtbagPosZ = 
+local dirtbagPosZ =
 	           {-32,-32,-32,
 	        -24,-24,-24,-24,-24,
 	    -16,-16,-16,-16,-16,-16,-16,
@@ -3559,15 +3503,15 @@ local dirtbagPosZ =
 	          24, 24, 24, 24, 24,
 	              32, 32, 32}
 
-local dirtbagPosY = 
+local dirtbagPosY =
 	            {2 , 3 , 2 ,
 	         2 , 3 , 7 , 3 , 2 ,
 	     2 , 5 , 20, 21, 20, 4 , 2 ,
 	 2 , 3 , 20, 25, 26, 25, 20, 3 , 2 ,
 	 3 , 7 , 21, 26, 28, 26, 21, 7 , 3 ,
 	 2 , 3 , 20, 25, 26, 25, 20, 3 , 2 ,
-	     2 , 4 , 20, 21, 20, 5 , 2 , 
-	          2, 3 , 7 , 3 , 2 , 
+	     2 , 4 , 20, 21, 20, 5 , 2 ,
+	          2, 3 , 7 , 3 , 2 ,
 	             2 , 3 , 2 }
 
 function gadget:UnitDestroyed(unitID, unitDefID)
@@ -3583,12 +3527,12 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 				function()
 					for i = 1, #dirtbagPosX, 1 do
 						local x, z = dirtbagPosX[i] + ux, dirtbagPosZ[i] + uz
-						if not (structureAreaMap[x] and structureAreaMap[x][z]) then
+						if IsPositionTerraformable(x, z) then
 							spAddHeightMap(x, z, dirtbagPosY[i])
 						end
 					end
 				end
-			) 
+			)
 			
 			local units = Spring.GetUnitsInCylinder(ux,uz,40)
 			for i = 1, #units do
@@ -3628,14 +3572,14 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 					local newHeight = heightMap[ix][iz] + heightChange
 					
 					local maxDiff = heightMap[ix-8][iz]-newHeight
-					if heightMap[ix+8][iz]-newHeight > maxDiff then 
-						maxDiff = heightMap[ix+8][iz]-newHeight 
+					if heightMap[ix+8][iz]-newHeight > maxDiff then
+						maxDiff = heightMap[ix+8][iz]-newHeight
 					end
-					if heightMap[ix][iz-8]-newHeight > maxDiff then 
-						maxDiff = heightMap[ix][iz-8]-newHeight 
+					if heightMap[ix][iz-8]-newHeight > maxDiff then
+						maxDiff = heightMap[ix][iz-8]-newHeight
 					end
-					if heightMap[ix][iz+8]-newHeight > maxDiff then 
-						maxDiff = heightMap[ix][iz+8]-newHeight 
+					if heightMap[ix][iz+8]-newHeight > maxDiff then
+						maxDiff = heightMap[ix][iz+8]-newHeight
 					end
 					
 					if maxDiff < maxHeightDifference then
@@ -3649,9 +3593,9 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 			end
 
 			local func = function()
-					for i = 1, points do	
+					for i = 1, points do
 						spSetHeightMap(point[i].x,point[i].z,point[i].y)
-					end 
+					end
 				end
 			spSetHeightMapFunc(func)
 		end
@@ -3762,15 +3706,15 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		-- check if the building is on terraform
 		for i = 1, terraformOrders do
 			
-			if (structure[unitID].minx < terraformOrder[i].border.right and 
+			if (structure[unitID].minx < terraformOrder[i].border.right and
 				structure[unitID].maxx > terraformOrder[i].border.left and
 				structure[unitID].minz < terraformOrder[i].border.bottom and
 				structure[unitID].maxz> terraformOrder[i].border.top) then
 				
 				for j = 1, terraformOrder[i].indexes  do
-					local oid = terraformUnitTable[terraformOrder[i].index[j]] 
+					local oid = terraformUnitTable[terraformOrder[i].index[j]]
 
-					if (structure[unitID].minx < terraformUnit[oid].border.right and 
+					if (structure[unitID].minx < terraformUnit[oid].border.right and
 						structure[unitID].maxx > terraformUnit[oid].border.left and
 						structure[unitID].minz < terraformUnit[oid].border.bottom and
 						structure[unitID].maxz > terraformUnit[oid].border.top) then
@@ -3807,7 +3751,7 @@ end
 -- Debug
 
 local function toggleDebug(cmd, line, words, player)
-	if not Spring.IsCheatingEnabled() then 
+	if not Spring.IsCheatingEnabled() then
 		return
 	end
 	local unitID = tonumber(words[1])

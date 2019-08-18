@@ -1,4 +1,4 @@
-return {	
+return {
 	["water"] = {
 		["surfaceAlpha"]  = 0.01,
 		["fresnelPower"]  = 2.0,

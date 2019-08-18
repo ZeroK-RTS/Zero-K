@@ -32,7 +32,7 @@
 		particleSize		= 0.5;
 		particleSizeSpread	= 1;
 
-		directional		= 0; 
+		directional		= 0;
 		useAirLos		= 1;
 		}
 	air=0;

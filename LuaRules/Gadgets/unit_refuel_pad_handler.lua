@@ -21,9 +21,9 @@ local spGetUnitBasePosition = Spring.GetUnitBasePosition
 local spGetUnitHeading      = Spring.GetUnitHeading
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spSetUnitVelocity     = Spring.SetUnitVelocity
-local spSetUnitLeaveTracks  = Spring.SetUnitLeaveTracks 
+local spSetUnitLeaveTracks  = Spring.SetUnitLeaveTracks
 local spGetUnitVelocity     = Spring.GetUnitVelocity
-local spGetUnitRotation     = Spring.GetUnitRotation 
+local spGetUnitRotation     = Spring.GetUnitRotation
 local spGetUnitHealth       = Spring.GetUnitHealth
 local spSetUnitHealth       = Spring.SetUnitHealth
 local spGetUnitIsStunned    = Spring.GetUnitIsStunned
@@ -112,7 +112,7 @@ local function AbortCheck(unitID, isLanded)
 				Spring.SetUnitResourcing(unitID, "uue", 0)
 				
 				-- activate unit and its jets. An attempt at the Vulture-losing-radar bug.
-				Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1) 
+				Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
 			end
 			mcDisable(unitID)
 			unitMovectrled[unitID] = nil
@@ -251,7 +251,7 @@ local function SitOnPad(unitID)
 		spSetUnitVelocity(unitID, 0, 0, 0)
 		Spring.SetUnitResourcing(unitID, "uue" ,0)
 		mcDisable(unitID)
-		GG.UpdateUnitAttributes(unitID) --update pending attribute changes in unit_attributes.lua if available 
+		GG.UpdateUnitAttributes(unitID) --update pending attribute changes in unit_attributes.lua if available
 		unitMovectrled[unitID] = nil
 		landingUnit[unitID] = nil
 		
@@ -291,7 +291,7 @@ local function CircleToLand(unitID, goal)
 	
 	local heading = spGetUnitHeading(unitID)*HEADING_TO_RAD
 	
-	-- Find position of focus points for left or right turning circles 
+	-- Find position of focus points for left or right turning circles
 	local leftFocus = {
 		[1] = start[1] + turnCircleRadius*sin(heading + PI/2),
 		[3] = start[3] + turnCircleRadius*cos(heading + PI/2)
@@ -303,8 +303,8 @@ local function CircleToLand(unitID, goal)
 	}
 	
 	-- Decide upon direction to turn
-	local leftDistSq = (goal[1] - leftFocus[1])^2 + (goal[3] - leftFocus[3])^2 
-	local rightDistSq = (goal[1] - rightFocus[1])^2 + (goal[3] - rightFocus[3])^2 
+	local leftDistSq = (goal[1] - leftFocus[1])^2 + (goal[3] - leftFocus[3])^2
+	local rightDistSq = (goal[1] - rightFocus[1])^2 + (goal[3] - rightFocus[3])^2
 	
 	--Spring.MarkerAddPoint(leftFocus[1],0,leftFocus[3],sqrt(leftDistSq))
 	--Spring.MarkerAddPoint(rightFocus[1],0,rightFocus[3],sqrt(rightDistSq))
@@ -523,16 +523,16 @@ function GG.LandAborted(unitID)
 	end
 end
 
-local function UpdateCoroutines() 
-	local newCoroutines = {} 
-	for i=1, #coroutines do 
-		local co = coroutines[i] 
-		if (coroutine.status(co) ~= "dead") then 
-			newCoroutines[#newCoroutines + 1] = co 
-		end 
-	end 
-	coroutines = newCoroutines 
-	for i=1, #coroutines do 
+local function UpdateCoroutines()
+	local newCoroutines = {}
+	for i=1, #coroutines do
+		local co = coroutines[i]
+		if (coroutine.status(co) ~= "dead") then
+			newCoroutines[#newCoroutines + 1] = co
+		end
+	end
+	coroutines = newCoroutines
+	for i=1, #coroutines do
 		assert(coroutine.resume(coroutines[i]))
 	end
 end

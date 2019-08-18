@@ -151,7 +151,7 @@ function widget:Initialize()
         gl_Position = gl_ProjectionMatrix * P;
         position = gl_Position;
       }
-    ]],  
+    ]],
  
     fragment = [[
       varying vec3 normal;
@@ -246,7 +246,7 @@ function widget:DrawWorldRefraction()
   local oldZMin, oldZMax = zMin, zMax
   zMin, zMax = zMin/1.2, zMax/1.2
   DrawWorldFunc()
-  zMin, zMax = oldZMin, oldZMax 
+  zMin, zMax = oldZMin, oldZMax
 end
 
 --------------------------------------------------------------------------------

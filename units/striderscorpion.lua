@@ -70,7 +70,7 @@ unitDef = {
       def                = [[FAKELASER]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 30,
-    },  
+    },
     
     {
       def                = [[LIGHTNING]],

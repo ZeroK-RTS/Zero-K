@@ -27,7 +27,7 @@ unitDef = {
   floater                       = true,
   footprintX                    = 4,
   footprintZ                    = 4,
-  highTrajectory                = 1, 
+  highTrajectory                = 1,
   iconType                      = [[staticarty]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -110,7 +110,7 @@ unitDef = {
       waterweapon             = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 550,
-    },  
+    },
   
     SLAMSPORE = {
       name                    = [[Slammer Spore]],

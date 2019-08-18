@@ -277,7 +277,7 @@ local function AnimFinished(waitingForAnim, piece, axis)
 	if wthreads then
 		waitingForAnim[index] = {}
 
-		while (#wthreads > 0) do	
+		while (#wthreads > 0) do
 			wthread = wthreads[#wthreads]
 			wthreads[#wthreads] = nil
 
@@ -558,7 +558,7 @@ local function LoadScript(scriptName, filename)
 end
 
 local function ToggleScriptDebug(cmd, line, words, player)
-	if not Spring.IsCheatingEnabled() then 
+	if not Spring.IsCheatingEnabled() then
 		return
 	end
 	

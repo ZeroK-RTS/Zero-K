@@ -74,7 +74,7 @@ unitDef = {
     {
       def                = [[TRILASER]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },    
+    },
 
   },
 
@@ -265,7 +265,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 2250,
-    },    
+    },
     
     ORCONE_ROCKET = {
       name                    = [[Medium-Range Missiles]],

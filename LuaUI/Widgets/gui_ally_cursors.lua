@@ -275,7 +275,7 @@ function widget:DrawWorldPreUnit()
   glPolygonOffset(false)
   glTexture(false)
   glDepthTest(false)
-end            
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

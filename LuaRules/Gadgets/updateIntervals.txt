@@ -2,10 +2,10 @@
 # This file holds all gadgets, which catch the GameFrame(n) event
 ################################################################################
 # Small info:
-# The engine handles 30 gameframes per second 
+# The engine handles 30 gameframes per second
 # (so a (n%30<1) script would be called every 1s)
 #
-# If now all gadgets would do somethings in every 30nd frame the game would lag 
+# If now all gadgets would do somethings in every 30nd frame the game would lag
 # (the rendering of that frame would be slower as the rest). So this file tries
 # to balance all work over the whole second (so the update interval is still be
 # 1s) as it holds offset for each gadget. The work is well balanced if such an

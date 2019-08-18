@@ -22,8 +22,8 @@ local spGetVisibleProjectiles     = Spring.GetVisibleProjectiles
 local spGetProjectilePosition     = Spring.GetProjectilePosition
 local spGetProjectileType         = Spring.GetProjectileType
 local spGetProjectileDefID        = Spring.GetProjectileDefID
-local spGetPieceProjectileParams  = Spring.GetPieceProjectileParams 
-local spGetProjectileVelocity     = Spring.GetProjectileVelocity 
+local spGetPieceProjectileParams  = Spring.GetPieceProjectileParams
+local spGetProjectileVelocity     = Spring.GetProjectileVelocity
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ options = {
 		name = "Enable Projectile Lights",
 		type = 'bool',
 		value = true,
-		OnChange = function (self) 
+		OnChange = function (self)
 			lightsEnabled = self.value
 		end,
 		noHotkey = true,
@@ -109,7 +109,7 @@ options = {
 		desc = "Override lights with the following parameters.",
 		type = 'bool',
 		value = false,
-		OnChange = function (self) 
+		OnChange = function (self)
 			doOverride = self.value
 		end,
 		noHotkey = true,
@@ -131,7 +131,7 @@ options = {
 		type = 'number',
 		value = 3,
 		min = 0.05, max = 5, step = 0.05,
-		OnChange = function (self) 
+		OnChange = function (self)
 			colorBrightness = self.value
 			ApplySetting()
 		end,
@@ -366,13 +366,13 @@ local function GetBeamLights(lightParams, pID, x, y, z)
 	if lightParams.beamStartOffset then
 		local m = lightParams.beamStartOffset
 		x, y, z = x + deltax*m, y + deltay*m, z + deltaz*m
-		deltax, deltay, deltaz = deltax*(1 - m), deltay*(1 - m), deltaz*(1 - m) 
+		deltax, deltay, deltaz = deltax*(1 - m), deltay*(1 - m), deltaz*(1 - m)
 	end
 	
 	local light = {
 		pID = pID,
-		px = x, py = y, pz = z, 
-		dx = deltax, dy = deltay, dz = deltaz, 
+		px = x, py = y, pz = z,
+		dx = deltax, dy = deltay, dz = deltaz,
 		param = (doOverride and overrideParam) or lightParams,
 		beam = true
 	}
@@ -390,7 +390,7 @@ end
 local function GetProjectileLight(lightParams, pID, x, y, z)
 	local light = {
 		pID = pID,
-		px = x, py = y, pz = z, 
+		px = x, py = y, pz = z,
 		param = (doOverride and overrideParam) or lightParams
 	}
 	-- Use the following to check heatray fadeout parameters.

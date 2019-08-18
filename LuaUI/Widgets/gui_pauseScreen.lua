@@ -39,7 +39,7 @@ local glDepthTest           = gl.DepthTest
 local osClock				= os.clock
 ----------------------------------------------------------------------------------
 -- CONFIGURATION
-local debug = false	
+local debug = false
 local boxWidth = 300
 local boxHeight = 60
 local slideTime = 0.4
@@ -83,9 +83,9 @@ local mouseOverClose = false
 
 options_path = 'Settings/HUD Panels/Pause Screen'
 
-options = { 
+options = {
 	hideimage = {
-		name='Disable Pause Screen', 
+		name='Disable Pause Screen',
 		type='bool',
 		desc = 'Remember to not display pause-screen anymore. \n\nRemainder: you can revisit this configuration page at any time later at "Settings/HUD Panels/Pause Screen" if needed.',
 		value=false,
@@ -189,8 +189,8 @@ function widget:DrawScreen()
 end
 
 function isOverWindow(x, y)
-	if ( ( x > screenCenterX - boxWidth) and ( y < screenCenterY + boxHeight ) and 
-		( x < screenCenterX + boxWidth ) and ( y > screenCenterY - boxHeight ) ) then	
+	if ( ( x > screenCenterX - boxWidth) and ( y < screenCenterY + boxHeight ) and
+		( x < screenCenterX + boxWidth ) and ( y > screenCenterY - boxHeight ) ) then
 		return true
 	end
 	return false
@@ -198,7 +198,7 @@ function isOverWindow(x, y)
 
 function widget:MousePress(x, y, button)
   if ( not clickTimestamp and (not (options.hideimage.value or tempDisabled) and not options.autofade.value)) then
-	if ( isOverWindow(x, y)) then	
+	if ( isOverWindow(x, y)) then
 		--do not update clickTimestamp any more after right mouse button click
 		if ( not (options.hideimage.value or tempDisabled) ) then
 			clickTimestamp = osClock()
@@ -207,7 +207,7 @@ function widget:MousePress(x, y, button)
 		--display setting for Pause Screen when pressing Spacebat+Click on the Pause Screen.
 		local alt, ctrl, meta, shift = Spring.GetModKeyState()
 		if not meta then  --//skip epicMenu when user didn't press the Spacebar
-			return false 
+			return false
 		end
 		WG.crude.OpenPath(options_path) --click + space will shortcut to option-menu
 		WG.crude.ShowMenu() --make epic Chili menu appear.
@@ -235,7 +235,7 @@ end
 
 function widget:Update()
 	local x,y = spGetMouseState()
-	if ( isOverWindow(x, y) ) then	
+	if ( isOverWindow(x, y) ) then
 		mouseOverClose = true
 	else
 		mouseOverClose = false
@@ -257,7 +257,7 @@ function drawPause(paused, now)
 
 	local text =  { 1.0, 1.0, 1.0, 1.0 }
 	local text2 =  { 0.9, 0.9, 0.9, 1.0 }
-	local outline =  { 0.4, 0.4, 0.4, 1.0 }	
+	local outline =  { 0.4, 0.4, 0.4, 1.0 }
 	local colorWnd = { 0.0, 0.0, 0.0, 0.6 }
 	local colorWnd2 = { 0.5, 0.5, 0.5, 0.6 }
 	local iconColor = { 1.0, 1.0, 1.0, 1.0 }
@@ -279,7 +279,7 @@ function drawPause(paused, now)
 	--adjust transparency when clicked
 	if ( clickTimestamp ~= nil or (options.hideimage.value or tempDisabled)) then
 		local factor = 0.0
-		if ( clickTimestamp ) then		
+		if ( clickTimestamp ) then
 			factor = ( 1.0 - ( now - clickTimestamp ) / fadeTime )
 		end
 		factor = max( factor, minTransparency )
@@ -294,7 +294,7 @@ function drawPause(paused, now)
 		outline[4] = outline[4] * factor
 		iconColor[4] = iconColor[4] * factor
 		iconColor2[4] = iconColor2[4]* factor
-		mouseOverColor[4] = mouseOverColor[4] * factor			
+		mouseOverColor[4] = mouseOverColor[4] * factor
 	end
 	local imgWidthHalf = imgWidth * 0.5
 	
@@ -302,7 +302,7 @@ function drawPause(paused, now)
 		colorWnd[4] = colorWnd[4] * 0
 		iconColor[4] = iconColor[4] * 0
 		iconColor2[4] = iconColor2[4]* 0
-		mouseOverColor[4] = mouseOverColor[4] * 0	
+		mouseOverColor[4] = mouseOverColor[4] * 0
 	end
 	
 	
@@ -397,7 +397,7 @@ function widget:ViewResize(viewSizeX, viewSizeY)
  end
 
 --Commons
-function ResetGl() 
+function ResetGl()
 	glColor( { 1.0, 1.0, 1.0, 1.0 } )
 	glLineWidth( 1.0 )
 	glDepthTest(false)
@@ -412,8 +412,8 @@ function printDebug( value )
 				else spEcho("false") end
 		elseif ( type(value ) == "table" ) then
 			spEcho("Dumping table:")
-			for key,val in pairs(value) do 
-				spEcho(key,val) 
+			for key,val in pairs(value) do
+				spEcho(key,val)
 			end
 		else
 			spEcho( value )

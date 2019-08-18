@@ -130,7 +130,7 @@ local function setSurfaceState(unitID, unitDefID, surfacing)
 	if not stun then
 		data.surfacing = surfacing
 	else
-		data.paraData.want = surfacing 
+		data.paraData.want = surfacing
 		if not data.paraData.para then
 			local def = floatDefs[data.unitDefID]
 			if def.sinkOnPara then
@@ -223,10 +223,10 @@ function gadget:GameFrame(f)
 				else
 					cmdID, cmdOpts, cmdTag = Spring.GetUnitCurrentCommand(unitID)
 				end
-				if cmdID then 
+				if cmdID then
 					if (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE) and cmdOpts == CMD.OPT_RIGHT then --Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position
 						Spring.GiveOrderArrayToUnitArray({unitID},{
-							{CMD.REMOVE, {cmdTag}, 0},--clear Spring's command that desire unit to return to old position	
+							{CMD.REMOVE, {cmdTag}, 0},--clear Spring's command that desire unit to return to old position
 							{CMD.INSERT, {0, CMD.STOP, CMD.SHIFT,}, CMD.OPT_ALT},
 						})
 					end
@@ -263,7 +263,7 @@ function gadget:GameFrame(f)
 				if def.sinkOnPara and not data.paraData.para then
 					stun = stun or select(1, Spring.GetUnitIsStunned(unitID))
 					if stun then
-						data.paraData.want = data.surfacing 
+						data.paraData.want = data.surfacing
 						data.surfacing = false
 						data.paraData.para = true
 					end
@@ -337,12 +337,12 @@ function gadget:GameFrame(f)
 					end
 				else --rising
 					local dragFactors = (data.speed > 0 and def.riseUpDrag or def.riseDownDrag)*data.nextSpecialDrag*def.waterHitDrag
-					local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)				
+					local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)
 					data.speed = (data.speed + def.riseAccel+drag) --float as fast as possible
 				end
 			else
 				local dragFactors = (def.airDrag)*data.nextSpecialDrag
-				local drag = CalculateDrag(data.speed,dragFactors, 1,0.02,1)	
+				local drag = CalculateDrag(data.speed,dragFactors, 1,0.02,1)
 				data.speed = (data.speed + def.airAccel + drag) --fall down from sky
 			end
 			
@@ -383,7 +383,7 @@ function gadget:GameFrame(f)
 					callScript(unitID, "Float_stopOnFloor")
 					removeFloat(unitID)
 					
-					i = i - 1 
+					i = i - 1
 				end
 			end
 			
@@ -418,17 +418,17 @@ local function FloatToggleCommand(unitID, cmdParams, cmdOptions)
 	end
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_UNIT_FLOAT_STATE] = true, [CMD_STOP] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID == CMD_UNIT_FLOAT_STATE) then
-		FloatToggleCommand(unitID, cmdParams, cmdOptions)  
+		FloatToggleCommand(unitID, cmdParams, cmdOptions)
 		return false  -- command was used
 	elseif (cmdID == CMD_STOP) then
 		if floatState[unitID] == FLOAT_ALWAYS then
@@ -501,7 +501,7 @@ function gadget:Initialize()
 			end
 		end
 		return false
-	end	
+	end
 	
 	GG.WantToTransport_FloatNow = function(unitID)
 		local unitDefID = Spring.GetUnitDefID(unitID)

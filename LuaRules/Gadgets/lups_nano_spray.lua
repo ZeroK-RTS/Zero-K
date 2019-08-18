@@ -18,7 +18,7 @@ end
 local spGetFactoryCommands = Spring.GetFactoryCommands
 local spGetCommandQueue    = Spring.GetCommandQueue
 
-local function GetCmdTag(unitID) 
+local function GetCmdTag(unitID)
 	local cmdTag = 0
 	local cmds = spGetFactoryCommands(unitID,1)
 	if (cmds) then
@@ -27,7 +27,7 @@ local function GetCmdTag(unitID)
 			cmdTag = cmd.tag
 		end
 	end
-	if cmdTag == 0 then 
+	if cmdTag == 0 then
 		if Spring.Utilities.COMPAT_GET_ORDER then
 			local queue = spGetCommandQueue(unitID,1)
 			if (queue) then
@@ -42,9 +42,9 @@ local function GetCmdTag(unitID)
 				cmdTag = firstCmdTag
 			end
 		end
-	end 
+	end
 	return cmdTag
-end 
+end
 	
 
 -------------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ end
 
 
 local function CopyTable(outtable,intable)
-  for i,v in pairs(intable) do 
+  for i,v in pairs(intable) do
     if (type(v)=='table') then
       if (type(outtable[i])~='table') then outtable[i] = {} end
       CopyTable(outtable[i],v)
@@ -135,7 +135,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
---  «« some basic functions »»
+--  Â«Â« some basic functions Â»Â»
 --
 
 local supportedFxs = {}
@@ -195,7 +195,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
---  «« NanoSpray handling »»
+--  Â«Â« NanoSpray handling Â»Â»
 --
 
 local nanoParticles = {}
@@ -204,7 +204,7 @@ local maxEngineParticles = Spring.GetConfigInt("MaxNanoParticles", 10000)
 local function GetFaction(udid)
   --local udef_factions = UnitDefs[udid].factions or {}
   --return ((#udef_factions~=1) and 'unknown') or udef_factions[1]
-  return "default" -- default 
+  return "default" -- default
 end
 
 local factionsNanoFx = {
@@ -374,7 +374,7 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:Update()
-  if (spGetGameFrame()<1) then 
+  if (spGetGameFrame()<1) then
     return
   end
 
@@ -396,7 +396,7 @@ function gadget:Update()
   --// init user custom nano fxs
   for faction,fx in pairs(Lups.Config or {}) do
     if (fx and (type(fx)=='table') and fx.fxtype) then
-      local fxType = fx.fxtype 
+      local fxType = fx.fxtype
       local fxSettings = fx
 
       if (fxType)and

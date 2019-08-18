@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 --- Colorbars module
 
@@ -21,17 +21,17 @@ Colorbars = Control:Inherit{
 local this = Colorbars
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Sets the new color
--- @tparam {r, g, b, a} c color table 
+-- @tparam {r, g, b, a} c color table
 function Colorbars:SetColor(c)
 	self:CallListeners(self.OnChange, c)
 	self.value = c
 	self:Invalidate()
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 local GL_LINE_LOOP = GL.LINE_LOOP
 local GL_LINES = GL.LINES
@@ -73,7 +73,7 @@ function Colorbars:DrawControl()
 	gl.BeginEnd(GL.TRIANGLE_STRIP, theme.DrawBorder_, barswidth + 2, 0, self.width - barswidth - 4, self.height, 1, self.borderColor, self.borderColor2)
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Colorbars:HitTest()
 	return self
@@ -105,4 +105,4 @@ function Colorbars:MouseMove(x, y, dx, dy, button)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================

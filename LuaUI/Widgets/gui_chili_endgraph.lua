@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:GetInfo() 
+function widget:GetInfo()
 	return {
 		name    = "EndGame Stats",
 		desc    = "v0.913 Chili replacement for default end game statistics",
@@ -10,7 +10,7 @@ function widget:GetInfo()
 		license = "public domain",
 		layer   = -1,
 		enabled = true
-	} 
+	}
 end
 
 --[[
@@ -119,11 +119,11 @@ local function formatTime(seconds)
 	local hours = math.floor(seconds/3600)
 	local minutes = math.floor(seconds/60) % 60
 	local seconds = seconds % 60
-	if minutes < 10 then 
-		minutes = "0" .. minutes 
+	if minutes < 10 then
+		minutes = "0" .. minutes
 	end
-	if seconds < 10 then 
-		seconds = "0" .. seconds 
+	if seconds < 10 then
+		seconds = "0" .. seconds
 	end
 	return hours .. ":" .. minutes .. ":" .. seconds
 end
@@ -131,19 +131,19 @@ end
 local function drawIntervals(graphMax)
 	for i = 1, 4 do
 		local line = Chili.Line:New{
-			parent = graphPanel, 
-			x = 0, 
+			parent = graphPanel,
+			x = 0,
 			bottom = (0.997*(i)/5*100 - 0.8) .. "%",
 			height = 0,
-			width = "100%", 
+			width = "100%",
 			color = {0.1,0.1,0.1,0.1}
 		}
 		if graphMax then
 			local label = Chili.Label:New{
-				parent = graphPanel, 
+				parent = graphPanel,
 				x = 5,
 				bottom = ((i)/5*100 + 1) .. "%",
-				width = "100%", 
+				width = "100%",
 				caption = numFormat(graphMax*i/5)
 			}
 		end
@@ -179,12 +179,12 @@ local function fixLabelAlignment()
 				if lineLabels.children[a].y >= lineLabels.children[b].y and lineLabels.children[a].y < lineLabels.children[b].y+11 then
 					lineLabels.children[a]:SetPos(0, lineLabels.children[b].y+11)
 					doAgain = false
-				end 
-			end 
-		end 
+				end
+			end
+		end
 	end
-	if doAgain then 
-		fixLabelAlignment() 
+	if doAgain then
+		fixLabelAlignment()
 	end
 end
 --]]
@@ -211,8 +211,8 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 	end
 	
 	local r,g,b,a = Spring.GetTeamColor(
-		usingAllyteams 
-		and ((teamID == Spring.GetMyAllyTeamID()) and Spring.GetMyTeamID() or Spring.GetTeamList(teamID)[1]) 
+		usingAllyteams
+		and ((teamID == Spring.GetMyAllyTeamID()) and Spring.GetMyTeamID() or Spring.GetTeamList(teamID)[1])
 		or teamID
 	)
 	local teamColor = {r,g,b,a}
@@ -226,7 +226,7 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 	end
 
 	for i = 1, #graphArray do
-		if (graphMax < graphArray[i]) then 
+		if (graphMax < graphArray[i]) then
 			graphMax = graphArray[i]
 		end
 	end
@@ -256,7 +256,7 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 			parent = graphPanel,
 			x = 55, y = (team_num)*20 + 5,
 			width = "100%",
-			height = 20, 
+			height = 20,
 			caption = name,
 			font = {color = teamColor}
 		}
@@ -390,7 +390,7 @@ function makePanel()
 	window0 = Chili.Control:New {
 		x = "0",
 		y = "0",
-		width = "100%", 
+		width = "100%",
 		height = "100%",
 		padding = {0,0,0,4},
 		buttonPressed = 1,
@@ -400,13 +400,13 @@ function makePanel()
 		y = 0,
 		right = 0,
 		bottom = 40,
-		width = 35, 
+		width = 35,
 		padding = {0,0,0,0},
 	}
 	graphSelect	= Chili.StackPanel:New {
 		parent = window0,
 		minHeight = 70,
-		x = 0, 
+		x = 0,
 		y = 0,
 		width = selW,
 		height = "100%",
@@ -417,26 +417,26 @@ function makePanel()
 	}
 	graphPanel = Chili.Panel:New {
 		parent = window0,
-		x = selW + 4, 
+		x = selW + 4,
 		right = 40,
-		y = 0, 
+		y = 0,
 		bottom = 40,
 		padding = {2, 2, 2, 2},
 	}
 	graphLabel = Chili.Label:New {
 		parent = window0,
 		caption = "",
-		x = "20%", 
+		x = "20%",
 		bottom = 5,
-		width = "70%", 
-		height = 30, 
+		width = "70%",
+		height = 30,
 		align = "center",
 		autosize = true,
 		font = {size = 30,},
 	}
 	graphTime = Chili.Label:New {
 		parent = window0,
-		bottom = 25, 
+		bottom = 25,
 		right = 50,
 		width = 50,
 		height = 10,
@@ -468,7 +468,7 @@ function makePanel()
 		}
 		local groupstack = Chili.StackPanel:New {
 			parent = grouppanel,
-			x = 0, 
+			x = 0,
 			y = 16,
 			bottom = 0,
 			width = "100%",
@@ -482,7 +482,7 @@ function makePanel()
 				caption = buttongroups[i][2][j][2],
 				tooltip = buttongroups[i][2][j][3],
 				parent = groupstack,
-				OnClick = { 
+				OnClick = {
 					function(obj)
 						if window0.buttonPressed then
 							SetButtonSelected(window0.graphButtons[window0.buttonPressed], false)
@@ -492,7 +492,7 @@ function makePanel()
 						graphPanel:ClearChildren()
 						lineLabels:ClearChildren()
 						getEngineArrays(obj.name,obj.caption)
-					end 
+					end
 				}
 			}
 			gb_i = gb_i + 1
@@ -506,7 +506,7 @@ function makePanel()
 		caption = " ",
 		right = 32, bottom = 2,
 		checked = false,
-		OnClick = { 
+		OnClick = {
 			function()
 				usingAllyteams = not usingAllyteams
 				if curGraph.name then

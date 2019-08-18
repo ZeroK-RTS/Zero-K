@@ -259,7 +259,7 @@ local ground = {
 	},
 }
 
-local antiAir = {	
+local antiAir = {
 	antiAir = {
 		"cloakaa",
 		"shieldaa",
@@ -375,7 +375,7 @@ local function AddListNames(list, source, addMisc, addCommander)
 			if not list[defID] then
 				local ud = UnitDefs[defID]
 				
-				local moveType = getMovetype(ud) 
+				local moveType = getMovetype(ud)
 				if moveType then
 					list[ud.id] = {
 						name = "miscUnit",

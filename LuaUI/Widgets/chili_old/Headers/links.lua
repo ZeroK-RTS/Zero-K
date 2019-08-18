@@ -1,10 +1,10 @@
 --//=============================================================================
 --//  SHORT INFO WHY WE DO THIS:
---// Cause of the reference based system in lua we can't 
+--// Cause of the reference based system in lua we can't
 --// destroy objects yourself, instead we have to tell
 --// the GarbageCollector somehow that an object isn't
 --// in use anymore.
---//  Now we have a quite complex class system in Chili 
+--//  Now we have a quite complex class system in Chili
 --// with parent and children links between objects. Those
 --// circles make it normally impossible for the GC to
 --// detect if an object (and all its children) can be

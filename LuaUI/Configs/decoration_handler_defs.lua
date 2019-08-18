@@ -34,9 +34,9 @@ local commtypeTable = {
 					offset = {0, 20, 0},
 					alpha = 0.8,
 				},
-			},			
+			},
 			shoulders = {
-				{	
+				{
 					piece = "torso",
 					height = 5,
 					width = 5,
@@ -45,7 +45,7 @@ local commtypeTable = {
 					offset = {10, 6.3, 0},
 					alpha = 0.8,
 				},
-				{	
+				{
 					piece = "torso",
 					height = 5,
 					width = 5,
@@ -91,9 +91,9 @@ local commtypeTable = {
 					offset = {0, 24, 0},
 					alpha = 0.8,
 				},
-			},			
+			},
 			shoulders = {
-				{	
+				{
 					piece = "torso",
 					height = 5,
 					width = 5,
@@ -102,7 +102,7 @@ local commtypeTable = {
 					offset = {15, 13, 0},
 					alpha = 0.8,
 				},
-				{	
+				{
 					piece = "torso",
 					height = 5,
 					width = 5,
@@ -149,9 +149,9 @@ local commtypeTable = {
 					offset = {0, 18, 0},
 					alpha = 0.8,
 				},
-			},			
+			},
 			shoulders = {
-				{	
+				{
 					piece = "torso",
 					height = 5,
 					width = 5,
@@ -160,7 +160,7 @@ local commtypeTable = {
 					offset = {15, 18, -1},
 					alpha = 0.8,
 				},
-				{	
+				{
 					piece = "torso",
 					height = 5,
 					width = 5,
@@ -207,9 +207,9 @@ local commtypeTable = {
 					offset = {0, 16, 0},
 					alpha = 0.8,
 				},
-			},			
+			},
 			shoulders = {
-				{	
+				{
 					piece = "torso",
 					height = 5,
 					width = 5,
@@ -218,7 +218,7 @@ local commtypeTable = {
 					offset = {15, 14, -1},
 					alpha = 0.8,
 				},
-				{	
+				{
 					piece = "torso",
 					height = 5,
 					width = 5,
@@ -264,9 +264,9 @@ local commtypeTable = {
 					offset = {0, 16, 0},
 					alpha = 0.8,
 				},
-			},			
+			},
 			shoulders = {
-				{	
+				{
 					piece = "torso",
 					height = 5,
 					width = 5,
@@ -275,7 +275,7 @@ local commtypeTable = {
 					offset = {12, 20, 0},
 					alpha = 0.8,
 				},
-				{	
+				{
 					piece = "torso",
 					height = 5,
 					width = 5,
@@ -321,9 +321,9 @@ local commtypeTable = {
 					offset = {0, 16, 0},
 					alpha = 0.8,
 				},
-			},			
+			},
 			shoulders = {
-				{	
+				{
 					piece = "torso",
 					height = 5,
 					width = 5,
@@ -332,7 +332,7 @@ local commtypeTable = {
 					offset = {13, 16, -7},
 					alpha = 0.8,
 				},
-				{	
+				{
 					piece = "torso",
 					height = 5,
 					width = 5,
@@ -378,9 +378,9 @@ local commtypeTable = {
 					offset = {0, 0, 22},
 					alpha = 0.8,
 				},
-			},			
+			},
 			shoulders = {
-				{	
+				{
 					piece = "Breast",
 					height = 5,
 					width = 5,
@@ -389,7 +389,7 @@ local commtypeTable = {
 					offset = {13, 16, -7},
 					alpha = 0.8,
 				},
-				{	
+				{
 					piece = "Breast",
 					height = 5,
 					width = 5,

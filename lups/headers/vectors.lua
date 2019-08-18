@@ -122,7 +122,7 @@ function CreateEmitMatrix3x3(x,y,z)
 	local xy = x*y
 	local yz = y*z
 
-	return { 
+	return {
 		x*x,  xy-z, xz+y,
 		xy+z, y*y,  yz-x,
 		xz-y, yz+x, z*z

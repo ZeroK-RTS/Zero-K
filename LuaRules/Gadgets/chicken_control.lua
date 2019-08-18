@@ -83,7 +83,7 @@ function gadget:Initialize()
       --break
     end
   end
-  if (ChickenTeam == -1) then 
+  if (ChickenTeam == -1) then
     --Spring.Echo("chicken_control gadget quit. did not find chicken")
     gadgetHandler:RemoveGadget()
   end

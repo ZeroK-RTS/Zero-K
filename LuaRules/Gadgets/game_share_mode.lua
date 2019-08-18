@@ -115,7 +115,7 @@ local function ProccessCommand(str)
 	local i = 1
 	-- A "word" is anything between two spaces or the start and the first space. So ProccessCommand("1 2 3 4")
 	-- would return 2 3 4 (first 'word' is ignored, only 2nd, 3rd, and 4th count).
-	for word in strGmatch(str, "%S+") do 
+	for word in strGmatch(str, "%S+") do
 		if i == 2 then
 			command = word
 		elseif i == 3 then
@@ -292,7 +292,7 @@ function gadget:GameFrame(frame)
 				if data.timeleft > 0 then
 					data.timeleft = data.timeleft - 1
 				end
-				if data.timeleft == 0 then 
+				if data.timeleft == 0 then
 					invitecount = invitecount-1
 					playerInvites[key] = nil
 					spSetPlayerRulesParam(player, "commshare_invite_" .. invitecount .. "_id", nil)
@@ -303,7 +303,7 @@ function gadget:GameFrame(frame)
 				end
 			end
 			spSetPlayerRulesParam(player, "commshare_invitecount",invitecount)
-			if invitecount == 0 then 
+			if invitecount == 0 then
 				-- Cleanup the table so that next second this doesn't run.
 				invites[player] = nil
 			end

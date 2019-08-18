@@ -1,12 +1,12 @@
 include "constants.lua"
 
-local base = piece 'base' 
-local turret = piece 'turret' 
-local hull = piece 'hull' 
-local wake1 = piece 'wake1' 
+local base = piece 'base'
+local turret = piece 'turret'
+local hull = piece 'hull'
+local wake1 = piece 'wake1'
 local wake2 = piece 'wake2'
-local missile = piece 'missile' 
-local firepoint = piece 'firepoint' 
+local missile = piece 'missile'
+local firepoint = piece 'firepoint'
 local doorl = piece 'doorl'
 local doorr = piece 'doorr'
 
@@ -72,7 +72,7 @@ function script.QueryWeapon()
 	return firepoint
 end
 
-function script.BlockShot(num, targetID)	
+function script.BlockShot(num, targetID)
 	-- This causes poor behaviour if there is nothing nearby which needs disarming, so OKP for Skeeter is default set to 'off' in \LuaRules\Gadgets\unit_overkill_prevention.lua
 	if GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, 180, 20, 120) then --less than 1 second - timeout, 3 seconds - disarmTimer
 		return true

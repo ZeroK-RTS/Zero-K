@@ -2,13 +2,13 @@ include "constants.lua"
 include "rockPiece.lua"
 local dynamicRockData
 
-local base = piece 'base' 
-local front = piece 'front' 
-local turret = piece 'turret' 
-local lbarrel = piece 'lbarrel' 
-local rbarrel = piece 'rbarrel' 
-local lflare = piece 'lflare' 
-local rflare = piece 'rflare' 
+local base = piece 'base'
+local front = piece 'front'
+local turret = piece 'turret'
+local lbarrel = piece 'lbarrel'
+local rbarrel = piece 'rbarrel'
+local lflare = piece 'lflare'
+local rflare = piece 'rflare'
 local exhaust = piece 'exhaust'
 local wakes = {}
 for i = 1, 8 do
@@ -16,7 +16,7 @@ for i = 1, 8 do
 end
 local ground1 = piece 'ground1'
 
-local random = math.random 
+local random = math.random
 local hpi = math.pi*0.5
 
 local shotNum = 1
@@ -118,7 +118,7 @@ local function RestoreAfterDelay()
 	Turn(turret, x_axis, 0, math.rad(45))
 end
 
-function script.AimFromWeapon() 
+function script.AimFromWeapon()
 	return turret
 end
 
@@ -151,7 +151,7 @@ function script.BlockShot(num, targetID)
 	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 660.1, 70, 0.3)
 end
 
-function script.Shot() 
+function script.Shot()
 	EmitSfx(flares[shotNum], GG.Script.UNIT_SFX2)
 	EmitSfx(exhaust, GG.Script.UNIT_SFX3)
 	shotNum = 3 - shotNum

@@ -1,13 +1,13 @@
-local base = piece 'base' 
-local lWing = piece 'lWing' 
-local rWing = piece 'rWing' 
-local gun1 = piece 'gun1' 
-local gun2 = piece 'gun2' 
-local muzz1 = piece 'muzzle1' 
-local muzz2 = piece 'muzzle2' 
+local base = piece 'base'
+local lWing = piece 'lWing'
+local rWing = piece 'rWing'
+local gun1 = piece 'gun1'
+local gun2 = piece 'gun2'
+local muzz1 = piece 'muzzle1'
+local muzz2 = piece 'muzzle2'
 
-local thrust1 = piece 'thrust1' 
-local thrust2 = piece 'thrust2' 
+local thrust1 = piece 'thrust1'
+local thrust2 = piece 'thrust2'
 
 local smokePiece = {base}
 
@@ -49,13 +49,13 @@ function script.BlockShot(num, targetID)
 	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 200.1, 35)
 end
 
-function script.Shot(num) 
+function script.Shot(num)
 	gun_1 = not gun_1
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= 0.25 then	
+	if severity <= 0.25 then
 		Explode(base, SFX.NONE)
 		Explode(lWing, SFX.NONE)
 		Explode(rWing, SFX.NONE)

@@ -17,7 +17,7 @@ local echo 				= Spring.Echo
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then 
+if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ end
 -------------------------------------------------------------------------------------
 --Callins
 
-function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
+function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	if step > 0 and blockspend[teamID] then
 		return false
 	end
@@ -80,7 +80,7 @@ end
 
 function gadget:GameFrame(f)
 	if (f%32) < 0.1 then
-		local send_messages = (f %(32*15)) < 0.1 
+		local send_messages = (f %(32*15)) < 0.1
 		Transfers( send_messages )
 	end
 end

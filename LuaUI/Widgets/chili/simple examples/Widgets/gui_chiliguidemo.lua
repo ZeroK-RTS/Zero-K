@@ -39,7 +39,7 @@ function widget:Initialize()
 	--------------------------------------------------------------------------------
 	--------------------------------------------------------------------------------
 
-	local testText = 
+	local testText =
 	[[Bolivians are voting in a referendum on a new constitution that President Evo Morales says will empower the country's indigenous majority.
 
 The changes also include strengthening state control of Bolivia's natural resources, and no longer recognising Catholicism as the official religion.
@@ -53,10 +53,10 @@ The wrangling has spilled over into, at times, deadly violence. At least 30 peas
 President Morales has said the new constitution will pave the way for correcting the historic inequalities of Bolivian society, where the economic elite is largely of European descent.
 ]]
 
-	local testText2 = 
+	local testText2 =
 	"\255\001\255\250Bolivians\b are voting in a referendum on a \255\255\255\000new\b constitution "
 
-	local testText3 = 
+	local testText3 =
 	[[Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod]]
 
 	--------------------------------------------------------------------------------
@@ -247,8 +247,8 @@ President Morales has said the new constitution will pave the way for correcting
 	--------------------------------------------------------------------------------
 
 	window1 = Chili.Window:New{
-		x = 450,  
-		y = 200,  
+		x = 450,
+		y = 200,
 		clientWidth  = 200,
 		clientHeight = 200,
 		resizable = true,

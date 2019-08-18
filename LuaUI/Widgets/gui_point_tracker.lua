@@ -231,9 +231,9 @@ function widget:MapDrawCmd(playerID, cmdType, px, py, pz, label)
 	local spectator, fullView = GetSpectatingState()
 	local _, _, _, playerTeam = GetPlayerInfo(playerID, false)
 	if (label == "Start " .. playerTeam
-			or cmdType ~= "point" 
-			or not (ArePlayersAllied(myPlayerID, playerID) or (spectator and fullView))) then 
-		return 
+			or cmdType ~= "point"
+			or not (ArePlayersAllied(myPlayerID, playerID) or (spectator and fullView))) then
+		return
 	end
 	
 	local r, g, b = GetPlayerColor(playerID)

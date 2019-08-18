@@ -73,7 +73,7 @@ local shooting = 0
 local wantedDirection = 0
 local ROTATION_SPEED = math.rad(3.5)/30
 local TARGET_ALT = 143565270/2^16
-local Vector = Spring.Utilities.Vector 
+local Vector = Spring.Utilities.Vector
 local max = math.max
 local soundTime = 0
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
@@ -294,12 +294,14 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, smokePiece)
+	-- Give the targeter +500 extra range to allow the build UI to show what a Starlight can hit
+	Spring.SetUnitWeaponState(unitID, 1, "range", 10500)
 
 	--Move(ShortSpikes,z_axis, -5)
 	--Move(LongSpikes,z_axis, -10)
 	local facing = Spring.GetUnitBuildFacing(unitID)
 	
-	wantedDirection = math.pi*(3 - facing)/2 
+	wantedDirection = math.pi*(3 - facing)/2
 end
 
 function script.Activate()

@@ -241,7 +241,7 @@ unitDef = {
       weaponAcceleration      = 50,
       weaponType              = [[TorpedoLauncher]],
       weaponVelocity          = 200,
-    },    
+    },
   },
 
 

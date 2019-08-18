@@ -32,7 +32,7 @@ local scrH, scrW 		= 0,0
 
 include("keysym.h.lua")
 
-local PI = 3.14 
+local PI = 3.14
 local B_HEIGHT = 20
 	
 
@@ -41,7 +41,7 @@ local selectedUnit
 local rotX, rotY, rotZ
 local posX, posY, posZ
 local showButton, hideButton, printPieceButton
-local writeOutButton, resetButton,  pieceTreeControl, scroll1, stack1 
+local writeOutButton, resetButton,  pieceTreeControl, scroll1, stack1
 
 --------------------------
 
@@ -102,7 +102,7 @@ local function explode(div,str)
 end
 
 local function SendMessageCheck(msg)
-	if not Spring.IsCheatingEnabled() then 
+	if not Spring.IsCheatingEnabled() then
 		echo "Cannot do this unless Cheating is enabled."
 		return
 	end
@@ -288,7 +288,7 @@ local function AnimWindow(unitID)
 	
 	local window = Window:New{
 		caption = "Animation Control",
-		x = scrW/3,  
+		x = scrW/3,
 		y = scrH/3,
 		width='20%',
 		minHeight=300,
@@ -317,13 +317,13 @@ function write_unit_piece_tree (unitID, unitDefID)
 	write_children (unitID,1,0)
 end
 
-function write_children (unitID, pID, recdeep)	
+function write_children (unitID, pID, recdeep)
 	PieceInfo = Spring.GetUnitPieceInfo (unitID, pID)
 	local pname = PieceInfo.name
 	if (recdeep == 0) then Spring.Echo (pname) end
 	local pchildren = PieceInfo.children
 	for i,cname  in ipairs(pchildren) do
-		local cpID = Spring.GetUnitPieceMap(unitID)[cname]		
+		local cpID = Spring.GetUnitPieceMap(unitID)[cname]
 		local spacing = string.rep("-",recdeep+1)
 		Spring.Echo (spacing .. cname)
 		write_children (unitID, cpID,recdeep+1)
@@ -335,11 +335,11 @@ function write_piece_list (unitID)
 	local allpieces = Spring.GetUnitPieceList (unitID)
 	local piece_n = table.getn (allpieces)
 	Spring.Echo ("unit has " .. piece_n  .. " pieces")
-	for pID=1, piece_n,1  do		
+	for pID=1, piece_n,1  do
 		Spring.Echo ("pID:" .. pID)
 		PieceInfo = Spring.GetUnitPieceInfo (unitID,pID)
 		local pname = PieceInfo.name
-		local pchildren = PieceInfo.children		
+		local pchildren = PieceInfo.children
 		Spring.Echo (" name:"..pname)
 	end
 end

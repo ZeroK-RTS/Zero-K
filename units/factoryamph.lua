@@ -7,7 +7,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
   buildingGroundDecalSizeY      = 10,
-  buildingGroundDecalType       = [[factoryamph_aoplane.dds]],  
+  buildingGroundDecalType       = [[factoryamph_aoplane.dds]],
 
   buildoptions     = {
     [[amphcon]],
@@ -45,6 +45,7 @@ unitDef = {
     selectionscalemult = 1,
     factorytab       = 1,
     shared_energy_gen = 1,
+    cus_noflashlight = 1,
   },
 
   energyUse        = 0,

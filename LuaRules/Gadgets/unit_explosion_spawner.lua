@@ -63,9 +63,9 @@ function gadget:Explosion(weaponID, px, py, pz, ownerID, proID)
 				-- Should it be UseUnitResource? But what gonna happen if projection owner is dead?
 				createList[#createList+1] = {
 					name = spawnDef.name,
-					team = teamID, 
-					x = x,y = y,z = z, 
-					expire = spawnDef.expire, 
+					team = teamID,
+					x = x,y = y,z = z,
+					expire = spawnDef.expire,
 					feature = spawnDef.feature
 				}
 				return false
@@ -110,13 +110,13 @@ function gadget:GameFrame(f)
 		else
 			local unitID = Spring.CreateUnit(c.name , c.x, c.y, c.z, 0, c.team)
 			-- Spring.SetUnitRulesParam(unitID, "parent_unit_id", c.owner)
-			if (c.expire > 0) and unitID then 
+			if (c.expire > 0) and unitID then
 				expireList[unitID] = f + c.expire * 32
 			end
 		end
 		createList[i]=nil
 	end
-	if ((f+6)%64<0.1) then 
+	if ((f+6)%64<0.1) then
 		for i, e in pairs(expireList) do
 			if (f > e) then
 				Spring.DestroyUnit(i, true)

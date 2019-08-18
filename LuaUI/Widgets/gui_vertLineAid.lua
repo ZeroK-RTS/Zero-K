@@ -178,6 +178,6 @@ function widget:DrawWorld()
 	end
 
 	gl.DepthTest (false)
-	gl.Color (1,1,1,1)	
+	gl.Color (1,1,1,1)
 	gl.PopAttrib ()
 end

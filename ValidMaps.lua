@@ -1,4 +1,4 @@
--- $Id: ValidMaps.lua 3171 2008-11-06 09:06:29Z det $ 
+-- $Id: ValidMaps.lua 3171 2008-11-06 09:06:29Z det $
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -8,21 +8,21 @@
 --  can (and can not) be used with it. The map information
 --  is the map's default information, and is done before
 --  MapOptions.lua can be used by maps.
--- 
+--
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
 -- Map specific call-outs:
 --
 --   Spring.GetMapList() -> { 'map1.smf', 'map2.smf', 'map3.sm3', etc... }
---  
+--
 --   Spring.GetMapInfo('map1') -> {
---     author  = 'string', 
+--     author  = 'string',
 --     desc    = 'string',
 --     mapX    = number,
 --     mapY    = number,
 --     tidal   = number,
---     gravity = number, 
+--     gravity = number,
 --     metal   = number,
 --     windMin = number,
 --     windMax = number,
@@ -34,7 +34,7 @@
 --       etc ...
 --     },
 --   }
--- 
+--
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -57,7 +57,7 @@ if (false) then
   end
   if (#validMaps == 0) then
     return { 'FAKEMAP' }
-  else 
+  else
     return validMaps
   end
 end

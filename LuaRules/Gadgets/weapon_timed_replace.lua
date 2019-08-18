@@ -12,7 +12,7 @@ end
 
 -------------------------------------------------------------
 -------------------------------------------------------------
-if not (gadgetHandler:IsSyncedCode()) then 
+if not (gadgetHandler:IsSyncedCode()) then
 	return false
 end
 -------------------------------------------------------------
@@ -47,8 +47,8 @@ function gadget:GameFrame(n)
 					local y = Spring.GetGroundHeight(x,z)
 					Spring.SetProjectileTarget(proID, x, y, z)
 				else
-					-- If the unit is not visible we have been homing onto a radar 
-					-- dot. The radar dot position is unknown to lua so target 
+					-- If the unit is not visible we have been homing onto a radar
+					-- dot. The radar dot position is unknown to lua so target
 					-- ground beneath the projectile.
 					local x,_,z = Spring.GetProjectilePosition(proID)
 					local y = Spring.GetGroundHeight(x,z)

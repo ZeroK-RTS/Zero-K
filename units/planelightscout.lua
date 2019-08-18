@@ -40,7 +40,7 @@ unitDef = {
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  objectName          = [[fairlight.s3o]],
+  objectName          = [[planelightscout.s3o]],
   script              = [[planelightscout.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 950,
@@ -54,7 +54,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[debris2x2a.s3o]],
+      object           = [[planelightscout_dead.s3o]],
     },
 
 

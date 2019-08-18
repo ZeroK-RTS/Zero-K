@@ -19,6 +19,7 @@ unitDef = {
 
   customParams                  = {
     aimposoffset   = [[0 22 0]],
+    cus_noflashlight = 1,
   },
 
   explodeAs                     = [[SMALL_BUILDINGEX]],

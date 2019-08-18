@@ -136,7 +136,7 @@ local smokeFX = {
 	lifeSpread   = 15,
 	rotSpeed     = 1,
 	rotSpeedSpread = -2,
-	rotSpread    = 360,	
+	rotSpread    = 360,
 	size = 30,
 	sizeSpread   = 5,
 	sizeGrowth   = 0.2,
@@ -210,7 +210,7 @@ end
 
 local function ClearPoints()
 	for id in pairs(mapPoints) do
-	      RemovePoint(id) 
+	      RemovePoint(id)
 	end
 end
 
@@ -505,7 +505,7 @@ function widget:Update(dt)
 	ringPeriod = ringPeriod + dt
 	if ringPeriod > circleFreq then
 		for id, point in pairs(mapPoints) do
-			CreateCircle(point)	
+			CreateCircle(point)
 		end
 		ringPeriod = 0
 	end

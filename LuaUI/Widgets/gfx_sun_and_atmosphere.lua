@@ -157,7 +157,7 @@ local function GetOptions()
 		AddColorOption(thing .. "Color", thing .. " Color", fogPath, Spring.SetAtmosphere)
 	end
 	AddNumberOption("fogStart", "Fog Start", fogPath, Spring.SetAtmosphere)
-	AddNumberOption("fogEnd", "Fog End", fogPath, Spring.SetAtmosphere)	
+	AddNumberOption("fogEnd", "Fog End", fogPath, Spring.SetAtmosphere)
 	
 	AddOption("save_map_settings", {
 		name = 'Save Settings',

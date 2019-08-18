@@ -25,7 +25,7 @@ for _, filename in ipairs(luaFiles) do
         ExplosionDefs[edName] = ed
       end
     end
-  end  
+  end
 end
 
 --------------------------------------------------------------------------------

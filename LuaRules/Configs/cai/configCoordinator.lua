@@ -6,9 +6,9 @@
 --	raiderBattlegroupCondition, the conditions that must be met to form a raider battlegroup
 --	combatBattlegroupCondition, the conditions that must be met to form a combat battlegroup
 
-aiConfigByName = 
+aiConfigByName =
 {
-	["CAI"] = 
+	["CAI"] =
 	{
 		controlFunction = constructionAndEconomyHandler,
 		buildConfig = factionBuildConfig,

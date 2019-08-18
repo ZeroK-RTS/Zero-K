@@ -106,7 +106,7 @@ end
 
 function HavenUpdate(teamID, allyTeamID)
 	local spectating = Spring.GetSpectatingState()
-	if (not spectating and Spring.GetLocalTeamID() == teamID) or (not options.onlyShowMyZones.value) then 
+	if (not spectating and Spring.GetLocalTeamID() == teamID) or (not options.onlyShowMyZones.value) then
 		GetHavens()
 	end
 end
@@ -144,18 +144,18 @@ function widget:CommandsChanged()
 		tooltip = 'Place a retreat zone. Units will retreat there.',
 		cursor  = 'Repair',
 		action  = 'sethaven',
-		params  = { }, 
+		params  = { },
 		texture = 'LuaUI/Images/commands/Bold/retreat.png',
 
-		pos = {123}, 
+		pos = {123},
 	})
 end
 
 local function DrawWorldFunc()
 	local fade = abs((spGetGameFrame() % 40) - 20) / 20
 	--Draw ambulance on havens.
-	if #havens == 0 or Spring.IsGUIHidden() then 
-		return 
+	if #havens == 0 or Spring.IsGUIHidden() then
+		return
 	end
 	
 	glDepthTest(true)

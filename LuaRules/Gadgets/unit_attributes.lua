@@ -13,7 +13,7 @@ function gadget:GetInfo()
       date      = "2009-11-27", --last update 2014-2-19
       license   = "GNU GPL, v2 or later",
       layer     = -1,
-      enabled   = true, 
+      enabled   = true,
    }
 end
 
@@ -87,13 +87,13 @@ for unitDefID,_ in pairs(hasSensorOrJamm) do
 end
 
 local function UpdateSensorAndJamm(unitID, unitDefID, enabled, radarOverride, sonarOverride, jammerOverride, sightOverride)
-	if radarUnitDef[unitDefID] or radarOverride then 
+	if radarUnitDef[unitDefID] or radarOverride then
 		Spring.SetUnitSensorRadius(unitID, "radar", (enabled and (radarOverride or radarUnitDef[unitDefID])) or 0)
 	end
-	if sonarUnitDef[unitDefID] or sonarOverride then 
+	if sonarUnitDef[unitDefID] or sonarOverride then
 		Spring.SetUnitSensorRadius(unitID, "sonar", (enabled and (sonarOverride or sonarUnitDef[unitDefID])) or 0)
 	end
-	if jammerUnitDef[unitDefID] or jammerOverride then 
+	if jammerUnitDef[unitDefID] or jammerOverride then
 		Spring.SetUnitSensorRadius(unitID, "radarJammer", (enabled and (jammerOverride or jammerUnitDef[unitDefID])) or 0)
 	end
 	if sightOverride then
@@ -108,7 +108,7 @@ end
 
 local origUnitBuildSpeed = {}
 
-local function UpdateBuildSpeed(unitID, ud, speedFactor)	
+local function UpdateBuildSpeed(unitID, ud, speedFactor)
 
     if ud.buildSpeed == 0 then
         return
@@ -127,7 +127,7 @@ local function UpdateBuildSpeed(unitID, ud, speedFactor)
 
 	spSetUnitRulesParam(unitID, "buildSpeed", state.buildSpeed*speedFactor, INLOS_ACCESS)
 	
-    spSetUnitBuildSpeed(unitID, 
+    spSetUnitBuildSpeed(unitID,
         state.buildSpeed*speedFactor, -- build
         2*state.buildSpeed*speedFactor, -- repair
         state.buildSpeed*speedFactor, -- reclaim
@@ -237,7 +237,7 @@ end
 
 local origUnitSpeed = {}
 
-local function UpdateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, maxAccelerationFactor)	
+local function UpdateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, maxAccelerationFactor)
 	local unitDefID = ud.id
 	if not origUnitSpeed[unitDefID] then
 	
@@ -312,12 +312,12 @@ local function UpdateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 			GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
 		elseif state.movetype == 2 then
 			if workingGroundMoveType then
-				local accRate = state.origMaxAcc*maxAccelerationFactor 
+				local accRate = state.origMaxAcc*maxAccelerationFactor
 				if isSlowed and accRate > speedFactor then
 					-- Clamp acceleration to mitigate prevent brief speedup when executing new order
 					-- 1 is here as an arbitary factor, there is no nice conversion which means that 1 is a good value.
-					accRate = speedFactor 
-				end 
+					accRate = speedFactor
+				end
 				local attribute =  {
 					maxSpeed        = state.origSpeed       *speedFactor,
 					maxReverseSpeed = (isSlowed and 0) or state.origReverseSpeed, --disallow reverse while slowed
@@ -359,9 +359,9 @@ local function removeUnit(unitID)
 	
 	currentEcon[unitID] = nil
 	currentBuildpower[unitID] = nil
-	currentReload[unitID] = nil 
-	currentMovement[unitID] = nil 
-	currentTurn[unitID] = nil 
+	currentReload[unitID] = nil
+	currentMovement[unitID] = nil
+	currentTurn[unitID] = nil
 	currentAcc[unitID] = nil
 end
 
@@ -372,8 +372,8 @@ function UpdateUnitAttributes(unitID, frame)
 	end
 	
 	local udid = spGetUnitDefID(unitID)
-	if not udid then 
-		return 
+	if not udid then
+		return
 	end
 	
 	frame = frame or spGetGameFrame()
@@ -429,7 +429,7 @@ function UpdateUnitAttributes(unitID, frame)
 			maxAccMult = 0
 		end
 		
-		-- Let other gadgets and widgets get the total effect without 
+		-- Let other gadgets and widgets get the total effect without
 		-- duplicating the pevious calculations.
 		spSetUnitRulesParam(unitID, "baseSpeedMult", baseSpeedMult, INLOS_ACCESS) -- Guaranteed not to be 0
 		spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult, INLOS_ACCESS)
@@ -526,14 +526,14 @@ function gadget:AllowCommand_GetWantedCommand()
 	return true --{[CMD.ONOFF] = true, [70] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID == 70 and unitSlowed[unitID]) then
 		return false
-	else 
+	else
 		return true
 	end
 end

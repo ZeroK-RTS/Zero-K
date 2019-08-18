@@ -24,9 +24,9 @@ local setAiPosCommand = {
 	tooltip = 'Set AI start position.',
 	cursor  = 'Attack',
 	action  = 'setaistart',
-	params  = {}, 
+	params  = {},
 	texture = 'LuaUI/Images/commands/Bold/attack.png',
-	pos = {124}, 
+	pos = {124},
 }
 
 -- Chili
@@ -35,7 +35,7 @@ local screen0
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
--- Variables 
+-- Variables
 
 local activePlacementTeamID
 local aiPositionWindow
@@ -50,9 +50,9 @@ local function SelectAiPlacement(teamID)
 end
 
 local function AddAiButton(parent, offset, teamData)
-	local tooltip = "Set start position for AI " .. teamData.teamID .. 
-		".\nName: " .. teamData.name .. 
-		"\nOwner: " .. teamData.playerName .. 
+	local tooltip = "Set start position for AI " .. teamData.teamID ..
+		".\nName: " .. teamData.name ..
+		"\nOwner: " .. teamData.playerName ..
 		"\nAlly: " .. teamData.allyTeamID
 	
 	local newButton = Chili.Button:New{
@@ -62,10 +62,10 @@ local function AddAiButton(parent, offset, teamData)
 		right = 0,
 		height = BUTTON_HEIGHT,
 		padding = {0, 0, 0, 0},
-		OnClick = { 
-			function(self) 
+		OnClick = {
+			function(self)
 				SelectAiPlacement(teamData.teamID)
-			end 
+			end
 		},
 		tooltip = tooltip,
 		parent = parent,
@@ -89,7 +89,7 @@ local function InitializeControls(aiTeams)
 	local mainWindow = Chili.Window:New{
 		classname = "main_window_small_tall",
 		name      = 'AiStartPosWindow',
-		x         = 50, 
+		x         = 50,
 		y         = 150,
 		width     = 250,
 		height    = 250,

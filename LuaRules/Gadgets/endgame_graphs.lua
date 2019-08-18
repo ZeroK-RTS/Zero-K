@@ -252,8 +252,8 @@ local function RegenerateNanoframeValues()
 end
 
 local function GetEnergyIncome (teamID)
-	return (select(4, Spring.GetTeamResources(teamID, "energy")) or 0) + 
-		(Spring.GetTeamRulesParam(teamID, "OD_energyIncome") or 0) - 
+	return (select(4, Spring.GetTeamResources(teamID, "energy")) or 0) +
+		(Spring.GetTeamRulesParam(teamID, "OD_energyIncome") or 0) -
 		math.max(0, (Spring.GetTeamRulesParam(teamID, "OD_energyChange") or 0))
 end
 

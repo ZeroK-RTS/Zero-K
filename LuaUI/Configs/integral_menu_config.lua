@@ -2,13 +2,13 @@ local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildC
 
 local function CommandClickFunction()
 	local _,_, meta,_ = Spring.GetModKeyState()
-	if not meta then 
+	if not meta then
 		return false
 	end
 	WG.crude.OpenPath("Hotkeys/Commands")
 	WG.crude.ShowMenu() --make epic Chili menu appear.
 	return true
-end 
+end
 
 local textConfig = {
 	bottomLeft = {

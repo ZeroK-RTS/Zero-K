@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 --- Control module
 
@@ -91,15 +91,15 @@ Control.disabledFont = table.merge({ color = {0.8, 0.8, 0.8, 0.8} }, Control.fon
 local this = Control
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:New(obj)
 	--// backward compability
 	BackwardCompa(obj)
 	
 	--//minimum size from minimum size table when minWidth & minHeight is not set (backward compatibility)
-	local minimumSize = obj.minimumSize or {} 
-	obj.minWidth = obj.minWidth or minimumSize[1] 
+	local minimumSize = obj.minimumSize or {}
+	obj.minWidth = obj.minWidth or minimumSize[1]
 	obj.minHeight = obj.minHeight or minimumSize[2]
 
 	if obj.DrawControl then
@@ -229,7 +229,7 @@ function Control:Dispose(...)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Sets the control's parent object.
 -- @tparam object.Object obj parent object
@@ -260,7 +260,7 @@ function Control:RemoveChild(obj)
 	return found
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:_GetMaxChildConstraints(child)
 	return 0, 0, self.clientWidth, self.clientHeight
@@ -403,7 +403,7 @@ function Control:GetRelativeBox(savespace)
 	return {left, top, width, height}
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:SetEnabled(enabled)
 	self.state.enabled = enabled
@@ -411,7 +411,7 @@ function Control:SetEnabled(enabled)
 	self:Invalidate()
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:UpdateClientArea(dontRedraw)
 	local padding = self.padding
@@ -530,7 +530,7 @@ function Control:RealignChildren(savespace)
 	self:CallChildren("Realign", savespace)
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Sets the control's position
 -- @int x x-coordinate
@@ -728,7 +728,7 @@ function Control:_UpdateConstraints(x, y, w, h)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:GetMinimumExtents()
 	local maxRight, maxBottom = 0, 0
@@ -753,7 +753,7 @@ function Control:GetMinimumExtents()
 				width = self.width or 0
 			else
 				width = cgb.width or 0
-			end 
+			end
 		end
 		if (not crb.left) then
 			left  = cgb.left or 0
@@ -861,7 +861,7 @@ function Control:GetChildrenCurrentExtents()
 	return minLeft, minTop, maxRight, maxBottom
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:StartResizing(x, y)
 	--//FIXME the x, y aren't needed check how drag is handled!
@@ -887,7 +887,7 @@ function Control:StopDragging(x, y)
 	self.dragging = false
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:LocalToClient(x, y)
 	local ca = self.clientArea
@@ -918,7 +918,7 @@ function Control:InClientArea(x, y)
 	return x >= clientArea[1] and y >= clientArea[2] and x <= clientArea[1] + clientArea[3] and y <= clientArea[2] + clientArea[4]
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Requests a redraw of the control.
 function Control:Invalidate()
@@ -934,7 +934,7 @@ function Control:InvalidateSelf()
 	self:RequestUpdate()
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:InstantUpdate()
 	if self:IsInView() then
@@ -974,7 +974,7 @@ function Control:Update()
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:_CheckIfRTTisAppreciated()
 	if (self.width <= 0) or (self.height <= 0) then
@@ -1194,7 +1194,7 @@ function Control:CreateViewTexture(suffix_name, width, height, fnc, ...)
 	self[fboName] = fbo
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 
 function Control:_DrawInClientArea(fnc, ...)
@@ -1265,7 +1265,7 @@ function Control:_DrawChildrenInClientAreaWithoutViewCheck(event)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 --//FIXME move resize and drag to Window class!!!!
 function Control:DrawBackground()
@@ -1305,9 +1305,9 @@ end
 function Control:DrawControl()
 	--//an option to make panel position snap to an integer
 	if self.snapToGrid then
-		self.x = math.floor(self.x) + 0.5 
-		self.y = math.floor(self.y) + 0.5 
-	end 
+		self.x = math.floor(self.x) + 0.5
+		self.y = math.floor(self.y) + 0.5
+	end
 	self:DrawBackground()
 	self:DrawBorder()
 end
@@ -1484,7 +1484,7 @@ function Control:DrawChildrenForList()
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 local function InLocalRect(cx, cy, w, h)
 	return (cx >= 0) and (cy >= 0) and (cx <= w) and (cy <= h)
@@ -1510,7 +1510,7 @@ function Control:HitTest(x, y)
 			end
 			--//an option that allow you to mouse click on empty panel
 			if self.hitTestAllowEmpty then
-				return self 
+				return self
 			end
 		end
 	end
@@ -1671,4 +1671,4 @@ function Control:MouseOut(...)
 	self:InvalidateSelf()
 end
 
---// ============================================================================= 
+--// =============================================================================

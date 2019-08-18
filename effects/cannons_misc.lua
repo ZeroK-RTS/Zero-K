@@ -25,8 +25,8 @@ return {
         pos                = [[0, 0, 0]],
 		dir				   = [[dir]],
       },
-    },	
-  }, 
+    },
+  },
   ["heavy_cannon_muzzle_shell"] = {
 	muzzle = {
       air                = true,
@@ -80,6 +80,6 @@ return {
         sizemod            = 1.0,
         texture            = [[shell]],
       },
-    },	
-  }, 
+    },
+  },
 }

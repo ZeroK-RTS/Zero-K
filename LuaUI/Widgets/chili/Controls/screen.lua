@@ -38,7 +38,7 @@ Screen = Object:Inherit{
 local this = Screen
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 function Screen:New(obj)
 	local vsx, vsy = Spring.GetViewSizes()
@@ -77,7 +77,7 @@ function Screen:OnGlobalDispose(obj)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --FIXME add new coordspace Device (which does y-invert)
 
@@ -126,7 +126,7 @@ function Screen:IsVisibleOnScreen()
 	return true
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Screen:Resize(w, h)
 	self.width = math.ceil(w)
@@ -135,7 +135,7 @@ function Screen:Resize(w, h)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 function Screen:Update(...)
 	--//FIXME create a passive MouseMove event and use it instead?
@@ -349,4 +349,4 @@ function Screen:TextEditing(...)
 	end
 	return (not not inherited:TextEditing(...))
 end
---// ============================================================================= 
+--// =============================================================================

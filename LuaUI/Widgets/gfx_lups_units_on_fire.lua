@@ -47,7 +47,7 @@ local flameFX = {
 	force = {0, 1, 0},
 	pos = {0, 0, 0},
 	partpos = "",
-	size = 1,	
+	size = 1,
 }
 
 --------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ function widget:Initialize()
 		widgetHandler:RemoveCallIn("GameFrame")
 		return
 	end
-	AddParticles = WG.Lups.AddParticles 
+	AddParticles = WG.Lups.AddParticles
 end
 
 local CHECK_INTERVAL = 6

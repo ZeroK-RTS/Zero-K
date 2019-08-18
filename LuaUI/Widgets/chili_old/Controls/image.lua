@@ -53,24 +53,24 @@ function Image:DrawControl()
   gl.Color(self.color)
 
   if (self.keepAspect) then
-    if (self.file2) then 
+    if (self.file2) then
       TextureHandler.LoadTexture(0,self.file2,self)
       local texInfo = gl.TextureInfo(self.file2) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
       _DrawTextureAspect(self.x,self.y,self.width,self.height, tw,th, self.flip2)
-    end 
-    if (self.file) then 
+    end
+    if (self.file) then
       TextureHandler.LoadTexture(0,self.file,self)
       local texInfo = gl.TextureInfo(self.file) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
       _DrawTextureAspect(self.x,self.y,self.width,self.height, tw,th, self.flip)
     end
   else
-    if (self.file2) then 
+    if (self.file2) then
       TextureHandler.LoadTexture(0,self.file2,self)
       gl.TexRect(self.x,self.y,self.x+self.width,self.y+self.height,false,self.flip2)
-    end 
-    if (self.file) then 
+    end
+    if (self.file) then
       TextureHandler.LoadTexture(0,self.file,self)
       gl.TexRect(self.x,self.y,self.x+self.width,self.y+self.height,false,self.flip)
     end

@@ -27,7 +27,7 @@ local spGetUnitDefID    = Spring.GetUnitDefID
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then 
+if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -73,14 +73,14 @@ local function SetVote(a1, a2, teamID, value)
 	--echo('setvote', a1, a2, teamID, value)
 	cfData[a1][a2].votes[teamID] = value
 	spSetTeamRulesParam(teamID, 'cf_vote_' ..a2, value and 1 or 0)
-end	
+end
 
 
 function clearVotes(alliance, enAlliance)
 	local teamList = cfData[alliance][enAlliance].votes
 	for teamID,_ in pairs(teamList) do
 		SetVote(alliance, enAlliance, teamID, false)
-		if TESTMODE and alliance == 2 and testOnce then	
+		if TESTMODE and alliance == 2 and testOnce then
 			testOnce = false
 			SetVote(alliance, enAlliance, teamID, true)
 		end
@@ -114,7 +114,7 @@ end
 
 function checkVotes()
 	for alliance, aData in pairs(cfData) do
-		for enAlliance, enData in pairs(aData) do			
+		for enAlliance, enData in pairs(aData) do
 			local yesVotes,totalVotes = 0,0
 			for teamID, vote in pairs(enData.votes) do
 				totalVotes = totalVotes + 1
@@ -122,14 +122,14 @@ function checkVotes()
 			end
 			
 			--100%
-			if yesVotes == totalVotes then 
+			if yesVotes == totalVotes then
 				SetCeasefireOffered(enAlliance, alliance, true)
 			else
 				SetCeasefireOffered(enAlliance, alliance, false)
 			end
 			
 		end
-	end			
+	end
 end
 
 function checkAllianceSizes()
@@ -271,7 +271,7 @@ function gadget:Initialize()
 		if alliance ~= gaiaAlliance then
 			for _, enAlliance in ipairs(enAllianceList) do
 				if enAlliance ~= alliance and enAlliance ~= gaiaAlliance then
-					clearVotes(alliance, enAlliance) 
+					clearVotes(alliance, enAlliance)
 					SetCeasefireOffered(alliance, enAlliance, false)
 					SetCeasefire(alliance, enAlliance, false)
 				end
@@ -292,11 +292,11 @@ function gadget:Initialize()
 
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_ANTINUKEZONE] = true, [CMD_ATTACK] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
@@ -373,7 +373,7 @@ function gadget:Update()
 		if not spec then
 			for cAlliance, _ in pairs(myCeasefires) do
 				
-				local cTeamList = spGetTeamList(cAlliance)	
+				local cTeamList = spGetTeamList(cAlliance)
 				if not spAreTeamsAllied(cTeamList[1], myTeamID) then
 					spSendCommands({'ally '.. cAlliance .. ' 1'})
 					echo('Ceasefire: Please use only the control panel to break ceasefires, '..teamNames[myTeamID] ..'!!')

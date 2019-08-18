@@ -77,7 +77,7 @@ return {
         sizegrowth         = 12,
         ttl                = 13,
       },
-    },    
+    },
   },
   ["GIANT_WATER_HIT"] = {
     usedefaultexplosions = false,
@@ -126,7 +126,7 @@ return {
         sizegrowth         = 36,
         ttl                = 13,
       },
-    },    
+    },
   },
 }
 

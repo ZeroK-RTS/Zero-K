@@ -54,7 +54,7 @@ local function ShieldsAreTouching(shield1, shield2)
 	local zDiff = shield1.z - shield2.z
 	local yDiff = shield1.y - shield2.y
 	local sumRadius = shield1.shieldRadius + shield2.shieldRadius
-	return xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius 
+	return xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius
 end
 
 local otherID
@@ -148,7 +148,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	if shieldWeaponDefID then
 		local shieldWep = WeaponDefs[shieldWeaponDefID]
 		local allyTeamID = spGetUnitAllyTeam(unitID)
-		if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID].InMap(unitID)) then 
+		if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID].InMap(unitID)) then
 			-- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
 			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or IterableMap.New()
 			
@@ -302,7 +302,7 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 		if not ud then
 			return true
 		end
-		weaponDefID = ud.weapons[beamEmitter].weaponDef 
+		weaponDefID = ud.weapons[beamEmitter].weaponDef
 	else
 		-- Projectile
 		weaponDefID = Spring.GetProjectileDefID(proID)

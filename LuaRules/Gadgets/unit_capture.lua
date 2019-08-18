@@ -9,7 +9,7 @@ function gadget:GetInfo()
 		date      = "30/9/2010",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = true   
+		enabled   = true
 	}
 end
 
@@ -72,7 +72,7 @@ local captureWeaponDefs, captureUnitDefs = include("LuaRules/Configs/capture_def
 local damageByID = {data = {}, count = 0}
 local unitDamage = {}
 local capturedUnits = {}
-local controllers = {} 
+local controllers = {}
 local reloading = {}
 
 --------------------------------------------------------------------------------
@@ -242,12 +242,12 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 		if captureWeaponDefs[wdid] then
 			wantedWeaponList[#wantedWeaponList + 1] = wdid
 		end
-	end 
+	end
 	return wantedWeaponList
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,attackerID, attackerDefID, attackerTeam)
-	if (not weaponID) or (not captureWeaponDefs[weaponID]) then 
+	if (not weaponID) or (not captureWeaponDefs[weaponID]) then
 		return damage
 	end
 
@@ -290,8 +290,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- check damage (armourmod, range falloff) if enabled
 	local def = captureWeaponDefs[weaponID]
 	local newCaptureDamage = def.captureDamage
-	if def.scaleDamage then 
-		newCaptureDamage = newCaptureDamage * (damage/def.baseDamage) 
+	if def.scaleDamage then
+		newCaptureDamage = newCaptureDamage * (damage/def.baseDamage)
 	end
 	-- scale damage based on real damage (i.e. take into account armortypes etc.)
 	health = health + FIREWALL_HEALTH
@@ -426,7 +426,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if (cmdID ~= CMD_UNIT_KILL_SUBORDINATES) then
 		return true  -- command was not used
 	end
-	KillToggleCommand(unitID, cmdParams, cmdOptions)  
+	KillToggleCommand(unitID, cmdParams, cmdOptions)
 	return false  -- command was used
 end
 
@@ -473,6 +473,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeamID)
 	if controllers[unitID] then
+		-- This was a mastermind, transfer captured units
 		local unitByID = controllers[unitID].unitByID
 		local i = 1
 		while i <= unitByID.count do
@@ -487,6 +488,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeamID)
 	end
 	
 	if capturedUnits[unitID] then
+		-- This was a captured unit, update our references
 		if capturedUnits[unitID].controllerID then
 			local oldController = capturedUnits[unitID].controllerID
 			removeThingFromIterable(unitID, controllers[oldController].units, controllers[oldController].unitByID)
@@ -494,8 +496,19 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeamID)
 		capturedUnits[unitID] = nil
 	end
 	
+
 	if unitDamage[unitID] then
-		removeThingFromDoubleTable(unitID, unitDamage, damageByID)
+		-- This was a partially captured unit
+		local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+		if morphedTo then
+			-- Psuedo-destruction from a morph, transfer capture progress
+			unitDamage[morphedTo] = unitDamage[unitID]
+			damageByID.data[unitDamage[unitID].index] = morphedTo
+			unitDamage[unitID] = nil
+		else
+			-- True destruction, discard the capture progress we were tracking
+			removeThingFromDoubleTable(unitID, unitDamage, damageByID)
+		end
 	end
 end
 
@@ -562,7 +575,7 @@ function gadget:Load(zip)
 	damageByID = {data = {}, count = 0}
 	unitDamage = {}
 	capturedUnits = {}
-	controllers = {} 
+	controllers = {}
 	reloading = {}
 	
 	-- Load the data
@@ -591,7 +604,7 @@ function gadget:Load(zip)
 				postCaptureReload = data.postCaptureReload,
 				units = GG.SaveLoad.GetNewUnitIDKeys(data.units),
 				unitByID = {
-					count = data.unitByID.count, 
+					count = data.unitByID.count,
 					data = GG.SaveLoad.GetNewUnitIDValues(data.unitByID.data)
 				},
 				killSubordinates = data.killSubordinates,
@@ -605,7 +618,7 @@ function gadget:Load(zip)
 		local newFrame = frame - loadGameFrame
 		if newFrame >= 0 then
 			reloading[newFrame] = {
-				count = data.count, 
+				count = data.count,
 				data = GG.SaveLoad.GetNewUnitIDValues(data.data)
 			}
 		end
@@ -624,7 +637,7 @@ local spIsUnitInView 		= Spring.IsUnitInView
 local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetUnitLosState 	= Spring.GetUnitLosState
 local spValidUnitID 		= Spring.ValidUnitID
-local spGetMyAllyTeamID 	= Spring.GetMyAllyTeamID 	
+local spGetMyAllyTeamID 	= Spring.GetMyAllyTeamID
 local spGetGameFrame        = Spring.GetGameFrame
 local spGetSpectatingState  = Spring.GetSpectatingState
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam

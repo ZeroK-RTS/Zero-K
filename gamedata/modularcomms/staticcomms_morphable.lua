@@ -19,7 +19,7 @@ return {
       {"commweapon_assaultcannon", "weaponmod_standoff_rocket", cost = 550},
       {"conversion_partillery", "module_adv_targeting", cost = 400},
       {"weaponmod_high_caliber_barrel", "module_ablative_armor", cost = 625},
-    },    
+    },
   },
   comm_cai_assault = {
     name = "Zweihander",
@@ -30,7 +30,7 @@ return {
       {"commweapon_lightninggun", "module_dmg_booster", cost = 250},
       {"weaponmod_high_frequency_beam", "module_adv_targeting", cost = 575},
       {"weaponmod_stun_booster", "module_autorepair", cost = 475},
-    },        
+    },
   },
   comm_cai_specialist = {
     name = "Eagle Eye",
@@ -41,7 +41,7 @@ return {
       {"commweapon_slowbeam", "module_adv_targeting", cost = 200},
       {"conversion_shockrifle", "module_adv_targeting", cost = 600},
       {"conversion_disruptor", "module_autorepair", cost = 400},
-    },       
+    },
   },
   comm_cai_hispeed = {
     name = "Blade Runner",
@@ -52,7 +52,7 @@ return {
       {"commweapon_shotgun", "module_ablative_armor", cost = 275},
       {"weaponmod_autoflechette", "module_high_power_servos", cost = 600},
       {"weaponmod_disruptor_ammo", "module_autorepair", cost = 500},
-    },      
+    },
   },
   comm_trainer_strike = {
     name = "Strike Trainer",
@@ -63,7 +63,7 @@ return {
       {"commweapon_lightninggun", "module_ablative_armor", cost = 275},
       {"module_autorepair", "module_high_power_servos", cost = 400},
       {"module_autorepair", "module_adv_targeting", cost = 400},
-    },     
+    },
   },
   comm_trainer_battle = {
     name = "Battle Trainer",
@@ -96,7 +96,7 @@ return {
       {"commweapon_slowbeam", "module_resurrect", cost = 325},
       {"module_high_power_servos", "module_adv_targeting", cost = 300},
       {"conversion_disruptor", "module_autorepair", cost = 400},
-    },       
+    },
   },
   comm_trainer_siege = {
     name = "Siege Trainer",
@@ -107,6 +107,6 @@ return {
       {"commweapon_assaultcannon", "weaponmod_standoff_rocket", cost = 550},
       {"conversion_partillery", "module_adv_targeting", cost = 400},
       {"weaponmod_high_caliber_barrel", "module_ablative_armor", cost = 625},
-    },    
+    },
   },
 }

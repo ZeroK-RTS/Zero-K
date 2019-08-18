@@ -1,13 +1,13 @@
 include "constants.lua"
 
 local spGetUnitTeam = Spring.GetUnitTeam
-local spGetUnitIsBuilding = Spring.GetUnitIsBuilding 
+local spGetUnitIsBuilding = Spring.GetUnitIsBuilding
 local spGetUnitHealth = Spring.GetUnitHealth
 
-local base = piece 'base' 
+local base = piece 'base'
 local floatl, floatr = piece('float_l','float_r')
-local pad = piece 'pad' 
-local pontoon = piece 'pontoon' 
+local pad = piece 'pad'
+local pontoon = piece 'pontoon'
 
 local emitPieces = {piece('emit04', 'emit08', 'emit012')}
 local nanoNum = 1
@@ -44,7 +44,7 @@ function script.Activate()
 		SetUnitValue(BUGGER_OFF, 1)
 		Sleep(1500)
 	end
-	]]--	
+	]]--
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	SetUnitValue(COB.BUGGER_OFF, 0)
 end

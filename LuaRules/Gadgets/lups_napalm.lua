@@ -62,7 +62,7 @@ else -- Unsynced
 	local napalmFX, heatFX = include("LuaRules/Configs/lups_napalm_fxs.lua")
 
 	local Lups
-	local LupsAddParticles 
+	local LupsAddParticles
 	local SYNCED = SYNCED
 
 	local function SpawnNapalmFX(data)

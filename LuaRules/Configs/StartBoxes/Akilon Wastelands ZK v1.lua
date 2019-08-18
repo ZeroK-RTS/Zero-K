@@ -1,4 +1,4 @@
-return { 
+return {
 	[0] = {
 		boxes = {
 			{

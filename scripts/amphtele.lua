@@ -6,7 +6,7 @@ include 'letsNotFailAtTrig.lua'
 
 local base, pelvis, body = piece('base', 'pelvis', 'body')
 local rthigh, rshin, rfoot, lthigh, lshin, lfoot = piece('rthigh', 'rshin', 'rfoot', 'lthigh', 'lshin', 'lfoot')
-local holder, sphere = piece('holder', 'sphere') 
+local holder, sphere = piece('holder', 'sphere')
 
 local smokePiece = {pelvis}
 --------------------------------------------------------------------------------------

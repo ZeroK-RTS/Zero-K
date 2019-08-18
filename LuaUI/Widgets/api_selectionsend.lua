@@ -74,7 +74,7 @@ local function SendSelUnits(selUnitsToSend)
 		--Spring.Echo ("pack to", selUnitsToSend[i], VFS.PackU16(selUnitsToSend[i]))
 		uStr = uStr .. VFS.PackU16(selUnitsToSend[i])
 	end
-	SendLuaUIMsg(uStr,"allies")	
+	SendLuaUIMsg(uStr,"allies")
 end
 
 
@@ -93,7 +93,7 @@ local function UpdateAllySelUnits()
 		--Spring.Echo (i, "unpack to", code, VFS.UnpackU16(code))
 	end
 	WG.allySelUnits = allySelUnits2
-end	
+end
 
 function widget:Update(dt)
 	timeSinceBroadcast = timeSinceBroadcast + dt
@@ -108,7 +108,7 @@ function widget:Update(dt)
 		end
 		if allyActiveTx[pid] == 0 then
 			allySelData[playerID] = nil
-		end	
+		end
 		
 	elseif timeSinceBroadcast > 1 and selchanged then
 		timeSinceBroadcast = 0

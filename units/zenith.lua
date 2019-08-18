@@ -4,7 +4,7 @@ unitDef = {
   description                   = [[Meteor Controller]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  buildCostMetal                = 38000,
+  buildCostMetal                = 40000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
@@ -22,7 +22,7 @@ unitDef = {
     --neededlink  = 150,
     --pylonrange  = 150,
     modelradius    = [[45]],
-  },  
+  },
   
   energyUse                     = 0,
   explodeAs                     = [[ATOMIC_BLAST]],
@@ -106,6 +106,7 @@ unitDef = {
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 6000,
     },
+
     METEOR      = {
       name                    = [[Meteor]],
       accuracy                = 700,
@@ -117,7 +118,7 @@ unitDef = {
       cegTag                  = [[METEOR_TAG]],
       collideFriendly         = true,
       craterBoost             = 3,
-      craterMult              = 6, 
+      craterMult              = 6,
 
       customParams              = {
         light_color = [[2.4 1.5 0.6]],
@@ -125,9 +126,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 1700,
-        planes  = 1700,
-        subs    = 85,
+        default = 1600,
+        subs    = 80,
       },
 
       edgeEffectiveness       = 0.8,
@@ -139,7 +139,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[asteroid.s3o]],
       range                   = 9000,
-      reloadtime              = 1.2,
+      reloadtime              = 1,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
@@ -157,7 +157,7 @@ unitDef = {
       weaponVelocity          = 1600,
       wobble                  = 5500,
     },
-    
+
     METEOR_AIM      = {
       name                    = [[Meteor]],
       accuracy                = 700,
@@ -176,9 +176,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 1700,
-        planes  = 1700,
-        subs    = 85,
+        default = 1600,
+        subs    = 80,
       },
 
       edgeEffectiveness       = 0.8,
@@ -190,7 +189,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[asteroid.s3o]],
       range                   = 9000,
-      reloadtime              = 1.2,
+      reloadtime              = 1,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
@@ -209,7 +208,7 @@ unitDef = {
       weaponVelocity          = 1200,
       wobble                  = 0,
     },
-    
+
     METEOR_FLOAT      = {
       name                    = [[Meteor]],
       accuracy                = 700,
@@ -229,9 +228,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 1700,
-        planes  = 1700,
-        subs    = 85,
+        default = 1600,
+        subs    = 80,
       },
 
       edgeEffectiveness       = 0.8,
@@ -243,7 +241,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[asteroid.s3o]],
       range                   = 9000,
-      reloadtime              = 1.2,
+      reloadtime              = 1,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
@@ -263,7 +261,7 @@ unitDef = {
       weaponVelocity          = 200,
       wobble                  = 30000,
     },
-    
+
     METEOR_UNCONTROLLED      = {
       name                    = [[Meteor]],
       accuracy                = 700,
@@ -284,9 +282,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 1700,
-        planes  = 1700,
-        subs    = 85,
+        default = 1600,
+        subs    = 80,
       },
 
       edgeEffectiveness       = 0.8,
@@ -298,7 +295,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[asteroid.s3o]],
       range                   = 9000,
-      reloadtime              = 1.2,
+      reloadtime              = 1,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,

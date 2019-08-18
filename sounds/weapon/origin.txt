@@ -49,7 +49,7 @@ torpedo.wav - Kanoba & freeloops
 torp_land.wav - Kanoba & Golgotha
 
 UFO:Alien Invasion(modified):
-heatray_fire1.wav 
+heatray_fire1.wav
 heatray_fire2.wav
 
 launcher.wav - blackhole_fire.wav (Golgotha), cloaker_select.wav (Scorched 3D) and shield_select.wav (Scorched 3D)

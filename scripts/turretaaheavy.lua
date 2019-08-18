@@ -31,7 +31,7 @@ function script.Create()
 	StartThread(IdleAnim)
 end
 
-function script.QueryWeapon() 
+function script.QueryWeapon()
 	return flare
 end
 
@@ -68,7 +68,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(turret, SFX.NONE)
 		Explode(barrel, SFX.NONE)
 		return 1 -- corpsetype
-	else		
+	else
 		Explode(base, SFX.SHATTER)
 		Explode(turret, SFX.SMOKE + SFX.FIRE)
 		Explode(barrel, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)

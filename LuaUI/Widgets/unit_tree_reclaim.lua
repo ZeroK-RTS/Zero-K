@@ -1,4 +1,4 @@
-function widget:GetInfo() 
+function widget:GetInfo()
 	return {
 		name = "Area-reclaim trees",
 		desc = "Area-reclaim will also eat trees if the order is centered on a tree",
@@ -26,19 +26,19 @@ options = {
 --------------------------------------------------------------------------------
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
-	if cmdID ~= CMD.RECLAIM or #cmdParams ~= 4 then 
-		return 
+	if cmdID ~= CMD.RECLAIM or #cmdParams ~= 4 then
+		return
 	end
 
 	if options.defaultAvoidTrees.value then
 		local targetType, targetID = Spring.TraceScreenRay(Spring.WorldToScreenCoords(cmdParams[1], cmdParams[2], cmdParams[3]))
 
-		if (targetType ~= "feature") then 
-			return 
+		if (targetType ~= "feature") then
+			return
 		end
 		local fd = FeatureDefs[Spring.GetFeatureDefID(targetID)]
-		if not fd.reclaimable or fd.autoreclaim then 
-			return 
+		if not fd.reclaimable or fd.autoreclaim then
+			return
 		end
 
 		if not cmdOptions.ctrl then
@@ -56,5 +56,5 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		end
 		WG.CommandInsert(cmdID, cmdParams, cmdOptions)
 	end
-	return true	
+	return true
 end

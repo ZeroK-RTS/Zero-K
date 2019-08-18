@@ -40,7 +40,7 @@ local function DrawMouseIcon()
 		
 		if mx > badX and mx < badRight and my > badY and my < badBottom then
 			return
-		end		
+		end
 		
 		gl.Color(1,1,1,0.5)
 		gl.Texture(WG.GetBuildIconFrame(UnitDefs[unitDefID])) --draw build icon on screen. Copied from gui_chili_gesture_menu.lua

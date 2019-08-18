@@ -97,18 +97,18 @@ local function UpdateUnitGrow(unitID, growScale)
 	
 	if unit.isSphere then
 		spSetUnitCollisionVolumeData(unitID,
-			unit.scale[1], unit.scale[2], unit.scale[3], 
-			unit.offset[1], unit.offset[2] - growScale*unit.scaleOff, unit.offset[3], 
+			unit.scale[1], unit.scale[2], unit.scale[3],
+			unit.offset[1], unit.offset[2] - growScale*unit.scaleOff, unit.offset[3],
 			unit.volumeType, unit.testType, unit.primaryAxis
 		)
 	else
 		spSetUnitCollisionVolumeData(unitID,
-			unit.scale[1], unit.scale[2] - growScale*unit.scaleOff, unit.scale[3], 
-			unit.offset[1], unit.offset[2] - growScale*unit.scaleOff/2, unit.offset[3], 
+			unit.scale[1], unit.scale[2] - growScale*unit.scaleOff, unit.scale[3],
+			unit.offset[1], unit.offset[2] - growScale*unit.scaleOff/2, unit.offset[3],
 			unit.volumeType, unit.testType, unit.primaryAxis)
 	end
 
-	spSetUnitMidAndAimPos(unitID, 
+	spSetUnitMidAndAimPos(unitID,
 		unit.mid[1], unit.mid[2], unit.mid[3],
 		unit.aim[1], unit.aim[2] - growScale*unit.aimOff, unit.aim[3], true)
 end
@@ -126,8 +126,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		mid[2] = Spring.GetUnitRulesParam(unitID, "midpos_override") or mid[2]
 		aim[2] = Spring.GetUnitRulesParam(unitID, "aimpos_override") or aim[2]
 		
-		spSetUnitMidAndAimPos(unitID, 
-			mid[1] + midTable.midx, mid[2] + midTable.midy, mid[3] + midTable.midz, 
+		spSetUnitMidAndAimPos(unitID,
+			mid[1] + midTable.midx, mid[2] + midTable.midy, mid[3] + midTable.midz,
 			aim[1] + midTable.midx, aim[2] + midTable.midy, aim[3] + midTable.midz, true)
 	else
 		mid = {0, Spring.GetUnitRulesParam(unitID, "midpos_override") or 0, 0}
@@ -147,10 +147,10 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	
 	-- Sertup growth scale
 	local _, baseY, _, _, midY, _, _, aimY = spGetUnitPosition(unitID, true, true)
-	local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ, 
+	local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
 		volumeType, testType, primaryAxis = spGetUnitCollisionVolumeData(unitID)
 	
-	local volumeBelow = -((midY - baseY) + offsetY - scaleY/2)	
+	local volumeBelow = -((midY - baseY) + offsetY - scaleY/2)
 	local aimAbove = (midY - baseY) + aim[2] - mid[2]
 	
 	if volumeBelow < 0 then
@@ -184,8 +184,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	local luaSelectionScale = ud.customParams.lua_selection_scale
 	if Spring.SetUnitSelectionVolumeData and luaSelectionScale then
 		Spring.SetUnitSelectionVolumeData(unitID,
-			scaleX*luaSelectionScale, scaleY*luaSelectionScale, scaleZ*luaSelectionScale, 
-			0, 0, 0, 
+			scaleX*luaSelectionScale, scaleY*luaSelectionScale, scaleZ*luaSelectionScale,
+			0, 0, 0,
 			volumeType, testType, primaryAxis)
 	end
 	

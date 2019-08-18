@@ -14,13 +14,13 @@ end
 --------------------------------------------------------------------------------
 -- Spring Function:
 local spGetUnitsInRectangle  = Spring.GetUnitsInRectangle
-local spGetUnitTeam = Spring.GetUnitTeam 
-local spGetTeamInfo  = Spring.GetTeamInfo 
+local spGetUnitTeam = Spring.GetUnitTeam
+local spGetTeamInfo  = Spring.GetTeamInfo
 local spGetUnitDefID = Spring.GetUnitDefID
-local spGetPlayerInfo  = Spring.GetPlayerInfo 
+local spGetPlayerInfo  = Spring.GetPlayerInfo
 local spSendCommands = Spring.SendCommands
 local spTraceScreenRay = Spring.TraceScreenRay
-local spValidUnitID  = Spring.ValidUnitID 
+local spValidUnitID  = Spring.ValidUnitID
 local spGetCameraPosition		= Spring.GetCameraPosition
 local spGetCameraFOV = Spring.GetCameraFOV
 local tan				= math.tan
@@ -89,7 +89,7 @@ function widget:MousePress(x, y, button)
 	local y = spGetGroundHeight(mpos[1], mpos[3]) + 3
 	fillingDistance = AdjustForFOV(fillingDistance)
 	local addedSize = MaintainUnitSize(40, fillingDistance, cy)
-	local unit = spGetUnitsInRectangle( mpos[1]-40-addedSize, mpos[3]-40-addedSize, mpos[1]+40+addedSize,mpos[3]+40+addedSize) 
+	local unit = spGetUnitsInRectangle( mpos[1]-40-addedSize, mpos[3]-40-addedSize, mpos[1]+40+addedSize,mpos[3]+40+addedSize)
 	boxSize[1] = 40+addedSize
 	boxSize[2] = {mpos[1],y,mpos[3]}
 	local unitID = unit[1] --//only take 1st row because since the box is quite small it could only fit 1 unit. 1 unit is a reasonable assumption.
@@ -107,7 +107,7 @@ function widget:MousePress(x, y, button)
 	if button == leftButton then
 		local unitDefID = spGetUnitDefID(unitID)
 		local unitDefinition = UnitDefs[unitDefID]
-		if unitDefinition ~= nil then --//if unit is an unknown radar blip, then skip 
+		if unitDefinition ~= nil then --//if unit is an unknown radar blip, then skip
 			local unitHumanName = unitDefinition.humanName
 			local textToBePasted = pasteCommand .. unitHumanName .. "," --//paste unitName
 			spSendCommands(textToBePasted)

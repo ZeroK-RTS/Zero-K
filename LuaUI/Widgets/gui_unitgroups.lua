@@ -23,8 +23,8 @@ local updatedGroups = {}
 local nLastClick = 0
 local nLastIcon = -1
 
-local unitGroups = {}	
---[[ each element contains: 
+local unitGroups = {}
+--[[ each element contains:
 -totalMaxHealth 			total maxHealth of all units in group
 -totalHealth 					total of health of all units in group
 -numUnits 					number of units in the group
@@ -60,7 +60,7 @@ local slideOffset={
 	right = -1,
 	bottom = -1,
 }
-local slideOffsetChanged={}	-- this table holds two booleans, "right" and "bottom".  if false, then the player has not changed the offset in that direction so 
+local slideOffsetChanged={}	-- this table holds two booleans, "right" and "bottom".  if false, then the player has not changed the offset in that direction so
 -- we just use the screen resolution.  If true, we ignore the screen resolution.
 local oldMouseX = 0
 local oldMouseY = 0
@@ -320,11 +320,11 @@ function widget:DrawScreen()
       end
     end
 
-    RecalcMappings()    
+    RecalcMappings()
 
   end
 
-  --~ 	SetupDimensions(10)    
+  --~ 	SetupDimensions(10)
 
   -- Check to see if we're in "slideMode" (we're moving the icons around)
   if slideMode then
@@ -360,7 +360,7 @@ function widget:DrawScreen()
   nLastGroupChecked  = nLastGroupChecked + 1
   if (nLastGroupChecked > 10) then
     nLastGroupChecked = 1
-  end 
+  end
 
   -- unit model rendering uses the depth-buffer
   gl.Clear(GL.DEPTH_BUFFER_BIT)
@@ -382,25 +382,25 @@ end
 
 function GetGroupIdFromNum(num)
   -- the Lua mod (%) does not seem to work.
-  if num ~= 10 then 
+  if num ~= 10 then
     return num
-  else 
+  else
     return 0
   end
 end
 
 function GetNumFromGroupId(groupId)
-  if groupId == 0 then 
+  if groupId == 0 then
     return 10
-  else 
+  else
     return groupId
   end
 end
 
 function DrawControlIcons()
   -- the control icons are three buttons:
-  --	(1) "Alignment" switch between right screen edge and bottom 
-  --	(2) "AlwaysOn" always show empty groups or allow them to slide away; and 
+  --	(1) "Alignment" switch between right screen edge and bottom
+  --	(2) "AlwaysOn" always show empty groups or allow them to slide away; and
   --	(3) "Shrink" close space between empty groups when they're empty (like idlecons script)
   local xmin, ymin, xmax, ymax = GetBoxForIcon(0)
   if xmin == nil then
@@ -472,7 +472,7 @@ function GetBoxForIcon(iconNum)
     xEdge = vsx - iconSizeX
     yEdge = (iconSizeY + 1) * (iconCount - iconNum)
     -- the following allows for the scrolling of the icon in and out
-    if iconNum ~= 0 and iconsAlwaysOn == false then 
+    if iconNum ~= 0 and iconsAlwaysOn == false then
       xEdge = xEdge + (iconSizeX * iconWindows[iconNum].windowHidden)
     end
     --~ 		yEdge = yEdge + vsy/2 - iconCount * iconSizeY / 2
@@ -484,7 +484,7 @@ function GetBoxForIcon(iconNum)
     --~ 		xEdge = xEdge + vsx/2 - iconCount * iconSizeX / 2
     xEdge = xEdge + slideOffset.bottom
     -- the following allows for the scrolling of the icon in and out
-    if iconNum ~= 0 and iconsAlwaysOn == false then 
+    if iconNum ~= 0 and iconsAlwaysOn == false then
       yEdge = yEdge - (iconSizeY * iconWindows[iconNum].windowHidden)
     end
     return xEdge, yEdge, xEdge + iconSizeX, yEdge + iconSizeY
@@ -498,14 +498,14 @@ end
   --~ 	rectMaxX = math.floor(xmid + (0.5 * width))
   --~ 	rectMinY = math.floor(0)
   --~ 	rectMaxY = math.floor(rectMinY + iconSizeY)
-  --~     
+  --~
   --~ end
 
   -------------------------------------------------------------------------------
   -------------------------------------------------------------------------------
 
   function CenterUnitDef(unitDefID)
-    local ud = UnitDefs[unitDefID] 
+    local ud = UnitDefs[unitDefID]
     if (not ud) then
       return
     end
@@ -563,7 +563,7 @@ end
   -------------------------------------------------------------------------------
 
   local function SetupModelDrawing()
-    gl.DepthTest(true) 
+    gl.DepthTest(true)
     gl.DepthMask(true)
     gl.Culling(GL.FRONT)
     gl.Lighting(true)
@@ -616,7 +616,7 @@ end
       elseif tIconWindow.windowHidden < 0 then
         tIconWindow.windowHidden = 0
       end
-    else 
+    else
       if tUnitGroup ~= nil and tUnitGroup.numUnits > 0 then
         tIconWindow.windowHidden = 0
       else
@@ -646,7 +646,7 @@ end
     if tUnitGroup ~= nil then
       gl.Scissor(xmin, ymin, xmax - xmin, ymax - ymin)
       if tUnitGroup.lastHealthDrop > Spring.GetGameSeconds() - 9 then
-        -- this group has suffered damange within the last 5 seconds!  
+        -- this group has suffered damange within the last 5 seconds!
         -- maybe add an icon or have the box flash!
         local colourTimer = math.cos(20 * widgetHandler:GetHourTimer())
         gl.Blending(GL.SRC_ALPHA, GL.ONE)
@@ -672,7 +672,7 @@ end
 
     -- draw the 3d model of the unit
     if tUnitGroup ~= nil and tUnitGroup.primaryUnitTypeId ~= nil then
-      local ud = UnitDefs[tUnitGroup.primaryUnitTypeId] 
+      local ud = UnitDefs[tUnitGroup.primaryUnitTypeId]
       if ud ~= nil then
         -- draw the 3D unit
         SetupModelDrawing()
@@ -708,8 +708,8 @@ end
         nBarLength = xmax - xmin - nHBuffer * 2
       end
       drawBox(xmin + nHBuffer, ymax - nVBuffer, nBarLength, nBarHeight, {0.8,0.8,0.8, 0.7}, {0.1,0.1,0.1, 0.7})
-      -- health bar 
-      local nHealthRatio = tUnitGroup.totalHealth / tUnitGroup.totalMaxHealth 
+      -- health bar
+      local nHealthRatio = tUnitGroup.totalHealth / tUnitGroup.totalMaxHealth
       local nHealthLength = nHealthRatio * (nBarLength - 2)
       local tHealthColour = { (1 - nHealthRatio), nHealthRatio, 0, 0.5}
       local tHealthColourBorder = {(1 - nHealthRatio) / 2, nHealthRatio / 2, 0, 0.5}
@@ -789,7 +789,7 @@ end
 
     -- Test for a double click action
     if (iconNum == nLastIcon) and (nNewClickTime - nLastClick < 2) then
-      -- The user double clicked.  
+      -- The user double clicked.
       bDoubleClick = true
       nLastClick = 0
       nLastIcon = -1
@@ -825,16 +825,16 @@ end
         iconChoice = 2 - math.floor(y / iconSizeY * 3)
       end
       if iconChoice == 0 then
-        -- selected "alignment" button 
+        -- selected "alignment" button
         if alignment=="right" then
           alignment = "bottom"
-        else 
+        else
           alignment = "right"
         end
         iconSizeX = iconDefaultWidth[alignment]
         iconSizeY = iconDefaultHeight[alignment]
       elseif iconChoice == 1 then
-        -- selected the Always On button 
+        -- selected the Always On button
         iconsAlwaysOn = not iconsAlwaysOn
         if iconsAlwaysOn and iconsShrink then
           -- these can not both be on at the same time
@@ -842,7 +842,7 @@ end
           RecalcMappings()
         end
       else
-        -- selected the Icons Shrink button 
+        -- selected the Icons Shrink button
         iconsShrink = not iconsShrink
         if iconsAlwaysOn and iconsShrink then
           -- these can not both be on at the same time
@@ -896,11 +896,11 @@ end
         -- Alignment button
         if alignment=="right" then
           return "Click to move the UnitGroups Icons to the bottom of the screen"
-        else 
+        else
           return "Click to move the UnitGroups Icons to the right side of the screen"
         end
       elseif iconChoice == 1 then
-        -- iconsAlwaysOn button 
+        -- iconsAlwaysOn button
         return "Click to alternate between always showing all of the UnitGroup icons, even when empty, or not showing them."
       else
         -- iconsShrink button
@@ -996,13 +996,13 @@ end
   end
 
   function drawBorder(left, top, width, height, lineWidth, boColor)
-    -- top line 
+    -- top line
     drawBoxSimple(left, top, width, lineWidth, boColor)
-    -- right line 
+    -- right line
     drawBoxSimple(left + width - lineWidth, top - lineWidth +1, lineWidth, height - lineWidth + 1, boColor)
-    -- bottom line 
+    -- bottom line
     drawBoxSimple(left, top - height + lineWidth, width - lineWidth, lineWidth, boColor)
-    -- left line 
+    -- left line
     drawBoxSimple(left, top - lineWidth + 1, lineWidth, height - lineWidth*2 + 2, boColor)
   end
 

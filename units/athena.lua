@@ -49,7 +49,7 @@ unitDef = {
   corpse              = [[DEAD]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[30 20 60]],
-  collisionVolumeType    = [[ellipsoid]], 
+  collisionVolumeType    = [[ellipsoid]],
   cruiseAlt           = 80,
 
   customParams        = {

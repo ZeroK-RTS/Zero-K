@@ -1,6 +1,6 @@
---// ============================================================================= 
+--// =============================================================================
 --// Chili DebugHandler
---// ============================================================================= 
+--// =============================================================================
 
 --// todo:
 --// * use the custom errorhandler for any widget- > chili interaction,
@@ -15,7 +15,7 @@
 
 DebugHandler = {}
 
---// ============================================================================= 
+--// =============================================================================
 --// List of all chili object for easy debugging
 
 --// DebugHandler.objectsOwnedByWidgets[widget][n] = owned_object
@@ -42,7 +42,7 @@ setmetatable(DebugHandler.allObjects, {
 })
 
 
---// ============================================================================= 
+--// =============================================================================
 --// Chili ErrorHandler
 --//
 --// Chili is a framework, so many widgets move parts of their code into its
@@ -133,7 +133,7 @@ end
 DebugHandler.ChiliErrorHandler = ChiliErrorHandler
 
 
---// ============================================================================= 
+--// =============================================================================
 --// Stacktrace
 
 function DebugHandler.Stacktrace()
@@ -190,7 +190,7 @@ function DebugHandler.Stacktrace()
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 --// Define some helper functions needed for xpcall
 
 --// we do this so we can identify it in Stacktrace() (cd = chili debug)
@@ -252,14 +252,14 @@ local function xpcall_va(func, ...)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 --// Define Chili.SafeCall
 
 DebugHandler.SafeCall = xpcall_va
 SafeCall = xpcall_va --// external code should access it via Chili.SafeCall()
 
 
---// ============================================================================= 
+--// =============================================================================
 --// Use our errorhandler in gl.CreateList
 
 local orig_gl = gl
@@ -272,7 +272,7 @@ end
 
 
 
---// ============================================================================= 
+--// =============================================================================
 --// Chili.DebugHandler.SafeWrap
 --// usage:
 --//   used for WG.Chili & screen0 to make any calling to them safe
@@ -373,7 +373,7 @@ function DebugHandler.SafeWrap(t_orig, ...)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 --// When a Widget gets removed destroy all its owned chili object, too
 
 local origRemoveWidget = widgetHandler.RemoveWidget
@@ -388,7 +388,7 @@ widgetHandler.RemoveWidget = function(self, widget, ...)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 --// Check the stack for any indication for an user widget
 --//  so we can remove all owned chili object when the widget crashes/unloads
 --//  (also useful for a lot of other debugging purposes)
@@ -441,7 +441,7 @@ function DebugHandler.GetWidgetOrigin(_i)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 --// gets called by Chili.Object:New{}
 
 function DebugHandler:RegisterObject(obj)
@@ -456,4 +456,4 @@ function DebugHandler:RegisterObject(obj)
 	--// hint: both tables above are weaktables, so we don't need a UnregisterObject!
 end
 
---// ============================================================================= 
+--// =============================================================================

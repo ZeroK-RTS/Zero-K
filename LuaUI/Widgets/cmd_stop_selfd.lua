@@ -6,7 +6,7 @@ function widget:GetInfo()
     date      = "GPL v3 or later",
     license   = "Feb 2015",
     layer     = 0,
-    enabled   = true  
+    enabled   = true
   }
 end
 
@@ -20,5 +20,5 @@ function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpti
 
     if (Spring.GetUnitSelfDTime(unitID) > 0) then
         Spring.GiveOrderToUnit(unitID, CMD.SELFD, EMPTY_TABLE, 0)
-    end 
+    end
 end

@@ -123,7 +123,7 @@ function preJump(turn,distance)
 					jumpDir = 4
 				else
 					jumpDir = 1
-				end	
+				end
 		end
 		
 		-- coil for jump
@@ -140,7 +140,7 @@ function preJump(turn,distance)
 		Turn(luparm, z_axis, UPARM_JUMP_COIL_ANGLE, UPARM_JUMP_COIL_SPEED)
 		Turn(ruparm, z_axis, -UPARM_JUMP_COIL_ANGLE, UPARM_JUMP_COIL_SPEED)
 		Turn(llarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_COIL_SPEED)
-		Turn(rlarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_COIL_SPEED)	 
+		Turn(rlarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_COIL_SPEED)
 end
 
 function beginJump()
@@ -210,7 +210,7 @@ local function Somersault()
 		
 		-- strike a pose
 		Turn(luparm, y_axis, 0, UPARM_JUMP_COIL_SPEED*1.5)
-		Turn(ruparm, y_axis, 0, UPARM_JUMP_COIL_SPEED*1.5)		
+		Turn(ruparm, y_axis, 0, UPARM_JUMP_COIL_SPEED*1.5)
 		Turn(luparm, z_axis, UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_COIL_SPEED*1.5)
 		Turn(ruparm, z_axis, -UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_COIL_SPEED*1.5)
 		Turn(llarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_COIL_SPEED*1.5)
@@ -229,7 +229,7 @@ function SomersaultLoop()
 						bSomersault = false
 						Somersault()
 				end
-				Sleep(100)	
+				Sleep(100)
 		end
 end
 
@@ -266,7 +266,7 @@ local function Walk()
 			Turn(luparm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
 			Turn(ruparm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 		end
-		WaitForTurn(rthigh, x_axis)		
+		WaitForTurn(rthigh, x_axis)
 		Sleep(0)
 	end
 end
@@ -281,17 +281,17 @@ function script.Create()
 		Turn(lbflare1, y_axis, math.rad(-45))
 		Turn(lbflare2, y_axis, math.rad(-45))
 		Turn(rbflare1, y_axis, math.rad(45))
-		Turn(rbflare2, y_axis, math.rad(45))	 
+		Turn(rbflare2, y_axis, math.rad(45))
 		
 	StartThread(GG.Script.SmokeUnit, smokePiece)
 		StartThread(SomersaultLoop)
 end
 
-function script.StartMoving() 
+function script.StartMoving()
 	StartThread(Walk)
 end
 
-function script.StopMoving() 
+function script.StopMoving()
 	StartThread(RestorePose)
 end
 

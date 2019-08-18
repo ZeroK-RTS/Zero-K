@@ -678,7 +678,7 @@ function LayoutPanel:_LayoutChildren()
     end
 
     --if (self.orientation == "horizontal") then
-      --FIXME use child:Resize or something like that 
+      --FIXME use child:Resize or something like that
       child:_UpdateConstraints(cposx,cposy)
     --else
     --  child:_UpdateConstraints(cposy,cposx)

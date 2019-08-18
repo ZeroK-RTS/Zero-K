@@ -8,7 +8,7 @@ local gadgetName = "Unit removal from rezzed structures"
 function gadget:GetInfo()
     return {
         name      = gadgetName,
-        desc      = "Prevents units from getting stuck inside a resurrected structure " .. 
+        desc      = "Prevents units from getting stuck inside a resurrected structure " ..
         "by moving them aside",
         author    = "Alcur",
         date      = "21.10.2017",
@@ -49,7 +49,7 @@ local extraMaxWaterDepth = 5
 local extraGatherDistance = 125
 
 local function Debug(message)
-    spEcho(gadgetName .. ": " .. message)    
+    spEcho(gadgetName .. ": " .. message)
 end
 
 local function IsGroundSlopeTraversable(unitDef, x, z)
@@ -79,7 +79,7 @@ local function IsLocationSubmerged(x, z)
     return spGetGroundHeight(x, z) < 0, depth
 end
 
--- only four possible directions (north, east, south and west) 
+-- only four possible directions (north, east, south and west)
 -- because currently more aren't needed
 local function IsPathTraversable(unitDef, startX, startZ, goalX, goalZ)
     local stepX = gameSquareSize
@@ -97,7 +97,7 @@ local function IsPathTraversable(unitDef, startX, startZ, goalX, goalZ)
         for z = startZ, goalZ, stepZ do
             local submerged, depth = IsLocationSubmerged(x, z)
             local canMoveInWater = CanUnitMoveInWater(unitDef, depth)
-            if not IsGroundSlopeTraversable(unitDef, x, z) or (submerged and 
+            if not IsGroundSlopeTraversable(unitDef, x, z) or (submerged and
                 not canMoveInWater) or (submerged and IsUnitShip(unitDef) and unitDef.moveDef.depth > depth) then
                 --Spring.MarkerAddPoint(x, 0, z, "Slope not traversable")
                 return false
@@ -181,7 +181,7 @@ local function EstimateRequiredStructureGap(unitID)
 
     --Debug("Unit size info: gMeanScaleRadius = " .. gMeanScaleRadius .. ", gMeanHalfFootprint = " .. gMeanHalfFootprint)
 
-    local estimatedGap = Max(Max(GeomMean({scaleX / 2, scaleY / 2, scaleZ / 2}), radius, GeomMean({def.xsize * gameSquareSize / 2, 
+    local estimatedGap = Max(Max(GeomMean({scaleX / 2, scaleY / 2, scaleZ / 2}), radius, GeomMean({def.xsize * gameSquareSize / 2,
                     def.zsize * gameSquareSize / 2})), gapMin)
 
     return estimatedGap
@@ -201,8 +201,8 @@ local function ShouldUnitBeMoved(targetUnitID, resUnitMinX, resUnitMinZ, resUnit
     --Debug("floater = " .. tostring(unitDef.floater))
     --Debug("Rectangle unit maxSlope is " .. tostring(unitDef.moveDef.maxSlope))
 
-    if not unitDef.isImmobile and unitDef.name ~= "terraunit" and not unitDef.isAirUnit and 
-    ((unitY - unitGroundY <= maxUnitHeightAboveGround) or (CanUnitSwim(unitDef) and 
+    if not unitDef.isImmobile and unitDef.name ~= "terraunit" and not unitDef.isAirUnit and
+    ((unitY - unitGroundY <= maxUnitHeightAboveGround) or (CanUnitSwim(unitDef) and
             WithinBounds(unitY, -unitDef.waterline - uHeight / 2 - extraMaxWaterDepth, maxUnitHeightAboveSea, true))) then
         -- per the Spring wiki unit height determines if a ship can go over something that is underwater
 
@@ -243,15 +243,15 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
             --Debug("createdUnitMinX = " .. createdUnitMinX .. ", createdUnitMaxX = " .. createdUnitMaxX)
             --Debug("createdUnitMinZ = " .. createdUnitMinZ .. ", createdUnitMaxZ = " .. createdUnitMaxZ)
 
-            local units = spGetUnitsInRectangle(createdUnitMinX - extraGatherDistance, 
-                createdUnitMinZ - extraGatherDistance, createdUnitMaxX + extraGatherDistance, 
+            local units = spGetUnitsInRectangle(createdUnitMinX - extraGatherDistance,
+                createdUnitMinZ - extraGatherDistance, createdUnitMaxX + extraGatherDistance,
                 createdUnitMaxZ + extraGatherDistance)
 
 
             --Debug("Y of the created unit: " .. uy1)
             --Debug("Ground Y of the created unit: " .. createdUnitGroundY)
             for i = 1, #units do
-                local shouldUnitBeMoved, requiredGap = ShouldUnitBeMoved(units[i], createdUnitMinX, 
+                local shouldUnitBeMoved, requiredGap = ShouldUnitBeMoved(units[i], createdUnitMinX,
                     createdUnitMinZ, createdUnitMaxX, createdUnitMaxZ)
                 if units[i] ~= unitID and shouldUnitBeMoved then
 
@@ -295,8 +295,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 end
 
 -- The below code is for testing. It creates an athena and a cloakassault if they don't exist.
--- A hovercraft wreck is created too if the corresponding factory or its wreck are absent. 
--- The polling checks every 10th frame if the things exist. The things are placed roughly onto 
+-- A hovercraft wreck is created too if the corresponding factory or its wreck are absent.
+-- The polling checks every 10th frame if the things exist. The things are placed roughly onto
 -- the centre of the map.
 --[[
 function gadget:GameFrame(f)

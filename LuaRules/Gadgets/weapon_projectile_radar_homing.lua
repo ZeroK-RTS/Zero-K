@@ -12,7 +12,7 @@ end
 
 -------------------------------------------------------------
 -------------------------------------------------------------
-if not (gadgetHandler:IsSyncedCode()) then 
+if not (gadgetHandler:IsSyncedCode()) then
 	return false
 end
 -------------------------------------------------------------
@@ -29,14 +29,14 @@ local projectileHomingDistance = {
 
 for wdid = 1, #WeaponDefs do
 	local wd = WeaponDefs[wdid]
-	if (not projectileHomingDistance[wdid]) and wd.tracks and 
+	if (not projectileHomingDistance[wdid]) and wd.tracks and
 			(wd.type == "TorpedoLauncher" or wd.type == "MissileLauncher" or wd.type == "StarburstLauncher") then
 		projectileHomingDistance[wdid] = (10 * wd.projectilespeed)^2
 	end
 end
 
 function gadget:Initialize()
-	for id, _ in pairs(projectileHomingDistance) do 
+	for id, _ in pairs(projectileHomingDistance) do
 		if Script.SetWatchProjectile then
 			Script.SetWatchProjectile(id, true)
 		else

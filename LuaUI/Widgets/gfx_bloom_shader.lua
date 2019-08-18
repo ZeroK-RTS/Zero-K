@@ -11,7 +11,7 @@ function widget:GetInfo()
 end
 
 --------------------------------------------------------------------------------
--- config 
+-- config
 --------------------------------------------------------------------------------
 
 local basicAlpha = 0.4
@@ -567,7 +567,7 @@ function widget:SetConfigData(data)
 end
 
 function widget:TextCommand(command)
-  if (string.find(command, "advbloom") == 1  and  string.len(command) == 8) then 
+  if (string.find(command, "advbloom") == 1  and  string.len(command) == 8) then
 		WG['bloom'].setAdvBloom(not drawHighlights)
 		if drawHighlights then
 	 		Spring.Echo('Adv bloom enabled')

@@ -141,7 +141,7 @@ local function StartTrack(track)
 		until newTrack ~= previousTrack or tries >= 10
 	end
 	-- for key, val in pairs(oggInfo) do
-		-- Spring.Echo(key, val)	
+		-- Spring.Echo(key, val)
 	-- end
 	firstFade = false
 	previousTrack = newTrack
@@ -181,7 +181,7 @@ local function SetPeaceThreshold(num)
 		peaceThreshold = num
 	else
 		peaceThreshold = 1000
-	end	
+	end
 end
 
 function widget:Update(dt)
@@ -264,7 +264,7 @@ function widget:Update(dt)
 		
 		if (not firstTime) then
 			StartTrack()
-			firstTime = true -- pop this cherry	
+			firstTime = true -- pop this cherry
 		end
 		
 		local playedTime, totalTime = Spring.GetSoundStreamTime()
@@ -314,7 +314,7 @@ function widget:GameStart()
 	end
 	
 	--Spring.Echo("Track: " .. newTrack)
-	newTrackWait = 0	
+	newTrackWait = 0
 end
 
 -- Safety of a heisenbug
@@ -347,7 +347,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 	end
 end
 
-function widget:UnitDestroyed(unitID, unitDefID, teamID) 
+function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	if unitExceptions[unitDefID] then
 		return
 	end
@@ -415,7 +415,7 @@ function widget:Initialize()
 	-- Spring.Echo(os.clock())
  
 	-- for TrackName,TrackDef in pairs(peaceTracks) do
-		-- Spring.Echo("Track: " .. TrackDef)	
+		-- Spring.Echo("Track: " .. TrackDef)
 	-- end
 	--math.randomseed(os.clock()* 101.01)--lurker wants you to burn in hell rgn
 	-- for i=1,20 do Spring.Echo(math.random()) end

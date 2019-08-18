@@ -22,7 +22,7 @@ local MIN_STORAGE = 0.5
 
 WG.allies = 1
 --[[
-WG.windEnergy = 0 
+WG.windEnergy = 0
 WG.highPriorityBP = 0
 WG.lowPriorityBP = 0
 --]]
@@ -227,24 +227,24 @@ options_order = {
  
 options = {
 	ecoPanelHideSpec = {
-		name  = 'Hide if spectating', 
-		type  = 'bool', 
+		name  = 'Hide if spectating',
+		type  = 'bool',
 		value = false,
 		noHotkey = true,
 		desc = "Should the panel hide when spectating?",
 		OnChange = option_recreateWindow
 	},
 	eExcessFlash = {
-		name  = 'Flash On Energy Excess', 
-		type  = 'bool', 
+		name  = 'Flash On Energy Excess',
+		type  = 'bool',
 		value = false,
 		noHotkey = true,
 		desc = "When enabled energy storage will flash if energy is being excessed. This only occurs if too much energy is left unlinked to metal extractors because normally excess is used for overdrive."
 	},
 	enableReserveBar = {
-		name  = 'Enable Reserve', 
-		type  = 'bool', 
-		value = true, 
+		name  = 'Enable Reserve',
+		type  = 'bool',
+		value = true,
 		noHotkey = true,
 		desc = "Ctrl+Click on the resource bars will set reserve when enabled. Low and Normal priority constructors cannot use resources in reserve storage."
 	},
@@ -259,20 +259,20 @@ options = {
 		value = 0, min = 0, max = 1, step = 0.01,
 	},
 	energyFlash = {
-		name  = "Energy Stall Flash", 
-		type  = "number", 
+		name  = "Energy Stall Flash",
+		type  = "number",
 		value = 0.1, min=0,max=1,step=0.02,
 		desc = "Energy storage will flash when it drops below this fraction of your total storage."
 	},
 	energyWarning = {
-		name  = "Energy Stall Warning", 
-		type  = "number", 
+		name  = "Energy Stall Warning",
+		type  = "number",
 		value = 0.1, min = 0,max = 1, step = 0.02,
 		desc = "Recieve a warning when energy storage drops below this value."
 	},
 	metalWarning = {
-		name  = "Metal Excess Warning", 
-		type  = "number", 
+		name  = "Metal Excess Warning",
+		type  = "number",
 		value = 0.9, min = 0,max = 1, step = 0.02,
 		desc = "Recieve a warning when metal storage exceeds this value."
 	},
@@ -311,10 +311,10 @@ options = {
 	},
 	colourBlind = {
 		name  = "Colourblind mode",
-		type  = "bool", 
-		value = false, 
+		type  = "bool",
+		value = false,
 		noHotkey = true,
-		OnChange = option_colourBlindUpdate, 
+		OnChange = option_colourBlindUpdate,
 		desc = "Uses Blue and Yellow instead of Red and Green for number display"
 	},
 	fontSize = {
@@ -439,11 +439,11 @@ end
 
 local function UpdateReserveBars(metal, energy, value, overrideOption, localOnly)
 	if options.enableReserveBar.value or overrideOption then
-		if value < 0 then 
-			value = 0 
+		if value < 0 then
+			value = 0
 		end
-		if value > 1 then 
-			value = 1 
+		if value > 1 then
+			value = 1
 		end
 		
 		reserveSentTimer = RESERVE_SEND_TIME
@@ -473,9 +473,9 @@ end
 --------------------------------------------------------------------------------
 
 local function Mix(startColour, endColour, interpParam)
-	return {endColour[1] * interpParam + startColour[1] * (1 - interpParam), 
-	endColour[2] * interpParam + startColour[2] * (1 - interpParam), 
-	endColour[3] * interpParam + startColour[3] * (1 - interpParam), 
+	return {endColour[1] * interpParam + startColour[1] * (1 - interpParam),
+	endColour[2] * interpParam + startColour[2] * (1 - interpParam),
+	endColour[3] * interpParam + startColour[3] * (1 - interpParam),
 	endColour[4] * interpParam + startColour[4] * (1 - interpParam), }
 end
 
@@ -522,13 +522,13 @@ end
 
 local function UpdateWindowOpacity()
 	if updateOpacity then
-		if (window_metal) then 
+		if (window_metal) then
 			window_metal.backgroundColor[4] = updateOpacity
-			window_metal:Invalidate() 
+			window_metal:Invalidate()
 		end
-		if (window_energy) then 
+		if (window_energy) then
 			window_energy.backgroundColor[4] = updateOpacity
-			window_energy:Invalidate() 
+			window_energy:Invalidate()
 		end
 		updateOpacity = false
 	end
@@ -590,8 +590,8 @@ end
 local initialReserveSet = false
 function widget:GameFrame(n)
 
-	if (n%TEAM_SLOWUPDATE_RATE ~= 0) then 
-        return 
+	if (n%TEAM_SLOWUPDATE_RATE ~= 0) then
+        return
     end
 	
 	if not window then
@@ -608,7 +608,7 @@ function widget:GameFrame(n)
 	
 	UpdateCustomParamResourceData()
 
-	local myTeamID = Spring.GetLocalTeamID()	
+	local myTeamID = Spring.GetLocalTeamID()
 	local myAllyTeamID = Spring.GetMyAllyTeamID()
 	local teams = Spring.GetTeamList(myAllyTeamID)
 	
@@ -633,7 +633,7 @@ function widget:GameFrame(n)
 		teamMSpent = teamMSpent + mExpe
 		teamFreeStorage = teamFreeStorage + mStor - mCurr
 		teamTotalMetalStored = teamTotalMetalStored + mCurr
-		teamTotalMetalCapacity = teamTotalMetalCapacity + mStor 
+		teamTotalMetalCapacity = teamTotalMetalCapacity + mStor
 		
 		local extraMetalPull = spGetTeamRulesParam(teams[i], "extraMetalPull") or 0
 		teamMPull = teamMPull + mPull + extraMetalPull
@@ -696,10 +696,10 @@ function widget:GameFrame(n)
 	end
 
 	-- cap by storage
-	if eCurr > eStor then 
+	if eCurr > eStor then
 		eCurr = eStor
 	end
-	if mCurr > mStor then 
+	if mCurr > mStor then
 		mCurr = mStor
 	end
 	
@@ -737,7 +737,7 @@ function widget:GameFrame(n)
 	metalWarningPanel.ShowWarning(flashModeEnabled and (metalWarning and not energyWarning))
 	energyWarningPanel.ShowWarning(flashModeEnabled and energyWarning)
 	
-	local mPercent, ePercent 
+	local mPercent, ePercent
 	if mStor > 1 then
 		mPercent = 100 * mCurr / mStor
 	else
@@ -803,16 +803,16 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_overdrive"] .. ": " .. metalOverdrive ..
 	"\n  " .. strings["resbar_reclaim"] .. ": " .. metalReclaim ..
 	"\n  " .. strings["resbar_cons"] .. ": " .. metalConstructor ..
-	"\n  " .. strings["resbar_sharing"] .. ": " .. metalShare .. 
+	"\n  " .. strings["resbar_sharing"] .. ": " .. metalShare ..
 	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
     "\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.metalStorageReserve or 0) ..
     "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(mCurr, mStor)  ..
-	"\n " .. 
+	"\n " ..
 	"\n  " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.metalReclaimTotal or 0) ..
 	"\n  " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.metalValue or 0) ..
 	"\n  " .. strings["resbar_nano_value"] .. ": " .. math.ceil(cp.nanoframeValue or 0) .. " / " .. math.ceil(cp.nanoframeTotal or 0) ..
 	"\n " ..
-	"\n" .. strings["team_metal_economy"] .. 
+	"\n" .. strings["team_metal_economy"] ..
 	"\n  " .. strings["resbar_inc"] .. ": " .. team_metalTotalIncome .. "      " .. strings["resbar_pull"] .. ": " .. team_metalPull ..
 	"\n  " .. strings["resbar_base_extraction"] .. ": " .. team_metalBase ..
 	"\n  " .. strings["resbar_overdrive"] .. ": " .. team_metalOverdrive ..
@@ -831,13 +831,13 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_generators"] .. ": " .. energyGenerators ..
 	"\n  " .. strings["resbar_reclaim"] .. ": " .. energyReclaim ..
 	"\n  " .. strings["resbar_cons"] .. ": " .. energyMisc ..
-	"\n  " .. strings["resbar_sharing_and_overdrive"] .. ": " .. energyOverdrive .. 
-	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstruction .. 
+	"\n  " .. strings["resbar_sharing_and_overdrive"] .. ": " .. energyOverdrive ..
+	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
 	"\n  " .. strings["resbar_other"] .. ": " .. energyOther ..
     "\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
     "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
-	"\n " .. 
-	"\n" .. strings["team_energy_economy"] .. 
+	"\n " ..
+	"\n" .. strings["team_energy_economy"] ..
 	"\n  " .. strings["resbar_inc"] .. ": " .. team_energyIncome .. "      " .. strings["resbar_pull"] .. ": " .. team_energyPull ..
 	"\n  " .. strings["resbar_generators"] .. ": " .. team_energyGenerators ..
 	"\n  " .. strings["resbar_reclaim"] .. ": " .. team_energyReclaim ..
@@ -1088,7 +1088,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		local width = (self.width - self.padding[1] - self.padding[3])
 		
 		if width > 0 then
-			local reserve = x/width 
+			local reserve = x/width
 			if mouse ~= 1 then
 				UpdateReserveBars(true, true, reserve)
 			elseif metal then
@@ -1273,7 +1273,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		max = 1,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
-		bars = { 
+		bars = {
 			{
 				color1 = col_reserve,
 				color2 = col_reserve,
@@ -1282,7 +1282,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 				s = 1, -- tex coords
 				t = 1,
 				tileSize = 16, --  if set then main axis texture coord = width / tileSize
-			}, 
+			},
 		}
 	}
 	
@@ -1298,29 +1298,29 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		fontShadow = false,
 		fontOffset = -2,
 		font = {
-			size = 20, 
-			color = {.8,.8,.8,.95}, 
+			size = 20,
+			color = {.8,.8,.8,.95},
 			outline = true,
-			outlineWidth = 2, 
+			outlineWidth = 2,
 			outlineWeight = 2
 		},
-		OnMouseDown = {function(self, x, y, mouse) 
+		OnMouseDown = {function(self, x, y, mouse)
 			mouseDownOnReserve = mouse
-			if not widgetHandler:InTweakMode() then 
-				SetReserveByMouse(self, x, y, mouseDownOnReserve, true) 
+			if not widgetHandler:InTweakMode() then
+				SetReserveByMouse(self, x, y, mouseDownOnReserve, true)
 			end
-			return (not widgetHandler:InTweakMode()) 
+			return (not widgetHandler:InTweakMode())
 		end},	-- this is needed for OnMouseUp to work
 		OnMouseUp = {function(self, x, y, mouse)
-			if widgetHandler:InTweakMode() or not mouseDownOnReserve then 
-				return 
+			if widgetHandler:InTweakMode() or not mouseDownOnReserve then
+				return
 			end
 			SetReserveByMouse(self, x, y, mouseDownOnReserve, true)
 			mouseDownOnReserve = false
 		end},
 		OnMouseMove = {function(self, x, y, mouse)
-			if widgetHandler:InTweakMode() or not mouseDownOnReserve then 
-				return 
+			if widgetHandler:InTweakMode() or not mouseDownOnReserve then
+				return
 			end
 			SetReserveByMouse(self, x, y, mouseDownOnReserve, true)
 		end},
@@ -1360,7 +1360,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		height = imageHeight,
 		keepAspect = true,
 		file   = 'LuaUI/Images/energy.png',
-	}	
+	}
 	
 	lbl_storage_energy = Chili.Label:New{
 		parent = window_energy,
@@ -1422,7 +1422,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		max = 1,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
-		bars = { 
+		bars = {
 			{
 				color1 = col_reserve,
 				color2 = col_reserve,
@@ -1431,7 +1431,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 				s = 1, -- tex coords
 				t = 1,
 				tileSize = 16, --  if set then main axis texture coord = width / tileSize
-			}, 
+			},
 		}
 	}
 	
@@ -1448,10 +1448,10 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		fontShadow = false,
 		fontOffset = -2,
 		font   = {
-			size = 20, 
-			color = {.8,.8,.8,.95}, 
+			size = 20,
+			color = {.8,.8,.8,.95},
 			outline = true,
-			outlineWidth = 2, 
+			outlineWidth = 2,
 			outlineWeight = 2
 		},
 	}
@@ -1466,23 +1466,23 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		right = 0,
 		bottom = 0,
 		fontShadow = false,
-		OnMouseDown = {function(self, x, y, mouse) 
+		OnMouseDown = {function(self, x, y, mouse)
 			mouseDownOnReserve = mouse
-			if not widgetHandler:InTweakMode() then 
-				SetReserveByMouse(self, x, y, mouseDownOnReserve, false) 
+			if not widgetHandler:InTweakMode() then
+				SetReserveByMouse(self, x, y, mouseDownOnReserve, false)
 			end
-			return (not widgetHandler:InTweakMode()) 
+			return (not widgetHandler:InTweakMode())
 		end},	-- this is needed for OnMouseUp to work
 		OnMouseUp = {function(self, x, y, mouse)
-			if widgetHandler:InTweakMode() or not mouseDownOnReserve then 
-				return 
+			if widgetHandler:InTweakMode() or not mouseDownOnReserve then
+				return
 			end
 			SetReserveByMouse(self, x, y, mouseDownOnReserve, false)
 			mouseDownOnReserve = false
 		end},
 		OnMouseMove = {function(self, x, y, mouse)
-			if widgetHandler:InTweakMode() or not mouseDownOnReserve then 
-				return 
+			if widgetHandler:InTweakMode() or not mouseDownOnReserve then
+				return
 			end
 			SetReserveByMouse(self, x, y, mouseDownOnReserve, false)
 		end},
@@ -1515,7 +1515,7 @@ function DestroyWindow()
 		local x,y,w,h = window.x, window.y, window.width, window.height
 		window:Dispose()
 		window = nil
-		return x,y,w,h 
+		return x,y,w,h
 	end
 end
 

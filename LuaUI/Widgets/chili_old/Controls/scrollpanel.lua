@@ -201,9 +201,9 @@ function ScrollPanel:UpdateLayout()
   local oldClamp = self.clampY or 0
   self.clampY = self.contentArea[4] - self.clientArea[4]
 
-  if self.verticalSmartScroll and self.scrollPosY >= oldClamp then 
+  if self.verticalSmartScroll and self.scrollPosY >= oldClamp then
     self.scrollPosY = self.clampY
-  else 
+  else
     self.scrollPosY = clamp(0, self.clampY, self.scrollPosY)
   end
   

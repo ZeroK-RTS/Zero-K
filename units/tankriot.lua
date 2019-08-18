@@ -17,6 +17,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    cus_noflashlight = 1,
   },
 
   explodeAs           = [[BIG_UNITEX]],

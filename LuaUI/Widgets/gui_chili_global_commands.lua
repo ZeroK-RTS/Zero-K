@@ -72,7 +72,7 @@ options = {
 	clearmapmarks = {
 		type = 'button',
 		action = 'clearmapmarks',
-	},	
+	},
 	lastmsgpos = {
 		type = 'button',
 		action = 'lastmsgpos',
@@ -215,28 +215,28 @@ local function languageChanged ()
 	end
 end
 
-local commandButtonMouseDown = { 
+local commandButtonMouseDown = {
 	function(self)
 		local _,_, meta,_ = Spring.GetModKeyState()
-		if not meta then 
+		if not meta then
 			return false
 		end
 		WG.crude.OpenPath("Hotkeys/Commands")
 		WG.crude.ShowMenu() --make epic Chili menu appear.
 		return true
-	end 
+	end
 }
 
-local globalMouseDown = { 
+local globalMouseDown = {
 	function(self)
 		local _,_, meta,_ = Spring.GetModKeyState()
-		if not meta then 
+		if not meta then
 			return false
 		end
 		WG.crude.OpenPath(options_path)
 		WG.crude.ShowMenu() --make epic Chili menu appear.
 		return true
-	end 
+	end
 }
 
 local function MakeCommandButton(parent, position, file, params, vertical, onClick)
@@ -253,7 +253,7 @@ local function MakeCommandButton(parent, position, file, params, vertical, onCli
 	local btn = Chili.Button:New{
 		x = (vertical and 0) or ((position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y),
 		y = (vertical and ((position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y)) or BUTTON_Y,
-		width = BUTTON_SIZE, 
+		width = BUTTON_SIZE,
 		height = BUTTON_SIZE,
 		classname = "button_tiny",
 		caption = "",
@@ -276,7 +276,7 @@ local function MakeCommandButton(parent, position, file, params, vertical, onCli
 				if onClick then
 					onClick()
 				end
-			end 
+			end
 		},
 		children = {
 		  file and
@@ -332,7 +332,7 @@ local function MakeDropdownButtonsFromWidget(parent, position, tooltip, width, t
 				if not freeze then
 					WG.SetWidgetOption(widgetName, widgetPath, settingName, keys[index])
 				end
-			end 
+			end
 		},
 	}
 	
@@ -377,19 +377,19 @@ local function MakeDropdownButtons(parent, position, overlays)
 	local overlaySelector = Chili.Button:New{
 		x = (position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y,
 		y = BUTTON_Y,
-		width = BUTTON_SIZE, 
+		width = BUTTON_SIZE,
 		height = BUTTON_SIZE,
 		classname = "button_tiny",
 		caption = "",
 		margin = {0,0,0,0},
 		padding = {2,2,2,2},
-		tooltip = "", 
+		tooltip = "",
 		parent = parent,
 		OnMouseDown = globalMouseDown,
 		OnClick = {
 			function(self)
 				overlayPanel:SetVisibility(not overlayPanel.visible)
-			end 
+			end
 		},
 	}
 		
@@ -432,7 +432,7 @@ end
 local function InitializeControls()
 	mainWindow = Window:New{
 		name      = 'globalCommandsWindow',
-		x         = 0, 
+		x         = 0,
 		y         = 0,
 		width     = 370,
 		height    = 50,
@@ -468,7 +468,7 @@ local function InitializeControls()
 		{nil, 'viewstandard', "normal"},
 		{'LuaUI/images/map/fow.png', 'viewfow', "los"},
 		{'LuaUI/images/map/heightmap.png', 'viewheightmap', "height"},
-		{'LuaUI/images/map/blockmap.png', 'viewblockmap', "pathTraversability"}, 
+		{'LuaUI/images/map/blockmap.png', 'viewblockmap', "pathTraversability"},
 	}
 	
 	-- Overlay related buttons
@@ -480,7 +480,7 @@ local function InitializeControls()
 	
 	-- handled differently because command is registered in another widget
 	buttons.toggle_eco_display = MakeCommandButton(contentHolder, offset,
-		'LuaUI/images/map/metalmap.png', 
+		'LuaUI/images/map/metalmap.png',
 		{action = 'showeco'}
 	)
 	offset = offset + 1
@@ -489,14 +489,14 @@ local function InitializeControls()
 	offset = offset + 1
 	
 	buttons.clearmapmarks = MakeCommandButton(contentHolder, offset,
-		'LuaUI/images/drawingcursors/eraser.png', 
-		{option = 'clearmapmarks'} 
+		'LuaUI/images/drawingcursors/eraser.png',
+		{option = 'clearmapmarks'}
 	)
 	offset = offset + 1
 	
 	buttons.lastmsgpos = MakeCommandButton(contentHolder, offset,
-		'LuaUI/images/Crystal_Clear_action_flag.png', 
-		{option = 'lastmsgpos'} 
+		'LuaUI/images/Crystal_Clear_action_flag.png',
+		{option = 'lastmsgpos'}
 	)
 	offset = offset + 1
 	
@@ -510,7 +510,7 @@ local function InitializeControls()
 	offset = offset + 1
 	
 	buttons.place_ferry_route = MakeCommandButton(contentHolder, offset,
-		'LuaUI/images/commands/Bold/ferry.png', 
+		'LuaUI/images/commands/Bold/ferry.png',
 		{action = 'setferry', command = CMD_SET_FERRY}
 	)
 	offset = offset + 1

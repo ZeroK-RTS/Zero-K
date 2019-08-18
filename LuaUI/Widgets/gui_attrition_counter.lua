@@ -85,7 +85,7 @@ local h = 0.00000001
 local teams = {
 	--	[teamID] = {
 	--		lostUnits = <number>
-	--		lostMetal = <number>	
+	--		lostMetal = <number>
 	-- 		rate = (allyTeams[other].lostMetal / #allyTeams[other].teamIDs) / lostMetal : <number> -- unused
 	--		friendAllyTeamID = teamID <number>
 	--		enemyAllyTeamID = teamID <number>
@@ -104,7 +104,7 @@ local allyTeams = {
 	--		numPlayers = <number>
 	--		highestElo = teamID <number>
 	--      name = <string>
-}setmetatable(allyTeams, {__index = function (t, k) rawset(t, k, {lostUnits = 0, lostMetal = h, rate = -1, numPlayers = 0, teamIDs = {}}); return t[k] end}) -- 
+}setmetatable(allyTeams, {__index = function (t, k) rawset(t, k, {lostUnits = 0, lostMetal = h, rate = -1, numPlayers = 0, teamIDs = {}}); return t[k] end}) --
 
 local frame = 0 -- options.updateFrequency.value
 local doUpdate = false
@@ -114,7 +114,7 @@ local doUpdate = false
 --------------- local functions
 ------------------------------------------------------------------------------------------------------------------------------------
 
-local function rgbToString(c) 
+local function rgbToString(c)
 	if(c) then
 		return '\255'..string.char(floor(c[1]*255))..string.char(floor(c[2]*255))..string.char(floor(c[3]*255))
 	else
@@ -173,8 +173,8 @@ end
 local function UpdateCounters()
 
 	local rate = allyTeams[myAllyTeam].rate
-	local caption	
-	if rate < 0 then caption = 'N/A'; label_rate_player.font.color = grey	
+	local caption
+	if rate < 0 then caption = 'N/A'; label_rate_player.font.color = grey
 	elseif rate > 9.99 then caption = 'PWN!'; label_rate_player.font.color = blue
 	else
 		caption = tostring(floor(rate*100))..'%'
@@ -182,10 +182,10 @@ local function UpdateCounters()
 			cap(3-rate*2),
 			cap(2*rate-1),
 			cap((rate-2) / 2),
-			1}	
+			1}
 	end
 	
-	label_rate_player:SetCaption(caption)	
+	label_rate_player:SetCaption(caption)
 	label_rate_player.x = (window_main.width / 2) - (font:GetTextWidth(caption, 30) / 2)
 	
 	label_own_kills_units:SetCaption(allyTeams[enemyAllyTeam].lostUnits)
@@ -196,7 +196,7 @@ local function UpdateCounters()
 	
 	icon_own_skull.x = font:GetTextWidth(label_own_kills_units.caption) + label_own_kills_units.x + 1; icon_own_skull:Invalidate()
 	label_own_kills_metal.x = icon_own_skull.x + 20
-	icon_own_bars.x = font:GetTextWidth(label_own_kills_metal.caption) + 1 + label_own_kills_metal.x; icon_own_bars:Invalidate()	
+	icon_own_bars.x = font:GetTextWidth(label_own_kills_metal.caption) + 1 + label_own_kills_metal.x; icon_own_bars:Invalidate()
 	
 	label_other_kills_metal.x = icon_other_bars.x - (font:GetTextWidth(label_other_kills_metal.caption) + 1)
 	icon_other_skull.x = label_other_kills_metal.x - 17; icon_other_skull:Invalidate()
@@ -206,7 +206,7 @@ end
 
 
 local function UpdateTooltips()
-	local at = allyTeams[myAllyTeam]			
+	local at = allyTeams[myAllyTeam]
 	local ttip = rgbToString(at.color)..at.name..'\n\n'..'\008'..'Units Lost: \t\t\t'..floor(at.lostUnits)
 		..'\nMetal Lost: \t\t\t'..floor(at.lostMetal)..'\n\n\nLost Units / Metal by Player:\n\n'
 	for team, _ in pairs (at.teamIDs) do
@@ -215,7 +215,7 @@ local function UpdateTooltips()
 	end
 	label_self.tooltip = ttip
 	
-	at = allyTeams[enemyAllyTeam]			
+	at = allyTeams[enemyAllyTeam]
 	ttip = rgbToString(at.color)..at.name..'\n\n'..'\008'..'Units Lost: \t\t\t'..floor(at.lostUnits)
 		..'\nMetal Lost: \t\t\t'..floor(at.lostMetal)..'\n\n\nLost Units / Metal by Player:\n\n'
 	for team, _ in pairs (at.teamIDs) do
@@ -233,7 +233,7 @@ local function UpdateRates()
 	-- player vs enemy team average. the information is largely misleading as no connection to players' individual kills can be made
 	-- -> players with no activity at all will show good rates, more active players will show bad rates even when possibly making cost
 	--[[
-	for i, _ in pairs(teams) do	
+	for i, _ in pairs(teams) do
 		enemyTeam = allyTeams[teams[i].enemyAllyTeam]
 		teams[i].rate = enemyTeam.lostMetal / (enemyTeam.numPlayers * teams[i].lostMetal)
 		
@@ -258,15 +258,15 @@ local function languageChanged ()
 end
 
 function widget:Initialize()
-	Chili = WG.Chili; 
-	if (not Chili) then 
-		widgetHandler:RemoveWidget() 
-		return 
+	Chili = WG.Chili;
+	if (not Chili) then
+		widgetHandler:RemoveWidget()
+		return
 	end
 
 	Window = Chili.Window
-	Label = Chili.Label	
-	Image = Chili.Image	
+	Label = Chili.Label
+	Image = Chili.Image
 	
 	font = Chili.Font:New{} -- need this to call GetTextWidth without looking up an instance
 	
@@ -311,10 +311,10 @@ function widget:Initialize()
 			teams[t].elo = elo;
 			
 			if allyTeams[allyTeamID].highestElo then
-				if elo > teams[allyTeams[allyTeamID].highestElo].elo then 
-					allyTeams[allyTeamID].highestElo = teamID 
+				if elo > teams[allyTeams[allyTeamID].highestElo].elo then
+					allyTeams[allyTeamID].highestElo = teamID
 				end
-			else 
+			else
 				allyTeams[allyTeamID].highestElo = teamID
 			end
 		end
@@ -352,7 +352,7 @@ function widget:GameFrame(n)
 		UpdateCounters()
 		UpdateTooltips()
 		doUpdate = false
-	end	
+	end
 end
 
 
@@ -360,13 +360,13 @@ local deadUnits = {} -- in spec mode UnitDestroyed would sometimes be called twi
 local capturedUnits = {} -- UnitTaken doesn't seem to have the luxury of reading capture_controller when unit is returned to owner
 
 local function UnitTransfered(unitID, unitDefID, oldTeamID, newTeamID)
-	-- check if transfer is due to mind control 
+	-- check if transfer is due to mind control
 	local captureController = Spring.GetUnitRulesParam(unitID,"capture_controller");
-	if captureController == nil or captureController == -1 then 
+	if captureController == nil or captureController == -1 then
 		-- unit is not presently mind controlled
 		if capturedUnits[unitID] and capturedUnits[unitID] == unitDefID then
 			-- unit was freed crom capture - refund score
-			capturedUnits[unitID] = nil;			
+			capturedUnits[unitID] = nil;
 			local buildProgress = select(5, GetUnitHealth(unitID))
 			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
 			local team = teams[newTeamID]
@@ -375,15 +375,15 @@ local function UnitTransfered(unitID, unitDefID, oldTeamID, newTeamID)
 			
 			local allyTeam = allyTeams[team.friendlyAllyTeam]
 			allyTeam.lostUnits = allyTeam.lostUnits - 1
-			allyTeam.lostMetal = allyTeam.lostMetal - worth		
+			allyTeam.lostMetal = allyTeam.lostMetal - worth
 			
 			doUpdate = true
 		end
 	else
-		-- transfers of presently captured units are ignored; they are already dead to us 
+		-- transfers of presently captured units are ignored; they are already dead to us
 		if not (capturedUnits[unitID] and capturedUnits[unitID] == unitDefID) then
 			-- unit has now become mind-controlled for the first time; oldTeamID lost it
-			capturedUnits[unitID] = unitDefID; -- verify unitdef in case of ID recycling 
+			capturedUnits[unitID] = unitDefID; -- verify unitdef in case of ID recycling
 			local buildProgress = select(5, GetUnitHealth(unitID))
 			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
 			local team = teams[oldTeamID]
@@ -406,7 +406,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, oldTeamID) --//will be e
 	UnitTransfered(unitID, unitDefID, oldTeamID, newTeamID);
 end
 
-function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, attTeamID)	
+function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, attTeamID)
 	
 	-- if its also the same kind of unit, its safe to assume that it is the very same unit
 	-- else it is most likely not the same unit but an old table entry and a re-used unitID. we just keep the entry
@@ -427,7 +427,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	
 	if deadUnits[unitID] and deadUnits[unitID] == unitDefID then
 		deadUnits[unitID] = nil
-		return 		
+		return
 	end
 	
 	capturedUnits[unitID] = nil;
@@ -441,13 +441,13 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	local ud = UnitDefs[unitDefID]
 	if ud.customParams.dontcount or ud.customParams.is_drone then return end
 	
-	-- ignore deaths of presently mind-controlled units 
+	-- ignore deaths of presently mind-controlled units
 	local captureController = Spring.GetUnitRulesParam(unitID,"capture_controller");
 	if captureController and captureController ~= -1 then return end
 		
 	local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
 	
-	-- if teamID and unitID and unitDefID and teamID ~= gaiaTeam then 	
+	-- if teamID and unitID and unitDefID and teamID ~= gaiaTeam then
 	local team = teams[teamID]
 	team.lostUnits = team.lostUnits + 1
 	team.lostMetal = team.lostMetal + worth
@@ -458,7 +458,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 		
 	doUpdate = true
 		
-	-- else Echo("<AttritionCounter>: missing param"..(teamID or 'teamID').." - "..(unitID or 'unitID').." - "..(unitDefID or 'UnitDefID')) return end	
+	-- else Echo("<AttritionCounter>: missing param"..(teamID or 'teamID').." - "..(unitID or 'unitID').." - "..(unitDefID or 'UnitDefID')) return end
 end
 
 
@@ -466,7 +466,7 @@ end
 --------------- layout
 ------------------------------------------------------------------------------------------------------------------------------------
 
-function CreateWindow()	
+function CreateWindow()
 	-- local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local countsOffset = 43;
 	
@@ -492,16 +492,16 @@ function CreateWindow()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)		
+		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 	}
 		
-	label_rate_player = Label:New {		
+	label_rate_player = Label:New {
 		parent = window_main,
 		x = (window_main.width / 2) - (font:GetTextWidth('---', 30) / 2), -- window_main.width * 0.415,
-		y = 15,		
+		y = 15,
 		fontSize = 30,
 		textColor = grey,
-		caption = '---',			
+		caption = '---',
 	}
 	
 	-- first team labels
@@ -514,7 +514,7 @@ function CreateWindow()
 		caption = allyTeams[myAllyTeam].name,
 		textColor = allyTeams[myAllyTeam].color,
 		tooltip = '',
-		HitTest = function (self, x, y) return self end,		
+		HitTest = function (self, x, y) return self end,
 	}
 	label_own_kills_units = Label:New{
 		parent = window_main,
@@ -545,7 +545,7 @@ function CreateWindow()
 		caption = '/ 0',
 		tooltip = 'Metal Value Destroyed',
 		HitTest = function (self, x, y) return self end,
-	}	
+	}
 	icon_own_bars = Image:New{
 		parent = window_main,
 		file = ICON_METAL_FILE,
@@ -560,13 +560,13 @@ function CreateWindow()
 	-- second team labels
 	label_other = Label:New {
 		parent = window_main,
-		right = 20,		
+		right = 20,
 		y = 0,
 		fontSize = 16,
 		align = 'right',
 		caption = allyTeams[enemyAllyTeam].name,
 		textColor = allyTeams[enemyAllyTeam].color,
-		HitTest = function (self, x, y) return self end,			
+		HitTest = function (self, x, y) return self end,
 	}
 	icon_other_bars = Image:New{
 		parent = window_main,
@@ -574,23 +574,23 @@ function CreateWindow()
 		width = 16,
 		height = 16,
 		x = window_main.clientWidth - (22 + 17),
-		--right = 22,		
+		--right = 22,
 		y = countsOffset,
 		tooltip = 'Metal Value Destroyed',
 		HitTest = function (self, x, y) return self end,
-	}	
+	}
 	label_other_kills_metal = Label:New{
-		parent = window_main,		
+		parent = window_main,
 		y = countsOffset+1,
 		x = icon_other_bars.x - (font:GetTextWidth('/ 0') + 1), --window_main.clientWidth - (22 + 17 + font:GetTextWidth('/ ---')),
 		--right = 22 + 17,
 		fontSize = 12,
 		--align = 'right',
-		caption = '/ 0',		
+		caption = '/ 0',
 		--right = icon_own_skull.x + 1 + font:GetTextWidth('/ ---'),
 		tooltip = 'Metal Value Destroyed',
 		HitTest = function (self, x, y) return self end,
-	}		
+	}
 	icon_other_skull = Image:New{
 		parent = window_main,
 		file = ICON_KILLS_FILE,
@@ -616,12 +616,12 @@ function CreateWindow()
 	}
 	
 	window_main.OnResize = {
-		function(self,...)		
+		function(self,...)
 			label_rate_player.x = (self.clientWidth / 2) - (font:GetTextWidth('---', 30) / 2); label_rate_player:Invalidate()
 			
 			icon_own_skull.x = font:GetTextWidth(label_own_kills_units.caption) + label_own_kills_units.x + 1; icon_own_skull:Invalidate()
 			label_own_kills_metal.x = icon_own_skull.x + 20
-			icon_own_bars.x = font:GetTextWidth(label_own_kills_metal.caption) + 1 + label_own_kills_metal.x; icon_own_bars:Invalidate()	
+			icon_own_bars.x = font:GetTextWidth(label_own_kills_metal.caption) + 1 + label_own_kills_metal.x; icon_own_bars:Invalidate()
 			
 			icon_other_bars.x = window_main.clientWidth - (22 + 17); icon_other_bars:Invalidate()
 			label_other_kills_metal.x = icon_other_bars.x - (font:GetTextWidth(label_other_kills_metal.caption) + 1); label_other_kills_metal:Invalidate()

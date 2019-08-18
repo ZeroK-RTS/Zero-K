@@ -81,7 +81,7 @@ function widget:Update(deltaTime)
  end
 end
 
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)                          
+function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
   for uID,_ in pairs(moveUnits) do
     if (uID == unitID) then
       table.remove(moveUnits,uID)

@@ -148,7 +148,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
     return
   end
 
-  if paralyzer then 
+  if paralyzer then
     unitParalyze[unitID] = {}
     unitParalyze[unitID].damage = damage
     unitParalyze[unitID].time = (lastTime + 0.1)
@@ -213,7 +213,7 @@ local function DrawUnitFunc(yshift, xshift, damage, textSize, alpha, paralyze)
   local fontDefaultSize = fontHandler.GetFontSize()
   gl.Scale(textSize/fontDefaultSize, textSize/fontDefaultSize, textSize/fontDefaultSize)
   fontHandler.DrawCentered(tostring(damage), 0,0)
-  gl.PopMatrix()	
+  gl.PopMatrix()
   --glText(damage, 0, 0, textSize, 'cno')
   if paralyze then	-- reset
     glColor(1,1,1)
@@ -257,20 +257,20 @@ local function DrawWorldFunc()
   gl.Texture(1, LUAUI_DIRNAME .. "images/gradient_alpha_2.png")
 
   for i, damage in pairs(damageTable) do
-    if (damage.lifeSpan <= 0) or not Spring.ValidUnitID(damage.unitID) then 
+    if (damage.lifeSpan <= 0) or not Spring.ValidUnitID(damage.unitID) then
       table.remove(damageTable,i)
     else
-      -- glDrawFuncAtUnit(damage.unitID, false, DrawUnitFunc, (damage.height + damage.heightOffset), 
+      -- glDrawFuncAtUnit(damage.unitID, false, DrawUnitFunc, (damage.height + damage.heightOffset),
                        -- damage.offset, damage.damage, damage.textSize, damage.lifeSpan, damage.paralyze) --draw on unit
-	  DrawUnitFunc2(damage.unitID, (damage.height + damage.heightOffset), 
+	  DrawUnitFunc2(damage.unitID, (damage.height + damage.heightOffset),
                        damage.offset, damage.damage, damage.textSize, damage.lifeSpan, damage.paralyze) --draw on unit + on unit icon
       if not paused then
-        if damage.paralyze then 
+        if damage.paralyze then
           damage.lifeSpan = (damage.lifeSpan - 0.05)
           damage.textSize = (damage.textSize + 0.2)
         else
           damage.heightOffset = (damage.heightOffset + damage.riseTime)
-          if (damage.heightOffset > 25) then 
+          if (damage.heightOffset > 25) then
             damage.lifeSpan = (damage.lifeSpan - damage.fadeTime)
           end
         end

@@ -72,7 +72,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if gunshipDef[unitDefID] then
 		local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
-		gunships.Add(unitID, 
+		gunships.Add(unitID,
 			{
 				unitDefID = unitDefID,
 				def = gunshipDef[unitDefID],

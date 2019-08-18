@@ -30,14 +30,14 @@ end
 
 function MergeTable(table1,table2)
 	local result = {}
-	for i,v in pairs(table2) do 
+	for i,v in pairs(table2) do
 		if (type(v)=='table') then
 			result[i] = MergeTable(v,{})
 		else
 			result[i] = v
 		end
 	end
-	for i,v in pairs(table1) do 
+	for i,v in pairs(table1) do
 		if (result[i]==nil) then
 			if (type(v)=='table') then
 				if (type(result[i])~='table') then result[i] = {} end
@@ -96,7 +96,7 @@ local staticmexes = {}
 local staticmexFX = staticmexGlow
 
 if (UnitDefNames["staticmex"]) then
-	staticmexDefID = UnitDefNames["staticmex"].id  
+	staticmexDefID = UnitDefNames["staticmex"].id
 end
 
 --------------------------------------------------------------------------------
@@ -137,16 +137,16 @@ local function ClearFx(unitID, fxIDtoDel)
 	local newTable = {}
 		for i = 1, #particleIDs[unitID] do
 			local fxID = particleIDs[unitID][i]
-			if fxID == fxIDtoDel then 
+			if fxID == fxIDtoDel then
 				Lups.RemoveParticles(fxID)
-			else 
+			else
 				newTable[#newTable+1] = fxID
 			end
 		end
 
-		if #newTable == 0 then 
+		if #newTable == 0 then
 			particleIDs[unitID] = nil
-		else 
+		else
 			particleIDs[unitID] = newTable
 		end
 	end
@@ -217,8 +217,8 @@ end
 
 local function UnitEnteredLos(_,unitID)
 	local spec, fullSpec = spGetSpectatingState()
-	if (spec and fullSpec) then 
-		return 
+	if (spec and fullSpec) then
+		return
 	end
 	
 	--[[
@@ -311,7 +311,10 @@ local function CheckForExistingUnits()
 	for i=1,#allUnits do
 		local unitID    = allUnits[i]
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		UnitFinished(nil,unitID,unitDefID)
+		local _,_,inBuild = Spring.GetUnitIsStunned(unitID)
+		if not inBuild then
+			UnitFinished(nil,unitID,unitDefID)
+		end
 	end
 
 	widgetHandler:RemoveWidgetCallIn("Update",widget)

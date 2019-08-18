@@ -14,7 +14,7 @@ unitDef = {
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 0 -5]],
   collisionVolumeScales  = [[40 40 40]],
-  collisionVolumeType    = [[ellipsoid]], 
+  collisionVolumeType    = [[ellipsoid]],
   selectionVolumeOffsets = [[0 0 0]],
   selectionVolumeScales  = [[45 45 45]],
   selectionVolumeType    = [[ellipsoid]],
@@ -53,7 +53,7 @@ unitDef = {
   },
 
   sightDistance       = 660,
-  sonarDistance       = 660,  
+  sonarDistance       = 660,
   turninplace         = 0,
   turnRate            = 616,
   workerTime          = 0,

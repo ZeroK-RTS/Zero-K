@@ -1,5 +1,5 @@
 
---// ============================================================================= 
+--// =============================================================================
 
 function widget:GetInfo()
 	return {
@@ -13,7 +13,7 @@ function widget:GetInfo()
 	}
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 local windows = {}
 
@@ -29,7 +29,7 @@ function widget:Initialize()
 	Spring.SetConfigInt('BumpWaterUseUniforms', 1)
 	Spring.SendCommands('water 4')
 
---// ============================================================================= 
+--// =============================================================================
 --// Helpers
 
 	local function GetGameConst(name)
@@ -57,7 +57,7 @@ function widget:Initialize()
 		Spring.SendCommands('water ' .. Spring.GetWaterMode())
 	end
 
---// ============================================================================= 
+--// =============================================================================
 --// Available Water Options
 
 	local options = {
@@ -107,7 +107,7 @@ function widget:Initialize()
 		end
 	end
 
---// ============================================================================= 
+--// =============================================================================
 --// Chili GUI creation
 
 	local Chili = WG.Chili
@@ -124,7 +124,7 @@ function widget:Initialize()
 	}
 	windows[#windows + 1] = window0
 
---// ============================================================================= 
+--// =============================================================================
 --// Determine first column width
 	
 	local testLabel = Chili.Label:New{}
@@ -135,12 +135,12 @@ function widget:Initialize()
 	end
 	testLabel:Dispose()
 
---// ============================================================================= 
+--// =============================================================================
 --// GUI Helpers
 
 	local function OnChange(self, value)
 		Spring.SetWaterParams({[self.name] = value})
-		self.custom.options.value = value 
+		self.custom.options.value = value
 
 		if (self.custom) and (self.custom.needReload) then
 			ReloadWater()
@@ -352,7 +352,7 @@ function widget:Initialize()
 	end
 
 
---// ============================================================================= 
+--// =============================================================================
 --// Create GUI Header controls
 
 	Chili.Button:New{
@@ -368,7 +368,7 @@ function widget:Initialize()
 		OnClick = {function() Spring.SendCommands('luaui disablewidget ' .. widget:GetInfo().name) end},
 	}
 
---// ============================================================================= 
+--// =============================================================================
 --// Create water config controls
 
 	for i = 1, #options do
@@ -412,7 +412,7 @@ function widget:Initialize()
 
 --]]
 
---// ============================================================================= 
+--// =============================================================================
 --// Footer
 
 	local function CamelCase(str)

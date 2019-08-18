@@ -1,4 +1,4 @@
-local base = piece 'base' 
+local base = piece 'base'
 local Left_Back_Leg = piece 'left_back_leg'
 local Left_Back_Foot = piece 'left_back_foot'
 local Right_Back_Leg = piece 'right_back_leg'

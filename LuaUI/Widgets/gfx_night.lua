@@ -108,29 +108,29 @@ options = {
 	time = {
 		name = "Time of day",
 		type = 'number',
-		min = 0, 
-		max = 0.5, 
+		min = 0,
+		max = 0.5,
 		step = 0.05,
 		value = 0.4,
 		desc = 'Starting Time of day.\n <--Midnight, Noon-->',
 		OnChange = function(self)
 			currDayTime = self.value
 			UpdateColors()
-		end, 
+		end,
 	},
 	secperday = {
 		name = "Game Minute Per Day",
 		type = 'number',
-		min = 1, 
-		max = 20, 
-		step = 1,		
+		min = 1,
+		max = 20,
+		step = 1,
 		value = 2,
 		OnChange = function(self)
 			secondsPerDay = self.value*60
 			UpdateDayPeriod()
-			Spring.Echo(self.value .. " Minute") 
+			Spring.Echo(self.value .. " Minute")
 		end,
-	},	
+	},
 	beam = {
 		name = "Searchlight Beams",
 		type = 'bool',
@@ -207,9 +207,9 @@ UpdateColors = function()
   local currHourPart = currDayTime * hoursPerDay - currHour + 1 -- (realnumber(0..1) * 14) - integer[1..14] + 1 = realnumber(0..1)
   local startColor = nightColorMap[currHour]
   local endColor
-  if (currHour == hoursPerDay) then 
-    endColor = nightColorMap[1] 
-  else 
+  if (currHour == hoursPerDay) then
+    endColor = nightColorMap[1]
+  else
     endColor = nightColorMap[currHour+1]
   end
   
@@ -217,9 +217,9 @@ UpdateColors = function()
                (1 - currHourPart) * startColor[2] + currHourPart * endColor[2],
                (1 - currHourPart) * startColor[3] + currHourPart * endColor[3],
                1}
-  currColorInverse = {(1 / currColor[1] - 1) * searchlightStrength, 
-                      (1 / currColor[2] - 1) * searchlightStrength, 
-                      (1 / currColor[3] - 1) * searchlightStrength, 
+  currColorInverse = {(1 / currColor[1] - 1) * searchlightStrength,
+                      (1 / currColor[2] - 1) * searchlightStrength,
+                      (1 / currColor[3] - 1) * searchlightStrength,
                        1}
 end
 
@@ -234,7 +234,7 @@ local function BaseVertices(baseX, baseZ, radius, ecc, heading,yOffset)
     local vz = baseZ + radius * math.sin(theta) / denom
     local vy = yOffset or math.max(GetGroundHeight(vx, vz), 0) --follow ground contour
     glVertex(vx, vy, vz)
-    theta = theta + searchlightVertexIncrement * denom 
+    theta = theta + searchlightVertexIncrement * denom
   end
   local denom = 1 - ecc
   local vx = baseX + radius * math.cos(heading) / denom
@@ -285,7 +285,7 @@ end
 
 local function DrawSearchlights()
   if (searchlightVertexCount < 2) then return end
-  if (options.bases.value == "none") and (options.beam.value == false) then return end 
+  if (options.bases.value == "none") and (options.beam.value == false) then return end
   
   local visibleUnits = GetVisibleUnits(-1, 30, false)
   local cx, cy, cz = GetCameraPosition()
@@ -360,7 +360,7 @@ local function DrawSearchlights()
 			end
 		    heading = -1*(GetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE + math.pi / 2
 			leadDistance = cache[defID].leadDist
-			relativeHeight = cache[defID].relativeY 
+			relativeHeight = cache[defID].relativeY
 			leadDist_to_height_ratio = cache[defID].lhRatio
 			radius = unitRadius * 2
 		  else
@@ -484,8 +484,8 @@ function widget:Initialize()
   vsx, vsy = widgetHandler:GetViewSizes()
   
   for unitDefID, unitDef in pairs(UnitDefs) do
-    if (   string.find(unitDef.name, "chicken") 
-        or string.find(unitDef.name, "roost") 
+    if (   string.find(unitDef.name, "chicken")
+        or string.find(unitDef.name, "roost")
         or string.find(unitDef.humanName, "Chicken")
         or string.find(unitDef.humanName, "Montro")
         or (unitDef.isImmobile and not
@@ -495,7 +495,7 @@ function widget:Initialize()
     end
   end
 
-  --[[  
+  --[[
   widgetHandler:AddAction("night_preunit", TogglePreUnit, nil, "t")
   widgetHandler:AddAction("night_basetype", SetBaseType, nil, "t")
   widgetHandler:AddAction("night_beam", ToggleBeam, nil, "t")

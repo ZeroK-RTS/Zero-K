@@ -18,6 +18,7 @@ unitDef = {
 
   customParams           = {
     modelradius    = [[17]],
+    cus_noflashlight = 1,
   },
 
   explodeAs              = [[BIG_UNIT]],

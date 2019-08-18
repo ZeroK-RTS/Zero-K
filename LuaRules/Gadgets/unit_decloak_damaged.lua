@@ -128,7 +128,7 @@ end
 
 GG.PokeDecloakUnit = PokeDecloakUnit
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                             weaponID, attackerID, attackerDefID, attackerTeam)
 	if damage > 0 and
 		not (attackerTeam and
@@ -248,7 +248,7 @@ end
 
 local function SetWantedCloaked(unitID, state)
 	if (not unitID) or spGetUnitIsDead(unitID) then
-		return 
+		return
 	end
 	
 	local wantCloakState = spGetUnitRulesParam(unitID, "wantcloak")
@@ -275,11 +275,11 @@ end
 
 GG.SetWantedCloaked = SetWantedCloaked
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_CLOAK] = true, [CMD_WANT_CLOAK] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 

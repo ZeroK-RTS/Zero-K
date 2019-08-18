@@ -80,7 +80,7 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 		if attritionWeaponDefs[wdid] then
 			wantedWeaponList[#wantedWeaponList + 1] = wdid
 		end
-	end 
+	end
 	return wantedWeaponList
 end
 

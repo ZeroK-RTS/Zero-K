@@ -6,7 +6,7 @@
 -- sphereToHit = (integer) intersect a custom sphere. Note: it override result from planeToHit and is CPU cheaper than planeToHit.
 -- returnRayDistance = (boolean) calculate ray-distance.
 -- smoothMeshTarget = (boolean) true if caller is using Spring.GetSmoothMeshHeight to find ground heights
-TraceCursorToGround = function (viewSizeX,viewSizeY,mousePos ,cs_fov, camPos, camRot,planeToHit,sphereToHit,returnRayDistance,smoothMeshTarget) 
+TraceCursorToGround = function (viewSizeX,viewSizeY,mousePos ,cs_fov, camPos, camRot,planeToHit,sphereToHit,returnRayDistance,smoothMeshTarget)
 	--return gx,gy,gz,rx,ry,rz,rayDist,cancelCache
 end
 ----------------------------------------------------------------------------
@@ -30,8 +30,8 @@ local function _ExtendedGetGroundHeight(x,z,smoothMeshTarget)
 	--out of map. Bound coordinate to within map
 	if x < 0 then x = 0; end
 	if x > Game.mapSizeX then x=Game.mapSizeX; end
-	if z < 0 then z = 0; end 
-	if z >  Game.mapSizeZ then z =  Game.mapSizeZ; end 
+	if z < 0 then z = 0; end
+	if z >  Game.mapSizeZ then z =  Game.mapSizeZ; end
 	if smoothMeshTarget then
 		return spGetSmoothMeshHeight(x,z)
 	else
@@ -67,7 +67,7 @@ local function _FindGroundWithHitScan(outResult,effectiveHeading,camPos,xz_GrndD
 	local currentGrndH, vertGroundDist = 0,-camPos.py
 	if abs(xz_GrndDistRatio) == 0 then --is looking directly downward. Easy case, no need to find Ray intersecting with ground
 		currentGrndH = _ExtendedGetGroundHeight(camPos.px,camPos.pz,smoothMeshTarget)
-		vertGroundDist =  (currentGrndH - camPos.py) 
+		vertGroundDist =  (currentGrndH - camPos.py)
 		outResult.px,outResult.py,outResult.pz,outResult.cursorxzDist = camPos.px,currentGrndH,camPos.pz,0
 		outResult.rx,outResult.ry,outResult.rz = 0,vertGroundDist,0
 		return
@@ -121,18 +121,18 @@ TraceCursorToGround = function(viewSizeX,viewSizeY,mousePos ,cs_fov, camPos, cam
 	local currentFov = cs_fov/2 --in Spring: 0 degree is directly ahead and +FOV/2 degree to the left and -FOV/2 degree to the right
 	--[[
 	--Opengl screen FOV scaling logic:
-	                                  >     
-	                              >    | 
-	                          >        |  
-	                      >            | 
+	                                  >
+	                              >    |
+	                          >        |
+	                      >            |
 	                  >  |             |  Notice! : 90 FOV screen size == 2 times 45 FOV screen size
 	              >      | <-45 FOV    |
-	          >          |   reference | 
-	      >              |   screen    | 
-	      > --- FOV=45   |             | 
+	          >          |   reference |
+	      >              |   screen    |
+	      > --- FOV=45   |             |
 	          >          |             |  <-- 90 FOV
 	              >      |             |      new screen size
-	                  >  |             |      
+	                  >  |             |
 	                      >            |
 	                          >        |
 	                              >    |
@@ -164,7 +164,7 @@ TraceCursorToGround = function(viewSizeX,viewSizeY,mousePos ,cs_fov, camPos, cam
 	local inclination = atan(distanceFromCenter/perspectivePlaneDistance) --translate distance in 2d plane to angle projected from the Sphere
 	inclination = inclination -PI/2 --offset 90 degree because we want to place the south hemisphere (bottom) of the dome on the screen
 	local azimuth = atan2(-mousePos.x,mousePos.y) --convert x,y to angle, so that left is +degree and right is -degree. Note: negative x flip left-right or right-left (flip the direction of angle)
-	--//Sphere-to-coordinate conversion//-- 
+	--//Sphere-to-coordinate conversion//--
 	--(x,y,z floating in space)
 	local virtualSphere = sphereToHit or 2000
 	local sphere_x = virtualSphere* sin(azimuth)* cos(inclination) --convert Sphere coordinate back to Cartesian coordinate to prepare for rotation procedure
@@ -174,7 +174,7 @@ TraceCursorToGround = function(viewSizeX,viewSizeY,mousePos ,cs_fov, camPos, cam
 	--(x,y,z rotated in space)
 	local rotateToInclination = PI/2+camRot.rx --rotate to +90 degree facing the horizon then rotate to camera's current facing.
 	local new_x = sphere_x --rotation on x-axis
-	local new_y = sphere_y* cos (rotateToInclination) + sphere_z* sin (rotateToInclination) --move points of Sphere to new location 
+	local new_y = sphere_y* cos (rotateToInclination) + sphere_z* sin (rotateToInclination) --move points of Sphere to new location
 	local new_z = sphere_z* cos (rotateToInclination) - sphere_y* sin (rotateToInclination)
 	--//coordinate-to-Sphere conversion//--
 	--(Inclination and Azimuth for x,y,z)
@@ -190,7 +190,7 @@ TraceCursorToGround = function(viewSizeX,viewSizeY,mousePos ,cs_fov, camPos, cam
 	local effectiveHeading = camRot.ry+cursorHeading
 	local tiltSign = abs(cursorTilt)/cursorTilt --Sphere's inclination direction (positive upward or negative downward)
 	local cursorTiltComplement = (PI/2-abs(cursorTilt))*tiltSign --return complement angle for cursorTilt. Note: we use 0 degree when look down, and 90 degree when facing the horizon. This simplify the problem conceptually. (actual case is 0 degree horizon and +-90 degree up/down)
-	cursorTiltComplement = min(HALFPI,abs(cursorTiltComplement))*tiltSign --limit to 89 degree to avoid infinity in math.tan() 
+	cursorTiltComplement = min(HALFPI,abs(cursorTiltComplement))*tiltSign --limit to 89 degree to avoid infinity in math.tan()
 	local xz_GrndDistRatio = tan(cursorTiltComplement)
 	
 	if not sphereToHit then

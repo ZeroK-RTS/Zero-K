@@ -32,7 +32,7 @@ local glUnitPieceMultMatrix = gl.UnitPieceMultMatrix
 local glScale          = gl.Scale
 
 local commtypeTable = include("Configs/decoration_handler_defs.lua")
-local textures = {} 
+local textures = {}
 local unitAlreadyAdded = {}
 
 local imagePaths = {	-- tested in order
@@ -67,7 +67,7 @@ local function AddUnitTexture(unitID, attributes, tex)
 	if not textures[tex].units[unitID] then
 		textures[tex].count = textures[tex].count + 1
 		textures[tex].units[unitID] = {data = {}, count = 0}
-	end	
+	end
 		
 	for i = 1,#attributes do
 		textures[tex].units[unitID].count = textures[tex].units[unitID].count + 1
@@ -166,8 +166,8 @@ function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 end
 
 function widget:UnitDestroyed( unitID,  unitDefID,  unitTeam)
-	if not Spring.IsUnitAllied(unitID) then 
-		return 
+	if not Spring.IsUnitAllied(unitID) then
+		return
 	end
 	RemovePossibleCommander(unitID,  unitDefID)
 end

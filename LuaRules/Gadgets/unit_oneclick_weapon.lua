@@ -58,7 +58,7 @@ function gadget:Initialize()
 		local ud = spGetUnitDefID(unitList[i])
 		local team = spGetUnitTeam(unitList[i])
 		gadget:UnitCreated(unitList[i], ud, team)
-	end	
+	end
 end
 
 function gadget:UnitCreated(unitID, unitDefID, team)
@@ -74,7 +74,7 @@ function gadget:UnitCreated(unitID, unitDefID, team)
 			
 			Spring.InsertUnitCmdDesc(unitID, INITIAL_CMD_DESC_ID + (i-1), desc)
 			--reloadFrame[unitID][i] = -1000
-		end		
+		end
 	end
 end
 
@@ -95,7 +95,7 @@ function gadget:GameFrame(n)
 			end
 		end
 		scheduledReload[n] = nil
-	end	
+	end
 end
 ]]--
 

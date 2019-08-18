@@ -35,7 +35,7 @@ PushZ(heading)
 {
 	signal SIG_PUSH_Z;
 	set-signal-mask SIG_PUSH_Z;
-	call-script ProjZPW(PUSH_Z_DIST, heading);	
+	call-script ProjZPW(PUSH_Z_DIST, heading);
 	move PUSH_PIECE to z-axis CALC_H_RESULT speed PUSH_Z_SPEED;
 	wait-for-move PUSH_PIECE along z-axis;
 	move PUSH_PIECE to z-axis 0 speed PUSH_Z_RESTORE;

@@ -41,7 +41,7 @@ local groupBeacon={} --beacon list in its group
 local groupBeaconOfficial={} --most recent update to beacon list
 local transportChargetime = {} --store dynamic (changing) charge time for transport
 --Spread job stuff: (spread looping across 1 second)
-local groupSpreadJobs={} 
+local groupSpreadJobs={}
 local groupEffectedUnit={}
 local groupLoopedUnit={}
 local groupBeaconQueue={}
@@ -74,7 +74,7 @@ function widget:Initialize()
 			end
 		end
 	end
-	local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, detectionRange,1, myTeamID,detectionRange) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other 
+	local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, detectionRange,1, myTeamID,detectionRange) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other
 	groupBeaconOfficial = cluster
 	for i=1, #nonClustered do
 		groupBeaconOfficial[#groupBeaconOfficial+1] = {nonClustered[i]}
@@ -97,16 +97,16 @@ function widget:UnitDestroyed(unitID, unitDefID)
 	listOfBeacon[unitID] = nil
 	IgnoreUnit[unitID] = nil
 	teleportedUnit[unitID] = nil
-	if issuedOrderTo[unitID] then 
+	if issuedOrderTo[unitID] then
 		local group = issuedOrderTo[unitID]
-		issuedOrderTo[unitID] = nil 
+		issuedOrderTo[unitID] = nil
 		if waitForNetworkDelay[group] then
-			waitForNetworkDelay[group][2] = waitForNetworkDelay[group][2] - 1 
-			if waitForNetworkDelay[group][2]==0 then 
-				waitForNetworkDelay[group] = nil 
+			waitForNetworkDelay[group][2] = waitForNetworkDelay[group][2] - 1
+			if waitForNetworkDelay[group][2]==0 then
+				waitForNetworkDelay[group] = nil
 			end
 		end
-	end 
+	end
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
@@ -133,7 +133,7 @@ local function GetNearbyBeacon(ex,ez,beaconData)
 end
 
 --SOME NOTE:
---"DiggDeeper()" use a straightforward recursive horizontal/sideway-search. 
+--"DiggDeeper()" use a straightforward recursive horizontal/sideway-search.
 function DiggDeeper(beaconIDList, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime_CNSTNT, lowestTime_VAR, previousOverheadTime, level, history_VAR, djinExitPos_CNSTNT)
 	level = level + 1
 	if level > 5 then
@@ -226,7 +226,7 @@ function widget:GameFrame(n)
 		end
 		IgnoreUnit = {} --recheck ignored unit in case "CmdDone()" do not work as expected
 	end
-	if n%30==14 then --every 30 frame period (1 second) at the 14th frame: 
+	if n%30==14 then --every 30 frame period (1 second) at the 14th frame:
 		--update deploy state
 		for beaconID,beaconData in pairs(listOfBeacon) do
 			local djinnID = beaconData["djinID"]
@@ -473,7 +473,7 @@ function widget:GameFrame(n)
 				end
 				for j=1, #groupBeacon[i],1 do --update beacon congestion status
 					local beaconID = groupBeacon[i][j]
-					if listOfBeacon[beaconID] then 
+					if listOfBeacon[beaconID] then
 						listOfBeacon[beaconID]["becnQeuu"]= beaconCurrentQueue[beaconID]
 					end
 				end
@@ -510,12 +510,12 @@ function GetUnitFastestWeaponRange(unitDef)
 end
 
 function ConvertCMDToMOVE(command)
-	if (command == nil) then 
+	if (command == nil) then
 		return nil
 	end
 
-	if command.id == CMD_RAW_MOVE 
-	or command.id == CMD.PATROL 
+	if command.id == CMD_RAW_MOVE
+	or command.id == CMD.PATROL
 	or command.id == CMD.FIGHT
 	or command.id == CMD.JUMP
 	or command.id == CMD.ATTACK then
@@ -578,11 +578,11 @@ end
 
 function GetWaypointDistance(unitID,moveID,queue,px,py,pz,isAttackCmd,weaponRange) --Note: source is from unit_transport_ai.lua (by Licho)
 	local d = 0
-	if (queue == nil) then 
+	if (queue == nil) then
 		return 99999
 	end
 	local v = queue
-	if (v.id == CMD_RAW_MOVE) then 
+	if (v.id == CMD_RAW_MOVE) then
 		local reachable = true --always assume target reachable
 		local waypoints
 		if moveID then --unit has compatible moveID?
@@ -612,7 +612,7 @@ function GetWaypointDistance(unitID,moveID,queue,px,py,pz,isAttackCmd,weaponRang
 	return d
 end
 
-function Dist(x,y,z, x2, y2, z2) 
+function Dist(x,y,z, x2, y2, z2)
 	local xd = x2-x
 	local yd = y2-y
 	local zd = z2-z
@@ -631,23 +631,23 @@ end
 ------------------------------------------------------------
 ------------------------------------------------------------
 
-function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID) 
+function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 	IgnoreUnit[unitID]=nil
 end
 
-function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag) 
+function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 	IgnoreUnit[unitID]=nil
 end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	IgnoreUnit[unitID]=nil
-	if issuedOrderTo[unitID] and (CMD.INSERT == cmdID and cmdParams[2] == CMD_WAIT_AT_BEACON) then 
+	if issuedOrderTo[unitID] and (CMD.INSERT == cmdID and cmdParams[2] == CMD_WAIT_AT_BEACON) then
 		local group = issuedOrderTo[unitID]
-		issuedOrderTo[unitID] = nil 
+		issuedOrderTo[unitID] = nil
 		if waitForNetworkDelay[group] then
-			waitForNetworkDelay[group][2] = waitForNetworkDelay[group][2] - 1 
-			if waitForNetworkDelay[group][2]==0 then 
-				waitForNetworkDelay[group] = nil 
+			waitForNetworkDelay[group][2] = waitForNetworkDelay[group][2] - 1
+			if waitForNetworkDelay[group][2]==0 then
+				waitForNetworkDelay[group] = nil
 			end
 		end
 	end

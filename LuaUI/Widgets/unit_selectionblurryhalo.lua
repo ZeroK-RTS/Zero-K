@@ -191,7 +191,7 @@ local function DrawSelected(visibleAllySelUnits, visibleSelected, visibleBoxed)
 
 	local mx, my = spGetMouseState()
 	local pointedType, data = spTraceScreenRay(mx, my, false, true)
-	if pointedType == 'unit' then 
+	if pointedType == 'unit' then
 		data = GetUnitUnderCursor(false) --Does minimap check and handles selection box as well
 	end
 

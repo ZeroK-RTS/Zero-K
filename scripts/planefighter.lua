@@ -1,7 +1,7 @@
 include "constants.lua"
 
 --pieces
-local base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing, rjet, ljet, body 
+local base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing, rjet, ljet, body
 	= piece("base", "flare1", "flare2", "nozzle1", "nozzle2", "missile", "rgun", "lgun", "rwing", "lwing", "rjet", "ljet", "body")
 
 local smokePiece = {base, rwing, lwing}
@@ -97,7 +97,7 @@ function script.StopMoving()
 	deactivate()
 end
 
-function script.QueryWeapon(num) 
+function script.QueryWeapon(num)
 	if num == 1 then
 		return flare[shotCycle]
 	elseif num == 2 then
@@ -105,12 +105,12 @@ function script.QueryWeapon(num)
 	end
 end
 
-function script.AimFromWeapon(num) 
+function script.AimFromWeapon(num)
 	return base
 end
 
 function script.AimWeapon(num, heading, pitch)
-	return not (GetUnitValue(COB.CRASHING) == 1) 
+	return not (GetUnitValue(COB.CRASHING) == 1)
 end
 
 function script.FireWeapon(num)

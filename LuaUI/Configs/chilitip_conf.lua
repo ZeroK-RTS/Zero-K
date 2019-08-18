@@ -7,7 +7,7 @@ local ignoreweapon =
 	
 	shieldriot = {1,3},
 	coraak = {1},
-	coramph = {2},	
+	coramph = {2},
 }
 local iconFormat = '.dds'
 

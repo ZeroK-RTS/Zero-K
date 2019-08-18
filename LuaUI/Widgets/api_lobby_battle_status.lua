@@ -146,7 +146,7 @@ function widget:Update(dt)
 	widgetHandler:RemoveCallIn("Update")
 end
 
-function widget:Initialize() 
+function widget:Initialize()
 	if not (Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()) then
 		widgetHandler:RemoveWidget()
 	end

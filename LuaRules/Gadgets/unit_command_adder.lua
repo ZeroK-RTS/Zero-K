@@ -73,7 +73,7 @@ function gadget:Initialize()
 	end
 end
 
-function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
+function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if addUnitDefs[unitDefID] then
 		if addUnitDefs[unitDefID].addFight then
 			spInsertUnitCmdDesc(unitID, fightCmdDesc)
@@ -85,6 +85,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 end
 
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam) 
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	addedUnits[unitID] = nil
 end

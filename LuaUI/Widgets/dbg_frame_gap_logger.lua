@@ -16,7 +16,7 @@ local updateLogging = false
 local lastTime = false
 local gaps = {}
 
-function widget:TextCommand(command) 
+function widget:TextCommand(command)
 	if command == "startlog" then
 		updateLogging = true
 	elseif command == "endlog" then

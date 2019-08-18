@@ -33,8 +33,8 @@ local SIG_AIM = 2
 
 local function RestoreAfterDelay()
 	Sleep(5000)
-	Turn(housing, x_axis, 0, math.rad(10)) 
-	Turn(basetop, y_axis, 0, math.rad(10)) 
+	Turn(housing, x_axis, 0, math.rad(10))
+	Turn(basetop, y_axis, 0, math.rad(10))
 end
 
 ----------------------------------------------------------------------------------------------

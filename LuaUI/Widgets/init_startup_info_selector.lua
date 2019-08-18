@@ -67,7 +67,7 @@ local WINDOW_HEIGHT = 480
 local BUTTON_WIDTH = 128
 local BUTTON_HEIGHT = 128
 
-if (vsx < 1024 or vsy < 768) then 
+if (vsx < 1024 or vsy < 768) then
 	--shrinker
 	WINDOW_WIDTH = vsx*(WINDOW_WIDTH/1024)
 	WINDOW_HEIGHT = vsy*(WINDOW_HEIGHT/768)
@@ -482,7 +482,7 @@ function widget:Initialize()
 			y=0;
 			file = "LuaUI/Images/startup_info_selector/selecticon.png",
 			keepAspect = false,
-		}	
+		}
 		CreateWindow()
 	end
 end

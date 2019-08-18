@@ -22,8 +22,8 @@ local movedefMap = {
 	["akbot4"] = "amph",
 	["akbot6"] = "amph",
 	["tkbot1"] = "spider",
-	["tkbot3"] = "spider", 
-	["tkbot4"] = "spider", 
+	["tkbot3"] = "spider",
+	["tkbot4"] = "spider",
 	["atkbot3"] = "air",
 	["tank2"] = "veh",
 	["tank3"] = "veh",
@@ -50,6 +50,6 @@ for i = 1, #UnitDefs do
 			end
 		end
 	end
-end	
+end
 
 return staticUnits, movetypeDefID, movetypes

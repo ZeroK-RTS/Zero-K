@@ -123,7 +123,7 @@ function widget:DrawScreen()
   local mouseIcon = MouseOverIcon(x, y)
 
   -- draw the buildpics
-  unitCounts.n = nil  
+  unitCounts.n = nil
   local icon = 0
   for udid,count in pairs(unitCounts) do
     DrawUnitDefIcon(udid, icon, count)
@@ -155,7 +155,7 @@ end
 
 
 function CenterUnitDef(unitDefID)
-  local ud = UnitDefs[unitDefID] 
+  local ud = UnitDefs[unitDefID]
   if (not ud) then
     return
   end
@@ -197,7 +197,7 @@ end
 
 
 local function SetupModelDrawing()
-  gl.DepthTest(true) 
+  gl.DepthTest(true)
   gl.DepthMask(true)
   --gl.Culling(GL.FRONT)
   gl.Lighting(true)
@@ -245,7 +245,7 @@ function DrawUnitDefIcon(unitDefID, iconPos, count)
   local xmid = (xmin + xmax) * 0.5
   local ymid = (ymin + ymax) * 0.5
 
-  local ud = UnitDefs[unitDefID] 
+  local ud = UnitDefs[unitDefID]
 
   -- draw background quad
 --  gl.Color(0.3, 0.3, 0.3, 1.0)

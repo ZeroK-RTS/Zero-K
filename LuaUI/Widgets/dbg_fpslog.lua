@@ -6,7 +6,7 @@ function widget:GetInfo()
     date      = "2011",
     license   = "dfgh",
     layer     = 0,
-    enabled   = false  --  loaded by default	
+    enabled   = false  --  loaded by default
   }
 end
 
@@ -34,7 +34,7 @@ function widget:Update(dt)
 		loggedi = loggedi + 1
 		screenFrame = 0
 		timeInterval = 0
-	end	
+	end
 end
 
 function widget:GameStart()

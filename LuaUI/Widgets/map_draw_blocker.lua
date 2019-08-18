@@ -404,7 +404,7 @@ line x y z x y z
 erase: x y z r
 ]]
 function widget:MapDrawCmd(playerID, cmdType, a, b, c, d, e, f)
-  if drawCmds[playerID] and validTypes[cmdType] then    
+  if drawCmds[playerID] and validTypes[cmdType] then
     local val = drawCmds[playerID].counters[cmdType][currentCounter]
     val = val + 1
     drawCmds[playerID].counters[cmdType][currentCounter] = val

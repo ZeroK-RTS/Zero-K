@@ -66,7 +66,7 @@ options = {
 		OnChange = function(self)
 			forRadarIcons = self.value
 		end
-	},		
+	},
 }
 options.iconsize.OnChange(options.iconsize)
 

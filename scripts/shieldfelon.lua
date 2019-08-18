@@ -164,23 +164,23 @@ local function RestoreAfterDelay()
 	bAiming = false
 end
 
-function script.QueryWeapon(num) 
-	if num == 1 then 
-		return shotPieces[num][gun_1 + 1] 
+function script.QueryWeapon(num)
+	if num == 1 then
+		return shotPieces[num][gun_1 + 1]
 	end
-	return shotPieces[num] 
+	return shotPieces[num]
 end
 
-function script.AimFromWeapon(num) 
+function script.AimFromWeapon(num)
 	--if num == 1 then
-	--	return shotPieces[num][gun_1 + 1] 
+	--	return shotPieces[num][gun_1 + 1]
 	--end
 	return shot1
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num == 2 then 
-		return false 
+	if num == 2 then
+		return false
 	end
 	
 	Signal(SIG_AIM)
@@ -240,7 +240,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(pelvis, SFX.SMOKE + SFX.FIRE)
 		Explode(torso, SFX.SHATTER)
 		Explode(lbarrel, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
-		Explode(rbarrel, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)		
+		Explode(rbarrel, SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2 -- corpsetype
 	end
 end

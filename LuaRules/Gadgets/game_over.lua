@@ -12,7 +12,7 @@ function gadget:GetInfo()
 		author    = "SirMaverick, Google Frog, KDR_11k, CarRepairer (unified by KingRaptor)",
 		date      = "2009",
 		license   = "GPL",
-		layer     = 1, 
+		layer     = 1,
 		enabled   = true  --  loaded by default?
 	}
 end
@@ -90,7 +90,7 @@ local alwaysHiddenDefs = {
 	[GetUnitDefIdByName("terraunit")] = true,
 }
 
-local doesNotCountList 
+local doesNotCountList
 if campaignBattleID then
 	doesNotCountList = {
 		[GetUnitDefIdByName("terraunit")] = true,
@@ -286,7 +286,7 @@ local function RevealAllianceUnits(allianceID)
 	local teamList = spGetTeamList(allianceID)
 	for i=1,#teamList do
 		local t = teamList[i]
-		local teamUnits = spGetTeamUnits(t) 
+		local teamUnits = spGetTeamUnits(t)
 		for j=1,#teamUnits do
 			local unitID = teamUnits[j]
 			local unitDefID = Spring.GetUnitDefID(unitID)
@@ -315,7 +315,7 @@ local function DestroyAlliance(allianceID, delayLossToNextGameFrame)
 	if not destroyedAlliances[allianceID] then
 		destroyedAlliances[allianceID] = true
 		local teamList = spGetTeamList(allianceID)
-		if teamList == nil or (#teamList == 0) then 
+		if teamList == nil or (#teamList == 0) then
 			return -- empty allyteam, don't bother
 		end
 		
@@ -361,7 +361,7 @@ local function DestroyAlliance(allianceID, delayLossToNextGameFrame)
 				local t = teamList[i]
 				
 				if explodeUnits then
-					local teamUnits = spGetTeamUnits(t) 
+					local teamUnits = spGetTeamUnits(t)
 					for j = 1, #teamUnits do
 						local unitID = teamUnits[j]
 						local pwUnits = (GG.PlanetWars or {}).unitsByID
@@ -561,7 +561,7 @@ local function ProcessLastAlly()
 			-- except chicken, who are alive even without units
 			local numAlive = aliveCount[t]
 			if #(Spring.GetTeamUnits(t)) == 0 then numAlive = 0 end
-			if (numAlive > 0) or (GG.waitingForComm or {})[t] or (GetTeamIsChicken(t)) then	
+			if (numAlive > 0) or (GG.waitingForComm or {})[t] or (GetTeamIsChicken(t)) then
 				-- count AI teams as active
 				local _,_,_,isAiTeam = spGetTeamInfo(t, false)
 				if isAiTeam then
@@ -643,7 +643,7 @@ local function CheckInactivityWin(cmd, line, words, player)
 		Spring.Echo("ProcessLastAlly", cmd, line, words, player)
 	end
 	if inactiveWinAllyTeam and not gameIsOver then
-		if player then 
+		if player then
 			local name,_,spec,_,allyTeamID = Spring.GetPlayerInfo(player, false)
 			if allyTeamID == inactiveWinAllyTeam and not spec then
 				Spring.Echo((name or "") .. " has forced a win due to dropped opposition.")

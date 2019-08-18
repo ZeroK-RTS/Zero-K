@@ -106,7 +106,7 @@ local function GetCommandPos(command) -- get the command position
 			else
 				return -10,-10,-10
 			end
-		end	
+		end
 	end
 	return -10,-10,-10
 end
@@ -210,7 +210,7 @@ local function ProcessCommand(id, params, options, sequence_order)
 						insert_pos = j - 1
 					end
 					px, py, pz = px2, py2, pz2
-				end	 
+				end
 			end
 			-- check for insert at end of queue if its shortest walk.
 			local dlen = math.sqrt(((px-cx)^2) + ((py-cy)^2) + ((pz-cz)^2))

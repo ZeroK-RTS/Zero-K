@@ -31,7 +31,7 @@ function drawPatches()
 		mexRotation[i] = mexRotation[i] or math.random(0, 360)
 		gl.PushMatrix()
 		gl.Translate(0.5, 0.5, 0)
-		gl.Rotate(mexRotation[i], 0, 0, 1)   
+		gl.Rotate(mexRotation[i], 0, 0, 1)
 		gl.DrawGroundQuad(mSpots[i].x - MEX_WIDTH/2, mSpots[i].z - MEX_HEIGHT/2, mSpots[i].x + MEX_WIDTH/2, mSpots[i].z + MEX_HEIGHT/2, false, -0.5, -0.5, 0.5, 0.5)
 		gl.PopMatrix()
 	end

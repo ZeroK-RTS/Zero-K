@@ -37,7 +37,7 @@ local function WeaponUpdate()
 		if height <= uwheight then
 			underwater = true
 			Spring.SetUnitCloak(unitID, 0)
-		elseif height > uwheight and underwater then 
+		elseif height > uwheight and underwater then
 			underwater = false
 			Spring.SetUnitCloak(unitID, 2) -- free cloak restored.
 		end
@@ -79,7 +79,7 @@ local function Dig()
 			WaitForTurn(mbody, y_axis)
 		else return end
 		Sleep(33)
-		if (isMoving) then	
+		if (isMoving) then
 			Turn(head, y_axis, 0, digSpeed/2)
 			Turn(fbody, y_axis, digRotate, digSpeed)
 			Turn(mbody, y_axis, -digRotate, digSpeed)

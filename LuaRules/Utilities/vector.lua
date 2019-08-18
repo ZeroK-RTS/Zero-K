@@ -83,7 +83,8 @@ end
 
 -- Projection of v1 onto v2
 local function Project(v1, v2)
-	return Mult(Dot(v1, v2), Unit(v2))
+	local uV2 = Unit(v2)
+	return Mult(Dot(v1, uV2), uV2)
 end
 
 -- The normal of v1 onto v2. Returns such that v1 = normal + projection

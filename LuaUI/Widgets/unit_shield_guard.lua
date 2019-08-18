@@ -39,7 +39,7 @@ local areaShieldCount = 0
 local shieldSpeed=0
 ----------------------------
 --  CONFIG
-local shieldUnitName = { 
+local shieldUnitName = {
   "shieldshield",
   "shieldassault",
 }
@@ -111,8 +111,8 @@ function widget:CommandNotify(id, params, options)
 				for i=1, #selectedUnits, 1 do
 					local notAreaShield = true
 					for areaShieldID, _ in pairs(areaShieldUnit) do --//exclude any Area Shield unit from the "guardedBy" list. This prevent bug and also gave nice feature
-						local unitID = selectedUnits[i] 
-						if areaShieldID == unitID then 
+						local unitID = selectedUnits[i]
+						if areaShieldID == unitID then
 							notAreaShield = false
 						end
 					end
@@ -122,7 +122,7 @@ function widget:CommandNotify(id, params, options)
 						--if enableEcho then Spring.Echo(targetID .. " targetID") end
 						follower_to_areaShieldUnit_meta[selectedUnits[i] ]= {areaShieldUnitID = targetID,positionInTable = placeToPut,}
 					end
-				end			
+				end
 			end
 		end
 	end
@@ -151,7 +151,7 @@ end
 
 
 
-function widget:UnitCreated(unitID, unitDefID, unitTeam) --//record all Area Shield unit into "areaShieldUnit". 
+function widget:UnitCreated(unitID, unitDefID, unitTeam) --//record all Area Shield unit into "areaShieldUnit".
 	if unitTeam ~= team then
 		return
 	end
@@ -226,10 +226,10 @@ end
 -----------------------
 --Add shield names to array
 
-function widget:Initialize() 
+function widget:Initialize()
   
   local units = spGetTeamUnits(team)
-  for i, id in ipairs(units) do 
+  for i, id in ipairs(units) do
 	widget:UnitCreated(id, spGetUnitDefID(id),team)
   end
 	
@@ -294,7 +294,7 @@ local shieldieeStopDis = 120 -- how far from the shield the shieldiees should st
 local shieldRadius = {shieldshield = 300, shieldassault = 80, shieldcon = 80}
 local shieldWait = {shieldshield = true, shieldassault = false, shieldcon = false}
 
-local shieldArray = { 
+local shieldArray = {
 	"shieldassault",
 	"shieldcon",
 }
@@ -377,11 +377,11 @@ end
 -- update following and shield
 
 function widget:GameFrame(n)
-	if (n%15<1) then 
+	if (n%15<1) then
 		updateShields()
 		updateFollowers()
 	end
-end 
+end
 
 
 ----------------------------
@@ -435,14 +435,14 @@ function widget:CommandNotify(id, params, options)
 							v.maxVelID = sid
 						end
 						follower[sid] = {
-							fol = cid, 
+							fol = cid,
 							vel = speed,
 							range = v.range
 						}
 						v.shieldiees[sid] = follower[sid]
 						v.folCount = v.folCount+1
 					else
-						spGiveOrderToUnit(sid, id, params, options)	
+						spGiveOrderToUnit(sid, id, params, options)
 					end
 				end
 				return true
@@ -469,13 +469,13 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 				local shieldRange = shieldRadius[ud.name]
 				local waits = shieldWait[ud.name]
 				shields[unitID] = {
-					id = unitID, ux = ux, uy = uy, uz = uz, 
-					range = shieldRange-shieldRangeSafety, 
-					reactiveRange = shieldRange-shieldReactivateRange, 
+					id = unitID, ux = ux, uy = uy, uz = uz,
+					range = shieldRange-shieldRangeSafety,
+					reactiveRange = shieldRange-shieldReactivateRange,
 					shieldiees = {},
 					folCount = 0,
 					waits = waits,
-					selfVel = speed, 
+					selfVel = speed,
 					maxVel = speed,
 					maxVelID = -1
 				}
@@ -536,9 +536,9 @@ end
 -----------------------
 --Add shield names to array
 
-function widget:Initialize() 
+function widget:Initialize()
 	local units = spGetTeamUnits(team)
-	for i, id in ipairs(units) do 
+	for i, id in ipairs(units) do
 		widget:UnitCreated(id, spGetUnitDefID(id),team)
 	end
 end

@@ -2,7 +2,7 @@
 -- by Chris Mackey
 include "constants.lua"
 
---pieces 
+--pieces
 local base = piece "base"
 local missile = piece "missile"
 local l_wing = piece "l_wing"

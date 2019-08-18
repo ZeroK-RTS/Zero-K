@@ -44,7 +44,7 @@ local function StartTurn(unitID, unitDefID, tx, tz, forceTurnRate)
 	local ux, _, uz = GetUnitPosition(unitID)
 	local dx, dz = tx - ux, tz - uz
 
-	local newHeading = math.deg(math.atan2(dx, dz)) * COB_ANGULAR	
+	local newHeading = math.deg(math.atan2(dx, dz)) * COB_ANGULAR
 	local currHeading = GetUnitCOBValue(unitID, COB.HEADING)
 	local deltaHeading = newHeading - currHeading;
 	--  find the direction for shortest turn
@@ -83,7 +83,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return true
 end
 

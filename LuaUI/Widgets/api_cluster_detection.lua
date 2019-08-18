@@ -30,7 +30,7 @@ local function BinarySearchNaturalOrder(position, orderedList)
 	local midPos = math.modf((span/2) + startPos + 0.5) --round to nearest integer
 	local found = false
 	while (span > 1) do
-		local difference = position - orderedList[midPos][2] 
+		local difference = position - orderedList[midPos][2]
  
 		if difference < 0 then
 			endPos = midPos
@@ -192,7 +192,7 @@ local function merge(left, right, CompareFunction)
 		local leftNotFinish = leftProgress <= #left
 		local rightNotFinish = rightProgress <= #right
         if leftNotFinish and rightNotFinish then --if length(left) > 0 and length(right) > 0
-            if CompareFunction(left[leftProgress],right[rightProgress]) then --if first(left) < first(right), sort ascending. if first(left) > first(right), sort descending. 
+            if CompareFunction(left[leftProgress],right[rightProgress]) then --if first(left) < first(right), sort ascending. if first(left) > first(right), sort descending.
                 result[#result+1] =left[leftProgress]--append first(left) to result
 				leftProgress = leftProgress + 1 --left = rest(left)
             else
@@ -250,7 +250,7 @@ local function OrderSeedsUpdate(neighborsID, currentUnitID,objects, orderSeed,un
 				if useMergeSorter_gbl then
 					orderSeed[#orderSeed+1] = {unitID = neighborUnitID, content = objects[neighborUnitID]}
 					unitID_to_orderSeedMeta[neighborUnitID] = #orderSeed
-				else				
+				else
 					orderSeed, unitID_to_orderSeedMeta = InsertOrderSeed (orderSeed, unitID_to_orderSeedMeta, neighborUnitID,objects)
 				end
 			else --// object already in OrderSeeds
@@ -326,10 +326,10 @@ local function ExpandClusterOrder(orderedObjects,receivedUnitList, unitID, neigh
 	objects[unitID].core_distance = SetCoreDistance(neighborsID, minimumNeighbor, unitID,receivedUnitList)
 	orderedObjects[#orderedObjects+1]=objects[unitID]
 	if objects[unitID].core_distance ~= nil then --//it have neighbor
-		local orderSeed ={} 
+		local orderSeed ={}
 		local unitID_to_orderSeedMeta = {}
 		orderSeed, objects, unitID_to_orderSeedMeta = OrderSeedsUpdate(neighborsID, unitID, objects, orderSeed,unitID_to_orderSeedMeta,receivedUnitList)
-		while #orderSeed > 0 do 
+		while #orderSeed > 0 do
 			local currentUnitID = orderSeed[#orderSeed].unitID
 			objects[currentUnitID] = orderSeed[#orderSeed].content
 			orderSeed[#orderSeed]=nil
@@ -387,18 +387,18 @@ function WG.OPTICS_cluster (receivedUnitList, neighborhoodRadius, minimumNeighbo
 		Spring.Echo("    Intersection: " .. intersectionCount)
 		osClock1 = os.clock()
 	end
-	--//CREATE cluster based on desired density (density == neighborhoodRadius_alt). 
+	--//CREATE cluster based on desired density (density == neighborhoodRadius_alt).
 	--//Note: changing cluster view to different density is really cheap when using this function as long as the initial neighborhoodRadius is greater than the new density.
 	--//if new density (neighborhoodRadius_alt) is greater than initial neighborhoodRadius, then you must recalculate the connections using bigger neighborhoodRadius which incur greater cost.
 	for i=1, #orderedObjects do
 		local unitID = orderedObjects[i].unitID
 		cluster, noiseIDList, currentClusterID = ExtractDBSCAN_Clustering (unitID, currentClusterID, cluster, noiseIDList, orderedObjects[i], neighborhoodRadius_alt)
 	end
-	if echoOutCalculationTime then	
+	if echoOutCalculationTime then
 		Spring.Echo("Extract Cluster: ".. os.clock() - osClock1)
 	end
 	return cluster, noiseIDList
-end	
+end
 
 function WG.Run_OPTIC(receivedUnitList, neighborhoodRadius, minimumNeighbor) --//OPTIC_cluster function are accessible globally
 	local objects={}
@@ -424,7 +424,7 @@ function WG.Extract_Cluster (orderedObjects,neighborhoodRadius_alt )
 	local cluster = {}
 	local noiseIDList = {}
 	local currentClusterID = 0
-	--//CREATE cluster based on desired density (density == neighborhoodRadius_alt). 
+	--//CREATE cluster based on desired density (density == neighborhoodRadius_alt).
 	--//Note: changing cluster view to different density is really cheap when using this function as long as the initial neighborhoodRadius is greater than the new density.
 	--//if new density (neighborhoodRadius_alt) is greater than initial neighborhoodRadius, then you must recalculate the connections using bigger neighborhoodRadius which incur greater cost.
 	for i=1, #orderedObjects do
@@ -507,11 +507,11 @@ function WG.DBSCAN_cluster(receivedUnitList,neighborhoodRadius,minimumNeighbor)
 				if #neighborUnits <= minimumNeighbor then --//if surrounding units is less-or-just-equal to minimum neighbor then mark current unit as noise or 'outliers'
 					local noiseIDLenght = #unitIDNoise or 0 --// if table is empty then make sure return table-lenght as 0 (zero) instead of 'nil'
 					unitIDNoise[noiseIDLenght +1] = unitID
-				else 
+				else
 					--local clusterIndex = #cluster+1 --//lenght of previous cluster table plus 1 new cluster
 					cluster[currentCluster_global]={} --//initialize new cluster with an empty table for unitID
 					local unitClusterLenght = #cluster[currentCluster_global] or 0 --// if table is empty then make sure return table-lenght as 0 (zero) instead of 'nil'
-					cluster[currentCluster_global][unitClusterLenght +1] = unitID --//lenght of the table-in-table containing unit list plus 1 new unit 
+					cluster[currentCluster_global][unitClusterLenght +1] = unitID --//lenght of the table-in-table containing unit list plus 1 new unit
 					unitID_to_clusterMeta[unitID] = currentCluster_global
 					
 					for l=1, #neighborUnits do
@@ -539,7 +539,7 @@ function WG.DBSCAN_cluster(receivedUnitList,neighborhoodRadius,minimumNeighbor)
 							end --//if #neighborUnits_ne ~= nil
 							
 							if unitID_to_clusterMeta[unitID_ne] ~= currentCluster_global then
-								local unitIndex_ne = #cluster[currentCluster_global] +1 --//lenght of the table-in-table containing unit list plus 1 new unit 
+								local unitIndex_ne = #cluster[currentCluster_global] +1 --//lenght of the table-in-table containing unit list plus 1 new unit
 								cluster[currentCluster_global][unitIndex_ne] = unitID_ne
 								
 								unitID_to_clusterMeta[unitID_ne] = currentCluster_global
@@ -555,8 +555,8 @@ function WG.DBSCAN_cluster(receivedUnitList,neighborhoodRadius,minimumNeighbor)
 	return cluster, unitIDNoise
 end
 --brief:   a clustering algorithm
---algorithm source: Ordering Points To Identify the Clustering Structure (OPTICS) by Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel and Jörg Sander
---algorithm source: density-based spatial clustering of applications with noise (DBSCAN) by Martin Ester, Hans-Peter Kriegel, Jörg Sander and Xiaowei Xu
+--algorithm source: Ordering Points To Identify the Clustering Structure (OPTICS) by Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel and JÃ¶rg Sander
+--algorithm source: density-based spatial clustering of applications with noise (DBSCAN) by Martin Ester, Hans-Peter Kriegel, JÃ¶rg Sander and Xiaowei Xu
 --Reference:
 --http://en.wikipedia.org/wiki/OPTICS_algorithm ;pseudocode
 --http://en.wikipedia.org/wiki/DBSCAN ;pseudocode

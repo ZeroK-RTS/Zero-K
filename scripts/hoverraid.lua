@@ -59,7 +59,7 @@ local function RestoreAfterDelay()
 	Turn(gun, x_axis, 0, math.rad(20))
 end
 
-function script.AimFromWeapon() 
+function script.AimFromWeapon()
 	return turret
 end
 

@@ -73,7 +73,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
-	  useAirLos			 = false,	  
+	  useAirLos			 = false,
       underwater         = 0,
       water              = false,
       properties = {

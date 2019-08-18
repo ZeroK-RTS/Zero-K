@@ -9,7 +9,7 @@ local lthigh, lcalf, lfoot = piece('lthigh', 'lcalf', 'lfoot')
 local rthigh, rcalf, rfoot = piece('rthigh', 'rcalf', 'rfoot')
 local leftLeg = { thigh = piece'lthigh', calf = piece'lcalf', foot = piece'lfoot'}
 local rightLeg = { thigh = piece'rthigh', calf = piece'rcalf', foot = piece'rfoot'}
-local base = piece 'base' 
+local base = piece 'base'
 local box = piece 'box'
 
 local smokePiece = { box }

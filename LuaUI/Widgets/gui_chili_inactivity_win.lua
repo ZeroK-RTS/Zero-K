@@ -8,7 +8,7 @@ function widget:GetInfo()
     author    = "GoogleFrog",
     date      = "1 August 2015",
     license   = "GNU GPL, v2 or later",
-    layer     = 0, 
+    layer     = 0,
     enabled   = true  --  loaded by default?
   }
 end
@@ -96,7 +96,7 @@ local function SetupWindow()
 		font   = {size = 20, color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, outlineWidth = 3},
 		tooltip = "Stop waiting for dropped players and declare yourself the winner.";
 		OnClick = {
-			function() 
+			function()
 				Spring.SendCommands("luarules inactivitywin")
 			end
 		}

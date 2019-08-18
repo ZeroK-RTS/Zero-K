@@ -48,7 +48,7 @@ unitDef = {
     explosiongenerators = {
       [[custom:flashmuzzle1]],
     },
-  }, 
+  },
 
   sightDistance                 = 660,
   useBuildingGroundDecal        = true,

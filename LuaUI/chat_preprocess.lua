@@ -115,7 +115,7 @@ local function SetupPlayers()
 				--Note2: <botname> only use name and not shortname. For comparison, crude playerlist botname is: '<'.. name ..'> '.. shortName
 				players[name] = { id = skirmishAIID, allyTeamId = allyTeamId, isAI = true}
 			end
-		end --if teamID ~= Spring.GetGaiaTeamID() 
+		end --if teamID ~= Spring.GetGaiaTeamID()
 	end --for each team
 end
 

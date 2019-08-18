@@ -57,7 +57,7 @@ unitDef = {
     {
       def                = [[LASER]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 160,
+      maxAngleDif        = 180,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
@@ -88,8 +88,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 7.5,
-        subs    = 0.5,
+        default = 7.8,
+        subs    = 0.39,
       },
 
       explosionGenerator      = [[custom:flash1red]],

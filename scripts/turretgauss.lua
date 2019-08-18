@@ -73,7 +73,7 @@ local function Open()
 end
 
 local function AimBlink()
-	while true do 
+	while true do
 		EmitSfx(aimProxy, 1024)
 		Sleep(200)
 	end
@@ -89,7 +89,7 @@ local function Close()
 	
 	Move(barrel1,y_axis,1,2);
 	Move(barrel2,y_axis,1,2);
-	Move(barrel3,y_axis,1,2); 
+	Move(barrel3,y_axis,1,2);
 	
 	Turn(wheel, x_axis, math.rad(-15),math.rad(90));
 	Turn(cannon, x_axis, math.rad(65),math.rad(90));
@@ -189,8 +189,8 @@ function script.QueryWeapon(n)
 	return muzzleProxy
 end
 
-function script.AimFromWeapon(n) 
-	return aimProxy 
+function script.AimFromWeapon(n)
+	return aimProxy
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -219,7 +219,7 @@ function script.AimWeapon(num, heading, pitch)
 	
 	StartThread(RestoreAfterDelay);
 
-	return is_open;	
+	return is_open;
 end
 
 function script.FireWeapon(n)
@@ -253,7 +253,7 @@ function script.Killed(recentDamage, maxHealth)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
 		return 1 -- corpsetype
-	else		
+	else
 		return 2 -- corpsetype
 	end
 end

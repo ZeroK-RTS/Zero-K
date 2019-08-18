@@ -27,16 +27,16 @@ local function MaybeAddFile(fileName)
 	end
 end
 
-local function AddDir(path) 
+local function AddDir(path)
 	for _, f in ipairs(VFS.DirList(path)) do
 		MaybeAddFile(f)
 	end
-	--[[for _, f in ipairs(VFS.SubDirs(path)) do 
-		if (f ~= "." and f ~=".." and f~=".svn") then 
+	--[[for _, f in ipairs(VFS.SubDirs(path)) do
+		if (f ~= "." and f ~=".." and f~=".svn") then
 			AddDir(f)
-		end 
+		end
 	end]]--
-end 
+end
 
 function widget:Initialize()
 	if Spring.GetGameFrame() > 0 then
@@ -46,13 +46,13 @@ function widget:Initialize()
 end
 
 function widget:DrawGenesis()
-	if files == nil then 
+	if files == nil then
 		files = {}
 		AddDir("LuaUI/Images/commands/Bold")
 		AddDir("LuaUI/Images/commands/states")
 		AddDir("LuaUI/Widgets/chili/Skins/Evolved")
 		AddDir("icons")
-	else 
+	else
 		if (UnitDefs[i]) then
 			gl.Texture(7,'#'..i)
 			gl.Texture(7,false)
@@ -63,10 +63,10 @@ function widget:DrawGenesis()
 				gl.Texture(7, file)
 				gl.Texture(7, false)
 				v = v + 1
-			else 
+			else
 				widgetHandler:RemoveWidget()
-			end 
-		end 
+			end
+		end
 	end
 end
 

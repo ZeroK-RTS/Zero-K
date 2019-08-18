@@ -62,7 +62,7 @@ function widget:Initialize()
 end
 
 function widget:GameFrame(n)
-	if n%30==14 then --every 30 frame period (1 second) at the 14th frame: 
+	if n%30==14 then --every 30 frame period (1 second) at the 14th frame:
 		--check if we were waiting for lag for too long
 		local currentSecond = spGetGameSeconds()
 		if waitForNetworkDelay then
@@ -71,7 +71,7 @@ function widget:GameFrame(n)
 			end
 		end
 	end
-	if ( n%15==0 and not waitForNetworkDelay) or spreadJobs then 
+	if ( n%15==0 and not waitForNetworkDelay) or spreadJobs then
 		local numberOfUnitToProcess = 29 --NUMBER OF UNIT PER SECOND. minimum: 29 unit per second
 		local numberOfUnitToProcessPerFrame = math.ceil(numberOfUnitToProcess/29) --spread looping to entire 1 second
 		spreadJobs = false
@@ -126,7 +126,7 @@ function widget:GameFrame(n)
 					--IS UNIT CHARGING JUMP? skip--
 					local jumpReload = spGetUnitRulesParam(unitID,"jumpReload")
 					if jumpReload then
-						if jumpReload < 0.95 then						
+						if jumpReload < 0.95 then
 							break; --a.k.a: Continue
 						end
 					end
@@ -200,7 +200,7 @@ function widget:GameFrame(n)
 
 						--NOTE: time to destination is in second.
 						local normalPathTime = normalTimeToDest - 2 --add 2 second benefit to regular walking (make walking more attractive choice unless jump can save more than 1 second travel time)
-						if totalTimeWithJump < normalPathTime then	
+						if totalTimeWithJump < normalPathTime then
 							local commandArray = {[1]=nil,[2]=nil,[3]=nil,[4]=nil}
 							if (math.abs(enterPoint_X-px)>50 or math.abs(enterPoint_Z-pz)>50) then
 								commandArray[1]= {CMD.INSERT, {0, CMD_RAW_MOVE, CMD.OPT_INTERNAL, enterPoint_X,enterPoint_Y,enterPoint_Z}, CMD.OPT_ALT}
@@ -338,7 +338,7 @@ function GetNearestObstacleEnterAndExitPoint(currPosX,currPosY, currPosZ, target
 		unitBoxDist = math.sqrt(unitBoxSize*unitBoxSize + unitBoxSize*gradient*unitBoxSize*gradient)
 		local xadd = unitBoxSize*xSgn
 		addingFunction = function(x,z,addValue,gradient)
-			return x+addValue, z+addValue*gradient 
+			return x+addValue, z+addValue*gradient
 		end
 		for i=1, 9999 do
 			x,z,finish = check_n_SavePosition(x,z,gradient,xadd)
@@ -351,8 +351,8 @@ function GetNearestObstacleEnterAndExitPoint(currPosX,currPosY, currPosZ, target
 		local gradient = xDiff/zDiff
 		unitBoxDist = math.sqrt(unitBoxSize*unitBoxSize + unitBoxSize*gradient*unitBoxSize*gradient)
 		local zadd = unitBoxSize*zSgn
-		addingFunction = function(x,z,addValue,gradient) 
-			return x+addValue*gradient, z + addValue 
+		addingFunction = function(x,z,addValue,gradient)
+			return x+addValue*gradient, z + addValue
 		end
 		for i=1, 9999 do
 			x,z,finish = check_n_SavePosition(x,z,gradient,zadd)
@@ -383,16 +383,16 @@ function GetUnitFastestWeaponRange(unitDef)
 end
 
 function ConvertCMDToMOVE(command)
-	if (command == nil) then 
+	if (command == nil) then
 		return nil
 	end
 	command = command[1]
-	if (command == nil) then 
+	if (command == nil) then
 		return nil
 	end
 
-	if command.id == CMD_RAW_MOVE 
-	or command.id == CMD.PATROL 
+	if command.id == CMD_RAW_MOVE
+	or command.id == CMD.PATROL
 	or command.id == CMD.FIGHT
 	or command.id == CMD.JUMP
 	or command.id == CMD.ATTACK then
@@ -455,11 +455,11 @@ end
 
 function GetWaypointDistance(unitID,moveID,queue,px,py,pz,isAttackCmd,weaponRange) --Note: source is from unit_transport_ai.lua (by Licho)
 	local d = 0
-	if (queue == nil) then 
+	if (queue == nil) then
 		return 99999
 	end
 	local v = queue
-	if (v.id == CMD.MOVE or v.id == CMD_RAW_MOVE) then 
+	if (v.id == CMD.MOVE or v.id == CMD_RAW_MOVE) then
 		local reachable = true --always assume target reachable
 		local waypoints
 		if moveID then --unit has compatible moveID?
@@ -489,7 +489,7 @@ function GetWaypointDistance(unitID,moveID,queue,px,py,pz,isAttackCmd,weaponRang
 	return d
 end
 
-function Dist(x,y,z, x2, y2, z2) 
+function Dist(x,y,z, x2, y2, z2)
 	local xd = x2-x
 	local yd = y2-y
 	local zd = z2-z
@@ -526,15 +526,15 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 		end
 		if (cmdID == CMD.INSERT) then --detected our own command (indicate network delay have passed)
 			local issuedOrderContent = issuedOrderTo[unitID]
-			if issuedOrderContent and 
+			if issuedOrderContent and
 			(cmdParams[4] == issuedOrderContent[2] and
 			cmdParams[5] == issuedOrderContent[3] and
 			cmdParams[6] == issuedOrderContent[4]) then
-				issuedOrderTo[unitID] = nil 
+				issuedOrderTo[unitID] = nil
 				if waitForNetworkDelay then
-					waitForNetworkDelay[2] = waitForNetworkDelay[2] - 1 
-					if waitForNetworkDelay[2]==0 then 
-						waitForNetworkDelay = nil 
+					waitForNetworkDelay[2] = waitForNetworkDelay[2] - 1
+					if waitForNetworkDelay[2]==0 then
+						waitForNetworkDelay = nil
 					end
 				end
 			end

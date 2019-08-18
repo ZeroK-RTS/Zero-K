@@ -94,7 +94,7 @@ function widget:Initialize()
 		y = vsy - 480,
 		width  = 210,
 		classname = "main_window_small_tall",
-		textColor = {1,1,1,0.55}, 
+		textColor = {1,1,1,0.55},
 		height = math.min(112,vsy/2),
 		parent = Chili.Screen0,
 		dockable  = true,
@@ -107,7 +107,7 @@ function widget:Initialize()
 				height = 7,
 				y = 4,
 				right = 4,
-				textColor = {1,1,1,0.55}, 
+				textColor = {1,1,1,0.55},
 				caption="x";
 				tooltip = "Close window";
 				OnClick = {function()

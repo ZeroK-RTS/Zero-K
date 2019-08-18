@@ -35,22 +35,22 @@ local function FixRanges(colors)
 			colors.gaiaColor[1] <= 1 and colors.gaiaColor[2] <= 1 and colors.gaiaColor[3] < 1 then
 		return colors
 	end
-	colors.gaiaColor[1] = colors.gaiaColor[1]/255 
+	colors.gaiaColor[1] = colors.gaiaColor[1]/255
 	colors.gaiaColor[2] = colors.gaiaColor[2]/255
 	colors.gaiaColor[3] = colors.gaiaColor[3]/255
 
-	colors.myColor[1] = colors.myColor[1]/255 
+	colors.myColor[1] = colors.myColor[1]/255
 	colors.myColor[2] = colors.myColor[2]/255
 	colors.myColor[3] = colors.myColor[3]/255
 
 	for set, contents in pairs(colors.allyColors) do
-		colors.allyColors[set][1] = colors.allyColors[set][1]/255 
+		colors.allyColors[set][1] = colors.allyColors[set][1]/255
 		colors.allyColors[set][2] = colors.allyColors[set][2]/255
 		colors.allyColors[set][3] = colors.allyColors[set][3]/255
 	end
 
 	for set, contents in pairs(colors.enemyColors) do
-		colors.enemyColors[set][1] = colors.enemyColors[set][1]/255 
+		colors.enemyColors[set][1] = colors.enemyColors[set][1]/255
 		colors.enemyColors[set][2] = colors.enemyColors[set][2]/255
 		colors.enemyColors[set][3] = colors.enemyColors[set][3]/255
 	end
@@ -169,7 +169,7 @@ WG.LocalColor.listeners = WG.LocalColor.listeners or {}
 
 local is_speccing
 
-local function SetNewTeamColors() 
+local function SetNewTeamColors()
 	local gaia = Spring.GetGaiaTeamID()
 	Spring.SetTeamColor(gaia, unpack(gaiaColor))
 	
@@ -255,7 +255,7 @@ function widget:Initialize()
 end
 
 local oldTeamID = Spring.GetMyTeamID()
--- This function is alright but other, poorly written widgets cause a massive spike when team colours change. 
+-- This function is alright but other, poorly written widgets cause a massive spike when team colours change.
 function widget:PlayerChanged()
 	if Spring.GetSpectatingState() then
 		return
@@ -306,7 +306,7 @@ function widget:DrawScreen()
 	
 	local vsx, vsy = Spring.GetViewGeometry()
 	local x = vsx/2 - width
-	local y = vsy - 160	
+	local y = vsy - 160
 	
 	for i = 1, #friendlyColors do
 		gl.Color(friendlyColors[i])

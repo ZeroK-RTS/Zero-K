@@ -1,12 +1,12 @@
-local ground = piece 'ground' 
-local base = piece 'base' 
-local flare = piece 'flare' 
-local muzzle = piece 'muzzle' 
-local turret = piece 'turret' 
-local barrel = piece 'barrel' 
-local barrel_back = piece 'barrel_back' 
-local sleeve = piece 'sleeve' 
-local query = piece 'query' 
+local ground = piece 'ground'
+local base = piece 'base'
+local flare = piece 'flare'
+local muzzle = piece 'muzzle'
+local turret = piece 'turret'
+local barrel = piece 'barrel'
+local barrel_back = piece 'barrel_back'
+local sleeve = piece 'sleeve'
+local query = piece 'query'
 
 include "constants.lua"
 include "pieceControl.lua"

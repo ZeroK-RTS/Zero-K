@@ -86,10 +86,10 @@ local modrules  = {
 
   flankingBonus = {
     -- defaults to 1
-    -- 0: no flanking bonus  
-    -- 1: global coords, mobile  
-    -- 2: unit coords, mobile  
-    -- 3: unit coords, locked 
+    -- 0: no flanking bonus
+    -- 1: global coords, mobile
+    -- 2: unit coords, mobile
+    -- 3: unit coords, locked
     defaultMode=0;
   },
 

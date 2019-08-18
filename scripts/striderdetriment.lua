@@ -87,8 +87,8 @@ local reloadTimeShort = wd and WeaponDefs[wd].reload*30 or 30
 --------------------------------------------------------------------------------
 function script.Create()
 	Turn(larm, z_axis, -0.1)
-	Turn(rarm, z_axis, 0.1)	
-	Turn(shoulderflare, x_axis, math.rad(-90))	
+	Turn(rarm, z_axis, 0.1)
+	Turn(shoulderflare, x_axis, math.rad(-90))
 	StartThread(GG.Script.SmokeUnit, smokePiece)
 end
 
@@ -239,7 +239,7 @@ local function BumpGunNum(num, doSleep)
 		Sleep(33)
 	end
 	gunIndex[num] = gunIndex[num] + 1
-	if gunIndex[num] > gunFlareCount[num] then 
+	if gunIndex[num] > gunFlareCount[num] then
 		gunIndex[num] = 1
 	end
 end

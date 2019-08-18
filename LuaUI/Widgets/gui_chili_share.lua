@@ -57,7 +57,7 @@ local defaultamount = 100
 local UpdateListFunction
 local wantRebuild = false
 
-options_path = 'Settings/HUD Panels/Player List' 
+options_path = 'Settings/HUD Panels/Player List'
 --[[ Change path if necessary. I just dumped it here because it made sense.
 Note: remerge is used in case of bugs! Feel free to remove it in a few stables.]]
 options = {
@@ -76,8 +76,8 @@ options = {
 	},
 	fixHotkeys = {
 		name  = "Fix hotkeys on start",
-		type  = "bool", 
-		value = true, 
+		type  = "bool",
+		value = true,
 		desc = "Fixes old hotkey issues once and then disables.",
 		advanced = true,
 		noHotkey = true,
@@ -221,10 +221,10 @@ local function getEcoInfo(teamID)
 	eStor = math.max(eStor - HIDDEN_STORAGE, MIN_STORAGE)
 
 	-- cap by storage
-	if eCurr > eStor then 
+	if eCurr > eStor then
 		eCurr = eStor
 	end
-	if mCurr > mStor then 
+	if mCurr > mStor then
 		mCurr = mStor
 	end
 
@@ -234,7 +234,7 @@ local function getEcoInfo(teamID)
 	local netMetal = mInco - mPull + mReci
 	local netEnergy = eInco - realEnergyPull
 	
-	local mPercent, ePercent 
+	local mPercent, ePercent
 	if mStor <= 1 then
 		mCurr = 0
 	end
@@ -258,7 +258,7 @@ local function RenderName(subject)
 	local mySpec = Spring.GetSpectatingState()
 	--Spring.Echo(tostring(active) .. " " .. tostring(spec))
 	local playerpanel = givemepanel[subject.id]
-	if not spec and active and ((subject.allyteam == myAllyTeamID) or mySpec) then 
+	if not spec and active and ((subject.allyteam == myAllyTeamID) or mySpec) then
 		local incomeM, incomeE, pullM, pullE, netM, netE, storedM, storedE, storageM, storageE = getEcoInfo(subject.team)
 		if incomeM then
 			--Spring.Echo("metal: " .. amt .. "/" .. stor)
@@ -425,7 +425,7 @@ local function UpdatePlayer(subject)
 			givemebuttons[subject.id]["metalin"]:SetVisibility(false)
 			givemebuttons[subject.id]["energyin"]:SetVisibility(false)
 		end
-	elseif mySpec then -- Spectator, but not fullview 
+	elseif mySpec then -- Spectator, but not fullview
 		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
 		givemebuttons[subject.id]["kick"]:SetVisibility(false)
 		givemebuttons[subject.id]["commshare"]:SetVisibility(false)
@@ -675,8 +675,8 @@ local function InitName(subject, playerPanel)
 			x=givemebuttons[subject.id]["unit"].x + buttonsize,
 			y=givemebuttons[subject.id]["unit"].y,
 			OnClick = {
-				function () 
-					GiveResource(subject.team,"metal") 
+				function ()
+					GiveResource(subject.team,"metal")
 				end
 			},
 			padding={2,2,2,2},
@@ -697,8 +697,8 @@ local function InitName(subject, playerPanel)
 			x=givemebuttons[subject.id]["metal"].x + buttonsize,
 			y=givemebuttons[subject.id]["metal"].y,
 			OnClick = {
-				function () 
-					GiveResource(subject.team,"energy") 
+				function ()
+					GiveResource(subject.team,"energy")
 				end
 			},
 			padding={1,1,1,1},
@@ -1000,7 +1000,7 @@ local function InitName(subject, playerPanel)
 	local adminImg = nil
 	avatar = avatar or "clogger"
 	local rankImg = "LuaUI/Images/LobbyRanks/" .. (icon or "0_0") .. ".png"
-	if clan and clan ~= "" then 
+	if clan and clan ~= "" then
 		clanImg = "LuaUI/Configs/Clans/" .. clan ..".png"
 	elseif faction and faction ~= "" then
 		clanImg = "LuaUI/Configs/Factions/" .. faction ..".png"
@@ -1111,7 +1111,7 @@ local function Buildme()
 	if (window) then
 		window:Dispose()
 	end
-	windowWidth = 768 
+	windowWidth = 768
 	windowHeight = 666
 	--Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
 	
@@ -1146,12 +1146,12 @@ local function Buildme()
 	for _, subject in ipairs(subjects) do
 		allyTeamID = subject.allyteam
 		if (playerpanels[allyTeamID]) then
-			--Spring.Echo(playerpanels[allyTeamID])	
+			--Spring.Echo(playerpanels[allyTeamID])
 			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID)
-			if (not name) then 
+			if (not name) then
 				name = "Team " .. allyTeamID
 			end
-			if (allyTeamID >= 100) then 
+			if (allyTeamID >= 100) then
 				name = "Spectators"
 			end
 			local height = #playerpanels[allyTeamID] * playerHeight + 20
@@ -1256,13 +1256,13 @@ local function Buildme()
 	}
 	window:SetVisibility(false)
 	buildframe = Spring.GetGameFrame()
-	--Spring.Echo("window " .. tostring(window.parent))	
+	--Spring.Echo("window " .. tostring(window.parent))
 	--Spring.Echo("Succesfully initialized")
 end
 UpdateListFunction = Buildme
 
 local function SetWantRebuild()
-	if (mySubjectID < 0 or not subjects[mySubjectID]) then 
+	if (mySubjectID < 0 or not subjects[mySubjectID]) then
 		return
 	end
 	if (not window) or (window and window.visible) then
@@ -1340,7 +1340,7 @@ local function UpdateAllyTeam(allyTeam)
 	local nonSpecs = false
 	for _, teamID in ipairs(Spring.GetTeamList(allyTeam)) do
 		local _, leader, dead, ai = Spring.GetTeamInfo(teamID, false)
-		if (ai) then 
+		if (ai) then
 			temp[#temp + 1] = {id = #temp + 1, team = teamID, ai = true, name = select(2, Spring.GetAIInfo(teamID)), allyteam = allyTeam, dead = dead}
 			nonSpecs = true
 		else
@@ -1349,7 +1349,7 @@ local function UpdateAllyTeam(allyTeam)
 				if playerID ~= Spring.GetMyPlayerID() and (teamID ~= 0 or teamZeroPlayers[playerID]) or not spec then
 					temp[#temp + 1] = {id = #temp + 1, team = teamID, player = playerID, name = name, allyteam = allyTeam, active = active, spec = spec, dead = dead}
 				end
-				nonSpecs = nonSpecs or active and not spec 
+				nonSpecs = nonSpecs or active and not spec
 			end
 		end
 	end
@@ -1362,7 +1362,7 @@ local function UpdateAllyTeam(allyTeam)
 				if (subject.player == Spring.GetMyPlayerID()) then
 					mySubjectID = #subjects
 				end
-				givemesubjects[subject.player] = subjects[#subjects]		
+				givemesubjects[subject.player] = subjects[#subjects]
 			end
 		end
 	end
@@ -1379,7 +1379,7 @@ local function UpdateSubjects()
 			UpdateAllyTeam(allyteamID)
 		end
 	end
-	for _, playerID in ipairs(Spring.GetPlayerList()) do 
+	for _, playerID in ipairs(Spring.GetPlayerList()) do
 		local name,active,spec, teamID, allyTeam = Spring.GetPlayerInfo(playerID, false)
 		if spec and active then
 			if (playerID == Spring.GetMyPlayerID()) then
@@ -1491,7 +1491,7 @@ end
 function widget:Initialize()
 	local spectating = Spring.GetSpectatingState()
 	
-	for _, playerID in ipairs(Spring.GetPlayerList()) do 
+	for _, playerID in ipairs(Spring.GetPlayerList()) do
 		local name,active,spec, teamID, allyTeam = Spring.GetPlayerInfo(playerID, false)
 		if teamID == 0 and not spec then
 			teamZeroPlayers[playerID] = true

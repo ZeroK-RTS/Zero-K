@@ -25,7 +25,7 @@ local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitHealth = Spring.GetUnitHealth
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 local spGetTeamInfo = Spring.GetTeamInfo
-local spGetUnitIsStunned = Spring.GetUnitIsStunned 
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
@@ -45,7 +45,7 @@ local DISARM_TIME_FACTOR = DISARM_DECAY_FRAMES + DISARM_ADD_TIME
 
 --// Values that reset every slow update
 -- Priority added based on health and capture for non-capture weapons
-local remNormalPriorityModifier = {} 
+local remNormalPriorityModifier = {}
 local remUnitHealth = {} -- used for overkill avoidance
 local remUnitHealthPriority = {}
 local remSpeed = {}
@@ -73,7 +73,7 @@ local remAllyTeam = {}
 local remUnitDefID = {}
 local remStatic = {}
 
- -- If there are more than STUN_ATTACKERS_IDLE_REQUIREMENT fire-at-will Racketeers or Cutters 
+ -- If there are more than STUN_ATTACKERS_IDLE_REQUIREMENT fire-at-will Racketeers or Cutters
  -- set targeted on a unit then the extra ones will attack other targets.
 local STUN_ATTACKERS_IDLE_REQUIREMENT = 3
 
@@ -119,7 +119,7 @@ local function GetUnitTransportieeDefID(unitID)
 			remTransportiee[unitID] = -1
 		end
 	end
-	return remTransportiee[unitID] 
+	return remTransportiee[unitID]
 end
 
 local function GetUnitStunnedOrInBuild(unitID)
@@ -146,7 +146,7 @@ local function GetUnitStunnedOrInBuild(unitID)
 						remStunned[unitID] = DISARM_BASE + math.max(0, math.min(DISARM_ADD, frames/DISARM_TIME_FACTOR))
 					end
 				end
-			else 
+			else
 				remStunned[unitID] = 0
 			end
 		end

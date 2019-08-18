@@ -206,7 +206,7 @@ return {
         width              = 3,
       },
     },
-  },  
+  },
   
   ["missiletrailblue"] = {
     alwaysvisible      = false,

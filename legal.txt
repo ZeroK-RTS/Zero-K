@@ -6,7 +6,7 @@ Copyright © 2008-2010 the 0K development team.
 
 Unless otherwise specified everything in this project is released under
 the GNU General Public License or Public Domain; you can redistribute it
-and/or modify it under the terms of the GNU General Public License as 
+and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or any later version.
 
