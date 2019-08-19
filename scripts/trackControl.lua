@@ -41,7 +41,7 @@ function TrackControlStartMoving()
 		Spin (wheels.small[i], x_axis, smallSpeed, smallAccel)
 	end
 	for i = 1, #wheels.large do
-		Spin (wheels.large[i], x_axis, largeSpeed, largeDecel)
+		Spin (wheels.large[i], x_axis, largeSpeed, largeAccel)
 	end
 	
 	while isMoving do
