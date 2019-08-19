@@ -19,7 +19,6 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spSetUnitTarget = Spring.SetUnitTarget
 local CMD_ATTACK = CMD.ATTACK
 local CMD_REMOVE = CMD.REMOVE
-local CMD_OPT_META = CMD.OPT_META
 local CMD_OPT_CTRL = CMD.OPT_CTRL
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 
@@ -49,9 +48,7 @@ function gadget:ScriptEndBurst(unitID, unitDefID, weaponNum)
 	end
 
 	local cmdID, cmdOpt, cmdTag, cmdParam1, cmdParam2, cmdParam3, cmdParam4 = spGetUnitCurrentCommand(unitID)
-	-- Some methods of issuing attack commands with Ctrl held do not have Ctrl show up in the opts.
-	-- In these cases widgets add Meta to opts.
-	local singleTarget = (cmdID == CMD_ATTACK and (cmdParam4 or 0) == 0 and (Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_CTRL) or Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_META)))
+	local singleTarget = (cmdID == CMD_ATTACK and (cmdParam4 or 0) == 0 and Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_CTRL))
 	if not singleTarget then
 		-- FIXME: jinking/kiting units might get a move command inserted in front (tested with gator)
 		return
