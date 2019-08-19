@@ -395,10 +395,30 @@ do
 	end
 end
 
-for _, wd in pairs (WeaponDefs) do
-	if wd.reloadtime then -- shields and death explosions don't have reloadtime
-		wd.reloadtime = (math.floor(wd.reloadtime * 30 + 1E-5) / 30) + 1E-6 -- sanitize to whole frames (plus leeways because float arithmetic is bonkers)
+--[[ Sanitize to whole frames (plus leeways because float arithmetic is bonkers).
+     The engine uses full frames for actual reload times, but forwards the raw
+     value to LuaUI (so for example calculated DPS is incorrect without sanitisation). ]]
+local function round_to_frames(name, wd, key)
+	local original_value = wd[key]
+	if not original_value then
+		-- even reloadtime can be nil (shields, death explosions)
+		return
 	end
+
+	local frames = math.max(1, math.floor((original_value + 1E-3) * Game.gameSpeed))
+
+	local sanitized_value = frames / Game.gameSpeed
+	if math.abs (original_value - sanitized_value) > 1E-3 then
+		Spring.Log("weapondefs_post", LOG.WARNING, name.."."..key.. " is set to " .. original_value .. " but will actually be " .. sanitized_value .. " ingame! Please put the correct value in the def (with 3 digit precision)")
+	end
+
+	wd[key] = sanitized_value + 1E-5
+end
+
+for name, wd in pairs (WeaponDefs) do
+	round_to_frames(name, wd, "reloadtime")
+	round_to_frames(name, wd, "burstrate")
+
 	if not wd.predictboost then
 		wd.predictboost = 1
 	end
