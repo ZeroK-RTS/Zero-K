@@ -113,7 +113,7 @@ local function TargetHeightUpdateThread(targetID, behaviour)
 		vx, vz = vx*PREDICT_FRAMES, vz*PREDICT_FRAMES
 		local predictX, predictZ = ux + vx, uz + vz
 		if math.abs(ux - tx) < vx then
-			local predictX = tx
+			predictX = tx
 		end
 		if math.abs(uz - tz) < vz then
 			predictZ = tz
