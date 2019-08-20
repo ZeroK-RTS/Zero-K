@@ -42,6 +42,7 @@ function gadget:GameFrame(n)
 		commands[i] = nil
 	end
 
+	commandCount = 0
 	ghRemoveCallIn(gh, 'GameFrame')
 end
 
