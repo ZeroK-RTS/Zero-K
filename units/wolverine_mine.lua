@@ -31,9 +31,6 @@ unitDef = {
   idleAutoHeal           = 10,
   idleTime               = 300,
   initCloaked            = true,
-  kamikaze               = true,
-  kamikazeDistance       = 0,
-  kamikazeUseLOS         = true,
   maxDamage              = 40,
   maxSlope               = 255,
   maxVelocity            = 0,
@@ -80,8 +77,8 @@ unitDef = {
       },
       
       damage                  = {
-        default = 40,
-        planes  = 40,
+        default = 40.01,
+        planes  = 40.01,
         subs    = 4,
       },
 

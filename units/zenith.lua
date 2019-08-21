@@ -123,6 +123,9 @@ unitDef = {
       customParams              = {
         light_color = [[2.4 1.5 0.6]],
         light_radius = 600,
+
+        spawns_name = "asteroid_dead",
+        spawns_feature = 1,
       },
 
       damage                  = {
@@ -173,6 +176,9 @@ unitDef = {
 
       customParams              = {
         light_radius = 0,
+
+        spawns_name = "asteroid_dead",
+        spawns_feature = 1,
       },
 
       damage                  = {
@@ -225,6 +231,9 @@ unitDef = {
       customParams              = {
         light_radius = 0,
         do_not_save = 1, -- Controlled meteors are regenerated on load.
+
+        spawns_name = "asteroid_dead",
+        spawns_feature = 1,
       },
 
       damage                  = {
@@ -279,6 +288,9 @@ unitDef = {
         light_color = [[2.4 1.5 0.6]],
         light_radius = 600,
         do_not_save = 1, -- Controlled meteors are regenerated on load.
+
+        spawns_name = "asteroid_dead",
+        spawns_feature = 1,
       },
 
       damage                  = {

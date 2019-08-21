@@ -72,6 +72,11 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams            = {
+        spawns_name = "wolverine_mine",
+        spawns_expire = 60,
+      },
+
       damage                  = {
         default = 20,
         planes  = 20,

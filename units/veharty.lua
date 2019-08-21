@@ -81,8 +81,10 @@ unitDef = {
         reaim_time = 8, -- COB
         damage_vs_shield = [[220]],
         damage_vs_feature = [[220]],
+
         spawns_name = "wolverine_mine",
         spawns_expire = 60,
+        spawn_blocked_by_shield = 1,
         
         light_radius = 0,
       },

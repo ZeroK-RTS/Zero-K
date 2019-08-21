@@ -34,7 +34,7 @@ local currentBomblet = 1
 local function Remove ()
 	for i = 3, 3 do
 		for j = 1, 4 do
-			Explode(petals[i][j], SFX.SHATTER)
+			Explode(petals[i][j], SFX.FALL + SFX.SMOKE)
 		end
 	end
 
@@ -108,9 +108,10 @@ function script.Shot (num)
 		firing = true
 	else
 		currentBomblet = currentBomblet + 1
-		if (currentBomblet == 5) then
-			StartThread(Remove)
-		end
 	end
 	Hide (bomblets[currentBomblet].bomb)
+end
+
+function script.EndBurst()
+	StartThread(Remove)
 end
