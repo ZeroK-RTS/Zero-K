@@ -288,7 +288,7 @@ local function Walk()
 	Sleep(70/sizeSpeedMult)
 end
 
-local function MotionControl(moving, aiming, justmoved)
+local function MotionControl()
 	--for i = 1024, 1050 do
 	--	Spring.Echo("Weapon", i)
 	--	for j = 1, 12 do
@@ -300,8 +300,9 @@ local function MotionControl(moving, aiming, justmoved)
 	--	local reloadTime = Spring.GetUnitWeaponState(unitID, i, "reloadTime")
 	--	Spring.Echo("Weapon reload time", i, reloadTime)
 	--end
-	
-	justmoved = true
+
+	local moving, aiming
+	local justmoved = true
 	while true do
 		moving = bMoving
 		aiming = bAiming

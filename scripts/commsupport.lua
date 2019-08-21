@@ -260,8 +260,9 @@ local function Walk()
 	Sleep(160)
 end
 
-local function MotionControl(moving, aiming, justmoved)
-	justmoved = true
+local function MotionControl()
+	local moving, aiming
+	local justmoved = true
 	while true do
 		moving = bMoving
 		aiming = bAiming
