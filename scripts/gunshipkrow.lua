@@ -152,14 +152,14 @@ local function updateVectors(num)
 	
 	Turn(gunpoints[num].pitch,x_axis,math.rad(-90))
 	Sleep(400)
-	local _, _, _, x, y, z = Spring.UnitScript.GetPiecePosDir(gunpoints[num].pitch)
-	gunpoints[num].radial = hat({x, y, z})
+	local _, _, _, x1, y1, z1 = Spring.UnitScript.GetPiecePosDir(gunpoints[num].pitch)
+	gunpoints[num].radial = hat({x1, y1, z1})
 	
 	Turn(gunpoints[num].rot,y_axis,math.rad(90))
 	Turn(gunpoints[num].pitch,x_axis,math.rad(90))
 	Sleep(400)
-	local _, _, _, x, y, z = Spring.UnitScript.GetPiecePosDir(gunpoints[num].pitch)
-	gunpoints[num].right = hat({x, y, z})
+	local _, _, _, x2, y2, z2 = Spring.UnitScript.GetPiecePosDir(gunpoints[num].pitch)
+	gunpoints[num].right = hat({x2, y2, z2})
 	
 	gunpoints[num].normal = cross(gunpoints[num].radial,gunpoints[num].right)
 	

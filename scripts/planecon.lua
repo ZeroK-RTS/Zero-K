@@ -17,7 +17,6 @@ local leftClawBit 		= piece 'LeftClawBit'
 local leftNano 			= piece 'LeftNano'
 local rightClaw 		= piece 'RightClaw'
 local rightClawBit 		= piece 'RightClawBit'
-local rightClawBit 		= piece 'RightClawBit'
 local engShield1 		= piece 'EngShield1'
 local engShield2 		= piece 'EngShield2'
 
