@@ -21,7 +21,6 @@ local bladeRetractSpeed = math.rad(120)
 local bladeAngle = math.rad(140)
 
 --variables
-local isMoving = false
 local feet = true
 
 --signals
@@ -86,12 +85,10 @@ local function Moving()
 end
 
 function script.StartMoving()
-	isMoving = true
 	StartThread(Moving)
 end
 
 function script.StopMoving()
-	isMoving = false
 	StartThread(StopFly)
 end
 

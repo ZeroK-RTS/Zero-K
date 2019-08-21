@@ -69,7 +69,6 @@ local signals = {
 }
 
 local restoreDelay = 3000
-local attacking = 0
 
 --local blockAim = {false, false, false, false}
 
@@ -239,7 +238,6 @@ end
 
 local function RestoreAfterDelay()
 	Sleep(restoreDelay)
-	attacking = false
 	--Turn(Base,x_axis, math.rad(0),1) --default tilt
 	--WaitForTurn (Base, x_axis)
 	--Turn(Base,z_axis, math.rad(0),1) --default tilt
@@ -298,7 +296,6 @@ function script.AimWeapon(num, heading, pitch)
 	end
 	Signal(signals[num])
 	SetSignalMask(signals[num])
-	attacking = true
 
 	--StartThread(TiltBody, heading)
 	

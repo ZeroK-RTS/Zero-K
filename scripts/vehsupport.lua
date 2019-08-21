@@ -15,7 +15,7 @@ local base, aim, rockbase, body, turret, arms, firepoint1, firepoint2, exhaust1,
 
 local smokePiece = {turret, body}
 
-local moving, runSpin, wheelTurnSpeed
+local moving, wheelTurnSpeed
 
 local deployed = false
 
@@ -120,8 +120,6 @@ function Roll()
 		StopSpin(lwheel1, x_axis)
 		StopSpin(lwheel2, x_axis)
 		StopSpin(lwheel3, x_axis)
-	
-		runSpin = false
 	end
 end
 
@@ -189,7 +187,6 @@ function StopMoving()
 end
 
 function StartMoving()
-	runSpin = true
 	moving = true
 	StartThread(SetDeploy,false)
 	
@@ -283,7 +280,6 @@ end
 
 function script.Create()
 	moving = false
-	runSpin = false
 	StartThread(SetDeploy,true)
 	StartThread(Suspension)
 	StartThread(AnimControl)

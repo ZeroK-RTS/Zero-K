@@ -49,7 +49,6 @@ local WALK_RATE = 38
 -- variables
 --------------------------------------------------------------------------------
 local bAiming = false
-local bMoving = false
 local gun_1 = 0
 
 --------------------------------------------------------------------------------
@@ -180,18 +179,15 @@ local function Stop()
 end
 
 function script.Create()
-	bMoving = false
 	bAiming = false
 	StartThread(GG.Script.SmokeUnit, {torso})
 end
 
 function script.StartMoving()
-	bMoving = true
 	StartThread(Walk)
 end
 
 function script.StopMoving()
-	bMoving = false
 	StartThread(Stop)
 end
 

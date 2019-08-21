@@ -60,7 +60,7 @@ local VERT_AIM_SPEED = math.rad(210)
 local AIM_SPEED = math.rad(360) -- noscope
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local bAiming, bCanAim, gun_unpacked, idleArmState = false, true, false, false
+local bAiming, bCanAim, gun_unpacked = false, true, false
 local maintainHeading = false
 local torsoHeading = 0
 
@@ -128,7 +128,6 @@ local function IdleAnim()
 		end
 		Turn(camera, y_axis, math.rad(30), math.rad(80))
 		Turn(forearmr, x_axis, math.rad(-30), math.rad(60))
-		idleArmState = true
 		Sleep(3500)
 		if not(bAiming) then
 			Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
@@ -142,7 +141,6 @@ local function IdleAnim()
 		end
 		Turn(camera, y_axis, math.rad(30), math.rad(80))
 		Turn(forearmr, x_axis, 0, math.rad(60))
-		idleArmState = false
 		Sleep(3500)
 	end
 end

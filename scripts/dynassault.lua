@@ -78,7 +78,7 @@ local RESTORE_DELAY = 2500
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local isMoving, isLasering, isDgunning, gunLockOut = false, false, false, false
+local isLasering, isDgunning, gunLockOut = false, false, false
 local restoreHeading, restorePitch = 0, 0
 
 local starBLaunchers = {}
@@ -218,12 +218,10 @@ function script.Create()
 end
 
 function script.StartMoving()
-	isMoving = true
 	StartThread(Walk)
 end
 
 function script.StopMoving()
-	isMoving = false
 	StartThread(RestoreLegs)
 end
 

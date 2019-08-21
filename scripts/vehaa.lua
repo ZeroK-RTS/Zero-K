@@ -25,7 +25,7 @@ local WHEEL_TURN_MULT = 1.2
 local ANIM_PERIOD = 50
 
 local smokePiece = {turret, body}
-local moving, runSpin, wheelTurnSpeed
+local moving, wheelTurnSpeed
 
 local turnTilt = 0
 
@@ -51,7 +51,6 @@ local function Roll()
 		StopSpin(rwheel2, x_axis)
 		StopSpin(lwheel1, x_axis)
 		StopSpin(lwheel2, x_axis)
-		runSpin = false
 	end
 end
 
@@ -62,7 +61,6 @@ end
 
 
 function StartMoving()
-	runSpin = true
 	moving = true
 	
 	local x,y,z = spGetUnitVelocity(unitID)
@@ -177,7 +175,6 @@ end
 
 function script.Create()
 	moving = false
-	runSpin = false
 	StartThread(Suspension)
 	StartThread(AnimControl)
 	StartThread(GG.Script.SmokeUnit, smokePiece)

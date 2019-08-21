@@ -15,7 +15,7 @@ local base, body, turret, sleeve, barrel, firepoint,
 	'gs1l', 'gs2l'
 )
 
-local moving, runSpin, reloading, mainHead, wheelTurnSpeed
+local moving, reloading, mainHead, wheelTurnSpeed
 
 local smokePiece = {turret, body}
 
@@ -65,7 +65,6 @@ function Suspension()
 		wheelTurnSpeed = speed*WHEEL_TURN_MULT
 	
 		if not moving and speed > 0.06 then
-			runSpin = true
 			moving = true
 		end
 
@@ -131,14 +130,11 @@ function Roll()
 		StopSpin(rwheel2, x_axis)
 		StopSpin(lwheel1, x_axis)
 		StopSpin(lwheel2, x_axis)
-	
-		runSpin = false
 	end
 end
 
 function script.StartMoving()
 	moving = true
-	runSpin = true
 	
 	local x,y,z = spGetUnitVelocity(unitID)
 	wheelTurnSpeed = math.sqrt(x*x+y*y+z*z)*10

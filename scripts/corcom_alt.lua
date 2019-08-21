@@ -71,7 +71,7 @@ local RESTORE_DELAY_DGUN = 2500
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local isMoving, isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, false, true
+local isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, true
 local restoreHeading, restorePitch = 0, 0
 
 local flamers = {}
@@ -153,12 +153,10 @@ function script.Create()
 end
 
 function script.StartMoving()
-	isMoving = true
 	StartThread(Walk)
 end
 
 function script.StopMoving()
-	isMoving = false
 	StartThread(RestoreLegs)
 end
 

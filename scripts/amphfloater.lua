@@ -45,7 +45,6 @@ local UNPACK_TIME = 1/3
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 
-local bUnpacked = false
 local gun_1 = 1
 
 --------------------------------------------------------------------------------------
@@ -115,7 +114,6 @@ end
 
 function Float_stationaryOnSurface()
 	Signal(SIG_FLOAT)
-	bUnpacked = true
 end
 
 function unit_teleported(position)
@@ -156,7 +154,6 @@ function script.StartMoving()
 	--Move(lthigh, y_axis, 0, 12)
 	--Move(rthigh, y_axis, 0, 12)
 	Signal(SIG_UNPACK)
-	bUnpacked = false
 	StartThread(Walk)
 end
 
@@ -165,7 +162,6 @@ local function Unpack()
 	SetSignalMask(SIG_UNPACK)
 	
 	Sleep(UNPACK_TIME)
-	bUnpacked = true
 end
 
 local function Stopping()

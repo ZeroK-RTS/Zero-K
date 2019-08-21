@@ -63,9 +63,7 @@ local shieldOn = false
 local dead = false
 local bMoving = false
 local bAiming = false
-local armsFree = true
 local inBuildAnim = false
-local dgunning = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -268,15 +266,9 @@ local function MotionControl(moving, aiming, justmoved)
 		moving = bMoving
 		aiming = bAiming
 		if moving then
-			if aiming then
-				armsFree = true
-			else
-				armsFree = false
-			end
 			Walk()
 			justmoved = true
 		else
-			armsFree = true
 			if justmoved then
 				Turn(rupleg, x_axis, 0, math.rad(200.071429))
 				Turn(rloleg, x_axis, 0, math.rad(200.071429))
@@ -350,12 +342,6 @@ function script.QueryWeapon(num)
 end
 
 local function AimRifle(heading, pitch, isDgun)
-	if isDgun then dgunning = true end
-	--[[
-	if dgunning and not isDgun then
-		return false
-	end
-	]]--
 	--torso
 	Turn(torso, x_axis, math.rad(5), math.rad(250))
 	Turn(torso, y_axis, 0, math.rad(250))
@@ -400,7 +386,6 @@ local function AimRifle(heading, pitch, isDgun)
 	WaitForTurn(armhold, x_axis) --need to make sure not
 	WaitForTurn(lloarm, x_axis) --stil setting up
 	StartThread(RestoreAfterDelay)
-	if isDgun then dgunning = false end
 	return true
 end
 
