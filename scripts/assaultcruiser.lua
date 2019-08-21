@@ -33,8 +33,6 @@ local smokePiece = {lowerhull, radarbase, upperhull}
 
 local SIG_RESTORE = 1
 local SIG_MOVE = 2
-local SIG_Aim = 4
-
 local RESTORE_DELAY = 5000
 
 local TURRET_PITCH_SPEED = math.rad(90)

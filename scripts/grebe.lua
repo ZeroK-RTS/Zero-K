@@ -101,10 +101,6 @@ local function RestoreAfterDelay()
 	Turn(countertilt, x_axis, 0, math.rad(47.5))
 end
 
-local function ReloadDisks(index)
-
-end
-
 function script.AimFromWeapon()
 	return aimpoint
 end
@@ -126,18 +122,6 @@ end
 function script.QueryWeapon(num)
 	if num == 1 then
 		return firepoints[gun_1]
-	end
-end
-
-function script.FireWeapon(num)
-	if num == 1 then
-		local i = 3
-		if gun_1 <= 2 then
-			i = 1
-		elseif gun_1 <= 4 then
-			i = 2
-		end
-		StartThread(ReloadDisks, index)
 	end
 end
 

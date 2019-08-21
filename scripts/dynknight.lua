@@ -103,15 +103,12 @@ local armsFree = true
 local restoreHeading = 0
 local gun_num = 0
 
-local flamers = {}
 local starBLaunchers = {}
 local wepTable = UnitDefs[unitDefID].weapons
 wepTable.n = nil
 for index, weapon in pairs(wepTable) do
 	local weaponDef = WeaponDefs[weapon.weaponDef]
-	if weaponDef.type == "Flame" or (weaponDef.customParams and weaponDef.customParams.flamethrower) then
-		flamers[index] = true
-	elseif weaponDef.type == "StarburstLauncher" then
+	if weaponDef.type == "StarburstLauncher" then
 		starBLaunchers[index] = true
 		--Spring.Echo("sbl found")
 	end
