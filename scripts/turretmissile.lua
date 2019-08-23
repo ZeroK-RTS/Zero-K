@@ -41,7 +41,7 @@ include "constants.lua"
 
 local scriptReload = include("scriptReload.lua")
 
-local ammo, missile, missilespeed, mfront
+local missile, missilespeed, mfront
 
 local SIG_AIM = 1
 local SIG_RESTORE = 2

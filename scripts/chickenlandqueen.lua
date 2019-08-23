@@ -33,7 +33,6 @@ local bladeRetractSpeed = math.rad(120)
 local PACE = 0.6
 
 --variables
-local isMoving = false
 local feet = true
 local jawNum = 1
 
@@ -190,12 +189,10 @@ local function StopWalk()
 end
 
 function script.StartMoving()
-	isMoving = true
 	StartThread(Walk)
 end
 
 function script.StopMoving()
-	isMoving = false
 	StartThread(StopWalk)
 end
 

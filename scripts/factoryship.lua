@@ -20,16 +20,14 @@ local SIG_BUILD = 2
 local function PadAdjust()
 	Signal(SIG_BUILD)
 	SetSignalMask(SIG_BUILD)
-	local buildee, progress
 	while true do
 		local buildee = spGetUnitIsBuilding(unitID)
 		--Spring.Echo(buildee)
 		if buildee then
-			progress = select(5, spGetUnitHealth(buildee))
+			local progress = select(5, spGetUnitHealth(buildee))
 			Move(pad, z_axis, -20 + (40*progress))
 			--Spring.Echo(progress)
 		else
-			progress = 0
 			Move(pad, z_axis, -20)
 		end
 		Sleep(500)

@@ -1,7 +1,5 @@
 include "constants.lua"
 
-local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
-
 local base = piece "base"
 local flare = piece "flare"
 local firept = piece "firept"

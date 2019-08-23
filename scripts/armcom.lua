@@ -85,7 +85,7 @@ local RESTORE_DELAY_DGUN = 2500
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local isMoving, isLasering, isDgunning, shieldOn = false, false, false, true
+local isLasering, isDgunning, shieldOn = false, false, true
 local restoreHeading, restorePitch = 0, 0
 
 local flamers = {}
@@ -112,7 +112,6 @@ local function Walk()
 	
 	Turn(nanolath, x_axis, math.rad(-40), ARM_SPEED_PITCH)
 	Turn(biggun, x_axis, math.rad(-62.5), ARM_SPEED_PITCH)
-	isMoving = true
 	
 	Turn(ground, x_axis, math.rad(10), math.rad(30))
 	while true do
@@ -176,7 +175,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	isMoving = false
 	StartThread(RestorePose)
 end
 

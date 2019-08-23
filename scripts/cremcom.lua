@@ -99,7 +99,7 @@ end
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local isMoving, armsFree, shieldOn, inJumpMode = false, true, true, false
+local armsFree, shieldOn = true, true
 local restoreHeading = 0
 local gun_num = 0
 
@@ -184,19 +184,16 @@ function script.Create()
 end
 
 function script.StartMoving()
-	isMoving = true
 	StartThread(Walk)
 end
 
 function script.StopMoving()
-	isMoving = false
 	StartThread(RestorePose)
 end
 
 function beginJump()
 	script.StopMoving()
 	GG.PokeDecloakUnit(unitID, 50)
-	inJumpMode = true
 end
 
 function jumping()
@@ -211,7 +208,6 @@ end
 
 function endJump()
 	script.StopMoving()
-	inJumpMode = false
 	EmitSfx(base, 1029)
 end
 

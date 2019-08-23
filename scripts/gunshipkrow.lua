@@ -69,7 +69,6 @@ local signals = {
 }
 
 local restoreDelay = 3000
-local attacking = 0
 
 --local blockAim = {false, false, false, false}
 
@@ -152,14 +151,14 @@ local function updateVectors(num)
 	
 	Turn(gunpoints[num].pitch,x_axis,math.rad(-90))
 	Sleep(400)
-	local _, _, _, x, y, z = Spring.UnitScript.GetPiecePosDir(gunpoints[num].pitch)
-	gunpoints[num].radial = hat({x, y, z})
+	local _, _, _, x1, y1, z1 = Spring.UnitScript.GetPiecePosDir(gunpoints[num].pitch)
+	gunpoints[num].radial = hat({x1, y1, z1})
 	
 	Turn(gunpoints[num].rot,y_axis,math.rad(90))
 	Turn(gunpoints[num].pitch,x_axis,math.rad(90))
 	Sleep(400)
-	local _, _, _, x, y, z = Spring.UnitScript.GetPiecePosDir(gunpoints[num].pitch)
-	gunpoints[num].right = hat({x, y, z})
+	local _, _, _, x2, y2, z2 = Spring.UnitScript.GetPiecePosDir(gunpoints[num].pitch)
+	gunpoints[num].right = hat({x2, y2, z2})
 	
 	gunpoints[num].normal = cross(gunpoints[num].radial,gunpoints[num].right)
 	
@@ -239,7 +238,6 @@ end
 
 local function RestoreAfterDelay()
 	Sleep(restoreDelay)
-	attacking = false
 	--Turn(Base,x_axis, math.rad(0),1) --default tilt
 	--WaitForTurn (Base, x_axis)
 	--Turn(Base,z_axis, math.rad(0),1) --default tilt
@@ -298,7 +296,6 @@ function script.AimWeapon(num, heading, pitch)
 	end
 	Signal(signals[num])
 	SetSignalMask(signals[num])
-	attacking = true
 
 	--StartThread(TiltBody, heading)
 	

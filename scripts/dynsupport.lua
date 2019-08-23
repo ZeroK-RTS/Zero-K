@@ -56,9 +56,7 @@ local canDgun = UnitDefs[unitDefID].canDgun
 local dead = false
 local bMoving = false
 local bAiming = false
-local armsFree = true
 local inBuildAnim = false
-local dgunning = false
 
 local SPEEDUP_FACTOR = 1.1
 local REF_TURN_SPEED = 185  -- deg/s
@@ -331,22 +329,17 @@ local function MotionSpeedControl()
 	end
 end
 
-local function MotionControl(moving, aiming, justmoved)
-	justmoved = true
+local function MotionControl()
+	local moving, aiming
+	local justmoved = true
 	while true do
 		moving = bMoving
 		aiming = bAiming
 
 		if moving then
-			if aiming then
-				armsFree = true
-			else
-				armsFree = false
-			end
 			Walk()
 			justmoved = true
 		else
-			armsFree = true
 			if justmoved then
 				Turn(pelvis, x_axis, math.rad(0), math.rad(60))
 				Turn(rupleg, x_axis, 0, math.rad(200.071429))
@@ -427,10 +420,6 @@ function script.QueryWeapon(num)
 end
 
 local function AimRifle(heading, pitch, isDgun)
-	if isDgun then
-		dgunning = true
-	end
-	
 	if pitch < -0.3 then
 		Move(flare, z_axis, pitch*20 - 10)
 	else
@@ -483,7 +472,6 @@ local function AimRifle(heading, pitch, isDgun)
 	WaitForTurn(rloarm, y_axis) --still setting up
 	
 	StartThread(RestoreAfterDelay)
-	if isDgun then dgunning = false end
 	return true
 end
 

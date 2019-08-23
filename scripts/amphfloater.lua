@@ -45,7 +45,6 @@ local UNPACK_TIME = 1/3
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 
-local bUnpacked = false
 local gun_1 = 1
 
 --------------------------------------------------------------------------------------
@@ -78,10 +77,10 @@ local function SinkBubbles()
 end
 
 local function dustBottom()
-	local x,y,z = Spring.GetUnitPiecePosDir(unitID,rfoot)
-	Spring.SpawnCEG("uw_vindiback", x, y+5, z, 0, 0, 0, 0)
-	local x,y,z = Spring.GetUnitPiecePosDir(unitID,lfoot)
-	Spring.SpawnCEG("uw_vindiback", x, y+5, z, 0, 0, 0, 0)
+	local x1,y1,z1 = Spring.GetUnitPiecePosDir(unitID,rfoot)
+	Spring.SpawnCEG("uw_vindiback", x1, y1+5, z1, 0, 0, 0, 0)
+	local x2,y2,z2 = Spring.GetUnitPiecePosDir(unitID,lfoot)
+	Spring.SpawnCEG("uw_vindiback", x2, y2+5, z2, 0, 0, 0, 0)
 end
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -115,7 +114,6 @@ end
 
 function Float_stationaryOnSurface()
 	Signal(SIG_FLOAT)
-	bUnpacked = true
 end
 
 function unit_teleported(position)
@@ -156,7 +154,6 @@ function script.StartMoving()
 	--Move(lthigh, y_axis, 0, 12)
 	--Move(rthigh, y_axis, 0, 12)
 	Signal(SIG_UNPACK)
-	bUnpacked = false
 	StartThread(Walk)
 end
 
@@ -165,7 +162,6 @@ local function Unpack()
 	SetSignalMask(SIG_UNPACK)
 	
 	Sleep(UNPACK_TIME)
-	bUnpacked = true
 end
 
 local function Stopping()

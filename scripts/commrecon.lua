@@ -68,9 +68,7 @@ local canDgun = UnitDefs[unitDefID].canDgun
 local dead = false
 local bMoving = false
 local bAiming = false
-local armsFree = true
 local shieldOn = true
-local dgunning = false
 local inJumpMode = false
 
 --------------------------------------------------------------------------------
@@ -263,21 +261,16 @@ local function Walk()
 	Sleep(70)
 end
 
-local function MotionControl(moving, aiming, justmoved)
-	justmoved = true
+local function MotionControl()
+	local moving, aiming
+	local justmoved = true
 	while true do
 		moving = bMoving
 		aiming = bAiming
 		if moving then
-			if aiming then
-				armsFree = true
-			else
-				armsFree = false
-			end
 			Walk()
 			justmoved = true
 		else
-			armsFree = true
 			if justmoved then
 				Turn(rupleg, x_axis, 0, math.rad(200.071429))
 				Turn(rloleg, x_axis, 0, math.rad(200.071429))
@@ -344,12 +337,6 @@ function script.AimFromWeapon(num)
 end
 
 local function AimRifle(heading, pitch, isDgun)
-	if isDgun then dgunning = true end
-	--[[
-	if dgunning and not isDgun then
-		return false
-	end
-	]]--
 	--torso
 	Turn(torso, x_axis, math.rad(15), math.rad(250))
 	Turn(torso, y_axis, math.rad(-25), math.rad(250))
@@ -394,7 +381,6 @@ local function AimRifle(heading, pitch, isDgun)
 	WaitForTurn(armhold, x_axis)
 	WaitForTurn(lloarm, z_axis)
 	StartThread(RestoreAfterDelay)
-	if isDgun then dgunning = false end
 	return true
 end
 
