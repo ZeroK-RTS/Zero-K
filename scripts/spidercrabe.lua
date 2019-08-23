@@ -153,7 +153,7 @@ local function Curl()
 	WaitForTurn(leg3, x_axis)
 	WaitForTurn(leg4, x_axis)
 	
- 	bCurling = false
+	bCurling = false
 	Spring.SetUnitArmored(unitID,true)
 end
 
