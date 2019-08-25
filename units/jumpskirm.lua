@@ -12,9 +12,10 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[30 30 20]],
-  collisionVolumeType           = [[box]],
+-- A box collision volume, while better matching the model, seems to increase friendly fire
+--  collisionVolumeOffsets        = [[0 0 0]],
+--  collisionVolumeScales         = [[30 30 20]],
+--  collisionVolumeType           = [[box]],
   selectionVolumeOffsets = [[0 0 0]],
   selectionVolumeScales  = [[42 42 42]],
   selectionVolumeType    = [[ellipsoid]],
