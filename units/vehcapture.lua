@@ -129,6 +129,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
+      collisionVolumeOffsets = [[0 0 0]],
+      collisionVolumeScales  = [[26 26 50]],
+      collisionVolumeType    = [[cylZ]],
       object           = [[corvrad_big_dead.s3o]],
     },
 

@@ -67,6 +67,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
+      collisionVolumeOffsets = [[0 0 -20]],
+      collisionVolumeScales  = [[90 90 60]],
+      collisionVolumeType    = [[ellipsoid]], 
       object           = [[bumblebee_d.dae]],
     },
 

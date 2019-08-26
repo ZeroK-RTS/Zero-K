@@ -124,6 +124,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
+      collisionVolumeOffsets = [[0 0 5]],
+      collisionVolumeScales  = [[35 15 45]],
+      collisionVolumeType    = [[box]],
       object           = [[fighter2_dead.s3o]],
     },
 
