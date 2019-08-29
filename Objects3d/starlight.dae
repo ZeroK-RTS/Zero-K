@@ -2075,7 +2075,7 @@
         <node id="SatelliteMount" name="SatelliteMount" type="NODE">
           <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 65.62811 0 0 0 1</matrix>
           <node id="SatelliteMuzzle" name="SatelliteMuzzle" type="NODE">
-            <matrix sid="transform">1 0 0 0 0 -1 -1.50996e-7 0 0 1.50996e-7 -1 -19.5185 0 0 0 1</matrix>
+            <matrix sid="transform">1 0 0 0 0 -1 0 0 0 0 -1 -19.5185 0 0 0 1</matrix>
           </node>
           <node id="Satellite" name="Satellite" type="NODE">
             <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>

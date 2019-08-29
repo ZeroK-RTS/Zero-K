@@ -106,6 +106,14 @@ local function CallSatelliteScript(funcName, args)
 	end
 end
 
+local HEADING_TO_RAD = 1/32768*math.pi
+local function GetDir(checkUnitID)
+	local heading = Spring.GetUnitHeading(satUnitID)
+	if heading then
+		return math.pi/2 - heading*HEADING_TO_RAD
+	end
+end
+
 local isFiring = false
 local function SetFiringState(shouldFire)
 	if isFiring == shouldFire then
@@ -125,11 +133,11 @@ function Undock()
 	
 	if state == DOCKED then
 		for i = 1, 4 do
-			Turn(DocksClockwise[i]	   ,z_axis,math.rad(-42.5),1)
+			Turn(DocksClockwise[i]      ,z_axis,math.rad(-42.5),1)
 			Turn(DocksCounterClockwise[i],z_axis,math.rad( 42.5),1)
 			
 			Turn(ActuatorBaseClockwise[i],z_axis,math.rad(-86),2)
-			Turn(ActuatorBaseCCW[i]	  ,z_axis,math.rad( 86),2)
+			Turn(ActuatorBaseCCW[i]      ,z_axis,math.rad( 86),2)
 			
 			Turn(ActuatorMidCW [i],z_axis,math.rad( 53),1.5)
 			Turn(ActuatorMidCCW[i],z_axis,math.rad( 53),1.5)
@@ -236,10 +244,10 @@ function TargetingLaser()
 		if not isStunned then
 			--// Aiming
 			local dx, _, dz = Spring.GetUnitDirection(satUnitID)
-			if dx then
+			local otherCurrentHeading = GetDir(satUnitID)
+			if dx and otherCurrentHeading then
 				local currentHeading = Vector.Angle(dx, dz)
-				
-				local aimOff = (currentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi
+				local aimOff = (otherCurrentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi
 				
 				if aimOff < 0 then
 					if aimOff < -ROTATION_SPEED then
@@ -377,7 +385,9 @@ function script.AimWeapon(num, heading, pitch)
 		
 		wantedDirection = currentHeading - heading + math.pi
 		
-		CallSatelliteScript('mahlazer_AimAt',pitch + math.pi/2)
+		pitchFudge = (math.pi/2 + pitch)*0.999 - math.pi/2
+		
+		CallSatelliteScript('mahlazer_AimAt', pitchFudge + math.pi/2)
 		Turn(SatelliteMuzzle, x_axis, math.pi/2+pitch, math.rad(1.2))
 		WaitForTurn(SatelliteMuzzle, x_axis)
 		
