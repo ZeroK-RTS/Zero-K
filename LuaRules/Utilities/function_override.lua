@@ -50,6 +50,18 @@ Spring.ScaledGetMouseState = function()
 	local mx, my, left, right, mid, offscreen = Spring.GetMouseState()
 	return mx/((WG and WG.uiScale) or 1), my/((WG and WG.uiScale) or 1), left, right, mid, offscreen
 end
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+
+local oldGetGroundExtremes = Spring.GetGroundExtremes
+
+Spring.GetGroundExtremes = function()
+	local minOverride = Spring.GetGameRulesParam("ground_min_override")
+	if minOverride then
+		return minOverride, Spring.GetGameRulesParam("ground_max_override")
+	end
+	return oldGetGroundExtremes()
+end
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
