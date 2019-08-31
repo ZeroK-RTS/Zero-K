@@ -38,7 +38,31 @@ local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+-- Constants
+
+local GRAVITY = (Game.gravity/30/30)
+
+local FEATURE = 102
+local GROUND = 103
+local UNIT = 117
+
+local MIN_FLY_TIME = 120
+local MAX_FLY_TIME = 150
+
+local SPEED_MAX = 9
+local SPEED_INT_WIDTH = 3
+-- Dart speed is 5.1.
+-- Normal launch speed is 9.9
+
+local RECENT_MAX = -1.45
+local RECENT_INT_WIDTH = 1
+
+local MAX_ALTITUDE_AIM = 400
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 -- Shared functions
+
 local spGetUnitDefID = Spring.GetUnitDefID
 local getMovetype = Spring.Utilities.getMovetype
 
@@ -50,14 +74,11 @@ for i = 1, #UnitDefs do
 	end
 end
 
-local function ValidThrowTarget(unitID, targetID)
+local function ValidThrowTarget(unitID, targetID, speed)
 	if unitID == targetID then
 		return false
 	end
-	local _, _, _, speed = Spring.GetUnitVelocity(targetID)
-	if speed > 6 then
-		-- Dart speed is 5.1.
-		-- Normal launch speed is 9.9
+	if speed > SPEED_MAX then
 		return false
 	end
 	local unitDefID = spGetUnitDefID(targetID)
@@ -100,14 +121,8 @@ local function SetUnitDrag(unitID, drag)
 	Spring.SetUnitPhysics(unitID, ux, uy, uz, vx, vy, vz, rx, ry, rz, drag, drag, drag)
 end
 
-local GRAVITY = (Game.gravity/30/30)
-
-local FEATURE = 102
-local GROUND = 103
-local UNIT = 117
-
-local MIN_FLY_TIME = 120
-local MAX_FLY_TIME = 150
+local max = math.max
+local min = math.min
 
 local throwUnits = IterableMap.New()
 local physicsRestore = IterableMap.New()
@@ -130,6 +145,8 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		tx, ty, tz = targetPos[1], targetPos[2], targetPos[3]
 	else
 		_, _, _, tx, ty, tz = Spring.GetUnitPosition(targetPos, true)
+		local groundHeight = math.max(Spring.GetGroundHeight(tx, tz) or 0, 0)
+		ty = math.min(ty, groundHeight - MAX_ALTITUDE_AIM)
 	end
 	ty = math.max(ty, 0)
 	
@@ -150,14 +167,20 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		for i = 1, #nearUnits do
 			local nearID = nearUnits[i]
 			local physicsData = physicsRestore and physicsRestore.Get(nearID)
-			if ((not physicsData) or (not physicsData.drag) or physicsData.drag > -0.4) and ValidThrowTarget(proOwnerID, nearID) then
+			local _, _, _, speed = Spring.GetUnitVelocity(nearID)
+			if ((not physicsData) or (not physicsData.drag) or physicsData.drag > RECENT_MAX) and ValidThrowTarget(proOwnerID, nearID, speed) then
+				local recentMult = max(0, min(1, (((physicsData and physicsData.drag) or 0) - RECENT_MAX)/RECENT_INT_WIDTH))
+				local speedMult  = max(0, min(1, (SPEED_MAX - speed)/SPEED_INT_WIDTH))
+				local launchMult = recentMult*speedMult
+				
 				local _,_,_, _, ny, _ = Spring.GetUnitPosition(nearID, true)
 				local ndy = ty - ny
 				local flyTime = math.max(MIN_FLY_TIME, math.min(MAX_FLY_TIME, math.sqrt(math.abs(ndy))*10))
 				
 				local px, py, pz = odx/flyTime, flyTime*GRAVITY/2 + ndy/flyTime, odz/flyTime
+				
 				local vx, vy, vz = Spring.GetUnitVelocity(nearID)
-				GG.AddGadgetImpulseRaw(nearID, px - vx, py - vy, pz - vz, true, true, nil, nil, true)
+				GG.AddGadgetImpulseRaw(nearID, (px - vx)*launchMult, (py - vy)*launchMult, (pz - vz)*launchMult, true, true, nil, nil, true)
 				SetUnitDrag(nearID, 0)
 				GG.SetCollisionDamageMult(nearID, 0)
 				Spring.SetUnitLeaveTracks(nearID, false)
@@ -390,7 +413,8 @@ local function DrawThrowerWires(unitID, data, index, spec, myAllyTeam)
 		if nearUnits then
 			for i = 1, #nearUnits do
 				local nearID = nearUnits[i]
-				if UnitIsActive(nearID) and ValidThrowTarget(unitID, nearID) and not alreadyWired[nearID] then
+				local _, _, _, speed = Spring.GetUnitVelocity(nearID)
+				if UnitIsActive(nearID) and ValidThrowTarget(unitID, nearID, speed) and not alreadyWired[nearID] then
 					DrawWire(unitID, nearID, spec, myAllyTeam, x, y, z)
 					alreadyWired[nearID] = true
 				end

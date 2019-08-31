@@ -59,10 +59,6 @@ local recommendedStartposRadius = 256
 
 local startTimer = Spring.GetTimer()
 
-local minY, maxY = Spring.GetGroundExtremes()
-local avgY = (maxY+minY)/2
-local sumY = (maxY-minY) + 100 -- with some leeway
-
 local function drawOwnBox ()
 	if not allyStartBox then return end
 	gl.BeginEnd(GL.TRIANGLES, function()
@@ -147,6 +143,10 @@ local function drawEnemyBoxes ()
 end
 
 local function drawBoxes()
+	local minY, maxY = Spring.GetGroundExtremes()
+	local avgY = (maxY+minY)/2
+	local sumY = (maxY-minY) + 100 -- with some leeway
+
 	gl.PushMatrix()
 	gl.Translate(0, avgY, 0)
 	gl.Scale(1, sumY, 1)
