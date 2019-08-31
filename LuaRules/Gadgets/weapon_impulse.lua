@@ -327,7 +327,7 @@ local function PushPullToggleCommand(unitID, unitDefID, state)
 		state = pushPullState[unitID]
 	end
 	
-	if state then
+	if state and GG.DelegateOrder then
 		GG.DelegateOrder(unitID, CMD_ONOFF, {state, CMD_PUSH_PULL}, 0)
 	end
 end

@@ -55,8 +55,8 @@ local function DelegateOrder(unitID, cmdID, cmdParams, cmdOptions)
 	commands[commandCount] = {unitID = unitID, cmdID = cmdID, params = cmdParams, options = cmdOptions}
 end
 
+GG.DelegateOrder = DelegateOrder
 function gadget:Initialize()
-	GG.DelegateOrder = DelegateOrder
 	ghRemoveCallIn(gh, 'GameFrame')
 end
 
