@@ -12,6 +12,9 @@ for id, data in pairs(WeaponDefs) do
 			duration = tonumber(cp.area_damage_duration) * 30,
 			rangeFall = tonumber(cp.area_damage_range_falloff),
 			timeFall = tonumber(cp.area_damage_time_falloff),
+			heightMax = tonumber(cp.area_damage_height_max),
+			heightInt = tonumber(cp.area_damage_height_int),
+			heightReduce = tonumber(cp.area_damage_height_reduce),
 		}
 		array[id].timeLoss = array[id].damage * array[id].timeFall * DAMAGE_PERIOD/array[id].duration
 	end

@@ -96,6 +96,9 @@ unitDef = {
         area_damage_duration = 13.3,
         area_damage_range_falloff = 0.4,
         area_damage_time_falloff = 0.6,
+        area_damage_height_max = 1200,
+        area_damage_height_int = 400,
+        area_damage_height_reduce = 160,
         
         light_color = [[1 1 1]],
         light_radius = 500,

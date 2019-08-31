@@ -58,14 +58,33 @@ end
 
 function gadget:Explosion(weaponID, px, py, pz, ownerID)
 	if (weaponInfo[weaponID]) then
+		local weaponDamage = weaponInfo[weaponID].damage
+		local timeLoss     = weaponInfo[weaponID].timeLoss
+		local heightMax    = weaponInfo[weaponID].heightMax
+		if heightMax then
+			local heightInt = weaponInfo[weaponID].heightInt or heightMax
+			local height = (py - math.max(0, Spring.GetGroundHeight(px, pz) or 0))
+			if height > heightMax then
+				return false
+			elseif height > heightMax - heightInt then
+				local mult = ((heightMax - height)/heightInt)
+				weaponDamage = weaponDamage*mult
+				timeLoss     = timeLoss*mult
+				local heightReduce = weaponInfo[weaponID].heightReduce
+				if heightReduce then
+					py = py - (1 - mult)*heightReduce
+				end
+			end
+		end
+		
 		explosionCount = explosionCount + 1
 		explosionList[explosionCount] = {
 			radius = weaponInfo[weaponID].radius,
-			damage = weaponInfo[weaponID].damage,
+			damage = weaponDamage,
 			impulse = weaponInfo[weaponID].impulse,
 			expiry = frameNum + weaponInfo[weaponID].duration,
 			rangeFall = weaponInfo[weaponID].rangeFall,
-			timeLoss = weaponInfo[weaponID].timeLoss,
+			timeLoss = timeLoss,
 			id = weaponID,
 			pos = {x = px, y = py, z = pz},
 			owner=ownerID,
