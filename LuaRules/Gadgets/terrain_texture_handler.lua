@@ -25,8 +25,6 @@ local BLOCK_SIZE = 8
 local spSetMapSquareTexture = Spring.SetMapSquareTexture
 local spGetMapSquareTexture = Spring.GetMapSquareTexture
 local spGetMyTeamID         = Spring.GetMyTeamID
-local spGetGroundHeight     = Spring.GetGroundHeight
-local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
 local floor = math.floor
 
 local SAVE_FILE = "Gadgets/terrain_texture_handler.lua"
@@ -217,6 +215,27 @@ local function drawCopySquare()
 	gl.TexRect(-1,1,1,-1)
 end
 
+local function DrawTextureOnSquare(x, z, size, sx, sz, xsize, zsize)
+	local x1 = 2*x/SQUARE_SIZE - 1
+	local z1 = 2*z/SQUARE_SIZE - 1
+	local x2 = 2*(x+size)/SQUARE_SIZE - 1
+	local z2 = 2*(z+size)/SQUARE_SIZE - 1
+	gl.TexRect(x1, z1, x2, z2, sx, sz, sx+xsize, sz+zsize)
+end
+
+local function GetMapTexture(sx, sz, texMipLvl, luaTex)
+	Spring.Echo("GG.mapgen_fulltex", GG.mapgen_fulltex)
+	if GG.mapgen_fulltex then
+		gl.Texture(GG.mapgen_fulltex)
+		gl.RenderToTexture(luaTex, DrawTextureOnSquare, 0, 0, SQUARE_SIZE, sx*SQUARE_SIZE/MAP_WIDTH, sz*SQUARE_SIZE/MAP_HEIGHT, SQUARE_SIZE/MAP_WIDTH, SQUARE_SIZE/MAP_HEIGHT)
+	elseif GG.mapgen_squareTexture and GG.mapgen_squareTexture[sx] and GG.mapgen_squareTexture[sx][sz] then
+		gl.Texture(GG.mapgen_squareTexture[sx][sz])
+		gl.RenderToTexture(luaTex, drawCopySquare)
+	else
+		spGetMapSquareTexture(sx, sz, texMipLvl, luaTex)
+	end
+end
+
 function gadget:DrawGenesis()
 	--Process gadget:UnsyncedHeightMapUpdate() data--
 	local updateCount = 1
@@ -291,7 +310,7 @@ function gadget:DrawGenesis()
 						}),
 					}
 					if mapTex[sx][sz].orig and mapTex[sx][sz].cur then
-						spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].orig)
+						GetMapTexture(sx, sz, 0, mapTex[sx][sz].orig)
 						--spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].cur)
 						gl.Texture(mapTex[sx][sz].orig)
 						gl.RenderToTexture(mapTex[sx][sz].cur, drawCopySquare)

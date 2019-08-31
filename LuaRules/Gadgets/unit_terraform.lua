@@ -395,6 +395,13 @@ local function SetupPointStructure(point, structArea, segArea)
 	end
 end
 
+local function GetGroundOrigHeightOverride(x, z, xOff, zOff)
+	if GG.mapgen_origHeight and GG.mapgen_origHeight[x] and GG.mapgen_origHeight[x][z] then
+		return GG.mapgen_origHeight[x][z]
+	end
+	return spGetGroundOrigHeight(x +  (xOff or 0), z + (zOff or 0))
+end
+
 --------------------------------------------------------------------------------
 -- Terraform Calculation Functions
 --------------------------------------------------------------------------------
@@ -1132,7 +1139,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 								segment[n].point[pc].orHeight = currHeight
 								segment[n].point[pc].prevHeight = currHeight
 								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,
-										spGetGroundOrigHeight(segment[n].point[pc].x, segment[n].point[pc].z),segment[n].point[pc].x, segment[n].point[pc].z) then
+										GetGroundOrigHeightOverride(segment[n].point[pc].x, segment[n].point[pc].z),segment[n].point[pc].x, segment[n].point[pc].z) then
 									pc = pc + 1
 								end
 							end
@@ -1276,7 +1283,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
-				segment[i].point[j].aimHeight = spGetGroundOrigHeight(segment[i].point[j].x, segment[i].point[j].z)
+				segment[i].point[j].aimHeight = GetGroundOrigHeightOverride(segment[i].point[j].x, segment[i].point[j].z)
 				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
 				
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
@@ -1581,7 +1588,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 						for x = lx, lx+8, 8 do
 							for z = lz, lz+8, 8 do
 								local currHeight = spGetGroundHeight(x, z)
-								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(x, z), x, z) then
+								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,GetGroundOrigHeightOverride(x, z), x, z) then
 									segment[n].point[m] = {x = x, z = z, orHeight = currHeight, prevHeight = currHeight}
 									m = m + 1
 									totalX = totalX + x
@@ -1597,7 +1604,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 						-- fill in bottom right if it is missing
 						if right and bottom then
 							local currHeight = spGetGroundHeight(lx+16, lz+16)
-							if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, lz+16), lx+16, lz+16) then
+							if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,GetGroundOrigHeightOverride(lx+16, lz+16), lx+16, lz+16) then
 								segment[n].point[m] = {x = lx+16, z = lz+16, orHeight = currHeight, prevHeight = currHeight}
 								m = m + 1
 								totalX = totalX + lx+16
@@ -1609,7 +1616,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 						if right then
 							for z = lz, lz+8, 8 do
 								local currHeight = spGetGroundHeight(lx+16, z)
-								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, z), lx+16, z) then
+								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,GetGroundOrigHeightOverride(lx+16, z), lx+16, z) then
 									segment[n].point[m] = {x = lx+16, z = z, orHeight = currHeight, prevHeight = currHeight}
 									m = m + 1
 									totalX = totalX + lx+16
@@ -1622,7 +1629,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 						if bottom then
 							for x = lx, lx+8, 8 do
 								local currHeight = spGetGroundHeight(x, lz+16)
-								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(x, lz+16), x, lz+16) then
+								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,GetGroundOrigHeightOverride(x, lz+16), x, lz+16) then
 									segment[n].point[m] = {x = x, z = lz+16, orHeight = currHeight, prevHeight = currHeight}
 									m = m + 1
 									totalX = totalX + x
@@ -1759,7 +1766,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
-				segment[i].point[j].aimHeight = spGetGroundOrigHeight(segment[i].point[j].x, segment[i].point[j].z)
+				segment[i].point[j].aimHeight = GetGroundOrigHeightOverride(segment[i].point[j].x, segment[i].point[j].z)
 				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
 				
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
@@ -2941,7 +2948,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 			local edge = drawingList[i].edge
 			drawingList[i].edge = nil -- don't sent to other gadget to send to unsynced
 			-- edge exists because raised walls have passability at higher normal than uniform ramps
-			local oHeight = spGetGroundOrigHeight(x,z)
+			local oHeight = GetGroundOrigHeightOverride(drawingList[i].x, drawingList[i].z, 4, 4)
 			local height = spGetGroundHeight(x,z)
 			if abs(oHeight-height) < 1 then
 				drawingList[i].tex = 0
