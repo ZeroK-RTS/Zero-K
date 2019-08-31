@@ -145,7 +145,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		tx, ty, tz = targetPos[1], targetPos[2], targetPos[3]
 	else
 		_, _, _, tx, ty, tz = Spring.GetUnitPosition(targetPos, true)
-		local groundHeight = math.max(Spring.GetGroundHeight(tx, tz) or 0, 0)
+		local groundHeight = math.max(Spring.Utilities.GetGroundHeightMinusOffmap(tx, tz) or 0, 0)
 		ty = math.min(ty, groundHeight - MAX_ALTITUDE_AIM)
 	end
 	ty = math.max(ty, 0)

@@ -63,7 +63,7 @@ function gadget:Explosion(weaponID, px, py, pz, ownerID)
 		local heightMax    = weaponInfo[weaponID].heightMax
 		if heightMax then
 			local heightInt = weaponInfo[weaponID].heightInt or heightMax
-			local height = (py - math.max(0, Spring.GetGroundHeight(px, pz) or 0))
+			local height = (py - math.max(0, Spring.Utilities.GetGroundHeightMinusOffmap(px, pz) or 0))
 			if height > heightMax then
 				return false
 			elseif height > heightMax - heightInt then

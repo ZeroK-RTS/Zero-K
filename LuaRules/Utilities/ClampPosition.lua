@@ -52,3 +52,19 @@ function Spring.Utilities.GiveClampedMoveGoalToUnit(unitID, x, z, speed, raw)
 	Spring.SetUnitMoveGoal(unitID, x, y, z, 16, speed, raw) -- The last argument is whether the goal is raw
 	return true
 end
+
+function Spring.Utilities.GetGroundHeightMinusOffmap(x, z)
+	local maxOff = 0
+	if x < 0 then
+		maxOff = -x
+	elseif x > mapWidth then
+		maxOff = x - mapWidth
+	end
+	if z < -maxOff then
+		maxOff = -z
+	elseif z > mapHeight + maxOff then
+		maxOff = z - mapWidth
+	end
+	return Spring.GetGroundHeight(x, z) - maxOff
+end
+
