@@ -23,8 +23,10 @@ local spTransferUnit = Spring.TransferUnit
 local transfers = {}
 local alreadyAdded
 
+GG.starlightSatelliteInvulnerable = GG.starlightSatelliteInvulnerable or {}
 --local starlights = {}
 
+local satelliteDefID = UnitDefNames["starlight_satellite"].id
 local starlightDefID = UnitDefNames["mahlazer"].id
 local starlightWeapons = {}
 for i = 1, #UnitDefs[starlightDefID].weapons do
@@ -82,17 +84,12 @@ end
 --------------------------------------------------------------------------------
 -- Initialization
 
---function gadget:UnitCreated(unitID, unitDefID)
---	if unitDefID == starlightDefID then
---		starlights[unitID] = true
---	end
---end
---
---function gadget:UnitDestroyed(unitID, unitDefID)
---	if unitDefID == starlightDefID then
---		starlights[unitID] = nil
---	end
---end
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+	if unitDefID == satelliteDefID and GG.starlightSatelliteInvulnerable[unitID] then
+		return 0
+	end
+	return damage
+end
 
 function gadget:Initialize()
 	alreadyAdded = false
@@ -110,6 +107,15 @@ function gadget:Initialize()
 			Script.SetWatchExplosion(weaponDefID, true)
 		else
 			Script.SetWatchWeapon(weaponDefID, true)
+		end
+	end
+end
+
+function gadget:Shutdown()
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		if unitDefID == satelliteDefID then
+			Spring.DestroyUnit(unitID, false, true)
 		end
 	end
 end

@@ -382,7 +382,6 @@ function script.Activate()
 end
 
 function script.Deactivate()
-	Spring.Echo("Deactivate", Spring.GetGameFrame())
 	Signal(SIG_DOCK)
 	StartThread(Dock)
 	StartThread(SpiralDown)
