@@ -45,7 +45,7 @@ local stateCommands = {	-- FIXME: is there a better way of doing this?
   [CMD_WANT_CLOAK] = true,	-- this is the only one that's really needed, since it can occur without user input (when a temporarily decloaked unit recloaks)
   [CMD.FIRE_STATE] = true,
   [CMD.MOVE_STATE] = true,
-  [CMD.ONOFF] = true,
+  [CMD_WANT_ONOFF] = true,
   [CMD.REPEAT] = true,
   [CMD.IDLEMODE] = true,
 }

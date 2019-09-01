@@ -222,7 +222,7 @@ local overrides = {
 	[CMD_RECALL_DRONES] = {caption= '', texture = imageDir .. 'Bold/recall_drones.png'},
 
 	-- states
-	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, caption=''},
+	[CMD_WANT_ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, caption=''},
 	[CMD_UNIT_AI] = { texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'}, caption=''},
 	[CMD.REPEAT] = { texture = {imageDir .. 'states/repeat_off.png', imageDir .. 'states/repeat_on.png'}, caption='', tooltip = tooltips["repeat"]},
 	[CMD.CLOAK] = { texture = {imageDir .. 'states/cloak_off.png', imageDir .. 'states/cloak_on.png'},
@@ -282,7 +282,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	rawmove=1,
 
 	-- states
-	onoff=2,
+	wantonoff=2,
 	['repeat']=2,
 	cloak=2,
 	movestate=2,

@@ -118,7 +118,7 @@ return {
 		{	"pastetext",	"Ctrl+v",},
 		{	"wait",	"ctrl+w",},
 		{	"areamex",	"w",},
-		{	"onoff",	"o",},
+		{	"wantonoff",	"o",},
 		{	"pushpull",	"o",},
 		{	"buildspacing dec",	"Any+x",},
 		{	"buildspacing inc",	"Any+z",},

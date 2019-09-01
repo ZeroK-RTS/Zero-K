@@ -31,7 +31,7 @@ local custom_cmd_actions = {
 	rawmove = {cmdType = 1, name = "Move"},
 
 	-- states
-	onoff = {cmdType = 2, name = "On/Off", states = {'Off', 'On'}},
+	wantonoff = {cmdType = 2, name = "On/Off", states = {'Off', 'On'}},
 	['repeat'] = {cmdType = 2, name = "Repeat", states = {'Off', 'On'}},
 	wantcloak = {cmdType = 2, name = "Cloak", states = {'Off', 'On'}},
 	movestate = {cmdType = 2, name = "Move State", states = {'Hold Position', 'Maneuver', 'Roam'}},
@@ -139,7 +139,7 @@ local usedActions = {
 	["embark"] = true,
 	["disembark"] = true,
 	["transportto"] = true,
-	["onoff"] = true,
+	["wantonoff"] = true,
 	["miscpriority"] = true,
 	["manualfire"] = true,
 	["repair"] = true,

@@ -81,6 +81,7 @@ CMD_ANTINUKEZONE = 35130 -- ceasefire
 CMD_UNIT_KILL_SUBORDINATES = 35821 -- unit_capture
 CMD_DISABLE_ATTACK = 35822 -- unit_launcher
 CMD_PUSH_PULL = 35666 -- weapon_impulse
+CMD_WANT_ONOFF = 35667
 CMD_UNIT_AI = 36214
 CMD_WANT_CLOAK = 37382
 CMD_DONT_FIRE_AT_RADAR = 38372 -- fire at radar toggle gadget

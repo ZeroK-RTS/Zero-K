@@ -2,12 +2,12 @@
 ----------------------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
-		name 	= "Gameframe Orders",
-		desc	= "Delegates unit orders to GameFrame to avoid AllowCommand recursion",
-		author	= "Histidine (L.J. Lim)",
-		date	= "2018.05.20",
-		license	= "GNU GPL, v2 or later",
-		layer	= math.huge,
+		name    = "Gameframe Orders",
+		desc    = "Delegates unit orders to GameFrame to avoid AllowCommand recursion",
+		author  = "Histidine (L.J. Lim)",
+		date    = "2018.05.20",
+		license = "GNU GPL, v2 or later",
+		layer   = math.huge,
 		enabled = true,
 	}
 end
@@ -17,7 +17,7 @@ if gadgetHandler:IsSyncedCode() then
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 
-local commands = {}	-- [1] = {unitID = id or array, cmdID = bla, params = bla, ...}
+local commands = {} -- [1] = {unitID = id or array, cmdID = bla, params = bla, ...}
 local commandCount = 0
 
 local gh = gadgetHandler
@@ -33,7 +33,7 @@ local function ExecuteCommand(cmd)
 end
 
 function gadget:GameFrame(n)
-	for i=1, commandCount do
+	for i = 1, commandCount do
 		local cmd = commands[i]
 		local success, err = pcall(ExecuteCommand, cmd)
 		if not success then
@@ -54,11 +54,7 @@ local function DelegateOrder(unitID, cmdID, cmdParams, cmdOptions)
 	commandCount = commandCount + 1
 	commands[commandCount] = {unitID = unitID, cmdID = cmdID, params = cmdParams, options = cmdOptions}
 end
-
 GG.DelegateOrder = DelegateOrder
-function gadget:Initialize()
-	ghRemoveCallIn(gh, 'GameFrame')
-end
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------

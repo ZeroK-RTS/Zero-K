@@ -1116,9 +1116,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		QueueState(name, "fire_at_radar", CMD_DONT_FIRE_AT_RADAR, orderArray, true)
 		QueueState(name, "personal_cloak_0", CMD_WANT_CLOAK, orderArray)
 		QueueState(name, "impulseMode", CMD_PUSH_PULL, orderArray)
+		QueueState(name, "activateWhenBuilt", CMD_WANT_ONOFF, orderArray)
 	end
 
-	if #orderArray>0 then
+	if #orderArray > 0 then
 		Spring.GiveOrderArrayToUnitArray ({unitID,},orderArray) --give out all orders at once
 	end
 	orderArray = nil
@@ -1177,9 +1178,8 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 
 	local name = UnitDefs[unitDefID].name
 	QueueState(name, "constructor_buildpriority", CMD_PRIORITY, orderArray)
-	QueueState(name, "activateWhenBuilt", CMD.ONOFF, orderArray)
 
-	if #orderArray>0 then
+	if #orderArray > 0 then
 		Spring.GiveOrderArrayToUnitArray ({unitID,},orderArray) --give out all orders at once
 	end
 	orderArray = nil

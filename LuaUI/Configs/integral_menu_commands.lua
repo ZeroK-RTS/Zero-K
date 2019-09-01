@@ -316,7 +316,7 @@ local imageDir = 'LuaUI/Images/commands/'
 --autoCallTransport =
 
 local tooltips = {
-	ONOFF = "Activation (_STATE_)\n  Toggles some unit abilities.",
+	WANT_ONOFF = "Activation (_STATE_)\n  Toggles some unit abilities.",
 	UNIT_AI = "Unit AI (_STATE_)\n  Move intelligently in combat.",
 	REPEAT = "Repeat (_STATE_)\n  Loop command queue. Construction queue for factories.",
 	WANT_CLOAK = "Cloak (_STATE_)\n  Makes the unit invisible, unless it fires, takes damage, or is too close to an enemy unit.",
@@ -396,9 +396,9 @@ local overrides = {
 	[CMD_RECALL_DRONES] = {texture = imageDir .. 'Bold/recall_drones.png'},
 
 	-- states
-	[CMD.ONOFF] = {
+	[CMD_WANT_ONOFF] = {
 		texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'},
-		stateTooltip = {tooltips.ONOFF:gsub("_STATE_", "Off"), tooltips.ONOFF:gsub("_STATE_", "On")}
+		stateTooltip = {tooltips.WANT_ONOFF:gsub("_STATE_", "Off"), tooltips.WANT_ONOFF:gsub("_STATE_", "On")}
 	},
 	[CMD_UNIT_AI] = {
 		texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'},

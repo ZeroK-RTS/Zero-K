@@ -173,6 +173,10 @@ function Dock()
 	Move(LongSpikes,z_axis, -10,1.5)
 	Sleep(100)
 	
+	while not Spring.ValidUnitID(satUnitID) do
+		Sleep(30)
+	end
+	
 	local dx, _, dz = Spring.GetUnitDirection(unitID)
 	if dx then
 		local heading = Vector.Angle(dx, dz)
@@ -300,23 +304,19 @@ function TargetingLaser()
 	end
 end
 
-function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
-	-- Give the targeter +500 extra range to allow the build UI to show what a Starlight can hit
-	Spring.SetUnitWeaponState(unitID, 1, "range", 10500)
+local function SnapSatellite()
+	while true do
+		local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount)
+		Spring.MoveCtrl.SetPosition(satUnitID,x,y,z)
+		Sleep(30)
+	end
+end
 
-	--Move(ShortSpikes,z_axis, -5)
-	--Move(LongSpikes,z_axis, -10)
-	local facing = Spring.GetUnitBuildFacing(unitID)
+local function DeferredInitialize()
+	while select(3, Spring.GetUnitIsStunned(unitID)) do
+		Sleep(30)
+	end
 	
-	wantedDirection = math.pi*(3 - facing)/2
-end
-
-function script.Activate()
-	StartThread(DeferredActivate);
-end
-
-function DeferredActivate()
 	Spin(UpperCoil, z_axis, 10,0.5)
 	Spin(LowerCoil, z_axis, 10,0.5)
 	
@@ -331,7 +331,7 @@ function DeferredActivate()
 	local heading = Vector.Angle(dx, dz)
 	
 	while not Spring.ValidUnitID(satUnitID) do
-		Sleep(1)
+		Sleep(30)
 		satUnitID = Spring.CreateUnit('starlight_satellite',x,y,z,0,Spring.GetUnitTeam(unitID))
 		if satUnitID then
 			satelliteCreated = true
@@ -361,11 +361,28 @@ function DeferredActivate()
 	end
 	
 	StartThread(SnapSatellite)
+end
+
+function script.Create()
+	StartThread(GG.Script.SmokeUnit, smokePiece)
+	-- Give the targeter +500 extra range to allow the build UI to show what a Starlight can hit
+	Spring.SetUnitWeaponState(unitID, 1, "range", 10500)
+
+	--Move(ShortSpikes,z_axis, -5)
+	--Move(LongSpikes,z_axis, -10)
+	local facing = Spring.GetUnitBuildFacing(unitID)
+	
+	wantedDirection = math.pi*(3 - facing)/2
+	StartThread(DeferredInitialize)
+end
+
+function script.Activate()
 	Signal(SIG_DOCK)
 	StartThread(Undock)
 end
 
 function script.Deactivate()
+	Spring.Echo("Deactivate", Spring.GetGameFrame())
 	Signal(SIG_DOCK)
 	StartThread(Dock)
 	StartThread(SpiralDown)
@@ -394,14 +411,6 @@ function script.AimWeapon(num, heading, pitch)
 		return aimingDone
 	end
 	return false
-end
-
-function SnapSatellite()
-	while true do
-		local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount)
-		Spring.MoveCtrl.SetPosition(satUnitID,x,y,z)
-		Sleep(30)
-	end
 end
 
 function script.QueryWeapon(num)
