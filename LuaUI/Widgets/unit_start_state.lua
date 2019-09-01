@@ -1211,6 +1211,13 @@ function widget:PlayerChanged()
 end
 
 function widget:GameFrame(n)
+	if Spring.GetGameState then
+		local finishedLoading, loadedFromSave, locallyPaused, lagging = Spring.GetGameState()
+		if loadedFromSave then
+			widgetHandler:RemoveCallIn("GameFrame", self)
+			return
+		end
+	end
 	if n < 10 then
 		return
 	end
