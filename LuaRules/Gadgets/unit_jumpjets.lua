@@ -346,7 +346,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			mcSetPosition(unitID, x, y, z)
 			if x0 then
 				jumping[unitID] = {x - x0, y - y0, z - z0}
-				spSetUnitVelocity(unitID, (x - x0)/30, (y - y0)/30, (z - z0)/30) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
+				spSetUnitVelocity(unitID, (x - x0), (y - y0), (z - z0)) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
 			end
 
 			Spring.UnitScript.CallAsUnit(unitID, env.jumping, i * 100)
