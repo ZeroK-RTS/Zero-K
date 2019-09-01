@@ -169,6 +169,9 @@ local function AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, uni
 	if doLosCheck and moveType == 2 then -- Only los check for land/sea units.
 		GG.AddSphericalLOSCheck(unitID, unitDefID)
 	end
+	if moveType == 1 then
+		GG.AddOscillateCheck(unitID, unitDefID)
+	end
 	thereIsStuffToDo = true
 end
 

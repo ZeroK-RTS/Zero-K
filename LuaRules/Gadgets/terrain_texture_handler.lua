@@ -224,7 +224,6 @@ local function DrawTextureOnSquare(x, z, size, sx, sz, xsize, zsize)
 end
 
 local function GetMapTexture(sx, sz, texMipLvl, luaTex)
-	Spring.Echo("GG.mapgen_fulltex", GG.mapgen_fulltex)
 	if GG.mapgen_fulltex then
 		gl.Texture(GG.mapgen_fulltex)
 		gl.RenderToTexture(luaTex, DrawTextureOnSquare, 0, 0, SQUARE_SIZE, sx*SQUARE_SIZE/MAP_WIDTH, sz*SQUARE_SIZE/MAP_HEIGHT, SQUARE_SIZE/MAP_WIDTH, SQUARE_SIZE/MAP_HEIGHT)
