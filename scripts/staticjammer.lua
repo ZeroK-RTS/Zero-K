@@ -4,7 +4,7 @@ local base, cylinder, turret, jammersturret, jam1, jam2, deploy = piece ('base',
 local smokePiece = {base}
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Activate()

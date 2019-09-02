@@ -287,7 +287,7 @@ function script.Create()
 	Hide(jet1)
 	Hide(jet2)
 	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function Stopping()

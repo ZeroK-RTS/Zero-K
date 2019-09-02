@@ -93,7 +93,7 @@ local function Close()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 function script.Activate()
 	Spin(radar, y_axis, math.rad(100))

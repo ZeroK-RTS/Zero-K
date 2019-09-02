@@ -37,7 +37,7 @@ function script.Create()
 	Hide(flare)
 	Hide(muzzle)
 	Hide(barrel_back)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(DisableCheck)
 	SetupQueryWeaponFixHax(query, flare)
 end

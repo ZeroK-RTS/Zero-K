@@ -53,7 +53,7 @@ function script.Create()
 	Turn(turretPieces[4].turret, y_axis, math.rad(180))
 	Turn(turretPieces[5].turret, y_axis, math.rad(180))
 	Spin(radardish, y_axis, math.rad(100))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function RestoreAfterDelay()

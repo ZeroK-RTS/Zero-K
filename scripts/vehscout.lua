@@ -63,7 +63,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, {bwheel, fwheel})
+	StartThread(GG.Script.SmokeUnit, unitID, {bwheel, fwheel})
 end
 
 local function RestoreAfterDelay()

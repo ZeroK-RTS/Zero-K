@@ -60,7 +60,7 @@ end
 function script.Create()
 	Hide(energyball)
 
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(Anim)
 end
 

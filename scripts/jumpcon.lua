@@ -587,7 +587,7 @@ function script.Create()
 	Hide(jump)
 	Hide(flare)
 	Turn(thrust, x_axis, math.rad(70), math.rad(2000))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, {nanoPiece})
 end
 

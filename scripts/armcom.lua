@@ -166,7 +166,7 @@ function script.Create()
 	Turn(lfirept, x_axis, math.rad(145))
 	Turn(rbigflash, x_axis, math.rad(145))
 	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

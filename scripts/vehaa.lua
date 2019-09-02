@@ -177,7 +177,7 @@ function script.Create()
 	moving = false
 	StartThread(Suspension)
 	StartThread(AnimControl)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 -- Weapons

@@ -213,7 +213,7 @@ function script.Create()
 --	Turn(rhand, x_axis, math.rad(41))
 --	Turn(lnanohand, x_axis, math.rad(36))
 	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

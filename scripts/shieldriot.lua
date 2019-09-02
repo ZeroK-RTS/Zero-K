@@ -141,7 +141,7 @@ end
 
 function script.Create()
 	--Move(emit, y_axis, 20)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function AutoAttack_Thread()

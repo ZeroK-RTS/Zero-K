@@ -85,7 +85,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread (GG.Script.SmokeUnit, {torso, flare})
+	StartThread (GG.Script.SmokeUnit, unitID, {torso, flare})
 end
 
 function script.AimFromWeapon(num)

@@ -138,7 +138,7 @@ local function Close()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, {pipe, lidh2, piece "smoke_1"})
+	StartThread(GG.Script.SmokeUnit, unitID, {pipe, lidh2, piece "smoke_1"})
 	Spring.SetUnitNanoPieces(unitID, {emit})
 	StartThread(Open)
 end

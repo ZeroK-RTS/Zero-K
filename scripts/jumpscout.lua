@@ -171,7 +171,7 @@ end
 
 function script.Create()
 	Turn(fire, x_axis, math.rad(-45.000000))
-	StartThread(GG.Script.SmokeUnit, {pelvis})
+	StartThread(GG.Script.SmokeUnit, unitID, {pelvis})
 end
 
 function script.StartMoving()

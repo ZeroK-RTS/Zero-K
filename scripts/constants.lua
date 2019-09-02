@@ -60,7 +60,7 @@ GG.Script.DETO_W8 = 4103
 GG.Script.SMOKEPUFF = 258
 
 -- useful functions
-function GG.Script.SmokeUnit(smokePiece, multiplier)
+function GG.Script.SmokeUnit(unitID, smokePiece, multiplier)
 	multiplier = multiplier or 1
 	local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
 	

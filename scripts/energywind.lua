@@ -82,7 +82,7 @@ function InitializeWind()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	baseDirection = math.random(0,GG.Script.tau)
 	Turn(base, y_axis, baseDirection)
 	baseDirection = baseDirection + hpi * Spring.GetUnitBuildFacing(unitID)

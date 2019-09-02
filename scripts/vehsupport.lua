@@ -283,7 +283,7 @@ function script.Create()
 	StartThread(SetDeploy,true)
 	StartThread(Suspension)
 	StartThread(AnimControl)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--StartThread(KeepStatic)
 	
 	Move(aim, y_axis, 10)

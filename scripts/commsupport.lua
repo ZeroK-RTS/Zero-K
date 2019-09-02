@@ -318,7 +318,7 @@ function script.Create()
 
 	StartThread(MotionControl)
 	StartThread(RestoreAfterDelay)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

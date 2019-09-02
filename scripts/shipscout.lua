@@ -19,7 +19,7 @@ local gun_1 = 0
 
 function script.Create()
 	restore_delay = 3000
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(turret, x_axis, math.rad(-90), math.rad(10000))
 	Turn(doorl, z_axis, math.rad(-100), math.rad(240))
 	Turn(doorr, z_axis, math.rad(100), math.rad(240))

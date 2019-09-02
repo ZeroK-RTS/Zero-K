@@ -182,7 +182,7 @@ function script.Create()
 	Move(rrack, z_axis, -4)
 	Move(lrack, z_axis, -4)
 
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(TiltBody)
 end
 

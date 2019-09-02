@@ -75,7 +75,7 @@ function script.Create()
 	Turn(turret2, y_axis, math.rad(180))
 	Turn(turret3, y_axis, math.rad(180))
 	Spin(radar, y_axis, math.rad(100))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 end
 

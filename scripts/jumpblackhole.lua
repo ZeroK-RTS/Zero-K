@@ -41,7 +41,7 @@ local SIG_Walk = 2
 local SIG_Aim = 4
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(flare, x_axis, 1.6, 5)
 	Turn(lshoulder, x_axis, -0.9, 5)
 	Turn(lforearm, z_axis, -0.2, 5)

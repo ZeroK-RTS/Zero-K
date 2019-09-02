@@ -140,7 +140,7 @@ end
 
 function script.Create()
 	Hide(ground1)
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)

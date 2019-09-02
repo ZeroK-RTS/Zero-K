@@ -460,7 +460,7 @@ end
 function script.Create()
 	Turn(dust1, x_axis, math.rad(90))
 	Turn(dust2, x_axis, math.rad(90))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(PickupAndDropFixer)
 	--StartThread(DustLoop)	-- looks stupid
 	

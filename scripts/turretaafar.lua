@@ -137,7 +137,7 @@ function script.Create()
 		Hide(plovak)
 	end
 	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	
 	--Spin(rotating_bas, y_axis, 0.5)
 	

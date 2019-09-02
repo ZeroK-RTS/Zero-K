@@ -114,7 +114,7 @@ function script.Create()
 		Sleep(1000)
 	end
 	StartThread(RestoreAfterDelay)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.AimWeapon(num, heading, pitch)

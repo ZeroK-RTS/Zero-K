@@ -74,7 +74,7 @@ end
 function script.Create()
 	SetInitialBomberSettings()
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Hide(rearthrust)
 	Hide(wingthrust1)
 	Hide(wingthrust2)

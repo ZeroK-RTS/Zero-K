@@ -25,7 +25,7 @@ local bFirepoint2 = false
 
 function script.Create()
 	Turn(turret, y_axis, math.pi)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Move(wingl, x_axis, -5, 7)
 	Move(wingr, x_axis, 5, 7)
 	Hide(turretbase)

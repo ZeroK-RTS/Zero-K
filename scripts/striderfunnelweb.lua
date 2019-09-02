@@ -88,7 +88,7 @@ function script.Create()
 	Move (aimpoint, z_axis, 4)
 	Move (aimpoint, y_axis, 2)
 	Move (aimpoint, x_axis, 0)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

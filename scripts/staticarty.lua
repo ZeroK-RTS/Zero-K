@@ -29,7 +29,7 @@ local RECOIL_RESTORE_SPEED = 1
 local smokePiece = {base, turret}
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.AimWeapon(num, heading, pitch)

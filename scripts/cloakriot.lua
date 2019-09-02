@@ -343,7 +343,7 @@ function script.Create()
 	Hide(rflare)
 	Hide(lflare)
 	
-	StartThread(GG.Script.SmokeUnit, {chest})
+	StartThread(GG.Script.SmokeUnit, unitID, {chest})
 end
 
 function script.StartMoving()

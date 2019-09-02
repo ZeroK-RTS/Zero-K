@@ -69,7 +69,7 @@ local restore_delay = 3000
 local gun_1_yaw = 0
 local dead = false
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 end
 

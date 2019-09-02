@@ -20,7 +20,7 @@ function script.Create()
 		--Hide(float1)
 		--Hide(float2)
 	end
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function Activate()

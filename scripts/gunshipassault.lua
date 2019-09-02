@@ -32,7 +32,7 @@ local function TiltWings()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(TiltWings)
 	Turn(Lwingengine, x_axis, math.rad(-90), math.rad(500))
 	Turn(Rwingengine, x_axis, math.rad(-90), math.rad(500))

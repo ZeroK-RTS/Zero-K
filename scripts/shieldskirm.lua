@@ -160,7 +160,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--gun_1 = torso
 	Turn(r_thigh, x_axis, math.rad(30))
 	Turn(l_thigh, x_axis, math.rad(30))

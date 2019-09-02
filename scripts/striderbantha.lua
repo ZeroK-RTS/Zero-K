@@ -105,7 +105,7 @@ function script.Create()
 	Turn(rarm, z_axis, 0.1)
 	Turn(lmissileflare, z_axis, math.rad(-90))
 	Turn(rmissileflare, z_axis, math.rad(-90))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function IdleAnim()

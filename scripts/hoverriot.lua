@@ -63,7 +63,7 @@ function script.Create()
 	Hide(ground1)
 	Move(ground1, x_axis, 24.2)
 	Move(ground1, y_axis, -8)
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 end

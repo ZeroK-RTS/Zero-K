@@ -153,7 +153,7 @@ local function FireDelayLoop()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(FireDelayLoop)
 	Move(shot1, y_axis, -80)
 end

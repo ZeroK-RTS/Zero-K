@@ -178,7 +178,7 @@ function script.Create()
 	Move(flareR, y_axis, -2)
 	Turn(flareL, x_axis, rightAngle)
 	Turn(flareR, x_axis, rightAngle)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

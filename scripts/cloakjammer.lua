@@ -91,7 +91,7 @@ function script.Deactivate()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, {head, hips, chest})
+	StartThread(GG.Script.SmokeUnit, unitID, {head, hips, chest})
 	Turn(hips, x_axis, math.rad(45))
 end
 	

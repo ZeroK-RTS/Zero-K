@@ -143,7 +143,7 @@ local function WeaponRangeUpdate()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(WeaponRangeUpdate)
 end
 

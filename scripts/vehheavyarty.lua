@@ -164,7 +164,7 @@ function script.Create()
 	Hide(tracks3)
 	Hide(tracks4)
 	Move(bay, x_axis, -BAY_DISTANCE)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -158,7 +158,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, {chest})
+	StartThread(GG.Script.SmokeUnit, unitID, {chest})
 	Turn(rthigh, y_axis, math.rad(-20))
 	Turn(lthigh, y_axis, math.rad(20))
 	Turn(rthigh, z_axis, math.rad(-3))

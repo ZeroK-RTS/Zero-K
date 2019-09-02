@@ -76,7 +76,7 @@ end
 -- Misc
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	Spring.SetUnitNanoPieces(unitID, nanos)
 end
 

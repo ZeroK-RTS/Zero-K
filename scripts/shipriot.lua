@@ -52,7 +52,7 @@ local RESTORE_DELAY = 3000
 
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 
 	Turn(gunb, y_axis, math.rad(-180))
 end

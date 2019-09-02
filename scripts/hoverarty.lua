@@ -80,7 +80,7 @@ function script.Create()
 	for i = 1, 4 do
 		Hide(wheels[i])
 	end
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(HoverFX)
 end
 

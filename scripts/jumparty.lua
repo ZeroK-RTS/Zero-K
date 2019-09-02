@@ -180,7 +180,7 @@ end
 
 function script.Create()
 	bAiming = false
-	StartThread(GG.Script.SmokeUnit, {torso})
+	StartThread(GG.Script.SmokeUnit, unitID, {torso})
 end
 
 function script.StartMoving()

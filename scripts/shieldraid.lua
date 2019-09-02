@@ -57,7 +57,7 @@ end
 
 function script.Create()
 	gun_1 = true
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(rightLeg.thigh, x_axis, math.rad(60))
 	Turn(leftLeg.thigh, x_axis, math.rad(60))
 				

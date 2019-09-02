@@ -19,7 +19,7 @@ local function SpinRadar()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(SpinRadar)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end

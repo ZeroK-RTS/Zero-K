@@ -153,7 +153,7 @@ function script.Create()
 	is_open = true;
 	
 	--StartThread(AimBlink);
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(RestoreAfterDelay);
 
 	Hide(legs);

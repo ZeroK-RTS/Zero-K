@@ -47,7 +47,7 @@ function script.Activate()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	if not Spring.GetUnitIsStunned(unitID) then
 		StartThread(Open)
 	end

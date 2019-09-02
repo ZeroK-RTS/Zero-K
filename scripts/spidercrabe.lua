@@ -254,7 +254,7 @@ function script.Create()
 	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.02)
 	
 	--StartThread(MotionControl)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--StartThread(BlinkingLight)
 	if Spring.GetUnitIsStunned(unitID) then
 		StartThread(CurlDelay)

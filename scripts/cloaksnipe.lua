@@ -199,7 +199,7 @@ end
 
 function script.Create()
 	--Turn(forearmr, x_axis, math.rad(-45), math.rad(280))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	UnpackGunInstant()
 	StartThread(IdleAnim)
 	--StartThread(TorsoHeadingThread)

@@ -60,7 +60,7 @@ function script.Create()
 
 	Move(engShield1, y_axis, 0, 0.5)
 	Move(engShield2, y_axis, 0, 0.5)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	StartThread(TiltBody)
 end

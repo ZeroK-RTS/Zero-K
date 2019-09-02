@@ -590,7 +590,7 @@ function script.Create()
 	
 	--dyncomm.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)

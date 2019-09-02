@@ -240,7 +240,7 @@ function script.Create()
 	Move(l_rocket, x_axis, 2)
 	Move(r_rocket, x_axis, -2)
 	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
-	StartThread(GG.Script.SmokeUnit, smokePieces)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePieces)
 end
 
 function script.AimFromWeapon()

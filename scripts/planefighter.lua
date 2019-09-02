@@ -86,7 +86,7 @@ end
 function script.Create()
 	Move(rwing, x_axis, WING_DISTANCE)
 	Move(lwing, x_axis, -WING_DISTANCE)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.StartMoving()

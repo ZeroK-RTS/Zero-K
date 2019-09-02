@@ -73,7 +73,7 @@ function script.Create()
 	Turn(ex_2, x_axis, math.rad(170))
 	Turn(ex_3, x_axis, math.rad(170))
 	Turn(axle, x_axis, math.rad(-30))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function Walk()

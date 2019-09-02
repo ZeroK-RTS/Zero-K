@@ -95,7 +95,7 @@ function Unstunned (stun_type)
 end
 
 function script.Create()
-	StartThread (GG.Script.SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (1000)
 	end

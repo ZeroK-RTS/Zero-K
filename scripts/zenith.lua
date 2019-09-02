@@ -288,7 +288,7 @@ function script.Create()
 	
 	Move(flare, y_axis, -110)
 	Turn(flare, x_axis, math.rad(-90))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(SpawnProjectileThread)
 	
 	-- Helpful for devving

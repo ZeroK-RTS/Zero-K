@@ -182,7 +182,7 @@ end
 
 function script.Create()
 	on = true
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	SetupQueryWeaponFixHax(cannonAim, flare1)
 end
 

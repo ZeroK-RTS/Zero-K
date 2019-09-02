@@ -213,7 +213,7 @@ function script.Create()
 	--Move(LeftTurretSeat,y_axis,-1.1)
 	--Move(LeftTurretSeat,z_axis,17)
 	--SetDGunCMD()
-	StartThread(GG.Script.SmokeUnit, {RearTurret, RightTurret, LeftTurret})
+	StartThread(GG.Script.SmokeUnit, unitID, {RearTurret, RightTurret, LeftTurret})
 	StartThread(EmitDust)
 	StartThread(DeathAnim)
 end

@@ -55,7 +55,7 @@ end
 
 function script.Create()
 	Turn(firepoint, x_axis, math.rad(-90))
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 end

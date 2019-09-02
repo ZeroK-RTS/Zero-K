@@ -267,5 +267,5 @@ function script.Create()
 	end
 	
 	StartThread(AnimationControl)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end

@@ -103,7 +103,7 @@ end
 
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 --	Turn(armr1, z_axis, math.rad(30), 100)
 --	Turn(arml1, z_axis, math.rad(-30), 100)
 end

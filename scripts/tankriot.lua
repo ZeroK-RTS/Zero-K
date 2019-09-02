@@ -189,7 +189,7 @@ function script.Create()
 	Move (missiles[1], z_axis, 0.5)
 	Move (missiles[2], z_axis, 0.5)
 
-	StartThread (GG.Script.SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Killed (recentDamage, maxHealth)

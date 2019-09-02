@@ -108,7 +108,7 @@ function script.Create()
 	Turn(lshoulder, x_axis, math.rad(22.5))
 	Turn(llarm, x_axis, math.rad(-45))
 
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function RestoreAfterDelay()

@@ -131,7 +131,7 @@ function script.Create()
 	Turn(laftleg, y_axis, math.rad(-45))
 	Turn(raftleg, y_axis, math.rad(45))
 
-	StartThread(GG.Script.SmokeUnit,smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.AimWeapon(num, heading, pitch)

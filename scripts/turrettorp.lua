@@ -47,7 +47,7 @@ function script.Create()
 		Turn(arm2, x_axis, math.rad(180))
 		--Turn(turret, x_axis, math.rad(0))
 	end
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.AimWeapon1(heading, pitch)

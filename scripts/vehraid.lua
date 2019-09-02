@@ -205,5 +205,5 @@ function script.Create()
 	moving = false
 	StartThread(Suspension)
 	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end

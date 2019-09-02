@@ -69,7 +69,7 @@ function script.Create()
 	Turn(rrfanbase, z_axis, math.rad(22.5))
 	Turn(lrfanbase, z_axis, math.rad(-22.5))
 
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(TiltBody)
 end
 

@@ -359,7 +359,7 @@ function script.Create()
 	TANK_MAX = UnitDefs[Spring.GetUnitDefID(unitID)].customParams.maxwatertank
 	--StartThread(Walk)
 
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function RestoreAfterDelay()

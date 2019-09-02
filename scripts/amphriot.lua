@@ -130,7 +130,7 @@ end
 
 function script.Create()
 	--StartThread(Walk)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(WeaponRangeUpdate)
 	local height = select(2, Spring.GetUnitPosition(unitID))
 	if height < -20 then

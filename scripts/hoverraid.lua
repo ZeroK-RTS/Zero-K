@@ -47,7 +47,7 @@ local function MoveScript()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 end

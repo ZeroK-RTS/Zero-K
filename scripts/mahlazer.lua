@@ -364,7 +364,7 @@ local function DeferredInitialize()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	-- Give the targeter +500 extra range to allow the build UI to show what a Starlight can hit
 	Spring.SetUnitWeaponState(unitID, 1, "range", 10500)
 

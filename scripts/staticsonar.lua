@@ -41,7 +41,7 @@ local function Bobbing ()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(Bobbing)
 end
 

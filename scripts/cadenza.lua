@@ -283,7 +283,7 @@ function script.Create()
 		Turn(rbflare1, y_axis, math.rad(45))
 		Turn(rbflare2, y_axis, math.rad(45))
 		
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 		StartThread(SomersaultLoop)
 end
 

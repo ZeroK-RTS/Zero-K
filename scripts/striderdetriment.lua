@@ -89,7 +89,7 @@ function script.Create()
 	Turn(larm, z_axis, -0.1)
 	Turn(rarm, z_axis, 0.1)
 	Turn(shoulderflare, x_axis, math.rad(-90))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function Step(frontLeg, backLeg)

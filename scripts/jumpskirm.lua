@@ -174,7 +174,7 @@ function script.Create()
 	Hide(flare)
 	Hide(support)
 	Hide(barrel)
-	StartThread(GG.Script.SmokeUnit, {torso})
+	StartThread(GG.Script.SmokeUnit, unitID, {torso})
 end
 
 function script.StartMoving()

@@ -144,7 +144,7 @@ local function StopLanded()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 0)
 	-- Permanent changes

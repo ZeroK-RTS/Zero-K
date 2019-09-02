@@ -262,7 +262,7 @@ end
 
 function script.Create()
 	SetInitialBomberSettings()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	GG.FakeUpright.FakeUprightInit(xp, zp, drop)
 	--StartThread(Lights)

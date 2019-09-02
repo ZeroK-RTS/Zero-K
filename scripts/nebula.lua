@@ -53,7 +53,7 @@ end
 
 function script.Create()
 	StartThread(EngineLoop)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--Turn(piece "turret3", z_axis, math.rad(-90))
 	--Turn(piece "turret4", z_axis, math.rad(90))
 	for i=1,2 do

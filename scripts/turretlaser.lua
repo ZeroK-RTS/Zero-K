@@ -30,7 +30,7 @@ function script.Create()
     
 	GG.SetupAimPosTerraform(unitID, unitDefID, mid, aim, midTable.midy + 22, midTable.midy + 40, 15, 40)
 	
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 end
 
 local function StunThread ()
