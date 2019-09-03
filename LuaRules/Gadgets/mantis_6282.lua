@@ -15,6 +15,8 @@ if (not gadgetHandler:IsSyncedCode()) then
 	return
 end
 
+local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(104, 1350)
+
 local lastX, lastY, lastZ, lastFeatureDefID, lastGameFrame
 
 local function Close(x1, x2)
@@ -30,4 +32,10 @@ function gadget:AllowFeatureCreation(featureDefID, teamID, x, y, z)
 	lastX, lastY, lastZ, lastFeatureDefID, lastGameFrame = x, y, z, featureDefID, frame
 	--Spring.Echo("Allowed", x, y, z, featureDefID, frame, math.random())
 	return true
+end
+
+function gadget:Initialize()
+	if not REVERSE_COMPAT then
+		gadgetHandler:RemoveGadget()
+	end
 end
