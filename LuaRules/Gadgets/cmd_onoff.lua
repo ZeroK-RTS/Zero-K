@@ -156,7 +156,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		spRemoveUnitCmdDesc(unitID, onoffDescID)
 	end
 	spInsertUnitCmdDesc(unitID, cmdDescUnits[unitDefID])
-	OnOffToggleCommand(unitID, unitDefID, true, onOffUnits[unitDefID])
+	OnOffToggleCommand(unitID, unitDefID, false, onOffUnits[unitDefID])
 end
 
 function gadget:Initialize()

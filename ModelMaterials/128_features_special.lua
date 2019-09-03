@@ -1,4 +1,5 @@
 local matTemplate = VFS.Include("ModelMaterials/Templates/defaultMaterialTemplate.lua")
+local sentError = false
 
 local metalWreckTreshold = 1
 local function SetWreckMetalThreshold(mwt)
@@ -59,6 +60,19 @@ local function GameFrameSlow(gf, mat, isDeferred)
 			if not metalInfo[fID] or abs(metalInfo[fID] - metalHere) > 1.0 then
 				metalInfo[fID] = metalHere
 				mhArray[1] = ((metalHere >= metalWreckTreshold) and metalHere) or 0.0
+				
+				if not (frSetMaterialUniform and frSetMaterialUniform[isDeferred]) then
+					if not sentError then
+						sentError = true
+						Spring.Echo("LUA_ERRRUN", "ModelMaterials/128_features_special.lua", "GameFrameSlow")
+						Spring.Echo("frSetMaterialUniform", frSetMaterialUniform)
+						Spring.Echo("isDeferred", isDeferred)
+						Spring.Echo("fID", fID)
+						local fx, fy, fz = Spring.GetFeaturePosition(fID)
+						Spring.Echo("fx, fy, fz", fx, fy, fz)
+					end
+					return
+				end
 				frSetMaterialUniform[isDeferred](fID, "opaque", 3, "floatOptions[1]", GL_FLOAT, mhArray)
 			end
 
