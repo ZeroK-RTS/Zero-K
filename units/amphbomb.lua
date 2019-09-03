@@ -110,8 +110,8 @@ local weaponDefs = {
     impulseBoost       = 0,
     impulseFactor      = 0.3,
     name               = "Slowing Explosion",
-    soundHit           = [[weapon/laser/disrupter_explosion]],
-    soundHitVolume     = 1.2,
+    soundHit           = [[weapon/aoe_aura2]],
+    soundHitVolume     = 4,
   },
 }
 unitDef.weaponDefs = weaponDefs

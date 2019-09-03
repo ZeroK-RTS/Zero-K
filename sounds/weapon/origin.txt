@@ -31,6 +31,7 @@ saw.wav
 
 Kanoba:
 aoe_aura.wav
+aoe_aura2.wav
 bomb_drop.wav
 bomb_drop_short.wav
 depthcharge.wav
