@@ -23,6 +23,7 @@ local weaponDef = {
 	impulseBoost            = 0,
 	impulseFactor           = 0,
 	interceptedByShieldType = 0,
+	leadLimit               = 80,
 	noExplode               = true,
 	noSelfDamage            = true,
 	range                   = 200,
