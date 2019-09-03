@@ -40,8 +40,8 @@ local defBrakeHeight = 500 --height above groundlevel,is customizable (in elmo)
 --Use "useSetUnitVelocity=true" when MoveCtrl usage cause problem (MoveCtrl is prefered by this gadget).
 --TODO: remove safety, make unit crash and explode like asteroid as a feature.
 
-local units = {}	-- the only thing that needs saving
-local cachedResult = {}	-- caches the falling behaviour based on time to ground, fall gravity, unit spawn height and unit brake height
+local units = {} -- the only thing that needs saving
+local cachedResult = {} -- caches the falling behaviour based on time to ground, fall gravity, unit spawn height and unit brake height
 
 _G.units = units
 
@@ -262,10 +262,6 @@ function gadget:Load(zip)
 	else
 		gadgetHandler:RemoveCallIn("GameFrame")
 	end
-end
-
-function gadget:Initialize()
-	gadgetHandler:RemoveCallIn("GameFrame")
 end
 
 --------------------------------------------------------------------------------

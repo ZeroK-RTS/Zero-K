@@ -165,5 +165,7 @@ function gadget:GameFrame()
 end
 
 function gadget:Initialize()
-	gadgetHandler:RemoveCallIn("GameFrame")
+	if projCount == 0 then
+		gadgetHandler:RemoveCallIn("GameFrame")
+	end
 end

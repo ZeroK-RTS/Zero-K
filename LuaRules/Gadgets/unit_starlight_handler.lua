@@ -21,7 +21,7 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spTransferUnit = Spring.TransferUnit
 
 local transfers = {}
-local alreadyAdded
+local alreadyAdded = false
 
 GG.starlightSatelliteInvulnerable = GG.starlightSatelliteInvulnerable or {}
 --local starlights = {}
@@ -92,8 +92,9 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 end
 
 function gadget:Initialize()
-	alreadyAdded = false
-	gadgetHandler:RemoveCallIn("GameFrame")
+	if not alreadyAdded then
+		gadgetHandler:RemoveCallIn("GameFrame")
+	end
 	
 	--for _, unitID in pairs(Spring.GetAllUnits()) do
 	--	gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
