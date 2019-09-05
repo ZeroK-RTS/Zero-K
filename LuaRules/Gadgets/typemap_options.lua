@@ -20,8 +20,9 @@ local oldTerrain = {}
 local IMPASSIBLE_TERRAIN = 137 -- Hope that this does not conflict with any maps
 local NANOFRAMES_BLOCK = false -- Allows for LOS hax.
 
-local retainException = VFS.Include("LuaRules/Configs/typemap_options_maps.lua")
-local RETAIN_MAP_IMPASSIBLE = not retainException[Game.mapName]
+local retainImpassException, retainRoadException = VFS.Include("LuaRules/Configs/typemap_options_maps.lua")
+local RETAIN_MAP_IMPASSIBLE = not retainImpassException[Game.mapName]
+local RETAIN_MAP_ROAD = not retainRoadException[Game.mapName]
 
 local function Round(x)
 	return math.floor((x + 4)/8)*8
@@ -114,7 +115,7 @@ end
 
 function gadget:Initialize()
 	Spring.SetTerrainTypeData(IMPASSIBLE_TERRAIN, 0, 0, 0, 0)
-	if (Spring.GetModOptions().typemapsetting == "1") then
+	if (Spring.GetModOptions().typemapsetting == "1") or (not RETAIN_MAP_ROAD) then
 		for i = 0, 255 do
 			if i ~= IMPASSIBLE_TERRAIN then
 				local name, _, t, k, h, s = Spring.GetTerrainTypeData(i)
