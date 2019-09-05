@@ -4,4 +4,5 @@ return {
 	["DeltaSiegeDry"] = true,
 	["CathraldaV10"] = true,
 	["Vein"] = true,
+	["Quicksilver 1.1"] = true,
 }
