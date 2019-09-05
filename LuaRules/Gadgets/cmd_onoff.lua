@@ -110,6 +110,7 @@ local function OnOffToggleCommand(unitID, unitDefID, instantCommand, state)
 		end
 	end
 end
+GG.OnOffToggleCommand = OnOffToggleCommand
 
 function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_WANT_ONOFF] = true, [CMD_PUSH_PULL] = true, [CMD_ONOFF] = true}
