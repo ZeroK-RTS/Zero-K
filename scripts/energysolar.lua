@@ -16,8 +16,6 @@ local smokePiece = {base}
 
 local SIG_Activate = 2
 local SIG_Defensive = 4
-local wantActivate = false
-local autoDeactivate = false
 local unitDefID = Spring.GetUnitDefID(unitID)
 
 -- don't ask daddy difficult questions like "Why does it armor at the START of the animation?"
@@ -68,9 +66,6 @@ function script.Activate()
 end
 
 function script.Deactivate()
-	if not autoDeactivate then
-		wantActivate = false
-	end
 	StartThread(Close)
 end
 
@@ -90,16 +85,14 @@ local function DefensiveManeuver()
 	end
 	Signal(SIG_Defensive)
 	SetSignalMask(SIG_Defensive)
-	wantActivate = wantActivate or Spring.GetUnitStates(unitID).active
-	autoDeactivate = true
+	
 	if GG.OnOffToggleCommand then
 		GG.OnOffToggleCommand(unitID, unitDefID, true, 0)
 	else
 		SetUnitValue(COB.ACTIVATION, 0)
 	end
-	autoDeactivate = false
 	Sleep(auto_close_time)
-	if not (wantActivate and Spring.GetUnitRulesParam(unitID, "tacticalAi_external") == 1) then
+	if not (GG.OnOff_GetLastCommandWantedState(unitID) and Spring.GetUnitRulesParam(unitID, "tacticalAi_external") == 1) then
 		return
 	end
 	if GG.OnOffToggleCommand then

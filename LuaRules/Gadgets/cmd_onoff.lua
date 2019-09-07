@@ -78,12 +78,13 @@ end
 -- Vars
 
 local unitWantedState = {}
+local lastCommandWantedState = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Command Handling
 
-local function OnOffToggleCommand(unitID, unitDefID, instantCommand, state)
+local function OnOffToggleCommand(unitID, unitDefID, instantCommand, state, fromCommand)
 	if not onOffUnits[unitDefID] then
 		return
 	end
@@ -100,6 +101,10 @@ local function OnOffToggleCommand(unitID, unitDefID, instantCommand, state)
 		end
 	else
 		state = unitWantedState[unitID]
+	end
+	
+	if fromCommand then
+		lastCommandWantedState[unitID] = state
 	end
 	
 	if state then
@@ -127,9 +132,19 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if (cmdID ~= CMD_WANT_ONOFF) and (cmdID ~= CMD_PUSH_PULL) then
 		return true  -- command was not used
 	end
-	OnOffToggleCommand(unitID, unitDefID, false, cmdParams[1])
+	OnOffToggleCommand(unitID, unitDefID, false, cmdParams[1], true)
 	return false  -- command was used
 end
+
+local function OnOff_GetWantedState(unitID)
+	return unitID and (unitWantedState[unitID] == 1)
+end
+GG.OnOff_GetWantedState = OnOff_GetWantedState
+
+local function OnOff_GetLastCommandWantedState(unitID)
+	return unitID and (lastCommandWantedState[unitID] == 1)
+end
+GG.OnOff_GetLastCommandWantedState = OnOff_GetLastCommandWantedState
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -137,6 +152,7 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if onOffUnits[unitDefID] then
 		unitWantedState[unitID] = nil
+		lastCommandWantedState[unitID] = nil
 	end
 end
 
@@ -157,7 +173,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		spRemoveUnitCmdDesc(unitID, onoffDescID)
 	end
 	spInsertUnitCmdDesc(unitID, cmdDescUnits[unitDefID])
-	OnOffToggleCommand(unitID, unitDefID, false, onOffUnits[unitDefID])
+	OnOffToggleCommand(unitID, unitDefID, false, onOffUnits[unitDefID], true)
 end
 
 function gadget:Initialize()
