@@ -37,9 +37,6 @@ local MAP_SIZE_X_SCALED = MAP_SIZE_X / METAL_MAP_SQUARE_SIZE
 local MAP_SIZE_Z = Game.mapSizeZ
 local MAP_SIZE_Z_SCALED = MAP_SIZE_Z / METAL_MAP_SQUARE_SIZE
 
-local gameConfig = VFS.FileExists(GAMESIDE_METALMAP) and VFS.Include(GAMESIDE_METALMAP) or false
-local mapConfig = VFS.FileExists(MAPSIDE_METALMAP) and VFS.Include(MAPSIDE_METALMAP) or false
-
 ------------------------------------------------------------
 -- Speedups
 ------------------------------------------------------------
@@ -149,7 +146,10 @@ end
 ------------------------------------------------------------
 function gadget:Initialize()
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Mex Spot Finder Initialising")
-	local metalSpots, fromEngineMetalmap = GetSpots()
+	local gameConfig = VFS.FileExists(GAMESIDE_METALMAP) and VFS.Include(GAMESIDE_METALMAP) or false
+	local mapConfig = VFS.FileExists(MAPSIDE_METALMAP) and VFS.Include(MAPSIDE_METALMAP) or false
+	
+	local metalSpots, fromEngineMetalmap = GetSpots(gameConfig, mapConfig)
 	local metalSpotsByPos = false
 	
 	if fromEngineMetalmap and #metalSpots < 6 then
@@ -277,7 +277,7 @@ local function makeString(group)
 	end
 end
 
-function GetSpots()
+function GetSpots(gameConfig, mapConfig)
 	
 	local spots = {}
 

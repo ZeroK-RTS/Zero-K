@@ -528,16 +528,19 @@ local function CheckTerrainChange(spotID)
 	end
 end
 
+local function CheckAllTerrainChanges()
+	for i = 1, #WG.metalSpots do
+		CheckEnemyMexes(i)
+		CheckTerrainChange(i)
+	end
+end
+
 function widget:GameFrame(n)
 	if not WG.metalSpots or (n % 5) ~= 0 then
 		return
 	end
 
-	for i = 1, #WG.metalSpots do
-		CheckEnemyMexes(i)
-		CheckTerrainChange(i)
-	end
-
+	CheckAllTerrainChanges()
 	if wantDrawListUpdate then
 		wantDrawListUpdate = false
 		updateMexDrawList()
@@ -586,7 +589,6 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 end
 
 local function Initialize()
-
 	if WG.metalSpots then
 		Spring.Echo("Mex Placement Initialised with " .. #WG.metalSpots .. " spots.")
 		for i = 1, #WG.metalSpots do
@@ -621,8 +623,17 @@ function widget:Initialize()
 	end
 end
 
+local firstUpdate = true
 function widget:Update()
 	widget:Initialize()
+	
+	if firstUpdate then
+		if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
+			Initialize()
+			CheckAllTerrainChanges()
+		end
+		firstUpdate = false
+	end
 
 	local isSpectating = spGetSpectatingState()
 	if WG.metalSpots and (wasSpectating ~= isSpectating) then
@@ -828,8 +839,8 @@ function widget:Shutdown()
 end
 
 local function DoLine(x1, y1, z1, x2, y2, z2)
-    gl.Vertex(x1, y1, z1)
-    gl.Vertex(x2, y2, z2)
+	gl.Vertex(x1, y1, z1)
+	gl.Vertex(x2, y2, z2)
 end
 
 function widget:DrawWorldPreUnit()
