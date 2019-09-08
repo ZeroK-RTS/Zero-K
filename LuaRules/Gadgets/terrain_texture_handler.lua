@@ -276,7 +276,8 @@ function gadget:DrawGenesis()
 				end
 				
 				if not mapTex[sx][sz] then
-					if GG.mapgen_squareTexture[sx][sz] then
+					if GG.mapgen_squareTexture and GG.mapgen_squareTexture[sx] and GG.mapgen_squareTexture[sx][sz] 
+							and GG.mapgen_currentTexture and GG.mapgen_currentTexture[sx] and GG.mapgen_currentTexture[sx][sz] then
 						mapTex[sx][sz] = {
 							orig = GG.mapgen_squareTexture[sx][sz],
 							cur  = GG.mapgen_currentTexture[sx][sz],
@@ -296,8 +297,7 @@ function gadget:DrawGenesis()
 							}),
 						}
 						if mapTex[sx][sz].orig and mapTex[sx][sz].cur then
-							GetMapTexture(sx, sz, 0, mapTex[sx][sz].orig)
-							--spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].cur)
+							spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].orig)
 							gl.Texture(mapTex[sx][sz].orig)
 							gl.RenderToTexture(mapTex[sx][sz].cur, drawCopySquare)
 						else
