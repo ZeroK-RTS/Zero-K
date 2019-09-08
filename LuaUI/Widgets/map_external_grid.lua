@@ -344,7 +344,7 @@ local function Initialize()
 end
 
 function widget:Initialize()
-	if Spring.GetGameRulesParam("waterLevelModifier") then
+	if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
 		return
 	end
 	Initialize()
