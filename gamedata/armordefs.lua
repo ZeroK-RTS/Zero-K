@@ -177,6 +177,40 @@ for name, wd in pairs(DEFS.weaponDefs) do
 	end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function ProcessSoundDefaults(wd)
+	local forceSetVolume = (not wd.soundstartvolume) or (not wd.soundhitvolume)
+
+	if not forceSetVolume then
+		return
+	end
+
+	local defaultDamage = wd.damage and wd.damage.default
+	if (not defaultDamage) or (defaultDamage <= 50) then
+		wd.soundstartvolume = 5
+		wd.soundhitvolume = 5
+		return
+	end
+
+	local soundVolume = math.sqrt(defaultDamage * 0.5)
+	if wd.weapontype == "LaserCannon" then
+		soundVolume = soundVolume*0.5
+	end
+
+	if (not wd.soundstartvolume) then
+		wd.soundstartvolume = soundVolume
+	end
+	if (not wd.soundhitvolume) then
+		wd.soundhitvolume = soundVolume
+	end
+end
+
+for name, wd in pairs(DEFS.weaponDefs) do
+	ProcessSoundDefaults(wd)
+end
+
 local system = VFS.Include('gamedata/system.lua')
 
 return system.lowerkeys(armorDefs)
