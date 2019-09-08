@@ -156,8 +156,8 @@ options = {
 		type  = "bool",
 		value = false,
 		OnChange = function(self)
-			option_CheckEnable(self)
-			-- WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", option_CheckEnable(self))
+			local enabled = option_CheckEnable(self)
+			WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", enabled)
 		end,
 		desc = "Enables the spectator resource bars when spectating a game with two teams."
 	},
@@ -945,7 +945,7 @@ local function GetOpposingAllyTeams()
 	end
 
 	if #returnData ~= 2 then
-		return
+		return false
 	end
 	
 	return returnData
@@ -979,6 +979,7 @@ function option_CheckEnable(self)
 	
 	allyTeamData = GetOpposingAllyTeams()
 	if not allyTeamData then
+		enabled = false
 		return false
 	end
 	
