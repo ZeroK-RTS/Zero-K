@@ -12,6 +12,7 @@ local weaponDef = {
 	cylinderTargeting       = 1,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[5]],
 
 		light_color = [[0.2 1.2 1.2]],

@@ -8,6 +8,7 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[5]],
 
 		light_camera_height = 1800,

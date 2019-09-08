@@ -8,6 +8,7 @@ local weaponDef = {
 	craterMult              = 6,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[3]],
 		muzzleEffectFire = [[custom:staticheavyarty_FLARE]],
 		manualfire = 1,

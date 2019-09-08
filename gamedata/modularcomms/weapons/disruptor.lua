@@ -9,6 +9,7 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		--timeslow_preset       = [[module_disruptorbeam]],
 		timeslow_damagefactor = [[2]],
 

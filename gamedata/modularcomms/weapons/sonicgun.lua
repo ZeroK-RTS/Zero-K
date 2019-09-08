@@ -9,6 +9,7 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[5]],
 		lups_explodelife = 100,
 		lups_explodespeed = 1,

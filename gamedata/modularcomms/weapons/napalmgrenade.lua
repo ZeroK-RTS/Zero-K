@@ -9,6 +9,7 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[3]],
 		setunitsonfire = "1",
 		burntime = [[90]],

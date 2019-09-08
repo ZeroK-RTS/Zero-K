@@ -9,6 +9,7 @@ local weaponDef = {
 	cylinderTargeting       = 1,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectFire   = [[custom:CRASHMUZZLE]],
 		onlyTargetCategory = [[FIXEDWING GUNSHIP]],
