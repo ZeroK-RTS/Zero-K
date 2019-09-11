@@ -427,7 +427,7 @@ local function AddAllianceUnit(unitID, unitDefID, teamID)
 		vitalAlive[allianceID][unitID] = true
 	elseif vitalConstructorAllyTeam[allianceID] then
 		local ud = UnitDefs[unitDefID]
-		if ud.isBuilder or ud.isFactory then
+		if ud.isBuilder or (ud.isFactory and not ud.customParams.notreallyafactory) then
 			vitalAlive[allianceID][unitID] = true
 		end
 	end
