@@ -267,9 +267,14 @@ local function GetTeamNames (allyTeamID)
 		return "AI", "AI"
 	end
 
+	local boxCount = 0
+	for _ in pairs(startboxConfig) do
+		boxCount = boxCount + 1
+	end
+
 	if ((shuffleMode == "off")
 		or (Spring.Utilities.GetTeamCount() == 2 and shuffleMode == "shuffle")
-		or (#startboxConfig == 1 and shuffleMode == "allshuffle")) -- actually means # == 2 since it counts from 0
+		or (boxCount == 2 and shuffleMode == "allshuffle"))
 	then
 		local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 		if boxID then
