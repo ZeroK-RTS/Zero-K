@@ -1,106 +1,31 @@
-return {
-	[0] = {
-		startpoints = {
-			{6820,2458},
-		},
-		boxes = {
-			{
-				{6636,2212},
-				{7004,2212},
-				{7004,2703},
-				{6636,2703},
-			},
-		},
-	},
-	[1] = {
-		startpoints = {
-			{5407,9769},
-		},
-		boxes = {
-			{
-				{5161,9585},
-				{5652,9585},
-				{5652,9953},
-				{5161,9953},
-			},
-		},
-	},
-	[2] = {
-		startpoints = {
-			{2458,5407},
-		},
-		boxes = {
-			{
-				{2212,5161},
-				{2703,5161},
-				{2703,5652},
-				{2212,5652},
-			},
-		},
-	},
-	[3] = {
-		startpoints = {
-			{9769,6820},
-		},
-		boxes = {
-			{
-				{9585,6636},
-				{9953,6636},
-				{9953,7004},
-				{9585,7004},
-			},
-		},
-	},
-	[4] = {
-		startpoints = {
-			{9216,3994},
-		},
-		boxes = {
-			{
-				{8970,3809},
-				{9462,3809},
-				{9462,4178},
-				{8970,4178},
-			},
-		},
-	},
-	[5] = {
-		startpoints = {
-			{3072,8172},
-		},
-		boxes = {
-			{
-				{2826,7987},
-				{3318,7987},
-				{3318,8356},
-				{2826,8356},
-			},
-		},
-	},
-	[6] = {
-		startpoints = {
-			{3994,3072},
-		},
-		boxes = {
-			{
-				{3809,2826},
-				{4178,2826},
-				{4178,3318},
-				{3809,3318},
-			},
-		},
-	},
-	[7] = {
-		startpoints = {
-			{8172,9216},
-		},
-		boxes = {
-			{
-				{7987,8970},
-				{8356,8970},
-				{8356,9462},
-				{7987,9462},
-			},
-		},
-	},
-}
+local base_startpos = {9263, 4100}
+local radius = 256
+
+local sin = math.sin
+local cos = math.cos
+local midX = Game.mapSizeX / 2
+local midZ = Game.mapSizeZ / 2
+local function Rotate(point, phi) return {
+	midX + (point[1] - midX) * cos(phi) - (point[2] - midZ) * sin(phi),
+	midZ + (point[2] - midZ) * cos(phi) + (point[1] - midX) * sin(phi),
+} end
+
+local ret = {}
+for i = 0, 15 do
+	local boxCenter = Rotate(base_startpos, i * math.pi / 8)
+	local box = {}
+	for j = 0, 15 do
+		local phi = j * math.pi / 8
+		box[j] = {
+			boxCenter[1] + radius * math.sin(phi),
+			boxCenter[2] + radius * math.cos(phi),
+		}
+	end
+	ret[i] = {
+		startpoints = { boxCenter },
+		boxes = { box },
+	}
+end
+
+return ret
+
