@@ -25,7 +25,7 @@ end
 
 function gadget:AllowFeatureCreation(featureDefID, teamID, x, y, z)
 	local frame = Spring.GetGameFrame()
-	if Close(x, lastX) and Close(y, lastX) and Close(z, lastZ) and featureDefID == lastFeatureDefID and frame == lastGameFrame then
+	if Close(x, lastX) and Close(y, lastY) and Close(z, lastZ) and featureDefID == lastFeatureDefID and frame == lastGameFrame then
 		--Spring.Echo("Blocked", x, y, z, featureDefID, frame, math.random())
 		return false
 	end
