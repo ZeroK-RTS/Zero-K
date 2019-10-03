@@ -20,16 +20,16 @@ unitDef = {
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[45 54 45]],
-  collisionVolumeType    = [[CylY]],  
+  collisionVolumeType    = [[CylY]],
   corpse              = [[DEAD]],
 
   customParams        = {
-	level = [[1]],
-	statsname = [[dynassault1]],
-	soundok = [[heavy_bot_move]],
-	soundselect = [[bot_select]],
-	soundbuild = [[builder_start]],
-	commtype = [[5]],
+    level = [[1]],
+    statsname = [[dynassault1]],
+    soundok = [[heavy_bot_move]],
+    soundselect = [[bot_select]],
+    soundbuild = [[builder_start]],
+    commtype = [[5]],
   },
 
   energyMake          = 6,
@@ -90,7 +90,7 @@ unitDef = {
       def                = [[ASSAULT_CANNON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },	
+    },
   },
 
 
@@ -103,6 +103,10 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
+
+      customParams            = {
+        bogus = 1,
+      },
 
       damage                  = {
         default = 0,
@@ -119,7 +123,7 @@ unitDef = {
       laserFlareSize          = 5.53,
       minIntensity            = 1,
       range                   = 360,
-      reloadtime              = 0.11,
+      reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/pulse_laser3]],
       soundTrigger            = true,
@@ -139,18 +143,18 @@ unitDef = {
       areaOfEffect            = 32,
       craterBoost             = 1,
       craterMult              = 3,
-	
+    
       damage                  = {
-		default = 360,
-		planes  = 360,
-		subs    = 18,
+        default = 360,
+        planes  = 360,
+        subs    = 18,
       },
       
       explosionGenerator      = [[custom:INGEBORG]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      myGravity		      = 0.25,
+      myGravity               = 0.25,
       range                   = 360,
       reloadtime              = 2,
       soundHit                = [[weapon/cannon/cannon_hit2]],

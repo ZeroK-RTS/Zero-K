@@ -73,7 +73,7 @@ local briefingWindow
 local missionWon, missionEndFrame, missionEndTime, missionResultSent
 
 -- wait this many frames after victory to make sure your commander doesn't die.
-local VICTORY_SUSTAIN_FRAMES = 50 
+local VICTORY_SUSTAIN_FRAMES = 50
 
 local ADD_GLOBAL_COMMAND_BUTTON = false
 local SCREEN_EDGE = 8
@@ -252,7 +252,7 @@ local function InitializeBriefingWindow()
 	local BRIEF_HEIGHT = 680
 	
 	local SCROLL_POS = 70
-	local SCROLL_HEIGHT = 170 
+	local SCROLL_HEIGHT = 170
 	
 	local externalFunctions = {}
 	
@@ -446,6 +446,15 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 		offset = offset + (#label.physicalLines)*14 + 2
 	end
 	
+	local function SetTentativeSuccess(index)
+		-- This is success that the UI draws, but it may still be overridden with failure by luaRules.
+		if objectives[index].terminated then
+			return
+		end
+		objectives[index].image.file = SUCCESS_ICON
+		objectives[index].image:Invalidate()
+	end
+	
 	local function UpdateSuccess(index)
 		if objectives[index].terminated then
 			return
@@ -481,6 +490,12 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 	
 	function externalFunctions.Update()
 		UpdateObjectiveSuccess()
+	end
+	
+	function externalFunctions.SetTentativeSuccess()
+		for i = 1, #objectives do
+			SetTentativeSuccess(i)
+		end
 	end
 	
 	function externalFunctions.UpdateTooltip(text)
@@ -544,14 +559,14 @@ local function InitializeObjectivesWindow()
 	local position = 4
 	local mainBlockPosition = position
 	mainObjectiveBlock, position = GetObjectivesBlock(holderWindow, position, objectiveList,  "objectiveSuccess_")
-	local mainHeight = position + holderWindow.padding[2] + holderWindow.padding[4] + 3 
+	local mainHeight = position + holderWindow.padding[2] + holderWindow.padding[4] + 3
 	local bonusHeight, bonusBlockPosition
 	
 	if #bonusObjectiveList > 0 then
 		position = position + 8
 		bonusBlockPosition = position
 		bonusObjectiveBlock, position = GetObjectivesBlock(holderWindow, position, bonusObjectiveList, "bonusObjectiveSuccess_")
-		bonusHeight = position + holderWindow.padding[2] + holderWindow.padding[4] + 3 
+		bonusHeight = position + holderWindow.padding[2] + holderWindow.padding[4] + 3
 	end
 	
 	if ADD_GLOBAL_COMMAND_BUTTON and WG.GlobalCommandBar then
@@ -732,6 +747,10 @@ local function MissionGameOver(newMissionWon)
 	missionEndFrame = Spring.GetGameFrame() + VICTORY_SUSTAIN_FRAMES
 	missionEndTime = osClock()
 	
+	if missionWon and mainObjectiveBlock then
+		mainObjectiveBlock.SetTentativeSuccess()
+	end
+	
 	if WG.Music then
 		WG.Music.PlayGameOverMusic(missionWon)
 	end
@@ -749,7 +768,7 @@ end
 -- Mostly from pause screen (very_bad_soldier)
 
 --Commons
-local function ResetGl() 
+local function ResetGl()
 	glColor( { 1.0, 1.0, 1.0, 1.0 } )
 	glLineWidth( 1.0 )
 	glDepthTest(false)
@@ -760,8 +779,8 @@ function IsOverWindow(x, y)
 	if not missionEndTime then
 		return false
 	end
-	if ((x > screenCenterX - boxWidth) and (y < screenCenterY + boxHeight) and 
-		(x < screenCenterX + boxWidth) and (y > screenCenterY - boxHeight)) then	
+	if ((x > screenCenterX - boxWidth) and (y < screenCenterY + boxHeight) and
+		(x < screenCenterX + boxWidth) and (y > screenCenterY - boxHeight)) then
 		return true
 	end
 	return false

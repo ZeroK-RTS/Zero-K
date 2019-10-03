@@ -12,15 +12,13 @@ end
 
 -------------------------------------------------------------
 -------------------------------------------------------------
-if not (gadgetHandler:IsSyncedCode()) then 
+if not (gadgetHandler:IsSyncedCode()) then
 	return false
 end
 -------------------------------------------------------------
 -------------------------------------------------------------
 local useRapidReaim = true
-
-local START_TIME = 20*60*30
-local FLIP_PERIOD =60*30
+local minReaimTime = 1
 
 -------------------------------------------------------------
 -------------------------------------------------------------
@@ -45,7 +43,7 @@ local function UpdateRapidReaim(unitID, unitDefID)
 		return
 	end
 	for weaponNum, reaimTime in pairs(unitDefsToModify[unitDefID]) do
-		Spring.SetUnitWeaponState(unitID, weaponNum, {reaimTime = (useRapidReaim and reaimTime) or 15})
+		Spring.SetUnitWeaponState(unitID, weaponNum, {reaimTime = math.max(minReaimTime, (useRapidReaim and reaimTime) or 15)})
 	end
 end
 
@@ -60,7 +58,7 @@ end
 -- Debug
 
 local function ToggleReaimTime(cmd, line, words, player)
-	if not Spring.IsCheatingEnabled() then 
+	if not Spring.IsCheatingEnabled() then
 		return
 	end
 	
@@ -92,6 +90,9 @@ function gadget:Initialize()
 	gadgetHandler:AddChatAction("debugreaim", ToggleReaimTime, "Debugs reaim time.")
 end
 
+--local START_TIME = 20*60*30
+--local FLIP_PERIOD =60*30
+--
 --function gadget:GameFrame(n)
 --	-- Performance test by switching during games.
 --	if n < START_TIME then

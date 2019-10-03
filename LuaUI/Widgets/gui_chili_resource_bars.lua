@@ -89,7 +89,7 @@ end
 
 options_order = {'eexcessflashalways', 'energyFlash', 'workerUsage','opacity','onlyShowExpense','enableReserveBar','defaultEnergyReserve','defaultMetalReserve'}
  
-options = { 
+options = {
   eexcessflashalways = {name='Always Flash On Energy Excess', type='bool', value=false},
   onlyShowExpense = {name='Only Show Expense', type='bool', value=false},
   enableReserveBar = {name='Enable Reserve', type='bool', value=false, tooltip = "Enables high priority reserve"},
@@ -157,13 +157,13 @@ local function updateReserveBars(metal, energy, value, overrideOption)
 		if value > 1 then value = 1 end
 		if metal then
 			local _, mStor = GetTeamResources(GetMyTeamID(), "metal")
-			Spring.SendLuaRulesMsg("mreserve:"..value*(mStor - HIDDEN_STORAGE)) 
+			Spring.SendLuaRulesMsg("mreserve:"..value*(mStor - HIDDEN_STORAGE))
 			WG.metalStorageReserve = value*(mStor - HIDDEN_STORAGE)
 			bar_metal_reserve_overlay:SetValue(value)
 		end
 		if energy then
 			local _, eStor = GetTeamResources(GetMyTeamID(), "energy")
-			Spring.SendLuaRulesMsg("ereserve:"..value*(eStor - HIDDEN_STORAGE)) 
+			Spring.SendLuaRulesMsg("ereserve:"..value*(eStor - HIDDEN_STORAGE))
 			WG.energyStorageReserve = value*(eStor - HIDDEN_STORAGE)
 			bar_energy_reserve_overlay:SetValue(value)
 		end
@@ -224,8 +224,8 @@ end
 local initialReserveSet = false
 function widget:GameFrame(n)
 
-	if (n%TEAM_SLOWUPDATE_RATE ~= 0) or not window then 
-        return 
+	if (n%TEAM_SLOWUPDATE_RATE ~= 0) or not window then
+        return
     end
 	
 	if n > 5 and not initialReserveSet then
@@ -277,7 +277,7 @@ function widget:GameFrame(n)
 		teamEnergyReclaim = teamEnergyReclaim + eInco - math.max(0, energyChange)
 		
 		teamTotalEnergyStored = teamTotalEnergyStored + math.min(eCurr, eStor - HIDDEN_STORAGE)
-		teamTotalEnergyCapacity = teamTotalEnergyCapacity + eStor - HIDDEN_STORAGE 
+		teamTotalEnergyCapacity = teamTotalEnergyCapacity + eStor - HIDDEN_STORAGE
 	end
 
 	local teamEnergyIncome = teamEnergyReclaim + cp.team_energyIncome
@@ -299,9 +299,9 @@ function widget:GameFrame(n)
 	
 	mStor = mStor - HIDDEN_STORAGE -- reduce by hidden storage
 	eStor = eStor - HIDDEN_STORAGE -- reduce by hidden storage
-	if eCurr > eStor then 
+	if eCurr > eStor then
 		eCurr = eStor -- cap by storage
-	end 
+	end
 
 	if options.onlyShowExpense.value then
 		eExpe = eExpe - cp.team_energyWaste/cp.allies -- if there is energy wastage, dont show it as used pull energy
@@ -391,12 +391,12 @@ function widget:GameFrame(n)
 	"\n  Overdrive: " .. metalOverdrive ..
 	"\n  Reclaim: " .. metalReclaim ..
 	"\n  Cons: " .. metalConstructor ..
-	"\n  Sharing: " .. metalShare .. 
+	"\n  Sharing: " .. metalShare ..
 	"\n  Construction: " .. metalConstuction ..
     "\n  Reserve: " .. math.ceil(WG.metalStorageReserve or 0) ..
     "\n  Stored: " .. ("%i / %i"):format(mCurr, mStor)  ..
-	"\n " .. 
-	"\nTeam Metal Economy  " .. 
+	"\n " ..
+	"\nTeam Metal Economy  " ..
 	"\n  Inc: " .. team_metalTotalIncome .. "      Pull: " .. team_metalPull ..
 	"\n  Base Extraction: " .. team_metalBase ..
 	"\n  Overdrive: " .. team_metalOverdrive ..
@@ -409,12 +409,12 @@ function widget:GameFrame(n)
 	bar_energy.tooltip = "Local Energy Economy" ..
 	"\n  Generators: " .. energyGenerators ..
 	"\n  Reclaim: " .. energyReclaim ..
-	"\n  Sharing & Overdrive: " .. energyOverdrive .. 
-	"\n  Construction: " .. metalConstuction .. 
+	"\n  Sharing & Overdrive: " .. energyOverdrive ..
+	"\n  Construction: " .. metalConstuction ..
 	"\n  Other: " .. energyOther ..
     "\n  Reserve: " .. math.ceil(WG.energyStorageReserve or 0) ..
     "\n  Stored: " .. ("%i / %i"):format(eCurr, eStor)  ..
-	"\n " .. 
+	"\n " ..
 	"\nTeam Energy Economy" ..
 	"\n  Inc: " .. team_energyIncome .. "      Pull: " .. team_energyPull ..
 	"\n  Generators: " .. team_energyGenerators ..
@@ -461,7 +461,7 @@ function widget:GameFrame(n)
 		lbl_energy.font:SetColor(1,0.7,0,1)
 	--elseif ((eStore - eCurr) < 50) then --// prevents blinking when overdrive is active
 	--	lbl_energy.font:SetColor(0,1,0,1)
-	else		
+	else
 		lbl_energy.font:SetColor(1,0,0,1)
 	end
 	local abs_eTotal = abs(eTotal)

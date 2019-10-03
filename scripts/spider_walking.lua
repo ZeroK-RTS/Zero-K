@@ -38,7 +38,7 @@ function GG.SpiderWalk.walk(br, mr, fr, bl, ml, fl,
 	
 	Turn(fr, y_axis, -(legForwardAngle-legForwardOffset), legForwardSpeed)	-- RF leg back
 	Turn(ml, y_axis, (legMiddleAngle-legMiddleOffset), legMiddleSpeed)	-- LM leg down
-	Turn(br, y_axis, -(legBackwardAngle-legBackwardOffset), legBackwardSpeed)	-- RB leg back	
+	Turn(br, y_axis, -(legBackwardAngle-legBackwardOffset), legBackwardSpeed)	-- RB leg back
 
 	Sleep(sleepTime)
 	
@@ -46,7 +46,7 @@ function GG.SpiderWalk.walk(br, mr, fr, bl, ml, fl,
 	GG.SpiderWalk.raise(mr, 0, legLowerSpeed, legMiddleTheta)
 	GG.SpiderWalk.raise(bl, 0, legLowerSpeed, -legBackwardTheta)
 	
-	Sleep(sleepTime)	
+	Sleep(sleepTime)
 	
 	GG.SpiderWalk.raise(fr, -legRaiseAngle, legRaiseSpeed, legForwardTheta)
 	GG.SpiderWalk.raise(ml, legRaiseAngle, legRaiseSpeed, -legMiddleTheta)
@@ -54,23 +54,23 @@ function GG.SpiderWalk.walk(br, mr, fr, bl, ml, fl,
 	
 	Turn(fr, y_axis, (legForwardAngle+legForwardOffset), legForwardSpeed)	-- RF leg forward
 	Turn(ml, y_axis, -(legMiddleAngle+legMiddleOffset), legMiddleSpeed)	-- LM leg forward
-	Turn(br, y_axis, (legBackwardAngle+legBackwardOffset), legBackwardSpeed)	-- RB leg forward		
+	Turn(br, y_axis, (legBackwardAngle+legBackwardOffset), legBackwardSpeed)	-- RB leg forward
 	
 	Turn(fl, y_axis, (legForwardAngle-legForwardOffset), legForwardSpeed)	-- LF leg back
 	Turn(mr, y_axis, -(legMiddleAngle-legMiddleOffset), legMiddleSpeed)	-- RM leg down
-	Turn(bl, y_axis, (legBackwardAngle-legBackwardOffset), legBackwardSpeed)	-- LB leg back	
+	Turn(bl, y_axis, (legBackwardAngle-legBackwardOffset), legBackwardSpeed)	-- LB leg back
 	
-	Sleep(sleepTime)				
+	Sleep(sleepTime)
 	
 	GG.SpiderWalk.raise(fr, 0, legLowerSpeed, legForwardTheta)
 	GG.SpiderWalk.raise(ml, 0, legLowerSpeed, -legMiddleTheta)
 	GG.SpiderWalk.raise(br, 0, legLowerSpeed, legBackwardTheta)
 	
-	Sleep(sleepTime)	
+	Sleep(sleepTime)
 end
 
 function GG.SpiderWalk.restoreLegs(br, mr, fr, bl, ml, fl,
-		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)	
+		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)
 
 	Turn(br, x_axis, 0, legRaiseSpeed)
 	Turn(br, z_axis, 0, legRaiseSpeed)	-- LF leg up
@@ -80,7 +80,7 @@ function GG.SpiderWalk.restoreLegs(br, mr, fr, bl, ml, fl,
 	Turn(mr, y_axis, 0, legMiddleSpeed)	-- RM leg forward
 	Turn(fr, x_axis, 0, legRaiseSpeed)
 	Turn(fr, z_axis, 0, legRaiseSpeed)	-- LB leg up
-	Turn(fr, y_axis, 0, legBackwardSpeed)	-- LB leg forward		
+	Turn(fr, y_axis, 0, legBackwardSpeed)	-- LB leg forward
 	
 	Turn(bl, x_axis, 0, legRaiseSpeed)
 	Turn(bl, z_axis, 0, legRaiseSpeed)	-- LF leg up
@@ -90,5 +90,5 @@ function GG.SpiderWalk.restoreLegs(br, mr, fr, bl, ml, fl,
 	Turn(ml, y_axis, 0, legMiddleSpeed)	-- RM leg forward
 	Turn(fl, x_axis, 0, legRaiseSpeed)
 	Turn(fl, z_axis, 0, legRaiseSpeed)	-- LB leg up
-	Turn(fl, y_axis, 0, legBackwardSpeed)	-- LB leg forward	
+	Turn(fl, y_axis, 0, legBackwardSpeed)	-- LB leg forward
 end

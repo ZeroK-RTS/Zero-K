@@ -49,7 +49,7 @@ end
 
 local weaponArray = {}
 
-for name,data in pairs(WeaponDefNames) do
+for name, data in pairs(WeaponDefNames) do
 	local custom = {scaleSlow = true}
 	local cp = data.customParams
 	if cp.timeslow_preset then
@@ -62,8 +62,10 @@ for name,data in pairs(WeaponDefNames) do
 		custom.smartRetargetHealth = cp.timeslow_smartretargethealth and tonumber(cp.timeslow_smartretargethealth) or nil
 		weapons[name] = custom
 	end
+	
 	if weapons[name] then
 		weaponArray[data.id] = Process(weapons[name])
+		weaponArray[data.id].rawDamage = tonumber(cp.raw_damage)
 	end
 end
 

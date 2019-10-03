@@ -16,7 +16,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[12]],
+    modelradius    = [[12]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -34,7 +34,7 @@ unitDef = {
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[mbot.s3o]],
-  script				 = [[shieldraid.lua]],
+  script                 = [[shieldraid.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {
@@ -74,10 +74,10 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-		light_camera_height = 1200,
-		light_radius = 120,
+        light_camera_height = 1200,
+        light_radius = 120,
       },
-	  
+      
       damage                  = {
         default = 9.53,
         subs    = 0.61,

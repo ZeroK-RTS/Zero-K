@@ -19,12 +19,12 @@ unitDef = {
   category               = [[LAND UNARMED]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[30 30 30]],
-  collisionVolumeType    = [[ellipsoid]], 
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[15]],
-	selection_scale = 1.2,
+    modelradius    = [[15]],
+    selection_scale = 1.2,
   },
 
   energyUse              = 0,

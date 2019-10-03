@@ -259,7 +259,7 @@ local function DoUnitGiveAway(allyTeamID, recieveTeamID, giveAwayTeams, doPlayer
 		local givePlayerID = doPlayerLineage and TeamIDToPlayerID(giveTeamID)
 		
 		-- Energy share is not set because the storage needs to be full for full overdrive.
-		-- Also energy income is mostly private and a large energy influx to the rest of the 
+		-- Also energy income is mostly private and a large energy influx to the rest of the
 		-- team is likely to be wasted or overdriven inefficently.
 		
 		local units = spGetTeamUnits(giveTeamID) or {}

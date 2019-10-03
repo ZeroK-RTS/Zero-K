@@ -9,11 +9,11 @@ unitDef = {
   buildPic            = [[vehriot.png]],
   canGuard            = true,
   canMove             = true,
-  canPatrol           = true,	
+  canPatrol           = true,
   category            = [[LAND]],
   selectionVolumeOffsets = [[0 0 0]],
   selectionVolumeScales  = [[42 42 42]],
-  selectionVolumeType    = [[ellipsoid]], 
+  selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -83,11 +83,11 @@ unitDef = {
         gatherradius = [[90]],
         smoothradius = [[60]],
         smoothmult   = [[0.08]],
-		force_ignore_ground = [[1]],
+        force_ignore_ground = [[1]],
 
-		light_camera_height = 1500,
+        light_camera_height = 1500,
       },
-	  
+      
       damage                  = {
         default = 220.2,
         planes  = 220.2,

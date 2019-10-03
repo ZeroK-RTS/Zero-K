@@ -1,9 +1,9 @@
-local base = piece 'base' 
-local body = piece 'body' 
-local turret = piece 'turret' 
-local ground1 = piece 'ground1' 
-local missile = piece 'missile' 
-local firepoint = piece 'firepoint' 
+local base = piece 'base'
+local body = piece 'body'
+local turret = piece 'turret'
+local ground1 = piece 'ground1'
+local missile = piece 'missile'
+local firepoint = piece 'firepoint'
 
 local wakes = {}
 for i = 1, 8 do
@@ -55,12 +55,12 @@ end
 
 function script.Create()
 	Turn(firepoint, x_axis, math.rad(-90))
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 end
 
-function script.AimFromWeapon() 
+function script.AimFromWeapon()
 	return turret
 end
 

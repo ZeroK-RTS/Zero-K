@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 --- TabPanel module
 
@@ -24,7 +24,7 @@ TabPanel = LayoutPanel:Inherit{
 local this = TabPanel
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 function TabPanel:New(obj)
 	obj = inherited.New(self, obj)
@@ -129,7 +129,7 @@ function TabPanel:GetTab(tabname)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 function TabPanel:ChangeTab(tabname)
 	if not tabname or not self.tabIndexMapping[tabname] then
@@ -145,4 +145,4 @@ function TabPanel:ChangeTab(tabname)
 	self.currentFrame:SetVisibility(true)
 	self:CallListeners(self.OnTabChange, tabname)
 end
---// ============================================================================= 
+--// =============================================================================

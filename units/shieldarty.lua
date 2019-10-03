@@ -69,17 +69,17 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        = {
-		burst = Shared.BURST_RELIABLE,
+      customParams        = {
+        burst = Shared.BURST_RELIABLE,
 
-	    disarmDamageMult = 1,
-		disarmDamageOnly = 1,
-		disarmTimer      = 6, -- seconds
-	  
-		light_camera_height = 1500,
-		light_color = [[1 1 1]],
-	  },
-	  
+        disarmDamageMult = 1,
+        disarmDamageOnly = 1,
+        disarmTimer      = 6, -- seconds
+      
+        light_camera_height = 1500,
+        light_color = [[1 1 1]],
+      },
+      
       damage                  = {
         default        = 2500,
       },

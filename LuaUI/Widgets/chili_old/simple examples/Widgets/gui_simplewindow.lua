@@ -67,7 +67,7 @@ function widget:Initialize()
 		autosize = false,
 		textColor = {1,0.1,0.1,0.9},
 		anchors = {left=true,bottom=true,right=true},
-	}	
+	}
 		
 	scrollabel2 = Chili.Label:New{
 		x = '51%',
@@ -80,7 +80,7 @@ function widget:Initialize()
 		autosize = false,
 		textColor = {0.1,1,0.1,0.9},
 		anchors = {left=true,bottom=true,right=true},
-	}		
+	}
 	
 	scrollpanel1 = ScrollPanel:New{
   		x = 0,
@@ -96,7 +96,7 @@ function widget:Initialize()
 			scrollabel1,
 			scrollabel2,
 		},
-	}		
+	}
 		
 	btn = Chili.Button:New{
 		x = 5,
@@ -121,7 +121,7 @@ function widget:Initialize()
 		autosize = false,
 		textColor = {1,0.1,0.1,0.9},
 		anchors = {left=true,bottom=true,right=true},
-	}	
+	}
 	
 	window0 = Chili.Window:New{
 		dockable = true,
@@ -154,6 +154,6 @@ function widget:Initialize()
 		autosize = false,
 		textColor = {0.1,0.1,1,0.9},
 		anchors = {left=true,bottom=true,right=true},
-	}	
+	}
 
 end

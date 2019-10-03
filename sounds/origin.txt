@@ -32,6 +32,10 @@ All zombie sounds (derived from http://www.freesound.org/people/sunnyterri/sound
 
 Klangfabrik:
 Sonic blaster shot sound (http://www.freesound.org/people/klangfabrik/sounds/232936/, sonic_blaster.wav)
+AA laser sound (https://freesound.org/people/klangfabrik/sounds/232936/)
+
+Anarchid: 
+disruptor_explosion (adapted from disruptor laser sound)
 
 Unfa:
 Sonic blaster impact sound (unfa_blast_2)

@@ -1,6 +1,6 @@
 if gadgetHandler:IsSyncedCode() then return end
 
-function gadget:GetInfo() 
+function gadget:GetInfo()
 	return {
 		name    = "Model projectiles only visible to own allyteam",
 		layer   = 0,

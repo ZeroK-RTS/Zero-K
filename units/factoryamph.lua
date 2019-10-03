@@ -7,18 +7,18 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
   buildingGroundDecalSizeY      = 10,
-  buildingGroundDecalType       = [[factoryamph_aoplane.dds]],  
+  buildingGroundDecalType       = [[factoryamph_aoplane.dds]],
 
   buildoptions     = {
     [[amphcon]],
     [[amphraid]],
     [[amphimpulse]],
     [[amphfloater]],
-    [[amphriot]],	
+    [[amphriot]],
     [[amphassault]],
-	[[amphlaunch]],
+    [[amphlaunch]],
     [[amphaa]],
-	[[amphbomb]],
+    [[amphbomb]],
     [[amphtele]],
   },
 
@@ -35,16 +35,17 @@ unitDef = {
   corpse           = [[DEAD]],
 
   customParams     = {
-	modelradius    = [[100]],
+    modelradius    = [[100]],
     aimposoffset   = [[0 0 -26]],
     midposoffset   = [[0 0 -10]],
     sortName = [[8]],
-	solid_factory = [[3]],
-	default_spacing = 8,
-	unstick_help   = 1,
+    solid_factory = [[3]],
+    default_spacing = 8,
+    unstick_help   = 1,
     selectionscalemult = 1,
-	factorytab       = 1,
-	shared_energy_gen = 1,
+    factorytab       = 1,
+    shared_energy_gen = 1,
+    cus_noflashlight = 1,
   },
 
   energyUse        = 0,
@@ -76,6 +77,9 @@ unitDef = {
       footprintX       = 7,
       footprintZ       = 7,
       object           = [[FACTORY2_DEAD.s3o]],
+      collisionVolumeOffsets = [[0 0 -16]],
+      collisionVolumeScales  = [[104 70 36]],
+      collisionVolumeType    = [[box]],
     },
 
     HEAP  = {

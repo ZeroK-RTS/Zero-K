@@ -3,15 +3,15 @@ if (not gadgetHandler:IsSyncedCode()) then
 end
 
 function gadget:GetInfo()
-  return {
-    name      = "Typemap Options",
-    desc      = "Edit's the map's typemap at the start of the game.",
-    author    = "Google Frog",
-    date      = "Feb, 2010",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "Typemap Options",
+		desc      = "Edit's the map's typemap at the start of the game.",
+		author    = "Google Frog",
+		date      = "Feb, 2010",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true  --  loaded by default?
+	}
 end
 
 local terrainNameToIndex = {}
@@ -20,7 +20,9 @@ local oldTerrain = {}
 local IMPASSIBLE_TERRAIN = 137 -- Hope that this does not conflict with any maps
 local NANOFRAMES_BLOCK = false -- Allows for LOS hax.
 
-local externalFunctions = {}
+local retainImpassException, retainRoadException = VFS.Include("LuaRules/Configs/typemap_options_maps.lua")
+local RETAIN_MAP_IMPASSIBLE = not retainImpassException[Game.mapName]
+local RETAIN_MAP_ROAD = not retainRoadException[Game.mapName]
 
 local function Round(x)
 	return math.floor((x + 4)/8)*8
@@ -104,12 +106,22 @@ function gadget:UnitFinished(unitID, unitDefID)
 	end
 end
 
+local function CheckNotImpassible(t, k, h, s)
+	if (not RETAIN_MAP_IMPASSIBLE) then
+		return true
+	end
+	return t > 0 or k > 0 or h > 0 or s > 0
+end
+
 function gadget:Initialize()
 	Spring.SetTerrainTypeData(IMPASSIBLE_TERRAIN, 0, 0, 0, 0)
-	if (Spring.GetModOptions().typemapsetting == "1") then
+	if (Spring.GetModOptions().typemapsetting == "1") or (not RETAIN_MAP_ROAD) then
 		for i = 0, 255 do
 			if i ~= IMPASSIBLE_TERRAIN then
-				Spring.SetTerrainTypeData(i, 1, 1, 1, 1)
+				local name, _, t, k, h, s = Spring.GetTerrainTypeData(i)
+				if CheckNotImpassible(t, k, h, s) then
+					Spring.SetTerrainTypeData(i, 1, 1, 1, 1)
+				end
 			end
 		end
 	else
@@ -119,7 +131,7 @@ function gadget:Initialize()
 				if name and not terrainNameToIndex[name] then
 					terrainNameToIndex[name] = i
 				end
-				if not (t == k and k == h and h == s and t ~= 0) then
+				if CheckNotImpassible(t, k, h, s) and not (t == k and k == h and h == s and t ~= 0) then
 					Spring.SetTerrainTypeData(i, 1,1,1,1)
 				end
 			end

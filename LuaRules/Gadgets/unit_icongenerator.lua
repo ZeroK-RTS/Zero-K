@@ -3,7 +3,7 @@
 --------------------------------------------------------------------------------
 --
 --  file:    unit_icongenerator.lua
---  brief:   
+--  brief:
 --  author:  jK
 --
 --  Copyright (C) 2007.
@@ -121,14 +121,14 @@ if (gadgetHandler:IsSyncedCode()) then
   end
 
 
-  function gadget:RecvLuaMsg(msg, playerID)
-    if (msg:find("buildicon",1,true)) then
+  function gadget:RecvLuaMsg(fullmsg, playerID)
+    if (fullmsg:find("buildicon",1,true)) then
       if (not Spring.IsCheatingEnabled()) then
         Spring.SendMessageToPlayer(playerID, "Cheating must be enabled");
         return true;
       end;
 
-      local msg     = msg:sub(11,msg:len());
+      local msg     = fullmsg:sub(11,fullmsg:len());
       local d = msg:find(";",d,true);
       local defname = msg:sub(1,d-1);
       local a = msg:find(";",d+1,true);

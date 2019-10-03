@@ -15,11 +15,11 @@ function gadget:GetInfo()
 end
 
 --------------------------------------------------------------------------------
---  «COMMON»  ------------------------------------------------------------------
+--  Â«COMMONÂ»  ------------------------------------------------------------------
 --------------------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
---  «SYNCED»  ------------------------------------------------------------------
+--  Â«SYNCEDÂ»  ------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 
@@ -50,7 +50,7 @@ local embarkCmdDesc = {
   id      = CMD_EMBARK, --defined in customcmds.h.lua
   type    = CMDTYPE.ICON,
   name    = 'Embark',
-  cursor  = 'Attack', 
+  cursor  = 'Attack',
   action  = 'embark',
   tooltip = 'Transport to location, or queue Embark point (SHIFT)',
   params  = {"alt"}
@@ -60,7 +60,7 @@ local disembarkCmdDesc = {
   id      = CMD_DISEMBARK, --defined in customcmds.h.lua
   type    = CMDTYPE.ICON,
   name    = 'Disembark',
-  cursor  = 'Attack', 
+  cursor  = 'Attack',
   action  = 'disembark',
   tooltip = 'Transport to location, or queue Disembark point (SHIFT)',
   params  = {"alt", "ctrl"}
@@ -71,7 +71,7 @@ local transportToCmdDesc = {
   type    = CMDTYPE.ICON_MAP, --has coordinate
   name    = 'TransportTo',
   hidden  = true,
-  cursor  = 'Attack', 
+  cursor  = 'Attack',
   action  = 'transportto',
   tooltip = 'Transport To location.',
 }
@@ -111,7 +111,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function IsTransportable(unitDefID)  
+function IsTransportable(unitDefID)
   ud = UnitDefs[unitDefID]
   if (ud == nil) then return false end
   udc = ud.springCategories
@@ -120,7 +120,7 @@ end
 
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-  if (hasTransports[teamID]) then 
+  if (hasTransports[teamID]) then
     if IsTransportable(unitDefID)  then AddCmdDesc(unitID) end
   elseif (transDefs[unitDefID]) then
     hasTransports[teamID] = true
@@ -183,7 +183,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_EMBARK] = true, [CMD_DISEMBARK] = true, [CMD_TRANSPORTTO] = true}
 end
 
@@ -198,7 +198,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
     local opt = CMD.OPT_ALT
 	local embark = true
-    if (cmdID == CMD_DISEMBARK and cmdOptions.shift) then 
+    if (cmdID == CMD_DISEMBARK and cmdOptions.shift) then
 		opt = opt + CMD.OPT_CTRL  --Note: Disembark only when in SHIFT mode (ctrl is used to mark disembark point)
 		embark = false --prevent enter into priority queue
 	end
@@ -219,11 +219,11 @@ end
 
 
 --------------------------------------------------------------------------------
---  «SYNCED»  ------------------------------------------------------------------
+--  Â«SYNCEDÂ»  ------------------------------------------------------------------
 --------------------------------------------------------------------------------
 else
 --------------------------------------------------------------------------------
---  «UNSYNCED»  ----------------------------------------------------------------
+--  Â«UNSYNCEDÂ»  ----------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function WrapToLuaUI(_,unitID,teamID, embark, shift, internal)
@@ -237,9 +237,9 @@ function gadget:Initialize()
 end
 
 --------------------------------------------------------------------------------
---  «UNSYNCED»  ----------------------------------------------------------------
+--  Â«UNSYNCEDÂ»  ----------------------------------------------------------------
 --------------------------------------------------------------------------------
 end
 --------------------------------------------------------------------------------
---  «COMMON»  ------------------------------------------------------------------
+--  Â«COMMONÂ»  ------------------------------------------------------------------
 --------------------------------------------------------------------------------

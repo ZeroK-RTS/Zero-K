@@ -79,7 +79,7 @@ local function CalculateBallisticConstant(deltaV,myGravity,heightDiff)
 		maxRange=xDist1 --maximum range
 		t=t1 --flight time
 	else
-		maxRange=xDist2 
+		maxRange=xDist2
 		t=t2
 	end
 	return maxRange, t --return maximum range and flight time.
@@ -103,10 +103,10 @@ local function CalculateModdedMaxRange(heightDiff, weapon)
 		heightModded = heightModded*weapon.heightBoostFactor
 		local moddedRange = CalculateBallisticConstant(weapon.deltaV,weapon.gameMyGravity,heightModded)
 		effectiveRange = moddedRange*weapon.scaleDown --Example: GetRange2D() in Spring\rts\Sim\Weapons\Cannon.cpp
-	elseif weapon.modType == 1 then 
+	elseif weapon.modType == 1 then
 		--SPHERE
 		effectiveRange = math.sqrt(weapon.customMaxRange^2 - heightModded^2) --Pythagoras theorem. Example: GetRange2D() in Spring\rts\Sim\Weapons\Weapon.cpp
-	elseif weapon.modType == 2 then 
+	elseif weapon.modType == 2 then
 		--CYLINDER
 		effectiveRange = weapon.customMaxRange - heightModded*weapon.customHeightMod --Example: GetRange2D() in Spring\rts\Sim\Weapons\StarburstLauncher.cpp
 		--Note: for unknown reason we must "Minus the heightMod" instead of adding it. This is the opposite of what shown on the source-code, but ingame test suggest "Minus heightMod" and not adding.

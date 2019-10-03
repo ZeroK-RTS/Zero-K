@@ -41,7 +41,7 @@ local SIG_Walk = 2
 local SIG_Aim = 4
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(flare, x_axis, 1.6, 5)
 	Turn(lshoulder, x_axis, -0.9, 5)
 	Turn(lforearm, z_axis, -0.2, 5)
@@ -177,7 +177,7 @@ end
 function preJump(turn, distance)
 end
 
-function beginJump() 
+function beginJump()
 	StartThread(StopWalk)
 end
 
@@ -193,7 +193,7 @@ end
 function halfJump()
 end
 
-function endJump() 
+function endJump()
 	EmitSfx(lfoot, GG.Script.UNIT_SFX4)
 	EmitSfx(rfoot, GG.Script.UNIT_SFX4)
 end

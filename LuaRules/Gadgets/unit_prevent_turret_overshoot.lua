@@ -45,11 +45,11 @@ local blockedCmds = {
 }
 
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return blockedCmds
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return allowedRangeSq
 end
 
@@ -165,5 +165,7 @@ function gadget:GameFrame()
 end
 
 function gadget:Initialize()
-	gadgetHandler:RemoveCallIn("GameFrame")
+	if projCount == 0 then
+		gadgetHandler:RemoveCallIn("GameFrame")
+	end
 end

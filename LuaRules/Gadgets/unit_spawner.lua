@@ -183,8 +183,8 @@ else
 	-- the problem is with human controlled chickens, otherwise it counts them as robot-players and difficulty increases very much
 	-- probably, ideally this needs to be taught to differentiate between human chickens and human robots...
 	for _, teamID in pairs(teams) do
-		local luaAI = Spring.GetTeamLuaAI(teamID)
-		if luaAI and string.find(string.lower(luaAI), "chicken") then
+		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
+		if teamLuaAI and string.find(string.lower(teamLuaAI), "chicken") then
 			lastChickenTeam = teamID
 			--break
 		end
@@ -352,7 +352,7 @@ end
 --
 
 local function IsPlayerUnitNear(x, z, r)
-	for teamID in pairs(humanTeams) do	 
+	for teamID in pairs(humanTeams) do
 		if (spGetUnitsInCylinder(x, z, r, teamID)[1]) then
 			return true
 		end
@@ -446,7 +446,7 @@ end
 local function ChooseTarget(unitID)
 	local tries = 0
 	local units = {}
-	if (not unitID) or (spGetUnitTeam(unitID) == gaiaTeamID) then 
+	if (not unitID) or (spGetUnitTeam(unitID) == gaiaTeamID) then
 		--makes chicken go for random unit belonging to owner of random player if unitID is NIL
 		local humanTeamList = SetToList(humanTeams)
 		if (not humanTeamList[1]) then
@@ -457,7 +457,7 @@ local function ChooseTarget(unitID)
 			units	= spGetTeamUnits(teamID)
 			tries = tries + 1
 		until (#units > 0 or tries >= 100)
-	else 
+	else
 		--makes chicken go for random unit belonging to owner of closest enemy
 		local teamID = spGetUnitTeam(unitID)
 		units = spGetTeamUnits(teamID)
@@ -478,7 +478,7 @@ end
 
 local function IsChickenTechAvailable(chickenName, chickenDef, time, techMod)
 	local currTech = time + techMod
-	local min = time * techTimeFloorFactor	
+	local min = time * techTimeFloorFactor
 	if currTech < min then
 		currTech = min
 	end
@@ -550,7 +550,7 @@ local function SpawnChicken(burrowID, spawnNumber, chickenName)
 		if unitID then
 			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, 0) --// set moveState to roam
 			if (tloc) then spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, 0) end
-			data.chickenBirths[unitID] = now 
+			data.chickenBirths[unitID] = now
 		end
 	end
 end
@@ -580,9 +580,9 @@ local function SpawnTurret(burrowID, turret, number, force)
 
 	if not force then
 		data.defensePool = data.defensePool - cost*spawnNumber
-	end	
+	end
 	
-	for i=1, spawnNumber do	
+	for i=1, spawnNumber do
 		repeat
 			x = random(bx - s, bx + s)
 			z = random(bz - s, bz + s)
@@ -628,7 +628,7 @@ local function SpawnSupport(burrowID, support, number, force)
 	local s = spawnSquare
 	local spawnNumber = number or math.max(math.floor(squadSize), 1)
 
-	for i=1, spawnNumber do	
+	for i=1, spawnNumber do
 		repeat
 			x = random(bx - s, bx + s)
 			z = random(bz - s, bz + s)
@@ -676,15 +676,15 @@ local function SpawnBurrow(number, loc, burrowLevel)
 					local vicinity = spGetUnitsInCylinder(x, z, maxBaseDistance)
 					local humanUnitsInVicinity = false
 					local humanUnitsInProximity = false
-					for i=1, #vicinity, 1 do
-						if (spGetUnitTeam(vicinity[i]) ~= chickenTeamID) then
+					for j=1, #vicinity, 1 do
+						if (spGetUnitTeam(vicinity[j]) ~= chickenTeamID) then
 							humanUnitsInVicinity = true
 							break
 						end
 					end
 				
-					for i=1, #proximity, 1 do
-						if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
+					for j=1, #proximity, 1 do
+						if (spGetUnitTeam(proximity[j]) ~= chickenTeamID) then
 							humanUnitsInProximity = true
 							break
 						end
@@ -872,7 +872,7 @@ local function Wave()
 		data.endMiniQueenNum = data.endMiniQueenNum + 1
 		if data.endMiniQueenNum == endMiniQueenWaves then
 			for i=1,playerCount do SpawnMiniQueen() end
-				endMiniQueenNum = 0 
+				endMiniQueenNum = 0
 			end
 	end
 	data.specialPowerCooldown = data.specialPowerCooldown - 1
@@ -932,13 +932,13 @@ local function Wave()
 	end
 	if defensePoolDelta < 0 then defensePoolDelta = 0 end
 	data.defensePool = data.defensePool + defensePoolDelta
-	data.defenseQuota = data.defensePool/burrowCount 
+	data.defenseQuota = data.defensePool/burrowCount
 	
 	local spawnDef = false
 	local cost = (defenders[turret] and defenders[turret].cost) or 1
 	if turret and cost < data.defenseQuota then
 		spawnDef = true
-		--Spring.Echo("Defense pool/quota: " .. data.defensePool .. " / " .. data.defenseQuota)		
+		--Spring.Echo("Defense pool/quota: " .. data.defensePool .. " / " .. data.defenseQuota)
 	end
 	
  
@@ -992,7 +992,7 @@ local function MorphQueen()
 	end
 
 	if not data.queenID then
-		Spring.Echo("LUA_ERRRUN chicken queen was not recreated correctly")
+		Spring.Echo("LUA_ERRRUN chicken queen was not recreated correctly, chicken team unit count / total unit count / maxunits ", Spring.GetTeamUnitCount(queenOwner), #Spring.GetAllUnits(), Spring.GetModOptions().maxunits or 10000)
 		return
 	end
 
@@ -1056,7 +1056,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 		local x, y, z = spGetUnitPosition(unitID)
 		data.targets[unitID] = unitTeam
 		--distance check for existing burrows goes here
-		for burrow, data in pairs(data.burrows) do
+		for burrow, burrowdata in pairs(data.burrows) do
 			UpdateBurrowTarget(burrow, unitID)
 		end
 	end
@@ -1145,7 +1145,7 @@ function gadget:GameFrame(n)
 		data.targetCache = ChooseTarget()
 
 		if (data.targetCache) then
-			local chickens = spGetTeamUnits(chickenTeamID) 
+			local chickens = spGetTeamUnits(chickenTeamID)
 			for i=1,#chickens do
 				local unitID = chickens[i]
 				if (not Spring.Utilities.GetUnitFirstCommand(unitID)) then
@@ -1176,10 +1176,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	data.chickenBirths[unitID] = nil
 	if data.targets[unitID] then
 		data.targets[unitID] = nil
-		for burrow, data in pairs(data.burrows) do
-			if data.targetID == unitID then		--retarget burrows if needed
-				data.targetID = burrow
-				data.targetDistance = 1000000
+		for burrow, burrowdata in pairs(data.burrows) do
+			if burrowdata.targetID == unitID then		--retarget burrows if needed
+				burrowdata.targetID = burrow
+				burrowdata.targetDistance = 1000000
 				UpdateBurrowTarget(burrow, nil)
 			end
 		end

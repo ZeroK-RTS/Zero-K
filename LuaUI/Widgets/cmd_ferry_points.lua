@@ -174,10 +174,10 @@ function widget:CommandsChanged()
 		tooltip = 'Places a ferry route',
 		cursor  = 'Repair',
 		action  = 'setferry',
-		params  = { }, 
+		params  = { },
 		texture = 'LuaUI/Images/commands/Bold/ferry.png',
 
-		pos = {CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT}, 
+		pos = {CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},
 	}
 end
 
@@ -194,7 +194,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				for i = 1, route.transportCount do
 					local trans = transport[route.transporters[i]]
 					if trans.waypoint == 0 then
-						Spring.GiveOrderToUnit(route.transporters[i], CMD.MOVE, 
+						Spring.GiveOrderToUnit(route.transporters[i], CMD.MOVE,
 							{route.start.x, route.start.y, route.start.z}, 0 )
 					end
 				end
@@ -203,7 +203,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				for i = 1, route.transportCount do
 					local trans = transport[route.transporters[i]]
 					if trans.waypoint == movingPoint.index then
-						Spring.GiveOrderToUnit(route.transporters[i], CMD.MOVE, 
+						Spring.GiveOrderToUnit(route.transporters[i], CMD.MOVE,
 							{route.points[movingPoint.index].x, route.points[movingPoint.index].y, route.points[movingPoint.index].z}, 0 )
 					end
 				end
@@ -344,14 +344,14 @@ function widget:Update()
 		end
 		toBeWaited.count = 0
 		toBeWaited.unit = {}
-	end	
+	end
 end
 
 -------------------------------------------------------------------
 -------------------------------------------------------------------
 --- UNIT HANDLING
 
-function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID) 
+function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 	if Spring.ValidUnitID(unitID) then
 		local currentCmd = Spring.GetUnitCurrentCommand(unitID)
 		if currentCmd == CMD.WAIT then

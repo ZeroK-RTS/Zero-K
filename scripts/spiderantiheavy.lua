@@ -1,21 +1,21 @@
 include "constants.lua"
 
-local base = piece 'base' 
-local turret = piece 'turret' 
-local barrel = piece 'barrel' 
-local flare = piece 'flare' 
+local base = piece 'base'
+local turret = piece 'turret'
+local barrel = piece 'barrel'
+local flare = piece 'flare'
 
-local lfrontleg = piece 'lfrontleg' 
-local lfrontleg1 = piece 'lfrontleg_1' 
+local lfrontleg = piece 'lfrontleg'
+local lfrontleg1 = piece 'lfrontleg_1'
 
-local rfrontleg = piece 'rfrontleg' 
-local rfrontleg1 = piece 'rfrontleg_1' 
+local rfrontleg = piece 'rfrontleg'
+local rfrontleg1 = piece 'rfrontleg_1'
 
-local laftleg = piece 'laftleg' 
-local laftleg1 = piece 'laftleg_1' 
+local laftleg = piece 'laftleg'
+local laftleg1 = piece 'laftleg_1'
 
-local raftleg = piece 'raftleg' 
-local raftleg1 = piece 'raftleg_1' 
+local raftleg = piece 'raftleg'
+local raftleg1 = piece 'raftleg_1'
 
 local PACE = 1.4
 
@@ -91,7 +91,7 @@ end
 local function StopWalk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
-	Move(base, y_axis, 0, 4*up)	
+	Move(base, y_axis, 0, 4*up)
 	Turn(lfrontleg, y_axis, 0) 	-- right front forward
 	Turn(lfrontleg, z_axis, 0, up)
 	Turn(lfrontleg1, z_axis, 0, up)
@@ -101,18 +101,18 @@ local function StopWalk()
 	Turn(laftleg1, z_axis, 0, up)
 	
 	Turn(rfrontleg, y_axis, 0) 	-- left front backward
-	Turn(rfrontleg, z_axis, 0, up) 
+	Turn(rfrontleg, z_axis, 0, up)
 	Turn(rfrontleg1, z_axis, 0, up)
 	
 	Turn(raftleg, y_axis, 0) 	-- left back forward
-	Turn(raftleg, z_axis, 0, up) 
+	Turn(raftleg, z_axis, 0, up)
 	Turn(raftleg1, z_axis, 0, up)
 
 
-	Turn(lfrontleg, y_axis, math.rad(45), forward) 
-	Turn(rfrontleg, y_axis, math.rad(-45), forward) 
-	Turn(laftleg, y_axis, math.rad(-45), forward) 
-	Turn(raftleg, y_axis, math.rad(45), forward) 
+	Turn(lfrontleg, y_axis, math.rad(45), forward)
+	Turn(rfrontleg, y_axis, math.rad(-45), forward)
+	Turn(laftleg, y_axis, math.rad(-45), forward)
+	Turn(raftleg, y_axis, math.rad(45), forward)
 
 end
 
@@ -126,12 +126,12 @@ end
 
 function script.Create()
 
-	Turn(lfrontleg, y_axis, math.rad(45)) 
-	Turn(rfrontleg, y_axis, math.rad(-45)) 
-	Turn(laftleg, y_axis, math.rad(-45)) 
-	Turn(raftleg, y_axis, math.rad(45)) 
+	Turn(lfrontleg, y_axis, math.rad(45))
+	Turn(rfrontleg, y_axis, math.rad(-45))
+	Turn(laftleg, y_axis, math.rad(-45))
+	Turn(raftleg, y_axis, math.rad(45))
 
-	StartThread(GG.Script.SmokeUnit,smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.AimWeapon(num, heading, pitch)

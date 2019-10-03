@@ -68,7 +68,7 @@ local st_find = string.find
 
 local sqrt  = math.sqrt
 local floor = math.floor
-local ceil  = math.ceil 
+local ceil  = math.ceil
 local abs   = math.abs
 local modf  = math.modf
 local string_format = string.format
@@ -82,14 +82,19 @@ local Grid = 16 -- grid size, do not change without other changes.
 -- Epic Menu
 ---------------------------------
 options_path = 'Settings/Interface/Building Placement'
-options_order = {'holdMouseForStructureTerraform', 'staticMouseTime'}
+options_order = {'structure_holdMouse', 'structure_altSelect', 'structure_altmmb', 'staticMouseTime'}
 options = {
-	holdMouseForStructureTerraform = {
-		name = "Hold Mouse To Terraform Structures",
+	structure_holdMouse = {
+		name = "Terraform by holding mouse click",
 		type = "bool",
-		value = true,
+		value = false,
 		desc = "When enabled, holding down the left mouse button while placing a structure will enter height selection mode.",
-		noHotkey = true,
+	},
+	structure_altSelect = {
+		name = "Terraform by selecting with Alt",
+		type = "bool",
+		value = false,
+		desc = "When enabled, holding Alt while selecting a build option (either on the command card or with a hotkey) will cause height selection mode when the structure is placed.",
 	},
 	staticMouseTime = {
 		name = "Structure Terraform Press Time",
@@ -106,10 +111,10 @@ options = {
 local originalCommandGiven = false
 
 -- max difference of height around terraforming, Makes Shraka Pyramids. Not used
-local maxHeightDifference = 30 
+local maxHeightDifference = 30
 
 -- elmos of height that correspond to a 1 veritcal pixel of mouse movement during height choosing
-local mouseSensitivity = 2 
+local mouseSensitivity = 2
 
 -- snap to Y grid for raise
 local heightSnap = 6
@@ -207,11 +212,11 @@ local function stopCommand()
 	drawingLasso = false
 	drawingRectangle = false
 	setHeight = false
-	if (volumeDraw) then 
+	if (volumeDraw) then
 		gl.DeleteList(volumeDraw)
 		gl.DeleteList(mouseGridDraw)
 	end
-	if (groundGridDraw) then 
+	if (groundGridDraw) then
 		gl.DeleteList(groundGridDraw)
 	end
 	volumeDraw = false
@@ -232,11 +237,11 @@ local function completelyStopCommand()
 	drawingLasso = false
 	drawingRectangle = false
 	setHeight = false
-	if (volumeDraw) then 
+	if (volumeDraw) then
 		gl.DeleteList(volumeDraw)
 		gl.DeleteList(mouseGridDraw)
 	end
-	if (groundGridDraw) then 
+	if (groundGridDraw) then
 		gl.DeleteList(groundGridDraw)
 	end
 	volumeDraw = false
@@ -259,7 +264,7 @@ end
 local function SendCommand()
 	local constructor = spGetSelectedUnits()
 
-	if (#constructor == 0) or (points == 0) then 
+	if (#constructor == 0) or (points == 0) then
 		return
 	end
 	
@@ -318,7 +323,7 @@ local function SendCommand()
 		params[4] = pointAveZ
 		params[5] = commandTag
 		params[6] = loop
-		params[7] = terraformHeight 
+		params[7] = terraformHeight
 		params[8] = points
 		params[9] = #constructor
 		params[10] = volumeSelection
@@ -373,7 +378,7 @@ local function SendCommand()
 		end
 	end
 	buildToGive = false
-	points = 0		
+	points = 0
 end
 
 --------------------------------------------------------------------------------
@@ -522,16 +527,16 @@ local function calculateLinePoints(mPoint, mPoints)
 	gPoint[1] = {x = floor((mPoint[1].x+8)/16)*16, z = floor((mPoint[1].z+8)/16)*16}
 	
 	if gPoint[gPoints].x < border.left then
-		border.left = gPoint[gPoints].x 
+		border.left = gPoint[gPoints].x
 	end
 	if gPoint[gPoints].x > border.right then
-		border.right = gPoint[gPoints].x 
+		border.right = gPoint[gPoints].x
 	end
 	if gPoint[gPoints].z < border.top then
 		border.top = gPoint[gPoints].z
 	end
 	if gPoint[gPoints].z > border.bottom then
-		border.bottom = gPoint[gPoints].z 
+		border.bottom = gPoint[gPoints].z
 	end
 	
 	
@@ -548,16 +553,16 @@ local function calculateLinePoints(mPoint, mPoints)
 			gPoints = gPoints + 1
 			gPoint[gPoints] = {x = mPoint[i].x, z = mPoint[i].z}
 			if gPoint[gPoints].x < border.left then
-				border.left = gPoint[gPoints].x 
+				border.left = gPoint[gPoints].x
 			end
 			if gPoint[gPoints].x > border.right then
-				border.right = gPoint[gPoints].x 
+				border.right = gPoint[gPoints].x
 			end
 			if gPoint[gPoints].z < border.top then
 				border.top = gPoint[gPoints].z
 			end
 			if gPoint[gPoints].z > border.bottom then
-				border.bottom = gPoint[gPoints].z 
+				border.bottom = gPoint[gPoints].z
 			end
 		else
 
@@ -565,39 +570,39 @@ local function calculateLinePoints(mPoint, mPoints)
 			if a_diffX > a_diffZ then
 				local m = diffZ/diffX
 				local sign = diffX/a_diffX
-				for j = 0, a_diffX, 16 do	
+				for j = 0, a_diffX, 16 do
 					gPoints = gPoints + 1
 					gPoint[gPoints] = {x = mPoint[i-1].x + j*sign, z = floor((mPoint[i-1].z + j*m*sign)/16)*16}
 					if gPoint[gPoints].x < border.left then
-						border.left = gPoint[gPoints].x 
+						border.left = gPoint[gPoints].x
 					end
 					if gPoint[gPoints].x > border.right then
-						border.right = gPoint[gPoints].x 
+						border.right = gPoint[gPoints].x
 					end
 					if gPoint[gPoints].z < border.top then
 						border.top = gPoint[gPoints].z
 					end
 					if gPoint[gPoints].z > border.bottom then
-						border.bottom = gPoint[gPoints].z 
+						border.bottom = gPoint[gPoints].z
 					end
 				end
 			else
 				local m = diffX/diffZ
 				local sign = diffZ/a_diffZ
-				for j = 0, a_diffZ, 16 do	
+				for j = 0, a_diffZ, 16 do
 					gPoints = gPoints + 1
 					gPoint[gPoints] = {x = floor((mPoint[i-1].x + j*m*sign)/16)*16, z = mPoint[i-1].z + j*sign}
 					if gPoint[gPoints].x < border.left then
-						border.left = gPoint[gPoints].x 
+						border.left = gPoint[gPoints].x
 					end
 					if gPoint[gPoints].x > border.right then
-						border.right = gPoint[gPoints].x 
+						border.right = gPoint[gPoints].x
 					end
 					if gPoint[gPoints].z < border.top then
 						border.top = gPoint[gPoints].z
 					end
 					if gPoint[gPoints].z > border.bottom then
-						border.bottom = gPoint[gPoints].z 
+						border.bottom = gPoint[gPoints].z
 					end
 				end
 			end
@@ -626,10 +631,10 @@ local function calculateLinePoints(mPoint, mPoints)
 			for lz = -16,0,16 do
 				if not area[gPoint[i].x+lx][gPoint[i].z+lz] then
 					drawPoints = drawPoints + 1
-					drawPoint[drawPoints] = {x = gPoint[i].x+lx,z = gPoint[i].z+lz, 
-						ytl = spGetGroundHeight(gPoint[i].x+lx,gPoint[i].z+lz), 
+					drawPoint[drawPoints] = {x = gPoint[i].x+lx,z = gPoint[i].z+lz,
+						ytl = spGetGroundHeight(gPoint[i].x+lx,gPoint[i].z+lz),
 						ytr = spGetGroundHeight(gPoint[i].x+lx+16,gPoint[i].z+lz),
-						ybl = spGetGroundHeight(gPoint[i].x+lx,gPoint[i].z+lz+16), 
+						ybl = spGetGroundHeight(gPoint[i].x+lx,gPoint[i].z+lz+16),
 						ybr = spGetGroundHeight(gPoint[i].x+lx+16,gPoint[i].z+lz+16),
 					}
 					area[gPoint[i].x+lx][gPoint[i].z+lz]  = true
@@ -667,16 +672,16 @@ local function calculateAreaPoints(mPoint, mPoints)
 	gPoint[1] = {x = floor((mPoint[1].x)/16)*16, z = floor((mPoint[1].z)/16)*16}
 	
 	if gPoint[gPoints].x < border.left then
-		border.left = gPoint[gPoints].x 
+		border.left = gPoint[gPoints].x
 	end
 	if gPoint[gPoints].x > border.right then
-		border.right = gPoint[gPoints].x 
+		border.right = gPoint[gPoints].x
 	end
 	if gPoint[gPoints].z < border.top then
 		border.top = gPoint[gPoints].z
 	end
 	if gPoint[gPoints].z > border.bottom then
-		border.bottom = gPoint[gPoints].z 
+		border.bottom = gPoint[gPoints].z
 	end
 	
 	for i = 2, mPoints, 1 do
@@ -692,16 +697,16 @@ local function calculateAreaPoints(mPoint, mPoints)
 			gPoints = gPoints + 1
 			gPoint[gPoints] = {x = mPoint[i].x, z = mPoint[i].z}
 			if gPoint[gPoints].x < border.left then
-				border.left = gPoint[gPoints].x 
+				border.left = gPoint[gPoints].x
 			end
 			if gPoint[gPoints].x > border.right then
-				border.right = gPoint[gPoints].x 
+				border.right = gPoint[gPoints].x
 			end
 			if gPoint[gPoints].z < border.top then
 				border.top = gPoint[gPoints].z
 			end
 			if gPoint[gPoints].z > border.bottom then
-				border.bottom = gPoint[gPoints].z 
+				border.bottom = gPoint[gPoints].z
 			end
 		else
 
@@ -709,39 +714,39 @@ local function calculateAreaPoints(mPoint, mPoints)
 			if a_diffX > a_diffZ then
 				local m = diffZ/diffX
 				local sign = diffX/a_diffX
-				for j = 0, a_diffX, 16 do	
+				for j = 0, a_diffX, 16 do
 					gPoints = gPoints + 1
 					gPoint[gPoints] = {x = mPoint[i-1].x + j*sign, z = floor((mPoint[i-1].z + j*m*sign)/16)*16}
 					if gPoint[gPoints].x < border.left then
-						border.left = gPoint[gPoints].x 
+						border.left = gPoint[gPoints].x
 					end
 					if gPoint[gPoints].x > border.right then
-						border.right = gPoint[gPoints].x 
+						border.right = gPoint[gPoints].x
 					end
 					if gPoint[gPoints].z < border.top then
 						border.top = gPoint[gPoints].z
 					end
 					if gPoint[gPoints].z > border.bottom then
-						border.bottom = gPoint[gPoints].z 
+						border.bottom = gPoint[gPoints].z
 					end
 				end
 			else
 				local m = diffX/diffZ
 				local sign = diffZ/a_diffZ
-				for j = 0, a_diffZ, 16 do	
+				for j = 0, a_diffZ, 16 do
 					gPoints = gPoints + 1
 					gPoint[gPoints] = {x = floor((mPoint[i-1].x + j*m*sign)/16)*16, z = mPoint[i-1].z + j*sign}
 					if gPoint[gPoints].x < border.left then
-						border.left = gPoint[gPoints].x 
+						border.left = gPoint[gPoints].x
 					end
 					if gPoint[gPoints].x > border.right then
-						border.right = gPoint[gPoints].x 
+						border.right = gPoint[gPoints].x
 					end
 					if gPoint[gPoints].z < border.top then
 						border.top = gPoint[gPoints].z
 					end
 					if gPoint[gPoints].z > border.bottom then
-						border.bottom = gPoint[gPoints].z 
+						border.bottom = gPoint[gPoints].z
 					end
 				end
 			end
@@ -827,10 +832,10 @@ local function calculateAreaPoints(mPoint, mPoints)
 		for j = border.top, border.bottom, 16 do
 			if area[i][j] then
 				drawPoints = drawPoints + 1
-				drawPoint[drawPoints] = {x = i,z = j, 
-					ytl = spGetGroundHeight(i,j), 
+				drawPoint[drawPoints] = {x = i,z = j,
+					ytl = spGetGroundHeight(i,j),
 					ytr = spGetGroundHeight(i+16,j),
-					ybl = spGetGroundHeight(i,j+16), 
+					ybl = spGetGroundHeight(i,j+16),
 					ybr = spGetGroundHeight(i+16,j+16),
 				}
 			end
@@ -850,7 +855,7 @@ local function calculateAreaPoints(mPoint, mPoints)
 	
 end
 
-local function SetFixedRectanglePoints(pos)	
+local function SetFixedRectanglePoints(pos)
 	if legalPos(pos) then
 		local x = floor((pos[1] + 8 - placingRectangle.oddX)/16)*16 + placingRectangle.oddX
 		local z = floor((pos[3] + 8 - placingRectangle.oddZ)/16)*16 + placingRectangle.oddZ
@@ -936,9 +941,9 @@ function widget:MousePress(mx, my, button)
 		loop = 1
 		calculateAreaPoints(point,points)
 		
-		if (groundGridDraw) then 
+		if (groundGridDraw) then
 			gl.DeleteList(groundGridDraw);
-			groundGridDraw = nil 
+			groundGridDraw = nil
 		end
 		groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
 	
@@ -958,7 +963,7 @@ function widget:MousePress(mx, my, button)
 	
 	local activeCmdIndex, activeid = spGetActiveCommand()
 	
-	if ((activeid == CMD_LEVEL) or (activeid == CMD_RAISE) or (activeid == CMD_SMOOTH) or (activeid == CMD_RESTORE) or (activeid == CMD_BUMPY)) 
+	if ((activeid == CMD_LEVEL) or (activeid == CMD_RAISE) or (activeid == CMD_SMOOTH) or (activeid == CMD_RESTORE) or (activeid == CMD_BUMPY))
 			and not (setHeight or drawingRectangle or drawingLasso or drawingRamp or simpleDrawingRamp or placingRectangle) then
 
 		if button == 1 then
@@ -1142,8 +1147,8 @@ function widget:MouseMove(mx, my, dx, dy, button)
 			if my ~= mouseY then
 				Spring.WarpMouse (mouseX,mouseY)
 				point[1].y = point[1].y + (my-mouseY)*mouseSensitivity
-				storedHeight = point[1].y 
-			end	
+				storedHeight = point[1].y
+			end
 		end
 		
 		return true
@@ -1170,7 +1175,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 			if my ~= mouseY then
 				Spring.WarpMouse (mouseX,mouseY)
 				point[2].y = point[2].y + (my-mouseY)*mouseSensitivity
-				storedHeight = point[2].y 
+				storedHeight = point[2].y
 			end
 		end
 			
@@ -1209,12 +1214,12 @@ function widget:Update(dt)
 	
 	if setHeight then
 		local mx,my = spGetMouseState()
-			
+		
 		if terraform_type == 1 then
 			local a,c,m,s = spGetModKeyState()
 			if c then
 				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
-				if legalPos(pos) then	
+				if legalPos(pos) then
 					terraformHeight = spGetGroundHeight(pos[1],pos[3])
 					storedHeight = terraformHeight
 					mouseX = mx
@@ -1222,7 +1227,7 @@ function widget:Update(dt)
 				end
 			elseif a then
 				Spring.WarpMouse (mouseX,mouseY)
-				storedHeight = storedHeight + (my-mouseY)*mouseSensitivity 
+				storedHeight = storedHeight + (my-mouseY)*mouseSensitivity
 				local heightArray = {
 					-2,
 					orHeight,
@@ -1234,7 +1239,7 @@ function widget:Update(dt)
 				terraformHeight = terraformHeight + (my-mouseY)*mouseSensitivity
 				storedHeight = terraformHeight
 			end
-			if (volumeDraw) then 
+			if (volumeDraw) then
 				gl.DeleteList(volumeDraw); volumeDraw=nil
 				gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
 			end
@@ -1247,7 +1252,7 @@ function widget:Update(dt)
 				terraformHeight = 0
 				storedHeight = 0
 			elseif a then
-				storedHeight = storedHeight + (my-mouseY)*mouseSensitivity 
+				storedHeight = storedHeight + (my-mouseY)*mouseSensitivity
 				terraformHeight = floor((storedHeight+heightSnap/2)/heightSnap)*heightSnap
 			else
 				terraformHeight = terraformHeight + (my-mouseY)*mouseSensitivity
@@ -1256,7 +1261,7 @@ function widget:Update(dt)
 			if (volumeDraw) then
 				gl.DeleteList(volumeDraw); volumeDraw=nil
 				gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
-			end			
+			end
 			volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeRaise)
 			mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridRaise)
 		elseif terraform_type == 4 then
@@ -1282,21 +1287,21 @@ function widget:Update(dt)
 					-- Do not draw really short ramps.
 					if dis > minRampLength*0.3 or (point[2].x ~= point[1].x) then
 						point[2] = {
-							x = point[1].x+minRampLength*(pos[1]-point[1].x)/dis, 
-							y = orHeight, 
-							z = point[1].z+minRampLength*(pos[3]-point[1].z)/dis, 
+							x = point[1].x+minRampLength*(pos[1]-point[1].x)/dis,
+							y = orHeight,
+							z = point[1].z+minRampLength*(pos[3]-point[1].z)/dis,
 							ground = orHeight
 						}
 					end
 				elseif dis > maxRampLength then
 					point[2] = {
-						x = point[1].x+maxRampLength*(pos[1]-point[1].x)/dis, 
-						y = orHeight, 
-						z = point[1].z+maxRampLength*(pos[3]-point[1].z)/dis, 
+						x = point[1].x+maxRampLength*(pos[1]-point[1].x)/dis,
+						y = orHeight,
+						z = point[1].z+maxRampLength*(pos[3]-point[1].z)/dis,
 						ground = orHeight
 					}
 				else
-					point[2] = {x = pos[1], y = orHeight, z = pos[3], ground = orHeight}	
+					point[2] = {x = pos[1], y = orHeight, z = pos[3], ground = orHeight}
 				end
 			end
 		end
@@ -1331,7 +1336,7 @@ function widget:Update(dt)
 		else
 			pos = select(2, spTraceScreenRay(mx, my, true, false, false, true))
 		end
-		if pos and legalPos(pos) and options.holdMouseForStructureTerraform.value then
+		if pos and legalPos(pos) and options.structure_holdMouse.value then
 			if buildingPress then
 				if math.abs(pos[1] - buildingPress.pos[1]) >= 4 or math.abs(pos[3] - buildingPress.pos[3]) >= 4 then
 					local a,c,m,s = spGetModKeyState()
@@ -1491,21 +1496,21 @@ function widget:MouseRelease(mx, my, button)
 								calculateLinePoints(point,points)
 							end
 							
-							if (groundGridDraw) then 
-								gl.DeleteList(groundGridDraw); 
-								groundGridDraw=nil 
+							if (groundGridDraw) then
+								gl.DeleteList(groundGridDraw);
+								groundGridDraw=nil
 							end
 							groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
 							
 							if terraform_type == 1 then
-								if (volumeDraw) then 
+								if (volumeDraw) then
 									gl.DeleteList(volumeDraw); volumeDraw=nil
 									gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
 								end
 								volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeLevel)
 								mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridLevel)
 							elseif terraform_type == 2 then
-								if (volumeDraw) then 
+								if (volumeDraw) then
 									gl.DeleteList(volumeDraw); volumeDraw=nil
 									gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
 								end
@@ -1531,7 +1536,7 @@ function widget:MouseRelease(mx, my, button)
 				else
 					x = point[2].x
 					z = point[2].z
-				end	
+				end
 				
 				points = 5
 				point[2] = {x = point[1].x, z = z}
@@ -1594,7 +1599,7 @@ function widget:MouseRelease(mx, my, button)
 								point[2] = {x = x + xsize + 16, z = point[1].z}
 								point[3] = {x = point[2].x, z = z + ysize + 16}
 								point[4] = {x = point[1].x, z = point[3].z}
-								point[5] = {x =point[1].x, z = point[1].z}	
+								point[5] = {x =point[1].x, z = point[1].z}
 								loop = 1
 							else
 								points = 5
@@ -1602,7 +1607,7 @@ function widget:MouseRelease(mx, my, button)
 								point[2] = {x = x + xsize + 16, z = point[1].z}
 								point[3] = {x = point[2].x, z = z + ysize + 16}
 								point[4] = {x = point[1].x, z = point[3].z}
-								point[5] = {x =point[1].x, z = point[1].z}	
+								point[5] = {x =point[1].x, z = point[1].z}
 								loop = 0
 							end
 							
@@ -1736,10 +1741,10 @@ function widget:KeyPress(key)
 		end
 	end
 	
-	if key == KEYSYMS.SPACE and ( 
-		(terraform_type == 1 and (setHeight or drawingLasso or placingRectangle or drawingRectangle)) or 
-		(terraform_type == 3 and (drawingLasso or drawingRectangle)) or 
-		(terraform_type == 4 and (setHeight or drawingRamp or simpleDrawingRamp or drawingRectangle)) or 
+	if key == KEYSYMS.SPACE and (
+		(terraform_type == 1 and (setHeight or drawingLasso or placingRectangle or drawingRectangle)) or
+		(terraform_type == 3 and (drawingLasso or drawingRectangle)) or
+		(terraform_type == 4 and (setHeight or drawingRamp or simpleDrawingRamp or drawingRectangle)) or
 		(terraform_type == 5 and (drawingLasso or drawingRectangle))
 	) then
 		volumeSelection = volumeSelection+1
@@ -1762,8 +1767,7 @@ end
 -- Rectangle placement interaction
 --------------------------------------------------------------------------------
 
-function Terraform_SetPlacingRectangle(unitDefID)
-	
+local function Terraform_SetPlacingRectangle(unitDefID)
 	-- Do no terraform with pregame placement.
 	if Spring.GetGameFrame() < 1 then
 		return false
@@ -1813,8 +1817,14 @@ function Terraform_SetPlacingRectangle(unitDefID)
 	return true
 end
 
+local function Terraform_SetPlacingRectangleCheck()
+	return options.structure_altSelect.value
+end
+
 function widget:Initialize()
-	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle --set WG content at initialize rather than during file read to avoid conflict with local copy (for dev/experimentation)
+	--set WG content at initialize rather than during file read to avoid conflict with local copy (for dev/experimentation)
+	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle
+	WG.Terraform_SetPlacingRectangleCheck = Terraform_SetPlacingRectangleCheck
 end
 
 --------------------------------------------------------------------------------
@@ -1917,7 +1927,7 @@ function widget:DrawWorld()
 	
 	else
 	
-		if setHeight then	
+		if setHeight then
 			--glDepthTest(true)
 			glCallList(groundGridDraw)
 			glCallList(volumeDraw)
@@ -1978,11 +1988,11 @@ end
 -- Drawing
 --------------------------------------------------------------------------------
 function widget:Shutdown()
-	if (volumeDraw) then 
+	if (volumeDraw) then
 		gl.DeleteList(volumeDraw); volumeDraw=nil
 		gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
 	end
-	if (groundGridDraw) then 
-		gl.DeleteList(groundGridDraw); groundGridDraw=nil 
+	if (groundGridDraw) then
+		gl.DeleteList(groundGridDraw); groundGridDraw=nil
 	end
 end

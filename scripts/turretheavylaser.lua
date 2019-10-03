@@ -33,8 +33,8 @@ local SIG_AIM = 2
 
 local function RestoreAfterDelay()
 	Sleep(5000)
-	Turn(housing, x_axis, 0, math.rad(10)) 
-	Turn(basetop, y_axis, 0, math.rad(10)) 
+	Turn(housing, x_axis, 0, math.rad(10))
+	Turn(basetop, y_axis, 0, math.rad(10))
 end
 
 ----------------------------------------------------------------------------------------------
@@ -44,12 +44,12 @@ function script.Create()
 	local ud = UnitDefs[unitDefID]
 	local midTable = ud.model
 	
-	local mid = {midTable.midx, midTable.midy, midTable.midz}
-	local aim = {midTable.midx, midTable.midy + 15, midTable.midz}
+	local midpos = {midTable.midx, midTable.midy,      midTable.midz}
+	local aimpos = {midTable.midx, midTable.midy + 15, midTable.midz}
 
-	GG.SetupAimPosTerraform(unitID, unitDefID, mid, aim, midTable.midy + 15, midTable.midy + 60, 15, 48)
+	GG.SetupAimPosTerraform(unitID, unitDefID, midpos, aimpos, midTable.midy + 15, midTable.midy + 60, 15, 48)
 	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 ----------------------------------------------------------------------------------------------

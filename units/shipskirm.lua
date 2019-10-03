@@ -18,7 +18,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	turnatfullspeed = [[1]],
+    turnatfullspeed = [[1]],
     modelradius     = [[24]],
   },
 
@@ -39,7 +39,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[shipskirm.s3o]],
-  script		         = [[shipskirm.lua]],
+  script                 = [[shipskirm.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
   sfxtypes               = {
 
@@ -59,12 +59,12 @@ unitDef = {
 
   weapons                = {
 
-	{
-      def                = [[ROCKET]], 
-	  badTargetCategory	 = [[FIXEDWING GUNSHIP]],
+    {
+      def                = [[ROCKET]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-	
+    
   },
 
 
@@ -73,16 +73,16 @@ unitDef = {
      ROCKET = {
       name                    = [[Unguided Rocket]],
       areaOfEffect            = 75,
-	  burst                   = 4,
-	  burstRate               = 0.3,
+      burst                   = 4,
+      burstRate               = 0.3,
       cegTag                  = [[missiletrailred]],
       craterBoost             = 1,
       craterMult              = 2,
 
       customParams        = {
-		light_camera_height = 1800,
+        light_camera_height = 1800,
       },
-	  
+      
       damage                  = {
         default = 200,
         planes  = 200,
@@ -111,7 +111,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 230,
-	  wobble                  = 5000,
+      wobble                  = 5000,
     },
 
   },

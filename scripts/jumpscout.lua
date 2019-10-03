@@ -1,13 +1,13 @@
-local gun = piece 'gun' 
+local gun = piece 'gun'
 local yaw = piece 'yaw'
-local pelvis = piece 'pelvis' 
-local fire = piece 'fire' 
-local rcalf = piece 'rcalf' 
-local rfoot = piece 'rfoot' 
-local lcalf = piece 'lcalf' 
-local lfoot = piece 'lfoot' 
-local lthigh = piece 'lthigh' 
-local rthigh = piece 'rthigh' 
+local pelvis = piece 'pelvis'
+local fire = piece 'fire'
+local rcalf = piece 'rcalf'
+local rfoot = piece 'rfoot'
+local lcalf = piece 'lcalf'
+local lfoot = piece 'lfoot'
+local lthigh = piece 'lthigh'
+local rthigh = piece 'rthigh'
 
 include "constants.lua"
 
@@ -171,7 +171,7 @@ end
 
 function script.Create()
 	Turn(fire, x_axis, math.rad(-45.000000))
-	StartThread(GG.Script.SmokeUnit, {pelvis})
+	StartThread(GG.Script.SmokeUnit, unitID, {pelvis})
 end
 
 function script.StartMoving()

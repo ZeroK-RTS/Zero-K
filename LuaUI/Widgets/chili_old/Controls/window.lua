@@ -32,6 +32,9 @@ end
 --//=============================================================================
 
 function Window:New(obj)
+  if obj.noFont == nil and obj.caption then
+    obj.noFont = false
+  end
   obj = inherited.New(self,obj)
   obj:BringToFront()
   return obj

@@ -24,7 +24,7 @@ unitDef = {
   cruiseAlt              = 120,
 
   customParams           = {
-	modelradius    = [[10]],
+    modelradius    = [[10]],
   },
 
   explodeAs              = [[LARGE_BUILDINGEX]],
@@ -41,8 +41,8 @@ unitDef = {
   minCloakDistance       = 150,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          	 = [[krow.s3o]],
-  script			     = [[gunshipkrow.lua]],
+  objectName             = [[krow.s3o]],
+  script                 = [[gunshipkrow.lua]],
   selfDestructAs         = [[LARGE_BUILDINGEX]],
 
   sfxtypes               = {
@@ -62,8 +62,8 @@ unitDef = {
 
     {
       def                = [[KROWLASER]],
-	  mainDir            = [[0.38 0.1 0.2]],
-	  maxAngleDif        = 180,
+      mainDir            = [[0.38 0.1 0.2]],
+      maxAngleDif        = 180,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -71,22 +71,22 @@ unitDef = {
 
     {
       def                = [[KROWLASER]],
-	  mainDir            = [[-0.38 0.1 0.2]],
-	  maxAngleDif        = 180,
+      mainDir            = [[-0.38 0.1 0.2]],
+      maxAngleDif        = 180,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-	
+    
     {
       def                = [[CLUSTERBOMB]],
-	  mainDir            = [[0 0 1]],
-	  maxAngleDif        = 360,	  
+      mainDir            = [[0 0 1]],
+      maxAngleDif        = 360,
     },
-	
+    
     {
       def                = [[KROWLASER]],
-	  mainDir            = [[0 0.1 -0.38]],
-	  maxAngleDif        = 180,
+      mainDir            = [[0 0.1 -0.38]],
+      maxAngleDif        = 180,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -107,8 +107,8 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-		light_camera_height = 1800,
-		light_radius = 160,
+        light_camera_height = 1800,
+        light_radius = 160,
       },
 
       damage                  = {
@@ -128,7 +128,7 @@ unitDef = {
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
       soundStart              = [[weapon/laser/heavylaser_fire2]],
-	  soundStartVolume		  = 0.7,
+      soundStartVolume        = 0.7,
       soundTrigger            = true,
       thickness               = 3.25,
       tolerance               = 10000,
@@ -140,8 +140,8 @@ unitDef = {
     TIMEDISTORT    = {
       name                    = [[Time Distortion Field]],
       areaOfEffect            = 600,
-	  burst					  = 100,
-	  burstRate				  = 0.1,	  
+      burst                   = 100,
+      burstRate               = 0.1,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -163,18 +163,18 @@ unitDef = {
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 230,
-    },	
-	
+    },
+    
     CLUSTERBOMB = {
       name                    = [[Cluster Bomb]],
       accuracy                = 200,
       areaOfEffect            = 128,
-	  burst					  = 75,
-	  burstRate				  = 0.07, -- real value in script; here for widgets	  
+      burst                   = 75,
+      burstRate               = 0.066, -- real value in script; here for widgets
       commandFire             = true,
       craterBoost             = 1,
       craterMult              = 2,
-	
+    
       damage                  = {
         default = 250,
         planes  = 250,
@@ -198,7 +198,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
-	},
+    },
   },
 
 
@@ -206,9 +206,9 @@ unitDef = {
 
     DEAD  = {
       blocking         = true,
-	  collisionVolumeOffsets = [[0 0 0]],
-	  collisionVolumeScales  = [[80 30 80]],
-	  collisionVolumeType    = [[ellipsoid]],	  
+      collisionVolumeOffsets = [[0 0 0]],
+      collisionVolumeScales  = [[80 30 80]],
+      collisionVolumeType    = [[ellipsoid]],
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,

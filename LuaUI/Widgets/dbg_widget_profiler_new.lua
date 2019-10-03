@@ -76,7 +76,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
--- make a table of the names of user widgets 
+-- make a table of the names of user widgets
 local userWidgets = {}
 function widget:Initialize()
 	for name,wData in pairs(widgetHandler.knownWidgets) do
@@ -118,12 +118,12 @@ local function Hook(w,name) -- name is the callin
 	local t
 
 	local helper_func = function(...)
-		local dt = spDiffTimers(spGetTimer(),t)    
-		local _,_,new_s,_ = spGetLuaMemUsage() 
+		local dt = spDiffTimers(spGetTimer(),t)
+		local _,_,new_s,_ = spGetLuaMemUsage()
 		local ds = new_s - s
 		c[1] = c[1] + dt
 		c[2] = c[2] + dt
-		c[3] = c[3] + ds 
+		c[3] = c[3] + ds
 		c[4] = c[4] + ds
 		inHook = nil
 		return ...
@@ -280,7 +280,7 @@ local deltaTime
 local redStrength = {}
 
 local minPerc = 0.005 -- above this value, we fade in how red we mark a widget
-local maxPerc = 0.02 -- above this value, we mark a widget as red 
+local maxPerc = 0.02 -- above this value, we mark a widget as red
 local minSpace = 10 -- Kb
 local maxSpace = 100
 
@@ -289,7 +289,7 @@ local totals_colour = "\255\200\200\255"
 local maxLines = 50
 
 local function CalcLoad(old_load, new_load, t)
-	return old_load*math.exp(-tick/t) + new_load*(1 - math.exp(-tick/t)) 
+	return old_load*math.exp(-tick/t) + new_load*(1 - math.exp(-tick/t))
 end
 
 function ColourString(R,G,B)
@@ -312,7 +312,7 @@ function GetRedColourStrings(v) --tLoad is %
 	if tTime<minPerc then tTime = minPerc end
 
 	-- time
-	local new_r = ((tTime-minPerc)/(maxPerc-minPerc)) 
+	local new_r = ((tTime-minPerc)/(maxPerc-minPerc))
 	redStrength[name..'_time'] = redStrength[name..'_time'] or 0
 	redStrength[name..'_time'] = u*redStrength[name..'_time'] + (1-u)*new_r
 	local r,g,b = 1, 1-redStrength[name.."_time"]*((255-64)/255), 1-redStrength[name.."_time"]*((255-64)/255)
@@ -389,7 +389,7 @@ function widget:DrawScreen()
 				c[1] = 0
 				
 				space = space + c[3]
-				if (c[4]>cmax_space) then 
+				if (c[4]>cmax_space) then
 					cmax_space = c[4]
 					cmaxname_space = cname
 				end

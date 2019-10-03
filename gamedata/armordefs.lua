@@ -37,7 +37,7 @@ local armorDefs = {
   -- populated automatically
   PLANES = {
 	"empiricaldpser",
-  }, 
+  },
   ELSE   = {},
   SHIELD = {},
 }
@@ -149,6 +149,7 @@ for name, wd in pairs(DEFS.weaponDefs) do
 		end
 	end
 	wd.customparams.shield_damage = wd.damage.shield/((wd.customparams.effective_beam_time or wd.beamtime or 1/30) * 30)
+	wd.customparams.stats_shield_damage = wd.damage.shield
 	if wd.beamtime and wd.beamtime >= 0.1 then
 		-- Settings damage default to 0 removes cratering and impulse so is not universally applied.
 		-- It fixes long beams vs shield cases.
@@ -174,6 +175,40 @@ for name, wd in pairs(DEFS.weaponDefs) do
 			wd.damage.default = 0.001 -- Settings damage default to 0 removes cratering and impulse
 		end
 	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function ProcessSoundDefaults(wd)
+	local forceSetVolume = (not wd.soundstartvolume) or (not wd.soundhitvolume)
+
+	if not forceSetVolume then
+		return
+	end
+
+	local defaultDamage = wd.damage and wd.damage.default
+	if (not defaultDamage) or (defaultDamage <= 50) then
+		wd.soundstartvolume = 5
+		wd.soundhitvolume = 5
+		return
+	end
+
+	local soundVolume = math.sqrt(defaultDamage * 0.5)
+	if wd.weapontype == "LaserCannon" then
+		soundVolume = soundVolume*0.5
+	end
+
+	if (not wd.soundstartvolume) then
+		wd.soundstartvolume = soundVolume
+	end
+	if (not wd.soundhitvolume) then
+		wd.soundhitvolume = soundVolume
+	end
+end
+
+for name, wd in pairs(DEFS.weaponDefs) do
+	ProcessSoundDefaults(wd)
 end
 
 local system = VFS.Include('gamedata/system.lua')

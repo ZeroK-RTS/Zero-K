@@ -86,9 +86,9 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 2,
 
-			customParams = {
-				burst = Shared.BURST_UNRELIABLE,
-			},
+      customParams = {
+        burst = Shared.BURST_UNRELIABLE,
+      },
 
       damage                  = {
         default = 900.5,
@@ -175,6 +175,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams            = {
+        bogus = 1,
+      },
+
       damage                  = {
         default = 1E-06,
         planes  = 1E-06,
@@ -190,7 +194,7 @@ unitDef = {
       reloadtime              = 8,
       size                    = 1E-06,
       smokeTrail              = false,
-      targetborder            = 1,
+      targetborder            = 0.9,
       
       textures                = {
         [[null]],

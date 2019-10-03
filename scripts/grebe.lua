@@ -61,7 +61,7 @@ local function Walk()
 		Turn(lshin, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(rshin, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
-		WaitForTurn(rthigh, x_axis)		
+		WaitForTurn(rthigh, x_axis)
 		Sleep(0)
 	end
 end
@@ -89,7 +89,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)	
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function RestoreAfterDelay()
@@ -99,10 +99,6 @@ local function RestoreAfterDelay()
 	Turn(body, y_axis, 0, math.rad(65))
 	Turn(pelvis, x_axis, 0, math.rad(47.5))
 	Turn(countertilt, x_axis, 0, math.rad(47.5))
-end
-
-local function ReloadDisks(index)
-
 end
 
 function script.AimFromWeapon()
@@ -115,7 +111,7 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask(SIG_AIM1)
 		Turn(body, y_axis, heading, math.rad(360))
 		Turn(pelvis, x_axis, -pitch, math.rad(180))
-		Turn(countertilt, x_axis, pitch, math.rad(180))	
+		Turn(countertilt, x_axis, pitch, math.rad(180))
 		WaitForTurn(body, y_axis)
 		WaitForTurn(pelvis, x_axis)
 		StartThread(RestoreAfterDelay)
@@ -126,18 +122,6 @@ end
 function script.QueryWeapon(num)
 	if num == 1 then
 		return firepoints[gun_1]
-	end
-end
-
-function script.FireWeapon(num)
-	if num == 1 then
-		local i = 3
-		if gun_1 <= 2 then
-			i = 1
-		elseif gun_1 <= 4 then
-			i = 2
-		end
-		StartThread(ReloadDisks, index)
 	end
 end
 

@@ -142,7 +142,7 @@ ResetWidget = function()
 	unitsCount = 0
 	unitMap = {}
 
-	local units = spGetAllUnits() 
+	local units = spGetAllUnits()
 	for _, unitID in ipairs(units) do
 		AddUnit(unitID)
 	end
@@ -214,7 +214,7 @@ local function DrawShadows()
 
 			-- calculate quad size
 			unitDefID = spGetUnitDefID(unitID)
-			local xsize = UnitDefs[unitDefID].xsize 
+			local xsize = UnitDefs[unitDefID].xsize
 			if xsize then
 				quadSize = xsize * 4
 			else

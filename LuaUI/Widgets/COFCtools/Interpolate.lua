@@ -33,7 +33,7 @@ function GetCenterBounds(cs)
 	local maxDc = math.max((maxDistY - cs.py), 0)/(maxDistY - mapEdgeBuffer)-- * math.tan(currentFOVhalf_rad) * 1.5)
 	-- Spring.Echo("MaxDC: "..maxDc)
 	local minX, minZ, maxX, maxZ = math.max(mcx - MWIDTH/2 * maxDc, 0), math.max(mcz - MHEIGHT/2 * maxDc, 0), math.min(mcx + MWIDTH/2 * maxDc, MWIDTH), math.min(mcz + MHEIGHT/2 * maxDc, MHEIGHT)
-	return minX, minZ, maxX, maxZ 
+	return minX, minZ, maxX, maxZ
 end
 
 local function CorrectLockpointCentering(cs, lockPoint) --For COFC's zoom out to center setting
@@ -72,8 +72,8 @@ local function InterpLockScreenWorldPoints(lockPoint, tweenFact)
 		if not lockPoint.screenDelta then
 			lockPoint.screenDelta = {x = lockPoint.screenEnd.x - lockPoint.screenBegin.x, y = lockPoint.screenEnd.y - lockPoint.screenBegin.y}
 		end
-		lockPoint.screen.x = lockPoint.screenBegin.x + lockPoint.screenDelta.x * tweenFact 
-		lockPoint.screen.y = lockPoint.screenBegin.y + lockPoint.screenDelta.y * tweenFact 
+		lockPoint.screen.x = lockPoint.screenBegin.x + lockPoint.screenDelta.x * tweenFact
+		lockPoint.screen.y = lockPoint.screenBegin.y + lockPoint.screenDelta.y * tweenFact
 	end
 
 	if not lockPoint.world and lockPoint.worldBegin then lockPoint.world = {x = lockPoint.worldBegin.x, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z} end
@@ -81,8 +81,8 @@ local function InterpLockScreenWorldPoints(lockPoint, tweenFact)
 		if not lockPoint.worldDelta then
 			lockPoint.worldDelta = {x = lockPoint.worldEnd.x - lockPoint.worldBegin.x, y = lockPoint.worldEnd.y - lockPoint.worldBegin.y, z = lockPoint.worldEnd.z - lockPoint.worldBegin.z}
 		end
-		lockPoint.world.x = lockPoint.worldBegin.x + lockPoint.worldDelta.x * tweenFact 
-		lockPoint.world.y = lockPoint.worldBegin.y + lockPoint.worldDelta.y * tweenFact 
+		lockPoint.world.x = lockPoint.worldBegin.x + lockPoint.worldDelta.x * tweenFact
+		lockPoint.world.y = lockPoint.worldBegin.y + lockPoint.worldDelta.y * tweenFact
 		lockPoint.world.z = lockPoint.worldBegin.z + lockPoint.worldDelta.z * tweenFact
 	end
 end
@@ -118,7 +118,7 @@ function GetLockpointCorrectionDelta(cs, lockPoint, tweenFact)
 		if lockPoint.mode == lockMode.free then
 			--When someone needs this, this is where to put in the correction mode that works on xyz
 			--should be useful for orbiting/rotating around a point, but not necessary for tiltzoom
-		end 
+		end
 	end
 	return dx, dy, dz
 end
@@ -142,9 +142,9 @@ local function CorrectToLockpoint(cs, tweenFact)
 		CorrectLockpointCamera(cs, dx, dy, dz)
 
 		--Theoretically this should handle zoom out to center for fromCursor and fromCenter, but it's
-		--not the most numerically stable, so it's only enabled for fromCursor, 
+		--not the most numerically stable, so it's only enabled for fromCursor,
 		--since fromCenter has another possible method that's less bouncy.
-		if lockTarget.worldCenter and lockTarget.mode ~= lockMode.xycenter then 
+		if lockTarget.worldCenter and lockTarget.mode ~= lockMode.xycenter then
 			dx, dz = CorrectLockpointCentering(cs, lockTarget)
 			CorrectLockpointCamera(cs, dx, dy, dz)
 		end
@@ -296,7 +296,7 @@ function Interpolate()
 	if ( lapsedTime >= deltaEnd.period) then
 		local cs = spGetCameraState()
 		CopyState(cs, targetCam)
-		-- AddSpeed(cs,deltaEnd,0.5) 
+		-- AddSpeed(cs,deltaEnd,0.5)
 		DisableEngineTilt(cs)
 		spSetCameraState(cs,0)
 		CorrectToLockpoint(cs, tweenFact)

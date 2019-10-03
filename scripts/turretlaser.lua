@@ -1,8 +1,8 @@
-local base = piece 'base' 
-local body = piece 'body' 
-local barrel = piece 'barrel' 
-local turret = piece 'turret' 
-local flare = piece 'flare' 
+local base = piece 'base'
+local body = piece 'body'
+local barrel = piece 'barrel'
+local turret = piece 'turret'
+local flare = piece 'flare'
 --linear constant 163840
 
 include "constants.lua"
@@ -14,8 +14,8 @@ local SIG_AIM = 2
 
 local function RestoreAfterDelay()
 	Sleep(5000)
-	Turn(barrel, x_axis, 0, math.rad(10)) 
-	Turn(turret, y_axis, 0, math.rad(10)) 
+	Turn(barrel, x_axis, 0, math.rad(10))
+	Turn(turret, y_axis, 0, math.rad(10))
 end
 
 local stuns = {false, false, false}
@@ -30,7 +30,7 @@ function script.Create()
     
 	GG.SetupAimPosTerraform(unitID, unitDefID, mid, aim, midTable.midy + 22, midTable.midy + 40, 15, 40)
 	
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 end
 
 local function StunThread ()

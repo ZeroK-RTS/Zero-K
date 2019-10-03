@@ -19,7 +19,7 @@ Window = Control:Inherit{
 local this = Window
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 --[[
 function Window:UpdateClientArea()
 	inherited.UpdateClientArea(self)
@@ -37,9 +37,12 @@ function Window:UpdateClientArea()
 	self.blurId = WG['blur_api'].InsertBlurRect(self.x, screeny, self.x + self.width, screeny-self.height)
 end
 --]]
---// ============================================================================= 
+--// =============================================================================
 
 function Window:New(obj)
+	if obj.noFont == nil and obj.caption then
+		obj.noFont = false
+	end
 	obj = inherited.New(self, obj)
 	obj:BringToFront()
 	return obj

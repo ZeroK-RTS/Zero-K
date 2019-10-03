@@ -13,7 +13,7 @@ unitDef = {
   category               = [[LAND SINK]],
   selectionVolumeOffsets = [[0 0 0]],
   selectionVolumeScales  = [[42 42 42]],
-  selectionVolumeType    = [[ellipsoid]], 
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -80,7 +80,7 @@ unitDef = {
       cylinderTargeting       = 1,
 
       customParams            = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
         isaa = [[1]],
         script_reload = [[12]],
@@ -105,7 +105,7 @@ unitDef = {
       model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
       range                   = 820,
-      reloadtime              = 0.32,
+      reloadtime              = 0.3,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],

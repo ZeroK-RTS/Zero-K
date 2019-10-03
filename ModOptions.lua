@@ -262,6 +262,22 @@ local options = {
     def=false,
   },
   {
+    key='disable_ai_team_resign',
+    name='Disable AI Resignation',
+    desc='Prevents AIs from resigning when they run out of constructors and factories.',
+    type='bool',
+    section= 'a_important',
+    def=false,
+  },
+  {
+    key='disable_overwhelming_advantage',
+    name='Disable Overwhelming Advantage',
+    desc='Disable team reveal when the opposing team has 25x more assets.',
+    type='bool',
+    section= 'a_important',
+    def=false,
+  },
+  {
     key='campaign_chassis',
     name='Allow campaign commander chassis',
     desc='Allows you to choose the campaign commander chassis.',
@@ -374,8 +390,8 @@ local options = {
     type   = 'bool',
     section= 'experimental',
     def    = false,
-  },  
---[[  
+  },
+--[[
   {
     key    = 'damagemult',
     name   = 'Damage Multiplier',
@@ -435,7 +451,7 @@ local options = {
 		desc    = 'Determines how many units and buildings a player is allowed to own at a time',
 		type    = 'number',
 		section = 'multipliers',
-		def     = 10000, -- don't change to anything reachable, won't take effect; engine default is ~10K 
+		def     = 10000, -- don't change to anything reachable, won't take effect; engine default is ~10K
 		                 -- (actually 32K / #teams so 1v1+gaia allows ~10K each)
 		min     = 10,
 		max     = 10000,
@@ -489,7 +505,7 @@ local options = {
   --  type	= "bool",
   --  def		= true,
   --  section	= "experimental",
-  --},  
+  --},
 --  { -- Causes desync https://springrts.com/mantis/view.php?id=5936
 --    key		= "pathfinder",
 --    name	= "Pathfinder type",
@@ -513,8 +529,8 @@ local options = {
 --	--	name = 'Classic',
 --	--	desc = 'An older pathfinding system without turninplace or reverse',
 --    --  }
---    },	
---  },  
+--    },
+--  },
   
   {
     key    = 'chicken',
@@ -670,7 +686,7 @@ local options = {
     max    = 9000,
     step   = 60,
   },
---[[  
+--[[
   {
 	key    = 'burrowtechtime',
 	name   = 'Burrow Tech Time',
@@ -680,9 +696,9 @@ local options = {
 	def    = 12,
 	min    = 0,
 	max    = 60,
-	step   = 1,  
+	step   = 1,
   },
-]]--  
+]]--
   {
 	key    = 'burrowqueentime',
 	name   = 'Burrow Queen Time',
@@ -692,7 +708,7 @@ local options = {
 	def    = 15,
 	min    = 0,
 	max    = 120,
-	step   = 1,  
+	step   = 1,
   },
 }
 

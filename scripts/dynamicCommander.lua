@@ -383,4 +383,4 @@ return {
 	Create            = Create,
 	SpawnModuleWrecks = SpawnModuleWrecks,
 	SpawnWreck        = SpawnWreck,
-}	
+}

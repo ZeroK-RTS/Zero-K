@@ -10,7 +10,7 @@ local claw2 = piece 'claw2'
 local wakes =
 	{ piece 'wake1'
 	, piece 'wake2'
-} 
+}
 local beam = piece 'beam'
 
 local smokePiece = {body, claw1, turret}
@@ -20,7 +20,7 @@ local SIG_Build = 1
 local SIG_Move = 2
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

@@ -53,7 +53,7 @@ local function GetSpeedMod()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(lshoulder, z_axis, math.rad(0))
 	Turn(lshoulder, x_axis, -math.rad(10))
 	Turn(lforearm, x_axis, -math.rad(80))

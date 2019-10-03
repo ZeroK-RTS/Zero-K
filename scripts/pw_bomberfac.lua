@@ -25,7 +25,7 @@ local function Close()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	Turn(build, x_axis, math.rad(180))
 	Turn(build, z_axis, math.rad(45)) -- Just... don't ask.

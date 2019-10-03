@@ -20,9 +20,9 @@ unitDef = {
     amph_regen = 30,
     amph_submerged_at = 40,
 
-	teleporter = 1,
-	teleporter_throughput = 120, -- mass per second
-	teleporter_beacon_spawn_time = 9,
+    teleporter = 1,
+    teleporter_throughput = 120, -- mass per second
+    teleporter_beacon_spawn_time = 9,
   },
 
   explodeAs              = [[BIG_UNIT]],

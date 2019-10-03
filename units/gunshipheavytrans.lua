@@ -26,9 +26,9 @@ unitDef = {
   cruiseAlt              = 250,
 
   customParams           = {
-	midposoffset   = [[0 0 0]],
-	aimposoffset   = [[0 10 0]],
-	modelradius    = [[15]],
+    midposoffset   = [[0 0 0]],
+    aimposoffset   = [[0 10 0]],
+    modelradius    = [[15]],
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -45,7 +45,7 @@ unitDef = {
   minCloakDistance       = 75,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[largeTransport.s3o]],
-  script				 = [[gunshipheavytrans.lua]],
+  script                 = [[gunshipheavytrans.lua]],
   releaseHeld            = true,
   selfDestructAs         = [[GUNSHIPEX]],
 
@@ -69,11 +69,11 @@ unitDef = {
 
   weapons                = {
 
-	{
+    {
       def                = [[LASER]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  mainDir            = [[-1 -1 1]],
+      mainDir            = [[-1 -1 1]],
       maxAngleDif        = 200,
     },
 
@@ -82,12 +82,12 @@ unitDef = {
       def                = [[LASER]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  mainDir            = [[1 -1 1]],
+      mainDir            = [[1 -1 1]],
       maxAngleDif        = 200,
     },
-	
-	
-	{
+    
+    
+    {
       def                = [[AALASER]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
       mainDir            = [[0 -1 1]],
@@ -123,7 +123,7 @@ unitDef = {
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
       fireStarter             = 50,
       impactOnly              = true,
-	  heightMod               = 1,
+      heightMod               = 1,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
@@ -140,7 +140,7 @@ unitDef = {
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 2400,
     },
-	
+    
     AALASER  = {
       name                    = [[Anti-Air Laser]],
       areaOfEffect            = 12,
@@ -188,8 +188,8 @@ unitDef = {
 
     DEAD  = {
       blocking         = true,
-	  collisionVolumeScales  = [[40 40 80]],
-	  collisionVolumeType    = [[CylZ]],
+      collisionVolumeScales  = [[40 40 80]],
+      collisionVolumeType    = [[CylZ]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,

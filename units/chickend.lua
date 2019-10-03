@@ -37,6 +37,7 @@ unitDef = {
   objectName                    = [[tube.s3o]],
   onoffable                     = true,
   power                         = 120,
+  script                        = [[chickend.lua]],
   selfDestructAs                = [[NOWEAPON]],
 
   sfxtypes                      = {

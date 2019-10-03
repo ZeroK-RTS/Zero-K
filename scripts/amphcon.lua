@@ -69,7 +69,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
@@ -81,9 +81,9 @@ local function RestoreAfterDelay()
 	Turn(lnozzle, x_axis, 0, math.rad(180))
 	Turn(rnozzle, x_axis, 0, math.rad(180))
 	Turn(lnozzle, y_axis, math.rad(-1), math.rad(180))
-	Turn(rnozzle, y_axis, math.rad(1), math.rad(180))	
+	Turn(rnozzle, y_axis, math.rad(1), math.rad(180))
 	WaitForTurn(lnozzle, y_axis)
-	Turn(ldoor, y_axis, 0, math.rad(180))	
+	Turn(ldoor, y_axis, 0, math.rad(180))
 	Turn(rdoor, y_axis, 0, math.rad(180))
 
 end
@@ -96,7 +96,7 @@ end
 function script.StartBuilding(heading, pitch)
 	Signal(SIG_RESTORE)
 	Turn(torso, y_axis, heading, math.rad(180))
-	Turn(ldoor, y_axis, math.rad(90), math.rad(180))	
+	Turn(ldoor, y_axis, math.rad(90), math.rad(180))
 	Turn(rdoor, y_axis, math.rad(-90), math.rad(180))
 	Turn(lnozzle, y_axis, math.rad(-180), math.rad(180))
 	Turn(rnozzle, y_axis, math.rad(180), math.rad(180))

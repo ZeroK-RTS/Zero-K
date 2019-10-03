@@ -246,7 +246,7 @@ else
       UpdateDrawCallin()
     else
       profile_synced = false
-    end	  
+    end
   end
   local function StartBoth(cmd, msg, words, playerID)
     Start(cmd, msg, words, playerID)
@@ -276,7 +276,7 @@ else
   function FilterLowValueToggle(cmd, msg, words, playerID)
     if (Spring.GetLocalPlayerID() ~= playerID) then
      return
-    end 
+    end
     displayLowValue = not displayLowValue
   end
   
@@ -306,8 +306,8 @@ else
 	end
 
   function gadget:Initialize()
-    gadgetHandler.actionHandler.AddSyncAction(gadget, "prf_started",SyncedCallinStarted) 
-    gadgetHandler.actionHandler.AddSyncAction(gadget, "prf_finished",SyncedCallinFinished) 
+    gadgetHandler.actionHandler.AddSyncAction(gadget, "prf_started",SyncedCallinStarted)
+    gadgetHandler.actionHandler.AddSyncAction(gadget, "prf_finished",SyncedCallinFinished)
 
     gadgetHandler.actionHandler.AddChatAction(gadget, 'uprofile', Start, " : starts the gadget profiler (for debugging issues)")
     gadgetHandler.actionHandler.AddChatAction(gadget, 'sprofile', StartSYNCED,"")
@@ -329,7 +329,7 @@ local averageTime = 5
 local loadAverages = {}
 
 local function CalcLoad(old_load, new_load, t)
-  return old_load*math.exp(-tick/t) + new_load*(1 - math.exp(-tick/t)) 
+  return old_load*math.exp(-tick/t) + new_load*(1 - math.exp(-tick/t))
   --return (old_load-new_load)*math.exp(-tick/t) + new_load
 end
 
@@ -489,7 +489,7 @@ end
         index1 = index1 + 3
         for cname, value in pairs(targetCallinCumul_unsynced) do
           gl.Text(cname, x+200, y+1-(fSpacing)*index1, fSize)
-          gl.Text(('%.4fs'):format(value), x+100, y+1-(fSpacing)*index1, fSize)       
+          gl.Text(('%.4fs'):format(value), x+100, y+1-(fSpacing)*index1, fSize)
           index1 = index1 + 1
         end
       end
@@ -499,7 +499,7 @@ end
       local j = 1
 
       gl.Rect(sX, y+5-(fSpacing)*j, sX+230, y+4-(fSpacing)*j)
-      gl.Color(1,0,0)   
+      gl.Color(1,0,0)
       gl.Text("SYNCED", sX+115, y-(fSpacing)*j, fSize, "nOc")
       gl.Color(1,1,1,1)
       j = j
@@ -525,7 +525,7 @@ end
         index2 = index2 + 3
         for cname, value in pairs(targetCallinCumul) do
           gl.Text(cname, sX+200, y+1-(fSpacing)*(j+index2), fSize)
-          gl.Text(('%.4fs'):format(value), sX+100, y+1-(fSpacing)*(j+index2), fSize)       
+          gl.Text(('%.4fs'):format(value), sX+100, y+1-(fSpacing)*(j+index2), fSize)
           index2 = index2 + 1
         end
       end

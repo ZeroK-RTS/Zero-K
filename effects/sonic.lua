@@ -133,7 +133,7 @@ local altforms = {
       },
       contract = {
      properties = {size = 80, sizegrowth = -24},
-      }, 
+      },
     },
   },
 }

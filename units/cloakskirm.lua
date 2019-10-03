@@ -16,9 +16,10 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[18]],
-	midposoffset   = [[0 6 0]],
-	reload_move_penalty = 0.8,
+    modelradius    = [[18]],
+    midposoffset   = [[0 6 0]],
+    reload_move_penalty = 0.8,
+    cus_noflashlight = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -77,12 +78,12 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
-		light_camera_height = 1600,
-		light_color = [[0.90 0.65 0.30]],
-		light_radius = 250,
-		reload_move_mod_time = 3,
+        light_camera_height = 1600,
+        light_color = [[0.90 0.65 0.30]],
+        light_radius = 250,
+        reload_move_mod_time = 3,
       },
 
       damage                  = {

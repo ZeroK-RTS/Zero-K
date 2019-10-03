@@ -14,8 +14,8 @@ local gl     = gl
 local Spring = Spring
 local table  = table
 
-local stockpilerDefNames = { 
-	"staticnuke", 
+local stockpilerDefNames = {
+	"staticnuke",
 	"subtacmissile",
 	"shipcarrier"
 }
@@ -54,8 +54,8 @@ options = {
 		type = 'number',
 		value = 9,
 		min = 2, max = 100, step = 1,
-		OnChange = function(self) 
-			fontSize = self.value 
+		OnChange = function(self)
+			fontSize = self.value
 		end,
 	},
 	drawHeight = {
@@ -74,17 +74,17 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 local function MakeETA(unitID,unitDefID)
-	if (unitDefID == nil) then 
-		return nil 
+	if (unitDefID == nil) then
+		return nil
 	end
 	local buildProgress = select(5, Spring.GetUnitHealth(unitID))
-	if (buildProgress == nil) then 
-		return nil 
+	if (buildProgress == nil) then
+		return nil
 	end
 
 	local ud = UnitDefs[unitDefID]
-	if (ud == nil)or(ud.height == nil) then 
-		return nil 
+	if (ud == nil)or(ud.height == nil) then
+		return nil
 	end
 
 	return {
@@ -154,8 +154,8 @@ end
 
 function widget:GameFrame(n)
 	-- 6N because stockpile happens in such increments, else its eta fluctuates
-	if (n % 6 ~= 0) then 
-		return 
+	if (n % 6 ~= 0) then
+		return
 	end
 
 	local _,_,pause = Spring.GetGameSpeed()
@@ -196,7 +196,7 @@ function widget:GameFrame(n)
 		if buildProgress == 1 then
 			etaTable[unitID] = nil
 		else
-			local dp = buildProgress - bi.lastProg 
+			local dp = buildProgress - bi.lastProg
 			local dt = gs - bi.lastTime
 			if (dt > 2) then
 				bi.firstSet = true
@@ -244,8 +244,8 @@ end
 
 function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 	local spec = Spring.GetSpectatingState()
-	if (spec) then 
-		return 
+	if (spec) then
+		return
 	end
 
 	if Spring.AreTeamsAllied (Spring.GetMyTeamID(), newTeam) then
@@ -342,7 +342,7 @@ local function DrawEtaText(unitID, timeLeft,yoffset, negative)
 end
 
 function widget:DrawWorld()
-	if Spring.IsGUIHidden() or not displayETA or (options.showonlyonshift.value and not select(4,Spring.GetModKeyState())) then 
+	if Spring.IsGUIHidden() or not displayETA or (options.showonlyonshift.value and not select(4,Spring.GetModKeyState())) then
 		return
 	end
 	gl.DepthTest(true)

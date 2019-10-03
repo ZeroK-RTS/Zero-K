@@ -1,15 +1,14 @@
 function widget:GetInfo()
-  return {
-    name      = "Custom Markers",
-    desc      = "Alternative to Spring map markers",
-    author    = "Evil4Zerggin (adapted by KingRaptor)",
-    date      = "29 December 2008",
-    license   = "GNU LGPL, v2.1 or later",
-    --layer     = 1001,	-- more than Chili
-	layer     = -10000001,	-- lower than minimap
-    alwaysStart = true,
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "Custom Markers",
+		desc      = "Alternative to Spring map markers",
+		author    = "Evil4Zerggin (adapted by KingRaptor)",
+		date      = "29 December 2008",
+		license   = "GNU LGPL, v2.1 or later",
+		layer     = 1001, -- more than Chili
+		alwaysStart = true,
+		enabled   = true  --  loaded by default?
+	}
 end
 
 ----------------------------------------------------------------
@@ -137,7 +136,7 @@ local smokeFX = {
 	lifeSpread   = 15,
 	rotSpeed     = 1,
 	rotSpeedSpread = -2,
-	rotSpread    = 360,	
+	rotSpread    = 360,
 	size = 30,
 	sizeSpread   = 5,
 	sizeGrowth   = 0.2,
@@ -163,7 +162,7 @@ local vsx, vsy, sMidX, sMidY
 --local functions
 ----------------------------------------------------------------
 local function GetPlayerColor(playerID)
-	local _, _, isSpec, teamID = GetPlayerInfo(playerID, false)
+	local _, _, isSpec, teamID = GetPlayerInfo(playerID)
 	if (isSpec) then return GetTeamColor(Spring.GetGaiaTeamID()) end
 	if (not teamID) then return nil end
 	return GetTeamColor(teamID)
@@ -211,7 +210,7 @@ end
 
 local function ClearPoints()
 	for id in pairs(mapPoints) do
-	      RemovePoint(id) 
+	      RemovePoint(id)
 	end
 end
 
@@ -379,11 +378,13 @@ end
 
 -- draw non-scaling text and offscreen markers
 function widget:DrawScreen()
-	if (not on) then return end
+	if (not on) then
+		return
+	end
 	
 	glLineWidth(lineWidth)
 	
-	for id,point in pairs(mapPoints) do
+	for id, point in pairs(mapPoints) do
 		local fontSizeLocal = point.fontSize or fontSize
 		local alpha = maxAlpha * (point.expiration - timeNow) / ttl
 		if (alpha <= 0) then
@@ -393,74 +394,80 @@ function widget:DrawScreen()
 			glColor(point.color[1], point.color[2], point.color[3], alpha * point.color[4])
 			if (sx >= 0 and sy >= 0	and sx <= vsx and sy <= vsy) then
 				--in screen
-				if WG.DrawAfterChili then
-					local func = function()
-						DrawOnScreenPoint(point, sx, sy, sz, fontSizeLocal)
-					end
-					WG.DrawAfterChili(func)
-				else
-					DrawOnScreenPoint(point, sx, sy, sz, fontSizeLocal)
-				end
+				DrawOnScreenPoint(point, sx, sy, sz, fontSizeLocal)
 			elseif point.showArrow ~= false then
 				--out of screen
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-				--flip if behind screen
-				if (sz > 1) then
-					sx = sMidX - sx
-					sy = sMidY - sy
+				local func = function()
+					glColor(point.color[1], point.color[2], point.color[3], alpha * point.color[4])
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+					--flip if behind screen
+					if (sz > 1) then
+						sx = sMidX - sx
+						sy = sMidY - sy
+					end
+					local xRatio = sMidX / abs(sx - sMidX)
+					local yRatio = sMidY / abs(sy - sMidY)
+					local edgeDist, vertices, textX, textY, textOptions
+					local smallFontSize = math.floor(fontSizeLocal * 2 / 3 + 0.5)
+					
+					if (xRatio < yRatio) then
+						edgeDist = (sy - sMidY) * xRatio + sMidY
+						if (sx > 0) then
+							vertices = {
+								{v = {vsx, edgeDist, 0}},
+								{v = {vsx - edgeMarkerSize, edgeDist + edgeMarkerSize, 0}},
+								{v = {vsx - edgeMarkerSize, edgeDist - edgeMarkerSize, 0}},
+							}
+							textX = vsx - edgeMarkerSize
+							textY = edgeDist - smallFontSize * 0.5
+							textOptions = "rn"
+						else
+							vertices = {
+								{v = {0, edgeDist, 0}},
+								{v = {edgeMarkerSize, edgeDist - edgeMarkerSize, 0}},
+								{v = {edgeMarkerSize, edgeDist + edgeMarkerSize, 0}},
+							}
+							textX = edgeMarkerSize
+							textY = edgeDist - smallFontSize * 0.5
+							textOptions = "n"
+						end
+					else
+						edgeDist = (sx - sMidX) * yRatio + sMidX
+						if (sy > 0) then
+							vertices = {
+								{v = {edgeDist, vsy, 0}},
+								{v = {edgeDist - edgeMarkerSize, vsy - edgeMarkerSize, 0}},
+								{v = {edgeDist + edgeMarkerSize, vsy - edgeMarkerSize, 0}},
+							}
+							textX = edgeDist
+							textY = vsy - edgeMarkerSize - smallFontSize
+							textOptions = "cn"
+						else
+							vertices = {
+								{v = {edgeDist, 0, 0}},
+								{v = {edgeDist + edgeMarkerSize, edgeMarkerSize, 0}},
+								{v = {edgeDist - edgeMarkerSize, edgeMarkerSize, 0}},
+							}
+							textX = edgeDist
+							textY = edgeMarkerSize
+							textOptions = "cn"
+						end
+					end
+					glShape(GL_TRIANGLES, vertices)
+					if point.text then
+						local cChar = GetColorChar(point.color)
+						glText(cChar..point.text.."\008", textX, textY, smallFontSize, textOptions .. 'o')
+					end
+					
+					glColor(1, 1, 1)
+					glLineWidth(1)
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 				end
-				local xRatio = sMidX / abs(sx - sMidX)
-				local yRatio = sMidY / abs(sy - sMidY)
-				local edgeDist, vertices, textX, textY, textOptions
-				local smallFontSize = math.floor(fontSizeLocal * 2 / 3 + 0.5)
 				
-				if (xRatio < yRatio) then
-					edgeDist = (sy - sMidY) * xRatio + sMidY
-					if (sx > 0) then
-						vertices = {
-							{v = {vsx, edgeDist, 0}},
-							{v = {vsx - edgeMarkerSize, edgeDist + edgeMarkerSize, 0}},
-							{v = {vsx - edgeMarkerSize, edgeDist - edgeMarkerSize, 0}},
-						}
-						textX = vsx - edgeMarkerSize
-						textY = edgeDist - smallFontSize * 0.5
-						textOptions = "rn"
-					else
-						vertices = {
-							{v = {0, edgeDist, 0}},
-							{v = {edgeMarkerSize, edgeDist - edgeMarkerSize, 0}},
-							{v = {edgeMarkerSize, edgeDist + edgeMarkerSize, 0}},
-						}
-						textX = edgeMarkerSize
-						textY = edgeDist - smallFontSize * 0.5
-						textOptions = "n"
-					end
+				if WG.DrawAfterChili then
+					WG.DrawAfterChili(func)
 				else
-					edgeDist = (sx - sMidX) * yRatio + sMidX
-					if (sy > 0) then
-						vertices = {
-							{v = {edgeDist, vsy, 0}},
-							{v = {edgeDist - edgeMarkerSize, vsy - edgeMarkerSize, 0}},
-							{v = {edgeDist + edgeMarkerSize, vsy - edgeMarkerSize, 0}},
-						}
-						textX = edgeDist
-						textY = vsy - edgeMarkerSize - smallFontSize
-						textOptions = "cn"
-					else
-						vertices = {
-							{v = {edgeDist, 0, 0}},
-							{v = {edgeDist + edgeMarkerSize, edgeMarkerSize, 0}},
-							{v = {edgeDist - edgeMarkerSize, edgeMarkerSize, 0}},
-						}
-						textX = edgeDist
-						textY = edgeMarkerSize
-						textOptions = "cn"
-					end
-				end
-				glShape(GL_TRIANGLES, vertices)
-				if point.text then
-					local cChar = GetColorChar(point.color)
-					glText(cChar..point.text.."\008", textX, textY, smallFontSize, textOptions .. 'o')
+					func()
 				end
 			end
 		end
@@ -498,7 +505,7 @@ function widget:Update(dt)
 	ringPeriod = ringPeriod + dt
 	if ringPeriod > circleFreq then
 		for id, point in pairs(mapPoints) do
-			CreateCircle(point)	
+			CreateCircle(point)
 		end
 		ringPeriod = 0
 	end

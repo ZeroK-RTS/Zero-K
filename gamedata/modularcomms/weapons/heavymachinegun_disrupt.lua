@@ -9,6 +9,7 @@ local weaponDef = {
 	craterMult              = 0.3,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectShot = [[custom:WARMUZZLE]],
 		miscEffectShot = [[custom:DEVA_SHELLS]],
@@ -19,7 +20,7 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 15,
+		default = 22.5,
 		subs    = 0.825,
 	},
 

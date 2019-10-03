@@ -35,7 +35,7 @@ unitDef = {
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
   maxDamage           = 2500,
-  maxSlope			  = 36,
+  maxSlope            = 36,
   maxVelocity         = 3,
   minCloakDistance    = 250,
   noAutoFire          = false,
@@ -90,11 +90,11 @@ unitDef = {
       name                    = [[Blob]],
       areaOfEffect            = 96,
       burst                   = 6,
-      burstrate               = 0.01,
+      burstrate               = 0.033,
       craterBoost             = 0,
       craterMult              = 0,
-			
-			customParams            = {
+            
+            customParams            = {
         light_radius = 0,
       },
 
@@ -129,7 +129,7 @@ unitDef = {
       avoidFriendly           = false,
       burst                   = 4,
       burstrate               = 0.2,
-	  canAttackGround		  = false,	  
+      canAttackGround          = false,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,

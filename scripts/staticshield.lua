@@ -81,7 +81,7 @@ function script.Create()
 	Turn(rb_leaf, x_axis, -l_angle, l_speed)
 	Turn(rb_leaf, z_axis, l_angle, l_speed)
 	
-	StartThread(GG.Script.SmokeUnit, {glow})
+	StartThread(GG.Script.SmokeUnit, unitID, {glow})
 	StartThread(initialize)
 end
 
@@ -143,7 +143,7 @@ function script.Killed(recentDamage, maxHealth)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
 		return 1 -- corpsetype
-	else		
+	else
 		return 2 -- corpsetype
 	end
 end

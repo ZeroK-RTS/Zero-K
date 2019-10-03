@@ -3,7 +3,7 @@ function widget:GetInfo()
   return {
     name      = "Mexspot Fetcher",
     desc      = "Fetches metal spot data from synced.",
-    author    = "Google Frog", -- 
+    author    = "Google Frog", --
     date      = "22 April 2012",
     license   = "GNU GPL, v2 or later",
     layer     = -30000,

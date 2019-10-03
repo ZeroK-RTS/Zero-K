@@ -75,7 +75,7 @@ local spGetVisibleUnits      = Spring.GetVisibleUnits
 
 -- Manual optimizations
 
-local spIsGUIHidden = Spring.IsGUIHidden 
+local spIsGUIHidden = Spring.IsGUIHidden
 local abs = math.abs
 local acos = math.acos
 local cos = math.cos
@@ -115,7 +115,7 @@ options = {
       name = "Outline opacity (0 boosts performance)",
       type = 'number',
       value = 0, min = 0, max = 1, step = 0.05,
-      --desc = "How much can be seen through the circle outline. The outline can removed completely by " .. 
+      --desc = "How much can be seen through the circle outline. The outline can removed completely by " ..
       --"setting this to 1, significantly enhancing performance",
   },
   fillOpacity = {
@@ -296,7 +296,7 @@ if not spIsGUIHidden() then
               glColor(colorSet)
               glDrawListAtUnit(visUnits[i], circlePolys, false,
                                radius, 1.0, radius,
-                               degrot, gz, 0, -gx) 
+                               degrot, gz, 0, -gx)
               if showOutline then
                 colorSet[4] = outlineOpacity
                 glColor(colorSet)
@@ -338,9 +338,9 @@ if not spIsGUIHidden() then
   local units = spGetVisibleUnits(-1, 30, true)
   for i=1, #units do
     local unitID = units[i]
-    if IsUnitInSelectionBox(unitID) or (GetUnitUnderCursor() == unitID and not spIsUnitSelected(unitID)) then 
-      glColor(1, 1, 1, 0.5) 
-    else 
+    if IsUnitInSelectionBox(unitID) or (GetUnitUnderCursor() == unitID and not spIsUnitSelected(unitID)) then
+      glColor(1, 1, 1, 0.5)
+    else
       glColor(1, 1, 1, alpha)
     end
     

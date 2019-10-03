@@ -10,6 +10,8 @@ local weaponDef = {
 	craterMult              = 6,
 
 	customParams            = {
+		is_unit_weapon = 1,
+		is_unit_weapon = 1,
 		muzzleEffectShot = [[custom:ataalaser]],
 		slot = [[3]],
 		manualfire = 1,
@@ -23,6 +25,7 @@ local weaponDef = {
 	impulseBoost            = 0,
 	impulseFactor           = 0,
 	interceptedByShieldType = 0,
+	leadLimit               = 80,
 	noExplode               = true,
 	noSelfDamage            = true,
 	range                   = 200,

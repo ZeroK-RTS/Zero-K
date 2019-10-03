@@ -56,5 +56,5 @@ function widget:PlayerChanged (playerID)
 		--Spring.Echo("<Attack Warning>: Spectator mode. Widget removed.")
 		widgetHandler:RemoveWidget()
 	end
-	localTeamID = Spring.GetLocalTeamID ()	
+	localTeamID = Spring.GetLocalTeamID ()
 end

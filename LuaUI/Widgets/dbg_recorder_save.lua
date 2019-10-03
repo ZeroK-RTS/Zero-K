@@ -5,13 +5,13 @@ function widget:GetInfo()
     author    = "Bluestone",
     date      = "June 2014",
     license   = "GNU GPL, v3 or later",
-    layer     = 1, 
-    enabled   = true  
+    layer     = 1,
+    enabled   = true
   }
 end
 
 UNIT_FILENAME = "REC_unit.lua"
-ORDER_Q_FILENAME = "REC_order_q.lua" 
+ORDER_Q_FILENAME = "REC_order_q.lua"
 FACTORY_Q_FILENAME = "REC_factory_q.lua"
 ORDER_FILENAME = "REC_order.lua"
 
@@ -28,7 +28,7 @@ end
 
 local startedRecording
 local recording
-local stopRecording 
+local stopRecording
 local recordTime = 60
 local order_table = {}
 
@@ -37,7 +37,7 @@ local unitIDtoKey = {}
 local white = "\255\255\255\255"
 
 function widget:UnitCommand(uID, uDID, tID, cmdID, params, options)
-    if recording then        
+    if recording then
         local frame = Spring.GetGameFrame()
         local cmdName = CMD[cmdID]
         options = {coded=options} --fix format, only the options.coded parameter reaches UnitCommand
@@ -59,7 +59,7 @@ function widget:UnitCommand(uID, uDID, tID, cmdID, params, options)
 end
 
 function widget:GameFrame(n)
-    if stopRecording==n then 
+    if stopRecording==n then
         recording = nil
         Spring.Echo(white .. "finished recording")
         table.save(order_table,ORDER_FILENAME,"--orders")
@@ -97,7 +97,7 @@ function SaveUnits()
 		
         unit_table[#unit_table+1] = entry
         
-        local orderQueue = Spring.GetCommandQueue(uID, 30) 
+        local orderQueue = Spring.GetCommandQueue(uID, 30)
         for _,order in ipairs(orderQueue) do
             if #order.params == 1 then
 				order.params[1] = unitIDtoKey[order.params[1]] or 0

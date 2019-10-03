@@ -40,17 +40,17 @@ options={
 		desc = 'MOVE & JUMP toggle pathmap vision.',
 		type = 'bool',
 		value = false,
-	},	
+	},
 }
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local currCmd =  spGetActiveCommand() --remember current command
 function widget:Update()
-	if not (options.enginemetalview.value or 
-	options.engineheightview.value or 
+	if not (options.enginemetalview.value or
+	options.engineheightview.value or
 	options.enginepathview.value) or
 	(currCmd == spGetActiveCommand())
-	then 
+	then
 		return --if detect no change in command selection: --skip whole thing
 	end
 	currCmd = spGetActiveCommand() --update active command
@@ -59,7 +59,7 @@ function widget:Update()
 	if activeCmd then
 		local match = false
 		local activeCmdName = activeCmd.name
-		if options.enginemetalview.value then 
+		if options.enginemetalview.value then
 			match = ToggleMapView(activeCmdName,{"Reclaim","Resurrect"},"metal","showmetalmap")
 		end
 		if options.engineheightview.value and not match then
@@ -68,7 +68,7 @@ function widget:Update()
 			end
 			match = ToggleMapView(activeCmdName,{"Build","Ramp","Level","Raise","Smooth","Restore"},"height","showelevation")
 		end
-		if options.enginepathview.value and not match then 
+		if options.enginepathview.value and not match then
 			ToggleMapView(activeCmdName,{"Move","Jump"},"pathTraversability","showpathtraversability")
 		end
 	end
@@ -92,7 +92,7 @@ function UntoggleMapView()
 		end
 		memPrevMapView = nil --forget about previous map-view
 		memPrevToggledView = nil
-	end	
+	end
 end
 
 function ToggleMapView(activeCmdName,trigger,mapMode,activateCommand)

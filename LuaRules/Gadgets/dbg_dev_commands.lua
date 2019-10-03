@@ -126,9 +126,9 @@ local syncedGadgetList = {
 local unsyncedGadgetList = {
 	"Ceasefires2",
 	"LockOptions",
-	"Awards",	
-	"Noexplode Stopper",	
-	"Perks",	
+	"Awards",
+	"Noexplode Stopper",
+	"Perks",
 	"Control gunship strafe range",
 	"Area Denial",
 	"Bounties",
@@ -176,11 +176,11 @@ local unsyncedGadgetList = {
 	"astar.lua",
 	"unit_missilesilo.lua",
 	"MarketPlace",
-	"IconGenerator",	
+	"IconGenerator",
 	"AirTransport_SeaPickup",
 	"lavarise",
 	"Unit E-Stall Disable",
-	"Disable Features",	
+	"Disable Features",
 	"Weapon Impulse ",
 	"Water Effects",
 	"Resign Gadget",
@@ -192,9 +192,9 @@ local unsyncedGadgetList = {
 	--"Dev Commands",
 	"unit_carrier_drones.lua",
 	"Lag Monitor",
-	"AirPlantParents",	
+	"AirPlantParents",
 	"ranks api",
-	"UnitCloakShield",	
+	"UnitCloakShield",
 	"StartSetup",
 	"Save/Load",
 	"Mex Control with energy link",
@@ -203,7 +203,7 @@ local unsyncedGadgetList = {
 	"Single-Hit Weapon",
 	"CMD_RAW_MOVE",
 	"Zombies!",
-	"CustomUnitShaders",	
+	"CustomUnitShaders",
 	"Lups Cloak FX",
 	"Test",
 	"Hide Autorepairlevel Command",
@@ -363,10 +363,10 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-function GG.TableEcho(data, name, indent)
+function GG.TableEcho(data, tableName, indent)
 	indent = indent or ""
-	name = name or "TableEcho"
-	Spring.Echo(indent .. name .. " = {")
+	tableName = tableName or "TableEcho"
+	Spring.Echo(indent .. tableName .. " = {")
 	for name, v in pairs(data) do
 		local ty =  type(v)
 		if ty == "table" then
@@ -424,7 +424,7 @@ local ORDERS_PASSIVE = {
 -- UnitName TeamID Number Radius [Xpos Zpos]
 -- For example '/luarules circle turretlaser 1 60 420 3200 3200'
 local function circleGive(cmd, line, words, player)
-	if not (spIsCheatingEnabled() and #words >= 4) then 
+	if not (spIsCheatingEnabled() and #words >= 4) then
 		return
 	end
 	local unitName = words[1]
@@ -448,7 +448,7 @@ local function circleGive(cmd, line, words, player)
 end
 
 local function MoveUnit(cmd, line, words, player)
-	if not (spIsCheatingEnabled() and #words >= 3) then 
+	if not (spIsCheatingEnabled() and #words >= 3) then
 		return
 	end
 	local unitID = tonumber(words[1])
@@ -463,7 +463,7 @@ local function MoveUnit(cmd, line, words, player)
 end
 
 local function DestroyUnit(cmd, line, words, player)
-	if not (spIsCheatingEnabled() and #words >= 1) then 
+	if not (spIsCheatingEnabled() and #words >= 1) then
 		return
 	end
 	local unitID = tonumber(words[1])
@@ -473,7 +473,7 @@ local function DestroyUnit(cmd, line, words, player)
 end
 
 local function RotateUnit(cmd, line, words, player)
-	if not (spIsCheatingEnabled() and #words >= 2) then 
+	if not (spIsCheatingEnabled() and #words >= 2) then
 		return
 	end
 	local unitID = tonumber(words[1])
@@ -532,7 +532,7 @@ local function give(cmd,line,words,player)
 				--Spring.CreateUnit(subUdid, x2+32, y2, z2, 1, 0, false)
 				--Spring.CreateUnit(subUdid, x2, y2, z2-32, 2, 0, false)
 				--Spring.CreateUnit(subUdid, x2-32, y2, z2, 3, 0, false)
-			end	
+			end
 		end
 	end
 	Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
@@ -600,7 +600,7 @@ local function gentleKill(cmd,line,words,player)
 end
 
 local function nanoFrame(cmd,line,words,player)
-	if not spIsCheatingEnabled() then 
+	if not spIsCheatingEnabled() then
 		return
 	end
 	local nanoAmount = math.max(0.01, math.min(1, tonumber(words[1] or "0.99") or 0.99))
@@ -707,12 +707,13 @@ local function serial(cmd,line,words,player)
 			local sublist = ud.buildOptions
 			for j = 1, #sublist do
 				unitList[#unitList + 1] = sublist[j]
-			end	
+			end
 		end
 	end
 	
 	creationIndex = tonumber(words[1]) or 1
 	creationUnitList = unitList
+	gadgetHandler:UpdateGadgetCallIn('GameFrame', gadget)
 end
 
 local function EchoCrush()
@@ -751,7 +752,7 @@ local function bisect(cmd,line,words,player)
 	for i = 1, #syncedGadgetList do
 		occured[syncedGadgetList[i] ] = true
 	end
-	for i = 1, #unsyncedGadgetList do 
+	for i = 1, #unsyncedGadgetList do
 		if not occured[unsyncedGadgetList[i] ] then
 			syncedGadgetList[#syncedGadgetList+1] = unsyncedGadgetList[i]
 		end
@@ -796,13 +797,10 @@ local function EmpiricalDps(cmd,line,words,player)
 end
 
 function gadget:GameFrame(n)
-	if (not creationIndex) then
-		return
-	end
-	
 	if n%120 == 0 then
 		if not creationUnitList[creationIndex] then
 			creationIndex, creationUnitList = nil, nil
+			gadgetHandler:RemoveGadgetCallIn('GameFrame', gadget)
 			return
 		end
 		local INCREMENT = 128
@@ -846,6 +844,8 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"serial",serial,"Gives all units in succession.")
 	gadgetHandler.actionHandler.AddChatAction(self,"restart",restart,"Gives some commanders and clears everything else.")
 	gadgetHandler.actionHandler.AddChatAction(self,"nocost",nocost,"Makes everything gadget-implemented free.")
+
+	gadgetHandler:RemoveGadgetCallIn('GameFrame', gadget)
 end
 
 -------------------------------------------------------------------------------------

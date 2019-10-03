@@ -12,13 +12,13 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[38 38 38]],
-  collisionVolumeType    = [[ellipsoid]], 
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-	aimposoffset   = [[0 0 0]],
-	midposoffset   = [[0 -6 0]],
-	modelradius    = [[19]],
+    aimposoffset   = [[0 0 0]],
+    midposoffset   = [[0 -6 0]],
+    modelradius    = [[19]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -73,12 +73,12 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
-	  
+      
       customParams            = {
         extra_damage = 600,
-		
-		light_color = [[0.75 0.75 0.56]],
-		light_radius = 190,
+        
+        light_color = [[0.75 0.75 0.56]],
+        light_radius = 190,
       },
 
       damage                  = {
@@ -96,7 +96,7 @@ unitDef = {
       noSelfDamage            = true,
       paralyzeTime            = 3,
       range                   = 240,
-      reloadtime              = 1.75,
+      reloadtime              = 1.733,
       rgbColor                = [[1 1 0.7]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,
@@ -112,10 +112,13 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      blocking         = false,
+      blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
+      collisionVolumeOffsets = [[0 0 0]],
+      collisionVolumeScales  = [[40 30 50]],
+      collisionVolumeType    = [[ellipsoid]], 
       object           = [[venom_wreck.s3o]],
     },
     HEAP  = {

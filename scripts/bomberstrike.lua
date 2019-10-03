@@ -1,22 +1,22 @@
 include "constants.lua"
 include "bombers.lua"
 
-local fuselage = piece 'fuselage' 
-local wingl = piece 'wingl' 
-local wingr = piece 'wingr' 
-local enginel = piece 'enginel' 
-local enginer = piece 'enginer' 
-local head = piece 'head' 
-local turretbase = piece 'turretbase' 
-local turret = piece 'turret' 
-local sleevel = piece 'sleevel' 
-local sleever = piece 'sleever' 
-local barrell = piece 'barrell' 
-local barrelr = piece 'barrelr' 
-local flarel = piece 'flarel' 
-local flarer = piece 'flarer' 
-local bombl = piece 'bombl' 
-local bombr = piece 'bombr' 
+local fuselage = piece 'fuselage'
+local wingl = piece 'wingl'
+local wingr = piece 'wingr'
+local enginel = piece 'enginel'
+local enginer = piece 'enginer'
+local head = piece 'head'
+local turretbase = piece 'turretbase'
+local turret = piece 'turret'
+local sleevel = piece 'sleevel'
+local sleever = piece 'sleever'
+local barrell = piece 'barrell'
+local barrelr = piece 'barrelr'
+local flarel = piece 'flarel'
+local flarer = piece 'flarer'
+local bombl = piece 'bombl'
+local bombr = piece 'bombr'
 
 local bFirepoint1 = false
 local bFirepoint2 = false
@@ -25,7 +25,7 @@ local bFirepoint2 = false
 
 function script.Create()
 	Turn(turret, y_axis, math.pi)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Move(wingl, x_axis, -5, 7)
 	Move(wingr, x_axis, 5, 7)
 	Hide(turretbase)
@@ -107,8 +107,8 @@ end
 
 function script.FireWeapon(num)
 	if num == 1 then
-	Sleep(66)
-	Reload()
+		Sleep(66)
+		Reload()
 	end
 end
 
@@ -129,7 +129,7 @@ function script.Killed(recentDamage, maxHealth)
 	Explode(sleevel, SFX.NONE)
 	Explode(sleever, SFX.NONE)
 	return 1
-	else	
+	else
 	Explode(fuselage, SFX.FALL + SFX.SMOKE)
 	Explode(head, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 	Explode(wingl, SFX.FALL + SFX.SMOKE)

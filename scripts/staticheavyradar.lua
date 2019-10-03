@@ -1,10 +1,10 @@
-local base = piece 'base' 
-local spinner = piece 'spinner' 
-local arm = piece 'arm' 
-local ant = piece 'ant' 
-local dish = piece 'dish' 
-local float1 = piece 'float1' 
-local float2 = piece 'float2' 
+local base = piece 'base'
+local spinner = piece 'spinner'
+local arm = piece 'arm'
+local ant = piece 'ant'
+local dish = piece 'dish'
+local float1 = piece 'float1'
+local float2 = piece 'float2'
 
 include "constants.lua"
 
@@ -20,7 +20,7 @@ function script.Create()
 		--Hide(float1)
 		--Hide(float2)
 	end
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function Activate()

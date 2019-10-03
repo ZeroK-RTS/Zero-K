@@ -11,14 +11,14 @@ unitDef.customparams.shield_emit_height = "30"
 
 
 unitDef.sfxtypes = {
-	explosiongenerators = {
-		[[custom:BEAMWEAPON_MUZZLE_BLUE]],
-		[[custom:NONE]],
-		[[custom:RAIDMUZZLE]],
-		[[custom:NONE]],
-		[[custom:VINDIBACK]],
-		[[custom:FLASH64]],
-	}
+    explosiongenerators = {
+        [[custom:BEAMWEAPON_MUZZLE_BLUE]],
+        [[custom:NONE]],
+        [[custom:RAIDMUZZLE]],
+        [[custom:NONE]],
+        [[custom:VINDIBACK]],
+        [[custom:FLASH64]],
+    }
 }
 
 return lowerkeys({ dynknight1 = unitDef })

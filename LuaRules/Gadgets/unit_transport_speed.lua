@@ -42,7 +42,7 @@ function gadget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transport
 		Spring.SetUnitRulesParam(transportID, "massOverride", mass[tudid])
 		Spring.SetUnitRulesParam(transportID, "selfMoveSpeedChange", 1)
 		GG.UpdateUnitAttributes(transportID)
-	end 
+	end
 end
 
 function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)

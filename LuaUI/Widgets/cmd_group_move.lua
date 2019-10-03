@@ -66,7 +66,7 @@ function widget:CommandNotify(id, params, options)
 					local angle = math.atan2((tx-unitPos[unitID].x),(tz-unitPos[unitID].z))
 					targetX = mx - (math.sin(angle) * maxOffset)
 					targetZ = mz - (math.cos(angle) * maxOffset)
-				end	
+				end
 				GiveOrderToUnit(unitID,CMD_RAW_MOVE,{targetX,params[2],targetZ},options.coded)
 			end
 			myOrder = false

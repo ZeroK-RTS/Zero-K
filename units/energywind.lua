@@ -20,8 +20,8 @@ unitDef = {
     pylonrange     = 60,
     windgen        = true,
     modelradius    = [[15]],
-	removewait     = 1,
-	default_spacing = 2,
+    removewait     = 1,
+    default_spacing = 2,
   },
 
   energyMake                    = 1.2,
@@ -68,9 +68,9 @@ unitDef = {
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[arm_wind_generator_dead_water.s3o]],
-	  customparams = {
-		health_override = 400,
-	  },
+      customparams = {
+        health_override = 400,
+      },
     }
 
   },

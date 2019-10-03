@@ -105,7 +105,7 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, dama
 	weapon1 = weapon1 or "commweapon_beamlaser"
 	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
 	
-	if chassis and chassisDefs[chassis] and chassisDefs[chassis].secondPeashooter and (not weapon2) and Spring.GetUnitRulesParam(unitID, "comm_level") > 2 then 
+	if chassis and chassisDefs[chassis] and chassisDefs[chassis].secondPeashooter and (not weapon2) and Spring.GetUnitRulesParam(unitID, "comm_level") > 2 then
 		weapon2 = "commweapon_beamlaser"
 	end
 	
@@ -240,7 +240,7 @@ local function ApplyModuleEffectsFromUnitRulesParams(unitID)
 		GG.SetUnitIdleRegen(unitID, 0, autoRegen / 2)
 	end
 	
-	ApplyWeaponData(unitID, Spring.GetUnitRulesParam(unitID, "comm_weapon_name_1"), 
+	ApplyWeaponData(unitID, Spring.GetUnitRulesParam(unitID, "comm_weapon_name_1"),
 		Spring.GetUnitRulesParam(unitID, "comm_weapon_name_2"),
 		Spring.GetUnitRulesParam(unitID, "comm_shield_name"))
 	
@@ -403,7 +403,7 @@ local function CreateStaticCommander(dyncommID, commProfileInfo, moduleList, mod
 	local upgradeDef = {
 		level = targetLevel,
 		staticLevel = targetLevel,
-		chassis = chassisDefID, 
+		chassis = chassisDefID,
 		totalCost = UnitDefs[chassisDefID].metalCost + moduleCost,
 		name = commProfileInfo.name,
 		moduleList = moduleList,
@@ -454,7 +454,7 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	
 	local upgradeDef = {
 		level = 0,
-		chassis = chassisDefID, 
+		chassis = chassisDefID,
 		totalCost = UnitDefs[baseUnitDefID].metalCost + moduleCost,
 		name = commProfileInfo.name,
 		moduleList = moduleList,
@@ -478,14 +478,14 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if interallyCreatedUnit then
 		InitializeDynamicCommander(
 			unitID,
-			internalCreationUpgradeDef.level, 
-			internalCreationUpgradeDef.chassis, 
-			internalCreationUpgradeDef.totalCost, 
-			internalCreationUpgradeDef.name, 
-			internalCreationUpgradeDef.baseUnitDefID, 
-			internalCreationUpgradeDef.baseWreckID, 
-			internalCreationUpgradeDef.baseHeapID, 
-			internalCreationUpgradeDef.moduleList, 
+			internalCreationUpgradeDef.level,
+			internalCreationUpgradeDef.chassis,
+			internalCreationUpgradeDef.totalCost,
+			internalCreationUpgradeDef.name,
+			internalCreationUpgradeDef.baseUnitDefID,
+			internalCreationUpgradeDef.baseWreckID,
+			internalCreationUpgradeDef.baseHeapID,
+			internalCreationUpgradeDef.moduleList,
 			internalCreationModuleEffectData,
 			internalCreationUpgradeDef.images,
 			internalCreationUpgradeDef.profileID,
@@ -511,13 +511,13 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		
 		InitializeDynamicCommander(
 			unitID,
-			0, 
-			chassisDefNames[commProfileInfo.chassis], 
-			UnitDefs[unitDefID].metalCost, 
-			commProfileInfo.name, 
-			unitDefID, 
-			commProfileInfo.baseWreckID, 
-			commProfileInfo.baseHeapID, 
+			0,
+			chassisDefNames[commProfileInfo.chassis],
+			UnitDefs[unitDefID].metalCost,
+			commProfileInfo.name,
+			unitDefID,
+			commProfileInfo.baseWreckID,
+			commProfileInfo.baseHeapID,
 			moduleList,
 			false,
 			commProfileInfo.images,
@@ -531,13 +531,13 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		
 		InitializeDynamicCommander(
 			unitID,
-			0, 
-			chassisDefByBaseDef[unitDefID], 
-			UnitDefs[unitDefID].metalCost, 
-			"Guinea Pig", 
-			unitDefID, 
-			chassisData.baseWreckID, 
-			chassisData.baseHeapID, 
+			0,
+			chassisDefByBaseDef[unitDefID],
+			UnitDefs[unitDefID].metalCost,
+			"Guinea Pig",
+			unitDefID,
+			chassisData.baseWreckID,
+			chassisData.baseHeapID,
 			{},
 			{}
 		)
@@ -586,7 +586,7 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	local index = 5
 	local pAlreadyOwned = {}
 	for i = 1, pAlreadyCount do
-		pAlreadyOwned[i] = params[index] 
+		pAlreadyOwned[i] = params[index]
 		index = index + 1
 	end
 	
@@ -615,7 +615,7 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	-- Check the validity of the new module set
 	local pNewModules = {}
 	for i = 1, pNewCount do
-		pNewModules[#pNewModules + 1] = params[index] 
+		pNewModules[#pNewModules + 1] = params[index]
 		index = index + 1
 	end
 	
@@ -623,7 +623,7 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	-- Empty module slots do not make it into this list
 	for i = 1, #pNewModules  do
 		if not moduleDefs[pNewModules[i]].emptyModule then
-			fullModuleList[#fullModuleList + 1] = pNewModules[i] 
+			fullModuleList[#fullModuleList + 1] = pNewModules[i]
 		end
 	end
 	

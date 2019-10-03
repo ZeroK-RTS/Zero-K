@@ -7,19 +7,19 @@ include "constants.lua"
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local base = piece 'base' 
-local body = piece 'body' 
-local scaffold = piece 'scaffold' 
-local trolleyb = piece 'trolleyb' 
-local trolleyu = piece 'trolleyu' 
-local clampb1 = piece 'clampb1' 
-local clampb2 = piece 'clampb2' 
-local clampu1 = piece 'clampu1' 
-local clampu2 = piece 'clampu2' 
-local silo1 = piece 'silo1' 
-local silo2 = piece 'silo2' 
-local silo3 = piece 'silo3' 
-local silo4 = piece 'silo4' 
+local base = piece 'base'
+local body = piece 'body'
+local scaffold = piece 'scaffold'
+local trolleyb = piece 'trolleyb'
+local trolleyu = piece 'trolleyu'
+local clampb1 = piece 'clampb1'
+local clampb2 = piece 'clampb2'
+local clampu1 = piece 'clampu1'
+local clampu2 = piece 'clampu2'
+local silo1 = piece 'silo1'
+local silo2 = piece 'silo2'
+local silo3 = piece 'silo3'
+local silo4 = piece 'silo4'
 
 local smokePiece = {body, silo1, silo3, scaffold}
 local pads = {silo1, silo2, silo3, silo4}
@@ -50,7 +50,7 @@ function GetPadNum(num)
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.StartBuilding()

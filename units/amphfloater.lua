@@ -19,7 +19,7 @@ unitDef = {
   customParams           = {
     amph_regen = 60,
     amph_submerged_at = 30,
-	sink_on_emp    = 0,
+    sink_on_emp    = 0,
     floattoggle    = [[1]],
   },
 
@@ -79,13 +79,13 @@ unitDef = {
       craterMult              = 2,
 
       customparams = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 1.667,
-		
-		light_camera_height = 2500,
-		light_color = [[1.36 0.68 1.5]],
-		light_radius = 180,
+        
+        light_camera_height = 2500,
+        light_color = [[1.36 0.68 1.5]],
+        light_radius = 180,
       },
 
       damage                  = {
@@ -123,6 +123,7 @@ unitDef = {
 
       customparams = {
         timeslow_damagefactor = 1.7,
+        bogus = 1,
       },
   
       damage                  = {

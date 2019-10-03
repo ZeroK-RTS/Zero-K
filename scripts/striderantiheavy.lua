@@ -4,28 +4,28 @@ include "constants.lua"
 -- pieces
 --------------------------------------------------------------------------------
 
-local ground = piece 'ground' 
-local pelvis = piece 'pelvis' 
-local lthigh = piece 'lthigh' 
-local llegtwister = piece 'llegtwister' 
-local lleg = piece 'lleg' 
-local lfoot = piece 'lfoot' 
-local rthigh = piece 'rthigh' 
-local rlegtwister = piece 'rlegtwister' 
-local rleg = piece 'rleg' 
-local rfoot = piece 'rfoot' 
-local torso = piece 'torso' 
-local head = piece 'head' 
-local luparm = piece 'luparm' 
-local lshaftarm = piece 'lshaftarm' 
-local lloarm = piece 'lloarm' 
-local ruparm = piece 'ruparm' 
-local rshaftarm = piece 'rshaftarm' 
-local rloarm = piece 'rloarm' 
-local nanospray = piece 'nanospray' 
-local turret = piece 'turret' 
-local laserblade = piece 'laserblade' 
-local jump = piece 'jump' 
+local ground = piece 'ground'
+local pelvis = piece 'pelvis'
+local lthigh = piece 'lthigh'
+local llegtwister = piece 'llegtwister'
+local lleg = piece 'lleg'
+local lfoot = piece 'lfoot'
+local rthigh = piece 'rthigh'
+local rlegtwister = piece 'rlegtwister'
+local rleg = piece 'rleg'
+local rfoot = piece 'rfoot'
+local torso = piece 'torso'
+local head = piece 'head'
+local luparm = piece 'luparm'
+local lshaftarm = piece 'lshaftarm'
+local lloarm = piece 'lloarm'
+local ruparm = piece 'ruparm'
+local rshaftarm = piece 'rshaftarm'
+local rloarm = piece 'rloarm'
+local nanospray = piece 'nanospray'
+local turret = piece 'turret'
+local laserblade = piece 'laserblade'
+local jump = piece 'jump'
 
 local firepoints = {[0] = nanospray, [1] = laserblade}
 
@@ -144,7 +144,7 @@ local function Walk()
 			Turn(luparm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 			Turn(ruparm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
 			Turn(lloarm, x_axis, FOREARM_BACK_ANGLE, FOREARM_BACK_SPEED)
-			Turn(rloarm, x_axis, FOREARM_FRONT_ANGLE, FOREARM_FRONT_SPEED)						
+			Turn(rloarm, x_axis, FOREARM_FRONT_ANGLE, FOREARM_FRONT_SPEED)
 		end
 		WaitForTurn(lthigh, x_axis)
 		Sleep(0)
@@ -162,7 +162,7 @@ local function Walk()
 						Turn(lloarm, x_axis, FOREARM_FRONT_ANGLE, FOREARM_FRONT_SPEED)
 			Turn(rloarm, x_axis, FOREARM_BACK_ANGLE, FOREARM_BACK_SPEED)
 		end
-		WaitForTurn(rthigh, x_axis)		
+		WaitForTurn(rthigh, x_axis)
 		Sleep(0)
 	end
 end
@@ -181,14 +181,14 @@ local function RestorePose()
 	Turn(luparm, x_axis, 0, math.rad(120))
 	Turn(ruparm, x_axis, 0, math.rad(120))
 	Turn(lloarm, x_axis, 0, math.rad(120))
-	Turn(rloarm, x_axis, 0, math.rad(120))		
+	Turn(rloarm, x_axis, 0, math.rad(120))
 end
 
 function script.Create()
 	Hide(nanospray)
 	Hide(laserblade)
 	Move(jump, y_axis, -10, 100)
-	StartThread(GG.Script.SmokeUnit, {head})
+	StartThread(GG.Script.SmokeUnit, unitID, {head})
 end
 
 function script.StartMoving()
@@ -225,14 +225,14 @@ end
 local function AssumeCombatPosition(heading, pitch)
 	Turn(head, y_axis, 0, math.rad(160))
 	Turn(turret, y_axis, heading, math.rad(240))
-	Turn(luparm, x_axis, -pitch/4, math.rad(240))	
+	Turn(luparm, x_axis, -pitch/4, math.rad(240))
 	Turn(lloarm, z_axis, math.rad(30), math.rad(300))
 		Turn(lloarm, x_axis, math.rad(-60), math.rad(240))
 		
 		Turn(ruparm, x_axis, math.rad(-80) + lastPitch, math.rad(240))
 	Turn(rloarm, x_axis, math.rad(-90), math.rad(300))
 	Turn(rloarm, y_axis, math.rad(80), math.rad(240))
-		Turn(rloarm, z_axis, 0, math.rad(300))		
+		Turn(rloarm, z_axis, 0, math.rad(300))
 end
 
 function script.AimFromWeapon(num)
@@ -269,11 +269,11 @@ function script.FireWeapon(num)
 	--gun_1 = 1 - gun_1
 	--if gun_1 == 1 then
 		--Turn(luparm, z_axis, math.rad(-45), math.rad(450))
-		--Turn(luparm, x_axis, math.rad(-lastPitch), math.rad(250))	
+		--Turn(luparm, x_axis, math.rad(-lastPitch), math.rad(250))
 		--Turn(lloarm, x_axis, math.rad(-20), math.rad(250))
 				bReloading = true
 				Turn(ruparm, x_axis, -lastPitch/4, math.rad(700))
-				Turn(rloarm, z_axis, math.rad(-30), math.rad(700))		
+				Turn(rloarm, z_axis, math.rad(-30), math.rad(700))
 				Turn(rloarm, x_axis, math.rad(-20), math.rad(700))
 				Turn(rloarm, y_axis, 0, math.rad(700))
 				Turn(lloarm, z_axis, math.rad(40), math.rad(300))
@@ -281,24 +281,24 @@ function script.FireWeapon(num)
 		Turn(turret, y_axis, math.rad(-10) + lastHeading, math.rad(300))
 		Turn(head, y_axis, math.rad(10), math.rad(300))
 		
-				StartThread(MuzzleFlash)				
+				StartThread(MuzzleFlash)
 		Sleep(800)
 		AssumeCombatPosition(lastHeading, lastPitch)
 				bReloading = false
 	--elseif gun_1 == 0 then
 	--	Turn(ruparm, z_axis, math.rad(-45), math.rad(450))
-	--	Turn(ruparm, x_axis, math.rad(-lastPitch), math.rad(250))	
+	--	Turn(ruparm, x_axis, math.rad(-lastPitch), math.rad(250))
 	--	Turn(rloarm, x_axis, math.rad(-20), math.rad(250))
 	--
 	--	Turn(luparm, x_axis, math.rad(90), math.rad(700))
 	--	Turn(lloarm, x_axis, math.rad(90), math.rad(700))
 	--	Turn(lloarm, y_axis, math.rad(-90), math.rad(700))
-	--	
+	--
 	--	Turn(torso, y_axis, math.rad(10), math.rad(300))
 	--	Turn(head, y_axis, math.rad(10), math.rad(300))
 	--	Sleep(500)
 	--	AssumeCombatPosition(lastHeading, lastPitch)
-	--end	
+	--end
 	
 end
 

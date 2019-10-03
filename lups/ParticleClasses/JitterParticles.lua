@@ -74,7 +74,7 @@ local spIsSphereInView      = Spring.IsSphereInView
 local spGetUnitRadius       = Spring.GetUnitRadius
 local spGetProjectilePosition = Spring.GetProjectilePosition
 
-local glTexture     = gl.Texture 
+local glTexture     = gl.Texture
 local glBlending    = gl.Blending
 local glUniform     = gl.Uniform
 local glUniformInt  = gl.UniformInt
@@ -263,7 +263,7 @@ function JitterParticles:Update(n)
 		self.uMovCoeff = self.airdrag^self.frame + self.uMovCoeff;
 	else
 		local rotBoost = 0
-		for i=1,n do 
+		for i=1,n do
 			self.uMovCoeff = self.airdrag^(self.frame+i) + self.uMovCoeff;
 		end
 	end

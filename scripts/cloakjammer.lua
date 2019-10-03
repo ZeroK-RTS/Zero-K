@@ -1,14 +1,14 @@
-local head = piece 'head' 
-local hips = piece 'hips' 
-local chest = piece 'chest' 
-local rthigh = piece 'rthigh' 
-local lthigh = piece 'lthigh' 
-local lshin = piece 'lshin' 
-local rshin = piece 'rshin' 
-local rfoot = piece 'rfoot' 
-local lfoot = piece 'lfoot' 
-local disc = piece 'disc' 
-local cloaker = piece 'cloaker' 
+local head = piece 'head'
+local hips = piece 'hips'
+local chest = piece 'chest'
+local rthigh = piece 'rthigh'
+local lthigh = piece 'lthigh'
+local lshin = piece 'lshin'
+local rshin = piece 'rshin'
+local rfoot = piece 'rfoot'
+local lfoot = piece 'lfoot'
+local disc = piece 'disc'
+local cloaker = piece 'cloaker'
 
 local SIG_MOVE = 1
 
@@ -27,7 +27,7 @@ local function Walk()
 		Turn(lfoot, z_axis, math.rad(0), math.rad(130))
 		Turn(rfoot, z_axis, math.rad(0), math.rad(130))
 	
-		Turn(rshin, x_axis, math.rad(85), math.rad(260))	
+		Turn(rshin, x_axis, math.rad(85), math.rad(260))
 		Turn(rthigh, x_axis, math.rad(-100), math.rad(135))
 		Turn(lthigh, x_axis, math.rad(30), math.rad(135))
 		Turn(chest, y_axis, math.rad(10), math.rad(60))
@@ -44,7 +44,7 @@ local function Walk()
 		Turn(chest, y_axis, math.rad(-10), math.rad(60))
 		WaitForMove(hips, y_axis)
 		
-		Move(hips, y_axis, 1.2, 4.2)	
+		Move(hips, y_axis, 1.2, 4.2)
 		WaitForMove(hips, y_axis)
 		
 		Turn(lshin, x_axis, math.rad(10), math.rad(315))
@@ -91,7 +91,7 @@ function script.Deactivate()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, {head, hips, chest})
+	StartThread(GG.Script.SmokeUnit, unitID, {head, hips, chest})
 	Turn(hips, x_axis, math.rad(45))
 end
 	

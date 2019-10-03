@@ -457,7 +457,7 @@ return {
         sizemod            = 1,
         texture            = [[blooddropwhite]],
       },
-    },  
+    },
   }
 }
 

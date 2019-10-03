@@ -79,10 +79,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-		light_radius = 0,
+      customParams              = {
+        light_radius = 0,
         combatrange = 5,
-	  },
+      },
 
       damage                  = {
         default = 36,
@@ -103,7 +103,7 @@ unitDef = {
       rgbColor                = [[1 0.25 0]],
       soundStart              = [[explosion/ex_small4_2]],
       soundStartVolume        = 25,
-      targetborder            = 1,
+      targetborder            = 0.9,
       thickness               = 0,
       tolerance               = 1000000,
       turret                  = true,

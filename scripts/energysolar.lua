@@ -1,10 +1,10 @@
 local GetUnitStates = Spring.GetUnitStates
 
-local base = piece 'base' 
-local dish1 = piece 'dish1' 
-local dish2 = piece 'dish2' 
-local dish3 = piece 'dish3' 
-local dish4 = piece 'dish4' 
+local base = piece 'base'
+local dish1 = piece 'dish1'
+local dish2 = piece 'dish2'
+local dish3 = piece 'dish3'
+local dish4 = piece 'dish4'
 local fakes = {piece 'fakebase', piece 'fakedish1', piece 'fakedish2', piece 'fakedish3', piece 'fakedish4'}
 
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
@@ -16,8 +16,7 @@ local smokePiece = {base}
 
 local SIG_Activate = 2
 local SIG_Defensive = 4
-local wantActivate = false
-local autoDeactivate = false
+local unitDefID = Spring.GetUnitDefID(unitID)
 
 -- don't ask daddy difficult questions like "Why does it armor at the START of the animation?"
 local function Open()
@@ -67,9 +66,6 @@ function script.Activate()
 end
 
 function script.Deactivate()
-	if not autoDeactivate then
-		wantActivate = false
-	end
 	StartThread(Close)
 end
 
@@ -77,7 +73,7 @@ function script.Create()
 	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 1)
 	for i = 1, #fakes do Hide (fakes[i]) end
 	Move (base, y_axis, -90000)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(base, y_axis, math.rad(45))
 end
 
@@ -89,15 +85,21 @@ local function DefensiveManeuver()
 	end
 	Signal(SIG_Defensive)
 	SetSignalMask(SIG_Defensive)
-	wantActivate = wantActivate or Spring.GetUnitStates(unitID).active
-	autoDeactivate = true
-	SetUnitValue(COB.ACTIVATION, 0)
-	autoDeactivate = false
+	
+	if GG.OnOffToggleCommand then
+		GG.OnOffToggleCommand(unitID, unitDefID, true, 0)
+	else
+		SetUnitValue(COB.ACTIVATION, 0)
+	end
 	Sleep(auto_close_time)
-	if not (wantActivate and Spring.GetUnitRulesParam(unitID, "tacticalAi_external") == 1) then
+	if not (GG.OnOff_GetLastCommandWantedState(unitID) and Spring.GetUnitRulesParam(unitID, "tacticalAi_external") == 1) then
 		return
 	end
-	SetUnitValue(COB.ACTIVATION, 1)
+	if GG.OnOffToggleCommand then
+		GG.OnOffToggleCommand(unitID, unitDefID, true, 1)
+	else
+		SetUnitValue(COB.ACTIVATION, 1)
+	end
 end
 
 function HitByWeaponGadget()

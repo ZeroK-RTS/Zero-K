@@ -50,7 +50,7 @@ local TARGET_UNIT   = 2
 --------------------------------------------------------------------------------
 -- Config
 
--- Unseen targets will be removed after at least UNSEEN_TIMEOUT*USEEN_UPDATE_FREQUENCY frames 
+-- Unseen targets will be removed after at least UNSEEN_TIMEOUT*USEEN_UPDATE_FREQUENCY frames
 -- and at most (UNSEEN_TIMEOUT+1)*USEEN_UPDATE_FREQUENCY frames/
 local USEEN_UPDATE_FREQUENCY = 45
 local UNSEEN_TIMEOUT = 2
@@ -65,7 +65,7 @@ local weaponCounts = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	weaponCounts[i] = (ud.weapons and #ud.weapons)
-	if ((not (ud.canFly and (ud.isBomber or ud.isBomberAirUnit))) and 
+	if ((not (ud.canFly and (ud.isBomber or ud.isBomberAirUnit))) and
 			ud.canAttack and ud.canMove and ud.maxWeaponRange and ud.maxWeaponRange > 0) or ud.isFactory then
 		if getMovetype(ud) == 0 then
 			waitWaitUnits[i] = true
@@ -151,7 +151,7 @@ local function setTarget(data, sendToWidget)
 	if spValidUnitID(data.id) then
 		if not data.targetID then
 			if locationInRange(data.id, data.unitDefID, data.x, data.y, data.z) then
-				spSetUnitTarget(data.id, data.x, data.y, data.z)
+				spSetUnitTarget(data.id, data.x, data.y, data.z, false, true)
 				GG.UnitSetGroundTarget(data.id)
 			end
 			if sendToWidget then
@@ -247,7 +247,7 @@ function gadget:Initialize()
 	
 end
 
-function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
+function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if validUnits[unitDefID] then
 		spInsertUnitCmdDesc(unitID, unitSetTargetCmdDesc)
 		spInsertUnitCmdDesc(unitID, unitSetTargetCircleCmdDesc)
@@ -260,10 +260,10 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 	if unitById[facID] and validUnits[unitDefID] then
 		local data = unit.data[unitById[facID]]
 		addUnit(unitID, {
-			id = unitID, 
-			targetID = data.targetID, 
+			id = unitID,
+			targetID = data.targetID,
 			x = data.x, y = data.y, z = data.z,
-			allyTeam = spGetUnitAllyTeam(unitID), 
+			allyTeam = spGetUnitAllyTeam(unitID),
 			unitDefID = unitDefID,
 			alwaysSeen = data.alwaysSeen,
 		})
@@ -286,9 +286,8 @@ local function disSQ(x1,y1,x2,y2)
 end
 
 local function setTargetClosestFromList(unitID, unitDefID, team, choiceUnits)
-
 	local ux, uy, uz = Spring.GetUnitPosition(unitID)
-				
+	
 	local bestDis = false
 	local bestUnit = false
 
@@ -312,9 +311,9 @@ local function setTargetClosestFromList(unitID, unitDefID, team, choiceUnits)
 		local targetUnitDef = spGetUnitDefID(bestUnit)
 		local tud = targetUnitDef and UnitDefs[targetUnitDef]
 		addUnit(unitID, {
-			id = unitID, 
-			targetID = bestUnit, 
-			allyTeam = spGetUnitAllyTeam(unitID), 
+			id = unitID,
+			targetID = bestUnit,
+			allyTeam = spGetUnitAllyTeam(unitID),
 			unitDefID = unitDefID,
 			alwaysSeen = tud and tud.isImmobile,
 		})
@@ -367,11 +366,11 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				
 			elseif #cmdParams == 3 or (#cmdParams == 4 and cmdParams[4] == 0) then
 				addUnit(unitID, {
-					id = unitID, 
-					x = cmdParams[1], 
-					y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end), 
-					z = cmdParams[3], 
-					allyTeam = spGetUnitAllyTeam(unitID), 
+					id = unitID,
+					x = cmdParams[1],
+					y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end),
+					z = cmdParams[3],
+					allyTeam = spGetUnitAllyTeam(unitID),
 					unitDefID = unitDefID,
 				})
 			
@@ -395,9 +394,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				local targetUnitDef = spGetUnitDefID(cmdParams[1])
 				local tud = targetUnitDef and UnitDefs[targetUnitDef]
 				addUnit(unitID, {
-					id = unitID, 
-					targetID = cmdParams[1], 
-					allyTeam = spGetUnitAllyTeam(unitID), 
+					id = unitID,
+					targetID = cmdParams[1],
+					allyTeam = spGetUnitAllyTeam(unitID),
 					allyAllowed = allyTargetUnits[unitDefID],
 					unitDefID = unitDefID,
 					alwaysSeen = tud and tud.isImmobile,
@@ -445,9 +444,9 @@ function GG.SetUnitTarget(unitID, targetID)
 	
 	if tud then
 		addUnit(unitID, {
-			id = unitID, 
-			targetID = targetID, 
-			allyTeam = spGetUnitAllyTeam(unitID), 
+			id = unitID,
+			targetID = targetID,
+			allyTeam = spGetUnitAllyTeam(unitID),
 			allyAllowed = allyTargetUnits[unitDefID],
 			unitDefID = unitDefID,
 			alwaysSeen = tud.isImmobile,
@@ -459,9 +458,9 @@ end
 -- Target update
 
 function gadget:GameFrame(n)
-	if n%16 == 15 then -- timing synced with slow update to reduce attack jittering
-		-- 15 causes attack command to override target command
-		-- 0 causes target command to take precedence
+	if n%5 == 4 then
+		-- Slow update every 15 frames
+		-- Ideally units would run this code the frame after their slow update
 
 		local toRemove = {count = 0, data = {}}
 		for i = 1, unit.count do

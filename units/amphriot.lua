@@ -77,7 +77,7 @@ unitDef = {
       name                    = [[Undersea Charge Launcher]],
       areaOfEffect            = 100,
       burst                   = 2,
-	  burstRate               = 0.2,
+      burstRate               = 0.2,
       avoidFriendly           = false,
       bouncerebound           = 1,
       bounceslip              = 1,
@@ -86,7 +86,7 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
-	  
+      
       damage                  = {
         default = 90.1,
       },
@@ -121,15 +121,15 @@ unitDef = {
       name                    = [[Flechette]],
       areaOfEffect            = 32,
       burst                   = 3,
-      burstRate               = 0.03,
+      burstRate               = 0.033,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
       customParams            = {
-		light_camera_height = 2000,
-		light_color = [[0.3 0.3 0.05]],
-		light_radius = 120,
+        light_camera_height = 2000,
+        light_color = [[0.3 0.3 0.05]],
+        light_radius = 120,
       },
 
       damage                  = {
@@ -150,7 +150,7 @@ unitDef = {
       rgbColor                = [[1 1 0]],
       soundHit                = [[impacts/shotgun_impactv5]],
       soundStart              = [[weapon/shotgun_firev4]],
-      soundStartVolume	      = 0.5,
+      soundStartVolume        = 0.5,
       soundTrigger            = true,
       sprayangle              = 1500,
       thickness               = 2,

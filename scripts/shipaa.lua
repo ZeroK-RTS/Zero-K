@@ -75,7 +75,7 @@ end
 
 function script.Create()
 	StartThread(MoveScript)
-	StartThread(GG.Script.SmokeUnit, {hull, turret[1], turret[2]})
+	StartThread(GG.Script.SmokeUnit, unitID, {hull, turret[1], turret[2]})
 end
 
 function script.AimFromWeapon(id)

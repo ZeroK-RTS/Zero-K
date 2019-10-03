@@ -7,7 +7,7 @@ local spin = math.rad(60)
 local spinAccel = math.rad(6)
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Activate()

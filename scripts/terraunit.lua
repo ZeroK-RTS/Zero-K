@@ -1,3 +1,3 @@
-function Detonate()	
+function Detonate()
 	GG.QueueUnitDescruction(unitID, true)
 end

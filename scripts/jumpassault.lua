@@ -1,16 +1,16 @@
-local base = piece 'base' 
-local l_leg = piece 'l_leg' 
-local l_foot = piece 'l_foot' 
-local l_rocket = piece 'l_rocket' 
-local l_pt = piece 'l_pt' 
-local r_leg = piece 'r_leg' 
-local r_foot = piece 'r_foot' 
-local r_rocket = piece 'r_rocket' 
-local r_pt = piece 'r_pt' 
+local base = piece 'base'
+local l_leg = piece 'l_leg'
+local l_foot = piece 'l_foot'
+local l_rocket = piece 'l_rocket'
+local l_pt = piece 'l_pt'
+local r_leg = piece 'r_leg'
+local r_foot = piece 'r_foot'
+local r_rocket = piece 'r_rocket'
+local r_pt = piece 'r_pt'
 local pre_turret = piece 'pre_turret'
-local turret = piece 'turret' 
-local ram = piece 'ram' 
-local spike = piece 'spike' 
+local turret = piece 'turret'
+local ram = piece 'ram'
+local spike = piece 'spike'
 
 include "constants.lua"
 include "rockPiece.lua"
@@ -240,7 +240,7 @@ function script.Create()
 	Move(l_rocket, x_axis, 2)
 	Move(r_rocket, x_axis, -2)
 	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
-	StartThread(GG.Script.SmokeUnit, smokePieces)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePieces)
 end
 
 function script.AimFromWeapon()

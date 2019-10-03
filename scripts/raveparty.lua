@@ -17,9 +17,9 @@ end
 local hpi = math.pi*0.5
 
 local headingSpeed = math.rad(4)
-local pitchSpeed = math.rad(60)
+local pitchSpeed = math.rad(61) -- Float maths makes this exactly one revolution every 6 seconds.
 
-local spindleOffset = math.rad(60)
+local spindleOffset = 0
 local spindlePitch = 0
 
 guns[5].y = 11
@@ -66,10 +66,10 @@ local weaponNum = 1
 local randomize = false
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(spindle, x_axis, spindleOffset + spindlePitch)
-	for i=1,6 do
-		Turn(guns[i].flare, x_axis, (math.rad(-60)* i+1))
+	for i = 1, 6 do
+		Turn(guns[i].flare, x_axis, (math.rad(-60)* i + 1))
 	end
 end
 
@@ -99,7 +99,7 @@ function script.AimWeapon(num, heading, pitch)
 	end
 
 	sleeper[num] = true
-	while weaponNum ~= num do 
+	while weaponNum ~= num do
 		Sleep(10)
 	end
 	sleeper[num] = false
@@ -157,15 +157,20 @@ function script.Shot(num)
 end
 
 function script.FireWeapon(num)
-	gunNum = gunNum + 1
-	if gunNum > 6 then gunNum = 1 end
-	spindleOffset = math.rad(60)*(gunNum)
+	Sleep(33)
 	if randomize then
 		weaponNum = math.random(1,6)
 	else
 		weaponNum = weaponNum + 1
-		if weaponNum > 6 then weaponNum = 1 end
+		if weaponNum > 6 then
+			weaponNum = 1
+		end
 	end
+	gunNum = gunNum + 1
+	if gunNum > 6 then
+		gunNum = 1
+	end
+	spindleOffset = math.rad(60)*(gunNum - 1)
 end
 
 function script.Killed(recentDamage, maxHealth)

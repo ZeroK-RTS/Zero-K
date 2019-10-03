@@ -35,7 +35,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB SINK TURRET]],
   objectName             = [[cremcrus.s3o]],
-  script				 = [[assaultcruiser.lua]],
+  script                 = [[assaultcruiser.lua]],
   selfDestructAs         = [[BIG_UNIT]],
 
   sfxtypes               = {
@@ -47,7 +47,7 @@ unitDef = {
 
   },
   sightDistance          = 600,
-  sonarDistance			 = 800,
+  sonarDistance           = 800,
   turninplace            = 0,
   turnRate               = 260,
   workerTime             = 0,
@@ -59,55 +59,55 @@ unitDef = {
       mainDir            = [[0 0 1]],
       maxAngleDif        = 120,
     },
-	
+    
     {
       def                = [[GAUSS]],
       mainDir            = [[-1 0 1]],
       maxAngleDif        = 240,
-	  badTargetCategory	 = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-	
+    
     {
       def                = [[GAUSS]],
       mainDir            = [[1 0 1]],
       maxAngleDif        = 240,
-	  badTargetCategory	 = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-	
+    
     {
       def                = [[GAUSS]],
       mainDir            = [[-1 0 -1]],
       maxAngleDif        = 240,
-	  badTargetCategory	 = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-	
+    
     {
       def                = [[GAUSS]],
       mainDir            = [[1 0 -1]],
       maxAngleDif        = 240,
-	  badTargetCategory	 = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },	
-	
+    },
+    
     {
       def                = [[MISSILE]],
       mainDir            = [[-1 0 0]],
       maxAngleDif        = 240,
-	  badTargetCategory	 = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
-    },	
+    },
 
     {
       def                = [[MISSILE]],
       mainDir            = [[1 0 0]],
       maxAngleDif        = 240,
-	  badTargetCategory	 = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
-    },		
-	
+    },
+    
   },
 
 
@@ -134,7 +134,7 @@ unitDef = {
       interceptedByShieldType = 1,
       laserFlareSize          = 5.53,
       range                   = 400,
-      reloadtime              = 0.11,
+      reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       texture1                = [[largelaser]],
       texture2                = [[flare]],
@@ -143,8 +143,8 @@ unitDef = {
       thickness               = 5,
       turret                  = true,
       weaponType              = [[BeamLaser]],
-    },	
-	
+    },
+    
     GAUSS = {
       name                    = [[Gauss Cannon]],
       alphaDecay              = 0.12,
@@ -186,12 +186,12 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 2400,
     },
-	
-	MISSILE      = {
+    
+    MISSILE      = {
       name                    = [[Cruiser Missiles]],
       areaOfEffect            = 48,
-	  burst					  = 2,
-	  burstRate				  = 0.25,
+      burst                    = 2,
+      burstRate                = 0.233,
       cegTag                  = [[missiletrailyellow]],
       craterBoost             = 1,
       craterMult              = 2,
@@ -203,7 +203,7 @@ unitDef = {
 
       edgeEffectiveness       = 0.5,
       fireStarter             = 100,
-	  fixedLauncher			  = true,	  
+      fixedLauncher              = true,
       flightTime              = 4,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -215,17 +215,17 @@ unitDef = {
       smokeTrail              = true,
       soundHit                = [[weapon/missile/missile_fire12]],
       soundStart              = [[weapon/missile/missile_fire10]],
-      startVelocity			  = 300,
+      startVelocity           = 300,
       tolerance               = 4000,
-	  tracks				  = true,
-	  trajectoryHeight		  = 0.5,
-	  turnrate				  = 30000,
-	  turret				  = true,	  
-	  waterWeapon			  = true,
+      tracks                  = true,
+      trajectoryHeight        = 0.5,
+      turnrate                = 30000,
+      turret                  = true,
+      waterWeapon             = true,
       weaponAcceleration      = 300,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 600,
-    },	
+    },
   },
 
 

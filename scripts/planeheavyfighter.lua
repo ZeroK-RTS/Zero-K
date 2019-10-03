@@ -30,7 +30,7 @@ end
 function script.Create()
 	Turn(thrust1, x_axis, -math.rad(90), 1)
 	Turn(thrust2, x_axis, -math.rad(90), 1)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.StartMoving()
@@ -52,19 +52,19 @@ function script.StopMoving()
 end
 
 function script.QueryWeapon(num)
-	if gun then 
+	if gun then
 		return missR
-	else 
-		return missL 
+	else
+		return missL
 	end
 end
 
-function script.AimFromWeapon(num) 
-	return base 
+function script.AimFromWeapon(num)
+	return base
 end
 
 function script.AimWeapon(num, heading, pitch)
-	return not (GetUnitValue(COB.CRASHING) == 1) 
+	return not (GetUnitValue(COB.CRASHING) == 1)
 end
 
 function script.Shot(num)

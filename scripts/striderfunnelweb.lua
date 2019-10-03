@@ -4,7 +4,7 @@ include "spider_walking.lua"
 local ALLY_ACCESS = {allied = true}
 
 local notum = piece 'notum'
-local gaster = piece 'gaster' 
+local gaster = piece 'gaster'
 local gunL, gunR, flareL, flareR, aimpoint = piece('gunl', 'gunr', 'flarel', 'flarer', 'aimpoint')
 local shieldArm, shield, eye, eyeflare = piece('shield_arm', 'shield', 'eye', 'eyeflare')
 local emitl, emitr = piece('emitl', 'emitr')
@@ -23,7 +23,9 @@ local nanoPieces = {eye}
 local SIG_WALK = 1
 local SIG_BUILD = 2
 
-local PERIOD = 0.275
+local modelScaling = 0.9
+local maxVelocity = 1.8
+local PERIOD = 0.495 * modelScaling / maxVelocity
 
 local sleepTime = PERIOD*1000
 
@@ -76,7 +78,7 @@ local function RestoreLegs()
 	Signal (SIG_WALK)
 	SetSignalMask (SIG_WALK)
 	GG.SpiderWalk.restoreLegs (br, mr, fr, bl, ml, fl,
-		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)				
+		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)
 end
 
 function script.Create()
@@ -86,7 +88,7 @@ function script.Create()
 	Move (aimpoint, z_axis, 4)
 	Move (aimpoint, y_axis, 2)
 	Move (aimpoint, x_axis, 0)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

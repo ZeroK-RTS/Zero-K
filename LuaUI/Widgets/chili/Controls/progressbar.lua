@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 --- Progressbar module
 
@@ -26,6 +26,7 @@ Progressbar = Control:Inherit{
 	reverse   = false,
 
 	caption   = "",
+	noFont    = false,
 
 	color     = {0, 0, 1, 1},
 	backgroundColor = {1, 1, 1, 1},
@@ -36,7 +37,7 @@ Progressbar = Control:Inherit{
 local this = Progressbar
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 function Progressbar:New(obj)
 	obj = inherited.New(self, obj)
@@ -45,7 +46,7 @@ function Progressbar:New(obj)
 	return obj
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Progressbar:_Clamp(v)
 	if (self.min < self.max) then
@@ -64,10 +65,10 @@ function Progressbar:_Clamp(v)
 	return v
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Sets the new color
--- @tparam {r, g, b, a} c color table 
+-- @tparam {r, g, b, a} c color table
 function Progressbar:SetColor(...)
 	local color = _ParseColorArgs(...)
 	table.merge(color, self.color)
@@ -113,7 +114,7 @@ function Progressbar:SetCaption(str)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 
 function Progressbar:DrawControl()
@@ -151,10 +152,10 @@ function Progressbar:DrawControl()
 		end
 	end
 
-	if (self.caption) then
+	if (self.caption) and not self.noFont then
 		(self.font):Print(self.caption, w*0.5, h*0.5, "center", "center")
 	end
 end
 
 
---// ============================================================================= 
+--// =============================================================================

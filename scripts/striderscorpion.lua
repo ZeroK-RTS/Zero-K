@@ -37,7 +37,7 @@ local smokePiece = {base, tailgun}
 local weaponPieces = {
 	[1] = {aimFrom = body, flare = {body}},
 	[2] = {aimFrom = tailgun, flare = {flare1} },
-	[3] = {aimFrom = tailgun, flare = {flare1} },	
+	[3] = {aimFrom = tailgun, flare = {flare1} },
 	[4] = {pivot = gunl, pitch = arml1, aimFrom = gunl, flare = {flare1l, flare2l, flare3l} },
 	[5] = {pivot = gunr, pitch = armr1, aimFrom = gunr, flare = {flare1r, flare2r, flare3r} },
 }
@@ -98,12 +98,12 @@ local function RestoreLegs()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	GG.SpiderWalk.restoreLegs(leg1, leg2, leg3, leg4, leg5, leg6,
-		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)		
+		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)
 end
 
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 --	Turn(armr1, z_axis, math.rad(30), 100)
 --	Turn(arml1, z_axis, math.rad(-30), 100)
 end
@@ -153,7 +153,7 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(weaponPieces[num].pitch, x_axis)
 		StartThread(RestoreAfterDelay)
 	end
-	return true	
+	return true
 end
 
 function script.AimFromWeapon(num)
@@ -177,7 +177,7 @@ function script.Shot(num)
 		EmitSfx(flare1, 1025)
 	elseif num == 3 then
 		EmitSfx(flare1, 1026)
-		EmitSfx(flare1, 1027)	
+		EmitSfx(flare1, 1027)
 	end
 end
 

@@ -2,13 +2,13 @@ include "constants.lua"
 include "rockPiece.lua"
 local dynamicRockData
 
-local base = piece 'base' 
-local front = piece 'front' 
-local turret = piece 'turret' 
-local lbarrel = piece 'lbarrel' 
-local rbarrel = piece 'rbarrel' 
-local lflare = piece 'lflare' 
-local rflare = piece 'rflare' 
+local base = piece 'base'
+local front = piece 'front'
+local turret = piece 'turret'
+local lbarrel = piece 'lbarrel'
+local rbarrel = piece 'rbarrel'
+local lflare = piece 'lflare'
+local rflare = piece 'rflare'
 local exhaust = piece 'exhaust'
 local wakes = {}
 for i = 1, 8 do
@@ -16,7 +16,7 @@ for i = 1, 8 do
 end
 local ground1 = piece 'ground1'
 
-local random = math.random 
+local random = math.random
 local hpi = math.pi*0.5
 
 local shotNum = 1
@@ -106,7 +106,7 @@ function script.Create()
 	Turn(exhaust, y_axis, math.rad(-180))
 	Turn(lbarrel, y_axis, ROCKET_SPREAD)
 	Turn(rbarrel, y_axis, -ROCKET_SPREAD)
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
@@ -118,19 +118,20 @@ local function RestoreAfterDelay()
 	Turn(turret, x_axis, 0, math.rad(45))
 end
 
-function script.AimFromWeapon() 
+function script.AimFromWeapon()
 	return turret
 end
 
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
+	local spreadPitch = math.min(0.8, pitch)
 	Turn(turret, y_axis, heading, math.rad(180))
-	Turn(turret, x_axis, -pitch, math.rad(100))
-	Turn(lbarrel, y_axis, ROCKET_SPREAD + 2*pitch, math.rad(300))
-	Turn(rbarrel, y_axis, -ROCKET_SPREAD - 2*pitch, math.rad(300))
-	Turn(lbarrel, x_axis, -pitch, math.rad(300))
-	Turn(rbarrel, x_axis, -pitch, math.rad(300))
+	Turn(turret, x_axis, -spreadPitch, math.rad(100))
+	Turn(lbarrel, y_axis, ROCKET_SPREAD + 2*spreadPitch, math.rad(300))
+	Turn(rbarrel, y_axis, -ROCKET_SPREAD - 2*spreadPitch, math.rad(300))
+	Turn(lbarrel, x_axis, -spreadPitch, math.rad(300))
+	Turn(rbarrel, x_axis, -spreadPitch, math.rad(300))
 	gunHeading = heading
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(turret, x_axis)
@@ -151,7 +152,7 @@ function script.BlockShot(num, targetID)
 	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 660.1, 70, 0.3)
 end
 
-function script.Shot() 
+function script.Shot()
 	EmitSfx(flares[shotNum], GG.Script.UNIT_SFX2)
 	EmitSfx(exhaust, GG.Script.UNIT_SFX3)
 	shotNum = 3 - shotNum

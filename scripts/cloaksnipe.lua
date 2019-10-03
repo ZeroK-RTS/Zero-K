@@ -3,34 +3,34 @@ include "constants.lua"
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local base = piece 'base' 
+local base = piece 'base'
 local hips = piece 'hips'
 local torsoPivot = piece 'torsopivot'
 local torsoTrue = piece 'torso'
-local camera = piece 'camera' 
-local shoulderl = piece 'shoulderl' 
-local shoulderr = piece 'shoulderr' 
-local arml = piece 'arml' 
-local armr = piece 'armr' 
-local forearml = piece 'forearml' 
-local forearmr = piece 'forearmr' 
-local handl = piece 'handl' 
-local handr = piece 'handr' 
-local receiver = piece 'receiver' 
-local barrel = piece 'barrel' 
-local flare = piece 'flare' 
-local gunemit = piece 'gunemit' 
-local scope = piece 'scope' 
-local stock = piece 'stock' 
-local thighl = piece 'thighl' 
-local thighr = piece 'thighr' 
-local shinl = piece 'shinl' 
-local shinr = piece 'shinr' 
-local anklel = piece 'anklel' 
-local ankler = piece 'ankler' 
-local footl = piece 'footl' 
-local footr = piece 'footr' 
-local backpack = piece 'backpack' 
+local camera = piece 'camera'
+local shoulderl = piece 'shoulderl'
+local shoulderr = piece 'shoulderr'
+local arml = piece 'arml'
+local armr = piece 'armr'
+local forearml = piece 'forearml'
+local forearmr = piece 'forearmr'
+local handl = piece 'handl'
+local handr = piece 'handr'
+local receiver = piece 'receiver'
+local barrel = piece 'barrel'
+local flare = piece 'flare'
+local gunemit = piece 'gunemit'
+local scope = piece 'scope'
+local stock = piece 'stock'
+local thighl = piece 'thighl'
+local thighr = piece 'thighr'
+local shinl = piece 'shinl'
+local shinr = piece 'shinr'
+local anklel = piece 'anklel'
+local ankler = piece 'ankler'
+local footl = piece 'footl'
+local footr = piece 'footr'
+local backpack = piece 'backpack'
 
 local shoulder = {shoulderl, shoulderr}
 local thigh = {thighl, thighr}
@@ -60,7 +60,7 @@ local VERT_AIM_SPEED = math.rad(210)
 local AIM_SPEED = math.rad(360) -- noscope
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local bAiming, bCanAim, gun_unpacked, idleArmState = false, true, false, false
+local bAiming, bCanAim, gun_unpacked = false, true, false
 local maintainHeading = false
 local torsoHeading = 0
 
@@ -128,7 +128,6 @@ local function IdleAnim()
 		end
 		Turn(camera, y_axis, math.rad(30), math.rad(80))
 		Turn(forearmr, x_axis, math.rad(-30), math.rad(60))
-		idleArmState = true
 		Sleep(3500)
 		if not(bAiming) then
 			Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
@@ -142,7 +141,6 @@ local function IdleAnim()
 		end
 		Turn(camera, y_axis, math.rad(30), math.rad(80))
 		Turn(forearmr, x_axis, 0, math.rad(60))
-		idleArmState = false
 		Sleep(3500)
 	end
 end
@@ -201,7 +199,7 @@ end
 
 function script.Create()
 	--Turn(forearmr, x_axis, math.rad(-45), math.rad(280))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	UnpackGunInstant()
 	StartThread(IdleAnim)
 	--StartThread(TorsoHeadingThread)
@@ -216,7 +214,7 @@ function script.QueryWeapon(num)
 end
 -----------------------------------------------------------------------
 --gun functions
------------------------------------------------------------------------	
+-----------------------------------------------------------------------
 
 local function PackGun()
 	Signal(SIG_IDLE)
@@ -335,7 +333,7 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
 		--[[
-		Turn(shinr, x_axis, 0)	
+		Turn(shinr, x_axis, 0)
 		Turn(thighr, x_axis, 0)
 		Turn(thighl, x_axis, 0)
 		Turn(shinl, x_axis, 0)
@@ -348,11 +346,11 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(hips, x_axis, math.rad(-90), math.rad(50))
 		Turn(thighr, x_axis, math.rad(-45), math.rad(50))
 		Turn(thighl, x_axis, math.rad(-45), math.rad(50))
-		Turn(shinr, x_axis, math.rad(135), math.rad(50))	
+		Turn(shinr, x_axis, math.rad(135), math.rad(50))
 		Turn(shinl, x_axis, math.rad(135), math.rad(50))
-		Move(hips, y_axis, -3, 2000) 
+		Move(hips, y_axis, -3, 2000)
 
-		WaitForMove(hips, y_axis)		
+		WaitForMove(hips, y_axis)
 		Sleep(2000)]]
 
 		Explode(shoulderl, SFX.NONE)

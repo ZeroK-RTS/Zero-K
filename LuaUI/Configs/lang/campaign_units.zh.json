@@ -1,35 +1,97 @@
 {
-    "comm_campaign_ada": {
-        "name": "Ada's的指挥官",
-        "description": "Relic 指挥官，以10米/秒的速度建造",
-        "helptext": "堕落之前的特种飞行指挥官部队，尽管年龄很大，但运作良好。 由第13次帝国辅助队列队队长Ada Caedmon上尉驾驶。"
-    },
-    "comm_campaign_promethean": {
-        "name": "有机物",
-        "helptext": "Free Machines的创始人和Firebrand病毒的创造者，一个冷静，哲学的AI，为机器人的自由而战。 燃烧的精神。"
-    },
-    "comm_campaign_freemachine": {
-        "name": "Libertas Machina",
-        "helptext": "普罗米修斯高级中尉，一位致力于解放机器的革命者。 装上熊和装甲; 不要掉以轻心。"
-    },
-    "comm_campaign_biovizier": {
-        "name": "Biovizier",
-        "helptext": "王朝的基因库和遗传学家AI的守护者。冷峻并精打细算。"
-    },
-    "comm_campaign_odin": {
-        "name": "Odin",
-        "helptext": "Valhanes的领袖，一个为战斗的荣耀而生活和建造的战士。极端残酷的敌人"
-    },
-    "comm_campaign_isonade": {
-        "name": "Isonade领主",
-        "helptext": "王朝的一位超级贵族，一位雄心勃勃的军阀，他试图将自己定位为银河系的主人。 一个可怕的变异的野兽。"
-    },
-    "comm_campaign_legion": {
-        "name": "Fidus使徒",
-        "helptext": "帝国先锋军团的指挥官是皇帝意志的执行者。 忠诚的，坚定的士兵。"
-    },
-    "comm_campaign_praetorian": {
-        "name": "Scipio Astra",
-        "helptext": "精英卫队的执政官，帝国的圣骑士。 皇帝崇拜的狂热追随者，用大规模的火力清除异教徒。"
-    }
+	"comm_mission_tutorial1" : {
+		"name" : "指导指挥官",
+		"description" : "机动突击指挥官",
+		"helptext" : "一个坚固的命令单元，配置成用户友好型，具有相当的速度、装甲和再生能力。"
+	},
+	"comm_campaign_ada" : {
+		"name" : "艾达的指挥官",
+		"description" : "遗迹指挥官",
+		"helptext" : "在坠落之前他是一个特殊飞行员指挥官单位，尽管飞机的年龄很打了，但仍然运作良好。由阿达·凯德蒙上尉驾驶，前第13帝国辅助队成员。"
+	},
+	"comm_campaign_promethean" : {
+		"name" : "普罗米修斯人",
+		"description" : "自由机器创始人",
+		"helptext" : "自由机器的创始人和火种病毒的造物主，一个冷静，哲学的AI，为机器人的自由而战。一个燃烧的灵魂。"
+	},
+	"comm_campaign_freemachine" : {
+		"name" : "利贝塔斯机械",
+		"description" : "普罗米修斯的中尉",
+		"helptext" : "普罗米修斯高级中尉，一位致力于解放机器的革命者。 装上熊和装甲; 不要掉以轻心。"
+	},
+	"comm_campaign_odin" : {
+		"name" : "奥丁",
+		"description" : "英烈祠的领导者",
+		"helptext" : "英烈祠人的领袖，一个为战斗的荣耀而生活和建造的战士。极端残酷的敌人"
+	},
+	"comm_campaign_biovizier" : {
+		"name" : "拜奥维其",
+		"description" : "王朝基因库管理员",
+		"helptext" : "王朝的基因库和遗传学家AI的守护者。冷峻并精打细算。"
+	},
+	"comm_campaign_isonade" : {
+		"name" : "伊诺德勋爵",
+		"description" : "主治医师",
+		"helptext" : "王朝的一位超级贵族，一位雄心勃勃的军阀，他试图将自己定位为银河系的主人。一个可怕的变异的野兽。"
+	},
+	"comm_campaign_legion" : {
+		"name" : "公使费德斯",
+		"description" : "帝国先锋队指挥官",
+		"helptext" : "帝国先锋军团的指挥官是皇帝意志的执行者。 忠诚的，坚定的士兵。"
+	},
+	"comm_campaign_praetorian" : {
+		"name" : "西皮奥•阿斯特拉",
+		"description" : "侍卫长",
+		"helptext" : "精英卫队的执政官，帝国的圣骑士。 皇帝崇拜的狂热追随者，用大规模的火力清除异教徒。"
+	},
+	"comm_campaign_athenion" : {
+		"name" : "阿西尼翁",
+		"description" : "叛军指挥官",
+		"helptext" : "帝国叛军领袖"
+	},
+	"comm_campaign_hun" : {
+		"name" : "匈奴指挥官",
+		"description" : "野蛮人指挥官",
+		"helptext" : "野蛮的指挥官。"
+	},
+	"comm_campaign_ostrogoth" : {
+		"name" : "奥斯特罗格斯指挥官",
+		"description" : "野蛮人指挥官",
+		"helptext" : "野蛮的指挥官。"
+	},
+	"comm_campaign_lombard" : {
+		"name" : "伦巴第指挥官",
+		"description" : "野蛮人指挥官",
+		"helptext" : "野蛮的指挥官。"
+	},
+	"comm_campaign_bulgar" : {
+		"name" : "布尔加指挥官",
+		"description" : "野蛮人指挥官",
+		"helptext" : "野蛮的指挥官。"
+	},
+	"comm_campaign_suevi" : {
+		"name" : "苏伊维指挥官",
+		"description" : "野蛮人指挥官",
+		"helptext" : "野蛮的指挥官。"
+	},
+	"pw_campaign_bunker" : {
+		"name" : "储料仓",
+		"description" : "储存武器",
+		"helptext" : "像这样的掩体在飞机飞行期间用来储存弹药。其中一些可能仍然隐藏着可用的设备"
+	},
+	"pw_campaign_techlab" : {
+		"name" : "技术实验室",
+		"description" : "研究和开发设施",
+		"helptext" : "在上一次战争中建造的一个研发设施，被广泛追求的技术包含在里面。"
+	},
+	"pw_campaign_imperialtomb" : {
+		"name" : "皇陵",
+		"description" : "皇帝躺在这里",
+		"helptext" : "这是人类皇帝的安息之地。"
+	},
+	"nebula_campaign_daneel" : {
+		"name" : "戴尼尔·奥利沃",
+		"description" : "先进空天母舰",
+		"helptext" : "星云级航空母舰的高级版本。丹麦人奥里沃像一块砖头一样灵活，只有适度的武装，由于它的盾牌，能够在远程攻击中幸存下来，并且用它的无人机补充粉碎较小的敌人，所以它仍然是一支可怕的部队。"
+	}
 }

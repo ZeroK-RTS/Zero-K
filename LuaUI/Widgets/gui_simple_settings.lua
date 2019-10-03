@@ -13,7 +13,7 @@ function widget:GetInfo()
 end
 
 local thisWidgetName = "Simple Settings"
-local initializationComplete = false 
+local initializationComplete = false
 
 local LUAMENU_SETTING = "changeSetting "
 
@@ -89,10 +89,10 @@ local optionGenerationTable = {
 		optionName = "minimapScreenSpace",
 		name = "Minimap Size",
 		type = "number",
-		min = 0.05, 
+		min = 0.05,
 		max = 0.4,
 		step = 0.01,
-		default = 0.19, 
+		default = 0.19,
 		path = "Settings/Interface",
 	},
 	{
@@ -111,7 +111,10 @@ local optionGenerationTable = {
 	--},
 	{
 		optionName = "unitOutline",
-		optionFunction = function(self) Spring.SendCommands{"luaui togglewidget Outline"} end,
+		optionFunction = function(self)
+			Spring.SendCommands{"luaui disablewidget Outline No Shader"}
+			Spring.SendCommands{"luaui togglewidget Outline Shader"}
+		end,
 		name = "Toggle Unit Outline",
 		desc = "Draws a black outline around units.",
 		type = "button",

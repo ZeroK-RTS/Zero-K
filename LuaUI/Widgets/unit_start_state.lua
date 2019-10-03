@@ -106,19 +106,19 @@ end
 
 options_path = 'Settings/Unit Behaviour/Default States'
 options_order = {
-	'inheritcontrol', 'presetlabel', 
-	'resetMoveStates', 'holdPosition', 
-	'skirmHoldPosition', 'artyHoldPosition', 'aaHoldPosition', 
+	'inheritcontrol', 'presetlabel',
+	'resetMoveStates', 'holdPosition',
+	'skirmHoldPosition', 'artyHoldPosition', 'aaHoldPosition',
 	'enableTacticalAI', 'disableTacticalAI',
-	'enableAutoAssist', 'disableAutoAssist', 
+	'enableAutoAssist', 'disableAutoAssist',
 	'enableAutoCallTransport', 'disableAutoCallTransport',
 	'setRanksToDefault', 'setRanksToThree',
-	'categorieslabel', 
-	'commander_label', 
-	'commander_firestate0', 
-	'commander_movestate1', 
-	'commander_constructor_buildpriority', 
-	'commander_misc_priority', 
+	'categorieslabel',
+	'commander_label',
+	'commander_firestate0',
+	'commander_movestate1',
+	'commander_constructor_buildpriority',
+	'commander_misc_priority',
 	'commander_retreat',
 	'commander_auto_call_transport_2',
 	'commander_selection_rank',
@@ -126,9 +126,9 @@ options_order = {
 
 options = {
 	inheritcontrol = {
-		name = "Inherit Factory Control Group", 
-		type = 'bool', 
-		value = false, 
+		name = "Inherit Factory Control Group",
+		type = 'bool',
+		value = false,
 		path = "Settings/Interface/Control Groups",
 	},
 
@@ -785,6 +785,18 @@ local function addUnit(defName, path)
 			options_order[#options_order+1] = defName .. "_activateWhenBuilt"
 		end
 	end
+	
+	if ud.customParams.attack_toggle then
+		options[defName .. "_disableattack"] = {
+			name = "  Disable Attack Commands",
+			desc = "Check the box to make the unit not respond to attack commands.",
+			type = 'bool',
+			value = false,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_disableattack"
+	
+	end
 end
 
 local function AddFactoryOfUnits(defName)
@@ -1089,6 +1101,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			WG.SetSelectionRank(unitID, value)
 		end
 		
+		value = GetStateValue(name, "disableattack")
+		if value then -- false is the default
+			orderArray[#orderArray + 1] = {CMD_DISABLE_ATTACK, {1}, CMD.OPT_SHIFT}
+		end
+		
 		QueueState(name, "tactical_ai_2", CMD_UNIT_AI, orderArray)
 		
 		value = GetStateValue(name, "tactical_ai_transport")
@@ -1099,9 +1116,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		QueueState(name, "fire_at_radar", CMD_DONT_FIRE_AT_RADAR, orderArray, true)
 		QueueState(name, "personal_cloak_0", CMD_WANT_CLOAK, orderArray)
 		QueueState(name, "impulseMode", CMD_PUSH_PULL, orderArray)
+		QueueState(name, "activateWhenBuilt", CMD_WANT_ONOFF, orderArray)
 	end
 
-	if #orderArray>0 then
+	if #orderArray > 0 then
 		Spring.GiveOrderArrayToUnitArray ({unitID,},orderArray) --give out all orders at once
 	end
 	orderArray = nil
@@ -1147,7 +1165,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		return
 	end
 	
-	local oldID = Spring.GetUnitRulesParam(unitID, "saveload_oldID")	
+	local oldID = Spring.GetUnitRulesParam(unitID, "saveload_oldID")
 	if oldID then
 		return
 	end
@@ -1160,9 +1178,8 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 
 	local name = UnitDefs[unitDefID].name
 	QueueState(name, "constructor_buildpriority", CMD_PRIORITY, orderArray)
-	QueueState(name, "activateWhenBuilt", CMD.ONOFF, orderArray)
 
-	if #orderArray>0 then
+	if #orderArray > 0 then
 		Spring.GiveOrderArrayToUnitArray ({unitID,},orderArray) --give out all orders at once
 	end
 	orderArray = nil
@@ -1194,6 +1211,13 @@ function widget:PlayerChanged()
 end
 
 function widget:GameFrame(n)
+	if Spring.GetGameState then
+		local finishedLoading, loadedFromSave, locallyPaused, lagging = Spring.GetGameState()
+		if loadedFromSave then
+			widgetHandler:RemoveCallIn("GameFrame", self)
+			return
+		end
+	end
 	if n < 10 then
 		return
 	end

@@ -32,7 +32,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   maxDamage              = 1100,
-  maxVelocity            = 3.65,
+  maxVelocity            = 3.8,
   minCloakDistance       = 75,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[rapier.s3o]],
@@ -72,13 +72,13 @@ unitDef = {
       craterMult              = 0,
 
       customparams = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 3,
-		
-		light_camera_height = 2500,
-		light_color = [[1.3 0.5 1.6]],
-		light_radius = 220,
+        
+        light_camera_height = 2500,
+        light_color = [[1.3 0.5 1.6]],
+        light_radius = 220,
       },
 
       damage                  = {

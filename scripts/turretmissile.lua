@@ -41,7 +41,7 @@ include "constants.lua"
 
 local scriptReload = include("scriptReload.lua")
 
-local ammo, missile, missilespeed, mfront
+local missile, missilespeed, mfront
 
 local SIG_AIM = 1
 local SIG_RESTORE = 2
@@ -54,7 +54,7 @@ local gameSpeed = Game.gameSpeed
 
 function script.Create()
 	scriptReload.SetupScriptReload(3, 12.5 * gameSpeed)
-	StartThread(GG.Script.SmokeUnit, {turret})
+	StartThread(GG.Script.SmokeUnit, unitID, {turret})
 
 	Turn(bay[0].exhaust, x_axis, math.rad(170))
 	Turn(bay[1].exhaust, x_axis, math.rad(170))

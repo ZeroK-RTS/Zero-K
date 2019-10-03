@@ -59,7 +59,7 @@ local oneClickWepDefNames = {
 
 
 for name, data in pairs(oneClickWepDefNames) do
-	if UnitDefNames[name] then 
+	if UnitDefNames[name] then
 		oneClickWepDefs[UnitDefNames[name].id] = data
 	end
 end

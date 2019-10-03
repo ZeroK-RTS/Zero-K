@@ -7,7 +7,7 @@ local gen2 = piece "gen2"
 local smokePiece = {gen1}
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Activate ()

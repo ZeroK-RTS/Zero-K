@@ -3,7 +3,6 @@
 include "constants.lua"
 
 local ground, pelvis, turret, turretheading, turretpitch, gunbase, gun1, gun2, lleg, rleg, lfoot, rfoot, firept1, firept2 = piece('ground', 'pelvis', 'turret', 'turretheading', 'turretpitch', 'gunbase', 'gun1', 'gun2', 'lleg', 'rleg', 'lfoot', 'rfoot', 'firept1', 'firept2')
-local SIG_AIM = {}
 local firepoints = {[0] = firept1, [1] = firept2}
 local barrels = {[0] = gun1, [1] = gun2}
 
@@ -11,7 +10,7 @@ local gun_1 = 0
 local firing = 0
 
 local SIG_WALK = 1
-local SIG_AIM = {2, 4}
+local SIG_AIM = 2
 local SIG_RESTORE = 8
 
 local PERIOD = 350
@@ -28,7 +27,7 @@ local unitDefID = Spring.GetUnitDefID(unitID)
 local smokePiece = {pelvis, turret}
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)	
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Hide(gunbase)
 	Hide(gun1)
 	Hide(gun2)

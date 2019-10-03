@@ -14,12 +14,12 @@ unitDef = {
   category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 12 0]],
   collisionVolumeScales         = [[58 76 58]],
-  collisionVolumeType	        = [[CylY]],
+  collisionVolumeType            = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
-	aimposoffset   = [[0 10 0]],
-	modelradius    = [[19]],
+    aimposoffset   = [[0 10 0]],
+    modelradius    = [[19]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
@@ -45,7 +45,7 @@ unitDef = {
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[oooooooooooooooo]],
-	
+    
   sfxtypes            = {
 
     explosiongenerators = {
@@ -55,7 +55,7 @@ unitDef = {
     },
 
   },
-	
+    
   weapons                       = {
 
     {
@@ -78,11 +78,11 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-		light_color = [[0.6 0.7 0.7]],
-		light_radius = 420,
-	  },
+      customParams              = {
+        isaa = [[1]],
+        light_color = [[0.6 0.7 0.7]],
+        light_radius = 420,
+      },
 
       damage                  = {
         default = 22.51,

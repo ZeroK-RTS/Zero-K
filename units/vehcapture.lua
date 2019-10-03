@@ -22,6 +22,7 @@ unitDef = {
   customParams        = {
     modelradius    = [[13]],
     turnatfullspeed = [[1]],
+    cus_noflashlight = 1,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -75,7 +76,7 @@ unitDef = {
       craterMult              = 0,
 
       customparams = {
-        capture_scaling = 0,
+        capture_scaling = 1,
         is_capture = 1,
         post_capture_reload = 360,
 
@@ -87,7 +88,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 2.6,
+        default = 11.1,
       },
 
       explosionGenerator      = [[custom:NONE]],
@@ -128,6 +129,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
+      collisionVolumeOffsets = [[0 0 0]],
+      collisionVolumeScales  = [[26 26 50]],
+      collisionVolumeType    = [[cylZ]],
       object           = [[corvrad_big_dead.s3o]],
     },
 

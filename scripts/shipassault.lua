@@ -44,13 +44,13 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	for i=1,#missiles do
 		Turn(missiles[i], x_axis, -math.rad(90))
 	end
 end
 
-function script.QueryWeapon(num) 
+function script.QueryWeapon(num)
 	if num == 1 then return gunPieces[gun_1].flare
 	else return	missiles[missileNum]
 	end
@@ -95,16 +95,16 @@ local function Recoil(piece)
 	Move(piece, z_axis, -8)
 	Sleep(400)
 	Move(piece, z_axis, 0, 6)
+	gun_1 = 1 - gun_1 --this updates the turret's aim at a resonable time
 end
 
 function script.Shot(num)
 	if num == 1 then
 		--EmitSfx(gunPieces[gun_1].flare, 1024)
-		gun_1 = 1 - gun_1
 		StartThread(Recoil, gunPieces[gun_1].barrel)
 	elseif num == 2 then
-		missileNum = missileNum + 1	
-		if missileNum > 4 then missileNum = 1 end		
+		missileNum = missileNum + 1
+		if missileNum > 4 then missileNum = 1 end
 		EmitSfx(missiles[missileNum], 1025)
 	end
 end

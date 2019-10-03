@@ -40,7 +40,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],
   objectName          = [[chicken_blimpy.s3o]],
   power               = 750,
-	script              = [[chicken_blimpy.lua]],
+    script              = [[chicken_blimpy.lua]],
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {
@@ -92,6 +92,10 @@ unitDef = {
       commandfire             = true,
       craterBoost             = 0,
       craterMult              = 0,
+
+      customParams            = {
+        bogus = 1,
+      },
 
       damage                  = {
         default = 0,
@@ -160,8 +164,8 @@ unitDef = {
       craterMult              = 0,
       
       customparams            = {
-      	spawns_name = "chicken_dodo",
-      	spawns_expire = 30,
+          spawns_name = "chicken_dodo",
+          spawns_expire = 30,
       },
 
       damage                  = {

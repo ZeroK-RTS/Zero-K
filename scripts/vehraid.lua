@@ -15,7 +15,7 @@ local base, body, turret, sleeve, barrel, firepoint,
 	'gs1l', 'gs2l'
 )
 
-local moving, runSpin, reloading, mainHead, wheelTurnSpeed
+local moving, reloading, mainHead, wheelTurnSpeed
 
 local smokePiece = {turret, body}
 
@@ -59,13 +59,12 @@ function Suspension()
 	local speed = 0
 	local onGround = false
 	
-	while true do 
+	while true do
 		-- Moving check
 		speed = select(4,spGetUnitVelocity(unitID))
 		wheelTurnSpeed = speed*WHEEL_TURN_MULT
 	
 		if not moving and speed > 0.06 then
-			runSpin = true
 			moving = true
 		end
 
@@ -73,12 +72,12 @@ function Suspension()
 			x,y,z = spGetUnitPosition(unitID)
 			height = spGetGroundHeight(x,z)
 			if y - height < 1 then -- If I am on the ground
-				s1r = GetWheelHeight(gs1r) 
-				s2r = GetWheelHeight(gs2r) 
-				s1l = GetWheelHeight(gs1l) 
-				s2l = GetWheelHeight(gs2l) 
+				s1r = GetWheelHeight(gs1r)
+				s2r = GetWheelHeight(gs2r)
+				s1l = GetWheelHeight(gs1l)
+				s2l = GetWheelHeight(gs2l)
 				
-				xtilta = (s2r + s2l - s1l - s1r)/6000 
+				xtilta = (s2r + s2l - s1l - s1r)/6000
 				xtiltv = xtiltv*0.99 + xtilta
 				xtilt = xtilt*0.98 + xtiltv
 
@@ -111,7 +110,7 @@ function Suspension()
 			end
 		end
 		Sleep(50)
-	end 
+	end
 end
 
 function RestoreAfterDelay()
@@ -131,14 +130,11 @@ function Roll()
 		StopSpin(rwheel2, x_axis)
 		StopSpin(lwheel1, x_axis)
 		StopSpin(lwheel2, x_axis)
-	
-		runSpin = false
 	end
 end
 
 function script.StartMoving()
 	moving = true
-	runSpin = true
 	
 	local x,y,z = spGetUnitVelocity(unitID)
 	wheelTurnSpeed = math.sqrt(x*x+y*y+z*z)*10
@@ -209,5 +205,5 @@ function script.Create()
 	moving = false
 	StartThread(Suspension)
 	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end

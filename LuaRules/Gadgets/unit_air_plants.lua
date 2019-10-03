@@ -79,7 +79,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	plantList[unitID] = nil
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_AP_FLY_STATE] = true, [CMD_AP_AUTOREPAIRLEVEL] = true}
 end
 
@@ -89,7 +89,7 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if AIRPLANT[unitDefID] then
-		if (cmdID == CMD_AP_FLY_STATE) and unitID and plantList[unitID] then 
+		if (cmdID == CMD_AP_FLY_STATE) and unitID and plantList[unitID] then
 			local cmdDescID = FindUnitCmdDesc(unitID, CMD_AP_FLY_STATE)
 			if cmdDescID then
 				landCmd.params[1] = cmdParams[1]

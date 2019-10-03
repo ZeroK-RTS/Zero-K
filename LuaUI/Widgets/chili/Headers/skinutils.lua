@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function _DrawTextureAspect(x, y, w, h , tw, th)
@@ -455,14 +455,14 @@ local function _DrawSelection(x, y, w, h)
 end
 
 local function _GetControlFont(obj)
-		if obj.state.enabled then
-				return obj.font
-		else
-				return obj.disabledFont
-		end
+	if obj.state.enabled or not obj.disabledFont then
+		return obj.font
+	else
+		return obj.disabledFont
+	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawWindow(obj)
@@ -483,7 +483,7 @@ function DrawWindow(obj)
 		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, 0, w, h, skLeft, skTop, skRight, skBottom, tw, th)
 	gl.Texture(0, false)
 
-	if (obj.caption) then
+	if (obj.caption) and not obj.noFont then
 		_GetControlFont(obj):Print(obj.caption, w*0.5, 9, "center")
 	end
 end
@@ -507,12 +507,12 @@ function DrawRepeatingTiledWindow(obj)
 		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawRepeatingTiledTexture, 0, 0, w, h, skLeft, skTop, skRight, skBottom, tw, th)
 	gl.Texture(0, false)
 
-	if (obj.caption) then
+	if (obj.caption) and not obj.noFont then
  		_GetControlFont(obj):Print(obj.caption, w*0.5, 9, "center")
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawButton(obj)
@@ -563,7 +563,7 @@ function DrawButton(obj)
 		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, 0, w, h, skLeft, skTop, skRight, skBottom, tw, th, 0, obj.disableTiling)
 	gl.Texture(0, false)
 
-	if (obj.caption) then
+	if (obj.caption) and not obj.noFont then
 		local font = _GetControlFont(obj)
 		font:Print(obj.caption, w*0.5 + (obj.captionHorAlign or 0), math.floor(h*0.5 - font.size*0.35) + (obj.captionAlign or 0), "center", "linecenter")
 	end
@@ -797,7 +797,7 @@ function DrawEditBox(obj)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawPanel(obj)
@@ -823,7 +823,7 @@ function DrawPanel(obj)
 	gl.Texture(0, false)
 end
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawItemBkGnd(obj, x, y, w, h, state)
@@ -852,7 +852,7 @@ function DrawItemBkGnd(obj, x, y, w, h, state)
 	gl.Texture(0, false)
 end
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawScrollPanelBorder(self)
@@ -881,7 +881,7 @@ function DrawScrollPanelBorder(self)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawScrollPanel(obj)
@@ -992,7 +992,7 @@ function DrawScrollPanel(obj)
 	gl.Texture(0, false)
 end
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawCheckbox(obj)
@@ -1036,13 +1036,13 @@ function DrawCheckbox(obj)
 	gl.Texture(0, false)
 
 	gl.Color(1, 1, 1, 1)
-	if (obj.caption) then
+	if (obj.caption) and not obj.noFont then
 		local font = _GetControlFont(obj)
 		font:Print(obj.caption, tx, ty - font.size*0.35, nil, obj.valign)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawProgressbar(obj)
@@ -1087,13 +1087,13 @@ function DrawProgressbar(obj)
 		--gl.ClipPlane(1, false)
 	gl.Texture(0, false)
 
-	if (obj.caption) then
+	if (obj.caption) and not obj.noFont then
 		local font = _GetControlFont(obj)
 		font:Print(obj.caption, x + w*0.5, y + h*0.5 - font.size*0.35 + (obj.fontOffset or 0), "center", "linecenter")
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawTrackbar(self)
@@ -1178,7 +1178,7 @@ function DrawTrackbar(self)
 	gl.Texture(0, false)
 end
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawTreeviewNode(self)
@@ -1264,7 +1264,7 @@ function DrawTreeviewNodeTree(self)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawLine(self)
@@ -1295,7 +1295,7 @@ function DrawLine(self)
 		gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 	end
 end
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawTabBarItem(obj)
@@ -1335,13 +1335,13 @@ function DrawTabBarItem(obj)
 		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, 0, w, h, skLeft, skTop, skRight, skBottom, tw, th, 0)
 	gl.Texture(0, false)
 
-	if (obj.caption) then
+	if (obj.caption) and not obj.noFont then
 		local cx, cy, cw, ch = unpack4(obj.clientArea)
 		_GetControlFont(obj):DrawInBox(obj.caption, cx, cy, cw, ch, "center", "center")
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function DrawDragGrip(obj)
@@ -1353,7 +1353,7 @@ function DrawResizeGrip(obj)
 	gl.BeginEnd(GL.LINES, _DrawResizeGrip, obj)
 end
 
---// ============================================================================= 
+--// =============================================================================
 --// HitTest helpers
 
 function _ProcessRelative(code, total)
@@ -1384,7 +1384,7 @@ function GetRelativeObjBox(obj, boxrelative)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 --//
 
 function NCHitTestWithPadding(obj, mx, my)
@@ -1474,4 +1474,4 @@ function WindowNCMouseDownPostChildren(obj, x, y)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================

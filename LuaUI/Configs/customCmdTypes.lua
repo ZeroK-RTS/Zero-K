@@ -31,7 +31,7 @@ local custom_cmd_actions = {
 	rawmove = {cmdType = 1, name = "Move"},
 
 	-- states
-	onoff = {cmdType = 2, name = "On/Off", states = {'Off', 'On'}},
+	wantonoff = {cmdType = 2, name = "On/Off", states = {'Off', 'On'}},
 	['repeat'] = {cmdType = 2, name = "Repeat", states = {'Off', 'On'}},
 	wantcloak = {cmdType = 2, name = "Cloak", states = {'Off', 'On'}},
 	movestate = {cmdType = 2, name = "Move State", states = {'Hold Position', 'Maneuver', 'Roam'}},
@@ -100,6 +100,7 @@ local custom_cmd_actions = {
 	selection_rank = {cmdType = 2, name = "Selection Rank", states = {'0', '1', '2', '3'}},
 	autocalltransport = {cmdType = 2, name = "Auto Call Transport", states = {'Off', 'On'}},
 	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Seppuku", states = {'Off', 'On'}},
+	disableattack = {cmdType = 2, name = "Allow Attack", states = {'Allowed', 'Blocked'}},
 	pushpull = {cmdType = 2, name = "Impulse Mode", states = {'Pull', 'Push'}},
 	autoassist = {cmdType = 2, name = "Factory Auto Assist", states = {'Off', 'On'}},
 	airstrafe = {cmdType = 2, name = "Gunship Strafe", states = {'Off', 'On'}},
@@ -138,7 +139,7 @@ local usedActions = {
 	["embark"] = true,
 	["disembark"] = true,
 	["transportto"] = true,
-	["onoff"] = true,
+	["wantonoff"] = true,
 	["miscpriority"] = true,
 	["manualfire"] = true,
 	["repair"] = true,

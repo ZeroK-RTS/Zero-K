@@ -4,7 +4,7 @@ local dynamicRockData
 include "trackControl.lua"
 include "pieceControl.lua"
 
-local base, body, turret1, sleeve1, barrel1, firepoint1, turret2, sleeve2, gun2, firepoint2 
+local base, body, turret1, sleeve1, barrel1, firepoint1, turret2, sleeve2, gun2, firepoint2
 	= piece("base", "body", "turret1", "sleeve1", "barrel1", "firepoint1", "turret2", "sleeve2", "gun2", "firepoint2")
 	
 -- Signal definitions
@@ -111,7 +111,7 @@ function script.Create()
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (250)
 	end
-	StartThread (GG.Script.SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.StartMoving()

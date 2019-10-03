@@ -142,7 +142,7 @@ local highlightPattern -- currently based on player name -- TODO add configurabl
 local firstEnter = true --used to activate ally-chat at game start. To run once
 local noAlly = false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
 
-local decayTime  = 20 
+local decayTime  = 20
 
 local lastMsgChat, lastMsgBackChat, lastMsgConsole
 
@@ -162,7 +162,7 @@ options_order = {
 	
 	'enableConsole',
 	
-	--'mousewheel', 
+	--'mousewheel',
 	'defaultAllyChat',
 	'defaultBacklogEnabled',
 	'mousewheelBacklog',
@@ -172,7 +172,7 @@ options_order = {
 	'enableChatBackground',
 	
 	'toggleBacklog',
-	'text_height_chat', 
+	'text_height_chat',
 	'text_height_console',
 	'backchatOpacity',
 	'autohide_text_time',
@@ -185,14 +185,14 @@ options_order = {
 	'color_chat', 'color_ally', 'color_other', 'color_spec',
 	
 	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'hideLog',
-	'error_opengl_source',	
+	'error_opengl_source',
 	
 	
 	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
 	--'highlight_surround',
 	'highlight_sound', 'color_highlight',
 	
-	--'highlighted_text_height', 
+	--'highlighted_text_height',
 	
 	'dedupe_messages', 'dedupe_points', --'color_dup',
 }
@@ -380,7 +380,7 @@ options = {
 		path = filter_path,
 	},
 	hideLabel = {
-		name = "Hide Labels",         
+		name = "Hide Labels",
 		type = 'bool',
 		value = false,
 		OnChange = onOptionsChanged,
@@ -399,7 +399,7 @@ options = {
 		name = 'Maximum Lines (20-100)',
 		type = 'number',
 		value = 60,
-		min = 20, max = 100, step = 1, 
+		min = 20, max = 100, step = 1,
 		OnChange = onOptionsChanged,
 	},
 	
@@ -451,7 +451,7 @@ options = {
 		name = "Chat Background color",
 		type = "colors",
 		value = { 0, 0, 0, 0},
-		OnChange = function(self) 
+		OnChange = function(self)
 			scrollpanel_chat.backgroundColor = self.value
 			scrollpanel_chat.borderColor = self.value
 			scrollpanel_chat:Invalidate()
@@ -609,7 +609,7 @@ local function SetInputFontSize(size)
 		Spring.SetConfigInt("FontSize", size, true) --3rd param true is "this game only"
 		Spring.SendCommands('font ' .. WG.Chili.EditBox.font.font)
 	end
-end	
+end
 
 --------------------------------------------------------------------------------
 -- TODO : should these pattern/escape functions be moved to some shared file/library?
@@ -775,8 +775,8 @@ local function MessageIsChatInfo(msg)
 	return string.find(msg.argument,'Speed set to') or
 	string.find(msg.argument,'following') or
 	string.find(msg.argument,'Connection attempted') or
-	string.find(msg.argument,'exited') or 
-	string.find(msg.argument,'is no more') or 
+	string.find(msg.argument,'exited') or
+	string.find(msg.argument,'is no more') or
 	string.find(msg.argument,'paused the game') or
 	string.find(msg.argument,'Sync error for') or
 	string.find(msg.argument,'Cheating is') or
@@ -845,7 +845,7 @@ local function AddMessage(msg, target, remake)
 		size = options.text_height_chat.value
 		stack = stack_backchat
 		lastMsg = lastMsgBackChat
-	end	
+	end
 	
 	-- TODO betterify this / make configurable
 	--[[
@@ -867,7 +867,7 @@ local function AddMessage(msg, target, remake)
 		return
 	end
 	
-	local control 
+	local control
 	local sourceTextBox
 	local message
 	local messageTextBox
@@ -990,7 +990,7 @@ local function AddMessage(msg, target, remake)
 		autosize = true,
 		resizeItems = false,
 		centerItems = false,
-		children = controlChildren;		
+		children = controlChildren;
 	}
 	
 	if target == 'chat' or target == 'backchat' then
@@ -1038,7 +1038,7 @@ local function AddMessage(msg, target, remake)
 
 	stack:UpdateClientArea()
 		
-end 
+end
 
 --[[
 local function setupColors()
@@ -1082,8 +1082,8 @@ local function SetupAITeamColor() --Copied from gui_chili_chat2_1.lua
 				--incolors[name] = color2incolor(Spring.GetTeamColor(teamID))
 				teamColors[name] = {Spring.GetTeamColor(teamID)}
 			end
-		end --if teamID ~= Spring.GetGaiaTeamID() 
-	end --for each team		
+		end --if teamID ~= Spring.GetGaiaTeamID()
+	end --for each team
 end
 
 local function setupMyself()
@@ -1128,12 +1128,12 @@ function RemakeConsole()
 	end
 	
 	-- FIXME : messages collection changing while iterating (if max_lines option has been shrinked)
-	for i = 1, #chatMessages do 
+	for i = 1, #chatMessages do
 		local msg = chatMessages[i]
 		--AddMessage(msg, 'chat', true, true )
 		AddMessage(msg, 'backchat', true )
 	end
-	for i = 1, #consoleMessages do 
+	for i = 1, #consoleMessages do
 		local msg = consoleMessages[i]
 		AddMessage(msg, 'console', true )
 	end
@@ -1268,7 +1268,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		ShowInputSpace()
 	else
 		HideInputSpace()
-	end 
+	end
 end
 
 
@@ -1314,7 +1314,7 @@ function widget:AddConsoleMessage(msg)
 	local messages = isChat and chatMessages or consoleMessages
 	
 	if #messages > 0
-		and messages[#messages].text == msg.text 
+		and messages[#messages].text == msg.text
 		and (isPoint and options.dedupe_points.value or options.dedupe_messages.value)
 		then
 		
@@ -1343,7 +1343,7 @@ function widget:AddConsoleMessage(msg)
 	
 	messages[#messages + 1] = msg
 	
-	if isChat then 
+	if isChat then
 		AddMessage(msg, 'chat')
 		AddMessage(msg, 'backchat')
 	else
@@ -1367,7 +1367,7 @@ function widget:AddConsoleMessage(msg)
 	-- if playername == myName then
 		if WG.enteringText then
 			HideInputSpace()
-		end 		
+		end
 	-- end
 end
 
@@ -1386,9 +1386,9 @@ function widget:Update(s)
 	
 	if timer > period then
 		timer = 0
-		Spring.SendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
-			window_chat.x / screen0.width + 0.003, 
-			1 - (window_chat.y + window_chat.height) / screen0.height + 0.004, 
+		Spring.SendCommands({string.format("inputtextgeo %f %f 0.02 %f",
+			window_chat.x / screen0.width + 0.003,
+			1 - (window_chat.y + window_chat.height) / screen0.height + 0.004,
 			window_chat.width / screen0.width)})
 		
 		for k,control in pairs(killTracker) do
@@ -1408,7 +1408,7 @@ function widget:Update(s)
 		fadeTimer = 0
 		for k,control in pairs(fadeTracker) do
 			control.fade = control.fade - (fadePeriod / fadeLength )
-			local alpha = control.fade 
+			local alpha = control.fade
 			
 			if alpha < 1 then
 				if control.fadeType == 'text' then
@@ -1563,7 +1563,7 @@ function widget:Initialize()
 		x = 5,
 		y = 5,
 		right = 5,
-		bottom = 5, 
+		bottom = 5,
 		verticalSmartScroll = true,
 		backgroundColor = {0,0,0,0},
 		borderColor = {0,0,0,0},

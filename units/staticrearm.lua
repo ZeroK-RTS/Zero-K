@@ -23,9 +23,9 @@ unitDef = {
 
   customParams        = {
     pad_count = 4,
-	nobuildpower   = 1,
-	notreallyafactory = 1,
-	selection_rank  = [[1]],
+    nobuildpower   = 1,
+    notreallyafactory = 1,
+    selection_rank  = [[1]],
     selectionscalemult = 1,
   },
 
@@ -40,7 +40,7 @@ unitDef = {
   maxVelocity         = 0,
   minCloakDistance    = 150,
   objectName          = [[airpad.s3o]],
-  script			  = [[staticrearm.lua]],
+  script              = [[staticrearm.lua]],
   selfDestructAs      = [[LARGE_BUILDINGEX]],
   showNanoSpray       = false,
   sightDistance       = 273,

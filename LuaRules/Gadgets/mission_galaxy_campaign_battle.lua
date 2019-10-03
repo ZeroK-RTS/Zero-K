@@ -216,8 +216,8 @@ local function InitializeVictoryConditions()
 		local defeatConfig = defeatConditionConfig[allyTeamID] or {}
 		if defeatConfig.vitalUnitTypes then
 			local unitDefMap = {}
-			for i = 1, #defeatConfig.vitalUnitTypes do
-				local ud = UnitDefNames[defeatConfig.vitalUnitTypes[i]]
+			for j = 1, #defeatConfig.vitalUnitTypes do
+				local ud = UnitDefNames[defeatConfig.vitalUnitTypes[j]]
 				if ud then
 					unitDefMap[ud.id] = true
 				end
@@ -579,7 +579,7 @@ local function SetupInitialUnitParameters(unitID, unitData)
 		Spring.SetUnitRulesParam(unitID, "ignoredByAI", 1, publicTrueTable)
 		Spring.SetUnitRulesParam(unitID, "avoidAttackingNeutral", 1)
 	elseif unitData.notAutoAttacked then
-		Spring.SetUnitNeutral(unitID, true) 
+		Spring.SetUnitNeutral(unitID, true)
 		Spring.SetUnitRulesParam(unitID, "ignoredByAI", 1, publicTrueTable)
 		Spring.SetUnitRulesParam(unitID, "avoidAttackingNeutral", 1)
 	end
@@ -688,14 +688,14 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		wantLevelGround = wantLevelGround or {}
 		wantLevelGround[#wantLevelGround + 1] = {
 			pos = {x, Spring.GetGroundHeight(x,z), z},
-			xSize = xSize, 
+			xSize = xSize,
 			zSize = zSize,
 		}
 	end
 	
 	if not unitID then
 		Spring.MarkerAddPoint(x, 0, z, "Error creating unit " .. (((ud or {}).humanName) or "???"))
-		return 
+		return
 	end
 	
 	if unitData.shieldFactor and ud.customParams.shield_power then
@@ -713,7 +713,7 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		local patrolRoute = unitData.patrolRoute
 		local patrolCommands = {
 			[1] = {
-				cmdID = CMD_RAW_MOVE, 
+				cmdID = CMD_RAW_MOVE,
 				pos = patrolRoute[1]
 			}
 		}
@@ -739,7 +739,7 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		
 		local patrolCommands = {
 			[1] = {
-				cmdID = CMD.PATROL, 
+				cmdID = CMD.PATROL,
 				pos = {cx, cz}
 			}
 		}
@@ -840,7 +840,7 @@ local function AddUnitTerraform(unitData)
 			z - zsize,
 			x + xsize,
 			z + zsize
-		}, 
+		},
 		height = unitData.terraformHeight,
 	}
 	
@@ -940,7 +940,7 @@ local function ProcessUnitCommand(unitID, command)
 		local x, z = command.pos[1], command.pos[2]
 		local y = CallAsTeam(team,
 			function ()
-				return Spring.GetGroundHeight(x, z) 
+				return Spring.GetGroundHeight(x, z)
 			end
 		)
 		
@@ -1133,7 +1133,7 @@ local function PlaceTeamUnits(teamID, customKeys, alliedToPlayer)
 end
 
 local function PlaceFeatures(featureData)
-	local gaiaTeamID = Spring.GetGaiaTeamID() 
+	local gaiaTeamID = Spring.GetGaiaTeamID()
 	for i = 1, #featureData do
 		PlaceFeature(featureData[i], gaiaTeamID)
 	end
@@ -1193,6 +1193,7 @@ local function CheckDisableControlAiMessage()
 		local dis_msg = "DISABLE_CONTROL:"
 		for i = 1, #data do
 			dis_msg = dis_msg .. data[i] .. "+"
+			Spring.SetUnitRulesParam(unitID, "disableAiControl", 1, publicTrueTable)
 		end
 		SendToUnsynced("SendAIEvent", teamID, dis_msg)
 	end
@@ -1224,8 +1225,8 @@ local function InitializeMidgameUnits(gameFrame)
 		
 		local midgameUnits = CustomKeyToUsefulTable(customKeys and customKeys.midgameunits)
 		if midgameUnits then
-			for i = 1, #midgameUnits do
-				AddMidgameUnit(midgameUnits[i], teamID, gameFrame)
+			for j = 1, #midgameUnits do
+				AddMidgameUnit(midgameUnits[j], teamID, gameFrame)
 			end
 		end
 	end
@@ -1256,7 +1257,7 @@ end
 
 local function DoInitialTerraform(noBuildings)
 	local terraformList = CustomKeyToUsefulTable(Spring.GetModOptions().initalterraform) or {}
-	local gaiaTeamID = Spring.GetGaiaTeamID() 
+	local gaiaTeamID = Spring.GetGaiaTeamID()
 	
 	if not noBuildings then
 		-- Add terraform for structures
@@ -1267,8 +1268,8 @@ local function DoInitialTerraform(noBuildings)
 			local initialUnits = GetExtraStartUnits(teamID, customKeys)
 			initialUnitDataTable[teamID] = initialUnitDataTable[teamID] or CustomKeyToUsefulTable(customKeys and customKeys.extrastartunits)
 			if initialUnits then
-				for i = 1, #initialUnits do
-					local unitTerra = AddUnitTerraform(initialUnits[i])
+				for j = 1, #initialUnits do
+					local unitTerra = AddUnitTerraform(initialUnits[j])
 					if unitTerra then
 						terraformList[#terraformList + 1] = unitTerra
 					end
@@ -1295,7 +1296,7 @@ local function DoInitialTerraform(noBuildings)
 	for i = 1, #terraformList do
 		local terraform = terraformList[i]
 		local pos = terraform.position
-		if terraform.terraformShape == 1 then 
+		if terraform.terraformShape == 1 then
 			-- Rectangle
 			local points = {
 				{x = pos[1], z = pos[2]},
@@ -1329,7 +1330,7 @@ local GalaxyCampaignHandler = {}
 
 function Unlocks.GetIsUnitUnlocked(teamID, unitDefID)
 	if unlockedUnitsByTeam[teamID] then
-		if not (unlockedUnitsByTeam[teamID][unitDefID]) then 
+		if not (unlockedUnitsByTeam[teamID][unitDefID]) then
 			return false
 		end
 	end

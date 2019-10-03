@@ -4,7 +4,7 @@ unitDef = {
   description         = [[Heavy Riot Support Tank]],
   acceleration        = 0.02181,
   brakeRate           = 0.04282,
-  buildCostMetal      = 520,
+  buildCostMetal      = 500,
   builder             = false,
   buildPic            = [[tankriot.png]],
   canGuard            = true,
@@ -17,6 +17,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    cus_noflashlight = 1,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -63,24 +64,24 @@ unitDef = {
     TAWF_BANISHER = {
       name                    = [[Heavy Missile]],
       areaOfEffect            = 160,
-	  cegTag                  = [[BANISHERTRAIL]],
+      cegTag                  = [[BANISHERTRAIL]],
       craterBoost             = 1,
       craterMult              = 2,
 
-	  customParams            = {
-		burst = Shared.BURST_RELIABLE,
+      customParams            = {
+        burst = Shared.BURST_RELIABLE,
 
-	    gatherradius = [[120]],
-	    smoothradius = [[80]],
-	    smoothmult   = [[0.25]],
-		force_ignore_ground = [[1]],
-		
-		light_color = [[1.4 1 0.7]],
-		light_radius = 320,
-	  },
-	  
+        gatherradius = [[120]],
+        smoothradius = [[80]],
+        smoothmult   = [[0.25]],
+        force_ignore_ground = [[1]],
+        
+        light_color = [[1.4 1 0.7]],
+        light_radius = 320,
+      },
+      
       damage                  = {
-        default = 440.5,
+        default = 420.1,
         subs    = 22,
       },
 
@@ -93,8 +94,8 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[corbanishrk.s3o]],
       noSelfDamage            = true,
-      range                   = 340,
-      reloadtime              = 2.15,
+      range                   = 320,
+      reloadtime              = 2.133,
       smokeTrail              = false,
       soundHit                = [[weapon/bomb_hit]],
       soundStart              = [[weapon/missile/banisher_fire]],

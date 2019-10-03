@@ -209,10 +209,10 @@ local function sinkFloat_thread()
 end
 
 local function dustBottom()
-	local x,y,z = Spring.GetUnitPiecePosDir(unitID,rfoot)
-	Spring.SpawnCEG("uw_vindiback", x, y+5, z, 0, 0, 0, 0)
-	local x,y,z = Spring.GetUnitPiecePosDir(unitID,lfoot)
-	Spring.SpawnCEG("uw_vindiback", x, y+5, z, 0, 0, 0, 0)
+	local x1,y1,z1 = Spring.GetUnitPiecePosDir(unitID,rfoot)
+	Spring.SpawnCEG("uw_vindiback", x1, y1+5, z1, 0, 0, 0, 0)
+	local x2,y2,z2 = Spring.GetUnitPiecePosDir(unitID,lfoot)
+	Spring.SpawnCEG("uw_vindiback", x2, y2+5, z2, 0, 0, 0, 0)
 end
 
 --------------------------------------------------------------------------------------
@@ -306,7 +306,7 @@ end
 
 function script.Create()
 	scriptReload.SetupScriptReload(4, 12 * gameSpeed)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function RestoreAfterDelay()

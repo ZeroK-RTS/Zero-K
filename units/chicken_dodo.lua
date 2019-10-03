@@ -62,24 +62,24 @@ unitDef = {
   waterline             = 4,
   workerTime            = 0,
 
-	weaponDefs = {
-		DODO_DEATH = {
-			name = "Extinction",
-			areaofeffect = 300,
-			craterboost =  1,
-			cratermult = 3.5,
-			edgeeffectiveness = 0.4,
-			impulseboost = 0,
-			impulsefactor = 0.4,
-			explosiongenerator = [[custom:large_green_goo]],
-			soundhit = [[explosion/mini_nuke]],
+    weaponDefs = {
+        DODO_DEATH = {
+            name = "Extinction",
+            areaofeffect = 300,
+            craterboost =  1,
+            cratermult = 3.5,
+            edgeeffectiveness = 0.4,
+            impulseboost = 0,
+            impulsefactor = 0.4,
+            explosiongenerator = [[custom:large_green_goo]],
+            soundhit = [[explosion/mini_nuke]],
 
-			damage = {
-				default = 500,
-				chicken = 50,
-			},
-		},
-	},
+            damage = {
+                default = 500,
+                chicken = 50,
+            },
+        },
+    },
 }
 
 return lowerkeys({ chicken_dodo = unitDef })

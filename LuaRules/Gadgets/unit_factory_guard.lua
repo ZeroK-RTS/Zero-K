@@ -75,7 +75,7 @@ local commandDesc = {
 	name    = 'Auto Assist',
 	cursor  = 'Repair',
 	action  = 'autoassist',
-	params  = {0, 'off', 'on'}, 
+	params  = {0, 'off', 'on'},
 }
 
 --------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ local function GuardFactory(unitID, unitDefID, factID, factDefID)
 	-- is this a factory?
 	local fd = UnitDefs[factDefID]
 	if (not (fd and fd.isFactory)) then
-		return 
+		return
 	end
 
 	-- can this unit assist?
@@ -128,7 +128,7 @@ local function GuardFactory(unitID, unitDefID, factID, factDefID)
 		dist = sideDis
 	end
 
-	-- facing values { S = 0, E = 1, N = 2, W = 3 }  
+	-- facing values { S = 0, E = 1, N = 2, W = 3 }
 	local dx, dz -- down vector
 	local rx, rz -- right vector
 	if (facing == 0) then
@@ -159,7 +159,7 @@ end
 --------------------
 -- interface stuff to add command
 
-local function SetAssistState(unitID, state) 
+local function SetAssistState(unitID, state)
 	if not (unitID and factories[unitID]) then
 		return
 	end
@@ -169,20 +169,20 @@ local function SetAssistState(unitID, state)
 		spEditUnitCmdDesc(unitID, cmdDescID, {params = commandDesc.params})
 		factories[unitID].assist = (state == 1)
 	end
-end 
+end
 
 function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_FACTORY_GUARD] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID,
                              cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_FACTORY_GUARD and factoryDefs[unitDefID] then
-		SetAssistState(unitID, cmdParams[1]) 
+		SetAssistState(unitID, cmdParams[1])
 		return false  -- command was used
 	end
 	return true  -- command was not used
@@ -210,7 +210,7 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam,
 	end
 end
 
-function gadget:Initialize() 
+function gadget:Initialize()
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
 	end

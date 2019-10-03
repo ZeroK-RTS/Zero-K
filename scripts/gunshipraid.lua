@@ -34,7 +34,7 @@ local function RestoreAfterDelay ()
 end
 
 function script.Create()
-	StartThread (GG.Script.SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread (TiltWings)
 	Hide (lfx)
 	Hide (rfx)

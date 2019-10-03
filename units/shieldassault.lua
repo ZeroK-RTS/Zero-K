@@ -18,6 +18,7 @@ unitDef = {
 
   customParams        = {
     shield_emit_height = 17,
+    cus_noflashlight = 1,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -36,7 +37,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[thud.s3o]],
   onoffable           = false,
-  script			  = [[shieldassault.lua]],
+  script              = [[shieldassault.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -105,11 +106,11 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-		light_camera_height = 1400,
-		light_color = [[0.80 0.54 0.23]],
-		light_radius = 200,
+        light_camera_height = 1400,
+        light_color = [[0.80 0.54 0.23]],
+        light_radius = 200,
       },
-	  
+
       damage                  = {
         default = 170,
         planes  = 170,

@@ -88,7 +88,7 @@ function widget:Update()
 	local time = floor(timef)
 	
 	-- update timers once every <updateInt> seconds
-	if (time % updateInt == 0 and time ~= lastTimeUpdate) then	
+	if (time % updateInt == 0 and time ~= lastTimeUpdate) then
 		lastTimeUpdate = time
 		--do update stuff:
 		
@@ -114,7 +114,7 @@ function getRotationVectors2d( vectorA, vectorB )
 	vectorA = normalizeVector2d( vectorA )
 	vectorB = normalizeVector2d( vectorB )
 	local radian = atan2( vectorA[2], vectorA[1] ) - atan2( vectorB[2], vectorB[1] )
-	local val = ( 360.0 * radian) / ( 2 * pi ) 
+	local val = ( 360.0 * radian) / ( 2 * pi )
 	return normalizeDegreeRange(val)
 end
 
@@ -170,7 +170,7 @@ function getFacingByMouseDelta( mouseDeltaX,mouseDeltaY )
 		newFacing = 2
 	elseif ( ( mouseDegree >= 45.0 ) and ( mouseDegree < 135.0 ) ) then
 		newFacing = 1
-	elseif ( ( mouseDegree >= 135.0 ) and ( mouseDegree < 225.0 ) ) then 
+	elseif ( ( mouseDegree >= 135.0 ) and ( mouseDegree < 225.0 ) ) then
 		newFacing = 0
 	elseif ( ( mouseDegree >= 225.0 ) and ( mouseDegree < 280.0 ) ) then
 		newFacing = 3
@@ -181,7 +181,7 @@ function getFacingByMouseDelta( mouseDeltaX,mouseDeltaY )
 	return newFacing
 end
 
-function manipulateFacing()	
+function manipulateFacing()
 	local mx,my,lmb,mmb,rmb = spGetMouseState()
 	local alt,ctrl,meta,shift = spGetModKeyState()
 	meta = meta and USE_META
@@ -357,7 +357,7 @@ function drawOrientation()
 end
 
 --Commons
-function ResetGl() 
+function ResetGl()
 	glColor( { 1.0, 1.0, 1.0, 1.0 } )
 	glLineWidth( 1.0 )
 	glDepthTest(false)
@@ -374,7 +374,7 @@ function CheckSpecState()
 		return false
 	end
 	
-	return true	
+	return true
 end
 
 function printDebug( value )
@@ -384,8 +384,8 @@ function printDebug( value )
 				else spEcho("false") end
 		elseif ( type(value ) == "table" ) then
 			spEcho("Dumping table:")
-			for key,val in pairs(value) do 
-				spEcho(key,val) 
+			for key,val in pairs(value) do
+				spEcho(key,val)
 			end
 		else
 			spEcho( value )

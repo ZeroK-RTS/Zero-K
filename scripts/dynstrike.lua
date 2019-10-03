@@ -266,7 +266,7 @@ function constructSkeleton(unit, piece, offset)
 
     for i=1,3 do
         info.offset[i] = offset[i]+info.offset[i];
-    end 
+    end
 
     bones[piece] = info.offset;
     local map = Spring.GetUnitPieceMap(unit);
@@ -280,17 +280,17 @@ function constructSkeleton(unit, piece, offset)
                 bones[cid] = cinfo;
             end
         end
-    end        
+    end
     return bones;
 end
 
 ---------------------------------------------------------------------
 -- Walking
 
-local PACE = 2.18
+local BASE_PACE = 2.18
 local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
-local PACE = PACE * VELOCITY/BASE_VELOCITY
+local PACE = BASE_PACE * VELOCITY/BASE_VELOCITY
 
 local SLEEP_TIME = 935*10/30 -- Empirically determined
 
@@ -342,8 +342,8 @@ local function Walk()
 		speedMult = math.max(0.05, (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*dyncomm.GetPace())
 		speedMult = speedMult*0.96
 		
-		local left = walkAngle[walkCycle] 
-		local right = walkAngle[3 - walkCycle] 
+		local left = walkAngle[walkCycle]
+		local right = walkAngle[3 - walkCycle]
 		-----------------------------------------------------------------------------------
 		
 		Turn(HipLeft, x_axis,  left[1].hip[1],  left[1].hip[2] * speedMult)
@@ -427,9 +427,9 @@ end
 
 function script.AimFromWeapon(num)
 	if dyncomm.IsManualFire(num) then
-		if dyncomm.GetWeapon(num) == 1 then 
+		if dyncomm.GetWeapon(num) == 1 then
 			return Palm
-		elseif dyncomm.GetWeapon(num) == 2 then 
+		elseif dyncomm.GetWeapon(num) == 2 then
 			return UnderMuzzle
 		end
 	end
@@ -437,9 +437,9 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	if dyncomm.GetWeapon(num) == 1 then 
+	if dyncomm.GetWeapon(num) == 1 then
 		return Muzzle
-	elseif dyncomm.GetWeapon(num) == 2 then 
+	elseif dyncomm.GetWeapon(num) == 2 then
 		return UnderMuzzle
 	end
 	return Shield
@@ -598,7 +598,7 @@ function script.Create()
 	
 	dyncomm.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)

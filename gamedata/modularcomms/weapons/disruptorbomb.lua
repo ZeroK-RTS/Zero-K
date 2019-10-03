@@ -9,6 +9,7 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[3]],
 		--timeslow_preset       = [[module_disruptorbomb]],
 		timeslow_damagefactor = [[6]],
@@ -36,7 +37,7 @@ local weaponDef = {
 	range                   = 450,
 	reloadtime              = 25,
 	smokeTrail              = true,
-    soundHit                = [[weapon/laser/disrupter_explosion]],
+    soundHit                = [[weapon/aoe_aura2]],
 	soundHitVolume          = 8,
 	soundStart              = [[weapon/cannon/cannon_fire3]],
 	--startVelocity           = 350,

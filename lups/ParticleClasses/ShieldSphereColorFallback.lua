@@ -61,7 +61,13 @@ function ShieldSphereColorFallback:Draw()
 	gl.Translate(pos[1],pos[2],pos[3])
 	
 	local col = GetShieldColor(self.unit, self)
-	col[4] = col[4]*0.5
+	
+	-- The Perlin noise shield needs special treatment due to its very high base transparency at low power
+	if self.faintShield then
+		col[4] = col[4] * 0.9 + 0.1
+	else
+		col[4] = col[4] * 0.5
+	end
 	
 	gl.Color(1, 1, 1, 1)
 	gl.Material({

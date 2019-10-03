@@ -1,7 +1,5 @@
 include "constants.lua"
 
-local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
-
 local base = piece "base"
 local flare = piece "flare"
 local firept = piece "firept"
@@ -81,8 +79,8 @@ local function TransformMeteor(weaponDefID, proID, meteorTeamID, meteorOwnerID, 
 	local newProID = Spring.SpawnProjectile(weaponDefID, {
 		pos = {px, py, pz},
 		["end"] = {x, y, z},
-		tracking = true, 
-		speed = {vx, vy, vz}, 
+		tracking = true,
+		speed = {vx, vy, vz},
 		ttl = timeToLiveDefs[weaponDefID],
 		gravity = gravityDefs[weaponDefID],
 		team = meteorTeamID,
@@ -137,9 +135,9 @@ local function SpawnMeteor()
 	local sourcePos = Vector.PolarToCart(SOURCE_RANGE*(1 - math.random()^2), 2*math.pi*math.random())
 	local hoverPos = Vector.PolarToCart(HOVER_RANGE*math.random()^2, 2*math.pi*math.random())
 	local proID = Spring.SpawnProjectile(floatWeaponDefID, {
-		pos = {ux + sourcePos[1], uy + SOURCE_HEIGHT, uz + sourcePos[2]}, 
-		tracking = true, 
-		speed = {0, -1, 0}, 
+		pos = {ux + sourcePos[1], uy + SOURCE_HEIGHT, uz + sourcePos[2]},
+		tracking = true,
+		speed = {0, -1, 0},
 		ttl = 18000, -- 18000 = 10 minutes
 		gravity = meteorGravity,
 		team = gaiaTeam,
@@ -247,6 +245,11 @@ local function LaunchAll(x, z)
 	tooltipProjectileCount = 0
 	Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
 	
+	-- Raw projectile manipulation doesn't create an event (needed for stuff like Fire Once)
+	if aimCount > 0 then
+		script.EndBurst(1)
+	end
+
 	-- Sleep to give time for the aim projectiles to turn
 	Sleep(1500)
 	
@@ -255,7 +258,7 @@ local function LaunchAll(x, z)
 	for i = 1, aimCount do
 		local proID = aim[i]
 		-- Check that the projectile ID is still valid
-		if Spring.GetProjectileDefID(proID) == aimWeaponDefID then			
+		if Spring.GetProjectileDefID(proID) == aimWeaponDefID then
 			-- Projectile is valid, launch!
 			local aimOff = Vector.PolarToCart(AIM_RADIUS*math.random()^2, 2*math.pi*math.random())
 			
@@ -283,10 +286,9 @@ function script.Create()
 	
 	currentlyStunned = IsDisabled()
 	
-	Move(firept, y_axis, 9001)
 	Move(flare, y_axis, -110)
 	Turn(flare, x_axis, math.rad(-90))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(SpawnProjectileThread)
 	
 	-- Helpful for devving
@@ -296,7 +298,7 @@ function script.Create()
 	--end
 end
 
-function script.QueryWeapon(num) 
+function script.QueryWeapon(num)
 	return firept
 end
 

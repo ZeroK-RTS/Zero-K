@@ -1,7 +1,7 @@
-local base = piece 'base' 
-local flare = piece 'flare' 
-local ground1 = piece 'ground1' 
-local barrel = piece 'barrel' 
+local base = piece 'base'
+local flare = piece 'flare'
+local ground1 = piece 'ground1'
+local barrel = piece 'barrel'
 
 local wakes = {}
 for i = 1, 8 do
@@ -63,7 +63,7 @@ function script.Create()
 	Hide(ground1)
 	Move(ground1, x_axis, 24.2)
 	Move(ground1, y_axis, -8)
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 end

@@ -1,13 +1,13 @@
 function widget:GetInfo()
   return {
     name      = "Chili Widget Selector", --needs epic menu to dynamically update widget checkbox colors.
-    desc      = "v1.013 Chili Widget Selector", 
+    desc      = "v1.013 Chili Widget Selector",
     author    = "CarRepairer",
     date      = "2012-01-11", --2013-06-11 (add crude filter/search capability)
     license   = "GNU GPL, v2 or later",
     layer     = -100000,
     handler   = true,
-    experimental = false,	
+    experimental = false,
     enabled   = true,
     alwaysStart = true,
   }
@@ -204,8 +204,8 @@ MakeWidgetList = function()
 	
 	local buttonWidth = window_w - 20
 	
-	for name,data in pairs(widgetHandler.knownWidgets) do 
-		if not data.alwaysStart then 
+	for name,data in pairs(widgetHandler.knownWidgets) do
+		if not data.alwaysStart then
 			data.basename = data.basename or ''
 			data.desc = data.desc or '' --become NIL if zipfile/archive corrupted
 			data.author = data.author or ''
@@ -216,11 +216,11 @@ MakeWidgetList = function()
 			local lowercase_desc = data.desc:lower()
 			local lowercase_author = data.author:lower()
 			
-			if filterUserInsertedTerm == "" or 
+			if filterUserInsertedTerm == "" or
 			lowercase_name:find(filterUserInsertedTerm) or
 			lowercase_desc:find(filterUserInsertedTerm) or
 			lowercase_author:find(filterUserInsertedTerm) or
-			lowercase_category:find(filterUserInsertedTerm) 
+			lowercase_category:find(filterUserInsertedTerm)
 			then
 			
 				if not data.fromZip then
@@ -241,8 +241,8 @@ MakeWidgetList = function()
 				}
 				listIsEmpty = false
 			end
-		end 
-	end 
+		end
+	end
 	
 	local widgets_cats_i = {}
 	for catdesc, catwidgets in pairs(widgets_cats) do
@@ -262,19 +262,19 @@ MakeWidgetList = function()
 		table.sort(catwidgets, function(t1,t2)
 			return t1.name < t2.name
 		end)
-		widget_children[#widget_children + 1] = 
+		widget_children[#widget_children + 1] =
 			Label:New{ caption = '- '.. catdesc ..' -', textColor = color.sub_header, align='center', }
 		
 		for _, wdata in ipairs(catwidgets) do
 			local enabled = WidgetEnabled(wdata.name)
 			
 			--Add checkbox to table that is used to update checkbox label colors when widget becomes active/inactive
-			widget_checks[wdata.name] = Checkbox:New{ 
-					caption = wdata.name, 
+			widget_checks[wdata.name] = Checkbox:New{
+					caption = wdata.name,
 					checked = enabled,
 					tooltip = '(By ' .. tostring(wdata.author) .. ")\n" .. tostring(wdata.desc),
-					OnChange = { 
-						function(self) 
+					OnChange = {
+						function(self)
 							widgetHandler:ToggleWidget(wdata.name)
 						end,
 					},
@@ -284,14 +284,14 @@ MakeWidgetList = function()
 		end
 	end
 	if listIsEmpty then
-		widget_children[1] = 
+		widget_children[1] =
 			Label:New{ caption = "- no match for \"" .. filterUserInsertedTerm .."\" -", align='center', }
-		widget_children[2] = 
+		widget_children[2] =
 			Label:New{ caption = " ", align='center', }
 	end
 	
 	local hotkey = WG.crude.GetHotkey("epic_chili_widget_selector_widgetlist_2")
-	if hotkey and hotkey ~= "" then 
+	if hotkey and hotkey ~= "" then
 		hotkey = " (" .. hotkey .. ")"
 	else
 		hotkey = ''
@@ -313,7 +313,7 @@ MakeWidgetList = function()
 			ScrollPanel:New{
 				x=5,
 				y=15,
-				right=5, 
+				right=5,
 				bottom = C_HEIGHT*2,
 				
 				children = {
@@ -324,7 +324,7 @@ MakeWidgetList = function()
 						right = 1,
 						
 						itemPadding = {1,1,1,1},
-						itemMargin = {0,0,0,0},		
+						itemMargin = {0,0,0,0},
 						children = widget_children,
 					},
 				},
@@ -333,10 +333,10 @@ MakeWidgetList = function()
 			
 			--Categorization checkbox
 			Checkbox:New{
-				caption = 'Categorize', 
+				caption = 'Categorize',
 				tooltip = 'List widgets by category',
-				OnClick = { function() widget_categorize = not widget_categorize end, KillWidgetList, MakeWidgetList }, 
-				textColor=color.sub_fg, 
+				OnClick = { function() widget_categorize = not widget_categorize end, KillWidgetList, MakeWidgetList },
+				textColor=color.sub_fg,
 				checked = widget_categorize,
 				
 				x = 5,
@@ -346,11 +346,11 @@ MakeWidgetList = function()
 			},
 			
 			--Search button
-			Button:New{ 
-				caption = 'Search', 
-				OnClick = { function() Spring.SendCommands("chat","PasteText /search:") end }, 
-				--backgroundColor=color.sub_close_bg, 
-				--textColor=color.sub_close_fg, 
+			Button:New{
+				caption = 'Search',
+				OnClick = { function() Spring.SendCommands("chat","PasteText /search:") end },
+				--backgroundColor=color.sub_close_bg,
+				--textColor=color.sub_close_fg,
 				--classname = "navigation_button",
 				
 				x = '33%',
@@ -360,11 +360,11 @@ MakeWidgetList = function()
 			},
 			
 			--Close button
-			Button:New{ 
-				caption = 'Close', 
-				OnClick = { KillWidgetList }, 
-				--backgroundColor=color.sub_close_bg, 
-				--textColor=color.sub_close_fg, 
+			Button:New{
+				caption = 'Close',
+				OnClick = { KillWidgetList },
+				--backgroundColor=color.sub_close_bg,
+				--textColor=color.sub_close_fg,
 				--classname = "navigation_button",
 				
 				x = '66%',

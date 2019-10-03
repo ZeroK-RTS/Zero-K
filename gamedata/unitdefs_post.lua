@@ -173,6 +173,7 @@ end
 for name, ud in pairs(UnitDefs) do
 	if not ud.customparams.dynamic_comm then
 		if ud.weapondefs then
+			local cobWeapon = (ud.script and ud.script:find("%.cob"))
 			for _, wd in pairs(ud.weapondefs) do
 				if wd.customparams and wd.customparams.script_reload then
 					ud.customparams.script_reload = wd.customparams.script_reload
@@ -185,6 +186,9 @@ for name, ud in pairs(UnitDefs) do
 				end
 				wd.customparams = wd.customparams or {}
 				wd.customparams.is_unit_weapon = 1
+				if cobWeapon then
+					wd.customparams.cob_weapon = 1
+				end
 			end
 		end
 	end
@@ -806,6 +810,20 @@ if Utilities.IsCurrentVersionNewerThan(104, 600) then
 	for name, ud in pairs (UnitDefs) do
 		ud.transportmass = nil
 		if ud.buildcostmetal and tonumber(ud.buildcostmetal) > TRANSPORT_LIGHT_COST_MAX then
+			ud.customparams.requireheavytrans = 1
+		end
+	end
+else
+	--[[ old engines handle transporting rules entirely on their own,
+	     but mark units anyway so that other code doesn't need to
+	     replicate these checks ]]
+	local valkDef = UnitDefs.gunshiptrans
+	local valkMaxMass = valkDef.transportmass
+	local valkMaxSize = valkDef.transportsize
+	for name, ud in pairs (UnitDefs) do
+		if ud.mass > valkMaxMass
+		or ud.footprintx > valkMaxSize
+		or ud.footprintz > valkMaxSize then
 			ud.customparams.requireheavytrans = 1
 		end
 	end

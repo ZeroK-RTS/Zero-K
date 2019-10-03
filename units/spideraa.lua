@@ -13,6 +13,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    cus_noflashlight = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -31,7 +32,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[tarantula.s3o]],
-  script				 = [[spideraa.lua]],
+  script                 = [[spideraa.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 660,
   trackOffset            = 0,
@@ -62,12 +63,12 @@ unitDef = {
       craterMult              = 2,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		burst = Shared.BURST_RELIABLE,
+      customParams              = {
+        burst = Shared.BURST_RELIABLE,
 
-		isaa = [[1]],
-		light_color = [[0.58 0.7 0.7]],
-	  },
+        isaa = [[1]],
+        light_color = [[0.58 0.7 0.7]],
+      },
 
       damage                  = {
         default = 20,
@@ -93,11 +94,11 @@ unitDef = {
       texture2                = [[AAsmoketrail]],
       tolerance               = 9000,
       tracks                  = true,
-      turnRate                = 55000,
+      turnRate                = 70000,
       turret                  = true,
-      weaponAcceleration      = 150,
+      weaponAcceleration      = 200,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 550,
+      weaponVelocity          = 750,
     },
 
   },
@@ -109,6 +110,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
+      collisionVolumeOffsets = [[0 -5 0]],
+      collisionVolumeScales  = [[40 30 40]],
+      collisionVolumeType    = [[ellipsoid]], 
       object           = [[tarantula_dead.s3o]],
     },
 

@@ -1,26 +1,26 @@
 include 'constants.lua'
 
-local head = piece 'head' 
-local hips = piece 'hips' 
-local lshoulder = piece 'lshoulder' 
-local lbcover = piece 'lbcover' 
-local ltcover = piece 'ltcover' 
-local rshoulder = piece 'rshoulder' 
-local rbcover = piece 'rbcover' 
-local rtcover = piece 'rtcover' 
-local chest = piece 'chest' 
-local rthigh = piece 'rthigh' 
-local lthigh = piece 'lthigh' 
-local lshin = piece 'lshin' 
-local rshin = piece 'rshin' 
-local rfoot = piece 'rfoot' 
-local lfoot = piece 'lfoot' 
-local lmissile = piece 'lmissile' 
-local rmissile = piece 'rmissile' 
-local rmuzzle = piece 'rmuzzle' 
-local rexhaust = piece 'rexhaust' 
-local lmuzzle = piece 'lmuzzle' 
-local lexhaust = piece 'lexhaust' 
+local head = piece 'head'
+local hips = piece 'hips'
+local lshoulder = piece 'lshoulder'
+local lbcover = piece 'lbcover'
+local ltcover = piece 'ltcover'
+local rshoulder = piece 'rshoulder'
+local rbcover = piece 'rbcover'
+local rtcover = piece 'rtcover'
+local chest = piece 'chest'
+local rthigh = piece 'rthigh'
+local lthigh = piece 'lthigh'
+local lshin = piece 'lshin'
+local rshin = piece 'rshin'
+local rfoot = piece 'rfoot'
+local lfoot = piece 'lfoot'
+local lmissile = piece 'lmissile'
+local rmissile = piece 'rmissile'
+local rmuzzle = piece 'rmuzzle'
+local rexhaust = piece 'rexhaust'
+local lmuzzle = piece 'lmuzzle'
+local lexhaust = piece 'lexhaust'
 
 local thigh = {lthigh, rthigh}
 local shin = {lshin, rshin}
@@ -158,7 +158,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, {chest})
+	StartThread(GG.Script.SmokeUnit, unitID, {chest})
 	Turn(rthigh, y_axis, math.rad(-20))
 	Turn(lthigh, y_axis, math.rad(20))
 	Turn(rthigh, z_axis, math.rad(-3))

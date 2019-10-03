@@ -51,7 +51,7 @@ unitDef = {
     unarmed       = true,
     addfight       = 1,
     addpatrol      = 1,
-  },  
+  },
   
   weapons                       = {
 

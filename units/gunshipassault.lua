@@ -2,9 +2,9 @@ unitDef = {
   unitname            = [[gunshipassault]],
   name                = [[Revenant]],
   description         = [[Heavy Raider/Assault Gunship]],
-  acceleration        = 0.135,
-  brakeRate           = 0.108,
-  buildCostMetal      = 900,
+  acceleration        = 0.15,
+  brakeRate           = 0.13,
+  buildCostMetal      = 850,
   builder             = false,
   buildPic            = [[gunshipassault.png]],
   canFly              = true,
@@ -18,11 +18,11 @@ unitDef = {
   collisionVolumeScales  = [[50 15 50]],
   collisionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 150,
+  cruiseAlt           = 135,
 
   customParams        = {
     airstrafecontrol = [[1]],
-	modelradius    = [[10]],
+    modelradius    = [[10]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -31,7 +31,7 @@ unitDef = {
   footprintZ          = 3,
   hoverAttack         = true,
   iconType            = [[heavygunshipassault]],
-  maxDamage           = 3400,
+  maxDamage           = 3600,
   maxVelocity         = 4.5,
   minCloakDistance    = 75,
   noAutoFire          = false,
@@ -40,7 +40,7 @@ unitDef = {
   script              = [[gunshipassault.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 585,
-  turnRate            = 849,
+  turnRate            = 1000,
 
   weapons             = {
 
@@ -63,18 +63,20 @@ unitDef = {
       avoidFeature            = false,
       avoidFriendly           = false,
       burst                   = 8,
-      burstrate               = 0.08,
+      burstrate               = 0.066,
       cegTag                  = [[BANISHERTRAIL]],
       collideFriendly         = false,
       craterBoost             = 0.123,
       craterMult              = 0.246,
 
       customparams = {
-		burst = Shared.BURST_UNRELIABLE,
+        burst = Shared.BURST_UNRELIABLE,
 
-		light_camera_height = 2500,
-		light_color = [[0.55 0.27 0.05]],
-		light_radius = 360,
+        light_camera_height = 2500,
+        light_color = [[0.55 0.27 0.05]],
+        light_radius = 360,
+        
+        combatrange = 160,
       },
 
       damage                  = {
@@ -92,7 +94,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[hobbes.s3o]],
       noSelfDamage            = true,
-      range                   = 300,
+      range                   = 270,
       reloadtime              = 9,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/rapid_rocket_hit]],
@@ -115,8 +117,8 @@ unitDef = {
 
     DEAD  = {
       blocking         = true,
-	  collisionVolumeScales  = [[65 20 65]],
-	  collisionVolumeType    = [[CylY]],
+      collisionVolumeScales  = [[65 20 65]],
+      collisionVolumeType    = [[CylY]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,

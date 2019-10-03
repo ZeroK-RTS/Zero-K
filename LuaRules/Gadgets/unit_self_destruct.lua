@@ -14,92 +14,99 @@ return {
 	date      = "April, 2009",
 	license   = "public domain",
 	layer     = 0,
-	enabled   = true  --  loaded by default?
+	enabled   = not (Spring.Utilities.Gametype.is1v1() or Spring.Utilities.Gametype.isFFA()),
 	}
 end
 
-local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
+local spGetTeamUnits         = Spring.GetTeamUnits
+local spGetUnitAllyTeam      = Spring.GetUnitAllyTeam
+local spGetUnitDefID         = Spring.GetUnitDefID
+local spGetUnitSelfDTime     = Spring.GetUnitSelfDTime
+local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
 
-deathTeams = {}
+local gh = gadgetHandler
+local ghRemoveCallIn = gh.RemoveCallIn
+local ghUpdateCallIn = gh.UpdateCallIn
 
--- auto detection of doesnotcount units
-local doesNotCountList = {}
-for name, ud in pairs(UnitDefs) do
-	if (ud.customParams.dontcount or ud.canKamikaze) then
-		doesNotCountList[ud.id] = true
+local CMD_SELFD = CMD.SELFD
+local EMPTY_TABLE = {}
+
+local teamList = Spring.GetTeamList()
+local teamCount = #teamList
+
+local deathTeams = {}
+local needsCheck = false
+
+local onlyCountList = {}
+for unitDefID, unitDef in pairs(UnitDefs) do
+	if not unitDef.customParams.dontcount and not unitDef.canKamikaze then
+		onlyCountList[unitDefID] = true
 	end
 end
 
--- one man ally?
-rogueAlly = {}
+function gadget:Initialize()
+	local max = math.max
+	for i = 1, teamCount do
+		local teamID = teamList[i]
+		deathTeams[teamID] = false
+	end
 
-function gadget:AllowCommand_GetWantedCommand()	
-	return {[CMD.SELFD] = true}
+	ghRemoveCallIn(gh, 'GameFrame')
+end
+
+function gadget:AllowCommand_GetWantedCommand()
+	return {[CMD_SELFD] = true}
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
-	return true
+	return onlyCountList
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,fromSynced)
-  local a = spGetUnitAllyTeam(unitID)
-  if not rogueAlly[a] and cmdID == CMD.SELFD then
-    deathTeams[unitTeam] = true
-  end
-  return true
+	if not needsCheck then
+		needsCheck = true
+		ghUpdateCallIn(gh, 'GameFrame')
+	end
+	deathTeams[unitTeam] = true
+	return true
+end
+
+local function CheckDeathTeam(teamID)
+	local  realUnitCount = 0
+	local selfDUnitCount = 0
+	local selfDUnitIDs = {}
+	local teamUnits = spGetTeamUnits(teamID)
+	for i = 1, #teamUnits do
+		local unitID = teamUnits[i]
+		local unitDefID = spGetUnitDefID(unitID)
+		if onlyCountList[unitDefID] then
+			realUnitCount = realUnitCount + 1
+
+			local selfDtime = spGetUnitSelfDTime(unitID)
+			if selfDtime > 0 then
+				selfDUnitCount = selfDUnitCount + 1
+				selfDUnitIDs[selfDUnitCount] = unitID
+			end
+		end
+	end
+
+	if selfDUnitCount > 0.8 * realUnitCount then
+		ghRemoveCallIn(gh, 'AllowCommand')
+		spGiveOrderToUnitArray(selfDUnitIDs, CMD_SELFD, EMPTY_TABLE, 0)
+		ghUpdateCallIn(gh, 'AllowCommand')
+		GG.ResignTeam(teamID)
+	end
 end
 
 function gadget:GameFrame(n)
-  for team,_ in pairs(deathTeams) do
-    local teamUnits = Spring.GetTeamUnits(team)
-    local realUnits = 0
-    local selfDunits = {}
-    for i=1, #teamUnits do
-      local u = teamUnits[i]
-      local selfDtime = Spring.GetUnitSelfDTime(u)
-      local udid = Spring.GetUnitDefID(u)
-      if not doesNotCountList[udid] then
-        realUnits = realUnits + 1
-        if selfDtime > 0 then
-          selfDunits[#selfDunits + 1] = u
-        end
-      end
-    end
-    if #selfDunits / realUnits > 0.8 then
-      Spring.GiveOrderToUnitArray(selfDunits, CMD.SELFD, {}, 0)
-      SendToUnsynced('resignteam', team)
-    end
-  end
-  deathTeams = {}
+	for i = 1, teamCount do
+		local teamID = teamList[i]
+		if deathTeams[teamID] then
+			CheckDeathTeam(teamID)
+			deathTeams[teamID] = false
+		end
+	end
 
-  -- check for rogue allies
-  -- max 1 player, active and not a spec
-  if n % 20 < 0.1 then
-    local allylist = Spring.GetAllyTeamList()
-    for i=1,#allylist do
-      repeat
-      local a = allylist[i]
-      local teamlist = Spring.GetTeamList(a)
-      if not teamlist then break end -- continue
-      local activeTeams = 0
-      for _,t in ipairs(teamlist) do
-        local playerlist = Spring.GetPlayerList(t, true) -- active players
-        if playerlist then
-          for j=1,#playerlist do
-            local _,_,spec = Spring.GetPlayerInfo(playerlist[j], false)
-            if not spec then
-              activeTeams = activeTeams + 1
-            end
-          end
-        end
-      end
-      if activeTeams < 2 then
-        rogueAlly[a] = true
-      else
-        rogueAlly[a] = false
-      end
-      until true
-    end
-  end
-
+	needsCheck = false
+	ghRemoveCallIn(gh, 'GameFrame')
 end

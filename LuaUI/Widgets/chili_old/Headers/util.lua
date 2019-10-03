@@ -119,7 +119,7 @@ local stackN = 1
 
 function PushScissor(x,y,w,h)
   local right = x+w
-  local bottom = y+h  
+  local bottom = y+h
   if (right  > curScissor[3]) then right  = curScissor[3] end
   if (bottom > curScissor[4]) then bottom = curScissor[4] end
   if (x < curScissor[1]) then x = curScissor[1] end
@@ -134,7 +134,7 @@ function PushScissor(x,y,w,h)
   if (width < 0) or (height < 0) then
     --// scissor is null space -> don't render at all
     return false
-  end    
+  end
   gl.Scissor(x,y,width,height)
 end
 

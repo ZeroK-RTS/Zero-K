@@ -23,9 +23,9 @@ unitDef = {
   cruiseAlt           = 220,
 
   customParams        = {
-	modelradius    = [[15]],
-	refuelturnradius = [[120]],
-	requireammo    = [[1]],
+    modelradius    = [[15]],
+    refuelturnradius = [[120]],
+    requireammo    = [[1]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -77,8 +77,8 @@ unitDef = {
       maxAngleDif        = 90,
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
-	
-	{
+    
+    {
       def                = [[SHIELD_CHECK]],
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
@@ -94,9 +94,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
+      customParams            = {
         reaim_time = 15, -- Fast update not required (maybe dangerous)
-	  },
+        bogus = 1,
+      },
 
       damage                  = {
         default = 0,
@@ -125,32 +126,32 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-	  cylinderTargeting	      = 1,
+      cylinderTargeting          = 1,
 
       damage                  = {
         default = 800.1,
         planes  = 800.1,
         subs    = 800.1,
       },
-	  
-	  customParams            = {
-		reaim_time = 15, -- Fast update not required (maybe dangerous)
-		light_color = [[1.1 0.9 0.45]],
-		light_radius = 220,
-		burst = Shared.BURST_RELIABLE,
-		torp_underwater = [[bomberprec_a_torpedo]],
-	  },
+      
+      customParams            = {
+        reaim_time = 15, -- Fast update not required (maybe dangerous)
+        light_color = [[1.1 0.9 0.45]],
+        light_radius = 220,
+        burst = Shared.BURST_RELIABLE,
+        torp_underwater = [[bomberprec_a_torpedo]],
+      },
 
       explosionGenerator      = [[custom:xamelimpact]],
       fireStarter             = 70,
       flightTime              = 3,
-	  heightmod				  = 0,
+      heightmod                  = 0,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-	  leadlimit               = 0,
+      leadlimit               = 0,
       model                   = [[wep_b_paveway.s3o]],
-	  leadLimit               = 20,
+      leadLimit               = 20,
       range                   = 150,
       reloadtime              = 5,
       smokeTrail              = false,
@@ -166,48 +167,51 @@ unitDef = {
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 200,
     },
-	
-	SHIELD_CHECK = {
+    
+    SHIELD_CHECK = {
       name                    = [[Fake Poker For Shields]],
       areaOfEffect            = 0,
-	  avoidFeature            = false,
+      avoidFeature            = false,
       avoidFriendly           = false,
+      avoidGround             = false,
       collideFeature          = false,
-	  collideFriendly         = false,
+      collideFriendly         = false,
+      collideGround           = false,
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
+      customParams            = {
         reaim_time = 15, -- Fast update not required (maybe dangerous)
-	  },
+        bogus = 1,
+      },
 
       damage                  = {
         default = -1E-06,
       },
 
-	  explosionGenerator      = [[custom:NONE]],
+      explosionGenerator      = [[custom:NONE]],
       flightTime              = 2,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
-	  model                   = [[emptyModel.s3o]],
+      model                   = [[emptyModel.s3o]],
       range                   = 600,
       reloadtime              = 1,
       rgbColor                = [[0 0 0]],
-	  startVelocity           = 2000,
-	  texture1                = [[null]],
-	  texture2                = [[null]],
-	  texture3                = [[null]],
+      startVelocity           = 2000,
+      texture1                = [[null]],
+      texture2                = [[null]],
+      texture3                = [[null]],
       turret                  = true,
-	  trajectoryHeight        = 1.5,
+      trajectoryHeight        = 1.5,
       weaponAcceleration      = 2000,
-	  weaponType              = [[MissileLauncher]],
+      weaponType              = [[MissileLauncher]],
       weaponVelocity          = 2000,
-	  waterWeapon             = true,
+      waterWeapon             = true,
     },
 
-	A_TORPEDO = {
+    A_TORPEDO = {
       name                    = [[Torpedo BombSabot For Bubble Effect]],
       areaOfEffect            = 32,
       craterBoost             = 1,
@@ -224,7 +228,7 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_b_paveway.s3o]],
-	  numbounce               = 4,
+      numbounce               = 4,
       range                   = 225,
       reloadtime              = 5,
       soundHit                = [[explosion/wet/ex_underwater]],
@@ -237,7 +241,7 @@ unitDef = {
       weaponAcceleration      = 50,
       weaponType              = [[TorpedoLauncher]],
       weaponVelocity          = 200,
-    },	
+    },
   },
 
 

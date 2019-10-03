@@ -19,10 +19,10 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-	modelradius    = [[37]],
-	stockpilecost  = [[80]],
-	stockpiletime  = [[20]],
-	priority_misc  = 1, -- Medium
+    modelradius    = [[37]],
+    stockpilecost  = [[80]],
+    stockpiletime  = [[20]],
+    priority_misc  = 1, -- Medium
   },
 
   explodeAs                     = [[ESTOR_BUILDING]],
@@ -68,12 +68,12 @@ unitDef = {
       craterMult              = 0.2,
       cylinderTargeting       = 3.2,
 
-	  customParams        	  = {
-		isaa = [[1]],
+      customParams              = {
+        isaa = [[1]],
 
-		light_color = [[1.5 1.8 1.8]],
-		light_radius = 600,
-	  },
+        light_color = [[1.5 1.8 1.8]],
+        light_radius = 600,
+      },
 
       damage                  = {
         default    = 160.15,

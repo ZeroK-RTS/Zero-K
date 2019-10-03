@@ -157,7 +157,7 @@ end
 
 local function AddCloakShieldCmdDesc(unitID, cloakShieldDef)
   cloakShieldCmdDesc.params[1] = (cloakShieldDef.init and '1') or '0'
-  local insertID = 
+  local insertID =
     FindUnitCmdDesc(unitID, CMD.CLOAK)      or
     FindUnitCmdDesc(unitID, CMD.ONOFF)      or
     FindUnitCmdDesc(unitID, CMD.TRAJECTORY) or
@@ -339,10 +339,10 @@ local function UpdateCloakees(data)
       local transported = Spring.GetUnitIsTransporting(cloakee)
       if transported ~= nil then
         for _,cloakeeLvl2 in ipairs(transported) do
-          local udid = GetUnitDefID(cloakeeLvl2)
-          if ((not uncloakableDefs[udid]) and
+          local udid2 = GetUnitDefID(cloakeeLvl2)
+          if ((not uncloakableDefs[udid2]) and
               (GetUnitAllyTeam(cloakeeLvl2) == allyTeam)) then
-            SetUnitCloakAndParam(cloakeeLvl2, 4, (not radiusException[udid]) and decloakDistance)
+            SetUnitCloakAndParam(cloakeeLvl2, 4, (not radiusException[udid2]) and decloakDistance)
             -- note: this gives perfect cloaking, but is the only level
             -- to work under paralysis
             cloakees[cloakeeLvl2] = true
@@ -512,7 +512,7 @@ function CloakShieldCommand(unitID, cmdParams)
 end
 
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_CLOAK_SHIELD] = true}
 end
 
@@ -525,7 +525,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,
   if (cmdID ~= CMD_CLOAK_SHIELD) then
     return true  -- command was not used
   end
-  CloakShieldCommand(unitID, cmdParams)  
+  CloakShieldCommand(unitID, cmdParams)
   return false  -- command was used
 end
 
@@ -535,7 +535,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,
   if (cmdID ~= CMD_CLOAK_SHIELD) then
     return false  -- command was not used
   end
-  CloakShieldCommand(unitID, cmdParams)  
+  CloakShieldCommand(unitID, cmdParams)
   return true, true  -- command was used, remove it
 end
 
@@ -652,7 +652,7 @@ local function DrawSphere(divs, arcs, neg)
         SphereVertex(sin(a) * topRad, top, cos(a) * topRad, neg)
         SphereVertex(sin(a) * botRad, bot, cos(a) * botRad, neg)
       end
-    end) 
+    end)
   end
   
   -- bottom
@@ -679,7 +679,7 @@ local function DrawSphere(divs, arcs, neg)
   end)
   gl.LineWidth(1.0)
 
-  -- points  
+  -- points
   -- FIXME ATIBUG gl.PointSize(10.0)
   --[[gl.BeginEnd(GL.POINTS, function()
     SphereVertex( 1,  0,  0)

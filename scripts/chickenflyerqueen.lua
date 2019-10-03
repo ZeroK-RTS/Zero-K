@@ -23,7 +23,6 @@ local bladeRetractSpeed = math.rad(120)
 local bladeAngle = math.rad(140)
 
 --variables
-local isMoving = false
 local feet = true
 
 local malus = GG.malus or 1
@@ -125,7 +124,7 @@ local function DropBasiliskLoop()
 			for i=1,malus do
 				EmitSfx(body,2048+5)
 				Sleep(1000)
-			end		
+			end
 		end
 		Sleep(8000)
 	end
@@ -143,12 +142,10 @@ local function Moving()
 end
 
 function script.StartMoving()
-	isMoving = true
 	StartThread(Moving)
 end
 
 function script.StopMoving()
-	isMoving = false
 	StartThread(StopFly)
 end
 

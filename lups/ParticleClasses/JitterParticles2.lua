@@ -99,7 +99,7 @@ local IsPosInLos    = Spring.IsPosInLos
 local IsPosInAirLos = Spring.IsPosInAirLos
 local IsPosInRadar  = Spring.IsPosInRadar
 
-local glTexture     = gl.Texture 
+local glTexture     = gl.Texture
 local glBlending    = gl.Blending
 local glUniform     = gl.Uniform
 local glUniformInt  = gl.UniformInt
@@ -219,7 +219,7 @@ function JitterParticles2:Initialize()
 			#define distStrength  gl_MultiTexCoord6.x
 			#define distScale     gl_MultiTexCoord6.y
 			#define distHeat      gl_MultiTexCoord6.z
-			#define animDir      (gl_MultiTexCoord2.zw) 
+			#define animDir      (gl_MultiTexCoord2.zw)
 
 			// particle attributes
 			#define posV        (gl_MultiTexCoord0.xyz)
@@ -230,7 +230,7 @@ function JitterParticles2:Initialize()
 			#define sizeStart       gl_MultiTexCoord2.x
 			#define sizeEnd         gl_MultiTexCoord2.y
 			// equation is: 1-(1-life)^exp
-			#define attributesExp  (gl_MultiTexCoord3.xy) 
+			#define attributesExp  (gl_MultiTexCoord3.xy)
 
 			const float halfpi = 0.159;
 
@@ -252,7 +252,7 @@ function JitterParticles2:Initialize()
 					 vec2 attrib = vec2(1.0) - pow(vec2(1.0 - life), abs(attributesExp));
 				 //if (attributesExp.x<0.0) attrib.x = 1.0 - attrib.x; // speed (no need for backward movement)
 					 if (attributesExp.y<0.0) attrib.y = 1.0 - attrib.y; // size
-					 attrib.y   = sizeStart + attrib.y * sizeEnd; 
+					 attrib.y   = sizeStart + attrib.y * sizeEnd;
 
 					 // calc vertex position
 					 vec3 forceV     = (1.0 - pow(1.0 - life, abs(forceExp))) * force;

@@ -16,23 +16,23 @@ local statsByLevel = {
 			movementclass = [[AKBOT3]],
 		},
 		[4] = {
-			collisionvolumescales  = [[60 70 60]],	
+			collisionvolumescales  = [[60 70 60]],
 			modelradius    = [[35]],
 			explodeas = "estor_building",
 			selfdestructas = "estor_building",
 			footprintx = 3,
 			footprintz = 3,
-			movementclass = [[AKBOT3]],			
+			movementclass = [[AKBOT3]],
 		},
 		[5] = {
-			collisionvolumescales  = [[65 75 65]],	
+			collisionvolumescales  = [[65 75 65]],
 			modelradius    = [[38]],
 			explodeas = "estor_building",
 			selfdestructas = "estor_building",
 			footprintx = 3,
 			footprintz = 3,
-			movementclass = [[AKBOT3]],			
-		},		
+			movementclass = [[AKBOT3]],
+		},
 	},
 	customparams = {
 	},
@@ -253,19 +253,19 @@ local copy = {
 		},
 		dynstrike2 = {
 			level = 2,
-			mainstats = {maxdamage = 3800, objectname = "strikecom_1.dae", collisionvolumescales  = [[50 55 50]],},
+			mainstats = {maxdamage = 4600, objectname = "strikecom_1.dae", collisionvolumescales  = [[50 55 50]],},
 			customparams = {modelradius = [[28]], shield_emit_height = 41.8},
 			wreckmodel = "strikecom_dead_1.dae",
 		},
 		dynstrike3 = {
 			level = 3,
-			mainstats = {maxdamage = 4600, objectname = "strikecom_2.dae", collisionvolumescales  = [[55 60 55]],},
+			mainstats = {maxdamage = 5200, objectname = "strikecom_2.dae", collisionvolumescales  = [[55 60 55]],},
 			customparams = {modelradius = [[30]], shield_emit_height = 45.6},
 			wreckmodel = "strikecom_dead_2.dae",
 		},
 		dynstrike4 = {
 			level = 4,
-			mainstats = {maxdamage = 5500, objectname = "strikecom_3.dae", collisionvolumescales  = [[58 66 58]],},
+			mainstats = {maxdamage = 5800, objectname = "strikecom_3.dae", collisionvolumescales  = [[58 66 58]],},
 			customparams = {modelradius = [[33]], shield_emit_height = 47.5},
 			wreckmodel = "strikecom_dead_3.dae",
 		},
@@ -283,19 +283,19 @@ local copy = {
 		},
 		dynrecon2 = {
 			level = 2,
-			mainstats = {maxdamage = 2800, objectname = "commrecon2.s3o", aimposoffset = [[0 12 0]]},
+			mainstats = {maxdamage = 3400, objectname = "commrecon2.s3o", aimposoffset = [[0 12 0]]},
 			customparams = {shield_emit_height = 33},
 			wreckmodel = "commrecon2_dead.s3o",
 		},
 		dynrecon3 = {
 			level = 3,
-			mainstats = {maxdamage = 3200, objectname = "commrecon3.s3o", aimposoffset = [[0 14 0]]},
+			mainstats = {maxdamage = 3600, objectname = "commrecon3.s3o", aimposoffset = [[0 14 0]]},
 			customparams = {shield_emit_height = 36},
 			wreckmodel = "commrecon3_dead.s3o",
 		},
 		dynrecon4 = {
 			level = 4,
-			mainstats = {maxdamage = 3600, objectname = "commrecon4.s3o", aimposoffset = [[0 16 0]]},
+			mainstats = {maxdamage = 3800, objectname = "commrecon4.s3o", aimposoffset = [[0 16 0]]},
 			customparams = {shield_emit_height = 37.5},
 			wreckmodel = "commrecon4_dead.s3o",
 		},
@@ -313,19 +313,19 @@ local copy = {
 		},
 		dynsupport2 = {
 			level = 2,
-			mainstats = {maxdamage = 3400, objectname = "commsupport2.s3o", aimposoffset = [[0 17 0]], builddistance = 244},
+			mainstats = {maxdamage = 4000, objectname = "commsupport2.s3o", aimposoffset = [[0 17 0]], builddistance = 244},
 			customparams = {shield_emit_height = 39.6},
 			wreckmodel = "commsupport2_dead.s3o",
 		},
 		dynsupport3 = {
 			level = 3,
-			mainstats = {maxdamage = 3800, objectname = "commsupport3.s3o", aimposoffset = [[0 19 0]], builddistance = 256},
+			mainstats = {maxdamage = 4300, objectname = "commsupport3.s3o", aimposoffset = [[0 19 0]], builddistance = 256},
 			customparams = {shield_emit_height = 43.62},
 			wreckmodel = "commsupport3_dead.s3o",
 		},
 		dynsupport4 = {
 			level = 4,
-			mainstats = {maxdamage = 4500, objectname = "commsupport4.s3o", aimposoffset = [[0 22 0]], builddistance = 268},
+			mainstats = {maxdamage = 4600, objectname = "commsupport4.s3o", aimposoffset = [[0 22 0]], builddistance = 268},
 			customparams = {shield_emit_height = 45},
 			wreckmodel = "commsupport4_dead.s3o",
 		},
@@ -344,14 +344,14 @@ local copy = {
 		dynassault2 = {
 			level = 2,
 			collisionvolumescales  = [[50 60 50]],
-			mainstats = {maxdamage = 4400, objectname = "benzcom2.s3o"},
+			mainstats = {maxdamage = 5000, objectname = "benzcom2.s3o"},
 			customparams = {modelradius = [[30]], shield_emit_height = 35.75},
 			wreckmodel = "benzcom2_wreck.s3o",
 		},
 		dynassault3 = {
 			level = 3,
 			collisionvolumescales  = [[55 65 55]],
-			mainstats = {maxdamage = 5500, objectname = "benzcom3.s3o",},
+			mainstats = {maxdamage = 5700, objectname = "benzcom3.s3o",},
 			customparams = {modelradius = [[33]], shield_emit_height = 39},
 			wreckmodel = "benzcom3_wreck.s3o",
 		},
@@ -377,25 +377,25 @@ local copy = {
 		},
 		dynknight2 = {
 			level = 2,
-			mainstats = {maxdamage = 3800, objectname = "cremcom2.s3o", collisionvolumescales  = [[50 55 50]],},
+			mainstats = {maxdamage = 4600, objectname = "cremcom2.s3o", collisionvolumescales  = [[50 55 50]],},
 			customparams = {modelradius = [[28]], shield_emit_height = 33},
 			wreckmodel = "cremcom2_dead.s3o",
 		},
 		dynknight3 = {
 			level = 3,
-			mainstats = {maxdamage = 4400, objectname = "cremcom3.s3o", collisionvolumescales  = [[55 60 55]],},
+			mainstats = {maxdamage = 5200, objectname = "cremcom3.s3o", collisionvolumescales  = [[55 60 55]],},
 			customparams = {modelradius = [[30]], shield_emit_height = 36},
 			wreckmodel = "cremcom3_dead.s3o",
 		},
 		dynknight4 = {
 			level = 4,
-			mainstats = {maxdamage = 5200, objectname = "cremcom4.s3o", collisionvolumescales  = [[60 65 60]],},
+			mainstats = {maxdamage = 5800, objectname = "cremcom4.s3o", collisionvolumescales  = [[60 65 60]],},
 			customparams = {modelradius = [[33]], shield_emit_height = 37.5},
 			wreckmodel = "cremcom4_dead.s3o",
 		},
 		dynknight5 = {
 			level = 5,
-			mainstats = {maxdamage = 6000, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
+			mainstats = {maxdamage = 6400, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
 			customparams = {modelradius = [[35]], shield_emit_height = 39},
 			wreckmodel = "cremcom5_dead.s3o",
 		},
@@ -416,7 +416,7 @@ for sourceName, copyTable in pairs(copy) do
 			end
 			--for statName, value in pairs(statsByLevel.customparams[stats.level]) do
 			--	UnitDefs[cloneName].customparams[statName] = value
-			--end		
+			--end
 			
 			-- copy from specific table
 			for statName, value in pairs(stats.mainstats or {}) do

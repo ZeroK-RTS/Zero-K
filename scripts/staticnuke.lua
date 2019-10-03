@@ -1,11 +1,11 @@
-local base = piece 'base' 
-local tube = piece 'tube' 
-local tower = piece 'tower' 
-local nuke = piece 'nuke' 
-local hoses = piece 'hoses' 
-local doorl = piece 'doorl' 
-local doorr = piece 'doorr' 
-local point = piece 'point' 
+local base = piece 'base'
+local tube = piece 'tube'
+local tower = piece 'tower'
+local nuke = piece 'nuke'
+local hoses = piece 'hoses'
+local doorl = piece 'doorl'
+local doorr = piece 'doorr'
+local point = piece 'point'
 
 include "constants.lua"
 
@@ -25,7 +25,7 @@ local function OpenDoors()
 	
 	if openingDoors or closingDoors then
 		return
-	end 
+	end
 	openingDoors = true
 
 	Move(doorl, x_axis, 0)
@@ -33,7 +33,7 @@ local function OpenDoors()
 	Move(doorr, x_axis, 0)
 	Move(doorr, x_axis, 22, 14)
 	Move(tube, y_axis, 0)
-	Move(nuke, x_axis, 0)	
+	Move(nuke, x_axis, 0)
 	Move(tower, y_axis, 0)
 	
 	Show(tube)
@@ -71,7 +71,7 @@ local function CloseDoors()
 	Sleep(500)
 	
 	WaitForMove(doorr, x_axis)
-	Hide(tube)	
+	Hide(tube)
 	
 	Sleep(500)	-- keep door from instantly opening after closing
 	closingDoors = false
@@ -96,7 +96,7 @@ function StockpileChanged(newStock)
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	Hide(tube)
 	Hide(tower)
 	Hide(nuke)

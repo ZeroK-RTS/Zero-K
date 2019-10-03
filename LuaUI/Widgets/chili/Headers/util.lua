@@ -1,10 +1,10 @@
---// ============================================================================= 
+--// =============================================================================
 
 function IsTweakMode()
 	return widgetHandler.tweakMode
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --// some needed gl constants
 GL_DEPTH24_STENCIL8 = 0x88F0
@@ -12,7 +12,7 @@ GL_KEEP      = 0x1E00
 GL_INCR_WRAP = 0x8507
 GL_DECR_WRAP = 0x8508
 
---// ============================================================================= 
+--// =============================================================================
 
 function unpack4(t)
 	if t then
@@ -86,7 +86,7 @@ function IsRelativeCoordType(code)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function IsObject(v)
 	return ((type(v) == "metatable") or (type(v) == "userdata")) and (v.classname)
@@ -118,7 +118,7 @@ function isfunc(v)
 	return (type(v) == "function")
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 local curScissor = {0, 0, 1e9, 1e9}
 local stack = {curScissor}
@@ -183,7 +183,7 @@ end
 
 
 local function PushStencilMask(obj, x, y, w, h)
-	obj._stencilMask = (obj.parent._stencilMask or 0) + 1
+	obj._stencilMask = ((obj.parent and obj.parent._stencilMask) or 0) + 1
 	if (obj._stencilMask > 255) then
 		obj._stencilMask = 0
 	end
@@ -220,7 +220,7 @@ local function PopStencilMask(obj, x, y, w, h)
 	end
 
 	gl.ColorMask(true)
-	gl.StencilFunc(GL.EQUAL, obj.parent._stencilMask or 0, 0xFF)
+	gl.StencilFunc(GL.EQUAL, ((obj.parent and obj.parent._stencilMask) or 0), 0xFF)
 	gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
 	--gl.StencilTest(false)
 
@@ -260,7 +260,7 @@ function PopLimitRenderRegion(...)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 function AreRectsOverlapping(rect1, rect2)
 	return
@@ -270,7 +270,7 @@ function AreRectsOverlapping(rect1, rect2)
 		(rect1[2] + rect1[4] >= rect2[2])
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 local oldPrint = print
 function print(...)
@@ -278,7 +278,7 @@ function print(...)
 	io.flush()
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function _ParseColorArgs(r, g, b, a)
 	local t = type(r)
@@ -290,7 +290,7 @@ function _ParseColorArgs(r, g, b, a)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function string:findlast(str)
 	local i
@@ -309,7 +309,7 @@ function string:GetExt()
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 local type  = type
 local pairs = pairs
@@ -451,7 +451,7 @@ function table:size()
 	return cnt
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 local weak_meta = {__mode = 'v'}
 function CreateWeakTable()
@@ -460,7 +460,7 @@ function CreateWeakTable()
 	return m
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function math.round(num, idp)
 	if (not idp) then
@@ -472,7 +472,7 @@ function math.round(num, idp)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function InvertColor(c)
 	return {1 - c[1], 1 - c[2], 1 - c[3], c[4]}
@@ -517,4 +517,4 @@ function incolor2color(inColor)
 	return r/255, g/255, b/255, a/255
 end
 
---// ============================================================================= 
+--// =============================================================================

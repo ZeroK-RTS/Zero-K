@@ -12,7 +12,7 @@ VFS.Include("LuaRules/Utilities/base64.lua")
 
 Spring.Log = Spring.Log or function() end
 --------------------------------------------------------------------------------
---	HOW IT WORKS: 
+--	HOW IT WORKS:
 --	First, it makes unitdefs as specified by the decoded modoption string, one for each unique comm type.
 --		The unitdefs are named: <name>
 --	It then modifies each unitdef based on the upgrades selected for that comm type.
@@ -72,7 +72,7 @@ local function DecodeBase64CommData(toDecode, useLegacyTranslator)
 	else
 		commDataTable = {}
 	end
-	if err then 
+	if err then
 		Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", 'Modular Comms warning: ' .. err)
 	end
 	return commDataTable
@@ -116,7 +116,7 @@ local function GenerateLevel0DyncommsAndWrecks()
 			local typeName = "Wreckage"
 			if featureName == "heap" then
 				typeName = "Debris"
-				mult = 0.2 
+				mult = 0.2
 			end
 			array.description = typeName .. " - " .. commProfile.name
 			array.customparams = array.customparams or {}
@@ -213,7 +213,7 @@ local function ProcessComm(name, config)
 				if upgrades[moduleName] then
 					--Spring.Echo("\tApplying upgrade: "..moduleName)
 					if upgrades[moduleName].func then --apply upgrade function
-						upgrades[moduleName].func(commDefs[name], attributeMods) 
+						upgrades[moduleName].func(commDefs[name], attributeMods)
 					end
 					if upgrades[moduleName].useWeaponSlot then
 						numWeapons = numWeapons + 1
@@ -266,7 +266,7 @@ local function ProcessComm(name, config)
 				
 				if decorations[decName] then
 					if decorations[decName].func then --apply upgrade function
-						decorations[decName].func(commDefs[name], config) 
+						decorations[decName].func(commDefs[name], config)
 					end
 				else
 					Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", "\tDecoration "..decName.." not found")
@@ -353,7 +353,7 @@ for name, data in pairs(commDefs) do
 				weaponData.customparams.extra_damage_mult = nil
 			end
 		end
-	end	
+	end
 	
 	-- set weapon1 range	- may need exception list in future depending on what weapons we add
 	if data.weapondefs and not data.customparams.dynamic_comm then
@@ -384,7 +384,7 @@ for name, data in pairs(commDefs) do
 		for wName, range in pairs(weaponRanges) do -- only works for 2 weapons max
 			if maxRange ~= range then
 				data.customparams.extradrawrange = range
-			end 
+			end
 		end
 		data.sightdistance = math.max(math.min(maxRange * 1.1, 600), data.sightdistance)
 	end
@@ -395,7 +395,7 @@ for name, data in pairs(commDefs) do
 		local typeName = "Wreckage"
 		if featureName == "heap" then
 			typeName = "Debris"
-			mult = 0.2 
+			mult = 0.2
 		end
 		array.description = typeName .. " - " .. data.name
 		array.metal = data.buildcostmetal * mult
@@ -406,7 +406,7 @@ for name, data in pairs(commDefs) do
 	end
 	
 	-- rez speed
-	if data.canresurrect then 
+	if data.canresurrect then
 		data.resurrectspeed = data.workertime*0.5
 	end
 	

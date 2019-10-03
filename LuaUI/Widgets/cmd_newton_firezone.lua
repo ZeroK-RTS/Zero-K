@@ -31,7 +31,7 @@ local glLineWidth = gl.LineWidth
 local glColor = gl.Color
 local glBeginEnd = gl.BeginEnd
 local glVertex = gl.Vertex
-local circleList 
+local circleList
 
 local spTraceScreenRay = Spring.TraceScreenRay
 local spGetGroundHeight = Spring.GetGroundHeight
@@ -55,9 +55,9 @@ local cmdFirezone = {
 	tooltip = 'Set a Newton firezone. Newtons will fire at all units in the area (including allies).',
 	cursor  = 'Attack',
 	action  = 'setfirezone',
-	params  = { }, 
+	params  = { },
 	texture = 'LuaUI/Images/commands/Bold/capture.png',
-	pos     = {CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},  
+	pos     = {CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},
 }
 
 local cmdStopFirezone = {
@@ -66,9 +66,9 @@ local cmdStopFirezone = {
 	tooltip = 'Disasociate Newton from current firezone.',
 	cursor  = 'Stop',
 	action  = 'cancelfirezone',
-	params  = { }, 
+	params  = { },
 	texture = 'LuaUI/Images/commands/Bold/stop.png',
-	pos     = {CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},  
+	pos     = {CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},
 }
 
 local bombUnitDefIDs = {
@@ -95,7 +95,7 @@ options_order = { 'lbl_newton', 'predictNewton', 'alwaysDrawZones', 'lbl_transpo
 options = {
 	lbl_newton = { name = 'Newton Launchers', type = 'label'},
 	predictNewton = {
-		type='radioButton', 
+		type='radioButton',
 		name='Predict impact location for',
 		items = {
 			{name = 'All units', key = 'all', desc = "All units will have their impact predicted whenever they take damge."},
@@ -118,7 +118,7 @@ options = {
 		end,
 	},
 	alwaysDrawZones = {
-		name = "Always draw firezones", 
+		name = "Always draw firezones",
 		desc = "Enable to always draw Newton firezones. Otherwise they are only drawn on selection.",
 		type = 'bool',
 		value = false,
@@ -128,7 +128,7 @@ options = {
 	},
 	lbl_transports = { name = 'Transports', type = 'label'},
 	predictDrop = {
-		type='radioButton', 
+		type='radioButton',
 		name='Predict transport drop location for',
 		items = {
 			{name = 'All units', key = 'all', desc = "All units will have their drop location predicted."},
@@ -199,7 +199,7 @@ local function LimitRectangleSize(rect,units)  --limit rectangle size to Newton'
 	local minX = math.huge
 	local maxZ = 0
 	local minZ = math.huge
-	for i = 1, #units do 
+	for i = 1, #units do
 		local unitID = units[i]
 		if spGetUnitDefID(unitID) == newtonUnitDefID then
 			local x,_,z = spGetUnitPosition(unitID)
@@ -294,7 +294,7 @@ local function PickColor()
 end
 
 local function RemoveDeadGroups(units)
-	for i = 1, #units do 
+	for i = 1, #units do
 		local unitID = units[i]
 		if newtonIDs[unitID] then
 			local groupID, index = newtonIDs[unitID].groupID, newtonIDs[unitID].index
@@ -433,14 +433,14 @@ end
 --- SPECTATOR CHECK
 local function IsSpectatorAndExit()
 	local _, _, spec = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
-	if spec then 
+	if spec then
 		Spring.Echo("Newton Firezone disabled for spectator.")
 		widgetHandler:RemoveWidget(widget)
 	end
 end
 
 local function RemoveIfSpectator()
-	if Spring.GetSpectatingState() and (not Spring.IsCheatingEnabled()) then 
+	if Spring.GetSpectatingState() and (not Spring.IsCheatingEnabled()) then
 		Spring.Echo("Newton Firezone disabled for spectator.")
 		widgetHandler:RemoveWidget(widget) --input self (widget) because we are using handler=true,
 	end
@@ -565,7 +565,7 @@ function widget:GameFrame(n)
 							if victimStillBeingAttacked[g] == unitID then --wait signal from UnitDamaged() that a unit is still being pushed
 								victimStillBeingAttacked[g] = nil--clear wait signal
 								unitToAttack = nil
-								break --wait for next frame until UnitDamaged() stop signalling wait. 
+								break --wait for next frame until UnitDamaged() stop signalling wait.
 								--NOTE: there is periodic pause when Newton reload in UnitDamaged() (every 0.2 second), this allowed the wait signal to be empty and prompted Newton-groups to retarget.
 							end
 							--if (#cmdQueue>0) then
@@ -591,7 +591,7 @@ function widget:GameFrame(n)
 							end
 						end
 					end
-					if unitToAttack and (groupTarget[g]~=unitToAttack) then --there are target, and target is different than previous target (prevent command spam)? 
+					if unitToAttack and (groupTarget[g]~=unitToAttack) then --there are target, and target is different than previous target (prevent command spam)?
 						spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitToAttack}, 0 ) --shoot unit
 						groupTarget[g] = unitToAttack --flag this group as having a target!
 						victimStillBeingAttacked[g] = nil --clear wait signal
@@ -692,7 +692,7 @@ function widget:DrawWorld()
 				gl.CallList(circleList)
 			gl.PopMatrix()
 		end
-	end	
+	end
 end
 
 ------Crash location estimator---
@@ -736,7 +736,7 @@ end
 function widget:Initialize()
 	--IsSpectatorAndExit()
 	
-	local circleVertex = function() 
+	local circleVertex = function()
 			local circleDivs, PI = 64 , math.pi
 			for i = 1, circleDivs do
 				local theta = 2 * PI * i / circleDivs
@@ -771,7 +771,7 @@ function SimulateWithoutDrag(xVel,yVel,zVel, x,y,z,gravity)
 		local future_time = iterationSoFar*step
 		future_locationX =xVel*future_time
 		future_locationZ =zVel*future_time
-		future_height =(yVel)*future_time - (gravity/2)*future_time*future_time 
+		future_height =(yVel)*future_time - (gravity/2)*future_time*future_time
 		local groundHeight =spGetGroundHeight(future_locationX+x,future_locationZ+z)
 		if gravity*future_time >= yVel then --is falling down phase?
 			reachApex = true
@@ -784,10 +784,10 @@ function SimulateWithoutDrag(xVel,yVel,zVel, x,y,z,gravity)
 	return future_locationX+x,future_height+y,future_locationZ+z
 end
 --b) complex balistic with airdrag
---SOURCE CODE copied from: 
+--SOURCE CODE copied from:
 --1) http://www2.hawaii.edu/~kjbeamer/
 --2) http://www.codeproject.com/Articles/19107/Flight-of-a-projectile
---Some Theory from: 
+--Some Theory from:
 --1) Kamalu J. Beamer ,"Projectile Motion Using Runge-Kutta Methods" PDF, 13 April 2013
 --2) Vit Buchta, "Flight of Projectile" CodeProject article, 8 Jun 2007
 --(No copyright licence was stated)
@@ -836,7 +836,7 @@ local function f_v(t,xold,vold,mass,area,gravity,airDensity) -- a function that 
   --MethodB: ideal implementation (more accurate to real airdrag, not implemented in spring)--
   -- local totalVelocity = math.sqrt(vold.hrzn^2+vold.vert^2)
   -- tmp.hrzn = (b/mass)*(totalVelocity^2)*(vold.hrzn/totalVelocity)*horizontalSign;
-  -- tmp.vert = -g+(b/mass)*(totalVelocity^2)*(vold.vert/totalVelocity)*verticalSign; 
+  -- tmp.vert = -g+(b/mass)*(totalVelocity^2)*(vold.vert/totalVelocity)*verticalSign;
   return(tmp);
 end
 
@@ -860,7 +860,7 @@ local function VecFRK4xv(ytype,t,xold, vold,dt,mass,area,gravity,airDensity)
 	local k1x = Scalar_vec2mult(dt,f_x(t,xold,vold));
 	local k1v = Scalar_vec2mult(dt,f_v(t,xold,vold,mass,area,gravity,airDensity));
 	local k2x = Scalar_vec2mult(dt,f_x(t+dt/2.0,Vec2sum(xold,Scalar_vec2mult(0.5,k1x)),Vec2sum(vold,Scalar_vec2mult(0.5,k1v))));
-	local k2v = Scalar_vec2mult(dt,f_v(t+dt/2.0,Vec2sum(xold,Scalar_vec2mult(0.5,k1x)),Vec2sum(vold,Scalar_vec2mult(0.5,k1v)),mass,area,gravity,airDensity));  
+	local k2v = Scalar_vec2mult(dt,f_v(t+dt/2.0,Vec2sum(xold,Scalar_vec2mult(0.5,k1x)),Vec2sum(vold,Scalar_vec2mult(0.5,k1v)),mass,area,gravity,airDensity));
 	local k3x = Scalar_vec2mult(dt,f_x(t+dt/2.0,Vec2sum(xold,Scalar_vec2mult(0.5,k2x)),Vec2sum(vold,Scalar_vec2mult(0.5,k2v))));
 	local k3v = Scalar_vec2mult(dt,f_v(t+dt/2.0,Vec2sum(xold,Scalar_vec2mult(0.5,k2x)),Vec2sum(vold,Scalar_vec2mult(0.5,k2v)),mass,area,gravity,airDensity));
 	local k4x = Scalar_vec2mult(dt,f_x(t+dt,Vec2sum(xold,k3x),Vec2sum(vold,k3v)));
@@ -878,7 +878,7 @@ local function VecFRK4xv(ytype,t,xold, vold,dt,mass,area,gravity,airDensity)
 end
 
 function SimulateWithDrag(velX,velY,velZ, x,y,z, gravity,mass,radius, airDensity)
-	radius = radius *0.01 --in centi-elmo (centimeter, or 10^-2) instead of elmo. See Spring/rts/Sim/Objects/SolidObject.cpp  
+	radius = radius *0.01 --in centi-elmo (centimeter, or 10^-2) instead of elmo. See Spring/rts/Sim/Objects/SolidObject.cpp
 	local horizontalVelocity = math.sqrt(velX^2+velZ^2)
 	local horizontalAngle = math.atan2 (velX/horizontalVelocity, velZ/horizontalVelocity)
 	local hrznAngleCos = math.cos(horizontalAngle)

@@ -1,20 +1,20 @@
 include "constants.lua"
 include "JumpRetreat.lua"
 
-local jump = piece 'jump' 
-local torso = piece 'torso' 
-local flare = piece 'flare' 
-local pelvis = piece 'pelvis' 
-local rcalf = piece 'rcalf' 
-local lcalf = piece 'lcalf' 
-local lthigh = piece 'lthigh' 
-local rthigh = piece 'rthigh' 
-local larm = piece 'larm' 
-local rarm = piece 'rarm' 
-local rhand = piece 'rhand' 
-local lhand = piece 'lhand' 
-local head = piece 'head' 
-local thrust = piece 'Thrust' 
+local jump = piece 'jump'
+local torso = piece 'torso'
+local flare = piece 'flare'
+local pelvis = piece 'pelvis'
+local rcalf = piece 'rcalf'
+local lcalf = piece 'lcalf'
+local lthigh = piece 'lthigh'
+local rthigh = piece 'rthigh'
+local larm = piece 'larm'
+local rarm = piece 'rarm'
+local rhand = piece 'rhand'
+local lhand = piece 'lhand'
+local head = piece 'head'
+local thrust = piece 'Thrust'
 
 local SIG_RESTORE = 16
 local SIG_AIM = 8
@@ -486,7 +486,7 @@ function script.QueryNanoPiece()
 	return nanoPiece
 end
 
-function script.StartBuilding(heading, pitch) 
+function script.StartBuilding(heading, pitch)
 	if GetUnitValue(COB.INBUILDSTANCE) == 0 then
 		Signal(SIG_STOPBUILD)
 		SetUnitValue(COB.INBUILDSTANCE, 1)
@@ -521,12 +521,12 @@ end
 --------------------------
 -- WEAPON
 
-function script.QueryWeapon(num) 
-	return rhand 
+function script.QueryWeapon(num)
+	return rhand
 end
 
-function script.AimFromWeapon(num) 
-	return torso 
+function script.AimFromWeapon(num)
+	return torso
 end
 
 local function RestoreAfterDelay()
@@ -587,7 +587,7 @@ function script.Create()
 	Hide(jump)
 	Hide(flare)
 	Turn(thrust, x_axis, math.rad(70), math.rad(2000))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, {nanoPiece})
 end
 

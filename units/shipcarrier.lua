@@ -22,12 +22,12 @@ unitDef = {
     description_de = [[Flugzeugträger (Bomber)]],
     description_fr = [[Porte-Avion Bombardier]],
     helptext       = [[The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire disarming missile launcher for disabling enemy capital ships at range and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets.]],
-	midposoffset   = [[0 -10 0]],
+    midposoffset   = [[0 -10 0]],
     modelradius    = [[80]],
-	stockpiletime  = [[30]],
-	stockpilecost  = [[150]],
-	priority_misc = 2, -- High
-	extradrawrange = 3000,
+    stockpiletime  = [[30]],
+    stockpilecost  = [[150]],
+    priority_misc = 2, -- High
+    extradrawrange = 3000,
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],
@@ -68,36 +68,36 @@ unitDef = {
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
-	{
+    {
       def                = [[DISARM_ROCKET]],
       badTargetCategory  = [[SWIM LAND SUB SHIP HOVER]],
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
-	
+    
   },
 
   weaponDefs             = {
 
-	DISARM_ROCKET        = {
+    DISARM_ROCKET        = {
       name                    = [[Disarm Missile]],
       areaOfEffect            = 280,
       collideFriendly         = false,
-	  cegTag                  = [[bigdisarmtrail]],
+      cegTag                  = [[bigdisarmtrail]],
       commandfire             = true,
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        = {
-		burst = Shared.BURST_RELIABLE,
+      customParams        = {
+        burst = Shared.BURST_RELIABLE,
 
         combatrange = 950,
         disarmDamageMult = 1.0,
         disarmDamageOnly = 1,
         disarmTimer      = 10, -- seconds
-		
-		light_color = [[1 1 1]],
+        
+        light_color = [[1 1 1]],
       },
-	  
+      
       damage                  = {
         default = 15000,
       },
@@ -119,7 +119,7 @@ unitDef = {
       stockpile               = true,
       stockpileTime           = 10^5,
       tolerance               = 4000,
-	  startVelocity			  = 200,
+      startVelocity           = 200,
       turnrate                = 25000,
       waterWeapon             = false,
       weaponAcceleration      = 400,
@@ -147,7 +147,7 @@ unitDef = {
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 1000,
-      reloadtime              = 1.25,
+      reloadtime              = 1.233,
       size                    = 1E-06,
       smokeTrail              = false,
 
@@ -172,8 +172,8 @@ unitDef = {
     DEAD  = {
       CollisionSphereScale   = 0.6,
       collisionVolumeOffsets = [[-5 -10 0]],
-	  collisionVolumeScales  = [[80 80 240]],
-	  collisionVolumeType    = [[CylZ]],
+      collisionVolumeScales  = [[80 80 240]],
+      collisionVolumeType    = [[CylZ]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 6,

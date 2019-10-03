@@ -20,7 +20,7 @@ unitDef = {
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[45 50 45]],
-  collisionVolumeType    = [[CylY]],  
+  collisionVolumeType    = [[CylY]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -61,7 +61,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:flashmuzzle1]],
-	  [[custom:NONE]],
+      [[custom:NONE]],
     },
 
   },
@@ -81,11 +81,11 @@ unitDef = {
 
   weapons             = {
 
-	[1] = {
+    [1] = {
       def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
-	}, 
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
   
     [5] = {
       def                = [[GAUSS]],
@@ -106,11 +106,15 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams            = {
+        bogus = 1,
+      },
+
       damage                  = {
         default = 0,
       },
 
-      duration                = 0.11,
+      duration                = 0.1,
       explosionGenerator      = [[custom:flash1green]],
       impactOnly              = true,
       impulseBoost            = 0,
@@ -119,7 +123,7 @@ unitDef = {
       laserFlareSize          = 5.53,
       minIntensity            = 1,
       range                   = 450,
-      reloadtime              = 0.11,
+      reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       sweepfire               = false,
       texture1                = [[largelaser]],
@@ -132,7 +136,7 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
     },
-	
+    
     GAUSS = {
       name                    = [[Gauss Rifle]],
       alphaDecay              = 0.12,

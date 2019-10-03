@@ -1,8 +1,8 @@
-local base = piece 'base' 
-local body = piece 'body' 
-local jet = piece 'jet' 
-local wingtipl = piece 'wingtipl' 
-local wingtipr = piece 'wingtipr' 
+local base = piece 'base'
+local body = piece 'body'
+local jet = piece 'jet'
+local wingtipl = piece 'wingtipl'
+local wingtipr = piece 'wingtipr'
 
 local smokePiece = {body, jet}
 
@@ -30,7 +30,7 @@ end
 
 function script.Create()
 	SetInitialBomberSettings()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	--StartThread(Lights)
 end

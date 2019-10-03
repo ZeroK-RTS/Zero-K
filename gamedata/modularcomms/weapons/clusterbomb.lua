@@ -6,12 +6,13 @@ local weaponDef = {
 	avoidNeutral            = false,
 	areaOfEffect            = 160,
 	burst                   = 2,
-	burstRate               = 0.03,
+	burstRate               = 0.033,
 	commandFire             = true,
 	craterBoost             = 1,
 	craterMult              = 2,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[3]],
 		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
 		miscEffectFire = [[custom:RIOT_SHELL_H]],

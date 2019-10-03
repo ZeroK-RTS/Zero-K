@@ -20,6 +20,7 @@ unitDef = {
 
   customParams          = {
     dontfireatradarcommand = '1',
+    cus_noflashlight = 1,
   },
 
   explodeAs             = [[BIG_UNITEX]],
@@ -69,9 +70,9 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-		burst = Shared.BURST_RELIABLE,
-		light_color = [[1.85 1.85 0.45]],
-		light_radius = 300,
+        burst = Shared.BURST_RELIABLE,
+        light_color = [[1.85 1.85 0.45]],
+        light_radius = 300,
       },
 
       damage                  = {
@@ -94,7 +95,7 @@ unitDef = {
       rgbColor                = [[1 1 0.25]],
       soundStart              = [[weapon/LightningBolt]],
       soundTrigger            = true,
-      targetborder            = 1,
+      targetborder            = 0.9,
       texture1                = [[lightning]],
       thickness               = 10,
       tolerance               = 10000,

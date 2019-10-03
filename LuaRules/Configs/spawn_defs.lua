@@ -11,7 +11,7 @@ spawnSquare				= 150	   -- size of the chicken spawn square centered on the burr
 spawnSquareIncrement	= 1		 -- square size increase for each unit spawned
 burrowName				= "roost"   -- burrow unit name
 maxBurrows				= 50
-minBaseDistance			= 700	  
+minBaseDistance			= 700
 maxBaseDistance			= 3500
 maxAge					= 5*60	  -- chicken die at this age, seconds
 
@@ -27,7 +27,7 @@ endlessMode				= false
 tooltipMessage			= "Kill chickens and collect their eggs to get metal."
 
 mexesUnitDefID = {
-	[-UnitDefNames.staticmex.id] = true, 
+	[-UnitDefNames.staticmex.id] = true,
 }
 mexes = {
 	"staticmex",
@@ -145,9 +145,9 @@ local chickenTypes = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOption
 	chickens			=  {time = 12,  squadSize = 1, obsolete = 35},
 	chickena			=  {time = 18,  squadSize = 0.5, obsolete = 40},
 	chickenr			=  {time = 24,  squadSize = 1.2, obsolete = 45},
-	--chicken_leaper	=  {time = 24,  squadSize = 2, obsolete = 45},  
+	--chicken_leaper	=  {time = 24,  squadSize = 2, obsolete = 45},
 	chickenwurm			=  {time = 28,  squadSize = 0.7},
-	chicken_roc			=  {time = 28,  squadSize = 0.4},  
+	chicken_roc			=  {time = 28,  squadSize = 0.4},
 	chicken_sporeshooter=  {time = 32,  squadSize = 0.5},
 	chickenf			=  {time = 32,  squadSize = 0.5},
 	chickenc			=  {time = 40,  squadSize = 0.5},
@@ -158,7 +158,7 @@ local chickenTypes = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOption
 
 local defenders = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptions().campaign_chicken_types_defense) or {
   chickend = {time = 10, squadSize = 0.6, cost = 1 },
-  chicken_dodo = {time = 25,  squadSize = 2, cost = 1}, 
+  chicken_dodo = {time = 25,  squadSize = 2, cost = 1},
   chicken_rafflesia =  {time = 25, squadSize = 0.4, cost = 2 },
 }
 
@@ -226,7 +226,7 @@ difficulties = {
 	},
 
 	['Chicken: Easy'] = {
-		chickenSpawnRate = 60, 
+		chickenSpawnRate = 60,
 		burrowSpawnRate  = 50,
 		gracePeriod	  = 180,
 		rampUpTime	   = 480,
@@ -238,14 +238,14 @@ difficulties = {
 	},
 
 	['Chicken: Normal'] = {
-		chickenSpawnRate = 50, 
+		chickenSpawnRate = 50,
 		burrowSpawnRate  = 45,
 		timeSpawnBonus   = .04,
 		miniQueenTime	= {0.6},
 	},
 
 	['Chicken: Hard'] = {
-		chickenSpawnRate = 45, 
+		chickenSpawnRate = 45,
 		burrowSpawnRate  = 45,
 		waveSizeMult	 = 1.2,
 		timeSpawnBonus   = .05,
@@ -259,11 +259,11 @@ difficulties = {
 	},
 	
 	['Chicken: Suicidal'] = {
-		chickenSpawnRate = 45, 
+		chickenSpawnRate = 45,
 		burrowSpawnRate  = 40,
-		waveSizeMult	 = 1.5,	
+		waveSizeMult	 = 1.5,
 		timeSpawnBonus   = .06,
-		burrowWaveSize	 = 1.6,	
+		burrowWaveSize	 = 1.6,
 		gracePeriod		 = 150,
 		gracePeriodMin	 = 30,
 		burrowRespawnChance = 0.25,
@@ -279,7 +279,7 @@ difficulties = {
 	},
 
 	['Chicken: Custom'] = {
-		chickenSpawnRate = modoptions.chickenspawnrate or 50, 
+		chickenSpawnRate = modoptions.chickenspawnrate or 50,
 		burrowSpawnRate  = modoptions.burrowspawnrate or 45,
 		waveSizeMult    = modoptions.wavesizemult or 1,
 		timeSpawnBonus   = .04,

@@ -60,15 +60,15 @@ GG.Script.DETO_W8 = 4103
 GG.Script.SMOKEPUFF = 258
 
 -- useful functions
-function GG.Script.SmokeUnit(smokePiece, multiplier)
+function GG.Script.SmokeUnit(unitID, smokePiece, multiplier)
 	multiplier = multiplier or 1
 	local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
 	
-	if not (smokePiece and smokePiece[1]) then 
-		return 
+	if not (smokePiece and smokePiece[1]) then
+		return
 	end
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do
-		Sleep(400) 
+		Sleep(400)
 	end
 	--Smoke loop
 	while true do

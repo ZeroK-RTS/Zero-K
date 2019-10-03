@@ -1,19 +1,19 @@
 include 'constants.lua'
 
-local base = piece 'base' 
-local pelvis = piece 'pelvis' 
-local torso = piece 'torso' 
-local emit = piece 'emit' 
-local fire = piece 'fire' 
-local Lleg = piece 'lleg' 
-local Rleg = piece 'rleg' 
-local lowerLleg = piece 'lowerlleg' 
-local lowerRleg = piece 'lowerrleg' 
-local Lfoot = piece 'lfoot' 
+local base = piece 'base'
+local pelvis = piece 'pelvis'
+local torso = piece 'torso'
+local emit = piece 'emit'
+local fire = piece 'fire'
+local Lleg = piece 'lleg'
+local Rleg = piece 'rleg'
+local lowerLleg = piece 'lowerlleg'
+local lowerRleg = piece 'lowerrleg'
+local Lfoot = piece 'lfoot'
 local Rfoot = piece 'rfoot'
 
-local l_gun = piece 'l_gun' 
-local r_gun = piece 'r_gun' 
+local l_gun = piece 'l_gun'
+local r_gun = piece 'r_gun'
 
 local smokePiece = {torso}
 
@@ -34,7 +34,7 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetGameFrame	 = Spring.GetGameFrame
 
 local waveWeaponDef = WeaponDefNames["shieldriot_blast"]
-local WAVE_RELOAD = math.ceil(waveWeaponDef.reload * Game.gameSpeed) -- 27
+local WAVE_RELOAD = math.floor(waveWeaponDef.reload * Game.gameSpeed)
 local WAVE_TIMEOUT = math.ceil(waveWeaponDef.damageAreaOfEffect / waveWeaponDef.explosionSpeed)* (1000 / Game.gameSpeed) + 200 -- empirically maximum delay of damage was (damageAreaOfEffect / explosionSpeed) - 4 frames
 
 --------------------------------------------------------------------------------
@@ -141,7 +141,7 @@ end
 
 function script.Create()
 	--Move(emit, y_axis, 20)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function AutoAttack_Thread()
@@ -167,12 +167,12 @@ end
 function FireAnim()
 	
 	local mspeed = 4
-	Move (l_gun, x_axis, 2, mspeed*3)	
+	Move (l_gun, x_axis, 2, mspeed*3)
 	Move (r_gun, x_axis, -2, mspeed*3)
 	WaitForMove(l_gun, x_axis)
 	WaitForMove(r_gun, x_axis)
 	Sleep(1)
-	Move (l_gun, x_axis, 0, mspeed)	
+	Move (l_gun, x_axis, 0, mspeed)
 	Move (r_gun, x_axis, 0, mspeed)
 	Sleep(1)
 end

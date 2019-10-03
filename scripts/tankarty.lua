@@ -4,14 +4,14 @@ local dynamicRockData
 include "trackControl.lua"
 include "pieceControl.lua"
 
-local main = piece 'main' 
-local turret = piece 'turret' 
-local outer = piece 'outer' 
-local inner = piece 'inner' 
-local sleeve = piece 'sleeve' 
-local barrel = piece 'barrel' 
-local flare = piece 'flare' 
-local breech = piece 'breech' 
+local main = piece 'main'
+local turret = piece 'turret'
+local outer = piece 'outer'
+local inner = piece 'inner'
+local sleeve = piece 'sleeve'
+local barrel = piece 'barrel'
+local flare = piece 'flare'
+local breech = piece 'breech'
 local smoke = piece 'smoke'
 
 local gunHeading = 0
@@ -141,7 +141,7 @@ function script.Create()
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (250)
 	end
-	StartThread (GG.Script.SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function RestoreAfterDelay()

@@ -16,10 +16,12 @@ end
 function widget:DrawGenesis()
 end
 
-local texName = "$model_gbuffer_normtex"
+local texName = "$model_gbuffer_difftex"
 
 function widget:DrawScreenEffects()
+	gl.Blending(false)
 	gl.Texture(0, texName)
 	gl.TexRect(0, 0, vsx, vsy, false, true)
 	gl.Texture(0, false)
+	gl.Blending(true)
 end

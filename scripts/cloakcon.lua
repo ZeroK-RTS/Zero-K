@@ -1,20 +1,20 @@
 include "constants.lua"
 
-local head = piece 'head' 
-local hips = piece 'hips' 
-local chest = piece 'chest' 
-local rthigh = piece 'rthigh' 
-local lthigh = piece 'lthigh' 
-local lshin = piece 'lshin' 
-local rshin = piece 'rshin' 
-local rfoot = piece 'rfoot' 
-local lfoot = piece 'lfoot' 
-local larm = piece 'larm' 
-local rupperarm = piece 'rupperarm' 
-local claw1 = piece 'claw1' 
-local claw2 = piece 'claw2' 
-local rshoulder = piece 'rshoulder' 
-local rforearm = piece 'rforearm' 
+local head = piece 'head'
+local hips = piece 'hips'
+local chest = piece 'chest'
+local rthigh = piece 'rthigh'
+local lthigh = piece 'lthigh'
+local lshin = piece 'lshin'
+local rshin = piece 'rshin'
+local rfoot = piece 'rfoot'
+local lfoot = piece 'lfoot'
+local larm = piece 'larm'
+local rupperarm = piece 'rupperarm'
+local claw1 = piece 'claw1'
+local claw2 = piece 'claw2'
+local rshoulder = piece 'rshoulder'
+local rforearm = piece 'rforearm'
 
 local thigh = {lthigh, rthigh}
 local shin = {lshin, rshin}
@@ -191,7 +191,7 @@ function script.QueryNanoPiece()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, {chest})
+	StartThread(GG.Script.SmokeUnit, unitID, {chest})
 	Turn(rthigh, y_axis, math.rad(-20))
 	Turn(lthigh, y_axis, math.rad(20))
 	Turn(rthigh, z_axis, math.rad(-3))

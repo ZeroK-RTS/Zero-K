@@ -26,7 +26,7 @@
 -- slam_flash from gundam_xamelimpact (heavily modified)
 -- slam_sparks_smokejets from klara (maybe unmodified)
 -- slam_seacloud & slam_landcloud stuff from nuke_150 (heavily modified)
--- slam_water_droplets from nuke_150 (modified) 
+-- slam_water_droplets from nuke_150 (modified)
 -- slam_trail from cruisetrail (modified)
 -- slam_water_pillar from torpedo_hit_main_large (more growth)
 -- slam_ray and slam_heat_pillar from galiblow.lua
@@ -957,7 +957,7 @@ return {
         alwaysVisible      = true,
         colorMap           = [[1 0.9 0.8 1.0	1 0.4 0 0.9		0.0 0.0 0.0 0.01]],
         size               = 110,
-        sizegrowth         = -0.025, 
+        sizegrowth         = -0.025,
         texture            = [[groundflash]],
         ttl                = 125,
       },
@@ -1006,7 +1006,7 @@ return {
         ttl                = 24,
       },
     },
-  },  
+  },
 
   ["slam_water_droplets"] = {
       watermist = {

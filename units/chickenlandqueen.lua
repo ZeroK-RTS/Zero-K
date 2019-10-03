@@ -103,7 +103,7 @@ unitDef = {
       def                = [[QUEENCRUSH]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
-	
+    
     {
       def                = [[DODOBOMB]],
       onlyTargetCategory = [[NONE]],
@@ -137,8 +137,8 @@ unitDef = {
       craterMult              = 2,
       
       customparams            = {
-      	spawns_name = "chickenc",
-      	spawns_expire = 0,
+          spawns_name = "chickenc",
+          spawns_expire = 0,
       },
 
       damage                  = {
@@ -179,8 +179,8 @@ unitDef = {
       craterMult              = 0,
       
       customparams            = {
-      	spawns_name = "chicken_dodo",
-      	spawns_expire = 30,
+          spawns_name = "chicken_dodo",
+          spawns_expire = 30,
       },
 
       damage                  = {
@@ -221,8 +221,8 @@ unitDef = {
       craterMult              = 2,
       
       customparams            = {
-      	spawns_name = "chicken_tiamat",
-      	spawns_expire = 0,
+          spawns_name = "chicken_tiamat",
+          spawns_expire = 0,
       },
 
       damage                  = {
@@ -249,17 +249,17 @@ unitDef = {
       weaponAcceleration      = 200,
       weaponType              = [[AircraftBomb]],
       weaponVelocity          = 200,
-    },	
-	
+    },
+    
     FIREGOO    = {
       name                    = [[Napalm Goo]],
       areaOfEffect            = 256,
       burst                   = 8,
-      burstrate               = 0.01,
+      burstrate               = 0.033,
       cegTag                  = [[queen_trail_fire]],
       
       customParams            = {
-	light_radius = 500,
+    light_radius = 500,
       },
       
       craterBoost             = 0,
@@ -332,7 +332,7 @@ unitDef = {
       craterMult              = 0.002,
 
       customParams           = {
-	lups_noshockwave = "1",
+    lups_noshockwave = "1",
       },
       
       

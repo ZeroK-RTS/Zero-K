@@ -1,14 +1,14 @@
-local fuselage = piece 'fuselage' 
-local head = piece 'head' 
-local wingl = piece 'wingl' 
-local wingr = piece 'wingr' 
-local enginel = piece 'enginel' 
-local enginer = piece 'enginer' 
-local arm = piece 'arm' 
-local lathe = piece 'lathe' 
-local jaw1 = piece 'jaw1' 
-local jaw2 = piece 'jaw2' 
-local nanopoint = piece 'nanopoint' 
+local fuselage = piece 'fuselage'
+local head = piece 'head'
+local wingl = piece 'wingl'
+local wingr = piece 'wingr'
+local enginel = piece 'enginel'
+local enginer = piece 'enginer'
+local arm = piece 'arm'
+local lathe = piece 'lathe'
+local jaw1 = piece 'jaw1'
+local jaw2 = piece 'jaw2'
+local nanopoint = piece 'nanopoint'
 
 include "constants.lua"
 include "gunshipConstructionTurnHax.lua"
@@ -30,7 +30,7 @@ local function BuildDecloakThread()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

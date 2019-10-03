@@ -12,7 +12,7 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 25 0]],
   collisionVolumeScales         = [[20 60 20]],
-  collisionVolumeType	        = [[CylY]],
+  collisionVolumeType           = [[CylY]],
 
   customParams                  = {
     mobilebuilding = [[1]],
@@ -65,18 +65,18 @@ unitDef = {
       craterMult              = 3.5,
 
       customParams            = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
-		restrict_in_widgets = 1,
+        restrict_in_widgets = 1,
 
       lups_explodelife = 1.5,
-		stats_hide_dps = 1, -- meaningless
-		stats_hide_reload = 1,
-		
-		light_color = [[1.35 0.8 0.36]],
-		light_radius = 400,
-	  },
-	  
+        stats_hide_dps = 1, -- meaningless
+        stats_hide_reload = 1,
+        
+        light_color = [[1.35 0.8 0.36]],
+        light_radius = 400,
+      },
+      
       damage                  = {
         default = 3502.4,
         subs    = 175,

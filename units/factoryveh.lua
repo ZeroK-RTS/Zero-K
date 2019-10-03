@@ -37,17 +37,17 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-	sortName       = [[2]],
-	default_spacing = 8,
+    sortName       = [[2]],
+    default_spacing = 8,
 
-	solid_factory  = 3,
-	aimposoffset   = [[0 0 -35]],
-	midposoffset   = [[0 0 -10]],
-	modelradius    = [[100]],
-	unstick_help   = 1,
+    solid_factory  = 3,
+    aimposoffset   = [[0 0 -35]],
+    midposoffset   = [[0 0 -10]],
+    modelradius    = [[100]],
+    unstick_help   = 1,
     selectionscalemult = 1,
-	factorytab       = 1,
-	shared_energy_gen = 1,
+    factorytab       = 1,
+    shared_energy_gen = 1,
   },
 
   energyUse                     = 0,

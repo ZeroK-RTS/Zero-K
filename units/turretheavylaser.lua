@@ -76,10 +76,10 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
-		burst = Shared.BURST_UNRELIABLE,
+        burst = Shared.BURST_UNRELIABLE,
 
-		light_color = [[1.25 1.25 3.75]],
-		light_radius = 180,
+        light_color = [[1.25 1.25 3.75]],
+        light_radius = 180,
       },
 
       damage                  = {
@@ -90,14 +90,14 @@ unitDef = {
 
       explosionGenerator      = [[custom:flash1bluedark]],
       fireStarter             = 90,
-	  fireTolerance           = 8192, -- 45 degrees
+      fireTolerance           = 8192, -- 45 degrees
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       largeBeamLaser          = true,
       laserFlareSize          = 10.4,
-	  leadLimit               = 18,
+      leadLimit               = 18,
       minIntensity            = 1,
       noSelfDamage            = true,
       projectiles             = 1,

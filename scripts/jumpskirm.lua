@@ -1,15 +1,15 @@
-local support = piece 'support' 
-local flare = piece 'flare' 
-local eye_flare = piece 'eye_flare' 
-local thigh1 = piece 'thigh1' 
-local thigh2 = piece 'thigh2' 
-local torso = piece 'torso' 
-local head = piece 'head' 
-local barrel = piece 'barrel' 
-local foot2 = piece 'foot2' 
-local foot1 = piece 'foot1' 
-local leg2 = piece 'leg2' 
-local leg1 = piece 'leg1' 
+local support = piece 'support'
+local flare = piece 'flare'
+local eye_flare = piece 'eye_flare'
+local thigh1 = piece 'thigh1'
+local thigh2 = piece 'thigh2'
+local torso = piece 'torso'
+local head = piece 'head'
+local barrel = piece 'barrel'
+local foot2 = piece 'foot2'
+local foot1 = piece 'foot1'
+local leg2 = piece 'leg2'
+local leg1 = piece 'leg1'
 local shoulder = piece 'shoulder'
 local shoulder_left = piece 'shoulder_left'
 
@@ -174,7 +174,7 @@ function script.Create()
 	Hide(flare)
 	Hide(support)
 	Hide(barrel)
-	StartThread(GG.Script.SmokeUnit, {torso})
+	StartThread(GG.Script.SmokeUnit, unitID, {torso})
 end
 
 function script.StartMoving()

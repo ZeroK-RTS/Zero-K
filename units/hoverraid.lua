@@ -14,7 +14,7 @@ unitDef = {
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 -2 0]],
   collisionVolumeScales  = [[19 19 36]],
-  collisionVolumeType    = [[cylZ]],  
+  collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -70,7 +70,7 @@ unitDef = {
       name                    = [[Gauss Cannon]],
       alphaDecay              = 0.12,
       areaOfEffect            = 16,
-	  avoidfeature            = false,
+      avoidfeature            = false,
       bouncerebound           = 0.15,
       bounceslip              = 1,
       burst                   = 1,
@@ -79,14 +79,14 @@ unitDef = {
       craterMult              = 0,
 
       customParams = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
         single_hit = true,
-		
-		light_camera_height = 1200,
-		light_radius = 180,
+        
+        light_camera_height = 1200,
+        light_radius = 180,
       },
-	  
+      
       damage                  = {
         default = 100.1,
       },
@@ -109,12 +109,12 @@ unitDef = {
       soundHit                = [[weapon/gauss_hit]],
       soundHitVolume          = 2.5,
       soundStart              = [[weapon/gauss_fire]],
-	  soundTrigger            = true,
+      soundTrigger            = true,
       soundStartVolume        = 2,
       sprayangle              = 400,
       stages                  = 32,
       turret                  = true,
-      waterweapon			  = true,
+      waterweapon             = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 2200,
     },

@@ -56,7 +56,7 @@ function script.Create()
 	Move(side1, z_axis, 20)
 	Move(side2, z_axis, 10)
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.QueryNanoPiece()

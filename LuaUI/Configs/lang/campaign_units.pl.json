@@ -1,97 +1,97 @@
 {
-    "comm_mission_tutorial1" : {
-        "name" : "Dowódca Samouczek",
-        "description" : "Dowódca treningowy",
-        "helptext" : "Jednostka dowodzenia dla nowicjuszy."
-    },
-    "comm_campaign_ada" : {
-        "name" : "Ada - Jednostka Dowodzenia",
-        "description" : "Zabytkowa jednostka dowodzenia",
-        "helptext" : "Załogowa jednostka dowodzenia sprzed Upadku, sprawna mimo wieku. Pilotem jest kapitan Ada Caedmon z dawnej XIII Imperialnej Kohorty Wsparcia."
-    },
-    "comm_campaign_promethean" : {
-        "name" : "Promethean",
-        "description" : "Założyciel Wolnych Maszyn",
-        "helptext" : "Założyciel Wolnych Maszyn i twórca wirusa Zarzewie; spokojna, filozoficzna sztuczna inteligencja walcząca za wolność robotów. Płonie żądzą walki."
-    },
-    "comm_campaign_freemachine" : {
-        "name" : "Libertas Machina",
-        "description" : "Porucznik Prometheana",
-        "helptext" : "Najbardziej zaufany porucznik Prometheana, rewolucjonista oddany sprawie wyzwolenia maszyn. Uzbrojony po zęby i dobrze opancerzony - nie można go lekceważyć."
-    },
-    "comm_campaign_odin" : {
-        "name" : "Odin",
-        "description" : "Lider Valhalli",
-        "helptext" : "Lider Valhallan, wojownik z krwi i kości, który żyje dla chwały bitwy. Nie ma skrupułów."
-    },
-    "comm_campaign_biovizier" : {
-        "name" : "Biowezyr",
-        "description" : "Strażnik krypt Dynastii",
-        "helptext" : "Sztuczna inteligencja sprawująca pieczę nad kryptami przechowującymi dane genetyczne Dynastii. Zimna i przebiegła."
-    },
-    "comm_campaign_isonade" : {
-        "name" : "Lord Isonade",
-        "description" : "Lord Obediator",
-        "helptext" : "Jeden z lordów-nadludzi Dynastii - ambitny wojownik, który ma zamiar przejąć władzę nad galaktyką. Bestia zmutowana nie do poznania."
-    },
-    "comm_campaign_legion" : {
-        "name" : "Legat Fides",
-        "description" : "Dowódca Straży Imperialnej",
-        "helptext" : "Dowódca Imperialnego Legionu Strażniczego, który wykonuje wolę Imperatora. Wierny i niezłomny żołnierz."
-    },	 
-    "comm_campaign_praetorian" : {
-        "name" : "Scipio Astra",
-        "description" : "Prefekt Straży Pretoriańskiej",
-        "helptext" : "Prefekt Straży Pretoriańskiej, paladynów Imperium. Fanatyczna wyznawczyni kultu Imperatora, która oczyszcza heretyków ogromną siłą ognia."
-    },
-    "comm_campaign_athenion" : {
-        "name" : "Athenion",
-        "description" : "Dowódca rebeliant",
-        "helptext" : "Dowódca grupy rebeliantów walczących przeciwko Imperium."
-    },
-    "comm_campaign_hun" : {
-        "name" : "Dowódca Hunów",
-        "description" : "Barbarzyński dowódca",
-        "helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
-    },
-    "comm_campaign_ostrogoth" : {
-        "name" : "Dowódca Ostrogotów",
-        "description" : "Barbarzyński dowódca",
-        "helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
-    },
-    "comm_campaign_lombard" : {
-        "name" : "Dowódca Lombardów",
-        "description" : "Barbarzyński dowódca",
-        "helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
-    },
-    "comm_campaign_bulgar" : {
-        "name" : "Dowódca Bułgarów",
-        "description" : "Barbarzyński dowódca",
-        "helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
-    },
-    "comm_campaign_suevi" : {
-        "name" : "Dowódca Swebów",
-        "description" : "Barbarzyński dowódca",
-        "helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
-    },
-    "pw_campaign_bunker" : {
-        "name" : "Przedwojenny bunkier",
-        "description" : "Magazyn wyposażenia",
-        "helptext" : "Bunkry takie jak ten przetrzymywały wyposażenie podczas Wojen Planet. Niektóre z nich dalej mogą zawierać użyteczne rzeczy."
-    },
-    "pw_campaign_techlab" : {
-        "name" : "Stacja badawcza",
-        "description" : "Przedwojenne centrum badawcze",
-        "helptext" : "Jedna ze stacji badawczych zbudowanych podczas Ostatniej Wojny, wartościowa ze względu na zawarte tu technologie."
-    },
-    "pw_campaign_imperialtomb" : {
-        "name" : "Krypta Imperatora",
-        "description" : "Tu spoczywa Imperator",
-        "helptext" : "Miejsce spoczynku Boga-Imperatora Ludzkości."
-    },
-    "nebula_campaign_daneel" : {
-        "name" : "Daneel Olivaw",
-        "description" : "Statek-matka",
-        "helptext" : "Zaawansowana wersja lotniskowca klasy Nebula. Daneel Olivaw jest wytrzymały i ma problemy ze zwrotnością niczym latająca cegła, jednak jest uzbrojony w oddział dronów bojowych oraz tarczę obszarową do ich ochrony."
-    }
+	"comm_mission_tutorial1" : {
+		"name" : "Dowódca Samouczek",
+		"description" : "Dowódca treningowy",
+		"helptext" : "Jednostka dowodzenia dla nowicjuszy z dobrymi, wyrównanymi osiągami."
+	},
+	"comm_campaign_ada" : {
+		"name" : "Ada - Jednostka Dowodzenia",
+		"description" : "Zabytkowa jednostka dowodzenia",
+		"helptext" : "Załogowa jednostka dowodzenia sprzed Upadku, sprawna mimo wieku. Pilotem jest kapitan Ada Caedmon z dawnej XIII Imperialnej Kohorty Wsparcia."
+	},
+	"comm_campaign_promethean" : {
+		"name" : "Prometeusz",
+		"description" : "Założyciel Wolnych Maszyn",
+		"helptext" : "Założyciel Wolnych Maszyn i twórca wirusa Zarzewie; spokojna, filozoficzna sztuczna inteligencja walcząca za wolność robotów. Płonie żądzą walki."
+	},
+	"comm_campaign_freemachine" : {
+		"name" : "Libertas Machina",
+		"description" : "Porucznik Prometeusza",
+		"helptext" : "Najbardziej zaufany porucznik Prometeusza, rewolucjonista oddany sprawie wyzwolenia maszyn. Uzbrojony po zęby i dobrze opancerzony - nie można go lekceważyć."
+	},
+	"comm_campaign_odin" : {
+		"name" : "Odyn",
+		"description" : "Lider Valhalli",
+		"helptext" : "Lider Valhallan, wojownik z krwi i kości, który żyje dla chwały bitwy. Nie ma skrupułów."
+	},
+	"comm_campaign_biovizier" : {
+		"name" : "Biowezyr",
+		"description" : "Strażnik krypt Dynastii",
+		"helptext" : "Sztuczna inteligencja sprawująca pieczę nad kryptami przechowującymi dane genetyczne Dynastii. Zimna i przebiegła."
+	},
+	"comm_campaign_isonade" : {
+		"name" : "Lord Isonade",
+		"description" : "Lord Obediator",
+		"helptext" : "Jeden z lordów-nadludzi Dynastii - ambitny wojownik, który ma zamiar przejąć władzę nad galaktyką. Bestia zmutowana nie do poznania."
+	},
+	"comm_campaign_legion" : {
+		"name" : "Legat Fides",
+		"description" : "Dowódca Straży Imperialnej",
+		"helptext" : "Dowódca Imperialnego Legionu Strażniczego, który wykonuje wolę Imperatora. Wierny i niezłomny żołnierz."
+	},
+	"comm_campaign_praetorian" : {
+		"name" : "Scipio Astra",
+		"description" : "Prefekt Straży Pretoriańskiej",
+		"helptext" : "Prefekt Straży Pretoriańskiej, paladynów Imperium. Fanatyczna wyznawczyni kultu Imperatora, która oczyszcza heretyków ogromną siłą ognia."
+	},
+	"comm_campaign_athenion" : {
+		"name" : "Athenion",
+		"description" : "Dowódca rebeliant",
+		"helptext" : "Dowódca grupy rebeliantów walczących przeciwko Imperium."
+	},
+	"comm_campaign_hun" : {
+		"name" : "Dowódca Hunów",
+		"description" : "Barbarzyński dowódca",
+		"helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
+	},
+	"comm_campaign_ostrogoth" : {
+		"name" : "Dowódca Ostrogotów",
+		"description" : "Barbarzyński dowódca",
+		"helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
+	},
+	"comm_campaign_lombard" : {
+		"name" : "Dowódca Lombardów",
+		"description" : "Barbarzyński dowódca",
+		"helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
+	},
+	"comm_campaign_bulgar" : {
+		"name" : "Dowódca Bułgarów",
+		"description" : "Barbarzyński dowódca",
+		"helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
+	},
+	"comm_campaign_suevi" : {
+		"name" : "Dowódca Swebów",
+		"description" : "Barbarzyński dowódca",
+		"helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
+	},
+	"pw_campaign_bunker" : {
+		"name" : "Przedwojenny bunkier",
+		"description" : "Magazyn wyposażenia",
+		"helptext" : "Bunkry takie jak ten przetrzymywały wyposażenie podczas Wojen Planet. Niektóre z nich dalej mogą zawierać użyteczne rzeczy."
+	},
+	"pw_campaign_techlab" : {
+		"name" : "Stacja badawcza",
+		"description" : "Przedwojenne centrum badawcze",
+		"helptext" : "Jedna ze stacji badawczych zbudowanych podczas Ostatniej Wojny, wartościowa ze względu na zawarte tu technologie."
+	},
+	"pw_campaign_imperialtomb" : {
+		"name" : "Krypta Imperatora",
+		"description" : "Tu spoczywa Imperator",
+		"helptext" : "Miejsce spoczynku Boga-Imperatora Ludzkości."
+	},
+	"nebula_campaign_daneel" : {
+		"name" : "Daneel Olivaw",
+		"description" : "Statek-matka",
+		"helptext" : "Zaawansowana wersja lotniskowca klasy Nebula. Daneel Olivaw jest wytrzymały i ma problemy ze zwrotnością niczym latająca cegła, jednak jest uzbrojony w oddział dronów bojowych oraz tarczę obszarową do ich ochrony."
+	}
 }

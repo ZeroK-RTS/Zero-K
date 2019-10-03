@@ -5,7 +5,7 @@ unitDef = {
   acceleration        = 0.1,
   airStrafe           = 0,
   brakeRate           = 0.08,
-  buildCostMetal      = 260,
+  buildCostMetal      = 240,
   buildDistance       = 160,
   builder             = true,
 
@@ -32,10 +32,10 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[0]],
-	modelradius    = [[15]],
+    modelradius    = [[15]],
     aimposoffset   = [[0 35 0]],
     midposoffset   = [[0 35 0]],
-	custom_height  = [[55]],
+    custom_height  = [[55]],
   },
 
   energyUse           = 0,
@@ -47,8 +47,8 @@ unitDef = {
   iconType            = [[builderair]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maxDamage           = 600,
-  maxVelocity         = 3.1,
+  maxDamage           = 850,
+  maxVelocity         = 3.2,
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -67,6 +67,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
+      collisionVolumeOffsets = [[0 0 -20]],
+      collisionVolumeScales  = [[90 90 60]],
+      collisionVolumeType    = [[ellipsoid]], 
       object           = [[bumblebee_d.dae]],
     },
 

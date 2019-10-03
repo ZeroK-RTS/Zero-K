@@ -15,7 +15,7 @@ return {
 	--				},
 	--			},
 	--		},
-	--		armbbase = {    
+	--		armbbase = {
 	--			offset = {47.316, 32.656, 0},
 	--			armb = {
 	--				offset = {-8.605, 29.659, 0},
@@ -24,7 +24,7 @@ return {
 	--				},
 	--			},
 	--		},
-	--		armcbase = {    
+	--		armcbase = {
 	--			offset = {47.316, 32.656, -30.519},
 	--			armc = {
 	--				offset = {-8.605, 29.659, 0},
@@ -33,7 +33,7 @@ return {
 	--				},
 	--			},
 	--		},
-	--		armdbase = {    
+	--		armdbase = {
 	--			offset = {-47.316, 32.656, -30.519},
 	--			armd = {
 	--				offset = {8.605, 29.659, 0},
@@ -42,7 +42,7 @@ return {
 	--				},
 	--			},
 	--		},
-	--		armebase = {    
+	--		armebase = {
 	--			offset = {-47.316, 32.656, 0},
 	--			arme = {
 	--				offset = {8.605, 29.659, 0},
@@ -51,7 +51,7 @@ return {
 	--				},
 	--			},
 	--		},
-	--		armfbase = {    
+	--		armfbase = {
 	--			offset = {-47.316, 32.656, 30.519},
 	--			armf = {
 	--				offset = {8.605, 29.659, 0},

@@ -1,21 +1,21 @@
-local base = piece 'base' 
-local body = piece 'body' 
-local turret = piece 'turret' 
+local base = piece 'base'
+local body = piece 'body'
+local turret = piece 'turret'
 local aim = piece 'aim'
-local door1 = piece 'door1' 
-local door2 = piece 'door2' 
-local door3 = piece 'door3' 
-local door4 = piece 'door4' 
-local door5 = piece 'door5' 
-local door6 = piece 'door6' 
-local sleeve = piece 'sleeve' 
-local b1 = piece 'b1' 
-local barrel = piece 'barrel' 
-local flare = piece 'flare' 
-local p1 = piece 'p1' 
-local p2 = piece 'p2' 
-local p3 = piece 'p3' 
-local p4 = piece 'p4' 
+local door1 = piece 'door1'
+local door2 = piece 'door2'
+local door3 = piece 'door3'
+local door4 = piece 'door4'
+local door5 = piece 'door5'
+local door6 = piece 'door6'
+local sleeve = piece 'sleeve'
+local b1 = piece 'b1'
+local barrel = piece 'barrel'
+local flare = piece 'flare'
+local p1 = piece 'p1'
+local p2 = piece 'p2'
+local p3 = piece 'p3'
+local p4 = piece 'p4'
 
 include "constants.lua"
 
@@ -114,7 +114,7 @@ function script.Create()
 		Sleep(1000)
 	end
 	StartThread(RestoreAfterDelay)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -188,7 +188,7 @@ function script.Killed(recentDamage, maxHealth)
 
 		Explode(barrel, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(b1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-		Explode(sleeve, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)		
+		Explode(sleeve, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		return 2
 	end
 end

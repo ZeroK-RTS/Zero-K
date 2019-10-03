@@ -21,11 +21,11 @@ function script.Create()
 	
 	GG.FakeUpright.FakeUprightInit(xp, zp, drop)
 	Turn(Lwing, z_axis, math.rad(90))
-	Turn(Rwing, z_axis, math.rad(-90))	
+	Turn(Rwing, z_axis, math.rad(-90))
 	Turn(LwingTip, z_axis, math.rad(-165))
 	Turn(RwingTip, z_axis, math.rad(165))
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Activate()
@@ -115,13 +115,13 @@ function script.QueryWeapon()
 	return drop
 end
 
-function script.AimFromWeapon() 
-	return drop 
+function script.AimFromWeapon()
+	return drop
 end
 
 function script.AimWeapon(heading, pitch)
-	if (GetUnitValue(GG.Script.CRASHING) == 1) then 
-		return false 
+	if (GetUnitValue(GG.Script.CRASHING) == 1) then
+		return false
 	end
 	return true
 end

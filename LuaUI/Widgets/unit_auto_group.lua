@@ -117,8 +117,8 @@ options = {
 	cleargroups = {
 		name = 'Clear All Auto Groups',
 		type = 'button',
-		OnChange = function() 
-			unit2group = {} 
+		OnChange = function()
+			unit2group = {}
 			Spring.Echo('game_message: Cleared Autogroups.')
 		end,
 		path = hotkeyPath,
@@ -139,7 +139,7 @@ for i = 0, 9 do
 	--options["autogroup_" .. i] = {
 	--	name = 'Autogroup ' .. i,
 	--	type = 'button',
-	--	OnChange = function() 
+	--	OnChange = function()
 	--		DoAutogroupAction(i)
 	--	end,
 	--	path = hotkeyPath,
@@ -215,7 +215,7 @@ function widget:PlayerChanged(playerID)
 	-- but the player is transferred before his units so reassignation happens in UnitGiven
 end
 
-function widget:Initialize() 
+function widget:Initialize()
 	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 	if spec then
 		widgetHandler:RemoveWidget()
@@ -255,19 +255,19 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 			if gr ~= nil then
 				SetUnitGroup(unitID, gr)
 			end
-		else 
+		else
 			finiGroup[unitID] = 1
 		end
 	end
 end
 
-function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
+function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if (unitTeam == myTeam) then
 		createdFrame[unitID] = GetGameFrame()
 	end
 end
 
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam) 
+function widget:UnitFromFactory(unitID, unitDefID, unitTeam)
 	if (unitTeam == myTeam) then
 		if options.immediate.value or groupableBuildings[unitDefID] then
 			createdFrame[unitID] = GetGameFrame()
@@ -353,7 +353,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 					--Echo('<AUTOGROUP> : Add unit ' .. unitID .. 'to group ' .. gr)
 					if (gr==nil) then
 						SetUnitGroup(unitID, -1)
-					else 
+					else
 						SetUnitGroup(unitID, gr)
 					end
 				end
@@ -392,13 +392,13 @@ function widget:KeyPress(key, modifier, isRepeat)
 	elseif (modifier.ctrl and not modifier.meta) then
 		if (key == removeAutogroupKey) then
 			local mx,my = GetMouseState()
-			local _,pos = TraceScreenRay(mx,my,true)     
+			local _,pos = TraceScreenRay(mx,my,true)
 			local mindist = math.huge
 			local muid = nil
 			if (pos == nil) then
 				return
 			end
-			for _, uid in ipairs(GetSelectedUnits()) do  
+			for _, uid in ipairs(GetSelectedUnits()) do
 				local x,_,z = GetUnitPosition(uid)
 				dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
 				if (dist < mindist) then
@@ -413,7 +413,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		end
 		 --[[
 		if (key == KEYSYMS.Q) then
-			for _, uid in ipairs(GetSelectedUnits()) do  
+			for _, uid in ipairs(GetSelectedUnits()) do
 				SetUnitGroup(uid,-1)
 			end
 		end
@@ -424,9 +424,9 @@ end
 
 function widget:GetConfigData()
 	local groups = {}
-	for id, gr in pairs(unit2group) do 
+	for id, gr in pairs(unit2group) do
 		table.insert(groups, {UnitDefs[id].name, gr})
-		end 
+		end
 		local ret ={
 			version = versionNum,
 			groups  = groups,

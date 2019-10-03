@@ -1,4 +1,4 @@
--- This is very much wip. There are lots of parts broken, so be warned. 
+-- This is very much wip. There are lots of parts broken, so be warned.
 --by Chris Mackey
 
 include "constants.lua"
@@ -73,14 +73,14 @@ function script.Create()
 	Turn(ex_2, x_axis, math.rad(170))
 	Turn(ex_3, x_axis, math.rad(170))
 	Turn(axle, x_axis, math.rad(-30))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function Walk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 	
-	while (true) do -- needs major fixing. 
+	while (true) do -- needs major fixing.
 		Move(base, y_axis, 3.6, 12)
 		
 		Turn(l_thigh, x_axis, 0.6, 4)
@@ -160,7 +160,7 @@ function script.AimFromWeapon1() return pod end
 function script.AimWeapon1(heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
-	pitch = math.max(pitch, math.rad(20))	-- results in a minimum pod angle of 20° above horizontal
+	pitch = math.max(pitch, math.rad(20))	-- results in a minimum pod angle of 20Â° above horizontal
 	Turn(head, y_axis, heading, 6)
 	Turn(pod, x_axis, -pitch, 6)
 	Move(podpist, y_axis, pitch*2.5, 3)

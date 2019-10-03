@@ -10,7 +10,7 @@ function widget:GetInfo()
 		author    = "Evil4Zerggin",
 		date      = "26 September 2008",
 		license   = "GNU LGPL, v2.1 or later",
-		layer     = 1, 
+		layer     = 1,
 		enabled   = true  --  loaded by default?
 	}
 end
@@ -34,9 +34,9 @@ local pointSizeMult        = 2048
 local aoeDefInfo = {}
 local dgunInfo = {}
 
-local unitAoeDefs = {} 
+local unitAoeDefs = {}
 local unitDgunDefs = {}
-local unitHasBeenSetup = {} 
+local unitHasBeenSetup = {}
 
 local aoeUnitInfo
 local dgunUnitInfo
@@ -56,7 +56,7 @@ local GetActiveCommand       = Spring.GetActiveCommand
 local GetCameraPosition      = Spring.GetCameraPosition
 local GetFeaturePosition     = Spring.GetFeaturePosition
 local GetGroundHeight        = Spring.GetGroundHeight
-local GetMouseState          = Spring.GetMouseState 
+local GetMouseState          = Spring.GetMouseState
 local GetSelectedUnitsSorted = Spring.GetSelectedUnitsSorted
 local GetUnitPosition        = Spring.GetUnitPosition
 local GetUnitRadius          = Spring.GetUnitRadius
@@ -109,10 +109,10 @@ end
 
 local function Normalize(x, y, z)
 	local mag = sqrt(x*x + y*y + z*z)
-	if (mag == 0) then 
-		return 
+	if (mag == 0) then
+		return
 	nil
-	else 
+	else
 		return x/mag, y/mag, z/mag, mag
 	end
 end
@@ -146,8 +146,8 @@ end
 local function GetMouseDistance()
 	local cx, cy, cz = GetCameraPosition()
 	local mx, my, mz = GetMouseTargetPosition()
-	if (not mx) then 
-		return nil 
+	if (not mx) then
+		return nil
 	end
 	local dx = cx - mx
 	local dy = cy - my
@@ -256,8 +256,8 @@ local function getWeaponInfo(weaponDef, unitDef)
 end
 
 local function SetupUnit(unitDef, unitID)
-	if (not unitDef.weapons) then 
-		return 
+	if (not unitDef.weapons) then
+		return
 	end
 
 	local weapon1, weapon2, manualfireWeapon, rangeMult
@@ -300,7 +300,7 @@ local function SetupUnit(unitDef, unitID)
 							retDgunInfo.range = retDgunInfo.range * rangeMult
 						end
 					end
-				elseif (not weaponDef.isShield 
+				elseif (not weaponDef.isShield
 						and not ToBool(weaponDef.interceptor) and not ToBool(weaponDef.customParams.hidden)
 						and (aoe > maxSpread or weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle) > maxSpread )) then
 					maxSpread = max(aoe, weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle))
@@ -310,7 +310,7 @@ local function SetupUnit(unitDef, unitID)
 		end
 	end
 
-	if (maxWeaponDef) then 
+	if (maxWeaponDef) then
 		retAoeInfo = getWeaponInfo(maxWeaponDef, unitDef)
 		if maxWeaponDef.customParams.gui_draw_range then
 			retAoeInfo.range = tonumber(maxWeaponDef.customParams.gui_draw_range)
@@ -358,7 +358,7 @@ local function UpdateSelection()
 				unitHasBeenSetup[unitID] = true
 			end
 			
-			if (dgunInfo[unitDefID]) then 
+			if (dgunInfo[unitDefID]) then
 				dgunUnitInfo = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
 				dgunUnitID = unitID
 			end
@@ -416,8 +416,8 @@ local function DrawNoExplode(aoe, fx, fy, fz, tx, ty, tz, range)
 
 	local bx, by, bz, dist = Normalize(dx, dy, dz)
 
-	if (not bx or dist > range) then 
-		return 
+	if (not bx or dist > range) then
+		return
 	end
 
 	local br = sqrt(bx*bx + bz*bz)
@@ -447,8 +447,8 @@ end
 local function GetBallisticVector(v, mg, dx, dy, dz, trajectory, range)
 	local dr_sq = dx*dx + dz*dz
 	local dr = sqrt(dr_sq)
-	if (dr > range) then 
-		return nil 
+	if (dr > range) then
+		return nil
 	end
 
 	local d_sq = dr_sq + dy*dy
@@ -458,22 +458,22 @@ local function GetBallisticVector(v, mg, dx, dy, dz, trajectory, range)
 	end
 
 	local root1 = v*v*v*v - 2*v*v*mg*dy - mg*mg*dr_sq
-	if (root1 < 0) then 
-		return nil 
+	if (root1 < 0) then
+		return nil
 	end
 
 	local root2 = 2*dr_sq*d_sq*(v*v - mg*dy - trajectory*sqrt(root1))
 
-	if (root2 < 0) then 
-		return nil 
+	if (root2 < 0) then
+		return nil
 	end
 
 	local vr = sqrt(root2)/(2*d_sq)
 	local vy
 
-	if (r == 0 or vr == 0) then 
+	if (r == 0 or vr == 0) then
 		vy = v
-	else 
+	else
 		vy = vr*dy/dr + dr*mg/(2*vr)
 	end
 
@@ -516,14 +516,14 @@ end
 --v: weaponvelocity
 --trajectory: +1 for high, -1 for low
 local function DrawBallisticScatter(scatter, v, mygravity ,fx, fy, fz, tx, ty, tz, trajectory, range)
-	if (scatter == 0) then 
-		return 
+	if (scatter == 0) then
+		return
 	end
 	local dx = tx - fx
 	local dy = ty - fy
 	local dz = tz - fz
-	if (dx == 0 and dz == 0) then 
-		return 
+	if (dx == 0 and dz == 0) then
+		return
 	end
 
 	local mg = mygravity or g
@@ -531,8 +531,8 @@ local function DrawBallisticScatter(scatter, v, mygravity ,fx, fy, fz, tx, ty, t
 	local bx, by, bz = GetBallisticVector(v, mg, dx, dy, dz, trajectory, range)
 
 	--don't draw anything if out of range
-	if (not bx) then 
-		return 
+	if (not bx) then
+		return
 	end
 
 	local br = sqrt(bx*bx + bz*bz)
@@ -620,8 +620,8 @@ local function DrawDirectScatter(scatter, fx, fy, fz, tx, ty, tz, range, unitRad
 
 	local bx, by, bz, d = Normalize(dx, dy, dz)
 
-	if (not bx or d == 0 or d > range) then 
-		return 
+	if (not bx or d == 0 or d > range) then
+		return
 	end
 
 	local ux = bx * unitRadius / sqrt(1 - by*by)
@@ -651,8 +651,8 @@ local function DrawDroppedScatter(aoe, ee, scatter, v, fx, fy, fz, tx, ty, tz, s
 
 	local bx, _, bz = Normalize(dx, 0, dz)
 
-	if (not bx) then 
-		return 
+	if (not bx) then
+		return
 	end
 
 	local vertices = {}
@@ -704,8 +704,8 @@ function widget:DrawWorld()
 	mouseDistance = GetMouseDistance() or 1000
 
 	local tx, ty, tz = GetMouseTargetPosition()
-	if (not tx) then 
-		return 
+	if (not tx) then
+		return
 	end
 	local _, cmd, _ = GetActiveCommand()
 	local info, unitID
@@ -720,7 +720,7 @@ function widget:DrawWorld()
 		end
 	end
 
-	if (cmd == CMD_ATTACK and aoeUnitInfo) then 
+	if (cmd == CMD_ATTACK and aoeUnitInfo) then
 		info = aoeUnitInfo
 		unitID = aoeUnitID
 	elseif (cmd == CMD_MANUALFIRE and dgunUnitInfo) then
@@ -739,15 +739,15 @@ function widget:DrawWorld()
 
 	local _,_,_,fx, fy, fz = GetUnitPosition(unitID, true)
 
-	if (not fx) then 
+	if (not fx) then
 		return
 	end
-	if (not info.mobile) then 
-		fy = fy + GetUnitRadius(unitID) 
+	if (not info.mobile) then
+		fy = fy + GetUnitRadius(unitID)
 	end
 
-	if (not info.waterWeapon) then 
-		ty = max(0, ty) 
+	if (not info.waterWeapon) then
+		ty = max(0, ty)
 	end
 
 	local weaponType = info.type

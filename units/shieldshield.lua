@@ -21,9 +21,9 @@ unitDef = {
     
     morphto = [[staticshield]],
     morphtime = 30,
-	
-	priority_misc = 1, -- Medium
-	unarmed       = true,
+    
+    priority_misc = 1, -- Medium
+    unarmed       = true,
   },
 
   explodeAs              = [[BIG_UNITEX]],

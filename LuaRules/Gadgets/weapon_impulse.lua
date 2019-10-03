@@ -7,20 +7,20 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:GetInfo()
-  return {
-    name      = "Weapon Impulse",
-    desc      = "Implements impulse reliant weapons because engine implementation is pretty much broken.",
-    author    = "Google Frog",
-    date      = "1 April 2012",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "Weapon Impulse",
+		desc      = "Implements impulse reliant weapons because engine implementation is pretty much broken.",
+		author    = "Google Frog",
+		date      = "1 April 2012",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true  --  loaded by default?
+	}
 end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-include("LuaRules/Configs/customcmds.h.lua")
+VFS.Include("LuaRules/Configs/customcmds.h.lua", nil, VFS.GAME)
 
 local GRAVITY = Game.gravity
 local GRAVITY_BASELINE = 120
@@ -62,17 +62,6 @@ local impulseMult = {
 	[2] = 0.0036, -- other
 }
 
-local pushPullCmdDesc = {
-	id      = CMD_PUSH_PULL,
-	type    = CMDTYPE.ICON_MODE,
-	name    = 'Push / Pull',
-	action  = 'pushpull',
-	tooltip = 'Toggles whether gravity weapons push or pull',
-	params  = {0, 'Push','Pull'}
-}
-
-local pushPullState = {}
-
 local impulseWeaponID = {}
 for i, wd in pairs(WeaponDefs) do
 	if wd.customParams and wd.customParams.impulse then
@@ -91,18 +80,11 @@ end
 
 local moveTypeByID = {}
 local mass = {}
-local impulseUnitDefID = {}
 
 for i=1,#UnitDefs do
 	local ud = UnitDefs[i]
 	mass[i] = ud.mass
 	moveTypeByID[i] = getMovetype(ud)
-
-	for _, w in pairs(ud.weapons) do
-		if impulseWeaponID[w.weaponDef] then
-			impulseUnitDefID[i] = true
-		end
-	end
 end
 
 -------------------------------------------------------------------------------------
@@ -186,6 +168,9 @@ local function AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, uni
 	
 	if doLosCheck and moveType == 2 then -- Only los check for land/sea units.
 		GG.AddSphericalLOSCheck(unitID, unitDefID)
+	end
+	if moveType == 1 then
+		GG.AddOscillateCheck(unitID, unitDefID)
 	end
 	thereIsStuffToDo = true
 end
@@ -303,55 +288,6 @@ local function CheckSpaceGunships(f)
 end
 --]]
 
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Command Handling
-
-local function PushPullToggleCommand(unitID, unitDefID, state)
-	if not impulseUnitDefID[unitDefID] then
-		return
-	end
-	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PUSH_PULL)
-	if not cmdDescID then
-		return
-	end
-	
-	if state then
-		if state ~= pushPullState[unitID] then
-			pushPullState[unitID] = state
-			pushPullCmdDesc.params[1] = state
-			spEditUnitCmdDesc(unitID, cmdDescID, {params = pushPullCmdDesc.params})
-		end
-	else
-		state = pushPullState[unitID]
-	end
-	
-	if state then
-		GG.DelegateOrder(unitID, CMD_ONOFF, {state, CMD_PUSH_PULL}, 0)
-	end
-end
-
-function gadget:AllowCommand_GetWantedCommand()
-	return {[CMD_PUSH_PULL] = true, [CMD_ONOFF] = true}
-end
-
-function gadget:AllowCommand_GetWantedUnitDefID()
-	return impulseUnitDefID
-end
-
-function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID == CMD_ONOFF) then
-		return cmdParams[2] == CMD_PUSH_PULL -- we block any on/off that we didn't call ourselves
-	end
-	if (cmdID ~= CMD_PUSH_PULL) then
-		return true  -- command was not used
-	end
-	PushPullToggleCommand(unitID, unitDefID, cmdParams[1])
-	return false  -- command was used
-end
-
-
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Unit Handling
@@ -370,36 +306,11 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	inTransport[unitID] = nil
-	if impulseUnitDefID[unitDefID] then
-		pushPullState[unitID] = nil
-	end
-end
-
-function gadget:UnitFinished(unitID, unitDefID, teamID)
-	if not impulseUnitDefID[unitDefID] then
-		return
-	end
-	PushPullToggleCommand(unitID, unitDefID)
-end
-
-function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if not impulseUnitDefID[unitDefID] then
-		return
-	end
-
-	spInsertUnitCmdDesc(unitID, pushPullCmdDesc)
-	PushPullToggleCommand(unitID, unitDefID, 1)
-	local onoffDescID = spFindUnitCmdDesc(unitID, CMD_ONOFF)
-	spRemoveUnitCmdDesc(unitID, onoffDescID)
 end
 
 function gadget:Initialize()
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = spGetUnitDefID(unitID)
-		local teamID = spGetUnitTeam(unitID)
-		gadget:UnitCreated(unitID, unitDefID, teamID)
-
 		local transporting = Spring.GetUnitIsTransporting(unitID)
 		if transporting then
 			for i = 1, #transporting do

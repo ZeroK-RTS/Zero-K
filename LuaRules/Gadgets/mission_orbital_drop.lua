@@ -34,14 +34,14 @@ local defBrakeHeight = 500 --height above groundlevel,is customizable (in elmo)
 
 ----------------------------------------------------------------------------------
 ----- Auto-Configure --------------------------------------------------------------
---NOTE: might look convoluted but it work. 
+--NOTE: might look convoluted but it work.
 --To call for unit drop simply do "GG.DropUnit(unitDefName|unitDefID, x, y, z, facing, teamID,[useSetUnitVelocity,[timeToGround, [fallGravity,[absSpawnHeight,[absBrakeHeight]]]]])"
 --For safety, please don't use 0 as timeToGround.
 --Use "useSetUnitVelocity=true" when MoveCtrl usage cause problem (MoveCtrl is prefered by this gadget).
 --TODO: remove safety, make unit crash and explode like asteroid as a feature.
 
-local units = {}	-- the only thing that needs saving
-local cachedResult = {}	-- caches the falling behaviour based on time to ground, fall gravity, unit spawn height and unit brake height
+local units = {} -- the only thing that needs saving
+local cachedResult = {} -- caches the falling behaviour based on time to ground, fall gravity, unit spawn height and unit brake height
 
 _G.units = units
 
@@ -94,8 +94,8 @@ end
 
 function GG.DropUnit(unitDefName, x, y, z, facing, teamID, useSetUnitVelocity, timeToGround, fallGravity, absSpawnHeight, absBrakeHeight, dyncommID, staticDyncommLevel, dynamicCommanderOnly)
   local gy = Spring.GetGroundHeight(x, z)
-  if y < gy then 
-    y = gy 
+  if y < gy then
+    y = gy
   end
   local unitID = (dyncommID and GG.Upgrades_CreateStarterDyncomm and GG.Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID, staticDyncommLevel))
   if (not unitID) and (not dynamicCommanderOnly) then
@@ -107,7 +107,7 @@ function GG.DropUnit(unitDefName, x, y, z, facing, teamID, useSetUnitVelocity, t
   end
   if type(unitDefName)=='number' then --incase other gadget use unitDefID, then convert to unitDefNames
     unitDefName = UnitDefs[unitDefName].name
-  end  
+  end
   if StartsWith(unitDefName, "chicken") then -- don't drop chickens, make them appear in a cloud of dirt instead
     Spring.SpawnCEG("dirt3", x, y, z)
     return unitID
@@ -135,6 +135,7 @@ function GG.DropUnit(unitDefName, x, y, z, facing, teamID, useSetUnitVelocity, t
 		Spring.MoveCtrl.SetGravity(unitID,0)
 	end
 	units[unitID] = {2,absBrakeHeight+gy,heading,useSetUnitVelocity,speedProfile} --store speed profile index, store braking height , store heading , store speed profile
+	gadgetHandler:UpdateCallIn("GameFrame")
 
 	Spring.SetUnitRulesParam(unitID, "orbitalDrop", 1, LOS_ACCESS)
 
@@ -153,6 +154,11 @@ end
 
 
 function gadget:GameFrame(frame)
+  if not next(units) then
+    gadgetHandler:RemoveCallIn("GameFrame")
+    return
+  end
+
   for unitID, controlValue in pairs(units) do
     if Spring.ValidUnitID(unitID) then
       local x, y, z = Spring.GetUnitPosition(unitID)
@@ -164,14 +170,14 @@ function gadget:GameFrame(frame)
 	  local useSetUnitVelocity = controlValue[4] --is using MoveCtrl?
 	  local speedProfile =  controlValue[5]
 	  if speedProfile[index+4] then --if next 4 index have content
-		units[unitID][1] = controlValue[1] +1 -- ++index 
+		units[unitID][1] = controlValue[1] +1 -- ++index
 	  end
 	  if useSetUnitVelocity then
-	    Spring.SetUnitVelocity(unitID,0,0,0) --Note: adding zero speed first & then desired speed later will make unit obey speed more accurately! 
+	    Spring.SetUnitVelocity(unitID,0,0,0) --Note: adding zero speed first & then desired speed later will make unit obey speed more accurately!
 		Spring.SetUnitVelocity(unitID,0,speedProfile[index],0)
 		Spring.SetUnitRotation(unitID,0,heading,0)
 	  else
-	    Spring.MoveCtrl.SetVelocity(unitID,0,0,0) --Note: adding zero speed first & then desired speed later will make unit obey speed more accurately! 
+	    Spring.MoveCtrl.SetVelocity(unitID,0,0,0) --Note: adding zero speed first & then desired speed later will make unit obey speed more accurately!
 		Spring.MoveCtrl.SetVelocity(unitID,0,speedProfile[index],0)
 	  end
       
@@ -250,6 +256,12 @@ function gadget:Load(zip)
 	end
 	units = loadedUnits
 	_G.units = units
+
+	if next(units) then
+		gadgetHandler:UpdateCallIn("GameFrame")
+	else
+		gadgetHandler:RemoveCallIn("GameFrame")
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -293,14 +305,14 @@ finalVel = -fallDist/fallPeriod + fallAcc*fallPeriod/2
 --Case 3: brake phase deacceleration
 0 = finalVel + brakeAcc* brakePeriod --inserted case 2 here
 0 = -fallDist/fallPeriod + fallAcc*fallPeriod/2 + brakeAcc* brakePeriod
-- brakeAcc* brakePeriod = -fallDist/fallPeriod + fallAcc*fallPeriod/2 
+- brakeAcc* brakePeriod = -fallDist/fallPeriod + fallAcc*fallPeriod/2
 -brakeAcc = (-fallDist/fallPeriod + fallAcc*fallPeriod/2)/brakePeriod
 brakeAcc = (fallDist/fallPeriod - fallAcc*fallPeriod/2)/brakePeriod
 
 --Case 4: braking period
 -brakeDist = finalVel*brakePeriod + brakeAcc*(brakePeriod^2)/2 --inserted case 3 and case 2 here
 -brakeDist = (-fallDist/fallPeriod + fallAcc*fallPeriod/2)*brakePeriod + ((fallDist/fallPeriod - fallAcc*fallPeriod/2)/brakePeriod)(brakePeriod^2)/2
--brakeDist = (-fallDist/fallPeriod + fallAcc*fallPeriod/2)*brakePeriod + (fallDist/fallPeriod - fallAcc*fallPeriod/2)*brakePeriod/2 
+-brakeDist = (-fallDist/fallPeriod + fallAcc*fallPeriod/2)*brakePeriod + (fallDist/fallPeriod - fallAcc*fallPeriod/2)*brakePeriod/2
 -brakeDist = (-fallDist/fallPeriod + fallAcc*fallPeriod/2)*brakePeriod - (-fallDist/fallPeriod + fallAcc*fallPeriod/2)*brakePeriod/2
 -brakeDist = (-fallDist/fallPeriod + fallAcc*fallPeriod/2)*brakePeriod*(1-1/2)
 -brakeDist = (-fallDist/fallPeriod + fallAcc*fallPeriod/2)*brakePeriod*(1/2)

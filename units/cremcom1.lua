@@ -24,13 +24,13 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	level = [[1]],
-	statsname = [[dynknight1]],
-	soundok = [[heavy_bot_move]],
-	soundselect = [[bot_select]],
-	soundbuild = [[builder_start]],
-	--lups_unit_fxs = { "commandShieldBlue" },
-	commtype = [[6]],
+    level = [[1]],
+    statsname = [[dynknight1]],
+    soundok = [[heavy_bot_move]],
+    soundselect = [[bot_select]],
+    soundbuild = [[builder_start]],
+    --lups_unit_fxs = { "commandShieldBlue" },
+    commtype = [[6]],
   },
 
   energyMake             = 6,
@@ -51,7 +51,7 @@ unitDef = {
   metalMake              = 4,
   metalStorage           = 500,
   minCloakDistance       = 75,
-  modelCenterOffset		 = [[0 1 0]],
+  modelCenterOffset      = [[0 1 0]],
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[cremcom.s3o]],
@@ -61,8 +61,8 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-    	[[custom:BEAMWEAPON_MUZZLE_BLUE]],
-		[[custom:NONE]],
+        [[custom:BEAMWEAPON_MUZZLE_BLUE]],
+        [[custom:NONE]],
     },
 
   },
@@ -108,6 +108,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams            = {
+        bogus = 1,
+      },
+
       damage                  = {
         default = 0,
         subs    = 0,
@@ -126,7 +130,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 300,
-      reloadtime              = 0.11,
+      reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/laser_burn5]],
       soundTrigger            = true,
@@ -155,7 +159,7 @@ unitDef = {
         subs    = 8.25,
       },
 
-      duration                = 0.11,
+      duration                = 0.1,
       edgeEffectiveness       = 0.99,
       explosionGenerator      = [[custom:flash1blue]],
       fireStarter             = 70,
@@ -168,7 +172,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 300,
-      reloadtime              = 0.11,
+      reloadtime              = 0.1,
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/pulse_laser3]],
       soundTrigger            = true,

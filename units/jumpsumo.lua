@@ -126,12 +126,16 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams            = {
+        bogus = 1,
+      },
+
       damage                  = {
         default = 0,
         subs    = 0,
       },
 
-      duration                = 0.11,
+      duration                = 0.1,
       edgeEffectiveness       = 0.99,
       explosionGenerator      = [[custom:flash1green]],
       fireStarter             = 70,
@@ -145,7 +149,7 @@ unitDef = {
       noSelfDamage            = true,
       proximityPriority       = 10,
       range                   = 440,
-      reloadtime              = 0.11,
+      reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/laser_burn5]],
       soundTrigger            = true,
@@ -165,7 +169,7 @@ unitDef = {
       areaOfEffect            = 8,
       avoidFriendly           = false,
       burst                   = 6,
-      burstrate               = 0.01,
+      burstrate               = 0.033,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
@@ -210,7 +214,7 @@ unitDef = {
       areaOfEffect            = 8,
       avoidFriendly           = false,
       burst                   = 6,
-      burstrate               = 0.01,
+      burstrate               = 0.033,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,

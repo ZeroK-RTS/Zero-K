@@ -46,8 +46,8 @@ local function RestoreTilt(signal)
 		Signal(SIG_TILT)
 	end
 	Turn(Base, x_axis, math.rad(0), math.rad(45))
-	Move(Spine1, y_axis, 0, 1) 
-	Move(Spine2, y_axis, 0, 1) 
+	Move(Spine1, y_axis, 0, 1)
+	Move(Spine2, y_axis, 0, 1)
 	
 	Turn(ForejetLeft, z_axis, 0, math.rad(60))
 	Turn(ForejetRight, z_axis, 0, math.rad(60))
@@ -65,8 +65,8 @@ local function TiltBody()
 				speed = 3.1
 			end
 			Turn(Base, x_axis, math.rad(7) * speed, math.rad(45))
-			Move(Spine1, y_axis, 0.3*speed, 1) 
-			Move(Spine2, y_axis, -0.3*speed, 1) 
+			Move(Spine1, y_axis, 0.3*speed, 1)
+			Move(Spine2, y_axis, -0.3*speed, 1)
 			
 			Turn(ForejetLeft, z_axis, -math.rad(2) * speed, math.rad(60))
 			Turn(ForejetRight, z_axis, -math.rad(2) * speed, math.rad(60))
@@ -144,7 +144,7 @@ local function StopLanded()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 0)
 	-- Permanent changes

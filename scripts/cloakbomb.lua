@@ -1,20 +1,20 @@
-local base = piece 'base' 
-local head = piece 'head' 
-local rupleg1 = piece 'rupleg1' 
-local rupleg2 = piece 'rupleg2' 
-local rupleg3 = piece 'rupleg3' 
-local lupleg1 = piece 'lupleg1' 
-local lupleg2 = piece 'lupleg2' 
-local lupleg3 = piece 'lupleg3' 
-local lleg3 = piece 'lleg3' 
-local lleg2 = piece 'lleg2' 
-local lleg1 = piece 'lleg1' 
-local rleg3 = piece 'rleg3' 
-local rleg2 = piece 'rleg2' 
-local rleg1 = piece 'rleg1' 
-local nano1 = piece 'nano1' 
-local nano2 = piece 'nano2' 
-local digger = piece 'digger' 
+local base = piece 'base'
+local head = piece 'head'
+local rupleg1 = piece 'rupleg1'
+local rupleg2 = piece 'rupleg2'
+local rupleg3 = piece 'rupleg3'
+local lupleg1 = piece 'lupleg1'
+local lupleg2 = piece 'lupleg2'
+local lupleg3 = piece 'lupleg3'
+local lleg3 = piece 'lleg3'
+local lleg2 = piece 'lleg2'
+local lleg1 = piece 'lleg1'
+local rleg3 = piece 'rleg3'
+local rleg2 = piece 'rleg2'
+local rleg1 = piece 'rleg1'
+local nano1 = piece 'nano1'
+local nano2 = piece 'nano2'
+local digger = piece 'digger'
 --linear constant 65536
 
 include "constants.lua"
@@ -233,7 +233,7 @@ function Detonate() -- Giving an order causes recursion.
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true)
 	if not Spring.GetUnitIsStunned(unitID) then
 		Burrow()

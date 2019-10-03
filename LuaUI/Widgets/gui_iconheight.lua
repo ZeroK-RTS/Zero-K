@@ -19,27 +19,27 @@ end
 This widget changes the icon-vs-unit drawing behavior such that either
 ALL units are drawn as icons or ALL units are drawn as units.
 
-The primary purpose is to allow for zooming in close and level to 
-watch a battle from a ground perspective, while having ALL the units 
-visible as units, even those far off in the distance behind the 
-battle in front of you. This may be desired for casts or video 
-recording, or simply because you think it looks better. 
+The primary purpose is to allow for zooming in close and level to
+watch a battle from a ground perspective, while having ALL the units
+visible as units, even those far off in the distance behind the
+battle in front of you. This may be desired for casts or video
+recording, or simply because you think it looks better.
 
-At the same time, one doesn't want to lose the ability to zoom out 
-and see units as icons. You could deal with this by adjusting the 
-Icon Distance, but that requires manual intervention (even if bound 
+At the same time, one doesn't want to lose the ability to zoom out
+and see units as icons. You could deal with this by adjusting the
+Icon Distance, but that requires manual intervention (even if bound
 to a hotkey).
 
-Accordingly, this widget will dynamically change the Icon Distance 
-based on the current camera height. When you are low to the ground, 
-the Icon Distance is set very high, so that all units will be seen 
-as units no matter how far away they are. Conversely, when you are 
-high above the ground, the Icon Distance is set to zero, so that all 
-units appear as icons no matter how close they are. What constitutes 
+Accordingly, this widget will dynamically change the Icon Distance
+based on the current camera height. When you are low to the ground,
+the Icon Distance is set very high, so that all units will be seen
+as units no matter how far away they are. Conversely, when you are
+high above the ground, the Icon Distance is set to zero, so that all
+units appear as icons no matter how close they are. What constitutes
 "low to the ground" is settable by a configuration slider.
 
-Note that this could cause your PC to unexpectedly attempt to render 
-lots of units in high detail. Be warned that your performance could 
+Note that this could cause your PC to unexpectedly attempt to render
+lots of units in high detail. Be warned that your performance could
 suffer if your PC is not up to the task.
 
 ----
@@ -48,16 +48,16 @@ In addition, since you may at some point decide that you want to see
 icons even below your chosen threshold altitude, or see units above it,
 you can manually override the dynamic Icon Distance using a hotkey.
 
-When you press the hotkey, if you are currently seeing icons you 
-will then see only units, no matter what your camera height is. 
-Conversely, if you are currently seeing units you will then see only 
-icons. Dynamic changing will be turned off. You can switch back and 
-forth between units and icons any time, as often as you like, using 
+When you press the hotkey, if you are currently seeing icons you
+will then see only units, no matter what your camera height is.
+Conversely, if you are currently seeing units you will then see only
+icons. Dynamic changing will be turned off. You can switch back and
+forth between units and icons any time, as often as you like, using
 the hotkey as a toggle.
 
-If you double-press the hotkey (like double-clicking the mouse 
-button, i.e. twice in rapid succession) then you will reactivate 
-Dynamic mode, and you will once again see icons when up high and 
+If you double-press the hotkey (like double-clicking the mouse
+button, i.e. twice in rapid succession) then you will reactivate
+Dynamic mode, and you will once again see icons when up high and
 units when down low.
 
 ----
@@ -101,7 +101,7 @@ local GotHotkeypress = function() end
 
 options_path = 'Settings/Graphics/Unit Visibility'
 
-options_order = { 
+options_order = {
 	'lblIconHeight',
 	'iconheight',
 	'iconmodehotkey',

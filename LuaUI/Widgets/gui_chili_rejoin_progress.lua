@@ -147,7 +147,7 @@ function widget:Initialize()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		minWidth = MIN_WIDTH, 
+		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
 		padding = {0, 0, 0, 0},
 		savespace = true, --probably could save space?

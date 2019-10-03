@@ -73,8 +73,10 @@ local GL_FRONT_AND_BACK = GL.FRONT_AND_BACK
 local GL_FILL           = GL.FILL
 local GL_GREATER         = GL.GREATER
 
+local abs   = math.abs
 local floor = math.floor
-local min, max = math.min, math.max
+local max   = math.max
+local min   = math.min
 local strFind = string.find
 local strFormat = string.format
 
@@ -185,6 +187,9 @@ WG.mouseoverMexIncome = 0
 
 local spotByID = {}
 local spotData = {}
+local spotHeights = {}
+
+local wantDrawListUpdate = false
 
 local wasSpectating = spGetSpectatingState()
 local metalSpotsNil = true
@@ -505,16 +510,40 @@ local function CheckEnemyMexes(spotID)
 	end
 
 	spotData[spotID] = nil
-	updateMexDrawList()
+	wantDrawListUpdate = true
+end
+
+local function CheckTerrainChange(spotID)
+	local spot = WG.metalSpots[spotID]
+	local x = spot.x
+	local z = spot.z
+
+	local y = max(0, spGetGroundHeight(x, z))
+
+	-- some leeway to avoid too much draw list recreation
+	-- since a lot of weapons have small but nonzero cratering
+	if abs(y - spotHeights[spotID]) > 1 then
+		spotHeights[spotID] = y
+		wantDrawListUpdate = true
+	end
+end
+
+local function CheckAllTerrainChanges()
+	for i = 1, #WG.metalSpots do
+		CheckEnemyMexes(i)
+		CheckTerrainChange(i)
+	end
 end
 
 function widget:GameFrame(n)
-	if not WG.metalSpots or (n % 30) ~= 0 then
+	if not WG.metalSpots or (n % 5) ~= 0 then
 		return
 	end
 
-	for i = 1, #WG.metalSpots do
-		CheckEnemyMexes(i)
+	CheckAllTerrainChanges()
+	if wantDrawListUpdate then
+		wantDrawListUpdate = false
+		updateMexDrawList()
 	end
 end
 
@@ -560,6 +589,14 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 end
 
 local function Initialize()
+	if WG.metalSpots then
+		Spring.Echo("Mex Placement Initialised with " .. #WG.metalSpots .. " spots.")
+		for i = 1, #WG.metalSpots do
+			spotHeights[i] = WG.metalSpots[i].y
+		end
+	else
+		Spring.Echo("Mex Placement Initialised with metal map mode.")
+	end
 
 	local units = spGetAllUnits()
 	for i, unitID in ipairs(units) do
@@ -567,12 +604,8 @@ local function Initialize()
 		local teamID = Spring.GetUnitTeam(unitID)
 		widget:UnitCreated(unitID, unitDefID, teamID)
 	end
-	if WG.metalSpots then
-		Spring.Echo("Mex Placement Initialised with " .. #WG.metalSpots .. " spots.")
-		updateMexDrawList()
-	else
-		Spring.Echo("Mex Placement Initialised with metal map mode.")
-	end
+
+	updateMexDrawList()
 
 	WG.GetClosestMetalSpot = GetClosestMetalSpot
 	if WG.LocalColor and WG.LocalColor.RegisterListener then
@@ -583,7 +616,25 @@ end
 local mexSpotToDraw = false
 local drawMexSpots = false
 
+function widget:Initialize()
+	if metalSpotsNil and WG.metalSpots ~= nil then
+		Initialize()
+		metalSpotsNil = false
+	end
+end
+
+local firstUpdate = true
 function widget:Update()
+	widget:Initialize()
+	
+	if firstUpdate then
+		if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
+			Initialize()
+			CheckAllTerrainChanges()
+		end
+		firstUpdate = false
+	end
+
 	local isSpectating = spGetSpectatingState()
 	if WG.metalSpots and (wasSpectating ~= isSpectating) then
 		spotByID = {}
@@ -597,10 +648,6 @@ function widget:Update()
 				widget:UnitCreated(unitID, unitDefID, teamID)
 			end
 		end
-	end
-	if metalSpotsNil and WG.metalSpots ~= nil then
-		Initialize()
-		metalSpotsNil = false
 	end
 
 	WG.mouseoverMexIncome = false
@@ -647,8 +694,7 @@ function calcMainMexDrawList()
 	for i = 1, #WG.metalSpots do
 		local spot = WG.metalSpots[i]
 		local x,z = spot.x, spot.z
-		local y = spGetGroundHeight(x,z)
-		if y < 0 then y = 0 end
+		local y = spotHeights[i]
 
 		local r, g, b = getSpotColor(i)
 		local width = (spot.metal > 0 and spot.metal) or 0.1
@@ -683,7 +729,6 @@ function calcMinimapMexDrawList()
 	for i = 1, #WG.metalSpots do
 		local spot = WG.metalSpots[i]
 		local x,z = spot.x, spot.z
-		local y = spGetGroundHeight(x,z)
 
 		local r,g,b = getSpotColor(i)
 		local width = (spot.metal > 0 and spot.metal) or 0.1
@@ -713,8 +758,7 @@ local function DrawIncomeLabels()
 	for i = 1, #WG.metalSpots do
 		local spot = WG.metalSpots[i]
 		local x,z = spot.x, spot.z
-		local y = spGetGroundHeight(x,z)
-		if y < 0 then y = 0 end
+		local y = spotHeights[i]
 
 		glPushMatrix()
 		glTranslate(x,y+5,z)
@@ -795,8 +839,8 @@ function widget:Shutdown()
 end
 
 local function DoLine(x1, y1, z1, x2, y2, z2)
-    gl.Vertex(x1, y1, z1)
-    gl.Vertex(x2, y2, z2)
+	gl.Vertex(x1, y1, z1)
+	gl.Vertex(x2, y2, z2)
 end
 
 function widget:DrawWorldPreUnit()

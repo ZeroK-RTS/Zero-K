@@ -68,7 +68,7 @@ return {
         expansionspeed     = 7,
         ttl                = 14,
       },
-    },    
+    },
 --	flashalt = {
 --	  air                = true,
 --	  class              = [[CBitmapMuzzleFlame]],

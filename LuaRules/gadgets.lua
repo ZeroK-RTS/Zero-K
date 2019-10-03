@@ -139,6 +139,10 @@ local callInLists = {
 	-- Misc Synced CallIns
 	"Explosion",
 
+	-- LUS callins
+	"ScriptFireWeapon",
+	"ScriptEndBurst",
+
 	-- LuaRules CallIns (note: the *PreDamaged calls belong here too)
 	"CommandFallback",
 	"AllowCommand",
@@ -351,6 +355,18 @@ function gadgetHandler:LoadGadget(filename)
   end
   if (err == false) then
     return nil -- gadget asked for a quiet death
+  end
+
+  -- raw access to gadgetHandler
+  if (gadget.GetInfo and gadget:GetInfo().script) then
+    gadget.scriptCallins = {
+      ScriptFireWeapon = function (_, unitID, unitDefID, weaponNum)
+        self:ScriptFireWeapon(unitID, unitDefID, weaponNum)
+      end,
+      ScriptEndBurst = function (_, unitID, unitDefID, weaponNum)
+        self:ScriptEndBurst(unitID, unitDefID, weaponNum)
+      end,
+    }
   end
 
   -- raw access to gadgetHandler
@@ -1126,6 +1142,18 @@ function gadgetHandler:SunChanged()
     g:SunChanged()
   end
   return
+end
+
+function gadgetHandler:ScriptFireWeapon(unitID, unitDefID, weaponNum)
+  for _,g in r_ipairs(self.ScriptFireWeaponList) do
+    g:ScriptFireWeapon(unitID, unitDefID, weaponNum)
+  end
+end
+
+function gadgetHandler:ScriptEndBurst(unitID, unitDefID, weaponNum)
+  for _,g in r_ipairs(self.ScriptEndBurstList) do
+    g:ScriptEndBurst(unitID, unitDefID, weaponNum)
+  end
 end
 
 function gadgetHandler:CommandFallback(unitID, unitDefID, unitTeam,

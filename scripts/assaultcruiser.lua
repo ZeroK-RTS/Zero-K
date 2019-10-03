@@ -33,8 +33,6 @@ local smokePiece = {lowerhull, radarbase, upperhull}
 
 local SIG_RESTORE = 1
 local SIG_MOVE = 2
-local SIG_Aim = 4
-
 local RESTORE_DELAY = 5000
 
 local TURRET_PITCH_SPEED = math.rad(90)
@@ -55,7 +53,7 @@ function script.Create()
 	Turn(turretPieces[4].turret, y_axis, math.rad(180))
 	Turn(turretPieces[5].turret, y_axis, math.rad(180))
 	Spin(radardish, y_axis, math.rad(100))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function RestoreAfterDelay()
@@ -96,7 +94,7 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(turretPieces[num].turret, y_axis, heading, TURRET_YAW_SPEED)
 	Turn(turretPieces[num].pivot, x_axis, -pitch, TURRET_PITCH_SPEED)
 	WaitForTurn(turretPieces[num].turret, y_axis)
-	WaitForTurn(turretPieces[num].pivot, x_axis)	
+	WaitForTurn(turretPieces[num].pivot, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
 end
@@ -108,7 +106,7 @@ function script.Shot(num)
 	local gun_num = gunStates[num]
 	local barrel = turretPieces[num].barrel[gun_num]
 	local flare = turretPieces[num].flare[gun_num]
-	local toEmit = (num <= 5) and 1024 or 1025 
+	local toEmit = (num <= 5) and 1024 or 1025
 	EmitSfx(flare, toEmit)
 	if (num <= 5) then
 		Move(barrel, z_axis, RECOIL_DISTANCE)
@@ -146,7 +144,7 @@ function script.Killed(recentDamage, maxHealth)
 		DeathAnim()
 		Explode(lowerhull, SFX.NONE)
 		Explode(upperhull, SFX.NONE)
-		return 1	
+		return 1
 	else
 		Explode(lowerhull, SFX.SHATTER)
 		Explode(upperhull, SFX.SHATTER)

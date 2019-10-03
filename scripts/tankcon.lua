@@ -45,7 +45,7 @@ local function RestoreAfterDelay()
 end
 
 function script.QueryWeapon(num)
-	return flares[current_flare]
+	return flares[3 - current_flare]
 end
 
 function script.AimFromWeapon(num)
@@ -71,10 +71,12 @@ function script.FireWeapon(num)
 	current_flare = 3 - current_flare
 end
 
+-- EndBurst doesn't seem to fix friendlyfire on units with high-RoF
+
 -- Misc
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	Spring.SetUnitNanoPieces(unitID, nanos)
 end
 

@@ -253,7 +253,7 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 	end
 	
 	local needsChanging = false
-	local bestRank, bestUnits 
+	local bestRank, bestUnits
 	for i = 1, #units do
 		local unitID = units[i]
 		local rank = unitID and selectionRank[unitID]
@@ -364,7 +364,7 @@ function widget:CommandsChanged()
 end
 
 function widget:CommandNotify(id, params, options)
-	if id ~= CMD_SELECTION_RANK then 
+	if id ~= CMD_SELECTION_RANK then
 		return false
 	end
 	local newRank = params[1]

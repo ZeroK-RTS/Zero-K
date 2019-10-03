@@ -45,20 +45,20 @@ local alwaysbait         = {["planeheavyfighter"] = {["turretaaclose"] = 1, ["tu
 local AAunittypes        = {["turretaaclose"] = 100, ["turretaaheavy"] = 300} -- what is valid for anti-bait behaviour
 -- number is the threshold of "points" above which a turret is considered escorted if it has at least that amount within half range
 local AAescort           = {  -- points of how much each AA unit is worth
-["turretmissile"] = 100, 
-["turretaafar"] = 350, 
-["turretaalaser"] = 250, 
-["turretaaflak"] = 350, 
+["turretmissile"] = 100,
+["turretaafar"] = 350,
+["turretaalaser"] = 250,
+["turretaaflak"] = 350,
 
-["planeheavyfighter"] = 100, 
-["planefighter"] = 80, 
-["gunshipskirm"] = 100, 
+["planeheavyfighter"] = 100,
+["planefighter"] = 80,
+["gunshipskirm"] = 100,
 
-["cloakaa"] = 60, 
-["shieldaa"] = 80, 
-["vehaa"] = 60, 
-["jumpaa"] = 250, 
-["corarch"] = 250, 
+["cloakaa"] = 60,
+["shieldaa"] = 80,
+["vehaa"] = 60,
+["jumpaa"] = 250,
+["corarch"] = 250,
 ["tankaa"] = 250}
 
 local AA                 = {} -- {id = unitID, escorted = boolean, range = maxrange, threshold = integer from unittypes}
@@ -207,11 +207,11 @@ function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attac
   return true, 1
 end
 
-function gadget:AllowCommand_GetWantedCommand()	return 
+function gadget:AllowCommand_GetWantedCommand()	return
 	{[CMD_UNIT_AI] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 

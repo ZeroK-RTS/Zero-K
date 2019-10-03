@@ -22,6 +22,8 @@ end
 -------------------------------------------------------------------------------------
 
 local UPDATE_FREQUENCY = 15
+local ELONGATION = 1.5
+local ON_GROUND_THRESHOLD = 10
 
 local units = {count = 0, data = {}}
 local unitsByID = {}
@@ -45,32 +47,38 @@ local function AddSphericalLOSCheck(unitID, unitDefID)
 	end
 end
 
-GG.AddSphereicalLOSCheck = AddSphericalLOSCheck	-- deprecated typo'd version, left in for any reverse compatibility that might be needed
-GG.AddSphericalLOSCheck = AddSphericalLOSCheck 
+GG.AddSphereicalLOSCheck = AddSphericalLOSCheck -- deprecated typo'd version, left in for any reverse compatibility that might be needed
+GG.AddSphericalLOSCheck = AddSphericalLOSCheck
 
-local function checkUnit(unitID, los, airLos)
+local function CheckUnit(unitID, los, airLos)
 	if not Spring.ValidUnitID(unitID) then
 		return false
 	end
 	
 	local x,y,z = Spring.GetUnitPosition(unitID)
-	local ground =  Spring.GetGroundHeight(x,z)
+	local ground = Spring.GetGroundHeight(x,z)
 
 	if ground and y then
-		local diff = y - ground
-		--GG.UnitEcho(unitID, diff)
+		local diff = y - math.max(0, ground)
 		
-		if diff < 10 then
+		if diff < ON_GROUND_THRESHOLD then
 			Spring.SetUnitSensorRadius(unitID, "los", los)
 			Spring.SetUnitSensorRadius(unitID, "airLos", airLos)
 			return true, false
-		elseif diff < los then
-			Spring.SetUnitSensorRadius(unitID, "los", los - diff)
-			Spring.SetUnitSensorRadius(unitID, "airLos", airLos - diff)
-		else
+		end
+		
+		diff = diff/ELONGATION
+		if diff >= los then
 			Spring.SetUnitSensorRadius(unitID, "los", 0)
 			Spring.SetUnitSensorRadius(unitID, "airLos", 0)
+			return true, true
 		end
+		
+		local angle = math.asin(diff / los)
+		local scaleFactor = math.cos(angle)
+		
+		Spring.SetUnitSensorRadius(unitID, "los", scaleFactor * los)
+		Spring.SetUnitSensorRadius(unitID, "airLos", scaleFactor * airLos)
 	end
 
 	return true, true
@@ -83,7 +91,7 @@ function gadget:GameFrame(f)
 		while i <= units.count do
 			local data = units.data[i]
 			local unitID = data.unitID
-			local valid, flying = checkUnit(unitID, data.los, data.airLos)
+			local valid, flying = CheckUnit(unitID, data.los, data.airLos)
 			if valid and (flying or f < data.removeAfter) then
 				i = i + 1
 			else

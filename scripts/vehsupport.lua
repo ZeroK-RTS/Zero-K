@@ -4,18 +4,18 @@ local base, aim, rockbase, body, turret, arms, firepoint1, firepoint2, exhaust1,
 	rwheel1, rwheel2, rwheel3,
 	lwheel1, lwheel2, lwheel3,
 	gs1r, gs2r, gs3r,
-	gs1l, gs2l, gs3l 
+	gs1l, gs2l, gs3l
 = piece(
 	"base", "aim", "rockbase", "body", "turret", "arms", "firepoint1", "firepoint2", "exhaust1", "exhaust2", "gun", "cab", "connection",
 	"rwheel1", "rwheel2", "rwheel3",
-	"lwheel1", "lwheel2", "lwheel3", 
+	"lwheel1", "lwheel2", "lwheel3",
 	"gs1r", "gs2r", "gs3r",
 	"gs1l", "gs2l", "gs3l"
 )
 
 local smokePiece = {turret, body}
 
-local moving, runSpin, wheelTurnSpeed
+local moving, wheelTurnSpeed
 
 local deployed = false
 
@@ -120,18 +120,16 @@ function Roll()
 		StopSpin(lwheel1, x_axis)
 		StopSpin(lwheel2, x_axis)
 		StopSpin(lwheel3, x_axis)
-	
-		runSpin = false
 	end
 end
 
-local function AnimControl() 
+local function AnimControl()
 	Signal(SIG_ANIM)
 	SetSignalMask(SIG_ANIM)
 	
 	local lastHeading, currHeading, diffHeading, pivotAngle
 	lastHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
-	while true do 
+	while true do
 	
 		--pivot
 		currHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
@@ -147,11 +145,11 @@ local function AnimControl()
 		
 		-- Bound maximun pivot
 		pivotAngle = diffHeading * PIVOT_MOD
-		if pivotAngle > MAX_PIVOT then 
-			pivotAngle = MAX_PIVOT 
+		if pivotAngle > MAX_PIVOT then
+			pivotAngle = MAX_PIVOT
 		end
-		if pivotAngle < MIN_PIVOT then 
-			pivotAngle = MIN_PIVOT 
+		if pivotAngle < MIN_PIVOT then
+			pivotAngle = MIN_PIVOT
 		end
 		
 		
@@ -189,7 +187,6 @@ function StopMoving()
 end
 
 function StartMoving()
-	runSpin = true
 	moving = true
 	StartThread(SetDeploy,false)
 	
@@ -213,7 +210,7 @@ function Suspension()
 	local ya, yv, yp = 0, 0, 0
 	local speed = 0
 	
-	while true do 
+	while true do
 		speed = select(4,spGetUnitVelocity(unitID))
 		wheelTurnSpeed = speed*WHEEL_TURN_MULT
 		
@@ -245,7 +242,7 @@ function Suspension()
 				s2l = GetWheelHeight(gs2l)
 				s3l = GetWheelHeight(gs3l)
 				
-				--xtilta = (s3r + s3l - s1l - s1r)/6000	
+				--xtilta = (s3r + s3l - s1l - s1r)/6000
 				--xtiltv = xtiltv*0.99 + xtilta
 				--xtilt = xtilt*0.98 + xtiltv
 
@@ -278,16 +275,15 @@ function Suspension()
 			end
 		end
 		Sleep(ANIM_PERIOD)
-	end 
+	end
 end
 
 function script.Create()
 	moving = false
-	runSpin = false
 	StartThread(SetDeploy,true)
 	StartThread(Suspension)
 	StartThread(AnimControl)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--StartThread(KeepStatic)
 	
 	Move(aim, y_axis, 10)

@@ -28,9 +28,9 @@ unitDef = {
     jump_speed       = 6,
     jump_reload      = 10,
     jump_from_midair = 0,
-	aimposoffset   = [[0 2 0]],
-	midposoffset   = [[0 2 0]],
-	modelradius    = [[10]],
+    aimposoffset   = [[0 2 0]],
+    midposoffset   = [[0 2 0]],
+    modelradius    = [[10]],
     selection_scale = 1, -- Maybe change later
   },
 
@@ -102,12 +102,12 @@ local weaponDefs = {
     impulseFactor      = 0.1,
     name               = "Explosion",
     soundHit           = "explosion/mini_nuke",
-	
-	customParams       = {
-		burst = Shared.BURST_UNRELIABLE,
+    
+    customParams       = {
+        burst = Shared.BURST_UNRELIABLE,
 
       lups_explodelife = 1.5,
-	},
+    },
     damage = {
       default          = 8002.4,
     },

@@ -218,8 +218,8 @@ function SetUnitStateIcons(unitID)
 end
 
 local function UpdateAllUnits()
-	if hide and not ((options.showpriority.value == "always") or (options.showarmorstate.value == "always")) then 
-		return 
+	if hide and not ((options.showpriority.value == "always") or (options.showarmorstate.value == "always")) then
+		return
 	end
 	local unitID
 	local units = spGetAllUnits()

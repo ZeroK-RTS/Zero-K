@@ -18,7 +18,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[11]],
+    modelradius    = [[11]],
+    cus_noflashlight = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -38,7 +39,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[spherejeth.s3o]],
-	script		             = [[cloakaa.lua]],
+    script               = [[cloakaa.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -83,11 +84,11 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-		light_color = [[0.2 1.2 1.2]],
-		light_radius = 120,
-	  },
+      customParams              = {
+        isaa = [[1]],
+        light_color = [[0.2 1.2 1.2]],
+        light_radius = 120,
+      },
 
       damage                  = {
         default = 1.94,

@@ -1,6 +1,6 @@
 --[[ Handles Pathfinding
  * Use this file to create pathfinding objects with movetypes.
- * This ojbect can generate paths between two points or return 
+ * This ojbect can generate paths between two points or return
  false when there is no path.
  * Can be passed heatmaps which weight the nodes.
 --]]
@@ -35,7 +35,7 @@ local DRAW_PATHMAP = false
 local DRAW_FOUND_PATH = false
 
 ---------------------------------------------------------------
--- Helper local functions 
+-- Helper local functions
 ---------------------------------------------------------------
 local CoordToIDarray = {}
 local IdToCoordarray = {}
@@ -185,7 +185,7 @@ local function CreatePathMap(pathUnitDefID, pathMoveDefName, avoidWaterDamage)
 			pathMap[i][j] = {
 				x = i,
 				z = j,
-				mx = i*PATH_SQUARE_SIZE - PATH_MID, 
+				mx = i*PATH_SQUARE_SIZE - PATH_MID,
 				mz = j*PATH_SQUARE_SIZE - PATH_MID,
 				linkList = {},
 				linkCount = 0,
@@ -202,7 +202,7 @@ local function CreatePathMap(pathUnitDefID, pathMoveDefName, avoidWaterDamage)
 			while point < #checkPoints and pathUnitDefID and not IsValidUnitLocation(px,pz) do
 				point = point + 1
 				px = checkPoints[point].x + i*PATH_SQUARE_SIZE - PATH_MID
-				pz = checkPoints[point].z + j*PATH_SQUARE_SIZE - PATH_MID	
+				pz = checkPoints[point].z + j*PATH_SQUARE_SIZE - PATH_MID
 				--Spring.MarkerAddPoint(px,0,pz, "")
 			end
 			

@@ -1,13 +1,13 @@
 include "constants.lua"
 
 local spGetUnitTeam = Spring.GetUnitTeam
-local spGetUnitIsBuilding = Spring.GetUnitIsBuilding 
+local spGetUnitIsBuilding = Spring.GetUnitIsBuilding
 local spGetUnitHealth = Spring.GetUnitHealth
 
-local base = piece 'base' 
+local base = piece 'base'
 local floatl, floatr = piece('float_l','float_r')
-local pad = piece 'pad' 
-local pontoon = piece 'pontoon' 
+local pad = piece 'pad'
+local pontoon = piece 'pontoon'
 
 local emitPieces = {piece('emit04', 'emit08', 'emit012')}
 local nanoNum = 1
@@ -20,16 +20,14 @@ local SIG_BUILD = 2
 local function PadAdjust()
 	Signal(SIG_BUILD)
 	SetSignalMask(SIG_BUILD)
-	local buildee, progress
 	while true do
 		local buildee = spGetUnitIsBuilding(unitID)
 		--Spring.Echo(buildee)
 		if buildee then
-			progress = select(5, spGetUnitHealth(buildee))
+			local progress = select(5, spGetUnitHealth(buildee))
 			Move(pad, z_axis, -20 + (40*progress))
 			--Spring.Echo(progress)
 		else
-			progress = 0
 			Move(pad, z_axis, -20)
 		end
 		Sleep(500)
@@ -44,7 +42,7 @@ function script.Activate()
 		SetUnitValue(BUGGER_OFF, 1)
 		Sleep(1500)
 	end
-	]]--	
+	]]--
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	SetUnitValue(COB.BUGGER_OFF, 0)
 end
@@ -65,7 +63,7 @@ end
 
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, emitPieces)
 end
 

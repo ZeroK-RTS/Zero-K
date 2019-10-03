@@ -4,7 +4,7 @@ unitDef = {
   description                   = [[Meteor Controller]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  buildCostMetal                = 32000,
+  buildCostMetal                = 40000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
@@ -21,8 +21,8 @@ unitDef = {
     keeptooltip = [[any string I want]],
     --neededlink  = 150,
     --pylonrange  = 150,
-	modelradius    = [[45]],
-  },  
+    modelradius    = [[45]],
+  },
   
   energyUse                     = 0,
   explodeAs                     = [[ATOMIC_BLAST]],
@@ -58,7 +58,7 @@ unitDef = {
 
     {
       def                = [[GRAVITY_NEG]],
-	  onlyTargetCategory = [[NONE]],
+      onlyTargetCategory = [[NONE]],
     },
 
   },
@@ -70,14 +70,14 @@ unitDef = {
       name                    = [[Attractive Gravity (fake)]],
       alwaysVisible           = 1,
       avoidFriendly           = false,
-	  canAttackGround		  = false,
+      canAttackGround         = false,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-		light_radius = 0,
-	  },
+      customParams            = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 0.001,
@@ -99,16 +99,17 @@ unitDef = {
       rgbColor2               = [[1 0.5 1]],
       size                    = 32,
       soundStart              = [[weapon/gravity_fire]],
-	  soundStartVolume        = 0.15,
+      soundStartVolume        = 0.15,
       thickness               = 32,
       tolerance               = 5000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 6000,
     },
+
     METEOR      = {
       name                    = [[Meteor]],
-	  accuracy                = 700,
+      accuracy                = 700,
       alwaysVisible           = 1,
       areaOfEffect            = 240,
       avoidFriendly           = false,
@@ -117,17 +118,19 @@ unitDef = {
       cegTag                  = [[METEOR_TAG]],
       collideFriendly         = true,
       craterBoost             = 3,
-      craterMult              = 6, 
+      craterMult              = 6,
 
-	  customParams        	  = {
-		light_color = [[2.4 1.5 0.6]],
-		light_radius = 600,
+      customParams              = {
+        light_color = [[2.4 1.5 0.6]],
+        light_radius = 600,
+
+        spawns_name = "asteroid_dead",
+        spawns_feature = 1,
       },
-	  
+
       damage                  = {
-        default = 2000,
-        planes  = 2000,
-        subs    = 100,
+        default = 1600,
+        subs    = 80,
       },
 
       edgeEffectiveness       = 0.8,
@@ -137,9 +140,10 @@ unitDef = {
       impulseBoost            = 250,
       impulseFactor           = 0.5,
       interceptedByShieldType = 2,
+      noSelfDamage            = false,
       model                   = [[asteroid.s3o]],
       range                   = 9000,
-      reloadtime              = 0.7,
+      reloadtime              = 1,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
@@ -151,16 +155,16 @@ unitDef = {
       },
 
       turret                  = true,
-	  turnrate                = 2000,
+      turnrate                = 2000,
       weaponAcceleration      = 2000,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 1600,
       wobble                  = 5500,
     },
-	
-	METEOR_AIM      = {
+
+    METEOR_AIM      = {
       name                    = [[Meteor]],
-	  accuracy                = 700,
+      accuracy                = 700,
       alwaysVisible           = 1,
       areaOfEffect            = 240,
       avoidFriendly           = false,
@@ -171,14 +175,16 @@ unitDef = {
       craterBoost             = 3,
       craterMult              = 6,
 
-	  customParams        	  = {
-		light_radius = 0,
-	  },
+      customParams              = {
+        light_radius = 0,
+
+        spawns_name = "asteroid_dead",
+        spawns_feature = 1,
+      },
 
       damage                  = {
-        default = 2000,
-        planes  = 2000,
-        subs    = 100,
+        default = 1600,
+        subs    = 80,
       },
 
       edgeEffectiveness       = 0.8,
@@ -188,9 +194,10 @@ unitDef = {
       impulseBoost            = 250,
       impulseFactor           = 0.5,
       interceptedByShieldType = 2,
+      noSelfDamage            = false,
       model                   = [[asteroid.s3o]],
       range                   = 9000,
-      reloadtime              = 0.7,
+      reloadtime              = 1,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
@@ -201,7 +208,7 @@ unitDef = {
         [[null]],
       },
 
-	  tracks                  = true,
+      tracks                  = true,
       turret                  = true,
       turnRate                = 25000,
       weaponAcceleration      = 600,
@@ -209,10 +216,10 @@ unitDef = {
       weaponVelocity          = 1200,
       wobble                  = 0,
     },
-	
-	METEOR_FLOAT      = {
+
+    METEOR_FLOAT      = {
       name                    = [[Meteor]],
-	  accuracy                = 700,
+      accuracy                = 700,
       alwaysVisible           = 1,
       areaOfEffect            = 240,
       avoidFriendly           = false,
@@ -223,15 +230,17 @@ unitDef = {
       craterBoost             = 3,
       craterMult              = 6,
 
-	  customParams        	  = {
-		light_radius = 0,
-		do_not_save = 1, -- Controlled meteors are regenerated on load.
-	  },
+      customParams              = {
+        light_radius = 0,
+        do_not_save = 1, -- Controlled meteors are regenerated on load.
+
+        spawns_name = "asteroid_dead",
+        spawns_feature = 1,
+      },
 
       damage                  = {
-        default = 2000,
-        planes  = 2000,
-        subs    = 100,
+        default = 1600,
+        subs    = 80,
       },
 
       edgeEffectiveness       = 0.8,
@@ -241,9 +250,10 @@ unitDef = {
       impulseBoost            = 250,
       impulseFactor           = 0.5,
       interceptedByShieldType = 2,
+      noSelfDamage            = false,
       model                   = [[asteroid.s3o]],
       range                   = 9000,
-      reloadtime              = 0.7,
+      reloadtime              = 1,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
@@ -254,7 +264,7 @@ unitDef = {
         [[null]],
       },
 
-	  tracks                  = true,
+      tracks                  = true,
       trajectoryHeight        = 0,
       turret                  = true,
       turnRate                = 6000,
@@ -263,10 +273,10 @@ unitDef = {
       weaponVelocity          = 200,
       wobble                  = 30000,
     },
-	
-	METEOR_UNCONTROLLED      = {
+
+    METEOR_UNCONTROLLED      = {
       name                    = [[Meteor]],
-	  accuracy                = 700,
+      accuracy                = 700,
       alwaysVisible           = 1,
       areaOfEffect            = 240,
       avoidFriendly           = false,
@@ -277,16 +287,18 @@ unitDef = {
       craterBoost             = 3,
       craterMult              = 6,
 
-	  customParams        	  = {
-		light_color = [[2.4 1.5 0.6]],
-		light_radius = 600,
-		do_not_save = 1, -- Controlled meteors are regenerated on load.
+      customParams              = {
+        light_color = [[2.4 1.5 0.6]],
+        light_radius = 600,
+        do_not_save = 1, -- Controlled meteors are regenerated on load.
+
+        spawns_name = "asteroid_dead",
+        spawns_feature = 1,
       },
 
       damage                  = {
-        default = 1000,
-        planes  = 1000,
-        subs    = 50,
+        default = 1600,
+        subs    = 80,
       },
 
       edgeEffectiveness       = 0.8,
@@ -296,9 +308,10 @@ unitDef = {
       impulseBoost            = 250,
       impulseFactor           = 0.5,
       interceptedByShieldType = 2,
+      noSelfDamage            = false,
       model                   = [[asteroid.s3o]],
       range                   = 9000,
-      reloadtime              = 0.7,
+      reloadtime              = 1,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,

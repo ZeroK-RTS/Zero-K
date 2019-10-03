@@ -20,8 +20,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[95]],
-	extradrawrange = 925,
+    modelradius    = [[95]],
+    extradrawrange = 925,
   },
 
   explodeAs              = [[NUCLEAR_MISSILE]],
@@ -74,7 +74,7 @@ unitDef = {
     {
       def                = [[TRILASER]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },    
+    },
 
   },
 
@@ -124,7 +124,7 @@ unitDef = {
       stages                  = 32,
       tolerance               = 4096,
       turret                  = true,
-      waterweapon			  = true,
+      waterweapon             = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 900,
     },
@@ -141,9 +141,9 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-	  },
+      customParams              = {
+        isaa = [[1]],
+      },
 
       damage                  = {
         default = 2.05,
@@ -180,13 +180,13 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
   
-      customParams			= {
-	--timeslow_preset = [[module_disruptorbeam]],
-	timeslow_damagefactor = [[2]],
+      customParams            = {
+    --timeslow_preset = [[module_disruptorbeam]],
+    timeslow_damagefactor = [[2]],
       },
-	  
+      
       damage                  = {
-	    default = 600,
+        default = 600,
       },
   
       explosionGenerator      = [[custom:flash2purple]],
@@ -227,7 +227,7 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
-		light_color = [[0.2 0.8 0.2]],
+        light_color = [[0.2 0.8 0.2]],
       },
       
       damage                  = {
@@ -244,7 +244,7 @@ unitDef = {
       interceptedByShieldType = 1,
       largeBeamLaser          = true,
       laserFlareSize          = 10.4,
-	  leadLimit               = 18,
+      leadLimit               = 18,
       minIntensity            = 1,
       noSelfDamage            = true,
       projectiles             = 3,
@@ -265,8 +265,8 @@ unitDef = {
       turret                  = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 2250,
-    },    
-	
+    },
+    
     ORCONE_ROCKET = {
       name                    = [[Medium-Range Missiles]],
       areaOfEffect            = 160,
@@ -274,15 +274,15 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-	  
-	  customParams            = {
-	    gatherradius = [[180]],
-	    smoothradius = [[120]],
-	    smoothmult   = [[0.25]],
-		
-		light_color = [[1 1.4 0.35]],
-		light_radius = 400,
-	  },
+      
+      customParams            = {
+        gatherradius = [[180]],
+        smoothradius = [[120]],
+        smoothmult   = [[0.25]],
+        
+        light_color = [[1 1.4 0.35]],
+        light_radius = 400,
+      },
 
       damage                  = {
         default = 851,
@@ -292,14 +292,14 @@ unitDef = {
       edgeEffectiveness       = 0.75,
       explosionGenerator      = [[custom:TESS]],
       fireStarter             = 55,
-	  flightTime              = 10,
+      flightTime              = 10,
       impulseBoost            = 0,
       impulseFactor           = 0.8,
       interceptedByShieldType = 2,
       model                   = [[wep_m_kickback.s3o]],
       noSelfDamage            = true,
       range                   = 925,
-      reloadtime              = 1.55,
+      reloadtime              = 1.533,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/vlaunch_hit]],
       soundStart              = [[weapon/missile/missile_launch]],

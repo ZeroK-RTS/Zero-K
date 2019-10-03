@@ -15,7 +15,7 @@ unitDef = {
 
   customParams                  = {
     pylonrange = 150,
-	removewait = 1,
+    removewait = 1,
   },
 
   energyMake                    = 35,

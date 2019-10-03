@@ -9,6 +9,7 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[5]],
 
 		light_color = [[0.9 0.22 0.22]],
@@ -16,7 +17,7 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 55,
+		default = 70,
 		subs    = 3,
 	},
 
@@ -27,7 +28,7 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	laserFlareSize          = 4.5,
 	minIntensity            = 1,
-	range                   = 310,
+	range                   = 300,
 	reloadtime              = 10/30,
 	rgbColor                = [[1 0 0]],
 	soundStart              = [[weapon/laser/mini_laser]],

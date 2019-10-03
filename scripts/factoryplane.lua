@@ -132,7 +132,7 @@ function padchange()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	local buildprogress = select(5, Spring.GetUnitHealth(unitID))
 	while buildprogress < 1 do

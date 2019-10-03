@@ -16,7 +16,7 @@ unitDef = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
-	statsname = "chicken_listener",
+    statsname = "chicken_listener",
   },
 
   explodeAs           = [[SMALL_UNITEX]],

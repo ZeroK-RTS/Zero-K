@@ -25,7 +25,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[14]],
+    modelradius    = [[14]],
+    cus_noflashlight = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -44,7 +45,7 @@ unitDef = {
   movementClass          = [[KBOT2]],
   objectName             = [[spherecon.s3o]],
   radarDistanceJam       = 256,
-	script                 = [[cloakcon.lua]],
+    script                 = [[cloakcon.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,
   sightDistance          = 375,

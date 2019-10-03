@@ -67,16 +67,16 @@ unitDef = {
       name                    = [[Plasma Artillery]],
       accuracy                = 180,
       areaOfEffect            = 96,
-	  avoidFeature            = false,
-	  avoidGround             = false,
+      avoidFeature            = false,
+      avoidGround             = false,
       craterBoost             = 1,
       craterMult              = 2,
 
       customParams            = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
         reaim_time = 8, -- COB
-		light_color = [[1.4 0.8 0.3]],
+        light_color = [[1.4 0.8 0.3]],
       },
 
       damage                  = {
@@ -86,7 +86,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
-	  explosionGenerator      = [[custom:DOT_Pillager_Explo]],
+      explosionGenerator      = [[custom:DOT_Pillager_Explo]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,

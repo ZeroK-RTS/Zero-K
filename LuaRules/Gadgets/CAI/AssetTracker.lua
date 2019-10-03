@@ -151,7 +151,7 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 		AddUnit = AddUnit,
 		RemoveUnit = RemoveUnit,
 		UpdateHeatmaps = UpdateHeatmaps,
-		GetUnitList = GetUnitList, 
+		GetUnitList = GetUnitList,
 		GetCombatUnitList = GetCombatUnitList,
 		GetHeatmap = GetHeatmap,
 	}

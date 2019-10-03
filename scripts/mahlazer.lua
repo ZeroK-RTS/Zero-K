@@ -73,7 +73,7 @@ local shooting = 0
 local wantedDirection = 0
 local ROTATION_SPEED = math.rad(3.5)/30
 local TARGET_ALT = 143565270/2^16
-local Vector = Spring.Utilities.Vector 
+local Vector = Spring.Utilities.Vector
 local max = math.max
 local soundTime = 0
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
@@ -106,6 +106,14 @@ local function CallSatelliteScript(funcName, args)
 	end
 end
 
+local HEADING_TO_RAD = 1/32768*math.pi
+local function GetDir(checkUnitID)
+	local heading = Spring.GetUnitHeading(satUnitID)
+	if heading then
+		return math.pi/2 - heading*HEADING_TO_RAD
+	end
+end
+
 local isFiring = false
 local function SetFiringState(shouldFire)
 	if isFiring == shouldFire then
@@ -125,11 +133,11 @@ function Undock()
 	
 	if state == DOCKED then
 		for i = 1, 4 do
-			Turn(DocksClockwise[i]	   ,z_axis,math.rad(-42.5),1)
+			Turn(DocksClockwise[i]      ,z_axis,math.rad(-42.5),1)
 			Turn(DocksCounterClockwise[i],z_axis,math.rad( 42.5),1)
 			
 			Turn(ActuatorBaseClockwise[i],z_axis,math.rad(-86),2)
-			Turn(ActuatorBaseCCW[i]	  ,z_axis,math.rad( 86),2)
+			Turn(ActuatorBaseCCW[i]      ,z_axis,math.rad( 86),2)
 			
 			Turn(ActuatorMidCW [i],z_axis,math.rad( 53),1.5)
 			Turn(ActuatorMidCCW[i],z_axis,math.rad( 53),1.5)
@@ -164,6 +172,10 @@ function Dock()
 	Move(ShortSpikes,z_axis, -5,1)
 	Move(LongSpikes,z_axis, -10,1.5)
 	Sleep(100)
+	
+	while not Spring.ValidUnitID(satUnitID) do
+		Sleep(30)
+	end
 	
 	local dx, _, dz = Spring.GetUnitDirection(unitID)
 	if dx then
@@ -236,10 +248,10 @@ function TargetingLaser()
 		if not isStunned then
 			--// Aiming
 			local dx, _, dz = Spring.GetUnitDirection(satUnitID)
-			if dx then
+			local otherCurrentHeading = GetDir(satUnitID)
+			if dx and otherCurrentHeading then
 				local currentHeading = Vector.Angle(dx, dz)
-				
-				local aimOff = (currentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi
+				local aimOff = (otherCurrentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi
 				
 				if aimOff < 0 then
 					if aimOff < -ROTATION_SPEED then
@@ -264,8 +276,8 @@ function TargetingLaser()
 				local _, SatelliteMuzzleY = Spring.GetUnitPiecePosition(unitID, SatelliteMuzzle)
 				newHeight = max(SatelliteMuzzleY-flashY, 1)
 				if newHeight ~= oldHeight then
+					Spring.SetUnitWeaponState(unitID, 2, "range", newHeight)
 					Spring.SetUnitWeaponState(unitID, 3, "range", newHeight)
-					Spring.SetUnitWeaponState(unitID, 5, "range", newHeight)
 					oldHeight = newHeight
 				end
 				
@@ -280,10 +292,10 @@ function TargetingLaser()
 				
 				--// Shooting
 				if shooting ~= 0 then
-					EmitSfx(EmitterMuzzle, GG.Script.FIRE_W3)
+					EmitSfx(EmitterMuzzle, GG.Script.FIRE_W2)
 					shooting = shooting - 1
 				else
-					EmitSfx(EmitterMuzzle, GG.Script.FIRE_W5)
+					EmitSfx(EmitterMuzzle, GG.Script.FIRE_W3)
 				end
 			end
 		end
@@ -292,23 +304,19 @@ function TargetingLaser()
 	end
 end
 
-function script.Create()
-	Spring.SetUnitWeaponState(unitID, 2, "range", 9300)
-	Spring.SetUnitWeaponState(unitID, 4, "range", 9300)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+local function SnapSatellite()
+	while true do
+		local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount)
+		Spring.MoveCtrl.SetPosition(satUnitID,x,y,z)
+		Sleep(30)
+	end
+end
 
-	--Move(ShortSpikes,z_axis, -5)
-	--Move(LongSpikes,z_axis, -10)
-	local facing = Spring.GetUnitBuildFacing(unitID)
+local function DeferredInitialize()
+	while select(3, Spring.GetUnitIsStunned(unitID)) do
+		Sleep(30)
+	end
 	
-	wantedDirection = math.pi*(3 - facing)/2 
-end
-
-function script.Activate()
-	StartThread(DeferredActivate);
-end
-
-function DeferredActivate()
 	Spin(UpperCoil, z_axis, 10,0.5)
 	Spin(LowerCoil, z_axis, 10,0.5)
 	
@@ -323,7 +331,7 @@ function DeferredActivate()
 	local heading = Vector.Angle(dx, dz)
 	
 	while not Spring.ValidUnitID(satUnitID) do
-		Sleep(1)
+		Sleep(30)
 		satUnitID = Spring.CreateUnit('starlight_satellite',x,y,z,0,Spring.GetUnitTeam(unitID))
 		if satUnitID then
 			satelliteCreated = true
@@ -353,6 +361,22 @@ function DeferredActivate()
 	end
 	
 	StartThread(SnapSatellite)
+end
+
+function script.Create()
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	-- Give the targeter +500 extra range to allow the build UI to show what a Starlight can hit
+	Spring.SetUnitWeaponState(unitID, 1, "range", 10500)
+
+	--Move(ShortSpikes,z_axis, -5)
+	--Move(LongSpikes,z_axis, -10)
+	local facing = Spring.GetUnitBuildFacing(unitID)
+	
+	wantedDirection = math.pi*(3 - facing)/2
+	StartThread(DeferredInitialize)
+end
+
+function script.Activate()
 	Signal(SIG_DOCK)
 	StartThread(Undock)
 end
@@ -377,21 +401,15 @@ function script.AimWeapon(num, heading, pitch)
 		
 		wantedDirection = currentHeading - heading + math.pi
 		
-		CallSatelliteScript('mahlazer_AimAt',pitch + math.pi/2)
+		pitchFudge = (math.pi/2 + pitch)*0.999 - math.pi/2
+		
+		CallSatelliteScript('mahlazer_AimAt', pitchFudge + math.pi/2)
 		Turn(SatelliteMuzzle, x_axis, math.pi/2+pitch, math.rad(1.2))
 		WaitForTurn(SatelliteMuzzle, x_axis)
 		
 		return aimingDone
 	end
 	return false
-end
-
-function SnapSatellite()
-	while true do
-		local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount)
-		Spring.MoveCtrl.SetPosition(satUnitID,x,y,z)
-		Sleep(30)
-	end
 end
 
 function script.QueryWeapon(num)

@@ -20,7 +20,7 @@ local PadAftNanoR = piece('PadAftNanoR');
 local PadFront = piece('PadFront');
 local PadFrontNanoL = piece('PadFrontNanoL');
 local PadFrontNanoR = piece('PadFrontNanoR');
-local Radar = piece('Radar'); 
+local Radar = piece('Radar');
 local Launcher = piece('Launcher');
 local WakeForeRight = piece('WakeForeRight');
 local WakeForeLeft = piece('WakeForeLeft');
@@ -69,7 +69,7 @@ function script.Create()
 	Hide(WakeForeRight)
 	Hide(WakeAftLeft)
 	Hide(WakeAftRight)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	
 	for bay,_ in pairs(droneBays) do
 		Move(bay, x_axis, 16)
@@ -141,7 +141,7 @@ function Carrier_droneStarted(piece)
 end
 
 local function closeBay(piece)
-	if(piece) then	
+	if(piece) then
 		local bay = droneBays[piece];
 		if(bay) then
 			Signal("bay"..piece)

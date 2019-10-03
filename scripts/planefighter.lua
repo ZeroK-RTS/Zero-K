@@ -1,7 +1,7 @@
 include "constants.lua"
 
 --pieces
-local base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing, rjet, ljet, body 
+local base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing, rjet, ljet, body
 	= piece("base", "flare1", "flare2", "nozzle1", "nozzle2", "missile", "rgun", "lgun", "rwing", "lwing", "rjet", "ljet", "body")
 
 local smokePiece = {base, rwing, lwing}
@@ -16,10 +16,10 @@ local flare = {
 local SPEEDUP_FACTOR = tonumber (UnitDef.customParams.boost_speed_mult)
 local BOOSTUP_FACTOR = tonumber (UnitDef.customParams.boost_accel_mult)
 local SPEEDUP_DURATION = tonumber (UnitDef.customParams.boost_duration)
-		
+
 ----------------------------------------------------------
 
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local CMD_ONECLICK_WEAPON = Spring.Utilities.CMD.ONECLICK_WEAPON
 
 local function RetreatThread()
 	Sleep(800)
@@ -86,7 +86,7 @@ end
 function script.Create()
 	Move(rwing, x_axis, WING_DISTANCE)
 	Move(lwing, x_axis, -WING_DISTANCE)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.StartMoving()
@@ -97,7 +97,7 @@ function script.StopMoving()
 	deactivate()
 end
 
-function script.QueryWeapon(num) 
+function script.QueryWeapon(num)
 	if num == 1 then
 		return flare[shotCycle]
 	elseif num == 2 then
@@ -105,12 +105,12 @@ function script.QueryWeapon(num)
 	end
 end
 
-function script.AimFromWeapon(num) 
+function script.AimFromWeapon(num)
 	return base
 end
 
 function script.AimWeapon(num, heading, pitch)
-	return not (GetUnitValue(COB.CRASHING) == 1) 
+	return not (GetUnitValue(COB.CRASHING) == 1)
 end
 
 function script.FireWeapon(num)

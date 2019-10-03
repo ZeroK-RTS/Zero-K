@@ -75,7 +75,7 @@ local function SetBuildOptions(unitID, unitDefID, team)
 	if (unitDef.isBuilder) then
 		for _, buildoptionID in pairs(unitDef.buildOptions) do
 			if unlockUnitsMap[buildoptionID] then
-				if not (unlocks[team] and unlocks[team][buildoptionID]) then 
+				if not (unlocks[team] and unlocks[team][buildoptionID]) then
 					LockUnit(unitID, buildoptionID, team)
 				else
 					UnlockUnit(unitID, buildoptionID, team)
@@ -114,17 +114,17 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 end
 
 -- blocks command - prevent widget hax
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return unlockUnitsMap
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, team, cmdID, cmdParams, cmdOpts)
 	if unlockUnitsMap[-cmdID] then
-		if not (unlocks[team] and unlocks[team][-cmdID]) and (not cmdOpts.right) then 
+		if not (unlocks[team] and unlocks[team][-cmdID]) and (not cmdOpts.right) then
 			return false
 		end
 	end
@@ -133,7 +133,7 @@ end
 
 function gadget:AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z)
 	if unlockUnitsMap[unitDefID] then
-		if not (unlocks[builderTeam] and unlocks[builderTeam][unitDefID]) then 
+		if not (unlocks[builderTeam] and unlocks[builderTeam][unitDefID]) then
 			return false
 		end
 	end
@@ -159,8 +159,8 @@ local function InitUnsafe()
 	end
 ]]--
 	
-	-- for name, id in pairs(playerIDsByName) do	
-	for index, id in pairs(Spring.GetPlayerList()) do	
+	-- for name, id in pairs(playerIDsByName) do
+	for index, id in pairs(Spring.GetPlayerList()) do
 		-- copied from PlanetWars
 		local unlockData, success
 		local customKeys = select(10, Spring.GetPlayerInfo(id))
@@ -174,7 +174,7 @@ local function InitUnsafe()
 			unlocksRaw = string.gsub(unlocksRaw, '_', '=')
 			unlocksRaw = Spring.Utilities.Base64Decode(unlocksRaw)
 			local unlockFunc, err = loadstring("return "..unlocksRaw)
-			if unlockFunc then 
+			if unlockFunc then
 				success, unlockData = pcall(unlockFunc)
 				if not success then
 					err = unlockData
@@ -182,11 +182,11 @@ local function InitUnsafe()
 				end
 			end
 		end
-		if err then 
+		if err then
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Unlock system error: ' .. err)
 		end
 
-		for index, name in pairs(unlockData) do
+		for unlockIndex, name in pairs(unlockData) do
 			local team = select(4, Spring.GetPlayerInfo(id, false))
 			local udid = UnitDefNames[name] and UnitDefNames[name].id
 			if udid then
@@ -203,7 +203,7 @@ local function InitUnsafe()
 		local udid = spGetUnitDefID(units[i])
 		local teamID = spGetUnitTeam(units[i])
 		gadget:UnitCreated(units[i], udid, teamID)
-	end	
+	end
 end
 
 function gadget:Initialize()

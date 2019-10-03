@@ -15,7 +15,7 @@ include("Widgets/COFCTools/ExportUtilities.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local GetSpectatingState = Spring.GetSpectatingState
-local GetTimer = Spring.GetTimer 
+local GetTimer = Spring.GetTimer
 local DiffTimers = Spring.DiffTimers
 
 local Chili
@@ -75,13 +75,13 @@ options = {
 		desc = 'Filter out messages from autohost',
 		type = 'bool',
 		value = true,
-	},	
+	},
 	text_height = {
 		name = 'Font Size (10-18)',
 		type = 'number',
 		value = 12,
 		min=10,max=18,step=1,
-	},	
+	},
 	window_margin = {
 		name = 'Margin (0 - 10)',
 		desc = 'Margin between bubbles',
@@ -252,7 +252,7 @@ function widget:AddChatMessage(msg)
 	local type = msg.msgtype
 	local text = msg.argument or ''
 	
-	if DuplicateMessage("chat", playerID, msg.argument, type) then 
+	if DuplicateMessage("chat", playerID, msg.argument, type) then
 		return
 	end
 
@@ -272,7 +272,7 @@ function widget:AddChatMessage(msg)
 		else
 			playerName,active,isSpec,teamID,allyTeamID,pingTime,cpuUsage,country,rank, customKeys  = Spring.GetPlayerInfo(playerID)
 			teamcolor = {Spring.GetTeamColor(teamID)}
-			if (customKeys ~= nil) and (customKeys.avatar~=nil) then 
+			if (customKeys ~= nil) and (customKeys.avatar~=nil) then
 				avatar = "LuaUI/Configs/Avatars/" .. customKeys.avatar .. ".png"
 			end
 		end
@@ -289,12 +289,12 @@ function widget:AddChatMessage(msg)
 	end
 
 	local pp = nil
-	if WG.alliedCursorsPos then 
+	if WG.alliedCursorsPos then
 		local cur = WG.alliedCursorsPos[playerID]
-		if cur ~= nil then 
+		if cur ~= nil then
 			pp = {cur[1], cur[2], cur[3], cur[4]}
 		end
-	end 
+	end
 
 	
 	local w = Chili.Window:New{
@@ -321,15 +321,15 @@ function widget:AddChatMessage(msg)
 				WG.crude.OpenPath('Settings/HUD Panels/Chat') --click + space will shortcut to option-menu
 				WG.crude.ShowMenu() --make epic Chili menu appear.
 				return true
-			end		
-			if pp ~= nil then 
+			end
+			if pp ~= nil then
 				SetCameraTarget(pp[1], 0, pp[2],1)
-			end 
+			end
 		end},
 	}
 	function w:HitTest(x,y)
 		return self
-	end 
+	end
 
 	
 	Chili.Image:New{
@@ -391,12 +391,12 @@ end
 function widget:AddConsoleMessage(msg)
 	
 	if not GetSpectatingState() then
-	      if (msg.source == 'spec' or msg.source == "enemy") and options.filterGlobalChat.value then 
+	      if (msg.source == 'spec' or msg.source == "enemy") and options.filterGlobalChat.value then
 		      return
 	      end
 	end
 	if msg.msgtype == 'other' then return end
-	if msg.msgtype == 'autohost' and options.filterAutohostMsg.value then 
+	if msg.msgtype == 'autohost' and options.filterAutohostMsg.value then
 	      return
 	end
 	widget:AddChatMessage(msg)
@@ -459,7 +459,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 	}
 	function w:HitTest(x,y)  -- FIXME: chili hacked to allow OnClick on window
 		return self
-	end 
+	end
 
 	Chili.Image:New{
 		parent = w;
@@ -571,8 +571,8 @@ local function SetupAITeamColor() --Copied from gui_chili_chat2_1.lua
 				local name = select(2,Spring.GetAIInfo(teamID))
 				colorAI[name] = {Spring.GetTeamColor(teamID)}
 			end
-		end --if teamID ~= Spring.GetGaiaTeamID() 
-	end --for each team		
+		end --if teamID ~= Spring.GetGaiaTeamID()
+	end --for each team
 end
 
 function widget:PlayerChanged(playerID)

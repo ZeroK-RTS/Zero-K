@@ -13,13 +13,13 @@ unitDef = {
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[50 50 50]],
-  collisionVolumeType    = [[ellipsoid]],  
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
-	aimposoffset   = [[0 0 0]],
-	midposoffset   = [[0 0 0]],
-	modelradius    = [[25]],
+    aimposoffset   = [[0 0 0]],
+    midposoffset   = [[0 0 0]],
+    modelradius    = [[25]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

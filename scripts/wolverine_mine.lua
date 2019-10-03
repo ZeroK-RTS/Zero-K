@@ -34,7 +34,7 @@ local currentBomblet = 1
 local function Remove ()
 	for i = 3, 3 do
 		for j = 1, 4 do
-			Explode(petals[i][j], SFX.SHATTER)
+			Explode(petals[i][j], SFX.FALL + SFX.SMOKE)
 		end
 	end
 
@@ -46,7 +46,7 @@ local function Remove ()
 	Spring.SetUnitNoMinimap(unitID, true)
 	Spring.SetUnitHealth(unitID, {paralyze = 99999999})
 	Spring.SetUnitCloak(unitID, 4)
-	Spring.SetUnitStealth(unitID, true)	
+	Spring.SetUnitStealth(unitID, true)
 	Spring.SetUnitBlocking(unitID,false,false,false)
 	Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
 	Spring.SetUnitSensorRadius(unitID, "los", 0)
@@ -54,7 +54,8 @@ local function Remove ()
 	Spring.MoveCtrl.Enable(unitID, true)
 	Spring.MoveCtrl.SetNoBlocking(unitID, true)
 	Spring.MoveCtrl.SetPosition(unitID, x, Spring.GetGroundHeight(x, z) - 1000, z)
-
+	Spring.SetUnitRulesParam(unitID,'untargetable',1)
+	Spring.SetUnitNeutral(unitID,true)
 	Sleep(5000)
 	Spring.DestroyUnit(unitID, false, true)
 end
@@ -107,9 +108,10 @@ function script.Shot (num)
 		firing = true
 	else
 		currentBomblet = currentBomblet + 1
-		if (currentBomblet == 5) then
-			StartThread(Remove)
-		end
 	end
 	Hide (bomblets[currentBomblet].bomb)
+end
+
+function script.EndBurst()
+	StartThread(Remove)
 end

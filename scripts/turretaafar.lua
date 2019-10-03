@@ -12,7 +12,7 @@ local spodni_zebra = piece 'spodni_zebra'
 local vrchni_zebra = piece 'vrchni_zebra'
 local trubky = piece 'trubky'
 
-local solid_ground = piece 'solid_ground' 
+local solid_ground = piece 'solid_ground'
 local gear = piece 'gear'
 local plovak = piece 'plovak'
 local gear001 = piece 'gear001'
@@ -89,7 +89,7 @@ local function IdleAnim()
 	Signal(SIG_IDLE)
 	SetSignalMask(SIG_IDLE)
 	while true do
-		EmitSfx(zelena, 1025)	
+		EmitSfx(zelena, 1025)
 		
 		heading = math.rad(math.random(-90, 90))
 		if(lastHeading > heading) then
@@ -126,7 +126,7 @@ local function RestoreAfterDelay()
 	--StartThread(IdleAnim)
 end
 
-function script.Create()	
+function script.Create()
 	--Spring.Echo("Vytvořeno")
 	--Hide(flare_l)
 	--Hide(flare_r)
@@ -137,11 +137,11 @@ function script.Create()
 		Hide(plovak)
 	end
 	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	
 	--Spin(rotating_bas, y_axis, 0.5)
 	
-	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end	
+	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
 	StartThread(IdleAnim)
 
 	--Turn(rotating_bas, y_axis, math.rad(-90), 0.5)
@@ -214,7 +214,7 @@ function DoAmmoRotate()
 	Move(raketa009, x_axis, 4.2, RELOAD_SPEED)
 	Move(raketa009, z_axis, 0.4, RELOAD_SPEED)
 	Move(raketa009_l, y_axis, -2.8, RELOAD_SPEED)
-	Move(raketa009_l, x_axis, -4.2, RELOAD_SPEED)	
+	Move(raketa009_l, x_axis, -4.2, RELOAD_SPEED)
 	Move(raketa009_l, z_axis, 0.4, RELOAD_SPEED)
 	
 	Sleep(MOV_DEL)
@@ -277,7 +277,7 @@ function DoAmmoRotate()
 	Move(raketa002_l, x_axis, -0.2, RELOAD_SPEED)
 	Move(raketa002_l, z_axis, 0, RELOAD_SPEED)
 	
-	Sleep(MOV_DEL)	
+	Sleep(MOV_DEL)
 	
 	--14
 	Move(raketa, y_axis, 4.8, RELOAD_SPEED)
@@ -321,10 +321,10 @@ function resetRockets()
 	--setZero(raketa026)
 	setZero(raketa027)
 	--setZero(raketa026_l)
-	setZero(raketa027_l)	
+	setZero(raketa027_l)
 end
 
-function setZero(piece) 
+function setZero(piece)
 	Move(piece, x_axis, 0)
 	Move(piece, y_axis, 0)
 	Move(piece, z_axis, 0)
@@ -354,11 +354,11 @@ function script.AimWeapon(num, heading, pitch)
 	
 	Spin(gear, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
 	Spin(gear001, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
-	Spin(gear002, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)	
+	Spin(gear002, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
 	
 	Turn(mc_rocket_ho, x_axis, -pitch, math.rad(TILT_SPEED))
 	WaitForTurn(rotating_bas, y_axis)
-	WaitForTurn(mc_rocket_ho, x_axis)	
+	WaitForTurn(mc_rocket_ho, x_axis)
 	
 	StopSpin(gear, y_axis)
 	StopSpin(gear001, y_axis)
@@ -368,7 +368,7 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-function script.Shot(num)	
+function script.Shot(num)
 	StartThread(Bum)
 end
 
@@ -380,14 +380,14 @@ function Bum()
 	if(gun) then
 		Hide(raketa026)
 				
-		Hide(raketa014)	
+		Hide(raketa014)
 		setZero(raketa014)
-		gun = false		
-	else		
+		gun = false
+	else
 		Hide(raketa026_l)
 		
 		gun = true
-		loaded = false	
+		loaded = false
 		Hide(raketa014_l)
 		setZero(raketa014_l)
 	end
@@ -397,7 +397,7 @@ function script.QueryWeapon()
 	return flare
 end
 
-function script.AimFromWeapon() 
+function script.AimFromWeapon()
 	return mc_rocket_ho
 end
 

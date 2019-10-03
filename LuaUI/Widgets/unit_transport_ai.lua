@@ -187,6 +187,7 @@ local ignoredCommand = {
 	[CMD_ABANDON_PW] = true,
 	[CMD_RECALL_DRONES] = true,
 	[CMD_UNIT_KILL_SUBORDINATES] = true,
+	[CMD_DISABLE_ATTACK] = true,
 	[CMD_PUSH_PULL] = true,
 	[CMD_UNIT_AI] = true,
 	[CMD_WANT_CLOAK] = true,
@@ -765,7 +766,7 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 	if cmdID == CMD.WAIT then
 		-- workaround: clears wait order if STOP fails to do so
 		spGiveOrderToUnit(unitID, CMD.WAIT, EMPTY_TABLE, 0)
-	end 
+	end
 end
 
 function CanTransport(transportID, unitID)

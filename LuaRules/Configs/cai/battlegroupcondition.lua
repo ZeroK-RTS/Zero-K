@@ -8,5 +8,5 @@ function battleGroupCondition2(idleFactor, idleCost) -- combat
 end
 
 function battleGroupCondition3(idleFactor, idleCost) -- gunship
-	return idleCost > 1000 
+	return idleCost > 1000
 end

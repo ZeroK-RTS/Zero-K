@@ -37,7 +37,6 @@ local glClear				= gl.Clear
 local glColorMask			= gl.ColorMask
 local glBlending			= gl.Blending
 local glLoadIdentity		= glLoadIdentity
-local glResetState			= gl.ResetState
 local glMatrixMode			= gl.MatrixMode
 local glPushMatrix			= gl.PushMatrix
 local glPopMatrix			= gl.PopMatrix
@@ -122,11 +121,11 @@ local ColorMatrices = {
 			0.176,	-0.016, -0.005,
 		},
 		right = {
-			-0.043, 0.378,	-0.072,	
-			-0.088, 0.734,	-0.113,	
+			-0.043, 0.378,	-0.072,
+			-0.088, 0.734,	-0.113,
 			-0.002,-0.018,	1.226
 		}
-	},		
+	},
 	
 	anaglyphhalfcol = {
 		left = {
@@ -282,7 +281,7 @@ options = {
 			- Use "Anaglyph (No Shader)" mode if you are having trouble with your video.
 			- Convergence setting only applies when there's a rotatable camera.
 			
-			Issues: 
+			Issues:
 				- Facing straight down will not show a 3D effect.
 				- Some widgets such as IceUI will interfere with "Anaglyph (No Shader)" mode. Turn them off or try other modes.
 		]],
@@ -316,7 +315,7 @@ options = {
 		name = 'Separation',
 		type = 'number',
 		value = sep,
-		min=0,max=30,step=0.1, 
+		min=0,max=30,step=0.1,
 		desc = 'How far apart your eyes are.',
 		OnChange = UpdateConvSep,
 	},
@@ -325,7 +324,7 @@ options = {
 		name = 'Convergence',
 		type = 'number',
 		value = conv,
-		min=0,max=0.05,step=0.001, 
+		min=0,max=0.05,step=0.001,
 		desc = 'How crosseyed you are.',
 		OnChange = UpdateConvSep,
 	},

@@ -60,7 +60,7 @@ end
 function script.Create()
 	Hide(energyball)
 
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(Anim)
 end
 
@@ -74,7 +74,7 @@ function script.Killed(recentDamage, maxHealth)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
 		return 1 -- corpsetype
-	else		
+	else
 		return 2 -- corpsetype
 	end
 end

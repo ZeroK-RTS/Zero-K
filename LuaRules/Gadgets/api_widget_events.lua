@@ -19,10 +19,10 @@ local spGetUnitLosState    	= Spring.GetUnitLosState
 local scriptUnitDestroyed		= Script.LuaUI.UnitDestroyed
 local scriptUnitDestroyedByTeam	= Script.LuaUI.UnitDestroyedByTeam
 
-function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attUnitID, attUnitDefID, attTeamID)	
+function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attUnitID, attUnitDefID, attTeamID)
 	local myAllyTeamID = spGetMyAllyTeamID()
 	local spec, specFullView = spGetSpectatingState()
-	local isAllyUnit = spAreTeamsAllied(unitTeam, spGetMyTeamID())	
+	local isAllyUnit = spAreTeamsAllied(unitTeam, spGetMyTeamID())
 	
 	-- we need to check if any widget uses the callin, otherwise it is not bound and will produce error spam
 	if Script.LuaUI('UnitDestroyedByTeam') then
@@ -38,11 +38,11 @@ function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attUnitID, attUnitDe
 			elseif spGetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 then
 					scriptUnitDestroyed (unitID, unitDefID, unitTeam)
 					scriptUnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
-			end		
+			end
 		end
-	else		
+	else
 		if not isAllyUnit and (not (spec and specFullView) and (spGetUnitLosState(unitID, spGetMyAllyTeamID(), true) % 2 == 1)) then
  			scriptUnitDestroyed (unitID, unitDefID, unitTeam)
  		end
- 	end	
+ 	end
 end

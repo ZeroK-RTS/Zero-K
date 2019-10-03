@@ -1,7 +1,5 @@
 -- TODO: CACHE INCLUDE FILE
 -- scripts common to bombers
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
--- local CMD_REARM = 33410 --get from customcmds.h.lua
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetUnitMoveTypeData = Spring.GetUnitMoveTypeData
 
@@ -16,7 +14,7 @@ local function ReloadQueue(queue, cmdTag)
  --// remove finished command
 	local start = 1
 	if (queue[1])and(cmdTag == queue[1].tag) then
-		start = 2 
+		start = 2
 		 if re then
 			storeParams = queue[1].params
 		end
@@ -107,7 +105,7 @@ function SetUnarmedAI()
 	end
 end
 
-local defaultTurnRadius = UnitDefs[unitDefID].turnRadius 
+local defaultTurnRadius = UnitDefs[unitDefID].turnRadius
 function SetArmedAI()
 	local aircraftState = (spGetUnitMoveTypeData(unitID) or {}).aircraftState
 	if aircraftState then

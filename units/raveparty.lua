@@ -73,15 +73,15 @@ unitDef = {
     {
       def                = [[GREEN_STAMPER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
-    },    
+    },
     {
       def                = [[BLUE_SHOCKER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
-    },    
+    },
     {
       def                = [[VIOLET_SLUGGER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
-    },        
+    },
   },
 
 
@@ -98,6 +98,7 @@ unitDef = {
 
       customParams = {
         restrict_in_widgets = 1,
+        script_reload = [[6]],
       },
       damage                  = {
         default = 3002.1,
@@ -137,6 +138,7 @@ unitDef = {
         burntime = 240,
         burnchance = 1,
         restrict_in_widgets = 1,
+        script_reload = [[6]],
 
         area_damage = 1,
         area_damage_radius = 320,
@@ -181,6 +183,7 @@ unitDef = {
 
       customParams = {
         restrict_in_widgets = 1,
+        script_reload = [[6]],
       },
 
       damage                  = {
@@ -207,7 +210,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1100,
-    },    
+    },
 
     GREEN_STAMPER = {
       name                    = [[Green Stamper]],
@@ -223,6 +226,7 @@ unitDef = {
         smoothradius = [[192]],
         smoothmult   = [[0.7]],
         restrict_in_widgets = 1,
+        script_reload = [[6]],
       },
       
       damage                  = {
@@ -247,7 +251,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1100,
-    },    
+    },
 
     BLUE_SHOCKER = {
       name                    = [[Blue Shocker]],
@@ -260,6 +264,7 @@ unitDef = {
 
       customParams = {
         restrict_in_widgets = 1,
+        script_reload = [[6]],
       },
 
       damage                  = {
@@ -301,6 +306,7 @@ unitDef = {
         timeslow_damagefactor = 10,
         nofriendlyfire = "needs hax",
         restrict_in_widgets = 1,
+        script_reload = [[6]],
       },
       
       damage                  = {
@@ -321,13 +327,13 @@ unitDef = {
       reloadtime              = 1,
       size                    = 15,
       sizeDecay               = 0.03,
-      soundHit                = [[weapon/laser/disrupter_explosion]],
+      soundHit                = [[weapon/aoe_aura2]],
       soundStart              = [[weapon/cannon/big_begrtha_gun_fire]],
       stages                  = 30,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1100,
-    },    
+    },
     
   },
 

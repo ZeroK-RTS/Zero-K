@@ -31,8 +31,8 @@ local CMD_RECLAIM = CMD.RECLAIM
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- This is the allowUnitBuildStep method. It is a seamless solution but turns 
--- out to be dramatically slower than the second solution. 
+-- This is the allowUnitBuildStep method. It is a seamless solution but turns
+-- out to be dramatically slower than the second solution.
 -- AllowUnitBuildStep is really really expensive.
 --[[
 local maxHealth = {}
@@ -55,7 +55,7 @@ end
 --]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- This is the alternate way of doing things. It iterates over all units which 
+-- This is the alternate way of doing things. It iterates over all units which
 -- have been the target of a reclaim command and gives them back the health that
 -- they lost in being reclaimed. It iterates over all units that have ever been
 -- targeted by reclaim every frame so would be pretty horrible in the worst case
@@ -96,7 +96,7 @@ function gadget:GameFrame(n)
 	end
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_RECLAIM] = true, [CMD_INSERT] = true}
 end
 

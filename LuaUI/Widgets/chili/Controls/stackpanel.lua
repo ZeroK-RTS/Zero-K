@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 --- StackPanel module
 
@@ -17,7 +17,7 @@ StackPanel = LayoutPanel:Inherit{
 local this = StackPanel
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 function StackPanel:New(obj)
 	if (obj.orientation == "horizontal") then
@@ -29,7 +29,7 @@ function StackPanel:New(obj)
 	return obj
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function StackPanel:SetOrientation(orientation)
 	if (orientation == "horizontal") then
@@ -41,4 +41,4 @@ function StackPanel:SetOrientation(orientation)
 	inherited.SetOrientation(self, orientation)
 end
 
---// ============================================================================= 
+--// =============================================================================

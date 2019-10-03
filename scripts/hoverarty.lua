@@ -1,14 +1,14 @@
 include "constants.lua"
 
-local base = piece 'base' 
-local turret = piece 'turret' 
-local gun = piece 'barrel1' 
+local base = piece 'base'
+local turret = piece 'turret'
+local gun = piece 'barrel1'
 local wheels = {piece 'frdirt', piece 'fldirt', piece 'rrdirt', piece 'rldirt'}
-local frpontoon = piece 'frpontoon' 
-local flpontoon = piece 'flpontoon' 
-local rrpontoon = piece 'rrpontoon' 
-local rlpontoon = piece 'rlpontoon' 
-local flare = piece 'firepoint1' 
+local frpontoon = piece 'frpontoon'
+local flpontoon = piece 'flpontoon'
+local rrpontoon = piece 'rrpontoon'
+local rlpontoon = piece 'rlpontoon'
+local flare = piece 'firepoint1'
 
 local smokePiece = {base, turret}
 
@@ -80,7 +80,7 @@ function script.Create()
 	for i = 1, 4 do
 		Hide(wheels[i])
 	end
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(HoverFX)
 end
 

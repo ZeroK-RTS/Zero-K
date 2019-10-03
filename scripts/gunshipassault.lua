@@ -1,13 +1,13 @@
-local base = piece 'base' 
-local body = piece 'body' 
-local firep1 = piece 'firep1' 
-local firep2 = piece 'firep2' 
-local wings = piece 'wings' 
-local fan = piece 'fan' 
-local Rwingengine = piece 'Rwingengine' 
-local Lwingengine = piece 'Lwingengine' 
-local Rengine = piece 'Rengine' 
-local Lengine = piece 'Lengine' 
+local base = piece 'base'
+local body = piece 'body'
+local firep1 = piece 'firep1'
+local firep2 = piece 'firep2'
+local wings = piece 'wings'
+local fan = piece 'fan'
+local Rwingengine = piece 'Rwingengine'
+local Lwingengine = piece 'Lwingengine'
+local Rengine = piece 'Rengine'
+local Lengine = piece 'Lengine'
 
 local smokePiece = {base}
 
@@ -32,7 +32,7 @@ local function TiltWings()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(TiltWings)
 	Turn(Lwingengine, x_axis, math.rad(-90), math.rad(500))
 	Turn(Rwingengine, x_axis, math.rad(-90), math.rad(500))
@@ -60,20 +60,11 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-function script.FireWeapon(num)
-	--Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, {})
+function script.BlockShot(num, targetID)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 700, 12)
 end
 
---[[
-function script.BlockShot(num)
-	--Spring.Echo("Checking shot")
-	firestate = Spring.GetUnitStates(unitID).firestate
-	--Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, {})
-	return false
-end
-]]--
-
-function script.Shot(num) 
+function script.Shot(num)
 	gun_1 = not gun_1
 end
 

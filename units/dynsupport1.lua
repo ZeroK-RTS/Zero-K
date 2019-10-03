@@ -19,7 +19,7 @@ unitDef = {
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[45 50 45]],
-  collisionVolumeType    = [[CylY]],  
+  collisionVolumeType    = [[CylY]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -29,10 +29,10 @@ unitDef = {
     soundselect = [[bot_select]],
     soundbuild = [[builder_start]],
     commtype = [[4]],
-	modelradius    = [[25]],
+    modelradius    = [[25]],
     aimposoffset   = [[0 15 0]],
-	dynamic_comm   = 1,
-	shared_energy_gen = 1,
+    dynamic_comm   = 1,
+    shared_energy_gen = 1,
   },
 
   energyStorage       = 500,
@@ -45,7 +45,7 @@ unitDef = {
   idleTime            = 0,
   leaveTracks         = true,
   losEmitHeight       = 40,
-  maxDamage           = 2800,
+  maxDamage           = 3800,
   maxSlope            = 36,
   maxVelocity         = 1.2,
   maxWaterDepth       = 5000,
@@ -61,11 +61,11 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:flashmuzzle1]],
-	  [[custom:NONE]],
-	  [[custom:NONE]],
-	  [[custom:NONE]],
-	  [[custom:NONE]],
-	  [[custom:NONE]],
+      [[custom:NONE]],
+      [[custom:NONE]],
+      [[custom:NONE]],
+      [[custom:NONE]],
+      [[custom:NONE]],
     },
 
   },

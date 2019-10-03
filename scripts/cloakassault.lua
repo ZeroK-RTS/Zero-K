@@ -1,18 +1,18 @@
-local base = piece 'base' 
-local chest = piece 'chest' 
-local aim = piece 'aim' 
-local flare = piece 'flare' 
-local hips = piece 'hips' 
-local lthigh = piece 'lthigh' 
-local rthigh = piece 'rthigh' 
-local lforearm = piece 'lforearm' 
-local rforearm = piece 'rforearm' 
-local rshoulder = piece 'rshoulder' 
-local lshoulder = piece 'lshoulder' 
-local rshin = piece 'rshin' 
-local rfoot = piece 'rfoot' 
-local lshin = piece 'lshin' 
-local lfoot = piece 'lfoot' 
+local base = piece 'base'
+local chest = piece 'chest'
+local aim = piece 'aim'
+local flare = piece 'flare'
+local hips = piece 'hips'
+local lthigh = piece 'lthigh'
+local rthigh = piece 'rthigh'
+local lforearm = piece 'lforearm'
+local rforearm = piece 'rforearm'
+local rshoulder = piece 'rshoulder'
+local lshoulder = piece 'lshoulder'
+local rshin = piece 'rshin'
+local rfoot = piece 'rfoot'
+local lshin = piece 'lshin'
+local lfoot = piece 'lfoot'
 --linear constant=65536
 
 include "constants.lua"
@@ -137,7 +137,7 @@ local function walk()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.StartMoving()

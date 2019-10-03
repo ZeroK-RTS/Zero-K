@@ -1,10 +1,10 @@
---// ============================================================================= 
+--// =============================================================================
 --//  SHORT INFO WHY WE DO THIS:
---// Cause of the reference based system in lua we can't 
+--// Cause of the reference based system in lua we can't
 --// destroy objects yourself, instead we have to tell
 --// the GarbageCollector somehow that an object isn't
 --// in use anymore.
---//  Now we have a quite complex class system in Chili 
+--//  Now we have a quite complex class system in Chili
 --// with parent and children links between objects. Those
 --// circles make it normally impossible for the GC to
 --// detect if an object (and all its children) can be
@@ -18,7 +18,7 @@
 --// catch the parent), and the link between the parent
 --// and its children is 'hard', so the GC won't catch the
 --// children as long as there is a parent object.
---// ============================================================================= 
+--// =============================================================================
 
 local wmeta =  {__mode = "v"}
 local newproxy = newproxy or getfenv(0).newproxy
@@ -113,4 +113,4 @@ function CheckWeakLink(link)
 	return (type(link) == "userdata") and link()
 end
 
---// ============================================================================= 
+--// =============================================================================

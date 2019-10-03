@@ -42,7 +42,7 @@ skin.button = {
   backgroundColor = {0.20, 0.38, 0.46, 0.95},
   focusColor  = {0.20, 0.42, 0.50, 0.9},
   borderColor = {0.20, 0.42, 0.50, 0.15},
-  pressBackgroundColor = {0.14, 0.365, 0.42, 0.85}, 
+  pressBackgroundColor = {0.14, 0.365, 0.42, 0.85},
   
   DrawControl = DrawButton,
 }
@@ -56,7 +56,7 @@ skin.button_tiny = {
   backgroundColor = {0.20, 0.38, 0.46, 0.95},
   focusColor  = {0.20, 0.42, 0.50, 0.9},
   borderColor = {0.20, 0.42, 0.50, 0.15},
-  pressBackgroundColor = {0.14, 0.365, 0.42, 0.85}, 
+  pressBackgroundColor = {0.14, 0.365, 0.42, 0.85},
   
   DrawControl = DrawButton,
 }

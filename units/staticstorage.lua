@@ -13,7 +13,7 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[60 60 60]],
-  collisionVolumeType           = [[ellipsoid]], 
+  collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
   energyStorage                 = 500,
   explodeAs                     = [[SMALL_BUILDINGEX]],
@@ -35,8 +35,8 @@ unitDef = {
 
   customParams                  = {
     modelradius    = [[30]],
-	removewait     = 1,
-	default_spacing = 0,
+    removewait     = 1,
+    default_spacing = 0,
     selectionscalemult = 1.15,
   },
 

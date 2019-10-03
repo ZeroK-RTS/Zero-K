@@ -34,6 +34,7 @@ local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local ALLY_ACCESS = {allied = true}
 
 local unitCostOverride = {}
+local terraunitDefID = UnitDefNames["terraunit"].id
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -56,8 +57,11 @@ end
 
 local damagedUnits = {}
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
-
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
+	if (unitDefID == terraunitDefID) or (damage < 0.01) then
+		return
+	end
+	
 	if (weaponDefID and noFFWeaponDefs[weaponDefID] and unitTeam and attackerTeam and spAreTeamsAllied(unitTeam, attackerTeam)) then
 		return
 	end

@@ -27,7 +27,7 @@ local function Open()
 
 	while true do
 		local income = Spring.GetUnitRulesParam(unitID, "current_metalIncome") or 0
-		income = income * metalmultInv 
+		income = income * metalmultInv
 		if income > 0 then
 			Spin (furnace, y_axis, income, math.rad(1))
 			Spin (drill1, y_axis, income, math.rad(1))
@@ -47,7 +47,7 @@ function script.Activate()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	if not Spring.GetUnitIsStunned(unitID) then
 		StartThread(Open)
 	end

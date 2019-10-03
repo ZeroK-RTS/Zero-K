@@ -45,7 +45,7 @@ local stopProductionCmdDesc = {
 	type		= CMDTYPE.ICON,
 	name		= 'Stop Production',
 	action	    = 'stopproduction',
-	cursor      = 'Stop', -- Probably does nothing 
+	cursor      = 'Stop', -- Probably does nothing
 	tooltip     = 'Clear the unit production queue.',
 }
 
@@ -53,7 +53,7 @@ local stopProductionCmdDesc = {
 --------------------------------------------------------------------------------
 -- Handle the command
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_STOP_PRODUCTION] = true}
 end
 

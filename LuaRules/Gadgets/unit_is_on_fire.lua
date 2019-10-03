@@ -26,16 +26,16 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 
 --// customparams values
--- setunitsonfire: 
+-- setunitsonfire:
 --    iff a weapon has this tag set to anything it will set units on fire.
--- burntime: 
+-- burntime:
 --    burntime of weapon in frames. defaults to DEFAULT_BURN_TIME*firestarter/100
--- burntimerand: 
+-- burntimerand:
 --    adds randomness to burntime. Defaults to DEFAULT_BURN_TIME_RANDOMNESS
---    Constant random distribution over domain [burntime*(1-burnTimeRand),burntime]. 
--- burnchance: 
+--    Constant random distribution over domain [burntime*(1-burnTimeRand),burntime].
+-- burnchance:
 --    Chance of a unit to be set on fire when hit. Defaults to firestarter/1000
--- burndamage: 
+-- burndamage:
 --    Damage per frame of burning. Defaults to DEFAULT_BURN_DAMAGE
 
 --//SETTINGS
@@ -67,7 +67,7 @@ local SetUnitCloak      = Spring.SetUnitCloak
 --------------------------------------------------------------------------------
 
 local function cpv(value)
-	return value and tonumber(value) 
+	return value and tonumber(value)
 end
 
 -- NOTE: fireStarter is divided by 100 somewhere in the engine between weapon defs and here.
@@ -127,7 +127,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 				local burnLength = fwd.burnTime*(random()*fwd.burnTimeRand + fwd.burnTimeBase)
 				if (not unitsOnFire[unitID]) or unitsOnFire[unitID].damageLeft < (burnLength*fwd.burnDamage) then
 					unitsOnFire[unitID] = {
-						endFrame    = gameFrame + burnLength, 
+						endFrame    = gameFrame + burnLength,
 						damageLeft  = burnLength*fwd.burnDamage,
 						fireDmg     = fwd.burnDamage,
 						attackerID  = attackerID,
@@ -168,7 +168,7 @@ function gadget:GameFrame(n)
 				cnt=cnt+1
 			end
 		end
-		inGameFrame = false 
+		inGameFrame = false
 	end
 end
 

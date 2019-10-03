@@ -1,19 +1,19 @@
 include "constants.lua"
 
-local base = piece 'base' 
-local hull = piece 'hull' 
-local gunf = piece 'gunf' 
-local barrelfl = piece 'barrelfl' 
-local flarefl = piece 'flarefl' 
-local barrelfr = piece 'barrelfr' 
-local flarefr = piece 'flarefr' 
-local gunb = piece 'gunb' 
-local barrelbl = piece 'barrelbl' 
-local flarebl = piece 'flarebl' 
-local barrelbr = piece 'barrelbr' 
-local flarebr = piece 'flarebr' 
-local wake1 = piece 'wake1' 
-local wake2 = piece 'wake2' 
+local base = piece 'base'
+local hull = piece 'hull'
+local gunf = piece 'gunf'
+local barrelfl = piece 'barrelfl'
+local flarefl = piece 'flarefl'
+local barrelfr = piece 'barrelfr'
+local flarefr = piece 'flarefr'
+local gunb = piece 'gunb'
+local barrelbl = piece 'barrelbl'
+local flarebl = piece 'flarebl'
+local barrelbr = piece 'barrelbr'
+local flarebr = piece 'flarebr'
+local wake1 = piece 'wake1'
+local wake2 = piece 'wake2'
 
 local smokePiece = {gunf, hull, gunb}
 
@@ -52,7 +52,7 @@ local RESTORE_DELAY = 3000
 
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 
 	Turn(gunb, y_axis, math.rad(-180))
 end

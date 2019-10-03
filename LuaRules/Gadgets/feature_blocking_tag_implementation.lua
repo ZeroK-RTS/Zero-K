@@ -29,7 +29,7 @@ local spSetFeatureBlocking = Spring.SetFeatureBlocking
 function gadget:FeatureCreated(featureID)
 	local blocking = spGetFeatureBlocking(featureID)
 	if not blocking then
-		spSetFeatureBlocking(featureID, 
+		spSetFeatureBlocking(featureID,
 			false, -- isBlocking
 			false, -- isSolidObjectCollidable
 			false, -- isProjectileCollidable

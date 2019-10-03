@@ -1,4 +1,4 @@
-local body = piece 'body' 
+local body = piece 'body'
 
 local LUpperClaw1 	= piece 'LUpperClaw1'
 local LMidClaw1 	= piece 'LMidClaw1'
@@ -127,29 +127,29 @@ local function openDoors()
 	Sleep(200)
 	doorOpen = true
 	--[[
-	WaitForTurn(LUpperClaw1, z_axis) 
-	WaitForTurn(RUpperClaw1, z_axis) 
+	WaitForTurn(LUpperClaw1, z_axis)
+	WaitForTurn(RUpperClaw1, z_axis)
 	WaitForTurn(LMidClaw1,z_axis)
 	WaitForTurn(RMidClaw1,z_axis)
 	WaitForTurn(LLowClaw1,z_axis)
 	WaitForTurn(RLowClaw1,z_axis)
 	
-	WaitForTurn(LUpperClaw2, z_axis) 
-	WaitForTurn(RUpperClaw2, z_axis) 
+	WaitForTurn(LUpperClaw2, z_axis)
+	WaitForTurn(RUpperClaw2, z_axis)
 	WaitForTurn(LMidClaw2,z_axis)
 	WaitForTurn(RMidClaw2,z_axis)
 	WaitForTurn(LLowClaw2,z_axis)
 	WaitForTurn(RLowClaw2,z_axis)
 	
-	WaitForTurn(LUpperClaw3, z_axis) 
-	WaitForTurn(RUpperClaw3, z_axis) 
+	WaitForTurn(LUpperClaw3, z_axis)
+	WaitForTurn(RUpperClaw3, z_axis)
 	WaitForTurn(LMidClaw3,z_axis)
 	WaitForTurn(RMidClaw3,z_axis)
 	WaitForTurn(LLowClaw3,z_axis)
 	WaitForTurn(RLowClaw3,z_axis)
 	
-	WaitForTurn(LUpperClaw4, z_axis) 
-	WaitForTurn(RUpperClaw4, z_axis) 
+	WaitForTurn(LUpperClaw4, z_axis)
+	WaitForTurn(RUpperClaw4, z_axis)
 	WaitForTurn(LMidClaw4,z_axis)
 	WaitForTurn(RMidClaw4,z_axis)
 	WaitForTurn(LLowClaw4,z_axis)
@@ -192,30 +192,30 @@ function closeDoors()
 	Sleep(200)
 	doorOpen = false
 	--[[
-	WaitForTurn(LUpperClaw1, z_axis) 
-	WaitForTurn(RUpperClaw1, z_axis) 
+	WaitForTurn(LUpperClaw1, z_axis)
+	WaitForTurn(RUpperClaw1, z_axis)
 	WaitForTurn(LMidClaw1,z_axis)
 	WaitForTurn(RMidClaw1,z_axis)
 	WaitForTurn(LLowClaw1,z_axis)
 	WaitForTurn(RLowClaw1,z_axis)
 	
 	
-	WaitForTurn(LUpperClaw2, z_axis) 
-	WaitForTurn(RUpperClaw2, z_axis) 
+	WaitForTurn(LUpperClaw2, z_axis)
+	WaitForTurn(RUpperClaw2, z_axis)
 	WaitForTurn(LMidClaw2,z_axis)
 	WaitForTurn(RMidClaw2,z_axis)
 	WaitForTurn(LLowClaw2,z_axis)
 	WaitForTurn(RLowClaw2,z_axis)
 	
-	WaitForTurn(LUpperClaw3, z_axis) 
-	WaitForTurn(RUpperClaw3, z_axis) 
+	WaitForTurn(LUpperClaw3, z_axis)
+	WaitForTurn(RUpperClaw3, z_axis)
 	WaitForTurn(LMidClaw3,z_axis)
 	WaitForTurn(RMidClaw3,z_axis)
 	WaitForTurn(LLowClaw3,z_axis)
 	WaitForTurn(RLowClaw3,z_axis)
 	
-	WaitForTurn(LUpperClaw4, z_axis) 
-	WaitForTurn(RUpperClaw4, z_axis) 
+	WaitForTurn(LUpperClaw4, z_axis)
+	WaitForTurn(RUpperClaw4, z_axis)
 	WaitForTurn(LMidClaw4,z_axis)
 	WaitForTurn(RMidClaw4,z_axis)
 	WaitForTurn(LLowClaw4,z_axis)
@@ -264,13 +264,13 @@ function ForceDropUnit()
 end
 
 --fetch unit id of passenger (from the load command)
-function getPassengerId() 
+function getPassengerId()
 	local cmd=Spring.GetCommandQueue(unitID, 1)
-	local unitId = nil	
+	local unitId = nil
 	
-	if cmd and cmd[1] then					
+	if cmd and cmd[1] then
 		if cmd[1]['id'] == 75 then -- CMDTYPE.LOAD_UNITS = 75
-			unitId = cmd[1]['params'][1]				
+			unitId = cmd[1]['params'][1]
 		end
 	end
 	
@@ -278,16 +278,16 @@ function getPassengerId()
 end
 
 --fetch id of command
-function getCommandId() 
-	local cmd=Spring.GetCommandQueue(unitID, 1)		
-	if cmd and cmd[1] then		
-		return cmd[1]['id']		
+function getCommandId()
+	local cmd=Spring.GetCommandQueue(unitID, 1)
+	if cmd and cmd[1] then
+		return cmd[1]['id']
 	end
 	
 	return nil
 end
 
-function getDropPoint() 
+function getDropPoint()
 	local cmd = Spring.GetCommandQueue(unitID, 1)
 	if cmd and cmd[1] and cmd[1].id == 81 then -- CMDTYPE.LOAD_UNITS = 75
 		return cmd[1]['params'][1], cmd[1]['params'][2], cmd[1]['params'][3]
@@ -314,11 +314,11 @@ function isNearPickupPoint(passengerId, requiredDist)
 	local dz = pz2 - pz
 	local dist = (dx^2 + dz^2)
 	
-	if dist < requiredDist^2 then	
+	if dist < requiredDist^2 then
 		return true
 	else
 		return false
-	end	
+	end
 end
 
 function isNearDropPoint(transportUnitId, requiredDist)
@@ -336,18 +336,18 @@ function isNearDropPoint(transportUnitId, requiredDist)
 	end
 	
 	local dx = px - px2
-	local dz = pz - pz2 
+	local dz = pz - pz2
 	local dist = (dx^2 + dz^2)
 	
 	if dist < requiredDist^2 then
 		return true
 	else
 		return false
-	end	
+	end
 end
 
 function isValidCargo(soonPassenger, passenger)
-	return ((soonPassenger and Spring.ValidUnitID(soonPassenger)) or 
+	return ((soonPassenger and Spring.ValidUnitID(soonPassenger)) or
 	(passenger and Spring.ValidUnitID(passenger)))
 end
 
@@ -383,14 +383,14 @@ function script.MoveRate(curRate)
 		StartThread(script.EndTransport) --formalize unit drop (finish animation, clear tag, ect)
 	elseif getCommandId() == 75 and isNearPickupPoint(passengerId, 1000) then
 		StartThread(openDoors)
-	elseif getCommandId() == 81 and isNearDropPoint(unitLoaded, 1000) then	
+	elseif getCommandId() == 81 and isNearDropPoint(unitLoaded, 1000) then
 		StartThread(openDoors)
 	end
 end
 
 function script.BeginTransport(passengerID)
-	if loaded then 
-		return 
+	if loaded then
+		return
 	end
 	Move(link, y_axis, -Spring.GetUnitHeight(passengerID) - 15, nil, true)
 	
@@ -414,14 +414,14 @@ function script.BeginTransport(passengerID)
 	--StartThread(closeDoors)
 end
 
-function script.EndTransport() 
+function script.EndTransport()
 	getDropPoint()
 	--StartThread(openDoors)
 	if (unitLoaded ~= nil) then
 		DropUnit(unitLoaded)
 		unitLoaded = nil
 	end
-	loaded = false	
+	loaded = false
 	SetUnitValue(COB.BUSY, 0)
 	Sleep(1000)
 	StartThread(closeDoors)
@@ -460,7 +460,7 @@ end
 function script.Create()
 	Turn(dust1, x_axis, math.rad(90))
 	Turn(dust2, x_axis, math.rad(90))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(PickupAndDropFixer)
 	--StartThread(DustLoop)	-- looks stupid
 	

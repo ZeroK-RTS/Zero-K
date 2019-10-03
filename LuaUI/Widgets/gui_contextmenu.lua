@@ -110,7 +110,7 @@ local valkMaxSize = UnitDefNames.gunshiptrans.transportSize * 2
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Generate unit behaviour paths 
+-- Generate unit behaviour paths
 local BEHAVIOUR_PATH = "Settings/Unit Behaviour/Default States/"
 
 local behaviourPath = {}
@@ -163,7 +163,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function MakeStatsWindow() 
+local function MakeStatsWindow()
 end
 
 options_order = {'shortNotation', 'text_hotkey'}
@@ -266,7 +266,7 @@ addUnit(UnitDefNames["tele_beacon"].id, "Units/Misc", false)
 addUnit(UnitDefNames["asteroid"].id, "Units/Misc", false)
 
 
-local lobbyIDs = {} -- stores peoples names by lobbyID to match commanders to owners 
+local lobbyIDs = {} -- stores peoples names by lobbyID to match commanders to owners
 local players = Spring.GetPlayerList()
 for i = 1, #players do
 	local customkeys = select(10, Spring.GetPlayerInfo(players[i]))
@@ -296,17 +296,17 @@ function comma_value(amount, displayPlusMinus)
 
 	-- amount is a string when ToSI is used before calling this function
 	if type(amount) == "number" then
-		if (amount ==0) then formatted = "0" else 
-			if (amount < 2 and (amount * 100)%100 ~=0) then 
+		if (amount ==0) then formatted = "0" else
+			if (amount < 2 and (amount * 100)%100 ~=0) then
 				if displayPlusMinus then formatted = strFormat("%+.2f", amount)
-				else formatted = strFormat("%.2f", amount) end 
-			elseif (amount < 20 and (amount * 10)%10 ~=0) then 
+				else formatted = strFormat("%.2f", amount) end
+			elseif (amount < 20 and (amount * 10)%10 ~=0) then
 				if displayPlusMinus then formatted = strFormat("%+.1f", amount)
-				else formatted = strFormat("%.1f", amount) end 
-			else 
+				else formatted = strFormat("%.1f", amount) end
+			else
 				if displayPlusMinus then formatted = strFormat("%+d", amount)
-				else formatted = strFormat("%d", amount) end 
-			end 
+				else formatted = strFormat("%d", amount) end
+			end
 		end
 	else
 		formatted = amount .. ""
@@ -351,12 +351,12 @@ local function CloseButtonFunc2(self)
 end
 
 local function CloseButton(width)
-	return Button:New{ 
-		caption = 'Close', 
-		OnClick = { CloseButtonFunc }, 
-		width=width, 
+	return Button:New{
+		caption = 'Close',
+		OnClick = { CloseButtonFunc },
+		width=width,
 		height = B_HEIGHT,
-		--backgroundColor=color.sub_back_bg, 
+		--backgroundColor=color.sub_back_bg,
 		--textColor=color.sub_back_fg,
 		--classname = "back_button",
 	}
@@ -428,7 +428,7 @@ local function weapons2Table(cells, ws, unitID)
 	cells[#cells+1] = ''
 
 	if wd.isShield then
-		local regen, drain = GetShieldRegenDrain(wd) 
+		local regen, drain = GetShieldRegenDrain(wd)
 		cells[#cells+1] = ' - Strength:'
 		cells[#cells+1] = wd.shieldPower .. " HP"
 		cells[#cells+1] = ' - Regen:'
@@ -505,52 +505,68 @@ local function weapons2Table(cells, ws, unitID)
 
 		local mult = tonumber(cp.statsprojectiles) or ((tonumber(cp.script_burst) or wd.salvoSize) * wd.projectiles)
 
-		local dps_str, dam_str = '', ''
+		local dps_str, dam_str, shield_dam_str = '', '', ''
+		local damageTypes = 0
 		if dps > 0 then
 			dam_str = dam_str .. numformat(dam,2)
-			if wd.customParams.stats_damage_per_second then
+			shield_dam_str = shield_dam_str .. numformat(dam,2)
+			if cp.stats_damage_per_second then
 				dps_str = dps_str .. numformat(tonumber(cp.stats_damage_per_second),2)
 			else
 				dps_str = dps_str .. numformat(dps*mult,2)
 			end
+			damageTypes = damageTypes + 1
 		end
 		if dpsw > 0 then
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
+				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorCyan) .. numformat(damw,2) .. " (P)\008"
+			shield_dam_str = shield_dam_str .. color2incolor(colorCyan) .. numformat(math.floor(damw / 3),2) .. " (P)\008"
 			dps_str = dps_str .. color2incolor(colorCyan) .. numformat(dpsw*mult,2) .. " (P)\008"
+			damageTypes = damageTypes + 1
 		end
 		if dpss > 0 then
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
+				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorPurple) .. numformat(dams,2) .. " (S)\008"
+			shield_dam_str = shield_dam_str .. color2incolor(colorPurple) .. numformat(math.floor(dams / 3),2) .. " (S)\008"
 			dps_str = dps_str .. color2incolor(colorPurple) .. numformat(dpss*mult,2) .. " (S)\008"
+			damageTypes = damageTypes + 1
 		end
 
 		if dpsd > 0 then
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
+				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorDisarm) .. numformat(damd,2) .. " (D)\008"
+			shield_dam_str = shield_dam_str .. color2incolor(colorDisarm) .. numformat(math.floor(damd / 3),2) .. " (D)\008"
 			dps_str = dps_str .. color2incolor(colorDisarm) .. numformat(dpsd*mult,2) .. " (D)\008"
+			damageTypes = damageTypes + 1
 		end
 
 		if dpsc > 0 then
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
+				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorCapture) .. numformat(damc,2) .. " (C)\008"
+			shield_dam_str = shield_dam_str .. color2incolor(colorCapture) .. numformat(damc,2) .. " (C)\008"
 			dps_str = dps_str .. color2incolor(colorCapture) .. numformat(dpsc*mult,2) .. " (C)\008"
+			damageTypes = damageTypes + 1
 		end
 
 		if mult > 1 then
 			dam_str = dam_str .. " x " .. mult
+			shield_dam_str = shield_dam_str .. " x " .. mult
 		end
 		
 		local show_damage = not cp.stats_hide_damage
@@ -570,7 +586,7 @@ local function weapons2Table(cells, ws, unitID)
 			show_dps = false
 		end
 		
-		if cp.damage_vs_shield then -- Badger
+		if cp.damage_vs_shield and cp.spawns_name then -- Badger
 			dam_str = tostring(cp.damage_vs_shield) .. " (" .. dam .. " + " .. (tonumber(cp.damage_vs_shield)-dam) .. " mine)"
 			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield)/reloadtime))
 		end
@@ -578,6 +594,21 @@ local function weapons2Table(cells, ws, unitID)
 		if show_damage then
 			cells[#cells+1] = ' - Damage:'
 			cells[#cells+1] = dam_str
+		end
+
+		-- shield damage
+		if (wd.interceptedByShieldType ~= 0) and show_damage and not cp.stats_hide_shield_damage then
+			if cp.damage_vs_shield then
+				cells[#cells+1] = ' - Shield damage:'
+				cells[#cells+1] = numformat(cp.stats_shield_damage)
+			elseif tonumber(cp.stats_shield_damage) ~= dam then
+				cells[#cells+1] = ' - Shield damage:'
+				if damageTypes > 1 or mult > 1 then
+					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage * mult), 2) .. " (" .. shield_dam_str .. ")"
+				else
+					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage * mult), 2)
+				end
+			end
 		end
 		
 		if cp.post_capture_reload then
@@ -590,15 +621,6 @@ local function weapons2Table(cells, ws, unitID)
 		if show_dps then
 			cells[#cells+1] = ' - DPS:'
 			cells[#cells+1] = dps_str
-		end
-		
-		local lowerName = name:lower()
-		if lowerName:find("flamethrower") or lowerName:find("flame thrower") then
-			cells[#cells+1] = ' - Shield damage:'
-			cells[#cells+1] = "300%"
-		elseif lowerName:find("gauss") then
-			cells[#cells+1] = ' - Shield damage:'
-			cells[#cells+1] = "150%"
 		end
 
 		if (wd.interceptedByShieldType == 0) then
@@ -1046,18 +1068,16 @@ local function printAbilities(ud, unitID)
 	end
 
 	if cp.windgen then
-		local ground_extreme = Spring.GetGameRulesParam("WindGroundExtreme") or 1
 		local wind_slope = Spring.GetGameRulesParam("WindSlope") or 0
 		local max_wind = Spring.GetGameRulesParam("WindMax") or 2.5
-		local bonus_per_elmo = max_wind * wind_slope / ground_extreme
-		local bonus_100 = numformat(100*bonus_per_elmo)
+		local bonus_100 = numformat(100*wind_slope*max_wind)
 
 		cells[#cells+1] = 'Generates energy from wind'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Variable income'
 		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Max wind:' 
-		cells[#cells+1] = max_wind
+		cells[#cells+1] = ' - Max wind:'
+		cells[#cells+1] = max_wind .. " E"
 		cells[#cells+1] = ' - Altitude bonus:'
 		cells[#cells+1] = bonus_100 .. " E / 100 height"
 		cells[#cells+1] = ''
@@ -1160,7 +1180,7 @@ local function printWeapons(unitDef, unitID)
 	local weaponStats = {}
 
 	local wd = WeaponDefs
-	if not wd then return false end	
+	if not wd then return false end
 	
 	local ucp = unitDef.customParams
 	
@@ -1191,7 +1211,7 @@ local function printWeapons(unitDef, unitID)
 				end
 			end
 			
-			if (not isDuplicate) and not weaponDef.customParams.fake_weapon then 
+			if (not isDuplicate) and not weaponDef.customParams.fake_weapon then
 				local wsTemp = {
 					weaponID = weaponID,
 					count = 1,
@@ -1230,10 +1250,10 @@ local function printWeapons(unitDef, unitID)
 end
 
 local function GetWeapon(weaponName)
-	return WeaponDefNames[weaponName] 
+	return WeaponDefNames[weaponName]
 end
 
-local function printunitinfo(ud, buttonWidth, unitID)	
+local function printunitinfo(ud, buttonWidth, unitID)
 	local icons = {
 		Image:New{
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
@@ -1272,12 +1292,12 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	end
 
 	local helptextbox = TextBox:New{
-		text = Spring.Utilities.GetHelptext(ud), 
-		textColor = color.stats_fg, 
+		text = Spring.Utilities.GetHelptext(ud),
+		textColor = color.stats_fg,
 		width = '100%',
 		height = '100%',
-		padding = { 0, 0, 0, 0 }, 
-		} 
+		padding = { 0, 0, 0, 0 },
+		}
 	
 	local statschildren = {}
 
@@ -1426,7 +1446,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		for i=1, #legacyModules do
 			statschildren[#statschildren+1] = Label:New{ caption = legacyModules[i], textColor = color.stats_fg,}
 			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg,}
-		end	
+		end
 	end
 
 	local cells = printAbilities(ud, isCommander and unitID)
@@ -1458,7 +1478,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	end
 
 	-- fixme: get a better way to get default buildlist?
-	local default_buildlist = UnitDefNames["shieldcon"].buildOptions 
+	local default_buildlist = UnitDefNames["shieldcon"].buildOptions
 	local this_buildlist = ud.buildOptions
 	if ((#this_buildlist ~= #default_buildlist) and (#this_buildlist > 0)) then
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
@@ -1566,7 +1586,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		children = { helptextbox, stack_stats, },
 	}
 	return {
-		helptext_stack, 
+		helptext_stack,
 		stack_icons,
 	}
 end
@@ -1639,17 +1659,17 @@ MakeStatsWindow = function(ud, x,y, unitID)
 			bottom = B_HEIGHT + 10,
 			padding = {2,2,2,2},
 			children = printunitinfo(ud, window_width, unitID) ,
-		},	
-		Button:New{ 
-			caption = 'Close', 
-			OnClick = { function(self) KillStatsWindow(num) end }, 
+		},
+		Button:New{
+			caption = 'Close',
+			OnClick = { function(self) KillStatsWindow(num) end },
 			
 			x=5,
 			height=B_HEIGHT,
 			right=5,
 			bottom=5,
 			
-			--backgroundColor=color.sub_back_bg, 
+			--backgroundColor=color.sub_back_bg,
 			--textColor=color.sub_back_fg,
 			--classname = "back_button",
 		}
@@ -1659,14 +1679,14 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		window_unitstats:Dispose()
 	end
 
-	statswindows[num] = Window:New{  
+	statswindows[num] = Window:New{
 		x = x,
 		y = y,
 		width  = window_width,
 		height = window_height,
 		resizable = true,
 		parent = screen0,
-		backgroundColor = color.stats_bg, 
+		backgroundColor = color.stats_bg,
 		classname = "main_window_small",
 		
 		minWidth = 250,
@@ -1713,12 +1733,12 @@ local function PriceWindow(unitID, action)
 			func = function() spSendLuaRulesMsg(  command .. '|' .. unitID .. '|' .. dollar_amount) end
 		end
 		if caption then
-			grid_children[#grid_children+1] = Button:New{ 
-				caption = caption, 
-				OnClick = { func, CloseButtonFunc2 }, 
+			grid_children[#grid_children+1] = Button:New{
+				caption = caption,
+				OnClick = { func, CloseButtonFunc2 },
 				width=window_width,
 				height=B_HEIGHT,
-				--backgroundColor=color.sub_back_bg, 
+				--backgroundColor=color.sub_back_bg,
 				--textColor=color.sub_back_fg,
 				--classname = "back_button",
 			}
@@ -1758,14 +1778,14 @@ local function PriceWindow(unitID, action)
 		children = children,
 	}
 	
-	local window = Window:New{  
-		x = scrW/2,  
+	local window = Window:New{
+		x = scrW/2,
 		y = scrH/2,
 		clientWidth  = window_width,
 		clientHeight = window_height,
 		resizable = false,
 		parent = screen0,
-		backgroundColor = color.context_bg, 
+		backgroundColor = color.context_bg,
 		children = {stack1},
 	}
 end
@@ -1790,11 +1810,11 @@ local function MakeUnitContextMenu(unitID,x,y)
 		Label:New{ caption = 'Player: ' .. playerName, width=window_width, textColor=teamColor },
 		Label:New{ caption = 'Alliance - ' .. alliance .. '    Team - ' .. team, width=window_width ,textColor = color.context_fg,},
 		
-		Button:New{ 
-			caption = 'Unit Info', 
-			OnClick = { function() MakeStatsWindow(ud,x,y) end }, 
+		Button:New{
+			caption = 'Unit Info',
+			OnClick = { function() MakeStatsWindow(ud,x,y) end },
 			width=window_width,
-			--backgroundColor=color.sub_back_bg, 
+			--backgroundColor=color.sub_back_bg,
 			--textColor=color.sub_back_fg,
 			--classname = "back_button",
 		},
@@ -1804,30 +1824,30 @@ local function MakeUnitContextMenu(unitID,x,y)
 	
 	if marketandbounty then
 		if team == myTeamID then
-			children[#children+1] =  Button:New{ 
-				caption = 'Set Sale Price', 
-				OnClick = { function(self) PriceWindow(unitID, 'sell') end }, 
-				width=window_width, 
-				--backgroundColor=color.sub_back_bg, 
+			children[#children+1] =  Button:New{
+				caption = 'Set Sale Price',
+				OnClick = { function(self) PriceWindow(unitID, 'sell') end },
+				width=window_width,
+				--backgroundColor=color.sub_back_bg,
 				--textColor=color.sub_back_fg,
 				--classname = "back_button",
 			}
 		else
-			children[#children+1] =  Button:New{ 
-				caption = 'Offer To Buy', 
-				OnClick = { function(self) PriceWindow(unitID, 'buy') end }, 
-				width=window_width, 
-				--backgroundColor=color.sub_back_bg, 
+			children[#children+1] =  Button:New{
+				caption = 'Offer To Buy',
+				OnClick = { function(self) PriceWindow(unitID, 'buy') end },
+				width=window_width,
+				--backgroundColor=color.sub_back_bg,
 				--textColor=color.sub_back_fg,
 				--classname = "back_button",
 			}
 		end
 		if myAlliance ~= alliance then
-			children[#children+1] =  Button:New{ 
-				caption = 'Place Bounty', 
-				OnClick = { function(self) PriceWindow(unitID, 'bounty') end }, 
-				width=window_width, 
-				--backgroundColor=color.sub_back_bg, 
+			children[#children+1] =  Button:New{
+				caption = 'Place Bounty',
+				OnClick = { function(self) PriceWindow(unitID, 'bounty') end },
+				width=window_width,
+				--backgroundColor=color.sub_back_bg,
 				--textColor=color.sub_back_fg,
 				--classname = "back_button",
 			}
@@ -1860,15 +1880,15 @@ local function MakeUnitContextMenu(unitID,x,y)
 		children = children,
 	}
 	
-	window_unitcontext = Window:New{  
-		x = x,  
-		y = y,  
+	window_unitcontext = Window:New{
+		x = x,
+		y = y,
 		clientWidth  = window_width,
 		clientHeight = window_height,
 		classname = "main_window_small",
 		resizable = false,
 		parent = screen0,
-		backgroundColor = color.context_bg, 
+		backgroundColor = color.context_bg,
 		children = {stack1},
 	}
 	AdjustWindow(window_unitcontext)

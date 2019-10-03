@@ -4,9 +4,9 @@
 include 'constants.lua'
 
 local base, pelvis, torso = piece('base', 'pelvis', 'torso')
-local shield = piece 'shield' 
-local lathe = piece 'lathe' 
-local emit = piece 'emit' 
+local shield = piece 'shield'
+local lathe = piece 'lathe'
+local emit = piece 'emit'
 local centerpoint = piece 'centerpoint'
 local rthigh, ruppercalf, rlowercalf, rfoot = piece('rthigh', 'ruppercalf', 'rlowercalf', 'rfoot')
 local lthigh, luppercalf, llowercalf, lfoot = piece('lthigh', 'luppercalf', 'llowercalf', 'lfoot')
@@ -46,7 +46,7 @@ local function Step(front, back)
 	WaitForTurn(front.uppercalf, x_axis)
 	WaitForTurn(back.thigh, x_axis)
 	WaitForTurn(back.uppercalf, x_axis)
-	-- wait one gameframe 
+	-- wait one gameframe
 	Sleep(0)
 end
 
@@ -62,7 +62,7 @@ local function Walk()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
@@ -76,7 +76,7 @@ local function Stopping()
 	Turn(rightLeg.thigh, x_axis, 0, math.rad(60) * PACE)
 	Turn(leftLeg.thigh, x_axis, 0, math.rad(60) * PACE)
 	Turn(rightLeg.uppercalf, x_axis, 0, math.rad(70) * PACE)
-	Turn(leftLeg.uppercalf, x_axis, 0, math.rad(70) * PACE) 
+	Turn(leftLeg.uppercalf, x_axis, 0, math.rad(70) * PACE)
 	Turn(rightLeg.foot, x_axis, 0, math.rad(60) * PACE)
 	Turn(leftLeg.foot, x_axis, 0, math.rad(60) * PACE)
 	

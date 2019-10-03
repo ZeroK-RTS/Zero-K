@@ -225,7 +225,7 @@ local menu_armcom = {
 	   {
         angle = 0,
         unit = "zenith"
-       }, 	   
+       },
     },
   },
   },

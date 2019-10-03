@@ -21,7 +21,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[14]],
+    modelradius    = [[14]],
+    cus_noflashlight = 1,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -41,7 +42,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherepole.s3o]],
-  script				 = [[cloakheavyraid.lua]],
+  script                 = [[cloakheavyraid.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {
@@ -84,14 +85,14 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-		light_camera_height = 500,
-		light_color = [[1 1 0.7]],
-		light_radius = 120,
-		light_beam_start = 0.25,
-		
+        light_camera_height = 500,
+        light_color = [[1 1 0.7]],
+        light_radius = 120,
+        light_beam_start = 0.25,
+        
         combatrange = 50,
       },
-	  
+      
       damage                  = {
         default = 200.1,
         planes  = 200,
@@ -100,7 +101,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_ORANGE]],
       fireStarter             = 90,
-	  hardStop                = false,
+      hardStop                = false,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -112,7 +113,7 @@ unitDef = {
       reloadtime              = 1.4,
       rgbColor                = [[1 0.25 0]],
       soundStart              = [[BladeSwing]],
-      targetborder            = 1,
+      targetborder            = 0.9,
       thickness               = 0,
       tolerance               = 10000,
       turret                  = true,

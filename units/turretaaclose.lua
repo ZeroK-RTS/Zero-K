@@ -12,7 +12,7 @@ unitDef = {
   category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 12 0]],
   collisionVolumeScales         = [[42 53 42]],
-  collisionVolumeType	        = [[CylY]],
+  collisionVolumeType            = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -43,7 +43,7 @@ unitDef = {
   },
   sightDistance                 = 550,
   useBuildingGroundDecal        = true,
-  waterline						= 10,
+  waterline                     = 10,
   workerTime                    = 0,
   yardMap                       = [[ooooooooo]],
 
@@ -70,7 +70,7 @@ unitDef = {
       cylinderTargeting       = 3,
 
       customParams = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
         isaa = [[1]],
         script_reload = [[15]],
@@ -90,7 +90,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-	  leadLimit               = 0,
+      leadLimit               = 0,
       model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
       range                   = 480,

@@ -34,7 +34,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[dante.s3o]],
-  script			  = [[striderdante.lua]],
+  script              = [[striderdante.lua]],
   selfDestructAs      = [[CRAWL_BLASTSML]],
 
   sfxtypes            = {
@@ -99,45 +99,45 @@ unitDef = {
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
-	  cegTag                  = [[flamer]],
+      cegTag                  = [[flamer]],
 
-	  customParams        	  = {
-		flamethrower = [[1]],
-	    setunitsonfire = "1",
+      customParams              = {
+        flamethrower = [[1]],
+        setunitsonfire = "1",
         burnchance = "0.4", -- Per-impact
-		burntime = [[450]],
+        burntime = [[450]],
 
-		light_camera_height = 1800,
+        light_camera_height = 1800,
         light_color = [[0.6 0.39 0.18]],
-		light_radius = 260,
-		light_fade_time = 13,
-		light_beam_mult_frames = 5,
-		light_beam_mult = 5,
-	  },
-	  
+        light_radius = 260,
+        light_fade_time = 13,
+        light_beam_mult_frames = 5,
+        light_beam_mult = 5,
+      },
+      
       damage                  = {
         default = 15,
         subs    = 0.15,
       },
 
-	  duration				  = 0.01,
+      duration                  = 0.01,
       explosionGenerator      = [[custom:SMOKE]],
-	  fallOffRate             = 1,
-	  fireStarter             = 100,
-	  heightMod               = 1,
-	  impulseBoost            = 0,
+      fallOffRate             = 1,
+      fireStarter             = 100,
+      heightMod               = 1,
+      impulseBoost            = 0,
       impulseFactor           = 0,
       intensity               = 0.3,
       interceptedByShieldType = 1,
       noExplode               = true,
       noSelfDamage            = true,
       range                   = 340,
-      reloadtime              = 0.16,
-	  rgbColor                = [[1 1 1]],
-	  soundStart              = [[weapon/flamethrower]],
+      reloadtime              = 0.133,
+      rgbColor                = [[1 1 1]],
+      soundStart              = [[weapon/flamethrower]],
       soundTrigger            = true,
-	  texture1				  = [[flame]],
-	  thickness	              = 0,
+      texture1                = [[flame]],
+      thickness               = 0,
       tolerance               = 5000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
@@ -153,16 +153,16 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-		light_camera_height = 2000,
-		light_color = [[0.9 0.4 0.12]],
-		light_radius = 180,
-		light_fade_time = 35,
-		light_fade_offset = 10,
-		light_beam_mult_frames = 9,
-		light_beam_mult = 8,
-	  },
-	  
+      customParams              = {
+        light_camera_height = 2000,
+        light_color = [[0.9 0.4 0.12]],
+        light_radius = 180,
+        light_fade_time = 35,
+        light_fade_offset = 10,
+        light_beam_mult_frames = 9,
+        light_beam_mult = 8,
+      },
+      
       damage                  = {
         default = 49,
         planes  = 49,
@@ -200,15 +200,15 @@ unitDef = {
       areaOfEffect            = 228,
       burst                   = 2,
       burstrate               = 0.1,
-	  cegTag                  = [[missiletrailredsmall]],
+      cegTag                  = [[missiletrailredsmall]],
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-	    setunitsonfire = "1",
-	    burnchance = "1",
-	  },
-	  
+      customParams              = {
+        setunitsonfire = "1",
+        burnchance = "1",
+      },
+      
       damage                  = {
         default = 120.8,
         subs    = 6,
@@ -254,14 +254,14 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-	    setunitsonfire = "1",
-	    burnchance = "1",
-		
-		light_color = [[0.8 0.4 0.1]],
-		light_radius = 320,
-	  },
-	  
+      customParams              = {
+        setunitsonfire = "1",
+        burnchance = "1",
+        
+        light_color = [[0.8 0.4 0.1]],
+        light_radius = 320,
+      },
+      
       damage                  = {
         default = 120.8,
         subs    = 6,
@@ -277,7 +277,7 @@ unitDef = {
       impulseFactor           = 0.1,
       interceptedByShieldType = 2,
       model                   = [[wep_m_hailstorm.s3o]],
-      projectiles			  = 2,
+      projectiles             = 2,
       range                   = 460,
       reloadtime              = 20,
       smokeTrail              = true,

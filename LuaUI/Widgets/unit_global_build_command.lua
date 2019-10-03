@@ -3,13 +3,13 @@
 --
 --  file:    unit_global_build_command.lua
 --  brief:   Fork of Central Build AI, which originally replaced Central Build Group AI
---  
+--
 --	author: aeonios (mtroyka)
 --	Copyright (C) 2015.
 --
 --	original by:  Troy H. Cheek
 --  Copyright (C) 2009.
---  
+--
 --	Licensed under the terms of the GNU GPL, v2 or later.
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -68,14 +68,14 @@ end
 ---- CHANGELOG (OLD)-----
 --	the following is from Central Build AI, which contains information that I found useful in understanding
 --	how the code works, and which documents certain Spring/ZK quirks that you may want to know about.
---	
+--
 -- msafwan(xponen)	v1.355	(26Jan2015)	:	1) all builder re-assign job every 4 second (even if already assigned a job)
 --											2) keep queue for unfinished building
 --											3) lower priority (and/or removal) for queue at enemy infested area
 --
--- msafwan,			v1.21	(7oct2012)	: 	fix some cases where unit become 'idle' but failed to be registered by CBA, 
+-- msafwan,			v1.21	(7oct2012)	: 	fix some cases where unit become 'idle' but failed to be registered by CBA,
 --											make CBA assign all job at once rather than sending 1 by 1 after every some gameframe delay,
--- msafwan,			v1.2	(4sept2012)	: 	made it work with ZK "cmd_mex_placement.lua" mex queue, 
+-- msafwan,			v1.2	(4sept2012)	: 	made it work with ZK "cmd_mex_placement.lua" mex queue,
 --											reduce the tendency to make a huge blob of constructor (where all constructor do same job),
 --											reduce chance of some constructor not given job when player have alot of constructor,
 -- rafal,			v1.1	(2May2012)	:	Don't fetch full Spring.GetCommandQueue in cases when only the first command is needed - instead using
@@ -84,7 +84,7 @@ end
 -- versus666,		v1.1	(16dec2011)	: 	mostly changed the layer order to get a logical priority among widgets.
 -- KingRaptor,		v1.1	(8dec2011)	:	Fixed the remaining unitdef tags for 85.0
 -- versus666,		v1.1	(7jan2011)	: 	Made CBA, cmd_retreat, gui_nuke_button, gui_team_platter.lua, unit_auto_group to obey F5 (gui hidden).
--- KingRaptor,		v1.1	(2Nov2010)	:	Moved version number from name to description. 
+-- KingRaptor,		v1.1	(2Nov2010)	:	Moved version number from name to description.
 -- lccquantum,		v1.1	(2Nov2010)	:	central_build_AI is disabled by default (people will wonder why their builders are acting wierd when in group 0)
 -- versus666,		v1.1	(1Nov2010)	: 	introduced into ZK
 
@@ -549,7 +549,7 @@ function widget:Update(dt)
 				else
 					x, y, z = spGetUnitPosition(myCmd.target)
 				end
-				local newCmd = {x=x, y=y, z=z} 
+				local newCmd = {x=x, y=y, z=z}
 				if spIsSphereInView(x, y, z, 100) then
 					if cmd == CMD_REPAIR then
 						stRepList[#stRepList+1] = newCmd
@@ -991,8 +991,8 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	end
 	
 	-- chicken autoreclaiming units to the center of your territory if they get attacked.
-	if busyUnits[unitID] and includedBuilders[unitID].cmdtype == commandType.buildQueue 
-	  and ((options.cleanWrecks.value and buildQueue[busyUnits[unitID]].id == CMD_RECLAIM) or (options.autoRepair.value and buildQueue[busyUnits[unitID]].id == CMD_REPAIR)) 
+	if busyUnits[unitID] and includedBuilders[unitID].cmdtype == commandType.buildQueue
+	  and ((options.cleanWrecks.value and buildQueue[busyUnits[unitID]].id == CMD_RECLAIM) or (options.autoRepair.value and buildQueue[busyUnits[unitID]].id == CMD_REPAIR))
 	  and options.chicken.value and territoryCount > 0 then
 		local job = buildQueue[busyUnits[unitID]]
 		if job.id == CMD_REPAIR and job.target then
@@ -1041,7 +1041,7 @@ function widget:CommandsChanged()
 				name    = 'Global Build',
 				cursor  = 'Repair',
 				action  = 'globalbuild',
-				params  = {order, 'off', 'on'}, 
+				params  = {order, 'off', 'on'},
 			})
 			
 			-- add the cancel jobs command
@@ -1052,7 +1052,7 @@ function widget:CommandsChanged()
 				name    = 'Global Build Cancel',
 				cursor  = 'Repair',
 				action  = 'globalbuildcancel',
-				--params  = {order, 'off', 'on'}, 
+				--params  = {order, 'off', 'on'},
 			})
 			
 			break
@@ -1060,7 +1060,7 @@ function widget:CommandsChanged()
 	end
 end
 
---	A ZK compatibility function: receive broadcasted event from "unit_initial_queue.lua" (ZK specific) which 
+--	A ZK compatibility function: receive broadcasted event from "unit_initial_queue.lua" (ZK specific) which
 function CommandNotifyPreQue(unitID)
 	if includedBuilders[unitID] then
 		includedBuilders[unitID].cmdtype = commandType.drec
@@ -1346,7 +1346,7 @@ end
 
 --[[
 HOW THIS WORKS:
-	FindEligibleWorker() 
+	FindEligibleWorker()
 		Sorts through our group and returns a worker to be assigned,
 		ensuring that we cycle through all workers (more or less) evenly. Does not consider workers that are under direct orders.
 	GiveWorkToUnit()
@@ -1471,7 +1471,7 @@ function GiveWorkToUnit(unitID)
 	end
 end
 
--- This function returns the cheapest job for a given worker, given the cost model implemented in CostOfJob(). 
+-- This function returns the cheapest job for a given worker, given the cost model implemented in CostOfJob().
 function FindCheapestJob(unitID)
     local cachedJob = nil -- the cheapest job that we've seen
     local cachedCost = 0 -- the cost of the currently cached cheapest job
@@ -1553,7 +1553,7 @@ function FindCheapestJob(unitID)
 		end
 	end
     return cachedJob -- after iterating over the entire queue, the resulting cached job will be the cheapest, return it.
-end       
+end
                     
 -- This function implements the 'intelligent' cost model for assigning jobs.
 function IntelliCost(unitID, hash, ux, uz, jx, jz)
@@ -1662,7 +1662,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 		end
 	end
 	return cost
-end                 
+end
 
 -- This function implements the 'flat' cost model for assigning jobs.
 function FlatCost(unitID, hash, ux, uz, jx, jz)
@@ -1729,7 +1729,7 @@ function FlatCost(unitID, hash, ux, uz, jx, jz)
 			cost = distance + (800 * (costMod - 2))
 		elseif job.id == CMD_REPAIR or job.id == CMD_RECLAIM then -- for repair and reclaim
 			cost = distance + (200 * costMod)
-		else 
+		else
 			cost = distance + (600 * costMod) -- for all other jobs, assist is expensive
 		end
 	end
@@ -2035,7 +2035,7 @@ function CleanOrders(cmd, isNew)
 				elseif canBuildThisThere == blockageType.mobiles and includedBuilders[blockerID] and UnitDefs[blockerDefID].moveDef.id and (includedBuilders[blockerID].cmdtype == commandType.idle or includedBuilders[blockerID].cmdtype == commandType.buildQueue) and next(cmd.assignedUnits) then
 				-- if blocked by a mobile unit, and it's one of our constructors, and not a flying unit, and it's not under direct orders, and there's actually a worker assigned to the job...
 					local x,y,z = spGetUnitPosition(blockerID)
-					local dx, dz = GetNormalizedDirection(cx, cz, x, z) 
+					local dx, dz = GetNormalizedDirection(cx, cz, x, z)
 					dx = dx*75
 					dz = dz*75
 					spGiveOrderToUnit(blockerID, CMD_RAW_MOVE, {x+dx, y, z+dz}, 0) -- move it out of the way
@@ -2116,7 +2116,7 @@ function CleanOrders(cmd, isNew)
 			local target = cmd.target
 			local good = false
 			
-			if hasRes then 
+			if hasRes then
 				if cmd.id == CMD_RESURRECT then -- for resurrect, check for conflicting reclaim orders, and remove them
 					myCmd = {id=CMD_RECLAIM, target=target}
 					xhash = BuildHash(myCmd)
@@ -2197,7 +2197,7 @@ function CanBuildThis(cmdID, unitID)
 		local bcmd = abs(cmdID) -- abs the command ID to get the unitDefID that it refers to
 		for _, options in ipairs(unitDef.buildOptions) do
 			if ( options == bcmd ) then -- check whether our unit can build it
-				return true 
+				return true
 			end
 		end
 		return false
@@ -2237,7 +2237,7 @@ function IsTargetReachable(unitID, tx,ty,tz)
 	    end
     else
 	    return true --for air units; always reachable
-    end	
+    end
 end
 
 -- This function caches pathing when a new worker enters the group.

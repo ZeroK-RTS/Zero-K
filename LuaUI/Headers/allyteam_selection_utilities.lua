@@ -29,7 +29,7 @@ local function GetLeftRightAllyTeamIDs()
 		comparisonX = Spring.GetGameRulesParam("startpos_x_" .. enemyBoxID .. "_1")
 	end
 
-	if myBoxRepresentativeSpotX <= comparisonX then
+	if (not myBoxRepresentativeSpotX) or (myBoxRepresentativeSpotX <= comparisonX) then
 		return {myAllyTeamID, enemyAllyTeamID}
 	else
 		return {enemyAllyTeamID, myAllyTeamID}

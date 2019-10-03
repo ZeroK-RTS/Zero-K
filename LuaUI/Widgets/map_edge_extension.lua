@@ -44,6 +44,12 @@ local drawingEnabled = true
 
 local SPACE_CLICK_OUTSIDE = false
 
+local forceTextureToGrid = false
+function WG.game_SetCustomExtensionGridTexture(newGridTex, newForceTextureToGrid)
+	gridTex = newGridTex
+	forceTextureToGrid = newForceTextureToGrid
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -65,7 +71,7 @@ options = {
 	--when using shader the map is stored once in a DL and drawn 8 times with vertex mirroring and bending
     --when not, the map is drawn mirrored 8 times into a display list
 	mapBorderStyle = {
-		type='radioButton', 
+		type='radioButton',
 		name='Exterior Effect',
 		items = {
 			{name = 'Texture',  key = 'texture', desc = "Mirror the heightmap and texture.",              hotkey = nil},
@@ -76,7 +82,7 @@ options = {
 		value = 'grid',  --default at start of widget is to be disabled!
 		OnChange = function(self)
 			Spring.SendCommands("mapborder " .. ((self.value == 'cutaway' or self.value == 'texture') and "1" or "0"))
-			drawingEnabled = (self.value == "texture") or (self.value == "grid") 
+			drawingEnabled = (self.value == "texture") or (self.value == "grid")
 			ResetWidget()
 		end,
 		noHotkey = true,
@@ -85,7 +91,7 @@ options = {
 		name = "Draw for islands",
 		type = 'bool',
 		value = false,
-		desc = "Draws mirror map when map is an island",		
+		desc = "Draws mirror map when map is an island",
 		noHotkey = true,
 	},
 	useShader = {
@@ -100,8 +106,8 @@ options = {
 	gridSize = {
 		name = "Heightmap tile size",
 		type = 'number',
-		min = 32, 
-		max = 512, 
+		min = 32,
+		max = 512,
 		step = 32,
 		value = 32,
 		desc = '',
@@ -111,8 +117,8 @@ options = {
 		name = "Texture Brightness",
 		advanced = true,
 		type = 'number',
-		min = 0, 
-		max = 1, 
+		min = 0,
+		max = 1,
 		step = 0.01,
 		value = 0.27,
 		desc = 'Sets the brightness of the realistic texture (doesn\'t affect the grid)',
@@ -256,7 +262,7 @@ local function IsIsland()
 		-- right edge
 		if GetGroundHeight(Game.mapSizeX, i) > 0 then
 			return false
-		end	
+		end
 	end
 	return true
 end
@@ -331,10 +337,10 @@ end
 local function DrawOMap(useMirrorShader)
 	gl.Blending(GL.SRC_ALPHA,GL.ONE_MINUS_SRC_ALPHA)
 	gl.DepthTest(GL.LEQUAL)
-        if options.mapBorderStyle.value == "texture" then 
+		if options.mapBorderStyle.value == "texture" and not forceTextureToGrid then
 			gl.Texture(realTex)
-		else 
-			gl.Texture(gridTex) 
+		else
+			gl.Texture(gridTex)
 		end
 	gl.BeginEnd(GL.TRIANGLE_STRIP,DrawMapVertices, useMirrorShader)
 	gl.DepthTest(false)
@@ -348,7 +354,7 @@ local function DrawOMap(useMirrorShader)
 	gl.DepthTest(false)
 	gl.Color(1,1,1,1)
 	gl.PopAttrib()
-	----	
+	----
 end
 
 local function Initialize()
@@ -364,7 +370,7 @@ local function Initialize()
 	local enableMapBorder = false
 	if island and not options.drawForIslands.value then
 		enableMapBorder = false
-	elseif options and (options.mapBorderStyle.value == 'cutaway' or options.mapBorderStyle.value == 'texture') then
+	elseif options and (options.mapBorderStyle.value == 'cutaway' or (options.mapBorderStyle.value == 'texture' and (not forceTextureToGrid))) then
 		enableMapBorder = true
 	end
 	
@@ -405,7 +411,7 @@ local function Initialize()
 end
 
 function widget:Initialize()
-	if Spring.GetGameRulesParam("waterLevelModifier") then
+	if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
 		return
 	end
 	Initialize()
@@ -434,15 +440,15 @@ local function DrawWorldFunc() --is overwritten when not using the shader
         gl.UseShader(mirrorShader)
         gl.PushMatrix()
         gl.DepthMask(true)
-        if options.mapBorderStyle.value == "texture" then 
-        		gl.Texture(realTex)
-        		glUniform(ubrightness, options.textureBrightness.value)
-        		glUniform(ugrid, 0)
-				else 
-						gl.Texture(gridTex) 
-        		glUniform(ubrightness, 1.0)
-        		glUniform(ugrid, 1)
-				end
+        if options.mapBorderStyle.value == "texture" and not forceTextureToGrid then
+			gl.Texture(realTex)
+			glUniform(ubrightness, options.textureBrightness.value)
+			glUniform(ugrid, 0)
+		else
+			gl.Texture(gridTex)
+			glUniform(ubrightness, 1.0)
+			glUniform(ugrid, 1)
+		end
         if wiremap then
             gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
         end

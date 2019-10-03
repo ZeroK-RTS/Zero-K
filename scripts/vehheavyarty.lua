@@ -31,19 +31,19 @@ local tracks = 1
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local function TrackControl() 
-	while isMoving do 
+local function TrackControl()
+	while isMoving do
 		tracks = tracks + 1
-		if tracks == 2 then 
+		if tracks == 2 then
 			Hide(tracks1)
 			Show(tracks2)
-		elseif tracks == 3 then 
+		elseif tracks == 3 then
 			Hide(tracks2)
 			Show(tracks3)
-		elseif tracks == 4 then 
+		elseif tracks == 4 then
 			Hide(tracks3)
 			Show(tracks4)
-		else 
+		else
 			tracks = 1
 			Hide(tracks4)
 			Show(tracks1)
@@ -52,7 +52,7 @@ local function TrackControl()
 	end
 end
 
-local function Prepare() 
+local function Prepare()
 	Move(bay, x_axis, 0, BAY_SPEED)
 	WaitForMove(bay, x_axis)
 	doStrobe = true
@@ -65,7 +65,7 @@ local function Prepare()
 	isReady = true
 end
 
-local function Reload() 
+local function Reload()
 	isReady = false
 	doStrobe = false
 	Turn(clamp1, z_axis, 0, CLAMP_SPEED)
@@ -100,27 +100,27 @@ local function Stopping()
 	end
 end
 
-function script.StartMoving() 
+function script.StartMoving()
 	isMoving = true
 	StartThread(Moving)
 end
 
-function script.StopMoving() 
+function script.StopMoving()
 	isMoving = false
 	StartThread(Stopping)
 end
 
-local function RestoreAfterDelay() 
+local function RestoreAfterDelay()
 	Sleep(RESTORE_DELAY)
 	StartThread(Reload)
 end
 
-function script.AimWeapon(num, heading, pitch) 
+function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	GG.DontFireRadar_CheckAim(unitID)
 	
-	if isLoaded then 
+	if isLoaded then
 		StartThread(Prepare)
 		if doStrobe then
 			EmitSfx(strobe, 1024)
@@ -148,28 +148,28 @@ function script.BlockShot(num, targetID)
 	return false
 end
 
-function script.QueryWeapon(num) 
+function script.QueryWeapon(num)
 	return smoke
 end
 
-function script.Shot(num) 
+function script.Shot(num)
 	Hide(missile)
 	isLoaded = false
 	doStrobe = false
 	StartThread(Reload)
 end
 
-function script.Create() 
+function script.Create()
 	Hide(tracks2)
 	Hide(tracks3)
 	Hide(tracks4)
 	Move(bay, x_axis, -BAY_DISTANCE)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25 then 
+	if severity <= .25 then
 		Explode(base, SFX.NONE)
 		Explode(bay, SFX.NONE)
 		Explode(gantry, SFX.NONE)
@@ -177,7 +177,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(clamp2, SFX.NONE)
 		Explode(missile, SFX.NONE)
 		return 1
-	elseif severity <= .50 then 
+	elseif severity <= .50 then
 		Explode(base, SFX.NONE)
 		Explode(bay, SFX.NONE)
 		Explode(gantry, SFX.FALL)
@@ -185,7 +185,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(clamp2, SFX.FALL)
 		Explode(missile, SFX.NONE)
 		return 1
-	else 
+	else
 		Explode(base, SFX.SHATTER)
 		Explode(bay, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		Explode(gantry, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)

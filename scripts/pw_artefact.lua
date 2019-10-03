@@ -22,9 +22,9 @@ local function Initialize()
 		Turn(pump3, z_axis, 1.4, 2)
 
 		WaitForMove(pumpcylinders, z_axis)
-		WaitForTurn(pump1, x_axis) 
-		WaitForTurn(pump2, z_axis) 
-		WaitForTurn(pump3, z_axis) 
+		WaitForTurn(pump1, x_axis)
+		WaitForTurn(pump2, z_axis)
+		WaitForTurn(pump3, z_axis)
 
 		Move(pumpcylinders, z_axis, 0, 15)
 		Turn(pump1, x_axis, 0, 2)

@@ -23,7 +23,7 @@ function script.Create()
 	if not GG.Script.onWater(unitID) then
 		Hide(floatbase)
 	end
-	StartThread(GG.Script.SmokeUnit, {guns})
+	StartThread(GG.Script.SmokeUnit, unitID, {guns})
 end
 
 local function RestoreAfterDelay()

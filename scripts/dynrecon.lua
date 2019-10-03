@@ -6,36 +6,36 @@ dyncomm = include('dynamicCommander.lua')
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local base = piece 'base' 
+local base = piece 'base'
 local shield = piece 'shield'
-local pelvis = piece 'pelvis' 
-local turret = piece 'turret' 
-local torso = piece 'torso' 
-local head = piece 'head' 
-local armhold = piece 'armhold' 
-local ruparm = piece 'ruparm' 
-local rarm = piece 'rarm' 
-local rloarm = piece 'rloarm' 
-local luparm = piece 'luparm' 
-local larm = piece 'larm' 
-local lloarm = piece 'lloarm' 
-local rupleg = piece 'rupleg' 
-local lupleg = piece 'lupleg' 
-local lloleg = piece 'lloleg' 
-local rloleg = piece 'rloleg' 
-local rfoot = piece 'rfoot' 
-local lfoot = piece 'lfoot' 
-local gun = piece 'gun' 
-local flare = piece 'flare' 
-local rsword = piece 'rsword' 
-local lsword = piece 'lsword' 
-local jet1 = piece 'jet1' 
-local jet2 = piece 'jet2' 
-local jx1 = piece 'jx1' 
-local jx2 = piece 'jx2' 
-local stab = piece 'stab' 
-local nanospray = piece 'nanospray' 
-local grenade = piece 'grenade' 
+local pelvis = piece 'pelvis'
+local turret = piece 'turret'
+local torso = piece 'torso'
+local head = piece 'head'
+local armhold = piece 'armhold'
+local ruparm = piece 'ruparm'
+local rarm = piece 'rarm'
+local rloarm = piece 'rloarm'
+local luparm = piece 'luparm'
+local larm = piece 'larm'
+local lloarm = piece 'lloarm'
+local rupleg = piece 'rupleg'
+local lupleg = piece 'lupleg'
+local lloleg = piece 'lloleg'
+local rloleg = piece 'rloleg'
+local rfoot = piece 'rfoot'
+local lfoot = piece 'lfoot'
+local gun = piece 'gun'
+local flare = piece 'flare'
+local rsword = piece 'rsword'
+local lsword = piece 'lsword'
+local jet1 = piece 'jet1'
+local jet2 = piece 'jet2'
+local jx1 = piece 'jx1'
+local jx2 = piece 'jx2'
+local stab = piece 'stab'
+local nanospray = piece 'nanospray'
+local grenade = piece 'grenade'
 
 local smokePiece = {torso}
 local nanoPieces = {nanospray}
@@ -62,9 +62,7 @@ local canDgun = UnitDefs[unitDefID].canDgun
 local dead = false
 local bMoving = false
 local bAiming = false
-local armsFree = true
 local shieldOn = true
-local dgunning = false
 local inJumpMode = false
 
 --------------------------------------------------------------------------------
@@ -96,34 +94,34 @@ local function RestoreAfterDelay()
 		else
 			Turn(turret, x_axis, 0, math.rad(150))
 			Turn(turret, y_axis, 0, math.rad(150))
-			--torso	
+			--torso
 			Turn(torso, x_axis, 0, math.rad(250))
 			Turn(torso, y_axis, 0, math.rad(250))
-			Turn(torso, z_axis, 0, math.rad(250))	
-			--head	
+			Turn(torso, z_axis, 0, math.rad(250))
+			--head
 			Turn(head, x_axis, 0, math.rad(250))
 			Turn(head, y_axis, 0, math.rad(250))
 			Turn(head, z_axis, 0, math.rad(250))
 			
 			-- at ease pose
 			Turn(armhold, x_axis, math.rad(-45), math.rad(250)) --upspring at -45
-			Turn(ruparm, x_axis, 0, math.rad(250)) 
-			Turn(ruparm, y_axis, 0, math.rad(250)) 
-			Turn(ruparm, z_axis, 0, math.rad(250)) 
+			Turn(ruparm, x_axis, 0, math.rad(250))
+			Turn(ruparm, y_axis, 0, math.rad(250))
+			Turn(ruparm, z_axis, 0, math.rad(250))
 			Turn(rarm, x_axis, math.rad(2), math.rad(250))	 --up 2
-			Turn(rarm, y_axis, 0, math.rad(250)) 
+			Turn(rarm, y_axis, 0, math.rad(250))
 			Turn(rarm, z_axis, math.rad(-(-12)), math.rad(250))	--up -12
 			Turn(rloarm, x_axis, math.rad(47), math.rad(250)) --up 47
 			Turn(rloarm, y_axis, math.rad(76), math.rad(250)) --up 76
 			Turn(rloarm, z_axis, math.rad(-(-47)), math.rad(250)) --up -47
 			Turn(luparm, x_axis, math.rad(-9), math.rad(250))	 --up -9
-			Turn(luparm, y_axis, 0, math.rad(250)) 
-			Turn(luparm, z_axis, 0, math.rad(250)) 
+			Turn(luparm, y_axis, 0, math.rad(250))
+			Turn(luparm, z_axis, 0, math.rad(250))
 			Turn(larm, x_axis, math.rad(5), math.rad(250))	 --up 5
 			Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up -3
 			Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up 22
 			Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up 82
-			Turn(lloarm, y_axis, 0, math.rad(250)) 
+			Turn(lloarm, y_axis, 0, math.rad(250))
 			Turn(lloarm, z_axis, math.rad(-(94)), math.rad(250)) --upspring 94
 			-- done at ease
 			Sleep(100)
@@ -216,7 +214,7 @@ local function Walk()
 	end
 	if not bAiming then
 		Turn(torso, y_axis, math.rad(-3.15) * sizeSpeedMult)
-	end	
+	end
 	Turn(rupleg, x_axis, math.rad(-28.758242) * sizeSpeedMult)
 	Turn(lupleg, x_axis, math.rad(12.247253) * sizeSpeedMult)
 	Turn(lloleg, x_axis, math.rad(19.659341) * sizeSpeedMult)
@@ -229,7 +227,7 @@ local function Walk()
 	end
 	if not bAiming then
 		Turn(torso, y_axis, math.rad(-1.88) * sizeSpeedMult)
-	end	
+	end
 	Turn(rupleg, x_axis, math.rad(-22.824176) * sizeSpeedMult)
 	Turn(lupleg, x_axis, math.rad(2.824176) * sizeSpeedMult)
 	Turn(lloleg, x_axis, math.rad(34.060440) * sizeSpeedMult)
@@ -241,7 +239,7 @@ local function Walk()
 	end
 	if not bAiming then
 		Turn(torso, y_axis, 0 * sizeSpeedMult)
-	end	
+	end
 	Turn(rupleg, x_axis, math.rad(-11.604396) * sizeSpeedMult)
 	Turn(lupleg, x_axis, math.rad(-6.725275) * sizeSpeedMult)
 	Turn(lloleg, x_axis, math.rad(39.401099) * sizeSpeedMult)
@@ -255,7 +253,7 @@ local function Walk()
 	end
 	if not bAiming then
 		Turn(torso, y_axis, math.rad(1.88) * sizeSpeedMult)
-	end	
+	end
 	Turn(rupleg, x_axis, math.rad(1.857143) * sizeSpeedMult)
 	Turn(lupleg, x_axis, math.rad(-24.357143) * sizeSpeedMult)
 	Turn(lloleg, x_axis, math.rad(45.093407) * sizeSpeedMult)
@@ -269,7 +267,7 @@ local function Walk()
 	end
 	if not bAiming then
 		Turn(torso, y_axis, math.rad(3.15) * sizeSpeedMult)
-	end	
+	end
 	Turn(rupleg, x_axis, math.rad(7.148352) * sizeSpeedMult)
 	Turn(lupleg, x_axis, math.rad(-28.181319) * sizeSpeedMult)
 	Turn(rfoot, x_axis, math.rad(-9.813187) * sizeSpeedMult)
@@ -280,7 +278,7 @@ local function Walk()
 	end
 	if not bAiming then
 		Turn(torso, y_axis, math.rad(4.2) * sizeSpeedMult)
-	end	
+	end
 	Turn(rupleg, x_axis, math.rad(8.423077) * sizeSpeedMult)
 	Turn(lupleg, x_axis, math.rad(-32.060440) * sizeSpeedMult)
 	Turn(lloleg, x_axis, math.rad(27.527473) * sizeSpeedMult)
@@ -290,7 +288,7 @@ local function Walk()
 	Sleep(70/sizeSpeedMult)
 end
 
-local function MotionControl(moving, aiming, justmoved)
+local function MotionControl()
 	--for i = 1024, 1050 do
 	--	Spring.Echo("Weapon", i)
 	--	for j = 1, 12 do
@@ -302,21 +300,16 @@ local function MotionControl(moving, aiming, justmoved)
 	--	local reloadTime = Spring.GetUnitWeaponState(unitID, i, "reloadTime")
 	--	Spring.Echo("Weapon reload time", i, reloadTime)
 	--end
-	
-	justmoved = true
+
+	local moving, aiming
+	local justmoved = true
 	while true do
 		moving = bMoving
 		aiming = bAiming
 		if moving then
-			if aiming then
-				armsFree = true
-			else
-				armsFree = false
-			end
 			Walk()
 			justmoved = true
 		else
-			armsFree = true
 			if justmoved then
 				Turn(rupleg, x_axis, 0, math.rad(200.071429) * sizeSpeedMult)
 				Turn(rloleg, x_axis, 0, math.rad(200.071429) * sizeSpeedMult)
@@ -342,23 +335,23 @@ function script.Create()
 	sizeSpeedMult = (1 - (1 - dyncomm.GetPace())/2.5) *SPEED_MULT
 	--alert to dirt
 	Turn(armhold, x_axis, math.rad(-45), math.rad(250)) --upspring at -45
-	Turn(ruparm, x_axis, 0, math.rad(250)) 
-	Turn(ruparm, y_axis, 0, math.rad(250)) 
-	Turn(ruparm, z_axis, 0, math.rad(250)) 
+	Turn(ruparm, x_axis, 0, math.rad(250))
+	Turn(ruparm, y_axis, 0, math.rad(250))
+	Turn(ruparm, z_axis, 0, math.rad(250))
 	Turn(rarm, x_axis, math.rad(2), math.rad(250))	 --up 2
-	Turn(rarm, y_axis, 0, math.rad(250)) 
+	Turn(rarm, y_axis, 0, math.rad(250))
 	Turn(rarm, z_axis, math.rad(-(-12)), math.rad(250))	--up -12
 	Turn(rloarm, x_axis, math.rad(47), math.rad(250)) --up 47
 	Turn(rloarm, y_axis, math.rad(76), math.rad(250)) --up 76
 	Turn(rloarm, z_axis, math.rad(-(-47)), math.rad(250)) --up -47
 	Turn(luparm, x_axis, math.rad(-9), math.rad(250))	 --up -9
-	Turn(luparm, y_axis, 0, math.rad(250)) 
-	Turn(luparm, z_axis, 0, math.rad(250)) 
+	Turn(luparm, y_axis, 0, math.rad(250))
+	Turn(luparm, z_axis, 0, math.rad(250))
 	Turn(larm, x_axis, math.rad(5), math.rad(250))	 --up 5
 	Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up -3
 	Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up 22
 	Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up 82
-	Turn(lloarm, y_axis, 0, math.rad(250)) 
+	Turn(lloarm, y_axis, 0, math.rad(250))
 	Turn(lloarm, z_axis, math.rad(-(94)), math.rad(250)) --upspring 94
 
 	Hide(flare)
@@ -368,7 +361,7 @@ function script.Create()
 
 	StartThread(MotionControl)
 	StartThread(RestoreAfterDelay)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
@@ -385,21 +378,15 @@ function script.AimFromWeapon(num)
 end
 
 local function AimRifle(heading, pitch, isDgun)
-	if isDgun then dgunning = true end
-	--[[
-	if dgunning and not isDgun then
-		return false
-	end
-	]]--
-	--torso	
+	--torso
 	Turn(torso, x_axis, math.rad(15), math.rad(250))
 	Turn(torso, y_axis, math.rad(-25), math.rad(250))
-	Turn(torso, z_axis, 0, math.rad(250))	
-	--head	
+	Turn(torso, z_axis, 0, math.rad(250))
+	--head
 	Turn(head, x_axis, math.rad(-15), math.rad(250))
 	Turn(head, y_axis, math.rad(25), math.rad(250))
-	Turn(head, z_axis, 0, math.rad(250))	
-	--rarm	
+	Turn(head, z_axis, 0, math.rad(250))
+	--rarm
 	Turn(ruparm, x_axis, math.rad(-83), math.rad(250))
 	Turn(ruparm, y_axis, math.rad(30), math.rad(250))
 	Turn(ruparm, z_axis, math.rad(-(10)), math.rad(250))
@@ -436,9 +423,6 @@ local function AimRifle(heading, pitch, isDgun)
 	WaitForTurn(lloarm, z_axis)
 	StartThread(RestoreAfterDelay)
 	
-	if isDgun then 
-		dgunning = false 
-	end	
 	return true
 end
 
@@ -446,7 +430,7 @@ function script.AimWeapon(num, heading, pitch)
 	local weaponNum = dyncomm.GetWeapon(num)
 	
 	if weaponNum == 3 then -- shield
-		return true 
+		return true
 	end
 	
 	if weaponNum == 1 then
@@ -489,7 +473,7 @@ function script.Shot(num)
 end
 
 local function JumpExhaust()
-	while inJumpMode do 
+	while inJumpMode do
 		EmitSfx(jx1, 1028)
 		EmitSfx(jx2, 1028)
 		Sleep(33)
@@ -499,7 +483,7 @@ end
 function preJump(turn, distance)
 end
 
-function beginJump() 
+function beginJump()
 	script.StopMoving()
 	GG.PokeDecloakUnit(unitID, 50)
 	inJumpMode = true
@@ -517,7 +501,7 @@ end
 function halfJump()
 end
 
-function endJump() 
+function endJump()
 	script.StopMoving()
 	inJumpMode = false
 	EmitSfx(base, 1029)
@@ -531,7 +515,7 @@ function script.StopBuilding()
 	end
 end
 
-function script.StartBuilding(heading, pitch) 
+function script.StartBuilding(heading, pitch)
 	--larm
 	restoreHeading, restorePitch = heading, pitch
 	BuildPose(heading, pitch)
@@ -553,24 +537,24 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(base, x_axis, math.rad(80), math.rad(80))
 		Turn(turret, x_axis, math.rad(-16), math.rad(50))
 		Turn(turret, y_axis, 0, math.rad(90))
-		Turn(rloleg, x_axis, math.rad(9), math.rad(250))	
-		Turn(rloleg, y_axis, math.rad(-73), math.rad(250))	
-		Turn(rloleg, z_axis, math.rad(-(3)), math.rad(250))	
-		Turn(lupleg, x_axis, math.rad(7), math.rad(250))	
-		Turn(lloleg, y_axis, math.rad(21), math.rad(250))	
-		Turn(lfoot, x_axis, math.rad(24), math.rad(250))	
+		Turn(rloleg, x_axis, math.rad(9), math.rad(250))
+		Turn(rloleg, y_axis, math.rad(-73), math.rad(250))
+		Turn(rloleg, z_axis, math.rad(-(3)), math.rad(250))
+		Turn(lupleg, x_axis, math.rad(7), math.rad(250))
+		Turn(lloleg, y_axis, math.rad(21), math.rad(250))
+		Turn(lfoot, x_axis, math.rad(24), math.rad(250))
 		
 		GG.Script.InitializeDeathAnimation(unitID)
 		Sleep(200) --give time to fall
-		Turn(ruparm, x_axis, math.rad(-48), math.rad(350))	
+		Turn(ruparm, x_axis, math.rad(-48), math.rad(350))
 		Turn(ruparm, y_axis, math.rad(32), math.rad(350)) --was -32
-		Turn(luparm, x_axis, math.rad(-50), math.rad(350))	
-		Turn(luparm, y_axis, math.rad(47), math.rad(350))	
+		Turn(luparm, x_axis, math.rad(-50), math.rad(350))
+		Turn(luparm, y_axis, math.rad(47), math.rad(350))
 		Turn(luparm, z_axis, math.rad(-(50)), math.rad(350))
 		Sleep(600)
 		EmitSfx(turret, 1027) --impact
 		--StartThread(burn)
-		--Sleep((1000 * rand (2, 5))) 
+		--Sleep((1000 * rand (2, 5)))
 		Sleep(100)
 		dyncomm.SpawnWreck(1)
 	elseif severity <= 0.5 then

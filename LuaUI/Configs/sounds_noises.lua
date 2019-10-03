@@ -1590,12 +1590,12 @@ for udid, ud in pairs(UnitDefs) do
 		if sounds[ud.name] then
 			sounds[ud.name].underattack = {[1] = commanderUnderAttack, volume = 0.8}
 			sounds[ud.name].attackdelay = function(hp) return 20*hp+2 end
-			sounds[ud.name].attackonscreen = true 
+			sounds[ud.name].attackonscreen = true
 			sounds[ud.name].volume = 0.6
 		else
 			sounds[ud.name] = {
 				underattack = {[1] = commanderUnderAttack, volume = 0.4},
-				attackDelay = function(hp) return 20*hp+2 end, 
+				attackDelay = function(hp) return 20*hp+2 end,
 				attackonscreen = true,
 			}
 		end
@@ -1609,7 +1609,7 @@ local underAttackSounds = {
 }
 for i,v in pairs(sounds) do
 	if not v.underattack then
-		v.underattack = underAttackSounds[math.random(1,#underAttackSounds)] 
+		v.underattack = underAttackSounds[math.random(1,#underAttackSounds)]
 	end
 end
 

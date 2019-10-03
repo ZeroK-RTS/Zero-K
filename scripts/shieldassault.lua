@@ -3,14 +3,14 @@
 
 include 'constants.lua'
 
-local base = piece 'base' 
-local shield = piece 'shield' 
-local head = piece 'head' 
-local l_gun = piece 'l_gun' 
-local r_gun = piece 'r_gun' 
-local firept1 = piece 'firept1' 
-local r_barrel = piece 'r_barrel' 
-local firept2 = piece 'firept2' 
+local base = piece 'base'
+local shield = piece 'shield'
+local head = piece 'head'
+local l_gun = piece 'l_gun'
+local r_gun = piece 'r_gun'
+local firept1 = piece 'firept1'
+local r_barrel = piece 'r_barrel'
+local firept2 = piece 'firept2'
 local l_barrel = piece 'l_barrel'
 local l_leg, lf_lever, lb_lever, l_foot, l_heel, l_heeltoe = piece('l_leg', 'lf_lever', 'lb_lever', 'l_foot', 'l_heel', 'l_heeltoe')
 local r_leg, rf_lever, rb_lever, r_foot, r_heel, r_heeltoe = piece('r_leg', 'rf_lever', 'rb_lever', 'r_foot', 'r_heel', 'r_heeltoe')
@@ -64,7 +64,7 @@ end
 
 function script.Create()
 	gun_1 = true
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Move(base, x_axis, -2)
 end
 
@@ -102,7 +102,7 @@ local function RestoreAfterDelay()
 	Turn(r_gun, x_axis, 0, math.rad(100))
 end
 
-function script.AimFromWeapon() 
+function script.AimFromWeapon()
 	return head
 end
 
@@ -119,8 +119,7 @@ function script.AimWeapon(num, heading, pitch)
 	return 1 -- allows fire weapon after WaitForTurn
 end
 
-function script.FireWeapon() 
-	gun_1 = not gun_1
+function script.FireWeapon()
 	if gun_1 then
 		EmitSfx(firept1, GG.Script.UNIT_SFX1)
 		EmitSfx(firept1, GG.Script.UNIT_SFX2)
@@ -129,7 +128,7 @@ function script.FireWeapon()
 
 		Move(r_barrel, z_axis, 0, 2.5)
 		Move(r_gun, z_axis, 0, 1.25)
-		else
+	else
 		EmitSfx(firept2, GG.Script.UNIT_SFX1)
 		EmitSfx(firept2, GG.Script.UNIT_SFX2)
 		Move(l_barrel, z_axis, -4, 0)
@@ -145,13 +144,17 @@ function script.QueryWeapon(num)
 		-- Gun
 		if gun_1 then
 			return firept1
-		else 
+		else
 			return firept2
 		end
 	else
 		-- Shield
 		return shield
 	end
+end
+
+function script.EndBurst()
+	gun_1 = not gun_1
 end
 
 function script.BlockShot(num, targetID)

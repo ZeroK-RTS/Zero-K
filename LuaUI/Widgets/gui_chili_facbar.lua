@@ -60,7 +60,7 @@ options = {
 		desc = "The maximum units to show in the factory's queue",
 		min = 2, max = 14,
 		value = 5,
-	},	
+	},
 	
 	buttonsize = {
 		type = 'number',
@@ -163,7 +163,7 @@ local function UpdateFac(i, facInfo)
 		--[[
 	elseif (unfinished_facs[facInfo.unitID]) then
 		_, _, _, _, progress = GetUnitHealth(facInfo.unitID)
-		if (progress>=1) then 
+		if (progress>=1) then
 			progress = -1
 			unfinished_facs[facInfo.unitID] = nil
 		end
@@ -186,7 +186,7 @@ local function UpdateFac(i, facInfo)
 		  
 		  local amount = buildQueue[unitDefIDb] or 0
 		  local boCount = boButton.childrenByName['count']
-		  local qCount = qButton.childrenByName['count']			
+		  local qCount = qButton.childrenByName['count']
 		  
 		  facs[i].qStack:RemoveChild(qButton)
 		  
@@ -240,7 +240,7 @@ local function UpdateFacQ(i, facInfo)
 			n = n+1
 		end
 	end
-end				
+end
 
 
 
@@ -249,7 +249,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		Button:New{
 			width = options.buttonsize.value*1.2,
 			height = options.buttonsize.value*1.0,
-			tooltip = 			WG.Translate("interface", "lmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "select") .. '\n' 					
+			tooltip = 			WG.Translate("interface", "lmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "select") .. '\n'
 				.. WhiteStr .. 	WG.Translate("interface", "mmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "go_to") .. '\n'
 				.. WhiteStr .. 	WG.Translate("interface", "rmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "quick_rallypoint_mode")
 				,
@@ -441,11 +441,16 @@ local function WaypointHandler(x,y,button)
 
   local type,param = Spring.TraceScreenRay(x,y)
   if type=='ground' then
-    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt) 
+    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt)
   elseif type=='unit' then
-    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.GUARD,{param},opt)     
+    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.GUARD,{param},opt)
+  elseif type~='feature' then
+    return -- sky, ignore
   else --feature
     type,param = Spring.TraceScreenRay(x,y,true)
+    if not param then
+      return -- there's sky behind the feature, ignore
+    end
     Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt)
   end
 
@@ -472,7 +477,7 @@ RecreateFacbar = function()
 			unitDefID      = unitBuildDefID
 		elseif (unfinished_facs[facInfo.unitID]) then
 			_, _, _, _, progress = GetUnitHealth(facInfo.unitID)
-			if (progress>=1) then 
+			if (progress>=1) then
 				progress = -1
 				unfinished_facs[facInfo.unitID] = nil
 			end
@@ -510,7 +515,7 @@ local function UpdateFactoryList()
     local unitDefID = GetUnitDefID(unitID)
     if UnitDefs[unitDefID].isFactory then
 		local bo =  UnitDefs[unitDefID] and UnitDefs[unitDefID].buildOptions
-		if bo and #bo > 0 then	
+		if bo and #bo > 0 then
 		  push(facs,{ unitID=unitID, unitDefID=unitDefID, buildList=UnitDefs[unitDefID].buildOptions })
 		  local _, _, _, _, buildProgress = GetUnitHealth(unitID)
 		  if (buildProgress)and(buildProgress<1) then
@@ -530,7 +535,7 @@ function widget:DrawWorld()
 	-- Draw factories command lines
 	if waypointMode>1 then
 		local unitID
-		if waypointMode>1 then 
+		if waypointMode>1 then
 			unitID = facs[waypointFac].unitID
 		end
 		DrawUnitCommands(unitID)
@@ -590,7 +595,7 @@ function widget:Update()
 	cycle_2_s = (cycle_2_s % (32*2)) + 1
 	
 	
-	if cycle_half_s == 1 then 
+	if cycle_half_s == 1 then
 		for i,facInfo in ipairs(facs) do
 			if Spring.ValidUnitID( facInfo.unitID ) then
 				if cycle_2_s == 1 then
@@ -636,9 +641,9 @@ function widget:SelectionChanged(selectedUnits)
 
 	pressedFac = -1
 	
-	if (#selectedUnits == 1) then 
-		for cnt, f in ipairs(facs) do 
-			if f.unitID == selectedUnits[1] then 
+	if (#selectedUnits == 1) then
+		for cnt, f in ipairs(facs) do
+			if f.unitID == selectedUnits[1] then
 				pressedFac = cnt
 				
 				local qStack = facs[pressedFac].qStack
@@ -653,7 +658,7 @@ end
 
 function widget:MouseRelease(x, y, button)
 	if (waypointMode>0)and(not inTweak) and (waypointMode>0)and(waypointFac>0) then
-		WaypointHandler(x,y,button)	
+		WaypointHandler(x,y,button)
 	end
 	return -1
 end

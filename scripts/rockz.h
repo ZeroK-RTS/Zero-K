@@ -60,7 +60,7 @@ RockZ(heading, rock_z)
 	call-script Abs(ROCKZ_H_ANGLE);
 	while ( CALC_H_RESULT > ROCK_Z_MIN )
 	{
-	    turn ROCK_PIECE to z-axis ROCKZ_H_ANGLE speed CALC_H_RESULT * ROCK_Z_SPEED;		
+	    turn ROCK_PIECE to z-axis ROCKZ_H_ANGLE speed CALC_H_RESULT * ROCK_Z_SPEED;
 		wait-for-turn ROCK_PIECE around z-axis;
 		ROCKZ_H_ANGLE = ROCKZ_H_ANGLE * ROCK_Z_DECAY;
 		call-script Abs(ROCKZ_H_ANGLE);

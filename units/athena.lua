@@ -48,8 +48,8 @@ unitDef = {
   collide             = true,
   corpse              = [[DEAD]],
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[30 30 30]],
-  collisionVolumeType    = [[ellipsoid]], 
+  collisionVolumeScales  = [[30 20 60]],
+  collisionVolumeType    = [[ellipsoid]],
   cruiseAlt           = 80,
 
   customParams        = {
@@ -92,6 +92,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
+      collisionVolumeOffsets = [[0 0 0]],
+      collisionVolumeScales  = [[30 20 60]],
+      collisionVolumeType    = [[ellipsoid]], 
       object           = [[selene_dead.s3o]],
     },
 

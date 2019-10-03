@@ -36,7 +36,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName             = [[catapult.s3o]],
-  script		 = [[striderarty.cob]],
+  script                 = [[striderarty.cob]],
   selfDestructAs         = [[ATOMIC_BLASTSML]],
   sightDistance          = 660,
   trackOffset            = 0,
@@ -52,7 +52,7 @@ unitDef = {
 
     {
       def                = [[ROCKET]],
-	  badTargetCategory  = [[GUNSHIP]],
+      badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
@@ -64,21 +64,21 @@ unitDef = {
     ROCKET = {
       name                    = [[Long-Range Rocket Battery]],
       areaOfEffect            = 128,
-	  avoidFeature            = false,
-	  avoidGround             = false,
+      avoidFeature            = false,
+      avoidGround             = false,
       burst                   = 20,
       burstrate               = 0.1,
-      cegTag                  = [[RAVENTRAIL]],
+      cegTag                  = [[RAVENTRAIL_Light]],
       craterBoost             = 1,
       craterMult              = 2,
-	  
-	  customParams        	  = {
+      
+      customParams              = {
         reaim_time = 8, -- COB
-		light_camera_height = 2500,
-		light_color = [[0.35 0.17 0.04]],
-		light_radius = 400,
-	  },
-	  
+        light_camera_height = 2500,
+        light_color = [[0.35 0.17 0.04]],
+        light_radius = 400,
+      },
+      
       damage                  = {
         default = 220.5,
         planes  = 220.5,

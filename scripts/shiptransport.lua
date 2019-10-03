@@ -121,8 +121,8 @@ function script.TransportPickup(passengerID)
 		return
 	end
 	
-	if loadedUnitID then 
-		return 
+	if loadedUnitID then
+		return
 	end
 	
 	StartThread(CopyTransportieeSensors, passengerID)
@@ -157,16 +157,16 @@ end
 
 -- note x, y z is in worldspace
 function script.TransportDrop(passengerID, x, y, z)
-	if not loadedUnitID then 
-		return 
+	if not loadedUnitID then
+		return
 	end
 	
 	local px1, py1, pz1 = Spring.GetUnitBasePosition(unitID)
 	local surfaceY = math.max(0, Spring.GetGroundHeight(px1, pz1))
 	if (py1 - surfaceY > 10) then
 		-- don't allow unloading when flying
-		return 
-	end 
+		return
+	end
 	
 	SetUnitValue(COB.BUSY, 1)
 	Spring.MoveCtrl.Enable(unitID) -- freeze in place during unloading to make sure the passenger gets unloaded at the right place
@@ -218,7 +218,7 @@ local function PingHeading()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--StartThread(PingHeading)
 end
 
@@ -227,10 +227,10 @@ function script.Killed(recentDamage, maxHealth)
 	if (severity <= 0.25) then
 		return 1 -- corpsetype
 	elseif (severity <= 0.5) then
-		Explode(fan, SFX.FALL)	
+		Explode(fan, SFX.FALL)
 		return 1 -- corpsetype
 	else
-		Explode(fan, SFX.FALL)	
+		Explode(fan, SFX.FALL)
 		return 2 -- corpsetype
 	end
 end

@@ -14,11 +14,11 @@ unitDef = {
   category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 11 -4]],
   collisionVolumeScales         = [[50 86 50]],
-  collisionVolumeType	        = [[CylY]],
+  collisionVolumeType            = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
-	aimposoffset   = [[0 16 0]],
+    aimposoffset   = [[0 16 0]],
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
@@ -77,10 +77,10 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-		light_radius = 0,
-	  },
+      customParams              = {
+        isaa = [[1]],
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 13.2,

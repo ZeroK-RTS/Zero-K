@@ -14,7 +14,7 @@ unitDef = {
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 0 -5]],
   collisionVolumeScales  = [[40 40 40]],
-  collisionVolumeType    = [[ellipsoid]], 
+  collisionVolumeType    = [[ellipsoid]],
   selectionVolumeOffsets = [[0 0 0]],
   selectionVolumeScales  = [[45 45 45]],
   selectionVolumeType    = [[ellipsoid]],
@@ -53,7 +53,7 @@ unitDef = {
   },
 
   sightDistance       = 660,
-  sonarDistance       = 660,  
+  sonarDistance       = 660,
   turninplace         = 0,
   turnRate            = 616,
   workerTime          = 0,
@@ -80,7 +80,7 @@ unitDef = {
       cylinderTargeting       = 1,
 
       customParams            = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
         isaa = [[1]],
         light_color = [[0.5 0.6 0.6]],

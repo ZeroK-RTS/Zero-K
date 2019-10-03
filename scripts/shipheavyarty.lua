@@ -75,7 +75,7 @@ function script.Create()
 	Turn(turret2, y_axis, math.rad(180))
 	Turn(turret3, y_axis, math.rad(180))
 	Spin(radar, y_axis, math.rad(100))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 end
 
@@ -134,7 +134,7 @@ function script.Shot(num)
 	local flare = flares[num][(gun[num])]
 	EmitSfx(flare, 1026)
 	Move(barrel, z_axis, RECOIL_DISTANCE)
-	Move(barrel, z_axis, 0, RECOIL_RESTORE_SPEED)	
+	Move(barrel, z_axis, 0, RECOIL_RESTORE_SPEED)
 	gun[num] = gun[num] + 1
 	if gun[num] > 3 then gun[num] = 1 end
 end
@@ -183,7 +183,7 @@ local function DeathAnim()
 	EmitSfx(turret1, 1025)
 	ExplodeTurret(1)
 	Sleep(100)
-	EmitSfx(hull, 1024)	
+	EmitSfx(hull, 1024)
 	EmitSfx(turret3, 1025)
 	ExplodeTurret(3)
 	Sleep(150)
@@ -202,7 +202,7 @@ function script.Killed(recentDamage, maxHealth)
 	elseif severity < 0.5 then
 		DeathAnim()
 		Explode(hull, SFX.NONE)
-		return 1	
+		return 1
 	else
 		for i=1,3 do
 			for v=1,3 do

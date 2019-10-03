@@ -1,30 +1,30 @@
-local base = piece 'base' 
-local head = piece 'head' 
-local popup = piece 'popup' 
-local l_missile = piece 'l_missile' 
-local l_tube = piece 'l_tube' 
-local l_door = piece 'l_door' 
-local l_doorslid = piece 'l_doorslid' 
-local l_flare = piece 'l_flare' 
-local r_missile = piece 'r_missile' 
-local r_tube = piece 'r_tube' 
-local r_door = piece 'r_door' 
-local r_doorslid = piece 'r_doorslid' 
-local r_flare = piece 'r_flare' 
-local l_thigh = piece 'l_thigh' 
-local l_leg = piece 'l_leg' 
-local l_shin = piece 'l_shin' 
-local l_foot = piece 'l_foot' 
-local l_toe = piece 'l_toe' 
-local lf_toe = piece 'lf_toe' 
-local lb_toe = piece 'lb_toe' 
-local r_thigh = piece 'r_thigh' 
-local r_leg = piece 'r_leg' 
-local r_shin = piece 'r_shin' 
-local r_foot = piece 'r_foot' 
-local r_toe = piece 'r_toe' 
-local rf_toe = piece 'rf_toe' 
-local rb_toe = piece 'rb_toe' 
+local base = piece 'base'
+local head = piece 'head'
+local popup = piece 'popup'
+local l_missile = piece 'l_missile'
+local l_tube = piece 'l_tube'
+local l_door = piece 'l_door'
+local l_doorslid = piece 'l_doorslid'
+local l_flare = piece 'l_flare'
+local r_missile = piece 'r_missile'
+local r_tube = piece 'r_tube'
+local r_door = piece 'r_door'
+local r_doorslid = piece 'r_doorslid'
+local r_flare = piece 'r_flare'
+local l_thigh = piece 'l_thigh'
+local l_leg = piece 'l_leg'
+local l_shin = piece 'l_shin'
+local l_foot = piece 'l_foot'
+local l_toe = piece 'l_toe'
+local lf_toe = piece 'lf_toe'
+local lb_toe = piece 'lb_toe'
+local r_thigh = piece 'r_thigh'
+local r_leg = piece 'r_leg'
+local r_shin = piece 'r_shin'
+local r_foot = piece 'r_foot'
+local r_toe = piece 'r_toe'
+local rf_toe = piece 'rf_toe'
+local rb_toe = piece 'rb_toe'
 
 include "constants.lua"
 
@@ -160,7 +160,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--gun_1 = torso
 	Turn(r_thigh, x_axis, math.rad(30))
 	Turn(l_thigh, x_axis, math.rad(30))
@@ -168,7 +168,7 @@ function script.Create()
 	StartThread(stopWalk)
 end
 
-local function RestoreAfterDelayLeft() 
+local function RestoreAfterDelayLeft()
 	Sleep(RESTORE_DELAY_TUBE)
 	Turn(l_tube, x_axis, math.rad(0), math.rad(45))
 	Move(l_missile, z_axis, 0)
@@ -191,7 +191,7 @@ local function RestoreAfterDelayLeft()
 	Turn(l_door, z_axis, math.rad(-(0)), math.rad(90))
 end
 
-local function RestoreAfterDelayRight() 
+local function RestoreAfterDelayRight()
 	Sleep(RESTORE_DELAY_TUBE)
 	Turn(r_tube, x_axis, math.rad(0), math.rad(45))
 	Move(r_missile, z_axis,5* 0)
@@ -225,7 +225,7 @@ local function RestoreAfterDelayHead()
 	Turn(l_tube, x_axis, math.rad(0), math.rad(45))
 end
 
-function script.AimWeapon(num, heading, pitch) 
+function script.AimWeapon(num, heading, pitch)
 
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
@@ -246,25 +246,25 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-function script.AimFromWeapon(num) 
+function script.AimFromWeapon(num)
 	return popup
 end
 
-function script.QueryWeapon(num) 
-	if gun_1 then 
+function script.QueryWeapon(num)
+	if gun_1 then
 		return l_flare
-	else 
+	else
 		return r_flare
 	end
 end
 
-function script.FireWeapon(num) 
-	if gun_1 then 
+function script.FireWeapon(num)
+	if gun_1 then
 		Move(l_missile, z_axis, 10, 100)
 		WaitForMove(l_missile, z_axis)
 		Hide(l_missile)
 		StartThread(RestoreAfterDelayLeft)
-	else 
+	else
 	
 		Move(r_missile, z_axis, 10, 100)
 		WaitForMove(r_missile, z_axis)

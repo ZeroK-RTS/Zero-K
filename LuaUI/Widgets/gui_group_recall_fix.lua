@@ -32,9 +32,9 @@ options = {
 		noHotkey = true,
 	},
 	timeoutlength = {
-		name = "Double Press Speed", 
-		type = "number", 
-		value = 0.4, 
+		name = "Double Press Speed",
+		type = "number",
+		value = 0.4,
 		min = 0,
 		max = 5,
 		step = 0.1,
@@ -103,7 +103,7 @@ for i = 1, 10 do
 end
 
 local spGetUnitGroup     = Spring.GetUnitGroup
-local spGetGroupList     = Spring.GetGroupList 
+local spGetGroupList     = Spring.GetGroupList
 local spGetTimer         = Spring.GetTimer
 local spDiffTimers       = Spring.DiffTimers
 local spGetSelectedUnits = Spring.GetSelectedUnits
@@ -116,7 +116,7 @@ local previousTime = spGetTimer()
 local function GroupRecallFix(key, modifier, isRepeat)
 	if (not modifier.ctrl and not modifier.alt and not modifier.meta) then --check key for group. Reference: unit_auto_group.lua by Licho
 		local group
-		if (key ~= nil and groupNumber[key]) then 
+		if (key ~= nil and groupNumber[key]) then
 			group = groupNumber[key]
 		end
 		if (group ~= nil) then

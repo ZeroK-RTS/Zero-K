@@ -92,7 +92,7 @@ local IsPosInLos    = Spring.IsPosInLos
 local IsPosInAirLos = Spring.IsPosInAirLos
 local IsPosInRadar  = Spring.IsPosInRadar
 
-local glTexture     = gl.Texture 
+local glTexture     = gl.Texture
 local glBlending    = gl.Blending
 local glUniform     = gl.Uniform
 local glUniformInt  = gl.UniformInt
@@ -304,7 +304,7 @@ function SimpleParticles:Update(n)
 		self.urot = (self.urot + self.rotSpeed)*self.rotairdrag;
 	else
 		local rotBoost = 0
-		for i=1,n do 
+		for i=1,n do
 			rotBoost = self.rotSpeed*(self.rotairdrag^i) + rotBoost;
 			self.uMovCoeff = self.airdrag^(self.frame+i) + self.uMovCoeff;
 		end

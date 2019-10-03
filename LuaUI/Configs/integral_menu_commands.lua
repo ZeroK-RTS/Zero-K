@@ -316,7 +316,7 @@ local imageDir = 'LuaUI/Images/commands/'
 --autoCallTransport =
 
 local tooltips = {
-	ONOFF = "Activation (_STATE_)\n  Toggles some unit abilities.",
+	WANT_ONOFF = "Activation (_STATE_)\n  Toggles some unit abilities.",
 	UNIT_AI = "Unit AI (_STATE_)\n  Move intelligently in combat.",
 	REPEAT = "Repeat (_STATE_)\n  Loop command queue. Construction queue for factories.",
 	WANT_CLOAK = "Cloak (_STATE_)\n  Makes the unit invisible, unless it fires, takes damage, or is too close to an enemy unit.",
@@ -333,6 +333,7 @@ local tooltips = {
 	AP_FLY_STATE = "Idle State (_STATE_)\n  Set whether aircraft lands when idle.",
 	UNIT_BOMBER_DIVE_STATE = "Dive State (_STATE_)\n  Set when Ravens dive.",
 	UNIT_KILL_SUBORDINATES = "Kill Captured (_STATE_)\n  Set whether to kill captured units.",
+	DISABLE_ATTACK = "Allow attack commands (_STATE_)\n  Set whether the unit responds to attack commands.",
 	PUSH_PULL = "Impulse Mode (_STATE_)\n  Set whether gravity guns push or pull.",
 	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire at radar dots.",
 	PREVENT_OVERKILL = "Overkill Prevention (_STATE_)\n  Prevents units from shooting at already doomed enemies.",
@@ -395,9 +396,9 @@ local overrides = {
 	[CMD_RECALL_DRONES] = {texture = imageDir .. 'Bold/recall_drones.png'},
 
 	-- states
-	[CMD.ONOFF] = {
+	[CMD_WANT_ONOFF] = {
 		texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'},
-		stateTooltip = {tooltips.ONOFF:gsub("_STATE_", "Off"), tooltips.ONOFF:gsub("_STATE_", "On")}
+		stateTooltip = {tooltips.WANT_ONOFF:gsub("_STATE_", "Off"), tooltips.WANT_ONOFF:gsub("_STATE_", "On")}
 	},
 	[CMD_UNIT_AI] = {
 		texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'},
@@ -489,6 +490,10 @@ local overrides = {
 	[CMD_UNIT_KILL_SUBORDINATES] = {
 		texture = {imageDir .. 'states/capturekill_off.png', imageDir .. 'states/capturekill_on.png'},
 		stateTooltip = {tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", "Keep"), tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", "Kill")}
+	},
+	[CMD_DISABLE_ATTACK] = {
+		texture = {imageDir .. 'states/disableattack_off.png', imageDir .. 'states/disableattack_on.png'},
+		stateTooltip = {tooltips.DISABLE_ATTACK:gsub("_STATE_", "Allowed"), tooltips.DISABLE_ATTACK:gsub("_STATE_", "Blocked")}
 	},
 	[CMD_PUSH_PULL] = {
 		texture = {imageDir .. 'states/pull_alt.png', imageDir .. 'states/push_alt.png'},

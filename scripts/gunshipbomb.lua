@@ -2,7 +2,7 @@
 -- by Chris Mackey
 include "constants.lua"
 
---pieces 
+--pieces
 local base = piece "base"
 local missile = piece "missile"
 local l_wing = piece "l_wing"
@@ -17,7 +17,6 @@ local up = 2
 local RIGHT_ANGLE = math.rad(90)
 
 local smokePiece = { base, l_wing, r_wing }
-local burrowed = false
 
 local SIG_BURROW = 1
 
@@ -34,8 +33,6 @@ local function Burrow()
 		height = Spring.GetGroundHeight(x,z)
 	end
 	
-	burrowed = true
-	
 	--Spring.UnitScript.SetUnitValue(firestate, 0)
 	Turn(base, side, -RIGHT_ANGLE, 5)
 	Turn(l_wing, side, RIGHT_ANGLE, 5)
@@ -46,7 +43,6 @@ end
 
 local function UnBurrow()
 	Signal(SIG_BURROW)
-	burrowed = false
 	Spring.SetUnitCloak(unitID, 0)
 	Spring.SetUnitStealth(unitID, false)
 	--Spring.UnitScript.SetUnitValue(firestate, 2)
@@ -62,7 +58,7 @@ function Detonate() -- Giving an order causes recursion.
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	if not Spring.GetUnitIsStunned(unitID) then
 		Spring.SetUnitCloak(unitID, 2)
 		Spring.SetUnitStealth(unitID, true)

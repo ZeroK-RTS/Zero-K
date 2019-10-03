@@ -11,7 +11,8 @@ function widget:GetInfo()
 	}
 end
 
-----------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Config
 
 options_path = 'Settings/Interface/Building Placement'
@@ -36,7 +37,7 @@ drawRadius[1] = {
 	width = 1,
 	miniWidth = 1,
 	textSize = 180,
-	}
+}
 
 drawRadius[2] = {
 	range = 6000,
@@ -45,7 +46,7 @@ drawRadius[2] = {
 	width = 1,
 	miniWidth = 1,
 	textSize = 260,
-	}
+}
 
 drawRadius[3] = {
 	range = 3675,
@@ -54,8 +55,8 @@ drawRadius[3] = {
 	width = 1,
 	miniWidth = 1,
 	textSize = 180,
-}	
-	
+}
+
 drawRadius[4] = {
 	range = 1500,
 	color = {0.2,0.2,1,0.75},
@@ -64,8 +65,8 @@ drawRadius[4] = {
 	miniWidth = 1,
 	textSize = 120,
 	--stipple = {4,1000},
-	}
-	
+}
+
 drawRadius[5] = {
 	range = 600,
 	color = {0.4,1,0.2,0.5},
@@ -74,18 +75,22 @@ drawRadius[5] = {
 	miniWidth = 1,
 	textSize = 60,
 	--stipple = {4,4095},
-	}
-	
+}
+
 local circleDivs = 64
-	
-----------------------------
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Speedup
-local spGetActiveCommand 	= Spring.GetActiveCommand
-local spTraceScreenRay		= Spring.TraceScreenRay
-local spGetMouseState		= Spring.GetMouseState
-local spTraceScreenRay		= Spring.TraceScreenRay
-local spGetGroundHeight		= Spring.GetGroundHeight
-local spGetCameraState 		= Spring.GetCameraState
+
+VFS.Include("LuaRules/Utilities/glVolumes.lua")
+
+local spGetActiveCommand = Spring.GetActiveCommand
+local spTraceScreenRay   = Spring.TraceScreenRay
+local spGetMouseState    = Spring.GetMouseState
+local spTraceScreenRay   = Spring.TraceScreenRay
+local spGetGroundHeight  = Spring.GetGroundHeight
+local spGetCameraState   = Spring.GetCameraState
 
 local siloDefID = -UnitDefNames["staticmissilesilo"].id
 
@@ -106,17 +111,17 @@ local glPushMatrix          = gl.PushMatrix
 local glTranslate           = gl.Translate
 local glBillboard           = gl.Billboard
 local glText                = gl.Text
-local glScale				= gl.Scale
-local glRotate				= gl.Rotate
-local glLoadIdentity		= gl.LoadIdentity
-local glLineStipple			= gl.LineStipple
+local glScale               = gl.Scale
+local glRotate              = gl.Rotate
+local glLoadIdentity        = gl.LoadIdentity
+local glLineStipple         = gl.LineStipple
 
 local mouseX, mouseZ
 
-----------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function DrawActiveCommandRanges()
-
 	local _, cmd_id = spGetActiveCommand()
 	
 	if not (cmd_id and cmd_id == siloDefID) then
@@ -161,18 +166,15 @@ local function DrawActiveCommandRanges()
 		glTranslate(mouseX + radius.range*dx,  height, mouseZ - (radius.range*dz)-5)
 		glBillboard()
 		glText( radius.text, 0, 0, radius.textSize, "cn")
-		glPopMatrix()  
-			
+		glPopMatrix()
 	end
 	
 	glLineStipple(false)
 	glLineWidth(1)
 	glColor(1, 1, 1, 1)
-	
 end
 
 local function DrawActiveCommandRangesMinimap(minimapX, minimapY)
-
 	local _, cmd_id = spGetActiveCommand()
 	
 	if not (cmd_id and cmd_id == siloDefID) then
@@ -202,7 +204,10 @@ local function DrawActiveCommandRangesMinimap(minimapX, minimapY)
 		glDrawCircle(mouseX, mouseZ, radius.range)
 	end
 	
-	--glPopMatrix()
+	glScale(1, 1, 1)
+	glLineStipple(false)
+	glLineWidth(1)
+	glColor(1, 1, 1, 1)
 end
 
 function widget:DrawInMiniMap(minimapX, minimapY)

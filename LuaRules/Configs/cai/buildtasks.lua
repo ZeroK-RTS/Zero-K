@@ -41,7 +41,7 @@ factionBuildConfig = {
 			[7] = {ID = UnitDefNames['factoryjump'].id},
 			[8] = {ID = UnitDefNames['factoryamph'].id},
 		},
-		factoryByDefId = {	
+		factoryByDefId = {
 			[UnitDefNames['factoryveh'].id] = {
 				defenceQuota = {2,0.6,0.3},
 				defenceRange = 400,
@@ -85,7 +85,7 @@ factionBuildConfig = {
 					importanceMult = 0.3,
 					count = 1,
 					[1] = {ID = UnitDefNames['vehsupport'].id, chance = 1},
-				},	
+				},
 				
 				[7] = { -- riot
 					importanceMult = 1.2,
@@ -130,7 +130,7 @@ factionBuildConfig = {
 				[4] = { -- arty
 					importanceMult = 0.3,
 					count = 1,
-					[1] = {ID = UnitDefNames['jumparty'].id, chance = 1},	
+					[1] = {ID = UnitDefNames['jumparty'].id, chance = 1},
 				},
 				
 				[5] = { --assault
@@ -157,7 +157,7 @@ factionBuildConfig = {
 					importanceMult = 0.8,
 					count = 1,
 					[1] = {ID = UnitDefNames['jumpaa'].id, chance = 1},
-				},				
+				},
 			},
 			[UnitDefNames['factoryspider'].id] = {
 				defenceQuota = {2,0.6,0.3},
@@ -215,7 +215,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 1,
 					[1] = {ID = UnitDefNames['spideraa'].id, chance = 1},
-				},	
+				},
 			},
 			[UnitDefNames['factorycloak'].id] = {
 				defenceQuota = {2,0.6,0.3},
@@ -255,7 +255,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 1,
 					[1] = {ID = UnitDefNames['cloakassault'].id, chance = 1},
-				},	
+				},
 				
 				[6] = { -- skirm
 					importanceMult = 1.2,
@@ -273,7 +273,7 @@ factionBuildConfig = {
 					importanceMult = 1.3,
 					count = 1,
 					[1] = {ID = UnitDefNames['cloakaa'].id, chance = 1},
-				},	
+				},
 			},
 			[UnitDefNames['factoryshield'].id] = {
 				defenceQuota = {2,0.6,0.3},
@@ -304,15 +304,15 @@ factionBuildConfig = {
 				
 				[4] = { -- arty
 					importanceMult = 0,
-					count = 0,	
-				--	[1] = {ID = UnitDefNames['jumparty'].id, chance = 1},					
+					count = 0,
+				--	[1] = {ID = UnitDefNames['jumparty'].id, chance = 1},
 				},
 				
 				[5] = { --assault
 					importanceMult = 1.2,
 					count = 1,
 					[1] = {ID = UnitDefNames['shieldassault'].id, chance = 1},
-				},	
+				},
 				
 				[6] = { -- skirm
 					importanceMult = 1.3,
@@ -330,7 +330,7 @@ factionBuildConfig = {
 					importanceMult = 1.3,
 					count = 1,
 					[1] = {ID = UnitDefNames['shieldaa'].id, chance = 1},
-				},	
+				},
 			},
 			[UnitDefNames['factoryhover'].id] = {
 				defenceQuota = {2,0.6,0.3},
@@ -388,7 +388,7 @@ factionBuildConfig = {
 					importanceMult = 0.8,
 					count = 1,
 					[1] = {ID = UnitDefNames['hoveraa'].id, chance = 1},
-				},	
+				},
 			},
 			[UnitDefNames['factorytank'].id] = {
 				defenceQuota = {2,0.6,0.3},
@@ -448,7 +448,7 @@ factionBuildConfig = {
 					importanceMult = 0.8,
 					count = 1,
 					[1] = {ID = UnitDefNames['tankaa'].id, chance = 1},
-				},	
+				},
 			},
 			[UnitDefNames['factoryamph'].id] = {
 				defenceQuota = {2,0.6,0.3},
@@ -507,7 +507,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 1,
 					[1] = {ID = UnitDefNames['amphaa'].id, chance = 1},
-				},	
+				},
 			},
 			[UnitDefNames['factoryplane'].id] = {
 				defenceQuota = {2,0.6,0.3},
@@ -547,7 +547,7 @@ factionBuildConfig = {
 				[5] = { -- gunship
 					importanceMult = 0,
 					count = 0,
-				},	
+				},
 			},
 			[UnitDefNames['factorygunship'].id] = {
 				defenceQuota = {2,0.6,0.3},
@@ -588,7 +588,7 @@ factionBuildConfig = {
 					[2] = {ID = UnitDefNames['gunshipraid'].id, chance = 0.35},
 					[3] = {ID = UnitDefNames['gunshipheavyskirm'].id, chance = 0.175},
 					[4] = {ID = UnitDefNames['gunshipassault'].id, chance = 0.175},
-				},	
+				},
 			},
 		},
 
@@ -611,7 +611,7 @@ factionBuildConfig = {
 		},
 		econByDefId = {
 			[UnitDefNames['energyfusion'].id] = {
-				energyGreaterThan = 30, 
+				energyGreaterThan = 30,
 				energySpacing = 100,
 				whileStall = false,
 				makeNearFactory = 1800,
@@ -625,7 +625,7 @@ factionBuildConfig = {
 			},
 			
 			[UnitDefNames['energygeo'].id] = {
-				energyGreaterThan = 20, 
+				energyGreaterThan = 20,
 				energySpacing = 400,
 				whileStall = false,
 				makeNearFactory = 1800,
@@ -639,7 +639,7 @@ factionBuildConfig = {
 			},
 			
 			[UnitDefNames['energysingu'].id] = {
-				energyGreaterThan = 120, 
+				energyGreaterThan = 120,
 				energySpacing = 600,
 				whileStall = false,
 				makeNearFactory = 1800,
@@ -653,7 +653,7 @@ factionBuildConfig = {
 			},
 			
 			[UnitDefNames['energyheavygeo'].id] = {
-				energyGreaterThan = 120, 
+				energyGreaterThan = 120,
 				energySpacing = 900,
 				whileStall = false,
 				makeNearFactory = false,
@@ -667,7 +667,7 @@ factionBuildConfig = {
 			},
 			
 			[UnitDefNames['energysolar'].id] = {
-				energyGreaterThan = 0, 
+				energyGreaterThan = 0,
 				whileStall = true,
 				makeNearFactory = false,
 				energySpacing = 0,
@@ -681,7 +681,7 @@ factionBuildConfig = {
 			},
 			
 			[UnitDefNames['energywind'].id] = {
-				energyGreaterThan = 0, 
+				energyGreaterThan = 0,
 				whileStall = true,
 				makeNearFactory = false,
 				energySpacing = 60,

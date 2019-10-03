@@ -8,7 +8,7 @@
  regarding LOS. A non-cheating AI would always create a unit list with its
  allyTeamID to ensure that the UnitList does not cheat.
  
-=== local functions === 
+=== local functions ===
 
  == GetUnitPosition(unitID) -> {x, y, z} or false
  Returns the position of the unitID obeying LOS and radar.
@@ -24,7 +24,7 @@
  
  == IsPositionNearUnit(x, z, radius, condition) -> boolean
  Returns true if there is a unit from the list satisfying the conditions
- within the radius around the point. The condition is the same as in 
+ within the radius around the point. The condition is the same as in
  GetNearestUnit.
  
  == OverwriteUnitData(unitID, newData)
@@ -197,7 +197,7 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 	-- Unit addition and removal handling
 	local function AddUnit(unitID, static, cost, newData)
 		if unitMap[unitID] then
-			if newData then 
+			if newData then
 				OverwriteUnitData(unitID, newData)
 			end
 			return false
@@ -258,8 +258,8 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 		local i = 0
 		return function ()
 			i = i + 1
-			if i <= unitCount then 
-				return unitList[i].unitID, unitList[i].cost, unitList[i].customData 
+			if i <= unitCount then
+				return unitList[i].unitID, unitList[i].cost, unitList[i].customData
 			end
 		end
 	end

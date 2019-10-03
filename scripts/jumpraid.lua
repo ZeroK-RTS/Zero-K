@@ -1,20 +1,20 @@
-local base = piece 'base' 
-local low_head = piece 'low_head' 
-local up_head = piece 'up_head' 
-local tank = piece 'tank' 
-local firept = piece 'firept' 
-local l_leg = piece 'l_leg' 
-local l_shin = piece 'l_shin' 
-local l_foot = piece 'l_foot' 
-local l_pist1 = piece 'l_pist1' 
-local l_pist2 = piece 'l_pist2' 
-local l_jetpt = piece 'l_jetpt' 
-local r_leg = piece 'r_leg' 
-local r_shin = piece 'r_shin' 
-local r_foot = piece 'r_foot' 
-local r_pist1 = piece 'r_pist1' 
-local r_pist2 = piece 'r_pist2' 
-local r_jetpt = piece 'r_jetpt' 
+local base = piece 'base'
+local low_head = piece 'low_head'
+local up_head = piece 'up_head'
+local tank = piece 'tank'
+local firept = piece 'firept'
+local l_leg = piece 'l_leg'
+local l_shin = piece 'l_shin'
+local l_foot = piece 'l_foot'
+local l_pist1 = piece 'l_pist1'
+local l_pist2 = piece 'l_pist2'
+local l_jetpt = piece 'l_jetpt'
+local r_leg = piece 'r_leg'
+local r_shin = piece 'r_shin'
+local r_foot = piece 'r_foot'
+local r_pist1 = piece 'r_pist1'
+local r_pist2 = piece 'r_pist2'
+local r_jetpt = piece 'r_jetpt'
 --by Chris Mackey
 --linear constant 163840
 
@@ -60,7 +60,7 @@ local function BeginJumpThread()
 	Move(base, y_axis, 0, LINEAR_SPEED)
 	Move(base, z_axis, -4, LINEAR_SPEED)
 	Move(l_shin, y_axis, 0, LINEAR_SPEED/2)
-	Move(r_shin, y_axis, 0, LINEAR_SPEED/2)	
+	Move(r_shin, y_axis, 0, LINEAR_SPEED/2)
 	
 	--wiggle legs in glee
 	Turn(l_leg, x_axis, math.rad(-20), ANGULAR_SPEED)
@@ -155,7 +155,7 @@ function jumping(jumpPercent)
 		EmitSfx(r_jetpt, 1026)
 	end
 	
-	if jumpPercent > 95 and not landing then 
+	if jumpPercent > 95 and not landing then
 		landing = true
 		--StartThread(PrepareJumpLand)
 	end
@@ -294,7 +294,7 @@ end
 
 function script.Create()
 
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	
 	Spin(tank, z_axis, 70)
 	

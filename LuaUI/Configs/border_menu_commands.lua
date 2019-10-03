@@ -222,7 +222,7 @@ local overrides = {
 	[CMD_RECALL_DRONES] = {caption= '', texture = imageDir .. 'Bold/recall_drones.png'},
 
 	-- states
-	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, caption=''},
+	[CMD_WANT_ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, caption=''},
 	[CMD_UNIT_AI] = { texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'}, caption=''},
 	[CMD.REPEAT] = { texture = {imageDir .. 'states/repeat_off.png', imageDir .. 'states/repeat_on.png'}, caption='', tooltip = tooltips["repeat"]},
 	[CMD.CLOAK] = { texture = {imageDir .. 'states/cloak_off.png', imageDir .. 'states/cloak_on.png'},
@@ -249,6 +249,7 @@ local overrides = {
 	[CMD_UNIT_BOMBER_DIVE_STATE] = { texture = {imageDir .. 'states/divebomb_off.png', imageDir .. 'states/divebomb_shield.png', imageDir .. 'states/divebomb_attack.png', imageDir .. 'states/divebomb_always.png'},
 		caption = '', tooltip = tooltips.diveBomb,},
 	[CMD_UNIT_KILL_SUBORDINATES] = {texture = {imageDir .. 'states/capturekill_off.png', imageDir .. 'states/capturekill_on.png'}, caption=''},
+	[CMD_DISABLE_ATTACK] = {texture = {imageDir .. 'states/disableattack_off.png', imageDir .. 'states/disableattack_on.png'}, caption=''},
 	[CMD_PUSH_PULL] = {texture = {imageDir .. 'states/pull_alt.png', imageDir .. 'states/push_alt.png'}, caption=''},
 	[CMD_DONT_FIRE_AT_RADAR] = {texture = {imageDir .. 'states/stealth_on.png', imageDir .. 'states/stealth_off.png'}, caption=''},
 	[CMD.TRAJECTORY] = { texture = {imageDir .. 'states/traj_low.png', imageDir .. 'states/traj_high.png'}, caption=''},
@@ -281,7 +282,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	rawmove=1,
 
 	-- states
-	onoff=2,
+	wantonoff=2,
 	['repeat']=2,
 	cloak=2,
 	movestate=2,
@@ -334,6 +335,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	antinukezone=2,
 	unitai=2,
 	unit_kill_subordinates=2,
+	disableattack=2,
 	pushpull=2,
 	autoassist=2,
 	autocalltransport=2,

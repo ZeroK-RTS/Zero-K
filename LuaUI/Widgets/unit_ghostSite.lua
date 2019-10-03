@@ -103,7 +103,7 @@ local function DrawGhostSites()
 
 			local ghostTeamColor = {Spring.GetTeamColor(ghost[PARAM_TEAMID])}
 			gl.PushMatrix()
-			gl.Translate(x, y, z) 
+			gl.Translate(x, y, z)
 			gl.Rotate(ghost[PARAM_FACING], 0, 1, 0)
 			
 			if shaderObj then

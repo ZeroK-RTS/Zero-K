@@ -66,11 +66,11 @@ function widget:CommandNotify(id, params, options) --ref: gui_tacticalCalculator
 	
 	if (id == CMD.ATTACK or id == CMD_UNIT_SET_TARGET or id == CMD_UNIT_SET_TARGET_CIRCLE) then
 		local cx, cy, cz, cr = params[1], params[2], params[3], params[4]
-		if (cr == nil) then --not area command
-			return false 
+		if (cr or 0) == 0 then --not area command
+			return false
 		end
 		if (cx == nil or cy == nil or cz == nil) then --outside of map
-			return false 
+			return false
 		end
 		--The following code filter out ground unit from dedicated AA, and
 		--split target among selected unit if user press CTRL+Area_attack
@@ -135,7 +135,7 @@ function ReturnAllAirTarget(targetUnits, selectedAlly,checkAir)
 		local enemyAllyID = Spring.GetUnitAllyTeam(unitID)
 		if (selectedAlly ~= enemyAllyID) then --differentiate between selected unit, targeted units, and enemyteam. Filter out ally and owned units
 			if checkAir then
-				local unitDefID = Spring.GetUnitDefID(unitID) 
+				local unitDefID = Spring.GetUnitDefID(unitID)
 				local unitDef = UnitDefs[unitDefID]
 				if not unitDef then
 					if GetDotsFloating(unitID) then --check & remember floating radar dots in new table.
@@ -149,7 +149,7 @@ function ReturnAllAirTarget(targetUnits, selectedAlly,checkAir)
 			end
 			nonFilteredTargets[#nonFilteredTargets +1] = unitID --also copy all target to a non-filtered table
 		end
-	end	
+	end
 	return filteredTargets, nonFilteredTargets
 end
 
@@ -163,7 +163,7 @@ function GetAAUnitList(units)
 			local unitDef_primaryWeapon = UnitDefs[unitDefID].weapons[1]
 			if (unitDef_primaryWeapon~= nil) then
 				local primaryWeapon_target = UnitDefs[unitDefID].weapons[1].onlyTargets
-				local exclusiveAA = (primaryWeapon_target["fixedwing"] and primaryWeapon_target["gunship"]) and 
+				local exclusiveAA = (primaryWeapon_target["fixedwing"] and primaryWeapon_target["gunship"]) and
 									not (primaryWeapon_target["sink"] or primaryWeapon_target["land"] or primaryWeapon_target["sub"])
 				--[[
 				Spring.Echo(UnitDefs[unitDefID].weapons[1].onlyTargets)
@@ -172,10 +172,10 @@ function GetAAUnitList(units)
 					Spring.Echo(content)
 				end
 				--]]
-				if (exclusiveAA) then 
-					antiAirUnits[#antiAirUnits +1]= unitID 
+				if (exclusiveAA) then
+					antiAirUnits[#antiAirUnits +1]= unitID
 				else
-					normalUnits[#normalUnits +1]= unitID 
+					normalUnits[#normalUnits +1]= unitID
 				end
 			else
 				normalUnits[#normalUnits +1]= unitID
@@ -198,7 +198,7 @@ function ReIssueCommandsToUnits(antiAirUnits,airTargets,normalUnits,allTargets,c
 			IssueCommand(antiAirUnits,airTargets,cmdID,options)
 			IssueCommand(normalUnits,allTargets,cmdID,options)
 			isHandled = true
-		else 
+		else
 			isHandled = false --nothing need to be done, let spring handle
 		end
 	end
@@ -234,12 +234,12 @@ end
 --------------------------------------------------------------------------------
 function GetDotsFloating (unitID) --ref: gui_vertLineAid.lua by msafwan
 	local x, y, z = Spring.GetUnitPosition(unitID)
-	if x == nil then 
+	if x == nil then
 		return false
 	end
 	local isFloating = false
 	local groundY = Spring.GetGroundHeight(x,z)
-	local surfaceY = math.max (groundY, 0) --//select water, or select terrain height depending on which is higher. 
+	local surfaceY = math.max (groundY, 0) --//select water, or select terrain height depending on which is higher.
 	if (y-surfaceY) >= 100 then  --//mark unit as flying if it appears to float far above surface, if this fail then player can force attack it with single-(non-area)-attack or scout its ID first.
 		isFloating = true
 	end

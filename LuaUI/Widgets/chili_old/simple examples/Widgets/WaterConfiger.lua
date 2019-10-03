@@ -140,7 +140,7 @@ function widget:Initialize()
 
   local function OnChange(self,value)
     Spring.SetWaterParams({[self.name] = value})
-    self.custom.options.value = value 
+    self.custom.options.value = value
 
     if (self.custom)and(self.custom.needReload) then
       ReloadWater()

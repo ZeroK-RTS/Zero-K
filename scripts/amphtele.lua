@@ -6,7 +6,7 @@ include 'letsNotFailAtTrig.lua'
 
 local base, pelvis, body = piece('base', 'pelvis', 'body')
 local rthigh, rshin, rfoot, lthigh, lshin, lfoot = piece('rthigh', 'rshin', 'rfoot', 'lthigh', 'lshin', 'lfoot')
-local holder, sphere = piece('holder', 'sphere') 
+local holder, sphere = piece('holder', 'sphere')
 
 local smokePiece = {pelvis}
 --------------------------------------------------------------------------------------
@@ -327,7 +327,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--StartThread(Walk)
 	activity_mode(1)
 end

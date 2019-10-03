@@ -3,7 +3,7 @@ function widget:GetInfo()
   return {
     name     = "Resurrect Congregate",
     desc     = versionNumber .. "Automatically send resurrected unit to nearby blob of allied units. (1 Blob = 5 ground units within 300 elmo radius, Congregating range: 3000 elmo)",
-    author   = "msafwan", 
+    author   = "msafwan",
     date     = "3 November 2013",
     license  = "GNU GPL, v2 or later",
     layer     = 0,
@@ -62,7 +62,7 @@ function widget:PlayerChanged(playerID)
 	if Spring.GetSpectatingState() then widgetHandler:RemoveWidget() end
 end
 
-local elapsedTime = 0 
+local elapsedTime = 0
 function widget:Update(n)
 	if not iNotLagging_gbl then
 		return
@@ -123,7 +123,7 @@ function GetAllClusterPosition()
 			end
 		end
 	end
-	local cluster, nonClustered = WG.OPTICS_cluster(listOfUnits, blobRadius_gbl_cnst,blobUnits_gbl_cnst, myTeamID,blobRadius_gbl_cnst) --//find clusters with atleast 5 unit per cluster and with at least within 300-elmo from each other 
+	local cluster, nonClustered = WG.OPTICS_cluster(listOfUnits, blobRadius_gbl_cnst,blobUnits_gbl_cnst, myTeamID,blobRadius_gbl_cnst) --//find clusters with atleast 5 unit per cluster and with at least within 300-elmo from each other
 	local groupPositions ={}
 	for index=1 , #cluster do
 		local sumX, sumY,sumZ, unitCount,meanX, meanY, meanZ = 0,0 ,0 ,0 ,0,0,0

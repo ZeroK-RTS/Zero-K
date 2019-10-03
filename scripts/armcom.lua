@@ -5,21 +5,21 @@ local spSetUnitShieldState = Spring.SetUnitShieldState
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local torso = piece 'torso' 
-local ruparm = piece 'ruparm' 
-local luparm = piece 'luparm' 
-local rbigflash = piece 'rbigflash' 
-local nanospray = piece 'nanospray' 
-local pelvis = piece 'pelvis' 
-local lfirept = piece 'lfirept' 
-local head = piece 'head' 
-local lthigh = piece 'lthigh' 
-local rthigh = piece 'rthigh' 
-local nanolath = piece 'nanolath' 
-local biggun = piece 'biggun' 
-local rleg = piece 'rleg' 
-local lleg = piece 'lleg' 
-local ground = piece 'ground' 
+local torso = piece 'torso'
+local ruparm = piece 'ruparm'
+local luparm = piece 'luparm'
+local rbigflash = piece 'rbigflash'
+local nanospray = piece 'nanospray'
+local pelvis = piece 'pelvis'
+local lfirept = piece 'lfirept'
+local head = piece 'head'
+local lthigh = piece 'lthigh'
+local rthigh = piece 'rthigh'
+local nanolath = piece 'nanolath'
+local biggun = piece 'biggun'
+local rleg = piece 'rleg'
+local lleg = piece 'lleg'
+local ground = piece 'ground'
 
 local smokePiece = {torso}
 local nanoPieces = {nanospray}
@@ -85,7 +85,7 @@ local RESTORE_DELAY_DGUN = 2500
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local isMoving, isLasering, isDgunning, shieldOn = false, false, false, true
+local isLasering, isDgunning, shieldOn = false, false, true
 local restoreHeading, restorePitch = 0, 0
 
 local flamers = {}
@@ -112,7 +112,6 @@ local function Walk()
 	
 	Turn(nanolath, x_axis, math.rad(-40), ARM_SPEED_PITCH)
 	Turn(biggun, x_axis, math.rad(-62.5), ARM_SPEED_PITCH)
-	isMoving = true
 	
 	Turn(ground, x_axis, math.rad(10), math.rad(30))
 	while true do
@@ -141,7 +140,7 @@ local function Walk()
 			Turn(luparm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
 			Turn(ruparm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 		end
-		WaitForTurn(rthigh, x_axis)		
+		WaitForTurn(rthigh, x_axis)
 		Sleep(0)
 	end
 end
@@ -167,16 +166,15 @@ function script.Create()
 	Turn(lfirept, x_axis, math.rad(145))
 	Turn(rbigflash, x_axis, math.rad(145))
 	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
-function script.StartMoving() 
+function script.StartMoving()
 	StartThread(Walk)
 end
 
-function script.StopMoving() 
-	isMoving = false
+function script.StopMoving()
 	StartThread(RestorePose)
 end
 
@@ -185,8 +183,8 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	if num == 3 then 
-		return rbigflash 
+	if num == 3 then
+		return rbigflash
 	elseif num == 2 or num == 4 then
 		return torso
 	end
@@ -218,7 +216,7 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_LASER)
 		SetSignalMask(SIG_LASER)
 		isLasering = true
-		if not isDgunning then 
+		if not isDgunning then
 			Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
 		end
 		Turn(nanolath, x_axis, math.rad(-40), ARM_SPEED_PITCH)
@@ -281,8 +279,8 @@ function script.StopBuilding()
 	StartThread(RestoreLaser)
 end
 
-function script.StartBuilding(heading, pitch) 
-	if not isLasering then 
+function script.StartBuilding(heading, pitch)
+	if not isLasering then
 		Turn(luparm, x_axis, math.rad(-60) - pitch, ARM_SPEED_PITCH)
 		if not (isDgunning) then Turn(torso, y_axis, heading, TORSO_SPEED_YAW) end
 	end

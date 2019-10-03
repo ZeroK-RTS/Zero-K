@@ -8,7 +8,7 @@ function widget:GetInfo()
     author    = "KingRaptor (L.J. Lim)",
     date      = "Dec 2011",
     license   = "GNU GPL, v2 or later",
-    layer     = -1,	-- make sure it draws before point tracker 
+    layer     = -1, -- make sure it draws before point tracker
     enabled   = true  --  loaded by default?
   }
 end
@@ -145,7 +145,7 @@ local function ModifyObjective(id, title, description, pos, status, color)
 	end
 	if (status) or color then
 		obj.label.font.color = color or statusColors[status] or obj.label.font.color
-		obj.label:Invalidate()	
+		obj.label:Invalidate()
 	end
 	
 	Spring.PlaySoundFile("sounds/message_private.wav", 1, "ui")
@@ -216,7 +216,7 @@ local function AddObjective(id, title, description, pos, status, color)
 			parent = obj.panel,
 			width = statusImageWidth,
 			height = statusImageWidth,
-			x = 4, 
+			x = 4,
 			y = (panelHeight - statusImageWidth)/2,
 			keepAspect = true,
 			file = statusImages[status],
@@ -314,15 +314,15 @@ function widget:Initialize()
 		return
 	end
 
-	Chili		= WG.Chili
-	Window		= Chili.Window
-	Panel		= Chili.Panel
-	StackPanel	= Chili.StackPanel
-	ScrollPanel	= Chili.ScrollPanel
-	Button		= Chili.Button
-	Label		= Chili.Label
-	Image		= Chili.Image
-	screen0		= Chili.Screen0
+	Chili       = WG.Chili
+	Window      = Chili.Window
+	Panel       = Chili.Panel
+	StackPanel  = Chili.StackPanel
+	ScrollPanel = Chili.ScrollPanel
+	Button      = Chili.Button
+	Label       = Chili.Label
+	Image       = Chili.Image
+	screen0     = Chili.Screen0
 	
 	local vsx, vsy = Spring.GetWindowGeometry()
 	local width, height = 480, 240
@@ -347,7 +347,7 @@ function widget:Initialize()
 		parent = screen0,
 		dockable = true,
 		color = {0,0,0,0},
-		right = 0,  
+		right = 0,
 		y = y,
 		width  = 64,
 		height = 64,
@@ -366,7 +366,7 @@ function widget:Initialize()
 		height = 64,
 		width = 64,
 		caption = '',
-		OnClick = {	function () 
+		OnClick = {	function ()
 				if open then Minimize(); else Expand(); end
 			end},
 		padding = {8,8,8,8},
@@ -391,7 +391,7 @@ function widget:Initialize()
 		width = "100%";
 		height = "100%";
 		padding = {2, 2, 2, 2},
-	}	
+	}
 	
 	minimizeButton = Button:New{
 		parent = mainPanel,
@@ -400,7 +400,7 @@ function widget:Initialize()
 		height = 26,
 		width = 26,
 		caption = '',
-		OnClick = {	function () 
+		OnClick = {	function ()
 				Minimize()
 			end},
 		backgroundColor = {1, 1, 1, 0},

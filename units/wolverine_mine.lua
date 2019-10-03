@@ -19,8 +19,8 @@ unitDef = {
 
   customParams           = {
     dontcount = [[1]],
-	mobilebuilding = [[1]],
-	idle_cloak = 1,
+    mobilebuilding = [[1]],
+    idle_cloak = 1,
   },
 
   explodeAs              = [[NOWEAPON]],
@@ -31,9 +31,6 @@ unitDef = {
   idleAutoHeal           = 10,
   idleTime               = 300,
   initCloaked            = true,
-  kamikaze               = true,
-  kamikazeDistance       = 0,
-  kamikazeUseLOS         = true,
   maxDamage              = 40,
   maxSlope               = 255,
   maxVelocity            = 0,
@@ -70,18 +67,18 @@ unitDef = {
       name                    = [[Bomblet]],
       areaOfEffect            = 16,
       burst                   = 5,
-      burstrate               = 0.01,
+      burstrate               = 0.033,
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customparams = {
-		stats_hide_dps = 1, -- one use
-		stats_hide_reload = 1,
-	  },
-	  
+      customparams = {
+        stats_hide_dps = 1, -- one use
+        stats_hide_reload = 1,
+      },
+      
       damage                  = {
-        default = 40,
-        planes  = 40,
+        default = 40.01,
+        planes  = 40.01,
         subs    = 4,
       },
 

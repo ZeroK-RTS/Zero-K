@@ -114,7 +114,7 @@ local function CleanTextures()
 	if screenTex then
 		gl.DeleteTexture(screenTex)
 		screenTex = nil
-	end	
+	end
 end
 
 local function CreateTextures()

@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 TreeViewNode = Control:Inherit{
 	classname = "treeviewnode",
@@ -8,7 +8,7 @@ TreeViewNode = Control:Inherit{
 
 	autosize = true,
 	caption   = "node",
-	expanded  = true,
+	expanded  = false,
 	
 	clickTextToToggle = false,
 	root      = false,
@@ -28,7 +28,7 @@ TreeViewNode = Control:Inherit{
 local this = TreeViewNode
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 function TreeViewNode:New(obj)
 	if (obj.root) then
@@ -107,7 +107,7 @@ end
 
 TreeViewNode.Clear = TreeViewNode.ClearChildren
 
---// ============================================================================= 
+--// =============================================================================
 
 function TreeViewNode:Add(item)
 	self.leaf = false
@@ -188,7 +188,7 @@ function TreeViewNode:Collapse()
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function TreeViewNode:GetNodeByCaption(caption)
 	for i = 1, #self.nodes do
@@ -222,7 +222,7 @@ function TreeViewNode:GetNodeByIndex(index, _i)
 	return _i
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function TreeViewNode:UpdateLayout()
 	local clientWidth = self.clientWidth
@@ -254,7 +254,7 @@ function TreeViewNode:UpdateLayout()
 	return true
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function TreeViewNode:_InNodeButton(x, y)
 	if self.root or self.leaf then
@@ -335,7 +335,7 @@ function TreeViewNode:MouseDblClick(x, y, ...)
 	return obj
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function TreeViewNode:DrawNode()
 	if (self.treeview) then

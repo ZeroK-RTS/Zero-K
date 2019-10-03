@@ -116,12 +116,12 @@ unitDef = {
       name                    = [[Blob]],
       areaOfEffect            = 160,
       burst                   = 8,
-      burstrate               = 0.01,
+      burstrate               = 0.033,
       cegTag                  = [[queen_trail]],
       craterBoost             = 0,
       craterMult              = 0,
-			
-			customParams            = {
+            
+            customParams            = {
         light_radius = 0,
       },
 

@@ -40,11 +40,10 @@ local boundsLoc
 
 local window
 local fakewindow
-local map_panel 
+local map_panel
 local buttons_panel
 local Chili
 local glDrawMiniMap = gl.DrawMiniMap
-local glResetState = gl.ResetState
 local glResetMatrices = gl.ResetMatrices
 local echo = Spring.Echo
 
@@ -61,13 +60,31 @@ local usingNewEngine = (#{Spring.GetLosViewColors()} == 5) -- newer engine has r
 
 WG.MinimapDraggingCamera = false --Boolean, false if selection through minimap is possible
 
+local fogBrightnessMin = 0
+local fogBrightnessMax = 1
+function WG.game_SetLosFogBrightnessMinimum(newMin)
+	if (not newMin) or (type(newMin) ~= "number") or (newMin < 0) or (newMin > 1) then
+		return
+	end
+	fogBrightnessMin = newMin
+	fogBrightnessMax = 1
+end
+
+function WG.game_SetLosFogBrightnessMaximum(newMax)
+	if (not newMax) or (type(newMax) ~= "number") or (newMax < 0) or (newMax > 1) then
+		return
+	end
+	fogBrightnessMin = 0
+	fogBrightnessMax = newMax
+end
+
 local function toggleTeamColors()
 	if WG.LocalColor and WG.LocalColor.localTeamColorToggle then
 		WG.LocalColor.localTeamColorToggle()
 	else
 		Spring.SendCommands("luaui enablewidget Local Team Colors")
 	end
-end 
+end
 
 local mapRatio = Game.mapX/Game.mapY
 local mapIsWider = mapRatio > 1
@@ -109,53 +126,56 @@ local hotkeysPath = 'Hotkeys/Misc'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map/Radar Color'
 local radar_path_edit = 'Settings/Interface/Map/Radar Color'
-options_order = { 
-	'label_drawing', 
+options_order = {
+	'label_drawing',
 	'drawinmap',
-	'clearmapmarks', 
+	'clearmapmarks',
 	'lastmsgpos',
 	
-	'lblViews', 
-	'viewstandard', 
-	'viewheightmap', 
-	'viewblockmap', 
+	'lblViews',
+	'viewstandard',
+	'viewheightmap',
+	'viewblockmap',
 	'viewfow',
 	'showeco',
 	
-	'lable_initialView', 
+	'lable_initialView',
 	'initialSensorState',
 	
 	-- Radar view configuration
 	'radar_view_colors_label1',
-	'radar_fog_brightness1', 
+	'radar_fog_brightness1',
 	
 	-- Radar view editing
-	'radar_view_colors_label2', 
-	'radar_radar_color', 
+	'radar_view_colors_label2',
+	'radar_radar_color',
 	'radar_radar2_color',
-	'radar_jammer_color', 
-
+	'radar_jammer_color',
+	
+	-- Debug
+	'echoLos',
+	
 	-- Radar view presets
 	'radar_view_presets_label1',
-	'radar_preset_only_los', 
-	'radar_preset_double_outline', 
-	'radar_preset_blue_line',  
-	'radar_preset_green', 
-	'radar_preset_green_in_blue', 
+	'radar_preset_only_los',
+	'radar_preset_double_outline',
+	'radar_preset_blue_line',
+	'radar_preset_green',
+	'radar_preset_green_in_blue',
 	
 	-- Minimap options
 	'disableMinimap',
 	'hideOnOverview',
 	'use_map_ratio',
-	'opacity', 
-	'alwaysResizable', 
-	'buttonsOnRight', 
-	'hidebuttons', 
+	'opacity',
+	'alwaysResizable',
+	'buttonsOnRight',
+	'hidebuttons',
 	'minimizable',
 	'lblblank1',
 
-	'leftClickOnMinimap', 
-	'fadeMinimapOnZoomOut', 
+	'leftClickOnMinimap',
+	'fadeMinimapOnZoomOut',
 	
 	'fancySkinning',
 }
@@ -175,14 +195,14 @@ options = {
 		type = 'button',
 		action = 'clearmapmarks',
 		path = hotkeysPath,
-	},	
+	},
 	lastmsgpos = {
 		name = 'Zoom To Last Message',
 		desc = 'Moves the camera to the most recently placed map marker or message.',
 		type = 'button',
 		action = 'lastmsgpos',
 		path = hotkeysPath,
-	},	
+	},
 	
 	lblViews = { type = 'label', name = 'Map Overlays', path = hotkeysPath},
 
@@ -243,9 +263,9 @@ options = {
 	
 --------------------------------------------------------------------------
 -- Configure Radar and Line of Sight 'Settings/Interface/Map/Radar'
---------------------------------------------------------------------------	
+--------------------------------------------------------------------------
 	
-	radar_view_colors_label1 = { 
+	radar_view_colors_label1 = {
 		type = 'label', name = 'Other Options',
 	},
 	
@@ -261,7 +281,7 @@ options = {
 -- Radar view color editing 'Settings/Interface/Map/Radar'
 --------------------------------------------------------------------------
 	
-	radar_view_colors_label2 = { 
+	radar_view_colors_label2 = {
 		type = 'label', name = '* Note: These colors are additive.', path = radar_path_edit,
 	},
 
@@ -287,11 +307,26 @@ options = {
 		path = radar_path_edit,
 	},
 	
+	echoLos = {
+		name = 'Print LOS config to console',
+		type = 'button',
+		OnChange = function()
+			local always, los, radar, jam, inRadar = Spring.GetLosViewColors()
+			Spring.Echo("always", always[1], always[2], always[3])
+			Spring.Echo("los", los[1], los[2], los[3])
+			Spring.Echo("radar", radar[1], radar[2], radar[3])
+			Spring.Echo("jam", jam[1], jam[2], jam[3])
+			Spring.Echo("inRadar", inRadar[1], inRadar[2], inRadar[3])
+		end,
+		advanced = true,
+		path = radar_path,
+	},
+	
 --------------------------------------------------------------------------
 -- Radar view presets 'Settings/Interface/Map/Radar'
 --------------------------------------------------------------------------
 	
-	radar_view_presets_label1 = { 
+	radar_view_presets_label1 = {
 		type = 'label', name = 'Radar Presets', path = radar_path,
 	},
 	
@@ -367,7 +402,6 @@ options = {
 		path = radar_path,
 	},
 	
-	
 --------------------------------------------------------------------------
 -- Minimap path area 'Settings/HUD Panels/Minimap'
 --------------------------------------------------------------------------
@@ -385,7 +419,7 @@ options = {
 		OnChange = function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 		noHotkey = true,
-	},	
+	},
 	use_map_ratio = {
 		name = 'Keep Aspect Ratio',
 		type = 'radioButton',
@@ -402,11 +436,11 @@ options = {
 				local maxSize = math.max(window.width, window.height)
 				local w,h = AdjustToMapAspectRatio(maxSize, maxSize, options.buttonsOnRight.value)
 				window:Resize(w,h,false,false)
-			end 
+			end
 		end,
 		path = minimap_path,
 		noHotkey = true,
-	},	
+	},
 	opacity = {
 		name = "Opacity",
 		type = "number",
@@ -431,7 +465,7 @@ options = {
 		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 		noHotkey = true,
-	},	
+	},
 	buttonsOnRight = {
 		name = 'Map buttons on the right',
 		type = 'bool',
@@ -445,8 +479,8 @@ options = {
 		type = 'bool',
 		advanced = true,
 		OnChange= function(self)
-			iconsize = self.value and 0 or 20 
-			MakeMinimapWindow() 
+			iconsize = self.value and 0 or 20
+			MakeMinimapWindow()
 		end,
 		value = false,
 		path = minimap_path,
@@ -472,7 +506,7 @@ options = {
 		},
 		path = minimap_path,
 		noHotkey = true,
-	},	
+	},
 	fadeMinimapOnZoomOut = {
 		name = "Minimap fading when zoomed out",
 		type = 'radioButton',
@@ -534,7 +568,7 @@ options = {
 	simpleMinimapColors = {
 		name = 'Simplified Minimap Colors',
 		type = 'bool',
-		desc = 'Show minimap blips as green for you, teal for allies and red for enemies (only minimap will use this simple color scheme).', 
+		desc = 'Show minimap blips as green for you, teal for allies and red for enemies (only minimap will use this simple color scheme).',
 		springsetting = 'SimpleMiniMapColors',
 		OnChange = function(self) Spring.SendCommands{"minimap simplecolors " .. (self.value and 1 or 0) } end,
 		path = minimap_path,
@@ -543,7 +577,7 @@ options = {
 }
 
 function WG.Minimap_SetOptions(aspect, opacity, resizable, buttonRight, minimizable)
-	if aspect == 'arwindow' or aspect == 'armap' or aspect == 'arnone' then 
+	if aspect == 'arwindow' or aspect == 'armap' or aspect == 'arnone' then
 		options.use_map_ratio.value = aspect
 	end
 	options.opacity.value = opacity
@@ -561,7 +595,8 @@ function updateRadarColors()
 
 	-- local fog = options.radar_fog_color.value
 	-- local los = options.radar_los_color.value
-	local fog_value = options.radar_fog_brightness1.value * losViewOffBrightness
+	local fogBrightness = (fogBrightnessMax - fogBrightnessMin) * options.radar_fog_brightness1.value + fogBrightnessMin
+	local fog_value = fogBrightness * losViewOffBrightness
 	local los_value = (losViewOffBrightness - fog_value)
 	local fog = {fog_value, fog_value, fog_value, 1}
 	local los = {los_value, los_value, los_value, 1}
@@ -573,8 +608,8 @@ function updateRadarColors()
 	else
 		Spring.SetLosViewColors(
 			{ fog[1], los[1], radar[1], jam[1]},
-			{ fog[2], los[2], radar[2], jam[2]}, 
-			{ fog[3], los[3], radar[3], jam[3]} 
+			{ fog[2], los[2], radar[2], jam[2]},
+			{ fog[3], los[3], radar[3], jam[3]}
 		)
 	end
 end
@@ -643,8 +678,8 @@ local function MakeMinimapButton(file, params)
 		hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
 	end
 		
-	return Chili.Button:New{ 
-		height=iconsize, width=iconsize, 
+	return Chili.Button:New{
+		height=iconsize, width=iconsize,
 		caption="",
 		margin={0,0,0,0},
 		padding={2,2,2,2},
@@ -749,8 +784,8 @@ MakeMinimapWindow = function()
 		centerItems = false,
 		
 		children = {
-			Chili.Button:New{ 
-				height=iconsize, width=iconsize, 
+			Chili.Button:New{
+				height=iconsize, width=iconsize,
 				caption="",
 				margin={0,0,0,0},
 				padding={2,2,2,2},
@@ -852,7 +887,7 @@ function widget:MousePress(x, y, button)
 	if Spring.GetActiveCommand() == 0 then
 		if (options.leftClickOnMinimap.value ~= 'unitselection' and button == 1) or button == 2 then
 			local traceType,traceValue = Spring.TraceScreenRay(x,y,false,true)
-			local coord 
+			local coord
 			if traceType == "ground" then
 				coord = traceValue
 			end
@@ -881,7 +916,7 @@ end
 function widget:MouseMove(x, y, dx, dy, button)
 	if leftClickDraggingCamera and Spring.IsAboveMiniMap(x, y) then
 		local traceType,traceValue = Spring.TraceScreenRay(x,y,true,true)
-		local coord 
+		local coord
 		if traceType == "ground" then
 			coord = traceValue
 		end
@@ -1025,7 +1060,7 @@ function widget:Shutdown()
 	end
 
 	WG.MinimapDraggingCamera = nil
-end 
+end
 
 local lx, ly, lw, lh, last_window_x, last_window_y
 
@@ -1034,15 +1069,15 @@ local function DrawMiniMap()
   glDrawMiniMap()
 end
 
-function widget:DrawScreen() 
+function widget:DrawScreen()
 	local cs = Spring.GetCameraState()
-	if (options.disableMinimap.value or window.hidden or cs.name == "ov") then 
+	if (options.disableMinimap.value or window.hidden or cs.name == "ov") then
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
 		ly = 0
 		lh = 0
 		lw = 0
-		return 
+		return
 	end
 
 	local cx,cy,cw,ch = Chili.unpack4(map_panel.clientArea)
@@ -1085,7 +1120,7 @@ function widget:DrawScreen()
 		end
 
 		--Guarantees a buffer of 0 alpha near full zoom-out, to help account for the camera following the map's elevation
-		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, alphaMin), 1.0) end 
+		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, alphaMin), 1.0) end
 	end
 
 	if math.abs(last_alpha - alpha) > 0.0001 then
@@ -1095,11 +1130,11 @@ function widget:DrawScreen()
 		fakewindow.backgroundColor = {1,1,1, final_opacity}
 		local final_map_bg_color = options.fadeMinimapOnZoomOut.value == 'full' and bgColor_panel[4]*alpha or bgColor_panel[4]
 		map_panel.backgroundColor = {1,1,1, final_map_bg_color}
-		if alpha < 0.1 then 
-			fakewindow.children = {map_panel} 
-		else 
-			fakewindow.children = {map_panel, buttons_panel} 
-		end 
+		if alpha < 0.1 then
+			fakewindow.children = {map_panel}
+		else
+			fakewindow.children = {map_panel, buttons_panel}
+		end
 		fakewindow:Invalidate()
 		map_panel:Invalidate()
 	end
@@ -1136,5 +1171,5 @@ function widget:DrawScreen()
 	gl.MatrixMode(GL.MODELVIEW)
 	gl.PopMatrix()
 	gl.PopAttrib()
-end 
+end
 

@@ -36,7 +36,7 @@ local function TiltWings()
 end
 
 function script.Create()
-	StartThread (GG.Script.SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread (TiltWings)
 end
 

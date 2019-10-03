@@ -13,6 +13,8 @@
 ---------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------
 
+local GetMovetypeUnitDefID = Spring.Utilities.GetMovetypeUnitDefID
+
 local function GetUnitMidPos(unitID)
 	local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
 	return x, y, z
@@ -28,11 +30,7 @@ local function GetUnitIsMobile(self, unitID)
 		return false
 	end
 	local unitDefID = Spring.GetUnitDefID(unitID)
-	local ud = unitDefID and UnitDefs[unitDefID]
-	if not ud then
-		return false
-	end
-	if ud.isImmobile then
+	if not GetMovetypeUnitDefID(unitDefID) then
 		return false
 	end
 	local build = select(5, Spring.GetUnitHealth(unitID))
@@ -42,26 +40,26 @@ local function GetUnitIsMobile(self, unitID)
 	return true
 end
 
-local function GetCmdTag(unitID) 
-		local cmdTag = 0
-		local cmds = Spring.GetFactoryCommands(unitID,1)
+local function GetCmdTag(unitID)
+	local cmdTag = 0
+	local cmds = Spring.GetFactoryCommands(unitID,1)
 	if (cmds) then
-				local cmd = cmds[1]
-				if cmd then
-					 cmdTag = cmd.tag
-				end
+			local cmd = cmds[1]
+			if cmd then
+				 cmdTag = cmd.tag
+			end
 		end
-	if cmdTag == 0 then 
+	if cmdTag == 0 then
 		local cmds = Spring.GetCommandQueue(unitID,1)
 		if (cmds) then
 			local cmd = cmds[1]
 			if cmd then
 				cmdTag = cmd.tag
 			end
-				end
-	end 
+		end
+	end
 	return cmdTag
-end 
+end
 
 
 function UpdateNanoParticles(self)

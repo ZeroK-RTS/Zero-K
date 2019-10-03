@@ -24,13 +24,13 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	level = [[1]],
-	statsname = [[dynstrike1]],
-	soundok = [[heavy_bot_move]],
-	soundselect = [[bot_select]],
-	soundbuild = [[builder_start]],
-	commtype = [[1]],
-	--decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
+    level = [[1]],
+    statsname = [[dynstrike1]],
+    soundok = [[heavy_bot_move]],
+    soundselect = [[bot_select]],
+    soundbuild = [[builder_start]],
+    commtype = [[1]],
+    --decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
     aimposoffset   = [[0 5 0]],
   },
 
@@ -61,8 +61,8 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-    	[[custom:BEAMWEAPON_MUZZLE_BLUE]],
-		[[custom:NONE]],
+        [[custom:BEAMWEAPON_MUZZLE_BLUE]],
+        [[custom:NONE]],
     },
 
   },
@@ -108,12 +108,16 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams            = {
+        bogus = 1,
+      },
+
       damage                  = {
         default = 0,
         subs    = 0,
       },
 
-      duration                = 0.11,
+      duration                = 0.1,
       edgeEffectiveness       = 0.99,
       explosionGenerator      = [[custom:flash1green]],
       fireStarter             = 70,
@@ -125,7 +129,7 @@ unitDef = {
       laserFlareSize          = 5.53,
       minIntensity            = 1,
       range                   = 300,
-      reloadtime              = 0.11,
+      reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/laser_burn5]],
       soundTrigger            = true,
@@ -155,7 +159,7 @@ unitDef = {
         subs    = 0.8,
       },
 
-      duration                = 0.11,
+      duration                = 0.1,
       edgeEffectiveness       = 0.99,
       explosionGenerator      = [[custom:flash1blue]],
       fireStarter             = 70,
@@ -167,7 +171,7 @@ unitDef = {
       laserFlareSize          = 3,
       minIntensity            = 1,
       range                   = 300,
-      reloadtime              = 0.11,
+      reloadtime              = 0.1,
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/pulse_laser3]],
       soundTrigger            = true,

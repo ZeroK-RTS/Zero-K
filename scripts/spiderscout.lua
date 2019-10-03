@@ -1,17 +1,17 @@
-local body = piece 'body' 
-local turret = piece 'turret' 
-local flare = piece 'flare' 
-local barrel = piece 'barrel' 
-local lfupleg = piece 'lfupleg' 
-local lrupleg = piece 'lrupleg' 
-local rrupleg = piece 'rrupleg' 
-local head = piece 'head' 
-local rfupleg = piece 'rfupleg' 
-local rrleg = piece 'rrleg' 
-local rfleg = piece 'rfleg' 
-local lrleg = piece 'lrleg' 
-local lfleg = piece 'lfleg' 
-local digger = piece 'digger' 
+local body = piece 'body'
+local turret = piece 'turret'
+local flare = piece 'flare'
+local barrel = piece 'barrel'
+local lfupleg = piece 'lfupleg'
+local lrupleg = piece 'lrupleg'
+local rrupleg = piece 'rrupleg'
+local head = piece 'head'
+local rfupleg = piece 'rfupleg'
+local rrleg = piece 'rrleg'
+local rfleg = piece 'rfleg'
+local lrleg = piece 'lrleg'
+local lfleg = piece 'lfleg'
+local digger = piece 'digger'
 
 include "constants.lua"
 include 'reliableStartMoving.lua'
@@ -330,7 +330,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, {body})
+	StartThread(GG.Script.SmokeUnit, unitID, {body})
 	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true)
 	if not Spring.GetUnitIsStunned(unitID) then
 		Burrow()

@@ -14,7 +14,7 @@ end
 local smokePiece = {wheel}
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)

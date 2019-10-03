@@ -1,12 +1,12 @@
-local ground = piece 'ground' 
-local base = piece 'base' 
-local flare = piece 'flare' 
-local muzzle = piece 'muzzle' 
-local turret = piece 'turret' 
-local barrel = piece 'barrel' 
-local barrel_back = piece 'barrel_back' 
-local sleeve = piece 'sleeve' 
-local query = piece 'query' 
+local ground = piece 'ground'
+local base = piece 'base'
+local flare = piece 'flare'
+local muzzle = piece 'muzzle'
+local turret = piece 'turret'
+local barrel = piece 'barrel'
+local barrel_back = piece 'barrel_back'
+local sleeve = piece 'sleeve'
+local query = piece 'query'
 
 include "constants.lua"
 include "pieceControl.lua"
@@ -37,7 +37,7 @@ function script.Create()
 	Hide(flare)
 	Hide(muzzle)
 	Hide(barrel_back)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(DisableCheck)
 	SetupQueryWeaponFixHax(query, flare)
 end
@@ -45,8 +45,8 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	Turn(turret, y_axis, heading, math.rad(5))
-	Turn(sleeve, x_axis, -pitch, math.rad(2.5))
+	Turn(turret, y_axis, heading, math.rad(4))
+	Turn(sleeve, x_axis, -pitch, math.rad(2))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(sleeve, x_axis)
 	StartThread(AimingDone)

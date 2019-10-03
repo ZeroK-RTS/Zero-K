@@ -63,7 +63,7 @@ local allyTeamRole = {
 	[1] = "defender",
 }
 
-local hqDefID = {
+local hqDefIDs = {
 	[0] = UnitDefNames["pw_hq_attacker"].id,
 	[1] = UnitDefNames["pw_hq_defender"].id,
 }
@@ -350,7 +350,7 @@ end
 local function checkOverlapWithNoGoZone(xl,zl,xu,zu) -- intersection check does not include boundry points
 	for i = 1, noGoZones.count do
 		local d = noGoZones.data[i]
-		if xl < d.xu and xu > d.xl and zl < d.zu and zu > d.zl then 
+		if xl < d.xu and xu > d.xl and zl < d.zu and zu > d.zl then
 			return true
 		end
 	end
@@ -476,7 +476,7 @@ local function SpawnStructure(info, teamID, boxData)
 	
 	local giveUp = 0
 	while (Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 or
-		  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
+		  (lava and Spring.GetGroundHeight(x,z) <= 0) or
 		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
 		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
 		x, z = GetRandomPosition(boxData)
@@ -557,7 +557,7 @@ local function SpawnHQ(teamID, boxData, hqDefID)
 	
 	local giveUp = 0
 	while (Spring.TestBuildOrder(hqDefID, x, 0 ,z, direction) == 0 or
-		  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
+		  (lava and Spring.GetGroundHeight(x,z) <= 0) or
 		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
 		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
 		x, z = GetRandomPosition(boxData)
@@ -717,7 +717,7 @@ function gadget:GamePreload()
 		local teamList = Spring.GetTeamList(i) or {0}
 		local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 		local teamID = GetAllyTeamLeader(teamList)
-		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]], hqDefID[i])
+		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]], hqDefIDs[i])
 	end
 	
 	Spring.SetGameRulesParam("pw_structureList_count", planetwarsStructureCount)
@@ -757,12 +757,12 @@ local function InitializeUnitsToSpawn()
 			end
 		end
 	end
-	if err then 
+	if err then
 		Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Planetwars warning: ' .. err)
 	end
 
-	if not unitData then 
-		unitData = {} 
+	if not unitData then
+		unitData = {}
 	end
 	
 	local replacedStrucutres = {}

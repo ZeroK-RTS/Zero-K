@@ -23,9 +23,9 @@ unitDef = {
   cruiseAlt           = 180,
 
   customParams        = {
-	modelradius    = [[10]],
-	refuelturnradius = [[120]],
-	requireammo    = [[1]],
+    modelradius    = [[10]],
+    refuelturnradius = [[120]],
+    requireammo    = [[1]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -46,7 +46,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName          = [[firestorm.s3o]],
-  script			  = [[bomberriot.lua]],
+  script              = [[bomberriot.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {
@@ -81,18 +81,18 @@ unitDef = {
       avoidFeature            = false,
       avoidFriendly           = false,
       burst                   = 15,
-      burstrate               = 0.09,
+      burstrate               = 0.066,
       collideFeature          = false,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
+      customParams              = {
         reaim_time = 15, -- Fast update not required (maybe dangerous)
-	    setunitsonfire = "1",
-		burntime = 300,
-	  },
-	  
+        setunitsonfire = "1",
+        burntime = 300,
+      },
+      
       damage                  = {
         default = 25,
         planes  = 25,
@@ -125,6 +125,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
+      collisionVolumeOffsets = [[0 0 -5]],
+      collisionVolumeScales  = [[55 15 70]],
+      collisionVolumeType    = [[box]],
       object           = [[firestorm_dead.s3o]],
     },
 

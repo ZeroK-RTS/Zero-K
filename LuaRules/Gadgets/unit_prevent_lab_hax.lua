@@ -77,8 +77,8 @@ local function CheckLabs(checkFeatures, onlyUnstick)
 			local clearUnits = data.unitExpulsionParameters
 			if clearUnits then
 				units = spGetUnitsInRectangle(clearUnits[1], clearUnits[2], clearUnits[3], clearUnits[4])
-				for i = 1, #units do
-					local unitID = units[i]
+				for j = 1, #units do
+					local unitID = units[j]
 					local unitDefID = spGetUnitDefID(unitID)
 					local ud = UnitDefs[unitDefID]
 					local movetype = Spring.Utilities.getMovetype(ud)
@@ -90,7 +90,7 @@ local function CheckLabs(checkFeatures, onlyUnstick)
 							local vx, vy, vz = spGetUnitVelocity(unitID)
 							
 							if aimY > -18 and aimY >= clearUnits[5] and aimY <= clearUnits[6] then
-								local isAlly = ally == data.ally 
+								local isAlly = ally == data.ally
 								
 								local l = abs(ux - clearUnits[1])
 								local t = abs(uz - clearUnits[2])
@@ -132,7 +132,7 @@ local function CheckLabs(checkFeatures, onlyUnstick)
 										end
 									end
 								end
-							end	
+							end
 						end
 					end
 				end
@@ -141,8 +141,8 @@ local function CheckLabs(checkFeatures, onlyUnstick)
 			if checkFeatures then
 				local clearFeatures = data.featureExpulsionParameters
 				features = spGetFeaturesInRectangle(clearFeatures[1], clearFeatures[2], clearFeatures[3], clearFeatures[4])
-				for i = 1, #features do
-					local featureID = features[i]
+				for j = 1, #features do
+					local featureID = features[j]
 					local fx, fy, fz = spGetFeaturePosition(featureID)
 					if fy and fy > clearFeatures[5] and fy < clearFeatures[6] then
 						local l = abs(fx - clearFeatures[1])
@@ -269,8 +269,8 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 		labList.count = labList.count + 1
 		labList.data[labList.count] = {
 			unitID = unitID,
-			ally = ally, 
-			team = teamID, 
+			ally = ally,
+			team = teamID,
 			face = 0,
 			unitExpulsionParameters = unitExpulsionParameters,
 			featureExpulsionParameters = featureExpulsionParameters,
@@ -330,6 +330,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	
 	local buildDefID, x, z, face
 	if cmdID == CMD.INSERT then
+		if not cmdParams[2] then
+			return true
+		end
 		if cmdParams[2] >= 0 then
 			return true
 		end
@@ -344,8 +347,17 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		face = cmdParams[4]
 	end
 	
+	if (not x) or (not z) then
+		-- Sometimes factory construction orders reach here
+		return true
+	end
+	
 	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
 	local ud = UnitDefs[buildDefID]
+	if not ud then
+		return true
+	end
+
 	local xsize = (ud.xsize)*4 - 8
 	local zsize = (ud.ysize or ud.zsize)*4 - 8
 	
@@ -358,23 +370,21 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	--Spring.MarkerAddLine(x + xsize,0,z + zsize,x - xsize,0,z + zsize)
 	--Spring.MarkerAddLine(x - xsize,0,z + zsize,x - xsize,0,z - zsize)
 	
-	if (not x) or (not z) then
-		if Spring.IsCheatingEnabled() then
-			Spring.Echo("Prevent Lab Hax AllowCommand")
-			Spring.Echo("cmdID", cmdID)
-			Spring.Utilities.TableEcho(cmdParams, "cmdParams")
-			Spring.Utilities.TableEcho(cmdOptions, "cmdOptions")
-			Spring.Echo("x z xsize zsize", x, z, xsize, zsize)
-		end
-		return true
-	end
+	--if (not x) or (not z) then
+	--	Spring.Echo("LUA_ERRRUN", "Prevent Lab Hax AllowCommand")
+	--	Spring.Echo("cmdID", cmdID, "ud.name", ud and ud.name)
+	--	Spring.Utilities.TableEcho(cmdParams, "cmdParams")
+	--	Spring.Utilities.TableEcho(cmdOptions, "cmdOptions")
+	--	Spring.Echo("x z xsize zsize", x, z, xsize, zsize)
+	--	return true
+	--end
 	
 	local labData = labList.data
 	for i = 1, labList.count do
 		local data = labData[i]
 		if data.ally == allyTeamID then
 			local clearFeatures = data.featureExpulsionParameters
-			if clearFeatures[1] < x + xsize and clearFeatures[3] > x - xsize and 
+			if clearFeatures[1] < x + xsize and clearFeatures[3] > x - xsize and
 					clearFeatures[2] < z + zsize and clearFeatures[4] > z - zsize then
 				return false
 			end

@@ -11,7 +11,7 @@ function widget:GetInfo()
     author    = "CarRepairer",
     date      = "2008-08-18",
     license   = "GNU GPL, v2 or later",
-    layer     = 1, 
+    layer     = 1,
 --[[before enabling, read commit message 5482]]
     --enabled   = (rank and rank == 1) or true,
     enabled   = false
@@ -40,7 +40,7 @@ local glDepthTest		= gl.DepthTest
 local glDrawGroundCircle	= gl.DrawGroundCircle
 
 
-local GetActiveCmdDescs	= Spring.GetActiveCmdDescs	
+local GetActiveCmdDescs	= Spring.GetActiveCmdDescs
 local GetActiveCommand	= Spring.GetActiveCommand
 local GetAllUnits	= Spring.GetAllUnits
 local GetCurrentTooltip = Spring.GetCurrentTooltip
@@ -49,7 +49,7 @@ local GetGameFrame	= Spring.GetGameFrame
 local GetGameSeconds	= Spring.GetGameSeconds
 local GetUnitPosition	= Spring.GetUnitPosition
 local GetMapDrawMode	= Spring.GetMapDrawMode
-local GetMouseState	= Spring.GetMouseState 
+local GetMouseState	= Spring.GetMouseState
 local GetSelectedUnits	= Spring.GetSelectedUnits
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local GetUnitDefID	= Spring.GetUnitDefID
@@ -117,7 +117,7 @@ local unfinishedUnitCount = {}
 
 local conditions = {}
 local tempConditions = {
-	clickedNubtron=1, 
+	clickedNubtron=1,
 	rotatedBuilding=1,
 }
 
@@ -132,8 +132,8 @@ local classesByUnit = {}
 local nubtronData = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_config.lua", nil, VFS.RAW_FIRST)
 local unitClasses = nubtronData.unitClasses
 local unitClassNames = nubtronData.unitClassNames
-local mClasses = nubtronData.mClasses 
-local steps = nubtronData.steps 
+local mClasses = nubtronData.mClasses
+local steps = nubtronData.steps
 local tasks = nubtronData.tasks
 local taskOrder = nubtronData.taskOrder
 nubtronData = nil
@@ -227,12 +227,12 @@ CheckState = function()
 
 
 	---- Task Error ----
-	local taskErr = testForAllConditions(curTask.errIfAll) 
+	local taskErr = testForAllConditions(curTask.errIfAll)
 			or testForAnyConditions(curTask.errIfAny)
 			or testForAnyNotConditions(curTask.errIfAnyNot)
 
 	---- Task Pass ----
-	local taskPass = testForAllConditions(curTask.passIfAll) 
+	local taskPass = testForAllConditions(curTask.passIfAll)
 		or testForAnyConditions(curTask.passIfAny)
 		or testForAnyNotConditions(curTask.passIfAnyNot)
 
@@ -253,12 +253,12 @@ CheckState = function()
 	end
 
 	---- Step Error ----
-	local stepErr = testForAllConditions(curStep.errIfAll) 
-			or testForAnyConditions(curStep.errIfAny) 
+	local stepErr = testForAllConditions(curStep.errIfAll)
+			or testForAnyConditions(curStep.errIfAny)
 			or testForAnyNotConditions(curStep.errIfAnyNot)
 
 	---- Step Pass ----
-	local stepPass = testForAllConditions(curStep.passIfAll) 
+	local stepPass = testForAllConditions(curStep.passIfAll)
 			or testForAnyConditions(curStep.passIfAny)
 			or testForAnyNotConditions(curStep.passIfAnyNot)
 
@@ -295,16 +295,16 @@ local function CheckAllUnits()
 		if udBuilding then
 			local buildeeClass = classesByUnit[udBuilding.name]
 			if buildeeClass then
-				setCondition('build' .. buildeeClass)				
+				setCondition('build' .. buildeeClass)
 			end
 
 		elseif cmdID == CMD_REPAIR then
 			
 			local repaireeID = cmdParam1
-			local udRepairee = UnitDefs[GetUnitDefID(repaireeID)]			
+			local udRepairee = UnitDefs[GetUnitDefID(repaireeID)]
 			local repaireeClass = classesByUnit[udRepairee.name]
 
-			if repaireeClass then			
+			if repaireeClass then
 				local _, _, _, _, repaireeBuildProgress = GetUnitHealth(repaireeID)
 				if repaireeBuildProgress < 1 then
 					setCondition('build' .. repaireeClass)
@@ -318,7 +318,7 @@ local function CheckAllUnits()
 	if bq and bq[1] then
 		for udid, uCount in pairs(bq[1]) do
 			local buildeeName = UnitDefs[udid].name
-			local buildeeClass = classesByUnit[buildeeName] 
+			local buildeeClass = classesByUnit[buildeeName]
 			if buildeeClass then
 				setCondition('build'.. buildeeClass)
 			end
@@ -388,7 +388,7 @@ local function remUnfinishedUnit(unitClass, unitID)
 		unfinishedUnitCount[unitClass] = unfinishedUnitCount[unitClass] - 1
 		if unfinishedUnitCount[unitClass] == 0 then
 			remCondition('unf'.. unitClass)
-		end			
+		end
 	end
 end
 
@@ -534,8 +534,8 @@ local function SetupNubtronWindow()
 		name   = 'nubtron';
 		--color = {0, 0, 0, 0},
 		width = 550;
-		height = imgsize+20; 
-		x = 450; 
+		height = imgsize+20;
+		x = 450;
 		bottom = 52;
 		dockable = false;
 		draggable = true,
@@ -571,14 +571,14 @@ function widget:DrawWorld()
 	local pulse = frame32 / 32
 	local radius = 100 - pulse*40
 
-	-- draw circle around units --	
+	-- draw circle around units --
 	for unitClass, units in pairs(unitClasses) do
 		
 		local unitSet
 		if curStepName == 'finish'.. unitClass then
 			unitSet = unfinishedUnits[unitClass]
 			glColor(1,0,0, pulse)
-		elseif curStepName == 'select'.. unitClass then	
+		elseif curStepName == 'select'.. unitClass then
 			unitSet = finishedUnits[unitClass]
 			glColor(0.3,0.3,1, pulse)
 		end
@@ -606,7 +606,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 		local ud = UnitDefs[unitDefID]
 		local _, _, _, _, buildProgress = GetUnitHealth(unitID)
 		local unitClass = classesByUnit[ud.name]
-		if unitClass then			
+		if unitClass then
 			addUnfinishedUnit(unitClass, unitID)
 			if unitClass == 'BotLab' then
 				myLabID = unitID
@@ -614,7 +614,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 
 			--[[
 			if buildProgress == 1 then
-				setCondition('have'.. classesByUnit[ud.name])			
+				setCondition('have'.. classesByUnit[ud.name])
 			end
 			--]]
 		end
@@ -633,7 +633,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 			myFaction = 'core'
 		end
 		if ud and ud.customParams.commtype then
-			myCommID = unitID	
+			myCommID = unitID
 		end
 
 	end
@@ -695,7 +695,7 @@ function widget:Initialize()
 		conditions['build'..unitClass] = nil
 		conditions['selbuild'..unitClass] = nil
 
-		unitClassName = unitClassNames[unitClass] 
+		unitClassName = unitClassNames[unitClass]
 
 		-- generic build structure steps
 		if mClasses[unitClass] then
@@ -841,7 +841,7 @@ function widget:Update()
 		--- build facing direction ---
 		--[[
 		if buildFacing ~= Spring.GetUnitBuildFacing() then
-			buildFacing = Spring.GetUnitBuildFacing() 
+			buildFacing = Spring.GetUnitBuildFacing()
 			setCondition('rotatedBuilding')
 		end
 		--]]

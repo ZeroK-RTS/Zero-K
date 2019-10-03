@@ -28,7 +28,7 @@ options_path = 'Settings/Interface/Mouse Cursor'
 options_order = {
 	'grabinput',
 	'lobbyDisables',
-	'pauseDisables',
+	'pauseDisables2',
 }
 
 -- Radio buttons are intentionally absent from these options to allow hotkeys to
@@ -62,14 +62,14 @@ options = {
 		end,
 		noHotkey = true,
 	},
-	pauseDisables = {
+	pauseDisables2 = {
 		name = "Pausing disables lock",
 		tooltip = "Disables input grabbing when the game is paused.",
 		type = "bool",
-		value = true,
+		value = false,
 		noHotkey = false,
 		OnChange = function (self)
-			if self.value and (options.grabinput.value and "1") then		
+			if self.value then
 				widgetHandler:UpdateCallIn("GamePaused")
 			else
 				widgetHandler:RemoveCallIn("GamePaused")
@@ -93,14 +93,14 @@ end
 function widget:Update(dt)
 	-- Input grabbing is disabled on Alt+Tab and there is no event for this. Therefore it needs to be periodically reenabled if the cursor has left Spring.
 	-- Bypass this when game is paused and intentionally unlocked.
-	if options.grabinput.value and (not lobbyOverlayActive) and (not options.pauseDisables.value and grabPaused) then
+	if options.grabinput.value and (not lobbyOverlayActive) then
 		local _, _, _, _, _, outsideSpring = Spring.GetMouseState()
 		if outsideSpring and not grabTimer then
 			grabTimer = 0
 		end
 		if grabTimer then
 			grabTimer = grabTimer + dt
-			if grabTimer > 1 then
+			if grabTimer > 1 and not grabPaused then
 				Spring.SendCommands("grabinput")
 				Spring.SendCommands("grabinput 1")
 				grabTimer = false
@@ -115,7 +115,7 @@ function widget:Shutdown()
 end
 
 function widget:GamePaused(playerID, paused)
-	if (options.grabinput.value) then
+	if (options.pauseDisables2.value and options.grabinput.value) then
 		if paused then
 			grabPaused = true
 			Spring.SendCommands("grabinput 0")

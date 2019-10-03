@@ -140,7 +140,6 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 	local block = not overlappingAreas
 	
 	if not block then
-		local _,_,_,_,_,_, x, y, z = Spring.GetUnitPosition(targetID, true, true)
 		local gameFrame = Spring.GetGameFrame()
 		local data = {
 			x = x,
@@ -291,19 +290,19 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	return true
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_PREVENT_OVERKILL] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID ~= CMD_PREVENT_OVERKILL) then		
+	if (cmdID ~= CMD_PREVENT_OVERKILL) then
 		return true  -- command was not used
-	end	
-	return PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)  
+	end
+	return PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 end
 
 -------------------------------------------------------------------------------------

@@ -86,21 +86,24 @@ unitDef = {
       craterBoost             = 100,
       craterMult              = 2,
 
-	  customParams            = {
-	    falldamageimmunity = [[120]],
+      customParams            = {
+        falldamageimmunity = [[120]],
 
-		area_damage = 1,
-		area_damage_radius = 70,
-		area_damage_dps = 5600,
-		area_damage_is_impulse = 1,
-		area_damage_duration = 13.3,
-		area_damage_range_falloff = 0.4,
-		area_damage_time_falloff = 0.6,
-		
-		light_color = [[1 1 1]],
-		light_radius = 500,
-	  },
-	  
+        area_damage = 1,
+        area_damage_radius = 70,
+        area_damage_dps = 5600,
+        area_damage_is_impulse = 1,
+        area_damage_duration = 13.3,
+        area_damage_range_falloff = 0.4,
+        area_damage_time_falloff = 0.6,
+        area_damage_height_max = 1200,
+        area_damage_height_int = 400,
+        area_damage_height_reduce = 160,
+        
+        light_color = [[1 1 1]],
+        light_radius = 500,
+      },
+      
       damage                  = {
         default = 0,
       },
@@ -109,7 +112,7 @@ unitDef = {
       explosionSpeed          = 50,
       impulseBoost            = 150,
       impulseFactor           = -2.5,
-	  intensity               = 0.9,
+      intensity               = 0.9,
       interceptedByShieldType = 1,
       myGravity               = 0.1,
       projectiles             = 1,
@@ -139,7 +142,7 @@ unitDef = {
       object           = [[freaker_dead.s3o]],
     },
 
-	
+    
     HEAP  = {
       blocking         = false,
       footprintX       = 2,

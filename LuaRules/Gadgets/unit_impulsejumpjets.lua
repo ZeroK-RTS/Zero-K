@@ -72,7 +72,7 @@ local spDestroyUnit        = Spring.DestroyUnit
 local spCreateUnit         = Spring.CreateUnit
 
 local spAddUnitImpulse      = Spring.AddUnitImpulse
-local spSetUnitRotation  	= Spring.SetUnitRotation 
+local spSetUnitRotation  	= Spring.SetUnitRotation
 local spGetUnitVelocity		= Spring.GetUnitVelocity
 
 local SetLeaveTracks = Spring.SetUnitLeaveTracks -- or MoveCtrl.SetLeaveTracks --0.82 compatiblity
@@ -137,7 +137,7 @@ local function ReloadQueue(unitID, queue, cmdTag)
 	--// remove finished command
 	local start = 1
 	if (queue[1])and(cmdTag == queue[1].tag) then
-		start = 2 
+		start = 2
 		 if re then
 			storeParams = queue[1].params
 		end
@@ -184,7 +184,7 @@ local function FindLaunchSpeedAndAcceleration(flightTime, vector, jumpHeight,gro
 end
 
 local function CopyJumpData(unitID)
-	--NOTE: jumping & lastJump table is refreshed with info for morphed unit in UnitDestroyed(). It is important for it to run first before GameFrame() loop is run 
+	--NOTE: jumping & lastJump table is refreshed with info for morphed unit in UnitDestroyed(). It is important for it to run first before GameFrame() loop is run
 	--because at GameFrame() we update the loop which call this function, and we expect all morph information to be present.
 
 	local oldUnitID = unitID --previous unitID
@@ -300,7 +300,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				if GG.wasMorphedTo[unitID] then --morphed during pre-jump animation
 					local newApexHeight,newSpeed
 					unitID,reloadTime,env,newSpeed,rotateMidAir,delay,newApexHeight,limitHeight = CopyJumpData(unitID)
-					if unitID == nil then 
+					if unitID == nil then
 						return
 					end
 					if not limitHeight then
@@ -343,7 +343,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		while i <= duration*1.5 do
 			if GG.wasMorphedTo[unitID] then --morphed during jump
 				unitID,reloadTime,env,speed = CopyJumpData(unitID, vector[2])
-				if unitID == nil then 
+				if unitID == nil then
 					return
 				end
 				halfJump = nil --reset halfjump flag. Redo halfjump script for new unit
@@ -368,7 +368,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 					jumped = true
 				end
 				local desiredVerticalSpeed = verticalLaunchVel - gravity*(i+1) --maintain original parabola trajectory at all cost. This prevent space-skuttle effect with Newton.
-				local currVertSpeed = verticalLaunchVel - defFallGravity*(i) 
+				local currVertSpeed = verticalLaunchVel - defFallGravity*(i)
 				local vx,vy,vz= spGetUnitVelocity(unitID)
 				local collide = (jumping[unitID] == 'collide')
 				jumping[unitID]= 'airborne'
@@ -427,7 +427,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		while reloadAmount < 1 do
 			if GG.wasMorphedTo[unitID] then --morphed while reloading jump
 				unitID,reloadTime = CopyJumpData (unitID, vector[2])
-				if unitID == nil then 
+				if unitID == nil then
 					return
 				end
 				lastJump[unitID] = jumpEndTime
@@ -450,18 +450,18 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 end
 
 
--- a bit convoluted for this but might be					 
+-- a bit convoluted for this but might be
 -- useful for lua unit scripts
-local function UpdateCoroutines() 
-	local newCoroutines = {} 
-	for i=1, #coroutines do 
-		local co = coroutines[i] 
-		if (coroutine.status(co) ~= "dead") then 
-			newCoroutines[#newCoroutines + 1] = co 
-		end 
-	end 
-	coroutines = newCoroutines 
-	for i=1, #coroutines do 
+local function UpdateCoroutines()
+	local newCoroutines = {}
+	for i=1, #coroutines do
+		local co = coroutines[i]
+		if (coroutine.status(co) ~= "dead") then
+			newCoroutines[#newCoroutines + 1] = co
+		end
+	end
+	coroutines = newCoroutines
+	for i=1, #coroutines do
 		assert(coroutine.resume(coroutines[i]))
 	end
 end
@@ -516,15 +516,15 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (not jumpDefs[unitDefID]) then
 		return
-	end 
+	end
 	--local t = spGetGameSeconds()
 	lastJump[unitID] = -200
 	spInsertUnitCmdDesc(unitID, jumpCmdDesc)
 end
 
 function gadget:UnitDestroyed(oldUnitID, unitDefID)
-	--NOTE: its really important to map old table to new id ASAP to prevent CommandFallback() from executing jump twice for morphed unit. 
-	--UnitDestroyed() is called before CommandFallback() when unit is morphed (unit_morph.lua must destroy unit before issuing command) 
+	--NOTE: its really important to map old table to new id ASAP to prevent CommandFallback() from executing jump twice for morphed unit.
+	--UnitDestroyed() is called before CommandFallback() when unit is morphed (unit_morph.lua must destroy unit before issuing command)
 	if jumping[oldUnitID] and GG.wasMorphedTo[oldUnitID] then
 		local newUnitID = GG.wasMorphedTo[oldUnitID]
 		jumping[newUnitID] = jumping[oldUnitID] --copy last jump state to new unit
@@ -536,7 +536,7 @@ function gadget:UnitDestroyed(oldUnitID, unitDefID)
 	end
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return true
 end
 
@@ -550,13 +550,13 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (jumpDefs[unitDefID].noJumpHandling) then 
+	if (jumpDefs[unitDefID].noJumpHandling) then
 		return true
 	end
 	
 	if goalSet[unitID] then
 		goalSet[unitID] = nil
-	end	
+	end
 	-- do no allow morphing while jumping
 	if (jumping[unitID] and GG.MorphInfo and cmdID >= CMD_MORPH and cmdID < CMD_MORPH+GG.MorphInfo["MAX_MORPH"]) then
 		-- allow to queue
@@ -591,7 +591,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 
 	if lastJumpPosition[unitID] then
-		if abs(lastJumpPosition[unitID][1] - cmdParams[1]) < 1 and 
+		if abs(lastJumpPosition[unitID][1] - cmdParams[1]) < 1 and
 				abs(lastJumpPosition[unitID][3] - cmdParams[3]) < 1 then
 			return true, true -- command was used, remove it (unit finished jump)
 		end

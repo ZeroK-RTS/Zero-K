@@ -14,7 +14,7 @@ local menu = {
 					angle = 45,
 					unit = "striderfunnelweb"
 				}
-			},  
+			},
 		},
 		{
 			angle = -90,

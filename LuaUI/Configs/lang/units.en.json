@@ -301,7 +301,7 @@
 	},
 	"staticcon" : {
 		"name" : "Caretaker",
-		"description" : "Static Constructor, Builds at 10 m/s",
+		"description" : "Construction Assistant, Builds at 10 m/s",
 		"helptext" : "The most cost-effective source of buildpower, the Caretaker is ideal for increasing the output of factories or automatically repairing nearby defenses. It cannot start any construction projects itself, however."
 	},
 	"terraunit" : {

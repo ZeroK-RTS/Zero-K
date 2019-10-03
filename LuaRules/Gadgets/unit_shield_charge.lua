@@ -74,7 +74,7 @@ local function IsShieldEnabled(unitID)
 	if not enabled then
 		return false
 	end
-	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
+	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID)
 	if stunned_or_inbuild then
 		return false
 	end
@@ -146,7 +146,7 @@ function gadget:GameFrame(n)
 				spSetUnitShieldState(unitID, -1, 0)
 			end
 			data.enabled = enabled
-		end	
+		end
 	end
 end
 
@@ -165,7 +165,7 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if ((shieldUnitDefID[unitDefID] and not UnitDefs[unitDefID].customParams.dynamic_comm) or commShieldID) and not unitMap[unitID] then
 		local def = shieldUnitDefID[unitDefID]
 		if commShieldID then
-			def = select(3, GG.Upgrades_UnitShieldDef(unitID)) 
+			def = select(3, GG.Upgrades_UnitShieldDef(unitID))
 			if not def then
 				return
 			end

@@ -20,6 +20,7 @@ TextBox = EditBox:Inherit{
   editable = false,
   selectable = false,
   multiline = true,
+  noFont = false,
 
   borderColor     = {0,0,0,0},
   focusColor      = {0,0,0,0},

@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 --- Font module
 
@@ -31,7 +31,7 @@ Font = Object:Inherit{
 local this = Font
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 function Font:New(obj)
 	obj = inherited.New(self, obj)
@@ -50,17 +50,18 @@ function Font:Dispose(...)
 	inherited.Dispose(self, ...)
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Font:_LoadFont()
 	local oldfont = self._font
-	self._font = FontHandler.LoadFont(self.font, self.size, self.outlineWidth, self.outlineWeight)
+	local uiScale = (WG and WG.uiScale or 1)
+	self._font = FontHandler.LoadFont(self.font, math.floor(self.size*uiScale), math.floor(self.outlineWidth*uiScale), self.outlineWeight)
 	--// do this after LoadFont because it can happen that LoadFont returns the same font again
 	--// but if we Unload our old one before, the gc could collect it before, so the engine would have to reload it again
 	FontHandler.UnloadFont(oldfont)
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 local function NotEqual(v1, v2)
 	local t1 = type(v1)
@@ -143,7 +144,7 @@ do
 	params = nil
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Font:GetLineHeight(size)
 	return self._font.lineheight * (size or self.size)
@@ -176,7 +177,7 @@ function Font:WrapText(text, width, height, size)
 	return (self._font):WrapText(text, width, height, size)
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Font:AdjustPosToAlignment(x, y, width, height, align, valign)
 	local extra = ''
@@ -248,7 +249,7 @@ local function _GetExtra(align, valign)
 	return extra
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Font:_DrawText(text, x, y, extra)
 	local font = self._font
@@ -307,4 +308,4 @@ end
 Font.Print = Font.Draw
 Font.PrintInBox = Font.DrawInBox
 
---// ============================================================================= 
+--// =============================================================================

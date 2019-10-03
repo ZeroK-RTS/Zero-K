@@ -37,9 +37,6 @@ local MAP_SIZE_X_SCALED = MAP_SIZE_X / METAL_MAP_SQUARE_SIZE
 local MAP_SIZE_Z = Game.mapSizeZ
 local MAP_SIZE_Z_SCALED = MAP_SIZE_Z / METAL_MAP_SQUARE_SIZE
 
-local gameConfig = VFS.FileExists(GAMESIDE_METALMAP) and VFS.Include(GAMESIDE_METALMAP) or false
-local mapConfig = VFS.FileExists(MAPSIDE_METALMAP) and VFS.Include(MAPSIDE_METALMAP) or false
-
 ------------------------------------------------------------
 -- Speedups
 ------------------------------------------------------------
@@ -48,10 +45,10 @@ local floor, ceil = math.floor, math.ceil
 local sqrt = math.sqrt
 local huge = math.huge
 
-local spGetGroundInfo     = Spring.GetGroundInfo
-local spGetGroundHeight   = Spring.GetGroundHeight
-local spTestBuildOrder    = Spring.TestBuildOrder
-local spSetGameRulesParam = Spring.SetGameRulesParam
+local spGetGroundInfo       = Spring.GetGroundInfo
+local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
+local spTestBuildOrder      = Spring.TestBuildOrder
+local spSetGameRulesParam   = Spring.SetGameRulesParam
 
 local extractorRadius = Game.extractorRadius
 local extractorRadiusSqr = extractorRadius * extractorRadius
@@ -109,10 +106,6 @@ local function SetMexGameRulesParams(metalSpots, needMexDrawing)
 		return
 	end
 	
-	if needMexDrawing then
-		spSetGameRulesParam("mex_need_drawing", 1)
-	end
-	
 	local mexCount = #metalSpots
 	spSetGameRulesParam("mex_count", mexCount)
 	
@@ -125,12 +118,38 @@ local function SetMexGameRulesParams(metalSpots, needMexDrawing)
 	end
 end
 
+local function SetMexHelperAttributes(metalSpots, needMexDrawing)
+	if not metalSpots then -- Mexes can be built anywhere
+		return
+	end
+
+	if needMexDrawing then
+		spSetGameRulesParam("mex_need_drawing", 1)
+	end
+	local mexCount = #metalSpots
+	
+	local minHeight
+	for i = 1, mexCount do
+		local mex = metalSpots[i]
+		if (not minHeight) or (mex.y < minHeight) then
+			minHeight = mex.y
+		end
+	end
+	
+	if minHeight then
+		spSetGameRulesParam("mex_min_height", minHeight)
+	end
+end
+
 ------------------------------------------------------------
 -- Callins
 ------------------------------------------------------------
 function gadget:Initialize()
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Mex Spot Finder Initialising")
-	local metalSpots, fromEngineMetalmap = GetSpots()
+	local gameConfig = VFS.FileExists(GAMESIDE_METALMAP) and VFS.Include(GAMESIDE_METALMAP) or false
+	local mapConfig = VFS.FileExists(MAPSIDE_METALMAP) and VFS.Include(MAPSIDE_METALMAP) or false
+	
+	local metalSpots, fromEngineMetalmap = GetSpots(gameConfig, mapConfig)
 	local metalSpotsByPos = false
 	
 	if fromEngineMetalmap and #metalSpots < 6 then
@@ -161,7 +180,8 @@ function gadget:Initialize()
 	end
 	
 	local needMexDrawing = (gameConfig and gameConfig.needMexDrawing) or (mapConfig and mapConfig.needMexDrawing)
-	SetMexGameRulesParams(metalSpots, needMexDrawing)
+	SetMexGameRulesParams(metalSpots)
+	SetMexHelperAttributes(metalSpots, needMexDrawing)
 
 	GG.metalSpots = metalSpots
 	GG.metalSpotsByPos = metalSpotsByPos
@@ -228,7 +248,7 @@ local function SanitiseSpots(spots, metalValueOverride)
 		if spot and spot.x and spot.z then
 			local metal
 			metal, spot.x, spot.z = IntegrateMetal(spot.x, spot.z)
-			spot.y = spGetGroundHeight(spot.x, spot.z)
+			spot.y = spGetGroundOrigHeight(spot.x, spot.z)
 			spot.metal = spot.metal or metalValueOverride or (metal > 0 and metal) or DEFAULT_MEX_INCOME
 			i = i + 1
 		else
@@ -257,7 +277,7 @@ local function makeString(group)
 	end
 end
 
-function GetSpots()
+function GetSpots(gameConfig, mapConfig)
 	
 	local spots = {}
 
@@ -390,7 +410,7 @@ function GetSpots()
 		
 		d.metal, d.x, d.z = IntegrateMetal(x,z)
 		
-		d.y = spGetGroundHeight(d.x, d.z)
+		d.y = spGetGroundOrigHeight(d.x, d.z)
 		
 		local merged = false
 		
@@ -402,7 +422,7 @@ function GetSpots()
 				
 				if dis < extractorRadiusSqr*1.7 or metal > (d.metal + spot.metal)*0.95 then
 					spot.x = mx
-					spot.y = spGetGroundHeight(mx, mx)
+					spot.y = spGetGroundOrigHeight(mx, mx)
 					spot.z = mz
 					spot.metal = metal
 					merged = true

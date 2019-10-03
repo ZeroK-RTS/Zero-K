@@ -21,7 +21,7 @@ unitDef = {
   
   customParams = {
     morphto        = [[planelightscout]],
-    morphtime      = 20,
+    morphtime      = 24,
     modelradius    = [[16]],
     priority_misc  = 2, -- High
     addfight       = 1,
@@ -46,7 +46,7 @@ unitDef = {
   script                        = [[staticradar.lua]],
   onoffable                     = true,
   radarDistance                 = 2100,
-  radarEmitHeight			    = 32,
+  radarEmitHeight               = 32,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 800,
   turnRate                      = 0,
@@ -100,7 +100,7 @@ unitDef = {
       laserFlareSize          = 1,
       minIntensity            = 1,
       range                   = 500,
-      reloadtime              = 0.03,
+      reloadtime              = 0.033,
       rgbColor                = [[0 0.7 0.6]],
       texture1                = [[largelaser]],
       texture2                = [[flare]],
@@ -124,8 +124,8 @@ unitDef = {
       },
 
       customParams           = {
-	lups_noshockwave = "1",
-	nofriendlyfire = "1",
+    lups_noshockwave = "1",
+    nofriendlyfire = "1",
       },
 
       edgeeffectiveness       = 1,
@@ -140,7 +140,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 230,
-    },    
+    },
 
   },
 

@@ -66,11 +66,16 @@ unitDef = {
       avoidFriendly           = false,
       avoidNeutral            = false,
       burnblow                = true,
-      collideEnemy            = false,      
+      collideEnemy            = false,
       collideFriendly         = false,
       collideNeutral          = false,
       craterBoost             = 0,
       craterMult              = 0,
+
+      customParams            = {
+        spawns_name = "wolverine_mine",
+        spawns_expire = 60,
+      },
 
       damage                  = {
         default = 20,

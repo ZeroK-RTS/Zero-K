@@ -134,10 +134,10 @@ function widget:Update(dt)
 				
 				if command.targetID then
 					if command.isFeature then
-						local x, y, z = GetFeatureTopPos(command.targetID) 
+						local x, y, z = GetFeatureTopPos(command.targetID)
 						command.pos = x and {x, y, z} or command.pos
 					else
-						local x, y, z = GetUnitTopPos(command.targetID) 
+						local x, y, z = GetUnitTopPos(command.targetID)
 						command.pos = x and {x, y, z} or command.pos
 					end
 				end

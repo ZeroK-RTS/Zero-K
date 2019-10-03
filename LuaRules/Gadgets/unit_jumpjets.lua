@@ -1,4 +1,4 @@
-function gadget:GetInfo() 
+function gadget:GetInfo()
 	return {
 			name    = "Jumpjets",
 			desc    = "Gives units the jump ability",
@@ -140,7 +140,7 @@ local function GetLandStructureCheckValues(x, z, myRadius)
 	
 	local featureID = false
 	if smallestDistance > myRadius then
-		-- No sufficiently close structure was found, 
+		-- No sufficiently close structure was found,
 		-- check whether the blocking was due to a feature.
 		local features = Spring.GetFeaturesInCylinder(x,z, 60 + myRadius)
 		
@@ -226,7 +226,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	local reloadTime       = (jumpDef.reload or 0)*30
 	local teamID           = spGetUnitTeam(unitID)
 	
-	if (not mustJump) and ((cannotJumpMidair and abs(startHeight - start[2]) > 1) or (startHeight < -UnitDefs[unitDefID].maxWaterDepth)) then
+	if (not mustJump) and ((cannotJumpMidair and abs(startHeight - start[2]) > 1) or (start[2] < -UnitDefs[unitDefID].maxWaterDepth)) then
 		return false, true
 	end
 	
@@ -308,8 +308,8 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 				Sleep()
 			end
 			
-			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then 
-				return 
+			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then
+				return
 			end
 			Spring.UnitScript.CallAsUnit(unitID,env.beginJump)
 			if PLAY_SOUND and (not cannotJumpMidair) then	-- don't make sound if we jump with legs instead of jets
@@ -335,8 +335,8 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		local halfJump
 		local i = 0
 		while i <= 1 do
-			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then 
-				return 
+			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then
+				return
 			end
 
 			local x0, y0, z0 = spGetUnitPosition(unitID)
@@ -346,7 +346,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			mcSetPosition(unitID, x, y, z)
 			if x0 then
 				jumping[unitID] = {x - x0, y - y0, z - z0}
-				spSetUnitVelocity(unitID, (x - x0)/30, (y - y0)/30, (z - z0)/30) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
+				spSetUnitVelocity(unitID, (x - x0), (y - y0), (z - z0)) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
 			end
 
 			Spring.UnitScript.CallAsUnit(unitID, env.jumping, i * 100)
@@ -417,12 +417,12 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		local reloadAmount = reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
 		
 		while reloadAmount < 1 do
-			local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
-			if morphedTo then 
-				unitID = morphedTo 
+			morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+			if morphedTo then
+				unitID = morphedTo
 			end
-			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then 
-				return 
+			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then
+				return
 			end
 
 			local stunnedOrInbuild = spGetUnitIsStunned(unitID)
@@ -439,16 +439,16 @@ end
 
 -- a bit convoluted for this but might be
 -- useful for lua unit scripts
-local function UpdateCoroutines() 
-	local newCoroutines = {} 
-	for i = 1, #coroutines do 
-		local co = coroutines[i] 
-		if (coroutine.status(co) ~= "dead") then 
-			newCoroutines[#newCoroutines + 1] = co 
-		end 
-	end 
-	coroutines = newCoroutines 
-	for i = 1, #coroutines do 
+local function UpdateCoroutines()
+	local newCoroutines = {}
+	for i = 1, #coroutines do
+		local co = coroutines[i]
+		if (coroutine.status(co) ~= "dead") then
+			newCoroutines[#newCoroutines + 1] = co
+		end
+	end
+	coroutines = newCoroutines
+	for i = 1, #coroutines do
 		assert(coroutine.resume(coroutines[i]))
 	end
 end
@@ -493,14 +493,14 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return gadget:AllowCommand(unitID, unitDefID, teamID, CMD_JUMP, {cmdParams[4], cmdParams[5], cmdParams[6]}, cmdParams[3])
 	end
 	
-	if not jumpDefs[unitDefID] then 
+	if not jumpDefs[unitDefID] then
 		if cmdID == CMD_JUMP then
 			return false
 		end
 		return true
 	end
 	
-	if (jumpDefs[unitDefID].noJumpHandling) then 
+	if (jumpDefs[unitDefID].noJumpHandling) then
 		return true
 	end
 	
@@ -544,7 +544,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return false
 	end
 
-	if not Spring.ValidUnitID(unitID) then
+	if (not Spring.ValidUnitID(unitID)) or (not cmdParams[3]) then
 		return true, true
 	end
 
@@ -557,7 +557,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 
 	if lastJumpPosition[unitID] then
-		if abs(lastJumpPosition[unitID][1] - cmdParams[1]) < 1 and 
+		if abs(lastJumpPosition[unitID][1] - cmdParams[1]) < 1 and
 				abs(lastJumpPosition[unitID][3] - cmdParams[3]) < 1 then
 			return true, true -- command was used, remove it (unit finished jump)
 		end
@@ -575,7 +575,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 			local coords = table.concat(cmdParams)
 			local currFrame = spGetGameFrame()
 			for allCoords, oldStuff in pairs(jumps) do
-				if currFrame-oldStuff[2] > 150 then 
+				if currFrame-oldStuff[2] > 150 then
 					jumps[allCoords] = nil --empty jump table (used for randomization) after 5 second. Use case: If infinite wave of unit has same jump coordinate then jump coordinate won't get infinitely random
 				end
 			end
@@ -612,7 +612,6 @@ end
 
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 	if jumpDefs[unitDefID] then
-		local queue = spGetCommandQueue(unitID, 2)
 		-- The first command in the queue is a move command added by the engine.
 		local cmdID_1, cmdID_2, cmdTag_1
 		if Spring.Utilities.COMPAT_GET_ORDER then
@@ -634,7 +633,7 @@ end
 
 function gadget:GameFrame(currFrame)
 	UpdateCoroutines()
-	for coords, queue_n_age in pairs(jumps) do 
+	for coords, queue_n_age in pairs(jumps) do
 		if currFrame-queue_n_age[2] > 300 then
 			jumps[coords] = nil
 		end

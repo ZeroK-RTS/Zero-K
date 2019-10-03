@@ -1,7 +1,7 @@
 include "constants.lua"
 include "utility.lua"
 
-local beacon, holder, sphere = piece('beacon', 'holder', 'sphere') 
+local beacon, holder, sphere = piece('beacon', 'holder', 'sphere')
 
 local SIG_CEG_EFFECTS = 1
 
@@ -78,7 +78,7 @@ function endTeleOutLoop()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--StartThread(Walk)
 	activity_mode(1)
 end

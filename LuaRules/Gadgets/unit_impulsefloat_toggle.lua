@@ -1,4 +1,4 @@
-if (not gadgetHandler:IsSyncedCode()) then 
+if (not gadgetHandler:IsSyncedCode()) then
     return
 end
 
@@ -109,7 +109,7 @@ local function addFloat(unitID, unitDefID, isFlying,transportCall)
 					transportCall = transportCall or 0,
 				}
 				local headingInRadian = Spring.GetUnitHeading(unitID)*RAD_PER_ROT
-				Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --this force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore 
+				Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --this force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore
 			end
 		end
 	end
@@ -130,7 +130,7 @@ local function setSurfaceState(unitID, unitDefID, surfacing)
 	if not stun then
 		data.surfacing = surfacing
 	else
-		data.paraData.want = surfacing 
+		data.paraData.want = surfacing
 		if not data.paraData.para then
 			local def = floatDefs[data.unitDefID]
 			if def.sinkOnPara then
@@ -250,7 +250,7 @@ function gadget:GameFrame(f)
 				if def.sinkOnPara and not data.paraData.para then
 					stun = stun or select(1, Spring.GetUnitIsStunned(unitID))
 					if stun then
-						data.paraData.want = data.surfacing 
+						data.paraData.want = data.surfacing
 						data.surfacing = false
 						data.paraData.para = true
 					end
@@ -353,7 +353,7 @@ function gadget:GameFrame(f)
 					callScript(unitID, "Float_stopOnFloor")
 					removeFloat(unitID)
 					
-					i = i - 1 
+					i = i - 1
 				end
 			end
 
@@ -361,7 +361,7 @@ function gadget:GameFrame(f)
 			local _,dy = Spring.GetUnitVelocity(unitID)
 			local dyCorrection = data.speed+GRAVITY-dy
 			local headingInRadian = Spring.GetUnitHeading(unitID)*RAD_PER_ROT --get current heading
-			Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --restore current heading. This force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore 
+			Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --restore current heading. This force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore
 			Spring.AddUnitImpulse(unitID, 0,-4,0) --Note: -4/+4 hax is for impulse capacitor  (Spring 91 only need -1/+1, Spring 94 require at least -4/+4). TODO: remove -4/+4 hax if no longer needed
 			Spring.AddUnitImpulse(unitID, 0,4+dyCorrection,0)
 			
@@ -396,17 +396,17 @@ local function FloatToggleCommand(unitID, cmdParams, cmdOptions)
 	end
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_UNIT_FLOAT_STATE] = true, [CMD_STOP] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID == CMD_UNIT_FLOAT_STATE) then
-		FloatToggleCommand(unitID, cmdParams, cmdOptions)  
+		FloatToggleCommand(unitID, cmdParams, cmdOptions)
 		return false  -- command was used
 	elseif (cmdID == CMD_STOP) then
 		if floatState[unitID] == FLOAT_ALWAYS then

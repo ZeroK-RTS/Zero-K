@@ -80,7 +80,7 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 		if attritionWeaponDefs[wdid] then
 			wantedWeaponList[#wantedWeaponList + 1] = wdid
 		end
-	end 
+	end
 	return wantedWeaponList
 end
 
@@ -104,8 +104,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- add slow damage
 	local slowdown = slowDef.slowDamage
 	if slowDef.scaleSlow then
-		slowdown = slowdown * (damage/WeaponDefs[weaponID].customParams.raw_damage)
-	end	--scale slow damage based on real damage (i.e. take into account armortypes etc.)
+		slowdown = slowdown * (damage / slowDef.rawDamage)
+	end --scale slow damage based on real damage (i.e. take into account armortypes etc.)
 
 	slowedUnits[unitID].slowDamage = slowedUnits[unitID].slowDamage + slowdown
 	slowedUnits[unitID].degradeTimer = DEGRADE_TIMER

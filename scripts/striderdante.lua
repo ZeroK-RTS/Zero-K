@@ -3,41 +3,41 @@ include 'constants.lua'
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local base = piece 'base' 
-local pelvis = piece 'pelvis' 
-local torso = piece 'torso' 
-local tail = piece 'tail' 
-local flagellum = piece 'flagellum' 
-local ruparm = piece 'ruparm' 
-local rarm = piece 'rarm' 
-local rshield = piece 'rshield' 
-local lshield = piece 'lshield' 
-local luparm = piece 'luparm' 
-local larm = piece 'larm' 
-local rupleg = piece 'rupleg' 
-local lupleg = piece 'lupleg' 
-local lleg = piece 'lleg' 
-local rleg = piece 'rleg' 
-local rfoot = piece 'rfoot' 
-local lfoot = piece 'lfoot' 
-local rtoef = piece 'rtoef' 
-local rtoer = piece 'rtoer' 
-local ltoef = piece 'ltoef' 
-local ltoer = piece 'ltoer' 
-local rf1 = piece 'rf1' 
-local rf2 = piece 'rf2' 
-local rf3 = piece 'rf3' 
-local rbak1 = piece 'rbak1' 
-local rbak2 = piece 'rbak2' 
-local lbak1 = piece 'lbak1' 
-local lbak2 = piece 'lbak2' 
-local lf1 = piece 'lf1' 
-local lf2 = piece 'lf2' 
-local lf3 = piece 'lf3' 
-local flame1 = piece 'flame1' 
-local flame2 = piece 'flame2' 
-local jet1 = piece 'jet1' 
-local jet2 = piece 'jet2' 
+local base = piece 'base'
+local pelvis = piece 'pelvis'
+local torso = piece 'torso'
+local tail = piece 'tail'
+local flagellum = piece 'flagellum'
+local ruparm = piece 'ruparm'
+local rarm = piece 'rarm'
+local rshield = piece 'rshield'
+local lshield = piece 'lshield'
+local luparm = piece 'luparm'
+local larm = piece 'larm'
+local rupleg = piece 'rupleg'
+local lupleg = piece 'lupleg'
+local lleg = piece 'lleg'
+local rleg = piece 'rleg'
+local rfoot = piece 'rfoot'
+local lfoot = piece 'lfoot'
+local rtoef = piece 'rtoef'
+local rtoer = piece 'rtoer'
+local ltoef = piece 'ltoef'
+local ltoer = piece 'ltoer'
+local rf1 = piece 'rf1'
+local rf2 = piece 'rf2'
+local rf3 = piece 'rf3'
+local rbak1 = piece 'rbak1'
+local rbak2 = piece 'rbak2'
+local lbak1 = piece 'lbak1'
+local lbak2 = piece 'lbak2'
+local lf1 = piece 'lf1'
+local lf2 = piece 'lf2'
+local lf3 = piece 'lf3'
+local flame1 = piece 'flame1'
+local flame2 = piece 'flame2'
+local jet1 = piece 'jet1'
+local jet2 = piece 'jet2'
 local fix = piece 'fix'
 
 local smokePiece = {torso, pelvis, flagellum}
@@ -83,7 +83,7 @@ local function RestorePose()
 	Turn(torso, x_axis, 0, math.rad(100))
 	
 	Turn(lupleg, x_axis, 0, math.rad(100))
-	Turn(rupleg, x_axis, 0, math.rad(100))		
+	Turn(rupleg, x_axis, 0, math.rad(100))
 	Turn(lfoot, x_axis, 0, math.rad(100))
 	Turn(rfoot, x_axis, 0, math.rad(100))
 	Turn(lleg, x_axis, 0, math.rad(100))
@@ -127,21 +127,21 @@ local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
 	Sleep(8000)
-	--torso	
+	--torso
 	if not dead then
 		Turn(torso, y_axis, 0, math.rad(100))
 		
-		Turn(ruparm, x_axis, 0, math.rad(250)) 
-		Turn(ruparm, y_axis, 0, math.rad(250)) 
-		Turn(ruparm, z_axis, math.rad(-(0)), math.rad(250)) 
+		Turn(ruparm, x_axis, 0, math.rad(250))
+		Turn(ruparm, y_axis, 0, math.rad(250))
+		Turn(ruparm, z_axis, math.rad(-(0)), math.rad(250))
 		Turn(rarm, x_axis, 0, math.rad(250))	 --up 2
-		Turn(rarm, y_axis, 0, math.rad(250)) 
+		Turn(rarm, y_axis, 0, math.rad(250))
 		Turn(rarm, z_axis, math.rad(-(0)), math.rad(250))	--up -12
 		Turn(flagellum, x_axis, 0, math.rad(90))
 	
 		Turn(luparm, x_axis, 0, math.rad(250))	 --up -9
-		Turn(luparm, y_axis, 0, math.rad(250)) 
-		Turn(luparm, z_axis, math.rad(-(0)), math.rad(250)) 
+		Turn(luparm, y_axis, 0, math.rad(250))
+		Turn(luparm, z_axis, math.rad(-(0)), math.rad(250))
 		Turn(larm, x_axis, 0, math.rad(250))	 --up 5
 		Turn(larm, y_axis, 0, math.rad(250))	 --up -3
 		Turn(larm, z_axis, math.rad(-(0)), math.rad(250))	 --up 22
@@ -244,7 +244,7 @@ local function Walk()
 		walkCycle = 3 - walkCycle
 		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)
 		
-		local left = walkAngle[walkCycle] 
+		local left = walkAngle[walkCycle]
 		local right = walkAngle[3 - walkCycle]
 		local main = walkAngle[3]
 		
@@ -287,7 +287,7 @@ function script.Create()
 	Hide(jet1)
 	Hide(jet2)
 	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function Stopping()
@@ -333,7 +333,7 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(rarm, x_axis, math.rad(20), math.rad(250))
 		Turn(larm, x_axis, math.rad(20), math.rad(250))
 		WaitForTurn(torso, y_axis)
-		WaitForTurn(larm, x_axis) --need to make surenot 
+		WaitForTurn(larm, x_axis) --need to make surenot
 		return true
 	elseif num == 2 then
 		if dgunning then return false end
@@ -379,7 +379,7 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(flagellum, x_axis)
 		WaitForTurn(torso, y_axis)
 		StartThread(RestoreAfterDelay)
-		return true	
+		return true
 	end
 end
 
@@ -441,10 +441,10 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(luparm, y_axis, math.rad(54), math.rad(50))
 		Turn(rupleg, x_axis, math.rad(-27), math.rad(50))
 		Turn(rupleg, y_axis, math.rad(-42), math.rad(50))
-		Turn(rupleg, z_axis, math.rad(-(-5)), math.rad(50))		
+		Turn(rupleg, z_axis, math.rad(-(-5)), math.rad(50))
 		Turn(rleg, x_axis, math.rad(13), math.rad(50))
 		Turn(rleg, y_axis, math.rad(-36), math.rad(50))
-		Turn(rleg, z_axis, math.rad(-(24)), math.rad(50))	
+		Turn(rleg, z_axis, math.rad(-(24)), math.rad(50))
 		Turn(lupleg, y_axis, math.rad(18), math.rad(50))
 		Turn(lleg, x_axis, math.rad(20), math.rad(50))
 		Turn(lleg, y_axis, math.rad(28), math.rad(50))

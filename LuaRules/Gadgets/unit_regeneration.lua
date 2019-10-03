@@ -58,8 +58,8 @@ local function SetUnitIdleRegen(unitID, idleTime, idleRate)
 		unitCount = unitCount + 1
 		unitList[unitCount] = unitID
 		units[unitID] = {
-			idleFrame = 0, 
-			idleTime = idleTime, 
+			idleFrame = 0,
+			idleTime = idleTime,
 			rate = idleRate,
 			index = unitCount
 		}

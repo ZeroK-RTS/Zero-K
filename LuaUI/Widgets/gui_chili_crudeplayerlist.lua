@@ -82,7 +82,7 @@ local x_icon_clan		= x_icon_rank + 16
 local x_cf				= x_icon_clan + 16
 local x_team			= x_cf + 20
 local x_name			= x_team + 16
-local x_share			= x_name + 140 
+local x_share			= x_name + 140
 local x_cpu				= x_share + 16
 local x_ping			= x_cpu + 16
 local x_postwins		= x_ping + 16
@@ -150,21 +150,21 @@ options = {
 		name = "Reset Wins",
 		desc = "Reset the win counts of all players",
 		type = 'button',
-		OnChange = function() 
-			if WG.WinCounter_Reset ~= nil then 
+		OnChange = function()
+			if WG.WinCounter_Reset ~= nil then
 				WG.WinCounter_Reset()
 				SetupPlayerNames()
-			end 
+			end
 		end,
-	},	
+	},
 	inc_wins_1 = {
 		name = "Increment Team 1 Wins",
 		desc = "",
 		type = 'button',
 		OnChange = function()
-			if WG.WinCounter_Increment ~= nil then 
+			if WG.WinCounter_Increment ~= nil then
 				local allyTeams = Spring.GetAllyTeamList()
-				WG.WinCounter_Increment(allyTeams[1]) 
+				WG.WinCounter_Increment(allyTeams[1])
 				SetupPlayerNames()
 			end
 		end,
@@ -175,9 +175,9 @@ options = {
 		desc = "",
 		type = 'button',
 		OnChange = function()
-			if WG.WinCounter_Increment ~= nil then 
+			if WG.WinCounter_Increment ~= nil then
 				local allyTeams = Spring.GetAllyTeamList()
-				WG.WinCounter_Increment(allyTeams[2]) 
+				WG.WinCounter_Increment(allyTeams[2])
 				SetupPlayerNames()
 			end
 		end,
@@ -200,7 +200,7 @@ options = {
 		value = false,
 		desc = "Align list entries to top (i.e. don't push to bottom)",
 		OnChange = function() SetupPlayerNames() end,
-	},	
+	},
 	showSpecs = {
 		name = "Show spectators",
 		type = 'bool',
@@ -225,7 +225,7 @@ options = {
 		name = "Scroll with mousewheel",
 		type = 'bool',
 		value = true,
-		OnChange = function(self) 
+		OnChange = function(self)
 				scroll_cpl.ignoreMouseWheel = not self.value;
 			end,
 	},
@@ -248,7 +248,7 @@ local function ShareUnits(playername, team)
 		local ux,uy,uz = Spring.GetUnitPosition(uid)
 		Spring.MarkerAddPoint(ux,uy,uz)
 		end]]
-		Spring.ShareResources(team, "units")     
+		Spring.ShareResources(team, "units")
 	else
 		Spring.Echo('Player List: No units selected to share.')
 	end
@@ -373,7 +373,7 @@ local function UpdatePlayerInfo()
 					name_out = "<Dead> " .. (name or '')
 				end
 			end
-			if entities[i].nameLabel then 
+			if entities[i].nameLabel then
 				entities[i].nameLabel:SetCaption(name_out)
 			end
 			
@@ -482,7 +482,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 	if entity == nil then
 		entity = {}
 		deadTeam = true
-	end	
+	end
 	
 	local name,active,spectator,pingTime,cpuUsage,country,_, customKeys
 	local playerID = entity.playerID or teams[teamID].leader
@@ -506,31 +506,31 @@ local function AddEntity(entity, teamID, allyTeamID)
 		end
 	end
 	local icon = nil
-	local icRank = nil 
+	local icRank = nil
 	local icCountry = country and country ~= '' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
 	
 	-- clan/faction emblems, level, country
-	if (not entity.isAI and customKeys ~= nil) then 
-		if (customKeys.clan~=nil and customKeys.clan~="") then 
+	if (not entity.isAI and customKeys ~= nil) then
+		if (customKeys.clan~=nil and customKeys.clan~="") then
 			icon = "LuaUI/Configs/Clans/" .. customKeys.clan ..".png"
 		elseif (customKeys.faction~=nil and customKeys.faction~="") then
 			icon = "LuaUI/Configs/Factions/" .. customKeys.faction ..".png"
-		end 
+		end
 		icRank = "LuaUI/Images/LobbyRanks/" .. (customKeys.icon or "0_0") .. ".png"
 	end
 	
 	local min_pingTime = math.min(pingTime, 1)
 	local min_cpuUsage = math.min(cpuUsage, 1)
-	local cpuCol = pingCpuColors[ math.ceil( min_cpuUsage * 5 ) ] 
+	local cpuCol = pingCpuColors[ math.ceil( min_cpuUsage * 5 ) ]
 	local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
 	local pingTime_readable = PingTimeOut(pingTime)
 
 	local wins = 0
 	if name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then wins = WG.WinCounter_currentWinTable[name].wins end
 
-	if not entity.isAI then 
+	if not entity.isAI then
 		-- flag
-		if icCountry ~= nil  then 
+		if icCountry ~= nil  then
 			scroll_cpl:AddChild(
 				Chili.Image:New{
 					file=icCountry;
@@ -540,9 +540,9 @@ local function AddEntity(entity, teamID, allyTeamID)
 					y=(fontsize+1) * row,
 				}
 			)
-		end 
+		end
 		-- level-based rank
-		if icRank ~= nil then 
+		if icRank ~= nil then
 			scroll_cpl:AddChild(
 				Chili.Image:New{
 					file=icRank;
@@ -552,9 +552,9 @@ local function AddEntity(entity, teamID, allyTeamID)
 					y=(fontsize+1) * row,
 				}
 			)
-		end 
+		end
 		-- clan icon
-		if icon ~= nil then 
+		if icon ~= nil then
 			scroll_cpl:AddChild(
 				Chili.Image:New{
 					file=icon;
@@ -566,7 +566,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 			)
 		end
 
-	end 
+	end
 	
 	-- name
 	local nameLabel = Label:New{
@@ -616,7 +616,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 			x=x_cpu,
 			y=(fontsize+1) * row,
 			height = (fontsize+3),
-			width = (fontsize+3)*10/16, 
+			width = (fontsize+3)*10/16,
 			tooltip = 'CPU: ' .. math.round(cpuUsage*100) .. '%',
 			file = cpuPic,
 			keepAspect = false,
@@ -628,7 +628,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 			x=x_ping,
 			y=(fontsize+1) * row,
 			height = (fontsize+3),
-			width = (fontsize+3)*10/16, 			
+			width = (fontsize+3)*10/16,
 			tooltip = 'Ping: ' .. pingTime_readable,
 			file = pingPic,
 			keepAspect = false,
@@ -685,7 +685,7 @@ local function AddAllyTeam(allyTeamID)
 	--		if a == localTeam then return true
 	--		elseif b == localTeam then return false end
 	--		return a.name:lower() < b.name:lower()
-	--	end)	
+	--	end)
 
 	if not options.allyTeamPerTeam.value then
 		WriteAllyTeamNumbers(allyTeamID)
@@ -765,7 +765,7 @@ SetupPlayerNames = function()
 			teams[teamID].leader = leader
 			allyTeams[allyTeamID] = allyTeams[allyTeamID] or {}
 			allyTeams[allyTeamID][#allyTeams[allyTeamID]+1] = teamID
-		end --if teamID ~= Spring.GetGaiaTeamID() 
+		end --if teamID ~= Spring.GetGaiaTeamID()
 	end --for each team
 
 	-- go through all players, register as entities, assign to teams
@@ -785,7 +785,7 @@ SetupPlayerNames = function()
 	end
 	
 	-- sort allyteams: own at top, others in order
-	table.sort(allyTeamsSorted, 
+	table.sort(allyTeamsSorted,
 		function(a,b)
 			if a == localAlliance then return true
 			elseif b == localAlliance then return false end
@@ -918,11 +918,11 @@ function widget:Initialize()
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local x_bound = 310
 	
-	window_cpl = Window:New{  
+	window_cpl = Window:New{
 		dockable = true,
 		name = "Player List",
 		color = {0,0,0,0},
-		right = 0,  
+		right = 0,
 		bottom = 0,
 		width  = x_bound,
 		height = 150,
@@ -952,10 +952,10 @@ function widget:Initialize()
 			local alt,ctrl, meta,shift = Spring.GetModKeyState()
 			local _,_,lmb,mmb,rmb = Spring.GetMouseState()
 			if (shift or ctrl or alt) or (mmb or rmb) or ((not self.tooltip or self.tooltip=="") and not (meta and lmb))  then --hover over window will intercept mouse, pressing right-mouse or middle-mouse or shift or ctrl or alt will stop intercept
-				return false 
+				return false
 			end
 			return self --mouse over panel
-		end,	
+		end,
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end
@@ -967,8 +967,8 @@ function widget:Initialize()
 	
 	function scroll_cpl:IsAboveVScrollbars(x, y)  -- this override default Scrollpanel's HitTest. It aim to: reduce chance of click stealing. It exclude any modifier key (shift,alt,ctrl, except spacebar which is used for Space+click shortcut), and only allow left-click to reposition the vertical scrollbar
 		local alt,ctrl, meta,shift = Spring.GetModKeyState()
-		if (x< self.width - self.scrollbarSize) or (shift or ctrl or alt) or (not select(3,Spring.GetMouseState())) then 
-			return false 
+		if (x< self.width - self.scrollbarSize) or (shift or ctrl or alt) or (not select(3,Spring.GetMouseState())) then
+			return false
 		end
 		return self
 	end

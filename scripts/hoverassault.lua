@@ -1,8 +1,8 @@
-local base = piece 'base' 
-local shield = piece 'shield' 
-local turret = piece 'turret' 
-local gun = piece 'gun' 
-local flare1 = piece 'flare1' 
+local base = piece 'base'
+local shield = piece 'shield'
+local turret = piece 'turret'
+local gun = piece 'gun'
+local flare1 = piece 'flare1'
 local flare2 = piece 'flare2'
 
 local wakes = {}
@@ -10,12 +10,12 @@ for i = 1, 8 do
 	wakes[i] = piece ('wake' .. i)
 end
 
-local ground1 = piece 'ground1' 
-local door1 = piece 'door1' 
-local door2 = piece 'door2' 
-local turretbase = piece 'turretbase' 
-local rim1 = piece 'rim1' 
-local rim2 = piece 'rim2' 
+local ground1 = piece 'ground1'
+local door1 = piece 'door1'
+local door2 = piece 'door2'
+local turretbase = piece 'turretbase'
+local rim1 = piece 'rim1'
+local rim2 = piece 'rim2'
 
 include "constants.lua"
 include "pieceControl.lua"
@@ -77,7 +77,7 @@ local rockData = {
 }
 
 ----------------------------------------------------------
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local CMD_UNIT_CANCEL_TARGET = Spring.Utilities.CMD.UNIT_CANCEL_TARGET
 local firestate = 0
 local firstTime = true
 
@@ -124,7 +124,7 @@ local function MoveScript()
 	while Spring.GetUnitIsStunned(unitID) do
 		Sleep(2000)
 	end
-	while true do 
+	while true do
 		if not Spring.GetUnitIsCloaked(unitID) then
 			if (sfxNum == 1 or sfxNum == 2) and select(2, Spring.GetUnitPosition(unitID)) == 0 then
 				for i = 1, 8 do
@@ -140,7 +140,7 @@ end
 
 function script.Create()
 	Hide(ground1)
-	StartThread(GG.Script.SmokeUnit, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
@@ -233,7 +233,7 @@ function Unstunned(stun_type)
 	end
 end
 
-function script.AimFromWeapon(num) 
+function script.AimFromWeapon(num)
 	return turret
 end
 

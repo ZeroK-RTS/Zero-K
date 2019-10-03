@@ -46,13 +46,6 @@ source_file = LuaUI/Configs/lang/pw_units.en.json
 source_lang = en
 type = KEYVALUEJSON
 
-[zero-k.pw-units-en-json--master]
-file_filter = LuaUI/Configs/lang/pw_units.<lang>.json
-minimum_perc = 0
-source_file = LuaUI/Configs/lang/pw_units.en.json
-source_lang = en
-type = KEYVALUEJSON
-
 [zero-k.campaign-units-en-json--master]
 file_filter = LuaUI/Configs/lang/campaign_units.<lang>.json
 minimum_perc = 0

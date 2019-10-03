@@ -1,12 +1,13 @@
 local name = "commweapon_rocketlauncher"
 local weaponDef = {
 	name                    = [[Rocket Launcher]],
-	areaOfEffect            = 75,
+	areaOfEffect            = 96,
 	cegTag                  = [[missiletrailred]],
 	craterBoost             = 0,
 	craterMult              = 0,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectFire = [[custom:STORMMUZZLE]],
 

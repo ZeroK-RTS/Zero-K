@@ -67,25 +67,27 @@ local pairs  = pairs
 local ipairs = ipairs
 local next   = next
 
-local spGetUnitRadius        = Spring.GetUnitRadius
-local spIsUnitVisible        = Spring.IsUnitVisible
-local spIsSphereInView       = Spring.IsSphereInView
-local spGetUnitLosState      = Spring.GetUnitLosState
-local spGetUnitViewPosition  = Spring.GetUnitViewPosition
-local spGetUnitDirection     = Spring.GetUnitDirection
-local spGetHeadingFromVector = Spring.GetHeadingFromVector
-local spGetUnitIsActive      = Spring.GetUnitIsActive
-local spGetUnitRulesParam    = Spring.GetUnitRulesParam
-local spGetGameFrame         = Spring.GetGameFrame
-local spGetFrameTimeOffset   = Spring.GetFrameTimeOffset
-local spGetUnitPieceList     = Spring.GetUnitPieceList
-local spGetSpectatingState   = Spring.GetSpectatingState
-local spGetLocalAllyTeamID   = Spring.GetLocalAllyTeamID
-local scGetReadAllyTeam      = Script.GetReadAllyTeam
-local spGetUnitPieceMap      = Spring.GetUnitPieceMap
-local spValidUnitID          = Spring.ValidUnitID
-local spGetUnitIsStunned     = Spring.GetUnitIsStunned
+local spGetUnitRadius         = Spring.GetUnitRadius
+local spIsUnitVisible         = Spring.IsUnitVisible
+local spIsSphereInView        = Spring.IsSphereInView
+local spGetUnitLosState       = Spring.GetUnitLosState
+local spGetUnitViewPosition   = Spring.GetUnitViewPosition
+local spGetUnitDirection      = Spring.GetUnitDirection
+local spGetHeadingFromVector  = Spring.GetHeadingFromVector
+local spGetUnitIsActive       = Spring.GetUnitIsActive
+local spGetUnitRulesParam     = Spring.GetUnitRulesParam
+local spGetGameFrame          = Spring.GetGameFrame
+local spGetFrameTimeOffset    = Spring.GetFrameTimeOffset
+local spGetUnitPieceList      = Spring.GetUnitPieceList
+local spGetSpectatingState    = Spring.GetSpectatingState
+local spGetLocalAllyTeamID    = Spring.GetLocalAllyTeamID
+local scGetReadAllyTeam       = Script.GetReadAllyTeam
+local spGetUnitPieceMap       = Spring.GetUnitPieceMap
+local spValidUnitID           = Spring.ValidUnitID
+local spGetUnitIsStunned      = Spring.GetUnitIsStunned
 local spGetProjectilePosition = Spring.GetProjectilePosition
+
+local GetMovetypeUnitDefID    = Spring.Utilities.GetMovetypeUnitDefID
 
 local glUnitPieceMatrix = gl.UnitPieceMatrix
 local glPushMatrix      = gl.PushMatrix
@@ -492,7 +494,7 @@ local function IsUnitPositionKnown(unitID)
 	if LocalAllyTeamID < 0 then
 		return true
 	end
-	local targetVisiblityState = Spring.GetUnitLosState(unitID, LocalAllyTeamID, true) 
+	local targetVisiblityState = Spring.GetUnitLosState(unitID, LocalAllyTeamID, true)
 	if not targetVisiblityState then
 		return false
 	end
@@ -506,10 +508,10 @@ local function IsUnitPositionKnown(unitID)
 		return false
 	end
 	local unitDefID = Spring.GetUnitDefID(unitID)
-	if not (unitDefID and UnitDefs[unitDefID]) then
+	if not (unitDefID) then
 		return false
 	end
-	return not Spring.Utilities.getMovetype(UnitDefs[unitDefID])
+	return not GetMovetypeUnitDefID(unitDefID)
 end
 
 local function RadarDotCheck(unitID)
@@ -535,7 +537,7 @@ local function Draw(extension,layer)
 				FxLayer[partClass]=nil
 			else
 				for unitID,UnitEffects in pairs(Units) do
-					if (not UnitEffects[1]) then 
+					if (not UnitEffects[1]) then
 						Units[unitID]=nil
 					else
 

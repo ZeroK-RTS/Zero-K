@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 --- Control module
 
@@ -78,29 +78,28 @@ Control = Object:Inherit{
 
 	drawcontrolv2 = nil, --// disable backward support with old DrawControl gl state (with 2.1 self.xy translation isn't needed anymore)
 
-	useRTT = false and ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
+	useRTT = ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
 	useDLists = false, --(gl.CreateList ~= nil), --FIXME broken in combination with RTT (wrong blending)
 
 	OnResize        = {},
 	OnEnableChanged = {},
 
-	-- __nofont should be manually set to true when using this class directly
-	__nofont = false,
+	noFont = true,
 }
 Control.disabledFont = table.merge({ color = {0.8, 0.8, 0.8, 0.8} }, Control.font)
 
 local this = Control
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:New(obj)
 	--// backward compability
 	BackwardCompa(obj)
 	
 	--//minimum size from minimum size table when minWidth & minHeight is not set (backward compatibility)
-	local minimumSize = obj.minimumSize or {} 
-	obj.minWidth = obj.minWidth or minimumSize[1] 
+	local minimumSize = obj.minimumSize or {}
+	obj.minWidth = obj.minWidth or minimumSize[1]
 	obj.minHeight = obj.minHeight or minimumSize[2]
 
 	if obj.DrawControl then
@@ -145,17 +144,29 @@ function Control:New(obj)
 
 	-- We don't create fonts for controls that don't need them
 	-- This should drastically use memory usage for some cases
-	if not obj.__nofont then
-		--// create font
-		obj.font = Font:New(obj.font)
-		obj.font:SetParent(obj)
-
-		--// create disabled font
-		obj.disabledFont = Font:New(obj.disabledFont)
-		obj.disabledFont:SetParent(obj)
-	else
+	if obj.noFont then
 		obj.font = nil
 		obj.disabledFont = nil
+	else
+		if obj.objectOverrideFont then
+			obj.font = obj.objectOverrideFont
+		else
+			--// create font
+			obj.font = Font:New(obj.font)
+			obj.font:SetParent(obj)
+		end
+		
+		if obj.hasDisabledFont then
+			if obj.objectOverrideDisabledFont then
+				obj.disabledFont = obj.objectOverrideDisabledFont
+			else
+				--// create disabled font
+				obj.disabledFont = Font:New(obj.disabledFont)
+				obj.disabledFont:SetParent(obj)
+			end
+		else
+			obj.disabledFont = nil
+		end
 	end
 
 	obj:DetectRelativeBounds()
@@ -167,7 +178,11 @@ function Control:New(obj)
 			obj:AddChild(cn[i], true)
 		end
 	end
+	obj:Realign()
 
+	if WG.ChiliRedraw then
+		WG.ChiliRedraw.AddControl(obj, "New")
+	end
 	return obj
 end
 
@@ -204,17 +219,17 @@ function Control:Dispose(...)
 
 	inherited.Dispose(self, ...)
 
-	if not self.__nofont then
-		if self.font.SetParent then
+	if (not self.noFont) then
+		if (not self.objectOverrideFont) and self.font and self.font.SetParent then
 			self.font:SetParent()
+		end
+		if (not self.objectOverrideDisabledFont) and self.disabledFont and self.disabledFont.SetParent then
 			self.disabledFont:SetParent()
-		else
-			Spring.Echo("nil self.font:SetParent", self.name)
 		end
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Sets the control's parent object.
 -- @tparam object.Object obj parent object
@@ -245,7 +260,7 @@ function Control:RemoveChild(obj)
 	return found
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:_GetMaxChildConstraints(child)
 	return 0, 0, self.clientWidth, self.clientHeight
@@ -388,15 +403,15 @@ function Control:GetRelativeBox(savespace)
 	return {left, top, width, height}
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:SetEnabled(enabled)
-		self.state.enabled = enabled
-		self:CallListeners(self.OnEnableChanged, not self.state.enabled)
-		self:Invalidate()
+	self.state.enabled = enabled
+	self:CallListeners(self.OnEnableChanged, not self.state.enabled)
+	self:Invalidate()
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:UpdateClientArea(dontRedraw)
 	local padding = self.padding
@@ -515,7 +530,7 @@ function Control:RealignChildren(savespace)
 	self:CallChildren("Realign", savespace)
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Sets the control's position
 -- @int x x-coordinate
@@ -713,7 +728,7 @@ function Control:_UpdateConstraints(x, y, w, h)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:GetMinimumExtents()
 	local maxRight, maxBottom = 0, 0
@@ -738,7 +753,7 @@ function Control:GetMinimumExtents()
 				width = self.width or 0
 			else
 				width = cgb.width or 0
-			end 
+			end
 		end
 		if (not crb.left) then
 			left  = cgb.left or 0
@@ -846,7 +861,7 @@ function Control:GetChildrenCurrentExtents()
 	return minLeft, minTop, maxRight, maxBottom
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:StartResizing(x, y)
 	--//FIXME the x, y aren't needed check how drag is handled!
@@ -872,7 +887,7 @@ function Control:StopDragging(x, y)
 	self.dragging = false
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:LocalToClient(x, y)
 	local ca = self.clientArea
@@ -903,7 +918,7 @@ function Control:InClientArea(x, y)
 	return x >= clientArea[1] and y >= clientArea[2] and x <= clientArea[1] + clientArea[3] and y <= clientArea[2] + clientArea[4]
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Requests a redraw of the control.
 function Control:Invalidate()
@@ -919,7 +934,7 @@ function Control:InvalidateSelf()
 	self:RequestUpdate()
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:InstantUpdate()
 	if self:IsInView() then
@@ -959,7 +974,7 @@ function Control:Update()
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 function Control:_CheckIfRTTisAppreciated()
 	if (self.width <= 0) or (self.height <= 0) then
@@ -981,6 +996,7 @@ function Control:_CheckIfRTTisAppreciated()
 			return (((self._redrawSelfCounter or 1) / (self._redrawCounter or 1)) < 0.03)
 		end
 	end
+	return true
 end
 
 
@@ -1178,7 +1194,7 @@ function Control:CreateViewTexture(suffix_name, width, height, fnc, ...)
 	self[fboName] = fbo
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 
 function Control:_DrawInClientArea(fnc, ...)
@@ -1249,7 +1265,7 @@ function Control:_DrawChildrenInClientAreaWithoutViewCheck(event)
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 --//FIXME move resize and drag to Window class!!!!
 function Control:DrawBackground()
@@ -1289,21 +1305,27 @@ end
 function Control:DrawControl()
 	--//an option to make panel position snap to an integer
 	if self.snapToGrid then
-		self.x = math.floor(self.x) + 0.5 
-		self.y = math.floor(self.y) + 0.5 
-	end 
+		self.x = math.floor(self.x) + 0.5
+		self.y = math.floor(self.y) + 0.5
+	end
 	self:DrawBackground()
 	self:DrawBorder()
 end
 
 
 function Control:DrawForList()
+	--if not self:IsVisibleDescendantByName("screen0") then
+	--	return
+	--end
 	self._redrawCounter = (self._redrawCounter or 0) + 1
 	if (not self._in_update and not self._usingRTT and self:_CheckIfRTTisAppreciated()) then
 		self:InvalidateSelf()
 	end
 
 	if (self._tex_all and not self._inrtt) then
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "DrawForList_tex_all")
+		end
 		gl.PushMatrix()
 		gl.Translate(self.x, self.y, 0)
 			gl.BlendFuncSeparate(GL.ONE, GL.SRC_ALPHA, GL.ZERO, GL.SRC_ALPHA)
@@ -1326,8 +1348,14 @@ function Control:DrawForList()
 	gl.Translate(self.x, self.y, 0)
 
 	if (self._own_dlist) then
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "DrawForList_own_dlist")
+		end
 		gl.CallList(self._own_dlist)
 	else
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "DrawForList")
+		end
 		if self._hasCustomDrawControl then
 			gl.Translate(-self.x, -self.y, 0)
 			self:DrawControl()
@@ -1379,6 +1407,9 @@ function Control:Draw()
 	end
 
 	if (self._tex_all) then
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "Draw_tex_all")
+		end
 		gl.PushMatrix()
 		gl.Translate(self.x, self.y, 0)
 			gl.BlendFunc(GL.ONE, GL.SRC_ALPHA)
@@ -1403,6 +1434,9 @@ function Control:Draw()
 	if (self._own_dlist) then
 		gl.CallList(self._own_dlist)
 	else
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "Draw")
+		end
 		if self._hasCustomDrawControl then
 			gl.Translate(-self.x, -self.y, 0)
 			self:DrawControl()
@@ -1443,11 +1477,14 @@ end
 
 function Control:DrawChildrenForList()
 	if (next(self.children)) then
+		if WG.ChiliRedraw then
+			WG.ChiliRedraw.AddControl(self, "DrawChildrenForList")
+		end
 		self:_DrawChildrenInClientAreaWithoutViewCheck('DrawForList')
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 local function InLocalRect(cx, cy, w, h)
 	return (cx >= 0) and (cy >= 0) and (cx <= w) and (cy <= h)
@@ -1473,7 +1510,7 @@ function Control:HitTest(x, y)
 			end
 			--//an option that allow you to mouse click on empty panel
 			if self.hitTestAllowEmpty then
-				return self 
+				return self
 			end
 		end
 	end
@@ -1634,4 +1671,4 @@ function Control:MouseOut(...)
 	self:InvalidateSelf()
 end
 
---// ============================================================================= 
+--// =============================================================================

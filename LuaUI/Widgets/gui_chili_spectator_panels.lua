@@ -113,8 +113,8 @@ end
 
 local function ShowOptions(self)
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	if not meta then 
-		return false 
+	if not meta then
+		return false
 	end
 	WG.crude.OpenPath(options_path)
 	WG.crude.ShowMenu()
@@ -136,16 +136,16 @@ options_order = {
 	'lable_playerPanel',
 	'enablePlayerPanel',
 	'playerOpacity',
-	'playerMainFontSize', 
+	'playerMainFontSize',
 	'playerFontSize',
 	
 	'lable_economyPanels',
 	'enableEconomyPanels',
 	'resourceOpacity',
-	'resourceMainFontSize', 
+	'resourceMainFontSize',
 	'resourceFontSize',
 	'flowAsArrows',
-	'colourBlind', 
+	'colourBlind',
 	'fancySkinning',
 }
  
@@ -153,11 +153,11 @@ local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/E
 options = {
 	enableSpectator = {
 		name  = "Enable as Spectator",
-		type  = "bool", 
-		value = false, 
+		type  = "bool",
+		value = false,
 		OnChange = function(self)
-			option_CheckEnable(self)
-			-- WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", option_CheckEnable(self))
+			local enabled = option_CheckEnable(self)
+			WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", enabled)
 		end,
 		desc = "Enables the spectator resource bars when spectating a game with two teams."
 	},
@@ -171,15 +171,15 @@ options = {
 	lable_playerPanel = {type = 'label', name = 'Player Panel',},
 	enablePlayerPanel = {
 		name  = "Enable Player Panel",
-		type  = "bool", 
-		value = true, 
+		type  = "bool",
+		value = true,
 		OnChange = function(self) option_CheckEnablePlayer(self) end,
-	},	
+	},
 	playerOpacity = {
 		name  = "Opacity",
 		type  = "number",
 		value = 0.6, min = 0, max = 1, step = 0.01,
-		OnChange = function(self) 
+		OnChange = function(self)
 				if playerWindow then
 					playerWindow.mainPanel.color = {1,1,1,self.value}
 					playerWindow.mainPanel.backgroundColor = {1,1,1,self.value}
@@ -204,8 +204,8 @@ options = {
 	lable_economyPanels = {type = 'label', name = 'Economy Panels',},
 	enableEconomyPanels = {
 		name  = "Enable Economy Panels",
-		type  = "bool", 
-		value = true, 
+		type  = "bool",
+		value = true,
 		OnChange = function(self) option_CheckEnableResource(self) end,
 	},
 	flowAsArrows = {
@@ -220,7 +220,7 @@ options = {
 		name  = "Opacity",
 		type  = "number",
 		value = 0.6, min = 0, max = 1, step = 0.01,
-		OnChange = function(self) 
+		OnChange = function(self)
 				if economyWindowData then
 					economyWindowData[1].metalPanel.mainPanel.color = {1,1,1,self.value}
 					economyWindowData[1].metalPanel.mainPanel.backgroundColor = {1,1,1,self.value}
@@ -254,10 +254,10 @@ options = {
 	},
 	colourBlind = {
 		name  = "Colourblind mode",
-		type  = "bool", 
-		value = false, 
+		type  = "bool",
+		value = false,
 		noHotkey = true,
-		OnChange = option_ColourBlindUpdate, 
+		OnChange = option_ColourBlindUpdate,
 		desc = "Uses Blue and Yellow instead of Red and Green for number display"
 	},
 	fancySkinning = {
@@ -302,9 +302,9 @@ options = {
 -- Resource Window Management
 
 local function Mix(startColour, endColour, interpParam)
-	return {endColour[1] * interpParam + startColour[1] * (1 - interpParam), 
-	endColour[2] * interpParam + startColour[2] * (1 - interpParam), 
-	endColour[3] * interpParam + startColour[3] * (1 - interpParam), 
+	return {endColour[1] * interpParam + startColour[1] * (1 - interpParam),
+	endColour[2] * interpParam + startColour[2] * (1 - interpParam),
+	endColour[3] * interpParam + startColour[3] * (1 - interpParam),
 	endColour[4] * interpParam + startColour[4] * (1 - interpParam), }
 end
 
@@ -402,7 +402,7 @@ local function UpdateResourcePanel(panel, income, net, overdrive, reclaim, stora
 		panel.bar:SetValue(100*storage/storageMax)
 	else
 		panel.bar:SetValue(0)
-	end 
+	end
 	
 	-- local newFontSize = math.round(GetFontMult(income)*options.resourceMainFontSize.value)
 	-- panel.label_income.font.size = newFontSize
@@ -469,14 +469,14 @@ local function UpdateResourceWindowPanel(sideID)
 		energyReclaim = energyReclaim + (eInco or 0) - math.max(0, energyChange)
 		
 		energyStorage = energyStorage + math.min((eCurr or 0), (eStor or 0) - HIDDEN_STORAGE)
-		energyStorageMax = energyStorageMax + (eStor or 0) - HIDDEN_STORAGE 
+		energyStorageMax = energyStorageMax + (eStor or 0) - HIDDEN_STORAGE
 	end
 	
 	energyReclaim = math.max(0, energyReclaim)
 	
-	local metalReclaim = metalIncome 
+	local metalReclaim = metalIncome
 			- (spGetTeamRulesParam(teams[1], "OD_team_metalOverdrive") or 0)
-			- (spGetTeamRulesParam(teams[1], "OD_team_metalBase") or 0) 
+			- (spGetTeamRulesParam(teams[1], "OD_team_metalBase") or 0)
 			- (spGetTeamRulesParam(teams[1], "OD_team_metalMisc") or 0)
 	local energyIncome = (spGetTeamRulesParam(teams[1], "OD_team_energyIncome") or 0) + energyReclaim
 	
@@ -493,7 +493,7 @@ local function UpdateResourceWindowPanel(sideID)
 	end
 	windowData.metalPanel.flashing = newMetalFlash and 1
 	
-	local newEnergyFlash = (energyStorage <= energyStorageMax*0.1) 
+	local newEnergyFlash = (energyStorage <= energyStorageMax*0.1)
 		or (energyWaste > 0)
 	if windowData.energyPanel.flashing and not newEnergyFlash then
 		windowData.energyPanel.barOverlay:SetColor(col_empty)
@@ -501,9 +501,9 @@ local function UpdateResourceWindowPanel(sideID)
 	windowData.energyPanel.flashing = newEnergyFlash and 1
 
 	--// Update GUI
-	UpdateResourcePanel(windowData.metalPanel, metalIncome, metalNet, 
+	UpdateResourcePanel(windowData.metalPanel, metalIncome, metalNet,
 		metalOverdrive, metalReclaim, metalStorage, metalStorageMax)
-	UpdateResourcePanel(windowData.energyPanel, energyIncome, energyNet, 
+	UpdateResourcePanel(windowData.energyPanel, energyIncome, energyNet,
 		-energyOverdrive, energyReclaim, energyStorage, energyStorageMax)
 end
 
@@ -565,10 +565,10 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 			noSkin = true,
 			fontOffset = -2,
 			font   = {
-				size = 20, 
-				color = {.8,.8,.8,.95}, 
+				size = 20,
+				color = {.8,.8,.8,.95},
 				outline = true,
-				outlineWidth = 2, 
+				outlineWidth = 2,
 				outlineWeight = 2
 			},
 			net = 0, -- cache, not a chili thing
@@ -587,10 +587,10 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 		fontShadow = false,
 		fontOffset = -2,
 		font   = {
-			size = 20, 
-			color = {.8,.8,.8,.95}, 
+			size = 20,
+			color = {.8,.8,.8,.95},
 			outline = true,
-			outlineWidth = 2, 
+			outlineWidth = 2,
 			outlineWeight = 2
 		},
 		net = 0, -- cache, not a chili thing
@@ -607,11 +607,11 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
  		align  = "center",
 		autosize = false,
 		font   = {
-			size = options.resourceMainFontSize.value, 
-			outline = true, 
-			outlineWidth = 2, 
+			size = options.resourceMainFontSize.value,
+			outline = true,
+			outlineWidth = 2,
 			outlineWeight = 2,
-			color = resourceColor, 
+			color = resourceColor,
 		},
 	}
 	
@@ -788,11 +788,11 @@ local function CreatePlayerWindow()
  		align  = "center",
 		autosize = false,
 		font   = {
-			size = math.round(options.playerMainFontSize.value*allyTeamData[1].nameSize), 
-			outline = true, 
-			outlineWidth = 2, 
+			size = math.round(options.playerMainFontSize.value*allyTeamData[1].nameSize),
+			outline = true,
+			outlineWidth = 2,
 			outlineWeight = 2,
-			color = {0.95, 1.0, 1.0, 1}, 
+			color = {0.95, 1.0, 1.0, 1},
 		},
 	}
 	
@@ -807,11 +807,11 @@ local function CreatePlayerWindow()
  		align  = "left",
 		autosize = false,
 		font   = {
-			size = math.round(options.playerMainFontSize.value*allyTeamData[1].nameSize), 
-			outline = true, 
-			outlineWidth = 2, 
+			size = math.round(options.playerMainFontSize.value*allyTeamData[1].nameSize),
+			outline = true,
+			outlineWidth = 2,
 			outlineWeight = 2,
-			color = allyTeamData[1].color, 
+			color = allyTeamData[1].color,
 		},
 	}
 	
@@ -826,11 +826,11 @@ local function CreatePlayerWindow()
  		align  = "right",
 		autosize = false,
 		font   = {
-			size = math.round(options.playerMainFontSize.value*allyTeamData[2].nameSize), 
-			outline = true, 
-			outlineWidth = 2, 
+			size = math.round(options.playerMainFontSize.value*allyTeamData[2].nameSize),
+			outline = true,
+			outlineWidth = 2,
 			outlineWeight = 2,
-			color = allyTeamData[2].color, 
+			color = allyTeamData[2].color,
 		},
 	}
 	
@@ -845,11 +845,11 @@ local function CreatePlayerWindow()
  		align  = "left",
 		autosize = false,
 		font   = {
-			size = options.playerMainFontSize.value, 
-			outline = true, 
-			outlineWidth = 2, 
+			size = options.playerMainFontSize.value,
+			outline = true,
+			outlineWidth = 2,
 			outlineWeight = 2,
-			color = allyTeamData[1].color, 
+			color = allyTeamData[1].color,
 		},
 	}
 	
@@ -864,11 +864,11 @@ local function CreatePlayerWindow()
  		align  = "right",
 		autosize = false,
 		font   = {
-			size = options.playerMainFontSize.value, 
-			outline = true, 
-			outlineWidth = 2, 
+			size = options.playerMainFontSize.value,
+			outline = true,
+			outlineWidth = 2,
 			outlineWeight = 2,
-			color = allyTeamData[2].color, 
+			color = allyTeamData[2].color,
 		},
 	}
 	
@@ -945,7 +945,7 @@ local function GetOpposingAllyTeams()
 	end
 
 	if #returnData ~= 2 then
-		return
+		return false
 	end
 	
 	return returnData
@@ -979,6 +979,7 @@ function option_CheckEnable(self)
 	
 	allyTeamData = GetOpposingAllyTeams()
 	if not allyTeamData then
+		enabled = false
 		return false
 	end
 	

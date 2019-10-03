@@ -5,7 +5,7 @@ unitDef = {
   acceleration           = 0.0552,
   activateWhenBuilt      = true,
   brakeRate              = 0.1375,
-  buildCostMetal         = 3500,
+  buildCostMetal         = 3000,
   buildPic               = [[striderfunnelweb.png]],
   builder                = true,
   
@@ -17,24 +17,31 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND UNARMED]],
+  collisionVolumeOffsets        = [[0 10 -10]],
+  collisionVolumeScales         = [[60 50 80]],
+  collisionVolumeType           = [[elipsoid]],
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[80 80 80]],
+  selectionVolumeType           = [[Sphere]],
+
   corpse                 = [[DEAD]],
 
   customParams           = {
-	priority_misc  = 1, -- Medium
-	shield_emit_height = 45,
-	unarmed       = true,
-	shield_power_gfx_override = 10000,
-	selection_rank = 3,
+    priority_misc  = 1, -- Medium
+    shield_emit_height = 45,
+    unarmed       = true,
+    shield_power_gfx_override = 10000,
+    selection_rank = 3,
   },
 
   explodeAs              = [[ESTOR_BUILDING]],
   footprintX             = 4,
   footprintZ             = 4,
-  iconType               = [[t3special]],
+  iconType               = [[t3spiderbuilder]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 6000,
+  maxDamage              = 6500,
   maxSlope               = 36,
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,
@@ -42,7 +49,7 @@ unitDef = {
   movementClass          = [[TKBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[funnelweb.s3o]],
+  objectName             = [[funnelweb.dae]],
   radarDistance          = 1400,
   radarEmitHeight        = 32,
   onoffable              = true,
@@ -64,7 +71,7 @@ unitDef = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 85,
-  turnRate               = 240,
+  turnRate               = 520,
   workerTime             = 40,
 
   weapons                = {
@@ -94,8 +101,8 @@ unitDef = {
       shieldBadColor          = [[1 0.1 0.1 1]],
       shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
-      shieldPower             = 28000,
-      shieldPowerRegen        = 200,
+      shieldPower             = 23000,
+      shieldPowerRegen        = 300,
       shieldPowerRegenEnergy  = 48,
       shieldRadius            = 550,
       shieldRepulser          = false,
@@ -104,7 +111,7 @@ unitDef = {
       visibleShieldRepulse    = false,
       weaponType              = [[Shield]],
     },
-	
+    
   },
 
 

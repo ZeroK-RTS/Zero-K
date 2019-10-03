@@ -58,7 +58,7 @@ local base = {
 	{
 		name = "shotty",
 		modules = {
-			"commweapon_shotgun_green", 
+			"commweapon_shotgun_green",
 			"weaponmod_autoflechette",
 			"commweapon_napalmgrenade",
 			"module_companion_drone",

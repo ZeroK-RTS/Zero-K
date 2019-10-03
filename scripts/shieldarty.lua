@@ -46,7 +46,7 @@ local SIG_Walk = 2
 local SIG_Aim = 4
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function Walk()

@@ -1,14 +1,14 @@
-local base = piece 'base' 
-local arm = piece 'arm' 
-local turret = piece 'turret' 
-local gun = piece 'gun' 
-local ledgun = piece 'ledgun' 
-local radar = piece 'radar' 
-local barrel = piece 'barrel' 
-local fire = piece 'fire' 
-local antenna = piece 'antenna' 
-local door1 = piece 'door1' 
-local door2 = piece 'door2' 
+local base = piece 'base'
+local arm = piece 'arm'
+local turret = piece 'turret'
+local gun = piece 'gun'
+local ledgun = piece 'ledgun'
+local radar = piece 'radar'
+local barrel = piece 'barrel'
+local fire = piece 'fire'
+local antenna = piece 'antenna'
+local door1 = piece 'door1'
+local door2 = piece 'door2'
 
 local smokePiece = {base, turret}
 
@@ -93,7 +93,7 @@ local function Close()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 function script.Activate()
 	Spin(radar, y_axis, math.rad(100))

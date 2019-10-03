@@ -1,12 +1,13 @@
 local name = "commweapon_rocketlauncher_napalm"
 local weaponDef = {
 	name                    = [[Napalm Rocket Launcher]],
-	areaOfEffect            = 128,
+	areaOfEffect            = 144,
 	cegTag                  = [[missiletrailred]],
-	craterBoost             = 0,
-	craterMult              = 0,
+	craterBoost             = 1,
+	craterMult              = 1,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectFire = [[custom:STORMMUZZLE]],
 		burntime         = 450,
@@ -19,7 +20,7 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 360,
+		default = 270,
 		subs    = 18,
 	},
 

@@ -245,7 +245,7 @@ function preJump(turn,distance)
 	Turn(b_dome, x_axis, disFactor*x/3, math.abs(x)/2)
 	Turn(b_dome, z_axis, disFactor*z/3, math.abs(z)/2)
 	
-	Signal(walk) 	
+	Signal(walk)
 	Move(t_dome, y_axis, 0, 10)
 	Move(b_dome, y_axis, 0, 20)
 
@@ -361,7 +361,7 @@ function script.Create()
 	Turn(rf_ball, y_axis, math.rad(-45))
 	Turn(lb_ball, y_axis, math.rad(-45))
 	Turn(rb_ball, y_axis, math.rad(45))
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function Stopping()
@@ -418,16 +418,16 @@ function script.StopMoving()
 	StartThread(Stopping)
 end
 
-function script.QueryWeapon(num) 
+function script.QueryWeapon(num)
 	return weaponPieces[num].flare
 end
 
 function script.AimFromWeapon(num)
-	return weaponPieces[num].turret 
+	return weaponPieces[num].turret
 end
 
 local normal = {0, 1/math.sqrt(2), 1/math.sqrt(2)}
-local radial = {1,0,0} 
+local radial = {1,0,0}
 
 local function RestoreAfterDelay(num)
 	SetSignalMask(SIG_Aim[num])
@@ -478,7 +478,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(t_eye, SFX.EXPLODE)
 		Explode(b_eye, SFX.EXPLODE)
 		return 1 -- corpsetype
-	else		
+	else
 		Explode(t_dome, SFX.EXPLODE)
 		Explode(t_eye, SFX.EXPLODE)
 		Explode(b_eye, SFX.EXPLODE)

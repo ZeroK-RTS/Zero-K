@@ -8,7 +8,7 @@
  same cluster. Close units may be in different clusters depending
  on how the boundaries work out.
  
-=== local functions === 
+=== local functions ===
  All UnitList local functions are accessible along with two more.
 
  
@@ -131,7 +131,7 @@ function UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, clusterRadius)
 			local clusterData = clusterList[i]
 			if clusterData.unitMap[unitID] then
 				RemoveUnitFromCluster(i, unitID)
-				return				
+				return
 			end
 		end
 	end
@@ -141,7 +141,7 @@ function UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, clusterRadius)
 		local i = 0
 		return function ()
 			i = i + 1
-			if i <= clusterCount then 
+			if i <= clusterCount then
 				local clusterData = clusterList[i]
 				return clusterData.averageX, clusterData.averageZ, clusterData.costSum, clusterData.unitCount
 			end

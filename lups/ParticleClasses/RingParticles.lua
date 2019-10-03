@@ -89,7 +89,7 @@ function RingParticles:UpdatePartList(partList,n)
 	--partList.rotate   = (partList.rotate + partList.rotspeed) * self.rotairdrag
 
 	local gravBoost,rotBoost = 0,0
-	for i=1,n do 
+	for i=1,n do
 		gravBoost = gravBoost + self.grav*(self.airdrag^i);
 		rotBoost  = rotBoost + partList.rotspeed*(self.rotairdrag^i);
 	end
@@ -161,7 +161,7 @@ function RingParticles:Draw()
 	--  self.genmipmap = false
 	--end
 
-	gl.Texture(self.texture)  
+	gl.Texture(self.texture)
 	gl.Blending(self.srcBlend,self.dstBlend)
 
 	gl.PushMatrix()

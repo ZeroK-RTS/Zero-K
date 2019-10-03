@@ -31,7 +31,8 @@ function gadget:GetInfo()
 		date      = "2 September 2009",
 		license   = "GPL v2",
 		layer     = 0,
-		enabled   = true --  loaded by default?
+		enabled   = true, --  loaded by default?
+		script    = true,
 	}
 end
 
@@ -276,7 +277,7 @@ local function AnimFinished(waitingForAnim, piece, axis)
 	if wthreads then
 		waitingForAnim[index] = {}
 
-		while (#wthreads > 0) do	
+		while (#wthreads > 0) do
 			wthread = wthreads[#wthreads]
 			wthreads[#wthreads] = nil
 
@@ -557,7 +558,7 @@ local function LoadScript(scriptName, filename)
 end
 
 local function ToggleScriptDebug(cmd, line, words, player)
-	if not Spring.IsCheatingEnabled() then 
+	if not Spring.IsCheatingEnabled() then
 		return
 	end
 	
@@ -637,6 +638,27 @@ local function Wrap_AimWeapon(unitID, callins)
 	end
 end
 
+local function Wrap_EndBurst(unitID, unitDefID, callins)
+	local EndBurst = callins.EndBurst
+
+	callins.EndBurst = function(weaponNum)
+		scriptCallins:ScriptEndBurst(unitID, unitDefID, weaponNum)
+		if EndBurst then
+			return StartThread(EndBurst, weaponNum)
+		end
+	end
+end
+
+local function Wrap_FireWeapon(unitID, unitDefID, callins)
+	local FireWeapon = callins.FireWeapon
+
+	callins.FireWeapon = function(weaponNum)
+		scriptCallins:ScriptFireWeapon(unitID, unitDefID, weaponNum)
+		if FireWeapon then
+			return StartThread(FireWeapon, weaponNum)
+		end
+	end
+end
 
 local function Wrap_AimShield(unitID, callins)
 	local AimShield = callins["AimShield"]
@@ -801,6 +823,8 @@ function gadget:UnitCreated(unitID, unitDefID)
 	Wrap_AimWeapon(unitID, callins)
 	Wrap_AimShield(unitID, callins)
 	Wrap_Killed(unitID, callins)
+	Wrap_EndBurst(unitID, unitDefID, callins)
+	Wrap_FireWeapon(unitID, unitDefID, callins)
 
 	-- Wrap everything so activeUnit get's set properly.
 	for k,v in pairs(callins) do

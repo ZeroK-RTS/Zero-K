@@ -4,26 +4,26 @@ include 'reliableStartMoving.lua'
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local base = piece 'base' 
-local ground = piece 'ground' 
-local turret = piece 'turret' 
-local blight = piece 'blight' 
-local canon = piece 'canon' 
-local barrel1 = piece 'barrel1' 
-local barrel2 = piece 'barrel2' 
-local flare1 = piece 'flare1' 
-local flare2 = piece 'flare2' 
-local flare3 = piece 'flare3' 
-local flare4 = piece 'flare4' 
-local flare5 = piece 'flare5' 
-local flare6 = piece 'flare6' 
-local flare7 = piece 'flare7' 
-local rocket = piece 'rocket' 
+local base = piece 'base'
+local ground = piece 'ground'
+local turret = piece 'turret'
+local blight = piece 'blight'
+local canon = piece 'canon'
+local barrel1 = piece 'barrel1'
+local barrel2 = piece 'barrel2'
+local flare1 = piece 'flare1'
+local flare2 = piece 'flare2'
+local flare3 = piece 'flare3'
+local flare4 = piece 'flare4'
+local flare5 = piece 'flare5'
+local flare6 = piece 'flare6'
+local flare7 = piece 'flare7'
+local rocket = piece 'rocket'
 local leg1 = piece 'leg1'	-- front right
 local leg2 = piece 'leg2'	-- back right
 local leg3 = piece 'leg3' 	-- back left
 local leg4 = piece 'leg4' 	-- front left
-local gflash = piece 'gflash' 
+local gflash = piece 'gflash'
 
 local smokePiece = {base, turret}
 
@@ -33,7 +33,7 @@ local smokePiece = {base, turret}
 
 local restore_delay = 3000
 
-local SIG_MOVE = 2	
+local SIG_MOVE = 2
 local SIG_AIM1 = 4
 local SIG_AIM2 = 8
 
@@ -69,14 +69,14 @@ local function Walk()
 		--Turn(leg1, z_axis, 0, legLowerSpeed)	-- RF leg down
 		Turn(leg1, y_axis, -legBackwardAngleMinor, legBackwardSpeed)	-- RF leg back
 		Turn(leg2, z_axis, -legRaiseAngle, legRaiseSpeed)	-- RB leg up
-		Turn(leg2, y_axis, 0, legForwardSpeed)	-- RB leg forward	
+		Turn(leg2, y_axis, 0, legForwardSpeed)	-- RB leg forward
 		
 		WaitForTurn(leg4, z_axis)
 		WaitForTurn(leg4, y_axis)
 		Sleep(0)
 		
 		-- Spring.Echo("lower left fore and right back")
-		Turn(leg4, z_axis, 0, legLowerSpeed)	-- LF leg down		
+		Turn(leg4, z_axis, 0, legLowerSpeed)	-- LF leg down
 		Turn(leg2, z_axis, 0, legLowerSpeed)	-- RB leg down
 		Sleep(0)
 		WaitForTurn(leg4, z_axis)
@@ -90,13 +90,13 @@ local function Walk()
 		Turn(leg1, z_axis, -legRaiseAngle, legRaiseSpeed)	-- RF leg up
 		Turn(leg1, y_axis, -legForwardAngle, legForwardSpeed)	-- RF leg forward
 		--Turn(leg2, z_axis, 0, legLowerSpeed)	-- RB leg down
-		Turn(leg2, y_axis, -legBackwardAngle, legBackwardSpeed)	-- RB leg back	
+		Turn(leg2, y_axis, -legBackwardAngle, legBackwardSpeed)	-- RB leg back
 		WaitForTurn(leg1, z_axis)
 		WaitForTurn(leg1, y_axis)
 		Sleep(0)
 
 		-- Spring.Echo("lower left back and right fore")
-		Turn(leg3, z_axis, 0, legLowerSpeed)	-- LB leg down		
+		Turn(leg3, z_axis, 0, legLowerSpeed)	-- LB leg down
 		Turn(leg1, z_axis, 0, legLowerSpeed)	-- RF leg down
 		Sleep(0)
 		WaitForTurn(leg3, z_axis)
@@ -153,7 +153,7 @@ local function Curl()
 	WaitForTurn(leg3, x_axis)
 	WaitForTurn(leg4, x_axis)
 	
- 	bCurling = false
+	bCurling = false
 	Spring.SetUnitArmored(unitID,true)
 end
 
@@ -254,7 +254,7 @@ function script.Create()
 	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.02)
 	
 	--StartThread(MotionControl)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--StartThread(BlinkingLight)
 	if Spring.GetUnitIsStunned(unitID) then
 		StartThread(CurlDelay)
@@ -264,7 +264,7 @@ function script.Create()
 	end
 end
 
-local function RockSelf(anglex, anglez)	
+local function RockSelf(anglex, anglez)
 	Turn(base, z_axis, -anglex, math.rad(50))
 	Turn(base, x_axis, anglez, math.rad(50))
 	WaitForTurn(base, z_axis)
@@ -314,7 +314,7 @@ end
 function script.FireWeapon(num)
 	if num == 1 then
 		Move(barrel1, z_axis, -1.2)
-		EmitSfx(flare1, 1024+0)	
+		EmitSfx(flare1, 1024+0)
 		EmitSfx(gflash, 1024+1)
 		Move(barrel2, z_axis, -1.2)
 		Sleep(150)
@@ -336,8 +336,8 @@ end
 function script.QueryWeapon(num)
 	if num == 1 then return flare1
 	else
-		if gun_0 == 0 then return flare2 
-		elseif gun_0 == 1 then return flare3 
+		if gun_0 == 0 then return flare2
+		elseif gun_0 == 1 then return flare3
 		else return flare4 end
 	end
 end

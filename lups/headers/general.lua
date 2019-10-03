@@ -53,6 +53,13 @@ function GetShieldColor(unitID, self)
 	local col1 = MergeShieldColor(self.colormap1, frac)
 	local col2 = self.colormap2 and MergeShieldColor(self.colormap2, frac)
 	
+	local boundCharge = math.max(20, charge)
+	local changeAlphaMult = 0.1 + 0.9*boundCharge/(boundCharge + 100)
+	col1[4] = col1[4]*changeAlphaMult
+	if col2 then
+		col2[4] = col2[4]*changeAlphaMult
+	end
+	
 	if self.hitResposeMult ~= 0 then
 		local hitTime = Spring.GetUnitRulesParam(unitID, "shieldHitFrame")
 		local frame = Spring.GetGameFrame()
@@ -70,7 +77,7 @@ end
 local type  = type
 local pairs = pairs
 function CopyTable(outtable,intable)
-	for i,v in pairs(intable) do 
+	for i,v in pairs(intable) do
 		if (type(v)=='table') then
 			if (type(outtable[i])~='table') then outtable[i] = {} end
 			CopyTable(outtable[i],v)

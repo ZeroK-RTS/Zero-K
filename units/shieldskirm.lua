@@ -16,9 +16,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	aimposoffset   = [[0 5 0]],
-	midposoffset   = [[0 5 0]],
-	modelradius    = [[14]],
+    aimposoffset   = [[0 5 0]],
+    midposoffset   = [[0 5 0]],
+    modelradius    = [[14]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -76,11 +76,11 @@ unitDef = {
       craterMult              = 2,
 
       customParams        = {
-		burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
 
-		light_camera_height = 1800,
+        light_camera_height = 1800,
       },
-	  
+      
       damage                  = {
         default = 350,
         planes  = 350,

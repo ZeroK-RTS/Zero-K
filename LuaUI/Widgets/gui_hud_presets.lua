@@ -295,9 +295,9 @@ local function SetupDefaultPreset()
 	local minimapWidth = math.ceil(screenWidth*2/11)
 	local minimapHeight = math.ceil(screenWidth*2/11 + 20)
 	WG.Minimap_SetOptions("arwindow", 0, false, false, false)
-	WG.SetWindowPosAndSize("Minimap Window", 
-		0, 
-		0, 
+	WG.SetWindowPosAndSize("Minimap Window",
+		0,
+		0,
 		minimapWidth,
 		minimapHeight
 	)
@@ -318,10 +318,10 @@ local function SetupDefaultPreset()
 	local selectionButtonCount = math.min(12,math.max(4,math.floor(integralWidth/selectorButtonWidth)))
 	local coreSelectorWidth = selectorButtonWidth*selectionButtonCount
 	
-	WG.SetWindowPosAndSize("selector_window", 
-		0, 
-		screenHeight - coreSelectorHeight - integralHeight, 
-		coreSelectorWidth, 
+	WG.SetWindowPosAndSize("selector_window",
+		0,
+		screenHeight - coreSelectorHeight - integralHeight,
+		coreSelectorWidth,
 		coreSelectorHeight
 	)
 	
@@ -442,9 +442,9 @@ local function SetupNewPreset()
 			minimapSize = screenWidth*options.minimapScreenSpace.value
 		end
 	end
-	WG.SetWindowPosAndSize("Minimap Window", 
-		0, 
-		screenHeight - minimapSize, 
+	WG.SetWindowPosAndSize("Minimap Window",
+		0,
+		screenHeight - minimapSize,
 		minimapSize,
 		minimapSize
 	)
@@ -452,10 +452,10 @@ local function SetupNewPreset()
 	local _,_, coreSelectorWidth, coreSelectorHeight = WG.GetWindowPosAndSize("selector_window")
 	coreSelectorHeight = coreSelectorHeight or 150
 	coreSelectorWidth = math.ceil(coreSelectorWidth or 60)
-	WG.SetWindowPosAndSize("selector_window", 
-		minimapSize, 
-		screenHeight - coreSelectorHeight, 
-		coreSelectorWidth, 
+	WG.SetWindowPosAndSize("selector_window",
+		minimapSize,
+		screenHeight - coreSelectorHeight,
+		coreSelectorWidth,
 		coreSelectorHeight
 	)
 	
@@ -713,10 +713,10 @@ local function GetBottomSizes(screenWidth, screenHeight, parity)
 		playerlistWidth = playerListControl.minWidth
 	end
 	
-	return integralWidth, integralHeight, 
-		coreSelectorWidth, coreSelectorHeight, 
-		minimapWidth, minimapHeight, 
-		selectionsWidth, selectionsHeight, 
+	return integralWidth, integralHeight,
+		coreSelectorWidth, coreSelectorHeight,
+		minimapWidth, minimapHeight,
+		selectionsWidth, selectionsHeight,
 		chatWidth, chatHeight,
 		playerlistWidth, playerlistHeight
 end
@@ -838,10 +838,10 @@ local function SetupMinimapLeftPreset()
 	------------------------------------------------------------------------
 	-- Bottom of the UI
 	
-	local integralWidth, integralHeight, 
-		coreSelectorWidth, coreSelectorHeight, 
-		minimapWidth, minimapHeight, 
-		selectionsWidth, selectionsHeight, 
+	local integralWidth, integralHeight,
+		coreSelectorWidth, coreSelectorHeight,
+		minimapWidth, minimapHeight,
+		selectionsWidth, selectionsHeight,
 		chatWidth, chatHeight,
 		playerlistWidth, playerlistHeight = GetBottomSizes(screenWidth, screenHeight, -1)
 	
@@ -871,9 +871,9 @@ local function SetupMinimapLeftPreset()
 	)
 	
 	-- Set Windows
-	WG.SetWindowPosAndSize("Minimap Window", 
-		0, 
-		screenHeight - minimapHeight, 
+	WG.SetWindowPosAndSize("Minimap Window",
+		0,
+		screenHeight - minimapHeight,
 		minimapWidth,
 		minimapHeight
 	)
@@ -889,10 +889,10 @@ local function SetupMinimapLeftPreset()
 		integralWidth + 3,
 		integralHeight
 	)
-	WG.SetWindowPosAndSize("selector_window", 
-		minimapWidth + selectionsWidth + integralWidth, 
-		screenHeight - coreSelectorHeight, 
-		coreSelectorWidth, 
+	WG.SetWindowPosAndSize("selector_window",
+		minimapWidth + selectionsWidth + integralWidth,
+		screenHeight - coreSelectorHeight,
+		coreSelectorWidth,
 		coreSelectorHeight
 	)
 	WG.SetWidgetOption(coreName, corePath, "leftsideofscreen", false)
@@ -943,10 +943,10 @@ local function SetupMinimapRightPreset()
 	------------------------------------------------------------------------
 	-- Bottom of the UI
 	
-	local integralWidth, integralHeight, 
-		coreSelectorWidth, coreSelectorHeight, 
-		minimapWidth, minimapHeight, 
-		selectionsWidth, selectionsHeight, 
+	local integralWidth, integralHeight,
+		coreSelectorWidth, coreSelectorHeight,
+		minimapWidth, minimapHeight,
+		selectionsWidth, selectionsHeight,
 		chatWidth, chatHeight,
 		playerlistWidth, playerlistHeight = GetBottomSizes(screenWidth, screenHeight, 1)
 	
@@ -976,9 +976,9 @@ local function SetupMinimapRightPreset()
 	)
 	
 	-- Set Windows
-	WG.SetWindowPosAndSize("Minimap Window", 
-		coreSelectorWidth + integralWidth + selectionsWidth, 
-		screenHeight - minimapHeight, 
+	WG.SetWindowPosAndSize("Minimap Window",
+		coreSelectorWidth + integralWidth + selectionsWidth,
+		screenHeight - minimapHeight,
 		minimapWidth,
 		minimapHeight
 	)
@@ -994,10 +994,10 @@ local function SetupMinimapRightPreset()
 		integralWidth + 3,
 		integralHeight
 	)
-	WG.SetWindowPosAndSize("selector_window", 
-		0, 
-		screenHeight - coreSelectorHeight, 
-		coreSelectorWidth, 
+	WG.SetWindowPosAndSize("selector_window",
+		0,
+		screenHeight - coreSelectorHeight,
+		coreSelectorWidth,
 		coreSelectorHeight
 	)
 	WG.SetWidgetOption(coreName, corePath, "leftsideofscreen", true)
@@ -1057,9 +1057,9 @@ local function SetupCraftyPreset()
 	local minimapWidth = screenWidth*9/44 + 20
 	local minimapHeight = screenWidth*9/44
 	WG.Minimap_SetOptions("armap", 0.8, false, true, false)
-	WG.SetWindowPosAndSize("Minimap Window", 
-		0, 
-		screenHeight - minimapHeight, 
+	WG.SetWindowPosAndSize("Minimap Window",
+		0,
+		screenHeight - minimapHeight,
 		minimapWidth,
 		minimapHeight
 	)
@@ -1069,10 +1069,10 @@ local function SetupCraftyPreset()
 	local coreSelectorHeight = 55*selectorButtonWidth/60
 	local selectionButtonCount = math.min(12,math.max(4,math.floor(minimapWidth/selectorButtonWidth)))
 	local coreSelectorWidth = selectorButtonWidth*selectionButtonCount
-	WG.SetWindowPosAndSize("selector_window", 
-		0, 
-		screenHeight - minimapHeight - coreSelectorHeight, 
-		coreSelectorWidth, 
+	WG.SetWindowPosAndSize("selector_window",
+		0,
+		screenHeight - minimapHeight - coreSelectorHeight,
+		coreSelectorWidth,
 		coreSelectorHeight
 	)
 	
@@ -1195,9 +1195,9 @@ local function SetupEnsemblePreset()
 	local minimapWidth = screenWidth*9/44 + 20
 	local minimapHeight = screenWidth*9/44
 	WG.Minimap_SetOptions("armap", 0.8, false, true, false)
-	WG.SetWindowPosAndSize("Minimap Window", 
-		screenWidth - minimapWidth, 
-		screenHeight - minimapHeight, 
+	WG.SetWindowPosAndSize("Minimap Window",
+		screenWidth - minimapWidth,
+		screenHeight - minimapHeight,
 		minimapWidth,
 		minimapHeight
 	)
@@ -1218,10 +1218,10 @@ local function SetupEnsemblePreset()
 	local coreSelectorHeight = 55*selectorButtonWidth/60
 	local selectionButtonCount = math.min(12,math.max(4,math.floor(integralWidth/selectorButtonWidth)))
 	local coreSelectorWidth = selectorButtonWidth*selectionButtonCount
-	WG.SetWindowPosAndSize("selector_window", 
-		integralWidth, 
-		screenHeight - selectionsHeight - coreSelectorHeight, 
-		coreSelectorWidth, 
+	WG.SetWindowPosAndSize("selector_window",
+		integralWidth,
+		screenHeight - selectionsHeight - coreSelectorHeight,
+		coreSelectorWidth,
 		coreSelectorHeight
 	)
 	
@@ -1323,9 +1323,9 @@ local function SetupWestwoodPreset()
 	local minimapWidth = resourceBarWidth
 	local minimapHeight = screenWidth*1/4
 	WG.Minimap_SetOptions("armap", 0.8, false, true, false)
-	WG.SetWindowPosAndSize("Minimap Window", 
-		screenWidth - minimapWidth, 
-		resourceBarHeight, 
+	WG.SetWindowPosAndSize("Minimap Window",
+		screenWidth - minimapWidth,
+		resourceBarHeight,
 		minimapWidth,
 		minimapHeight
 	)
@@ -1356,10 +1356,10 @@ local function SetupWestwoodPreset()
 	local coreSelectorHeight = 55*selectorButtonWidth/60
 	local selectionButtonCount = math.min(12,math.max(4,math.floor(resourceBarWidth/selectorButtonWidth)))
 	local coreSelectorWidth = selectorButtonWidth*selectionButtonCount
-	WG.SetWindowPosAndSize("selector_window", 
-		screenWidth - selectionsWidth, 
-		screenHeight - selectionsHeight - coreSelectorHeight, 
-		coreSelectorWidth, 
+	WG.SetWindowPosAndSize("selector_window",
+		screenWidth - selectionsWidth,
+		screenHeight - selectionsHeight - coreSelectorHeight,
+		coreSelectorWidth,
 		coreSelectorHeight
 	)
 	
@@ -1414,7 +1414,7 @@ local firstUpdate = true
 
 local presetFunction = {
 	default2 = SetupDefaultPreset,
-	new = SetupNewPreset, 
+	new = SetupNewPreset,
 	minimapLeft = SetupMinimapLeftPreset,
 	minimapRight = SetupMinimapRightPreset,
 	crafty = SetupCraftyPreset,
@@ -1424,7 +1424,7 @@ local presetFunction = {
 
 local function UpdateInterfacePreset(self)
 	if firstUpdate then
-		-- Don't reset IU while initializing 
+		-- Don't reset IU while initializing
 		return
 	end
 	local presetKey = self.value
@@ -1442,23 +1442,23 @@ options_order = {'updateNewDefaults', 'setToDefault', 'maintainDefaultUI', 'mini
 options = {
 	updateNewDefaults = {
 		name  = "Stay up to date",
-		type  = "bool", 
-		value = true, 
+		type  = "bool",
+		value = true,
 		desc = "Updates your UI when new defaults are released.",
 		noHotkey = true,
 	},
 	setToDefault = {
 		name  = "Set To Default Once",
-		type  = "bool", 
-		value = true, 
+		type  = "bool",
+		value = true,
 		desc = "Resets the HUD to the default next time this widget is initialized.",
 		advanced = true,
 		noHotkey = true,
 	},
 	maintainDefaultUI = {
 		name  = "Reset on screen resolution change",
-		type  = "bool", 
-		value = true, 
+		type  = "bool",
+		value = true,
 		desc = "Resets the UI when screen resolution changes. Disable if you plan to customise your UI.",
 		noHotkey = true,
 	},
@@ -1489,6 +1489,28 @@ options = {
 		OnChange = UpdateInterfacePreset
 	},
 }
+
+----------------------------------------------------
+-- Interface
+----------------------------------------------------
+
+function WG.HudEnableWidget(widgetName)
+	widgetHandler:EnableWidget(widgetName)
+end
+
+function WG.HudDisableWidget(widgetName)
+	widgetHandler:DisableWidget(widgetName)
+end
+
+function WG.IsWidgetEnabled(widgetName)
+	local widgets = widgetHandler.widgets
+	for i = 1, #widgets do
+		local w = widgets[i]
+		if w:GetInfo().name == widgetName then
+			return true
+		end
+	end
+end
 
 ----------------------------------------------------
 -- Callins
@@ -1533,7 +1555,7 @@ function widget:Update(dt)
 	end
 	
 	if options.maintainDefaultUI.value  then
-		timeSinceUpdate = timeSinceUpdate + dt 
+		timeSinceUpdate = timeSinceUpdate + dt
 		if timeSinceUpdate > UPDATE_FREQUENCY then
 			local screenWidth, screenHeight = Spring.GetWindowGeometry()
 			if oldWidth ~= screenWidth or oldHeight ~= screenHeight then

@@ -7,6 +7,34 @@ local function WrappedInclude(x)
 	return ret
 end
 
+local function GetStartboxName(midX, midZ)
+	if (midX < 0.33) then
+		if (midZ < 0.33) then
+			return "North-West", "NW"
+		elseif (midZ > 0.66) then
+			return "South-West", "SW"
+		else
+			return "West", "W"
+		end
+	elseif (midX > 0.66) then
+		if (midZ < 0.33) then
+			return "North-East", "NE"
+		elseif (midZ > 0.66) then
+			return "South-East", "SE"
+		else
+			return "East", "E"
+		end
+	else
+		if (midZ < 0.33) then
+			return "North", "N"
+		elseif (midZ > 0.66) then
+			return "South", "S"
+		else
+			return "Center", "Center"
+		end
+	end
+end
+
 local function ParseBoxes ()
 	local mapsideBoxes = "mapconfig/map_startboxes.lua"
 	local modsideBoxes = "LuaRules/Configs/StartBoxes/" .. (Game.mapName or "") .. ".lua"
@@ -33,43 +61,7 @@ local function ParseBoxes ()
 				box[3] = box[3]*Game.mapSizeX
 				box[4] = box[4]*Game.mapSizeZ
 
-				local longName = "Center"
-				local shortName = "Center"
-
-				if (midX < 0.33) then
-					if (midZ < 0.33) then
-						longName = "North-West"
-						shortName = "NW"
-					elseif (midZ > 0.66) then
-						longName = "South-West"
-						shortName = "SW"
-					else
-						longName = "West"
-						shortName = "W"
-					end
-				elseif (midX > 0.66) then
-					if (midZ < 0.33) then
-						longName = "North-East"
-						shortName = "NE"
-					elseif (midZ > 0.66) then
-						longName = "South-East"
-						shortName = "SE"
-					else
-						longName = "East"
-						shortName = "E"
-					end
-				else
-					if (midZ < 0.33) then
-						longName = "North"
-						shortName = "N"
-					elseif (midZ > 0.66) then
-						longName = "South"
-						shortName = "S"
-					else
-						longName = "Center"
-						shortName = "Center"
-					end
-				end
+				local longName, shortName = GetStartboxName(midX, midZ)
 
 				startBoxConfig[id] = {
 					boxes = {{

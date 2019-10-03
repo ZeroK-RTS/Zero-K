@@ -68,3 +68,10 @@ function Spring.Utilities.CheckBit(name, number, bit)
 	return number and (number%(2*bit) >= bit)
 end
 
+function Spring.Utilities.IsBitSet(number, bit)
+	return number and (number%(2*bit) >= bit)
+end
+
+function Spring.Utilities.AndBit(number, bit)
+	return number + ((Spring.Utilities.IsBitSet(number, bit) and 0) or bit)
+end

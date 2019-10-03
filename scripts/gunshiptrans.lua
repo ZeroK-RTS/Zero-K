@@ -1,4 +1,4 @@
-local base = piece 'base' 
+local base = piece 'base'
 
 
 --New bits
@@ -37,10 +37,10 @@ local function openDoors()
 	Turn(rUpperCl1,z_axis, math.rad(140), 6)
 	Sleep(100)
 									 
-	Turn(lUpperCl2,z_axis, math.rad(-140),6)	
+	Turn(lUpperCl2,z_axis, math.rad(-140),6)
 	Turn(rUpperCl2,z_axis, math.rad(140), 6)
-	WaitForTurn(lUpperCl1, z_axis) 
-	WaitForTurn(rUpperCl1, z_axis) 
+	WaitForTurn(lUpperCl1, z_axis)
+	WaitForTurn(rUpperCl1, z_axis)
 	WaitForTurn(lUpperCl2, z_axis)
 	WaitForTurn(rUpperCl2, z_axis)
 	doorOpen = true
@@ -54,11 +54,11 @@ function closeDoors()
 	Turn(rUpperCl1,z_axis, math.rad(0),4)
 	Sleep(100)
 
-	Turn(lUpperCl2,z_axis, math.rad(0),4)	
+	Turn(lUpperCl2,z_axis, math.rad(0),4)
 	Turn(rUpperCl2,z_axis, math.rad(0),4)
 
 	WaitForTurn(lUpperCl1, z_axis)
-	WaitForTurn(rUpperCl1, z_axis)	
+	WaitForTurn(rUpperCl1, z_axis)
 	WaitForTurn(lUpperCl2, z_axis)
 	WaitForTurn(rUpperCl2, z_axis)
 	doorOpen = false
@@ -83,13 +83,13 @@ function ForceDropUnit()
 end
 
 --fetch unit id of passenger (from the load command)
-function getPassengerId() 
+function getPassengerId()
 	local cmd = Spring.GetCommandQueue(unitID, 1)
-	local unitId = nil	
+	local unitId = nil
 	
-	if cmd and cmd[1] then					
+	if cmd and cmd[1] then
 		if cmd[1]['id'] == 75 then -- CMDTYPE.LOAD_UNITS = 75
-			unitId = cmd[1]['params'][1]				
+			unitId = cmd[1]['params'][1]
 		end
 	end
 	
@@ -98,15 +98,15 @@ end
 
 
 --fetch id of command
-function getCommandId() 
+function getCommandId()
 	local cmd=Spring.GetCommandQueue(unitID, 1)
-	if cmd and cmd[1] then		
-		return cmd[1]['id']		
+	if cmd and cmd[1] then
+		return cmd[1]['id']
 	end
 	return nil
 end
 
-function getDropPoint() 
+function getDropPoint()
 	local cmd = Spring.GetCommandQueue(unitID, 1)
 	if cmd and cmd[1] and cmd[1].id == 81 then -- CMDTYPE.LOAD_UNITS = 75
 		return cmd[1]['params'][1], cmd[1]['params'][2], cmd[1]['params'][3]
@@ -133,11 +133,11 @@ function isNearPickupPoint(passengerId, requiredDist)
 	local dz = pz2 - pz
 	local dist = (dx^2 + dz^2)
 	
-	if dist < requiredDist^2 then	
+	if dist < requiredDist^2 then
 		return true
 	else
 		return false
-	end	
+	end
 end
 
 
@@ -156,18 +156,18 @@ function isNearDropPoint(transportUnitId, requiredDist)
 	end
 	
 	local dx = px - px2
-	local dz = pz - pz2 
+	local dz = pz - pz2
 	local dist = (dx^2 + dz^2)
 	
 	if dist < requiredDist^2 then
 		return true
 	else
 		return false
-	end	
+	end
 end
 
 function isValidCargo(soonPassenger, passenger)
-	return ((soonPassenger and Spring.ValidUnitID(soonPassenger)) or 
+	return ((soonPassenger and Spring.ValidUnitID(soonPassenger)) or
 	(passenger and Spring.ValidUnitID(passenger)))
 end
 
@@ -210,8 +210,8 @@ function script.MoveRate(curRate)
 end
 
 function script.BeginTransport(passengerID)
-	if loaded then 
-		return 
+	if loaded then
+		return
 	end
 	Move(link, y_axis, -Spring.GetUnitHeight(passengerID), nil, true)
 	
@@ -235,7 +235,7 @@ end
 
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(PickupAndDropFixer)
 end
 
@@ -253,13 +253,13 @@ end
 
 -- note x, y z is in worldspace
 --function script.TransportDrop(passengerID, x, y, z)
-function script.EndTransport() 
+function script.EndTransport()
 	--StartThread(openDoors)
 	if (unitLoaded ~= nil) then
 		DropUnit(unitLoaded)
 		unitLoaded = nil
 	end
-	loaded = false	
+	loaded = false
 	SetUnitValue(COB.BUSY, 0)
 	Sleep(500)
 	StartThread(closeDoors)

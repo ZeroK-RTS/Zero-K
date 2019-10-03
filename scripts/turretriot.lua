@@ -45,7 +45,7 @@ function Unstunned(stun_type)
 end
 
 function script.Create()
-	StartThread (GG.Script.SmokeUnit, smokePiece)
+	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn (ejector, y_axis, math.rad(-90))
 end
 

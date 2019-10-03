@@ -58,7 +58,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	if not aircraftDefIDs[unitDefID] then
 		return
 	end
-	if (not recentDamage[unitID]) or select(3, spGetUnitIsStunned(unitID)) then 
+	if (not recentDamage[unitID]) or select(3, spGetUnitIsStunned(unitID)) then
 		return
 	end
 	--Spring.Echo("Plane damaged")
@@ -67,8 +67,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	if spGetUnitHealth(unitID) < 0 then
 		--Spring.Echo("Plane shot down")
 		local rDam = 0
-		for frame, damage in pairs(recentDamage[unitID] or {}) do
-			rDam = rDam + damage
+		for frame, recentDamageInstance in pairs(recentDamage[unitID] or {}) do
+			rDam = rDam + recentDamageInstance
 		end
 		local maxHealth = aircraftDefIDs[unitDefID]
 		local severity = rDam/maxHealth
@@ -83,7 +83,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 			if GG.AircraftCrashingDown then
 				GG.AircraftCrashingDown(unitID) --send event to unit_bomber_command.lua to cancel any airpad reservation hold by this airplane
 			end
-		end	
+		end
 		recentDamage[unitID] = nil	-- no longer need to track this plane
 	end
 end
@@ -93,8 +93,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-	if (not aircraftDefIDs[unitDefID]) or select(3, spGetUnitIsStunned(unitID)) then 
-		return 
+	if (not aircraftDefIDs[unitDefID]) or select(3, spGetUnitIsStunned(unitID)) then
+		return
 	end
 	recentDamage[unitID] = {}
 end

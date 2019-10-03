@@ -43,9 +43,9 @@ local shot               = {} -- {id = shotID, unitID = ownerunitID, target = ta
 
 local AAunittypes        = {["turretmissile"] = 1, ["turretaaclose"] = 1, ["turretaafar"] = 1, ["turretaaheavy"] = 1} -- number = shot damage
 local IsAA = {
-	[UnitDefNames.turretmissile.id] = true, 
-	[UnitDefNames.turretaaclose.id] = true, 
-	[UnitDefNames.turretaafar.id] = true, 
+	[UnitDefNames.turretmissile.id] = true,
+	[UnitDefNames.turretaaclose.id] = true,
+	[UnitDefNames.turretaafar.id] = true,
 	[UnitDefNames.turretaaheavy.id] = true
 }
 
@@ -139,9 +139,9 @@ function gadget:Initialize()
     for i = 1,#WeaponDefs do
 	  local wd = WeaponDefs[i]
 	  if wd.name:find(unitname) then
-		for i = 1, #wd.damages do
-		  if damage < wd.damages[i] then
-		    damage = wd.damages[i]
+		for j = 1, #wd.damages do
+		  if damage < wd.damages[j] then
+		    damage = wd.damages[j]
 		  end
 		end
 	  end

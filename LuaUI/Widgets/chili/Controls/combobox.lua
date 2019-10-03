@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 
 --- ComboBox module
 
@@ -28,6 +28,7 @@ ComboBox = Button:Inherit{
 	maxDropDownWidth = 500,
 	minDropDownWidth = 50,
 	topHeight = 7,
+	noFont = false,
 }
 
 local ComboBoxWindow      = Window:Inherit{classname = "combobox_window", resizable = false, draggable = false, }
@@ -116,7 +117,7 @@ function ComboBox:MouseDown(x, y)
 					height = self.itemHeight,
 					fontsize = self.itemFontSize,
 					state = {focused = (i == self.selected), selected = (i == self.selected)},
-					OnMouseUp = { 
+					OnMouseUp = {
 						function()
 							if selectByName then
 								self:Select(item)
@@ -124,7 +125,7 @@ function ComboBox:MouseDown(x, y)
 								self:Select(i)
 							end
 							self:_CloseWindow()
-						end 
+						end
 					}
 				}
 				labels[#labels + 1] = newBtn

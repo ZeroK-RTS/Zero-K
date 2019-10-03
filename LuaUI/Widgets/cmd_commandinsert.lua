@@ -106,7 +106,7 @@ local function GetCommandPos(command) -- get the command position
 			else
 				return -10,-10,-10
 			end
-		end	
+		end
 	end
 	return -10,-10,-10
 end
@@ -137,6 +137,7 @@ local function ProcessCommand(id, params, options, sequence_order)
 	-- Redefine the way in which modifiers apply to Area- Repair and Rez
 	local ctrl = options.ctrl
 	local meta = options.meta
+
 	if ctrl and not meta and id == CMD.REPAIR then
 		-- Engine CTRL means "keep repairing even when being reclaimed" (now inaccessible)
 		-- Engine META means "only repair live units, don't assist construction" (now CTRL)
@@ -204,7 +205,7 @@ local function ProcessCommand(id, params, options, sequence_order)
 						insert_pos = j - 1
 					end
 					px, py, pz = px2, py2, pz2
-				end	 
+				end
 			end
 			-- check for insert at end of queue if its shortest walk.
 			local dlen = math.sqrt(((px-cx)^2) + ((py-cy)^2) + ((pz-cz)^2))

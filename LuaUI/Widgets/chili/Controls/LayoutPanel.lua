@@ -1,4 +1,4 @@
---// ============================================================================= 
+--// =============================================================================
 --// This control is the base of any auto-layout panel, this includes:
 --//   grid, stackpanel, tables, itemlistview, listbox, radiogroups, ...
 --//
@@ -70,13 +70,13 @@ LayoutPanel = Control:Inherit{
 	_rows = nil,
 	_columns = nil,
 	_cells = nil,
-	__nofont = true,
+	noFont = true,
 }
 
 local this = LayoutPanel
 local inherited = this.inherited
 
---// ============================================================================= 
+--// =============================================================================
 
 function LayoutPanel:New(obj)
 	obj = inherited.New(self, obj)
@@ -86,7 +86,7 @@ function LayoutPanel:New(obj)
 	return obj
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 --- Set the panel's orientation
 -- @string orientation new orientation
@@ -95,11 +95,11 @@ function LayoutPanel:SetOrientation(orientation)
 	inherited.UpdateClientArea(self)
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 local tsort = table.sort
 
---// ============================================================================= 
+--// =============================================================================
 
 local function compareSizes(a, b)
 	return a[2] < b[2]
@@ -327,7 +327,7 @@ function LayoutPanel:_AutoArrangeOrdinate(freeSpace)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function LayoutPanel:GetMaxWeight()
 	--// calculate max weights for each column and row
@@ -395,7 +395,7 @@ function LayoutPanel:_GetMaxChildConstraints(child)
 	return margin[1] + itemPadding[1], margin[2] + itemPadding[2], maxChildWidth, maxChildHeight
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function LayoutPanel:GetMinimumExtents()
 --[[
@@ -420,7 +420,7 @@ function LayoutPanel:GetMinimumExtents()
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 --// Note: there are two different layput functions depending on resizeItems
 
 function LayoutPanel:_LayoutChildrenResizeItems()
@@ -704,7 +704,7 @@ function LayoutPanel:_LayoutChildren()
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 function LayoutPanel:UpdateLayout()
 	if (not self.children[1]) then
@@ -738,7 +738,7 @@ function LayoutPanel:UpdateLayout()
 	return true
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function LayoutPanel:DrawBackground()
 end
@@ -809,7 +809,7 @@ function LayoutPanel:DrawChildrenForList()
 	self:_DrawChildrenInClientArea('DrawForList')
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function LayoutPanel:GetItemIndexAt(cx, cy)
 	local cells = self._cells
@@ -832,7 +832,7 @@ function LayoutPanel:GetItemXY(itemIdx)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================
 
 function LayoutPanel:MultiRectSelect(item1, item2, append)
 	--// note: this functions does NOT update self._lastSelected!
@@ -944,7 +944,7 @@ function LayoutPanel:DeselectAll()
 end
 
 
---// ============================================================================= 
+--// =============================================================================
 
 function LayoutPanel:MouseDown(x, y, button, mods)
 	local clickedChild = inherited.MouseDown(self, x, y, button, mods)
@@ -1003,4 +1003,4 @@ function LayoutPanel:MouseDblClick(x, y, button, mods)
 	end
 end
 
---// ============================================================================= 
+--// =============================================================================

@@ -16,7 +16,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[16]],
+    modelradius    = [[16]],
+    cus_noflashlight = 1,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -79,9 +80,9 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-		light_camera_height = 1200,
-		light_color = [[0.8 0.76 0.38]],
-		light_radius = 120,
+        light_camera_height = 1200,
+        light_color = [[0.8 0.76 0.38]],
+        light_radius = 120,
       },
 
       damage                  = {
@@ -98,7 +99,7 @@ unitDef = {
       noGap                   = false,
       noSelfDamage            = true,
       range                   = 185,
-      reloadtime              = 0.31,
+      reloadtime              = 0.3,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
       size                    = 1.75,

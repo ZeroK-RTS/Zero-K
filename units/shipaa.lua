@@ -21,8 +21,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[45]],
-	turnatfullspeed = [[1]],
+    modelradius    = [[45]],
+    turnatfullspeed = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -43,7 +43,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[shipaa.s3o]],
   radarDistance          = 1000,
-  script				 = [[shipaa.lua]],
+  script                 = [[shipaa.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 660,
   sonarDistance          = 660,
@@ -81,12 +81,12 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-		
-		light_camera_height = 2600,
-		light_radius = 220,
-	  },
+      customParams              = {
+        isaa = [[1]],
+        
+        light_camera_height = 2600,
+        light_radius = 220,
+      },
 
       damage                  = {
         default = 1.3,

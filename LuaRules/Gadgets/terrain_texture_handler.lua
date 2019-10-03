@@ -25,8 +25,6 @@ local BLOCK_SIZE = 8
 local spSetMapSquareTexture = Spring.SetMapSquareTexture
 local spGetMapSquareTexture = Spring.GetMapSquareTexture
 local spGetMyTeamID         = Spring.GetMyTeamID
-local spGetGroundHeight     = Spring.GetGroundHeight
-local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
 local floor = math.floor
 
 local SAVE_FILE = "Gadgets/terrain_texture_handler.lua"
@@ -84,8 +82,6 @@ else
 local glTexture = gl.Texture
 local glCreateTexture = gl.CreateTexture
 local glDeleteTexture = gl.DeleteTexture
-local CallAsTeam = CallAsTeam
-
 
 local TEXTURE_COUNT = 3
 local texturePool = {
@@ -234,7 +230,7 @@ function gadget:DrawGenesis()
 		for cx = cx1, cx2 do
 			if chunkMap[cx] and chunkMap[cx][cz] and not (chunkUpdateMap[cx] and chunkUpdateMap[cx][cz]) then --only process chunk that has been added by ChangeTextureBlock()
 				chunkUpdateMap[cx] = chunkUpdateMap[cx] or {}
-                chunkUpdateMap[cx][cz] = true 
+                chunkUpdateMap[cx][cz] = true
 				chunkUpdateList.count = chunkUpdateList.count + 1
 				chunkUpdateList.data[chunkUpdateList.count] = {x = cx, z = cz}
 				--Spring.MarkerAddPoint(x,0,z,"point triggered")
@@ -254,7 +250,7 @@ function gadget:DrawGenesis()
 		--gl.DepthMask(false)
 		--gl.DepthTest(false)
 		--gl.Color(1,1,1,1)
-		--gl.AlphaTest(false)	
+		--gl.AlphaTest(false)
 		
 		gl.ResetState()
 		gl.ResetMatrices()
@@ -278,33 +274,41 @@ function gadget:DrawGenesis()
 				if not mapTex[sx] then
 					mapTex[sx] = {}
 				end
+				
 				if not mapTex[sx][sz] then
-					mapTex[sx][sz] = {
-						cur = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
-							wrap_s = GL.CLAMP_TO_EDGE, 
-							wrap_t = GL.CLAMP_TO_EDGE,
-							fbo = true,
-							min_filter = GL.LINEAR_MIPMAP_NEAREST,
-						}),
-						orig = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
-							wrap_s = GL.CLAMP_TO_EDGE, 
-							wrap_t = GL.CLAMP_TO_EDGE,
-							fbo = true,
-						}),
-					}
-					if mapTex[sx][sz].orig and mapTex[sx][sz].cur then
-						spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].orig)
-						--spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].cur)
-						gl.Texture(mapTex[sx][sz].orig)
-						gl.RenderToTexture(mapTex[sx][sz].cur, drawCopySquare)
+					if GG.mapgen_squareTexture and GG.mapgen_squareTexture[sx] and GG.mapgen_squareTexture[sx][sz] 
+							and GG.mapgen_currentTexture and GG.mapgen_currentTexture[sx] and GG.mapgen_currentTexture[sx][sz] then
+						mapTex[sx][sz] = {
+							orig = GG.mapgen_squareTexture[sx][sz],
+							cur  = GG.mapgen_currentTexture[sx][sz],
+						}
 					else
-						if mapTex[sx][sz].cur then
-							gl.DeleteTextureFBO(mapTex[sx][sz].cur)
+						mapTex[sx][sz] = {
+							cur = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
+								wrap_s = GL.CLAMP_TO_EDGE,
+								wrap_t = GL.CLAMP_TO_EDGE,
+								fbo = true,
+								min_filter = GL.LINEAR_MIPMAP_NEAREST,
+							}),
+							orig = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
+								wrap_s = GL.CLAMP_TO_EDGE,
+								wrap_t = GL.CLAMP_TO_EDGE,
+								fbo = true,
+							}),
+						}
+						if mapTex[sx][sz].orig and mapTex[sx][sz].cur then
+							spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].orig)
+							gl.Texture(mapTex[sx][sz].orig)
+							gl.RenderToTexture(mapTex[sx][sz].cur, drawCopySquare)
+						else
+							if mapTex[sx][sz].cur then
+								gl.DeleteTextureFBO(mapTex[sx][sz].cur)
+							end
+							if mapTex[sx][sz].orig then
+								gl.DeleteTextureFBO(mapTex[sx][sz].orig)
+							end
+							mapTex[sx][sz] = nil
 						end
-						if mapTex[sx][sz].orig then
-							gl.DeleteTextureFBO(mapTex[sx][sz].orig)
-						end
-						mapTex[sx][sz] = nil
 					end
 				end
 				
@@ -318,12 +322,12 @@ function gadget:DrawGenesis()
 							count = 0,
 							data = {}
 						}
-					end	
+					end
 					
 					local toTex = toTexture[tex]
 					toTex.count = toTex.count + 1
 					toTex.data[toTex.count] = {x = x, z = z, sx = sx, sz = sz}
-				else 
+				else
 					-- Restore Texture
 					if blockStateMap[x] then
 						blockStateMap[x][z] = nil

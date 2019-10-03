@@ -73,7 +73,7 @@ local function Open()
 end
 
 local function AimBlink()
-	while true do 
+	while true do
 		EmitSfx(aimProxy, 1024)
 		Sleep(200)
 	end
@@ -89,8 +89,8 @@ local function Close()
 	
 	Move(barrel1,y_axis,1,2);
 	Move(barrel2,y_axis,1,2);
-	Move(barrel3,y_axis,1,2); 
-		
+	Move(barrel3,y_axis,1,2);
+	
 	Turn(wheel, x_axis, math.rad(-15),math.rad(90));
 	Turn(cannon, x_axis, math.rad(65),math.rad(90));
 	
@@ -128,10 +128,10 @@ function RestoreAfterDelay()
 	Sleep(restore_delay);
 	
 	repeat
-			local inactive = spGetUnitIsStunned(unitID)
-			if inactive then
-					Sleep(restore_delay)
-			end
+		local inactive = spGetUnitIsStunned(unitID)
+		if inactive then
+			Sleep(restore_delay)
+		end
 	until not inactive
 	
 	StartThread(Close);
@@ -151,9 +151,9 @@ end
 
 function script.Create()
 	is_open = true;
-		
+	
 	--StartThread(AimBlink);
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(RestoreAfterDelay);
 
 	Hide(legs);
@@ -181,11 +181,11 @@ end
 
 
 function script.QueryWeapon(n)
-	return (is_open and muzzle) or muzzleProxy
+	return muzzleProxy
 end
 
-function script.AimFromWeapon(n) 
-	return aimProxy 
+function script.AimFromWeapon(n)
+	return aimProxy
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -193,6 +193,9 @@ function script.AimWeapon(num, heading, pitch)
 	SetSignalMask(aim)
 	
 	Turn(belt, z_axis, heading, math.rad(200));
+
+	-- instantly turn the actual sim gun towards target, then wait for the visual pieces to animate
+	Turn(aimProxy, x_axis, -pitch); 
 	
 	if (not is_open) then
 		StartThread(Open);
@@ -214,11 +217,11 @@ function script.AimWeapon(num, heading, pitch)
 	
 	StartThread(RestoreAfterDelay);
 
-	return is_open;	
+	return is_open;
 end
 
 function script.FireWeapon(n)
-	EmitSfx(muzzle, 1024)
+	EmitSfx(muzzleProxy, 1024)
 	Move(barrel1,y_axis,1,5);
 	Move(barrel2,y_axis,1,7);
 	Move(barrel3,y_axis,1,9);
@@ -248,7 +251,7 @@ function script.Killed(recentDamage, maxHealth)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
 		return 1 -- corpsetype
-	else		
+	else
 		return 2 -- corpsetype
 	end
 end

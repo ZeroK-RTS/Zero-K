@@ -18,7 +18,7 @@ unitDef = {
 
   customParams        = {
     fireproof      = [[1]],
-	specialreloadtime = [[850]],
+    specialreloadtime = [[850]],
     aimposoffset      = [[0 5 0]],
   },
 
@@ -57,8 +57,8 @@ unitDef = {
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER GUNSHIP]],
     },
-	
-	--{
+    
+    --{
     --  def                = [[BOGUS_FAKE_NAPALM_BOMBLET]],
     --  badTargetCategory  = [[GUNSHIP]],
     --  onlyTargetCategory = [[]],
@@ -80,20 +80,20 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        	  = {
-	    setunitsonfire = "1",
-		burnchance     = "1",
-		burntime       = 60,
+      customParams              = {
+        setunitsonfire = "1",
+        burnchance     = "1",
+        burntime       = 60,
 
-		area_damage = 1,
-		area_damage_radius = 108,
-		area_damage_dps = 36,
-		area_damage_duration = 16,
-		
-		light_color = [[1.6 0.8 0.32]],
-		light_radius = 320,
-	  },
-	  
+        area_damage = 1,
+        area_damage_radius = 108,
+        area_damage_dps = 36,
+        area_damage_duration = 16,
+        
+        light_color = [[1.6 0.8 0.32]],
+        light_radius = 320,
+      },
+      
       damage                  = {
         default = 70,
         planes  = 70,
@@ -119,22 +119,23 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 800,
     },
-	
-	BOGUS_FAKE_NAPALM_BOMBLET = {
+    
+    BOGUS_FAKE_NAPALM_BOMBLET = {
       name                    = [[Fake Flame Bomb]],
-	  accuracy				  = 1000,
+      accuracy                = 1000,
       areaOfEffect            = 64,
-	  canattackground         = false,
+      canattackground         = false,
       craterBoost             = 0,
       craterMult              = 0,
       cegTag                  = [[flamer]],
 
-	  customParams        	  = {
-	    setunitsonfire = "1",
-		burnchance = 0.8,
-		burntime = 600,
-	  },
-	  
+      customParams            = {
+        setunitsonfire = "1",
+        burnchance = 0.8,
+        burntime = 600,
+        bogus = 1,
+      },
+      
       damage                  = {
         default = 20,
         planes  = 20,
@@ -144,12 +145,12 @@ unitDef = {
       explosionGenerator      = [[custom:napalm_koda_small]],
       fireStarter             = 65,
       flameGfxTime            = 0.1,
-	  flightTime              = 0.1,
+      flightTime              = 0.1,
       impulseBoost            = 0,
       impulseFactor           = 0.2,
       interceptedByShieldType = 2,
       model                   = [[wep_b_fabby.s3o]],
-	  myGravity               = 0.5,
+      myGravity               = 0.5,
       projectiles             = 1,
       range                   = 0,
       reloadtime              = 6,
@@ -158,13 +159,13 @@ unitDef = {
       soundHitVolume          = 4,
       soundStart              = [[weapon/cannon/cannon_fire3]],
       --soundStartVolume        = 2,
-	  soundTrigger			  = false,
+      soundTrigger              = false,
       sprayangle              = 300,
       startVelocity           = 10,
       texture2                = [[darksmoketrail]],
-	  tracks                  = false,
+      tracks                  = false,
       trajectoryHeight        = 0.2,
-	  turnrate                = 500,
+      turnrate                = 500,
       turret                  = true,
       weaponAcceleration      = 190,
       weaponType              = [[MissileLauncher]],

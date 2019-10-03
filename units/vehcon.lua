@@ -22,8 +22,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	modelradius    = [[20]],
-	selection_scale = 1.2,
+    modelradius    = [[20]],
+    selection_scale = 1.2,
+    cus_noflashlight = 1,
   },
 
   energyUse              = 0,

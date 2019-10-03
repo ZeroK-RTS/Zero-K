@@ -54,7 +54,7 @@ local SIG_Aim = 4
 local SIG_Aim2 = 8
 local SIG_Aim3 = 16
 local SIG_Idle = 32
-local armgun = false
+local armGunIsR = false
 local missilegun = 1
 local PACE = 1.25
 
@@ -102,10 +102,10 @@ local reloadTimeShort = wd and WeaponDefs[wd].reload*30 or 30
 --------------------------------------------------------------------------------
 function script.Create()
 	Turn(larm, z_axis, -0.1)
-	Turn(rarm, z_axis, 0.1)	
+	Turn(rarm, z_axis, 0.1)
 	Turn(lmissileflare, z_axis, math.rad(-90))
-	Turn(rmissileflare, z_axis, math.rad(-90))	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	Turn(rmissileflare, z_axis, math.rad(-90))
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function IdleAnim()
@@ -114,14 +114,14 @@ local function IdleAnim()
 	Sleep(12000)
 	while true do
 		local shoulder, arm, lclaw, rclaw
-		if armgun then
+		if armGunIsR then
 			shoulder, arm, lclaw, rclaw = larm, larmgun, larm_lgunclaw, larm_rgunclaw
 			Turn(head, y_axis, math.rad(30), math.rad(60))
 		else
 			shoulder, arm, lclaw, rclaw = rarm, rarmgun, rarm_lgunclaw, rarm_rgunclaw
 			Turn(head, y_axis, math.rad(-30), math.rad(60))
 		end
-		armgun = not armgun
+		armGunIsR = not armGunIsR
 		Turn(arm, x_axis, math.rad(-20), math.rad(45))
 		Turn(shoulder, x_axis, math.rad(-20), math.rad(45))
 		Sleep(2000)
@@ -145,10 +145,10 @@ local function Step(frontLeg, backLeg)
 		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i])
 		Turn(backLeg[i], x_axis, LEG_BACK_ANGLES[i], LEG_BACK_SPEEDS[i])
 	end
-	
+
 	--lower body at extended stride
 	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED)
-	
+
 	-- swing arms and body
 	if not(isFiring) then
 		if (frontLeg == leftLeg) then
@@ -178,10 +178,10 @@ local function Step(frontLeg, backLeg)
 		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i])
 		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i])
 	end
-	
+
 	-- raise body as leg passes underneath
 	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED)
-	
+
 	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
 		WaitForTurn(backLeg[i], x_axis)
@@ -189,7 +189,7 @@ local function Step(frontLeg, backLeg)
 end
 
 local function Passing(frontLeg, backLeg)
-	
+
 end
 
 
@@ -271,10 +271,10 @@ local function missilelaunch()
 end
 
 local function armrecoil()
-	if armgun then
+	if not armGunIsR then
 		EmitSfx(larmflare, 1024)
 		EmitSfx(larmflare, 1025)
-		
+
 		Move(larmgun, z_axis, -6)
 		Turn(larm_lgunclaw, y_axis, math.rad(45))
 		Turn(larm_rgunclaw, y_axis, math.rad(-45))
@@ -285,7 +285,7 @@ local function armrecoil()
 	else
 		EmitSfx(rarmflare, 1024)
 		EmitSfx(rarmflare, 1025)
-		
+
 		Move(rarmgun, z_axis, -6)
 		Turn(rarm_lgunclaw, y_axis, math.rad(45))
 		Turn(rarm_rgunclaw, y_axis, math.rad(-45))
@@ -294,14 +294,16 @@ local function armrecoil()
 		Turn(rarm_lgunclaw, y_axis, 0, 0.5)
 		Turn(rarm_rgunclaw, y_axis, 0, 0.5)
 	end
+	Sleep(33)
+	armGunIsR = not armGunIsR
 end
 
 function script.QueryWeapon(num)
 	if num == 1 then
 		return headflare
 	elseif num == 2 then
-		if armgun then return larmflare
-		else return rarmflare end	
+		if armGunIsR then return rarmflare
+		else return larmflare end
 	elseif num == 3 then
 		if missilegun == 1 then
 			return lmissiles
@@ -348,14 +350,14 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_Aim2)
 		SetSignalMask(SIG_Aim2)
 		isFiring = true
-		
+
 		Turn(torso, y_axis, heading, 3)
 		Turn(larm, x_axis, -pitch, 3)
 		Turn(rarm, x_axis, -pitch, 3)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
 		StartThread(RestoreAfterDelay)
-		return true	
+		return true
 	elseif num == 3 then
 		return true
 	end
@@ -365,14 +367,9 @@ end
 
 function script.Shot(num)
 	if num == 2 then
-		armgun = not armgun
 		StartThread(armrecoil)
 	elseif num == 3 then
-		if missilegun < 2 then
-			missilegun = missilegun+1
-		else
-			missilegun = 1
-		end
+		missilegun = (missilegun % 2) + 1
 		StartThread(missilelaunch)
 	end
 end
@@ -391,9 +388,9 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(lmissiles, SFX.SHATTER)
 		Explode(rmissiles, SFX.SHATTER)
 		Turn(torso, y_axis, 0, 50)
-		Turn(rarmgun, y_axis, 30, 20)	
+		Turn(rarmgun, y_axis, 30, 20)
 		Turn(larmgun, y_axis, 30, 20)
-		
+
 		GG.Script.InitializeDeathAnimation(unitID)
 		Sleep(800)
 		return 1 -- corpsetype

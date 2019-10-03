@@ -39,18 +39,18 @@ include "LuaRules/Configs/customcmds.h.lua"
 
 local airpadDefs = {
 	[UnitDefNames["factoryplane"].id] = {
-		mobile = false, 
-		cap = 1, 
+		mobile = false,
+		cap = 1,
 		padPieceName={"land"}
 	},
 	[UnitDefNames["staticrearm"].id] = {
-		mobile = false, 
-		cap = 4, 
+		mobile = false,
+		cap = 4,
 		padPieceName={"land1","land2","land3","land4"}
 	},
 	[UnitDefNames["shipcarrier"].id] = {
-		mobile = true, 
-		cap = 2, 
+		mobile = true,
+		cap = 2,
 		padPieceName={"LandingFore","LandingAft"}
 	},
 }
@@ -89,7 +89,7 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetUnitsInBox	= Spring.GetUnitsInBox
 local spGetUnitPieceMap = Spring.GetUnitPieceMap
 local spGetUnitPosition = Spring.GetUnitPosition
-local spGetUnitPiecePosition = Spring.GetUnitPiecePosition 
+local spGetUnitPiecePosition = Spring.GetUnitPiecePosition
 local spGetUnitVectors = Spring.GetUnitVectors
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetCommandQueue = Spring.GetCommandQueue
@@ -231,7 +231,7 @@ local function RefreshEmptyPad(airpadID,airpadDefID)
 			local somethingOnThePad = spGetUnitsInBox(uxx-20,uyy-20,uzz-20, uxx+20,uyy+20,uzz+20)
 			local unit1 = somethingOnThePad[1]
 			local unit2 = somethingOnThePad[2]
-			if (#somethingOnThePad == 1 and unit1== airpadID) or 
+			if (#somethingOnThePad == 1 and unit1== airpadID) or
 			(#somethingOnThePad == 0) then
 				airpadsData[airpadID].emptySpot[#airpadsData[airpadID].emptySpot+1] = pieceNum; --Spring.MarkerAddPoint(uxx,uyy,uzz, "O")
 			end
@@ -450,8 +450,8 @@ local function CancelAirpadReservation(unitID)
 	end
 
 	--Spring.Echo("Clearing reservation by "..unitID.." at pad "..targetPad)
-	if not airpadsData[targetPad] then 
-		return 
+	if not airpadsData[targetPad] then
+		return
 	end
 	local reservations = airpadsData[targetPad].reservations
 	if reservations.units[unitID] then
@@ -533,7 +533,7 @@ function gadget:GameFrame(n)
 		for bomberID, data in pairs(bomberToPad) do
 			local padID = data.padID
 			local unitDefID = data.unitDefID
-			if (Spring.Utilities.GetUnitFirstCommand(bomberID) == CMD_REARM) and 
+			if (Spring.Utilities.GetUnitFirstCommand(bomberID) == CMD_REARM) and
 					((Spring.GetUnitSeparation(bomberID, padID, true) or 1000) < ((unitDefID and airDefs[unitDefID] and airDefs[unitDefID].padRadius) or DEFAULT_PAD_RADIUS)) then
 				if not airpadRefreshEmptyspot then
 					RefreshEmptyspot_minusBomberLanding() --initialize empty pad count once
@@ -544,7 +544,7 @@ function gadget:GameFrame(n)
 					if spotCount>0 then
 						local padPiece = airpadsData[padID].emptySpot[spotCount]
 						table.remove(airpadsData[padID].emptySpot) --remove used spot
-						if Spring.Utilities.GetUnitRepeat(bomberID) then 
+						if Spring.Utilities.GetUnitRepeat(bomberID) then
 							cmdIgnoreSelf = true
 							-- InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
 							spGiveOrderToUnit(bomberID, CMD.INSERT, {-1, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, CMD.OPT_ALT) --Internal to avoid repeat
@@ -571,7 +571,7 @@ function gadget:GameFrame(n)
 		for unitID in pairs(bomberUnitIDs) do -- CommandFallback doesn't seem to activate for inbuilt commands!!! <-- What this really mean?
 			if spGetUnitRulesParam(unitID, "noammo") == 1 then
 				local cmdID = Spring.Utilities.GetUnitFirstCommand(unitID)
-				if (not cmdID) or combatCommands[cmdID] then --should never happen... (all should be catch by AllowCommand) 
+				if (not cmdID) or combatCommands[cmdID] then --should never happen... (all should be catch by AllowCommand)
 					RequestRearm(unitID, nil, true)
 				end
 			end
@@ -580,7 +580,7 @@ function gadget:GameFrame(n)
 end
 
 function GG.RequireRefuel(bomberID)
-	return (spGetUnitRulesParam(bomberID, "noammo") == 2) 
+	return (spGetUnitRulesParam(bomberID, "noammo") == 2)
 end
 
 function GG.RefuelComplete(bomberID)
@@ -598,7 +598,7 @@ function GG.LandComplete(bomberID)
 	-- Check queue inheritence
 	local queueLength = spGetCommandQueue(bomberID, 0)
 	local cmdID = Spring.Utilities.GetUnitFirstCommand(bomberID)
-	if (queueLength == 0 or (queueLength == 1 and (cmdID == CMD_REARM or cmdID == 0))) and 
+	if (queueLength == 0 or (queueLength == 1 and (cmdID == CMD_REARM or cmdID == 0))) and
 			(padID and airpadsData[padID] and not airpadsData[padID].mobile) then
 		local padQueueLength = spGetCommandQueue(padID, 0)
 		if padQueueLength > 0 then
@@ -680,7 +680,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
 		if ((cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and not cmdOptions.shift and health > maxHealth - 1) then
 			return false  -- don't rearm unless damaged or need ammo
-		end	
+		end
 	elseif noAmmo == 2 or noAmmo==3 then
 		if (cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and not cmdOptions.shift then
 			return false --don't find new pad if already on the pad currently refueling or repairing.
@@ -704,7 +704,7 @@ end
 
 -- not worth the system resources until bombers using reverse built pads is fixed for real
 --[[
-function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
+function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	if step < 0 and airpadsData[unitID] and select(5,Spring.GetUnitHealth(unitID)) == 1 then
 		gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
@@ -717,7 +717,6 @@ else
 -- UNSYNCED
 --------------------------------------------------------------------------------
 local spGetLocalTeamID = Spring.GetLocalTeamID
-local spAreTeamsAllied = Spring.AreTeamsAllied
 local spGetSpectatingState = Spring.GetSpectatingState
 local spValidUnitID = Spring.ValidUnitID
 local spGetSelectedUnits = Spring.GetSelectedUnits

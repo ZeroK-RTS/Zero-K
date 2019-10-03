@@ -56,7 +56,7 @@ local function CheckClimb(unitID, unitData)
 	
 	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
 	
-	if y - unitData.y > unitData.def.maxClimb or Spring.GetGroundHeight(x + vx*UPDATE_PERIOD, z + vz*UPDATE_PERIOD) > y + math.max(0, vz*UPDATE_PERIOD) then
+	if y - unitData.y > unitData.def.maxClimb or Spring.GetGroundHeight(x + vx*UPDATE_PERIOD, z + vz*UPDATE_PERIOD) > y + math.max(0, vy*UPDATE_PERIOD) then
 		unitData.x, unitData.y, unitData.z = x, y + unitData.def.speedCap, z
 		Spring.SetUnitVelocity(unitID, vx*0.1, unitData.def.speedCap, vz*0.1)
 		return
@@ -72,7 +72,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if gunshipDef[unitDefID] then
 		local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
-		gunships.Add(unitID, 
+		gunships.Add(unitID,
 			{
 				unitDefID = unitDefID,
 				def = gunshipDef[unitDefID],

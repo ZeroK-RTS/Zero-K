@@ -50,7 +50,7 @@ local function new(class, comp)
         comp = comp or f_min,
         kv={},
         kvEnd=0,
-        kvStart=1, 
+        kvStart=1,
         invKey={}
   }, class)
 end

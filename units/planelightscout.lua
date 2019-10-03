@@ -3,7 +3,7 @@ unitDef = {
   name                = [[Sparrow]],
   description         = [[Light Scout Plane]],
   brakerate           = 0.4,
-  buildCostMetal      = 120,
+  buildCostMetal      = 235,
   builder             = false,
   buildPic            = [[planelightscout.png]],
   canFly              = true,
@@ -21,7 +21,7 @@ unitDef = {
 
   customParams        = {
     modelradius    = [[8]],
-    refuelturnradius = [[160]],
+    refuelturnradius = [[130]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -32,19 +32,19 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maxAcc              = 0.5,
-  maxDamage           = 400,
-  maxAileron          = 0.018,
-  maxElevator         = 0.02,
-  maxRudder           = 0.008,
-  maxVelocity         = 7.5,
+  maxDamage           = 350,
+  maxAileron          = 0.016,
+  maxElevator         = 0.022,
+  maxRudder           = 0.012,
+  maxVelocity         = 7,
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  objectName          = [[fairlight.s3o]],
+  objectName          = [[planelightscout.s3o]],
   script              = [[planelightscout.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 950,
-  turnRadius          = 70,
+  turnRadius          = 50,
   workerTime          = 0,
 
   featureDefs         = {
@@ -54,7 +54,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[debris2x2a.s3o]],
+      object           = [[planelightscout_dead.s3o]],
     },
 
 

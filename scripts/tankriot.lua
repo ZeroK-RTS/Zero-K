@@ -165,10 +165,13 @@ local function ReloadThread(missile)
 end
 
 function script.FireWeapon()
-	currentMissile = 3 - currentMissile
 	StartThread(ReloadThread, currentMissile)
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FIRE_FORCE)
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], gunHeading - hpi, ROCK_FIRE_FORCE)
+end
+
+function script.EndBurst()
+	currentMissile = 3 - currentMissile
 end
 
 function script.BlockShot(num, targetID)
@@ -185,8 +188,8 @@ function script.Create()
 
 	Move (missiles[1], z_axis, 0.5)
 	Move (missiles[2], z_axis, 0.5)
-	
-	StartThread (GG.Script.SmokeUnit, smokePiece)
+
+	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Killed (recentDamage, maxHealth)
@@ -196,8 +199,8 @@ function script.Killed (recentDamage, maxHealth)
 		if (math.random() < 2*severity) then Explode (missiles[2], SFX.FALL + SFX.SMOKE) end
 		return 1
 	elseif (severity < 0.75) then
-		if (math.random() < severity) then 
-			Explode (turret, SFX.FALL) 
+		if (math.random() < severity) then
+			Explode (turret, SFX.FALL)
 		end
 		Explode(sleeve, SFX.FALL)
 		Explode(trackData.tracks[1], SFX.SHATTER)

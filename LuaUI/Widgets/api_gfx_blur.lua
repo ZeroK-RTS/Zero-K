@@ -131,7 +131,7 @@ end
 --------------------------------------------------------------------------------
 
 local function DrawStencilTexture()
-  if (next(BlurRects)) then 
+  if (next(BlurRects)) then
     if (stenciltex == nil)or(vsx+vsy~=oldvs) then
       gl.DeleteTextureFBO(stenciltex)
 
@@ -150,7 +150,7 @@ local function DrawStencilTexture()
         widgetHandler:RemoveWidget()
         return false
       end
-    end 
+    end
   else
     gl.RenderToTexture(stenciltex, gl.Clear, GL.COLOR_BUFFER_BIT ,0,0,0,0)
     return
@@ -242,7 +242,7 @@ function widget:Initialize()
 
   -- create blur shaders
   blurShader = gl.CreateShader({
-    fragment = "uniform sampler2D tex2; " .. str_blurShader_part1 .. 
+    fragment = "uniform sampler2D tex2; " .. str_blurShader_part1 ..
                " float stencil = texture2D(tex2, texCoord).a; if (stencil<0.01) {gl_FragColor = texture2D(tex0, texCoord); return;} " ..
                str_blurShader_part2,
     uniformInt = {
@@ -272,7 +272,7 @@ function widget:Initialize()
 
   -- create noise shaders
   noiseShader = gl.CreateShader({
-    fragment = "uniform sampler2D tex1; uniform sampler2D tex2; " .. str_blurShader_part1 .. 
+    fragment = "uniform sampler2D tex1; uniform sampler2D tex2; " .. str_blurShader_part1 ..
                " float stencil = texture2D(tex2, texCoord).a; if (stencil<0.01) {gl_FragColor = texture2D(tex0, texCoord); return;} " ..
                str_noiseShader_part2,
     uniformInt = {

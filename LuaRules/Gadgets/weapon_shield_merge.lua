@@ -7,12 +7,12 @@ end
 --------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
-		name = "Shield Merge",
-		desc = "Implements shields as if they had a large shared battery between adjacent shields.",
-		author = "GoogleFrog",
-		date = "30 July 2016",
+		name    = "Shield Merge",
+		desc    = "Implements shields as if they had a large shared battery between adjacent shields.",
+		author  = "GoogleFrog",
+		date    = "30 July 2016",
 		license = "None",
-		layer = 100,
+		layer   = 100,
 		enabled = true
 	}
 end
@@ -22,12 +22,12 @@ local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local spGetUnitPosition		= Spring.GetUnitPosition
-local spGetUnitDefID		= Spring.GetUnitDefID
-local spGetUnitTeam			= Spring.GetUnitTeam
-local spGetTeamInfo			= Spring.GetTeamInfo
-local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
-local spGetUnitIsStunned	= Spring.GetUnitIsStunned
+local spGetUnitPosition  = Spring.GetUnitPosition
+local spGetUnitDefID     = Spring.GetUnitDefID
+local spGetUnitTeam      = Spring.GetUnitTeam
+local spGetTeamInfo      = Spring.GetTeamInfo
+local spGetUnitAllyTeam  = Spring.GetUnitAllyTeam
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
 local modOptions = Spring.GetModOptions()
 local MERGE_ENABLED = (modOptions.shield_merge == "share")
@@ -39,8 +39,10 @@ local allyTeamShields = {}
 local gameFrame = 0
 
 local shieldDamages = {}
+local defaultShielDamages = {}
 for i = 1, #WeaponDefs do
 	shieldDamages[i] = tonumber(WeaponDefs[i].customParams.shield_damage)
+	defaultShielDamages[i] = WeaponDefs[i].damages[SHIELD_ARMOR]
 end
 
 --------------------------------------------------------------------------------
@@ -52,7 +54,7 @@ local function ShieldsAreTouching(shield1, shield2)
 	local zDiff = shield1.z - shield2.z
 	local yDiff = shield1.y - shield2.y
 	local sumRadius = shield1.shieldRadius + shield2.shieldRadius
-	return xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius 
+	return xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius
 end
 
 local otherID
@@ -127,7 +129,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID)
 	-- only count finished buildings
-	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID)
+	local stunned_or_inbuild, _, inbuild = spGetUnitIsStunned(unitID)
 	if stunned_or_inbuild ~= nil and inbuild then
 		return
 	end
@@ -135,10 +137,9 @@ function gadget:UnitCreated(unitID, unitDefID)
 	local ud = UnitDefs[unitDefID]
 	
 	local shieldWeaponDefID
-	local shieldNum = -1
 	if ud.customParams.dynamic_comm then
 		if GG.Upgrades_UnitShieldDef then
-			shieldWeaponDefID, shieldNum = GG.Upgrades_UnitShieldDef(unitID)
+			shieldWeaponDefID = GG.Upgrades_UnitShieldDef(unitID)
 		end
 	else
 		shieldWeaponDefID = ud.shieldWeaponDef
@@ -147,7 +148,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	if shieldWeaponDefID then
 		local shieldWep = WeaponDefs[shieldWeaponDefID]
 		local allyTeamID = spGetUnitAllyTeam(unitID)
-		if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID].InMap(unitID)) then 
+		if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID].InMap(unitID)) then
 			-- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
 			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or IterableMap.New()
 			
@@ -213,14 +214,9 @@ local beamMultiHitException = {
 	[UnitDefNames["amphassault"].id] = true,
 	[UnitDefNames["striderdetriment"].id] = true,
 }
-local repeatedHits = {}
 local penetrationPower = {}
 
 function gadget:GameFrame(n)
-	repeatedHits = {} -- Feel sorry for GC
-	if not MERGE_ENABLED then
-		return
-	end
 	gameFrame = n
 	if n%13 == 7 then
 		for allyTeamID, unitList in pairs(allyTeamShields) do
@@ -296,25 +292,17 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	
 	if (not Spring.ValidUnitID(shieldCarrierUnitID)) or Spring.GetUnitIsDead(shieldCarrierUnitID) then
 		return false
-	end	
+	end
 	
 	if proID == -1 then
 		local unitDefID = Spring.GetUnitDefID(beamCarrierID)
-		-- Beam weapons hit shields four times per frame.
-		-- No idea why.
-		if not beamMultiHitException[unitDefID] then
-			hackyProID = beamCarrierID + beamEmitter/64
-			repeatedHits[shieldCarrierUnitID] = repeatedHits[shieldCarrierUnitID] or {}
-			if repeatedHits[shieldCarrierUnitID][hackyProID] ~= nil then
-				return repeatedHits[shieldCarrierUnitID][hackyProID]
-			end
-		end
+		hackyProID = beamCarrierID + beamEmitter/64
 		-- Beam weapon
 		local ud = beamCarrierID and UnitDefs[unitDefID]
 		if not ud then
 			return true
 		end
-		weaponDefID = ud.weapons[beamEmitter].weaponDef 
+		weaponDefID = ud.weapons[beamEmitter].weaponDef
 	else
 		-- Projectile
 		weaponDefID = Spring.GetProjectileDefID(proID)
@@ -324,14 +312,9 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 		return true
 	end
 
-	local wd = WeaponDefs[weaponDefID]
 	local damage = shieldDamages[weaponDefID]
 	
-	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, wd.damages[SHIELD_ARMOR], hackyProID or proID)
-	
-	if hackyProID then
-		repeatedHits[shieldCarrierUnitID][hackyProID] = projectilePasses
-	end
+	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, defaultShielDamages[weaponDefID], hackyProID or proID)
 	return projectilePasses
 end
 
@@ -355,6 +338,7 @@ function gadget:Initialize()
 	if MERGE_ENABLED then
 		RegenerateData()
 	else
+		gadgetHandler:RemoveCallIn("GameFrame")
 		gadgetHandler:RemoveCallIn("UnitCreated")
 		gadgetHandler:RemoveCallIn("UnitFinished")
 		gadgetHandler:RemoveCallIn("UnitDestroyed")

@@ -10,7 +10,7 @@ function widget:GetInfo()
     license   = "GPL",
     layer     = -1,	--higher layer is loaded last
     enabled   = false,
-    --detailsDefault = 2    
+    --detailsDefault = 2
   }
 end
 --------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ options = {
 		name = "Draw for islands",
 		type = 'bool',
 		value = true,
-		desc = "Draws boundary wall when map is an island",		
+		desc = "Draws boundary wall when map is an island",
 	},
 	wallFromOutside = {
 		name = "Visible walls from outside",
@@ -71,8 +71,8 @@ options = {
 				gl.DeleteList(dListWall)
 				widget:Initialize()
 			end
-		end, 		
-	},		
+		end,
+	},
 }
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ local function IsIsland()
 		-- right edge
 		if GetGroundHeight(Game.mapSizeX, i) > 0 then
 			return false
-		end	
+		end
 	end
 	return true
 end
@@ -113,13 +113,13 @@ local function TextOutside()
 		local average = (GetGroundHeight(mapSizeX/2,0) + GetGroundHeight(0,mapSizeZ/2) + GetGroundHeight(mapSizeX/2,mapSizeZ) +GetGroundHeight(mapSizeX,mapSizeZ/2))/4
 
 		gl.Rotate(-90,1,0,0)
-		gl.Translate (0,0,average)		
+		gl.Translate (0,0,average)
 		gl.Text("North", mapSizeX/2, 200, 200, "co")
 		
 		gl.Rotate(-90,0,0,1)
 		gl.Text("East", mapSizeZ/2, mapSizeX+200, 200, "co")
 		
-		gl.Rotate(-90,0,0,1)	
+		gl.Rotate(-90,0,0,1)
 		gl.Text("South", -mapSizeX/2, mapSizeZ +200, 200, "co")
 		
 		gl.Rotate(-90,0,0,1)
@@ -139,47 +139,47 @@ local function DrawMapWall()
     end
     gl.Shape( GL.TRIANGLE_STRIP,
         {
-            { v = { 0, minHeight, 0},      --top left down   
-                    texcoord = { 0, 0 },           
+            { v = { 0, minHeight, 0},      --top left down
+                    texcoord = { 0, 0 },
                     c = colorFloor
             },
-                { v = { 0, maxHeight, 0},          
-                    texcoord = { 0, height*texScale },      --top left up     
-                    c = colorCeiling
-            },    
-            { v = { Game.mapSizeX, minHeight, 0},          
-                    texcoord = { Game.mapSizeX*texScale, 0 },   --top right        
-                    c = colorFloor
-            },
-                { v = { Game.mapSizeX, maxHeight, 0},          
-                    texcoord = { Game.mapSizeX*texScale, height*texScale },           
+                { v = { 0, maxHeight, 0},
+                    texcoord = { 0, height*texScale },      --top left up
                     c = colorCeiling
             },
-            
-                    { v = { Game.mapSizeX, minHeight, Game.mapSizeZ},          -- bottom right  
-                    texcoord = { Game.mapSizeX*texScale+Game.mapSizeZ*texScale, 0 },        
+            { v = { Game.mapSizeX, minHeight, 0},
+                    texcoord = { Game.mapSizeX*texScale, 0 },   --top right
                     c = colorFloor
             },
-                { v = { Game.mapSizeX, maxHeight, Game.mapSizeZ},          
-                    texcoord = { Game.mapSizeX*texScale+Game.mapSizeZ*texScale, height*texScale },           
+                { v = { Game.mapSizeX, maxHeight, 0},
+                    texcoord = { Game.mapSizeX*texScale, height*texScale },
                     c = colorCeiling
             },
             
-                { v = { 0, minHeight, Game.mapSizeZ},  --bottom left        
-                    texcoord = { Game.mapSizeZ*texScale, 0 },           
+                    { v = { Game.mapSizeX, minHeight, Game.mapSizeZ},          -- bottom right
+                    texcoord = { Game.mapSizeX*texScale+Game.mapSizeZ*texScale, 0 },
                     c = colorFloor
             },
-                { v = { 0, maxHeight, Game.mapSizeZ},          
-                    texcoord = { Game.mapSizeZ*texScale, height*texScale },           
+                { v = { Game.mapSizeX, maxHeight, Game.mapSizeZ},
+                    texcoord = { Game.mapSizeX*texScale+Game.mapSizeZ*texScale, height*texScale },
                     c = colorCeiling
             },
             
-                 { v = { 0, minHeight, 0},        --back to top right  
-                    texcoord = { 0, 0 },           
+                { v = { 0, minHeight, Game.mapSizeZ},  --bottom left
+                    texcoord = { Game.mapSizeZ*texScale, 0 },
                     c = colorFloor
             },
-                { v = { 0, maxHeight, 0},          
-                    texcoord = { 0, height*texScale },           
+                { v = { 0, maxHeight, Game.mapSizeZ},
+                    texcoord = { Game.mapSizeZ*texScale, height*texScale },
+                    c = colorCeiling
+            },
+            
+                 { v = { 0, minHeight, 0},        --back to top right
+                    texcoord = { 0, 0 },
+                    c = colorFloor
+            },
+                { v = { 0, maxHeight, 0},
+                    texcoord = { 0, height*texScale },
                     c = colorCeiling
             },
         }
@@ -204,7 +204,7 @@ local function Initialize()
 end
 
 function widget:Initialize()
-	if Spring.GetGameRulesParam("waterLevelModifier") then
+	if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
 		return
 	end
 	Initialize()

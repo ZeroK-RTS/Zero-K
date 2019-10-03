@@ -68,7 +68,7 @@ local function GetZenithTooltip (unitID)
 		return
 	end
 	
-	return (WG.Translate("units", "zenith.description") or "Meteor Controller") .. " - " .. (WG.Translate("interface", "meteors_controlled") or "Meteors controlled") .. " " .. (meteorsControlled or "0") .. "/500"
+	return (WG.Translate("units", "zenith.description") or "Meteor Controller") .. " - " .. (WG.Translate("interface", "meteors_controlled") or "Meteors controlled") .. " " .. (meteorsControlled or "0") .. "/300"
 end
 
 local function GetAvatarTooltip(unitID)
@@ -164,7 +164,7 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 		end
 	end
 	if unitDefID and buildTimes[unitDefID] then
-		return buildTimes[unitDefID] 
+		return buildTimes[unitDefID]
 	end
 	return 50
 end

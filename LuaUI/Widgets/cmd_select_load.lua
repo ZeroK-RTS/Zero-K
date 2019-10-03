@@ -130,10 +130,6 @@ local function CopyMoveThenUnload(transportID, unitID)
 	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, queueToRemove, 0)
 end
 
-local valkMaxMass = UnitDefNames.gunshiptrans.transportMass
-local valkMaxSize = UnitDefNames.gunshiptrans.transportSize * 2
-local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(104, 600)
-
 local function DoSelectionLoad()
 	-- Find the units which can transport and the units which are transports
 	local selectedUnits = Spring.GetSelectedUnits()
@@ -158,34 +154,24 @@ local function DoSelectionLoad()
 						end
 					end
 				end
+			elseif ud.customParams.requireheavytrans then
+				heavy[#heavy + 1] = unitID
 			else
-				if REVERSE_COMPAT then
-					if (ud.mass > valkMaxMass) or (ud.xsize > valkMaxSize) or (ud.zsize > valkMaxSize) then
-						heavy[#heavy + 1] = unitID
-					else
-						light[#light + 1] = unitID
-					end
-				else
-					if ud.customParams.requireheavytrans then
-						heavy[#heavy + 1] = unitID
-					else
-						light[#light + 1] = unitID
-					end
-				end
+				light[#light + 1] = unitID
 			end
 		end
 	end
 	
 	-- Assign transports to units
 	local lightEnd = math.min(#light, #lightTrans)
-	for i = 1, lightEnd do 
+	for i = 1, lightEnd do
 		Spring.GiveOrderToUnit(lightTrans[i], CMD.LOAD_UNITS, {light[i]}, CMD.OPT_RIGHT)
 		Spring.GiveOrderToUnit(light[i], CMD.WAIT, EMPTY_TABLE, CMD.OPT_RIGHT)
 		CopyMoveThenUnload(lightTrans[i], light[i])
 	end
 	
 	local heavyEnd = math.min(#heavy, #heavyTrans)
-	for i = 1, heavyEnd do 
+	for i = 1, heavyEnd do
 		Spring.GiveOrderToUnit(heavyTrans[i], CMD.LOAD_UNITS, {heavy[i]}, CMD.OPT_RIGHT)
 		Spring.GiveOrderToUnit(heavy[i], CMD.WAIT, EMPTY_TABLE, CMD.OPT_RIGHT)
 		CopyMoveThenUnload(heavyTrans[i], heavy[i])
@@ -199,7 +185,7 @@ local function DoSelectionLoad()
 		local offset = #heavy - #lightTrans
 		heavyEnd = math.min(#light, #heavyTrans + #lightTrans - #heavy)
 		--Spring.Echo("offset", offset)
-		for i = #lightTrans + 1, heavyEnd do 
+		for i = #lightTrans + 1, heavyEnd do
 			Spring.GiveOrderToUnit(heavyTrans[offset + i], CMD.LOAD_UNITS, {light[i]}, CMD.OPT_RIGHT)
 			Spring.GiveOrderToUnit(light[i], CMD.WAIT, EMPTY_TABLE, CMD.OPT_RIGHT)
 			CopyMoveThenUnload(heavyTrans[offset + i], light[i])

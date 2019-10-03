@@ -17,7 +17,7 @@ local morphDefs = {
 			energy = 600,
 			time = 90,
 		},
-	}, 
+	},
 }
 
 local baseComMorph = {
@@ -99,7 +99,7 @@ local function InitUnsafe()
 			commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
 			--Spring.Echo(commDataRaw)
 			local commDataFunc, err = loadstring("return "..commDataRaw)
-			if commDataFunc then 
+			if commDataFunc then
 				success, commData = pcall(commDataFunc)
 				if not success then
 					err = commData
@@ -107,7 +107,7 @@ local function InitUnsafe()
 				end
 			end
 		end
-		if err then 
+		if err then
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Comm Morph warning: ' .. err)
 		end
 
@@ -120,15 +120,15 @@ end
 
 local function CheckForExistingMorph(morphee, target)
 	local array = morphDefs[morphee]
-	if not array then 
+	if not array then
 		return false
 	end
 	if array.into then
 		return (array.into == target)
 	end
 	for index,morphOpts in pairs(array) do
-		if morphOpts.into and morphOpts.into == target then 
-			return true 
+		if morphOpts.into and morphOpts.into == target then
+			return true
 		end
 	end
 	return false
@@ -251,14 +251,14 @@ local function ValidateMorphDefs(mds)
 			newDefs[udSrc.id] = {}
 			if (morphData.into) then
 				local morphDef = BuildMorphDef(udSrc, morphData)
-				if (morphDef) then 
-					newDefs[udSrc.id][morphDef.cmd] = morphDef 
+				if (morphDef) then
+					newDefs[udSrc.id][morphDef.cmd] = morphDef
 				end
 			else
 				for _, morphData in pairs(morphData) do
 					local morphDef = BuildMorphDef(udSrc, morphData)
-					if (morphDef) then 
-						newDefs[udSrc.id][morphDef.cmd] = morphDef 
+					if (morphDef) then
+						newDefs[udSrc.id][morphDef.cmd] = morphDef
 					end
 				end
 			end

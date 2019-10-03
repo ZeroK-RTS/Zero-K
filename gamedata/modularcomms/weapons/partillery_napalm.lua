@@ -5,6 +5,7 @@ local weaponDef = {
 	areaOfEffect            = 128,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		muzzleEffectFire = [[custom:thud_fire_fx]],
 		burnchance = [[1]],
 		setunitsonfire = [[1]],

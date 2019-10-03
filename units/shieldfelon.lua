@@ -14,9 +14,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	shield_emit_height = 25,
-	shield_color_mult = 1.1,
-	dontfireatradarcommand = '1',
+    shield_emit_height = 25,
+    shield_color_mult = 1.1,
+    dontfireatradarcommand = '1',
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -61,8 +61,8 @@ unitDef = {
       def                = [[SHIELDGUN]],
       badTargetCategory  = [[UNARMED]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  --mainDir            = [[0 1 0]],
-	  --maxAngleDif        = 270,
+      --mainDir            = [[0 1 0]],
+      --maxAngleDif        = 270,
     },
     {
       def = [[SHIELD]],
@@ -104,10 +104,10 @@ unitDef = {
 
       customParams            = {
         shield_drain = 75,
-		
-		light_camera_height = 2500,
-		light_color = [[0.66 0.32 0.90]],
-		light_radius = 120,
+        
+        light_camera_height = 2500,
+        light_color = [[0.66 0.32 0.90]],
+        light_radius = 120,
       },
 
       damage                  = {
@@ -122,7 +122,7 @@ unitDef = {
       intensity               = 6,
       interceptedByShieldType = 1,
       range                   = 435,
-      reloadtime              = 0.15,
+      reloadtime              = 0.133,
       rgbColor                = [[0.5 0 0.7]],
       soundStart              = [[weapon/constant_electric]],
       soundStartVolume        = 9,

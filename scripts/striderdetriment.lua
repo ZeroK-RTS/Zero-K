@@ -27,7 +27,12 @@ local barrels = {larmbarrel1, larmbarrel2, larmbarrel3, rarmbarrel1, rarmbarrel2
 local aimpoints = {torso, aaturret, shoulderflare, head}
 
 local gunIndex = {1,1,1,1}
-local flareIndex = {1,1,1,1}
+local gunFixEmit = {true, false, false, false}
+
+local gunFlareCount = {}
+for i = 1, #gunFlares do
+	gunFlareCount[i] = #gunFlares[i]
+end
 
 local lastTorsoHeading = 0
 --------------------------------------------------------------------------------
@@ -39,17 +44,17 @@ local SIG_Walk = 2
 local PACE = 0.8
 
 -- four leg positions - front to straight, then to back, then to bent (then front again)
-local LEG_FRONT_ANGLES	= { thigh=math.rad(-40), knee=math.rad(-10), shin=math.rad(50), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(15) }
-local LEG_FRONT_SPEEDS	= { thigh=math.rad(60)*PACE, knee=math.rad(60)*PACE, shin=math.rad(110)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(30)*PACE }
+local LEG_FRONT_ANGLES    = { thigh=math.rad(-40), knee=math.rad(-10), shin=math.rad(50), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(15) }
+local LEG_FRONT_SPEEDS    = { thigh=math.rad(60)*PACE, knee=math.rad(60)*PACE, shin=math.rad(110)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(30)*PACE }
 
 local LEG_STRAIGHT_ANGLES = { thigh=math.rad(-10), knee=math.rad(-20), shin=math.rad(30), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
 local LEG_STRAIGHT_SPEEDS = { thigh=math.rad(60)*PACE, knee=math.rad(30)*PACE, shin=math.rad(40)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(30)*PACE }
 
-local LEG_BACK_ANGLES	 = { thigh=math.rad(10), knee=math.rad(-5), shin=math.rad(15), foot=math.rad(0), toef=math.rad(-20), toeb=math.rad(-10) }
-local LEG_BACK_SPEEDS	 = { thigh=math.rad(30)*PACE, knee=math.rad(60)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(40)*PACE, toeb=math.rad(60)*PACE }
+local LEG_BACK_ANGLES     = { thigh=math.rad(10), knee=math.rad(-5), shin=math.rad(15), foot=math.rad(0), toef=math.rad(-20), toeb=math.rad(-10) }
+local LEG_BACK_SPEEDS     = { thigh=math.rad(30)*PACE, knee=math.rad(60)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(40)*PACE, toeb=math.rad(60)*PACE }
 
-local LEG_BENT_ANGLES	 = { thigh=math.rad(-15), knee=math.rad(20), shin=math.rad(-20), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
-local LEG_BENT_SPEEDS	 = { thigh=math.rad(60)*PACE, knee=math.rad(90)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
+local LEG_BENT_ANGLES     = { thigh=math.rad(-15), knee=math.rad(20), shin=math.rad(-20), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_BENT_SPEEDS     = { thigh=math.rad(60)*PACE, knee=math.rad(90)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
 local TORSO_ANGLE_MOTION = math.rad(8)
 local TORSO_SPEED_MOTION = math.rad(15)*PACE
@@ -82,9 +87,9 @@ local reloadTimeShort = wd and WeaponDefs[wd].reload*30 or 30
 --------------------------------------------------------------------------------
 function script.Create()
 	Turn(larm, z_axis, -0.1)
-	Turn(rarm, z_axis, 0.1)	
-	Turn(shoulderflare, x_axis, math.rad(-90))	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	Turn(rarm, z_axis, 0.1)
+	Turn(shoulderflare, x_axis, math.rad(-90))
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 local function Step(frontLeg, backLeg)
@@ -190,7 +195,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	return gunFlares[num][ flareIndex[num] ]
+	return gunFlares[num][ gunIndex[num] ]
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -229,15 +234,25 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
+local function BumpGunNum(num, doSleep)
+	if doSleep then
+		Sleep(33)
+	end
+	gunIndex[num] = gunIndex[num] + 1
+	if gunIndex[num] > gunFlareCount[num] then
+		gunIndex[num] = 1
+	end
+end
+
 function script.Shot(num)
 	if num == 1 then
 		Move(barrels[gunIndex[1]], z_axis, -20)
 		Move(barrels[gunIndex[1]], z_axis, 0, 20)
-	end 
-	flareIndex[num] = gunIndex[num] -- store current gunIndex in flareIndex 
-	gunIndex[num] = gunIndex[num] + 1
-	if gunIndex[num] > #gunFlares[num] then 
-		gunIndex[num] = 1
+	end
+	if gunFixEmit[num] then
+		StartThread(BumpGunNum, num, true)
+	else
+		BumpGunNum(num)
 	end
 end
 
@@ -251,7 +266,7 @@ function script.BlockShot(num, targetID)
 	if GG.DontFireRadar_CheckBlock(unitID, targetID) then
 		return true
 	end
-	-- Seperation check is not required as the physics of the missile seems to result in a
+	-- Separation check is not required as the physics of the missile seems to result in a
 	-- time to impact of between 140 and 150 frames in almost all cases.
 	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 800.1, 150, false, false, true) then
 		return true

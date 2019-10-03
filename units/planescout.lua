@@ -20,10 +20,10 @@ unitDef = {
   cruiseAlt           = 250,
 
   customParams        = {
-	modelradius    = [[20]],
-	specialreloadtime = [[600]],
-	refuelturnradius = [[120]],
-	priority_misc = 2, -- High
+    modelradius       = [[20]],
+    specialreloadtime = [[600]],
+    refuelturnradius  = [[120]],
+    priority_misc     = 2, -- High
   },
 
   energyUse           = 1.5,
@@ -60,6 +60,9 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
+      collisionVolumeOffsets = [[0 0 0]],
+      collisionVolumeScales  = [[35 12 60]],
+      collisionVolumeType    = [[box]],
       object           = [[armpnix_dead.s3o]],
     },
 

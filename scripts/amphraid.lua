@@ -4,7 +4,7 @@ include "constants.lua"
 
 local base, torso, head = piece('base', 'torso', 'head')
 local rthigh, rshin, rfoot, lthigh, lshin, lfoot = piece('rthigh', 'rshin', 'rfoot', 'lthigh', 'lshin', 'lfoot')
-local lturret, rturret, lflare, rflare = piece('lturret', 'rturret', 'lflare', 'rflare') 
+local lturret, rturret, lflare, rflare = piece('lturret', 'rturret', 'lflare', 'rflare')
 
 local firepoints = {[0] = lflare, [1] = rflare}
 
@@ -68,15 +68,15 @@ local function Walk()
 		--Spring.Echo("Right foot middle, left foot middle")
 		Turn(lthigh, x_axis, math.rad(-10), math.rad(160)*PACE)
 		Turn(lshin, x_axis, math.rad(-40), math.rad(250)*PACE)
-		Turn(lfoot, x_axis, math.rad(50), math.rad(140)*PACE)		
+		Turn(lfoot, x_axis, math.rad(50), math.rad(140)*PACE)
 		Turn(rthigh, x_axis, math.rad(40), math.rad(140)*PACE)
 		Turn(rshin, x_axis, math.rad(-40), math.rad(140)*PACE)
-		Turn(rfoot, x_axis, math.rad(0), math.rad(140)*PACE)	
+		Turn(rfoot, x_axis, math.rad(0), math.rad(140)*PACE)
 		Move(torso, y_axis, 0, 12*PACE)
 		WaitForMove(torso, y_axis)
 		Sleep(0)
 		
-		--Spring.Echo("Right foot up, Left foot down")		
+		--Spring.Echo("Right foot up, Left foot down")
 		Turn(rthigh, x_axis, math.rad(20), math.rad(120)*PACE)
 		Turn(rshin, x_axis, math.rad(-60), math.rad(140)*PACE)
 		Turn(rfoot, x_axis, math.rad(40), math.rad(210)*PACE)
@@ -143,7 +143,7 @@ local function WeaponRangeUpdate()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)	
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(WeaponRangeUpdate)
 end
 
@@ -165,7 +165,7 @@ function script.AimWeapon(num, heading, pitch)
 	SetSignalMask(SIG_AIM[num])
 	Turn(head, y_axis, heading, math.rad(240))
 	Turn(lturret, x_axis, -pitch, math.rad(120))
-	Turn(rturret, x_axis, -pitch, math.rad(120))	
+	Turn(rturret, x_axis, -pitch, math.rad(120))
 	WaitForTurn(head, y_axis)
 	WaitForTurn(lturret, x_axis)
 	WaitForTurn(rturret, x_axis)

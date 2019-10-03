@@ -2,15 +2,15 @@ include "constants.lua"
 
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
-local base = piece 'base' 
-local turret = piece 'turret' 
-local sleeve = piece 'sleeve' 
-local barrel1 = piece 'barrel1' 
-local flare1 = piece 'flare1' 
-local barrel2 = piece 'barrel2' 
-local flare2 = piece 'flare2' 
-local barrel3 = piece 'barrel3' 
-local flare3 = piece 'flare3' 
+local base = piece 'base'
+local turret = piece 'turret'
+local sleeve = piece 'sleeve'
+local barrel1 = piece 'barrel1'
+local flare1 = piece 'flare1'
+local barrel2 = piece 'barrel2'
+local flare2 = piece 'flare2'
+local barrel3 = piece 'barrel3'
+local flare3 = piece 'flare3'
 
 local gun_1 = 1
 
@@ -29,7 +29,7 @@ local RECOIL_RESTORE_SPEED = 1
 local smokePiece = {base, turret}
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -46,10 +46,10 @@ function script.AimWeapon(num, heading, pitch)
 	return (spGetUnitRulesParam(unitID, "lowpower") == 0)	--checks for sufficient energy in grid
 end
 
-function script.Shot(num) 
+function script.Shot(num)
 	gun_1 = gun_1 + 1
-	if gun_1 > 3 then 
-		gun_1 = 1 
+	if gun_1 > 3 then
+		gun_1 = 1
 	end
 	
 	EmitSfx(gunPieces[gun_1].flare, 1024)

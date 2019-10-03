@@ -165,7 +165,7 @@ local wasSimpleColor = nil -- variable: indicate if simple color was toggled on 
 
 local time_opened = nil
 
-local GetTimer = Spring.GetTimer 
+local GetTimer = Spring.GetTimer
 local DiffTimers = Spring.DiffTimers
 
 ----
@@ -173,10 +173,10 @@ local DiffTimers = Spring.DiffTimers
 options_path = "Settings/HUD Panels/Chat/Console"
 options_order = {
 	'lblError',
-	'error_opengl_source',	
+	'error_opengl_source',
 	
 	'lblGeneral',
-	'mousewheel', 
+	'mousewheel',
 	'defaultAllyChat',
 	'text_height', 'max_lines',
 	'color_background', 'color_chat', 'color_ally', 'color_other', 'color_spec',
@@ -194,7 +194,7 @@ options_order = {
 	
 	'lblHilite',
 	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
-	'highlight_surround', 'highlight_sound', 'color_highlight','highlighted_text_height', 
+	'highlight_surround', 'highlight_sound', 'color_highlight','highlighted_text_height',
 	
 	'lblDedupe',
 	'dedupe_messages', 'dedupe_points','color_dup',
@@ -381,7 +381,7 @@ options = {
 		name = 'Maximum Lines (20-100)',
 		type = 'number',
 		value = 60,
-		min = 20, max = 100, step = 1, 
+		min = 20, max = 100, step = 1,
 		OnChange = onOptionsChanged,
 	},
 	
@@ -425,7 +425,7 @@ options = {
 		name = "Background color",
 		type = "colors",
 		value = { 0, 0, 0, 0},
-		OnChange = function(self) 
+		OnChange = function(self)
 			scrollpanel1.backgroundColor = self.value
 			scrollpanel1.borderColor = self.value
 			scrollpanel1:Invalidate()
@@ -447,7 +447,7 @@ options = {
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-	},	
+	},
 	autohide = {
 		name = "Autohide chat",
 		desc = "Hides the chat when not in use",
@@ -460,7 +460,7 @@ options = {
 		name = "Autohide time",
 		type = 'number',
 		value = 8,
-		min = 1, max = 30, step = 1, 
+		min = 1, max = 30, step = 1,
 		OnChange = onOptionsChanged,
 	},
 	
@@ -584,8 +584,8 @@ local function MessageIsChatInfo(msg)
 	return string.find(msg.argument,'Speed set to') or
 	string.find(msg.argument,'following') or
 	string.find(msg.argument,'Connection attempted') or
-	string.find(msg.argument,'exited') or 
-	string.find(msg.argument,'is no more') or 
+	string.find(msg.argument,'exited') or
+	string.find(msg.argument,'is no more') or
 	string.find(msg.argument,'paused the game') or
 	string.find(msg.argument,'Sync error for') or
 	string.find(msg.argument,'Cheating is') or
@@ -683,15 +683,15 @@ local function displayMessage(msg, remake)
 			end
 			stack_console:AddChild(button, false)
 		else
-			stack_console:AddChild(textbox, false)	
+			stack_console:AddChild(textbox, false)
 		end
 
 		stack_console:UpdateClientArea()
 		
-	end 
+	end
 
 	showConsole()
-end 
+end
 
 
 local function setupColors()
@@ -731,8 +731,8 @@ local function SetupAITeamColor() --Copied from gui_chili_chat2_1.lua
 				local name = select(2,Spring.GetAIInfo(teamID))
 				incolors[name] = color2incolor(Spring.GetTeamColor(teamID))
 			end
-		end --if teamID ~= Spring.GetGaiaTeamID() 
-	end --for each team	
+		end --if teamID ~= Spring.GetGaiaTeamID()
+	end --for each team
 end
 
 local function setupMyself()
@@ -765,8 +765,8 @@ function RemakeConsole()
 	end
 	for i = 1, #messages do -- FIXME : messages collection changing while iterating (if max_lines option has been shrinked)
 		local msg = messages[i]
-		displayMessage(msg, true)	
-	end	
+		displayMessage(msg, true)
+	end
 	
 	removeToMaxLines()
 	
@@ -775,7 +775,7 @@ function RemakeConsole()
 		hideConsole()
 	else
 		showConsole()
-	end 
+	end
 end
 
 
@@ -796,8 +796,8 @@ function widget:KeyPress(key, modifier, isRepeat)
 		WG.enteringText = true
 		showConsole()
 	else
-		WG.enteringText = false		
-	end 
+		WG.enteringText = false
+	end
 end
 
 
@@ -869,7 +869,7 @@ function widget:AddConsoleMessage(msg)
 		if WG.enteringText then
 			WG.enteringText = false
 			-- hideConsole()
-		end 		
+		end
 	-- end
 end
 
@@ -883,16 +883,16 @@ function widget:Update(s)
 	if options.autohide.value and time_opened and (DiffTimers(GetTimer(), time_opened) > options.autohide_time.value) then
 		-- echo(inputspace.state.enabled)
 		-- if not inputspace.visible then --TODO find some way to guarantee this doesn't go off when, and only when, text is being entered
-			hideConsole() 
+			hideConsole()
 		-- end
 	end
 
 	timer = timer + s
 	if timer > 2 then
 		timer = 0
-		Spring.SendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
-			window_console.x / screen0.width + 0.004, 
-			1 - (window_console.y + window_console.height) / screen0.height + 0.005, 
+		Spring.SendCommands({string.format("inputtextgeo %f %f 0.02 %f",
+			window_console.x / screen0.width + 0.004,
+			1 - (window_console.y + window_console.height) / screen0.height + 0.005,
 			window_console.width / screen0.width)})
 --		CheckColorScheme()
 	end
@@ -1006,13 +1006,13 @@ function widget:Initialize()
 	function scrollpanel1:IsAboveVScrollbars(x, y)  -- this override default Scrollpanel's HitTest.
 		--It aim to: exclude any modifier key (shift,alt,ctrl, except spacebar which is used for Space+click shortcut), and only allow left-click to reposition the vertical scrollbar, because it have a chance of stealing click when giving order (highest when in Low resolution and when ChiliChat2 is positioned to left of screen).
 		local alt,ctrl, meta,shift = Spring.GetModKeyState()
-		if (x< self.width - self.scrollbarSize) or (shift or ctrl or alt) or (not select(3,Spring.GetMouseState())) then 
-			return false 
+		if (x< self.width - self.scrollbarSize) or (shift or ctrl or alt) or (not select(3,Spring.GetMouseState())) then
+			return false
 		end --skip modifier key since they meant player are using click to issue command. Try to not steal click
 		return self
 	end
 	
-	window_console = WG.Chili.Window:New{  
+	window_console = WG.Chili.Window:New{
 		margin = { 0, 0, 0, 0 },
 		padding = { 0, 0, 0, 0 },
 		dockable = true,
@@ -1030,7 +1030,7 @@ function widget:Initialize()
 		tweakResizable = true,
 		minimizable = true,
 		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
-		selfImplementedMinimizable = 
+		selfImplementedMinimizable =
 			function (show)
 				if show then
 					options.autohide.value = false

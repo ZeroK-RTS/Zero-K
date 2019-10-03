@@ -1,10 +1,10 @@
 include 'constants.lua'
 
-local base = piece 'base' 
-local head = piece 'head' 
-local l_gun = piece 'l_gun' 
-local l_gun_barr = piece 'l_gun_barr' 
-local r_gun = piece 'r_gun' 
+local base = piece 'base'
+local head = piece 'head'
+local l_gun = piece 'l_gun'
+local l_gun_barr = piece 'l_gun_barr'
+local r_gun = piece 'r_gun'
 local r_gun_barr = piece 'r_gun_barr'
 local l_thigh, l_leg, l_foot = piece('l_thigh', 'l_leg', 'l_foot')
 local r_thigh, r_leg, r_foot = piece('r_thigh', 'r_leg', 'r_foot')
@@ -57,7 +57,7 @@ end
 
 function script.Create()
 	gun_1 = true
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(rightLeg.thigh, x_axis, math.rad(60))
 	Turn(leftLeg.thigh, x_axis, math.rad(60))
 				
@@ -110,7 +110,7 @@ function script.AimFromWeapon()
 end
 
 function script.QueryWeapon(num)
-	if gun_1 then	
+	if gun_1 then
 		return r_gun_barr
 	else
 		return l_gun_barr
@@ -130,9 +130,9 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-function script.FireWeapon(num) 
+function script.FireWeapon(num)
 	gun_1 = not gun_1
-	if gun_1 then	
+	if gun_1 then
 		EmitSfx(r_gun_barr, GG.Script.UNIT_SFX1)
 		Spin(r_gun_barr, z_axis, math.rad(1000), math.rad(50))
 	else
@@ -144,7 +144,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= 0.25 then	
+	if severity <= 0.25 then
 		Explode(head, SFX.NONE)
 		Explode(l_gun_barr, SFX.NONE)
 		Explode(l_gun, SFX.NONE)
@@ -172,7 +172,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rightLeg.foot, SFX.FALL)
 		Explode(base, SFX.SHATTER)
 		return 1
-	else 
+	else
 		Explode(r_gun, SFX.SHATTER)
 		Explode(l_gun, SFX.SHATTER)
 		Explode(r_gun_barr, SFX.SHATTER)

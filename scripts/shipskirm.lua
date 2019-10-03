@@ -5,29 +5,29 @@ include 'constants.lua'
 --------------------------------------------------------------------
 --pieces
 --------------------------------------------------------------------
-local hull = piece 'hull' 
-local neck = piece 'neck' 
-local turret = piece 'turret' 
-local arml = piece 'arml' 
-local armr = piece 'armr' 
-local flare1 = piece 'flare1' 
-local flare2 = piece 'flare2' 
-local flare3 = piece 'flare3' 
-local flare4 = piece 'flare4' 
-local missile1 = piece 'missile1' 
-local missile2 = piece 'missile2' 
-local missile3 = piece 'missile3' 
-local missile4 = piece 'missile4' 
-local exhaust1 = piece 'exhaust1' 
-local exhaust2 = piece 'exhaust2' 
-local exhaust3 = piece 'exhaust3' 
-local exhaust4 = piece 'exhaust4' 
-local wakel = piece 'wakel' 
-local waker = piece 'waker' 
-local exp1 = piece 'exp1' 
-local exp2 = piece 'exp2' 
-local exp3 = piece 'exp3' 
-local exp4 = piece 'exp4' 
+local hull = piece 'hull'
+local neck = piece 'neck'
+local turret = piece 'turret'
+local arml = piece 'arml'
+local armr = piece 'armr'
+local flare1 = piece 'flare1'
+local flare2 = piece 'flare2'
+local flare3 = piece 'flare3'
+local flare4 = piece 'flare4'
+local missile1 = piece 'missile1'
+local missile2 = piece 'missile2'
+local missile3 = piece 'missile3'
+local missile4 = piece 'missile4'
+local exhaust1 = piece 'exhaust1'
+local exhaust2 = piece 'exhaust2'
+local exhaust3 = piece 'exhaust3'
+local exhaust4 = piece 'exhaust4'
+local wakel = piece 'wakel'
+local waker = piece 'waker'
+local exp1 = piece 'exp1'
+local exp2 = piece 'exp2'
+local exp3 = piece 'exp3'
+local exp4 = piece 'exp4'
 
 --------------------------------------------------------------------
 --constants
@@ -43,7 +43,7 @@ local dynamicRockData
 
 local ROCK_PIECE = hull -- should be negative to alternate rocking direction
 local ROCK_SPEED = 3 --number of quarter-cycles per second around z-axis
-local ROCK_DECAY = -1/2	--rocking around z-axis is reduced by this factor each time' 
+local ROCK_DECAY = -1/2	--rocking around z-axis is reduced by this factor each time'
 local ROCK_MIN = math.rad(3) --if around z-axis rock is not greater than this amount rocking will stop after returning to center
 local ROCK_MAX = math.rad(15)
 local SIG_ROCK_Z = 16 --Signal to prevent multiple rocking
@@ -69,7 +69,7 @@ local restore_delay = 3000
 local gun_1_yaw = 0
 local dead = false
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 end
 

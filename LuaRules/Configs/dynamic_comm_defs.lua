@@ -732,7 +732,7 @@ local moduleDefs = {
 	{
 		name = "module_heavy_armor",
 		humanName = "High Density Plating",
-		description = "High Density Plating - Provides " .. 1600*HP_MULT .. " health but reduces movement by 10%. " .. 
+		description = "High Density Plating - Provides " .. 1600*HP_MULT .. " health but reduces movement by 10%. " ..
 		"Limit: 8, Requires Ablative Armour Plates",
 		image = moduleImagePath .. "module_heavy_armor.png",
 		limit = 8,
@@ -892,7 +892,7 @@ local morphCosts = {
 }
 
 local function extraLevelCostFunction(level)
-	return (level - 2) * 100 * COST_MULT 
+	return (level - 2) * 100 * COST_MULT
 end
 
 local chassisDefs = {
@@ -1173,7 +1173,7 @@ local chassisDefs = {
 				morphBaseCost = 0,
 				chassisApplicationFunction = function (modules, sharedData)
 					-- All comms have 10 BP in their unitDef (even support)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5 
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynsupport0"].id
@@ -1689,7 +1689,7 @@ end
 
 local function ModuleIsValid(level, chassis, slotAllows, moduleDefID, alreadyOwned, alreadyOwned2)
 	local data = moduleDefs[moduleDefID]
-	if (not slotAllows[data.slotType]) or (data.requireLevel or 0) > level or 
+	if (not slotAllows[data.slotType]) or (data.requireLevel or 0) > level or
 			(data.requireChassis and (not data.requireChassis[chassis])) or data.unequipable then
 		return false
 	end
@@ -1732,7 +1732,7 @@ local function ModuleIsValid(level, chassis, slotAllows, moduleDefID, alreadyOwn
 
 	-- Check that the module limit is not reached
 	if limit and (alreadyOwned[moduleDefID] or (alreadyOwned2 and alreadyOwned2[moduleDefID])) then
-		local count = (alreadyOwned[moduleDefID] or 0) + ((alreadyOwned2 and alreadyOwned2[moduleDefID]) or 0) 
+		local count = (alreadyOwned[moduleDefID] or 0) + ((alreadyOwned2 and alreadyOwned2[moduleDefID]) or 0)
 		if count > limit then
 			return false
 		end

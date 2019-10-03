@@ -55,7 +55,7 @@ function script.HitByWeapon(x, z)
 end
 ]]
 
-local function AnimControl() 
+local function AnimControl()
 	Signal(SIG_ANIM)
 	SetSignalMask(SIG_ANIM)
 	
@@ -63,16 +63,16 @@ local function AnimControl()
 	lastHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
 	while true do
 		tracks = tracks + 1
-		if tracks == 2 then 
+		if tracks == 2 then
 			Hide(tracks1)
 			Show(tracks2)
-		elseif tracks == 3 then 
+		elseif tracks == 3 then
 			Hide(tracks2)
 			Show(tracks3)
-		elseif tracks == 4 then 
+		elseif tracks == 4 then
 			Hide(tracks3)
 			Show(tracks4)
-		else 
+		else
 			tracks = 1
 			Hide(tracks4)
 			Show(tracks1)
@@ -90,9 +90,9 @@ local function AnimControl()
 		--pivot
 		currHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
 		diffHeading = (currHeading - lastHeading)
-		if (diffHeading > 0 and diffHeading < MIN_DIFF) or (diffHeading < 0 and diffHeading > -MIN_DIFF) then 
+		if (diffHeading > 0 and diffHeading < MIN_DIFF) or (diffHeading < 0 and diffHeading > -MIN_DIFF) then
 			diffHeading = MIN_DIFF -- to prevent segfaulting perfect alignment
-		end	
+		end
 		
 		-- Fix wrap location
 		if diffHeading > math.pi then
@@ -104,11 +104,11 @@ local function AnimControl()
 		
 		-- Bound maximun pivot
 		pivotAngle = diffHeading * PIVOT_MOD
-		if pivotAngle > MAX_PIVOT then 
-			pivotAngle = MAX_PIVOT 
+		if pivotAngle > MAX_PIVOT then
+			pivotAngle = MAX_PIVOT
 		end
-		if pivotAngle < MIN_PIVOT then 
-			pivotAngle = MIN_PIVOT 
+		if pivotAngle < MIN_PIVOT then
+			pivotAngle = MIN_PIVOT
 		end
 		
 		-- Turn slowly for small course corrections
@@ -157,7 +157,7 @@ function script.AimFromWeapon(num) return flare end
 function script.QueryWeapon(num) return flare end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(rear, y_axis, 0.01, PIVOT_SPEED)
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (1000)
@@ -224,11 +224,11 @@ local function Stopping()
 	end
 end
 
-function script.StartMoving() 
+function script.StartMoving()
 	StartThread(AnimControl)
 end
 
-function script.StopMoving() 
+function script.StopMoving()
 	StartThread(Stopping)
 end
 

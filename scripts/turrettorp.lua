@@ -1,10 +1,10 @@
 include "constants.lua"
 
-local base = piece 'base' 
-local arm1 = piece 'arm1' 
-local arm2 = piece 'arm2' 
-local turret = piece 'turret' 
-local firepoint = piece 'firepoint' 
+local base = piece 'base'
+local arm1 = piece 'arm1'
+local arm2 = piece 'arm2'
+local turret = piece 'turret'
+local firepoint = piece 'firepoint'
 
 local waterFire = false
 
@@ -46,8 +46,8 @@ function script.Create()
 		Turn(arm1, x_axis, math.rad(180))
 		Turn(arm2, x_axis, math.rad(180))
 		--Turn(turret, x_axis, math.rad(0))
-	end	
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	end
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.AimWeapon1(heading, pitch)

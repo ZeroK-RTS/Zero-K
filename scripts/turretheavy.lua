@@ -83,7 +83,7 @@ local function Open()
 	end
 
 	-- Ready Cannon Head
-	Move(cannon, z_axis, 0, 10)	
+	Move(cannon, z_axis, 0, 10)
 	WaitForMove(cannon, z_axis)
 	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
 		Sleep(500)
@@ -118,7 +118,7 @@ function Close()
 		Sleep(500)
 	end
 	
-	-- Prepare both guns to be stowed. 
+	-- Prepare both guns to be stowed.
 	Move(cannon, z_axis, -10, 10)
 	Turn(heatray, x_axis, 0, 2)
 	
@@ -182,19 +182,19 @@ end
 
 function script.Create()
 	on = true
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	SetupQueryWeaponFixHax(cannonAim, flare1)
 end
 
 local aimFromSet = {cannonAim, heatraybase}
 
 function script.AimFromWeapon(num)
-	return aimFromSet[num] 
+	return aimFromSet[num]
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if (not on) or (spGetUnitRulesParam(unitID, "lowpower") == 1) then 
-		return false 
+	if (not on) or (spGetUnitRulesParam(unitID, "lowpower") == 1) then
+		return false
 	end
 	if num == 1 then
 		Signal(aim)
@@ -203,7 +203,7 @@ function script.AimWeapon(num, heading, pitch)
 		position = math.floor((heading + tauOn16)/tauOn8)%8
 		
 		Turn(shellbase, y_axis, heading, mainHeading)
-		Turn(cannonbase, x_axis, -pitch, mainPitch) 
+		Turn(cannonbase, x_axis, -pitch, mainPitch)
 		WaitForTurn (shellbase, y_axis)
 		WaitForTurn (cannonbase, x_axis)
 		
@@ -228,9 +228,9 @@ function script.QueryWeapon(num)
 	if num == 1 then
 		return GetQueryPiece()
 	elseif num == 2 then
-		if heat then 
+		if heat then
 			return flare2
-		else 
+		else
 			return flare3
 		end
 	end
@@ -255,7 +255,7 @@ function script.Killed(recentDamage, maxHealth)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
 		return 1 -- corpsetype
-	else		
+	else
 		return 2 -- corpsetype
 	end
 end

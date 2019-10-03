@@ -3,12 +3,13 @@ local weaponDef = {
 	name                    = [[Shotgun]],
 	areaOfEffect            = 32,
 	burst                   = 3,
-	burstRate               = 0.03,
+	burstRate               = 0.033,
 	coreThickness           = 0.5,
 	craterBoost             = 0,
 	craterMult              = 0,
 
 	customParams            = {
+		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
 		miscEffectFire   = [[custom:RIOT_SHELL_L]],

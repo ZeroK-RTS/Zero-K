@@ -20,6 +20,7 @@ unitDef = {
 
   customParams           = {
     modelradius    = [[7]],
+    cus_noflashlight = 1,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -82,9 +83,9 @@ unitDef = {
       craterMult              = 0.3,
 
       customParams        = {
-		light_camera_height = 1600,
-		light_color = [[0.8 0.76 0.38]],
-		light_radius = 150,
+        light_camera_height = 1600,
+        light_color = [[0.8 0.76 0.38]],
+        light_radius = 150,
       },
 
       damage                  = {

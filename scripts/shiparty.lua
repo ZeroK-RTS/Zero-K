@@ -37,7 +37,7 @@ local dynamicRockData
 
 local ROCK_PIECE = base	-- should be negative to alternate rocking direction
 local ROCK_SPEED = 3		--number of quarter-cycles per second around z-axis
-local ROCK_DECAY = -1/2	--rocking around z-axis is reduced by this factor each time' 
+local ROCK_DECAY = -1/2	--rocking around z-axis is reduced by this factor each time'
 local ROCK_MIN = math.rad(3)	--if around z-axis rock is not greater than this amount rocking will stop after returning to center
 local ROCK_MAX = math.rad(15)
 local SIG_ROCK_Z = 16		--Signal( to prevent multiple rocking
@@ -93,7 +93,7 @@ function script.Create()
 	Hide( depthcharge3)
 	Hide( depthcharge4)
 	Hide( depthcharge5)
-	StartThread(GG.Script.SmokeUnit, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spin( sonar , y_axis, math.rad(60) )
 	Spin( radarpole , y_axis, math.rad(-90) )
 	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
@@ -138,7 +138,7 @@ end
 	-- return (1)
 -- end
 
--- FireWeapon2() 
+-- FireWeapon2()
 	-- return (0)
 -- end
 
@@ -147,15 +147,15 @@ end
 	-- Move( depthcharge2 , y_axis, DEPTHCHARGE_Y  )
 	-- Move( depthcharge3 , y_axis, DEPTHCHARGE_Y  )
 	-- Move( depthcharge4 , y_axis, DEPTHCHARGE_Y  )
-	
+
 	-- Move( depthcharge1 , z_axis, DEPTHCHARGE_Z  )
 	-- Move( depthcharge2 , z_axis, DEPTHCHARGE_Z  )
 	-- Move( depthcharge3 , z_axis, DEPTHCHARGE_Z  )
 	-- Move( depthcharge4 , z_axis, DEPTHCHARGE_Z  )
-	
+
 	-- Move( depthcharge5 , y_axis, -12  )
 	-- Move( depthcharge5 , z_axis, 4.5  )
-	
+
 	-- Spin( depthcharge1 , x_axis, DEPTHCHARGE_ROLL
  -- )
 	-- Spin( depthcharge2 , x_axis, DEPTHCHARGE_ROLL
@@ -164,17 +164,17 @@ end
  -- )
 	-- Spin( depthcharge4 , x_axis, DEPTHCHARGE_ROLL
  -- )
-	
+
 	-- Move( depthcharge1 , y_axis, 0 , DEPTHCHARGE_Y )
 	-- Move( depthcharge2 , y_axis, 0 , DEPTHCHARGE_Y )
 	-- Move( depthcharge3 , y_axis, 0 , DEPTHCHARGE_Y )
 	-- Move( depthcharge4 , y_axis, 0 , DEPTHCHARGE_Y )
-	
+
 	-- Move( depthcharge1 , z_axis, 0 , DEPTHCHARGE_Z )
 	-- Move( depthcharge2 , z_axis, 0 , DEPTHCHARGE_Z )
 	-- Move( depthcharge3 , z_axis, 0 , DEPTHCHARGE_Z )
 	-- Move( depthcharge4 , z_axis, 0 , DEPTHCHARGE_Z )
-	
+
 	-- Move( depthcharge5 , y_axis, DEPTHCHARGE_Y , DEPTHCHARGE_LIFT )
 	-- WaitForMove(depthcharge5, y_axis)
 	-- Move( depthcharge5 , z_axis, DEPTHCHARGE_Z , DEPTHCHARGE_LIFT )
@@ -183,13 +183,13 @@ end
 	-- Move( depthcharge5 , z_axis, 0 , DEPTHCHARGE_LOAD_Z )
 	-- Spin( depthcharge5 , x_axis, DEPTHCHARGE_LOAD_ROLL
  -- )
-	
+
 	-- WaitForMove(depthcharge1, z_axis)
 	-- WaitForMove(depthcharge2, z_axis)
 	-- WaitForMove(depthcharge3, z_axis)
 	-- WaitForMove(depthcharge4, z_axis)
 	-- WaitForMove(depthcharge5, z_axis)
-	
+
 	-- stop-spin depthcharge1 around x-axis
 	-- stop-spin depthcharge2 around x-axis
 	-- stop-spin depthcharge3 around x-axis
@@ -209,9 +209,9 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if dead then return false end
-	
+
 	local states = Spring.GetUnitStates(unitID)
-	
+
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
 	Turn( turret , y_axis, heading, math.rad(50.000000) )
@@ -225,17 +225,15 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-function script.FireWeapon(num) 
+function script.FireWeapon(num)
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gun_1_yaw, ROCK_FORCE)
-	
-	gun_1 = 1 - gun_1
-	
-	if  gun_1 == 0 then 
+
+	if  gun_1 == 0 then
 		Show( fire1)
 		Hide( fire1)
 		Move( barrel1 , z_axis, -8  )
 		Move( barrel1 , z_axis, 0 , 8.000000 )
-	else 
+	else
 		Show( fire2)
 		Hide( fire2)
 		Move( barrel2 , z_axis, -8  )
@@ -243,15 +241,19 @@ function script.FireWeapon(num)
 	end
 end
 
+function script.EndBurst()
+	gun_1 = 1 - gun_1
+end
+
 function script.AimFromWeapon(num)
 	return turret
 end
 
-function script.QueryWeapon(num) 
-	if gun_1 == 1 then 
-		return fire1
-	else 
+function script.QueryWeapon(num)
+	if gun_1 == 1 then
 		return fire2
+	else
+		return fire1
 	end
 end
 
@@ -261,7 +263,7 @@ function script.BlockShot(num, targetID)
 	end
 	return false
 end
-	
+
 function script.SweetSpot(num)
 	return base
 end
@@ -269,9 +271,9 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	Explode( body, SFX.SHATTER)
-	if  severity <= 0.25  then 
+	if  severity <= 0.25  then
 		return 1
-	elseif  severity <= 0.50  then 
+	elseif  severity <= 0.50  then
 		Explode( sleeve1, SFX.FALL)
 		Explode( sleeve2, SFX.FALL)
 		Explode( barrel1, SFX.FALL)
@@ -285,7 +287,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode( radardish, SFX.FALL)
 		Explode( propeller, SFX.FALL)
 		return 1
-	else 
+	else
 		Explode( turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
 		Explode( sleeve1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)
 		Explode( sleeve2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT + SFX.SHATTER)

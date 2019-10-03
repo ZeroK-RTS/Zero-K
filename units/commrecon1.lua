@@ -20,7 +20,7 @@ unitDef = {
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[45 50 45]],
-  collisionVolumeType    = [[CylY]],  
+  collisionVolumeType    = [[CylY]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -29,11 +29,11 @@ unitDef = {
     jump_speed         = 6,
     jump_reload        = 20,
     jump_from_midair   = 1,
-	level = [[1]],
-	statsname = [[dynrecon1]],
-	soundok = [[heavy_bot_move]],
-	soundselect = [[bot_select]],
-	soundbuild = [[builder_start]],
+    level = [[1]],
+    statsname = [[dynrecon1]],
+    soundok = [[heavy_bot_move]],
+    soundselect = [[bot_select]],
+    soundbuild = [[builder_start]],
     commtype = [[3]],
     aimposoffset   = [[0 10 0]],
   },
@@ -65,10 +65,10 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-	  [[custom:NONE]],
-	  [[custom:NONE]],
+      [[custom:NONE]],
+      [[custom:NONE]],
       [[custom:RAIDMUZZLE]],
-	  [[custom:NONE]],
+      [[custom:NONE]],
       [[custom:VINDIBACK]],
       [[custom:FLASH64]],
     },
@@ -90,11 +90,11 @@ unitDef = {
 
   weapons             = {
   
-	[1] = {
+    [1] = {
       def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
-	},
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
   
     [5] = {
       def                = [[SLOWBEAM]],
@@ -115,11 +115,15 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams            = {
+        bogus = 1,
+      },
+
       damage                  = {
         default = 0,
       },
 
-      duration                = 0.11,
+      duration                = 0.1,
       explosionGenerator      = [[custom:flash1green]],
       impactOnly              = true,
       impulseBoost            = 0,
@@ -128,7 +132,7 @@ unitDef = {
       laserFlareSize          = 5.53,
       minIntensity            = 1,
       range                   = 400,
-      reloadtime              = 0.11,
+      reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       sweepfire               = false,
       texture1                = [[largelaser]],
