@@ -122,15 +122,13 @@ vec2 get1CompFilters(int x)
 
 float LinearizeDepth(vec2 uv){
   float depthNDC = texture2D(blurTex0, uv).r;
-  #if DEPTH_CLIP01
+  #if (DEPTH_CLIP01 == 0)
     depthNDC = 2.0 * depthNDC - 1.0;
   #endif
 
     float n22 = viewProjection[2][2];
 
-    return ((abs(((1.0 + depthNDC) * (1.0 + n22))/(2.0 * (depthNDC + n22)))
-      * (distanceLimits.y - distanceLimits.x)) + distanceLimits.x) / BLUR_START_DIST;
-    // return abs(viewProjection[3][2] / (viewProjection[2][2] + depthNDC)) / BLUR_START_DIST;
+    return abs(viewProjection[3][2] / (viewProjection[2][2] + depthNDC)) / BLUR_START_DIST;
 }
 
 float GetFilterRadius(vec2 uv)
@@ -221,7 +219,7 @@ void main()
       {
         testDepth = LinearizeDepth(centerUV +
           (vec2(autofocusTestCoordOffsets[i].x * aspectRatio,
-            autofocusTestCoordOffsets[i].y) * clamp(focusDepth * 4.4, 0.1, 0.225)));
+            autofocusTestCoordOffsets[i].y) * clamp(focusDepth * 3.3, 0.1, 0.225)));
         //We use averages here instead of just directly min/max testing testDepth in order to have smoother focus transitions
         //across big changes to focus depth, such as the camera scrolling over a cliff or being zoomed in on a unit.
         minTestDepth = min(minTestDepth, (3.0 * minTestDepth + 2.0 * testDepth) / 5.0);
@@ -240,13 +238,13 @@ void main()
           (maxTestDepth + 2.5 * maxTestDepth * focusDepthAirFactor) / 3.5 :
           maxTestDepth * focusDepthAirFactor, focusDepth);
 
-      float focalLength = 0.05;
+      float focalLength = 0.03;
       float minFStop = 1.0 * focalLength;
       float curveDepth = 6.0;
       float baseAperture =
         focalLength/max(testFocusDepth * exp(curveDepth * testFocusDepth), minFStop);
 
-      float apertureBoundsFudgeFactor = 1.15; //Used to control bounds depths without having to change inFocusThreshold
+      float apertureBoundsFudgeFactor = 2.55; //Used to control bounds depths without having to change inFocusThreshold
       float maxDepthAperture = ApertureSizeToKeepFocusFor(maxTestDepth, focusDepth) * apertureBoundsFudgeFactor;
       float minDepthAperture = ApertureSizeToKeepFocusFor(minTestDepth, focusDepth) * apertureBoundsFudgeFactor;
 
