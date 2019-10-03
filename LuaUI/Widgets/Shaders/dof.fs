@@ -217,8 +217,8 @@ void main()
       int autofocusTestCoordCount = 8;
       for (int i = 0; i < autofocusTestCoordCount; ++i)
       {
-        testDepth = LinearizeDepth(centerUV + 
-          (vec2(autofocusTestCoordOffsets[i].x * aspectRatio, 
+        testDepth = LinearizeDepth(centerUV +
+          (vec2(autofocusTestCoordOffsets[i].x * aspectRatio,
             autofocusTestCoordOffsets[i].y) * clamp(focusDepth * 3.3, 0.1, 0.225)));
         //We use averages here instead of just directly min/max testing testDepth in order to have smoother focus transitions
         //across big changes to focus depth, such as the camera scrolling over a cliff or being zoomed in on a unit.
