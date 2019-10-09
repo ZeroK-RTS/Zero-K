@@ -253,7 +253,6 @@ local function _CompileMaterialShaders(rendering)
 				matSrc.shadowDefinitions,
 				string.format("MatName: \"%s\"(%s)", matName, "Shadow")
 			)
-
 			if luaShader then
 				if matSrc.shadowShader then
 					if matSrc.shadowShaderObj then
@@ -559,7 +558,9 @@ local function ObjectFinished(rendering, objectID, objectDefID)
 			rendering.spActivateMaterial(objectID, 3)
 
 			rendering.spSetMaterial(objectID, 3, "opaque", GetObjectMaterial(rendering, objectDefID))
-			rendering.spSetMaterial(objectID, 3, "shadow", GetObjectShadowMaterial(rendering, objectDefID))
+			if mat.shadowShader then
+				rendering.spSetMaterial(objectID, 3, "shadow", GetObjectShadowMaterial(rendering, objectDefID))
+			end
 
 			for pieceID in ipairs(rendering.spGetObjectPieceList(objectID) or {}) do
 				rendering.spSetPieceList(objectID, 3, pieceID)

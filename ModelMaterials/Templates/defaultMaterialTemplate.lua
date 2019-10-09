@@ -229,10 +229,10 @@ fragment = [[
 
 	#if (RENDERING_MODE == 2) //shadows pass. AMD requests that extensions are declared right on top of the shader
 		#if (SUPPORT_DEPTH_LAYOUT == 1)
-			#extension GL_ARB_conservative_depth : enable
+			//#extension GL_ARB_conservative_depth : enable
 			//#extension GL_EXT_conservative_depth : enable
 			// preserve early-z performance if possible
-			layout(depth_unchanged) out float gl_FragDepth;
+			//layout(depth_unchanged) out float gl_FragDepth;
 		#endif
 	#endif
 
@@ -674,6 +674,7 @@ fragment = [[
 		vec4 texColor2 = texture(texture2, modelUV);
 		if (texColor2.a < 0.5)
 			discard;
+
 	}
 #endif
 ]],
@@ -709,6 +710,7 @@ local defaultMaterialTemplate = {
 	shadowDefinitions = {
 		"#define RENDERING_MODE 2",
 		"#define SUPPORT_DEPTH_LAYOUT ".. tostring((Platform.glSupportFragDepthLayout and 1) or 0),
+		"#define SUPPORT_CLIP_CONTROL ".. tostring((Platform.glSupportClipSpaceControl and 1) or 0),
 	},
 
 	shaderOptions = {
