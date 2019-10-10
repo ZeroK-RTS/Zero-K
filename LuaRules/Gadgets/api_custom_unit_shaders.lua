@@ -585,18 +585,6 @@ local function ObjectFinished(rendering, objectID, objectDefID)
 end
 
 
---[[
-
-	drawList            = {},
-	materialInfos       = {},
-	bufMaterials        = {},
-	bufShadowMaterials  = {},
-	materialDefs        = {},
-	loadedTextures      = {},
-
-
-]]--
-
 local function _CleanupEverything(rendering)
 	for objectID, mat in pairs(rendering.drawList) do
 		local DrawObject = mat[rendering.DrawObject]
