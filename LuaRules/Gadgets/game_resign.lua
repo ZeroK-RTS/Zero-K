@@ -20,8 +20,15 @@ local function ResignTeam(teamID)
 	spSetTeamRulesParam(teamID, "WasKilled", 1)
 end
 
+local function ResignAllyTeam(allyTeamID)
+	for i, teamID in pairs (Spring.GetTeamList(allyTeamID)) do
+		ResignTeam (teamID)
+	end
+end
+
 function gadget:Initialize()
 	GG.ResignTeam = ResignTeam
+	GG.ResignAllyTeam = ResignAllyTeam
 end
 
 function gadget:RecvLuaMsg (msg, playerID)
