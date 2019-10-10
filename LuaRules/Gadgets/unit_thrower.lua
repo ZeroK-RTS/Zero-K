@@ -291,10 +291,9 @@ function gadget:Initialize()
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 	end
-	if Script.SetWatchProjectile then
-		for id, _ in pairs(throwWeaponDef) do
-			Script.SetWatchProjectile(id, true)
-		end
+
+	for id, _ in pairs(throwWeaponDef) do
+		Script.SetWatchProjectile(id, true)
 	end
 end
 

@@ -132,11 +132,7 @@ end
 
 function gadget:Initialize()
 	for w,_ in pairs(weaponInfo) do
-		if Script.SetWatchExplosion then
-			Script.SetWatchExplosion(w, true)
-		else
-			Script.SetWatchWeapon(w, true)
-		end
+		Script.SetWatchExplosion(w, true)
 	end
 end
 

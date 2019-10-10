@@ -91,6 +91,12 @@ if Script.IsEngineMinVersion(104, 0, 536) then
 	end
 end
 
+if not Script.IsEngineMinVersion(104, 0, 1100) then
+	Script.SetWatchProjectile  = Script.SetWatchWeapon
+	Script.SetWatchExplosion   = Script.SetWatchWeapon
+	Script.SetWatchAllowTarget = Script.SetWatchWeapon
+end
+
 if not Script.IsEngineMinVersion(104, 0, 1143) then
 	local spGetCommandQueue = Spring.GetCommandQueue
 	local unpacc = unpack

@@ -3233,11 +3233,7 @@ for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
 	if wd.customParams and wd.customParams.smoothradius or wd.customParams.smoothmult then
 		wantedList[#wantedList + 1] = wd.id
-		if Script.SetWatchExplosion then
-			Script.SetWatchExplosion(wd.id, true)
-		else
-			Script.SetWatchWeapon(wd.id, true)
-		end
+		Script.SetWatchExplosion(wd.id, true)
 		SeismicWeapon[wd.id] = {
 			smooth = wd.customParams.smoothmult or DEFAULT_SMOOTH,
 			smoothradius = wd.customParams.smoothradius or wd.craterAreaOfEffect*0.5,

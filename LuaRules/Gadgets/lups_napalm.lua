@@ -24,11 +24,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		if (wd.description:find("Napalm") or (wd.customParams and (wd.customParams.lups_napalm_fx or wd.customParams.lups_heat_fx))) then
 			napalmWeapons[wd.id] = true
 			wantedList[#wantedList + 1] = wd.id
-			if Script.SetWatchExplosion then
-				Script.SetWatchExplosion(wd.id, true)
-			else
-				Script.SetWatchWeapon(wd.id, true)
-			end
+			Script.SetWatchExplosion(wd.id, true)
 		end
 	end
 

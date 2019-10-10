@@ -107,11 +107,7 @@ end
 
 function gadget:Initialize()
 	for i = 1, #wantedList do
-		if Script.SetWatchExplosion then
-			Script.SetWatchExplosion(wantedList[i], true)
-		else
-			Script.SetWatchWeapon(wantedList[i], true)
-		end
+		Script.SetWatchExplosion(wantedList[i], true)
 	end
 end
 

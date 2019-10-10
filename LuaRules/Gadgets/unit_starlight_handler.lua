@@ -104,11 +104,7 @@ function gadget:Initialize()
 	local ud = UnitDefs[starlightDefID]
 	
 	for weaponDefID, _ in pairs(starlightWeapons) do
-		if Script.SetWatchExplosion then
-			Script.SetWatchExplosion(weaponDefID, true)
-		else
-			Script.SetWatchWeapon(weaponDefID, true)
-		end
+		Script.SetWatchExplosion(weaponDefID, true)
 	end
 end
 

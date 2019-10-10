@@ -29,11 +29,7 @@ for i = 1, #WeaponDefs do
 	if (wd.damageAreaOfEffect >= 800 and wd.targetable) then
 		nux[wd.id] = wd.damageAreaOfEffect
 		wantedList[#wantedList + 1] = wd.id
-		if Script.SetWatchExplosion then
-			Script.SetWatchExplosion(wd.id, true)
-		else
-			Script.SetWatchWeapon(wd.id, true)
-		end
+		Script.SetWatchExplosion(wd.id, true)
 	end
 end
 

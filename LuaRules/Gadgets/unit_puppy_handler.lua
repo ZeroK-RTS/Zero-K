@@ -136,11 +136,7 @@ function gadget:Initialize()
 	puppyWeaponID = puppyDef.weapons[1].weaponDef
 	puppyLosRadius = puppyDef.losRadius
 	wantedList = {puppyWeaponID}
-	if Script.SetWatchExplosion then
-		Script.SetWatchExplosion(puppyWeaponID, true)
-	else
-		Script.SetWatchWeapon(puppyWeaponID, true)
-	end
+	Script.SetWatchExplosion(puppyWeaponID, true)
 end
 
 -- in event of shield impact, gets data about both units and passes it to UnitPreDamaged

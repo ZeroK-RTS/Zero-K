@@ -444,11 +444,7 @@ function gadget:Initialize()
 
 	for weaponID,wd in pairs(WeaponDefs) do
 		if wd.customParams and wd.customParams.is_unit_weapon then
-			if Script.SetWatchAllowTarget then
-				Script.SetWatchAllowTarget(weaponID, true)
-			else
-				Script.SetWatchWeapon(weaponID, true)
-			end
+			Script.SetWatchAllowTarget(weaponID, true)
 		end
 	end
 end

@@ -41,11 +41,7 @@ for i = 1, #WeaponDefs do
 		if wd.description == "Implosion Bomb" then
 			hasShockwave[wd.id] = {special = 1}
 			wantedList[#wantedList + 1] = wd.id
-			if Script.SetWatchExplosion then
-				Script.SetWatchExplosion(wd.id, true)
-			else
-				Script.SetWatchWeapon(wd.id, true)
-			end
+			Script.SetWatchExplosion(wd.id, true)
 		elseif normalShockwave then
 			hasShockwave[wd.id] = {
 				life = 23*life,
@@ -53,19 +49,11 @@ for i = 1, #WeaponDefs do
 				growth = (wd.damageAreaOfEffect*1.1)/20*speed
 			}
 			wantedList[#wantedList + 1] = wd.id
-			if Script.SetWatchExplosion then
-				Script.SetWatchExplosion(wd.id, true)
-			else
-				Script.SetWatchWeapon(wd.id, true)
-			end
+			Script.SetWatchExplosion(wd.id, true)
 		elseif (wd.type == "DGun") then
 			hasShockwave[wd.id] = {DGun = true}
 			wantedList[#wantedList + 1] = wd.id
-			if Script.SetWatchExplosion then
-				Script.SetWatchExplosion(wd.id, true)
-			else
-				Script.SetWatchWeapon(wd.id, true)
-			end
+			Script.SetWatchExplosion(wd.id, true)
 		end
 	end
 end

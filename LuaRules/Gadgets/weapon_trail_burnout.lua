@@ -21,7 +21,6 @@ local noExplosionVFX = {}
 
 local spGetGameFrame     = Spring.GetGameFrame
 local spSetProjectileCeg = Spring.SetProjectileCEG
-local scSetWatchWeapon   = Script.SetWatchWeapon
 local spGetProjectileVelocity = Spring.GetProjectileVelocity
 local spGetProjectileTarget = Spring.GetProjectileTarget
 local spSetProjectileCollision = Spring.SetProjectileCollision
@@ -41,13 +40,14 @@ function gadget:Initialize()
 					burnout = wd.customParams.trail_burnout,
 					burnoutCeg = wd.customParams.trail_burnout_ceg or defaultCeg
 				}
-				scSetWatchWeapon(wd.id, true)
+				Script.SetWatchProjectile(wd.id, true)
 			end
 			if wd.customParams.torp_underwater then
 				underwaterWeapon[wd.id] = {
 					torpName = wd.customParams.torp_underwater,
 				}
-				scSetWatchWeapon(wd.id, true)
+				Script.SetWatchProjectile(wd.id, true)
+				Script.SetWatchExplosion(wd.id, true)
 			end
 		end
 	end

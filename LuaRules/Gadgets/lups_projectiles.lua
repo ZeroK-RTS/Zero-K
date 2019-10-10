@@ -27,7 +27,7 @@ for i=1,#WeaponDefs do
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "malformed projectile Lups definition for weapon " .. wd.name .. "\n" .. err  )
 		end
 		if data then
-			Script.SetWatchWeapon(i, true)
+			Script.SetWatchProjectile(i, true)
 			weapons[i] = data
 		end
 	end
@@ -58,11 +58,7 @@ end
 
 function gadget:Initialize()
 	for weaponID in pairs(weapons) do
-		if Script.SetWatchProjectile then
-			Script.SetWatchProjectile(weaponID, true)
-		else
-			Script.SetWatchWeapon(weaponID, true)
-		end
+		Script.SetWatchProjectile(weaponID, true)
 	end
 end
 
