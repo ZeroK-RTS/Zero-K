@@ -68,6 +68,8 @@ local LuaShader = VFS.Include(LUASHADER_DIR .. "LuaShader.lua")
 local advShading
 local shadows
 
+local bug3734wa = false
+
 local sunChanged = false
 local optionsChanged = true --just in case
 
@@ -253,7 +255,6 @@ local function _CompileMaterialShaders(rendering)
 				matSrc.shadowDefinitions,
 				string.format("MatName: \"%s\"(%s)", matName, "Shadow")
 			)
-
 			if luaShader then
 				if matSrc.shadowShader then
 					if matSrc.shadowShaderObj then
@@ -299,6 +300,7 @@ local function _ProcessOptions(optName, _, optValues, playerID)
 		end
 	end
 end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -559,7 +561,9 @@ local function ObjectFinished(rendering, objectID, objectDefID)
 			rendering.spActivateMaterial(objectID, 3)
 
 			rendering.spSetMaterial(objectID, 3, "opaque", GetObjectMaterial(rendering, objectDefID))
-			rendering.spSetMaterial(objectID, 3, "shadow", GetObjectShadowMaterial(rendering, objectDefID))
+			if mat.shadowShader and (not bug3734wa) then
+				rendering.spSetMaterial(objectID, 3, "shadow", GetObjectShadowMaterial(rendering, objectDefID))
+			end
 
 			for pieceID in ipairs(rendering.spGetObjectPieceList(objectID) or {}) do
 				rendering.spSetPieceList(objectID, 3, pieceID)
@@ -611,6 +615,16 @@ local function _CleanupEverything(rendering)
 	for optName, _ in pairs(registeredOptions) do
 		gadgetHandler:RemoveChatAction(optName)
 	end
+
+	rendering.drawList            = {}
+	rendering.materialInfos       = {}
+	rendering.bufMaterials        = {}
+	rendering.bufShadowMaterials  = {}
+	rendering.materialDefs        = {}
+	rendering.loadedTextures      = {}
+
+	gadgetHandler:RemoveChatAction("cusreload")
+	gadgetHandler:RemoveChatAction("reloadcus")
 end
 
 local function ObjectDestroyed(rendering, objectID, objectDefID)
@@ -792,6 +806,17 @@ end
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 
+local function ReloadCUS(optName, _, _, playerID)
+	if (playerID ~= Spring.GetMyPlayerID()) then
+		return
+	end
+	gadget:Shutdown()
+	gadget:Initialize()
+end
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
 function gadget:Initialize()
 	--// GG assignment
 	GG.CUS = {}
@@ -805,6 +830,9 @@ function gadget:Initialize()
 	advShading = Spring.HaveAdvShading()
 
 	shadows = Spring.HaveShadows()
+
+	bug3734wa = Spring.GetConfigInt("bug3734wa", 0) > 0
+
 	local normalmapping = Spring.GetConfigInt("NormalMapping", 1) > 0
 	local treewind = Spring.GetConfigInt("TreeWind", 1) > 0
 
@@ -834,11 +862,11 @@ function gadget:Initialize()
 	end
 
 	BindMaterials()
+	gadgetHandler:AddChatAction("cusreload", ReloadCUS)
+	gadgetHandler:AddChatAction("reloadcus", ReloadCUS)
 end
 
---// Workaround: unsynced LuaRules doesn't receive Shutdown events
-cusShutdown = Script.CreateScream()
-cusShutdown.func = function()
+function gadget:Shutdown()
 	for _, rendering in ipairs(allRendering) do
 		_CleanupEverything(rendering)
 	end
