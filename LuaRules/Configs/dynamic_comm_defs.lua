@@ -78,10 +78,12 @@ local moduleDefs = {
 		humanName = "Beam Laser",
 		description = "Beam Laser: An effective short-range cutting tool",
 		image = moduleImagePath .. "commweapon_beamlaser.png",
-		limit = 1,
+		limit = 2,
 		cost = 5 * COST_MULT,
-		requireChassis = {"recon", "assault", "support", "strike", "knight"},
-		requireLevel = 3,
+		requireChassis = {"knight"}, --[[ can fit on any chassis, but is already
+		                                  baseline for multiplayer comms, so we
+		                                  don't offer it for them ]]
+		requireLevel = 1,
 		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
 			if sharedData.noMoreWeapons then
