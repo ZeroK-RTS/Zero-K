@@ -10,13 +10,15 @@ unitDef = {
   buildingGroundDecalType       = [[staticheavyarty_aoplane.dds]],
   buildPic                      = [[staticheavyarty.png]],
   category                      = [[SINK]],
-  collisionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeOffsets        = [[0 -40 0]],
+  collisionVolumeOffsets        = [[0 -40 0]],
   collisionVolumeScales         = [[70 194 70]],
   collisionVolumeType           = [[cylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
 
+    midposoffset   = [[0, 40, 0]],
     modelradius    = [[35]],
     selectionscalemult = 1,
   },
