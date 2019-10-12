@@ -14,8 +14,8 @@ unitDef = {
   buildPic                      = [[mahlazer.png]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[160 160 160]],
-  collisionVolumeType           = [[ellipsoid]],
+  collisionVolumeScales         = [[120 100 120]],
+  collisionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
