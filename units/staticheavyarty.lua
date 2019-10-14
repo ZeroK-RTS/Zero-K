@@ -110,6 +110,9 @@ unitDef = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeOffsets        = [[0 0 -7]],
+      collisionVolumeScales         = [[70 194 70]],
+      collisionVolumeType           = [[cylY]],
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
