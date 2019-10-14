@@ -12,6 +12,9 @@ unitDef = {
   buildingGroundDecalType       = [[staticnuke_aoplane.dds]],
   buildPic                      = [[staticnuke.png]],
   category                      = [[SINK UNARMED]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[90 55 115]],
+  collisionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
