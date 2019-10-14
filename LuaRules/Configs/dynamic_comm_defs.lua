@@ -80,7 +80,9 @@ local moduleDefs = {
 		image = moduleImagePath .. "commweapon_beamlaser.png",
 		limit = 2,
 		cost = 5 * COST_MULT,
-		requireChassis = {"recon", "assault", "support", "strike", "knight"},
+		requireChassis = {"knight"}, --[[ can fit on any chassis, but is already
+		                                  baseline for multiplayer comms, so we
+		                                  don't offer it for them ]]
 		requireLevel = 1,
 		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
