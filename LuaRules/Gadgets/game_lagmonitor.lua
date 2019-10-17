@@ -385,6 +385,7 @@ local function InitializeAiTeamRulesParams()
 	end
 end
 
+local SHARE_DECAY_RATE = 60 * Game.gameSpeed
 function gadget:GameFrame(n)
 	if n == 0 then
 		InitializeAiTeamRulesParams()
@@ -394,6 +395,16 @@ function gadget:GameFrame(n)
 		--Spring.Echo("============================")
 		for i = 1, #allyTeamList do
 			UpdateAllyTeamActivity(allyTeamList[i])
+		end
+	end
+	
+	if n % SHARE_DECAY_RATE == 0 then
+		for i = 1, #playerResourceShare do
+			--[[ Decay shares to equal over time as the earlygame
+			     rigidity (lanes etc) become more nebulous ]]
+			local currentShare = playerResourceShare[i]
+			local newShare = 1 + (currentShare - 1) * 0.933 -- halves the extra share every ~10 minutes
+			playerResourceShare[i] = newShare
 		end
 	end
 end
@@ -418,7 +429,12 @@ function gadget:Initialize()
 	local playerList = Spring.GetPlayerList()
 	for i = 1, #playerList do
 		local playerID = playerList[i]
-		playerResourceShare[playerID] = 1
+		local customKeys = select(10, Spring.GetPlayerInfo(playerID))
+
+		--[[ Start people off with as many shares as they have comms so that they
+		     can use the extra BP comfortably and fulfil their team's expectations. ]]
+		local comms = 1 + (customKeys and customKeys.extracomm and tonumber(customKeys.extracomm) or 0)
+		playerResourceShare[playerID] = comms
 	end
 
 	local teamList = Spring.GetTeamList()
