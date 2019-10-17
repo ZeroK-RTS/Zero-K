@@ -26,6 +26,7 @@ end
 
 --Everything else: anti-bug, syntax, methods, ect
 local playerLineageUnits = {} --keep track of unit ownership: Is populated when gadget give away units, and when units is created. Depopulated when units is destroyed, or is finished construction, or when gadget return units to owner.
+local playerResourceShare = {}
 local teamResourceShare = {}
 local allyTeamResourceShares = {}
 local unitAlreadyFinished = {}
@@ -168,9 +169,10 @@ local function UpdateTeamActivity(teamID)
 	local isBackupAi = false
 	local players = spGetPlayerList(teamID)
 	for i = 1, #players do
-		local activeRank = GetPlayerActivity(players[i])
+		local playerID = players[i]
+		local activeRank = GetPlayerActivity(playerID)
 		if activeRank then
-			resourceShare = resourceShare + 1
+			resourceShare = resourceShare + playerResourceShare[playerID]
 			if (not teamRank) or (activeRank > teamRank) then
 				teamRank = activeRank
 			end
@@ -246,7 +248,7 @@ local function GetRawTeamShare(teamID)
 		local playerID = players[i]
 		local _, active, spec = spGetPlayerInfo(playerID, false)
 		if active and not spec then
-			shares = shares + 1
+			shares = shares + playerResourceShare[playerID]
 		end
 	end
 
@@ -408,7 +410,17 @@ function externalFunctions.GetResourceShares()
 	return allyTeamResourceShares, teamResourceShare
 end
 
+function gadget:PlayerAdded(playerID) -- in case a mid-game joining spectator uses `/team x`
+	playerResourceShare[playerID] = 1
+end
+
 function gadget:Initialize()
+	local playerList = Spring.GetPlayerList()
+	for i = 1, #playerList do
+		local playerID = playerList[i]
+		playerResourceShare[playerID] = 1
+	end
+
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
