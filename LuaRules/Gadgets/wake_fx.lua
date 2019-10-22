@@ -27,16 +27,15 @@ local units = {count = 0, data = {}}
 local fold_frames = 7 -- every seventh frame
 local n_folds = 4 -- check every fourth unit
 local current_fold = 1
+local wadingSMC = {}
+wadingSMC[Game.speedModClasses.Tank] = true
+wadingSMC[Game.speedModClasses.KBot] = true
 
 local function canWade(unitDefID)
     local moveDef = UnitDefs[unitDefID].moveDef
-    if (moveDef and moveDef.family) then
-        local mdFamily = moveDef.family
-        if mdFamily == "kbot" or mdFamily == "tank" then
-            return true
-        end
+    if (moveDef and moveDef.smClass) then
+        return wadingSMC[moveDef.smClass] or false
     end
-    return false
 end
 
 local function isMoving(unitID)
