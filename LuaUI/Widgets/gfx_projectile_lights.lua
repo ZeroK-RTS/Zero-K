@@ -9,7 +9,7 @@ function widget:GetInfo()
 		author    = "GoogleFrog (beherith orgional)",
 		date      = "5 March 2016",
 		license   = "GPL V2",
-		layer     = 0,
+		layer     = 999999,
 		enabled   = true
 	}
 end
