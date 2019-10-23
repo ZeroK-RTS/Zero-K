@@ -74,7 +74,6 @@ local vsy = nil	-- current viewport height
 local blurShaderH = nil
 local blurShaderV = nil
 local dofPrepass = nil
-local dofFeather = nil
 local bokehInitialPass = nil
 local bokehFinalPass = nil
 local dofShader = nil
@@ -82,7 +81,6 @@ local dofShader = nil
 -- Textures
 local screenTex = nil
 local downscaleTex = nil
-local downscaleDepth = nil
 local blurTex = nil
 local pongTex = nil
 local Rtex = nil
@@ -97,9 +95,6 @@ local bokehFBO = nil
 
 -- prepass shader uniform handles
 local projectionLoc = nil
-
--- feathering shader uniform handles
-local invResScaleLoc = nil
 
 -- combine shader uniform handles
 local bloomFactorLoc = nil
@@ -125,7 +120,6 @@ local function CleanTextures()
 	
 	if glDeleteTexture then
 		glDeleteTexture(downscaleTex or "")
-		glDeleteTexture(downscaleDepth or "")
 		glDeleteTexture(screenTex or "")
 		glDeleteTexture(blurTex or "")
 		glDeleteTexture(pongTex or "")
@@ -139,7 +133,6 @@ local function CleanTextures()
 	
 	screenTex = nil
 	downscaleTex = nil
-	downscaleDepth = nil
 	blurTex = nil
 	pongTex = nil
 	Rtex, Gtex, Btex = nil, nil, nil
@@ -151,7 +144,6 @@ end
 local function CleanShaders()
 	if (glDeleteShader) then
 		glDeleteShader(dofPrepass)
-		glDeleteShader(dofFeather)
 		glDeleteShader(dofShader)
 		glDeleteShader(blurShaderH)
 		glDeleteShader(blurShaderV)
@@ -164,7 +156,6 @@ local function CleanShaders()
 	bokehFinalPass = nil
 	dofShader = nil
 	dofPrepass = nil
-	dofFeather = nil
 end
 
 function widget:ViewResize(x, y)
@@ -174,10 +165,6 @@ function widget:ViewResize(x, y)
 	if bokehInitialPass and bokehFinalPass then
 		gl.ActiveShader(bokehInitialPass, function() glUniform(bokehInverseRXloc, 2.0/vsx) end)
 		gl.ActiveShader(bokehFinalPass, function() glUniform(bokehInverseRYloc, 2.0/vsy) end)
-	end
-	
-	if dofFeather then
-		gl.ActiveShader(dofFeather, function() glUniform(invResScaleLoc, 2.0/vsx, 2.0/vsy) end)
 	end
 	
 	screenTex = glCreateTexture(vsx, vsy, {
@@ -199,18 +186,11 @@ function widget:ViewResize(x, y)
 		depthTex = gl.CreateTexture(vsx,vsy, {
 			border = false,
 			format = GL_DEPTH_COMPONENT24,
-			min_filter = GL.LINEAR,
-			mag_filter = GL.LINEAR,
+			min_filter = GL.NEAREST,
+			mag_filter = GL.NEAREST,
 		})
 		
 		if options.useHQ.value then
-			downscaleDepth = gl.CreateTexture(vsx/2,vsy/2, {
-				border = false,
-				format = GL_DEPTH_COMPONENT24,
-				min_filter = GL.LINEAR,
-				mag_filter = GL.LINEAR,
-			})
-			
 			Rtex = glCreateTexture(vsx/2, vsy/2, {
 				fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 				wrap_s = GL.MIRRORED_REPEAT, wrap_t = GL.MIRRORED_REPEAT, format = GL_RGBA16F_ARB
@@ -253,16 +233,18 @@ function widget:ViewResize(x, y)
 		end
 	end
 	
-	pongTex = glCreateTexture(vsx/2, vsy/2, {
-		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-		wrap_s = GL.MIRRORED_REPEAT, wrap_t = GL.MIRRORED_REPEAT,
-	})
-	
-	if not pongTex then
-		Spring.Echo("DoF/Bloom: Failed to create intermediate blur texture!")
-		widget:Shutdown()
-		widgetHandler:RemoveWidget()
-		return
+	if not options.useDoF.value or not options.useHQ.value then
+		pongTex = glCreateTexture(vsx/2, vsy/2, {
+			fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
+			wrap_s = GL.MIRRORED_REPEAT, wrap_t = GL.MIRRORED_REPEAT,
+		})
+
+		if not pongTex then
+			Spring.Echo("DoF/Bloom: Failed to create intermediate blur texture!")
+			widget:Shutdown()
+			widgetHandler:RemoveWidget()
+			return
+		end
 	end
 	
 	if options.useBloom.value then
@@ -327,22 +309,6 @@ local function InitShaders()
 		projectionLoc = gl.GetUniformLocation(dofPrepass, "projection")
 		
 		if options.useHQ.value then
-			dofFeather = glCreateShader({
-				fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\dof_feather_pass.fs", VFS.ZIP),
-				
-				uniformInt = {downscaleTex = 0, depthTex = 1},
-			})
-			
-			if not dofFeather then
-				Spring.Echo("DOF/Bloom Widget: Failed to create DoF feathering shader!")
-				Spring.Echo(gl.GetShaderLog())
-				widget:Shutdown()
-				widgetHandler:RemoveWidget()
-				return
-			end
-			
-			invResScaleLoc = gl.GetUniformLocation(dofFeather, "invResScale")
-		
 			bokehInitialPass = glCreateShader({
 				fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\bokeh_blur_initial_pass.fs", VFS.ZIP),
 				
@@ -461,22 +427,12 @@ local function ApplyPreproc()
 	mglRenderToTexture(downscaleTex, screenTex, 1, -1)
 	
 	if options.useDoF.value and options.useHQ.value then
-		mglRenderToTexture(downscaleDepth, depthTex, 1, -1) --downscale the depth tex for feathering.
-	
-		glUseShader(dofFeather)
-			glTexture(0, downscaleTex)
-			glTexture(1, downscaleDepth)
-			glRenderToTexture(blurTex, glTexRect, -1, 1, 1, -1)
-			glTexture(0, false)
-			glTexture(1, false)
-		glUseShader(0)
-		
 		-- blur the alpha values by 1px to smooth out the blur scaling
 		glUseShader(blurShaderH)
 			glUniform(bloomInverseRXloc, 2.0/vsx)
 			glUniformInt(bigBlurHloc, 0)
 			glUniformInt(alphaHloc, 1)
-			mglRenderToTexture(pongTex, blurTex, 1, -1)
+			mglRenderToTexture(blurTex, downscaleTex, 1, -1)
 			glUniformInt(alphaHloc, 0)
 		glUseShader(0)
 		
@@ -484,7 +440,7 @@ local function ApplyPreproc()
 			glUniform(bloomInverseRYloc, 2.0/vsy)
 			glUniformInt(bigBlurVloc, 0)
 			glUniformInt(alphaVloc, 1)
-			mglRenderToTexture(downscaleTex, pongTex, 1, -1)
+			mglRenderToTexture(downscaleTex, blurTex, 1, -1)
 			glUniformInt(alphaVloc, 0)
 		glUseShader(0)
 		
