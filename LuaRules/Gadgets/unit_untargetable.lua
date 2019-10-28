@@ -7,7 +7,7 @@ end
 --------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
-		name = "Disallow unit for command targeting",
+		name = "Disallow unit for command and weapon targeting",
 		desc = "Forbid all commands from targeting specific units",
 		author = "Anarchid",
 		date = "1.07.2016",
@@ -38,4 +38,10 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	end
 
 	return false
+end
+
+function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
+	if not spValidUnitID(targetID) or spGetUnitRulesParam(targetID, "untargetable") ~= 1 then
+		return true
+	end
 end
