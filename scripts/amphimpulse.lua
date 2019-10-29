@@ -63,7 +63,6 @@ local impulseDepthMult = -tonumber(wd.customParams.impulsedepthmult)
 
 local SOUND_PERIOD = 2
 local soundIndex = SOUND_PERIOD
-local TANK_MAX
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -356,7 +355,6 @@ function script.StopMoving()
 end
 
 function script.Create()
-	TANK_MAX = UnitDefs[Spring.GetUnitDefID(unitID)].customParams.maxwatertank
 	--StartThread(Walk)
 
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
