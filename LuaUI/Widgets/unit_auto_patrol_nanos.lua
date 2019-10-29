@@ -36,6 +36,7 @@ local spGetMyTeamID     = Spring.GetMyTeamID
 local spGetTeamUnits    = Spring.GetTeamUnits
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetUnitDefID    = Spring.GetUnitDefID
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetGameRulesParam = Spring.GetGameRulesParam
@@ -172,11 +173,13 @@ function widget:UnitGiven(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
+	local _,_,isNanoframe = spGetUnitIsStunned(unitID)
 	if not enableIdleNanos
 	or stoppedUnit[unitID]
 	or unitTeam ~= spGetMyTeamID()
 	or not IsImmobileBuilder(UnitDefs[unitDefID])
 	or spGetGameRulesParam("loadPurge") == 1
+	or isNanoframe
 	then
 		return
 	end
