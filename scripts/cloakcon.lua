@@ -191,6 +191,7 @@ function script.QueryNanoPiece()
 end
 
 function script.Create()
+	Spring.SetUnitNanoPieces(unitID, {claw1})
 	StartThread(GG.Script.SmokeUnit, unitID, {chest})
 	Turn(rthigh, y_axis, math.rad(-20))
 	Turn(lthigh, y_axis, math.rad(20))

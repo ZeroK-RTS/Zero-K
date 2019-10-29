@@ -6,7 +6,7 @@ local post1, post2 = piece ('post1', 'post2')
 local nano1, nano2 = piece ('nano1', 'nano2')
 local base, pad = piece ('base', 'pad')
 
-local nanoPieces = { nano1, nano2 }
+local nanoPieces = { beam1, beam2 }
 local smokePiece = { base }
 
 local function Open ()
@@ -89,7 +89,7 @@ function script.QueryBuildInfo ()
 	return pad
 end
 
-local explodables = {nano1, nano2, beam1, beam2, post1, post2, door1, door2}
+local explodables = {nano1, nano2, post1, post2, door1, door2}
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	local brutal = (severity > 0.5)

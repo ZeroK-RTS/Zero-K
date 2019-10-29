@@ -12,7 +12,6 @@ local lbrace1, lbrace2 = piece('lbrace1', 'lbrace2')
 local rguard1, rguard2 = piece('rguard1', 'rguard2')
 local lguard1, lguard2 = piece('lguard1', 'lguard2')
 
-local nanoPieces = {lnano, rnano}
 local smokePiece = {body, turret}
 
 local wheels = {fwheel, rwheel1, rwheel2, rwheel3, rwheel4, lwheel1, lwheel2, lwheel3, lwheel4}
@@ -48,7 +47,7 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	Spring.SetUnitNanoPieces(unitID, nanoPieces)
+	Spring.SetUnitNanoPieces(unitID, {firepoint})
 end
 
 local function RestoreAfterDelay()

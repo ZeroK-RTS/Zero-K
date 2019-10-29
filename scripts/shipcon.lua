@@ -74,7 +74,7 @@ end
 
 function script.QueryNanoPiece()
 	GG.LUPS.QueryNanoPiece(unitID, unitDefID, Spring.GetUnitTeam(unitID), beam)
-	return emit
+	return beam
 end
 
 local explodables = {turret, arm1, arm2, armpiece, claw1, claw2}
