@@ -34,7 +34,7 @@ local spGetUnitIsStunned       = Spring.GetUnitIsStunned
 local spGetUnitTeam            = Spring.GetUnitTeam
 local spGetUnitStates          = Spring.GetUnitStates
 local spGetUnitDefID           = Spring.GetUnitDefID
-local spSetFeatureReclaim      = Spring.SetFeatureReclaim
+local spSetFeatureResources    = Spring.SetFeatureResources
 local spDestroyFeature         = Spring.DestroyFeature
 local spCreateUnit             = Spring.CreateUnit
 local spGiveOrderToUnit        = Spring.GiveOrderToUnit
@@ -129,7 +129,6 @@ function gadget:GameFrame(f)
 
 	if f%UPDATE_FREQUNECY == 3 then
 		
-		killedFeature = {} -- list of features that will be killed
 		local featureMetal = {} -- list of updated feature metal
 		
 		-- loop through units and gain resources
@@ -152,8 +151,7 @@ function gadget:GameFrame(f)
 					   0,0,0,
 					   30, 30
 					);
-					local _, maxMetal, _,_, reclaim = spGetFeatureResources(feature)
-					metal = featureMetal[feature] or maxMetal*reclaim
+					local metal = featureMetal[feature] or spGetFeatureResources(feature)
 					-- The 0.0001 is to safeguard against rounding errors possibly introduced by
 					-- the fact that reclaim has a fractional value.
 					if metal - 0.0001 > quota then
@@ -198,9 +196,16 @@ function gadget:GameFrame(f)
 			   0,0,0,
 			   30, 30
 			);
-			
-			local _, maxMetal = spGetFeatureResources(id)
-			spSetFeatureReclaim(id, metal/maxMetal)
+
+			-- NB: if somebody finishes the reclaim of a partially goo'd feature
+			-- they will receive the "missing" energy as a chunk (for example if you
+			-- drain 80% using goo and then reclaim the remaining 20% manually, you'll
+			-- get 20% during the course of that reclaim and then the 80% as a single chunk).
+			-- If goo finishes all the metal, the remaining energy is lost.
+			-- Currently all gooables have 0 energy worth so this is not a problem,
+			-- but a mapper could in theory add that.
+			local _, maxMetal, energy = spGetFeatureResources(id)
+			spSetFeatureResources(id, metal, energy, nil, metal / maxMetal)
 		end
 		
 		for id, _ in pairs(killedFeature) do
@@ -211,7 +216,10 @@ function gadget:GameFrame(f)
 			   0,0,0,
 			   30, 30
 			);
+
 			spDestroyFeature(id)
+
+			killedFeature[id] = nil
 		end
 		
 		-- check for enough resources to spawn a new unit
