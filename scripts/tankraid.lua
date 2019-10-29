@@ -224,24 +224,19 @@ function script.BlockShot(num, targetID)
 	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 125, 50)
 end
 
-function script.Killed(severity, corpsetype)
+function script.Killed(recentDamage, maxHealth)
+	local severity = 100 * recentDamage / maxHealth
 	if severity <= 25 then
-	
-		corpsetype = 1
 		Explode(body, SFX.NONE)
 		Explode(turret, SFX.NONE)
 		return 1
 	end
 	if severity <= 50 then
-	
-		corpsetype = 1
 		Explode(body, SFX.NONE)
 		Explode(turret,SFX.NONE)
 		Explode(barrel, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 1
 	else
-	
-		corpsetype = 2
 		Explode(body, SFX.NONE)
 		Explode(turret, SFX.NONE)
 		Explode(barrel, SFX.FALL + SFX.SMOKE + SFX.FIRE)
