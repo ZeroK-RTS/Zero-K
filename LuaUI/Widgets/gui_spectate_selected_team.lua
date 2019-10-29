@@ -12,6 +12,7 @@ function widget:GetInfo()
 end
 
 local spGetUnitTeam = Spring.GetUnitTeam
+local spGetMyTeamID = Spring.GetMyTeamID
 local spSendCommands = Spring.SendCommands
 
 local specOld = false
@@ -75,7 +76,8 @@ function widget:SelectionChanged(selection)
   if selection and #selection > 0 then
     -- I cannot read users mind, use first unit
     team = spGetUnitTeam(selection[1])
-    if team then
+    local lastTeam = spGetMyTeamID()
+    if team and team ~= lastTeam then
       spSendCommands("specteam "..team)
     end
   end
