@@ -25,8 +25,6 @@ local SIG_AIM1 = 2
 local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 
-local SPEED = 1.9
-
 local SPEED = 2
 
 --------------------------------------------------------------------------------
