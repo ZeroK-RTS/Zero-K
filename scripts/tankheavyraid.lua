@@ -200,22 +200,16 @@ end
 function script.Killed(severity, maxHealth)
 	severity = severity / maxHealth
 	if severity <= 0.25 then
-	
-		corpsetype = 1
 		Explode(main, SFX.NONE)
 		Explode(turret, SFX.NONE)
 		return 1
 	end
 	if severity <= 0.50 then
-	
-		corpsetype = 1
 		Explode(main, SFX.NONE)
 		Explode(turret,SFX.NONE)
 		Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 1
 	else
-	
-		corpsetype = 2
 		Explode(main, SFX.NONE)
 		Explode(turret, SFX.NONE)
 		Explode(barrel2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
