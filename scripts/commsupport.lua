@@ -45,16 +45,6 @@ local SIG_WALK = 1
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local flamers = {}
-local wepTable = UnitDefs[unitDefID].weapons
-wepTable.n = nil
-for index, weapon in pairs(wepTable) do
-	local weaponDef = WeaponDefs[weapon.weaponDef]
-	if weaponDef.type == "Flame" or (weaponDef.customParams and weaponDef.customParams.flamethrower) then
-		flamers[index] = true
-	end
-end
-
 local restoreHeading, restorePitch = 0, 0
 
 local canDgun = UnitDefs[unitDefID].canDgun
@@ -444,9 +434,6 @@ function script.Shot(num)
 		EmitSfx(flare, 1025)
 	elseif num == 3 then
 		EmitSfx(flare, 1027)
-	end
-	if flamers[num] then
-		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
 	end
 end
 
