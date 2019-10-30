@@ -11,9 +11,9 @@ local colors = {
 	gaiaColor	= Range({ 200, 200, 200 }),	-- can only be 1 color
 	
 	allyColors = {
-	  Range({ 020, 105, 255 }),
+	  Range({ 010, 080, 255 }),
 	  Range({ 010, 250, 250 }),
-	  Range({ 120, 120, 255 }),
+	  Range({ 150, 150, 255 }),
 	  Range({ 005, 120, 005 }),
 	  Range({ 120, 175, 050 }),
 	  Range({ 090, 040, 255 }),
