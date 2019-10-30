@@ -228,9 +228,6 @@ local function DustLoop()
 		if (takeoffOrLanding) then
 			EmitSfx(dust1, 1025)
 			EmitSfx(dust2, 1025)
-		else
-			--EmitSfx(dust1, 1025)
-			--EmitSfx(dust2, 1025)
 		end
 		Sleep(66)
 	end
