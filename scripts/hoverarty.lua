@@ -64,10 +64,6 @@ function script.setSFXoccupy(num)
 	curTerrainType = num
 end
 
-function script.StopMoving()
-	bMoving = 0
-end
-
 function script.Create()
 	Hide(flare)
 
