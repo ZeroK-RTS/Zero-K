@@ -194,7 +194,6 @@ function script.Killed(recentDamage, maxHealth)
 	if (severity < 0.25) then
 		return 1
 	elseif (severity < 0.5) then
-		corpsetype = 1
 		Explode(barrel, SFX.FALL)
 		Explode(breech, SFX.FALL)
 		Explode(sleeve, SFX.FALL)
