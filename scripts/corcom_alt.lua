@@ -74,15 +74,12 @@ local RESTORE_DELAY_DGUN = 2500
 local isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, true
 local restoreHeading, restorePitch = 0, 0
 
-local flamers = {}
 local starBLaunchers = {}
 local wepTable = UnitDefs[unitDefID].weapons
 wepTable.n = nil
 for index, weapon in pairs(wepTable) do
 	local weaponDef = WeaponDefs[weapon.weaponDef]
-	if weaponDef.type == "Flame" or (weaponDef.customParams and weaponDef.customParams.flamethrower) then
-		flamers[index] = true
-	elseif weaponDef.type == "StarburstLauncher" then
+	if weaponDef.type == "StarburstLauncher" then
 		starBLaunchers[index] = true
 		--Spring.Echo("sbl found")
 	end
@@ -187,9 +184,6 @@ function script.Shot(num)
 		EmitSfx(lfirept, 1025)
 	elseif num == 3 then
 		EmitSfx(rbigflash, 1027)
-	end
-	if flamers[num] then
-		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
 	end
 end
 
