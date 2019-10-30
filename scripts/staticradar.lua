@@ -98,7 +98,6 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(head, SFX.FALL + SFX.EXPLODE)
 		return 1
 	elseif severity <= .99 then
-		corpsetype = 2
 		Explode(ground, SFX.NONE)
 		Explode(head, SFX.FALL + SFX.EXPLODE)
 		return 2
