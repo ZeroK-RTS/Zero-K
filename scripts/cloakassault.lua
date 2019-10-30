@@ -38,19 +38,17 @@ local steptime = 10
 local stride_top = -0.5
 local stride_bottom = -2.75
 
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local function GetSpeedMod()
-	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	return (spGetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
 end
 
 local function walk()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 
-	local speedmod = 1
-	local truespeed = runspeed
 	while true do
-		speedmod = GetSpeedMod()
-		truespeed = runspeed * speedmod
+		local truespeed = runspeed * GetSpeedMod()
 
 		Turn(hips, z_axis, 0.08, truespeed*0.15)
 
@@ -92,8 +90,7 @@ local function walk()
 
 		Sleep(steptime)
 
-		speedmod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
-		truespeed = runspeed * speedmod
+		truespeed = runspeed * GetSpeedMod() -- again because it might've changed during sleep
 		Turn(hips, z_axis, -0.08, truespeed*0.15)
 
 		Turn(lthigh, x_axis, -0.65, truespeed*1.25)

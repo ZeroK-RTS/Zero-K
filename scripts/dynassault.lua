@@ -140,9 +140,6 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	
-	local speedMult = 1
-	local scaleMult = dyncomm.GetScale()
-	
 	while true do
 		walkCycle = 3 - walkCycle
 		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*dyncomm.GetPace()

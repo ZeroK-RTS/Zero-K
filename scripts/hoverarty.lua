@@ -48,14 +48,10 @@ local function WobbleUnit()
 end
 
 local function HoverFX()
-	local emitType = 1024
 	while true do
 		if not Spring.GetUnitIsCloaked(unitID) then
-			if (curTerrainType == 1 or curTerrainType == 2) and select(2, Spring.GetUnitPosition(unitID)) == 0 then
-				emitType = 5
-			else
-				emitType = 1024
-			end
+			local isOnWater = (curTerrainType == 1 or curTerrainType == 2) and select(2, Spring.GetUnitPosition(unitID)) == 0
+			local emitType = isOnWater and 5 or 1024
 			for i = 1, 4 do
 				EmitSfx(wheels[i], emitType)
 			end
@@ -66,10 +62,6 @@ end
 
 function script.setSFXoccupy(num)
 	curTerrainType = num
-end
-
-function script.StopMoving()
-	bMoving = 0
 end
 
 function script.Create()

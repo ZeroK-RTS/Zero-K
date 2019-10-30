@@ -195,7 +195,7 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(belt, z_axis, heading, math.rad(200));
 
 	-- instantly turn the actual sim gun towards target, then wait for the visual pieces to animate
-	Turn(aimProxy, x_axis, -pitch); 
+	Turn(aimProxy, x_axis, -pitch)
 	
 	if (not is_open) then
 		StartThread(Open);
