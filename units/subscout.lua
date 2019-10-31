@@ -38,6 +38,7 @@ unitDef = {
   noAutoFire            = false,
   noChaseCategory       = [[FIXEDWING SATELLITE HOVER]],
   objectName            = [[subscout.s3o]],
+  script                = [[subscout.lua]],
   selfDestructAs        = [[SUBSCOUT_DEATH]],
   selfDestructCountdown = 0,
   sightDistance         = 550,
