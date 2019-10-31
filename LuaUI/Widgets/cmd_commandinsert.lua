@@ -240,7 +240,7 @@ local function EncodeOptions(options)
 	return coded
 end
 
-function WG.CommandInsert(id, params, options, seq)
+function WG.CommandInsert(id, params, options, seq, nonInsertIfPossible)
 	options.coded = (options.coded or EncodeOptions(options))
 	seq = seq or 0
 
@@ -268,7 +268,11 @@ function WG.CommandInsert(id, params, options, seq)
 		local unitID = units[i]
 		local commands = Spring.GetCommandQueue(unitID, 0)
 		if commands then
-			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {commands + seq, id, options.coded, unpack(params)}, CMD.OPT_ALT)
+			if nonInsertIfPossible then
+				Spring.GiveOrderToUnit(unitID, id, params, options.coded)
+			else
+				Spring.GiveOrderToUnit(unitID, CMD.INSERT, {commands + seq, id, options.coded, unpack(params)}, CMD.OPT_ALT)
+			end
 		end
 	end
 end

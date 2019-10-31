@@ -379,7 +379,7 @@ function widget:CommandNotify(cmdID, params, options)
 				end
 
 				if makeMexEnergy then
-					for i=1, #addons do
+					for i = 1, #addons do
 						local addon = addons[i]
 						local xx = x+addon[1]
 						local zz = z+addon[2]
@@ -396,7 +396,7 @@ function widget:CommandNotify(cmdID, params, options)
 
 			for i = 1, #commandArrayToIssue do
 				local command = commandArrayToIssue[i]
-				WG.CommandInsert(command[1], command[2], options, i - 1)
+				WG.CommandInsert(command[1], command[2], options, i - 1, true)
 			end
 		end
 
