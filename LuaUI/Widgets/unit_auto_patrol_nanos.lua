@@ -178,6 +178,14 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 		return
 	end
 
+	--[[ A unit can become "idle" in the process of receiving a command. Consider:
+
+	  CommandNotify()
+	    RemoveAllCommands() -- triggers idle here
+	    return false -- not actually idle
+
+	If the command was ordered with SHIFT it would get appended after the patrol. ]]
+
 	idleCheckUnits = idleCheckUnits or {}
 	idleCheckUnits[unitID] = true
 end
