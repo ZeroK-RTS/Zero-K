@@ -60,6 +60,7 @@ local carrierList = {}
 local droneList = {}
 local drones_to_move = {}
 local killList = {}
+local recall_frame_start = {}
 
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 
@@ -546,11 +547,11 @@ local function UpdateCarrierTarget(carrierID, frame)
 	local setTargetOrder = false
 	
 	--checks if there is an active recall order
-	local recallFrame = spGetUnitRulesParam(carrierID,"recall_frame_start")
+	local recallFrame = recall_frame_start[carrierID]
 	if recallFrame then
 		if frame > recallFrame + RECALL_TIMEOUT then
 			--recall has expired
-			spSetUnitRulesParam(carrierID,"recall_frame_start",nil)
+			recall_frame_start[carrierID] = nil
 		else
 			recallDrones = true
 		end
@@ -687,7 +688,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 	
 	if (cmdID == CMD.ATTACK or cmdID == CMD.FIGHT or cmdID == CMD.PATROL or cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE) then
-		spSetUnitRulesParam(unitID,"recall_frame_start",nil)
+		recall_frame_start[unitID] = nil
 		return true
 	end
 	
@@ -710,7 +711,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		end
 		
 		frame = spGetGameFrame()
-		spSetUnitRulesParam(unitID,"recall_frame_start",frame)
+		recall_frame_start[unitID] = frame
 		
 		return false
 	end
@@ -757,6 +758,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 		generateDrones[unitID] = nil
 		carrierList[unitID] = nil
+		recall_frame_start[unitID] = nil
 	elseif (droneList[unitID]) then
 		local carrierID = droneList[unitID].carrier
 		local setID = droneList[unitID].set
