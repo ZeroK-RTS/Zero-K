@@ -28,6 +28,7 @@ unitDef = {
   minCloakDistance  = 150,
   noAutoFire        = false,
   objectName        = [[roost]],
+  script            = [[roost.lua]],
   selfDestructAs    = [[NOWEAPON]],
 
   sfxtypes          = {
