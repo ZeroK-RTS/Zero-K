@@ -23,6 +23,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aimposoffset = [[0 10 0]],
   },
 
   explodeAs              = [[CRAWL_BLASTSML]],
