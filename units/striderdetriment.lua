@@ -96,6 +96,7 @@ unitDef = {
       
       customParams = {
         single_hit_multi = true,
+        reaim_time = 1,
       },
 
       damage                  = {
@@ -143,6 +144,7 @@ unitDef = {
 
       customParams              = {
         isaa = [[1]],
+        reaim_time = 1,
       },
 
       damage                  = {
@@ -181,8 +183,9 @@ unitDef = {
       craterMult              = 0,
   
       customParams            = {
-    --timeslow_preset = [[module_disruptorbeam]],
-    timeslow_damagefactor = [[2]],
+        --timeslow_preset = [[module_disruptorbeam]],
+        timeslow_damagefactor = [[2]],
+        reaim_time = 1,
       },
       
       damage                  = {
@@ -228,6 +231,7 @@ unitDef = {
       
       customParams            = {
         light_color = [[0.2 0.8 0.2]],
+        reaim_time = 1,
       },
       
       damage                  = {
@@ -282,6 +286,7 @@ unitDef = {
         
         light_color = [[1 1.4 0.35]],
         light_radius = 400,
+        reaim_time = 1,
       },
 
       damage                  = {

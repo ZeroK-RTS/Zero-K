@@ -115,6 +115,7 @@ unitDef = {
 
       customParams            = {
         bogus = 1,
+        reaim_time = 1,
       },
 
       damage                  = {
@@ -163,6 +164,7 @@ unitDef = {
         light_color = [[0.85 0.85 1.2]],
         light_radius = 200,
         gui_draw_range = 450,
+        reaim_time = 1,
       },
 
       cylinderTargeting      = 0,
@@ -208,6 +210,7 @@ unitDef = {
         light_color = [[0.7 0.7 0.2]],
         light_radius = 320,
         gui_draw_range = 450,
+        reaim_time = 1,
       },
 
       damage                  = {
@@ -251,6 +254,7 @@ unitDef = {
       customParams            = {
         light_color = [[0.9 0.22 0.22]],
         light_radius = 80,
+        reaim_time = 1,
       },
       
       damage                  = {

@@ -15,6 +15,7 @@ local weaponDef = {
 		miscEffectFire   = [[custom:RIOT_SHELL_L]],
 
 		light_camera_height = 1500,
+		reaim_time = 1,
 	},
 
 	damage                  = {

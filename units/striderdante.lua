@@ -113,6 +113,7 @@ unitDef = {
         light_fade_time = 13,
         light_beam_mult_frames = 5,
         light_beam_mult = 5,
+        reaim_time = 1,
       },
       
       damage                  = {
@@ -161,6 +162,7 @@ unitDef = {
         light_fade_offset = 10,
         light_beam_mult_frames = 9,
         light_beam_mult = 8,
+        reaim_time = 1,
       },
       
       damage                  = {
@@ -207,6 +209,7 @@ unitDef = {
       customParams              = {
         setunitsonfire = "1",
         burnchance = "1",
+        reaim_time = 1,
       },
       
       damage                  = {
@@ -260,6 +263,7 @@ unitDef = {
         
         light_color = [[0.8 0.4 0.1]],
         light_radius = 320,
+        reaim_time = 1,
       },
       
       damage                  = {

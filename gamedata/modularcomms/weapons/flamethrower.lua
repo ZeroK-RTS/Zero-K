@@ -25,6 +25,7 @@ local weaponDef = {
 		light_fade_time = 10,
 		light_beam_mult_frames = 5,
 		light_beam_mult = 5,
+		reaim_time = 1,
 	},
 
 	damage                  = {

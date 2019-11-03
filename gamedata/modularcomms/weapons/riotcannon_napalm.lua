@@ -18,6 +18,7 @@ local weaponDef = {
 		setunitsonfire   = [[1]],
 
 		light_camera_height = 1500,
+		reaim_time = 1,
 	},
 
 	damage                  = {

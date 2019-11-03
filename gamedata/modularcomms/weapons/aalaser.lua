@@ -17,6 +17,7 @@ local weaponDef = {
 
 		light_color = [[0.2 1.2 1.2]],
 		light_radius = 120,
+		reaim_time = 1,
 	},
 
 	damage                  = {

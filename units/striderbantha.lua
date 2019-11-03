@@ -100,6 +100,7 @@ unitDef = {
 
         light_color = [[1.25 0.8 1.75]],
         light_radius = 320,
+        reaim_time = 1,
       },
 
       damage                  = {
@@ -150,6 +151,7 @@ unitDef = {
         combatrange = 900,
         light_color = [[0.65 0.65 0.18]],
         light_radius = 380,
+        reaim_time = 1,
       },
 
       damage                  = {
@@ -199,6 +201,7 @@ unitDef = {
         light_camera_height = 2200,
         light_color = [[0.85 0.85 1.2]],
         light_radius = 200,
+        reaim_time = 1,
       },
 
       damage                  = {

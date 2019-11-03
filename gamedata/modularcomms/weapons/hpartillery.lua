@@ -12,6 +12,7 @@ local weaponDef = {
 		miscEffectFire = [[custom:RIOT_SHELL_H]],
 
 		light_color = [[1.4 0.8 0.3]],
+		reaim_time = 1,
 	},
 
 	damage                  = {

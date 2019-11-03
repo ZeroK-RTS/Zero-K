@@ -15,6 +15,7 @@ local weaponDef = {
 		badTargetCategory  = [[FIXEDWING]],
 		onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP HOVER]],
 		slot = [[5]],
+		reaim_time = 1,
 	},
 
 	damage                  = {

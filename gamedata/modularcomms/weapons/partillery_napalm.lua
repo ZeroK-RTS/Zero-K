@@ -10,6 +10,7 @@ local weaponDef = {
 		burnchance = [[1]],
 		setunitsonfire = [[1]],
 		burntime = [[450]],
+		reaim_time = 1,
 	},
 
 	craterBoost             = 0,

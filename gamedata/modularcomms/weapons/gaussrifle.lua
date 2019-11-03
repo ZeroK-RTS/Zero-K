@@ -15,6 +15,7 @@ local weaponDef = {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:flashmuzzle1]],
 		single_hit_multi = true,
+		reaim_time = 1,
 	},
 
 	damage                  = {

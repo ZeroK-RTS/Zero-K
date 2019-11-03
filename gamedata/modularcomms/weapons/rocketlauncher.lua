@@ -14,6 +14,7 @@ local weaponDef = {
 		light_camera_height = 2200,
 		light_color = [[0.95 0.65 0.30]],
 		light_radius = 280,
+		reaim_time = 1,
 	},
 
 	damage                  = {

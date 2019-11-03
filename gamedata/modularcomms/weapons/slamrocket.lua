@@ -22,6 +22,7 @@ local weaponDef = {
 
 		light_camera_height = 2500,
 		light_color = [[1 0.8 0.2]],
+		reaim_time = 1,
 	},
 	cylinderTargeting       = 1.0,
 

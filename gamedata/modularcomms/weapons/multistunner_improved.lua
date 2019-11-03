@@ -16,6 +16,7 @@ local weaponDef = {
 
 		light_color = [[0.75 0.75 0.22]],
 		light_radius = 350,
+		reaim_time = 1,
 	},
 
 	craterBoost             = 0,
