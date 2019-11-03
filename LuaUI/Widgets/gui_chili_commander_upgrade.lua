@@ -1012,6 +1012,27 @@ function widget:SelectionChanged(selectedUnits)
 	cachedSelectedUnits = selectedUnits
 end
 
+function deepcopy(orig, copies)
+    copies = copies or {}
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        if copies[orig] then
+            copy = copies[orig]
+        else
+            copy = {}
+            copies[orig] = copy
+            setmetatable(copy, deepcopy(getmetatable(orig), copies))
+            for orig_key, orig_value in next, orig, nil do
+                copy[deepcopy(orig_key, copies)] = deepcopy(orig_value, copies)
+            end
+        end
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
 function widget:CommandsChanged()
 	local units = cachedSelectedUnits or Spring.GetSelectedUnits()
 	if mainWindowShown then
@@ -1029,8 +1050,11 @@ function widget:CommandsChanged()
 				end
 				
 				table.sort(alreadyOwned)
-				
-				if upgradeUtilities.ModuleSetsAreIdentical(alreadyOwned, upgradeSignature.alreadyOwned) then
+
+				local ourComOwns = deepcopy(upgradeSignature.alreadyOwned)
+				table.sort(ourComOwns)
+
+				if upgradeUtilities.ModuleSetsAreIdentical(alreadyOwned, ourComOwns) then
 					foundMatchingComm = true
 					break
 				end
