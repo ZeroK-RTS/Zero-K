@@ -1,7 +1,7 @@
 include "constants.lua"
 include "JumpRetreat.lua"
 
-dyncomm = include('dynamicCommander.lua')
+local dyncomm = include('dynamicCommander.lua')
 
 --------------------------------------------------------------------------------
 -- pieces
