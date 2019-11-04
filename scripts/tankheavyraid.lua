@@ -46,7 +46,7 @@ end
 
 
 
-function AnimationControl()
+local function AnimationControl()
 
 	local current_tracks = 0
 	

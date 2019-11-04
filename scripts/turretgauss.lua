@@ -124,7 +124,7 @@ local function Close()
 	end
 end
 
-function RestoreAfterDelay()
+local function RestoreAfterDelay()
 	Sleep(restore_delay);
 	
 	repeat

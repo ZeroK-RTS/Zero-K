@@ -42,6 +42,7 @@ end
 ----------------------------------------------------------
 ----------------------------------------------------------
 
+--[[
 function FlameTrailThread()
 	flaming = true
 	Signal(SIG_Restore)
@@ -64,11 +65,12 @@ end
 function FlameTrail()
 	StartThread(FlameTrailThread)
 end
+]]
 
 ----------------------------------------------------------
 ----------------------------------------------------------
 
-function AnimationControl()
+local function AnimationControl()
 
 	local current_tracks = 0
 	
