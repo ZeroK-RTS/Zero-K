@@ -106,9 +106,9 @@ end
 
 local function ShotThread()
 	Move(gun, y_axis, -2, 40)
-	Turn(turretbase, x_axis, math.rad(165), math.rad(200))
+	Turn(turretbase, x_axis, math.rad(145), math.rad(400))
 	Sleep(100)
-	Turn(turretbase, x_axis, math.rad(180), math.rad(40))
+	Turn(turretbase, x_axis, math.rad(180), math.rad(60))
 	Move(gun, y_axis, 2, 2)
 end
 
