@@ -11,6 +11,7 @@ local launcher2 = piece 'launcher2'
 local firepoint1 = piece 'firepoint1'
 local firepoint2 = piece 'firepoint2'
 
+local aiming = false
 local shot = 0
 local gun = {
 	[0] = {firepoint = firepoint1, loaded = true},
