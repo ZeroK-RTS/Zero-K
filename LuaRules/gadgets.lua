@@ -1168,6 +1168,22 @@ function gadgetHandler:CommandFallback(unitID, unitDefID, unitTeam,
   return true  -- remove the command
 end
 
+if Script.IsEngineMinVersion(104, 0, 1431) then
+
+function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam,
+                                    cmdID, cmdParams, cmdOptions, cmdTag,
+                                    playerID, fromSynced, fromLua)
+  for _,g in r_ipairs(self.AllowCommandList) do
+
+	if (not g:AllowCommand(unitID, unitDefID, unitTeam,
+                           cmdID, cmdParams, cmdOptions, cmdTag, fromSynced)) then
+      return false
+    end
+  end
+  return true
+end
+
+else
 
 function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam,
                                     cmdID, cmdParams, cmdOptions, cmdTag, synced)
@@ -1179,6 +1195,8 @@ function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam,
     end
   end
   return true
+end
+
 end
 
 function gadgetHandler:AllowStartPosition(playerID, teamID, readyState, cx, cy, cz, rx, ry, rz)
@@ -2283,11 +2301,26 @@ end
 -- FIXME: NOT IN BASE VERSION
 --
 
+if Script.IsEngineMinVersion(104, 0, 1431) then
+
+function gadgetHandler:UnitCommand(unitID, unitDefID, unitTeam,
+	cmdID, cmdOpts, cmdParams, cmdTag, -- opts is a bitmask
+	playerID, fromSynced, fromLua)
+  for _,g in r_ipairs(self.UnitCommandList) do
+    g:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams, cmdTag, playerID, fromSynced, fromLua)
+  end
+  return
+end
+
+else
+
 function gadgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams) -- opts is a bitmask
   for _,g in r_ipairs(self.UnitCommandList) do
     g:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
   end
   return
+end
+
 end
 
 function gadgetHandler:UnitEnteredWater(unitID, unitDefID, unitTeam)

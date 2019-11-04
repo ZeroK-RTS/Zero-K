@@ -2220,6 +2220,19 @@ function widgetHandler:UnitIdle(unitID, unitDefID, unitTeam)
 end
 
 
+if Script.IsEngineMinVersion(104, 0, 1431) then
+
+function widgetHandler:UnitCommand(unitID, unitDefID, unitTeam,
+	cmdID, cmdOpts, cmdParams, cmdTag, -- opts is a bitmask
+	playerID, fromSynced, fromLua)
+  for _,w in r_ipairs(self.UnitCommandList) do
+    w:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams, cmdTag, playerID, fromSynced, fromLua)
+  end
+  return
+end
+
+else
+
 function widgetHandler:UnitCommand(unitID, unitDefID, unitTeam,
                                    cmdId, cmdParams, cmdOpts, cmdTag) --cmdTag available in Spring 95
   for _,w in r_ipairs(self.UnitCommandList) do
@@ -2229,6 +2242,7 @@ function widgetHandler:UnitCommand(unitID, unitDefID, unitTeam,
   return
 end
 
+end
 
 function widgetHandler:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag) --cmdParams & cmdOptions available in Spring 95
   for _,w in r_ipairs(self.UnitCmdDoneList) do
