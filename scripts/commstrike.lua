@@ -1,6 +1,6 @@
 include "constants.lua"
 
-dyncomm = include('dynamicCommander.lua')
+local dyncomm = include('dynamicCommander.lua')
 
 local AntennaTip = piece('AntennaTip')
 local ArmLeft = piece('ArmLeft')
