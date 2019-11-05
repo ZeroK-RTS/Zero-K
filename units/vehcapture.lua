@@ -115,6 +115,7 @@ unitDef = {
       thickness               = 4.2,
       tolerance               = 5000,
       turret                  = true,
+      waterweapon             = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
     },

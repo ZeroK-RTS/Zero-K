@@ -130,7 +130,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 1700,
+        default = 1700.1,
       },
 
       explosionGenerator      = [[custom:NONE]],
