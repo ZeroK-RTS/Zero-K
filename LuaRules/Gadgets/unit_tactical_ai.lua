@@ -539,7 +539,7 @@ local function GetUnitVisibleInformation(unitID, allyTeamID)
 		return
 	end
 	local states = spGetUnitLosState(unitID, allyTeamID, false)
-	return spGetUnitDefID(unitID), states and states.typed
+	return spGetUnitDefID(unitID), states and (states.los or states.radar), states and states.typed
 end
 
 local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fx, fy, fz, data, behaviour, enemy, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, frame, alwaysJink)
@@ -661,11 +661,12 @@ local function updateUnits(frame, start, increment)
 				
 				local alwaysJink = (behaviour.alwaysJinkFight and ((cmdID == CMD_FIGHT) or move))
 				local enemyUnitDef = false
+				local isVisible = false
 				local typeKnown = false
 				
 				if not alwaysJink then
 					if enemy == -1 then -- if I am fighting/patroling ground get nearest enemy
-						enemy = (spGetUnitNearestEnemy(unitID,behaviour.searchRange,true) or false)
+						enemy = (spGetUnitNearestEnemy(unitID, behaviour.searchRange, true) or false)
 					end
 					--GG.UnitEcho(enemy)
 					--Spring.Echo("enemy spotted 2")
@@ -673,7 +674,11 @@ local function updateUnits(frame, start, increment)
 					--Spring.Echo("enemy in los")
 					-- use AI on target
 
-					enemyUnitDef, typeKnown = GetUnitVisibleInformation(enemy, data.allyTeam)
+					enemyUnitDef, isVisible, typeKnown = GetUnitVisibleInformation(enemy, data.allyTeam)
+				end
+				
+				if not isVisible then
+					return
 				end
 				
 				local usefulEnemy = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fightX, fightY, fightZ,
