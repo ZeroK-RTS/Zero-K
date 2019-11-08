@@ -2880,7 +2880,7 @@ local function MPL_CalculateDimensions()
 	mpl_conf.icon_height = mpl_conf.text_height + 2
 	mpl_conf.bar_height = mpl_conf.text_height + 4
 	
-	mpl_conf.allyteam_buffer = 3
+	mpl_conf.allyteam_buffer = 9
 	
 	mpl_conf.name_width = options.mpl_namewidth.value * options.mpl_textHeight.value / 2
 	mpl_conf.status_width = mpl_conf.bar_height
@@ -2889,8 +2889,9 @@ local function MPL_CalculateDimensions()
 	
 	mpl_conf.bar_width = mpl_conf.me_width + mpl_conf.me_width + mpl_conf.sep_width + mpl_conf.name_width + mpl_conf.status_width
 	
-	mpl_conf.status_x = mpl_conf.bar_width - mpl_conf.status_width
-	mpl_conf.name_x = mpl_conf.status_x - mpl_conf.name_width
+	--mpl_conf.status_x = mpl_conf.bar_width - mpl_conf.status_width
+    mpl_conf.status_offset = mpl_conf.status_width;
+	mpl_conf.name_x = mpl_conf.bar_width - mpl_conf.name_width
 	mpl_conf.sep_x = mpl_conf.name_x - mpl_conf.sep_width
 	
 	mpl_conf.window_pad_left = 2
@@ -3222,6 +3223,9 @@ function MPL_UpdateStateTeamControls(teamID)
 			SortSingleVcon(mpl.vcon_playerControls[eID], nil, ComparePlayerVcons, true, true)
 		end
 		local namewidth = math.max(2, mpl.vcon_playerControls[eID].subcon.name.font:GetTextWidth(playerEntities[eID].name) + 10)
+        if mpl.vcon_playerControls[eID].subcon.status.caption ~= "" then
+            namewidth = namewidth + mpl_conf.status_offset
+        end
 		mpl.vcon_teamControls[teamID].options.maxNameWidth = math.max(mpl.vcon_teamControls[teamID].options.maxNameWidth, namewidth)
 	else
 		for eID, _ in pairs(teamEntities[teamID].memberPEIDs) do
@@ -3238,6 +3242,9 @@ function MPL_UpdateStateTeamControls(teamID)
 				SortSingleVcon(mpl.vcon_playerControls[eID], nil, ComparePlayerVcons, true, true)
 			end
 			local namewidth = math.max(2, mpl.vcon_playerControls[eID].subcon.name.font:GetTextWidth(playerEntities[eID].name) + 10)
+            if mpl.vcon_playerControls[eID].subcon.status.caption ~= "" then
+                namewidth = namewidth + mpl_conf.status_offset
+            end
 			mpl.vcon_teamControls[teamID].options.maxNameWidth = math.max(mpl.vcon_teamControls[teamID].options.maxNameWidth, namewidth)
 		end
 	end
@@ -3359,17 +3366,21 @@ function MPL_UpdateVolatilePlayerControls(entityID)
 			local teamStatusText = ""
 			local statusTooltip = ""
 			teamStatusCol, teamStatusText, statusTooltip = FormatStatus(playerEntities[entityID].active, playerEntities[entityID].resigned, playerEntities[entityID].ping, playerEntities[entityID].cpu, Spring.GetTeamUnitCount(playerEntities[entityID].teamID))
-			if teamStatusText ~= "" then
-				status.font:SetColor(teamStatusCol)
-				status:SetCaption(teamStatusText)
-				status.tooltip = statusTooltip
-				status:Invalidate()
-			else
-				status.font:SetColor{0.35,0.35,0.35,1}
-				status:SetCaption("·")
-				status.tooltip = ""
-				status:Invalidate()
-			end
+            if teamStatusText ~= status.caption then
+                if teamStatusText ~= "" then
+                    name:SetPos(mpl_conf.name_x - mpl_conf.status_offset, mpl_conf.text_y, mpl_conf.name_width - 4, mpl_conf.text_height)
+                    status.font:SetColor(teamStatusCol)
+                    status:SetCaption(teamStatusText)
+                    status.tooltip = statusTooltip
+                    status:Invalidate()
+                else
+                    name:SetPos(mpl_conf.name_x, mpl_conf.text_y, mpl_conf.name_width - 4, mpl_conf.text_height)
+                    status.font:SetColor{0.35,0.35,0.35,1}
+                    status:SetCaption("·")
+                    status.tooltip = ""
+                    status:Invalidate()
+                end
+            end
 		end
 	end
 end
@@ -3432,7 +3443,7 @@ function MPL_ConfigurePlayerControls(entityID)
 	end
 	if status then
 		if status.parent == main then SafeRemoveChild(status,main) end
-		status:SetPos(mpl_conf.status_x, mpl_conf.text_y, mpl_conf.status_width, mpl_conf.text_height)
+		status:SetPos(mpl_conf.bar_width - mpl_conf.status_offset, mpl_conf.text_y, mpl_conf.status_width, mpl_conf.text_height)
 		status.font.size = mpl_conf.text_height
 		status:SetCaption("ERROR")
 		status.align = "center"
