@@ -300,26 +300,26 @@ end
 
 local function SquadAction(eID)
 	if not iAmSpec and playerEntities[eID].allyTeamID == myAllyTeam and playerEntities[eID].teamID ~= myTeam and not playerEntities[eID].isAI then
-		Spring.Echo("Squad Action Player "..eID)
+		Spring.Echo("DYNLIST Squad Action Player "..eID)
 	else
-		Spring.Echo("Fail Squad Action Player "..eID)
+		Spring.Echo("DYNLIST Fail Squad Action Player "..eID)
 	end
 end
 
 local function UnitGiftAction(eID)
 	if not iAmSpec and playerEntities[eID].allyTeamID == myAllyTeam and playerEntities[eID].teamID ~= myTeam then
 		GiveUnit(playerEntities[eID].teamID)
-		Spring.Echo("Unit Gift Player "..eID)
+		Spring.Echo("DYNLIST Unit Gift Player "..eID)
 	else
-		Spring.Echo("Fail Unit Gift Player "..eID)
+		Spring.Echo("DYNLIST Fail Unit Gift Player "..eID)
 	end
 end
 
 local function WhisperAction(eID)
 	if not iAmSpec and not playerEntities[eID].isAI and playerEntities[eID].playerID ~= myID and (playerEntities[eID].allyTeamID == myAllyTeam or Spring.Utilities.GetTeamCount() > 2) then
-		Spring.Echo("Whisper Player "..eID)
+		Spring.Echo("DYNLIST Whisper Player "..eID)
 	else
-		Spring.Echo("Fail Whisper Player "..eID)
+		Spring.Echo("DYNLIST Fail Whisper Player "..eID)
 	end
 end
 
@@ -362,7 +362,7 @@ local function SafeAddChild(child, adult)
 		end
 		adult:AddChild(child)
 	else
-		Spring.Echo("PLW ERROR SafeAddChild Nil")
+		Spring.Echo("DYNLIST SafeAddChild Nil")
 	end
 end
 
@@ -376,7 +376,7 @@ local function SafeRemoveChild(child, adult)
 		--	Spring.Echo("PLW ERROR SafeRemoveChild Parentage")
 		--end
 	else
-		Spring.Echo("PLW ERROR SafeRemoveChild Nil")
+		Spring.Echo("DYNLIST SafeRemoveChild Nil")
 	end
 end
 
@@ -500,6 +500,110 @@ end
 
 local function cap (x) return math.max(math.min(x,1),0) end
 
+-- comparison function for allyteam bars, when they are displayed alone
+function CompareAllyTeamBarVcons(vcon1, vcon2)
+	if (not vcon1.options) or (not vcon1.options.atID) then -- separator bar should be at the bottom
+		return true
+	elseif (not vcon2.options) or (not vcon2.options.atID) then
+		return false
+	else
+		return CompareAllyTeams(vcon1.options.atID, vcon2.options.atID)
+	end
+end
+
+-- comparison function for allyteam boxes
+function CompareAllyTeamVcons(vcon1, vcon2)
+	if not vcon1.vID then -- the ally team bar should be at the top
+		return false
+	elseif not vcon2.vID then -- if neither of these are true, the vIDs should be allyteam IDs
+		return true
+	else
+		return CompareAllyTeams(vcon1.vID, vcon2.vID)
+	end
+end
+
+-- comparison function for team boxes
+function CompareTeamVcons(vcon1, vcon2)
+	if not vcon1.vID then -- check that these are vcons
+		return false
+	elseif not vcon2.vID then 
+		return true
+	elseif teamEntities[vcon1.vID] and teamEntities[vcon2.vID] then
+		local elo1 = tonumber(teamEntities[vcon1.vID].elo)
+		local res1 = teamEntities[vcon1.vID].resigned
+		local elo2 = tonumber(teamEntities[vcon2.vID].elo)
+		local res2 = teamEntities[vcon2.vID].resigned
+		if res2 then 
+			return false
+		elseif res1 then
+			return true
+		end
+		if not iAmSpec then
+			if unsortYourself then
+				if vcon1.vID == myTeam then return false
+				elseif vcon2.vID == myTeam then return true
+				end
+			end
+		end
+		if elo1 and elo2 then
+			if elo2 > elo1 then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+-- comparison function for spectator boxes
+function CompareSpectatorVcons(vcon1, vcon2)
+	if not vcon1.vID then
+		return false
+	elseif not vcon2.vID then
+		return true
+	elseif spectatorEntities[vcon1.vID] and spectatorEntities[vcon2.vID] then
+		local name1 = spectatorEntities[vcon1.vID].name
+		local name2 = spectatorEntities[vcon2.vID].name
+		if name1 and name2 then
+			if name2 == "unknown" then 
+				return false
+			elseif name1 == "unknown" or name1 > name2 then 
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
+
+-- comparison function for player boxes
+function ComparePlayerVcons(vcon1, vcon2)
+	if not vcon1.vID then -- check that these are vcons
+		return false
+	elseif not vcon2.vID then
+		return true
+	elseif playerEntities[vcon1.vID] and playerEntities[vcon2.vID] then
+		local elo1 = tonumber(playerEntities[vcon1.vID].elo)
+		local res1 = playerEntities[vcon1.vID].resigned
+		local elo2 = tonumber(playerEntities[vcon2.vID].elo)
+		local res2 = playerEntities[vcon2.vID].resigned
+		if not iAmSpec then
+			if unsortYourself then
+				if playerEntities[vcon1.vID].playerID == myID then return false
+				elseif playerEntities[vcon2.vID].playerID == myID then return true
+				end
+			end
+		elseif res2 then 
+			return false
+		elseif res1 then
+			return true
+		elseif elo2 and (not elo1 or elo2 > elo1) then
+			return true
+		end
+	end
+	return false
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- functions for managing vertically-stacked controls
@@ -555,8 +659,8 @@ end
 
 -- removes a vcon
 local function RemoveVcon(target)
-	if (not target) then Spring.Echo ("PLW ERROR RemoveVcon Nil Target"); return end
-	if (not target.parent) then Spring.Echo ("PLW ERROR RemoveVcon Nil Parent"); return end
+	if (not target) then Spring.Echo ("DYNLIST RemoveVcon Nil Target"); return end
+	if (not target.parent) then Spring.Echo ("DYNLIST RemoveVcon Nil Parent"); return end
 	local parent = target.parent
 	if parent then
 		if target == parent.firstChild then
@@ -580,7 +684,7 @@ end
 
 -- inserts a new vcon as the first child of a parent
 local function InsertTopVconChild(new, parent)
-	if (not new) or (not parent) then Spring.Echo ("PLW ERROR InsertTopVconChild"); return end
+	if (not new) or (not parent) then Spring.Echo ("DYNLIST InsertTopVconChild"); return end
 	new.below = parent.firstChild
 	new.above = nil
 	new.parent = parent
@@ -592,7 +696,7 @@ end
 
 -- inserts a new vcon as the last child of a parent
 local function InsertBottomVconChild(new, parent)
-	if (not new) or (not parent) then Spring.Echo ("PLW ERROR InsertBottomVconChild"); return end
+	if (not new) or (not parent) then Spring.Echo ("DYNLIST InsertBottomVconChild"); return end
 	new.above = parent.lastChild
 	new.below = nil
 	new.parent = parent
@@ -604,7 +708,7 @@ end
 
 -- inserts a new vcon before some other one
 local function InsertVconBefore(new, nextCon)
-	if (not new) or (not parent) then Spring.Echo ("PLW ERROR InsertVconBefore"); return end
+	if (not new) or (not parent) then Spring.Echo ("DYNLIST InsertVconBefore"); return end
 	new.parent = nextCon.parent
 	new.below = nextCon
 	new.above = nextCon.above
@@ -616,7 +720,7 @@ end
 
 -- switch a vcon with the one below it
 local function SwitchVconDown(moving)
-	if (not moving) or (not moving.below) then Spring.Echo ("PLW ERROR SwitchVconDown"); return end
+	if (not moving) or (not moving.below) then Spring.Echo ("DYNLIST SwitchVconDown"); return end
 	local pos1, pos2, pos3, pos4
 	pos1 = moving.above
 	pos3 = moving
@@ -1048,7 +1152,7 @@ local function PLW_UpdateStatePlayerListControl()
 			end
 			SafeAddChild(plw.vcon_allyTeamControls[atID].main, plw.vcon_playerList.main)
 			InsertBottomVconChild(plw.vcon_allyTeamControls[atID], plw.vcon_playerList)
-			SortSingleVcon(plw.vcon_allyTeamControls[atID], nil, PLW_CompareAllyTeamVcons, true, true)
+			SortSingleVcon(plw.vcon_allyTeamControls[atID], nil, CompareAllyTeamVcons, true, true)
 		end
 		
 		
@@ -1061,7 +1165,7 @@ local function PLW_UpdateStatePlayerListControl()
 				end
 				SafeAddChild(plw.vcon_allyTeamBarControls[atID].main, plw.vcon_allyTeamSummaries.main)
 				InsertTopVconChild(plw.vcon_allyTeamBarControls[atID], plw.vcon_allyTeamSummaries)
-				SortSingleVcon(plw.vcon_allyTeamBarControls[atID], nil, PLW_CompareAllyTeamBarVcons, false, false)
+				SortSingleVcon(plw.vcon_allyTeamBarControls[atID], nil, CompareAllyTeamBarVcons, false, false)
 			end
 			
 		end
@@ -1099,7 +1203,7 @@ local function PLW_UpdateStateSpectatorListControl()
 			end
 			SafeAddChild(plw.vcon_spectatorControls[eID].main,plw.vcon_spectatorList.main)
 			InsertBottomVconChild(plw.vcon_spectatorControls[eID],plw.vcon_spectatorList)
-			SortSingleVcon(plw.vcon_spectatorControls[eID], nil, PLW_CompareSpectatorVcons, true, true)
+			SortSingleVcon(plw.vcon_spectatorControls[eID], nil, CompareSpectatorVcons, true, true)
 		end
 	end
 	
@@ -1150,7 +1254,9 @@ local function PLW_ConfigureStaticControls()
 					SafeAddChild(phmain, plw.vcon_playerList.main)
 				end
 				if aa then 
+					SafeAddChild(aa, phmain)
 					if options.plw_show_netWorth.value ~= 'disable' then
+						aa:Show()
 						aa:SetPos(plw_conf.x_mobile_icon,plw_conf.plw_headerTextHeight,plw_conf.header_icon_width,plw_conf.header_icon_height)
 						if options.plw_show_netWorth.value ~= 'sum' then
 							aa.tooltip = "Total army value"
@@ -1158,7 +1264,8 @@ local function PLW_ConfigureStaticControls()
 							aa.tooltip = "Total army and defence value"
 						end
 					else
-						aa:SetPos(-100,-100,plw_conf.header_icon_width,plw_conf.header_icon_height)
+						--aa:SetPos(-100,-100,plw_conf.header_icon_width,plw_conf.header_icon_height)
+						aa:Hide()
 					end
 					aa.file = "LuaUI/Images/commands/Bold/attack.png"
 					
@@ -1169,25 +1276,29 @@ local function PLW_ConfigureStaticControls()
 					--aa.OnClick = {function(self, x, y, mouse) Spring.Echo("Bung") end}
 					
 					aa:Invalidate()
-					SafeAddChild(aa, phmain)
 				end
 				if dd then 
+					SafeAddChild(dd, phmain)
 					if options.plw_show_netWorth.value == 'all' then
+						dd:Show()
 						dd:SetPos(plw_conf.x_defence_icon,plw_conf.plw_headerTextHeight,plw_conf.header_icon_width,plw_conf.header_icon_height)
 						dd.file = "LuaUI/Images/commands/Bold/guard.png"
 						dd.tooltip = "Total defence value"
 					else
-						dd:SetPos(-100,-100,plw_conf.header_icon_width,plw_conf.header_icon_height)
+						--dd:SetPos(-100,-100,plw_conf.header_icon_width,plw_conf.header_icon_height)
+						dd:Hide()
 					end
 					function dd:HitTest(x,y) return self end
 					dd:Invalidate()
-					SafeAddChild(dd, phmain)
 				end
 				if mm then 
+					SafeAddChild(mm, phmain)
 					if true then
+						mm:Show()
 						mm:SetPos(plw_conf.x_metal_icon,plw_conf.plw_headerTextHeight,plw_conf.header_icon_width,plw_conf.header_icon_height)
 					else
-						mm:SetPos(-100,-100,plw_conf.header_icon_width,plw_conf.header_icon_height)
+						mm:Hide()
+						--mm:SetPos(-100,-100,plw_conf.header_icon_width,plw_conf.header_icon_height)
 					end
 					if options.plw_show_resourceStatus.value then
 						mm.tooltip = "Metal income and storage"
@@ -1198,13 +1309,15 @@ local function PLW_ConfigureStaticControls()
 					function mm:HitTest(x,y) return self end
 					mm.file = "LuaUI/Images/metalplus.png"
 					mm:Invalidate()
-					SafeAddChild(mm, phmain)
 				end
 				if ee then 
+					SafeAddChild(ee, phmain)
 					if true then
+						ee:Show()
 						ee:SetPos(plw_conf.x_energy_icon,plw_conf.plw_headerTextHeight,plw_conf.header_icon_width,plw_conf.header_icon_height)
 					else
-						ee:SetPos(-100,-100,plw_conf.header_icon_width,plw_conf.header_icon_height)
+						ee:Hide()
+						--ee:SetPos(-100,-100,plw_conf.header_icon_width,plw_conf.header_icon_height)
 					end
 					if options.plw_show_resourceStatus.value then
 						ee.tooltip = "Energy income and storage"
@@ -1214,32 +1327,34 @@ local function PLW_ConfigureStaticControls()
 					function ee:HitTest(x,y) return self end
 					ee.file = "LuaUI/Images/energyplus.png"
 					ee:Invalidate()
-					SafeAddChild(ee, phmain)
 				end
 				if cc then 
+					SafeAddChild(cc, phmain)
 					cc.file = "LuaUI/Images/playerlist/cpu.png"
 					if options.plw_cpuPlayerDisp.value == 'text' then
-					--if true then
+						cc:Show()
 						cc:SetPos(plw_conf.x_cpu_icon,plw_conf.plw_headerTextHeight,plw_conf.header_icon_width,plw_conf.header_icon_height)
 					else
-						cc:SetPos(-100,-100,plw_conf.header_icon_width,plw_conf.header_icon_height)
+						cc:Hide()
+						--cc:SetPos(-100,-100,plw_conf.header_icon_width,plw_conf.header_icon_height)
 					end
 					cc.tooltip = "CPU usage"
 					function cc:HitTest(x,y) return self end
 					cc:Invalidate()
-					SafeAddChild(cc, phmain)
 				end
 				if pp then 
+					SafeAddChild(pp, phmain)
 					pp.file = "LuaUI/Images/playerlist/ping.png"
 					if options.plw_pingPlayerDisp.value == 'text' then
+						pp:Show()
 						pp:SetPos(plw_conf.x_ping_icon,plw_conf.plw_headerTextHeight,plw_conf.header_icon_width,plw_conf.header_icon_height)
 					else
-						pp:SetPos(-100,-100,plw_conf.header_icon_width,plw_conf.header_icon_height)
+						pp:Hide()
+						--pp:SetPos(-100,-100,plw_conf.header_icon_width,plw_conf.header_icon_height)
 					end
 					pp.tooltip = "Ping time"
 					function pp:HitTest(x,y) return self end
 					pp:Invalidate()
-					SafeAddChild(pp, phmain)
 				end
 				InsertTopVconChild(plw.vcon_playerHeader,plw.vcon_playerList)
 			end
@@ -1527,28 +1642,6 @@ local function PLW_CreateStaticControls()
 	PLW_ConfigureStaticControls()
 end
 
--- comparison function for allyteam bars, when they are displayed alone
-function PLW_CompareAllyTeamBarVcons(vcon1, vcon2)
-	if (not vcon1.options) or (not vcon1.options.atID) then -- separator bar should be at the bottom
-		return true
-	elseif (not vcon2.options) or (not vcon2.options.atID) then
-		return false
-	else
-		return CompareAllyTeams(vcon1.options.atID, vcon2.options.atID)
-	end
-end
-
--- comparison function for allyteam boxes
-function PLW_CompareAllyTeamVcons(vcon1, vcon2)
-	if not vcon1.vID then -- the ally team bar should be at the top
-		return false
-	elseif not vcon2.vID then -- if neither of these are true, the vIDs should be allyteam IDs
-		return true
-	else
-		return CompareAllyTeams(vcon1.vID, vcon2.vID)
-	end
-end
-
 -- updates volatile components of allyteam box
 local function PLW_UpdateVolatileAllyTeamControls(allyTeamID)
 	if (not allyTeamEntities[allyTeamID]) or (not plw.vcon_allyTeamControls[allyTeamID]) or (not plw.vcon_allyTeamControls[allyTeamID].subcon) then
@@ -1566,9 +1659,11 @@ local function PLW_UpdateVolatileAllyTeamControls(allyTeamID)
 		plw.vcon_allyTeamBarControls[allyTeamID].subcon.eInc:Invalidate()
 	else
 		if allyTeamEntities[allyTeamID].m_mobiles then
+			if options.plw_show_netWorth.value == 'sum' or options.plw_show_netWorth.value == 'army' then
+				plw.vcon_allyTeamBarControls[allyTeamID].subcon.aVal.tooltip = "Army value: "..FormatMetalStats(allyTeamEntities[allyTeamID].m_mobiles).."\nDefence value: "..FormatMetalStats(allyTeamEntities[allyTeamID].m_defence)
+			end
 			if options.plw_show_netWorth.value == 'sum' then
 				plw.vcon_allyTeamBarControls[allyTeamID].subcon.aVal:SetCaption(FormatMetalStats(allyTeamEntities[allyTeamID].m_mobiles+allyTeamEntities[allyTeamID].m_defence))
-				plw.vcon_allyTeamBarControls[allyTeamID].subcon.aVal.tooltip = "Army value: "..FormatMetalStats(allyTeamEntities[allyTeamID].m_mobiles).."\nDefence value: "..FormatMetalStats(allyTeamEntities[allyTeamID].m_defence)
 			else
 				plw.vcon_allyTeamBarControls[allyTeamID].subcon.aVal:SetCaption(FormatMetalStats(allyTeamEntities[allyTeamID].m_mobiles))
 			end
@@ -1748,7 +1843,7 @@ local function PLW_UpdateStateAllyTeamControls(allyTeamID)
 			SafeRemoveChild(teamVCon.main,teamVCon.parent.main)
 			RemoveVcon(teamVCon)
 			--teamVCon.main:SetPos(-2*plw_conf.x_window_width, teamVCon.main.y, teamVCon.main.width, teamVCon.main.height)			
-			if plw.vcon_allyTeamControls[allyTeamID].firstChild then SortVcons(plw.vcon_allyTeamControls[allyTeamID].firstChild,PLW_CompareTeamVcons,false) end
+			if plw.vcon_allyTeamControls[allyTeamID].firstChild then SortVcons(plw.vcon_allyTeamControls[allyTeamID].firstChild,CompareTeamVcons,false) end
 		end
 		
 		if teamVCon and teamVCon.parent ~= plw.vcon_allyTeamControls[allyTeamID] then
@@ -1756,24 +1851,24 @@ local function PLW_UpdateStateAllyTeamControls(allyTeamID)
 				local oldparent = teamVCon.parent
 				RemoveVcon(teamVCon)
 				SafeRemoveChild(teamVCon.main,oldparent.main)
-				if oldparent.firstChild then SortVcons(oldparent.firstChild,PLW_CompareTeamVcons,false) end
+				if oldparent.firstChild then SortVcons(oldparent.firstChild,CompareTeamVcons,false) end
 			end
 			if nPlayers > 0 then
 				SafeAddChild(teamVCon.main,plw.vcon_allyTeamControls[allyTeamID].main)
 				InsertBottomVconChild(teamVCon, plw.vcon_allyTeamControls[allyTeamID])
-				SortSingleVcon(teamVCon, nil, PLW_CompareTeamVcons, true, true)
+				SortSingleVcon(teamVCon, nil, CompareTeamVcons, true, true)
 			end
 		end
 	end
 	
 	-- try shifting this allyteam up and down
-	SortSingleVcon(plw.vcon_allyTeamControls[allyTeamID], nil, PLW_CompareAllyTeamVcons, true, true)
-	SortSingleVcon(plw.vcon_allyTeamControls[allyTeamID], nil, PLW_CompareAllyTeamVcons, false, true)
+	SortSingleVcon(plw.vcon_allyTeamControls[allyTeamID], nil, CompareAllyTeamVcons, true, true)
+	SortSingleVcon(plw.vcon_allyTeamControls[allyTeamID], nil, CompareAllyTeamVcons, false, true)
 	
 	-- if summary bars are separate sort them too
 	if options.plw_allyteamBarLoc.value == 'above' and drawTeamnames then
-		SortSingleVcon(plw.vcon_allyTeamBarControls[allyTeamID], nil, PLW_CompareAllyTeamBarVcons, true, false)
-		SortSingleVcon(plw.vcon_allyTeamBarControls[allyTeamID], nil, PLW_CompareAllyTeamBarVcons, false, false)
+		SortSingleVcon(plw.vcon_allyTeamBarControls[allyTeamID], nil, CompareAllyTeamBarVcons, true, false)
+		SortSingleVcon(plw.vcon_allyTeamBarControls[allyTeamID], nil, CompareAllyTeamBarVcons, false, false)
 	end
 	
 	PLW_UpdateVolatileAllyTeamControls(allyTeamID)
@@ -1928,35 +2023,7 @@ local function PLW_CreateAllyTeamControls(allyTeamID)
 	PLW_ConfigureAllyTeamControls(allyTeamID)
 end
 
--- comparison function for team boxes
-function PLW_CompareTeamVcons(vcon1, vcon2)
-	if not vcon1.vID then -- the ally team bar should be at the top
-		return false
-	elseif not vcon2.vID then -- if neither of these happen, the vIDs should be team IDs
-		return true
-	elseif teamEntities[vcon1.vID] and teamEntities[vcon2.vID] then
-		local elo1 = tonumber(teamEntities[vcon1.vID].elo)
-		local res1 = teamEntities[vcon1.vID].resigned
-		local elo2 = tonumber(teamEntities[vcon2.vID].elo)
-		local res2 = teamEntities[vcon2.vID].resigned
-		if res2 then 
-			return false
-		elseif res1 then
-			return true
-		end
-		if not iAmSpec then
-			if vcon1.vID == myTeam then return false
-			elseif vcon2.vID == myTeam then return true
-			end
-		end
-		if elo1 and elo2 then
-			if elo2 > elo1 then
-				return true
-			end
-		end
-	end
-	return false
-end
+
 
 -- updates volatile components of team box
 local function PLW_UpdateVolatileTeamControls(teamID)
@@ -1977,9 +2044,11 @@ local function PLW_UpdateVolatileTeamControls(teamID)
 		plw.vcon_teamControls[teamID].subcon.eBar:SetPos(-100, -100, 1,1)
 	else
 		if teamEntities[teamID].m_mobiles then
+			if options.plw_show_netWorth.value == 'sum' or options.plw_show_netWorth.value == 'army' then
+				plw.vcon_teamControls[teamID].subcon.aVal.tooltip = "Army value: "..FormatMetalStats(teamEntities[teamID].m_mobiles).."\nDefence value: "..FormatMetalStats(teamEntities[teamID].m_defence)
+			end
 			if options.plw_show_netWorth.value == 'sum' then
 				plw.vcon_teamControls[teamID].subcon.aVal:SetCaption(FormatMetalStats(teamEntities[teamID].m_mobiles+teamEntities[teamID].m_defence))
-				plw.vcon_teamControls[teamID].subcon.aVal.tooltip = "Army value: "..FormatMetalStats(teamEntities[teamID].m_mobiles).."\nDefence value: "..FormatMetalStats(teamEntities[teamID].m_defence)
 			else
 				plw.vcon_teamControls[teamID].subcon.aVal:SetCaption(FormatMetalStats(teamEntities[teamID].m_mobiles))
 			end
@@ -2063,11 +2132,11 @@ local function PLW_UpdateStateTeamControls(teamID)
 				local oldparent = plw.vcon_playerControls[eID].parent
 				RemoveVcon(plw.vcon_playerControls[eID])
 				SafeRemoveChild(plw.vcon_playerControls[eID].main,oldparent.main)
-				if oldparent.firstChild then SortVcons(oldparent.firstChild,PLW_ComparePlayerVcons,false) end
+				if oldparent.firstChild then SortVcons(oldparent.firstChild,ComparePlayerVcons,false) end
 			end
 			InsertBottomVconChild(plw.vcon_playerControls[eID], plw.vcon_teamControls[teamID])
 			SafeAddChild(plw.vcon_playerControls[eID].main,plw.vcon_teamControls[teamID].main)
-			SortSingleVcon(plw.vcon_playerControls[eID], nil, PLW_ComparePlayerVcons, true, true)
+			SortSingleVcon(plw.vcon_playerControls[eID], nil, ComparePlayerVcons, true, true)
 		end
 	else
 		for eID, _ in pairs(teamEntities[teamID].memberPEIDs) do
@@ -2077,11 +2146,11 @@ local function PLW_UpdateStateTeamControls(teamID)
 					local oldparent = plw.vcon_playerControls[eID].parent
 					RemoveVcon(plw.vcon_playerControls[eID])
 					SafeRemoveChild(plw.vcon_playerControls[eID].main,oldparent.main)
-					if oldparent.firstChild then SortVcons(oldparent.firstChild,PLW_ComparePlayerVcons,false) end
+					if oldparent.firstChild then SortVcons(oldparent.firstChild,ComparePlayerVcons,false) end
 				end
 				InsertBottomVconChild(plw.vcon_playerControls[eID], plw.vcon_teamControls[teamID])
 				SafeAddChild(plw.vcon_playerControls[eID].main,plw.vcon_teamControls[teamID].main)
-				SortSingleVcon(plw.vcon_playerControls[eID], nil, PLW_ComparePlayerVcons, true, true)
+				SortSingleVcon(plw.vcon_playerControls[eID], nil, ComparePlayerVcons, true, true)
 			end
 		end
 	end
@@ -2100,6 +2169,8 @@ local function PLW_UpdateStateTeamControls(teamID)
 			local eInc = plw.vcon_teamControls[teamID].subcon.eInc
 			
 			if not iAmSpec and teamEntities[teamID].allyTeamID == myAllyTeam and teamID ~= myTeam then
+				mBarB:Show()
+				eBarB:Show()
 				mBarB:SetPos(plw_conf.x_resourcestate_begin + plw_conf.x_m_fill_offset, plw_conf.playerbar_text_y + 1, plw_conf.x_m_fill_width, plw_conf.playerbar_text_height - 2)
 				eBarB:SetPos(plw_conf.x_resourcestate_begin + plw_conf.x_e_fill_offset, plw_conf.playerbar_text_y + 1, plw_conf.x_e_fill_width, plw_conf.playerbar_text_height - 2)
 				function mBar:HitTest(x,y) return nil end
@@ -2107,6 +2178,8 @@ local function PLW_UpdateStateTeamControls(teamID)
 			else
 				mBarB:SetPos(-100, -100, plw_conf.x_m_fill_width, plw_conf.playerbar_text_height - 2)
 				eBarB:SetPos(-100, -100, plw_conf.x_m_fill_width, plw_conf.playerbar_text_height - 2)
+				mBarB:Hide()
+				eBarB:Hide()
 				function mBar:HitTest(x,y) return self end
 				function eBar:HitTest(x,y) return self end
 			end
@@ -2141,15 +2214,17 @@ local function PLW_UpdateStateTeamControls(teamID)
 	
 	if plw.vcon_teamControls[teamID] and plw.vcon_teamControls[teamID].subcon.line then
 		if nPlayers > 1 then
+			plw.vcon_teamControls[teamID].subcon.line:Show()
 			plw.vcon_teamControls[teamID].subcon.line:SetPos(plw_conf.x_addedline_begin + plw_conf.x_addedline_offset,plw_conf.playerbar_height * 0.15, 1, plw_conf.playerbar_height * (nPlayers - 0.3))
 		else
 			plw.vcon_teamControls[teamID].subcon.line:SetPos(-100,plw_conf.playerbar_height * 0.15, 1, plw_conf.playerbar_height * 0.7)
+			plw.vcon_teamControls[teamID].subcon.line:Hide()
 		end		
 	end
 
 	-- try shifting this teambox up and down
-	SortSingleVcon(plw.vcon_teamControls[teamID], nil, PLW_CompareTeamVcons, true, true)
-	SortSingleVcon(plw.vcon_teamControls[teamID], nil, PLW_CompareTeamVcons, false, true)
+	SortSingleVcon(plw.vcon_teamControls[teamID], nil, CompareTeamVcons, true, true)
+	SortSingleVcon(plw.vcon_teamControls[teamID], nil, CompareTeamVcons, false, true)
 	
 	PLW_UpdateVolatileTeamControls(teamID)
 end
@@ -2177,46 +2252,55 @@ local function PLW_ConfigureTeamControls(teamID)
 			SafeAddChild(rBar,main)
 		end
 		if aVal then 
+			SafeAddChild(aVal,rBar)
 			if options.plw_show_netWorth.value ~= 'disable' then
+				aVal:Show()
 				aVal:SetPos(plw_conf.x_resourcestate_begin + plw_conf.x_m_mobiles_offset, plw_conf.playerbar_text_y, plw_conf.x_m_mobiles_width, plw_conf.playerbar_text_height)
 			else
-				aVal:SetPos(-100, -100, plw_conf.x_m_mobiles_width, plw_conf.playerbar_text_height)
+				--aVal:SetPos(-100, -100, plw_conf.x_m_mobiles_width, plw_conf.playerbar_text_height)
+				aVal:Hide()
 			end
 			aVal.font.size = plw_conf.playerbar_text_height
 			
 			aVal.align = 'right'
 			aVal:SetCaption("E")
-			SafeAddChild(aVal,rBar)
+			
 		end
 		if dVal then 
+			SafeAddChild(dVal,rBar)
 			if options.plw_show_netWorth.value == 'all' then
+				dVal:Show()
 				dVal:SetPos(plw_conf.x_resourcestate_begin + plw_conf.x_m_defense_offset, plw_conf.playerbar_text_y, plw_conf.x_m_defense_width, plw_conf.playerbar_text_height)
 			else
-				dVal:SetPos(-100, -100, plw_conf.x_m_defense_width, plw_conf.playerbar_text_height)
+				--dVal:SetPos(-100, -100, plw_conf.x_m_defense_width, plw_conf.playerbar_text_height)
+				dVal:Hide()
 			end
 			dVal.font.size = plw_conf.playerbar_text_height
 			
 			dVal.align = 'right'
 			dVal:SetCaption("E")
-			SafeAddChild(dVal,rBar)
 		end
-		if mInc then 
+		if mInc then
+			SafeAddChild(mInc,rBar)
 			if options.plw_show_resourceStatus.value then
+				mInc:Show()
 				mInc:SetPos(plw_conf.x_resourcestate_begin + plw_conf.x_m_income_offset, plw_conf.playerbar_text_y, plw_conf.x_m_income_width, plw_conf.playerbar_text_height)
 			else	
-				mInc:SetPos(-100, -100, plw_conf.x_m_income_width, plw_conf.playerbar_text_height)
+				--mInc:SetPos(-100, -100, plw_conf.x_m_income_width, plw_conf.playerbar_text_height)
+				mInc:Hide()
 			end
 			mInc.font.size = plw_conf.playerbar_text_height
 			
 			mInc.align = 'right'
 			mInc:SetCaption("E")
-			SafeAddChild(mInc,rBar)
 		end
 		if eInc then 
 			if options.plw_show_resourceStatus.value then
+				eInc:Show()
 				eInc:SetPos(plw_conf.x_resourcestate_begin + plw_conf.x_e_income_offset, plw_conf.playerbar_text_y, plw_conf.x_e_income_width, plw_conf.playerbar_text_height)
 			else
-				eInc:SetPos(-100, -100, plw_conf.x_e_income_width, plw_conf.playerbar_text_height)
+				--eInc:SetPos(-100, -100, plw_conf.x_e_income_width, plw_conf.playerbar_text_height)
+				eInc:Hide()
 			end
 			eInc.font.size = plw_conf.playerbar_text_height
 			
@@ -2225,24 +2309,29 @@ local function PLW_ConfigureTeamControls(teamID)
 			SafeAddChild(eInc,rBar)
 		end
 		if mBar then
+			SafeAddChild(mBar,rBar)
 			--if options.plw_show_resourceStatus.value then
 			if true then
+				mBar:Show()
 				mBar:SetPos(plw_conf.x_resourcestate_begin + plw_conf.x_m_fill_offset, plw_conf.playerbar_text_y + 1, plw_conf.x_m_fill_width, plw_conf.playerbar_text_height - 2)
 			else
-				mBar:SetPos(-100, -100, plw_conf.x_m_fill_width, plw_conf.playerbar_text_height - 2)
+				--mBar:SetPos(-100, -100, plw_conf.x_m_fill_width, plw_conf.playerbar_text_height - 2)
+				mBar:Hide()
 			end
 			mBar:SetColor{.5,.5,.5,1}
 			mBar.font:SetColor{1,.5,.5,1}
 			mBar:SetMinMax(0,1)
 			--function mBar:HitTest(x,y) return self end
-			SafeAddChild(mBar,rBar)
 		end
 		if mBarB then 
+			SafeAddChild(mBarB,rBar)
 			--if options.plw_show_resourceStatus.value then
 			if true then
+				mBarB:Show()
 				mBarB:SetPos(plw_conf.x_resourcestate_begin + plw_conf.x_m_fill_offset, plw_conf.playerbar_text_y + 1, plw_conf.x_m_fill_width, plw_conf.playerbar_text_height - 2)
 			else
-				mBarB:SetPos(-100, -100, plw_conf.x_m_fill_width, plw_conf.playerbar_text_height - 2)
+				--mBarB:SetPos(-100, -100, plw_conf.x_m_fill_width, plw_conf.playerbar_text_height - 2)
+				mBarB:Hide()
 			end
 			--function mBarB:HitTest(x,y) return self end
 			--mBarB.OnMouseDown = {function(self, x, y, mouse) Spring.Echo("Give Metal") end}
@@ -2253,27 +2342,31 @@ local function PLW_ConfigureTeamControls(teamID)
 						GiveResource(teamID,"metal")
 					end
 				end}
-			SafeAddChild(mBarB,rBar)
 		end
 		if eBar then
+			SafeAddChild(eBar,rBar)
 			--if options.plw_show_resourceStatus.value then
 			if true then
+				eBar:Show()
 				eBar:SetPos(plw_conf.x_resourcestate_begin + plw_conf.x_e_fill_offset, plw_conf.playerbar_text_y + 1, plw_conf.x_e_fill_width, plw_conf.playerbar_text_height - 2)
 			else
-				eBar:SetPos(-100, -100, plw_conf.x_e_fill_width, plw_conf.playerbar_text_height - 2)
+				--eBar:SetPos(-100, -100, plw_conf.x_e_fill_width, plw_conf.playerbar_text_height - 2)
+				eBar:Hide()
 			end
 			eBar:SetColor{0.85,0.85,0.6,1}
 			eBar.font:SetColor{1,.5,.5,1}
 			eBar:SetMinMax(0,1)
 			--function eBar:HitTest(x,y) return self end
-			SafeAddChild(eBar,rBar)
 		end
 		if eBarB then 
+			SafeAddChild(eBarB,rBar)
 			--if options.plw_show_resourceStatus.value then
 			if true then
+				eBarB:Show()
 				eBarB:SetPos(plw_conf.x_resourcestate_begin + plw_conf.x_e_fill_offset, plw_conf.playerbar_text_y + 1, plw_conf.x_e_fill_width, plw_conf.playerbar_text_height - 2)
 			else
-				eBarB:SetPos(-100, -100, plw_conf.x_e_fill_width, plw_conf.playerbar_text_height - 2)
+				--eBarB:SetPos(-100, -100, plw_conf.x_e_fill_width, plw_conf.playerbar_text_height - 2)
+				eBarB:Hide()
 			end
 			--function eBarB:HitTest(x,y) return self end
 			--eBarB.OnMouseDown = {function(self, x, y, mouse) Spring.Echo("Give Metal") end}
@@ -2284,11 +2377,11 @@ local function PLW_ConfigureTeamControls(teamID)
 						GiveResource(teamID,"energy")
 					end
 				end}
-			SafeAddChild(eBarB,rBar)
 		end
 		if gLine then
-			gLine:SetPos(-100,plw_conf.playerbar_height * 0.15, 1, plw_conf.playerbar_height * 0.7)
 			SafeAddChild(gLine,main)
+			gLine:Hide()
+			--gLine:SetPos(-100,plw_conf.playerbar_height * 0.15, 1, plw_conf.playerbar_height * 0.7)
 		end
 	end
 	
@@ -2315,31 +2408,6 @@ local function PLW_CreateTeamControls(teamID)
 	plw.vcon_teamControls[teamID] = CreateVcon(teamID, mainControl, subcon, 0, 0, {})
 	
 	PLW_ConfigureTeamControls(teamID)
-end
-
-function PLW_ComparePlayerVcons(vcon1, vcon2)
-	if not vcon1.vID then -- the ally team bar should be at the top
-		return false
-	elseif not vcon2.vID then -- if neither of these are true, the vIDs should be player IDs
-		return true
-	elseif playerEntities[vcon1.vID] and playerEntities[vcon2.vID] then
-		local elo1 = tonumber(playerEntities[vcon1.vID].elo)
-		local res1 = playerEntities[vcon1.vID].resigned
-		local elo2 = tonumber(playerEntities[vcon2.vID].elo)
-		local res2 = playerEntities[vcon2.vID].resigned
-		if not iAmSpec then
-			if playerEntities[vcon1.vID].playerID == myID then return false
-			elseif playerEntities[vcon2.vID].playerID == myID then return true
-			end
-		elseif res2 then 
-			return false
-		elseif res1 then
-			return true
-		elseif elo2 and (not elo1 or elo2 > elo1) then
-			return true
-		end
-	end
-	return false
 end
 
 -- updates player row
@@ -2444,8 +2512,8 @@ local function PLW_UpdateStatePlayerControls(eID)
 	end
 	
 	-- try shifting this playerbox up and down
-	SortSingleVcon(plw.vcon_playerControls[eID], nil, PLW_ComparePlayerVcons, true, true)
-	SortSingleVcon(plw.vcon_playerControls[eID], nil, PLW_ComparePlayerVcons, false, true)
+	SortSingleVcon(plw.vcon_playerControls[eID], nil, ComparePlayerVcons, true, true)
+	SortSingleVcon(plw.vcon_playerControls[eID], nil, ComparePlayerVcons, false, true)
 	
 	PLW_UpdateVolatilePlayerControls(eID)
 end
@@ -2472,39 +2540,49 @@ local function PLW_ConfigurePlayerControls(entityID)
 	
 	if main then main:SetPos(0, 0, plw_conf.x_window_width, plw_conf.playerbar_height) end
 	if clan then 
+		SafeAddChild(clan,main)
 		if options.plw_showClan.value then
-			clan:SetPos(plw_conf.x_ccr_begin + plw_conf.x_icon_clan_offset, 0, plw_conf.x_icon_clan_width, plw_conf.playerbar_image_height); SafeAddChild(clan,main) 
+			clan:Show()
+			clan:SetPos(plw_conf.x_ccr_begin + plw_conf.x_icon_clan_offset, 0, plw_conf.x_icon_clan_width, plw_conf.playerbar_image_height)
 		else
-			clan:SetPos(-100, -100, plw_conf.x_icon_clan_width, plw_conf.playerbar_image_height); SafeAddChild(clan,main) 
+			clan:SetPos(-100, -100, plw_conf.x_icon_clan_width, plw_conf.playerbar_image_height)
+			clan:Hide()
 		end
 	end
 	if country then 
+		SafeAddChild(country,main) 
 		if options.plw_showCountry.value then
-			country:SetPos(plw_conf.x_ccr_begin + plw_conf.x_icon_country_offset, 0, plw_conf.x_icon_country_width, plw_conf.playerbar_image_height); SafeAddChild(country,main) 
+			country:Show()
+			country:SetPos(plw_conf.x_ccr_begin + plw_conf.x_icon_country_offset, 0, plw_conf.x_icon_country_width, plw_conf.playerbar_image_height)
 		else
-			country:SetPos(-100, -100, plw_conf.x_icon_country_width, plw_conf.playerbar_image_height); SafeAddChild(country,main) 
+			country:SetPos(-100, -100, plw_conf.x_icon_country_width, plw_conf.playerbar_image_height)
+			country:Hide()
 		end
 	end
 	if rank then 
+		SafeAddChild(rank,main)
 		if options.plw_showRank.value then
-			rank:SetPos(plw_conf.x_ccr_begin + plw_conf.x_icon_rank_offset, 0, plw_conf.x_icon_rank_width, plw_conf.playerbar_image_height); SafeAddChild(rank,main) 
+			rank:Show()
+			rank:SetPos(plw_conf.x_ccr_begin + plw_conf.x_icon_rank_offset, 0, plw_conf.x_icon_rank_width, plw_conf.playerbar_image_height) 
 		else
-			rank:SetPos(-100, -100, plw_conf.x_icon_rank_width, plw_conf.playerbar_image_height); SafeAddChild(rank,main) 
+			rank:SetPos(-100, -100, plw_conf.x_icon_rank_width, plw_conf.playerbar_image_height)
+			rank:Hide()
 		end
 	end
 	if name then 
+		SafeAddChild(name,main)
 		name:SetPos(plw_conf.x_name_begin + plw_conf.x_name_offset, plw_conf.playerbar_text_y, plw_conf.x_name_width - 10, plw_conf.playerbar_text_height)
 		name.font.size = plw_conf.playerbar_text_height
 		name:SetCaption("ERROR")
 		function name:HitTest(x,y) return self end
-		SafeAddChild(name,main)
+		
 	end
 	if statusText then 
+		SafeAddChild(statusText,main)
 		statusText:SetPos(plw_conf.x_playerstate_begin + plw_conf.x_playerstate_offset, plw_conf.playerbar_text_y, plw_conf.x_playerstate_width, plw_conf.playerbar_text_height)
 		function statusText:HitTest(x,y) return self end
 		statusText.font.size = plw_conf.playerbar_text_height
 		statusText:SetCaption("ERROR")
-		SafeAddChild(statusText,main)
 	end
 	
 	if cpuImage and cpuImage.parent == main then SafeRemoveChild(cpuImage,main) end
@@ -2564,26 +2642,6 @@ local function PLW_CreatePlayerControls(entityID)
 	
 end
 
-function PLW_CompareSpectatorVcons(vcon1, vcon2)
-	if not vcon1.vID then
-		return false
-	elseif not vcon2.vID then
-		return true
-	elseif spectatorEntities[vcon1.vID] and spectatorEntities[vcon2.vID] then
-		local name1 = spectatorEntities[vcon1.vID].name
-		local name2 = spectatorEntities[vcon2.vID].name
-		if name1 and name2 then
-			if name2 == "unknown" then 
-				return false
-			elseif name1 == "unknown" or name1 > name2 then 
-				return true
-			end
-		end
-	end
-
-	return false
-end
-
 -- updates spectator row
 local function PLW_UpdateVolatileSpectatorControls(eID)
 	if (not spectatorEntities[eID]) or (not plw.vcon_spectatorControls[eID]) or (not plw.vcon_spectatorControls[eID].subcon) then
@@ -2639,8 +2697,8 @@ local function PLW_UpdateStateSpectatorControls(eID)
 	-- end
 
 	-- try shifting this specbox up and down
-	SortSingleVcon(plw.vcon_spectatorControls[eID], nil, PLW_CompareSpectatorVcons, true, true)
-	SortSingleVcon(plw.vcon_spectatorControls[eID], nil, PLW_CompareSpectatorVcons, false, true)
+	SortSingleVcon(plw.vcon_spectatorControls[eID], nil, CompareSpectatorVcons, true, true)
+	SortSingleVcon(plw.vcon_spectatorControls[eID], nil, CompareSpectatorVcons, false, true)
 	
 	PLW_UpdateVolatileSpectatorControls(eID)
 end
@@ -2680,36 +2738,56 @@ local function PLW_ConfigureSpectatorControls(entityID)
 		SafeAddChild(statusText,main)
 	end
 	
-	if cpuImage and cpuImage.parent == main then SafeRemoveChild(cpuImage,main) end
-	if pingImage and pingImage.parent == main then SafeRemoveChild(pingImage,main) end
-	if cpuText and cpuText.parent == main then SafeRemoveChild(cpuText,main) end
-	if pingText and pingText.parent == main then SafeRemoveChild(pingText,main) end
+	--if cpuImage and cpuImage.parent == main then SafeRemoveChild(cpuImage,main) end
+	--if pingImage and pingImage.parent == main then SafeRemoveChild(pingImage,main) end
+	--if cpuText and cpuText.parent == main then SafeRemoveChild(cpuText,main) end
+	--if pingText and pingText.parent == main then SafeRemoveChild(pingText,main) end
 	
-	if cpuText and options.plw_cpuSpecDisp.value == 'text' then
-		cpuText:SetPos(plw_conf.x_cpuping_spectator_begin + plw_conf.x_cpu_spectator_offset, plw_conf.playerbar_text_y, plw_conf.x_cpu_spectator_width, plw_conf.playerbar_text_height) 
-		cpuText.font.size = plw_conf.playerbar_text_height
-		cpuText:SetCaption("ERROR")
+	if cpuText then
 		SafeAddChild(cpuText,main) 
+		if options.plw_cpuSpecDisp.value == 'text' then
+			cpuText:Show()
+			cpuText:SetPos(plw_conf.x_cpuping_spectator_begin + plw_conf.x_cpu_spectator_offset, plw_conf.playerbar_text_y, plw_conf.x_cpu_spectator_width, plw_conf.playerbar_text_height) 
+			cpuText.font.size = plw_conf.playerbar_text_height
+			cpuText:SetCaption("ERROR")
+		else
+			cpuText:Hide()
+		end
 	end
-	if pingText and options.plw_pingSpecDisp.value == 'text' then 
-		pingText:SetPos(plw_conf.x_cpuping_spectator_begin + plw_conf.x_ping_spectator_offset, plw_conf.playerbar_text_y, plw_conf.x_ping_spectator_width, plw_conf.playerbar_text_height) 
-		pingText.font.size = plw_conf.playerbar_text_height
-		pingText:SetCaption("ERROR")
+	if pingText then 
 		SafeAddChild(pingText,main)
+		if options.plw_pingSpecDisp.value == 'text' then
+			pingText:Show()
+			pingText:SetPos(plw_conf.x_cpuping_spectator_begin + plw_conf.x_ping_spectator_offset, plw_conf.playerbar_text_y, plw_conf.x_ping_spectator_width, plw_conf.playerbar_text_height) 
+			pingText.font.size = plw_conf.playerbar_text_height
+			pingText:SetCaption("ERROR")
+		else
+			pingText:Hide()
+		end
 	end
-	if cpuImage and options.plw_cpuSpecDisp.value == 'icon' then 
-		cpuImage:SetPos(plw_conf.x_cpuping_spectator_begin + plw_conf.x_cpu_spectator_offset, 0, plw_conf.x_cpu_spectator_width, plw_conf.playerbar_image_height)
-		cpuImage.file = "LuaUI/Images/playerlist/cpu.png"
-		function cpuImage:HitTest(x,y) return self end
-		cpuImage:Invalidate()
+	if cpuImage then 
 		SafeAddChild(cpuImage,main)
+		if options.plw_cpuSpecDisp.value == 'icon' then
+			cpuImage:Show()
+			cpuImage:SetPos(plw_conf.x_cpuping_spectator_begin + plw_conf.x_cpu_spectator_offset, 0, plw_conf.x_cpu_spectator_width, plw_conf.playerbar_image_height)
+			cpuImage.file = "LuaUI/Images/playerlist/cpu.png"
+			function cpuImage:HitTest(x,y) return self end
+			cpuImage:Invalidate()
+		else
+			cpuImage:Hide()
+		end
 	end
-	if pingImage and options.plw_pingSpecDisp.value == 'icon' then 
-		pingImage:SetPos(plw_conf.x_cpuping_spectator_begin + plw_conf.x_ping_spectator_offset, 0, plw_conf.x_ping_spectator_width, plw_conf.playerbar_image_height)
-		pingImage.file = "LuaUI/Images/playerlist/ping.png"
-		function pingImage:HitTest(x,y) return self end
-		pingImage:Invalidate()
+	if pingImage then 
 		SafeAddChild(pingImage,main)
+		if options.plw_pingSpecDisp.value == 'icon' then
+			pingImage:Show()
+			pingImage:SetPos(plw_conf.x_cpuping_spectator_begin + plw_conf.x_ping_spectator_offset, 0, plw_conf.x_ping_spectator_width, plw_conf.playerbar_image_height)
+			pingImage.file = "LuaUI/Images/playerlist/ping.png"
+			function pingImage:HitTest(x,y) return self end
+			pingImage:Invalidate()
+		else
+			pingImage:Hide()
+		end
 	end
 
 	PLW_UpdateStateSpectatorControls(entityID, true)
@@ -2719,9 +2797,6 @@ end
 local function PLW_CreateSpectatorControls(entityID)
 
 	local mainControl = Control:New{padding = {0, 0, 0, 0},color = {0, 0, 0, 0}}
-	-- local clanImage = Image:New{}
-	-- local countryImage = Image:New{}
-	-- local rankImage = Image:New{}
 	local nameLabel = Label:New{autosize = false}
 	local statusLabel = Label:New{autosize = false}
 	local cpuLabel = Label:New{autosize = false, align = "center"}
@@ -2729,7 +2804,6 @@ local function PLW_CreateSpectatorControls(entityID)
 	local cpuIm = Image:New{}
 	local pingIm = Image:New{}
 	
-	--local subcon = {name = nameLabel, clan = clanImage, country = countryImage, rank = rankImage, statusText = statusLabel, cpuText = cpuLabel, pingText = pingLabel, cpuImage = cpuIm, pingImage = pingIm}
 	local subcon = {name = nameLabel, statusText = statusLabel, cpuText = cpuLabel, pingText = pingLabel, cpuImage = cpuIm, pingImage = pingIm}
 	
 	plw.vcon_spectatorControls[entityID] = CreateVcon(entityID, mainControl, subcon, 0, 0, {})
@@ -2857,7 +2931,7 @@ function MPL_UpdateStateGlobalControls()
 			end
 			SafeAddChild(mpl.vcon_allyTeamControls[atID].main, mpl.vcon_playerList.main)
 			InsertBottomVconChild(mpl.vcon_allyTeamControls[atID], mpl.vcon_playerList)
-			SortSingleVcon(mpl.vcon_allyTeamControls[atID], nil, PLW_CompareAllyTeamVcons, true, true)
+			SortSingleVcon(mpl.vcon_allyTeamControls[atID], nil, CompareAllyTeamVcons, true, true)
 		end
 	end
 
@@ -2962,7 +3036,7 @@ function MPL_UpdateStateAllyTeamControls(allyTeamID)
 			SafeRemoveChild(teamVCon.main,teamVCon.parent.main)
 			RemoveVcon(teamVCon)
 			--teamVCon.main:SetPos(-2*plw_conf.x_window_width, teamVCon.main.y, teamVCon.main.width, teamVCon.main.height)			
-			if mpl.vcon_allyTeamControls[allyTeamID].firstChild then SortVcons(mpl.vcon_allyTeamControls[allyTeamID].firstChild,PLW_CompareTeamVcons,false) end
+			if mpl.vcon_allyTeamControls[allyTeamID].firstChild then SortVcons(mpl.vcon_allyTeamControls[allyTeamID].firstChild,CompareTeamVcons,false) end
 		end
 		
 		if teamVCon and teamVCon.parent ~= mpl.vcon_allyTeamControls[allyTeamID] then
@@ -2970,19 +3044,19 @@ function MPL_UpdateStateAllyTeamControls(allyTeamID)
 				local oldparent = teamVCon.parent
 				RemoveVcon(teamVCon)
 				SafeRemoveChild(teamVCon.main,oldparent.main)
-				if oldparent.firstChild then SortVcons(oldparent.firstChild,PLW_CompareTeamVcons,false) end
+				if oldparent.firstChild then SortVcons(oldparent.firstChild,CompareTeamVcons,false) end
 			end
 			if nPlayers > 0 then
 				SafeAddChild(teamVCon.main,mpl.vcon_allyTeamControls[allyTeamID].main)
 				InsertBottomVconChild(teamVCon, mpl.vcon_allyTeamControls[allyTeamID])
-				SortSingleVcon(teamVCon, nil, PLW_CompareTeamVcons, true, true)
+				SortSingleVcon(teamVCon, nil, CompareTeamVcons, true, true)
 			end
 		end
 	end
 	
 	-- try shifting this allyteam up and down
-	SortSingleVcon(mpl.vcon_allyTeamControls[allyTeamID], nil, PLW_CompareAllyTeamVcons, true, true)
-	SortSingleVcon(mpl.vcon_allyTeamControls[allyTeamID], nil, PLW_CompareAllyTeamVcons, false, true)
+	SortSingleVcon(mpl.vcon_allyTeamControls[allyTeamID], nil, CompareAllyTeamVcons, true, true)
+	SortSingleVcon(mpl.vcon_allyTeamControls[allyTeamID], nil, CompareAllyTeamVcons, false, true)
 	
 	MPL_UpdateVolatileAllyTeamControls(allyTeamID)
 
@@ -3141,11 +3215,11 @@ function MPL_UpdateStateTeamControls(teamID)
 				local oldparent = mpl.vcon_playerControls[eID].parent
 				RemoveVcon(mpl.vcon_playerControls[eID])
 				SafeRemoveChild(mpl.vcon_playerControls[eID].main,oldparent.main)
-				if oldparent.firstChild then SortVcons(oldparent.firstChild,PLW_ComparePlayerVcons,false) end
+				if oldparent.firstChild then SortVcons(oldparent.firstChild,ComparePlayerVcons,false) end
 			end
 			InsertBottomVconChild(mpl.vcon_playerControls[eID], mpl.vcon_teamControls[teamID])
 			SafeAddChild(mpl.vcon_playerControls[eID].main,mpl.vcon_teamControls[teamID].main)
-			SortSingleVcon(mpl.vcon_playerControls[eID], nil, PLW_ComparePlayerVcons, true, true)
+			SortSingleVcon(mpl.vcon_playerControls[eID], nil, ComparePlayerVcons, true, true)
 		end
 		local namewidth = math.max(2, mpl.vcon_playerControls[eID].subcon.name.font:GetTextWidth(playerEntities[eID].name) + 10)
 		mpl.vcon_teamControls[teamID].options.maxNameWidth = math.max(mpl.vcon_teamControls[teamID].options.maxNameWidth, namewidth)
@@ -3157,11 +3231,11 @@ function MPL_UpdateStateTeamControls(teamID)
 					local oldparent = mpl.vcon_playerControls[eID].parent
 					RemoveVcon(mpl.vcon_playerControls[eID])
 					SafeRemoveChild(mpl.vcon_playerControls[eID].main,oldparent.main)
-					if oldparent.firstChild then SortVcons(oldparent.firstChild,PLW_ComparePlayerVcons,false) end
+					if oldparent.firstChild then SortVcons(oldparent.firstChild,ComparePlayerVcons,false) end
 				end
 				InsertBottomVconChild(mpl.vcon_playerControls[eID], mpl.vcon_teamControls[teamID])
 				SafeAddChild(mpl.vcon_playerControls[eID].main,mpl.vcon_teamControls[teamID].main)
-				SortSingleVcon(mpl.vcon_playerControls[eID], nil, PLW_ComparePlayerVcons, true, true)
+				SortSingleVcon(mpl.vcon_playerControls[eID], nil, ComparePlayerVcons, true, true)
 			end
 			local namewidth = math.max(2, mpl.vcon_playerControls[eID].subcon.name.font:GetTextWidth(playerEntities[eID].name) + 10)
 			mpl.vcon_teamControls[teamID].options.maxNameWidth = math.max(mpl.vcon_teamControls[teamID].options.maxNameWidth, namewidth)
@@ -3200,8 +3274,8 @@ function MPL_UpdateStateTeamControls(teamID)
 		end
 	end
 	
-	SortSingleVcon(mpl.vcon_teamControls[teamID], nil, PLW_CompareTeamVcons, true, true)
-	SortSingleVcon(mpl.vcon_teamControls[teamID], nil, PLW_CompareTeamVcons, false, true)
+	SortSingleVcon(mpl.vcon_teamControls[teamID], nil, CompareTeamVcons, true, true)
+	SortSingleVcon(mpl.vcon_teamControls[teamID], nil, CompareTeamVcons, false, true)
 
 	MPL_UpdateVolatileTeamControls(teamID)
 
@@ -3236,7 +3310,7 @@ function MPL_ConfigureTeamControls(teamID)
 	end
 	if alert then
 		if alert.parent == main then SafeRemoveChild(alert,main) end
-		if options.mpl_showEnergy.value then
+		if options.mpl_showStorageAlert.value then
 			alert:SetPos(0, 0, mpl_conf.me_width, mpl_conf.icon_height)
 			alert.file = "LuaUI/Images/Crystal_Clear_app_error.png"
 			function alert:HitTest(x,y) return self end
@@ -3327,8 +3401,8 @@ function MPL_UpdateStatePlayerControls(entityID)
 		status:Invalidate()
 	end
 	
-	SortSingleVcon(mpl.vcon_playerControls[entityID], nil, PLW_ComparePlayerVcons, true, true)
-	SortSingleVcon(mpl.vcon_playerControls[entityID], nil, PLW_ComparePlayerVcons, false, true)
+	SortSingleVcon(mpl.vcon_playerControls[entityID], nil, ComparePlayerVcons, true, true)
+	SortSingleVcon(mpl.vcon_playerControls[entityID], nil, ComparePlayerVcons, false, true)
 	
 	MPL_UpdateVolatilePlayerControls(entityID)
 	
@@ -3744,7 +3818,7 @@ local function UpdateTeamEntity(tID, fullUpdate)
 	
 end
 
-local function UpdateSpectatorEntity(eID, fullUpdate)
+local function UpdateSpectatorEntity(eID, fullUpdate, initialUpdate)
 	if spectatorEntities[eID] then
 		local name,act,spectator,tID,atID,ping,cpu,country,rank,customKeys = Spring.GetPlayerInfo(spectatorEntities[eID].playerID)
 		local clan, faction, level, elo
@@ -3755,15 +3829,22 @@ local function UpdateSpectatorEntity(eID, fullUpdate)
 			elo = customKeys.elo
 			rank = customKeys.icon
 		end
-		if fullUpdate then
-			spectatorEntities[eID].clan = clan
+        
+        if initialUpdate then 
+            spectatorEntities[eID].clan = clan
 			spectatorEntities[eID].country = country
 			spectatorEntities[eID].faction = faction
 			spectatorEntities[eID].level = level
 			spectatorEntities[eID].elo = elo
 			spectatorEntities[eID].name = name
-			spectatorEntities[eID].teamID = tID
-			spectatorEntities[eID].needsFullVisUpdate = true
+            spectatorEntities[eID].needsFullVisUpdate = true
+        end
+        
+		if fullUpdate then
+            if spectatorEntities[eID].teamID ~= tID then
+                spectatorEntities[eID].teamID = tID
+                spectatorEntities[eID].needsFullVisUpdate = true
+            end
 		end
 		
 		spectatorEntities[eID].cpu = cpu
@@ -3773,7 +3854,7 @@ local function UpdateSpectatorEntity(eID, fullUpdate)
 	end
 end
 
-local function UpdatePlayerEntity(eID, fullUpdate)
+local function UpdatePlayerEntity(eID, fullUpdate, initialUpdate)
 	if playerEntities[eID] then
 		if playerEntities[eID].isAI then
 			local _, ainame, hostingPlayerID, aishortName, _, _ = Spring.GetAIInfo(playerEntities[eID].teamID)
@@ -3811,17 +3892,29 @@ local function UpdatePlayerEntity(eID, fullUpdate)
 				rank = customKeys.icon
 			end
 			
-			if fullUpdate then
-				playerEntities[eID].allyTeamID = atID
-				playerEntities[eID].clan = clan
+            if initialUpdate then
+                playerEntities[eID].clan = clan
 				playerEntities[eID].country = country
 				playerEntities[eID].faction = faction
 				playerEntities[eID].level = level
 				playerEntities[eID].elo = elo
 				playerEntities[eID].rank = rank
 				playerEntities[eID].name = name
-				playerEntities[eID].isLeader = (leader == playerEntities[eID].playerID)
-			
+                playerEntities[eID].needsFullVisUpdate = true
+            end
+            
+			if fullUpdate then
+                if playerEntities[eID].allyTeamID ~= atID then
+                    playerEntities[eID].allyTeamID = atID
+                    playerEntities[eID].needsFullVisUpdate = true
+                end
+                
+                
+                if playerEntities[eID].isLeader ~= (leader == playerEntities[eID].playerID) then
+                    playerEntities[eID].isLeader = (leader == playerEntities[eID].playerID)
+                    playerEntities[eID].needsFullVisUpdate = true
+                end
+				
 				if spectator and not playerEntities[eID].resigned then
 					playerEntities[eID].resigned = true
 					local oldTeam = playerEntities[eID].teamID
@@ -3834,6 +3927,7 @@ local function UpdatePlayerEntity(eID, fullUpdate)
 						speclistNeedsFullVisUpdate = true
 						spectatorLookup[playerEntities[eID].playerID] = specEID
 						UpdateSpectatorEntity(specEID, true)
+                        playerEntities[eID].needsFullVisUpdate = true
 					end
 				end
 			
@@ -3852,11 +3946,12 @@ local function UpdatePlayerEntity(eID, fullUpdate)
 					if oldTeam then UpdateTeamEntity(oldTeam, true) end
 					if newTeam then UpdateTeamEntity(newTeam, true) end
 					playerEntities[eID].teamID = newTeam
+                    playerEntities[eID].needsFullVisUpdate = true
 				end
+                
 				if tID then UpdateTeamEntity(tID, true) end
-				playerEntities[eID].needsFullVisUpdate = true
 			end
-			--TODO other updates
+
 			playerEntities[eID].active = act
 			playerEntities[eID].cpu = cpu
 			playerEntities[eID].ping = ping
@@ -3877,7 +3972,7 @@ local function AddHumanEntity(playerID)
 				spectatorEntities[eID] = CreateSpectatorEntity(playerID)
 				spectatorLookup[playerID] = eID
 			end
-			UpdateSpectatorEntity(eID, true)
+			UpdateSpectatorEntity(eID, true, true)
 			speclistNeedsFullVisUpdate = true
 		else
 			if not humanLookup[playerID] then
@@ -3886,7 +3981,7 @@ local function AddHumanEntity(playerID)
 				humanLookup[playerID] = eID
 			end
 			
-			UpdatePlayerEntity(eID, true)
+			UpdatePlayerEntity(eID, true, true)
 			playerlistNeedsFullVisUpdate = true
 		end
 	end
@@ -3905,7 +4000,7 @@ local function AddAIEntity(teamID)
 			aiLookup[teamID] = eID
 		end
 		
-		UpdatePlayerEntity(eID, true)
+		UpdatePlayerEntity(eID, true, true)
 		playerlistNeedsFullVisUpdate = true
 	
 		-- if not teamEntities[teamID] then
@@ -4187,9 +4282,9 @@ options_order = {
 	--
 	'plw_backgroundOpacity','plw_maxWindowHeight','plw_textHeight','plw_windowDraggable','plw_fancySkinning',
 	--
-	'mpl_visible','mpl_namewidth','mpl_textHeight','mpl_showMetal','mpl_showEnergy','mpl_maxWindowHeight',
+	'mpl_visible','mpl_namewidth','mpl_textHeight','mpl_showMetal','mpl_showEnergy','mpl_showStorageAlert','mpl_maxWindowHeight',
 	--
-	'freq',
+	'freq','unsortYourself'
 }
 options = {
 	plw_visible = {
@@ -4208,6 +4303,16 @@ options = {
 		noHotkey = true,
 		advanced = false,
 		path = 'Settings/HUD Panels/Dynamic Player Lists',
+	},
+	unsortYourself = {
+		name = "Sort self to top as player",
+		type = 'bool',
+		value = true,
+		desc = "Display yourself at the top of your team list",
+		path = 'Settings/HUD Panels/Dynamic Player Lists',
+		OnChange = function() PLW_CreateInitialControls(); plw_scrollPanelsNeedReset = true end,
+		noHotkey = true,
+		advanced = true
 	},
 	plw_namewidth = {
 		name = "Name Width",
@@ -4507,7 +4612,15 @@ options = {
 		advanced = true
 	},
 	mpl_showEnergy = {
-		name = 'Display energy excess indicator',
+		name = 'Display energy stall indicator',
+		type = 'bool',
+		value = true,
+		path = 'Settings/HUD Panels/Dynamic Player Lists/Minimal List',
+		OnChange = function() MPL_CreateAllControls() end,
+		advanced = true
+	},
+	mpl_showStorageAlert = {
+		name = 'Display zero-storage indicator',
 		type = 'bool',
 		value = true,
 		path = 'Settings/HUD Panels/Dynamic Player Lists/Minimal List',
