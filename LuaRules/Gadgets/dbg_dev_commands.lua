@@ -743,6 +743,9 @@ local function EchoCrush()
 end
 
 local function bisect(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
 	local increment = math.abs(tonumber(words[1]) or 1)
 	local offset = math.floor(tonumber(words[2]) or 0)
 	local invert = (math.abs(tonumber(words[3]) or 0) == 1) or false
@@ -797,6 +800,9 @@ local function EmpiricalDps(cmd,line,words,player)
 end
 
 function gadget:GameFrame(n)
+	if not spIsCheatingEnabled() then
+		return
+	end
 	if n%120 == 0 then
 		if not creationUnitList[creationIndex] then
 			creationIndex, creationUnitList = nil, nil
@@ -855,6 +861,9 @@ else -- UNSYNCED
 -------------------------------------------------------------------------------------
 
 local function bisect(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
 	local increment = math.abs(tonumber(words[1]) or 1)
 	local offset = math.floor(tonumber(words[2]) or 0)
 	local invert = (math.abs(tonumber(words[3]) or 0) == 1) or false
