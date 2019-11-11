@@ -280,7 +280,7 @@ local function IntegrateMetal(x, z, forceUpdate)
 			local dist = sqrt(dx * dx + dz * dz)
 
 			if (dist < MEX_RADIUS) then
-				local _, metal = spGetGroundInfo(cx, cz)
+				local _, _, metal = spGetGroundInfo(cx, cz)
 				result = result + metal
 			end
 		end

@@ -66,20 +66,6 @@ end
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 
-if Script.IsEngineMinVersion(104, 0, 50) then
-	local origGetGroundInfo = Spring.GetGroundInfo
-	Spring.GetGroundInfo = function (x, z)
-		local r1, r2, r3, r4, r5, r6, r7, r8, r9 = origGetGroundInfo(x, z)
-		return r2, r3, r4, r5, r6, r7, r8, r9, r1
-	end
-
-	local origGetTerrainTypeData = Spring.GetTerrainTypeData
-	Spring.GetTerrainTypeData = function (index)
-		local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTerrainTypeData(index)
-		return r2, r3, r4, r5, r6, r7, r8, r1
-	end
-end
-
 if Script.IsEngineMinVersion(104, 0, 536) then
 	local origGetPlayerInfo = Spring.GetPlayerInfo
 	Spring.GetPlayerInfo = function (playerID)

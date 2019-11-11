@@ -36,7 +36,7 @@ local function SetImpassibleTerrain(x1, z1, x2, z2)
 		oldTerrain[i] = oldTerrain[i] or {}
 		for j = z1, z2, 8 do
 			if not oldTerrain[i][j] then
-				local terrainType = Spring.GetGroundInfo(i, j)
+				local _, terrainType = Spring.GetGroundInfo(i, j)
 				if terrainNameToIndex[terrainType] then
 					oldTerrain[i][j] = terrainNameToIndex[terrainType]
 				end
@@ -118,7 +118,7 @@ function gadget:Initialize()
 	if (Spring.GetModOptions().typemapsetting == "1") or (not RETAIN_MAP_ROAD) then
 		for i = 0, 255 do
 			if i ~= IMPASSIBLE_TERRAIN then
-				local name, _, t, k, h, s = Spring.GetTerrainTypeData(i)
+				local _, name, _, t, k, h, s = Spring.GetTerrainTypeData(i)
 				if CheckNotImpassible(t, k, h, s) then
 					Spring.SetTerrainTypeData(i, 1, 1, 1, 1)
 				end
@@ -127,7 +127,7 @@ function gadget:Initialize()
 	else
 		for i = 0, 255 do
 			if i ~= IMPASSIBLE_TERRAIN then
-				local name, _, t, k, h, s = Spring.GetTerrainTypeData(i)
+				local _, name, _, t, k, h, s = Spring.GetTerrainTypeData(i)
 				if name and not terrainNameToIndex[name] then
 					terrainNameToIndex[name] = i
 				end
