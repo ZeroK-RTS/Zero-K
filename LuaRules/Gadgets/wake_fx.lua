@@ -28,7 +28,7 @@ local fold_frames = 7 -- every seventh frame
 local n_folds = 4 -- check every fourth unit
 local current_fold = 1
 
-local canWade = {}
+local wadeDepth = {}
 do
 	local smc = Game.speedModClasses
 	local wadingSMC = {
@@ -52,10 +52,11 @@ do
 		return true
 	end
 
-	for unitDefID = 1, #UnitDefs do
+	local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
+	for unitDefID = 1, #UD do
 		-- there are ~400 wadables but the highest one's ID is >512, so we also assign `false`
 		-- instead of keeping them `nil` to keep the internal representation an array (faster)
-		canWade[unitDefID] = checkCanWade(unitDefID)
+		wadeDepth[unitDefID] = checkCanWade(unitDefID) and spGetUnitDefDimensions(unitDefID).height
 	end
 end
 
@@ -65,12 +66,12 @@ local function isMoving(unitID)
 end
 
 function gadget:UnitCreated(unitID, unitDefID)
-	if canWade[unitDefID] then
-		local uddim = Spring.GetUnitDefDimensions(unitDefID)
+	local maxDepth = wadeDepth[unitDefID]
+	if maxDepth then
 		if not unit[unitID] then
 			units.count = units.count + 1
 			units.data[units.count] = unitID
-			unit[unitID] = {id = units.count, h = uddim.height}
+			unit[unitID] = {id = units.count, h = maxDepth}
 		end
 	end
 end
