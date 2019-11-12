@@ -19,9 +19,9 @@ options_order = {'useDoF', 'highQuality', 'autofocus', 'mousefocus',  'autofocus
 options = {
 	useDoF =
 	{
-		type='bool', 
-		name='Apply Depth of Field Effect', 
-		value=false, 
+		type='bool',
+		name='Apply Depth of Field Effect',
+		value=false,
 		advanced = false,
 	},
 	highQuality =
@@ -150,8 +150,8 @@ local function CleanupTextures()
 	glDeleteTexture(depthTex or "")
 	gl.DeleteFBO(intermediateBlurFBO)
 	gl.DeleteFBO(baseBlurFBO)
-	baseBlurTex, baseNearBlurTex, intermediateBlurTex0, intermediateBlurTex1, 
-	intermediateBlurTex2, intermediateBlurTex3, finalBlurTex, finalNearBlurTex, 
+	baseBlurTex, baseNearBlurTex, intermediateBlurTex0, intermediateBlurTex1,
+	intermediateBlurTex2, intermediateBlurTex3, finalBlurTex, finalNearBlurTex,
 	screenTex, depthTex =
 		nil, nil, nil, nil,
 		nil, nil, nil, nil,
@@ -277,7 +277,7 @@ function InitTextures()
 			color0 = baseBlurTex,
 			color1 = baseNearBlurTex,
 	     drawbuffers = {
-	     	GL_COLOR_ATTACHMENT0_EXT, 
+	     	GL_COLOR_ATTACHMENT0_EXT,
 	     	GL_COLOR_ATTACHMENT1_EXT
 	     }
 			})
