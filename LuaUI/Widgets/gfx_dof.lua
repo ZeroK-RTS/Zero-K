@@ -17,23 +17,23 @@ options_order = {'useDoF', 'highQuality', 'autofocus', 'mousefocus',  'autofocus
 'autofocusFocalLength', 'manualfocusLabel', 'focusDepth', 'fStop'}
 
 options = {
-	useDoF = 
-	{ 
+	useDoF =
+	{
 		type='bool', 
 		name='Apply Depth of Field Effect', 
 		value=false, 
 		advanced = false,
 	},
 	highQuality =
-	{ 
+	{
 		type='bool',
 		name='High Quality',
 		value=false,
 		advanced=false,
 		OnChange = function(self) InitTextures() end,
-	}, 
-	autofocus = 
-	{ 
+	},
+	autofocus =
+	{
 		type='bool',
 		name='Automatically Set Focus',
 		value=true,
@@ -44,7 +44,7 @@ options = {
 		name='Focus on Mouse Position',
 		value=false,
 	},
-	autofocusLabel = 
+	autofocusLabel =
 	{
 		type='label',
 		name='Autofocus Parameters'
@@ -70,7 +70,7 @@ options = {
 		min = 0.005, max = 1.0, step = 0.005,
 		value = 0.03,
 	},
-	manualfocusLabel = 
+	manualfocusLabel =
 	{
 		type='label',
 		name='Manual Focus Parameters'
@@ -152,9 +152,9 @@ local function CleanupTextures()
 	gl.DeleteFBO(baseBlurFBO)
 	baseBlurTex, baseNearBlurTex, intermediateBlurTex0, intermediateBlurTex1, 
 	intermediateBlurTex2, intermediateBlurTex3, finalBlurTex, finalNearBlurTex, 
-	screenTex, depthTex = 
+	screenTex, depthTex =
 		nil, nil, nil, nil,
-		nil, nil, nil, nil, 
+		nil, nil, nil, nil,
 		nil, nil
 	intermediateBlurFBO = nil
 	baseBlurFBO = nil
@@ -198,7 +198,7 @@ local qualityLoc = nil
 local passLoc = nil
 
 -- shader uniform enums
-local shaderPasses = 
+local shaderPasses =
 {
 	filterSize = 0,
 	initialBlur = 1,
@@ -226,7 +226,7 @@ function InitTextures()
 		format = GL_DEPTH_COMPONENT24,
 		min_filter = GL.NEAREST,
 		mag_filter = GL.NEAREST,
-	})	
+	})
 
 	baseBlurTex = glCreateTexture(blurTexSizeX, blurTexSizeY, {
 		min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
@@ -276,7 +276,7 @@ function InitTextures()
 		baseBlurFBO = gl.CreateFBO({
 			color0 = baseBlurTex,
 			color1 = baseNearBlurTex,
-	     drawbuffers = { 
+	     drawbuffers = {
 	     	GL_COLOR_ATTACHMENT0_EXT, 
 	     	GL_COLOR_ATTACHMENT1_EXT
 	     }
@@ -287,9 +287,9 @@ function InitTextures()
 			color1 = intermediateBlurTex1,
 			color2 = intermediateBlurTex2,
 			color3 = intermediateBlurTex3,
-	     drawbuffers = { 
-	     	GL_COLOR_ATTACHMENT0_EXT, 
-	     	GL_COLOR_ATTACHMENT1_EXT, 
+	     drawbuffers = {
+	     	GL_COLOR_ATTACHMENT0_EXT,
+	     	GL_COLOR_ATTACHMENT1_EXT,
 	     	GL_COLOR_ATTACHMENT2_EXT,
 	     	GL_COLOR_ATTACHMENT3_EXT
 	     }
@@ -297,7 +297,7 @@ function InitTextures()
 	else
 		baseBlurFBO = gl.CreateFBO({
 			color0 = baseBlurTex,
-	     drawbuffers = { 
+	     drawbuffers = {
 	     	GL_COLOR_ATTACHMENT0_EXT
 	     }
 			})
@@ -306,9 +306,9 @@ function InitTextures()
 			color0 = intermediateBlurTex0,
 			color1 = intermediateBlurTex1,
 			color2 = intermediateBlurTex2,
-	     drawbuffers = { 
-	     	GL_COLOR_ATTACHMENT0_EXT, 
-	     	GL_COLOR_ATTACHMENT1_EXT, 
+	     drawbuffers = {
+	     	GL_COLOR_ATTACHMENT0_EXT,
+	     	GL_COLOR_ATTACHMENT1_EXT,
 	     	GL_COLOR_ATTACHMENT2_EXT
 	     }
 			})
@@ -408,7 +408,7 @@ local function FilterCalculation()
 
   -- glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
 	glTexRect(0, 0, vsx, vsy, false, true)
-	-- 
+	--
 	glTexture(0, false)
 	glTexture(1, false)
 end
@@ -512,8 +512,6 @@ function widget:DrawScreenEffects()
 			glRenderToTexture(finalNearBlurTex, FinalNearBlur)
 		end
 		Composition()
-
-		-- FilterCalculation()
 
 	glUseShader(0)
 end
