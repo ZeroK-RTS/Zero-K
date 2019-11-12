@@ -110,6 +110,9 @@ for i = 0, 64, 8 do
 	end
 end
 
+local maxCommandPoints = 2500
+local maxCommandUnits = 1000
+
 local maxAreaSize = 2000 -- max X or Z bound of area terraform
 local areaSegMaxSize = 200 -- max width and height of terraform squares
 
@@ -1061,7 +1064,11 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 					updateBorderWithPoint(border, point[points].x, point[points].z)
 				end
 			end
-			
+		end
+		
+		if points > maxWallPoints then
+			-- cancel command if the wall is too big, anti-slowdown
+			return false
 		end
 	end
 	
@@ -1069,13 +1076,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 	border.top = border.top - 16
 	border.right = border.right + 16
 	border.bottom = border.bottom + 16
-	
-	if points > maxWallPoints then
-		-- cancel command if the wall is too big, anti-slowdown
-		return false
-	end
 
-	
 	--** Split the mouse points into segments **
 	
 	-- area checks for overlap
@@ -1464,13 +1465,12 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 					updateBorderWithPoint(border, point[points].x, point[points].z)
 				end
 			end
-			
 		end
-	end
-	
-	if border.right-border.left > maxAreaSize or border.bottom-border.top > maxAreaSize then
-		-- cancel command if the area is too big, anti-slowdown
-		return false
+		
+		if border.right-border.left > maxAreaSize or border.bottom-border.top > maxAreaSize then
+			-- cancel command if the area is too big, anti-slowdown
+			return false
+		end
 	end
 	
 	--** Compute which points are on the inside of the Loop **
@@ -2000,6 +2000,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		local pointCount = cmdParams[8]
 		local constructorCount = cmdParams[9]
 		local volumeSelection = cmdParams[10]
+		
+		if pointCount > maxCommandPoints or constructorCount > maxCommandUnits then
+			return
+		end
 		
 		--level or raise or smooth or restore or bumpify
 		if terraform_type == 1 or terraform_type == 2 or terraform_type == 3 or terraform_type == 5 then --or terraform_type == 6 then
