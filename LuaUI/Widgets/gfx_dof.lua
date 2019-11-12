@@ -13,7 +13,8 @@ end
 
 options_path = 'Settings/Graphics/Effects/Depth of Field'
 
-options_order = {'useDoF', 'highQuality', 'autofocus', 'mousefocus', 'focusDepth', 'fStop'}
+options_order = {'useDoF', 'highQuality', 'autofocus', 'mousefocus',  'autofocusLabel', 'autofocusInFocusMultiplier', 'autofocusPower', 
+'autofocusFocalLength', 'manualfocusLabel', 'focusDepth', 'fStop'}
 
 options = {
 	useDoF =
@@ -42,6 +43,37 @@ options = {
 		type='bool',
 		name='Focus on Mouse Position',
 		value=false,
+	},
+	autofocusLabel =
+	{
+		type='label',
+		name='Autofocus Parameters'
+	},
+	autofocusInFocusMultiplier =
+	{
+		type='number',
+		name='Autofocus Minimum In-Focus region size',
+		min = 0.05, max = 10.0, step = 0.05,
+		value = 0.4,
+	},
+	autofocusPower =
+	{
+		type='number',
+		name='Autofocus Power (lower = blurrier at range)',
+		min = 0.05, max = 50.0, step = 0.05,
+		value = 6.0,
+	},
+	autofocusFocalLength =
+	{
+		type='number',
+		name='Autofocus Focal Length',
+		min = 0.005, max = 1.0, step = 0.005,
+		value = 0.03,
+	},
+	manualfocusLabel =
+	{
+		type='label',
+		name='Manual Focus Parameters'
 	},
 	focusDepth =
 	{
@@ -155,6 +187,9 @@ local viewProjectionLoc = nil
 local resolutionLoc = nil
 local distanceLimitsLoc = nil
 local autofocusLoc = nil
+local autofocusFudgeFactorLoc = nil
+local autofocusPowerLoc = nil
+local autofocusFocalLengthLoc = nil
 local mousefocusLoc = nil
 local focusDepthLoc = nil
 local mouseDepthCoordLoc = nil
@@ -337,6 +372,9 @@ function widget:Initialize()
 	resolutionLoc = gl.GetUniformLocation(dofShader, "resolution")
 	distanceLimitsLoc = gl.GetUniformLocation(dofShader, "distanceLimits")
 	autofocusLoc = gl.GetUniformLocation(dofShader, "autofocus")
+	autofocusFudgeFactorLoc = gl.GetUniformLocation(dofShader, "autofocusFudgeFactor")
+	autofocusPowerLoc = gl.GetUniformLocation(dofShader, "autofocusPower")
+	autofocusFocalLengthLoc = gl.GetUniformLocation(dofShader, "autofocusFocalLength")
 	mousefocusLoc = gl.GetUniformLocation(dofShader, "mousefocus")
 	focusDepthLoc = gl.GetUniformLocation(dofShader, "manualFocusDepth")
 	mouseDepthCoordLoc = gl.GetUniformLocation(dofShader, "mouseDepthCoord")
@@ -457,6 +495,9 @@ function widget:DrawScreenEffects()
 		glUniform(distanceLimitsLoc, gl.GetViewRange())
 
 		glUniformInt(autofocusLoc, options.autofocus.value and 1 or 0)
+		glUniform(autofocusFudgeFactorLoc, options.autofocusInFocusMultiplier.value)
+		glUniform(autofocusPowerLoc, options.autofocusPower.value)
+		glUniform(autofocusFocalLengthLoc, options.autofocusFocalLength.value)
 		glUniformInt(mousefocusLoc, options.mousefocus.value and 1 or 0)
 		glUniform(mouseDepthCoordLoc, mx/vsx, my/vsy)
 		glUniform(focusDepthLoc, options.focusDepth.value / maxBlurDistance)
