@@ -98,6 +98,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["spiderassault"].id] = 1,
 	[UnitDefNames["cloakskirm"].id] = 1,
 	[UnitDefNames["cloakarty"].id] = 1,
+	[UnitDefNames["tankarty"].id] = 1,
 	[UnitDefNames["striderdetriment"].id] = 1,
 	[UnitDefNames["shipassault"].id] = 1,
 	[UnitDefNames["shiparty"].id] = 1,
