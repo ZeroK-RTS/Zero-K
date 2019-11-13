@@ -40,7 +40,7 @@ function widget:Initialize()
 	--------------------------------------------------------------------------------
 
 	local testText =
-	[[Bolivians are voting in a referendum on a new constitution that President Evo Morales says will empower the country's indigenous majority.
+	[[Bolivians are voting in a referendum on a new constitution that resigned President Evo Morales says will empower the country's indigenous majority.
 
 The changes also include strengthening state control of Bolivia's natural resources, and no longer recognising Catholicism as the official religion.
 
