@@ -171,6 +171,7 @@ unitDef = {
     SHIELD_CHECK = {
       name                    = [[Fake Poker For Shields]],
       areaOfEffect            = 0,
+      burnblow                = true,
       avoidFeature            = false,
       avoidFriendly           = false,
       avoidGround             = false,
@@ -190,7 +191,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:NONE]],
-      flightTime              = 2,
+      flightTime              = 0.7,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
