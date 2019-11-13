@@ -51,7 +51,7 @@ unitDef = {
 
   },
 
-  sightDistance          = 325,
+  sightDistance          = 385,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.8,
@@ -101,7 +101,7 @@ unitDef = {
       intensity               = 12,
       interceptedByShieldType = 1,
       paralyzeTime            = 1,
-      range                   = 280,
+      range                   = 350,
       reloadtime              = 2.2,
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning_fast]],

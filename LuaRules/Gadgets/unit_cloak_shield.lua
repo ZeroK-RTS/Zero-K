@@ -104,6 +104,7 @@ local function ValidateCloakShieldDefs(mds)
       newData.shrinkRate = def.shrinkRate or 256
       newData.selfCloak  = def.selfCloak or false
       newData.decloakDistance  = def.decloakDistance or false
+      newData.selfDecloakDistance  = def.selfDecloakDistance or false
       newData.radiusException  = def.radiusException or {}
       newData.isTransport = (ud.transportCapacity >= 1)
       newDefs[ud.id] = newData
@@ -201,13 +202,13 @@ local function AddCloakShieldUnit(unitID, cloakShieldDef)
 end
 
 local alliedTrueTable = {allied = true}
-local function SetUnitCloakAndParam(unitID, level, decloakDistance)
+local function SetUnitCloakAndParam(unitID, level, decloakDistance, selfCloak)
 	local newRadius = decloakDistance
 	if level then
 		local cannotCloak = GetUnitRulesParam(unitID, "cannotcloak")
 		if cannotCloak ~= 1 then
 			local changeRadius = true
-			if cloakers[unitID] and cloakers[unitID].radius > 0 then
+			if (not selfCloak) and cloakers[unitID] and cloakers[unitID].radius > 0 then
 				changeRadius = false
 				newRadius = 0
 			end
@@ -312,6 +313,7 @@ local function UpdateCloakees(data)
   local level     = data.def.level
   local selfCloak = data.def.selfCloak
   local decloakDistance = data.def.decloakDistance
+  local selfDecloakDistance = data.def.selfDecloakDistance
   local radiusException = data.def.radiusException
   local x, y, z = GetUnitPosition(unitID)
   if (x == nil) then return end
@@ -327,7 +329,7 @@ local function UpdateCloakees(data)
         cloakees[cloakee] = true
       elseif (selfCloak) then
         --self cloak
-        SetUnitCloakAndParam(cloakee, level, (not radiusException[udid]) and decloakDistance)
+        SetUnitCloakAndParam(cloakee, level, selfDecloakDistance, selfDecloakDistance and true)
         cloakees[cloakee] = true
       end
     end

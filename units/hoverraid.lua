@@ -88,7 +88,7 @@ unitDef = {
       },
       
       damage                  = {
-        default = 100.1,
+        default = 95.01,
       },
       
       explosionGenerator      = [[custom:gauss_hit_l]],
