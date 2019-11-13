@@ -42,6 +42,8 @@ for i=1,#UnitDefs do
 		morphDefs[name][#morphDefs[name] + 1] = {
 			into = morphTo,
 			time = cp.morphtime or (cp.level and math.floor((targetDef.metalCost - ud.metalCost) / (6 * (cp.level+1)))),	-- or 30,
+			metal = tonumber(cp.morphcost),
+			energy = tonumber(cp.morphcost),
 			combatMorph = cp.combatmorph == "1",
 		}
 	end
@@ -213,7 +215,7 @@ local function BuildMorphDef(udSrc, morphData)
 		newData.into = udDst.id
 		newData.time = morphData.time or math.floor(unitDef.buildTime*7/UPGRADING_BUILD_SPEED)
 		newData.increment = (1 / (30 * newData.time))
-		newData.metal	= morphData.metal or DefCost('metalCost', udSrc, udDst)
+		newData.metal = morphData.metal or DefCost('metalCost', udSrc, udDst)
 		newData.energy = morphData.energy or DefCost('energyCost', udSrc, udDst)
 		newData.combatMorph = morphData.combatMorph or false
 		newData.resTable = {
