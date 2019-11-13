@@ -70,8 +70,8 @@ unitDef = {
 
     {
       def                = [[DISARM_ROCKET]],
-      badTargetCategory  = [[SWIM LAND SUB SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
+      badTargetCategory  = [[SWIM LAND SUB SHIP HOVER GUNSHIP FIXEDWING]],
+      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
     
   },
@@ -119,8 +119,9 @@ unitDef = {
       stockpile               = true,
       stockpileTime           = 10^5,
       tolerance               = 4000,
+      tracks                  = true,
       startVelocity           = 200,
-      turnrate                = 25000,
+      turnrate                = 30000,
       waterWeapon             = false,
       weaponAcceleration      = 400,
       weaponTimer             = 1.4,

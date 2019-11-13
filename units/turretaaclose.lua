@@ -41,7 +41,7 @@ unitDef = {
     },
 
   },
-  sightDistance                 = 550,
+  sightDistance                 = 560,
   useBuildingGroundDecal        = true,
   waterline                     = 10,
   workerTime                    = 0,
@@ -93,7 +93,7 @@ unitDef = {
       leadLimit               = 0,
       model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
-      range                   = 480,
+      range                   = 490,
       reloadtime              = 0.2,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med11]],
