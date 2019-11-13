@@ -32,13 +32,27 @@ local function tobool(val)
   return false
 end
 
+local function lowerkeys(t)
+	local tn = {}
+	for i,v in pairs(t) do
+		local typ = type(i)
+		if type(v)=="table" then
+			v = lowerkeys(v)
+		end
+		if typ=="string" then
+			tn[i:lower()] = v
+		else
+			tn[i] = v
+		end
+	end
+	return tn
+end
 
 --deep not safe with circular tables! defaults To false
 Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 CopyTable = Spring.Utilities.CopyTable
 MergeTable = Spring.Utilities.MergeTable
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -50,6 +64,26 @@ for _, ud in pairs(UnitDefs) do
         ud.customparams = {}
     end
  end
+ 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Balance Testing
+--
+
+--modOptions.tweakunits = 'ewpjbG9ha3JhaWQgPSB7YnVpbGRDb3N0TWV0YWwgPSAxMCwKd2VhcG9uRGVmcyA9IHtFTUcgPSB7ZGFtYWdlID0ge2RlZmF1bHQgPSAyMDB9fX19LAp9'
+
+if modOptions.tweakunits and modOptions.tweakunits ~= "" then
+	local tweaks = Spring.Utilities.CustomKeyToUsefulTable(modOptions.tweakunits)
+	if tweaks then
+		Spring.Echo("Loading tweakunits modoption")
+		for name, ud in pairs(UnitDefs) do
+			if tweaks[name] then
+				Spring.Echo("Loading tweakunits for " .. name)
+				Spring.Utilities.OverwriteTableInplace(ud, lowerkeys(tweaks[name]), true)
+			end
+		end
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
