@@ -36,7 +36,7 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 600,
   maxSlope               = 36,
-  maxVelocity            = 2.5,
+  maxVelocity            = 2.6,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
@@ -45,7 +45,7 @@ unitDef = {
   script                 = [[shieldscout.lua]],
   selfDestructAs         = [[CLOGGER_EXPLODE]],
   selfDestructCountdown  = 0,
-  sightDistance          = 350,
+  sightDistance          = 380,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -85,9 +85,9 @@ unitDef = {
       },
 
       damage                  = {
-        default = 36,
-        planes  = 36,
-        subs    = 3.6,
+        default = 45,
+        planes  = 45,
+        subs    = 4.5,
       },
 
       explosionGenerator      = [[custom:none]],
