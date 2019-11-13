@@ -18,9 +18,6 @@ function gadget:GetInfo()
 	}
 end
 
-local SFXTYPE_WAKE1 = 2
-local SFXTYPE_WAKE2 = 3
-
 local unit = {}
 local units = {count = 0, data = {}}
 
@@ -29,16 +26,18 @@ local n_folds = 4 -- check every fourth unit
 local current_fold = 1
 
 local wadeDepth = {}
+local wadeSfxID = {}
 do
 	local smc = Game.speedModClasses
 	local wadingSMC = {
 		[smc.Tank] = true,
 		[smc.KBot] = true,
 	}
+	local SFXTYPE_WAKE1 = 2
+	local SFXTYPE_WAKE2 = 3
 
 	local UD = UnitDefs
-	local function checkCanWade(unitDefID)
-		local unitDef = UD[unitDefID]
+	local function checkCanWade(unitDef)
 		local moveDef = unitDef.moveDef
 		if not moveDef then
 			return false
@@ -54,9 +53,19 @@ do
 
 	local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
 	for unitDefID = 1, #UD do
-		-- there are ~400 wadables but the highest one's ID is >512, so we also assign `false`
-		-- instead of keeping them `nil` to keep the internal representation an array (faster)
-		wadeDepth[unitDefID] = checkCanWade(unitDefID) and spGetUnitDefDimensions(unitDefID).height
+		local unitDef = UD[unitDefID]
+		if checkCanWade(unitDef) then
+			wadeDepth[unitDefID] = spGetUnitDefDimensions(unitDefID).height
+
+			local cpR = unitDef.customParams.modelradius
+			local r = cpR and tonumber(cpR) or unitDef.radius
+			wadeSfxID[unitDefID] = r > 50 and SFXTYPE_WAKE2 or SFXTYPE_WAKE1
+		else
+			-- there are ~400 wadables but the highest one's ID is >512, so we also assign `false`
+			-- instead of keeping them `nil` to keep the internal representation an array (faster)
+			wadeDepth[unitDefID] = false
+			wadeSfxID[unitDefID] = false
+		end
 	end
 end
 
@@ -71,7 +80,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 		if not unit[unitID] then
 			units.count = units.count + 1
 			units.data[units.count] = unitID
-			unit[unitID] = {id = units.count, h = maxDepth}
+			unit[unitID] = {id = units.count, h = maxDepth, fx = wadeSfxID[unitDefID]}
 		end
 	end
 end
@@ -100,14 +109,9 @@ function gadget:GameFrame(n)
 			if y and h then
 				-- emit wakes only when moving and not completely submerged
 				if y > -h and y <= 0 and isMoving(unitID) and not Spring.GetUnitIsCloaked(unitID) then
-					local radius = Spring.GetUnitRadius(unitID)
-					local effect = SFXTYPE_WAKE1
-					if radius > 50 then
-						effect = SFXTYPE_WAKE2
-					end
 					Spring.UnitScript.CallAsUnit(unitID,
 						function()
-							Spring.UnitScript.EmitSfx(1,effect);
+							Spring.UnitScript.EmitSfx(1, unit[unitID].fx);
 						end
 					)
 				end
