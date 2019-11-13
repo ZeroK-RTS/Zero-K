@@ -25,6 +25,9 @@ local fold_frames = 7 -- every seventh frame
 local n_folds = 4 -- check every fourth unit
 local current_fold = 1
 
+local spusCallAsUnit = Spring.UnitScript.CallAsUnit
+local spusEmitSfx    = Spring.UnitScript.EmitSfx
+
 local wadeDepth = {}
 local wadeSfxID = {}
 do
@@ -109,11 +112,9 @@ function gadget:GameFrame(n)
 			if y and h then
 				-- emit wakes only when moving and not completely submerged
 				if y > -h and y <= 0 and isMoving(unitID) and not Spring.GetUnitIsCloaked(unitID) then
-					Spring.UnitScript.CallAsUnit(unitID,
-						function()
-							Spring.UnitScript.EmitSfx(1, unit[unitID].fx);
-						end
-					)
+					-- 1 is the pieceID, most likely it's usually the base piece
+					-- but even if it isn't, it doesn't really matter
+					spusCallAsUnit(unitID, spusEmitSfx, 1, unit[unitID].fx)
 				end
 			else
 				gadget:UnitDestroyed(unitID)
