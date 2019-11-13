@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 if not gadgetHandler:IsSyncedCode() then
-    return
+	return
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -60,43 +60,43 @@ do
 end
 
 local function isMoving(unitID)
-    local velocity = select(4, Spring.GetUnitVelocity(unitID))
-    return velocity > 0
+	local velocity = select(4, Spring.GetUnitVelocity(unitID))
+	return velocity > 0
 end
 
 function gadget:UnitCreated(unitID, unitDefID)
-    if canWade[unitDefID] then
-        local uddim = Spring.GetUnitDefDimensions(unitDefID)
-        if not unit[unitID] then
-            units.count = units.count + 1
-            units.data[units.count] = unitID
-            unit[unitID] = {id = units.count, h = uddim.height}
-        end
-    end
+	if canWade[unitDefID] then
+		local uddim = Spring.GetUnitDefDimensions(unitDefID)
+		if not unit[unitID] then
+			units.count = units.count + 1
+			units.data[units.count] = unitID
+			unit[unitID] = {id = units.count, h = uddim.height}
+		end
+	end
 end
 
 function gadget:UnitDestroyed(unitID)
-    if unit[unitID] then
-        units.data[unit[unitID].id] = units.data[units.count]
-        unit[units.data[units.count]].id = unit[unitID].id --shift last entry into empty space
-        units.data[units.count] = nil
-        units.count = units.count - 1
-        unit[unitID] = nil
-    end
+	if unit[unitID] then
+		units.data[unit[unitID].id] = units.data[units.count]
+		unit[units.data[units.count]].id = unit[unitID].id --shift last entry into empty space
+		units.data[units.count] = nil
+		units.count = units.count - 1
+		unit[unitID] = nil
+	end
 end
 
 function gadget:GameFrame(n)
-    if n%fold_frames == 0 then
-        local listData = units.data
-        if current_fold > n_folds then
-             current_fold = 1
-        end
+	if n%fold_frames == 0 then
+		local listData = units.data
+		if current_fold > n_folds then
+			 current_fold = 1
+		end
 		
-        for i = current_fold, units.count, n_folds do
-            local unitID = listData[i]
-            local x,y,z = Spring.GetUnitPosition(unitID)
-            local h = unit[unitID].h
-            if y and h then
+		for i = current_fold, units.count, n_folds do
+			local unitID = listData[i]
+			local x,y,z = Spring.GetUnitPosition(unitID)
+			local h = unit[unitID].h
+			if y and h then
 				-- emit wakes only when moving and not completely submerged
 				if y > -h and y <= 0 and isMoving(unitID) and not Spring.GetUnitIsCloaked(unitID) then
 					local radius = Spring.GetUnitRadius(unitID)
@@ -112,8 +112,8 @@ function gadget:GameFrame(n)
 				end
 			else
 				gadget:UnitDestroyed(unitID)
-            end
-        end
-        current_fold = current_fold + 1
-    end
+			end
+		end
+		current_fold = current_fold + 1
+	end
 end
