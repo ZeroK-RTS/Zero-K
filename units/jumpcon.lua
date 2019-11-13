@@ -67,7 +67,7 @@ unitDef = {
   trackWidth          = 22,
   turnRate            = 1400,
   upright             = true,
-  workerTime          = 4,
+  workerTime          = 5,
  
   weapons             = {
 
