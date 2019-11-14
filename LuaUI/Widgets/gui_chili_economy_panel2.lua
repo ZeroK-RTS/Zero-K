@@ -180,9 +180,6 @@ options_path = 'Settings/HUD Panels/Economy Panel'
 
 local function option_recreateWindow()
 	local x,y,w,h = DestroyWindow()
-	if WG.SpectatorPanels_enabled then
-		return false
-	end
 	if options.ecoPanelHideSpec.value then
 		local spectating = select(1, Spring.GetSpectatingState())
 		if spectating then
