@@ -118,7 +118,7 @@ unitDef = {
       footprintZ       = 2,
       collisionVolumeOffsets = [[0 0 0]],
       collisionVolumeScales  = [[40 30 50]],
-      collisionVolumeType    = [[ellipsoid]], 
+      collisionVolumeType    = [[ellipsoid]],
       object           = [[venom_wreck.s3o]],
     },
     HEAP  = {

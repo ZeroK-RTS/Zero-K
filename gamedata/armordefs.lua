@@ -164,7 +164,7 @@ for name, wd in pairs(DEFS.weaponDefs) do
 
 		if wd.paralyzer then
 			-- paralyzer is hardcoded in Spring to deal no wreck damage so this handling does nothing.
- 			wd.damage.default = 0.001 -- Settings damage default to 0 removes cratering and impulse
+			wd.damage.default = 0.001 -- Settings damage default to 0 removes cratering and impulse
 		end
 
 		if (cp.timeslow_damagefactor) and (tobool(cp.timeslow_onlyslow)) then

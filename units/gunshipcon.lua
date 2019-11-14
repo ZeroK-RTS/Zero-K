@@ -69,7 +69,7 @@ unitDef = {
       footprintZ       = 2,
       collisionVolumeOffsets = [[0 0 -20]],
       collisionVolumeScales  = [[90 90 60]],
-      collisionVolumeType    = [[ellipsoid]], 
+      collisionVolumeType    = [[ellipsoid]],
       object           = [[bumblebee_d.dae]],
     },
 

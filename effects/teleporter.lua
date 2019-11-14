@@ -269,7 +269,7 @@ return {
     },
   },
   ["teleport_fade"] = {
-  	groundflash = {
+      groundflash = {
       circlealpha        = 0,
       circlegrowth       = 0,
       flashalpha         = 0.5,

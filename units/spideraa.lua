@@ -112,7 +112,7 @@ unitDef = {
       footprintZ       = 3,
       collisionVolumeOffsets = [[0 -5 0]],
       collisionVolumeScales  = [[40 30 40]],
-      collisionVolumeType    = [[ellipsoid]], 
+      collisionVolumeType    = [[ellipsoid]],
       object           = [[tarantula_dead.s3o]],
     },
 

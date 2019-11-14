@@ -115,7 +115,7 @@ unitDef = {
       footprintZ       = 2,
       collisionVolumeOffsets = [[0 -5 0]],
       collisionVolumeScales  = [[42 42 42]],
-      collisionVolumeType    = [[ellipsoid]], 
+      collisionVolumeType    = [[ellipsoid]],
       object           = [[corraid_dead.s3o]],
     },
 
