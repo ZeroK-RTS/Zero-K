@@ -180,13 +180,16 @@ options_path = 'Settings/HUD Panels/Economy Panel'
 
 local function option_recreateWindow()
 	local x,y,w,h = DestroyWindow()
+	if WG.SpectatorPanels_enabled then
+		return false
+	end
 	if options.ecoPanelHideSpec.value then
 		local spectating = select(1, Spring.GetSpectatingState())
 		if spectating then
 			return false
 		end
 	end
-		
+	
 	CreateWindow(x,y,w,h)
 	return true
 end
@@ -591,8 +594,8 @@ local initialReserveSet = false
 function widget:GameFrame(n)
 
 	if (n%TEAM_SLOWUPDATE_RATE ~= 0) then
-        return
-    end
+		return
+	end
 	
 	if not window then
 		if not option_recreateWindow() then

@@ -958,6 +958,7 @@ function option_CheckEnable(self)
 			RemovePlayerWindow()
 			RemoveEconomyWindows()
 			enabled = false
+			WG.SpectatorPanels_enabled = false
 		end
 		return false
 	end
@@ -968,17 +969,20 @@ function option_CheckEnable(self)
 			RemovePlayerWindow()
 			RemoveEconomyWindows()
 			enabled = false
+			WG.SpectatorPanels_enabled = false
 		end
 		return false
 	end
 	
 	if enabled then
+		WG.SpectatorPanels_enabled = true
 		return true
 	end
 	
 	allyTeamData = GetOpposingAllyTeams()
 	if not allyTeamData then
 		enabled = false
+		WG.SpectatorPanels_enabled = false
 		return false
 	end
 	
@@ -993,6 +997,7 @@ function option_CheckEnable(self)
 	option_UpdateFonts()
 
 	enabled = true
+	WG.SpectatorPanels_enabled = true
 	return true
 end
 
@@ -1024,7 +1029,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Shutdown()
-	--window:Dispose()
+	WG.SpectatorPanels_enabled = false
 end
 
 function widget:PlayerChanged(pID)
