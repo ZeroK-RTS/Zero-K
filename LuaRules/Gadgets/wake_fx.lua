@@ -80,11 +80,9 @@ end
 function gadget:UnitCreated(unitID, unitDefID)
 	local maxDepth = wadeDepth[unitDefID]
 	if maxDepth then
-		if not unit[unitID] then
-			units.count = units.count + 1
-			units.data[units.count] = unitID
-			unit[unitID] = {id = units.count, h = maxDepth, fx = wadeSfxID[unitDefID]}
-		end
+		units.count = units.count + 1
+		units.data[units.count] = unitID
+		unit[unitID] = {id = units.count, h = maxDepth, fx = wadeSfxID[unitDefID]}
 	end
 end
 
@@ -109,15 +107,11 @@ function gadget:GameFrame(n)
 			local unitID = listData[i]
 			local x,y,z = Spring.GetUnitPosition(unitID)
 			local h = unit[unitID].h
-			if y and h then
-				-- emit wakes only when moving and not completely submerged
-				if y > -h and y <= 0 and isMoving(unitID) and not Spring.GetUnitIsCloaked(unitID) then
-					-- 1 is the pieceID, most likely it's usually the base piece
-					-- but even if it isn't, it doesn't really matter
-					spusCallAsUnit(unitID, spusEmitSfx, 1, unit[unitID].fx)
-				end
-			else
-				gadget:UnitDestroyed(unitID)
+
+			if y > -h and y <= 0 and isMoving(unitID) and not Spring.GetUnitIsCloaked(unitID) then
+				-- 1 is the pieceID, most likely it's usually the base piece
+				-- but even if it isn't, it doesn't really matter
+				spusCallAsUnit(unitID, spusEmitSfx, 1, unit[unitID].fx)
 			end
 		end
 		current_fold = current_fold + 1
