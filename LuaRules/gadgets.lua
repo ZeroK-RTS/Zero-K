@@ -2141,7 +2141,7 @@ local function AllowCommandParams(cmdParams, playerID)
 	for i = 1, #cmdParams do
 		if cmdParams[i] < -SIZE_LIMIT or cmdParams[i] > SIZE_LIMIT then
 			Spring.Echo("Bad command from", (playerID and Spring.GetPlayerInfo(playerID)) or "unknown")
-			--return false
+			return false
 		end
 	end
 	return true
