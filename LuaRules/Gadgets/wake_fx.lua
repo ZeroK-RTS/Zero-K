@@ -19,11 +19,16 @@ function gadget:GetInfo()
 end
 
 local unit = {}
-local units = {count = 0, data = {}}
+local unitsCount = 0
+local unitsData = {}
 
 local fold_frames = 7 -- every seventh frame
 local n_folds = 4 -- check every fourth unit
 local current_fold = 1
+
+local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
+local spGetUnitPosition  = Spring.GetUnitPosition
+local spGetUnitVelocity  = Spring.GetUnitVelocity
 
 local spusCallAsUnit = Spring.UnitScript.CallAsUnit
 local spusEmitSfx    = Spring.UnitScript.EmitSfx
@@ -58,7 +63,7 @@ do
 	for unitDefID = 1, #UD do
 		local unitDef = UD[unitDefID]
 		if checkCanWade(unitDef) then
-			wadeDepth[unitDefID] = spGetUnitDefDimensions(unitDefID).height
+			wadeDepth[unitDefID] = -spGetUnitDefDimensions(unitDefID).height
 
 			local cpR = unitDef.customParams.modelradius
 			local r = cpR and tonumber(cpR) or unitDef.radius
@@ -72,49 +77,44 @@ do
 	end
 end
 
-local function isMoving(unitID)
-	local velocity = select(4, Spring.GetUnitVelocity(unitID))
-	return velocity > 0
-end
-
 function gadget:UnitCreated(unitID, unitDefID)
 	local maxDepth = wadeDepth[unitDefID]
 	if maxDepth then
-		units.count = units.count + 1
-		units.data[units.count] = unitID
-		unit[unitID] = {id = units.count, h = maxDepth, fx = wadeSfxID[unitDefID]}
+		unitsCount = unitsCount + 1
+		unitsData[unitsCount] = unitID
+		unit[unitID] = {id = unitsCount, h = maxDepth, fx = wadeSfxID[unitDefID]}
 	end
 end
 
 function gadget:UnitDestroyed(unitID)
-	if unit[unitID] then
-		units.data[unit[unitID].id] = units.data[units.count]
-		unit[units.data[units.count]].id = unit[unitID].id --shift last entry into empty space
-		units.data[units.count] = nil
-		units.count = units.count - 1
+	local data = unit[unitID]
+	if data then
+		local unitIndex = data.id
+		local lastUnitID = unitsData[unitsCount]
+		unitsData[unitIndex] = lastUnitID
+		unit[lastUnitID].id = unitIndex --shift last entry into empty space
+		unitsData[unitsCount] = nil
+		unitsCount = unitsCount - 1
 		unit[unitID] = nil
 	end
 end
 
 function gadget:GameFrame(n)
 	if n%fold_frames == 0 then
-		local listData = units.data
-		if current_fold > n_folds then
-			 current_fold = 1
-		end
-		
-		for i = current_fold, units.count, n_folds do
+		local listData = unitsData
+		for i = current_fold, unitsCount, n_folds do
 			local unitID = listData[i]
-			local x,y,z = Spring.GetUnitPosition(unitID)
-			local h = unit[unitID].h
+			local data = unit[unitID]
+			local x,y,z = spGetUnitPosition(unitID)
+			local h = data.h
 
-			if y > -h and y <= 0 and isMoving(unitID) and not Spring.GetUnitIsCloaked(unitID) then
+			if y > h and y <= 0 and select(4, spGetUnitVelocity(unitID)) > 0 and not spGetUnitIsCloaked(unitID) then
 				-- 1 is the pieceID, most likely it's usually the base piece
 				-- but even if it isn't, it doesn't really matter
-				spusCallAsUnit(unitID, spusEmitSfx, 1, unit[unitID].fx)
+				spusCallAsUnit(unitID, spusEmitSfx, 1, data.fx)
 			end
 		end
-		current_fold = current_fold + 1
+		current_fold = (current_fold % n_folds) + 1
 	end
 end
 
