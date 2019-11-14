@@ -123,3 +123,12 @@ function gadget:GameFrame(n)
 		current_fold = current_fold + 1
 	end
 end
+
+function gadget:Initialize()
+	local spGetUnitDefID = Spring.GetUnitDefID
+	local allUnits = Spring.GetAllUnits()
+	for i = 1, #allUnits do
+		local unitID = allUnits[i]
+		gadget:UnitCreated(unitID, spGetUnitDefID(unitID))
+	end
+end
