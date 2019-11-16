@@ -28,6 +28,7 @@ unitDef = {
     stockpilecost  = [[150]],
     priority_misc = 2, -- High
     extradrawrange = 3000,
+    ispad         = 1,
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],

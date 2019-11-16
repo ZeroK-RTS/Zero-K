@@ -27,6 +27,7 @@ unitDef = {
     notreallyafactory = 1,
     selection_rank  = [[1]],
     selectionscalemult = 1,
+    ispad         = 1,
   },
 
   explodeAs           = [[LARGE_BUILDINGEX]],

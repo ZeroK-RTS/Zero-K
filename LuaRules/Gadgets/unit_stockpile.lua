@@ -87,7 +87,7 @@ function gadget:GameFrame(n)
 				data.resTable.e = data.resTable.m
 			end
 			
-			if (def.stockCost == 0) or spUseUnitResource(unitID, data.resTable) then
+			if (newStockSpeed > 0) and ((def.stockCost == 0) or spUseUnitResource(unitID, data.resTable)) then
 				data.progress = data.progress - newStockSpeed
 				if data.progress <= 0 then
 					spSetUnitStockpile(unitID, stocked, 1)

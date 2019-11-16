@@ -40,6 +40,7 @@ unitDef = {
     default_spacing = 8,
     factorytab       = 1,
     shared_energy_gen = 1,
+    ispad         = 1,
   },
 
   energyUse                     = 0,

@@ -26,22 +26,22 @@ end
 --------------------------------------------------------------------------------
 include("LuaRules/Configs/customcmds.h.lua")
 
-local AddUnitDamage     = Spring.AddUnitDamage
-local CreateUnit        = Spring.CreateUnit
-local GetCommandQueue   = Spring.GetCommandQueue
-local GetUnitIsStunned  = Spring.GetUnitIsStunned
-local GetUnitPieceMap	= Spring.GetUnitPieceMap
-local GetUnitPiecePosDir= Spring.GetUnitPiecePosDir
-local GetUnitPosition   = Spring.GetUnitPosition
-local GiveOrderToUnit   = Spring.GiveOrderToUnit
-local SetUnitPosition   = Spring.SetUnitPosition
-local SetUnitNoSelect   = Spring.SetUnitNoSelect
-local TransferUnit      = Spring.TransferUnit
+local AddUnitDamage       = Spring.AddUnitDamage
+local CreateUnit          = Spring.CreateUnit
+local GetCommandQueue     = Spring.GetCommandQueue
+local GetUnitIsStunned    = Spring.GetUnitIsStunned
+local GetUnitPieceMap     = Spring.GetUnitPieceMap
+local GetUnitPiecePosDir  = Spring.GetUnitPiecePosDir
+local GetUnitPosition     = Spring.GetUnitPosition
+local GiveOrderToUnit     = Spring.GiveOrderToUnit
+local SetUnitPosition     = Spring.SetUnitPosition
+local SetUnitNoSelect     = Spring.SetUnitNoSelect
+local TransferUnit        = Spring.TransferUnit
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
-local spGetGameFrame    = Spring.GetGameFrame
-local random            = math.random
-local CMD_ATTACK		= CMD.ATTACK
+local spGetGameFrame      = Spring.GetGameFrame
+local random              = math.random
+local CMD_ATTACK          = CMD.ATTACK
 
 local emptyTable = {}
 local INLOS_ACCESS = {inlos = true}

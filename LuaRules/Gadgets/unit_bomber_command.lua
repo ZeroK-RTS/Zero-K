@@ -27,13 +27,13 @@ end
 --------------------------------------------------------------------------------
 -- speedups
 --------------------------------------------------------------------------------
-local spGetUnitTeam		= Spring.GetUnitTeam
-local spGetUnitAllyTeam	= Spring.GetUnitAllyTeam
-local spGetUnitDefID	= Spring.GetUnitDefID
-local spGetUnitIsDead	= Spring.GetUnitIsDead
-local spGetUnitRulesParam	= Spring.GetUnitRulesParam
-local spSetUnitRulesParam	= Spring.SetUnitRulesParam
-local spAreTeamsAllied = Spring.AreTeamsAllied
+local spGetUnitTeam        = Spring.GetUnitTeam
+local spGetUnitAllyTeam    = Spring.GetUnitAllyTeam
+local spGetUnitDefID       = Spring.GetUnitDefID
+local spGetUnitIsDead      = Spring.GetUnitIsDead
+local spGetUnitRulesParam  = Spring.GetUnitRulesParam
+local spSetUnitRulesParam  = Spring.SetUnitRulesParam
+local spAreTeamsAllied     = Spring.AreTeamsAllied
 
 include "LuaRules/Configs/customcmds.h.lua"
 
@@ -147,12 +147,12 @@ local findPadCMD = {
 
 local emptyTable = {}
 
-local airpadsData = {}	-- stores data
-local airpadsPerAllyteam = {}	-- [allyTeam] = {[pad1ID] = unitDefID1, [pad2ID] = unitDefID2, ..}
+local airpadsData = {}         -- stores data
+local airpadsPerAllyteam = {}  -- [allyTeam] = {[pad1ID] = unitDefID1, [pad2ID] = unitDefID2, ..}
 local bomberUnitIDs = {}
-local bomberToPad = {}	-- [bomberID] = detination pad ID
-local bomberLanding = {} -- [bomberID] = true
-local rearmRequest = {} -- [bomberID] = true	(used to avoid recursion in UnitIdle)
+local bomberToPad = {}         -- [bomberID] = detination pad ID
+local bomberLanding = {}       -- [bomberID] = true
+local rearmRequest = {}        -- [bomberID] = true (used to avoid recursion in UnitIdle)
 local rearmRemove = {}
 local cmdIgnoreSelf = false
 -- local totalReservedPad = 0
@@ -416,6 +416,8 @@ function gadget:UnitFinished(unitID, unitDefID, team)
 		airpadsData[unitID].emptySpot = {}
 		airpadsPerAllyteam[allyTeam][unitID] = unitDefID
 		spSetUnitRulesParam(unitID,"unreservedPad",airpadsData[unitID].cap) --hint widgets
+		
+		GG.AddMiscPriorityUnit(unitID) -- For refuel pad handler
 	end
 end
 
