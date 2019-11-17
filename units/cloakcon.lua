@@ -33,7 +33,7 @@ unitDef = {
     area_cloak_upkeep = 8,
     area_cloak_radius = 192,
     area_cloak_decloak_distance = 75,
-    area_cloak_self_decloak_distance = 128,
+    area_cloak_self_decloak_distance = 192,
     area_cloak_grow_rate = 350,
     area_cloak_shrink_rate = 1400,
 

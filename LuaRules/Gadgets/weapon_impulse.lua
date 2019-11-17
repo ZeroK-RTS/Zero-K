@@ -57,7 +57,7 @@ local CMD_ONOFF = CMD.ONOFF
 local GUNSHIP_VERTICAL_MULT = 0.25 -- prevents rediculus gunship climb
 
 local impulseMult = {
-	[0] = 0.023, -- fixedwing
+	[0] = 0.022, -- fixedwing
 	[1] = 0.004, -- gunships
 	[2] = 0.0036, -- other
 }
