@@ -399,6 +399,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- velocityPrediction (defaults in config): number of frames of enemy velocity prediction for skirming and fleeing
 -- selfVelocityPrediction (defaults to false): Whether the unit predicts its own velocity when calculating range.
 -- reloadSkirmLeeway (defaults to false): Increase skirm range by reloadSkirmLeeway*remainingReloadFrames when reloading.
+-- skirmBlockedApproachOnFight (defaults to false): Applies skirmBlockedApproachFrames to all commands.
 -- skirmBlockedApproachFrames (defaults to false): Stop skirming after this many frames of being fully reloaded if not set to attack move.
 -- skirmBlockApproachHeadingBlock (defaults to false): Blocks the effect of skirmBlockedApproachFrames if the dot product of enemyVector and unitFacing exceeds skirmBlockApproachHeadingBlock.
 
@@ -1140,6 +1141,7 @@ local behaviourConfig = {
 		swarms = {},
 		flees = {},
 		skirmLeeway = 40,
+		skirmBlockedApproachOnFight = true,
 		skirmBlockedApproachFrames = 120,
 	},
 	

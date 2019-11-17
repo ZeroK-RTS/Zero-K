@@ -429,17 +429,18 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 			end
 		end
 		
-		if (not doHug) and (not haveFightAndHoldPos) and behaviour.skirmBlockedApproachFrames then
+		if (not doHug) and (behaviour.skirmBlockedApproachOnFight or not haveFightAndHoldPos) and behaviour.skirmBlockedApproachFrames then
 			if not reloadFrames then
 				local reloadState = spGetUnitWeaponState(unitID, behaviour.weaponNum, 'reloadState')
 				if reloadState then
 					reloadFrames = reloadState - n
 				end
 			end
+			
 			-- Negative reloadFrames is how many frames the weapon has been loaded for.
 			-- If a unit has not fired then it has been loaded since frame zero.
 			if reloadFrames and (behaviour.skirmBlockedApproachFrames < -reloadFrames) then
-				if behaviour.skirmBlockApproachHeadingBlock and HeadingAllowReloadSkirmBlock(unitID, behaviour.skirmBlockApproachHeadingBlock, ex, ez) then
+				if (not behaviour.skirmBlockApproachHeadingBlock) or HeadingAllowReloadSkirmBlock(unitID, behaviour.skirmBlockApproachHeadingBlock, ex, ez) then
 					if cmdID and move and not behaviour.skirmKeepOrder then
 						spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 					end
