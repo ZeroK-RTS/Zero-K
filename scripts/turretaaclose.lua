@@ -56,7 +56,7 @@ function script.AimWeapon(num, heading, pitch)
 
 	aiming = true
 
-	Turn(turret, y_axis, heading, math.rad(200))
+	Turn(turret, y_axis, heading, math.rad(250))
 	Turn(launcher1, x_axis, -pitch, math.rad(200))
 	Turn(launcher2, x_axis, -pitch, math.rad(200))
 
