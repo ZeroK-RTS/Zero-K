@@ -389,7 +389,7 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 	ex, ey, ez = ex - ux, ey - uy, ez - uz
 	
 	local predict = 1
-	if enemySpeed < behaviour.mySpeed then
+	if enemySpeed < behaviour.mySpeed*0.95 then
 		predict = 0.8*enemySpeed/behaviour.mySpeed
 	end
 	predict = predict*behaviour.velocityPrediction
