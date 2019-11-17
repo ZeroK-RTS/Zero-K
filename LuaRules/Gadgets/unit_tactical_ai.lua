@@ -374,7 +374,7 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 	local data = unit[unitID]
 	--local pointDis = spGetUnitSeparation (enemy,unitID,true)
 	
-	local vx,vy,vz = spGetUnitVelocity(enemy)
+	local vx,vy,vz, enemySpeed = spGetUnitVelocity(enemy)
 	local ex,ey,ez,_,aimY = spGetUnitPosition(enemy, false, true) -- enemy position
 	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
 
@@ -388,8 +388,14 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 	-- The e vector is relative to unit position
 	ex, ey, ez = ex - ux, ey - uy, ez - uz
 	
+	local predict = 1
+	if enemySpeed < behaviour.mySpeed then
+		predict = 0.8*enemySpeed/behaviour.mySpeed
+	end
+	predict = predict*behaviour.velocityPrediction
+	
 	-- The d vector is also relative to unit position.
-	local dx,dy,dz = ex + vx*behaviour.velocityPrediction, ey + vy*behaviour.velocityPrediction, ez + vz*behaviour.velocityPrediction
+	local dx,dy,dz = ex + vx*predict, ey + vy*predict, ez + vz*predict
 	if behaviour.selfVelocityPrediction then
 		local uvx,uvy,uvz = spGetUnitVelocity(unitID)
 		dx,dy,dz = dx - uvx*behaviour.velocityPrediction, dy - uvy*behaviour.velocityPrediction, dz - uvz*behaviour.velocityPrediction
@@ -771,6 +777,7 @@ local function GetBehaviourTable(behaviourData, ud)
 	behaviourData.fleeOrderDis            = (behaviourData.fleeOrderDis or 120)
 	behaviourData.hugRange                = (behaviourData.hugRange or behaviourDefaults.defaultHugRange)
 	behaviourData.minFleeRange            = behaviourData.minFleeRange - behaviourData.fleeLeeway
+	behaviourData.mySpeed                 = ud.speed/30
 	
 	if behaviourData.fightOnlyOverride then
 		for k, v in pairs(behaviourData) do
