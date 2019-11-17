@@ -919,7 +919,7 @@ local behaviourConfig = {
 	
 	--assaults
 	["cloakassault"] = {
-		skirms = riotRangeSkirmieeArray,
+		skirms = medRangeSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		flees = {},
 		fightOnlyUnits = medRangeExplodables,
