@@ -479,13 +479,13 @@ function gadget:Load(zip)
   
   for unitID, data in pairs(cloakers) do
     local radius = Spring.GetUnitRulesParam(unitID, "cloakerRadius") or 0
-	if radius > 0 then
-	  data.radius = radius
-	  if (data.draw) then
-		SendToUnsynced(SYNCSTR, data.id, radius)
-	  end
-	  UpdateCloakees(data)
-	end
+    if radius > 0 then
+      data.radius = radius
+      if (data.draw) then
+    	SendToUnsynced(SYNCSTR, data.id, radius)
+      end
+      UpdateCloakees(data)
+    end
   end
 end
 
@@ -498,6 +498,17 @@ function CloakShieldCommand(unitID, cmdParams)
   local data = cloakShieldUnits[unitID]
   if (not data) then
     return false
+  end
+
+  if data.maxrad < 300 and not cmdParams[2] then
+    local teamID = Spring.GetUnitTeam(unitID)
+    if not teamID then
+      return
+    end
+    local _, _, _, isAiTeam = Spring.GetTeamInfo(teamID)
+    if isAiTeam then
+      return false
+    end
   end
 
   local state = (cmdParams[1] == 1)
