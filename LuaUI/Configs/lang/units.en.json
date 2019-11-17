@@ -1052,7 +1052,7 @@
 	"cloakcon" : {
 		"name" : "Conjurer",
 		"description" : "Cloaked Construction Bot, Builds at 5 m/s",
-		"helptext" : "The Conjurer packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance."
+		"helptext" : "The Conjurer packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance. It can also enable a short-range cloaking field, which unlike the aforementioned abilities costs energy to maintain."
 	},
 	"turretsunlance" : {
 		"name" : "Sunlance",

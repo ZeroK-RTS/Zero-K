@@ -1052,7 +1052,7 @@
 	"cloakcon" : {
 		"name" : "Conjurer",
 		"description" : "Niewidzialny bot konstruktor, moc 5 m/s",
-		"helptext" : "Conjurer to niewidzialny konstruktor z zakłócaczem krótkiego zasięgu."
+		"helptext" : "Conjurer to niewidzialny konstruktor z zakłócaczem radaru krótkiego zasięgu. Może też włączyć pole niewidzialności, co jednak w przeciwieństwie do wcześniej wymienionych umiejętności wymaga energii do działania."
 	},
 	"turretsunlance" : {
 		"name" : "Sunlance",

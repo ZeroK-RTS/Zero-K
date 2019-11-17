@@ -252,7 +252,7 @@
 	"cloakcon" : {
 		"name" : "Conjurer",
 		"description" : "Getarnter Konstruktionsroboter, Baut mit 5 M/s",
-		"helptext" : "Der Conjurer besitzt einen Störsender mit kurzer Reichweite und ein Tarngerät, um geheim und unerkannt expandieren zu können."
+		"helptext" : "Der Conjurer besitzt einen Störsender mit kurzer Reichweite und ein Tarngerät, um geheim und unerkannt expandieren zu können. Er ist auch mit einem kleinen Tarnschild ausgestattet, der im Gegensatz zu den vorgenannten Fähigkeiten nutzt Energie."
 	},
 	"gunshipaa" : {
 		"name" : "Trident",
@@ -487,7 +487,7 @@
 	"cloakjammer" : {
 		"name" : "Iris",
 		"description" : "Tarn-/Störsenderroboter",
-		"helptext" : "Der Iris besitzt ein Gerät zum Stören feindlicher Radarwellen. Des Weiteren ist er mit einem kleinen Tarnschild ausgestattet, um nahe, freundliche Einheiten zu tarnen."
+		"helptext" : "Der Iris besitzt ein Gerät zum Stören feindlicher Radarwellen. Des Weiteren ist er mit einem Tarnschild ausgestattet, um nahe, freundliche Einheiten zu tarnen."
 	},
 	"striderhub" : {
 		"name" : "Strider Hub",
