@@ -1148,7 +1148,7 @@ function gadget:GameFrame(n)
 			local chickens = spGetTeamUnits(chickenTeamID)
 			for i=1,#chickens do
 				local unitID = chickens[i]
-				if (not Spring.Utilities.GetUnitFirstCommand(unitID)) then
+				if not Spring.GetUnitCurrentCommand(unitID) then
 					--AttackNearestEnemy(unitID)
 					if (difficulty > 1) and (unitID == data.queenID) then
 						spGiveOrderToUnit(unitID, CMD_RAW_MOVE, data.targetCache, CMD.OPT_SHIFT)

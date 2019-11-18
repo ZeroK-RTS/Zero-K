@@ -126,32 +126,11 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	if spValidUnitID(attackerID) and slowDef.smartRetarget then
 		local health = spGetUnitHealth(unitID)
 		if slowedUnits[unitID].slowDamage > health*slowDef.smartRetarget and health > (slowDef.smartRetargetHealth or 0) then
-			
-			local cID_1, cOpt_1, cTag_1, cp_1, cp_2
-			local cID_2, cOpt_2, cTag_2, cps_1, cps_2
-			local cID_3
-			
-			if Spring.Utilities.COMPAT_GET_ORDER then
-				local queue = Spring.GetCommandQueue(attackerID, 3)
-				if queue and queue[1] then
-					cID_1, cOpt_1, cTag_1, cp_1, cp_2 = queue[1].id, queue[1].options.coded, queue[1].tag, queue[1].params[1], queue[1].params[2]
-				end
-				if queue and queue[2] then
-					cID_2, cOpt_2, cTag_2, cps_1, cps_2 = queue[2].id, queue[2].options.coded, queue[2].tag, queue[2].params[1], queue[2].params[2]
-				end
-				if queue and queue[3] then
-					cID_3 = queue[3].id
-				end
-			else
-				cID_1, cOpt_1, cTag_1, cp_1, cp_2 = Spring.GetUnitCurrentCommand(attackerID)
-			end
-			
 			-- set order by player
+			local cID_1, cOpt_1, cTag_1, cp_1, cp_2 = Spring.GetUnitCurrentCommand(attackerID)
 			if cID_1 == CMD_ATTACK and (not cp_2) and cp_1 == unitID then
-				if not Spring.Utilities.COMPAT_GET_ORDER then
-					cID_2, cOpt_2, cTag_2, cps_1, cps_2 = Spring.GetUnitCurrentCommand(attackerID, 2)
-					cID_3 = Spring.GetUnitCurrentCommand(attackerID, 3)
-				end
+				local cID_2, cOpt_2, cTag_2, cps_1, cps_2 = Spring.GetUnitCurrentCommand(attackerID, 2)
+				local cID_3 = Spring.GetUnitCurrentCommand(attackerID, 3)
 				if cID_2 and (cID_2 == CMD_ATTACK or (cID_3 and cID_2 == CMD_SET_WANTED_MAX_SPEED and cID_3 == CMD_ATTACK)) then
 					local re = Spring.Utilities.GetUnitRepeat(attackerID)
 					if cID_2 == CMD_SET_WANTED_MAX_SPEED then
@@ -174,18 +153,14 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 					if (not team) or team ~= gaiaTeamID then
 						spSetUnitTarget(attackerID,newTargetID)
 						if cID_1 and cID_1 == CMD_ATTACK then
-							if not Spring.Utilities.COMPAT_GET_ORDER then
-								cID_2, cOpt_2, cTag_2, cps_1, cps_2 = Spring.GetUnitCurrentCommand(attackerID, 2)
-							end
+							local cID_2, cOpt_2, cTag_2, cps_1, cps_2 = Spring.GetUnitCurrentCommand(attackerID, 2)
 							if cID_2 and cID_2 == CMD_SET_WANTED_MAX_SPEED then
 								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cTag_1,cTag_2}, 0)
 							else
 								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cTag_1},0)
 							end
 						elseif cID_2 and (cID_1 == CMD_MOVE or cID_1 == CMD_RAW_MOVE or cID_1 == CMD_RAW_BUILD) then
-							if not Spring.Utilities.COMPAT_GET_ORDER then
-								cID_2, cOpt_2, cTag_2, cps_1, cps_2 = Spring.GetUnitCurrentCommand(attackerID, 2)
-							end
+							local cID_2, cOpt_2, cTag_2, cps_1, cps_2 = Spring.GetUnitCurrentCommand(attackerID, 2)
 							if cID_2 == CMD_FIGHT and Spring.Utilities.CheckBit(gadget:GetInfo().name, cOpt_2, CMD.OPT_INTERNAL) and (not cps_2) and cps_1 == unitID then
 								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cTag_2},0)
 							end

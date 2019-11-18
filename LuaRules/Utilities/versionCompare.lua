@@ -36,5 +36,3 @@ function Spring.Utilities.IsCurrentVersionNewerThan(rel, dev)
 	end
 	return false -- A newer version would not fail to return before now
 end
-
-Spring.Utilities.COMPAT_GET_ORDER = not Spring.Utilities.IsCurrentVersionNewerThan(104, 1140)

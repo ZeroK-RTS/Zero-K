@@ -409,15 +409,7 @@ function gadget:GameFrame(f)
 				-- complete teleport
 				if teleFinished then
 					local teleportiee = tele[tid].teleportiee
-					local cmdID, cmdTag, cmdParam_1
-					if Spring.Utilities.COMPAT_GET_ORDER then
-						local queue = Spring.GetCommandQueue(teleportiee, 1)
-						if queue and queue[1] then
-							cmdID, cmdTag, cmdParam_1 = queue[1].id, queue[1].tag, queue[1].params[1]
-						end
-					else
-						cmdID, _, cmdTag, cmdParam_1 = Spring.GetUnitCurrentCommand(teleportiee)
-					end
+					local cmdID, _, cmdTag, cmdParam_1 = Spring.GetUnitCurrentCommand(teleportiee)
 					if cmdID and cmdID == CMD_WAIT_AT_BEACON and cmdParam_1 == bid then
 						local ud = Spring.GetUnitDefID(teleportiee)
 						ud = ud and UnitDefs[ud]
@@ -481,15 +473,7 @@ function gadget:GameFrame(f)
 					for j = 1, #units do
 						local nid = units[j]
 						if allyTeam == Spring.GetUnitAllyTeam(nid) and beaconWaiter[nid] then
-							local cmdID, cmdParam_1
-							if Spring.Utilities.COMPAT_GET_ORDER then
-								local queue = Spring.GetCommandQueue(nid, 1)
-								if queue and queue[1] then
-									cmdID, cmdParam_1 = queue[1].id, queue[1].params[1]
-								end
-							else
-								cmdID, _, _, cmdParam_1 = Spring.GetUnitCurrentCommand(nid)
-							end
+							local cmdID, _, _, cmdParam_1 = Spring.GetUnitCurrentCommand(nid)
 							if cmdID and cmdID == CMD_WAIT_AT_BEACON and cmdParam_1 == bid then
 								local priority = beaconWaiter[nid].frame
 								if ((not bestPriority) or priority < bestPriority) then

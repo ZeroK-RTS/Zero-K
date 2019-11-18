@@ -528,17 +528,7 @@ local function GetDistance(x1, x2, y1, y2)
 end
 
 local function UpdateCarrierTarget(carrierID, frame)
-	local cmdID, cmdParam_1, cmdParam_2, cmdParam_3
-	if Spring.Utilities.COMPAT_GET_ORDER then
-		local queue = Spring.GetCommandQueue(carrierID, 1)
-		if queue and queue[1] then
-			local par = queue[1].params
-			cmdID, cmdParam_1, cmdParam_2, cmdParam_3 = queue[1].id, par[1], par[2], par[3]
-		end
-	else
-		cmdID, _, _, cmdParam_1, cmdParam_2, cmdParam_3 = Spring.GetUnitCurrentCommand(carrierID)
-	end
-	
+	local cmdID, _, _, cmdParam_1, cmdParam_2, cmdParam_3 = Spring.GetUnitCurrentCommand(carrierID)
 	local droneSendDistance = nil
 	local px, py, pz
 	local target

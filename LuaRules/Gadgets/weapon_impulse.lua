@@ -410,7 +410,7 @@ local function AddImpulses()
 					spSetUnitVelocity(unitID, vx + data.x, vy + data.y, vz + data.z)
 
 					--if data.allied then
-						if Spring.Utilities.GetUnitFirstCommand(unitID) == CMD_GUARD then
+						if Spring.GetUnitCurrentCommand(unitID) == CMD_GUARD then
 							spGiveOrderToUnit(unitID, CMD_STOP, {0}, 0)
 						end
 

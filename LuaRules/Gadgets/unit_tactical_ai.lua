@@ -94,63 +94,6 @@ local function distance(x1,y1,x2,y2)
 	return sqrt((x1-x2)^2 + (y1-y2)^2)
 end
 
-local function getUnitOrderState_COMPAT(unitID, data, cQueue, holdPos)
-	-- ret 1: enemy ID, value of -1 means no manual target set so the nearest enemy should be used.
-	--        Return false means the unit does not want orders from tactical ai.
-	-- ret 2: true if there is a move command at the start of queue which will need removal.
-	-- ret 3: true if the unit is using AI due to a fight or patrol command.
-	-- ret 4: fallback enemy ID. This is set if the unit has a non-manual attack command.
-	--        Use it as a fallback if there is no behaviour against the nearest enemy.
-	-- ret 5, 6, 7: Fight command target
-	
-	if not cQueue or #cQueue == 0 then
-		if (not holdPos) then
-			return -1, false -- could still skirm from static or flee
-		end
-		return false -- no queue and on hold position.
-	end
-	
-	if (#cQueue == 1 and holdPos and cQueue[1].id == CMD_ATTACK and cQueue[1].options.internal) then
-		return false -- set to hold position and is auto-acquiring target
-	end
-	
-	local fightTwo = (#cQueue > 1 and cQueue[2].id == CMD_FIGHT)
-	if cQueue[1].id == CMD_FIGHT then
-		return -1, false, true, nil, cQueue[1].params[1], cQueue[1].params[2], cQueue[1].params[3]
-	elseif cQueue[1].id == CMD_ATTACK and ((not holdPos) or fightTwo) then -- if I attack
-		local target,check = cQueue[1].params[1],cQueue[1].params[2]
-		if (not check) and spValidUnitID(target) then -- if I target a unit
-			if not (cQueue[1].id == CMD_FIGHT or fightTwo or cQueue[1].options.internal) then -- only skirm single target when given the order manually
-				return target, false
-			else
-				return -1, false, true, target
-			end
-		elseif (cQueue[1].id == CMD_FIGHT) then --  if I target the ground and have fight or patrol command
-			return -1, false, nil, nil, cQueue[1].params[1], cQueue[1].params[2], cQueue[1].params[3]
-		end
-	elseif (cQueue[1].id == CMD_MOVE or cQueue[1].id == CMD_RAW_MOVE) and #cQueue > 1 then
-		-- if I am moving
-		local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
-		if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
-			local fightThree = (#cQueue > 2 and cQueue[3].id == CMD_FIGHT)
-			if fightTwo or (cQueue[2].id == CMD_ATTACK and ((not holdPos) or fightThree)) then -- if the next command is attack, patrol or fight
-				local target,check = cQueue[2].params[1],cQueue[2].params[2]
-				if not check then -- if I target a unit
-					if not (cQueue[2].id == CMD_FIGHT or fightThree or cQueue[2].options.internal) then -- only skirm single target when given the order manually
-						return target, true, nil, nil, cQueue[2].params[1], cQueue[2].params[2], cQueue[2].params[3]
-					else
-						return -1, true, true, target, cQueue[2].params[1], cQueue[2].params[2], cQueue[2].params[3]
-					end
-				elseif (cQueue[2].id == 16) then -- if I target the ground and have fight or patrol command
-					return -1, true, true, nil, cQueue[2].params[1], cQueue[2].params[2], cQueue[2].params[3]
-				end
-			end
-		end
-	end
-
-	return false
-end
-
 local function getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
 	-- ret 1: enemy ID, value of -1 means no manual target set so the nearest enemy should be used.
 	--        Return false means the unit does not want orders from tactical ai.
@@ -621,34 +564,15 @@ local function updateUnits(frame, start, increment)
 			--Spring.Echo("unit parsed")
 			if (not data.active) or spGetUnitRulesParam(unitID,"disable_tac_ai") == 1 then
 				if data.receivedOrder then
-					if Spring.Utilities.COMPAT_GET_ORDER then
-						local cQueue = spGetCommandQueue(unitID,1)
-						if cQueue and cQueue[1] then
-							clearOrder(unitID, data, cQueue[1].id, cQueue[1].tag, cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3])
-						end
-					else
-						cmdID, _, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-						clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
-					end
+					local cmdID, _, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+					clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 				end
 				break
 			end
 			
-			local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3
-			local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ
+			local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
 			local holdPos = (Spring.Utilities.GetUnitMoveState(unitID) == 0)
-			if Spring.Utilities.COMPAT_GET_ORDER then
-				local cQueue = spGetCommandQueue(unitID, 3)
-				if cQueue and cQueue[1] then
-					cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = cQueue[1].id, cQueue[1].options.coded, cQueue[1].tag, cQueue[1].params[1], cQueue[1].params[2], cQueue[1].params[3]
-				end
-				enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = getUnitOrderState_COMPAT(unitID, data, cQueue, holdPos) -- returns target enemy and movement state
-			else
-				cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-				enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
-				--Spring.Echo("enemy, move, haveFight, autoAttackEnemyID", enemy, move, haveFight, autoAttackEnemyID)
-				--Spring.Echo("fightX, fightY, fightZ", fightX, fightY, fightZ)
-			end
+			local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
 			
 			--local ux,uy,uz = spGetUnitPosition(unitID)
 			--Spring.MarkerAddPoint(ux,uy,uz,"unit active")

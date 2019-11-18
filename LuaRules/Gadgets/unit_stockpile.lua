@@ -68,7 +68,7 @@ function gadget:GameFrame(n)
 		local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID)
 		local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
 		local def = stockpileUnitDefID[data.unitDefID]
-		local cmdID = Spring.Utilities.GetUnitFirstCommand(unitID)
+		local cmdID = Spring.GetUnitCurrentCommand(unitID)
 		local isWaiting = cmdID and (cmdID == CMD.WAIT)
 		if (not (stunned_or_inbuild or disarmed)) and queued ~= 0 and not (isWaiting and (def.stockCost > 0)) then
 			

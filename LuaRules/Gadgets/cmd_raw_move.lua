@@ -475,7 +475,7 @@ end
 
 local function CheckUnitQueues()
 	for unitID,_ in pairs(unitQueuesToCheck) do
-		if Spring.Utilities.GetUnitFirstCommand(unitID) ~= CMD_RAW_MOVE then
+		if Spring.GetUnitCurrentCommand(unitID) ~= CMD_RAW_MOVE then
 			StopRawMoveUnit(unitID)
 		end
 		unitQueuesToCheck[unitID] = nil
@@ -526,19 +526,9 @@ end
 -- Constructor Handling
 
 local function GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6, unitID)
+	local _
 	if cmdID == CMD_RAW_BUILD then
-		if Spring.Utilities.COMPAT_GET_ORDER then
-			local queue = Spring.GetCommandQueue(unitID, 2)
-			if queue and queue[2] then
-				local par = queue[2].params
-				cmdID = queue[2].id
-				cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = par[1], par[2], par[3], par[4], par[5], par[6]
-			else
-				cmdID = false
-			end
-		else
-			cmdID, _, _, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID, 2)
-		end
+		cmdID, _, _, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID, 2)
 	end
 	if not cmdID then
 		return false
@@ -580,22 +570,7 @@ local function CheckConstructorBuild(unitID)
 		return
 	end
 	
-	local cmdID, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6
-	if Spring.Utilities.COMPAT_GET_ORDER then
-		local queue = Spring.GetCommandQueue(unitID, 1)
-		if queue and queue[1] then
-			local par = queue[1].params
-			cmdID, cmdTag = queue[1].id, queue[1].tag
-			cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = par[1], par[2], par[3], par[4], par[5], par[6]
-		end
-	else
-		cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID)
-	end
-	
-	local queue = spGetCommandQueue(unitID, 2)
-	if not queue then
-		return
-	end
+	local cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID)
 	local cx, cy, cz = GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6, unitID)
 
 	if cmdID == CMD_RAW_BUILD and cp_3 then
@@ -706,17 +681,7 @@ end
 -- Move replacement
 
 local function ReplaceMoveCommand(unitID)
-	local cmdID, cmdTag, cmdParam_1, cmdParam_2, cmdParam_3
-	if Spring.Utilities.COMPAT_GET_ORDER then
-		local queue = Spring.GetCommandQueue(unitID, 1)
-		if queue and queue[1] then
-			cmdID, cmdTag = queue[1].id, queue[1].tag
-			cmdParam_1, cmdParam_2, cmdParam_3 = queue[1].params[1], queue[1].params[2], queue[1].params[3]
-		end
-	else
-		cmdID, _, cmdTag, cmdParam_1, cmdParam_2, cmdParam_3 = Spring.GetUnitCurrentCommand(unitID)
-	end
-
+	local cmdID, _, cmdTag, cmdParam_1, cmdParam_2, cmdParam_3 = Spring.GetUnitCurrentCommand(unitID)
 	if cmdID == CMD_MOVE and cmdParam_3 then
 		if fromFactory[unitID] then
 			fromFactory[unitID] = nil

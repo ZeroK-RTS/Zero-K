@@ -280,14 +280,8 @@ local function GiveRetreatOrders(unitID, hx,hz)
 	spGiveOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD.WAIT, CMD.OPT_SHIFT}, CMD.OPT_ALT) --SHIFT W
 	GiveClampedOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD_RAW_MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, CMD.OPT_ALT) -- ALT makes the 0 positional
 	
-	local tag1, tag2
-	if Spring.Utilities.COMPAT_GET_ORDER then
-		local cmds = Spring.GetCommandQueue(unitID, 2)
-		tag1, tag2 = cmds[1].tag, cmds[2] and cmds[2].tag
-	else
-		_, _, tag1 = Spring.GetUnitCurrentCommand(unitID)
-		_, _, tag2 = Spring.GetUnitCurrentCommand(unitID, 2)
-	end
+	local _, _, tag1 = Spring.GetUnitCurrentCommand(unitID)
+	local _, _, tag2 = Spring.GetUnitCurrentCommand(unitID, 2)
 	
 	isRetreating[unitID] = true
 	retreaterTagsMove[unitID] = tag1

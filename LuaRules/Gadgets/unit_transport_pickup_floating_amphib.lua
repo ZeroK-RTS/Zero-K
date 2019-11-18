@@ -112,7 +112,7 @@ local function IsUnitAllied(unitID1,unitID2)
 end
 
 local function IsUnitIdle(unitID)
-	local cmdID = Spring.Utilities.GetUnitFirstCommand(unitID)
+	local cmdID = Spring.GetUnitCurrentCommand(unitID)
 	local moving = cmdID and sinkCommand[cmdID]
 	return not moving
 end
@@ -325,7 +325,7 @@ function gadget:GameFrame(f)
 						haveFloater = true
 					end
 				end
-				local cmdID = Spring.Utilities.GetUnitFirstCommand(transportID)
+				local cmdID = Spring.GetUnitCurrentCommand(transportID)
 				if cmdID then
 					if cmdID == CMD.LOAD_UNITS and haveFloater then
 						i = i + 1 --go to next entry
