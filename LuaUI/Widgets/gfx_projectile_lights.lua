@@ -345,7 +345,7 @@ local function GetBeamLights(lightParams, pID, x, y, z)
 	if lightParams.beamMult then
 		local mult = lightParams.beamMult
 		if lightParams.beamMultFrames then
-			timeToLive = timeToLive or Spring.GetProjectileTimeToLive(pID)
+			timeToLive = Spring.GetProjectileTimeToLive(pID)
 			if (not lightParams.maxTTL) or lightParams.maxTTL < timeToLive then
 				lightParams.maxTTL = timeToLive
 			end

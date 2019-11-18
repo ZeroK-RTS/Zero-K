@@ -646,7 +646,7 @@ local function MakeSpecTooltip()
 	)
 
 	if list_size <= 2 then
-		windowTooltip = windowTooltip or "PLAYERS"
+		windowTooltip = "PLAYERS"
 		for i=1, #players do
 			windowTooltip = windowTooltip .. "\n\t"..players[i].name.."\t"..players[i].cpuColChar..(players[i].cpuText)..'\008' .. "\t"..players[i].pingColChar..(players[i].pingText).."\008"
 		end
