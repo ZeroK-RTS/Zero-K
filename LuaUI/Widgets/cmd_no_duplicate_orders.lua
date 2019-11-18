@@ -90,7 +90,7 @@ function widget:CommandNotify(id, params, options)
 					if cmdID == CMD_RAW_BUILD then
 						cmdID_2, _, cmdTag_2, cmdParam1_2, _, cmdParam3_2 = Spring.GetUnitCurrentCommand(unitID, 2)
 					end
-					local structureMatch = ((cmdID < 0)   and cmdParam3   and (params[1] == buildList[toLocString(cmdParam1, 0, cmdParam3)])) or 
+					local structureMatch = ((cmdID < 0) and cmdParam3 and (params[1] == buildList[toLocString(cmdParam1, 0, cmdParam3)])) or
 							   (cmdID_2 and (cmdID_2 < 0) and cmdParam3_2 and (params[1] == buildList[toLocString(cmdParam1_2, 0, cmdParam3_2)]))
 					if structureMatch then
 						if shiftMode then

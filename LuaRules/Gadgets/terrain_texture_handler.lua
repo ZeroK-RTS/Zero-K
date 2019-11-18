@@ -276,7 +276,7 @@ function gadget:DrawGenesis()
 				end
 				
 				if not mapTex[sx][sz] then
-					if GG.mapgen_squareTexture and GG.mapgen_squareTexture[sx] and GG.mapgen_squareTexture[sx][sz] 
+					if GG.mapgen_squareTexture and GG.mapgen_squareTexture[sx] and GG.mapgen_squareTexture[sx][sz]
 							and GG.mapgen_currentTexture and GG.mapgen_currentTexture[sx] and GG.mapgen_currentTexture[sx][sz] then
 						mapTex[sx][sz] = {
 							orig = GG.mapgen_squareTexture[sx][sz],

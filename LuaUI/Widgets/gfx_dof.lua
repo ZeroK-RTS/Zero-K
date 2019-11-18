@@ -13,7 +13,7 @@ end
 
 options_path = 'Settings/Graphics/Effects/Depth of Field'
 
-options_order = {'useDoF', 'highQuality', 'autofocus', 'mousefocus',  'autofocusLabel', 'autofocusInFocusMultiplier', 'autofocusPower', 
+options_order = {'useDoF', 'highQuality', 'autofocus', 'mousefocus',  'autofocusLabel', 'autofocusInFocusMultiplier', 'autofocusPower',
 'autofocusFocalLength', 'manualfocusLabel', 'focusDepth', 'fStop'}
 
 options = {

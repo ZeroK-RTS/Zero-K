@@ -355,7 +355,7 @@ function widget:Update(dt)
 		end
 		
 		if height > 0 and pointY < 0 then
-			drawWater = true 
+			drawWater = true
 		else
 			drawWater = false
 		end
