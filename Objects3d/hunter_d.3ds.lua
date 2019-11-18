@@ -1,4 +1,4 @@
-hunter_d = {
+return {
 	pieces = {
 		hunter_d = {},
 	},
@@ -10,5 +10,3 @@ hunter_d = {
 	tex2 = "wreck2.dds",
 	numpieces = 1,
 }
-
-return hunter_d

@@ -1,4 +1,4 @@
-model = {
+return {
       radius = 20.0,
       height = 20.0,
       tex1 = "zeppelin_1.dds",
@@ -6,4 +6,3 @@ model = {
       midpos = {0,0,0},
       invertteamcolor = false
 }
-return model
