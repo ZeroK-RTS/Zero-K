@@ -34,15 +34,17 @@ end
 
 local function lowerkeys(t)
 	local tn = {}
-	for i,v in pairs(t) do
-		local typ = type(i)
-		if type(v)=="table" then
-			v = lowerkeys(v)
-		end
-		if typ=="string" then
-			tn[i:lower()] = v
-		else
-			tn[i] = v
+	if type(t) == "table" then
+		for i,v in pairs(t) do
+			local typ = type(i)
+			if type(v)=="table" then
+				v = lowerkeys(v)
+			end
+			if typ=="string" then
+				tn[i:lower()] = v
+			else
+				tn[i] = v
+			end
 		end
 	end
 	return tn
@@ -74,7 +76,7 @@ for _, ud in pairs(UnitDefs) do
 
 if modOptions.tweakunits and modOptions.tweakunits ~= "" then
 	local tweaks = Spring.Utilities.CustomKeyToUsefulTable(modOptions.tweakunits)
-	if tweaks then
+	if type(tweaks) == "table" then
 		Spring.Echo("Loading tweakunits modoption")
 		for name, ud in pairs(UnitDefs) do
 			if tweaks[name] then
