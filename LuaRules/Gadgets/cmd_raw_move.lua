@@ -172,7 +172,6 @@ local moveRawCmdDesc = {
 }
 
 local TEST_MOVE_SPACING = 16
-local LAZY_TEST_MOVE_SPACING = 8
 local LAZY_SEARCH_DISTANCE = 450
 local BLOCK_RELAX_DISTANCE = 250
 local STUCK_TRAVEL = 25
