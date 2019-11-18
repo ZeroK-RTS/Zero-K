@@ -268,8 +268,6 @@ local function UpdateFac(i, facInfo)
 	local buildList   = facInfo.buildList
 	local buildQueue  = GetBuildQueue(facInfo.unitID)
 	for j,unitDefIDb in ipairs(buildList) do
-		local unitDefIDb = unitDefIDb
-		
 		if not facs[i].boStack then
 		  echo('<Chili Facpanel> Strange error #1' )
 		else
@@ -832,7 +830,6 @@ RecreateFacbar = function()
 		local buildList   = facInfo.buildList
 		local buildQueue  = GetBuildQueue(facInfo.unitID)
 		for j,unitDefIDb in ipairs(buildList) do
-			local unitDefIDb = unitDefIDb
 			boStack:AddChild( MakeButton(unitDefIDb, facInfo.unitID, unitDefIDb, i) )
 		end
 		boStack:AddChild( MakeClearButton( facInfo.unitID, i ) )
