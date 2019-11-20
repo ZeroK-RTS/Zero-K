@@ -6,8 +6,8 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 --deep not safe with circular tables! defaults To false
-function Spring.Utilities.CopyTable(tableToCopy, deep)
-  local copy = {}
+function Spring.Utilities.CopyTable(tableToCopy, deep, appendTo)
+  local copy = appendTo or {}
   for key, value in pairs(tableToCopy) do
     if (deep and type(value) == "table") then
       copy[key] = Spring.Utilities.CopyTable(value, true)

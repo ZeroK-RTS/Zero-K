@@ -19,10 +19,6 @@
 -- beamweapon_muzzle_blue
 -- beamweapon_muzzle_purple
 
-Spring = Spring or {}
-Spring.Utilities = Spring.Utilities or {}
-VFS.Include("LuaRules/Utilities/tablefunctions.lua")
-
 local cegs = {
   ["beamlaser_hit_blue"] = {
     usedefaultexplosions = false,
@@ -1208,8 +1204,9 @@ local colors = {
   },
 }
 
+local suMergeTable = Spring.Utilities.MergeTable
 for color, info in pairs(colors) do
-  cegs[color] = Spring.Utilities.MergeTable(info.data, cegs[info.source], true)
+  cegs[color] = suMergeTable(info.data, cegs[info.source], true)
 end
 
 return cegs
