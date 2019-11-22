@@ -1,4 +1,4 @@
-unitDef = {
+return { shipcarrier = {
   unitname               = [[shipcarrier]],
   name                   = [[Reef]],
   description            = [[Aircraft Carrier (Bombardment), stockpiles disarm missiles at 5 m/s]],
@@ -192,6 +192,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipcarrier = unitDef })
+} }

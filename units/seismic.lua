@@ -1,4 +1,4 @@
-unitDef = {
+return { seismic = {
   unitname                      = [[seismic]],
   name                          = [[Quake]],
   description                   = [[Seismic Missile]],
@@ -110,6 +110,4 @@ unitDef = {
   featureDefs                   = {
   },
 
-}
-
-return lowerkeys({ seismic = unitDef })
+} }

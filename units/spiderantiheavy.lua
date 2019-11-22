@@ -1,4 +1,4 @@
-unitDef = {
+return { spiderantiheavy = {
   unitname              = [[spiderantiheavy]],
   name                  = [[Widow]],
   description           = [[Cloaked Scout/Anti-Heavy]],
@@ -125,6 +125,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spiderantiheavy = unitDef })
+} }

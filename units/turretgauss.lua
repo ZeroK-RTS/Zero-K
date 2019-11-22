@@ -1,4 +1,4 @@
-unitDef = {
+return { turretgauss = {
   unitname                      = [[turretgauss]],
   name                          = [[Gauss]],
   description                   = [[Gauss Turret, 20 health/s when closed]],
@@ -138,6 +138,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretgauss = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { striderantiheavy = {
   unitname               = [[striderantiheavy]],
   name                   = [[Ultimatum]],
   description            = [[Cloaked Anti-Heavy/Anti-Strider Walker]],
@@ -132,6 +132,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderantiheavy = unitDef })
+} }

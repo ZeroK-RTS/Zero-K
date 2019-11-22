@@ -1,4 +1,4 @@
-unitDef = {
+return { jumparty = {
   unitname               = [[jumparty]],
   name                   = [[Firewalker]],
   description            = [[Saturation Artillery Walker]],
@@ -186,6 +186,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumparty = unitDef })
+} }

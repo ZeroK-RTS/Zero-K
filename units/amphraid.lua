@@ -1,4 +1,4 @@
-unitDef = {
+return { amphraid = {
   unitname               = [[amphraid]],
   name                   = [[Duck]],
   description            = [[Amphibious Raider Bot (Anti-Sub)]],
@@ -175,6 +175,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphraid = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { turrettorp = {
   unitname          = [[turrettorp]],
   name              = [[Urchin]],
   description       = [[Torpedo Launcher]],
@@ -117,6 +117,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turrettorp = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { striderfunnelweb = {
   unitname               = [[striderfunnelweb]],
   name                   = [[Funnelweb]],
   description            = [[Shield Support Strider]],
@@ -134,6 +134,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderfunnelweb = unitDef })
+} }

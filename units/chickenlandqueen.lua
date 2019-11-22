@@ -1,4 +1,4 @@
-unitDef = {
+return { chickenlandqueen = {
   unitname               = [[chickenlandqueen]],
   name                   = [[Chicken Queen]],
   description            = [[Clucking Hell!]],
@@ -413,6 +413,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chickenlandqueen = unitDef })
+} }

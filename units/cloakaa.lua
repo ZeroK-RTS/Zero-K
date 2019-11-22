@@ -1,4 +1,4 @@
-unitDef = {
+return { cloakaa = {
   unitname               = [[cloakaa]],
   name                   = [[Gremlin]],
   description            = [[Cloaked Anti-Air Bot]],
@@ -136,6 +136,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakaa = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { factoryshield = {
   unitname                      = [[factoryshield]],
   name                          = [[Shieldbot Factory]],
   description                   = [[Produces Tough, Shielded Robots, Builds at 10 m/s]],
@@ -87,6 +87,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ factoryshield = unitDef })
+} }

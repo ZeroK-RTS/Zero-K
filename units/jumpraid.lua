@@ -1,4 +1,4 @@
-unitDef = {
+return { jumpraid = {
   unitname              = [[jumpraid]],
   name                  = [[Pyro]],
   description           = [[Raider/Riot Jumper]],
@@ -187,6 +187,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumpraid = unitDef })
+} }

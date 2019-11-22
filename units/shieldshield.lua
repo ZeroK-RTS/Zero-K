@@ -1,4 +1,4 @@
-unitDef = {
+return { shieldshield = {
   unitname               = [[shieldshield]],
   name                   = [[Aspis]],
   description            = [[Area Shield Walker]],
@@ -112,6 +112,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shieldshield = unitDef })
+} }

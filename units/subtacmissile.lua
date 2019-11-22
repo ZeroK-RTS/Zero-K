@@ -1,4 +1,4 @@
-unitDef = {
+return { subtacmissile = {
   unitname               = [[subtacmissile]],
   name                   = [[Scylla]],
   description            = [[Tactical Nuke Missile Sub, Drains 20 m/s, 30 second stockpile]],
@@ -169,6 +169,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ subtacmissile = unitDef })
+} }

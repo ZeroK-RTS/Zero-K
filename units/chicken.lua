@@ -1,4 +1,4 @@
-unitDef = {
+return { chicken = {
   unitname            = [[chicken]],
   name                = [[Chicken]],
   description         = [[Swarmer]],
@@ -105,6 +105,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chicken = unitDef })
+} }

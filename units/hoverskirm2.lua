@@ -1,4 +1,4 @@
-unitDef = {
+return { hoverskirm2 = {
   unitname            = [[hoverskirm2]],
   name                = [[Trisula]],
   description         = [[Light Assault/Battle Hovercraft]],
@@ -119,6 +119,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoverskirm2 = unitDef })
+} }

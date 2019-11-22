@@ -1,4 +1,4 @@
-unitDef = {
+return { spidercrabe = {
   unitname               = [[spidercrabe]],
   name                   = [[Crab]],
   description            = [[Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary]],
@@ -126,6 +126,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spidercrabe = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { shiptransport = {
   unitname            = [[shiptransport]],
   name                = [[Surfboard]],
   description         = [[Transport Platform]],
@@ -64,6 +64,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shiptransport = unitDef })
+} }

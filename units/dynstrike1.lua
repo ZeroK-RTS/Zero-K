@@ -1,4 +1,4 @@
-unitDef = {
+return { dynstrike1 = {
   unitname               = [[dynstrike1]],
   name                   = [[Strike Commander]],
   description            = [[Mobile Assault Commander]],
@@ -98,6 +98,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ dynstrike1 = unitDef })
+} }

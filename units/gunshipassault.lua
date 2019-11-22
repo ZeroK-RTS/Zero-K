@@ -1,4 +1,4 @@
-unitDef = {
+return { gunshipassault = {
   unitname            = [[gunshipassault]],
   name                = [[Revenant]],
   description         = [[Heavy Raider/Assault Gunship]],
@@ -135,6 +135,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ gunshipassault = unitDef })
+} }

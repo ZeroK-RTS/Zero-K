@@ -1,4 +1,4 @@
-unitDef = {
+return { chicken_drone_starter = {
   unitname            = [[chicken_drone_starter]],
   name                = [[Drone]],
   description         = [[Morphs Into Chicken Structures]],
@@ -63,6 +63,4 @@ unitDef = {
   upright             = false,
   waterline           = 8,
   workerTime          = 0,
-}
-
-return lowerkeys({ chicken_drone_starter = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { shipskirm = {
   unitname               = [[shipskirm]],
   name                   = [[Mistral]],
   description            = [[Rocket Boat (Skirmisher)]],
@@ -139,6 +139,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipskirm = unitDef })
+} }

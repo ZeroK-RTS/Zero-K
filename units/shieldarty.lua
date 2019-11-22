@@ -1,4 +1,4 @@
-unitDef = {
+return { shieldarty = {
   unitname               = [[shieldarty]],
   name                   = [[Racketeer]],
   description            = [[Disarming Artillery]],
@@ -133,6 +133,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shieldarty = unitDef })
+} }

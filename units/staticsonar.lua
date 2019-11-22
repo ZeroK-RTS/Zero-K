@@ -1,4 +1,4 @@
-unitDef = {
+return { staticsonar = {
   unitname          = [[staticsonar]],
   name              = [[Sonar Station]],
   description       = [[Locates Water Units]],
@@ -57,6 +57,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticsonar = unitDef })
+} }

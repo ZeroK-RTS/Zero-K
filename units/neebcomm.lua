@@ -1,4 +1,4 @@
-unitDef = {
+return { neebcomm = {
   unitname            = [[neebcomm]],
   name                = [[Neeb Comm]],
   description         = [[Ugly Turkey]],
@@ -71,6 +71,4 @@ unitDef = {
   upright             = false,
   workerTime          = 7.5,
 
-}
-
-return lowerkeys({ neebcomm = unitDef })
+} }

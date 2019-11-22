@@ -1,4 +1,4 @@
-unitDef = {
+return { jumpsumo = {
   unitname            = [[jumpsumo]],
   name                = [[Jugglenaut]],
   description         = [[Heavy Riot Jumper]],
@@ -425,6 +425,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumpsumo = unitDef })
+} }

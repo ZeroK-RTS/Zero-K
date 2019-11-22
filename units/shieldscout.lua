@@ -1,4 +1,4 @@
-unitDef = {
+return { shieldscout = {
   unitname               = [[shieldscout]],
   name                   = [[Dirtbag]],
   description            = [[Box of Dirt]],
@@ -144,6 +144,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shieldscout = unitDef })
+} }

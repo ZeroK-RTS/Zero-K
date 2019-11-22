@@ -1,4 +1,4 @@
-unitDef = {
+return { cloakcon = {
   unitname               = [[cloakcon]],
   name                   = [[Conjurer]],
   description            = [[Cloaked Construction Bot, Builds at 5 m/s]],
@@ -88,6 +88,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakcon = unitDef })
+} }

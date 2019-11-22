@@ -1,5 +1,4 @@
-unitDef = {
-
+return { shiptorpraider = {
   unitname            = [[shiptorpraider]],
   name                = [[Hunter]],
   description         = [[Torpedo-Boat (Raider)]],
@@ -141,7 +140,4 @@ unitDef = {
 
   },
 
-}
-
-
-return lowerkeys({ shiptorpraider = unitDef })
+} }

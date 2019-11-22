@@ -1,4 +1,4 @@
-unitDef = {
+return { turretaaflak = {
   unitname                      = [[turretaaflak]],
   name                          = [[Thresher]],
   description                   = [[Anti-Air Flak Gun]],
@@ -127,6 +127,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretaaflak = unitDef })
+} }

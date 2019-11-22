@@ -1,4 +1,4 @@
-unitDef = {
+return { raveparty = {
   unitname                      = [[raveparty]],
   name                          = [[Disco Rave Party]],
   description                   = [[Destructive Rainbow Projector]],
@@ -357,6 +357,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ raveparty = unitDef })
+} }

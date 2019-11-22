@@ -1,4 +1,4 @@
-unitDef = {
+return { vehassault = {
   unitname               = [[vehassault]],
   name                   = [[Ravager]],
   description            = [[Assault Rover]],
@@ -129,6 +129,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ vehassault = unitDef })
+} }

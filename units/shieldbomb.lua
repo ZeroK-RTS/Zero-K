@@ -1,4 +1,4 @@
-unitDef = {
+return { shieldbomb = {
   unitname               = [[shieldbomb]],
   name                   = [[Snitch]],
   description            = [[Crawling Bomb (Burrows)]],
@@ -86,31 +86,24 @@ unitDef = {
     },
 
   },
-}
-
---------------------------------------------------------------------------------
-
-local weaponDefs = {
-  shieldbomb_DEATH = {
-    areaOfEffect       = 384,
-    craterBoost        = 1,
-    craterMult         = 3.5,
-    edgeEffectiveness  = 0.4,
-    explosionGenerator = "custom:ROACHPLOSION",
-    explosionSpeed     = 10000,
-    impulseBoost       = 0,
-    impulseFactor      = 0.3,
-    name               = "Explosion",
-    soundHit           = "explosion/mini_nuke",
-    damage = {
-      default          = 1200.8,
+  weaponDefs = {
+    shieldbomb_DEATH = {
+      areaOfEffect       = 384,
+      craterBoost        = 1,
+      craterMult         = 3.5,
+      edgeEffectiveness  = 0.4,
+      explosionGenerator = "custom:ROACHPLOSION",
+      explosionSpeed     = 10000,
+      impulseBoost       = 0,
+      impulseFactor      = 0.3,
+      name               = "Explosion",
+      soundHit           = "explosion/mini_nuke",
+      damage = {
+        default          = 1200.8,
+      },
+      customParams = {
+        burst = Shared.BURST_UNRELIABLE,
+      },
     },
-    customParams = {
-      burst = Shared.BURST_UNRELIABLE,
-    },
-  },
-}
-unitDef.weaponDefs = weaponDefs
-
---------------------------------------------------------------------------------
-return lowerkeys({ shieldbomb = unitDef })
+  }
+} }

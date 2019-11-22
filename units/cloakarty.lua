@@ -1,4 +1,4 @@
-unitDef = {
+return { cloakarty = {
   unitname               = [[cloakarty]],
   name                   = [[Sling]],
   description            = [[Light Artillery Bot]],
@@ -125,6 +125,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakarty = unitDef })
+} }

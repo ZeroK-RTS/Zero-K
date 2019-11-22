@@ -1,4 +1,4 @@
-unitDef = {
+return { gunshipemp = {
   unitname            = [[gunshipemp]],
   name                = [[Gnat]],
   description         = [[Anti-Heavy EMP Drone]],
@@ -133,6 +133,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ gunshipemp = unitDef })
+} }

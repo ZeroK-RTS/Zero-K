@@ -1,4 +1,4 @@
-unitDef = {
+return { fakeunit_aatarget = {
   unitname              = [[fakeunit_aatarget]],
   name                  = [[Fake AA target]],
   description           = [[Used by the jumpjet script.]],
@@ -41,6 +41,4 @@ unitDef = {
   sightDistance         = 0.2,
   turnRate              = 0,
   workerTime            = 0,
-}
-
-return lowerkeys({ fakeunit_aatarget = unitDef })
+} }

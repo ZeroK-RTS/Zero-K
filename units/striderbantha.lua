@@ -1,4 +1,4 @@
-unitDef = {
+return { striderbantha = {
   unitname               = [[striderbantha]],
   name                   = [[Paladin]],
   description            = [[Ranged Support Strider]],
@@ -254,6 +254,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderbantha = unitDef })
+} }

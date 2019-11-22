@@ -1,4 +1,4 @@
-unitDef = {
+return { jumpblackhole = {
   unitname              = [[jumpblackhole]],
   name                  = [[Placeholder]],
   description           = [[Black Hole Launcher]],
@@ -152,6 +152,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumpblackhole = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { hoveraa = {
   unitname            = [[hoveraa]],
   name                = [[Flail]],
   description         = [[Anti-Air Hovercraft]],
@@ -141,6 +141,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoveraa = unitDef })
+} }

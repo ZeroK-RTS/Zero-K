@@ -1,4 +1,4 @@
-unitDef = {
+return { shipaa = {
   unitname               = [[shipaa]],
 
   name                   = [[Zephyr]],
@@ -196,6 +196,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipaa = unitDef })
+} }

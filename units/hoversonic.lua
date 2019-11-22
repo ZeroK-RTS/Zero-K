@@ -1,4 +1,4 @@
-unitDef = {
+return { hoversonic = {
   unitname            = [[hoversonic]],
   name                = [[Morningstar]],
   description         = [[Antisub Hovercraft]],
@@ -132,6 +132,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoversonic = unitDef })
+} }

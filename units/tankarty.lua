@@ -1,4 +1,4 @@
-unitDef = {
+return { tankarty = {
   unitname            = [[tankarty]],
   name                = [[Emissary]],
   description         = [[General-Purpose Artillery]],
@@ -124,6 +124,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ tankarty = unitDef })
+} }

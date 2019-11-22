@@ -1,4 +1,4 @@
-unitDef = {
+return { veharty = {
   unitname            = [[veharty]],
   name                = [[Badger]],
   description         = [[Artillery Minelayer Rover]],
@@ -135,6 +135,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ veharty = unitDef })
+} }

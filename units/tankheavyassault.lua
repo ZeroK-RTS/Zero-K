@@ -1,4 +1,4 @@
-unitDef = {
+return { tankheavyassault = {
   unitname            = [[tankheavyassault]],
   name                = [[Cyclops]],
   description         = [[Very Heavy Tank Buster]],
@@ -226,6 +226,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ tankheavyassault = unitDef })
+} }

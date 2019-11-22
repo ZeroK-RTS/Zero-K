@@ -1,4 +1,4 @@
-unitDef = {
+return { jumpscout = {
   unitname               = [[jumpscout]],
   name                   = [[Puppy]],
   description            = [[Walking Missile]],
@@ -142,6 +142,4 @@ unitDef = {
 
   },
   
-}
-
-return lowerkeys({ jumpscout = unitDef })
+} }

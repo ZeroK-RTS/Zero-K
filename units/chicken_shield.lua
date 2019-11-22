@@ -1,4 +1,4 @@
-unitDef = {
+return { chicken_shield = {
   unitname            = [[chicken_shield]],
   name                = [[Blooper]],
   description         = [[Shield/Anti-Air]],
@@ -200,6 +200,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chicken_shield = unitDef })
+} }

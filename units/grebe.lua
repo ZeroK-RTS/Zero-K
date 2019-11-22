@@ -1,4 +1,4 @@
-unitDef = {
+return { grebe = {
   unitname               = [[grebe]],
   name                   = [[Grebe]],
   description            = [[Amphibious Raider Bot]],
@@ -157,6 +157,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ grebe = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { subscout = {
   unitname              = [[subscout]],
   name                  = [[Lancelet]],
   description           = [[Scout/Suicide Minisub]],
@@ -71,6 +71,4 @@ unitDef = {
             },
         },
     },
-}
-
-return lowerkeys({ subscout = unitDef })
+} }

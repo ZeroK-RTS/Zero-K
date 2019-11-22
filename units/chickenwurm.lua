@@ -1,4 +1,4 @@
-unitDef = {
+return { chickenwurm = {
   unitname            = [[chickenwurm]],
   name                = [[Wurm]],
   description         = [[Burrowing Flamer (Assault/Riot)]],
@@ -160,6 +160,4 @@ unitDef = {
     },
   },
 
-}
-
-return lowerkeys({ chickenwurm = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { gunshipheavytrans = {
   unitname               = [[gunshipheavytrans]],
   name                   = [[Hercules]],
   description            = [[Armed Heavy Air Transport]],
@@ -206,6 +206,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ gunshipheavytrans = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { jumpcon = {
   unitname            = [[jumpcon]],
   name                = [[Constable]],
   description         = [[Jumpjet Constructor, Builds at 4 m/s]],
@@ -153,6 +153,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumpcon = unitDef })
+} }

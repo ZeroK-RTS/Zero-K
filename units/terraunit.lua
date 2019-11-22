@@ -1,4 +1,4 @@
-unitDef = {
+return { terraunit = {
   unitname               = [[terraunit]],
   name                   = [[Terraform]],
   description            = [[Spent: 0]],
@@ -46,6 +46,4 @@ unitDef = {
   upright                = false,
   workerTime             = 0,
   yardMap                = [[yyyy]],
-}
-
-return lowerkeys({ terraunit = unitDef })
+} }

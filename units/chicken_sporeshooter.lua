@@ -1,4 +1,4 @@
-unitDef = {
+return { chicken_sporeshooter = {
   unitname            = [[chicken_sporeshooter]],
   name                = [[Sporeshooter]],
   description         = [[All-Terrain Spores (Anti-Air/Skirm)]],
@@ -121,6 +121,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chicken_sporeshooter = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { turretaalaser = {
   unitname                      = [[turretaalaser]],
   name                          = [[Razor]],
   description                   = [[Hardened Anti-Air Laser]],
@@ -129,6 +129,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretaalaser = unitDef })
+} }

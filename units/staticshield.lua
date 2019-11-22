@@ -1,4 +1,4 @@
-unitDef = {
+return { staticshield = {
   unitname                      = [[staticshield]],
   name                          = [[Aegis]],
   description                   = [[Area Shield]],
@@ -114,6 +114,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticshield = unitDef })
+} }

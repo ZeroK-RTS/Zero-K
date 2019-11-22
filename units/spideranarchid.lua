@@ -1,4 +1,4 @@
-unitDef = {
+return { spideranarchid = {
   unitname               = [[spideranarchid]],
   name                   = [[Anarchid]],
   description            = [[Riot EMP Spider]],
@@ -127,6 +127,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spideranarchid = unitDef })
+} }

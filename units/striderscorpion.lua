@@ -1,4 +1,4 @@
-unitDef = {
+return { striderscorpion = {
   unitname               = [[striderscorpion]],
   name                   = [[Scorpion]],
   description            = [[Cloaked Infiltration Strider]],
@@ -303,6 +303,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderscorpion = unitDef })
+} }

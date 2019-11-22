@@ -1,4 +1,4 @@
-unitDef = {
+return { staticarty = {
   unitname                      = [[staticarty]],
   name                          = [[Cerberus]],
   description                   = [[Plasma Artillery Battery - Requires connection to a 50 energy grid]],
@@ -128,6 +128,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticarty = unitDef })
+} }

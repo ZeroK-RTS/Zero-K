@@ -1,4 +1,4 @@
-unitDef = {
+return { turretmissile = {
   unitname                      = [[turretmissile]],
   name                          = [[Picket]],
   description                   = [[Light Missile Tower]],
@@ -141,6 +141,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretmissile = unitDef })
+} }

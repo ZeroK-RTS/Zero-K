@@ -1,4 +1,4 @@
-unitDef = {
+return { spiderassault = {
   unitname               = [[spiderassault]],
   name                   = [[Hermit]],
   description            = [[All Terrain Assault Bot]],
@@ -121,6 +121,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spiderassault = unitDef })
+} }

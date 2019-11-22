@@ -1,4 +1,4 @@
-unitDef = {
+return { chicken_listener_b = {
   unitname            = [[chicken_listener_b]],
   name                = [[Listener (burrowed)]],
   description         = [[Burrowing Mobile Seismic Detector]],
@@ -55,6 +55,4 @@ unitDef = {
   upright             = false,
   waterline           = 8,
   workerTime          = 0,
-}
-
-return lowerkeys({ chicken_listener_b = unitDef })
+} }

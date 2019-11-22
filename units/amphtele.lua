@@ -1,4 +1,4 @@
-unitDef = {
+return { amphtele = {
   unitname               = [[amphtele]],
   name                   = [[Djinn]],
   description            = [[Amphibious Teleport Bridge]],
@@ -69,6 +69,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphtele = unitDef })
+} }

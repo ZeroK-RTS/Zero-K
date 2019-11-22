@@ -1,4 +1,4 @@
-unitDef = {
+return { striderhub = {
   unitname                      = [[striderhub]],
   name                          = [[Strider Hub]],
   description                   = [[Constructs Striders, Builds at 10 m/s]],
@@ -92,6 +92,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderhub = unitDef })
+} }

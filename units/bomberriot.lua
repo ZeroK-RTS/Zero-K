@@ -1,4 +1,4 @@
-unitDef = {
+return { bomberriot = {
   unitname            = [[bomberriot]],
   name                = [[Phoenix]],
   description         = [[Saturation Napalm Bomber]],
@@ -140,6 +140,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ bomberriot = unitDef })
+} }

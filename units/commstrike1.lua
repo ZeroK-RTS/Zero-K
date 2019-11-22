@@ -1,4 +1,4 @@
-unitDef = {
+return { commstrike1 = {
   unitname               = [[commstrike1]],
   name                   = [[Strike Commander]],
   description            = [[Mobile Assault Commander]],
@@ -196,6 +196,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ commstrike1 = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { turretimpulse = {
   unitname                      = [[turretimpulse]],
   name                          = [[Newton]],
   description                   = [[Gravity Turret]],
@@ -172,6 +172,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretimpulse = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { zenith = {
   unitname                      = [[zenith]],
   name                          = [[Zenith]],
   description                   = [[Meteor Controller]],
@@ -351,6 +351,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ zenith = unitDef })
+} }

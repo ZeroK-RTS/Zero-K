@@ -1,4 +1,4 @@
-unitDef = {
+return { dynsupport1 = {
   unitname            = [[dynsupport1]],
   name                = [[Engineer Commander]],
   description         = [[Econ/Support Commander]],
@@ -101,6 +101,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ dynsupport1 = unitDef })
+} }

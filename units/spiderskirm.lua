@@ -1,4 +1,4 @@
-unitDef = {
+return { spiderskirm = {
   unitname               = [[spiderskirm]],
   name                   = [[Recluse]],
   description            = [[Skirmisher Spider (Indirect Fire)]],
@@ -124,6 +124,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spiderskirm = unitDef })
+} }

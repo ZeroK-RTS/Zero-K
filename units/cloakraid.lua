@@ -1,4 +1,4 @@
-unitDef = {
+return { cloakraid = {
   unitname               = [[cloakraid]],
   name                   = [[Glaive]],
   description            = [[Light Raider Bot]],
@@ -135,6 +135,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakraid = unitDef })
+} }

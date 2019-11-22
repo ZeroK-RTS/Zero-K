@@ -1,4 +1,4 @@
-unitDef = {
+return { planecon = {
   unitname            = [[planecon]],
   name                = [[Crane]],
   description         = [[Construction Aircraft, Builds at 4 m/s]],
@@ -78,6 +78,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ planecon = unitDef })
+} }

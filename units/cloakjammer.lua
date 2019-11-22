@@ -1,4 +1,4 @@
-unitDef = {
+return { cloakjammer = {
   unitname               = [[cloakjammer]],
   name                   = [[Iris]],
   description            = [[Area Cloaker/Jammer Walker]],
@@ -71,6 +71,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakjammer = unitDef })
+} }

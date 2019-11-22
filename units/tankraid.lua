@@ -1,4 +1,4 @@
-unitDef = {
+return { tankraid = {
   unitname            = [[tankraid]],
   name                = [[Kodachi]],
   description         = [[Raider Tank]],
@@ -195,6 +195,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ tankraid = unitDef })
+} }

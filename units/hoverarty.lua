@@ -1,4 +1,4 @@
-unitDef = {
+return { hoverarty = {
   unitname            = [[hoverarty]],
   name                = [[Lance]],
   description         = [[Anti-Heavy Artillery Hovercraft]],
@@ -142,6 +142,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoverarty = unitDef })
+} }

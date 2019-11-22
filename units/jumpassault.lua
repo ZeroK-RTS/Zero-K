@@ -1,4 +1,4 @@
-unitDef = {
+return { jumpassault = {
   unitname            = [[jumpassault]],
   name                = [[Jack]],
   description         = [[Melee Assault Jumper]],
@@ -138,6 +138,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumpassault = unitDef })
+} }

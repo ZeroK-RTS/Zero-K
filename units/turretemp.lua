@@ -1,4 +1,4 @@
-unitDef = {
+return { turretemp = {
   unitname                      = [[turretemp]],
   name                          = [[Faraday]],
   description                   = [[EMP Turret]],
@@ -121,6 +121,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretemp = unitDef })
+} }

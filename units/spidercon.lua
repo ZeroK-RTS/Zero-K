@@ -1,4 +1,4 @@
-unitDef = {
+return { spidercon = {
   unitname               = [[spidercon]],
   name                   = [[Weaver]],
   description            = [[Construction Spider, Builds at 7.5 m/s]],
@@ -75,6 +75,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spidercon = unitDef })
+} }

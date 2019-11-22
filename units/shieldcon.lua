@@ -1,4 +1,4 @@
-unitDef = {
+return { shieldcon = {
   unitname            = [[shieldcon]],
   name                = [[Convict]],
   description         = [[Shielded Construction Bot, Builds at 5 m/s]],
@@ -108,6 +108,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shieldcon = unitDef })
+} }

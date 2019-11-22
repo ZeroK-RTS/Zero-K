@@ -1,4 +1,4 @@
-unitDef = {
+return { hoverminer = {
   unitname            = [[hoverminer]],
   name                = [[Dampener]],
   description         = [[Minelaying Hover]],
@@ -123,6 +123,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoverminer = unitDef })
+} }

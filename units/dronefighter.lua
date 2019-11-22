@@ -1,4 +1,4 @@
-unitDef = {
+return { dronefighter = {
   unitname               = [[dronefighter]],
   name                   = [[Spicula]],
   description            = [[Fighter Drone]],
@@ -110,6 +110,4 @@ unitDef = {
       weaponType              = [[BeamLaser]],
     },
   },
-}
-
-return lowerkeys({ dronefighter = unitDef })
+} }

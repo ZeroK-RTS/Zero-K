@@ -1,4 +1,4 @@
-unitDef = {
+return { dronecarry = {
   unitname            = [[dronecarry]],
   name                = [[Gull]],
   description         = [[Carrier Drone]],
@@ -110,6 +110,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ dronecarry = unitDef })
+} }

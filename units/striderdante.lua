@@ -1,4 +1,4 @@
-unitDef = {
+return { striderdante = {
   unitname            = [[striderdante]],
   name                = [[Dante]],
   description         = [[Assault/Riot Strider]],
@@ -323,6 +323,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderdante = unitDef })
+} }

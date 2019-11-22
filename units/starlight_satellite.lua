@@ -1,4 +1,4 @@
-starlight_satellite = {
+return { starlight_satellite = {
   unitname               = [[starlight_satellite]],
   name                   = [[Glint]],
   description            = [[Starlight relay satellite]],
@@ -186,6 +186,4 @@ starlight_satellite = {
 
   },
 
-}
-
-return lowerkeys({ starlight_satellite = starlight_satellite})
+} }

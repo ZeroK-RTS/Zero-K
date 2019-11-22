@@ -1,4 +1,4 @@
-unitDef = {
+return { amphcon = {
   unitname            = [[amphcon]],
   name                = [[Conch]],
   description         = [[Amphibious Construction Bot, Builds at 7.5 m/s]],
@@ -69,6 +69,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphcon = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { turretheavy = {
   unitname                      = [[turretheavy]],
   name                          = [[Desolator]],
   description                   = [[Medium Range Defense Fortress - Power by connecting to a 50 energy grid]],
@@ -192,6 +192,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretheavy = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { spiderscout = {
   unitname            = [[spiderscout]],
   name                = [[Flea]],
   description         = [[Ultralight Scout Spider (Burrows)]],
@@ -135,6 +135,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spiderscout = unitDef })
+} }

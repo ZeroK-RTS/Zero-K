@@ -1,4 +1,4 @@
-unitDef = {
+return { bomberstrike = {
   unitname            = [[bomberstrike]],
   name                = [[Kestrel]],
   description         = [[Tactical Strike Bomber]],
@@ -122,6 +122,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ bomberstrike = unitDef })
+} }

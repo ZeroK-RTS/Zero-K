@@ -1,4 +1,4 @@
-unitDef = {
+return { energysingu = {
   unitname                      = [[energysingu]],
   name                          = [[Singularity Reactor]],
   description                   = [[Large Powerplant (+225) - HAZARDOUS]],
@@ -86,6 +86,4 @@ unitDef = {
       },
     },
   },
-}
-
-return lowerkeys({ energysingu = unitDef })
+} }

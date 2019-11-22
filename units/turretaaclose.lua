@@ -1,4 +1,4 @@
-unitDef = {
+return { turretaaclose = {
   unitname                      = [[turretaaclose]],
   name                          = [[Hacksaw]],
   description                   = [[Burst Anti-Air Turret]],
@@ -131,6 +131,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretaaclose = unitDef })
+} }

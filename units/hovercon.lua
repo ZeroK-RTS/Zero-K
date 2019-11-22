@@ -1,4 +1,4 @@
-unitDef = {
+return { hovercon = {
   unitname            = [[hovercon]],
   name                = [[Quill]],
   description         = [[Construction Hovercraft, Builds at 5 m/s]],
@@ -79,6 +79,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hovercon = unitDef })
+} }

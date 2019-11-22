@@ -1,4 +1,4 @@
-unitDef = {
+return { hoverraid = {
   unitname            = [[hoverraid]],
   name                = [[Dagger]],
   description         = [[Fast Attack Hovercraft]],
@@ -140,6 +140,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoverraid = unitDef })
+} }

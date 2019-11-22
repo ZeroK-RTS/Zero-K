@@ -1,4 +1,4 @@
-unitDef = {
+return { shipriot = {
   unitname               = [[shipriot]],
   name                   = [[Corsair]],
   description            = [[Corvette (Raider/Riot)]],
@@ -144,6 +144,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipriot = unitDef })
+} }

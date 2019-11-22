@@ -1,4 +1,4 @@
-unitDef = {
+return { shieldassault = {
   unitname            = [[shieldassault]],
   name                = [[Thug]],
   description         = [[Shielded Assault Bot]],
@@ -151,6 +151,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shieldassault = unitDef })
+} }

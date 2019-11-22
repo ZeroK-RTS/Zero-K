@@ -1,4 +1,4 @@
-unitDef = {
+return { factoryship = {
   unitname               = [[factoryship]],
   name                   = [[Shipyard]],
   description            = [[Produces Naval Units, Builds at 10 m/s]],
@@ -90,6 +90,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ factoryship = unitDef })
+} }

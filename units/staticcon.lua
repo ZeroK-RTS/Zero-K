@@ -1,4 +1,4 @@
-unitDef = {
+return { staticcon = {
   unitname                      = [[staticcon]],
   name                          = [[Caretaker]],
   description                   = [[Construction Assistant, Builds at 10 m/s]],
@@ -89,6 +89,4 @@ unitDef = {
             },
         },
     },
-}
-
-return lowerkeys({ staticcon = unitDef })
+} }

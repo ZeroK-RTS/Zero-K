@@ -1,4 +1,4 @@
-unitDef = {
+return { fakeunit_los = {
   unitname              = [[fakeunit_los]],
   name                  = [[LOS Provider]],
   description           = [[Knows all and sees all]],
@@ -42,6 +42,4 @@ unitDef = {
   stealth               = true,
   turnRate              = 0,
   workerTime            = 0,
-}
-
-return lowerkeys({ fakeunit_los = unitDef })
+} }

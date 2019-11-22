@@ -1,4 +1,4 @@
-unitDef = {
+return { commrecon1 = {
   unitname            = [[commrecon1]],
   name                = [[Recon Commander]],
   description         = [[High Mobility Commander, Builds at 10 m/s]],
@@ -215,6 +215,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ commrecon1 = unitDef })
+} }

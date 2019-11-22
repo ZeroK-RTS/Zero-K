@@ -1,4 +1,4 @@
-unitDef = {
+return { amphfloater = {
   unitname               = [[amphfloater]],
   name                   = [[Buoy]],
   description            = [[Heavy Amphibious Skirmisher Bot]],
@@ -173,6 +173,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphfloater = unitDef })
+} }

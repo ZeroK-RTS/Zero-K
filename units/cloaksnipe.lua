@@ -1,4 +1,4 @@
-unitDef = {
+return { cloaksnipe = {
   unitname               = [[cloaksnipe]],
   name                   = [[Phantom]],
   description            = [[Cloaked Skirmish/Anti-Heavy Artillery Bot]],
@@ -136,6 +136,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloaksnipe = unitDef })
+} }

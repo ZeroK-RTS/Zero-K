@@ -1,4 +1,4 @@
-unitDef = {
+return { amphriot = {
   unitname               = [[amphriot]],
   name                   = [[Scallop]],
   description            = [[Amphibious Riot Bot (Anti-Sub)]],
@@ -180,6 +180,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphriot = unitDef })
+} }

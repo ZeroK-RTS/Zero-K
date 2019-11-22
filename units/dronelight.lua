@@ -1,4 +1,4 @@
-unitDef = {
+return { dronelight = {
   unitname            = [[dronelight]],
   name                = [[Firefly]],
   description         = [[Attack Drone]],
@@ -105,6 +105,4 @@ unitDef = {
     },
   },
 
-}
-
-return lowerkeys({ dronelight = unitDef })
+} }

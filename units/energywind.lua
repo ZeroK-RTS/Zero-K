@@ -1,4 +1,4 @@
-unitDef = {
+return { energywind = {
   unitname                      = [[energywind]],
   name                          = [[Wind/Tidal Generator]],
   description                   = [[Small Powerplant]],
@@ -75,6 +75,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ energywind = unitDef })
+} }

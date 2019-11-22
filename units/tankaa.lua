@@ -1,4 +1,4 @@
-unitDef = {
+return { tankaa = {
   unitname               = [[tankaa]],
   name                   = [[Ettin]],
   description            = [[Flak Anti-Air Tank]],
@@ -133,6 +133,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ tankaa = unitDef })
+} }

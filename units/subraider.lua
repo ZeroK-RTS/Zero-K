@@ -1,4 +1,4 @@
-unitDef = {
+return { subraider = {
   unitname               = [[subraider]],
   name                   = [[Seawolf]],
   description            = [[Attack Submarine (Stealth Raider)]],
@@ -185,6 +185,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ subraider = unitDef })
+} }

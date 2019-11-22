@@ -1,4 +1,4 @@
-unitDef = {
+return { spideraa = {
   unitname               = [[spideraa]],
   name                   = [[Tarantula]],
   description            = [[Anti-Air Spider]],
@@ -125,6 +125,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spideraa = unitDef })
+} }

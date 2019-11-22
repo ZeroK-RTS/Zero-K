@@ -1,4 +1,4 @@
-unitDef = {
+return { chickend = {
   unitname                      = [[chickend]],
   name                          = [[Chicken Tube]],
   description                   = [[Defense and energy source]],
@@ -119,6 +119,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chickend = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { staticantinuke = {
   unitname                      = [[staticantinuke]],
   name                          = [[Antinuke]],
   description                   = [[Strategic Nuke Interception System]],
@@ -135,6 +135,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticantinuke = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { turretriot = {
   unitname                      = [[turretriot]],
   name                          = [[Stardust]],
   description                   = [[Anti-Swarm Turret]],
@@ -125,6 +125,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretriot = unitDef })
+} }

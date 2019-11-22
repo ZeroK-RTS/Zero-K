@@ -1,4 +1,4 @@
-unitDef = {
+return { turretsunlance = {
   unitname                      = [[turretsunlance]],
   name                          = [[Sunlance]],
   description                   = [[Anti-Tank Turret - Requires 25 Power]],
@@ -129,6 +129,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretsunlance = unitDef })
+} }

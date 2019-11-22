@@ -1,4 +1,4 @@
-unitDef = {
+return { pw_hq_attacker = {
   unitname                      = [[pw_hq_attacker]],
   name                          = [[Attacker Command]],
   description                   = [[PlanetWars Field HQ (changes influence gain)]],
@@ -96,6 +96,4 @@ unitDef = {
     },
   },
 
-}
-
-return lowerkeys({ pw_hq_attacker = unitDef })
+} }
